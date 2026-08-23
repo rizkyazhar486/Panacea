@@ -206,65 +206,6 @@ export function UbinUtangTidur() {
   )
 }
 
-// ── Protein harian ─────────────────────────────────────────────────────────
-//
-// Sasaran 1,6 g/kg berat badan adalah titik jenuh yang berulang kali muncul
-// pada telaah latihan beban; rentang yang dianjurkan 1,2-2,0 g/kg. Karena itu
-// yang digambar adalah RENTANG, bukan satu garis tunggal — dan angkanya hanya
-// muncul bila berat badan memang tercatat.
-export function UbinProtein() {
-  const { state } = useStore()
-  const berat = typeof getVitals().weightKg === 'number' ? (getVitals().weightKg as number) : 0
-
-  const gram = useMemo(() => {
-    const p = (x: number) => String(x).padStart(2, '0')
-    const d = new Date()
-    const hariIni = `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}`
-    let g = 0
-    let ada = false
-    for (const f of state.foods ?? []) {
-      if (f?.date !== hariIni) continue
-      ada = true
-      g += f.protein ?? 0
-    }
-    return ada ? g : null
-  }, [state.foods])
-
-  if (!berat || gram == null) return null
-  const bawah = berat * 1.2
-  const target = berat * 1.6
-  const atas = berat * 2.0
-
-  return (
-    <section>
-      <Kepala judul="Protein hari ini" ke="/nutrition" />
-      <div className="kaca rounded-3xl p-3">
-        <div className="flex items-baseline gap-1.5">
-          <span className="text-[26px] font-black leading-none tabular-nums nyala text-ink dark:text-white">{Math.round(gram)}</span>
-          <span className="t-mikro font-bold text-neutral-400">g</span>
-          <span className="t-mikro ml-auto shrink-0 tabular-nums text-neutral-400">
-            {Math.round(bawah)}–{Math.round(atas)} g untuk {berat} kg
-          </span>
-        </div>
-        <span className="relative mt-2 block h-2.5 w-full rounded-full bg-neutral-200 dark:bg-white/10" aria-hidden>
-          {/* Pita rentang anjuran digambar lebih dahulu, lalu batang asupan di
-              atasnya: yang ditanyakan orang adalah "sudah masuk rentang atau
-              belum", dan itu hanya terbaca bila keduanya satu sumbu. */}
-          <span
-            className="absolute inset-y-0 rounded-full bg-brand/25"
-            style={{ left: `${(bawah / (atas * 1.15)) * 100}%`, width: `${((atas - bawah) / (atas * 1.15)) * 100}%` }}
-          />
-          <span className="absolute inset-y-0 w-px bg-neutral-600 dark:bg-white/60" style={{ left: `${(target / (atas * 1.15)) * 100}%` }} />
-          <span className="absolute inset-y-0 left-0 rounded-full bg-brand" style={{ width: `${Math.min(100, (gram / (atas * 1.15)) * 100)}%` }} />
-        </span>
-        <p className="t-mikro mt-1.5 leading-snug text-neutral-400">
-          Pita = 1,2–2,0 g/kg; garis = 1,6 g/kg, titik jenuh pada telaah latihan beban. Untuk penyakit ginjal kronik, sasarannya berbeda dan ditentukan dokter.
-        </p>
-      </div>
-    </section>
-  )
-}
-
 // ── Tekanan darah ──────────────────────────────────────────────────────────
 export function UbinTekanan() {
   const { sis, dia, deret } = useMemo(() => {

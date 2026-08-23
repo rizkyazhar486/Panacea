@@ -2,6 +2,7 @@ import { useMemo } from 'react'
 import { Link } from 'react-router-dom'
 import { useStore } from '../lib/store'
 import { deretMetrik } from '../lib/riwayatVitals'
+import { getVitals } from '../lib/healthVitals'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Dua widget lebar yang menggambarkan hari: tidur dan asupan.
@@ -143,6 +144,7 @@ export function UbinGiziLebar() {
   }, [state.foods])
 
   if (!(state.foods ?? []).length) return null
+  const berat = typeof getVitals().weightKg === 'number' ? (getVitals().weightKg as number) : 0
 
   // Energi dari makronutrien: 4 kkal/g karbohidrat dan protein, 9 kkal/g lemak
   // (faktor Atwater). Dipakai untuk PERBANDINGAN antar-makro, bukan untuk
@@ -172,6 +174,28 @@ export function UbinGiziLebar() {
             </span>
           )}
         </div>
+
+        {/* PITA PROTEIN DILIPAT KE SINI dari widget tersendiri.
+            Dua widget yang sama-sama menjawab "sudah cukup makan apa belum"
+            memaksa mata memeriksa keduanya untuk satu pertanyaan. Sasarannya
+            tetap sama: pita 1,2-2,0 g/kg dengan garis 1,6 g/kg — bentuk
+            buktinya memang rentang, bukan satu angka. */}
+        {berat > 0 && protein > 0 && (
+          <div className="mt-2">
+            <div className="flex items-baseline justify-between gap-2">
+              <span className="t-mikro text-neutral-500">Protein <b className="text-ink dark:text-white">{Math.round(protein)} g</b></span>
+              <span className="t-mikro tabular-nums text-neutral-400">{Math.round(berat * 1.2)}–{Math.round(berat * 2)} g untuk {berat} kg</span>
+            </div>
+            <span className="relative mt-1 block h-2 w-full rounded-full bg-neutral-200 dark:bg-white/10" aria-hidden>
+              <span
+                className="absolute inset-y-0 rounded-full bg-brand/25"
+                style={{ left: `${(1.2 / 2.3) * 100}%`, width: `${(0.8 / 2.3) * 100}%` }}
+              />
+              <span className="absolute inset-y-0 w-px bg-neutral-600 dark:bg-white/60" style={{ left: `${(1.6 / 2.3) * 100}%` }} />
+              <span className="absolute inset-y-0 left-0 rounded-full bg-brand" style={{ width: `${Math.min(100, (protein / berat / 2.3) * 100)}%` }} />
+            </span>
+          </div>
+        )}
 
         {eTotal > 0 ? (
           <>

@@ -33,10 +33,11 @@ import { UbinPewaktu } from './UbinPewaktu'
 import { UbinNotifikasi } from './UbinNotifikasi'
 import { UbinMata, UbinFokus, UbinKopi } from './UbinWaktuHidup'
 import { UbinPuasa } from './UbinPuasa'
-import { UbinZona2, UbinPemulihanDenyut, UbinUtangTidur, UbinProtein, UbinTekanan, UbinNapas, UbinDuduk } from './UbinLanjutan'
+import { UbinZona2, UbinPemulihanDenyut, UbinUtangTidur, UbinTekanan, UbinNapas, UbinDuduk } from './UbinLanjutan'
 import { UbinHrv, UbinTahapTidur, UbinEfisiensiTidur, UbinLajuNapas, UbinSaturasi, UbinSuhu } from './UbinPerangkat'
 import { UbinLingkungan } from './UbinLingkungan'
 import { UbinLab } from './UbinLab'
+import { UbinPangan } from './UbinPangan'
 import { UbinTenaga, UbinHidrasi, UbinCahaya, UbinTangga, UbinVo2Tren, UbinKomposisi, UbinSuplemen, UbinSuhuEkstrem } from './UbinHarianPlus'
 import { UbinTidurLebar, UbinGiziLebar } from './UbinTidurGizi'
 import { PetaKonsistensi } from './PetaKonsistensi'
@@ -343,18 +344,6 @@ function KartuGrafikOlahraga() {
  * dalam satu bentuk membuat mata harus memeriksa tiap ubin untuk tahu ia jenis
  * yang mana. Bentuknya dibuat lebih rendah supaya perbedaan itu terbaca sekilas.
  */
-function UbinPintasan({ w }: { w: (typeof WIDGETS)[number] }) {
-  // Bila fitur ini punya ubin hidup DAN datanya sudah ada, angkanya yang
-  // ditampilkan. Ubin hidup mengembalikan null ketika datanya belum ada,
-  // sehingga pintu biasa di bawah ini tetap menjadi jalan keluarnya.
-  // Widget tanpa ubin hidup tidak digambar sama sekali, dan widget yang
-  // ubinnya belum punya data pun tidak: kartu berisi lambang dan nama fitur
-  // adalah PINTU, bukan widget, dan papan yang penuh pintu membuat aplikasi
-  // ini terbaca sebagai menu belaka — terutama bagi pemakai baru, yang justru
-  // paling mudah menyimpulkan begitu.
-  const Langsung = UBIN_LANGSUNG[w.id]
-  return Langsung ? Langsung() : null
-}
 
 /**
  * Rincian angka tubuh sebagai daftar baris.
@@ -493,22 +482,6 @@ export function PapanWidget({ pratinjau, tanggalCatatan }: { pratinjau: Pratinja
   // Wilayah yang sudah punya grafik tujuh hari tidak diulang sebagai ubin teks.
   const bergrafik = wilayahBergrafik(state)
 
-  /* HANYA WIDGET YANG PUNYA UBIN HIDUP.
-     Sebelum ini, widget tanpa ubin hidup tetap digambar sebagai kartu berisi
-     lambang, nama, dan satu baris keterangan — sebuah PINTU. Di layar itu
-     terbaca persis seperti yang dikeluhkan: widget yang isinya hanya tulisan.
-     Pintu ke fitur mana pun tetap ada di kisi fitur, di pencarian, dan di menu
-     tombol melayang; ia tidak perlu menempati petak widget juga. */
-  const pintasan = WIDGETS.filter(
-    (w) => pilihan.includes(w.id) && !BERKARTU.includes(w.id) && UBIN_LANGSUNG[w.id]
-      // Widget yang wilayahnya SUDAH digambar sebagai grafik tujuh hari tidak
-      // digambar dua kali. Sebelum ini "Latihan" muncul sebagai tujuh batang di
-      // bagian Tujuh hari DAN sebagai ubin "Latihan 7 hari" beberapa petak di
-      // bawahnya — angka yang sama, dua kali, pada satu layar.
-      && !(w.id === 'pelatih' && bergrafik.includes('latihan'))
-      && !(w.id === 'tidur' && bergrafik.includes('tidur'))
-      && !(w.id === 'detakJantung' && bergrafik.includes('tubuh'))
-  )
 
   const DI_PANEL_ATAS = ['weightKg', 'restingHr', 'td']
   const td = barisTekananDarah()
@@ -537,6 +510,15 @@ export function PapanWidget({ pratinjau, tanggalCatatan }: { pratinjau: Pratinja
         berdampingan justru menambah pekerjaan tangan tanpa menghemat apa pun. */}
     <Tumpukan
       judul="Ringkas"
+      /* Tombol pengaturnya ikut pindah ke sini bersama widgetnya. Sebelum ini
+         ia menumpang di kepala bagian "Widget" — dan ketika bagian itu dihapus
+         karena seluruh isinya sudah pindah ke tumpukan, satu-satunya jalan
+         mengatur widget ikut terhapus bersamanya. */
+      aksi={
+        <button onClick={() => setAturBuka(true)} className="t-kecil flex min-h-[40px] shrink-0 items-center whitespace-nowrap font-bold text-brand">
+          Atur widget
+        </button>
+      }
       /* DITULIS SEBAGAI ELEMEN <Komponen />, BUKAN DIPANGGIL SEBAGAI FUNGSI.
          Percobaan pertama memanggil UBIN_LEBAR.salat?.() untuk memeriksa
          apakah ada isinya sebelum dimasukkan ke tumpukan. Itu memanggil
@@ -555,6 +537,7 @@ export function PapanWidget({ pratinjau, tanggalCatatan }: { pratinjau: Pratinja
         ...(pilihan.includes('giziLebar') ? [{ kunci: 'giziLebar', isi: <UbinGiziLebar /> }] : []),
         ...(pilihan.includes('motivasi') ? [{ kunci: 'motivasi', isi: <UbinMotivasi /> }] : []),
         ...(pilihan.includes('lingkungan') ? [{ kunci: 'lingkungan', isi: <UbinLingkungan /> }] : []),
+        ...(pilihan.includes('pangan') ? [{ kunci: 'pangan', isi: <UbinPangan /> }] : []),
         ...(pilihan.includes('lab') ? [{ kunci: 'lab', isi: <UbinLab /> }] : []),
         ...(pilihan.includes('tenaga') ? [{ kunci: 'tenaga', isi: <UbinTenaga /> }] : []),
         ...(pilihan.includes('hidrasi2') ? [{ kunci: 'hidrasi2', isi: <UbinHidrasi /> }] : []),
@@ -573,7 +556,6 @@ export function PapanWidget({ pratinjau, tanggalCatatan }: { pratinjau: Pratinja
         ...(pilihan.includes('zona2') ? [{ kunci: 'zona2', isi: <UbinZona2 /> }] : []),
         ...(pilihan.includes('hrr') ? [{ kunci: 'hrr', isi: <UbinPemulihanDenyut /> }] : []),
         ...(pilihan.includes('utangTidur') ? [{ kunci: 'utangTidur', isi: <UbinUtangTidur /> }] : []),
-        ...(pilihan.includes('protein') ? [{ kunci: 'protein', isi: <UbinProtein /> }] : []),
         ...(pilihan.includes('tekanan') ? [{ kunci: 'tekanan', isi: <UbinTekanan /> }] : []),
         ...(pilihan.includes('napas') ? [{ kunci: 'napas', isi: <UbinNapas /> }] : []),
         ...(pilihan.includes('duduk') ? [{ kunci: 'duduk', isi: <UbinDuduk /> }] : []),
@@ -622,26 +604,6 @@ export function PapanWidget({ pratinjau, tanggalCatatan }: { pratinjau: Pratinja
 
     {adaGrafik && <KartuGrafikOlahraga />}
 
-    <section>
-      <div className="mb-2 flex items-baseline justify-between gap-2">
-        <h2 className="t-kecil font-black uppercase tracking-wide text-neutral-500">Widget</h2>
-        <button onClick={() => setAturBuka(true)} className="t-kecil flex min-h-[40px] items-center font-bold text-brand">
-          Atur widget
-        </button>
-      </div>
-      {pintasan.length ? (
-        <div className="grid grid-cols-2 gap-fluid">
-          {pintasan.map((w) => <UbinPintasan key={w.id} w={w} />)}
-        </div>
-      ) : (
-        <button
-          onClick={() => setAturBuka(true)}
-          className="t-kecil flex min-h-[76px] w-full items-center justify-center rounded-3xl border border-dashed border-neutral-300 px-3 text-center leading-snug text-neutral-500 dark:border-white/20"
-        >
-          Pilih widget →
-        </button>
-      )}
-    </section>
 
     {aturBuka && <PemilihWidget tutup={() => setAturBuka(false)} />}
     </>

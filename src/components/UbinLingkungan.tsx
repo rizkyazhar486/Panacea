@@ -27,8 +27,30 @@ interface Data {
   pm10?: number
   uv?: number
   uvMaks?: number
+  suhuC?: number
+  terasaC?: number
+  lembapPct?: number
+  terbit?: string
+  terbenam?: string
   sumber: string
   error?: string
+}
+
+/**
+ * Keterangan risiko panas saat berlatih, dari suhu yang DIRASAKAN.
+ *
+ * Ambangnya mengikuti bentuk peringatan panas yang lazim dipakai layanan
+ * cuaca (indeks panas): di bawah 27 °C tidak ada peringatan khusus, 27-32 °C
+ * kelelahan panas mungkin terjadi pada aktivitas lama, 32-41 °C kram dan
+ * kelelahan panas semakin mungkin, di atas itu sengatan panas menjadi
+ * ancaman nyata. Yang dipakai suhu terasa, bukan suhu udara, karena pada
+ * kelembapan tinggi keringat menguap lebih lambat.
+ */
+function risikoPanas(terasa: number): { label: string; kelas: string; saran: string } | null {
+  if (terasa < 27) return null
+  if (terasa < 32) return { label: 'Hati-hati', kelas: 'bg-amber-500', saran: 'Sesi panjang di luar: tambah minum dan pilih jam yang lebih teduh.' }
+  if (terasa < 41) return { label: 'Sangat hati-hati', kelas: 'bg-orange-500', saran: 'Kram dan kelelahan panas makin mungkin. Turunkan intensitas, perbanyak jeda minum.' }
+  return { label: 'Berbahaya', kelas: 'bg-rose-500', saran: 'Sengatan panas menjadi ancaman nyata. Pindahkan latihan ke dalam ruangan atau ke pagi buta.' }
 }
 
 const TINGKAT_AQI: { batas: number; label: string; kelas: string }[] = [
@@ -110,6 +132,38 @@ export function UbinLingkungan() {
             </div>
           )}
         </div>
+
+        {/* Cuaca latihan: suhu terasa, kelembapan, dan jendela matahari.
+            Ketiganya dari permintaan yang sama, jadi tidak menambah beban
+            jaringan sama sekali. */}
+        {(data.terasaC != null || data.terbit) && (
+          <div className="mt-2 border-t border-neutral-100 pt-2 dark:border-white/10">
+            <div className="flex items-baseline gap-2">
+              {data.terasaC != null && (
+                <>
+                  <span className="text-[20px] font-black leading-none tabular-nums text-ink dark:text-white">{Math.round(data.terasaC)}°</span>
+                  <span className="t-mikro font-bold text-neutral-400">
+                    terasa{data.suhuC != null ? ` · udara ${Math.round(data.suhuC)}°` : ''}{data.lembapPct != null ? ` · lembap ${Math.round(data.lembapPct)}%` : ''}
+                  </span>
+                </>
+              )}
+              {data.terbit && data.terbenam && (
+                <span className="t-mikro ml-auto shrink-0 tabular-nums text-neutral-400">
+                  ☀ {data.terbit.slice(11, 16)}–{data.terbenam.slice(11, 16)}
+                </span>
+              )}
+            </div>
+            {data.terasaC != null && (() => {
+              const r = risikoPanas(data.terasaC)
+              return r ? (
+                <p className="t-mikro mt-1 leading-snug text-neutral-500 dark:text-neutral-400">
+                  <span className={`mr-1 inline-block rounded-full px-1.5 py-0.5 font-black text-white ${r.kelas}`}>{r.label}</span>
+                  {r.saran}
+                </p>
+              ) : null
+            })()}
+          </div>
+        )}
 
         {u && <p className="t-mikro mt-2 leading-snug text-neutral-500 dark:text-neutral-400">{u.saran}</p>}
         <p className="t-mikro mt-1 text-neutral-400">

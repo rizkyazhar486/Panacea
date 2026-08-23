@@ -582,6 +582,19 @@ async function aturanLingkungan(k: Konteks): Promise<{ id: string; kabar: Kabar 
       },
     }
   }
+  // Panas didahulukan atas UV: sengatan panas melukai pada hari itu juga,
+  // sedangkan kerusakan sinar UV menumpuk bertahun-tahun. Ketika keduanya
+  // terpenuhi, yang mendesak yang dikirim.
+  if (typeof l.terasaC === 'number' && l.terasaC >= 32) {
+    return {
+      id: 'panasBerbahaya',
+      kabar: {
+        judul: `Terasa ${Math.round(l.terasaC)}° di ${kota}`,
+        badan: `Suhu udara ${l.suhuC != null ? `${Math.round(l.suhuC)}°` : '—'} dengan kelembapan ${l.lembapPct != null ? `${Math.round(l.lembapPct)}%` : '—'}. Pada suhu terasa setinggi ini, kram dan kelelahan panas makin mungkin: turunkan intensitas, perbanyak jeda minum, atau pindah ke dalam ruangan.`,
+        url: './#/latihan',
+      },
+    }
+  }
   if (typeof l.uvMaks === 'number' && l.uvMaks >= 8) {
     return {
       id: 'uvTinggi',

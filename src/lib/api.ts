@@ -318,10 +318,18 @@ export const api = {
   getHealthWebhookToken: () => req<{ token: string }>('/api/health-profile/webhook-token').then((r) => r.token),
   rotateHealthWebhookToken: () => req<{ token: string }>('/api/health-profile/webhook-token/rotate', { method: 'POST' }).then((r) => r.token),
   // Live sports scores (free sources — see server/src/sports.ts for coverage & gaps)
+  cariPangan: (q: string, kode?: string) =>
+    req<{ pangan: { kode?: string; nama: string; merek?: string; kkal100?: number; karbo100?: number; protein100?: number; lemak100?: number; serat100?: number; garam100?: number; sumber: string }[] }>(
+      `/api/pangan?q=${encodeURIComponent(q)}${kode ? `&kode=${encodeURIComponent(kode)}` : ''}`,
+    ).then((r) => r.pangan),
   simpanRingkasan: (ringkasan: Record<string, unknown>) =>
     req<{ ringkasan: Record<string, unknown> }>('/api/ringkasan', { method: 'PUT', body: JSON.stringify({ ringkasan }) }),
   lingkungan: (kota: string) =>
-    req<{ kota: string; aqi?: number; pm25?: number; pm10?: number; uv?: number; uvMaks?: number; sumber: string; error?: string }>(
+    req<{
+      kota: string; aqi?: number; pm25?: number; pm10?: number; uv?: number; uvMaks?: number
+      suhuC?: number; terasaC?: number; lembapPct?: number; terbit?: string; terbenam?: string
+      sumber: string; error?: string
+    }>(
       `/api/lingkungan?kota=${encodeURIComponent(kota)}`,
     ),
   getSportsLeagues: () => req<{ leagues: { id: string; label: string }[]; unavailable: { leagueId: string; label: string; unavailable: true; reason: string }[] }>('/api/sports/leagues'),

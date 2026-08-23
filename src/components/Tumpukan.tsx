@@ -19,7 +19,7 @@ import { useEffect, useRef, useState, type ReactNode } from 'react'
 // ponselnya.
 // ─────────────────────────────────────────────────────────────────────────────
 
-export function Tumpukan({ judul, anak }: { judul?: string; anak: { kunci: string; isi: ReactNode }[] }) {
+export function Tumpukan({ judul, anak, aksi }: { judul?: string; anak: { kunci: string; isi: ReactNode }[]; aksi?: ReactNode }) {
   const wadah = useRef<HTMLDivElement>(null)
   const [aktif, setAktif] = useState(0)
   /* TINGGI MENGIKUTI HALAMAN YANG SEDANG TAMPAK.
@@ -101,24 +101,43 @@ export function Tumpukan({ judul, anak }: { judul?: string; anak: { kunci: strin
 
   return (
     <section>
-      {judul && tampil.length > 1 && (
+      {judul && (
         <div className="mb-2 flex items-center justify-between gap-2">
           <h2 className="t-kecil font-black uppercase tracking-wide text-neutral-500">{judul}</h2>
+          {aksi}
           {/* Titik halaman: penanda letak DAN tombol. Pada iOS titik ini hanya
               penanda, tetapi di sini ia juga dapat ditekan — pada layar sentuh
               yang lebar, menggeser empat kali lebih lelah daripada menekan
               titik keempat. */}
-          <div className="flex items-center gap-1.5">
-            {tampil.map((a, i) => (
-              <button
-                key={a.kunci}
-                onClick={() => ke(i)}
-                aria-label={`Widget ${i + 1} dari ${tampil.length}`}
-                aria-current={i === aktif}
-                className={`h-1.5 rounded-full transition-all ${i === aktif ? 'w-4 bg-brand' : 'w-1.5 bg-neutral-300 dark:bg-white/25'}`}
-              />
-            ))}
-          </div>
+          {/* TITIK BERUBAH MENJADI BILAH SAAT HALAMANNYA BANYAK.
+              Dua puluh lima titik pada layar 390 px meluber keluar tepi dan
+              tidak lagi dapat ditekan satu per satu — terlihat pada tangkapan
+              layar. Di atas sepuluh halaman, penandanya menjadi bilah kemajuan
+              beserta nomornya: satu benda kecil yang tetap terbaca berapa pun
+              banyaknya. */}
+          {tampil.length > 10 ? (
+            <div className="ml-auto flex shrink-0 items-center gap-1.5">
+              <span className="t-mikro tabular-nums text-neutral-400">{aktif + 1}/{tampil.length}</span>
+              <span className="block h-1.5 w-16 rounded-full bg-neutral-300 dark:bg-white/25" aria-hidden>
+                <span
+                  className="block h-full rounded-full bg-brand transition-all"
+                  style={{ width: `${((aktif + 1) / tampil.length) * 100}%` }}
+                />
+              </span>
+            </div>
+          ) : (
+            <div className="ml-auto flex items-center gap-1.5">
+              {tampil.length > 1 && tampil.map((a, i) => (
+                <button
+                  key={a.kunci}
+                  onClick={() => ke(i)}
+                  aria-label={`Widget ${i + 1} dari ${tampil.length}`}
+                  aria-current={i === aktif}
+                  className={`h-1.5 rounded-full transition-all ${i === aktif ? 'w-4 bg-brand' : 'w-1.5 bg-neutral-300 dark:bg-white/25'}`}
+                />
+              ))}
+            </div>
+          )}
         </div>
       )}
 

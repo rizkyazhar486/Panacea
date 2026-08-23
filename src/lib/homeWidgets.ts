@@ -110,6 +110,7 @@ export const WIDGETS: WidgetDef[] = [
   { id: 'komposisi', label: 'Komposisi Tubuh', ringkas: 'Berat, lemak, otot rangka', ke: '/tubuh', emoji: '⚖️', kategori: 'Tubuh & Data', bawaan: true },
   { id: 'suplemen', label: 'Suplemen', ringkas: 'Daftar sendiri, tanpa anjuran', ke: '/harian', emoji: '💊', kategori: 'Gizi', bawaan: true },
   { id: 'suhuEkstrem', label: 'Panas & Dingin', ringkas: 'Sauna dan rendaman dingin', ke: '/harian', emoji: '🔥', kategori: 'Tidur & Pemulihan', bawaan: true },
+  { id: 'pangan', label: 'Cari Pangan Kemasan', ringkas: 'Barcode atau nama, dari Open Food Facts', ke: '/nutrition', emoji: '🔎', kategori: 'Gizi', bawaan: true },
   { id: 'lab', label: 'Hasil Lab', ringkas: 'HbA1c, ApoB, eGFR, dan perjalanannya', ke: '/tubuh', emoji: '🧪', kategori: 'Klinis & Belajar', bawaan: true },
   { id: 'lingkungan', label: 'Udara & UV', ringkas: 'AQI dan indeks UV kota Anda', ke: '/tubuh', emoji: '🌤️', kategori: 'Tubuh & Data', bawaan: true },
   { id: 'hrv', label: 'HRV Semalam', ringkas: 'Terhadap kebiasaan 14 hari', ke: '/tubuh?t=jantung', emoji: '💓', kategori: 'Tidur & Pemulihan', bawaan: true },
@@ -121,7 +122,6 @@ export const WIDGETS: WidgetDef[] = [
   { id: 'zona2', label: 'Zona 2 Sepekan', ringkas: 'Menit di 60–70% HRmaks', ke: '/latihan?t=analisis', emoji: '🫀', kategori: 'Latihan', bawaan: true },
   { id: 'hrr', label: 'Pemulihan Denyut', ringkas: 'Turun berapa bpm dalam 1 menit', ke: '/latihan?t=analisis', emoji: '📉', kategori: 'Latihan', bawaan: true },
   { id: 'utangTidur', label: 'Utang Tidur', ringkas: '7 malam terhadap kebiasaan', ke: '/pola-tidur', emoji: '😴', kategori: 'Tidur & Pemulihan', bawaan: true },
-  { id: 'protein', label: 'Protein Hari Ini', ringkas: 'Terhadap 1,2–2,0 g/kg', ke: '/nutrition', emoji: '🍗', kategori: 'Gizi', bawaan: true },
   { id: 'tekanan', label: 'Tekanan Darah', ringkas: 'Sistolik dan diastolik', ke: '/tubuh', emoji: '🩸', kategori: 'Tubuh & Data', bawaan: true },
   { id: 'napas', label: 'Napas 2 Menit', ringkas: 'Panduan napas terpandu', ke: '/harian', emoji: '🌬️', kategori: 'Tubuh & Data', bawaan: true },
   { id: 'duduk', label: 'Duduk', ringkas: 'Pengingat berdiri tiap 30 menit', ke: '/harian', emoji: '🪑', kategori: 'Tubuh & Data', bawaan: true },
@@ -294,59 +294,22 @@ export const WIDGETS: WidgetDef[] = [
  * yang berhak menempati beranda.
  */
 export const WIDGET_HIDUP = [
-  'pantauan',       // daftar pilihan sendiri: penyakit, obat, skor, stasiun
-  'kebugaran',      // bugar/lelah/segar + keputusan hari ini
-  'grafikLatihan',
-  'grafikTidur',
-  'grafikLangkah',
-  'grafikGizi',
-  'grafikDenyut',
-  'tubuh',          // langkah hari ini + cincin kebiasaan
-  'pelatih',        // latihan 7 hari
-  'tidur',          // tidur semalam + 14 malam
-  'detakJantung',   // denyut istirahat + garis
-  'longevity',      // kapasitas aerobik + selisih MET
-  'salat',          // salat berikutnya + hitungan mundur
-  'konsistensi',    // peta 12 pekan: hari mana saja yang tercatat
-  'motivasi',       // rangkaian hari + pekan ini vs pekan lalu
-  'obatCepat',      // cari dosis SKDI di dalam ubinnya
-  'kalkulatorCepat',// IMT/MAP/LPB/dosis per kg, dihitung di tempat
-  'stasiunSering',  // kasus OSCE tersering per sistem, dari arsip
-  'skorTim',        // pertandingan tim favorit, dari server skor
-  'tidurLebar',     // 14 malam + kebiasaan sendiri
-  'giziLebar',      // kalori hari ini + susunan makro
-  'inspirasi',      // 97 kartu: kisah ketahanan, kutipan atlet, semangat koas
-  'kartuBelajar',   // kartu tatalaksana yang jawabannya ditutup
-  'soalHarian',     // satu soal dari bank soal, dengan pembahasan
-  'pewaktu',        // hitungan mundur nap dan AMRAP
-  'pengingat',      // saklar notifikasi latihan, gol tim, adzan, salat
-  'mata',           // 20-20-20
-  'fokus',          // sesi kerja/menatap layar
-  'kopi',           // kopi terakhir + perkiraan sisa kafein
-  'puasa',          // menuju Magrib + jendela makan
-  'zona2',          // menit zona 2 sepekan, dari deret denyut
-  'hrr',            // pemulihan denyut satu menit
-  'utangTidur',     // tujuh malam terhadap kebiasaan sendiri
-  'protein',        // gram hari ini terhadap 1,2-2,0 g/kg
-  'tekanan',        // sistolik/diastolik + 14 bacaan
-  'napas',          // panduan napas dua menit
-  'duduk',          // pengingat berdiri
-  'hrv',            // HRV semalam + kebiasaan 14 hari
-  'tahapTidur',     // dalam/REM/inti dari perangkat
-  'efisiensiTidur', // tidur ÷ waktu di ranjang
-  'lajuNapas',      // napas per menit semalam
-  'saturasi',       // SpO2 semalam
-  'suhu',           // simpangan suhu dari kebiasaan
-  'lingkungan',     // AQI + UV dari Open-Meteo lewat server
-  'lab',            // hasil lab yang dimasukkan sendiri + rentang rujukan
-  'tenaga',         // tenaga yang dirasakan, 1-5
-  'hidrasi2',       // cairan hari ini
-  'cahaya',         // cahaya pagi + rangkaian
-  'tangga',         // lantai ditapaki
-  'vo2tren',        // perjalanan VO2max
-  'komposisi',      // berat + lemak + otot
-  'suplemen',       // daftar sendiri
-  'suhuEkstrem',    // sauna & rendaman dingin
+  // ── Ringkasan hari ini ──────────────────────────────────────────────────
+  'pantauan', 'kebugaran', 'salat', 'konsistensi', 'motivasi',
+  // ── Tidur & pemulihan ───────────────────────────────────────────────────
+  'tidurLebar', 'utangTidur', 'hrv', 'tahapTidur', 'efisiensiTidur', 'suhuEkstrem',
+  // ── Latihan ─────────────────────────────────────────────────────────────
+  'zona2', 'hrr', 'vo2tren', 'tangga', 'pewaktu',
+  // ── Gizi ────────────────────────────────────────────────────────────────
+  'giziLebar', 'hidrasi2', 'pangan', 'kopi', 'puasa', 'suplemen',
+  // ── Tubuh & vital ───────────────────────────────────────────────────────
+  'komposisi', 'tekanan', 'lajuNapas', 'saturasi', 'suhu', 'lab', 'tenaga',
+  // ── Grafik tujuh hari (kisi dua kolom, bukan tumpukan) ──────────────────
+  'grafikLatihan', 'grafikTidur', 'grafikLangkah', 'grafikGizi', 'grafikDenyut',
+  // ── Belajar & klinis ────────────────────────────────────────────────────
+  'obatCepat', 'kalkulatorCepat', 'stasiunSering', 'kartuBelajar', 'soalHarian', 'inspirasi',
+  // ── Hidup & lingkungan ──────────────────────────────────────────────────
+  'skorTim', 'lingkungan', 'cahaya', 'mata', 'fokus', 'duduk', 'napas', 'pengingat',
 ] as const
 
 /** Katalog yang boleh menempati beranda. */

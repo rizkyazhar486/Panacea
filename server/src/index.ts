@@ -118,7 +118,7 @@ import { parseHealthWebhookPayload, extractHeartRateSeries, extractSleepSessions
 import { checkHrZoneAlert, checkBedtimeReminder, checkWorkoutReminder, suggestedBedtime, ZONES } from './healthAlerts.js'
 import { fetchLeagueScoreboard, fetchF1Info, fetchMotoGpInfo, LEAGUES, UNAVAILABLE } from './sports.js'
 import { checkPrayerReminder } from './salat.js'
-import { lingkunganKota } from './lingkungan.js'
+import { lingkunganKota, cariPangan } from './lingkungan.js'
 import { jalankanAturanNotif } from './aturanNotif.js'
 import { searchPubmed } from './pubmed.js'
 import { fetchQuote, fetchQuotes, searchSymbols, INSTRUMENTS, UNGGULAN, WATCHLIST_MAX, RANGES, isValidSymbol, type Range } from './markets.js'
@@ -853,6 +853,13 @@ app.get('/api/sports/scores', async (req, res) => {
 app.put('/api/ringkasan', requireAuth, (req, res) => {
   const u = (req as any).user as { id: string }
   res.json({ ringkasan: saveRingkasan(u.id, (req.body as { ringkasan?: Record<string, unknown> })?.ringkasan ?? {}) })
+})
+// Pencarian pangan (Open Food Facts) — publik, tidak memuat data siapa pun.
+app.get('/api/pangan', async (req, res) => {
+  const q = String(req.query.q ?? '').slice(0, 60)
+  const kode = String(req.query.kode ?? '').replace(/[^0-9]/g, '').slice(0, 20)
+  if (!q && !kode) { res.json({ pangan: [] }); return }
+  res.json({ pangan: await cariPangan(q, kode || undefined) })
 })
 app.get('/api/lingkungan', async (req, res) => {
   res.json(await lingkunganKota(String(req.query.kota ?? 'Jakarta')))
