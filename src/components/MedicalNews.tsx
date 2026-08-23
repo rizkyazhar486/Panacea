@@ -17,61 +17,61 @@ interface NewsItem {
   title: string
   detail: string
   /** editorial status label — honest curation, not a fake citation */
-  kind: 'Nobel' | 'Clinical Trial' | 'Research' | 'Device' | 'New'
+  kind: 'Nobel' | 'Uji Klinis' | 'Penelitian' | 'Perangkat' | 'Baru'
   /** international vs domestic (Indonesia) coverage — default international */
-  region?: 'Internasional' | 'Domestic'
+  region?: 'Internasional' | 'Dalam Negeri'
 }
 
 const CURATED: NewsItem[] = [
-  { cat: 'CRISPR', kind: 'Clinical Trial', title: 'First CRISPR gene therapy approved', detail: 'Casgevy (exa-cel) — CRISPR/Cas9 editing for sickle cell disease & beta-thalassemia marks the arrival of real clinical gene therapy.' },
-  { cat: 'CRISPR', kind: 'Clinical Trial', title: 'Base and prime editing reach the clinic', detail: 'Single-letter precision DNA editing is now being trialed for familial hypercholesterolemia and inherited metabolic disease.' },
-  { cat: 'Stem Cells', kind: 'Clinical Trial', title: 'Stem-cell-derived islet cells take on type 1 diabetes', detail: 'Insulin-producing cells grown from stem cells have made some patients insulin-independent in early clinical trials.' },
-  { cat: 'Longevity', kind: 'Research', title: 'Epigenetic reprogramming "rejuvenates" cells', detail: 'Partial Yamanaka factors restore youthful markers in cells in preclinical studies — a research frontier aimed at extending healthspan.' },
-  { cat: 'AI', kind: 'Research', title: 'AlphaFold maps the protein universe', detail: 'AlphaFold 3 predicts protein structures and interactions, cutting drug-discovery timelines from years to weeks.' },
-  { cat: 'Nobel', kind: 'Nobel', title: 'Nobel Prize in Medicine: mRNA & microRNA', detail: '2023 — Karikó & Weissman (modified mRNA); 2024 — Ambros & Ruvkun (microRNA): foundations of precision therapeutics.' },
-  { cat: 'Metabolic', kind: 'Clinical Trial', title: 'GLP-1 drugs go beyond weight loss', detail: 'Semaglutide and tirzepatide show benefits for heart health, chronic kidney disease and sleep apnea — far beyond obesity treatment.' },
-  { cat: 'Neuro', kind: 'Clinical Trial', title: 'Anti-amyloid drugs slow Alzheimer’s', detail: 'Lecanemab and donanemab slow early-stage cognitive decline — the first real breakthrough in a decade.' },
-  { cat: 'Devices', kind: 'Device', title: 'Wearables become screening tools', detail: 'Over-the-counter CGMs, watch-based ECG/AFib detection and SpO₂ sensors are bringing early detection to the wrist.' },
-  { cat: 'Genomics', kind: 'Research', title: 'Genome sequencing gets cheaper and faster', detail: 'A full genome now takes hours and costs hundreds of dollars — opening the door to mass mutation screening and precision oncology.' },
-  { cat: 'AI-EMR', kind: 'New', title: 'Ambient clinical documentation arrives', detail: 'AI drafts medical notes straight from doctor–patient conversations, cutting burnout and giving physicians more time with patients.' },
-  { cat: 'Oncology', kind: 'Clinical Trial', title: 'Personalized mRNA cancer vaccines', detail: 'mRNA vaccines tailored to each patient’s tumor are showing promising responses in melanoma and pancreatic cancer.' },
-  { cat: 'Performance', kind: 'Research', title: 'VO₂max — a biomarker for longevity', detail: 'High cardiorespiratory fitness is strongly linked to lower mortality — relevant for Hyrox athletes and team sports alike.' },
-  { cat: 'Performance', kind: 'Research', title: 'Lactate zones guide training and recovery', detail: 'Mapping lactate thresholds is optimizing high-intensity training loads and athlete recovery schedules.' },
-  { cat: 'Immunology', kind: 'Research', title: 'CAR-T cells take aim at autoimmune disease', detail: 'Engineered T-cell therapy, originally developed for blood cancers, is now being trialed for lupus and severe autoimmune conditions.' },
+  { cat: 'CRISPR', kind: 'Uji Klinis', title: 'Terapi gen CRISPR pertama disetujui', detail: 'Casgevy (exa-cel) — penyuntingan CRISPR/Cas9 untuk anemia sel sabit & talasemia beta menandai datangnya terapi gen yang benar-benar dipakai klinis.' },
+  { cat: 'CRISPR', kind: 'Uji Klinis', title: 'Base editing dan prime editing sampai ke klinik', detail: 'Penyuntingan DNA setepat satu huruf kini diujikan pada hiperkolesterolemia familial dan penyakit metabolik keturunan.' },
+  { cat: 'Sel Punca', kind: 'Uji Klinis', title: 'Sel islet dari sel punca menghadapi diabetes tipe 1', detail: 'Sel penghasil insulin yang ditumbuhkan dari sel punca membuat sebagian pasien lepas dari insulin pada uji klinis awal.' },
+  { cat: 'Longevity', kind: 'Penelitian', title: 'Pemrograman ulang epigenetik "memudakan" sel', detail: 'Faktor Yamanaka parsial memulihkan penanda muda pada sel dalam kajian praklinis — batas terdepan penelitian untuk memperpanjang masa sehat.' },
+  { cat: 'AI', kind: 'Penelitian', title: 'AlphaFold memetakan jagat protein', detail: 'AlphaFold 3 meramalkan struktur dan interaksi protein, memangkas waktu penemuan obat dari hitungan tahun menjadi pekan.' },
+  { cat: 'Nobel', kind: 'Nobel', title: 'Nobel Kedokteran: mRNA & microRNA', detail: '2023 — Karikó & Weissman (mRNA termodifikasi); 2024 — Ambros & Ruvkun (microRNA): dasar bagi terapi presisi.' },
+  { cat: 'Metabolik', kind: 'Uji Klinis', title: 'Obat GLP-1 tidak berhenti pada penurunan berat', detail: 'Semaglutid dan tirzepatid menunjukkan manfaat pada kesehatan jantung, penyakit ginjal menahun, dan apnea tidur — jauh melampaui pengobatan obesitas.' },
+  { cat: 'Saraf', kind: 'Uji Klinis', title: 'Obat anti-amiloid memperlambat Alzheimer', detail: 'Lekanemab dan donanemab memperlambat penurunan daya pikir tahap awal — terobosan sungguhan pertama dalam sepuluh tahun.' },
+  { cat: 'Perangkat', kind: 'Perangkat', title: 'Perangkat pakai menjadi alat penapisan', detail: 'Sensor gula darah bebas beli, deteksi EKG/fibrilasi atrium lewat jam tangan, dan sensor SpO₂ membawa deteksi dini ke pergelangan tangan.' },
+  { cat: 'Genomika', kind: 'Penelitian', title: 'Pembacaan genom makin murah dan cepat', detail: 'Satu genom utuh kini selesai dalam hitungan jam dengan biaya ratusan dolar — membuka jalan bagi penapisan mutasi massal dan onkologi presisi.' },
+  { cat: 'AI-EMR', kind: 'Baru', title: 'Pencatatan klinis otomatis mulai dipakai', detail: 'AI menyusun draf catatan medis langsung dari percakapan dokter dan pasien, mengurangi kelelahan kerja dan menambah waktu dokter bersama pasiennya.' },
+  { cat: 'Onkologi', kind: 'Uji Klinis', title: 'Vaksin kanker mRNA yang dipersonalisasi', detail: 'Vaksin mRNA yang disesuaikan dengan tumor tiap pasien menunjukkan respons menjanjikan pada melanoma dan kanker pankreas.' },
+  { cat: 'Penampilan', kind: 'Penelitian', title: 'VO₂maks — biomarker umur panjang', detail: 'Kebugaran kardiorespirasi yang tinggi berkaitan erat dengan angka kematian yang lebih rendah — berlaku bagi atlet Hyrox maupun olahraga beregu.' },
+  { cat: 'Penampilan', kind: 'Penelitian', title: 'Zona laktat menuntun latihan dan pemulihan', detail: 'Pemetaan ambang laktat menyempurnakan takaran latihan intensitas tinggi dan jadwal pemulihan atlet.' },
+  { cat: 'Imunologi', kind: 'Penelitian', title: 'Sel CAR-T diarahkan ke penyakit autoimun', detail: 'Terapi sel T rekayasa yang semula dikembangkan untuk kanker darah kini diujikan pada lupus dan penyakit autoimun berat.' },
   // --- Domestic (Indonesia) ---
-  { cat: 'SATUSEHAT', kind: 'New', title: 'SATUSEHAT becomes the backbone of national medical records', detail: 'Indonesia’s health ministry is driving interoperability of health data across facilities through the SATUSEHAT platform — the foundation for a unified electronic medical record system nationwide.', region: 'Domestic' },
-  { cat: 'Telemedicine', kind: 'New', title: 'Telemedicine adoption accelerates post-pandemic', detail: 'Remote consultations and digital prescriptions are becoming standard in Indonesia’s major cities, extending access to doctors in outlying regions.', region: 'Domestic' },
-  { cat: 'JKN', kind: 'New', title: 'KRIS — a standardized inpatient class for BPJS', detail: 'The Standard Inpatient Class (KRIS) is being rolled out in stages to equalize care quality for JKN/BPJS Kesehatan (Indonesia’s national health insurance) participants.', region: 'Domestic' },
-  { cat: 'Tropical Disease', kind: 'Clinical Trial', title: 'Wolbachia mosquitoes curb dengue cases', detail: 'Wolbachia technology deployed across several Indonesian cities has been shown to significantly reduce dengue fever cases.', region: 'Domestic' },
-  { cat: 'Stunting', kind: 'Research', title: 'Reducing stunting becomes a national priority', detail: 'Nutrition interventions during the first 1,000 days of life and growth monitoring are being intensified to lower child stunting rates.', region: 'Domestic' },
-  { cat: 'Immunization', kind: 'New', title: 'HPV vaccine joins the national immunization program', detail: 'Expanded HPV vaccination for schoolgirls aims to reduce cervical cancer — one of the most common cancers among Indonesian women.', region: 'Domestic' },
+  { cat: 'SATUSEHAT', kind: 'Baru', title: 'SATUSEHAT menjadi tulang punggung rekam medis nasional', detail: 'Kementerian Kesehatan mendorong pertukaran data kesehatan antarfasilitas lewat platform SATUSEHAT — fondasi rekam medis elektronik yang menyatu secara nasional.', region: 'Dalam Negeri' },
+  { cat: 'Telemedisin', kind: 'Baru', title: 'Pemakaian telemedisin melaju setelah pandemi', detail: 'Konsultasi jarak jauh dan resep digital menjadi lazim di kota-kota besar Indonesia, memperluas akses ke dokter bagi daerah terpencil.', region: 'Dalam Negeri' },
+  { cat: 'JKN', kind: 'Baru', title: 'KRIS — kelas rawat inap baku untuk BPJS', detail: 'Kelas Rawat Inap Standar (KRIS) diterapkan bertahap untuk menyetarakan mutu layanan bagi peserta JKN/BPJS Kesehatan.', region: 'Dalam Negeri' },
+  { cat: 'Penyakit Tropis', kind: 'Uji Klinis', title: 'Nyamuk ber-Wolbachia menekan kasus demam berdarah', detail: 'Teknologi Wolbachia yang diterapkan di beberapa kota Indonesia terbukti menurunkan kasus demam berdarah secara bermakna.', region: 'Dalam Negeri' },
+  { cat: 'Stunting', kind: 'Penelitian', title: 'Penurunan stunting menjadi prioritas nasional', detail: 'Intervensi gizi pada 1.000 hari pertama kehidupan dan pemantauan pertumbuhan digencarkan untuk menurunkan angka stunting anak.', region: 'Dalam Negeri' },
+  { cat: 'Imunisasi', kind: 'Baru', title: 'Vaksin HPV masuk program imunisasi nasional', detail: 'Perluasan vaksinasi HPV bagi siswi bertujuan menurunkan kanker serviks — salah satu kanker tersering pada perempuan Indonesia.', region: 'Dalam Negeri' },
 ]
 
 interface Quote {
   q: string
   who: string
-  role: 'Innovator' | 'Investor' | 'Nobel' | 'Clinician' | 'Researcher'
+  role: 'Inovator' | 'Investor' | 'Nobel' | 'Klinisi' | 'Peneliti'
 }
 
 // Paraphrased sentiments faithful to each figure's well-documented public
 // stance — curated, not verbatim transcripts.
 const QUOTES: Quote[] = [
-  { q: 'Gene editing gives us the power to rewrite the code of life — and with it, immense responsibility.', who: 'Jennifer Doudna', role: 'Nobel' },
-  { q: 'AI can accelerate scientific discovery from decades to years.', who: 'Demis Hassabis', role: 'Nobel' },
-  { q: 'Aging isn’t an absolute fate — it’s a process that can be understood and slowed.', who: 'David Sinclair', role: 'Researcher' },
-  { q: 'The goal of medicine isn’t just to extend life, but to extend healthy years.', who: 'Peter Attia', role: 'Clinician' },
-  { q: 'Data and AI are bringing empathy back to medicine by giving doctors time for their patients.', who: 'Eric Topol', role: 'Clinician' },
-  { q: 'The smartest capital flows toward prevention — the best returns are healthy years.', who: 'Longevity Investment Thesis', role: 'Investor' },
-  { q: 'Betting on biology as technology is the opportunity of this century.', who: 'Bio Venture Capital', role: 'Investor' },
-  { q: 'Prevention is cheaper, more humane, and more powerful than treatment.', who: 'Modern Public Health', role: 'Clinician' },
+  { q: 'Penyuntingan gen memberi kita kuasa menulis ulang sandi kehidupan — dan bersamanya, tanggung jawab yang besar.', who: 'Jennifer Doudna', role: 'Nobel' },
+  { q: 'AI dapat mempercepat penemuan ilmiah dari hitungan dasawarsa menjadi hitungan tahun.', who: 'Demis Hassabis', role: 'Nobel' },
+  { q: 'Penuaan bukan takdir yang mutlak — ia proses yang dapat dipahami dan diperlambat.', who: 'David Sinclair', role: 'Peneliti' },
+  { q: 'Tujuan kedokteran bukan sekadar memperpanjang hidup, melainkan memperpanjang tahun-tahun yang sehat.', who: 'Peter Attia', role: 'Klinisi' },
+  { q: 'Data dan AI mengembalikan empati ke dalam kedokteran dengan memberi dokter waktu untuk pasiennya.', who: 'Eric Topol', role: 'Klinisi' },
+  { q: 'Modal yang paling cerdas mengalir ke pencegahan — imbal hasil terbaiknya adalah tahun-tahun yang sehat.', who: 'Tesis Investasi Umur Panjang', role: 'Investor' },
+  { q: 'Bertaruh pada biologi sebagai teknologi adalah peluang abad ini.', who: 'Bio Venture Capital', role: 'Investor' },
+  { q: 'Pencegahan lebih murah, lebih manusiawi, dan lebih ampuh daripada pengobatan.', who: 'Kesehatan Masyarakat Modern', role: 'Klinisi' },
 ]
 
 const KIND_STYLE: Record<NewsItem['kind'], string> = {
   Nobel: 'text-amber-600',
-  'Clinical Trial': 'text-brand-dark',
-  Research: 'text-neutral-500',
-  Device: 'text-sky-600',
-  New: 'text-accent',
+  'Uji Klinis': 'text-brand-dark',
+  Penelitian: 'text-neutral-500',
+  Perangkat: 'text-sky-600',
+  Baru: 'text-accent',
 }
 
 function shuffle<T>(arr: T[]): T[] {
@@ -85,7 +85,7 @@ function shuffle<T>(arr: T[]): T[] {
 
 // Region pill — distinguishes domestic (Indonesia) from international coverage.
 function RegionTag({ region }: { region?: NewsItem['region'] }) {
-  const dom = region === 'Domestic'
+  const dom = region === 'Dalam Negeri'
   return (
     <span className={`shrink-0 rounded-full px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wide ${dom ? 'bg-red-50 text-red-600' : 'bg-sky-50 text-sky-600'}`}>
       {dom ? '🇮🇩 Domestic' : '🌍 International'}
@@ -150,7 +150,7 @@ export function MedicalNews() {
   // international and domestic (Indonesia) coverage every time.
   const { lead, rest } = useMemo(() => {
     const intl = shuffle(CURATED.filter((n) => (n.region ?? 'Internasional') === 'Internasional'))
-    const dom = shuffle(CURATED.filter((n) => n.region === 'Domestic'))
+    const dom = shuffle(CURATED.filter((n) => n.region === 'Dalam Negeri'))
     const mixed = shuffle([...intl.slice(1, 5), ...dom.slice(0, 3)]).slice(0, 6)
     return { lead: intl[0], rest: mixed }
   }, [])
@@ -166,9 +166,9 @@ export function MedicalNews() {
         {/* Masthead */}
         <div className="flex flex-col gap-4 border-b border-black/10 pb-5 sm:flex-row sm:items-end sm:justify-between">
           <div>
-            <span className="text-xs font-bold uppercase tracking-[0.2em] text-brand-dark">News &amp; Innovation</span>
+            <span className="text-xs font-bold uppercase tracking-[0.2em] text-brand-dark">Berita &amp; Inovasi</span>
             <h2 className="mt-1.5 text-3xl font-extrabold leading-none tracking-tight sm:text-4xl">
-              The Latest in Medical Technology
+              Yang Terbaru dalam Teknologi Kedokteran
             </h2>
           </div>
           <div className="flex items-center gap-2 self-start rounded-full border border-black/10 bg-white/70 px-3 py-1.5 backdrop-blur sm:self-auto">
@@ -186,8 +186,8 @@ export function MedicalNews() {
             {/* Featured live lead */}
             <a href={liveMix.lead.link} target="_blank" rel="noreferrer" className="group relative flex flex-col">
               <div className="flex items-center gap-2">
-                <span className="text-[10px] font-bold uppercase tracking-[0.14em] text-brand-dark">Breaking</span>
-                <RegionTag region={liveMix.lead.region === 'domestic' ? 'Domestic' : 'Internasional'} />
+                <span className="text-[10px] font-bold uppercase tracking-[0.14em] text-brand-dark">Terkini</span>
+                <RegionTag region={liveMix.lead.region === 'domestic' ? 'Dalam Negeri' : 'Internasional'} />
               </div>
               <h3 className="mt-3 text-2xl font-bold leading-tight tracking-tight sm:text-[28px]">
                 {cleanTitle(liveMix.lead.title, liveMix.lead.source)}
@@ -213,7 +213,7 @@ export function MedicalNews() {
                     <div className="min-w-0">
                       <div className="flex items-center gap-2">
                         <span className="truncate text-[10px] font-bold uppercase tracking-[0.14em] text-neutral-500">{n.source || 'Health'}</span>
-                        <RegionTag region={n.region === 'domestic' ? 'Domestic' : 'Internasional'} />
+                        <RegionTag region={n.region === 'domestic' ? 'Dalam Negeri' : 'Internasional'} />
                       </div>
                       <h4 className="mt-1 text-[15px] font-semibold leading-snug transition-colors group-hover:text-brand-dark">
                         {cleanTitle(n.title, n.source)}
@@ -239,7 +239,7 @@ export function MedicalNews() {
             <p className="mt-3 max-w-xl text-[15px] leading-relaxed text-neutral-600">{lead.detail}</p>
             <div className="mt-5 h-px w-16 bg-brand/40 transition-all duration-300 group-hover:w-28" />
             <span className="mt-3 inline-flex items-center gap-1.5 text-xs font-bold text-brand-dark">
-              Top story
+              Berita utama
               <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14M13 6l6 6-6 6" /></svg>
             </span>
           </article>

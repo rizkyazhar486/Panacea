@@ -81,37 +81,37 @@ type Tier = {
 const TIERS: Tier[] = [
   {
     name: 'Free',
-    tagline: 'For everyone, forever',
+    tagline: 'Untuk semua orang, selamanya',
     price: 'Rp0',
     features: [
-      <>AI Chatbot — history-taking &amp; health education</>,
-      <>Community, Facility GPS &amp; Emergency SOS</>,
+      <>Obrolan AI — anamnesis &amp; edukasi kesehatan</>,
+      <>Komunitas, GPS Fasilitas &amp; SOS Darurat</>,
       <>Kalkulator Klinis — gratis untuk 50 pendaftar pertama</>,
     ],
   },
   {
     name: 'Plus',
-    tagline: 'Personal longevity insight, powered by AI',
+    tagline: 'Telaah umur panjang pribadi, ditenagai AI',
     price: 'Rp49,000',
     note: '/month',
     highlight: true,
     features: [
       <>Semua isi paket Gratis</>,
-      <>AI Longevity Calculator — diet, exercise, sleep &amp; sun exposure</>,
+      <>Kalkulator AI Umur Panjang — makan, olahraga, tidur &amp; paparan matahari</>,
       <>2× In-depth AI Consultations per month (worth Rp98,000)</>,
       <>Akses penuh Kalkulator Klinis (melampaui jatah gratis)</>,
     ],
   },
   {
     name: 'Pro',
-    tagline: 'For chronic conditions & ongoing monitoring',
+    tagline: 'Untuk penyakit menahun & pemantauan berkelanjutan',
     price: 'Rp199,000',
     note: '/month',
     features: [
       <>Semua isi paket Plus</>,
-      <>Chronic Monitoring — biomarker trends &amp; ongoing recommendations</>,
-      <>Unlimited in-depth AI Consultations</>,
-      <>Priority support</>,
+      <>Pemantauan Menahun — tren biomarker &amp; anjuran berkelanjutan</>,
+      <>Konsultasi AI mendalam tanpa batas</>,
+      <>Dukungan prioritas</>,
     ],
   },
 ]
@@ -126,17 +126,17 @@ export function PricingSection({ onMasuk, promo }: { onMasuk: () => void; promo?
 
       <div className="relative mx-auto max-w-5xl">
         <Reveal className="text-center">
-          <span className="rounded-full bg-white/10 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.25em] text-emerald-300">Transparent & Fair</span>
+          <span className="rounded-full bg-white/10 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.25em] text-emerald-300">Terbuka & Adil</span>
           <h2 className="mt-4 text-4xl font-black leading-[1.05] tracking-tight text-white sm:text-6xl">
             <span className="inline-flex items-center gap-3">
-              Services
+              Layanan
               <span className="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-white/10 text-base sm:h-10 sm:w-10 sm:text-lg">↓</span>
             </span>
             <br />
-            <span className="font-serif-display italic text-emerald-300">&amp; Pricing</span>
+            <span className="font-serif-display italic text-emerald-300">&amp; Harga</span>
           </h2>
           <p className="mx-auto mt-4 max-w-xl text-white/60">
-            Three simple plans — pick what fits your needs, upgrade or downgrade anytime.
+            Tiga paket sederhana — pilih yang sesuai kebutuhan Anda, naik atau turun paket kapan saja.
           </p>
         </Reveal>
 
@@ -153,7 +153,7 @@ export function PricingSection({ onMasuk, promo }: { onMasuk: () => void; promo?
             <Reveal key={t.name} delay={40 + i * 50}>
               <TiltCard className={t.highlight ? 'ring-1 ring-emerald-400/30' : ''}>
                 <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.2em] text-white/40">
-                  {t.highlight && <span className="rounded-full bg-emerald-400/20 px-2 py-0.5 text-emerald-300">Most popular</span>}
+                  {t.highlight && <span className="rounded-full bg-emerald-400/20 px-2 py-0.5 text-emerald-300">Paling banyak dipilih</span>}
                   {t.name}
                 </div>
                 <h3 className="mt-1 text-xl font-extrabold text-white">{t.tagline}</h3>
@@ -170,7 +170,7 @@ export function PricingSection({ onMasuk, promo }: { onMasuk: () => void; promo?
                     t.highlight ? 'bg-emerald-400 text-brand-dark hover:brightness-105' : 'bg-white/10 text-white hover:bg-white/15'
                   }`}
                 >
-                  {t.name === 'Free' ? 'Start Free' : `Choose ${t.name}`}
+                  {t.name === 'Free' ? 'Mulai Gratis' : `Pilih ${t.name}`}
                 </button>
               </TiltCard>
             </Reveal>
@@ -188,16 +188,16 @@ export function PricingSection({ onMasuk, promo }: { onMasuk: () => void; promo?
               </p>
               <div className="mt-4">
                 <PriceLine label="Bayar dari saldo PanaceaToken Anda" price="500 PNC" />
-                <PriceLine label="Equivalent bank transfer" price="Rp500,000" note="one-time payment, lifetime access" />
+                <PriceLine label="Transfer bank senilai" price="Rp500,000" note="one-time payment, lifetime access" />
               </div>
             </TiltCard>
             <TiltCard>
-              <div className="text-[10px] font-bold uppercase tracking-[0.2em] text-white/40">Chronic — lifetime account option</div>
+              <div className="text-[10px] font-bold uppercase tracking-[0.2em] text-white/40">Menahun — pilihan akun seumur hidup</div>
               <p className="mt-2 text-sm text-white/60">
-                For patients who'd rather pay once than subscribe to Pro for years on end.
+                Untuk pasien yang lebih memilih membayar sekali daripada berlangganan Pro bertahun-tahun.
               </p>
               <div className="mt-4">
-                <PriceLine label="Chronic Monitoring Lifetime" price="Rp19,900,000" note="one-time payment" />
+                <PriceLine label="Pemantauan Menahun Seumur Hidup" price="Rp19,900,000" note="one-time payment" />
                 <PriceLine label="1 PanaceaToken (PNC)" price="Rp1,000" note="flexible top-up" />
               </div>
             </TiltCard>
@@ -206,13 +206,13 @@ export function PricingSection({ onMasuk, promo }: { onMasuk: () => void; promo?
 
         <Reveal delay={70}>
           <div className="mx-auto mt-6 max-w-xl rounded-2xl border border-white/15 bg-white/[0.06] px-6 py-4 text-center backdrop-blur-sm">
-            <div className="text-[10px] font-bold uppercase tracking-[0.2em] text-emerald-300">How to Pay</div>
+            <div className="text-[10px] font-bold uppercase tracking-[0.2em] text-emerald-300">Cara Membayar</div>
             <p className="mt-1.5 text-sm text-white/70">
-              All payments are made via <b className="text-white">bank transfer</b> to our official account:
+              All payments are made via <b className="text-white">transfer bank</b> to our official account:
             </p>
             <div className="mt-2 text-base font-black text-white">{MANUAL_BANK.bank} · {MANUAL_BANK.number}</div>
             <div className="text-xs text-white/60">Account holder: {MANUAL_BANK.holder}</div>
-            <p className="mt-1.5 text-[11px] text-white/45">Upload your proof of transfer in the app — your balance is verified &amp; added by our team.</p>
+            <p className="mt-1.5 text-[11px] text-white/45">Unggah bukti transfer Anda di aplikasi — saldonya diperiksa &amp; ditambahkan oleh tim kami.</p>
           </div>
         </Reveal>
 
