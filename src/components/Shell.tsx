@@ -51,6 +51,7 @@ import { Landing } from '../pages/Landing'
 import { ContactService } from './ContactService'
 import { NotificationBell } from './NotificationBell'
 import { InstallBanner } from './InstallApp'
+import { PeringatanPenyimpanan } from './PeringatanPenyimpanan'
 import { OnboardingTour, AssessmentPrompt } from './OnboardingTour'
 import { api, backendEnabled } from '../lib/api'
 import { trackVisit, rankByUsage } from '../lib/usage'
@@ -749,6 +750,7 @@ export function Shell({ children }: { children: ReactNode }) {
             menggeser ? 'geser-ikut' : 'geser-pulih'}`}
           style={geser ? { transform: `translate3d(${geser}px,0,0)` } : undefined}
         >
+          {onHome && <PeringatanPenyimpanan />}
           {onHome && <InstallBanner />}
           {onHome && homeServices.length > 0 && (
             <div className="mb-5 hidden lg:block">

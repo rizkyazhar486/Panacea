@@ -91,7 +91,37 @@ export function Login({ onBack }: { onBack?: () => void }) {
 
   useEffect(() => {
     if (!backendEnabled) return
-    api.health().then(setHealth).catch(() => setError('Backend unreachable — local mode.'))
+    /* SERVER YANG SEDANG TIDUR BUKAN SERVER YANG MATI.
+       Render mematikan instans gratis setelah lima belas menit tanpa
+       permintaan, dan permintaan pertama sesudah itu baru dijawab sekitar
+       lima puluh detik kemudian. Percobaan tunggal hampir selalu gagal pada
+       pembukaan pertama hari itu, lalu aplikasi menyatakan "backend
+       unreachable" — dan yang dibaca pemakainya adalah aplikasinya rusak,
+       padahal ia hanya perlu menunggu. Dicoba tiga kali dengan jeda, dan
+       selama menunggu ia mengatakan apa yang sedang terjadi. */
+    let batal = false
+    const coba = async () => {
+      for (let i = 0; i < 3; i++) {
+        try {
+          const h = await api.health()
+          if (batal) return
+          setHealth(h)
+          setError(h.penyimpanan === 'berkas'
+            ? 'Server berjalan tanpa basis data tetap (MONGODB_URI belum diisi). Akun dan data yang tersimpan di server akan HILANG pada deploy ulang berikutnya — termasuk akun yang baru dibuat sekarang.'
+            : '')
+          return
+        } catch {
+          if (batal) return
+          setError(i === 0
+            ? 'Menghubungi server… instans gratis tidur setelah 15 menit dan perlu ~50 detik untuk bangun.'
+            : 'Masih menunggu server bangun…')
+          await new Promise((r) => setTimeout(r, 8000))
+        }
+      }
+      if (!batal) setError('Server tidak dapat dihubungi — aplikasi berjalan dalam mode lokal. Data tetap tersimpan di perangkat ini.')
+    }
+    void coba()
+    return () => { batal = true }
   }, [])
 
   useEffect(() => {

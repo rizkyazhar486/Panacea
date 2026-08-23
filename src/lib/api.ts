@@ -41,6 +41,14 @@ export interface Health {
    * server yang belum dipasang ulang dari kegagalan yang sesungguhnya.
    */
   kemampuan?: { evidenceJson?: boolean }
+  /**
+   * Bentuk penyimpanan server. 'berkas' berarti seluruh data hanya ada di
+   * cakram sementara dan HILANG pada deploy ulang berikutnya — akun tidak
+   * dapat dipakai masuk lagi, dan catatan yang sudah tersinkron lenyap.
+   * Tidak ada pada server versi lama; ketiadaannya berarti tidak diketahui,
+   * bukan berarti aman.
+   */
+  penyimpanan?: 'mongo' | 'berkas'
   aiConsultPnc?: number
   tokenToIdr: number
   midtransClientKey: string | null

@@ -349,6 +349,22 @@ export async function initStore() {
   }
 }
 
+/**
+ * Bentuk penyimpanan yang SEDANG dipakai — 'mongo' atau 'berkas'.
+ *
+ * MENGAPA INI HARUS DAPAT DILIHAT DARI LUAR. Tanpa MONGODB_URI, seluruh
+ * keadaan hanya hidup di data.json, dan cakram Render bersifat sementara:
+ * setiap deploy ulang atau restart menghapusnya. Yang dialami pemakainya
+ * bukan "penyimpanan sementara" melainkan AKUNNYA HILANG — ia tidak dapat
+ * masuk lagi dengan surel yang sama, dan catatan yang sudah tersinkron lenyap.
+ * Selama ini keadaan itu hanya tertulis di catatan log server, yang tidak
+ * pernah dilihat siapa pun. Sekarang ia ikut dalam /api/health supaya
+ * aplikasinya dapat mengatakannya dengan jujur.
+ */
+export function modePenyimpanan(): 'mongo' | 'berkas' {
+  return mongoCol ? 'mongo' : 'berkas'
+}
+
 export function uid(): string {
   return Math.random().toString(36).slice(2) + Date.now().toString(36)
 }

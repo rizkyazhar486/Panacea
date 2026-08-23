@@ -103,6 +103,7 @@ import {
   recordWebhookDelivery,
   getWebhookDeliveries,
   diagnoseSync,
+  modePenyimpanan,
 } from './store.js'
 import { googleLogin, devLogin, currentUser, clearSession, requireAuth } from './auth.js'
 import { emailOtpStart, emailOtpVerify, emailOtpLive } from './otp.js'
@@ -197,6 +198,10 @@ app.use(['/api/auth', '/api/login', '/api/dev-login'], authLimiter)
 app.get('/api/health', (_req, res) => {
   res.json({
     ok: true,
+    // 'berkas' berarti data hanya ada di cakram sementara dan akan HILANG pada
+    // deploy ulang berikutnya — aplikasi mengatakannya, bukan menunggu orang
+    // menemukannya sendiri saat gagal masuk.
+    penyimpanan: modePenyimpanan(),
     features: { google: features.googleLive, payments: features.paymentsLive, ai: features.aiLive, push: features.pushLive, email: features.emailLive, payout: features.payoutLive, otpEmail: emailOtpLive },
     /*
      * KEMAMPUAN SERVER, supaya aplikasi dapat membedakan SERVER YANG BELUM
