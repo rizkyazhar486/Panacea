@@ -125,6 +125,8 @@ export const WIDGETS: WidgetDef[] = [
   { id: 'tidur14', label: 'Tidur 14 Malam', ringkas: 'Nilai tengah dan malam yang kurang', ke: '/pola-tidur', emoji: '🌙', kategori: 'Tidur & Pemulihan', bawaan: true },
   { id: 'muatanPekan', label: 'Menit Latihan per Pekan', ringkas: 'Delapan pekan terakhir', ke: '/latihan', emoji: '📈', kategori: 'Latihan', bawaan: true },
   { id: 'kaloriBanding', label: 'Tercatat Hari Ini', ringkas: 'Makanan dan latihan yang sudah dicatat', ke: '/nutrisi', emoji: '🍽️', kategori: 'Gizi', bawaan: true },
+  { id: 'kepatuhan', label: 'Kepatuhan Minum 14 Hari', ringkas: 'Hari lengkap, sebagian, dan terlewat', ke: '/harian', emoji: '💊', kategori: 'Tubuh & Data', bawaan: true },
+  { id: 'beratTren', label: 'Berat 90 Hari', ringkas: 'Arah tiga bulan, bukan selisih harian', ke: '/tubuh', emoji: '⚖️', kategori: 'Tubuh & Data', bawaan: true },
   { id: 'lab', label: 'Hasil Lab', ringkas: 'HbA1c, ApoB, eGFR, dan perjalanannya', ke: '/tubuh', emoji: '🧪', kategori: 'Klinis & Belajar', bawaan: true },
   { id: 'lingkungan', label: 'Udara & UV', ringkas: 'AQI dan indeks UV kota Anda', ke: '/tubuh', emoji: '🌤️', kategori: 'Tubuh & Data', bawaan: true },
   { id: 'hrv', label: 'HRV Semalam', ringkas: 'Terhadap kebiasaan 14 hari', ke: '/tubuh?t=jantung', emoji: '💓', kategori: 'Tidur & Pemulihan', bawaan: true },
@@ -321,7 +323,7 @@ export const WIDGET_HIDUP = [
   'komposisi', 'tekanan', 'lajuNapas', 'saturasi', 'suhu', 'lab', 'tenaga',
   'obatPengingat', 'beban', 'ukurBerkala', 'skrining',
   'amsler', 'layar', 'peregangan', 'tekananSebar', 'rangkaian', 'jetlag',
-  'nadiPanjang', 'tidur14', 'muatanPekan', 'kaloriBanding',
+  'nadiPanjang', 'tidur14', 'muatanPekan', 'kaloriBanding', 'kepatuhan', 'beratTren',
   // ── Grafik tujuh hari (kisi dua kolom, bukan tumpukan) ──────────────────
   'grafikLatihan', 'grafikTidur', 'grafikLangkah', 'grafikGizi', 'grafikDenyut',
   // ── Belajar & klinis ────────────────────────────────────────────────────

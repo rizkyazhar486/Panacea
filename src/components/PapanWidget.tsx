@@ -39,7 +39,7 @@ import { UbinLingkungan } from './UbinLingkungan'
 import { UbinLab } from './UbinLab'
 import { UbinPangan } from './UbinPangan'
 import { UbinObatPengingat, UbinBeban, UbinUkurBerkala, UbinSkrining } from './UbinUkur'
-import { UbinNadiPanjang, UbinTidurDuaPekan, UbinMuatanPekan, UbinKaloriBanding } from './UbinTambahan'
+import { UbinNadiPanjang, UbinTidurDuaPekan, UbinMuatanPekan, UbinKaloriBanding, UbinKepatuhan, UbinBeratTren } from './UbinTambahan'
 import { UbinAmsler, UbinLayar, UbinPeregangan, UbinTekananPagiSore, UbinRangkaian as UbinRangkaianKebiasaan, UbinJetLag } from './UbinPenutup'
 import { UbinTenaga, UbinHidrasi, UbinCahaya, UbinTangga, UbinVo2Tren, UbinKomposisi, UbinSuplemen, UbinSuhuEkstrem } from './UbinHarianPlus'
 import { UbinTidurLebar, UbinGiziLebar } from './UbinTidurGizi'
@@ -559,6 +559,8 @@ export function PapanWidget({ pratinjau, tanggalCatatan }: { pratinjau: Pratinja
         ...(pilihan.includes('tidur14') ? [{ kunci: 'tidur14', isi: <UbinTidurDuaPekan /> }] : []),
         ...(pilihan.includes('muatanPekan') ? [{ kunci: 'muatanPekan', isi: <UbinMuatanPekan /> }] : []),
         ...(pilihan.includes('kaloriBanding') ? [{ kunci: 'kaloriBanding', isi: <UbinKaloriBanding /> }] : []),
+        ...(pilihan.includes('kepatuhan') ? [{ kunci: 'kepatuhan', isi: <UbinKepatuhan /> }] : []),
+        ...(pilihan.includes('beratTren') ? [{ kunci: 'beratTren', isi: <UbinBeratTren /> }] : []),
         ...(pilihan.includes('lab') ? [{ kunci: 'lab', isi: <UbinLab /> }] : []),
         ...(pilihan.includes('tenaga') ? [{ kunci: 'tenaga', isi: <UbinTenaga /> }] : []),
         ...(pilihan.includes('hidrasi2') ? [{ kunci: 'hidrasi2', isi: <UbinHidrasi /> }] : []),

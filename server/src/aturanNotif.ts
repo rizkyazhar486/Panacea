@@ -638,6 +638,60 @@ export const ATURAN: Aturan[] = [
     },
   },
   {
+    /* KISI AMSLER YANG BERUBAH.
+       Ini satu-satunya aturan di berkas ini yang mengarahkan orang KELUAR dari
+       aplikasi secepat mungkin, dan itu memang maksudnya: garis yang tampak
+       bengkok atau bagian yang hilang pada penglihatan tengah dapat menandakan
+       keadaan yang penanganannya bergantung pada waktu. Yang TIDAK dilakukan:
+       menyebut nama penyakit mana pun. Aplikasi ini tidak dapat membedakannya,
+       dan menebak nama justru menunda orang ke tempat yang benar. Jeda satu
+       hari, karena selama hasilnya masih 'berubah' pengingat ini memang harus
+       berulang. */
+    id: 'amslerBerubah',
+    kategori: 'vital',
+    jendela: [J(8), J(20)],
+    jeda: 1,
+    nilai: (k) => {
+      if (k.ringkas?.amslerBerubah !== true) return null
+      return {
+        judul: 'Kisi Amsler Anda tercatat berubah',
+        badan: 'Garis yang bengkok, kabur, atau bagian yang hilang di penglihatan tengah sebaiknya diperiksa dokter mata — tidak ditunggu sampai jadwal berikutnya. Aplikasi ini tidak dapat menyebut sebabnya, dan menebaknya hanya menunda Anda ke tempat yang benar.',
+        url: './#/tubuh',
+      }
+    },
+  },
+  {
+    /* BERAT TURUN CEPAT TANPA DISENGAJA.
+       Lima persen berat badan dalam sebulan adalah ambang yang lazim dipakai
+       untuk penurunan berat yang perlu ditelusuri sebabnya. Kalimatnya
+       menyebutkan lebih dahulu kemungkinan yang paling sering dan paling jinak
+       — memang sedang diusahakan — karena mengirim kecemasan kepada orang yang
+       sedang berhasil menurunkan berat adalah cara tercepat membuat seluruh
+       pemberitahuan aplikasi ini ditutup. */
+    id: 'beratTurunCepat',
+    kategori: 'vital',
+    jendela: [J(9), J(19)],
+    jeda: 14,
+    nilai: (k) => {
+      const kini = angka(k.hariIni, 'weightKg')
+      if (kini == null || kini <= 0) return null
+      const lama = k.riwayat.slice(0, -1).filter((r) => angka(r, 'weightKg') != null)
+      if (lama.length < 5) return null
+      const awal = lama[0]
+      const w0 = angka(awal, 'weightKg')
+      if (w0 == null || w0 <= 0) return null
+      const hari = Math.round((Date.parse(`${k.tanggalLokal}T00:00:00Z`) - Date.parse(`${awal.date}T00:00:00Z`)) / 864e5)
+      if (!Number.isFinite(hari) || hari < 14 || hari > 120) return null
+      const perBulan = ((kini - w0) / hari) * 30
+      if (perBulan > -(w0 * 0.05)) return null
+      return {
+        judul: `Berat turun ${Math.abs(Math.round(perBulan * 10) / 10)} kg per 30 hari`,
+        badan: 'Bila ini memang sedang Anda usahakan, angka itu cepat tetapi bukan hal yang mengkhawatirkan. Bila tidak diusahakan, penurunan lebih dari 5% berat badan dalam sebulan adalah keluhan yang perlu ditelusuri sebabnya bersama dokter.',
+        url: './#/tubuh',
+      }
+    },
+  },
+  {
     /* AMSLER LAMA TIDAK DIPERIKSA.
        Perubahan pada penglihatan tengah datang perlahan dan mata yang satu
        menutupi kekurangan mata yang lain, sehingga yang menyadarinya justru

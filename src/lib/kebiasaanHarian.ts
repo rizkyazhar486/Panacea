@@ -69,10 +69,35 @@ export function sudahDiminum(): string[] {
   return v.tanggal === tanggalHariIni() && Array.isArray(v.id) ? v.id : []
 }
 
+/* RIWAYAT KEPATUHAN, karena penanda harian saja tidak dapat menjawab
+   pertanyaan yang sesungguhnya.
+   KUNCI_MINUM hanya menyimpan HARI INI: begitu tanggal berganti, isinya
+   dianggap kosong dan hari kemarin hilang tanpa jejak. Akibatnya pertanyaan
+   "seberapa sering saya benar-benar meminumnya" — satu-satunya pertanyaan
+   yang penting pada obat rutin — tidak dapat dijawab sama sekali. Di sini
+   yang disimpan hanya dua angka per hari, jumlah yang diminum dan jumlah yang
+   dijadwalkan, tanpa nama obatnya. */
+const KUNCI_RIWAYAT_MINUM = 'pmd_suplemen_riwayat_v1'
+
+export interface HariMinum { tanggal: string; minum: number; total: number }
+
+export function riwayatMinum(): HariMinum[] {
+  const v = baca<HariMinum[]>(KUNCI_RIWAYAT_MINUM, [])
+  return Array.isArray(v) ? v.filter((h) => h && typeof h.tanggal === 'string') : []
+}
+
+function catatKepatuhan(minum: number): void {
+  const hari = tanggalHariIni()
+  const total = ambilSuplemen().length
+  const lama = riwayatMinum().filter((h) => h.tanggal !== hari)
+  tulis(KUNCI_RIWAYAT_MINUM, [...lama, { tanggal: hari, minum, total }].slice(-120), 'panacea:suplemen')
+}
+
 export function alihkanMinum(id: string): string[] {
   const kini = sudahDiminum()
   const next = kini.includes(id) ? kini.filter((x) => x !== id) : [...kini, id]
   tulis(KUNCI_MINUM, { tanggal: tanggalHariIni(), id: next }, 'panacea:suplemen')
+  catatKepatuhan(next.length)
   return next
 }
 

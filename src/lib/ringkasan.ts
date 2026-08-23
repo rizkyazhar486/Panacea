@@ -49,6 +49,7 @@ interface Ringkasan {
   umurGenggam?: number
   hariSejakBeban?: number
   amslerHariLalu?: number
+  amslerBerubah?: boolean
   fokusMenitHariIni?: number
   jetlagJam?: number
   jetlagHariLagi?: number
@@ -127,11 +128,12 @@ export function susunRingkasan(): Ringkasan {
   // rencana penyesuaian jet lag. Tetap angka saja — tidak ada catatan, tidak
   // ada tujuan perjalanan, tidak ada nama kota.
   try {
-    const amsler = JSON.parse(localStorage.getItem('pmd_amsler_v1') || '[]') as { tanggal?: string }[]
-    const akhir = amsler[amsler.length - 1]?.tanggal
-    if (akhir) {
-      const hari = Math.floor((Date.now() - Date.parse(`${akhir}T00:00:00`)) / 864e5)
+    const amsler = JSON.parse(localStorage.getItem('pmd_amsler_v1') || '[]') as { tanggal?: string; hasil?: string }[]
+    const terakhir = amsler[amsler.length - 1] as { tanggal?: string; hasil?: string } | undefined
+    if (terakhir?.tanggal) {
+      const hari = Math.floor((Date.now() - Date.parse(`${terakhir.tanggal}T00:00:00`)) / 864e5)
       if (Number.isFinite(hari) && hari >= 0) r.amslerHariLalu = hari
+      if (terakhir.hasil === 'berubah' && hari <= 14) r.amslerBerubah = true
     }
   } catch { /* abaikan */ }
 

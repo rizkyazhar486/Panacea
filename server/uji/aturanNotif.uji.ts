@@ -137,6 +137,28 @@ periksa('bebanSepi diam sesudah 3 hari',
 periksa('bebanSepi diam sesudah 90 hari (sudah berhenti sama sekali, bukan lupa)',
   !cari('bebanSepi').nilai(konteks({}, 17 * 60, { hariSejakBeban: 90 })))
 
+// 7g. Amsler berubah dan berat turun cepat.
+periksa('amslerBerubah menyala bila hasil terakhir berubah',
+  !!cari('amslerBerubah').nilai(konteks({}, 10 * 60, { amslerBerubah: true })))
+periksa('amslerBerubah diam bila hasilnya normal',
+  !cari('amslerBerubah').nilai(konteks({}, 10 * 60, { amslerBerubah: false })))
+periksa('amslerBerubah tidak menyebut nama penyakit',
+  !/degenerasi|makula|retina|glaukoma/i.test(cari('amslerBerubah').nilai(konteks({}, 10 * 60, { amslerBerubah: true }))!.badan))
+{
+  const k = konteks({ weightKg: 54 }, 10 * 60)
+  for (const b of k.riwayat) b.weightKg = 60
+  k.hariIni.weightKg = 54
+  periksa('beratTurunCepat menyala pada penurunan 10% dalam rentang riwayat', !!cari('beratTurunCepat').nilai(k))
+  periksa('beratTurunCepat menyebut kemungkinan disengaja lebih dahulu',
+    /memang sedang Anda usahakan/.test(cari('beratTurunCepat').nilai(k)!.badan))
+}
+{
+  const k = konteks({ weightKg: 59.5 }, 10 * 60)
+  for (const b of k.riwayat) b.weightKg = 60
+  k.hariIni.weightKg = 59.5
+  periksa('beratTurunCepat diam pada penurunan setengah kilogram', !cari('beratTurunCepat').nilai(k))
+}
+
 // 7f. Kabar baik dan hari istirahat.
 {
   const k = konteks({ restingHr: 52 }, 8 * 60)

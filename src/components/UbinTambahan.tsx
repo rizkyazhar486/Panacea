@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import { useStore } from '../lib/store'
 import { deretMetrik, rentangPribadi } from '../lib/riwayatVitals'
 import { getWorkouts } from '../lib/workoutStore'
+import { riwayatMinum } from '../lib/kebiasaanHarian'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Empat widget yang membaca RENTANG WAKTU LEBIH PANJANG daripada tujuh hari.
@@ -250,6 +251,104 @@ export function UbinKaloriBanding() {
           Ini BUKAN neraca energi. Sisi makanan hanya sebesar yang sempat dicatat, sisi latihan tidak memuat metabolisme
           basal — yang justru bagian terbesar pemakaian energi harian — dan keduanya punya galat besar. Yang dapat
           dibaca dari sini hanya seberapa lengkap catatan hari ini.
+        </p>
+      </div>
+    </section>
+  )
+}
+
+// ── Kepatuhan minum, 14 hari ───────────────────────────────────────────────
+//
+// Pertanyaan yang sesungguhnya pada obat rutin bukan "sudah minum hari ini?"
+// melainkan "seberapa sering saya benar-benar meminumnya" — dan itulah yang
+// paling menentukan hasilnya pada tekanan darah, gula, dan hampir semua obat
+// harian. Riwayatnya baru dimulai sejak fitur ini ada, dan ubin ini
+// mengatakannya alih-alih menampilkan hari-hari kosong seolah terlewat.
+export function UbinKepatuhan() {
+  const hari = useMemo(() => {
+    const peta = new Map(riwayatMinum().map((h) => [h.tanggal, h]))
+    const out: { tanggal: string; minum: number; total: number; ada: boolean }[] = []
+    for (let i = 13; i >= 0; i--) {
+      const d = new Date(Date.now() - i * 864e5)
+      const p = (x: number) => String(x).padStart(2, '0')
+      const t = `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}`
+      const r = peta.get(t)
+      out.push({ tanggal: t, minum: r?.minum ?? 0, total: r?.total ?? 0, ada: Boolean(r) })
+    }
+    return out
+  }, [])
+
+  const tercatat = hari.filter((h) => h.ada && h.total > 0)
+  if (tercatat.length < 3) return null
+  const penuh = tercatat.filter((h) => h.minum >= h.total).length
+
+  return (
+    <section>
+      <Kepala judul="Kepatuhan minum 14 hari" ke="/harian" />
+      <div className="kaca rounded-3xl p-3">
+        <div className="flex items-baseline gap-1.5">
+          <span className="text-[26px] font-black leading-none tabular-nums nyala text-ink dark:text-white">{penuh}</span>
+          <span className="t-mikro font-bold text-neutral-400">dari {tercatat.length} hari lengkap</span>
+        </div>
+        <span className="mt-2 grid grid-cols-7 gap-1" aria-hidden>
+          {hari.map((h) => (
+            <span
+              key={h.tanggal}
+              title={h.ada ? `${h.minum}/${h.total}` : 'belum tercatat'}
+              className={`h-5 rounded ${
+                !h.ada || h.total === 0 ? 'bg-neutral-200 dark:bg-white/10'
+                  : h.minum >= h.total ? 'bg-emerald-500'
+                  : h.minum > 0 ? 'bg-amber-400'
+                  : 'bg-rose-400'
+              }`}
+            />
+          ))}
+        </span>
+        <p className="t-mikro mt-1.5 leading-snug text-neutral-400">
+          Hijau berarti seluruh yang dijadwalkan hari itu ditandai diminum, kuning sebagian, merah tidak satu pun,
+          abu-abu belum tercatat. Riwayat ini baru dimulai sejak fitur pencatatannya ada — hari yang lebih tua tidak
+          hilang, memang tidak pernah tersimpan.
+        </p>
+      </div>
+    </section>
+  )
+}
+
+// ── Berat 90 hari ──────────────────────────────────────────────────────────
+//
+// Perubahan berat yang berarti berjalan dalam hitungan bulan, sedangkan
+// timbangan berubah satu-dua kilogram dalam sehari karena air dan isi usus.
+// Jendela sembilan puluh hari inilah yang memisahkan keduanya, dan angka yang
+// disebut adalah SELISIH per tiga puluh hari, bukan selisih hari ke hari.
+export function UbinBeratTren() {
+  const deret = useMemo(() => deretMetrik('weightKg', 90), [])
+  if (deret.length < 5) return null
+
+  const nilai = deret.map((d) => d.nilai)
+  const kini = nilai[nilai.length - 1]
+  const tAkhir = Date.parse(`${deret[deret.length - 1].tanggal}T00:00:00`)
+  const tAwal = Date.parse(`${deret[0].tanggal}T00:00:00`)
+  const rentangHari = Math.max(1, Math.round((tAkhir - tAwal) / 864e5))
+  const selisih = kini - nilai[0]
+  const perBulan = (selisih / rentangHari) * 30
+  const cepat = Math.abs(perBulan) >= kini * 0.05
+
+  return (
+    <section>
+      <Kepala judul="Berat 90 hari" ke="/tubuh" />
+      <div className="kaca rounded-3xl p-3">
+        <div className="flex items-baseline gap-1.5">
+          <span className="text-[26px] font-black leading-none tabular-nums nyala text-ink dark:text-white">{(Math.round(kini * 10) / 10).toFixed(1)}</span>
+          <span className="t-mikro font-bold text-neutral-400">kg</span>
+          <span className="t-mikro ml-auto shrink-0 tabular-nums text-neutral-400">
+            {perBulan >= 0 ? '+' : ''}{(Math.round(perBulan * 10) / 10).toFixed(1)} kg / 30 hari
+          </span>
+        </div>
+        <Garis nilai={nilai} warna={cepat ? 'text-amber-500' : 'text-brand'} />
+        <p className="t-mikro mt-1 leading-snug text-neutral-400">
+          Dihitung dari {deret.length} penimbangan dalam {rentangHari} hari. Timbangan berubah satu-dua kilogram dalam
+          sehari karena air dan isi usus, jadi yang dibaca di sini arah tiga bulan, bukan selisih hari ke hari.
+          {cepat && ' Perubahan lebih dari 5% berat badan dalam sebulan tanpa disengaja layak dibicarakan dengan dokter.'}
         </p>
       </div>
     </section>
