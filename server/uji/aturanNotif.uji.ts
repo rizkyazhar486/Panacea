@@ -1,0 +1,76 @@
+// Uji mesin aturan tanpa server: store dan push diganti dengan tiruan lewat
+// jalur impor yang sama, jadi yang diuji benar-benar berkas aturannya.
+import { ATURAN, PREF_KATEGORI } from '../src/aturanNotif.js'
+
+const hari = (n: number) => new Date(Date.now() - n * 864e5).toISOString().slice(0, 10)
+const riwayat = Array.from({ length: 20 }, (_, i) => ({
+  date: hari(19 - i),
+  hrvMs: 60 + (i % 5),
+  restingHr: 57 + (i % 3),
+  respRate: 14 + (i % 2) * 0.3,
+  bodyTempC: 36.5,
+  sleepH: 7.0 + (i % 3) * 0.2,
+  steps: 9000 + (i % 4) * 300,
+  exerciseMin: i % 3 === 0 ? 45 : 0,
+  weightKg: 68,
+  spo2Pct: 96,
+}))
+
+function konteks(patch: Record<string, unknown>, menit: number) {
+  const r = riwayat.map((b) => ({ ...b }))
+  const hariIni = { ...r[r.length - 1], ...patch }
+  r[r.length - 1] = hariIni
+  return {
+    userId: 'u', email: 'u@x.id', prefs: {}, riwayat: r, hariIni,
+    menitLokal: menit, tanggalLokal: hari(0),
+  }
+}
+
+let lulus = 0, gagal = 0
+function periksa(nama: string, benar: boolean, tambahan = '') {
+  if (benar) { lulus++; console.log('  ok   ', nama) }
+  else { gagal++; console.log('  GAGAL', nama, tambahan) }
+}
+
+const cari = (id: string) => ATURAN.find((a) => a.id === id)!
+
+// 1. HRV turun 20% memicu; HRV normal tidak.
+periksa('hrvTurun menyala saat 48 ms vs kebiasaan ~62', !!cari('hrvTurun').nilai(konteks({ hrvMs: 48 }, 7 * 60)))
+periksa('hrvTurun diam saat 61 ms', !cari('hrvTurun').nilai(konteks({ hrvMs: 61 }, 7 * 60)))
+
+// 2. Denyut istirahat naik 5+.
+periksa('rhrNaik menyala saat +7 bpm', !!cari('rhrNaik').nilai(konteks({ restingHr: 65 }, 7 * 60)))
+periksa('rhrNaik diam saat +2 bpm', !cari('rhrNaik').nilai(konteks({ restingHr: 60 }, 7 * 60)))
+
+// 3. Saturasi rendah butuh DUA malam.
+const satuMalam = konteks({ spo2Pct: 89 }, 8 * 60)
+periksa('spo2Rendah diam bila hanya satu malam', !cari('spo2Rendah').nilai(satuMalam))
+const duaMalam = konteks({ spo2Pct: 89 }, 8 * 60)
+duaMalam.riwayat[duaMalam.riwayat.length - 2].spo2Pct = 90
+periksa('spo2Rendah menyala bila dua malam', !!cari('spo2Rendah').nilai(duaMalam))
+
+// 4. Tekanan darah.
+periksa('tekananTinggi menyala 145/95', !!cari('tekananTinggi').nilai(konteks({ systolic: 145, diastolic: 95 }, 10 * 60)))
+periksa('tekananTinggi diam 120/78', !cari('tekananTinggi').nilai(konteks({ systolic: 120, diastolic: 78 }, 10 * 60)))
+
+// 5. Tiga hari tanpa latihan.
+const sepi = konteks({ exerciseMin: 0 }, 17 * 60)
+for (let i = 1; i <= 3; i++) sepi.riwayat[sepi.riwayat.length - i].exerciseMin = 0
+periksa('latihanSepi menyala sesudah 3 hari kosong', !!cari('latihanSepi').nilai(sepi))
+
+// 6. Utang tidur.
+const utang = konteks({ sleepH: 5 }, 21 * 60)
+for (let i = 1; i <= 7; i++) utang.riwayat[utang.riwayat.length - i].sleepH = 5.2
+periksa('utangTidur menyala saat 7 malam pendek', !!cari('utangTidur').nilai(utang))
+
+// 7. Jendela waktu tiap aturan masuk akal (tidak ada yang tengah malam).
+for (const a of ATURAN) {
+  if (!a.jendela) continue
+  periksa(`jendela ${a.id} di luar jam tidur`, a.jendela[0] >= 6 * 60 && a.jendela[1] <= 22 * 60, String(a.jendela))
+}
+
+// 8. Tiap kategori punya kunci setelannya.
+for (const a of ATURAN) periksa(`kategori ${a.id} punya pref`, !!PREF_KATEGORI[a.kategori])
+
+console.log(`\n${lulus} lulus, ${gagal} gagal`)
+process.exit(gagal ? 1 : 0)

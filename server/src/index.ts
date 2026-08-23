@@ -118,6 +118,7 @@ import { checkHrZoneAlert, checkBedtimeReminder, checkWorkoutReminder, suggested
 import { fetchLeagueScoreboard, fetchF1Info, fetchMotoGpInfo, LEAGUES, UNAVAILABLE } from './sports.js'
 import { checkPrayerReminder } from './salat.js'
 import { lingkunganKota } from './lingkungan.js'
+import { jalankanAturanNotif } from './aturanNotif.js'
 import { searchPubmed } from './pubmed.js'
 import { fetchQuote, fetchQuotes, searchSymbols, INSTRUMENTS, UNGGULAN, WATCHLIST_MAX, RANGES, isValidSymbol, type Range } from './markets.js'
 import { searchTrials } from './trials.js'
@@ -1563,6 +1564,9 @@ setInterval(() => {
     // Pengingat SEBELUM waktu salat (bawaan lima menit). Bukan adzan — Web
     // Push tidak dapat memutar lantunan, jadi yang dijanjikan hanya kabarnya.
     checkPrayerReminder(u.id).catch(() => {})
+    // Mesin aturan: paling banyak satu notifikasi per detak per orang, dengan
+    // kuota harian dan jam senyap. Lihat aturanNotif.ts.
+    jalankanAturanNotif(u.id, u.email).catch(() => {})
   }
 }, 60_000)
 

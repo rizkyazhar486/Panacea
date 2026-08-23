@@ -645,6 +645,8 @@ export const SERVER_OWNED_SETTING_KEYS: readonly string[] = [
   'sleepLastFiredOn',       // once-a-day guard; client-writable = repeat sends
   'latihanLastFiredOn',     // penjaga sekali sehari untuk pengingat latihan
   'salatLastFired',         // penjaga per salat per hari; client-writable = kirim ulang
+  'notifTerakhir',          // penjaga jeda antar-aturan; client-writable = banjir
+  'notifHitung',            // pemakaian kuota harian; client-writable = lewat kuota
 ]
 
 /** Strips server-owned keys from a client-supplied settings patch. */

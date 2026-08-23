@@ -36,6 +36,35 @@ interface Setelan {
   notifSalat?: boolean
   salatLeadMin?: number
   salatKota?: string
+  salatNegara?: string
+  salatMetode?: number
+  // Kategori mesin aturan — lihat server/src/aturanNotif.ts.
+  notifPemulihan?: boolean
+  notifLatihanPintar?: boolean
+  notifVital?: boolean
+  notifLingkungan?: boolean
+  notifKuota?: number
+  notifSenyapMulai?: number
+  notifSenyapSelesai?: number
+}
+
+/* Kategori notifikasi berbasis keadaan — bukan jam tetap seperti tiga saklar
+   di atasnya. Isinya baru dikirim BILA syaratnya terpenuhi, dan yang
+   menentukan syaratnya adalah data yang benar-benar masuk. Karena itu
+   keterangannya menyebut contoh syarat, bukan menjanjikan notifikasi harian. */
+const KATEGORI: { kunci: keyof Setelan; judul: string; contoh: string }[] = [
+  { kunci: 'notifPemulihan', judul: 'Pemulihan & tidur', contoh: 'HRV atau denyut istirahat menyimpang, utang tidur menumpuk' },
+  { kunci: 'notifLatihanPintar', judul: 'Latihan', contoh: 'tiga hari tanpa sesi, menit pekan ini kurang, langkah tertinggal' },
+  { kunci: 'notifVital', judul: 'Vital & pencegahan', contoh: 'tekanan darah tinggi, saturasi rendah dua malam, data berhenti masuk' },
+  { kunci: 'notifLingkungan', judul: 'Udara & sinar UV', contoh: 'AQI di atas 80 atau indeks UV puncak ≥ 8 di kota Anda' },
+]
+
+function jamDariMenit(m: number): string {
+  return `${String(Math.floor(m / 60)).padStart(2, '0')}:${String(m % 60).padStart(2, '0')}`
+}
+function menitDariJam(v: string): number {
+  const [h, m] = v.split(':').map(Number)
+  return (Number.isFinite(h) ? h : 22) * 60 + (Number.isFinite(m) ? m : 0)
 }
 
 function Saklar({ nyala, onUbah, label }: { nyala: boolean; onUbah: (v: boolean) => void; label: string }) {
@@ -230,6 +259,72 @@ export function UbinNotifikasi() {
               </span>
             }
           />
+        </div>
+
+        {/* ── Notifikasi berbasis keadaan ─────────────────────────────────
+            Tiga saklar di atas berbunyi pada JAM yang ditentukan; yang di
+            bawah ini hanya berbunyi bila SYARATNYA terpenuhi. Bedanya
+            disebut karena harapan yang salah adalah cara tercepat membuat
+            orang mematikan seluruh notifikasi. */}
+        <div className="border-t border-neutral-100 pt-2 dark:border-white/10">
+          <p className="t-mikro pb-1 font-black uppercase tracking-wide text-neutral-500">Berdasarkan keadaan</p>
+          {KATEGORI.map((c) => (
+            <div key={String(c.kunci)} className="border-t border-neutral-100 first:border-t-0 dark:border-white/10">
+              <Baris
+                judul={c.judul}
+                catatan={pushNyala ? c.contoh : 'Nyalakan notifikasi dahulu'}
+                kanan={
+                  <Saklar
+                    label={c.judul}
+                    nyala={!!setelan[c.kunci] && pushNyala}
+                    onUbah={(v) => void simpanServer({ [c.kunci]: v } as Setelan)}
+                  />
+                }
+              />
+            </div>
+          ))}
+
+          {/* KUOTA DAN JAM SENYAP ADA DI SINI, bukan tersembunyi di
+              pengaturan: keduanya yang menentukan apakah aplikasi ini masih
+              boleh menyela hidup orang besok. */}
+          <div className="flex items-center gap-2 border-t border-neutral-100 py-2 dark:border-white/10">
+            <span className="min-w-0 flex-1">
+              <span className="t-kecil block truncate font-bold text-ink dark:text-white">Paling banyak per hari</span>
+              <span className="t-mikro block truncate text-neutral-400">Sesudah kuota habis, sisanya menunggu besok</span>
+            </span>
+            <select
+              value={String(setelan.notifKuota ?? 6)}
+              onChange={(e) => void simpanServer({ notifKuota: Number(e.target.value) })}
+              aria-label="Kuota notifikasi harian"
+              className="t-kecil shrink-0 rounded-lg border border-neutral-200 bg-transparent px-1.5 py-1 tabular-nums text-ink dark:border-white/12 dark:text-white"
+            >
+              {[2, 4, 6, 8, 12].map((n) => <option key={n} value={n}>{n}</option>)}
+            </select>
+          </div>
+
+          <div className="flex items-center gap-2 border-t border-neutral-100 py-2 dark:border-white/10">
+            <span className="min-w-0 flex-1">
+              <span className="t-kecil block truncate font-bold text-ink dark:text-white">Jam senyap</span>
+              <span className="t-mikro block truncate text-neutral-400">Tidak ada yang dikirim pada jam ini</span>
+            </span>
+            <span className="flex shrink-0 items-center gap-1">
+              <input
+                type="time"
+                value={jamDariMenit(setelan.notifSenyapMulai ?? 22 * 60)}
+                onChange={(e) => void simpanServer({ notifSenyapMulai: menitDariJam(e.target.value) })}
+                aria-label="Jam senyap mulai"
+                className="t-kecil rounded-lg border border-neutral-200 bg-transparent px-1 py-1 tabular-nums text-ink dark:border-white/12 dark:text-white"
+              />
+              <span className="t-mikro text-neutral-400">–</span>
+              <input
+                type="time"
+                value={jamDariMenit(setelan.notifSenyapSelesai ?? 6 * 60)}
+                onChange={(e) => void simpanServer({ notifSenyapSelesai: menitDariJam(e.target.value) })}
+                aria-label="Jam senyap selesai"
+                className="t-kecil rounded-lg border border-neutral-200 bg-transparent px-1 py-1 tabular-nums text-ink dark:border-white/12 dark:text-white"
+              />
+            </span>
+          </div>
         </div>
       </div>
     </section>
