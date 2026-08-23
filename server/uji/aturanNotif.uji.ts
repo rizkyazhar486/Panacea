@@ -119,6 +119,24 @@ for (let i = 1; i <= 14; i++) tangga.riwayat[tangga.riwayat.length - i].flightsC
 tangga.hariIni.flightsClimbed = 1
 periksa('tanggaSepi menyala saat 1 lantai vs kebiasaan 12', !!cari('tanggaSepi').nilai(tangga))
 
+// 7d. Gelombang keempat: skrining, kekuatan genggam, angkat beban.
+periksa('skriningLewat menyala bila dua lewat jatuh tempo',
+  !!cari('skriningLewat').nilai(konteks({}, 10 * 60, { skriningLewat: 2 })))
+periksa('skriningLewat diam bila tidak ada yang lewat',
+  !cari('skriningLewat').nilai(konteks({}, 10 * 60, { skriningLewat: 0 })))
+
+periksa('genggamLama menyala sesudah 5 bulan',
+  !!cari('genggamLama').nilai(konteks({}, 10 * 60, { umurGenggam: 150 })))
+periksa('genggamLama diam sesudah 2 bulan',
+  !cari('genggamLama').nilai(konteks({}, 10 * 60, { umurGenggam: 60 })))
+
+periksa('bebanSepi menyala sesudah 14 hari',
+  !!cari('bebanSepi').nilai(konteks({}, 17 * 60, { hariSejakBeban: 14 })))
+periksa('bebanSepi diam sesudah 3 hari',
+  !cari('bebanSepi').nilai(konteks({}, 17 * 60, { hariSejakBeban: 3 })))
+periksa('bebanSepi diam sesudah 90 hari (sudah berhenti sama sekali, bukan lupa)',
+  !cari('bebanSepi').nilai(konteks({}, 17 * 60, { hariSejakBeban: 90 })))
+
 // 7b. Jendela waktu tiap aturan masuk akal (tidak ada yang tengah malam).
 for (const a of ATURAN) {
   if (!a.jendela) continue

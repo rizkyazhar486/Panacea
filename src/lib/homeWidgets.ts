@@ -111,6 +111,10 @@ export const WIDGETS: WidgetDef[] = [
   { id: 'suplemen', label: 'Suplemen', ringkas: 'Daftar sendiri, tanpa anjuran', ke: '/harian', emoji: '💊', kategori: 'Gizi', bawaan: true },
   { id: 'suhuEkstrem', label: 'Panas & Dingin', ringkas: 'Sauna dan rendaman dingin', ke: '/harian', emoji: '🔥', kategori: 'Tidur & Pemulihan', bawaan: true },
   { id: 'pangan', label: 'Cari Pangan Kemasan', ringkas: 'Barcode atau nama, dari Open Food Facts', ke: '/nutrition', emoji: '🔎', kategori: 'Gizi', bawaan: true },
+  { id: 'obatPengingat', label: 'Obat', ringkas: 'Dosis berikutnya dan pengingat aktif', ke: '/med-reminders', emoji: '💊', kategori: 'Layanan & Darurat', bawaan: true },
+  { id: 'beban', label: 'Volume Angkat Beban', ringkas: 'Delapan pekan dan rekor gerakan', ke: '/latihan-beban', emoji: '🏋️', kategori: 'Latihan', bawaan: true },
+  { id: 'ukurBerkala', label: 'Ukur Berkala', ringkas: 'Kekuatan genggam dan keseimbangan', ke: '/tubuh', emoji: '✊', kategori: 'Tubuh & Data', bawaan: true },
+  { id: 'skrining', label: 'Skrining & Vaksin', ringkas: 'Jatuh tempo pemeriksaan Anda sendiri', ke: '/tubuh', emoji: '🗓️', kategori: 'Klinis & Belajar', bawaan: true },
   { id: 'lab', label: 'Hasil Lab', ringkas: 'HbA1c, ApoB, eGFR, dan perjalanannya', ke: '/tubuh', emoji: '🧪', kategori: 'Klinis & Belajar', bawaan: true },
   { id: 'lingkungan', label: 'Udara & UV', ringkas: 'AQI dan indeks UV kota Anda', ke: '/tubuh', emoji: '🌤️', kategori: 'Tubuh & Data', bawaan: true },
   { id: 'hrv', label: 'HRV Semalam', ringkas: 'Terhadap kebiasaan 14 hari', ke: '/tubuh?t=jantung', emoji: '💓', kategori: 'Tidur & Pemulihan', bawaan: true },
@@ -305,6 +309,7 @@ export const WIDGET_HIDUP = [
   'giziLebar', 'hidrasi2', 'pangan', 'kopi', 'puasa', 'suplemen',
   // ── Tubuh & vital ───────────────────────────────────────────────────────
   'komposisi', 'tekanan', 'lajuNapas', 'saturasi', 'suhu', 'lab', 'tenaga',
+  'obatPengingat', 'beban', 'ukurBerkala', 'skrining',
   // ── Grafik tujuh hari (kisi dua kolom, bukan tumpukan) ──────────────────
   'grafikLatihan', 'grafikTidur', 'grafikLangkah', 'grafikGizi', 'grafikDenyut',
   // ── Belajar & klinis ────────────────────────────────────────────────────

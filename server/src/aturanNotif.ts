@@ -545,6 +545,51 @@ export const ATURAN: Aturan[] = [
     },
   },
   {
+    id: 'skriningLewat',
+    kategori: 'vital',
+    jendela: [J(9), J(11)],
+    jeda: 14,
+    nilai: (k) => {
+      const n = Number(k.ringkas?.skriningLewat)
+      if (!Number.isFinite(n) || n <= 0) return null
+      return {
+        judul: n === 1 ? 'Satu pemeriksaan lewat jatuh tempo' : `${n} pemeriksaan lewat jatuh tempo`,
+        badan: 'Menurut jarak yang Anda sendiri tetapkan bersama dokter Anda. Aplikasi ini tidak menentukan siapa perlu diperiksa apa — ia hanya mengingat kesepakatan itu.',
+        url: './#/tubuh',
+      }
+    },
+  },
+  {
+    id: 'genggamLama',
+    kategori: 'vital',
+    jendela: [J(9), J(17)],
+    jeda: 30,
+    nilai: (k) => {
+      const u = Number(k.ringkas?.umurGenggam)
+      if (!Number.isFinite(u) || u < 120) return null
+      return {
+        judul: `Kekuatan genggam terakhir ${Math.round(u / 30)} bulan lalu`,
+        badan: 'Pengukuran yang jarang hanya bermakna sebagai perbandingan antar-pengukuran. Sekali tiap tiga bulan sudah cukup untuk melihat arahnya.',
+        url: './#/tubuh',
+      }
+    },
+  },
+  {
+    id: 'bebanSepi',
+    kategori: 'latihan',
+    jendela: [J(16), J(19)],
+    jeda: 7,
+    nilai: (k) => {
+      const h = Number(k.ringkas?.hariSejakBeban)
+      if (!Number.isFinite(h) || h < 10 || h > 60) return null
+      return {
+        judul: `${Math.round(h)} hari tanpa sesi angkat beban`,
+        badan: 'Massa dan kekuatan otot menurun lebih cepat daripada kebugaran aerobik saat berhenti. Dua sesi pendek sepekan sudah cukup untuk menahannya.',
+        url: './#/latihan-beban',
+      }
+    },
+  },
+  {
     id: 'belumTersinkron',
     kategori: 'vital',
     jendela: [J(10), J(12)],

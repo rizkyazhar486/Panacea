@@ -38,6 +38,7 @@ import { UbinHrv, UbinTahapTidur, UbinEfisiensiTidur, UbinLajuNapas, UbinSaturas
 import { UbinLingkungan } from './UbinLingkungan'
 import { UbinLab } from './UbinLab'
 import { UbinPangan } from './UbinPangan'
+import { UbinObatPengingat, UbinBeban, UbinUkurBerkala, UbinSkrining } from './UbinUkur'
 import { UbinTenaga, UbinHidrasi, UbinCahaya, UbinTangga, UbinVo2Tren, UbinKomposisi, UbinSuplemen, UbinSuhuEkstrem } from './UbinHarianPlus'
 import { UbinTidurLebar, UbinGiziLebar } from './UbinTidurGizi'
 import { PetaKonsistensi } from './PetaKonsistensi'
@@ -538,6 +539,10 @@ export function PapanWidget({ pratinjau, tanggalCatatan }: { pratinjau: Pratinja
         ...(pilihan.includes('motivasi') ? [{ kunci: 'motivasi', isi: <UbinMotivasi /> }] : []),
         ...(pilihan.includes('lingkungan') ? [{ kunci: 'lingkungan', isi: <UbinLingkungan /> }] : []),
         ...(pilihan.includes('pangan') ? [{ kunci: 'pangan', isi: <UbinPangan /> }] : []),
+        ...(pilihan.includes('obatPengingat') ? [{ kunci: 'obatPengingat', isi: <UbinObatPengingat /> }] : []),
+        ...(pilihan.includes('beban') ? [{ kunci: 'beban', isi: <UbinBeban /> }] : []),
+        ...(pilihan.includes('ukurBerkala') ? [{ kunci: 'ukurBerkala', isi: <UbinUkurBerkala /> }] : []),
+        ...(pilihan.includes('skrining') ? [{ kunci: 'skrining', isi: <UbinSkrining /> }] : []),
         ...(pilihan.includes('lab') ? [{ kunci: 'lab', isi: <UbinLab /> }] : []),
         ...(pilihan.includes('tenaga') ? [{ kunci: 'tenaga', isi: <UbinTenaga /> }] : []),
         ...(pilihan.includes('hidrasi2') ? [{ kunci: 'hidrasi2', isi: <UbinHidrasi /> }] : []),

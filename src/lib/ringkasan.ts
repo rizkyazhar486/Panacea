@@ -2,6 +2,8 @@ import { api, backendEnabled } from './api'
 import { getVitals } from './healthVitals'
 import { ambilLab } from './lab'
 import { ambilSuplemen, sudahDiminum, hariSejak } from './kebiasaanHarian'
+import { jumlahLewat, umurUkur } from './ukurBerkala'
+import { ambilSesi } from './angkatBeban'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Ringkasan harian yang dititipkan ke server — SESEDIKIT MUNGKIN.
@@ -43,6 +45,9 @@ interface Ringkasan {
   cahayaHariIni?: boolean
   suplemenBelum?: number
   hariSejakPanas?: number
+  skriningLewat?: number
+  umurGenggam?: number
+  hariSejakBeban?: number
 }
 
 function tanggalLokal(d = new Date()): string {
@@ -103,6 +108,15 @@ export function susunRingkasan(): Ringkasan {
     if (daftar.length) r.suplemenBelum = daftar.length - sudahDiminum().length
     const panas = hariSejak('panas')
     if (panas != null) r.hariSejakPanas = panas
+    const lewat = jumlahLewat()
+    if (lewat > 0) r.skriningLewat = lewat
+    const g = umurUkur('genggam')
+    if (g != null) r.umurGenggam = g
+    const beban = ambilSesi()
+    if (beban.length) {
+      const t = Date.parse(beban[beban.length - 1].tanggal)
+      if (Number.isFinite(t)) r.hariSejakBeban = Math.floor((Date.now() - t) / 864e5)
+    }
   } catch { /* abaikan */ }
 
   return r
