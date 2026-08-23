@@ -1,0 +1,477 @@
+import { useEffect, useMemo, useRef, useState } from 'react'
+import { Link } from 'react-router-dom'
+import { getWorkouts } from '../lib/workoutStore'
+import { hitungSesi } from '../lib/trainingPhysiology'
+import { sesiDariWorkout } from '../lib/analisisPro'
+import { hrMaxFromAge } from '../lib/workoutImport'
+import { getDemo } from '../lib/profile'
+import { getVitals } from '../lib/healthVitals'
+import { deretMetrik, ambilRiwayat } from '../lib/riwayatVitals'
+import { useStore } from '../lib/store'
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Widget lanjutan — yang bisa dihitung JUJUR dari data yang sudah masuk.
+//
+// Berkas ini lahir dari satu daftar berisi 210 widget yang diinginkan. Yang
+// dikerjakan di sini hanya yang datanya benar-benar ada di aplikasi ini, dan
+// tiap widget menyebut dari mana angkanya. Yang menuntut alat yang belum
+// tersambung (CGM, EEG, dinamometer) atau yang bentuknya ramalan gabungan
+// (usia biologis, perkiraan sisa umur) sengaja TIDAK dibuat: widget yang
+// menampilkan angka yang tidak diukur akan selalu terlihat meyakinkan, dan di
+// aplikasi kesehatan itu justru bahayanya.
+// ─────────────────────────────────────────────────────────────────────────────
+
+const HARI = 864e5
+
+function Kepala({ judul, ke, kanan }: { judul: string; ke?: string; kanan?: React.ReactNode }) {
+  return (
+    <div className="mb-2 flex items-baseline justify-between gap-2">
+      <h2 className="t-kecil font-black uppercase tracking-wide text-neutral-500">{judul}</h2>
+      {kanan ?? (ke ? (
+        <Link to={ke} className="t-kecil flex min-h-[40px] items-center font-bold text-brand">Buka →</Link>
+      ) : null)}
+    </div>
+  )
+}
+
+function median(a: number[]): number {
+  if (!a.length) return 0
+  const s = [...a].sort((x, y) => x - y)
+  const t = Math.floor(s.length / 2)
+  return s.length % 2 ? s[t] : (s[t - 1] + s[t]) / 2
+}
+
+function konteksLatihan() {
+  const sesi = getWorkouts()
+  const demo = getDemo()
+  const usia = demo.age > 0 ? demo.age : 30
+  const jk: 'M' | 'F' = demo.sex === 'F' ? 'F' : 'M'
+  const v = getVitals()
+  return {
+    sesi,
+    k: {
+      hrMax: sesi.reduce((a, w) => Math.max(a, w.maxHr ?? 0), 0) || hrMaxFromAge(usia, jk),
+      hrRest: typeof v.restingHr === 'number' && v.restingHr > 0 ? v.restingHr : 60,
+      sex: jk,
+    },
+  }
+}
+
+// ── Zona 2 sepekan ─────────────────────────────────────────────────────────
+//
+// Menit di zona 2 (60-70% denyut maksimal) selama tujuh hari terakhir, dihitung
+// dari deret denyut tiap sesi — bukan dari jenis olahraganya. Anjuran yang
+// paling sering dikutip adalah 150-180 menit sepekan; yang ditampilkan di sini
+// adalah menitnya sendiri beserta garis anjuran itu, bukan nilai lulus/gagal.
+export function UbinZona2() {
+  const { sesi, k } = useMemo(konteksLatihan, [])
+  const menit = useMemo(() => {
+    const pekan = sesi.filter((w) => Date.now() - Date.parse(w.mulai) < 7 * HARI && w.hr.length >= 2)
+    if (!pekan.length) return null
+    const terhitung = hitungSesi(pekan.map(sesiDariWorkout), k)
+    return terhitung.reduce((a, s) => a + (s.zona.find((z) => z.z === 2)?.menit ?? 0), 0)
+  }, [sesi, k])
+
+  if (menit == null) return null
+  const sasaran = 150
+
+  return (
+    <section>
+      <Kepala judul="Zona 2 · 7 hari" ke="/latihan?t=analisis" />
+      <div className="kaca rounded-3xl p-3">
+        <div className="flex items-baseline gap-1.5">
+          <span className="text-[26px] font-black leading-none tabular-nums nyala text-ink dark:text-white">{Math.round(menit)}</span>
+          <span className="t-mikro font-bold text-neutral-400">menit di 60–70% HRmaks</span>
+        </div>
+        {/* Bilah dengan penanda anjuran pada 150 menit. Bilah dipotong pada
+            200 menit supaya menit di atas anjuran tetap terlihat sebagai
+            kelebihan, bukan menempel di ujung tanpa keterangan. */}
+        <span className="relative mt-2 block h-2.5 w-full rounded-full bg-neutral-200 dark:bg-white/10" aria-hidden>
+          <span className="block h-full rounded-full bg-brand" style={{ width: `${Math.min(100, (menit / 200) * 100)}%` }} />
+          <span className="absolute inset-y-0 w-px bg-neutral-500 dark:bg-white/50" style={{ left: `${(sasaran / 200) * 100}%` }} />
+        </span>
+        <p className="t-mikro mt-1.5 leading-snug text-neutral-400">
+          Garis = 150 menit/pekan, anjuran aktivitas sedang WHO. Dihitung dari deret denyut tiap sesi, bukan dari jenis olahraganya.
+        </p>
+      </div>
+    </section>
+  )
+}
+
+// ── Pemulihan denyut satu menit ────────────────────────────────────────────
+//
+// Turunnya denyut pada menit pertama sesudah sesi berakhir (HRR1). Sudah
+// dihitung saat impor dari deret nyata; di sini hanya dikumpulkan. Penurunan
+// yang lebih besar umumnya menyertai kebugaran yang lebih baik, tetapi ANGKA
+// AMBANG tidak ditulis: batas "≤12 bpm" berasal dari uji treadmill dengan
+// pendinginan terkendali, dan sesi lapangan tidak memenuhi syarat itu.
+export function UbinPemulihanDenyut() {
+  const deret = useMemo(() => {
+    return getWorkouts()
+      .filter((w) => typeof w.hrr1 === 'number' && w.hrr1 > 0)
+      .sort((a, b) => Date.parse(a.mulai) - Date.parse(b.mulai))
+      .slice(-10)
+      .map((w) => ({ nilai: w.hrr1 as number, tanggal: w.mulai }))
+  }, [])
+
+  if (deret.length < 2) return null
+  const akhir = deret[deret.length - 1].nilai
+  const maks = Math.max(...deret.map((d) => d.nilai))
+
+  return (
+    <section>
+      <Kepala judul="Pemulihan denyut 1 menit" ke="/latihan?t=analisis" />
+      <div className="kaca rounded-3xl p-3">
+        <div className="flex items-baseline gap-1.5">
+          <span className="text-[26px] font-black leading-none tabular-nums nyala text-ink dark:text-white">−{akhir}</span>
+          <span className="t-mikro font-bold text-neutral-400">bpm, sesi terakhir</span>
+          <span className="t-mikro ml-auto shrink-0 text-neutral-400">{deret.length} sesi</span>
+        </div>
+        <span className="mt-2 flex h-10 items-end gap-[3px]" aria-hidden>
+          {deret.map((d, i) => (
+            <span key={i} className="flex-1 rounded-sm bg-rose-400" style={{ height: `${Math.max(10, (d.nilai / maks) * 100)}%` }} />
+          ))}
+        </span>
+        <p className="t-mikro mt-1.5 leading-snug text-neutral-400">
+          Selisih denyut akhir sesi dengan satu menit sesudahnya. Arahnya yang dibaca; ambang baku tidak ditulis karena berasal dari uji treadmill terkendali, bukan sesi lapangan.
+        </p>
+      </div>
+    </section>
+  )
+}
+
+// ── Utang tidur ────────────────────────────────────────────────────────────
+//
+// Selisih tujuh malam terakhir terhadap KEBIASAAN SENDIRI, bukan terhadap
+// delapan jam. Kebutuhan tidur berbeda tiap orang, dan menagih semua orang
+// dengan angka yang sama membuat sebagian merasa gagal setiap hari.
+export function UbinUtangTidur() {
+  const { state } = useStore()
+  const { utang, malam, biasa } = useMemo(() => {
+    const peta = new Map<string, number>()
+    for (const t of deretMetrik('sleepH')) peta.set(t.tanggal, t.nilai)
+    for (const s of state.sleepLogs ?? []) if (s?.date && s.hours > 0) peta.set(s.date, s.hours)
+    const kunci = (n: number) => {
+      const d = new Date(Date.now() - n * HARI)
+      const p = (x: number) => String(x).padStart(2, '0')
+      return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}`
+    }
+    const semua = [...peta.values()]
+    const biasa = median(semua)
+    const malam: number[] = []
+    for (let i = 6; i >= 0; i--) malam.push(peta.get(kunci(i)) ?? 0)
+    const tercatat = malam.filter((x) => x > 0)
+    const utang = tercatat.length ? tercatat.reduce((a, b) => a + (b - biasa), 0) : null
+    return { utang, malam, biasa }
+  }, [state.sleepLogs])
+
+  if (utang == null || biasa <= 0) return null
+
+  return (
+    <section>
+      <Kepala judul="Utang tidur 7 malam" ke="/pola-tidur" />
+      <div className="kaca rounded-3xl p-3">
+        <div className="flex items-baseline gap-1.5">
+          <span className={`text-[26px] font-black leading-none tabular-nums ${utang < 0 ? 'text-rose-500' : 'text-brand'}`}>
+            {utang >= 0 ? '+' : '−'}{Math.abs(utang).toFixed(1)}
+          </span>
+          <span className="t-mikro font-bold text-neutral-400">jam terhadap kebiasaan</span>
+        </div>
+        {/* Batang selisih terhadap garis tengah: yang lebih panjang dari
+            kebiasaan tumbuh KE ATAS garis, yang lebih pendek ke bawah.
+            Percobaan pertama memakai margin otomatis untuk menempelkannya ke
+            garis, dan pada tangkapan layar batangnya melayang tidak menyentuh
+            garis sama sekali — sekarang tiap batang dipatok mutlak pada garis
+            tengah kolomnya sendiri, sehingga tidak dapat meleset. */}
+        <span className="mt-2 flex h-12 gap-[3px]" aria-hidden>
+          {malam.map((v, i) => {
+            const d = v > 0 ? v - biasa : 0
+            const tinggi = v === 0 ? 3 : Math.max(4, Math.min(24, (Math.abs(d) / Math.max(0.5, biasa * 0.4)) * 24))
+            return (
+              <span key={i} className="relative h-full flex-1">
+                <span className="absolute inset-x-0 top-1/2 h-px bg-neutral-300 dark:bg-white/20" />
+                <span
+                  className={`absolute inset-x-0 rounded-sm ${v === 0 ? 'bg-neutral-300 dark:bg-white/15' : d < 0 ? 'bg-rose-400' : 'bg-brand'}`}
+                  style={d < 0 ? { top: '50%', height: tinggi } : { bottom: '50%', height: tinggi }}
+                />
+              </span>
+            )
+          })}
+        </span>
+        <p className="t-mikro mt-1.5 text-neutral-400">
+          Kebiasaan Anda {biasa.toFixed(1)} jam · di atas garis lebih panjang, di bawah lebih pendek
+        </p>
+      </div>
+    </section>
+  )
+}
+
+// ── Protein harian ─────────────────────────────────────────────────────────
+//
+// Sasaran 1,6 g/kg berat badan adalah titik jenuh yang berulang kali muncul
+// pada telaah latihan beban; rentang yang dianjurkan 1,2-2,0 g/kg. Karena itu
+// yang digambar adalah RENTANG, bukan satu garis tunggal — dan angkanya hanya
+// muncul bila berat badan memang tercatat.
+export function UbinProtein() {
+  const { state } = useStore()
+  const berat = typeof getVitals().weightKg === 'number' ? (getVitals().weightKg as number) : 0
+
+  const gram = useMemo(() => {
+    const p = (x: number) => String(x).padStart(2, '0')
+    const d = new Date()
+    const hariIni = `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}`
+    let g = 0
+    let ada = false
+    for (const f of state.foods ?? []) {
+      if (f?.date !== hariIni) continue
+      ada = true
+      g += f.protein ?? 0
+    }
+    return ada ? g : null
+  }, [state.foods])
+
+  if (!berat || gram == null) return null
+  const bawah = berat * 1.2
+  const target = berat * 1.6
+  const atas = berat * 2.0
+
+  return (
+    <section>
+      <Kepala judul="Protein hari ini" ke="/nutrition" />
+      <div className="kaca rounded-3xl p-3">
+        <div className="flex items-baseline gap-1.5">
+          <span className="text-[26px] font-black leading-none tabular-nums nyala text-ink dark:text-white">{Math.round(gram)}</span>
+          <span className="t-mikro font-bold text-neutral-400">g</span>
+          <span className="t-mikro ml-auto shrink-0 tabular-nums text-neutral-400">
+            {Math.round(bawah)}–{Math.round(atas)} g untuk {berat} kg
+          </span>
+        </div>
+        <span className="relative mt-2 block h-2.5 w-full rounded-full bg-neutral-200 dark:bg-white/10" aria-hidden>
+          {/* Pita rentang anjuran digambar lebih dahulu, lalu batang asupan di
+              atasnya: yang ditanyakan orang adalah "sudah masuk rentang atau
+              belum", dan itu hanya terbaca bila keduanya satu sumbu. */}
+          <span
+            className="absolute inset-y-0 rounded-full bg-brand/25"
+            style={{ left: `${(bawah / (atas * 1.15)) * 100}%`, width: `${((atas - bawah) / (atas * 1.15)) * 100}%` }}
+          />
+          <span className="absolute inset-y-0 w-px bg-neutral-600 dark:bg-white/60" style={{ left: `${(target / (atas * 1.15)) * 100}%` }} />
+          <span className="absolute inset-y-0 left-0 rounded-full bg-brand" style={{ width: `${Math.min(100, (gram / (atas * 1.15)) * 100)}%` }} />
+        </span>
+        <p className="t-mikro mt-1.5 leading-snug text-neutral-400">
+          Pita = 1,2–2,0 g/kg; garis = 1,6 g/kg, titik jenuh pada telaah latihan beban. Untuk penyakit ginjal kronik, sasarannya berbeda dan ditentukan dokter.
+        </p>
+      </div>
+    </section>
+  )
+}
+
+// ── Tekanan darah ──────────────────────────────────────────────────────────
+export function UbinTekanan() {
+  const { sis, dia, deret } = useMemo(() => {
+    const v = getVitals()
+    const riwayat = ambilRiwayat()
+      .filter((h) => typeof h.nilai?.systolic === 'number' && typeof h.nilai?.diastolic === 'number')
+      .slice(-14)
+      .map((h) => ({ s: h.nilai.systolic as number, d: h.nilai.diastolic as number }))
+    return {
+      sis: typeof v.systolic === 'number' ? v.systolic : null,
+      dia: typeof v.diastolic === 'number' ? v.diastolic : null,
+      deret: riwayat,
+    }
+  }, [])
+
+  if (sis == null || dia == null) return null
+
+  return (
+    <section>
+      <Kepala judul="Tekanan darah" ke="/tubuh" />
+      <div className="kaca rounded-3xl p-3">
+        <div className="flex items-baseline gap-1.5">
+          <span className="text-[26px] font-black leading-none tabular-nums nyala text-ink dark:text-white">{sis}/{dia}</span>
+          <span className="t-mikro font-bold text-neutral-400">mmHg</span>
+        </div>
+        {deret.length >= 3 && (
+          /* Dua garis pada satu sumbu, bukan dua grafik: sistolik dan
+             diastolik hanya bermakna dibaca berpasangan. */
+          <svg viewBox="0 0 100 40" preserveAspectRatio="none" className="mt-2 h-12 w-full" role="img" aria-label="Tekanan darah 14 bacaan terakhir">
+            {(['s', 'd'] as const).map((kunci, idx) => {
+              const nilai = deret.map((p) => p[kunci])
+              const semua = [...deret.map((p) => p.s), ...deret.map((p) => p.d)]
+              const min = Math.min(...semua) - 5
+              const maks = Math.max(...semua) + 5
+              const titik = nilai
+                .map((v, i) => `${(i / Math.max(1, nilai.length - 1)) * 100},${40 - ((v - min) / Math.max(1, maks - min)) * 38}`)
+                .join(' ')
+              return (
+                <polyline
+                  key={kunci}
+                  points={titik}
+                  fill="none"
+                  strokeWidth="1.6"
+                  vectorEffect="non-scaling-stroke"
+                  stroke="currentColor"
+                  className={idx === 0 ? 'text-rose-400' : 'text-sky-400'}
+                />
+              )
+            })}
+          </svg>
+        )}
+        <p className="t-mikro mt-1 leading-snug text-neutral-400">
+          Satu bacaan bukan diagnosis: penetapan hipertensi memakai rerata beberapa bacaan pada hari berbeda, dengan istirahat 5 menit sebelumnya.
+        </p>
+      </div>
+    </section>
+  )
+}
+
+// ── Napas 2 menit (physiological sigh) ─────────────────────────────────────
+//
+// Panduan napas satu ketukan: tarik, tarik pendek lagi, lalu buang panjang.
+// Yang dijanjikan hanya efek SESAAT pada rasa tenang dan laju napas — itulah
+// yang diukur pada percobaan terkendalinya. Tidak ada klaim menurunkan
+// tekanan darah jangka panjang atau memperbaiki HRV semalaman.
+const POLA: { label: string; detik: number }[] = [
+  { label: 'Tarik lewat hidung', detik: 4 },
+  { label: 'Tarik pendek lagi', detik: 1 },
+  { label: 'Buang panjang lewat mulut', detik: 7 },
+]
+
+export function UbinNapas() {
+  const [jalan, setJalan] = useState(false)
+  const [mulai, setMulai] = useState(0)
+  const [, paksa] = useState(0)
+  const getarTerakhir = useRef(-1)
+
+  useEffect(() => {
+    if (!jalan) return
+    const id = window.setInterval(() => paksa((n) => n + 1), 200)
+    return () => window.clearInterval(id)
+  }, [jalan])
+
+  const putaranDetik = POLA.reduce((a, p) => a + p.detik, 0)
+  const lewat = jalan ? (Date.now() - mulai) / 1000 : 0
+  const selesai = jalan && lewat >= 120
+
+  useEffect(() => { if (selesai) { setJalan(false); try { navigator.vibrate?.([200, 100, 200]) } catch { /* — */ } } }, [selesai])
+
+  let fase = POLA[0]
+  let sisaFase = 0
+  if (jalan) {
+    let t = lewat % putaranDetik
+    for (const p of POLA) {
+      if (t < p.detik) { fase = p; sisaFase = p.detik - t; break }
+      t -= p.detik
+    }
+    const idx = POLA.indexOf(fase)
+    if (getarTerakhir.current !== idx) {
+      getarTerakhir.current = idx
+      try { navigator.vibrate?.(idx === 2 ? 120 : 45) } catch { /* — */ }
+    }
+  }
+
+  return (
+    <section>
+      <Kepala
+        judul="Napas 2 menit"
+        kanan={jalan ? (
+          <button onClick={() => setJalan(false)} className="t-kecil flex min-h-[40px] items-center font-bold text-neutral-500">Berhenti</button>
+        ) : undefined}
+      />
+      <div className="kaca rounded-3xl p-3">
+        {!jalan ? (
+          <>
+            <p className="t-kecil leading-snug text-neutral-600 dark:text-neutral-300">
+              Tarik — tarik pendek lagi — buang panjang. Diulang dua menit.
+            </p>
+            <button
+              onClick={() => { setMulai(Date.now()); getarTerakhir.current = -1; setJalan(true) }}
+              className="t-kecil mt-2 min-h-[44px] w-full rounded-2xl bg-brand font-bold text-white transition active:scale-[0.98]"
+            >
+              Mulai
+            </button>
+            <p className="t-mikro mt-2 leading-snug text-neutral-400">
+              Yang terukur pada percobaannya efek sesaat pada rasa tenang dan laju napas — bukan perbaikan tekanan darah jangka panjang.
+            </p>
+          </>
+        ) : (
+          <div className="flex items-center gap-3">
+            <span
+              className="grid shrink-0 place-items-center rounded-full bg-brand text-white transition-all duration-500 cahaya-hijau"
+              style={{ width: fase.label.startsWith('Buang') ? 56 : 84, height: fase.label.startsWith('Buang') ? 56 : 84 }}
+            >
+              <span className="text-[18px] font-black tabular-nums">{Math.ceil(sisaFase)}</span>
+            </span>
+            <span className="min-w-0 flex-1">
+              <span className="t-kecil block font-black text-ink dark:text-white">{fase.label}</span>
+              <span className="t-mikro block text-neutral-400">Sisa {Math.max(0, Math.ceil(120 - lewat))} detik</span>
+            </span>
+          </div>
+        )}
+      </div>
+    </section>
+  )
+}
+
+// ── Terlalu lama duduk ─────────────────────────────────────────────────────
+//
+// Pengingat berdiri tiap 30 menit. Yang dihitung adalah waktu sejak terakhir
+// kali tombol "sudah berdiri" ditekan — bukan gerak yang terdeteksi sensor,
+// karena aplikasi web tidak dapat melihatnya. Ditulis begitu supaya tidak
+// dikira alat pendeteksi.
+const KUNCI_DUDUK = 'pmd_duduk_v1'
+
+export function UbinDuduk() {
+  const [sejak, setSejak] = useState<number>(() => {
+    const v = Number(localStorage.getItem(KUNCI_DUDUK) || 0)
+    return Number.isFinite(v) && v > 0 ? v : Date.now()
+  })
+  const [, paksa] = useState(0)
+  const sudahGetar = useRef(false)
+
+  useEffect(() => {
+    const id = window.setInterval(() => paksa((n) => n + 1), 30_000)
+    return () => window.clearInterval(id)
+  }, [])
+
+  const menit = (Date.now() - sejak) / 60_000
+  useEffect(() => {
+    if (menit >= 30 && !sudahGetar.current) {
+      sudahGetar.current = true
+      try { navigator.vibrate?.([200, 120, 200]) } catch { /* — */ }
+    }
+    if (menit < 30) sudahGetar.current = false
+  }, [menit])
+
+  const tandai = () => {
+    const t = Date.now()
+    try { localStorage.setItem(KUNCI_DUDUK, String(t)) } catch { /* kuota */ }
+    sudahGetar.current = false
+    setSejak(t)
+  }
+
+  return (
+    <section>
+      <Kepala
+        judul="Duduk"
+        kanan={<button onClick={tandai} className="t-kecil flex min-h-[40px] items-center font-bold text-brand">Sudah berdiri</button>}
+      />
+      <div className="kaca rounded-3xl p-3">
+        <div className="flex items-baseline gap-1.5">
+          <span className={`text-[26px] font-black leading-none tabular-nums ${menit >= 30 ? 'text-rose-500' : 'text-ink dark:text-white'}`}>
+            {Math.floor(menit)}
+          </span>
+          <span className="t-mikro font-bold text-neutral-400">menit sejak terakhir berdiri</span>
+        </div>
+        <span className="mt-2 block h-2.5 w-full rounded-full bg-neutral-200 dark:bg-white/10" aria-hidden>
+          <span
+            className={`block h-full rounded-full ${menit >= 30 ? 'bg-rose-500' : 'bg-brand'}`}
+            style={{ width: `${Math.min(100, (menit / 30) * 100)}%` }}
+          />
+        </span>
+        <p className="t-mikro mt-1.5 leading-snug text-neutral-400">
+          Dihitung dari tombol, bukan dari sensor — aplikasi web tidak dapat melihat Anda duduk atau berdiri.
+        </p>
+      </div>
+    </section>
+  )
+}

@@ -102,6 +102,13 @@ export const WIDGETS: WidgetDef[] = [
   { id: 'labDecoder', label: 'Baca Hasil Lab', ringkas: 'Terjemahkan angka laboratorium', ke: '/lab-decoder', emoji: '🧾', kategori: 'Tubuh & Data' },
   { id: 'rppg', label: 'Detak dari Kamera', ringkas: 'Ukur nadi lewat wajah', ke: '/rppg-heart-rate', emoji: '📷', kategori: 'Tubuh & Data' },
   { id: 'vokal', label: 'Biomarker Suara', ringkas: 'Petunjuk kesehatan dari suara', ke: '/vocal-biomarkers', emoji: '🎙️', kategori: 'Tubuh & Data' },
+  { id: 'zona2', label: 'Zona 2 Sepekan', ringkas: 'Menit di 60–70% HRmaks', ke: '/latihan?t=analisis', emoji: '🫀', kategori: 'Latihan', bawaan: true },
+  { id: 'hrr', label: 'Pemulihan Denyut', ringkas: 'Turun berapa bpm dalam 1 menit', ke: '/latihan?t=analisis', emoji: '📉', kategori: 'Latihan', bawaan: true },
+  { id: 'utangTidur', label: 'Utang Tidur', ringkas: '7 malam terhadap kebiasaan', ke: '/pola-tidur', emoji: '😴', kategori: 'Tidur & Pemulihan', bawaan: true },
+  { id: 'protein', label: 'Protein Hari Ini', ringkas: 'Terhadap 1,2–2,0 g/kg', ke: '/nutrition', emoji: '🍗', kategori: 'Gizi', bawaan: true },
+  { id: 'tekanan', label: 'Tekanan Darah', ringkas: 'Sistolik dan diastolik', ke: '/tubuh', emoji: '🩸', kategori: 'Tubuh & Data', bawaan: true },
+  { id: 'napas', label: 'Napas 2 Menit', ringkas: 'Panduan napas terpandu', ke: '/harian', emoji: '🌬️', kategori: 'Tubuh & Data', bawaan: true },
+  { id: 'duduk', label: 'Duduk', ringkas: 'Pengingat berdiri tiap 30 menit', ke: '/harian', emoji: '🪑', kategori: 'Tubuh & Data', bawaan: true },
   { id: 'mata', label: 'Mata 20-20-20', ringkas: 'Jeda mata tiap 20 menit', ke: '/tubuh', emoji: '👁️', kategori: 'Tubuh & Data', bawaan: true },
   { id: 'fokus', label: 'Sesi Fokus', ringkas: 'Hitungan mundur kerja atau layar', ke: '/harian', emoji: '🎯', kategori: 'Tubuh & Data', bawaan: true },
   { id: 'kopi', label: 'Kopi', ringkas: 'Kopi terakhir dan sisa kafein', ke: '/pola-tidur', emoji: '☕', kategori: 'Gizi', bawaan: true },
@@ -301,6 +308,13 @@ export const WIDGET_HIDUP = [
   'fokus',          // sesi kerja/menatap layar
   'kopi',           // kopi terakhir + perkiraan sisa kafein
   'puasa',          // menuju Magrib + jendela makan
+  'zona2',          // menit zona 2 sepekan, dari deret denyut
+  'hrr',            // pemulihan denyut satu menit
+  'utangTidur',     // tujuh malam terhadap kebiasaan sendiri
+  'protein',        // gram hari ini terhadap 1,2-2,0 g/kg
+  'tekanan',        // sistolik/diastolik + 14 bacaan
+  'napas',          // panduan napas dua menit
+  'duduk',          // pengingat berdiri
 ] as const
 
 /** Katalog yang boleh menempati beranda. */

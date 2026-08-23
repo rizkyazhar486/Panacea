@@ -33,6 +33,7 @@ import { UbinPewaktu } from './UbinPewaktu'
 import { UbinNotifikasi } from './UbinNotifikasi'
 import { UbinMata, UbinFokus, UbinKopi } from './UbinWaktuHidup'
 import { UbinPuasa } from './UbinPuasa'
+import { UbinZona2, UbinPemulihanDenyut, UbinUtangTidur, UbinProtein, UbinTekanan, UbinNapas, UbinDuduk } from './UbinLanjutan'
 import { UbinTidurLebar, UbinGiziLebar } from './UbinTidurGizi'
 import { PetaKonsistensi } from './PetaKonsistensi'
 import { ambilRiwayat } from '../lib/riwayatVitals'
@@ -468,6 +469,7 @@ export function PapanWidget({ pratinjau, tanggalCatatan }: { pratinjau: Pratinja
     'skorTim', 'tidurLebar', 'giziLebar',
     'inspirasi', 'kartuBelajar', 'soalHarian', 'pewaktu', 'pengingat',
     'mata', 'fokus', 'kopi', 'puasa',
+    'zona2', 'hrr', 'utangTidur', 'protein', 'tekanan', 'napas', 'duduk',
   ]
   const adaGrafik = pilihan.includes('grafikOlahraga')
 
@@ -546,6 +548,13 @@ export function PapanWidget({ pratinjau, tanggalCatatan }: { pratinjau: Pratinja
         ...(pilihan.includes('tidurLebar') ? [{ kunci: 'tidurLebar', isi: <UbinTidurLebar /> }] : []),
         ...(pilihan.includes('giziLebar') ? [{ kunci: 'giziLebar', isi: <UbinGiziLebar /> }] : []),
         ...(pilihan.includes('motivasi') ? [{ kunci: 'motivasi', isi: <UbinMotivasi /> }] : []),
+        ...(pilihan.includes('zona2') ? [{ kunci: 'zona2', isi: <UbinZona2 /> }] : []),
+        ...(pilihan.includes('hrr') ? [{ kunci: 'hrr', isi: <UbinPemulihanDenyut /> }] : []),
+        ...(pilihan.includes('utangTidur') ? [{ kunci: 'utangTidur', isi: <UbinUtangTidur /> }] : []),
+        ...(pilihan.includes('protein') ? [{ kunci: 'protein', isi: <UbinProtein /> }] : []),
+        ...(pilihan.includes('tekanan') ? [{ kunci: 'tekanan', isi: <UbinTekanan /> }] : []),
+        ...(pilihan.includes('napas') ? [{ kunci: 'napas', isi: <UbinNapas /> }] : []),
+        ...(pilihan.includes('duduk') ? [{ kunci: 'duduk', isi: <UbinDuduk /> }] : []),
         ...(pilihan.includes('fokus') ? [{ kunci: 'fokus', isi: <UbinFokus /> }] : []),
         ...(pilihan.includes('mata') ? [{ kunci: 'mata', isi: <UbinMata /> }] : []),
         ...(pilihan.includes('puasa') ? [{ kunci: 'puasa', isi: <UbinPuasa /> }] : []),
