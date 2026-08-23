@@ -121,6 +121,10 @@ export const WIDGETS: WidgetDef[] = [
   { id: 'tekananSebar', label: 'Sebaran Tekanan Darah', ringkas: 'Rerata dan rentang antar-bacaan', ke: '/tubuh', emoji: '📉', kategori: 'Tubuh & Data', bawaan: true },
   { id: 'rangkaian', label: 'Rangkaian Kebiasaan', ringkas: 'Hari berturut-turut, tanpa hukuman', ke: '/harian', emoji: '🔗', kategori: 'Tubuh & Data', bawaan: true },
   { id: 'jetlag', label: 'Jet Lag', ringkas: 'Geser jam tidur sebelum berangkat', ke: '/harian', emoji: '✈️', kategori: 'Tidur & Pemulihan', bawaan: true },
+  { id: 'nadiPanjang', label: 'Nadi Istirahat 30 Hari', ringkas: 'Terhadap pita kebiasaan Anda sendiri', ke: '/tubuh', emoji: '❤️', kategori: 'Tubuh & Data', bawaan: true },
+  { id: 'tidur14', label: 'Tidur 14 Malam', ringkas: 'Nilai tengah dan malam yang kurang', ke: '/pola-tidur', emoji: '🌙', kategori: 'Tidur & Pemulihan', bawaan: true },
+  { id: 'muatanPekan', label: 'Menit Latihan per Pekan', ringkas: 'Delapan pekan terakhir', ke: '/latihan', emoji: '📈', kategori: 'Latihan', bawaan: true },
+  { id: 'kaloriBanding', label: 'Tercatat Hari Ini', ringkas: 'Makanan dan latihan yang sudah dicatat', ke: '/nutrisi', emoji: '🍽️', kategori: 'Gizi', bawaan: true },
   { id: 'lab', label: 'Hasil Lab', ringkas: 'HbA1c, ApoB, eGFR, dan perjalanannya', ke: '/tubuh', emoji: '🧪', kategori: 'Klinis & Belajar', bawaan: true },
   { id: 'lingkungan', label: 'Udara & UV', ringkas: 'AQI dan indeks UV kota Anda', ke: '/tubuh', emoji: '🌤️', kategori: 'Tubuh & Data', bawaan: true },
   { id: 'hrv', label: 'HRV Semalam', ringkas: 'Terhadap kebiasaan 14 hari', ke: '/tubuh?t=jantung', emoji: '💓', kategori: 'Tidur & Pemulihan', bawaan: true },
@@ -317,6 +321,7 @@ export const WIDGET_HIDUP = [
   'komposisi', 'tekanan', 'lajuNapas', 'saturasi', 'suhu', 'lab', 'tenaga',
   'obatPengingat', 'beban', 'ukurBerkala', 'skrining',
   'amsler', 'layar', 'peregangan', 'tekananSebar', 'rangkaian', 'jetlag',
+  'nadiPanjang', 'tidur14', 'muatanPekan', 'kaloriBanding',
   // ── Grafik tujuh hari (kisi dua kolom, bukan tumpukan) ──────────────────
   'grafikLatihan', 'grafikTidur', 'grafikLangkah', 'grafikGizi', 'grafikDenyut',
   // ── Belajar & klinis ────────────────────────────────────────────────────

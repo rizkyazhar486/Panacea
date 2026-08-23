@@ -137,6 +137,37 @@ periksa('bebanSepi diam sesudah 3 hari',
 periksa('bebanSepi diam sesudah 90 hari (sudah berhenti sama sekali, bukan lupa)',
   !cari('bebanSepi').nilai(konteks({}, 17 * 60, { hariSejakBeban: 90 })))
 
+// 7f. Kabar baik dan hari istirahat.
+{
+  const k = konteks({ restingHr: 52 }, 8 * 60)
+  for (const b of k.riwayat) b.restingHr = 52
+  k.riwayat[k.riwayat.length - 3].restingHr = 60
+  k.hariIni.restingHr = 52
+  periksa('rhrPulih menyala sesudah beberapa hari tinggi lalu kembali', !!cari('rhrPulih').nilai(k))
+}
+{
+  const k = konteks({ restingHr: 52 }, 8 * 60)
+  for (const b of k.riwayat) b.restingHr = 52
+  k.hariIni.restingHr = 52
+  periksa('rhrPulih diam bila memang tidak pernah naik', !cari('rhrPulih').nilai(k))
+}
+{
+  const k = konteks({ sleepH: 7.5 }, 9 * 60)
+  for (const b of k.riwayat.slice(-3)) b.sleepH = 7.5
+  periksa('tidurTigaMalam menyala pada tiga malam >= 7 jam', !!cari('tidurTigaMalam').nilai(k))
+  k.riwayat[k.riwayat.length - 2].sleepH = 5.5
+  periksa('tidurTigaMalam diam bila satu malam kurang', !cari('tidurTigaMalam').nilai(k))
+}
+{
+  const k = konteks({ exerciseMin: 45 }, 19 * 60)
+  for (const b of k.riwayat.slice(-7)) b.exerciseMin = 45
+  periksa('tanpaIstirahat menyala pada tujuh hari beruntun', !!cari('tanpaIstirahat').nilai(k))
+  periksa('tanpaIstirahat tidak berbunyi seperti diagnosis',
+    /bukan diagnosis/.test(cari('tanpaIstirahat').nilai(k)!.badan))
+  k.riwayat[k.riwayat.length - 4].exerciseMin = 0
+  periksa('tanpaIstirahat diam bila ada satu hari istirahat', !cari('tanpaIstirahat').nilai(k))
+}
+
 // 7e. Gelombang penutup: Amsler, waktu layar, jet lag.
 periksa('amslerLama menyala sesudah 30 hari',
   !!cari('amslerLama').nilai(konteks({}, 10 * 60, { amslerHariLalu: 30 })))

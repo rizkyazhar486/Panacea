@@ -560,6 +560,84 @@ export const ATURAN: Aturan[] = [
     },
   },
   {
+    /* NADI ISTIRAHAT KEMBALI KE KEBIASAAN — KABAR BAIK YANG BERISI.
+       Aturan lain memberi tahu saat sesuatu naik. Bila tidak ada satu pun yang
+       memberi tahu saat ia kembali, yang dipelajari orang dari aplikasi ini
+       hanyalah bahwa ia berbicara ketika ada yang salah — dan pemberitahuan
+       semacam itu lama-lama ditutup semuanya. Syaratnya ketat: harus ada hari
+       yang benar-benar tinggi dalam sepekan terakhir, lalu hari ini kembali ke
+       dalam kebiasaannya. */
+    id: 'rhrPulih',
+    kategori: 'pemulihan',
+    jendela: [J(6), J(10)],
+    jeda: 7,
+    nilai: (k) => {
+      const kini = angka(k.hariIni, 'restingHr')
+      const b = biasa(k.riwayat, 'restingHr')
+      if (kini == null || b == null) return null
+      if (kini > b + 1) return null
+      const pekan = k.riwayat.slice(-8, -1)
+      const pernahTinggi = pekan.some((r) => {
+        const v = angka(r, 'restingHr')
+        return v != null && v >= b + 5
+      })
+      if (!pernahTinggi) return null
+      return {
+        judul: 'Denyut istirahat kembali seperti biasa',
+        badan: `${Math.round(kini)} bpm pagi ini, sama dengan kebiasaan Anda ${Math.round(b)} bpm — setelah beberapa hari lebih tinggi. Apa pun yang membebani pekan lalu, tubuh sudah selesai dengannya.`,
+        url: './#/tubuh?t=jantung',
+      }
+    },
+  },
+  {
+    /* TIGA MALAM BERTURUT DI ATAS TUJUH JAM.
+       Tujuh jam adalah batas bawah yang paling sering dipakai untuk orang
+       dewasa, bukan target pribadi siapa pun — dan kalimatnya menyebut itu,
+       supaya yang kebutuhannya memang lain tidak merasa gagal. */
+    id: 'tidurTigaMalam',
+    kategori: 'pemulihan',
+    jendela: [J(8), J(11)],
+    jeda: 7,
+    nilai: (k) => {
+      const tiga = k.riwayat.slice(-3)
+      if (tiga.length < 3) return null
+      const jam = tiga.map((r) => angka(r, 'sleepH'))
+      if (jam.some((j) => j == null || j < 7)) return null
+      const rerata = (jam as number[]).reduce((a, b) => a + b, 0) / 3
+      return {
+        judul: 'Tiga malam berturut cukup tidur',
+        badan: `Rerata ${(Math.round(rerata * 10) / 10).toFixed(1)} jam. Tujuh jam adalah batas bawah yang paling sering dipakai untuk orang dewasa, bukan target pribadi — dan yang berarti memang bukan satu malamnya, melainkan berturut-turutnya.`,
+        url: './#/pola-tidur',
+      }
+    },
+  },
+  {
+    /* TUJUH HARI BERTURUT TANPA HARI ISTIRAHAT.
+       Ini BUKAN diagnosis latihan berlebih, dan tidak boleh berbunyi seperti
+       itu: apa yang disebut "overtraining" memerlukan lebih banyak keterangan
+       daripada yang dimiliki aplikasi ini. Yang dikatakan hanya faktanya —
+       tujuh hari beruntun tercatat latihan — beserta alasan mengapa hari
+       istirahat memang bagian dari programnya, bukan kegagalan menjalankannya. */
+    id: 'tanpaIstirahat',
+    kategori: 'latihan',
+    jendela: [J(18), J(21)],
+    jeda: 7,
+    nilai: (k) => {
+      const tujuh = k.riwayat.slice(-7)
+      if (tujuh.length < 7) return null
+      const semuaLatihan = tujuh.every((r) => {
+        const m = angka(r, 'exerciseMin')
+        return m != null && m >= 20
+      })
+      if (!semuaLatihan) return null
+      return {
+        judul: 'Tujuh hari beruntun berlatih',
+        badan: 'Hari istirahat adalah bagian dari programnya, bukan kegagalan menjalankannya — otot dan tendon menyesuaikan diri saat pulih, bukan saat dibebani. Ini bukan diagnosis latihan berlebih; hanya catatan tujuh hari beruntun.',
+        url: './#/latihan',
+      }
+    },
+  },
+  {
     /* AMSLER LAMA TIDAK DIPERIKSA.
        Perubahan pada penglihatan tengah datang perlahan dan mata yang satu
        menutupi kekurangan mata yang lain, sehingga yang menyadarinya justru
