@@ -3,7 +3,7 @@ import { createRoot } from 'react-dom/client'
 import { HashRouter, Routes, Route, Navigate } from 'react-router-dom'
 import './index.css'
 import { applyAppearance } from './lib/theme'
-import { applyLang, getLang } from './lib/i18n'
+import { applyLang, getLang, muatKamusKalimat, umumkanBahasa } from './lib/i18n'
 import { initPwaInstall } from './lib/pwa'
 import { StoreProvider } from './lib/store'
 import { Shell } from './components/Shell'
@@ -212,6 +212,10 @@ const BioSimulators = lazy(() => import('./pages/BioSimulators').then((m) => ({ 
 // Apply the saved appearance (theme, text size, motion) and language before first paint.
 applyAppearance()
 applyLang(getLang())
+// Kamus kalimat dimuat sejak awal, bukan saat komponen pertama memerlukannya.
+// Ini tidak menahan gambar pertama: yang belum siap tampil dalam bahasa Inggris
+// — bahasa sumber aplikasi ini — lalu tergantikan begitu kamusnya datang.
+void muatKamusKalimat(getLang()).then(umumkanBahasa)
 initPwaInstall()
 
 // Register the PWA service worker (installable + offline shell).

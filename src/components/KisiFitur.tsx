@@ -1,4 +1,6 @@
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
+import { tr } from '../lib/i18n'
+import { useBahasa } from '../lib/useBahasa'
 import { Link } from 'react-router-dom'
 import { WIDGETS } from '../lib/homeWidgets'
 
@@ -49,7 +51,7 @@ function Lambang({ w }: { w: (typeof WIDGETS)[number] }) {
       {/* Dua baris, lalu dipotong. Label yang boleh memanjang membuat tinggi
           tiap ubin berbeda-beda dan barisnya tidak lagi sejajar. */}
       <span className="line-clamp-2 text-[10.5px] font-bold leading-tight text-ink dark:text-white">
-        {w.label}
+        {tr(w.label)}
       </span>
     </Link>
   )
@@ -65,7 +67,7 @@ function Bagian({ kategori, daftar }: { kategori: string; daftar: typeof WIDGETS
   return (
     <section id={`bagian-${kategori}`} className="rounded-3xl bg-white p-3 dark:bg-white/5">
       <div className="mb-2 flex items-center justify-between gap-2">
-        <h3 className="text-[13px] font-black text-ink dark:text-white">{kategori}</h3>
+        <h3 className="text-[13px] font-black text-ink dark:text-white">{tr(kategori)}</h3>
         {sisa > 0 && (
           <button
             onClick={() => setSemua((v) => !v)}
@@ -92,6 +94,7 @@ function Bagian({ kategori, daftar }: { kategori: string; daftar: typeof WIDGETS
  * tetapi hilang dari kisi, tanpa ada yang menyadarinya.
  */
 export function KisiFitur() {
+  useBahasa() // menggambar ulang saat bahasanya berganti
   const [pilih, setPilih] = useState<string | null>(null)
   const [cari, setCari] = useState('')
   const [cariBuka, setCariBuka] = useState(false)
@@ -106,7 +109,7 @@ export function KisiFitur() {
     () =>
       kunci
         ? WIDGETS.filter((w) =>
-            `${w.label} ${w.ringkas} ${w.kategori}`.toLowerCase().includes(kunci),
+            `${w.label} ${w.ringkas} ${w.kategori} ${tr(w.label)} ${tr(w.ringkas)}`.toLowerCase().includes(kunci),
           )
         : [],
     [kunci],
@@ -264,7 +267,7 @@ export function KisiFitur() {
           }`}
           style={{ width: 'auto' }}
         >
-          Semua
+          {tr('All')}
         </button>
         {kelompok.map(([k, d], i) => (
           <button
@@ -277,7 +280,7 @@ export function KisiFitur() {
             }`}
             style={{ width: 'auto' }}
           >
-            {k} <span className="ml-1 opacity-60">{d.length}</span>
+            {tr(k)} <span className="ml-1 opacity-60">{d.length}</span>
           </button>
         ))}
       </div>

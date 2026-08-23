@@ -1,4 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
+import { tr } from '../lib/i18n'
+import { useBahasa } from '../lib/useBahasa'
 import { createPortal } from 'react-dom'
 import { widgetPapan, ambilWidget, alihkanWidget, simpanWidget, widgetBawaan } from '../lib/homeWidgets'
 
@@ -27,6 +29,7 @@ const WIDGETS = widgetPapan()
 // ─────────────────────────────────────────────────────────────────────────────
 
 export function PemilihWidget({ tutup }: { tutup: () => void }) {
+  useBahasa() // menggambar ulang saat bahasanya berganti
   const [aktif, setAktif] = useState<string[]>(ambilWidget)
   const [cari, setCari] = useState('')
 
@@ -41,7 +44,7 @@ export function PemilihWidget({ tutup }: { tutup: () => void }) {
   const kelompok = useMemo(() => {
     const q = cari.toLowerCase().trim()
     const cocok = WIDGETS.filter((w) =>
-      !q || `${w.label} ${w.ringkas} ${w.kategori}`.toLowerCase().includes(q),
+      !q || `${w.label} ${w.ringkas} ${w.kategori} ${tr(w.label)} ${tr(w.ringkas)}`.toLowerCase().includes(q),
     )
     const peta = new Map<string, typeof WIDGETS>()
     for (const w of cocok) {
@@ -92,7 +95,7 @@ export function PemilihWidget({ tutup }: { tutup: () => void }) {
         <div className="min-h-0 flex-1 overflow-y-auto p-3">
           {kelompok.map(([kategori, daftar]) => (
             <section key={kategori} className="mb-4">
-              <h3 className="mb-1.5 text-[11px] font-black uppercase tracking-wide text-neutral-500">{kategori}</h3>
+              <h3 className="mb-1.5 text-[11px] font-black uppercase tracking-wide text-neutral-500">{tr(kategori)}</h3>
               <div className="space-y-1.5">
                 {daftar.map((w) => {
                   const nyala = aktif.includes(w.id)
@@ -109,8 +112,8 @@ export function PemilihWidget({ tutup }: { tutup: () => void }) {
                     >
                       <span aria-hidden className="text-[18px]">{w.emoji}</span>
                       <span className="min-w-0 flex-1">
-                        <span className="block truncate text-[13px] font-bold text-ink dark:text-white">{w.label}</span>
-                        <span className="block truncate text-[11px] text-neutral-500">{w.ringkas}</span>
+                        <span className="block truncate text-[13px] font-bold text-ink dark:text-white">{tr(w.label)}</span>
+                        <span className="block truncate text-[11px] text-neutral-500">{tr(w.ringkas)}</span>
                       </span>
                       {/* Keadaan nyala dibedakan lewat LAMBANG, bukan warna saja —
                           pembedaan yang hanya bersandar warna tidak sampai kepada
