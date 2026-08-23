@@ -68,18 +68,18 @@ export function UbinNadiPanjang() {
   const luar = rentang && (kini < rentang.bawah || kini > rentang.atas)
   return (
     <section>
-      <Kepala judul="Nadi istirahat 30 hari" ke="/tubuh" />
+      <Kepala judul="Resting heart rate, 30 days" ke="/tubuh" />
       <div className="kaca rounded-3xl p-3">
         <div className="flex items-baseline gap-1.5">
           <span className="text-[26px] font-black leading-none tabular-nums nyala text-ink dark:text-white">{Math.round(kini)}</span>
           <span className="t-mikro font-bold text-neutral-400">bpm</span>
-          <span className="t-mikro ml-auto shrink-0 tabular-nums text-neutral-400">{deret.length} hari tercatat</span>
+          <span className="t-mikro ml-auto shrink-0 tabular-nums text-neutral-400">{deret.length} days logged</span>
         </div>
         <Garis nilai={nilai} bawah={rentang?.bawah} atas={rentang?.atas} warna={luar ? 'text-amber-500' : 'text-rose-500'} />
         <p className="t-mikro mt-1 leading-snug text-neutral-400">
           {rentang
-            ? `Pita abu-abu adalah kebiasaan Anda sendiri, ${Math.round(rentang.bawah)}–${Math.round(rentang.atas)} bpm. ${luar ? 'Hari ini di luar pita itu — satu hari di luar pita bukan penyakit; yang berarti adalah bila ia menetap beberapa hari.' : 'Hari ini masih di dalamnya.'}`
-            : 'Belum cukup titik untuk menyebut kebiasaan Anda sendiri; yang digambar baru garisnya.'}
+            ? `The grey band is your own usual range, ${Math.round(rentang.bawah)}–${Math.round(rentang.atas)} bpm. ${luar ? 'Today sits outside it — one day outside the band is not an illness; what matters is whether it stays there for several days.' : 'Today is still inside it.'}`
+            : 'Not enough readings yet to call anything usual for you; only the line is drawn so far.'}
         </p>
       </div>
     </section>
@@ -113,12 +113,12 @@ export function UbinTidurDuaPekan() {
 
   return (
     <section>
-      <Kepala judul="Tidur 14 malam" ke="/pola-tidur" />
+      <Kepala judul="Sleep, 14 nights" ke="/pola-tidur" />
       <div className="kaca rounded-3xl p-3">
         <div className="flex items-baseline gap-1.5">
           <span className="text-[26px] font-black leading-none tabular-nums nyala text-ink dark:text-white">{(Math.round(tengah * 10) / 10).toFixed(1)}</span>
-          <span className="t-mikro font-bold text-neutral-400">jam — nilai tengah</span>
-          <span className="t-mikro ml-auto shrink-0 tabular-nums text-neutral-400">{tercatat.length}/14 malam</span>
+          <span className="t-mikro font-bold text-neutral-400">h — median</span>
+          <span className="t-mikro ml-auto shrink-0 tabular-nums text-neutral-400">{tercatat.length}/14 nights</span>
         </div>
         {/* Garis tujuh jam digambar sebagai acuan, bukan sebagai target yang
             gagal dicapai: kebutuhan tidur berbeda antar-orang, dan tujuh jam
@@ -134,8 +134,8 @@ export function UbinTidurDuaPekan() {
           ))}
         </span>
         <p className="t-mikro mt-1 leading-snug text-neutral-400">
-          Garis putus-putus di 7 jam adalah acuan yang paling sering dipakai untuk orang dewasa, bukan target Anda —
-          kebutuhan tidur berbeda antar-orang. {dibawah7} dari {tercatat.length} malam di bawahnya. Batang kosong berarti malam itu tidak tercatat.
+          The dashed line at 7 h is the reference most often used for adults, not your personal target — sleep need
+          differs between people. {dibawah7} of {tercatat.length} nights fell below it. An empty bar means that night was not logged.
         </p>
       </div>
     </section>
@@ -172,13 +172,13 @@ export function UbinMuatanPekan() {
 
   return (
     <section>
-      <Kepala judul="Menit latihan per pekan" ke="/latihan" />
+      <Kepala judul="Training minutes per week" ke="/latihan" />
       <div className="kaca rounded-3xl p-3">
         <div className="flex items-baseline gap-1.5">
           <span className="text-[26px] font-black leading-none tabular-nums nyala text-ink dark:text-white">{ini}</span>
-          <span className="t-mikro font-bold text-neutral-400">menit pekan ini</span>
+          <span className="t-mikro font-bold text-neutral-400">minutes this week</span>
           <span className="t-mikro ml-auto shrink-0 tabular-nums text-neutral-400">
-            {lalu > 0 ? `${ini >= lalu ? '+' : ''}${ini - lalu} vs pekan lalu` : '8 pekan'}
+            {lalu > 0 ? `${ini >= lalu ? '+' : ''}${ini - lalu} vs last week` : '8 weeks'}
           </span>
         </div>
         <span className="relative mt-2 flex h-14 items-end gap-[3px]" aria-hidden>
@@ -192,8 +192,8 @@ export function UbinMuatanPekan() {
           ))}
         </span>
         <p className="t-mikro mt-1 leading-snug text-neutral-400">
-          Garis putus-putus 150 menit adalah anjuran mingguan aktivitas sedang untuk orang dewasa (WHO). Yang dihitung
-          hanya sesi yang tercatat di aplikasi ini, jadi jalan kaki yang tidak dicatat tidak masuk.
+          The dashed line at 150 minutes is the weekly moderate-activity recommendation for adults (WHO). Only sessions
+          logged in this app are counted, so walking you never recorded does not appear here.
         </p>
       </div>
     </section>
@@ -229,12 +229,12 @@ export function UbinKaloriBanding() {
 
   return (
     <section>
-      <Kepala judul="Tercatat hari ini" ke="/nutrisi" />
+      <Kepala judul="Logged today" ke="/nutrisi" />
       <div className="kaca rounded-3xl p-3">
         <div className="flex flex-col gap-2">
           {[
-            { nama: 'Makanan tercatat', nilai: masuk, kelas: 'bg-brand' },
-            { nama: 'Kalori latihan', nilai: latihan, kelas: 'bg-amber-500' },
+            { nama: 'Food logged', nilai: masuk, kelas: 'bg-brand' },
+            { nama: 'Training calories', nilai: latihan, kelas: 'bg-amber-500' },
           ].map((b) => (
             <div key={b.nama}>
               <div className="flex items-baseline justify-between gap-2">
@@ -248,9 +248,9 @@ export function UbinKaloriBanding() {
           ))}
         </div>
         <p className="t-mikro mt-2 leading-snug text-neutral-400">
-          Ini BUKAN neraca energi. Sisi makanan hanya sebesar yang sempat dicatat, sisi latihan tidak memuat metabolisme
-          basal — yang justru bagian terbesar pemakaian energi harian — dan keduanya punya galat besar. Yang dapat
-          dibaca dari sini hanya seberapa lengkap catatan hari ini.
+          This is NOT an energy balance. The food side is only as big as what you managed to log, the training side leaves
+          out basal metabolism — which is the largest part of daily energy use — and both carry wide error. All this can
+          tell you is how complete today's logging is.
         </p>
       </div>
     </section>
@@ -284,17 +284,17 @@ export function UbinKepatuhan() {
 
   return (
     <section>
-      <Kepala judul="Kepatuhan minum 14 hari" ke="/harian" />
+      <Kepala judul="Adherence, 14 days" ke="/harian" />
       <div className="kaca rounded-3xl p-3">
         <div className="flex items-baseline gap-1.5">
           <span className="text-[26px] font-black leading-none tabular-nums nyala text-ink dark:text-white">{penuh}</span>
-          <span className="t-mikro font-bold text-neutral-400">dari {tercatat.length} hari lengkap</span>
+          <span className="t-mikro font-bold text-neutral-400">of {tercatat.length} days complete</span>
         </div>
         <span className="mt-2 grid grid-cols-7 gap-1" aria-hidden>
           {hari.map((h) => (
             <span
               key={h.tanggal}
-              title={h.ada ? `${h.minum}/${h.total}` : 'belum tercatat'}
+              title={h.ada ? `${h.minum}/${h.total}` : 'not logged'}
               className={`h-5 rounded ${
                 !h.ada || h.total === 0 ? 'bg-neutral-200 dark:bg-white/10'
                   : h.minum >= h.total ? 'bg-emerald-500'
@@ -305,9 +305,9 @@ export function UbinKepatuhan() {
           ))}
         </span>
         <p className="t-mikro mt-1.5 leading-snug text-neutral-400">
-          Hijau berarti seluruh yang dijadwalkan hari itu ditandai diminum, kuning sebagian, merah tidak satu pun,
-          abu-abu belum tercatat. Riwayat ini baru dimulai sejak fitur pencatatannya ada — hari yang lebih tua tidak
-          hilang, memang tidak pernah tersimpan.
+          Green means everything scheduled that day was marked as taken, amber some of it, red none, grey not logged at
+          all. This history only begins when the logging feature did — older days are not missing, they were never
+          stored.
         </p>
       </div>
     </section>
@@ -335,20 +335,20 @@ export function UbinBeratTren() {
 
   return (
     <section>
-      <Kepala judul="Berat 90 hari" ke="/tubuh" />
+      <Kepala judul="Weight, 90 days" ke="/tubuh" />
       <div className="kaca rounded-3xl p-3">
         <div className="flex items-baseline gap-1.5">
           <span className="text-[26px] font-black leading-none tabular-nums nyala text-ink dark:text-white">{(Math.round(kini * 10) / 10).toFixed(1)}</span>
           <span className="t-mikro font-bold text-neutral-400">kg</span>
           <span className="t-mikro ml-auto shrink-0 tabular-nums text-neutral-400">
-            {perBulan >= 0 ? '+' : ''}{(Math.round(perBulan * 10) / 10).toFixed(1)} kg / 30 hari
+            {perBulan >= 0 ? '+' : ''}{(Math.round(perBulan * 10) / 10).toFixed(1)} kg / 30 days
           </span>
         </div>
         <Garis nilai={nilai} warna={cepat ? 'text-amber-500' : 'text-brand'} />
         <p className="t-mikro mt-1 leading-snug text-neutral-400">
-          Dihitung dari {deret.length} penimbangan dalam {rentangHari} hari. Timbangan berubah satu-dua kilogram dalam
-          sehari karena air dan isi usus, jadi yang dibaca di sini arah tiga bulan, bukan selisih hari ke hari.
-          {cepat && ' Perubahan lebih dari 5% berat badan dalam sebulan tanpa disengaja layak dibicarakan dengan dokter.'}
+          Calculated from {deret.length} weigh-ins across {rentangHari} days. The scale moves a kilo or two within a single
+          day from water and gut contents, so what you read here is the three-month direction, not day-to-day change.
+          {cepat && ' An unintended change of more than 5% of body weight in a month is worth raising with a doctor.'}
         </p>
       </div>
     </section>

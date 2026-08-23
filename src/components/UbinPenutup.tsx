@@ -61,7 +61,7 @@ export function UbinAmsler() {
   return (
     <section>
       <Kepala
-        judul="Kisi Amsler"
+        judul="Amsler grid"
         kanan={
           <button onClick={() => setBuka((v) => !v)} className="t-kecil flex min-h-[40px] items-center font-bold text-brand">
             {buka ? 'Tutup' : 'Mulai'}
@@ -72,8 +72,8 @@ export function UbinAmsler() {
         {buka ? (
           <>
             <p className="t-mikro leading-snug text-neutral-500 dark:text-neutral-400">
-              Pakai kacamata baca bila biasa memakainya. Tutup satu mata, tatap titik tengah dari jarak baca biasa
-              (± 30 cm), lalu perhatikan seluruh kisi tanpa memindahkan pandangan. Ulangi untuk mata yang lain.
+              Wear your reading glasses if you normally do. Cover one eye and look at the centre dot from your usual
+              reading distance (about 30 cm), then take in the whole grid without moving your gaze. Repeat for the other eye.
             </p>
             {/* Kisi digambar sebagai SVG, bukan gambar: ia harus tajam pada
                 layar kerapatan berapa pun, dan garis yang buram karena gambar
@@ -89,10 +89,10 @@ export function UbinAmsler() {
             </svg>
             <div className="mt-2 grid grid-cols-2 gap-1.5">
               <button onClick={() => catat('normal')} className="t-kecil min-h-[44px] rounded-2xl bg-brand font-bold text-white">
-                Garis lurus semua
+                All lines straight
               </button>
               <button onClick={() => catat('berubah')} className="t-kecil min-h-[44px] rounded-2xl bg-amber-500 font-bold text-white">
-                Ada yang bengkok/hilang
+                Something bent or missing
               </button>
             </div>
           </>
@@ -100,23 +100,23 @@ export function UbinAmsler() {
           <>
             <div className="flex items-baseline gap-1.5">
               <span className={`t-sedang font-black ${akhir?.hasil === 'berubah' ? 'text-amber-500' : 'text-ink dark:text-white'}`}>
-                {akhir ? (akhir.hasil === 'berubah' ? 'Ada perubahan' : 'Garis lurus') : 'Belum pernah'}
+                {akhir ? (akhir.hasil === 'berubah' ? 'Change noted' : 'Lines straight') : 'Never'}
               </span>
               {umur != null && (
                 <span className="t-mikro ml-auto shrink-0 text-neutral-400">
-                  {umur === 0 ? 'hari ini' : `${umur} hari lalu`}
+                  {umur === 0 ? 'today' : `${umur} hari lalu`}
                 </span>
               )}
             </div>
             {akhir?.hasil === 'berubah' && (
               <p className="t-kecil mt-1.5 leading-snug text-amber-600 dark:text-amber-400">
-                Perubahan pada kisi ini pantas diperiksakan ke dokter mata, bukan ditunggu.
+                A change on this grid is worth taking to an eye doctor rather than waiting out.
               </p>
             )}
           </>
         )}
         <p className="t-mikro mt-2 leading-snug text-neutral-400">
-          Alat pemantauan mandiri, bukan pemeriksaan mata dan bukan diagnosis. Gunanya menyadari perubahan lebih awal lalu memeriksakannya.
+          A self-monitoring tool — not an eye examination and not a diagnosis. Its purpose is to notice a change early, then get it looked at.
         </p>
       </div>
     </section>
@@ -165,12 +165,12 @@ export function UbinLayar() {
 
   return (
     <section>
-      <Kepala judul="Sesi fokus tercatat" ke="/harian" />
+      <Kepala judul="Focus sessions logged" ke="/harian" />
       <div className="kaca rounded-3xl p-3">
         <div className="flex items-baseline gap-1.5">
           <span className="text-[26px] font-black leading-none tabular-nums nyala text-ink dark:text-white">{hariIni}</span>
-          <span className="t-mikro font-bold text-neutral-400">menit hari ini</span>
-          <span className="t-mikro ml-auto shrink-0 tabular-nums text-neutral-400">{pekan} mnt / 7 hari</span>
+          <span className="t-mikro font-bold text-neutral-400">minutes today</span>
+          <span className="t-mikro ml-auto shrink-0 tabular-nums text-neutral-400">{pekan} min / 7 days</span>
         </div>
         <span className="mt-2 flex h-10 items-end gap-[3px]" aria-hidden>
           {deret.map((v, i) => (
@@ -178,7 +178,7 @@ export function UbinLayar() {
           ))}
         </span>
         <p className="t-mikro mt-1.5 leading-snug text-neutral-400">
-          Yang dihitung hanya sesi fokus yang Anda jalankan di aplikasi ini — bukan seluruh pemakaian layar, yang memang tidak dapat dilihat aplikasi web.
+          Only the focus sessions you run inside this app are counted — not your total screen time, which a web app genuinely cannot see.
         </p>
       </div>
     </section>
@@ -187,11 +187,11 @@ export function UbinLayar() {
 
 // ── Peregangan tiga menit ──────────────────────────────────────────────────
 const GERAK = [
-  { nama: 'Rotasi punggung atas', detik: 40, isyarat: 'Duduk atau berdiri, pinggul menghadap depan, hanya dada yang berputar.' },
-  { nama: 'Buka dada di ambang pintu', detik: 40, isyarat: 'Lengan di kusen setinggi bahu, melangkah maju sampai terasa tarikan di dada.' },
-  { nama: 'Regang otot pinggul depan', detik: 40, isyarat: 'Posisi setengah berlutut, panggul ditarik ke depan, perut sedikit dikencangkan.' },
-  { nama: 'Regang belakang paha', detik: 40, isyarat: 'Tumit di kursi rendah, punggung lurus, membungkuk dari pinggul bukan dari punggung.' },
-  { nama: 'Naik-turun pergelangan kaki', detik: 20, isyarat: 'Lutut melewati ujung jari kaki, tumit tetap menempel lantai.' },
+  { nama: 'Upper-back rotation', detik: 40, isyarat: 'Sitting or standing, hips facing forward, only the chest turns.' },
+  { nama: 'Doorway chest opener', detik: 40, isyarat: 'Forearms on the frame at shoulder height, step forward until you feel the stretch across the chest.' },
+  { nama: 'Hip flexor stretch', detik: 40, isyarat: 'Half-kneeling, pelvis tucked forward, abdomen lightly braced.' },
+  { nama: 'Hamstring stretch', detik: 40, isyarat: 'Heel on a low chair, back straight, hinge from the hips rather than the spine.' },
+  { nama: 'Ankle rocks', detik: 20, isyarat: 'Knee travels past the toes, heel stays on the floor.' },
 ]
 
 export function UbinPeregangan() {
@@ -234,7 +234,7 @@ export function UbinPeregangan() {
   return (
     <section>
       <Kepala
-        judul="Peregangan 3 menit"
+        judul="3-minute stretch"
         kanan={jalan ? (
           <button onClick={() => setJalan(false)} className="t-kecil flex min-h-[40px] items-center font-bold text-neutral-500">Berhenti</button>
         ) : undefined}
@@ -243,7 +243,7 @@ export function UbinPeregangan() {
         {!jalan ? (
           <>
             <p className="t-kecil leading-snug text-neutral-600 dark:text-neutral-300">
-              Lima gerakan untuk bagian tubuh yang paling kaku sesudah duduk lama.
+              Five movements for the parts that stiffen most after long sitting.
             </p>
             <button
               onClick={() => { setMulai(Date.now()); getar.current = -1; setJalan(true) }}
@@ -252,7 +252,7 @@ export function UbinPeregangan() {
               Mulai
             </button>
             <p className="t-mikro mt-2 leading-snug text-neutral-400">
-              Peregangan menambah rentang gerak dan enak dirasakan; yang tidak terbukti adalah klaim bahwa ia mencegah cedera atau menghilangkan nyeri otot sesudah latihan.
+              Stretching increases range of motion and feels good; what is not established is the claim that it prevents injury or removes muscle soreness after training.
             </p>
           </>
         ) : (
@@ -298,7 +298,7 @@ export function UbinTekananPagiSore() {
 
   return (
     <section>
-      <Kepala judul="Sebaran tekanan darah" ke="/tubuh" />
+      <Kepala judul="Blood pressure spread" ke="/tubuh" />
       <div className="kaca rounded-3xl p-3">
         <div className="flex items-baseline gap-1.5">
           <span className="text-[26px] font-black leading-none tabular-nums nyala text-ink dark:text-white">{Math.round(rata(semua))}</span>
@@ -345,7 +345,7 @@ export function UbinRangkaian() {
 
   return (
     <section>
-      <Kepala judul="Rangkaian kebiasaan" ke="/harian" />
+      <Kepala judul="Habit streaks" ke="/harian" />
       <div className="kaca rounded-3xl p-3">
         <div className="flex flex-col gap-2">
           {baris.map((b) => (
@@ -363,7 +363,7 @@ export function UbinRangkaian() {
             yang menghukum membuat orang berhenti mencatat sama sekali sesudah
             satu hari terlewat, dan yang hilang bukan rangkaiannya melainkan
             datanya. */}
-        <p className="t-mikro mt-2 text-neutral-400">Hari berturut-turut. Terputus berarti mulai lagi dari satu — tidak ada yang hilang selain hitungannya.</p>
+        <p className="t-mikro mt-2 text-neutral-400">Days in a row. Breaking one means starting from one again — nothing is lost except the count.</p>
       </div>
     </section>
   )
@@ -408,7 +408,7 @@ export function UbinJetLag() {
           <select
             value={selisih}
             onChange={(e) => simpan(e.target.value, tanggal)}
-            aria-label="Selisih jam tujuan"
+            aria-label="Destination hour difference"
             className="t-kecil min-w-0 flex-1 rounded-xl border border-neutral-200 bg-transparent px-2 py-2 text-ink dark:border-white/12 dark:text-white"
           >
             {Array.from({ length: 25 }, (_, i) => i - 12).map((n) => (
@@ -425,25 +425,25 @@ export function UbinJetLag() {
         </div>
 
         {jam === 0 ? (
-          <p className="t-kecil mt-2 text-neutral-500">Isi selisih jam kota tujuan dan tanggal berangkat.</p>
+          <p className="t-kecil mt-2 text-neutral-500">Enter the hour difference at your destination and your departure date.</p>
         ) : (
           <>
             <div className="mt-2 flex items-baseline gap-1.5">
               <span className="text-[26px] font-black leading-none tabular-nums nyala text-ink dark:text-white">{perluHari}</span>
-              <span className="t-mikro font-bold text-neutral-400">hari untuk menyesuaikan</span>
+              <span className="t-mikro font-bold text-neutral-400">days to adjust</span>
               {hariLagi != null && (
                 <span className="t-mikro ml-auto shrink-0 tabular-nums text-neutral-400">
-                  {hariLagi > 0 ? `berangkat ${hariLagi} hari lagi` : 'sudah berangkat'}
+                  {hariLagi > 0 ? `berangkat ${hariLagi} hari lagi` : 'already departed'}
                 </span>
               )}
             </div>
             <p className="t-kecil mt-1.5 leading-snug text-neutral-600 dark:text-neutral-300">
               {keTimur
-                ? `Ke timur: majukan jam tidur ${perluHari > 3 ? 'satu jam tiap hari' : `${perluHari} kali satu jam`} sebelum berangkat, dan cari cahaya terang pada pagi hari di tujuan.`
-                : `Ke barat: mundurkan jam tidur ${perluHari > 3 ? 'satu jam tiap hari' : `${perluHari} kali satu jam`} sebelum berangkat, dan cari cahaya terang pada sore hari di tujuan.`}
+                ? `Ke timur: majukan jam tidur ${perluHari > 3 ? 'one hour per day' : `${perluHari} kali satu jam`} sebelum berangkat, dan cari cahaya terang pada pagi hari di tujuan.`
+                : `Ke barat: mundurkan jam tidur ${perluHari > 3 ? 'one hour per day' : `${perluHari} kali satu jam`} sebelum berangkat, dan cari cahaya terang pada sore hari di tujuan.`}
             </p>
             <p className="t-mikro mt-1.5 leading-snug text-neutral-400">
-              Jam biologis bergeser kira-kira satu jam per hari, jadi selisih besar memang tidak dapat dikejar sekaligus. Tidak ada anjuran melatonin di sini — itu obat, dan aturannya ditentukan dokter Anda.
+              The body clock shifts roughly an hour a day, so a large difference genuinely cannot be closed at once. There is no melatonin advice here — that is a medicine, and how to use it is your doctor's call.
             </p>
           </>
         )}

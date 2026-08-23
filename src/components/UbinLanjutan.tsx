@@ -77,11 +77,11 @@ export function UbinZona2() {
 
   return (
     <section>
-      <Kepala judul="Zona 2 · 7 hari" ke="/latihan?t=analisis" />
+      <Kepala judul="Zone 2 · 7 days" ke="/latihan?t=analisis" />
       <div className="kaca rounded-3xl p-3">
         <div className="flex items-baseline gap-1.5">
           <span className="text-[26px] font-black leading-none tabular-nums nyala text-ink dark:text-white">{Math.round(menit)}</span>
-          <span className="t-mikro font-bold text-neutral-400">menit di 60–70% HRmaks</span>
+          <span className="t-mikro font-bold text-neutral-400">minutes at 60–70% of max HR</span>
         </div>
         {/* Bilah dengan penanda anjuran pada 150 menit. Bilah dipotong pada
             200 menit supaya menit di atas anjuran tetap terlihat sebagai
@@ -91,7 +91,7 @@ export function UbinZona2() {
           <span className="absolute inset-y-0 w-px bg-neutral-500 dark:bg-white/50" style={{ left: `${(sasaran / 200) * 100}%` }} />
         </span>
         <p className="t-mikro mt-1.5 leading-snug text-neutral-400">
-          Garis = 150 menit/pekan, anjuran aktivitas sedang WHO. Dihitung dari deret denyut tiap sesi, bukan dari jenis olahraganya.
+          The line marks 150 min/week, the WHO moderate-activity recommendation. Calculated from each session's heart-rate series, not from the sport you picked.
         </p>
       </div>
     </section>
@@ -120,7 +120,7 @@ export function UbinPemulihanDenyut() {
 
   return (
     <section>
-      <Kepala judul="Pemulihan denyut 1 menit" ke="/latihan?t=analisis" />
+      <Kepala judul="1-minute heart rate recovery" ke="/latihan?t=analisis" />
       <div className="kaca rounded-3xl p-3">
         <div className="flex items-baseline gap-1.5">
           <span className="text-[26px] font-black leading-none tabular-nums nyala text-ink dark:text-white">−{akhir}</span>
@@ -133,7 +133,7 @@ export function UbinPemulihanDenyut() {
           ))}
         </span>
         <p className="t-mikro mt-1.5 leading-snug text-neutral-400">
-          Selisih denyut akhir sesi dengan satu menit sesudahnya. Arahnya yang dibaca; ambang baku tidak ditulis karena berasal dari uji treadmill terkendali, bukan sesi lapangan.
+          The drop between your heart rate at the end of a session and one minute later. Read the direction; no standard threshold is quoted here, because those come from controlled treadmill testing rather than field sessions.
         </p>
       </div>
     </section>
@@ -169,13 +169,13 @@ export function UbinUtangTidur() {
 
   return (
     <section>
-      <Kepala judul="Utang tidur 7 malam" ke="/pola-tidur" />
+      <Kepala judul="Sleep debt, 7 nights" ke="/pola-tidur" />
       <div className="kaca rounded-3xl p-3">
         <div className="flex items-baseline gap-1.5">
           <span className={`text-[26px] font-black leading-none tabular-nums ${utang < 0 ? 'text-rose-500' : 'text-brand'}`}>
             {utang >= 0 ? '+' : '−'}{Math.abs(utang).toFixed(1)}
           </span>
-          <span className="t-mikro font-bold text-neutral-400">jam terhadap kebiasaan</span>
+          <span className="t-mikro font-bold text-neutral-400">h against your usual</span>
         </div>
         {/* Batang selisih terhadap garis tengah: yang lebih panjang dari
             kebiasaan tumbuh KE ATAS garis, yang lebih pendek ke bawah.
@@ -258,7 +258,7 @@ export function UbinTekanan() {
           </svg>
         )}
         <p className="t-mikro mt-1 leading-snug text-neutral-400">
-          Satu bacaan bukan diagnosis: penetapan hipertensi memakai rerata beberapa bacaan pada hari berbeda, dengan istirahat 5 menit sebelumnya.
+          A single reading is not a diagnosis: hypertension is established from the average of several readings on different days, each after five minutes of rest.
         </p>
       </div>
     </section>
@@ -313,7 +313,7 @@ export function UbinNapas() {
   return (
     <section>
       <Kepala
-        judul="Napas 2 menit"
+        judul="2-minute breathing"
         kanan={jalan ? (
           <button onClick={() => setJalan(false)} className="t-kecil flex min-h-[40px] items-center font-bold text-neutral-500">Berhenti</button>
         ) : undefined}
@@ -322,7 +322,7 @@ export function UbinNapas() {
         {!jalan ? (
           <>
             <p className="t-kecil leading-snug text-neutral-600 dark:text-neutral-300">
-              Tarik — tarik pendek lagi — buang panjang. Diulang dua menit.
+              Inhale — a second short inhale — then a long exhale. Repeated for two minutes.
             </p>
             <button
               onClick={() => { setMulai(Date.now()); getarTerakhir.current = -1; setJalan(true) }}
@@ -331,7 +331,7 @@ export function UbinNapas() {
               Mulai
             </button>
             <p className="t-mikro mt-2 leading-snug text-neutral-400">
-              Yang terukur pada percobaannya efek sesaat pada rasa tenang dan laju napas — bukan perbaikan tekanan darah jangka panjang.
+              What the trials measured is a short-term effect on calm and breathing rate — not a lasting improvement in blood pressure.
             </p>
           </>
         ) : (
@@ -394,7 +394,7 @@ export function UbinDuduk() {
     <section>
       <Kepala
         judul="Duduk"
-        kanan={<button onClick={tandai} className="t-kecil flex min-h-[40px] items-center font-bold text-brand">Sudah berdiri</button>}
+        kanan={<button onClick={tandai} className="t-kecil flex min-h-[40px] items-center font-bold text-brand">Stood up</button>}
       />
       <div className="kaca rounded-3xl p-3">
         <div className="flex items-baseline gap-1.5">
@@ -410,7 +410,7 @@ export function UbinDuduk() {
           />
         </span>
         <p className="t-mikro mt-1.5 leading-snug text-neutral-400">
-          Dihitung dari tombol, bukan dari sensor — aplikasi web tidak dapat melihat Anda duduk atau berdiri.
+          Counted from the button, not from a sensor — a web app cannot see whether you are sitting or standing.
         </p>
       </div>
     </section>

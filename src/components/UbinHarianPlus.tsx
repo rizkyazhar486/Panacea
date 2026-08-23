@@ -69,7 +69,7 @@ export function UbinTenaga() {
 
   return (
     <section>
-      <Kepala judul="Tenaga hari ini" ke="/harian" />
+      <Kepala judul="Energy today" ke="/harian" />
       <div className="kaca rounded-3xl p-3">
         <div className="grid grid-cols-5 gap-1">
           {LABEL.map((l, i) => (
@@ -126,7 +126,7 @@ export function UbinHidrasi() {
   return (
     <section>
       <Kepala
-        judul="Cairan hari ini"
+        judul="Fluids today"
         kanan={
           <span className="flex items-center gap-1">
             {[250, 500].map((n) => (
@@ -150,8 +150,7 @@ export function UbinHidrasi() {
           <span className="block h-full rounded-full bg-sky-400" style={{ width: `${Math.min(100, (ml / Math.max(2000, biasa)) * 100)}%` }} />
         </span>
         <p className="t-mikro mt-1.5 leading-snug text-neutral-400">
-          Tidak ada takaran tunggal yang benar untuk semua orang: kebutuhan berubah menurut suhu, keringat, dan makanan. Yang dibandingkan kebiasaan Anda sendiri.
-        </p>
+          There is no single correct amount for everyone: needs shift with temperature, sweat, and food. What is compared here is your own usual intake.</p>
       </div>
     </section>
   )
@@ -185,21 +184,20 @@ export function UbinCahaya() {
             onClick={() => logWellness(hariIni, { sunDone: !sudah })}
             className={`t-kecil flex min-h-[40px] items-center font-bold ${sudah ? 'text-neutral-500' : 'text-brand'}`}
           >
-            {sudah ? 'Batalkan' : 'Sudah ✓'}
+            {sudah ? 'Batalkan' : 'Done ✓'}
           </button>
         }
       />
       <div className="kaca rounded-3xl p-3">
         <div className="flex items-baseline gap-1.5">
           <span className="text-[26px] font-black leading-none tabular-nums nyala text-ink dark:text-white">{rangkaian}</span>
-          <span className="t-mikro font-bold text-neutral-400">hari berturut-turut</span>
+          <span className="t-mikro font-bold text-neutral-400">days in a row</span>
           {menitPerangkat != null && (
             <span className="t-mikro ml-auto shrink-0 tabular-nums text-neutral-400">{Math.round(menitPerangkat)} mnt di luar (perangkat)</span>
           )}
         </div>
         <p className="t-mikro mt-1.5 leading-snug text-neutral-400">
-          Cahaya terang pagi hari adalah penanda waktu terkuat bagi jam biologis. Yang dicatat di sini keputusan Anda sendiri, bukan pengukuran lux.
-        </p>
+          Bright morning light is the strongest time cue for the body clock. What is logged here is your own decision, not a light measurement.</p>
       </div>
     </section>
   )
@@ -219,7 +217,7 @@ export function UbinTangga() {
       <div className="kaca rounded-3xl p-3">
         <div className="flex items-baseline gap-1.5">
           <span className="text-[26px] font-black leading-none tabular-nums nyala text-ink dark:text-white">{Math.round(kini)}</span>
-          <span className="t-mikro font-bold text-neutral-400">lantai hari ini</span>
+          <span className="t-mikro font-bold text-neutral-400">floors today</span>
           {biasa > 0 && <span className="t-mikro ml-auto shrink-0 tabular-nums text-neutral-400">biasanya {Math.round(biasa)}</span>}
         </div>
         {deret.length >= 3 && (
@@ -230,8 +228,7 @@ export function UbinTangga() {
           </span>
         )}
         <p className="t-mikro mt-1.5 leading-snug text-neutral-400">
-          Naik tangga memuat beban pada tungkai dan tulang panggul sekaligus menaikkan denyut — dua hal yang jalan datar tidak berikan sebanyak itu.
-        </p>
+          Climbing stairs loads the legs and hips while raising the heart rate — two things that walking on the flat does not deliver together.</p>
       </div>
     </section>
   )
@@ -272,7 +269,7 @@ export function UbinVo2Tren() {
           <polyline points={titik} fill="none" stroke="currentColor" strokeWidth="1.8" vectorEffect="non-scaling-stroke" strokeLinejoin="round" className="text-brand" />
         </svg>
         <p className="t-mikro mt-1 leading-snug text-neutral-400">
-          Cara ukur terakhir: {akhir.cara ?? 'tidak dicatat'}. Angka dari jam tangan dan dari tes lapangan tidak selalu sebanding — yang dibaca arahnya, bukan selisih satu bacaan.
+          Cara ukur terakhir: {akhir.cara ?? 'not logged'}. Angka dari jam tangan dan dari tes lapangan tidak selalu sebanding — yang dibaca arahnya, bukan selisih satu bacaan.
         </p>
       </div>
     </section>
@@ -321,8 +318,7 @@ export function UbinKomposisi() {
           </>
         )}
         <p className="t-mikro mt-1.5 leading-snug text-neutral-400">
-          Timbangan bioimpedans menaksir lemak dari tahanan listrik, dan taksirannya bergeser oleh cairan tubuh — ukur pada keadaan yang sama tiap kali agar arahnya bermakna.
-        </p>
+          Bioimpedance scales estimate fat from electrical resistance, and the estimate moves with body water — measure under the same conditions each time.</p>
       </div>
     </section>
   )
@@ -347,7 +343,7 @@ export function UbinSuplemen() {
   return (
     <section>
       <Kepala
-        judul="Suplemen hari ini"
+        judul="Supplements today"
         kanan={
           <button onClick={() => setBuka((v) => !v)} className="t-kecil flex min-h-[40px] items-center font-bold text-brand">
             {buka ? 'Tutup' : '+ Tambah'}
@@ -385,7 +381,7 @@ export function UbinSuplemen() {
 
         {!daftar.length ? (
           <p className="t-kecil text-neutral-500">
-            Belum ada daftar. Aplikasi ini tidak menganjurkan suplemen apa pun — ia hanya mengingat yang sudah Anda putuskan sendiri.
+            No list yet. This app recommends no supplement at all — it only remembers what you have already decided for yourself.
           </p>
         ) : (
           <>
@@ -474,8 +470,7 @@ export function UbinSuhuEkstrem() {
           <span className="t-mikro ml-auto shrink-0 text-neutral-400">{pekanIni} sesi pekan ini</span>
         </div>
         <p className="t-mikro mt-2 leading-snug text-neutral-400">
-          Dicatat sebagai kegiatan, bukan sebagai terapi: bukti pada manusia untuk sauna paling kuat berupa penelitian pengamatan, dan untuk rendaman dingin masih kecil serta bertentangan.
-        </p>
+          Logged as an activity, not as therapy: the strongest human evidence for sauna use is observational, not large randomised trials.</p>
       </div>
     </section>
   )

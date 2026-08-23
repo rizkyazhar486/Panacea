@@ -47,5 +47,15 @@ const id: Record<string, string> = {
   'Mind & Habits': 'Jiwa & Kebiasaan',
   'Services & Emergency': 'Layanan & Darurat',
   'Faith & Life': 'Ibadah & Hidup',
+  // Ubin beranda — Tambahan
+  'Resting heart rate, 30 days': 'Nadi istirahat 30 hari',
+  'Sleep, 14 nights': 'Tidur 14 malam',
+  'Training minutes per week': 'Menit latihan per pekan',
+  'Logged today': 'Tercatat hari ini',
+  'Adherence, 14 days': 'Kepatuhan minum 14 hari',
+  'Weight, 90 days': 'Berat 90 hari',
+  'Food logged': 'Makanan tercatat',
+  'Training calories': 'Kalori latihan',
+  'not logged': 'belum tercatat',
 }
 export default id
