@@ -204,7 +204,7 @@ export function Login({ onBack }: { onBack?: () => void }) {
         <div className="relative">
           <h1 className="text-4xl font-extrabold leading-tight">
             Longevity Medical-AI{' '}
-            <span className="animate-gradient-text bg-gradient-to-r from-white via-emerald-100 to-white bg-clip-text text-transparent">Co-Physician</span>
+            <span className="animate-gradient-text bg-gradient-to-r from-white via-emerald-100 to-white bg-clip-text text-transparent">Sejawat Dokter</span>
           </h1>
           <p className="mt-3 max-w-md text-ink/85">
             AI handles history-taking & education; doctors verify. Tokenized medical records,
@@ -315,7 +315,7 @@ export function Login({ onBack }: { onBack?: () => void }) {
 
           {/* ── Adaptive form fields ───────────── */}
           <div className="space-y-3">
-            <Field label="Email">
+            <Field label="Surel">
               <input className={inputClass} value={f.email}
                 onChange={e => setF(p => ({ ...p, email: e.target.value }))} type="email" />
             </Field>
@@ -367,26 +367,26 @@ export function Login({ onBack }: { onBack?: () => void }) {
                   </label>
                   <input className={inputClass} value={f.str}
                     onChange={e => setF(p => ({ ...p, str: e.target.value }))}
-                    placeholder="Required — STR / practice certificate" />
+                    placeholder="Wajib — STR / surat izin praktik" />
                   <p className="mt-1 text-[11px] text-neutral-500">
                     {role === 'dokter' ? 'AI-EMR is only for certified clinicians.' : 'Required for certified clinicians / academics.'}
                   </p>
                 </div>
 
-                <Collapse title="Education & Credentials History">
+                <Collapse title="Riwayat Pendidikan & Kredensial">
                   {role === 'kontributor' && (
                     <div className="grid grid-cols-2 gap-2">
-                      <Mini label="Title" value={f.gelar} onChange={v => setF(p => ({ ...p, gelar: v }))} placeholder="Dr., Dr. Sp.PD" />
-                      <Mini label="Specialty" value={f.spesialis} onChange={v => setF(p => ({ ...p, spesialis: v }))} placeholder="Internal Medicine" />
+                      <Mini label="Gelar" value={f.gelar} onChange={v => setF(p => ({ ...p, gelar: v }))} placeholder="Dr., Dr. Sp.PD" />
+                      <Mini label="Spesialisasi" value={f.spesialis} onChange={v => setF(p => ({ ...p, spesialis: v }))} placeholder="Penyakit Dalam" />
                     </div>
                   )}
                   {role === 'verifikator' && (
-                    <Mini label="Subspecialty" value={f.subspesialis} onChange={v => setF(p => ({ ...p, subspesialis: v }))} placeholder="Gastroenterology-Hepatology" />
+                    <Mini label="Subspesialisasi" value={f.subspesialis} onChange={v => setF(p => ({ ...p, subspesialis: v }))} placeholder="Gastroenterologi-Hepatologi" />
                   )}
-                  <Mini label="Expertise" value={f.keahlian} onChange={v => setF(p => ({ ...p, keahlian: v }))} placeholder="Preventive cardiology, longevity" />
+                  <Mini label="Keahlian" value={f.keahlian} onChange={v => setF(p => ({ ...p, keahlian: v }))} placeholder="Kardiologi pencegahan, umur panjang" />
                   <div className="grid grid-cols-2 gap-2">
                     <Mini label="University" value={f.universitas} onChange={v => setF(p => ({ ...p, universitas: v }))} placeholder="Universitas Indonesia" />
-                    <Mini label="Graduation Year" value={f.tahunLulus} onChange={v => setF(p => ({ ...p, tahunLulus: v.replace(/\D/g, '').slice(0, 4) }))} placeholder="2018" numeric />
+                    <Mini label="Tahun Lulus" value={f.tahunLulus} onChange={v => setF(p => ({ ...p, tahunLulus: v.replace(/\D/g, '').slice(0, 4) }))} placeholder="2018" numeric />
                   </div>
                   <div>
                     <label className="mb-1 block text-[11px] font-semibold text-neutral-500">Upload Credentials (PDF)</label>
@@ -395,7 +395,7 @@ export function Login({ onBack }: { onBack?: () => void }) {
                       className="block w-full text-xs text-neutral-500 file:mr-3 file:rounded-full file:border-0 file:bg-brand file:px-3 file:py-1.5 file:text-xs file:font-bold file:text-white" />
                     {f.pdfName && <p className="mt-1 text-[11px] text-brand-dark">✓ {f.pdfName}</p>}
                   </div>
-                  <p className="text-[11px] text-neutral-500">Reviewed by AI-Agent & approved by Owner before full access.</p>
+                  <p className="text-[11px] text-neutral-500">Ditelaah AI-Agent & disetujui Pemilik sebelum akses penuh diberikan.</p>
                 </Collapse>
               </>
             )}
@@ -459,7 +459,7 @@ function EmailOtpLogin({ role, name, str, email, setEmail, consentOk, onLogin }:
           type="email" placeholder="email@you.com" disabled={sent} />
         {!sent
           ? <Button onClick={start} disabled={busy} className="shrink-0">{busy ? '…' : 'Send Code'}</Button>
-          : <button onClick={() => { setSent(false); setCode(''); setMsg('') }} className="shrink-0 px-2 text-xs font-semibold text-neutral-500">Change</button>}
+          : <button onClick={() => { setSent(false); setCode(''); setMsg('') }} className="shrink-0 px-2 text-xs font-semibold text-neutral-500">Ubah</button>}
       </div>
       {sent && (
         <div className="mt-2 flex gap-2">
@@ -480,12 +480,12 @@ function LegalModal({ onClose }: { onClose: () => void }) {
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4" onClick={onClose}>
       <div className="max-h-[85vh] w-full max-w-lg overflow-y-auto rounded-2xl bg-white p-6 shadow-xl"
         onClick={e => e.stopPropagation()}>
-        <h3 className="text-lg font-bold">Consent, Privacy & Terms</h3>
+        <h3 className="text-lg font-bold">Persetujuan, Privasi & Ketentuan</h3>
         <div className="mt-3 space-y-3 text-sm leading-relaxed text-neutral-600">
-          <p><b>Informed Consent.</b> AI interactions are educational & supportive in nature — not a final diagnosis. Diagnosis & treatment still require verification by a licensed doctor.</p>
-          <p><b>Privacy (Indonesia's PDP Law No. 27/2022).</b> Your health data is specific personal data, stored encrypted in Indonesia, with an access audit log. You have the right to access, correct, and delete your data at any time.</p>
-          <p><b>Terms.</b> AI-EMR hanya untuk tenaga medis dengan STR/SIP terverifikasi. Layanan apotek tunduk pada apoteker berizin & ketentuan BPOM. Dalam keadaan gawat darurat, pakailah fitur SOS Darurat dan hubungi fasilitas kesehatan terdekat.</p>
-          <p className="text-xs text-neutral-500">The full version is available in the "Privacy & Legal" menu after signing in.</p>
+          <p><b>Persetujuan Setelah Penjelasan.</b> AI interactions are educational & supportive in nature — not a final diagnosis. Diagnosis & treatment still require verification by a licensed doctor.</p>
+          <p><b>Privasi (UU PDP No. 27/2022).</b> Your health data is specific personal data, stored encrypted in Indonesia, with an access audit log. You have the right to access, correct, and delete your data at any time.</p>
+          <p><b>Ketentuan.</b> AI-EMR hanya untuk tenaga medis dengan STR/SIP terverifikasi. Layanan apotek tunduk pada apoteker berizin & ketentuan BPOM. Dalam keadaan gawat darurat, pakailah fitur SOS Darurat dan hubungi fasilitas kesehatan terdekat.</p>
+          <p className="text-xs text-neutral-500">Versi lengkapnya ada di menu "Privasi & Hukum" setelah Anda masuk.</p>
         </div>
         <button onClick={onClose}
           className="mt-5 w-full rounded-full bg-gradient-to-b from-[#00BF63] to-[#0b7a4b] py-2.5 text-sm font-bold text-white">
