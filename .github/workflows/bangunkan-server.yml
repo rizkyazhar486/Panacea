@@ -21,11 +21,18 @@
 #      server tetap bangun pada jam yang tidak ada apa pun untuk dikirim adalah
 #      pemborosan tanpa hasil.
 #
-# YANG PERLU DIISI SEKALI. Variabel repositori bernama SERVER_URL berisi alamat
-# server Render, misalnya https://nama-anda.onrender.com — Settings → Secrets
-# and variables → Actions → Variables → New repository variable. Tanpa itu alur
-# kerja ini berhenti sendiri tanpa menjadi gagal, supaya tidak mengirimi Anda
-# pemberitahuan galat setiap sepuluh menit.
+# TIDAK ADA YANG PERLU DIISI, pada umumnya. Alamat servernya diambil dari
+# variabel repositori VITE_API_URL yang memang SUDAH dipakai alur kerja
+# penerbitan untuk membangun aplikasinya — nilainya persis alamat yang sama.
+# Meminta orang mengisi variabel kedua berisi nilai yang sudah ada di sebelahnya
+# hanyalah cara lain membuat langkah yang mudah terlewat.
+#
+# SERVER_URL tetap dibaca lebih dahulu bila ada, untuk keadaan yang jarang:
+# server notifikasi berbeda dari server yang dipakai aplikasi. Keduanya boleh
+# berupa variabel repositori maupun secret — Settings → Secrets and variables →
+# Actions. Bila tidak satu pun ada, alur kerja ini berhenti sendiri TANPA
+# menjadi gagal, supaya tidak mengirimi Anda pemberitahuan galat tiap sepuluh
+# menit.
 #
 # YANG JUJUR HARUS DIKATAKAN. Penjadwal GitHub Actions bersifat "sebisanya":
 # pada jam sibuk ia lazim terlambat lima sampai lima belas menit, dan sesekali
@@ -58,11 +65,19 @@ jobs:
       - name: Sentuh /api/health
         env:
           SERVER_URL: ${{ vars.SERVER_URL }}
+          SERVER_URL_SECRET: ${{ secrets.SERVER_URL }}
+          VITE_API_URL: ${{ vars.VITE_API_URL }}
+          VITE_API_URL_SECRET: ${{ secrets.VITE_API_URL }}
         run: |
-          if [ -z "$SERVER_URL" ]; then
-            echo "SERVER_URL belum diisi — lihat keterangan di kepala berkas ini. Berhenti tanpa menjadi gagal."
+          # Urutannya: yang paling khusus lebih dahulu, lalu alamat yang memang
+          # sudah dipakai aplikasinya.
+          alamat="${SERVER_URL:-${SERVER_URL_SECRET:-${VITE_API_URL:-$VITE_API_URL_SECRET}}}"
+          if [ -z "$alamat" ]; then
+            echo "Tidak ada VITE_API_URL maupun SERVER_URL di repositori ini — lihat keterangan di kepala berkas. Berhenti tanpa menjadi gagal."
             exit 0
           fi
+          echo "Menyentuh: ${alamat%/}/api/health"
+          SERVER_URL="$alamat"
           # Instans yang benar-benar tidur perlu waktu lama untuk bangun;
           # 90 detik cukup untuk hampir semua kasus, dan kegagalan sesekali
           # memang tidak boleh menjadi kegagalan alur kerja: yang berikutnya
