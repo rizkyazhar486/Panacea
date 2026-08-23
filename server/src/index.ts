@@ -120,7 +120,7 @@ import { checkHrZoneAlert, checkBedtimeReminder, checkWorkoutReminder, suggested
 import { fetchLeagueScoreboard, fetchF1Info, fetchMotoGpInfo, LEAGUES, UNAVAILABLE } from './sports.js'
 import { checkPrayerReminder } from './salat.js'
 import { lingkunganKota, cariPangan } from './lingkungan.js'
-import { jalankanAturanNotif } from './aturanNotif.js'
+import { jalankanAturanNotif, detakMesinAturan } from './aturanNotif.js'
 import { searchPubmed } from './pubmed.js'
 import { fetchQuote, fetchQuotes, searchSymbols, INSTRUMENTS, UNGGULAN, WATCHLIST_MAX, RANGES, isValidSymbol, type Range } from './markets.js'
 import { searchTrials } from './trials.js'
@@ -1206,6 +1206,11 @@ app.get('/api/push/status', requireAuth, (req, res) => {
     vapidGalat: k.galat || undefined,
     langganan: listPushSubs(u.id).length,
     penyimpanan: modePenyimpanan(),
+    // Detik sejak penjadwal terakhir berdetak. Nilai yang sangat kecil pada
+    // permintaan pertama hari itu berarti servernya baru saja dibangunkan —
+    // yaitu selama tertidur tidak ada jadwal siapa pun yang diperiksa.
+    detakDetikLalu: detakMesinAturan() ? Math.round((Date.now() - detakMesinAturan()) / 1000) : null,
+    hidupDetik: Math.round(process.uptime()),
   })
 })
 app.post('/api/push/subscribe', requireAuth, (req, res) => {

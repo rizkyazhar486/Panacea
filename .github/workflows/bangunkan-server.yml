@@ -1,0 +1,76 @@
+# ─────────────────────────────────────────────────────────────────────────────
+# Membangunkan server gratis supaya pengingat berjadwal benar-benar terkirim.
+#
+# MASALAHNYA. Penjadwal notifikasi hidup DI DALAM server: tiap menit ia
+# memeriksa jam tiap orang, aturan mana yang terpenuhi, lalu mengirimnya. Pada
+# paket gratis Render, instansnya dimatikan setelah 15 menit tanpa permintaan —
+# dan selama tertidur tidak ada satu pun pemeriksaan yang berjalan. Akibatnya
+# pengingat pukul lima sore hanya terkirim bila kebetulan ada orang membuka
+# aplikasinya sekitar jam itu, yang justru kebalikan dari gunanya pengingat.
+#
+# CARANYA. Alur kerja ini menyentuh /api/health tiap sepuluh menit. Satu
+# permintaan sudah cukup membuat Render menghidupkan instansnya kembali, dan
+# begitu hidup, penjadwal di dalamnya berjalan lagi seperti biasa.
+#
+# HANYA PADA JAM BANGUN, dan itu disengaja karena DUA alasan:
+#   1. Paket gratis Render memberi 750 jam instans per bulan. Dihidupkan
+#      sepanjang hari memakai sekitar 730 jam — muat, tetapi tidak menyisakan
+#      apa pun untuk layanan gratis lain di akun yang sama. Dijalankan pukul
+#      04.00-23.00 WIB, pemakaiannya sekitar 580 jam sebulan.
+#   2. Aplikasi ini memang tidak mengirim notifikasi pada jam senyap. Menjaga
+#      server tetap bangun pada jam yang tidak ada apa pun untuk dikirim adalah
+#      pemborosan tanpa hasil.
+#
+# YANG PERLU DIISI SEKALI. Variabel repositori bernama SERVER_URL berisi alamat
+# server Render, misalnya https://nama-anda.onrender.com — Settings → Secrets
+# and variables → Actions → Variables → New repository variable. Tanpa itu alur
+# kerja ini berhenti sendiri tanpa menjadi gagal, supaya tidak mengirimi Anda
+# pemberitahuan galat setiap sepuluh menit.
+#
+# YANG JUJUR HARUS DIKATAKAN. Penjadwal GitHub Actions bersifat "sebisanya":
+# pada jam sibuk ia lazim terlambat lima sampai lima belas menit, dan sesekali
+# satu putaran dilewati sama sekali. Untuk membangunkan server itu tidak
+# menjadi soal — server yang bangun karena telat lima menit tetap mengejar
+# jadwal orang pada menit berikutnya. Ini bukan pengganti instans berbayar bila
+# yang dibutuhkan ketepatan detik.
+# ─────────────────────────────────────────────────────────────────────────────
+
+name: Bangunkan server
+
+on:
+  schedule:
+    # Tiap 10 menit, pukul 04.00-23.00 WIB (WIB = UTC+7).
+    - cron: '*/10 21-23,0-16 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: bangunkan-server
+  cancel-in-progress: false
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Sentuh /api/health
+        env:
+          SERVER_URL: ${{ vars.SERVER_URL }}
+        run: |
+          if [ -z "$SERVER_URL" ]; then
+            echo "SERVER_URL belum diisi — lihat keterangan di kepala berkas ini. Berhenti tanpa menjadi gagal."
+            exit 0
+          fi
+          # Instans yang benar-benar tidur perlu waktu lama untuk bangun;
+          # 90 detik cukup untuk hampir semua kasus, dan kegagalan sesekali
+          # memang tidak boleh menjadi kegagalan alur kerja: yang berikutnya
+          # datang sepuluh menit lagi.
+          kode=$(curl -s -o /tmp/jawab.json -w '%{http_code}' --max-time 90 "${SERVER_URL%/}/api/health" || echo 000)
+          echo "HTTP $kode"
+          head -c 400 /tmp/jawab.json || true
+          echo
+          if [ "$kode" != "200" ]; then
+            echo "::warning::Server belum menjawab 200 (kode $kode). Percobaan berikutnya sepuluh menit lagi."
+          fi

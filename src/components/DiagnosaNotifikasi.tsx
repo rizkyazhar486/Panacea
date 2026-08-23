@@ -74,7 +74,10 @@ export function DiagnosaNotifikasi({ setelan }: { setelan: Record<string, unknow
        diisi, kunci diisi dan berhasil dipasang, dan kunci diisi tetapi DITOLAK
        — yang terakhir itulah yang terjadi pada kunci yang tersalin bersama
        spasi, dan sebelumnya hanya tercatat di log server. */
-    let ks: { vapidDiisi: boolean; vapidDicoba: boolean; vapidGalat?: string; langganan: number; penyimpanan: string } | null = null
+    let ks: {
+      vapidDiisi: boolean; vapidDicoba: boolean; vapidGalat?: string; langganan: number
+      penyimpanan: string; detakDetikLalu?: number | null; hidupDetik?: number
+    } | null = null
     if (backendEnabled) {
       try { ks = await api.pushStatusServer() } catch { ks = null }
     }
@@ -100,6 +103,25 @@ export function DiagnosaNotifikasi({ setelan }: { setelan: Record<string, unknow
             ? 'Tidak ada. Server ini juga berjalan tanpa basis data tetap, sehingga daftar langganan TERHAPUS pada setiap deploy ulang — tekan “Nyalakan” lagi, dan isi MONGODB_URI agar tidak terulang.'
             : 'Tidak ada. Tekan “Nyalakan” sekali lagi di perangkat ini.',
     })
+
+    /* APAKAH PENJADWALNYA MEMANG BERJALAN.
+       Pada instans gratis yang dimatikan saat sepi, server yang tertidur
+       sepanjang sore terlihat sama persis dengan server yang bangun tetapi
+       tidak menemukan satu pun aturan terpenuhi. Umur hidup instans menjawab
+       itu: nilai yang baru beberapa menit pada siang hari berarti ia baru saja
+       dibangunkan oleh kunjungan Anda sendiri — dan selama tertidur, tidak ada
+       jadwal siapa pun yang diperiksa. */
+    if (ks?.hidupDetik != null) {
+      const menit = Math.round(ks.hidupDetik / 60)
+      const baruBangun = ks.hidupDetik < 20 * 60
+      out.push({
+        nama: 'Penjadwal server sedang berjalan',
+        keadaan: baruBangun ? 'tanya' : 'ok',
+        sebab: baruBangun
+          ? `Server baru hidup ${menit} menit — kemungkinan besar baru dibangunkan oleh kunjungan ini. Selama tertidur ia tidak memeriksa jadwal siapa pun. Lihat catatan di bawah untuk cara membangunkannya sendiri tanpa biaya.`
+          : `Sudah hidup ${menit >= 120 ? `${Math.round(menit / 60)} jam` : `${menit} menit`} tanpa terputus.`,
+      })
+    }
 
     const jenisNyala = ['notifPemulihan', 'notifLatihanPintar', 'notifVital', 'notifLingkungan', 'notifGizi', 'notifKebiasaan']
       .filter((k) => setelan[k] === true).length
@@ -174,7 +196,9 @@ export function DiagnosaNotifikasi({ setelan }: { setelan: Record<string, unknow
             Pengingat berjadwal dikirim server, bukan oleh ponsel Anda. Pada paket gratis Render, server dimatikan
             setelah 15 menit tanpa kunjungan — selama tertidur ia tidak memeriksa jadwal siapa pun, sehingga pengingat
             pukul lima sore dapat terlewat pada hari aplikasi ini tidak dibuka sama sekali. Itu batas paketnya, bukan
-            kesalahan setelan Anda.
+            kesalahan setelan Anda. Repositori ini sudah memuat alur kerja GitHub Actions yang menyentuh server tiap
+            sepuluh menit pada pukul 04.00-23.00 WIB supaya ia tetap bangun tanpa biaya tambahan; yang perlu diisi
+            hanya variabel repositori <code>SERVER_URL</code>.
           </p>
         </div>
       )}

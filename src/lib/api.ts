@@ -240,7 +240,10 @@ export const api = {
     req<{ ok: boolean }>('/api/push/unsubscribe', { method: 'POST', body: JSON.stringify({ endpoint }) }),
   /** Keadaan push tanpa mengirim notifikasi apa pun. */
   pushStatusServer: () =>
-    req<{ vapidDiisi: boolean; vapidDicoba: boolean; vapidGalat?: string; langganan: number; penyimpanan: 'mongo' | 'berkas' }>('/api/push/status'),
+    req<{
+      vapidDiisi: boolean; vapidDicoba: boolean; vapidGalat?: string; langganan: number
+      penyimpanan: 'mongo' | 'berkas'; detakDetikLalu?: number | null; hidupDetik?: number
+    }>('/api/push/status'),
   pushTest: () => req<{ ok: boolean; sent: number; reason?: string }>('/api/push/test', { method: 'POST' }),
   pushBroadcast: (title: string, body: string) =>
     req<{ ok: boolean; sent: number; recipients: number }>('/api/push/broadcast', {

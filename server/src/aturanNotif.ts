@@ -860,7 +860,19 @@ function sedangSenyap(prefs: Record<string, any>, menit: number): boolean {
 
 export interface HasilJalan { terkirim: string | null; alasan: string }
 
+/* KAPAN MESIN ATURAN TERAKHIR BERDETAK.
+   Pada instans gratis yang dimatikan saat sepi, pertanyaan "apakah penjadwalnya
+   benar-benar berjalan" tidak dapat dijawab dari sisi peramban sama sekali —
+   dan tanpa jawabannya, server yang tertidur sepanjang sore terlihat sama
+   dengan server yang bangun tetapi tidak menemukan satu pun aturan terpenuhi.
+   Angka ini hanya ada di memori: ia ikut hilang saat instansnya dimatikan, dan
+   justru itulah keterangannya — nilai yang baru beberapa detik sesudah server
+   hidup berarti ia memang baru saja bangun. */
+let detakTerakhir = 0
+export function detakMesinAturan(): number { return detakTerakhir }
+
 export async function jalankanAturanNotif(userId: string, email: string): Promise<HasilJalan> {
+  detakTerakhir = Date.now()
   const prefs = getSettings(userId)
 
   const adaKategoriHidup = Object.values(PREF_KATEGORI).some((p) => prefs[p] === true)
