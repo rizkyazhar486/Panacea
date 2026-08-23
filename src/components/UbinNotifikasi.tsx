@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { api, backendEnabled } from '../lib/api'
 import { enablePush, pushStatus, type PushStatus } from '../lib/push'
+import { DiagnosaNotifikasi } from './DiagnosaNotifikasi'
 import { muatSetelan, simpanSetelan } from '../lib/adzan'
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -108,7 +109,11 @@ export function UbinNotifikasi() {
 
   useEffect(() => {
     void pushStatus().then(setPush)
-    if (backendEnabled) void api.getSettings().then((s) => setSetelan(s as Setelan)).catch(() => {})
+    // Jawaban server yang tidak berbentuk seperti dugaan TIDAK BOLEH menjatuhkan
+    // halaman. Sebelum penjaga ini, satu jawaban kosong dari server membuat
+    // seluruh beranda berganti menjadi layar "Something went wrong" — dan yang
+    // hilang bukan hanya widget pengingatnya, melainkan semuanya.
+    if (backendEnabled) void api.getSettings().then((s) => setSetelan((s ?? {}) as Setelan)).catch(() => {})
   }, [])
 
   const simpanServer = async (patch: Setelan) => {
@@ -330,6 +335,8 @@ export function UbinNotifikasi() {
             </span>
           </div>
         </div>
+
+        <DiagnosaNotifikasi setelan={setelan as Record<string, unknown>} />
       </div>
     </section>
   )
