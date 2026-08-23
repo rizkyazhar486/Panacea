@@ -7,6 +7,7 @@ import { indukRute } from '../lib/alurHalaman'
 import { useState, useEffect, useCallback, useRef, type ReactNode } from 'react'
 import { LogoMark } from './Logo'
 import { FabNavigasi } from './FabNavigasi'
+import { kirimRingkasan } from '../lib/ringkasan'
 import {
   IconDashboard,
   IconChat,
@@ -394,6 +395,22 @@ export function Shell({ children }: { children: ReactNode }) {
   // Bergantung pada `account`: percobaan pertama terjadi sebelum sesi ada dan
   // pasti gagal, jadi harus dijalankan lagi begitu pengguna masuk.
   useEffect(() => { if (account) void autoIsiDariPerangkat() }, [account])
+
+  /* Ringkasan harian dititipkan ke server supaya aturan notifikasi dapat
+     memakai data yang hanya ada di perangkat (gizi, umur hasil lab, puasa,
+     kopi). Dikirim saat aplikasi dibuka dan sesudah data berubah; berkasnya
+     sendiri menahan pengiriman jadi paling sering sejam sekali. */
+  useEffect(() => {
+    if (!account) return
+    void kirimRingkasan()
+    const on = () => void kirimRingkasan()
+    window.addEventListener('panacea:lab', on)
+    window.addEventListener('panacea:health-updated', on)
+    return () => {
+      window.removeEventListener('panacea:lab', on)
+      window.removeEventListener('panacea:health-updated', on)
+    }
+  }, [account])
 
   const [tersembunyi, setTersembunyi] = useState<string[]>(ambilTersembunyi)
   useEffect(() => langgananFitur(setTersembunyi), [])

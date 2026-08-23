@@ -43,6 +43,7 @@ import {
   getSettings,
   saveSettings,
   getHealthProfile,
+  saveRingkasan,
   saveHealthProfile,
   recordDeviceHealthSync,
   getHealthWebhookToken,
@@ -847,6 +848,12 @@ app.get('/api/sports/scores', async (req, res) => {
 })
 // Udara dan UV di kota pengguna — publik seperti papan skor, karena bukan
 // data pribadi siapa pun: yang dikirim hanya nama kota.
+// Ringkasan harian dari perangkat pemakainya — dipakai mesin aturan untuk
+// kondisi yang datanya hanya ada di perangkat (gizi, lab, puasa, kopi).
+app.put('/api/ringkasan', requireAuth, (req, res) => {
+  const u = (req as any).user as { id: string }
+  res.json({ ringkasan: saveRingkasan(u.id, (req.body as { ringkasan?: Record<string, unknown> })?.ringkasan ?? {}) })
+})
 app.get('/api/lingkungan', async (req, res) => {
   res.json(await lingkunganKota(String(req.query.kota ?? 'Jakarta')))
 })

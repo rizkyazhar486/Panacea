@@ -16,13 +16,13 @@ const riwayat = Array.from({ length: 20 }, (_, i) => ({
   spo2Pct: 96,
 }))
 
-function konteks(patch: Record<string, unknown>, menit: number) {
+function konteks(patch: Record<string, unknown>, menit: number, ringkas: Record<string, unknown> = {}) {
   const r = riwayat.map((b) => ({ ...b }))
   const hariIni = { ...r[r.length - 1], ...patch }
   r[r.length - 1] = hariIni
   return {
     userId: 'u', email: 'u@x.id', prefs: {}, riwayat: r, hariIni,
-    menitLokal: menit, tanggalLokal: hari(0),
+    menitLokal: menit, tanggalLokal: hari(0), ringkas,
   }
 }
 
@@ -63,7 +63,35 @@ const utang = konteks({ sleepH: 5 }, 21 * 60)
 for (let i = 1; i <= 7; i++) utang.riwayat[utang.riwayat.length - i].sleepH = 5.2
 periksa('utangTidur menyala saat 7 malam pendek', !!cari('utangTidur').nilai(utang))
 
-// 7. Jendela waktu tiap aturan masuk akal (tidak ada yang tengah malam).
+// 7. Aturan gizi memakai ringkasan dari perangkat.
+periksa('proteinTertinggal menyala saat 40 g pada 68 kg',
+  !!cari('proteinTertinggal').nilai(konteks({}, 17 * 60, { tanggal: hari(0), proteinG: 40, beratKg: 68 })))
+periksa('proteinTertinggal diam saat 120 g',
+  !cari('proteinTertinggal').nilai(konteks({}, 17 * 60, { tanggal: hari(0), proteinG: 120, beratKg: 68 })))
+periksa('proteinTertinggal diam bila ringkasan bukan hari ini',
+  !cari('proteinTertinggal').nilai(konteks({}, 17 * 60, { tanggal: hari(3), proteinG: 10, beratKg: 68 })))
+
+periksa('kopiTerlaluSore menyala bila diminum satu jam lalu pukul 16',
+  !!cari('kopiTerlaluSore').nilai(konteks({}, 16 * 60, { kopiTerakhir: Date.now() - 3600_000 })))
+periksa('kopiTerlaluSore diam bila kopinya pagi tadi',
+  !cari('kopiTerlaluSore').nilai(konteks({}, 16 * 60, { kopiTerakhir: Date.now() - 8 * 3600_000 })))
+
+periksa('labKedaluwarsa menyala bila HbA1c 8 bulan lalu',
+  !!cari('labKedaluwarsa').nilai(konteks({}, 10 * 60, { tanggal: hari(0), labTerakhir: { hba1c: hari(240) } })))
+periksa('labKedaluwarsa diam bila HbA1c dua bulan lalu',
+  !cari('labKedaluwarsa').nilai(konteks({}, 10 * 60, { tanggal: hari(0), labTerakhir: { hba1c: hari(60) } })))
+
+periksa('puasaPanjang menyala pada jam ke-22',
+  !!cari('puasaPanjang').nilai(konteks({}, 12 * 60, { puasaMulai: Date.now() - 22 * 3600_000 })))
+periksa('puasaPanjang diam pada jam ke-14',
+  !cari('puasaPanjang').nilai(konteks({}, 12 * 60, { puasaMulai: Date.now() - 14 * 3600_000 })))
+
+periksa('catatanHarianSepi menyala sesudah 3 hari',
+  !!cari('catatanHarianSepi').nilai(konteks({}, 20 * 60, { tanggal: hari(3), catatanHariIni: false })))
+periksa('catatanHarianSepi diam bila hari ini sudah mencatat',
+  !cari('catatanHarianSepi').nilai(konteks({}, 20 * 60, { tanggal: hari(0), catatanHariIni: true })))
+
+// 7b. Jendela waktu tiap aturan masuk akal (tidak ada yang tengah malam).
 for (const a of ATURAN) {
   if (!a.jendela) continue
   periksa(`jendela ${a.id} di luar jam tidur`, a.jendela[0] >= 6 * 60 && a.jendela[1] <= 22 * 60, String(a.jendela))

@@ -1,4 +1,4 @@
-import { getSettings, saveSettings, getHealthProfile } from './store.js'
+import { getSettings, saveSettings, getHealthProfile, getRingkasan } from './store.js'
 import { notify } from './push.js'
 import { lingkunganKota } from './lingkungan.js'
 
@@ -29,7 +29,7 @@ import { lingkunganKota } from './lingkungan.js'
 // ditulis sebagai aturan, betapapun bagus kalimatnya.
 // ─────────────────────────────────────────────────────────────────────────────
 
-export type Kategori = 'pemulihan' | 'latihan' | 'vital' | 'lingkungan'
+export type Kategori = 'pemulihan' | 'latihan' | 'vital' | 'lingkungan' | 'gizi' | 'kebiasaan'
 
 /** Kunci setelan yang menyalakan tiap kategori. Bawaannya mati. */
 export const PREF_KATEGORI: Record<Kategori, string> = {
@@ -37,6 +37,8 @@ export const PREF_KATEGORI: Record<Kategori, string> = {
   latihan: 'notifLatihanPintar',
   vital: 'notifVital',
   lingkungan: 'notifLingkungan',
+  gizi: 'notifGizi',
+  kebiasaan: 'notifKebiasaan',
 }
 
 interface Baris { date: string; [k: string]: unknown }
@@ -51,6 +53,13 @@ export interface Konteks {
   hariIni: Baris | null
   menitLokal: number
   tanggalLokal: string
+  /**
+   * Ringkasan yang dititipkan aplikasi di perangkat pemakainya — gizi, umur
+   * hasil lab, jendela puasa, jam kopi terakhir. Server tidak pernah menyimpan
+   * catatan makan atau nilai labnya sendiri; yang ada di sini hanya angka yang
+   * dipakai aturan.
+   */
+  ringkas: Record<string, any>
 }
 
 export interface Kabar { judul: string; badan: string; url: string }
@@ -320,6 +329,132 @@ export const ATURAN: Aturan[] = [
     },
   },
   {
+    id: 'proteinTertinggal',
+    kategori: 'gizi',
+    jendela: [J(16), J(19)],
+    jeda: 2,
+    nilai: (k) => {
+      const r = k.ringkas
+      if (r?.tanggal !== k.tanggalLokal) return null
+      const gram = Number(r.proteinG)
+      const berat = Number(r.beratKg) || Number(angka(k.hariIni, 'weightKg'))
+      if (!Number.isFinite(gram) || !Number.isFinite(berat) || berat <= 0) return null
+      const bawah = berat * 1.2
+      if (gram >= bawah) return null
+      return {
+        judul: `Protein baru ${Math.round(gram)} g`,
+        badan: `Rentang yang lazim dianjurkan 1,2–2,0 g/kg — untuk ${Math.round(berat)} kg berarti ${Math.round(bawah)}–${Math.round(berat * 2)} g. Masih ada makan malam untuk menutupnya.`,
+        url: './#/nutrition',
+      }
+    },
+  },
+  {
+    id: 'belumMakanTercatat',
+    kategori: 'gizi',
+    jendela: [J(20), J(21)],
+    jeda: 3,
+    nilai: (k) => {
+      const r = k.ringkas
+      // Hanya bagi yang MEMANG mencatat: ringkasan kemarin ada, hari ini kosong.
+      if (!r || typeof r.tanggal !== 'string') return null
+      if (r.tanggal === k.tanggalLokal && Number(r.kkal) > 0) return null
+      const selisih = Math.floor((Date.parse(`${k.tanggalLokal}T00:00:00Z`) - Date.parse(`${r.tanggal}T00:00:00Z`)) / 864e5)
+      if (!Number.isFinite(selisih) || selisih < 1 || selisih > 3) return null
+      return {
+        judul: 'Catatan makan kosong hari ini',
+        badan: 'Satu baris pun sudah menolong: yang dipakai perbandingan besok adalah kebiasaan Anda sendiri, dan kebiasaan itu hanya terbentuk dari hari yang tercatat.',
+        url: './#/nutrition',
+      }
+    },
+  },
+  {
+    id: 'kopiTerlaluSore',
+    kategori: 'gizi',
+    jendela: [J(15), J(20)],
+    jeda: 3,
+    nilai: (k) => {
+      const t = Number(k.ringkas?.kopiTerakhir)
+      if (!Number.isFinite(t)) return null
+      const jamLalu = (Date.now() - t) / 3_600_000
+      if (jamLalu > 2) return null // baru saja diminum
+      const jamLokal = Math.floor(k.menitLokal / 60)
+      if (jamLokal < 15) return null
+      return {
+        judul: 'Kopi sore',
+        badan: `Paruh waktu kafein sekitar lima jam (lazimnya 3–7 jam, berbeda tiap orang). Diminum pukul ${String(jamLokal).padStart(2, '0')}.00, sekitar separuhnya masih ada menjelang tengah malam.`,
+        url: './#/pola-tidur',
+      }
+    },
+  },
+  {
+    id: 'labKedaluwarsa',
+    kategori: 'vital',
+    jendela: [J(9), J(11)],
+    jeda: 30,
+    nilai: (k) => {
+      const peta = k.ringkas?.labTerakhir as Record<string, string> | undefined
+      if (!peta || typeof peta !== 'object') return null
+      // Jarak yang lazim dianjurkan; disebut apa adanya sebagai "lazim",
+      // bukan sebagai aturan medis — jaraknya berbeda menurut keadaan
+      // masing-masing orang dan ditentukan dokternya.
+      const jarak: Record<string, { hari: number; nama: string }> = {
+        hba1c: { hari: 180, nama: 'HbA1c' },
+        gdp: { hari: 365, nama: 'Glukosa puasa' },
+        apob: { hari: 365, nama: 'ApoB' },
+        ldl: { hari: 365, nama: 'Profil lipid' },
+        egfr: { hari: 365, nama: 'Fungsi ginjal (eGFR)' },
+        sgpt: { hari: 365, nama: 'Enzim hati' },
+      }
+      for (const [jenis, d] of Object.entries(jarak)) {
+        const tgl = peta[jenis]
+        if (!tgl) continue
+        const umur = Math.floor((Date.parse(`${k.tanggalLokal}T00:00:00Z`) - Date.parse(`${tgl}T00:00:00Z`)) / 864e5)
+        if (!Number.isFinite(umur) || umur < d.hari) continue
+        return {
+          judul: `${d.nama} terakhir ${Math.round(umur / 30)} bulan lalu`,
+          badan: `Jarak yang lazim untuk pemeriksaan ini sekitar ${Math.round(d.hari / 30)} bulan. Jarak sebenarnya ditentukan dokter menurut keadaan Anda — ini hanya pengingat bahwa angkanya sudah tua.`,
+          url: './#/tubuh',
+        }
+      }
+      return null
+    },
+  },
+  {
+    id: 'puasaPanjang',
+    kategori: 'gizi',
+    jendela: [J(10), J(20)],
+    jeda: 1,
+    nilai: (k) => {
+      const t = Number(k.ringkas?.puasaMulai)
+      if (!Number.isFinite(t)) return null
+      const jam = (Date.now() - t) / 3_600_000
+      if (jam < 20 || jam > 30) return null
+      return {
+        judul: `Jendela makan sudah ${Math.floor(jam)} jam`,
+        badan: 'Yang ditampilkan hanya lamanya — tidak ada klaim manfaat pada jam ke sekian. Bila terasa pusing, lemas, atau berdebar, berbuka lebih dulu.',
+        url: './#/harian',
+      }
+    },
+  },
+  {
+    id: 'catatanHarianSepi',
+    kategori: 'kebiasaan',
+    jendela: [J(19), J(21)],
+    jeda: 4,
+    nilai: (k) => {
+      const r = k.ringkas
+      if (!r || typeof r.tanggal !== 'string') return null
+      if (r.catatanHariIni === true) return null
+      const selisih = Math.floor((Date.parse(`${k.tanggalLokal}T00:00:00Z`) - Date.parse(`${r.tanggal}T00:00:00Z`)) / 864e5)
+      if (!Number.isFinite(selisih) || selisih < 2 || selisih > 14) return null
+      return {
+        judul: `${selisih} hari tanpa catatan harian`,
+        badan: 'Tidur, tenaga, dan satu baris keterangan sudah cukup. Angka yang dibandingkan besok berasal dari hari-hari yang tercatat, bukan dari hari yang terlewat.',
+        url: './#/harian',
+      }
+    },
+  },
+  {
     id: 'belumTersinkron',
     kategori: 'vital',
     jendela: [J(10), J(12)],
@@ -403,7 +538,8 @@ export async function jalankanAturanNotif(userId: string, email: string): Promis
   const riwayat: Baris[] = Array.isArray(profil.history) ? (profil.history as Baris[]) : []
   const hariIni = riwayat.length ? riwayat[riwayat.length - 1] : null
 
-  const k: Konteks = { userId, email, prefs, riwayat, hariIni, menitLokal, tanggalLokal }
+  const ringkas = getRingkasan(userId)
+  const k: Konteks = { userId, email, prefs, riwayat, hariIni, menitLokal, tanggalLokal, ringkas }
   const terakhir: Record<string, string> = prefs.notifTerakhir ?? {}
 
   const bolehKirim = (id: string, jeda: number): boolean => {

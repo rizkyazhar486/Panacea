@@ -111,6 +111,7 @@ interface DB {
   sportsFavorites?: Record<string, string[]> // userId -> followed team keys, e.g. "epl:Arsenal"
   feedback?: Feedback[] // in-app "Pesan & Saran" — delivered to the owner only
   reminders?: Record<string, MedReminder[]> // userId -> medication reminders
+  ringkasan?: Record<string, Record<string, any>> // userId -> ringkasan harian dari perangkat pemakainya
   meets?: Meet[] // Club Hub meets — real, user-created, server-persisted
   clubs?: Club[] // Club Hub clubs — real, user-created, server-persisted
   secondOpinions?: SecondOpinion[] // AI-drafted, doctor-reviewed second opinions
@@ -848,6 +849,56 @@ export function setSportsFavorites(userId: string, teams: string[]): string[] {
   save()
   return clean
 }
+/**
+ * Ringkasan harian yang dikirim aplikasi di perangkat pemakainya.
+ *
+ * MENGAPA PERLU. Sebagian data hidup HANYA di perangkat — catatan makan, hasil
+ * lab yang diketik sendiri, jam kopi terakhir, jendela puasa. Server tidak
+ * pernah melihatnya, dan itu memang disengaja. Tetapi notifikasi dikirim
+ * server, sehingga aturan seperti "protein baru 40 g pada pukul lima sore"
+ * mustahil tanpa satu ringkasan kecil yang dititipkan ke sini.
+ *
+ * YANG DIKIRIM SENGAJA SESEDIKIT MUNGKIN: hanya angka yang benar-benar dipakai
+ * aturan, tanpa satu pun nama makanan, nama obat, atau catatan harian. Isinya
+ * dipangkas di sini juga, bukan hanya dipercayakan ke pengirimnya.
+ */
+const RINGKASAN_DIIZINKAN = [
+  'tanggal', 'kkal', 'proteinG', 'beratKg', 'puasaMulai', 'kopiTerakhir',
+  'labTerakhir', 'tenaga', 'catatanHariIni', 'jamTidurTarget',
+] as const
+
+export function getRingkasan(userId: string): Record<string, any> {
+  return db.ringkasan?.[userId] ?? {}
+}
+
+export function saveRingkasan(userId: string, isi: Record<string, any>): Record<string, any> {
+  if (!db.ringkasan) db.ringkasan = {}
+  const bersih: Record<string, any> = {}
+  for (const k of RINGKASAN_DIIZINKAN) {
+    const v = (isi as Record<string, unknown>)[k]
+    if (typeof v === 'number' && Number.isFinite(v)) bersih[k] = v
+    else if (typeof v === 'string' && v.length <= 40) bersih[k] = v
+    else if (typeof v === 'boolean') bersih[k] = v
+    else if (k === 'labTerakhir' && v && typeof v === 'object') {
+      // Peta jenis lab -> tanggal. Hanya tanggal, tidak ada nilainya: yang
+      // dibutuhkan aturan cuma UMUR pemeriksaannya.
+      const peta: Record<string, string> = {}
+      let n = 0
+      for (const [jenis, tgl] of Object.entries(v as Record<string, unknown>)) {
+        if (n++ >= 40) break
+        if (typeof jenis === 'string' && jenis.length <= 24 && typeof tgl === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(tgl)) {
+          peta[jenis] = tgl
+        }
+      }
+      bersih[k] = peta
+    }
+  }
+  bersih.diperbaruiPada = new Date().toISOString()
+  db.ringkasan[userId] = bersih
+  save()
+  return bersih
+}
+
 export function allSportsFavorites(): Record<string, string[]> {
   return db.sportsFavorites ?? {}
 }

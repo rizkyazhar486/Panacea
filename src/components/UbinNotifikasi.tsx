@@ -43,6 +43,8 @@ interface Setelan {
   notifLatihanPintar?: boolean
   notifVital?: boolean
   notifLingkungan?: boolean
+  notifGizi?: boolean
+  notifKebiasaan?: boolean
   notifKuota?: number
   notifSenyapMulai?: number
   notifSenyapSelesai?: number
@@ -57,6 +59,8 @@ const KATEGORI: { kunci: keyof Setelan; judul: string; contoh: string }[] = [
   { kunci: 'notifLatihanPintar', judul: 'Latihan', contoh: 'tiga hari tanpa sesi, menit pekan ini kurang, langkah tertinggal' },
   { kunci: 'notifVital', judul: 'Vital & pencegahan', contoh: 'tekanan darah tinggi, saturasi rendah dua malam, data berhenti masuk' },
   { kunci: 'notifLingkungan', judul: 'Udara & sinar UV', contoh: 'AQI di atas 80 atau indeks UV puncak ≥ 8 di kota Anda' },
+  { kunci: 'notifGizi', judul: 'Gizi & kafein', contoh: 'protein tertinggal sore hari, kopi sore, jendela puasa panjang' },
+  { kunci: 'notifKebiasaan', judul: 'Kebiasaan mencatat', contoh: 'beberapa hari tanpa catatan harian atau catatan makan' },
 ]
 
 function jamDariMenit(m: number): string {
