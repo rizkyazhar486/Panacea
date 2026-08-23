@@ -215,11 +215,33 @@ function fighterName(c?: EspnFighterCompetitor): string | undefined {
   return c?.athlete?.displayName ?? c?.athlete?.shortName
 }
 
-export async function fetchLeagueScoreboard(leagueId: string): Promise<LeagueResult> {
+/**
+ * Rentang tanggal opsional untuk papan skor ESPN, bentuknya YYYYMMDD-YYYYMMDD.
+ *
+ * MENGAPA PERLU. Tanpa rentang, papan skor ESPN hanya berisi pertandingan HARI
+ * INI (untuk NFL: pekan berjalan). Widget "skor tim Anda" karena itu selalu
+ * kosong pada hari tim itu tidak bertanding — dan pemakainya menyimpulkan
+ * fiturnya rusak, bukan bahwa timnya memang libur. Dengan rentang, widget
+ * dapat menanyakan sepuluh hari ke depan dan menampilkan jadwal berikutnya.
+ *
+ * Hanya diteruskan ke sumber ESPN; TheSportsDB dan API-Sports punya bentuk
+ * permintaannya sendiri dan mengabaikannya.
+ */
+function tanggalSah(dates: string | undefined): string | undefined {
+  return dates && /^\d{8}(-\d{8})?$/.test(dates) ? dates : undefined
+}
+
+export async function fetchLeagueScoreboard(leagueId: string, dates?: string): Promise<LeagueResult> {
   const league = LEAGUES.find((l) => l.id === leagueId)
   if (!league) return { leagueId, label: leagueId, events: [], error: 'unknown_league' }
 
-  const hit = cache.get(leagueId)
+  const rentang = tanggalSah(dates)
+  // Kunci singgahan HARUS memuat rentangnya. Tanpa itu, permintaan sepuluh
+  // hari ke depan akan dijawab dengan singgahan hari ini, atau sebaliknya —
+  // dan yang kedua jauh lebih buruk: papan skor hari ini menampilkan jadwal
+  // pekan depan seolah sedang berlangsung.
+  const kunci = rentang ? `${leagueId}@${rentang}` : leagueId
+  const hit = cache.get(kunci)
   if (hit && Date.now() - hit.at < CACHE_MS) return hit.data
 
   if (league.source === 'tsdb') return fetchTsdbScoreboard(league)
@@ -227,7 +249,7 @@ export async function fetchLeagueScoreboard(leagueId: string): Promise<LeagueRes
   if (league.id === 'grandslam') return fetchGrandSlamScoreboard(league)
 
   try {
-    const url = `${ESPN_BASE}/${league.sport}/${league.slug}/scoreboard`
+    const url = `${ESPN_BASE}/${league.sport}/${league.slug}/scoreboard${rentang ? `?dates=${rentang}&limit=100` : ''}`
     const res = await fetch(url, { headers: { Accept: 'application/json' } })
     if (!res.ok) {
       console.log(`[sports] ${leagueId} fetch failed: HTTP ${res.status}`)
@@ -242,7 +264,7 @@ export async function fetchLeagueScoreboard(leagueId: string): Promise<LeagueRes
       events = (json.events ?? []).map(normalizeEspnEvent).filter((e): e is NormalizedEvent => e !== null)
     }
     const result: LeagueResult = { leagueId, label: league.label, events }
-    cache.set(leagueId, { at: Date.now(), data: result })
+    cache.set(kunci, { at: Date.now(), data: result })
     return result
   } catch (e) {
     console.log(`[sports] ${leagueId} fetch error:`, (e as Error).message)

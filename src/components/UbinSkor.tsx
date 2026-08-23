@@ -79,14 +79,54 @@ export function UbinSkor() {
           else perLiga.set(liga, new Set([nama]))
         }
 
-        const hasil: Laga[] = []
-        for (const [liga, tim] of [...perLiga.entries()].slice(0, 3)) {
+        /* PENCOCOKAN NAMA DILONGGARKAN.
+           Favorit disimpan sebagai "liga:nama tim" persis seperti yang
+           tertulis di papan skor saat ditekan bintang. Nama itu bisa berubah
+           ejaannya di sumbernya ("Tottenham Hotspur" vs "Tottenham"), dan
+           pembandingan huruf-per-huruf membuat tim yang jelas-jelas dibintangi
+           tidak pernah cocok — persis keluhan yang membuat bagian ini ditulis
+           ulang. Sekarang cocok bila salah satu nama memuat yang lain, atau
+           singkatannya sama. */
+        const cocok = (t: Set<string>, r?: Regu) => {
+          if (!r) return false
+          const nama = (r.name ?? '').toLowerCase()
+          const singkat = (r.abbrev ?? '').toLowerCase()
+          for (const f of t) {
+            const p = f.toLowerCase()
+            if (!p) continue
+            if (nama === p || singkat === p) return true
+            if (nama.includes(p) || p.includes(nama)) return true
+          }
+          return false
+        }
+
+        const ambil = async (liga: string, tim: Set<string>, dates?: string) => {
+          const keluar: Laga[] = []
           try {
-            const r = await api.getSportsScores(liga)
+            const r = await api.getSportsScores(liga, dates)
             for (const e of (r.events ?? []) as Laga[]) {
-              if (tim.has(e.home?.name) || tim.has(e.away?.name)) hasil.push(e)
+              if (cocok(tim, e.home) || cocok(tim, e.away)) keluar.push(e)
             }
           } catch { /* satu liga gagal tidak boleh menjatuhkan yang lain */ }
+          return keluar
+        }
+
+        const liga3 = [...perLiga.entries()].slice(0, 3)
+        let hasil: Laga[] = []
+        for (const [liga, tim] of liga3) hasil.push(...await ambil(liga, tim))
+
+        /* TIDAK ADA LAGA HARI INI BUKAN BERARTI TIDAK ADA APA-APA.
+           Papan skor tanpa rentang tanggal hanya berisi pertandingan hari ini,
+           sehingga widget ini kosong pada hari tim itu libur — dan yang
+           terbaca oleh pemakainya adalah "fitur ini rusak", bukan "tim saya
+           tidak main hari ini". Bila kosong, ditanyakan sekali lagi untuk
+           empat belas hari ke depan dan yang ditampilkan jadwal berikutnya. */
+        if (!hasil.length) {
+          const hariIni = new Date()
+          const cap = (d: Date) => `${d.getFullYear()}${String(d.getMonth() + 1).padStart(2, '0')}${String(d.getDate()).padStart(2, '0')}`
+          const rentang = `${cap(hariIni)}-${cap(new Date(Date.now() + 14 * 864e5))}`
+          for (const [liga, tim] of liga3) hasil.push(...await ambil(liga, tim, rentang))
+          hasil = hasil.filter((e) => e.state !== 'post')
         }
         if (!hidup) return
 
@@ -130,7 +170,9 @@ export function UbinSkor() {
             Belum ada tim favorit. Pilih tim di halaman Skor Olahraga →
           </Link>
         ) : laga.length === 0 ? (
-          <p className="t-kecil text-neutral-500">Tidak ada pertandingan tim Anda hari ini.</p>
+          <p className="t-kecil text-neutral-500">
+            Tidak ada pertandingan tim Anda hari ini maupun dalam 14 hari ke depan menurut sumber skor.
+          </p>
         ) : (
           <div className="flex flex-col gap-3">
             {laga.map((e) => {
@@ -139,7 +181,11 @@ export function UbinSkor() {
                 <Link key={e.id} to="/sports-scores" className="block">
                   <div className="flex items-center justify-between gap-2">
                     <span className={`t-mikro rounded-full px-2 py-0.5 font-black ${k.kelas}`}>{k.label}</span>
-                    <span className="t-mikro truncate tabular-nums text-neutral-400">{e.statusDetail}</span>
+                    <span className="t-mikro truncate tabular-nums text-neutral-400">
+                      {e.state === 'pre' && e.startTime
+                        ? new Date(e.startTime).toLocaleString('id-ID', { weekday: 'short', day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })
+                        : e.statusDetail}
+                    </span>
                   </div>
                   <div className="mt-1.5 flex items-center gap-2">
                     <Lambang src={e.home.logo} nama={e.home.name} />

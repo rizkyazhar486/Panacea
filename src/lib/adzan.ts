@@ -210,6 +210,16 @@ export interface SetelanAdzan {
   pilih: Record<Salat, boolean>
   /** Alamat rekaman adzan milik pengguna sendiri, bila ada. */
   suaraUrl: string
+  /**
+   * Getar saat waktunya tiba.
+   *
+   * BUKAN pengganti bunyi, melainkan pendamping. Telepon yang disenyapkan
+   * tidak mengeluarkan bunyi sama sekali — dan telepon disenyapkan justru di
+   * tempat orang paling ingin diingatkan: rapat, kuliah, bangsal. Sebaliknya
+   * iOS Safari tidak mengenal getar sama sekali. Keduanya dicoba, dan yang
+   * bekerja di perangkat itulah yang menyampaikan.
+   */
+  getar: boolean
 }
 
 export const SETELAN_AWAL: SetelanAdzan = {
@@ -220,6 +230,7 @@ export const SETELAN_AWAL: SetelanAdzan = {
   awalanMenit: 0,
   pilih: { Fajr: true, Dhuhr: true, Asr: true, Maghrib: true, Isha: true },
   suaraUrl: '',
+  getar: true,
 }
 
 const KUNCI_SETELAN = 'pmd-adzan-setelan-v1'

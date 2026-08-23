@@ -81,6 +81,11 @@ export function Adzan() {
       } else {
         bunyikanNada()
       }
+      // Getar mendampingi bunyi, tidak menggantikannya: telepon yang
+      // disenyapkan tidak berbunyi, dan iOS Safari tidak mengenal getar.
+      if (setelan.getar) {
+        try { navigator.vibrate?.([300, 150, 300, 150, 500]) } catch { /* tidak didukung */ }
+      }
       try {
         if ('Notification' in window && Notification.permission === 'granted') {
           new Notification(`🕌 ${nama}`, { body: badan, tag: `adzan-${w.salat}` })

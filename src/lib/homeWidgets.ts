@@ -102,6 +102,8 @@ export const WIDGETS: WidgetDef[] = [
   { id: 'labDecoder', label: 'Baca Hasil Lab', ringkas: 'Terjemahkan angka laboratorium', ke: '/lab-decoder', emoji: '🧾', kategori: 'Tubuh & Data' },
   { id: 'rppg', label: 'Detak dari Kamera', ringkas: 'Ukur nadi lewat wajah', ke: '/rppg-heart-rate', emoji: '📷', kategori: 'Tubuh & Data' },
   { id: 'vokal', label: 'Biomarker Suara', ringkas: 'Petunjuk kesehatan dari suara', ke: '/vocal-biomarkers', emoji: '🎙️', kategori: 'Tubuh & Data' },
+  { id: 'pewaktu', label: 'Pewaktu', ringkas: 'Tidur singkat dan AMRAP', ke: '/latihan', emoji: '⏱️', kategori: 'Latihan', bawaan: true },
+  { id: 'pengingat', label: 'Pengingat', ringkas: 'Latihan, gol tim, dan adzan', ke: '/settings', emoji: '🔔', kategori: 'Layanan & Darurat', bawaan: true },
   { id: 'inspirasi', label: 'Inspirasi', ringkas: 'Kisah dan kutipan, berganti tiap hari', ke: '/resilience-stories', emoji: '✨', kategori: 'Ibadah & Hidup', bawaan: true },
   { id: 'kartuBelajar', label: 'Kartu Belajar', ringkas: 'Diagnosis → tatalaksana, ditutup dulu', ke: '/med-study?bagian=therapy', emoji: '🗂️', kategori: 'Klinis & Belajar', bawaan: true },
   { id: 'soalHarian', label: 'Soal Hari Ini', ringkas: 'Satu soal dengan pembahasan', ke: '/med-study', emoji: '❓', kategori: 'Klinis & Belajar', bawaan: true },
@@ -289,6 +291,8 @@ export const WIDGET_HIDUP = [
   'inspirasi',      // 97 kartu: kisah ketahanan, kutipan atlet, semangat koas
   'kartuBelajar',   // kartu tatalaksana yang jawabannya ditutup
   'soalHarian',     // satu soal dari bank soal, dengan pembahasan
+  'pewaktu',        // hitungan mundur nap dan AMRAP
+  'pengingat',      // saklar notifikasi latihan, gol tim, adzan
 ] as const
 
 /** Katalog yang boleh menempati beranda. */

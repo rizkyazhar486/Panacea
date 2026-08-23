@@ -199,3 +199,49 @@ export async function checkBedtimeReminder(userId: string, email: string): Promi
 
   return { sent: true, reason: 'sent' }
 }
+
+export interface LatihanCheck { sent: boolean; reason: string }
+
+/**
+ * Pengingat latihan harian pada jam yang dipilih sendiri.
+ *
+ * BENTUKNYA SENGAJA SAMA PERSIS dengan pengingat tidur di atas: dipanggil
+ * sekali semenit, jendela toleransi dua menit supaya satu detak yang terlewat
+ * tidak menghapus pengingat hari itu, dan satu cap tanggal LOKAL milik
+ * penggunanya sendiri supaya tidak terkirim dua kali. Menyalin bentuk yang
+ * sudah terbukti lebih baik daripada mengarang penjadwal kedua dengan cacat
+ * yang berbeda.
+ *
+ * Jam dibaca menurut zona waktu pengguna (tzOffsetMin yang dikirim clientnya),
+ * jadi 17.00 berarti pukul lima sore di tempat dia berada — bukan di server.
+ */
+export async function checkWorkoutReminder(userId: string): Promise<LatihanCheck> {
+  const prefs = getSettings(userId)
+  if (prefs.notifLatihan !== true) return { sent: false, reason: 'off' }
+
+  const target = parseHHMM(prefs.latihanHHMM)
+  if (target == null) return { sent: false, reason: 'no-target' }
+
+  // Hari yang dipilih, 0 = Minggu. Kosong berarti setiap hari.
+  const hariDipilih: number[] = Array.isArray(prefs.latihanHari) ? prefs.latihanHari.filter((h: unknown) => typeof h === 'number') : []
+  const lokal = new Date(Date.now() + (Number(prefs.tzOffsetMin) || 0) * 60_000)
+  if (hariDipilih.length && !hariDipilih.includes(lokal.getUTCDay())) return { sent: false, reason: 'not-today' }
+
+  const now = localMinutesNow(prefs)
+  const diff = Math.min(Math.abs(now - target), 1440 - Math.abs(now - target))
+  if (diff > 2) return { sent: false, reason: 'not-time' }
+
+  const localDate = lokal.toISOString().slice(0, 10)
+  if (prefs.latihanLastFiredOn === localDate) return { sent: false, reason: 'already-today' }
+
+  saveSettings(userId, { latihanLastFiredOn: localDate })
+  const jam = `${String(Math.floor(target / 60)).padStart(2, '0')}.${String(target % 60).padStart(2, '0')}`
+  await notify(userId, {
+    title: '🏃 Waktunya latihan',
+    body: `Jadwal latihan Anda pukul ${jam}. Sesi pendek yang benar-benar dikerjakan lebih berarti daripada sesi panjang yang ditunda.`,
+    url: './#/latihan',
+    tag: 'latihan-harian',
+  }, 'notifLatihan').catch(() => {})
+
+  return { sent: true, reason: 'sent' }
+}

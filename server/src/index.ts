@@ -114,7 +114,7 @@ import { createPayment, confirmPayment, paymentWebhook, orderStatus } from './pa
 import { disburse, irisLive } from './iris.js'
 import { KATALOG, KATEGORI } from './healthMetrics.js'
 import { parseHealthWebhookPayload, extractHeartRateSeries, extractSleepSessions, newestSampleDate } from './healthWebhook.js'
-import { checkHrZoneAlert, checkBedtimeReminder, suggestedBedtime, ZONES } from './healthAlerts.js'
+import { checkHrZoneAlert, checkBedtimeReminder, checkWorkoutReminder, suggestedBedtime, ZONES } from './healthAlerts.js'
 import { fetchLeagueScoreboard, fetchF1Info, fetchMotoGpInfo, LEAGUES, UNAVAILABLE } from './sports.js'
 import { searchPubmed } from './pubmed.js'
 import { fetchQuote, fetchQuotes, searchSymbols, INSTRUMENTS, UNGGULAN, WATCHLIST_MAX, RANGES, isValidSymbol, type Range } from './markets.js'
@@ -838,7 +838,9 @@ app.get('/api/sports/scores', async (req, res) => {
     res.status(400).json({ error: 'unknown_league' })
     return
   }
-  res.json(await fetchLeagueScoreboard(league))
+  // dates opsional (YYYYMMDD-YYYYMMDD) supaya widget dapat menanyakan jadwal
+  // beberapa hari ke depan, bukan hanya pertandingan hari ini.
+  res.json(await fetchLeagueScoreboard(league, req.query.dates ? String(req.query.dates) : undefined))
 })
 app.get('/api/sports/f1', async (_req, res) => {
   res.json(await fetchF1Info())
@@ -1548,6 +1550,9 @@ setInterval(() => {
 setInterval(() => {
   for (const u of allUsersForAlerts()) {
     checkBedtimeReminder(u.id, u.email).catch(() => {})
+    // Pengingat latihan harian, penjadwal yang sama persis: jam milik
+    // pengguna sendiri, sekali sehari, jendela toleransi dua menit.
+    checkWorkoutReminder(u.id).catch(() => {})
   }
 }, 60_000)
 

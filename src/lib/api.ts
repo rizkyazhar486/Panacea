@@ -323,7 +323,10 @@ export const api = {
     req<{ unlocked: boolean; free: boolean; limit: number; slotsLeft: number; pricePnc: number; priceIdr: number }>('/api/clinical-calculators/access'),
   unlockClinicalCalcPnc: () =>
     req<{ ok: boolean; unlocked: boolean; balance: number }>('/api/clinical-calculators/unlock-pnc', { method: 'POST' }),
-  getSportsScores: (league: string) => req<{ leagueId: string; label: string; events: unknown[]; error?: string }>(`/api/sports/scores?league=${encodeURIComponent(league)}`),
+  getSportsScores: (league: string, dates?: string) =>
+    req<{ leagueId: string; label: string; events: unknown[]; error?: string }>(
+      `/api/sports/scores?league=${encodeURIComponent(league)}${dates ? `&dates=${encodeURIComponent(dates)}` : ''}`,
+    ),
   getF1Info: () => req<{ next?: { raceName: string; circuit: string; location: string; date: string; time?: string }; lastRaceName?: string; lastPodium?: { position: string; driver: string; constructor: string }[]; error?: string }>('/api/sports/f1'),
   getMotoGpInfo: () => req<{ next?: { name: string; circuit: string; country: string; date: string }; lastRaceName?: string; lastRaceDate?: string; error?: string }>('/api/sports/motogp'),
   searchPubmed: (q: string) => req<{ articles: { pmid: string; title: string; authors: string; journal: string; year: string; url: string }[]; error?: string }>(`/api/evidence/pubmed?q=${encodeURIComponent(q)}`),

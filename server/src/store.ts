@@ -643,6 +643,7 @@ export const SERVER_OWNED_SETTING_KEYS: readonly string[] = [
   'strStatus',              // professional verification — gates AI-EMR
   'hrZoneLastAlertAt',      // alert cooldown; client-writable = spam bypass
   'sleepLastFiredOn',       // once-a-day guard; client-writable = repeat sends
+  'latihanLastFiredOn',     // penjaga sekali sehari untuk pengingat latihan
 ]
 
 /** Strips server-owned keys from a client-supplied settings patch. */
