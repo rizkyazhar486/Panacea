@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Prosa } from '../components/Prosa'
+import { PemutarBaca } from '../components/PemutarBaca'
 import { Card, SectionTitle, Button } from '../components/ui'
 import { Ringkas, Poin } from '../components/Ringkas'
 import { IconShield } from '../components/icons'
@@ -356,7 +357,15 @@ export function Kitab() {
                     </p>
                   )}
 
-                  <p className="mt-2 text-[13px] leading-relaxed text-neutral-700">{a.terjemahan}</p>
+                  <div className="mt-2 flex items-start gap-2">
+                    <p className="min-w-0 flex-1 text-[13px] leading-relaxed text-neutral-700">{a.terjemahan}</p>
+                    {/* Pembacaan suara untuk TERJEMAHANNYA saja, tidak untuk
+                        ayat Arabnya: mesin suara peramban melafalkan aksara
+                        Arab dengan suara Indonesia, dan hasilnya bukan bacaan
+                        Al-Qur'an melainkan pelafalan yang salah. Bacaan Arab
+                        tetap berupa rekaman qari yang sudah ada di atas. */}
+                    <PemutarBaca teks={a.terjemahan} kecil label={`Dengarkan terjemahan ayat ${a.nomor}`} />
+                  </div>
 
                   <div className="mt-2 space-y-1.5">
                     {a.tafsir && (
@@ -364,7 +373,12 @@ export function Kitab() {
                         anak={
                           a.tafsir.bahasa === 'Arabic'
                             ? <p dir="rtl" lang="ar" className="text-right text-[15px] leading-[2]">{a.tafsir.teks}</p>
-                            : <p className="text-[13px] leading-relaxed">{a.tafsir.teks}</p>
+                            : (
+                              <>
+                                <p className="text-[13px] leading-relaxed">{a.tafsir.teks}</p>
+                                <div className="mt-1.5"><PemutarBaca teks={a.tafsir.teks} label="Dengarkan tafsir" /></div>
+                              </>
+                            )
                         } />
                     )}
                     {/* Renungan, bukan tafsir. Bedanya dinyatakan pada judulnya. */}

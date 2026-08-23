@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { SKDI_ENTRIES } from '../lib/skdiTherapyReference'
 import { RIWAYAT_OSCE } from '../lib/osceUkmppdRiwayat'
+import { PemutarBaca } from './PemutarBaca'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Widget yang BEKERJA di tempatnya, bukan mengantar ke halaman lain.
@@ -109,6 +110,14 @@ export function UbinObat() {
           </div>
         )}
 
+        {tampil.length > 0 && (
+          <div className="mt-2">
+            <PemutarBaca
+              teks={tampil.map((e) => `${e.diagnosis}. ${e.classification ?? ''}. ${e.therapy}`).join('. ')}
+              label="Dengarkan dosis"
+            />
+          </div>
+        )}
         <p className="t-mikro mt-2 text-neutral-400">
           {hasil.length ? `${hasil.length} dari ${SKDI_ENTRIES.length} baris` : `Sumber: acuan tatalaksana SKDI · ${SKDI_ENTRIES.length} baris`}
         </p>

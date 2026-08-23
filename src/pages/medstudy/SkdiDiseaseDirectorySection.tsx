@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { sinonimUntuk } from '../../lib/sinonimPenyakit'
+import { PemutarBaca } from '../../components/PemutarBaca'
 import { Mindmap, WARNA, type Cabang } from './Mindmap'
 import { Card, SectionTitle, Badge } from '../../components/ui'
 import { IconBook } from '../../components/icons'
@@ -160,6 +161,20 @@ function rantaiKeTeks(langkah: string[]): string[] {
  * obat -> bahaya. Itu alur berpikir klinis, dan karena urutannya tetap, orang
  * hafal posisinya, bukan kalimatnya.
  */
+/**
+ * Susun catatan menjadi satu teks yang enak didengar.
+ *
+ * Label cabang ikut dibacakan ("Sebab:", "Tanda:") karena tanpa penanda itu
+ * pendengarnya kehilangan tempat sesudah kalimat ketiga — di layar peranannya
+ * dipegang warna dan tata letak, dan telinga tidak punya keduanya.
+ */
+function teksCatatan(nama: string, cabang: Cabang[]): string {
+  const bagian = cabang
+    .filter((c) => c.butir.length)
+    .map((c) => `${c.label}. ${c.butir.join('. ')}`)
+  return [nama, ...bagian].join('. ')
+}
+
 function cabangDari(note: {
   definisi?: string
   deep?: SkdiDiseaseNote
@@ -351,6 +366,15 @@ export default function SkdiDiseaseDirectorySection() {
                   )}
                   {isOpen && note && (
                     <div data-catatan className="mt-3 border-t border-neutral-200 pt-3 dark:border-white/10">
+                      {/* PEMBACAAN SUARA CATATAN INI.
+                          Teksnya disusun dari cabang mindmap yang sama yang
+                          digambar di bawah — bukan dari elemen di layar —
+                          supaya urutan yang didengar sama persis dengan yang
+                          dibaca, dan tidak ikut membacakan label tombol atau
+                          nomor rujukan. */}
+                      <div className="mb-2">
+                        <PemutarBaca teks={teksCatatan(e.disease, cabangDari(note))} label="Dengarkan catatan" />
+                      </div>
                       <Mindmap pusat={e.disease} sub={e.subsection ?? undefined} cabang={cabangDari(note)} />
                       {note.kind === 'osce' && (
                         <p className="mt-2 text-[10px] italic text-neutral-500">Dari station OSCE: {note.sourceStation}</p>

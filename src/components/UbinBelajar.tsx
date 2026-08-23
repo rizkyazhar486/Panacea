@@ -5,6 +5,7 @@ import { KUTIPAN_ATLET } from '../lib/kutipanAtlet'
 import { MOTIVATION } from '../lib/studyContent'
 import { SKDI_ENTRIES } from '../lib/skdiTherapyReference'
 import { QUIZ_BANK, type QuizQuestion } from '../lib/quizBank'
+import { PemutarBaca } from './PemutarBaca'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Tiga widget yang mengambil dari isi yang SUDAH ADA di aplikasi ini.
@@ -99,6 +100,14 @@ export function UbinInspirasi() {
             <span className="t-mikro mt-1.5 block truncate text-neutral-400">{k.konteks}</span>
           </>
         )}
+        <div className="mt-2">
+          <PemutarBaca
+            teks={k.jenis === 'kisah' ? `${k.nama}. ${k.bidang}. ${k.sulit} ${k.hikmah}`
+              : k.jenis === 'atlet' ? `${k.teks} — ${k.oleh}, ${k.prestasi}`
+                : `${k.teks} ${k.konteks}`}
+            label="Dengarkan"
+          />
+        </div>
         <p className="t-mikro mt-2 text-neutral-400">{daftar.length} kartu · berganti tiap hari</p>
       </div>
     </section>
@@ -140,6 +149,14 @@ export function UbinKartuBelajar() {
         )}
         <span className="t-mikro mt-2 block text-neutral-400">Acuan tatalaksana SKDI · {SKDI_ENTRIES.length} kartu</span>
       </button>
+      {/* Tombol dengar DI LUAR kartunya: kartu ini sendiri sebuah tombol
+          (menekannya membuka jawaban), dan tombol di dalam tombol membuat
+          setiap ketukan mengerjakan dua hal sekaligus. */}
+      {buka && (
+        <div className="mt-1.5">
+          <PemutarBaca teks={`${e.diagnosis}. ${e.classification ?? ''}. ${e.therapy}`} label="Dengarkan kartu" />
+        </div>
+      )}
     </section>
   )
 }
@@ -218,6 +235,9 @@ export function UbinSoal() {
             </p>
             <p className="t-mikro mt-0.5 line-clamp-4 leading-snug text-neutral-500 dark:text-neutral-400">{s.explanation}</p>
             {s.source && <p className="t-mikro mt-1 truncate text-neutral-400">Sumber: {s.source}</p>}
+            <div className="mt-2">
+              <PemutarBaca teks={`${s.q}. Pembahasan. ${s.explanation}`} label="Dengarkan pembahasan" />
+            </div>
           </>
         )}
       </div>
