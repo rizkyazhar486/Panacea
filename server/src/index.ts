@@ -304,7 +304,7 @@ app.post('/api/wallet/withdraw', requireAuth, async (req, res) => {
     : payout.status === 'queued'
     ? `Penarikan Rp${amountIdr.toLocaleString('id-ID')} dibuat & menunggu persetujuan.`
     : `Penarikan Rp${amountIdr.toLocaleString('id-ID')} diterima — diproses manual oleh tim.`
-  notify(u.id, { title: 'Penarikan diproses', body, url: '/billing' }, 'notifTransactions').catch(() => {})
+  notify(u.id, { title: 'Penarikan diproses', body, url: './#/billing' }, 'notifTransactions').catch(() => {})
   // Notify the owner of every withdrawal so manual transfers (1×24 jam) can be
   // actioned — includes the requester's bank account details.
   const owner = getUserByEmail(config.ownerEmail)
@@ -314,7 +314,7 @@ app.post('/api/wallet/withdraw', requireAuth, async (req, res) => {
       {
         title: '💸 Permintaan Penarikan PNC',
         body: `${u.name} menarik Rp${amountIdr.toLocaleString('id-ID')} → ${bank} ${accountNumber} a.n. ${accountHolder}. Proses manual maks 1×24 jam.`,
-        url: '/billing',
+        url: './#/billing',
       },
       'notifTransactions',
     ).catch(() => {})
@@ -345,9 +345,9 @@ app.post('/api/wallet/topups/decide', requireAuth, (req, res) => {
   if (!t) return res.status(404).json({ error: 'not_found_or_decided' })
   if (approve) {
     credit(t.userId, t.amountPnc, 'deposit', `Top-up manual disetujui (Rp${t.amountIdr.toLocaleString('id-ID')})`)
-    notify(t.userId, { title: 'Top-up approved ✅', body: `${t.amountPnc} PNC added to your balance.`, url: '/billing' }, 'notifTransactions').catch(() => {})
+    notify(t.userId, { title: 'Top-up approved ✅', body: `${t.amountPnc} PNC added to your balance.`, url: './#/billing' }, 'notifTransactions').catch(() => {})
   } else {
-    notify(t.userId, { title: 'Top-up declined', body: `Your ${t.amountPnc} PNC top-up was not approved. Contact an admin if you have questions.`, url: '/billing' }, 'notifTransactions').catch(() => {})
+    notify(t.userId, { title: 'Top-up declined', body: `Your ${t.amountPnc} PNC top-up was not approved. Contact an admin if you have questions.`, url: './#/billing' }, 'notifTransactions').catch(() => {})
   }
   addAudit(u, approve ? 'wallet.topup_approve' : 'wallet.topup_reject', `${t.amountPnc} PNC · ${t.email}`)
   res.json({ ok: true, request: t, balance: balance(t.userId) })
@@ -1429,7 +1429,7 @@ app.post('/api/feedback', requireAuth, (req, res) => {
   addFeedback(entry)
   const owner = getUserByEmail(config.ownerEmail)
   if (owner) {
-    notify(owner.id, { title: `💬 ${safeKind} baru dari ${u.name}`, body: trimmed.slice(0, 120), url: '/owner' }, 'notifTransactions').catch(() => {})
+    notify(owner.id, { title: `💬 ${safeKind} baru dari ${u.name}`, body: trimmed.slice(0, 120), url: './#/owner' }, 'notifTransactions').catch(() => {})
   }
   res.json({ ok: true, entry })
 })
@@ -1510,7 +1510,13 @@ async function pollSportsFavorites() {
         const follows = teams.some((t) => t === `${leagueId}:${ev.home.name}` || t === `${leagueId}:${ev.away.name}`)
         if (!follows) continue
         const title = justFinished ? `Selesai: ${ev.home.name} ${ev.home.score}-${ev.away.score} ${ev.away.name}` : `Gol! ${ev.home.name} ${ev.home.score}-${ev.away.score} ${ev.away.name}`
-        notify(userId, { title, body: `${result.label} · ${ev.statusDetail}`, tag: key }, 'sportsNotif').catch(() => {})
+        /* ALAMAT TUJUAN WAJIB ADA.
+           Notifikasi skor selama ini dikirim TANPA url, sehingga ketukannya
+           jatuh ke alamat bawaan pekerja layanan — yaitu ke mana pun jendela
+           terakhir berada, termasuk halaman yang sudah tidak ada lagi. Sebuah
+           pemberitahuan yang tidak dapat menjelaskan dirinya sendiri saat
+           ditekan lebih buruk daripada tidak dikirim. */
+        notify(userId, { title, body: `${result.label} · ${ev.statusDetail}`, tag: key, url: './#/sports-scores' }, 'sportsNotif').catch(() => {})
       }
     }
   }
@@ -1526,10 +1532,20 @@ function alertOwner(kind: string, detail: string) {
   if (now - lastOwnerAlert < 60_000) return // at most one alert/minute
   lastOwnerAlert = now
   const owner = getUserByEmail(config.ownerEmail)
-  const body = `${kind}: ${detail}`.slice(0, 300)
+  /* JEJAK RAHASIA DIBUANG DARI ISI PEMBERITAHUAN.
+     Kesalahan rute memuat alamat lengkap yang diminta, dan sebagian alamat itu
+     MENGANDUNG TOKEN — jalur webhook, misalnya. Pemberitahuan tersimpan di
+     basis data, tampil di daftar lonceng, dan ikut terbaca siapa pun yang
+     melihat layar. Token yang bocor lewat pesan galat adalah cara kebocoran
+     yang paling sering terlewat karena pesannya sendiri terlihat tidak
+     berbahaya. */
+  const bersih = detail
+    .replace(/(\/api\/[\w-]*webhook[\w-]*\/)[A-Za-z0-9_-]{8,}/g, '$1[disamarkan]')
+    .replace(/\b(token|key|secret|password|authorization)\b(\s*[=:]\s*)\S+/gi, '$1$2[disamarkan]')
+  const body = `${kind}: ${bersih}`.slice(0, 300)
   console.error(`[incident] ${body}`)
-  if (owner) notify(owner.id, { title: '🚨 Panaceamed production incident', body, url: '/owner' }, 'notifTransactions').catch(() => {})
-  sendEmail(config.ownerEmail, '🚨 Panaceamed production incident', `<p><b>${kind}</b></p><pre>${detail.slice(0, 2000)}</pre>`).catch(() => {})
+  if (owner) notify(owner.id, { title: '🚨 Panaceamed production incident', body, url: './#/owner' }, 'notifTransactions').catch(() => {})
+  sendEmail(config.ownerEmail, '🚨 Panaceamed production incident', `<p><b>${kind}</b></p><pre>${bersih.slice(0, 2000)}</pre>`).catch(() => {})
 }
 
 // Express error-handling middleware (must be registered AFTER all routes).
@@ -1594,7 +1610,7 @@ setInterval(() => {
     notify(userId, {
       title: `💊 ${reminder.medName}`,
       body: reminder.dose ? `Time for your ${reminder.dose} dose.` : 'Time to take your medication.',
-      url: '/med-reminders',
+      url: './#/med-reminders',
       tag: `reminder-${reminder.id}`,
     }, 'notifMedReminders').catch(() => {})
   }

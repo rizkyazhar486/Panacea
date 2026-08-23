@@ -85,8 +85,30 @@ export async function sendPush(userId: string, payload: PushPayload): Promise<nu
 // Deliver a notification both ways: persist to the in-app inbox AND send a push.
 // If a preference key is given and the user disabled it, the notification is
 // skipped entirely (inbox + push).
+/*
+ * ALAMAT DIBAKUKAN DI SATU TEMPAT, bukan dipercayakan pada tiap pemanggil.
+ *
+ * Aplikasinya memakai HashRouter: satu-satunya alamat yang berarti adalah yang
+ * memuat '#/'. Tujuh pemanggil di berkas lain menuliskan '/billing', '/owner',
+ * dan '/med-reminders' — alamat yang PADA APLIKASI INI TIDAK ADA, sehingga
+ * setiap ketukan pada notifikasi itu mendarat di halaman 404. Cacat seperti itu
+ * tidak dapat diperbaiki dengan memperbaiki ketujuh pemanggilnya saja: yang
+ * kedelapan akan ditulis dengan cara yang sama, dan tidak ada satu pun uji yang
+ * menangkapnya. Karena itu pembakuannya diletakkan pada pintu yang dilewati
+ * SEMUA notifikasi.
+ */
+function bakukanUrl(url?: string): string | undefined {
+  if (!url) return undefined
+  const u = url.trim()
+  if (!u) return undefined
+  if (u.includes('#/')) return u
+  if (u.startsWith('http://') || u.startsWith('https://')) return u
+  return `./#/${u.replace(/^\.?\/+/, '')}`
+}
+
 export async function notify(userId: string, payload: PushPayload, pref?: string): Promise<number> {
   if (pref && getSettings(userId)[pref] === false) return 0
-  addNotification(userId, { title: payload.title, body: payload.body, url: payload.url })
-  return sendPush(userId, payload)
+  const rapi: PushPayload = { ...payload, url: bakukanUrl(payload.url) }
+  addNotification(userId, { title: rapi.title, body: rapi.body, url: rapi.url })
+  return sendPush(userId, rapi)
 }

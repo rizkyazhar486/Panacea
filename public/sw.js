@@ -3,7 +3,7 @@
 // with an offline fallback to the cached shell); same-origin static assets are
 // cache-first (they're content-hashed, so safe). API & cross-origin requests
 // (backend, Cloudinary, Google, fonts) are never cached.
-const CACHE = 'panaceamed-v6'
+const CACHE = 'panaceamed-v7'
 const SHELL = ['./', './index.html', './manifest.webmanifest', './logo-mark.png']
 
 self.addEventListener('install', (event) => {
@@ -37,15 +37,44 @@ self.addEventListener('push', (event) => {
   )
 })
 
+// KETUKAN PADA NOTIFIKASI HARUS SAMPAI KE HALAMANNYA.
+//
+// Dua cacat diperbaiki di sini sekaligus, dan keduanya menghasilkan gejala yang
+// sama bagi pemakainya — notifikasi ditekan, lalu mendarat di tempat yang salah:
+//
+//   1. Jendela yang SUDAH terbuka hanya difokuskan, alamat tujuannya diabaikan
+//      sama sekali. Yang terlihat: notifikasi gol ditekan, aplikasi terbuka
+//      pada halaman apa pun yang terakhir dibuka — kadang halaman yang sudah
+//      tidak ada lagi, sehingga yang muncul justru layar 404.
+//   2. Alamat relatif ('./#/skor') diserahkan mentah ke openWindow. Alamat
+//      relatif diselesaikan terhadap letak berkas pekerja ini, dan itu tidak
+//      selalu sama dengan akar aplikasi — pada pemasangan ke Layar Utama iOS
+//      hasilnya dapat meleset satu tingkat, dan yang meleset satu tingkat pada
+//      HashRouter berarti rute yang tidak dikenali.
+//
+// Sekarang alamatnya diselesaikan terhadap SCOPE pendaftaran — akar aplikasi
+// yang sebenarnya — dan jendela yang sudah terbuka DIARAHKAN ke sana sebelum
+// difokuskan.
 self.addEventListener('notificationclick', (event) => {
   event.notification.close()
-  const url = (event.notification.data && event.notification.data.url) || './'
+  const mentah = (event.notification.data && event.notification.data.url) || './'
+  let tujuan
+  try {
+    tujuan = new URL(mentah, self.registration.scope).href
+  } catch (e) {
+    tujuan = self.registration.scope
+  }
   event.waitUntil(
     self.clients.matchAll({ type: 'window', includeUncontrolled: true }).then((clients) => {
       for (const c of clients) {
+        // navigate() tidak ada pada sebagian peramban; bila tidak ada, jendela
+        // tetap difokuskan supaya ketukannya tidak berakhir tanpa apa pun.
+        if ('navigate' in c) {
+          return c.navigate(tujuan).then((k) => (k && 'focus' in k ? k.focus() : c.focus())).catch(() => c.focus())
+        }
         if ('focus' in c) return c.focus()
       }
-      if (self.clients.openWindow) return self.clients.openWindow(url)
+      if (self.clients.openWindow) return self.clients.openWindow(tujuan)
     }),
   )
 })

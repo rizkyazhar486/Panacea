@@ -157,9 +157,21 @@ export function NotificationBell() {
     }
   }
 
+  /* PEMBERITAHUAN LAMA TETAP DAPAT DIBUKA.
+     Sebagian pemberitahuan yang sudah tersimpan memuat alamat gaya lama
+     ('/owner', '/billing') yang pada aplikasi ber-HashRouter ini tidak ada.
+     Server sekarang membakukannya sebelum mengirim, tetapi yang TERLANJUR
+     tersimpan tidak ikut berubah — dan yang menekannya akan mendarat di
+     halaman 404, persis seperti sebelum perbaikan. Karena itu pembakuan yang
+     sama dikerjakan sekali lagi di sini, saat dibuka. */
   function bukaTautan(n: Notif) {
-    const i = n.url ? n.url.indexOf('#/') : -1
-    if (i >= 0) { setOpen(false); nav(n.url!.slice(i + 1)) }
+    if (!n.url) return
+    const u = n.url.trim()
+    const i = u.indexOf('#/')
+    const rute = i >= 0 ? u.slice(i + 1) : u.startsWith('/') ? u : null
+    if (!rute) return
+    setOpen(false)
+    nav(rute)
   }
 
   if (!backendEnabled) return null
