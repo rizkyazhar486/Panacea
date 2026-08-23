@@ -455,6 +455,96 @@ export const ATURAN: Aturan[] = [
     },
   },
   {
+    id: 'tenagaRendah',
+    kategori: 'pemulihan',
+    jendela: [J(18), J(21)],
+    jeda: 4,
+    nilai: (k) => {
+      const t = Number(k.ringkas?.tenaga)
+      if (!Number.isFinite(t) || t > 2 || k.ringkas?.tanggal !== k.tanggalLokal) return null
+      const hrv = angka(k.hariIni, 'hrvMs')
+      const bHrv = biasa(k.riwayat, 'hrvMs')
+      // Bila angka terukur justru baik, itu DISEBUTKAN — perselisihan antara
+      // yang dirasakan dan yang terukur adalah keterangan, bukan kesalahan
+      // salah satunya.
+      const catatan = hrv != null && bHrv != null && hrv >= bHrv
+        ? ` HRV Anda sendiri justru di atas kebiasaan (${Math.round(hrv)} vs ${Math.round(bHrv)} ms) — lelah yang tidak terbaca sensor tetap lelah.`
+        : ''
+      return {
+        judul: 'Tenaga terasa rendah hari ini',
+        badan: `Anda menandainya ${t} dari 5.${catatan} Tidur lebih awal dan sesi ringan besok sering lebih menolong daripada memaksa.`,
+        url: './#/harian',
+      }
+    },
+  },
+  {
+    id: 'cairanTertinggal',
+    kategori: 'gizi',
+    jendela: [J(15), J(18)],
+    jeda: 3,
+    nilai: (k) => {
+      const r = k.ringkas
+      if (r?.tanggal !== k.tanggalLokal) return null
+      const ml = Number(r.airMl)
+      if (!Number.isFinite(ml) || ml <= 0) return null
+      if (ml >= 1200) return null
+      return {
+        judul: `Cairan baru ${(ml / 1000).toFixed(1)} liter`,
+        badan: 'Tidak ada takaran tunggal yang benar untuk semua orang, tetapi ini di bawah kebiasaan Anda sendiri pada jam segini. Segelas sekarang lebih mudah daripada dua gelas menjelang tidur.',
+        url: './#/hydration',
+      }
+    },
+  },
+  {
+    id: 'cahayaBelum',
+    kategori: 'kebiasaan',
+    jendela: [J(8), J(10)],
+    jeda: 2,
+    nilai: (k) => {
+      const r = k.ringkas
+      if (r?.tanggal !== k.tanggalLokal) return null
+      if (r.cahayaHariIni !== false) return null
+      return {
+        judul: 'Cahaya pagi belum ditandai',
+        badan: 'Sepuluh menit di luar pagi hari adalah penanda waktu terkuat bagi jam biologis, dan pengaruhnya terasa pada tidur malam nanti — bukan pada pagi ini.',
+        url: './#/harian',
+      }
+    },
+  },
+  {
+    id: 'suplemenBelum',
+    kategori: 'kebiasaan',
+    jendela: [J(9), J(11)],
+    jeda: 1,
+    nilai: (k) => {
+      const r = k.ringkas
+      if (r?.tanggal !== k.tanggalLokal) return null
+      const n = Number(r.suplemenBelum)
+      if (!Number.isFinite(n) || n <= 0) return null
+      return {
+        judul: `${n} suplemen belum ditandai`,
+        badan: 'Dari daftar yang Anda susun sendiri. Aplikasi ini tidak menganjurkan suplemen apa pun — ia hanya mengingat yang sudah Anda putuskan.',
+        url: './#/harian',
+      }
+    },
+  },
+  {
+    id: 'tanggaSepi',
+    kategori: 'latihan',
+    jendela: [J(17), J(19)],
+    jeda: 5,
+    nilai: (k) => {
+      const kini = angka(k.hariIni, 'flightsClimbed')
+      const b = biasa(k.riwayat, 'flightsClimbed')
+      if (kini == null || b == null || b < 3 || kini >= b * 0.4) return null
+      return {
+        judul: 'Hari ini hampir tanpa tangga',
+        badan: `${Math.round(kini)} lantai, biasanya Anda ${Math.round(b)}. Naik tangga memuat tungkai dan menaikkan denyut sekaligus — dua hal yang jalan datar tidak berikan sebanyak itu.`,
+        url: './#/tubuh',
+      }
+    },
+  },
+  {
     id: 'belumTersinkron',
     kategori: 'vital',
     jendela: [J(10), J(12)],

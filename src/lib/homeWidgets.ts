@@ -102,6 +102,14 @@ export const WIDGETS: WidgetDef[] = [
   { id: 'labDecoder', label: 'Baca Hasil Lab', ringkas: 'Terjemahkan angka laboratorium', ke: '/lab-decoder', emoji: '🧾', kategori: 'Tubuh & Data' },
   { id: 'rppg', label: 'Detak dari Kamera', ringkas: 'Ukur nadi lewat wajah', ke: '/rppg-heart-rate', emoji: '📷', kategori: 'Tubuh & Data' },
   { id: 'vokal', label: 'Biomarker Suara', ringkas: 'Petunjuk kesehatan dari suara', ke: '/vocal-biomarkers', emoji: '🎙️', kategori: 'Tubuh & Data' },
+  { id: 'tenaga', label: 'Tenaga Hari Ini', ringkas: 'Dilaporkan sendiri, 14 hari', ke: '/harian', emoji: '🔋', kategori: 'Tubuh & Data', bawaan: true },
+  { id: 'hidrasi2', label: 'Cairan Hari Ini', ringkas: 'Terhadap kebiasaan sendiri', ke: '/hydration', emoji: '💧', kategori: 'Gizi', bawaan: true },
+  { id: 'cahaya', label: 'Cahaya Pagi', ringkas: 'Rangkaian hari berturut-turut', ke: '/harian', emoji: '🌅', kategori: 'Tubuh & Data', bawaan: true },
+  { id: 'tangga', label: 'Lantai Ditapaki', ringkas: 'Tangga hari ini vs kebiasaan', ke: '/tubuh', emoji: '🪜', kategori: 'Latihan', bawaan: true },
+  { id: 'vo2tren', label: 'VO₂max', ringkas: 'Perjalanan bacaan Anda', ke: '/longevity', emoji: '🫁', kategori: 'Latihan', bawaan: true },
+  { id: 'komposisi', label: 'Komposisi Tubuh', ringkas: 'Berat, lemak, otot rangka', ke: '/tubuh', emoji: '⚖️', kategori: 'Tubuh & Data', bawaan: true },
+  { id: 'suplemen', label: 'Suplemen', ringkas: 'Daftar sendiri, tanpa anjuran', ke: '/harian', emoji: '💊', kategori: 'Gizi', bawaan: true },
+  { id: 'suhuEkstrem', label: 'Panas & Dingin', ringkas: 'Sauna dan rendaman dingin', ke: '/harian', emoji: '🔥', kategori: 'Tidur & Pemulihan', bawaan: true },
   { id: 'lab', label: 'Hasil Lab', ringkas: 'HbA1c, ApoB, eGFR, dan perjalanannya', ke: '/tubuh', emoji: '🧪', kategori: 'Klinis & Belajar', bawaan: true },
   { id: 'lingkungan', label: 'Udara & UV', ringkas: 'AQI dan indeks UV kota Anda', ke: '/tubuh', emoji: '🌤️', kategori: 'Tubuh & Data', bawaan: true },
   { id: 'hrv', label: 'HRV Semalam', ringkas: 'Terhadap kebiasaan 14 hari', ke: '/tubuh?t=jantung', emoji: '💓', kategori: 'Tidur & Pemulihan', bawaan: true },
@@ -331,6 +339,14 @@ export const WIDGET_HIDUP = [
   'suhu',           // simpangan suhu dari kebiasaan
   'lingkungan',     // AQI + UV dari Open-Meteo lewat server
   'lab',            // hasil lab yang dimasukkan sendiri + rentang rujukan
+  'tenaga',         // tenaga yang dirasakan, 1-5
+  'hidrasi2',       // cairan hari ini
+  'cahaya',         // cahaya pagi + rangkaian
+  'tangga',         // lantai ditapaki
+  'vo2tren',        // perjalanan VO2max
+  'komposisi',      // berat + lemak + otot
+  'suplemen',       // daftar sendiri
+  'suhuEkstrem',    // sauna & rendaman dingin
 ] as const
 
 /** Katalog yang boleh menempati beranda. */

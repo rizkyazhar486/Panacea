@@ -37,6 +37,7 @@ import { UbinZona2, UbinPemulihanDenyut, UbinUtangTidur, UbinProtein, UbinTekana
 import { UbinHrv, UbinTahapTidur, UbinEfisiensiTidur, UbinLajuNapas, UbinSaturasi, UbinSuhu } from './UbinPerangkat'
 import { UbinLingkungan } from './UbinLingkungan'
 import { UbinLab } from './UbinLab'
+import { UbinTenaga, UbinHidrasi, UbinCahaya, UbinTangga, UbinVo2Tren, UbinKomposisi, UbinSuplemen, UbinSuhuEkstrem } from './UbinHarianPlus'
 import { UbinTidurLebar, UbinGiziLebar } from './UbinTidurGizi'
 import { PetaKonsistensi } from './PetaKonsistensi'
 import { ambilRiwayat } from '../lib/riwayatVitals'
@@ -474,6 +475,7 @@ export function PapanWidget({ pratinjau, tanggalCatatan }: { pratinjau: Pratinja
     'mata', 'fokus', 'kopi', 'puasa',
     'zona2', 'hrr', 'utangTidur', 'protein', 'tekanan', 'napas', 'duduk',
     'hrv', 'tahapTidur', 'efisiensiTidur', 'lajuNapas', 'saturasi', 'suhu', 'lingkungan', 'lab',
+    'tenaga', 'hidrasi2', 'cahaya', 'tangga', 'vo2tren', 'komposisi', 'suplemen', 'suhuEkstrem',
   ]
   const adaGrafik = pilihan.includes('grafikOlahraga')
 
@@ -554,6 +556,14 @@ export function PapanWidget({ pratinjau, tanggalCatatan }: { pratinjau: Pratinja
         ...(pilihan.includes('motivasi') ? [{ kunci: 'motivasi', isi: <UbinMotivasi /> }] : []),
         ...(pilihan.includes('lingkungan') ? [{ kunci: 'lingkungan', isi: <UbinLingkungan /> }] : []),
         ...(pilihan.includes('lab') ? [{ kunci: 'lab', isi: <UbinLab /> }] : []),
+        ...(pilihan.includes('tenaga') ? [{ kunci: 'tenaga', isi: <UbinTenaga /> }] : []),
+        ...(pilihan.includes('hidrasi2') ? [{ kunci: 'hidrasi2', isi: <UbinHidrasi /> }] : []),
+        ...(pilihan.includes('cahaya') ? [{ kunci: 'cahaya', isi: <UbinCahaya /> }] : []),
+        ...(pilihan.includes('tangga') ? [{ kunci: 'tangga', isi: <UbinTangga /> }] : []),
+        ...(pilihan.includes('vo2tren') ? [{ kunci: 'vo2tren', isi: <UbinVo2Tren /> }] : []),
+        ...(pilihan.includes('komposisi') ? [{ kunci: 'komposisi', isi: <UbinKomposisi /> }] : []),
+        ...(pilihan.includes('suplemen') ? [{ kunci: 'suplemen', isi: <UbinSuplemen /> }] : []),
+        ...(pilihan.includes('suhuEkstrem') ? [{ kunci: 'suhuEkstrem', isi: <UbinSuhuEkstrem /> }] : []),
         ...(pilihan.includes('hrv') ? [{ kunci: 'hrv', isi: <UbinHrv /> }] : []),
         ...(pilihan.includes('tahapTidur') ? [{ kunci: 'tahapTidur', isi: <UbinTahapTidur /> }] : []),
         ...(pilihan.includes('efisiensiTidur') ? [{ kunci: 'efisiensiTidur', isi: <UbinEfisiensiTidur /> }] : []),

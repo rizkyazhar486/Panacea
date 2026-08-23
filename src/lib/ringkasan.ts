@@ -1,6 +1,7 @@
 import { api, backendEnabled } from './api'
 import { getVitals } from './healthVitals'
 import { ambilLab } from './lab'
+import { ambilSuplemen, sudahDiminum, hariSejak } from './kebiasaanHarian'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Ringkasan harian yang dititipkan ke server — SESEDIKIT MUNGKIN.
@@ -37,6 +38,11 @@ interface Ringkasan {
   kopiTerakhir?: number
   labTerakhir?: Record<string, string>
   catatanHariIni?: boolean
+  tenaga?: number
+  airMl?: number
+  cahayaHariIni?: boolean
+  suplemenBelum?: number
+  hariSejakPanas?: number
 }
 
 function tanggalLokal(d = new Date()): string {
@@ -68,7 +74,11 @@ export function susunRingkasan(): Ringkasan {
       protein += Number(f.protein) || 0
     }
     if (ada) { r.kkal = Math.round(kkal); r.proteinG = Math.round(protein) }
-    r.catatanHariIni = Boolean(st.wellness?.[hariIni])
+    const w = st.wellness?.[hariIni]
+    r.catatanHariIni = Boolean(w)
+    if (typeof w?.tenaga === 'number') r.tenaga = w.tenaga
+    if (typeof w?.waterMl === 'number') r.airMl = Math.round(w.waterMl)
+    r.cahayaHariIni = Boolean(w?.sunDone)
   } catch { /* simpanan rusak — ringkasan tetap dikirim tanpa bagian ini */ }
 
   const berat = getVitals().weightKg
@@ -86,6 +96,13 @@ export function susunRingkasan(): Ringkasan {
       if (akhir?.tanggal) peta[jenis] = akhir.tanggal
     }
     if (Object.keys(peta).length) r.labTerakhir = peta
+  } catch { /* abaikan */ }
+
+  try {
+    const daftar = ambilSuplemen()
+    if (daftar.length) r.suplemenBelum = daftar.length - sudahDiminum().length
+    const panas = hariSejak('panas')
+    if (panas != null) r.hariSejakPanas = panas
   } catch { /* abaikan */ }
 
   return r

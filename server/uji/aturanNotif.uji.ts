@@ -91,6 +91,34 @@ periksa('catatanHarianSepi menyala sesudah 3 hari',
 periksa('catatanHarianSepi diam bila hari ini sudah mencatat',
   !cari('catatanHarianSepi').nilai(konteks({}, 20 * 60, { tanggal: hari(0), catatanHariIni: true })))
 
+// 7c. Gelombang ketiga: tenaga, cairan, cahaya, suplemen, tangga.
+periksa('tenagaRendah menyala saat ditandai 2 dari 5',
+  !!cari('tenagaRendah').nilai(konteks({}, 19 * 60, { tanggal: hari(0), tenaga: 2 })))
+periksa('tenagaRendah diam saat ditandai 4',
+  !cari('tenagaRendah').nilai(konteks({}, 19 * 60, { tanggal: hari(0), tenaga: 4 })))
+
+periksa('cairanTertinggal menyala pada 800 mL sore hari',
+  !!cari('cairanTertinggal').nilai(konteks({}, 16 * 60, { tanggal: hari(0), airMl: 800 })))
+periksa('cairanTertinggal diam pada 2000 mL',
+  !cari('cairanTertinggal').nilai(konteks({}, 16 * 60, { tanggal: hari(0), airMl: 2000 })))
+periksa('cairanTertinggal diam bila belum pernah mencatat sama sekali',
+  !cari('cairanTertinggal').nilai(konteks({}, 16 * 60, { tanggal: hari(0) })))
+
+periksa('cahayaBelum menyala bila ditandai belum',
+  !!cari('cahayaBelum').nilai(konteks({}, 9 * 60, { tanggal: hari(0), cahayaHariIni: false })))
+periksa('cahayaBelum diam bila sudah',
+  !cari('cahayaBelum').nilai(konteks({}, 9 * 60, { tanggal: hari(0), cahayaHariIni: true })))
+
+periksa('suplemenBelum menyala bila dua belum ditandai',
+  !!cari('suplemenBelum').nilai(konteks({}, 10 * 60, { tanggal: hari(0), suplemenBelum: 2 })))
+periksa('suplemenBelum diam bila semua sudah',
+  !cari('suplemenBelum').nilai(konteks({}, 10 * 60, { tanggal: hari(0), suplemenBelum: 0 })))
+
+const tangga = konteks({ flightsClimbed: 1 }, 18 * 60)
+for (let i = 1; i <= 14; i++) tangga.riwayat[tangga.riwayat.length - i].flightsClimbed = 12
+tangga.hariIni.flightsClimbed = 1
+periksa('tanggaSepi menyala saat 1 lantai vs kebiasaan 12', !!cari('tanggaSepi').nilai(tangga))
+
 // 7b. Jendela waktu tiap aturan masuk akal (tidak ada yang tengah malam).
 for (const a of ATURAN) {
   if (!a.jendela) continue

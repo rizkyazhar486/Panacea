@@ -865,6 +865,7 @@ export function setSportsFavorites(userId: string, teams: string[]): string[] {
 const RINGKASAN_DIIZINKAN = [
   'tanggal', 'kkal', 'proteinG', 'beratKg', 'puasaMulai', 'kopiTerakhir',
   'labTerakhir', 'tenaga', 'catatanHariIni', 'jamTidurTarget',
+  'airMl', 'cahayaHariIni', 'suplemenBelum', 'hariSejakPanas',
 ] as const
 
 export function getRingkasan(userId: string): Record<string, any> {
