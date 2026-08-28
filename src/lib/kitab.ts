@@ -506,7 +506,17 @@ export async function bacaSurah(
   return lewatPenyedia(async (p) => {
     const url = (ed: string) => `${p.basis}${p.jalurSurah.replace('{n}', String(nomor)).replace('{ed}', ed)}`
     const edTerj = p.edisiTerjemahan[terjemahan] ?? terjemahan
-    const edTaf = tafsirId ? p.edisiTafsir[tafsirId] : undefined
+    // PETA EDISI ADALAH TERJEMAHAN NAMA, BUKAN DAFTAR-PUTIH.
+    //
+    // Sebelumnya baris ini berhenti pada peta: id tafsir yang tidak tercantum
+    // menghasilkan undefined, sehingga tafsirnya TIDAK DIAMBIL SAMA SEKALI dan
+    // layarnya tampak seperti tafsir yang tidak tersedia. Itu memutus seluruh
+    // gunanya menanyakan daftar tafsir kepada penyedia saat berjalan — id yang
+    // baru saja disebut penyedianya sendiri justru ditolak di sini.
+    //
+    // Barisnya kini jatuh ke id apa adanya, persis seperti yang sudah
+    // dilakukan edisi terjemahan tepat di atasnya.
+    const edTaf = tafsirId ? p.edisiTafsir[tafsirId] ?? tafsirId : undefined
     const edLatin = pilihan.latin ? p.edisiLatin : undefined
     const edQari = pilihan.qari ? p.edisiQari[pilihan.qari] : undefined
     const gagalSebagian: string[] = []
@@ -614,6 +624,93 @@ export const TAFSIR = [
   { id: 'ar.jalalayn', nama: 'Tafsir Al-Jalalayn', bahasa: 'Arabic',
     tentang: 'The classical text in its original Arabic.' },
 ]
+
+// ─────────────────────────────────────────────────────────────────────────────
+// TAFSIR YANG BENAR-BENAR TERSEDIA, DITANYAKAN KEPADA PENYEDIANYA.
+//
+// Daftar TAFSIR di bawah ditulis tangan, dan itu menimbulkan satu masalah yang
+// nyata: ia hanya memuat apa yang KEBETULAN diketahui saat berkas ini ditulis.
+// Pengguna yang membaca terjemahan Kemenag lalu menyalakan tafsir memperoleh
+// tafsir berbahasa Inggris atau Arab, dan menyimpulkan tafsir Indonesia tidak
+// ada — padahal yang tidak ada hanyalah barisnya di berkas ini.
+//
+// Menambah id edisi berdasarkan TEBAKAN bukan jalan keluarnya: id yang keliru
+// gagal diam-diam, atau lebih buruk, berhasil dengan isi yang bukan tafsir yang
+// dikira pembacanya. Maka daftarnya DITANYAKAN kepada penyedia saat berjalan.
+// Apa pun yang kembali nyata menurut definisi, sebab penyedianya sendiri yang
+// menyebutkannya.
+//
+// Yang ditulis tangan tetap dipertahankan sebagai CADANGAN untuk keadaan tanpa
+// jaringan, dan sebagai sumber keterangan "tentang" tiap tafsir yang memang
+// tidak disediakan API.
+// ─────────────────────────────────────────────────────────────────────────────
+
+export interface TafsirTersedia {
+  id: string
+  nama: string
+  bahasa: string
+  /** true bila datang dari penyedia, false bila dari daftar cadangan. */
+  dariPenyedia: boolean
+  tentang?: string
+}
+
+const NAMA_BAHASA: Record<string, string> = {
+  id: 'Indonesian', en: 'English', ar: 'Arabic', ur: 'Urdu', bn: 'Bengali',
+  tr: 'Turkish', fr: 'French', ru: 'Russian', fa: 'Persian',
+}
+
+/**
+ * Tafsir yang ditawarkan penyedia, disaring menurut bahasa bila diminta.
+ *
+ * Kegagalan TIDAK dilempar: yang memanggil memperoleh daftar cadangan, dan
+ * layar tetap dapat menawarkan sesuatu. Yang tidak boleh terjadi adalah layar
+ * kosong karena satu permintaan jaringan gagal.
+ */
+export async function daftarTafsir(bahasa?: string): Promise<TafsirTersedia[]> {
+  const p = PENYEDIA[0]
+  const cadangan = TAFSIR
+    .filter((t) => !bahasa || t.bahasa.toLowerCase().startsWith(NAMA_BAHASA[bahasa]?.toLowerCase() ?? bahasa))
+    .map((t) => ({ id: t.id, nama: t.nama, bahasa: t.bahasa, dariPenyedia: false, tentang: t.tentang }))
+
+  try {
+    const url = `${p.basis}/edition?format=text&type=tafsir${bahasa ? `&language=${encodeURIComponent(bahasa)}` : ''}`
+    const j = await ambil<unknown>(url, `edisi-tafsir-${bahasa ?? 'semua'}`)
+    const baris = ((j.data as { data?: unknown }).data ?? []) as Record<string, unknown>[]
+    const hasil: TafsirTersedia[] = []
+    for (const b of baris) {
+      const id = String(b['identifier'] ?? '')
+      const nama = String(b['englishName'] ?? b['name'] ?? id)
+      const kode = String(b['language'] ?? '')
+      if (!id || !nama) continue
+      const tulis = TAFSIR.find((t) => t.id === id)
+      hasil.push({
+        id,
+        nama: tulis?.nama ?? nama,
+        bahasa: tulis?.bahasa ?? NAMA_BAHASA[kode] ?? (kode || 'Unknown'),
+        dariPenyedia: true,
+        tentang: tulis?.tentang,
+      })
+    }
+    if (hasil.length) {
+      simpanLolos(j)
+      return hasil
+    }
+    return cadangan
+  } catch {
+    return cadangan
+  }
+}
+
+/**
+ * Satu tafsir yang paling cocok untuk bahasa yang diminta, bila ada.
+ *
+ * Dipakai layar yang perlu memilih SENDIRI tanpa bertanya — misalnya ubin ayat
+ * harian, yang tidak punya tempat untuk sebuah pemilih.
+ */
+export async function tafsirUntukBahasa(bahasa: string): Promise<TafsirTersedia | null> {
+  const l = await daftarTafsir(bahasa)
+  return l.find((t) => t.dariPenyedia) ?? l[0] ?? null
+}
 
 export const TERJEMAHAN = [
   { id: 'en.sahih', nama: 'Saheeh International', bahasa: 'English' },

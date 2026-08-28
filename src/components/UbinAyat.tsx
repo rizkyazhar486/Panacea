@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { bacaSurah, penyediaSekarang, renunganUntuk, TAFSIR, QARI, type Ayat } from '../lib/kitab'
+import { bacaSurah, penyediaSekarang, renunganUntuk, tafsirUntukBahasa, QARI, type Ayat, type TafsirTersedia } from '../lib/kitab'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Ubin satu ayat — dibaca, didengar, dan dipahami, di beranda.
@@ -20,14 +20,17 @@ import { bacaSurah, penyediaSekarang, renunganUntuk, TAFSIR, QARI, type Ayat } f
 // memintanya membaca keduanya dan perbedaan di antara keduanya sering justru
 // yang membuka maknanya.
 //
-// TENTANG TAFSIR BAHASA INDONESIA. Penyedia yang terpasang menyediakan
-// TERJEMAHAN Kemenag dalam bahasa Indonesia, tetapi belum ada edisi TAFSIR
-// berbahasa Indonesia yang dapat diperiksa dari lingkungan ini. Maka tafsir
-// yang ditampilkan berbahasa Inggris beserta nama penyusunnya, dan
-// ketidaktersediaan yang Indonesia DIKATAKAN di layar. Memasang id edisi
-// tafsir Indonesia berdasarkan tebakan berarti mengirim sesuatu yang akan
-// gagal diam-diam — atau lebih buruk, berhasil dengan isi yang bukan tafsir
-// yang dikira pembacanya.
+// TAFSIRNYA TIDAK LAGI DIPATOK. Sebelumnya satu id tafsir berbahasa Inggris
+// ditulis di sini, sebab id edisi Indonesia tidak dapat diperiksa dari
+// lingkungan pengembangan yang jaringannya tertutup — dan menebaknya berarti
+// mengirim sesuatu yang gagal diam-diam, atau lebih buruk, berhasil dengan isi
+// yang bukan tafsir yang dikira pembacanya.
+//
+// Sekarang daftar tafsir DITANYAKAN kepada penyedia saat berjalan, disaring
+// bahasa Indonesia. Apa pun yang kembali nyata menurut definisi, sebab
+// penyedianya sendiri yang menyebutkannya. Bila tidak ada yang kembali —
+// jaringan mati, atau penyedianya memang tidak punya — ubin ini jatuh ke
+// tafsir berbahasa Inggris dan MENGATAKAN bahasa apa yang sedang dibaca.
 // ─────────────────────────────────────────────────────────────────────────────
 
 /**
@@ -77,7 +80,7 @@ function pilihanHariIni(): { surah: number; ayat: number } {
   return PILIHAN[((hari % PILIHAN.length) + PILIHAN.length) % PILIHAN.length]
 }
 
-const TAFSIR_DIPAKAI = 'en.maududi'
+const TAFSIR_CADANGAN = 'en.maududi'
 const QARI_DIPAKAI = 'alafasy'
 
 interface Isi {
@@ -93,6 +96,7 @@ export function UbinAyat() {
   const [isi, setIsi] = useState<Isi | null>(null)
   const [galat, setGalat] = useState('')
   const [bukaTafsir, setBukaTafsir] = useState(false)
+  const [tafsirDipakai, setTafsirDipakai] = useState<TafsirTersedia | null>(null)
 
   useEffect(() => {
     let batal = false
@@ -101,10 +105,18 @@ export function UbinAyat() {
     // Dua pembacaan: satu untuk terjemahan Indonesia, satu untuk Inggris
     // beserta tafsir dan rekamannya. Keduanya melewati pemeriksaan keutuhan
     // yang sama.
-    Promise.all([
-      bacaSurah(surah, 'id.indonesian', undefined, {}),
-      bacaSurah(surah, 'en.sahih', TAFSIR_DIPAKAI, { qari: QARI_DIPAKAI }),
-    ])
+    // Tafsir Indonesia ditanyakan lebih dahulu; bila penyedianya tidak
+    // menawarkan satu pun, yang dipakai tafsir cadangan berbahasa Inggris.
+    tafsirUntukBahasa('id')
+      .then((t) => (batal ? null : t))
+      .then((t) => {
+        const pilih = t?.id ?? TAFSIR_CADANGAN
+        if (!batal) setTafsirDipakai(t ?? null)
+        return Promise.all([
+          bacaSurah(surah, 'id.indonesian', undefined, {}),
+          bacaSurah(surah, 'en.sahih', pilih, { qari: QARI_DIPAKAI }),
+        ])
+      })
       .then(([id, en]) => {
         if (batal) return
         const aId = id.ayat.find((a) => a.nomor === ayat)
@@ -146,7 +158,7 @@ export function UbinAyat() {
 
   if (!isi) return null
 
-  const tafsirInfo = TAFSIR.find((t) => t.id === TAFSIR_DIPAKAI)
+  const tafsirInfo = tafsirDipakai
   const qariInfo = QARI.find((q) => q.id === QARI_DIPAKAI)
 
   return (
@@ -198,8 +210,12 @@ export function UbinAyat() {
               aria-expanded={bukaTafsir}
               className="flex min-h-[40px] w-full items-center justify-between gap-2 rounded-xl bg-brand/10 px-3 text-left"
             >
+              {/* Nama dan bahasa diambil dari keterangan yang DISEBUT PENYEDIA,
+                  bukan dari hasil pencarian di daftar tulisan tangan — daftar
+                  itu tidak memuat edisi yang baru ditemukan saat berjalan, dan
+                  hasilnya "Unknown" pada tafsir yang sebenarnya jelas asalnya. */}
               <span className="t-mikro font-black uppercase tracking-wide text-brand-dark dark:text-brand">
-                Commentary · {isi.ayatEn.tafsir.oleh}
+                Commentary · {tafsirInfo?.nama ?? isi.ayatEn.tafsir.oleh}
               </span>
               <span aria-hidden className="t-mikro font-black text-brand">{bukaTafsir ? '▲' : '▼'}</span>
             </button>
@@ -207,9 +223,11 @@ export function UbinAyat() {
               <>
                 <p className="t-kecil mt-2 leading-[1.65] text-ink dark:text-neutral-200">{isi.ayatEn.tafsir.teks}</p>
                 <p className="t-mikro mt-2 leading-snug text-neutral-500">
-                  {tafsirInfo?.tentang} This commentary is in {isi.ayatEn.tafsir.bahasa}. The translation above is
-                  available in Indonesian, but the source that serves this app does not yet carry an Indonesian
-                  commentary edition that could be verified — so none is shown rather than one that was guessed at.
+                  {tafsirInfo?.tentang ? `${tafsirInfo.tentang} ` : ''}
+                  This commentary is in {tafsirInfo?.bahasa ?? isi.ayatEn.tafsir.bahasa}
+                  {tafsirInfo?.dariPenyedia === false
+                    ? ' — the source could not be asked which editions it carries just now, so a known one was used.'
+                    : '.'}
                 </p>
               </>
             )}

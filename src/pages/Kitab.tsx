@@ -6,6 +6,7 @@ import { Ringkas, Poin } from '../components/Ringkas'
 import { IconShield } from '../components/icons'
 import {
   daftarSurah, bacaSurah, renunganUntuk, penyediaSekarang, TAFSIR, TERJEMAHAN, QARI,
+  daftarTafsir, type TafsirTersedia,
   TOTAL_SURAH, TOTAL_AYAT_HAFS, bacaAlkitab, bacaTanakh, PENGANTAR, SUMBER,
   bacaTradisi,
   type Surah, type Bacaan, type HasilBaca, type Pengantar,
@@ -36,6 +37,23 @@ export function Kitab() {
   const [isi, setIsi] = useState<HasilBaca | null>(null)
   const [terjemahan, setTerjemahan] = useState(TERJEMAHAN[0].id)
   const [tafsirId, setTafsirId] = useState<string | undefined>(TAFSIR[0].id)
+
+  // DAFTAR TAFSIR DITANYAKAN KEPADA PENYEDIANYA, tidak dipatok di aplikasi.
+  //
+  // Yang ditulis tangan hanya memuat apa yang kebetulan diketahui saat berkas
+  // itu ditulis, dan akibatnya nyata: pembaca terjemahan Kemenag yang
+  // menyalakan tafsir memperoleh Inggris atau Arab, lalu menyimpulkan tafsir
+  // Indonesia tidak ada — padahal yang tidak ada hanya barisnya di daftar itu.
+  // Saat jaringan gagal, daftar tulisan tangan tetap dipakai sebagai cadangan
+  // dan ditandai sebagai cadangan di layar.
+  const [tafsirTersedia, setTafsirTersedia] = useState<TafsirTersedia[]>(
+    () => TAFSIR.map((t) => ({ ...t, dariPenyedia: false })),
+  )
+  useEffect(() => {
+    let batal = false
+    daftarTafsir().then((l) => { if (!batal && l.length) setTafsirTersedia(l) })
+    return () => { batal = true }
+  }, [])
   // Alih aksara menyala secara bawaan. Sebagian besar pengguna aplikasi ini
   // tidak membaca aksara Arab, dan tanpa alih aksara mereka hanya bisa MELIHAT
   // ayat tanpa bisa melafalkannya — jadi bawaan yang benar adalah menyala.
@@ -259,7 +277,7 @@ export function Kitab() {
               <button onClick={() => setTafsirId(undefined)} aria-pressed={!tafsirId}
                 className={`rounded-lg px-2.5 py-1 text-[12px] font-bold ${
                   !tafsirId ? 'bg-brand text-white' : 'bg-neutral-100 text-neutral-600'}`}>None</button>
-              {TAFSIR.map((t) => (
+              {tafsirTersedia.map((t) => (
                 <button key={t.id} onClick={() => setTafsirId(t.id)} aria-pressed={tafsirId === t.id}
                   className={`rounded-lg px-2.5 py-1 text-[12px] font-bold ${
                     tafsirId === t.id ? 'bg-brand text-white' : 'bg-neutral-100 text-neutral-600'}`}>
@@ -269,11 +287,12 @@ export function Kitab() {
                 </button>
               ))}
             </div>
-            {tafsirId && (
-              <p className="mt-1 text-[10px] leading-relaxed text-neutral-500">
-                {TAFSIR.find((t) => t.id === tafsirId)?.tentang}
-              </p>
-            )}
+            <p className="mt-1 text-[10px] leading-relaxed text-neutral-500">
+              {tafsirId && `${tafsirTersedia.find((t) => t.id === tafsirId)?.tentang ?? ''} `}
+              {tafsirTersedia.some((t) => t.dariPenyedia)
+                ? `${tafsirTersedia.length} editions, listed by ${penyediaSekarang().nama} itself rather than written into this app.`
+                : 'Could not ask the source which editions it carries just now, so a known list is shown.'}
+            </p>
             <div className="mt-2">
               <Ringkas ikon="💚" judul="Why commentary matters here"
                 anak={
