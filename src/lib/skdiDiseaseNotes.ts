@@ -6015,7 +6015,7 @@ export const SKDI_DISEASE_NOTES: Record<string, SkdiDiseaseNote> = {
     definisi: 'Sindrom klinis akibat kelainan struktur/fungsi jantung yang menurunkan curah jantung atau meningkatkan tekanan pengisian.',
     diagnosis: ['Sesak saat aktivitas, ortopnea, paroxysmal nocturnal dyspnea, edema tungkai, JVP meningkat; ekokardiografi mengklasifikasikan HFrEF (EF ≤40%) dan HFpEF (EF ≥50%)'],
     tatalaksana: [
-      'HFrEF — empat pilar terapi: ACE-inhibitor/ARB/ARNI, beta-blocker, antagonis reseptor mineralokortikoid, dan SGLT2 inhibitor; diuretik untuk kontrol gejala kongesti',
+      'HFrEF — EMPAT PILAR, dimulai berdekatan lalu dititrasi, bukan berurutan. (1) Kaptopril 3x6,25 mg naik sampai 3x50 mg, ramipril 1x1,25 mg sampai 1x10 mg, kandesartan 1x4 mg sampai 1x32 mg, atau sakubitril-valsartan 2x49/51 mg sampai 2x97/103 mg (jeda 36 jam bila berpindah dari penghambat ACE). (2) Bisoprolol 1x1,25 mg sampai 1x10 mg atau karvedilol 2x3,125 mg sampai 2x25 mg, digandakan tiap 2 pekan, hanya dimulai saat euvolemik. (3) Spironolakton 1x12,5-25 mg sampai 1x50 mg bila kalium <5,0 mEq/L dan eGFR >30. (4) Dapagliflozin atau empagliflozin 1x10 mg tanpa titrasi. Furosemid 1-2x20-80 mg hanya untuk keluhan bendungan — ia meredakan tetapi tidak memperpanjang umur',
       'Edukasi restriksi garam dan cairan, pemantauan berat badan harian, rehabilitasi jantung, vaksinasi',
     ],
     referensi: ['SKDI2012', 'PERKIHF2020', 'BRAUNWALD2022'],
