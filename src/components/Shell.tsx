@@ -119,7 +119,7 @@ const nav: Nav[] = [
   { to: '/evidence', label: 'Clinical Evidence', icon: IconStethoscope, roles: ['pasien', 'dokter', 'owner'], group: 'Clinical & AI' },
   { to: '/osce-ukmppd', label: 'OSCE UKMPPD Stations', icon: IconStethoscope, roles: ['pasien', 'dokter', 'owner'], group: 'Clinical & AI' },
   { to: '/clinical-calculators', label: 'Clinical Calculators', icon: IconActivity, roles: ['pasien', 'dokter', 'owner'], group: 'Clinical & AI' },
-  { to: '/drug-info', label: 'Drugs & Prescribing', icon: IconPill, roles: ['pasien', 'dokter', 'owner'], group: 'Clinical & AI' },
+  { to: '/drug-info', label: 'Drugs, Herbal & Prescribing', icon: IconPill, roles: ['pasien', 'dokter', 'owner'], group: 'Clinical & AI' },
   { to: '/emr', label: 'Medical Records', icon: IconEMR, roles: ['dokter', 'owner'], group: 'Clinical & AI' },
   { to: '/clinical-hub', label: 'Other Clinical Tools', icon: IconStethoscope, roles: ['pasien', 'dokter', 'owner'], group: 'Clinical & AI' },
   // Sosial

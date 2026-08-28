@@ -2,7 +2,8 @@ import { useMemo, useState } from 'react'
 import { Card, SectionTitle, inputClass, Button, Badge } from '../components/ui'
 import { IconPill, IconShield } from '../components/icons'
 import { api } from '../lib/api'
-import { ATC, cariObat, jumlahObat, jumlahEml, type Obat } from '../lib/obatKatalog'
+import { ATC, cariObat, jumlahObat, jumlahEml, dosisSkdi, type Obat } from '../lib/obatKatalog'
+import { HERBAL, cariHerbal, jumlahHerbal, BUKTI_LABEL, BPOM_LABEL, type Herbal } from '../lib/herbal'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Drug Info — dua sumber, dan tiap kalimat di layar mengaku datang dari yang mana.
@@ -42,10 +43,15 @@ export function DrugInfo() {
   const [related, setRelated] = useState<RelatedDrug[]>([])
   const [pilih, setPilih] = useState<Obat | null>(null)
   const [jelajah, setJelajah] = useState<string | null>(null)
+  const [tab, setTab] = useState<'obat' | 'herbal'>('obat')
+  const [herbalBuka, setHerbalBuka] = useState<string | null>(null)
 
   const total = useMemo(() => jumlahObat(), [])
   const eml = useMemo(() => jumlahEml(), [])
   const hasil = useMemo(() => cariObat(q), [q])
+  const hasilHerbal = useMemo(() => cariHerbal(q), [q])
+  const totalHerbal = useMemo(() => jumlahHerbal(), [])
+  const dosis = useMemo(() => (pilih ? dosisSkdi(pilih.nama) : []), [pilih])
 
   async function search(name?: string) {
     const text = (name ?? q).trim()
@@ -86,9 +92,36 @@ export function DrugInfo() {
           <Button onClick={() => search()} disabled={loading || !q.trim()}>{loading ? '…' : 'Label'}</Button>
         </div>
 
+        {/* Herbal berdiri sebagai bagiannya sendiri, tidak dicampur ke dalam
+            daftar obat. Mencampurnya membuat keduanya terbaca seperti benda
+            yang setara — padahal yang satu punya label resmi berdosis dan yang
+            lain kadar bahan aktifnya berbeda antar produk dan antar panen. */}
+        <div className="mt-2 flex gap-1.5">
+          <button
+            onClick={() => setTab('obat')} aria-pressed={tab === 'obat'}
+            className={`min-h-[36px] flex-1 rounded-full px-3 text-[12px] font-bold ${
+              tab === 'obat' ? 'bg-brand text-ink' : 'bg-neutral-100 text-neutral-600 dark:bg-white/10 dark:text-neutral-300'}`}
+          >
+            💊 Medicines
+          </button>
+          <button
+            onClick={() => setTab('herbal')} aria-pressed={tab === 'herbal'}
+            className={`min-h-[36px] flex-1 rounded-full px-3 text-[12px] font-bold ${
+              tab === 'herbal' ? 'bg-brand text-ink' : 'bg-neutral-100 text-neutral-600 dark:bg-white/10 dark:text-neutral-300'}`}
+          >
+            🌿 Herbal
+          </button>
+        </div>
+
         <div className="mt-2 flex flex-wrap items-center gap-2">
-          <Badge tone="brand">{total} substances</Badge>
-          <Badge tone="low">{eml} on the WHO essential list</Badge>
+          {tab === 'obat' ? (
+            <>
+              <Badge tone="brand">{total} substances</Badge>
+              <Badge tone="low">{eml} on the WHO essential list</Badge>
+            </>
+          ) : (
+            <Badge tone="brand">{totalHerbal} preparations</Badge>
+          )}
           <Badge tone="neutral">works offline</Badge>
         </div>
 
@@ -106,7 +139,7 @@ export function DrugInfo() {
       </Card>
 
       {/* ── Hasil katalog: instan, tanpa jaringan ───────────────────────────── */}
-      {q.trim() && !pilih && (
+      {tab === 'obat' && q.trim() && !pilih && (
         <Card className="!p-4">
           <div className="text-[10px] font-black uppercase tracking-wide text-neutral-500">
             In this app's catalogue {hasil.length > 0 && `· ${hasil.length}`}
@@ -142,7 +175,7 @@ export function DrugInfo() {
         </Card>
       )}
 
-      {pilih && (
+      {tab === 'obat' && pilih && (
         <Card className="!p-5">
           <div className="flex flex-wrap items-baseline gap-2">
             <div className="text-xl font-black text-ink dark:text-white">{pilih.nama}</div>
@@ -159,26 +192,49 @@ export function DrugInfo() {
             </div>
           )}
           {/* Ketiadaan dosis DINYATAKAN, bukan dibiarkan tampak seperti kelalaian. */}
-          <p className="mt-2 text-[10.5px] leading-relaxed text-neutral-500">
-            No dose is given here on purpose. Doses in this app come from a source that can be named — the official
-            label below, or the curated SKDI therapy reference — never from memory.
-          </p>
+          {dosis.length > 0 ? (
+            <div className="mt-2 rounded-xl bg-brand/10 p-2.5">
+              <div className="text-[10px] font-black uppercase tracking-wide text-brand-dark">
+                Dose · from this app's SKDI therapy reference
+              </div>
+              {dosis.map((d, i) => (
+                <div key={i} className="mt-1.5">
+                  <div className="text-[10px] font-bold uppercase tracking-wide text-neutral-500">
+                    {d.golongan} · {d.keluhan}
+                  </div>
+                  <p className="mt-0.5 text-[12px] leading-relaxed text-ink dark:text-neutral-200">{d.dosis}</p>
+                </div>
+              ))}
+              {/* Dosis ini milik GOLONGANNYA, dan sering menyebut lebih dari
+                  satu zat di dalamnya. Menyebutnya "dosis obat ini" akan
+                  keliru pada golongan yang anggotanya beberapa. */}
+              <p className="mt-1.5 text-[10px] leading-snug text-neutral-500">
+                These are the doses recorded for the drug group, which may name more than one substance. Written for
+                Indonesian practice; check against the label for the product in your hand.
+              </p>
+            </div>
+          ) : (
+            <p className="mt-2 text-[10.5px] leading-relaxed text-neutral-500">
+              No dose is given here on purpose. Doses in this app come from a source that can be named — the official
+              label below, or the curated SKDI therapy reference — never from memory.
+            </p>
+          )}
           <button onClick={() => { setPilih(null) }} className="mt-2 min-h-[36px] text-[11px] font-bold text-brand">
             ← Back to results
           </button>
         </Card>
       )}
 
-      {loading && <Card className="!p-8 text-center"><span className="mx-auto block h-6 w-6 animate-spin rounded-full border-2 border-brand border-t-transparent" /></Card>}
+      {tab === 'obat' && loading && <Card className="!p-8 text-center"><span className="mx-auto block h-6 w-6 animate-spin rounded-full border-2 border-brand border-t-transparent" /></Card>}
 
-      {drug === null && !loading && (
+      {tab === 'obat' && drug === null && !loading && (
         <Card className="!p-5 text-center text-sm text-neutral-500">
           No FDA label found for that name. The label database covers products marketed in the United States, so a drug
           used elsewhere can be entirely real and still absent here. Try the generic name, or check the spelling.
         </Card>
       )}
 
-      {drug && (
+      {tab === 'obat' && drug && (
         <>
           <Card className="!p-5">
             <div className="text-[10px] font-black uppercase tracking-wide text-neutral-500">From the official label</div>
@@ -208,7 +264,7 @@ export function DrugInfo() {
       )}
 
       {/* ── Jelajah menurut kelompok ATC ────────────────────────────────────── */}
-      {!q.trim() && (
+      {tab === 'obat' && !q.trim() && (
         <Card className="!p-4">
           <div className="text-[10px] font-black uppercase tracking-wide text-neutral-500">Browse by ATC group</div>
           <p className="mt-1 text-[11px] leading-relaxed text-neutral-500">
@@ -261,6 +317,99 @@ export function DrugInfo() {
         </Card>
       )}
 
+      {/* ── Herbal ─────────────────────────────────────────────────────────── */}
+      {tab === 'herbal' && (
+        <>
+          <Card className="!p-4">
+            <p className="text-[11.5px] leading-relaxed text-neutral-600 dark:text-neutral-300">
+              Traditional use is listed, and then what the human evidence actually shows — including when the honest
+              answer is "thin", or "trials were done and did not find it". Both can be true of the same plant at once,
+              and hiding the second out of respect for the first respects nobody.
+            </p>
+            <p className="mt-1.5 text-[11.5px] leading-relaxed text-neutral-600 dark:text-neutral-300">
+              <b>Interactions are the reason this section exists.</b> Herbal preparations are commonly taken alongside
+              prescribed medicines, and it is the meeting of the two that causes harm more often than either alone.
+            </p>
+            <p className="mt-1.5 text-[10.5px] leading-relaxed text-neutral-500">
+              No doses are given. The amount of active constituent differs between products and between harvests, so any
+              number printed here would be wrong for almost every real product.
+            </p>
+          </Card>
+
+          {(q.trim() ? [{ id: 'cari', judul: `Matching “${q.trim()}”`, emoji: '🔎', isi: hasilHerbal }] : HERBAL).map((g) => (
+            g.isi.length === 0 ? null : (
+              <Card key={g.id} className="!p-4">
+                <div className="flex items-baseline gap-2">
+                  <span aria-hidden className="text-[16px]">{g.emoji}</span>
+                  <h3 className="min-w-0 flex-1 text-[13.5px] font-black text-ink dark:text-white">{g.judul}</h3>
+                  <span className="shrink-0 text-[10px] font-bold tabular-nums text-neutral-400">{g.isi.length}</span>
+                </div>
+                <div className="mt-2 space-y-1.5">
+                  {g.isi.map((h: Herbal) => {
+                    const bk = BUKTI_LABEL[h.bukti]
+                    const terbuka = herbalBuka === h.latin
+                    return (
+                      <div key={h.latin} className="rounded-2xl bg-white/60 p-3 dark:bg-white/5">
+                        <button
+                          onClick={() => setHerbalBuka(terbuka ? null : h.latin)}
+                          aria-expanded={terbuka}
+                          className="flex w-full items-start gap-2 text-left"
+                        >
+                          <span className="min-w-0 flex-1">
+                            <span className="block text-[13px] font-bold text-ink dark:text-white">
+                              {h.nama}{h.lokal ? ` · ${h.lokal}` : ''}
+                            </span>
+                            <span className="block text-[11px] italic text-neutral-500">{h.latin}</span>
+                          </span>
+                          <span className="shrink-0"><Badge tone={bk.nada}>{bk.label}</Badge></span>
+                        </button>
+
+                        {terbuka && (
+                          <div className="mt-2 space-y-2 border-t border-neutral-200 pt-2 dark:border-white/10">
+                            <Baris judul="Traditionally used for" isi={h.tradisional} />
+                            <Baris judul={`Evidence · ${bk.label}`} isi={`${h.temuan} ${bk.jelas}`} />
+                            {h.interaksi && (
+                              <div className="rounded-xl bg-rose-500/10 p-2">
+                                <div className="text-[10px] font-black uppercase tracking-wide text-rose-700 dark:text-rose-300">
+                                  Interactions with medicines
+                                </div>
+                                <p className="mt-0.5 text-[12px] leading-relaxed text-ink dark:text-neutral-200">{h.interaksi}</p>
+                              </div>
+                            )}
+                            {h.bahaya && (
+                              <div className="rounded-xl bg-amber-500/10 p-2">
+                                <div className="text-[10px] font-black uppercase tracking-wide text-amber-800 dark:text-amber-300">
+                                  Harms
+                                </div>
+                                <p className="mt-0.5 text-[12px] leading-relaxed text-ink dark:text-neutral-200">{h.bahaya}</p>
+                              </div>
+                            )}
+                            {h.bpom && (
+                              <p className="text-[11px] leading-snug text-neutral-500">
+                                <b>Indonesia · {BPOM_LABEL[h.bpom].label}</b> — {BPOM_LABEL[h.bpom].jelas}
+                              </p>
+                            )}
+                          </div>
+                        )}
+                      </div>
+                    )
+                  })}
+                </div>
+              </Card>
+            )
+          ))}
+
+          {q.trim() && hasilHerbal.length === 0 && (
+            <Card className="!p-4">
+              <p className="text-[12px] leading-relaxed text-neutral-500">
+                No herbal preparation here matches that. Absence from this list is not a safety statement — it means it
+                has not been written up yet.
+              </p>
+            </Card>
+          )}
+        </>
+      )}
+
       <div className="rounded-2xl border border-neutral-100 bg-white p-4 text-center text-[11px] leading-relaxed text-neutral-500 dark:border-white/10 dark:bg-white/5">
         <IconShield size={12} className="mr-1 inline" />
         Label text via the free openFDA API (US labels — wording and availability vary by country and brand); related
@@ -268,6 +417,15 @@ export function DrugInfo() {
         List. This is reference information, not personal medical advice. For interactions with your own medicines and
         conditions, ask your pharmacist or doctor.
       </div>
+    </div>
+  )
+}
+
+function Baris({ judul, isi }: { judul: string; isi: string }) {
+  return (
+    <div>
+      <div className="text-[10px] font-black uppercase tracking-wide text-neutral-400">{judul}</div>
+      <p className="mt-0.5 text-[12px] leading-relaxed text-ink dark:text-neutral-200">{isi}</p>
     </div>
   )
 }

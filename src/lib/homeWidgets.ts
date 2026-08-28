@@ -48,7 +48,7 @@ export const WIDGETS: WidgetDef[] = [
   { id: 'mnemonik', label: 'Mnemonics', ringkas: 'Shorthand that actually sticks', ke: '/med-study?bagian=mnemonik', emoji: '🔤', kategori: 'Clinical & Learning' },
   { id: 'evidence', label: 'Clinical Evidence', ringkas: 'Clinical questions, answers graded by evidence', ke: '/evidence', emoji: '🔬', kategori: 'Clinical & Learning' },
   { id: 'emr', label: 'AI-EMR', ringkas: 'SOAP medical records with AI assistance', ke: '/emr', emoji: '📝', kategori: 'Clinical & Learning' },
-  { id: 'drugInfo', label: 'Drug Information', ringkas: 'Look up drugs and their interactions', ke: '/drug-info', emoji: '💉', kategori: 'Clinical & Learning' },
+  { id: 'drugInfo', label: 'Drug & Herbal Information', ringkas: '550 substances, 41 herbal preparations, and the official label', ke: '/drug-info', emoji: '💉', kategori: 'Clinical & Learning' },
   { id: 'empirik', label: 'Empirical Therapy', ringkas: 'Empirical antibiotics by source of infection', ke: '/empiric-therapy-reference', emoji: '🦠', kategori: 'Clinical & Learning' },
   { id: 'lesi', label: 'Skin Lesion Mapper', ringkas: 'Recognise lesion morphology', ke: '/dermatology-lesion-mapper', emoji: '🔎', kategori: 'Clinical & Learning' },
   { id: 'psikiatri', label: 'Mental State Exam', ringkas: 'Structured psychiatric examination', ke: '/psychiatric-status-exam', emoji: '🧠', kategori: 'Clinical & Learning' },

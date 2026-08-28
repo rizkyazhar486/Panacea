@@ -59,6 +59,8 @@ export interface KelompokAtc {
   sub: { nama: string; obat: Obat[] }[]
 }
 
+import { OBAT_PER_KELUHAN } from './golonganObat'
+
 const o = (nama: string, kelas: string, untuk: string, eml?: boolean, catatan?: string): Obat =>
   ({ nama, kelas, untuk, ...(eml ? { eml: true } : {}), ...(catatan ? { catatan } : {}) })
 
@@ -823,6 +825,105 @@ export function jumlahObat(): number {
 
 export function jumlahEml(): number {
   return semuaObat().filter((x) => x.eml).length
+}
+
+/**
+ * Ejaan Indonesia untuk nama INN.
+ *
+ * Corpus SKDI memakai ejaan Indonesia ("Amoksisilin", "Parasetamol",
+ * "Seftriakson") sedangkan katalog ini memakai INN. Tanpa jembatan ini,
+ * pencarian dosis gagal diam-diam pada obat yang justru paling sering dipakai.
+ *
+ * DITULIS SATU PER SATU, TIDAK DITEBAK DENGAN ATURAN ALIH-EJAAN. Aturan
+ * "c menjadi k" dan sejenisnya bekerja untuk sebagian besar nama lalu gagal
+ * pada sebagian kecil — dan pada nama obat, gagal berarti mencocokkan zat yang
+ * keliru. Daftar yang ditulis tangan bisa kurang lengkap; ia tidak bisa salah.
+ */
+const EJAAN_ID: Record<string, string[]> = {
+  'Amoxicillin': ['Amoksisilin'],
+  'Paracetamol': ['Parasetamol'],
+  'Omeprazole': ['Omeprazol'],
+  'Ceftriaxone': ['Seftriakson'],
+  'Cefalexin': ['Sefaleksin'],
+  'Ciprofloxacin': ['Siprofloksasin'],
+  'Azithromycin': ['Azitromisin'],
+  'Chloramphenicol': ['Kloramfenikol'],
+  'Metronidazole': ['Metronidazol'],
+  'Albendazole': ['Albendazol'],
+  'Gentamicin': ['Gentamisin'],
+  'Captopril': ['Kaptopril'],
+  'Amlodipine': ['Amlodipin'],
+  'Bisoprolol': ['Bisoprolol'],
+  'Furosemide': ['Furosemid'],
+  'Hydrochlorothiazide': ['Hidroklorotiazid'],
+  'Spironolactone': ['Spironolakton'],
+  'Digoxin': ['Digoksin'],
+  'Glibenclamide': ['Glibenklamid'],
+  'Liraglutide': ['Liraglutid'],
+  'Dapagliflozin': ['Dapagliflozin'],
+  'Prednisolone': ['Prednison'],
+  'Hydrocortisone (systemic)': ['Hidrokortison'],
+  'Budesonide': ['Budesonid'],
+  'Fluticasone': ['Flutikason'],
+  'Ipratropium bromide': ['Ipratropium'],
+  'Acetylcysteine': ['Asetilsistein'],
+  'Dextromethorphan': ['Dekstrometorfan'],
+  'Chlorphenamine': ['Klorfeniramin'],
+  'Cetirizine': ['Setirizin'],
+  'Diphenhydramine': ['Difenhidramin'],
+  'Dimenhydrinate': ['Dimenhidrinat'],
+  'Metoclopramide': ['Metoklopramid'],
+  'Loperamide': ['Loperamid'],
+  'Lactulose': ['Laktulosa'],
+  'Bisacodyl': ['Bisakodil'],
+  'Psyllium': ['Psilium'],
+  'Simeticone': ['Simetikon'],
+  'Hyoscine butylbromide': ['Hiosin'],
+  'Betahistine': ['Betahistin'],
+  'Phenytoin': ['Fenitoin'],
+  'Nitrofurantoin': ['Nitrofurantoin'],
+  'Ketoconazole (topical)': ['Ketokonazol'],
+  'Noradrenaline (norepinephrine)': ['Norepinefrin'],
+  'Dobutamine': ['Dobutamin'],
+  'Dopamine': ['Dopamin'],
+  'Propranolol': ['Propranolol'],
+  'Isosorbide dinitrate': ['ISDN'],
+  'Oral rehydration salts': ['Oralit'],
+  'Pseudoephedrine': ['Pseudoefedrin'],
+  'Cyanocobalamin (B12)': ['Mekobalamin'],
+  'Zinc sulfate': ['Zinc'],
+  'Zinc sulfate (supplement)': ['Zinc'],
+}
+
+/**
+ * Dosis dari corpus SKDI, bila zat ini memang ada di sana.
+ *
+ * Dosis TIDAK ditulis di katalog ini — lihat kepala berkas. Tetapi aplikasi ini
+ * sudah punya corpus berdosis yang dikurasi (golonganObat.ts), dan membiarkan
+ * keduanya terpisah berarti pemakainya menemukan zatnya di satu layar lalu
+ * harus mencarinya lagi di layar lain untuk dosis yang sebenarnya sudah ada.
+ *
+ * Pencocokan dilakukan atas NAMA ZAT di dalam medan `contoh`, dan dilakukan
+ * dengan batas kata — bukan dengan `includes` polos. Tanpa batas kata,
+ * "Aspirin" cocok dengan "Aspirin-dipiridamol" dan, lebih buruk, potongan nama
+ * pendek cocok dengan zat yang sama sekali lain.
+ */
+export function dosisSkdi(nama: string): { keluhan: string; golongan: string; dosis: string }[] {
+  const dasar = nama.replace(/\s*\(.*?\)\s*/g, '').trim()
+  const kandidat = [dasar, ...(EJAAN_ID[nama] ?? EJAAN_ID[dasar] ?? [])].filter((x) => x.length >= 4)
+  if (!kandidat.length) return []
+  const pola = kandidat.map(
+    (x) => new RegExp(`(^|[^a-z])${x.toLowerCase().replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}([^a-z]|$)`, 'i'),
+  )
+  const keluar: { keluhan: string; golongan: string; dosis: string }[] = []
+  for (const k of OBAT_PER_KELUHAN) {
+    for (const g of k.golongan) {
+      if (g.dosis && pola.some((r) => r.test(g.contoh))) {
+        keluar.push({ keluhan: k.keluhan, golongan: g.nama, dosis: g.dosis })
+      }
+    }
+  }
+  return keluar
 }
 
 export default ATC
