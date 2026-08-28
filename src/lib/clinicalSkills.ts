@@ -1181,6 +1181,35 @@ export const CLINICAL_SKILLS: ClinicalSkill[] = [
         ],
       },
       {
+        fase: '5b. Intubasi urutan cepat — obat dan takarannya',
+        steps: [
+          'PRAPENANGANAN bila berindikasi: fentanil 1-3 µg/kgBB IV 3 menit sebelumnya untuk meredam lonjakan tekanan darah dan tekanan intrakranial (cedera kepala, diseksi aorta, penyakit jantung iskemik). Cairan dan vasopresor disiapkan LEBIH DAHULU pada yang tekanannya rendah.',
+          'PENIDUR — ETOMIDAT 0,3 mg/kgBB IV adalah yang paling stabil terhadap tekanan darah; ia menekan kortisol sekali pemberian, dan itu bukan alasan menghindarinya pada keadaan darurat.',
+          'PENIDUR — KETAMIN 1-2 mg/kgBB IV (0,5-1 mg/kgBB bila tekanan darah sudah rendah): ia mempertahankan tekanan darah dan sekaligus melebarkan bronkus, sehingga menjadi pilihan pada asma berat dan pada syok. Ia menaikkan produksi air liur; siapkan suction.',
+          'PENIDUR — PROPOFOL 1,5-2,5 mg/kgBB IV: mudah dititrasi, tetapi MENURUNKAN TEKANAN DARAH dengan tajam; dihindari pada syok dan pada penderita yang belum dicairkan.',
+          'PENIDUR — MIDAZOLAM 0,1-0,3 mg/kgBB IV bila tidak ada yang lain; mulai kerjanya paling lambat di antara semuanya dan tekanan darah ikut turun.',
+          'PELUMPUH — SUKSINILKOLIN 1,5 mg/kgBB IV: mulai kerja 45-60 detik, habis dalam 6-10 menit. DILARANG bila ada hiperkalemia, gagal ginjal dengan kalium tinggi, luka bakar atau cedera remuk yang berumur lebih dari 48 jam sampai 6 bulan, penyakit neuromuskular, dan riwayat hipertermia maligna — pada keadaan itu ia melepaskan kalium dan dapat menghentikan jantung.',
+          'PELUMPUH — ROKURONIUM 1,2 mg/kgBB IV: mulai kerja hampir sama cepat pada dosis ini, tanpa satu pun larangan di atas; kerjanya 45-70 menit, dan itu berarti bila intubasi gagal penderita tetap lumpuh — karena itu rencana penyelamatan harus sudah siap sebelum obatnya masuk. Sugamadeks 16 mg/kgBB membalikkannya bila tersedia.',
+          'URUTANNYA: preoksigenasi → prapenanganan → penidur → pelumpuh, penidur dan pelumpuh disuntikkan berurutan tanpa jeda, lalu tunggu 45-60 detik SAMBIL TIDAK memompa (kecuali saturasi turun) agar lambung tidak terisi udara.',
+          'PENIDUR TIDAK PERNAH DILEWATI ketika pelumpuh diberikan. Penderita yang lumpuh tanpa tertidur mengalami seluruh tindakan dalam keadaan sadar tanpa dapat memberi tanda apa pun; ini kekeliruan yang meninggalkan bekas seumur hidup.',
+          'SESUDAH tabung terpasang dan letaknya terbukti: sedasi diteruskan (midazolam 0,05-0,1 mg/kgBB/jam, propofol 1-4 mg/kgBB/jam, atau fentanil 1-2 µg/kgBB/jam) — pelumpuh habis jauh lebih cepat daripada yang diperkirakan orang.',
+        ],
+      },
+      {
+        fase: '5c. Ukuran pada anak dan bayi — angka yang harus ada di kepala',
+        steps: [
+          'ETT tanpa balon: (umur dalam tahun / 4) + 4. Dengan balon: (umur / 4) + 3,5. Bayi cukup bulan 3,0-3,5 mm; prematur 2,5-3,0 mm. Sediakan setengah ukuran di atas dan di bawah.',
+          'KEDALAMAN pada bibir = ukuran tabung x 3. Tabung 4,0 mm dipasang sampai 12 cm; tabung 3,5 mm sampai 10,5 cm. Pada neonatus, angka lain yang dipakai: 6 + berat badan dalam kilogram.',
+          'BILAH LURUS (Miller) 0 untuk prematur, 1 untuk bayi cukup bulan sampai 1 tahun, 2 untuk anak sampai sekitar 6 tahun — epiglotis anak panjang, lemas, dan berbentuk omega sehingga harus diangkat LANGSUNG, bukan lewat valekula.',
+          'OPA diukur dari sudut mulut ke angulus mandibula seperti pada dewasa, tetapi TIDAK PERNAH DIPUTAR 180 derajat pada anak — langit-langitnya lunak dan mudah robek; masukkan menghadap ke bawah dengan bantuan spatula lidah.',
+          'POSISI: bayi diganjal pada BAHU, bukan kepala. Oksiput bayi besar sehingga berbaring datar sudah memfleksikan lehernya; menambah bantal justru menutup jalan napasnya.',
+          'Bagian tersempit jalan napas anak kecil ada di daerah KRIKOID, bukan di pita suara — itu sebab tabung dapat melewati pita suara tetapi tertahan di bawahnya, dan sebab tabung yang terlalu besar meninggalkan cedera subglotis.',
+          'ANAK MENJADI HIPOKSIA JAUH LEBIH CEPAT: kebutuhan oksigennya per kilogram dua kali dewasa sementara kapasitas residu fungsionalnya lebih kecil. Preoksigenasi mutlak, dan jendela percobaannya jauh lebih pendek.',
+          'BRADIKARDIA pada anak adalah tanda HIPOKSIA sampai terbukti sebaliknya — jawabannya oksigen dan ventilasi, bukan langsung atropin. Atropin 0,02 mg/kgBB (minimal 0,1 mg) disiapkan bila diperlukan.',
+          'Suction anak: kateter lunak, tekanan 80-100 mmHg (dewasa 100-150 mmHg), tidak lebih dari 5-10 detik sekali sedot.',
+        ],
+      },
+      {
         fase: '6. Intubasi endotrakeal — langkahnya',
         steps: [
           'Berdiri di kepala penderita, tempat tidur setinggi pinggang Anda. Posisi mengendus sudah diatur.',
