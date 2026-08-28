@@ -41,6 +41,7 @@ export const WIDGETS: WidgetDef[] = [
   { id: 'medStudy', label: 'Med Study Hub', ringkas: 'Question bank, OSCE technique, and exam plans', ke: '/med-study', emoji: '📚', kategori: 'Clinical & Learning' },
   { id: 'tatalaksana', label: 'SKDI Therapy', ringkas: 'Find drugs and doses by disease', ke: '/med-study?bagian=therapy', emoji: '💊', kategori: 'Clinical & Learning' },
   { id: 'penyakit', label: 'SKDI Disease List', ringkas: 'Full notes for each disease', ke: '/med-study?bagian=diseases', emoji: '📖', kategori: 'Clinical & Learning' },
+  { id: 'usmle', label: 'Preclinical & USMLE', ringkas: 'Step 1, Step 2 CK, Step 3, ECFMG, and specialty training', ke: '/med-study?bagian=usmle', emoji: '🎓', kategori: 'Clinical & Learning' },
   { id: 'osce', label: 'OSCE UKMPPD Stations', ringkas: 'Recap of 1,416 stations, 32 sittings', ke: '/osce-ukmppd', emoji: '🩺', kategori: 'Clinical & Learning' },
   { id: 'caseBank', label: 'OSCE Case Bank', ringkas: 'Cases and how often they appear', ke: '/med-study?bagian=case-bank', emoji: '📋', kategori: 'Clinical & Learning' },
   { id: 'simulator', label: 'Station Simulator', ringkas: 'Practise a station against the clock', ke: '/med-study?bagian=station-sim', emoji: '🎭', kategori: 'Clinical & Learning' },

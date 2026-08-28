@@ -7,7 +7,7 @@ import { IconBook, IconStethoscope, IconSparkle, IconActivity } from '../compone
 import { STUDY_TECHNIQUES, OSCE_TECHNIQUE, MOTIVATION, EXAM_TIMELINE } from '../lib/studyContent'
 import { EXAM_INFO, EXAM_ORDER, questionsForExam, type ExamTrack } from '../lib/examBank'
 
-type Section = 'practice' | 'osce' | 'case-bank' | 'station-sim' | 'skills' | 'procedures' | 'therapy' | 'diseases' | 'mnemonik' | 'techniques' | 'timeline'
+type Section = 'practice' | 'osce' | 'case-bank' | 'station-sim' | 'skills' | 'procedures' | 'therapy' | 'diseases' | 'mnemonik' | 'techniques' | 'timeline' | 'usmle'
 
 const SECTIONS: { id: Section; label: string; emoji: string }[] = [
   { id: 'practice', label: 'Question Bank', emoji: '❓' },
@@ -20,6 +20,7 @@ const SECTIONS: { id: Section; label: string; emoji: string }[] = [
   { id: 'diseases', label: 'Daftar Penyakit SKDI', emoji: '📖' },
   { id: 'mnemonik', label: 'Jembatan Keledai', emoji: '🔤' },
   { id: 'techniques', label: 'Cara Belajar', emoji: '🧠' },
+  { id: 'usmle', label: 'Preclinical & USMLE', emoji: '🎓' },
   { id: 'timeline', label: 'Exam Plan', emoji: '📅' },
 ]
 
@@ -34,6 +35,7 @@ const OsceCaseBankSection = lazy(() => import('./medstudy/OsceCaseBankSection'))
 const StationSimulatorSection = lazy(() => import('./medstudy/StationSimulatorSection'))
 const ClinicalSkillsSection = lazy(() => import('./medstudy/ClinicalSkillsSection'))
 const MnemonikSection = lazy(() => import('./medstudy/MnemonikSection'))
+const UsmleSection = lazy(() => import('./medstudy/UsmleSection'))
 
 function SectionFallback() {
   return <RangkaDaftar jumlah={4} />
@@ -93,7 +95,7 @@ export function MedStudyHub() {
             /* h-10: 40 px adalah batas bawah sasaran sentuh. Dengan py-1.5 keping
                ini hanya 30 px, dan pada kisi sepuluh keping yang saling
                berdempetan meleset satu keping berarti membuka bagian lain. */
-            className={`flex h-10 items-center rounded-full px-3 text-xs font-bold transition ${section === s.id ? 'bg-brand text-white' : 'bg-neutral-100 text-neutral-500 hover:bg-neutral-200'}`}
+            className={`flex h-10 items-center rounded-full px-3 text-xs font-bold transition ${section === s.id ? 'bg-brand text-ink' : 'bg-neutral-100 text-neutral-500 hover:bg-neutral-200'}`}
           >
             {s.emoji} {s.label}
           </button>
@@ -113,6 +115,7 @@ export function MedStudyHub() {
         {section === 'therapy' && <SkdiTherapySection cariAwal={params.get('cari') ?? ''} />}
         {section === 'diseases' && <SkdiDiseaseDirectorySection />}
         {section === 'mnemonik' && <MnemonikSection />}
+        {section === 'usmle' && <UsmleSection cariAwal={params.get('cari') ?? ''} />}
       </Suspense>
     </div>
   )

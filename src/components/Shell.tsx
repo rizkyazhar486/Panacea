@@ -115,6 +115,8 @@ const nav: Nav[] = [
   { to: '/emergency', label: 'Emergency & SOS', icon: IconShield, roles: ['pasien', 'dokter', 'owner'], group: 'Health' },
   // Klinis
   { to: '/med-study', label: 'Med Study', icon: IconBook, roles: ['pasien', 'dokter', 'owner'], group: 'Clinical & AI' },
+  { to: '/med-study?bagian=usmle', label: 'Preclinical & USMLE', icon: IconBook, roles: ['pasien', 'dokter', 'owner'], group: 'Clinical & AI' },
+  { to: '/evidence', label: 'Clinical Evidence', icon: IconStethoscope, roles: ['pasien', 'dokter', 'owner'], group: 'Clinical & AI' },
   { to: '/osce-ukmppd', label: 'OSCE UKMPPD Stations', icon: IconStethoscope, roles: ['pasien', 'dokter', 'owner'], group: 'Clinical & AI' },
   { to: '/clinical-calculators', label: 'Clinical Calculators', icon: IconActivity, roles: ['pasien', 'dokter', 'owner'], group: 'Clinical & AI' },
   { to: '/drug-info', label: 'Drugs & Prescribing', icon: IconPill, roles: ['pasien', 'dokter', 'owner'], group: 'Clinical & AI' },
