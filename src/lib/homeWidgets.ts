@@ -208,7 +208,7 @@ export const WIDGETS: WidgetDef[] = [
   { id: 'siapKunjungan', label: 'Ready for the Doctor', ringkas: 'Your questions, written before you go', ke: '/visit-prep', emoji: '📋', kategori: 'Services & Emergency' },
   { id: 'pesanan', label: 'Orders', ringkas: 'Your order history', ke: '/orders', emoji: '📦', kategori: 'Services & Emergency' },
   { id: 'keuangan', label: 'Money', ringkas: 'Wallet and transactions', ke: '/keuangan', emoji: '💰', kategori: 'Services & Emergency' },
-  { id: 'salat', label: 'Prayer Times', ringkas: 'Today\'s prayer times', ke: '/prayer-times', emoji: '🕌', kategori: 'Faith & Life' },
+  { id: 'salat', label: 'Prayer Times', ringkas: 'Today\'s prayer times and the Qibla', ke: '/prayer-times', emoji: '🕌', kategori: 'Faith & Life' },
   { id: 'kitab', label: 'Scripture', ringkas: 'Daily reading', ke: '/scripture', emoji: '📜', kategori: 'Faith & Life' },
   { id: 'hadis', label: 'Hadith', ringkas: 'A hadith collection', ke: '/hadith', emoji: '🕋', kategori: 'Faith & Life' },
   { id: 'komunitas', label: 'Community', ringkas: 'News and discussion', ke: '/community', emoji: '👥', kategori: 'Faith & Life' },

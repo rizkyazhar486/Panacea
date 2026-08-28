@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { Prosa } from '../components/Prosa'
+import { Kiblat } from '../components/Kiblat'
 import { Card, SectionTitle, Button, Field, inputClass } from '../components/ui'
 import { Ringkas, Poin } from '../components/Ringkas'
 import { IconShield } from '../components/icons'
@@ -236,6 +237,16 @@ export function Adzan() {
             </div>
           </div>
         )}
+      </Card>
+
+      {/* ── Arah kiblat ──────────────────────────────────────────────────
+          Ditempelkan di sini, bukan dijadikan halaman sendiri: keduanya
+          menjawab pertanyaan yang sama pada saat yang sama. */}
+      <Card>
+        <div className="text-[13px] font-black text-ink">Qibla direction</div>
+        <div className="mt-2">
+          <Kiblat kota={setelan.kota} negara={setelan.negara} />
+        </div>
       </Card>
 
       {/* ── Lokasi dan metode ────────────────────────────────────────────── */}
