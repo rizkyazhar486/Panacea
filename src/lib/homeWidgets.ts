@@ -125,6 +125,7 @@ export const WIDGETS: WidgetDef[] = [
   { id: 'tidur14', label: 'Sleep, 14 Nights', ringkas: 'Median, and the nights that fell short', ke: '/pola-tidur', emoji: '🌙', kategori: 'Sleep & Recovery', bawaan: true },
   { id: 'muatanPekan', label: 'Training Minutes per Week', ringkas: 'The last eight weeks', ke: '/latihan', emoji: '📈', kategori: 'Training', bawaan: true },
   { id: 'kaloriBanding', label: 'Logged Today', ringkas: 'Food and training you\'ve recorded', ke: '/nutrisi', emoji: '🍽️', kategori: 'Nutrition', bawaan: true },
+  { id: 'tdee', label: 'Daily Energy', ringkas: 'BMR, TDEE, calorie target and macros', ke: '/macro-lab', emoji: '🔥', kategori: 'Nutrition', bawaan: true },
   { id: 'kepatuhan', label: 'Adherence, 14 Days', ringkas: 'Complete days, partial days, and missed', ke: '/harian', emoji: '💊', kategori: 'Body & Data', bawaan: true },
   { id: 'beratTren', label: 'Weight, 90 Days', ringkas: 'The three-month direction, not day-to-day noise', ke: '/tubuh', emoji: '⚖️', kategori: 'Body & Data', bawaan: true },
   { id: 'lab', label: 'Lab Results', ringkas: 'HbA1c, ApoB, eGFR — and how they\'ve moved', ke: '/tubuh', emoji: '🧪', kategori: 'Clinical & Learning', bawaan: true },
@@ -323,7 +324,7 @@ export const WIDGET_HIDUP = [
   'komposisi', 'tekanan', 'lajuNapas', 'saturasi', 'suhu', 'lab', 'tenaga',
   'obatPengingat', 'beban', 'ukurBerkala', 'skrining',
   'amsler', 'layar', 'peregangan', 'tekananSebar', 'rangkaian', 'jetlag',
-  'nadiPanjang', 'tidur14', 'muatanPekan', 'kaloriBanding', 'kepatuhan', 'beratTren',
+  'nadiPanjang', 'tidur14', 'muatanPekan', 'kaloriBanding', 'tdee', 'kepatuhan', 'beratTren',
   // ── Grafik tujuh hari (kisi dua kolom, bukan tumpukan) ──────────────────
   'grafikLatihan', 'grafikTidur', 'grafikLangkah', 'grafikGizi', 'grafikDenyut',
   // ── Belajar & klinis ────────────────────────────────────────────────────

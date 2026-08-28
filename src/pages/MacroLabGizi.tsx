@@ -7,6 +7,7 @@ import { IconLeaf } from '../components/icons'
 import { useVitalField } from '../lib/useVitals'
 import { KolomVitalTerikat } from '../components/KolomVital'
 import { getDemo } from '../lib/profile'
+import { hitungTdee, TUJUAN_GIZI, AKTIVITAS_GIZI, PROTEIN_PER_KG, type TujuanGizi, type TingkatAktivitas } from '../lib/tdee'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Macro Lab — target makronutrien dan komposisi makan.
@@ -29,29 +30,6 @@ import { getDemo } from '../lib/profile'
 //      yang jadi penyeimbang, bukan lemak.
 // ─────────────────────────────────────────────────────────────────────────────
 
-type Tujuan = 'defisit' | 'rawat' | 'surplus'
-type Aktivitas = 'ringan' | 'sedang' | 'berat' | 'atlet'
-
-const TUJUAN: { id: Tujuan; label: string; ringkas: string; faktor: number }[] = [
-  { id: 'defisit', label: 'Turun berat', ringkas: 'Defisit ±20%', faktor: 0.8 },
-  { id: 'rawat', label: 'Pertahankan', ringkas: 'Sesuai kebutuhan', faktor: 1 },
-  { id: 'surplus', label: 'Naik massa', ringkas: 'Surplus ±10%', faktor: 1.1 },
-]
-
-const AKTIVITAS: { id: Aktivitas; label: string; f: number }[] = [
-  { id: 'ringan', label: 'Jarang olahraga', f: 1.375 },
-  { id: 'sedang', label: '3-4× sepekan', f: 1.55 },
-  { id: 'berat', label: '5-6× sepekan', f: 1.725 },
-  { id: 'atlet', label: 'Atlet / 2× sehari', f: 1.9 },
-]
-
-/** Protein per kg berat badan menurut tujuan — rentang konsensus ISSN/ACSM. */
-const PROTEIN_PER_KG: Record<Tujuan, [number, number]> = {
-  defisit: [1.8, 2.4],   // lebih tinggi saat defisit: menjaga otot
-  rawat: [1.4, 1.8],
-  surplus: [1.6, 2.2],
-}
-
 export function MacroLabGizi() {
   const demo = useMemo(() => getDemo(), [])
   const ikatBerat = useVitalField('weightKg', demo.weightKg || 70)
@@ -59,47 +37,23 @@ export function MacroLabGizi() {
   const [berat] = ikatBerat
   const [tinggi] = ikatTinggi
   const [umur, setAge] = useState<number | undefined>(demo.age || 30)
-  const [tujuan, setTujuan] = useState<Tujuan>('rawat')
-  const [aktivitas, setAktivitas] = useState<Aktivitas>('sedang')
+  const [tujuan, setTujuan] = useState<TujuanGizi>('rawat')
+  const [aktivitas, setAktivitas] = useState<TingkatAktivitas>('sedang')
   const [makanPerHari, setMakanPerHari] = useState<number | undefined>(3)
 
-  const h = useMemo(() => {
-    const b = berat > 0 ? berat : 70
-    const t = tinggi > 0 ? tinggi : 170
-    const u = umur && umur > 0 ? umur : 30
-    // Mifflin-St Jeor. Dipakai pria/wanita lewat demo.sex bila ada.
-    // Mifflin-St Jeor (1990), Am J Clin Nutr 51(2):241-7.
-    const bmr = 10 * b + 6.25 * t - 5 * u + (demo.sex === 'F' ? -161 : 5)
-    const tdee = bmr * (AKTIVITAS.find((a) => a.id === aktivitas)?.f ?? 1.55)
-    const target = tdee * (TUJUAN.find((x) => x.id === tujuan)?.faktor ?? 1)
-
-    const [pLo, pHi] = PROTEIN_PER_KG[tujuan]
-    const proteinG = Math.round(b * ((pLo + pHi) / 2))
-    // Lantai lemak 0,8 g/kg — di bawah itu hormon dan vitamin larut lemak
-    // mulai terganggu, jadi lemak TIDAK diperlakukan sebagai sisa.
-    const lemakG = Math.max(Math.round(b * 0.8), Math.round((target * 0.25) / 9))
-    const sisaKkal = target - proteinG * 4 - lemakG * 9
-    const karboG = Math.max(0, Math.round(sisaKkal / 4))
-
-    const perMakan = makanPerHari && makanPerHari > 0 ? makanPerHari : 3
-    return {
-      bmr: Math.round(bmr), tdee: Math.round(tdee), target: Math.round(target),
-      proteinG, lemakG, karboG,
-      proteinLo: Math.round(b * pLo), proteinHi: Math.round(b * pHi),
-      pctP: Math.round((proteinG * 4 / target) * 100),
-      pctL: Math.round((lemakG * 9 / target) * 100),
-      pctK: Math.round((karboG * 4 / target) * 100),
-      perMakan: {
-        kkal: Math.round(target / perMakan),
-        protein: Math.round(proteinG / perMakan),
-        karbo: Math.round(karboG / perMakan),
-        lemak: Math.round(lemakG / perMakan),
-      },
-      seratG: Math.round((target / 1000) * 14),   // 14 g per 1000 kkal
-      // 33 mL/kg adalah aturan praktis yang lazim, bukan angka hasil penelitian.
-      airL: Math.round(b * 0.033 * 10) / 10,
-    }
-  }, [berat, tinggi, umur, tujuan, aktivitas, makanPerHari, demo.sex])
+  const h = useMemo(
+    () =>
+      hitungTdee({
+        beratKg: berat,
+        tinggiCm: tinggi,
+        umur: umur ?? 30,
+        sex: demo.sex,
+        tujuan,
+        aktivitas,
+        makanPerHari,
+      }),
+    [berat, tinggi, umur, tujuan, aktivitas, makanPerHari, demo.sex],
+  )
 
   const bar = [
     { l: 'Protein', g: h.proteinG, pct: h.pctP, w: 'bg-emerald-500' },
@@ -129,7 +83,7 @@ export function MacroLabGizi() {
 
         <div className="mt-3 text-[11px] font-black uppercase tracking-wide text-neutral-500">Tujuan</div>
         <div className="mt-2 grid grid-cols-3 gap-1.5">
-          {TUJUAN.map((t) => (
+          {TUJUAN_GIZI.map((t) => (
             <button key={t.id} onClick={() => setTujuan(t.id)} aria-pressed={tujuan === t.id}
               className={`rounded-xl p-2 text-left transition ${tujuan === t.id ? 'bg-brand/25 ring-2 ring-brand' : 'bg-white/5'}`}>
               <div className="text-[12px] font-black text-ink">{t.label}</div>
@@ -140,7 +94,7 @@ export function MacroLabGizi() {
 
         <div className="mt-3 text-[11px] font-black uppercase tracking-wide text-neutral-500">Aktivitas</div>
         <div className="mt-2 grid grid-cols-2 gap-1.5">
-          {AKTIVITAS.map((a) => (
+          {AKTIVITAS_GIZI.map((a) => (
             <button key={a.id} onClick={() => setAktivitas(a.id)} aria-pressed={aktivitas === a.id}
               className={`rounded-xl px-2.5 py-2 text-left text-[12px] font-bold transition ${aktivitas === a.id ? 'bg-brand/25 ring-2 ring-brand text-white' : 'bg-white/5 text-neutral-600'}`}>
               {a.label}
