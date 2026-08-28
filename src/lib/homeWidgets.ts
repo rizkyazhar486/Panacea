@@ -126,6 +126,7 @@ export const WIDGETS: WidgetDef[] = [
   { id: 'muatanPekan', label: 'Training Minutes per Week', ringkas: 'The last eight weeks', ke: '/latihan', emoji: '📈', kategori: 'Training', bawaan: true },
   { id: 'kaloriBanding', label: 'Logged Today', ringkas: 'Food and training you\'ve recorded', ke: '/nutrisi', emoji: '🍽️', kategori: 'Nutrition', bawaan: true },
   { id: 'tdee', label: 'Daily Energy', ringkas: 'BMR, TDEE, calorie target and macros', ke: '/macro-lab', emoji: '🔥', kategori: 'Nutrition', bawaan: true },
+  { id: 'aturanAngka', label: 'How Your Numbers Work', ringkas: 'What each number reads, what moves it, and what to do', ke: '/how-numbers-work', emoji: '🎯', kategori: 'Body & Data' },
   { id: 'kepatuhan', label: 'Adherence, 14 Days', ringkas: 'Complete days, partial days, and missed', ke: '/harian', emoji: '💊', kategori: 'Body & Data', bawaan: true },
   { id: 'beratTren', label: 'Weight, 90 Days', ringkas: 'The three-month direction, not day-to-day noise', ke: '/tubuh', emoji: '⚖️', kategori: 'Body & Data', bawaan: true },
   { id: 'lab', label: 'Lab Results', ringkas: 'HbA1c, ApoB, eGFR — and how they\'ve moved', ke: '/tubuh', emoji: '🧪', kategori: 'Clinical & Learning', bawaan: true },

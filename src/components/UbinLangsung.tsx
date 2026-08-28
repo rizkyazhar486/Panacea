@@ -15,6 +15,7 @@
 
 import { Link } from 'react-router-dom'
 import { getVitals } from '../lib/healthVitals'
+import { useJam } from '../lib/useJam'
 import { getWorkouts } from '../lib/workoutStore'
 import { deretMetrik } from '../lib/riwayatVitals'
 import { GrafikMini } from './GrafikMini'
@@ -259,7 +260,15 @@ function GarisKesegaran({ deret }: { deret: number[] }) {
   )
 }
 
-export function hitungPelatih() {
+// `sekarang` DIWAJIBKAN mengalir dari luar, bukan diambil diam-diam dari
+// Date.now() di dalam sini.
+//
+// Kebugaran dan kelelahan meluruh terhadap waktu, jadi angkanya berubah walau
+// tidak ada latihan baru. Tetapi React hanya menghitung ulang saat ada yang
+// berubah — dan bila waktu tidak pernah menjadi salah satu masukannya, tidak
+// ada yang berubah. Ubin yang dibiarkan terbuka melewati tengah malam lalu
+// menampilkan angka KEMARIN, dan yang membacanya menyimpulkan angkanya macet.
+export function hitungPelatih(sekarang = Date.now()) {
   const sesi = getWorkouts()
   if (sesi.length < 3) return null
   const demo = getDemo()
@@ -271,7 +280,7 @@ export function hitungPelatih() {
     hrRest: typeof v.restingHr === 'number' && v.restingHr > 0 ? v.restingHr : 60,
     sex: jk,
   }
-  const ff = kebugaranKesegaran(sesi, k, 90)
+  const ff = kebugaranKesegaran(sesi, k, 90, sekarang)
   const kini = ff.length ? ff[ff.length - 1] : null
   if (!kini) return null
   // Bila modelnya tidak dapat dihitung, ubin ini TIDAK ADA — lebih baik
@@ -281,7 +290,8 @@ export function hitungPelatih() {
 }
 
 export function UbinPelatihLebar() {
-  const hasil = hitungPelatih()
+  const sekarang = useJam()
+  const hasil = hitungPelatih(sekarang)
   if (!hasil) return null
   const { sesi, k, kini, ff } = hasil
   const saran = saranBerikutnya(sesi, k)

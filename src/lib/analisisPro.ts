@@ -84,8 +84,8 @@ export interface TitikKebugaran {
   upaya: number
 }
 
-const TAU_KEBUGARAN = 42
-const TAU_KELELAHAN = 7
+export const TAU_KEBUGARAN = 42
+export const TAU_KELELAHAN = 7
 
 /**
  * Model impuls-respons Banister: dua rerata bergerak eksponensial atas upaya
