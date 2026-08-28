@@ -111,6 +111,7 @@ const Hadis = lazy(() => import('./pages/Hadis').then((m) => ({ default: m.Hadis
 const Adzan = lazy(() => import('./pages/Adzan').then((m) => ({ default: m.Adzan })))
 const AturanAngka = lazy(() => import('./pages/AturanAngka').then((m) => ({ default: m.AturanAngka })))
 const Kalistenik = lazy(() => import('./pages/Kalistenik').then((m) => ({ default: m.Kalistenik })))
+const PapanAtlet = lazy(() => import('./pages/PapanAtlet').then((m) => ({ default: m.PapanAtlet })))
 const Perubahan = lazy(() => import('./pages/Perubahan').then((m) => ({ default: m.Perubahan })))
 const Learn = lazy(() => import('./pages/Learn').then((m) => ({ default: m.Learn })))
 const DekConnect = lazy(() => import('./pages/DekConnect').then((m) => ({ default: m.DekConnect })))
@@ -340,6 +341,7 @@ createRoot(document.getElementById('root')!).render(
               <Route path="/pelacak-klinis" element={<Navigate to="/tubuh?t=klinis" replace />} />
               <Route path="/how-numbers-work" element={<AturanAngka />} />
               <Route path="/calisthenics" element={<Kalistenik />} />
+              <Route path="/athlete-board" element={<PapanAtlet />} />
               <Route path="/analisis-pro" element={<Navigate to="/latihan?t=analisis" replace />} />
               <Route path="/clinical-hub" element={<ClinicalHub />} />
               <Route path="/sleep-toolkit" element={<SleepToolkit />} />

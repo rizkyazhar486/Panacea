@@ -128,6 +128,7 @@ export const WIDGETS: WidgetDef[] = [
   { id: 'tdee', label: 'Daily Energy', ringkas: 'BMR, TDEE, calorie target and macros', ke: '/macro-lab', emoji: '🔥', kategori: 'Nutrition', bawaan: true },
   { id: 'aturanAngka', label: 'How Your Numbers Work', ringkas: 'What each number reads, what moves it, and what to do', ke: '/how-numbers-work', emoji: '🎯', kategori: 'Body & Data' },
   { id: 'kalistenik', label: 'Calisthenics Ladder', ringkas: 'Beginner to advanced — 109 movements, 4 phases', ke: '/calisthenics', emoji: '🤸', kategori: 'Training' },
+  { id: 'papanAtlet', label: 'Athlete Board', ringkas: 'Load, ratio, focus, and when you train', ke: '/athlete-board', emoji: '📈', kategori: 'Training' },
   { id: 'ayatHarian', label: 'Verse of the Day', ringkas: 'One verse, both translations, recitation and commentary', ke: '/scripture', emoji: '📖', kategori: 'Faith & Life' },
   { id: 'hitungHari', label: 'Days Since', ringkas: 'Day counters for habits you are changing', ke: '/harian', emoji: '📅', kategori: 'Body & Data' },
   { id: 'kepatuhan', label: 'Adherence, 14 Days', ringkas: 'Complete days, partial days, and missed', ke: '/harian', emoji: '💊', kategori: 'Body & Data', bawaan: true },
