@@ -84,6 +84,12 @@ export type Tanda =
   //    rifampisin + heparin menyala, padahal tidak ada yang terjadi di sana.
   | 'imunosupresan-sempit'
   | 'doac' | 'warfarin'
+  // ── Putaran ketiga ────────────────────────────────────────────────────────
+  | 'kardiotoksik' | 'ototoksik'
+  | 'metotreksat' | 'hambat-sekresi-tubular'
+  | 'bradikardik'
+  | 'opioid' | 'benzodiazepin'
+  | 'nsaid' | 'raas'
 
 /** Penandaan menurut GOLONGAN farmakologi di katalog obat. */
 const TANDA_KELAS: { cocok: RegExp; tanda: Tanda[] }[] = [
@@ -104,7 +110,13 @@ const TANDA_KELAS: { cocok: RegExp; tanda: Tanda[] }[] = [
   { cocok: /direct factor Xa inhibitor|direct thrombin inhibitor/i, tanda: ['doac'] },
   { cocok: /beta blocker|calcium channel blocker|alpha-2 agonist|vasodilator|alpha-1 blocker|If channel/i, tanda: ['antihipertensi'] },
   { cocok: /dopamine precursor|dopamine agonist|MAO-B|COMT/i, tanda: ['levodopa'] },
-  { cocok: /statin|HMG-CoA|antituberculosis|triazole antifungal|antiretroviral|reverse transcriptase|protease inhibitor/i, tanda: ['hepatotoksik'] },
+  /* 'hepatotoksik' sempat mencakup statin dan seluruh antiretroviral, dan
+     akibatnya aturan hati menjadi yang PALING SERING menyala dari semuanya —
+     630 dari 191.271 pasangan. Statin jarang benar-benar merusak hati
+     (persoalannya otot, dan itu sudah punya aturannya sendiri), dan
+     antiretroviral modern juga tidak. Yang tersisa hanyalah golongan yang
+     memang dikenal hepatotoksik; sisanya ditandai satu per satu pada zatnya. */
+  { cocok: /antituberculosis|triazole antifungal/i, tanda: ['hepatotoksik'] },
   { cocok: /aminoglycoside|glycopeptide|polymyxin|platinum compound|contrast medium/i, tanda: ['nefrotoksik'] },
   { cocok: /contraceptive|progestogen|oestrogen/i, tanda: ['kontrasepsi-hormonal'] },
   { cocok: /reverse transcriptase inhibitor|integrase|protease inhibitor|non-nucleoside/i, tanda: ['antiretroviral'] },
@@ -127,7 +139,16 @@ const TANDA_KELAS: { cocok: RegExp; tanda: Tanda[] }[] = [
   { cocok: /live attenuated vaccine/i, tanda: ['vaksin-hidup'] },
   { cocok: /SSRI|SNRI|thiazide/i, tanda: ['hiponatremia'] },
   { cocok: /neuromuscular blocker/i, tanda: ['blokade-neuromuskular'] },
-  { cocok: /aminoglycoside/i, tanda: ['potensiasi-nm'] },
+  { cocok: /aminoglycoside/i, tanda: ['potensiasi-nm', 'ototoksik'] },
+  // ── Putaran ketiga ────────────────────────────────────────────────────────
+  { cocok: /anthracycline|anti-HER2/i, tanda: ['kardiotoksik'] },
+  { cocok: /platinum compound|loop diuretic|glycopeptide/i, tanda: ['ototoksik'] },
+  { cocok: /NSAID|COX-2/i, tanda: ['nsaid', 'hambat-sekresi-tubular'] },
+  { cocok: /penicillin|aminopenicillin/i, tanda: ['hambat-sekresi-tubular'] },
+  { cocok: /ACE inhibitor|angiotensin receptor blocker|neprilysin|mineralocorticoid receptor antagonist|non-steroidal MRA/i, tanda: ['raas'] },
+  { cocok: /beta blocker|non-dihydropyridine calcium channel blocker|cardiac glycoside|If channel|acetylcholinesterase inhibitor/i, tanda: ['bradikardik'] },
+  { cocok: /opioid|synthetic opioid/i, tanda: ['opioid'] },
+  { cocok: /benzodiazepine/i, tanda: ['benzodiazepin'] },
 ]
 
 /** Zat yang perilakunya menyimpang dari golongannya. Ditulis satu per satu. */
@@ -140,13 +161,10 @@ const TANDA_ZAT: Record<string, Tanda[]> = {
   'Itraconazole': ['hambat-cyp3a4'],
   'Voriconazole': ['hambat-cyp3a4', 'hepatotoksik'],
   'Ketoconazole (topical)': ['hambat-cyp3a4'],
-  'Ritonavir': ['hambat-cyp3a4', 'antiretroviral'],
   'Nirmatrelvir/ritonavir': ['hambat-cyp3a4'],
   'Cimetidine': ['hambat-cyp3a4'],
   'Lithium carbonate': ['litium'],
-  'Amiodarone': ['qt', 'hepatotoksik', 'hambat-cyp3a4'],
   'Tramadol': ['serotonergik', 'sedatif'],
-  'Methotrexate': ['hepatotoksik', 'nefrotoksik'],
   'Paracetamol': ['hepatotoksik'],
   'Isoniazid': ['hepatotoksik'],
   'Pyrazinamide': ['hepatotoksik'],
@@ -195,6 +213,28 @@ const TANDA_ZAT: Record<string, Tanda[]> = {
   'Methadone': ['qt', 'sedatif'],
   'Citalopram': ['serotonergik', 'qt', 'hiponatremia'],
   'Escitalopram': ['serotonergik', 'qt', 'hiponatremia'],
+  'Nevirapine': ['hepatotoksik', 'antiretroviral'],
+  'Efavirenz': ['hepatotoksik', 'antiretroviral'],
+  'Ritonavir': ['hambat-cyp3a4', 'antiretroviral', 'hepatotoksik'],
+  // ── Putaran ketiga ────────────────────────────────────────────────────────
+  'Methotrexate': ['metotreksat', 'mielosupresi', 'hepatotoksik', 'nefrotoksik'],
+  'Simvastatin': ['miopati', 'hepatotoksik'],
+  'Atorvastatin': ['miopati', 'hepatotoksik'],
+  'Amiodarone': ['qt', 'hepatotoksik', 'hambat-cyp3a4', 'bradikardik'],
+  'Diltiazem': ['antihipertensi', 'bradikardik', 'hambat-cyp3a4'],
+  'Verapamil': ['antihipertensi', 'bradikardik', 'hambat-cyp3a4'],
+  'Doxorubicin': ['kardiotoksik', 'mielosupresi'],
+  'Daunorubicin': ['kardiotoksik', 'mielosupresi'],
+  'Trastuzumab': ['kardiotoksik'],
+  'Cisplatin': ['ototoksik', 'nefrotoksik', 'mielosupresi'],
+  'Furosemide': ['kalium-turun', 'antihipertensi', 'ototoksik'],
+  'Vancomycin': ['nefrotoksik', 'ototoksik'],
+  'Tenofovir disoproxil': ['nefrotoksik', 'antiretroviral'],
+  'Probenecid': ['hambat-sekresi-tubular'],
+  'Haloperidol': ['qt', 'antikolinergik', 'sedatif'],
+  'Chlorpromazine': ['qt', 'antikolinergik', 'sedatif'],
+  'Hydroxyzine': ['qt', 'antikolinergik', 'sedatif'],
+  'Ondansetron': ['qt'],
 }
 
 /** Penandaan herbal, ditulis per tanaman. */
@@ -333,7 +373,11 @@ const ATURAN: Aturan[] = [
   { a: 'hiperglikemik', b: 'hipoglikemik', berat: 'perhatian',
     judul: 'Glucose control will be disturbed',
     sebab: 'Corticosteroids raise blood glucose, often substantially, and the diabetes treatment usually needs adjusting up during the course and back down afterwards.' },
-  { a: 'mielosupresi', b: 'mielosupresi', berat: 'serius',
+  /* 'perhatian', bukan 'serius': kemoterapi kombinasi memang dirancang
+     menumpuk mielosupresi, dan menandainya serius berarti memperingatkan
+     regimen yang justru benar. Yang diminta di sini pemantauan, bukan
+     penghindaran. */
+  { a: 'mielosupresi', b: 'mielosupresi', berat: 'perhatian',
     judul: 'Additive bone marrow suppression',
     sebab: 'Neutropenia, anaemia and thrombocytopenia deepen together. Blood count monitoring is the safeguard.' },
   { a: 'miopati', b: 'miopati', berat: 'serius',
@@ -357,6 +401,27 @@ const ATURAN: Aturan[] = [
   { a: 'potensiasi-nm', b: 'blokade-neuromuskular', berat: 'perhatian',
     judul: 'Neuromuscular blockade may be prolonged',
     sebab: 'Aminoglycosides potentiate neuromuscular blockers, delaying recovery of breathing after anaesthesia.' },
+  { a: 'hambat-cyp3a4', b: 'miopati', berat: 'serius',
+    judul: 'Statin or colchicine levels rise — muscle injury risk',
+    sebab: 'Macrolides, azole antifungals and some calcium channel blockers block the enzyme that clears simvastatin, atorvastatin and colchicine. Rhabdomyolysis and fatal colchicine toxicity have both occurred this way, and the usual answer is to pause the statin for the antibiotic course.' },
+  { a: 'kardiotoksik', b: 'kardiotoksik', berat: 'serius',
+    judul: 'Additive cardiac toxicity',
+    sebab: 'Anthracyclines and trastuzumab both damage myocardium, and together the fall in ejection fraction is greater. Cardiac function is monitored, not assumed.' },
+  { a: 'ototoksik', b: 'ototoksik', berat: 'perhatian',
+    judul: 'Additive hearing and balance damage',
+    sebab: 'Aminoglycosides, platinum agents, vancomycin and loop diuretics are each ototoxic, and the damage is usually permanent. Rapid infusion and dehydration make it worse.' },
+  { a: 'hambat-sekresi-tubular', b: 'metotreksat', berat: 'serius',
+    judul: 'Methotrexate clearance falls — toxicity risk',
+    sebab: 'NSAIDs, penicillins, probenecid and proton pump inhibitors compete with methotrexate for renal tubular secretion. Levels rise, and marrow and mucosal toxicity follow. This has killed patients on weekly low-dose methotrexate.' },
+  { a: 'bradikardik', b: 'bradikardik', berat: 'serius',
+    judul: 'Bradycardia and heart block risk',
+    sebab: 'Beta blockers with verapamil or diltiazem, or either with digoxin or amiodarone, can slow conduction to the point of arrest. The intravenous combination is the most dangerous.' },
+  { a: 'opioid', b: 'benzodiazepin', berat: 'serius',
+    judul: 'Respiratory depression — a leading cause of overdose death',
+    sebab: 'Each depresses breathing by a different route and together the effect is more than additive. This combination carries a boxed warning in most countries. Where it is unavoidable, doses are kept low and naloxone is made available.' },
+  { a: 'nsaid', b: 'raas', berat: 'perhatian',
+    judul: 'Acute kidney injury risk',
+    sebab: 'NSAIDs constrict the afferent arteriole while ACE inhibitors and ARBs dilate the efferent one, so filtration pressure falls from both sides. Add a diuretic and this is the classic triple whammy — a common, preventable cause of admission.' },
   { a: 'imunosupresan', b: 'imunosupresan', berat: 'perhatian', hanyaHerbal: true,
     judul: 'Immune effects may oppose or add to each other',
     sebab: 'Herbal immunostimulants can oppose prescribed immunosuppression; the direction is not always predictable.' },
