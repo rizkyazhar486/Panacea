@@ -1086,6 +1086,192 @@ export const CLINICAL_SKILLS: ClinicalSkill[] = [
     referensi: ['ATLS2018', 'PAPDI2014', 'HARRISON2022'],
   },
 
+
+  // ══════════════════════════════════════════════════════════════════════════
+  // PENGELOLAAN JALAN NAPAS
+  //
+  // Sebelumnya OPA, NPA, laringoskop, dan ETT hanya muncul sebagai NAMA di
+  // daftar alat pada stasiun ATLS dan ACLS — tidak satu langkah pun mengajarkan
+  // cara memilih ukurannya, memasangnya, dan membuktikan letaknya benar.
+  // Padahal justru itulah yang dinilai, dan justru itu pula yang membunuh bila
+  // keliru: tabung di kerongkongan yang tidak dikenali mematikan lebih cepat
+  // daripada tidak memasang tabung sama sekali.
+  // ══════════════════════════════════════════════════════════════════════════
+  {
+    id: 'jalan-napas-definitif',
+    category: 'Kegawatdaruratan',
+    title: 'Pengelolaan Jalan Napas — OPA, NPA, BVM, dan Intubasi Endotrakeal',
+    subtitle: 'Dari membuka jalan napas dengan tangan sampai memasang tabung, memilih ukurannya, dan membuktikan letaknya',
+    indikasi: [
+      'GAGAL MENJAGA jalan napas: tidak sadar, refleks muntah hilang, mendengkur atau berkumur, GCS 8 atau kurang',
+      'GAGAL MELINDUNGI jalan napas dari isi lambung atau darah: perdarahan saluran cerna atas, muntah berulang, luka bakar wajah dengan jelaga',
+      'GAGAL OKSIGENASI atau VENTILASI: hipoksemia yang tidak terkoreksi, retensi karbon dioksida, kelelahan otot napas',
+      'PERKIRAAN PERJALANAN PENYAKIT: luka bakar inhalasi, angioedema, dan trauma leher yang bengkaknya akan bertambah — dipasang SEBELUM sulit, bukan sesudah',
+      'Henti jantung sesudah penekanan dada dan defibrilasi berjalan, bukan sebelumnya',
+    ],
+    kontraindikasi: [
+      'OPA: penderita yang MASIH punya refleks muntah — akan merangsang muntah dan aspirasi',
+      'NPA: kecurigaan fraktur basis kranii (racoon eyes, Battle sign, rinore atau otore cairan serebrospinal) karena tabung dapat masuk rongga tengkorak; koagulopati berat dan sumbatan hidung',
+      'Intubasi oral: trismus berat dan trauma wajah yang menghalangi mulut — pikirkan jalan napas bedah',
+      'Tidak ada kontraindikasi mutlak untuk mengamankan jalan napas pada penderita yang tidak dapat bernapas',
+    ],
+    alat: [
+      'SUCTION yang SUDAH menyala dan diuji sebelum apa pun dimulai, dengan kateter kaku Yankauer untuk mulut dan kateter lunak untuk tabung',
+      'SUMBER OKSIGEN, bag-valve-mask dengan reservoir, dan sungkup ukuran yang pas (menutup dari pangkal hidung sampai lekuk dagu)',
+      'OPA (Guedel) ukuran 000-4 dan NPA ukuran 6,0-8,0 mm — sediakan satu ukuran di atas dan satu di bawah perkiraan',
+      'LARINGOSKOP: gagang dengan baterai yang sudah diuji nyalanya; BILAH MELENGKUNG (Macintosh) 3 untuk perempuan dewasa dan 4 untuk laki-laki dewasa; BILAH LURUS (Miller) 0-2 untuk bayi dan anak kecil karena epiglotisnya panjang dan lemas sehingga harus diangkat langsung',
+      'ETT (endotracheal tube): dewasa laki-laki 7,5-8,0 mm, perempuan 7,0-7,5 mm; ANAK memakai (umur dalam tahun / 4) + 4 untuk tabung tanpa balon atau + 3,5 untuk tabung berbalon. Sediakan 0,5 mm lebih besar dan lebih kecil',
+      'INTRODUCER (bougie / stilet): stilet lentur dimasukkan ke dalam tabung dan dibengkokkan menyerupai tongkat hoki; BOUGIE dipakai bila hanya epiglotis yang terlihat — ujungnya yang membengkok dimasukkan lebih dahulu, lalu tabung disusupkan menyusurinya',
+      'SPUIT 10 mL untuk mengembangkan balon, dan manometer balon bila tersedia (sasaran 20-30 cmH2O)',
+      'CONNECTOR 15 mm pada pangkal tabung — penghubung baku ke bag-valve-mask dan ke ventilator; periksa ia terpasang erat sebelum tabung dimasukkan',
+      'TAPE atau pengikat tabung, penanda kedalaman, dan gunting; stetoskop; kapnograf gelombang (end-tidal CO2) bila ada',
+      'MAGILL FORCEPS untuk benda asing, LMA sebagai penyelamat, dan set krikotiroidotomi yang SUDAH terbuka di samping tempat tidur',
+      'Obat: sedasi dan pelumpuh otot bila intubasi urutan cepat dikerjakan oleh yang berwenang',
+    ],
+    fases: [
+      {
+        fase: '1. Membuka jalan napas dengan tangan — sebelum satu alat pun disentuh',
+        steps: [
+          'Nilai dahulu: bicara dengan kalimat penuh berarti jalan napasnya terbuka dan tidak perlu apa-apa. Mendengkur berarti pangkal lidah jatuh; berkumur berarti ada cairan; stridor berarti sumbatan di laring.',
+          'HEAD TILT-CHIN LIFT pada penderita tanpa kecurigaan cedera leher: dahi ditekan ke belakang, dagu diangkat pada bagian bertulangnya (bukan pada jaringan lunak di bawah dagu, yang justru mendorong lidah ke belakang).',
+          'JAW THRUST pada SEMUA korban trauma: jari-jari di sudut rahang, rahang bawah didorong ke depan sementara leher dipertahankan segaris. Ini satu-satunya cara membuka jalan napas yang tidak menggerakkan tulang leher.',
+          'SUCTION apa pun yang terlihat — darah, muntahan, gigi lepas. Kateter kaku, di bawah penglihatan langsung, dan TIDAK LEBIH DARI 10-15 DETIK sekali sedot karena penyedotan juga menyedot oksigen.',
+          'Posisi mengendus (sniffing position) pada dewasa: leher difleksikan terhadap dada dan kepala diekstensikan terhadap leher — bantal setinggi 7-10 cm di bawah kepala. Pada BAYI justru sebaliknya: kepala netral, karena oksiputnya besar dan bantal justru menekuk jalan napasnya; ganjal di bawah bahu.',
+        ],
+      },
+      {
+        fase: '2. OPA (orofaringeal, Guedel) — ukur, masukkan, buktikan',
+        steps: [
+          'UKUR dari SUDUT MULUT sampai ANGULUS MANDIBULA (atau dari tengah gigi seri sampai sudut rahang). Terlalu panjang menekan epiglotis dan justru menyumbat; terlalu pendek mendorong lidah ke belakang.',
+          'Pastikan penderita TIDAK punya refleks muntah. Bila ia menolak alatnya atau muntah, cabut segera dan ganti dengan NPA.',
+          'DEWASA: masukkan TERBALIK dengan ujung menghadap langit-langit, dorong sampai pangkal lidah, lalu PUTAR 180 derajat sehingga lengkungnya mengikuti lidah.',
+          'ANAK DAN BAYI: JANGAN diputar — langit-langitnya lunak dan mudah robek. Masukkan menghadap ke bawah mengikuti lengkung lidah, dibantu spatula lidah menekan lidah ke bawah.',
+          'BUKTIKAN: flensa di luar bibir, dengkuran hilang, dan udara terdengar bergerak. Bila dengkuran menetap, ukurannya salah atau lidah belum terangkat.',
+        ],
+      },
+      {
+        fase: '3. NPA (nasofaringeal) — untuk yang refleks muntahnya masih ada',
+        steps: [
+          'UKUR dari UJUNG HIDUNG sampai TRAGUS (daun telinga bagian depan). Diameter dipilih kira-kira sebesar jari kelingking penderita; dewasa lazimnya 6,5-7,0 mm untuk perempuan dan 7,0-8,0 mm untuk laki-laki.',
+          'SINGKIRKAN fraktur basis kranii sebelum memasang. Ini kekeliruan yang paling ditakuti pada stasiun trauma.',
+          'Lumasi seluruh batangnya dengan pelumas larut air. Pilih lubang hidung KANAN lebih dahulu bila tidak ada halangan.',
+          'Masukkan TEGAK LURUS terhadap wajah, menyusur DASAR rongga hidung — bukan miring ke atas mengikuti batang hidung. Bila tertahan, jangan dipaksa; putar sedikit atau pindah ke lubang sebelah.',
+          'BUKTIKAN: flensa menempel di lubang hidung, napas terdengar dan terasa di pangkalnya. Perdarahan hidung ringan sering terjadi dan bukan alasan mencabut bila jalan napasnya membaik.',
+        ],
+      },
+      {
+        fase: '4. Ventilasi bag-valve-mask — keterampilan yang menyelamatkan lebih banyak nyawa daripada intubasi',
+        steps: [
+          'Pasang oksigen 15 L/menit dengan reservoir terisi penuh sebelum sungkup ditempelkan.',
+          'PEGANGAN E-C satu penolong: ibu jari dan telunjuk membentuk C menekan sungkup ke wajah; tiga jari sisanya membentuk E mengangkat RAHANG ke sungkup — bukan menekan sungkup ke wajah.',
+          'DUA PENOLONG JAUH LEBIH BAIK dan harus dipilih bila ada orang kedua: satu memegang sungkup dengan dua tangan (pegangan E-C ganda), satu memompa. Kebocoran sungkup adalah sebab tersering ventilasi gagal.',
+          'Pompa sampai DADA BARU TERANGKAT, selama sekitar 1 detik, 10-12 kali per menit pada dewasa dan 20-30 kali pada anak. Memompa terlalu kuat dan terlalu cepat mendorong udara ke LAMBUNG, menaikkan diafragma, dan menimbulkan muntah.',
+          'Bila sulit: pasang OPA atau NPA, perbaiki posisi, tekan krikoid hanya bila memang diperlukan, dan pertimbangkan LMA. Ventilasi yang berhasil dengan sungkup memberi waktu; intubasi yang dipaksakan menghabiskannya.',
+        ],
+      },
+      {
+        fase: '5. Persiapan intubasi — tujuh hal yang disiapkan sebelum laringoskop diambil',
+        steps: [
+          'PREOKSIGENASI 3-5 menit dengan oksigen 100%, atau delapan kali napas dalam bila waktunya mendesak. Inilah yang menentukan berapa lama Anda boleh mencoba tanpa penderita menjadi biru.',
+          'Nilai kesulitan dengan LEMON: Look (wajah, jenggot, trauma), Evaluate 3-3-2 (tiga jari antara gigi, tiga jari dari dagu ke tulang hyoid, dua jari dari hyoid ke tiroid), Mallampati, Obstruction, Neck mobility.',
+          'Siapkan dan UJI: laringoskop menyala, tabung dua ukuran, balon diuji lalu dikempiskan kembali, stilet atau bougie, spuit 10 mL, suction menyala, bag-valve-mask tersambung, alat pemantau terpasang.',
+          'Periksa CONNECTOR 15 mm pada pangkal tabung terpasang rapat — connector yang lepas di dalam mulut saat tabung sudah masuk adalah kepanikan yang tidak perlu.',
+          'Tentukan RENCANA KEDUA dan KETIGA sebelum mencoba yang pertama: bougie, LMA, lalu krikotiroidotomi. Sebutkan keras-keras kepada tim.',
+          'Tetapkan batas: SATU KALI PERCOBAAN maksimal 30 detik, atau berhenti lebih awal bila saturasi turun di bawah 90%. Kembali ke sungkup, oksigenasi ulang, baru mencoba lagi dengan sesuatu yang DIUBAH.',
+        ],
+      },
+      {
+        fase: '6. Intubasi endotrakeal — langkahnya',
+        steps: [
+          'Berdiri di kepala penderita, tempat tidur setinggi pinggang Anda. Posisi mengendus sudah diatur.',
+          'Buka mulut dengan teknik gunting (scissor) memakai ibu jari dan telunjuk tangan kanan pada gigi geraham.',
+          'Pegang laringoskop dengan TANGAN KIRI selalu. Masukkan bilah dari SUDUT KANAN mulut, sapu lidah ke KIRI — lidah yang tertinggal di tengah adalah sebab tersering pita suara tidak terlihat.',
+          'Bilah MELENGKUNG: ujungnya masuk ke VALEKULA (lekuk antara pangkal lidah dan epiglotis), lalu angkat sehingga epiglotis terangkat tidak langsung. Bilah LURUS: epiglotisnya diangkat LANGSUNG dengan ujung bilah.',
+          'ANGKAT sepanjang sumbu gagang, ke arah 45 derajat menjauhi Anda — JANGAN MENGUNGKIT dengan gigi seri sebagai tumpuan; itu mematahkan gigi dan tetap tidak memperlihatkan apa-apa.',
+          'Bila hanya epiglotis yang terlihat, minta BURP (backward, upward, rightward pressure) pada tulang rawan tiroid, atau pakai BOUGIE: rasakan gerigi trakea saat ujungnya menyusur, lalu susupkan tabung menyusurinya sambil bougie ditahan.',
+          'MASUKKAN TABUNG DARI SISI KANAN sambil MATA TETAP MELIHAT pita suara — jangan memasukkan tabung dari tengah karena ia menutupi pandangan Anda sendiri. Lihat balonnya melewati pita suara.',
+          'Cabut stilet SAAT tabung melewati pita suara, teruskan sampai kedalaman sasaran, kembangkan balon dengan 5-10 mL udara sampai kebocoran hilang (tekanan 20-30 cmH2O, tidak lebih — tekanan berlebih menekan aliran darah mukosa trakea).',
+          'KEDALAMAN pada bibir: laki-laki dewasa 22-23 cm, perempuan 21-22 cm; ANAK memakai ukuran tabung dikalikan 3 (tabung 4,0 mm dipasang sampai 12 cm).',
+        ],
+      },
+      {
+        fase: '7. Membuktikan letaknya — bagian yang tidak boleh dipercepat',
+        steps: [
+          'KAPNOGRAFI GELOMBANG adalah baku emas: gelombang persegi yang menetap selama enam kali napas berarti tabung di trakea. Pada henti jantung nilainya rendah tetapi bentuk gelombangnya tetap ada.',
+          'Lihat DADA TERANGKAT SIMETRIS dan embun pada dinding tabung (embun saja tidak cukup — ia juga muncul pada tabung di kerongkongan).',
+          'AUSKULTASI dengan urutan yang benar: LAMBUNG DAHULU (epigastrium — bila terdengar gelembung, cabut segera), lalu aksila KIRI, lalu aksila KANAN. Basal dan apeks kedua paru.',
+          'SUARA DI KANAN SAJA berarti tabung terlalu dalam dan masuk bronkus utama kanan — kempiskan balon, tarik 1-2 cm, kembangkan lagi, dan periksa ulang.',
+          'AMANKAN dengan TAPE atau pengikat: catat angka kedalaman di bibir, dan catat ulang setiap kali penderita dipindahkan. Tabung yang tergeser saat pemindahan adalah komplikasi yang paling sering dan paling mudah dicegah.',
+          'FOTO TORAKS untuk memastikan kedalaman (ujung tabung 2-5 cm di atas karina) — ia MEMASTIKAN KEDALAMAN, bukan memastikan tabung di trakea; foto tidak dapat memisahkan trakea dari kerongkongan dengan andal.',
+          'Sesudah aman: pasang pipa nasogastrik untuk mengempiskan lambung, sedasi sesuai kebutuhan, dan tetapkan setelan ventilator.',
+        ],
+      },
+      {
+        fase: '8. Bila gagal — jalan keluar yang sudah direncanakan',
+        steps: [
+          'DUA KALI GAGAL oleh orang yang sama berarti berhenti mencoba dengan cara yang sama. Kembali ke ventilasi sungkup dan panggil bantuan.',
+          'LMA (sungkup laring) sebagai penyelamat: masukkan mengikuti langit-langit sampai tertahan, kembangkan balonnya, dan ventilasi. Ia tidak melindungi dari aspirasi tetapi ia memberi oksigen.',
+          'TIDAK BISA INTUBASI, TIDAK BISA VENTILASI adalah keadaan yang menuntut KRIKOTIROIDOTOMI: raba membran krikotiroid antara tulang rawan tiroid dan krikoid, sayat melintang, masukkan bougie, lalu tabung 6,0 mm. Pada anak di bawah 12 tahun dipakai tusukan jarum dengan ventilasi jet, bukan sayatan.',
+          'Waktu bukan sekutu di sini: keputusan untuk menyayat harus diambil SEBELUM saturasi memaksa, bukan sesudah.',
+        ],
+      },
+    ],
+    mnemonics: [
+      {
+        akronim: 'LEMON — meramalkan intubasi yang sulit',
+        kepanjangan: [
+          'L — Look externally: jenggot, gigi tonggos, wajah cedera, leher pendek dan gemuk',
+          'E — Evaluate 3-3-2: 3 jari bukaan mulut, 3 jari dagu ke hyoid, 2 jari hyoid ke tiroid',
+          'M — Mallampati: kelas III dan IV memperkirakan pandangan yang sulit',
+          'O — Obstruction: benda asing, abses, angioedema, luka bakar inhalasi',
+          'N — Neck mobility: leher yang kaku atau dikuncikan pada trauma',
+        ],
+      },
+      {
+        akronim: 'Ukuran cepat',
+        kepanjangan: [
+          'OPA — sudut mulut sampai angulus mandibula',
+          'NPA — ujung hidung sampai tragus, sebesar jari kelingking',
+          'ETT dewasa — laki-laki 7,5-8,0 mm, perempuan 7,0-7,5 mm',
+          'ETT anak — (umur/4) + 4 tanpa balon, (umur/4) + 3,5 dengan balon',
+          'Kedalaman anak — ukuran tabung x 3 (tabung 4,0 dipasang sampai 12 cm)',
+          'Bilah — Macintosh 3 perempuan, Macintosh 4 laki-laki, Miller 0-2 bayi',
+        ],
+      },
+      {
+        akronim: 'DOPE — tiba-tiba memburuk sesudah terintubasi',
+        kepanjangan: [
+          'D — Displacement: tabung tergeser, terlalu dalam, atau keluar',
+          'O — Obstruction: tabung tersumbat lendir atau tergigit',
+          'P — Pneumothorax: pneumotoraks tekanan akibat ventilasi',
+          'E — Equipment: bag, connector, sumber oksigen, atau ventilator',
+        ],
+        catatan: 'Lepaskan dari ventilator dan pompa dengan tangan sambil menelusuri keempatnya — tangan merasakan tahanan yang tidak dapat ditunjukkan angka mana pun.',
+      },
+    ],
+    tips: [
+      'Ventilasi sungkup yang baik mengalahkan intubasi yang buruk. Penderita mati karena tidak mendapat oksigen, bukan karena tidak punya tabung.',
+      'Suction dinyalakan dan diuji SEBELUM apa pun dimulai. Suction yang baru dicari saat penderita muntah sama saja dengan tidak ada.',
+      'Jangan mengungkit laringoskop dengan gigi seri sebagai tumpuan — angkat sepanjang sumbu gagang.',
+      'Auskultasi dimulai dari LAMBUNG, bukan dari paru. Urutannya sendiri yang dinilai penguji.',
+      'Suara napas hanya di kanan berarti terlalu dalam — tarik, jangan dorong.',
+      'Catat angka kedalaman di bibir dan periksa ulang setelah setiap pemindahan penderita.',
+      'Pada bayi, ganjal BAHU bukan kepala; oksiput yang besar sudah memfleksikan lehernya sendiri.',
+      'Balon dikembangkan sampai kebocoran berhenti, bukan sampai keras. Tekanan lebih dari 30 cmH2O menghentikan aliran darah mukosa trakea.',
+    ],
+    komplikasi: [
+      'INTUBASI ESOFAGUS yang tidak dikenali — komplikasi paling mematikan dan seluruhnya dapat dicegah dengan kapnografi',
+      'Intubasi bronkus kanan: satu paru tidak berventilasi, saturasi turun, dan lama-lama paru kiri kolaps',
+      'Gigi patah, bibir dan lidah terjepit, robekan faring dan pita suara',
+      'Aspirasi isi lambung saat percobaan berulang, terutama bila ventilasi sungkup terlalu kuat mendorong udara ke lambung',
+      'Bradikardia dan henti jantung akibat hipoksia selama percobaan yang terlalu lama, dan rangsang vagal pada anak',
+      'Nekrosis mukosa trakea dan stenosis di kemudian hari akibat tekanan balon berlebih',
+      'NPA: perdarahan hidung, dan masuknya tabung ke rongga tengkorak pada fraktur basis kranii',
+      'OPA: muntah dan laringospasme bila refleks muntah masih ada',
+    ],
+    referensi: ['ATLS2018', 'PAPDI2014', 'HARRISON2022'],
+  },
+
   // ══════════════════════════════════════════════════════════════════════════
   {
     id: 'injeksi-vaksin',
