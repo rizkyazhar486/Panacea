@@ -22,6 +22,11 @@ import { useEffect, useRef, useState, type ReactNode } from 'react'
 export function Tumpukan({ judul, anak, aksi }: { judul?: string; anak: { kunci: string; isi: ReactNode }[]; aksi?: ReactNode }) {
   const wadah = useRef<HTMLDivElement>(null)
   const [aktif, setAktif] = useState(0)
+  /* Sampai tangan benar-benar menggeser, petak ini milik halaman pertama.
+     Halaman dipasang bertahap dan yang kosong disembunyikan, jadi susunannya
+     berubah beberapa kali sesudah beranda terbuka — dan tanpa penanda ini
+     beranda terbuka pada halaman kedua atau ketiga tanpa ada yang memintanya. */
+  const digeser = useRef(false)
   /* TINGGI MENGIKUTI HALAMAN YANG SEDANG TAMPAK.
      Wadah geser mengambil tinggi halaman TERTINGGI, sehingga halaman pendek
      menyisakan ruang kosong sebesar selisihnya — pada layar 390 px selisih itu
@@ -92,15 +97,49 @@ export function Tumpukan({ judul, anak, aksi }: { judul?: string; anak: { kunci:
 
   const tampil = anak.map((a, i) => ({ ...a, i })).filter((a) => !kosong[a.i])
 
+  /* SATU TINGGI UNTUK SEMUA HALAMAN, bukan tinggi halaman yang sedang tampak.
+     Mengikuti halaman yang tampak terdengar benar dan ternyata salah: tinggi
+     halaman di tumpukan ini terukur 79 px sampai 445 px, sehingga tiap geseran
+     memindahkan seluruh isi beranda di bawahnya sejauh ratusan piksel. Yang
+     terasa oleh mata bukan "pas", melainkan halaman yang berkedut — dan itulah
+     yang terbaca sebagai cacat.
+
+     Sekarang tingginya satu, diambil dari halaman tertinggi dan DIBATASI. Batas
+     bawahnya menjaga bingkai tetap terlihat sebagai bingkai; batas atasnya
+     menjaga satu widget panjang tidak memaksa dua puluh lima widget lain
+     menjadi kotak melompong. Halaman yang lebih panjang dari batas digulir di
+     dalam dirinya sendiri, tidak dipotong. */
+  const TINGGI_MIN = 132
+  const TINGGI_MAKS = 268
   useEffect(() => {
-    const el = halaman.current[tampil[aktif]?.i ?? 0]
-    if (!el) return
-    const ukur = () => setTinggi(el.scrollHeight || undefined)
+    /* TINGGI ALAMI DIHITUNG, TIDAK DIBACA LANGSUNG.
+       Halaman kini diregangkan setinggi petaknya, jadi scrollHeight-nya sama
+       dengan tinggi petak itu sendiri — mengukurnya berarti mengukur hasil
+       pengukuran sebelumnya, dan petak yang sempat mengecil tidak akan pernah
+       membesar lagi. Terlihat langsung: tingginya terkunci di 132 px padahal
+       ada halaman setinggi 445 px.
+
+       Yang dibaca adalah isi bagian yang menggulir. Tinggi alami sebuah
+       halaman = tinggi halaman tanpa bagian itu, ditambah tinggi ISI bagian
+       itu — dan angka terakhir tidak terpengaruh peregangan. */
+    const ukur = () => {
+      let maks = 0
+      tampil.forEach((t) => {
+        const el = halaman.current[t.i]
+        if (!el) return
+        const kartu = el.firstElementChild?.lastElementChild
+        const alami = kartu
+          ? el.scrollHeight - kartu.clientHeight + kartu.scrollHeight
+          : el.scrollHeight
+        maks = Math.max(maks, alami)
+      })
+      if (maks) setTinggi(Math.min(TINGGI_MAKS, Math.max(TINGGI_MIN, maks)))
+    }
     ukur()
     const po = new ResizeObserver(ukur)
-    po.observe(el)
+    for (const t of tampil) { const el = halaman.current[t.i]; if (el) po.observe(el) }
     return () => po.disconnect()
-  }, [aktif, tampil])
+  }, [tampil])
 
   useEffect(() => {
     const el = wadah.current
@@ -115,13 +154,46 @@ export function Tumpukan({ judul, anak, aksi }: { judul?: string; anak: { kunci:
         jalan = false
       })
     }
+    // Digeser oleh TANGAN, bukan oleh guliran mana pun: guliran juga terjadi
+    // saat tata letak berubah sendiri, dan menganggapnya sebagai niat pemakai
+    // membuat beranda terbuka di halaman yang tidak pernah ia pilih.
+    const tandai = () => { digeser.current = true }
     el.addEventListener('scroll', gulir, { passive: true })
-    return () => el.removeEventListener('scroll', gulir)
+    el.addEventListener('pointerdown', tandai, { passive: true })
+    el.addEventListener('wheel', tandai, { passive: true })
+    el.addEventListener('keydown', tandai)
+    return () => {
+      el.removeEventListener('scroll', gulir)
+      el.removeEventListener('pointerdown', tandai)
+      el.removeEventListener('wheel', tandai)
+      el.removeEventListener('keydown', tandai)
+    }
   }, [anak.length])
+
+  /* DIKUNCI ULANG KE TEPI HALAMAN SETELAH SUSUNANNYA BERUBAH.
+     Halaman dipasang bertahap dan halaman kosong disembunyikan, jadi jumlah
+     halaman bertambah dan berkurang beberapa kali sesudah beranda terbuka.
+     Letak guliran tidak ikut berubah, sehingga petaknya berhenti di TENGAH dua
+     halaman: satu widget terpotong di kiri, satu lagi di kanan, keduanya
+     setengah — persis bentuk yang terlihat seperti gagal dimuat. Peramban
+     hanya menjamin lekatan pada geseran, bukan pada perubahan tata letak, jadi
+     penguncian ini dilakukan sendiri. */
+  useEffect(() => {
+    const el = wadah.current
+    if (!el) return
+    const id = window.setTimeout(() => {
+      const w = el.clientWidth
+      if (!w) return
+      const tepat = digeser.current ? Math.round(el.scrollLeft / w) * w : 0
+      if (Math.abs(el.scrollLeft - tepat) > 1) el.scrollTo({ left: tepat })
+    }, 60)
+    return () => window.clearTimeout(id)
+  }, [tampil.length, tinggi])
 
   if (!anak.length) return null
 
   const ke = (i: number) => {
+    digeser.current = true
     const el = wadah.current
     if (el) el.scrollTo({ left: i * el.clientWidth, behavior: 'smooth' })
   }
@@ -172,15 +244,12 @@ export function Tumpukan({ judul, anak, aksi }: { judul?: string; anak: { kunci:
           kembali milik sistem di tepi layar. */}
       <div
         ref={wadah}
-        className="geser-halaman items-start"
-        /* FIRM, TETAPI TETAP MENGALIR.
-           Tingginya mengikuti halaman yang tampak — itu yang membuat tiap
-           halaman terasa pas. Yang membuatnya tadinya terasa "loss" adalah dua
-           hal lain: petak yang dapat menyusut sampai setinggi satu baris
-           sehingga bingkainya seakan hilang, dan geseran yang dapat meluncur
-           melewati dua-tiga halaman sekaligus. Sekarang ada tinggi minimum,
-           dan tiap geseran berhenti tepat satu halaman. */
-        style={{ scrollbarWidth: 'none', height: tinggi, minHeight: 120, transition: 'height 0.22s ease' }}
+        className="geser-halaman"
+        /* Tanpa transisi tinggi: tingginya sekarang sama untuk semua halaman,
+           jadi tidak ada yang perlu dianimasikan — dan animasi tinggi pada
+           petak yang tidak berubah tinggi hanya menambah gerakan yang tidak
+           dijelaskan oleh apa pun. */
+        style={{ scrollbarWidth: 'none', height: tinggi, minHeight: TINGGI_MIN }}
       >
         {anak.map((a, i) => (
           <div

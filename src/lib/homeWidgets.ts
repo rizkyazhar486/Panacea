@@ -164,6 +164,7 @@ export const WIDGETS: WidgetDef[] = [
   { id: 'kopi', label: 'Coffee', ringkas: 'Last coffee and caffeine still on board', ke: '/pola-tidur', emoji: '☕', kategori: 'Nutrition' },
   { id: 'puasa', label: 'Fasting', ringkas: 'Time to Maghrib and your eating window', ke: '/prayer-times', emoji: '🌙', kategori: 'Faith & Life' },
   { id: 'pewaktu', label: 'Timers', ringkas: 'Naps and AMRAP', ke: '/latihan', emoji: '⏱️', kategori: 'Training' },
+  { id: 'kabar', label: 'Notifications', ringkas: 'What was actually sent, still readable after the lock screen', ke: '/settings', emoji: '🔔', kategori: 'Services & Emergency', bawaan: true },
   { id: 'pengingat', label: 'Reminders', ringkas: 'Training, team goals, and the call to prayer', ke: '/settings', emoji: '🔔', kategori: 'Services & Emergency' },
   { id: 'ringkasanKarya', label: 'Book & Film Summaries', ringkas: 'One paragraph per book and film', ke: '/ringkasan-karya', emoji: '📚', kategori: 'Faith & Life' },
   { id: 'inspirasi', label: 'Inspiration', ringkas: 'Stories and quotes, changing daily', ke: '/resilience-stories', emoji: '✨', kategori: 'Faith & Life' },
@@ -342,7 +343,7 @@ export const WIDGET_HIDUP = [
   // ── Belajar & klinis ────────────────────────────────────────────────────
   'obatCepat', 'kalkulatorCepat', 'stasiunSering', 'kartuBelajar', 'soalHarian', 'inspirasi', 'ringkasanKarya',
   // ── Hidup & lingkungan ──────────────────────────────────────────────────
-  'skorTim', 'lingkungan', 'cahaya', 'mata', 'fokus', 'duduk', 'napas', 'pengingat', 'ayatHarian', 'hitungHari',
+  'skorTim', 'lingkungan', 'cahaya', 'mata', 'fokus', 'duduk', 'napas', 'kabar', 'pengingat', 'ayatHarian', 'hitungHari',
 ] as const
 
 /** Katalog yang boleh menempati beranda. */

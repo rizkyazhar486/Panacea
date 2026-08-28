@@ -977,8 +977,44 @@ html { -webkit-overflow-scrolling: touch; }
   .geser-halaman > * {
     flex: 0 0 100%;
     min-width: 0;
-    scroll-snap-align: center;
+    scroll-snap-align: start;
     scroll-snap-stop: always;
+  }
+
+  /* HALAMAN MENGISI PETAKNYA, TIDAK MENGAMBANG DI DALAMNYA.
+     Petak tumpukan kini setinggi halaman tertinggi, jadi halaman pendek akan
+     menyisakan rongga sampai dua ratus piksel di bawahnya — rongga yang tidak
+     dijelaskan oleh apa pun di layar dan karena itu terbaca sebagai bagian
+     yang gagal dimuat. Yang benar bukan mengecilkan petaknya, melainkan
+     membiarkan kartunya tumbuh: satu kartu yang sedikit lebih lapang masih
+     terbaca sebagai kartu, sedangkan kartu kecil yang mengambang di tengah
+     kotak besar tidak.
+
+     Bagian TERAKHIR tiap widget — kartunya, sesudah baris judul — yang
+     tumbuh, dan ia menggulir di dalam dirinya sendiri bila isinya melebihi
+     batas tinggi petak. Tidak ada yang dipotong. */
+  .geser-halaman > * {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .geser-halaman > * > * {
+    display: flex;
+    flex: 1 1 auto;
+    flex-direction: column;
+    min-height: 0;
+  }
+
+  .geser-halaman > * > * > :last-child {
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow-y: auto;
+    overscroll-behavior-y: contain;
+    scrollbar-width: none;
+  }
+
+  .geser-halaman > * > * > :last-child::-webkit-scrollbar {
+    display: none;
   }
 
   /* ── Deret KARTU: lekatan WAJIB, bukan sekadar berdekatan ────────────────

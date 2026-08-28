@@ -31,6 +31,7 @@ import { UbinSkor } from './UbinSkor'
 import { UbinInspirasi, UbinKartuBelajar, UbinSoal, UbinRingkasanKarya } from './UbinBelajar'
 import { UbinPewaktu } from './UbinPewaktu'
 import { UbinNotifikasi } from './UbinNotifikasi'
+import { UbinKabar } from './UbinKabar'
 import { UbinMata, UbinFokus, UbinKopi } from './UbinWaktuHidup'
 import { UbinPuasa } from './UbinPuasa'
 import { UbinZona2, UbinPemulihanDenyut, UbinUtangTidur, UbinTekanan, UbinNapas, UbinDuduk } from './UbinLanjutan'
@@ -465,7 +466,7 @@ export function PapanWidget({ pratinjau, tanggalCatatan }: { pratinjau: Pratinja
     'grafikOlahraga',
     'grafikLatihan', 'grafikTidur', 'grafikLangkah', 'grafikGizi', 'grafikDenyut',
     'pantauan', 'kebugaran', 'salat', 'konsistensi',
-    'motivasi', 'obatCepat', 'kalkulatorCepat', 'stasiunSering',
+    'kabar', 'motivasi', 'obatCepat', 'kalkulatorCepat', 'stasiunSering',
     'skorTim', 'tidurLebar', 'giziLebar',
     'inspirasi', 'kartuBelajar', 'soalHarian', 'pewaktu', 'pengingat',
     'mata', 'fokus', 'kopi', 'puasa',
@@ -595,6 +596,7 @@ export function PapanWidget({ pratinjau, tanggalCatatan }: { pratinjau: Pratinja
         ...(pilihan.includes('puasa') ? [{ kunci: 'puasa', isi: <UbinPuasa /> }] : []),
         ...(pilihan.includes('kopi') ? [{ kunci: 'kopi', isi: <UbinKopi /> }] : []),
         ...(pilihan.includes('pewaktu') ? [{ kunci: 'pewaktu', isi: <UbinPewaktu /> }] : []),
+        ...(pilihan.includes('kabar') ? [{ kunci: 'kabar', isi: <UbinKabar /> }] : []),
         ...(pilihan.includes('pengingat') ? [{ kunci: 'pengingat', isi: <UbinNotifikasi /> }] : []),
         ...(pilihan.includes('inspirasi') ? [{ kunci: 'inspirasi', isi: <UbinInspirasi /> }] : []),
         ...(pilihan.includes('ringkasanKarya') ? [{ kunci: 'ringkasanKarya', isi: <UbinRingkasanKarya /> }] : []),
