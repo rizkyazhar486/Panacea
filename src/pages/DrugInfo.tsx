@@ -4,6 +4,7 @@ import { IconPill, IconShield } from '../components/icons'
 import { api } from '../lib/api'
 import { ATC, cariObat, jumlahObat, jumlahEml, dosisSkdi, type Obat } from '../lib/obatKatalog'
 import { HERBAL, cariHerbal, jumlahHerbal, BUKTI_LABEL, BPOM_LABEL, type Herbal } from '../lib/herbal'
+import { semuaButir, periksa, type Butir } from '../lib/interaksi'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Drug Info — dua sumber, dan tiap kalimat di layar mengaku datang dari yang mana.
@@ -43,7 +44,9 @@ export function DrugInfo() {
   const [related, setRelated] = useState<RelatedDrug[]>([])
   const [pilih, setPilih] = useState<Obat | null>(null)
   const [jelajah, setJelajah] = useState<string | null>(null)
-  const [tab, setTab] = useState<'obat' | 'herbal'>('obat')
+  const [tab, setTab] = useState<'obat' | 'herbal' | 'periksa'>('obat')
+  const [daftar, setDaftar] = useState<Butir[]>([])
+  const [cariButir, setCariButir] = useState('')
   const [herbalBuka, setHerbalBuka] = useState<string | null>(null)
 
   const total = useMemo(() => jumlahObat(), [])
@@ -52,6 +55,15 @@ export function DrugInfo() {
   const hasilHerbal = useMemo(() => cariHerbal(q), [q])
   const totalHerbal = useMemo(() => jumlahHerbal(), [])
   const dosis = useMemo(() => (pilih ? dosisSkdi(pilih.nama) : []), [pilih])
+  const butir = useMemo(() => semuaButir(), [])
+  const saran = useMemo(() => {
+    const t = cariButir.toLowerCase().trim()
+    if (t.length < 2) return []
+    return butir
+      .filter((x) => !daftar.some((d) => d.id === x.id) && `${x.nama} ${x.keterangan}`.toLowerCase().includes(t))
+      .slice(0, 8)
+  }, [cariButir, butir, daftar])
+  const temuan = useMemo(() => periksa(daftar), [daftar])
 
   async function search(name?: string) {
     const text = (name ?? q).trim()
@@ -80,7 +92,7 @@ export function DrugInfo() {
           title="Drug Info"
           subtitle="Search an active substance — its class, what it is used for, and the safety point that matters. The official label is fetched on top when you are online."
         />
-        <div className="mt-3 flex gap-2">
+        {tab !== 'periksa' && <div className="mt-3 flex gap-2">
           <input
             className={inputClass}
             value={q}
@@ -90,7 +102,7 @@ export function DrugInfo() {
             aria-label="Search drugs"
           />
           <Button onClick={() => search()} disabled={loading || !q.trim()}>{loading ? '…' : 'Label'}</Button>
-        </div>
+        </div>}
 
         {/* Herbal berdiri sebagai bagiannya sendiri, tidak dicampur ke dalam
             daftar obat. Mencampurnya membuat keduanya terbaca seperti benda
@@ -111,10 +123,19 @@ export function DrugInfo() {
           >
             🌿 Herbal
           </button>
+          <button
+            onClick={() => setTab('periksa')} aria-pressed={tab === 'periksa'}
+            className={`min-h-[36px] flex-1 rounded-full px-3 text-[12px] font-bold ${
+              tab === 'periksa' ? 'bg-brand text-ink' : 'bg-neutral-100 text-neutral-600 dark:bg-white/10 dark:text-neutral-300'}`}
+          >
+            ⚠️ Check
+          </button>
         </div>
 
         <div className="mt-2 flex flex-wrap items-center gap-2">
-          {tab === 'obat' ? (
+          {tab === 'periksa' ? (
+            <Badge tone="neutral">{daftar.length} in your list</Badge>
+          ) : tab === 'obat' ? (
             <>
               <Badge tone="brand">{total} substances</Badge>
               <Badge tone="low">{eml} on the WHO essential list</Badge>
@@ -127,7 +148,7 @@ export function DrugInfo() {
 
         {err && <p className="mt-3 rounded-xl bg-red-50 px-3 py-2 text-xs font-semibold text-red-600 dark:bg-red-500/10 dark:text-red-300">{err}</p>}
 
-        {!q && (
+        {!q && tab !== 'periksa' && (
           <div className="mt-3 flex flex-wrap gap-2">
             {EXAMPLES.map((ex) => (
               <button key={ex} onClick={() => { setQ(ex) }} className="rounded-full bg-neutral-100 px-3 py-1.5 text-xs font-bold text-neutral-600 hover:bg-brand-50 hover:text-brand-dark dark:bg-white/5 dark:text-neutral-300">
@@ -407,6 +428,108 @@ export function DrugInfo() {
               </p>
             </Card>
           )}
+        </>
+      )}
+
+      {/* ── Pemeriksa interaksi ─────────────────────────────────────────────── */}
+      {tab === 'periksa' && (
+        <>
+          <Card className="!p-4">
+            <div className="text-[10px] font-black uppercase tracking-wide text-neutral-500">Your list</div>
+            <input
+              value={cariButir}
+              onChange={(e) => setCariButir(e.target.value)}
+              placeholder="Add a medicine or herbal — type at least two letters"
+              aria-label="Add to interaction list"
+              className="mt-2 min-h-[44px] w-full rounded-xl border border-neutral-200 px-3 text-sm outline-none focus:border-brand dark:border-white/10 dark:bg-white/5"
+            />
+            {saran.length > 0 && (
+              <div className="mt-1.5 space-y-1">
+                {saran.map((x) => (
+                  <button
+                    key={x.id}
+                    onClick={() => { setDaftar((d) => [...d, x]); setCariButir('') }}
+                    className="flex min-h-[40px] w-full items-center gap-2 rounded-xl bg-neutral-100 px-2.5 text-left dark:bg-white/10"
+                  >
+                    <span aria-hidden>{x.jenis === 'herbal' ? '🌿' : '💊'}</span>
+                    <span className="min-w-0 flex-1">
+                      <span className="block truncate text-[12.5px] font-bold text-ink dark:text-white">{x.nama}</span>
+                      <span className="block truncate text-[10.5px] text-neutral-500">{x.keterangan}</span>
+                    </span>
+                    <span className="text-[11px] font-black text-brand">Add</span>
+                  </button>
+                ))}
+              </div>
+            )}
+
+            {daftar.length > 0 && (
+              <div className="mt-2 flex flex-wrap gap-1.5">
+                {daftar.map((x) => (
+                  <button
+                    key={x.id}
+                    onClick={() => setDaftar((d) => d.filter((y) => y.id !== x.id))}
+                    className="inline-flex items-center gap-1 rounded-full bg-brand/15 px-2.5 py-1 text-[11.5px] font-bold text-brand-dark"
+                  >
+                    {x.jenis === 'herbal' ? '🌿' : '💊'} {x.nama}
+                    <span aria-hidden className="text-[13px] leading-none">×</span>
+                  </button>
+                ))}
+              </div>
+            )}
+          </Card>
+
+          {daftar.length >= 2 && (
+            <Card className="!p-4">
+              <div className="text-[10px] font-black uppercase tracking-wide text-neutral-500">
+                Found {temuan.length}
+              </div>
+              {temuan.length === 0 ? (
+                /* KOSONG TIDAK BERARTI AMAN, dan itu ditulis. Hasil kosong yang
+                   dibaca sebagai "aman" adalah kegagalan paling merugikan yang
+                   bisa dilakukan alat semacam ini. */
+                <p className="mt-1.5 text-[12px] leading-relaxed text-neutral-600 dark:text-neutral-300">
+                  Nothing in this app's rules matched that combination. <b>That does not mean it is safe.</b> This tool
+                  only knows the mechanisms written into it, and no list of mechanisms is complete. Your pharmacist has
+                  a full database and your whole medication list; this does not replace either.
+                </p>
+              ) : (
+                <div className="mt-2 space-y-2">
+                  {temuan.map((t, i) => (
+                    <div
+                      key={i}
+                      className={`rounded-2xl p-3 ${t.berat === 'serius' ? 'bg-rose-500/10' : 'bg-amber-500/10'}`}
+                    >
+                      <div className="flex flex-wrap items-center gap-1.5">
+                        <span className={`rounded-full px-2 py-0.5 text-[9.5px] font-black uppercase tracking-wide ${
+                          t.berat === 'serius' ? 'bg-rose-600 text-white' : 'bg-amber-600 text-white'}`}>
+                          {t.berat === 'serius' ? 'Serious' : 'Caution'}
+                        </span>
+                        <span className="text-[11px] font-bold text-neutral-600 dark:text-neutral-300">
+                          {t.a.nama} + {t.b.nama}
+                        </span>
+                      </div>
+                      <div className="mt-1 text-[13px] font-black text-ink dark:text-white">{t.judul}</div>
+                      <p className="mt-0.5 text-[12px] leading-relaxed text-ink dark:text-neutral-200">{t.sebab}</p>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </Card>
+          )}
+
+          <Card className="!p-4">
+            <div className="text-[10px] font-black uppercase tracking-wide text-neutral-500">What this is, and is not</div>
+            <p className="mt-1.5 text-[11.5px] leading-relaxed text-neutral-600 dark:text-neutral-300">
+              This checks the <b>mechanisms</b> written into this app — enzyme induction and inhibition, added bleeding
+              risk, potassium shifts, QT prolongation, sedation, and a few others. It works by tagging drug classes
+              rather than listing pairs, so one rule covers a whole class at once and can tell you <i>why</i>.
+            </p>
+            <p className="mt-1.5 text-[11.5px] leading-relaxed text-neutral-600 dark:text-neutral-300">
+              It is <b>not a complete interaction check</b>, and it does not know your kidney function, your liver, your
+              pregnancy status, or your doses. Combinations that are perfectly normal treatment are deliberately not
+              flagged, because a tool that warns constantly stops being read.
+            </p>
+          </Card>
         </>
       )}
 
