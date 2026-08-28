@@ -53,6 +53,10 @@ interface Ringkasan {
   fokusMenitHariIni?: number
   jetlagJam?: number
   jetlagHariLagi?: number
+  /** Jam sejak muncul ke permukaan pada selaman terakhir. */
+  selamJamLalu?: number
+  /** Syarat tunggu sebelum terbang untuk selaman itu: 12 atau 18 jam. */
+  selamSyaratJam?: number
 }
 
 function tanggalLokal(d = new Date()): string {
@@ -150,6 +154,32 @@ export function susunRingkasan(): Ringkasan {
     if (j?.tanggal && Number.isFinite(jam) && jam !== 0) {
       const lagi = Math.ceil((Date.parse(`${j.tanggal}T00:00:00`) - Date.now()) / 864e5)
       if (Number.isFinite(lagi) && lagi >= 0 && lagi <= 30) { r.jetlagJam = jam; r.jetlagHariLagi = lagi }
+    }
+  } catch { /* abaikan */ }
+
+  // MENYELAM. Yang dikirim hanya DUA ANGKA — berapa jam sejak muncul ke
+  // permukaan, dan syarat tunggu 12 atau 18 jam — bukan kedalaman, bukan
+  // lokasi, dan bukan riwayatnya. Keduanya cukup untuk aturan yang ada, dan
+  // lokasi menyelam seseorang bukan sesuatu yang perlu meninggalkan alatnya.
+  try {
+    const l = JSON.parse(localStorage.getItem('pmd_selam_v1') || '[]') as { keluar?: string }[]
+    if (Array.isArray(l) && l.length) {
+      const waktu = l
+        .map((x) => Date.parse(String(x?.keluar)))
+        .filter((t) => Number.isFinite(t))
+        .sort((a, b) => b - a)
+      const t = waktu[0]
+      if (t != null) {
+        const jamLalu = (Date.now() - t) / 3600_000
+        // Hanya dikirim selama masih ada kemungkinan berarti — sesudah dua hari
+        // tidak ada aturan yang memakainya lagi.
+        if (jamLalu >= 0 && jamLalu <= 48) {
+          const dalam24 = waktu.filter((x) => x <= t && x > t - 24 * 3600_000).length
+          const dalam72 = waktu.filter((x) => x <= t && x > t - 72 * 3600_000).length
+          r.selamJamLalu = Math.round(jamLalu * 10) / 10
+          r.selamSyaratJam = dalam24 > 1 || dalam72 > 2 ? 18 : 12
+        }
+      }
     }
   } catch { /* abaikan */ }
 

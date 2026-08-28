@@ -884,6 +884,7 @@ const RINGKASAN_DIIZINKAN = [
   'airMl', 'cahayaHariIni', 'suplemenBelum', 'hariSejakPanas',
   'skriningLewat', 'umurGenggam', 'hariSejakBeban',
   'amslerHariLalu', 'amslerBerubah', 'fokusMenitHariIni', 'jetlagJam', 'jetlagHariLagi',
+  'selamJamLalu', 'selamSyaratJam',
 ] as const
 
 export function getRingkasan(userId: string): Record<string, any> {

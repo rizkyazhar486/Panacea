@@ -804,8 +804,51 @@ export const ATURAN: Aturan[] = [
       }
     },
   },
+  // ── Menyelam ──────────────────────────────────────────────────────────────
+  //
+  // Dua aturan ini adalah satu-satunya di berkas ini yang mengabarkan sesuatu
+  // yang dapat MENCEDERAI bila diabaikan, dan karena itu keduanya berbeda dari
+  // yang lain: jendelanya sepanjang hari, jedanya paling pendek, dan
+  // kalimatnya menyebut jam yang tersisa, bukan anjuran umum.
+  //
+  // Yang dipakai hanya dua angka yang dititipkan klien — berapa jam sejak
+  // muncul ke permukaan, dan syarat tunggu 12 atau 18 jam. Kedalaman dan
+  // lokasi menyelam tidak pernah meninggalkan alatnya.
+  {
+    id: 'terbangBelumAman',
+    kategori: 'vital',
+    jeda: 0,
+    nilai: (k) => {
+      const jamLalu = typeof k.ringkas.selamJamLalu === 'number' ? k.ringkas.selamJamLalu : null
+      const syarat = typeof k.ringkas.selamSyaratJam === 'number' ? k.ringkas.selamSyaratJam : null
+      if (jamLalu == null || syarat == null || jamLalu >= syarat) return null
+      const sisa = Math.max(0, Math.round((syarat - jamLalu) * 10) / 10)
+      return {
+        judul: `Do not fly for another ${sisa} h`,
+        badan: `You surfaced ${jamLalu} h ago, and the guideline for your dive profile is ${syarat} h before flying. This is the Divers Alert Network recommendation, not a guarantee — if you feel unwell, wait longer.`,
+        url: './#/dive-log',
+      }
+    },
+  },
+  {
+    id: 'selamBerulang',
+    kategori: 'vital',
+    jeda: 0,
+    nilai: (k) => {
+      const jamLalu = typeof k.ringkas.selamJamLalu === 'number' ? k.ringkas.selamJamLalu : null
+      if (jamLalu == null || jamLalu >= 12) return null
+      // Bila aturan terbang sudah akan mengabarkan hal yang sama, aturan ini
+      // diam: dua pemberitahuan untuk satu keadaan membuat keduanya diabaikan.
+      const syarat = typeof k.ringkas.selamSyaratJam === 'number' ? k.ringkas.selamSyaratJam : null
+      if (syarat != null && jamLalu < syarat) return null
+      return {
+        judul: 'Surface interval under 12 hours',
+        badan: `You surfaced ${jamLalu} h ago. A dive now counts as a repetitive dive — set your computer for it, and remember your no-decompression time will be shorter than it was this morning.`,
+        url: './#/dive-log',
+      }
+    },
+  },
 ]
-
 /** Aturan lingkungan dipisah karena perlu memanggil layanan luar. */
 async function aturanLingkungan(k: Konteks): Promise<{ id: string; kabar: Kabar } | null> {
   if (k.prefs[PREF_KATEGORI.lingkungan] !== true) return null

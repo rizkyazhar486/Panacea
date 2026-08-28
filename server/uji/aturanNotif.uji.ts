@@ -210,6 +210,30 @@ periksa('jetlagSiap diam bila tanpa selisih jam',
 periksa('jetlagSiap ke barat berbunyi "lebih malam"',
   /lebih malam/.test(cari('jetlagSiap').nilai(konteks({}, 20 * 60, { jetlagJam: -5, jetlagHariLagi: 2 }))!.judul))
 
+
+// ── Menyelam ────────────────────────────────────────────────────────────────
+//
+// Dua aturan ini mengabarkan sesuatu yang dapat MENCEDERAI bila diabaikan,
+// jadi yang diuji bukan hanya "menyala/diam" melainkan juga bahwa keduanya
+// TIDAK berbunyi bersamaan untuk satu keadaan.
+periksa('terbangBelumAman menyala 4 jam sesudah selaman tunggal (syarat 12 jam)',
+  !!cari('terbangBelumAman').nilai(konteks({}, 14 * 60, { selamJamLalu: 4, selamSyaratJam: 12 })))
+periksa('terbangBelumAman diam 13 jam sesudah selaman tunggal',
+  !cari('terbangBelumAman').nilai(konteks({}, 14 * 60, { selamJamLalu: 13, selamSyaratJam: 12 })))
+periksa('terbangBelumAman masih menyala 13 jam sesudah selaman berulang (syarat 18 jam)',
+  !!cari('terbangBelumAman').nilai(konteks({}, 14 * 60, { selamJamLalu: 13, selamSyaratJam: 18 })))
+periksa('terbangBelumAman menyebut sisa jamnya',
+  /5 h/.test(cari('terbangBelumAman').nilai(konteks({}, 14 * 60, { selamJamLalu: 13, selamSyaratJam: 18 }))!.judul))
+periksa('terbangBelumAman diam tanpa data menyelam',
+  !cari('terbangBelumAman').nilai(konteks({}, 14 * 60, {})))
+
+periksa('selamBerulang diam bila aturan terbang sudah mengabarkan hal yang sama',
+  !cari('selamBerulang').nilai(konteks({}, 14 * 60, { selamJamLalu: 4, selamSyaratJam: 12 })))
+periksa('selamBerulang menyala pada jeda 6 jam ketika syarat terbang sudah lewat',
+  !!cari('selamBerulang').nilai(konteks({}, 14 * 60, { selamJamLalu: 6, selamSyaratJam: 4 })))
+periksa('selamBerulang diam sesudah 14 jam',
+  !cari('selamBerulang').nilai(konteks({}, 14 * 60, { selamJamLalu: 14, selamSyaratJam: 12 })))
+
 // 7b. Jendela waktu tiap aturan masuk akal (tidak ada yang tengah malam).
 for (const a of ATURAN) {
   if (!a.jendela) continue
