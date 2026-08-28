@@ -49,7 +49,7 @@ export function Prosa({ children, kelas, baris = 2 }: {
            teks telanjang tingginya cuma 18 px. */
         className="flex h-10 items-center text-[11px] font-bold text-brand underline underline-offset-2"
       >
-        {buka ? 'ringkas' : 'selengkapnya'}
+        {buka ? 'less' : 'more'}
       </button>
     </p>
   )

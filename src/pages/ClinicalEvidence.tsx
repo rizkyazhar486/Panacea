@@ -3,6 +3,7 @@ import { Card, SectionTitle, Field, inputClass, Badge, Button } from '../compone
 import { IconSearch, IconShield, IconChartUp, IconStethoscope } from '../components/icons'
 import { useStore } from '../lib/store'
 import {
+  GagalUrai,
   askClinicalEvidence, verificationLinks, evidenceAvailable,
   STRENGTH_META, CERTAINTY_META, type EvidenceAnswer,
   claimFounderIfEligible, evidenceGate, recordFreeQuery,
@@ -59,6 +60,8 @@ export function ClinicalEvidence() {
   const [region, setRegion] = useState('')
   const [loading, setLoading] = useState(false)
   const [err, setErr] = useState('')
+  // Balasan mentah saat penguraian gagal — lihat catatan pada GagalUrai.
+  const [mentah, setMentah] = useState('')
   const [answer, setAnswer] = useState<EvidenceAnswer | null>(null)
   const [articles, setArticles] = useState<PubmedArticle[]>([])
   const [articlesLoading, setArticlesLoading] = useState(false)
@@ -72,7 +75,7 @@ export function ClinicalEvidence() {
     const text = (question ?? q).trim()
     if (!text) return
     if (question) setQ(question)
-    setErr(''); setTopupNeeded(false)
+    setErr(''); setMentah(''); setTopupNeeded(false)
 
     // Access control: founders are free; others use their free allowance, then
     // pay 150 PNC per query from the wallet.
@@ -101,6 +104,7 @@ export function ClinicalEvidence() {
       // question for every failure — including failures on our side, where no
       // rephrasing could ever have helped.
       const msg = String(e instanceof Error ? e.message : e)
+      if (e instanceof GagalUrai && e.mentah.trim()) setMentah(e.mentah.slice(0, 4000))
       if (msg.includes('backend_unavailable') || msg.includes('ai_not_configured'))
         setErr('The AI service is not configured on this deployment yet. The verification links below still search the primary literature.')
       else if (msg.includes('rate_limited'))
@@ -214,6 +218,27 @@ export function ClinicalEvidence() {
           <span className="text-[11px] text-neutral-500">⌘/Ctrl + Enter</span>
         </div>
         {err && <p className="mt-3 rounded-xl bg-red-50 px-3 py-2 text-xs font-semibold text-red-600 dark:bg-red-500/10 dark:text-red-300">{err}</p>}
+
+        {/* BALASAN MENTAHNYA DITUNJUKKAN, TIDAK DISEMBUNYIKAN.
+            "Jawabannya tidak dapat dibaca" itu benar tetapi tidak berguna:
+            pemakainya tidak tahu apa yang harus dilakukan, dan yang
+            memperbaikinya tidak tahu apa yang sebenarnya kembali — satu
+            putaran laporan hilang setiap kali. Terlipat, jadi ia tidak
+            mengganggu siapa pun yang tidak membutuhkannya. */}
+        {mentah && (
+          <details className="mt-2">
+            <summary className="cursor-pointer text-[11px] font-bold text-neutral-500">
+              What came back (technical detail)
+            </summary>
+            <p className="mt-1 text-[10px] leading-snug text-neutral-500">
+              This is the engine's reply, unedited. If you are reporting the problem, this is the part worth sending —
+              it names the cause, which the message above cannot.
+            </p>
+            <pre className="mt-1 max-h-56 overflow-auto whitespace-pre-wrap break-words rounded-xl bg-neutral-100 p-2 text-[10px] leading-snug text-neutral-700 dark:bg-white/10 dark:text-neutral-200">
+              {mentah}
+            </pre>
+          </details>
+        )}
       </Card>
 
       {/* Example questions */}
@@ -246,7 +271,16 @@ export function ClinicalEvidence() {
               <Badge tone={CERTAINTY_META[answer.overallCertainty].tone}>{CERTAINTY_META[answer.overallCertainty].label}</Badge>
             </div>
             <h2 className="mt-3 text-lg font-black text-ink dark:text-ink">Bottom line</h2>
-            <p className="mt-1 text-sm leading-relaxed text-neutral-700 dark:text-neutral-200">{answer.bottomLine}</p>
+            {/* Kesimpulan boleh kosong bila penyedianya tidak mengembalikannya.
+                Yang ditulis adalah ketiadaannya, bukan ringkasan buatan yang
+                menutupinya — sisa jawabannya tetap ditampilkan di bawah. */}
+            {answer.bottomLine ? (
+              <p className="mt-1 text-sm leading-relaxed text-neutral-700 dark:text-neutral-200">{answer.bottomLine}</p>
+            ) : (
+              <p className="mt-1 text-sm leading-relaxed text-neutral-500">
+                The engine did not return a bottom line for this question. What it did return is below, unchanged.
+              </p>
+            )}
             <div className="mt-3">
               <div className="mb-1 flex items-center justify-between text-[10px] font-bold uppercase tracking-wide text-neutral-500">
                 <span>Overall certainty of evidence</span><span>{CERTAINTY_META[answer.overallCertainty].label}</span>
@@ -325,7 +359,7 @@ export function ClinicalEvidence() {
       {/* Verification links — always available once a question is typed */}
       {links.length > 0 && (
         <Card className="!p-5">
-          <SectionTitle icon={<IconSearch size={20} />} title="Periksa pada pustaka primer" subtitle="Buka pertanyaan yang sama di sumber bukti utama — tanpa masuk akun, berlaku di seluruh dunia" />
+          <SectionTitle icon={<IconSearch size={20} />} title="Check the primary literature" subtitle="Open the same question in the main evidence sources — no login, and it works anywhere in the world" />
           <div className="mt-3 grid grid-cols-1 gap-2 sm:grid-cols-2">
             {links.map((l) => (
               <a key={l.label} href={l.url} target="_blank" rel="noreferrer" className="flex items-center justify-between rounded-xl border border-neutral-200 bg-white px-3 py-2.5 transition hover:border-brand dark:border-white/10 dark:bg-white/5">

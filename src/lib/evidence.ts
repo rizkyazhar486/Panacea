@@ -251,35 +251,118 @@ export function recordFreeQuery(): void {
   try { localStorage.setItem(USED_KEY, String(evidenceUsedCount() + 1)) } catch { /* ignore */ }
 }
 
+/**
+ * Galat yang MEMBAWA jawabannya.
+ *
+ * Sebelum ini kegagalan urai hanya melempar 'parse_failed', dan layar berkata
+ * "jawabannya tidak dapat dibaca". Itu benar tetapi tidak berguna bagi siapa
+ * pun: pemakainya tidak tahu apa yang harus dilakukan, dan yang memperbaiki
+ * tidak tahu apa yang sebenarnya kembali. Satu putaran laporan hilang setiap
+ * kali. Sekarang teks aslinya ikut dibawa dan dapat ditampilkan.
+ */
+export class GagalUrai extends Error {
+  mentah: string
+  constructor(pesan: string, mentah: string) {
+    super(pesan)
+    this.name = 'GagalUrai'
+    this.mentah = mentah
+  }
+}
+
+/**
+ * Terima bentuk yang MELESET SEDIKIT, jangan tolak seluruhnya.
+ *
+ * Skema meminta bottomLine. Penyedia yang berbeda mengembalikan bottom_line,
+ * bottomline, atau summary untuk maksud yang sama persis, dan menolak jawaban
+ * yang isinya benar hanya karena namanya berbeda satu garis bawah adalah
+ * kegagalan yang seluruhnya buatan kita sendiri.
+ *
+ * Yang TIDAK dilakukan: mengarang isi. Bila memang tidak ada satu pun bentuk
+ * yang membawa kesimpulan, nilainya kosong dan layar mengatakannya kosong.
+ */
+function ambilKesimpulan(o: Record<string, unknown>): string {
+  for (const k of ['bottomLine', 'bottom_line', 'bottomline', 'summary', 'conclusion']) {
+    const v = o[k]
+    if (typeof v === 'string' && v.trim()) return v.trim()
+  }
+  return ''
+}
+
+function ambilDaftar(o: Record<string, unknown>, ...kunci: string[]): unknown[] {
+  for (const k of kunci) {
+    const v = o[k]
+    if (Array.isArray(v)) return v
+  }
+  return []
+}
+
+/** Apakah objek ini membawa isi yang layak ditampilkan sama sekali? */
+function adaIsinya(o: Record<string, unknown> | null): boolean {
+  if (!o) return false
+  return Boolean(
+    ambilKesimpulan(o) ||
+    ambilDaftar(o, 'keyPoints', 'key_points').length ||
+    ambilDaftar(o, 'considerations').length ||
+    ambilDaftar(o, 'redFlags', 'red_flags').length,
+  )
+}
+
 export async function askClinicalEvidence(question: string, filters: EvidenceFilters = {}): Promise<EvidenceAnswer> {
   const q = question.trim()
   if (!q) throw new Error('empty_question')
   if (!backendEnabled) throw new Error('backend_unavailable')
 
-  const { text } = await api.aiMessages({
-    // 'opus' marks this as a reasoning-grade request, and `json` tells the
-    // server the reply will be machine-parsed — both are required for the
-    // answer to come back as a bare object rather than chatty prose. The old
-    // value here was an OpenRouter-style slug that matched no route at all.
-    model: 'claude-opus-4-8',
-    json: true,
-    system: EVIDENCE_SYSTEM,
-    messages: [{ role: 'user', content: buildUserPrompt(q, filters) }],
-    // The schema has seven fields, several of them lists of full sentences.
-    // 2048 tokens truncated ordinary answers mid-object.
-    max_tokens: 4096,
-  })
-  const parsed = safeParse(text)
-  if (!parsed || !parsed.bottomLine) {
+  // Satu permintaan, dan bila bentuknya meleset, SATU perbaikan.
+  const minta = (pesan: { role: 'user' | 'assistant'; content: string }[]) =>
+    api.aiMessages({
+      // 'opus' marks this as a reasoning-grade request, and `json` tells the
+      // server the reply will be machine-parsed — both are required for the
+      // answer to come back as a bare object rather than chatty prose. The old
+      // value here was an OpenRouter-style slug that matched no route at all.
+      model: 'claude-opus-4-8',
+      json: true,
+      system: EVIDENCE_SYSTEM,
+      messages: pesan,
+      // The schema has seven fields, several of them lists of full sentences.
+      // 2048 tokens truncated ordinary answers mid-object.
+      max_tokens: 4096,
+    })
+
+  const awal = buildUserPrompt(q, filters)
+  let { text } = await minta([{ role: 'user', content: awal }])
+  let parsed = safeParse(text) as Record<string, unknown> | null
+
+  if (!adaIsinya(parsed)) {
+    /*
+     * SEKALI DIPERBAIKI SEBELUM MENYERAH.
+     *
+     * Kegagalan yang benar-benar terjadi hampir selalu bentuk, bukan isi:
+     * objek dibungkus prosa, dibungkus pagar kode, atau dibungkus satu lapis
+     * kunci tambahan. Meminta ulang dengan menunjukkan balasan sebelumnya
+     * memperbaikinya jauh lebih sering daripada tidak — dan itu satu permintaan
+     * tambahan, bukan pertanyaan baru, jadi tidak ada yang ditagihkan lagi.
+     *
+     * Bila percobaan kedua pun gagal, barulah menyerah — dan menyerah sambil
+     * MEMBAWA teks aslinya, supaya sebabnya dapat dilihat alih-alih ditebak.
+     */
+    const r2 = await minta([
+      { role: 'user', content: awal },
+      { role: 'assistant', content: text.slice(0, 3000) },
+      { role: 'user', content: 'That reply could not be parsed. Return the SAME content again as a single minified JSON object matching the schema exactly, with no prose, no code fences, and no wrapper key. Start with { and end with }.' },
+    ]).catch(() => ({ text: '' }))
+    if (r2.text) {
+      const p2 = safeParse(r2.text) as Record<string, unknown> | null
+      if (adaIsinya(p2)) { parsed = p2; text = r2.text }
+    }
+  }
+
+  if (!adaIsinya(parsed)) {
     /*
      * SEBUTKAN SEBABNYA, JANGAN HANYA MENYEBUT GAGALNYA.
      *
      * Perbaikan Clinical Evidence berada di SERVER, bukan di aplikasi ini.
      * Selama server yang terpasang masih versi lama, jawabannya kembali
-     * sebagai prosa yang tidak dapat diurai — dan pesan 'format tidak terduga'
-     * membuat pemakainya menyangka fiturnya rusak, lalu mencoba berulang kali
-     * dengan pertanyaan yang berbeda-beda padahal tidak ada pertanyaan yang
-     * akan berhasil.
+     * sebagai prosa yang tidak dapat diurai.
      *
      * Server yang sudah diperbarui menyebutkan kemampuannya pada /api/health.
      * Bila penanda itu tidak ada, itulah sebabnya, dan itu yang disampaikan.
@@ -291,19 +374,25 @@ export async function askClinicalEvidence(question: string, filters: EvidenceFil
     } catch {
       // Tidak dapat memastikan; jangan menuduh servernya usang tanpa bukti.
     }
-    if (serverLama) throw new Error('server_lama')
-    throw new Error(text.trim() ? 'parse_failed' : 'empty_reply')
+    if (serverLama) throw new GagalUrai('server_lama', text)
+    throw new GagalUrai(text.trim() ? 'parse_failed' : 'empty_reply', text)
   }
 
+  const o = parsed as Record<string, unknown>
+  const titik = ambilDaftar(o, 'keyPoints', 'key_points')
+    .filter((p): p is { claim: string } => Boolean(p && typeof p === 'object' && (p as { claim?: unknown }).claim))
   return {
     question: q,
-    bottomLine: parsed.bottomLine,
-    strength: (parsed.strength as RecStrength) ?? 'uncertain',
-    overallCertainty: (parsed.overallCertainty as Certainty) ?? 'low',
-    keyPoints: Array.isArray(parsed.keyPoints) ? parsed.keyPoints.filter((p) => p && p.claim) : [],
-    considerations: Array.isArray(parsed.considerations) ? parsed.considerations : [],
-    redFlags: Array.isArray(parsed.redFlags) ? parsed.redFlags : [],
-    patientFriendly: parsed.patientFriendly ?? '',
+    // Boleh kosong. Layar mengatakannya kosong; tidak ada kesimpulan yang
+    // dikarang untuk menutupi ketiadaannya.
+    bottomLine: ambilKesimpulan(o),
+    strength: ((o.strength as RecStrength) ?? 'uncertain'),
+    overallCertainty: ((o.overallCertainty ?? o.certainty) as Certainty) ?? 'low',
+    keyPoints: titik as EvidenceAnswer['keyPoints'],
+    considerations: ambilDaftar(o, 'considerations').filter((x): x is string => typeof x === 'string'),
+    redFlags: ambilDaftar(o, 'redFlags', 'red_flags').filter((x): x is string => typeof x === 'string'),
+    patientFriendly: typeof o.patientFriendly === 'string' ? o.patientFriendly
+      : typeof o.patient_friendly === 'string' ? o.patient_friendly : '',
     disclaimer: DISCLAIMER,
   }
 }
