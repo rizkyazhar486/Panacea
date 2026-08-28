@@ -32,6 +32,14 @@ function KartuGolongan({ g, buka, ketuk }: { g: GolonganObat; buka: boolean; ket
 
       {buka && (
         <div className="space-y-2.5 px-3 pb-3">
+          {/* Dosis diletakkan PALING ATAS dan diberi latar sendiri. Golongan yang
+              benar tanpa angka tidak bisa ditulis di kertas resep; inilah yang
+              sebenarnya dicari orang saat membuka bagian ini. */}
+          <p className="rounded-lg bg-brand/10 p-2.5 text-[11.5px] leading-snug text-ink dark:text-white">
+            <span className="font-black text-brand-dark dark:text-brand">💊 Dosis: </span>
+            {g.dosis}
+          </p>
+
           <p className="text-[11.5px] leading-snug text-neutral-700 dark:text-neutral-200">
             <span className="font-bold text-brand-dark dark:text-brand">Kapan dipakai: </span>
             {g.kapan}
@@ -72,6 +80,7 @@ export function ObatPerKeluhan() {
             g.nama.toLowerCase().includes(q) ||
             g.contoh.toLowerCase().includes(q) ||
             g.kapan.toLowerCase().includes(q) ||
+            g.dosis.toLowerCase().includes(q) ||
             k.keluhan.toLowerCase().includes(q),
         ),
       }))
