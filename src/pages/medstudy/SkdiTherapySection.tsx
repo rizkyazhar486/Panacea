@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react'
-import { ObatPerKeluhan } from '../../components/ObatPerKeluhan'
+import { ObatPerKeluhan, saringKeluhan } from '../../components/ObatPerKeluhan'
+import { OBAT_PER_KELUHAN } from '../../lib/golonganObat'
 import { Prosa } from '../../components/Prosa'
 import { Card, SectionTitle, Badge } from '../../components/ui'
 import { IconActivity } from '../../components/icons'
@@ -37,6 +38,23 @@ export default function SkdiTherapySection({ cariAwal = '' }: { cariAwal?: strin
     return Array.from(map.entries())
   }, [filteredTherapy])
 
+  // SATU kata kunci, DUA daftar.
+  //
+  // Sebelumnya halaman ini punya dua kotak pencarian pada satu layar: satu
+  // milik halaman untuk daftar tatalaksana, satu lagi di dalam bagian "obat
+  // menurut keluhan". Keduanya menyaring daftar yang berbeda, tidak saling
+  // memberi tahu, dan yang mengetik di kotak yang salah memperoleh "tidak ada
+  // hasil" untuk sesuatu yang sebenarnya ADA di layar yang sama.
+  const OBAT_PER_KELUHAN_JUMLAH = {
+    keluhan: OBAT_PER_KELUHAN.length,
+    golongan: OBAT_PER_KELUHAN.reduce((a, k) => a + k.golongan.length, 0),
+  }
+  const keluhanKetemu = useMemo(() => saringKeluhan(query), [query])
+  const jumlahGolongan = useMemo(
+    () => keluhanKetemu.reduce((a, k) => a + k.golongan.length, 0),
+    [keluhanKetemu],
+  )
+
   const filteredEponym = useMemo(() => {
     const q = query.toLowerCase().trim()
     if (!q) return EPONYM_ENTRIES
@@ -59,7 +77,7 @@ export default function SkdiTherapySection({ cariAwal = '' }: { cariAwal?: strin
         </div>
         <input
           className="mt-3 w-full rounded-xl border border-neutral-200 bg-white px-4 py-2.5 text-[13px] outline-none focus:border-brand dark:border-white/10 dark:bg-white/5"
-          placeholder="Cari diagnosis atau terapi…"
+          placeholder="Cari keluhan, diagnosis, obat, atau dosis…"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
         />
@@ -73,14 +91,52 @@ export default function SkdiTherapySection({ cariAwal = '' }: { cariAwal?: strin
         )}
       </Card>
 
-      {/* Ditaruh TEPAT DI BAWAH JUDUL, sebelum tabel per diagnosis. Yang berdiri
-          di depan pasien tidak memulai dari nama diagnosis atau nama obat — ia
-          memulai dari KELUHAN. Menaruhnya di bawah tabel berarti hanya ditemukan
-          oleh yang sudah tahu apa yang dicarinya, persis kelompok yang paling
-          tidak membutuhkannya. */}
-      <Card>
-        <ObatPerKeluhan />
-      </Card>
+      {/* ── SESI 1: DARI KELUHAN ─────────────────────────────────────────
+          Ditaruh TEPAT DI BAWAH kotak pencarian, sebelum tabel per diagnosis.
+          Yang berdiri di depan pasien tidak memulai dari nama diagnosis atau
+          nama obat — ia memulai dari KELUHAN. Menaruhnya di bawah tabel berarti
+          hanya ditemukan oleh yang sudah tahu apa yang dicarinya, persis
+          kelompok yang paling tidak membutuhkannya.
+
+          Kedua sesi kini disaring oleh SATU kata kunci di atas, dan masing-
+          masing menuliskan jumlah temuannya sendiri — sehingga terlihat bahwa
+          pencarian yang sama menjangkau keduanya. */}
+      {tab === 'therapy' && (
+        <Card>
+          <div className="mb-3 flex items-baseline justify-between gap-2 border-b border-neutral-200 pb-2 dark:border-white/10">
+            <h3 className="text-[14px] font-black text-ink dark:text-white">
+              <span className="text-brand">1 ·</span> Dari keluhan
+            </h3>
+            <span className="text-[11px] font-bold tabular-nums text-neutral-400">
+              {query.trim()
+                ? `${jumlahGolongan} golongan pada ${keluhanKetemu.length} keluhan`
+                : `${OBAT_PER_KELUHAN_JUMLAH.golongan} golongan · ${OBAT_PER_KELUHAN_JUMLAH.keluhan} keluhan`}
+            </span>
+          </div>
+          <p className="mb-3 text-[11.5px] leading-snug text-neutral-500">
+            Dari keluhan menuju GOLONGAN, baru menuju obat dan dosisnya. Salah golongan jauh lebih merugikan
+            daripada salah merek.
+          </p>
+          {jumlahGolongan === 0 ? (
+            <p className="text-center text-[12.5px] text-neutral-500">
+              Tidak ada golongan yang cocok dengan &ldquo;{query.trim()}&rdquo; — coba lihat sesi 2 di bawah.
+            </p>
+          ) : (
+            <ObatPerKeluhan cari={query} />
+          )}
+        </Card>
+      )}
+
+      {tab === 'therapy' && (
+        <div className="flex items-baseline justify-between gap-2 px-1">
+          <h3 className="text-[14px] font-black text-ink dark:text-white">
+            <span className="text-brand">2 ·</span> Dari diagnosis
+          </h3>
+          <span className="text-[11px] font-bold tabular-nums text-neutral-400">
+            {filteredTherapy.length} tatalaksana
+          </span>
+        </div>
+      )}
 
       {tab === 'therapy' && groupedTherapy.map(([sys, entries]) => (
         <Card key={sys} className="!p-4">
@@ -100,7 +156,11 @@ export default function SkdiTherapySection({ cariAwal = '' }: { cariAwal?: strin
       ))}
       {tab === 'resep' && <PanelResep />}
 
-      {tab === 'therapy' && filteredTherapy.length === 0 && <p className="text-center text-[13px] text-neutral-500">Tidak ada hasil.</p>}
+      {tab === 'therapy' && filteredTherapy.length === 0 && (
+        <p className="text-center text-[13px] text-neutral-500">
+          Tidak ada tatalaksana yang cocok{jumlahGolongan > 0 ? ' — tetapi sesi 1 di atas punya hasilnya.' : '.'}
+        </p>
+      )}
 
       {tab === 'eponym' && (
         <Card className="!p-4">

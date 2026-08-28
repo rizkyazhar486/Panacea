@@ -65,9 +65,43 @@ function KartuGolongan({ g, buka, ketuk }: { g: GolonganObat; buka: boolean; ket
   )
 }
 
-export function ObatPerKeluhan() {
+/**
+ * Menyaring katalog dengan satu kata kunci.
+ *
+ * Diekspor supaya halaman yang memuat bagian ini dapat MENGHITUNG hasilnya
+ * tanpa merendernya — dipakai untuk menuliskan jumlah temuan di kepala seksi
+ * sebelum isinya digulirkan.
+ */
+export function saringKeluhan(cari: string) {
+  const q = cari.toLowerCase().trim()
+  if (!q) return OBAT_PER_KELUHAN
+  return OBAT_PER_KELUHAN
+    .map((k) => ({
+      ...k,
+      golongan: k.golongan.filter(
+        (g) =>
+          g.nama.toLowerCase().includes(q) ||
+          g.contoh.toLowerCase().includes(q) ||
+          g.kapan.toLowerCase().includes(q) ||
+          g.dosis.toLowerCase().includes(q) ||
+          k.keluhan.toLowerCase().includes(q),
+      ),
+    }))
+    .filter((k) => k.golongan.length > 0)
+}
+
+/**
+ * @param cari  kata kunci dari LUAR. Bila diberikan, kotak pencarian sendiri
+ *   tidak digambar — halaman induk sudah punya satu, dan dua kotak pencarian
+ *   yang menyaring dua daftar berbeda pada satu layar adalah cara paling pasti
+ *   membuat orang mengetik di kotak yang salah lalu menyimpulkan tidak ada
+ *   hasilnya.
+ */
+export function ObatPerKeluhan({ cari: cariLuar }: { cari?: string } = {}) {
   const [terbuka, setTerbuka] = useState<string | null>(null)
-  const [cari, setCari] = useState('')
+  const [cariSendiri, setCari] = useState('')
+  const dikendalikan = cariLuar !== undefined
+  const cari = dikendalikan ? cariLuar : cariSendiri
 
   const tampil = useMemo(() => {
     const q = cari.toLowerCase().trim()
@@ -89,7 +123,7 @@ export function ObatPerKeluhan() {
 
   return (
     <section className="space-y-4">
-      <div>
+      <div className={dikendalikan ? 'hidden' : undefined}>
         <h3 className="text-[15px] font-black text-ink dark:text-white">Obat menurut keluhan</h3>
         <p className="mt-1 text-[11.5px] leading-snug text-neutral-500">
           Dari keluhan menuju GOLONGAN, baru menuju obatnya. Yang menentukan di depan pasien adalah
@@ -99,15 +133,17 @@ export function ObatPerKeluhan() {
         </p>
       </div>
 
-      <input
-        type="search"
-        value={cari}
-        onChange={(e) => setCari(e.target.value)}
-        placeholder="Cari golongan atau obat (mis. furosemid, kuinolon, syok)…"
-        className="min-h-[44px] w-full rounded-xl border border-neutral-200 bg-white px-3 text-[13px] text-ink placeholder:text-neutral-400 dark:border-white/10 dark:bg-neutral-900 dark:text-white"
-      />
+      {!dikendalikan && (
+        <input
+          type="search"
+          value={cari}
+          onChange={(e) => setCari(e.target.value)}
+          placeholder="Cari golongan atau obat (mis. furosemid, kuinolon, syok)…"
+          className="min-h-[44px] w-full rounded-xl border border-neutral-200 bg-white px-3 text-[13px] text-ink placeholder:text-neutral-400 dark:border-white/10 dark:bg-neutral-900 dark:text-white"
+        />
+      )}
 
-      {tampil.length === 0 && (
+      {tampil.length === 0 && !dikendalikan && (
         <p className="text-center text-[12.5px] text-neutral-500">Tidak ada hasil — coba kata lain.</p>
       )}
 
