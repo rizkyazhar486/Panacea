@@ -134,6 +134,7 @@ export const WIDGETS: WidgetDef[] = [
   { id: 'ringHarian', label: 'Today in Rings', ringkas: 'Recovery, exertion, steps and sleep at a glance', ke: '/athlete-board', emoji: '⭕', kategori: 'Body & Data', bawaan: true },
   { id: 'ayatHarian', label: 'Verse of the Day', ringkas: 'One verse, both translations, recitation and commentary', ke: '/scripture', emoji: '📖', kategori: 'Faith & Life' },
   { id: 'kisahNabi', label: 'Stories of the Prophets', ringkas: 'Summaries with the verses that carry them', ke: '/prophet-stories', emoji: '🕋', kategori: 'Faith & Life' },
+  { id: 'edukasiAwam', label: 'Health, Explained', ringkas: 'Everyday complaints in plain language', ke: '/health-explained', emoji: '📗', kategori: 'Clinical & Learning' },
   { id: 'hitungHari', label: 'Days Since', ringkas: 'Day counters for habits you are changing', ke: '/harian', emoji: '📅', kategori: 'Body & Data' },
   { id: 'kepatuhan', label: 'Adherence, 14 Days', ringkas: 'Complete days, partial days, and missed', ke: '/harian', emoji: '💊', kategori: 'Body & Data', bawaan: true },
   { id: 'beratTren', label: 'Weight, 90 Days', ringkas: 'The three-month direction, not day-to-day noise', ke: '/tubuh', emoji: '⚖️', kategori: 'Body & Data', bawaan: true },
