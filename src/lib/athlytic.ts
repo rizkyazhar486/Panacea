@@ -291,3 +291,245 @@ export function pemulihanHarian(hari = 90): { tanggal: string; nilai: number }[]
   }
   return out
 }
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Panel lanjutan: kebugaran kardio, pemulihan denyut, adaptasi, rekor, dan
+// ringkasan bulanan serta tahunan.
+// ─────────────────────────────────────────────────────────────────────────────
+
+export interface TitikTren {
+  tanggal: string
+  nilai: number
+}
+
+export interface KebugaranKardio {
+  kini: number
+  /** Perubahan terhadap nilai 90 hari lalu, bila ada. */
+  delta: number | null
+  deret: TitikTren[]
+  /** Rentang usia-jenis kelamin: titik tengah dan posisi orang ini. */
+  titikTengah: number
+  pita: string
+  selisihMet: number
+  /** Rasio bahaya kematian terhadap orang seusia di titik tengah (Kodama 2009). */
+  hr: number
+  perkiraan: boolean
+}
+
+/**
+ * VO2max terhadap orang seusianya.
+ *
+ * MEMAKAI TITIK TENGAH SEUSIA, BUKAN PITA "poor-superior" TETAP. VO2max 42
+ * pada usia 25 dan pada usia 60 adalah dua hal yang sama sekali berbeda, dan
+ * pita tetap yang tidak memandang usia membuat yang muda merasa aman dan yang
+ * tua merasa gagal tanpa dasar.
+ */
+export function kebugaranKardio<J>(
+  deretVo2: TitikTren[],
+  usia: number,
+  jk: J,
+  nilaiKebugaranFn: (vo2: number, usia: number, jk: J) => {
+    titikTengah: number; pita: string; selisihMet: number; hrTerhadapTitikTengah: number
+  } | null,
+  perkiraan = false,
+): KebugaranKardio | null {
+  if (!deretVo2.length) return null
+  const kini = deretVo2[deretVo2.length - 1].nilai
+  const nilai = nilaiKebugaranFn(kini, usia, jk)
+  if (!nilai) return null
+  const lama = deretVo2.find((d) => Date.parse(`${d.tanggal}T00:00:00`) <= Date.now() - 90 * 86400_000)
+  return {
+    kini: Math.round(kini * 10) / 10,
+    delta: lama ? Math.round((kini - lama.nilai) * 10) / 10 : null,
+    deret: deretVo2,
+    titikTengah: Math.round(nilai.titikTengah * 10) / 10,
+    pita: nilai.pita,
+    selisihMet: Math.round(nilai.selisihMet * 10) / 10,
+    hr: Math.round(nilai.hrTerhadapTitikTengah * 100) / 100,
+    perkiraan,
+  }
+}
+
+export interface PemulihanDenyut {
+  rata: number
+  terbaik: number
+  jumlah: number
+  deret: { tanggal: string; nilai: number }[]
+  baca: string
+}
+
+/**
+ * Penurunan denyut pada menit pertama sesudah sesi berakhir.
+ *
+ * Ia salah satu ukuran kebugaran otonom yang paling langsung: yang bugar
+ * mengembalikan tonus parasimpatis lebih cepat. Penurunan di bawah 12 denyut
+ * pada menit pertama berhubungan dengan risiko kematian yang lebih tinggi pada
+ * penelitian aslinya — tetapi itu berlaku bagi KELOMPOK, dan pada satu orang
+ * yang menentukan adalah ARAHNYA dari waktu ke waktu.
+ */
+export function pemulihanDenyut(workouts: { mulai: string; hrr1?: number }[]): PemulihanDenyut | null {
+  const ada = workouts
+    .filter((w) => typeof w.hrr1 === 'number' && Number.isFinite(w.hrr1) && (w.hrr1 as number) > 0)
+    .map((w) => ({ tanggal: kunciHari(new Date(w.mulai)), nilai: w.hrr1 as number }))
+    .sort((a, b) => (a.tanggal < b.tanggal ? -1 : 1))
+  if (ada.length < 3) return null
+  const rata = ada.reduce((a, d) => a + d.nilai, 0) / ada.length
+  const terbaik = Math.max(...ada.map((d) => d.nilai))
+  const baca =
+    rata >= 25 ? 'A fast return — this is what a well-trained autonomic system looks like.'
+      : rata >= 18 ? 'A healthy return.'
+        : rata >= 12 ? 'Within the ordinary range. It tends to rise as aerobic fitness rises.'
+          : 'Slower than 12 beats in the first minute. In the original studies this pattern was associated with higher risk at the level of GROUPS — for one person what matters is the direction over months, and it is worth mentioning to a doctor rather than acting on alone.'
+  return { rata: Math.round(rata), terbaik, jumlah: ada.length, deret: ada.slice(-30), baca }
+}
+
+export interface Adaptasi {
+  hrvRata: number | null
+  /** Koefisien variasi HRV dalam persen — makin kecil makin mantap. */
+  hrvCov: number | null
+  hrvArah: number | null
+  rhrRata: number | null
+  rhrArah: number | null
+  hari: number
+  baca: string
+}
+
+/**
+ * Kemantapan dan arah dua penanda adaptasi: variabilitas denyut dan denyut
+ * istirahat.
+ *
+ * KOEFISIEN VARIASI DIPAKAI, BUKAN SIMPANGAN BAKU MENTAH. HRV seseorang yang
+ * rata-ratanya 90 ms wajar bergoyang lebih lebar daripada yang rata-ratanya
+ * 30 ms; simpangan baku mentah akan menyebut yang pertama "tidak stabil"
+ * semata karena angkanya lebih besar.
+ */
+export function adaptasi(
+  hrv: TitikTren[],
+  rhr: TitikTren[],
+  hari = 28,
+): Adaptasi | null {
+  const batas = Date.now() - hari * 86400_000
+  const dalam = (l: TitikTren[]) => l.filter((d) => Date.parse(`${d.tanggal}T00:00:00`) >= batas)
+  const h = dalam(hrv)
+  const r = dalam(rhr)
+  if (h.length < 7 && r.length < 7) return null
+
+  const rata = (l: TitikTren[]) => (l.length ? l.reduce((a, d) => a + d.nilai, 0) / l.length : null)
+  const arah = (l: TitikTren[]) => {
+    if (l.length < 8) return null
+    const tengah = Math.floor(l.length / 2)
+    const a = rata(l.slice(0, tengah))
+    const b = rata(l.slice(tengah))
+    return a != null && b != null ? Math.round((b - a) * 10) / 10 : null
+  }
+  const hrvRata = rata(h)
+  let cov: number | null = null
+  if (h.length >= 7 && hrvRata && hrvRata > 0) {
+    const varians = h.reduce((a, d) => a + (d.nilai - hrvRata) ** 2, 0) / h.length
+    cov = Math.round((Math.sqrt(varians) / hrvRata) * 1000) / 10
+  }
+  const rhrRata = rata(r)
+  const hrvArah = arah(h)
+  const rhrArah = arah(r)
+
+  const baca =
+    cov != null && cov > 15
+      ? `HRV is swinging widely (${cov}% of its own average). Wide swings usually mean the load, sleep or stress is changing faster than the body is settling.`
+      : hrvArah != null && rhrArah != null && hrvArah > 0 && rhrArah < 0
+        ? 'HRV rising and resting heart rate falling together — the clearest signal that training is being absorbed.'
+        : hrvArah != null && rhrArah != null && hrvArah < 0 && rhrArah > 0
+          ? 'HRV falling and resting heart rate rising together. Two or three weeks of this is the pattern that precedes overreaching.'
+          : 'Both markers are steady. Steady is the normal state; it is the sustained drift in one direction that carries information.'
+
+  return {
+    hrvRata: hrvRata != null ? Math.round(hrvRata) : null,
+    hrvCov: cov,
+    hrvArah,
+    rhrRata: rhrRata != null ? Math.round(rhrRata) : null,
+    rhrArah,
+    hari: Math.max(h.length, r.length),
+    baca,
+  }
+}
+
+export interface Rekor {
+  label: string
+  nilai: string
+  tanggal: string
+}
+
+/** Rekor pribadi dari sesi yang benar-benar tercatat. */
+export function rekorPribadi(sesi: SesiTerhitung[]): Rekor[] {
+  const out: Rekor[] = []
+  const fmtTgl = (s: string) => kunciHari(new Date(s))
+
+  const terjauh = sesi.reduce<SesiTerhitung | null>((a, s) => (!a || (s.jarakKm ?? 0) > (a.jarakKm ?? 0) ? s : a), null)
+  if (terjauh?.jarakKm) out.push({ label: 'Longest distance', nilai: `${terjauh.jarakKm.toFixed(1)} km`, tanggal: fmtTgl(terjauh.mulai) })
+
+  const terlama = sesi.reduce<SesiTerhitung | null>((a, s) => (!a || s.durasiDetik > a.durasiDetik ? s : a), null)
+  if (terlama && terlama.durasiDetik > 0) {
+    out.push({ label: 'Longest session', nilai: `${Math.round(terlama.durasiDetik / 60)} min`, tanggal: fmtTgl(terlama.mulai) })
+  }
+
+  const terberat = sesi.reduce<SesiTerhitung | null>((a, s) => (!a || s.trimp > a.trimp ? s : a), null)
+  if (terberat && terberat.trimp > 0) out.push({ label: 'Hardest session', nilai: `${Math.round(terberat.trimp)} load`, tanggal: fmtTgl(terberat.mulai) })
+
+  // Pace terbaik hanya dari sesi yang jaraknya cukup untuk berarti.
+  const cepat = sesi
+    .filter((s) => (s.jarakKm ?? 0) >= 3 && s.durasiDetik > 0)
+    .reduce<SesiTerhitung | null>((a, s) => {
+      const p = s.durasiDetik / (s.jarakKm as number)
+      const pa = a ? a.durasiDetik / (a.jarakKm as number) : Infinity
+      return p < pa ? s : a
+    }, null)
+  if (cepat?.jarakKm) {
+    const sec = cepat.durasiDetik / cepat.jarakKm
+    out.push({
+      label: 'Fastest pace (3 km+)',
+      nilai: `${Math.floor(sec / 60)}:${String(Math.round(sec % 60)).padStart(2, '0')} /km`,
+      tanggal: fmtTgl(cepat.mulai),
+    })
+  }
+
+  return out
+}
+
+export interface Bulanan {
+  bulan: string
+  sesi: number
+  menit: number
+  km: number
+  beban: number
+}
+
+/** Ringkasan per bulan kalender untuk n bulan terakhir. */
+export function rekapBulanan(sesi: SesiTerhitung[], bulan = 6, sekarang = Date.now()): Bulanan[] {
+  const peta = new Map<string, Bulanan>()
+  for (const s of sesi) {
+    const t = new Date(s.mulai)
+    if (Number.isNaN(t.getTime())) continue
+    const k = `${t.getFullYear()}-${String(t.getMonth() + 1).padStart(2, '0')}`
+    const p = peta.get(k) ?? { bulan: k, sesi: 0, menit: 0, km: 0, beban: 0 }
+    p.sesi += 1
+    p.menit += s.durasiDetik / 60
+    p.km += s.jarakKm ?? 0
+    p.beban += s.trimp
+    peta.set(k, p)
+  }
+  const out: Bulanan[] = []
+  const d = new Date(sekarang)
+  for (let i = bulan - 1; i >= 0; i--) {
+    const b = new Date(d.getFullYear(), d.getMonth() - i, 1)
+    const k = `${b.getFullYear()}-${String(b.getMonth() + 1).padStart(2, '0')}`
+    const p = peta.get(k)
+    out.push(p
+      ? { ...p, menit: Math.round(p.menit), km: Math.round(p.km * 10) / 10, beban: Math.round(p.beban) }
+      : { bulan: k, sesi: 0, menit: 0, km: 0, beban: 0 })
+  }
+  return out
+}
+
+/** Satu petak per hari selama 364 hari terakhir, untuk kisi setahun. */
+export function petakTahun(sesi: SesiTerhitung[], sekarang = Date.now()): TitikHarian[] {
+  return bebanHarian(sesi, 364, sekarang)
+}

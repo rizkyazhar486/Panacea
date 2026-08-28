@@ -1,4 +1,4 @@
-import { useMemo } from 'react'
+import { useEffect, useMemo, useRef } from 'react'
 import { Link } from 'react-router-dom'
 import { SectionTitle } from '../components/ui'
 import { IconActivity } from '../components/icons'
@@ -12,7 +12,10 @@ import { ringkasBeban, statusLatihan } from '../lib/trainingPhysiology'
 import {
   siapkan, bebanHarian, rentangBeban, fokusBeban, kapanBerlatih,
   bebanPekanan, upayaLawanPemulihan, dampakBeban, pemulihanHarian,
+  kebugaranKardio, pemulihanDenyut, adaptasi, rekorPribadi, rekapBulanan, petakTahun,
 } from '../lib/athlytic'
+import { deretMetrik } from '../lib/riwayatVitals'
+import { nilaiKebugaran, vo2DariDenyut } from '../lib/bugarIlmiah'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Papan atlet — beranda angka, bukan beranda kalimat.
@@ -32,6 +35,18 @@ import {
 // sama di seluruh aplikasi — biru kebugaran, merah kelelahan, hijau segar,
 // jingga upaya.
 // ─────────────────────────────────────────────────────────────────────────────
+
+// Nilai `pita` dari bugarIlmiah adalah DATA berbahasa Indonesia yang dipakai
+// juga di tempat lain; ia tidak diterjemahkan di sumbernya, melainkan
+// dipetakan ke antarmuka di sini. Menerjemahkan nilainya sendiri akan
+// mematahkan setiap perbandingan yang memakainya.
+const PITA_EN: Record<string, string> = {
+  'jauh di bawah': 'well below',
+  'di bawah': 'below',
+  sekitar: 'around',
+  'di atas': 'above',
+  'jauh di atas': 'well above',
+}
 
 const NEON = {
   biru: '#38bdf8',
@@ -76,6 +91,18 @@ function Panel({
 export function PapanAtlet() {
   const sekarang = useJam()
 
+  // Kisi setahun dibuka DIGULIR KE UJUNG KANAN.
+  //
+  // Urutan lama-ke-baru dari kiri ke kanan adalah kebiasaan yang sudah dikenal,
+  // tetapi pada layar telepon ia berarti yang pertama terlihat adalah bulan
+  // yang paling tidak menarik — dan pekan-pekan terakhir, satu-satunya bagian
+  // yang benar-benar ingin dilihat orang, tersembunyi di luar layar.
+  const kisi = useRef<HTMLDivElement | null>(null)
+  useEffect(() => {
+    const el = kisi.current
+    if (el) el.scrollLeft = el.scrollWidth
+  })
+
   const data = useMemo(() => {
     const workouts = getWorkouts()
     if (workouts.length < 3) return null
@@ -93,6 +120,19 @@ export function PapanAtlet() {
     const kini = ff.length ? ff[ff.length - 1] : null
     const b = ringkasBeban(sesi, sekarang)
     const pemulihan = pemulihanHarian(90)
+
+    // VO2max: yang dilaporkan alat lebih dipercaya. Bila tidak ada, DIPERKIRAKAN
+    // dari denyut maksimal dan denyut istirahat — dan sifat perkiraannya
+    // dinyatakan di layar, bukan disembunyikan.
+    let deretVo2 = deretMetrik('vo2max', 365)
+    let vo2Perkiraan = false
+    if (!deretVo2.length) {
+      const p = vo2DariDenyut(k.hrMax, k.hrRest)
+      if (p) {
+        deretVo2 = [{ tanggal: new Date().toISOString().slice(0, 10), nilai: p.nilai }]
+        vo2Perkiraan = true
+      }
+    }
     const pasangan = upayaLawanPemulihan(sesi, pemulihan, 60, sekarang)
     return {
       sesi,
@@ -107,6 +147,12 @@ export function PapanAtlet() {
       pekanan: bebanPekanan(sesi, 12, sekarang),
       pasangan,
       dampak: dampakBeban(pasangan),
+      kardio: kebugaranKardio(deretVo2, usia, jk === 'F' ? 'P' : 'L', nilaiKebugaran, vo2Perkiraan),
+      hrr: pemulihanDenyut(workouts),
+      adaptasi: adaptasi(deretMetrik('hrvMs', 90), deretMetrik('restingHr', 90), 28),
+      rekor: rekorPribadi(sesi),
+      bulanan: rekapBulanan(sesi, 6, sekarang),
+      tahun: petakTahun(sesi, sekarang),
     }
   }, [sekarang])
 
@@ -123,6 +169,7 @@ export function PapanAtlet() {
   }
 
   const { harian, rentang, fokus, kapan, pekanan, pasangan, dampak, kini, beban, status } = data
+  const { kardio, hrr, adaptasi: adap, rekor, bulanan, tahun } = data
   const maksHarian = Math.max(...harian.map((d) => d.beban), 1)
   const maksPekan = Math.max(...pekanan.map((p) => p.beban), 1)
   const acwr = beban.acwr
@@ -349,6 +396,203 @@ export function PapanAtlet() {
           </div>
         </Panel>
       )}
+
+      {/* ── Kebugaran kardio ─────────────────────────────────────────────── */}
+      {kardio && (
+        <Panel
+          judul="Cardio fitness · VO₂max"
+          nilai={kardio.kini}
+          satuan={`ml/kg/min · typical for your age ${kardio.titikTengah}`}
+          warna={kardio.selisihMet >= 0.75 ? NEON.hijau : kardio.selisihMet <= -0.75 ? NEON.merah : NEON.jingga}
+          catatan={
+            (kardio.perkiraan
+              ? 'Estimated from your maximum and resting heart rate, not measured — it can differ from a lab test by over ten percent, and is most useful for watching direction rather than comparing with other people. '
+              : '') +
+            `You are ${PITA_EN[kardio.pita] ?? kardio.pita} the midpoint for your age and sex, by ${Math.abs(kardio.selisihMet).toFixed(1)} MET. Kodama 2009 puts each MET at a hazard ratio of 0.87 for all-cause mortality, which places you near ${kardio.hr.toFixed(2)} relative to that midpoint — a figure that applies to GROUPS, never to one person's future.`
+          }
+        >
+          {/* Posisi terhadap titik tengah seusia, bukan terhadap pita tetap.
+              VO2max 42 pada usia 25 dan pada usia 60 adalah dua hal yang sama
+              sekali berbeda. */}
+          <div className="relative mt-3 h-4 overflow-hidden rounded-full bg-neutral-200 dark:bg-white/10">
+            <span className="absolute inset-y-0 w-px bg-neutral-400" style={{ left: '50%' }} />
+            <span
+              className="absolute inset-y-0 w-1 rounded-full"
+              style={{
+                left: `calc(${Math.min(97, Math.max(1, 50 + kardio.selisihMet * 12))}% - 2px)`,
+                background: kardio.selisihMet >= 0 ? NEON.hijau : NEON.merah,
+                boxShadow: `0 0 8px ${kardio.selisihMet >= 0 ? NEON.hijau : NEON.merah}`,
+              }}
+            />
+          </div>
+          <div className="mt-1 flex justify-between text-[9px] font-bold text-neutral-400">
+            <span>−4 MET</span><span>age midpoint</span><span>+4 MET</span>
+          </div>
+          {kardio.delta != null && (
+            <div className="mt-2 text-[11px] font-bold" style={{ color: kardio.delta >= 0 ? NEON.hijau : NEON.merah }}>
+              {kardio.delta >= 0 ? '▲' : '▼'} {Math.abs(kardio.delta)} over 90 days
+            </div>
+          )}
+        </Panel>
+      )}
+
+      {/* ── Pemulihan denyut ─────────────────────────────────────────────── */}
+      {hrr && (
+        <Panel
+          judul="Heart-rate recovery · 1 min"
+          nilai={hrr.rata}
+          satuan={`bpm average · best ${hrr.terbaik} · ${hrr.jumlah} sessions`}
+          warna={hrr.rata >= 18 ? NEON.hijau : hrr.rata >= 12 ? NEON.jingga : NEON.merah}
+          catatan={hrr.baca}
+        >
+          <div className="mt-2 flex h-16 items-end gap-[3px]">
+            {hrr.deret.map((d, i) => (
+              <span
+                key={`${d.tanggal}-${i}`}
+                className="flex-1 rounded-t-sm"
+                style={{
+                  height: `${Math.max(4, Math.min(100, (d.nilai / Math.max(...hrr.deret.map((x) => x.nilai), 1)) * 100))}%`,
+                  background: NEON.hijau,
+                  boxShadow: `0 0 5px ${NEON.hijau}55`,
+                }}
+                title={`${d.tanggal}: −${d.nilai} bpm`}
+              />
+            ))}
+          </div>
+        </Panel>
+      )}
+
+      {/* ── Adaptasi ─────────────────────────────────────────────────────── */}
+      {adap && (
+        <Panel judul="Training adaptation · 28 days" catatan={adap.baca}>
+          <div className="mt-2 grid grid-cols-3 gap-2">
+            {[
+              { l: 'HRV', v: adap.hrvRata, u: 'ms', d: adap.hrvArah, baikNaik: true, c: NEON.sian },
+              { l: 'HRV stability', v: adap.hrvCov, u: '% CoV', d: null, baikNaik: false, c: NEON.ungu },
+              { l: 'Resting HR', v: adap.rhrRata, u: 'bpm', d: adap.rhrArah, baikNaik: false, c: NEON.merah },
+            ].map((x) => (
+              <div key={x.l} className="rounded-2xl bg-white/60 p-2 text-center dark:bg-white/5">
+                <div className="text-[9px] font-black uppercase tracking-wide text-neutral-400">{x.l}</div>
+                <div className="text-[20px] font-black leading-none tabular-nums" style={{ color: x.c }}>
+                  {x.v ?? '—'}
+                </div>
+                <div className="text-[9px] font-bold text-neutral-400">{x.u}</div>
+                {x.d != null && Math.abs(x.d) >= 0.1 && (
+                  <div
+                    className="mt-0.5 text-[10px] font-black"
+                    style={{ color: (x.d > 0) === x.baikNaik ? NEON.hijau : NEON.merah }}
+                  >
+                    {x.d > 0 ? '▲' : '▼'} {Math.abs(x.d)}
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+          <p className="mt-2 text-[10px] leading-snug text-neutral-400">
+            Stability is the coefficient of variation — the spread of your HRV as a share of your own average, so a
+            person who normally sits at 90 ms is not called unstable simply because their numbers are bigger.
+          </p>
+        </Panel>
+      )}
+
+      {/* ── Rekor pribadi ────────────────────────────────────────────────── */}
+      {rekor.length > 0 && (
+        <Panel judul="Personal records" nilai={rekor.length} satuan="from your own logged sessions">
+          <div className="mt-2 space-y-1.5">
+            {rekor.map((r) => (
+              <div key={r.label} className="flex items-baseline justify-between gap-2 rounded-xl bg-white/60 px-3 py-2 dark:bg-white/5">
+                <span className="text-[11px] font-bold text-neutral-500">{r.label}</span>
+                <span className="text-right">
+                  <span className="block text-[15px] font-black leading-none tabular-nums text-ink dark:text-white">{r.nilai}</span>
+                  <span className="text-[9px] font-bold text-neutral-400">{r.tanggal}</span>
+                </span>
+              </div>
+            ))}
+          </div>
+        </Panel>
+      )}
+
+      {/* ── Rekap bulanan ────────────────────────────────────────────────── */}
+      <Panel
+        judul="Month over month"
+        nilai={bulanan[bulanan.length - 1]?.sesi ?? 0}
+        satuan="sessions this month"
+        warna={NEON.jingga}
+      >
+        <div className="mt-2 space-y-1">
+          {bulanan.map((b) => {
+            const maks = Math.max(...bulanan.map((x) => x.beban), 1)
+            return (
+              <div key={b.bulan} className="flex items-center gap-2">
+                <span className="w-14 shrink-0 text-[10px] font-bold text-neutral-400">{b.bulan}</span>
+                <span className="h-3 flex-1 overflow-hidden rounded-full bg-neutral-200 dark:bg-white/10">
+                  <span
+                    className="block h-full rounded-full"
+                    style={{ width: `${(b.beban / maks) * 100}%`, background: NEON.jingga, boxShadow: `0 0 6px ${NEON.jingga}66` }}
+                  />
+                </span>
+                {/* Satu baris, tanpa patah. Angka yang patah menjadi dua baris
+                    membuat tinggi tiap baris berbeda-beda dan batangnya tidak
+                    lagi dapat dibandingkan sekilas — padahal perbandingan
+                    sekilas itulah seluruh gunanya. */}
+                <span className="w-[74px] shrink-0 whitespace-nowrap text-right text-[10px] font-bold tabular-nums text-neutral-500">
+                  {b.sesi}× · {Math.round(b.menit / 60)}h
+                </span>
+              </div>
+            )
+          })}
+        </div>
+      </Panel>
+
+      {/* ── Kisi setahun ─────────────────────────────────────────────────── */}
+      <Panel
+        judul="Your year"
+        nilai={tahun.filter((d) => d.sesi > 0).length}
+        satuan="days trained in the last 364"
+        warna={NEON.hijau}
+        catatan="One square per day. The gaps carry as much information as the streaks — most people find their year has a shape they did not know about."
+      >
+        {/* Petaknya 8 px, bukan 6. Pada 6 px seluruh kisi terbaca sebagai satu
+            blok abu-abu di layar telepon — dan kisi yang tidak terbaca sama
+            saja dengan kisi yang tidak ada. Lebar penuhnya digulir mendatar. */}
+        <div ref={kisi} className="mt-2 overflow-x-auto">
+          <div className="flex min-w-[470px] gap-[3px]">
+            {Array.from({ length: 52 }, (_, w) => (
+              <div key={w} className="flex flex-col gap-[2px]">
+                {Array.from({ length: 7 }, (_, d) => {
+                  const idx = w * 7 + d
+                  const hari = tahun[idx]
+                  if (!hari) return <span key={d} className="h-[8px] w-[8px]" />
+                  const maks = Math.max(...tahun.map((x) => x.beban), 1)
+                  const kuat = hari.beban / maks
+                  return (
+                    <span
+                      key={d}
+                      className="h-[8px] w-[8px] rounded-[2px]"
+                      style={{
+                        background: hari.beban === 0 ? 'rgba(120,120,120,0.16)' : NEON.hijau,
+                        opacity: hari.beban === 0 ? 1 : 0.3 + kuat * 0.7,
+                      }}
+                      title={`${hari.tanggal}: ${hari.beban}`}
+                    />
+                  )
+                })}
+              </div>
+            ))}
+          </div>
+        </div>
+        <div className="mt-2 flex items-center gap-1.5">
+          <span className="text-[9px] font-bold text-neutral-400">less</span>
+          {[0, 0.3, 0.55, 0.8, 1].map((o) => (
+            <span
+              key={o}
+              className="h-[8px] w-[8px] rounded-[2px]"
+              style={{ background: o === 0 ? 'rgba(120,120,120,0.16)' : NEON.hijau, opacity: o === 0 ? 1 : 0.3 + o * 0.7 }}
+            />
+          ))}
+          <span className="text-[9px] font-bold text-neutral-400">more · swipe to see the whole year</span>
+        </div>
+      </Panel>
 
       {/* ── Status ───────────────────────────────────────────────────────── */}
       <Panel judul="Training status" nilai={status.label} warna={status.warna} catatan={status.saran}>
