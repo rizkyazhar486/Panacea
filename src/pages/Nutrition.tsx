@@ -9,6 +9,7 @@ import { IconPlus, IconSparkle, IconHeart, IconStethoscope, IconHospital, IconFl
 import { ShareToFeed } from '../components/ShareToFeed'
 import { api, backendEnabled } from '../lib/api'
 import { getDemo, setDemo } from '../lib/profile'
+import { JENIS_OLAHRAGA, type JenisOlahraga } from '../lib/olahraga'
 import { getVitals } from '../lib/healthVitals'
 import { denyutMaksPerkiraan, vo2DariDenyut } from '../lib/bugarIlmiah'
 
@@ -48,7 +49,6 @@ const CT = { ok: 'var(--teks-ok)', warn: 'var(--teks-warn)', bad: 'var(--teks-ba
    ═══════════════════════════════════════════════════════ */
 interface Body { w: number; h: number; age: number; g: 'M' | 'F'; act: number; goal: 'lose' | 'maintain' | 'gain' }
 interface Food { name: string; k: number; c: number; p: number; f: number; fb: number; na: number; k2: number; mg: number; fe: number; zn: number; vitC: number; vitD: number; omega3: number; gi: number; cat: string; emoji: string; tags: string[] }
-interface Exer { name: string; emoji: string; met: number; int: string; gps: boolean; cat: string; hiit: boolean }
 interface GP { lat: number; lng: number; t: number; hr?: number }
 interface IV { date: string; heartRate?: number; steps?: number; systolic?: number; diastolic?: number; spo2?: number; hrv?: number; vo2Max?: number; glucose?: number; hba1c?: number; creatinine?: number; gfr?: number; bun?: number; potassium?: number; sodium?: number; crp?: number; esr?: number; wbc?: number; hemoglobin?: number; platelet?: number; alt?: number; ast?: number; albumin?: number; bilirubin?: number; tsh?: number; t4?: number; cortisol?: number; uricAcid?: number; ldl?: number; hdl?: number; triglycerides?: number; totalCholesterol?: number; ferritin?: number; vitB12?: number; folate?: number; vitD?: number; calcium?: number; phosphorus?: number }
 interface Rec { e: string; t: string; d: string; pr: number; c: string }
@@ -227,114 +227,13 @@ const FD: Food[] = [
 const FCATS = [...new Set(FD.map(f => f.cat))]
 
 /* ═══════════════════════════════════════════════════════
-   COMPREHENSIVE EXERCISE DATABASE (60+ activities)
+   JENIS OLAHRAGA — sekarang dari src/lib/olahraga.ts
+   
+   Daftarnya dipindahkan ke lib supaya pencatat latihan, pengingat, dan papan
+   atlet memakai daftar yang SAMA. Tiga salinan daftar akan berbeda dalam
+   beberapa bulan, dan yang melihat perbedaannya adalah pemakainya.
    ═══════════════════════════════════════════════════════ */
-const EX: Exer[] = [
-  // CARDIO - WALKING
-  { name: 'Casual walk', emoji: '🚶', met: 2.5, int: 'Low', gps: true, cat: 'Cardio', hiit: false },
-  { name: 'Brisk walk', emoji: '🚶‍♂️', met: 3.5, int: 'Moderate', gps: true, cat: 'Cardio', hiit: false },
-  { name: 'Nordic walking', emoji: '🚶‍♀️', met: 4.8, int: 'Moderate', gps: true, cat: 'Cardio', hiit: false },
-  { name: 'Power walking', emoji: '⚡', met: 5.5, int: 'Moderate', gps: true, cat: 'Cardio', hiit: false },
-  // CARDIO - RUNNING
-  { name: 'Jogging', emoji: '🏃', met: 7.0, int: 'Moderate', gps: true, cat: 'Cardio', hiit: false },
-  { name: 'Easy run', emoji: '🏃‍♂️', met: 8.0, int: 'Moderate', gps: true, cat: 'Cardio', hiit: false },
-  { name: 'Running', emoji: '🏃‍♀️', met: 9.8, int: 'High', gps: true, cat: 'Cardio', hiit: false },
-  { name: 'Fast run', emoji: '💨', met: 12.5, int: 'Very High', gps: true, cat: 'Cardio', hiit: true },
-  { name: '100m sprint', emoji: '⚡', met: 18.0, int: 'Very High', gps: true, cat: 'Cardio', hiit: true },
-  { name: '200m sprint', emoji: '⚡', met: 16.0, int: 'Very High', gps: true, cat: 'Cardio', hiit: true },
-  { name: '400m sprint', emoji: '🔥', met: 14.0, int: 'Very High', gps: true, cat: 'Cardio', hiit: true },
-  { name: 'Fartlek', emoji: '🌀', met: 11.5, int: 'High', gps: true, cat: 'Cardio', hiit: true },
-  { name: 'Tempo run', emoji: '🎯', met: 10.8, int: 'High', gps: true, cat: 'Cardio', hiit: false },
-  { name: 'Interval run', emoji: '🔄', met: 13.0, int: 'Very High', gps: true, cat: 'Cardio', hiit: true },
-  { name: 'Uphill run', emoji: '⛰️', met: 12.0, int: 'Very High', gps: true, cat: 'Cardio', hiit: true },
-  { name: 'Trail running', emoji: '🏔️', met: 10.5, int: 'High', gps: true, cat: 'Cardio', hiit: false },
-  { name: 'Treadmill walk', emoji: '🚶', met: 3.0, int: 'Low', gps: false, cat: 'Cardio', hiit: false },
-  { name: 'Treadmill run', emoji: '🏃', met: 9.0, int: 'High', gps: false, cat: 'Cardio', hiit: false },
-  // CARDIO - CYCLING
-  { name: 'Casual cycling', emoji: '🚴', met: 6.0, int: 'Moderate', gps: true, cat: 'Cardio', hiit: false },
-  { name: 'Moderate cycling', emoji: '🚴‍♂️', met: 8.0, int: 'Moderate', gps: true, cat: 'Cardio', hiit: false },
-  { name: 'Intense cycling', emoji: '🚴‍♀️', met: 12.0, int: 'High', gps: true, cat: 'Cardio', hiit: true },
-  { name: 'Cycling time trial', emoji: '⏱️', met: 16.0, int: 'Very High', gps: true, cat: 'Cardio', hiit: true },
-  { name: 'Indoor cycling', emoji: '🚲', met: 8.5, int: 'High', gps: false, cat: 'Cardio', hiit: false },
-  { name: 'Spinning HIIT', emoji: '🔥', met: 14.0, int: 'Very High', gps: false, cat: 'Cardio', hiit: true },
-  // CARDIO - SWIMMING
-  { name: 'Casual swimming', emoji: '🏊', met: 5.8, int: 'Moderate', gps: false, cat: 'Cardio', hiit: false },
-  { name: 'Freestyle swimming', emoji: '🏊‍♂️', met: 8.0, int: 'High', gps: false, cat: 'Cardio', hiit: false },
-  { name: 'Butterfly swimming', emoji: '🦋', met: 11.0, int: 'Very High', gps: false, cat: 'Cardio', hiit: true },
-  { name: 'HIIT swimming', emoji: '🔥', met: 12.0, int: 'Very High', gps: false, cat: 'Cardio', hiit: true },
-  // CARDIO - OTHER
-  { name: 'Trekking/Hiking', emoji: '🥾', met: 6.0, int: 'Moderate', gps: true, cat: 'Cardio', hiit: false },
-  { name: 'Aerobics', emoji: '💃', met: 6.5, int: 'Moderate', gps: false, cat: 'Cardio', hiit: false },
-  { name: 'Zumba', emoji: '🕺', met: 6.5, int: 'Moderate', gps: false, cat: 'Cardio', hiit: false },
-  { name: 'Jump rope', emoji: '⏭️', met: 12.3, int: 'High', gps: false, cat: 'Cardio', hiit: true },
-  { name: 'Boxing', emoji: '🥊', met: 7.8, int: 'High', gps: false, cat: 'Cardio', hiit: true },
-  { name: 'Kickboxing', emoji: '🦵', met: 9.0, int: 'High', gps: false, cat: 'Cardio', hiit: true },
-  { name: 'Rowing', emoji: '🚣', met: 7.0, int: 'High', gps: false, cat: 'Cardio', hiit: false },
-  { name: 'Elliptical', emoji: '🔄', met: 5.0, int: 'Moderate', gps: false, cat: 'Cardio', hiit: false },
-  { name: 'Stair climbing', emoji: '🏗️', met: 9.0, int: 'High', gps: false, cat: 'Cardio', hiit: false },
-  { name: 'Jump rope HIIT', emoji: '🔥', met: 14.0, int: 'Very High', gps: false, cat: 'Cardio', hiit: true },
-  { name: 'Burpees', emoji: '💪', met: 12.0, int: 'Very High', gps: false, cat: 'Cardio', hiit: true },
-  { name: 'Mountain climbers', emoji: '⛰️', met: 10.0, int: 'High', gps: false, cat: 'Cardio', hiit: true },
-  { name: 'Jumping jacks', emoji: '⭐', met: 8.0, int: 'High', gps: false, cat: 'Cardio', hiit: false },
-  // FLEXIBILITY
-  { name: 'Yoga', emoji: '🧘', met: 2.5, int: 'Low', gps: false, cat: 'Flexibility', hiit: false },
-  { name: 'Power yoga', emoji: '🧘‍♂️', met: 4.0, int: 'Moderate', gps: false, cat: 'Flexibility', hiit: false },
-  { name: 'Pilates', emoji: '🤸', met: 3.0, int: 'Low', gps: false, cat: 'Flexibility', hiit: false },
-  { name: 'Stretching', emoji: '🤸‍♀️', met: 2.3, int: 'Low', gps: false, cat: 'Flexibility', hiit: false },
-  { name: 'Tai chi', emoji: '☯️', met: 3.0, int: 'Low', gps: false, cat: 'Flexibility', hiit: false },
-  // STRENGTH
-  { name: 'Light weightlifting', emoji: '🏋️', met: 3.5, int: 'Low', gps: false, cat: 'Strength', hiit: false },
-  { name: 'Weightlifting', emoji: '🏋️‍♂️', met: 5.0, int: 'Moderate', gps: false, cat: 'Strength', hiit: false },
-  { name: 'Heavy weightlifting', emoji: '🏋️‍♀️', met: 6.0, int: 'High', gps: false, cat: 'Strength', hiit: false },
-  { name: 'Crossfit', emoji: '💪', met: 8.0, int: 'High', gps: false, cat: 'Strength', hiit: true },
-  { name: 'Circuit training', emoji: '🔄', met: 8.5, int: 'High', gps: false, cat: 'Strength', hiit: true },
-  { name: 'Push-ups', emoji: '💪', met: 8.0, int: 'High', gps: false, cat: 'Strength', hiit: false },
-  { name: 'Pull-ups', emoji: '💪', met: 8.0, int: 'High', gps: false, cat: 'Strength', hiit: false },
-  { name: 'Plank', emoji: '🧱', met: 3.8, int: 'Low', gps: false, cat: 'Strength', hiit: false },
-  { name: 'Deadlift', emoji: '🏋️', met: 6.0, int: 'High', gps: false, cat: 'Strength', hiit: false },
-  { name: 'Squat', emoji: '🦵', met: 5.0, int: 'Moderate', gps: false, cat: 'Strength', hiit: false },
-  { name: 'Kettlebell swing', emoji: '🔔', met: 9.8, int: 'High', gps: false, cat: 'Strength', hiit: true },
-  { name: 'Battle ropes', emoji: '🪢', met: 10.0, int: 'High', gps: false, cat: 'Strength', hiit: true },
-  // SPORTS
-  { name: 'Futsal', emoji: '⚽', met: 10.0, int: 'High', gps: true, cat: 'Sports', hiit: true },
-  { name: 'Soccer', emoji: '🏆', met: 10.0, int: 'High', gps: true, cat: 'Sports', hiit: true },
-  { name: 'Basketball', emoji: '🏀', met: 6.5, int: 'Moderate', gps: true, cat: 'Sports', hiit: false },
-  { name: 'Badminton', emoji: '🏸', met: 5.5, int: 'Moderate', gps: false, cat: 'Sports', hiit: false },
-  { name: 'Tennis', emoji: '🎾', met: 7.3, int: 'High', gps: true, cat: 'Sports', hiit: false },
-  { name: 'Table tennis', emoji: '🏓', met: 4.0, int: 'Moderate', gps: false, cat: 'Sports', hiit: false },
-  { name: 'Volleyball', emoji: '🏐', met: 4.0, int: 'Moderate', gps: false, cat: 'Sports', hiit: false },
-  { name: 'Rugby', emoji: '🏈', met: 10.0, int: 'High', gps: true, cat: 'Sports', hiit: true },
-  { name: 'Archery', emoji: '🏹', met: 3.5, int: 'Low', gps: false, cat: 'Sports', hiit: false },
-  { name: 'Golf', emoji: '⛳', met: 3.5, int: 'Low', gps: true, cat: 'Sports', hiit: false },
-  { name: 'Rock climbing', emoji: '🧗', met: 8.0, int: 'High', gps: false, cat: 'Sports', hiit: false },
-  { name: 'Skateboarding', emoji: '🛹', met: 5.0, int: 'Moderate', gps: true, cat: 'Sports', hiit: false },
-  // AQUATIC
-  { name: 'Water polo', emoji: '🤽', met: 10.0, int: 'High', gps: false, cat: 'Aquatic', hiit: true },
-  { name: 'Surfing', emoji: '🏄', met: 3.0, int: 'Moderate', gps: true, cat: 'Aquatic', hiit: false },
-  { name: 'Snorkeling', emoji: '🤿', met: 4.0, int: 'Low', gps: true, cat: 'Aquatic', hiit: false },
-  // RECOVERY
-  { name: 'Sweeping', emoji: '🧹', met: 3.3, int: 'Low', gps: false, cat: 'Activity', hiit: false },
-  { name: 'Washing', emoji: '🧼', met: 2.0, int: 'Low', gps: false, cat: 'Activity', hiit: false },
-  { name: 'Gardening', emoji: '🌱', met: 3.8, int: 'Low', gps: false, cat: 'Activity', hiit: false },
-  { name: 'Cycling to work', emoji: '🚲', met: 5.0, int: 'Moderate', gps: true, cat: 'Activity', hiit: false },
-  // HIGH-INTENSITY / FUNCTIONAL (Hyrox, CrossFit, etc.)
-  { name: 'Hyrox (race)', emoji: '🟥', met: 13.0, int: 'Very High', gps: true, cat: 'HIIT', hiit: true },
-  { name: 'CrossFit WOD', emoji: '🏋️‍♀️', met: 12.0, int: 'Very High', gps: false, cat: 'HIIT', hiit: true },
-  { name: 'Functional bootcamp', emoji: '🥾', met: 10.0, int: 'High', gps: false, cat: 'HIIT', hiit: true },
-  { name: 'Sled push/pull', emoji: '🛷', met: 11.0, int: 'Very High', gps: false, cat: 'HIIT', hiit: true },
-  { name: 'Wall balls', emoji: '🧱', met: 9.0, int: 'High', gps: false, cat: 'HIIT', hiit: true },
-  { name: 'Rowing erg (sprint)', emoji: '🚣', met: 12.0, int: 'Very High', gps: false, cat: 'HIIT', hiit: true },
-  { name: 'SkiErg', emoji: '⛷️', met: 11.0, int: 'Very High', gps: false, cat: 'HIIT', hiit: true },
-  { name: 'Assault bike', emoji: '🚴‍♂️', met: 12.5, int: 'Very High', gps: false, cat: 'HIIT', hiit: true },
-  { name: 'Farmer carry', emoji: '🧳', met: 8.0, int: 'High', gps: false, cat: 'HIIT', hiit: true },
-  { name: 'Box jumps', emoji: '📦', met: 10.0, int: 'Very High', gps: false, cat: 'HIIT', hiit: true },
-  // TEAM SPORTS (moderate-high)
-  { name: 'American football', emoji: '🏈', met: 8.0, int: 'High', gps: true, cat: 'Sports', hiit: true },
-  { name: 'Basketball (competitive)', emoji: '🏀', met: 8.0, int: 'High', gps: true, cat: 'Sports', hiit: true },
-  { name: 'Soccer (competitive)', emoji: '⚽', met: 10.3, int: 'Very High', gps: true, cat: 'Sports', hiit: true },
-  { name: 'Ice hockey', emoji: '🏒', met: 8.0, int: 'High', gps: true, cat: 'Sports', hiit: true },
-  { name: 'Handball', emoji: '🤾', met: 8.0, int: 'High', gps: true, cat: 'Sports', hiit: true },
-]
+const EX = JENIS_OLAHRAGA
 const EXCATS = [...new Set(EX.map(e => e.cat))]
 
 /* ═══════════════════════════════════════════════════════
@@ -1238,7 +1137,7 @@ function GPSTracker({ body, onComplete }: { body: Body; onComplete: (kcal: numbe
   )
 }
 
-function ManualEx({ body, ex, onComplete }: { body: Body; ex: Exer; onComplete: (kcal: number, min: number, metH: number) => void }) {
+function ManualEx({ body, ex, onComplete }: { body: Body; ex: JenisOlahraga; onComplete: (kcal: number, min: number, metH: number) => void }) {
   const [min, setMin] = useState(30)
   const k = getMetBurn(ex.met, body.w, min); const mH = ex.met * (min / 60)
   return (
