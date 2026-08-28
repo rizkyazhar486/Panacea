@@ -53,6 +53,37 @@ export type Tanda =
   | 'antiretroviral'
   | 'nitrat' | 'pde5'
   | 'litium'
+  // ── Ditambahkan pada putaran kedua. Semuanya mekanisme yang mapan dan
+  //    sering benar-benar mencederai orang, bukan kemungkinan teoretis.
+  | 'hambat-cyp2c19' | 'substrat-cyp2c19'
+  | 'naikkan-warfarin'
+  | 'antikolinergik' | 'kolinergik'
+  | 'hiperglikemik'
+  | 'mielosupresi'
+  | 'miopati'
+  | 'tiopurin' | 'xantin-oksidase'
+  | 'valproat' | 'karbapenem'
+  | 'kelasi-kation' | 'kation-polivalen'
+  | 'vaksin-hidup'
+  | 'hiponatremia'
+  | 'blokade-neuromuskular' | 'potensiasi-nm'
+  // ── Penajaman. Dua penandaan sebelumnya TERLALU LEBAR dan menyalakan
+  //    peringatan yang keliru — ditemukan dengan menyilangkan seluruh 619
+  //    butir dan membaca aturan mana yang paling sering menyala.
+  //
+  //    'imunosupresan' dipakai untuk aturan vaksin hidup, dan di situ ia
+  //    memang harus lebar: anti-TNF dan penghambat JAK sama-sama menekan
+  //    imunitas. Tetapi aturan CYP3A4 keliru bila memakai tanda yang sama —
+  //    adalimumab bukan substrat CYP3A4, jadi klaritromisin + adalimumab
+  //    menyala tanpa dasar. Yang berlaku untuk CYP adalah penghambat
+  //    kalsineurin dan mTOR saja.
+  //
+  //    Hal serupa pada antikoagulan: rivaroksaban dan apiksaban memang
+  //    substrat CYP3A4 dan P-gp, sedangkan heparin sama sekali bukan, dan
+  //    warfarin lewat CYP2C9 — bukan 3A4. Menyamakan ketiganya membuat
+  //    rifampisin + heparin menyala, padahal tidak ada yang terjadi di sana.
+  | 'imunosupresan-sempit'
+  | 'doac' | 'warfarin'
 
 /** Penandaan menurut GOLONGAN farmakologi di katalog obat. */
 const TANDA_KELAS: { cocok: RegExp; tanda: Tanda[] }[] = [
@@ -68,7 +99,9 @@ const TANDA_KELAS: { cocok: RegExp; tanda: Tanda[] }[] = [
   { cocok: /mineralocorticoid receptor antagonist|potassium-sparing|non-steroidal MRA/i, tanda: ['kalium-naik', 'antihipertensi'] },
   { cocok: /ACE inhibitor|angiotensin receptor blocker|neprilysin/i, tanda: ['kalium-naik', 'antihipertensi'] },
   { cocok: /cardiac glycoside/i, tanda: ['digoksin'] },
-  { cocok: /calcineurin inhibitor|mTOR inhibitor|immunosuppressant|anti-TNF|JAK inhibitor|IL-6|IL-12/i, tanda: ['imunosupresan'] },
+  { cocok: /calcineurin inhibitor|mTOR inhibitor/i, tanda: ['imunosupresan', 'imunosupresan-sempit'] },
+  { cocok: /immunosuppressant|anti-TNF|JAK inhibitor|IL-6|IL-12|TNF receptor|anti-integrin|checkpoint inhibitor/i, tanda: ['imunosupresan'] },
+  { cocok: /direct factor Xa inhibitor|direct thrombin inhibitor/i, tanda: ['doac'] },
   { cocok: /beta blocker|calcium channel blocker|alpha-2 agonist|vasodilator|alpha-1 blocker|If channel/i, tanda: ['antihipertensi'] },
   { cocok: /dopamine precursor|dopamine agonist|MAO-B|COMT/i, tanda: ['levodopa'] },
   { cocok: /statin|HMG-CoA|antituberculosis|triazole antifungal|antiretroviral|reverse transcriptase|protease inhibitor/i, tanda: ['hepatotoksik'] },
@@ -78,12 +111,28 @@ const TANDA_KELAS: { cocok: RegExp; tanda: Tanda[] }[] = [
   { cocok: /nitrate/i, tanda: ['nitrat'] },
   { cocok: /PDE5/i, tanda: ['pde5'] },
   { cocok: /mood stabiliser/i, tanda: ['litium'] },
+  // ── Putaran kedua ─────────────────────────────────────────────────────────
+  { cocok: /proton pump inhibitor/i, tanda: ['hambat-cyp2c19', 'kation-polivalen'] },
+  { cocok: /antimuscarinic|antispasmodic|cycloplegic|mydriatic|first-generation antihistamine/i, tanda: ['antikolinergik'] },
+  { cocok: /tricyclic antidepressant|typical antipsychotic|atypical antipsychotic/i, tanda: ['antikolinergik'] },
+  { cocok: /acetylcholinesterase inhibitor|cholinesterase (inhibitor|reactivator)/i, tanda: ['kolinergik'] },
+  { cocok: /glucocorticoid|corticosteroid with mineralocorticoid/i, tanda: ['hiperglikemik', 'kalium-turun'] },
+  { cocok: /beta-2 agonist/i, tanda: ['kalium-turun'] },
+  { cocok: /alkylating agent|anthracycline|vinca alkaloid|taxane|topoisomerase|pyrimidine analogue|purine analogue|antifolate|platinum compound|antitumour antibiotic|oral fluoropyrimidine|antimetabolite/i, tanda: ['mielosupresi'] },
+  { cocok: /HMG-CoA reductase inhibitor|fibrate/i, tanda: ['miopati'] },
+  { cocok: /xanthine oxidase inhibitor/i, tanda: ['xantin-oksidase'] },
+  { cocok: /carbapenem/i, tanda: ['karbapenem'] },
+  { cocok: /tetracycline|glycylcycline|fluoroquinolone|bisphosphonate|thyroid hormone/i, tanda: ['kelasi-kation'] },
+  { cocok: /antacid|iron salt|intravenous iron|mineral|phosphate binder|potassium binder/i, tanda: ['kation-polivalen'] },
+  { cocok: /live attenuated vaccine/i, tanda: ['vaksin-hidup'] },
+  { cocok: /SSRI|SNRI|thiazide/i, tanda: ['hiponatremia'] },
+  { cocok: /neuromuscular blocker/i, tanda: ['blokade-neuromuskular'] },
+  { cocok: /aminoglycoside/i, tanda: ['potensiasi-nm'] },
 ]
 
 /** Zat yang perilakunya menyimpang dari golongannya. Ditulis satu per satu. */
 const TANDA_ZAT: Record<string, Tanda[]> = {
   'Rifampicin': ['induksi-cyp3a4', 'hepatotoksik'],
-  'Carbamazepine': ['induksi-cyp3a4'],
   'Phenytoin': ['induksi-cyp3a4'],
   'Phenobarbital': ['induksi-cyp3a4'],
   'Clarithromycin': ['hambat-cyp3a4', 'qt'],
@@ -97,12 +146,11 @@ const TANDA_ZAT: Record<string, Tanda[]> = {
   'Lithium carbonate': ['litium'],
   'Amiodarone': ['qt', 'hepatotoksik', 'hambat-cyp3a4'],
   'Tramadol': ['serotonergik', 'sedatif'],
-  'Linezolid': ['serotonergik'],
   'Methotrexate': ['hepatotoksik', 'nefrotoksik'],
   'Paracetamol': ['hepatotoksik'],
   'Isoniazid': ['hepatotoksik'],
   'Pyrazinamide': ['hepatotoksik'],
-  'Warfarin': ['antikoagulan', 'risiko-perdarahan'],
+  'Warfarin': ['antikoagulan', 'risiko-perdarahan', 'warfarin'],
   'Aspirin (low dose)': ['antiplatelet', 'risiko-perdarahan'],
   'Aspirin (analgesic dose)': ['antiplatelet', 'risiko-perdarahan'],
   'Digoxin': ['digoksin'],
@@ -113,6 +161,40 @@ const TANDA_ZAT: Record<string, Tanda[]> = {
   'Levodopa/carbidopa': ['levodopa'],
   'Spironolactone': ['kalium-naik', 'antihipertensi'],
   'Liquorice': ['kalium-turun'],
+  // ── Putaran kedua ─────────────────────────────────────────────────────────
+  'Clopidogrel': ['antiplatelet', 'risiko-perdarahan', 'substrat-cyp2c19'],
+  'Omeprazole': ['hambat-cyp2c19', 'kation-polivalen'],
+  'Esomeprazole': ['hambat-cyp2c19', 'kation-polivalen'],
+  'Metronidazole': ['naikkan-warfarin'],
+  'Metronidazole (vaginal)': ['naikkan-warfarin'],
+  'Fluconazole': ['naikkan-warfarin', 'qt', 'hambat-cyp3a4'],
+  'Trimethoprim/sulfamethoxazole': ['naikkan-warfarin', 'kalium-naik', 'mielosupresi'],
+  'Colchicine': ['miopati'],
+  'Azathioprine': ['tiopurin', 'mielosupresi', 'imunosupresan'],
+  '6-Mercaptopurine': ['tiopurin', 'mielosupresi'],
+  'Allopurinol': ['xantin-oksidase'],
+  'Febuxostat': ['xantin-oksidase'],
+  'Sodium valproate': ['valproat', 'hepatotoksik'],
+  'Levothyroxine': ['kelasi-kation'],
+  'Lamotrigine': ['hiponatremia'],
+  'Oxcarbazepine': ['hiponatremia', 'induksi-cyp3a4'],
+  'Carbamazepine': ['induksi-cyp3a4', 'hiponatremia'],
+  'Ganciclovir': ['mielosupresi'],
+  'Valganciclovir': ['mielosupresi'],
+  'Zidovudine': ['mielosupresi', 'antiretroviral'],
+  'Linezolid': ['serotonergik', 'mielosupresi'],
+  'Hydroxycarbamide': ['mielosupresi'],
+  'Neostigmine': ['kolinergik'],
+  'Pyridostigmine': ['kolinergik'],
+  'Physostigmine': ['kolinergik'],
+  'Quinine': ['qt'],
+  'Mefloquine': ['qt'],
+  'Chloroquine': ['qt'],
+  'Bedaquiline': ['qt'],
+  'Domperidone': ['qt'],
+  'Methadone': ['qt', 'sedatif'],
+  'Citalopram': ['serotonergik', 'qt', 'hiponatremia'],
+  'Escitalopram': ['serotonergik', 'qt', 'hiponatremia'],
 }
 
 /** Penandaan herbal, ditulis per tanaman. */
@@ -179,18 +261,21 @@ const ATURAN: Aturan[] = [
   { a: 'induksi-cyp3a4', b: 'antiretroviral', berat: 'serius',
     judul: 'Antiretroviral levels fall — risk of losing viral control and of resistance',
     sebab: 'Induction reduces drug exposure. This combination has caused treatment failure.' },
-  { a: 'induksi-cyp3a4', b: 'imunosupresan', berat: 'serius',
+  { a: 'induksi-cyp3a4', b: 'imunosupresan-sempit', berat: 'serius',
     judul: 'Transplant rejection risk',
     sebab: 'Induction lowers tacrolimus and ciclosporin levels. Rejection has been reported with this combination.' },
-  { a: 'induksi-cyp3a4', b: 'antikoagulan', berat: 'serius',
-    judul: 'Anticoagulation may become ineffective',
-    sebab: 'Induction reduces anticoagulant exposure, and the loss of effect is not visible without monitoring.' },
-  { a: 'hambat-cyp3a4', b: 'imunosupresan', berat: 'serius',
+  { a: 'induksi-cyp3a4', b: 'doac', berat: 'serius',
+    judul: 'Direct oral anticoagulant may become ineffective',
+    sebab: 'Rivaroxaban, apixaban and dabigatran depend on CYP3A4 and P-glycoprotein. Induction lowers their exposure, and unlike warfarin there is no INR to show it — the first sign is a clot.' },
+  { a: 'induksi-cyp3a4', b: 'warfarin', berat: 'serius',
+    judul: 'Warfarin effect falls',
+    sebab: 'Enzyme induction increases warfarin clearance and the INR drops, often over days to weeks. It also rebounds when the inducer is stopped, which is the more dangerous half.' },
+  { a: 'hambat-cyp3a4', b: 'imunosupresan-sempit', berat: 'serius',
     judul: 'Immunosuppressant levels may rise to toxic range',
     sebab: 'Enzyme inhibition raises exposure of narrow-index drugs; nephrotoxicity and neurotoxicity follow.' },
-  { a: 'hambat-cyp3a4', b: 'antikoagulan', berat: 'perhatian',
-    judul: 'Anticoagulant effect may increase',
-    sebab: 'Inhibition raises exposure, increasing bleeding risk.' },
+  { a: 'hambat-cyp3a4', b: 'doac', berat: 'perhatian',
+    judul: 'Direct oral anticoagulant exposure rises',
+    sebab: 'Inhibition of CYP3A4 and P-glycoprotein raises the level of these anticoagulants, increasing bleeding risk with no routine test to detect it.' },
   { a: 'risiko-perdarahan', b: 'antikoagulan', berat: 'serius',
     judul: 'Bleeding risk adds up',
     sebab: 'Two agents acting on haemostasis by different routes. The risk is additive and is not detected by INR alone.' },
@@ -233,6 +318,45 @@ const ATURAN: Aturan[] = [
   { a: 'litium', b: 'kalium-turun', berat: 'serius',
     judul: 'Lithium levels may rise',
     sebab: 'Diuretics and fluid shifts raise lithium levels into the toxic range, and lithium toxicity can cause permanent neurological damage.' },
+  { a: 'hambat-cyp2c19', b: 'substrat-cyp2c19', berat: 'serius',
+    judul: 'Clopidogrel may not work',
+    sebab: 'Clopidogrel is a prodrug activated by CYP2C19. Inhibiting that enzyme leaves less active drug, and the loss of antiplatelet effect is invisible without testing — it shows up as a stent thrombosis or a stroke.' },
+  { a: 'naikkan-warfarin', b: 'antikoagulan', berat: 'serius',
+    judul: 'Warfarin effect increases sharply',
+    sebab: 'A well-documented rise in INR with bleeding. If the combination is necessary, the INR needs checking within days, not at the usual interval.' },
+  { a: 'antikolinergik', b: 'antikolinergik', berat: 'perhatian',
+    judul: 'Anticholinergic burden adds up',
+    sebab: 'Confusion, urinary retention, constipation, dry mouth and falls. In older people this is one of the commonest avoidable causes of delirium, and each drug alone looks harmless.' },
+  { a: 'kolinergik', b: 'antikolinergik', berat: 'perhatian',
+    judul: 'These two work against each other',
+    sebab: 'One is given to raise acetylcholine and the other blocks it. The prescribed benefit is being cancelled — a common and invisible prescribing cascade.' },
+  { a: 'hiperglikemik', b: 'hipoglikemik', berat: 'perhatian',
+    judul: 'Glucose control will be disturbed',
+    sebab: 'Corticosteroids raise blood glucose, often substantially, and the diabetes treatment usually needs adjusting up during the course and back down afterwards.' },
+  { a: 'mielosupresi', b: 'mielosupresi', berat: 'serius',
+    judul: 'Additive bone marrow suppression',
+    sebab: 'Neutropenia, anaemia and thrombocytopenia deepen together. Blood count monitoring is the safeguard.' },
+  { a: 'miopati', b: 'miopati', berat: 'serius',
+    judul: 'Muscle injury risk — up to rhabdomyolysis',
+    sebab: 'Statins with fibrates or colchicine raise the risk of myopathy well above either alone. Unexplained muscle pain with dark urine needs a creatine kinase, not reassurance.' },
+  { a: 'xantin-oksidase', b: 'tiopurin', berat: 'serius',
+    judul: 'Life-threatening marrow suppression — this pair is a classic',
+    sebab: 'Allopurinol blocks the enzyme that clears azathioprine and mercaptopurine, so their levels rise several-fold. Given together at normal doses this has killed people. It requires a large dose reduction or a different urate-lowering drug.' },
+  { a: 'karbapenem', b: 'valproat', berat: 'serius',
+    judul: 'Valproate levels collapse — seizures may break through',
+    sebab: 'Carbapenems reduce valproate concentrations quickly and substantially, and raising the valproate dose does not reliably compensate. A different antibiotic is usually the answer.' },
+  { a: 'kelasi-kation', b: 'kation-polivalen', berat: 'perhatian',
+    judul: 'Absorption is reduced — separate the doses',
+    sebab: 'Calcium, iron, magnesium and aluminium bind these drugs in the gut so that less is absorbed. Treatment failure follows, and it looks like resistance or non-response. Separating the doses by a few hours usually solves it.' },
+  { a: 'vaksin-hidup', b: 'imunosupresan', berat: 'serius',
+    judul: 'Live vaccine during immunosuppression',
+    sebab: 'A live attenuated organism can cause disseminated infection in someone whose immunity is suppressed. Timing relative to therapy is what makes this safe or unsafe.' },
+  { a: 'hiponatremia', b: 'hiponatremia', berat: 'perhatian',
+    judul: 'Sodium may fall',
+    sebab: 'Both are recognised causes of hyponatraemia, and together the risk is greater — particularly in older people, where it presents as confusion or a fall rather than as anything obviously chemical.' },
+  { a: 'potensiasi-nm', b: 'blokade-neuromuskular', berat: 'perhatian',
+    judul: 'Neuromuscular blockade may be prolonged',
+    sebab: 'Aminoglycosides potentiate neuromuscular blockers, delaying recovery of breathing after anaesthesia.' },
   { a: 'imunosupresan', b: 'imunosupresan', berat: 'perhatian', hanyaHerbal: true,
     judul: 'Immune effects may oppose or add to each other',
     sebab: 'Herbal immunostimulants can oppose prescribed immunosuppression; the direction is not always predictable.' },
