@@ -8,6 +8,7 @@ import {
   claimFounderIfEligible, evidenceGate, recordFreeQuery,
   EVIDENCE_PRICE_PNC, EVIDENCE_FREE_ALLOWANCE, type EvidenceGate,
   fetchRelatedArticles, type PubmedArticle,
+  AUDIENS, type Audiens,
 } from '../lib/evidence'
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -44,6 +45,17 @@ export function ClinicalEvidence() {
   const [q, setQ] = useState('')
   const [specialty, setSpecialty] = useState('')
   const [population, setPopulation] = useState('')
+  // Pilihan pembaca DISIMPAN. Yang membuka halaman ini sebagai orang awam akan
+  // membukanya sebagai orang awam lagi besok, dan menyuruhnya memilih ulang
+  // tiap kali adalah cara pasti membuatnya menerima jawaban yang bukan untuknya.
+  const [audiens, setAudiens] = useState<Audiens>(() => {
+    try {
+      const v = localStorage.getItem('pmd_evidence_audiens')
+      return v === 'awam' || v === 'pelajar' || v === 'profesional' ? v : 'profesional'
+    } catch {
+      return 'profesional'
+    }
+  })
   const [region, setRegion] = useState('')
   const [loading, setLoading] = useState(false)
   const [err, setErr] = useState('')
@@ -77,7 +89,7 @@ export function ClinicalEvidence() {
     // Fetch real PubMed articles in parallel with the AI synthesis.
     fetchRelatedArticles(text).then((a) => setArticles(a)).finally(() => setArticlesLoading(false))
     try {
-      const a = await askClinicalEvidence(text, { specialty, population, region })
+      const a = await askClinicalEvidence(text, { specialty, population, region, audiens })
       setAnswer(a)
       // Only consume a free-allowance credit on success and when not a founder/paid.
       if (!g.founder && !paid) recordFreeQuery()
@@ -154,6 +166,34 @@ export function ClinicalEvidence() {
             className="min-h-[80px] w-full rounded-xl border border-neutral-200 p-3 text-sm outline-none focus:border-brand dark:border-white/10 dark:bg-white/5"
           />
         </div>
+        {/* PEMBACA DIPILIH LEBIH DAHULU, di atas penyaring lain.
+            Ia mengubah ISI jawaban, bukan hanya nadanya — dan karena itu
+            memilihnya sesudah mengetik pertanyaan terasa seperti pilihan
+            tambahan, padahal ia yang paling menentukan. */}
+        <div className="mt-3">
+          <div className="text-[10px] font-black uppercase tracking-wide text-neutral-500">Answer written for</div>
+          <div className="mt-1.5 grid grid-cols-3 gap-1.5">
+            {AUDIENS.map((a) => (
+              <button
+                key={a.id}
+                onClick={() => {
+                  setAudiens(a.id)
+                  try { localStorage.setItem('pmd_evidence_audiens', a.id) } catch { /* abaikan */ }
+                }}
+                aria-pressed={audiens === a.id}
+                className={`min-h-[44px] rounded-xl px-2 text-[11.5px] font-bold ${
+                  audiens === a.id ? 'bg-brand text-white' : 'bg-neutral-100 text-neutral-600 dark:bg-white/10 dark:text-neutral-300'
+                }`}
+              >
+                {a.label}
+              </button>
+            ))}
+          </div>
+          <p className="mt-1 text-[10.5px] leading-snug text-neutral-500">
+            {AUDIENS.find((a) => a.id === audiens)?.untuk}
+          </p>
+        </div>
+
         <div className="mt-3 grid grid-cols-2 gap-3 sm:grid-cols-3">
           <Field label="Specialty (optional)">
             <input className={inputClass} value={specialty} onChange={(e) => setSpecialty(e.target.value)} placeholder="e.g. Cardiology" />

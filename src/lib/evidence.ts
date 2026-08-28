@@ -43,6 +43,39 @@ export interface EvidenceFilters {
   specialty?: string
   population?: string   // e.g. adult, pediatric, pregnancy, geriatric
   region?: string       // free-text country/region so guidance can note local variation
+  /** Untuk siapa jawabannya ditulis. Mengubah ISI, bukan hanya nada. */
+  audiens?: Audiens
+}
+
+/**
+ * Tiga pembaca, tiga kebutuhan yang benar-benar berbeda.
+ *
+ * INI BUKAN SEKADAR NADA. Menulis ulang jawaban yang sama dengan kata yang
+ * lebih sederhana tidak menolong orang awam: yang ia butuhkan bukan versi
+ * ringkas dari pertimbangan dokter, melainkan jawaban atas pertanyaan yang
+ * BERBEDA — apa yang harus saya lakukan, dan kapan saya harus khawatir.
+ * Mahasiswa membutuhkan yang ketiga lagi: mekanisme, penggolongan, dan
+ * jebakan yang muncul di ujian.
+ *
+ * Yang TIDAK berubah menurut pembacanya: derajat kepastian, tanda bahaya, dan
+ * larangan mengarang rujukan. Menurunkan kejujuran demi pembaca yang lebih
+ * awam adalah bentuk merendahkan yang paling merugikan.
+ */
+export type Audiens = 'awam' | 'pelajar' | 'profesional'
+
+export const AUDIENS: { id: Audiens; label: string; untuk: string }[] = [
+  { id: 'awam', label: 'Plain language', untuk: 'For anyone. What it means for you, what to do, and when to see someone.' },
+  { id: 'pelajar', label: 'Student', untuk: 'For exams: mechanism, classification, first line versus alternatives, and the traps.' },
+  { id: 'profesional', label: 'Professional', untuk: 'For clinicians: doses, contraindications, monitoring, and where guidelines diverge.' },
+]
+
+const ARAHAN_AUDIENS: Record<Audiens, string> = {
+  awam:
+    'AUDIENCE: a member of the public with no medical training. Write every sentence so a careful reader with no clinical background can follow it. Expand any term you must use, in the same sentence. Lead with what this means for the person and what they should actually do. Say plainly when something needs a doctor rather than self-management, and never imply the reader can diagnose themselves. Do NOT drop the certainty grading or the red flags — a simpler answer must not become a more confident one. Keep drug names but always pair them with what they are for; give doses only as ranges a prescriber would confirm, never as an instruction to take.',
+  pelajar:
+    'AUDIENCE: a medical student or resident preparing for board examinations. Emphasise MECHANISM (why the intervention works, at the level of physiology and pharmacology), CLASSIFICATION (how the condition or the drugs are grouped, and what decides which group), FIRST LINE versus alternatives and why, and the mistakes that most often cost marks or harm patients. Give concrete drug names with doses. Where a classic exam distinction exists, state it explicitly.',
+  profesional:
+    'AUDIENCE: a practising clinician. Full detail: concrete regimens with doses and duration, contraindications, monitoring parameters and their intervals, dose adjustment in renal or hepatic impairment, and where major guidelines disagree with each other. Assume the reader knows the vocabulary; do not spend words explaining it.',
 }
 
 const EVIDENCE_SYSTEM = `You are a rigorous clinical-evidence synthesis assistant for licensed health professionals worldwide. You produce structured, source-aware answers in the style of UpToDate / AMBOSS / DynaMed.
@@ -59,6 +92,7 @@ OUTPUT: Return ONLY minified JSON, no prose, no code fences, matching exactly:
 
 function buildUserPrompt(q: string, f: EvidenceFilters): string {
   const ctx: string[] = []
+  ctx.push(ARAHAN_AUDIENS[f.audiens ?? 'profesional'])
   if (f.specialty) ctx.push(`Specialty focus: ${f.specialty}.`)
   if (f.population) ctx.push(`Population: ${f.population}.`)
   if (f.region) ctx.push(`Clinician's region/country (note local guideline variation where relevant): ${f.region}.`)
