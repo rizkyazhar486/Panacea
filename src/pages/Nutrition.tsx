@@ -975,8 +975,15 @@ function FoodPhotoAI({ onDetect }: { onDetect: (items: DetectedFood[]) => void }
    2. FOOD TRACKER
    ═══════════════════════════════════════════════════════ */
 function FoodTracker({ body, activeProtocol }: { body: Body; activeProtocol?: ChronicProtocol }) {
-  const { state, addFood } = useStore()
+  const { state, addFood, removeFood } = useStore()
   const [q, setQ] = useState(''); const [cat, setCat] = useState('All'); const [name, setName] = useState(FD[0].name); const [g, setG] = useState(100)
+  // Baris mana yang sedang menanyakan "yakin hapus".
+  //
+  // Dibuat dua langkah dengan sengaja. Tombol hapus satu ketukan pada daftar
+  // yang digulirkan dengan ibu jari akan terpencet, dan kehilangan catatan
+  // karena salah pencet persis sama merugikannya dengan tidak bisa menghapus
+  // sama sekali.
+  const [konfirmasiHapus, setKonfirmasiHapus] = useState<string | null>(null)
   const todays = state.foods.filter(f => f.date === today())
   const total = todays.reduce((a, f) => ({ k: a.k + f.kcal, c: a.c + f.carbs, p: a.p + f.protein, f: a.f + f.fat }), { k: 0, c: 0, p: 0, f: 0 })
   const fiber = todays.reduce((a, f) => { const fd = FD.find(x => x.name === f.name); return a + (fd ? fd.fb * f.grams / 100 : 0) }, 0)
@@ -1033,15 +1040,31 @@ function FoodTracker({ body, activeProtocol }: { body: Body; activeProtocol?: Ch
 
       <div className="mt-4 flex gap-2">
         <div className="flex-1"><input className={inputClass} placeholder="Search food..." value={q} onChange={e => setQ(e.target.value)} /></div>
-        <select className={inputClass + ' w-28'} value={cat} onChange={e => setCat(e.target.value)}><option>All</option>{FCATS.map(c => <option key={c}>{c}</option>)}</select>
+        {/* Lebarnya diatur oleh PEMBUNGKUS, bukan oleh kelas w-28 pada select.
+            inputClass sudah membawa w-full, dan pada Tailwind pemenangnya
+            ditentukan urutan di dalam stylesheet, bukan urutan penulisan —
+            w-full menang, select menjadi selebar mungkin, dan kolom cari di
+            sebelahnya tergencet menjadi kotak kecil yang tidak terbaca. */}
+        <div className="w-28 shrink-0"><select className={inputClass} value={cat} onChange={e => setCat(e.target.value)}><option>All</option>{FCATS.map(c => <option key={c}>{c}</option>)}</select></div>
       </div>
-      <div className="mt-2 flex flex-wrap gap-1.5 max-h-44 overflow-y-auto rounded-xl border border-neutral-100 bg-neutral-50/50 p-2" style={{ scrollbarWidth: 'thin' }}>
+      {/* KOTAK INI SELALU DITANYAKAN "INI APA".
+          Ia daftar bahan pangan yang dapat dipilih, tetapi tidak berjudul, dan
+          isinya cip berwarna yang terlihat seperti hasil, bukan seperti pilihan.
+          Judul dan hitungannya diberikan supaya jelas ini rak bahan, dan angka
+          di belakang tiap nama adalah kalori per 100 gram. */}
+      <div className="mt-3 flex items-baseline justify-between gap-2">
+        <span className="text-[10px] font-black uppercase tracking-wide text-neutral-500">
+          Pick a food · {filtered.length} shown
+        </span>
+        <span className="text-[10px] text-neutral-400">number = kcal per 100 g</span>
+      </div>
+      <div className="mt-1 flex flex-wrap gap-1.5 max-h-44 overflow-y-auto rounded-xl border border-neutral-100 bg-neutral-50/50 p-2" style={{ scrollbarWidth: 'thin' }}>
         {filtered.map(f => {
           const rec = activeProtocol && activeProtocol.specialFoods.some(sf => f.name.includes(sf))
           const avo = activeProtocol && activeProtocol.avoidFoods.some(af => f.name.includes(af))
           return (
             <button key={f.name} onClick={() => setName(f.name)} className={'inline-flex min-h-[40px] items-center rounded-lg border px-2 text-[11px] font-medium transition active:scale-95 ' + (name === f.name ? 'border-brand bg-brand/10 text-brand-dark' : avo ? 'border-red-200 text-red-600 bg-red-50/50' : rec ? 'border-green-200 text-green-600 bg-green-50/50' : 'border-transparent text-neutral-600 hover:bg-white')}>
-              {f.emoji} {f.name} <span className="text-neutral-500">{f.k}</span>
+              {f.emoji} {f.name} <span className="ml-1 tabular-nums text-neutral-500">{f.k}</span>
               {rec && <span className="ml-0.5 text-green-500">{'\u2705'}</span>}
               {avo && <span className="ml-0.5 text-red-600">{'\u274C'}</span>}
             </button>
@@ -1062,15 +1085,39 @@ function FoodTracker({ body, activeProtocol }: { body: Body; activeProtocol?: Ch
           </div>
           {fd.tags.length > 0 && <div className="mt-1.5 flex flex-wrap gap-1">{fd.tags.slice(0, 4).map(t => <span key={t} className="rounded-full bg-neutral-100 px-2 py-0.5 text-[10px] text-neutral-500">{t}</span>)}</div>}
         </div>
-        <div className="w-20"><Field label="Gram"><input className={inputClass} type="number" value={g} onChange={e => setG(+e.target.value)} /></Field></div>
+        <div className="w-20 shrink-0"><Field label="Gram"><input className={inputClass} type="number" value={g} onChange={e => setG(+e.target.value)} /></Field></div>
         <Button onClick={() => addFood({ id: uid(), date: today(), name, grams: g, kcal: pv.k, carbs: pv.c, protein: pv.p, fat: pv.f })} className="h-[42px] shrink-0 rounded-xl"><IconPlus size={15} /></Button>
       </div>
-      <div className="mt-3 space-y-1 max-h-48 overflow-y-auto" style={{ scrollbarWidth: 'thin' }}>
+      <div className="mt-3 flex items-baseline justify-between gap-2">
+        <span className="text-[10px] font-black uppercase tracking-wide text-neutral-500">Logged today</span>
+        {todays.length > 0 && <span className="text-[10px] text-neutral-400">tap {'\u00D7'} to remove</span>}
+      </div>
+      <div className="mt-1 space-y-1 max-h-48 overflow-y-auto" style={{ scrollbarWidth: 'thin' }}>
         {todays.length === 0 && <Empty e={'\u{1F37D}\uFE0F'} t="No food logged yet" />}
-        {todays.map(f => { const s = FD.find(x => x.name === f.name); return (
-          <div key={f.id} className="flex items-center justify-between rounded-lg px-3 py-2 transition hover:bg-neutral-50">
+        {todays.map(f => { const s = FD.find(x => x.name === f.name); const tanya = konfirmasiHapus === f.id; return (
+          <div key={f.id} className="flex items-center gap-2 rounded-lg px-3 py-2 transition hover:bg-neutral-50">
             <div className="min-w-0 flex-1"><span className="text-sm font-medium">{s ? s.emoji : ''} {f.name}</span><span className="ml-2 text-[10px] text-neutral-500">{f.grams}g</span></div>
-            <div className="shrink-0 tabular-nums text-xs"><span className="font-bold" style={{ color: 'var(--teks-ok)' }}>{f.kcal}</span><span className="text-neutral-500 ml-1">kcal</span></div>
+            {tanya ? (
+              <div className="flex shrink-0 items-center gap-1">
+                <button
+                  onClick={() => { removeFood(f.id); setKonfirmasiHapus(null) }}
+                  className="min-h-[40px] rounded-lg bg-red-600 px-2.5 text-[11px] font-bold text-white"
+                >Delete</button>
+                <button
+                  onClick={() => setKonfirmasiHapus(null)}
+                  className="min-h-[40px] rounded-lg bg-neutral-200 px-2.5 text-[11px] font-bold text-neutral-700"
+                >Keep</button>
+              </div>
+            ) : (
+              <>
+                <div className="shrink-0 tabular-nums text-xs"><span className="font-bold" style={{ color: 'var(--teks-ok)' }}>{f.kcal}</span><span className="text-neutral-500 ml-1">kcal</span></div>
+                <button
+                  onClick={() => setKonfirmasiHapus(f.id)}
+                  aria-label={'Remove ' + f.name + ' from today'}
+                  className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg text-neutral-400 transition active:scale-90 hover:bg-red-50 hover:text-red-600"
+                >{'\u00D7'}</button>
+              </>
+            )}
           </div>
         )})}
       </div>

@@ -333,6 +333,15 @@ interface Store {
   buyLongevitySub: () => { ok: boolean; reason?: string }
   buyChronicSub: (plan: 'monthly' | 'lifetime') => { ok: boolean; reason?: string }
   addFood: (f: FoodEntry) => void
+  /**
+   * Menghapus satu entri makanan.
+   *
+   * Sebelumnya tidak ada sama sekali: makanan bisa dicatat tetapi tidak pernah
+   * bisa dibatalkan. Satu ketukan yang tidak sengaja pada daftar bahan pangan
+   * masuk ke catatan hari itu dan tinggal di sana selamanya, ikut menghitung
+   * kalori dan makro sepanjang hari.
+   */
+  removeFood: (id: string) => void
   logWellness: (date: string, patch: Partial<Omit<WellnessDay, 'date'>>) => void
   addOrder: (o: Order) => void
   addProduct: (p: PharmacyProduct) => void
@@ -908,6 +917,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
         })),
       setActiveProgram: (program) => setState((st) => ({ ...st, activeProgram: program })),
       addFood: (f) => setState((st) => ({ ...st, foods: [f, ...st.foods] })),
+      removeFood: (id) => setState((st) => ({ ...st, foods: st.foods.filter((f) => f.id !== id) })),
       logWellness: (date, patch) =>
         setState((st) => ({
           ...st,
