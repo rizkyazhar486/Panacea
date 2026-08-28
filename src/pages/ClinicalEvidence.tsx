@@ -130,7 +130,7 @@ export function ClinicalEvidence() {
         <SectionTitle
           icon={<IconStethoscope size={20} />}
           title="Clinical Evidence"
-          subtitle="Ajukan pertanyaan klinis — jawabannya tersusun, bertingkat bukti, dan menyebut sumbernya. Berlaku di negara mana pun; tiap jawaban menautkan ke pustaka primer untuk diperiksa sendiri."
+          subtitle="Ask a clinical question — the answer is structured, graded by evidence, and names its sources. It applies in any country, and every answer links to the primary literature so you can check it yourself."
         />
         {!evidenceAvailable() && (
           <p className="mt-3 rounded-xl border border-amber-200 bg-amber-50 px-3 py-2 text-xs font-semibold text-amber-800 dark:border-amber-500/30 dark:bg-amber-500/10 dark:text-amber-200">
@@ -162,7 +162,7 @@ export function ClinicalEvidence() {
             value={q}
             onChange={(e) => setQ(e.target.value)}
             onKeyDown={(e) => { if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) ask() }}
-            placeholder="mis. Antihipertensi lini pertama pada dewasa dengan diabetes melitus tipe 2 dan albuminuria?"
+            placeholder="e.g. First-line antihypertensive in an adult with type 2 diabetes and albuminuria?"
             className="min-h-[80px] w-full rounded-xl border border-neutral-200 p-3 text-sm outline-none focus:border-brand dark:border-white/10 dark:bg-white/5"
           />
         </div>
