@@ -67,7 +67,7 @@ function Kotak({ c, buka, onToggle }: { c: Cabang; buka: boolean; onToggle: () =
       <button
         onClick={onToggle}
         aria-expanded={buka}
-        className="w-full rounded-lg border border-neutral-200 bg-white p-2 text-left dark:border-white/10 dark:bg-white/5"
+        className={`w-full rounded-lg border border-neutral-200 bg-white text-left dark:border-white/10 dark:bg-white/5 ${buka ? 'p-3' : 'p-2'}`}
       >
         <div className="flex items-center gap-1.5">
           <span className={`rounded px-1.5 py-0.5 text-[10px] font-black uppercase tracking-wide text-white ${c.warna}`}>
@@ -77,10 +77,25 @@ function Kotak({ c, buka, onToggle }: { c: Cabang; buka: boolean; onToggle: () =
             {buka ? '− tutup' : sisa > 0 ? `+${sisa}` : '⤢'}
           </span>
         </div>
-        <ul className="mt-1 space-y-0.5">
+        {/* MEMBACA berbeda dari MELIHAT PETA.
+            Saat tertutup, kotak ini adalah simpul peta: 12 px rapat supaya
+            banyak cabang muat sekaligus di layar 390 px. Saat DIBUKA ia
+            berubah menjadi bacaan — butirnya kalimat panjang berisi dosis,
+            dan 12 px dengan jarak baris 1,4 membuatnya menjadi dinding huruf
+            yang, menurut pemakainya sendiri, "terlalu kecil dan tidak
+            berspacing". Maka ukuran dan jaraknya ikut berubah bersama
+            keadaannya, bukan dipatok satu nilai untuk kedua keperluan. */}
+        <ul className={buka ? 'mt-2 space-y-2.5' : 'mt-1 space-y-0.5'}>
           {tampil.map((t, i) => (
-            <li key={i} className="flex gap-1.5 text-[12px] leading-[1.4] text-ink dark:text-neutral-200">
-              <span className="mt-[6px] h-1 w-1 shrink-0 rounded-full bg-neutral-400" />
+            <li
+              key={i}
+              className={`flex text-ink dark:text-neutral-200 ${
+                buka ? 'gap-2 text-[14px] leading-[1.65]' : 'gap-1.5 text-[12px] leading-[1.4]'
+              }`}
+            >
+              <span
+                className={`shrink-0 rounded-full bg-neutral-400 ${buka ? 'mt-[9px] h-1.5 w-1.5' : 'mt-[6px] h-1 w-1'}`}
+              />
               <span style={buka ? undefined : {
                 display: '-webkit-box', WebkitLineClamp: KLAMP, WebkitBoxOrient: 'vertical', overflow: 'hidden',
               }}>{t}</span>
