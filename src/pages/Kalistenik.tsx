@@ -3,6 +3,7 @@ import { Card, SectionTitle } from '../components/ui'
 import { IconLeaf } from '../components/icons'
 import { FASE, TANGGA, JUMLAH_GERAKAN, ATURAN, type Tangga, type FaseId } from '../lib/kalistenik'
 import { bacaKemajuan, tandaiLevel, hitungTuntas, type Kemajuan } from '../lib/kalistenikProgres'
+import { GerakDasar } from '../components/GerakDasar'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Kalistenik pemula sampai mahir — empat fase, dua belas tangga, 109 gerakan.
@@ -191,6 +192,14 @@ export function Kalistenik() {
           your bodyweight, limb length, training age, sleep and food. What is promised is the ORDER.
         </p>
       </Card>
+
+      {/* Lima gerakan dasar, digambar. Ditaruh SEBELUM fase dan tangga:
+          yang baru mulai perlu melihat bentuk gerakannya lebih dahulu, sebelum
+          diminta memilih anak tangga mana yang ia kuasai. */}
+      <div className="space-y-2">
+        <h2 className="text-[13px] font-black uppercase tracking-wide text-brand">The five basics, drawn</h2>
+        <GerakDasar />
+      </div>
 
       {/* Fase */}
       <div className="space-y-2">
