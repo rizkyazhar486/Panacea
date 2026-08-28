@@ -129,6 +129,7 @@ export const WIDGETS: WidgetDef[] = [
   { id: 'aturanAngka', label: 'How Your Numbers Work', ringkas: 'What each number reads, what moves it, and what to do', ke: '/how-numbers-work', emoji: '🎯', kategori: 'Body & Data' },
   { id: 'kalistenik', label: 'Calisthenics Ladder', ringkas: 'Beginner to advanced — 109 movements, 4 phases', ke: '/calisthenics', emoji: '🤸', kategori: 'Training' },
   { id: 'ayatHarian', label: 'Verse of the Day', ringkas: 'One verse, both translations, recitation and commentary', ke: '/scripture', emoji: '📖', kategori: 'Faith & Life' },
+  { id: 'hitungHari', label: 'Days Since', ringkas: 'Day counters for habits you are changing', ke: '/harian', emoji: '📅', kategori: 'Body & Data' },
   { id: 'kepatuhan', label: 'Adherence, 14 Days', ringkas: 'Complete days, partial days, and missed', ke: '/harian', emoji: '💊', kategori: 'Body & Data', bawaan: true },
   { id: 'beratTren', label: 'Weight, 90 Days', ringkas: 'The three-month direction, not day-to-day noise', ke: '/tubuh', emoji: '⚖️', kategori: 'Body & Data', bawaan: true },
   { id: 'lab', label: 'Lab Results', ringkas: 'HbA1c, ApoB, eGFR — and how they\'ve moved', ke: '/tubuh', emoji: '🧪', kategori: 'Clinical & Learning', bawaan: true },
@@ -333,7 +334,7 @@ export const WIDGET_HIDUP = [
   // ── Belajar & klinis ────────────────────────────────────────────────────
   'obatCepat', 'kalkulatorCepat', 'stasiunSering', 'kartuBelajar', 'soalHarian', 'inspirasi', 'ringkasanKarya',
   // ── Hidup & lingkungan ──────────────────────────────────────────────────
-  'skorTim', 'lingkungan', 'cahaya', 'mata', 'fokus', 'duduk', 'napas', 'pengingat', 'ayatHarian',
+  'skorTim', 'lingkungan', 'cahaya', 'mata', 'fokus', 'duduk', 'napas', 'pengingat', 'ayatHarian', 'hitungHari',
 ] as const
 
 /** Katalog yang boleh menempati beranda. */
