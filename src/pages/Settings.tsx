@@ -368,7 +368,7 @@ function FeedbackCard({ simple: S }: { simple: boolean }) {
         <button
           onClick={sendToApp}
           disabled={!canSend || busy}
-          className={`mt-2 w-full rounded-xl py-3 text-center font-bold text-white ${S ? 'text-base' : 'text-sm'} ${canSend && !busy ? 'bg-brand' : 'cursor-not-allowed bg-neutral-300'}`}
+          className={`mt-2 w-full rounded-xl py-3 text-center font-bold ${S ? 'text-base' : 'text-sm'} ${canSend && !busy ? 'bg-brand text-white' : 'cursor-not-allowed bg-neutral-200 text-neutral-500'}`}
         >
           {busy ? 'Sending…' : appSent ? '✓ Sent to Owner' : '📩 Send to Owner (App)'}
         </button>
@@ -379,14 +379,14 @@ function FeedbackCard({ simple: S }: { simple: boolean }) {
           href={canSend ? `https://wa.me/${FEEDBACK_WA}?text=${encodeURIComponent(body)}` : undefined}
           target="_blank" rel="noreferrer"
           onClick={(e) => { if (!canSend) { e.preventDefault(); return } record() }}
-          className={`flex-1 rounded-xl py-3 text-center font-bold text-white ${S ? 'text-base' : 'text-sm'} ${canSend ? 'bg-[#25D366]' : 'cursor-not-allowed bg-neutral-300'}`}
+          className={`flex-1 rounded-xl py-3 text-center font-bold ${S ? 'text-base' : 'text-sm'} ${canSend ? 'bg-[#25D366] text-white' : 'cursor-not-allowed bg-neutral-200 text-neutral-500'}`}
         >
           Send via WhatsApp
         </a>
         <a
           href={canSend ? `mailto:${FEEDBACK_EMAIL}?subject=${encodeURIComponent(`[${kind}] Feedback Panaceamed.id`)}&body=${encodeURIComponent(text.trim())}` : undefined}
           onClick={(e) => { if (!canSend) { e.preventDefault(); return } record() }}
-          className={`flex-1 rounded-xl border-2 py-3 text-center font-bold ${S ? 'text-base' : 'text-sm'} ${canSend ? 'border-brand text-brand-dark' : 'cursor-not-allowed border-neutral-200 text-neutral-300'}`}
+          className={`flex-1 rounded-xl border-2 py-3 text-center font-bold ${S ? 'text-base' : 'text-sm'} ${canSend ? 'border-brand text-brand-dark' : 'cursor-not-allowed border-neutral-200 text-neutral-500'}`}
         >
           ✉️ Email
         </a>

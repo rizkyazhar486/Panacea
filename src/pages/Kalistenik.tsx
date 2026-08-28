@@ -260,8 +260,17 @@ export function Kalistenik() {
               key={f.id}
               onClick={() => setFaseTampil(faseTampil === f.id ? null : f.id)}
               aria-pressed={faseTampil === f.id}
-              className="min-h-[36px] rounded-full px-2.5 text-[11px] font-bold text-white"
-              style={{ background: faseTampil === f.id ? WARNA_FASE[f.id] : 'rgba(120,120,120,0.35)' }}
+              /* Keping yang TIDAK terpilih memakai bentuk yang sama seperti
+                 keping "All" di sebelahnya. Sebelumnya ia putih di atas abu-abu
+                 35% — terukur 1,64:1, yaitu tulisan yang praktis tidak ada,
+                 padahal justru keping yang belum terpilih itulah yang harus
+                 terbaca supaya orang tahu ada apa di baliknya. Warna fasenya
+                 tetap dipakai, hanya saat keping itu terpilih; dan tulisannya
+                 tinta, sebab keempat warna fase itu warna terang. */
+              className={`min-h-[36px] rounded-full px-2.5 text-[11px] font-bold ${
+                faseTampil === f.id ? 'text-ink' : 'bg-neutral-100 text-neutral-600 dark:bg-white/10 dark:text-neutral-300'
+              }`}
+              style={faseTampil === f.id ? { background: WARNA_FASE[f.id] } : undefined}
             >
               Phase {f.id}
             </button>

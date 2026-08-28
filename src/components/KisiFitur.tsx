@@ -263,7 +263,7 @@ export function KisiFitur() {
           onClick={() => setPilih(null)}
           aria-pressed={pilih === null}
           className={`t-kecil relative z-10 flex min-h-[40px] items-center rounded-full px-4 font-bold transition-colors ${
-            pilih === null ? 'text-white' : 'bg-neutral-100 text-neutral-600 dark:bg-white/10 dark:text-neutral-300'
+            pilih === null ? 'text-ink' : 'bg-neutral-100 text-neutral-600 dark:bg-white/10 dark:text-neutral-300'
           }`}
           style={{ width: 'auto' }}
         >
@@ -276,7 +276,7 @@ export function KisiFitur() {
             onClick={() => setPilih(pilih === k ? null : k)}
             aria-pressed={pilih === k}
             className={`t-kecil relative z-10 flex min-h-[40px] items-center whitespace-nowrap rounded-full px-4 font-bold transition-colors ${
-              pilih === k ? 'text-white' : 'bg-neutral-100 text-neutral-600 dark:bg-white/10 dark:text-neutral-300'
+              pilih === k ? 'text-ink' : 'bg-neutral-100 text-neutral-600 dark:bg-white/10 dark:text-neutral-300'
             }`}
             style={{ width: 'auto' }}
           >
