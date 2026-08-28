@@ -87,7 +87,7 @@ export function PemilihWidget({ tutup }: { tutup: () => void }) {
             value={cari}
             onChange={(e) => setCari(e.target.value)}
             placeholder="Cari fitur…"
-            aria-label="Cari fitur"
+            aria-label="Search features"
             className="h-11 w-full rounded-xl border border-neutral-200 bg-white px-3 text-[13px] text-ink placeholder:text-neutral-400 dark:border-white/15 dark:bg-white/10 dark:text-white"
           />
         </div>

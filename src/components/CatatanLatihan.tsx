@@ -19,11 +19,11 @@ import { catatLatihanTangan, sesiTangan } from '../lib/latihanManual'
 // ─────────────────────────────────────────────────────────────────────────────
 
 const BERAT = [
-  { nilai: 2, label: 'Ringan' },
-  { nilai: 4, label: 'Sedang' },
-  { nilai: 6, label: 'Berat' },
-  { nilai: 8, label: 'Keras' },
-  { nilai: 10, label: 'Habis' },
+  { nilai: 2, label: 'Easy' },
+  { nilai: 4, label: 'Moderate' },
+  { nilai: 6, label: 'Hard' },
+  { nilai: 8, label: 'Very hard' },
+  { nilai: 10, label: 'All out' },
 ] as const
 
 const HARI = 86400_000
@@ -58,7 +58,7 @@ export function CatatanLatihan() {
       jarakKm: jarak.trim() ? Number(jarak.replace(',', '.')) : undefined,
     })
     if (!hasil) { setPesan('Lama sesi belum masuk akal — isi dalam menit.'); return }
-    setPesan(`Tersimpan untuk ${tanggal}.`)
+    setPesan(`Saved for ${tanggal}.`)
     setNama(''); setMenit(''); setRpe(null); setJarak('')
     setVersi((v) => v + 1)
   }
@@ -66,7 +66,7 @@ export function CatatanLatihan() {
   return (
     <section className="kaca rounded-3xl p-4">
       <div className="flex items-baseline justify-between gap-2">
-        <h2 className="t-sedang font-black text-ink dark:text-white">Catat latihan</h2>
+        <h2 className="t-sedang font-black text-ink dark:text-white">Log a session</h2>
         <button
           type="button"
           onClick={() => { setUntukKemarin((v) => !v); setPesan('') }}
@@ -75,26 +75,26 @@ export function CatatanLatihan() {
             untukKemarin ? 'bg-brand text-white' : 'bg-neutral-100 text-neutral-600 dark:bg-white/10 dark:text-neutral-300'
           }`}
         >
-          {untukKemarin ? 'untuk kemarin' : 'untuk kemarin?'}
+          {untukKemarin ? 'for yesterday' : 'for yesterday?'}
         </button>
       </div>
 
       <p className="t-kecil mt-1 leading-snug text-neutral-600 dark:text-neutral-300">
         {ringkas.total === 0
-          ? 'Belum ada sesi tersimpan. Satu sesi sudah cukup untuk mulai menghitung kebugaran.'
-          : `${ringkas.total} sesi tersimpan${ringkas.tangan ? `, ${ringkas.tangan} di antaranya dicatat tangan` : ''}.`}
+          ? 'No sessions saved yet. One session is enough to start computing fitness.'
+          : `${ringkas.total} session${ringkas.total === 1 ? '' : 's'} saved${ringkas.tangan ? `, ${ringkas.tangan} of them entered by hand` : ''}.`}
       </p>
 
       <div className="mt-3 space-y-3">
         <div>
           <label htmlFor="cl-nama" className="t-mikro mb-1 block font-bold uppercase tracking-wide text-neutral-500">
-            Latihan apa
+            What did you do
           </label>
           <input
             id="cl-nama"
             value={nama}
             onChange={(e) => { setNama(e.target.value.slice(0, 40)); setPesan('') }}
-            placeholder="Lari, futsal, angkat beban…"
+            placeholder="Run, football, weights…"
             className="t-sedang h-11 w-full rounded-xl border border-neutral-200 bg-white px-3 text-ink dark:border-white/10 dark:bg-white/5 dark:text-white"
           />
         </div>
@@ -102,7 +102,7 @@ export function CatatanLatihan() {
         <div className="grid grid-cols-2 gap-fluid">
           <div>
             <label htmlFor="cl-menit" className="t-mikro mb-1 block font-bold uppercase tracking-wide text-neutral-500">
-              Lama (menit)
+              Duration (minutes)
             </label>
             <input
               id="cl-menit"
@@ -115,21 +115,21 @@ export function CatatanLatihan() {
           </div>
           <div>
             <label htmlFor="cl-jarak" className="t-mikro mb-1 block font-bold uppercase tracking-wide text-neutral-500">
-              Jarak (km, opsional)
+              Distance (km, optional)
             </label>
             <input
               id="cl-jarak"
               value={jarak}
               onChange={(e) => { setJarak(e.target.value.replace(/[^\d.,]/g, '').slice(0, 6)); setPesan('') }}
               inputMode="decimal"
-              placeholder="5,2"
+              placeholder="5.2"
               className="t-sedang h-11 w-full rounded-xl border border-neutral-200 bg-white px-3 font-bold text-ink dark:border-white/10 dark:bg-white/5 dark:text-white"
             />
           </div>
         </div>
 
         <div>
-          <div className="t-mikro mb-1 font-bold uppercase tracking-wide text-neutral-500">Seberapa berat terasa</div>
+          <div className="t-mikro mb-1 font-bold uppercase tracking-wide text-neutral-500">How hard it felt</div>
           <div className="grid grid-cols-5 gap-0 rounded-xl bg-neutral-100 p-1 dark:bg-white/10">
             {BERAT.map((b) => (
               <button
@@ -153,7 +153,7 @@ export function CatatanLatihan() {
           disabled={!bolehSimpan}
           className="t-sedang flex min-h-[44px] w-full items-center justify-center rounded-xl bg-brand font-black text-white transition disabled:opacity-40"
         >
-          Simpan sesi {untukKemarin ? 'kemarin' : 'hari ini'}
+          Save {untukKemarin ? "yesterday's" : "today's"} session
         </button>
 
         {pesan && <p className="t-kecil text-center text-brand-dark">{pesan}</p>}

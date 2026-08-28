@@ -39,12 +39,12 @@ export function UbinPantauan() {
   if (!daftar.length) {
     return (
       <section>
-        <h2 className="t-kecil mb-2 font-black uppercase tracking-wide text-neutral-500">Pantauan</h2>
+        <h2 className="t-kecil mb-2 font-black uppercase tracking-wide text-neutral-500">Watching</h2>
         <button
           onClick={() => window.dispatchEvent(new Event('panacea:cari'))}
           className="t-kecil flex min-h-[64px] w-full items-center justify-center rounded-3xl border border-dashed border-neutral-300 px-3 text-center leading-snug text-neutral-500 dark:border-white/20"
         >
-          Belum ada. Cari penyakit, obat, atau skor lalu tekan ★ untuk memantaunya di sini.
+          Nothing yet. Search for a disease, drug, or score, then tap ★ to watch it here.
         </button>
       </section>
     )
@@ -54,10 +54,10 @@ export function UbinPantauan() {
     <section>
       <div className="mb-2 flex items-baseline justify-between gap-2">
         <h2 className="t-kecil font-black uppercase tracking-wide text-neutral-500">
-          Pantauan <span className="tabular-nums opacity-60">{daftar.length}</span>
+          Watching <span className="tabular-nums opacity-60">{daftar.length}</span>
         </h2>
         <button onClick={() => setSunting((v) => !v)} className="t-kecil flex min-h-[40px] items-center font-bold text-brand">
-          {sunting ? 'Selesai' : 'Ubah'}
+          {sunting ? 'Done' : 'Edit'}
         </button>
       </div>
 

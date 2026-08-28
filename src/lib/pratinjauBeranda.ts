@@ -116,10 +116,10 @@ function selisihHari(tanggal: string, sekarang: number): number | null {
  */
 function umurKata(hari: number | null): string | undefined {
   if (hari === null || hari <= 0) return undefined
-  if (hari === 1) return 'kemarin'
-  if (hari < 7) return `${hari} hari lalu`
-  if (hari < 30) return `${Math.floor(hari / 7)} pekan lalu`
-  return 'lebih dari sebulan lalu'
+  if (hari === 1) return 'yesterday'
+  if (hari < 7) return `${hari} days ago`
+  if (hari < 30) return `${Math.floor(hari / 7)} week${Math.floor(hari / 7) === 1 ? '' : 's'} ago`
+  return 'over a month ago'
 }
 
 export interface BahanPratinjau {
@@ -134,7 +134,7 @@ function pratinjauLatihan(umurTahun: number, sekarang: number): Pratinjau {
   const w = getWorkouts()
   if (!w.length) {
     return {
-      id: 'latihan', wilayah: 'Latihan', ke: '/latihan', nilai: '', garis: 'Belum ada sesi tersimpan. Hubungkan atau catat satu sesi.',
+      id: 'latihan', wilayah: 'Training', ke: '/latihan', nilai: '', garis: 'No sessions saved yet. Connect a device or log one.',
       nada: 'text-emerald-600 dark:text-emerald-400',
     }
   }
@@ -154,16 +154,16 @@ function pratinjauLatihan(umurTahun: number, sekarang: number): Pratinjau {
   const hari = terakhir ? Math.floor((sekarang - terakhir) / HARI) : null
   if (!st) {
     return {
-      id: 'latihan', wilayah: 'Latihan', ke: '/latihan', nilai: String(w.length), satuan: 'sesi',
-      garis: 'Tersimpan, namun belum cukup untuk menghitung kesegaran.',
+      id: 'latihan', wilayah: 'Training', ke: '/latihan', nilai: String(w.length), satuan: 'sessions',
+      garis: 'Saved, but not yet enough to compute freshness.',
       umur: umurKata(hari), nada: 'text-emerald-600 dark:text-emerald-400',
     }
   }
   return {
-    id: 'latihan', wilayah: 'Latihan', ke: '/latihan',
-    nilai: String(Math.round(st.kesegaran)), satuan: 'segar',
+    id: 'latihan', wilayah: 'Training', ke: '/latihan',
+    nilai: String(Math.round(st.kesegaran)), satuan: 'fresh',
     // Tanpa "bagus"/"kurang": lihat aturan 3.
-    garis: 'Selisih kebugaran dan kelelahan menurut model beban latihan.',
+    garis: 'Fitness minus fatigue, from the training-load model.',
     umur: umurKata(hari),
     nada: 'text-emerald-600 dark:text-emerald-400',
   }
@@ -174,8 +174,8 @@ function pratinjauGizi(foods: FoodEntry[], sekarang: number): Pratinjau {
   const kcal = foods.filter((f) => f.date === hariIni).reduce((a, f) => a + (f.kcal || 0), 0)
   if (!foods.length) {
     return {
-      id: 'gizi', wilayah: 'Gizi', ke: '/nutrition', nilai: '',
-      garis: 'Belum ada makanan tercatat. Catat satu untuk memulai.',
+      id: 'gizi', wilayah: 'Nutrition', ke: '/nutrition', nilai: '',
+      garis: 'No food logged yet. Log one to begin.',
       nada: 'text-amber-600 dark:text-amber-400',
     }
   }
@@ -183,8 +183,8 @@ function pratinjauGizi(foods: FoodEntry[], sekarang: number): Pratinjau {
     // Nol yang JUJUR: ada riwayat, tetapi hari ini memang belum dicatat.
     // Dibedakan dari nol yang berarti "tidak ada data" — lihat aturan 1.
     return {
-      id: 'gizi', wilayah: 'Gizi', ke: '/nutrition', nilai: '',
-      garis: 'Hari ini belum ada yang dicatat.',
+      id: 'gizi', wilayah: 'Nutrition', ke: '/nutrition', nilai: '',
+      garis: 'Nothing logged today.',
       nada: 'text-amber-600 dark:text-amber-400',
     }
   }
@@ -195,10 +195,10 @@ function pratinjauGizi(foods: FoodEntry[], sekarang: number): Pratinjau {
   const perHari = new Map<string, number>()
   for (const f of foods) if (f.date) perHari.set(f.date, (perHari.get(f.date) ?? 0) + (f.kcal || 0))
   return {
-    id: 'gizi', wilayah: 'Gizi', ke: '/nutrition', nilai: String(Math.round(kcal)), satuan: 'kkal',
-    garis: `Dari ${porsi} catatan hari ini.`,
+    id: 'gizi', wilayah: 'Nutrition', ke: '/nutrition', nilai: String(Math.round(kcal)), satuan: 'kcal',
+    garis: `From ${porsi} ${porsi === 1 ? 'entry' : 'entries'} today.`,
     nada: 'text-amber-600 dark:text-amber-400',
-    ...bangunDeret([...perHari.entries()].map(([tanggal, nilai]) => ({ tanggal, nilai })), '14 hari'),
+    ...bangunDeret([...perHari.entries()].map(([tanggal, nilai]) => ({ tanggal, nilai })), '14 days'),
   }
 }
 
@@ -207,8 +207,8 @@ function pratinjauTidur(logs: SleepLog[], sekarang: number): Pratinjau {
   const t = urut[0]
   if (!t) {
     return {
-      id: 'tidur', wilayah: 'Tidur', ke: '/recovery', nilai: '',
-      garis: 'Belum ada catatan tidur.',
+      id: 'tidur', wilayah: 'Sleep', ke: '/recovery', nilai: '',
+      garis: 'No sleep logged yet.',
       nada: 'text-indigo-600 dark:text-indigo-400',
     }
   }
@@ -217,11 +217,11 @@ function pratinjauTidur(logs: SleepLog[], sekarang: number): Pratinjau {
   // tidur yang dilaporkan sendiri meleset dalam hitungan puluhan menit.
   const jam = Math.round(t.hours * 10) / 10
   return {
-    id: 'tidur', wilayah: 'Tidur', ke: '/recovery', nilai: String(jam), satuan: 'jam',
-    garis: urut.length > 1 ? `Catatan terakhir dari ${urut.length} malam.` : 'Catatan pertama Anda.',
+    id: 'tidur', wilayah: 'Sleep', ke: '/recovery', nilai: String(jam), satuan: 'hours',
+    garis: urut.length > 1 ? `Latest of ${urut.length} nights.` : 'Your first entry.',
     umur: umurKata(hari),
     nada: 'text-indigo-600 dark:text-indigo-400',
-    ...bangunDeret(logs.map((l) => ({ tanggal: l.date, nilai: l.hours as number })), '14 malam'),
+    ...bangunDeret(logs.map((l) => ({ tanggal: l.date, nilai: l.hours as number })), '14 nights'),
   }
 }
 
@@ -234,23 +234,23 @@ function pratinjauTubuh(sekarang: number): Pratinjau {
   const hari = Number.isNaN(t) ? null : Math.floor((sekarang - t) / HARI)
   if (typeof v.restingHr === 'number' && v.restingHr > 0) {
     return {
-      id: 'tubuh', wilayah: 'Tubuh', ke: '/tubuh', nilai: String(v.restingHr), satuan: 'bpm istirahat',
-      garis: 'Denyut istirahat terakhir yang tercatat.',
+      id: 'tubuh', wilayah: 'Body', ke: '/tubuh', nilai: String(v.restingHr), satuan: 'bpm resting',
+      garis: 'Your most recent resting heart rate.',
       umur: umurKata(hari),
       nada: 'text-rose-600 dark:text-rose-400',
     }
   }
   if (v.systolic && v.diastolic) {
     return {
-      id: 'tubuh', wilayah: 'Tubuh', ke: '/tubuh', nilai: `${v.systolic}/${v.diastolic}`, satuan: 'mmHg',
-      garis: 'Satu bacaan tekanan darah, bukan diagnosis.',
+      id: 'tubuh', wilayah: 'Body', ke: '/tubuh', nilai: `${v.systolic}/${v.diastolic}`, satuan: 'mmHg',
+      garis: 'One blood-pressure reading, not a diagnosis.',
       umur: umurKata(hari),
       nada: 'text-rose-600 dark:text-rose-400',
     }
   }
   return {
-    id: 'tubuh', wilayah: 'Tubuh', ke: '/tubuh', nilai: '',
-    garis: 'Belum ada tanda tubuh tersimpan.',
+    id: 'tubuh', wilayah: 'Body', ke: '/tubuh', nilai: '',
+    garis: 'No vitals saved yet.',
     nada: 'text-rose-600 dark:text-rose-400',
   }
 }

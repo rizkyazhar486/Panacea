@@ -424,7 +424,7 @@ export default function Beranda() {
             className="mt-3 flex min-h-[44px] items-center justify-between gap-3 rounded-2xl bg-white/70 px-3 py-2.5 dark:bg-white/5"
           >
             <span className="t-sedang font-semibold text-ink dark:text-white">
-              Belum ada angka. Mulai dari 3 langkah singkat.
+              No numbers yet. Start with 3 short steps.
             </span>
             <span className="text-brand">›</span>
           </Link>
@@ -462,7 +462,7 @@ export default function Beranda() {
           to="/tutorial"
           className="t-sedang flex min-h-[44px] items-center justify-center gap-2 font-bold text-brand"
         >
-          <LogoPanduan size={16} /> Baru di sini? Buka panduan 6 langkah
+          <LogoPanduan size={16} /> New here? Open the 6-step guide
         </Link>
       )}
       </div>

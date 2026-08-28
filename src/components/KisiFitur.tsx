@@ -73,7 +73,7 @@ function Bagian({ kategori, daftar }: { kategori: string; daftar: typeof WIDGETS
             onClick={() => setSemua((v) => !v)}
             className="flex h-10 shrink-0 items-center gap-1 text-[11px] font-bold text-brand"
           >
-            {semua ? 'Ringkas' : `Lihat semua (${daftar.length})`}
+            {semua ? 'Show less' : `Show all (${daftar.length})`}
             <span aria-hidden>{semua ? '▲' : '›'}</span>
           </button>
         )}
@@ -152,7 +152,7 @@ export function KisiFitur() {
   return (
     <section className="j-grup">
       <div className="flex items-center justify-between gap-2">
-        <h2 className="t-kecil shrink-0 font-black uppercase tracking-wide text-neutral-500">Semua fitur</h2>
+        <h2 className="t-kecil shrink-0 font-black uppercase tracking-wide text-neutral-500">All features</h2>
 
         {/* Kotak cari yang MEMANJANG saat diketuk, bukan kotak yang selalu
             terbentang. Dalam keadaan tertutup ia satu lambang 40 px, sehingga
@@ -176,7 +176,7 @@ export function KisiFitur() {
                 onChange={(e) => setCari(e.target.value)}
                 onKeyDown={(e) => { if (e.key === 'Escape') { setCari(''); setCariBuka(false) } }}
                 placeholder={`Cari di ${WIDGETS.length} fitur`}
-                aria-label="Cari fitur"
+                aria-label="Search features"
                 className="t-kecil min-h-[40px] w-full min-w-0 bg-transparent font-semibold text-ink outline-none dark:text-white"
               />
               <button
@@ -191,7 +191,7 @@ export function KisiFitur() {
             <>
               <button
                 onClick={() => setCariBuka(true)}
-                aria-label="Cari fitur"
+                aria-label="Search features"
                 aria-expanded={false}
                 className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-neutral-100 text-neutral-600 transition-transform duration-200 hover:scale-105 dark:bg-white/10 dark:text-neutral-300"
               >
@@ -291,7 +291,7 @@ export function KisiFitur() {
         </div>
       ) : (
         <p className="t-kecil px-1 leading-snug text-neutral-500">
-          Pilih kelompok di atas, atau ketik untuk mencari di {WIDGETS.length} fitur.
+          Pick a group above, or type to search {WIDGETS.length} features.
         </p>
       )}
         </>

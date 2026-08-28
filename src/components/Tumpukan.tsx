@@ -230,7 +230,7 @@ export function Tumpukan({ judul, anak, aksi }: { judul?: string; anak: { kunci:
                 <button
                   key={a.kunci}
                   onClick={() => ke(i)}
-                  aria-label={`Widget ${i + 1} dari ${tampil.length}`}
+                  aria-label={`Widget ${i + 1} of ${tampil.length}`}
                   aria-current={i === aktif}
                   className={`h-1.5 rounded-full transition-all ${i === aktif ? 'w-4 bg-brand' : 'w-1.5 bg-neutral-300 dark:bg-white/25'}`}
                 />

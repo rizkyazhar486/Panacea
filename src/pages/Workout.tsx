@@ -164,7 +164,7 @@ export function Workout() {
       />
 
       <Card className="!p-5">
-        <SectionTitle icon={<IconActivity size={20} />} title="AI Program — Workout Tracker" subtitle="Statis dan dinamis, dengan alat atau kalistenik, menurut kelompok otot — berpijak pada ilmu olahraga dan ortopedi" />
+        <SectionTitle icon={<IconActivity size={20} />} title="AI Program — Workout Tracker" subtitle="Static and dynamic, with equipment or calisthenics, by muscle group — grounded in sports science and orthopaedics" />
         <div className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-3">
           <select className={inputClass} value={muscle} onChange={(e) => setMuscle(e.target.value as Muscle | 'All')}>
             <option value="All">All Muscles</option>
@@ -261,7 +261,7 @@ export function Workout() {
       )}
 
       <Card className="!p-5">
-        <SectionTitle icon={<IconRun size={18} />} title="Programming Principles" subtitle="Dasar ilmu olahraga untuk menyusun peningkatan beban" />
+        <SectionTitle icon={<IconRun size={18} />} title="Programming Principles" subtitle="The sports-science basis for building progressive overload" />
         <ul className="mt-2 space-y-1.5 text-sm text-neutral-600">
           <li>• <b>Progressive overload</b>: increase load/reps/volume 2.5-10%/week while RPE &lt;8-9.</li>
           <li>• <b>Periodization</b>: alternate high-volume/low-intensity phases with high-intensity/low-volume phases; deload every 4-6 weeks.</li>

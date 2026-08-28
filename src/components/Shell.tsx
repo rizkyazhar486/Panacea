@@ -102,38 +102,38 @@ export const NAV_UNTUK_PENGATURAN: { to: string; label: string; group: string; r
  */
 const nav: Nav[] = [
   // Beranda
-  { to: '/', label: 'Beranda', icon: IconHome, roles: ['pasien', 'dokter', 'owner'], end: true, group: 'Home' },
-  { to: '/semua-fitur', label: 'Semua Fitur', icon: IconSearch, roles: ALL, group: 'Home' },
-  { to: '/tutorial', label: 'Panduan Pemakaian', icon: IconBook, roles: ALL, group: 'Home' },
-  { to: '/profile', label: 'Profil', icon: IconUser, roles: ['pasien', 'dokter', 'owner'], group: 'Home' },
+  { to: '/', label: 'Home', icon: IconHome, roles: ['pasien', 'dokter', 'owner'], end: true, group: 'Home' },
+  { to: '/semua-fitur', label: 'All Features', icon: IconSearch, roles: ALL, group: 'Home' },
+  { to: '/tutorial', label: 'How to Use', icon: IconBook, roles: ALL, group: 'Home' },
+  { to: '/profile', label: 'Profile', icon: IconUser, roles: ['pasien', 'dokter', 'owner'], group: 'Home' },
   // Badan Anda
-  { to: '/tubuh', label: 'Tanda Tubuh', icon: IconActivity, roles: ['pasien', 'dokter', 'owner'], group: 'Health' },
-  { to: '/nutrition', label: 'Gizi', icon: IconFood, roles: ['pasien', 'dokter', 'owner'], group: 'Health' },
-  { to: '/latihan', label: 'Latihan', icon: IconRun, roles: ['pasien', 'dokter', 'owner'], group: 'Health' },
-  { to: '/recovery', label: 'Tidur & Pemulihan', icon: IconMoon, roles: ['pasien', 'dokter'], group: 'Health' },
-  { to: '/health-data', label: 'Data Kesehatan', icon: IconHeart, roles: ['pasien', 'dokter', 'owner'], group: 'Health' },
-  { to: '/emergency', label: 'Darurat & SOS', icon: IconShield, roles: ['pasien', 'dokter', 'owner'], group: 'Health' },
+  { to: '/tubuh', label: 'Vitals', icon: IconActivity, roles: ['pasien', 'dokter', 'owner'], group: 'Health' },
+  { to: '/nutrition', label: 'Nutrition', icon: IconFood, roles: ['pasien', 'dokter', 'owner'], group: 'Health' },
+  { to: '/latihan', label: 'Training', icon: IconRun, roles: ['pasien', 'dokter', 'owner'], group: 'Health' },
+  { to: '/recovery', label: 'Sleep & Recovery', icon: IconMoon, roles: ['pasien', 'dokter'], group: 'Health' },
+  { to: '/health-data', label: 'Health Data', icon: IconHeart, roles: ['pasien', 'dokter', 'owner'], group: 'Health' },
+  { to: '/emergency', label: 'Emergency & SOS', icon: IconShield, roles: ['pasien', 'dokter', 'owner'], group: 'Health' },
   // Klinis
-  { to: '/med-study', label: 'Belajar Kedokteran', icon: IconBook, roles: ['pasien', 'dokter', 'owner'], group: 'Clinical & AI' },
-  { to: '/osce-ukmppd', label: 'Stasiun OSCE UKMPPD', icon: IconStethoscope, roles: ['pasien', 'dokter', 'owner'], group: 'Clinical & AI' },
-  { to: '/clinical-calculators', label: 'Kalkulator Klinis', icon: IconActivity, roles: ['pasien', 'dokter', 'owner'], group: 'Clinical & AI' },
-  { to: '/drug-info', label: 'Obat & Resep', icon: IconPill, roles: ['pasien', 'dokter', 'owner'], group: 'Clinical & AI' },
-  { to: '/emr', label: 'Rekam Medis', icon: IconEMR, roles: ['dokter', 'owner'], group: 'Clinical & AI' },
-  { to: '/clinical-hub', label: 'Alat Klinis Lain', icon: IconStethoscope, roles: ['pasien', 'dokter', 'owner'], group: 'Clinical & AI' },
+  { to: '/med-study', label: 'Med Study', icon: IconBook, roles: ['pasien', 'dokter', 'owner'], group: 'Clinical & AI' },
+  { to: '/osce-ukmppd', label: 'OSCE UKMPPD Stations', icon: IconStethoscope, roles: ['pasien', 'dokter', 'owner'], group: 'Clinical & AI' },
+  { to: '/clinical-calculators', label: 'Clinical Calculators', icon: IconActivity, roles: ['pasien', 'dokter', 'owner'], group: 'Clinical & AI' },
+  { to: '/drug-info', label: 'Drugs & Prescribing', icon: IconPill, roles: ['pasien', 'dokter', 'owner'], group: 'Clinical & AI' },
+  { to: '/emr', label: 'Medical Records', icon: IconEMR, roles: ['dokter', 'owner'], group: 'Clinical & AI' },
+  { to: '/clinical-hub', label: 'Other Clinical Tools', icon: IconStethoscope, roles: ['pasien', 'dokter', 'owner'], group: 'Clinical & AI' },
   // Sosial
-  { to: '/feed', label: 'Kabar Teman', icon: IconUsers, roles: ['pasien', 'dokter', 'owner'], group: 'Content' },
-  { to: '/community', label: 'Komunitas', icon: IconUsers, roles: ['pasien', 'dokter', 'owner'], group: 'Content' },
-  { to: '/messages', label: 'Pesan', icon: IconChat, roles: ['pasien', 'dokter', 'owner'], group: 'Content' },
-  { to: '/scripture', label: 'Ibadah', icon: IconBook, roles: ALL, group: 'Content' },
+  { to: '/feed', label: "Friends' Feed", icon: IconUsers, roles: ['pasien', 'dokter', 'owner'], group: 'Content' },
+  { to: '/community', label: 'Community', icon: IconUsers, roles: ['pasien', 'dokter', 'owner'], group: 'Content' },
+  { to: '/messages', label: 'Messages', icon: IconChat, roles: ['pasien', 'dokter', 'owner'], group: 'Content' },
+  { to: '/scripture', label: 'Faith', icon: IconBook, roles: ALL, group: 'Content' },
   // Pengelolaan (peran tertentu saja)
   { to: '/admin', label: 'Admin', icon: IconShield, roles: ['admin'], group: 'Manage' },
   { to: '/owner', label: 'Owner', icon: IconShield, roles: ['owner'], group: 'Manage' },
   { to: '/owner-analytics', label: 'Owner Analytics', icon: IconShield, roles: ['owner'], group: 'Manage' },
-  { to: '/editor', label: 'Tulis Materi', icon: IconBook, roles: ['kontributor'], group: 'Manage' },
-  { to: '/verification', label: 'Verifikasi', icon: IconShield, roles: ['verifikator'], group: 'Manage' },
+  { to: '/editor', label: 'Write Content', icon: IconBook, roles: ['kontributor'], group: 'Manage' },
+  { to: '/verification', label: 'Verification', icon: IconShield, roles: ['verifikator'], group: 'Manage' },
   // Akun
-  { to: '/atur-fitur', label: 'Atur Fitur', icon: IconSettings, roles: ALL, group: 'Account' },
-  { to: '/settings', label: 'Pengaturan', icon: IconSettings, roles: ALL, group: 'Account' },
+  { to: '/atur-fitur', label: 'Manage Features', icon: IconSettings, roles: ALL, group: 'Account' },
+  { to: '/settings', label: 'Settings', icon: IconSettings, roles: ALL, group: 'Account' },
 ]
 
 /**
@@ -500,7 +500,7 @@ export function Shell({ children }: { children: ReactNode }) {
         <nav className="flex flex-1 flex-col gap-1 overflow-y-auto">
           {groups.map((g) => {
             const open = !closedGroups[g.name]
-            // A single-item "Beranda" group renders as a plain link (no accordion).
+            // A single-item "Home" group renders as a plain link (no accordion).
             if (g.name === 'Home') {
               return g.items.map((n) => (
                 <NavLink key={n.to} to={n.to} end={n.end} className={({ isActive }) => `flex items-center gap-3 rounded-full px-4 py-2.5 text-sm font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/30 ${isActive ? 'bg-brand-50 text-brand-dark font-bold' : 'text-neutral-500 hover:bg-neutral-50 hover:text-neutral-800'}`}>
@@ -842,13 +842,13 @@ export function Shell({ children }: { children: ReactNode }) {
       {['pasien', 'dokter', 'owner'].includes(account.role) && !navHidden && (
         <FabNavigasi
           tujuan={[
-            { to: '/', label: 'Beranda', ikon: <IconHome size={19} />, end: true },
-            { to: '/community', label: 'Komunitas', ikon: <IconUsers size={19} /> },
+            { to: '/', label: 'Home', ikon: <IconHome size={19} />, end: true },
+            { to: '/community', label: 'Community', ikon: <IconUsers size={19} /> },
             { to: '/vitapulse', label: 'VitaPulse', ikon: <IconActivity size={19} /> },
             { to: '/health-data', label: 'Perangkat', ikon: <IconHeart size={19} /> },
-            { to: '/latihan', label: 'Latihan', ikon: <IconRun size={19} /> },
+            { to: '/latihan', label: 'Training', ikon: <IconRun size={19} /> },
             { to: '/sports-scores', label: 'Skor Langsung', ikon: <IconFlame size={19} /> },
-            { to: '/profile', label: 'Profil', ikon: <IconUser size={19} /> },
+            { to: '/profile', label: 'Profile', ikon: <IconUser size={19} /> },
           ]}
           onCari={() => setCariBuka(true)}
           onTambah={() => {

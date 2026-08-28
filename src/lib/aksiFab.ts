@@ -35,7 +35,7 @@ export interface AksiFab {
 export const KATALOG_AKSI: AksiFab[] = [
   { id: 'cari', label: 'Cari', ikon: '⌕', jenis: 'cari' },
   { id: 'kembali', label: 'Kembali', ikon: '‹', jenis: 'kembali' },
-  { id: 'beranda', label: 'Beranda', ikon: '⌂', jenis: 'rute', ke: '/' },
+  { id: 'beranda', label: 'Home', ikon: '⌂', jenis: 'rute', ke: '/' },
   { id: 'atas', label: 'Ke atas', ikon: '↑', jenis: 'atas' },
   { id: 'catat', label: 'Catat', ikon: '✎', jenis: 'rute', ke: '/harian' },
   { id: 'sos', label: 'SOS', ikon: '✚', jenis: 'rute', ke: '/emergency' },

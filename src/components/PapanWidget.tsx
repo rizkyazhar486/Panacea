@@ -131,7 +131,7 @@ function UbinKosong({ ke, judul }: { ke: string; judul: string; garis?: string }
       className="flex min-h-[64px] flex-col justify-center gap-0.5 rounded-3xl border border-dashed border-neutral-300 p-3 transition active:scale-[0.98] dark:border-white/20"
     >
       <span className="t-mikro font-black uppercase tracking-wide text-neutral-500">{judul}</span>
-      <span className="t-kecil text-neutral-400">Belum ada — catat →</span>
+      <span className="t-kecil text-neutral-400">Nothing yet — log one →</span>
     </Link>
   )
 }
@@ -254,7 +254,7 @@ function Angka({ label, nilai }: { label: string; nilai: string }) {
 export function UbinRangkaian({ tanggal }: { tanggal: string[] }) {
   const r = hitungRangkaian(tanggal)
   if (r.total === 0) {
-    return <UbinKosong ke="/logs" judul="Catatan" garis="Belum ada hari tercatat. Satu catatan hari ini sudah cukup untuk memulai." />
+    return <UbinKosong ke="/logs" judul="Log" garis="No days recorded yet. One entry today is enough to begin." />
   }
   return (
     <Ubin ke="/logs" judul="Catatan" lebar tanda={r.hariIniSudah ? 'hari ini' : undefined}>
@@ -299,15 +299,15 @@ export function UbinKlinis() {
   }, [])
 
   return (
-    <Ubin ke="/med-study" judul="Klinis" lebar>
+    <Ubin ke="/med-study" judul="Clinical" lebar>
       {n ? (
         /* Tiga angka pada satu baris. Ini isi katalog, bukan angka tubuh
            siapa pun, jadi tidak ada tren yang dapat digambar — yang jujur
            hanyalah jumlahnya. */
         <div className="flex items-end justify-between gap-2">
-          <Angka label="penyakit" nilai={String(n.penyakit)} />
-          <Angka label="obat" nilai={String(n.obat)} />
-          <Angka label="stasiun" nilai={String(n.stasiun)} />
+          <Angka label="diseases" nilai={String(n.penyakit)} />
+          <Angka label="drugs" nilai={String(n.obat)} />
+          <Angka label="stations" nilai={String(n.stasiun)} />
         </div>
       ) : (
         <p className="t-kecil text-neutral-400">Menghitung isi…</p>
@@ -414,7 +414,7 @@ function DaftarRincian({ baris }: { baris: BarisRincian[] }) {
       </div>
       {baris.length > 6 && (
         <button onClick={() => setSemua((v) => !v)} className="t-kecil flex min-h-[40px] items-center font-bold text-brand">
-          {semua ? 'Ringkas ▲' : `Lihat ${baris.length - 6} angka lainnya ▼`}
+          {semua ? 'Show less ▲' : `Show ${baris.length - 6} more ▼`}
         </button>
       )}
     </section>
@@ -521,14 +521,14 @@ export function PapanWidget({ pratinjau, tanggalCatatan }: { pratinjau: Pratinja
         tetap berdampingan seperti biasa, karena menumpuk dua benda yang muat
         berdampingan justru menambah pekerjaan tangan tanpa menghemat apa pun. */}
     <Tumpukan
-      judul="Ringkas"
+      judul="Summary"
       /* Tombol pengaturnya ikut pindah ke sini bersama widgetnya. Sebelum ini
          ia menumpang di kepala bagian "Widget" — dan ketika bagian itu dihapus
          karena seluruh isinya sudah pindah ke tumpukan, satu-satunya jalan
          mengatur widget ikut terhapus bersamanya. */
       aksi={
         <button onClick={() => setAturBuka(true)} className="t-kecil flex min-h-[40px] shrink-0 items-center whitespace-nowrap font-bold text-brand">
-          Atur widget
+          Manage widgets
         </button>
       }
       /* DITULIS SEBAGAI ELEMEN <Komponen />, BUKAN DIPANGGIL SEBAGAI FUNGSI.

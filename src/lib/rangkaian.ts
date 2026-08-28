@@ -107,17 +107,17 @@ export function hitungRangkaian(tanggal: string[], sekarang = Date.now()): Rangk
 export function bacaRangkaian(r: Rangkaian): string {
   if (r.total === 0) {
     // Satu baris pendek: ajakan panjang di dasbor terbaca sebagai basa-basi.
-    return 'Belum ada catatan — mulai hari ini.'
+    return 'No entries yet — start today.'
   }
   if (r.berjalan === 0) {
-    return `Ada jeda sejak catatan terakhir. Seluruhnya sudah ${r.total} hari tercatat, dan angka itu tidak berkurang.`
+    return `There is a gap since the last entry. ${r.total} days are recorded in total, and that number never goes down.`
   }
   if (r.berjalan === 1) {
-    return `Hari ini tercatat. Seluruhnya ${r.total} hari.`
+    return `Today is recorded. ${r.total} days in total.`
   }
-  return `${r.berjalan} hari berturut tercatat, dan ${r.total} hari seluruhnya.`
+  return `${r.berjalan} days recorded in a row, and ${r.total} days in total.`
 }
 
 /** Peringatan yang wajib menemani angka ini di mana pun ia ditampilkan. */
 export const PERINGATAN_RANGKAIAN =
-  'Angka ini menghitung hari Anda MENCATAT, bukan hari Anda sehat.'
+  'This number counts the days you LOGGED, not the days you were healthy.'

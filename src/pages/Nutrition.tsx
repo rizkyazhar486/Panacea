@@ -1738,11 +1738,11 @@ export function Nutrition() {
   const angkaHariIni = useMemo<Angka[]>(() => {
     const target = Math.round(getTdee(getBmr(body.w, body.h, body.age, body.g), body.act) * (1 + goalAdj(body.goal)))
     const out: Angka[] = [
-      { label: 'Kalori', nilai: String(Math.round(totalKcal)), satuan: `/ ${target}`,
+      { label: 'Calories', nilai: String(Math.round(totalKcal)), satuan: `/ ${target}`,
         nada: totalKcal > target * 1.1 ? NADA.perhatian : NADA.netral },
       { label: 'Protein', nilai: String(Math.round(totalProt)), satuan: 'g', nada: NADA.biru },
     ]
-    if (body.w) out.push({ label: 'Berat', nilai: String(body.w), satuan: 'kg', nada: NADA.netral })
+    if (body.w) out.push({ label: 'Weight', nilai: String(body.w), satuan: 'kg', nada: NADA.netral })
     if (wt.waterMl) out.push({ label: 'Air', nilai: String(Math.round(wt.waterMl / 100) / 10), satuan: 'L', nada: NADA.biru })
     return out
   }, [body, totalKcal, totalProt, wt.waterMl])
@@ -1761,10 +1761,10 @@ export function Nutrition() {
    * angka klinis.
    */
   const KELOMPOK = [
-    { id: 'makan', label: 'Makan', emoji: '\u{1F37D}\uFE0F' },
-    { id: 'tubuh', label: 'Tubuh', emoji: '\u2696\uFE0F' },
-    { id: 'gerak', label: 'Gerak', emoji: '\u{1F3C3}' },
-    { id: 'klinis', label: 'Klinis', emoji: '\u{1F9EC}' },
+    { id: 'makan', label: 'Food', emoji: '\u{1F37D}\uFE0F' },
+    { id: 'tubuh', label: 'Body', emoji: '\u2696\uFE0F' },
+    { id: 'gerak', label: 'Movement', emoji: '\u{1F3C3}' },
+    { id: 'klinis', label: 'Clinical', emoji: '\u{1F9EC}' },
   ] as const
   type IdKel = (typeof KELOMPOK)[number]['id']
   const [kel, setKel] = useState<IdKel>('makan')
@@ -1791,7 +1791,7 @@ export function Nutrition() {
   return (
     <div className="mx-auto max-w-2xl space-y-6 px-4 pb-24 sm:px-[30px]">
       <div className="flex items-center justify-between gap-2">
-        <h1 className="text-[19px] font-black leading-tight text-ink dark:text-white">Gizi</h1>
+        <h1 className="text-[19px] font-black leading-tight text-ink dark:text-white">Nutrition</h1>
         <ShareToFeed activity="\u{1F957} Nutrition & Calories" defaultCaption="My nutrition & healthy lifestyle progress today \u{1F957}" />
       </div>
 
@@ -1849,7 +1849,7 @@ export function Nutrition() {
 
       {/* Quick Links — longevity calculator capabilities */}
       <Card className="!p-5">
-        <SectionTitle icon={<IconHeart size={18} />} title="Kalkulator Umur Panjang Terbaik" subtitle="Dibuat untuk membantu manusia hidup lebih panjang dan lebih sehat" />
+        <SectionTitle icon={<IconHeart size={18} />} title="Longevity Calculators" subtitle="Built to help people live longer and healthier" />
         <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-4">
           {[
             { icon: '🫀', label: 'VO₂max Est.', desc: 'Aerobic capacity', anchor: 'calc-vo2max' },
@@ -1878,9 +1878,9 @@ export function Nutrition() {
             judul="Built to clinical standards — calculated live from your data"
             anak={
               <div className="space-y-1.5">
-                <Poin ikon="🏅">Disetel menurut tuntutan atlet ketahanan elite dan atlet olahraga beregu.</Poin>
-                <Poin ikon="🫀">Mencakup lebih dari 15 penyakit menahun, termasuk gagal jantung, PPOK, diabetes, gagal ginjal, dan kanker.</Poin>
-                <Poin ikon="⚡">Tiap sasaran dihitung ulang begitu angka Anda berubah — tidak ada tabel yang dipatok tetap.</Poin>
+                <Poin ikon="🏅">Tuned to the demands of elite endurance and team-sport athletes.</Poin>
+                <Poin ikon="🫀">Covers more than 15 chronic conditions, including heart failure, COPD, diabetes, kidney failure, and cancer.</Poin>
+                <Poin ikon="⚡">Every target is recomputed the moment your numbers change — no fixed lookup tables.</Poin>
               </div>
             }
           />
@@ -1905,7 +1905,7 @@ export function Nutrition() {
             anak={
               <div className="space-y-1.5">
                 <Poin ikon="🍗">"Grilled chicken" stands for common recipes — your recipe, portion, and brand shift the real numbers.</Poin>
-                <Poin ikon="🩺">Bila ketelitian penting secara medis — penyakit ginjal, alergi berat — bacalah label produk dan tanyakan kepada ahli gizi klinis.</Poin>
+                <Poin ikon="🩺">Where precision matters medically — kidney disease, severe allergy — read the product label and ask a clinical dietitian.</Poin>
               </div>
             }
           />
