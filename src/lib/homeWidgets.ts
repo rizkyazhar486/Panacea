@@ -129,6 +129,7 @@ export const WIDGETS: WidgetDef[] = [
   { id: 'aturanAngka', label: 'How Your Numbers Work', ringkas: 'What each number reads, what moves it, and what to do', ke: '/how-numbers-work', emoji: '🎯', kategori: 'Body & Data' },
   { id: 'kalistenik', label: 'Calisthenics Ladder', ringkas: 'Beginner to advanced — 109 movements, 4 phases', ke: '/calisthenics', emoji: '🤸', kategori: 'Training' },
   { id: 'papanAtlet', label: 'Athlete Board', ringkas: 'Load, ratio, focus, and when you train', ke: '/athlete-board', emoji: '📈', kategori: 'Training' },
+  { id: 'selam', label: 'Dive Log', ringkas: 'Depth, surface interval, and time to fly', ke: '/dive-log', emoji: '🤿', kategori: 'Training' },
   { id: 'ringHarian', label: 'Today in Rings', ringkas: 'Recovery, exertion, steps and sleep at a glance', ke: '/athlete-board', emoji: '⭕', kategori: 'Body & Data', bawaan: true },
   { id: 'ayatHarian', label: 'Verse of the Day', ringkas: 'One verse, both translations, recitation and commentary', ke: '/scripture', emoji: '📖', kategori: 'Faith & Life' },
   { id: 'hitungHari', label: 'Days Since', ringkas: 'Day counters for habits you are changing', ke: '/harian', emoji: '📅', kategori: 'Body & Data' },
