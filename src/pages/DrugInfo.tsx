@@ -1,10 +1,10 @@
 import { useMemo, useState } from 'react'
 import { Card, SectionTitle, inputClass, Button, Badge } from '../components/ui'
 import { IconPill, IconShield } from '../components/icons'
-import { api } from '../lib/api'
+import { api, backendEnabled } from '../lib/api'
 import { ATC, cariObat, jumlahObat, jumlahEml, dosisSkdi, type Obat } from '../lib/obatKatalog'
 import { HERBAL, cariHerbal, jumlahHerbal, BUKTI_LABEL, BPOM_LABEL, type Herbal } from '../lib/herbal'
-import { semuaButir, periksa, type Butir } from '../lib/interaksi'
+import { semuaButir, periksa, dariNama, type Butir } from '../lib/interaksi'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Drug Info — dua sumber, dan tiap kalimat di layar mengaku datang dari yang mana.
@@ -47,6 +47,9 @@ export function DrugInfo() {
   const [tab, setTab] = useState<'obat' | 'herbal' | 'periksa'>('obat')
   const [daftar, setDaftar] = useState<Butir[]>([])
   const [cariButir, setCariButir] = useState('')
+  const [muatPengingat, setMuatPengingat] = useState(false)
+  const [takDikenali, setTakDikenali] = useState<string[]>([])
+  const [pesanPengingat, setPesanPengingat] = useState('')
   const [herbalBuka, setHerbalBuka] = useState<string | null>(null)
 
   const total = useMemo(() => jumlahObat(), [])
@@ -78,6 +81,30 @@ export function DrugInfo() {
     } catch {
       setErr('Could not reach the label database. The catalogue entry above still applies — it works offline.')
     } finally { setLoading(false) }
+  }
+
+  /**
+   * Ambil daftar obat yang SUDAH tersimpan sebagai pengingat, alih-alih
+   * memaksa mengetiknya ulang. Daftar yang harus diketik ulang tiap kali
+   * adalah daftar yang tidak pernah diperiksa.
+   *
+   * Nama yang tidak dikenali TIDAK dibuang diam-diam — ia ditampilkan. Nama
+   * yang hilang tanpa jejak membuat pemeriksaan tampak lengkap padahal
+   * separuh daftarnya tidak pernah ikut diperiksa.
+   */
+  async function dariPengingat() {
+    setMuatPengingat(true); setPesanPengingat(''); setTakDikenali([])
+    try {
+      const r = await api.listReminders()
+      const nama = r.filter((x) => x.active).map((x) => `${x.medName} ${x.dose ?? ''}`.trim())
+      if (nama.length === 0) { setPesanPengingat('No active reminders saved yet.'); return }
+      const { cocok, tidakDikenali } = dariNama(nama)
+      setDaftar((d) => [...d, ...cocok.filter((c) => !d.some((y) => y.id === c.id))])
+      setTakDikenali(tidakDikenali)
+      if (cocok.length === 0) setPesanPengingat('None of your reminders matched a substance in the catalogue.')
+    } catch {
+      setPesanPengingat('Could not reach your saved reminders. You can still add medicines by hand below.')
+    } finally { setMuatPengingat(false) }
   }
 
   function buka(x: Obat) {
@@ -435,7 +462,37 @@ export function DrugInfo() {
       {tab === 'periksa' && (
         <>
           <Card className="!p-4">
-            <div className="text-[10px] font-black uppercase tracking-wide text-neutral-500">Your list</div>
+            <div className="flex items-baseline justify-between gap-2">
+              <div className="text-[10px] font-black uppercase tracking-wide text-neutral-500">Your list</div>
+              {backendEnabled && (
+                <button
+                  onClick={dariPengingat}
+                  disabled={muatPengingat}
+                  className="min-h-[36px] text-[11px] font-bold text-brand"
+                >
+                  {muatPengingat ? 'Loading…' : 'Load my reminders'}
+                </button>
+              )}
+            </div>
+            {pesanPengingat && (
+              <p className="mt-1 text-[11px] leading-snug text-neutral-500">{pesanPengingat}</p>
+            )}
+            {takDikenali.length > 0 && (
+              /* Yang tidak dikenali DITAMPILKAN, bukan dibuang. */
+              <div className="mt-1.5 rounded-xl bg-amber-500/10 p-2">
+                <div className="text-[10px] font-black uppercase tracking-wide text-amber-800 dark:text-amber-300">
+                  Not recognised — these were NOT checked
+                </div>
+                <p className="mt-0.5 text-[11.5px] leading-relaxed text-ink dark:text-neutral-200">
+                  {takDikenali.join(' · ')}
+                </p>
+                <p className="mt-1 text-[10.5px] leading-snug text-neutral-600 dark:text-neutral-300">
+                  Compounded preparations and brand names the catalogue does not hold. Add them by their generic name
+                  below if you know it — otherwise this check is missing part of your list, and you should treat it
+                  that way.
+                </p>
+              </div>
+            )}
             <input
               value={cariButir}
               onChange={(e) => setCariButir(e.target.value)}

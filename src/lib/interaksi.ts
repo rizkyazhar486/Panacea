@@ -1,4 +1,4 @@
-import { semuaObat } from './obatKatalog'
+import { semuaObat, EJAAN_ID } from './obatKatalog'
 import { semuaHerbal } from './herbal'
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -491,6 +491,63 @@ export function periksa(butir: Butir[]): Temuan[] {
   // Yang serius lebih dahulu. Urutan pada layar peringatan adalah bagian dari
   // peringatannya sendiri.
   return hasil.sort((p, q) => (p.berat === q.berat ? 0 : p.berat === 'serius' ? -1 : 1))
+}
+
+/**
+ * Cocokkan nama bebas — dari daftar pengingat obat — ke satu butir katalog.
+ *
+ * PENCOCOKANNYA KETAT DAN SENGAJA DEMIKIAN. Yang diterima hanya: nama persis,
+ * atau nama katalog yang muncul sebagai KATA UTUH di dalam teks yang ditulis
+ * orang ("Metformin 500 mg" cocok dengan Metformin).
+ *
+ * Yang TIDAK dilakukan: pencocokan samar. Pada nama obat, kemiripan ejaan
+ * adalah bahaya. "Clobazam" dan "clonazepam", "chlorpromazine" dan
+ * "chlorpropamide" berjarak satu-dua huruf menurut ukuran teks mana pun, dan
+ * memeriksa interaksi untuk obat yang KELIRU lebih buruk daripada tidak
+ * memeriksa sama sekali — sebab hasilnya terlihat seperti pemeriksaan yang
+ * sudah dilakukan.
+ *
+ * Yang tidak cocok dikembalikan sebagai tidak cocok, dan pemanggilnya wajib
+ * menampilkannya. Nama yang diam-diam dibuang membuat pemeriksaan tampak
+ * lengkap padahal separuh daftarnya tidak pernah ikut diperiksa.
+ */
+export function cocokkanNama(teks: string, daftar = semuaButir()): Butir | null {
+  const t = teks.toLowerCase().trim()
+  if (!t) return null
+  const persis = daftar.find((x) => x.nama.toLowerCase() === t)
+  if (persis) return persis
+  // Kata utuh, dan yang TERPANJANG lebih dahulu: pada "Insulin glargine",
+  // "Insulin human" juga cocok sebagai potongan, dan yang lebih panjang lebih
+  // spesifik.
+  const urut = [...daftar].sort((a, b) => b.nama.length - a.nama.length)
+  for (const x of urut) {
+    // Nama herbal ditulis "Nama · Nama lokal", dan nama obat kadang membawa
+    // keterangan dalam kurung. Keduanya dipecah supaya masing-masing bagian
+    // bisa dicocokkan sendiri — orang menulis "St John's wort", bukan
+    // "St John's wort · Hipericum".
+    const bagian = [
+      ...x.nama.split('·'),
+      ...(EJAAN_ID[x.nama] ?? []),
+    ].map((b) => b.replace(/\s*\(.*?\)\s*/g, '').trim().toLowerCase()).filter((b) => b.length >= 4)
+    for (const n of bagian) {
+      const pola = new RegExp(`(^|[^a-z])${n.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}([^a-z]|$)`, 'i')
+      if (pola.test(t)) return x
+    }
+  }
+  return null
+}
+
+/** Ubah daftar nama bebas menjadi butir, sambil menahan yang tidak dikenali. */
+export function dariNama(nama: string[]): { cocok: Butir[]; tidakDikenali: string[] } {
+  const daftar = semuaButir()
+  const cocok: Butir[] = []
+  const tidakDikenali: string[] = []
+  for (const n of nama) {
+    const b = cocokkanNama(n, daftar)
+    if (b && !cocok.some((c) => c.id === b.id)) cocok.push(b)
+    else if (!b) tidakDikenali.push(n)
+  }
+  return { cocok, tidakDikenali }
 }
 
 export default periksa

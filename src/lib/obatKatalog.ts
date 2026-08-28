@@ -839,7 +839,7 @@ export function jumlahEml(): number {
  * pada sebagian kecil — dan pada nama obat, gagal berarti mencocokkan zat yang
  * keliru. Daftar yang ditulis tangan bisa kurang lengkap; ia tidak bisa salah.
  */
-const EJAAN_ID: Record<string, string[]> = {
+export const EJAAN_ID: Record<string, string[]> = {
   'Amoxicillin': ['Amoksisilin'],
   'Paracetamol': ['Parasetamol'],
   'Omeprazole': ['Omeprazol'],
