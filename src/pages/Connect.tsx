@@ -3,7 +3,8 @@ import { Card, SectionTitle, Badge, Field, inputClass, Button } from '../compone
 import { IconUsers, IconShield } from '../components/icons'
 import { useStore } from '../lib/store'
 import {
-  ACTIVITY_OPTIONS, SAFETY_RULES, buildDeck, compatibility,
+  ACTIVITY_OPTIONS, ACTIVITY_LABEL, LOOKING_FOR_LABEL, CHILDREN_LABEL, MATCH_LABEL,
+  SAFETY_RULES, buildDeck, compatibility,
   type MatchProfile, type Preferences, type Sex,
 } from '../lib/matching'
 
@@ -71,11 +72,11 @@ export function Connect() {
   const matches = useMemo(() => pool.filter((p) => liked.includes(p.id)), [pool, liked])
 
   const TABS = [
-    { id: 'profil', l: 'Profil' },
+    { id: 'profil', l: 'Profile' },
     { id: 'filter', l: 'Preference' },
-    { id: 'deck', l: 'Jelajah' },
-    { id: 'match', l: `Cocok (${matches.length})` },
-    { id: 'aman', l: 'Keamanan' },
+    { id: 'deck', l: 'Explore' },
+    { id: 'match', l: `Matches (${matches.length})` },
+    { id: 'aman', l: 'Safety' },
   ] as const
 
   return (
@@ -84,7 +85,7 @@ export function Connect() {
         <span className="grid h-11 w-11 place-items-center rounded-2xl bg-brand-50 text-2xl">🤝</span>
         <div>
           <h1 className="text-lg font-black text-ink dark:text-ink">Connect</h1>
-          <p className="text-xs text-neutral-500">Cari teman olahraga atau pasangan — perempuan yang memulai</p>
+          <p className="text-xs text-neutral-500">Find a training partner or a match — women start the conversation</p>
         </div>
       </div>
 
@@ -106,28 +107,28 @@ export function Connect() {
           <SectionTitle icon={<IconUsers size={18} />} title="Preference" subtitle="Decides who appears in Explore" />
           <div className="mt-3 space-y-3">
             <div>
-              <div className="text-[12px] font-bold text-ink dark:text-ink">Tertarik pada</div>
+              <div className="text-[12px] font-bold text-ink dark:text-ink">Interested in</div>
               <div className="mt-1 flex gap-1.5">
                 {(['P', 'L'] as Sex[]).map((s) => (
                   <button key={s} onClick={() => setPrefs({ ...prefs, interestedIn: s })}
                     className={`rounded-full px-3 py-1.5 text-[11px] font-bold ${prefs.interestedIn === s ? 'bg-brand text-white' : 'bg-neutral-100 text-neutral-600 dark:bg-white/10'}`}>
-                    {s === 'P' ? 'Perempuan' : 'Laki-laki'}
+                    {s === 'P' ? 'Women' : 'Men'}
                   </button>
                 ))}
               </div>
             </div>
             <div className="grid grid-cols-2 gap-2">
-              <Field label="Usia minimum">
+              <Field label="Minimum age">
                 <input className={inputClass} inputMode="numeric" value={prefs.ageMin}
                   onChange={(e) => setPrefs({ ...prefs, ageMin: Number(e.target.value) || 18 })} />
               </Field>
-              <Field label="Usia maksimum">
+              <Field label="Maximum age">
                 <input className={inputClass} inputMode="numeric" value={prefs.ageMax}
                   onChange={(e) => setPrefs({ ...prefs, ageMax: Number(e.target.value) || 99 })} />
               </Field>
             </div>
             <div>
-              <div className="text-[12px] font-bold text-ink dark:text-ink">Jarak maksimum</div>
+              <div className="text-[12px] font-bold text-ink dark:text-ink">Maximum distance</div>
               <div className="mt-1 flex flex-wrap gap-1.5">
                 {BANDS.map((b) => (
                   <button key={b} onClick={() => setPrefs({ ...prefs, maxDistanceBand: b })}
@@ -137,19 +138,19 @@ export function Connect() {
                 ))}
               </div>
               <p className="mt-1 text-[10px] leading-relaxed text-neutral-500">
-                Jarak selalu berupa rentang, tidak pernah titik pasti — lokasi persis pada profil
-                kencan adalah cara penguntitan terjadi.
+                Distance is always a band, never an exact point — a precise location on a dating
+                profile is how stalking happens.
               </p>
             </div>
             <label className="flex items-center gap-2 rounded-xl bg-neutral-50 px-3 py-2.5 dark:bg-white/5">
               <input type="checkbox" checked={prefs.mustShareActivity}
                 onChange={(e) => setPrefs({ ...prefs, mustShareActivity: e.target.checked })} />
-              <span className="text-[12px] font-semibold text-neutral-700 dark:text-neutral-200">Harus punya minimal satu olahraga yang sama</span>
+              <span className="text-[12px] font-semibold text-neutral-700 dark:text-neutral-200">Must share at least one sport</span>
             </label>
             <label className="flex items-center gap-2 rounded-xl bg-neutral-50 px-3 py-2.5 dark:bg-white/5">
               <input type="checkbox" checked={prefs.nonSmokerOnly}
                 onChange={(e) => setPrefs({ ...prefs, nonSmokerOnly: e.target.checked })} />
-              <span className="text-[12px] font-semibold text-neutral-700 dark:text-neutral-200">Hanya yang tidak merokok</span>
+              <span className="text-[12px] font-semibold text-neutral-700 dark:text-neutral-200">Non-smokers only</span>
             </label>
           </div>
         </Card>
@@ -158,14 +159,14 @@ export function Connect() {
       {tab === 'deck' && (
         !profile ? (
           <Card className="!p-4">
-            <p className="text-[12px] leading-relaxed text-neutral-500">Lengkapi profil Anda lebih dulu di tab <b>Profil</b>.</p>
+            <p className="text-[12px] leading-relaxed text-neutral-500">Fill in your profile first, in the <b>Profile</b> tab.</p>
           </Card>
         ) : !current ? (
           <Card className="!p-4">
             <p className="text-[12px] leading-relaxed text-neutral-500">
-              Tidak ada profil lain yang cocok dengan preferensi Anda saat ini. Longgarkan filter di
-              tab <b>Preference</b>, atau tunggu lebih banyak pengguna bergabung. Halaman ini tidak
-              menampilkan profil buatan — yang muncul hanya orang sungguhan.
+              No other profile matches your current preferences. Loosen the filters in the
+              <b>Preference</b> tab, or wait for more people to join. This page shows no invented
+              profiles — only real people appear here.
             </p>
           </Card>
         ) : (
@@ -177,15 +178,15 @@ export function Connect() {
         !safetyAck ? (
           <Card className="!p-4">
             <p className="text-[12px] leading-relaxed text-neutral-500">
-              Baca dan setujui panduan keamanan di tab <b>Keamanan</b> sebelum membuka daftar
-              kecocokan. Ini disengaja — bagian ini bukan formalitas.
+              Read and accept the safety guidance in the <b>Safety</b> tab before opening your
+              matches. This is deliberate — that section is not a formality.
             </p>
           </Card>
         ) : matches.length === 0 ? (
-          <Card className="!p-4"><p className="text-[12px] text-neutral-500">Belum ada kecocokan.</p></Card>
+          <Card className="!p-4"><p className="text-[12px] text-neutral-500">No matches yet.</p></Card>
         ) : (
           <Card className="!p-4">
-            <div className="text-[11px] font-black uppercase tracking-wide text-neutral-500">Kecocokan Anda</div>
+            <div className="text-[11px] font-black uppercase tracking-wide text-neutral-500">Your matches</div>
             <div className="mt-2 space-y-2">
               {matches.map((m) => (
                 <div key={m.id} className="rounded-xl bg-neutral-50 p-3 dark:bg-white/5">
@@ -193,7 +194,7 @@ export function Connect() {
                   <div className="text-[11px] text-neutral-500">{m.city} · {m.distanceBand}</div>
                   {profile && (
                     <p className="mt-1 text-[11px] leading-relaxed text-neutral-500">
-                      {compatibility(profile, m).sharedActivities.join(', ') || 'Belum ada aktivitas yang sama'}
+                      {compatibility(profile, m).sharedActivities.join(', ') || 'No shared activities yet'}
                     </p>
                   )}
                 </div>
@@ -201,8 +202,8 @@ export function Connect() {
             </div>
             <p className="mt-3 text-[11px] leading-relaxed text-neutral-500">
               {iInitiate
-                ? 'Anda yang memulai percakapan. Tidak ada kewajiban membalas siapa pun, dan Anda boleh berhenti kapan saja.'
-                : 'Menunggu dia memulai percakapan. Anda tidak dapat mengirim pesan lebih dulu — ini disengaja untuk mengurangi pesan yang tidak diinginkan.'}
+                ? 'You start the conversation. You are never obliged to reply to anyone, and you can stop at any time.'
+                : 'Waiting for her to start the conversation. You cannot message first — this is deliberate, to cut down unwanted messages.'}
             </p>
           </Card>
         )
@@ -210,7 +211,7 @@ export function Connect() {
 
       {tab === 'aman' && (
         <Card className="!p-4">
-          <SectionTitle icon={<IconShield size={18} />} title="Keamanan" subtitle="Wajib dibaca sebelum membuka daftar kecocokan" />
+          <SectionTitle icon={<IconShield size={18} />} title="Safety" subtitle="Required reading before your matches open" />
           <ul className="mt-3 space-y-2">
             {SAFETY_RULES.map((r, i) => (
               <li key={i} className="flex gap-2 rounded-xl bg-neutral-50 p-3 text-[12px] leading-relaxed text-neutral-700 dark:bg-white/5 dark:text-neutral-200">
@@ -221,14 +222,14 @@ export function Connect() {
           </ul>
           <label className="mt-3 flex items-center gap-2 rounded-xl bg-brand-50 px-3 py-3 dark:bg-brand/10">
             <input type="checkbox" checked={safetyAck} onChange={(e) => setSafetyAck(e.target.checked)} />
-            <span className="text-[12px] font-bold text-brand-dark">Saya sudah membaca dan memahami panduan ini</span>
+            <span className="text-[12px] font-bold text-brand-dark">I have read and understood this guidance</span>
           </label>
         </Card>
       )}
 
       <div className="rounded-2xl border border-neutral-100 bg-white p-4 text-center text-[11px] leading-relaxed text-neutral-500 dark:border-white/10 dark:bg-white/5">
-        Hanya untuk usia 18 tahun ke atas. Profil dan pilihan Anda disimpan di perangkat ini. Laporkan
-        perilaku yang membuat Anda tidak nyaman — dan hentikan komunikasi lebih dulu, sebelum melapor.
+        Strictly 18 and over. Your profile and choices stay on this device. Report behaviour that makes
+        you uncomfortable — and stop communicating first, before you report.
       </div>
     </div>
   )
@@ -244,9 +245,9 @@ function SwipeCard({ me, them, iInitiate, onSwipe, remaining }: {
       <div className="flex items-start justify-between gap-2">
         <div>
           <h2 className="text-[17px] font-black text-ink dark:text-ink">{them.displayName}, {them.age}</h2>
-          <div className="text-[11px] text-neutral-500">{them.city} · {them.distanceBand} · mencari {them.lookingFor}</div>
+          <div className="text-[11px] text-neutral-500">{them.city} · {them.distanceBand} · looking for {LOOKING_FOR_LABEL[them.lookingFor]}</div>
         </div>
-        <Badge tone={c.label === 'Banyak kesamaan' ? 'normal' : c.label === 'Beberapa kesamaan' ? 'low' : 'neutral'}>{c.label}</Badge>
+        <Badge tone={c.label === 'many' ? 'normal' : c.label === 'some' ? 'low' : 'neutral'}>{MATCH_LABEL[c.label]}</Badge>
       </div>
 
       <p className="mt-3 text-[13px] leading-relaxed text-neutral-700 dark:text-neutral-200">{them.bio}</p>
@@ -262,7 +263,7 @@ function SwipeCard({ me, them, iInitiate, onSwipe, remaining }: {
 
       {c.agreements.length > 0 && (
         <div className="mt-3">
-          <div className="text-[11px] font-black uppercase tracking-wide text-emerald-700 dark:text-emerald-700">Kesamaan</div>
+          <div className="text-[11px] font-black uppercase tracking-wide text-emerald-700 dark:text-emerald-700">In common</div>
           <ul className="mt-1 list-disc space-y-0.5 pl-4 text-[12px] leading-relaxed text-neutral-600 dark:text-neutral-300">
             {c.agreements.map((a, i) => <li key={i}>{a}</li>)}
           </ul>
@@ -271,13 +272,13 @@ function SwipeCard({ me, them, iInitiate, onSwipe, remaining }: {
 
       {c.frictions.length > 0 && (
         <div className="mt-3">
-          <div className="text-[11px] font-black uppercase tracking-wide text-amber-700 dark:text-amber-700">Perbedaan</div>
+          <div className="text-[11px] font-black uppercase tracking-wide text-amber-700 dark:text-amber-700">Differences</div>
           <ul className="mt-1 list-disc space-y-0.5 pl-4 text-[12px] leading-relaxed text-neutral-600 dark:text-neutral-300">
             {c.frictions.map((f, i) => <li key={i}>{f}</li>)}
           </ul>
           <p className="mt-1 text-[10px] leading-relaxed text-neutral-500">
-            Perbedaan sengaja ditampilkan, bukan disembunyikan. Aplikasi yang menyembunyikannya demi
-            memperbanyak kecocokan merugikan penggunanya sendiri.
+            Differences are shown on purpose, not hidden. An app that hides them to manufacture more
+            matches is working against its own users.
           </p>
         </div>
       )}
@@ -285,15 +286,15 @@ function SwipeCard({ me, them, iInitiate, onSwipe, remaining }: {
       <div className="mt-4 flex gap-2">
         <button onClick={() => onSwipe('left')}
           className="flex-1 rounded-xl bg-neutral-100 px-4 py-3 text-sm font-bold text-neutral-700 transition hover:bg-neutral-200 dark:bg-white/10 dark:text-neutral-200">
-          ← Lewati
+          ← Skip
         </button>
         <button onClick={() => onSwipe('right')}
           className="flex-1 rounded-xl bg-brand px-4 py-3 text-sm font-bold text-white transition hover:opacity-90">
-          Suka →
+          Like →
         </button>
       </div>
       <p className="mt-2 text-center text-[10px] text-neutral-500">
-        {remaining} profil tersisa · {iInitiate ? 'Anda yang memulai percakapan bila cocok' : 'Bila cocok, dia yang memulai percakapan'}
+        {remaining} profiles left · {iInitiate ? 'You start the conversation if you match' : 'If you match, she starts the conversation'}
       </p>
     </Card>
   )
@@ -316,60 +317,60 @@ function ProfileEditor({ initial, defaultName, onSave }: {
 
   return (
     <Card className="!p-4">
-      <SectionTitle icon={<IconUsers size={18} />} title="Profil Anda" subtitle="Yang dilihat orang lain" />
+      <SectionTitle icon={<IconUsers size={18} />} title="Your profile" subtitle="What other people see" />
       <div className="mt-3 space-y-2">
         <div className="grid grid-cols-2 gap-2">
-          <Field label="Nama tampilan"><input className={inputClass} value={p.displayName} onChange={(e) => setP({ ...p, displayName: e.target.value })} /></Field>
-          <Field label="Usia"><input className={inputClass} inputMode="numeric" value={p.age} onChange={(e) => setP({ ...p, age: Number(e.target.value) || 18 })} /></Field>
+          <Field label="Display name"><input className={inputClass} value={p.displayName} onChange={(e) => setP({ ...p, displayName: e.target.value })} /></Field>
+          <Field label="Age"><input className={inputClass} inputMode="numeric" value={p.age} onChange={(e) => setP({ ...p, age: Number(e.target.value) || 18 })} /></Field>
         </div>
         <div>
-          <div className="text-[12px] font-bold text-ink dark:text-ink">Jenis kelamin</div>
+          <div className="text-[12px] font-bold text-ink dark:text-ink">Sex</div>
           <div className="mt-1 flex gap-1.5">
             {(['P', 'L'] as Sex[]).map((s) => (
               <button key={s} onClick={() => setP({ ...p, sex: s })}
                 className={`rounded-full px-3 py-1.5 text-[11px] font-bold ${p.sex === s ? 'bg-brand text-white' : 'bg-neutral-100 text-neutral-600 dark:bg-white/10'}`}>
-                {s === 'P' ? 'Perempuan' : 'Laki-laki'}
+                {s === 'P' ? 'Women' : 'Men'}
               </button>
             ))}
           </div>
           <p className="mt-1 text-[10px] leading-relaxed text-neutral-500">
-            Mengikuti model Bumble: perempuan yang memulai percakapan lebih dulu.
+            Following the Bumble model: women start the conversation first.
           </p>
         </div>
-        <Field label="Kota"><input className={inputClass} placeholder="Jakarta Selatan" value={p.city} onChange={(e) => setP({ ...p, city: e.target.value })} /></Field>
-        <Field label="Tentang Anda"><input className={inputClass} placeholder="Suka lari pagi, kerja di rumah sakit" value={p.bio} onChange={(e) => setP({ ...p, bio: e.target.value })} /></Field>
+        <Field label="City"><input className={inputClass} placeholder="Jakarta Selatan" value={p.city} onChange={(e) => setP({ ...p, city: e.target.value })} /></Field>
+        <Field label="About you"><input className={inputClass} placeholder="Morning runner, works at a hospital" value={p.bio} onChange={(e) => setP({ ...p, bio: e.target.value })} /></Field>
 
         <div>
-          <div className="text-[12px] font-bold text-ink dark:text-ink">Olahraga yang Anda lakukan</div>
+          <div className="text-[12px] font-bold text-ink dark:text-ink">Sports you do</div>
           <div className="mt-1 flex flex-wrap gap-1.5">
             {ACTIVITY_OPTIONS.map((a) => (
               <button key={a} onClick={() => toggleActivity(a)}
                 className={`rounded-full px-3 py-1.5 text-[11px] font-bold ${p.activities.includes(a) ? 'bg-brand text-white' : 'bg-neutral-100 text-neutral-600 dark:bg-white/10'}`}>
-                {a}
+                {ACTIVITY_LABEL[a] ?? a}
               </button>
             ))}
           </div>
         </div>
 
         <div>
-          <div className="text-[12px] font-bold text-ink dark:text-ink">Mencari</div>
+          <div className="text-[12px] font-bold text-ink dark:text-ink">Looking for</div>
           <div className="mt-1 flex flex-wrap gap-1.5">
             {(['teman olahraga', 'hubungan serius', 'belum yakin'] as const).map((l) => (
               <button key={l} onClick={() => setP({ ...p, lookingFor: l })}
                 className={`rounded-full px-3 py-1.5 text-[11px] font-bold ${p.lookingFor === l ? 'bg-brand text-white' : 'bg-neutral-100 text-neutral-600 dark:bg-white/10'}`}>
-                {l}
+                {LOOKING_FOR_LABEL[l]}
               </button>
             ))}
           </div>
         </div>
 
         <div>
-          <div className="text-[12px] font-bold text-ink dark:text-ink">Anak</div>
+          <div className="text-[12px] font-bold text-ink dark:text-ink">Children</div>
           <div className="mt-1 flex flex-wrap gap-1.5">
             {(['ya', 'tidak', 'belum yakin'] as const).map((w) => (
               <button key={w} onClick={() => setP({ ...p, lifestyle: { ...p.lifestyle, wantsChildren: w } })}
                 className={`rounded-full px-3 py-1.5 text-[11px] font-bold ${p.lifestyle.wantsChildren === w ? 'bg-brand text-white' : 'bg-neutral-100 text-neutral-600 dark:bg-white/10'}`}>
-                {w === 'ya' ? 'Ingin' : w === 'tidak' ? 'Tidak ingin' : 'Belum yakin'}
+                {CHILDREN_LABEL[w]}
               </button>
             ))}
           </div>
@@ -378,14 +379,14 @@ function ProfileEditor({ initial, defaultName, onSave }: {
         <label className="flex items-center gap-2 rounded-xl bg-neutral-50 px-3 py-2.5 dark:bg-white/5">
           <input type="checkbox" checked={p.lifestyle.smokes}
             onChange={(e) => setP({ ...p, lifestyle: { ...p.lifestyle, smokes: e.target.checked } })} />
-          <span className="text-[12px] font-semibold text-neutral-700 dark:text-neutral-200">Saya merokok</span>
+          <span className="text-[12px] font-semibold text-neutral-700 dark:text-neutral-200">I smoke</span>
         </label>
 
         <Button className="w-full" onClick={() => { onSave(p); setSaved(true); setTimeout(() => setSaved(false), 1800) }}>
-          {saved ? 'Tersimpan ✓' : 'Simpan profil'}
+          {saved ? 'Saved ✓' : 'Save profile'}
         </Button>
         <p className="text-[10px] leading-relaxed text-neutral-500">
-          Jangan cantumkan alamat rumah, nomor telepon, tempat kerja persis, atau NIK di bagian mana pun.
+          Do not put your home address, phone number, exact workplace, or national ID anywhere on this profile.
         </p>
       </div>
     </Card>

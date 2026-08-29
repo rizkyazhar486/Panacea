@@ -52,6 +52,28 @@ export const ACTIVITY_OPTIONS = [
   'Badminton', 'Hiking', 'Panjat tebing', 'Tenis', 'Muay thai', 'Pilates', 'Menari',
 ]
 
+// Nilai di ACTIVITY_OPTIONS dan pada lifestyle/lookingFor adalah IDENTITAS:
+// tersimpan di profil pengguna dan dibandingkan dengan === atau .includes().
+// Menerjemahkan nilainya akan mengosongkan profil yang sudah ada. Yang
+// diterjemahkan hanya labelnya.
+export const ACTIVITY_LABEL: Record<string, string> = {
+  Lari: 'Running', Gym: 'Gym', Bersepeda: 'Cycling', Berenang: 'Swimming',
+  Yoga: 'Yoga', Futsal: 'Futsal', Basket: 'Basketball', Badminton: 'Badminton',
+  Hiking: 'Hiking', 'Panjat tebing': 'Climbing', Tenis: 'Tennis',
+  'Muay thai': 'Muay thai', Pilates: 'Pilates', Menari: 'Dance',
+}
+export const LOOKING_FOR_LABEL: Record<MatchProfile['lookingFor'], string> = {
+  'teman olahraga': 'a training partner',
+  'hubungan serius': 'a serious relationship',
+  'belum yakin': 'not sure yet',
+}
+export const CHILDREN_LABEL: Record<MatchProfile['lifestyle']['wantsChildren'], string> = {
+  ya: 'Want children', tidak: 'Do not want children', 'belum yakin': 'Not sure yet',
+}
+export const MATCH_LABEL: Record<Compatibility['label'], string> = {
+  many: 'A lot in common', some: 'Some in common', few: 'Little in common',
+}
+
 const BAND_ORDER: MatchProfile['distanceBand'][] = ['<5 km', '5-15 km', '15-50 km', '>50 km']
 
 export interface Compatibility {
@@ -60,7 +82,7 @@ export interface Compatibility {
   agreements: string[]
   frictions: string[]
   /** Coarse label, deliberately not a number. */
-  label: 'Banyak kesamaan' | 'Beberapa kesamaan' | 'Sedikit kesamaan'
+  label: 'many' | 'some' | 'few'
 }
 
 export function compatibility(me: MatchProfile, them: MatchProfile): Compatibility {
@@ -69,29 +91,29 @@ export function compatibility(me: MatchProfile, them: MatchProfile): Compatibili
   const agreements: string[] = []
   const frictions: string[] = []
 
-  if (me.lookingFor === them.lookingFor) agreements.push(`Sama-sama mencari ${me.lookingFor}`)
-  else frictions.push(`Anda mencari ${me.lookingFor}, dia mencari ${them.lookingFor}`)
+  if (me.lookingFor === them.lookingFor) agreements.push(`Both looking for ${LOOKING_FOR_LABEL[me.lookingFor]}`)
+  else frictions.push(`You are looking for ${LOOKING_FOR_LABEL[me.lookingFor]}, they are looking for ${LOOKING_FOR_LABEL[them.lookingFor]}`)
 
   if (me.lifestyle.smokes === them.lifestyle.smokes) {
-    agreements.push(me.lifestyle.smokes ? 'Sama-sama merokok' : 'Sama-sama tidak merokok')
+    agreements.push(me.lifestyle.smokes ? 'Both smoke' : 'Neither smokes')
   } else {
-    frictions.push(me.lifestyle.smokes ? 'Anda merokok, dia tidak' : 'Dia merokok, Anda tidak')
+    frictions.push(me.lifestyle.smokes ? 'You smoke, they do not' : 'They smoke, you do not')
   }
 
-  if (me.lifestyle.drinks === them.lifestyle.drinks) agreements.push('Kebiasaan minum serupa')
+  if (me.lifestyle.drinks === them.lifestyle.drinks) agreements.push('Similar drinking habits')
 
   const exDiff = Math.abs(me.lifestyle.exerciseDaysPerWeek - them.lifestyle.exerciseDaysPerWeek)
-  if (exDiff <= 1) agreements.push('Frekuensi olahraga mirip')
-  else if (exDiff >= 4) frictions.push('Frekuensi olahraga jauh berbeda')
+  if (exDiff <= 1) agreements.push('Similar training frequency')
+  else if (exDiff >= 4) frictions.push('Very different training frequency')
 
-  if (me.lifestyle.sleepSchedule === them.lifestyle.sleepSchedule) agreements.push('Pola tidur serupa')
+  if (me.lifestyle.sleepSchedule === them.lifestyle.sleepSchedule) agreements.push('Similar sleep pattern')
   else if (
     (me.lifestyle.sleepSchedule === 'pagi' && them.lifestyle.sleepSchedule === 'malam') ||
     (me.lifestyle.sleepSchedule === 'malam' && them.lifestyle.sleepSchedule === 'pagi')
-  ) frictions.push('Pola tidur berlawanan (pagi vs malam)')
+  ) frictions.push('Opposite sleep patterns (early bird vs night owl)')
 
   if (me.lifestyle.wantsChildren === them.lifestyle.wantsChildren) {
-    agreements.push(`Sama-sama ${me.lifestyle.wantsChildren === 'belum yakin' ? 'belum yakin soal anak' : me.lifestyle.wantsChildren === 'ya' ? 'ingin punya anak' : 'tidak ingin punya anak'}`)
+    agreements.push(me.lifestyle.wantsChildren === 'belum yakin' ? 'Both unsure about children' : me.lifestyle.wantsChildren === 'ya' ? 'Both want children' : 'Neither wants children')
   } else if (
     (me.lifestyle.wantsChildren === 'ya' && them.lifestyle.wantsChildren === 'tidak') ||
     (me.lifestyle.wantsChildren === 'tidak' && them.lifestyle.wantsChildren === 'ya')
@@ -99,13 +121,13 @@ export function compatibility(me: MatchProfile, them: MatchProfile): Compatibili
     // Surfaced early on purpose: this is the disagreement that most often ends
     // relationships years later, and a matching product that hides it to
     // maximise matches is doing its users harm.
-    frictions.push('Berbeda soal keinginan punya anak — perbedaan ini sebaiknya dibicarakan lebih awal, bukan nanti')
+    frictions.push('You disagree about wanting children — this is worth discussing early rather than later')
   }
 
   const positives = sharedActivities.length + agreements.length
-  const label = positives >= 5 && frictions.length <= 1 ? 'Banyak kesamaan'
-    : positives >= 3 ? 'Beberapa kesamaan'
-    : 'Sedikit kesamaan'
+  const label: Compatibility['label'] = positives >= 5 && frictions.length <= 1 ? 'many'
+    : positives >= 3 ? 'some'
+    : 'few'
 
   return { sharedActivities, agreements, frictions, label }
 }
@@ -144,12 +166,12 @@ export function buildDeck(
 
 /** Safety guidance shown before any first meeting is arranged. */
 export const SAFETY_RULES = [
-  'Bertemu pertama kali di TEMPAT UMUM yang ramai — kafe, pusat kebun raya, atau gym. Jangan di rumah, kos, maupun tempat sepi.',
-  'Beri tahu satu orang yang Anda percaya: dengan siapa Anda bertemu, di mana, dan jam berapa. Bagikan lokasi langsung selama pertemuan.',
-  'Berangkat dan pulang dengan kendaraan Anda sendiri atau transportasi yang Anda pesan sendiri. Jangan dijemput di rumah pada pertemuan pertama.',
-  'Jangan meninggalkan minuman tanpa pengawasan, dan jangan menerima minuman yang tidak Anda lihat disiapkan.',
-  'JANGAN pernah mengirim uang, pulsa, atau data rekening — permintaan uang dari orang yang belum pernah Anda temui adalah pola penipuan yang paling sering, seberapa pun meyakinkan ceritanya.',
-  'Jangan membagikan alamat rumah, alamat kantor, NIK, atau foto dokumen identitas.',
-  'Percayai rasa tidak nyaman Anda. Anda boleh mengakhiri pertemuan kapan saja tanpa memberi alasan, dan tidak berutang penjelasan kepada siapa pun.',
-  'Bila seseorang menekan Anda untuk pindah ke aplikasi lain dengan cepat, menolak panggilan video, atau ceritanya berubah-ubah — hentikan komunikasi dan laporkan.',
+  'Meet for the first time in a BUSY PUBLIC PLACE — a cafe, a park, a gym. Never at a home, a room, or anywhere quiet.',
+  'Tell someone you trust who you are meeting, where, and when. Share your live location for the duration.',
+  'Travel there and back under your own arrangements. Do not get picked up from home on a first meeting.',
+  'Never leave your drink unattended, and do not accept a drink you did not see poured.',
+  'NEVER send money, credit, or bank details. A request for money from someone you have not met is the single most common scam pattern, however convincing the story.',
+  'Do not share your home address, workplace address, national ID number, or photos of identity documents.',
+  'Trust your discomfort. You can end a meeting at any time without giving a reason, and you owe nobody an explanation.',
+  'If someone pushes to move to another app quickly, refuses a video call, or their story keeps changing — stop communicating and report them.',
 ]
