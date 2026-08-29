@@ -107,6 +107,75 @@ export const RUPA: Record<string, Rupa> = {
     bg: 'bg-emerald-400/25', teks: 'text-emerald-700 dark:text-emerald-300', garis: 'bg-emerald-400',
     kilau: ['from-emerald-100/70', 'to-teal-50/40'],
   },
+
+  // ── Grup MENU (Shell). Kuncinya berbeda dari kategori widget, tetapi
+  //    rupanya dipusatkan di berkas yang sama supaya warna satu gagasan tidak
+  //    pernah berbeda di dua layar. Halaman "All Features" memakai yang ini.
+  'Home': {
+    label: 'Home & Social', emoji: '🏠',
+    bg: 'bg-brand/20', teks: 'text-brand-dark dark:text-brand', garis: 'bg-brand',
+    kilau: ['from-emerald-100/70', 'to-green-50/40'],
+  },
+  'Move': {
+    label: 'Move', emoji: '🏃',
+    bg: 'bg-orange-400/25', teks: 'text-orange-700 dark:text-orange-300', garis: 'bg-orange-400',
+    kilau: ['from-orange-100/70', 'to-amber-50/40'],
+  },
+  'Your Body': {
+    label: 'Your Body', emoji: '📈',
+    bg: 'bg-teal-400/25', teks: 'text-teal-700 dark:text-teal-300', garis: 'bg-teal-400',
+    kilau: ['from-teal-100/70', 'to-cyan-50/40'],
+  },
+  'Longevity': {
+    label: 'Live Longer', emoji: '🌱',
+    bg: 'bg-lime-400/25', teks: 'text-lime-700 dark:text-lime-300', garis: 'bg-lime-400',
+    kilau: ['from-lime-100/70', 'to-emerald-50/40'],
+  },
+  'Learn & Look Up': {
+    label: 'Learn & Look Up', emoji: '📚',
+    bg: 'bg-amber-400/25', teks: 'text-amber-700 dark:text-amber-300', garis: 'bg-amber-400',
+    kilau: ['from-amber-100/70', 'to-yellow-50/40'],
+  },
+  'Calculators & Labs': {
+    label: 'Work It Out', emoji: '🧮',
+    bg: 'bg-cyan-400/25', teks: 'text-cyan-700 dark:text-cyan-300', garis: 'bg-cyan-400',
+    kilau: ['from-cyan-100/70', 'to-sky-50/40'],
+  },
+  'Fitness': {
+    label: 'Fitness', emoji: '💪',
+    bg: 'bg-orange-400/25', teks: 'text-orange-700 dark:text-orange-300', garis: 'bg-orange-400',
+    kilau: ['from-orange-100/70', 'to-rose-50/40'],
+  },
+  'Services': {
+    label: 'Help & Services', emoji: '🤝',
+    bg: 'bg-rose-400/25', teks: 'text-rose-700 dark:text-rose-300', garis: 'bg-rose-400',
+    kilau: ['from-rose-100/70', 'to-pink-50/40'],
+  },
+  'Content': {
+    label: 'Read & Learn', emoji: '📖',
+    bg: 'bg-violet-400/25', teks: 'text-violet-700 dark:text-violet-300', garis: 'bg-violet-400',
+    kilau: ['from-violet-100/70', 'to-fuchsia-50/40'],
+  },
+  'Money': {
+    label: 'Money', emoji: '💰',
+    bg: 'bg-yellow-400/25', teks: 'text-yellow-700 dark:text-yellow-300', garis: 'bg-yellow-400',
+    kilau: ['from-yellow-100/70', 'to-amber-50/40'],
+  },
+  'Manage': {
+    label: 'Manage', emoji: '🛠️',
+    bg: 'bg-slate-400/25', teks: 'text-slate-700 dark:text-slate-300', garis: 'bg-slate-400',
+    kilau: ['from-slate-100/70', 'to-neutral-50/40'],
+  },
+  'Account': {
+    label: 'Account & More', emoji: '⚙️',
+    bg: 'bg-neutral-400/25', teks: 'text-neutral-700 dark:text-neutral-300', garis: 'bg-neutral-400',
+    kilau: ['from-neutral-100/70', 'to-neutral-50/40'],
+  },
+  'Shop': {
+    label: 'Shop & Paid Services', emoji: '🛒',
+    bg: 'bg-pink-400/25', teks: 'text-pink-700 dark:text-pink-300', garis: 'bg-pink-400',
+    kilau: ['from-pink-100/70', 'to-rose-50/40'],
+  },
 }
 
 const CADANGAN: Rupa = {

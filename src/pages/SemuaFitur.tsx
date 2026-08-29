@@ -4,6 +4,7 @@ import { useStore } from '../lib/store'
 import { NAV_UNTUK_PENGATURAN } from '../components/Shell'
 import { FITUR_DARI_HUB } from '../lib/katalogFitur'
 import { penjelasan } from '../lib/penjelasanFitur'
+import { rupa } from '../lib/kategoriRupa'
 
 /**
  * Direktori seluruh fitur, dapat dicari.
@@ -18,19 +19,14 @@ import { penjelasan } from '../lib/penjelasanFitur'
  * ditemukan siapa pun.
  */
 
-/** Nama grup dalam bahasa yang dipakai pemakainya, bukan istilah internal. */
-const NAMA_GRUP: Record<string, string> = {
-  Home: 'Beranda & Sosial',
-  Health: 'Kesehatan Harian',
-  Longevity: 'Umur Panjang',
-  'Calculators & Labs': 'Kalkulator & Lab',
-  Fitness: 'Kebugaran',
-  'Clinical & AI': 'Klinis & AI',
-  Services: 'Layanan',
-  Content: 'Belajar & Materi',
-  Manage: 'Pengelolaan',
-  Account: 'Akun & Lainnya',
-}
+/*
+ * NAMA DAN WARNA GRUP TIDAK LAGI DITULIS DI SINI.
+ *
+ * Sebelumnya halaman ini punya petanya sendiri, dan akibatnya satu gagasan
+ * yang sama memakai dua nama di dua layar — "Klinis & AI" di sini, sesuatu
+ * yang lain di kisi beranda. Sekarang keduanya membaca lib/kategoriRupa.ts,
+ * jadi menamai ulang sebuah kelompok cukup dilakukan sekali.
+ */
 
 /**
  * Toko, farmasi, dan transaksi dipisahkan ke grupnya sendiri.
@@ -88,14 +84,13 @@ export default function SemuaFitur() {
     })
     const peta = new Map<string, typeof cocok>()
     for (const n of cocok) {
-      const g = TOKO.has(n.to) ? 'Toko & Layanan Berbayar' : (NAMA_GRUP[n.group] ?? n.group)
+      const g = TOKO.has(n.to) ? 'Shop' : n.group
       if (!peta.has(g)) peta.set(g, [])
       peta.get(g)!.push(n)
     }
     // Toko diletakkan paling belakang: ia yang paling jarang dituju, dan
     // menaruhnya di atas membuat halaman ini terbaca sebagai etalase.
-    return [...peta.entries()].sort((a, b) =>
-      (a[0].startsWith('Toko') ? 1 : 0) - (b[0].startsWith('Toko') ? 1 : 0))
+    return [...peta.entries()].sort((a, b) => (a[0] === 'Shop' ? 1 : 0) - (b[0] === 'Shop' ? 1 : 0))
   }, [q, peran, semua])
 
   const total = grup.reduce((a, [, v]) => a + v.length, 0)
@@ -103,23 +98,28 @@ export default function SemuaFitur() {
   return (
     <div className="space-y-4 pb-4">
       <header>
-        <h1 className="text-[20px] font-black text-ink dark:text-white">Semua Fitur</h1>
+        <h1 className="text-[20px] font-black text-ink dark:text-white">Everything in here</h1>
         <p className="text-[13px] text-neutral-500">
-          {total} halaman. Menu hanya memuat yang harian — sisanya ada di sini.
+          {total} pages. The menu holds only what you need daily — the rest lives here.
         </p>
       </header>
 
       <input
         value={q}
         onChange={(e) => setQ(e.target.value)}
-        placeholder="Cari fitur…"
+        placeholder="Search…"
         className="w-full rounded-2xl border border-neutral-200 bg-white px-4 py-3 text-[13px] outline-none focus:border-brand dark:border-white/10 dark:bg-white/5"
       />
 
       {grup.map(([nama, isi]) => (
         <section key={nama}>
-          <h2 className="mb-1.5 text-[11px] font-black uppercase tracking-wide text-neutral-500">
-            {nama} <span className="text-neutral-400">· {isi.length}</span>
+          {/* Judulnya membawa warna dan lambang kelompoknya, sama seperti di
+              kisi beranda — supaya kedua layar terasa satu tempat. */}
+          <h2 className="mb-1.5 flex items-center gap-1.5 text-[12px] font-black">
+            <span aria-hidden className={`h-4 w-1.5 shrink-0 rounded-full ${rupa(nama).garis}`} />
+            <span aria-hidden>{rupa(nama).emoji}</span>
+            <span className={rupa(nama).teks}>{rupa(nama).label}</span>
+            <span className="text-[10px] font-bold text-neutral-400">· {isi.length}</span>
           </h2>
           {/* Tabel, bukan deretan keping.
               Keping hanya memuat nama, dan nama seperti "VitaPulse" maupun
@@ -132,7 +132,7 @@ export default function SemuaFitur() {
               sungguhan memaksa dua kolom berdampingan, dan kolom penjelasan
               tersisa ±150 px sehingga tiap kalimat pecah menjadi enam baris.
               Susunan menurun membuat penjelasan memakai lebar penuh. */}
-          <ul className="overflow-hidden rounded-2xl border border-neutral-200 dark:border-white/10">
+          <ul className={`relative isolate overflow-hidden rounded-2xl border border-neutral-200 bg-gradient-to-br dark:border-white/10 ${rupa(nama).kilau[0]} ${rupa(nama).kilau[1]}`}>
             {isi.map((n, i) => {
               const apa = penjelasan(n.to, n.apa)
               return (
@@ -141,8 +141,14 @@ export default function SemuaFitur() {
                     to={n.to}
                     /* min-h-[56px]: dua baris teks pada 390 px, sekaligus jauh
                        di atas batas bawah sasaran sentuh 40 px. */
-                    className="flex min-h-[56px] items-center gap-3 bg-white px-3 py-2.5 transition active:bg-neutral-50 dark:bg-white/5 dark:active:bg-white/10"
+                    className="flex min-h-[56px] items-center gap-3 bg-white/75 px-3 py-2.5 transition active:bg-white/50 dark:bg-white/5 dark:active:bg-white/10"
                   >
+                    {/* Lambang kelompoknya diulang tiap baris: pada daftar
+                        panjang yang digulir, judul bagiannya sudah lama keluar
+                        dari layar saat orang membaca baris ke-sepuluh. */}
+                    <span aria-hidden className={`grid h-8 w-8 shrink-0 place-items-center rounded-xl text-[15px] ${rupa(nama).bg}`}>
+                      {rupa(nama).emoji}
+                    </span>
                     <span className="min-w-0 flex-1">
                       <span className="block text-[13px] font-bold leading-tight text-ink dark:text-white">
                         {n.label}
@@ -163,7 +169,7 @@ export default function SemuaFitur() {
       ))}
 
       {total === 0 && (
-        <p className="text-center text-[13px] text-neutral-500">Tidak ada yang cocok — coba kata lain.</p>
+        <p className="text-center text-[13px] text-neutral-500">Nothing matches — try another word.</p>
       )}
     </div>
   )
