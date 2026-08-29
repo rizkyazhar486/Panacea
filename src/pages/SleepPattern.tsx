@@ -123,8 +123,8 @@ export function SleepPattern() {
         <SectionTitle icon={<IconTimer />} title="Sleep Pattern" />
         <Card>
           <p className="text-sm text-neutral-600 leading-relaxed">
-            Rincian tidur per tahapan diisi server melalui sinkronisasi otomatis, dan saat ini aplikasi
-            berjalan tanpa server.
+            Stage-by-stage sleep detail is filled in by the server through automatic sync, and the app
+            is currently running without one.
           </p>
         </Card>
       </div>
@@ -136,78 +136,78 @@ export function SleepPattern() {
       <SectionTitle
         icon={<IconTimer />}
         title="Sleep Pattern"
-        subtitle="Menurut tahap dan menurut malam, dari Apple Watch lewat sinkronisasi otomatis"
+        subtitle="By stage and by night, from Apple Watch via automatic sync"
       />
 
       <Card>
         <p className="text-sm text-neutral-600 leading-relaxed">
-          Total jam tidur adalah angka yang paling sering dilihat dan paling sedikit artinya.
-          <strong className="text-ink"> Tujuh jam yang terpecah-pecah dengan tidur dalam nyaris nol tidak
-          sama dengan tujuh jam yang utuh</strong> — dan hanya rincian tahapan yang bisa membedakannya.
+          Total hours slept is the number people look at most and the one that means least.
+          <strong className="text-ink"> Seven broken hours with almost no deep sleep is not the same as
+          seven unbroken ones</strong> — and only the stage breakdown can tell them apart.
         </p>
         <p className="text-sm text-neutral-500 mt-2 leading-relaxed">
-          Bagi orang yang jadwal jaganya berantakan, yang paling menentukan justru bukan lamanya melainkan
-          <strong className="text-ink"> keteraturan jamnya</strong>. Jam tidur yang berpindah-pindah tiap
-          malam memberi tubuh sinyal waktu yang saling bertentangan, dan itu memberi rasa lelah yang tidak
-          hilang meskipun jumlah jamnya cukup.
+          For anyone on a broken shift pattern, what matters most is not the duration but
+          <strong className="text-ink"> the consistency of the timing</strong>. A bedtime that moves every
+          night gives the body contradictory time cues, and that produces a tiredness which does not lift
+          even when the hours add up.
         </p>
       </Card>
 
       {gagal ? (
         <Card>
-          <p className="text-sm text-neutral-500">Tidak bisa memuat data tidur.</p>
-          <button onClick={load} className="mt-3 rounded-lg bg-brand px-3 py-1.5 text-xs font-bold text-white">Coba lagi</button>
+          <p className="text-sm text-neutral-500">Could not load sleep data.</p>
+          <button onClick={load} className="mt-3 rounded-lg bg-brand px-3 py-1.5 text-xs font-bold text-white">Try again</button>
         </Card>
       ) : memuat ? (
         <Card><p className="text-sm text-slate-500">Loading…</p></Card>
       ) : !urut.length ? (
         <Card>
-          <p className="text-sm text-neutral-600 leading-relaxed">Belum ada malam yang tercatat.</p>
+          <p className="text-sm text-neutral-600 leading-relaxed">No nights recorded yet.</p>
           <p className="mt-2 text-sm text-neutral-500 leading-relaxed">
-            Pastikan <strong className="text-ink">Sleep Analysis</strong> ikut dicentang di Health Auto Export,
-            dan Anda memakai jam tangan saat tidur. Rincian tahapan hanya ada bila jam tangan dipakai
-            sepanjang malam — bila hanya iPhone yang di dekat tempat tidur, yang terekam paling jauh adalah
-            waktu di tempat tidur, tanpa tahapan.
+            Make sure <strong className="text-ink">Sleep Analysis</strong> is ticked in Health Auto Export,
+            and that you wear the watch to bed. Stage detail only exists if the watch is worn through the
+            night — with just an iPhone beside the bed, the most that gets recorded is time in bed, with no
+            stages.
           </p>
           <Link to="/health-data" className="mt-3 inline-block rounded-lg bg-brand px-3 py-1.5 text-xs font-bold text-white">
-            Buka pengaturan sinkronisasi →
+            Open sync settings →
           </Link>
         </Card>
       ) : (
         <>
           <Card>
-            <SectionTitle icon={<IconActivity />} title="Summary" subtitle={`${ringkas!.malam} malam terakhir`} />
+            <SectionTitle icon={<IconActivity />} title="Summary" subtitle={`Last ${ringkas!.malam} nights`} />
             <div className="grid grid-cols-2 gap-2 mt-2 sm:grid-cols-4">
-              <Stat label="Rata-rata tidur" value={fmtDurasi(ringkas!.reratatotal)} />
-              <Stat label="Tidur dalam" value={fmtDurasi(ringkas!.rerataDeep)} />
+              <Stat label="Average sleep" value={fmtDurasi(ringkas!.reratatotal)} />
+              <Stat label="Deep sleep" value={fmtDurasi(ringkas!.rerataDeep)} />
               <Stat label="REM" value={fmtDurasi(ringkas!.rerataRem)} />
               <Stat
-                label="Keteraturan"
+                label="Consistency"
                 value={ringkas!.keteraturanMenit != null ? `±${ringkas!.keteraturanMenit} m` : '—'}
               />
             </div>
 
             {ringkas!.rerataJamTidur != null && (
               <p className="mt-3 text-sm text-neutral-500 leading-relaxed">
-                Rata-rata Anda mulai tidur sekitar pukul <strong className="text-ink">{fmtJam(ringkas!.rerataJamTidur)}</strong>
-                {ringkas!.rerataJamBangun != null && <> dan bangun sekitar <strong className="text-ink">{fmtJam(ringkas!.rerataJamBangun)}</strong></>}.
-                {' '}Dihitung melingkar, sehingga jam sebelum dan sesudah tengah malam tidak dirata-ratakan menjadi siang hari.
+                On average you fall asleep around <strong className="text-ink">{fmtJam(ringkas!.rerataJamTidur)}</strong>
+                {ringkas!.rerataJamBangun != null && <> and wake around <strong className="text-ink">{fmtJam(ringkas!.rerataJamBangun)}</strong></>}.
+                {' '}Averaged circularly, so times either side of midnight do not average out to the middle of the day.
               </p>
             )}
 
             {ringkas!.keteraturanMenit != null && (
               <p className={`mt-2 text-sm leading-relaxed ${ringkas!.keteraturanMenit <= 45 ? 'text-emerald-200/90' : 'text-amber-100/90'}`}>
                 {ringkas!.keteraturanMenit <= 45
-                  ? `Jam mulai tidur Anda cukup teratur (bergeser sekitar ${ringkas!.keteraturanMenit} menit dari malam ke malam). Ini bagian yang paling menentukan dan Anda sudah memilikinya.`
-                  : `Jam mulai tidur Anda bergeser sekitar ${ringkas!.keteraturanMenit} menit dari malam ke malam. Pergeseran sebesar ini memberi tubuh sinyal waktu yang berubah-ubah. Bila jadwal jaga membuat jam tidur mustahil disamakan, yang paling terbantu adalah menetapkan JAM BANGUN dan mendapat cahaya terang segera sesudahnya — jam bangun jauh lebih mudah dikendalikan daripada jam tertidur.`}
+                  ? `Your bedtime is fairly consistent (moving about ${ringkas!.keteraturanMenit} minutes from night to night). This is the part that matters most, and you already have it.`
+                  : `Your bedtime moves about ${ringkas!.keteraturanMenit} minutes from night to night. A shift that size gives the body a moving time cue. If shift work makes a fixed bedtime impossible, the thing that helps most is fixing your WAKE TIME and getting bright light straight after — wake time is far easier to control than the moment you fall asleep.`}
               </p>
             )}
           </Card>
 
           <Card>
-            <SectionTitle title="Per malam" subtitle="Panjang bilah sebanding dengan lama tidur" />
+            <SectionTitle title="Night by night" subtitle="Bar length is proportional to time asleep" />
             <div className="mt-2 flex flex-wrap gap-x-3 gap-y-1 text-[10px]">
-              {([['deep', 'Dalam'], ['rem', 'REM'], ['core', 'Inti'], ['awake', 'Terbangun']] as const).map(([k, l]) => (
+              {([['deep', 'Deep'], ['rem', 'REM'], ['core', 'Core'], ['awake', 'Awake']] as const).map(([k, l]) => (
                 <span key={k} className="flex items-center gap-1.5 text-neutral-500">
                   <span className="h-2 w-2 rounded-full" style={{ background: WARNA[k] }} />{l}
                 </span>
@@ -249,7 +249,7 @@ export function SleepPattern() {
                       </div>
                     </div>
                     {jumlahStage === 0 && (
-                      <p className="mt-0.5 text-[10px] text-slate-500">Tahapan tidak terekam malam ini — kemungkinan jam tangan tidak dipakai.</p>
+                      <p className="mt-0.5 text-[10px] text-slate-500">No stages recorded this night — the watch was probably not worn.</p>
                     )}
                   </div>
                 )
@@ -258,13 +258,13 @@ export function SleepPattern() {
           </Card>
 
           <Card>
-            <SectionTitle icon={<IconHeart />} title="Cara membacanya" />
+            <SectionTitle icon={<IconHeart />} title="How to read this" />
             <div className="mt-2 space-y-2.5">
               {[
-                ['Tidur dalam', 'Paling banyak muncul pada sepertiga awal malam, dan inilah tahap yang paling berkaitan dengan pemulihan fisik serta pelepasan hormon pertumbuhan. Tidur yang dimulai jauh lebih larut memangkas bagian ini lebih dahulu — itulah sebabnya begadang terasa jauh lebih merusak daripada sekadar tidur lebih pendek.'],
-                ['REM', 'Terkonsentrasi pada sepertiga akhir malam dan berkaitan dengan daya ingat serta pengolahan emosi. Bangun lebih awal dari biasanya memotong REM lebih dahulu, sehingga terasa sebagai suasana hati yang buruk meskipun jumlah jamnya cukup.'],
-                ['Terbangun', 'Terbangun singkat beberapa kali semalam adalah hal yang normal dan dialami semua orang. Yang perlu diperhatikan adalah bila jumlahnya banyak dan disertai rasa mengantuk berat di siang hari.'],
-                ['Batas alat ini', 'Tahapan tidur dari jam tangan merupakan PERKIRAAN dari gerakan dan denyut jantung, bukan hasil rekaman gelombang otak. Ia cukup baik untuk melihat kecenderungan diri sendiri, dan tidak dapat dipakai untuk menegakkan diagnosis gangguan tidur. Mendengkur keras dengan henti napas yang disaksikan orang lain, maupun rasa mengantuk berat di siang hari, perlu diperiksakan langsung dan tidak akan terjawab oleh angka di halaman ini.'],
+                ['Deep sleep', 'Mostly appears in the first third of the night, and it is the stage most tied to physical recovery and growth-hormone release. Going to bed much later cuts into this part first — which is why a late night feels far more damaging than simply sleeping less.'],
+                ['REM', 'Concentrated in the last third of the night, and tied to memory and emotional processing. Waking earlier than usual cuts REM first, which shows up as a poor mood even when the hours look adequate.'],
+                ['Awake', 'Waking briefly a few times a night is normal and happens to everyone. What is worth attention is many awakenings together with heavy daytime sleepiness.'],
+                ['What this tool cannot do', 'Sleep stages from a watch are an ESTIMATE derived from movement and heart rate, not a recording of brain waves. They are good enough for spotting your own trends, and cannot be used to diagnose a sleep disorder. Loud snoring with witnessed pauses in breathing, or heavy daytime sleepiness, needs an in-person assessment and will not be answered by the numbers on this page.'],
               ].map(([judul, isi]) => (
                 <div key={judul} className="rounded-lg border border-white/10 bg-white/[0.03] p-3">
                   <div className="text-sm font-semibold text-ink">{judul}</div>

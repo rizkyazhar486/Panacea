@@ -26,36 +26,36 @@ import { hrMaxFromAge } from '../lib/workoutImport'
 const SETELAN: { nama: string; setKe: string; kenapa: string }[] = [
   {
     nama: 'Include Workouts',
-    setKe: 'NYALAKAN',
+    setKe: 'ON',
     kenapa:
-      'Ini yang paling menentukan dan paling sering tertinggal mati. Deret detak jantung saat latihan JAUH lebih rapat daripada catatan harian — inilah satu-satunya data yang mendekati berkesinambungan. Bila mati, seluruh sesi lari Anda tidak pernah terkirim sama sekali meskipun metrik hariannya terkirim lengkap.',
+      'This matters most and is the one most often left off. The heart-rate trace during a workout is FAR denser than the daily record — it is the only data that comes close to continuous. With it off, none of your runs are ever sent at all, even though the daily metrics arrive in full.',
   },
   {
     nama: 'Aggregate Data',
-    setKe: 'MATIKAN',
+    setKe: 'OFF',
     kenapa:
-      'Bila menyala, aplikasi meringkas sampel menjadi satu baris Min/Rata-rata/Maks per satuan waktu — hasilnya satu titik per menit meskipun jam tangan merekam jauh lebih rapat. Dimatikan, yang terkirim adalah sampel mentah, sekitar tiap 5 detik saat latihan. Ini perbedaan antara 60 detik dan 5 detik per titik.',
+      'With this on, the app collapses samples into one Min/Average/Max row per time unit — giving one point per minute even though the watch records far more densely. With it off, raw samples are sent, roughly every 5 seconds during a workout. This is the difference between 60 seconds and 5 seconds per point.',
   },
   {
     nama: 'Automation interval',
-    setKe: '5 menit',
+    setKe: '5 minutes',
     kenapa:
-      'Menentukan seberapa lama data tertahan di telepon sebelum terkirim, bukan kerapatan sampelnya. Menurunkannya dari 15 menit ke 5 menit membuat log tertinggal beberapa menit saja, bukan seperempat jam. Lebih rendah dari itu tidak menambah apa pun karena Apple Health sendiri tidak menulis secepat itu.',
+      'This sets how long data waits on the phone before being sent, not how densely it is sampled. Dropping it from 15 minutes to 5 leaves the log a few minutes behind rather than a quarter of an hour. Going lower adds nothing, because Apple Health itself does not write that fast.',
   },
 ]
 
 const RENTANG = [
-  { key: '3j', label: '3 jam', ms: 3 * 3600_000 },
-  { key: '12j', label: '12 jam', ms: 12 * 3600_000 },
-  { key: '24j', label: '24 jam', ms: 24 * 3600_000 },
-  { key: '7h', label: '7 hari', ms: 7 * 24 * 3600_000 },
+  { key: '3j', label: '3 hours', ms: 3 * 3600_000 },
+  { key: '12j', label: '12 hours', ms: 12 * 3600_000 },
+  { key: '24j', label: '24 hours', ms: 24 * 3600_000 },
+  { key: '7h', label: '7 days', ms: 7 * 24 * 3600_000 },
 ] as const
 
 const KIND_LABEL: Record<HrSample['kind'], string> = {
-  workout: 'Saat latihan',
-  heart_rate: 'Harian',
-  resting: 'Istirahat',
-  walking_avg: 'Rata-rata berjalan',
+  workout: 'During workout',
+  heart_rate: 'Daily',
+  resting: 'Resting',
+  walking_avg: 'Walking average',
 }
 
 export function HeartRateLog() {
@@ -125,12 +125,12 @@ export function HeartRateLog() {
   if (!backendEnabled) {
     return (
       <div className="space-y-4">
-        <SectionTitle icon={<IconHeart />} title="Log Detak Jantung" />
+        <SectionTitle icon={<IconHeart />} title="Heart Rate Log" />
         <Card>
           <p className="text-sm text-neutral-600 leading-relaxed">
-            Log ini diisi oleh server melalui sinkronisasi otomatis, dan saat ini aplikasi berjalan
-            tanpa server. History latihan yang Anda unggah sendiri tetap bisa dilihat di{' '}
-            <Link to="/riwayat-latihan" className="font-semibold text-ink underline">History Latihan</Link>.
+            This log is filled in by the server through automatic sync, and the app is currently running
+            without one. Training sessions you uploaded yourself are still visible in{' '}
+            <Link to="/riwayat-latihan" className="font-semibold text-ink underline">Training History</Link>.
           </p>
         </Card>
       </div>
@@ -141,40 +141,40 @@ export function HeartRateLog() {
     <div className="space-y-4">
       <SectionTitle
         icon={<IconHeart />}
-        title="Log Detak Jantung"
-        subtitle="Tiap sampel yang dikirim jam tangan Anda, bukan hanya nilai terakhirnya"
+        title="Heart Rate Log"
+        subtitle="Every sample your watch sends, not just the latest value"
       />
 
       <Card>
-        <SectionTitle icon={<IconTimer />} title="Seberapa dekat ini dengan waktu sesungguhnya" />
+        <SectionTitle icon={<IconTimer />} title="How close to real time this is" />
         <p className="text-sm text-neutral-600 mt-2 leading-relaxed">
-          Jujur di depan supaya harapannya tepat: <strong className="text-ink">detak jantung per detik
-          tidak tersedia</strong>, dan itu bukan batasan Panaceamed melainkan batasan datanya sendiri.
+          Said plainly up front so expectations are right: <strong className="text-ink">second-by-second
+          heart rate is not available</strong>, and that is not a Panaceamed limitation but a limitation of
+          the data itself.
         </p>
         <ul className="mt-2 space-y-1.5 text-sm text-neutral-500">
           <li className="flex gap-2"><span className="text-slate-600">•</span><span>
-            Apple Watch <strong className="text-ink">tidak mencatat denyut tiap detik</strong>. Saat latihan
-            ia mengambil sampel sekitar tiap 5 detik; saat istirahat hanya beberapa menit sekali dan tidak teratur.
-            Data per detik memang tidak pernah ada di Apple Health, sehingga tidak ada aplikasi mana pun yang bisa mengirimkannya.
+            Apple Watch <strong className="text-ink">does not record a beat every second</strong>. During a
+            workout it samples roughly every 5 seconds; at rest, only every few minutes and irregularly.
+            Per-second data never exists in Apple Health, so no app can send it.
           </span></li>
           <li className="flex gap-2"><span className="text-slate-600">•</span><span>
-            Otomatisasi Health Auto Export berjalan pada selang <strong className="text-ink">menit</strong>, bukan detik.
-            Paling cepat yang bisa dicapai adalah beberapa menit di belakang waktu nyata.
+            Health Auto Export automations run on <strong className="text-ink">minute</strong> intervals, not
+            seconds. The best achievable is a few minutes behind real time.
           </span></li>
         </ul>
         <p className="text-sm text-neutral-500 mt-2 leading-relaxed">
-          Jadi yang benar-benar bisa diberikan adalah <strong className="text-ink">seluruh sampel yang memang
-          direkam Apple Health, tertunda beberapa menit</strong> — sebuah catatan, bukan monitor. Untuk denyut yang
-          benar-benar hidup per detik, satu-satunya jalan adalah strap dada Bluetooth, dan browser di iPhone
-          tidak mendukungnya sama sekali.
+          So what can honestly be offered is <strong className="text-ink">every sample Apple Health actually
+          recorded, a few minutes delayed</strong> — a log, not a monitor. For genuinely live per-second heart
+          rate the only route is a Bluetooth chest strap, and iPhone browsers do not support them at all.
         </p>
       </Card>
 
       <Card>
         <SectionTitle
           icon={<IconActivity />}
-          title="Tiga pengaturan yang menentukan kerapatan data"
-          subtitle="Inilah yang benar-benar mengubah hasilnya — bukan seberapa sering Anda membuka halaman ini"
+          title="The three settings that decide data density"
+          subtitle="These are what actually change the result — not how often you open this page"
         />
         <div className="mt-2 space-y-2">
           {SETELAN.map((x) => (
@@ -190,9 +190,9 @@ export function HeartRateLog() {
           ))}
         </div>
         <p className="mt-3 text-[11px] leading-relaxed text-slate-500">
-          Ketiganya ada di Health Auto Export, pada layar pengaturan ekspor otomatis yang sama tempat
-          Anda menempelkan tautan sinkronisasi. Panduan lengkapnya di{' '}
-          <Link to="/health-data/tutorial" className="font-semibold text-neutral-600 underline">panduan sinkronisasi</Link>.
+          All three live in Health Auto Export, on the same automatic-export settings screen where you
+          pasted your sync link. The full walkthrough is in the{' '}
+          <Link to="/health-data/tutorial" className="font-semibold text-neutral-600 underline">sync guide</Link>.
         </p>
       </Card>
 
@@ -216,48 +216,48 @@ export function HeartRateLog() {
               autoRefresh ? 'border-emerald-500/30 bg-emerald-500/10 text-emerald-300' : 'border-white/10 text-neutral-500'
             }`}
           >
-            {autoRefresh ? '● Menyegarkan tiap menit' : '○ Segarkan manual'}
+            {autoRefresh ? '● Refreshing every minute' : '○ Manual refresh'}
           </button>
           <button onClick={load} className="rounded-lg border border-white/10 px-3 py-1.5 text-xs font-bold text-neutral-500">
-            Muat ulang
+            Reload
           </button>
         </div>
         {terakhirCek && (
           <p className="mt-2 text-[11px] text-slate-500">
-            Terakhir diperiksa {new Date(terakhirCek).toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
-            {memuat && ' · memuat…'}
+            Last checked {new Date(terakhirCek).toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
+            {memuat && ' · loading…'}
           </p>
         )}
       </Card>
 
       {gagal ? (
         <Card>
-          <p className="text-sm text-neutral-500">Tidak bisa memuat log. Periksa sambungan internet Anda.</p>
-          <button onClick={load} className="mt-3 rounded-lg bg-brand px-3 py-1.5 text-xs font-bold text-white">Coba lagi</button>
+          <p className="text-sm text-neutral-500">Could not load the log. Check your internet connection.</p>
+          <button onClick={load} className="mt-3 rounded-lg bg-brand px-3 py-1.5 text-xs font-bold text-white">Try again</button>
         </Card>
       ) : !samples.length ? (
         <Card>
           <p className="text-sm text-neutral-600 leading-relaxed">
-            Belum ada sampel pada rentang ini.
+            No samples in this range yet.
           </p>
           <p className="mt-2 text-sm text-neutral-500 leading-relaxed">
-            Log terisi otomatis begitu otomatisasi Health Auto Export mengirim data ke tautan sinkronisasi Anda.
-            Bila belum pernah terisi sama sekali, periksa dahulu bahwa URL webhook di aplikasi itu benar dan
-            <strong className="text-ink"> tidak tertulis dua kali</strong> — kesalahan tempel yang membuat
-            server tidak pernah menerima apa pun.
+            The log fills in automatically as soon as a Health Auto Export automation sends data to your sync
+            link. If it has never filled at all, first check that the webhook URL in that app is correct and
+            <strong className="text-ink"> not pasted twice</strong> — a paste error that leaves the server
+            receiving nothing.
           </p>
           <Link to="/health-data" className="mt-3 inline-block rounded-lg bg-brand px-3 py-1.5 text-xs font-bold text-white">
-            Buka pengaturan sinkronisasi →
+            Open sync settings →
           </Link>
         </Card>
       ) : (
         <>
           <Card>
             <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
-              <Stat label="Terbaru" value={`${ringkas!.terbaru}`} sub={waktuLalu(ringkas!.terbaruAt)} />
-              <Stat label="Terendah" value={`${ringkas!.min}`} sub="bpm" />
-              <Stat label="Tengah" value={`${ringkas!.median}`} sub="bpm" />
-              <Stat label="Tertinggi" value={`${ringkas!.max}`} sub="bpm" />
+              <Stat label="Latest" value={`${ringkas!.terbaru}`} sub={waktuLalu(ringkas!.terbaruAt)} />
+              <Stat label="Lowest" value={`${ringkas!.min}`} sub="bpm" />
+              <Stat label="Median" value={`${ringkas!.median}`} sub="bpm" />
+              <Stat label="Highest" value={`${ringkas!.max}`} sub="bpm" />
             </div>
             <p className="mt-3 text-[11px] leading-relaxed text-slate-500">
               {ringkas!.jumlah} sampel
@@ -268,7 +268,7 @@ export function HeartRateLog() {
           </Card>
 
           <Card>
-            <SectionTitle icon={<IconActivity />} title="Grafik" subtitle="Pita warna menandai zona terhadap HRmax" />
+            <SectionTitle icon={<IconActivity />} title="Chart" subtitle="Colour bands mark zones relative to HRmax" />
             <div className="mt-2" style={{ width: '100%', height: 220 }}>
               <ResponsiveContainer>
                 <AreaChart data={chart} margin={{ top: 6, right: 8, bottom: 0, left: -18 }}>
@@ -292,7 +292,7 @@ export function HeartRateLog() {
                   <Tooltip
                     contentStyle={{ background: '#0f172a', border: '1px solid rgba(255,255,255,0.12)', borderRadius: 8, fontSize: 11 }}
                     labelFormatter={(v) => new Date(Number(v)).toLocaleString('en-GB', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}
-                    formatter={(v) => [`${v} bpm`, 'Denyut']}
+                    formatter={(v) => [`${v} bpm`, 'Heart rate']}
                   />
                   <Area type="monotone" dataKey="bpm" stroke="#f43f5e" strokeWidth={1.6} fill="url(#hrFill)" dot={false} isAnimationActive={false} />
                 </AreaChart>
@@ -301,7 +301,7 @@ export function HeartRateLog() {
           </Card>
 
           <Card>
-            <SectionTitle title="Sampel terbaru" subtitle="200 terakhir, terbaru di atas" />
+            <SectionTitle title="Latest samples" subtitle="Last 200, newest first" />
             <div className="mt-2 max-h-96 overflow-y-auto">
               {[...samples].reverse().slice(0, 200).map((s, i) => (
                 <div key={`${s.t}-${s.kind}-${i}`} className="flex items-center gap-2 border-b border-white/5 py-1.5 text-xs last:border-0">
@@ -321,7 +321,7 @@ export function HeartRateLog() {
       )}
 
       <Card>
-        <Prosa kelas="text-xs leading-relaxed text-slate-500">Sampel yang sama dikirim berulang kali oleh otomatisasi disaring berdasarkan waktunya, jadi menjalankan sinkronisasi lebih sering tidak menggandakan data. Log dibatasi supaya tidak tumbuh tanpa batas; yang tersimpan adalah bagian terbaru.</Prosa>
+        <Prosa kelas="text-xs leading-relaxed text-slate-500">Identical samples sent repeatedly by the automation are de-duplicated by timestamp, so syncing more often does not double up the data. The log is capped so it cannot grow without limit; what is kept is the most recent stretch.</Prosa>
       </Card>
     </div>
   )

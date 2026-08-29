@@ -24,16 +24,16 @@ const GaitAnalysis = lazy(() => import('./GaitAnalysis').then((m) => ({ default:
 const ClinicalTrackers = lazy(() => import('./ClinicalTrackers').then((m) => ({ default: m.ClinicalTrackers })))
 
 const TABS: TabDef[] = [
-  { id: 'energi', label: 'Energi', emoji: '🔋', komponen: BodyBattery,
-    ringkas: 'Cadangan energi 0–100 dan tingkat stres sepanjang hari' },
-  { id: 'jantung', label: 'Jantung', emoji: '❤️', komponen: HeartRateLog,
-    ringkas: 'Setiap sampel denyut yang dikirim jam tangan, dan serapatnya' },
-  { id: 'tidur', label: 'Tidur', emoji: '😴', komponen: SleepPattern,
-    ringkas: 'Durasi, tahapan, dan keteraturan jam tidur' },
-  { id: 'gerak', label: 'Gerak', emoji: '🦶', komponen: GaitAnalysis,
-    ringkas: 'Asimetri langkah, kualitas jalan, bentuk lari, pemulihan denyut' },
-  { id: 'klinis', label: 'Klinis', emoji: '🩺', komponen: ClinicalTrackers,
-    ringkas: 'SpO₂, rekam EKG, jet lag, kehamilan, fisiologi kursi roda' },
+  { id: 'energi', label: 'Energy', emoji: '🔋', komponen: BodyBattery,
+    ringkas: 'Energy reserve 0–100 and stress level through the day' },
+  { id: 'jantung', label: 'Heart', emoji: '❤️', komponen: HeartRateLog,
+    ringkas: 'Every heart-rate sample the watch sends, and how dense it is' },
+  { id: 'tidur', label: 'Sleep', emoji: '😴', komponen: SleepPattern,
+    ringkas: 'Duration, stages, and how consistent your bedtime is' },
+  { id: 'gerak', label: 'Movement', emoji: '🦶', komponen: GaitAnalysis,
+    ringkas: 'Step asymmetry, walking quality, running form, heart-rate recovery' },
+  { id: 'klinis', label: 'Clinical', emoji: '🩺', komponen: ClinicalTrackers,
+    ringkas: 'SpO₂, ECG recordings, jet lag, pregnancy, wheelchair physiology' },
 ]
 
 export function PusatTubuh() {
@@ -49,9 +49,9 @@ export function PusatTubuh() {
   const angka = useMemo<Angka[]>(() => {
     const v = getVitals()
     const out: Angka[] = []
-    if (v.weightKg) out.push({ label: 'Berat', nilai: String(v.weightKg), satuan: 'kg', nada: NADA.netral })
-    if (v.restingHr) out.push({ label: 'Nadi', nilai: String(v.restingHr), satuan: 'bpm', nada: NADA.jantung })
-    if (v.systolic && v.diastolic) out.push({ label: 'Tensi', nilai: `${v.systolic}/${v.diastolic}`, nada: NADA.netral })
+    if (v.weightKg) out.push({ label: 'Weight', nilai: String(v.weightKg), satuan: 'kg', nada: NADA.netral })
+    if (v.restingHr) out.push({ label: 'Pulse', nilai: String(v.restingHr), satuan: 'bpm', nada: NADA.jantung })
+    if (v.systolic && v.diastolic) out.push({ label: 'BP', nilai: `${v.systolic}/${v.diastolic}`, nada: NADA.netral })
     if (v.spo2Pct) out.push({ label: 'SpO₂', nilai: String(v.spo2Pct), satuan: '%', nada: NADA.biru })
     if (v.hrvMs) out.push({ label: 'HRV', nilai: String(v.hrvMs), satuan: 'ms', nada: NADA.biru })
     return out
@@ -79,8 +79,8 @@ export function PusatTubuh() {
 
   return (
     <HalamanTab
-      judul="Tanda Tubuh"
-      subjudul="Energi, jantung, tidur, gerak, dan pemantau klinis dalam satu halaman"
+      judul="Body Signals"
+      subjudul="Energy, heart, sleep, movement and clinical trackers on one page"
       ikon={<IconActivity />}
       ringkasan={<PanelAngka angka={angka} />}
       tabs={TABS}
