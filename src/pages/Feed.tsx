@@ -481,7 +481,7 @@ function GpsTrackerCard({ onShareToFeed, authorName }: { onShareToFeed: (data: S
         </div>
         <div className="flex items-center gap-2">
           {mode === 'done' && (
-            <button onClick={shareToFeed} className="flex items-center gap-1.5 rounded-xl px-3 py-2 text-[11px] font-bold text-ink transition-all active:scale-95" style={{ background: 'linear-gradient(135deg, #00BF63, #0B7A4B)', boxShadow: '0 4px 14px rgba(0,191,99,0.3)' }}>
+            <button onClick={shareToFeed} className="flex items-center gap-1.5 rounded-xl px-3 py-2 text-[11px] font-bold text-ink transition-all active:scale-95" style={{ background: 'linear-gradient(135deg, #00BF63, #00A857)', boxShadow: '0 4px 14px rgba(0,191,99,0.3)' }}>
               <IconShare2 size={13} /> Share
             </button>
           )}
@@ -564,7 +564,7 @@ function GpsTrackerCard({ onShareToFeed, authorName }: { onShareToFeed: (data: S
                   <span className="font-extrabold" style={{ color: progressPct >= 100 ? '#00BF63' : '#f59e0b' }}>{progressPct.toFixed(1)}%</span>
                 </div>
                 <div className="h-2 rounded-full bg-neutral-100 overflow-hidden">
-                  <div className="h-full rounded-full transition-all duration-700" style={{ width: `${Math.min(100, progressPct)}%`, background: 'linear-gradient(90deg, #00BF63, #0B7A4B)' }} />
+                  <div className="h-full rounded-full transition-all duration-700" style={{ width: `${Math.min(100, progressPct)}%`, background: 'linear-gradient(90deg, #00BF63, #00A857)' }} />
                 </div>
                 <div className="flex justify-between text-[10px] text-neutral-500 mt-1">
                   <span>0 km</span>
@@ -673,20 +673,20 @@ function GpsTrackerCard({ onShareToFeed, authorName }: { onShareToFeed: (data: S
 
         <div className="flex gap-2">
           {mode === 'idle' && <>
-            <button onClick={startTrack} className="flex-1 h-11 rounded-xl text-sm font-bold text-ink transition-all active:scale-95" style={{ background: 'linear-gradient(135deg, #00BF63, #0B7A4B)', boxShadow: '0 4px 14px rgba(0,191,99,0.3)' }}>▶ Start GPS</button>
+            <button onClick={startTrack} className="flex-1 h-11 rounded-xl text-sm font-bold text-ink transition-all active:scale-95" style={{ background: 'linear-gradient(135deg, #00BF63, #00A857)', boxShadow: '0 4px 14px rgba(0,191,99,0.3)' }}>▶ Start GPS</button>
             <button onClick={() => { setMode('planning'); setPlan([]) }} className="h-11 rounded-xl text-sm font-bold border-2 border-purple-300 text-purple-700 bg-purple-50 hover:bg-purple-100 transition-all active:scale-95">📍 Plan Route</button>
           </>}
           {mode === 'planning' && <>
             <button onClick={() => setPlan([])} className="h-10 rounded-xl text-xs font-bold border border-neutral-200 text-neutral-600 px-4">Clear</button>
             <button onClick={reset} className="flex-1 h-10 rounded-xl text-xs font-bold border border-neutral-200 text-neutral-600">Cancel</button>
-            <button onClick={startTrack} className="flex-1 h-10 rounded-xl text-xs font-bold text-ink" style={{ background: 'linear-gradient(135deg, #00BF63, #0B7A4B)' }}>▶ Start</button>
+            <button onClick={startTrack} className="flex-1 h-10 rounded-xl text-xs font-bold text-ink" style={{ background: 'linear-gradient(135deg, #00BF63, #00A857)' }}>▶ Start</button>
           </>}
           {mode === 'tracking' && <>
             <button onClick={pause} className="flex-1 h-11 rounded-xl text-sm font-bold text-white bg-amber-500 hover:bg-amber-600 transition-all active:scale-95">⏸ Pause</button>
             <button onClick={stop} className="flex-1 h-11 rounded-xl text-sm font-bold text-white bg-red-500 hover:bg-red-600 transition-all active:scale-95">⏹ Finish</button>
           </>}
           {mode === 'paused' && <>
-            <button onClick={resume} className="flex-1 h-11 rounded-xl text-sm font-bold text-ink transition-all active:scale-95" style={{ background: 'linear-gradient(135deg, #00BF63, #0B7A4B)' }}>▶ Resume</button>
+            <button onClick={resume} className="flex-1 h-11 rounded-xl text-sm font-bold text-ink transition-all active:scale-95" style={{ background: 'linear-gradient(135deg, #00BF63, #00A857)' }}>▶ Resume</button>
             <button onClick={stop} className="flex-1 h-11 rounded-xl text-sm font-bold text-white bg-red-500 hover:bg-red-600 transition-all active:scale-95">⏹ Finish</button>
           </>}
           {mode === 'done' && <button onClick={reset} className="w-full h-10 rounded-xl text-sm font-bold border border-neutral-200 text-neutral-600 hover:bg-neutral-50 transition-all">Done & Reset</button>}
@@ -812,7 +812,7 @@ function StoryViewer({ group, onClose, onComment, onReact }: {
           ))}
           <input value={draft} onChange={(e) => setDraft(e.target.value)} onKeyDown={(e) => { if (e.key === 'Enter') send() }}
             placeholder="Reply directly..." className="flex-1 rounded-full border border-white/30 bg-black/30 px-4 py-2.5 text-xs text-white placeholder:text-white/50 focus:outline-none" />
-          <button onClick={send} disabled={!draft.trim()} className="grid h-10 w-10 shrink-0 place-items-center rounded-full text-ink transition active:scale-90 disabled:opacity-40" style={{ background: 'linear-gradient(135deg, #00BF63, #0B7A4B)' }}>
+          <button onClick={send} disabled={!draft.trim()} className="grid h-10 w-10 shrink-0 place-items-center rounded-full text-ink transition active:scale-90 disabled:opacity-40" style={{ background: 'linear-gradient(135deg, #00BF63, #00A857)' }}>
             <IconSend size={16} />
           </button>
         </div>
@@ -1030,7 +1030,7 @@ function ComposeModal({ onClose, onPost, onShareGps, authorEmail, authorName, ro
           </div>
 
           <div className="flex justify-end">
-            <button onClick={submit} disabled={busy || (!caption.trim() && photos.length === 0 && !videoUrl)} className="group inline-flex min-h-[44px] items-center gap-2 rounded-full py-2 pl-6 pr-2 text-sm font-bold text-ink shadow-[0_8px_22px_-8px_rgba(0,191,99,0.6)] transition-all duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] hover:-translate-y-0.5 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:translate-y-0" style={{ background: 'linear-gradient(135deg, #00BF63, #0B7A4B)' }}>
+            <button onClick={submit} disabled={busy || (!caption.trim() && photos.length === 0 && !videoUrl)} className="group inline-flex min-h-[44px] items-center gap-2 rounded-full py-2 pl-6 pr-2 text-sm font-bold text-ink shadow-[0_8px_22px_-8px_rgba(0,191,99,0.6)] transition-all duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] hover:-translate-y-0.5 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:translate-y-0" style={{ background: 'linear-gradient(135deg, #00BF63, #00A857)' }}>
               Post
               <span className="grid h-8 w-8 place-items-center rounded-full bg-white/15 transition-transform duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] group-hover:translate-x-0.5">
                 <IconSend size={15} />
@@ -1235,7 +1235,7 @@ export function PostCard({ post, viewerEmail, viewerName }: { post: SocialPost; 
           {/* Share button rendered as a logo only (no text) */}
           <button onClick={share} aria-label="Share to social media" title="Share"
             className="grid h-9 w-9 shrink-0 place-items-center rounded-full text-ink transition active:scale-90"
-            style={{ background: 'linear-gradient(135deg, #00BF63, #0B7A4B)', boxShadow: '0 4px 12px rgba(0,191,99,0.32)' }}>
+            style={{ background: 'linear-gradient(135deg, #00BF63, #00A857)', boxShadow: '0 4px 12px rgba(0,191,99,0.32)' }}>
             <IconShare2 size={15} />
           </button>
           {/* Options menu (Instagram-style: Save / QR / Insights / Archive / Edit / Delete …) */}
@@ -1353,7 +1353,7 @@ export function PostCard({ post, viewerEmail, viewerName }: { post: SocialPost; 
           <div className="flex items-center gap-2">
             <input value={draft} onChange={e => setDraft(e.target.value)} onKeyDown={e => { if (e.key === 'Enter') addComment() }}
               placeholder="Write a comment..." className="flex-1 rounded-full border border-neutral-200 bg-white px-4 py-2 text-xs focus:outline-none focus:border-brand" />
-            <button onClick={addComment} disabled={!draft.trim()} className="grid h-9 w-9 shrink-0 place-items-center rounded-full text-ink transition active:scale-90 disabled:opacity-40" style={{ background: 'linear-gradient(135deg, #00BF63, #0B7A4B)' }}>
+            <button onClick={addComment} disabled={!draft.trim()} className="grid h-9 w-9 shrink-0 place-items-center rounded-full text-ink transition active:scale-90 disabled:opacity-40" style={{ background: 'linear-gradient(135deg, #00BF63, #00A857)' }}>
               <IconSend size={15} />
             </button>
           </div>
@@ -1459,7 +1459,7 @@ export function KomunitasSehat({ viewerEmail, viewerName }: { viewerEmail: strin
             <div className="text-neutral-500">{checkedInToday ? 'You\'ve checked in today.' : 'Not checked in yet today.'}</div>
           </div>
           <button onClick={checkInToday} disabled={checkedInToday}
-            className="rounded-xl px-4 py-2 text-xs font-bold text-ink transition disabled:opacity-50" style={{ background: 'linear-gradient(135deg, #00BF63, #0B7A4B)' }}>
+            className="rounded-xl px-4 py-2 text-xs font-bold text-ink transition disabled:opacity-50" style={{ background: 'linear-gradient(135deg, #00BF63, #00A857)' }}>
             {checkedInToday ? '✓ Checked in' : 'Check In Now'}
           </button>
         </div>
@@ -1541,7 +1541,7 @@ export function KomunitasSehat({ viewerEmail, viewerName }: { viewerEmail: strin
           <input value={supportTo} onChange={(e) => setSupportTo(e.target.value)} placeholder="For whom?" className={inputClass + ' w-28 shrink-0 text-xs'} />
           <input value={supportText} onChange={(e) => setSupportText(e.target.value)} placeholder="Send a quick word of encouragement..." className={inputClass + ' min-w-[160px] flex-1 text-xs'} />
           <button onClick={() => { sendSupport(supportTo, supportText); setSupportTo(''); setSupportText('') }} disabled={!supportText.trim()}
-            className="grid h-9 w-9 shrink-0 place-items-center rounded-full text-ink transition disabled:opacity-40" style={{ background: 'linear-gradient(135deg, #00BF63, #0B7A4B)' }}>
+            className="grid h-9 w-9 shrink-0 place-items-center rounded-full text-ink transition disabled:opacity-40" style={{ background: 'linear-gradient(135deg, #00BF63, #00A857)' }}>
             <IconSend size={15} />
           </button>
         </div>
@@ -1613,7 +1613,7 @@ export function KomunitasSehat({ viewerEmail, viewerName }: { viewerEmail: strin
           <input value={gratTo} onChange={(e) => setGratTo(e.target.value)} placeholder="For whom?" className={inputClass + ' w-28 shrink-0 text-xs'} />
           <input value={gratText} onChange={(e) => setGratText(e.target.value)} placeholder="A note of thanks..." className={inputClass + ' min-w-[160px] flex-1 text-xs'} />
           <button onClick={() => { addGratitude(gratTo, gratText); setGratTo(''); setGratText('') }} disabled={!gratText.trim() || !gratTo.trim()}
-            className="grid h-9 w-9 shrink-0 place-items-center rounded-full text-ink transition disabled:opacity-40" style={{ background: 'linear-gradient(135deg, #00BF63, #0B7A4B)' }}>
+            className="grid h-9 w-9 shrink-0 place-items-center rounded-full text-ink transition disabled:opacity-40" style={{ background: 'linear-gradient(135deg, #00BF63, #00A857)' }}>
             <IconSend size={15} />
           </button>
         </div>
@@ -1952,7 +1952,7 @@ export function PusatKesehatanRealtime({ viewerEmail }: { viewerEmail: string })
           </button>
         )}
         <button onClick={() => addSelfVital({ systolic: sys, diastolic: dia, heartRate: hr, spo2, tempC })}
-          className="w-full rounded-xl px-4 py-2 text-xs font-bold text-ink" style={{ background: 'linear-gradient(135deg, #00BF63, #0B7A4B)' }}>
+          className="w-full rounded-xl px-4 py-2 text-xs font-bold text-ink" style={{ background: 'linear-gradient(135deg, #00BF63, #00A857)' }}>
           Record Vitals Now
         </button>
         {lastVital && (
@@ -2018,7 +2018,7 @@ export function PusatKesehatanRealtime({ viewerEmail }: { viewerEmail: string })
               <span className="text-sm font-black">{cooperVo2 > 0 ? cooperVo2 : '—'}</span> <span className="text-[10px] font-bold">mL/kg/min</span>
             </div>
             <button onClick={() => logVo2Max(cooperVo2, 'Cooper Test')} disabled={cooperVo2 <= 0}
-              className="rounded-xl px-3 py-2 text-xs font-bold text-ink disabled:opacity-40" style={{ background: 'linear-gradient(135deg, #00BF63, #0B7A4B)' }}>Record</button>
+              className="rounded-xl px-3 py-2 text-xs font-bold text-ink disabled:opacity-40" style={{ background: 'linear-gradient(135deg, #00BF63, #00A857)' }}>Record</button>
           </div>
           <Prosa kelas="text-[10px] text-neutral-500">Berlarilah sejauh mungkin dalam 12 menit (pakai Pelacak GPS untuk mengukur jaraknya), lalu masukkan jaraknya. Rumus Cooper yang paling tepat di antara pilihan ini.</Prosa>
         </div>
@@ -2144,7 +2144,7 @@ export function PusatKesehatanRealtime({ viewerEmail }: { viewerEmail: string })
           <div className="rounded-xl bg-neutral-50 p-2"><div className="text-neutral-500">Blood Pressure</div><div className="tinta-aksen font-bold" style={{ ["--aksen" as string]: bpCat.color }}>{sys}/{dia} · {bpCat.label}</div></div>
           <div className="rounded-xl bg-neutral-50 p-2"><div className="text-neutral-500">Sleep today</div><div className="font-bold text-indigo-600">{todaySleep ? `${sleepScore}/100` : 'Not recorded'}</div></div>
           <div className="rounded-xl bg-neutral-50 p-2"><div className="text-neutral-500">Latest vitals</div><div className="font-bold text-neutral-700">{lastVital ? timeAgo(lastVital.at) : 'None yet'}</div></div>
-          <div className="rounded-xl bg-neutral-50 p-2"><div className="text-neutral-500">VO2Max</div><div className="font-bold" style={{ color: vo2Cat.c }}>{lastVo2 ? `${lastVo2.value} · ${lastVo2.method}` : `${vo2max} · ${vo2Cat.l}`}</div></div>
+          <div className="rounded-xl bg-neutral-50 p-2"><div className="text-neutral-500">VO2Max</div><div className="tinta-aksen font-bold" style={{ ["--aksen" as string]: vo2Cat.c }}>{lastVo2 ? `${lastVo2.value} · ${lastVo2.method}` : `${vo2max} · ${vo2Cat.l}`}</div></div>
         </div>
       </Card>
     </div>
@@ -2302,7 +2302,7 @@ export default function SportsSocialFeed() {
         aria-label="Create a new post or story"
         data-tour="compose"
         className="fixed bottom-8 right-5 z-30 hidden h-14 w-14 place-items-center rounded-full text-ink shadow-lg transition active:scale-95 lg:grid"
-        style={{ background: 'linear-gradient(135deg, #00BF63, #0B7A4B)', boxShadow: '0 8px 24px rgba(0,191,99,0.4)' }}
+        style={{ background: 'linear-gradient(135deg, #00BF63, #00A857)', boxShadow: '0 8px 24px rgba(0,191,99,0.4)' }}
       >
         <IconPlus size={26} />
       </button>

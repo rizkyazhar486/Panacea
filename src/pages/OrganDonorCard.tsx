@@ -98,7 +98,7 @@ export function OrganDonorCard() {
         <Card className="!p-0 overflow-hidden">
           <div
             className={intend === 'yes' ? 'p-5 text-ink' : 'p-5'}
-            style={intend === 'yes' ? { background: 'linear-gradient(135deg, #00BF63, #0B7A4B)' } : undefined}
+            style={intend === 'yes' ? { background: 'linear-gradient(135deg, #00BF63, #00A857)' } : undefined}
           >
             <div className="text-xs font-black uppercase tracking-wide opacity-80">Organ Donor Card</div>
             <div className="mt-1 text-lg font-black">{name || 'Your name'}</div>

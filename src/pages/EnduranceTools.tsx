@@ -175,7 +175,7 @@ function TabBahanBakar() {
         {rencana.peringatan.length > 0 && (
           <div className="mt-3 space-y-1.5">
             {rencana.peringatan.map((p, i) => (
-              <p key={i} className="rounded-lg border border-amber-500/25 bg-amber-500/[0.07] p-2.5 text-sm leading-relaxed text-amber-100/90">{p}</p>
+              <p key={i} className="rounded-lg border border-amber-500/25 bg-amber-500/[0.07] p-2.5 text-sm leading-relaxed text-amber-900 dark:text-amber-100/90">{p}</p>
             ))}
           </div>
         )}
@@ -351,7 +351,7 @@ function TabPanduan() {
         </div>
         <div className="mt-3 space-y-1.5">
           {hasil.peringatan.map((p, i) => (
-            <p key={i} className="rounded-lg border border-amber-500/25 bg-amber-500/[0.07] p-2.5 text-sm leading-relaxed text-amber-100/90">{p}</p>
+            <p key={i} className="rounded-lg border border-amber-500/25 bg-amber-500/[0.07] p-2.5 text-sm leading-relaxed text-amber-900 dark:text-amber-100/90">{p}</p>
           ))}
         </div>
       </Card>

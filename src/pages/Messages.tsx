@@ -76,7 +76,7 @@ export function Messages() {
         />
         <button onClick={start} disabled={!draft.trim()} aria-label="Start conversation"
           className="grid h-11 w-11 shrink-0 place-items-center rounded-full text-ink disabled:opacity-40"
-          style={{ background: 'linear-gradient(135deg, #00BF63, #0B7A4B)' }}>
+          style={{ background: 'linear-gradient(135deg, #00BF63, #00A857)' }}>
           <IconSend size={18} />
         </button>
       </div>

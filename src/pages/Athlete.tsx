@@ -22,7 +22,7 @@ function AthleteQuotePopup() {
         <p className="text-lg font-bold leading-snug text-ink">“{q.quote}”</p>
         <div className="mt-4 text-sm font-black text-brand-dark">{q.author}</div>
         <div className="text-xs text-neutral-500">{q.feat}</div>
-        <button onClick={() => setOpen(false)} className="mt-5 w-full rounded-2xl py-3 text-sm font-bold text-white transition active:scale-95" style={{ background: 'linear-gradient(135deg, #00BF63, #0B7A4B)' }}>
+        <button onClick={() => setOpen(false)} className="mt-5 w-full rounded-2xl py-3 text-sm font-bold text-ink tinta-tetap transition active:scale-95" style={{ background: 'linear-gradient(135deg, #00BF63, #00A857)' }}>
           Let's Train! 💪
         </button>
       </div>

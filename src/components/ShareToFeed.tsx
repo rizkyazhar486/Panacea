@@ -80,8 +80,8 @@ export function ShareToFeed({ defaultCaption = '', activity = 'Update' }: { defa
       <button
         onClick={() => setOpen(true)}
         aria-label="Share to feed or story"
-        className="flex items-center gap-2 rounded-xl px-4 py-2.5 text-sm font-bold text-white transition active:scale-95"
-        style={{ background: 'linear-gradient(135deg, #00BF63, #0B7A4B)' }}
+        className="flex items-center gap-2 rounded-xl px-4 py-2.5 text-sm font-bold text-ink tinta-tetap transition active:scale-95"
+        style={{ background: 'linear-gradient(135deg, #00BF63, #00A857)' }}
       >
         <IconShare2 size={16} /> Share
       </button>
@@ -123,7 +123,7 @@ export function ShareToFeed({ defaultCaption = '', activity = 'Update' }: { defa
               </button>
               <button onClick={publishPost} disabled={busy || (!media && !caption.trim())}
                 className="flex items-center justify-center gap-2 rounded-xl py-3 text-sm font-bold text-white disabled:opacity-40"
-                style={{ background: 'linear-gradient(135deg, #00BF63, #0B7A4B)' }}>
+                style={{ background: 'linear-gradient(135deg, #00BF63, #00A857)' }}>
                 📣 Post
               </button>
             </div>

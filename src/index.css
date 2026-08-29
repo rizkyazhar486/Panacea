@@ -2274,7 +2274,7 @@ h1, h2, h3,
    gradien PUTIH di belakangnya. Yang perlu diubah latarnya, bukan hurufnya. */
 .tombol-di-hijau.liquid-glass-btn,
 .dark .tombol-di-hijau.liquid-glass-btn {
-  background: rgba(255, 255, 255, 0.16) !important;
+  background: rgba(255, 255, 255, 0.08) !important;
   border-color: rgba(255, 255, 255, 0.85) !important;
   color: #ffffff !important;
 }
@@ -2294,10 +2294,24 @@ h1, h2, h3,
 .bg-neutral-400.text-white, .bg-neutral-400 .text-white,
 .bg-neutral-300.text-white, .bg-neutral-300 .text-white { color: var(--color-ink) !important; }
 
-/* Tinta gelap di atas hijau merek TUA (#0b7a4b): 3,47:1. Di sana putih yang
-   benar — 5,4:1 — bukan tinta. */
-:root:not(.dark) .bg-brand-dark.text-ink, :root:not(.dark) .bg-brand-dark .text-ink,
-:root:not(.dark) .bg-brand.text-ink, :root:not(.dark) .bg-brand .text-ink { color: #ffffff !important; }
+/* Tinta gelap di atas hijau merek TUA (#0b7a4b): 3,47:1; di sana putih yang
+   benar. TETAPI bg-brand adalah #00BF63 — hijau TERANG — dan di atasnya
+   tinta gelap justru yang benar (7,4:1). Menyamakan keduanya membalik sembilan
+   keping di /longevity menjadi putih di atas hijau terang, 2,43:1. Dua warna
+   berbeda dengan nama yang mirip; yang dipisahkan namanya, bukan dugaannya. */
+:root:not(.dark) .bg-brand-dark.text-ink,
+:root:not(.dark) .bg-brand-dark .text-ink { color: #ffffff !important; }
+.bg-brand:not([class*="/"]).text-white,
+.bg-brand:not([class*="/"]) .text-white { color: var(--color-ink) !important; }
+
+/* Warna tingkat bukti mode terang: 4,09–4,22 dari 4,5. Selisihnya tipis,
+   tetapi tipis tetap di bawah ambang. */
+.keping-tier--strong, .tinta-tier--strong { color: #0f6130; }
+.keping-tier--moderate, .tinta-tier--moderate { color: #8a3f07; }
+
+/* Kaki kartu gelap di /nutrition selalu gelap di kedua tema, jadi hurufnya
+   selalu hijau muda — pemetaan mode terang tidak berlaku di sana. */
+.tinta-hijau-muda, :root:not(.dark) .tinta-hijau-muda { color: #6ee7a3 !important; }
 
 /* Kuning-500 pada 80% kelegapan sebagai huruf di atas putih: 1,85:1. */
 :root:not(.dark) .text-amber-500\/80, :root:not(.dark) .text-amber-500\/70,

@@ -156,7 +156,7 @@ export function Profile() {
               </label>
             </div>
 
-            <button onClick={saveProfile} className="mt-5 w-full rounded-2xl py-3 text-base font-bold text-ink" style={{ background: 'linear-gradient(135deg, #00BF63, #0B7A4B)' }}>Save Profile</button>
+            <button onClick={saveProfile} className="mt-5 w-full rounded-2xl py-3 text-base font-bold text-ink" style={{ background: 'linear-gradient(135deg, #00BF63, #00A857)' }}>Save Profile</button>
           </div>
         </div>
         </Portal>

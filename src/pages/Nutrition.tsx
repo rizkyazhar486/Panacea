@@ -1607,7 +1607,7 @@ function LongevityCard({ body, wt, todaysFoods, vitals, activeProtocol }: {
                 memang penanda, bukan bacaan utama, tetapi penanda yang tidak
                 terbaca sama saja dengan tidak ada. */}
             <span className="text-[11px] font-black tracking-wider text-white/60">PANACEA</span>
-            <span className="text-[11px] font-black tracking-wider text-emerald-300">MED</span>
+            <span className="text-[11px] font-black tracking-wider text-emerald-300 tinta-hijau-muda">MED</span>
           </div>
           <span className="text-[10px] font-mono text-white/50">.id</span>
         </div>

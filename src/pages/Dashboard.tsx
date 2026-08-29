@@ -411,7 +411,7 @@ export function Dashboard() {
     return (
       <div className="mx-auto max-w-xl space-y-10 py-16">
         <div className="text-center">
-          <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-[22px]" style={{ background: 'linear-gradient(135deg, #00BF63, #0B7A4B)', boxShadow: '0 12px 40px rgba(0,191,99,0.3)' }}>
+          <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-[22px]" style={{ background: 'linear-gradient(135deg, #00BF63, #00A857)', boxShadow: '0 12px 40px rgba(0,191,99,0.3)' }}>
             <IconHeart size={34} className="text-ink" />
           </div>
           <h2 className="mt-7 text-2xl font-black tracking-tight">Start Your Longevity Journey</h2>
@@ -436,7 +436,7 @@ export function Dashboard() {
         <button onClick={() => setShowAddPatient((s) => !s)} className="flex shrink-0 items-center gap-1.5 rounded-full border border-dashed border-neutral-200 px-4 py-2 text-[11px] font-semibold text-neutral-500 transition-all duration-200 hover:border-[#00BF63] hover:text-[#00BF63] hover:bg-[rgba(0,191,99,0.05)] active:scale-[0.97]">
           <IconPlus size={13} /> New Patient
         </button>
-        <button onClick={() => setShowAdd((s) => !s)} className="flex shrink-0 items-center gap-1.5 rounded-full px-4 py-2 text-[11px] font-bold text-ink transition-all duration-200 hover:shadow-lg active:scale-[0.97]" style={{ background: 'linear-gradient(135deg, #00BF63, #0B7A4B)', boxShadow: '0 4px 16px rgba(0,191,99,0.3)' }}>
+        <button onClick={() => setShowAdd((s) => !s)} className="flex shrink-0 items-center gap-1.5 rounded-full px-4 py-2 text-[11px] font-bold text-ink transition-all duration-200 hover:shadow-lg active:scale-[0.97]" style={{ background: 'linear-gradient(135deg, #00BF63, #00A857)', boxShadow: '0 4px 16px rgba(0,191,99,0.3)' }}>
           <IconHeart size={13} /> Record Vitals
         </button>
         {vitals.length > 0 && <span className="shrink-0 px-2 text-[10px] font-bold uppercase tracking-[0.2em] text-neutral-300">{vitals.length} entries</span>}

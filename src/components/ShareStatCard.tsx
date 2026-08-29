@@ -210,8 +210,8 @@ export function ShareStatCard(props: StatCardProps) {
       <button
         onClick={() => setOpen(true)}
         aria-label="Share results"
-        className="flex items-center gap-2 rounded-xl px-4 py-2.5 text-sm font-bold text-white transition active:scale-95"
-        style={{ background: 'linear-gradient(135deg, #00BF63, #0B7A4B)' }}
+        className="flex items-center gap-2 rounded-xl px-4 py-2.5 text-sm font-bold text-ink tinta-tetap transition active:scale-95"
+        style={{ background: 'linear-gradient(135deg, #00BF63, #00A857)' }}
       >
         <IconShare2 size={16} /> Share Results
       </button>
@@ -240,7 +240,7 @@ export function ShareStatCard(props: StatCardProps) {
 
             <button onClick={shareExternally} disabled={busy || !dataUrl}
               className="mb-2 flex w-full items-center justify-center gap-2 rounded-xl py-3 text-sm font-bold text-white disabled:opacity-40"
-              style={{ background: 'linear-gradient(135deg, #00BF63, #0B7A4B)' }}>
+              style={{ background: 'linear-gradient(135deg, #00BF63, #00A857)' }}>
               <IconShare2 size={16} /> Share to Other Apps (WA, IG, etc.)
             </button>
 

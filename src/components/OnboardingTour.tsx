@@ -43,7 +43,7 @@ export function OnboardingTour() {
         </div>
 
         <button onClick={close} className="mt-6 w-full rounded-2xl py-3.5 text-base font-bold text-white transition active:scale-95"
-          style={{ background: 'linear-gradient(135deg, #00BF63, #0B7A4B)' }}>
+          style={{ background: 'linear-gradient(135deg, #00BF63, #00A857)' }}>
           Get Started ✓
         </button>
       </div>
@@ -85,7 +85,7 @@ export function AssessmentPrompt() {
           This helps make your training program safer and more effective from day one.
         </p>
         <a href="#/assessment" onClick={dismiss} className="mt-5 block w-full rounded-2xl py-3.5 text-center text-base font-bold text-white transition active:scale-95"
-          style={{ background: 'linear-gradient(135deg, #00BF63, #0B7A4B)' }}>
+          style={{ background: 'linear-gradient(135deg, #00BF63, #00A857)' }}>
           Complete Now →
         </a>
         <button onClick={dismiss} className="mt-2 w-full rounded-2xl py-3 text-sm font-bold text-neutral-500">Maybe later</button>
