@@ -300,7 +300,7 @@ export function Longevity() {
               </svg>
               <div className="absolute inset-0 grid place-items-center">
                 <div>
-                  <div className="text-4xl font-extrabold" style={{ color: scoreColor }}>{score ?? '—'}</div>
+                  <div className="tinta-aksen text-4xl font-extrabold" style={{ ["--aksen" as string]: scoreColor }}>{score ?? '—'}</div>
                   <div className="text-[10px] font-bold uppercase tracking-widest text-neutral-500">Longevity Score</div>
                 </div>
               </div>

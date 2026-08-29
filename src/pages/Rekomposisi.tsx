@@ -90,7 +90,7 @@ export function Rekomposisi() {
                  Putih di atasnya 2,1:1. Yang terpilih memakai tinta gelap; yang
                  tidak terpilih tetap putih, sebab latarnya abu tembus di atas
                  kartu gelap. */
-              className={`min-h-[44px] rounded-xl px-2 text-[12px] font-bold ${fase === f.id ? 'tinta-tetap' : 'text-white'}`}
+              className={`min-h-[44px] rounded-xl px-2 text-[12px] font-bold ${fase === f.id ? 'tinta-tetap' : 'text-neutral-700 dark:text-white'}`}
               style={{ background: fase === f.id ? WARNA_FASE[f.id] : 'rgba(120,120,120,0.35)' }}
             >
               {f.nama}
@@ -140,7 +140,7 @@ export function Rekomposisi() {
             ].map((x) => (
               <div key={x.l} className="rounded-2xl bg-neutral-50 p-2 dark:bg-white/5">
                 <div className="text-[9px] font-black uppercase tracking-wide text-neutral-400">{x.l}</div>
-                <div className="text-[17px] font-black leading-tight tabular-nums" style={{ color: x.c }}>{x.v}</div>
+                <div className="tinta-aksen text-[17px] font-black leading-tight tabular-nums" style={{ ["--aksen" as string]: x.c }}>{x.v}</div>
               </div>
             ))}
           </div>

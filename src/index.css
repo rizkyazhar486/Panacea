@@ -2266,3 +2266,54 @@ h1, h2, h3,
 .panel-hasil--kurang .angka-hasil { color: #B45309; }
 .dark .panel-hasil--lulus  .angka-hasil { color: #6ee7a3; }
 .dark .panel-hasil--kurang .angka-hasil { color: #fcd34d; }
+
+/* ── Mode terang, sisa sapuan ──────────────────────────────────────────────
+   Tombol "Subscribe Now" di /marketplace terukur 1,00:1 — putih di atas
+   putih, benar-benar tak terlihat. Ia berada di atas kartu hijau dan ditulis
+   border-white !text-white, tetapi .liquid-glass-btn--outline melukis
+   gradien PUTIH di belakangnya. Yang perlu diubah latarnya, bukan hurufnya. */
+.tombol-di-hijau.liquid-glass-btn,
+.dark .tombol-di-hijau.liquid-glass-btn {
+  background: rgba(255, 255, 255, 0.16) !important;
+  border-color: rgba(255, 255, 255, 0.85) !important;
+  color: #ffffff !important;
+}
+
+/* Hijau muda mode gelap bocor ke mode terang di atas keping bg-brand-100
+   (1,08:1 di /athlete dan /recovery). Aturan lama ada tetapi dikalahkan
+   aturan .bg-ink yang ditulis belakangan. */
+:root:not(.dark) [class~="bg-brand-100"] .text-brand-dark,
+:root:not(.dark) [class~="bg-brand-100"].text-brand-dark { color: #0a6b42 !important; }
+
+/* Putih di atas bidang PUCAT: hijau merek 25% dan abu-400. Keduanya warna
+   tengah — hurufnya yang digelapkan, warna kepingnya tetap. */
+:root:not(.dark) .bg-brand\/25 .text-white,
+:root:not(.dark) .bg-brand\/25.text-white,
+:root:not(.dark) .bg-brand\/20 .text-white,
+:root:not(.dark) .bg-brand\/20.text-white { color: #0a5c39 !important; }
+.bg-neutral-400.text-white, .bg-neutral-400 .text-white,
+.bg-neutral-300.text-white, .bg-neutral-300 .text-white { color: var(--color-ink) !important; }
+
+/* Tinta gelap di atas hijau merek TUA (#0b7a4b): 3,47:1. Di sana putih yang
+   benar — 5,4:1 — bukan tinta. */
+:root:not(.dark) .bg-brand-dark.text-ink, :root:not(.dark) .bg-brand-dark .text-ink,
+:root:not(.dark) .bg-brand.text-ink, :root:not(.dark) .bg-brand .text-ink { color: #ffffff !important; }
+
+/* Kuning-500 pada 80% kelegapan sebagai huruf di atas putih: 1,85:1. */
+:root:not(.dark) .text-amber-500\/80, :root:not(.dark) .text-amber-500\/70,
+:root:not(.dark) .text-amber-500\/90 { color: #92400e !important; }
+:root:not(.dark) .text-amber-700 { color: #7c3306; }
+:root:not(.dark) .text-neutral-400 { color: #595959; }
+
+/* ── Warna aksen sebagai HURUF ─────────────────────────────────────────────
+   Warna PENGISI dan warna HURUF bukan hal yang sama. #34d399 sebagai bidang
+   itu benar; #34d399 sebagai angka di atas kartu putih terukur 1,84:1. Warna
+   ini datang dari gaya sebaris (WARNA_FASE, bmiCategory, dan sejenisnya),
+   jadi tidak ada nama kelas untuk dipegang — nilainya diteruskan sebagai
+   --aksen, lalu digelapkan di sini dengan color-mix.
+
+   Angka 34% diukur, bukan dikira: pada 30% warna paling terang di aplikasi
+   (#fbbf24) masih 4,23:1. Di mode gelap warna aslinya dipakai apa adanya —
+   di sana latarnya memang gelap. */
+.tinta-aksen { color: color-mix(in oklab, var(--aksen), #000 34%); }
+.dark .tinta-aksen { color: var(--aksen); }

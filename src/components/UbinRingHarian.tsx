@@ -67,7 +67,7 @@ function Cincin({
           )}
         </svg>
         <span className="absolute inset-0 flex items-center justify-center">
-          <span className="text-[14px] font-black tabular-nums" style={{ color: nilai == null ? undefined : warna }}>
+          <span className="tinta-aksen text-[14px] font-black tabular-nums" style={{ ["--aksen" as string]: nilai == null ? undefined : warna }}>
             {tampil}
           </span>
         </span>

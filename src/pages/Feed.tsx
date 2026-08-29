@@ -2140,8 +2140,8 @@ export function PusatKesehatanRealtime({ viewerEmail }: { viewerEmail: string })
           <button onClick={exportReport} className="rounded-full bg-neutral-100 px-2.5 py-1 text-[10px] font-bold text-neutral-600">⬇ Export Report</button>
         </div>
         <div className="grid grid-cols-2 gap-2 text-[11px]">
-          <div className="rounded-xl bg-neutral-50 p-2"><div className="text-neutral-500">BMI</div><div className="font-bold" style={{ color: bmiCat.c }}>{bmi.toFixed(1)} · {bmiCat.l}</div></div>
-          <div className="rounded-xl bg-neutral-50 p-2"><div className="text-neutral-500">Blood Pressure</div><div className="font-bold" style={{ color: bpCat.color }}>{sys}/{dia} · {bpCat.label}</div></div>
+          <div className="rounded-xl bg-neutral-50 p-2"><div className="text-neutral-500">BMI</div><div className="tinta-aksen font-bold" style={{ ["--aksen" as string]: bmiCat.c }}>{bmi.toFixed(1)} · {bmiCat.l}</div></div>
+          <div className="rounded-xl bg-neutral-50 p-2"><div className="text-neutral-500">Blood Pressure</div><div className="tinta-aksen font-bold" style={{ ["--aksen" as string]: bpCat.color }}>{sys}/{dia} · {bpCat.label}</div></div>
           <div className="rounded-xl bg-neutral-50 p-2"><div className="text-neutral-500">Sleep today</div><div className="font-bold text-indigo-600">{todaySleep ? `${sleepScore}/100` : 'Not recorded'}</div></div>
           <div className="rounded-xl bg-neutral-50 p-2"><div className="text-neutral-500">Latest vitals</div><div className="font-bold text-neutral-700">{lastVital ? timeAgo(lastVital.at) : 'None yet'}</div></div>
           <div className="rounded-xl bg-neutral-50 p-2"><div className="text-neutral-500">VO2Max</div><div className="font-bold" style={{ color: vo2Cat.c }}>{lastVo2 ? `${lastVo2.value} · ${lastVo2.method}` : `${vo2max} · ${vo2Cat.l}`}</div></div>

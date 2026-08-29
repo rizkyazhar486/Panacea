@@ -256,7 +256,7 @@ export function Readiness() {
           <div className="flex flex-col items-center gap-1">
             <Ring value={rec ?? 0} max={100} color={tone.color}>
               <div>
-                <div className="text-3xl font-extrabold" style={{ color: tone.color }}>{rec ?? '—'}<span className="text-sm text-neutral-500">%</span></div>
+                <div className="tinta-aksen text-3xl font-extrabold" style={{ ["--aksen" as string]: tone.color }}>{rec ?? '—'}<span className="text-sm text-neutral-500">%</span></div>
                 <div className="text-[10px] font-bold uppercase tracking-widest text-neutral-500">Recovery</div>
               </div>
             </Ring>
@@ -271,7 +271,7 @@ export function Readiness() {
           </div>
         </div>
         <div className="mt-3 rounded-2xl p-3 text-center" style={{ background: `${tone.color}14`, border: `1px solid ${tone.color}30` }}>
-          <div className="text-sm font-extrabold" style={{ color: tone.color }}>{tone.label}</div>
+          <div className="tinta-aksen text-sm font-extrabold" style={{ ["--aksen" as string]: tone.color }}>{tone.label}</div>
           {rec != null && (
             <p className="mt-1 text-[11px] text-neutral-500">
               Optimal strain target today: <b>{lo}–{hi}</b>.
