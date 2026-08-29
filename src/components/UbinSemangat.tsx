@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { KESENANGAN, WARNA, tawaranHariIni, hariIniSelesai, tandai } from '../lib/semangat'
+import { Cincin, Gelembung } from './Rupa'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Ubin yang membuka beranda.
@@ -47,15 +48,27 @@ export function UbinSemangat() {
         </Link>
       </div>
 
-      <div className="kaca rounded-3xl p-3">
-        <p className="t-sedang font-black leading-snug text-ink dark:text-white">
-          {jumlah === 0 && 'Three small things, if you feel like it.'}
-          {jumlah === 1 && 'One done. That already counts.'}
-          {jumlah === 2 && 'Two done. Nice day so far.'}
-          {jumlah === 3 && 'All three. Go enjoy the rest of it.'}
-        </p>
+      {/* overflow-hidden supaya gelembung dekoratifnya terpotong rapi oleh
+          lengkung kartunya sendiri, bukan meluber ke halaman. */}
+      <div className="kaca relative overflow-hidden rounded-3xl p-3">
+        <Gelembung warna="bg-amber-300/30" kelas="-right-8 -top-10 h-28 w-28" />
+        <Gelembung warna="bg-sky-300/25" kelas="-left-10 top-16 h-24 w-24" />
 
-        <div className="mt-2.5 space-y-2">
+        <div className="relative flex items-center gap-3">
+          {/* Cincin, bukan angka: pertanyaan yang sebenarnya diajukan orang
+              adalah "sudahkah aku melakukan sesuatu hari ini", dan itu dijawab
+              bentuk jauh lebih cepat daripada pecahan 2/3. */}
+          <Cincin isi={jumlah / 3} ukuran={46} tebal={6}
+            anak={<span aria-hidden className="text-[16px]">{jumlah === 3 ? '🎉' : '✨'}</span>} />
+          <p className="t-sedang min-w-0 flex-1 font-black leading-snug text-ink dark:text-white">
+            {jumlah === 0 && 'Three small things, if you feel like it.'}
+            {jumlah === 1 && 'One done. That already counts.'}
+            {jumlah === 2 && 'Two done. Nice day so far.'}
+            {jumlah === 3 && 'All three. Go enjoy the rest of it.'}
+          </p>
+        </div>
+
+        <div className="relative mt-2.5 space-y-2">
           {tawaran.map((k) => {
             const w = WARNA[k.warna]
             const sudah = selesai.includes(k.id)
@@ -108,7 +121,7 @@ export function UbinSemangat() {
           })}
         </div>
 
-        <p className="t-mikro mt-2.5 leading-snug text-neutral-500">
+        <p className="t-mikro relative mt-2.5 leading-snug text-neutral-500">
           Nothing here can be broken or lost. A day with none of these is still a fine day — these are offers, not
           tasks, and there are {KESENANGAN.length} of them that take turns.
         </p>

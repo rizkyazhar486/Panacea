@@ -397,7 +397,7 @@ export default function Beranda() {
         <div className="flex items-start justify-between gap-3">
           <div className="min-w-0">
             <h1 className="t-judul truncate font-black leading-tight text-ink dark:text-white">
-              Halo{nama && `, ${nama}`}
+              Hi{nama && `, ${nama}`}
             </h1>
           </div>
           {/* Membuka kotak pencarian di atas halaman ini, BUKAN pindah ke
@@ -408,7 +408,7 @@ export default function Beranda() {
             onClick={() => window.dispatchEvent(new Event('panacea:cari'))}
             className="t-sedang flex h-11 shrink-0 items-center rounded-full bg-brand px-5 font-bold text-white transition active:scale-95"
           >
-            Cari
+            Search
           </button>
         </div>
 

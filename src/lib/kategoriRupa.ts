@@ -36,6 +36,8 @@ export interface Rupa {
   teks: string
   /** Garis tipis penanda bagian. */
   garis: string
+  /** Dua warna gradien lembut untuk latar kartu bagiannya. */
+  kilau: [string, string]
 }
 
 /** Urutan tampil. Yang tidak disebut di sini muncul sesudahnya, apa adanya. */
@@ -56,50 +58,61 @@ export const RUPA: Record<string, Rupa> = {
   'Training': {
     label: 'Move & Train', emoji: '🏃',
     bg: 'bg-orange-400/25', teks: 'text-orange-700 dark:text-orange-300', garis: 'bg-orange-400',
+    kilau: ['from-orange-100/70', 'to-amber-50/40'],
   },
   'Nutrition': {
     label: 'Eat Well', emoji: '🥗',
     bg: 'bg-lime-400/25', teks: 'text-lime-700 dark:text-lime-300', garis: 'bg-lime-400',
+    kilau: ['from-lime-100/70', 'to-emerald-50/40'],
   },
   'Sleep & Recovery': {
     label: 'Sleep & Recover', emoji: '🌙',
     bg: 'bg-indigo-400/25', teks: 'text-indigo-700 dark:text-indigo-300', garis: 'bg-indigo-400',
+    kilau: ['from-indigo-100/70', 'to-violet-50/40'],
   },
   'Mind & Habits': {
     label: 'Mind & Habits', emoji: '🧘',
     bg: 'bg-violet-400/25', teks: 'text-violet-700 dark:text-violet-300', garis: 'bg-violet-400',
+    kilau: ['from-violet-100/70', 'to-fuchsia-50/40'],
   },
   'Body & Data': {
     label: 'Your Body', emoji: '📈',
     bg: 'bg-teal-400/25', teks: 'text-teal-700 dark:text-teal-300', garis: 'bg-teal-400',
+    kilau: ['from-teal-100/70', 'to-cyan-50/40'],
   },
   'Prevention & Screening': {
     label: 'Stay Ahead', emoji: '🛡️',
     bg: 'bg-sky-400/25', teks: 'text-sky-700 dark:text-sky-300', garis: 'bg-sky-400',
+    kilau: ['from-sky-100/70', 'to-blue-50/40'],
   },
   // Nama lamanya menempatkan pembacanya sebagai klinisi. Isinya tidak berubah
   // sama sekali — hanya perkenalannya.
   'Clinical & Learning': {
     label: 'Learn & Look Up', emoji: '📚',
     bg: 'bg-amber-400/25', teks: 'text-amber-700 dark:text-amber-300', garis: 'bg-amber-400',
+    kilau: ['from-amber-100/70', 'to-yellow-50/40'],
   },
   'Calculators & Scores': {
     label: 'Work It Out', emoji: '🧮',
     bg: 'bg-cyan-400/25', teks: 'text-cyan-700 dark:text-cyan-300', garis: 'bg-cyan-400',
+    kilau: ['from-cyan-100/70', 'to-sky-50/40'],
   },
   'Services & Emergency': {
     label: 'Help & Services', emoji: '🤝',
     bg: 'bg-rose-400/25', teks: 'text-rose-700 dark:text-rose-300', garis: 'bg-rose-400',
+    kilau: ['from-rose-100/70', 'to-pink-50/40'],
   },
   'Faith & Life': {
     label: 'Faith & Life', emoji: '🕊️',
     bg: 'bg-emerald-400/25', teks: 'text-emerald-700 dark:text-emerald-300', garis: 'bg-emerald-400',
+    kilau: ['from-emerald-100/70', 'to-teal-50/40'],
   },
 }
 
 const CADANGAN: Rupa = {
   label: '', emoji: '✨',
   bg: 'bg-neutral-200/60 dark:bg-white/10', teks: 'text-neutral-700 dark:text-neutral-200', garis: 'bg-neutral-400',
+  kilau: ['from-neutral-100/70', 'to-neutral-50/40'],
 }
 
 export function rupa(kategori: string): Rupa {

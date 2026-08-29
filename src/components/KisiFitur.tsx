@@ -4,6 +4,7 @@ import { useBahasa } from '../lib/useBahasa'
 import { Link } from 'react-router-dom'
 import { WIDGETS } from '../lib/homeWidgets'
 import { rupa, urutkanKategori } from '../lib/kategoriRupa'
+import { Kilau } from './Rupa'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Kisi fitur bergaya super-app.
@@ -69,8 +70,12 @@ function Bagian({ kategori, daftar }: { kategori: string; daftar: typeof WIDGETS
   const tampil = semua ? daftar : daftar.slice(0, PER_BAGIAN)
   const sisa = daftar.length - PER_BAGIAN
 
+  // Kartu bagiannya ikut mengambil warna kelompoknya, sebagai gradien LEMBUT
+  // di lapisan belakang — tulisannya tetap memakai tinta biasa, sehingga rasio
+  // kontrasnya tidak berubah-ubah mengikuti gradien.
   return (
-    <section id={`bagian-${kategori}`} className="rounded-3xl bg-white p-3 dark:bg-white/5">
+    <section id={`bagian-${kategori}`} className="relative isolate overflow-hidden rounded-3xl bg-white p-3 dark:bg-white/5">
+      <Kilau dari={rupa(kategori).kilau[0]} ke={rupa(kategori).kilau[1]} kelas="dark:opacity-20" />
       <div className="mb-2 flex items-center justify-between gap-2">
         <h3 className="flex items-center gap-1.5 text-[13px] font-black">
           <span aria-hidden className={`h-4 w-1.5 shrink-0 rounded-full ${rupa(kategori).garis}`} />
