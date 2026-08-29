@@ -1,0 +1,89 @@
+# Sisa temuan kontras — mode GELAP. Dihasilkan alat/periksa-kontras.mjs atas 201 halaman.
+# Disimpan sebagai DAFTAR KERJA, bukan sebagai laporan: yang tercatat di sini belum diperbaiki.
+
+### /  gagal:1 pola:1
+  1.04/4.5 11.2px w700 rgb(12, 20, 16) on rgb(23,23,23) :: All :: t-kecil relative z-10 flex min-h-[40px] items-center rounded-full px-4 font-bold transitio
+### /corrected-calcium  gagal:1 pola:1
+  1.52/4.5 12px w600 rgb(90, 61, 5) on rgb(43,37,20) :: The correction changes the clinical catego :: mt-3 rounded-xl border border-amber-200 bg-amber-50 px-3 py-2 text-xs font-semibold text-a
+### /crossfit  gagal:1 pola:1
+  3.79/4.5 11px w900 oklch(0.586 0.253 17.585) on rgb(32,25,25) :: ⚠️ Rabdomiolisis — kenali sebelum mulai :: text-[11px] font-black uppercase tracking-wide text-rose-600
+### /evidence  gagal:1 pola:1
+  1.52/4.5 12px w600 rgb(90, 61, 5) on rgb(43,37,20) :: AI synthesis isn't configured on this depl :: mt-3 rounded-xl border border-amber-200 bg-amber-50 px-3 py-2 text-xs font-semibold text-a
+### /fitness-test  gagal:1 pola:1
+  2.47/4.5 11px w400 rgb(147, 161, 156) on rgb(255,244,229) :: Total Score :: text-[11px] text-neutral-500
+### /harada  gagal:1 pola:1
+  3.44/4.5 12px w700 oklch(0.586 0.253 17.585) on rgb(32,36,34) :: Kosongkan kisi :: rounded-xl bg-white/5 px-3 py-2 text-[12px] font-bold text-rose-600
+### /health-data/tutorial  gagal:3 pola:2
+  2.09/4.5 12px w400 rgb(104, 254, 154) on rgb(148,160,154) :: your sync link is unique and can only data :: text-[12px] leading-relaxed text-brand-dark
+  2.09/4.5 12px w400 rgb(104, 254, 154) on rgb(148,160,154) :: write :: 
+### /learn  gagal:42 pola:9
+  2.35/4.5 10px w900 rgb(87, 97, 111) on rgb(38,40,43) :: 1  weak :: rounded-full px-1.5 py-0.5 text-[10px] font-black uppercase
+  2.54/4.5 10px w900 rgb(87, 97, 111) on rgb(30,34,34) :: Weak evidence :: rounded-full px-2 py-0.5 text-[10px] font-black uppercase
+  2.6/4.5 12px w700 rgb(87, 97, 111) on rgb(28,32,33) :: Weak evidence :: 
+  2.89/4.5 10px w900 rgb(21, 128, 61) on rgb(30,44,37) :: 2  strong :: rounded-full px-1.5 py-0.5 text-[10px] font-black uppercase
+  2.92/4.5 10px w900 rgb(180, 83, 9) on rgb(49,38,31) :: 1  moderate :: rounded-full px-1.5 py-0.5 text-[10px] font-black uppercase
+  3.13/4.5 10px w900 rgb(21, 128, 61) on rgb(21,38,27) :: Strong evidence :: rounded-full px-2 py-0.5 text-[10px] font-black uppercase
+  3.16/4.5 10px w900 rgb(180, 83, 9) on rgb(42,32,21) :: Moderate evidence :: rounded-full px-2 py-0.5 text-[10px] font-black uppercase
+  3.25/4.5 12px w700 rgb(180, 83, 9) on rgb(28,32,33) :: Moderate evidence :: 
+  3.26/4.5 12px w700 rgb(21, 128, 61) on rgb(28,32,33) :: Strong evidence :: 
+### /macro-lab  gagal:1 pola:1
+  4.23/4.5 10px w400 rgb(147, 161, 156) on rgb(15,66,42) :: Matches your needs :: text-[10px] text-neutral-500
+### /marketplace  gagal:2 pola:2
+  3.74/4.5 14px w500 rgba(238, 242, 239, 0.82) on rgb(11,122,75) :: /30 days :: text-sm font-medium text-ink/70
+  4.3/4.5 14px w400 rgba(238, 242, 239, 0.92) on rgb(11,122,75) :: Unlock AI-powered Longevity Scores in the  :: mt-1 max-w-lg text-sm text-ink/85
+### /med-reminders  gagal:1 pola:1
+  1.52/4.5 12px w600 rgb(90, 61, 5) on rgb(43,37,20) :: Reminders need the backend (and push notif :: mt-3 rounded-xl border border-amber-200 bg-amber-50 px-3 py-2 text-xs font-semibold text-a
+### /owner  gagal:3 pola:3
+  3.74/4.5 12px w600 rgba(238, 242, 239, 0.82) on rgb(11,122,75) :: Estimated Gross Revenue :: text-xs font-semibold uppercase tracking-wide text-ink/70
+  3.74/4.5 11px w400 rgba(238, 242, 239, 0.82) on rgb(11,122,75) :: Monthly target Rp 50,000,000 :: mt-1 text-[11px] text-ink/70
+  4.05/4.5 14px w400 rgba(238, 242, 239, 0.88) on rgb(11,122,75) :: ≈ 0 PNC + Rp 0 consultations :: mt-1 text-sm text-ink/80
+### /peregangan  gagal:4 pola:1
+  3.44/4.5 12px w700 oklch(0.586 0.253 17.585) on rgb(32,36,34) :: ✗ If you are not flexible, you have not st :: text-[12px] font-bold text-rose-600
+### /pharmacy  gagal:20 pola:20
+  1.41/4.5 12px w600 rgb(104, 254, 154) on rgb(208,195,38) :: OTC :: inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold bg-brand-100 tex
+  1.56/4.5 12px w600 rgb(104, 254, 154) on rgb(217,178,40) :: OTC :: inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold bg-brand-100 tex
+  1.68/3 36px w400 rgb(238, 242, 239) on rgb(234,180,9) :: ☀️ :: mb-2 grid h-20 place-items-center rounded-xl text-4xl
+  1.68/4.5 12px w600 rgb(104, 254, 154) on rgb(33,199,134) :: OTC :: inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold bg-brand-100 tex
+  1.68/3 48px w400 rgb(238, 242, 239) on rgb(234,180,9) :: ☀️ :: 
+  1.68/4.5 12px w600 rgb(104, 254, 154) on rgb(37,197,163) :: OTC :: inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold bg-brand-100 tex
+  1.83/4.5 12px w600 rgb(104, 254, 154) on rgb(33,183,218) :: OTC :: inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold bg-brand-100 tex
+  1.88/3 36px w400 rgb(238, 242, 239) on rgb(246,159,12) :: 🍊 :: mb-2 grid h-20 place-items-center rounded-xl text-4xl
+  1.88/3 48px w400 rgb(238, 242, 239) on rgb(246,159,12) :: 🍊 :: 
+  2.04/4.5 12px w600 rgb(104, 254, 154) on rgb(220,142,47) :: OTC :: inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold bg-brand-100 tex
+  2.22/3 36px w400 rgb(238, 242, 239) on rgb(15,186,129) :: 💊 :: mb-2 grid h-20 place-items-center rounded-xl text-4xl
+  2.22/3 48px w400 rgb(238, 242, 239) on rgb(15,186,129) :: 💊 :: 
+### /reality-check  gagal:2 pola:1
+  1.65/3 20px w900 rgb(90, 61, 5) on rgb(44,25,29) :: 335 days :: text-xl font-black text-rose-600
+### /recomposition  gagal:4 pola:2
+  2.14/4.5 12px w700 rgb(255, 255, 255) on rgb(56,189,248) :: Build :: min-h-[44px] rounded-xl px-2 text-[12px] font-bold text-white
+  3.99/4.5 11px w700 oklch(0.645 0.246 16.439) on rgb(36,39,44) :: asked: Track SMM on a body-composition sca :: text-[11px] font-bold text-rose-500
+### /social  gagal:1 pola:1
+  1.04/4.5 11.2px w700 rgb(12, 20, 16) on rgb(23,23,23) :: All :: t-kecil relative z-10 flex min-h-[40px] items-center rounded-full px-4 font-bold transitio
+### /supplements  gagal:3 pola:2
+  1.52/4.5 12px w400 rgb(90, 61, 5) on rgb(43,37,20) :: Ini bahan belajar, bukan panduan cara mema :: mt-3 rounded-xl border border-amber-200 bg-amber-50 p-3 text-xs leading-relaxed text-amber
+  1.52/4.5 12px w700 rgb(90, 61, 5) on rgb(43,37,20) :: no doses, cycles, or protocols :: 
+### /teknik-lari  gagal:1 pola:1
+  3.2/4.5 10px w900 oklch(0.586 0.253 17.585) on rgb(55,35,40) :: The most common mistake :: text-[10px] font-black uppercase text-rose-600
+### /thermal-therapy  gagal:2 pola:1
+  1.52/4.5 12px w600 rgb(90, 61, 5) on rgb(43,37,20) :: ⚠️ Never do cold plunges alone or in open  :: mt-2 rounded-xl border border-amber-200 bg-amber-50 px-3 py-2 text-[12px] font-semibold te
+### /training-plan  gagal:1 pola:1
+  1.72/4.5 12px w800 rgb(253, 164, 175) on rgb(255,241,242) :: 🛡️ Safety Screening (answer honestly befo :: text-xs font-extrabold text-rose-700
+### /trials  gagal:1 pola:1
+  1.52/4.5 12px w600 rgb(90, 61, 5) on rgb(43,37,20) :: Live trial search needs the backend — you  :: mt-3 rounded-xl border border-amber-200 bg-amber-50 px-3 py-2 text-xs font-semibold text-a
+### /tutorial  gagal:1 pola:1
+  2.58/4.5 10px w900 rgb(255, 255, 255) on rgb(161,161,161) :: BEDA DGN :: w-[68px] shrink-0 rounded px-1.5 py-0.5 text-center text-[10px] font-black uppercase track
+### /vitapulse  gagal:13 pola:12
+  1.56/4.5 10px w400 rgb(125, 211, 252) on rgb(240,249,255) :: Fluid/day :: text-[10px]
+  1.56/4.5 14px w900 rgb(125, 211, 252) on rgb(240,249,255) :: 2.7 :: text-sm font-black
+  1.56/4.5 10px w700 rgb(125, 211, 252) on rgb(240,249,255) :: liter :: text-[10px] font-bold
+  1.58/4.5 10px w700 rgb(238, 242, 239) on rgb(247,182,72) :: Record :: rounded-full bg-white/25 px-2.5 py-1 text-[10px] font-bold
+  1.78/4.5 12px w700 rgb(165, 180, 252) on rgb(238,242,255) :: /100 (not saved yet) :: text-xs font-bold
+  1.9/4.5 10px w400 rgb(238, 242, 239) on rgb(245,158,11) :: BMI :: text-[10px] opacity-90
+  1.9/4.5 14px w900 rgb(238, 242, 239) on rgb(245,158,11) :: 44.7 :: text-sm font-black
+  1.9/4.5 10px w700 rgb(238, 242, 239) on rgb(245,158,11) :: Overweight :: text-[10px] font-bold
+  1.9/4.5 12px w700 rgb(238, 242, 239) on rgb(245,158,11) :: mL/kg/min · Adequate :: text-xs font-bold
+  2.15/4.5 14px w900 rgb(238, 242, 239) on rgb(0,191,99) :: 120 / 80 mmHg :: text-sm font-black
+  2.15/4.5 12px w700 rgb(238, 242, 239) on rgb(0,191,99) :: Normal :: text-xs font-bold
+  2.32/4.5 11px w700 oklch(0.511 0.262 276.966) on rgb(36,39,44) :: Not recorded :: font-bold text-indigo-600
+### /wellness-hub  gagal:1 pola:1
+  1.41/4.5 10px w700 rgb(107, 74, 5) on rgb(68,56,37) :: Metabolic :: rounded-full px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wide bg-amber-100 text

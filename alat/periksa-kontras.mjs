@@ -112,9 +112,9 @@ const AUDIT = () => {
 }
 const RUTE=(process.env.RUTE||'/,/vitals,/nutrition,/workout,/med-study,/settings').split(',')
 for (const rute of RUTE) {
-  await p.goto('http://127.0.0.1:4206/#'+rute, {waitUntil:'networkidle'}); await p.waitForTimeout(1800)
+  await p.goto('http://127.0.0.1:4206/#'+rute, {waitUntil:'networkidle'}); await p.waitForTimeout(Number(process.env.TUNGGU||1800))
   for (let i=0;i<6;i++){const d=p.locator('[role="dialog"]'); if(!(await d.count()))break; const btn=d.first().locator('button'); const n=await btn.count(); if(!n)break; await btn.nth(n-1).click({force:true}).catch(()=>{}); await p.waitForTimeout(500)}
-  await p.waitForTimeout(1200)
+  await p.waitForTimeout(Number(process.env.TUNGGU2||1200))
   const h = await p.evaluate(AUDIT)
   const uniq=[...new Map(h.map(x=>[x.kelas+'|'+x.warna+'|'+x.latar,x])).values()].sort((a,b)=>a.rasio-b.rasio)
   console.log('\n### '+rute+'  gagal:'+h.length+' pola:'+uniq.length)

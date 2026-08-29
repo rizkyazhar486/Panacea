@@ -138,7 +138,7 @@ function TabBahanBakar() {
             </button>
           ))}
           <button onClick={() => setSensitif((v) => !v)}
-            className={`rounded-lg border px-3 py-1.5 text-xs font-bold ${sensitif ? 'border-amber-500/40 bg-amber-500/10 text-amber-300' : 'border-white/10 text-neutral-500'}`}>
+            className={`rounded-lg border px-3 py-1.5 text-xs font-bold ${sensitif ? 'border-amber-500/40 bg-amber-500/10 text-amber-700 dark:text-amber-300' : 'border-white/10 text-neutral-500'}`}>
             Perut sensitif
           </button>
         </div>

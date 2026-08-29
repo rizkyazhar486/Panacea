@@ -17,7 +17,7 @@ import { parsePace, fmtPace, trainingPaces, RUN_ZONES } from '../lib/baseTrainin
 type Tab = 'banding' | 'lari' | 'sepeda' | 'renang' | 'kecepatan' | 'jadwal'
 
 const ARAH_STYLE: Record<string, string> = {
-  memperbaiki: 'bg-emerald-500/10 border-emerald-500/30 text-emerald-300',
+  memperbaiki: 'bg-emerald-500/10 border-emerald-500/30 text-emerald-700 dark:text-emerald-300',
   merusak: 'bg-rose-500/10 border-rose-500/30 text-rose-300',
   netral: 'bg-slate-500/10 border-slate-500/30 text-neutral-600',
 }
@@ -115,7 +115,7 @@ function CompareTab() {
             <p className="text-sm mt-1 leading-relaxed opacity-95">{s.postur}</p>
           </div>
 
-          <div className="mt-2 text-sm text-amber-300/90">
+          <div className="mt-2 text-sm text-amber-700 dark:text-amber-300">
             <span className="text-amber-500/80">Typical injuries:</span> {s.cederaKhas}
           </div>
         </Card>
@@ -135,7 +135,7 @@ function RunTab() {
       <Field label="Race pace (min:sec per km)">
         <input className={inputClass} value={racePace} onChange={(e) => setRacePace(e.target.value)} inputMode="numeric" />
       </Field>
-      {sec == null && <p className="text-sm text-amber-300 mt-2">Format min:sec, for example 5:30.</p>}
+      {sec == null && <p className="text-sm text-amber-700 dark:text-amber-300 mt-2">Format min:sec, for example 5:30.</p>}
       {res && (
         <div className="grid gap-2 sm:grid-cols-2 mt-3">
           {RUN_ZONES.map((z) => {
@@ -182,7 +182,7 @@ function BikeTab() {
         </div>
 
         {ftp == null ? (
-          <p className="text-sm text-amber-300 mt-3">Enter your average power in watts.</p>
+          <p className="text-sm text-amber-700 dark:text-amber-300 mt-3">Enter your average power in watts.</p>
         ) : (
           <>
             <div className="mt-3 flex flex-wrap items-baseline gap-3">
@@ -234,7 +234,7 @@ function BikeTab() {
             <div key={f.bagian} className="rounded-lg border border-white/10 bg-white/[0.03] p-3">
               <div className="font-semibold text-ink text-sm">{f.bagian}</div>
               <div className="text-sm text-neutral-500 mt-1">{f.patokan}</div>
-              <div className="text-sm text-amber-300/90 mt-1"><span className="text-amber-500/80">If it is wrong:</span> {f.bilaSalah}</div>
+              <div className="text-sm text-amber-700 dark:text-amber-300 mt-1"><span className="text-amber-500/80">If it is wrong:</span> {f.bilaSalah}</div>
             </div>
           ))}
         </div>
@@ -287,7 +287,7 @@ function SwimTab() {
         </div>
 
         {css == null ? (
-          <p className="text-sm text-amber-300 mt-3">
+          <p className="text-sm text-amber-700 dark:text-amber-300 mt-3">
             Masukkan kedua waktu dalam format menit:detik. Waktu 400 m harus lebih lama daripada 200 m.
           </p>
         ) : (
@@ -321,7 +321,7 @@ function SwimTab() {
 
       <Card>
         <div className="rounded-lg border border-emerald-500/30 bg-emerald-500/10 p-3">
-          <div className="text-sm font-semibold text-emerald-300">Swimming is the only one of the three that improves posture</div>
+          <div className="text-sm font-semibold text-emerald-700 dark:text-emerald-300">Swimming is the only one of the three that improves posture</div>
           <p className="text-sm text-neutral-600 mt-1 leading-relaxed">
             Gaya bebas dan gaya punggung menarik lengan ke belakang melawan tahanan air, sehingga menguatkan
             latissimus dorsi, rhomboid, dan trapezius bawah — otot yang justru melemah akibat duduk dan berdiri
@@ -330,7 +330,7 @@ function SwimTab() {
           </p>
         </div>
         <div className="rounded-lg border border-amber-500/30 bg-amber-500/10 p-3 mt-3">
-          <div className="text-sm font-semibold text-amber-300">One thing to watch</div>
+          <div className="text-sm font-semibold text-amber-700 dark:text-amber-300">One thing to watch</div>
           <Prosa kelas="text-sm text-neutral-600 mt-1 leading-relaxed">Nyeri bahu pada perenang hampir selalu berasal dari jarak tempuh yang naik terlalu cepat dan dari tangan yang melewati garis tengah tubuh saat masuk air. Bila bahu mulai nyeri, yang perlu dibenahi lebih dahulu adalah teknik dan jarak tempuh — bukan menambah latihan bahu.</Prosa>
         </div>
       </Card>
