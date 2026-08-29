@@ -114,10 +114,13 @@ export function FitnessTest() {
             </div>
           ))}
         </div>
-        <div className="mt-4 flex items-center justify-between rounded-xl p-3" style={{ background: lulus ? '#E9FAF2' : '#FFF4E5' }}>
+        {/* Latarnya dulu heks sebaris, satu nilai untuk dua tema, sehingga
+            keterangan abu di atasnya terbaca 2,15:1 di mode gelap. Gaya
+            sebaris tidak bisa dijangkau tema; dipindahkan ke kelas. */}
+        <div className={`panel-hasil ${lulus ? 'panel-hasil--lulus' : 'panel-hasil--kurang'} mt-4 flex items-center justify-between rounded-xl p-3`}>
           <div>
             <div className="text-[11px] text-neutral-500">Total Score</div>
-            <div className="text-2xl font-black" style={{ color: lulus ? '#0B7A4B' : '#B45309' }}>{total}<span className="text-sm">/100</span></div>
+            <div className="angka-hasil text-2xl font-black">{total}<span className="text-sm">/100</span></div>
           </div>
           <Badge tone={lulus ? 'normal' : 'high'}>{lulus ? '✓ Meets Requirements' : 'Needs Improvement'}</Badge>
         </div>

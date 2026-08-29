@@ -2245,3 +2245,24 @@ h1, h2, h3,
    harus memaksa hurufnya tetap gelap; pemetaan tema tidak tahu soal !important
    yang ditulis di tempat pemakaian. */
 .tinta-hijau-tua, .dark .tinta-hijau-tua { color: #0a6b42 !important; }
+
+/* Abu-abu netral juga dipakai sebagai keterangan di atas bidang pucat itu. */
+.dark :is([class~="bg-sky-50"], [class~="bg-sky-100"], [class~="bg-indigo-50"], [class~="bg-indigo-100"], [class~="bg-blue-50"], [class~="bg-violet-100"], [class~="bg-purple-50"], [class~="bg-purple-100"], [class~="bg-emerald-50"], [class~="bg-emerald-100"], [class~="bg-green-50"], [class~="bg-green-100"], [class~="bg-teal-100"], [class~="bg-amber-50"], [class~="bg-amber-100"], [class~="bg-orange-50"], [class~="bg-rose-50"], [class~="bg-rose-100"], [class~="bg-red-50"], [class~="bg-pink-50"], [class~="bg-pink-100"]):not([class*="dark:bg-"]) :is(.text-neutral-400, .text-neutral-500, .text-neutral-600, .text-slate-400, .text-slate-500, .text-slate-600, .text-gray-400, .text-gray-500, .text-gray-600),
+.dark :is([class~="bg-sky-50"], [class~="bg-sky-100"], [class~="bg-indigo-50"], [class~="bg-indigo-100"], [class~="bg-blue-50"], [class~="bg-violet-100"], [class~="bg-purple-50"], [class~="bg-purple-100"], [class~="bg-emerald-50"], [class~="bg-emerald-100"], [class~="bg-green-50"], [class~="bg-green-100"], [class~="bg-teal-100"], [class~="bg-amber-50"], [class~="bg-amber-100"], [class~="bg-orange-50"], [class~="bg-rose-50"], [class~="bg-rose-100"], [class~="bg-red-50"], [class~="bg-pink-50"], [class~="bg-pink-100"]):not([class*="dark:bg-"]):is(.text-neutral-400, .text-neutral-500, .text-neutral-600, .text-slate-400, .text-slate-500, .text-slate-600, .text-gray-400, .text-gray-500, .text-gray-600) { color: #57534e !important; }
+
+/* Sisa selisih tipis di atas kartu berwarna gelap: abu-400 terukur 4,33:1
+   pada kartu mawar tua, batu tulis-500 3,27:1 pada kartu hijau tua. */
+.dark .text-neutral-400 { color: #a4b0ac !important; }
+.dark .text-slate-500, .dark .text-slate-600 { color: #b6c0cc; }
+
+/* Panel hasil tes kebugaran. */
+.panel-hasil--lulus  { background: #E9FAF2; }
+.panel-hasil--kurang { background: #FFF4E5; }
+.panel-hasil .text-neutral-500 { color: #616161; }
+.dark .panel-hasil--lulus  { background: rgba(11, 122, 75, 0.22); }
+.dark .panel-hasil--kurang { background: rgba(180, 83, 9, 0.22); }
+.dark .panel-hasil .text-neutral-500 { color: #b9c4bf; }
+.panel-hasil--lulus  .angka-hasil { color: #0B7A4B; }
+.panel-hasil--kurang .angka-hasil { color: #B45309; }
+.dark .panel-hasil--lulus  .angka-hasil { color: #6ee7a3; }
+.dark .panel-hasil--kurang .angka-hasil { color: #fcd34d; }
