@@ -754,7 +754,10 @@ function Pillar({ label, v, hl }: { label: string; v: number; hl?: boolean }) {
   return (
     <div>
       <div className="mb-0.5 flex justify-between text-[11px] font-medium">
-        <span className={hl ? 'text-ink font-bold' : 'text-ink/70'}>{label}</span>
+        {/* Pilar hidup di dalam kartu bergradien hijau tua — tulisannya
+            terang. Yang disorot dibuat kuning, sewarna bilahnya, bukan
+            dibuat lebih gelap. */}
+        <span className={hl ? 'font-bold text-yellow-300' : 'text-white/70'}>{label}</span>
         <span className="font-bold">{v}</span>
       </div>
       <div className={'h-1.5 overflow-hidden rounded-full ' + (hl ? 'bg-white/30' : 'bg-white/20')}>
@@ -1532,7 +1535,15 @@ function LongevityCard({ body, wt, todaysFoods, vitals, activeProtocol }: {
 
   return (
     <Card className="!p-0 overflow-hidden">
-      <div className="relative p-6 text-ink" style={{ background: 'linear-gradient(135deg, #0B7A4B 0%, #064e36 40%, #0a2f1f 100%)' }}>
+      {/* KARTU INI SENGAJA GELAP, jadi tulisannya harus terang.
+          Seluruh isinya sebelumnya memakai `text-ink` — tinta gelap di atas
+          gradien hijau tua, yaitu gelap di atas gelap. Terlihat langsung pada
+          tangkapan layar: judul "Start Small", angka tiap pilar, dan nama
+          produk di kakinya hampir tidak terbaca. Pemeriksaan kontras otomatis
+          MELEWATKANNYA karena latarnya gradien dan penelusur warna hanya bisa
+          membaca warna latar yang polos — cacat yang hanya tertangkap oleh
+          mata pada layar sungguhan. */}
+      <div className="relative p-6 text-white" style={{ background: 'linear-gradient(135deg, #0B7A4B 0%, #064e36 40%, #0a2f1f 100%)' }}>
         <div className="absolute right-4 top-4 opacity-[0.04]">
           <svg width="80" height="80" viewBox="0 0 80 80"><circle cx="40" cy="40" r="35" fill="none" stroke="white" strokeWidth="2" /><circle cx="40" cy="40" r="28" fill="none" stroke="white" strokeWidth="1.5" /><circle cx="40" cy="40" r="20" fill="none" stroke="white" strokeWidth="1" /></svg>
         </div>
@@ -1542,9 +1553,9 @@ function LongevityCard({ body, wt, todaysFoods, vitals, activeProtocol }: {
 
         <div className="relative">
           <div className="flex items-center gap-2 mb-1">
-            <span className="text-[10px] font-bold uppercase tracking-[0.3em] text-ink/40">Longevity Score</span>
-            <span className="text-[10px] text-ink/20">{'\u00B7'}</span>
-            <span className="text-[10px] font-bold uppercase tracking-[0.3em] text-ink/40">{new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}</span>
+            <span className="text-[10px] font-bold uppercase tracking-[0.3em] text-white/40">Longevity Score</span>
+            <span className="text-[10px] text-white/20">{'\u00B7'}</span>
+            <span className="text-[10px] font-bold uppercase tracking-[0.3em] text-white/40">{new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}</span>
             {activeProtocol && <span className="ml-2"><Badge tone="high">{activeProtocol.emoji} {activeProtocol.name}</Badge></span>}
           </div>
 
@@ -1556,14 +1567,14 @@ function LongevityCard({ body, wt, todaysFoods, vitals, activeProtocol }: {
               </svg>
               <div className="absolute inset-0 flex flex-col items-center justify-center">
                 <span className="text-3xl font-black tabular-nums">{lng.score}</span>
-                <span className="text-[10px] text-ink/30">/100</span>
+                <span className="text-[10px] text-white/30">/100</span>
               </div>
             </div>
             <div className="flex-1 min-w-0">
               <div className="text-2xl font-black leading-tight">{scoreLabel}</div>
               <div className="mt-1.5 inline-flex items-center gap-1.5 rounded-full px-3 py-1" style={{ background: 'rgba(255,255,255,0.1)' }}>
                 <span className="inline-block h-[5px] w-[5px] rounded-full" style={{ background: scoreColor, boxShadow: '0 0 6px ' + scoreColor }} />
-                <span className="text-[11px] font-semibold text-ink/80">Focus on improving: <b>{topPillar.label} ({topPillar.v})</b></span>
+                <span className="text-[11px] font-semibold text-white/80">Focus on improving: <b>{topPillar.label} ({topPillar.v})</b></span>
               </div>
             </div>
           </div>
@@ -1577,20 +1588,20 @@ function LongevityCard({ body, wt, todaysFoods, vitals, activeProtocol }: {
 
           {/* Quick Vitals */}
           <div className="mt-4 grid grid-cols-4 gap-2">
-            {vitals.avgHR != null && <div className="rounded-lg bg-white/5 px-2 py-1.5 text-center"><div className="text-[10px] text-ink/40 uppercase">HR</div><div className="text-sm font-extrabold tabular-nums">{vitals.avgHR}</div></div>}
-            {vitals.avgSpo2 != null && <div className="rounded-lg bg-white/5 px-2 py-1.5 text-center"><div className="text-[10px] text-ink/40 uppercase">SpO2</div><div className="text-sm font-extrabold tabular-nums">{vitals.avgSpo2}%</div></div>}
-            {(vitals.vo2Max || vo2Est) != null && <div className="rounded-lg bg-white/5 px-2 py-1.5 text-center"><div className="text-[10px] text-ink/40 uppercase">VO2Max</div><div className="text-sm font-extrabold tabular-nums">{(vitals.vo2Max || vo2Est || 0).toFixed(1)}</div></div>}
-            {bmi > 0 && <div className="rounded-lg bg-white/5 px-2 py-1.5 text-center"><div className="text-[10px] text-ink/40 uppercase">BMI</div><div className="text-sm font-extrabold tabular-nums">{bmi.toFixed(1)}</div></div>}
+            {vitals.avgHR != null && <div className="rounded-lg bg-white/5 px-2 py-1.5 text-center"><div className="text-[10px] text-white/40 uppercase">HR</div><div className="text-sm font-extrabold tabular-nums">{vitals.avgHR}</div></div>}
+            {vitals.avgSpo2 != null && <div className="rounded-lg bg-white/5 px-2 py-1.5 text-center"><div className="text-[10px] text-white/40 uppercase">SpO2</div><div className="text-sm font-extrabold tabular-nums">{vitals.avgSpo2}%</div></div>}
+            {(vitals.vo2Max || vo2Est) != null && <div className="rounded-lg bg-white/5 px-2 py-1.5 text-center"><div className="text-[10px] text-white/40 uppercase">VO2Max</div><div className="text-sm font-extrabold tabular-nums">{(vitals.vo2Max || vo2Est || 0).toFixed(1)}</div></div>}
+            {bmi > 0 && <div className="rounded-lg bg-white/5 px-2 py-1.5 text-center"><div className="text-[10px] text-white/40 uppercase">BMI</div><div className="text-sm font-extrabold tabular-nums">{bmi.toFixed(1)}</div></div>}
           </div>
         </div>
 
         {/* Footer */}
         <div className="relative mt-5 flex items-center justify-between border-t border-white/10 pt-3">
           <div className="flex items-center gap-1.5">
-            <span className="text-[11px] font-black tracking-wider text-ink/25">PANACEA</span>
+            <span className="text-[11px] font-black tracking-wider text-white/25">PANACEA</span>
             <span className="text-[11px] font-black tracking-wider" style={{ color: 'var(--teks-ok)', opacity: 0.75 }}>MED</span>
           </div>
-          <span className="text-[10px] font-mono text-ink/20">.id</span>
+          <span className="text-[10px] font-mono text-white/20">.id</span>
         </div>
       </div>
     </Card>
@@ -1743,7 +1754,7 @@ export function Nutrition() {
       { label: 'Protein', nilai: String(Math.round(totalProt)), satuan: 'g', nada: NADA.biru },
     ]
     if (body.w) out.push({ label: 'Weight', nilai: String(body.w), satuan: 'kg', nada: NADA.netral })
-    if (wt.waterMl) out.push({ label: 'Air', nilai: String(Math.round(wt.waterMl / 100) / 10), satuan: 'L', nada: NADA.biru })
+    if (wt.waterMl) out.push({ label: 'Water', nilai: String(Math.round(wt.waterMl / 100) / 10), satuan: 'L', nada: NADA.biru })
     return out
   }, [body, totalKcal, totalProt, wt.waterMl])
 
@@ -1760,11 +1771,14 @@ export function Nutrition() {
    * apa yang saya makan, bagaimana badan saya, apa yang saya lakukan, apa kata
    * angka klinis.
    */
+  /* Tiap tab membawa warnanya sendiri, bukan hijau merek untuk keempatnya.
+     Dengan satu warna, satu-satunya penanda tab mana yang aktif adalah
+     posisinya — dan posisi tidak terlihat saat baris tabnya digeser. */
   const KELOMPOK = [
-    { id: 'makan', label: 'Food', emoji: '\u{1F37D}\uFE0F' },
-    { id: 'tubuh', label: 'Body', emoji: '\u2696\uFE0F' },
-    { id: 'gerak', label: 'Movement', emoji: '\u{1F3C3}' },
-    { id: 'klinis', label: 'Clinical', emoji: '\u{1F9EC}' },
+    { id: 'makan', label: 'Food', emoji: '\u{1F37D}\uFE0F', aktif: 'bg-lime-400 text-ink', diam: 'bg-lime-400/20 text-lime-800 dark:text-lime-300' },
+    { id: 'tubuh', label: 'Body', emoji: '\u2696\uFE0F', aktif: 'bg-teal-400 text-ink', diam: 'bg-teal-400/20 text-teal-800 dark:text-teal-300' },
+    { id: 'gerak', label: 'Movement', emoji: '\u{1F3C3}', aktif: 'bg-orange-400 text-ink', diam: 'bg-orange-400/20 text-orange-800 dark:text-orange-300' },
+    { id: 'klinis', label: 'Clinical', emoji: '\u{1F9EC}', aktif: 'bg-violet-400 text-ink', diam: 'bg-violet-400/20 text-violet-800 dark:text-violet-300' },
   ] as const
   type IdKel = (typeof KELOMPOK)[number]['id']
   const [kel, setKel] = useState<IdKel>('makan')
@@ -1806,7 +1820,7 @@ export function Nutrition() {
         {KELOMPOK.map((k) => (
           <button key={k.id} onClick={() => setKel(k.id)} aria-pressed={kel === k.id}
             className={`flex min-h-[40px] shrink-0 items-center gap-1.5 rounded-full px-3.5 text-[12px] font-bold transition active:scale-95 ${
-              kel === k.id ? 'bg-brand text-white' : 'bg-neutral-100 text-neutral-600 dark:bg-white/10 dark:text-neutral-300'}`}>
+              kel === k.id ? k.aktif : k.diam}`}>
             <span>{k.emoji}</span>{k.label}
           </button>
         ))}
@@ -1823,7 +1837,7 @@ export function Nutrition() {
         <>
           <div id="calc-bmi"><BodyCard intakeKcal={totalKcal} /></div>
           <div id="calc-vo2max">
-            <Suspense fallback={<div className="rounded-2xl border border-black/5 bg-white p-5 text-center text-xs text-neutral-500 shadow-sm">Memuat tren kesehatan…</div>}>
+            <Suspense fallback={<div className="rounded-2xl border border-black/5 bg-white p-5 text-center text-xs text-neutral-500 shadow-sm">Loading health trends…</div>}>
               <HealthTrends weight={body.w} height={body.h} age={body.age} gender={body.g as 'M' | 'F'} hrRest={vitals.avgHR} />
             </Suspense>
           </div>

@@ -42,9 +42,25 @@ export function Garis({ deret, kelas }: { deret: number[]; kelas: string }) {
   )
 }
 
+/**
+ * Latar kartu, diturunkan dari NADA angkanya.
+ *
+ * Kartu angka dipakai di banyak halaman, jadi satu perubahan di sini mewarnai
+ * seluruhnya sekaligus. Latarnya SANGAT tipis dan sewarna angkanya — cukup
+ * untuk membuat baris angka terbaca sebagai empat benda, bukan sebagai satu
+ * bidang putih panjang, tanpa mengubah rasio kontras tulisannya.
+ */
+const LATAR: Record<string, string> = {
+  'text-ink dark:text-white': 'bg-neutral-400/12',
+  'text-emerald-600 dark:text-emerald-400': 'bg-emerald-400/18',
+  'text-amber-600 dark:text-amber-400': 'bg-amber-400/20',
+  'text-rose-600 dark:text-rose-400': 'bg-rose-400/18',
+  'text-sky-600 dark:text-sky-400': 'bg-sky-400/18',
+}
+
 export function KartuAngka({ a }: { a: Angka }) {
   return (
-    <div className="flex min-w-0 flex-1 flex-col gap-[6px] rounded-2xl bg-white/70 p-3 dark:bg-white/5">
+    <div className={`flex min-w-0 flex-1 flex-col gap-[6px] rounded-2xl p-3 ${LATAR[a.nada] ?? 'bg-white/70 dark:bg-white/5'}`}>
       {/* Label dipangkas, bukan dibiarkan membungkus: empat kartu pada layar
           390 px menyisakan ±78 px per kartu, dan label sembilan huruf pecah di
           tengah kata. Yang dipendekkan labelnya, bukan angkanya. */}
