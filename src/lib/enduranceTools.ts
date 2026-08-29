@@ -50,10 +50,10 @@ export function lajuKeringat(u: UjiKeringat): LajuKeringat | null {
   const pctKehilangan = +(((u.beratSebelumKg - u.beratSesudahKg) / u.beratSebelumKg) * 100).toFixed(2)
 
   const catatan = pctKehilangan >= 2
-    ? `Anda kehilangan ${pctKehilangan}% berat badan. Di atas 2% performa daya tahan mulai menurun dan rasa lelah muncul lebih cepat — sesi ini kurang minum.`
+    ? `You lost ${pctKehilangan}% of your body weight. Above 2%, endurance performance starts to fall and fatigue arrives sooner — you under-drank on this session.`
     : pctKehilangan <= -1
-      ? 'Berat badan Anda NAIK selama sesi. Ini tanda minum berlebihan; pada sesi panjang keadaan itu berisiko menurunkan kadar natrium darah (hiponatremia), yang justru lebih berbahaya daripada sedikit dehidrasi.'
-      : `Kehilangan ${pctKehilangan}% berat badan — dalam rentang yang wajar.`
+      ? 'Your body weight WENT UP during the session. That is a sign of over-drinking; on long sessions it risks lowering blood sodium (hyponatraemia), which is more dangerous than mild dehydration.'
+      : `Lost ${pctKehilangan}% of body weight — within a sensible range.`
 
   return { mlPerJam: Math.max(0, mlPerJam), pctKehilangan, catatan }
 }
@@ -99,7 +99,7 @@ export function rencanaBahanBakar(opsi: {
 
   let karboPerJamGram = 0
   if (durasiMenit < 45) {
-    dasar.push('Di bawah 45 menit, simpanan glikogen tubuh sudah cukup — tidak perlu karbohidrat selama sesi.')
+    dasar.push('Under 45 minutes, your stored glycogen is enough — no carbohydrate needed during the session.')
   } else if (durasiMenit < 75) {
     karboPerJamGram = intensitas === 'berat' ? 30 : 0
     dasar.push(karboPerJamGram > 0
@@ -107,29 +107,29 @@ export function rencanaBahanBakar(opsi: {
       : '45-75 menit intensitas ringan-sedang: belum perlu karbohidrat.')
   } else if (durasiMenit <= 150) {
     karboPerJamGram = intensitas === 'berat' ? 60 : 45
-    dasar.push('1-2,5 jam: 30-60 g/jam adalah rentang yang lazim; diambil bagian atasnya untuk intensitas berat.')
+    dasar.push('1–2.5 hours: 30–60 g/h is the usual range; the upper end is taken for hard intensity.')
   } else {
     karboPerJamGram = intensitas === 'berat' ? 90 : 70
-    dasar.push('Di atas 2,5 jam: 60-90 g/jam. Penyerapan glukosa jenuh sekitar 60 g/jam, sehingga di atas itu WAJIB memakai campuran glukosa dan fruktosa (perbandingan sekitar 2:1) — jalur penyerapan fruktosa berbeda dan tidak ikut jenuh.')
-    peringatan.push('Di atas 60 g/jam, pakai produk campuran glukosa-fruktosa. Memaksakan glukosa saja pada dosis ini adalah penyebab tersering mual dan gangguan perut saat lomba.')
+    dasar.push('Beyond 2.5 hours: 60–90 g/h. Glucose absorption saturates around 60 g/h, so above that you MUST use a glucose-fructose mix (roughly 2:1) — fructose takes a different absorption route and does not saturate with it.')
+    peringatan.push('Above 60 g/h, use a glucose-fructose product. Forcing glucose alone at this dose is the most common cause of nausea and gut trouble on race day.')
   }
 
   if (opsi.perutSensitif && karboPerJamGram > 60) {
     karboPerJamGram = 60
-    peringatan.push('Dosis diturunkan ke 60 g/jam karena Anda menandai perut sensitif. Toleransi usus bisa DILATIH: naikkan 10 g/jam tiap dua pekan pada sesi panjang latihan, jangan saat lomba.')
+    peringatan.push('The dose is reduced to 60 g/h because you flagged a sensitive stomach. Gut tolerance can be TRAINED: add 10 g/h every two weeks on long training sessions, never on race day.')
   }
 
   // Cairan: pakai laju keringat sendiri bila ada; kalau tidak, perkiraan kasar
   // yang dinaikkan bila panas.
   let cairanPerJamMl = opsi.lajuKeringatMlPerJam ?? 0
   if (cairanPerJamMl > 0) {
-    dasar.push(`Cairan mengikuti laju keringat Anda sendiri (${cairanPerJamMl} mL/jam) — ini jauh lebih tepat daripada anjuran umum.`)
+    dasar.push(`Fluid follows your own measured sweat rate (${cairanPerJamMl} mL/h) — far more accurate than any generic advice.`)
   } else {
     cairanPerJamMl = 500
     if ((opsi.suhuC ?? 25) >= 28) cairanPerJamMl = 750
     if ((opsi.suhuC ?? 25) >= 32) cairanPerJamMl = 900
-    dasar.push('Belum ada uji keringat, jadi dipakai perkiraan umum yang disesuaikan suhu. Lakukan uji keringat untuk angka yang benar-benar milik Anda.')
-    peringatan.push('Angka cairan ini PERKIRAAN. Laju keringat berbeda sampai tiga kali lipat antarorang pada suhu yang sama.')
+    dasar.push('No sweat test on file, so a temperature-adjusted general estimate is used. Run a sweat test to get a number that is actually yours.')
+    peringatan.push('This fluid figure is an ESTIMATE. Sweat rate varies by up to three times between people at the same temperature.')
   }
   // Minum melebihi laju keringat berisiko; batasi anjurannya.
   cairanPerJamMl = Math.min(cairanPerJamMl, 1000)
@@ -139,7 +139,7 @@ export function rencanaBahanBakar(opsi: {
   if ((opsi.suhuC ?? 25) >= 30) natriumPerJamMg += 200
   if (durasiMenit > 240) natriumPerJamMg = Math.max(natriumPerJamMg, 800)
   if (durasiMenit > 90) {
-    dasar.push('Natrium ditambahkan karena sesi melewati 90 menit: pada sesi panjang, minum air tawar dalam jumlah besar tanpa garam dapat menurunkan kadar natrium darah.')
+    dasar.push('Sodium is added because the session passes 90 minutes: on long efforts, drinking large volumes of plain water without salt can lower blood sodium.')
   }
 
   const jadwal: { menit: number; isi: string }[] = []
@@ -148,11 +148,11 @@ export function rencanaBahanBakar(opsi: {
     for (let m = langkah; m < durasiMenit; m += langkah) {
       const gram = Math.round((karboPerJamGram * langkah) / 60)
       const ml = Math.round((cairanPerJamMl * langkah) / 60)
-      jadwal.push({ menit: m, isi: `${gram > 0 ? `${gram} g karbohidrat + ` : ''}${ml} mL cairan` })
+      jadwal.push({ menit: m, isi: `${gram > 0 ? `${gram} g carbohydrate + ` : ''}${ml} mL fluid` })
     }
   }
   if (durasiMenit >= 90) {
-    peringatan.push('Latih rencana ini pada sesi latihan panjang SEBELUM dipakai di lomba. Usus perlu dibiasakan, dan hari lomba bukan tempat mencoba sesuatu yang baru.')
+    peringatan.push('Rehearse this plan on long training sessions BEFORE using it in a race. The gut needs habituating, and race day is not the place to try something new.')
   }
 
   return {
@@ -198,23 +198,23 @@ export function hitungFtp(opsi: { metode: TesFtp; nilaiWatt: number; beratKg?: n
     manual: 1,
   }
   const nama: Record<TesFtp, string> = {
-    tes20menit: 'Tes 20 menit — rata-rata daya × 0,95',
-    tes8menit: 'Tes 2 × 8 menit — rata-rata terbaik × 0,90',
-    ramp: 'Tes ramp — daya 1 menit terakhir × 0,75',
-    manual: 'Dimasukkan sendiri',
+    tes20menit: '20-minute test — average power × 0.95',
+    tes8menit: '2 × 8-minute test — best average × 0.90',
+    ramp: 'Ramp test — final 1-minute power × 0.75',
+    manual: 'Entered manually',
   }
   const ftp = Math.round(nilaiWatt * faktor[metode])
   const wattPerKg = beratKg && beratKg > 0 ? +(ftp / beratKg).toFixed(2) : null
 
   // Zona Coggan, dinyatakan sebagai persentase FTP.
   const zona = [
-    { z: 1, nama: 'Pemulihan aktif', lo: 0, hi: 0.55, tujuan: 'Memulihkan tanpa menambah beban.' },
-    { z: 2, nama: 'Ketahanan', lo: 0.56, hi: 0.75, tujuan: 'Basis aerobik. Di sinilah sebagian besar jam bersepeda seharusnya dihabiskan.' },
-    { z: 3, nama: 'Tempo', lo: 0.76, hi: 0.90, tujuan: 'Menengah — berguna, namun bila SEMUA sesi di sini, kemajuan mandek.' },
-    { z: 4, nama: 'Ambang', lo: 0.91, hi: 1.05, tujuan: 'Menaikkan FTP itu sendiri. Interval 8-20 menit.' },
-    { z: 5, nama: 'VO2max', lo: 1.06, hi: 1.20, tujuan: 'Menaikkan kemampuan aerobik maksimal. Interval 3-5 menit.' },
-    { z: 6, nama: 'Kapasitas anaerobik', lo: 1.21, hi: 1.50, tujuan: 'Serangan pendek 30 detik sampai 3 menit.' },
-    { z: 7, nama: 'Daya neuromuskular', lo: 1.51, hi: null as number | null, tujuan: 'Sprint di bawah 30 detik.' },
+    { z: 1, nama: 'Active recovery', lo: 0, hi: 0.55, tujuan: 'Recover without adding load.' },
+    { z: 2, nama: 'Endurance', lo: 0.56, hi: 0.75, tujuan: 'The aerobic base. This is where most riding hours should go.' },
+    { z: 3, nama: 'Tempo', lo: 0.76, hi: 0.90, tujuan: 'The middle ground — useful, but if EVERY session lives here, progress stalls.' },
+    { z: 4, nama: 'Threshold', lo: 0.91, hi: 1.05, tujuan: 'Raises FTP itself. Intervals of 8–20 minutes.' },
+    { z: 5, nama: 'VO2max', lo: 1.06, hi: 1.20, tujuan: 'Raises maximal aerobic capacity. Intervals of 3–5 minutes.' },
+    { z: 6, nama: 'Anaerobic capacity', lo: 1.21, hi: 1.50, tujuan: 'Short attacks of 30 seconds to 3 minutes.' },
+    { z: 7, nama: 'Neuromuscular power', lo: 1.51, hi: null as number | null, tujuan: 'Sprints under 30 seconds.' },
   ].map((z) => ({
     z: z.z, nama: z.nama, tujuan: z.tujuan,
     dari: Math.round(ftp * z.lo),
@@ -227,10 +227,10 @@ export function hitungFtp(opsi: { metode: TesFtp; nilaiWatt: number; beratKg?: n
 /** Rentang kasar yang lazim dipakai untuk menempatkan diri; bukan patokan medis. */
 export function kategoriWkg(wkg: number, sex: 'M' | 'F'): string {
   const batas = sex === 'F'
-    ? [[1.4, 'Pemula'], [2.2, 'Rekreasi'], [3.1, 'Adequate terlatih'], [4.0, 'Terlatih'], [4.8, 'Sangat terlatih'], [99, 'Tingkat elite']] as const
-    : [[1.8, 'Pemula'], [2.6, 'Rekreasi'], [3.5, 'Adequate terlatih'], [4.5, 'Terlatih'], [5.3, 'Sangat terlatih'], [99, 'Tingkat elite']] as const
+    ? [[1.4, 'Beginner'], [2.2, 'Recreational'], [3.1, 'Moderately trained'], [4.0, 'Trained'], [4.8, 'Well trained'], [99, 'Elite level']] as const
+    : [[1.8, 'Beginner'], [2.6, 'Recreational'], [3.5, 'Moderately trained'], [4.5, 'Trained'], [5.3, 'Well trained'], [99, 'Elite level']] as const
   for (const [b, l] of batas) if (wkg < b) return l
-  return 'Tingkat elite'
+  return 'Elite level'
 }
 
 // ═══ 3. PANDUAN DAYA UNTUK RUTE ═════════════════════════════════════════════
@@ -320,12 +320,12 @@ export function panduanDaya(opsi: {
   const out: TargetSegmen[] = segmen.map((s) => {
     // Penyesuaian menurut kemiringan, dibatasi agar tetap masuk akal.
     let pengali = 1
-    let catatan = 'Datar — jaga daya tepat pada target, jangan tergoda menambah.'
-    if (s.gradienPct >= 8) { pengali = 1.12; catatan = 'Tanjakan curam — boleh di atas target; di kecepatan rendah setiap watt paling berharga.' }
-    else if (s.gradienPct >= 4) { pengali = 1.07; catatan = 'Tanjakan sedang — sedikit di atas target.' }
-    else if (s.gradienPct >= 1.5) { pengali = 1.03; catatan = 'Tanjakan landai — sedikit di atas target.' }
-    else if (s.gradienPct <= -4) { pengali = 0.7; catatan = 'Turunan — kurangi daya, hampir seluruhnya akan terbuang melawan udara. Pulihkan di sini.' }
-    else if (s.gradienPct <= -1.5) { pengali = 0.85; catatan = 'Turunan landai — turunkan daya sedikit.' }
+    let catatan = 'Flat — hold power right on target, and resist the urge to push.'
+    if (s.gradienPct >= 8) { pengali = 1.12; catatan = 'Steep climb — going above target is fine; at low speed every watt counts most.' }
+    else if (s.gradienPct >= 4) { pengali = 1.07; catatan = 'Moderate climb — slightly above target.' }
+    else if (s.gradienPct >= 1.5) { pengali = 1.03; catatan = 'Gentle climb — slightly above target.' }
+    else if (s.gradienPct <= -4) { pengali = 0.7; catatan = 'Descent — ease off; almost all of it would be wasted against the air. Recover here.' }
+    else if (s.gradienPct <= -1.5) { pengali = 0.85; catatan = 'Gentle descent — ease the power slightly.' }
 
     const targetWatt = Math.round(ftp * targetIf * pengali)
     const kmh = kecepatanDariDaya({ watt: targetWatt, massaTotalKg, gradienPct: s.gradienPct, cda: opsi.cda, crr: opsi.crr })
@@ -338,10 +338,10 @@ export function panduanDaya(opsi: {
   const totalKm = out.reduce((a, s) => a + s.jarakKm, 0)
 
   if (targetIf > 0.85 && totalMenit > 120) {
-    peringatan.push('Intensitas di atas 0,85 FTP untuk lomba lebih dari dua jam hampir selalu terlalu tinggi. Sebagian besar pelomba yang "meledak" melakukannya pada jam pertama.')
+    peringatan.push('An intensity above 0.85 FTP for a race longer than two hours is almost always too high. Most riders who blow up do it in the first hour.')
   }
-  if (targetIf > 1) peringatan.push('Target di atas FTP tidak dapat dipertahankan lebih dari sekitar satu jam menurut definisi FTP itu sendiri.')
-  peringatan.push('Perkiraan waktu memakai nilai baku CdA dan hambatan gelinding, dan TIDAK memperhitungkan angin. Angin berlawanan mengubah hasilnya secara berarti.')
+  if (targetIf > 1) peringatan.push('A target above FTP cannot be held beyond about an hour, by the definition of FTP itself.')
+  peringatan.push('Time estimates use default CdA and rolling-resistance values and do NOT account for wind. A headwind changes the result substantially.')
 
   return { segmen: out, totalMenit: +totalMenit.toFixed(1), totalKm: +totalKm.toFixed(2), ifPerkiraan: targetIf, peringatan }
 }
@@ -396,15 +396,15 @@ export function aklimatisasiPanas(paparan: PaparanPanas[], sekarang = Date.now()
   const persen = Math.min(100, Math.round((poin / 14) * 100))
   const hariEfektif = +(poin).toFixed(1)
 
-  const label = persen >= 80 ? 'Teraklimatisasi' : persen >= 50 ? 'Sebagian' : persen >= 20 ? 'Awal' : 'Belum'
+  const label = persen >= 80 ? 'Acclimatised' : persen >= 50 ? 'Partly' : persen >= 20 ? 'Early' : 'Not yet'
   return {
     persen, label, hariEfektif,
-    penjelasan: 'Aklimatisasi panas berkembang dalam sekitar 10-14 hari paparan berulang di atas 27 °C selama minimal 30 menit, dan sebagian besar kemajuannya terjadi pada lima hari pertama. Yang beradaptasi: volume plasma bertambah, keringat keluar lebih awal dan lebih encer, dan denyut jantung pada beban yang sama menurun.',
+    penjelasan: 'Heat acclimatisation develops over roughly 10–14 days of repeated exposure above 27 °C for at least 30 minutes, and most of the gain happens in the first five days. What adapts: plasma volume rises, sweating starts earlier and is more dilute, and heart rate at the same workload falls.',
     saran: persen >= 80
-      ? 'Pertahankan dengan paparan panas 2-3 kali sepekan. Tanpa paparan, sekitar seperempatnya luruh tiap pekan.'
+      ? 'Maintain it with heat exposure 2–3 times a week. Without exposure, about a quarter of it decays each week.'
       : persen >= 50
-        ? 'Lanjutkan paparan harian. Sesi mudah di suhu panas sudah cukup — tidak perlu sesi keras, dan sesi keras dalam panas justru menambah risiko.'
-        : 'Mulai dengan sesi mudah 30-60 menit dalam suhu panas, dan naikkan durasinya bertahap. Jangan memulai dengan sesi keras.',
+        ? 'Keep up daily exposure. Easy sessions in the heat are enough — hard sessions are not needed, and hard sessions in heat add risk.'
+        : 'Start with easy 30–60 minute sessions in the heat and build the duration gradually. Do not begin with hard sessions.',
   }
 }
 
@@ -434,21 +434,21 @@ export function aklimatisasiKetinggian(paparan: PaparanKetinggian[], sekarang = 
   const persen = Math.min(100, Math.round((poin / 32) * 100))
   return {
     persen, hariEfektif: +poin.toFixed(1),
-    label: persen >= 80 ? 'Teraklimatisasi' : persen >= 50 ? 'Sebagian' : persen >= 20 ? 'Awal' : 'Belum',
-    penjelasan: 'Rangsangan ketinggian baru bermakna di atas sekitar 1500 m. Penyesuaian pernapasan dan cairan berlangsung beberapa hari, sedangkan pertambahan sel darah merah memerlukan sekitar 3-4 pekan tinggal cukup lama tiap harinya.',
+    label: persen >= 80 ? 'Acclimatised' : persen >= 50 ? 'Partly' : persen >= 20 ? 'Early' : 'Not yet',
+    penjelasan: 'The altitude stimulus only becomes meaningful above about 1500 m. Breathing and fluid adjustments take a few days, while the increase in red blood cells needs roughly 3–4 weeks of spending enough hours up there each day.',
     saran: persen >= 80
-      ? 'Sudah menyesuaikan. Ingat performa di ketinggian tetap lebih rendah daripada di permukaan laut, meskipun sudah teraklimatisasi.'
-      : 'Pada hari-hari awal, turunkan intensitas dan jangan menilai kebugaran dari kecepatan — pada ketinggian, denyut jantung yang sama menghasilkan kecepatan yang lebih rendah. Perhatikan gejala penyakit ketinggian: nyeri kepala, mual, sulit tidur, dan sesak yang tidak wajar.',
+      ? 'Adapted. Remember that performance at altitude remains below sea level even once acclimatised.'
+      : 'In the early days, drop the intensity and do not judge fitness by speed — at altitude the same heart rate produces a lower speed. Watch for altitude sickness: headache, nausea, poor sleep, and breathlessness beyond what is normal.',
   }
 }
 
 /** Penurunan performa daya tahan menurut ketinggian, sebagai gambaran kasar. */
 export function penaltiKetinggian(meter: number): { pctVo2Turun: number; ket: string } {
-  if (meter < 1000) return { pctVo2Turun: 0, ket: 'Di bawah 1000 m, pengaruhnya pada sebagian besar orang dapat diabaikan.' }
+  if (meter < 1000) return { pctVo2Turun: 0, ket: 'Below 1000 m the effect is negligible for most people.' }
   // Sekitar 6% penurunan VO2max tiap 1000 m di atas 1000 m.
   const pct = +(((meter - 1000) / 1000) * 6).toFixed(1)
   return {
     pctVo2Turun: pct,
-    ket: `Pada ${meter} m, kemampuan aerobik maksimal turun sekitar ${pct}% dibanding permukaan laut. Sesuaikan target kecepatan, bukan target denyut jantung — denyut Anda akan terasa lebih tinggi pada kecepatan yang lebih rendah, dan itu wajar.`,
+    ket: `At ${meter} m, maximal aerobic capacity is about ${pct}% lower than at sea level. Adjust your pace targets, not your heart-rate targets — your heart rate will read higher at a slower pace, and that is normal.`,
   }
 }
