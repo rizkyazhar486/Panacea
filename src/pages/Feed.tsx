@@ -1911,7 +1911,7 @@ export function PusatKesehatanRealtime({ viewerEmail }: { viewerEmail: string })
           <option value={1.9}>Heavy exercise</option>
         </select>
         <div className="grid grid-cols-3 gap-2">
-          <div className="rounded-xl p-2 text-center text-ink" style={{ background: bmiCat.c }}>
+          <div className="rounded-xl p-2 text-center text-ink tinta-tetap" style={{ background: bmiCat.c }}>
             <div className="text-[10px] opacity-90">BMI</div>
             <div className="text-sm font-black">{bmi.toFixed(1)}</div>
             <div className="text-[10px] font-bold">{bmiCat.l}</div>
@@ -1936,7 +1936,7 @@ export function PusatKesehatanRealtime({ viewerEmail }: { viewerEmail: string })
           <KolomVitalTerikat ikat={ikatSys} label="Systolic" satuan="mmHg" kelas="text-xs" />
           <KolomVitalTerikat ikat={ikatDia} label="Diastolic" satuan="mmHg" kelas="text-xs" />
         </div>
-        <div className="rounded-xl p-2 text-center text-ink" style={{ background: bpCat.color }}>
+        <div className="rounded-xl p-2 text-center text-ink tinta-tetap" style={{ background: bpCat.color }}>
           <span className="text-sm font-black">{sys}/{dia} mmHg</span> — <span className="text-xs font-bold">{bpCat.label}</span>
         </div>
         <div className="grid grid-cols-3 gap-2 border-t border-neutral-100 pt-2 text-xs">
@@ -2003,9 +2003,9 @@ export function PusatKesehatanRealtime({ viewerEmail }: { viewerEmail: string })
           <Field label="Max HR (bpm)"><input type="number" value={hrMaxInput} onChange={(e) => setHrMaxInput(+e.target.value || 0)} className={inputClass + ' text-xs'} /></Field>
         </div>
         <p className="text-[10px] text-neutral-500">Default Max HR = 220 − age. Change it if you know your actual tested value.</p>
-        <div className="flex items-center justify-between rounded-xl p-2 text-ink" style={{ background: vo2Cat.c }}>
+        <div className="flex items-center justify-between rounded-xl p-2 text-ink tinta-tetap" style={{ background: vo2Cat.c }}>
           <span><span className="text-sm font-black">{vo2max}</span> <span className="text-xs font-bold">mL/kg/min · {vo2Cat.l}</span></span>
-          <button onClick={() => logVo2Max(vo2max, 'HR Estimate')} className="rounded-full bg-white/25 px-2.5 py-1 text-[10px] font-bold">Record</button>
+          <button onClick={() => logVo2Max(vo2max, 'HR Estimate')} className="rounded-full bg-black/15 px-2.5 py-1 text-[10px] font-bold tinta-tetap">Record</button>
         </div>
         <p className="text-[10px] text-neutral-500">Non-exercise estimate (Uth-Sørensen).</p>
 

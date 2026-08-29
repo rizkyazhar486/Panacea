@@ -86,7 +86,11 @@ export function Rekomposisi() {
                 try { localStorage.setItem('pmd_rekomp_fase', f.id) } catch { /* abaikan */ }
               }}
               aria-pressed={fase === f.id}
-              className="min-h-[44px] rounded-xl px-2 text-[12px] font-bold text-white"
+              /* Ketiga warna fase adalah warna MUDA (#38bdf8, #fb7185, #34d399).
+                 Putih di atasnya 2,1:1. Yang terpilih memakai tinta gelap; yang
+                 tidak terpilih tetap putih, sebab latarnya abu tembus di atas
+                 kartu gelap. */
+              className={`min-h-[44px] rounded-xl px-2 text-[12px] font-bold ${fase === f.id ? 'tinta-tetap' : 'text-white'}`}
               style={{ background: fase === f.id ? WARNA_FASE[f.id] : 'rgba(120,120,120,0.35)' }}
             >
               {f.nama}

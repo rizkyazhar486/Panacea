@@ -151,7 +151,10 @@ button:active, a[href]:active, [role='button']:active { transform: scale(0.985);
 
 /* Brand tints adapt for contrast on dark — mint/teal accent trio */
 .dark .bg-brand-50 { background-color: rgba(104, 254, 154, 0.13) !important; }
-.dark .bg-brand-100 { background-color: rgba(104, 254, 154, 0.2) !important; }
+/* Pekat, bukan tembus. Pada 20% alpha, warna kartu di balik keping ikut
+   naik: di /pharmacy keping OTC duduk di atas kartu kuning dan hasilnya
+   hijau muda di atas kuning, 1,41:1. */
+.dark .bg-brand-100 { background-color: #10402a !important; }
 .dark .text-brand-dark { color: #68fe9a !important; }
 
 /* Inks */
@@ -1833,12 +1836,40 @@ h1, h2, h3,
    di mode gelap justru GELAP, dan hasilnya 1,52:1 di sepuluh halaman. Ini
    ketiga kalinya pola [class*=] menghasilkan cacat baru pada putaran ini;
    [class~=] mencocokkan token utuh dan tidak bisa meleset begitu. */
-.dark [class~="bg-amber-50"] .text-amber-700, .dark [class~="bg-amber-50"].text-amber-700,
-.dark [class~="bg-amber-50"] .text-amber-800, .dark [class~="bg-amber-50"].text-amber-800,
-.dark [class~="bg-amber-50"] .text-amber-600, .dark [class~="bg-amber-50"].text-amber-600,
-.dark [class~="bg-amber-50"] .text-neutral-500, .dark [class~="bg-amber-50"].text-neutral-500,
-.dark [class~="bg-rose-50"] .text-rose-600, .dark [class~="bg-rose-50"].text-rose-600,
-.dark [class~="bg-orange-50"] .text-neutral-500 { color: #5a3d05 !important; }
+/* Pembeda yang sebenarnya bukan nama kelas -50, melainkan ADA TIDAKNYA
+   varian dark:bg-* di elemen yang sama. Kotak yang menulis
+   "bg-amber-50 dark:bg-amber-500/10" BERUBAH GELAP di mode gelap; kotak yang
+   hanya menulis "bg-amber-50" tetap terang. Aturan sebelumnya menyamakan
+   keduanya dan memaksa huruf cokelat tua ke atas latar cokelat tua — 1,52:1
+   di tujuh halaman. :not([class*="dark:bg-"]) memisahkan keduanya tepat pada
+   pembedanya, bukan pada tebakan. */
+.dark [class~="bg-amber-50"]:not([class*="dark:bg-"]) .text-amber-700, .dark [class~="bg-amber-50"]:not([class*="dark:bg-"]).text-amber-700,
+.dark [class~="bg-amber-50"]:not([class*="dark:bg-"]) .text-amber-800, .dark [class~="bg-amber-50"]:not([class*="dark:bg-"]).text-amber-800,
+.dark [class~="bg-amber-50"]:not([class*="dark:bg-"]) .text-amber-900, .dark [class~="bg-amber-50"]:not([class*="dark:bg-"]).text-amber-900,
+.dark [class~="bg-amber-50"]:not([class*="dark:bg-"]) .text-amber-600, .dark [class~="bg-amber-50"]:not([class*="dark:bg-"]).text-amber-600,
+.dark [class~="bg-amber-50"]:not([class*="dark:bg-"]) .text-neutral-500, .dark [class~="bg-amber-50"]:not([class*="dark:bg-"]).text-neutral-500,
+.dark [class~="bg-rose-50"]:not([class*="dark:bg-"]) .text-rose-600, .dark [class~="bg-rose-50"]:not([class*="dark:bg-"]).text-rose-600,
+.dark [class~="bg-rose-50"]:not([class*="dark:bg-"]) .text-rose-700, .dark [class~="bg-rose-50"]:not([class*="dark:bg-"]).text-rose-700,
+.dark [class~="bg-orange-50"]:not([class*="dark:bg-"]) .text-neutral-500 { color: #5a3d05 !important; }
+
+/* Sisi sebaliknya: bidang -50/-100 yang MEMANG digelapkan oleh varian dark:.
+   Di sana hurufnya harus terang, dan varian dark:text-* tidak selalu ditulis
+   di tiap tempat pemakaian. */
+.dark [class~="bg-amber-50"][class*="dark:bg-"] .text-amber-600, .dark [class~="bg-amber-50"][class*="dark:bg-"].text-amber-600,
+.dark [class~="bg-amber-50"][class*="dark:bg-"] .text-amber-700, .dark [class~="bg-amber-50"][class*="dark:bg-"].text-amber-700,
+.dark [class~="bg-amber-50"][class*="dark:bg-"] .text-amber-800, .dark [class~="bg-amber-50"][class*="dark:bg-"].text-amber-800,
+.dark [class~="bg-amber-50"][class*="dark:bg-"] .text-amber-900, .dark [class~="bg-amber-50"][class*="dark:bg-"].text-amber-900,
+.dark [class~="bg-amber-100"][class*="dark:bg-"] .text-amber-700, .dark [class~="bg-amber-100"][class*="dark:bg-"].text-amber-700,
+.dark [class~="bg-amber-100"][class*="dark:bg-"] .text-amber-800, .dark [class~="bg-amber-100"][class*="dark:bg-"].text-amber-800 { color: #fcd34d !important; }
+.dark [class~="bg-rose-50"][class*="dark:bg-"] .text-rose-600, .dark [class~="bg-rose-50"][class*="dark:bg-"].text-rose-600,
+.dark [class~="bg-rose-50"][class*="dark:bg-"] .text-rose-700, .dark [class~="bg-rose-50"][class*="dark:bg-"].text-rose-700,
+.dark [class~="bg-rose-50"][class*="dark:bg-"] .text-rose-800, .dark [class~="bg-rose-50"][class*="dark:bg-"].text-rose-800 { color: #fda4af !important; }
+
+/* Merah mawar-600 sebagai HURUF di atas kartu gelap: 3,2–3,8:1 di lima
+   halaman peringatan. Dinaikkan ke rose-400. Aturan bidang -50 di atas
+   punya kekhususan lebih tinggi, jadi kotak terang tidak ikut terbawa. */
+.dark .text-rose-600 { color: #fb7185; }
+.dark .text-rose-500 { color: #fda4af; }
 
 /* Tinta setengah tembus DI ATAS BIDANG TERANG PEKAT: pemetaan tema
    menerangkannya, dan hasilnya terang di atas terang (1,84:1). */
@@ -2114,3 +2145,103 @@ h1, h2, h3,
 
 /* Legenda recharts memakai warna deretnya sendiri; merahnya 3,76:1. */
 :root:not(.dark) .recharts-legend-item-text { color: #b91c1c !important; }
+
+/* ── Tingkat bukti di halaman Learn ────────────────────────────────────────
+   Warnanya dulu ditulis sebagai gaya sebaris dari TIER_LABEL[..].color, satu
+   nilai untuk dua tema. Di mode gelap hasilnya hijau tua dan abu tua di atas
+   kartu gelap: 2,35–3,26:1 pada 42 tempat di satu halaman. Gaya sebaris tidak
+   bisa dijangkau tema, jadi warnanya dipindahkan ke kelas — dan hanya dengan
+   begitu sakelar tema ikut mengubahnya tanpa render ulang. */
+.keping-tier--strong   { background: rgba(21, 128, 61, 0.13);  color: #15803d; }
+.keping-tier--moderate { background: rgba(180, 83, 9, 0.13);   color: #b45309; }
+.keping-tier--weak     { background: rgba(87, 97, 111, 0.13);  color: #4b5563; }
+.tinta-tier--strong   { color: #15803d; }
+.tinta-tier--moderate { color: #b45309; }
+.tinta-tier--weak     { color: #4b5563; }
+.dark .keping-tier--strong   { background: rgba(74, 222, 128, 0.16); color: #6ee7a3; }
+.dark .keping-tier--moderate { background: rgba(251, 191, 36, 0.16); color: #fcd34d; }
+.dark .keping-tier--weak     { background: rgba(148, 163, 184, 0.16); color: #cbd5e1; }
+.dark .tinta-tier--strong   { color: #6ee7a3; }
+.dark .tinta-tier--moderate { color: #fcd34d; }
+.dark .tinta-tier--weak     { color: #cbd5e1; }
+
+
+
+
+/* ── Bidang pucat yang TIDAK ikut menggelap ────────────────────────────────
+   Aturan tema menerangkan .text-*-700 di mode gelap, dengan asumsi bidang di
+   belakangnya ikut digelapkan. Sebagian bidang -50/-100 memang tidak pernah
+   digelapkan — "bg-sky-50 text-sky-700" tetap putih kebiruan dan hurufnya
+   berubah menjadi sky-300 di atasnya: 1,56:1.
+
+   Daftar bidang di bawah DIUKUR di peramban, satu per satu, bukan ditebak
+   dari namanya. Tebakan pertama memasukkan bg-neutral-50, bg-brand-50 dan
+   bg-red-100 — ketiganya justru DIPETAKAN GELAP oleh berkas ini sendiri, dan
+   aturannya berbalik merusak tujuh tempat yang tadinya benar. */
+.dark :is([class~="bg-sky-50"], [class~="bg-sky-100"], [class~="bg-indigo-50"], [class~="bg-indigo-100"], [class~="bg-blue-50"], [class~="bg-violet-100"], [class~="bg-purple-50"], [class~="bg-purple-100"], [class~="bg-emerald-50"], [class~="bg-emerald-100"], [class~="bg-green-50"], [class~="bg-green-100"], [class~="bg-teal-100"], [class~="bg-amber-50"], [class~="bg-amber-100"], [class~="bg-orange-50"], [class~="bg-rose-50"], [class~="bg-rose-100"], [class~="bg-red-50"], [class~="bg-pink-50"], [class~="bg-pink-100"]):not([class*="dark:bg-"]) :is(.text-sky-600, .text-sky-700, .text-sky-800, .text-sky-900),
+.dark :is([class~="bg-sky-50"], [class~="bg-sky-100"], [class~="bg-indigo-50"], [class~="bg-indigo-100"], [class~="bg-blue-50"], [class~="bg-violet-100"], [class~="bg-purple-50"], [class~="bg-purple-100"], [class~="bg-emerald-50"], [class~="bg-emerald-100"], [class~="bg-green-50"], [class~="bg-green-100"], [class~="bg-teal-100"], [class~="bg-amber-50"], [class~="bg-amber-100"], [class~="bg-orange-50"], [class~="bg-rose-50"], [class~="bg-rose-100"], [class~="bg-red-50"], [class~="bg-pink-50"], [class~="bg-pink-100"]):not([class*="dark:bg-"]):is(.text-sky-600, .text-sky-700, .text-sky-800, .text-sky-900) { color: #0369a1 !important; }
+
+.dark :is([class~="bg-sky-50"], [class~="bg-sky-100"], [class~="bg-indigo-50"], [class~="bg-indigo-100"], [class~="bg-blue-50"], [class~="bg-violet-100"], [class~="bg-purple-50"], [class~="bg-purple-100"], [class~="bg-emerald-50"], [class~="bg-emerald-100"], [class~="bg-green-50"], [class~="bg-green-100"], [class~="bg-teal-100"], [class~="bg-amber-50"], [class~="bg-amber-100"], [class~="bg-orange-50"], [class~="bg-rose-50"], [class~="bg-rose-100"], [class~="bg-red-50"], [class~="bg-pink-50"], [class~="bg-pink-100"]):not([class*="dark:bg-"]) :is(.text-indigo-600, .text-indigo-700, .text-indigo-800, .text-indigo-900),
+.dark :is([class~="bg-sky-50"], [class~="bg-sky-100"], [class~="bg-indigo-50"], [class~="bg-indigo-100"], [class~="bg-blue-50"], [class~="bg-violet-100"], [class~="bg-purple-50"], [class~="bg-purple-100"], [class~="bg-emerald-50"], [class~="bg-emerald-100"], [class~="bg-green-50"], [class~="bg-green-100"], [class~="bg-teal-100"], [class~="bg-amber-50"], [class~="bg-amber-100"], [class~="bg-orange-50"], [class~="bg-rose-50"], [class~="bg-rose-100"], [class~="bg-red-50"], [class~="bg-pink-50"], [class~="bg-pink-100"]):not([class*="dark:bg-"]):is(.text-indigo-600, .text-indigo-700, .text-indigo-800, .text-indigo-900) { color: #4338ca !important; }
+
+.dark :is([class~="bg-sky-50"], [class~="bg-sky-100"], [class~="bg-indigo-50"], [class~="bg-indigo-100"], [class~="bg-blue-50"], [class~="bg-violet-100"], [class~="bg-purple-50"], [class~="bg-purple-100"], [class~="bg-emerald-50"], [class~="bg-emerald-100"], [class~="bg-green-50"], [class~="bg-green-100"], [class~="bg-teal-100"], [class~="bg-amber-50"], [class~="bg-amber-100"], [class~="bg-orange-50"], [class~="bg-rose-50"], [class~="bg-rose-100"], [class~="bg-red-50"], [class~="bg-pink-50"], [class~="bg-pink-100"]):not([class*="dark:bg-"]) :is(.text-blue-600, .text-blue-700, .text-blue-800, .text-blue-900),
+.dark :is([class~="bg-sky-50"], [class~="bg-sky-100"], [class~="bg-indigo-50"], [class~="bg-indigo-100"], [class~="bg-blue-50"], [class~="bg-violet-100"], [class~="bg-purple-50"], [class~="bg-purple-100"], [class~="bg-emerald-50"], [class~="bg-emerald-100"], [class~="bg-green-50"], [class~="bg-green-100"], [class~="bg-teal-100"], [class~="bg-amber-50"], [class~="bg-amber-100"], [class~="bg-orange-50"], [class~="bg-rose-50"], [class~="bg-rose-100"], [class~="bg-red-50"], [class~="bg-pink-50"], [class~="bg-pink-100"]):not([class*="dark:bg-"]):is(.text-blue-600, .text-blue-700, .text-blue-800, .text-blue-900) { color: #1d4ed8 !important; }
+
+.dark :is([class~="bg-sky-50"], [class~="bg-sky-100"], [class~="bg-indigo-50"], [class~="bg-indigo-100"], [class~="bg-blue-50"], [class~="bg-violet-100"], [class~="bg-purple-50"], [class~="bg-purple-100"], [class~="bg-emerald-50"], [class~="bg-emerald-100"], [class~="bg-green-50"], [class~="bg-green-100"], [class~="bg-teal-100"], [class~="bg-amber-50"], [class~="bg-amber-100"], [class~="bg-orange-50"], [class~="bg-rose-50"], [class~="bg-rose-100"], [class~="bg-red-50"], [class~="bg-pink-50"], [class~="bg-pink-100"]):not([class*="dark:bg-"]) :is(.text-violet-600, .text-violet-700, .text-violet-800, .text-violet-900),
+.dark :is([class~="bg-sky-50"], [class~="bg-sky-100"], [class~="bg-indigo-50"], [class~="bg-indigo-100"], [class~="bg-blue-50"], [class~="bg-violet-100"], [class~="bg-purple-50"], [class~="bg-purple-100"], [class~="bg-emerald-50"], [class~="bg-emerald-100"], [class~="bg-green-50"], [class~="bg-green-100"], [class~="bg-teal-100"], [class~="bg-amber-50"], [class~="bg-amber-100"], [class~="bg-orange-50"], [class~="bg-rose-50"], [class~="bg-rose-100"], [class~="bg-red-50"], [class~="bg-pink-50"], [class~="bg-pink-100"]):not([class*="dark:bg-"]):is(.text-violet-600, .text-violet-700, .text-violet-800, .text-violet-900) { color: #6d28d9 !important; }
+
+.dark :is([class~="bg-sky-50"], [class~="bg-sky-100"], [class~="bg-indigo-50"], [class~="bg-indigo-100"], [class~="bg-blue-50"], [class~="bg-violet-100"], [class~="bg-purple-50"], [class~="bg-purple-100"], [class~="bg-emerald-50"], [class~="bg-emerald-100"], [class~="bg-green-50"], [class~="bg-green-100"], [class~="bg-teal-100"], [class~="bg-amber-50"], [class~="bg-amber-100"], [class~="bg-orange-50"], [class~="bg-rose-50"], [class~="bg-rose-100"], [class~="bg-red-50"], [class~="bg-pink-50"], [class~="bg-pink-100"]):not([class*="dark:bg-"]) :is(.text-purple-600, .text-purple-700, .text-purple-800, .text-purple-900),
+.dark :is([class~="bg-sky-50"], [class~="bg-sky-100"], [class~="bg-indigo-50"], [class~="bg-indigo-100"], [class~="bg-blue-50"], [class~="bg-violet-100"], [class~="bg-purple-50"], [class~="bg-purple-100"], [class~="bg-emerald-50"], [class~="bg-emerald-100"], [class~="bg-green-50"], [class~="bg-green-100"], [class~="bg-teal-100"], [class~="bg-amber-50"], [class~="bg-amber-100"], [class~="bg-orange-50"], [class~="bg-rose-50"], [class~="bg-rose-100"], [class~="bg-red-50"], [class~="bg-pink-50"], [class~="bg-pink-100"]):not([class*="dark:bg-"]):is(.text-purple-600, .text-purple-700, .text-purple-800, .text-purple-900) { color: #6b21a8 !important; }
+
+.dark :is([class~="bg-sky-50"], [class~="bg-sky-100"], [class~="bg-indigo-50"], [class~="bg-indigo-100"], [class~="bg-blue-50"], [class~="bg-violet-100"], [class~="bg-purple-50"], [class~="bg-purple-100"], [class~="bg-emerald-50"], [class~="bg-emerald-100"], [class~="bg-green-50"], [class~="bg-green-100"], [class~="bg-teal-100"], [class~="bg-amber-50"], [class~="bg-amber-100"], [class~="bg-orange-50"], [class~="bg-rose-50"], [class~="bg-rose-100"], [class~="bg-red-50"], [class~="bg-pink-50"], [class~="bg-pink-100"]):not([class*="dark:bg-"]) :is(.text-emerald-600, .text-emerald-700, .text-emerald-800, .text-emerald-900),
+.dark :is([class~="bg-sky-50"], [class~="bg-sky-100"], [class~="bg-indigo-50"], [class~="bg-indigo-100"], [class~="bg-blue-50"], [class~="bg-violet-100"], [class~="bg-purple-50"], [class~="bg-purple-100"], [class~="bg-emerald-50"], [class~="bg-emerald-100"], [class~="bg-green-50"], [class~="bg-green-100"], [class~="bg-teal-100"], [class~="bg-amber-50"], [class~="bg-amber-100"], [class~="bg-orange-50"], [class~="bg-rose-50"], [class~="bg-rose-100"], [class~="bg-red-50"], [class~="bg-pink-50"], [class~="bg-pink-100"]):not([class*="dark:bg-"]):is(.text-emerald-600, .text-emerald-700, .text-emerald-800, .text-emerald-900) { color: #046c4e !important; }
+
+.dark :is([class~="bg-sky-50"], [class~="bg-sky-100"], [class~="bg-indigo-50"], [class~="bg-indigo-100"], [class~="bg-blue-50"], [class~="bg-violet-100"], [class~="bg-purple-50"], [class~="bg-purple-100"], [class~="bg-emerald-50"], [class~="bg-emerald-100"], [class~="bg-green-50"], [class~="bg-green-100"], [class~="bg-teal-100"], [class~="bg-amber-50"], [class~="bg-amber-100"], [class~="bg-orange-50"], [class~="bg-rose-50"], [class~="bg-rose-100"], [class~="bg-red-50"], [class~="bg-pink-50"], [class~="bg-pink-100"]):not([class*="dark:bg-"]) :is(.text-green-600, .text-green-700, .text-green-800, .text-green-900),
+.dark :is([class~="bg-sky-50"], [class~="bg-sky-100"], [class~="bg-indigo-50"], [class~="bg-indigo-100"], [class~="bg-blue-50"], [class~="bg-violet-100"], [class~="bg-purple-50"], [class~="bg-purple-100"], [class~="bg-emerald-50"], [class~="bg-emerald-100"], [class~="bg-green-50"], [class~="bg-green-100"], [class~="bg-teal-100"], [class~="bg-amber-50"], [class~="bg-amber-100"], [class~="bg-orange-50"], [class~="bg-rose-50"], [class~="bg-rose-100"], [class~="bg-red-50"], [class~="bg-pink-50"], [class~="bg-pink-100"]):not([class*="dark:bg-"]):is(.text-green-600, .text-green-700, .text-green-800, .text-green-900) { color: #15803d !important; }
+
+.dark :is([class~="bg-sky-50"], [class~="bg-sky-100"], [class~="bg-indigo-50"], [class~="bg-indigo-100"], [class~="bg-blue-50"], [class~="bg-violet-100"], [class~="bg-purple-50"], [class~="bg-purple-100"], [class~="bg-emerald-50"], [class~="bg-emerald-100"], [class~="bg-green-50"], [class~="bg-green-100"], [class~="bg-teal-100"], [class~="bg-amber-50"], [class~="bg-amber-100"], [class~="bg-orange-50"], [class~="bg-rose-50"], [class~="bg-rose-100"], [class~="bg-red-50"], [class~="bg-pink-50"], [class~="bg-pink-100"]):not([class*="dark:bg-"]) :is(.text-teal-600, .text-teal-700, .text-teal-800, .text-teal-900),
+.dark :is([class~="bg-sky-50"], [class~="bg-sky-100"], [class~="bg-indigo-50"], [class~="bg-indigo-100"], [class~="bg-blue-50"], [class~="bg-violet-100"], [class~="bg-purple-50"], [class~="bg-purple-100"], [class~="bg-emerald-50"], [class~="bg-emerald-100"], [class~="bg-green-50"], [class~="bg-green-100"], [class~="bg-teal-100"], [class~="bg-amber-50"], [class~="bg-amber-100"], [class~="bg-orange-50"], [class~="bg-rose-50"], [class~="bg-rose-100"], [class~="bg-red-50"], [class~="bg-pink-50"], [class~="bg-pink-100"]):not([class*="dark:bg-"]):is(.text-teal-600, .text-teal-700, .text-teal-800, .text-teal-900) { color: #0f766e !important; }
+
+.dark :is([class~="bg-sky-50"], [class~="bg-sky-100"], [class~="bg-indigo-50"], [class~="bg-indigo-100"], [class~="bg-blue-50"], [class~="bg-violet-100"], [class~="bg-purple-50"], [class~="bg-purple-100"], [class~="bg-emerald-50"], [class~="bg-emerald-100"], [class~="bg-green-50"], [class~="bg-green-100"], [class~="bg-teal-100"], [class~="bg-amber-50"], [class~="bg-amber-100"], [class~="bg-orange-50"], [class~="bg-rose-50"], [class~="bg-rose-100"], [class~="bg-red-50"], [class~="bg-pink-50"], [class~="bg-pink-100"]):not([class*="dark:bg-"]) :is(.text-cyan-600, .text-cyan-700, .text-cyan-800, .text-cyan-900),
+.dark :is([class~="bg-sky-50"], [class~="bg-sky-100"], [class~="bg-indigo-50"], [class~="bg-indigo-100"], [class~="bg-blue-50"], [class~="bg-violet-100"], [class~="bg-purple-50"], [class~="bg-purple-100"], [class~="bg-emerald-50"], [class~="bg-emerald-100"], [class~="bg-green-50"], [class~="bg-green-100"], [class~="bg-teal-100"], [class~="bg-amber-50"], [class~="bg-amber-100"], [class~="bg-orange-50"], [class~="bg-rose-50"], [class~="bg-rose-100"], [class~="bg-red-50"], [class~="bg-pink-50"], [class~="bg-pink-100"]):not([class*="dark:bg-"]):is(.text-cyan-600, .text-cyan-700, .text-cyan-800, .text-cyan-900) { color: #155e75 !important; }
+
+.dark :is([class~="bg-sky-50"], [class~="bg-sky-100"], [class~="bg-indigo-50"], [class~="bg-indigo-100"], [class~="bg-blue-50"], [class~="bg-violet-100"], [class~="bg-purple-50"], [class~="bg-purple-100"], [class~="bg-emerald-50"], [class~="bg-emerald-100"], [class~="bg-green-50"], [class~="bg-green-100"], [class~="bg-teal-100"], [class~="bg-amber-50"], [class~="bg-amber-100"], [class~="bg-orange-50"], [class~="bg-rose-50"], [class~="bg-rose-100"], [class~="bg-red-50"], [class~="bg-pink-50"], [class~="bg-pink-100"]):not([class*="dark:bg-"]) :is(.text-amber-600, .text-amber-700, .text-amber-800, .text-amber-900),
+.dark :is([class~="bg-sky-50"], [class~="bg-sky-100"], [class~="bg-indigo-50"], [class~="bg-indigo-100"], [class~="bg-blue-50"], [class~="bg-violet-100"], [class~="bg-purple-50"], [class~="bg-purple-100"], [class~="bg-emerald-50"], [class~="bg-emerald-100"], [class~="bg-green-50"], [class~="bg-green-100"], [class~="bg-teal-100"], [class~="bg-amber-50"], [class~="bg-amber-100"], [class~="bg-orange-50"], [class~="bg-rose-50"], [class~="bg-rose-100"], [class~="bg-red-50"], [class~="bg-pink-50"], [class~="bg-pink-100"]):not([class*="dark:bg-"]):is(.text-amber-600, .text-amber-700, .text-amber-800, .text-amber-900) { color: #92400e !important; }
+
+.dark :is([class~="bg-sky-50"], [class~="bg-sky-100"], [class~="bg-indigo-50"], [class~="bg-indigo-100"], [class~="bg-blue-50"], [class~="bg-violet-100"], [class~="bg-purple-50"], [class~="bg-purple-100"], [class~="bg-emerald-50"], [class~="bg-emerald-100"], [class~="bg-green-50"], [class~="bg-green-100"], [class~="bg-teal-100"], [class~="bg-amber-50"], [class~="bg-amber-100"], [class~="bg-orange-50"], [class~="bg-rose-50"], [class~="bg-rose-100"], [class~="bg-red-50"], [class~="bg-pink-50"], [class~="bg-pink-100"]):not([class*="dark:bg-"]) :is(.text-orange-600, .text-orange-700, .text-orange-800, .text-orange-900),
+.dark :is([class~="bg-sky-50"], [class~="bg-sky-100"], [class~="bg-indigo-50"], [class~="bg-indigo-100"], [class~="bg-blue-50"], [class~="bg-violet-100"], [class~="bg-purple-50"], [class~="bg-purple-100"], [class~="bg-emerald-50"], [class~="bg-emerald-100"], [class~="bg-green-50"], [class~="bg-green-100"], [class~="bg-teal-100"], [class~="bg-amber-50"], [class~="bg-amber-100"], [class~="bg-orange-50"], [class~="bg-rose-50"], [class~="bg-rose-100"], [class~="bg-red-50"], [class~="bg-pink-50"], [class~="bg-pink-100"]):not([class*="dark:bg-"]):is(.text-orange-600, .text-orange-700, .text-orange-800, .text-orange-900) { color: #9a3412 !important; }
+
+.dark :is([class~="bg-sky-50"], [class~="bg-sky-100"], [class~="bg-indigo-50"], [class~="bg-indigo-100"], [class~="bg-blue-50"], [class~="bg-violet-100"], [class~="bg-purple-50"], [class~="bg-purple-100"], [class~="bg-emerald-50"], [class~="bg-emerald-100"], [class~="bg-green-50"], [class~="bg-green-100"], [class~="bg-teal-100"], [class~="bg-amber-50"], [class~="bg-amber-100"], [class~="bg-orange-50"], [class~="bg-rose-50"], [class~="bg-rose-100"], [class~="bg-red-50"], [class~="bg-pink-50"], [class~="bg-pink-100"]):not([class*="dark:bg-"]) :is(.text-rose-600, .text-rose-700, .text-rose-800, .text-rose-900),
+.dark :is([class~="bg-sky-50"], [class~="bg-sky-100"], [class~="bg-indigo-50"], [class~="bg-indigo-100"], [class~="bg-blue-50"], [class~="bg-violet-100"], [class~="bg-purple-50"], [class~="bg-purple-100"], [class~="bg-emerald-50"], [class~="bg-emerald-100"], [class~="bg-green-50"], [class~="bg-green-100"], [class~="bg-teal-100"], [class~="bg-amber-50"], [class~="bg-amber-100"], [class~="bg-orange-50"], [class~="bg-rose-50"], [class~="bg-rose-100"], [class~="bg-red-50"], [class~="bg-pink-50"], [class~="bg-pink-100"]):not([class*="dark:bg-"]):is(.text-rose-600, .text-rose-700, .text-rose-800, .text-rose-900) { color: #9f1239 !important; }
+
+.dark :is([class~="bg-sky-50"], [class~="bg-sky-100"], [class~="bg-indigo-50"], [class~="bg-indigo-100"], [class~="bg-blue-50"], [class~="bg-violet-100"], [class~="bg-purple-50"], [class~="bg-purple-100"], [class~="bg-emerald-50"], [class~="bg-emerald-100"], [class~="bg-green-50"], [class~="bg-green-100"], [class~="bg-teal-100"], [class~="bg-amber-50"], [class~="bg-amber-100"], [class~="bg-orange-50"], [class~="bg-rose-50"], [class~="bg-rose-100"], [class~="bg-red-50"], [class~="bg-pink-50"], [class~="bg-pink-100"]):not([class*="dark:bg-"]) :is(.text-red-600, .text-red-700, .text-red-800, .text-red-900),
+.dark :is([class~="bg-sky-50"], [class~="bg-sky-100"], [class~="bg-indigo-50"], [class~="bg-indigo-100"], [class~="bg-blue-50"], [class~="bg-violet-100"], [class~="bg-purple-50"], [class~="bg-purple-100"], [class~="bg-emerald-50"], [class~="bg-emerald-100"], [class~="bg-green-50"], [class~="bg-green-100"], [class~="bg-teal-100"], [class~="bg-amber-50"], [class~="bg-amber-100"], [class~="bg-orange-50"], [class~="bg-rose-50"], [class~="bg-rose-100"], [class~="bg-red-50"], [class~="bg-pink-50"], [class~="bg-pink-100"]):not([class*="dark:bg-"]):is(.text-red-600, .text-red-700, .text-red-800, .text-red-900) { color: #b91c1c !important; }
+
+.dark :is([class~="bg-sky-50"], [class~="bg-sky-100"], [class~="bg-indigo-50"], [class~="bg-indigo-100"], [class~="bg-blue-50"], [class~="bg-violet-100"], [class~="bg-purple-50"], [class~="bg-purple-100"], [class~="bg-emerald-50"], [class~="bg-emerald-100"], [class~="bg-green-50"], [class~="bg-green-100"], [class~="bg-teal-100"], [class~="bg-amber-50"], [class~="bg-amber-100"], [class~="bg-orange-50"], [class~="bg-rose-50"], [class~="bg-rose-100"], [class~="bg-red-50"], [class~="bg-pink-50"], [class~="bg-pink-100"]):not([class*="dark:bg-"]) :is(.text-pink-600, .text-pink-700, .text-pink-800, .text-pink-900),
+.dark :is([class~="bg-sky-50"], [class~="bg-sky-100"], [class~="bg-indigo-50"], [class~="bg-indigo-100"], [class~="bg-blue-50"], [class~="bg-violet-100"], [class~="bg-purple-50"], [class~="bg-purple-100"], [class~="bg-emerald-50"], [class~="bg-emerald-100"], [class~="bg-green-50"], [class~="bg-green-100"], [class~="bg-teal-100"], [class~="bg-amber-50"], [class~="bg-amber-100"], [class~="bg-orange-50"], [class~="bg-rose-50"], [class~="bg-rose-100"], [class~="bg-red-50"], [class~="bg-pink-50"], [class~="bg-pink-100"]):not([class*="dark:bg-"]):is(.text-pink-600, .text-pink-700, .text-pink-800, .text-pink-900) { color: #9d174d !important; }
+
+/* bg-brand-50 justru berlawanan: di mode gelap ia menjadi tint hijau gelap
+   (alpha 0,13 di atas kartu), jadi hurufnya yang harus terang. */
+.dark [class~="bg-brand-50"] .text-brand-dark,
+.dark [class~="bg-brand-50"].text-brand-dark { color: #68fe9a !important; }
+
+/* ── Sisa temuan mode gelap, satu per satu ─────────────────────────────────
+   Putih di atas biru langit-400 dan abu-400: keduanya warna TENGAH, terlalu
+   terang untuk huruf putih dan terlalu gelap untuk huruf hitam di mode gelap.
+   Yang digelapkan hurufnya, supaya warna kepingnya tetap. */
+.dark .bg-sky-400.text-white, .dark .bg-sky-400 .text-white,
+.dark .bg-sky-300.text-white, .dark .bg-sky-300 .text-white,
+.dark .bg-neutral-400.text-white, .dark .bg-neutral-400 .text-white { color: var(--color-ink) !important; }
+
+/* Nila-600 sebagai huruf di atas kartu gelap: 1,9:1. */
+.dark .text-indigo-600 { color: #a5b4fc; }
+.dark .text-violet-600 { color: #c4b5fd; }
+
+/* Abu-500 di atas bidang hijau tua (kartu "Matches your needs"): 4,23:1,
+   selisihnya tipis tetapi tetap di bawah ambang. */
+.dark .text-neutral-500 { color: #9dada7 !important; }
+
+/* Kartu yang memaksa latarnya tetap terang di kedua tema (!bg-brand-50) juga
+   harus memaksa hurufnya tetap gelap; pemetaan tema tidak tahu soal !important
+   yang ditulis di tempat pemakaian. */
+.tinta-hijau-tua, .dark .tinta-hijau-tua { color: #0a6b42 !important; }

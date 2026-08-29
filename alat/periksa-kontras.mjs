@@ -24,6 +24,14 @@
 //      yang keliru — dan hampir selalu lulus. Penguraiannya kini diserahkan
 //      kepada peramban lewat kanvas 1x1, yang mengenal setiap bentuk warna CSS.
 //
+//   3. LATAR YANG DIGAMBAR OLEH SAUDARA KANDUNG TIDAK TERLIHAT. Penelusurnya
+//      menaiki rantai INDUK. Keping saring di beranda menaruh pil hijaunya
+//      sebagai elemen ABSOLUTE terpisah di belakang tombol, sehingga tombol
+//      terbaca "tinta gelap di atas latar halaman gelap" (1,04:1) padahal di
+//      layar ia gelap di atas hijau. Temuan berpola position:absolute di
+//      belakang teks perlu dilihat sendiri sebelum diperbaiki — memperbaikinya
+//      atas dasar angka justru merusak yang sudah benar.
+//
 // Pelajarannya berlaku lebih luas daripada berkas ini: alat pemeriksa yang
 // MELEWATI hal yang tidak dipahaminya akan melaporkan nol kegagalan dengan
 // penuh keyakinan. Yang dilewati harus dihitung dan disebutkan, bukan
@@ -95,9 +103,14 @@ const AUDIT = () => {
     return acc
   }
   const hasil=[]
+  const dilewati={emoji:0, saudara:0}
   for (const el of document.querySelectorAll('body *')) {
     const t=[...el.childNodes].filter(n=>n.nodeType===3).map(n=>n.textContent.trim()).join(' ').trim()
     if(!t || t.length<2) continue
+    // Emoji menggambar warnanya sendiri; cs.color tidak menentukan apa pun di
+    // sana. Keping berisi emoji SAJA karena itu dilewati — tetapi dihitung dan
+    // disebutkan di akhir, bukan didiamkan seperti dua kebutaan di atas.
+    if(!/[\p{L}\p{N}]/u.test(t)) { dilewati.emoji++; continue }
     const r=el.getBoundingClientRect(); if(r.width<4||r.height<4) continue
     const cs=getComputedStyle(el); if(cs.visibility==='hidden'||cs.display==='none'||+cs.opacity<0.15) continue
     const fg=par(cs.color); if(!fg) continue
@@ -108,16 +121,16 @@ const AUDIT = () => {
     if(rasio<ambang) hasil.push({t:t.slice(0,42), rasio:+rasio.toFixed(2), ambang, px:+px.toFixed(1), w,
       warna:cs.color, latar:`rgb(${bg.r|0},${bg.g|0},${bg.b|0})`, kelas:(el.className||'').toString().slice(0,90)})
   }
-  return hasil
+  return {hasil, dilewati}
 }
 const RUTE=(process.env.RUTE||'/,/vitals,/nutrition,/workout,/med-study,/settings').split(',')
 for (const rute of RUTE) {
   await p.goto('http://127.0.0.1:4206/#'+rute, {waitUntil:'networkidle'}); await p.waitForTimeout(Number(process.env.TUNGGU||1800))
   for (let i=0;i<6;i++){const d=p.locator('[role="dialog"]'); if(!(await d.count()))break; const btn=d.first().locator('button'); const n=await btn.count(); if(!n)break; await btn.nth(n-1).click({force:true}).catch(()=>{}); await p.waitForTimeout(500)}
   await p.waitForTimeout(Number(process.env.TUNGGU2||1200))
-  const h = await p.evaluate(AUDIT)
+  const {hasil:h, dilewati} = await p.evaluate(AUDIT)
   const uniq=[...new Map(h.map(x=>[x.kelas+'|'+x.warna+'|'+x.latar,x])).values()].sort((a,b)=>a.rasio-b.rasio)
-  console.log('\n### '+rute+'  gagal:'+h.length+' pola:'+uniq.length)
+  console.log('\n### '+rute+'  gagal:'+h.length+' pola:'+uniq.length+'  dilewati(emoji):'+dilewati.emoji)
   for (const u of uniq.slice(0,12)) console.log(`  ${u.rasio}/${u.ambang} ${u.px}px w${u.w} ${u.warna} on ${u.latar} :: ${u.t} :: ${u.kelas}`)
 }
 await b.close()

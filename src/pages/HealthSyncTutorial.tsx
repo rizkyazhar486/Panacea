@@ -279,12 +279,12 @@ export function HealthSyncTutorial() {
       )}
 
       {/* Privacy note */}
-      <Card className="!p-5 !bg-brand-50/60 !border-brand/20">
+      <Card className="!p-5 !bg-brand-50 !border-brand/20">
         <div className="flex items-start gap-3">
           <div className="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-brand text-white">
             <IconShield size={18} />
           </div>
-          <p className="text-[12px] leading-relaxed text-brand-dark">
+          <p className="text-[12px] leading-relaxed text-brand-dark tinta-hijau-tua">
             <b>Privacy:</b> your sync link is unique and can only <i>write</i> data to your own account — it can't be used to read anyone's data. The server only stores six summary numbers, not your raw HealthKit history. Link leaked? Regenerate it anytime on the Health Data page.
           </p>
         </div>

@@ -38,8 +38,7 @@ export function Learn() {
         </p>
         <div className="mt-2.5 flex flex-wrap gap-1.5">
           {(Object.keys(TIER_LABEL) as Tier[]).map((t) => (
-            <span key={t} className="rounded-full px-2 py-0.5 text-[10px] font-black uppercase"
-              style={{ background: `${TIER_LABEL[t].color}22`, color: TIER_LABEL[t].color }}>
+            <span key={t} className={`keping-tier keping-tier--${t} rounded-full px-2 py-0.5 text-[10px] font-black uppercase`}>
               {TIER_LABEL[t].label}
             </span>
           ))}
@@ -50,7 +49,7 @@ export function Learn() {
               <div className="space-y-1.5">
                 {(Object.keys(TIER_LABEL) as Tier[]).map((t) => (
                   <Poin key={t} ikon="•">
-                    <b style={{ color: TIER_LABEL[t].color }}>{TIER_LABEL[t].label}</b> — {TIER_LABEL[t].blurb}
+                    <b className={`tinta-tier tinta-tier--${t}`}>{TIER_LABEL[t].label}</b> — {TIER_LABEL[t].blurb}
                   </Poin>
                 ))}
               </div>
@@ -70,8 +69,7 @@ export function Learn() {
                 <div className="mt-1.5 flex flex-wrap items-center gap-1.5">
                   <span className="text-[10px] font-bold text-neutral-500">{t.minutes} min read</span>
                   {ringkasTier(t).map((r) => (
-                    <span key={r.tier} className="rounded-full px-1.5 py-0.5 text-[10px] font-black uppercase"
-                      style={{ background: `${TIER_LABEL[r.tier].color}1f`, color: TIER_LABEL[r.tier].color }}>
+                    <span key={r.tier} className={`keping-tier keping-tier--${r.tier} rounded-full px-1.5 py-0.5 text-[10px] font-black uppercase`}>
                       {r.n} {r.tier}
                     </span>
                   ))}
@@ -144,8 +142,7 @@ function TopicView({ topic, onClose }: { topic: Topic; onClose: () => void }) {
         <Card key={i}>
           <div className="flex flex-wrap items-baseline justify-between gap-2">
             <h3 className="text-[15px] font-black text-ink">{s.heading}</h3>
-            <span className="shrink-0 rounded-full px-2 py-0.5 text-[10px] font-black uppercase"
-              style={{ background: `${TIER_LABEL[s.tier].color}22`, color: TIER_LABEL[s.tier].color }}>
+            <span className={`keping-tier keping-tier--${s.tier} shrink-0 rounded-full px-2 py-0.5 text-[10px] font-black uppercase`}>
               {TIER_LABEL[s.tier].label}
             </span>
           </div>
