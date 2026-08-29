@@ -290,7 +290,10 @@ export function Recovery() {
         </div>
 
         <div className="mt-4 rounded-2xl bg-ink p-4 text-white">
-          <div className="text-xs font-semibold uppercase tracking-wide text-ink/50">Day {elapsed} &middot; Current Phase</div>
+          {/* Kartunya berlatar tinta gelap, jadi tulisannya harus terang.
+              `text-ink/50` di sini menghasilkan tinta di atas tinta — terukur
+              1:1, yaitu tidak terlihat sama sekali. */}
+          <div className="text-xs font-semibold uppercase tracking-wide text-white/70">Day {elapsed} &middot; Current Phase</div>
           <div className="mt-1 text-2xl font-extrabold text-brand">{current.label}</div>
           <Badge tone="brand">{TYPE_LABEL[p.type]}</Badge>
         </div>

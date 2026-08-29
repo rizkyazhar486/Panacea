@@ -156,6 +156,14 @@ button:active, a[href]:active, [role='button']:active { transform: scale(0.985);
 
 /* Inks */
 .dark .text-ink { color: #eef2ef !important; }
+
+/* TINTA DI ATAS HIJAU MEREK TETAP GELAP, JUGA DI MODE GELAP.
+   Aturan di atas memetakan setiap `text-ink` menjadi terang saat mode gelap —
+   benar untuk latar gelap, dan salah untuk satu keadaan: bidang hijau merek.
+   Hijau itu warnanya sama di kedua tema, jadi tulisan terang di atasnya
+   terukur 2,15:1. Keping terpilih di Med Study jatuh tepat ke sana. */
+.dark .bg-brand.text-ink,
+.dark .bg-brand .text-ink { color: var(--color-ink) !important; }
 .dark .text-neutral-900,
 .dark .text-neutral-800,
 .dark .text-neutral-700 { color: #e6ece8 !important; }

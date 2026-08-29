@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react'
+import { rupaRute } from '../lib/warnaRute'
 import { Prosa } from './Prosa'
 
 export function Card({
@@ -33,12 +34,20 @@ export function SectionTitle({
   subtitle?: string
   right?: ReactNode
 }) {
+  const w = rupaRute()
   return (
     <div className="mb-4 flex items-start justify-between gap-3">
       <div className="flex items-center gap-2.5">
-        {icon && <span className="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-brand-50 text-brand-dark">{icon}</span>}
+        {/* Warnanya diturunkan dari ALAMAT halaman, bukan dari properti.
+            SectionTitle dipakai di 186 berkas; memberi warna lewat properti
+            berarti menyunting 186 tempat, dan yang terlewat akan tetap abu-abu
+            tanpa ada yang menyadarinya. Lihat lib/warnaRute.ts. */}
+        {icon && <span className={`grid h-9 w-9 shrink-0 place-items-center rounded-xl ${w.bg} ${w.teks}`}>{icon}</span>}
         <div className="min-w-0">
-          <h2 className="text-lg font-extrabold leading-tight tracking-tight text-ink">{title}</h2>
+          <h2 className="flex items-center gap-2 text-lg font-extrabold leading-tight tracking-tight text-ink">
+            <span aria-hidden className={`h-4 w-1 shrink-0 rounded-full ${w.garis}`} />
+            {title}
+          </h2>
           {/* Subjudul dilipat otomatis bila panjang. Ini dipakai 188 berkas,
               jadi satu perubahan di sini memendekkan seluruh aplikasi tanpa
               menyentuh satu halaman pun -- dan tanpa membuang satu kata pun,
