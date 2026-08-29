@@ -2331,3 +2331,6 @@ h1, h2, h3,
    di sana latarnya memang gelap. */
 .tinta-aksen { color: color-mix(in oklab, var(--aksen), #000 34%); }
 .dark .tinta-aksen { color: var(--aksen); }
+
+/* Batu tulis-500 di atas kartu hampir putih: 4,44 dari 4,5. */
+:root:not(.dark) .text-slate-500 { color: #57626f; }

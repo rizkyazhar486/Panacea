@@ -1,50 +1,12 @@
-# Sisa temuan kontras — mode TERANG. Dihasilkan alat/periksa-kontras.mjs atas 201 halaman.
-# Disimpan sebagai DAFTAR KERJA, bukan sebagai laporan: yang tercatat di sini belum diperbaiki.
-
-### /alat-endurance  gagal:3 pola:1
-  1.05/4.5 14px w400 oklab(0.962 -0.00577481 0.0587167 / 0.9) on rgb(255,248,237) :: Latih rencana ini pada sesi latihan panjan :: rounded-lg border border-amber-500/25 bg-amber-500/[0.07] p-2.5 text-sm leading-relaxed te
-### /athlete  gagal:1 pola:1
-  1.08/4.5 12px w600 rgb(104, 254, 154) on rgb(205,243,224) :: Good :: inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold bg-brand-100 tex
-### /community  gagal:1 pola:1
-  3.47/4.5 12px w700 rgb(12, 20, 16) on rgb(11,122,75) :: Check In Now :: rounded-xl px-4 py-2 text-xs font-bold text-ink transition disabled:opacity-50
-### /lari-sepeda-renang  gagal:3 pola:1
-  1.85/4.5 14px w400 oklab(0.769 0.0640531 0.176752 / 0.8) on rgb(255,255,255) :: Typical injuries: :: text-amber-500/80
-### /latihan-dasar  gagal:4 pola:1
-  1.85/4.5 12px w400 oklab(0.769 0.0640531 0.176752 / 0.8) on rgb(255,255,255) :: Common mistake: :: text-amber-500/80
-### /learn  gagal:29 pola:6
-  4.13/4.5 10px w900 rgb(180, 83, 9) on rgb(242,231,221) :: 1  moderate :: rounded-full px-1.5 py-0.5 text-[10px] font-black uppercase
-  4.16/4.5 10px w900 rgb(21, 128, 61) on rgb(223,237,227) :: 2  strong :: rounded-full px-1.5 py-0.5 text-[10px] font-black uppercase
-  4.18/4.5 10px w900 rgb(180, 83, 9) on rgb(245,231,222) :: Moderate evidence :: rounded-full px-2 py-0.5 text-[10px] font-black uppercase
-  4.19/4.5 10px w900 rgb(21, 128, 61) on rgb(223,238,229) :: Strong evidence :: rounded-full px-2 py-0.5 text-[10px] font-black uppercase
-  4.19/4.5 10px w900 rgb(180, 83, 9) on rgb(244,232,223) :: 1  moderate :: rounded-full px-1.5 py-0.5 text-[10px] font-black uppercase
-  4.21/4.5 10px w900 rgb(21, 128, 61) on rgb(225,238,229) :: 2  strong :: rounded-full px-1.5 py-0.5 text-[10px] font-black uppercase
-### /macro-lab  gagal:1 pola:1
-  1.27/4.5 12px w700 rgb(255, 255, 255) on rgb(191,238,216) :: 3-4x a week :: rounded-xl px-2.5 py-2 text-left text-[12px] font-bold transition bg-brand/25 ring-2 ring-
-### /marketplace  gagal:3 pola:3
-  1/4.5 14px w700 rgb(255, 255, 255) on rgb(255,255,255) :: Subscribe Now :: liquid-glass-btn liquid-glass-btn--outline inline-flex min-h-[44px] items-center justify-c
-  2.6/4.5 14px w500 oklab(0.181481 -0.0139769 0.00433281 / 0.7) on rgb(11,122,75) :: /30 days :: text-sm font-medium text-ink/70
-  3.07/4.5 14px w400 oklab(0.181481 -0.0139769 0.00433281 / 0.85) on rgb(11,122,75) :: Unlock AI-powered Longevity Scores in the  :: mt-1 max-w-lg text-sm text-ink/85
-### /nutrition  gagal:1 pola:1
-  2.66/4.5 11px w900 rgb(4, 120, 87) on rgb(10,47,31) :: MED :: text-[11px] font-black tracking-wider text-emerald-300
-### /owner  gagal:3 pola:3
-  2.6/4.5 12px w600 oklab(0.181481 -0.0139769 0.00433281 / 0.7) on rgb(11,122,75) :: Estimated Gross Revenue :: text-xs font-semibold uppercase tracking-wide text-ink/70
-  2.6/4.5 11px w400 oklab(0.181481 -0.0139769 0.00433281 / 0.7) on rgb(11,122,75) :: Monthly target Rp 50,000,000 :: mt-1 text-[11px] text-ink/70
-  2.91/4.5 14px w400 oklab(0.181481 -0.0139769 0.00433281 / 0.8) on rgb(11,122,75) :: ≈ 0 PNC + Rp 0 consultations :: mt-1 text-sm text-ink/80
-### /readiness  gagal:1 pola:1
-  2.38/4.5 14px w800 rgb(163, 163, 163) on rgb(248,248,248) :: Fill in your morning check-in first :: text-sm font-extrabold
-### /recomposition  gagal:7 pola:5
-  1.54/4.5 12px w700 rgb(255, 255, 255) on rgb(207,207,207) :: Maintain :: min-h-[44px] rounded-xl px-2 text-[12px] font-bold text-white
-  1.6/4.5 17px w900 rgb(251, 191, 36) on rgb(250,250,250) :: 85g :: text-[17px] font-black leading-tight tabular-nums
-  1.84/4.5 17px w900 rgb(52, 211, 153) on rgb(250,250,250) :: 133g :: text-[17px] font-black leading-tight tabular-nums
-  2.05/4.5 17px w900 rgb(56, 189, 248) on rgb(250,250,250) :: 443g :: text-[17px] font-black leading-tight tabular-nums
-  2.14/4.5 12px w700 rgb(255, 255, 255) on rgb(56,189,248) :: Build :: min-h-[44px] rounded-xl px-2 text-[12px] font-bold text-white
-### /recovery  gagal:1 pola:1
-  1.08/4.5 12px w600 rgb(104, 254, 154) on rgb(205,243,224) :: Injury (Muscle/Joint/Bone) :: inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold bg-brand-100 tex
-### /tutorial  gagal:1 pola:1
-  2.58/4.5 10px w900 rgb(255, 255, 255) on rgb(161,161,161) :: BEDA DGN :: w-[68px] shrink-0 rounded px-1.5 py-0.5 text-center text-[10px] font-black uppercase track
-### /vitapulse  gagal:5 pola:4
-  2.06/4.5 11px w700 rgb(245, 158, 11) on rgb(250,250,250) :: 44.7 · Adequate :: font-bold
-  2.33/4.5 11px w700 rgb(0, 191, 99) on rgb(250,250,250) :: 120 / 80 · Normal :: font-bold
-  3.47/4.5 12px w700 rgb(12, 20, 16) on rgb(11,122,75) :: Record Vitals Now :: w-full rounded-xl px-4 py-2 text-xs font-bold text-ink
-  3.47/4.5 12px w700 rgb(12, 20, 16) on rgb(11,122,75) :: Record :: rounded-xl px-3 py-2 text-xs font-bold text-ink disabled:opacity-40
-SELESAI
+# Sisa temuan kontras — mode TERANG. Dihasilkan alat/periksa-kontras.mjs atas 202 halaman.
+# Disimpan sebagai DAFTAR KERJA, bukan sebagai laporan.
+#
+# KOSONG. Sapuan terakhir: 0 temuan di 202 halaman, kedua tema.
+#
+# Catatan angka: berkas ini sebelumnya diringkas sebagai "31 temuan". Itu
+# keliru — isinya sendiri mencatat 29 temuan di /learn saja. Dasar yang
+# sebenarnya sekitar 70 temuan di 21 halaman.
+#
+# Yang tetap dilewati alatnya, dan alasannya, tercatat di kepala
+# alat/periksa-kontras.mjs sebagai empat kebutaan: bidang bergradien, warna
+# oklch(), latar yang digambar elemen saudara, dan glif emoji.
