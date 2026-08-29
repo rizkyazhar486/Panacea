@@ -118,6 +118,28 @@ const EX: Exercise[] = [
 ]
 
 const MUSCLES: Muscle[] = ['Chest', 'Back', 'Shoulders', 'Arms', 'Legs', 'Glutes', 'Core', 'Full Body']
+/**
+ * Warna dan lambang tiap kelompok otot.
+ *
+ * Daftar 23 gerakan yang seluruhnya kartu putih polos harus DIBACA satu per
+ * satu untuk menemukan yang dicari. Dengan warna, mata menemukan kelompoknya
+ * sebelum membaca satu kata pun — dan pada halaman yang orang buka sambil
+ * berdiri di gym, itu perbedaan yang nyata.
+ *
+ * Warnanya dipilih agar berbeda satu sama lain pada layar kecil, bukan agar
+ * "cocok" — kelompok yang warnanya berdekatan sama saja dengan tidak berwarna.
+ */
+const OTOT: Record<Muscle, { bg: string; teks: string; garis: string; emoji: string }> = {
+  'Chest': { bg: 'bg-rose-400/25', teks: 'text-rose-700 dark:text-rose-300', garis: 'bg-rose-400', emoji: '🫁' },
+  'Back': { bg: 'bg-sky-400/25', teks: 'text-sky-700 dark:text-sky-300', garis: 'bg-sky-400', emoji: '🪃' },
+  'Legs': { bg: 'bg-orange-400/25', teks: 'text-orange-700 dark:text-orange-300', garis: 'bg-orange-400', emoji: '🦵' },
+  'Glutes': { bg: 'bg-amber-400/25', teks: 'text-amber-700 dark:text-amber-300', garis: 'bg-amber-400', emoji: '🍑' },
+  'Shoulders': { bg: 'bg-violet-400/25', teks: 'text-violet-700 dark:text-violet-300', garis: 'bg-violet-400', emoji: '🎯' },
+  'Arms': { bg: 'bg-cyan-400/25', teks: 'text-cyan-700 dark:text-cyan-300', garis: 'bg-cyan-400', emoji: '💪' },
+  'Core': { bg: 'bg-lime-400/25', teks: 'text-lime-700 dark:text-lime-300', garis: 'bg-lime-400', emoji: '🌀' },
+  'Full Body': { bg: 'bg-fuchsia-400/25', teks: 'text-fuchsia-700 dark:text-fuchsia-300', garis: 'bg-fuchsia-400', emoji: '🔥' },
+}
+
 const MODALITIES: Modality[] = ['Strength', 'Muscle Gain', 'Tone & Shape', 'Cardio', 'Endurance', 'HIIT', 'Fat Loss', 'Mobility', 'Agility', 'Balance & Coordination', 'Core', 'Kettlebell', 'Muay Thai / Martial Arts', 'Battling Ropes', 'Post Natal Shaping', 'Focus & Movement', 'Muscle Memory']
 
 interface LogEntry { id: string; exId: string; date: string; sets: number; reps: number; weight: number }
@@ -181,38 +203,47 @@ export function Workout() {
           </select>
         </div>
 
-        <div className="mt-4 grid grid-cols-3 gap-3">
-          <div className="rounded-xl bg-neutral-50 p-3 text-center">
-            <div className="text-lg font-extrabold text-ink">{todayLog.length}</div>
-            <div className="text-[10px] text-neutral-500">Sets today</div>
+        <div className="mt-4 grid grid-cols-3 gap-2">
+          <div className="rounded-2xl bg-orange-400/20 p-3 text-center">
+            <div className="text-lg font-black text-orange-700 dark:text-orange-300">{todayLog.length}</div>
+            <div className="text-[10px] font-bold text-neutral-600 dark:text-neutral-300">Sets today</div>
           </div>
-          <div className="rounded-xl bg-neutral-50 p-3 text-center">
-            <div className="text-lg font-extrabold text-ink">{weekLog.length}</div>
-            <div className="text-[10px] text-neutral-500">Sessions this week</div>
+          <div className="rounded-2xl bg-violet-400/20 p-3 text-center">
+            <div className="text-lg font-black text-violet-700 dark:text-violet-300">{weekLog.length}</div>
+            <div className="text-[10px] font-bold text-neutral-600 dark:text-neutral-300">Sessions this week</div>
           </div>
-          <div className="rounded-xl bg-brand-50 p-3 text-center">
-            <div className="text-lg font-extrabold text-brand-dark">{weeklyVolume.toLocaleString('en-US')}</div>
-            <div className="text-[10px] text-neutral-500">Weekly volume</div>
+          <div className="rounded-2xl bg-lime-400/20 p-3 text-center">
+            <div className="text-lg font-black text-lime-700 dark:text-lime-300">{weeklyVolume.toLocaleString('en-US')}</div>
+            <div className="text-[10px] font-bold text-neutral-600 dark:text-neutral-300">Weekly volume</div>
           </div>
         </div>
       </Card>
 
       <div className="space-y-2.5">
         {filtered.map((e) => (
-          <Card key={e.id} className="!p-4">
-            <button type="button" className="flex w-full items-center justify-between gap-2 text-left" onClick={() => setOpen(open === e.id ? null : e.id)}>
-              <div className="min-w-0">
-                <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-sm font-bold text-ink">
+          <Card key={e.id} className="relative isolate !p-4 !pl-5 overflow-hidden">
+            {/* Pita warna kelompok otot di tepi kiri: penanda yang terbaca
+                bahkan saat kartunya hanya terlihat separuh sambil digulir. */}
+            <span aria-hidden className={`absolute inset-y-0 left-0 w-1.5 ${OTOT[e.muscle].garis}`} />
+            {/* items-start, bukan items-center: nama gerakan bisa memakan tiga
+                baris label, dan lambang yang ditengahkan terhadap tiga baris
+                melayang jauh di bawah judulnya. */}
+            <button type="button" className="flex w-full items-start justify-between gap-2.5 text-left" onClick={() => setOpen(open === e.id ? null : e.id)}>
+              <span aria-hidden className={`mt-0.5 grid h-10 w-10 shrink-0 place-items-center rounded-2xl text-[18px] ${OTOT[e.muscle].bg}`}>
+                {OTOT[e.muscle].emoji}
+              </span>
+              <div className="min-w-0 flex-1">
+                <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-sm font-bold text-ink dark:text-white">
                   {e.name}
                   <Badge tone={e.type === 'Calisthenic' ? 'brand' : 'neutral'}>{e.type}</Badge>
                   <Badge tone="neutral">{e.mode}</Badge>
                 </div>
                 <div className="mt-1 flex flex-wrap gap-1">
-                  <span className="rounded-full bg-neutral-100 px-2 py-0.5 text-[10px] font-semibold text-neutral-500">{e.muscle}</span>
+                  <span className={`rounded-full px-2 py-0.5 text-[10px] font-black ${OTOT[e.muscle].bg} ${OTOT[e.muscle].teks}`}>{e.muscle}</span>
                   {e.modalities.slice(0, 3).map((m) => <span key={m} className="rounded-full bg-brand-50 px-2 py-0.5 text-[10px] font-semibold text-brand-dark">{m}</span>)}
                 </div>
               </div>
-              <IconActivity size={16} className={`shrink-0 ${open === e.id ? 'text-brand' : 'text-neutral-300'}`} />
+              <IconActivity size={16} className={`mt-2 shrink-0 ${open === e.id ? 'text-brand' : 'text-neutral-300'}`} />
             </button>
 
             {open === e.id && (
@@ -244,7 +275,7 @@ export function Workout() {
 
       {todayLog.length > 0 && (
         <Card className="!p-5">
-          <SectionTitle icon={<IconFlame size={18} />} title="Today's Log" subtitle="Set yang sudah Anda catat" />
+          <SectionTitle icon={<IconFlame size={18} />} title="Today's Log" subtitle="The sets you have logged" />
           <div className="mt-2 space-y-1.5">
             {todayLog.map((l) => {
               const ex = EX.find((x) => x.id === l.exId)
