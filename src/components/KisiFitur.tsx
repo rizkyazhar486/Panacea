@@ -3,6 +3,7 @@ import { tr } from '../lib/i18n'
 import { useBahasa } from '../lib/useBahasa'
 import { Link } from 'react-router-dom'
 import { WIDGETS } from '../lib/homeWidgets'
+import { rupa, urutkanKategori } from '../lib/kategoriRupa'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Kisi fitur bergaya super-app.
@@ -42,9 +43,13 @@ function Lambang({ w }: { w: (typeof WIDGETS)[number] }) {
       to={w.ke}
       className="flex min-h-[76px] flex-col items-center gap-1 rounded-2xl p-1 text-center transition active:scale-95"
     >
+      {/* Latarnya mengambil warna KELOMPOKNYA. Dua ratus lambang berlatar
+          abu-abu yang sama terbaca seperti daftar inventaris; warna per
+          kelompok membuat mata menemukan bagiannya tanpa membaca judul, dan
+          itu bukan hiasan melainkan navigasi. */}
       <span
         aria-hidden
-        className="flex h-11 w-11 items-center justify-center rounded-2xl bg-neutral-100 text-[20px] dark:bg-white/10"
+        className={`flex h-11 w-11 items-center justify-center rounded-2xl text-[20px] ${rupa(w.kategori).bg}`}
       >
         {w.emoji}
       </span>
@@ -67,7 +72,11 @@ function Bagian({ kategori, daftar }: { kategori: string; daftar: typeof WIDGETS
   return (
     <section id={`bagian-${kategori}`} className="rounded-3xl bg-white p-3 dark:bg-white/5">
       <div className="mb-2 flex items-center justify-between gap-2">
-        <h3 className="text-[13px] font-black text-ink dark:text-white">{tr(kategori)}</h3>
+        <h3 className="flex items-center gap-1.5 text-[13px] font-black">
+          <span aria-hidden className={`h-4 w-1.5 shrink-0 rounded-full ${rupa(kategori).garis}`} />
+          <span aria-hidden>{rupa(kategori).emoji}</span>
+          <span className={rupa(kategori).teks}>{tr(rupa(kategori).label)}</span>
+        </h3>
         {sisa > 0 && (
           <button
             onClick={() => setSemua((v) => !v)}
@@ -121,7 +130,10 @@ export function KisiFitur() {
       if (!peta.has(w.kategori)) peta.set(w.kategori, [])
       peta.get(w.kategori)!.push(w)
     }
-    return [...peta.entries()]
+    // Diurutkan supaya olahraga berada paling depan — itu yang paling sering
+    // benar-benar dibuka, dan yang paling ingin ditemukan cepat.
+    const urut = urutkanKategori([...peta.keys()])
+    return urut.map((k) => [k, peta.get(k)!] as [string, typeof WIDGETS])
   }, [])
 
   // Tanpa kelompok terpilih, kisi ini dulu membentangkan SELURUH kelompok
@@ -200,7 +212,7 @@ export function KisiFitur() {
                 </svg>
               </button>
               <Link to="/semua-fitur" className="t-kecil flex min-h-[40px] shrink-0 items-center font-bold text-brand">
-                Daftar lengkap →
+                Full list →
               </Link>
             </>
           )}
@@ -280,7 +292,7 @@ export function KisiFitur() {
             }`}
             style={{ width: 'auto' }}
           >
-            {tr(k)} <span className="ml-1 opacity-60">{d.length}</span>
+            <span aria-hidden className="mr-1">{rupa(k).emoji}</span>{tr(rupa(k).label)} <span className="ml-1 opacity-60">{d.length}</span>
           </button>
         ))}
       </div>

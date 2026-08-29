@@ -79,7 +79,13 @@ const ALL: Role[] = ['pasien', 'dokter', 'kontributor', 'verifikator', 'admin', 
 
 // Sidebar groups (accordion sections) — order defines display order. Grouped by
 // intent with short labels so the menu stays scannable and icon-led.
-const GROUP_ORDER = ['Home', 'Health', 'Longevity', 'Calculators & Labs', 'Fitness', 'Clinical & AI', 'Services', 'Money', 'Content', 'Manage', 'Account']
+/* URUTAN INI ADALAH PERKENALAN APLIKASI. Yang berada di atas adalah yang
+   dianggap penting, dan sebelumnya yang di atas adalah "Health" berisi tanda
+   vital dan kartu darurat, disusul "Clinical & AI". Susunan itu memperkenalkan
+   aplikasi ini sebagai alat klinis kepada orang yang membukanya untuk hidup
+   lebih sehat. Sekarang gerak lebih dahulu, dan bagian klinisnya
+   diperkenalkan sebagai PENGETAHUAN — isinya sama persis. */
+const GROUP_ORDER = ['Home', 'Move', 'Your Body', 'Longevity', 'Learn & Look Up', 'Calculators & Labs', 'Fitness', 'Services', 'Money', 'Content', 'Manage', 'Account']
 
 /**
  * Dipakai layar "Atur Fitur" agar daftarnya berasal dari sumber yang sama
@@ -106,22 +112,23 @@ const nav: Nav[] = [
   { to: '/semua-fitur', label: 'All Features', icon: IconSearch, roles: ALL, group: 'Home' },
   { to: '/tutorial', label: 'How to Use', icon: IconBook, roles: ALL, group: 'Home' },
   { to: '/profile', label: 'Profile', icon: IconUser, roles: ['pasien', 'dokter', 'owner'], group: 'Home' },
-  // Badan Anda
-  { to: '/tubuh', label: 'Vitals', icon: IconActivity, roles: ['pasien', 'dokter', 'owner'], group: 'Health' },
-  { to: '/nutrition', label: 'Nutrition', icon: IconFood, roles: ['pasien', 'dokter', 'owner'], group: 'Health' },
-  { to: '/latihan', label: 'Training', icon: IconRun, roles: ['pasien', 'dokter', 'owner'], group: 'Health' },
-  { to: '/recovery', label: 'Sleep & Recovery', icon: IconMoon, roles: ['pasien', 'dokter'], group: 'Health' },
-  { to: '/health-data', label: 'Health Data', icon: IconHeart, roles: ['pasien', 'dokter', 'owner'], group: 'Health' },
-  { to: '/emergency', label: 'Emergency & SOS', icon: IconShield, roles: ['pasien', 'dokter', 'owner'], group: 'Health' },
-  // Klinis
-  { to: '/med-study', label: 'Med Study', icon: IconBook, roles: ['pasien', 'dokter', 'owner'], group: 'Clinical & AI' },
-  { to: '/med-study?bagian=usmle', label: 'Preclinical & USMLE', icon: IconBook, roles: ['pasien', 'dokter', 'owner'], group: 'Clinical & AI' },
-  { to: '/evidence', label: 'Clinical Evidence', icon: IconStethoscope, roles: ['pasien', 'dokter', 'owner'], group: 'Clinical & AI' },
-  { to: '/osce-ukmppd', label: 'OSCE UKMPPD Stations', icon: IconStethoscope, roles: ['pasien', 'dokter', 'owner'], group: 'Clinical & AI' },
-  { to: '/clinical-calculators', label: 'Clinical Calculators', icon: IconActivity, roles: ['pasien', 'dokter', 'owner'], group: 'Clinical & AI' },
-  { to: '/drug-info', label: 'Drugs, Herbal & Prescribing', icon: IconPill, roles: ['pasien', 'dokter', 'owner'], group: 'Clinical & AI' },
-  { to: '/emr', label: 'Medical Records', icon: IconEMR, roles: ['dokter', 'owner'], group: 'Clinical & AI' },
-  { to: '/clinical-hub', label: 'Other Clinical Tools', icon: IconStethoscope, roles: ['pasien', 'dokter', 'owner'], group: 'Clinical & AI' },
+  // Gerak lebih dahulu, lalu badan.
+  { to: '/latihan', label: 'Training', icon: IconRun, roles: ['pasien', 'dokter', 'owner'], group: 'Move' },
+  { to: '/workout', label: 'Workouts', icon: IconRun, roles: ['pasien', 'dokter', 'owner'], group: 'Move' },
+  { to: '/recovery', label: 'Sleep & Recovery', icon: IconMoon, roles: ['pasien', 'dokter'], group: 'Move' },
+  { to: '/tubuh', label: 'Your Numbers', icon: IconActivity, roles: ['pasien', 'dokter', 'owner'], group: 'Your Body' },
+  { to: '/nutrition', label: 'Nutrition', icon: IconFood, roles: ['pasien', 'dokter', 'owner'], group: 'Your Body' },
+  { to: '/health-data', label: 'Health Data', icon: IconHeart, roles: ['pasien', 'dokter', 'owner'], group: 'Your Body' },
+  { to: '/emergency', label: 'Emergency Card', icon: IconShield, roles: ['pasien', 'dokter', 'owner'], group: 'Services' },
+  // Pengetahuan — dahulu "Klinis". Isinya sama, perkenalannya berbeda.
+  { to: '/med-study', label: 'Medical Library', icon: IconBook, roles: ['pasien', 'dokter', 'owner'], group: 'Learn & Look Up' },
+  { to: '/med-study?bagian=usmle', label: 'Study Curriculum', icon: IconBook, roles: ['pasien', 'dokter', 'owner'], group: 'Learn & Look Up' },
+  { to: '/evidence', label: 'Ask a Health Question', icon: IconSearch, roles: ['pasien', 'dokter', 'owner'], group: 'Learn & Look Up' },
+  { to: '/osce-ukmppd', label: 'Exam Practice', icon: IconBook, roles: ['dokter', 'owner'], group: 'Learn & Look Up' },
+  { to: '/clinical-calculators', label: 'Health Calculators', icon: IconActivity, roles: ['pasien', 'dokter', 'owner'], group: 'Calculators & Labs' },
+  { to: '/drug-info', label: 'Drugs & Herbal', icon: IconPill, roles: ['pasien', 'dokter', 'owner'], group: 'Learn & Look Up' },
+  { to: '/emr', label: 'Medical Records', icon: IconEMR, roles: ['dokter', 'owner'], group: 'Learn & Look Up' },
+  { to: '/clinical-hub', label: 'More Tools', icon: IconStethoscope, roles: ['dokter', 'owner'], group: 'Learn & Look Up' },
   // Sosial
   { to: '/feed', label: "Friends' Feed", icon: IconUsers, roles: ['pasien', 'dokter', 'owner'], group: 'Content' },
   { to: '/community', label: 'Community', icon: IconUsers, roles: ['pasien', 'dokter', 'owner'], group: 'Content' },
