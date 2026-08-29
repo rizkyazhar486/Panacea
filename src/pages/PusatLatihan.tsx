@@ -30,14 +30,14 @@ const TrainingPhysiology = lazy(() => import('./TrainingPhysiology').then((m) =>
 const EnduranceTools = lazy(() => import('./EnduranceTools').then((m) => ({ default: m.EnduranceTools })))
 
 const TABS: TabDef[] = [
-  { id: 'pelatih', label: 'Pelatih', emoji: '🏃', komponen: WorkoutHistory,
-    ringkas: 'Sesi berikutnya, rangkuman sesi terakhir, riwayat, target, rekor' },
-  { id: 'analisis', label: 'Analisis', emoji: '📈', komponen: AnalisisPro,
-    ringkas: 'Kebugaran & kesegaran, upaya relatif, log latihan, zona pace' },
-  { id: 'fisiologi', label: 'Fisiologi', emoji: '🫀', komponen: TrainingPhysiology,
-    ringkas: 'Beban latihan, status, waktu pulih, ambang laktat, kesiapan' },
-  { id: 'endurance', label: 'Daya Tahan', emoji: '⛽', komponen: EnduranceTools,
-    ringkas: 'Bahan bakar, laju keringat, FTP, panduan daya, aklimatisasi' },
+  { id: 'pelatih', label: 'Coach', emoji: '🏃', komponen: WorkoutHistory,
+    ringkas: 'Next session, last session summary, history, targets, records' },
+  { id: 'analisis', label: 'Analysis', emoji: '📈', komponen: AnalisisPro,
+    ringkas: 'Fitness & freshness, relative effort, training log, pace zones' },
+  { id: 'fisiologi', label: 'Physiology', emoji: '🫀', komponen: TrainingPhysiology,
+    ringkas: 'Training load, status, recovery time, lactate threshold, readiness' },
+  { id: 'endurance', label: 'Endurance', emoji: '⛽', komponen: EnduranceTools,
+    ringkas: 'Fuelling, sweat rate, FTP, power guidance, acclimatisation' },
 ]
 
 export function PusatLatihan() {
@@ -66,11 +66,11 @@ export function PusatLatihan() {
       return x ? x.kesegaran : 0
     })
     return [
-      { label: 'Segar', nilai: String(Math.round(st.kesegaran)),
+      { label: 'Fresh', nilai: String(Math.round(st.kesegaran)),
         nada: st.kesegaran >= -10 ? NADA.baik : NADA.perhatian, deret },
-      { label: 'Bugar', nilai: String(Math.round(st.kebugaran)), nada: NADA.biru },
-      { label: 'Lelah', nilai: String(Math.round(st.kelelahan)), nada: NADA.jantung },
-      { label: 'Sesi', nilai: String(w.length), satuan: 'tercatat', nada: NADA.netral },
+      { label: 'Fit', nilai: String(Math.round(st.kebugaran)), nada: NADA.biru },
+      { label: 'Fatigue', nilai: String(Math.round(st.kelelahan)), nada: NADA.jantung },
+      { label: 'Sessions', nilai: String(w.length), satuan: 'recorded', nada: NADA.netral },
     ]
   }, [])
 
@@ -126,8 +126,8 @@ export function PusatLatihan() {
 
   return (
     <HalamanTab
-      judul="Latihan"
-      subjudul="Pelatih, analisis, fisiologi, dan daya tahan dalam satu halaman"
+      judul="Training"
+      subjudul="Coach, analysis, physiology and endurance on one page"
       ikon={<IconRun />}
       ringkasan={<PanelAngka angka={angka} />}
       tabs={TABS}
@@ -157,7 +157,7 @@ export function PusatLatihan() {
           {/* Pintu ke alat-alat yang tidak muat dalam empat tab di atas. */}
           <Link to="/fitness-hub"
             className="flex h-11 items-center justify-center rounded-2xl border border-dashed border-white/15 text-[12px] font-bold text-neutral-500 transition hover:border-white/30 hover:text-ink">
-            🔎 Seluruh alat latihan lainnya
+            🔎 All other training tools
           </Link>
         </div>
       }

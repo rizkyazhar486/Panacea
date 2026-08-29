@@ -55,7 +55,6 @@ const GymEquipment = lazy(() => import('./pages/GymEquipment').then((m) => ({ de
 const BaseTraining = lazy(() => import('./pages/BaseTraining').then((m) => ({ default: m.BaseTraining })))
 const MultiSport = lazy(() => import('./pages/MultiSport').then((m) => ({ default: m.MultiSport })))
 const GaitAnalysis = lazy(() => import('./pages/GaitAnalysis').then((m) => ({ default: m.GaitAnalysis })))
-const WorkoutHistory = lazy(() => import('./pages/WorkoutHistory').then((m) => ({ default: m.WorkoutHistory })))
 const Notifications = lazy(() => import('./pages/Notifications').then((m) => ({ default: m.Notifications })))
 const HeartRateLog = lazy(() => import('./pages/HeartRateLog').then((m) => ({ default: m.HeartRateLog })))
 const SleepPattern = lazy(() => import('./pages/SleepPattern').then((m) => ({ default: m.SleepPattern })))

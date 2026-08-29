@@ -293,20 +293,20 @@ export function parseHrNotifications(text: string): HrNotification[] {
  */
 export const NOTIF_INFO: Record<HrNotification['jenis'], { arti: string; kapanPenting: string }> = {
   tinggi: {
-    arti: 'Jam tangan mendeteksi denyut di atas ambang yang Anda tetapkan selama sepuluh menit ketika Anda tampak TIDAK sedang beraktivitas. Pemicu tersering justru bukan penyakit: gerakan yang tidak terbaca sebagai olahraga, kecemasan, kopi, demam, kurang tidur, dehidrasi, maupun sensor yang bergeser di pergelangan.',
-    kapanPenting: 'Menjadi penting bila disertai nyeri dada, sesak, pingsan maupun hampir pingsan, pusing berputar, atau bila berulang tanpa pemicu yang jelas. Bawa daftar kejadian ini saat memeriksakan diri — waktu kejadiannya lebih berguna bagi dokter daripada angka puncaknya.',
+    arti: 'The watch detected a heart rate above your set threshold for ten minutes while you appeared NOT to be active. The most common triggers are not illness: movement the watch did not read as exercise, anxiety, coffee, fever, poor sleep, dehydration, or the sensor shifting on your wrist.',
+    kapanPenting: 'It matters if it comes with chest pain, breathlessness, fainting or near-fainting, spinning dizziness, or if it repeats with no clear trigger. Bring this list of events to an appointment — the timing is more useful to a clinician than the peak number.',
   },
   rendah: {
-    arti: 'Denyut di bawah ambang saat tidak sedang tidur. Pada orang yang terlatih, denyut istirahat rendah merupakan tanda kebugaran dan bukan masalah.',
-    kapanPenting: 'Menjadi penting bila disertai rasa melayang, mudah lelah yang tidak biasa, pingsan, maupun bila Anda memakai obat yang memperlambat denyut seperti penyekat beta.',
+    arti: 'A heart rate below the threshold while not asleep. In trained people, a low resting heart rate is a sign of fitness rather than a problem.',
+    kapanPenting: 'It matters if it comes with light-headedness, unusual fatigue, fainting, or if you take medicines that slow the heart such as beta blockers.',
   },
   iramaTidakTeratur: {
-    arti: 'Pola denyut yang tidak teratur dan menyerupai fibrilasi atrium. Ini pemberitahuan, bukan diagnosis — jam tangan tidak dapat menegakkan diagnosis gangguan irama.',
-    kapanPenting: 'Perlu ditindaklanjuti dengan pemeriksaan langsung dan rekaman jantung, terutama bila berulang. Simpan tanggal kejadiannya.',
+    arti: 'An irregular rhythm resembling atrial fibrillation. This is a notification, not a diagnosis — a watch cannot diagnose a rhythm disorder.',
+    kapanPenting: 'This needs following up with an in-person examination and an ECG, especially if it repeats. Keep the dates.',
   },
   lain: {
-    arti: 'Peringatan denyut dari jam tangan.',
-    kapanPenting: 'Perhatikan gejala yang menyertai, bukan angkanya sendiri.',
+    arti: 'A heart-rate alert from your watch.',
+    kapanPenting: 'Pay attention to the symptoms alongside it, not the number on its own.',
   },
 }
 
