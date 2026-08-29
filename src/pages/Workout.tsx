@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react'
 import { hariIni } from '../lib/tanggal'
 import { Card, SectionTitle, Button, Badge, inputClass } from '../components/ui'
+import { PoseGerak, poseUntuk } from '../components/PoseGerak'
 import { IconActivity, IconFlame, IconRun, IconCheck, IconPlus } from '../components/icons'
 import { VideoGallery } from '../components/VideoGallery'
 
@@ -229,8 +230,14 @@ export function Workout() {
                 baris label, dan lambang yang ditengahkan terhadap tiga baris
                 melayang jauh di bawah judulnya. */}
             <button type="button" className="flex w-full items-start justify-between gap-2.5 text-left" onClick={() => setOpen(open === e.id ? null : e.id)}>
-              <span aria-hidden className={`mt-0.5 grid h-10 w-10 shrink-0 place-items-center rounded-2xl text-[18px] ${OTOT[e.muscle].bg}`}>
-                {OTOT[e.muscle].emoji}
+              {/* Sosok gerakannya bila ada; bila tidak, lambang kelompok
+                  ototnya. Gerakan seperti tali gelombang dan latihan napas
+                  tidak punya siluet yang terbaca pada 40 px, dan sosok yang
+                  keliru lebih membingungkan daripada tidak ada sosok. */}
+              <span aria-hidden className={`mt-0.5 grid h-14 w-14 shrink-0 place-items-center rounded-2xl ${OTOT[e.muscle].bg} ${OTOT[e.muscle].teks}`}>
+                {poseUntuk(e.name)
+                  ? <PoseGerak nama={e.name} kelas="h-12 w-12" />
+                  : <span className="text-[20px]">{OTOT[e.muscle].emoji}</span>}
               </span>
               <div className="min-w-0 flex-1">
                 <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-sm font-bold text-ink dark:text-white">
