@@ -1526,3 +1526,236 @@ h1, h2, h3,
     linear-gradient(90deg, rgba(0, 255, 136, 0.022) 1px, transparent 1px);
   background-size: 32px 32px;
 }
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   BIDANG BERWARNA DAN BERGRADIEN — sapuan sesudah pemeriksa kontras diperbaiki.
+ 
+   Pemeriksa kontras sebelumnya MELEWATI setiap elemen yang latarnya gradien,
+   sebab penelusur warnanya hanya bisa membaca latar polos. Akibatnya seluruh
+   golongan cacat ini lolos berkali-kali: kartu bergradien bisa lulus setiap
+   pemeriksaan otomatis sambil tetap tidak terbaca. Pemeriksanya kini menguraikan
+   perhentian warna gradien dan memakai yang PALING GELAP — sebab tulisan harus
+   terbaca di seluruh bentangan gradien, bukan hanya di titik paling terangnya.
+ 
+   Yang di bawah ini temuannya, sembilan pola, semuanya terukur.
+   ───────────────────────────────────────────────────────────────────────────── */
+
+/* Tombol kaca hijau: putih di atas gradien hijau terang hanya 1,6:1 di mode
+   gelap. Hijaunya sama di kedua tema, jadi tintanya yang harus gelap — aturan
+   yang sama seperti pada bidang hijau merek lainnya.
+   Ujung GELAP gradiennya ikut diterangkan: dengan #0B7A4B di ujung kanan,
+   tinta gelap tinggal 3,47:1 — tombol yang terbaca di separuh kiri lalu
+   memudar di separuh kanan. */
+.liquid-glass-btn--primary,
+.liquid-glass-btn--primary * { color: var(--color-ink) !important; }
+.liquid-glass-btn--primary { background: linear-gradient(135deg, #00BF63, #00A857) !important; }
+
+/* TINTA DI ATAS BIDANG TERANG TETAP GELAP DI MODE GELAP.
+   Pemetaan `.dark .text-ink` menjadikan setiap tinta terang; benar untuk latar
+   gelap, salah di atas kuning, jingga, dan sejenisnya — warna itu sama di kedua
+   tema. "RPE 6" di atas amber-500 terukur 1,9:1. */
+.dark .bg-amber-400 .text-ink, .dark .bg-amber-400.text-ink,
+.dark .bg-amber-500 .text-ink, .dark .bg-amber-500.text-ink,
+.dark .bg-yellow-400 .text-ink, .dark .bg-yellow-400.text-ink,
+.dark .bg-orange-400 .text-ink, .dark .bg-orange-400.text-ink,
+.dark .bg-lime-400 .text-ink, .dark .bg-lime-400.text-ink,
+.dark .bg-teal-400 .text-ink, .dark .bg-teal-400.text-ink,
+.dark .bg-violet-400 .text-ink, .dark .bg-violet-400.text-ink { color: var(--color-ink) !important; }
+
+/* Merah tanda bahaya sebagai BIDANG dengan tulisan putih: 3,66:1. Sebagai
+   huruf ia sudah digelapkan sebelumnya; ini pasangannya. */
+:root:not(.dark) .bg-accent.text-white,
+:root:not(.dark) .bg-accent .text-white { background-color: #c81e1e; }
+
+/* Merah sebagai huruf di mode gelap. Sebelumnya hanya mode terang yang
+   diperbaiki; di mode gelap ia tinggal 4,09:1 di atas lencana merah muda. */
+.dark .text-accent { color: #ff8a8a !important; }
+
+/* Teks penjelas mode gelap, lagi. #7a8681 diukur terhadap kanvas #171717 dan
+   lolos di sana; di atas PERMUKAAN KARTU yang lebih terang (#1d2123) ia
+   4,27:1. Kartu adalah tempat teks itu paling sering berada. */
+.dark .text-neutral-400 { color: #869390 !important; }
+
+/* Tombol mati di mode gelap: neutral-500 di atas permukaan neutral-200 yang
+   sudah dipetakan gelap, 4,2:1. */
+.dark .bg-neutral-200 { background-color: #2b2f33 !important; }
+.dark .bg-neutral-200 .text-neutral-500,
+.dark .bg-neutral-200.text-neutral-500 { color: #a8b2af !important; }
+
+/* ── Sapuan kedua, sesudah pemeriksa mengenali warna oklch ─────────────────
+   Penelusur warna sebelumnya hanya mengenali bentuk rgba(). Tailwind v4
+   mengeluarkan warna sebagai oklch(), sehingga SETIAP bidang berwarna dibaca
+   sebagai "tidak ada latar" dan tulisan di atasnya dinilai terhadap warna
+   halaman — lulus tanpa pernah benar-benar diperiksa. Penguraiannya kini
+   diserahkan kepada peramban lewat kanvas, dan yang di bawah ini temuannya. */
+
+/* text-neutral-500 muncul di 28 tempat yang gagal. Di atas putih ia 4,74:1 dan
+   lolos; di atas latar berwarna tipis yang baru ditambahkan ia turun ke 3,75.
+   #616161: 6,19:1 di atas putih dan 4,89:1 di atas latar tipis, dan masih
+   jelas lebih redup daripada tinta utama. */
+:root:not(.dark) .text-neutral-500 { color: #616161; }
+/* Sama sebabnya: di atas latar berwarna tipis, #6e6e6e turun ke 4,33:1. */
+:root:not(.dark) .text-neutral-400 { color: #666666; }
+
+/* Warna terang yang dipakai sebagai HURUF di atas putih. Pasangan dari aturan
+   serupa yang sudah ada untuk brand, amber, emerald, sky dan rose. */
+:root:not(.dark) .text-green-600 { color: #15803d; }
+:root:not(.dark) .text-blue-500 { color: #1d4ed8; }
+:root:not(.dark) .text-purple-500 { color: #7e22ce; }
+
+/* ── Mode gelap, sapuan yang sama ──────────────────────────────────────────
+   Ditemukan setelah pemeriksa mengenali oklch. Semuanya pola yang berulang,
+   bukan satu-dua tempat. */
+
+/* Bidang terang PEKAT yang membawa tinta: pemetaan `.dark .text-ink`
+   menjadikannya terang, sedangkan warna bidangnya sama di kedua tema.
+   :not([class*="/"]) WAJIB ada — kelas seperti bg-amber-500/10 adalah warna
+   TIPIS yang di mode gelap justru gelap, dan memaksakan tinta gelap di atasnya
+   menghasilkan 1,15:1. Percobaan pertama tanpa penyaring itu membuat cacat
+   baru sambil memperbaiki yang lama. */
+.dark .bg-amber-300:not([class*="/"]) .text-ink,
+.dark .bg-amber-300:not([class*="/"]).text-ink,
+.dark .bg-amber-400:not([class*="/"]) .text-ink,
+.dark .bg-amber-400:not([class*="/"]).text-ink,
+.dark .bg-amber-500:not([class*="/"]) .text-ink,
+.dark .bg-amber-500:not([class*="/"]).text-ink,
+.dark .bg-yellow-300:not([class*="/"]) .text-ink,
+.dark .bg-yellow-300:not([class*="/"]).text-ink,
+.dark .bg-yellow-400:not([class*="/"]) .text-ink,
+.dark .bg-yellow-400:not([class*="/"]).text-ink,
+.dark .bg-yellow-500:not([class*="/"]) .text-ink,
+.dark .bg-yellow-500:not([class*="/"]).text-ink,
+.dark .bg-orange-300:not([class*="/"]) .text-ink,
+.dark .bg-orange-300:not([class*="/"]).text-ink,
+.dark .bg-orange-400:not([class*="/"]) .text-ink,
+.dark .bg-orange-400:not([class*="/"]).text-ink,
+.dark .bg-orange-500:not([class*="/"]) .text-ink,
+.dark .bg-orange-500:not([class*="/"]).text-ink,
+.dark .bg-lime-300:not([class*="/"]) .text-ink,
+.dark .bg-lime-300:not([class*="/"]).text-ink,
+.dark .bg-lime-400:not([class*="/"]) .text-ink,
+.dark .bg-lime-400:not([class*="/"]).text-ink,
+.dark .bg-lime-500:not([class*="/"]) .text-ink,
+.dark .bg-lime-500:not([class*="/"]).text-ink,
+.dark .bg-green-300:not([class*="/"]) .text-ink,
+.dark .bg-green-300:not([class*="/"]).text-ink,
+.dark .bg-green-400:not([class*="/"]) .text-ink,
+.dark .bg-green-400:not([class*="/"]).text-ink,
+.dark .bg-green-500:not([class*="/"]) .text-ink,
+.dark .bg-green-500:not([class*="/"]).text-ink,
+.dark .bg-emerald-300:not([class*="/"]) .text-ink,
+.dark .bg-emerald-300:not([class*="/"]).text-ink,
+.dark .bg-emerald-400:not([class*="/"]) .text-ink,
+.dark .bg-emerald-400:not([class*="/"]).text-ink,
+.dark .bg-emerald-500:not([class*="/"]) .text-ink,
+.dark .bg-emerald-500:not([class*="/"]).text-ink,
+.dark .bg-teal-300:not([class*="/"]) .text-ink,
+.dark .bg-teal-300:not([class*="/"]).text-ink,
+.dark .bg-teal-400:not([class*="/"]) .text-ink,
+.dark .bg-teal-400:not([class*="/"]).text-ink,
+.dark .bg-teal-500:not([class*="/"]) .text-ink,
+.dark .bg-teal-500:not([class*="/"]).text-ink,
+.dark .bg-cyan-300:not([class*="/"]) .text-ink,
+.dark .bg-cyan-300:not([class*="/"]).text-ink,
+.dark .bg-cyan-400:not([class*="/"]) .text-ink,
+.dark .bg-cyan-400:not([class*="/"]).text-ink,
+.dark .bg-cyan-500:not([class*="/"]) .text-ink,
+.dark .bg-cyan-500:not([class*="/"]).text-ink,
+.dark .bg-sky-300:not([class*="/"]) .text-ink,
+.dark .bg-sky-300:not([class*="/"]).text-ink,
+.dark .bg-sky-400:not([class*="/"]) .text-ink,
+.dark .bg-sky-400:not([class*="/"]).text-ink,
+.dark .bg-sky-500:not([class*="/"]) .text-ink,
+.dark .bg-sky-500:not([class*="/"]).text-ink,
+.dark .bg-violet-300:not([class*="/"]) .text-ink,
+.dark .bg-violet-300:not([class*="/"]).text-ink,
+.dark .bg-violet-400:not([class*="/"]) .text-ink,
+.dark .bg-violet-400:not([class*="/"]).text-ink,
+.dark .bg-violet-500:not([class*="/"]) .text-ink,
+.dark .bg-violet-500:not([class*="/"]).text-ink,
+.dark .bg-pink-300:not([class*="/"]) .text-ink,
+.dark .bg-pink-300:not([class*="/"]).text-ink,
+.dark .bg-pink-400:not([class*="/"]) .text-ink,
+.dark .bg-pink-400:not([class*="/"]).text-ink,
+.dark .bg-pink-500:not([class*="/"]) .text-ink,
+.dark .bg-pink-500:not([class*="/"]).text-ink,
+.dark .bg-rose-300:not([class*="/"]) .text-ink,
+.dark .bg-rose-300:not([class*="/"]).text-ink,
+.dark .bg-rose-400:not([class*="/"]) .text-ink,
+.dark .bg-rose-400:not([class*="/"]).text-ink,
+.dark .bg-rose-500:not([class*="/"]) .text-ink,
+.dark .bg-rose-500:not([class*="/"]).text-ink,
+.dark .bg-fuchsia-300:not([class*="/"]) .text-ink,
+.dark .bg-fuchsia-300:not([class*="/"]).text-ink,
+.dark .bg-fuchsia-400:not([class*="/"]) .text-ink,
+.dark .bg-fuchsia-400:not([class*="/"]).text-ink,
+.dark .bg-fuchsia-500:not([class*="/"]) .text-ink,
+.dark .bg-fuchsia-500:not([class*="/"]).text-ink,
+.dark .bg-indigo-300:not([class*="/"]) .text-ink,
+.dark .bg-indigo-300:not([class*="/"]).text-ink,
+.dark .bg-indigo-400:not([class*="/"]) .text-ink,
+.dark .bg-indigo-400:not([class*="/"]).text-ink,
+.dark .bg-indigo-500:not([class*="/"]) .text-ink,
+.dark .bg-indigo-500:not([class*="/"]).text-ink,
+.dark .bg-blue-300:not([class*="/"]) .text-ink,
+.dark .bg-blue-300:not([class*="/"]).text-ink,
+.dark .bg-blue-400:not([class*="/"]) .text-ink,
+.dark .bg-blue-400:not([class*="/"]).text-ink,
+.dark .bg-blue-500:not([class*="/"]) .text-ink,
+.dark .bg-blue-500:not([class*="/"]).text-ink,
+.dark .bg-purple-300:not([class*="/"]) .text-ink,
+.dark .bg-purple-300:not([class*="/"]).text-ink,
+.dark .bg-purple-400:not([class*="/"]) .text-ink,
+.dark .bg-purple-400:not([class*="/"]).text-ink,
+.dark .bg-purple-500:not([class*="/"]) .text-ink,
+.dark .bg-purple-500:not([class*="/"]).text-ink { color: var(--color-ink) !important; }
+
+/* Merah tanda bahaya sebagai BIDANG, di mode gelap pula. */
+.dark .bg-accent.text-white, .dark .bg-accent .text-white { background-color: #b01818; }
+
+/* Lencana merah muda tetap terang di mode gelap, jadi hurufnya harus gelap —
+   bukan merah muda seperti pada latar gelap. */
+.dark .bg-red-100 { background-color: #4a1d1d !important; }
+
+/* Warna terang sebagai huruf di atas kanvas gelap. */
+.dark .text-purple-500 { color: #c084fc !important; }
+.dark .text-indigo-500 { color: #a5b4fc !important; }
+.dark .text-blue-500 { color: #93c5fd !important; }
+.dark .text-slate-500 { color: #a3aeb8 !important; }
+
+/* Tinta yang TIDAK PERNAH terbalik, untuk bidang berwarna yang dipasang lewat
+   gaya sebaris — di sana tidak ada nama kelas latar yang bisa dijadikan
+   pegangan oleh aturan di atas. */
+.tinta-tetap, .dark .tinta-tetap { color: var(--color-ink) !important; }
+
+/* Warna -700 dan -800 adalah warna huruf untuk latar TERANG. Di mode gelap
+   ia menjadi gelap di atas gelap; dipetakan ke saudara terangnya. */
+.dark .text-rose-700, .dark .text-rose-800 { color: #fda4af !important; }
+.dark .text-sky-700, .dark .text-sky-800 { color: #7dd3fc !important; }
+.dark .text-emerald-700, .dark .text-emerald-800 { color: #6ee7b7 !important; }
+.dark .text-amber-700, .dark .text-amber-800 { color: #fcd34d !important; }
+.dark .text-orange-700, .dark .text-orange-800 { color: #fdba74 !important; }
+.dark .text-lime-700, .dark .text-lime-800 { color: #bef264 !important; }
+.dark .text-teal-700, .dark .text-teal-800 { color: #5eead4 !important; }
+.dark .text-cyan-700, .dark .text-cyan-800 { color: #67e8f9 !important; }
+.dark .text-violet-700, .dark .text-violet-800 { color: #c4b5fd !important; }
+.dark .text-fuchsia-700, .dark .text-fuchsia-800 { color: #f0abfc !important; }
+.dark .text-pink-700, .dark .text-pink-800 { color: #f9a8d4 !important; }
+.dark .text-indigo-700, .dark .text-indigo-800 { color: #a5b4fc !important; }
+.dark .text-yellow-700, .dark .text-yellow-800 { color: #fde047 !important; }
+.dark .text-green-700, .dark .text-green-800 { color: #86efac !important; }
+.dark .text-blue-700, .dark .text-blue-800 { color: #93c5fd !important; }
+
+/* Lencana -100: SEBAGIAN dipetakan gelap di mode gelap dan sebagian tidak,
+   dan itu yang menentukan warna hurufnya. bg-brand-100 dan bg-rose-100 sudah
+   dipetakan gelap, jadi hurufnya harus terang — percobaan pertama menyamakan
+   semuanya dan justru menghasilkan 1,07:1 pada lencana hijau. Yang tersisa di
+   sini hanya yang benar-benar tetap terang. */
+.dark [class*="bg-amber-100"] .text-amber-700, .dark [class*="bg-amber-100"].text-amber-700,
+.dark [class*="bg-lime-100"] .text-lime-700, .dark [class*="bg-lime-100"].text-lime-700 { color: #6b4a05 !important; }
+
+/* amber-600 sebagai huruf gagal di KEDUA tema — 3,2:1 di atas putih dan
+   3,53:1 di atas kanvas gelap. Ia memang warna peringatan lembut, dan
+   lembutnya kelewatan. */
+:root:not(.dark) .text-amber-600 { color: #92400e; }
+.dark .text-amber-600 { color: #fcd34d !important; }

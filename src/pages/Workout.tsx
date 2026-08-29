@@ -131,14 +131,14 @@ const MUSCLES: Muscle[] = ['Chest', 'Back', 'Shoulders', 'Arms', 'Legs', 'Glutes
  * "cocok" — kelompok yang warnanya berdekatan sama saja dengan tidak berwarna.
  */
 const OTOT: Record<Muscle, { bg: string; teks: string; garis: string; emoji: string }> = {
-  'Chest': { bg: 'bg-rose-400/25', teks: 'text-rose-700 dark:text-rose-300', garis: 'bg-rose-400', emoji: '🫁' },
-  'Back': { bg: 'bg-sky-400/25', teks: 'text-sky-700 dark:text-sky-300', garis: 'bg-sky-400', emoji: '🪃' },
-  'Legs': { bg: 'bg-orange-400/25', teks: 'text-orange-700 dark:text-orange-300', garis: 'bg-orange-400', emoji: '🦵' },
-  'Glutes': { bg: 'bg-amber-400/25', teks: 'text-amber-700 dark:text-amber-300', garis: 'bg-amber-400', emoji: '🍑' },
-  'Shoulders': { bg: 'bg-violet-400/25', teks: 'text-violet-700 dark:text-violet-300', garis: 'bg-violet-400', emoji: '🎯' },
-  'Arms': { bg: 'bg-cyan-400/25', teks: 'text-cyan-700 dark:text-cyan-300', garis: 'bg-cyan-400', emoji: '💪' },
-  'Core': { bg: 'bg-lime-400/25', teks: 'text-lime-700 dark:text-lime-300', garis: 'bg-lime-400', emoji: '🌀' },
-  'Full Body': { bg: 'bg-fuchsia-400/25', teks: 'text-fuchsia-700 dark:text-fuchsia-300', garis: 'bg-fuchsia-400', emoji: '🔥' },
+  'Chest': { bg: 'bg-rose-400/25', teks: 'text-rose-800 dark:text-rose-300', garis: 'bg-rose-400', emoji: '🫁' },
+  'Back': { bg: 'bg-sky-400/25', teks: 'text-sky-800 dark:text-sky-300', garis: 'bg-sky-400', emoji: '🪃' },
+  'Legs': { bg: 'bg-orange-400/25', teks: 'text-orange-800 dark:text-orange-300', garis: 'bg-orange-400', emoji: '🦵' },
+  'Glutes': { bg: 'bg-amber-400/25', teks: 'text-amber-800 dark:text-amber-300', garis: 'bg-amber-400', emoji: '🍑' },
+  'Shoulders': { bg: 'bg-violet-400/25', teks: 'text-violet-800 dark:text-violet-300', garis: 'bg-violet-400', emoji: '🎯' },
+  'Arms': { bg: 'bg-cyan-400/25', teks: 'text-cyan-800 dark:text-cyan-300', garis: 'bg-cyan-400', emoji: '💪' },
+  'Core': { bg: 'bg-lime-400/25', teks: 'text-lime-800 dark:text-lime-300', garis: 'bg-lime-400', emoji: '🌀' },
+  'Full Body': { bg: 'bg-fuchsia-400/25', teks: 'text-fuchsia-800 dark:text-fuchsia-300', garis: 'bg-fuchsia-400', emoji: '🔥' },
 }
 
 const MODALITIES: Modality[] = ['Strength', 'Muscle Gain', 'Tone & Shape', 'Cardio', 'Endurance', 'HIIT', 'Fat Loss', 'Mobility', 'Agility', 'Balance & Coordination', 'Core', 'Kettlebell', 'Muay Thai / Martial Arts', 'Battling Ropes', 'Post Natal Shaping', 'Focus & Movement', 'Muscle Memory']
@@ -206,15 +206,15 @@ export function Workout() {
 
         <div className="mt-4 grid grid-cols-3 gap-2">
           <div className="rounded-2xl bg-orange-400/20 p-3 text-center">
-            <div className="text-lg font-black text-orange-700 dark:text-orange-300">{todayLog.length}</div>
+            <div className="text-lg font-black text-orange-800 dark:text-orange-300">{todayLog.length}</div>
             <div className="text-[10px] font-bold text-neutral-600 dark:text-neutral-300">Sets today</div>
           </div>
           <div className="rounded-2xl bg-violet-400/20 p-3 text-center">
-            <div className="text-lg font-black text-violet-700 dark:text-violet-300">{weekLog.length}</div>
+            <div className="text-lg font-black text-violet-800 dark:text-violet-300">{weekLog.length}</div>
             <div className="text-[10px] font-bold text-neutral-600 dark:text-neutral-300">Sessions this week</div>
           </div>
           <div className="rounded-2xl bg-lime-400/20 p-3 text-center">
-            <div className="text-lg font-black text-lime-700 dark:text-lime-300">{weeklyVolume.toLocaleString('en-US')}</div>
+            <div className="text-lg font-black text-lime-800 dark:text-lime-300">{weeklyVolume.toLocaleString('en-US')}</div>
             <div className="text-[10px] font-bold text-neutral-600 dark:text-neutral-300">Weekly volume</div>
           </div>
         </div>

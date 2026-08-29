@@ -863,8 +863,12 @@ function FoodPhotoAI({ onDetect }: { onDetect: (items: DetectedFood[]) => void }
   }
   return (
     <div className="mt-4 rounded-2xl border border-dashed border-brand/40 bg-brand-50/50 p-3">
-      <label className={'flex cursor-pointer items-center justify-center gap-2 rounded-xl py-3 text-sm font-bold text-ink transition active:scale-[0.98] ' + (busy ? 'opacity-60' : '')}
-        style={{ background: 'linear-gradient(135deg, #00BF63, #0B7A4B)' }}>
+      <label className={'flex cursor-pointer items-center justify-center gap-2 rounded-xl py-3 text-sm font-bold tinta-tetap transition active:scale-[0.98] ' + (busy ? 'opacity-60' : '')}
+        /* Ujung gelap gradien ini dahulu #0B7A4B, dan tinta gelap di atasnya
+           hanya 3,47:1 — tombol yang terbaca di separuh kiri lalu memudar di
+           separuh kanan. Rentangnya dipersempit agar KEDUA ujungnya cukup
+           terang untuk tinta gelap. */
+        style={{ background: 'linear-gradient(135deg, #00BF63, #00A857)' }}>
         {busy ? '⏳ AI analyzing photo…' : '📸 Food Photo → AI auto-fills journal'}
         <input type="file" accept="image/*" capture="environment" className="hidden" onChange={pick} disabled={busy} />
       </label>
@@ -1553,9 +1557,9 @@ function LongevityCard({ body, wt, todaysFoods, vitals, activeProtocol }: {
 
         <div className="relative">
           <div className="flex items-center gap-2 mb-1">
-            <span className="text-[10px] font-bold uppercase tracking-[0.3em] text-white/40">Longevity Score</span>
-            <span className="text-[10px] text-white/20">{'\u00B7'}</span>
-            <span className="text-[10px] font-bold uppercase tracking-[0.3em] text-white/40">{new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}</span>
+            <span className="text-[10px] font-bold uppercase tracking-[0.3em] text-white/65">Longevity Score</span>
+            <span className="text-[10px] text-white/55">{'\u00B7'}</span>
+            <span className="text-[10px] font-bold uppercase tracking-[0.3em] text-white/65">{new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}</span>
             {activeProtocol && <span className="ml-2"><Badge tone="high">{activeProtocol.emoji} {activeProtocol.name}</Badge></span>}
           </div>
 
@@ -1567,7 +1571,7 @@ function LongevityCard({ body, wt, todaysFoods, vitals, activeProtocol }: {
               </svg>
               <div className="absolute inset-0 flex flex-col items-center justify-center">
                 <span className="text-3xl font-black tabular-nums">{lng.score}</span>
-                <span className="text-[10px] text-white/30">/100</span>
+                <span className="text-[10px] text-white/60">/100</span>
               </div>
             </div>
             <div className="flex-1 min-w-0">
@@ -1588,20 +1592,24 @@ function LongevityCard({ body, wt, todaysFoods, vitals, activeProtocol }: {
 
           {/* Quick Vitals */}
           <div className="mt-4 grid grid-cols-4 gap-2">
-            {vitals.avgHR != null && <div className="rounded-lg bg-white/5 px-2 py-1.5 text-center"><div className="text-[10px] text-white/40 uppercase">HR</div><div className="text-sm font-extrabold tabular-nums">{vitals.avgHR}</div></div>}
-            {vitals.avgSpo2 != null && <div className="rounded-lg bg-white/5 px-2 py-1.5 text-center"><div className="text-[10px] text-white/40 uppercase">SpO2</div><div className="text-sm font-extrabold tabular-nums">{vitals.avgSpo2}%</div></div>}
-            {(vitals.vo2Max || vo2Est) != null && <div className="rounded-lg bg-white/5 px-2 py-1.5 text-center"><div className="text-[10px] text-white/40 uppercase">VO2Max</div><div className="text-sm font-extrabold tabular-nums">{(vitals.vo2Max || vo2Est || 0).toFixed(1)}</div></div>}
-            {bmi > 0 && <div className="rounded-lg bg-white/5 px-2 py-1.5 text-center"><div className="text-[10px] text-white/40 uppercase">BMI</div><div className="text-sm font-extrabold tabular-nums">{bmi.toFixed(1)}</div></div>}
+            {vitals.avgHR != null && <div className="rounded-lg bg-white/5 px-2 py-1.5 text-center"><div className="text-[10px] text-white/65 uppercase">HR</div><div className="text-sm font-extrabold tabular-nums">{vitals.avgHR}</div></div>}
+            {vitals.avgSpo2 != null && <div className="rounded-lg bg-white/5 px-2 py-1.5 text-center"><div className="text-[10px] text-white/65 uppercase">SpO2</div><div className="text-sm font-extrabold tabular-nums">{vitals.avgSpo2}%</div></div>}
+            {(vitals.vo2Max || vo2Est) != null && <div className="rounded-lg bg-white/5 px-2 py-1.5 text-center"><div className="text-[10px] text-white/65 uppercase">VO2Max</div><div className="text-sm font-extrabold tabular-nums">{(vitals.vo2Max || vo2Est || 0).toFixed(1)}</div></div>}
+            {bmi > 0 && <div className="rounded-lg bg-white/5 px-2 py-1.5 text-center"><div className="text-[10px] text-white/65 uppercase">BMI</div><div className="text-sm font-extrabold tabular-nums">{bmi.toFixed(1)}</div></div>}
           </div>
         </div>
 
         {/* Footer */}
         <div className="relative mt-5 flex items-center justify-between border-t border-white/10 pt-3">
           <div className="flex items-center gap-1.5">
-            <span className="text-[11px] font-black tracking-wider text-white/25">PANACEA</span>
-            <span className="text-[11px] font-black tracking-wider" style={{ color: 'var(--teks-ok)', opacity: 0.75 }}>MED</span>
+            {/* Nama produk di kaki kartu gelap ini sebelumnya putih 25% dan
+                hijau merek — keduanya di bawah ambang di atas hijau tua. Ia
+                memang penanda, bukan bacaan utama, tetapi penanda yang tidak
+                terbaca sama saja dengan tidak ada. */}
+            <span className="text-[11px] font-black tracking-wider text-white/60">PANACEA</span>
+            <span className="text-[11px] font-black tracking-wider text-emerald-300">MED</span>
           </div>
-          <span className="text-[10px] font-mono text-white/20">.id</span>
+          <span className="text-[10px] font-mono text-white/50">.id</span>
         </div>
       </div>
     </Card>

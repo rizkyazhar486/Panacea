@@ -96,12 +96,14 @@ export function Logs() {
         <div className="space-y-2 border-t border-neutral-100 pt-3">
           <div className="flex items-center gap-2">
             <input value={type} onChange={(e) => setType(e.target.value)} placeholder="Type (Run, Gym, HIIT…)" className="flex-1 rounded-xl border border-neutral-200 px-3 py-2 text-xs outline-none focus:border-brand" />
-            <span className="rounded-lg px-2.5 py-1.5 text-sm font-black text-ink" style={{ background: RPE_COLOR(rpe) }}>RPE {rpe}</span>
+            {/* Latarnya dipasang lewat gaya sebaris, jadi tidak ada nama kelas yang
+                bisa dipegang aturan mode gelap — dipakai tinta-tetap. */}
+            <span className="rounded-lg px-2.5 py-1.5 text-sm font-black tinta-tetap" style={{ background: RPE_COLOR(rpe) }}>RPE {rpe}</span>
           </div>
           <input type="range" min={1} max={10} value={rpe} onChange={(e) => setRpe(+e.target.value)} className="w-full accent-[#00BF63]" />
           <div className="flex justify-between text-[10px] text-neutral-500"><span>1 Light</span><span>5 Moderate</span><span>10 Maximal</span></div>
           <input value={note} onChange={(e) => setNote(e.target.value)} placeholder="Notes (optional)" className="w-full rounded-xl border border-neutral-200 px-3 py-2 text-xs outline-none focus:border-brand" />
-          <button onClick={() => { addTrainingLog(rpe, type, note); setNote('') }} className="w-full rounded-xl py-2.5 text-sm font-bold text-ink" style={{ background: 'linear-gradient(135deg, #00BF63, #0B7A4B)' }}>Log Today's Intensity</button>
+          <button onClick={() => { addTrainingLog(rpe, type, note); setNote('') }} className="w-full rounded-xl py-2.5 text-sm font-bold text-white" style={{ background: 'linear-gradient(135deg, #00BF63, #0B7A4B)' }}>Log Today's Intensity</button>
         </div>
       </Card>
 

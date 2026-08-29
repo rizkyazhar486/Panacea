@@ -93,7 +93,13 @@ export function HalamanTab({
           <button key={t.id} onClick={() => pilih(t.id)}
             aria-current={t.id === aktif ? 'page' : undefined}
             className={`flex h-10 shrink-0 items-center gap-1.5 rounded-full px-3.5 text-[12px] font-bold transition ${
-              t.id === aktif ? 'bg-brand text-white' : 'bg-white/5 text-slate-400 hover:text-white'
+              /* Keping tab ini ditulis untuk latar gelap: bg-white/5 dan
+                 text-slate-400 hampir tidak terlihat di atas kanvas terang —
+                 terukur 2,45:1. Dibuat memakai pasangan yang bekerja di kedua
+                 tema, seperti keping tab di halaman lain. */
+              t.id === aktif
+                ? 'bg-brand text-ink'
+                : 'bg-neutral-100 text-neutral-600 hover:bg-neutral-200 dark:bg-white/10 dark:text-neutral-300'
             }`}>
             <span className="text-[13px]">{t.emoji}</span>{t.label}
           </button>
