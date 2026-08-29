@@ -22,18 +22,18 @@ export type Category =
   | 'lifestyle' | 'shopping' | 'savings' | 'other'
 
 export const CATEGORY_LABEL: Record<Category, string> = {
-  income: 'Pemasukan',
-  housing: 'Residence',
-  food: 'Makan & bahan pokok',
-  transport: 'Transportasi',
-  utilities: 'Listrik, air, internet',
-  health: 'Kesehatan',
-  debt: 'Cicilan & utang',
-  education: 'Pendidikan',
-  lifestyle: 'Hiburan & gaya hidup',
-  shopping: 'Belanja',
-  savings: 'Tabungan & investasi',
-  other: 'Lain-lain',
+  income: 'Income',
+  housing: 'Housing',
+  food: 'Food & groceries',
+  transport: 'Transport',
+  utilities: 'Utilities & internet',
+  health: 'Health',
+  debt: 'Debt repayments',
+  education: 'Education',
+  lifestyle: 'Lifestyle & entertainment',
+  shopping: 'Shopping',
+  savings: 'Savings & investing',
+  other: 'Other',
 }
 
 /** 50/30/20: needs, wants, savings-and-debt-repayment. */
@@ -122,20 +122,20 @@ export function emergencyMonths(savings: number, monthlyEssentials: number): num
 
 export function emergencyVerdict(months: number): { label: string; tone: 'critical' | 'high' | 'low' | 'normal'; advice: string } {
   if (months < 1) return {
-    label: 'Belum ada penyangga', tone: 'critical',
-    advice: 'Ini prioritas nomor satu, di atas investasi apa pun. Tanpa dana darurat, satu kejadian tak terduga memaksa Anda berutang berbunga tinggi — dan bunga itu hampir pasti lebih besar daripada imbal hasil investasi mana pun yang bisa Anda kejar.',
+    label: 'No buffer yet', tone: 'critical',
+    advice: 'This is priority number one, ahead of any investing. Without an emergency fund, a single unexpected event forces you into high-interest debt — and that interest will almost certainly cost more than any investment return you could chase.',
   }
   if (months < 3) return {
-    label: 'Tipis', tone: 'high',
-    advice: 'Teruskan menambah sampai minimal 3 bulan pengeluaran pokok sebelum menambah porsi investasi berisiko.',
+    label: 'Thin', tone: 'high',
+    advice: 'Keep adding until you have at least 3 months of essential spending before increasing your exposure to risk.',
   }
   if (months < 6) return {
     label: 'Adequate', tone: 'low',
-    advice: 'Sudah memadai untuk sebagian besar keadaan. Target 6 bulan bila penghasilan Anda tidak tetap, bekerja lepas, atau menjadi satu-satunya pencari nafkah.',
+    advice: 'Enough for most situations. Aim for 6 months if your income is irregular, you freelance, or you are the only earner.',
   }
   return {
-    label: 'Kuat', tone: 'normal',
-    advice: 'Penyangga Anda kuat. Kelebihan di atas 12 bulan pengeluaran pokok umumnya lebih baik dialihkan sebagian, karena uang tunai tergerus inflasi.',
+    label: 'Strong', tone: 'normal',
+    advice: 'Your buffer is strong. Beyond about 12 months of essential spending, cash is usually better partly redirected — it loses value to inflation.',
   }
 }
 
@@ -162,10 +162,10 @@ export function planDebt(debts: Debt[], strategy: 'avalanche' | 'snowball'): Deb
   return {
     order, strategy, totalBalance, weightedRatePct,
     rationale: strategy === 'avalanche'
-      ? 'Bunga tertinggi dilunasi lebih dulu. Secara matematis ini paling murah — total bunga yang Anda bayar paling kecil.'
-      : 'Saldo terkecil dilunasi lebih dulu. Secara matematis sedikit lebih mahal, tetapi kemenangan cepat di awal membuat sebagian orang bertahan menjalankannya — dan rencana yang dijalankan mengalahkan rencana optimal yang ditinggalkan.',
+      ? 'Highest interest is cleared first. Mathematically this is the cheapest route — you pay the least total interest.'
+      : 'Smallest balance is cleared first. Slightly more expensive on paper, but the early wins keep some people going — and a plan you actually follow beats an optimal plan you abandon.',
     highInterestWarning: worst && worst.annualRatePct >= 18
-      ? `"${worst.name}" berbunga ${worst.annualRatePct}% per tahun. Melunasi utang ini setara memperoleh imbal hasil ${worst.annualRatePct}% bebas risiko — hampir tidak ada investasi yang bisa mengalahkannya secara konsisten. Dahulukan ini sebelum berinvestasi.`
+      ? `"${worst.name}" charges ${worst.annualRatePct}% a year. Paying it off is the same as earning a risk-free ${worst.annualRatePct}% return — almost no investment beats that consistently. Clear this before you invest.`
       : null,
   }
 }
@@ -183,6 +183,15 @@ export interface RiskAnswers {
 }
 
 export type RiskLevel = 'konservatif' | 'moderat' | 'agresif'
+
+// Nilainya IDENTITAS, dibandingkan dengan === dan tersimpan di perangkat
+// pengguna; menerjemahkannya akan mengosongkan profil yang sudah tersimpan.
+// Yang diterjemahkan labelnya.
+export const RISK_LEVEL_LABEL: Record<RiskLevel, string> = {
+  konservatif: 'Conservative',
+  moderat: 'Moderate',
+  agresif: 'Aggressive',
+}
 
 export interface RiskResult {
   level: RiskLevel
@@ -205,36 +214,36 @@ export function assessRisk(a: RiskAnswers): RiskResult {
   // a 24% credit-card bill.
   const blockers: string[] = []
   if (a.hasHighInterestDebt) blockers.push(
-    'Anda masih punya utang berbunga tinggi. Melunasinya memberi imbal hasil pasti sebesar bunga utang itu — bereskan lebih dulu sebelum menambah porsi investasi berisiko.')
+    'You still carry high-interest debt. Paying it off returns exactly that interest rate, guaranteed — clear it before taking on more investment risk.')
   if (!a.hasEmergencyFund) blockers.push(
-    'Dana darurat belum terbentuk. Tanpa penyangga, penurunan pasar yang bersamaan dengan kebutuhan mendadak memaksa Anda menjual di harga terburuk.')
+    'You have no emergency fund yet. Without a buffer, a market drop that coincides with an urgent need forces you to sell at the worst possible price.')
 
   const level: RiskLevel = blockers.length ? 'konservatif' : score >= 8 ? 'agresif' : score >= 5 ? 'moderat' : 'konservatif'
 
   const allocation =
     level === 'agresif'
       ? [
-          { label: 'Saham / reksa dana saham & indeks', pct: 70, note: 'Potensi tertinggi, juga penurunan terdalam. Hanya untuk uang yang tidak akan dipakai bertahun-tahun.' },
-          { label: 'Obligasi / reksa dana pendapatan tetap', pct: 20, note: 'Peredam saat pasar saham jatuh.' },
-          { label: 'Kas & pasar uang', pct: 10, note: 'Likuiditas untuk kebutuhan dekat.' },
+          { label: 'Equities / index & equity funds', pct: 70, note: 'Highest potential, and the deepest falls. Only for money you will not touch for years.' },
+          { label: 'Bonds / fixed-income funds', pct: 20, note: 'A shock absorber when equities fall.' },
+          { label: 'Cash & money market', pct: 10, note: 'Liquidity for near-term needs.' },
         ]
       : level === 'moderat'
       ? [
-          { label: 'Saham / reksa dana saham & indeks', pct: 50, note: 'Mesin pertumbuhan, dengan porsi yang masih bisa Anda tahan saat turun.' },
-          { label: 'Obligasi / reksa dana pendapatan tetap', pct: 35, note: 'Menstabilkan nilai portofolio.' },
-          { label: 'Kas & pasar uang', pct: 15, note: 'Likuiditas dan ketenangan.' },
+          { label: 'Equities / index & equity funds', pct: 50, note: 'The growth engine, at a size you can still stomach in a downturn.' },
+          { label: 'Bonds / fixed-income funds', pct: 35, note: 'Steadies the value of the portfolio.' },
+          { label: 'Cash & money market', pct: 15, note: 'Liquidity, and peace of mind.' },
         ]
       : [
-          { label: 'Kas, deposito & pasar uang', pct: 50, note: 'Prioritas menjaga nilai pokok dan likuiditas.' },
-          { label: 'Obligasi / pendapatan tetap', pct: 35, note: 'Imbal hasil lebih tinggi dari kas dengan fluktuasi terbatas.' },
-          { label: 'Saham / reksa dana indeks', pct: 15, note: 'Porsi kecil agar tetap tumbuh melawan inflasi.' },
+          { label: 'Cash, deposits & money market', pct: 50, note: 'Protecting the principal and staying liquid come first.' },
+          { label: 'Bonds / fixed income', pct: 35, note: 'More return than cash, with limited swings.' },
+          { label: 'Equities / index funds', pct: 15, note: 'A small slice so the money still outgrows inflation.' },
         ]
 
   return {
     level, score, allocation, blockers,
     reasoning: blockers.length
-      ? 'Profil dikunci di konservatif bukan karena jawaban Anda, melainkan karena kondisi keuangan dasarnya belum siap menanggung risiko. Ini soal kemampuan, bukan keberanian.'
-      : `Jangka waktu ${a.horizonYears} tahun, reaksi Anda terhadap penurunan, kestabilan penghasilan, dan pengalaman menghasilkan skor ${score}. Alokasi di bawah adalah kelas aset, bukan rekomendasi produk atau saham tertentu.`,
+      ? 'The profile is locked to conservative not because of your answers, but because the underlying finances are not ready to carry risk yet. This is about capacity, not nerve.'
+      : `A ${a.horizonYears}-year horizon, your reaction to a drawdown, your income stability and your experience give a score of ${score}. The allocation below is asset classes — not a recommendation of any specific product or security.`,
   }
 }
 

@@ -5,7 +5,7 @@ import { Card, SectionTitle, Badge, Field, inputClass, Button } from '../compone
 import { IconToken } from '../components/icons'
 import {
   CATEGORY_LABEL, summarise, emergencyMonths, emergencyVerdict, planDebt, assessRisk,
-  project, formatIdr,
+  project, formatIdr, RISK_LEVEL_LABEL,
   type Category, type Tx, type Debt, type RiskAnswers,
 } from '../lib/finance'
 
@@ -48,11 +48,11 @@ export function MoneyHub() {
   const summary = useMemo(() => summarise(txs), [txs])
 
   const TABS: { id: Tab; l: string }[] = [
-    { id: 'catat', l: 'Catat' },
-    { id: 'arus', l: 'Arus Kas' },
-    { id: 'darurat', l: 'Dana Darurat' },
-    { id: 'utang', l: 'Utang' },
-    { id: 'investasi', l: 'Profil Risiko' },
+    { id: 'catat', l: 'Record' },
+    { id: 'arus', l: 'Cash Flow' },
+    { id: 'darurat', l: 'Emergency Fund' },
+    { id: 'utang', l: 'Debt' },
+    { id: 'investasi', l: 'Risk Profile' },
   ]
 
   return (
@@ -60,8 +60,8 @@ export function MoneyHub() {
       <div className="flex items-center gap-3">
         <span className="grid h-11 w-11 place-items-center rounded-2xl bg-brand-50 text-2xl">💰</span>
         <div>
-          <h1 className="text-lg font-black text-ink dark:text-ink">Keuangan Pribadi</h1>
-          <p className="text-xs text-neutral-500">Catat, lihat ke mana uang pergi, dan tahu urutan yang benar</p>
+          <h1 className="text-lg font-black text-ink dark:text-ink">Personal Finance</h1>
+          <p className="text-xs text-neutral-500">Record it, see where the money goes, and know the right order</p>
         </div>
       </div>
 
@@ -84,9 +84,9 @@ export function MoneyHub() {
       {tab === 'investasi' && <RiskTab />}
 
       <div className="rounded-2xl border border-neutral-100 bg-white p-4 text-center text-[11px] leading-relaxed text-neutral-500 dark:border-white/10 dark:bg-white/5">
-        Alat bantu edukasi keuangan pribadi. Halaman ini tidak memberi rekomendasi membeli atau
-        menjual saham maupun produk investasi tertentu, dan bukan pengganti nasihat perencana
-        keuangan berizin. Seluruh data disimpan di perangkat Anda sendiri.
+        An educational personal-finance tool. This page does not recommend buying or selling any
+        specific security or investment product, and is not a substitute for advice from a licensed
+        financial planner. All data stays on your own device.
       </div>
     </div>
   )
@@ -117,7 +117,7 @@ function RecordTab({ txs, setTxs }: { txs: Tx[]; setTxs: (f: (t: Tx[]) => Tx[]) 
   return (
     <>
       <Card className="!p-4">
-        <SectionTitle icon={<IconToken size={18} />} title="Catat transaksi" subtitle="Sepuluh detik sudah cukup — keteraturan lebih penting daripada kelengkapan" />
+        <SectionTitle icon={<IconToken size={18} />} title="Record a transaction" subtitle="Ten seconds is enough — consistency matters more than completeness" />
         <div className="mt-3 flex gap-2">
           {(['expense', 'income'] as const).map((k) => (
             <button
@@ -125,13 +125,13 @@ function RecordTab({ txs, setTxs }: { txs: Tx[]; setTxs: (f: (t: Tx[]) => Tx[]) 
               onClick={() => setKind(k)}
               className={`flex-1 rounded-xl px-3 py-2 text-[12px] font-bold transition ${kind === k ? 'bg-brand text-white' : 'bg-neutral-100 text-neutral-600 dark:bg-white/10'}`}
             >
-              {k === 'expense' ? 'Pengeluaran' : 'Pemasukan'}
+              {k === 'expense' ? 'Expense' : 'Income'}
             </button>
           ))}
         </div>
 
         <div className="mt-3">
-          <Field label="Jumlah (Rp)">
+          <Field label="Amount (Rp)">
             <input className={inputClass} inputMode="numeric" placeholder="50000"
               value={amount} onChange={(e) => setAmount(e.target.value)} />
           </Field>
@@ -139,7 +139,7 @@ function RecordTab({ txs, setTxs }: { txs: Tx[]; setTxs: (f: (t: Tx[]) => Tx[]) 
 
         {kind === 'expense' && (
           <div className="mt-3">
-            <div className="text-[11px] font-black uppercase tracking-wide text-neutral-500">Kategori</div>
+            <div className="text-[11px] font-black uppercase tracking-wide text-neutral-500">Category</div>
             <div className="mt-1.5 flex flex-wrap gap-1.5">
               {EXPENSE_CATEGORIES.map((c) => (
                 <button key={c} onClick={() => setCategory(c)}
@@ -152,28 +152,28 @@ function RecordTab({ txs, setTxs }: { txs: Tx[]; setTxs: (f: (t: Tx[]) => Tx[]) 
         )}
 
         <div className="mt-3 grid grid-cols-2 gap-2">
-          <Field label="Tanggal">
+          <Field label="Date">
             <input className={inputClass} type="date" value={date} onChange={(e) => setDate(e.target.value)} />
           </Field>
-          <Field label="Catatan (opsional)">
-            <input className={inputClass} placeholder="makan siang" value={note} onChange={(e) => setNote(e.target.value)} />
+          <Field label="Note (optional)">
+            <input className={inputClass} placeholder="lunch" value={note} onChange={(e) => setNote(e.target.value)} />
           </Field>
         </div>
 
-        <Button className="mt-3 w-full" onClick={add}>Tambahkan</Button>
+        <Button className="mt-3 w-full" onClick={add}>Add</Button>
       </Card>
 
       <Card className="!p-4">
-        <div className="text-[11px] font-black uppercase tracking-wide text-neutral-500">Terakhir dicatat</div>
+        <div className="text-[11px] font-black uppercase tracking-wide text-neutral-500">Recently recorded</div>
         {recent.length === 0 ? (
-          <Prosa kelas="mt-2 text-[12px] leading-relaxed text-neutral-500">Belum ada catatan. Mulai dari mencatat pengeluaran hari ini saja — jangan mencoba merekonstruksi sebulan ke belakang, karena itulah yang membuat sebagian besar orang berhenti di hari pertama.</Prosa>
+          <Prosa kelas="mt-2 text-[12px] leading-relaxed text-neutral-500">Nothing recorded yet. Start with just today's spending — do not try to reconstruct the past month, because that is what makes most people quit on day one.</Prosa>
         ) : (
           <div className="mt-2 space-y-1.5">
             {recent.map((t) => (
               <div key={t.id} className="flex items-center justify-between gap-2 rounded-xl bg-neutral-50 px-3 py-2 dark:bg-white/5">
                 <div className="min-w-0">
                   <div className="text-[12px] font-bold text-ink dark:text-ink">
-                    {t.kind === 'income' ? 'Pemasukan' : CATEGORY_LABEL[t.category]}
+                    {t.kind === 'income' ? 'Income' : CATEGORY_LABEL[t.category]}
                   </div>
                   <div className="text-[10px] text-neutral-500">{t.date}{t.note ? ` · ${t.note}` : ''}</div>
                 </div>
@@ -182,7 +182,7 @@ function RecordTab({ txs, setTxs }: { txs: Tx[]; setTxs: (f: (t: Tx[]) => Tx[]) 
                     {t.kind === 'income' ? '+' : '−'}{formatIdr(t.amount)}
                   </span>
                   <button onClick={() => setTxs((x) => x.filter((y) => y.id !== t.id))}
-                    className="text-[11px] font-bold text-rose-500 hover:underline">Hapus</button>
+                    className="text-[11px] font-bold text-rose-500 hover:underline">Delete</button>
                 </div>
               </div>
             ))}
@@ -199,8 +199,8 @@ function CashflowTab({ summary, hasData }: { summary: ReturnType<typeof summaris
     return (
       <Card className="!p-4">
         <p className="text-[12px] leading-relaxed text-neutral-500">
-          Belum ada data. Catat beberapa transaksi lebih dulu di tab <b>Catat</b> — analisis di sini
-          dihitung dari catatan Anda sendiri, bukan dari angka contoh.
+          No data yet. Record a few transactions in the <b>Record</b> tab first — everything here is
+          calculated from your own entries, not from sample numbers.
         </p>
       </Card>
     )
@@ -208,44 +208,44 @@ function CashflowTab({ summary, hasData }: { summary: ReturnType<typeof summaris
 
   const b = summary.bucketPct
   const verdict =
-    summary.net < 0 ? { l: 'Pengeluaran melebihi pemasukan', tone: 'critical' as const }
-    : summary.savingsRatePct < 10 ? { l: 'Sisa tipis', tone: 'high' as const }
-    : summary.savingsRatePct < 20 ? { l: 'Adequate sehat', tone: 'low' as const }
-    : { l: 'Sehat', tone: 'normal' as const }
+    summary.net < 0 ? { l: 'Spending exceeds income', tone: 'critical' as const }
+    : summary.savingsRatePct < 10 ? { l: 'Thin margin', tone: 'high' as const }
+    : summary.savingsRatePct < 20 ? { l: 'Reasonably healthy', tone: 'low' as const }
+    : { l: 'Healthy', tone: 'normal' as const }
 
   return (
     <>
       <Card className="!p-4">
-        <SectionTitle icon={<IconToken size={18} />} title="Arus kas" subtitle="Dari transaksi yang Anda catat" />
+        <SectionTitle icon={<IconToken size={18} />} title="Cash flow" subtitle="From the transactions you recorded" />
         <div className="mt-3 grid grid-cols-3 gap-2 text-center">
           <div className="rounded-xl bg-emerald-50 p-2.5 dark:bg-emerald-500/10">
-            <div className="text-[10px] font-bold uppercase text-neutral-500">Masuk</div>
+            <div className="text-[10px] font-bold uppercase text-neutral-500">In</div>
             <div className="text-[13px] font-black text-emerald-700 dark:text-emerald-300">{formatIdr(summary.income)}</div>
           </div>
           <div className="rounded-xl bg-rose-50 p-2.5 dark:bg-rose-500/10">
-            <div className="text-[10px] font-bold uppercase text-neutral-500">Keluar</div>
+            <div className="text-[10px] font-bold uppercase text-neutral-500">Out</div>
             <div className="text-[13px] font-black text-rose-700 dark:text-rose-300">{formatIdr(summary.expense)}</div>
           </div>
           <div className="rounded-xl bg-neutral-100 p-2.5 dark:bg-white/10">
-            <div className="text-[10px] font-bold uppercase text-neutral-500">Sisa</div>
+            <div className="text-[10px] font-bold uppercase text-neutral-500">Left</div>
             <div className="text-[13px] font-black text-ink dark:text-ink">{formatIdr(summary.net)}</div>
           </div>
         </div>
         <div className="mt-2 flex items-center gap-2">
           <Badge tone={verdict.tone}>{verdict.l}</Badge>
           {summary.income > 0 && (
-            <span className="text-[11px] text-neutral-500">Rasio menabung {summary.savingsRatePct.toFixed(0)}%</span>
+            <span className="text-[11px] text-neutral-500">Savings rate {summary.savingsRatePct.toFixed(0)}%</span>
           )}
         </div>
       </Card>
 
       <Card className="!p-4">
-        <div className="text-[11px] font-black uppercase tracking-wide text-neutral-500">Pola 50/30/20</div>
+        <div className="text-[11px] font-black uppercase tracking-wide text-neutral-500">The 50/30/20 pattern</div>
         <div className="mt-2 space-y-2">
           {([
-            ['needs', 'Kebutuhan', 50],
-            ['wants', 'Keinginan', 30],
-            ['savings', 'Menabung & bayar utang', 20],
+            ['needs', 'Needs', 50],
+            ['wants', 'Wants', 30],
+            ['savings', 'Saving & debt repayment', 20],
           ] as const).map(([k, label, target]) => (
             <div key={k}>
               <div className="flex items-center justify-between text-[12px]">
@@ -258,11 +258,11 @@ function CashflowTab({ summary, hasData }: { summary: ReturnType<typeof summaris
             </div>
           ))}
         </div>
-        <Prosa kelas="mt-3 text-[11px] leading-relaxed text-neutral-500">50/30/20 adalah patokan kasar, bukan aturan. Di kota dengan biaya sewa tinggi, porsi kebutuhan hampir selalu melewati 50% dan itu bukan tanda Anda boros — yang lebih berguna adalah melihat arahnya dari bulan ke bulan, bukan membandingkannya dengan angka ideal.</Prosa>
+        <Prosa kelas="mt-3 text-[11px] leading-relaxed text-neutral-500">50/30/20 is a rough guide, not a rule. In a high-rent city the needs share almost always passes 50%, and that is not a sign you overspend — what actually helps is watching the direction month to month, rather than comparing yourself with an ideal number.</Prosa>
       </Card>
 
       <Card className="!p-4">
-        <div className="text-[11px] font-black uppercase tracking-wide text-neutral-500">Ke mana uang pergi</div>
+        <div className="text-[11px] font-black uppercase tracking-wide text-neutral-500">Where the money goes</div>
         <div className="mt-2 space-y-1.5">
           {summary.byCategory.map((c) => (
             <div key={c.category} className="flex items-center gap-2">
@@ -291,27 +291,27 @@ function EmergencyTab({ summary }: { summary: ReturnType<typeof summarise> }) {
   return (
     <>
       <Card className="!p-4">
-        <SectionTitle icon={<IconToken size={18} />} title="Dana darurat" subtitle="Prioritas pertama, sebelum investasi apa pun" />
+        <SectionTitle icon={<IconToken size={18} />} title="Emergency fund" subtitle="The first priority, before any investing" />
         <div className="mt-3 grid gap-3">
-          <Field label="Tabungan likuid saat ini (Rp)">
+          <Field label="Liquid savings right now (Rp)">
             <input className={inputClass} inputMode="numeric" placeholder="10000000"
               value={savings} onChange={(e2) => setSavings(e2.target.value)} />
           </Field>
-          <Field label="Pengeluaran POKOK per bulan (Rp)">
+          <Field label="ESSENTIAL spending per month (Rp)">
             <input className={inputClass} inputMode="numeric" placeholder="5000000"
               value={essentials} onChange={(e2) => setEssentials(e2.target.value)} />
           </Field>
         </div>
         <p className="mt-1 text-[11px] leading-relaxed text-neutral-500">
-          Gunakan pengeluaran <b>pokok</b>, bukan total. Yang menentukan saat penghasilan berhenti
-          adalah apa yang tetap harus dibayar — bukan apa yang biasa Anda belanjakan.
+          Use <b>essential</b> spending, not the total. What matters when income stops is what still
+          has to be paid — not what you usually spend.
         </p>
 
         {s > 0 && e > 0 && (
           <div className="mt-3 rounded-xl bg-neutral-50 p-3 dark:bg-white/5">
             <div className="flex items-center justify-between">
-              <span className="text-[12px] font-bold text-neutral-500">Bertahan sekitar</span>
-              <span className="text-2xl font-black text-ink dark:text-ink">{months.toFixed(1)}<span className="text-sm text-neutral-500"> bulan</span></span>
+              <span className="text-[12px] font-bold text-neutral-500">Lasts roughly</span>
+              <span className="text-2xl font-black text-ink dark:text-ink">{months.toFixed(1)}<span className="text-sm text-neutral-500"> months</span></span>
             </div>
             <div className="mt-1"><Badge tone={v.tone}>{v.label}</Badge></div>
             <p className="mt-2 text-[12px] leading-relaxed text-neutral-600 dark:text-neutral-300">{v.advice}</p>
@@ -347,22 +347,22 @@ function DebtTab({ debts, setDebts }: { debts: Debt[]; setDebts: (f: (d: Debt[])
   return (
     <>
       <Card className="!p-4">
-        <SectionTitle icon={<IconToken size={18} />} title="Daftar utang" subtitle="Urutan pelunasan menentukan berapa total bunga yang Anda bayar" />
+        <SectionTitle icon={<IconToken size={18} />} title="Your debts" subtitle="The order you clear them decides how much interest you pay in total" />
         <div className="mt-3 grid gap-2">
-          <Field label="Nama utang"><input className={inputClass} placeholder="Kartu kredit A" value={name} onChange={(e) => setName(e.target.value)} /></Field>
+          <Field label="Debt name"><input className={inputClass} placeholder="Credit card A" value={name} onChange={(e) => setName(e.target.value)} /></Field>
           <div className="grid grid-cols-2 gap-2">
-            <Field label="Sisa (Rp)"><input className={inputClass} inputMode="numeric" placeholder="8000000" value={balance} onChange={(e) => setBalance(e.target.value)} /></Field>
-            <Field label="Bunga / tahun (%)"><input className={inputClass} inputMode="decimal" placeholder="24" value={rate} onChange={(e) => setRate(e.target.value)} /></Field>
+            <Field label="Balance (Rp)"><input className={inputClass} inputMode="numeric" placeholder="8000000" value={balance} onChange={(e) => setBalance(e.target.value)} /></Field>
+            <Field label="Interest / year (%)"><input className={inputClass} inputMode="decimal" placeholder="24" value={rate} onChange={(e) => setRate(e.target.value)} /></Field>
           </div>
-          <Field label="Cicilan minimum (Rp)"><input className={inputClass} inputMode="numeric" placeholder="500000" value={minPay} onChange={(e) => setMinPay(e.target.value)} /></Field>
+          <Field label="Minimum payment (Rp)"><input className={inputClass} inputMode="numeric" placeholder="500000" value={minPay} onChange={(e) => setMinPay(e.target.value)} /></Field>
         </div>
-        <Button className="mt-3 w-full" onClick={add}>Tambahkan utang</Button>
+        <Button className="mt-3 w-full" onClick={add}>Add debt</Button>
       </Card>
 
       {debts.length > 0 && (
         <Card className="!p-4">
           <div className="flex gap-2">
-            {([['avalanche', 'Bunga tertinggi dulu'], ['snowball', 'Saldo terkecil dulu']] as const).map(([k, l]) => (
+            {([['avalanche', 'Highest interest first'], ['snowball', 'Smallest balance first']] as const).map(([k, l]) => (
               <button key={k} onClick={() => setStrategy(k)}
                 className={`flex-1 rounded-xl px-3 py-2 text-[11px] font-bold transition ${strategy === k ? 'bg-brand text-white' : 'bg-neutral-100 text-neutral-600 dark:bg-white/10'}`}>
                 {l}
@@ -382,17 +382,17 @@ function DebtTab({ debts, setDebts }: { debts: Debt[]; setDebts: (f: (d: Debt[])
               <div key={d.id} className="flex items-center justify-between gap-2 rounded-xl bg-neutral-50 px-3 py-2 dark:bg-white/5">
                 <div className="min-w-0">
                   <div className="text-[12px] font-bold text-ink dark:text-ink">{i + 1}. {d.name}</div>
-                  <div className="text-[10px] text-neutral-500">{formatIdr(d.balance)} · {d.annualRatePct}% / tahun</div>
+                  <div className="text-[10px] text-neutral-500">{formatIdr(d.balance)} · {d.annualRatePct}% / year</div>
                 </div>
                 <button onClick={() => setDebts((x) => x.filter((y) => y.id !== d.id))}
-                  className="shrink-0 text-[11px] font-bold text-rose-500 hover:underline">Hapus</button>
+                  className="shrink-0 text-[11px] font-bold text-rose-500 hover:underline">Delete</button>
               </div>
             ))}
           </div>
 
           <div className="mt-3 rounded-xl bg-neutral-50 p-3 text-[12px] dark:bg-white/5">
-            <div className="flex justify-between"><span className="text-neutral-500">Total utang</span><span className="font-black text-ink dark:text-ink">{formatIdr(plan.totalBalance)}</span></div>
-            <div className="mt-1 flex justify-between"><span className="text-neutral-500">Bunga rata-rata tertimbang</span><span className="font-black text-ink dark:text-ink">{plan.weightedRatePct.toFixed(1)}%</span></div>
+            <div className="flex justify-between"><span className="text-neutral-500">Total debt</span><span className="font-black text-ink dark:text-ink">{formatIdr(plan.totalBalance)}</span></div>
+            <div className="mt-1 flex justify-between"><span className="text-neutral-500">Weighted average interest</span><span className="font-black text-ink dark:text-ink">{plan.weightedRatePct.toFixed(1)}%</span></div>
           </div>
         </Card>
       )}
@@ -417,25 +417,25 @@ function RiskTab() {
   return (
     <>
       <Card className="!p-4">
-        <SectionTitle icon={<IconToken size={18} />} title="Profil risiko" subtitle="Menentukan campuran kelas aset — bukan saham tertentu" />
+        <SectionTitle icon={<IconToken size={18} />} title="Risk profile" subtitle="Sets the mix of asset classes — not any particular security" />
 
         <div className="mt-3 space-y-3">
           <div>
-            <div className="text-[12px] font-bold text-ink dark:text-ink">Uang ini tidak akan dipakai selama</div>
+            <div className="text-[12px] font-bold text-ink dark:text-ink">This money will not be touched for</div>
             <div className="mt-1 flex flex-wrap gap-1.5">
               {[1, 3, 5, 10, 20].map((y) => (
                 <button key={y} onClick={() => set({ horizonYears: y })}
                   className={`rounded-full px-3 py-1.5 text-[11px] font-bold ${a.horizonYears === y ? 'bg-brand text-white' : 'bg-neutral-100 text-neutral-600 dark:bg-white/10'}`}>
-                  {y} tahun
+                  {y} years
                 </button>
               ))}
             </div>
           </div>
 
           <div>
-            <div className="text-[12px] font-bold text-ink dark:text-ink">Jika nilainya turun 20% dalam sebulan, Anda akan</div>
+            <div className="text-[12px] font-bold text-ink dark:text-ink">If it dropped 20% in a month, you would</div>
             <div className="mt-1 flex flex-wrap gap-1.5">
-              {([[0, 'Jual semua'], [1, 'Jual sebagian'], [2, 'Diamkan'], [3, 'Tambah beli']] as const).map(([v, l]) => (
+              {([[0, 'Sell everything'], [1, 'Sell some'], [2, 'Leave it alone'], [3, 'Buy more']] as const).map(([v, l]) => (
                 <button key={v} onClick={() => set({ drawdownReaction: v })}
                   className={`rounded-full px-3 py-1.5 text-[11px] font-bold ${a.drawdownReaction === v ? 'bg-brand text-white' : 'bg-neutral-100 text-neutral-600 dark:bg-white/10'}`}>
                   {l}
@@ -445,9 +445,9 @@ function RiskTab() {
           </div>
 
           <div>
-            <div className="text-[12px] font-bold text-ink dark:text-ink">Kestabilan penghasilan</div>
+            <div className="text-[12px] font-bold text-ink dark:text-ink">Income stability</div>
             <div className="mt-1 flex flex-wrap gap-1.5">
-              {([[0, 'Tidak tetap'], [1, 'Campuran'], [2, 'Tetap']] as const).map(([v, l]) => (
+              {([[0, 'Irregular'], [1, 'Mixed'], [2, 'Steady']] as const).map(([v, l]) => (
                 <button key={v} onClick={() => set({ incomeStability: v })}
                   className={`rounded-full px-3 py-1.5 text-[11px] font-bold ${a.incomeStability === v ? 'bg-brand text-white' : 'bg-neutral-100 text-neutral-600 dark:bg-white/10'}`}>
                   {l}
@@ -459,11 +459,11 @@ function RiskTab() {
           <div className="grid gap-2">
             <label className="flex items-center gap-2 rounded-xl bg-neutral-50 px-3 py-2.5 dark:bg-white/5">
               <input type="checkbox" checked={a.hasEmergencyFund} onChange={(e) => set({ hasEmergencyFund: e.target.checked })} />
-              <span className="text-[12px] font-semibold text-neutral-700 dark:text-neutral-200">Dana darurat minimal 3 bulan sudah ada</span>
+              <span className="text-[12px] font-semibold text-neutral-700 dark:text-neutral-200">I have at least 3 months of emergency fund</span>
             </label>
             <label className="flex items-center gap-2 rounded-xl bg-neutral-50 px-3 py-2.5 dark:bg-white/5">
               <input type="checkbox" checked={a.hasHighInterestDebt} onChange={(e) => set({ hasHighInterestDebt: e.target.checked })} />
-              <span className="text-[12px] font-semibold text-neutral-700 dark:text-neutral-200">Masih punya utang berbunga tinggi (di atas 15% per tahun)</span>
+              <span className="text-[12px] font-semibold text-neutral-700 dark:text-neutral-200">I still have high-interest debt (above 15% a year)</span>
             </label>
           </div>
         </div>
@@ -472,7 +472,7 @@ function RiskTab() {
       <Card className="!p-4">
         <div className="flex items-center justify-between">
           <span className="text-[12px] font-bold text-neutral-500">Your profile</span>
-          <Badge tone={r.level === 'agresif' ? 'high' : r.level === 'moderat' ? 'low' : 'normal'}>{r.level}</Badge>
+          <Badge tone={r.level === 'agresif' ? 'high' : r.level === 'moderat' ? 'low' : 'normal'}>{RISK_LEVEL_LABEL[r.level]}</Badge>
         </div>
         <p className="mt-2 text-[12px] leading-relaxed text-neutral-600 dark:text-neutral-300">{r.reasoning}</p>
 
@@ -498,19 +498,19 @@ function RiskTab() {
       </Card>
 
       <Card className="!p-4">
-        <div className="text-[11px] font-black uppercase tracking-wide text-neutral-500">Proyeksi menabung rutin</div>
+        <div className="text-[11px] font-black uppercase tracking-wide text-neutral-500">Regular-saving projection</div>
         <div className="mt-2">
-          <Field label="Setoran per bulan (Rp)">
+          <Field label="Contribution per month (Rp)">
             <input className={inputClass} inputMode="numeric" value={monthly} onChange={(e) => setMonthly(e.target.value)} />
           </Field>
         </div>
         {m > 0 && (
           <div className="mt-3 rounded-xl bg-neutral-50 p-3 dark:bg-white/5">
-            <div className="text-[12px] font-bold text-neutral-500">Setelah {a.horizonYears} tahun, kemungkinan berada di antara</div>
+            <div className="text-[12px] font-bold text-neutral-500">After {a.horizonYears} years, likely somewhere between</div>
             <div className="mt-1 text-[15px] font-black text-ink dark:text-ink">
               {formatIdr(low[low.length - 1]?.value ?? 0)} — {formatIdr(high[high.length - 1]?.value ?? 0)}
             </div>
-            <Prosa kelas="mt-2 text-[11px] leading-relaxed text-neutral-500">Ditampilkan sebagai rentang (asumsi 4% dan 9% per tahun), bukan satu angka. Satu angka memberi kesan pasti yang tidak ada — dan orang menyusun rencana hidup di atas kesan itu. Hasil sesungguhnya bisa di luar rentang ini, termasuk lebih rendah dari total setoran Anda bila pasar sedang buruk saat Anda membutuhkannya.</Prosa>
+            <Prosa kelas="mt-2 text-[11px] leading-relaxed text-neutral-500">Shown as a range (assuming 4% and 9% a year), not a single number. A single number implies a certainty that does not exist — and people build life plans on that impression. The real outcome can fall outside this range, including below what you paid in, if markets are down when you need the money.</Prosa>
           </div>
         )}
       </Card>
