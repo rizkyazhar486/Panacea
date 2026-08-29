@@ -32,6 +32,7 @@ import { UbinInspirasi, UbinKartuBelajar, UbinSoal, UbinRingkasanKarya } from '.
 import { UbinPewaktu } from './UbinPewaktu'
 import { UbinNotifikasi } from './UbinNotifikasi'
 import { UbinKabar } from './UbinKabar'
+import { UbinSemangat } from './UbinSemangat'
 import { UbinMata, UbinFokus, UbinKopi } from './UbinWaktuHidup'
 import { UbinPuasa } from './UbinPuasa'
 import { UbinZona2, UbinPemulihanDenyut, UbinUtangTidur, UbinTekanan, UbinNapas, UbinDuduk } from './UbinLanjutan'
@@ -514,6 +515,15 @@ export function PapanWidget({ pratinjau, tanggalCatatan }: { pratinjau: Pratinja
 
   return (
     <>
+    {/* YANG PERTAMA TERLIHAT DI BERANDA, dan ia berdiri SENDIRI — tidak masuk
+        ke dalam tumpukan yang harus digeser.
+        Sebelumnya yang pertama terlihat adalah grafik denyut dan tekanan
+        darah. Keduanya berguna dan tetap ada, hanya tidak lagi menyapa lebih
+        dahulu: aplikasi yang membuka harinya dengan angka penyakit membuat
+        pemakainya merasa seperti pasien, dan orang yang merasa seperti pasien
+        menutup aplikasinya. Alasan lengkapnya di kepala lib/semangat.ts. */}
+    {pilihan.includes('semangat') && <div className="mb-5"><UbinSemangat /></div>}
+
     {/* TUMPUKAN: widget lebar berbagi satu petak dan digeser mendatar.
         Empat widget lebar berdiri sendiri-sendiri memakai empat kali tinggi
         yang sama; ditumpuk, ketiganya memakai tinggi satu widget. Yang masuk

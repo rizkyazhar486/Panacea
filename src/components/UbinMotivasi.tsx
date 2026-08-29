@@ -81,9 +81,9 @@ export function UbinMotivasi() {
   return (
     <section>
       <div className="mb-2 flex items-baseline justify-between gap-2">
-        <h2 className="t-kecil font-black uppercase tracking-wide text-neutral-500">Pekan ini</h2>
+        <h2 className="t-kecil font-black uppercase tracking-wide text-neutral-500">This week</h2>
         <Link to="/harian" className="t-kecil flex min-h-[40px] items-center font-bold text-brand">
-          Catat →
+          Log →
         </Link>
       </div>
 
@@ -114,8 +114,8 @@ export function UbinMotivasi() {
                     40 menit terbaca "+100%" padahal selisihnya satu sesi. */}
                 <span className="mt-1.5 block">
                   {[
-                    { l: 'Pekan ini', v: pekanIni, n: 'bg-brand' },
-                    { l: 'Pekan lalu', v: pekanLalu, n: 'bg-neutral-400 dark:bg-white/30' },
+                    { l: 'This week', v: pekanIni, n: 'bg-brand' },
+                    { l: 'Last week', v: pekanLalu, n: 'bg-neutral-400 dark:bg-white/30' },
                   ].map((x) => (
                     <span key={x.l} className="mt-0.5 flex items-center gap-1.5">
                       <span className="t-mikro w-[52px] shrink-0 text-neutral-400">{x.l}</span>
@@ -125,13 +125,13 @@ export function UbinMotivasi() {
                           style={{ width: `${Math.max(x.v > 0 ? 4 : 0, (x.v / Math.max(1, pekanIni, pekanLalu)) * 100)}%` }}
                         />
                       </span>
-                      <span className="t-mikro w-[46px] shrink-0 text-right tabular-nums text-neutral-500">{x.v} mnt</span>
+                      <span className="t-mikro w-[46px] shrink-0 text-right tabular-nums text-neutral-500">{x.v} min</span>
                     </span>
                   ))}
                 </span>
               </>
             ) : (
-              <span className="t-kecil text-neutral-500">Belum ada jejak pekan ini.</span>
+              <span className="t-kecil text-neutral-500">Nothing logged this week yet.</span>
             )}
           </div>
         </div>

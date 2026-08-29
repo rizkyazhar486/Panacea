@@ -328,7 +328,7 @@ export function UbinNapas() {
               onClick={() => { setMulai(Date.now()); getarTerakhir.current = -1; setJalan(true) }}
               className="t-kecil mt-2 min-h-[44px] w-full rounded-2xl bg-brand font-bold text-white transition active:scale-[0.98]"
             >
-              Mulai
+              Start
             </button>
             <p className="t-mikro mt-2 leading-snug text-neutral-400">
               What the trials measured is a short-term effect on calm and breathing rate — not a lasting improvement in blood pressure.
