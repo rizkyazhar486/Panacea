@@ -97,14 +97,14 @@ export function UbinBeban() {
 
   return (
     <section>
-      <Kepala judul="Volume angkat beban" ke="/latihan-beban" />
+      <Kepala judul="Lifting volume" ke="/latihan-beban" />
       <div className="kaca rounded-3xl p-3">
         <div className="flex items-baseline gap-1.5">
           <span className="text-[26px] font-black leading-none tabular-nums nyala text-ink dark:text-white">
             {(kini / 1000).toFixed(1)}
           </span>
-          <span className="t-mikro font-bold text-neutral-400">ton pekan ini</span>
-          <span className="t-mikro ml-auto shrink-0 text-neutral-400">{sesiPekan} sesi</span>
+          <span className="t-mikro font-bold text-neutral-400">tonnes this week</span>
+          <span className="t-mikro ml-auto shrink-0 text-neutral-400">{sesiPekan} sessions</span>
         </div>
         {/* Volume = berat x ulangan x set, dijumlahkan. Ia BUKAN ukuran mutu
             latihan: menaikkan angka ini dengan menambah set ringan sangat
@@ -183,7 +183,7 @@ export function UbinUkurBerkala() {
 
   return (
     <section>
-      <Kepala judul="Ukur berkala" ke="/tubuh" />
+      <Kepala judul="Periodic measures" ke="/tubuh" />
       <div className="kaca rounded-3xl p-3">
         <div className="flex gap-1.5">
           {(['genggam', 'keseimbangan'] as const).map((j) => (
@@ -194,7 +194,7 @@ export function UbinUkurBerkala() {
                 j === jenis ? 'bg-brand text-white' : 'bg-neutral-100 text-neutral-500 dark:bg-white/8 dark:text-neutral-300'
               }`}
             >
-              {j === 'genggam' ? 'Kekuatan genggam' : 'Berdiri satu kaki'}
+              {j === 'genggam' ? 'Grip strength' : 'Single-leg stand'}
             </button>
           ))}
         </div>
@@ -203,10 +203,10 @@ export function UbinUkurBerkala() {
           <span className="text-[26px] font-black leading-none tabular-nums nyala text-ink dark:text-white">
             {akhir ? akhir.nilai : '—'}
           </span>
-          <span className="t-mikro font-bold text-neutral-400">{jenis === 'genggam' ? 'kg' : 'detik'}</span>
+          <span className="t-mikro font-bold text-neutral-400">{jenis === 'genggam' ? 'kg' : 'seconds'}</span>
           {umur != null && (
             <span className="t-mikro ml-auto shrink-0 text-neutral-400">
-              {umur === 0 ? 'diukur hari ini' : `${umur} hari lalu`}
+              {umur === 0 ? 'measured today' : `${umur} days ago`}
             </span>
           )}
         </div>
@@ -226,7 +226,7 @@ export function UbinUkurBerkala() {
               jam.current ? 'bg-rose-500 text-white' : 'bg-brand text-white'
             }`}
           >
-            {jam.current ? `Berhenti · ${detik.toFixed(1)} detik` : 'Mulai hitung (mata terbuka, satu kaki)'}
+            {jam.current ? `Stop · ${detik.toFixed(1)} s` : 'Start timing (eyes open, one leg)'}
           </button>
         ) : (
           <div className="mt-2 flex gap-1.5">
@@ -234,18 +234,18 @@ export function UbinUkurBerkala() {
               inputMode="decimal"
               value={nilai}
               onChange={(e) => setNilai(e.target.value)}
-              placeholder="Hasil dinamometer (kg)"
-              aria-label="Kekuatan genggam kg"
+              placeholder="Dynamometer result (kg)"
+              aria-label="Grip strength in kg"
               className={KELAS_ISIAN}
             />
-            <button onClick={simpan} className="t-kecil shrink-0 rounded-xl bg-brand px-3 font-bold text-white">Catat</button>
+            <button onClick={simpan} className="t-kecil shrink-0 rounded-xl bg-brand px-3 font-bold text-white">Log</button>
           </div>
         )}
 
         <p className="t-mikro mt-2 leading-snug text-neutral-400">
           {jenis === 'genggam'
-            ? 'Butuh dinamometer genggam. Yang diukur kekuatan genggam — penanda yang berulang kali menyertai kemandirian di usia lanjut pada penelitian kohor, bukan ramalan tentang Anda.'
-            : 'Berdiri satu kaki, mata terbuka, dekat pegangan. Hentikan begitu kaki menyentuh lantai. Yang diukur lamanya berdiri, bukan ramalan risiko jatuh.'}
+            ? 'Needs a hand dynamometer. What is measured is grip strength — a marker that repeatedly accompanies independence in later life in cohort studies, not a prediction about you.'
+            : 'Stand on one leg, eyes open, near something to hold. Stop the moment the foot touches the floor. What is measured is how long you stood, not a prediction of fall risk.'}
         </p>
       </div>
     </section>
@@ -274,10 +274,10 @@ export function UbinSkrining() {
   return (
     <section>
       <Kepala
-        judul="Skrining & vaksin"
+        judul="Screening & vaccines"
         kanan={
           <button onClick={() => setBuka((v) => !v)} className="t-kecil flex min-h-[40px] items-center font-bold text-brand">
-            {buka ? 'Tutup' : '+ Tambah'}
+            {buka ? 'Close' : '+ Add'}
           </button>
         }
       />
@@ -287,30 +287,30 @@ export function UbinSkrining() {
             <input
               value={nama}
               onChange={(e) => setNama(e.target.value)}
-              placeholder="Mis. Papsmear, HbA1c, gigi"
-              aria-label="Nama pemeriksaan"
+              placeholder="e.g. Cervical smear, HbA1c, dental"
+              aria-label="Test name"
               className={KELAS_ISIAN}
             />
             <select
               value={bulan}
               onChange={(e) => setBulan(e.target.value)}
-              aria-label="Jarak bulan"
+              aria-label="Interval in months"
               className="t-kecil shrink-0 rounded-xl border border-neutral-200 bg-transparent px-1.5 text-ink dark:border-white/12 dark:text-white"
             >
-              {[3, 6, 12, 24, 36, 60].map((b) => <option key={b} value={b}>{b} bln</option>)}
+              {[3, 6, 12, 24, 36, 60].map((b) => <option key={b} value={b}>{b} mo</option>)}
             </select>
             <button
               onClick={() => { tambahSkrining(nama, Number(bulan)); setNama(''); setBuka(false); setVersi((v) => v + 1) }}
               className="t-kecil shrink-0 rounded-xl bg-brand px-3 font-bold text-white"
             >
-              Simpan
+              Save
             </button>
           </div>
         )}
 
         {!daftar.length ? (
           <p className="t-kecil text-neutral-500">
-            Belum ada. Tambahkan pemeriksaan beserta jarak yang sudah Anda sepakati dengan dokter — aplikasi ini tidak menentukan siapa perlu diperiksa apa.
+            Nothing yet. Add a test and the interval you agreed with your doctor — this app does not decide who needs which test.
           </p>
         ) : (
           <div className="flex flex-col gap-1.5">
@@ -322,17 +322,17 @@ export function UbinSkrining() {
                     <span className="t-kecil block truncate font-bold text-ink dark:text-white">{s.nama}</span>
                     <span className={`t-mikro block truncate ${lewat ? 'font-bold text-amber-600 dark:text-amber-400' : 'text-neutral-400'}`}>
                       {sisa == null
-                        ? `Belum pernah ditandai · tiap ${s.bulan} bln`
+                        ? `Never marked · every ${s.bulan} mo`
                         : lewat
-                          ? `Lewat ${Math.abs(sisa)} hari · tiap ${s.bulan} bln`
-                          : `${sisa} hari lagi · tiap ${s.bulan} bln`}
+                          ? `${Math.abs(sisa)} days overdue · every ${s.bulan} mo`
+                          : `${sisa} days to go · every ${s.bulan} mo`}
                     </span>
                   </span>
                   <button
                     onClick={() => { tandaiSkrining(s.id); setVersi((v) => v + 1) }}
                     className="t-mikro min-h-[40px] shrink-0 rounded-lg bg-neutral-100 px-2 font-black text-neutral-600 dark:bg-white/10 dark:text-neutral-200"
                   >
-                    Sudah
+                    Done
                   </button>
                   <button
                     onClick={() => { hapusSkrining(s.id); setVersi((v) => v + 1) }}

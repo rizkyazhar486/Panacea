@@ -52,7 +52,7 @@ function Judul({ teks, kanan }: { teks: string; kanan?: React.ReactNode }) {
 }
 
 function Delta({ pct, terbalik = false }: { pct: number | null; terbalik?: boolean }) {
-  if (pct === null) return <span className="text-[10.5px] text-neutral-500">belum ada pembanding</span>
+  if (pct === null) return <span className="text-[10.5px] text-neutral-500">no comparison yet</span>
   const baik = terbalik ? pct < 0 : pct > 0
   const warna = pct === 0 ? 'text-neutral-400' : baik ? 'text-emerald-400' : 'text-amber-400'
   return (
@@ -67,7 +67,7 @@ function Garis({
   nilai, warna, balik = false, format,
 }: { nilai: (number | null)[]; warna: string; balik?: boolean; format: (n: number) => string }) {
   const ada = nilai.filter((n): n is number => n !== null)
-  if (ada.length < 2) return <Kosong pesan="Belum cukup titik untuk digambar." />
+  if (ada.length < 2) return <Kosong pesan="Not enough points to draw yet." />
   const lo = Math.min(...ada), hi = Math.max(...ada)
   const rentang = hi - lo || 1
   const x = (i: number) => L + (i / Math.max(1, nilai.length - 1)) * (W - L - R)
@@ -86,7 +86,7 @@ function Garis({
   if (kini.length > 1) potongan.push(kini.join(' '))
 
   return (
-    <svg viewBox={`0 0 ${W} ${H}`} className="w-full" role="img" aria-label="grafik tren">
+    <svg viewBox={`0 0 ${W} ${H}`} className="w-full" role="img" aria-label="trend chart">
       <line x1={L} y1={H - B} x2={W - R} y2={H - B} stroke="currentColor" strokeOpacity="0.15" />
       <text x={2} y={A + 8} className="fill-current text-[9px] opacity-50">{format(balik ? lo : hi)}</text>
       <text x={2} y={H - B - 2} className="fill-current text-[9px] opacity-50">{format(balik ? hi : lo)}</text>
@@ -105,11 +105,11 @@ function Batang({ nilai, label, warna, format }: {
   nilai: (number | null)[]; label: string[]; warna: string; format: (n: number) => string
 }) {
   const ada = nilai.filter((n): n is number => n !== null)
-  if (!ada.length) return <Kosong pesan="Belum ada data untuk digambar." />
+  if (!ada.length) return <Kosong pesan="No data to draw yet." />
   const hi = Math.max(...ada) || 1
   const lebar = (W - L - R) / nilai.length
   return (
-    <svg viewBox={`0 0 ${W} ${H}`} className="w-full" role="img" aria-label="grafik mingguan">
+    <svg viewBox={`0 0 ${W} ${H}`} className="w-full" role="img" aria-label="weekly chart">
       <line x1={L} y1={H - B} x2={W - R} y2={H - B} stroke="currentColor" strokeOpacity="0.15" />
       <text x={2} y={A + 8} className="fill-current text-[9px] opacity-50">{format(hi)}</text>
       {nilai.map((v, i) => {
@@ -175,7 +175,7 @@ export function GrafikOlahraga({
   const labelPekan = pekanan.map((p) => p.awal.slice(5).replace('-', '/'))
 
   if (!workouts.length) {
-    return <Kosong pesan="Belum ada sesi tercatat. Impor dari jam atau catat satu sesi, lalu grafiknya muncul di sini." />
+    return <Kosong pesan="No sessions recorded yet. Import from a watch or log one session, and the charts appear here." />
   }
 
   const totalKm = harian.reduce((a, d) => a + (d.km ?? 0), 0)
@@ -188,7 +188,7 @@ export function GrafikOlahraga({
       <div className="space-y-2">
         <div className="flex items-baseline justify-between gap-2">
           <span className="text-[10px] font-black uppercase tracking-wide text-slate-500">
-            Olahraga 30 hari
+            Exercise, 30 days
           </span>
           <Delta pct={bandingkan(pekanIni?.km ?? null, pekanLalu?.km ?? null).deltaPct} />
         </div>
@@ -200,11 +200,11 @@ export function GrafikOlahraga({
           </span>
           <span className="text-lg font-black text-white">
             {totalLangkah > 0 ? (totalLangkah / 1000).toFixed(0) + 'k' : '—'}
-            <span className="ml-1 text-[11px] font-bold text-slate-400">langkah</span>
+            <span className="ml-1 text-[11px] font-bold text-slate-400">steps</span>
           </span>
           <span className="text-lg font-black text-white">
             {hariAktif}
-            <span className="ml-1 text-[11px] font-bold text-slate-400">hari aktif</span>
+            <span className="ml-1 text-[11px] font-bold text-slate-400">active days</span>
           </span>
         </div>
 
@@ -213,7 +213,7 @@ export function GrafikOlahraga({
             latihannya sendiri. */}
         <div className="text-slate-400">
           {cakup.jarak.ada === 0
-            ? <Kosong pesan="Belum ada sesi yang merekam jarak." />
+            ? <Kosong pesan="No session has recorded a distance yet." />
             : <Batang nilai={pekanan.map((p) => p.km)} label={labelPekan} warna="#60a5fa" format={(n) => n.toFixed(0) + ' km'} />}
         </div>
 
@@ -224,7 +224,7 @@ export function GrafikOlahraga({
                 z.pct > 0 && <div key={z.z} style={{ width: `${z.pct}%`, background: z.warna }} />
               ))}
             </div>
-            <p className="mt-1 text-[10.5px] text-slate-500">{z12}% waktu di Z1-Z2 (aerobik ringan)</p>
+            <p className="mt-1 text-[10.5px] text-slate-500">{z12}% of time in Z1–Z2 (easy aerobic)</p>
           </div>
         )}
       </div>
@@ -235,7 +235,7 @@ export function GrafikOlahraga({
     <section className="space-y-3">
       <div className="flex items-center justify-between gap-2">
         <div>
-          <h3 className="text-[15px] font-black text-white">Angka olahraga Anda</h3>
+          <h3 className="text-[15px] font-black text-white">Your exercise numbers</h3>
           <p className="text-[11px] text-neutral-500">
             {hariAktif} hari aktif dari {rentang} hari terakhir
           </p>
@@ -259,20 +259,20 @@ export function GrafikOlahraga({
           bukan bentuk grafiknya. */}
       <div className="grid grid-cols-3 gap-2">
         <div className="rounded-2xl bg-white/5 p-3">
-          <div className="text-[10px] font-black uppercase tracking-wide text-neutral-500">Jarak</div>
+          <div className="text-[10px] font-black uppercase tracking-wide text-neutral-500">Distance</div>
           <div className="mt-0.5 text-lg font-black text-white">
             {totalKm > 0 ? totalKm.toFixed(1) : '—'}
             <span className="ml-1 text-[11px] font-bold text-neutral-500">km</span>
           </div>
         </div>
         <div className="rounded-2xl bg-white/5 p-3">
-          <div className="text-[10px] font-black uppercase tracking-wide text-neutral-500">Langkah</div>
+          <div className="text-[10px] font-black uppercase tracking-wide text-neutral-500">Steps</div>
           <div className="mt-0.5 text-lg font-black text-white">
             {totalLangkah > 0 ? (totalLangkah / 1000).toFixed(1) + 'k' : '—'}
           </div>
         </div>
         <div className="rounded-2xl bg-white/5 p-3">
-          <div className="text-[10px] font-black uppercase tracking-wide text-neutral-500">Sesi</div>
+          <div className="text-[10px] font-black uppercase tracking-wide text-neutral-500">Sessions</div>
           <div className="mt-0.5 text-lg font-black text-white">
             {harian.reduce((a, d) => a + d.sesi, 0)}
           </div>
@@ -280,51 +280,51 @@ export function GrafikOlahraga({
       </div>
 
       <KartuGrafik
-        judul="Jarak per pekan (km)"
+        judul="Distance per week (km)"
         kanan={<Delta pct={bandingkan(pekanIni?.km ?? null, pekanLalu?.km ?? null).deltaPct} />}
         anak={
           cakup.jarak.ada === 0
-            ? <Kosong pesan="Tidak ada satu pun sesi yang merekam jarak. Grafik ini muncul setelah ada sesi berjarak (lari, jalan, sepeda)." />
+            ? <Kosong pesan="Not a single session has recorded a distance. This chart appears once there is a session with distance (running, walking, cycling)." />
             : <Batang nilai={pekanan.map((p) => p.km)} label={labelPekan} warna="#60a5fa" format={(n) => n.toFixed(0) + ' km'} />
         }
       />
 
       <KartuGrafik
-        judul="Langkah harian"
+        judul="Daily steps"
         kanan={<span className="text-[10.5px] text-neutral-500">{cakup.langkah.ada}/{cakup.langkah.total} sesi merekam</span>}
         anak={
           cakup.langkah.ada < MIN_SESI
-            ? <Kosong pesan={`Baru ${cakup.langkah.ada} sesi yang merekam langkah — belum cukup untuk disebut tren. Sebagian jam hanya mencatat langkah pada mode berjalan.`} />
+            ? <Kosong pesan={`Only ${cakup.langkah.ada} sessions have recorded steps — not enough to call a trend. Some watches only record steps in walking mode.`} />
             : <Garis nilai={harian.map((d) => d.langkah)} warna="#a78bfa" format={(n) => (n / 1000).toFixed(1) + 'k'} />
         }
       />
 
       <KartuGrafik
-        judul="Pace (makin ke atas makin cepat)"
+        judul="Pace (higher is faster)"
         kanan={<span className="text-[10.5px] font-bold text-neutral-300">{tulisPace(pekanIni?.paceSec ?? null)}</span>}
         anak={
           cakup.pace.ada < MIN_SESI
-            ? <Kosong pesan={`Baru ${cakup.pace.ada} sesi yang punya pace. Pace hanya terhitung pada sesi yang merekam jarak dan waktu.`} />
+            ? <Kosong pesan={`Only ${cakup.pace.ada} sessions have a pace. Pace is only computed for sessions that record both distance and time.`} />
             : <Garis nilai={harian.map((d) => d.paceSec)} warna="#34d399" balik format={(n) => tulisPace(n).replace('/km', '')} />
         }
       />
 
       <KartuGrafik
-        judul="Denyut rata-rata (bpm)"
+        judul="Average heart rate (bpm)"
         kanan={<Delta pct={bandingkan(pekanIni?.avgHr ?? null, pekanLalu?.avgHr ?? null).deltaPct} terbalik />}
         anak={
           cakup.denyut.ada < MIN_SESI
-            ? <Kosong pesan={`Baru ${cakup.denyut.ada} sesi yang merekam denyut. Sesi yang dicatat tangan tidak punya denyut.`} />
+            ? <Kosong pesan={`Only ${cakup.denyut.ada} sessions have recorded a heart rate. Sessions logged by hand have none.`} />
             : <Garis nilai={harian.map((d) => d.avgHr)} warna="#f87171" format={(n) => Math.round(n) + '' } />
         }
       />
 
       <KartuGrafik
-        judul="Kadens (langkah/menit)"
-        kanan={<span className="text-[10.5px] text-neutral-500">{cakup.kadens.ada}/{cakup.kadens.total} sesi merekam</span>}
+        judul="Cadence (steps/min)"
+        kanan={<span className="text-[10.5px] text-neutral-500">{cakup.kadens.ada}/{cakup.kadens.total} sessions recording</span>}
         anak={
           cakup.kadens.ada < MIN_SESI
-            ? <Kosong pesan={`Baru ${cakup.kadens.ada} sesi yang merekam kadens — belum cukup untuk digambar sebagai tren. Kadens umumnya hanya terekam oleh jam lari atau sensor kaki.`} />
+            ? <Kosong pesan={`Only ${cakup.kadens.ada} sessions have recorded cadence — not enough to draw as a trend. Cadence is usually only captured by a running watch or a foot pod.`} />
             : <Garis nilai={harian.map((d) => d.kadens)} warna="#fbbf24" format={(n) => Math.round(n) + ''} />
         }
       />
@@ -332,11 +332,11 @@ export function GrafikOlahraga({
       <div className="rounded-2xl bg-white/5 p-3">
         <Judul
           teks="Zona denyut — 28 hari"
-          kanan={<span className="text-[10.5px] text-neutral-500">{zona.sesiDipakai} sesi dipakai</span>}
+          kanan={<span className="text-[10.5px] text-neutral-500">{zona.sesiDipakai} sessions used</span>}
         />
         {zona.sesiDipakai === 0 ? (
           <div className="mt-1.5">
-            <Kosong pesan={`Zona hanya dapat dihitung dari sesi yang merekam DERET denyut, dan belum ada satu pun dalam 28 hari terakhir${zona.sesiDilewati ? ` (${zona.sesiDilewati} sesi dilewati karena hanya punya denyut rata-rata)` : ''}.`} />
+            <Kosong pesan={`Zones can only be computed from sessions that record a heart-rate SERIES, and there has not been one in the last 28 days${zona.sesiDilewati ? ` (${zona.sesiDilewati} sessions skipped because they only carry an average heart rate)` : ''}.`} />
           </div>
         ) : (
           <>
@@ -360,10 +360,10 @@ export function GrafikOlahraga({
                 atlet ketahanan terlatih, bukan dari orang yang berolahraga tiga
                 kali sepekan untuk sehat. */}
             <p className="mt-2 text-[11px] leading-snug text-neutral-500">
-              Sebagian besar waktu sebaiknya di Z1-Z2 ({zona.zona[0].pct + zona.zona[1].pct}% saat
-              ini). Berlatih terlalu sering di Z3 — terlalu berat untuk pemulihan, terlalu ringan
-              untuk memperbaiki ambang — adalah kesalahan yang paling lazim. Ini rambu dari latihan
-              ketahanan, bukan aturan kesehatan.
+              Most of the time should sit in Z1–Z2 ({zona.zona[0].pct + zona.zona[1].pct}% at
+              present). Training too often in Z3 — too hard to recover from, too easy to improve the
+              threshold — is the most common mistake. This is a guideline from endurance training,
+              not a health rule.
             </p>
           </>
         )}
@@ -371,10 +371,10 @@ export function GrafikOlahraga({
 
       {zona.sesiDilewati > 0 && zona.sesiDipakai > 0 && (
         <p className="text-[10.5px] leading-snug text-neutral-500">
-          {zona.sesiDilewati} sesi tidak ikut dihitung zonanya karena hanya menyimpan denyut
-          rata-rata. Rata-rata 150 bisa berasal dari satu jam mantap di Z3, bisa juga dari
-          selang-seling Z1 dan Z5 — dua latihan yang sama sekali berbeda, jadi menempatkannya di
-          satu zona akan menggambar kebiasaan yang tidak pernah terjadi.
+          {zona.sesiDilewati} sessions are excluded from the zone calculation because they only
+          store an average heart rate. An average of 150 could come from a steady hour in Z3, or from
+          alternating Z1 and Z5 — two completely different workouts, so placing it in one zone would
+          draw a pattern that never happened.
         </p>
       )}
     </section>

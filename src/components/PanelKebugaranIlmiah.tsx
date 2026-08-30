@@ -146,10 +146,10 @@ export function PanelKebugaranIlmiah(b: BahanPanel) {
   if (!adaIsi) {
     return (
       <div className="rounded-xl bg-black/[0.03] p-3 text-[11.5px] leading-snug text-neutral-600 dark:bg-white/5 dark:text-neutral-300">
-        Belum ada angka yang cukup untuk ditampilkan. Yang diperlukan paling sedikit satu di antara: VO₂max terukur, atau
-        denyut istirahat (untuk perkiraan), atau kekuatan genggam, atau jumlah langkah harian.
+        Not enough numbers to show anything yet. At least one of these is needed: a measured VO₂max, a resting heart rate
+        (for an estimate), grip strength, or a daily step count.
         <div className="mt-1.5 opacity-80">
-          Bagian ini sengaja kosong alih-alih menampilkan angka bawaan — angka bawaan tidak dapat dibedakan dari hasil ukur.
+          This section is deliberately empty rather than showing default numbers — a default cannot be told apart from a measurement.
         </div>
       </div>
     )
@@ -158,18 +158,19 @@ export function PanelKebugaranIlmiah(b: BahanPanel) {
   return (
     <div className="space-y-2">
       <div className="rounded-xl border border-amber-500/30 bg-amber-500/[0.07] p-3">
-        <div className="text-[10px] font-black uppercase tracking-wide text-amber-700 dark:text-amber-400">Cara membaca bagian ini</div>
+        <div className="text-[10px] font-black uppercase tracking-wide text-amber-700 dark:text-amber-400">How to read this section</div>
         <p className="mt-1 text-[11px] leading-snug text-neutral-700 dark:text-neutral-200">
-          Angka di bawah adalah <b>rasio bahaya pada KELOMPOK</b>, bukan ramalan bagi seorang. Rasio 0,70 berarti kelompok
-          dengan ciri itu mengalami kematian 30% lebih sedikit selama masa pengamatan — <b>bukan</b> berarti Anda akan hidup
-          30% lebih lama. Semuanya bersifat <b>kaitan</b>, dan sebagian besar berasal dari kohort pengamatan, bukan uji acak.
+          The figures below are <b>hazard ratios for GROUPS</b>, not predictions for an individual. A ratio of 0.70 means the
+          group with that characteristic had 30% fewer deaths over the observation period — it does <b>not</b> mean you will
+          live 30% longer. All of it is <b>association</b>, and most of it comes from observational cohorts, not randomised
+          trials.
         </p>
       </div>
 
       {hasil && (
         <div className="rounded-xl bg-black/[0.03] p-3 dark:bg-white/5">
           <div className="flex items-baseline justify-between">
-            <div className="text-[10px] font-black uppercase tracking-wide text-neutral-500">Kapasitas aerobik</div>
+            <div className="text-[10px] font-black uppercase tracking-wide text-neutral-500">Aerobic capacity</div>
             <div className="text-[10px] font-bold text-neutral-500">{hasil.met.toFixed(1)} MET</div>
           </div>
           <div className="mt-0.5 flex items-baseline gap-1.5">
@@ -185,30 +186,30 @@ export function PanelKebugaranIlmiah(b: BahanPanel) {
           <SkalaVo2 vo2={hasil.vo2} titik={hasil.titikTengah} jk={b.jk} usia={b.usia} />
 
           <p className="mt-1.5 text-[11.5px] leading-snug text-neutral-700 dark:text-neutral-200">
-            Berada <b>{hasil.pita}</b> titik tengah orang seusia dan sejenis kelamin, selisih{' '}
+            <b>{hasil.pita}</b> the median for your age and sex, a difference of{' '}
             <b>{hasil.selisihMet >= 0 ? '+' : ''}{hasil.selisihMet.toFixed(1)} MET</b>.
           </p>
           <p className="mt-1 text-[11.5px] leading-snug text-neutral-700 dark:text-neutral-200">
-            Setiap 1 MET lebih tinggi berkaitan dengan kematian segala sebab <b>13% lebih rendah</b> (HR 0,87; IK95%
-            0,84-0,90). Untuk selisih Anda, rasio bahaya terhadap titik tengah menjadi{' '}
+            Each 1 MET higher is associated with <b>13% lower</b> all-cause mortality (HR 0.87; 95% CI
+            0.84–0.90). For your difference, the hazard ratio against the median comes to{' '}
             <b style={{ color: warnaPita(hasil.selisihMet) }}>{hasil.hrTerhadapTitikTengah.toFixed(2)}</b>.
           </p>
           <KartuSumber kunci="kodama" />
 
           {perkiraan && (
             <div className="mt-2 rounded-lg border border-amber-500/30 bg-amber-500/[0.07] p-2">
-              <div className="text-[10px] font-black text-amber-700 dark:text-amber-400">Ini perkiraan, bukan pengukuran</div>
+              <div className="text-[10px] font-black text-amber-700 dark:text-amber-400">This is an estimate, not a measurement</div>
               <p className="mt-0.5 text-[11px] leading-snug text-neutral-700 dark:text-neutral-200">
                 {perkiraan.cara}. {perkiraan.ketidakpastian}
-                {hrMaks && !hrMaks.terukur && ` Denyut maksimalnya sendiri juga perkiraan: ${hrMaks.ketidakpastian}`}
+                {hrMaks && !hrMaks.terukur && ` The maximum heart rate is itself an estimate: ${hrMaks.ketidakpastian}`}
               </p>
               <KartuSumber kunci="uth" />
             </div>
           )}
 
           <div className="mt-2 text-[10.5px] leading-snug text-neutral-500">
-            Titik tengah rujukan berlaku untuk uji <b>treadmill</b>; uji sepeda menghasilkan nilai 10-15% lebih rendah, dan
-            membandingkannya dengan tabel ini akan tampak lebih buruk daripada keadaan sebenarnya.
+            The reference medians apply to a <b>treadmill</b> test; a cycle test yields values 10–15% lower, and comparing
+            those against this table will look worse than the truth.
             <KartuSumber kunci="friend" />
           </div>
         </div>
@@ -216,16 +217,16 @@ export function PanelKebugaranIlmiah(b: BahanPanel) {
 
       {genggam && b.genggamKg && (
         <Baris
-          judul="Kekuatan genggam"
+          judul="Grip strength"
           sumber="leong"
           isi={
             <>
-              <b>{b.genggamKg} kg</b>. Studi PURE melaporkan setiap <b>5 kg lebih rendah</b> berkaitan dengan kematian segala
-              sebab <b>16% lebih tinggi</b> (HR 1,16). Terhadap acuan {b.jk === 'L' ? '40' : '25'} kg, rasio bahayanya{' '}
+              <b>{b.genggamKg} kg</b>. The PURE study reported that each <b>5 kg lower</b> was associated with <b>16% higher</b>
+              all-cause mortality (HR 1.16). Against a reference of {b.jk === 'L' ? '40' : '25'} kg, the hazard ratio is{' '}
               <b>{genggam.toFixed(2)}</b>.
               <div className="mt-1 text-[10.5px] text-neutral-500">
-                Acuan itu dipilih sebagai titik banding, <b>bukan</b> batas normal — PURE melaporkan efek per selisih 5 kg dan
-                tidak menetapkan nilai normal.
+                That reference was chosen as a comparison point, <b>not</b> a normal threshold — PURE reported an effect per
+                5 kg difference and did not define a normal value.
               </div>
             </>
           }
@@ -234,13 +235,13 @@ export function PanelKebugaranIlmiah(b: BahanPanel) {
 
       {langkah && (
         <Baris
-          judul="Langkah harian"
+          judul="Daily steps"
           sumber="paluch"
           isi={
             <>
-              <b>{langkah.langkah.toLocaleString('id-ID')}</b> langkah. {langkah.keterangan}
+              <b>{langkah.langkah.toLocaleString('en-GB')}</b> steps. {langkah.keterangan}
               <div className="mt-1 text-[10.5px] text-neutral-500">
-                Angka 10.000 yang beredar luas berasal dari nama sebuah pedometer Jepang tahun 1960-an, bukan dari penelitian.
+                The widely quoted 10,000 comes from the name of a 1960s Japanese pedometer, not from research.
               </div>
             </>
           }
@@ -249,15 +250,15 @@ export function PanelKebugaranIlmiah(b: BahanPanel) {
 
       {sebaran && (
         <Baris
-          judul="Sebaran intensitas"
+          judul="Intensity distribution"
           sumber="seiler"
           isi={
             <>
-              <b>{sebaran.persenRendah.toFixed(0)}%</b> intensitas rendah, <b>{sebaran.persenTinggi.toFixed(0)}%</b> tinggi.{' '}
+              <b>{sebaran.persenRendah.toFixed(0)}%</b> low intensity, <b>{sebaran.persenTinggi.toFixed(0)}%</b> high.{' '}
               {sebaran.keterangan}
               <div className="mt-1 text-[10.5px] text-neutral-500">
-                Pola 80/20 adalah gambaran yang <b>diamati</b> pada atlet ketahanan berprestasi, bukan resep yang teruji untuk
-                bukan atlet.
+                The 80/20 pattern is something <b>observed</b> in high-performing endurance athletes, not a tested
+                prescription for non-athletes.
               </div>
             </>
           }
@@ -265,9 +266,9 @@ export function PanelKebugaranIlmiah(b: BahanPanel) {
       )}
 
       <div className="rounded-xl bg-black/[0.03] p-3 text-[10.5px] leading-snug text-neutral-500 dark:bg-white/5">
-        <b>Yang sengaja tidak ditampilkan di sini:</b> usia biologis dan ramalan sisa umur. Tidak ada persamaan yang
-        disepakati untuk menghitung usia biologis dari pengukuran lapangan, dan rasio bahaya kelompok tidak dapat diubah
-        menjadi ramalan bagi seorang. Menampilkannya dengan desimal akan menjadi ketepatan yang tidak dimiliki datanya.
+        <b>Deliberately not shown here:</b> biological age and remaining-life predictions. There is no agreed equation for
+        computing biological age from field measurements, and group hazard ratios cannot be turned into a prediction for one
+        person. Showing either to a decimal place would claim a precision the data does not have.
       </div>
     </div>
   )
