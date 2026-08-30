@@ -118,11 +118,11 @@ function malamMengandung(t: number, malam: SleepNight[]): boolean {
 
 function labelPeristiwa(jenis: 'kuras' | 'isi', delta: number, tidur: boolean, menit: number): string {
   if (jenis === 'isi') {
-    if (tidur) return `Tidur mengisi ${delta} poin`
-    return `Istirahat mengisi ${delta} poin`
+    if (tidur) return `Sleep charged ${delta} points`
+    return `Rest charged ${delta} points`
   }
-  if (menit <= 90 && delta >= 15) return `Aktivitas berat menguras ${delta} poin`
-  return `Aktivitas menguras ${delta} poin`
+  if (menit <= 90 && delta >= 15) return `Hard activity drained ${delta} points`
+  return `Activity drained ${delta} points`
 }
 
 /**
@@ -149,7 +149,7 @@ export function hitungBodyBattery(
   if (urut.length < 2) {
     return {
       cukupData: false,
-      alasan: 'Belum ada cukup sampel denyut untuk membentuk kurva. Perlu minimal dua titik.',
+      alasan: 'Not enough heart-rate samples yet to form a curve. At least two points are needed.',
       titik: [], sekarang: awal, tertinggi: awal, terendah: awal,
       cakupan: 0, jamTertutup: 0, jamTotal: 0, peristiwa: [], istirahat: 0, hrMaks, catatan,
     }
@@ -167,19 +167,19 @@ export function hitungBodyBattery(
     const ATAP_MASUK_AKAL = 90
     if (istirahat > ATAP_MASUK_AKAL) {
       istirahat = ATAP_MASUK_AKAL
-      catatan.push('Rentang ini hanya berisi sampel dari sesi latihan, sehingga denyut istirahat tidak bisa diukur dan dipakai perkiraan umum. Isi denyut istirahat di profil kesehatan agar kurvanya akurat.')
+      catatan.push('This range contains only samples from training sessions, so resting heart rate could not be measured and a generic estimate was used. Enter your resting heart rate in the health profile for an accurate curve.')
     }
   }
   if (istirahat == null) {
     return {
       cukupData: false,
-      alasan: 'Denyut istirahat belum bisa diperkirakan dari data yang ada.',
+      alasan: 'Resting heart rate cannot yet be estimated from the available data.',
       titik: [], sekarang: awal, tertinggi: awal, terendah: awal,
       cakupan: 0, jamTertutup: 0, jamTotal: 0, peristiwa: [], istirahat: 0, hrMaks, catatan,
     }
   }
   if (istirahat >= hrMaks - 20) {
-    catatan.push('Denyut istirahat dan denyut maksimum terlalu berdekatan, sehingga kurva di bawah ini kurang peka. Periksa umur di profil.')
+    catatan.push('Resting and maximum heart rate are too close together, which makes the curve below less sensitive. Check the age in your profile.')
   }
 
   const titik: TitikBaterai[] = []
@@ -240,10 +240,10 @@ export function hitungBodyBattery(
   const nilaiSemua = titik.map((p) => p.nilai)
   const cakupan = totalMs > 0 ? tertutupMs / totalMs : 0
   if (cakupan < 0.5) {
-    catatan.push('Lebih dari separuh rentang ini tidak tertutup sampel, jadi kurvanya terputus-putus. Nyalakan "Include Workouts" dan matikan "Aggregate Data" di Health Auto Export untuk data yang jauh lebih rapat.')
+    catatan.push('More than half of this range has no samples, so the curve is broken up. Switch on "Include Workouts" and switch off "Aggregate Data" in Health Auto Export for far denser data.')
   }
   if (!malam.length) {
-    catatan.push('Belum ada data tidur, sehingga pengisian malam dihitung dengan laju istirahat biasa dan cenderung lebih rendah dari sebenarnya.')
+    catatan.push('No sleep data yet, so overnight charging is computed at the ordinary resting rate and tends to read lower than it really is.')
   }
 
   return {
@@ -286,16 +286,16 @@ export function hitungStres(samples: HrSample[], istirahat: number, hrMaks: numb
   // f 0 → 0, f 0.35 ke atas → 100. Di atas sepertiga cadangan saat diam,
   // membedakan lebih jauh tidak lagi bermakna.
   const skor = Math.round(Math.min(100, (f / 0.35) * 100))
-  if (skor <= 25) return { skor, label: 'Istirahat', warna: '#22c55e', arti: 'Tubuh dalam keadaan pulih. Ini keadaan yang diharapkan saat santai dan saat tidur.' }
-  if (skor <= 50) return { skor, label: 'Rendah', warna: '#84cc16', arti: 'Beban ringan sehari-hari. Tidak ada yang perlu dilakukan.' }
-  if (skor <= 75) return { skor, label: 'Sedang', warna: '#f59e0b', arti: 'Tubuh bekerja lebih keras dari biasanya sepanjang periode ini. Bisa datang dari kurang tidur, kafein, sakit, atau tekanan pikiran.' }
-  return { skor, label: 'Tinggi', warna: '#ef4444', arti: 'Denyut bertahan jauh di atas istirahat padahal tidak sedang berolahraga. Bila berlanjut beberapa hari, pertimbangkan mengurangi beban latihan dan memeriksa tidur.' }
+  if (skor <= 25) return { skor, label: 'Resting', warna: '#22c55e', arti: 'The body is in a recovered state. This is what you would expect at rest and during sleep.' }
+  if (skor <= 50) return { skor, label: 'Low', warna: '#84cc16', arti: 'Ordinary everyday load. Nothing needs doing.' }
+  if (skor <= 75) return { skor, label: 'Moderate', warna: '#f59e0b', arti: 'The body worked harder than usual across this period. It can come from short sleep, caffeine, illness, or mental pressure.' }
+  return { skor, label: 'High', warna: '#ef4444', arti: 'Heart rate stayed well above resting while not exercising. If this persists for several days, consider reducing training load and looking at sleep.' }
 }
 
 /** Saran singkat berdasarkan nilai baterai saat ini. */
 export function saranBaterai(nilai: number): { judul: string; isi: string; warna: string } {
-  if (nilai >= 75) return { judul: 'Cadangan penuh', isi: 'Ini saat terbaik untuk sesi berat atau hari yang padat.', warna: '#22c55e' }
+  if (nilai >= 75) return { judul: 'Fully charged', isi: 'This is the best time for a hard session or a demanding day.', warna: '#22c55e' }
   if (nilai >= 50) return { judul: 'Adequate', isi: 'A moderate session is still safe. Leave room if tomorrow is planned hard.', warna: '#84cc16' }
-  if (nilai >= 25) return { judul: 'Menipis', isi: 'Pilih sesi ringan atau pemulihan. Tidur lebih awal akan terasa besar efeknya.', warna: '#f59e0b' }
-  return { judul: 'Hampir habis', isi: 'Tubuh sedang menuntut pemulihan. Hindari sesi berat hari ini.', warna: '#ef4444' }
+  if (nilai >= 25) return { judul: 'Running low', isi: 'Choose an easy or recovery session. An early night will make a large difference.', warna: '#f59e0b' }
+  return { judul: 'Nearly empty', isi: 'The body is asking for recovery. Avoid a hard session today.', warna: '#ef4444' }
 }

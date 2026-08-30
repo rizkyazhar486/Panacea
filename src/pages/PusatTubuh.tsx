@@ -87,10 +87,10 @@ export function PusatTubuh() {
       kaki={
         klinis.length > 0 ? (
           <section className="space-y-3">
-            <h2 className="text-[13px] font-black text-ink dark:text-white">Dari mana angka-angka ini</h2>
+            <h2 className="text-[13px] font-black text-ink dark:text-white">Where these numbers come from</h2>
             <p className="text-[12px] leading-relaxed text-neutral-500">
-              Setiap angka di bawah membawa rentang rujukannya beserta populasi asalnya, seberapa besar ayunan
-              hariannya, dan kapan ia tidak boleh dipercaya.
+              Each number below carries its reference range and the population it came from, how much it swings
+              day to day, and when it should not be trusted.
             </p>
             {klinis.map((a) => (
               <KartuAngkaKlinis key={a.label} a={a} />

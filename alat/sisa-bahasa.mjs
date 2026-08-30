@@ -47,7 +47,23 @@ function teksTampak(baris) {
   // sendiri. Tanpa pola ini, "Pace acuan:" lolos berkali-kali.
   const awal = baris.match(/^\s{6,}([A-Za-z][^<>{}\n]{4,})(?:<|$)/)
   if (awal) out.push(awal[1])
-  for (const m of baris.matchAll(/'([^'\n]{4,})'|"([^"\n]{4,})"|`([^`\n]{4,})`/g)) out.push(m[1] ?? m[2] ?? m[3])
+  // Petik dipasangkan dengan menyusuri baris, BUKAN dengan regex bergantian.
+  // Regex /'([^']+)'/ pada `nama: 'Jalan', met: 2.5, int: 'ringan'` ikut
+  // menangkap ", met: 2.5, int: " — potongan KODE di antara dua string — lalu
+  // melaporkannya sebagai teks Indonesia. Itu membuat olahraga.ts terbaca 283
+  // temuan yang hampir seluruhnya bukan teks.
+  for (const q of ["'", '"', '`']) {
+    let i = 0
+    while (i < baris.length) {
+      const a = baris.indexOf(q, i)
+      if (a < 0) break
+      const b = baris.indexOf(q, a + 1)
+      if (b < 0) break
+      const isi = baris.slice(a + 1, b)
+      if (isi.length >= 4) out.push(isi)
+      i = b + 1
+    }
+  }
   return out
 }
 const hasil = []
@@ -70,7 +86,14 @@ function periksa(p) {
       if (tok.length < 2) continue
       const util = t.trim().split(/\s+/).filter((k) => /^(dark:|hover:|focus:|active:|sm:|md:|lg:|group-)/.test(k) || /^(text|bg|border|rounded|flex|grid|min|max|w|h|p|m|px|py|mt|mb|ml|mr|gap|font|leading|tracking|shadow|ring|space|items|justify|overflow|absolute|relative|inline|shrink|transition|opacity|z|whitespace|truncate|uppercase|tabular|place|cursor|select|pointer|backdrop|animate|duration|ease|scale|translate|t-)(-|$)/.test(k)).length
       if (util > 0) continue
+      // Potongan KODE bukan teks. Penandanya khas dan tidak muncul di kalimat.
+      if (/(^|\s)(const|let|var|return|function|await|typeof)\s|=>|\)\s*\.|\.\w+\(|===|!==|\?\?/.test(t)) continue
       const asing = tok.filter((w) => !EN.has(w.toLowerCase()))
+        // Akronim dan singkatan (BMI, TDEE, CSV) memang bukan kata kamus.
+        .filter((w) => !/^[A-Z0-9]+$/.test(w))
+        // Nama diri diawali huruf besar di tengah kalimat; nama hidangan dan
+        // nama orang lolos di sini, dan memang bukan kalimat Indonesia.
+        .filter((w) => !/^[A-Z][a-z]+$/.test(w))
       if (asing.length >= 2 || (asing.length === 1 && tok.length <= 4)) {
         hasil.push({ p, i: i + 1, t: t.trim().slice(0, 88), asing: [...new Set(asing)].slice(0, 5) })
       }

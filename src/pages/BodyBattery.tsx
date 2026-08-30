@@ -78,8 +78,8 @@ export function BodyBattery() {
         <SectionTitle icon={<IconActivity />} title="Body Battery" />
         <Card>
           <p className="text-sm leading-relaxed text-neutral-600">
-            Body Battery dihitung dari deret denyut yang dikumpulkan server lewat sinkronisasi
-            otomatis, dan saat ini aplikasi berjalan tanpa server.
+            Body Battery is computed from the heart-rate trace the server collects through automatic
+            sync, and the app is currently running without a server.
           </p>
         </Card>
       </div>
@@ -91,7 +91,7 @@ export function BodyBattery() {
       <SectionTitle
         icon={<IconActivity />}
         title="Body Battery"
-        subtitle="Cadangan tenaga 0–100, dihitung dari denyut jantung sepanjang hari"
+        subtitle="A 0–100 energy reserve, computed from heart rate through the day"
       />
 
       <div className="flex gap-2">
@@ -109,16 +109,16 @@ export function BodyBattery() {
       </div>
 
       {memuat && <Card><p className="text-sm text-neutral-500">Loading…</p></Card>}
-      {gagal && <Card><p className="text-sm text-red-600">Gagal memuat data. Coba muat ulang halaman.</p></Card>}
+      {gagal && <Card><p className="text-sm text-red-600">Could not load the data. Try reloading the page.</p></Card>}
 
       {!memuat && !gagal && !hasil.cukupData && (
         <Card>
-          <p className="text-sm font-bold text-ink dark:text-ink">Belum bisa dihitung</p>
+          <p className="text-sm font-bold text-ink dark:text-ink">Cannot be computed yet</p>
           <p className="mt-1 text-sm leading-relaxed text-neutral-500">{hasil.alasan}</p>
           <p className="mt-3 text-sm leading-relaxed text-neutral-500">
-            Body Battery butuh deret denyut, bukan sekadar ringkasan harian. Cara memperbanyaknya ada
-            di <Link to="/log-detak-jantung" className="font-semibold underline">Heart Rate Log</Link> —
-            singkatnya, nyalakan <b>Include Workouts</b> dan matikan <b>Aggregate Data</b> di Health Auto Export.
+            Body Battery needs a heart-rate trace, not just a daily summary. How to get more of it is in
+            <Link to="/log-detak-jantung" className="font-semibold underline"> Heart Rate Log</Link> — in
+            short, switch on <b>Include Workouts</b> and switch off <b>Aggregate Data</b> in Health Auto Export.
           </p>
         </Card>
       )}
@@ -147,7 +147,7 @@ export function BodyBattery() {
           </Card>
 
           <Card>
-            <div className="text-xs font-black uppercase tracking-wide text-neutral-500">Kurva energi</div>
+            <div className="text-xs font-black uppercase tracking-wide text-neutral-500">Energy curve</div>
             <div className="mt-3 h-56">
               <ResponsiveContainer width="100%" height="100%">
                 <AreaChart data={hasil.titik} margin={{ top: 4, right: 4, bottom: 0, left: -22 }}>
@@ -167,7 +167,7 @@ export function BodyBattery() {
                     labelFormatter={(t) => tanggalJam(Number(t))}
                     formatter={(v, n, p) => {
                       const d = p.payload as { bpm: number; lajuPerJam: number; tidur: boolean }
-                      return [`${v} — ${d.bpm} bpm${d.tidur ? ', tidur' : ''}${d.lajuPerJam ? `, ${d.lajuPerJam > 0 ? '+' : ''}${d.lajuPerJam}/jam` : ''}`, 'Baterai']
+                      return [`${v} — ${d.bpm} bpm${d.tidur ? ', asleep' : ''}${d.lajuPerJam ? `, ${d.lajuPerJam > 0 ? '+' : ''}${d.lajuPerJam}/h` : ''}`, 'Battery']
                     }}
                     contentStyle={{ fontSize: 12, borderRadius: 12 }}
                   />
@@ -176,15 +176,15 @@ export function BodyBattery() {
               </ResponsiveContainer>
             </div>
             <p className="mt-2 text-[11px] leading-relaxed text-neutral-500">
-              Tertutup sampel <b className="tabular-nums">{hasil.jamTertutup} dari {hasil.jamTotal} jam</b>
-              {' '}({Math.round(hasil.cakupan * 100)}%). Celah lebih dari {JEDA_MAKS_MS / 60_000} menit sengaja
-              tidak dihitung, jadi bagian yang datar bisa berarti tidak ada data — bukan tidak ada perubahan.
+              Covered by samples for <b className="tabular-nums">{hasil.jamTertutup} of {hasil.jamTotal} hours</b>
+              {' '}({Math.round(hasil.cakupan * 100)}%). Gaps longer than {JEDA_MAKS_MS / 60_000} minutes are
+              deliberately not counted, so a flat stretch can mean no data — not no change.
             </p>
           </Card>
 
           {stres && (
             <Card>
-              <div className="text-xs font-black uppercase tracking-wide text-neutral-500">Stres sepanjang hari</div>
+              <div className="text-xs font-black uppercase tracking-wide text-neutral-500">Stress through the day</div>
               <div className="mt-2 flex items-baseline gap-2">
                 <span className="text-3xl font-black tabular-nums" style={{ color: stres.warna }}>{stres.skor}</span>
                 <span className="text-sm font-bold" style={{ color: stres.warna }}>{stres.label}</span>
@@ -193,13 +193,13 @@ export function BodyBattery() {
                 <div className="h-full rounded-full" style={{ width: `${stres.skor}%`, background: stres.warna }} />
               </div>
               <p className="mt-3 text-sm leading-relaxed text-neutral-500">{stres.arti}</p>
-              <Prosa kelas="mt-2 text-[11px] leading-relaxed text-neutral-500">Sampel dari sesi latihan dikeluarkan dari hitungan ini. Denyut tinggi saat berolahraga bukan stres — bila ikut dihitung, hari dengan sesi terbaik justru akan terbaca paling buruk.</Prosa>
+              <Prosa kelas="mt-2 text-[11px] leading-relaxed text-neutral-500">Samples from training sessions are excluded here. A high heart rate during exercise is not stress — if it were counted, the day with your best session would read as the worst.</Prosa>
             </Card>
           )}
 
           {hasil.peristiwa.length > 0 && (
             <Card>
-              <div className="text-xs font-black uppercase tracking-wide text-neutral-500">Yang paling memengaruhi</div>
+              <div className="text-xs font-black uppercase tracking-wide text-neutral-500">What affected it most</div>
               <div className="mt-3 space-y-2">
                 {hasil.peristiwa.map((p, i) => (
                   <div key={i} className="flex items-start justify-between gap-3 rounded-xl bg-neutral-50 px-3 py-2 dark:bg-white/5">
@@ -217,23 +217,23 @@ export function BodyBattery() {
           )}
 
           <Card>
-            <div className="text-xs font-black uppercase tracking-wide text-neutral-500">Dasar hitungan</div>
+            <div className="text-xs font-black uppercase tracking-wide text-neutral-500">Basis of the calculation</div>
             <div className="mt-3 grid grid-cols-2 gap-3 text-sm">
               <div>
-                <div className="text-[11px] text-neutral-500">Denyut istirahat</div>
+                <div className="text-[11px] text-neutral-500">Resting heart rate</div>
                 <div className="font-black tabular-nums text-ink dark:text-ink">{hasil.istirahat} bpm</div>
               </div>
               <div>
-                <div className="text-[11px] text-neutral-500">Denyut maksimum</div>
+                <div className="text-[11px] text-neutral-500">Maximum heart rate</div>
                 <div className="font-black tabular-nums text-ink dark:text-ink">{hasil.hrMaks} bpm</div>
               </div>
             </div>
-            <Prosa kelas="mt-3 text-sm leading-relaxed text-neutral-500">Garmin menghitung Body Battery dari variabilitas denyut yang direkam terus-menerus. Apple Watch tidak merekamnya seperti itu, jadi halaman ini memakai posisi denyut terhadap cadangan denyut: mendekati istirahat mengisi, jauh di atasnya menguras, dan tidur mengisi paling cepat. Arahnya sama, tetapi angkanya tidak akan persis sama dengan Garmin.</Prosa>
+            <Prosa kelas="mt-3 text-sm leading-relaxed text-neutral-500">Garmin computes Body Battery from continuously recorded heart-rate variability. Apple Watch does not record it that way, so this page uses where the heart rate sits within your heart-rate reserve: near resting it charges, far above it drains, and sleep charges fastest. The direction is the same, but the numbers will not match Garmin exactly.</Prosa>
           </Card>
 
           {hasil.catatan.length > 0 && (
             <Card>
-              <div className="text-xs font-black uppercase tracking-wide text-amber-500">Batas data</div>
+              <div className="text-xs font-black uppercase tracking-wide text-amber-500">Data limits</div>
               <ul className="mt-2 space-y-2">
                 {hasil.catatan.map((c, i) => (
                   <li key={i} className="text-sm leading-relaxed text-neutral-500">• {c}</li>

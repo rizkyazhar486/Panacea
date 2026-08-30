@@ -113,19 +113,19 @@ export interface AngkaKlinis {
 /** Warna dan label tingkat keyakinan — tetap sama di seluruh aplikasi. */
 export const TINGKAT_INFO: Record<Tingkat, { label: string; nada: string; arti: string }> = {
   terukur: {
-    label: 'Terukur',
+    label: 'Measured',
     nada: 'bg-emerald-500',
-    arti: 'Datang langsung dari sensor maupun alat ukur. Ketidakpastiannya adalah ketidakpastian alatnya.',
+    arti: 'Comes straight from a sensor or measuring device. Its uncertainty is the device\u2019s uncertainty.',
   },
   terhitung: {
-    label: 'Terhitung',
+    label: 'Calculated',
     nada: 'bg-sky-500',
-    arti: 'Aritmetika pasti dari angka yang terukur. Tidak menambah asumsi baru, hanya merambatkan galat masukannya.',
+    arti: 'Exact arithmetic on measured numbers. It adds no new assumptions, only propagates the error of its inputs.',
   },
   termodelkan: {
-    label: 'Termodelkan',
+    label: 'Modelled',
     nada: 'bg-amber-500',
-    arti: 'Keluaran sebuah model beserta asumsi dan tetapannya. Dapat keliru meskipun seluruh masukannya benar.',
+    arti: 'The output of a model, with its assumptions and constants. It can be wrong even when every input is right.',
   },
 }
 

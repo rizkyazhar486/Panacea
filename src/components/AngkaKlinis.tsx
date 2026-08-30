@@ -72,28 +72,28 @@ export function KartuAngkaKlinis({ a }: { a: Angka }) {
             <span className="text-[28px] font-black leading-none tabular-nums text-ink dark:text-white">{a.nilai}</span>
             {/* Satuan ditulis; bila kosong dinyatakan dengan kata-kata. */}
             <span className="text-[11px] font-bold text-neutral-400">
-              {a.satuan || 'tanpa satuan'}
+              {a.satuan || 'no unit'}
             </span>
           </span>
           <span className="mt-1.5 block text-[12px] leading-snug text-neutral-600 dark:text-neutral-300">{a.arti}</span>
         </span>
-        <span className="shrink-0 text-[11px] font-bold text-brand">{buka ? 'tutup' : 'periksa'}</span>
+        <span className="shrink-0 text-[11px] font-bold text-brand">{buka ? 'close' : 'inspect'}</span>
       </button>
 
       {buka && (
         <div className="mt-3 space-y-2.5">
-          <Bagian judul={`Tingkat keyakinan — ${t.label}`}>
+          <Bagian judul={`Confidence level — ${t.label}`}>
             <p className="text-[12px] leading-relaxed text-neutral-700 dark:text-neutral-300">{t.arti}</p>
           </Bagian>
 
           {a.skala && (
-            <Bagian judul="Skala — angka ini diukur terhadap apa">
+            <Bagian judul="Scale — what this number is measured against">
               <p className="text-[12px] leading-relaxed text-neutral-700 dark:text-neutral-300">{a.skala}</p>
             </Bagian>
           )}
 
           {a.rumus && (
-            <Bagian judul="Rumus, dengan nilai Anda sendiri">
+            <Bagian judul="The formula, with your own values">
               <code className="block overflow-x-auto whitespace-pre-wrap break-words text-[11px] font-bold leading-relaxed text-ink dark:text-white">
                 {a.rumus}
               </code>
@@ -117,14 +117,14 @@ export function KartuAngkaKlinis({ a }: { a: Angka }) {
           )}
 
           {a.ketidakpastian && (
-            <Bagian judul="Perubahan terkecil yang bermakna">
+            <Bagian judul="Smallest meaningful change">
               <p className="text-[12px] font-bold leading-relaxed text-ink dark:text-white">{a.ketidakpastian.sdc}</p>
               <p className="mt-1 text-[11px] leading-relaxed text-neutral-500">{a.ketidakpastian.dasar}</p>
             </Bagian>
           )}
 
           {a.rujukan && (
-            <Bagian judul="Rentang rujukan">
+            <Bagian judul="Reference range">
               <p className="text-[12px] font-bold text-ink dark:text-white">{a.rujukan.rentang}</p>
               <p className="mt-1 text-[11px] leading-relaxed text-neutral-500">
                 Populasi: {a.rujukan.populasi} · {a.rujukan.sumber}
@@ -138,7 +138,7 @@ export function KartuAngkaKlinis({ a }: { a: Angka }) {
           {a.tidakDipengaruhi && a.tidakDipengaruhi.length > 0 && (
             <div className="rounded-2xl border border-rose-200 bg-rose-50/60 p-3 dark:border-rose-500/20 dark:bg-rose-500/10">
               <div className="mb-1.5 text-[10px] font-black uppercase tracking-wide text-rose-700 dark:text-rose-400">
-                Tidak dipengaruhi oleh
+                Not affected by
               </div>
               <ul className="space-y-1.5">
                 {a.tidakDipengaruhi.map((x, i) => (
@@ -154,7 +154,7 @@ export function KartuAngkaKlinis({ a }: { a: Angka }) {
           {a.yangMenggerakkan && a.yangMenggerakkan.length > 0 && (
             <div className="rounded-2xl border border-emerald-200 bg-emerald-50/60 p-3 dark:border-emerald-500/20 dark:bg-emerald-500/10">
               <div className="mb-1.5 text-[10px] font-black uppercase tracking-wide text-emerald-700 dark:text-emerald-400">
-                Yang benar-benar menggerakkannya
+                What actually moves it
               </div>
               <ul className="space-y-1.5">
                 {a.yangMenggerakkan.map((x, i) => (
@@ -168,7 +168,7 @@ export function KartuAngkaKlinis({ a }: { a: Angka }) {
           )}
 
           {a.batasan && a.batasan.length > 0 && (
-            <Bagian judul="Kapan angka ini tidak boleh dipercaya">
+            <Bagian judul="When this number should not be trusted">
               <Butir isi={a.batasan} />
             </Bagian>
           )}

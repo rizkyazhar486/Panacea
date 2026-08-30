@@ -37,7 +37,7 @@ import type { AngkaKlinis } from './angkaKlinis'
 // keterangan tambahan.
 // ─────────────────────────────────────────────────────────────────────────────
 
-const SUMBER_LAZIM = 'nilai lazim dalam ajaran klinis dan fisiologi olahraga baku, bukan kutipan satu penelitian'
+const SUMBER_LAZIM = 'values in standard clinical teaching and exercise physiology, not a citation of any single study'
 
 /** Simpangan baku dalam satu orang dari hari ke hari, dipakai menghitung SDC. */
 interface Ragam {
@@ -75,12 +75,12 @@ export interface BahanTubuh {
 
 const RAGAM_RHR: Ragam = {
   sdHarian: 3,
-  keterangan: 'Denyut istirahat yang diukur jam tangan sepanjang malam berayun beberapa denyut dari malam ke malam pada orang yang sama dan sehat, tergantung suhu kamar, waktu makan terakhir, alkohol, dan mutu tidur.',
+  keterangan: 'Resting heart rate measured by a watch across the night swings by a few beats from night to night in the same healthy person, depending on room temperature, when you last ate, alcohol, and sleep quality.',
 }
 
 const RAGAM_HRV: Ragam = {
   sdHarian: 8,
-  keterangan: 'HRV adalah ukuran yang paling berayun di antara seluruh tanda tubuh. Ragam antar-malam pada orang sehat lazimnya belasan sampai dua puluhan persen dari nilainya sendiri, sehingga selisih satu malam hampir selalu derau.',
+  keterangan: 'HRV is the most volatile of all the body signals. Night-to-night variation in healthy people commonly runs to ten or twenty per cent of its own value, so a one-night difference is almost always noise.',
 }
 
 export function auditDenyutIstirahat(b: BahanTubuh): AngkaKlinis | null {
@@ -89,39 +89,39 @@ export function auditDenyutIstirahat(b: BahanTubuh): AngkaKlinis | null {
   const dasar = b.dasarRestingHr
 
   return {
-    label: 'Denyut istirahat',
+    label: 'Resting heart rate',
     nilai: String(Math.round(b.restingHr)),
     satuan: 'bpm',
     tingkat: 'terukur',
-    arti: 'Denyut jantung terendah yang tercatat saat tubuh benar-benar diam, umumnya pada tidur paruh kedua malam.',
+    arti: 'The lowest heart rate recorded while the body is genuinely still, usually during the second half of the night.',
     masukan: [
-      { nama: 'Bacaan terbaru', nilai: `${Math.round(b.restingHr)} bpm`, sumber: 'jam tangan maupun catatan manual' },
-      ...(dasar ? [{ nama: 'Nilai dasar Anda sendiri', nilai: `${Math.round(dasar)} bpm`, sumber: 'rerata riwayat Anda' }] : []),
+      { nama: 'Latest reading', nilai: `${Math.round(b.restingHr)} bpm`, sumber: 'a watch or a manual entry' },
+      ...(dasar ? [{ nama: 'Your own baseline', nilai: `${Math.round(dasar)} bpm`, sumber: 'the average of your history' }] : []),
     ],
     ketidakpastian: {
-      sdc: `Selisih di bawah ${batas} bpm terhadap nilai dasar Anda sendiri tidak layak ditafsirkan.`,
-      dasar: `${RAGAM_RHR.keterangan} Batas ${batas} bpm dihitung sebagai 2,77 × simpangan baku harian ${RAGAM_RHR.sdHarian} bpm, kaidah baku untuk membedakan perubahan nyata dari ragam pengukuran.`,
+      sdc: `A difference under ${batas} bpm against your own baseline is not worth interpreting.`,
+      dasar: `${RAGAM_RHR.keterangan} The ${batas} bpm threshold is 2.77 × the daily standard deviation of ${RAGAM_RHR.sdHarian} bpm — the standard rule for separating real change from measurement variation.`,
     },
     rujukan: {
-      rentang: '60-100 bpm pada dewasa; 40-60 bpm lazim pada orang yang terlatih daya tahan',
-      populasi: 'dewasa umum; rentang bawah berlaku bagi yang berlatih daya tahan teratur',
+      rentang: '60–100 bpm in adults; 40–60 bpm is common in endurance-trained people',
+      populasi: 'general adults; the lower range applies to those training endurance regularly',
       sumber: SUMBER_LAZIM,
     },
     tidakDipengaruhi: [
-      'Kebugaran satu sesi. Denyut istirahat mencerminkan penyesuaian berminggu-minggu, bukan latihan kemarin.',
-      'Jumlah langkah harian.',
+      "Fitness from a single session. Resting heart rate reflects adaptation over weeks, not yesterday's workout.",
+      'Daily step count.',
     ],
     yangMenggerakkan: [
-      'Latihan daya tahan teratur — menurunkannya perlahan selama berminggu-minggu sampai berbulan-bulan.',
-      'Alkohol malam sebelumnya, demam, dehidrasi, dan kurang tidur — menaikkannya untuk sementara.',
-      'Obat: penyekat beta menurunkan, obat asma golongan agonis beta dan dekongestan menaikkan.',
-      'Suhu kamar dan waktu makan terakhir.',
+      'Regular endurance training — lowers it slowly over weeks to months.',
+      'Alcohol the night before, fever, dehydration and short sleep — raise it temporarily.',
+      'Medicines: beta blockers lower it; beta-agonist asthma inhalers and decongestants raise it.',
+      'Room temperature and when you last ate.',
     ],
     batasan: [
-      'Rentang 60-100 bpm berasal dari kelaziman, bukan dari data akibat kesehatan. Nilai 95 bpm berada di dalam rentang itu namun tetap lebih tinggi risikonya daripada 60 bpm.',
-      'Angka ini TIDAK DAPAT DIPAKAI MENILAI KEBUGARAN ANTARORANG. Sebagiannya diwariskan; ada orang bugar dengan denyut 65 dan orang tidak bugar dengan denyut 55.',
-      'Bila Anda memakai penyekat beta maupun obat jantung lain, seluruh penafsiran di atas berubah dan harus dibicarakan dengan dokter yang meresepkannya.',
-      'Denyut istirahat yang menetap di atas 100 bpm, maupun di bawah 40 bpm disertai pusing atau pingsan, adalah alasan memeriksakan diri — bukan alasan menyesuaikan latihan.',
+      'The 60–100 bpm range comes from what is common, not from outcome data. A value of 95 bpm sits inside that range and still carries more risk than 60 bpm.',
+      'This number CANNOT BE USED TO COMPARE FITNESS BETWEEN PEOPLE. Part of it is inherited; there are fit people at 65 and unfit people at 55.',
+      'If you take a beta blocker or another cardiac medicine, everything above changes and should be discussed with the doctor who prescribed it.',
+      'A resting heart rate persistently above 100 bpm, or below 40 bpm with dizziness or fainting, is a reason to get checked — not a reason to adjust training.',
     ],
   }
 }
@@ -135,37 +135,37 @@ export function auditHrv(b: BahanTubuh): AngkaKlinis | null {
     nilai: String(Math.round(b.hrvMs)),
     satuan: 'ms',
     tingkat: 'terukur',
-    arti: 'Ragam jarak antardenyut jantung. Mencerminkan seberapa besar pengaruh saraf parasimpatis — bagian susunan saraf yang menenangkan — pada saat pengukuran.',
-    skala: 'Nilainya sangat berbeda antarorang dan sangat bergantung usia. PERBANDINGAN YANG BERMAKNA HANYA TERHADAP RIWAYAT ANDA SENDIRI; membandingkan HRV dengan orang lain hampir tidak berarti apa-apa.',
+    arti: 'The variation in the interval between heartbeats. It reflects how much parasympathetic influence — the calming branch of the nervous system — was present at the time of measurement.',
+    skala: 'Values differ enormously between people and depend heavily on age. THE ONLY MEANINGFUL COMPARISON IS AGAINST YOUR OWN HISTORY; comparing HRV with another person means almost nothing.',
     masukan: [
-      { nama: 'Bacaan terbaru', nilai: `${Math.round(b.hrvMs)} ms`, sumber: 'jam tangan' },
-      ...(b.dasarHrvMs ? [{ nama: 'Nilai dasar Anda sendiri', nilai: `${Math.round(b.dasarHrvMs)} ms`, sumber: 'rerata riwayat Anda' }] : []),
+      { nama: 'Latest reading', nilai: `${Math.round(b.hrvMs)} ms`, sumber: 'a watch' },
+      ...(b.dasarHrvMs ? [{ nama: 'Your own baseline', nilai: `${Math.round(b.dasarHrvMs)} ms`, sumber: 'the average of your history' }] : []),
     ],
     ketidakpastian: {
-      sdc: `Selisih di bawah kira-kira ${batas} ms terhadap nilai dasar Anda sendiri adalah derau, bukan perubahan.`,
-      dasar: `${RAGAM_HRV.keterangan} Karena itu satu malam tidak pernah cukup: yang layak dibaca adalah rerata tujuh hari, bukan angka semalam.`,
+      sdc: `A difference under roughly ${batas} ms against your own baseline is noise, not change.`,
+      dasar: `${RAGAM_HRV.keterangan} That is why one night is never enough: what is worth reading is the seven-day average, not a single night's number.`,
     },
     rujukan: {
-      rentang: 'Sangat lebar dan menurun seiring usia; puluhan milidetik pada dewasa muda, jauh lebih rendah pada usia lanjut. Tidak ada satu rentang yang berlaku untuk semua orang.',
-      populasi: 'bergantung usia, jenis kelamin, cara pengukuran, dan alat — nilai dari jam tangan tidak dapat disamakan dengan pengukuran laboratorium',
+      rentang: 'Very wide, and falling with age; tens of milliseconds in young adults, far lower in older people. There is no single range that applies to everyone.',
+      populasi: 'depends on age, sex, measurement method and device — a watch value cannot be equated with a laboratory measurement',
       sumber: SUMBER_LAZIM,
     },
     tidakDipengaruhi: [
-      'Jumlah langkah dan kalori harian.',
-      'Berat badan dalam jangka pendek.',
+      'Daily steps and calories.',
+      'Body weight in the short term.',
     ],
     yangMenggerakkan: [
-      'Alkohol — menurunkannya dengan sangat jelas, sering merupakan pengaruh tunggal terbesar yang terlihat pada data perorangan.',
-      'Latihan berat pada hari sebelumnya, sakit, demam, dan kurang tidur — menurunkan sementara.',
-      'Makan berat menjelang tidur dan suhu kamar yang panas.',
-      'Beban pikiran dan kecemasan.',
-      'Latihan daya tahan teratur — menaikkannya perlahan selama berbulan-bulan.',
+      "Alcohol — lowers it markedly, and is often the single largest visible effect in an individual's data.",
+      'Hard training the day before, illness, fever and short sleep — lower it temporarily.',
+      'A heavy meal close to bedtime, and a hot room.',
+      'Mental load and anxiety.',
+      'Regular endurance training — raises it slowly over months.',
     ],
     batasan: [
-      'ANGKA SEMALAM HAMPIR TIDAK BERARTI APA-APA. Yang berarti adalah arah rerata tujuh hari terhadap rerata sebulan.',
-      'Nilai dari jam tangan bergantung pada cara alat menghitungnya dan pada bagian malam mana yang diambil; membandingkan angka dari dua merek alat berbeda tidak sah.',
-      'Nilai rendah TIDAK berarti sakit, dan nilai tinggi TIDAK berarti sehat. Ada orang sehat yang nilainya rendah sepanjang hidupnya.',
-      'Tidak dapat dipakai untuk mendiagnosis apa pun. Ia hanya penanda kasar keadaan saraf otonom pada malam itu.',
+      'A SINGLE NIGHT MEANS ALMOST NOTHING. What means something is the direction of the seven-day average against the monthly average.',
+      'A watch value depends on how the device computes it and which part of the night it samples; comparing numbers from two different brands is not valid.',
+      'A low value does NOT mean illness, and a high one does NOT mean health. There are healthy people whose values are low for life.',
+      'It cannot be used to diagnose anything. It is only a rough marker of autonomic state on that night.',
     ],
   }
 }
@@ -175,32 +175,32 @@ export function auditSpo2(b: BahanTubuh): AngkaKlinis | null {
   const v = Math.round(b.spo2Pct)
 
   return {
-    label: 'Saturasi oksigen',
+    label: 'Oxygen saturation',
     nilai: String(v),
     satuan: '%',
     tingkat: 'terukur',
-    arti: 'Perkiraan persentase hemoglobin yang mengikat oksigen, dibaca dari penyerapan cahaya menembus kulit.',
-    masukan: [{ nama: 'Bacaan terbaru', nilai: `${v}%`, sumber: 'oksimeter pada jam tangan maupun alat jari' }],
+    arti: 'An estimate of the percentage of haemoglobin carrying oxygen, read from how light is absorbed through the skin.',
+    masukan: [{ nama: 'Latest reading', nilai: `${v}%`, sumber: 'a watch oximeter or a fingertip device' }],
     ketidakpastian: {
-      sdc: `Bacaan ${v}% sebaiknya dibaca sebagai kira-kira ${v - 3}% sampai ${v + 3}%, dan tidak lebih tepat dari itu.`,
-      dasar: 'Oksimeter denyut mengukur cahaya yang menembus jaringan, bukan kadar oksigen darah secara langsung. Galat khasnya beberapa persen, dan pada alat konsumen lebih besar daripada alat rumah sakit.',
+      sdc: `A reading of ${v}% is best read as roughly ${v - 3}% to ${v + 3}%, and no more precisely than that.`,
+      dasar: 'A pulse oximeter measures light passing through tissue, not blood oxygen directly. Its typical error is a few per cent, and larger on consumer devices than on hospital ones.',
     },
     rujukan: {
-      rentang: '95-100% pada orang sehat di dataran rendah',
-      populasi: 'dewasa sehat tanpa penyakit paru maupun jantung, di ketinggian mendekati permukaan laut',
+      rentang: '95–100% in healthy people at low altitude',
+      populasi: 'healthy adults without lung or heart disease, at close to sea level',
       sumber: SUMBER_LAZIM,
     },
-    tidakDipengaruhi: ['Kebugaran dan latihan.', 'Tidur, kecuali bila ada henti napas saat tidur.'],
+    tidakDipengaruhi: ['Fitness and training.', 'Sleep, unless there is sleep apnoea.'],
     yangMenggerakkan: [
-      'Ketinggian tempat — turun secara wajar di dataran tinggi.',
-      'Penyakit paru dan jantung.',
-      'Henti napas saat tidur — menurunkannya berulang kali sepanjang malam.',
+      'Altitude — it falls legitimately at height.',
+      'Lung and heart disease.',
+      'Sleep apnoea — drops it repeatedly through the night.',
     ],
     batasan: [
-      'KETEPATANNYA MENURUN PADA KULIT BERWARNA LEBIH GELAP, dan kecenderungannya adalah MEMBACA TERLALU TINGGI. Ini kekeliruan alat yang sudah lama didokumentasikan dan bermakna klinis, sebab kekurangan oksigen dapat terlewat justru pada orang yang paling perlu diketahui.',
-      'Kuku berwarna, tangan dingin, gerakan, dan alat yang longgar semuanya membuat bacaan tidak dapat dipercaya.',
-      'Alat konsumen TIDAK DIRANCANG untuk mengambil keputusan medis. Bacaan rendah yang mengejutkan sebaiknya diulang dengan tangan hangat dan alat yang pas sebelum disimpulkan.',
-      'Sesak napas yang nyata dengan saturasi yang terbaca normal tetap harus diperiksakan — keluhan mendahului angka.',
+      'ACCURACY IS WORSE ON DARKER SKIN, and the bias is towards READING TOO HIGH. This is a long-documented, clinically meaningful device error, because low oxygen can be missed in exactly the people it most needs detecting in.',
+      'Nail polish, cold hands, movement and a loose device all make a reading unreliable.',
+      'Consumer devices are NOT DESIGNED for medical decisions. A surprisingly low reading should be repeated with warm hands and a well-fitted device before drawing any conclusion.',
+      'Genuine breathlessness with a normal-looking saturation still needs assessment — symptoms come before numbers.',
     ],
   }
 }
@@ -210,32 +210,32 @@ export function auditTekananDarah(b: BahanTubuh): AngkaKlinis | null {
   const s = Math.round(b.systolic), d = Math.round(b.diastolic)
 
   return {
-    label: 'Tekanan darah',
+    label: 'Blood pressure',
     nilai: `${s}/${d}`,
     satuan: 'mmHg',
     tingkat: 'terukur',
-    arti: 'Tekanan dalam pembuluh arteri saat jantung memompa dan saat jantung mengisi.',
-    masukan: [{ nama: 'Bacaan terbaru', nilai: `${s}/${d} mmHg`, sumber: 'tensimeter' }],
+    arti: 'The pressure in the arteries when the heart pumps and when it fills.',
+    masukan: [{ nama: 'Latest reading', nilai: `${s}/${d} mmHg`, sumber: 'a blood-pressure monitor' }],
     ketidakpastian: {
-      sdc: 'Selisih di bawah kira-kira 8 mmHg antara dua pengukuran belum layak ditafsirkan.',
-      dasar: 'Tekanan darah berayun sepanjang hari dan dari pengukuran ke pengukuran. Karena itu diagnosis tidak pernah ditegakkan dari satu bacaan.',
+      sdc: 'A difference under roughly 8 mmHg between two measurements is not yet worth interpreting.',
+      dasar: 'Blood pressure swings through the day and between measurements. That is why a diagnosis is never made from a single reading.',
     },
     rujukan: {
-      rentang: 'Optimal di bawah 120/80 mmHg; tinggi bila 140/90 mmHg atau lebih pada pengukuran di fasilitas kesehatan, dan 135/85 mmHg atau lebih pada pengukuran di rumah',
-      populasi: 'dewasa; ambang di rumah memang lebih rendah karena bacaan di rumah rata-rata lebih rendah daripada di klinik',
-      sumber: 'Pedoman hipertensi PERKI 2021 dan ajaran klinis baku',
+      rentang: 'Optimal below 120/80 mmHg; high at 140/90 mmHg or above measured in a clinic, and 135/85 mmHg or above measured at home',
+      populasi: 'adults; the home threshold is deliberately lower because home readings average lower than clinic ones',
+      sumber: 'PERKI 2021 hypertension guideline and standard clinical teaching',
     },
-    tidakDipengaruhi: ['Kebugaran dalam jangka pendek.', 'Satu sesi latihan.'],
+    tidakDipengaruhi: ['Fitness in the short term.', 'A single training session.'],
     yangMenggerakkan: [
-      'Garam, berat badan, alkohol, dan kurang gerak.',
-      'Nyeri, kecemasan, kandung kemih penuh, dan berbicara saat diukur — semuanya menaikkan untuk sementara.',
-      'Kopi dan rokok dalam 30 menit terakhir.',
-      'Obat: penurun tekanan darah, dan sebaliknya dekongestan serta obat antiinflamasi nonsteroid yang menaikkan.',
+      'Salt, body weight, alcohol and inactivity.',
+      'Pain, anxiety, a full bladder and talking during the measurement — all raise it temporarily.',
+      'Coffee and smoking in the last 30 minutes.',
+      'Medicines: antihypertensives lower it; decongestants and NSAIDs raise it.',
     ],
     batasan: [
-      'SATU BACAAN TIDAK MENEGAKKAN APA PUN. Diagnosis memerlukan pengukuran berulang pada hari yang berbeda, dan sebaiknya di rumah.',
-      'Cara mengukur menentukan hasilnya: duduk bersandar lima menit lebih dahulu, kaki menapak lantai, lengan disangga setinggi jantung, manset seukuran lengan, dan tidak berbicara. Manset yang terlalu kecil membuat bacaan terlalu tinggi.',
-      'Tekanan darah 180/110 mmHg atau lebih, terlebih disertai nyeri dada, sesak, nyeri kepala hebat, gangguan penglihatan, maupun kelemahan sesisi, adalah alasan mencari pertolongan segera — bukan alasan mengulang pengukuran.',
+      'A SINGLE READING ESTABLISHES NOTHING. Diagnosis needs repeated measurements on different days, preferably at home.',
+      'Technique decides the result: sit supported for five minutes first, feet flat on the floor, arm supported at heart height, a cuff sized to the arm, and no talking. A cuff that is too small reads too high.',
+      'A blood pressure of 180/110 mmHg or above, especially with chest pain, breathlessness, severe headache, visual disturbance or one-sided weakness, is a reason to seek help immediately — not a reason to repeat the measurement.',
     ],
   }
 }
