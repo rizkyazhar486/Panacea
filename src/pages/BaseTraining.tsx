@@ -35,24 +35,24 @@ export function BaseTraining() {
 
   return (
     <div className="space-y-4">
-      <SectionTitle icon={<IconRun />} title="Foundation Training" subtitle="Lari, push-up, pull-up, sit-up, dan perbaikan postur" />
+      <SectionTitle icon={<IconRun />} title="Foundation Training" subtitle="Running, push-ups, pull-ups, sit-ups, and posture correction" />
 
       <Card>
         <p className="text-sm text-neutral-600 leading-relaxed">
-          Halaman ini menjawab dua pertanyaan yang paling sering salah dijawab orang yang berlatih tanpa pelatih:
-          <strong className="text-ink"> how fast you should actually be running</strong>, dan
+          This page answers the two questions people training without a coach most often get wrong:
+          <strong className="text-ink"> how fast you should actually be running</strong>, and
           <strong className="text-ink"> where to start if you cannot do a single pull-up</strong>.
-          Semua hitungan berjalan di perangkat ini, tanpa mengirim data ke mana pun.
+          Every calculation runs on this device; nothing is sent anywhere.
         </p>
       </Card>
 
       <div className="flex flex-wrap gap-2">
         {([
-          ['lari', '🏃 Pace Lari'],
+          ['lari', '🏃 Running Pace'],
           ['kalistenik', '💪 Push/Pull/Sit-Up'],
-          ['postur', '🧍 Koreksi Postur'],
-          ['peregangan', '🧘 Peregangan'],
-          ['jadwal', '🗓️ Susunan Seminggu'],
+          ['postur', '🧍 Posture Correction'],
+          ['peregangan', '🧘 Stretching'],
+          ['jadwal', '🗓️ Weekly Layout'],
         ] as [Tab, string][]).map(([k, label]) => (
           <button
             key={k}
@@ -73,7 +73,7 @@ export function BaseTraining() {
       {tab === 'jadwal' && <ScheduleTab />}
 
       <Card>
-        <SectionTitle icon={<IconHeart />} title="Aturan yang paling sering dilanggar" />
+        <SectionTitle icon={<IconHeart />} title="The rules most often broken" />
         <div className="space-y-3 mt-2">
           {RULES.map((r) => (
             <div key={r.judul} className="rounded-lg border border-white/10 bg-white/[0.03] p-3">
@@ -105,10 +105,10 @@ function RunTab() {
   return (
     <div className="space-y-4">
       <Card>
-        <SectionTitle icon={<IconTimer />} title="Training pace calculator" subtitle="Dari pace lomba Anda, tentukan pace untuk tiap jenis lari" />
+        <SectionTitle icon={<IconTimer />} title="Training pace calculator" subtitle="From your race pace, work out the pace for each kind of run" />
 
         <div className="flex gap-2 mt-3 mb-3">
-          {([['pace', 'Saya tahu pace lomba'], ['waktu', 'Saya tahu waktu lari terakhir']] as ['pace' | 'waktu', string][]).map(([k, l]) => (
+          {([['pace', 'I know my race pace'], ['waktu', 'I know my last run time']] as ['pace' | 'waktu', string][]).map(([k, l]) => (
             <button
               key={k}
               onClick={() => setMode(k)}
@@ -141,7 +141,7 @@ function RunTab() {
         {result && (
           <>
             <div className="mt-4 text-sm text-neutral-500">
-              Pace acuan: <span className="text-ink font-semibold">{fmtPace(result.race)}</span> /km
+              Reference pace: <span className="text-ink font-semibold">{fmtPace(result.race)}</span> /km
               {result.clamped && (
                 <span className="ml-2 text-amber-300">
                   (di luar rentang tabel 3:00-6:00 — angka diambil dari baris terdekat)
@@ -164,13 +164,13 @@ function RunTab() {
               })}
             </div>
 
-            <Prosa kelas="text-xs text-slate-500 mt-3">Estimasi mengikuti kerangka VDOT (Jack Daniels' Running Formula), diinterpolasi di antara baris tabel. Angka ini titik awal, bukan aturan mati — sesuaikan dengan rasa dan cuaca.</Prosa>
+            <Prosa kelas="text-xs text-slate-500 mt-3">Estimates follow the VDOT framework (Jack Daniels' Running Formula), interpolated between table rows. These are a starting point, not a fixed rule — adjust for how you feel and for the weather.</Prosa>
           </>
         )}
       </Card>
 
       <Card>
-        <SectionTitle icon={<IconRun />} title="Four kinds of run, four different purposes" subtitle="Jangan berlari sekuat tenaga pada tiap sesi" />
+        <SectionTitle icon={<IconRun />} title="Four kinds of run, four different purposes" subtitle="Do not run every session flat out" />
         <div className="space-y-3 mt-2">
           {RUN_ZONES.map((z) => (
             <div key={z.key} className="rounded-lg border border-white/10 bg-white/[0.03] p-3">
@@ -191,7 +191,7 @@ function RunTab() {
       </Card>
 
       <Card>
-        <SectionTitle title="Full pace table" subtitle="Untuk pace lomba 3:00–6:00 per km" />
+        <SectionTitle title="Full pace table" subtitle="For race paces of 3:00–6:00 per km" />
         <div className="overflow-x-auto mt-2">
           <table className="w-full text-sm min-w-[520px]">
             <thead>
@@ -226,9 +226,9 @@ function CalisthenicsTab() {
     <div className="space-y-4">
       <Card>
         <p className="text-sm text-neutral-600 leading-relaxed">
-          Tangga di bawah menggantikan resep "3×10" yang tidak berarti apa-apa bila satu repetisi penuh pun belum bisa,
-          dan tidak menantang bila sudah bisa tiga puluh. <strong className="text-ink">Mulai dari tingkat yang bisa
-          Anda kerjakan hari ini</strong>, dan naik hanya setelah syaratnya terpenuhi.
+          The ladder below replaces the "3×10" prescription, which means nothing if you cannot do a single full
+          repetition and is no challenge once you can do thirty. <strong className="text-ink">Start at the level you
+          can actually do today</strong>, and move up only once the criteria are met.
         </p>
       </Card>
       {LADDERS.map((l) => <LadderCard key={l.key} ladder={l} />)}
@@ -288,18 +288,18 @@ function PostureTab() {
   return (
     <div className="space-y-4">
       <Card>
-        <SectionTitle icon={<IconActivity />} title="Mengapa postur rusak, dan apa yang sebenarnya perlu dibenahi" />
+        <SectionTitle icon={<IconActivity />} title="Why posture breaks down, and what actually needs fixing" />
         <p className="text-sm text-neutral-600 mt-2 leading-relaxed">
-          Berdiri membungkuk maupun duduk berjam-jam menghasilkan pola yang dapat diprediksi:
-          <strong className="text-ink"> the front shortens and the back weakens</strong> — dada dan otot leher
-          depan menarik bahu ke depan, sementara rhomboid serta trapezius bawah yang seharusnya menahan belikat justru
-          kehilangan kekuatan. Karena itu programnya berpasangan: regangkan yang memendek, kuatkan yang melemah.
-          Mengerjakan salah satunya saja jarang mengubah apa pun.
+          Slouching, or sitting for hours, produces a predictable pattern:
+          <strong className="text-ink"> the front shortens and the back weakens</strong> — the chest and the
+          front neck muscles pull the shoulders forward, while the rhomboids and lower trapezius that should hold
+          the shoulder blades lose strength. That is why the programme comes in pairs: stretch what shortened,
+          strengthen what weakened. Doing only one of the two rarely changes anything.
         </p>
         <p className="text-sm text-neutral-500 mt-3 leading-relaxed">
-          Yang perlu diluruskan: postur bukan soal menemukan satu posisi sempurna lalu mempertahankannya. Kerusakan
-          datang dari <strong className="text-ink">how long you stay in one position</strong>, bukan dari posisi itu
-          sendiri — sehingga sering berpindah posisi lebih menentukan daripada duduk "benar" selama enam jam.
+          One thing worth correcting: posture is not about finding a single perfect position and holding it. The
+          damage comes from <strong className="text-ink">how long you stay in one position</strong>, not from the
+          position itself — so changing position often matters more than sitting "correctly" for six hours.
         </p>
       </Card>
 
@@ -339,7 +339,7 @@ function ScheduleTab() {
 
   return (
     <Card>
-      <SectionTitle icon={<IconTimer />} title="Bagaimana satu pekan disusun" subtitle="Memadukan lari, kalistenik, dan pemulihan" />
+      <SectionTitle icon={<IconTimer />} title="How a week is put together" subtitle="Combining running, calisthenics and recovery" />
 
       <div className="flex gap-2 mt-3">
         {([3, 4, 5] as const).map((n) => (
@@ -365,9 +365,9 @@ function ScheduleTab() {
       </div>
 
       <p className="text-sm text-neutral-500 mt-4 leading-relaxed">
-        Susunan ini menyisakan minimal dua hari pemulihan. Bila jam tidur sedang kacau karena jaga malam,
-        <strong className="text-ink"> cut the number of sessions rather than forcing them all in</strong> — berlatih dengan
-        kurang tidur memberi hasil yang lebih buruk daripada berlatih lebih sedikit dengan tidur cukup.
+        This layout leaves at least two recovery days. If your sleep is disrupted by night shifts,
+        <strong className="text-ink"> cut the number of sessions rather than forcing them all in</strong> — training
+        short of sleep gives worse results than training less with enough of it.
       </p>
     </Card>
   )
@@ -396,7 +396,7 @@ function StretchTab() {
   return (
     <div className="space-y-4">
       <Card>
-        <SectionTitle icon={<IconActivity />} title="Empat hal yang menentukan peregangan berhasil atau sia-sia" />
+        <SectionTitle icon={<IconActivity />} title="Four things that decide whether stretching works or is wasted" />
         <p className="text-sm text-neutral-600 mt-2 leading-relaxed">
           The most common mistake is not the choice of movement but
           <strong className="text-ink"> when</strong>,
@@ -419,7 +419,7 @@ function StretchTab() {
       <DoseCalculator />
 
       <Card>
-        <SectionTitle icon={<IconTimer />} title="Ready-made routines" subtitle="Empat saat yang berbeda menuntut jenis peregangan yang berbeda" />
+        <SectionTitle icon={<IconTimer />} title="Ready-made routines" subtitle="Four different moments call for four different kinds of stretching" />
         <div className="space-y-3 mt-2">
           {ROUTINES.map((r) => (
             <div key={r.key} className="rounded-lg border border-white/10 bg-white/[0.03] p-3">
@@ -443,7 +443,7 @@ function StretchTab() {
       </Card>
 
       <Card>
-        <SectionTitle icon={<IconRun />} title="By muscle group" subtitle="Posisi, di mana seharusnya terasa, dan kekeliruan yang paling sering" />
+        <SectionTitle icon={<IconRun />} title="By muscle group" subtitle="The position, where it should be felt, and the most common mistakes" />
 
         <div className="flex flex-wrap gap-2 mt-3">
           {([['semua', 'All'], ['atas', 'Upper body'], ['inti', 'Hips & trunk'], ['bawah', 'Legs']] as [Wilayah | 'semua', string][]).map(([k, l]) => (
@@ -527,10 +527,10 @@ function StretchTab() {
       </Card>
 
       <Card>
-        <SectionTitle icon={<IconHeart />} title="Hentikan peregangan dan periksakan diri bila ada tanda ini" />
+        <SectionTitle icon={<IconHeart />} title="Stop stretching and get checked if these appear" />
         <p className="text-sm text-neutral-500 mt-2 leading-relaxed">
-          Tanda-tanda berikut bukan masalah kelenturan. Meregangkannya lebih jauh tidak menolong dan dapat
-          memperburuk keadaan.
+          The following are not flexibility problems. Stretching further will not help and may make things
+          worse.
         </p>
         <ul className="mt-2 space-y-1.5">
           {RED_FLAGS.map((f) => (
@@ -541,8 +541,8 @@ function StretchTab() {
           ))}
         </ul>
         <p className="text-xs text-slate-500 mt-3 leading-relaxed">
-          Isi halaman ini adalah edukasi latihan untuk orang sehat, bukan terapi untuk cedera maupun nyeri yang
-          sedang berlangsung.
+          The content of this page is training education for healthy people, not therapy for an injury or for pain
+          you currently have.
         </p>
       </Card>
     </div>
@@ -565,8 +565,8 @@ function DoseCalculator() {
     <Card>
       <SectionTitle
         icon={<IconTimer />}
-        title="Sudah cukupkah takaran peregangan Anda"
-        subtitle="Yang menentukan hasilnya adalah total waktu per otot per pekan, bukan seberapa dalam Anda menarik"
+        title="Are you stretching enough?"
+        subtitle="What decides the outcome is total time per muscle per week, not how hard you pull"
       />
 
       <div className="grid grid-cols-3 gap-3 mt-3">
