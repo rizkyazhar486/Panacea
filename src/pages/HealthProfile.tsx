@@ -193,7 +193,7 @@ export function HealthProfile() {
       if (!keys.length) {
         setNote('')
         setErr(gambar
-          ? 'Tidak ada angka yang terbaca dari gambar itu. Pastikan seluruh daftar terlihat dan tidak terpotong, lalu coba lagi.'
+          ? 'No numbers could be read from that image. Make sure the whole list is visible and not cut off, then try again.'
           : 'No recognizable data found in that file. Try export.xml (Apple Health), physiological_cycles.csv (WHOOP), or a JSON export from WHOOP/Garmin Connect.')
         return
       }
@@ -225,8 +225,8 @@ export function HealthProfile() {
       const wBaru = mergeWorkouts(w)
       const nBaru = mergeHrNotifications(n)
       const extra = [
-        wBaru ? `${wBaru} latihan baru` : '',
-        nBaru ? `${nBaru} peringatan denyut` : '',
+        wBaru ? `${wBaru} new workouts` : '',
+        nBaru ? `${nBaru} heart-rate alerts` : '',
       ].filter(Boolean).join(', ')
 
       setNote(`Filled from ${r.source}: ${keys.length} values — now shared across the app.${extra ? ` Plus ${extra}.` : ''} Review, then press Save.`)
@@ -234,8 +234,8 @@ export function HealthProfile() {
       setNote('')
       const m = (e as Error)?.message
       setErr(m === 'ai_not_configured'
-        ? 'Membaca gambar memerlukan AI yang belum aktif di server ini. Sementara itu, isi angkanya manual di bawah.'
-        : m === 'ai_failed' ? 'Gagal membaca gambar. Coba lagi, atau isi angkanya manual di bawah.'
+        ? 'Reading an image needs AI, which is not enabled on this server. In the meantime, enter the numbers by hand below.'
+        : m === 'ai_failed' ? 'Could not read that image. Try again, or enter the numbers by hand below.'
         : 'Failed to read the file.')
     } finally {
       if (fileRef.current) fileRef.current.value = ''
@@ -270,7 +270,7 @@ export function HealthProfile() {
       <Card className="!p-5">
         <SectionTitle icon={<IconHeart size={20} />} title="My Health Data"
           subtitle={backendEnabled ? 'Saved on the server per account — follows you across all devices' : 'Saved on this device (server not active)'} />
-        <Prosa kelas="mt-1 text-[11px] leading-relaxed text-neutral-500">Apple Watch tersinkron langsung; Garmin dan WHOOP diimpor dari berkas yang Anda ekspor lalu unggah; selebihnya dapat diisi dengan tangan. Apa pun yang Anda isi di sini langsung mengalir ke seluruh kalkulator kebugaran &amp; umur panjang di aplikasi ini.</Prosa>
+        <Prosa kelas="mt-1 text-[11px] leading-relaxed text-neutral-500">Apple Watch syncs directly; Garmin and WHOOP are imported from a file you export and upload; everything else can be filled in by hand. Whatever you enter here flows straight into every fitness and longevity calculator in the app.</Prosa>
         <div className="mt-3">
           <div className="text-xs font-semibold uppercase tracking-wide text-neutral-500">Data Source</div>
           <div className="mt-1.5 flex flex-wrap gap-1.5">
@@ -287,22 +287,21 @@ export function HealthProfile() {
 
       {/* Import from / export to a file */}
       <Card className="!p-5">
-        <SectionTitle icon={<IconActivity size={20} />} title="Import & Export" subtitle="Apple Health .xml · Health Auto Export .json · InBody .csv · WHOOP/Garmin .csv/.json · tangkapan layar timbangan .jpg/.png" />
+        <SectionTitle icon={<IconActivity size={20} />} title="Import & Export" subtitle="Apple Health .xml · Health Auto Export .json · InBody .csv · WHOOP/Garmin .csv/.json · scale screenshot .jpg/.png" />
         <p className="mt-1 text-[11px] leading-relaxed text-neutral-500">
-          <b>Apple Watch</b> can auto-sync below. <b>Garmin dan WHOOP tidak menyediakan sambungan sinkron langsung</b>,
+          <b>Apple Watch</b> can auto-sync below. <b>Garmin and WHOOP offer no direct sync connection</b>,
           so export your data from the Garmin Connect or WHOOP app and upload the file here — the
           fields fill in automatically, and you'll see exactly what was found before saving.
         </p>
         <p className="mt-1 text-[11px] leading-relaxed text-neutral-500">
-          <b>Timbangan pintar (Moving Life, Xiaomi dan sekelasnya)</b> sering tidak punya tombol
-          ekspor sama sekali — unggah saja <b>tangkapan layar</b> laporannya dan angkanya dibaca
-          otomatis.
+          <b>Smart scales (Moving Life, Xiaomi and the like)</b> often have no export button at all —
+          just upload a <b>screenshot</b> of the report and the numbers are read automatically.
         </p>
         <p className="mt-1 text-[11px] leading-relaxed text-amber-600 dark:text-amber-700">
-          Berkas .xml/.csv/.json diproses di perangkat Anda dan tidak pernah diunggah.
-          <b> Tangkapan layar berbeda:</b> gambarnya dikirim ke server untuk dibaca, karena
-          pembacaan huruf memerlukan model penglihatan. Kalau laporan itu memuat nama atau hal lain
-          yang tidak ingin Anda kirim, potong dulu bagian itu sebelum mengunggah.
+          .xml/.csv/.json files are processed on your device and never uploaded.
+          <b> Screenshots are different:</b> the image is sent to the server to be read, because
+          text recognition needs a vision model. If the report contains a name or anything else you
+          would rather not send, crop that part out before uploading.
         </p>
         <div className="mt-3 flex flex-wrap items-center gap-2">
           <input ref={fileRef} type="file" accept=".xml,.csv,.json,.jpg,.jpeg,.png,.webp,text/xml,text/csv,application/json,image/*" className="hidden" onChange={(e) => onImport(e.target.files?.[0])} />
@@ -333,7 +332,7 @@ export function HealthProfile() {
       </Card>
 
       <Card className="!p-5">
-        <SectionTitle icon={<IconHeart size={20} />} title="Cardio, Recovery & HRV" subtitle="Dari jam tangan/cincin atau dari sebuah tes" />
+        <SectionTitle icon={<IconHeart size={20} />} title="Cardio, Recovery & HRV" subtitle="From a watch or ring, or from a test" />
         <div className="mt-2 grid grid-cols-2 gap-3 sm:grid-cols-3">
           {num('VO₂max (ml/kg/min)', 'vo2max', 0.1, 'e.g. 42')}
           {num('Resting HR (bpm)', 'restingHr', 1, 'e.g. 58')}
@@ -356,7 +355,7 @@ export function HealthProfile() {
       </Card>
 
       <Card className="!p-5">
-        <SectionTitle icon={<IconActivity size={20} />} title="Body Composition" subtitle="Dari timbangan pintar / InBody" />
+        <SectionTitle icon={<IconActivity size={20} />} title="Body Composition" subtitle="From a smart scale or InBody" />
         <div className="mt-2 grid grid-cols-2 gap-3 sm:grid-cols-3">
           {num('Body fat (%)', 'bodyFatPct', 0.1, 'e.g. 18')}
           {num('Muscle mass (kg)', 'muscleMassKg', 0.1)}
@@ -438,7 +437,7 @@ function BenchmarkCard({ profile }: { profile: HealthProfile }) {
 
   return (
     <Card className="!p-5">
-      <SectionTitle icon={<IconHeart size={20} />} title="Bandingkan dengan Populasi Umum" subtitle="Estimate based on age & sex norms" />
+      <SectionTitle icon={<IconHeart size={20} />} title="Compare With the General Population" subtitle="Estimate based on age & sex norms" />
       <div className="mt-3 space-y-4">
         {items.map((it) => (
           <div key={it.key}>
@@ -464,7 +463,7 @@ function TrendChart({ history }: { history: Snapshot[] }) {
   if (history.length < 2) {
     return (
       <Card className="!p-5">
-        <SectionTitle icon={<IconActivity size={20} />} title="Trends" subtitle="Grafik muncul setelah tersimpan ≥2 kali" />
+        <SectionTitle icon={<IconActivity size={20} />} title="Trends" subtitle="The chart appears after ≥2 saves" />
         <p className="mt-1 text-[11px] text-neutral-500">Save your data regularly (e.g. every morning) to track your VO₂max, HRV, and resting HR over time.</p>
       </Card>
     )
@@ -537,7 +536,7 @@ function DeviceSyncSummary({ profile }: { profile: HealthProfile }) {
   // Beberapa nilai tidak berasal dari katalog (tidur punya bentuk sampel
   // sendiri), jadi ditambahkan terpisah agar tidak hilang.
   const tambahan: KatalogMetrik[] = typeof blob.sleepH === 'number' && (blob.sleepH as number) > 0
-    ? [{ kunci: 'sleepH', label: 'Durasi tidur', kategori: 'Tidur', satuan: 'jam' }]
+    ? [{ kunci: 'sleepH', label: 'Sleep duration', kategori: 'Sleep', satuan: 'h' }]
     : []
   const daftar = [...terisi, ...tambahan]
 
@@ -561,8 +560,8 @@ function DeviceSyncSummary({ profile }: { profile: HealthProfile }) {
   return (
     <Card className="!p-5">
       <div className="flex items-center justify-between gap-3">
-        <SectionTitle icon={<IconActivity size={20} />} title="Tersinkron dari Perangkat Anda"
-          subtitle={`${profile.deviceSyncSource ?? 'Device'} · ${daftar.length} metrik terisi otomatis`} />
+        <SectionTitle icon={<IconActivity size={20} />} title="Synced From Your Device"
+          subtitle={`${profile.deviceSyncSource ?? 'Device'} · ${daftar.length} metrics filled in automatically`} />
         <span className="flex shrink-0 items-center gap-1.5 rounded-full bg-brand-50 px-2.5 py-1 text-[10px] font-bold text-brand-dark">
           <span className="h-2 w-2 rounded-full bg-brand vital-dot" /> {ago}
         </span>
@@ -588,12 +587,12 @@ function DeviceSyncSummary({ profile }: { profile: HealthProfile }) {
           {kategoriTampil.length > 3 && (
             <button onClick={() => setSemua(!semua)}
               className="mt-3 w-full rounded-xl bg-neutral-100 py-2 text-[12px] font-bold text-ink dark:bg-white/10 dark:text-white">
-              {semua ? 'Tampilkan lebih sedikit' : `Tampilkan ${kategoriTampil.length - 3} kategori lainnya`}
+              {semua ? 'Show fewer' : `Show ${kategoriTampil.length - 3} more categories`}
             </button>
           )}
         </>
       ) : (
-        <Prosa kelas="mt-2 text-xs text-neutral-500">Perangkat tersambung, tetapi sinkronisasi ini tidak membawa metrik yang cocok — perluas Date Range di Health Auto Export dan angkanya akan terisi di sini.</Prosa>
+        <Prosa kelas="mt-2 text-xs text-neutral-500">The device is connected, but this sync carried no matching metrics — widen the Date Range in Health Auto Export and the numbers will fill in here.</Prosa>
       )}
     </Card>
   )
@@ -637,10 +636,10 @@ function AutoSyncCard() {
 
   async function rotate() {
     if (!confirm(
-      'Buat tautan sinkronisasi baru?\n\n'
-      + 'Tautan LAMA langsung berhenti bekerja. Sampai Anda menempelkan tautan baru ke Health Auto Export, '
-      + 'tidak ada data dari iPhone yang masuk.\n\n'
-      + 'Lakukan ini bila tautan Anda pernah terkirim ke orang lain, tertangkap layar, maupun tertempel di tempat umum.'
+      'Create a new sync link?\n\n'
+      + 'The OLD link stops working immediately. Until you paste the new one into Health Auto Export, '
+      + 'no data from your iPhone will arrive.\n\n'
+      + 'Do this if your link was ever sent to someone else, captured in a screenshot, or pasted somewhere public.'
     )) return
     setBaruDiputar(false)
     setBusy(true)
@@ -655,7 +654,7 @@ function AutoSyncCard() {
 
   return (
     <Card className="!p-5">
-      <SectionTitle icon={<IconHeart size={20} />} title="Sinkron Otomatis dari Apple Watch" subtitle="Lewat aplikasi pihak ketiga “Health Auto Export”" />
+      <SectionTitle icon={<IconHeart size={20} />} title="Automatic Sync From Apple Watch" subtitle="Via the third-party app “Health Auto Export”" />
       <p className="mt-1 text-[11px] leading-relaxed text-neutral-500">
         A website can't read Apple Health directly — that's an Apple restriction, native apps only. The closest thing to "automatic": install the <b>Health Auto Export</b> app (App Store, one-time purchase) on your iPhone, then point it at your private link below.
       </p>
@@ -667,15 +666,15 @@ function AutoSyncCard() {
           <span className="text-[12px] font-bold text-neutral-600 dark:text-neutral-300">Server Panaceamed</span>
           <div className="flex items-center gap-2">
             <Badge tone={conn === 'up' ? 'normal' : conn === 'down' ? 'critical' : 'low'}>
-              {conn === 'up' ? 'Terhubung' : conn === 'down' ? 'Tidak merespons' : 'Memeriksa…'}
+              {conn === 'up' ? 'Connected' : conn === 'down' ? 'Not responding' : 'Checking…'}
             </Badge>
             <button onClick={checkConnection} className="text-[11px] font-bold text-brand-dark hover:underline">Cek ulang</button>
           </div>
         </div>
         <div className="mt-1.5 flex items-center justify-between gap-2">
-          <span className="text-[12px] font-bold text-neutral-600 dark:text-neutral-300">Kiriman terakhir dari perangkat</span>
+          <span className="text-[12px] font-bold text-neutral-600 dark:text-neutral-300">Last delivery from the device</span>
           <span className="text-[12px] font-black text-ink dark:text-ink">
-            {lastSync ? timeAgoShort(new Date(lastSync)) : "belum pernah"}
+            {lastSync ? timeAgoShort(new Date(lastSync)) : "never"}
           </span>
         </div>
         {conn === 'down' && (
@@ -685,7 +684,7 @@ function AutoSyncCard() {
           </p>
         )}
         {conn === 'up' && !lastSync && (
-          <Prosa kelas="mt-2 text-[11px] leading-relaxed text-neutral-500">Server sehat, tetapi belum pernah menerima kiriman dari perangkat Anda. Artinya masalahnya ada di sisi iPhone — URL, izin Health, atau otomatisasi yang belum berjalan — bukan di server.</Prosa>
+          <Prosa kelas="mt-2 text-[11px] leading-relaxed text-neutral-500">The server is healthy but has never received a delivery from your device. That places the problem on the iPhone side — the URL, Health permissions, or an automation that has not run — not on the server.</Prosa>
         )}
       </div>
 
@@ -704,12 +703,12 @@ function AutoSyncCard() {
 
       {baruDiputar && (
         <div className="mt-3 rounded-xl border border-amber-300 bg-amber-50 p-3 dark:border-amber-500/30 dark:bg-amber-500/10">
-          <div className="text-[12px] font-black text-amber-800 dark:text-amber-300">Tautan baru dibuat — sinkronisasi Anda sekarang MATI</div>
+          <div className="text-[12px] font-black text-amber-800 dark:text-amber-300">New link created — your sync is now OFF</div>
           <ol className="mt-1.5 list-decimal space-y-1 pl-4 text-[12px] leading-relaxed text-amber-900 dark:text-amber-100/90">
-            <li>Tekan <b>Copy</b> pada tautan baru di atas.</li>
-            <li>Buka Health Auto Export → otomatisasi Anda → <b>kosongkan kolom URL</b>, tempel sekali.</li>
-            <li>Tekan <b>Update</b> di kanan atas, lalu <b>Manual Export</b> sekali.</li>
-            <li>Ulangi untuk setiap otomatisasi yang memakai tautan ini.</li>
+            <li>Press <b>Copy</b> on the new link above.</li>
+            <li>Open Health Auto Export → your automation → <b>clear the URL field</b>, then paste once.</li>
+            <li>Press <b>Update</b> at the top right, then <b>Manual Export</b> once.</li>
+            <li>Repeat for every automation that uses this link.</li>
           </ol>
         </div>
       )}
@@ -725,7 +724,7 @@ function AutoSyncCard() {
         disabled={busy || !token}
         className="mt-3 w-full rounded-xl border border-rose-200 bg-rose-50 px-4 py-2.5 text-xs font-bold text-rose-700 transition hover:bg-rose-100 disabled:opacity-50 dark:border-rose-500/30 dark:bg-rose-500/10 dark:text-rose-300"
       >
-        {busy ? 'Memproses…' : '🔑 Buat tautan baru (bila tautan lama bocor)'}
+        {busy ? 'Working…' : '🔑 Create a new link (if the old one leaked)'}
       </button>
       <p className="mt-1 text-[10px] leading-relaxed text-neutral-500">
         Setelah ini tautan lama langsung tidak berlaku, dan Anda harus memperbarui URL di aplikasi
@@ -772,7 +771,7 @@ function SyncDiagnosticsCard() {
     setFileNote(`${f.name} · ${(f.size / 1e6).toFixed(2)} MB`)
     const r = new FileReader()
     r.onload = () => run(String(r.result ?? ''))
-    r.onerror = () => setFileNote('File tidak bisa dibaca. Coba salin isinya ke kotak di bawah.')
+    r.onerror = () => setFileNote('That file could not be read. Try pasting its contents into the box below.')
     r.readAsText(f)
   }
 
@@ -784,7 +783,7 @@ function SyncDiagnosticsCard() {
   return (
     <Card className="!p-5">
       <SectionTitle icon={<IconActivity size={20} />} title="Diagnostik Sinkronisasi"
-        subtitle="Cari tahu mengapa data dari iPhone Anda tidak sampai" />
+        subtitle="Work out why data from your iPhone is not arriving" />
       {!open ? (
         <button onClick={() => setOpen(true)}
           className="mt-3 w-full rounded-xl bg-neutral-100 px-4 py-3 text-sm font-bold text-neutral-700 transition hover:bg-neutral-200 dark:bg-white/10 dark:text-neutral-200">
@@ -794,7 +793,7 @@ function SyncDiagnosticsCard() {
         <>
           <p className="mt-2 text-[12px] leading-relaxed text-neutral-500">
             Pilih berkas ekspor apa pun secara langsung — <b>JSON</b> dari Health Auto Export,
-            <b> CSV</b> dari InBody maupun WHOOP, atau <b>XML</b> dari Apple Health.
+            <b> CSV</b> from InBody or WHOOP, or <b>XML</b> from Apple Health.
             Isinya diperiksa di perangkat Anda sendiri — tidak dikirim ke mana pun.
           </p>
 
@@ -805,7 +804,7 @@ function SyncDiagnosticsCard() {
           </Button>
           {fileNote && <p className="mt-1 text-[11px] text-neutral-500">{fileNote}</p>}
 
-          <Prosa kelas="mt-3 text-[11px] leading-relaxed text-neutral-500">Menempel isinya juga bisa, tapi file 7 hari bisa berukuran beberapa megabyte dan berat untuk browser di HP — memilih file jauh lebih aman.</Prosa>
+          <Prosa kelas="mt-3 text-[11px] leading-relaxed text-neutral-500">Pasting the contents also works, but a 7-day file can run to several megabytes and strains a phone browser — choosing the file is far safer.</Prosa>
           <textarea
             ref={taRef}
             className={inputClass + ' mt-1 h-28 font-mono !text-[10px]'}
@@ -828,7 +827,7 @@ function SyncDiagnosticsCard() {
               </div>
 
               <div className="rounded-xl bg-brand-50 p-3 dark:bg-brand/10">
-                <div className="text-[11px] font-black uppercase tracking-wide text-brand-dark">Yang perlu dilakukan</div>
+                <div className="text-[11px] font-black uppercase tracking-wide text-brand-dark">What to do</div>
                 <ol className="mt-1 list-decimal space-y-1 pl-4 text-[12px] leading-relaxed text-neutral-700 dark:text-neutral-200">
                   {d.actions.map((a, i) => <li key={i}>{a}</li>)}
                 </ol>
@@ -836,7 +835,7 @@ function SyncDiagnosticsCard() {
 
               {d.unknownNames.length > 0 && (
                 <div className="rounded-xl bg-rose-50 p-3 dark:bg-rose-500/10">
-                  <div className="text-[11px] font-black uppercase tracking-wide text-rose-700 dark:text-rose-300">Nama yang belum kami kenali</div>
+                  <div className="text-[11px] font-black uppercase tracking-wide text-rose-700 dark:text-rose-300">Names we do not recognise yet</div>
                   <p className="mt-1 break-all font-mono text-[10px] leading-relaxed text-neutral-700 dark:text-neutral-200">
                     {d.unknownNames.join(', ')}
                   </p>
