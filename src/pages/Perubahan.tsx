@@ -79,7 +79,7 @@ export function Perubahan() {
           <div className="mt-3 grid grid-cols-3 gap-2">
             <Angka label="Weeks reviewed" nilai={rk.ditinjau} />
             <Angka label="Avg days at minimum" nilai={rk.rerataHariMinimum} />
-            <Angka label="Pekan yang bergerak" nilai={rk.pekanMaju} />
+            <Angka label="The week that moves" nilai={rk.pekanMaju} />
           </div>
         </Card>
       )}
@@ -191,7 +191,7 @@ function Susun({
   return (
     <div className="mx-auto max-w-2xl space-y-4 pb-24">
       <SectionTitle icon={<IconChartUp />} title="Change"
-        subtitle="Dua belas pekan, satu komitmen, dan ukuran yang boleh berkata tidak" />
+        subtitle="Twelve weeks, one commitment, and a measure allowed to say no" />
 
       {langkah === 0 && (
         <Card>
@@ -273,12 +273,12 @@ function TinjauPekan({ pekan, onSimpan }: { pekan: number; onSimpan: (t: import(
             ))}
           </div>
         </div>
-        <Field label="Apa yang paling menghalangi?">
+        <Field label="What gets in the way most?">
           <input className={inputClass} value={halangan} aria-label="What got in the way"
             placeholder="Late meetings on Tuesdays" onChange={(e) => setHalangan(e.target.value)} />
         </Field>
-        <Field label="Satu perubahan untuk pekan depan">
-          <input className={inputClass} value={penyesuaian} aria-label="Satu perubahan untuk pekan depan"
+        <Field label="One change for next week">
+          <input className={inputClass} value={penyesuaian} aria-label="One change for next week"
             placeholder="Move Tuesday session to morning" onChange={(e) => setPenyesuaian(e.target.value)} />
         </Field>
         <Button onClick={() => onSimpan({

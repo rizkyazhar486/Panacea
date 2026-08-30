@@ -474,7 +474,7 @@ export const KURIKULUM: Blok[] = [
         sumber: [S.abms] },
       { id: 'sp-indonesia', judul: 'Indonesian specialist training, for comparison', blok: 'Specialty',
         mengapa: 'PPDS entry, collegium examinations and STR/SIP registration follow a different structure from the US pathway, and this app is used by people planning either — or both.',
-        sumber: [{ badan: 'Konsil Kedokteran Indonesia / Kementerian Kesehatan RI', nama: 'Peraturan registrasi dan pendidikan dokter spesialis', tautan: 'https://www.kemkes.go.id' }] },
+        sumber: [{ badan: 'Konsil Kedokteran Indonesia / Kementerian Kesehatan RI', nama: 'Regulation of specialist registration and training', tautan: 'https://www.kemkes.go.id' }] },
     ],
   },
 ]

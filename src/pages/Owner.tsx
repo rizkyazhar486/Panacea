@@ -74,7 +74,7 @@ export function Owner() {
           <SectionTitle
             icon={<IconShield size={20} />}
             title="Manage Admin Access"
-            subtitle="Hanya surel yang Anda izinkan di sini yang dapat masuk sebagai Admin."
+            subtitle="Only email addresses you allow here can sign in as Admin."
           />
           <div className="flex gap-2">
             <input
@@ -350,7 +350,7 @@ function UserDirectoryPanel() {
       <SectionTitle
         icon={<IconUsers size={20} />}
         title="User Directory"
-        subtitle="Semua akun yang mendaftar, bertransaksi, & berlangganan"
+        subtitle="Every account that registers, transacts and subscribes"
         right={<Badge tone="brand">{rows?.length ?? 0} accounts</Badge>}
       />
       {err && <p className="mb-2 text-xs text-accent">{err}</p>}
@@ -417,7 +417,7 @@ function FeedbackInboxPanel() {
       <SectionTitle
         icon={<span className="text-xl">💬</span>}
         title="User Messages & Suggestions"
-        subtitle="Masukan yang dikirim langsung dari aplikasi"
+        subtitle="Feedback sent directly from the app"
         right={<Badge tone={unread.length ? 'high' : 'brand'}>{unread.length} unread</Badge>}
       />
       {err && <p className="mb-2 text-xs text-accent">{err}</p>}
@@ -622,7 +622,7 @@ function BroadcastPanel() {
   if (!backendEnabled) return null
   return (
     <Card>
-      <SectionTitle icon={<IconBell size={20} />} title="Send Announcement (Push)" subtitle="Pemberitahuan kepada semua pengguna yang berlangganan & mengizinkan siaran" />
+      <SectionTitle icon={<IconBell size={20} />} title="Send Announcement (Push)" subtitle="A notification to every user who is subscribed and has allowed broadcasts" />
       <div className="space-y-2">
         <input className={inputClass} value={title} onChange={(e) => setTitle(e.target.value)} placeholder="Title (e.g. Service Update)" maxLength={60} />
         <textarea className={`${inputClass} min-h-[72px]`} value={body} onChange={(e) => setBody(e.target.value)} placeholder="Announcement content…" maxLength={180} />
@@ -669,7 +669,7 @@ function DoctorVerifyPanel() {
       <SectionTitle
         icon={<IconShield size={20} />}
         title="Doctor STR Verification"
-        subtitle="Periksa STR/SIP sebelum memberi akses AI-EMR (UU Kesehatan)"
+        subtitle="Check practice and licence numbers before granting AI-EMR access (Health Act)"
         right={docs ? <Badge tone={pending.length ? 'high' : 'brand'}>{pending.length} pending</Badge> : undefined}
       />
       {err && <p className="text-sm text-accent">{err}</p>}

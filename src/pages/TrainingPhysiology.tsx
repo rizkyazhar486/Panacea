@@ -121,9 +121,9 @@ export function TrainingPhysiology() {
   if (!workouts.length) {
     return (
       <div className="space-y-4">
-        <SectionTitle icon={<IconActivity />} title="Training Physiology" subtitle="Beban, status, pemulihan, dan kesiapan" />
+        <SectionTitle icon={<IconActivity />} title="Training Physiology" subtitle="Load, status, recovery and readiness" />
         <Card>
-          <Prosa kelas="text-sm text-neutral-600 leading-relaxed">Belum ada sesi latihan tersimpan. Seluruh halaman ini dihitung dari deret detak jantung tiap sesi, jadi tidak ada yang bisa ditampilkan sebelum ada sesi yang masuk.</Prosa>
+          <Prosa kelas="text-sm text-neutral-600 leading-relaxed">No training sessions stored yet. Everything on this page is computed from the heart-rate trace of each session, so there is nothing to show until sessions arrive.</Prosa>
           <p className="mt-2 text-sm text-neutral-500 leading-relaxed">
             Turn on <strong className="text-ink">Include Workouts</strong> in Health Auto Export, then
             sync. The instructions are in{' '}
@@ -287,11 +287,11 @@ export function TrainingPhysiology() {
               <span className="text-sm font-semibold text-ink">Lactate threshold heart rate (LTHR)</span>
               <span className="text-lg font-semibold tabular-nums text-ink">
                 {lthr.lthr != null ? `${lthr.lthr} bpm` : '—'}
-                {lthr.pctHrMax != null && <span className="ml-1 text-xs text-slate-500">{lthr.pctHrMax}% HRmaks</span>}
+                {lthr.pctHrMax != null && <span className="ml-1 text-xs text-slate-500">{lthr.pctHrMax}% HRmax</span>}
               </span>
             </div>
             <p className="mt-1 text-sm leading-relaxed text-neutral-500">{lthr.metode}</p>
-            <Prosa kelas="mt-1.5 text-sm leading-relaxed text-neutral-500">Di atas ambang ini kelelahan menumpuk jauh lebih cepat dan performa cepat menurun. Inilah batas yang memisahkan &quot;berat tapi terkendali&quot; dari &quot;tidak bisa dipertahankan&quot;.</Prosa>
+            <Prosa kelas="mt-1.5 text-sm leading-relaxed text-neutral-500">Above this threshold, fatigue accumulates far faster and performance falls away quickly. This is the line separating &quot;hard but controlled&quot; from &quot;not sustainable&quot;.</Prosa>
           </div>
 
           <div className="rounded-lg border border-white/10 bg-white/[0.03] p-3">
@@ -325,19 +325,19 @@ export function TrainingPhysiology() {
 
       {/* Dasar perhitungan */}
       <Card>
-        <SectionTitle icon={<IconActivity />} title="Angka-angka ini dibangun di atas apa" />
+        <SectionTitle icon={<IconActivity />} title="What these numbers are built on" />
         <p className="mt-2 text-sm leading-relaxed text-neutral-600">
           Garmin derives load from <b>EPOC</b> estimated through Firstbeat's proprietary model, using
           second-by-second heart rate along with beat-to-beat variability. An Apple Watch does not expose data
           at that resolution, so this page <b>does not claim to compute EPOC</b>.
         </p>
         <p className="mt-2 text-sm leading-relaxed text-neutral-500">
-          Yang dipakai adalah <b>TRIMP (Banister)</b> — ukuran beban berbasis detak jantung yang sudah lama
-          dipakai di lapangan maupun penelitian, dengan pembobotan eksponensial sehingga satu menit intensitas
-          tinggi dihitung jauh lebih berat daripada satu menit ringan. Angkanya <b>tidak sebanding dengan angka
-          Garmin</b>; yang bermakna adalah kecenderungannya pada diri Anda sendiri.
+          What is used instead is <b>TRIMP (Banister)</b> — a heart-rate-based load measure long used in both
+          the field and the literature, with exponential weighting so that a minute at high intensity counts far
+          more heavily than a minute of easy work. The numbers are <b>not comparable with Garmin's</b>; what
+          matters is the trend within your own data.
         </p>
-        <Prosa kelas="mt-2 text-sm leading-relaxed text-neutral-500">Nisbah beban 7:28 hari dipakai luas, namun bukti bahwa ia meramalkan cedera masih diperdebatkan. Ia dipakai di sini sebagai penanda perubahan, bukan sebagai ramalan.</Prosa>
+        <Prosa kelas="mt-2 text-sm leading-relaxed text-neutral-500">The 7:28-day load ratio is widely used, but the evidence that it predicts injury is still contested. It is used here as a marker of change, not as a prediction.</Prosa>
       </Card>
 
       <KartuBelumDariJam />
@@ -376,8 +376,8 @@ function KartuBelumDariJam() {
    */
   return (
     <Card>
-      <SectionTitle icon={<IconTimer />} title="Yang tidak berasal dari jam tangan"
-        subtitle="Itu bukan berarti tidak ada — masing-masing berdiri sebagai alatnya sendiri" />
+      <SectionTitle icon={<IconTimer />} title="What does not come from the watch"
+        subtitle="That does not mean it is missing — each one stands as its own tool" />
       <p className="mt-2 text-sm leading-relaxed text-neutral-500">
         {UNAVAILABLE.length} things <strong className="text-ink">cannot be computed from an Apple Watch export</strong> —
         which is not the same as being impossible. <strong className="text-ink">{tersedia} of them already exist</strong> as
