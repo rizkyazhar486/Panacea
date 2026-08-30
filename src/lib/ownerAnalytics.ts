@@ -38,48 +38,48 @@ export function auditSeo(i: SeoInput): { findings: SeoFinding[]; score: number }
   const f: SeoFinding[] = []
 
   const tl = i.title.trim().length
-  f.push(tl === 0 ? { area: 'Title tag', status: 'kritis', detail: 'Tidak ada title.', fix: 'Tulis title 50-60 karakter yang memuat kata kunci utama di bagian depan.' }
-    : tl < 30 ? { area: 'Title tag', status: 'perlu diperbaiki', detail: `Terlalu pendek (${tl} karakter).`, fix: 'Perpanjang ke 50-60 karakter.' }
-    : tl > 60 ? { area: 'Title tag', status: 'perlu diperbaiki', detail: `Terlalu panjang (${tl} karakter) sehingga terpotong di hasil pencarian.`, fix: 'Pangkas ke 50-60 karakter.' }
-    : { area: 'Title tag', status: 'baik', detail: `${tl} karakter — panjangnya pas.` })
+  f.push(tl === 0 ? { area: 'Title tag', status: 'kritis', detail: 'No title at all.', fix: 'Write a 50–60 character title with the main keyword near the front.' }
+    : tl < 30 ? { area: 'Title tag', status: 'perlu diperbaiki', detail: `Too short (${tl} characters).`, fix: 'Extend it to 50–60 characters.' }
+    : tl > 60 ? { area: 'Title tag', status: 'perlu diperbaiki', detail: `Too long (${tl} characters), so it gets truncated in search results.`, fix: 'Trim it to 50–60 characters.' }
+    : { area: 'Title tag', status: 'baik', detail: `${tl} characters — a good length.` })
 
   const dl = i.metaDescription.trim().length
-  f.push(dl === 0 ? { area: 'Meta description', status: 'perlu diperbaiki', detail: 'Kosong — mesin pencari akan mengarang cuplikan sendiri.', fix: 'Tulis 120-158 karakter yang menjelaskan isi halaman dan mengundang klik.' }
-    : dl > 158 ? { area: 'Meta description', status: 'perlu diperbaiki', detail: `Terlalu panjang (${dl}), akan terpotong.`, fix: 'Pangkas ke bawah 158 karakter.' }
-    : { area: 'Meta description', status: 'baik', detail: `${dl} karakter.` })
+  f.push(dl === 0 ? { area: 'Meta description', status: 'perlu diperbaiki', detail: 'Empty — search engines will invent their own snippet.', fix: 'Write 120–158 characters that describe the page and invite a click.' }
+    : dl > 158 ? { area: 'Meta description', status: 'perlu diperbaiki', detail: `Too long (${dl}); it will be truncated.`, fix: 'Trim it below 158 characters.' }
+    : { area: 'Meta description', status: 'baik', detail: `${dl} characters.` })
 
-  f.push(i.h1Count === 1 ? { area: 'Struktur heading', status: 'baik', detail: 'Tepat satu H1.' }
-    : i.h1Count === 0 ? { area: 'Struktur heading', status: 'perlu diperbaiki', detail: 'Tidak ada H1.', fix: 'Tambahkan satu H1 yang menyatakan topik halaman.' }
-    : { area: 'Struktur heading', status: 'perlu diperbaiki', detail: `Ada ${i.h1Count} H1.`, fix: 'Sisakan satu H1; sisanya jadikan H2.' })
+  f.push(i.h1Count === 1 ? { area: 'Heading structure', status: 'baik', detail: 'Exactly one H1.' }
+    : i.h1Count === 0 ? { area: 'Heading structure', status: 'perlu diperbaiki', detail: 'No H1.', fix: 'Add a single H1 stating the topic of the page.' }
+    : { area: 'Heading structure', status: 'perlu diperbaiki', detail: `${i.h1Count} H1 tags.`, fix: 'Keep one H1; turn the rest into H2s.' })
 
   f.push(i.wordCount < 300
-    ? { area: 'Kedalaman konten', status: 'perlu diperbaiki', detail: `${i.wordCount} kata — tipis untuk halaman yang ingin diperingkat.`, fix: 'Jawab pertanyaan nyata pengguna; jangan menambah kata demi jumlah kata semata.' }
-    : { area: 'Kedalaman konten', status: 'baik', detail: `${i.wordCount} kata.` })
+    ? { area: 'Content depth', status: 'perlu diperbaiki', detail: `${i.wordCount} words — thin for a page meant to rank.`, fix: 'Answer real user questions; do not add words for the sake of the count.' }
+    : { area: 'Content depth', status: 'baik', detail: `${i.wordCount} words.` })
 
   const missingAlt = Math.max(0, i.imagesTotal - i.imagesWithAlt)
   f.push(missingAlt > 0
-    ? { area: 'Teks alternatif gambar', status: 'perlu diperbaiki', detail: `${missingAlt} gambar tanpa alt.`, fix: 'Alt bukan hanya soal SEO — ini yang dibacakan pembaca layar kepada pengguna tunanetra. Perbaiki karena alasan itu lebih dulu.' }
-    : { area: 'Teks alternatif gambar', status: 'baik', detail: 'Semua gambar punya alt.' })
+    ? { area: 'Image alt text', status: 'perlu diperbaiki', detail: `${missingAlt} images without alt text.`, fix: 'Alt text is not only an SEO matter — it is what a screen reader speaks to a blind user. Fix it for that reason first.' }
+    : { area: 'Image alt text', status: 'baik', detail: 'Every image has alt text.' })
 
   f.push(i.loadSeconds > 3
-    ? { area: 'Kecepatan muat', status: i.loadSeconds > 5 ? 'kritis' : 'perlu diperbaiki', detail: `${i.loadSeconds.toFixed(1)} detik.`, fix: 'Kompres gambar, tunda skrip yang tidak kritis, dan pecah bundel besar. Kecepatan memengaruhi peringkat sekaligus tingkat pengunjung yang pergi.' }
-    : { area: 'Kecepatan muat', status: 'baik', detail: `${i.loadSeconds.toFixed(1)} detik.` })
+    ? { area: 'Load speed', status: i.loadSeconds > 5 ? 'kritis' : 'perlu diperbaiki', detail: `${i.loadSeconds.toFixed(1)} seconds.`, fix: 'Compress images, defer non-critical scripts, and split large bundles. Speed affects both ranking and how many visitors leave.' }
+    : { area: 'Load speed', status: 'baik', detail: `${i.loadSeconds.toFixed(1)} seconds.` })
 
-  f.push(i.mobileFriendly ? { area: 'Mobile', status: 'baik', detail: 'Ramah perangkat seluler.' }
-    : { area: 'Mobile', status: 'kritis', detail: 'Tidak ramah seluler.', fix: 'Google memakai versi seluler untuk pengindeksan. Ini prioritas tertinggi.' })
+  f.push(i.mobileFriendly ? { area: 'Mobile', status: 'baik', detail: 'Mobile friendly.' }
+    : { area: 'Mobile', status: 'kritis', detail: 'Not mobile friendly.', fix: 'Google indexes the mobile version. This is the highest priority.' })
 
-  f.push(i.httpsEnabled ? { area: 'HTTPS', status: 'baik', detail: 'Aktif.' }
-    : { area: 'HTTPS', status: 'kritis', detail: 'Tidak aktif.', fix: 'Wajib, terlebih untuk situs kesehatan yang menangani data pribadi.' })
+  f.push(i.httpsEnabled ? { area: 'HTTPS', status: 'baik', detail: 'Enabled.' }
+    : { area: 'HTTPS', status: 'kritis', detail: 'Not enabled.', fix: 'Mandatory, all the more so for a health site handling personal data.' })
 
-  f.push(i.hasCanonical ? { area: 'Canonical', status: 'baik', detail: 'Ada.' }
-    : { area: 'Canonical', status: 'perlu diperbaiki', detail: 'Tidak ada tag canonical.', fix: 'Cegah konten duplikat dari variasi URL.' })
+  f.push(i.hasCanonical ? { area: 'Canonical', status: 'baik', detail: 'Present.' }
+    : { area: 'Canonical', status: 'perlu diperbaiki', detail: 'No canonical tag.', fix: 'Prevent duplicate content from URL variations.' })
 
-  f.push(i.hasStructuredData ? { area: 'Data terstruktur', status: 'baik', detail: 'Ada schema markup.' }
-    : { area: 'Data terstruktur', status: 'perlu diperbaiki', detail: 'Belum ada.', fix: 'Tambahkan schema yang sesuai (Organization, Article, FAQ) agar tampil lebih kaya di hasil pencarian.' })
+  f.push(i.hasStructuredData ? { area: 'Structured data', status: 'baik', detail: 'Schema markup present.' }
+    : { area: 'Structured data', status: 'perlu diperbaiki', detail: 'None yet.', fix: 'Add the appropriate schema (Organization, Article, FAQ) for richer search results.' })
 
   f.push(i.internalLinks < 3
-    ? { area: 'Tautan internal', status: 'perlu diperbaiki', detail: `${i.internalLinks} tautan.`, fix: 'Tautkan ke halaman terkait agar perayapan dan navigasi lebih baik.' }
-    : { area: 'Tautan internal', status: 'baik', detail: `${i.internalLinks} tautan.` })
+    ? { area: 'Internal links', status: 'perlu diperbaiki', detail: `${i.internalLinks} links.`, fix: 'Link to related pages to improve crawling and navigation.' }
+    : { area: 'Internal links', status: 'baik', detail: `${i.internalLinks} links.` })
 
   const score = Math.round((f.filter((x) => x.status === 'baik').length / f.length) * 100)
   return { findings: f, score }
@@ -151,14 +151,14 @@ export function analyseAb(i: AbInput): AbResult {
     ciLowPp, ciHighPp,
     readyToCall,
     verdict: !readyToCall
-      ? 'Belum boleh disimpulkan — sampel belum mencapai jumlah yang direncanakan.'
+      ? 'Too early to call — the sample has not reached the planned size.'
       : significant
-      ? (p2 > p1 ? 'Variasi menang secara statistik.' : 'Variasi kalah secara statistik.')
-      : 'Tidak ada perbedaan yang terdeteksi.',
+      ? (p2 > p1 ? 'The variant wins, statistically.' : 'The variant loses, statistically.')
+      : 'No difference detected.',
     warning: !readyToCall
-      ? 'Menghentikan uji saat angkanya terlihat bagus adalah kesalahan termahal dalam eksperimen. Mengintip berulang lalu berhenti ketika melewati ambang signifikansi membuat tingkat positif palsu jauh melampaui 5% — Anda akan "memenangkan" uji yang sebenarnya hanya derau, lalu merilis perubahan yang tidak berefek apa pun. Jalankan sampai jumlah sampel yang direncanakan tercapai.'
+      ? 'Stopping a test the moment the numbers look good is the most expensive mistake in experimentation. Peeking repeatedly and stopping when significance is crossed pushes the false-positive rate far above 5% — you will "win" a test that was only noise, then ship a change that does nothing. Run it until the planned sample size is reached.'
       : !significant && Math.abs(ciHighPp - ciLowPp) > 4
-      ? 'Hasilnya tidak signifikan, tetapi selang kepercayaannya lebar — ini berarti "belum tahu", bukan "tidak ada bedanya". Uji dengan sampel lebih besar bila perbedaan sebesar ini penting bagi Anda.'
+      ? 'The result is not significant, but the confidence interval is wide — that means "we do not know yet", not "there is no difference". Test with a larger sample if a difference this size matters to you.'
       : null,
   }
 }
@@ -188,6 +188,19 @@ export interface Customer {
 
 export type SegmentName = 'Juara' | 'Setia' | 'Berpotensi' | 'Baru' | 'Berisiko pergi' | 'Hilang'
 
+// Nilai SegmentName, status audit, dan label sentimen dibandingkan dengan ===
+// di halaman, jadi nilainya tidak diterjemahkan. Yang diterjemahkan labelnya.
+export const SEGMENT_LABEL: Record<SegmentName, string> = {
+  Juara: 'Champion', Setia: 'Loyal', Berpotensi: 'Promising', Baru: 'New',
+  'Berisiko pergi': 'At risk of leaving', Hilang: 'Lost',
+}
+export const SEO_STATUS_LABEL: Record<SeoFinding['status'], string> = {
+  baik: 'good', 'perlu diperbaiki': 'needs work', kritis: 'critical',
+}
+export const SENTIMENT_LABEL: Record<SentimentResult['label'], string> = {
+  positif: 'positive', netral: 'neutral', negatif: 'negative',
+}
+
 export interface Segment {
   customer: Customer
   segment: SegmentName
@@ -212,17 +225,17 @@ export function segment(customers: Customer[]): Segment[] {
     let s: SegmentName
     let action: string
     if (r >= 3 && f >= 3 && m >= 3) {
-      s = 'Juara'; action = 'Jangan ganggu dengan promosi. Mintalah masukan dan ulasan — kelompok inilah yang paling jujur dan paling didengar calon pengguna lain.'
+      s = 'Juara'; action = 'Do not interrupt them with promotions. Ask for feedback and reviews — this group is the most honest, and the one prospective users listen to most.'
     } else if (r >= 3 && f >= 3) {
-      s = 'Setia'; action = 'Pertahankan dengan fitur yang benar-benar dipakai, bukan dengan diskon. Diskon kepada orang yang sudah setia hanya menurunkan pendapatan tanpa menambah loyalitas.'
+      s = 'Setia'; action = 'Keep them with features they actually use, not with discounts. Discounting to the already-loyal only lowers revenue without adding loyalty.'
     } else if (r >= 3 && f <= 2) {
-      s = 'Baru'; action = 'Fokus pada keberhasilan pertama secepat mungkin. Yang menentukan mereka bertahan adalah merasakan satu manfaat nyata pada minggu pertama.'
+      s = 'Baru'; action = 'Focus on their first success as fast as possible. What decides whether they stay is feeling one real benefit in the first week.'
     } else if (r === 2 && f >= 2) {
-      s = 'Berisiko pergi'; action = 'Hubungi dengan pertanyaan, bukan penawaran. Cari tahu apa yang berubah — sebagian besar pengguna pergi karena satu hambatan yang bisa diperbaiki.'
+      s = 'Berisiko pergi'; action = 'Reach out with a question, not an offer. Find out what changed — most users leave over a single fixable obstacle.'
     } else if (m >= 3) {
-      s = 'Berpotensi'; action = 'Pernah bernilai tinggi tetapi jarang kembali. Tunjukkan apa yang baru sejak terakhir mereka datang.'
+      s = 'Berpotensi'; action = 'Once high value but rarely back. Show them what is new since their last visit.'
     } else {
-      s = 'Hilang'; action = 'Biaya menarik kembali kelompok ini paling tinggi. Satu upaya jujur, lalu berhenti — mengirim pesan berulang kepada orang yang sudah pergi merusak reputasi pengirim Anda.'
+      s = 'Hilang'; action = 'Winning this group back costs the most. One honest attempt, then stop — repeatedly messaging people who have left damages your sender reputation.'
     }
     return { customer: c, segment: s, action }
   })
@@ -230,9 +243,15 @@ export function segment(customers: Customer[]): Segment[] {
 
 // ── Sentiment ────────────────────────────────────────────────────────────────
 
-const POSITIVE = ['bagus', 'baik', 'mantap', 'membantu', 'cepat', 'mudah', 'ramah', 'puas', 'suka', 'rekomendasi', 'terima kasih', 'jelas', 'akurat', 'lengkap', 'nyaman']
-const NEGATIVE = ['buruk', 'jelek', 'lambat', 'susah', 'sulit', 'error', 'bug', 'mahal', 'kecewa', 'bingung', 'gagal', 'lemot', 'ribet', 'tidak akurat', 'menyesatkan', 'rusak']
-const NEGATORS = ['tidak', 'bukan', 'kurang', 'belum', 'jangan']
+const POSITIVE = [
+  'bagus', 'baik', 'mantap', 'membantu', 'cepat', 'mudah', 'ramah', 'puas', 'suka', 'rekomendasi', 'terima kasih', 'jelas', 'akurat', 'lengkap', 'nyaman',
+  'good', 'great', 'helpful', 'fast', 'easy', 'clear', 'accurate', 'love', 'excellent', 'useful', 'simple', 'reliable',
+]
+const NEGATIVE = [
+  'buruk', 'jelek', 'lambat', 'susah', 'sulit', 'error', 'bug', 'mahal', 'kecewa', 'bingung', 'gagal', 'lemot', 'ribet', 'tidak akurat', 'menyesatkan', 'rusak',
+  'bad', 'slow', 'hard', 'difficult', 'expensive', 'confusing', 'broken', 'crash', 'useless', 'misleading', 'disappointing',
+]
+const NEGATORS = ['tidak', 'bukan', 'kurang', 'belum', 'jangan', 'not', 'never', 'no']
 
 export interface SentimentResult {
   label: 'positif' | 'netral' | 'negatif'
@@ -272,6 +291,6 @@ export function analyseSentiment(text: string): SentimentResult {
     score,
     label: score > 0 ? 'positif' : score < 0 ? 'negatif' : 'netral',
     matchedPositive, matchedNegative,
-    caveat: 'Analisis ini berbasis daftar kata dan tidak memahami sindiran, ulasan campuran, maupun konteks. Gunakan untuk memilah komentar mana yang perlu dibaca lebih dulu — bukan sebagai pengganti membacanya.',
+    caveat: 'This analysis is word-list based and understands neither sarcasm, mixed reviews, nor context. Use it to triage which comments to read first — not as a substitute for reading them.',
   }
 }
