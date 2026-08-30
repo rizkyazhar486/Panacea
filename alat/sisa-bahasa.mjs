@@ -83,7 +83,10 @@ function periksa(p) {
       if (/\$\{/.test(t) && t.replace(/\$\{[^}]*\}/g, '').trim().length < 8) continue
       // Buang daftar kelas dan jalur.
       const tok = t.trim().split(/[\s/·—–,.:;!?()"'’“”|]+/).filter((w) => /^[A-Za-z]{3,}$/.test(w))
-      if (tok.length < 2) continue
+      // Label SATU KATA ("Kemajuan", "Tenggat") dulu dilewati karena syaratnya
+      // dua kata. Itu melewatkan justru bentuk label yang paling lazim di
+      // antarmuka; keduanya baru ketahuan dari tangkapan layar.
+      if (tok.length < 1) continue
       const util = t.trim().split(/\s+/).filter((k) => /^(dark:|hover:|focus:|active:|sm:|md:|lg:|group-)/.test(k) || /^(text|bg|border|rounded|flex|grid|min|max|w|h|p|m|px|py|mt|mb|ml|mr|gap|font|leading|tracking|shadow|ring|space|items|justify|overflow|absolute|relative|inline|shrink|transition|opacity|z|whitespace|truncate|uppercase|tabular|place|cursor|select|pointer|backdrop|animate|duration|ease|scale|translate|t-)(-|$)/.test(k)).length
       if (util > 0) continue
       // Potongan KODE bukan teks. Penandanya khas dan tidak muncul di kalimat.
