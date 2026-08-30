@@ -397,7 +397,7 @@ export function panduanOlahragaHamil(trimester: 1 | 2 | 3): PanduanOlahragaHamil
       'Vaginal bleeding',
       'Abdominal pain or persistent regular contractions',
       'Fluid leaking from the vagina',
-      'Sesak napas sebelum beraktivitas',
+      'Breathlessness before any exertion',
       'Chest pain',
       'Vertigo or near-fainting that persists',
       'Severe headache',
@@ -410,11 +410,11 @@ export function panduanOlahragaHamil(trimester: 1 | 2 | 3): PanduanOlahragaHamil
       'A weak or sutured cervix',
       'A multiple pregnancy with risk of preterm birth',
       'Persistent bleeding in the second or third trimester',
-      'Plasenta previa setelah 26 minggu',
+      'Placenta praevia after 26 weeks',
       'A history of, or threatened, preterm labour in this pregnancy',
-      'Ketuban pecah dini',
+      'Premature rupture of membranes',
       'Pre-eclampsia or uncontrolled hypertension in pregnancy',
-      'Anemia berat',
+      'Severe anaemia',
     ],
   }
 }

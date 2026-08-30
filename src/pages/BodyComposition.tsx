@@ -237,8 +237,8 @@ export function BodyComposition() {
             step={step}
             ariaLabel={label} />
           {perluSimpan && baruDisimpan !== String(key) && (
-            <button type="button" onClick={kirim} aria-label={`Simpan ${label}`}
-              title="Simpan nilai ini untuk seluruh aplikasi (atau tekan Enter)"
+            <button type="button" onClick={kirim} aria-label={`Save ${label}`}
+              title="Save this value app-wide (or press Enter)"
               className="shrink-0 rounded-lg bg-brand px-2 py-1.5 text-[12px] font-black text-ink">↵</button>
           )}
           {baruDisimpan === String(key) && <span className="shrink-0 text-[10px] font-bold text-emerald-600" role="status">✓</span>}
@@ -254,7 +254,7 @@ export function BodyComposition() {
         <SectionTitle
           icon={<IconActivity size={20} />}
           title="Body Composition & Longevity"
-          subtitle="Terisi sendiri dari Profil Kesehatan Anda (Apple Health / WHOOP / dsb.) — boleh ditimpa dengan tangan dari timbangan pintar atau cetakan InBody kapan saja"
+          subtitle="Filled in automatically from your Health Profile (Apple Health / WHOOP / etc.) — you can override any value by hand from a smart scale or an InBody printout"
           right={<Button variant="outline" onClick={() => syncNow(false)}>🔄 Sync from Health Profile</Button>}
         />
         {syncNote && <p className="mt-2 rounded-xl bg-brand-50 px-3 py-2 text-[11px] font-semibold text-brand-dark">{syncNote}</p>}
@@ -271,8 +271,8 @@ export function BodyComposition() {
           {num('Hip (cm)', 'hip')}
           {num('Neck (cm)', 'neck')}
           {num('VO₂max', 'vo2', 0.1)}
-          {num('SMM InBody (kg, ops.)', 'smm', 0.1)}
-          {num('Fat Mass InBody (kg, ops.)', 'bfm', 0.1)}
+          {num('SMM InBody (kg, opt.)', 'smm', 0.1)}
+          {num('Fat Mass InBody (kg, opt.)', 'bfm', 0.1)}
           {num('Resting HR', 'rhr')}
           {num('HRV (ms)', 'hrv')}
         </div>
@@ -292,7 +292,7 @@ export function BodyComposition() {
 
       {/* Muscle-Fat analysis bars */}
       <Card className="!p-5">
-        <SectionTitle icon={<IconChartUp size={20} />} title="Muscle-Fat Analysis" subtitle="Gaya InBody: Kurang · Normal · Lebih" />
+        <SectionTitle icon={<IconChartUp size={20} />} title="Muscle-Fat Analysis" subtitle="InBody style: Under · Normal · Over" />
         <div className="mt-3 space-y-2.5">
           <RangeBar label="Body Weight" value={b.w} unit="kg" lo={18.5 * Math.pow(b.h / 100, 2)} hi={24.9 * Math.pow(b.h / 100, 2)} max={35 * Math.pow(b.h / 100, 2)} />
           <RangeBar label="Skeletal Muscle Mass" value={d.smm} unit="kg" lo={b.w * 0.37} hi={b.w * 0.5} max={b.w * 0.6} />
@@ -311,7 +311,7 @@ export function BodyComposition() {
 
       {/* Lab & Pemeriksaan Lanjutan */}
       <Card className="!p-5">
-        <SectionTitle icon={<IconActivity size={20} />} title="Lab & Advanced Screening" subtitle="Kepadatan massa tulang (DEXA) — isi bila Anda punya hasil pemeriksaan" />
+        <SectionTitle icon={<IconActivity size={20} />} title="Lab & Advanced Screening" subtitle="Bone mineral density (DEXA) — fill this in if you have a scan result" />
         <div className="mt-3 grid grid-cols-2 gap-3 sm:grid-cols-3">
           {num('T-score BMD (DEXA)', 'bmd', 0.1)}
         </div>
@@ -323,7 +323,7 @@ export function BodyComposition() {
                 {b.bmd >= -1 ? 'Normal' : b.bmd >= -2.5 ? 'Osteopenia' : 'Osteoporosis'}
               </Badge>
             </div>
-            <Prosa kelas="mt-1.5 text-[11px] leading-relaxed text-neutral-500">Skor-T ≥ −1: normal · −1 sampai −2,5: osteopenia (massa tulang rendah) · ≤ −2,5: osteoporosis (kriteria WHO). Kepadatan tulang menurun secara alami seiring umur — latihan beban serta kecukupan kalsium/vitamin D dan protein membantu mempertahankannya.</Prosa>
+            <Prosa kelas="mt-1.5 text-[11px] leading-relaxed text-neutral-500">T-score ≥ −1: normal · −1 to −2.5: osteopenia (low bone mass) · ≤ −2.5: osteoporosis (WHO criteria). Bone density declines naturally with age — resistance training plus adequate calcium, vitamin D and protein help preserve it.</Prosa>
           </div>
         )}
         {b.bmd === 0 && <p className="mt-2 text-[11px] text-neutral-500">No data yet. BMD is measured via a DEXA scan at a health facility/radiology lab.</p>}
@@ -331,11 +331,11 @@ export function BodyComposition() {
 
       {/* Longevity indicator bento */}
       <Card className="!p-5">
-        <SectionTitle icon={<IconHeart size={20} />} title="Penanda Harian" subtitle="Arah perubahan pada diri sendiri, bukan angka mutlak" />
+        <SectionTitle icon={<IconHeart size={20} />} title="Daily Markers" subtitle="The direction of change in yourself, not absolute numbers" />
         <p className="mt-2 rounded-xl bg-amber-500/10 px-3 py-2 text-[11px] leading-snug text-amber-800 dark:text-amber-300">
-          Kesiapan, laju penuaan, dan harapan hidup di bawah ini dihitung dengan bobot <b>pilihan penulis</b>, bukan hasil
-          penelitian. Bacalah perubahannya dari waktu ke waktu — jangan dibandingkan dengan orang lain atau dibaca sebagai
-          tahun hidup. Persen lemak dan BMR di halaman ini memakai persamaan terbitan (Navy tape; Mifflin-St Jeor).
+          Readiness, pace of aging and life expectancy below are computed with <b>weights chosen by the author</b>, not
+          research findings. Read them as change over time — do not compare them with other people or read them as years of
+          life. Body-fat percentage and BMR on this page use published equations (Navy tape; Mifflin-St Jeor).
         </p>
         <div className="mt-3 grid grid-cols-3 gap-3 sm:grid-cols-4">
           {num('Total sleep (hrs)', 'sleepH', 0.1)}
@@ -406,49 +406,49 @@ function ScaleMeasurements() {
   const v = useVitals()
   const rows: { label: string; nilai?: number; satuan: string; rujukan: string; arti: string }[] = [
     {
-      label: 'Air tubuh', nilai: v.bodyWaterPct, satuan: '%',
-      rujukan: 'Umumnya 50-65% pada pria dan 45-60% pada wanita',
-      arti: 'Sebagian besar tubuh adalah air, dan sebagian besar air itu berada DI DALAM otot. Karena itu persentase air yang rendah biasanya menandakan massa otot yang kurang, bukan sekadar kurang minum — dan angkanya turun-naik beberapa persen sepanjang hari mengikuti minum, keringat, serta makanan asin.',
+      label: 'Body water', nilai: v.bodyWaterPct, satuan: '%',
+      rujukan: 'Typically 50–65% in men and 45–60% in women',
+      arti: 'Most of the body is water, and most of that water sits INSIDE muscle. So a low water percentage usually signals low muscle mass rather than simply not drinking enough — and the number swings by a few percent through the day with drinking, sweating and salty food.',
     },
     {
       label: 'Protein', nilai: v.proteinPct, satuan: '%',
-      rujukan: 'Umumnya sekitar 16-20% dari berat badan',
-      arti: 'Perkiraan bagian tubuh yang berupa protein struktural, hampir seluruhnya otot dan organ. Nilai rendah biasanya berjalan seiring massa otot yang rendah.',
+      rujukan: 'Typically around 16–20% of body weight',
+      arti: 'An estimate of the share of the body made of structural protein, almost all of it muscle and organs. A low value usually travels together with low muscle mass.',
     },
     {
-      label: 'Massa otot', nilai: v.musclePct, satuan: '%',
-      rujukan: 'Bergantung usia dan jenis kelamin; dinilai bersama berat badan, bukan sendirian',
-      arti: 'Persentase, bukan kilogram — sehingga ia bisa NAIK hanya karena lemak berkurang meskipun ototnya tidak bertambah sedikit pun. Untuk menilai kemajuan latihan, massa otot dalam kilogram lebih jujur daripada persentasenya.',
+      label: 'Muscle mass', nilai: v.musclePct, satuan: '%',
+      rujukan: 'Depends on age and sex; judge it alongside body weight, not on its own',
+      arti: 'A percentage, not kilograms — so it can RISE purely because fat fell, even if no muscle was gained at all. To judge training progress, muscle mass in kilograms is more honest than the percentage.',
     },
     {
-      label: 'Massa tulang', nilai: v.boneMassKg, satuan: 'kg',
-      rujukan: 'Umumnya 2-4 kg; berubah sangat lambat',
-      arti: 'Perkiraan dari impedansi listrik, BUKAN pengukuran kepadatan tulang. Angka ini tidak dapat dipakai untuk menilai osteoporosis — itu memerlukan pemeriksaan DEXA. Perubahan dari minggu ke minggu pada alat ini hampir selalu berupa derau pengukuran.',
+      label: 'Bone mass', nilai: v.boneMassKg, satuan: 'kg',
+      rujukan: 'Typically 2–4 kg; changes very slowly',
+      arti: 'Estimated from electrical impedance, NOT a measurement of bone density. This number cannot be used to assess osteoporosis — that needs a DEXA scan. Week-to-week changes on these devices are almost always measurement noise.',
     },
     {
-      label: 'Lemak bawah kulit', nilai: v.subcutaneousFatKg, satuan: 'kg',
-      rujukan: 'Tidak ada nilai baku — berguna dibandingkan dengan diri sendiri',
-      arti: 'Lemak yang berada tepat di bawah kulit. Berbeda dari lemak viseral, lemak jenis ini jauh lebih kecil kaitannya dengan risiko penyakit jantung dan metabolik.',
+      label: 'Subcutaneous fat', nilai: v.subcutaneousFatKg, satuan: 'kg',
+      rujukan: 'No standard value — useful compared against yourself',
+      arti: 'The fat sitting just under the skin. Unlike visceral fat, this kind is far less strongly linked to cardiovascular and metabolic risk.',
     },
     {
-      label: 'Lemak viseral', nilai: v.visceralFatIndex ?? v.visceralFatLevel, satuan: '',
-      rujukan: 'Umumnya dianggap baik pada nilai di bawah 10 pada skala alat ini',
-      arti: 'Lemak yang mengelilingi organ dalam perut. INILAH jenis lemak yang paling berkaitan dengan diabetes tipe 2, hipertensi, dan penyakit jantung — dan ia bisa tinggi meskipun berat badan tampak normal. Yang paling menurunkannya adalah aktivitas aerobik teratur dan pengurangan gula sederhana, bukan latihan perut.',
+      label: 'Visceral fat', nilai: v.visceralFatIndex ?? v.visceralFatLevel, satuan: '',
+      rujukan: 'Generally considered good below 10 on this device scale',
+      arti: 'The fat wrapped around the organs in the abdomen. THIS is the kind most strongly linked to type 2 diabetes, hypertension and heart disease — and it can be high even when body weight looks normal. What lowers it most is regular aerobic activity and cutting simple sugars, not abdominal exercises.',
     },
     {
-      label: 'Laju metabolisme basal', nilai: v.bmrKcal, satuan: 'kkal/hari',
-      rujukan: 'Kebutuhan tubuh saat istirahat penuh',
-      arti: 'Energi yang dipakai tubuh untuk hidup saja tanpa bergerak. Menjadi dasar perhitungan kebutuhan kalori harian, dan turun ketika massa otot berkurang — inilah salah satu alasan diet ketat berulang menjadi makin sulit setiap kali diulang.',
+      label: 'Basal metabolic rate', nilai: v.bmrKcal, satuan: 'kcal/day',
+      rujukan: 'What the body needs at complete rest',
+      arti: 'The energy the body uses simply to stay alive without moving. It is the basis of daily calorie needs, and it falls when muscle mass is lost — one reason repeated crash diets get harder each time round.',
     },
     {
-      label: 'Total energi harian', nilai: v.amrKcal, satuan: 'kkal/hari',
-      rujukan: 'Basal ditambah aktivitas',
-      arti: 'Perkiraan kebutuhan kalori sehari termasuk aktivitas. Angka dari alat ini merupakan perkiraan kasar; yang lebih dapat dipercaya adalah menyesuaikannya berdasarkan perubahan berat badan nyata selama dua sampai tiga minggu.',
+      label: 'Total daily energy', nilai: v.amrKcal, satuan: 'kcal/day',
+      rujukan: 'Basal plus activity',
+      arti: 'An estimate of daily calorie needs including activity. The device figure is a rough estimate; more trustworthy is adjusting it against your actual weight change over two to three weeks.',
     },
     {
-      label: 'Usia tubuh', nilai: v.bodyAge, satuan: 'tahun',
-      rujukan: 'Dibandingkan dengan usia sebenarnya',
-      arti: 'Bukan besaran medis. Alat menghitungnya dari komposisi tubuh memakai rumus tertutup yang berbeda-beda antarmerek, sehingga tidak dapat dibandingkan antaralat dan tidak bermakna secara klinis. Berguna sebagai penyemangat, tidak lebih.',
+      label: 'Body age', nilai: v.bodyAge, satuan: 'years',
+      rujukan: 'Compared against your actual age',
+      arti: 'Not a medical quantity. Devices compute it from body composition using closed formulas that differ between brands, so it cannot be compared across devices and means nothing clinically. Useful as encouragement, no more.',
     },
   ]
 
@@ -459,8 +459,8 @@ function ScaleMeasurements() {
     <Card className="!p-5">
       <SectionTitle
         icon={<IconActivity size={20} />}
-        title="Dari alat komposisi tubuh"
-        subtitle="Nilai yang hanya dapat diberikan InBody atau timbangan BIA — bukan perkiraan dari rumus"
+        title="From a body-composition device"
+        subtitle="Values only an InBody or BIA scale can give — not estimated from a formula"
       />
       <div className="mt-3 space-y-2">
         {ada.map((r) => (
@@ -476,7 +476,7 @@ function ScaleMeasurements() {
           </div>
         ))}
       </div>
-      <Prosa kelas="mt-3 text-[11px] leading-relaxed text-neutral-500">Alat BIA mengukur hambatan listrik lalu MEMPERKIRAKAN komposisi dari situ, sehingga hasilnya dipengaruhi status cairan, makan, olahraga, dan waktu pengukuran. Agar dapat dibandingkan, ukur pada keadaan yang sama: pagi hari, setelah buang air kecil, sebelum makan dan minum, dan sebelum berolahraga.</Prosa>
+      <Prosa kelas="mt-3 text-[11px] leading-relaxed text-neutral-500">BIA devices measure electrical resistance and then ESTIMATE composition from it, so the result is affected by hydration, food, exercise and time of day. To make readings comparable, measure under the same conditions: in the morning, after urinating, before eating or drinking, and before exercise.</Prosa>
     </Card>
   )
 }
