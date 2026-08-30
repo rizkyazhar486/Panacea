@@ -39,14 +39,19 @@ function bersih(s) {
   return s.replace(/\/\*[\s\S]*?\*\//g, (m) => ' '.repeat(m.length))
           .replace(/^[ \t]*\/\/.*$/gm, (m) => ' '.repeat(m.length))
 }
-function teksTampak(baris) {
+function teksTampak(baris, jsx) {
   const out = []
   for (const m of baris.matchAll(/(?:title|subtitle|label|placeholder|judul|ringkas|subjudul|aria-label|alt)=["'{]?["']([^"'\n]{4,})["']/g)) out.push(m[1])
   for (const m of baris.matchAll(/>([^<>{}\n]{4,})</g)) out.push(m[1])
   // Simpul teks JSX yang membentang beberapa baris tidak punya '>' di barisnya
   // sendiri. Tanpa pola ini, "Pace acuan:" lolos berkali-kali.
-  const awal = baris.match(/^\s{6,}([A-Za-z][^<>{}\n]{4,})(?:<|$)/)
-  if (awal) out.push(awal[1])
+  // HANYA untuk .tsx. Pada .ts, pola ini menangkap baris objek literal seperti
+  // `nama: 'Upper trapezius stretch',` dan melaporkan nama propertinya sebagai
+  // teks — stretching.ts terbaca 86 temuan yang hampir semuanya nama properti.
+  if (jsx) {
+    const awal = baris.match(/^\s{6,}([A-Za-z][^<>{}\n]{4,})(?:<|$)/)
+    if (awal && !/^\s*\w+:/.test(awal[1])) out.push(awal[1])
+  }
   // Petik dipasangkan dengan menyusuri baris, BUKAN dengan regex bergantian.
   // Regex /'([^']+)'/ pada `nama: 'Jalan', met: 2.5, int: 'ringan'` ikut
   // menangkap ", met: 2.5, int: " — potongan KODE di antara dua string — lalu
@@ -78,7 +83,7 @@ function periksa(p) {
   if (KECUALI.test(p)) return
   const src = bersih(fs.readFileSync(p, 'utf8'))
   src.split('\n').forEach((b, i) => {
-    for (const t of teksTampak(b)) {
+    for (const t of teksTampak(b, /\.tsx$/.test(p))) {
       if (/^[\w.\/#-]+$/.test(t)) continue
       if (/\$\{/.test(t) && t.replace(/\$\{[^}]*\}/g, '').trim().length < 8) continue
       // Buang daftar kelas dan jalur.

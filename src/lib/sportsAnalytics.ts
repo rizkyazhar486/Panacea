@@ -40,44 +40,44 @@ export interface MetricDef {
 
 export const SPORT_METRICS: Record<Sport, MetricDef[]> = {
   sepakbola: [
-    { key: 'goalsPer90', label: 'Gol per 90 menit', eliteAt: 0.8, floorAt: 0, hint: 'Penyerang elite ±0,6-0,8' },
-    { key: 'assistsPer90', label: 'Assist per 90 menit', eliteAt: 0.5, floorAt: 0 },
-    { key: 'passAccuracy', label: 'Akurasi umpan (%)', eliteAt: 92, floorAt: 65 },
-    { key: 'duelsWonPct', label: 'Duel dimenangkan (%)', eliteAt: 65, floorAt: 35 },
-    { key: 'distanceKm', label: 'Jarak tempuh per laga (km)', eliteAt: 12, floorAt: 7 },
-    { key: 'turnoversPer90', label: 'Kehilangan bola per 90', eliteAt: 5, floorAt: 25, inverse: true },
+    { key: 'goalsPer90', label: 'Goals per 90 minutes', eliteAt: 0.8, floorAt: 0, hint: 'Elite forwards ±0.6–0.8' },
+    { key: 'assistsPer90', label: 'Assists per 90 minutes', eliteAt: 0.5, floorAt: 0 },
+    { key: 'passAccuracy', label: 'Pass accuracy (%)', eliteAt: 92, floorAt: 65 },
+    { key: 'duelsWonPct', label: 'Duels won (%)', eliteAt: 65, floorAt: 35 },
+    { key: 'distanceKm', label: 'Distance covered per match (km)', eliteAt: 12, floorAt: 7 },
+    { key: 'turnoversPer90', label: 'Possession losses per 90', eliteAt: 5, floorAt: 25, inverse: true },
   ],
   basket: [
-    { key: 'pointsPerGame', label: 'Poin per laga', eliteAt: 28, floorAt: 4 },
-    { key: 'assistsPerGame', label: 'Assist per laga', eliteAt: 9, floorAt: 0.5 },
-    { key: 'reboundsPerGame', label: 'Rebound per laga', eliteAt: 12, floorAt: 1 },
+    { key: 'pointsPerGame', label: 'Points per game', eliteAt: 28, floorAt: 4 },
+    { key: 'assistsPerGame', label: 'Assists per game', eliteAt: 9, floorAt: 0.5 },
+    { key: 'reboundsPerGame', label: 'Rebounds per game', eliteAt: 12, floorAt: 1 },
     { key: 'trueShootingPct', label: 'True shooting (%)', eliteAt: 63, floorAt: 45 },
-    { key: 'stealsBlocksPerGame', label: 'Steal + block per laga', eliteAt: 3.5, floorAt: 0.3 },
-    { key: 'turnoversPerGame', label: 'Turnover per laga', eliteAt: 1, floorAt: 5, inverse: true },
+    { key: 'stealsBlocksPerGame', label: 'Steals + blocks per game', eliteAt: 3.5, floorAt: 0.3 },
+    { key: 'turnoversPerGame', label: 'Turnovers per game', eliteAt: 1, floorAt: 5, inverse: true },
   ],
   futsal: [
-    { key: 'goalsPerGame', label: 'Gol per laga', eliteAt: 1.5, floorAt: 0 },
-    { key: 'assistsPerGame', label: 'Assist per laga', eliteAt: 1.2, floorAt: 0 },
-    { key: 'passAccuracy', label: 'Akurasi umpan (%)', eliteAt: 90, floorAt: 60 },
-    { key: 'tacklesPerGame', label: 'Rebut bola per laga', eliteAt: 4, floorAt: 0.5 },
-    { key: 'shotAccuracy', label: 'Akurasi tembakan (%)', eliteAt: 55, floorAt: 20 },
-    { key: 'foulsPerGame', label: 'Pelanggaran per laga', eliteAt: 1, floorAt: 5, inverse: true },
+    { key: 'goalsPerGame', label: 'Goals per game', eliteAt: 1.5, floorAt: 0 },
+    { key: 'assistsPerGame', label: 'Assists per game', eliteAt: 1.2, floorAt: 0 },
+    { key: 'passAccuracy', label: 'Pass accuracy (%)', eliteAt: 90, floorAt: 60 },
+    { key: 'tacklesPerGame', label: 'Tackles per game', eliteAt: 4, floorAt: 0.5 },
+    { key: 'shotAccuracy', label: 'Shot accuracy (%)', eliteAt: 55, floorAt: 20 },
+    { key: 'foulsPerGame', label: 'Fouls per game', eliteAt: 1, floorAt: 5, inverse: true },
   ],
   tenis: [
-    { key: 'firstServePct', label: 'Servis pertama masuk (%)', eliteAt: 70, floorAt: 50 },
-    { key: 'firstServeWonPct', label: 'Poin dimenangkan servis 1 (%)', eliteAt: 80, floorAt: 55 },
-    { key: 'breakPointsSavedPct', label: 'Break point diselamatkan (%)', eliteAt: 70, floorAt: 40 },
-    { key: 'returnPointsWonPct', label: 'Poin return dimenangkan (%)', eliteAt: 45, floorAt: 25 },
-    { key: 'winnersPerMatch', label: 'Winner per pertandingan', eliteAt: 45, floorAt: 10 },
-    { key: 'unforcedErrorsPerMatch', label: 'Unforced error per laga', eliteAt: 15, floorAt: 55, inverse: true },
+    { key: 'firstServePct', label: 'First serves in (%)', eliteAt: 70, floorAt: 50 },
+    { key: 'firstServeWonPct', label: 'First-serve points won (%)', eliteAt: 80, floorAt: 55 },
+    { key: 'breakPointsSavedPct', label: 'Break points saved (%)', eliteAt: 70, floorAt: 40 },
+    { key: 'returnPointsWonPct', label: 'Return points won (%)', eliteAt: 45, floorAt: 25 },
+    { key: 'winnersPerMatch', label: 'Winners per match', eliteAt: 45, floorAt: 10 },
+    { key: 'unforcedErrorsPerMatch', label: 'Unforced errors per match', eliteAt: 15, floorAt: 55, inverse: true },
   ],
   'american-football': [
-    { key: 'yardsPerGame', label: 'Yard per laga', eliteAt: 110, floorAt: 10 },
-    { key: 'touchdownsPerGame', label: 'Touchdown per laga', eliteAt: 1.2, floorAt: 0 },
+    { key: 'yardsPerGame', label: 'Yards per game', eliteAt: 110, floorAt: 10 },
+    { key: 'touchdownsPerGame', label: 'Touchdowns per game', eliteAt: 1.2, floorAt: 0 },
     { key: 'completionPct', label: 'Completion / catch rate (%)', eliteAt: 70, floorAt: 45 },
-    { key: 'yardsPerTouch', label: 'Yard per sentuhan', eliteAt: 9, floorAt: 3 },
-    { key: 'tacklesPerGame', label: 'Tackle per laga', eliteAt: 8, floorAt: 1 },
-    { key: 'turnoversPerGame', label: 'Turnover diberikan per laga', eliteAt: 0.2, floorAt: 2, inverse: true },
+    { key: 'yardsPerTouch', label: 'Yards per touch', eliteAt: 9, floorAt: 3 },
+    { key: 'tacklesPerGame', label: 'Tackles per game', eliteAt: 8, floorAt: 1 },
+    { key: 'turnoversPerGame', label: 'Turnovers conceded per game', eliteAt: 0.2, floorAt: 2, inverse: true },
   ],
 }
 
@@ -178,11 +178,11 @@ export function valuePlayer(p: Player): Valuation {
   const allRound = weakest * 100
 
   const agents: AgentVerdict[] = [
-    { agent: 'Produksi', score: round(output), focus: 'Hasil mentah', reasoning: 'Menilai keluaran langsung — gol, assist, poin, yard. Ini yang paling terlihat, dan karena itu paling sering dinilai berlebihan.' },
-    { agent: 'Efisiensi', score: round(efficiency), focus: 'Biaya per hasil', reasoning: 'Menilai akurasi dan kehilangan bola. Pemain produktif yang boros penguasaan sering menambah lebih sedikit daripada yang terlihat di papan skor.' },
-    { agent: 'Ketersediaan', score: round(durability), focus: 'Bisa dimainkan atau tidak', reasoning: 'Persentase laga yang benar-benar dijalani. Ketersediaan adalah keterampilan yang paling sering dihargai terlalu rendah — pemain hebat yang absen separuh musim memberi nilai lebih kecil daripada pemain baik yang selalu siap.' },
-    { agent: 'Kurva usia', score: round(ageScore), focus: 'Lintasan, bukan kondisi saat ini', reasoning: `Jarak dari usia puncak tipikal (${peak} tahun). Menilai arah, bukan mutu sekarang — pemain 20 tahun dan 34 tahun dengan statistik identik bukan aset yang sama.` },
-    { agent: 'Kelengkapan', score: round(allRound), focus: 'Titik terlemah', reasoning: 'Dinilai dari aspek TERLEMAH, bukan rata-rata. Lawan menyerang celah, bukan rata-rata — profil timpang lebih mudah dinetralkan.' },
+    { agent: 'Production', score: round(output), focus: 'Raw output', reasoning: 'Judges direct output — goals, assists, points, yards. It is the most visible, and for that reason the most often overrated.' },
+    { agent: 'Efficiency', score: round(efficiency), focus: 'Cost per output', reasoning: 'Judges accuracy and possession loss. A productive player who is wasteful in possession often adds less than the scoreboard suggests.' },
+    { agent: 'Availability', score: round(durability), focus: 'Availability', reasoning: 'The percentage of matches actually played. Availability is the most under-valued skill there is — a great player absent for half a season delivers less than a good one who is always fit.' },
+    { agent: 'Age curve', score: round(ageScore), focus: 'Trajectory, not current condition', reasoning: `Distance from the typical peak age (${peak}). Judges direction rather than current quality — a 20-year-old and a 34-year-old with identical statistics are not the same asset.` },
+    { agent: 'All-round', score: round(allRound), focus: 'Weakest point', reasoning: 'Judged on the WEAKEST attribute, not the average. Opponents attack the gap, not the average — a lopsided profile is easier to neutralise.' },
   ]
 
   const scores = agents.map((a) => a.score)
@@ -193,18 +193,18 @@ export function valuePlayer(p: Player): Valuation {
   const n = Math.max(0, p.matchesPlayed)
   const confidence = n >= 30 ? 3 : n >= 15 ? 6 : n >= 8 ? 10 : n >= 3 ? 16 : 25
   const sampleWarning =
-    n === 0 ? 'Belum ada laga tercatat — angka di bawah tidak bermakna.'
-    : n < 8 ? `Hanya ${n} laga. Pada sampel sekecil ini, keberuntungan dan lawan yang dihadapi menjelaskan sebagian besar variasi. Perlakukan sebagai kesan awal, bukan penilaian.`
-    : n < 15 ? `${n} laga — cukup untuk gambaran kasar, belum cukup untuk keputusan transfer atau kontrak.`
+    n === 0 ? 'No matches recorded yet — the numbers below mean nothing.'
+    : n < 8 ? `Only ${n} matches. At a sample this small, luck and the opposition faced explain most of the variation. Treat it as a first impression, not an assessment.`
+    : n < 15 ? `${n} matches — enough for a rough picture, not enough for a transfer or contract decision.`
     : null
 
   const hi = agents.reduce((m, a) => (a.score > m.score ? a : m), agents[0])
   const lo = agents.reduce((m, a) => (a.score < m.score ? a : m), agents[0])
   const disagreementNote =
     disagreement >= 40
-      ? `Selisih antar-agen sangat lebar (${round(disagreement)} poin). "${hi.agent}" menilai jauh lebih tinggi daripada "${lo.agent}" — inilah temuan sesungguhnya, bukan skor gabungannya. Pemain seperti ini biasanya sangat baik pada satu hal dan punya kelemahan nyata yang bisa dieksploitasi.`
+      ? `The agents disagree sharply (${round(disagreement)} points). "${hi.agent}" rates far higher than "${lo.agent}" — that gap is the real finding, not the combined score. A player like this is usually excellent at one thing and carries a genuine, exploitable weakness.`
       : disagreement >= 20
-      ? `Selisih antar-agen sedang (${round(disagreement)} poin), terutama antara "${hi.agent}" dan "${lo.agent}". Profil tidak merata; perhatikan konteks penggunaannya.`
+      ? `The agents disagree moderately (${round(disagreement)} points), mainly between "${hi.agent}" and "${lo.agent}". The profile is uneven; pay attention to the context they would be used in.`
       : `Antar-agen relatif sepakat (selisih ${round(disagreement)} poin). Profil merata — skor gabungan cukup mewakili.`
 
   return { overall, confidence, sampleWarning, agents, disagreement: round(disagreement), disagreementNote }
@@ -292,9 +292,9 @@ export function analyseTeam(players: Player[]): TeamInsight {
 
   const notes: string[] = []
   if (thinPositions.length) notes.push(`Hanya satu pemain terdaftar pada posisi: ${thinPositions.join(', ')}. Satu cedera di sana langsung menjadi masalah susunan tim.`)
-  if (injuryLoadPct >= 20) notes.push(`${injuryLoadPct}% laga hilang karena cedera. Angka setinggi ini lebih sering menunjuk pada beban latihan atau pemulihan, bukan kesialan.`)
-  if (averageAge >= 30) notes.push(`Rata-rata usia ${averageAge} tahun — pertimbangkan regenerasi, karena penurunan pada kelompok ini cenderung terjadi bersamaan.`)
-  if (averageAge > 0 && averageAge <= 23) notes.push(`Rata-rata usia ${averageAge} tahun — potensi besar, tetapi konsistensi antar-laga biasanya masih rendah.`)
+  if (injuryLoadPct >= 20) notes.push(`${injuryLoadPct}% of matches lost to injury. A figure this high points to training load or recovery more often than to bad luck.`)
+  if (averageAge >= 30) notes.push(`Average age ${averageAge} — consider regeneration, because decline in this group tends to arrive at the same time.`)
+  if (averageAge > 0 && averageAge <= 23) notes.push(`Average age ${averageAge} — high potential, but match-to-match consistency is usually still low.`)
 
   return { squadSize: players.length, averageOverall, averageAge, thinPositions, injuryLoadPct, notes }
 }

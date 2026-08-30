@@ -17,22 +17,22 @@ type Tab = 'negara' | 'suku-bunga' | 'simulasi' | 'dagang'
 type Metric = 'gdpUsdTn' | 'inflationPct' | 'policyRatePct' | 'unemploymentPct' | 'govDebtPctGdp' | 'perCapita'
 
 const METRIC_LABEL: Record<Metric, string> = {
-  gdpUsdTn: 'PDB (triliun USD)',
-  perCapita: 'PDB per kapita (USD)',
-  inflationPct: 'Inflasi (%)',
-  policyRatePct: 'Suku bunga acuan (%)',
-  unemploymentPct: 'Pengangguran (%)',
-  govDebtPctGdp: 'Utang pemerintah (% PDB)',
+  gdpUsdTn: 'GDP (trillion USD)',
+  perCapita: 'GDP per capita (USD)',
+  inflationPct: 'Inflation (%)',
+  policyRatePct: 'Policy rate (%)',
+  unemploymentPct: 'Unemployment (%)',
+  govDebtPctGdp: 'Government debt (% of GDP)',
 }
 
 export function MacroLab() {
   const [tab, setTab] = useState<Tab>('negara')
 
   const TABS: { id: Tab; l: string }[] = [
-    { id: 'negara', l: 'Perbandingan Negara' },
-    { id: 'suku-bunga', l: 'Dampak Suku Bunga' },
-    { id: 'simulasi', l: 'Simulasi Kebijakan' },
-    { id: 'dagang', l: 'Perdagangan' },
+    { id: 'negara', l: 'Country Comparison' },
+    { id: 'suku-bunga', l: 'Interest Rate Effects' },
+    { id: 'simulasi', l: 'Policy Simulation' },
+    { id: 'dagang', l: 'Trade' },
   ]
 
   return (
@@ -41,7 +41,7 @@ export function MacroLab() {
         <span className="grid h-11 w-11 place-items-center rounded-2xl bg-brand-50 text-2xl">🌐</span>
         <div>
           <h1 className="text-lg font-black text-ink dark:text-ink">Macro Lab</h1>
-          <p className="text-xs text-neutral-500">Ekonomi makro, suku bunga, dan perdagangan — dengan asumsi yang terbuka</p>
+          <p className="text-xs text-neutral-500">Macroeconomics, interest rates and trade — with the assumptions in the open</p>
         </div>
       </div>
 
@@ -49,11 +49,11 @@ export function MacroLab() {
         <div className="flex items-start gap-2 rounded-xl bg-amber-50 p-3 dark:bg-amber-500/10">
           <span className="text-base">⚠️</span>
           <p className="text-[12px] leading-relaxed text-amber-900 dark:text-amber-200">
-            Angka negara di halaman ini adalah <b>data acuan statis per {DATA_AS_OF}</b>, bukan
-            umpan langsung. Angka tanpa tanggal lebih menyesatkan daripada tidak ada angka sama
-            sekali — jadi verifikasi ke sumber primer sebelum memakainya untuk keputusan nyata.
-            Bagian simulasi <b>bukan ramalan</b>: ia menunjukkan konsekuensi mekanis dari asumsi
-            yang Anda masukkan sendiri.
+            The country figures on this page are <b>static reference data as of {DATA_AS_OF}</b>, not
+            a live feed. A number without a date is more misleading than no number at all — so verify
+            against primary sources before using any of it for a real decision. The simulation section
+            is <b>not a forecast</b>: it shows the mechanical consequences of the assumptions you
+            enter yourself.
           </p>
         </div>
       </Card>
@@ -80,9 +80,8 @@ export function MacroLab() {
       </Card>
 
       <div className="rounded-2xl border border-neutral-100 bg-white p-4 text-center text-[11px] leading-relaxed text-neutral-500 dark:border-white/10 dark:bg-white/5">
-        Alat edukasi ekonomi makro. Bukan nasihat investasi maupun kebijakan, dan tidak
-        memperkirakan pergerakan pasar. Angka dibulatkan untuk perbandingan, bukan untuk perhitungan
-        yang presisi.
+        An educational macroeconomics tool. Not investment or policy advice, and it does not predict
+        market movements. Figures are rounded for comparison, not for precise calculation.
       </div>
     </div>
   )
@@ -108,11 +107,11 @@ function CountryTab() {
   return (
     <>
       <Card className="!p-4">
-        <SectionTitle icon={<IconToken size={18} />} title="Perbandingan negara" subtitle={`Reference data as of ${DATA_AS_OF}`} />
+        <SectionTitle icon={<IconToken size={18} />} title="Country comparison" subtitle={`Reference data as of ${DATA_AS_OF}`} />
         <div className="mt-3 flex flex-wrap gap-1.5">
           <button onClick={() => setBloc(null)}
             className={`rounded-full px-3 py-1.5 text-[11px] font-bold ${!bloc ? 'bg-brand text-white' : 'bg-neutral-100 text-neutral-600 dark:bg-white/10'}`}>
-            Semua
+            All
           </button>
           {(Object.keys(BLOC_LABEL) as Bloc[]).map((b) => (
             <button key={b} onClick={() => setBloc(b)}
@@ -183,10 +182,10 @@ function RateTab() {
   return (
     <>
       <Card className="!p-4">
-        <SectionTitle icon={<IconToken size={18} />} title="Dampak perubahan suku bunga" subtitle="Akibat yang timbul dari asumsi Anda sendiri" />
+        <SectionTitle icon={<IconToken size={18} />} title="Effects of an interest-rate change" subtitle="The consequences that follow from your own assumptions" />
         <div className="mt-3 space-y-3">
           <div>
-            <div className="text-[12px] font-bold text-ink dark:text-ink">Perubahan suku bunga acuan</div>
+            <div className="text-[12px] font-bold text-ink dark:text-ink">Change in the policy rate</div>
             <div className="mt-1 flex flex-wrap gap-1.5">
               {[-2, -1, -0.5, 0.5, 1, 2].map((d) => (
                 <button key={d} onClick={() => setDelta(d)}
@@ -200,7 +199,7 @@ function RateTab() {
             <input type="range" min={0} max={1} step={0.05} value={pass}
               onChange={(e) => setPass(Number(e.target.value))} className="w-full" />
           </Field>
-          <Field label={`Utang rumah tangga: ${debt}% dari pendapatan`}>
+          <Field label={`Household debt: ${debt}% of income`}>
             <input type="range" min={0} max={250} step={10} value={debt}
               onChange={(e) => setDebt(Number(e.target.value))} className="w-full" />
           </Field>
@@ -210,13 +209,13 @@ function RateTab() {
       <Card className="!p-4">
         <div className="rounded-xl bg-neutral-50 p-3 dark:bg-white/5">
           <div className="flex items-center justify-between">
-            <span className="text-[12px] font-bold text-neutral-500">Bunga kredit bergerak</span>
+            <span className="text-[12px] font-bold text-neutral-500">Lending rate moves</span>
             <span className="text-xl font-black text-ink dark:text-ink">
               {r.lendingRateChangePp > 0 ? '+' : ''}{r.lendingRateChangePp.toFixed(2)} pp
             </span>
           </div>
           <div className="mt-1 flex items-center justify-between">
-            <span className="text-[12px] font-bold text-neutral-500">Perkiraan cicilan bulanan</span>
+            <span className="text-[12px] font-bold text-neutral-500">Estimated monthly payment</span>
             <span className="text-[15px] font-black text-ink dark:text-ink">
               {r.monthlyPaymentChangePct > 0 ? '+' : ''}{r.monthlyPaymentChangePct.toFixed(1)}%
             </span>
@@ -236,7 +235,7 @@ function RateTab() {
         </div>
 
         <div className="mt-3 rounded-xl bg-amber-50 p-3 dark:bg-amber-500/10">
-          <div className="text-[11px] font-black uppercase tracking-wide text-amber-800 dark:text-amber-300">Jeda kebijakan</div>
+          <div className="text-[11px] font-black uppercase tracking-wide text-amber-800 dark:text-amber-300">Policy lag</div>
           <p className="mt-1 text-[12px] leading-relaxed text-neutral-700 dark:text-neutral-200">{r.lagNote}</p>
         </div>
       </Card>
@@ -262,17 +261,17 @@ function SimTab() {
   return (
     <>
       <Card className="!p-4">
-        <SectionTitle icon={<IconToken size={18} />} title="Simulasi kebijakan per kuartal" subtitle="Aturan Taylor sederhana — bukan ramalan" />
+        <SectionTitle icon={<IconToken size={18} />} title="Quarterly policy simulation" subtitle="A simple Taylor rule — not a forecast" />
         <div className="mt-3 grid grid-cols-2 gap-2">
-          <Field label="Inflasi awal (%)">
+          <Field label="Starting inflation (%)">
             <input className={inputClass} inputMode="decimal" value={startInflation}
               onChange={(e) => setStartInflation(Number(e.target.value) || 0)} />
           </Field>
-          <Field label="Target inflasi (%)">
+          <Field label="Inflation target (%)">
             <input className={inputClass} inputMode="decimal" value={target}
               onChange={(e) => setTarget(Number(e.target.value) || 0)} />
           </Field>
-          <Field label="Suku bunga awal (%)">
+          <Field label="Starting policy rate (%)">
             <input className={inputClass} inputMode="decimal" value={startRate}
               onChange={(e) => setStartRate(Number(e.target.value) || 0)} />
           </Field>
@@ -282,7 +281,7 @@ function SimTab() {
           </Field>
         </div>
         <div className="mt-2">
-          <div className="text-[12px] font-bold text-ink dark:text-ink">Jumlah kuartal</div>
+          <div className="text-[12px] font-bold text-ink dark:text-ink">Number of quarters</div>
           <div className="mt-1 flex gap-1.5">
             {[4, 8, 12, 20].map((q) => (
               <button key={q} onClick={() => setQuarters(q)}
@@ -303,24 +302,24 @@ function SimTab() {
               <YAxis tick={{ fontSize: 10 }} />
               <Tooltip contentStyle={{ fontSize: 11 }} />
               <Legend wrapperStyle={{ fontSize: 11 }} />
-              <Line type="monotone" dataKey="inflationPct" name="Inflasi" stroke="#ef4444" dot={false} strokeWidth={2} />
-              <Line type="monotone" dataKey="policyRatePct" name="Suku bunga" stroke="#00BF63" dot={false} strokeWidth={2} />
+              <Line type="monotone" dataKey="inflationPct" name="Inflation" stroke="#ef4444" dot={false} strokeWidth={2} />
+              <Line type="monotone" dataKey="policyRatePct" name="Policy rate" stroke="#00BF63" dot={false} strokeWidth={2} />
               <Line type="monotone" dataKey="outputGapPct" name="Output gap" stroke="#6366f1" dot={false} strokeWidth={2} />
             </LineChart>
           </ResponsiveContainer>
         </div>
 
         <div className="mt-3 rounded-xl bg-neutral-50 p-3 dark:bg-white/5">
-          <div className="text-[11px] font-black uppercase tracking-wide text-neutral-500">Persamaan yang dipakai</div>
+          <div className="text-[11px] font-black uppercase tracking-wide text-neutral-500">The equations used</div>
           <pre className="mt-1 overflow-x-auto text-[10px] leading-relaxed text-neutral-600 dark:text-neutral-300">
-{`suku bunga target = riil netral + inflasi
-                  + 0,5 × (inflasi − target)
-                  + 0,5 × output gap
-suku bunga        = bergerak 50% menuju target tiap kuartal
-output gap        −= 0,3 × (suku bunga riil − riil netral)
-inflasi           = 0,7×inflasi + 0,3×target + 0,2×output gap`}
+{`target rate = neutral real + inflation
+              + 0.5 × (inflation − target)
+              + 0.5 × output gap
+policy rate = moves 50% toward target each quarter
+output gap  −= 0.3 × (real rate − neutral real)
+inflation   = 0.7×inflation + 0.3×target + 0.2×output gap`}
           </pre>
-          <Prosa kelas="mt-2 text-[11px] leading-relaxed text-neutral-500">Persamaannya ditampilkan supaya Anda bisa menilai modelnya, bukan sekadar mempercayai grafiknya. Model ini sangat disederhanakan dan mengabaikan banyak hal yang nyata — guncangan harga pangan dan energi, nilai tukar, ekspektasi inflasi yang tidak jangkar, dan kebijakan fiskal. Gunakan untuk memahami arah dan jeda, bukan untuk memperkirakan angka bulan depan.</Prosa>
+          <Prosa kelas="mt-2 text-[11px] leading-relaxed text-neutral-500">The equations are shown so you can judge the model rather than simply trust the chart. This model is heavily simplified and ignores a great deal that is real — food and energy price shocks, exchange rates, unanchored inflation expectations, and fiscal policy. Use it to understand direction and lag, not to predict next month's number.</Prosa>
         </div>
       </Card>
     </>
@@ -339,34 +338,34 @@ function TradeTab() {
   return (
     <>
       <Card className="!p-4">
-        <SectionTitle icon={<IconToken size={18} />} title="Analisis perdagangan" subtitle="Neraca, keterbukaan, dan cara membacanya" />
+        <SectionTitle icon={<IconToken size={18} />} title="Trade analysis" subtitle="Balance, openness, and how to read them" />
         <div className="mt-3 grid gap-2">
-          <Field label="Ekspor (miliar USD)"><input className={inputClass} inputMode="decimal" value={ex} onChange={(e) => setEx(e.target.value)} /></Field>
-          <Field label="Impor (miliar USD)"><input className={inputClass} inputMode="decimal" value={im} onChange={(e) => setIm(e.target.value)} /></Field>
-          <Field label="PDB (miliar USD)"><input className={inputClass} inputMode="decimal" value={gdp} onChange={(e) => setGdp(e.target.value)} /></Field>
+          <Field label="Exports (billion USD)"><input className={inputClass} inputMode="decimal" value={ex} onChange={(e) => setEx(e.target.value)} /></Field>
+          <Field label="Imports (billion USD)"><input className={inputClass} inputMode="decimal" value={im} onChange={(e) => setIm(e.target.value)} /></Field>
+          <Field label="GDP (billion USD)"><input className={inputClass} inputMode="decimal" value={gdp} onChange={(e) => setGdp(e.target.value)} /></Field>
         </div>
       </Card>
 
       <Card className="!p-4">
         <div className="rounded-xl bg-neutral-50 p-3 dark:bg-white/5">
           <div className="flex items-center justify-between">
-            <span className="text-[12px] font-bold text-neutral-500">Neraca perdagangan</span>
+            <span className="text-[12px] font-bold text-neutral-500">Trade balance</span>
             <span className={`text-xl font-black ${a.balanceUsdBn >= 0 ? 'text-emerald-600' : 'text-rose-600'}`}>
-              {a.balanceUsdBn >= 0 ? '+' : ''}{a.balanceUsdBn.toFixed(1)} miliar USD
+              {a.balanceUsdBn >= 0 ? '+' : ''}{a.balanceUsdBn.toFixed(1)} billion USD
             </span>
           </div>
           <div className="mt-1 flex items-center justify-between text-[12px]">
-            <span className="text-neutral-500">Terhadap PDB</span>
+            <span className="text-neutral-500">As a share of GDP</span>
             <span className="font-bold text-ink dark:text-ink">{a.balancePctGdp.toFixed(2)}%</span>
           </div>
           <div className="mt-1 flex items-center justify-between text-[12px]">
-            <span className="text-neutral-500">Keterbukaan perdagangan</span>
-            <span className="font-bold text-ink dark:text-ink">{a.tradeOpennessPct.toFixed(1)}% PDB</span>
+            <span className="text-neutral-500">Trade openness</span>
+            <span className="font-bold text-ink dark:text-ink">{a.tradeOpennessPct.toFixed(1)}% of GDP</span>
           </div>
         </div>
         <div className="mt-2"><Badge tone={a.balanceUsdBn >= 0 ? 'normal' : 'high'}>{a.verdict}</Badge></div>
         <div className="mt-3 rounded-xl bg-amber-50 p-3 dark:bg-amber-500/10">
-          <div className="text-[11px] font-black uppercase tracking-wide text-amber-800 dark:text-amber-300">Jangan buru-buru menyimpulkan</div>
+          <div className="text-[11px] font-black uppercase tracking-wide text-amber-800 dark:text-amber-300">Do not jump to conclusions</div>
           <p className="mt-1 text-[12px] leading-relaxed text-neutral-700 dark:text-neutral-200">{a.caution}</p>
         </div>
       </Card>

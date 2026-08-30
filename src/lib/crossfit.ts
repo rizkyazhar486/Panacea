@@ -44,12 +44,12 @@ export const FORMAT: Format[] = [
   {
     id: 'fortime',
     nama: 'For Time',
-    kepanjangan: 'Selesaikan secepat mungkin',
+    kepanjangan: 'Finish as fast as possible',
     singkat: 'Fixed work, time as the score.',
     caraKerja: 'The number of reps is set. Your score is how long you take to finish them.',
     bagusUntuk: 'A clean comparison over time — same load, same reps, so the time actually means something.',
     jebakan: 'The format most often linked with injury in beginners, because broken technique still "counts" as long as the rep is completed.',
-    contoh: 'Fran — 21-15-9 thruster & pull-up, secepat mungkin.',
+    contoh: 'Fran — 21-15-9 thruster & pull-up, as fast as possible.',
   },
   {
     id: 'emom',
@@ -74,7 +74,7 @@ export const FORMAT: Format[] = [
   {
     id: 'chipper',
     nama: 'Chipper',
-    kepanjangan: 'Daftar panjang, sekali lewat',
+    kepanjangan: 'A long list, worked through once',
     singkat: 'Many movements, none repeated.',
     caraKerja: 'A list of movements with large rep counts, worked through in order to the end, with no rounds.',
     bagusUntuk: 'Mental endurance and movement variety in a single session.',
@@ -85,11 +85,11 @@ export const FORMAT: Format[] = [
     id: 'couplet',
     nama: 'Couplet & Triplet',
     kepanjangan: 'Two or three movements alternating',
-    singkat: 'Struktur paling umum di CrossFit.',
+    singkat: 'The most common structure in CrossFit.',
     caraKerja: 'Two (couplet) or three (triplet) movements alternated. They are usually paired so different muscles work, letting one movement "rest" the other.',
     bagusUntuk: 'High intensity without one muscle group giving out before the cardiovascular system does.',
     jebakan: 'A bad pairing (say two pulling movements) ends the session through grip failure rather than breathing.',
-    contoh: 'Helen (triplet) — 3 ronde: lari 400 m, 21 kettlebell swing, 12 pull-up.',
+    contoh: 'Helen (triplet) — 3 rounds: 400 m run, 21 kettlebell swings, 12 pull-ups.',
   },
   {
     id: 'ladder',
@@ -104,12 +104,12 @@ export const FORMAT: Format[] = [
   {
     id: 'hyrox',
     nama: 'HYROX',
-    kepanjangan: 'Lomba kebugaran terstandar',
-    singkat: '8 × 1 km lari diselingi 8 stasiun.',
+    kepanjangan: 'A standardised fitness race',
+    singkat: '8 × 1 km runs alternating with 8 stations.',
     caraKerja: 'Unlike CrossFit, the order is THE SAME at every race in the world — run 1 km, one station, repeat eight times. The stations are ski erg, sled push, sled pull, burpee broad jump, row, farmers carry, sandbag lunge, wall balls.',
     bagusUntuk: 'People who want a fair comparison across time and across cities, and who prefer endurance to technical barbell work.',
     jebakan: 'The running adds up to eight kilometres. Many people train the stations and forget that this race is mostly running.',
-    contoh: 'Simulasi separuh: 4 × (lari 1 km + satu stasiun).',
+    contoh: 'Half simulation: 4 × (1 km run + one station).',
   },
 ]
 
@@ -151,7 +151,7 @@ export const BENCHMARK: Benchmark[] = [
   {
     nama: 'Cindy', kelompok: 'girls', format: '20-minute AMRAP', bodyweight: true,
     isi: ['5 pull-up', '10 push-up', '15 air squat'],
-    targetWaktu: 'Pemula 8-12 ronde · menengah 15-20 · mahir 20+',
+    targetWaktu: 'Beginner 8–12 rounds · intermediate 15–20 · advanced 20+',
     skala: 'Swap pull-ups for ring rows or band-assisted pull-ups; push-ups from the knees or inclined on a box. If the first round takes more than 90 seconds, drop the reps to 3-6-9.',
     catatan: 'The best-known bodyweight benchmark and the best entry point: no barbell, no Olympic technique.',
     jam: { jenis: 'amrap', menit: 20 },
@@ -169,7 +169,7 @@ export const BENCHMARK: Benchmark[] = [
   {
     nama: 'Angie', kelompok: 'girls', format: 'For Time', bodyweight: true,
     isi: ['100 pull-up', '100 push-up', '100 sit-up', '100 air squat'],
-    targetWaktu: 'Pemula 25-35 mnt · menengah 18-22 · mahir <15',
+    targetWaktu: 'Beginner 25–35 min · intermediate 18–22 · advanced <15',
     skala: 'The "Half Angie" version (50 of each) is an honest entry point. Each movement is completed in full before moving on.',
     catatan: '400 reps in total. This is one of the sessions that carries a rhabdomyolysis risk in the unaccustomed — see the warning below.',
     jam: { jenis: 'fortime', batas: 40, ronde: 4 },
@@ -196,7 +196,7 @@ export const BENCHMARK: Benchmark[] = [
   {
     nama: 'Annie', kelompok: 'girls', format: 'For Time (50-40-30-20-10)', bodyweight: true,
     isi: ['Double-under', 'Sit-up'],
-    targetWaktu: 'Pemula 12-18 mnt · mahir <7',
+    targetWaktu: 'Beginner 12–18 min · advanced <7',
     skala: 'Swap double-unders for single-unders at double the reps (100-80-60-40-20) — not half.',
     catatan: 'Good for learning double-unders: low fatigue, high repetition.',
     jam: { jenis: 'fortime', batas: 25, ronde: 5 },
@@ -205,8 +205,8 @@ export const BENCHMARK: Benchmark[] = [
   // ── Melibatkan beban ──────────────────────────────────────────────────────
   {
     nama: 'Fran', kelompok: 'girls', format: 'For Time (21-15-9)', bodyweight: false,
-    isi: ['Thruster', 'Pull-up'], bebanRx: '43 kg pria / 30 kg wanita',
-    targetWaktu: 'Pemula 8-12 mnt · menengah 5-7 · elite <3',
+    isi: ['Thruster', 'Pull-up'], bebanRx: '43 kg men / 30 kg women',
+    targetWaktu: 'Beginner 8–12 min · intermediate 5–7 · elite <3',
     skala: 'Lower the load until the set of 21 can be done in two sets at most. If it needs breaking up more than that, the load is too heavy for what this session is for.',
     catatan: 'The best-known benchmark. Precisely because it is short, the temptation to go too heavy is strongest here.',
     jam: { jenis: 'fortime', batas: 20, ronde: 3 },
@@ -214,8 +214,8 @@ export const BENCHMARK: Benchmark[] = [
   },
   {
     nama: 'Helen', kelompok: 'girls', format: '3 ronde For Time', bodyweight: false,
-    isi: ['Lari 400 m', '21 kettlebell swing', '12 pull-up'], bebanRx: 'KB 24 kg / 16 kg',
-    targetWaktu: 'Pemula 14-18 mnt · menengah 10-12 · mahir <9',
+    isi: ['Lari 400 m', '21 kettlebell swings', '12 pull-up'], bebanRx: 'KB 24 kg / 16 kg',
+    targetWaktu: 'Beginner 14–18 min · intermediate 10–12 · advanced <9',
     skala: 'Cut the run to 200–300 m; lower the kettlebell so 21 swings can be done unbroken.',
     catatan: 'A triplet with a good balance of running, pulling and hip hinging.',
     jam: { jenis: 'fortime', batas: 25, ronde: 3 },
@@ -224,7 +224,7 @@ export const BENCHMARK: Benchmark[] = [
   {
     nama: 'Grace', kelompok: 'girls', format: 'For Time', bodyweight: false,
     isi: ['30 clean & jerk'], bebanRx: '61 kg / 43 kg',
-    targetWaktu: 'Pemula 6-10 mnt · mahir <3',
+    targetWaktu: 'Beginner 6–10 min · advanced <3',
     skala: 'Use a load you can lift 10 times unbroken when fresh — usually far lighter than you would guess.',
     catatan: 'A single Olympic movement repeated. Do NOT attempt this before a coach has assessed your clean & jerk.',
     jam: { jenis: 'fortime', batas: 20 },
@@ -233,7 +233,7 @@ export const BENCHMARK: Benchmark[] = [
   {
     nama: 'Karen', kelompok: 'girls', format: 'For Time', bodyweight: false,
     isi: ['150 wall ball'], bebanRx: '9 kg ke target 3 m / 6 kg ke 2,7 m',
-    targetWaktu: 'Pemula 12-18 mnt · mahir <7',
+    targetWaktu: 'Beginner 12–18 min · advanced <7',
     skala: 'Drop to 100 or 75 reps before you drop the weight of the ball.',
     catatan: 'Simple and brutal. The quad soreness afterwards usually lasts several days.',
     jam: { jenis: 'fortime', batas: 25 },
@@ -244,7 +244,7 @@ export const BENCHMARK: Benchmark[] = [
     nama: 'Murph', kelompok: 'hero', format: 'For Time', bodyweight: false,
     isi: ['Lari 1,6 km', '100 pull-up', '200 push-up', '300 air squat', 'Lari 1,6 km'],
     bebanRx: 'With a 9 kg / 6 kg vest',
-    targetWaktu: 'Pemula 55-75 mnt · menengah 40-50 · mahir <35',
+    targetWaktu: 'Beginner 55–75 min · intermediate 40–50 · advanced <35',
     skala: 'No vest, break it into 20 rounds of 5-10-15, and halve it ("Half Murph") on a first attempt. This is the single session that causes the most rhabdomyolysis in a year.',
     catatan: 'Named for Lieutenant Michael Murphy, a Navy SEAL killed in Afghanistan in 2005. Usually done on Memorial Day.',
     jam: { jenis: 'fortime', batas: 90, ronde: 5 },
@@ -252,7 +252,7 @@ export const BENCHMARK: Benchmark[] = [
   },
   {
     nama: 'Chad', kelompok: 'hero', format: 'For Time', bodyweight: true,
-    isi: ['1000 box step-up (kotak 50 cm)'], bebanRx: 'Ransel 20 kg / 14 kg',
+    isi: ['1000 box step-ups (50 cm box)'], bebanRx: '20 kg / 14 kg backpack',
     targetWaktu: '60–100 minutes',
     skala: 'No rucksack, a lower box, and 500 reps for a first attempt.',
     catatan: 'Named for Chad Wilkinson, a Navy SEAL who died by suicide in 2018; the session is used to raise awareness of suicide prevention among veterans.',
@@ -262,7 +262,7 @@ export const BENCHMARK: Benchmark[] = [
   {
     nama: 'JT', kelompok: 'hero', format: 'For Time (21-15-9)', bodyweight: true,
     isi: ['Handstand push-up', 'Ring dip', 'Push-up'],
-    targetWaktu: 'Pemula 15-25 mnt · mahir <8',
+    targetWaktu: 'Beginner 15–25 min · advanced <8',
     skala: 'Pike push-ups, bench dips, knee push-ups. The descending ladder helps — the hardest part comes first.',
     catatan: 'Named for Petty Officer Jeff Taylor, killed in the same operation as Michael Murphy.',
     jam: { jenis: 'fortime', batas: 30, ronde: 3 },
@@ -271,7 +271,7 @@ export const BENCHMARK: Benchmark[] = [
   // ── Titik masuk ───────────────────────────────────────────────────────────
   {
     nama: 'Baby Cindy', kelompok: 'pemula', format: '10-minute AMRAP', bodyweight: true,
-    isi: ['3 ring row', '6 push-up (boleh miring)', '9 air squat'],
+    isi: ['3 ring rows', '6 push-ups (incline allowed)', '9 air squats'],
     targetWaktu: '6-10 ronde',
     skala: 'If 10 rounds feels easy, extend the time to 15 minutes before adding reps.',
     catatan: 'Start here if this is your first week. There is nothing embarrassing about starting here.',
@@ -308,23 +308,23 @@ export interface Arketipe {
 }
 
 export const ARKETIPE: Arketipe[] = [
-  { id: 'kelelawar', gambar: 'https://d8j0ntlcm91z4.cloudfront.net/user_3FaS56ACS5VALa5WTIecT6KKkQf/hf_20260807_084005_89809645-98f7-4e0d-a0e0-693070145f92.png', ikon: '🦇', nama: 'Sang Penjaga Malam', sifat: 'An ordinary person who wins through discipline rather than talent',
-    latihan: 'Kekuatan dasar + kapasitas kerja', format: 'Barbara or Chelsea',
+  { id: 'kelelawar', gambar: 'https://d8j0ntlcm91z4.cloudfront.net/user_3FaS56ACS5VALa5WTIecT6KKkQf/hf_20260807_084005_89809645-98f7-4e0d-a0e0-693070145f92.png', ikon: '🦇', nama: 'The Night Watch', sifat: 'An ordinary person who wins through discipline rather than talent',
+    latihan: 'Base strength + work capacity', format: 'Barbara or Chelsea',
     kenapa: 'The archetype with no superpowers. All of it comes from training repeated when nobody is watching — and Barbara’s scheduled rest tests exactly that.' },
-  { id: 'laba-laba', gambar: 'https://d8j0ntlcm91z4.cloudfront.net/user_3FaS56ACS5VALa5WTIecT6KKkQf/hf_20260807_084005_1b9bba55-233f-4a1d-af05-47702fefdd46.png', ikon: '🕷️', nama: 'Sang Pemanjat', sifat: 'Light, agile, strong relative to body weight',
-    latihan: 'Strength-to-weight ratio', format: 'Cindy, lalu Mary',
+  { id: 'laba-laba', gambar: 'https://d8j0ntlcm91z4.cloudfront.net/user_3FaS56ACS5VALa5WTIecT6KKkQf/hf_20260807_084005_1b9bba55-233f-4a1d-af05-47702fefdd46.png', ikon: '🕷️', nama: 'The Climber', sifat: 'Light, agile, strong relative to body weight',
+    latihan: 'Strength-to-weight ratio', format: 'Cindy, then Mary',
     kenapa: 'Every movement is bodyweight. Progress comes from getting stronger at your own body, not from adding load.' },
-  { id: 'baja', gambar: 'https://d8j0ntlcm91z4.cloudfront.net/user_3FaS56ACS5VALa5WTIecT6KKkQf/hf_20260807_084027_21649ae4-79ce-4e0e-a789-7bb8e5553e63.png', ikon: '🛡️', nama: 'Sang Perisai', sifat: 'Endurance that does not run out',
-    latihan: 'Daya tahan jangka panjang', format: 'Murph (scaled) or HYROX',
+  { id: 'baja', gambar: 'https://d8j0ntlcm91z4.cloudfront.net/user_3FaS56ACS5VALa5WTIecT6KKkQf/hf_20260807_084027_21649ae4-79ce-4e0e-a789-7bb8e5553e63.png', ikon: '🛡️', nama: 'The Shield', sifat: 'Endurance that does not run out',
+    latihan: 'Long-duration endurance', format: 'Murph (scaled) or HYROX',
     kenapa: 'Long sessions test something different from hard ones: staying technically clean past the 40-minute mark.' },
-  { id: 'mesin', gambar: 'https://d8j0ntlcm91z4.cloudfront.net/user_3FaS56ACS5VALa5WTIecT6KKkQf/hf_20260807_084027_a2c19749-889e-43f1-9508-941866f19330.png', ikon: '⚙️', nama: 'Sang Perekayasa', sifat: 'Winning through calculation and tools rather than muscle',
+  { id: 'mesin', gambar: 'https://d8j0ntlcm91z4.cloudfront.net/user_3FaS56ACS5VALa5WTIecT6KKkQf/hf_20260807_084027_a2c19749-889e-43f1-9508-941866f19330.png', ikon: '⚙️', nama: 'The Engineer', sifat: 'Winning through calculation and tools rather than muscle',
     latihan: 'Pacing and strategy', format: 'Any AMRAP with a rep-breakdown plan',
     kenapa: 'Write your rep-breakdown plan BEFORE the clock starts, then follow it. This is the skill that raises scores fastest.' },
-  { id: 'raksasa', gambar: 'https://d8j0ntlcm91z4.cloudfront.net/user_3FaS56ACS5VALa5WTIecT6KKkQf/hf_20260807_084202_b39923ca-18a1-48f1-a12f-4e162cfa4905.png', ikon: '💪', nama: 'Sang Raksasa', sifat: 'Kekuatan mentah, ledakan pendek',
-    latihan: 'Kekuatan maksimal', format: 'Grace or Karen',
+  { id: 'raksasa', gambar: 'https://d8j0ntlcm91z4.cloudfront.net/user_3FaS56ACS5VALa5WTIecT6KKkQf/hf_20260807_084202_b39923ca-18a1-48f1-a12f-4e162cfa4905.png', ikon: '💪', nama: 'The Giant', sifat: 'Raw strength, short bursts',
+    latihan: 'Maximal strength', format: 'Grace or Karen',
     kenapa: 'Short and heavy. This archetype most needs restraint: raw strength without technique is the fastest route to a back injury.' },
-  { id: 'petir', gambar: 'https://d8j0ntlcm91z4.cloudfront.net/user_3FaS56ACS5VALa5WTIecT6KKkQf/hf_20260807_084202_737ab391-d512-4aa6-83d8-45187a8ff5de.png', ikon: '⚡', nama: 'Sang Pelari Cepat', sifat: 'Kecepatan di atas segalanya',
-    latihan: 'Tenaga anaerobik', format: 'Fran or Tabata',
+  { id: 'petir', gambar: 'https://d8j0ntlcm91z4.cloudfront.net/user_3FaS56ACS5VALa5WTIecT6KKkQf/hf_20260807_084202_737ab391-d512-4aa6-83d8-45187a8ff5de.png', ikon: '⚡', nama: 'The Sprinter', sifat: 'Speed above everything',
+    latihan: 'Anaerobic power', format: 'Fran or Tabata',
     kenapa: 'All of them finish in under ten minutes. Enjoyable — and for exactly that reason, the ones most often done too often.' },
 ]
 
@@ -359,8 +359,8 @@ export const ATURAN_AMAN = [
 ]
 
 export const RUJUKAN = [
-  'Tabata I, dkk. Effects of moderate-intensity endurance and high-intensity intermittent training on anaerobic capacity and VO2max. Med Sci Sports Exerc. 1996;28(10):1327-30.',
-  'Hopkins BS, dkk. Rhabdomyolysis in CrossFit: a systematic review. Orthop J Sports Med. 2019.',
+  'Tabata I, et al. Effects of moderate-intensity endurance and high-intensity intermittent training on anaerobic capacity and VO2max. Med Sci Sports Exerc. 1996;28(10):1327-30.',
+  'Hopkins BS, et al. Rhabdomyolysis in CrossFit: a systematic review. Orthop J Sports Med. 2019.',
   'ACSM. Guidelines for Exercise Testing and Prescription, 11th edition, 2021 — chapters on scaling and training-load progression.',
-  'Meyer M, dkk. Exertional rhabdomyolysis: a systematic review. Sports Health. 2018;10(3):260-266.',
+  'Meyer M, et al. Exertional rhabdomyolysis: a systematic review. Sports Health. 2018;10(3):260-266.',
 ]
