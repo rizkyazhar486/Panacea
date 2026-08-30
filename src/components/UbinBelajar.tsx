@@ -6,7 +6,7 @@ import { MOTIVATION } from '../lib/studyContent'
 import { SKDI_ENTRIES } from '../lib/skdiTherapyReference'
 import { QUIZ_BANK, type QuizQuestion } from '../lib/quizBank'
 import { PemutarBaca } from './PemutarBaca'
-import { KARYA } from '../lib/ringkasanKarya'
+import { KARYA, JENIS_LABEL } from '../lib/ringkasanKarya'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Tiga widget yang mengambil dari isi yang SUDAH ADA di aplikasi ini.
@@ -262,7 +262,7 @@ export function UbinRingkasanKarya() {
       <div className="kaca rounded-3xl p-3">
         <div className="flex items-baseline justify-between gap-2">
           <span className="t-kecil min-w-0 truncate font-black text-ink dark:text-white">{k.judul}</span>
-          <span className="t-mikro shrink-0 uppercase text-neutral-400">{k.jenis}</span>
+          <span className="t-mikro shrink-0 uppercase text-neutral-400">{JENIS_LABEL[k.jenis]}</span>
         </div>
         <span className="t-mikro block truncate text-neutral-400">{k.oleh}{k.tahun ? ` · ${k.tahun}` : ''}</span>
         <p className="t-kecil mt-2 line-clamp-5 leading-snug text-neutral-600 dark:text-neutral-300">{k.ringkas}</p>
