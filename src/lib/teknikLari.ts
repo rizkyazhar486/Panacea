@@ -51,7 +51,7 @@ export const BAGIAN: Bagian[] = [
       'Count the steps of one foot for 30 seconds during an easy run, then multiply by four. That is your current cadence.',
       'Raise it by 5% first — not straight to 180. That number came from observing elite runners in races, not as a target for everyone.',
       'Use a metronome or a track at the target BPM for 5–10 minutes inside an easy run.',
-      'Biarkan panjang langkah menyesuaikan sendiri. Jangan diatur langsung.',
+      'Let stride length adjust itself. Do not set it deliberately.',
     ],
     kesalahan: 'Chasing 180 spm when your natural cadence is 158. A jump that large makes running feel unnatural and is usually abandoned within a week.',
     latihan: '4 × 1 minute at +5% cadence, with 2 minutes free cadence between, inside an easy run.',
@@ -173,7 +173,7 @@ export const FISIOLOGI: Fisiologi[] = [
       'Raise the weekly total by at most 10% over the previous week, and not every week.',
       'Every fourth week, drop volume by 20–30%. The adaptation happens in that easy week, not in the hard ones.',
       'A single long run should not exceed 30–35% of the weekly total.',
-      'Tambah jumlah sesi sebelum menambah jarak per sesi.',
+      'Add sessions before adding distance per session.',
     ],
   },
   {
@@ -183,7 +183,7 @@ export const FISIOLOGI: Fisiologi[] = [
     aturan: [
       'Two quality sessions a week at most, whatever your level.',
       'An easy run should feel TOO easy. If it does not, it is not an easy run.',
-      'Jangan dua sesi keras berturut-turut. Beri jarak minimal 48 jam.',
+      'Never two hard sessions back to back. Leave at least 48 hours between them.',
       'When torn between easy and moderate, choose easy.',
     ],
   },

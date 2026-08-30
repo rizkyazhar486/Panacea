@@ -187,7 +187,7 @@ export function PricingSection({ onMasuk, promo }: { onMasuk: () => void; promo?
                 34 internationally standard clinical scores &amp; decision-support tools (APGAR, GCS, CURB-65, NIHSS, Parkland, Blood Gas, and more) — for those who'd rather not subscribe monthly.
               </p>
               <div className="mt-4">
-                <PriceLine label="Bayar dari saldo PanaceaToken Anda" price="500 PNC" />
+                <PriceLine label="Pay from your PanaceaToken balance" price="500 PNC" />
                 <PriceLine label="Equivalent bank transfer" price="Rp500,000" note="one-time payment, lifetime access" />
               </div>
             </TiltCard>

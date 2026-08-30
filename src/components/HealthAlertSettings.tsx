@@ -99,7 +99,7 @@ export function HealthAlertSettings() {
       <SectionTitle
         icon={<IconBell />}
         title="Pengingat terhubung perangkat"
-        subtitle="Nyalakan yang Anda perlukan — masing-masing punya pengaturannya sendiri"
+        subtitle="Switch on what you need — each has its own settings"
         right={simpan === 'saving' ? <span className="text-[11px] text-neutral-500">menyimpan…</span>
           : simpan === 'saved' ? <span className="text-[11px] font-bold text-brand-dark">tersimpan ✓</span> : undefined}
       />

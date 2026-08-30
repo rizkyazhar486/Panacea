@@ -31,7 +31,7 @@ export const GROUPS: { title: string; emoji: string; feats: Feat[] }[] = [
     title: 'Mind & Mental Wellness',
     emoji: '🧠',
     feats: [
-      { to: '/connect', name: 'Connect — Cari Teman & Pasangan', what: 'Profil, filter dan kecocokan berbasis gaya hidup sehat — bukan pemasangan perangkat', kw: 'connect kenalan teman pasangan jodoh relasi relationship match kecocokan deck profil sosial dating', tag: 'Wellness' },
+      { to: '/connect', name: 'Connect — Cari Teman & Pasangan', what: 'Profiles, filters and matching based on a healthy lifestyle — not device pairing', kw: 'connect kenalan teman pasangan jodoh relasi relationship match kecocokan deck profil sosial dating', tag: 'Wellness' },
       { to: '/breathwork', name: 'Breathwork Pacer', what: 'Animated paced breathing to calm you in minutes', kw: 'breathing box 478 coherence anxiety stress calm vagus', tag: 'New' },
       { to: '/gratitude', name: 'Gratitude Journal', what: '"Three Good Things" — a proven mood lift', kw: 'gratitude journal happiness positive psychology mood', tag: 'New' },
       { to: '/mental-health-screen', name: 'Mental Health Check', what: 'Validated depression & anxiety screening', kw: 'phq gad depression anxiety screen mental', tag: 'Mental' },
@@ -59,7 +59,7 @@ export const GROUPS: { title: string; emoji: string; feats: Feat[] }[] = [
       { to: '/fasting', name: 'Metabolic Fasting', what: 'Time-restricted eating window & metabolic phases', kw: 'fasting intermittent eating window metabolic autophagy', tag: 'Metabolic' },
       { to: '/thermal-therapy', name: 'Thermal Therapy', what: 'Sauna & cold-exposure protocols with the evidence', kw: 'sauna cold plunge heat ice thermal recovery', tag: 'New' },
       { to: '/macro-lab', name: 'Macro Lab', what: 'Macronutrient targets and meal composition', kw: 'macro protein karbohidrat lemak gizi makro kalori', tag: 'Wellness' },
-      { to: '/sehat-sibuk', name: 'Sehat Tapi Sibuk', what: 'Health habits that fit a packed schedule', kw: 'sibuk busy habit kebiasaan praktis waktu terbatas', tag: 'Wellness' },
+      { to: '/sehat-sibuk', name: 'Healthy But Busy', what: 'Health habits that fit a packed schedule', kw: 'sibuk busy habit kebiasaan praktis waktu terbatas', tag: 'Wellness' },
       { to: '/carbon-diet', name: 'Carbon-Footprint Diet', what: 'Dietary choices weighed by carbon footprint', kw: 'carbon jejak karbon diet lingkungan iklim makanan', tag: 'Wellness' },
       { to: '/nutrition', name: 'Nutrition & BMR', what: 'Calories, macros, and metabolic rate', kw: 'nutrition calorie macro bmr tdee diet', tag: 'Wellness' },
       { to: '/hydration', name: 'Hydration', what: 'Your daily water target', kw: 'water hydration drink fluid', tag: 'Wellness' },
@@ -157,7 +157,7 @@ export function WellnessHub() {
   return (
     <div className="mx-auto max-w-2xl space-y-5 pb-24">
       <Card className="!p-5">
-        <SectionTitle icon={<IconSparkle size={20} />} title="Wellness Hub" subtitle="Hidup lebih panjang, terasa lebih baik, menua dengan baik — seluruh perjalanan Anda dalam satu tempat" />
+        <SectionTitle icon={<IconSparkle size={20} />} title="Wellness Hub" subtitle="Live longer, feel better, age well — your whole journey in one place" />
         <p className="mt-2 text-[13px] leading-relaxed text-neutral-500">
           Longevity, mental wellness, sleep, metabolism, and aesthetics — {total} tools, each grounded
           in evidence and yours to build a daily practice around.

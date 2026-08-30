@@ -146,7 +146,7 @@ function WaistHeightRatio() {
     ratio < 0.5 ? { label: 'Lower risk', tone: 'brand' } : ratio < 0.6 ? { label: 'Increased risk', tone: 'low' } : { label: 'High risk', tone: 'critical' }
   return (
     <Card className="!p-5">
-      <Prosa kelas="text-[13px] leading-relaxed text-neutral-500">Rasio lingkar pinggang terhadap tinggi badan — beberapa penelitian menemukan pedoman "jaga lingkar pinggang kurang dari separuh tinggi badan" lebih sederhana dan lebih baik dalam memperkirakan risiko kardiometabolik daripada IMT saja, karena ia langsung menangkap lemak pusat (viseral).</Prosa>
+      <Prosa kelas="text-[13px] leading-relaxed text-neutral-500">Rasio lingkar pinggang terhadap tinggi badan — beberapa penelitian menemukan pedoman "keep your waist under half your height" lebih sederhana dan lebih baik dalam memperkirakan risiko kardiometabolik daripada IMT saja, karena ia langsung menangkap lemak pusat (viseral).</Prosa>
       <div className="mt-3 grid grid-cols-2 gap-3">
         <Field label="Waist circumference (cm)">
           <input className={inputClass} type="number" min={40} max={200} value={waist} onChange={(e) => setWaist(Number(e.target.value) || 0)} />

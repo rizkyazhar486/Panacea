@@ -561,7 +561,7 @@ function PasswordForm({ lang, onDone, simple: S }: { lang: Lang; onDone: () => v
   const [msg, setMsg] = useState('')
   function submit() {
     if (pw.length < 8) return setMsg(lang === 'en' ? 'Minimum 8 characters.' : 'Minimal 8 karakter.')
-    if (pw !== pw2) return setMsg(lang === 'en' ? 'Passwords do not match.' : 'Kata sandi tidak cocok.')
+    if (pw !== pw2) return setMsg(lang === 'en' ? 'Passwords do not match.' : 'Passwords do not match.')
     setMsg('')
     onDone()
   }

@@ -175,7 +175,7 @@ export function UbinNotifikasi() {
         <div className="border-t border-neutral-100 dark:border-white/10">
           <Baris
             judul="Goals from the teams you starred"
-            catatan={pushNyala ? 'Gol dan peluit akhir, diperiksa server tiap 90 detik' : 'Turn notifications on first'}
+            catatan={pushNyala ? 'Goals and full-time, checked by the server every 90 seconds' : 'Turn notifications on first'}
             kanan={
               <Saklar
                 label="Team goal alerts"
@@ -226,7 +226,7 @@ export function UbinNotifikasi() {
         <div className="border-t border-neutral-100 dark:border-white/10">
           <Baris
             judul="Adhan"
-            catatan={adzan.aktif ? `Bunyi${adzan.getar ? ' + getar' : ''} · hanya saat aplikasi terbuka` : 'Bunyi di dalam aplikasi · mati'}
+            catatan={adzan.aktif ? `Sound${adzan.getar ? ' + vibrate' : ''} · only while the app is open` : 'In-app sound · off'}
             kanan={
               <span className="flex shrink-0 items-center gap-2">
                 {adzan.aktif && (

@@ -70,7 +70,7 @@ export const SPORTS: SportProfile[] = [
     key: 'renang',
     nama: 'Renang',
     emoji: '🏊',
-    satuan: 'Waktu per 100 meter',
+    satuan: 'Time per 100 metres',
     tesAmbang:
       'All-out 400 m and 200 m tests; the difference in times gives Critical Swim Speed as an estimate of threshold',
     bebanSendi:
@@ -98,7 +98,7 @@ export interface PowerZone {
 export const POWER_ZONES: PowerZone[] = [
   { n: 1, nama: 'Pemulihan aktif', pctLo: 0, pctHi: 55, tujuan: 'Speeds recovery without adding fatigue', durasi: '30–60 minutes', rasa: 'Very easy — you can hold a conversation throughout' },
   { n: 2, nama: 'Endurance', pctLo: 56, pctHi: 75, tujuan: 'Builds the aerobic base and fat-burning capacity', durasi: '1-5 jam', rasa: 'Easy — you can still speak in full sentences' },
-  { n: 3, nama: 'Tempo', pctLo: 76, pctHi: 90, tujuan: 'Menaikkan efisiensi aerobik', durasi: '20–60 minutes', rasa: 'Sedang, berbicara mulai terpotong' },
+  { n: 3, nama: 'Tempo', pctLo: 76, pctHi: 90, tujuan: 'Menaikkan efisiensi aerobik', durasi: '20–60 minutes', rasa: 'Moderate — speech starts breaking up' },
   { n: 4, nama: 'Ambang laktat', pctLo: 91, pctHi: 105, tujuan: 'Menaikkan ambang laktat — penentu terbesar performa', durasi: '8–30 minute blocks', rasa: 'Hard but controlled — 3–5 words at a time' },
   { n: 5, nama: 'VO₂max', pctLo: 106, pctHi: 120, tujuan: 'Menaikkan kapasitas aerobik maksimal', durasi: '3–8 minute blocks', rasa: 'Very hard — one or two words only' },
   { n: 6, nama: 'Anaerobik', pctLo: 121, pctHi: 150, tujuan: 'Anaerobic capacity and lactate tolerance', durasi: 'Blocks of 30 seconds to 3 minutes', rasa: 'Very hard — you cannot speak' },
@@ -122,9 +122,9 @@ export function wattPerKg(ftp: number, beratKg: number): number | null {
 }
 
 export const WKG_BANDS: { min: number; label: string }[] = [
-  { min: 5.0, label: 'Setara pesepeda kompetitif tingkat tinggi' },
-  { min: 4.0, label: 'Sangat baik — setara pesepeda balap amatir kuat' },
-  { min: 3.0, label: 'Baik — di atas rata-rata pesepeda rekreasi rutin' },
+  { min: 5.0, label: 'Equivalent to a high-level competitive cyclist' },
+  { min: 4.0, label: 'Very good — equivalent to a strong amateur racer' },
+  { min: 3.0, label: 'Good — above the average regular recreational cyclist' },
   { min: 2.0, label: 'Intermediate — the aerobic base is in place' },
   { min: 0, label: 'Beginner — build zone 2 volume first' },
 ]

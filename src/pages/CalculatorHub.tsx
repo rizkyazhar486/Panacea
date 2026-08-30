@@ -26,7 +26,7 @@ interface Tool { to: string; name: string; what: string; keywords: string }
 const DARI_HALAMAN: Tool[] = ALAT_DI_HALAMAN.map((a) => ({
   to: tautanAlat(a.id),
   name: a.label,
-  what: 'Di dalam halaman Clinical Calculators — terbuka langsung pada alatnya',
+  what: 'Inside the Clinical Calculators page — opens straight onto the tool',
   keywords: a.kw,
 }))
 
@@ -123,7 +123,7 @@ const GROUPS: { title: string; emoji: string; tools: Tool[] }[] = [
     ],
   },
   {
-    title: 'Semua alat di halaman Clinical Calculators',
+    title: 'Every tool in the Clinical Calculators page',
     emoji: '🧰',
     tools: DARI_HALAMAN,
   },

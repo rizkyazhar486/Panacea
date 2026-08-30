@@ -1311,7 +1311,7 @@ function LabTracker({ activeProtocol }: { activeProtocol?: ChronicProtocol }) {
   return (
     <Card className="!p-5">
       <div className="flex items-center justify-between">
-        <SectionTitle icon={<IconStethoscope size={18} />} title="Weekly Lab Tracker" subtitle="Pantau perubahan hasil laboratorium tiap pekan" />
+        <SectionTitle icon={<IconStethoscope size={18} />} title="Weekly Lab Tracker" subtitle="Track how your lab results change week to week" />
         <div className="flex gap-2">
           <label className="cursor-pointer rounded-lg bg-neutral-100 px-3 py-1.5 text-[11px] font-bold text-neutral-600 transition hover:bg-neutral-200 active:scale-95">
             {'\u{1F4C1}'} Import
@@ -1694,7 +1694,7 @@ function ObesityWeeklyPlan({ protocol }: { protocol: ChronicProtocol }) {
 
   return (
     <Card className="!p-5">
-      <SectionTitle icon={<IconFlame size={18} />} title="Weekly Schedule — Obesity" subtitle="Jadwal makan & olahraga 7 hari berdasarkan protokol obesitas" />
+      <SectionTitle icon={<IconFlame size={18} />} title="Weekly Schedule — Obesity" subtitle="A 7-day meal and exercise schedule based on obesity protocols" />
       <div className="mt-3 space-y-2">
         {plan.map((d) => (
           <div key={d.day} className="rounded-2xl border border-neutral-100 p-3">

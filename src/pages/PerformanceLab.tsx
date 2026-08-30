@@ -78,7 +78,7 @@ export function PerformanceLab() {
   return (
     <div className="mx-auto max-w-3xl space-y-5 pb-24">
       <Card className="!p-5">
-        <SectionTitle icon={<IconGauge size={20} />} title="Performance Lab" subtitle="Rangkaian lengkap uji dan kalkulator kekuatan, ketahanan & kecepatan — manual/berbasis laboratorium" />
+        <SectionTitle icon={<IconGauge size={20} />} title="Performance Lab" subtitle="A full suite of strength, endurance and speed tests and calculators — manual and lab-based" />
         <p className="mt-1 text-[11px] leading-relaxed text-neutral-500">
           Fill in values from a watch, lab equipment (lactate, NIRS, power meter) or field tests. Everything is stored offline on your device.
           Before starting a heavy program, first complete the <a href="#/assessment" className="font-bold text-brand-dark underline">Initial Assessment</a> (movement patterns, pain, injury risk, asymmetry).
@@ -532,7 +532,7 @@ function HydrationCard() {
     <div className="rounded-2xl border border-neutral-100 p-4">
       <div className="text-sm font-extrabold">💧 Sweat Rate & Hydration</div>
       <div className="mt-2 grid grid-cols-2 gap-2">
-        <KolomVitalTerikat ikat={ikatPre} label="Berat sebelum (kg)" satuan="kg" step={0.1} />
+        <KolomVitalTerikat ikat={ikatPre} label="Weight before (kg)" satuan="kg" step={0.1} />
         <Field label="Weight after (kg)"><input className={inputClass} type="number" step="0.1" value={post} onChange={(e) => setPost(+e.target.value)} /></Field>
         <Field label="Fluid consumed (L)"><input className={inputClass} type="number" step="0.1" value={fluid} onChange={(e) => setFluid(+e.target.value)} /></Field>
         <Field label="Duration (hours)"><input className={inputClass} type="number" step="0.1" value={hrs} onChange={(e) => setHrs(+e.target.value)} /></Field>

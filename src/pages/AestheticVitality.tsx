@@ -200,7 +200,7 @@ export function AestheticVitality() {
         <SectionTitle
           icon={<IconSparkle size={20} />}
           title="Aesthetic Vitality"
-          subtitle="Ilmu penampilan yang sehat dan bercahaya — dibaca sebagai daya hidup, bukan sebagai penilaian. Penanda perbandingan tubuh, kulit, dan pemulihan tersinkron sendiri dari Profil Kesehatan dan Komposisi Tubuh Anda."
+          subtitle="The science of looking healthy and well — read as vitality, not as a judgement. Body-proportion, skin and recovery markers sync automatically from your Health Profile and Body Composition."
           right={<button onClick={() => syncNow(false)} className="shrink-0 rounded-full border border-brand/30 bg-brand-50 px-3 py-1.5 text-[11px] font-bold text-brand-dark active:scale-95">🔄 Sync devices</button>}
         />
         {syncNote && <p className="mt-2 rounded-xl bg-brand-50 px-3 py-2 text-[11px] font-semibold text-brand-dark">{syncNote}</p>}
@@ -230,7 +230,7 @@ export function AestheticVitality() {
       {/* Live indicators */}
       {indicators.length > 0 && (
         <Card className="!p-5">
-          <SectionTitle icon={<IconChartUp size={20} />} title="Penanda Anda Saat Ini" subtitle="Masing-masing adalah tanda kesehatan yang dikaitkan penelitian dengan daya tarik yang dipersepsikan" />
+          <SectionTitle icon={<IconChartUp size={20} />} title="Your Markers Right Now" subtitle="Each is a health signal that research links to perceived attractiveness" />
           <div className="mt-3 space-y-2">
             {indicators.map((i) => (
               <div key={i.id} className="rounded-xl border border-neutral-100 p-3 dark:border-white/10">
@@ -253,7 +253,7 @@ export function AestheticVitality() {
 
       {/* Inputs */}
       <Card className="!p-5">
-        <SectionTitle icon={<IconActivity size={20} />} title="Measurements" subtitle="Masukan perbandingan tubuh & daya hidup — sebagian besar terisi sendiri dari halaman lain; bagian wajah boleh dikosongkan & diukur sendiri" />
+        <SectionTitle icon={<IconActivity size={20} />} title="Measurements" subtitle="Body-proportion and vitality inputs — most fill in automatically from other pages; the facial section is optional and self-measured" />
         <div className="mt-3 grid grid-cols-2 gap-3 sm:grid-cols-3">
           <Field label="Sex">
             <select className={inputClass} value={d.g} onChange={(e) => u({ g: e.target.value as 'M' | 'F' })}>
@@ -284,7 +284,7 @@ export function AestheticVitality() {
 
       {/* Concept pillars */}
       <Card className="!p-5">
-        <SectionTitle icon={<IconHeart size={20} />} title="Apa yang Membuat Sesuatu Terlihat Indah?" subtitle="Sisi evolusi, budaya, psikologi, filsafat & rancangan" />
+        <SectionTitle icon={<IconHeart size={20} />} title="What Makes Something Look Beautiful?" subtitle="Sisi evolusi, budaya, psikologi, filsafat & rancangan" />
         <div className="mt-3 space-y-3">
           {PILLARS.map((p) => (
             <div key={p.title} className="rounded-xl bg-neutral-50 p-3 dark:bg-white/5">

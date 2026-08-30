@@ -311,8 +311,8 @@ export const ARKETIPE: Arketipe[] = [
   { id: 'kelelawar', gambar: 'https://d8j0ntlcm91z4.cloudfront.net/user_3FaS56ACS5VALa5WTIecT6KKkQf/hf_20260807_084005_89809645-98f7-4e0d-a0e0-693070145f92.png', ikon: '🦇', nama: 'Sang Penjaga Malam', sifat: 'An ordinary person who wins through discipline rather than talent',
     latihan: 'Kekuatan dasar + kapasitas kerja', format: 'Barbara or Chelsea',
     kenapa: 'The archetype with no superpowers. All of it comes from training repeated when nobody is watching — and Barbara’s scheduled rest tests exactly that.' },
-  { id: 'laba-laba', gambar: 'https://d8j0ntlcm91z4.cloudfront.net/user_3FaS56ACS5VALa5WTIecT6KKkQf/hf_20260807_084005_1b9bba55-233f-4a1d-af05-47702fefdd46.png', ikon: '🕷️', nama: 'Sang Pemanjat', sifat: 'Ringan, lincah, kuat relatif terhadap berat badan',
-    latihan: 'Rasio kekuatan-terhadap-berat', format: 'Cindy, lalu Mary',
+  { id: 'laba-laba', gambar: 'https://d8j0ntlcm91z4.cloudfront.net/user_3FaS56ACS5VALa5WTIecT6KKkQf/hf_20260807_084005_1b9bba55-233f-4a1d-af05-47702fefdd46.png', ikon: '🕷️', nama: 'Sang Pemanjat', sifat: 'Light, agile, strong relative to body weight',
+    latihan: 'Strength-to-weight ratio', format: 'Cindy, lalu Mary',
     kenapa: 'Every movement is bodyweight. Progress comes from getting stronger at your own body, not from adding load.' },
   { id: 'baja', gambar: 'https://d8j0ntlcm91z4.cloudfront.net/user_3FaS56ACS5VALa5WTIecT6KKkQf/hf_20260807_084027_21649ae4-79ce-4e0e-a789-7bb8e5553e63.png', ikon: '🛡️', nama: 'Sang Perisai', sifat: 'Endurance that does not run out',
     latihan: 'Daya tahan jangka panjang', format: 'Murph (scaled) or HYROX',
@@ -335,7 +335,7 @@ export interface Peringatan {
 }
 
 export const RABDO: Peringatan = {
-  judul: 'Rabdomiolisis — kenali sebelum mulai',
+  judul: 'Rhabdomyolysis — know this before you start',
   isi: 'Very high-volume training, especially repeated lowering movements (pull-up descents, lunges, box step-downs) in someone untrained, can damage muscle fibres badly enough that myoglobin enters the blood and stresses the kidneys. This is not scaremongering: the cases most often reported follow Murph, Angie, and somebody’s first session back after a long break. It is a medical emergency.',
   tanda: [
     'Muscle pain far beyond ordinary training soreness, especially 24–72 hours afterwards',

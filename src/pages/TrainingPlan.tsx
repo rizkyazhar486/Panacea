@@ -340,7 +340,7 @@ function RunnerCoach() {
 
   return (
     <Card className="!p-5">
-      <SectionTitle icon={<IconRun size={20} />} title="Personal Running Coach" subtitle="Masukkan lari terakhir Anda — dapatkan VO₂max yang sebenarnya, zona pace pribadi & rencana yang masuk akal" />
+      <SectionTitle icon={<IconRun size={20} />} title="Personal Running Coach" subtitle="Enter your last run — get a real VO₂max, personal pace zones and a plan that makes sense" />
 
       {/* Safety red-flag screen — a duty-of-care gate before intense running. */}
       <div className="mt-2 rounded-2xl border border-rose-200 bg-rose-50 p-3">
@@ -375,7 +375,7 @@ function RunnerCoach() {
       <div className="mt-2 grid grid-cols-2 gap-3 sm:grid-cols-4">
         <Field label="Distance (km)"><input className={inputClass} type="number" step={0.1} value={km || ''} placeholder="e.g. 3" onChange={(e) => setKm(+e.target.value)} /></Field>
         <Field label="Time (minutes)"><input className={inputClass} type="number" value={min || ''} placeholder="e.g. 25" onChange={(e) => setMin(+e.target.value)} /></Field>
-        <Field label="Seberapa berat rasanya?">
+        <Field label="How hard did it feel?">
           <select className={inputClass} value={effort} onChange={(e) => setEffort(e.target.value as typeof effort)}>
             <option value="easy">Ringan (masih bisa mengobrol)</option>
             <option value="moderate">Moderate (fairly hard)</option>
@@ -589,7 +589,7 @@ export function TrainingPlan() {
 
       {/* Movement technique videos (Higgsfield) */}
       <Card className="!p-5">
-        <SectionTitle icon={<IconRun size={20} />} title="Movement Technique Videos" subtitle="Contoh cara melakukan gerakan dengan bentuk yang benar" />
+        <SectionTitle icon={<IconRun size={20} />} title="Movement Technique Videos" subtitle="Examples of how to perform the movement with good form" />
         <div className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-3">
           {TECHNIQUE_VIDEOS.map((v) => (
             <div key={v.label} className="overflow-hidden rounded-2xl border border-neutral-100">
@@ -697,7 +697,7 @@ export function TrainingPlan() {
 
       {/* Longevity panel — user's own numbers */}
       <Card className="!p-5">
-        <SectionTitle icon={<IconHeart size={20} />} title="Panel Umur Panjang Anda" subtitle="VO₂max, strength, muscle mass, glucose — Panaceamed's core competency" />
+        <SectionTitle icon={<IconHeart size={20} />} title="Your Longevity Panel" subtitle="VO₂max, strength, muscle mass, glucose — Panaceamed's core competency" />
         <div className="mt-3 grid grid-cols-3 gap-3">
           <Field label={<>VO₂max (from watch/test)<PrefillBadge show={hasHealth('vo2max')} /></>}><input className={inputClass} type="number" min={0} value={vo2Now || ''} placeholder="e.g. 40" onChange={(e) => setVo2Now(+e.target.value)} onBlur={() => pushBiometrics({ vo2max: vo2Now })} /></Field>
           <Field label="Cooper 12-min ALL-OUT (m)"><input className={inputClass} type="number" value={cooper || ''} placeholder="e.g. 2200" onChange={(e) => setCooper(+e.target.value)} /></Field>

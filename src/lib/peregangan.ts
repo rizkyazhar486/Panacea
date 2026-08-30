@@ -62,7 +62,7 @@ export const GERAKAN: Gerakan[] = [
       'Sink into the deepest squat you can with heels staying on the floor.',
       'Elbows inside the knees, press the knees outward slowly.',
       'Keep the chest lifted throughout.',
-      'Berdiri, ulangi. Kedalaman biasanya bertambah tiap pengulangan.',
+      'Stand up and repeat. Depth usually improves with each round.',
     ],
     untuk: ['Lifting', 'CrossFit', 'General'],
     gambar: 'https://d8j0ntlcm91z4.cloudfront.net/user_3FaS56ACS5VALa5WTIecT6KKkQf/hf_20260807_085407_31fa57a2-2b37-41e3-a3af-342e5504f179.png',
@@ -166,7 +166,7 @@ export const GERAKAN: Gerakan[] = [
   },
   {
     id: 'kucing-sapi', nama: 'Cat-cow', kapan: 'harian', target: 'The whole spine',
-    durasi: '10 siklus, mengikuti napas',
+    durasi: '10 cycles, following the breath',
     cara: [
       'On all fours.',
       'Inhale: drop the belly, lift the chest and tailbone.',
@@ -279,7 +279,7 @@ export const SALAH_KAPRAH = [
     fakta: 'The effect is tiny to meaningless — around one point on a 100-point scale. Stretching remains useful for range of motion and comfort, just not for this.',
   },
   {
-    klaim: 'Sakit berarti berhasil.',
+    klaim: 'Pain means it is working.',
     fakta: 'A stretch should feel like a pull, not sharp or stabbing. Sharp pain, tingling, or numbness means stop — those are nerve signs, not muscle.',
   },
   {

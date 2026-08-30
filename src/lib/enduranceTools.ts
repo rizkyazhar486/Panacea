@@ -103,8 +103,8 @@ export function rencanaBahanBakar(opsi: {
   } else if (durasiMenit < 75) {
     karboPerJamGram = intensitas === 'berat' ? 30 : 0
     dasar.push(karboPerJamGram > 0
-      ? '45-75 menit pada intensitas berat: 30 g/jam, atau cukup berkumur minuman karbohidrat — efeknya lewat rangsangan di mulut, bukan lewat penyerapan.'
-      : '45-75 menit intensitas ringan-sedang: belum perlu karbohidrat.')
+      ? '45–75 minutes at hard intensity: 30 g/h, or simply rinse and spit a carbohydrate drink — the effect works through receptors in the mouth, not through absorption.'
+      : '45–75 minutes at easy to moderate intensity: no carbohydrate needed yet.')
   } else if (durasiMenit <= 150) {
     karboPerJamGram = intensitas === 'berat' ? 60 : 45
     dasar.push('1–2.5 hours: 30–60 g/h is the usual range; the upper end is taken for hard intensity.')
@@ -353,7 +353,7 @@ export function saranIf(durasiJam: number): { if: number; ket: string } {
   if (durasiJam <= 2) return { if: 0.85, ket: '1-2 jam: 0,83-0,87 FTP.' }
   if (durasiJam <= 3) return { if: 0.80, ket: '2-3 jam: 0,78-0,82 FTP.' }
   if (durasiJam <= 5) return { if: 0.73, ket: '3-5 jam: 0,70-0,75 FTP.' }
-  return { if: 0.65, ket: 'Di atas 5 jam: 0,60-0,68 FTP. Menahan diri di awal jauh lebih menentukan daripada tenaga di akhir.' }
+  return { if: 0.65, ket: 'Beyond 5 hours: 0.60–0.68 FTP. Holding back early matters far more than what is left at the end.' }
 }
 
 // ═══ 4. AKLIMATISASI PANAS & KETINGGIAN ═════════════════════════════════════

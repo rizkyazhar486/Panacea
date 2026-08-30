@@ -58,7 +58,7 @@ export function LifeCompass() {
   return (
     <div className="mx-auto max-w-2xl space-y-5 pb-24">
       <Card className="!p-5">
-        <SectionTitle icon={<IconSparkle size={20} />} title="Life Compass" subtitle="Susun visi, misi, dan langkah berikutnya — agar masa depan terasa sebagai arah, bukan kecemasan" />
+        <SectionTitle icon={<IconSparkle size={20} />} title="Life Compass" subtitle="Set out a vision, a mission and the next step — so the future reads as a direction rather than anxiety" />
         <Prosa kelas="mt-2 text-[13px] leading-relaxed text-neutral-500">Kecemasan tentang masa depan kerap muncul karena tidak ada rencana untuk mengarahkannya. Halaman ini menuntun dua hal yang secara konsisten ditemukan bermanfaat dalam psikologi: menyebutkan apa yang benar-benar penting bagi Anda (penjernihan nilai), dan mengubah impian besar menjadi satu langkah nyata berikutnya (implementation intentions — terbukti meningkatkan pelaksanaan secara berarti dibanding sekadar menetapkan sasaran).</Prosa>
       </Card>
 

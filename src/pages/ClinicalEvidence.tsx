@@ -114,7 +114,7 @@ export function ClinicalEvidence() {
         // /api/health, dan penanda evidenceJson memang tidak ada. Menyuruh
         // pengguna mengulang pertanyaan di sini akan menyesatkan — tidak ada
         // pertanyaan yang akan berhasil sampai servernya dipasang ulang.
-        setErr('Server belum diperbarui. Perbaikan Clinical Evidence sudah ada di kode tetapi server yang sedang berjalan masih versi lama, sehingga jawabannya kembali dalam bentuk yang tidak dapat dibaca. Mengubah pertanyaan tidak akan menolong — server perlu dipasang ulang (deploy) lebih dahulu. Tautan penelusuran di bawah tetap berfungsi.')
+        setErr('The server has not been updated. The Clinical Evidence fix is in the code, but the running server is still an older build, so the reply comes back in a form that cannot be read. Rewording the question will not help — the server needs redeploying first. The search links below still work.')
       else if (msg.includes('empty_reply') || msg.includes('parse_failed'))
         setErr('The evidence engine answered but the reply could not be read. This is a fault on our side, not with your question — please try again.')
       else if (msg.includes('ai_failed'))
@@ -329,7 +329,7 @@ export function ClinicalEvidence() {
 
           {answer.patientFriendly && (
             <Card className="!p-5">
-              <SectionTitle icon={<IconStethoscope size={20} />} title="Plain-language version" subtitle="Untuk dijelaskan kepada pasien" />
+              <SectionTitle icon={<IconStethoscope size={20} />} title="Plain-language version" subtitle="To explain to a patient" />
               <p className="mt-2 text-sm leading-relaxed text-neutral-600 dark:text-neutral-300">{answer.patientFriendly}</p>
             </Card>
           )}
@@ -339,7 +339,7 @@ export function ClinicalEvidence() {
       {/* Live journal retrieval — real PubMed articles for this question */}
       {(articlesLoading || articles.length > 0) && (
         <Card className="!p-5">
-          <SectionTitle icon={<IconSearch size={20} />} title="Related published articles" subtitle="Langsung dari PubMed (NCBI) untuk pertanyaan ini — makalah nyata yang saat ini terindeks" />
+          <SectionTitle icon={<IconSearch size={20} />} title="Related published articles" subtitle="Straight from PubMed (NCBI) for this question — real papers currently indexed" />
           {articlesLoading && articles.length === 0 ? (
             <p className="mt-3 text-sm text-neutral-500">Fetching articles from PubMed…</p>
           ) : (

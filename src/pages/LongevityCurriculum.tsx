@@ -132,7 +132,7 @@ export function LongevityCurriculum() {
       <SectionTitle
         icon={<IconHeart size={20} />}
         title="Longevity Medicine Curriculum"
-        subtitle="Ikhtisar bertingkat untuk tenaga medis/institusi — sel punca, robotika, SGLT2i, AI, peptida, hormon, kesehatan jantung-pembuluh darah, penanda hayati & infrastruktur penelitian"
+        subtitle="A tiered overview for clinicians and institutions — stem cells, robotics, SGLT2i, AI, peptides, hormones, cardiovascular health, biomarkers and research infrastructure"
       />
       <p className="text-[12px] leading-relaxed text-neutral-500">
         Each module is tagged with its evidence maturity level. This is educational/orientation material for clinicians, <b>not a prescribing guide</b> —

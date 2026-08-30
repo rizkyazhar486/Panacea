@@ -212,7 +212,7 @@ export const LADDERS: Ladder[] = [
     frekuensi: '3–4 times a week, with at least one day between sessions',
     steps: [
       { level: 1, name: 'Push-up dinding', target: '3×15', naik: '3 × 15 with full, controlled range', cue: 'Body in one straight line from ear to heel; do not pike at the hips' },
-      { level: 2, name: 'Push-up meja / bangku', target: '3×12', naik: '3 × 12 without the hips sagging', cue: 'Semakin rendah tumpuan, semakin berat; turunkan ketinggian secara bertahap' },
+      { level: 2, name: 'Push-up meja / bangku', target: '3×12', naik: '3 × 12 without the hips sagging', cue: 'The lower the support, the harder it gets; lower the height gradually' },
       { level: 3, name: 'Knee push-up', target: '3×12', naik: '3 × 12 with the chest close to the floor', cue: 'Knees, hips and shoulders in one line — do not bend at the hip' },
       { level: 4, name: 'Push-up penuh', target: '3×8', naik: '3 × 8 with the chest almost touching the floor', cue: 'Elbows about 45° from the body, not flared to 90° — flared elbows load the shoulder joint' },
       { level: 5, name: 'Push-up penuh volume', target: '3×20', naik: '3 × 20', cue: 'Pause 1 second at the bottom; quality of movement matters more than the count' },
@@ -232,7 +232,7 @@ export const LADDERS: Ladder[] = [
       { level: 3, name: 'Australian row / inverted row', target: '3×10', naik: '3 × 12 with the body progressively more horizontal', cue: 'Pull until the chest meets the bar; hold the body straight as a plank' },
       { level: 4, name: 'Negative pull-up', target: '3 × 5 with a 5-second lowering', naik: 'Control a 5-second lowering for 3 × 5', cue: 'Jump to the top, then lower as slowly as you can — the lowering phase is what builds the strength' },
       { level: 5, name: 'Pull-up penuh', target: '3×3', naik: '3 × 5', cue: 'Chin over the bar, lower until the elbows are almost straight; no swinging' },
-      { level: 6, name: 'Pull-up volume / berbeban', target: '3 × 10, or add load', naik: '—', cue: 'Setelah 3×10 tercapai, tambah beban alih-alih menambah jumlah repetisi' },
+      { level: 6, name: 'Pull-up volume / berbeban', target: '3 × 10, or add load', naik: '—', cue: 'Once you reach 3×10, add load rather than more repetitions' },
     ],
   },
   {
@@ -248,7 +248,7 @@ export const LADDERS: Ladder[] = [
       { level: 3, name: 'Crunch terkendali', target: '3×15', naik: '3 × 20', cue: 'Lift only until the shoulder blades clear the floor; keep the neck relaxed and do not pull on it' },
       { level: 4, name: 'Sit-up penuh', target: '3×15', naik: '3 × 20', cue: 'Slow and controlled; stop if the lower back hurts' },
       { level: 5, name: 'Hanging knee raise', target: '3×10', naik: '3 × 12', cue: 'Lift by curling the pelvis upward, not by simply flexing the hip' },
-      { level: 6, name: 'Hanging leg raise / ab wheel', target: '3×8', naik: '—', cue: 'Jangan mengayun; kendalikan fase turun' },
+      { level: 6, name: 'Hanging leg raise / ab wheel', target: '3×8', naik: '—', cue: 'No swinging; control the lowering phase' },
     ],
   },
 ]
@@ -309,7 +309,7 @@ export function weeklyTemplate(hariLari: 3 | 4 | 5): WeekPlan[] {
 /** The rule broken most often dan paling sering menyebabkan cedera. */
 export const RULES: { judul: string; isi: string }[] = [
   {
-    judul: 'Naikkan jarak maksimal 10% per minggu',
+    judul: 'Increase distance by at most 10% a week',
     isi: 'Running injuries in beginners almost always come from adding distance too fast, not from technique. Bone, tendon and ligament adapt far more slowly than the heart and lungs — the feeling of "still having more" arrives before the tissue is ready.',
   },
   {

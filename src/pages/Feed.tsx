@@ -1446,7 +1446,7 @@ export function KomunitasSehat({ viewerEmail, viewerName }: { viewerEmail: strin
       <Card className="space-y-3">
         <div className="text-xs font-black text-ink">🤝 Health Buddy</div>
         <div className="flex items-center gap-2">
-          <input value={buddyDraft} onChange={(e) => setBuddyDraft(e.target.value)} placeholder="Nama teman penjaga komitmen Anda"
+          <input value={buddyDraft} onChange={(e) => setBuddyDraft(e.target.value)} placeholder="Your accountability partner's name"
             className={inputClass + ' flex-1 text-xs'} />
           <button onClick={() => setBuddy(buddyDraft)} className="rounded-xl bg-neutral-100 px-3 py-2 text-xs font-bold text-neutral-600">Save</button>
         </div>
@@ -1526,7 +1526,7 @@ export function KomunitasSehat({ viewerEmail, viewerName }: { viewerEmail: strin
             </button>
           ))}
         </div>
-        <input value={moodNote} onChange={(e) => setMoodNote(e.target.value)} placeholder="Catatan singkat (boleh dikosongkan), lalu pilih suasana hati di atas"
+        <input value={moodNote} onChange={(e) => setMoodNote(e.target.value)} placeholder="A short note (optional), then pick a mood above"
           className={inputClass + ' text-xs'} />
         {recentMoods.length > 0 && (
           <div className="space-y-1.5 border-t border-neutral-100 pt-2">

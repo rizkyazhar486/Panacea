@@ -163,7 +163,7 @@ export function Verification() {
 
       {/* Contributor roster */}
       <Card>
-        <SectionTitle title="Contributors & Verifiers" subtitle="Penulis harus terverifikasi sebelum materinya tampil" />
+        <SectionTitle title="Contributors & Verifiers" subtitle="Authors must be verified before their material appears" />
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>

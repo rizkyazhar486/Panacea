@@ -62,7 +62,7 @@ export function SubstanceUseScreen() {
       <Card className="!p-5">
         <div className="text-xs font-black uppercase tracking-wide text-neutral-500">Pack-Year Calculator (tobacco)</div>
         <div className="mt-3 grid gap-3 sm:grid-cols-2">
-          <Field label="Batang rokok per hari (saat masih merokok)">
+          <Field label="Cigarettes per day (while still smoking)">
             <input className={inputClass} type="number" min={0} value={cigsPerDay || ''} onChange={(e) => setCigsPerDay(Number(e.target.value) || 0)} />
           </Field>
           <Field label="Years smoked">
@@ -71,7 +71,7 @@ export function SubstanceUseScreen() {
           <Field label="Current age">
             <input className={inputClass} type="number" min={0} value={age || ''} onChange={(e) => setAge(Number(e.target.value) || 0)} />
           </Field>
-          <Field label="Sudah berapa tahun berhenti (0 bila masih merokok)">
+          <Field label="Years since quitting (0 if still smoking)">
             <input className={inputClass} type="number" min={0} value={quitYearsAgo || ''} onChange={(e) => setQuitYearsAgo(Number(e.target.value) || 0)} />
           </Field>
         </div>

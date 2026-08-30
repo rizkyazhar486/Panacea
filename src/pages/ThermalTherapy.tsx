@@ -50,7 +50,7 @@ export function ThermalTherapy() {
   return (
     <div className="mx-auto max-w-2xl space-y-5 pb-24">
       <Card className="!p-5">
-        <SectionTitle icon={<IconFlame size={20} />} title="Thermal Therapy" subtitle="Sauna & paparan dingin — protokol, bukti, dan catatan mingguan" />
+        <SectionTitle icon={<IconFlame size={20} />} title="Thermal Therapy" subtitle="Sauna and cold exposure — protocols, evidence, and a weekly log" />
         <Prosa kelas="mt-2 text-[13px] leading-relaxed text-neutral-500">Paparan panas dan dingin yang disengaja adalah dua kebiasaan umur panjang yang paling banyak dibicarakan. Berikut apa yang benar-benar didukung bukti, bagaimana menakar masing-masing, dan catatan sederhana untuk membangun kebiasaannya — beserta batas keselamatan yang penting.</Prosa>
       </Card>
 

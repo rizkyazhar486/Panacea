@@ -4,7 +4,7 @@ import { Card, SectionTitle, Badge } from '../components/ui'
 import { IconActivity, IconShield, IconChartUp, IconHeart } from '../components/icons'
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Suplemen untuk Latihan & Penampilan Olahraga
+// Supplements for Training and Sports Performance
 // ─────────────────────────────────────────────────────────────────────────────
 // Structured after the NIH Office of Dietary Supplements (ODS) health-
 // professional fact sheet. This is EVIDENCE-REVIEW / HARM-REDUCTION education,
@@ -443,7 +443,7 @@ export function DietarySupplements() {
       <Card className="!p-5">
         <SectionTitle
           icon={<IconActivity size={20} />}
-          title="Suplemen untuk Latihan & Penampilan Olahraga"
+          title="Supplements for Training and Sports Performance"
           subtitle="Rujukan tinjauan bukti, disusun mengikuti lembar fakta NIH Office of Dietary Supplements"
         />
         <Prosa kelas="mt-3 text-sm leading-relaxed text-neutral-600 dark:text-neutral-300">Atlet dan orang yang aktif memakai bermacam produk untuk memperbaiki penampilan, pemulihan, dan bentuk tubuh — dari zat gizi yang sudah banyak diteliti sampai hormon resep dan bahan kimia penelitian yang tidak disetujui. Halaman ini meninjau apa sebenarnya zat-zat itu, apa yang ditunjukkan dan TIDAK ditunjukkan buktinya, serta keadaan keamanan dan hukumnya. Tujuannya pengurangan bahaya secara jujur dan berdasar.</Prosa>
@@ -491,7 +491,7 @@ export function DietarySupplements() {
 
       {/* Ingredients banned from dietary supplements */}
       <Card className="!p-5">
-        <SectionTitle icon={<IconShield size={20} />} title="Bahan yang Dilarang dalam Suplemen" subtitle="Dijual sebagai 'suplemen' padahal bukan bahan suplemen yang sah" />
+        <SectionTitle icon={<IconShield size={20} />} title="Banned Substances in Supplements" subtitle="Sold as 'supplements' while not being legitimate supplement ingredients" />
         <p className="mt-2 text-sm leading-relaxed text-neutral-600 dark:text-neutral-300">
           Several substances above are frequently sold in products labeled as dietary supplements even though they are not lawful
           supplement ingredients — they are unapproved drugs. This includes <b>SARMs</b> (ostarine, ligandrol, RAD-140 and others),
@@ -503,7 +503,7 @@ export function DietarySupplements() {
 
       {/* Regulation */}
       <Card className="!p-5">
-        <SectionTitle icon={<IconShield size={20} />} title="Regulation" subtitle="Bagaimana suplemen diatur — dan tidak diatur" />
+        <SectionTitle icon={<IconShield size={20} />} title="Regulation" subtitle="How supplements are regulated — and how they are not" />
         <ul className="mt-2 ml-4 list-disc space-y-1.5 text-sm leading-relaxed text-neutral-600 dark:text-neutral-300">
           <li>Suplemen makanan bersifat <b>not</b> reviewed for safety and efficacy before sale the way medicines are; manufacturers are responsible for safety, and regulators act mainly after problems appear.</li>
           <li>Supplements can be <b>contaminated or adulterated</b> with unlabeled drugs (including steroids and stimulants) — a real cause of failed drug tests and health harm.</li>
@@ -538,7 +538,7 @@ export function DietarySupplements() {
 
       {/* Usage prevalence */}
       <Card className="!p-5">
-        <SectionTitle icon={<IconChartUp size={20} />} title="Reported Usage Prevalence" subtitle="Rentang perkiraan dari survei & tinjauan — angkanya sangat berbeda antarpopulasi" />
+        <SectionTitle icon={<IconChartUp size={20} />} title="Reported Usage Prevalence" subtitle="Estimated ranges from surveys and reviews — the numbers differ greatly between populations" />
         <div className="mt-3 space-y-2">
           {PREVALENCE.map((p) => (
             <div key={p.group} className="rounded-xl bg-neutral-50 p-3 dark:bg-white/5">

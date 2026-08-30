@@ -73,7 +73,7 @@ export function DermatologyLesionMapper() {
       </div>
 
       <Card className="!p-5">
-        <SectionTitle icon={<IconActivity size={20} />} title="Dermatologic Status & Lesion Predilection Mapper" subtitle="Pencatatan pemeriksaan yang tersusun + diagnosis banding klasik menurut morfologi/lokasi — bukan diagnosis dari foto" />
+        <SectionTitle icon={<IconActivity size={20} />} title="Dermatologic Status & Lesion Predilection Mapper" subtitle="Structured examination notes + classic differentials by morphology and site — not a diagnosis from a photo" />
         <Prosa kelas="mt-2 text-[13px] leading-relaxed text-amber-700 dark:text-amber-300">Alat ini tidak menganalisis foto dan tidak mendiagnosis dari gambar — model tingkat konsumen tidak dapat menyingkirkan keganasan secara andal maupun memberi diagnosis yang tepat dari sebuah gambar, dan berpura-pura sebaliknya tidak aman. Sebagai gantinya ia mencatat temuan pemeriksaan Anda secara tersusun lalu memunculkan diagnosis banding klasik yang diajarkan dermatologi untuk morfologi + lokasi itu, persis seperti cara kerja tabel di buku ajar. Selalu padukan dengan keadaan klinis, dan lakukan biopsi/rujukan bila ragu.</Prosa>
       </Card>
 

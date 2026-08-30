@@ -248,7 +248,7 @@ export function SexualHealth() {
       <PeriodTracker />
 
       <Card className="!p-5">
-        <SectionTitle icon={<IconHeart size={20} />} title="Sexual & Reproductive Health Education" subtitle="Kesuburan, kontrasepsi, ANC, dan kesehatan seksual — berdasarkan ilmu kebidanan & kandungan" />
+        <SectionTitle icon={<IconHeart size={20} />} title="Sexual & Reproductive Health Education" subtitle="Fertility, contraception, antenatal care and sexual health — grounded in obstetrics and gynaecology" />
         <div className="mt-3 space-y-2.5">
           {SEX_ED_TOPICS.map((t) => (
             <div key={t.title} className="rounded-xl border border-neutral-100 p-3">
@@ -260,7 +260,7 @@ export function SexualHealth() {
       </Card>
 
       <Card className="!p-5">
-        <SectionTitle icon={<IconUsers size={20} />} title="Fertility Control & Contraceptive Options" subtitle="Bandingkan metode kontrasepsi sesuai kebutuhan Anda" />
+        <SectionTitle icon={<IconUsers size={20} />} title="Fertility Control & Contraceptive Options" subtitle="Compare contraceptive methods against what you need" />
         <div className="mt-3 space-y-2.5">
           {KB_METHODS.map((m) => (
             <div key={m.name} className="rounded-xl border border-neutral-100 p-3">
@@ -280,7 +280,7 @@ export function SexualHealth() {
         <SectionTitle
           icon={<IconHospital size={20} />}
           title="Nearby Family Planning / OB-GYN Facilities (GPS)"
-          subtitle="Klinik dan rumah sakit yang melayani keluarga berencana, ANC, dan pelayanan kebidanan"
+          subtitle="Clinics and hospitals offering family planning, antenatal care and maternity services"
           right={<Button variant="outline" onClick={useMyLocation} disabled={geoState === 'asking' || loading}>📍 {geoState === 'asking' || loading ? 'Searching…' : 'Use My Location'}</Button>}
         />
         <div className={`mt-2 rounded-xl px-3 py-2 text-xs ${geoState === 'granted' ? 'bg-brand-50 text-brand-dark' : geoState === 'denied' ? 'bg-red-50 text-accent' : 'bg-neutral-50 text-neutral-500'}`}>

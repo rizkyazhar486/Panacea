@@ -66,7 +66,7 @@ export function BloodDonation() {
   return (
     <div className="mx-auto max-w-2xl space-y-5 pb-24">
       <Card className="!p-5">
-        <SectionTitle icon={<IconDrop size={20} />} title="Blood Donation Eligibility" subtitle="Penapisan awal singkat, beserta tanggal Anda boleh menyumbang lagi" />
+        <SectionTitle icon={<IconDrop size={20} />} title="Blood Donation Eligibility" subtitle="A short pre-screen, plus the date you can donate again" />
         <p className="mt-2 text-[13px] leading-relaxed text-neutral-500">
           This checks the generic criteria most national blood services use — it is <b>not</b> the
           actual screening (hemoglobin check, brief health interview) every blood bank performs on-site
@@ -83,7 +83,7 @@ export function BloodDonation() {
             <input className={inputClass} type="number" min={0} max={250} value={weightKg} onChange={(e) => { const v = Number(e.target.value) || 0; setWeightKg(v); update({ weightKg: v }) }} />
           </Field>
         </div>
-        <Field label="Tanggal donor darah lengkap terakhir Anda (kosongkan bila belum pernah / tidak berlaku)">
+        <Field label="Date of your last whole-blood donation (leave blank if never / not applicable)">
           <input className={`${inputClass} mt-1`} type="date" value={lastDonation} onChange={(e) => { setLastDonation(e.target.value); update({ lastDonation: e.target.value }) }} max={hariIni()} />
         </Field>
         <div className="mt-3 space-y-2">

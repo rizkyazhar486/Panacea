@@ -125,7 +125,7 @@ export function RppgHeartRate() {
   return (
     <div className="mx-auto max-w-2xl space-y-5 pb-24">
       <Card className="!p-5">
-        <SectionTitle icon={<IconActivity size={20} />} title="rPPG Heart Rate (experimental)" subtitle="Perkirakan nadi Anda dari kamera — tanpa perlu perangkat pakai" />
+        <SectionTitle icon={<IconActivity size={20} />} title="rPPG Heart Rate (experimental)" subtitle="Estimate your pulse from the camera — no wearable needed" />
         <p className="mt-2 text-[13px] leading-relaxed text-amber-700 dark:text-amber-300">
           <b>Percobaan, bukan alat kesehatan.</b> This estimates heart rate from subtle color changes
           in your face caused by blood flow (remote photoplethysmography) — accuracy depends heavily on

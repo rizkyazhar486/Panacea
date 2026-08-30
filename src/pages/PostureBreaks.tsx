@@ -100,7 +100,7 @@ export function PostureBreaks() {
   return (
     <div className="mx-auto max-w-2xl space-y-5 pb-24">
       <Card className="!p-5">
-        <SectionTitle icon={<IconTimer size={20} />} title="Posture & Desk-Break Reminder" subtitle="Dorongan lembut untuk berdiri, meregang, atau mengistirahatkan mata" />
+        <SectionTitle icon={<IconTimer size={20} />} title="Posture & Desk-Break Reminder" subtitle="Gentle nudges to stand up, stretch, or rest your eyes" />
         <Prosa kelas="mt-2 text-[13px] leading-relaxed text-neutral-500">Duduk terus-menerus dan menatap layar tanpa jeda adalah dua kebiasaan harian yang paling mudah dibenahi. Pilih selangnya, biarkan tab ini terbuka (atau izinkan pemberitahuan), lalu terima pengingat beserta jeda singkat yang jelas untuk dikerjakan.</Prosa>
         <div className="mt-3 flex flex-wrap gap-2">
           {INTERVALS.map((m) => (

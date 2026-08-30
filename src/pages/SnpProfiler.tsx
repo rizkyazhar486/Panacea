@@ -124,7 +124,7 @@ export function SnpProfiler() {
   return (
     <div className="mx-auto max-w-2xl space-y-5 pb-24">
       <Card className="!p-5">
-        <SectionTitle icon={<IconStethoscope size={20} />} title="Local SNP Longevity Profiler" subtitle="Membaca berkas DNA mentah Anda sepenuhnya di dalam peramban — tidak ada yang diunggah" />
+        <SectionTitle icon={<IconStethoscope size={20} />} title="Local SNP Longevity Profiler" subtitle="Reads your raw DNA file entirely inside the browser — nothing is uploaded" />
         <p className="mt-2 text-[13px] leading-relaxed text-neutral-500">
           Upload a raw genotype export (23andMe, AncestryDNA, or similar — usually a "Download Raw Data"
           option in your account settings). It's matched locally against {SNP_DB.length} well-documented

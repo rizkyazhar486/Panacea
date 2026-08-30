@@ -76,7 +76,7 @@ export function LongevityScience() {
   return (
     <div className="mx-auto max-w-2xl space-y-5 pb-24">
       <Card className="!p-5">
-        <SectionTitle icon={<IconStethoscope size={20} />} title="Longevity Science Explainers" subtitle="Apa sebenarnya arti istilah-istilah yang sedang ramai" />
+        <SectionTitle icon={<IconStethoscope size={20} />} title="Longevity Science Explainers" subtitle="What the terms everyone is using actually mean" />
         <Prosa kelas="mt-2 text-[13px] leading-relaxed text-neutral-500">Penjelasan mekanisme dengan bahasa sederhana untuk istilah yang terus muncul dalam pembicaraan umur panjang. Butir yang berupa obat (metformin, rapamisin, metilen biru) dijelaskan agar dipahami, bukan sebagai anjuran memakainya — semuanya memerlukan dokter yang meresepkan.</Prosa>
       </Card>
 

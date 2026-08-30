@@ -229,8 +229,8 @@ export function HealthSyncTutorial() {
       <Card className="!p-5">
         <SectionTitle
           icon={<IconGauge size={20} />}
-          title="Tiga pilihan yang menentukan kerapatan data"
-          subtitle="Lebih menentukan daripada seluruh langkah lain digabungkan — dan dua di antaranya bawaannya justru keliru"
+          title="The three settings that decide data density"
+          subtitle="They matter more than every other step combined — and two of them ship with the wrong default"
         />
         <p className="mt-2 text-[13px] leading-relaxed text-neutral-600">
           Steps 1–6 decide <b>whether</b> data arrives. These decide <b>how much</b>. Without them you can
@@ -268,7 +268,7 @@ export function HealthSyncTutorial() {
       {/* Live link preview, if logged in with backend enabled */}
       {backendEnabled && (
         <Card className="!p-5">
-          <SectionTitle icon={<IconKey size={20} />} title="Tautan Sinkron Pribadi Anda" subtitle="Untuk langkah 2 — salin ke dalam aplikasinya" />
+          <SectionTitle icon={<IconKey size={20} />} title="Your Private Sync Link" subtitle="For step 2 — copy this into the app" />
           <div className="mt-2 rounded-xl bg-neutral-50 p-3 font-mono text-[11px] text-neutral-600 break-all">
             {url ?? 'Loading…'}
           </div>

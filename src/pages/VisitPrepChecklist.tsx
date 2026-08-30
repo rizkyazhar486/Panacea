@@ -96,17 +96,17 @@ export function VisitPrepChecklist() {
   return (
     <div className="mx-auto max-w-2xl space-y-5 pb-24">
       <Card className="!p-5">
-        <SectionTitle icon={<IconStethoscope size={20} />} title="Doctor-Visit Prep Checklist" subtitle="Apa yang dibawa dan apa yang ditanyakan, sebelum Anda masuk" />
+        <SectionTitle icon={<IconStethoscope size={20} />} title="Doctor-Visit Prep Checklist" subtitle="What to bring and what to ask, before you go in" />
         <Prosa kelas="mt-2 text-[13px] leading-relaxed text-neutral-500">Konsultasi berjalan lebih baik bila Anda datang dengan persiapan — halaman ini mengubah alasan kunjungan Anda menjadi daftar periksa yang nyata beserta pertanyaan yang layak diajukan, supaya tidak baru teringat di mobil dalam perjalanan pulang.</Prosa>
         <Field label="Kunjungan ini tentang apa?">
           <select className={`${inputClass} mt-1`} value={type} onChange={(e) => setType(e.target.value as VisitType)}>
             {VISIT_TYPES.map((v) => <option key={v.id} value={v.id}>{v.label}</option>)}
           </select>
         </Field>
-        <Field label="Singkat saja, dengan kata-kata Anda sendiri (boleh dikosongkan)">
+        <Field label="Keep it short, in your own words (optional)">
           <input className={`${inputClass} mt-1`} placeholder="e.g. Lower back pain for 2 weeks" value={reason} onChange={(e) => setReason(e.target.value)} />
         </Field>
-        <Field label="Catatan gejala — sejak kapan, apa yang memperingan/memperberat (boleh dikosongkan)">
+        <Field label="Symptom notes — when it started, what makes it better or worse (optional)">
           <textarea className={`${inputClass} mt-1 min-h-20`} value={symptomNotes} onChange={(e) => setSymptomNotes(e.target.value)} />
         </Field>
       </Card>

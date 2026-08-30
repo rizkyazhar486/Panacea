@@ -148,7 +148,7 @@ export function ClubHub() {
   return (
     <div className="mx-auto max-w-2xl space-y-5 pb-24">
       <Card className="!p-5">
-        <SectionTitle icon={<IconUsers size={20} />} title="Club Hub" subtitle="Temukan orang-orang Anda — klub dan pertemuan kelompok, semuanya nyata" />
+        <SectionTitle icon={<IconUsers size={20} />} title="Club Hub" subtitle="Find your people — clubs and group meet-ups, all of them real" />
         <Prosa kelas="mt-2 text-[13px] leading-relaxed text-neutral-500">Kegiatan kelompok yang teratur adalah salah satu penanda terkuat orang bertahan berolahraga. Bergabunglah dengan klub, datanglah ke pertemuan, dan latihan Anda tidak lagi bergantung pada tekad semata. Siapa pun boleh memulai klub atau menjadi tuan rumah pertemuan — tidak ada penjaga gerbang.</Prosa>
         <div className="mt-3 flex flex-wrap gap-2">
           {([['meets', 'Meets'], ['myhub', 'My Hub'], ['clubs', 'Clubs']] as [Tab, string][]).map(([t, label]) => (

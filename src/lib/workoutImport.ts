@@ -263,9 +263,9 @@ export function parseHrNotifications(text: string): HrNotification[] {
         : kind.includes('low') ? 'rendah'
           : kind.includes('irregular') ? 'iramaTidakTeratur' : 'lain'
     const label =
-      jenis === 'tinggi' ? 'Denyut tinggi saat tidak beraktivitas'
+      jenis === 'tinggi' ? 'High heart rate while inactive'
         : jenis === 'rendah' ? 'Denyut rendah'
-          : jenis === 'iramaTidakTeratur' ? 'Irama tidak teratur' : 'Peringatan denyut'
+          : jenis === 'iramaTidakTeratur' ? 'Irregular rhythm' : 'Heart-rate alert'
 
     const samples = Array.isArray(n?.heartRateData) ? (n.heartRateData as Record<string, unknown>[]) : []
     const bpms = samples.map((s) => sampleBpm(s)).filter((v): v is number => v != null && v > 0)

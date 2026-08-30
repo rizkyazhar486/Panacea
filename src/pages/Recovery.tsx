@@ -88,7 +88,7 @@ function SleepScoreCard() {
 
   return (
     <Card className="!p-5">
-      <SectionTitle icon={<IconMoon size={20} />} title="Skor Tidur" subtitle="Lama, waktu terlelap, terbangun, dan keajekan jam tidur" />
+      <SectionTitle icon={<IconMoon size={20} />} title="Skor Tidur" subtitle="Duration, time to fall asleep, awakenings, and how consistent your bedtime is" />
       <p className="mt-2 rounded-xl bg-amber-500/10 px-3 py-2 text-[11px] leading-snug text-amber-800 dark:text-amber-300">
         Bobot keempat bagian ini <b>pilihan penulis</b>, bukan skor tidur tervalidasi. Pakai perubahannya dari malam ke
         malam pada diri sendiri. Untuk penilaian baku, PSQI (Buysse dkk., 1989) adalah yang lazim dipakai.
@@ -211,7 +211,7 @@ function MeditationCard() {
 
   return (
     <Card className="!p-5">
-      <SectionTitle icon={<IconLeaf size={20} />} title="Guided Meditation" subtitle="Naskah tuntunan + suara latar untuk menenangkan pikiran sebelum tidur" />
+      <SectionTitle icon={<IconLeaf size={20} />} title="Guided Meditation" subtitle="A guided script plus background sound to settle the mind before sleep" />
 
       <div className="flex gap-2 overflow-x-auto pb-1">
         {MEDITATION_SCRIPTS.map((s) => (
@@ -300,14 +300,14 @@ export function Recovery() {
       </Card>
 
       <Card className="!p-5">
-        <SectionTitle icon={<IconLeaf size={20} />} title="Panduan untuk Tahap Ini" subtitle="Anjuran menurut berapa hari sejak Anda memulai" />
+        <SectionTitle icon={<IconLeaf size={20} />} title="Guidance for This Stage" subtitle="Advice based on how many days in you are" />
         <ul className="mt-2 space-y-1.5 text-sm text-neutral-600">
           {current.guidance.map((g, i) => <li key={i}>• {g}</li>)}
         </ul>
       </Card>
 
       <Card className="!p-5">
-        <SectionTitle icon={<IconActivity size={20} />} title="Recovery Timeline" subtitle="Semua tahap untuk jenis ini" />
+        <SectionTitle icon={<IconActivity size={20} />} title="Recovery Timeline" subtitle="All stages for this type" />
         <div className="mt-3 space-y-2">
           {phases.map((ph, i) => (
             <div key={ph.label} className={'flex items-center justify-between rounded-xl border p-3 ' + (i === (idx === -1 ? phases.length - 1 : idx) ? 'border-brand/40 bg-brand-50/40' : 'border-neutral-100')}>

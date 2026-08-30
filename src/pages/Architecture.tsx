@@ -56,7 +56,7 @@ export function Architecture() {
         <SectionTitle
           icon={<IconShield size={20} />}
           title="Hybrid CDSS Architecture — Lateral + Vertical"
-          subtitle="Fondasi Panaceamed.id: dukungan peresepan yang aman (dokter tetap di dalam alurnya) + edukasi pasien yang dipersonalisasi"
+          subtitle="The foundation of Panaceamed.id: safe prescribing support (a doctor stays in the loop) + personalised patient education"
         />
         <div className="flex flex-wrap gap-2">
           <Badge tone="brand">Dokter tetap di dalam alurnya</Badge>

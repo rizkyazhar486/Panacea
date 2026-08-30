@@ -142,7 +142,7 @@ export function Billing() {
 
       {/* Plans */}
       <Card>
-        <SectionTitle title="Choose a Subscription Plan" subtitle="Untuk tenaga medis perorangan maupun institusi rumah sakit" />
+        <SectionTitle title="Choose a Subscription Plan" subtitle="For individual clinicians and for hospital institutions" />
         <div className="grid gap-4 md:grid-cols-2">
           {PLANS.map((pl) => {
             const active = subscription.plan === pl.id
@@ -316,7 +316,7 @@ function EmrPurchaseModal({
             <Field label="Number of doctor seats">
               <input className={inputClass} type="number" min={1} value={seats} onChange={(e) => setSeats(Number(e.target.value))} />
             </Field>
-            <UploadBox label="STR tiap dokter (boleh beberapa berkas JPG)" multiple onFiles={(f) => setStrFiles(f)} files={strFiles} />
+            <UploadBox label="Practice licence for each doctor (several JPG files allowed)" multiple onFiles={(f) => setStrFiles(f)} files={strFiles} />
           </div>
         )}
 

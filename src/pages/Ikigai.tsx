@@ -67,7 +67,7 @@ export function Ikigai() {
   return (
     <div className="mx-auto max-w-2xl space-y-5 pb-24">
       <Card className="!p-5">
-        <SectionTitle icon={<IconSparkle size={20} />} title="Ikigai & Legacy Letter" subtitle="Perenungan tersusun tentang tujuan hidup — faktor umur panjang yang tervalidasi, bukan sekadar suasana hati" />
+        <SectionTitle icon={<IconSparkle size={20} />} title="Ikigai & Legacy Letter" subtitle="A structured reflection on purpose — a validated longevity factor, not just a mood" />
         <p className="mt-2 text-[13px] leading-relaxed text-neutral-500">
           Having a clear sense of purpose is linked to lower all-cause mortality in long-term studies,
           independent of other health factors. This page turns that into something concrete: the

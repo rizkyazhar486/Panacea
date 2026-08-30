@@ -82,9 +82,9 @@ export function LabDecoder() {
   return (
     <div className="mx-auto max-w-2xl space-y-5 pb-24">
       <Card className="!p-5">
-        <SectionTitle icon={<IconChartUp size={20} />} title="Lab Result Decoder" subtitle="Masukkan nilai pemeriksaan darah Anda → dibacakan dengan bahasa sederhana. Pribadi, diolah di perangkat." />
+        <SectionTitle icon={<IconChartUp size={20} />} title="Lab Result Decoder" subtitle="Enter your blood test values → read back in plain language. Private, processed on your device." />
         <div className="mt-3 max-w-[160px]">
-          <Field label="Jenis kelamin (untuk rentang rujukan)">
+          <Field label="Sex (for reference ranges)">
             <select className={inputClass} value={sex} onChange={(e) => setSex(e.target.value as Sex)}>
               <option value="M">Male</option><option value="F">Female</option>
             </select>
@@ -95,7 +95,7 @@ export function LabDecoder() {
       {/* Summary of anything flagged */}
       {flagged.length > 0 && (
         <Card className="!p-5">
-          <SectionTitle icon={<IconActivity size={20} />} title={`${flagged.length} value${flagged.length > 1 ? 's' : ''} outside range`} subtitle="Apa arti masing-masing dengan bahasa sederhana" />
+          <SectionTitle icon={<IconActivity size={20} />} title={`${flagged.length} value${flagged.length > 1 ? 's' : ''} outside range`} subtitle="What each one means, in plain language" />
           <div className="mt-3 space-y-2">
             {flagged.map((r) => (
               <div key={r.def.id} className={'rounded-xl border p-3 ' + (r.bad ? 'border-rose-200 bg-rose-50 dark:border-rose-500/30 dark:bg-rose-500/10' : 'border-amber-200 bg-amber-50 dark:border-amber-500/30 dark:bg-amber-500/10')}>

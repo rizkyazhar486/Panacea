@@ -332,7 +332,7 @@ function waktuLalu(t: number): string {
   if (m < 1) return 'baru saja'
   if (m < 60) return `${m} menit lalu`
   const h = Math.floor(m / 60)
-  return h < 24 ? `${h} jam lalu` : `${Math.floor(h / 24)} hari lalu`
+  return h < 24 ? `${h} jam lalu` : `${Math.floor(h / 24)} days ago`
 }
 
 function fmtSelang(detik: number): string {

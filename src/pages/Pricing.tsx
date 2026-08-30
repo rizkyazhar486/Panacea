@@ -29,7 +29,7 @@ const TIERS: Tier[] = [
     features: [
       'AI Chatbot — history-taking & health education',
       'Community, Facility GPS & Emergency SOS',
-      'Kalkulator Klinis — gratis untuk 50 pendaftar pertama',
+      'Clinical Calculators — free for the first 50 sign-ups',
     ],
     cta: 'Get Started on Home',
     to: '/',
@@ -69,7 +69,7 @@ export function Pricing() {
   const navigate = useNavigate()
   return (
     <div className="mx-auto max-w-2xl space-y-4 p-4">
-      <SectionTitle icon={<IconWallet size={20} />} title="Services & Pricing" subtitle="Tiga paket sederhana — pilih yang sesuai kebutuhan, naik atau turun paket kapan saja" />
+      <SectionTitle icon={<IconWallet size={20} />} title="Services & Pricing" subtitle="Three simple plans — pick what fits, move up or down at any time" />
 
       <div className="grid gap-4">
         {TIERS.map((t) => (
