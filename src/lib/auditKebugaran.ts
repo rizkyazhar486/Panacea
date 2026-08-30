@@ -69,17 +69,17 @@ export interface BahanAudit {
  */
 function batasanBersama(b: BahanAudit): string[] {
   const out = [
-    'Hanya menghitung latihan yang TERCATAT. Kerja fisik, jalan kaki harian, dan sesi yang lupa direkam tidak masuk sama sekali, sehingga angkanya lebih rendah daripada beban tubuh yang sesungguhnya.',
-    'Beban dihitung dari denyut jantung. Latihan beban dan gerakan kekuatan menaikkan denyut jauh lebih sedikit daripada bebannya bagi otot dan sendi, sehingga selalu dinilai terlalu ringan oleh model ini.',
-    `Memakai denyut maksimum ${b.hrMax} bpm dan denyut istirahat ${b.hrIstirahat} bpm. Keduanya menggeser seluruh angka bila keliru; denyut maksimum yang ditaksir dari usia dapat meleset 10-12 bpm pada perorangan.`,
+    'Counts only RECORDED training. Physical work, daily walking, and sessions you forgot to record do not enter at all, so the figure sits below the load your body actually carried.',
+    'Load is computed from heart rate. Resistance training and strength work raise heart rate far less than they load muscle and joints, so this model always scores them too lightly.',
+    `Uses a maximum heart rate of ${b.hrMax} bpm and a resting heart rate of ${b.hrIstirahat} bpm. Both shift every number if they are wrong; a maximum estimated from age can be 10–12 bpm out for an individual.`,
   ]
   if (b.rentangHari < 42) {
     out.unshift(
-      `Data baru mencakup ${b.rentangHari} hari, sedangkan tetapan waktu kebugaran adalah ${BANISTER.tauKebugaran} hari. Angka kebugaran BELUM MENCAPAI NILAI TETAPNYA dan masih akan naik meskipun latihan Anda tidak berubah sama sekali.`,
+      `The data covers only ${b.rentangHari} days, while the fitness time constant is ${BANISTER.tauKebugaran} days. The fitness figure HAS NOT REACHED ITS STEADY VALUE and will keep rising even if your training does not change at all.`,
     )
   }
   if (b.jumlahSesi < 10) {
-    out.push(`Baru ${b.jumlahSesi} sesi yang terbaca. Di bawah sekitar sepuluh sesi, satu sesi tunggal masih menggeser angkanya secara mencolok.`)
+    out.push(`Only ${b.jumlahSesi} sessions have been read so far. Below about ten sessions, a single session still moves the figure noticeably.`)
   }
   return out
 }
@@ -87,34 +87,34 @@ function batasanBersama(b: BahanAudit): string[] {
 export function auditKebugaran(b: BahanAudit): AngkaKlinis {
   const a = bobotHarian(BANISTER.tauKebugaran)
   return {
-    label: 'Kebugaran',
+    label: 'Fitness',
     nilai: String(Math.round(b.kebugaran)),
     satuan: '',
     tingkat: 'termodelkan',
-    arti: `Rerata beban latihan harian Anda selama kira-kira ${BANISTER.tauKebugaran} hari terakhir, dengan hari yang lebih baru diberi bobot lebih besar.`,
-    skala: 'TIDAK BERSATUAN dan tidak berskala populasi. Angka ini hanya sebanding dengan riwayat Anda sendiri — tidak ada data orang lain di dalam perhitungannya, sehingga tidak ada arti "tinggi" maupun "rendah" selain dibandingkan bulan-bulan Anda sebelumnya.',
-    rumus: `kebugaran hari ini = kebugaran kemarin + ${persen(a)} × (beban hari ini − kebugaran kemarin)`,
+    arti: `Your average daily training load over roughly the last ${BANISTER.tauKebugaran} days, with more recent days weighted more heavily.`,
+    skala: 'UNITLESS, and not scaled to any population. This number is comparable only with your own history — nobody else’s data enters the calculation, so "high" and "low" mean nothing except against your own earlier months.',
+    rumus: `fitness today = fitness yesterday + ${persen(a)} × (load today − fitness yesterday)`,
     masukan: [
-      { nama: 'Beban latihan hari ini', nilai: String(Math.round(b.upayaHariIni)), sumber: 'dihitung dari deret denyut jantung sesi' },
-      { nama: 'Kebugaran kemarin', nilai: String(Math.round(b.kebugaran)), sumber: 'dihitung' },
-      { nama: 'Tetapan waktu τ', nilai: `${BANISTER.tauKebugaran} hari`, sumber: 'tetapan model Banister' },
-      { nama: 'Sesi terpakai', nilai: `${b.jumlahSesi} sesi dalam ${b.rentangHari} hari`, sumber: 'riwayat impor' },
+      { nama: 'Training load today', nilai: String(Math.round(b.upayaHariIni)), sumber: 'computed from the session heart-rate series' },
+      { nama: 'Fitness yesterday', nilai: String(Math.round(b.kebugaran)), sumber: 'computed' },
+      { nama: 'Time constant τ', nilai: `${BANISTER.tauKebugaran} days`, sumber: 'a constant of the Banister model' },
+      { nama: 'Sessions used', nilai: `${b.jumlahSesi} sessions across ${b.rentangHari} days`, sumber: 'imported history' },
     ],
     ketidakpastian: {
-      sdc: 'Perubahan di bawah kira-kira 3 satuan dalam sepekan tidak layak ditafsirkan.',
-      dasar: `Dengan bobot harian hanya ${persen(a)}, satu sesi biasa hanya menggeser angka ini kurang dari satu satuan. Naik-turun harian sebesar itu adalah aritmetika, bukan perubahan pada tubuh.`,
+      sdc: 'A change under roughly 3 units in a week is not worth interpreting.',
+      dasar: `With a daily weight of only ${persen(a)}, an ordinary session moves this figure by less than one unit. Day-to-day movement of that size is arithmetic, not a change in the body.`,
     },
     tidakDipengaruhi: [
-      'TIDUR — berapa pun lama dan mutunya. Tidur sama sekali bukan masukan bagi model ini.',
-      'Denyut istirahat pagi, HRV, dan suhu tubuh.',
-      'Makan, berat badan, dan hidrasi.',
-      'Perasaan lelah maupun bugar hari itu.',
-      'Istirahat sehari maupun dua hari — kebugaran meluruh sangat lambat.',
+      'SLEEP — whatever its length or quality. Sleep is not an input to this model at all.',
+      'Morning resting heart rate, HRV, and body temperature.',
+      'Food, body weight, and hydration.',
+      'How tired or fresh you feel that day.',
+      'A day or two of rest — fitness decays very slowly.',
     ],
     yangMenggerakkan: [
-      `Hanya beban latihan yang tercatat. Untuk menaikkannya diperlukan penambahan beban yang bertahan berminggu-minggu, bukan satu sesi berat.`,
-      `Karena τ = ${BANISTER.tauKebugaran} hari, kira-kira dua pertiga akibat sebuah perubahan beban baru terlihat setelah ${BANISTER.tauKebugaran} hari, dan hampir seluruhnya setelah tiga kali τ.`,
-      'Berhenti berlatih sama sekali menurunkannya kira-kira separuh dalam 29 hari.',
+      'Only recorded training load. Raising it needs an increase sustained over weeks, not one hard session.',
+      `Because τ = ${BANISTER.tauKebugaran} days, about two thirds of the effect of a load change only appears after ${BANISTER.tauKebugaran} days, and almost all of it after three times τ.`,
+      'Stopping training entirely halves it in about 29 days.',
     ],
     batasan: batasanBersama(b),
   }
@@ -123,35 +123,35 @@ export function auditKebugaran(b: BahanAudit): AngkaKlinis {
 export function auditKelelahan(b: BahanAudit): AngkaKlinis {
   const a = bobotHarian(BANISTER.tauKelelahan)
   return {
-    label: 'Kelelahan',
+    label: 'Fatigue',
     nilai: String(Math.round(b.kelelahan)),
     satuan: '',
     tingkat: 'termodelkan',
-    arti: `Rerata beban latihan harian Anda selama kira-kira ${BANISTER.tauKelelahan} hari terakhir. Naik cepat setelah latihan berat dan turun cepat saat istirahat.`,
-    skala: 'TIDAK BERSATUAN, dan dinyatakan dalam skala yang sama persis dengan kebugaran — itulah sebabnya keduanya boleh dikurangkan.',
-    rumus: `kelelahan hari ini = kelelahan kemarin + ${persen(a)} × (beban hari ini − kelelahan kemarin)`,
+    arti: `Your average daily training load over roughly the last ${BANISTER.tauKelelahan} days. It rises fast after hard training and falls fast during rest.`,
+    skala: 'UNITLESS, and expressed on exactly the same scale as fitness — which is why the two can be subtracted.',
+    rumus: `fatigue today = fatigue yesterday + ${persen(a)} × (load today − fatigue yesterday)`,
     masukan: [
-      { nama: 'Beban latihan hari ini', nilai: String(Math.round(b.upayaHariIni)), sumber: 'dihitung dari deret denyut jantung sesi' },
-      { nama: 'Kelelahan kemarin', nilai: String(Math.round(b.kelelahan)), sumber: 'dihitung' },
-      { nama: 'Tetapan waktu τ', nilai: `${BANISTER.tauKelelahan} hari`, sumber: 'tetapan model Banister' },
+      { nama: 'Training load today', nilai: String(Math.round(b.upayaHariIni)), sumber: 'computed from the session heart-rate series' },
+      { nama: 'Fatigue yesterday', nilai: String(Math.round(b.kelelahan)), sumber: 'computed' },
+      { nama: 'Time constant τ', nilai: `${BANISTER.tauKelelahan} days`, sumber: 'a constant of the Banister model' },
     ],
     ketidakpastian: {
-      sdc: 'Perubahan di bawah kira-kira 5 satuan dalam sehari tidak layak ditafsirkan.',
-      dasar: `Bobot hariannya ${persen(a)}, jauh lebih besar daripada kebugaran, sehingga angka ini memang berayun lebar dari hari ke hari bahkan pada latihan yang teratur.`,
+      sdc: 'A change under roughly 5 units in a day is not worth interpreting.',
+      dasar: `Its daily weight is ${persen(a)}, far larger than fitness, so this figure genuinely swings widely from day to day even on regular training.`,
     },
     tidakDipengaruhi: [
-      'TIDUR, HRV, dan denyut istirahat — tidak satu pun menjadi masukan.',
-      'Rasa pegal dan nyeri otot.',
-      'Beban pikiran, pekerjaan, dan tekanan hidup.',
-      'Sakit, demam, maupun kurang darah.',
+      'SLEEP, HRV, and resting heart rate — not one of them is an input.',
+      'Soreness and muscle pain.',
+      'Mental load, work, and life pressure.',
+      'Illness, fever, or anaemia.',
     ],
     yangMenggerakkan: [
-      'Beban latihan beberapa hari terakhir. Satu sesi berat menaikkannya dengan segera.',
-      `Karena τ = ${BANISTER.tauKelelahan} hari, kira-kira separuhnya hilang setelah 5 hari tanpa latihan.`,
+      'Training load over the last few days. One hard session raises it immediately.',
+      `Because τ = ${BANISTER.tauKelelahan} days, about half of it is gone after 5 days without training.`,
     ],
     batasan: [
       ...batasanBersama(b),
-      'Yang diukur adalah kelelahan AKIBAT LATIHAN semata. Lelah karena kurang tidur, sakit, maupun beban pikiran tidak akan pernah muncul di sini, meskipun tubuh Anda merasakannya dengan cara yang sama.',
+      'What is measured is TRAINING fatigue only. Tiredness from short sleep, illness, or mental load will never appear here, even though your body feels it the same way.',
     ],
   }
 }
@@ -159,35 +159,35 @@ export function auditKelelahan(b: BahanAudit): AngkaKlinis {
 export function auditKesegaran(b: BahanAudit): AngkaKlinis {
   const beda = b.kebugaran - b.kelelahan
   return {
-    label: 'Kesegaran',
+    label: 'Freshness',
     nilai: String(Math.round(b.kesegaran)),
     satuan: '',
     tingkat: 'termodelkan',
-    arti: 'Selisih antara rerata beban 42 hari dan rerata beban 7 hari. Positif berarti beban belakangan ini lebih ringan daripada kebiasaan Anda; negatif berarti lebih berat.',
-    skala: 'TIDAK BERSATUAN. Nilainya berkisar di sekitar nol menurut susunannya sendiri, bukan menurut keadaan tubuh.',
-    rumus: `kesegaran = kebugaran − kelelahan = ${Math.round(b.kebugaran)} − ${Math.round(b.kelelahan)} = ${Math.round(beda)}`,
+    arti: 'The difference between the 42-day average load and the 7-day average load. Positive means recent load is lighter than your norm; negative means heavier.',
+    skala: 'UNITLESS. It hovers around zero by its own construction, not because of the state of your body.',
+    rumus: `freshness = fitness − fatigue = ${Math.round(b.kebugaran)} − ${Math.round(b.kelelahan)} = ${Math.round(beda)}`,
     masukan: [
-      { nama: 'Kebugaran (rerata 42 hari)', nilai: String(Math.round(b.kebugaran)), sumber: 'dihitung' },
-      { nama: 'Kelelahan (rerata 7 hari)', nilai: String(Math.round(b.kelelahan)), sumber: 'dihitung' },
+      { nama: 'Fitness (42-day average)', nilai: String(Math.round(b.kebugaran)), sumber: 'computed' },
+      { nama: 'Fatigue (7-day average)', nilai: String(Math.round(b.kelelahan)), sumber: 'computed' },
     ],
     ketidakpastian: {
-      sdc: 'Perubahan di bawah kira-kira 5 satuan tidak layak ditafsirkan, sebab galat kedua penyusunnya ikut terbawa.',
-      dasar: 'Selisih dua angka yang masing-masing tidak pasti selalu lebih tidak pasti daripada keduanya.',
+      sdc: 'A change under roughly 5 units is not worth interpreting, because the error of both components carries through.',
+      dasar: 'The difference between two uncertain numbers is always more uncertain than either of them.',
     },
     tidakDipengaruhi: [
-      'TIDUR — termasuk tidur sepuluh jam. Bukan masukan bagi model ini.',
-      'HRV, denyut istirahat pagi, dan perasaan Anda hari itu.',
-      'Makan, kafein, dan hidrasi.',
+      'SLEEP — including a ten-hour night. Not an input to this model.',
+      'HRV, morning resting heart rate, and how you feel that day.',
+      'Food, caffeine, and hydration.',
     ],
     yangMenggerakkan: [
-      'HANYA perbedaan antara beban pekan ini dan kebiasaan dua bulan terakhir.',
-      'Menjadi positif memerlukan penurunan beban yang disengaja selama 7-14 hari. Inilah yang dilakukan atlet sebelum bertanding, dan namanya taper.',
-      'Menjadi negatif setiap kali beban dinaikkan — dan itu memang yang seharusnya terjadi saat sedang membangun.',
+      'ONLY the difference between this week’s load and your norm over the last two months.',
+      'Turning positive requires a deliberate drop in load over 7–14 days. This is what athletes do before competing, and it is called a taper.',
+      'It turns negative every time load is increased — and that is exactly what should happen while building.',
     ],
     batasan: [
       ...batasanBersama(b),
-      'NILAI YANG SELALU DI SEKITAR NOL MAUPUN NEGATIF ADALAH KELUARAN YANG DIHARAPKAN, bukan tanda ada yang salah. Bila beban latihan kira-kira tetap, rerata 7 hari akan mendekati rerata 42 hari, sehingga selisihnya memang tidak pernah menjadi positif. Berlatih tekun dan teratur akan selalu terbaca "tidak segar" selama beban tidak diturunkan.',
-      'Angka ini TIDAK MENGUKUR kesiapan tubuh. Ia mengukur bentuk grafik latihan Anda. Untuk kesiapan yang sesungguhnya, denyut istirahat pagi, HRV, mutu tidur, dan rasa badan jauh lebih menentukan — dan tidak satu pun dari itu masuk ke sini.',
+      'A VALUE THAT SITS AROUND ZERO OR NEGATIVE IS THE EXPECTED OUTPUT, not a sign something is wrong. If training load is roughly constant, the 7-day average approaches the 42-day average, so the difference never turns positive. Training diligently and regularly will always read as "not fresh" for as long as load is not reduced.',
+      'This number does NOT MEASURE readiness. It measures the shape of your training graph. For actual readiness, morning resting heart rate, HRV, sleep quality and how the body feels matter far more — and not one of them enters here.',
     ],
   }
 }
@@ -200,10 +200,10 @@ export function auditKesegaran(b: BahanAudit): AngkaKlinis {
  */
 export function bacaanJujur(b: BahanAudit): string | null {
   if (b.rentangHari < 42) {
-    return `Data Anda baru mencakup ${b.rentangHari} hari, sedangkan kebugaran dihitung dengan tetapan waktu ${BANISTER.tauKebugaran} hari. Angkanya masih akan naik dengan sendirinya meskipun latihan Anda tidak berubah — jadi belum layak dibaca sebagai keadaan yang mapan.`
+    return `Your data covers only ${b.rentangHari} days, while fitness is computed with a time constant of ${BANISTER.tauKebugaran} days. The figure will keep rising on its own even if your training does not change — so it is not yet worth reading as a settled state.`
   }
   if (b.kesegaran <= 0 && b.kelelahan >= b.kebugaran * 0.9) {
-    return `Kesegaran Anda di sekitar nol maupun negatif karena beban pekan ini kira-kira sama dengan kebiasaan dua bulan terakhir — itu keluaran yang diharapkan dari latihan yang teratur, bukan tanda tubuh bermasalah. Angka ini hanya akan menjadi positif bila beban sengaja diturunkan selama 7-14 hari. Perlu ditegaskan pula bahwa tidur tidak masuk ke dalam perhitungan ini sama sekali; bila Anda merasa lelah meskipun tidur cukup, sebabnya harus dicari pada denyut istirahat, HRV, gizi, maupun pemeriksaan darah — bukan pada angka ini.`
+    return `Your freshness sits around zero or negative because this week’s load is roughly the same as your norm over the last two months — that is the expected output of regular training, not a sign anything is wrong. This number only turns positive if load is deliberately reduced for 7–14 days. It is also worth stating plainly that sleep does not enter this calculation at all; if you feel tired despite sleeping enough, the cause has to be looked for in resting heart rate, HRV, nutrition or blood tests — not in this number.`
   }
   return null
 }
