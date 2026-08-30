@@ -17,10 +17,10 @@ import {
 // ─────────────────────────────────────────────────────────────────────────────
 
 const BAND_STYLE: Record<Band, { chip: string; dot: string; label: string }> = {
-  baik: { chip: 'bg-emerald-500/10 border-emerald-500/30 text-emerald-300', dot: 'bg-emerald-400', label: 'Baik' },
-  sedang: { chip: 'bg-amber-500/10 border-amber-500/30 text-amber-300', dot: 'bg-amber-400', label: 'Sedang' },
-  perhatian: { chip: 'bg-rose-500/10 border-rose-500/30 text-rose-300', dot: 'bg-rose-400', label: 'Perhatian' },
-  takTersedia: { chip: 'bg-white/5 border-white/10 text-slate-500', dot: 'bg-slate-600', label: 'Belum ada data' },
+  baik: { chip: 'bg-emerald-500/10 border-emerald-500/30 text-emerald-300', dot: 'bg-emerald-400', label: 'Good' },
+  sedang: { chip: 'bg-amber-500/10 border-amber-500/30 text-amber-300', dot: 'bg-amber-400', label: 'Moderate' },
+  perhatian: { chip: 'bg-rose-500/10 border-rose-500/30 text-rose-300', dot: 'bg-rose-400', label: 'Attention' },
+  takTersedia: { chip: 'bg-white/5 border-white/10 text-slate-500', dot: 'bg-slate-600', label: 'No data yet' },
 }
 
 export function GaitAnalysis() {
@@ -35,37 +35,37 @@ export function GaitAnalysis() {
       <SectionTitle
         icon={<IconRun />}
         title="Movement Analysis"
-        subtitle="Mutu langkah, bentuk lari, dan pemulihan — dari data jam tangan yang selama ini tidak terbaca"
+        subtitle="Walking quality, running form and recovery — from watch data that has gone unread until now"
       />
 
       <Card>
         <p className="text-sm text-neutral-600 leading-relaxed">
-          Jumlah langkah hanya mengatakan <strong className="text-ink">seberapa banyak</strong> Anda bergerak.
-          Angka di halaman ini mengatakan <strong className="text-ink">sebaik apa</strong> Anda bergerak — dan
-          ketimpangan langkah maupun fase tumpuan yang memanjang sering menjadi petunjuk paling awal adanya
-          kompensasi akibat nyeri, kelemahan sesisi, maupun postur yang sudah lama menyimpang.
+          A step count only tells you <strong className="text-ink">how much</strong> you moved.
+          The numbers on this page tell you <strong className="text-ink">how well</strong> you moved — and
+          walking asymmetry or a lengthening support phase are often the earliest clues to compensation from
+          pain, one-sided weakness, or long-standing postural drift.
         </p>
         <div className="mt-3 flex flex-wrap items-center gap-2">
-          <Badge>{cov.terisi} dari {cov.total} metrik terisi</Badge>
+          <Badge>{cov.terisi} of {cov.total} metrics filled in</Badge>
           {vitals.source && <Badge>{vitals.source}</Badge>}
           {vitals.measuredAt && (
             <span className="text-xs text-slate-500">
-              terakhir {new Date(vitals.measuredAt).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}
+              last {new Date(vitals.measuredAt).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}
             </span>
           )}
         </div>
         {cov.terisi === 0 && (
           <p className="text-sm text-amber-200/90 mt-3 leading-relaxed">
-            Belum ada data sama sekali. Unggah berkas ekspor Anda di{' '}
+            No data at all yet. Upload your export file on{' '}
             <Link to="/health-data" className="font-semibold underline">Health Data</Link>{' '}
-            — semua angka di bawah terisi dari berkas yang sama, tanpa perlu memasukkan apa pun secara manual.
+            — every number below fills in from that same file, with nothing to enter by hand.
           </p>
         )}
       </Card>
 
       {sorot.length > 0 && (
         <Card>
-          <SectionTitle icon={<IconHeart />} title="Yang paling layak Anda perhatikan" subtitle="Diurutkan menurut seberapa jauh masing-masing keluar dari rentang rujukannya" />
+          <SectionTitle icon={<IconHeart />} title="What is most worth your attention" subtitle="Ordered by how far each one sits outside its reference range" />
           <div className="space-y-2 mt-2">
             {sorot.map((r) => (
               <div key={r.key} className="rounded-lg border border-rose-500/25 bg-rose-500/[0.07] p-3">
@@ -77,7 +77,7 @@ export function GaitAnalysis() {
                 <p className="text-sm text-neutral-600 mt-1.5 leading-relaxed">{r.arti}</p>
                 {r.langkah && (
                   <p className="text-sm text-emerald-200/90 mt-1.5 leading-relaxed">
-                    <span className="text-emerald-500/80">Yang bisa dilakukan: </span>{r.langkah}
+                    <span className="text-emerald-500/80">What you can do: </span>{r.langkah}
                   </p>
                 )}
               </div>
@@ -91,11 +91,11 @@ export function GaitAnalysis() {
           <SectionTitle icon={<IconActivity />} title="Last run summary" />
           <div className="grid grid-cols-3 gap-2 mt-2">
             <Stat label="Pace" value={`${fmtPaceSec(pace)}/km`} />
-            <Stat label="Kecepatan" value={`${(vitals.runningSpeedKmh ?? 0).toFixed(1)} km/j`} />
+            <Stat label="Speed" value={`${(vitals.runningSpeedKmh ?? 0).toFixed(1)} km/h`} />
             <Stat label="VO₂max" value={vitals.vo2max ? String(vitals.vo2max) : '—'} />
           </div>
           <p className="text-sm text-neutral-500 mt-3 leading-relaxed">
-            Dari sini, pace latihan untuk tiap jenis lari bisa dihitung di{' '}
+            From here, training paces for each kind of run can be worked out in{' '}
             <Link to="/latihan-dasar" className="font-semibold text-ink underline">Foundation Training</Link>.
           </p>
         </Card>
@@ -137,7 +137,7 @@ function ReadingRow({ r }: { r: Reading }) {
       <p className="text-sm text-neutral-500 mt-1.5 leading-relaxed">{r.arti}</p>
       {r.langkah && r.band !== 'baik' && r.band !== 'takTersedia' && (
         <p className="text-sm text-emerald-200/80 mt-1.5 leading-relaxed">
-          <span className="text-emerald-500/80">Yang bisa dilakukan: </span>{r.langkah}
+          <span className="text-emerald-500/80">What you can do: </span>{r.langkah}
         </p>
       )}
     </div>
