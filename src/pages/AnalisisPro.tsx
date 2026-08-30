@@ -95,14 +95,14 @@ export function AnalisisPro() {
   if (!workouts.length) {
     return (
       <div className="space-y-4 pb-24">
-        <SectionTitle icon={<IconChartUp />} title="Analisis Pro" subtitle="Kebugaran, kesegaran, upaya relatif, rekor, dan target" />
+        <SectionTitle icon={<IconChartUp />} title="Pro Analysis" subtitle="Fitness, freshness, relative effort, records and targets" />
         <Card>
-          <Prosa kelas="text-sm leading-relaxed text-neutral-600">Belum ada sesi latihan tersimpan, jadi belum ada yang bisa dianalisis. Semua angka di halaman ini dihitung dari sesi nyata — tidak ada contoh atau data bawaan.</Prosa>
+          <Prosa kelas="text-sm leading-relaxed text-neutral-600">No training sessions stored yet, so there is nothing to analyse. Every number on this page is computed from real sessions — there is no sample or default data.</Prosa>
           <p className="mt-2 text-sm leading-relaxed text-slate-500">
-            Sesi masuk sendiri lewat sinkronisasi bila di Health Auto Export ada otomatisasi
-            <strong className="text-neutral-600"> Data Type: Workouts</strong> dengan
-            <strong className="text-neutral-600"> Date Range: Today</strong>. Periksa di{' '}
-            <Link to="/health-data/tutorial" className="font-semibold text-ink underline">Diagnosa sinkronisasi</Link>.
+            Sessions arrive automatically through sync when Health Auto Export has an automation with
+            <strong className="text-neutral-600"> Data Type: Workouts</strong> and
+            <strong className="text-neutral-600"> Date Range: Today</strong>. Check it in{' '}
+            <Link to="/health-data/tutorial" className="font-semibold text-ink underline">Sync diagnostics</Link>.
           </p>
         </Card>
         <KartuTidakDibangun />
@@ -112,7 +112,7 @@ export function AnalisisPro() {
 
   return (
     <div className="space-y-4 pb-24">
-      <SectionTitle icon={<IconChartUp />} title="Analisis Pro"
+      <SectionTitle icon={<IconChartUp />} title="Pro Analysis"
         subtitle={`${workouts.length} sessions · HRmax ${konteks.hrMax} · Resting HR ${konteks.hrRest} bpm`} />
 
       <SeksiLari workouts={workouts} hrMax={konteks.hrMax} />
@@ -120,12 +120,12 @@ export function AnalisisPro() {
       {/* ── Kebugaran & Kesegaran ── */}
       {kini && baca && (
         <Card>
-          <SectionTitle icon={<IconChartUp />} title="Kebugaran & Kesegaran"
-            subtitle="Beban yang sudah mengendap (42 hari) melawan kelelahan yang masih tertinggal (7 hari)" />
+          <SectionTitle icon={<IconChartUp />} title="Fitness & Freshness"
+            subtitle="Settled load (42 days) against the fatigue still hanging around (7 days)" />
           <div className="mt-3 grid grid-cols-3 gap-2">
-            <Stat label="Kebugaran" value={String(Math.round(kini.kebugaran))} warna="#60a5fa" />
-            <Stat label="Kelelahan" value={String(Math.round(kini.kelelahan))} warna="#f87171" />
-            <Stat label="Kesegaran" value={String(Math.round(kini.kesegaran))} warna={baca.warna} />
+            <Stat label="Fitness" value={String(Math.round(kini.kebugaran))} warna="#60a5fa" />
+            <Stat label="Fatigue" value={String(Math.round(kini.kelelahan))} warna="#f87171" />
+            <Stat label="Freshness" value={String(Math.round(kini.kesegaran))} warna={baca.warna} />
           </div>
           <div className="mt-3 h-52">
             <ResponsiveContainer width="100%" height="100%">
@@ -204,12 +204,12 @@ export function AnalisisPro() {
 
       {/* ── Target ── */}
       <Card>
-        <SectionTitle icon={<IconTimer />} title="Target" subtitle="Tetapkan sendiri, dihitung dari sesi yang benar-benar tercatat" />
+        <SectionTitle icon={<IconTimer />} title="Target" subtitle="Set it yourself; progress is counted from sessions actually recorded" />
         <div className="mt-3 flex flex-wrap gap-2">
           <Pilih value={target.jenis} onChange={(v) => setTarget({ ...target, jenis: v as JenisTarget })}
-            opsi={[['jarak', 'Jarak'], ['waktu', 'Waktu'], ['sesi', 'Jumlah sesi']]} />
+            opsi={[['jarak', 'Distance'], ['waktu', 'Time'], ['sesi', 'Session count']]} />
           <Pilih value={target.periode} onChange={(v) => setTarget({ ...target, periode: v as PeriodeTarget })}
-            opsi={[['pekan', 'Per pekan'], ['bulan', 'Per bulan'], ['tahun', 'Per tahun']]} />
+            opsi={[['pekan', 'Per week'], ['bulan', 'Per month'], ['tahun', 'Per year']]} />
           <input type="number" min={1} value={target.nilai}
             onChange={(e) => setTarget({ ...target, nilai: Math.max(0, Number(e.target.value) || 0) })}
             className="w-24 rounded-xl border border-white/10 bg-white/5 px-3 py-1.5 text-sm text-white" />
@@ -227,15 +227,15 @@ export function AnalisisPro() {
         </div>
         <p className="mt-2 text-[12px] leading-relaxed text-neutral-500">
           {kemajuan.pct >= 100
-            ? 'Target periode ini sudah tercapai.'
-            : `Sisa ${kemajuan.sisaHari} hari — perlu sekitar ${kemajuan.perluPerHari} ${kemajuan.satuan} per hari. ${kemajuan.diJalur ? 'Saat ini masih di jalur.' : 'Saat ini tertinggal dari laju yang dibutuhkan.'}`}
+            ? 'Target for this period is already met.'
+            : `${kemajuan.sisaHari} days left — about ${kemajuan.perluPerHari} ${kemajuan.satuan} a day from here. ${kemajuan.diJalur ? 'You are on track.' : 'You are behind the pace needed.'}`}
         </p>
       </Card>
 
       {/* ── Upaya relatif ── */}
       <Card>
-        <SectionTitle icon={<IconActivity />} title="Upaya Relatif"
-          subtitle="Seberapa berat tiap sesi, dari denyut jantung — bukan dari lamanya saja" />
+        <SectionTitle icon={<IconActivity />} title="Relative Effort"
+          subtitle="How hard each session was, from heart rate — not from duration alone" />
         <div className="mt-3 space-y-1.5">
           {terbaru.map((w) => {
             const u = upayaRelatif(w, konteks)
@@ -246,7 +246,7 @@ export function AnalisisPro() {
                   <div className="text-[10px] text-slate-500">
                     {new Date(w.mulai).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })}
                     {' · '}{fmtDurasi(w.durasi)}{w.jarakKm ? ` · ${w.jarakKm} km` : ''}
-                    {!u.dariDeret && ' · dari rata-rata'}
+                    {!u.dariDeret && ' · from the average'}
                   </div>
                 </div>
                 <div className="shrink-0 text-right">
@@ -257,13 +257,13 @@ export function AnalisisPro() {
             )
           })}
         </div>
-        <Prosa kelas="mt-2 text-[11px] leading-relaxed text-slate-500">Berbasis TRIMP Banister: satu menit berat membebani jauh lebih besar daripada satu menit ringan. Skalanya tidak akan sama persis dengan angka Strava — rumus mereka tidak diterbitkan — tetapi perbandingan antar sesi Anda sendiri tetap sahih.</Prosa>
+        <Prosa kelas="mt-2 text-[11px] leading-relaxed text-slate-500">Based on Banister TRIMP: a hard minute weighs far more than an easy one. The scale will not match Strava's numbers exactly — their formula is unpublished — but comparisons between your own sessions remain valid.</Prosa>
       </Card>
 
       {/* ── Usaha terbaik ── */}
       {pr.length > 0 && (
         <Card>
-          <SectionTitle icon={<IconRun />} title="Usaha Terbaik" subtitle="Fastest time per distance" />
+          <SectionTitle icon={<IconRun />} title="Best Efforts" subtitle="Fastest time per distance" />
           <div className="mt-3 space-y-1.5">
             {pr.map((p) => (
               <div key={p.label} className="flex items-center justify-between gap-3 rounded-xl bg-white/5 px-3 py-2">
@@ -271,7 +271,7 @@ export function AnalisisPro() {
                   <div className="text-[13px] font-bold text-ink">{p.label}</div>
                   <div className="text-[10px] text-slate-500">
                     {new Date(p.tanggal).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}
-                    {p.diskalakan && ' · diskalakan dari jarak yang tidak persis'}
+                    {p.diskalakan && ' · scaled from an inexact distance'}
                   </div>
                 </div>
                 <div className="text-right">
@@ -357,8 +357,8 @@ export function AnalisisPro() {
 function KartuTidakDibangun() {
   return (
     <Card>
-      <SectionTitle icon={<IconActivity />} title="Yang tidak dibangun di sini"
-        subtitle="Beserta alasannya — bukan sekadar ‘belum tersedia’" />
+      <SectionTitle icon={<IconActivity />} title="What is not built here"
+        subtitle="With the reason why — not simply ‘coming soon’" />
       <div className="mt-3 space-y-2">
         {TIDAK_DIBANGUN.map((t) => (
           <div key={t.fitur} className="rounded-xl border border-white/10 bg-white/[0.02] p-3">
@@ -409,20 +409,20 @@ function SeksiLari({ workouts, hrMax }: { workouts: ImportedWorkout[]; hrMax: nu
 
   return (
     <Card>
-      <SectionTitle icon={<IconRun />} title="Analisis Lari"
-        subtitle="Dihitung dari sesi yang tersimpan — tiap bagian hilang bila bahannya kurang" />
+      <SectionTitle icon={<IconRun />} title="Running Analysis"
+        subtitle="Computed from stored sessions — each section disappears when its input is missing" />
 
       {sebar && (
         <div className="mt-4">
           <div className="flex items-baseline justify-between gap-2">
-            <h3 className="text-[13px] font-black text-ink dark:text-white">Sebaran intensitas</h3>
-            <span className="text-[11px] text-neutral-500">{sebar.totalMenit} menit · {sebar.sesi} sesi</span>
+            <h3 className="text-[13px] font-black text-ink dark:text-white">Intensity distribution</h3>
+            <span className="text-[11px] text-neutral-500">{sebar.totalMenit} min · {sebar.sesi} sessions</span>
           </div>
           <div className="mt-2 flex h-6 overflow-hidden rounded-full">
             {[
-              { p: sebar.persen[0], c: '#34d399', l: 'mudah' },
-              { p: sebar.persen[1], c: '#fbbf24', l: 'sedang' },
-              { p: sebar.persen[2], c: '#f87171', l: 'keras' },
+              { p: sebar.persen[0], c: '#34d399', l: 'easy' },
+              { p: sebar.persen[1], c: '#fbbf24', l: 'moderate' },
+              { p: sebar.persen[2], c: '#f87171', l: 'hard' },
             ].map((x) => (
               <span key={x.l} style={{ width: `${x.p}%`, background: x.c }}
                 className="grid place-items-center text-[10px] font-black text-white">
@@ -431,21 +431,21 @@ function SeksiLari({ workouts, hrMax }: { workouts: ImportedWorkout[]; hrMax: nu
             ))}
           </div>
           <div className="mt-1 flex flex-wrap gap-x-3 text-[11px] text-neutral-500">
-            <span>&lt;80% HRmaks mudah</span><span>80–87% sedang</span><span>≥87% keras</span>
+            <span>&lt;80% HRmax easy</span><span>80–87% moderate</span><span>≥87% hard</span>
           </div>
           <p className="mt-2 text-[11.5px] leading-snug text-neutral-500">
-            {Math.round(sebar.persen[0])}% waktunya mudah.{' '}
+            {Math.round(sebar.persen[0])}% of the time was easy.{' '}
             {sebar.persen[0] >= 75
-              ? 'Ini sejalan dengan pola yang diamati pada atlet ketahanan terlatih.'
-              : 'Pola pada atlet ketahanan terlatih sekitar 80% mudah; bagian sedang yang besar adalah yang paling sering menahan kemajuan.'}{' '}
-            <span className="opacity-75">Seiler &amp; Kjerland (2006), Scand J Med Sci Sports 16:49-56 — pola yang DIAMATI pada atlet terlatih, bukan resep bagi semua orang.</span>
+              ? 'That is in line with the pattern observed in trained endurance athletes.'
+              : 'Trained endurance athletes sit at around 80% easy; a large moderate share is the most common thing holding progress back.'}{' '}
+            <span className="opacity-75">Seiler &amp; Kjerland (2006), Scand J Med Sci Sports 16:49-56 — a pattern OBSERVED in trained athletes, not a prescription for everyone.</span>
           </p>
         </div>
       )}
 
       {perMinggu.length > 0 && (
         <div className="mt-5">
-          <h3 className="text-[13px] font-black text-ink dark:text-white">Sebaran per minggu</h3>
+          <h3 className="text-[13px] font-black text-ink dark:text-white">Week-by-week distribution</h3>
           <div className="mt-2 space-y-1.5">
             {perMinggu.map((m) => (
               <div key={m.mulai} className="flex items-center gap-2">
@@ -472,7 +472,7 @@ function SeksiLari({ workouts, hrMax }: { workouts: ImportedWorkout[]; hrMax: nu
       {vol && (
         <div className="mt-5">
           <div className="flex items-baseline justify-between gap-2">
-            <h3 className="text-[13px] font-black text-ink dark:text-white">Volume 8 minggu</h3>
+            <h3 className="text-[13px] font-black text-ink dark:text-white">8-week volume</h3>
             <span className="text-[11px] text-neutral-500">
               rata-rata {vol.rataKm.toFixed(1)} km/mgg · tren {vol.trenKmPerMinggu >= 0 ? '+' : ''}{vol.trenKmPerMinggu.toFixed(1)} km/mgg
             </span>
@@ -494,7 +494,7 @@ function SeksiLari({ workouts, hrMax }: { workouts: ImportedWorkout[]; hrMax: nu
 
       {hanyut.length > 0 && (
         <div className="mt-5">
-          <h3 className="text-[13px] font-black text-ink dark:text-white">Hanyutan denyut pada sesi panjang</h3>
+          <h3 className="text-[13px] font-black text-ink dark:text-white">Heart-rate drift on long sessions</h3>
           <div className="mt-2 overflow-x-auto">
             <table className="w-full min-w-[320px] text-[11.5px]">
               <thead>
@@ -526,7 +526,7 @@ function SeksiLari({ workouts, hrMax }: { workouts: ImportedWorkout[]; hrMax: nu
 
       {ramal && acuan && (
         <div className="mt-5">
-          <h3 className="text-[13px] font-black text-ink dark:text-white">Perkiraan waktu lomba</h3>
+          <h3 className="text-[13px] font-black text-ink dark:text-white">Predicted race times</h3>
           <p className="text-[11px] text-neutral-500">
             Dari {acuan.label} {fmtDurasi(acuan.detik)} ({acuan.tanggal})
           </p>
