@@ -164,7 +164,11 @@ app.use('/api/health-webhook/:token', webhookLimiter, (req, res, next) => {
   }
   next()
 })
-app.use('/api/health-webhook', express.json({ limit: '5mb' }))
+// 12mb, sama dengan sisa aplikasi. Batas 5mb sebelumnya lebih ketat daripada
+// batas umum, dan satu sesi lari panjang yang diekspor beserta deret detak
+// jantung per detik sudah bisa melewatinya — kirimannya ditolak 413 dan seluruh
+// sesi itu hilang tanpa jejak di mana pun.
+app.use('/api/health-webhook', express.json({ limit: '12mb' }))
 
 app.use(express.json({ limit: '12mb' })) // allow base64 images for AI vision
 app.use(cookieParser())
@@ -1561,11 +1565,27 @@ app.use((err: unknown, req: express.Request, res: express.Response, _next: expre
   //      JSON rusak berulang kali.
   const e = err as { type?: string; status?: number; statusCode?: number }
   const kode = e?.status ?? e?.statusCode
+  // Kiriman webhook yang gugur di pengurai tidak pernah sampai ke penangannya,
+  // jadi tanpa baris ini ia tidak tercatat sama sekali dan halaman diagnosis
+  // menjawab "sinkronisasi terlihat sehat" padahal sesi latihannya hilang.
+  const catatTolakan = (sebab: 'too_large' | 'bad_json') => {
+    const cocok = req.path.match(/^\/api\/health-webhook\/([^/]+)/)
+    if (!cocok) return
+    const email = emailForWebhookToken(cocok[1])
+    if (!email) return
+    recordWebhookDelivery(email, {
+      at: new Date().toISOString(),
+      metricGroups: [], workouts: 0, hrSamples: 0, sleepNights: 0,
+      matched: [], newestSampleDate: null, rejected: sebab,
+    })
+  }
   if (e?.type === 'entity.too.large' || kode === 413) {
+    catatTolakan('too_large')
     if (!res.headersSent) res.status(413).json({ error: 'payload_too_large' })
     return
   }
   if (e?.type === 'entity.parse.failed' || (typeof kode === 'number' && kode >= 400 && kode < 500)) {
+    if (e?.type === 'entity.parse.failed') catatTolakan('bad_json')
     if (!res.headersSent) res.status(400).json({ error: 'bad_request' })
     return
   }

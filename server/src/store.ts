@@ -1273,6 +1273,13 @@ export interface WebhookDelivery {
   matched: string[]
   /** Newest sample date in the payload (phone-local), if any. */
   newestSampleDate: string | null
+  /**
+   * Kiriman yang ditolak SEBELUM sampai ke penangan — badan terlalu besar atau
+   * JSON rusak. Tanpa catatan ini kegagalan itu tak terlihat di mana pun:
+   * telepon menerima galat, log pengiriman tetap kosong, dan halaman diagnosis
+   * justru menjawab "sinkronisasi terlihat sehat".
+   */
+  rejected?: 'too_large' | 'bad_json'
 }
 
 const MAX_DELIVERIES = 25
@@ -1310,10 +1317,10 @@ export function diagnoseSync(email: string): { findings: SyncFinding[]; deliveri
   if (!d.length) {
     findings.push({
       level: 'error',
-      judul: 'Belum ada satu pun kiriman yang sampai',
-      detail: 'Server belum pernah menerima data dari telepon ini. Biasanya berarti URL di aplikasi Health Auto Export salah, tokennya sudah dirotasi sehingga yang lama tidak berlaku lagi, atau otomatisasinya belum pernah benar-benar berjalan.',
+      judul: 'No delivery has ever arrived',
+      detail: 'The server has never received data from this phone. Usually that means the URL in Health Auto Export is wrong, the token was rotated so the old one no longer works, or the automation has never actually run.',
       setelan: 'REST API URL',
-      ubahKe: 'Tempel ulang Private Sync Link terbaru dari halaman ini',
+      ubahKe: 'Paste the latest Private Sync Link from this page again',
     })
     return { findings, deliveries: 0, lastAt: null }
   }
@@ -1322,13 +1329,30 @@ export function diagnoseSync(email: string): { findings: SyncFinding[]; deliveri
   // stop being reported.
   const recent = d.slice(-10)
 
+  // Rejected payloads first: while these are happening, every other finding is
+  // computed from deliveries that DID land, so the sync looks healthier than it
+  // is. A single long run with per-second heart rate is the usual cause.
+  const ditolak = recent.filter((x) => x.rejected)
+  if (ditolak.length) {
+    const besar = ditolak.filter((x) => x.rejected === 'too_large').length
+    findings.push({
+      level: 'error',
+      judul: 'Some deliveries were rejected before they could be read',
+      detail: besar
+        ? `${besar} of the last ${recent.length} deliveries were too large for the server to accept, so nothing in them was saved — including any workout they carried. A single long run exported with per-second heart rate is the usual cause. The phone reports this as a failure, but nothing else in the app would have shown it.`
+        : `${ditolak.length} of the last ${recent.length} deliveries could not be read as JSON, so nothing in them was saved.`,
+      setelan: 'Export Period',
+      ubahKe: 'Narrow it to "Today" so each delivery carries one day rather than several',
+    })
+  }
+
   if (recent.every((x) => x.workouts === 0)) {
     findings.push({
       level: 'error',
-      judul: 'Latihan tidak pernah ikut terkirim',
-      detail: `Dari ${recent.length} kiriman terakhir, tidak satu pun memuat data latihan. Inilah sebabnya sesi lari tidak muncul di Riwayat Latihan — datanya memang tidak pernah dikirim. Deret detak jantung saat latihan juga ikut hilang, padahal itu data paling rapat yang bisa dihasilkan jam tangan.`,
+      judul: 'Workouts are never included',
+      detail: `Not one of the last ${recent.length} deliveries carried workout data. This is why a run does not appear in Workout History — it was never sent. The heart-rate series recorded during the workout is lost with it, and that is the densest data the watch can produce.`,
       setelan: 'Include Workouts',
-      ubahKe: 'NYALAKAN (dan biarkan Workout Types kosong agar semua jenis ikut)',
+      ubahKe: 'Turn it ON (and leave Workout Types empty so every type is included)',
     })
   }
 
@@ -1338,20 +1362,20 @@ export function diagnoseSync(email: string): { findings: SyncFinding[]; deliveri
     const terbaru = adaTanggal[adaTanggal.length - 1].newestSampleDate!
     findings.push({
       level: 'error',
-      judul: 'Data hari ini tidak pernah ikut terkirim',
-      detail: `Sampel terbaru yang pernah sampai tertanggal ${terbaru}, padahal hari ini ${hariIni}. Artinya rentang ekspor tidak mencakup hari berjalan, sehingga tren berhenti di kemarin dan apa pun yang Anda lakukan hari ini tidak akan pernah muncul — berapa kali pun sinkronisasi berjalan.`,
+      judul: 'Today’s data is never included',
+      detail: `The newest sample ever to arrive is dated ${terbaru}, while today is ${hariIni}. The export range does not cover the current day, so trends stop at yesterday and nothing you do today will ever appear — however many times the sync runs.`,
       setelan: 'Export Period',
-      ubahKe: '"Today" (atau "Last 7 Days" bila ingin sekalian menambal hari yang bolong)',
+      ubahKe: '"Today" (or "Last 7 Days" to backfill the missing days at the same time)',
     })
   }
 
   if (recent.every((x) => x.hrSamples === 0)) {
     findings.push({
       level: 'warn',
-      judul: 'Tidak ada satu pun sampel detak jantung tersimpan',
-      detail: 'Kiriman sampai, tetapi tidak membawa deret detak jantung. Body Battery, Log Detak Jantung dan Fisiologi Latihan semuanya bergantung pada deret ini.',
+      judul: 'No heart-rate sample has been stored',
+      detail: 'Deliveries arrive, but they carry no heart-rate series. Body Battery, Heart Rate Log and Training Physiology all depend on it.',
       setelan: 'Aggregate Data',
-      ubahKe: 'MATIKAN, dan pastikan metrik "Heart Rate" tercentang',
+      ubahKe: 'Turn it OFF, and make sure the "Heart Rate" metric is ticked',
     })
   }
 
@@ -1359,8 +1383,8 @@ export function diagnoseSync(email: string): { findings: SyncFinding[]; deliveri
   if (kosong.length === recent.length && recent.length >= 3) {
     findings.push({
       level: 'warn',
-      judul: 'Metrik terkirim tanpa isi',
-      detail: 'Nama metriknya sampai, tetapi semuanya kosong. Ini khas rentang tanggal yang tidak memuat data apa pun.',
+      judul: 'Metrics arrive empty',
+      detail: 'The metric names arrive, but every one of them is empty. That is characteristic of a date range containing no data at all.',
       setelan: 'Export Period',
       ubahKe: '"Last 7 Days"',
     })
@@ -1375,18 +1399,18 @@ export function diagnoseSync(email: string): { findings: SyncFinding[]; deliveri
   if (hampa.length === recent.length && recent.length >= 3) {
     findings.push({
       level: 'warn',
-      judul: 'Kiriman sampai tetapi tidak menghasilkan apa pun',
-      detail: 'Server menerima kiriman, namun tidak ada satu pun yang bisa disimpan darinya. Telepon akan tetap melaporkan sukses, jadi kegagalan ini tidak terlihat dari sisi mana pun. Coba perluas rentang tanggal; bila tetap begini, kirimkan tangkapan layar halaman ini.',
+      judul: 'Deliveries arrive but produce nothing',
+      detail: 'The server receives deliveries, but nothing in them can be saved. The phone still reports success, so this failure is invisible from either side. Try widening the date range; if it stays like this, send a screenshot of this page.',
       setelan: 'Export Period / Data Type',
-      ubahKe: '"Last 7 Days", dan pastikan metrik yang diinginkan tercentang',
+      ubahKe: '"Last 7 Days", and make sure the metrics you want are ticked',
     })
   }
 
   if (!findings.length) {
     findings.push({
       level: 'ok',
-      judul: 'Sinkronisasi terlihat sehat',
-      detail: `${d.length} kiriman tercatat, yang terakhir membawa ${last!.hrSamples} sampel detak jantung dan ${last!.workouts} latihan.`,
+      judul: 'Sync looks healthy',
+      detail: `${d.length} deliveries recorded; the most recent carried ${last!.hrSamples} heart-rate samples and ${last!.workouts} workouts.`,
     })
   }
   return { findings, deliveries: d.length, lastAt: last!.at }
