@@ -32,9 +32,9 @@ import { api, backendEnabled } from '../lib/api'
 // dengan PLATFORM_SOSIAL di server/src/connect.ts — server yang menolak, bukan
 // formulir ini, jadi formulir hanya boleh menawarkan yang pasti diterima.
 const PLATFORM = [
-  { id: 'linkedin' as const, label: 'LinkedIn', contoh: 'https://linkedin.com/in/nama-anda' },
-  { id: 'facebook' as const, label: 'Facebook', contoh: 'https://facebook.com/nama.anda' },
-  { id: 'instagram' as const, label: 'Instagram', contoh: 'https://instagram.com/namaanda' },
+  { id: 'linkedin' as const, label: 'LinkedIn', contoh: 'https://linkedin.com/in/your-name' },
+  { id: 'facebook' as const, label: 'Facebook', contoh: 'https://facebook.com/your.name' },
+  { id: 'instagram' as const, label: 'Instagram', contoh: 'https://instagram.com/yourname' },
 ]
 
 // Tujuan pemrosesan yang perlu persetujuan tegas. Idnya harus sama dengan
@@ -163,24 +163,24 @@ export function VerifikasiConnect() {
       <Card className="!border-sky-500/30 !bg-sky-500/5">
         <div className="text-[11px] font-black uppercase tracking-wide text-sky-700">What happens to your data</div>
         <ul className="mt-2 space-y-1.5 text-[12px] leading-relaxed text-neutral-600">
-          <li>• <b>NIK tidak lagi diminta.</b> Pemakaian NIK oleh pihak swasta diatur UU Adminduk
-            24/2013 dan menuntut kerja sama resmi dengan Dukcapil. Identitas kini diikat ke
-            <b> nomor telepon</b>, yang dipakai memastikan satu orang tidak membuat dua akun.
-            NIK tidak diminta di bagian mana pun aplikasi ini.</li>
-          <li>• <b>Phone number tidak disimpan.</b> Hanya sidiknya dan empat digit terakhir, jadi
-            basis data yang bocor tidak memberi siapa pun daftar nomor untuk dihubungi.</li>
-          <li>• <b>Orientasi seksual tidak pernah ditampilkan kepada pengguna lain.</b>
-            Ia hanya dipakai mesin pencocokan di server.</li>
-          <li>• <b>Alamat tidak ditampilkan utuh</b> — pengguna lain hanya melihat kotanya.
-            Jarak dihitung antar pusat kota, bukan dari GPS.</li>
-          <li>• <b>Selfie dihapus setelah putusan.</b> Ia dilihat pemilik satu kali untuk
-            mencocokkan wajah, lalu tautannya dibuang — baik ajuan Anda disetujui maupun ditolak.</li>
-          <li>• <b>Agama tidak lagi diminta.</b> Dulu kolomnya ada, tetapi tidak dipakai oleh apa
-            pun; data yang tidak dipakai tidak boleh diminta.</li>
-          <li>• <b>Persetujuan bisa Anda tarik kapan saja</b>, dan penarikannya menghapus data
-            verifikasi Anda.</li>
+          <li>• <b>The national ID number is no longer requested.</b> Private use of the NIK is governed by
+            UU Adminduk 24/2013 and requires a formal arrangement with Dukcapil. Identity is now tied to a
+            <b> phone number</b>, used to ensure one person does not create two accounts.
+            The NIK is not requested anywhere in this app.</li>
+          <li>• <b>The phone number itself is not stored.</b> Only its fingerprint and the last four digits, so
+            a leaked database gives nobody a list of numbers to contact.</li>
+          <li>• <b>Sexual orientation is never shown to other users.</b>
+            It is used only by the matching engine on the server.</li>
+          <li>• <b>The address is never shown in full</b> — other users see only the city.
+            Distance is computed between city centres, not from GPS.</li>
+          <li>• <b>The selfie is deleted after the decision.</b> The owner views it once to match the face,
+            then the link is discarded — whether your application is approved or rejected.</li>
+          <li>• <b>Religion is no longer requested.</b> The field used to exist but nothing used it;
+            data that is not used should not be collected.</li>
+          <li>• <b>You can withdraw consent at any time</b>, and withdrawing it deletes your
+            verification data.</li>
         </ul>
-        <Prosa kelas="mt-2 text-[10px] leading-relaxed text-slate-500">Dasar: UU No. 27/2022 tentang Pelindungan Data Pribadi — Pasal 4 ayat (2) untuk data pribadi spesifik, Pasal 16 untuk pembatasan tujuan, Pasal 20-22 untuk persetujuan, Pasal 9 untuk penarikan persetujuan, dan Pasal 43 untuk penghapusan.</Prosa>
+        <Prosa kelas="mt-2 text-[10px] leading-relaxed text-slate-500">Basis: UU No. 27/2022 on Personal Data Protection — Article 4(2) for specific personal data, Article 16 for purpose limitation, Articles 20–22 for consent, Article 9 for withdrawal of consent, and Article 43 for erasure.</Prosa>
       </Card>
 
       {status !== 'terverifikasi' && status !== 'menunggu' && (

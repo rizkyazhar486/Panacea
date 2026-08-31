@@ -21,9 +21,9 @@ import {
 // ─────────────────────────────────────────────────────────────────────────────
 
 const SLOTS: { v: Slot; l: string; sub: string }[] = [
-  { v: 2, l: '2 menit', sub: 'Sedang tidak punya waktu sama sekali' },
-  { v: 10, l: '10 menit', sub: 'Ada sela di antara pekerjaan' },
-  { v: 30, l: '30 menit', sub: 'Today agak longgar' },
+  { v: 2, l: '2 minutes', sub: 'No time at all right now' },
+  { v: 10, l: '10 minutes', sub: 'A gap between tasks' },
+  { v: 30, l: '30 minutes', sub: 'Today is a bit freer' },
 ]
 
 export function RealisticHealth() {
@@ -50,24 +50,23 @@ export function RealisticHealth() {
       <div className="flex items-center gap-3">
         <span className="grid h-11 w-11 place-items-center rounded-2xl bg-brand-50 text-2xl">🌱</span>
         <div>
-          <h1 className="text-lg font-black text-ink dark:text-ink">Sehat Tapi Sibuk</h1>
-          <p className="text-xs text-neutral-500">Satu tindakan yang muat di hari Anda — bukan skor yang membuat Anda merasa gagal</p>
+          <h1 className="text-lg font-black text-ink dark:text-ink">Healthy But Busy</h1>
+          <p className="text-xs text-neutral-500">One action that fits your day — not a score that makes you feel like a failure</p>
         </div>
       </div>
 
       <Card className="!p-4">
         <p className="text-[12px] leading-relaxed text-neutral-600 dark:text-neutral-300">
-          Halaman ini dibuat karena keluhan yang wajar: banyak aplikasi kesehatan memberi tahu Anda
-          bahwa pemulihan Anda buruk, lalu berhenti di situ. Diberi nilai jelek tanpa jalan keluar
-          tidak membuat siapa pun lebih sehat — itu hanya membuat orang berhenti membuka aplikasinya.
-          Jadi di sini <b>tindakan lebih dulu, angka belakangan</b>, dan tidak ada saran yang
-          mengandaikan waktu yang tidak Anda punya.
+          This page exists because of a fair complaint: many health apps tell you your recovery is
+          poor and then stop there. Being marked badly with no way out makes nobody healthier — it
+          only makes people stop opening the app. So here it is <b>action first, numbers second</b>,
+          and no suggestion assumes time you do not have.
         </p>
       </Card>
 
       {/* Step 1 — the only inputs, kept to three taps. */}
       <Card className="!p-4">
-        <SectionTitle icon={<IconHeart size={18} />} title="Today realistisnya berapa?" subtitle="Jawab jujur — jawaban kecil justru berguna" />
+        <SectionTitle icon={<IconHeart size={18} />} title="How much time do you realistically have?" subtitle="Answer honestly — a small answer is the useful one" />
 
         <div className="mt-3 grid gap-2">
           {SLOTS.map((s) => (
@@ -87,24 +86,24 @@ export function RealisticHealth() {
         <label className="mt-3 flex items-center gap-2 rounded-xl bg-neutral-50 px-3 py-2.5 dark:bg-white/5">
           <input type="checkbox" checked={wrecked} onChange={(e) => setWrecked(e.target.checked)} />
           <span className="text-[12px] font-semibold text-neutral-700 dark:text-neutral-200">
-            Saya benar-benar kehabisan tenaga hari ini
+            I am genuinely out of energy today
           </span>
         </label>
         {wrecked && (
           <p className="mt-1.5 text-[11px] leading-relaxed text-neutral-500">
-            Baik — saran yang menuntut tenaga disembunyikan. Pada hari seperti ini, mempertahankan
-            kebiasaan lebih berharga daripada memaksakan latihan.
+            Fine — suggestions that demand energy are hidden. On a day like this, keeping the habit
+            alive is worth more than forcing a session.
           </p>
         )}
 
         <div className="mt-3">
-          <div className="text-[11px] font-black uppercase tracking-wide text-neutral-500">Yang paling mengganggu sekarang</div>
+          <div className="text-[11px] font-black uppercase tracking-wide text-neutral-500">What is bothering you most right now</div>
           <div className="mt-1.5 flex flex-wrap gap-1.5">
             <button
               onClick={() => setWorst(null)}
               className={`rounded-full px-3 py-1.5 text-[11px] font-bold ${!worst ? 'bg-brand text-white' : 'bg-neutral-100 text-neutral-600 dark:bg-white/10'}`}
             >
-              Tidak yakin
+              Not sure
             </button>
             {(Object.keys(DOMAIN_LABEL) as Domain[]).map((d) => (
               <button
@@ -122,7 +121,7 @@ export function RealisticHealth() {
       {/* Step 2 — ONE action. This is the point of the page. */}
       {primary && (
         <Card className="!p-5">
-          <div className="text-[11px] font-black uppercase tracking-wide text-brand-dark">Lakukan ini saja hari ini</div>
+          <div className="text-[11px] font-black uppercase tracking-wide text-brand-dark">Just do this today</div>
           <h2 className="mt-1 text-[17px] font-black leading-snug text-ink dark:text-ink">{primary.title}</h2>
           <p className="mt-2 text-[13px] leading-relaxed text-neutral-700 dark:text-neutral-200">{primary.how}</p>
           <p className="mt-2 text-[12px] leading-relaxed text-neutral-500">{primary.why}</p>
@@ -132,11 +131,11 @@ export function RealisticHealth() {
               doneIds.includes(primary.id) ? 'bg-brand-50 text-brand-dark' : 'bg-brand text-white hover:opacity-90'
             }`}
           >
-            {doneIds.includes(primary.id) ? 'Sudah dikerjakan ✓' : 'Tandai sudah dikerjakan'}
+            {doneIds.includes(primary.id) ? 'Done ✓' : 'Mark as done'}
           </button>
           {doneIds.includes(primary.id) && (
             <p className="mt-2 text-center text-[11px] leading-relaxed text-neutral-500">
-              Itu sudah cukup untuk hari ini. Tidak ada target harian yang perlu dikejar di halaman ini.
+              That is enough for today. There is no daily target to chase on this page.
             </p>
           )}
         </Card>
@@ -144,7 +143,7 @@ export function RealisticHealth() {
 
       {alternatives.length > 0 && (
         <Card className="!p-4">
-          <div className="text-[11px] font-black uppercase tracking-wide text-neutral-500">Kalau yang tadi tidak cocok</div>
+          <div className="text-[11px] font-black uppercase tracking-wide text-neutral-500">If that one does not fit</div>
           <div className="mt-2 space-y-2">
             {alternatives.map((d) => (
               <div key={d.id} className="rounded-xl bg-neutral-50 p-3 dark:bg-white/5">
@@ -157,7 +156,7 @@ export function RealisticHealth() {
                   onClick={() => toggleDone(d.id)}
                   className="mt-2 text-[11px] font-bold text-brand-dark hover:underline"
                 >
-                  {doneIds.includes(d.id) ? 'Sudah ✓' : 'Tandai sudah'}
+                  {doneIds.includes(d.id) ? 'Done ✓' : 'Mark done'}
                 </button>
               </div>
             ))}
@@ -174,12 +173,12 @@ export function RealisticHealth() {
           <h3 className="mt-1 text-[14px] font-black text-ink dark:text-ink">{triage.headline}</h3>
           <p className="mt-2 text-[12px] leading-relaxed text-neutral-600 dark:text-neutral-300">{triage.meaning}</p>
           <div className="mt-3 rounded-xl bg-brand-50 p-3 dark:bg-brand/10">
-            <div className="text-[11px] font-black uppercase tracking-wide text-brand-dark">Yang berguna hari ini</div>
+            <div className="text-[11px] font-black uppercase tracking-wide text-brand-dark">What is useful today</div>
             <p className="mt-1 text-[12px] leading-relaxed text-neutral-700 dark:text-neutral-200">{triage.doToday}</p>
           </div>
           {triage.seeDoctor && (
             <div className="mt-2 rounded-xl bg-rose-50 p-3 dark:bg-rose-500/10">
-              <div className="text-[11px] font-black uppercase tracking-wide text-rose-700 dark:text-rose-300">Periksakan bila</div>
+              <div className="text-[11px] font-black uppercase tracking-wide text-rose-700 dark:text-rose-300">Get checked if</div>
               <p className="mt-1 text-[12px] leading-relaxed text-neutral-700 dark:text-neutral-200">{triage.seeDoctor}</p>
             </div>
           )}
@@ -188,18 +187,18 @@ export function RealisticHealth() {
 
       {/* The principles, stated plainly — users deserve to know the reasoning. */}
       <Card className="!p-4">
-        <div className="text-[11px] font-black uppercase tracking-wide text-neutral-500">Prinsip halaman ini</div>
+        <div className="text-[11px] font-black uppercase tracking-wide text-neutral-500">The principles behind this page</div>
         <ul className="mt-2 space-y-2 text-[12px] leading-relaxed text-neutral-600 dark:text-neutral-300">
-          <li><b>Jangan pernah nol.</b> Dua menit mengalahkan nol, dan bukan versi gagal dari tiga puluh menit. Lompatan kesehatan terbesar terjadi saat naik dari tidak pernah sama sekali menjadi sedikit — bukan dari sedikit menjadi banyak.</li>
-          <li><b>Ubah lingkungan, jangan andalkan kemauan.</b> Menaruh telepon di ruangan lain lebih andal daripada berniat tidak membukanya. Kemauan adalah hal pertama yang habis ketika Anda lelah.</li>
-          <li><b>Tambah, jangan larang.</b> Menambahkan protein lebih mungkin bertahan daripada melarang gorengan. Aturan yang melarang akan gagal pada minggu yang berat, dan kegagalan itu biasanya diikuti berhenti total.</li>
-          <li><b>Melewatkan sehari bukan kegagalan.</b> Yang menentukan hasil adalah rata-rata berbulan-bulan, bukan kesempurnaan tiap hari. Aplikasi yang menghukum Anda karena satu hari bolong membuat Anda berhenti, dan berhenti itulah kerugian yang sesungguhnya.</li>
+          <li><b>Never zero.</b> Two minutes beats zero, and is not a failed version of thirty. The largest health gain comes from moving from none at all to a little — not from a little to a lot.</li>
+          <li><b>Change the environment, do not rely on willpower.</b> Putting the phone in another room is more reliable than intending not to open it. Willpower is the first thing to run out when you are tired.</li>
+          <li><b>Add, do not forbid.</b> Adding protein is more likely to last than banning fried food. A rule built on prohibition fails in a hard week, and that failure is usually followed by stopping altogether.</li>
+          <li><b>Missing a day is not a failure.</b> What decides the outcome is the average across months, not perfection each day. An app that punishes you for one missed day makes you stop, and stopping is the real loss.</li>
         </ul>
       </Card>
 
       <div className="rounded-2xl border border-neutral-100 bg-white p-4 text-center text-[11px] leading-relaxed text-neutral-500 dark:border-white/10 dark:bg-white/5">
-        Saran umum untuk orang sehat. Bila Anda punya penyakit jantung, paru, sendi, sedang hamil,
-        atau minum obat rutin, bicarakan dulu dengan dokter sebelum menambah aktivitas fisik.
+        General advice for healthy people. If you have heart, lung or joint disease, are pregnant,
+        or take regular medication, discuss it with a doctor before increasing physical activity.
       </div>
     </div>
   )
