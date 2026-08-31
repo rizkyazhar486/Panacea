@@ -179,7 +179,7 @@ export function triageBadReading(input: {
       meaning:
         'One short night lowers concentration and raises hunger, but it does not permanently damage your health. The body repays part of the debt itself the following night. What harms you is not this one night but a pattern lasting months.',
       doToday:
-        'Do not add load today: skip heavy training, add no caffeine after the afternoon, and keep tomorrow’s wake time as usual. A nap is fine â 20 minutes at most, and before 3 pm.',
+        'Do not add load today: skip heavy training, add no caffeine after the afternoon, and keep tomorrow’s wake time as usual. A nap is fine — 20 minutes at most, and before 3 pm.',
       seeDoctor:
         'If you are so sleepy you nearly nod off while driving, snore loudly with pauses in breathing that others have witnessed, or are always tired despite sleeping enough — that needs medical assessment, not self-repair.',
     }

@@ -31,10 +31,10 @@ interface Prefs {
 }
 
 const ZONA = [
-  { z: 2, nama: 'Z2 — Aerobik dasar', ket: 'Noisiest. Almost any moderate activity will set it off.' },
+  { z: 2, nama: 'Z2 — Base aerobic', ket: 'Noisiest. Almost any moderate activity will set it off.' },
   { z: 3, nama: 'Z3 — Tempo', ket: 'Tells you when you rise above easy intensity.' },
-  { z: 4, nama: 'Z4 — Ambang laktat', ket: 'A sensible default for most people: tells you when a session turns genuinely hard.' },
-  { z: 5, nama: 'Z5 — Maksimal', ket: 'Rarest. Only when effort approaches maximal.' },
+  { z: 4, nama: 'Z4 — Lactate threshold', ket: 'A sensible default for most people: tells you when a session turns genuinely hard.' },
+  { z: 5, nama: 'Z5 — Maximal', ket: 'Rarest. Only when effort approaches maximal.' },
 ]
 
 export function HealthAlertSettings() {
@@ -82,9 +82,9 @@ export function HealthAlertSettings() {
   if (!backendEnabled) {
     return (
       <Card>
-        <SectionTitle icon={<IconBell />} title="Pengingat terhubung perangkat" />
+        <SectionTitle icon={<IconBell />} title="Device-linked reminders" />
         <p className="mt-2 text-sm text-neutral-500">
-          Pengingat ini dikirim oleh server, dan aplikasi sedang berjalan tanpa server.
+          These reminders are sent by the server, and the app is running without one.
         </p>
       </Card>
     )
@@ -98,17 +98,17 @@ export function HealthAlertSettings() {
     <Card>
       <SectionTitle
         icon={<IconBell />}
-        title="Pengingat terhubung perangkat"
+        title="Device-linked reminders"
         subtitle="Switch on what you need — each has its own settings"
-        right={simpan === 'saving' ? <span className="text-[11px] text-neutral-500">menyimpan…</span>
-          : simpan === 'saved' ? <span className="text-[11px] font-bold text-brand-dark">tersimpan ✓</span> : undefined}
+        right={simpan === 'saving' ? <span className="text-[11px] text-neutral-500">saving…</span>
+          : simpan === 'saved' ? <span className="text-[11px] font-bold text-brand-dark">saved ✓</span> : undefined}
       />
 
       {push !== 'enabled' && (
         <div className="mt-3 rounded-xl border border-amber-300 bg-amber-50 p-3 dark:border-amber-500/30 dark:bg-amber-500/10">
           <div className="text-[12px] font-black text-amber-800 dark:text-amber-300">
             {push === 'unsupported' ? 'This device cannot receive notifications yet'
-              : push === 'denied' ? 'Izin pemberitahuan ditolak'
+              : push === 'denied' ? 'Notification permission denied'
                 : push === 'unavailable' ? 'Notification service is unavailable'
                   : 'Notifications are not switched on for this device'}
           </div>
@@ -122,13 +122,13 @@ export function HealthAlertSettings() {
               : 'On iPhone, notifications only work if Panaceamed has been ADDED TO THE HOME SCREEN (Share → Add to Home Screen) and opened from that icon, not from a Safari tab. This is an iOS limitation, not a setting you missed.'}
           </p>
           <Link to="/settings" className="mt-2 inline-block text-[12px] font-bold text-amber-900 underline dark:text-amber-200">
-            Buka pengaturan pemberitahuan →
+            Open notification settings →
           </Link>
         </div>
       )}
 
       {gagal && (
-        <p className="mt-3 text-sm text-rose-600">Could not load settings. <button onClick={load} className="underline">Coba lagi</button></p>
+        <p className="mt-3 text-sm text-rose-600">Could not load settings. <button onClick={load} className="underline">Try again</button></p>
       )}
       {memuat && <p className="mt-3 text-sm text-neutral-500">Loading…</p>}
 
@@ -164,14 +164,14 @@ export function HealthAlertSettings() {
                   })}
                 </div>
                 <p className="mt-2 text-[11px] leading-relaxed text-neutral-500">
-                  <b>Bukan seketika.</b> Peringatan ini menumpang sinkronisasi Health Auto Export yang berjalan
-                  tiap beberapa menit, jadi datangnya beberapa menit setelah zonanya terlewati — berguna untuk
-                  menyadari &quot;ternyata lari mudah tadi tidak mudah&quot;, bukan sebagai peringatan saat sedang berlari.
-                  Paling banyak satu peringatan tiap 20 menit.
+                  <b>Not instant.</b> These alerts ride on the Health Auto Export sync, which runs every few
+                  minutes, so one arrives a few minutes after the zone was crossed — useful for realising
+                  &quot;that easy run was not actually easy&quot;, not as a warning while you are still running.
+                  At most one alert every 20 minutes.
                 </p>
                 <p className="mt-1 text-[11px] leading-relaxed text-neutral-500">
-                  Batas zona dihitung dari denyut maksimal Anda — dipakai denyut tertinggi yang pernah tercatat
-                  bila itu lebih tinggi daripada rumus 220−usia. Lihat angkanya di{' '}
+                  Zone boundaries are computed from your maximum heart rate — the highest reading ever recorded
+                  is used when that exceeds the 220−age formula. See the number in{' '}
                   <Link to="/riwayat-latihan" className="font-bold text-brand-dark underline">Training History</Link>.
                 </p>
               </div>
@@ -188,12 +188,12 @@ export function HealthAlertSettings() {
               onToggle={(v) => save({ notifMedReminders: v })}
             />
             <p className="mt-2 text-[11px] leading-relaxed text-neutral-500">
-              Sakelar ini hanya mengizinkan pengirimannya. Yang menentukan kapan berbunyi adalah obat yang
-              Anda daftarkan beserta jamnya — <b>if the list is empty, nothing will fire</b>.
-              Inilah sebab tersering pengingat obat terasa &quot;tidak jalan&quot;.
+              This switch only permits them to be sent. What decides when one fires is the medicines you
+              register and the times you give them — <b>if the list is empty, nothing will fire</b>.
+              This is the most common reason medication reminders seem &quot;not to work&quot;.
             </p>
             <Link to="/med-reminders" className="mt-2 inline-block rounded-lg bg-brand px-3 py-1.5 text-xs font-bold text-white">
-              Atur daftar obat →
+              Manage medication list →
             </Link>
           </div>
 
@@ -226,22 +226,22 @@ export function HealthAlertSettings() {
                   </button>
                 )}
                 <div className="flex flex-wrap items-center gap-2">
-                  <label className="text-[12px] font-bold text-neutral-600 dark:text-neutral-300">Diingatkan berapa menit sebelumnya</label>
+                  <label className="text-[12px] font-bold text-neutral-600 dark:text-neutral-300">How many minutes ahead to remind you</label>
                   <select
                     value={String(prefs.sleepLeadMin ?? 30)}
                     onChange={(e) => save({ sleepLeadMin: Number(e.target.value) })}
                     className="rounded-lg border border-neutral-200 bg-white px-2 py-1 text-sm font-bold dark:border-white/10 dark:bg-white/5 dark:text-white"
                   >
-                    {[0, 15, 30, 45, 60, 90].map((m) => <option key={m} value={m}>{m === 0 ? 'on time' : `${m} menit`}</option>)}
+                    {[0, 15, 30, 45, 60, 90].map((m) => <option key={m} value={m}>{m === 0 ? 'on time' : `${m} min`}</option>)}
                   </select>
                 </div>
                 <p className="text-[11px] leading-relaxed text-neutral-500">
-                  Yang paling menentukan kualitas tidur bukan lamanya, melainkan <b>jam yang tetap sama tiap
-                  malam</b>. Bila jadwal jaga membuat jam tidur mustahil disamakan, tetapkan jam ini sesuai
-                  malam-malam yang Anda kendalikan, dan abaikan pada malam jaga.
+                  What decides sleep quality most is not its length but <b>a time that stays the same every
+                  night</b>. If a shift rota makes a fixed bedtime impossible, set this time for the nights you
+                  do control, and ignore it on duty nights.
                 </p>
                 <p className="text-[11px] leading-relaxed text-neutral-500">
-                  Dikirim menurut jam setempat Anda. History malam Anda ada di{' '}
+                  Sent in your local time. Your night history is in{' '}
                   <Link to="/pola-tidur" className="font-bold text-brand-dark underline">Sleep Pattern</Link>.
                 </p>
               </div>

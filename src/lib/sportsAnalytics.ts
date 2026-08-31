@@ -18,10 +18,10 @@
 export type Sport = 'sepakbola' | 'basket' | 'futsal' | 'tenis' | 'american-football'
 
 export const SPORT_LABEL: Record<Sport, string> = {
-  sepakbola: 'Sepak bola',
-  basket: 'Bola basket',
+  sepakbola: 'Football',
+  basket: 'Basketball',
   futsal: 'Futsal',
-  tenis: 'Tenis',
+  tenis: 'Tennis',
   'american-football': 'American football / NFL',
 }
 

@@ -124,7 +124,7 @@ function diagnoseCsv(text: string): MetricReport[] {
     const num = parseFloat(cell.replace(',', '.'))
     const hit = KNOWN.find((k) => k.test(norm(name)))
     return {
-      name: name.trim() || '(kolom tanpa nama)',
+      name: name.trim() || '(unnamed column)',
       sampleCount: kosong ? 0 : 1,
       recognised: Boolean(hit),
       mappedTo: hit?.field,
@@ -179,12 +179,12 @@ export function diagnose(rawText: string): SyncDiagnosis {
 
     return {
       ...base, verdict: 'not-json',
-      headline: 'Isi berkas ini tidak bisa dibaca',
-      explanation: 'Formatnya bukan JSON, bukan CSV bertajuk kolom, dan bukan XML Apple Health. Kemungkinan berkasnya tersalin sebagian, berupa tangkapan layar, maupun masih terbungkus dalam berkas ZIP.',
+      headline: 'This file could not be read',
+      explanation: 'It is not JSON, not CSV with a header row, and not Apple Health XML. The file was most likely copied only partly, is a screenshot, or is still inside a ZIP.',
       actions: [
-        'Bila berkasnya .zip, buka dahulu di aplikasi Files lalu pilih berkas di dalamnya.',
-        'Di Health Auto Export, gunakan Export lalu pilih format JSON maupun CSV.',
-        'Bila menempelkan teks, salin SELURUH isi berkas dari awal sampai akhir.',
+        'If the file is a .zip, open it in the Files app first and pick the file inside it.',
+        'In Health Auto Export, use Export and choose either JSON or CSV.',
+        'If you are pasting text, copy the WHOLE file from beginning to end.',
       ],
     }
   }
@@ -193,11 +193,11 @@ export function diagnose(rawText: string): SyncDiagnosis {
   try { root = JSON.parse(rawText) } catch {
     return {
       ...base, verdict: 'not-json',
-      headline: 'Isi yang ditempel bukan JSON yang sah',
-      explanation: 'Teksnya dimulai seperti JSON namun tidak dapat diurai sampai selesai — hampir selalu karena tersalin sebagian saja.',
+      headline: 'The pasted content is not valid JSON',
+      explanation: 'The text starts like JSON but cannot be parsed to the end — almost always because only part of it was copied.',
       actions: [
-        'Gunakan tombol pilih berkas alih-alih menyalin teks; berkas 7 hari terlalu panjang untuk disalin dengan tepat.',
-        'Bila tetap menempel, salin SELURUH isinya mulai dari tanda kurung kurawal pertama.',
+        'Use the file picker instead of copying text; a 7-day file is too long to copy accurately.',
+        'If you do paste, copy EVERYTHING starting from the first curly brace.',
       ],
     }
   }
@@ -208,12 +208,12 @@ export function diagnose(rawText: string): SyncDiagnosis {
   if (!Array.isArray(metrics) || metrics.length === 0) {
     return {
       ...base, verdict: 'no-payload',
-      headline: 'Tidak ada satu pun grup metrik di dalam data ini',
-      explanation: 'Struktur yang diharapkan adalah data.metrics berisi daftar metrik. Di sini bagian itu kosong atau tidak ada — artinya telepon memang tidak mengirimkan metrik apa pun, bukan sekadar salah nama.',
+      headline: 'There is no metric group in this data at all',
+      explanation: 'The expected structure is data.metrics holding a list of metrics. Here that part is empty or absent — meaning the phone sent no metrics at all, not that a name failed to match.',
       actions: [
-        'Di Health Auto Export, pastikan ada metrik yang DICENTANG pada bagian pemilihan data.',
-        'Pastikan izin akses Health sudah diberikan ke aplikasi tersebut di Pengaturan iPhone.',
-        'Bila memakai Automation, pastikan otomatisasinya benar-benar berjalan dan bukan sekadar tersimpan.',
+        'In Health Auto Export, make sure some metrics are TICKED in the data selection section.',
+        'Make sure Health access permission has been granted to that app in iPhone Settings.',
+        'If you use an Automation, make sure it actually runs rather than merely being saved.',
       ],
     }
   }
@@ -242,43 +242,43 @@ function summarise(reports: MetricReport[], bentuk: string): SyncDiagnosis {
   const matched = withSamples.filter((r) => r.recognised)
   const emptyCount = reports.length - withSamples.length
   const unknownNames = withSamples.filter((r) => !r.recognised).map((r) => r.name)
-  const asal = bentuk && bentuk !== 'JSON' ? ` Berkas dibaca sebagai ${bentuk}.` : ''
+  const asal = bentuk && bentuk !== 'JSON' ? ` The file was read as ${bentuk}.` : ''
 
   const common = { metrics: reports, matchedCount: matched.length, emptyCount, unknownNames }
 
   if (matched.length > 0) {
     return {
       ...common, verdict: 'ok',
-      headline: `${matched.length} metrik dikenali dan akan tersimpan`,
+      headline: `${matched.length} metrics recognised and will be saved`,
       explanation: emptyCount > 0
-        ? `Sinkronisasi ini berfungsi. ${emptyCount} grup lain datang tanpa sampel — itu wajar, karena metrik seperti VO2max, berat badan, atau tekanan darah tidak tercatat setiap hari.${asal}`
-        : `Sinkronisasi ini berfungsi dan semua grup membawa sampel.${asal}`,
+        ? `This sync works. ${emptyCount} other groups arrived with no samples — that is normal, because metrics such as VO2max, body weight, or blood pressure are not recorded every day.${asal}`
+        : `This sync works and every group carried samples.${asal}`,
       actions: matched.length < 5
-        ? ['Bila Anda ingin lebih banyak data masuk, centang lebih banyak metrik di Health Auto Export dan perluas Date Range menjadi "Last 7 Days".']
-        : ['Tidak ada yang perlu diperbaiki pada sisi ini.'],
+        ? ['If you want more data to come through, tick more metrics in Health Auto Export and widen the Date Range to "Last 7 Days".']
+        : ['Nothing needs fixing on this side.'],
     }
   }
 
   if (withSamples.length === 0) {
     return {
       ...common, verdict: 'empty-samples',
-      headline: `${reports.length} grup metrik datang, tetapi semuanya KOSONG`,
-      explanation: `Ini penyebab tersering, dan bukan kerusakan. Telepon berhasil menghubungi server, namun rentang tanggal yang dipilih tidak berisi data. Beberapa metrik memang tidak tercatat harian — VO2max hanya muncul setelah latihan luar ruang tertentu, dan berat badan hanya ada bila Anda menimbang.${asal}`,
+      headline: `${reports.length} metric groups arrived, but every one is EMPTY`,
+      explanation: `This is the most common cause, and nothing is broken. The phone reached the server, but the chosen date range contains no data. Some metrics are simply not recorded daily — VO2max appears only after certain outdoor workouts, and body weight only if you step on a scale.${asal}`,
       actions: [
-        'Ubah Date Range di Health Auto Export menjadi "Last 7 Days" atau lebih panjang.',
-        'Pastikan Apple Watch sudah tersinkron ke iPhone sebelum ekspor dijalankan.',
-        'Coba mulai dari metrik yang pasti terisi harian: Steps, Heart Rate, dan Active Energy.',
+        'Change the Date Range in Health Auto Export to "Last 7 Days" or longer.',
+        'Make sure the Apple Watch has synced to the iPhone before the export runs.',
+        'Start with metrics that are certain to be filled daily: Steps, Heart Rate, and Active Energy.',
       ],
     }
   }
 
   return {
     ...common, verdict: 'name-mismatch',
-    headline: 'Data ada, tetapi tidak ada nama metrik yang kami kenali',
-    explanation: `Grup metrik datang lengkap dengan sampel, namun penamaannya tidak cocok dengan yang kami petakan. Ini kesalahan di sisi kami, bukan di sisi Anda — versi aplikasi yang berbeda kadang memakai nama yang berbeda.${asal}`,
+    headline: 'There is data, but no metric name we recognise',
+    explanation: `The metric groups arrived complete with samples, but their names do not match anything we map. This is a fault on our side, not yours — different app versions sometimes use different names.${asal}`,
     actions: [
-      'Salin daftar nama di bawah ini dan kirimkan kepada kami — dari situ pemetaannya bisa langsung diperbaiki.',
-      'Sementara itu, unggah file JSON-nya lewat tombol impor di atas; jalur impor file memakai pemetaan yang lebih luas.',
+      'Copy the list of names below and send it to us — the mapping can be fixed straight from that.',
+      'In the meantime, upload the JSON file with the import button above; the file import path uses a wider mapping.',
     ],
   }
 }

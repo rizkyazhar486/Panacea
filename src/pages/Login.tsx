@@ -107,18 +107,18 @@ export function Login({ onBack }: { onBack?: () => void }) {
           if (batal) return
           setHealth(h)
           setError(h.penyimpanan === 'berkas'
-            ? 'Server berjalan tanpa basis data tetap (MONGODB_URI belum diisi). Akun dan data yang tersimpan di server akan HILANG pada deploy ulang berikutnya — termasuk akun yang baru dibuat sekarang.'
+            ? 'The server is running without a persistent database (MONGODB_URI is not set). Accounts and data stored on the server will be LOST on the next redeploy — including any account created now.'
             : '')
           return
         } catch {
           if (batal) return
           setError(i === 0
-            ? 'Menghubungi server… instans gratis tidur setelah 15 menit dan perlu ~50 detik untuk bangun.'
-            : 'Masih menunggu server bangun…')
+            ? 'Contacting the server… the free instance sleeps after 15 minutes and needs about 50 seconds to wake.'
+            : 'Still waiting for the server to wake…')
           await new Promise((r) => setTimeout(r, 8000))
         }
       }
-      if (!batal) setError('Server tidak dapat dihubungi — aplikasi berjalan dalam mode lokal. Data tetap tersimpan di perangkat ini.')
+      if (!batal) setError('The server could not be reached — the app is running in local mode. Data is still saved on this device.')
     }
     void coba()
     return () => { batal = true }
@@ -319,7 +319,7 @@ export function Login({ onBack }: { onBack?: () => void }) {
               <input className={inputClass} value={f.email}
                 onChange={e => setF(p => ({ ...p, email: e.target.value }))} type="email" />
             </Field>
-            <Field label="Nama">
+            <Field label="Name">
               <input className={inputClass} value={f.name}
                 onChange={e => setF(p => ({ ...p, name: e.target.value }))} placeholder="Nama Anda" />
             </Field>
@@ -332,19 +332,19 @@ export function Login({ onBack }: { onBack?: () => void }) {
                 atau berhenti mendaftar -- keduanya lebih buruk daripada
                 membiarkannya kosong dengan jujur. */}
             {!simple && (
-              <Collapse title="Agar angkanya lebih tepat (boleh dilewati)">
+              <Collapse title="For more accurate numbers (optional)">
                 <p className="text-[11px] leading-relaxed text-neutral-500">
-                  Umur dan jenis kelamin dipakai untuk memperkirakan denyut jantung maksimum dan kebutuhan
-                  energi harian. Tanpa keduanya, angka itu memakai nilai umum dan akan menyimpang dari
-                  keadaan Anda. Tidak ada bagian lain aplikasi yang terkunci karenanya.
+                  Age and sex are used to estimate maximum heart rate and daily energy needs. Without
+                  them those numbers fall back to generic values and will drift from your actual
+                  situation. No other part of the app is locked behind this.
                 </p>
                 <div className="grid grid-cols-2 gap-3">
                   <div>
-                    <label className="mb-1 block text-[11px] font-semibold text-neutral-500">Jenis kelamin</label>
+                    <label className="mb-1 block text-[11px] font-semibold text-neutral-500">Sex</label>
                     <select className={inputClass} value={f.sex}
                       onChange={e => setF(p => ({ ...p, sex: e.target.value as 'L' | 'P' }))}>
-                      <option value="L">Laki-laki</option>
-                      <option value="P">Perempuan</option>
+                      <option value="L">Male</option>
+                      <option value="P">Female</option>
                     </select>
                   </div>
                   <div>
@@ -402,17 +402,17 @@ export function Login({ onBack }: { onBack?: () => void }) {
 
             {/* Optional pasien details — collapsed by default */}
             {role === 'pasien' && (
-              <Collapse title="Keterangan tambahan (boleh dilewati)">
+              <Collapse title="Additional details (optional)">
                 <div className="grid grid-cols-2 gap-2">
-                  <Mini label="Pekerjaan" value={f.occupation} onChange={v => setF(p => ({ ...p, occupation: v }))} placeholder="Karyawan" />
+                  <Mini label="Occupation" value={f.occupation} onChange={v => setF(p => ({ ...p, occupation: v }))} placeholder="Office worker" />
                 </div>
-                <Mini label="Riwayat kesehatan" value={f.background} onChange={v => setF(p => ({ ...p, background: v }))} placeholder="Ada darah tinggi di keluarga, dsb." />
+                <Mini label="Health history" value={f.background} onChange={v => setF(p => ({ ...p, background: v }))} placeholder="High blood pressure in the family, etc." />
               </Collapse>
             )}
           </div>
 
-          <Button onClick={doLogin} className="w-full">{role === 'pasien' ? 'Masuk' : `Masuk sebagai ${cur.title}`}</Button>
-          <p className="text-center text-[11px] text-neutral-500">⚕️ Data dilindungi sesuai Undang-Undang Pelindungan Data Pribadi.</p>
+          <Button onClick={doLogin} className="w-full">{role === 'pasien' ? 'Sign In' : `Sign in as ${cur.title}`}</Button>
+          <p className="text-center text-[11px] text-neutral-500">⚕️ Data is protected under the Personal Data Protection Law.</p>
         </div>
 
         {showLegal && <LegalModal onClose={() => setShowLegal(false)} />}
@@ -484,7 +484,7 @@ function LegalModal({ onClose }: { onClose: () => void }) {
         <div className="mt-3 space-y-3 text-sm leading-relaxed text-neutral-600">
           <p><b>Informed Consent.</b> AI interactions are educational & supportive in nature — not a final diagnosis. Diagnosis & treatment still require verification by a licensed doctor.</p>
           <p><b>Privacy (Indonesia's PDP Law No. 27/2022).</b> Your health data is specific personal data, stored encrypted in Indonesia, with an access audit log. You have the right to access, correct, and delete your data at any time.</p>
-          <p><b>Terms.</b> AI-EMR hanya untuk tenaga medis dengan STR/SIP terverifikasi. Layanan apotek tunduk pada apoteker berizin & ketentuan BPOM. Dalam keadaan gawat darurat, pakailah fitur SOS Darurat dan hubungi fasilitas kesehatan terdekat.</p>
+          <p><b>Terms.</b> AI-EMR is only for medical professionals with a verified STR/SIP. Pharmacy services are subject to licensed pharmacists and BPOM regulations. In an emergency, use the Emergency SOS feature and contact the nearest healthcare facility.</p>
           <p className="text-xs text-neutral-500">The full version is available in the "Privacy & Legal" menu after signing in.</p>
         </div>
         <button onClick={onClose}

@@ -63,11 +63,11 @@ export function upayaRelatif(w: ImportedWorkout, k: Konteks): UpayaRelatif {
   const skor = Math.round(trimpSesi(sesiDariWorkout(w), k) * SKALA_UPAYA)
   const dariDeret = w.hr.length >= 2
   const [label, warna] =
-    skor >= 250 ? ['Sangat berat', '#ef4444']
-      : skor >= 150 ? ['Berat', '#f59e0b']
-        : skor >= 80 ? ['Sedang', '#60a5fa']
-          : skor >= 30 ? ['Ringan', '#34d399']
-            : ['Sangat ringan', '#94a3b8']
+    skor >= 250 ? ['Very hard', '#ef4444']
+      : skor >= 150 ? ['Hard', '#f59e0b']
+        : skor >= 80 ? ['Moderate', '#60a5fa']
+          : skor >= 30 ? ['Easy', '#34d399']
+            : ['Very easy', '#94a3b8']
   return { skor, label, warna, dariDeret }
 }
 
@@ -253,28 +253,28 @@ export function lajuBeban(
 
   let judul: string, arti: string, warna: string
   if (rasio === null) {
-    judul = 'Belum ada pembanding'
-    arti = 'Belum ada beban sebelumnya untuk dibandingkan. Setelah dua pekan berjalan, laju penambahan Anda bisa dihitung.'
+    judul = 'Nothing to compare against yet'
+    arti = 'There is no earlier load to compare against. After two weeks of training your rate of increase can be computed.'
     warna = '#94a3b8'
     // Lonjakan jarak SAJA tidak cukup untuk memicu peringatan merah. Jadwal
     // selang-sehari menaruh empat sesi di satu pekan dan tiga di pekan lain —
     // selisih 33% yang murni akibat penggalan kalender, bukan penambahan beban.
     // Karena itu jarak hanya menaikkan derajat peringatan bila rasio ikut naik.
   } else if (rasio > 1.5 || (naikJarakPct !== null && naikJarakPct > 30 && rasio > 1.3)) {
-    judul = 'Naik terlalu cepat'
-    arti = `Beban tujuh hari terakhir ${rasio}× kebiasaan Anda${naikJarakPct !== null ? `, jarak naik ${naikJarakPct}% dari pekan lalu` : ''}. Yang paling sering mendahului cedera bukan latihan berat, melainkan penambahan yang cepat. Menahan laju sekarang jauh lebih murah daripada berhenti enam pekan nanti.${ragu}`
+    judul = 'Increasing too fast'
+    arti = `The last seven days carried ${rasio}× your usual load${naikJarakPct !== null ? `, with distance up ${naikJarakPct}% on last week` : ''}. What most often precedes an injury is not hard training but a fast increase. Holding the rate now is far cheaper than stopping for six weeks later.${ragu}`
     warna = '#ef4444'
   } else if (rasio > 1.3) {
-    judul = 'Agak cepat'
-    arti = `Beban pekan ini ${rasio}× kebiasaan Anda. Masih wajar untuk satu pekan berat, asalkan pekan berikutnya lebih ringan.${ragu}`
+    judul = 'Slightly fast'
+    arti = `This week carried ${rasio}× your usual load. Still reasonable for one hard week, provided the next one is lighter.${ragu}`
     warna = '#f59e0b'
   } else if (rasio < 0.8) {
-    judul = 'Sedang menurun'
-    arti = `Beban pekan ini ${rasio}× kebiasaan Anda — lebih ringan. Bagus sebagai pekan pemulihan; bila berlanjut beberapa pekan, kebugaran yang sudah dibangun akan ikut turun.${ragu}`
+    judul = 'Winding down'
+    arti = `This week carried ${rasio}× your usual load — lighter. Good as a recovery week; if it continues for several weeks, the fitness you have built will fall away with it.${ragu}`
     warna = '#60a5fa'
   } else {
-    judul = 'Laju sehat'
-    arti = `Beban pekan ini ${rasio}× kebiasaan Anda — penambahannya bertahap. Ini pola yang paling bisa dipertahankan.${ragu}`
+    judul = 'Healthy rate'
+    arti = `This week carried ${rasio}× your usual load — a gradual increase. This is the most sustainable pattern there is.${ragu}`
     warna = '#22c55e'
   }
 
@@ -318,16 +318,16 @@ export interface BacaKesegaran {
 export function bacaKesegaran(kesegaran: number, hariRiwayat?: number): BacaKesegaran {
   if (hariRiwayat !== undefined && hariRiwayat < TAU_KEBUGARAN && kesegaran < -10) {
     return {
-      judul: 'Belum bisa dibaca',
+      judul: 'Not readable yet',
       arti: `Your history is only ${Math.round(hariRiwayat)} days long. Fitness is computed with a 42-day time constant, so the number is still filling in and will sit well below fatigue for a while — that is what the start of every history looks like, not a sign that you are worn out. Freshness only becomes trustworthy after roughly six weeks of consistently logged sessions.`,
       warna: '#94a3b8',
     }
   }
-  if (kesegaran >= 15) return { judul: 'Sangat segar', arti: 'Beban sudah mengendap sepenuhnya. Bagus untuk lomba atau tes, tetapi bila bertahan lama biasanya berarti latihan sedang terlalu sedikit untuk menambah kebugaran.', warna: '#22c55e' }
-  if (kesegaran >= 5) return { judul: 'Segar', arti: 'Siap untuk sesi kualitas atau lomba.', warna: '#84cc16' }
-  if (kesegaran >= -10) return { judul: 'Seimbang', arti: 'Beban dan pemulihan sedang sepadan. Ini keadaan yang paling produktif untuk membangun kebugaran.', warna: '#60a5fa' }
-  if (kesegaran >= -30) return { judul: 'Menumpuk lelah', arti: 'Sedang dalam blok berat. Wajar dan memang perlu, asalkan diikuti minggu yang lebih ringan.', warna: '#f59e0b' }
-  return { judul: 'Sangat lelah', arti: 'Kelelahan jauh di atas kebugaran. Bila dipaksakan lebih lama, risikonya cedera dan kemunduran, bukan kemajuan.', warna: '#ef4444' }
+  if (kesegaran >= 15) return { judul: 'Very fresh', arti: 'The load has fully settled. Good for a race or a test, but if it lasts it usually means training is too light to add fitness.', warna: '#22c55e' }
+  if (kesegaran >= 5) return { judul: 'Fresh', arti: 'Ready for a quality session or a race.', warna: '#84cc16' }
+  if (kesegaran >= -10) return { judul: 'Balanced', arti: 'Load and recovery are matched. This is the most productive state for building fitness.', warna: '#60a5fa' }
+  if (kesegaran >= -30) return { judul: 'Accumulating fatigue', arti: 'You are in a hard block. Normal and indeed necessary, provided a lighter week follows.', warna: '#f59e0b' }
+  return { judul: 'Very fatigued', arti: 'Fatigue is far above fitness. Pushed further, what follows is injury and regression, not progress.', warna: '#ef4444' }
 }
 
 // ── 3. Grade Adjusted Pace ──────────────────────────────────────────────────
@@ -553,10 +553,10 @@ export interface ZonaPace {
  */
 export function zonaPace(workouts: ImportedWorkout[], paceAmbangSec: number): ZonaPace[] {
   const def: { nama: string; lo: number; hi: number; warna: string }[] = [
-    { nama: 'Pemulihan', lo: 1.29, hi: 99, warna: '#94a3b8' },
-    { nama: 'Mudah', lo: 1.15, hi: 1.29, warna: '#34d399' },
-    { nama: 'Maraton', lo: 1.06, hi: 1.15, warna: '#60a5fa' },
-    { nama: 'Ambang', lo: 0.97, hi: 1.06, warna: '#fbbf24' },
+    { nama: 'Recovery', lo: 1.29, hi: 99, warna: '#94a3b8' },
+    { nama: 'Easy', lo: 1.15, hi: 1.29, warna: '#34d399' },
+    { nama: 'Marathon', lo: 1.06, hi: 1.15, warna: '#60a5fa' },
+    { nama: 'Threshold', lo: 0.97, hi: 1.06, warna: '#fbbf24' },
     { nama: 'Interval', lo: 0, hi: 0.97, warna: '#f87171' },
   ]
   return def.map((z) => {
@@ -583,19 +583,19 @@ export function perkiraanPaceAmbang(workouts: ImportedWorkout[]): number | null 
 
 export const TIDAK_DIBANGUN: { fitur: string; kenapa: string }[] = [
   {
-    fitur: 'Segmen, papan peringkat, dan Live Segments',
-    kenapa: 'Menuntut basis data rute publik beserta jutaan percobaan pengguna lain untuk dijadikan pembanding. Ini persoalan platform dan komunitas, bukan rumus — angka apa pun yang dibuat sendiri di sini akan menyesatkan karena tidak ada yang diperbandingkan.',
+    fitur: 'Segments, leaderboards, and Live Segments',
+    kenapa: 'Requires a database of public routes plus millions of other people’s attempts to compare against. That is a platform and community problem, not a formula — any number invented here would mislead, because there is nothing to compare with.',
   },
   {
-    fitur: 'Peta rute, heatmap pribadi, peta luring, dan Beacon',
-    kenapa: 'Semuanya menuntut jejak GPS. Server ini SENGAJA membuang larik rute sebelum menyimpan: itu bagian paling sensitif dari kiriman, dan menyimpan riwayat lokasi seseorang "siapa tahu berguna nanti" bukan alasan yang cukup. Bila kelak fitur peta benar-benar dibuat, penyimpanannya akan diminta izinnya secara terpisah.',
+    fitur: 'Route maps, personal heatmaps, offline maps, and Beacon',
+    kenapa: 'All of these require a GPS trace. This server DELIBERATELY discards route arrays before storing: that is the most sensitive part of the payload, and keeping someone’s location history "in case it turns out useful" is not a sufficient reason. If map features are ever built, storage will be consented to separately.',
   },
   {
-    fitur: 'Split dan usaha terbaik di dalam satu sesi',
-    kenapa: 'Ekspor yang masuk membawa deret detak jantung, bukan jarak per titik waktu. Tanpa jarak kumulatif, "5 km tercepat di dalam lari 10 km" tidak bisa dihitung — hanya sesi utuh yang bisa dibandingkan.',
+    fitur: 'Splits and best efforts within a single session',
+    kenapa: 'The incoming export carries a heart-rate series, not distance per point in time. Without cumulative distance, "fastest 5 km inside a 10 km run" cannot be computed — only whole sessions can be compared.',
   },
   {
-    fitur: 'Cuaca pada aktivitas',
-    kenapa: 'Butuh riwayat cuaca per koordinat dan waktu, yang berarti menyimpan lokasi tiap sesi. Ditahan atas alasan yang sama dengan peta rute.',
+    fitur: 'Weather on an activity',
+    kenapa: 'Needs weather history per coordinate and time, which means storing the location of every session. Held back for the same reason as route maps.',
   },
 ]

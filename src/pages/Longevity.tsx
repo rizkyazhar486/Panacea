@@ -176,10 +176,10 @@ function syncFromDevices(cur: LongevityData): { next: LongevityData; changed: st
     }
   }
   pakai(v.vo2max, patch.vo2 ?? cur.vo2, 'vo2', 'VO₂max')
-  pakai(v.restingHr, patch.rhr ?? cur.rhr, 'rhr', 'Denyut istirahat')
-  pakai(v.sleepH, patch.sleepH ?? cur.sleepH, 'sleepH', 'Tidur')
-  pakai(v.systolic, cur.sbp, 'sbp', 'Tekanan sistolik')
-  pakai(v.waistHipRatio, patch.whr ?? cur.whr, 'whr', 'Rasio pinggang-panggul')
+  pakai(v.restingHr, patch.rhr ?? cur.rhr, 'rhr', 'Resting heart rate')
+  pakai(v.sleepH, patch.sleepH ?? cur.sleepH, 'sleepH', 'Sleep')
+  pakai(v.systolic, cur.sbp, 'sbp', 'Systolic pressure')
+  pakai(v.waistHipRatio, patch.whr ?? cur.whr, 'whr', 'Waist-to-hip ratio')
   return { next: { ...cur, ...patch }, changed }
 }
 
@@ -257,8 +257,8 @@ export function Longevity() {
             nilai={d[key] as number | undefined}
             onNilai={(n) => u({ [key]: n } as Partial<LongevityData>)} />
           {perluSimpan && baruDisimpan !== String(key) && (
-            <button type="button" onClick={kirim} aria-label={`Simpan ${label}`}
-              title="Simpan nilai ini untuk seluruh aplikasi (atau tekan Enter)"
+            <button type="button" onClick={kirim} aria-label={`Save ${label}`}
+              title="Save this value across the whole app (or press Enter)"
               className="shrink-0 rounded-lg bg-brand px-2 py-1.5 text-[12px] font-black text-ink">↵</button>
           )}
           {baruDisimpan === String(key) && <span className="shrink-0 text-[10px] font-bold text-emerald-600" role="status">✓</span>}
@@ -285,7 +285,7 @@ export function Longevity() {
         <SectionTitle
           icon={<IconHeart size={20} />}
           title="Longevity Center"
-          subtitle="Jam tangan Anda menilai hari Anda — halaman ini menilai dasawarsa Anda. VO₂max, denyut istirahat, tidur & rasio pinggang-panggul diperbarui sendiri dari Profil Kesehatan (Apple Health / WHOOP) dan Komposisi Tubuh."
+          subtitle="Your watch judges your day — this page judges your decade. VO₂max, resting heart rate, sleep & waist-to-hip ratio update themselves from Health Profile (Apple Health / WHOOP) and Body Composition."
           right={<button onClick={() => syncNow(false)} className="shrink-0 rounded-full border border-brand/30 bg-brand-50 px-3 py-1.5 text-[11px] font-bold text-brand-dark active:scale-95">🔄 Sync devices</button>}
         />
         {syncNote && <p className="mt-2 rounded-xl bg-brand-50 px-3 py-2 text-[11px] font-semibold text-brand-dark">{syncNote}</p>}
@@ -340,8 +340,8 @@ export function Longevity() {
       <Card className="!p-5">
         <SectionTitle
           icon={<span className="text-lg">🔬</span>}
-          title="Angka yang dapat dilacak ke sumbernya"
-          subtitle="Hanya besaran yang benar-benar dilaporkan penelitian, masing-masing dengan kutipan, ukuran kohort, dan batas ketidakpastiannya"
+          title="Numbers traceable to their source"
+          subtitle="Only quantities research actually reports, each with its citation, cohort size, and uncertainty bounds"
         />
         <div className="mt-3">
           <PanelKebugaranIlmiah
@@ -363,7 +363,7 @@ export function Longevity() {
       </Card>
 
       <Card className="!p-5">
-        <SectionTitle icon={<IconActivity size={20} />} title="8 Longevity Pillars" subtitle="Predictor jangka panjang yang memang terbukti — TETAPI bobot penggabungannya adalah pilihan penulis, bukan hasil penelitian" />
+        <SectionTitle icon={<IconActivity size={20} />} title="8 Longevity Pillars" subtitle="Long-term predictors that are genuinely established — BUT the weights combining them are the author’s choice, not a research finding" />
         <div className="mt-2 grid grid-cols-2 gap-3">
           {num('VO₂max (ml/kg/min)', 'vo2', 0.1)}
           {num('Best grip (kg)', 'grip', 0.5)}
@@ -415,7 +415,7 @@ export function Longevity() {
 
       {/* Decade projection */}
       <Card className="!p-5">
-        <SectionTitle icon={<IconChartUp size={20} />} title="Proyeksi Dasawarsa — Latih Diri Anda yang Berumur 80" subtitle="Tanpa latihan: VO₂max −10% per dasawarsa, otot −8% per dasawarsa sesudah umur 30. Dengan latihan: separuhnya." />
+        <SectionTitle icon={<IconChartUp size={20} />} title="Decade Projection — Train Your 80-Year-Old Self" subtitle="Untrained: VO₂max −10% per decade, muscle −8% per decade after age 30. Trained: half that." />
         {vo2Proj60 && vo2Proj80 ? (
           <div className="mt-2 space-y-3">
             <div className="rounded-2xl bg-ink p-4 text-white">
@@ -462,7 +462,7 @@ export function Longevity() {
 
       {/* Testing protocol */}
       <Card className="!p-5">
-        <SectionTitle icon={<IconTimer size={20} />} title="Periodic Testing Protocol" subtitle="Yang diukur akan membaik — tandai tiap butir yang sudah dikerjakan" />
+        <SectionTitle icon={<IconTimer size={20} />} title="Periodic Testing Protocol" subtitle="What gets measured improves — tick each item once it is done" />
         <div className="mt-2 space-y-2">
           {PROTOCOL.map((p) => {
             const last = d.tests[p.id]

@@ -178,7 +178,7 @@ export function UbinCahaya() {
   return (
     <section>
       <Kepala
-        judul="Cahaya pagi"
+        judul="Morning light"
         kanan={
           <button
             onClick={() => logWellness(hariIni, { sunDone: !sudah })}
@@ -213,7 +213,7 @@ export function UbinTangga() {
 
   return (
     <section>
-      <Kepala judul="Lantai ditapaki" ke="/tubuh" />
+      <Kepala judul="Floors climbed" ke="/tubuh" />
       <div className="kaca rounded-3xl p-3">
         <div className="flex items-baseline gap-1.5">
           <span className="text-[26px] font-black leading-none tabular-nums nyala text-ink dark:text-white">{Math.round(kini)}</span>
@@ -265,7 +265,7 @@ export function UbinVo2Tren() {
             {selisih >= 0 ? '+' : '−'}{Math.abs(selisih).toFixed(1)} sejak bacaan pertama
           </span>
         </div>
-        <svg viewBox="0 0 100 36" preserveAspectRatio="none" className="mt-2 h-11 w-full" role="img" aria-label={`${daftar.length} bacaan VO2max`}>
+        <svg viewBox="0 0 100 36" preserveAspectRatio="none" className="mt-2 h-11 w-full" role="img" aria-label={`${daftar.length} VO2max readings`}>
           <polyline points={titik} fill="none" stroke="currentColor" strokeWidth="1.8" vectorEffect="non-scaling-stroke" strokeLinejoin="round" className="text-brand" />
         </svg>
         <p className="t-mikro mt-1 leading-snug text-neutral-400">
@@ -291,7 +291,7 @@ export function UbinKomposisi() {
 
   return (
     <section>
-      <Kepala judul="Komposisi tubuh" ke="/tubuh" />
+      <Kepala judul="Body composition" ke="/tubuh" />
       <div className="kaca rounded-3xl p-3">
         <div className="flex items-baseline gap-1.5">
           <span className="text-[26px] font-black leading-none tabular-nums nyala text-ink dark:text-white">{berat.toFixed(1)}</span>
@@ -312,7 +312,7 @@ export function UbinKomposisi() {
             <div className="mt-1.5 flex items-baseline justify-between gap-2">
               <span className="t-mikro text-neutral-500">Lemak <b className="text-ink dark:text-white">{massaLemak.toFixed(1)} kg</b> ({lemak.toFixed(1)}%)</span>
               <span className="t-mikro text-neutral-500">
-                {otot > 0 ? <>Otot rangka <b className="text-ink dark:text-white">{otot.toFixed(1)} kg</b></> : <>Sisa <b className="text-ink dark:text-white">{sisa.toFixed(1)} kg</b></>}
+                {otot > 0 ? <>Skeletal muscle <b className="text-ink dark:text-white">{otot.toFixed(1)} kg</b></> : <>Remainder <b className="text-ink dark:text-white">{sisa.toFixed(1)} kg</b></>}
               </span>
             </div>
           </>
@@ -356,14 +356,14 @@ export function UbinSuplemen() {
             <input
               value={nama}
               onChange={(e) => setNama(e.target.value)}
-              placeholder="Nama suplemen"
-              aria-label="Nama suplemen"
+              placeholder="Supplement name"
+              aria-label="Supplement name"
               className="t-kecil min-w-0 flex-1 rounded-xl border border-neutral-200 bg-transparent px-2.5 py-2 text-ink dark:border-white/12 dark:text-white"
             />
             <select
               value={waktu}
               onChange={(e) => setWaktu(e.target.value as 'pagi' | 'siang' | 'malam')}
-              aria-label="Waktu minum"
+              aria-label="Time to take"
               className="t-kecil shrink-0 rounded-xl border border-neutral-200 bg-transparent px-1.5 text-ink dark:border-white/12 dark:text-white"
             >
               <option value="pagi">Pagi</option>
@@ -414,7 +414,7 @@ export function UbinSuplemen() {
               })}
             </div>
             <p className="t-mikro mt-2 leading-snug text-neutral-400">
-              {diminum.length} dari {daftar.length} ditandai hari ini. Daftar dan dosisnya urusan Anda dan dokter Anda; aplikasi ini hanya mengingat.
+              {diminum.length} of {daftar.length} marked today. The list and its doses are between you and your doctor; this app only remembers them.
             </p>
           </>
         )}
@@ -445,7 +445,7 @@ export function UbinSuhuEkstrem() {
   return (
     <section>
       <Kepala
-        judul="Panas & dingin"
+        judul="Heat & cold"
         kanan={
           <span className="flex items-center gap-1">
             <button onClick={() => { catatSesiSuhu('panas', 15); setVersi((v) => v + 1) }} className="t-mikro min-h-[40px] rounded-lg bg-orange-500 px-2 font-black text-white">+ Sauna</button>
@@ -456,15 +456,15 @@ export function UbinSuhuEkstrem() {
       <div className="kaca rounded-3xl p-3">
         <div className="flex items-baseline gap-3">
           <span className="min-w-0">
-            <span className="t-mikro block text-neutral-400">Sauna terakhir</span>
+            <span className="t-mikro block text-neutral-400">Last sauna</span>
             <span className="text-[20px] font-black leading-none tabular-nums text-ink dark:text-white">
-              {panas == null ? '—' : panas === 0 ? 'hari ini' : `${panas} hari`}
+              {panas == null ? '—' : panas === 0 ? 'today' : `${panas} d`}
             </span>
           </span>
           <span className="min-w-0">
-            <span className="t-mikro block text-neutral-400">Dingin terakhir</span>
+            <span className="t-mikro block text-neutral-400">Last cold</span>
             <span className="text-[20px] font-black leading-none tabular-nums text-ink dark:text-white">
-              {dingin == null ? '—' : dingin === 0 ? 'hari ini' : `${dingin} hari`}
+              {dingin == null ? '—' : dingin === 0 ? 'today' : `${dingin} d`}
             </span>
           </span>
           <span className="t-mikro ml-auto shrink-0 text-neutral-400">{pekanIni} sesi pekan ini</span>

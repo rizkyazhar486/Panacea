@@ -38,22 +38,23 @@ export function SportsLab() {
         <span className="grid h-11 w-11 place-items-center rounded-2xl bg-brand-50 text-2xl">📊</span>
         <div>
           <h1 className="text-lg font-black text-ink dark:text-ink">Sports Lab</h1>
-          <p className="text-xs text-neutral-500">Valuasi pemain multi-agen & pencarian pemain serupa</p>
+          <p className="text-xs text-neutral-500">Multi-agent player valuation & similar-player search</p>
         </div>
       </div>
 
       <Card className="!p-4">
         <p className="text-[12px] leading-relaxed text-neutral-600 dark:text-neutral-300">
-          Lima agen menilai pemain dari sudut yang berbeda dan <b>tidak saling melihat hasil satu sama
-          lain</b>. Itu disengaja: nilai sebuah panel justru terletak pada kemungkinan mereka berbeda
-          pendapat. Ketika agen "Produksi" dan agen "Ketersediaan" berselisih jauh, selisih itulah
-          temuannya — bukan rata-ratanya. Setiap skor juga disertai rentang ketidakpastian yang
-          ditentukan jumlah laga, karena pemain yang dinilai dari 4 laga dan 40 laga tidak setara.
+          Five agents rate a player from different angles and <b>never see one another’s
+          results</b>. That is deliberate: the value of a panel lies precisely in its members being
+          able to disagree. When the "Production" agent and the "Availability" agent diverge sharply,
+          that gap is the finding — not their average. Every score also carries an uncertainty
+          range set by the number of matches, because a player judged on 4 matches and one judged on
+          40 are not equivalent.
         </p>
       </Card>
 
       <Card className="!p-4">
-        <div className="text-[11px] font-black uppercase tracking-wide text-neutral-500">Cabang olahraga</div>
+        <div className="text-[11px] font-black uppercase tracking-wide text-neutral-500">Sport</div>
         <div className="mt-2 flex flex-wrap gap-1.5">
           {(Object.keys(SPORT_LABEL) as Sport[]).map((s) => (
             <button key={s} onClick={() => { setSport(s); setSelectedId(null) }}
@@ -69,9 +70,9 @@ export function SportsLab() {
       {roster.length === 0 ? (
         <Card className="!p-4">
           <p className="text-[12px] leading-relaxed text-neutral-500">
-            Belum ada pemain untuk {SPORT_LABEL[sport]}. Tambahkan minimal dua pemain agar pencarian
-            pemain serupa bisa bekerja — kemiripan dihitung dari data yang Anda masukkan sendiri,
-            bukan dari basis data bawaan.
+            No players yet for {SPORT_LABEL[sport]}. Add at least two so similar-player search can
+            work — similarity is computed from the data you enter yourself, not from a built-in
+            database.
           </p>
         </Card>
       ) : (
@@ -94,9 +95,9 @@ export function SportsLab() {
               </div>
             )}
             <div className="mt-3 grid grid-cols-3 gap-2 text-center">
-              <Stat label="Rata-rata nilai" value={String(team.averageOverall)} />
-              <Stat label="Rata-rata usia" value={String(team.averageAge)} />
-              <Stat label="Laga hilang" value={`${team.injuryLoadPct}%`} />
+              <Stat label="Average rating" value={String(team.averageOverall)} />
+              <Stat label="Average age" value={String(team.averageAge)} />
+              <Stat label="Matches lost" value={`${team.injuryLoadPct}%`} />
             </div>
           </Card>
 
@@ -106,19 +107,19 @@ export function SportsLab() {
                 <div className="flex items-start justify-between gap-2">
                   <div>
                     <h2 className="text-[16px] font-black text-ink dark:text-ink">{selected.name}</h2>
-                    <div className="text-[11px] text-neutral-500">{selected.position} · {selected.ageYears} th · {selected.matchesPlayed} laga</div>
+                    <div className="text-[11px] text-neutral-500">{selected.position} · {selected.ageYears} yr · {selected.matchesPlayed} matches</div>
                   </div>
                   <button onClick={() => setPlayers((x) => x.filter((y) => y.id !== selected.id))}
-                    className="shrink-0 text-[11px] font-bold text-rose-500 hover:underline">Hapus</button>
+                    className="shrink-0 text-[11px] font-bold text-rose-500 hover:underline">Remove</button>
                 </div>
 
                 <div className="mt-3 rounded-xl bg-neutral-50 p-3 text-center dark:bg-white/5">
-                  <div className="text-[11px] font-bold uppercase text-neutral-500">Nilai gabungan</div>
+                  <div className="text-[11px] font-bold uppercase text-neutral-500">Overall rating</div>
                   <div className="text-3xl font-black text-ink dark:text-ink">
                     {valuation.overall}
                     <span className="text-base font-bold text-neutral-500"> ± {valuation.confidence}</span>
                   </div>
-                  <div className="mt-1 text-[10px] text-neutral-500">Rentang berasal dari jumlah laga, bukan dari mutu pemain</div>
+                  <div className="mt-1 text-[10px] text-neutral-500">The range comes from the number of matches, not from the player’s quality</div>
                 </div>
 
                 {valuation.sampleWarning && (
@@ -154,11 +155,11 @@ export function SportsLab() {
               </Card>
 
               <Card className="!p-4">
-                <SectionTitle icon={<IconActivity size={18} />} title="Pemain serupa"
-                  subtitle="Kemiripan kosinus pada vektor performa ternormalisasi" />
+                <SectionTitle icon={<IconActivity size={18} />} title="Similar players"
+                  subtitle="Cosine similarity on normalised performance vectors" />
                 {similar.length === 0 ? (
                   <p className="mt-2 text-[12px] leading-relaxed text-neutral-500">
-                    Perlu minimal dua pemain pada cabang yang sama untuk membandingkan.
+                    At least two players in the same sport are needed to compare.
                   </p>
                 ) : (
                   <div className="mt-2 space-y-2">
@@ -170,19 +171,19 @@ export function SportsLab() {
                         </div>
                         {s.sharedStrengths.length > 0 && (
                           <p className="mt-1 text-[11px] leading-relaxed text-neutral-500">
-                            Sama-sama kuat pada: {s.sharedStrengths.join(', ')}
+                            Both strong in: {s.sharedStrengths.join(', ')}
                           </p>
                         )}
                         {s.biggestDifference && (
                           <p className="mt-0.5 text-[11px] leading-relaxed text-amber-700 dark:text-amber-300">
-                            Perbedaan terbesar: {s.biggestDifference}
+                            Biggest difference: {s.biggestDifference}
                           </p>
                         )}
                       </div>
                     ))}
                     <p className="mt-1 text-[10px] leading-relaxed text-neutral-500">
-                      Setiap dimensi punya nama, sehingga hasil "mirip" selalu bisa dijelaskan —
-                      bukan sekadar dinyatakan.
+                      Every dimension has a name, so a "similar" result can always be explained —
+                      not merely asserted.
                     </p>
                   </div>
                 )}
@@ -193,8 +194,8 @@ export function SportsLab() {
       )}
 
       <div className="rounded-2xl border border-neutral-100 bg-white p-4 text-center text-[11px] leading-relaxed text-neutral-500 dark:border-white/10 dark:bg-white/5">
-        Alat bantu analisis, bukan pengganti penilaian pelatih maupun pemandu bakat. Seluruh data
-        dimasukkan dan disimpan oleh Anda sendiri di perangkat ini — tidak ada basis data pemain bawaan.
+        An analysis aid, not a replacement for the judgement of a coach or a scout. All data is
+        entered and stored by you on this device — there is no built-in player database.
       </div>
     </div>
   )
@@ -240,26 +241,26 @@ function AddPlayer({ sport, onAdd }: { sport: Sport; onAdd: (p: Player) => void 
   return (
     <Card className="!p-4">
       <button className="flex w-full items-center justify-between" onClick={() => setOpen(!open)}>
-        <span className="text-[13px] font-black text-ink dark:text-ink">Tambah pemain</span>
-        <span className="text-[11px] font-bold text-neutral-500">{open ? 'Tutup ▲' : 'Buka ▼'}</span>
+        <span className="text-[13px] font-black text-ink dark:text-ink">Add player</span>
+        <span className="text-[11px] font-bold text-neutral-500">{open ? 'Close ▲' : 'Open ▼'}</span>
       </button>
 
       {open && (
         <div className="mt-3 space-y-2">
           <div className="grid grid-cols-2 gap-2">
-            <Field label="Nama"><input className={inputClass} value={name} onChange={(e) => setName(e.target.value)} /></Field>
-            <Field label="Posisi"><input className={inputClass} placeholder="Penyerang" value={position} onChange={(e) => setPosition(e.target.value)} /></Field>
+            <Field label="Name"><input className={inputClass} value={name} onChange={(e) => setName(e.target.value)} /></Field>
+            <Field label="Position"><input className={inputClass} placeholder="Forward" value={position} onChange={(e) => setPosition(e.target.value)} /></Field>
           </div>
           <div className="grid grid-cols-2 gap-2">
-            <Field label="Usia"><input className={inputClass} inputMode="numeric" value={age} onChange={(e) => setAge(e.target.value)} /></Field>
-            <Field label="Menit per laga"><input className={inputClass} inputMode="numeric" value={minutes} onChange={(e) => setMinutes(e.target.value)} /></Field>
+            <Field label="Age"><input className={inputClass} inputMode="numeric" value={age} onChange={(e) => setAge(e.target.value)} /></Field>
+            <Field label="Minutes per match"><input className={inputClass} inputMode="numeric" value={minutes} onChange={(e) => setMinutes(e.target.value)} /></Field>
           </div>
           <div className="grid grid-cols-2 gap-2">
-            <Field label="Laga dimainkan"><input className={inputClass} inputMode="numeric" value={played} onChange={(e) => setPlayed(e.target.value)} /></Field>
-            <Field label="Laga absen (cedera)"><input className={inputClass} inputMode="numeric" value={missed} onChange={(e) => setMissed(e.target.value)} /></Field>
+            <Field label="Matches played"><input className={inputClass} inputMode="numeric" value={played} onChange={(e) => setPlayed(e.target.value)} /></Field>
+            <Field label="Matches missed (injury)"><input className={inputClass} inputMode="numeric" value={missed} onChange={(e) => setMissed(e.target.value)} /></Field>
           </div>
 
-          <div className="pt-1 text-[11px] font-black uppercase tracking-wide text-neutral-500">Statistik {SPORT_LABEL[sport]}</div>
+          <div className="pt-1 text-[11px] font-black uppercase tracking-wide text-neutral-500">{SPORT_LABEL[sport]} statistics</div>
           {defs.map((d) => (
             <Field key={d.key} label={d.label}>
               <input className={inputClass} inputMode="decimal" placeholder={d.hint ?? `elite ≈ ${d.eliteAt}`}
@@ -267,7 +268,7 @@ function AddPlayer({ sport, onAdd }: { sport: Sport; onAdd: (p: Player) => void 
             </Field>
           ))}
 
-          <Button className="w-full" onClick={submit}>Simpan pemain</Button>
+          <Button className="w-full" onClick={submit}>Save player</Button>
         </div>
       )}
     </Card>
