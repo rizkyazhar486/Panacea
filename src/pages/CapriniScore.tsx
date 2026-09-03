@@ -96,7 +96,7 @@ export function CapriniScore() {
     <div className="mx-auto max-w-2xl space-y-5 pb-24">
       <Card className="!p-5">
         <SectionTitle icon={<IconActivity size={20} />} title="Caprini Score" subtitle="Surgical VTE risk assessment (Caprini 2005; validated Bahl 2010)" />
-        <Prosa kelas="mt-2 text-[13px] leading-relaxed text-neutral-500">Penentuan derajat risiko tromboemboli vena pada pasien bedah, dipetakan ke tingkat profilaksis menurut panduan ACCP/CHEST. Untuk pasien penyakit dalam (nonbedah) yang dirawat, pakailah skor Padua. Centang hanya kelompok umur yang sesuai.</Prosa>
+        <Prosa kelas="mt-2 text-[13px] leading-relaxed text-neutral-500">Determines the degree of venous thromboembolism risk in surgical patients, mapped to a prophylaxis level per ACCP/CHEST guidelines. For admitted medical (non-surgical) patients, use the Padua score instead. Check only the matching age group.</Prosa>
       </Card>
 
       {GROUPS.map((g) => (

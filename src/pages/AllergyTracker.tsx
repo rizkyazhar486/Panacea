@@ -106,7 +106,7 @@ export function AllergyTracker() {
   return (
     <div className="mx-auto max-w-2xl space-y-5 pb-24">
       <Card className="!p-5">
-        <SectionTitle icon={<IconAlertTriangle size={20} />} title="Catatan Alergi" subtitle="Catatan pribadi alergi makanan, minuman, obat & kontak" />
+        <SectionTitle icon={<IconAlertTriangle size={20} />} title="Allergy Log" subtitle="A personal record of food, drink, medication & contact allergies" />
         <Prosa kelas="mt-2 text-[13px] leading-relaxed text-neutral-500">Simpan daftar berjalan hal-hal yang membuat Anda alergi — makanan, minuman, obat, serta pemicu kontak/benda (lateks, nikel, kosmetik, dan penyebab dermatitis kontak alergi lainnya). Daftar ini tersimpan di perangkat Anda sebagai catatan pribadi; tunjukkan kepada tenaga medis mana pun sebelum resep baru, tindakan, atau makanan yang Anda ragukan.</Prosa>
       </Card>
 
@@ -132,7 +132,7 @@ export function AllergyTracker() {
           </Field>
           <p className="-mt-1.5 text-[11px] text-neutral-500">{CATEGORY_HINT[draft.category]}</p>
 
-          <Field label="Anda alergi terhadap apa?">
+          <Field label="What are you allergic to?">
             <input className={inputClass} value={draft.name} onChange={(e) => setDraft((d) => ({ ...d, name: e.target.value }))} placeholder="e.g. Shrimp, Amoxicillin, Nickel" />
           </Field>
 

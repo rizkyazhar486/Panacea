@@ -267,7 +267,7 @@ function LadderCard({ ladder }: { ladder: Ladder }) {
 
       <div className="rounded-lg border border-white/10 bg-white/[0.03] p-3 mt-3">
         <div className="flex flex-wrap items-center gap-2">
-          <Badge>Tingkat {cur.level}</Badge>
+          <Badge>Level {cur.level}</Badge>
           <span className="font-semibold text-ink">{cur.name}</span>
           <span className="text-sm text-neutral-500">— {cur.target}</span>
         </div>
@@ -348,7 +348,7 @@ function ScheduleTab() {
             onClick={() => setHari(n)}
             className={`px-3 py-1.5 rounded-lg text-sm border ${hari === n ? 'bg-white/10 border-white/30 text-white' : 'border-white/10 text-neutral-500'}`}
           >
-            {n} hari lari
+            {n} run days
           </button>
         ))}
       </div>
@@ -469,7 +469,7 @@ function StretchTab() {
                   <span className="text-lg shrink-0">{g.ikon}</span>
                   <span className="flex-1 min-w-0">
                     <span className="block font-semibold text-ink text-sm">{g.nama}</span>
-                    <span className="block text-xs text-slate-500">{WILAYAH_LABEL[g.wilayah]} · {g.stretches.length} gerakan</span>
+                    <span className="block text-xs text-slate-500">{WILAYAH_LABEL[g.wilayah]} · {g.stretches.length} movements</span>
                   </span>
                   <span className="text-slate-500 text-xs shrink-0">{terbuka ? '▲' : '▼'}</span>
                 </button>
@@ -599,8 +599,8 @@ function DoseCalculator() {
             />
           </div>
           <div className="flex justify-between text-xs text-slate-500 mt-1">
-            <span>{fmtDur(hasil.perSesiDetik)} per sesi</span>
-            <span>ambang {fmtDur(WEEKLY_TARGET_SEC)}</span>
+            <span>{fmtDur(hasil.perSesiDetik)} per session</span>
+            <span>target {fmtDur(WEEKLY_TARGET_SEC)}</span>
           </div>
 
           <p className={`text-sm mt-3 leading-relaxed ${hasil.cukup ? 'text-emerald-200/90' : 'text-amber-100/90'}`}>
