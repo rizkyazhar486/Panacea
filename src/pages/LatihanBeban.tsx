@@ -56,19 +56,19 @@ export function LatihanBeban() {
 
   return (
     <div className="mx-auto max-w-3xl space-y-4 px-fluid pb-24">
-      <SectionTitle icon={<IconRun size={20} />} title="Latihan Beban" subtitle="Set, ulangan, beban — dan apa yang boleh disimpulkan darinya" />
+      <SectionTitle icon={<IconRun size={20} />} title="Strength Training Log" subtitle="Sets, reps, weight — and what can honestly be concluded from them" />
 
       <Card className="!p-3">
-        <h2 className="text-[13px] font-black text-ink dark:text-white">Catat sesi</h2>
+        <h2 className="text-[13px] font-black text-ink dark:text-white">Log a session</h2>
         <div className="mt-2 grid grid-cols-2 gap-2">
           <label className="col-span-2">
-            <span className="text-[11px] font-bold text-neutral-500">Gerakan</span>
+            <span className="text-[11px] font-bold text-neutral-500">Movement</span>
             <input value={gerakan} onChange={(e) => setGerakan(e.target.value)} placeholder="Squat, bench press, deadlift…"
-              className={inputClass} aria-label="Gerakan" />
+              className={inputClass} aria-label="Movement" />
           </label>
           <label className="col-span-2">
-            <span className="text-[11px] font-bold text-neutral-500">Tanggal</span>
-            <input type="date" value={tanggal} max={hariIni()} onChange={(e) => setTanggal(e.target.value)} className={inputClass} aria-label="Tanggal" />
+            <span className="text-[11px] font-bold text-neutral-500">Date</span>
+            <input type="date" value={tanggal} max={hariIni()} onChange={(e) => setTanggal(e.target.value)} className={inputClass} aria-label="Date" />
           </label>
         </div>
 
@@ -76,12 +76,12 @@ export function LatihanBeban() {
           {set.map((s, i) => (
             <div key={i} className="flex items-center gap-2">
               <span className="w-10 shrink-0 text-[11px] font-bold text-neutral-500">Set {i + 1}</span>
-              <input type="number" min={0} inputMode="numeric" value={s.ulangan || ''} placeholder="ulangan"
+              <input type="number" min={0} inputMode="numeric" value={s.ulangan || ''} placeholder="reps"
                 onChange={(e) => ubahSet(i, 'ulangan', Number(e.target.value) || 0)}
-                className={inputClass} aria-label={`Ulangan set ${i + 1}`} />
+                className={inputClass} aria-label={`Reps for set ${i + 1}`} />
               <input type="number" min={0} step="0.5" inputMode="decimal" value={s.kg || ''} placeholder="kg"
                 onChange={(e) => ubahSet(i, 'kg', Number(e.target.value) || 0)}
-                className={inputClass} aria-label={`Beban set ${i + 1} dalam kilogram`} />
+                className={inputClass} aria-label={`Weight for set ${i + 1} in kilograms`} />
             </div>
           ))}
           <button onClick={() => setSet((s) => [...s, { ulangan: 0, kg: 0 }])}
@@ -95,8 +95,8 @@ export function LatihanBeban() {
             </span>
             {ramal && (
               <span className="block text-[11px] text-neutral-500">
-                Perkiraan 1RM {ramal.kg.toFixed(1)} kg dari {ramal.dariKg} kg × {ramal.dariUlangan}
-                {ramal.raguh && ' — di atas 10 ulangan, persamaannya melemah'}
+                Estimated 1RM {ramal.kg.toFixed(1)} kg from {ramal.dariKg} kg × {ramal.dariUlangan}
+                {ramal.raguh && ' — above 10 reps the equation weakens'}
               </span>
             )}
           </div>
@@ -104,13 +104,13 @@ export function LatihanBeban() {
 
         <button onClick={simpan} disabled={!gerakan.trim() || !volumeBaru}
           className="mt-2 flex h-11 w-full items-center justify-center rounded-xl bg-brand text-[13px] font-black text-white disabled:opacity-40">
-          Simpan sesi
+          Save session
         </button>
       </Card>
 
       {adaVolume && (
         <Card className="!p-3">
-          <h2 className="text-[13px] font-black text-ink dark:text-white">Volume 8 minggu</h2>
+          <h2 className="text-[13px] font-black text-ink dark:text-white">8-week volume</h2>
           <div className="mt-2 flex h-24 items-end gap-1">
             {mingguan.map((m) => (
               <span key={m.mulai} className="flex flex-1 flex-col items-center gap-1">
@@ -120,44 +120,44 @@ export function LatihanBeban() {
             ))}
           </div>
           <p className="mt-1 text-[11px] leading-snug text-neutral-500">
-            Volume beban total per minggu, dalam ribuan kilogram. Ini penjumlahan set × ulangan × beban — bukan model,
-            bukan skor.
+            Total load volume per week, in thousands of kilograms. This is the sum of sets × reps × weight — not a
+            model, not a score.
           </p>
         </Card>
       )}
 
       {rekor.length > 0 && (
         <Card className="!p-3">
-          <h2 className="text-[13px] font-black text-ink dark:text-white">Rekor per gerakan</h2>
+          <h2 className="text-[13px] font-black text-ink dark:text-white">Records per movement</h2>
           <div className="mt-2 divide-y divide-neutral-100 dark:divide-white/10">
             {rekor.map((r) => (
               <div key={r.gerakan} className="py-2">
                 <div className="flex items-baseline justify-between gap-2">
                   <span className="min-w-0 truncate text-[12.5px] font-bold text-ink dark:text-white">{r.gerakan}</span>
                   <span className="shrink-0 text-[11px] tabular-nums text-neutral-500">
-                    terberat <b className="text-ink dark:text-white">{r.bebanTerberat} kg</b> · {r.sesi} sesi
+                    heaviest <b className="text-ink dark:text-white">{r.bebanTerberat} kg</b> · {r.sesi} sessions
                   </span>
                 </div>
                 <span className="text-[11px] text-neutral-500">
-                  Perkiraan 1RM {r.terbaik1RM.kg.toFixed(1)} kg
-                  <span className="opacity-75"> (dari {r.terbaik1RM.dariKg} kg × {r.terbaik1RM.dariUlangan})</span>
-                  {r.terbaik1RM.raguh && <span className="text-amber-600"> · di atas 10 ulangan</span>}
-                  {' · '}volume {Math.round(r.volumeTotal).toLocaleString('id-ID')} kg
+                  Estimated 1RM {r.terbaik1RM.kg.toFixed(1)} kg
+                  <span className="opacity-75"> (from {r.terbaik1RM.dariKg} kg × {r.terbaik1RM.dariUlangan})</span>
+                  {r.terbaik1RM.raguh && <span className="text-amber-600"> · above 10 reps</span>}
+                  {' · '}volume {Math.round(r.volumeTotal).toLocaleString('en-GB')} kg
                 </span>
               </div>
             ))}
           </div>
           <p className="mt-2 text-[11px] leading-snug text-neutral-500">
-            Perkiraan 1RM memakai Epley (1985): 1RM = beban × (1 + ulangan/30). Persamaan ini dicocokkan pada ulangan
-            rendah; di atas sepuluh ulangan sebaran antarorang melebar tajam dan angkanya menjadi tebakan — karena itu
-            ditandai, bukan disembunyikan. <b>Jangan dipakai sebagai beban percobaan</b> tanpa penjaga.
+            The estimated 1RM uses Epley (1985): 1RM = weight × (1 + reps/30). This equation is fitted to low
+            reps; above ten reps the spread between people widens sharply and the figure becomes a guess — which is
+            why it is flagged, not hidden. <b>Do not use it as a weight to attempt</b> without a spotter.
           </p>
         </Card>
       )}
 
       {semua.length > 0 && (
         <Card className="!p-3">
-          <h2 className="text-[13px] font-black text-ink dark:text-white">Sesi tersimpan</h2>
+          <h2 className="text-[13px] font-black text-ink dark:text-white">Saved sessions</h2>
           <div className="mt-2 divide-y divide-neutral-100 dark:divide-white/10">
             {semua.slice(0, 20).map((s) => (
               <div key={s.id} className="flex items-baseline justify-between gap-2 py-2">

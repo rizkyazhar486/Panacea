@@ -173,7 +173,7 @@ export function PencarianGlobal({ buka, tutup }: { buka: boolean; tutup: () => v
   return (
     <Portal>
       <div className="fixed inset-0 z-[90] flex items-start justify-center bg-black/60 p-0 pt-0 sm:pt-16"
-        onClick={tutup} role="dialog" aria-modal="true" aria-label="Pencarian">
+        onClick={tutup} role="dialog" aria-modal="true" aria-label="Search">
         <div className="max-h-full w-full max-w-lg overflow-hidden rounded-none bg-slate-900 sm:max-h-[70vh] sm:rounded-3xl"
           onClick={(e) => e.stopPropagation()}>
           <div className="flex items-center gap-2 border-b border-white/10 px-4 py-3">
@@ -181,33 +181,33 @@ export function PencarianGlobal({ buka, tutup }: { buka: boolean; tutup: () => v
             <input
               ref={kotak}
               className="min-w-0 flex-1 bg-transparent text-[15px] text-white outline-none placeholder:text-slate-500"
-              placeholder="Fitur, penyakit, obat, skor, orang, #tagar…"
+              placeholder="Features, diseases, drugs, scores, people, #hashtags…"
               value={q}
               onChange={(e) => setQ(e.target.value)}
               onKeyDown={padaTombol}
-              aria-label="Cari fitur, penyakit, obat, orang, atau tagar"
+              aria-label="Search features, diseases, drugs, people, or hashtags"
             />
-            <button onClick={tutup} aria-label="Tutup pencarian"
-              className="shrink-0 rounded-lg bg-white/5 px-2.5 py-1 text-[11px] font-bold text-slate-300">Tutup</button>
+            <button onClick={tutup} aria-label="Close search"
+              className="shrink-0 rounded-lg bg-white/5 px-2.5 py-1 text-[11px] font-bold text-slate-300">Close</button>
           </div>
 
           <div className="max-h-[calc(100vh-64px)] overflow-y-auto p-2 sm:max-h-[calc(70vh-64px)]">
             {!q.trim() && (
               <p className="px-3 py-6 text-center text-[12px] leading-relaxed text-slate-500">
-                Ketik apa saja: nama fitur, penyakit, obat, kalkulator, stasiun OSCE, orang, atau #tagar.
-                {jumlahIndeks > 0 && <><br />{jumlahIndeks.toLocaleString('id-ID')} hal terindeks.</>}
+                Type anything: a feature name, disease, drug, calculator, OSCE station, person, or #hashtag.
+                {jumlahIndeks > 0 && <><br />{jumlahIndeks.toLocaleString('en-GB')} things indexed.</>}
               </p>
             )}
 
             {q.trim() && semua.length === 0 && (
               <p className="px-3 py-6 text-center text-[12px] text-slate-500">
-                Tidak ada yang cocok dengan "{q}".
+                Nothing matches "{q}".
               </p>
             )}
 
             {fitur.length > 0 && (
               <div className="mb-1">
-                <div className="px-3 py-1 text-[10px] font-black uppercase tracking-wide text-slate-500">Fitur</div>
+                <div className="px-3 py-1 text-[10px] font-black uppercase tracking-wide text-slate-500">Features</div>
                 {fitur.map((f, i) => (
                   <button key={f.to} onClick={() => pergi(f.to)}
                     className={`flex w-full items-center justify-between gap-3 rounded-xl px-3 py-2 text-left ${
@@ -240,13 +240,13 @@ export function PencarianGlobal({ buka, tutup }: { buka: boolean; tutup: () => v
 
             {tagar.length > 0 && (
               <div className="mb-1">
-                <div className="px-3 py-1 text-[10px] font-black uppercase tracking-wide text-slate-500">Tagar</div>
+                <div className="px-3 py-1 text-[10px] font-black uppercase tracking-wide text-slate-500">Hashtags</div>
                 {tagar.map((h) => (
                   <button key={h.tag} onClick={() => pergi(`/jelajah?tag=${h.tag}`)}
                     className={`flex w-full items-center justify-between gap-3 rounded-xl px-3 py-2 text-left ${
                       semua[sorot]?.kunci === 't' + h.tag ? 'bg-brand/25' : 'hover:bg-white/5'}`}>
                     <span className="min-w-0 flex-1 truncate text-[13px] font-bold text-white">#{h.tag}</span>
-                    <span className="shrink-0 text-[10px] text-slate-500">{h.jumlah} kiriman</span>
+                    <span className="shrink-0 text-[10px] text-slate-500">{h.jumlah} posts</span>
                   </button>
                 ))}
               </div>

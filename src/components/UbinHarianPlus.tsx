@@ -24,7 +24,7 @@ function Kepala({ judul, ke, kanan }: { judul: string; ke?: string; kanan?: Reac
   return (
     <div className="mb-2 flex items-baseline justify-between gap-2">
       <h2 className="t-kecil font-black uppercase tracking-wide text-neutral-500">{judul}</h2>
-      {kanan ?? (ke ? <Link to={ke} className="t-kecil flex min-h-[40px] items-center font-bold text-brand">Buka →</Link> : null)}
+      {kanan ?? (ke ? <Link to={ke} className="t-kecil flex min-h-[40px] items-center font-bold text-brand">Open →</Link> : null)}
     </div>
   )
 }
@@ -65,7 +65,7 @@ export function UbinTenaga() {
   const kini = (state.wellness ?? {})[hariIni]?.tenaga ?? 0
   const terisi = deret.filter((x) => x > 0)
   const biasa = median(terisi)
-  const LABEL = ['Habis', 'Lemas', 'Biasa', 'Segar', 'Penuh']
+  const LABEL = ['Empty', 'Low', 'Normal', 'Fresh', 'Full']
 
   return (
     <section>
@@ -135,7 +135,7 @@ export function UbinHidrasi() {
               </button>
             ))}
             {ml > 0 && (
-              <button onClick={() => tambah(-250)} aria-label="Kurangi 250 mL" className="t-mikro min-h-[40px] px-1 font-black text-neutral-400">−</button>
+              <button onClick={() => tambah(-250)} aria-label="Subtract 250 mL" className="t-mikro min-h-[40px] px-1 font-black text-neutral-400">−</button>
             )}
           </span>
         }
@@ -144,7 +144,7 @@ export function UbinHidrasi() {
         <div className="flex items-baseline gap-1.5">
           <span className="text-[26px] font-black leading-none tabular-nums nyala text-ink dark:text-white">{(ml / 1000).toFixed(1)}</span>
           <span className="t-mikro font-bold text-neutral-400">liter</span>
-          {biasa > 0 && <span className="t-mikro ml-auto shrink-0 tabular-nums text-neutral-400">biasanya {(biasa / 1000).toFixed(1)} L</span>}
+          {biasa > 0 && <span className="t-mikro ml-auto shrink-0 tabular-nums text-neutral-400">usually {(biasa / 1000).toFixed(1)} L</span>}
         </div>
         <span className="mt-2 block h-2.5 w-full rounded-full bg-neutral-200 dark:bg-white/10" aria-hidden>
           <span className="block h-full rounded-full bg-sky-400" style={{ width: `${Math.min(100, (ml / Math.max(2000, biasa)) * 100)}%` }} />
@@ -184,7 +184,7 @@ export function UbinCahaya() {
             onClick={() => logWellness(hariIni, { sunDone: !sudah })}
             className={`t-kecil flex min-h-[40px] items-center font-bold ${sudah ? 'text-neutral-500' : 'text-brand'}`}
           >
-            {sudah ? 'Batalkan' : 'Done ✓'}
+            {sudah ? 'Undo' : 'Done ✓'}
           </button>
         }
       />
@@ -193,7 +193,7 @@ export function UbinCahaya() {
           <span className="text-[26px] font-black leading-none tabular-nums nyala text-ink dark:text-white">{rangkaian}</span>
           <span className="t-mikro font-bold text-neutral-400">days in a row</span>
           {menitPerangkat != null && (
-            <span className="t-mikro ml-auto shrink-0 tabular-nums text-neutral-400">{Math.round(menitPerangkat)} mnt di luar (perangkat)</span>
+            <span className="t-mikro ml-auto shrink-0 tabular-nums text-neutral-400">{Math.round(menitPerangkat)} min outside (device)</span>
           )}
         </div>
         <p className="t-mikro mt-1.5 leading-snug text-neutral-400">
@@ -218,7 +218,7 @@ export function UbinTangga() {
         <div className="flex items-baseline gap-1.5">
           <span className="text-[26px] font-black leading-none tabular-nums nyala text-ink dark:text-white">{Math.round(kini)}</span>
           <span className="t-mikro font-bold text-neutral-400">floors today</span>
-          {biasa > 0 && <span className="t-mikro ml-auto shrink-0 tabular-nums text-neutral-400">biasanya {Math.round(biasa)}</span>}
+          {biasa > 0 && <span className="t-mikro ml-auto shrink-0 tabular-nums text-neutral-400">usually {Math.round(biasa)}</span>}
         </div>
         {deret.length >= 3 && (
           <span className="mt-2 flex h-10 items-end gap-[3px]" aria-hidden>
@@ -241,7 +241,7 @@ export function UbinVo2Tren() {
     const dariLog = (state.vo2maxLog ?? [])
       .filter((e) => e?.at && typeof e.value === 'number' && e.value > 0)
       .map((e) => ({ t: Date.parse(e.at), v: e.value, cara: e.method }))
-    const dariPerangkat = deretMetrik('vo2max').map((x) => ({ t: Date.parse(x.tanggal), v: x.nilai, cara: 'Perangkat' }))
+    const dariPerangkat = deretMetrik('vo2max').map((x) => ({ t: Date.parse(x.tanggal), v: x.nilai, cara: 'Device' }))
     return [...dariLog, ...dariPerangkat].filter((x) => Number.isFinite(x.t)).sort((a, b) => a.t - b.t).slice(-12)
   }, [state.vo2maxLog])
 
@@ -262,14 +262,14 @@ export function UbinVo2Tren() {
           <span className="text-[26px] font-black leading-none tabular-nums nyala text-ink dark:text-white">{akhir.v.toFixed(1)}</span>
           <span className="t-mikro font-bold text-neutral-400">mL/kg/mnt</span>
           <span className="t-mikro ml-auto shrink-0 tabular-nums text-neutral-500">
-            {selisih >= 0 ? '+' : '−'}{Math.abs(selisih).toFixed(1)} sejak bacaan pertama
+            {selisih >= 0 ? '+' : '−'}{Math.abs(selisih).toFixed(1)} since the first reading
           </span>
         </div>
         <svg viewBox="0 0 100 36" preserveAspectRatio="none" className="mt-2 h-11 w-full" role="img" aria-label={`${daftar.length} VO2max readings`}>
           <polyline points={titik} fill="none" stroke="currentColor" strokeWidth="1.8" vectorEffect="non-scaling-stroke" strokeLinejoin="round" className="text-brand" />
         </svg>
         <p className="t-mikro mt-1 leading-snug text-neutral-400">
-          Cara ukur terakhir: {akhir.cara ?? 'not logged'}. Angka dari jam tangan dan dari tes lapangan tidak selalu sebanding — yang dibaca arahnya, bukan selisih satu bacaan.
+          Last measured by: {akhir.cara ?? 'not logged'}. Watch estimates and field tests are not always comparable — what matters is the direction, not one reading's difference.
         </p>
       </div>
     </section>
@@ -298,7 +298,7 @@ export function UbinKomposisi() {
           <span className="t-mikro font-bold text-neutral-400">kg</span>
           {deretBerat.length >= 5 && (
             <span className="t-mikro ml-auto shrink-0 tabular-nums text-neutral-500">
-              {(berat - deretBerat[0] >= 0 ? '+' : '−')}{Math.abs(berat - deretBerat[0]).toFixed(1)} kg dalam {deretBerat.length} bacaan
+              {(berat - deretBerat[0] >= 0 ? '+' : '−')}{Math.abs(berat - deretBerat[0]).toFixed(1)} kg over {deretBerat.length} readings
             </span>
           )}
         </div>
@@ -310,7 +310,7 @@ export function UbinKomposisi() {
               <span className="h-full bg-brand" style={{ width: `${(sisa / berat) * 100}%` }} />
             </span>
             <div className="mt-1.5 flex items-baseline justify-between gap-2">
-              <span className="t-mikro text-neutral-500">Lemak <b className="text-ink dark:text-white">{massaLemak.toFixed(1)} kg</b> ({lemak.toFixed(1)}%)</span>
+              <span className="t-mikro text-neutral-500">Fat <b className="text-ink dark:text-white">{massaLemak.toFixed(1)} kg</b> ({lemak.toFixed(1)}%)</span>
               <span className="t-mikro text-neutral-500">
                 {otot > 0 ? <>Skeletal muscle <b className="text-ink dark:text-white">{otot.toFixed(1)} kg</b></> : <>Remainder <b className="text-ink dark:text-white">{sisa.toFixed(1)} kg</b></>}
               </span>
@@ -346,7 +346,7 @@ export function UbinSuplemen() {
         judul="Supplements today"
         kanan={
           <button onClick={() => setBuka((v) => !v)} className="t-kecil flex min-h-[40px] items-center font-bold text-brand">
-            {buka ? 'Tutup' : '+ Tambah'}
+            {buka ? 'Close' : '+ Add'}
           </button>
         }
       />
@@ -366,15 +366,15 @@ export function UbinSuplemen() {
               aria-label="Time to take"
               className="t-kecil shrink-0 rounded-xl border border-neutral-200 bg-transparent px-1.5 text-ink dark:border-white/12 dark:text-white"
             >
-              <option value="pagi">Pagi</option>
-              <option value="siang">Siang</option>
-              <option value="malam">Malam</option>
+              <option value="pagi">Morning</option>
+              <option value="siang">Afternoon</option>
+              <option value="malam">Evening</option>
             </select>
             <button
               onClick={() => { tambahSuplemen(nama, waktu); setNama(''); setBuka(false) }}
               className="t-kecil shrink-0 rounded-xl bg-brand px-3 font-bold text-white"
             >
-              Simpan
+              Save
             </button>
           </div>
         )}
@@ -449,7 +449,7 @@ export function UbinSuhuEkstrem() {
         kanan={
           <span className="flex items-center gap-1">
             <button onClick={() => { catatSesiSuhu('panas', 15); setVersi((v) => v + 1) }} className="t-mikro min-h-[40px] rounded-lg bg-orange-500 px-2 font-black text-white">+ Sauna</button>
-            <button onClick={() => { catatSesiSuhu('dingin', 3); setVersi((v) => v + 1) }} className="t-mikro min-h-[40px] rounded-lg bg-sky-500 px-2 font-black text-white">+ Dingin</button>
+            <button onClick={() => { catatSesiSuhu('dingin', 3); setVersi((v) => v + 1) }} className="t-mikro min-h-[40px] rounded-lg bg-sky-500 px-2 font-black text-white">+ Cold</button>
           </span>
         }
       />
@@ -467,7 +467,7 @@ export function UbinSuhuEkstrem() {
               {dingin == null ? '—' : dingin === 0 ? 'today' : `${dingin} d`}
             </span>
           </span>
-          <span className="t-mikro ml-auto shrink-0 text-neutral-400">{pekanIni} sesi pekan ini</span>
+          <span className="t-mikro ml-auto shrink-0 text-neutral-400">{pekanIni} sessions this week</span>
         </div>
         <p className="t-mikro mt-2 leading-snug text-neutral-400">
           Logged as an activity, not as therapy: the strongest human evidence for sauna use is observational, not large randomised trials.</p>

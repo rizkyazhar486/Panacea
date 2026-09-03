@@ -74,7 +74,7 @@ export function ArtiKebugaran({
         className="flex min-h-[40px] w-full items-center justify-between gap-2 text-left"
       >
         <span className="text-[10px] font-black uppercase tracking-wide text-slate-500">
-          Apa arti angka ini?
+          What do these numbers mean?
         </span>
         <span aria-hidden className="text-[11px] font-black text-slate-400">{buka ? '▲' : '▼'}</span>
       </button>
@@ -82,49 +82,49 @@ export function ArtiKebugaran({
       {buka && (
         <div className="space-y-2.5 pb-1 text-[11.5px] leading-snug text-slate-400">
           <p>
-            <b className="text-slate-200">Kebugaran {Math.round(kebugaran)}</b> — rata-rata beban
-            latihan Anda selama <b>42 hari</b> terakhir. Karena rentangnya sepanjang itu, ia memang
-            BERGERAK SANGAT LAMBAT: satu sesi berat hanya menggesernya sekitar satu angka. Bila
-            latihan Anda tetap, ia akan mendatar di satu angka dan bertahan di situ berminggu-minggu.
-            Itu bukan tanda macet — itu justru artinya beban Anda stabil.
+            <b className="text-slate-200">Fitness {Math.round(kebugaran)}</b> — your average training
+            load over the last <b>42 days</b>. Because the window is that long, it genuinely
+            MOVES VERY SLOWLY: one hard session shifts it by only about one point. If your
+            training stays the same, it will flatten at one figure and sit there for weeks.
+            That is not a sign of stalling — it means your load is stable.
           </p>
           <p>
-            <b className="text-slate-200">Kelelahan {Math.round(kelelahan)}</b> — beban{' '}
-            <b>7 hari</b> terakhir. Naik cepat setelah sesi berat, dan surut dalam beberapa hari
-            istirahat.
+            <b className="text-slate-200">Fatigue {Math.round(kelelahan)}</b> — your load over
+            the last <b>7 days</b>. It rises quickly after a hard session, and fades within a few
+            days of rest.
           </p>
           <p>
-            <b className="text-slate-200">Kesegaran {Math.round(kesegaran)}</b> = kebugaran dikurangi
-            kelelahan. Pada latihan yang rutin, angka ini WAJAR berada di sekitar nol atau sedikit
-            minus — itu berarti beban dan pemulihan sepadan, bukan berarti Anda kelelahan. Ia baru
-            menjadi positif besar setelah Anda benar-benar mengurangi latihan beberapa hari.
+            <b className="text-slate-200">Freshness {Math.round(kesegaran)}</b> = fitness minus
+            fatigue. During regular training, this figure NORMALLY sits around zero or slightly
+            negative — that means load and recovery are matched, not that you are exhausted. It
+            only turns strongly positive once you genuinely cut back training for several days.
           </p>
           <p className="text-slate-300">{arti}</p>
 
           <div className="rounded-xl bg-white/5 p-2.5">
             <div className="text-[10px] font-black uppercase tracking-wide text-slate-500">
-              Yang dipakai menghitung
+              What goes into this calculation
             </div>
             <ul className="mt-1 space-y-0.5">
-              <li>Sesi 7 hari terakhir: <b className="text-slate-200">{d.pekan}</b></li>
-              <li>Sesi 42 hari terakhir: <b className="text-slate-200">{d.enamPekan}</b></li>
+              <li>Sessions in the last 7 days: <b className="text-slate-200">{d.pekan}</b></li>
+              <li>Sessions in the last 42 days: <b className="text-slate-200">{d.enamPekan}</b></li>
               <li>
-                Latihan terakhir:{' '}
+                Last workout:{' '}
                 <b className="text-slate-200">
-                  {d.hariSejakTerakhir === null ? 'belum ada'
-                    : d.hariSejakTerakhir === 0 ? 'hari ini'
-                      : `${d.hariSejakTerakhir} hari lalu`}
+                  {d.hariSejakTerakhir === null ? 'none yet'
+                    : d.hariSejakTerakhir === 0 ? 'today'
+                      : `${d.hariSejakTerakhir} d ago`}
                 </b>
               </li>
-              <li>Panjang riwayat: <b className="text-slate-200">{d.umurRiwayat} hari</b></li>
+              <li>History length: <b className="text-slate-200">{d.umurRiwayat} days</b></li>
             </ul>
           </div>
 
           <p>
-            <b className="text-slate-200">Yang akan menggerakkannya.</b> Kesegaran naik bila Anda
-            beristirahat 3-5 hari — kelelahan surut lebih dahulu. Kebugaran hanya naik bila beban
-            rata-rata Anda benar-benar bertambah dan ditahan berminggu-minggu; menambah satu sesi
-            berat lalu kembali seperti semula tidak akan mengubahnya.
+            <b className="text-slate-200">What actually moves it.</b> Freshness rises if you
+            rest for 3-5 days — fatigue fades first. Fitness only rises if your average load
+            genuinely increases and is held for weeks; adding one hard session then returning
+            to normal will not change it.
           </p>
         </div>
       )}
