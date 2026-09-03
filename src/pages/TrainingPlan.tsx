@@ -355,7 +355,7 @@ function RunnerCoach() {
         </div>
         {flags.length > 0 && (
           <div className="mt-2 rounded-xl bg-white p-3 text-[11px] leading-relaxed text-rose-700">
-            <b>Hentikan dulu — periksakan diri ke dokter sebelum latihan intensitas tinggi atau Tes Cooper.</b> The symptoms you flagged (especially dizziness/near-fainting or chest pain during exercise) should be evaluated (ECG + cardiac exam) to confirm it's safe. In the meantime, limit yourself to brisk walking and never train to the point of near-fainting.
+            <b>Hold off — see a doctor before high-intensity training or the Cooper Test.</b> The symptoms you flagged (especially dizziness/near-fainting or chest pain during exercise) should be evaluated (ECG + cardiac exam) to confirm it's safe. In the meantime, limit yourself to brisk walking and never train to the point of near-fainting.
             <div className="mt-2"><a href="#/consult" className="font-bold underline">Consult a doctor</a> · <a href="#/hospitals" className="font-bold underline">Nearest facility</a></div>
           </div>
         )}
@@ -377,7 +377,7 @@ function RunnerCoach() {
         <Field label="Time (minutes)"><input className={inputClass} type="number" value={min || ''} placeholder="e.g. 25" onChange={(e) => setMin(+e.target.value)} /></Field>
         <Field label="How hard did it feel?">
           <select className={inputClass} value={effort} onChange={(e) => setEffort(e.target.value as typeof effort)}>
-            <option value="easy">Ringan (masih bisa mengobrol)</option>
+            <option value="easy">Easy (can still hold a conversation)</option>
             <option value="moderate">Moderate (fairly hard)</option>
             <option value="hard">All-out (maximal)</option>
           </select>
@@ -677,7 +677,7 @@ export function TrainingPlan() {
       {/* Year macrocycle */}
       {view === 'tahun' && (
         <Card className="!p-5">
-          <SectionTitle icon={<IconChartUp size={20} />} title="12-Month Macrocycle" subtitle="Periodisasi setahun menuju satu puncak — pola tim juara" />
+          <SectionTitle icon={<IconChartUp size={20} />} title="12-Month Macrocycle" subtitle="A year of periodization toward a single peak — the pattern used by championship teams" />
           <div className="mt-3 space-y-2">
             {[
               { p: 'Month 1-3 · Base', desc: 'Aerobic foundation (Zone 2 dominant) + basic technique & strength. ACWR stable at 0.9-1.1.' },
