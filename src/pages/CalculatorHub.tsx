@@ -161,10 +161,10 @@ export function CalculatorHub() {
             di halaman itu kini ikut terdaftar dan ikut tercari dari sini, dan
             menekannya mendarat langsung pada alatnya. */}
         <p className="mt-2 text-[12px] text-neutral-500">
-          Mencari semuanya sekaligus? Setiap alat di aplikasi ini terdaftar di sini —
-          termasuk yang tampil sebagai tab di{' '}
+          Looking for everything at once? Every tool in this app is listed here —
+          including the ones that appear as tabs on{' '}
           <a href="#/clinical-calculators" className="font-bold text-brand-dark">Clinical Calculators</a>.
-          Menekannya membuka langsung pada alat itu.
+          Tapping one takes you straight to that tool.
         </p>
       </Card>
 
