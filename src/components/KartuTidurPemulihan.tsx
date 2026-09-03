@@ -19,10 +19,10 @@ import { deretMetrik } from '../lib/riwayatVitals'
 // ─────────────────────────────────────────────────────────────────────────────
 
 const TAHAP = [
-  { kunci: 'sleepDeepH', label: 'Dalam', warna: '#4f46e5' },
+  { kunci: 'sleepDeepH', label: 'Deep', warna: '#4f46e5' },
   { kunci: 'sleepRemH', label: 'REM', warna: '#a78bfa' },
-  { kunci: 'sleepCoreH', label: 'Inti', warna: '#818cf8' },
-  { kunci: 'sleepAwakeH', label: 'Terjaga', warna: '#cbd5e1' },
+  { kunci: 'sleepCoreH', label: 'Core', warna: '#818cf8' },
+  { kunci: 'sleepAwakeH', label: 'Awake', warna: '#cbd5e1' },
 ] as const
 
 function num(x: unknown): number | null {
@@ -56,14 +56,14 @@ export function KartuTidurPemulihan() {
   return (
     <div className="kaca rounded-3xl p-3">
       <div className="mb-2 flex items-baseline justify-between gap-2">
-        <h2 className="text-[13px] font-black text-ink dark:text-white">Tidur &amp; pemulihan</h2>
-        {rataMalam && <span className="text-[10px] text-neutral-500">rata {malam.length} malam {rataMalam.toFixed(1)} jam</span>}
+        <h2 className="text-[13px] font-black text-ink dark:text-white">Sleep &amp; recovery</h2>
+        {rataMalam && <span className="text-[10px] text-neutral-500">avg {malam.length} nights {rataMalam.toFixed(1)} hrs</span>}
       </div>
 
       {total && (
         <div className="flex items-baseline gap-1.5">
           <span className="text-[26px] font-black leading-none tabular-nums text-ink dark:text-white">{total.toFixed(1)}</span>
-          <span className="text-[11px] font-bold text-neutral-400">jam semalam</span>
+          <span className="text-[11px] font-bold text-neutral-400">hrs last night</span>
         </div>
       )}
 
@@ -83,15 +83,15 @@ export function KartuTidurPemulihan() {
             ))}
           </div>
           <p className="mt-1.5 text-[10.5px] leading-snug text-neutral-500">
-            Tahapan ini <b>dugaan jam tangan</b> dari denyut dan gerak, bukan gelombang otak. Terhadap polisomnografi,
-            pembedaan dalam/REM lemah (de Zambotti dkk., 2019, Chest 156:1275-83) — yang tegas hanyalah lama tidurnya.
+            These stages are <b>the watch's estimate</b> from heart rate and movement, not brain waves. Against polysomnography,
+            the deep/REM distinction is weak (de Zambotti et al., 2019, Chest 156:1275-83) — only total sleep duration is solid.
           </p>
         </div>
       )}
 
       {malam.length >= 3 && (
         <div className="mt-3">
-          <span className="text-[10px] font-black uppercase tracking-wide text-neutral-500">{malam.length} malam terakhir</span>
+          <span className="text-[10px] font-black uppercase tracking-wide text-neutral-500">last {malam.length} nights</span>
           <div className="mt-1 flex h-16 items-end gap-1">
             {malam.map((m, i) => (
               <span key={i} className="flex-1 rounded-t bg-indigo-400/70" style={{ height: `${Math.max(3, (m / maks) * 60)}px` }} />
@@ -110,13 +110,13 @@ export function KartuTidurPemulihan() {
           )}
           {istirahat && (
             <span className="rounded-xl bg-black/[0.03] p-2 dark:bg-white/5">
-              <span className="block text-[9.5px] font-bold uppercase tracking-wide text-neutral-500">Denyut</span>
+              <span className="block text-[9.5px] font-bold uppercase tracking-wide text-neutral-500">Heart rate</span>
               <span className="block text-[16px] font-black tabular-nums text-ink dark:text-white">{Math.round(istirahat)}<span className="text-[10px] font-bold text-neutral-400"> bpm</span></span>
             </span>
           )}
           {pulih && (
             <span className="rounded-xl bg-black/[0.03] p-2 dark:bg-white/5">
-              <span className="block text-[9.5px] font-bold uppercase tracking-wide text-neutral-500">Pemulihan</span>
+              <span className="block text-[9.5px] font-bold uppercase tracking-wide text-neutral-500">Recovery</span>
               <span className="block text-[16px] font-black tabular-nums text-ink dark:text-white">{Math.round(pulih)}<span className="text-[10px] font-bold text-neutral-400"> %</span></span>
             </span>
           )}
@@ -124,8 +124,8 @@ export function KartuTidurPemulihan() {
       )}
 
       <p className="mt-2 text-[10.5px] leading-snug text-neutral-500">
-        Tidak ada skor tidur gabungan di sini. Menggabungkan lama, tahap, dan gangguan dengan bobot pilihan sendiri
-        menghasilkan satu angka yang terlihat pasti justru pada bagian yang paling tidak pasti.
+        There is no combined sleep score here. Combining duration, stages, and disruption with self-chosen
+        weights produces a single number that looks certain precisely where it is least certain.
       </p>
     </div>
   )

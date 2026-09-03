@@ -89,7 +89,7 @@ export function KolomPelatih({
       {/* 1. Apa berikutnya */}
       <Card>
         <SectionTitle icon={<IconRun />} title="Next session"
-          subtitle="Disusun dari sesi terakhir Anda, berapa lama sejak itu, dan kelelahan yang masih tertinggal" />
+          subtitle="Built from your last session, how long ago it was, and remaining fatigue" />
         <div className="mt-3 rounded-2xl p-4" style={{ background: `${saran.warna}14`, border: `1px solid ${saran.warna}33` }}>
           <div className="flex flex-wrap items-baseline justify-between gap-2">
             <span className="text-lg font-black" style={{ color: saran.warna }}>{saran.judul}</span>
@@ -157,8 +157,8 @@ export function KolomPelatih({
 
       {/* 3. Jadwal pekan */}
       <Card>
-        <SectionTitle icon={<IconTimer />} title="Rencana pekan ini"
-          subtitle="Dua sesi bermutu, satu sesi panjang, sisanya ringan — sengaja dibuat sederhana" />
+        <SectionTitle icon={<IconTimer />} title="This week's plan"
+          subtitle="Two quality sessions, one long session, the rest easy — deliberately kept simple" />
         <div className="mt-3 space-y-1.5">
           {jadwal.map((h) => (
             <div key={h.tanggal}
@@ -223,13 +223,13 @@ function lamanya(ms: number): string {
   const hari = Math.floor(menit / 1440)
   const jam = Math.floor((menit % 1440) / 60)
   const sisa = menit % 60
-  if (hari) return jam ? `${hari} hari ${jam} jam` : `${hari} hari`
-  if (jam) return sisa ? `${jam} jam ${sisa} menit` : `${jam} jam`
-  return `${sisa} menit`
+  if (hari) return jam ? `${hari}d ${jam}h` : `${hari}d`
+  if (jam) return sisa ? `${jam}h ${sisa}m` : `${jam}h`
+  return `${sisa}m`
 }
 
-const HARI = ['Min', 'Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab']
-const BULAN = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des']
+const HARI = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
+const BULAN = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
 
 function kapan(iso: string): string {
   const d = new Date(iso)
@@ -261,7 +261,7 @@ function SejakTerakhir({ jedaMs, nama, mulai, kelelahanKini, proyeksi }: {
   return (
     <div className="mt-3 rounded-2xl bg-white/5 p-3">
       <div className="flex flex-wrap items-baseline gap-x-2">
-        <span className="text-[11px] uppercase tracking-wide text-slate-500">⏱ Sejak latihan terakhir</span>
+        <span className="text-[11px] uppercase tracking-wide text-slate-500">⏱ Since last session</span>
         <span className="text-[15px] font-black tabular-nums text-slate-200">{lamanya(jedaMs)}</span>
       </div>
       {(nama || mulai) && (
@@ -272,7 +272,7 @@ function SejakTerakhir({ jedaMs, nama, mulai, kelelahanKini, proyeksi }: {
 
       {kelelahanKini !== null && proyeksi.some((p) => p.kelelahan !== null) && (
         <div className="mt-2">
-          <div className="mb-1 text-[10px] uppercase tracking-wide text-slate-500">Kelelahan bila terus istirahat</div>
+          <div className="mb-1 text-[10px] uppercase tracking-wide text-slate-500">Fatigue if you keep resting</div>
           <div data-proyeksi className="flex flex-wrap items-center gap-x-1.5 gap-y-1 text-[12px] tabular-nums">
             <span data-kel className="rounded-md bg-red-500/15 px-2 py-0.5 font-black text-red-300">{kelelahanKini}</span>
             <span className="text-[10px] text-slate-500">kini</span>
@@ -294,8 +294,8 @@ function SejakTerakhir({ jedaMs, nama, mulai, kelelahanKini, proyeksi }: {
           hari terhitung sebagai "latihan hari ini". */}
       {baru && (
         <p className="mt-2 text-[11px] leading-relaxed text-amber-300/80">
-          Tercatat kurang dari sehari lalu. Kalau Anda sebenarnya sedang libur,
-          tanggal sesinya salah tercatat — itu yang menahan angka kelelahan.
+          Logged less than a day ago. If you're actually taking a rest day,
+          the session date was recorded wrong — that's what's holding the fatigue number up.
         </p>
       )}
     </div>

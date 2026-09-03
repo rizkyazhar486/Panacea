@@ -34,7 +34,7 @@ function BloodTrendForecaster() {
 
   return (
     <Card className="!p-5">
-      <Prosa kelas="text-[13px] text-neutral-500">Masukkan nilai sebuah penanda hayati beberapa tahun terakhir (mis. glukosa puasa, mg/dL) — regresi linear memproyeksikan trennya lima tahun ke depan bila tidak ada yang berubah.</Prosa>
+      <Prosa kelas="text-[13px] text-neutral-500">Enter a biomarker's values from the last few years (e.g. fasting glucose, mg/dL) — linear regression projects its trend five years ahead if nothing changes.</Prosa>
       <div className="mt-3 grid grid-cols-5 gap-1.5">
         {values.map((v, i) => (
           <Field key={i} label={`Yr ${i + 1}`}>
@@ -139,7 +139,7 @@ function OmegaRatio() {
         <div className="text-2xl font-black text-brand-dark">{ratio.toFixed(1)} : 1</div>
         <Badge tone={band[1] as 'brand' | 'low' | 'critical'}>{band[0]}</Badge>
       </div>
-      <Prosa kelas="mt-2 text-[12px] leading-relaxed text-neutral-500">Pola makan Barat kerap berada pada omega-6:3 sebesar 15:1-20:1; pola makan tradisional diperkirakan lebih dekat ke 1:1-4:1. Rasio yang lebih rendah diduga memihak keseimbangan eikosanoid yang kurang pro-radang — ini bidang penelitian yang masih berjalan, bukan sasaran klinis yang sudah disepakati.</Prosa>
+      <Prosa kelas="mt-2 text-[12px] leading-relaxed text-neutral-500">Western diets often sit at an omega-6:3 ratio of 15:1-20:1; traditional diets are estimated closer to 1:1-4:1. A lower ratio is thought to favor a less pro-inflammatory eicosanoid balance — this is an active area of research, not an agreed-upon clinical target.</Prosa>
     </Card>
   )
 }
@@ -229,7 +229,7 @@ function SupplementCombiner() {
           </div>
         ))}
       </div>
-      <Prosa kelas="mt-2 text-[11px] text-neutral-500">Model peluruhan eksponensial satu kompartemen yang disederhanakan — farmakokinetik sesungguhnya melibatkan fase penyerapan, metabolisme (CYP450), dan ragam antarorang yang tidak tertangkap di sini. Bukan nasihat medis; periksakan interaksi yang sebenarnya kepada apoteker.</Prosa>
+      <Prosa kelas="mt-2 text-[11px] text-neutral-500">A simplified single-compartment exponential-decay model — real pharmacokinetics involve an absorption phase, metabolism (CYP450), and person-to-person variation not captured here. Not medical advice; check real interactions with a pharmacist.</Prosa>
     </Card>
   )
 }

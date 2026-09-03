@@ -15,11 +15,11 @@ const SECTIONS: { id: Section; label: string; emoji: string }[] = [
   { id: 'case-bank', label: 'OSCE Case Bank', emoji: '📋' },
   { id: 'station-sim', label: 'Station Simulator', emoji: '🎭' },
   { id: 'skills', label: 'SKDI Skills Checklist', emoji: '✅' },
-  { id: 'procedures', label: 'Keterampilan Klinis', emoji: '🧰' },
+  { id: 'procedures', label: 'Clinical Skills', emoji: '🧰' },
   { id: 'therapy', label: 'SKDI Therapy Reference', emoji: '💊' },
-  { id: 'diseases', label: 'Daftar Penyakit SKDI', emoji: '📖' },
-  { id: 'mnemonik', label: 'Jembatan Keledai', emoji: '🔤' },
-  { id: 'techniques', label: 'Cara Belajar', emoji: '🧠' },
+  { id: 'diseases', label: 'SKDI Disease Directory', emoji: '📖' },
+  { id: 'mnemonik', label: 'Memory Aids', emoji: '🔤' },
+  { id: 'techniques', label: 'Study Techniques', emoji: '🧠' },
   { id: 'usmle', label: 'Preclinical & USMLE', emoji: '🎓' },
   { id: 'timeline', label: 'Exam Plan', emoji: '📅' },
 ]
@@ -66,7 +66,7 @@ export function MedStudyHub() {
         <SectionTitle
           icon={<IconBook size={20} />}
           title="Med Study Hub"
-          subtitle="Untuk OSCE · UKMPPD · koas · PPDS — latihan, teknik & menjaga kewarasan"
+          subtitle="For OSCE · UKMPPD · clinical clerkship · residency — practice, technique & staying sane"
         />
         {/* Motivation — honest encouragement for the grind */}
         <div className="mt-3 rounded-2xl bg-gradient-to-br from-brand-50 to-brand-100/40 p-4">
@@ -80,7 +80,7 @@ export function MedStudyHub() {
                  26 px. */
               className="flex h-10 shrink-0 items-center rounded-full bg-white/70 px-3 text-[11px] font-bold text-brand-dark transition active:scale-95"
             >
-              Kutipan lain →
+              Another quote →
             </button>
           </div>
         </div>
@@ -203,7 +203,7 @@ function PracticeBank() {
         </>
       )}
 
-      <Prosa kelas="mt-4 text-[10px] leading-relaxed text-neutral-500">Ini soal latihan asli yang ditulis mengikuti format dan cetak biru tiap ujian — bukan soal ujian sungguhan atau bocoran, yang hak ciptanya dipegang penyelenggara masing-masing. Bagi peserta UKMPPD: bank soal USMLE dan PLAB mengikuti kemampuan penalaran klinis dan cetak biru yang sama dengan yang menjadi acuan UKMPPD.</Prosa>
+      <Prosa kelas="mt-4 text-[10px] leading-relaxed text-neutral-500">These are original practice questions written to follow each exam's format and blueprint — not real exam questions or leaked material, which remain copyrighted by their respective organizers. For UKMPPD candidates: the USMLE and PLAB question banks follow the same clinical-reasoning skills and blueprint that UKMPPD itself is built on.</Prosa>
     </Card>
   )
 }
@@ -212,7 +212,7 @@ function OsceSection() {
   return (
     <div className="space-y-3">
       <Card className="!p-4">
-        <SectionTitle icon={<IconStethoscope size={20} />} title="OSCE Station Technique" subtitle="Nilai diberikan untuk perilaku yang dapat diamati — teknik sama dapat dinilainya dengan pengetahuan" />
+        <SectionTitle icon={<IconStethoscope size={20} />} title="OSCE Station Technique" subtitle="Marks are given for observable behavior — technique is graded as much as knowledge" />
       </Card>
       {OSCE_TECHNIQUE.map((tip) => (
         <Card key={tip.station} className="!p-4">
@@ -238,7 +238,7 @@ function TechniquesSection() {
   return (
     <div className="space-y-3">
       <Card className="!p-4">
-        <SectionTitle icon={<IconSparkle size={20} />} title="Cara Belajar" subtitle="Cara belajar yang berdasar bukti, diurutkan menurut besar pengaruhnya dalam pustaka ilmu belajar" />
+        <SectionTitle icon={<IconSparkle size={20} />} title="Study Techniques" subtitle="Evidence-based study methods, ordered by effect size in the learning-science literature" />
       </Card>
       {STUDY_TECHNIQUES.map((t) => (
         <Card key={t.title} className="!p-4">
@@ -258,7 +258,7 @@ function TimelineSection() {
   return (
     <div className="space-y-3">
       <Card className="!p-4">
-        <SectionTitle icon={<IconActivity size={20} />} title="Countdown Plan" subtitle="Rencana kerja untuk pekan-pekan menjelang OSCE / UKMPPD" />
+        <SectionTitle icon={<IconActivity size={20} />} title="Countdown Plan" subtitle="A work plan for the weeks leading up to OSCE / UKMPPD" />
       </Card>
       {EXAM_TIMELINE.map((item, i) => (
         <Card key={item.title} className="!p-4">
