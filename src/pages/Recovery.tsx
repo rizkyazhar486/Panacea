@@ -88,10 +88,10 @@ function SleepScoreCard() {
 
   return (
     <Card className="!p-5">
-      <SectionTitle icon={<IconMoon size={20} />} title="Skor Tidur" subtitle="Duration, time to fall asleep, awakenings, and how consistent your bedtime is" />
+      <SectionTitle icon={<IconMoon size={20} />} title="Sleep Score" subtitle="Duration, time to fall asleep, awakenings, and how consistent your bedtime is" />
       <p className="mt-2 rounded-xl bg-amber-500/10 px-3 py-2 text-[11px] leading-snug text-amber-800 dark:text-amber-300">
-        Bobot keempat bagian ini <b>pilihan penulis</b>, bukan skor tidur tervalidasi. Pakai perubahannya dari malam ke
-        malam pada diri sendiri. Untuk penilaian baku, PSQI (Buysse dkk., 1989) adalah yang lazim dipakai.
+        The weighting of these four components is <b>the author's choice</b>, not a validated sleep score. Use your own
+        night-to-night change. For a standardized assessment, the PSQI (Buysse et al., 1989) is the commonly used one.
       </p>
       <div className="mt-3 grid grid-cols-2 gap-3">
         <Field label={sleepFromDevice ? 'Total Sleep (hours) — from your device' : 'Total Sleep (hours)'}><input className={inputClass} type="number" step="0.5" value={hours} onChange={(e) => setHours(+e.target.value)} /></Field>
@@ -109,7 +109,7 @@ function SleepScoreCard() {
         <div><div className="text-sm font-black text-ink">{s.awakening}</div><div className="text-[10px] font-bold uppercase text-neutral-500">Awakenings</div></div>
         <div><div className="text-sm font-black text-ink">{s.consistency}</div><div className="text-[10px] font-bold uppercase text-neutral-500">Consistency</div></div>
       </div>
-      <Prosa kelas="mt-3 text-[10px] leading-relaxed text-neutral-500">Pembobotan: Lama tidur 40% (optimal 7-9 jam) · Waktu terlelap 20% (idealnya ≤15 menit) · Terbangun 20% (idealnya 0 kali) · Keajekan jam tidur 20% (idealnya menyimpang ≤30 menit dari biasanya) — pola ini mengikuti bagian inti Pittsburgh Sleep Quality Index (PSQI), disederhanakan untuk pemantauan harian sendiri. Bobot persennya pilihan penulis, bukan bobot PSQI yang tervalidasi.</Prosa>
+      <Prosa kelas="mt-3 text-[10px] leading-relaxed text-neutral-500">Weighting: Sleep duration 40% (optimal 7-9 hours) · Time to fall asleep 20% (ideally ≤15 minutes) · Awakenings 20% (ideally 0 times) · Bedtime consistency 20% (ideally within ≤30 minutes of usual) — this pattern follows the core of the Pittsburgh Sleep Quality Index (PSQI), simplified for daily self-monitoring. The percentage weights are the author's choice, not validated PSQI weights.</Prosa>
     </Card>
   )
 }
@@ -246,7 +246,7 @@ function MeditationCard() {
         <span className="text-[10px] font-bold uppercase text-neutral-500">Volume</span>
         <input type="range" min={0} max={0.5} step={0.01} value={volume} onChange={(e) => changeVolume(+e.target.value)} className="flex-1 accent-brand" />
       </div>
-      <Prosa kelas="mt-3 text-[10px] leading-relaxed text-neutral-500">Suara latar dibangkitkan langsung di perangkat Anda (Web Audio API) — bekerja sepenuhnya luring, tanpa bergantung pada layanan musik pihak ketiga yang belum tentu selalu dapat dijangkau.</Prosa>
+      <Prosa kelas="mt-3 text-[10px] leading-relaxed text-neutral-500">Background sound is generated directly on your device (Web Audio API) — it works fully offline, without depending on a third-party music service that may not always be reachable.</Prosa>
     </Card>
   )
 }

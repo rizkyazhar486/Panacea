@@ -45,17 +45,17 @@ export function SerumOsmolality() {
   return (
     <div className="mx-auto max-w-2xl space-y-5 pb-24">
       <Card className="!p-5">
-        <SectionTitle icon={<IconActivity size={20} />} title="Osmolalitas Serum & Selisih Osmolal" subtitle="Osmolalitas hitung + selisihnya terhadap yang terukur (penapisan alkohol beracun)" />
+        <SectionTitle icon={<IconActivity size={20} />} title="Serum Osmolality & Osmolal Gap" subtitle="Calculated osmolality + its gap against the measured value (toxic-alcohol screening)" />
         <p className="mt-2 text-[13px] leading-relaxed text-neutral-500">
-          Osmolalitas hitung = 2×Na + glukosa/18 + BUN/2,8 (+ etanol/3,7 bila diukur).
-          Membandingkannya dengan osmolalitas yang diukur laboratorium memberi selisih osmolal — selisih {'>'}10 mOsm/kg
-          menunjukkan adanya osmol yang tidak terukur, klasiknya alkohol beracun (metanol, etilen glikol, isopropanol).
+          Calculated osmolality = 2×Na + glucose/18 + BUN/2.8 (+ ethanol/3.7 if measured).
+          Comparing this with the lab-measured osmolality gives the osmolal gap — a gap {'>'}10 mOsm/kg
+          indicates unmeasured osmoles, classically toxic alcohols (methanol, ethylene glycol, isopropanol).
         </p>
         <div className="mt-3 grid grid-cols-2 gap-3">
-          <Field label="Natrium (mEq/L)">
+          <Field label="Sodium (mEq/L)">
             <input className={inputClass} type="number" min={0} value={na || ''} onChange={(e) => setNa(Number(e.target.value) || 0)} />
           </Field>
-          <Field label="Glukosa (mg/dL)">
+          <Field label="Glucose (mg/dL)">
             <input className={inputClass} type="number" min={0} value={glucose || ''} onChange={(e) => setGlucose(Number(e.target.value) || 0)} />
           </Field>
           <Field label="BUN (mg/dL)">
@@ -73,13 +73,13 @@ export function SerumOsmolality() {
       <Card className="!p-5">
         <div className="grid grid-cols-2 gap-4">
           <div>
-            <div className="text-[11px] font-bold uppercase tracking-wide text-neutral-500">Osmolalitas hitung</div>
+            <div className="text-[11px] font-bold uppercase tracking-wide text-neutral-500">Calculated osmolality</div>
             <div className="mt-1 text-2xl font-black text-brand-dark">{calculated.toFixed(0)}</div>
             <div className="text-[11px] text-neutral-500">mOsm/kg</div>
             <Badge tone={cBand.tone}>{cBand.label}</Badge>
           </div>
           <div>
-            <div className="text-[11px] font-bold uppercase tracking-wide text-neutral-500">Selisih osmolal</div>
+            <div className="text-[11px] font-bold uppercase tracking-wide text-neutral-500">Osmolal gap</div>
             {gap != null ? (
               <>
                 <div className="mt-1 text-2xl font-black text-ink dark:text-ink">{gap.toFixed(0)}</div>
@@ -87,12 +87,12 @@ export function SerumOsmolality() {
                 {gBand && <Badge tone={gBand.tone}>{gBand.label}</Badge>}
               </>
             ) : (
-              <p className="mt-1 text-[12px] text-neutral-500">Masukkan osmolalitas terukur untuk menghitung selisihnya.</p>
+              <p className="mt-1 text-[12px] text-neutral-500">Enter the measured osmolality to calculate the gap.</p>
             )}
           </div>
         </div>
         {gap != null && gap > 10 && (
-          <Prosa kelas="mt-3 rounded-xl border border-amber-200 bg-amber-50 px-3 py-2 text-xs font-semibold text-amber-800 dark:border-amber-500/30 dark:bg-amber-500/10 dark:text-amber-200">Selisih osmolal melebar — dalam keadaan klinis yang sesuai (penurunan kesadaran, asidosis metabolik tanpa sebab jelas), pikirkan keracunan alkohol beracun dan kirimkan pemeriksaan kadarnya; pengobatan (fomepizol) tidak boleh menunggu pemastian bila kecurigaannya kuat.</Prosa>
+          <Prosa kelas="mt-3 rounded-xl border border-amber-200 bg-amber-50 px-3 py-2 text-xs font-semibold text-amber-800 dark:border-amber-500/30 dark:bg-amber-500/10 dark:text-amber-200">Widened osmolal gap — in the appropriate clinical setting (decreased consciousness, unexplained metabolic acidosis), consider toxic-alcohol poisoning and send confirmatory levels; treatment (fomepizole) should not wait for confirmation when suspicion is strong.</Prosa>
         )}
       </Card>
 
