@@ -230,7 +230,7 @@ function SupportiveCard({ r }: { r: SupportiveResult }) {
           <span className="text-sm font-semibold">{r.name}</span>
           {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
           <Badge tone={(r.flag ?? 'normal') as any}>{flagLabel}</Badge>
-          <span className="rounded-md bg-neutral-100 px-1.5 py-0.5 text-[10px] font-semibold text-neutral-500">{r.category}</span>
+          <span className="rounded-md bg-neutral-100 px-1.5 py-0.5 text-[10px] font-semibold text-neutral-500">{SUPPORTIVE_CAT_LABEL[r.category] ?? r.category}</span>
         </div>
         <div className="mt-0.5 flex flex-wrap items-center gap-x-3 gap-y-0.5 text-xs text-neutral-500">
           <span className="font-bold" style={{ color: s.dot }}>{r.value} {r.unit}</span>
@@ -389,6 +389,13 @@ function AiClinicalInsight({ patient, vitals, supportive }: { patient: Patient; 
 /* ═══════════════════════════════════════════
    MAIN DASHBOARD
    ═══════════════════════════════════════════ */
+
+// Kunci kategori penunjang TERSIMPAN di rekam medis dan dibandingkan dengan
+// ===, jadi ia tetap data; hanya labelnya yang dialihkan. Sebelum ini kuncinya
+// dirender mentah sehingga "Radiologi" dan "Lainnya" tampil di layar.
+const SUPPORTIVE_CAT_LABEL: Record<string, string> = {
+  Lab: 'Lab', EKG: 'ECG', Radiologi: 'Radiology', Lainnya: 'Other',
+}
 
 export function Dashboard() {
   const { state, activePatient, addVital, addPatient } = useStore()

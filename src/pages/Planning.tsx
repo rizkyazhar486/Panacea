@@ -16,6 +16,17 @@ const CATEGORIES: PlanItem['category'][] = [
   'Monitoring',
 ]
 
+// Kuncinya TERSIMPAN di dalam rekam medis dan dibandingkan dengan ===, jadi ia
+// tetap data. Yang dialihkan hanya labelnya. Sebelum ini kuncinya dirender
+// mentah di tiga tempat sehingga bahasa Indonesia tampil di layar Perencanaan.
+const CAT_LABEL: Record<PlanItem['category'], string> = {
+  Suportif: 'Supportive',
+  Definitif: 'Definitive',
+  Edukasi: 'Education',
+  'Follow-up': 'Follow-up',
+  Monitoring: 'Monitoring',
+}
+
 export function Planning() {
   const { state, activePatient, saveRecord } = useStore()
   const record = state.records[activePatient.id]
@@ -91,7 +102,7 @@ export function Planning() {
             >
               <div className="min-w-0 flex-1">
                 <div className="mb-1 flex items-center gap-2">
-                  <Badge tone="neutral">{pi.category}</Badge>
+                  <Badge tone="neutral">{CAT_LABEL[pi.category] ?? pi.category}</Badge>
                   <span className="flex items-center gap-1 text-[11px] font-semibold uppercase tracking-wide text-neutral-500">
                     {pi.source === 'AI' ? <IconSparkle size={12} /> : <IconCheck size={12} />}
                     {pi.source}
@@ -139,7 +150,7 @@ export function Planning() {
               >
                 {CATEGORIES.map((c) => (
                   <option key={c} value={c}>
-                    {c}
+                    {CAT_LABEL[c] ?? c}
                   </option>
                 ))}
               </select>
@@ -326,7 +337,7 @@ function CdssPanel({ plan, patient }: { plan: PlanItem[]; patient: Patient }) {
                 <div className="flex flex-wrap items-start justify-between gap-2">
                   <div className="min-w-0 flex-1">
                     <div className="mb-1 flex items-center gap-2">
-                      <Badge tone="neutral">{item.category}</Badge>
+                      <Badge tone="neutral">{CAT_LABEL[item.category] ?? item.category}</Badge>
                       {s.highAlert && <Badge tone="critical">High-alert</Badge>}
                       {overrides[item.id] && <Badge tone="high">Clinician override</Badge>}
                     </div>
