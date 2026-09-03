@@ -12,6 +12,34 @@ import path from 'path'
  * Di sini kebalikannya: tiap kata pada teks yang tampak di layar diuji
  * terhadap kosakata INGGRIS. Kata yang bukan Inggris — apa pun kata itu —
  * ikut terhitung. Bahasa Indonesia tidak perlu dikenali lebih dulu.
+ *
+ * YANG MASIH DILEWATKAN, dan sebabnya:
+ *
+ *   1. Kata yang kebetulan ada di kamus Inggris. "lari" benar-benar terdaftar
+ *      di daftar 274 ribu kata itu, jadi label "Lari" tidak akan pernah
+ *      dilaporkan. Kamus sebesar apa pun punya tumpang tindih semacam ini.
+ *   2. Petik tunggal di dalam string berpetik ganda ("Man's") membuat penyusuran
+ *      petik tidak sinkron sampai akhir baris, sehingga potongan kode di
+ *      antaranya sesekali terlaporkan sebagai teks.
+ *   3. Nama diri berbentuk dua kata berhuruf besar ("Cal Newport") sengaja
+ *      dibuang; label dua kata berhuruf besar ikut terbuang bersamanya.
+ *
+ * TIGA LUBANG YANG SUDAH DITAMBAL, karena ketiganya menyebabkan pemindai ini
+ * melaporkan berkas sebagai bersih selama tiga rilis berturut-turut sementara
+ * layarnya masih berbahasa Indonesia:
+ *
+ *   a. Setiap kata berhuruf besar dibuang sebagai "nama diri". Label antarmuka
+ *      hampir selalu berhuruf besar, jadi aturan itu membuang justru yang
+ *      dicari: "Perbandingan", "Karbohidrat", "Renang", "Jadwal", "Kemajuan".
+ *   b. Setiap teks tanpa spasi dibuang sebagai "pengenal". Label satu kata juga
+ *      tidak berspasi, sehingga "Lemak" dan "Serat" ikut hilang.
+ *   c. Ambang enam huruf untuk label satu kata. Ambang itu ada untuk menyingkir-
+ *      kan singkatan kode, tetapi singkatan kode ditulis huruf kecil.
+ *
+ * Ketiganya hanya ketahuan dari tangkapan layar, bukan dari pemindaian. Itu
+ * pelajaran yang sama yang sudah tercatat di alat pemeriksa kontras: pemeriksa
+ * yang melewatkan apa yang tidak dipahaminya melaporkan angka yang salah
+ * dengan penuh keyakinan.
  */
 /*
  * Kamus Inggris (274 ribu kata) TIDAK disimpan di repositori — 2,7 MB, dan
@@ -83,8 +111,19 @@ function periksa(p) {
   if (KECUALI.test(p)) return
   const src = bersih(fs.readFileSync(p, 'utf8'))
   src.split('\n').forEach((b, i) => {
+    // Baris katalog gizi: { name: 'Rendang', k: 193, c: 2, ..., cat: 'Protein' }.
+    // Nama hidangan Indonesia adalah NAMA, bukan antarmuka, dan memang sengaja
+    // dibiarkan. Bentuk barisnya khas sehingga bisa dilewati tanpa menebak-nebak
+    // nama hidangannya satu per satu.
+    if (/\bk:\s*-?\d/.test(b) && /\bcat:\s*'/.test(b)) return
     for (const t of teksTampak(b, /\.tsx$/.test(p))) {
-      if (/^[\w.\/#-]+$/.test(t)) continue
+      // Pengenal, kelas dan jalur tidak mengandung spasi — tetapi begitu pula
+      // label satu kata seperti "Karbohidrat" dan "Kemajuan". Membuang semua
+      // yang tanpa spasi berarti membuang seluruh label satu kata; itulah sebab
+      // "Lemak" dan "Serat" lolos meski kata berhuruf besar sudah diizinkan.
+      // Pengenal ditulis huruf kecil, camelCase, snake_case atau berupa jalur,
+      // jadi kata tunggal berhuruf besar dikecualikan dari pembuangan ini.
+      if (/^[\w.\/#-]+$/.test(t) && !/^[A-Z][a-z]{3,}$/.test(t)) continue
       if (/\$\{/.test(t) && t.replace(/\$\{[^}]*\}/g, '').trim().length < 8) continue
       // Buang daftar kelas dan jalur.
       const tok = t.trim().split(/[\s/·—–,.:;!?()"'’“”|]+/).filter((w) => /^[A-Za-z]{3,}$/.test(w))
@@ -95,17 +134,32 @@ function periksa(p) {
       // Satu kata saja diterima hanya bila cukup panjang untuk menjadi label
       // sungguhan. Tanpa batas ini, singkatan kode seperti "req", "idx", "tmp"
       // memenuhi laporan — api.ts terbaca 78 temuan yang seluruhnya kode.
-      if (tok.length === 1 && tok[0].length < 6) continue
+      // Singkatan kode ("req", "idx", "tmp") ditulis huruf kecil; label satu kata
+      // di antarmuka ditulis berhuruf besar. Karena itu ambangnya dibedakan:
+      // tanpa ini "Lemak", "Serat" dan "Kemajuan" tidak pernah terlaporkan.
+      if (tok.length === 1 && tok[0].length < (/^[A-Z][a-z]+$/.test(tok[0]) ? 4 : 6)) continue
       const util = t.trim().split(/\s+/).filter((k) => /^(dark:|hover:|focus:|active:|sm:|md:|lg:|group-)/.test(k) || /^(text|bg|border|rounded|flex|grid|min|max|w|h|p|m|px|py|mt|mb|ml|mr|gap|font|leading|tracking|shadow|ring|space|items|justify|overflow|absolute|relative|inline|shrink|transition|opacity|z|whitespace|truncate|uppercase|tabular|place|cursor|select|pointer|backdrop|animate|duration|ease|scale|translate|t-)(-|$)/.test(k)).length
       if (util > 0) continue
       // Potongan KODE bukan teks. Penandanya khas dan tidak muncul di kalimat.
       if (/(^|\s)(const|let|var|return|function|await|typeof)\s|=>|\)\s*\.|\.\w+\(|===|!==|\?\?/.test(t)) continue
+      // Nama orang berbentuk "Charles Duhigg" / "Cal Newport": SETIAP katanya
+      // berhuruf besar dan jumlahnya lebih dari satu. Label antarmuka satu kata
+      // ("Perbandingan", "Karbohidrat") tidak berbentuk begitu, jadi keduanya
+      // bisa dipisahkan tanpa membuang salah satunya.
+      const berhurufBesar = tok.filter((w) => /^[A-Z][a-z]+$/.test(w)).length
+      const namaDiri = tok.length > 1 && berhurufBesar === tok.length
       const asing = tok.filter((w) => !EN.has(w.toLowerCase()))
         // Akronim dan singkatan (BMI, TDEE, CSV) memang bukan kata kamus.
         .filter((w) => !/^[A-Z0-9]+$/.test(w))
-        // Nama diri diawali huruf besar di tengah kalimat; nama hidangan dan
-        // nama orang lolos di sini, dan memang bukan kalimat Indonesia.
-        .filter((w) => !/^[A-Z][a-z]+$/.test(w))
+        // Nama diri diawali huruf besar DI TENGAH KALIMAT. Membuang setiap kata
+        // berhuruf besar tanpa syarat adalah lubang terbesar pemindai ini:
+        // label antarmuka hampir selalu berhuruf besar, sehingga "Perbandingan",
+        // "Karbohidrat", "Renang", "Jadwal" dan "Kemajuan" dibuang diam-diam
+        // dan hanya ketahuan dari tangkapan layar, tiga rilis berturut-turut.
+        // Karena itu syaratnya dipersempit: kata berhuruf besar hanya dianggap
+        // nama diri bila benar-benar berada di TENGAH kalimat panjang. Pada teks
+        // pendek berbentuk label, huruf besar tidak memberi tahu apa pun.
+        .filter((w) => !(namaDiri && /^[A-Z][a-z]+$/.test(w)))
       if (asing.length >= 2 || (asing.length === 1 && tok.length <= 4)) {
         hasil.push({ p, i: i + 1, t: t.trim().slice(0, 88), asing: [...new Set(asing)].slice(0, 5) })
       }
