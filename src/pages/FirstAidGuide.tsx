@@ -15,151 +15,152 @@ interface Guide { id: string; title: string; emoji: string; category: string; wh
 const GUIDES: Guide[] = [
   {
     id: 'choking',
-    title: 'Tersedak (dewasa/anak, sadar)',
+    title: 'Choking (adult/child, conscious)',
     emoji: '🫁',
-    category: 'Jalan Napas',
-    whenToCall911: 'Bila orangnya sama sekali tidak dapat batuk, berbicara, atau bernapas, atau menjadi tidak sadar.',
+    category: 'Airway',
+    whenToCall911: 'If the person cannot cough, speak, or breathe at all, or becomes unconscious.',
     steps: [
-      'Tanyakan "Anda tersedak?" — bila ia masih dapat batuk kuat atau berbicara, doronglah ia terus batuk dan jangan campur tangan dulu.',
-      'Bila ia tidak dapat bernapas, batuk, atau berbicara: berdirilah di belakangnya, condongkan badannya ke depan.',
-      'Berikan 5 tepukan mantap di punggung, di antara kedua tulang belikat, dengan pangkal telapak tangan.',
-      'Bila belum berhasil, berikan 5 hentakan perut (Heimlich): kepalkan tangan di atas pusar, genggam dengan tangan lain, tarik cepat ke dalam dan ke atas.',
-      'Selang-seling 5 tepukan punggung dan 5 hentakan perut sampai bendanya keluar atau orangnya menjadi tidak sadar.',
-      'Bila ia menjadi tidak sadar, baringkan ke lantai dan mulai RJP — segera hubungi layanan gawat darurat bila belum dilakukan.',
+      'Ask "Are you choking?" — if they can still cough forcefully or speak, encourage continued coughing and don\'t intervene yet.',
+      'If they cannot breathe, cough, or speak: stand behind them and lean their upper body forward.',
+      'Give 5 firm back blows between the shoulder blades using the heel of your hand.',
+      'If that doesn\'t work, give 5 abdominal thrusts (Heimlich maneuver): make a fist above the navel, grasp it with your other hand, and pull sharply inward and upward.',
+      'Alternate 5 back blows and 5 abdominal thrusts until the object comes out or the person becomes unconscious.',
+      'If they become unconscious, lower them to the floor and start CPR — call emergency services immediately if not already done.',
     ],
-    doNot: ['Jangan melakukan hentakan perut pada bayi di bawah 1 tahun — pakailah tepukan punggung dan hentakan dada.', 'Jangan menyapu mulut dengan jari secara membabi buta kecuali bendanya terlihat.'],
+    doNot: ['Do not perform abdominal thrusts on an infant under 1 year old — use back blows and chest thrusts instead.', 'Do not blindly sweep the mouth with a finger unless the object is visible.'],
   },
   {
     id: 'cpr',
-    title: 'RJP dewasa (oleh orang awam)',
+    title: 'Adult CPR (by a bystander)',
     emoji: '❤️',
-    category: 'Jantung',
-    whenToCall911: 'Segera — bila Anda sendirian, teleponlah dulu sebelum memulai penekanan dada, baru mulai RJP.',
+    category: 'Cardiac',
+    whenToCall911: 'Immediately — if you are alone, call first before starting chest compressions, then begin CPR.',
     steps: [
-      'Periksa kesadarannya: tepuk bahunya dengan mantap dan panggil dengan keras. Periksa napas normal (tidak lebih dari 10 detik).',
-      'Bila tidak sadar dan napasnya tidak normal, hubungi layanan gawat darurat (atau minta orang lain menelepon) dan ambil AED bila tersedia.',
-      'Letakkan pangkal telapak satu tangan di tengah dada, tangan lain di atasnya, jari-jari saling mengunci.',
-      'Tekan kuat dan cepat: sedalam sedikitnya 5 cm, 100-120 kali per menit, dan biarkan dada mengembang penuh di antara tiap penekanan.',
-      'Bila terlatih dan bersedia, berikan 2 napas bantuan tiap 30 penekanan (30:2). Bila tidak terlatih atau tidak bersedia, teruskan RJP penekanan dada saja.',
-      'Lanjutkan sampai AED datang (ikuti panduan suaranya), petugas mengambil alih, atau orangnya mulai bernapas normal.',
+      'Check responsiveness: tap their shoulder firmly and shout. Check for normal breathing (no more than 10 seconds).',
+      'If unresponsive and not breathing normally, call emergency services (or have someone else call) and get an AED if available.',
+      'Place the heel of one hand in the center of the chest, the other hand on top, fingers interlocked.',
+      'Push hard and fast: at least 5 cm deep, 100-120 compressions per minute, and let the chest fully recoil between compressions.',
+      'If trained and willing, give 2 rescue breaths every 30 compressions (30:2). If untrained or unwilling, continue compression-only CPR.',
+      'Continue until the AED arrives (follow its voice prompts), professional help takes over, or the person starts breathing normally.',
     ],
-    doNot: ['Jangan menghentikan penekanan dada lebih dari 10 detik sekali berhenti.', 'Jangan melakukan RJP pada orang yang napasnya normal.'],
+    doNot: ['Do not stop compressions for more than 10 seconds at a time.', 'Do not perform CPR on someone who is breathing normally.'],
   },
   {
     id: 'bleeding',
-    title: 'Perdarahan hebat',
+    title: 'Severe bleeding',
     emoji: '🩸',
     category: 'Trauma',
-    whenToCall911: 'Perdarahan apa pun yang tidak berhenti dengan penekanan langsung, darah yang menyembur, atau luka yang dalam/luas.',
+    whenToCall911: 'Any bleeding that does not stop with direct pressure, spurting blood, or a deep/extensive wound.',
     steps: [
-      'Hubungi layanan gawat darurat bila perdarahannya hebat.',
-      'Tekan luka dengan mantap dan langsung memakai kain bersih atau perban — jangan dilepas bila tembus darah, tambahkan lapisan di atasnya.',
-      'Bila memungkinkan, angkat bagian yang terluka lebih tinggi dari jantung.',
-      'Bila perdarahan berlanjut meski sudah ditekan langsung dan lukanya di anggota gerak, pasang torniket beberapa sentimeter di atas luka (bukan di atas sendi), kencangkan sampai perdarahan berhenti. Catat jam pemasangannya.',
-      'Jaga orangnya tetap hangat dan tidak banyak bergerak untuk mengurangi risiko syok.',
+      'Call emergency services if the bleeding is severe.',
+      'Press firmly and directly on the wound with a clean cloth or bandage — if it soaks through, do not remove it, just add more layers on top.',
+      'If possible, raise the injured part above the level of the heart.',
+      'If bleeding continues despite direct pressure and the wound is on a limb, apply a tourniquet a few centimeters above the wound (not over a joint), tightening it until the bleeding stops. Note the time it was applied.',
+      'Keep the person warm and still to reduce the risk of shock.',
     ],
-    doNot: ['Jangan mencabut benda yang menancap — ganjal di sekelilingnya dan tekan di tepinya.', 'Jangan mengendurkan torniket yang sudah terpasang kecuali atas arahan petugas medis.'],
+    doNot: ['Do not remove an object that is impaled in the wound — pad around it and press at its edges.', 'Do not loosen a tourniquet that is already in place unless directed by medical personnel.'],
   },
   {
     id: 'burns',
-    title: 'Luka bakar',
+    title: 'Burns',
     emoji: '🔥',
     category: 'Trauma',
-    whenToCall911: 'Luka bakar yang lebih luas dari telapak tangan orangnya, mengenai wajah/tangan/kemaluan, luka dalam/hangus, atau akibat bahan kimia/listrik.',
+    whenToCall911: 'A burn larger than the person\'s palm, one affecting the face/hands/genitals, a deep or charred wound, or one caused by chemicals/electricity.',
     steps: [
-      'Jauhkan orangnya dari sumber panas dan lepaskan perhiasan/pakaian ketat di dekat luka sebelum pembengkakan mulai.',
-      'Dinginkan luka di bawah air mengalir yang sejuk (bukan sedingin es) selama 20 menit.',
-      'Tutup longgar dengan penutup luka bersih yang tidak lengket atau plastik pembungkus.',
-      'Pada luka bakar bahan kimia, sapu dulu bahan kimia keringnya, lalu siram dengan air mengalir banyak sedikitnya 20 menit.',
-      'Tangani sebagai syok (baringkan, angkat tungkai, jaga kehangatan) bila luka bakarnya luas.',
+      'Move the person away from the heat source and remove jewelry/tight clothing near the burn before swelling starts.',
+      'Cool the burn under cool (not ice-cold) running water for 20 minutes.',
+      'Cover loosely with a clean, non-stick dressing or plastic wrap.',
+      'For chemical burns, brush off dry chemical residue first, then flush with plenty of running water for at least 20 minutes.',
+      'Treat for shock (lay flat, raise the legs, keep warm) if the burn is extensive.',
     ],
-    doNot: ['Jangan mengoleskan es, mentega, minyak, atau pasta gigi pada luka bakar.', 'Jangan memecahkan lepuh.', 'Jangan menarik pakaian yang melekat pada luka bakar.'],
+    doNot: ['Do not apply ice, butter, oil, or toothpaste to a burn.', 'Do not pop blisters.', 'Do not pull off clothing stuck to a burn.'],
   },
   {
     id: 'seizure',
-    title: 'Kejang',
+    title: 'Seizure',
     emoji: '🧠',
-    category: 'Saraf',
-    whenToCall911: 'Kejang pertama kali seumur hidup, berlangsung lebih dari 5 menit, kejang berikutnya datang sebelum pulih, ada cedera saat kejang, sesak napas sesudahnya, atau orangnya sedang hamil/diabetes/diketahui bukan penyandang epilepsi.',
+    category: 'Neurological',
+    whenToCall911: 'A first-ever seizure, one lasting more than 5 minutes, another seizure starting before recovery, an injury during the seizure, breathing difficulty afterward, or the person is pregnant/diabetic/not known to have epilepsy.',
     steps: [
-      'Tetap tenang dan hitung lama kejangnya.',
-      'Singkirkan benda keras/tajam di sekitarnya untuk mencegah cedera; jangan menahan gerakannya.',
-      'Letakkan sesuatu yang lembut di bawah kepalanya.',
-      'Setelah kejangnya berhenti, miringkan tubuhnya (posisi pemulihan) agar jalan napas tetap bebas.',
-      'Temani sampai ia benar-benar sadar penuh; bicaralah dengan tenang saat kesadarannya kembali.',
+      'Stay calm and time how long the seizure lasts.',
+      'Clear hard/sharp objects nearby to prevent injury; do not hold them down.',
+      'Place something soft under their head.',
+      'Once the seizure stops, roll them onto their side (recovery position) to keep the airway clear.',
+      'Stay with them until they are fully alert; speak calmly as their awareness returns.',
     ],
-    doNot: ['Jangan memasukkan apa pun ke dalam mulutnya.', 'Jangan berusaha menahan tubuhnya.', 'Jangan memberi minum atau makan sebelum ia sadar penuh.'],
+    doNot: ['Do not put anything in their mouth.', 'Do not try to restrain their movements.', 'Do not give them anything to drink or eat before they are fully alert.'],
   },
   {
     id: 'fainting',
-    title: 'Pingsan',
+    title: 'Fainting',
     emoji: '💫',
-    category: 'Umum',
-    whenToCall911: 'Tidak sadar kembali dalam satu menit, cedera akibat jatuh, nyeri dada, denyut jantung tidak teratur, atau orangnya sedang hamil/lanjut usia.',
+    category: 'General',
+    whenToCall911: 'Not regaining consciousness within a minute, injury from the fall, chest pain, an irregular heartbeat, or the person is pregnant/elderly.',
     steps: [
-      'Baringkan orangnya mendatar dan angkat tungkainya sekitar 30 cm agar aliran darah ke otak membaik.',
-      'Longgarkan pakaian yang ketat di leher/pinggang.',
-      'Periksa napasnya; bila tidak bernapas normal, mulai RJP dan hubungi layanan gawat darurat.',
-      'Setelah siuman, biarkan ia berbaring beberapa menit sebelum perlahan didudukkan.',
+      'Lay the person flat and raise their legs about 30 cm to improve blood flow to the brain.',
+      'Loosen tight clothing at the neck/waist.',
+      'Check their breathing; if not breathing normally, start CPR and call emergency services.',
+      'Once they come to, let them lie down for a few minutes before slowly sitting up.',
     ],
-    doNot: ['Jangan mendudukkan atau membangunkan orangnya dengan cepat.', 'Jangan memberi makan atau minum sebelum ia sadar penuh.'],
+    doNot: ['Do not sit or wake the person up quickly.', 'Do not give food or drink before they are fully alert.'],
   },
   {
     id: 'stroke',
-    title: 'Dugaan stroke (FAST)',
+    title: 'Suspected stroke (FAST)',
     emoji: '🧠',
-    category: 'Saraf',
-    whenToCall911: 'Salah satu tanda FAST, meskipun kemudian menghilang — segera telepon, catat jam gejalanya mulai.',
+    category: 'Neurological',
+    whenToCall911: 'Any one FAST sign, even if it resolves afterward — call immediately and note the time symptoms started.',
     steps: [
-      'F — Face (wajah): minta ia tersenyum. Apakah satu sisi turun?',
-      'A — Arms (lengan): minta ia mengangkat kedua lengan. Apakah salah satu melorot?',
-      'S — Speech (bicara): minta ia mengulang satu kalimat. Apakah pelo atau aneh?',
-      'T — Time (waktu): bila ada satu tanda saja, segera hubungi layanan gawat darurat dan catat jam persis gejalanya mulai (ini menentukan pilihan pengobatannya).',
-      'Jaga orangnya tetap tenang, duduk atau berbaring dengan kepala sedikit ditinggikan, dan jangan beri makan atau minum (kemampuan menelannya bisa terganggu).',
+      'F — Face: ask them to smile. Does one side droop?',
+      'A — Arms: ask them to raise both arms. Does one drift down?',
+      'S — Speech: ask them to repeat a sentence. Is their speech slurred or strange?',
+      'T — Time: if even one sign is present, call emergency services immediately and note the exact time symptoms started (this determines treatment options).',
+      'Keep the person calm, sitting or lying with their head slightly raised, and do not give food or drink (their ability to swallow may be affected).',
     ],
-    doNot: ['Jangan menunggu gejalanya membaik sebelum meminta pertolongan — tiap menit berarti bagi jaringan otak.', 'Jangan memberi aspirin atau obat apa pun tanpa arahan medis.'],
+    doNot: ['Do not wait for symptoms to improve before seeking help — every minute matters for brain tissue.', 'Do not give aspirin or any medication without medical guidance.'],
   },
   {
     id: 'allergic',
     title: 'Severe allergic reaction (anaphylaxis)',
     emoji: '⚠️',
-    category: 'Alergi',
-    whenToCall911: 'Tanda sesak napas apa pun, pembengkakan wajah/tenggorokan, biduran luas disertai pusing, atau paparan alergen yang diketahui berat.',
+    category: 'Allergy',
+    whenToCall911: 'Any sign of difficulty breathing, swelling of the face/throat, widespread hives with dizziness, or a known severe allergen exposure.',
     steps: [
       'Call emergency services immediately.',
-      'Bila orangnya punya penyuntik otomatis epinefrin (mis. EpiPen), bantu ia memakainya — suntikkan di paha sisi luar, tahan selama waktu yang tertera pada alatnya.',
-      'Baringkan mendatar dengan tungkai diangkat (kecuali bila ia sesak napas, biarkan ia duduk).',
-      'Dosis kedua epinefrin dapat diberikan sesudah 5-15 menit bila gejalanya tidak membaik dan tersedia penyuntik otomatis lain.',
+      'If the person has an epinephrine auto-injector (e.g. EpiPen), help them use it — inject into the outer thigh and hold for the time stated on the device.',
+      'Lay them flat with legs raised (unless they have trouble breathing, in which case let them sit up).',
+      'A second dose of epinephrine can be given after 5-15 minutes if symptoms haven\'t improved and another auto-injector is available.',
       'Begin CPR if they stop breathing or become unresponsive.',
     ],
-    doNot: ['Jangan menunggu gejalanya membaik sebelum memakai epinefrin bila obatnya tersedia dan anafilaksis dicurigai.', 'Jangan menyuruhnya berdiri atau berjalan mendadak — ini dapat memperburuk penurunan tekanan darah.'],
+    doNot: ['Do not wait for symptoms to improve before using epinephrine if it\'s available and anaphylaxis is suspected.', 'Do not have them stand or walk suddenly — this can worsen the drop in blood pressure.'],
   },
 ]
 
-const CATEGORIES = ['Semua', ...Array.from(new Set(GUIDES.map((g) => g.category)))]
+const CATEGORY_ALL = 'All'
+const CATEGORIES = [CATEGORY_ALL, ...Array.from(new Set(GUIDES.map((g) => g.category)))]
 
 export function FirstAidGuide() {
   const [query, setQuery] = useState('')
-  const [cat, setCat] = useState('Semua')
+  const [cat, setCat] = useState(CATEGORY_ALL)
   const [open, setOpen] = useState<string | null>(null)
   const q = query.trim().toLowerCase()
 
   const filtered = useMemo(
-    () => GUIDES.filter((g) => (cat === 'Semua' || g.category === cat) && (!q || (g.title + g.category).toLowerCase().includes(q))),
+    () => GUIDES.filter((g) => (cat === CATEGORY_ALL || g.category === cat) && (!q || (g.title + g.category).toLowerCase().includes(q))),
     [q, cat],
   )
 
   return (
     <div className="mx-auto max-w-2xl space-y-5 pb-24">
       <Card className="!p-5">
-        <SectionTitle icon={<IconShield size={20} />} title="Panduan Cepat Pertolongan Pertama" subtitle="Langkah gawat darurat dengan bahasa sederhana untuk orang di sekitar" />
+        <SectionTitle icon={<IconShield size={20} />} title="First Aid Quick Guide" subtitle="Plain-language emergency steps for bystanders" />
         <p className="mt-2 text-[13px] leading-relaxed text-red-600 dark:text-red-300">
-          <b>Ini tidak menggantikan panggilan ke layanan gawat darurat.</b> Dalam keadaan gawat darurat sungguhan,
-          mintalah pertolongan lebih dahulu (atau minta orang lain menelepon) — langkah-langkah di sini adalah apa yang
-          dikerjakan selagi pertolongan dalam perjalanan, mengikuti panduan pertolongan pertama untuk orang awam dari
-          Palang Merah / AHA.
+          <b>This does not replace calling emergency services.</b> In a real emergency,
+          call for help first (or have someone else call) — the steps here are what to
+          do while help is on the way, following bystander first-aid guidance from the
+          Red Cross / AHA.
         </p>
-        <input className={`${inputClass} mt-3`} placeholder="Cari: tersedak, perdarahan, kejang…" value={query} onChange={(e) => setQuery(e.target.value)} />
+        <input className={`${inputClass} mt-3`} placeholder="Search: choking, bleeding, seizure…" value={query} onChange={(e) => setQuery(e.target.value)} />
         <div className="mt-3 flex flex-wrap gap-2">
           {CATEGORIES.map((c) => (
             <button key={c} onClick={() => setCat(c)} className={`rounded-full px-3 py-1.5 text-[12px] font-bold transition ${cat === c ? 'bg-brand text-white' : 'bg-neutral-100 text-neutral-600 dark:bg-white/10 dark:text-neutral-300'}`}>{c}</button>
@@ -184,7 +185,7 @@ export function FirstAidGuide() {
             {isOpen && (
               <div className="border-t border-neutral-100 p-4 dark:border-white/10">
                 <div className="rounded-xl bg-red-50 p-3 text-[12px] leading-relaxed text-red-700 dark:bg-red-500/10 dark:text-red-300">
-                  <b>Hubungi layanan gawat darurat bila:</b> {g.whenToCall911}
+                  <b>Call emergency services if:</b> {g.whenToCall911}
                 </div>
                 <div className="mt-3 text-xs font-black uppercase tracking-wide text-neutral-500">Steps</div>
                 <ol className="mt-1.5 list-inside list-decimal space-y-1.5 text-[13px] leading-relaxed text-neutral-700 dark:text-neutral-300">
@@ -201,9 +202,9 @@ export function FirstAidGuide() {
       })}
 
       <div className="rounded-2xl border border-neutral-100 bg-white p-4 text-center text-[11px] leading-relaxed text-neutral-500 dark:border-white/10 dark:bg-white/5">
-        Mengikuti urutan baku penolong awam (panduan Palang Merah / American Heart Association untuk orang di sekitar).
-        Rujukan untuk belajar saja — ikutilah pelatihan pertolongan pertama / RJP bersertifikat untuk latihan langsung,
-        dan dalam keadaan gawat darurat sungguhan selalu hubungi nomor darurat setempat.
+        Follows standard bystander first-aid sequences (Red Cross / American Heart Association guidance for laypeople).
+        For learning reference only — take a certified first aid / CPR course for hands-on practice,
+        and in a real emergency always call your local emergency number.
       </div>
     </div>
   )
