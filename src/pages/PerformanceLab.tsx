@@ -253,7 +253,7 @@ function MetabolicMapCard() {
         <span className="flex items-center gap-1"><span className="h-2 w-2 rounded-full bg-red-500" />Carb Oxidation %</span>
         <span className="flex items-center gap-1"><span className="h-2 w-2 rounded-full bg-sky-400" />Lactate (mmol)</span>
       </div>
-      <Prosa kelas="mt-2 text-[10px] leading-relaxed text-ink/70">Puncak "Fat Max" umumnya berada di Z2 (sekitar 60% HRmaks) — kunci latihan dasar yang memakai lemak sebagai bahan bakar. Di atas Z4, pembakaran lemak nyaris berhenti dan tubuh beralih sepenuhnya ke karbohidrat sementara laktat menumpuk dengan cepat.</Prosa>
+      <Prosa kelas="mt-2 text-[10px] leading-relaxed text-ink/70">"Fat Max" typically peaks in Z2 (around 60% HRmax) — the key zone for base training that uses fat as fuel. Above Z4, fat burning nearly stops and the body switches almost entirely to carbohydrate while lactate accumulates rapidly.</Prosa>
     </div>
   )
 }

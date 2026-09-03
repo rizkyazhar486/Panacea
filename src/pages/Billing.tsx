@@ -489,7 +489,7 @@ function ProofVerification() {
       <SectionTitle
         icon={<IconShield size={20} />}
         title="Verify Transfer Proof (Owner)"
-        subtitle="Setujui buktinya → PNC ditambahkan otomatis"
+        subtitle="Approve the proof → PNC is added automatically"
         right={<Badge tone={pending.length ? 'high' : 'brand'}>{pending.length} pending</Badge>}
       />
       {reqs.length === 0 ? (

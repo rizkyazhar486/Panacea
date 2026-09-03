@@ -103,8 +103,8 @@ export function ClinicalHub() {
       ))}
 
       <div className="rounded-2xl border border-neutral-100 bg-white p-4 text-center text-[11px] leading-relaxed text-neutral-500 dark:border-white/10 dark:bg-white/5">
-        Beberapa alat di sini ditujukan untuk tenaga kesehatan dan hanya muncul bila akun kamu terverifikasi.
-        Semuanya bersifat edukatif dan bukan pengganti penilaian klinis langsung.
+        Some tools here are intended for healthcare professionals and only appear once your account is verified.
+        Everything is educational and not a substitute for direct clinical judgment.
       </div>
     </div>
   )
