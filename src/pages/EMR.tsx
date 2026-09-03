@@ -234,7 +234,7 @@ export function EMR() {
 
       {/* S — Subjective */}
       <Card>
-        <SectionTitle title="S · Subjective — History" subtitle="Draf disusun AI, dapat disunting dokter" />
+        <SectionTitle title="S · Subjective — History" subtitle="Drafted by AI, editable by the doctor" />
         <div className="grid gap-4 md:grid-cols-2">
           {ANAMNESIS_FIELDS.map((f) => (
             <div key={f.key} className={f.key === 'rps' ? 'md:col-span-2' : ''}>
@@ -257,7 +257,7 @@ export function EMR() {
       <Card>
         <SectionTitle
           title="O · Objective — Physical Examination"
-          subtitle="Dilengkapi & diperiksa ulang oleh dokter pemeriksa"
+          subtitle="Completed and re-checked by the examining doctor"
           right={
             <label className="flex cursor-pointer items-center gap-2 text-sm font-semibold">
               <input
@@ -302,7 +302,7 @@ export function EMR() {
             rows={2}
           />
           <ExamField
-            label="Pemeriksaan per Sistem (usulan penunjang dari AI di bawah — lengkapi temuannya)"
+            label="Examination by system (AI workup suggestions below — complete the findings)"
             value={draft.physicalExam.perSystem}
             onChange={(v) => setExam('perSystem', v)}
             rows={6}
@@ -435,7 +435,7 @@ export function EMR() {
       <Card>
         <SectionTitle
           title="P · Plan — Summary"
-          subtitle="Rincian pemeriksaan ulang rencana ada di modul Perencanaan"
+          subtitle="Details of planned re-examination are in the Planning module"
           right={
             <Link to="/planning">
               <Button variant="outline">Open Planning →</Button>
@@ -588,7 +588,7 @@ function DiagnosisPicker({ value, aiText, onChange }: {
           ))}
         </div>
       )}
-      <Prosa kelas="mt-1.5 text-[10px] text-neutral-500">Standar ICD-10 (dipakai SATUSEHAT/BPJS) beserta padanan ICD-11 untuk diagnosis yang lazim. Diagnosis utama akhir tetap ditetapkan dan ditandatangani dokter.</Prosa>
+      <Prosa kelas="mt-1.5 text-[10px] text-neutral-500">ICD-10 standard (used by SATUSEHAT/BPJS) with ICD-11 equivalents for common diagnoses. The final principal diagnosis is still set and signed by the doctor.</Prosa>
     </div>
   )
 }
@@ -648,7 +648,7 @@ function EducationCard({ diagnosis }: { diagnosis: string }) {
       <SectionTitle
         icon={<IconBook size={18} />}
         title="Patient Education — Brief & In-Depth"
-        subtitle="Agar pasien memahami keadaannya dan cara menjaga kesehatannya"
+        subtitle="So the patient understands their condition and how to look after their health"
         right={
           <Button onClick={gen} disabled={busy}>
             <IconSparkle size={16} /> {busy ? 'Generating…' : sheet ? 'Regenerate' : 'Create Patient Education'}

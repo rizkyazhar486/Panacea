@@ -98,7 +98,7 @@ export function Marketplace() {
         <SectionTitle
           icon={<IconStore size={20} />}
           title="Medical Reference Hub"
-          subtitle="Temukan, pelajari, dan bagikan rujukan kedokteran pilihan dari kontributor terverifikasi. Tiap dokumen dilindungi tanda air demi keamanan dan keasliannya."
+          subtitle="Find, study, and share curated medical references from verified contributors. Every document is watermarked for security and authenticity."
           right={
             <span className="flex items-center gap-1.5 rounded-xl bg-ink px-3 py-1.5 text-sm font-bold text-white">
               <IconToken size={16} className="text-brand" /> {state.wallet.balance} PNC
@@ -225,10 +225,10 @@ function UploadPanel({
     const m: Material = {
       id: uid(),
       title: f.title.trim(),
-      description: f.description.trim() || 'Tanpa deskripsi.',
+      description: f.description.trim() || 'No description.',
       category: f.category,
       exam: f.exam,
-      specialty: f.specialty.trim() || 'Umum',
+      specialty: f.specialty.trim() || 'General',
       authorId,
       authorName,
       fileType: f.fileType,
@@ -249,7 +249,7 @@ function UploadPanel({
       <SectionTitle
         icon={<IconUpload size={18} />}
         title="Share & Verify Medical References"
-        subtitle="Kontributor dapat mengirimkan materi kedokteran untuk ditinjau AI dan verifikator spesialis sebelum diterbitkan."
+        subtitle="Contributors can submit medical material for review by AI and specialist verifiers before publication."
       />
       <div className="grid gap-3 md:grid-cols-2">
         <Field label="Title">

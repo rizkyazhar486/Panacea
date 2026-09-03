@@ -32,8 +32,8 @@ function kunci(d: Date): string {
   return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}`
 }
 
-const NAMA_HARI = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu']
-const NAMA_BULAN = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des']
+const NAMA_HARI = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']
+const NAMA_BULAN = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
 
 function judulTanggal(d: Date): string {
   return `${NAMA_HARI[d.getDay()]}, ${d.getDate()} ${NAMA_BULAN[d.getMonth()]} ${d.getFullYear()}`
@@ -102,12 +102,12 @@ export function Harian() {
   const totalDetik = sesiHari.reduce((a, s) => a + (s.durasi ?? 0), 0)
 
   const terukur: Petak[] = [
-    { label: 'Lari', nilai: totalKm > 0 ? totalKm.toFixed(1) : '—', satuan: 'km' },
-    { label: 'Langkah', nilai: angka(hari?.nilai.steps) },
-    { label: 'Berat', nilai: angka(hari?.nilai.weightKg, 1), satuan: 'kg' },
-    { label: 'Denyut istirahat', nilai: angka(hari?.nilai.restingHr), satuan: 'bpm' },
+    { label: 'Running', nilai: totalKm > 0 ? totalKm.toFixed(1) : '—', satuan: 'km' },
+    { label: 'Steps', nilai: angka(hari?.nilai.steps) },
+    { label: 'Weight', nilai: angka(hari?.nilai.weightKg, 1), satuan: 'kg' },
+    { label: 'Resting HR', nilai: angka(hari?.nilai.restingHr), satuan: 'bpm' },
     { label: 'HRV', nilai: angka(hari?.nilai.hrvMs), satuan: 'ms' },
-    { label: 'Tidur', nilai: angka(hari?.nilai.sleepH ?? tidurLog?.hours, 1), satuan: 'jam' },
+    { label: 'Sleep', nilai: angka(hari?.nilai.sleepH ?? tidurLog?.hours, 1), satuan: 'h' },
   ]
 
   const pekan = Array.from({ length: 7 }, (_, i) => {
@@ -118,18 +118,18 @@ export function Harian() {
 
   return (
     <div className="mx-auto max-w-3xl space-y-4 px-fluid pb-24">
-      <SectionTitle icon={<IconChartUp size={20} />} title="Harian" subtitle="Telusuri hari mana pun — yang terukur dan yang Anda rasakan" />
+      <SectionTitle icon={<IconChartUp size={20} />} title="Daily" subtitle="Browse any day — what was measured and what you felt" />
 
       <div className="flex items-center gap-2">
-        <button onClick={() => setGeser((g) => g - 1)} aria-label="Hari sebelumnya"
+        <button onClick={() => setGeser((g) => g - 1)} aria-label="Previous day"
           className="grid h-11 w-11 shrink-0 place-items-center rounded-full bg-neutral-100 text-lg font-black dark:bg-white/10">‹</button>
         <div className="min-w-0 flex-1 text-center">
           <span className="block truncate text-[14px] font-black text-ink dark:text-white">{judulTanggal(tanggalObj)}</span>
           <span className="block text-[11px] text-neutral-500">
-            {geser === 0 ? 'Hari ini' : geser === -1 ? 'Kemarin' : `${Math.abs(geser)} hari lalu`}
+            {geser === 0 ? 'Today' : geser === -1 ? 'Yesterday' : `${Math.abs(geser)} days ago`}
           </span>
         </div>
-        <button onClick={() => setGeser((g) => Math.min(0, g + 1))} disabled={geser === 0} aria-label="Hari berikutnya"
+        <button onClick={() => setGeser((g) => Math.min(0, g + 1))} disabled={geser === 0} aria-label="Next day"
           className="grid h-11 w-11 shrink-0 place-items-center rounded-full bg-neutral-100 text-lg font-black disabled:opacity-30 dark:bg-white/10">›</button>
       </div>
 
@@ -157,7 +157,7 @@ export function Harian() {
       </div>
 
       <Card className="!p-3">
-        <span className="text-[10px] font-black uppercase tracking-wide text-neutral-500">Terukur — masuk sendiri dari perangkat</span>
+        <span className="text-[10px] font-black uppercase tracking-wide text-neutral-500">Measured — arrives automatically from your device</span>
         <div className="mt-2 grid grid-cols-3 gap-2">
           {terukur.map((p) => <Petak key={p.label} p={p} />)}
         </div>
@@ -176,17 +176,17 @@ export function Harian() {
           </div>
         )}
         {sesiHari.length === 0 && totalDetik === 0 && (
-          <p className="mt-2 text-[11px] text-neutral-400">Tidak ada sesi tersimpan pada hari ini.</p>
+          <p className="mt-2 text-[11px] text-neutral-400">No sessions stored for this day.</p>
         )}
       </Card>
 
       <Card className="!p-3">
-        <span className="text-[10px] font-black uppercase tracking-wide text-neutral-500">Anda catat — tidak terukur alat mana pun</span>
+        <span className="text-[10px] font-black uppercase tracking-wide text-neutral-500">You log it — no device measures this</span>
 
         <div className="mt-2">
-          <span className="text-[11px] font-bold text-neutral-500">Tenaga hari itu</span>
+          <span className="text-[11px] font-bold text-neutral-500">Energy that day</span>
           <div className="mt-1 flex gap-1">
-            {['Habis', 'Lemas', 'Biasa', 'Segar', 'Penuh'].map((l, i) => (
+            {['Empty', 'Low', 'Normal', 'Fresh', 'Full'].map((l, i) => (
               <button
                 key={l}
                 onClick={() => { const n = i + 1; setTenaga(n); logWellness(tgl, { tenaga: n }) }}
@@ -202,23 +202,23 @@ export function Harian() {
         </div>
 
         <div className="mt-3">
-          <label className="text-[11px] font-bold text-neutral-500" htmlFor="catatan-harian">Catatan</label>
+          <label className="text-[11px] font-bold text-neutral-500" htmlFor="catatan-harian">Notes</label>
           <textarea
             id="catatan-harian"
             value={catatan}
             maxLength={280}
             onChange={(e) => setCatatan(e.target.value)}
             onBlur={() => logWellness(tgl, { catatan: catatan.trim() })}
-            placeholder="Bagaimana rasanya, nyeri di mana, cuaca…"
+            placeholder="How it felt, where it hurt, the weather…"
             className="mt-1 h-20 w-full rounded-xl border border-neutral-200 bg-white p-2.5 text-[13px] text-ink placeholder:text-neutral-400 dark:border-white/15 dark:bg-white/10 dark:text-white"
           />
-          <span className="text-[10px] text-neutral-400">{catatan.length}/280 · tersimpan saat kotak ditinggalkan</span>
+          <span className="text-[10px] text-neutral-400">{catatan.length}/280 · saved when you leave the box</span>
         </div>
 
         <p className="mt-2 text-[11px] leading-snug text-neutral-500">
-          Tenaga dan catatan <b>tidak pernah menjadi masukan model</b> beban latihan. Nilai yang dilaporkan sendiri tidak
-          dapat disamakan dengan nilai terukur — dan justru ketika keduanya berselisih, perselisihannya yang memberi
-          keterangan.
+          Energy and notes are <b>never fed into the training-load model</b>. A self-reported value cannot be
+          equated with a measured one — and it is precisely when the two disagree that the disagreement tells you
+          something.
         </p>
       </Card>
     </div>

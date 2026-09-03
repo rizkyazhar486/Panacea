@@ -249,7 +249,7 @@ function EmrPurchaseModal({
 }) {
   const isCompany = plan === 'rumah-sakit'
   const [buyer, setBuyer] = useState<'perusahaan' | 'individu'>(isCompany ? 'perusahaan' : 'individu')
-  const [orgType, setOrgType] = useState<'Rumah Sakit' | 'Instansi'>('Rumah Sakit')
+  const [orgType, setOrgType] = useState<'Hospital' | 'Institution'>('Hospital')
   const [orgName, setOrgName] = useState('')
   const [npwp, setNpwp] = useState('')
   const [str, setStr] = useState('')
@@ -302,13 +302,13 @@ function EmrPurchaseModal({
         ) : (
           <div className="mt-4 space-y-3">
             <Field label="Buyer Type">
-              <select className={inputClass} value={orgType} onChange={(e) => setOrgType(e.target.value as 'Rumah Sakit' | 'Instansi')}>
-                <option>Rumah Sakit</option>
-                <option>Instansi</option>
+              <select className={inputClass} value={orgType} onChange={(e) => setOrgType(e.target.value as 'Hospital' | 'Institution')}>
+                <option>Hospital</option>
+                <option>Institution</option>
               </select>
             </Field>
-            <Field label={`${orgType === 'Rumah Sakit' ? 'Hospital' : 'Institution'} Name`}>
-              <input className={inputClass} value={orgName} onChange={(e) => setOrgName(e.target.value)} placeholder={`e.g. ${orgType === 'Rumah Sakit' ? 'Sehat Sentosa Hospital' : 'City Health Department'}`} />
+            <Field label={`${orgType === 'Hospital' ? 'Hospital' : 'Institution'} Name`}>
+              <input className={inputClass} value={orgName} onChange={(e) => setOrgName(e.target.value)} placeholder={`e.g. ${orgType === 'Hospital' ? 'Sehat Sentosa Hospital' : 'City Health Department'}`} />
             </Field>
             <Field label="Company NPWP (Tax ID)">
               <input className={inputClass} value={npwp} onChange={(e) => setNpwp(e.target.value)} placeholder="00.000.000.0-000.000" />
@@ -573,7 +573,7 @@ function BackendWallet() {
       <SectionTitle
         icon={<IconShield size={20} />}
         title="Real Wallet (Backend)"
-        subtitle="Saldo & penarikan dana diproses oleh server"
+        subtitle="Balance and withdrawals are processed by the server"
         right={<Badge tone={live ? 'brand' : 'high'}>{live ? 'Backend Active' : 'Local Mode'}</Badge>}
       />
       <div className="flex flex-wrap items-end justify-between gap-4 rounded-2xl bg-brand p-5 text-white">

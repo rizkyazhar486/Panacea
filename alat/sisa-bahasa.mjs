@@ -54,6 +54,15 @@ if (!fs.existsSync(KAMUS)) {
   process.exit(1)
 }
 const EN = new Set(fs.readFileSync(KAMUS, 'utf8').split('\n').map((w) => w.trim().toLowerCase()).filter(Boolean))
+// Paket kamusnya membuang nama diri, termasuk nama hari dan bulan. Setelah kata
+// berhuruf besar boleh dilaporkan, "Sunday" dan "January" — yang justru sudah
+// BERBAHASA INGGRIS — ikut terlapor sebagai temuan. Ditambahkan di sini, bukan
+// dengan mengecualikan kata berhuruf besar lagi.
+for (const w of [
+  'sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday',
+  'january', 'february', 'march', 'april', 'may', 'june', 'july', 'august',
+  'september', 'october', 'november', 'december',
+]) EN.add(w)
 
 /*
  * Yang dikecualikan, beserta alasannya — semuanya BUKAN antarmuka:

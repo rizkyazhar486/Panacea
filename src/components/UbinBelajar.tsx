@@ -38,7 +38,7 @@ function Kepala({ judul, ke, aksi }: { judul: string; ke: string; aksi?: React.R
       <span className="flex items-center gap-3">
         {aksi}
         <Link to={ke} className="t-kecil flex min-h-[40px] items-center font-bold text-brand">
-          Buka →
+          Open →
         </Link>
       </span>
     </div>
@@ -48,7 +48,7 @@ function Kepala({ judul, ke, aksi }: { judul: string; ke: string; aksi?: React.R
 function TombolLain({ onClick }: { onClick: () => void }) {
   return (
     <button onClick={onClick} className="t-kecil flex min-h-[40px] items-center font-bold text-neutral-500">
-      Lain ↻
+      Another ↻
     </button>
   )
 }
@@ -80,7 +80,7 @@ export function UbinInspirasi() {
 
   return (
     <section>
-      <Kepala judul="Inspirasi" ke="/resilience-stories" aksi={<TombolLain onClick={() => setGeser((g) => g + 1)} />} />
+      <Kepala judul="Inspiration" ke="/resilience-stories" aksi={<TombolLain onClick={() => setGeser((g) => g + 1)} />} />
       <div className="kaca rounded-3xl p-3">
         {k.jenis === 'kisah' ? (
           <>
@@ -106,10 +106,10 @@ export function UbinInspirasi() {
             teks={k.jenis === 'kisah' ? `${k.nama}. ${k.bidang}. ${k.sulit} ${k.hikmah}`
               : k.jenis === 'atlet' ? `${k.teks} — ${k.oleh}, ${k.prestasi}`
                 : `${k.teks} ${k.konteks}`}
-            label="Dengarkan"
+            label="Listen"
           />
         </div>
-        <p className="t-mikro mt-2 text-neutral-400">{daftar.length} kartu · berganti tiap hari</p>
+        <p className="t-mikro mt-2 text-neutral-400">{daftar.length} cards · a new one each day</p>
       </div>
     </section>
   )
@@ -129,7 +129,7 @@ export function UbinKartuBelajar() {
   return (
     <section>
       <Kepala
-        judul="Kartu belajar"
+        judul="Study card"
         ke="/med-study?bagian=therapy"
         aksi={<TombolLain onClick={() => { setGeser((g) => g + 1); setBuka(false) }} />}
       />
@@ -146,16 +146,16 @@ export function UbinKartuBelajar() {
         {buka ? (
           <p className="t-kecil mt-2 line-clamp-4 leading-snug text-neutral-600 dark:text-neutral-300">{e.therapy}</p>
         ) : (
-          <p className="t-kecil mt-2 text-brand">Tatalaksananya? Tekan untuk membuka →</p>
+          <p className="t-kecil mt-2 text-brand">Its management? Tap to reveal →</p>
         )}
-        <span className="t-mikro mt-2 block text-neutral-400">Acuan tatalaksana SKDI · {SKDI_ENTRIES.length} kartu</span>
+        <span className="t-mikro mt-2 block text-neutral-400">SKDI management reference · {SKDI_ENTRIES.length} cards</span>
       </button>
       {/* Tombol dengar DI LUAR kartunya: kartu ini sendiri sebuah tombol
           (menekannya membuka jawaban), dan tombol di dalam tombol membuat
           setiap ketukan mengerjakan dua hal sekaligus. */}
       {buka && (
         <div className="mt-1.5">
-          <PemutarBaca teks={`${e.diagnosis}. ${e.classification ?? ''}. ${e.therapy}`} label="Dengarkan kartu" />
+          <PemutarBaca teks={`${e.diagnosis}. ${e.classification ?? ''}. ${e.therapy}`} label="Listen to the card" />
         </div>
       )}
     </section>
@@ -185,7 +185,7 @@ export function UbinSoal() {
 
   const pilihan: { label: string; nilai: number | boolean }[] =
     s.type === 'tf'
-      ? [{ label: 'Fakta', nilai: true }, { label: 'Mitos', nilai: false }]
+      ? [{ label: 'Fact', nilai: true }, { label: 'Myth', nilai: false }]
       : (s.options ?? []).map((o, i) => ({ label: o, nilai: i }))
 
   const sudah = jawab !== null
@@ -194,7 +194,7 @@ export function UbinSoal() {
   return (
     <section>
       <Kepala
-        judul="Soal hari ini"
+        judul="Today’s question"
         ke="/med-study"
         aksi={<TombolLain onClick={() => { setGeser((g) => g + 1); setJawab(null) }} />}
       />
@@ -232,12 +232,12 @@ export function UbinSoal() {
         {sudah && (
           <>
             <p className={`t-kecil mt-2 font-black ${benar ? 'text-brand' : 'text-rose-500'}`}>
-              {benar ? 'Benar' : 'Belum tepat'}
+              {benar ? 'Correct' : 'Not quite'}
             </p>
             <p className="t-mikro mt-0.5 line-clamp-4 leading-snug text-neutral-500 dark:text-neutral-400">{s.explanation}</p>
-            {s.source && <p className="t-mikro mt-1 truncate text-neutral-400">Sumber: {s.source}</p>}
+            {s.source && <p className="t-mikro mt-1 truncate text-neutral-400">Source: {s.source}</p>}
             <div className="mt-2">
-              <PemutarBaca teks={`${s.q}. Pembahasan. ${s.explanation}`} label="Dengarkan pembahasan" />
+              <PemutarBaca teks={`${s.q}. Explanation. ${s.explanation}`} label="Listen to the explanation" />
             </div>
           </>
         )}
@@ -258,7 +258,7 @@ export function UbinRingkasanKarya() {
 
   return (
     <section>
-      <Kepala judul="Ringkasan karya" ke="/ringkasan-karya" aksi={<TombolLain onClick={() => setGeser((g) => g + 1)} />} />
+      <Kepala judul="Work summaries" ke="/ringkasan-karya" aksi={<TombolLain onClick={() => setGeser((g) => g + 1)} />} />
       <div className="kaca rounded-3xl p-3">
         <div className="flex items-baseline justify-between gap-2">
           <span className="t-kecil min-w-0 truncate font-black text-ink dark:text-white">{k.judul}</span>
@@ -267,7 +267,7 @@ export function UbinRingkasanKarya() {
         <span className="t-mikro block truncate text-neutral-400">{k.oleh}{k.tahun ? ` · ${k.tahun}` : ''}</span>
         <p className="t-kecil mt-2 line-clamp-5 leading-snug text-neutral-600 dark:text-neutral-300">{k.ringkas}</p>
         <div className="mt-2">
-          <PemutarBaca teks={`${k.judul}, oleh ${k.oleh}. ${k.ringkas}`} label="Dengarkan" />
+          <PemutarBaca teks={`${k.judul}, oleh ${k.oleh}. ${k.ringkas}`} label="Listen" />
         </div>
         <p className="t-mikro mt-2 text-neutral-400">{KARYA.length} karya · berganti tiap hari</p>
       </div>
