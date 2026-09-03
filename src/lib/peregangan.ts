@@ -69,7 +69,7 @@ export const GERAKAN: Gerakan[] = [
   },
   {
     id: 'lengan-renang', nama: 'Arm circles & shoulder pulls', kapan: 'sebelum', target: 'Shoulders, chest, upper back',
-    durasi: '10 putaran tiap arah',
+    durasi: '10 circles each direction',
     cara: [
       'Circle both arms in large arcs forward, then backward.',
       'Follow with elbows pulled back, shoulder blades squeezed together.',

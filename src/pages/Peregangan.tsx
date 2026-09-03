@@ -55,7 +55,7 @@ export function Peregangan() {
       <SectionTitle
         icon={<IconLeaf />}
         title="Stretching & Posture"
-        subtitle="Disusun menurut kapan, bukan menurut otot"
+        subtitle="Organised by when, not by muscle"
       />
 
       {/* Hal yang paling sering salah, ditaruh paling atas. */}
@@ -67,7 +67,7 @@ export function Peregangan() {
           before training is <b>dynamic</b> work: movement that takes the joints through their range,
           repeatedly.
         </p>
-        <Prosa kelas="mt-2 text-[12px] leading-relaxed text-neutral-600">Peregangan statis tetap ada tempatnya — sesudah latihan, atau sebagai sesi tersendiri untuk menambah luas gerak sendi. Yang selama ini keliru hanyalah waktunya.</Prosa>
+        <Prosa kelas="mt-2 text-[12px] leading-relaxed text-neutral-600">Static stretching still has its place — after training, or as a session of its own to increase joint range of motion. All that was ever wrong was the timing.</Prosa>
       </Card>
 
       {/* Protokol siap pakai */}
@@ -168,10 +168,10 @@ export function Peregangan() {
                   <div className="space-y-2 border-t border-white/10 px-3 py-2.5">
                     {g.video ? (
                       <video src={g.video} autoPlay muted loop playsInline preload="metadata"
-                        aria-label={`Demonstrasi ${g.nama}`}
+                        aria-label={`${g.nama} demonstration`}
                         className="aspect-square w-full rounded-xl object-cover" />
                     ) : g.gambar ? (
-                      <img src={g.gambar} alt={`Posisi akhir ${g.nama}`} loading="lazy"
+                      <img src={g.gambar} alt={`${g.nama} end position`} loading="lazy"
                         className="aspect-square w-full rounded-xl object-cover" />
                     ) : null}
                     <div className="flex flex-wrap gap-2 text-[11px] text-neutral-500">
@@ -224,7 +224,7 @@ export function Peregangan() {
             <li key={r} className="text-[10px] leading-relaxed text-slate-500">{r}</li>
           ))}
         </ul>
-        <Prosa kelas="mt-3 text-[11px] leading-relaxed text-neutral-500">Klip peragaan adalah gambaran gerakan yang dibuat AI, bukan rekaman seorang instruktur. Bila suatu gerakan menimbulkan nyeri tajam, kesemutan, atau baal, hentikan dan periksakan — itu menunjuk ke saraf, bukan ke otot.</Prosa>
+        <Prosa kelas="mt-3 text-[11px] leading-relaxed text-neutral-500">The demonstration clips are AI-generated depictions of the movement, not footage of an instructor. If a movement causes sharp pain, tingling, or numbness, stop and get it checked — that points to a nerve, not a muscle.</Prosa>
       </Card>
     </div>
   )
