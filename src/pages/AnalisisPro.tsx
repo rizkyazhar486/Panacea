@@ -162,7 +162,7 @@ export function AnalisisPro() {
                 <span className="text-sm font-bold" style={{ color: laju.warna }}>{laju.judul}</span>
                 {laju.rasio !== null && (
                   <span className="text-[11px] font-bold text-neutral-500">
-                    beban 7 hari {laju.akut} · kebiasaan {laju.kronis} · rasio {laju.rasio}
+                    7-day load {laju.akut} · baseline {laju.kronis} · ratio {laju.rasio}
                   </span>
                 )}
               </div>
@@ -474,7 +474,7 @@ function SeksiLari({ workouts, hrMax }: { workouts: ImportedWorkout[]; hrMax: nu
           <div className="flex items-baseline justify-between gap-2">
             <h3 className="text-[13px] font-black text-ink dark:text-white">8-week volume</h3>
             <span className="text-[11px] text-neutral-500">
-              rata-rata {vol.rataKm.toFixed(1)} km/mgg · tren {vol.trenKmPerMinggu >= 0 ? '+' : ''}{vol.trenKmPerMinggu.toFixed(1)} km/mgg
+              mean {vol.rataKm.toFixed(1)} km/wk · trend {vol.trenKmPerMinggu >= 0 ? '+' : ''}{vol.trenKmPerMinggu.toFixed(1)} km/wk
             </span>
           </div>
           <div className="mt-2 flex h-24 items-end gap-1">

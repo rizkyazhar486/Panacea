@@ -78,7 +78,7 @@ export function SportsLab() {
       ) : (
         <>
           <Card className="!p-4">
-            <div className="text-[11px] font-black uppercase tracking-wide text-neutral-500">Skuad ({roster.length})</div>
+            <div className="text-[11px] font-black uppercase tracking-wide text-neutral-500">Squad ({roster.length})</div>
             <div className="mt-2 flex flex-wrap gap-1.5">
               {roster.map((p) => (
                 <button key={p.id} onClick={() => setSelectedId(p.id)}
@@ -145,7 +145,7 @@ export function SportsLab() {
 
                 <div className="mt-3 rounded-xl border border-brand/30 p-3">
                   <div className="flex items-center justify-between">
-                    <span className="text-[11px] font-black uppercase tracking-wide text-brand-dark">Selisih antar-agen</span>
+                    <span className="text-[11px] font-black uppercase tracking-wide text-brand-dark">Disagreement between agents</span>
                     <Badge tone={valuation.disagreement >= 40 ? 'critical' : valuation.disagreement >= 20 ? 'high' : 'normal'}>
                       {valuation.disagreement} poin
                     </Badge>

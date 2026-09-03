@@ -352,7 +352,7 @@ export function Login({ onBack }: { onBack?: () => void }) {
                     <input className={inputClass} value={f.dob}
                       onChange={e => setF(p => ({ ...p, dob: e.target.value }))} type="date"
                       max={hariIni()} />
-                    {f.dob && <p className="mt-0.5 text-[11px] text-brand-dark">Umur: {ageFromDob(f.dob)} tahun</p>}
+                    {f.dob && <p className="mt-0.5 text-[11px] text-brand-dark">Age: {ageFromDob(f.dob)} years</p>}
                   </div>
                 </div>
               </Collapse>

@@ -302,7 +302,7 @@ export function UbinTekananPagiSore() {
       <div className="kaca rounded-3xl p-3">
         <div className="flex items-baseline gap-1.5">
           <span className="text-[26px] font-black leading-none tabular-nums nyala text-ink dark:text-white">{Math.round(rata(semua))}</span>
-          <span className="t-mikro font-bold text-neutral-400">mmHg sistolik, rerata {semua.length} bacaan</span>
+          <span className="t-mikro font-bold text-neutral-400">mmHg systolic, mean of {semua.length} readings</span>
         </div>
         <span className="mt-2 flex h-10 items-end gap-[2px]" aria-hidden>
           {semua.slice(-20).map((v, i) => {
@@ -312,7 +312,7 @@ export function UbinTekananPagiSore() {
           })}
         </span>
         <p className="t-mikro mt-1.5 leading-snug text-neutral-400">
-          Rentang {Math.round(rentang)} mmHg antar-bacaan. Naik-turun sebesar belasan mmHg antar-waktu adalah hal biasa — itulah sebabnya penetapan hipertensi memakai rerata beberapa bacaan pada hari yang berbeda, bukan satu angka tertinggi.
+          A spread of {Math.round(rentang)} mmHg between readings. Swings of a dozen or more mmHg between occasions are normal — which is why a diagnosis of hypertension uses the mean of several readings on different days, not a single highest figure.
         </p>
       </div>
     </section>

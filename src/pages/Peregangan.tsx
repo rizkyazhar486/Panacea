@@ -142,7 +142,7 @@ export function Peregangan() {
         </div>
 
         {daftar.length === 0 && (
-          <p className="mt-3 text-[12px] text-neutral-500">Tidak ada yang cocok dengan "{cari}".</p>
+          <p className="mt-3 text-[12px] text-neutral-500">Nothing matches "{cari}".</p>
         )}
 
         <div className="mt-3 space-y-1.5">

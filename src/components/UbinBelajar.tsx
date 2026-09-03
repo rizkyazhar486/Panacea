@@ -269,7 +269,7 @@ export function UbinRingkasanKarya() {
         <div className="mt-2">
           <PemutarBaca teks={`${k.judul}, oleh ${k.oleh}. ${k.ringkas}`} label="Listen" />
         </div>
-        <p className="t-mikro mt-2 text-neutral-400">{KARYA.length} karya · berganti tiap hari</p>
+        <p className="t-mikro mt-2 text-neutral-400">{KARYA.length} works · a new one each day</p>
       </div>
     </section>
   )

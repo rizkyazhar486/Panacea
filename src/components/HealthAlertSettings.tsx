@@ -222,7 +222,7 @@ export function HealthAlertSettings() {
                     onClick={() => save({ sleepTargetHHMM: saranJam })}
                     className="text-[11px] font-bold text-brand-dark underline"
                   >
-                    Pakai {saranJam} — jam tidur tengah Anda dari data jam tangan
+                    Use {saranJam} — your median bedtime from watch data
                   </button>
                 )}
                 <div className="flex flex-wrap items-center gap-2">

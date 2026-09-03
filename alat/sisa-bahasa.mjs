@@ -89,6 +89,18 @@ function teksTampak(baris, jsx) {
     const awal = baris.match(/^\s{6,}([A-Za-z][^<>{}\n]{4,})(?:<|$)/)
     if (awal && !/^\s*\w+:/.test(awal[1])) out.push(awal[1])
   }
+  // Simpul teks JSX yang MEMUAT interpolasi tidak pernah terambil sama sekali:
+  // kedua pola di atas menolak kurung kurawal, sehingga "{n} disembunyikan" dan
+  // "Puncak hari ini {x}" tidak pernah terlaporkan. Yang salah bukan ambang
+  // panjangnya melainkan pengambilannya. Di sini interpolasinya dibuang lebih
+  // dulu, lalu pola yang sama dijalankan ulang atas sisa teksnya.
+  if (jsx && /\{/.test(baris)) {
+    const tanpa = baris.replace(/\{[^{}]*\}/g, ' ')
+    for (const m of tanpa.matchAll(/>([^<>{}\n]{4,})</g)) out.push(m[1])
+    const awal2 = tanpa.match(/^\s{6,}([A-Za-z][^<>{}\n]{4,})(?:<|$)/)
+    if (awal2 && !/^\s*\w+:/.test(awal2[1])) out.push(awal2[1])
+  }
+
   // Petik dipasangkan dengan menyusuri baris, BUKAN dengan regex bergantian.
   // Regex /'([^']+)'/ pada `nama: 'Jalan', met: 2.5, int: 'ringan'` ikut
   // menangkap ", met: 2.5, int: " — potongan KODE di antara dua string — lalu

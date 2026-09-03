@@ -315,7 +315,7 @@ export function UbinStasiun() {
         </div>
 
         <p className="t-mikro mt-2 text-neutral-400">
-          Dari {RIWAYAT_OSCE.length} stasiun yang tercatat pernah keluar. Seberapa sering, bukan seberapa mungkin.
+          From {RIWAYAT_OSCE.length} stations recorded as having appeared. How often, not how likely.
         </p>
       </div>
     </section>

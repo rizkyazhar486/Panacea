@@ -845,13 +845,13 @@ function SyncDiagnosticsCard() {
               {d.metrics.length > 0 && (
                 <div>
                   <div className="text-[11px] font-black uppercase tracking-wide text-neutral-500">
-                    Rincian · {d.matchedCount} dikenali · {d.emptyCount} kosong · {d.metrics.length} total
+                    Detail · {d.matchedCount} recognised · {d.emptyCount} empty · {d.metrics.length} total
                   </div>
                   <div className="mt-1.5 space-y-1">
                     {d.metrics.slice(0, MAX_ROWS).map((m, i) => (
                       <div key={i} className="flex items-center justify-between gap-2 rounded-lg bg-neutral-50 px-2.5 py-1.5 dark:bg-white/5">
                         <span className="min-w-0 flex-1 truncate font-mono text-[10px] text-neutral-600 dark:text-neutral-300">{m.name}</span>
-                        <span className="shrink-0 text-[10px] text-neutral-500">{m.sampleCount} sampel</span>
+                        <span className="shrink-0 text-[10px] text-neutral-500">{m.sampleCount} samples</span>
                         <span className={`shrink-0 text-[10px] font-bold ${
                           m.sampleCount === 0 ? 'text-amber-600'
                           : m.recognised ? 'text-emerald-600' : 'text-rose-600'}`}>

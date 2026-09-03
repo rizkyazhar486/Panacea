@@ -353,7 +353,7 @@ function SpeedTab() {
       </Card>
 
       <div className="flex flex-wrap gap-2">
-        {([['semua', 'Semua'], ['lari', '🏃 Running'], ['sepeda', '🚴 Cycling'], ['renang', '🏊 Renang']] as [Sport | 'semua', string][]).map(([k, l]) => (
+        {([['semua', 'All'], ['lari', '🏃 Running'], ['sepeda', '🚴 Cycling'], ['renang', '🏊 Swimming']] as [Sport | 'semua', string][]).map(([k, l]) => (
           <button
             key={k}
             onClick={() => setF(k)}
@@ -416,7 +416,7 @@ function ScheduleTab() {
         <div className="rounded-lg border border-emerald-500/30 bg-emerald-500/10 p-3 mt-3">
           <p className="text-sm text-neutral-600 leading-relaxed">
             With posture as the goal, <strong className="text-ink">swimming and pulling work are increased</strong>
-            {' '}sementara <strong className="text-ink">cycling is capped and always followed by its counterweight</strong> —
+            {' '}while <strong className="text-ink">cycling is capped and always followed by its counterweight</strong> —
             because the two work in opposite directions on posture.
           </p>
         </div>
