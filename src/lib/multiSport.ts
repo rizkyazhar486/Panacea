@@ -298,7 +298,7 @@ export function weeklyMultiSport(goal: Goal): Session[] {
       { hari: 'Monday', sport: 'renang', isi: 'Technique + threshold: 10 × 100 m at CSS pace', fokus: 'Lactate threshold' },
       { hari: 'Tuesday', sport: 'lari', isi: 'Intervals: 5 × 1000 m at interval pace', fokus: 'VO₂max' },
       { hari: 'Wednesday', sport: 'sepeda', isi: 'Zone 2 for 60–90 minutes + 5 neuromuscular sprints', fokus: 'Base + speed' },
-      { hari: 'Thursday', sport: 'kekuatan', isi: 'Lifting and pulling work + the posture programme', fokus: 'Kekuatan' },
+      { hari: 'Thursday', sport: 'kekuatan', isi: 'Lifting and pulling work + the posture programme', fokus: 'Strength' },
       { hari: 'Friday', sport: 'lari', isi: '25-minute tempo + 6 strides', fokus: 'Lactate threshold' },
       { hari: 'Saturday', sport: 'sepeda', isi: 'Threshold blocks: 3 × 12 minutes in zone 4', fokus: 'FTP' },
       { hari: 'Sunday', sport: 'pulih', isi: 'Easy swim or a gentle walk', fokus: 'Recovery' },

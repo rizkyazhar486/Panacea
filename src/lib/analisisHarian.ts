@@ -202,11 +202,11 @@ export interface ZonaDenyut {
 }
 
 const NAMA_ZONA: { nama: string; warna: string; lo: number; hi: number }[] = [
-  { nama: 'Z1 Pemulihan', warna: '#94a3b8', lo: 0, hi: 0.6 },
-  { nama: 'Z2 Aerobik', warna: '#34d399', lo: 0.6, hi: 0.7 },
+  { nama: 'Z1 Recovery', warna: '#94a3b8', lo: 0, hi: 0.6 },
+  { nama: 'Z2 Aerobic', warna: '#34d399', lo: 0.6, hi: 0.7 },
   { nama: 'Z3 Tempo', warna: '#60a5fa', lo: 0.7, hi: 0.8 },
-  { nama: 'Z4 Ambang', warna: '#fbbf24', lo: 0.8, hi: 0.9 },
-  { nama: 'Z5 Maksimal', warna: '#f87171', lo: 0.9, hi: 9 },
+  { nama: 'Z4 Threshold', warna: '#fbbf24', lo: 0.8, hi: 0.9 },
+  { nama: 'Z5 Maximal', warna: '#f87171', lo: 0.9, hi: 9 },
 ]
 
 /**

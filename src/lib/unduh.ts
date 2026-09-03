@@ -104,10 +104,10 @@ export function simpanKanvas(canvas: HTMLCanvasElement, nama: string, judul?: st
 /** Kalimat singkat untuk diperlihatkan setelah menyimpan. */
 export function pesanSimpan(h: HasilSimpan, nama: string): string {
   switch (h) {
-    case 'dibagikan': return 'Terkirim ke lembar berbagi.'
-    case 'diunduh': return `Tersimpan sebagai ${nama}.`
-    case 'dibuka': return 'Dibuka di tab baru — tekan lama gambarnya untuk menyimpan.'
+    case 'dibagikan': return 'Sent to the share sheet.'
+    case 'diunduh': return `Saved as ${nama}.`
+    case 'dibuka': return 'Opened in a new tab — press and hold the image to save it.'
     case 'dibatalkan': return ''
-    default: return 'Gagal menyimpan berkas.'
+    default: return 'Failed to save the file.'
   }
 }
