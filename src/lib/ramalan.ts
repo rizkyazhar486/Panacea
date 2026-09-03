@@ -192,11 +192,11 @@ export function menunggu(jenis: string, sekarang = Date.now()): Ramalan[] {
  * memang belum cukup.
  */
 export function bacaRapor(r: RaporRamalan | null): string {
-  if (!r) return 'Belum ada ramalan yang tanggalnya sudah lewat, jadi belum ada yang dapat dinilai. Rapor ini akan terisi dengan sendirinya.'
+  if (!r) return 'No forecast has come due yet, so there is nothing to grade yet. This report card will fill in on its own.'
   if (r.jumlah < 7) {
-    return `Baru ${r.jumlah} ramalan yang dapat dinilai. Di bawah tujuh, angka ketepatan belum berarti apa-apa dan sengaja tidak ditafsirkan di sini.`
+    return `Only ${r.jumlah} forecast(s) gradable so far. Below seven, the accuracy figure doesn't mean anything yet and is deliberately not interpreted here.`
   }
-  const arah = r.bias > 0 ? 'terlalu rendah' : r.bias < 0 ? 'terlalu tinggi' : 'tidak condong ke satu arah'
+  const arah = r.bias > 0 ? 'too low' : r.bias < 0 ? 'too high' : 'not skewed either way'
   const persen = Math.round((r.tepat / r.jumlah) * 100)
-  return `Dari ${r.jumlah} ramalan, ${r.tepat} (${persen}%) melesetnya masih di bawah ambang bermakna. Rerata besar kesalahan ${r.mae} ${r.satuan || 'satuan'}, dan ramalannya cenderung ${arah} sebesar ${Math.abs(r.bias)}. Kesalahan terbesar yang pernah terjadi ${r.terburuk}.`
+  return `Out of ${r.jumlah} forecasts, ${r.tepat} (${persen}%) missed by less than the meaningful threshold. Average error size ${r.mae} ${r.satuan || 'units'}, and forecasts tend to run ${arah} by ${Math.abs(r.bias)}. The worst error so far was ${r.terburuk}.`
 }

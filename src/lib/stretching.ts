@@ -167,7 +167,7 @@ export const MUSCLE_GROUPS: MuscleGroup[] = [
         durasi: '5–8 slow reps, or hold for 20–30 seconds',
       },
       {
-        nama: 'Open book (rotasi berbaring miring)',
+        nama: 'Open book (side-lying rotation)',
         otot: 'Upper-back rotation',
         posisi: [
           'Lie on your side with both knees bent to 90° and stacked, both arms straight out in front and stacked',
@@ -336,7 +336,7 @@ export const MUSCLE_GROUPS: MuscleGroup[] = [
           'Set the back tall, then push the hips BACKWARD while hinging forward from the hip joint',
           'The back stays flat throughout',
         ],
-        terasaDi: 'Belakang paha kanan',
+        terasaDi: 'Back of the right thigh',
         salah:
           'Rounding the back to reach the toes. That shifts the load onto the ligaments of the lower back and builds a movement habit that becomes dangerous under load.',
         durasi: '30 seconds each side',
@@ -355,13 +355,13 @@ export const MUSCLE_GROUPS: MuscleGroup[] = [
     stretches: [
       {
         nama: 'Standing quadriceps stretch',
-        otot: 'Kuadrisep, terutama rectus femoris',
+        otot: 'Quadriceps, especially rectus femoris',
         posisi: [
           'Stand holding a wall, bend the right knee and take hold of the right ankle',
           'Draw the heel toward the buttock, KEEPING BOTH KNEES IN LINE',
           'Squeeze the glutes and brace the abdomen so the lower back does not arch',
         ],
-        terasaDi: 'Depan paha kanan',
+        terasaDi: 'Front of the right thigh',
         salah:
           'Pulling the knee out to the side or back away from the body, and letting the lower back arch. Both move the stretch out of the muscle and into the knee and lumbar joints.',
         durasi: '30 seconds each side, 2–3 times',
@@ -380,7 +380,7 @@ export const MUSCLE_GROUPS: MuscleGroup[] = [
     stretches: [
       {
         nama: 'Seated adductor stretch (butterfly)',
-        otot: 'Adduktor pendek',
+        otot: 'Adductor brevis',
         posisi: [
           'Sit and bring the soles of both feet together, drawing them in toward you',
           'Sit tall, then hinge forward from the hips',

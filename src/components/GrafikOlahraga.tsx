@@ -237,7 +237,7 @@ export function GrafikOlahraga({
         <div>
           <h3 className="text-[15px] font-black text-white">Your exercise numbers</h3>
           <p className="text-[11px] text-neutral-500">
-            {hariAktif} hari aktif dari {rentang} hari terakhir
+            {hariAktif} active days out of the last {rentang} days
           </p>
         </div>
         <div className="flex shrink-0 gap-1 rounded-full bg-white/5 p-1">
@@ -291,7 +291,7 @@ export function GrafikOlahraga({
 
       <KartuGrafik
         judul="Daily steps"
-        kanan={<span className="text-[10.5px] text-neutral-500">{cakup.langkah.ada}/{cakup.langkah.total} sesi merekam</span>}
+        kanan={<span className="text-[10.5px] text-neutral-500">{cakup.langkah.ada}/{cakup.langkah.total} sessions recording</span>}
         anak={
           cakup.langkah.ada < MIN_SESI
             ? <Kosong pesan={`Only ${cakup.langkah.ada} sessions have recorded steps — not enough to call a trend. Some watches only record steps in walking mode.`} />
@@ -331,7 +331,7 @@ export function GrafikOlahraga({
 
       <div className="rounded-2xl bg-white/5 p-3">
         <Judul
-          teks="Zona denyut — 28 hari"
+          teks="Heart-rate zones — 28 days"
           kanan={<span className="text-[10.5px] text-neutral-500">{zona.sesiDipakai} sessions used</span>}
         />
         {zona.sesiDipakai === 0 ? (
