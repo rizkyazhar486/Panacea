@@ -60,7 +60,7 @@ export function PediatricDkaCalculator() {
     <div className="mx-auto max-w-2xl space-y-5 pb-24">
       <Card className="!p-5">
         <SectionTitle icon={<IconActivity size={20} />} title="Pediatric DKA Fluid & Insulin Calculator" subtitle="Resuscitation, rehydration, maintenance, potassium & insulin — standard pediatric DKA protocol" />
-        <Prosa kelas="mt-2 text-[13px] leading-relaxed text-neutral-500">Menirukan lembar kerja cairan KAD anak yang baku di sisi tempat tidur: bolus (bila syok) → defisit 48 jam + cairan rumatan → laju per jam → kelompok kalium → laju infus insulin. Alat bantu hitung semata — selalu pastikan terhadap protokol institusi Anda.</Prosa>
+        <Prosa kelas="mt-2 text-[13px] leading-relaxed text-neutral-500">Mimics the standard bedside pediatric DKA fluid worksheet: bolus (if shock) → 48-hour deficit + maintenance fluid → hourly rate → potassium bracket → insulin infusion rate. A calculation aid only — always confirm against your institution's protocol.</Prosa>
 
         <div className="mt-4 grid grid-cols-2 gap-3">
           <Field label="Weight (kg)">

@@ -80,7 +80,7 @@ function SkalaVo2({ vo2, titik, jk, usia }: { vo2: number; titik: number; jk: 'L
       </div>
       <div className="flex justify-between text-[9.5px] text-neutral-500">
         <span>{min.toFixed(0)}</span>
-        <span>titik tengah {jk === 'L' ? 'laki-laki' : 'perempuan'} {usia} th: {titik.toFixed(1)}</span>
+        <span>median for {jk === 'L' ? 'men' : 'women'} age {usia}: {titik.toFixed(1)}</span>
         <span>{max.toFixed(0)}</span>
       </div>
     </div>

@@ -79,7 +79,7 @@ export function UbinObat() {
           <input
             value={q}
             onChange={(e) => setQ(e.target.value)}
-            placeholder="Tifoid, amoksisilin, kejang…"
+            placeholder="Typhoid, amoxicillin, seizure…"
             aria-label="Search a drug or disease"
             className={KELAS_ISIAN}
           />

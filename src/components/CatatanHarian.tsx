@@ -107,15 +107,15 @@ export function CatatanHarian() {
       {rangkaian.total > 0 && (
         <div className="angka-fluid mt-3">
           <div className="rounded-2xl bg-white/70 p-3 dark:bg-white/5">
-            <div className="t-mikro font-bold uppercase tracking-wide text-neutral-500">Berturut</div>
+            <div className="t-mikro font-bold uppercase tracking-wide text-neutral-500">Current streak</div>
             <div className="t-angka font-black leading-none tabular-nums text-ink dark:text-white">{rangkaian.berjalan}</div>
           </div>
           <div className="rounded-2xl bg-white/70 p-3 dark:bg-white/5">
-            <div className="t-mikro font-bold uppercase tracking-wide text-neutral-500">Terpanjang</div>
+            <div className="t-mikro font-bold uppercase tracking-wide text-neutral-500">Longest</div>
             <div className="t-angka font-black leading-none tabular-nums text-ink dark:text-white">{rangkaian.terpanjang}</div>
           </div>
           <div className="rounded-2xl bg-white/70 p-3 dark:bg-white/5">
-            <div className="t-mikro font-bold uppercase tracking-wide text-neutral-500">Seluruhnya</div>
+            <div className="t-mikro font-bold uppercase tracking-wide text-neutral-500">Total</div>
             <div className="t-angka font-black leading-none tabular-nums text-ink dark:text-white">{rangkaian.total}</div>
           </div>
         </div>

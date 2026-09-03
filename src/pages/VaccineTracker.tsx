@@ -85,7 +85,7 @@ export function VaccineTracker() {
     <div className="mx-auto max-w-2xl space-y-5 pb-24">
       <Card className="!p-5">
         <SectionTitle icon={<IconShield size={20} />} title="Vaccine / Immunization Tracker" subtitle="Record your last dose, see when the next one is due" />
-        <Prosa kelas="mt-2 text-[13px] leading-relaxed text-neutral-500">Masukkan tanggal dosis terakhir tiap vaksin — untuk yang diberikan pada selang tetap (influenza, Tdap, penguat COVID), Anda akan melihat tanggal jatuh temponya. Rangkaian berdosis banyak (MMR, HPV, herpes zoster, pneumokokus, hepatitis B) bukan pengulangan rutin, jadi ikuti status rangkaiannya bersama tenaga medis, bukan lewat hitung mundur di sini.</Prosa>
+        <Prosa kelas="mt-2 text-[13px] leading-relaxed text-neutral-500">Enter the date of the last dose for each vaccine — for ones given on a fixed interval (influenza, Tdap, COVID boosters), you'll see the due date. Multi-dose series (MMR, HPV, herpes zoster, pneumococcal, hepatitis B) aren't routine repeats, so track series status with a healthcare provider, not via a countdown here.</Prosa>
       </Card>
 
       {(overdue.length > 0 || dueSoon.length > 0) && (

@@ -92,8 +92,8 @@ export function PetaKonsistensi() {
   return (
     <section className="peta-konsistensi kaca rounded-3xl p-3">
       <div className="mb-2 flex items-baseline justify-between gap-2">
-        <h2 className="t-kecil font-black uppercase tracking-wide text-neutral-500">Konsistensi</h2>
-        <span className="t-mikro tabular-nums text-neutral-400">{terisi} hari tercatat · {PEKAN} pekan</span>
+        <h2 className="t-kecil font-black uppercase tracking-wide text-neutral-500">Consistency</h2>
+        <span className="t-mikro tabular-nums text-neutral-400">{terisi} days logged · {PEKAN} weeks</span>
       </div>
 
       {/* SATU KISI, BUKAN DUA KOLOM YANG DISUSUN BERDAMPINGAN.
