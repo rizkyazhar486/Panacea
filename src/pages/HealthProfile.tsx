@@ -149,7 +149,7 @@ export function HealthProfile() {
    * berbeda bagi pengguna.
    */
   async function bacaGambarBia(file: File): Promise<ImportResult> {
-    setNote('Membaca gambar…')
+    setNote('Reading image…')
     const dataUrl = await new Promise<string>((res, rej) => {
       const fr = new FileReader()
       fr.onload = () => res(String(fr.result))
@@ -668,7 +668,7 @@ function AutoSyncCard() {
             <Badge tone={conn === 'up' ? 'normal' : conn === 'down' ? 'critical' : 'low'}>
               {conn === 'up' ? 'Connected' : conn === 'down' ? 'Not responding' : 'Checking…'}
             </Badge>
-            <button onClick={checkConnection} className="text-[11px] font-bold text-brand-dark hover:underline">Cek ulang</button>
+            <button onClick={checkConnection} className="text-[11px] font-bold text-brand-dark hover:underline">Check again</button>
           </div>
         </div>
         <div className="mt-1.5 flex items-center justify-between gap-2">
@@ -679,8 +679,8 @@ function AutoSyncCard() {
         </div>
         {conn === 'down' && (
           <p className="mt-2 text-[11px] leading-relaxed text-rose-600 dark:text-rose-600">
-            Server tidak menjawab. Selama ini terjadi, tidak ada data dari iPhone yang bisa masuk —
-            periksa status deployment sebelum menelusuri pengaturan di aplikasi.
+            The server is not responding. While that lasts, no data from the iPhone can arrive —
+            check the deployment status before hunting through settings in the app.
           </p>
         )}
         {conn === 'up' && !lastSync && (
@@ -695,9 +695,9 @@ function AutoSyncCard() {
           <button onClick={copy} disabled={!url} className="shrink-0 rounded-xl bg-neutral-100 px-3 py-2 text-xs font-bold text-neutral-600 transition hover:bg-neutral-200 disabled:opacity-50">{copied ? 'Copied ✓' : 'Copy'}</button>
         </div>
         <p className="mt-1 text-[10px] leading-relaxed text-neutral-500">
-          Rahasiakan tautan ini — siapa pun yang memilikinya bisa mengirim data ke akun Anda.
-          Saat menempelkannya di Health Auto Export, <b>kosongkan dahulu kolom URL</b> lalu tempel
-          sekali; menempel di atas isi lama menghasilkan alamat ganda yang tidak akan pernah dikenali server.
+          Keep this link secret — anyone who has it can push data into your account.
+          When pasting it into Health Auto Export, <b>clear the URL field first</b>, then paste
+          once; pasting over the old contents produces a doubled address the server will never recognise.
         </p>
       </div>
 
@@ -727,8 +727,8 @@ function AutoSyncCard() {
         {busy ? 'Working…' : '🔑 Create a new link (if the old one leaked)'}
       </button>
       <p className="mt-1 text-[10px] leading-relaxed text-neutral-500">
-        Setelah ini tautan lama langsung tidak berlaku, dan Anda harus memperbarui URL di aplikasi
-        sebelum data bisa masuk lagi.
+        The old link stops working immediately afterwards, and you must update the URL in the app
+        before data can arrive again.
       </p>
     </Card>
   )
@@ -787,14 +787,14 @@ function SyncDiagnosticsCard() {
       {!open ? (
         <button onClick={() => setOpen(true)}
           className="mt-3 w-full rounded-xl bg-neutral-100 px-4 py-3 text-sm font-bold text-neutral-700 transition hover:bg-neutral-200 dark:bg-white/10 dark:text-neutral-200">
-          Buka alat diagnostik
+          Open the diagnostic tool
         </button>
       ) : (
         <>
           <p className="mt-2 text-[12px] leading-relaxed text-neutral-500">
-            Pilih berkas ekspor apa pun secara langsung — <b>JSON</b> dari Health Auto Export,
+            Pick any export file directly — <b>JSON</b> from Health Auto Export,
             <b> CSV</b> from InBody or WHOOP, or <b>XML</b> from Apple Health.
-            Isinya diperiksa di perangkat Anda sendiri — tidak dikirim ke mana pun.
+            Its contents are examined on your own device — nothing is sent anywhere.
           </p>
 
           <input ref={fileRef} type="file" accept=".json,.csv,.xml,.txt,.tsv,application/json,text/csv,text/xml,text/plain" className="hidden"
@@ -813,10 +813,10 @@ function SyncDiagnosticsCard() {
           />
           <div className="mt-2 flex gap-2">
             <Button className="flex-1" disabled={busy} onClick={() => run(taRef.current?.value ?? '')}>
-              {busy ? 'Memeriksa…' : 'Periksa'}
+              {busy ? 'Checking…' : 'Check'}
             </Button>
             <button onClick={() => { if (taRef.current) taRef.current.value = ''; setD(null); setFileNote('') }}
-              className="rounded-xl bg-neutral-100 px-4 text-sm font-bold text-neutral-600 dark:bg-white/10">Bersihkan</button>
+              className="rounded-xl bg-neutral-100 px-4 text-sm font-bold text-neutral-600 dark:bg-white/10">Clear</button>
           </div>
 
           {d && (

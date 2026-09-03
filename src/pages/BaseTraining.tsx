@@ -381,7 +381,7 @@ function ScheduleTab() {
 const WILAYAH_LABEL: Record<Wilayah, string> = {
   atas: 'Upper body',
   inti: 'Hips & trunk',
-  bawah: 'Tungkai',
+  bawah: 'Legs',
 }
 
 function StretchTab() {

@@ -128,7 +128,7 @@ export function BodyBattery() {
           <Card>
             <div className="flex items-end justify-between gap-4">
               <div>
-                <div className="text-xs font-black uppercase tracking-wide text-neutral-500">Sekarang</div>
+                <div className="text-xs font-black uppercase tracking-wide text-neutral-500">Now</div>
                 <div className="mt-1 flex items-baseline gap-2">
                   <span className="text-5xl font-black tabular-nums" style={{ color: saran.warna }}>{hasil.sekarang}</span>
                   <span className="text-lg font-bold text-neutral-500">/ 100</span>
@@ -136,8 +136,8 @@ export function BodyBattery() {
                 <div className="mt-1 text-sm font-bold" style={{ color: saran.warna }}>{saran.judul}</div>
               </div>
               <div className="text-right text-xs text-neutral-500">
-                <div>Tertinggi <b className="tabular-nums text-ink dark:text-ink">{hasil.tertinggi}</b></div>
-                <div>Terendah <b className="tabular-nums text-ink dark:text-ink">{hasil.terendah}</b></div>
+                <div>Highest <b className="tabular-nums text-ink dark:text-ink">{hasil.tertinggi}</b></div>
+                <div>Lowest <b className="tabular-nums text-ink dark:text-ink">{hasil.terendah}</b></div>
               </div>
             </div>
             <div className="mt-3 h-2 overflow-hidden rounded-full bg-neutral-100 dark:bg-white/10">

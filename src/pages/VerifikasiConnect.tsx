@@ -141,7 +141,7 @@ export function VerifikasiConnect() {
         <Card className="!border-emerald-500/30 !bg-emerald-500/5">
           <p className="text-[13px] font-bold text-emerald-700">✓ Your account is already verified.</p>
           <p className="mt-1 text-[12px] text-neutral-600">
-            Trust credit Anda <b>{saya?.kredit}</b> dari {saya?.ambang.awal}.
+            Your trust credit is <b>{saya?.kredit}</b> out of {saya?.ambang.awal}.
             {saya?.bahaya && ' Your credit is in the danger zone.'}
           </p>
         </Card>
@@ -222,7 +222,7 @@ export function VerifikasiConnect() {
                 <input className={inputClass} inputMode="tel" placeholder="08123456789"
                   value={f.telepon} onChange={(e) => set('telepon', e.target.value)} aria-label="Phone number" />
               </Field>
-              <Prosa kelas="mt-1 text-[11px] leading-relaxed text-neutral-500">Dipakai memastikan satu orang tidak membuat dua akun. Nomornya tidak disimpan — hanya sidiknya dan empat digit terakhir, jadi ia tidak bisa dibaca kembali maupun dipakai menghubungi Anda.</Prosa>
+              <Prosa kelas="mt-1 text-[11px] leading-relaxed text-neutral-500">Used to ensure one person does not create two accounts. The number itself is not stored — only its fingerprint and the last four digits, so it can neither be read back nor used to contact you.</Prosa>
             </div>
             <div className="mt-2">
               <Field label="Posed selfie link">
@@ -230,8 +230,8 @@ export function VerifikasiConnect() {
                   onChange={(e) => set('selfieUrl', e.target.value)} aria-label="Selfie link" />
               </Field>
               <p className="mt-1 text-[11px] leading-relaxed text-neutral-500">
-                Foto wajah Anda sambil <b>membentuk huruf P dengan jari</b>. Pose ini yang membuktikan
-                fotonya diambil sekarang oleh Anda sendiri, bukan diambil dari internet.
+                A photo of your face while <b>forming the letter P with your fingers</b>. This pose is what proves
+                the photo was taken by you just now, rather than pulled from the internet.
               </p>
             </div>
             <div className="mt-2 grid grid-cols-1 gap-2">
@@ -243,11 +243,11 @@ export function VerifikasiConnect() {
               ))}
             </div>
             <p className="mt-1 text-[11px] leading-relaxed text-neutral-500">
-              Isi <b>minimal satu</b> dari ketiganya. Satu akun media sosial hanya boleh dipakai
-              satu akun Connect. Hanya tiga ini yang diterima karena pencocokan
-              wajah baru berarti bila halaman pembandingnya sulit dikarang mendadak — ketiganya
-              memperlihatkan riwayat unggahan, koneksi, dan tanggal bergabung. Tautan ke situs lain
-              tidak memberi pemilik apa pun untuk dinilai.
+              Fill in <b>at least one</b> of the three. One social account may only be used by
+              one Connect account. Only these three are accepted because matching a
+              face only means something when the page it is compared against is hard to fabricate on the spot — all three
+              show a posting history, connections, and a join date. A link to any other site
+              gives the owner nothing to assess.
             </p>
           </Card>
 
@@ -256,7 +256,7 @@ export function VerifikasiConnect() {
             <div className="text-[11px] font-black uppercase tracking-wide text-neutral-500">
               Processing consent
             </div>
-            <Prosa kelas="mt-1 text-[11px] leading-relaxed text-neutral-500">Ketiganya wajib untuk bisa diverifikasi, dan itu disampaikan terus terang: bila salah satu tidak Anda setujui, verifikasi tidak bisa dijalankan. Yang dipisah di sini adalah informasinya — Anda berhak tahu persis apa yang Anda setujui, satu per satu.</Prosa>
+            <Prosa kelas="mt-1 text-[11px] leading-relaxed text-neutral-500">All three are required for verification, and that is stated plainly: if you decline any one of them, verification cannot proceed. What is separated here is the information — you are entitled to know exactly what you are agreeing to, one item at a time.</Prosa>
             <div className="mt-2 space-y-2">
               {TUJUAN.map((t) => (
                 <label key={t.id} className="flex cursor-pointer items-start gap-2 rounded-xl bg-white/5 p-2.5">
@@ -296,7 +296,7 @@ export function VerifikasiConnect() {
           </div>
           {tarik ? (
             <div className="mt-2 rounded-xl bg-rose-500/10 p-3">
-              <Prosa kelas="text-[12px] leading-relaxed text-neutral-600">Menarik persetujuan menghapus data verifikasi Anda dan mengembalikan akun ke status belum terverifikasi, sehingga Connect tidak bisa dipakai sampai Anda mengajukannya lagi. Trust credit dan riwayat pelanggaran tetap tersimpan.</Prosa>
+              <Prosa kelas="text-[12px] leading-relaxed text-neutral-600">Withdrawing consent deletes your verification data and returns the account to unverified status, so Connect cannot be used until you apply again. Trust credit and violation history are retained.</Prosa>
               <div className="mt-2 flex gap-2">
                 <button onClick={() => void lakukanTarik()}
                   className="rounded-xl bg-rose-500 px-3 py-2 text-[12px] font-bold text-ink">
@@ -315,8 +315,8 @@ export function VerifikasiConnect() {
             </button>
           )}
           <p className="mt-2 text-[10px] leading-relaxed text-slate-500">
-            Catatan persetujuan beserta tanggal penarikannya tetap disimpan — justru itulah bukti
-            bahwa penarikan Anda dihormati.
+            The consent record and the date you withdrew it are kept — that record is precisely the evidence
+            that your withdrawal was honoured.
           </p>
         </Card>
       )}
@@ -332,12 +332,12 @@ export function VerifikasiConnect() {
             <span className="text-[11px] text-neutral-500">dari {saya.ambang.awal}</span>
           </div>
           <p className="mt-1 text-[11px] leading-relaxed text-neutral-500">
-            Di bawah {saya.ambang.bahaya} akun berada dalam bahaya. Di bawah {saya.ambang.hapus} akun
-            dijadwalkan dihapus — dijadwalkan, bukan langsung, supaya keputusan yang keliru masih bisa ditarik.
+            Below {saya.ambang.bahaya} the account is at risk. Below {saya.ambang.hapus} the account is
+            scheduled for deletion — scheduled, not immediate, so that a mistaken decision can still be reversed.
           </p>
           {saya.hapusPada && (
             <p className="mt-2 rounded-lg bg-rose-500/10 p-2 text-[12px] font-bold text-rose-600">
-              Akun dijadwalkan dihapus pada {saya.hapusPada.slice(0, 10)}.
+              Account scheduled for deletion on {saya.hapusPada.slice(0, 10)}.
             </p>
           )}
           {saya.pelanggaran.length > 0 && (

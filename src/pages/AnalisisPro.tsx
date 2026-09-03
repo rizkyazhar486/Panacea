@@ -143,9 +143,9 @@ export function AnalisisPro() {
                 <Tooltip contentStyle={{ fontSize: 11, borderRadius: 10, background: '#0f172a', border: '1px solid #334155', color: '#e2e8f0' }}
                   wrapperStyle={{ outline: 'none' }} isAnimationActive={false}
                   labelFormatter={(v) => new Date(v as string).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })} />
-                <Area type="monotone" dataKey="kebugaran" name="Kebugaran" stroke="#60a5fa" strokeWidth={2} fill="url(#fitFill)" dot={false} />
-                <Line type="monotone" dataKey="kelelahan" name="Kelelahan" stroke="#f87171" strokeWidth={1.6} dot={false} />
-                <Line type="monotone" dataKey="kesegaran" name="Kesegaran" stroke="#34d399" strokeWidth={1.6} strokeDasharray="4 3" dot={false} />
+                <Area type="monotone" dataKey="kebugaran" name="Fitness" stroke="#60a5fa" strokeWidth={2} fill="url(#fitFill)" dot={false} />
+                <Line type="monotone" dataKey="kelelahan" name="Fatigue" stroke="#f87171" strokeWidth={1.6} dot={false} />
+                <Line type="monotone" dataKey="kesegaran" name="Freshness" stroke="#34d399" strokeWidth={1.6} strokeDasharray="4 3" dot={false} />
               </ComposedChart>
             </ResponsiveContainer>
           </div>
@@ -181,21 +181,21 @@ export function AnalisisPro() {
                     <span>0</span><span>0,8</span><span>1,3</span><span>2,0</span>
                   </div>
                   <p className="mt-1 text-[11px] leading-snug text-neutral-500">
-                    Pita hijau 0,8–1,3 berasal dari Gabbett (2016), Br J Sports Med 50:273-80 pada atlet tim. Kerangka ini
-                    dikritik keras — Impellizzeri dkk. (2020), Br J Sports Med 54:1245-6 menunjukkan rasio semacam ini dapat
-                    memperlihatkan kaitan bahkan pada data acak. Bacalah sebagai rambu, <b>bukan</b> batas aman.
+                    The green band 0.8–1.3 comes from Gabbett (2016), Br J Sports Med 50:273-80, in team-sport athletes. That
+                    framework has been sharply criticised — Impellizzeri et al. (2020), Br J Sports Med 54:1245-6 showed ratios
+                    of this kind can show an association even in random data. Read it as a signpost, <b>not</b> a safety limit.
                   </p>
                 </div>
               )}
               <p className="mt-1 text-[12px] leading-relaxed text-neutral-500">{laju.arti}</p>
               {laju.kmPekanLalu > 0 && (
                 <p className="mt-1 text-[11px] text-slate-500">
-                  Jarak: {laju.kmPekanIni} km pekan ini, {laju.kmPekanLalu} km pekan lalu.
+                  Distance: {laju.kmPekanIni} km this week, {laju.kmPekanLalu} km last week.
                 </p>
               )}
               <p className="mt-1 text-[10px] leading-relaxed text-slate-600">
-                Rambu 0,8–1,3 berasal dari penelitian pada atlet tim dan sejak itu banyak dikritik —
-                ia menandai kecepatan penambahan, bukan meramalkan cedera.
+                The 0.8–1.3 signpost comes from research in team-sport athletes and has been widely criticised since —
+                it marks the rate of increase, it does not predict injury.
               </p>
             </div>
           )}
@@ -297,7 +297,7 @@ export function AnalisisPro() {
                   <div className="min-w-0">
                     <div className="text-[13px] font-bold text-ink">{z.nama}</div>
                     <div className="text-[10px] text-slate-500">
-                      {z.hinggaSec === Infinity ? `lebih lambat dari ${fmtPace(z.dariSec)}` : `${fmtPace(z.hinggaSec)} – ${fmtPace(z.dariSec)}`}/km
+                      {z.hinggaSec === Infinity ? `slower than ${fmtPace(z.dariSec)}` : `${fmtPace(z.hinggaSec)} – ${fmtPace(z.dariSec)}`}/km
                     </div>
                   </div>
                 </div>
@@ -318,7 +318,7 @@ export function AnalisisPro() {
             {(['pekan', 'bulan'] as const).map((s) => (
               <button key={s} onClick={() => setSatuanLog(s)}
                 className={`rounded-lg px-2.5 py-1 text-[11px] font-bold ${satuanLog === s ? 'bg-brand text-white' : 'bg-white/10 text-neutral-500'}`}>
-                {s === 'pekan' ? 'Pekan' : 'Bulan'}
+                {s === 'pekan' ? 'Week' : 'Month'}
               </button>
             ))}
           </div>
@@ -327,11 +327,11 @@ export function AnalisisPro() {
           <table className="w-full text-left text-[12px]">
             <thead>
               <tr className="text-[10px] uppercase tracking-wide text-slate-500">
-                <th className="pb-2 pr-3 font-bold">Periode</th>
+                <th className="pb-2 pr-3 font-bold">Period</th>
                 <th className="pb-2 pr-3 text-right font-bold">Sessions</th>
-                <th className="pb-2 pr-3 text-right font-bold">Waktu</th>
-                <th className="pb-2 pr-3 text-right font-bold">Jarak</th>
-                <th className="pb-2 text-right font-bold">Upaya</th>
+                <th className="pb-2 pr-3 text-right font-bold">Time</th>
+                <th className="pb-2 pr-3 text-right font-bold">Distance</th>
+                <th className="pb-2 text-right font-bold">Effort</th>
               </tr>
             </thead>
             <tbody>
@@ -464,7 +464,7 @@ function SeksiLari({ workouts, hrMax }: { workouts: ImportedWorkout[]; hrMax: nu
             ))}
           </div>
           <p className="mt-1 text-[11.5px] leading-snug text-neutral-500">
-            Angka di kanan adalah bagian yang mudah. Minggu tanpa denyut terekam tidak muncul — bukan digambar kosong.
+            The figure on the right is the easy portion. Weeks with no recorded heart rate are omitted — not drawn as empty.
           </p>
         </div>
       )}
@@ -486,8 +486,8 @@ function SeksiLari({ workouts, hrMax }: { workouts: ImportedWorkout[]; hrMax: nu
             ))}
           </div>
           <p className="mt-1 text-[11.5px] leading-snug text-neutral-500">
-            Kemiringan regresi kuadrat terkecil atas delapan minggu terakhir. Satu minggu yang terlewat menggeser garis ini
-            lebih jauh daripada yang diduga.
+            Least-squares regression slope over the last eight weeks. One missed week shifts this line further than you
+            would expect.
           </p>
         </div>
       )}
@@ -499,7 +499,7 @@ function SeksiLari({ workouts, hrMax }: { workouts: ImportedWorkout[]; hrMax: nu
             <table className="w-full min-w-[320px] text-[11.5px]">
               <thead>
                 <tr className="text-left text-[10px] uppercase tracking-wide text-neutral-500">
-                  <th className="py-1">Tanggal</th><th>Km</th><th>Awal</th><th>Akhir</th><th className="text-right">Selisih</th>
+                  <th className="py-1">Date</th><th>Km</th><th>Start</th><th>End</th><th className="text-right">Difference</th>
                 </tr>
               </thead>
               <tbody className="tabular-nums">
@@ -518,8 +518,8 @@ function SeksiLari({ workouts, hrMax }: { workouts: ImportedWorkout[]; hrMax: nu
             </table>
           </div>
           <p className="mt-1 text-[11.5px] leading-snug text-neutral-500">
-            Kenaikan denyut rata-rata dari paruh pertama ke paruh kedua. Ini <b>bukan</b> decoupling (Pa:HR): pace per titik
-            tidak tersimpan, jadi lajunya tidak dapat diperiksa. Angka ini hanya berarti bila laju Anda memang dijaga tetap.
+            The rise in average heart rate from the first half to the second. This is <b>not</b> decoupling (Pa:HR): pace per
+            point is not stored, so the pace cannot be checked. This number only means something if you did hold pace steady.
           </p>
         </div>
       )}
@@ -535,13 +535,13 @@ function SeksiLari({ workouts, hrMax }: { workouts: ImportedWorkout[]; hrMax: nu
               <span key={t.label} className="rounded-xl bg-black/[0.03] p-2 text-center dark:bg-white/5">
                 <span className="block text-[10px] font-bold uppercase tracking-wide text-neutral-500">{t.label}</span>
                 <span className="block text-[15px] font-black tabular-nums text-ink dark:text-white">{fmtDurasi(Math.round(t.detik))}</span>
-                {t.jauh && <span className="block text-[9.5px] leading-tight text-amber-600">di luar jangkauan data</span>}
+                {t.jauh && <span className="block text-[9.5px] leading-tight text-amber-600">outside the data range</span>}
               </span>
             ))}
           </div>
           <p className="mt-1 text-[11.5px] leading-snug text-neutral-500">
-            Riegel (1981): T₂ = T₁ × (D₂/D₁)^1,06. Eksponennya dicocokkan pada rekor dunia dan cenderung <b>terlalu optimis</b>
-            untuk jarak yang jauh lebih panjang daripada yang pernah Anda tempuh — ditandai di atas.
+            Riegel (1981): T₂ = T₁ × (D₂/D₁)^1.06. The exponent was fitted to world records and tends to be <b>too optimistic</b>
+            for distances far longer than any you have actually covered — those are marked above.
           </p>
         </div>
       )}

@@ -229,11 +229,11 @@ export function Login({ onBack }: { onBack?: () => void }) {
 
         <div className="w-full max-w-md space-y-5">
           <div className="lg:hidden"><Wordmark size={34} /></div>
-          {onBack && <button onClick={onBack} className="inline-flex min-h-[44px] items-center text-sm font-semibold text-neutral-500 hover:text-brand-dark">← Kembali</button>}
+          {onBack && <button onClick={onBack} className="inline-flex min-h-[44px] items-center text-sm font-semibold text-neutral-500 hover:text-brand-dark">← Back</button>}
 
           <div>
-            <h2 className="text-2xl font-extrabold">Masuk atau daftar</h2>
-            <p className="mt-1 text-sm text-neutral-500">Cukup email dan nama. Selebihnya bisa menyusul.</p>
+            <h2 className="text-2xl font-extrabold">Sign in or sign up</h2>
+            <p className="mt-1 text-sm text-neutral-500">Just an email and a name. The rest can follow later.</p>
           </div>
 
           {/* ── Peran ──────────────────────────────────────────────────────
@@ -262,7 +262,7 @@ export function Login({ onBack }: { onBack?: () => void }) {
           ) : (
             <button type="button" onClick={() => setPilihPeran(true)}
               className="flex min-h-[44px] w-full items-center justify-center rounded-xl border border-dashed border-neutral-300 px-3 text-[12px] font-bold text-neutral-500 transition hover:border-brand hover:text-brand-dark">
-              Saya dokter, penulis, atau verifikator →
+              I am a doctor, writer, or verifier →
             </button>
           )}
 
@@ -283,7 +283,7 @@ export function Login({ onBack }: { onBack?: () => void }) {
           <label className="flex cursor-pointer items-start gap-2 rounded-xl bg-neutral-50 p-3 text-[12px] leading-snug text-neutral-600">
             <input type="checkbox" checked={consent} onChange={e => setConsent(e.target.checked)}
               className="mt-0.5 h-4 w-4 shrink-0 accent-[#00BF63]" />
-            <span>Saya setuju dengan{' '}
+            <span>I agree to the{' '}
               {/* Sengaja tetap sebesar barisnya: ini tautan DI DALAM kalimat,
                   dan membesarkannya menjadi 44 px akan merusak paragraf yang
                   memuatnya. */}
@@ -298,8 +298,8 @@ export function Login({ onBack }: { onBack?: () => void }) {
                   dipakai adalah apakah ia duduk di dalam kalimat yang lebih
                   panjang daripada dirinya sendiri. */}
               <button type="button" onClick={() => setShowLegal(true)}
-                className="font-bold text-brand-dark underline">Syarat & Kebijakan Privasi</button>.
-              AI bersifat membantu, bukan pengganti dokter.</span>
+                className="font-bold text-brand-dark underline">Terms & Privacy Policy</button>.
+              AI is a support, not a replacement for a doctor.</span>
           </label>
 
           {error && <p className="text-xs text-accent">{error}</p>}
@@ -310,7 +310,7 @@ export function Login({ onBack }: { onBack?: () => void }) {
           )}
 
           <div className="flex items-center gap-3 text-xs text-neutral-500">
-            <span className="h-px flex-1 bg-neutral-200" /> atau isi sendiri <span className="h-px flex-1 bg-neutral-200" />
+            <span className="h-px flex-1 bg-neutral-200" /> or fill it in yourself <span className="h-px flex-1 bg-neutral-200" />
           </div>
 
           {/* ── Adaptive form fields ───────────── */}
@@ -348,7 +348,7 @@ export function Login({ onBack }: { onBack?: () => void }) {
                     </select>
                   </div>
                   <div>
-                    <label className="mb-1 block text-[11px] font-semibold text-neutral-500">Tanggal lahir</label>
+                    <label className="mb-1 block text-[11px] font-semibold text-neutral-500">Date of birth</label>
                     <input className={inputClass} value={f.dob}
                       onChange={e => setF(p => ({ ...p, dob: e.target.value }))} type="date"
                       max={hariIni()} />

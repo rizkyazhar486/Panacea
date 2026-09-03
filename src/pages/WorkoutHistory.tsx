@@ -292,7 +292,7 @@ function WorkoutRow({ w, hrMax, terbuka, onToggle }: { w: ImportedWorkout; hrMax
         <div className="flex flex-wrap items-baseline justify-between gap-2">
           <span className="font-semibold text-ink text-sm">
             {w.nama}
-            {w.diDalamRuangan === false && <span className="text-slate-500 font-normal"> · luar ruangan</span>}
+            {w.diDalamRuangan === false && <span className="text-slate-500 font-normal"> · outdoors</span>}
           </span>
           <span className="text-xs text-slate-500">
             {tgl.toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short' })}
@@ -314,7 +314,7 @@ function WorkoutRow({ w, hrMax, terbuka, onToggle }: { w: ImportedWorkout; hrMax
           {chart.length > 1 && (
             <div className="rounded-lg border border-white/10 bg-black/20 p-2">
               <div className="text-[10px] font-semibold uppercase tracking-widest text-slate-500 mb-1">
-                Detak jantung per menit
+                Beats per minute
               </div>
               <div style={{ width: '100%', height: 160 }}>
                 <ResponsiveContainer>
@@ -330,7 +330,7 @@ function WorkoutRow({ w, hrMax, terbuka, onToggle }: { w: ImportedWorkout; hrMax
                     <Tooltip
                       contentStyle={{ background: '#0f172a', border: '1px solid rgba(255,255,255,0.12)', borderRadius: 8, fontSize: 11 }}
                       labelFormatter={(v) => `menit ${v}`}
-                      formatter={(v) => [`${v} bpm`, 'Denyut']}
+                      formatter={(v) => [`${v} bpm`, 'Heart rate']}
                     />
                     <Line type="monotone" dataKey="bpm" stroke="#f43f5e" strokeWidth={2} dot={false} />
                   </LineChart>
@@ -342,7 +342,7 @@ function WorkoutRow({ w, hrMax, terbuka, onToggle }: { w: ImportedWorkout; hrMax
           {zones.length > 0 && (
             <div>
               <div className="text-[10px] font-semibold uppercase tracking-widest text-slate-500 mb-1.5">
-                Waktu per zona
+                Time per zone
               </div>
               <div className="flex h-3 w-full overflow-hidden rounded-full bg-white/5">
                 {zones.map((z) => (

@@ -140,7 +140,7 @@ export function PusatLatihan() {
           {audit && (
             <section className="space-y-3">
               <h2 className="text-[13px] font-black text-ink dark:text-white">
-                Dari mana angka-angka ini
+                Where these numbers come from
               </h2>
               {bacaanJujur(audit.bahan) && (
                 <p className="rounded-2xl border-l-4 border-amber-400 bg-amber-50/70 p-3 text-[12px] leading-relaxed text-amber-900 dark:bg-amber-500/10 dark:text-amber-200">

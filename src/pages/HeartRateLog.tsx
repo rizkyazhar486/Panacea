@@ -261,9 +261,9 @@ export function HeartRateLog() {
             </div>
             <p className="mt-3 text-[11px] leading-relaxed text-slate-500">
               {ringkas!.jumlah} sampel
-              {ringkas!.rapatDetik != null && ` · rata-rata satu sampel tiap ${fmtSelang(ringkas!.rapatDetik)}`}.
-              Kerapatan inilah gambaran sesungguhnya seberapa sering jam tangan Anda merekam — jauh lebih rapat
-              saat latihan, jarang saat diam.
+              {ringkas!.rapatDetik != null && ` · on average one sample every ${fmtSelang(ringkas!.rapatDetik)}`}.
+              This density is the real picture of how often your watch records — far denser
+              during a workout, sparse at rest.
             </p>
           </Card>
 
@@ -329,10 +329,10 @@ export function HeartRateLog() {
 
 function waktuLalu(t: number): string {
   const m = Math.floor((Date.now() - t) / 60000)
-  if (m < 1) return 'baru saja'
-  if (m < 60) return `${m} menit lalu`
+  if (m < 1) return 'just now'
+  if (m < 60) return `${m} min ago`
   const h = Math.floor(m / 60)
-  return h < 24 ? `${h} jam lalu` : `${Math.floor(h / 24)} days ago`
+  return h < 24 ? `${h} h ago` : `${Math.floor(h / 24)} days ago`
 }
 
 function fmtSelang(detik: number): string {
