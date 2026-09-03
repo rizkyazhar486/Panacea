@@ -182,6 +182,7 @@ function DDICheck({ texts }: { texts: string[] }) {
   const hits = checkInteractions(texts)
   const toneFor = (s: string): 'critical' | 'high' | 'normal' =>
     s === 'mayor' ? 'critical' : s === 'moderat' ? 'high' : 'normal'
+  const SEVERITY_LABEL: Record<string, string> = { mayor: 'major', moderat: 'moderate', minor: 'minor' }
   return (
     <Card>
       <SectionTitle
@@ -196,7 +197,7 @@ function DDICheck({ texts }: { texts: string[] }) {
         <div className="space-y-2">
           {hits.map((h, i) => (
             <div key={i} className="flex items-start gap-2 rounded-xl border border-neutral-100 p-3">
-              <Badge tone={toneFor(h.severity)}>{h.severity}</Badge>
+              <Badge tone={toneFor(h.severity)}>{SEVERITY_LABEL[h.severity] ?? h.severity}</Badge>
               <div className="text-sm">
                 <span className="font-bold capitalize">{h.drugs[0]} × {h.drugs[1]}</span>
                 <p className="text-neutral-600">{h.effect}</p>

@@ -9,16 +9,16 @@ export interface Interaction {
 }
 
 const TABLE: Interaction[] = [
-  { a: ['warfarin'], b: ['aspirin', 'asetosal', 'nsaid', 'ibuprofen', 'ketorolac', 'natrium diklofenak'], severity: 'mayor', effect: 'Risiko perdarahan meningkat.' },
-  { a: ['warfarin'], b: ['ciprofloxacin', 'metronidazole', 'flukonazol'], severity: 'mayor', effect: 'Peningkatan INR — risiko perdarahan.' },
-  { a: ['ace', 'lisinopril', 'ramipril', 'captopril', 'arb', 'valsartan', 'candesartan', 'losartan'], b: ['spironolakton', 'spironolactone', 'kalium', 'potassium', 'amilorid'], severity: 'mayor', effect: 'Hiperkalemia.' },
-  { a: ['digoksin', 'digoxin'], b: ['furosemide', 'furosemid', 'hidroklorotiazid', 'hct', 'thiazide'], severity: 'moderat', effect: 'Hipokalemia → toksisitas digoksin.' },
-  { a: ['simvastatin', 'atorvastatin', 'statin'], b: ['klaritromisin', 'clarithromycin', 'eritromisin', 'erythromycin', 'gemfibrozil'], severity: 'mayor', effect: 'Risiko miopati/rhabdomiolisis.' },
-  { a: ['metformin'], b: ['kontras', 'contrast', 'media kontras'], severity: 'moderat', effect: 'Risiko asidosis laktat — tahan sekitar prosedur kontras.' },
-  { a: ['clopidogrel', 'klopidogrel'], b: ['omeprazole', 'omeprazol', 'esomeprazole'], severity: 'moderat', effect: 'Efek antiplatelet clopidogrel berkurang.' },
-  { a: ['ssri', 'sertraline', 'fluoxetine', 'fluoxetin'], b: ['tramadol', 'triptan', 'mao'], severity: 'mayor', effect: 'Risiko sindrom serotonin.' },
-  { a: ['ssri', 'sertraline', 'fluoxetine'], b: ['nsaid', 'aspirin', 'ibuprofen', 'warfarin'], severity: 'moderat', effect: 'Risiko perdarahan GI.' },
-  { a: ['insulin'], b: ['propranolol', 'beta-bloker', 'beta blocker'], severity: 'moderat', effect: 'Beta-bloker menutupi gejala hipoglikemia.' },
+  { a: ['warfarin'], b: ['aspirin', 'asetosal', 'nsaid', 'ibuprofen', 'ketorolac', 'natrium diklofenak'], severity: 'mayor', effect: 'Increased bleeding risk.' },
+  { a: ['warfarin'], b: ['ciprofloxacin', 'metronidazole', 'flukonazol'], severity: 'mayor', effect: 'Increased INR — bleeding risk.' },
+  { a: ['ace', 'lisinopril', 'ramipril', 'captopril', 'arb', 'valsartan', 'candesartan', 'losartan'], b: ['spironolakton', 'spironolactone', 'kalium', 'potassium', 'amilorid'], severity: 'mayor', effect: 'Hyperkalemia.' },
+  { a: ['digoksin', 'digoxin'], b: ['furosemide', 'furosemid', 'hidroklorotiazid', 'hct', 'thiazide'], severity: 'moderat', effect: 'Hypokalemia → digoxin toxicity.' },
+  { a: ['simvastatin', 'atorvastatin', 'statin'], b: ['klaritromisin', 'clarithromycin', 'eritromisin', 'erythromycin', 'gemfibrozil'], severity: 'mayor', effect: 'Risk of myopathy/rhabdomyolysis.' },
+  { a: ['metformin'], b: ['kontras', 'contrast', 'media kontras'], severity: 'moderat', effect: 'Risk of lactic acidosis — hold around contrast procedures.' },
+  { a: ['clopidogrel', 'klopidogrel'], b: ['omeprazole', 'omeprazol', 'esomeprazole'], severity: 'moderat', effect: "Reduced clopidogrel antiplatelet effect." },
+  { a: ['ssri', 'sertraline', 'fluoxetine', 'fluoxetin'], b: ['tramadol', 'triptan', 'mao'], severity: 'mayor', effect: 'Risk of serotonin syndrome.' },
+  { a: ['ssri', 'sertraline', 'fluoxetine'], b: ['nsaid', 'aspirin', 'ibuprofen', 'warfarin'], severity: 'moderat', effect: 'Risk of GI bleeding.' },
+  { a: ['insulin'], b: ['propranolol', 'beta-bloker', 'beta blocker'], severity: 'moderat', effect: 'Beta-blocker masks hypoglycemia symptoms.' },
 ]
 
 export interface DDIHit {
