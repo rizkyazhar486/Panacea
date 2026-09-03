@@ -50,30 +50,30 @@ export function AturFitur() {
 
   return (
     <div className="space-y-4 pb-24">
-      <SectionTitle icon={<IconSettings />} title="Atur Fitur"
-        subtitle="Sembunyikan yang tidak Anda pakai supaya menunya tetap pendek" />
+      <SectionTitle icon={<IconSettings />} title="Manage Features"
+        subtitle="Hide what you do not use so the menu stays short" />
 
       <Card>
         <p className="text-sm leading-relaxed text-neutral-600">
-          Menyembunyikan fitur <b>tidak menghapusnya</b>. Halamannya tetap hidup, tautan lama dan
-          penanda halaman tetap bekerja — yang hilang hanya kehadirannya di menu dan di hub.
-          Semuanya bisa dikembalikan kapan pun dari halaman ini.
+          Hiding a feature <b>does not delete it</b>. Its page stays live, old links and
+          bookmarks keep working — all that goes is its presence in the menu and the hub.
+          Everything can be restored at any time from this page.
         </p>
         <div className="mt-3 flex flex-wrap items-center gap-2">
           <span className="rounded-full bg-white/5 px-3 py-1 text-[12px] font-bold text-neutral-600">
-            {jumlahTersembunyi} disembunyikan
+            {jumlahTersembunyi} hidden
           </span>
           {jumlahTersembunyi > 0 && (
             <button onClick={() => { tampilkanSemua(); setTersembunyi([]) }}
               className="rounded-full bg-brand px-3 py-1 text-[12px] font-bold text-ink">
-              Tampilkan semua lagi
+              Show everything again
             </button>
           )}
         </div>
       </Card>
 
       <Card>
-        <input className={inputClass} placeholder="Cari fitur…" value={cari}
+        <input className={inputClass} placeholder="Search features…" value={cari}
           onChange={(e) => setCari(e.target.value)} />
       </Card>
 
@@ -99,7 +99,7 @@ export function AturFitur() {
                     setTersembunyi(next)
                   }}
                   className="shrink-0 rounded-lg bg-white/5 px-2.5 py-1 text-[11px] font-bold text-neutral-600">
-                  {semuaTersembunyi ? 'Tampilkan grup' : 'Sembunyikan grup'}
+                  {semuaTersembunyi ? 'Show group' : 'Hide group'}
                 </button>
               )}
             </div>
@@ -115,14 +115,14 @@ export function AturFitur() {
                     </span>
                     {kunci ? (
                       <span className="shrink-0 rounded-md bg-white/5 px-2 py-0.5 text-[10px] font-bold text-slate-500"
-                        title="Selalu tersedia demi keselamatan, dan supaya pengaturan tidak pernah dapat mengunci Anda di luar">
-                        selalu ada
+                        title="Always available for safety, and so settings can never lock you out">
+                        always on
                       </span>
                     ) : (
                       <button onClick={() => setTersembunyi(alihkanFitur(n.to))}
-                        aria-label={off ? `Tampilkan ${n.label}` : `Sembunyikan ${n.label}`}
+                        aria-label={off ? `Show ${n.label}` : `Hide ${n.label}`}
                         className={`shrink-0 rounded-lg px-2.5 py-1 text-[11px] font-bold ${off ? 'bg-brand text-white' : 'bg-white/10 text-neutral-600'}`}>
-                        {off ? 'Tampilkan' : 'Sembunyikan'}
+                        {off ? 'Show' : 'Hide'}
                       </button>
                     )}
                   </div>
@@ -134,11 +134,11 @@ export function AturFitur() {
       })}
 
       <Card>
-        <Prosa kelas="text-[12px] leading-relaxed text-neutral-500">Beranda, Profil, Pengaturan dan Kartu Darurat sengaja tidak bisa disembunyikan. Menyembunyikan jalan menuju pengaturan akan mengunci Anda dari pengaturan Anda sendiri, dan tombol darurat bukan sesuatu yang pantas dihilangkan oleh aplikasi kesehatan.</Prosa>
+        <Prosa kelas="text-[12px] leading-relaxed text-neutral-500">Home, Profile, Settings and the Emergency Card deliberately cannot be hidden. Hiding the route to settings would lock you out of your own settings, and an emergency button is not something a health app should let you remove.</Prosa>
         <p className="mt-2 text-[12px] leading-relaxed text-neutral-500">
-          Ingin mengatur kartu di beranda? Itu terpisah dan ada di{' '}
-          <Link to="/" className="font-semibold text-ink underline">Beranda</Link> lewat tombol
-          "Atur kartu beranda".
+          Want to arrange the cards on the home screen? That is separate and lives on{' '}
+          <Link to="/" className="font-semibold text-ink underline">Home</Link>, under the
+          "Manage widgets" button.
         </p>
       </Card>
     </div>

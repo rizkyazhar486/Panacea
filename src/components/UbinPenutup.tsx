@@ -21,7 +21,7 @@ function Kepala({ judul, ke, kanan }: { judul: string; ke?: string; kanan?: Reac
   return (
     <div className="mb-2 flex items-baseline justify-between gap-2">
       <h2 className="t-kecil font-black uppercase tracking-wide text-neutral-500">{judul}</h2>
-      {kanan ?? (ke ? <Link to={ke} className="t-kecil flex min-h-[40px] items-center font-bold text-brand">Buka →</Link> : null)}
+      {kanan ?? (ke ? <Link to={ke} className="t-kecil flex min-h-[40px] items-center font-bold text-brand">Open →</Link> : null)}
     </div>
   )
 }
@@ -64,7 +64,7 @@ export function UbinAmsler() {
         judul="Amsler grid"
         kanan={
           <button onClick={() => setBuka((v) => !v)} className="t-kecil flex min-h-[40px] items-center font-bold text-brand">
-            {buka ? 'Tutup' : 'Mulai'}
+            {buka ? 'Close' : 'Start'}
           </button>
         }
       />
@@ -104,7 +104,7 @@ export function UbinAmsler() {
               </span>
               {umur != null && (
                 <span className="t-mikro ml-auto shrink-0 text-neutral-400">
-                  {umur === 0 ? 'today' : `${umur} hari lalu`}
+                  {umur === 0 ? 'today' : `${umur} d ago`}
                 </span>
               )}
             </div>
@@ -236,7 +236,7 @@ export function UbinPeregangan() {
       <Kepala
         judul="3-minute stretch"
         kanan={jalan ? (
-          <button onClick={() => setJalan(false)} className="t-kecil flex min-h-[40px] items-center font-bold text-neutral-500">Berhenti</button>
+          <button onClick={() => setJalan(false)} className="t-kecil flex min-h-[40px] items-center font-bold text-neutral-500">Stop</button>
         ) : undefined}
       />
       <div className="kaca rounded-3xl p-3">
@@ -249,7 +249,7 @@ export function UbinPeregangan() {
               onClick={() => { setMulai(Date.now()); getar.current = -1; setJalan(true) }}
               className="t-kecil mt-2 min-h-[44px] w-full rounded-2xl bg-brand font-bold text-white transition active:scale-[0.98]"
             >
-              Mulai
+              Start
             </button>
             <p className="t-mikro mt-2 leading-snug text-neutral-400">
               Stretching increases range of motion and feels good; what is not established is the claim that it prevents injury or removes muscle soreness after training.
@@ -334,9 +334,9 @@ export function UbinRangkaian() {
       return n
     }
     return [
-      { label: 'Catatan harian', n: hitung((h) => !!h) },
-      { label: 'Cahaya pagi', n: hitung((h) => !!(h as { sunDone?: boolean })?.sunDone) },
-      { label: 'Tenaga ditandai', n: hitung((h) => typeof (h as { tenaga?: number })?.tenaga === 'number') },
+      { label: 'Daily notes', n: hitung((h) => !!h) },
+      { label: 'Morning light', n: hitung((h) => !!(h as { sunDone?: boolean })?.sunDone) },
+      { label: 'Energy logged', n: hitung((h) => typeof (h as { tenaga?: number })?.tenaga === 'number') },
     ]
   }, [state.wellness])
 
@@ -412,14 +412,14 @@ export function UbinJetLag() {
             className="t-kecil min-w-0 flex-1 rounded-xl border border-neutral-200 bg-transparent px-2 py-2 text-ink dark:border-white/12 dark:text-white"
           >
             {Array.from({ length: 25 }, (_, i) => i - 12).map((n) => (
-              <option key={n} value={String(n)}>{n === 0 ? 'Sama' : n > 0 ? `+${n} jam (timur)` : `${n} jam (barat)`}</option>
+              <option key={n} value={String(n)}>{n === 0 ? 'Same' : n > 0 ? `+${n} h (east)` : `${n} h (west)`}</option>
             ))}
           </select>
           <input
             type="date"
             value={tanggal}
             onChange={(e) => simpan(selisih, e.target.value)}
-            aria-label="Tanggal berangkat"
+            aria-label="Departure date"
             className="t-kecil min-w-0 flex-1 rounded-xl border border-neutral-200 bg-transparent px-2 py-2 text-ink dark:border-white/12 dark:text-white"
           />
         </div>
@@ -433,14 +433,14 @@ export function UbinJetLag() {
               <span className="t-mikro font-bold text-neutral-400">days to adjust</span>
               {hariLagi != null && (
                 <span className="t-mikro ml-auto shrink-0 tabular-nums text-neutral-400">
-                  {hariLagi > 0 ? `berangkat ${hariLagi} hari lagi` : 'already departed'}
+                  {hariLagi > 0 ? `departing in ${hariLagi} d` : 'already departed'}
                 </span>
               )}
             </div>
             <p className="t-kecil mt-1.5 leading-snug text-neutral-600 dark:text-neutral-300">
               {keTimur
-                ? `Ke timur: majukan jam tidur ${perluHari > 3 ? 'one hour per day' : `${perluHari} kali satu jam`} sebelum berangkat, dan cari cahaya terang pada pagi hari di tujuan.`
-                : `Ke barat: mundurkan jam tidur ${perluHari > 3 ? 'one hour per day' : `${perluHari} kali satu jam`} sebelum berangkat, dan cari cahaya terang pada sore hari di tujuan.`}
+                ? `Heading east: bring your bedtime forward ${perluHari > 3 ? 'one hour per day' : `by an hour on ${perluHari} days`} before departure, and seek bright light in the morning once you arrive.`
+                : `Heading west: push your bedtime later ${perluHari > 3 ? 'one hour per day' : `by an hour on ${perluHari} days`} before departure, and seek bright light in the afternoon once you arrive.`}
             </p>
             <p className="t-mikro mt-1.5 leading-snug text-neutral-400">
               The body clock shifts roughly an hour a day, so a large difference genuinely cannot be closed at once. There is no melatonin advice here — that is a medicine, and how to use it is your doctor's call.

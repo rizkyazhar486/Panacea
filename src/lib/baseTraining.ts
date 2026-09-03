@@ -41,7 +41,7 @@ export const RUN_ZONES: RunZone[] = [
   {
     key: 'easy',
     name: 'Easy Run',
-    tujuan: 'Membangun aerobic base',
+    tujuan: 'Builds the aerobic base',
     kenapa:
       'Low intensity sustained for a long time stimulates capillary growth in muscle, increases the number and size of mitochondria, and enlarges the heart’s stroke volume. These adaptations only occur if the intensity is low enough to hold for a long time — go too fast and the session becomes a fatigue cost with no gain in aerobic base.',
     porsi: '70–80% of weekly kilometres',
@@ -53,7 +53,7 @@ export const RUN_ZONES: RunZone[] = [
   {
     key: 'long',
     name: 'Long Run',
-    tujuan: 'Membangun endurance',
+    tujuan: 'Builds endurance',
     kenapa:
       'Long duration depletes glycogen stores so the body learns to use fat as fuel, strengthens connective tissue, and trains mental endurance. What produces the adaptation here is TIME ON FEET, not speed.',
     porsi: '20–30% of weekly kilometres, once a week',
@@ -65,7 +65,7 @@ export const RUN_ZONES: RunZone[] = [
   {
     key: 'tempo',
     name: 'Tempo Run',
-    tujuan: 'Menaikkan lactate threshold',
+    tujuan: 'Raises the lactate threshold',
     kenapa:
       'The lactate threshold is the highest speed you can hold without lactate accumulating faster than it is cleared. Running right around that threshold trains the body to clear lactate more efficiently, so a pace that once felt hard starts to feel comfortable. It is the single largest determinant of middle- and long-distance performance.',
     porsi: '10–15% of weekly kilometres',
@@ -211,11 +211,11 @@ export const LADDERS: Ladder[] = [
       'Serratus anterior is the muscle that holds the shoulder blade against the rib cage. When it is weak the blade wings out and the shoulder drops forward. A push-up finished with a full protraction at the top — rather than stopping when the elbows lock — trains it directly.',
     frekuensi: '3–4 times a week, with at least one day between sessions',
     steps: [
-      { level: 1, name: 'Push-up dinding', target: '3×15', naik: '3 × 15 with full, controlled range', cue: 'Body in one straight line from ear to heel; do not pike at the hips' },
-      { level: 2, name: 'Push-up meja / bangku', target: '3×12', naik: '3 × 12 without the hips sagging', cue: 'The lower the support, the harder it gets; lower the height gradually' },
+      { level: 1, name: 'Wall push-up', target: '3×15', naik: '3 × 15 with full, controlled range', cue: 'Body in one straight line from ear to heel; do not pike at the hips' },
+      { level: 2, name: 'Table / bench push-up', target: '3×12', naik: '3 × 12 without the hips sagging', cue: 'The lower the support, the harder it gets; lower the height gradually' },
       { level: 3, name: 'Knee push-up', target: '3×12', naik: '3 × 12 with the chest close to the floor', cue: 'Knees, hips and shoulders in one line — do not bend at the hip' },
       { level: 4, name: 'Push-up penuh', target: '3×8', naik: '3 × 8 with the chest almost touching the floor', cue: 'Elbows about 45° from the body, not flared to 90° — flared elbows load the shoulder joint' },
-      { level: 5, name: 'Push-up penuh volume', target: '3×20', naik: '3 × 20', cue: 'Pause 1 second at the bottom; quality of movement matters more than the count' },
+      { level: 5, name: 'Full push-up, volume', target: '3×20', naik: '3 × 20', cue: 'Pause 1 second at the bottom; quality of movement matters more than the count' },
       { level: 6, name: 'Feet-elevated / archer push-up', target: '3×10', naik: 'Progress to one-arm variants if you want to', cue: 'Raise the feet to load the shoulders and upper chest more' },
     ],
   },
@@ -232,7 +232,7 @@ export const LADDERS: Ladder[] = [
       { level: 3, name: 'Australian row / inverted row', target: '3×10', naik: '3 × 12 with the body progressively more horizontal', cue: 'Pull until the chest meets the bar; hold the body straight as a plank' },
       { level: 4, name: 'Negative pull-up', target: '3 × 5 with a 5-second lowering', naik: 'Control a 5-second lowering for 3 × 5', cue: 'Jump to the top, then lower as slowly as you can — the lowering phase is what builds the strength' },
       { level: 5, name: 'Pull-up penuh', target: '3×3', naik: '3 × 5', cue: 'Chin over the bar, lower until the elbows are almost straight; no swinging' },
-      { level: 6, name: 'Pull-up volume / berbeban', target: '3 × 10, or add load', naik: '—', cue: 'Once you reach 3×10, add load rather than more repetitions' },
+      { level: 6, name: 'Pull-up, volume / weighted', target: '3 × 10, or add load', naik: '—', cue: 'Once you reach 3×10, add load rather than more repetitions' },
     ],
   },
   {
@@ -245,7 +245,7 @@ export const LADDERS: Ladder[] = [
     steps: [
       { level: 1, name: 'Dead bug', target: '3 × 8 each side', naik: 'The lower back stays in contact with the floor throughout', cue: 'The lower back must NOT lift off the floor — that is a requirement, not a suggestion' },
       { level: 2, name: 'Plank', target: '3 × 30 seconds', naik: '3 × 45 seconds without the hips dropping', cue: 'Hips level with the shoulders; squeeze the glutes so the pelvis does not tip' },
-      { level: 3, name: 'Crunch terkendali', target: '3×15', naik: '3 × 20', cue: 'Lift only until the shoulder blades clear the floor; keep the neck relaxed and do not pull on it' },
+      { level: 3, name: 'Controlled crunch', target: '3×15', naik: '3 × 20', cue: 'Lift only until the shoulder blades clear the floor; keep the neck relaxed and do not pull on it' },
       { level: 4, name: 'Sit-up penuh', target: '3×15', naik: '3 × 20', cue: 'Slow and controlled; stop if the lower back hurts' },
       { level: 5, name: 'Hanging knee raise', target: '3×10', naik: '3 × 12', cue: 'Lift by curling the pelvis upward, not by simply flexing the hip' },
       { level: 6, name: 'Hanging leg raise / ab wheel', target: '3×8', naik: '—', cue: 'No swinging; control the lowering phase' },
@@ -277,8 +277,8 @@ export const POSTURE_PROGRAM: PostureItem[] = [
   { nama: 'Face pulls or band rows', jenis: 'kuatkan', dosis: '3 × 15, three times a week', cue: 'Pull toward the forehead with high elbows — this trains the lower trapezius and the external rotators' },
   { nama: 'Prone Y-T-W', jenis: 'kuatkan', dosis: '3 × 8 of each letter', cue: 'Lie face down and lift the arms into a Y, T, and W with the thumbs pointing up' },
   { nama: 'Glute bridge', jenis: 'kuatkan', dosis: '3×12', cue: 'Glutes weakened by long sitting tip the pelvis forward and leave the lower back carrying too much' },
-  { nama: 'Stand up every 30–45 minutes', jenis: 'sadari', dosis: 'Sepanjang jam kerja', cue: 'Posture suffers from HOW LONG you hold one position, not from one wrong position. Changing position matters more than finding a perfect one' },
-  { nama: 'Set your screen and desk height', jenis: 'sadari', dosis: 'Sekali, permanen', cue: 'The top of the screen slightly below eye level; elbows around 90°. Holding good posture at a badly set desk will not last' },
+  { nama: 'Stand up every 30–45 minutes', jenis: 'sadari', dosis: 'Throughout the working day', cue: 'Posture suffers from HOW LONG you hold one position, not from one wrong position. Changing position matters more than finding a perfect one' },
+  { nama: 'Set your screen and desk height', jenis: 'sadari', dosis: 'Once, permanently', cue: 'The top of the screen slightly below eye level; elbows around 90°. Holding good posture at a badly set desk will not last' },
 ]
 
 export interface WeekPlan {
@@ -290,18 +290,18 @@ export interface WeekPlan {
 /** Contoh susunan seminggu yang menggabungkan lari dan kalistenik. */
 export function weeklyTemplate(hariLari: 3 | 4 | 5): WeekPlan[] {
   const base: WeekPlan[] = [
-    { hari: 'Senin', isi: 'Easy run 30–40 minutes + the posture programme', jenis: 'lari' },
-    { hari: 'Selasa', isi: 'Push-up + pull-up + core (tangga progresi)', jenis: 'kekuatan' },
-    { hari: 'Rabu', isi: 'Tempo run 20–30 minutes (after warming up)', jenis: 'lari' },
-    { hari: 'Kamis', isi: 'A gentle walk, stretching, enough sleep', jenis: 'pulih' },
-    { hari: 'Jumat', isi: 'Push-up + pull-up + core (tangga progresi)', jenis: 'kekuatan' },
-    { hari: 'Sabtu', isi: 'Long run 60–90 minutes at long-run pace', jenis: 'lari' },
-    { hari: 'Minggu', isi: 'Complete rest or a light walk', jenis: 'pulih' },
+    { hari: 'Monday', isi: 'Easy run 30–40 minutes + the posture programme', jenis: 'lari' },
+    { hari: 'Tuesday', isi: 'Push-up + pull-up + core (progression ladder)', jenis: 'kekuatan' },
+    { hari: 'Wednesday', isi: 'Tempo run 20–30 minutes (after warming up)', jenis: 'lari' },
+    { hari: 'Thursday', isi: 'A gentle walk, stretching, enough sleep', jenis: 'pulih' },
+    { hari: 'Friday', isi: 'Push-up + pull-up + core (progression ladder)', jenis: 'kekuatan' },
+    { hari: 'Saturday', isi: 'Long run 60–90 minutes at long-run pace', jenis: 'lari' },
+    { hari: 'Sunday', isi: 'Complete rest or a light walk', jenis: 'pulih' },
   ]
-  if (hariLari === 4) base[3] = { hari: 'Kamis', isi: 'Easy run, 30 minutes', jenis: 'lari' }
+  if (hariLari === 4) base[3] = { hari: 'Thursday', isi: 'Easy run, 30 minutes', jenis: 'lari' }
   if (hariLari === 5) {
-    base[3] = { hari: 'Kamis', isi: 'Easy run, 30 minutes', jenis: 'lari' }
-    base[6] = { hari: 'Minggu', isi: 'Intervals 6 × 400 m (only once the aerobic base is solid)', jenis: 'lari' }
+    base[3] = { hari: 'Thursday', isi: 'Easy run, 30 minutes', jenis: 'lari' }
+    base[6] = { hari: 'Sunday', isi: 'Intervals 6 × 400 m (only once the aerobic base is solid)', jenis: 'lari' }
   }
   return base
 }

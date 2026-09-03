@@ -31,7 +31,7 @@ function Kepala({ judul, ke, kanan }: { judul: string; ke: string; kanan?: React
   return (
     <div className="mb-2 flex items-baseline justify-between gap-2">
       <h2 className="t-kecil font-black uppercase tracking-wide text-neutral-500">{judul}</h2>
-      {kanan ?? <Link to={ke} className="t-kecil flex min-h-[40px] items-center font-bold text-brand">Buka →</Link>}
+      {kanan ?? <Link to={ke} className="t-kecil flex min-h-[40px] items-center font-bold text-brand">Open →</Link>}
     </div>
   )
 }
@@ -46,7 +46,7 @@ function GarisKebiasaan({ deret, biasa, kelas }: { deret: number[]; biasa: numbe
   const y = (v: number) => 34 - ((v - min) / rentang) * 30
   const titik = deret.map((v, i) => `${(i / (deret.length - 1)) * 100},${y(v).toFixed(2)}`).join(' ')
   return (
-    <svg viewBox="0 0 100 36" preserveAspectRatio="none" className="mt-2 h-10 w-full" role="img" aria-label={`${deret.length} bacaan terakhir`}>
+    <svg viewBox="0 0 100 36" preserveAspectRatio="none" className="mt-2 h-10 w-full" role="img" aria-label={`last ${deret.length} readings`}>
       <line x1="0" y1={y(biasa)} x2="100" y2={y(biasa)} stroke="currentColor" strokeWidth="0.6" strokeDasharray="3 3" className="text-neutral-400" />
       <polyline points={titik} fill="none" stroke="currentColor" strokeWidth="1.8" vectorEffect="non-scaling-stroke" strokeLinejoin="round" className={kelas} />
     </svg>
@@ -93,12 +93,12 @@ export function UbinHrv() {
 
   return (
     <section>
-      <Kepala judul="HRV semalam" ke="/tubuh?t=jantung" />
+      <Kepala judul="Overnight HRV" ke="/tubuh?t=jantung" />
       <div className="kaca rounded-3xl p-3">
         <PanelAngka nilai={kini} satuan="ms" biasa={biasa} satuanBiasa=" ms" />
         <GarisKebiasaan deret={deret} biasa={biasa} kelas="text-emerald-400" />
         <p className="t-mikro mt-1 leading-snug text-neutral-400">
-          Garis putus-putus = kebiasaan 14 hari Anda sendiri. HRV antar-orang berbeda jauh, jadi tidak ada ambang tunggal yang berlaku untuk semua.
+          The dashed line is your own 14-day baseline. HRV varies enormously between people, so no single threshold applies to everyone.
         </p>
       </div>
     </section>
@@ -130,7 +130,7 @@ export function UbinTahapTidur() {
 
   return (
     <section>
-      <Kepala judul="Tahap tidur" ke="/pola-tidur" />
+      <Kepala judul="Sleep stages" ke="/pola-tidur" />
       <div className="kaca rounded-3xl p-3">
         <div className="flex items-baseline gap-1.5">
           <span className="text-[26px] font-black leading-none tabular-nums nyala text-ink dark:text-white">{jam(total)}</span>
@@ -146,9 +146,9 @@ export function UbinTahapTidur() {
 
         <div className="mt-1.5 flex items-baseline justify-between gap-2">
           {[
-            { l: 'Dalam', v: deep, n: 'bg-indigo-600', b: rerata.deep },
+            { l: 'Deep', v: deep, n: 'bg-indigo-600', b: rerata.deep },
             { l: 'REM', v: rem, n: 'bg-violet-400', b: rerata.rem },
-            { l: 'Inti', v: core, n: 'bg-sky-300', b: 0 },
+            { l: 'Core', v: core, n: 'bg-sky-300', b: 0 },
           ].map((x) => (
             <span key={x.l} className="flex min-w-0 items-center gap-1.5">
               <span className={`h-2 w-2 shrink-0 rounded-full ${x.n}`} />
@@ -160,8 +160,8 @@ export function UbinTahapTidur() {
 
         <p className="t-mikro mt-1.5 leading-snug text-neutral-400">
           {rerata.deep > 0
-            ? `Rata-rata 14 hari: dalam ${jam(rerata.deep)}, REM ${jam(rerata.rem)}.`
-            : 'Perkiraan tahap tidur dari jam tangan berbasis gerak dan denyut — cukup untuk melihat arah, bukan untuk menilai satu malam.'}
+            ? `14-day average: deep ${jam(rerata.deep)}, REM ${jam(rerata.rem)}.`
+            : 'Sleep stages estimated by the watch from movement and heart rate — enough to see a direction, not to judge a single night.'}
         </p>
       </div>
     </section>
@@ -179,11 +179,11 @@ export function UbinEfisiensiTidur() {
 
   return (
     <section>
-      <Kepala judul="Efisiensi tidur" ke="/pola-tidur" />
+      <Kepala judul="Sleep efficiency" ke="/pola-tidur" />
       <div className="kaca rounded-3xl p-3">
         <div className="flex items-baseline gap-1.5">
           <span className="text-[26px] font-black leading-none tabular-nums nyala text-ink dark:text-white">{Math.round(efisiensi)}%</span>
-          <span className="t-mikro font-bold text-neutral-400">tidur ÷ waktu di ranjang</span>
+          <span className="t-mikro font-bold text-neutral-400">asleep ÷ time in bed</span>
         </div>
         <span className="mt-2 flex h-3 w-full overflow-hidden rounded-full bg-neutral-200 dark:bg-white/10" aria-hidden>
           <span className="h-full bg-brand" style={{ width: `${efisiensi}%` }} />
@@ -210,14 +210,14 @@ export function UbinLajuNapas() {
 
   return (
     <section>
-      <Kepala judul="Laju napas semalam" ke="/tubuh" />
+      <Kepala judul="Overnight breathing rate" ke="/tubuh" />
       <div className="kaca rounded-3xl p-3">
         {/* Arah terbalik: naiknya laju napas yang perlu diperhatikan, bukan
             turunnya — itulah tanda yang menyertai demam dan sesi berat. */}
-        <PanelAngka nilai={kini} satuan="napas/menit" biasa={biasa} arahTerbalik />
+        <PanelAngka nilai={kini} satuan="breaths/min" biasa={biasa} arahTerbalik />
         <GarisKebiasaan deret={deret} biasa={biasa} kelas="text-cyan-400" />
         <p className="t-mikro mt-1 leading-snug text-neutral-400">
-          Kenaikan beberapa napas per menit dari kebiasaan sering menyertai demam, kurang tidur, atau sesi berat — bukan diagnosis, hanya penanda arah.
+          A rise of a few breaths per minute above your baseline often accompanies fever, short sleep, or a hard session — not a diagnosis, only a pointer.
         </p>
       </div>
     </section>
@@ -237,12 +237,12 @@ export function UbinSaturasi() {
 
   return (
     <section>
-      <Kepala judul="Saturasi oksigen" ke="/tubuh" />
+      <Kepala judul="Oxygen saturation" ke="/tubuh" />
       <div className="kaca rounded-3xl p-3">
         <PanelAngka nilai={kini} satuan="%" biasa={biasa} satuanBiasa="%" />
         <GarisKebiasaan deret={deret} biasa={biasa} kelas="text-sky-400" />
         <p className="t-mikro mt-1 leading-snug text-neutral-400">
-          Sensor pergelangan tangan bukan alat diagnosis dan melesetnya beberapa persen adalah biasa, terutama pada kulit gelap dan tangan dingin. Bacaan rendah yang berulang layak diperiksa dengan oksimeter jari.
+          A wrist sensor is not a diagnostic device, and being off by a few per cent is normal — particularly on darker skin and cold hands. Repeated low readings are worth checking with a fingertip oximeter.
         </p>
       </div>
     </section>
@@ -263,7 +263,7 @@ export function UbinSuhu() {
 
   return (
     <section>
-      <Kepala judul="Suhu tubuh" ke="/tubuh" />
+      <Kepala judul="Body temperature" ke="/tubuh" />
       <div className="kaca rounded-3xl p-3">
         <div className="flex items-baseline gap-1.5">
           <span className={`text-[26px] font-black leading-none tabular-nums ${Math.abs(simpang) >= 0.5 ? 'text-amber-500' : 'text-ink dark:text-white'}`}>
@@ -272,13 +272,13 @@ export function UbinSuhu() {
           <span className="t-mikro font-bold text-neutral-400">°C</span>
           {biasa > 0 && (
             <span className="t-mikro ml-auto shrink-0 tabular-nums text-neutral-500">
-              {simpang >= 0 ? '+' : '−'}{Math.abs(simpang).toFixed(2)} °C dari kebiasaan
+              {simpang >= 0 ? '+' : '−'}{Math.abs(simpang).toFixed(2)} °C from baseline
             </span>
           )}
         </div>
         <GarisKebiasaan deret={deret} biasa={biasa} kelas="text-orange-400" />
         <p className="t-mikro mt-1 leading-snug text-neutral-400">
-          Yang dibaca SIMPANGANNYA terhadap kebiasaan sendiri, bukan angka mutlaknya: sensor pergelangan tangan mengukur suhu kulit, bukan suhu inti.
+          What is read is the DEVIATION from your own baseline, not the absolute figure: a wrist sensor measures skin temperature, not core temperature.
         </p>
       </div>
     </section>
