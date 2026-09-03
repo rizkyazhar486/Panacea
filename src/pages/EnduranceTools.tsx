@@ -259,10 +259,10 @@ function TabPanduan() {
   const [massa, setMassa] = useState(String((demo.weightKg || 65) + 9))
   const [durasiJam, setDurasiJam] = useState('2')
   const [segmen, setSegmen] = useState<Segmen[]>([
-    { nama: 'Datar awal', jarakKm: 20, gradienPct: 0 },
-    { nama: 'Tanjakan', jarakKm: 8, gradienPct: 7 },
-    { nama: 'Turunan', jarakKm: 8, gradienPct: -6 },
-    { nama: 'Datar akhir', jarakKm: 14, gradienPct: 0 },
+    { nama: 'Opening flat', jarakKm: 20, gradienPct: 0 },
+    { nama: 'Climb', jarakKm: 8, gradienPct: 7 },
+    { nama: 'Descent', jarakKm: 8, gradienPct: -6 },
+    { nama: 'Closing flat', jarakKm: 14, gradienPct: 0 },
   ])
 
   const anjuran = useMemo(() => saranIf(Number(durasiJam) || 2), [durasiJam])
@@ -281,10 +281,10 @@ function TabPanduan() {
       <Card>
         <SectionTitle icon={<IconTimer />} title="Route power guide" subtitle="Target watts per segment, from the gradient profile" />
         <p className="mt-2 text-sm leading-relaxed text-neutral-500">
-          Aturan intinya berlawanan dengan naluri kebanyakan orang: <strong className="text-ink">naik
-          tanjakan pakai daya lebih tinggi, turun dan datar pakai lebih rendah</strong>. Saat menanjak
-          kecepatan rendah sehingga hambatan udara kecil dan setiap watt tambahan langsung menghemat waktu;
-          saat menurun, watt tambahan hampir seluruhnya terbuang melawan udara.
+          The core rule runs against most people's instinct: <strong className="text-ink">use higher
+          power on climbs, lower power on descents and flats</strong>. Going uphill, speed is low so air
+          resistance is small and every extra watt saves time directly; going downhill, extra watts are
+          almost entirely wasted against the air.
         </p>
         <div className="mt-3 grid grid-cols-3 gap-3">
           <Field label="FTP (W)"><input className={inputClass} inputMode="numeric" value={ftp} onChange={(e) => setFtp(e.target.value)} /></Field>
@@ -292,7 +292,7 @@ function TabPanduan() {
           <Field label="Estimated hours"><input className={inputClass} inputMode="decimal" value={durasiJam} onChange={(e) => { setDurasiJam(e.target.value); setTargetIf(null) }} /></Field>
         </div>
         <p className="mt-2 text-[11px] leading-relaxed text-slate-500">
-          Berat total = badan + sepeda + perlengkapan. {anjuran.ket}
+          Total weight = body + bike + gear. {anjuran.ket}
         </p>
         <div className="mt-2 flex flex-wrap items-center gap-2">
           <span className="text-xs text-neutral-500">Target intensity</span>
@@ -398,8 +398,8 @@ function TabAklimatisasi() {
           <div className="flex items-end"><button onClick={tambahPanas} className="w-full rounded-lg bg-brand px-3 py-2 text-xs font-bold text-white">Log today</button></div>
         </div>
         <p className="mt-1.5 text-[11px] text-slate-500">
-          {panas.length} paparan tercatat. Hanya sesi di atas 27 °C dan minimal 30 menit yang dihitung —
-          di bawah itu rangsangannya terlalu lemah untuk memicu adaptasi.
+          {panas.length} exposures logged. Only sessions above 27 °C and at least 30 minutes count —
+          below that the stimulus is too weak to trigger adaptation.
         </p>
       </Card>
 

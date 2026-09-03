@@ -35,7 +35,7 @@ function SmokingCard() {
 
   return (
     <Card className="!p-5">
-      <SectionTitle icon={<IconActivity size={20} />} title="🚬 Smoking, in real numbers" subtitle="Berapa biaya sebuah kebiasaan harian dalam uang dan waktu" />
+      <SectionTitle icon={<IconActivity size={20} />} title="🚬 Smoking, in real numbers" subtitle="What a daily habit actually costs in money and time" />
       <div className="mt-3 grid grid-cols-2 gap-3 sm:grid-cols-4">
         <Field label="Cigarettes / day"><input className={inputClass} type="number" value={perDay || ''} onChange={(e) => setPerDay(+e.target.value)} /></Field>
         <Field label="Price / pack"><input className={inputClass} type="number" value={pricePack || ''} onChange={(e) => setPricePack(+e.target.value)} /></Field>
@@ -84,7 +84,7 @@ function SugarCard() {
   const pctWho = (grams / WHO_FREE_SUGAR_G) * 100
   return (
     <Card className="!p-5">
-      <SectionTitle icon={<IconChartUp size={20} />} title="🥤 Sugar shock" subtitle="Berapa sebenarnya gula dalam minuman Anda — dalam sendok teh" />
+      <SectionTitle icon={<IconChartUp size={20} />} title="🥤 Sugar shock" subtitle="How much sugar is actually in your drink — in teaspoons" />
       <div className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-2">
         <Field label="Drink">
           <select className={inputClass} value={sel} onChange={(e) => setSel(+e.target.value)}>
@@ -131,7 +131,7 @@ function AlcoholCard() {
   const overGuideline = drinksWeek > 14
   return (
     <Card className="!p-5">
-      <SectionTitle icon={<IconHeart size={20} />} title="🍺 Alcohol check" subtitle="Di mana asupan mingguan Anda dibanding panduan risiko rendah" />
+      <SectionTitle icon={<IconHeart size={20} />} title="🍺 Alcohol check" subtitle="Where your weekly intake sits against low-risk guidance" />
       <div className="mt-3 grid grid-cols-2 gap-3">
         <Field label="Standard drinks / week"><input className={inputClass} type="number" value={drinksWeek || ''} onChange={(e) => setDrinksWeek(+e.target.value)} /></Field>
         <div className="flex items-end"><Badge tone={overGuideline ? 'critical' : drinksWeek > 7 ? 'low' : 'brand'}>{overGuideline ? 'Above low-risk' : drinksWeek > 7 ? 'Moderate' : 'Low-risk range'}</Badge></div>
@@ -146,7 +146,7 @@ function AlcoholCard() {
           <div className="text-xl font-black text-ink dark:text-ink">{(gramsYear / 1000).toFixed(1)} kg</div>
         </div>
       </div>
-      <Prosa kelas="mt-3 text-[12px] leading-relaxed text-neutral-500 dark:text-neutral-500">Satu takaran baku ≈ 10 g alkohol murni. Panduan risiko rendah yang lazim adalah ≤14 takaran baku per pekan disertai hari-hari tanpa alkohol — dan bukti terkini menemukan tidak ada jumlah yang benar-benar "menyehatkan". Makin sedikit makin baik.</Prosa>
+      <Prosa kelas="mt-3 text-[12px] leading-relaxed text-neutral-500 dark:text-neutral-500">One standard drink ≈ 10 g of pure alcohol. Common low-risk guidance is ≤14 standard drinks per week with alcohol-free days — and current evidence finds no amount that is genuinely "healthy". Less is better.</Prosa>
     </Card>
   )
 }
@@ -155,8 +155,8 @@ export function RealityCheck() {
   return (
     <div className="mx-auto max-w-2xl space-y-5 pb-24">
       <Card className="!p-5">
-        <SectionTitle icon={<IconChartUp size={20} />} title="Habit Reality Check" subtitle="Ubah kebiasaan sehari-hari menjadi angka yang nyata — uang, sendok teh, dan waktu" />
-        <Prosa kelas="mt-2 text-sm leading-relaxed text-neutral-600 dark:text-neutral-300">Kebiasaan kecil sehari-hari menumpuk dengan cara yang mudah diremehkan. Kalkulator singkat ini membuat biaya sebenarnya terlihat. Semuanya dihitung di perangkat Anda — tidak ada yang disimpan atau dikirim ke mana pun.</Prosa>
+        <SectionTitle icon={<IconChartUp size={20} />} title="Habit Reality Check" subtitle="Turn everyday habits into real numbers — money, teaspoons, and time" />
+        <Prosa kelas="mt-2 text-sm leading-relaxed text-neutral-600 dark:text-neutral-300">Small daily habits add up in ways that are easy to underestimate. These quick calculators make the real cost visible. Everything is computed on your device — nothing is stored or sent anywhere.</Prosa>
       </Card>
       <SmokingCard />
       <SugarCard />

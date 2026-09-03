@@ -32,19 +32,19 @@ export function TeknikLari() {
       <SectionTitle
         icon={<IconRun />}
         title="Running Technique"
-        subtitle="Dari langkah pertama sampai pernapasan — diurutkan menurut kekuatan buktinya"
+        subtitle="From your first stride to your breathing — ordered by strength of evidence"
       />
 
       {/* Yang paling sering salah dipahami, ditaruh paling atas. */}
       <Card className="!border-amber-500/30 !bg-amber-500/5">
         <div className="text-[11px] font-black uppercase tracking-wide text-amber-700">Read this first</div>
         <p className="mt-2 text-[12px] leading-relaxed text-neutral-600">
-          <b>Tidak ada satu bentuk lari yang benar untuk semua orang.</b> The best evidence available
+          <b>There is no single correct running form for everyone.</b> The best evidence available
           shows that forcibly changing your gait — especially forcing a forefoot landing — does not
           reduce injury risk, and often just moves it from the knee to the Achilles tendon and the
           bones of the foot.
         </p>
-        <Prosa kelas="mt-2 text-[12px] leading-relaxed text-neutral-600">Karena itu tiap bagian di bawah membawa peringkat buktinya sendiri, dan daftarnya diurutkan dari yang paling kuat dukungannya. Bila waktu Anda terbatas, kerjakan yang hijau lebih dahulu dan biarkan sisanya.</Prosa>
+        <Prosa kelas="mt-2 text-[12px] leading-relaxed text-neutral-600">That's why each section below carries its own evidence rating, and the list is ordered from the most strongly supported. If your time is limited, work through the green ones first and leave the rest.</Prosa>
       </Card>
 
       {/* Teknik */}
@@ -74,10 +74,10 @@ export function TeknikLari() {
                   <div className="space-y-2 border-t border-white/10 px-3 py-2.5">
                     {b.video ? (
                       <video src={b.video} autoPlay muted loop playsInline preload="none"
-                        aria-label={`Demonstrasi ${b.nama}`}
+                        aria-label={`Demonstration of ${b.nama}`}
                         className="aspect-square w-full rounded-xl object-cover" />
                     ) : b.gambar ? (
-                      <img src={b.gambar} alt={`Acuan ${b.nama}`} loading="lazy"
+                      <img src={b.gambar} alt={`Reference for ${b.nama}`} loading="lazy"
                         className="aspect-square w-full rounded-xl object-cover" />
                     ) : null}
 
@@ -117,8 +117,8 @@ export function TeknikLari() {
       <Card>
         <div className="text-[11px] font-black uppercase tracking-wide text-neutral-500">Building endurance</div>
         <p className="mt-1 text-[12px] leading-relaxed text-neutral-500">
-          Teknik menentukan seberapa murah tiap langkah. Empat hal ini menentukan berapa lama Anda
-          bisa mempertahankannya.
+          Technique determines how cheap each stride is. These four things determine how long you
+          can sustain it.
         </p>
         <div className="mt-3 space-y-1.5">
           {FISIOLOGI.map((f) => {
@@ -157,10 +157,10 @@ export function TeknikLari() {
       <Card>
         <div className="text-[11px] font-black uppercase tracking-wide text-neutral-500">Your own pace</div>
         <p className="mt-2 text-[12px] leading-relaxed text-neutral-600">
-          Angka pace easy, tempo dan interval bergantung pada kebugaran Anda sekarang, jadi ia tidak
-          diulang di sini. Halaman <b>Foundation Training &amp; Posture</b> menghitungnya dari hasil lomba
-          atau tes Anda memakai kerangka VDOT, dan <b>Analisis Pro</b> membaca zona pace langsung
-          dari sesi yang sudah tersinkron.
+          Easy, tempo and interval pace figures depend on your current fitness, so they aren't
+          repeated here. The <b>Foundation Training &amp; Posture</b> page calculates them from your race
+          or test results using the VDOT framework, and <b>Analysis Pro</b> reads pace zones directly
+          from your synced sessions.
         </p>
         <div className="mt-3 flex flex-wrap gap-2">
           <Link to="/latihan-dasar"
@@ -177,7 +177,7 @@ export function TeknikLari() {
             <li key={r} className="text-[10px] leading-relaxed text-slate-500">{r}</li>
           ))}
         </ul>
-        <Prosa kelas="mt-3 text-[11px] leading-relaxed text-neutral-500">Klip dan gambar dihasilkan AI sebagai acuan bentuk, bukan rekaman pelatih. Bila ada nyeri yang berulang di tempat yang sama, itu urusan tenaga kesehatan — bukan urusan memperbaiki teknik sendiri dari halaman web.</Prosa>
+        <Prosa kelas="mt-3 text-[11px] leading-relaxed text-neutral-500">Clips and images are AI-generated as form references, not coach footage. Recurring pain in the same spot is a healthcare matter — not something to fix by yourself from a web page.</Prosa>
       </Card>
     </div>
   )

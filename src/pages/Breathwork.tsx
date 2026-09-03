@@ -103,8 +103,8 @@ export function Breathwork() {
   return (
     <div className="mx-auto max-w-2xl space-y-5 pb-24">
       <Card className="!p-5">
-        <SectionTitle icon={<IconActivity size={20} />} title="Breathwork Pacer" subtitle="Napas berirama untuk menenangkan sistem saraf dalam hitungan menit" />
-        <Prosa kelas="mt-2 text-[13px] leading-relaxed text-neutral-500">Napas lambat sekitar 5-6 kali per menit menaikkan ragam denyut jantung dan mengaktifkan tanggapan parasimpatis "istirahat &amp; cerna". Ikuti lingkarannya — membesar saat menarik napas, mengecil saat mengembuskan.</Prosa>
+        <SectionTitle icon={<IconActivity size={20} />} title="Breathwork Pacer" subtitle="Rhythmic breathing to calm the nervous system in minutes" />
+        <Prosa kelas="mt-2 text-[13px] leading-relaxed text-neutral-500">Slow breathing at around 5-6 breaths per minute raises heart rate variability and activates the parasympathetic "rest &amp; digest" response. Follow the circle — expanding as you inhale, shrinking as you exhale.</Prosa>
         <div className="mt-3 grid grid-cols-2 gap-2">
           {PROTOCOLS.map((p) => (
             <button key={p.id} onClick={() => { setProto(p); setRunning(false) }} className={`rounded-xl px-3 py-2 text-left text-[12px] font-bold transition ${proto.id === p.id ? 'bg-brand text-white' : 'bg-neutral-100 text-neutral-600 dark:bg-white/10 dark:text-neutral-300'}`}>
