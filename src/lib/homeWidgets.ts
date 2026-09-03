@@ -256,7 +256,7 @@ export const WIDGETS: WidgetDef[] = [
   { id: 'padua', label: 'Padua Score', ringkas: 'Whether medical inpatients need VTE prophylaxis', ke: '/padua-score', emoji: '🩸', kategori: 'Calculators & Scores' },
   { id: 'caprini', label: 'Caprini Score', ringkas: 'Whether surgical patients need VTE prophylaxis', ke: '/caprini-score', emoji: '🩹', kategori: 'Calculators & Scores' },
   { id: 'duke', label: 'Duke Criteria', ringkas: 'Diagnosing infective endocarditis', ke: '/duke-criteria', emoji: '❤️‍🩹', kategori: 'Calculators & Scores' },
-  { id: 'lights', label: "Kriteria Light", ringkas: 'Eksudat atau transudat pada efusi pleura', ke: '/lights-criteria', emoji: '💧', kategori: 'Calculators & Scores' },
+  { id: 'lights', label: "Light's Criteria", ringkas: 'Exudate or transudate in a pleural effusion', ke: '/lights-criteria', emoji: '💧', kategori: 'Calculators & Scores' },
   { id: 'ranson', label: 'Ranson Criteria', ringkas: 'Pancreatitis severity on admission and at 48 hours', ke: '/ranson-criteria', emoji: '🧪', kategori: 'Calculators & Scores' },
   { id: 'bisap', label: 'BISAP Score', ringkas: 'Pancreatitis severity within the first 24 hours', ke: '/bisap-score', emoji: '⏱️', kategori: 'Calculators & Scores' },
   { id: 'blatchford', label: 'Glasgow-Blatchford', ringkas: 'Who needs admission in upper GI bleeding', ke: '/glasgow-blatchford-score', emoji: '🩸', kategori: 'Calculators & Scores' },
