@@ -121,12 +121,12 @@ function UbinLangkah() {
   const deret = deretMetrik('steps').map((t) => t.nilai)
   const biasa = median(deret.slice(-7))
   return (
-    <Bingkai ke="/tubuh" judul="Langkah hari ini">
+    <Bingkai ke="/tubuh" judul="Steps today">
       <div className="flex items-center gap-2">
         {biasa > 0 && <Cincin rasio={kini / biasa} isi={`${Math.round((kini / biasa) * 100)}%`} />}
         <div className="min-w-0">
-          <Angka nilai={kini.toLocaleString('id-ID')} />
-          {biasa > 0 && <span className="t-mikro block truncate text-neutral-400">biasanya {Math.round(biasa).toLocaleString('id-ID')}</span>}
+          <Angka nilai={kini.toLocaleString('en-GB')} />
+          {biasa > 0 && <span className="t-mikro block truncate text-neutral-400">usually {Math.round(biasa).toLocaleString('en-GB')}</span>}
         </div>
       </div>
     </Bingkai>
@@ -142,8 +142,8 @@ function UbinLatihan() {
   const detikPerKm = km > 0 ? (menit * 60) / km : 0
   const pace = detikPerKm > 0 ? `${Math.floor(detikPerKm / 60)}:${String(Math.round(detikPerKm % 60)).padStart(2, '0')}` : null
   return (
-    <Bingkai ke="/riwayat-latihan" judul="Latihan 7 hari">
-      <Angka nilai={String(sesi.length)} satuan={`sesi · ${menit} mnt`} />
+    <Bingkai ke="/riwayat-latihan" judul="Training, 7 days">
+      <Angka nilai={String(sesi.length)} satuan={`sessions · ${menit} min`} />
       {/* Keterangan jarak dan pace DIGANTI GRAFIK, bukan ditambah di bawahnya.
           Dua baris kalimat di dalam ubin sekecil ini membuat ubinnya terbaca
           sebagai paragraf; sebaran latihan sepekan justru tidak terbaca sama
@@ -162,9 +162,9 @@ function UbinTidur() {
   const kini = typeof v.sleepH === 'number' && v.sleepH > 0 ? v.sleepH : deret[deret.length - 1]
   if (!(kini > 0)) return null
   return (
-    <Bingkai ke="/pola-tidur" judul="Tidur semalam">
+    <Bingkai ke="/pola-tidur" judul="Sleep last night">
       <div className="flex items-center justify-between gap-2">
-        <Angka nilai={kini.toFixed(1)} satuan="jam" />
+        <Angka nilai={kini.toFixed(1)} satuan="h" />
         <GrafikMini deret={deret.slice(-14)} />
       </div>
     </Bingkai>
@@ -177,7 +177,7 @@ function UbinDenyut() {
   const kini = typeof v.restingHr === 'number' ? v.restingHr : 0
   if (!(kini > 0)) return null
   return (
-    <Bingkai ke="/log-detak-jantung" judul="Denyut istirahat">
+    <Bingkai ke="/log-detak-jantung" judul="Resting heart rate">
       <div className="flex items-center justify-between gap-2">
         <Angka nilai={String(Math.round(kini))} satuan="bpm" nada="text-rose-600 dark:text-rose-400" />
         <GrafikMini deret={deretMetrik('restingHr').map((t) => t.nilai).slice(-14)} />
@@ -196,7 +196,7 @@ function UbinLongevity() {
   const titik = usia > 0 ? titikTengahVo2(usia, jk) : null
   const selisihMet = titik ? (vo2 - titik) / ML_PER_MET : null
   return (
-    <Bingkai ke="/longevity" judul="Kapasitas aerobik">
+    <Bingkai ke="/longevity" judul="Aerobic capacity">
       <Angka nilai={vo2.toFixed(1)} satuan="mL/kg/mnt" />
       {titik == null ? (
         <span className="t-mikro truncate text-neutral-400">{(vo2 / ML_PER_MET).toFixed(1)} MET</span>
@@ -253,7 +253,7 @@ function GarisKesegaran({ deret }: { deret: number[] }) {
   const x = (i: number) => (i / (deret.length - 1)) * 100
   const titik = deret.map((v, i) => `${x(i).toFixed(2)},${y(v).toFixed(2)}`).join(' ')
   return (
-    <svg viewBox={`0 0 100 ${T}`} preserveAspectRatio="none" className="h-[34px] w-full" role="img" aria-label={`Kesegaran ${deret.length} hari terakhir`}>
+    <svg viewBox={`0 0 100 ${T}`} preserveAspectRatio="none" className="h-[34px] w-full" role="img" aria-label={`Freshness, last ${deret.length} days`}>
       <line x1="0" y1={T / 2} x2="100" y2={T / 2} stroke="currentColor" strokeWidth="0.5" className="text-neutral-300 dark:text-white/25" />
       <polyline points={titik} fill="none" stroke="currentColor" strokeWidth="1.6" vectorEffect="non-scaling-stroke" strokeLinejoin="round" className="text-brand" />
     </svg>
@@ -299,7 +299,7 @@ export function UbinPelatihLebar() {
   return (
     <Link to="/analisis-pro" className="kaca col-span-2 flex flex-col gap-2 rounded-3xl p-3 transition active:scale-[0.98]">
       <div className="flex items-center justify-between gap-2">
-        <span className="t-mikro font-black uppercase tracking-wide text-neutral-500">Latihan hari ini</span>
+        <span className="t-mikro font-black uppercase tracking-wide text-neutral-500">Training today</span>
         <span className="t-mikro rounded-full px-2 py-0.5 font-black text-white" style={{ background: saran.warna }}>
           {saran.kapan}
         </span>
@@ -307,9 +307,9 @@ export function UbinPelatihLebar() {
 
       <div className="grid grid-cols-3 gap-2">
         {[
-          { l: 'Bugar', v: kini.kebugaran, n: 'text-sky-600 dark:text-sky-400', s: 'beban 42 hari' },
-          { l: 'Lelah', v: kini.kelelahan, n: 'text-rose-600 dark:text-rose-400', s: 'beban 7 hari' },
-          { l: 'Segar', v: kini.kesegaran, n: 'text-ink dark:text-white', s: 'bugar − lelah' },
+          { l: 'Fitness', v: kini.kebugaran, n: 'text-sky-600 dark:text-sky-400', s: '42-day load' },
+          { l: 'Fatigue', v: kini.kelelahan, n: 'text-rose-600 dark:text-rose-400', s: '7-day load' },
+          { l: 'Fresh', v: kini.kesegaran, n: 'text-ink dark:text-white', s: 'fitness − fatigue' },
         ].map((x) => (
           <span key={x.l} className="min-w-0">
             <span className="t-mikro block truncate font-bold uppercase tracking-wide text-neutral-500">{x.l}</span>
