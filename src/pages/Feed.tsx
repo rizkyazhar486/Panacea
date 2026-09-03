@@ -1749,7 +1749,7 @@ export function PusatKesehatanRealtime({ viewerEmail }: { viewerEmail: string })
   const [hrRest, setHrRest] = useVitalField('restingHr', 65).slice(0, 2) as [number, (n: number) => void]
   const [hrMaxInput, setHrMaxInput] = useState(220 - age)
   const vo2max = Math.round((15.3 * (hrMaxInput / Math.max(hrRest, 1))) * 10) / 10
-  const vo2Cat = vo2max >= 55 ? { l: 'Sangat Baik', c: '#00BF63' } : vo2max >= 45 ? { l: 'Baik', c: '#84CC16' } : vo2max >= 35 ? { l: 'Adequate', c: '#F59E0B' } : { l: 'Rendah', c: '#EF4444' }
+  const vo2Cat = vo2max >= 55 ? { l: 'Excellent', c: '#00BF63' } : vo2max >= 45 ? { l: 'Good', c: '#84CC16' } : vo2max >= 35 ? { l: 'Adequate', c: '#F59E0B' } : { l: 'Low', c: '#EF4444' }
   // #5: Tes Cooper — jarak (meter) yang ditempuh dalam lari 12 menit.
   const [cooperMeters, setCooperMeters] = useState(2400)
   const cooperVo2 = Math.round(((cooperMeters - 504.9) / 44.73) * 10) / 10
@@ -1820,7 +1820,7 @@ export function PusatKesehatanRealtime({ viewerEmail }: { viewerEmail: string })
       <h1>🩺 Health Report — Panaceamed.id</h1>
       <div class="sub">Generated: ${esc(new Date().toLocaleString('en-US'))}</div>
       <table>${rows.map((r) => `<tr><td>${esc(r[0])}</td><td>${esc(r[1])}</td></tr>`).join('')}</table>
-      <div class="foot">Data ini dilaporkan sendiri dan tidak menggantikan diagnosis dari tenaga kesehatan.</div>
+      <div class="foot">This data is self-reported and does not replace a diagnosis from a healthcare provider.</div>
       </body></html>`)
     win.document.close()
     setTimeout(() => win.print(), 400)
@@ -1854,9 +1854,9 @@ export function PusatKesehatanRealtime({ viewerEmail }: { viewerEmail: string })
 
   // Which visible fields are currently following the device, for the badge.
   const deviceFields = [
-    weightFromDevice && 'berat', heightFromDevice && 'tinggi',
-    hrFromDevice && 'nadi', spo2FromDevice && 'SpO\u2082', tempFromDevice && 'suhu',
-    sysFromDevice && diaFromDevice && 'tekanan darah',
+    weightFromDevice && 'weight', heightFromDevice && 'height',
+    hrFromDevice && 'pulse', spo2FromDevice && 'SpO\u2082', tempFromDevice && 'temperature',
+    sysFromDevice && diaFromDevice && 'blood pressure',
   ].filter(Boolean) as string[]
 
   return (
@@ -1868,7 +1868,7 @@ export function PusatKesehatanRealtime({ viewerEmail }: { viewerEmail: string })
           watch data actually arrived. */}
       {deviceFields.length > 0 && (
         <div className="flex flex-wrap items-center gap-x-2 gap-y-1 rounded-xl bg-brand-50 px-3 py-2 text-[11px] font-semibold text-brand-dark dark:bg-brand/10">
-          <span>⌚ Terisi otomatis dari {vitals.source ?? 'perangkat Anda'}</span>
+          <span>⌚ Auto-filled from {vitals.source ?? 'your device'}</span>
           {vitalsAge(vitals) && <span className="text-neutral-500">· {vitalsAge(vitals)}</span>}
           <span className="text-neutral-500">· {deviceFields.join(', ')}</span>
         </div>
@@ -2020,7 +2020,7 @@ export function PusatKesehatanRealtime({ viewerEmail }: { viewerEmail: string })
             <button onClick={() => logVo2Max(cooperVo2, 'Cooper Test')} disabled={cooperVo2 <= 0}
               className="rounded-xl px-3 py-2 text-xs font-bold text-ink disabled:opacity-40" style={{ background: 'linear-gradient(135deg, #00BF63, #00A857)' }}>Record</button>
           </div>
-          <Prosa kelas="text-[10px] text-neutral-500">Berlarilah sejauh mungkin dalam 12 menit (pakai Pelacak GPS untuk mengukur jaraknya), lalu masukkan jaraknya. Rumus Cooper yang paling tepat di antara pilihan ini.</Prosa>
+          <Prosa kelas="text-[10px] text-neutral-500">Run as far as you can in 12 minutes (use GPS Tracker to measure the distance), then enter the distance. The Cooper formula is the most accurate of these options.</Prosa>
         </div>
 
         {lastVo2 && (
