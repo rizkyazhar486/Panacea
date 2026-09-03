@@ -292,7 +292,7 @@ function AIOperatorPanel() {
       <SectionTitle
         icon={<IconSparkle size={20} />}
         title="AI Marketing Team — CMO, Social, SEO, Content, Ads, Operations"
-        subtitle="5 departemen AI di bawah satu CMO — analisis & penyusunan draf seketika, ditenagai AI (gratis lewat server)"
+        subtitle="5 AI departments under one CMO — instant analysis & drafting, AI-powered (free via the server)"
         right={pending && (pending.topups + pending.doctors > 0)
           ? <Badge tone="high">{pending.topups + pending.doctors} need action</Badge>
           : <Badge tone="brand">AI ready</Badge>}

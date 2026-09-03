@@ -28,11 +28,11 @@ export interface Hasil {
 }
 
 export const NAMA_JENIS: Record<JenisHasil, string> = {
-  fitur: 'Fitur',
-  penyakit: 'Penyakit',
-  obat: 'Obat & tatalaksana',
-  stasiun: 'Stasiun OSCE',
-  kalkulator: 'Kalkulator & skor',
+  fitur: 'Features',
+  penyakit: 'Diseases',
+  obat: 'Drugs & treatment',
+  stasiun: 'OSCE stations',
+  kalkulator: 'Calculators & scores',
 }
 
 interface Butir {
@@ -120,7 +120,7 @@ async function bangun(): Promise<Butir[]> {
     out.push({
       jenis: 'penyakit',
       judul: nama,
-      ringkas: 'Catatan lengkap: anamnesis, pemeriksaan, diagnosis, tatalaksana',
+      ringkas: 'Full station notes: history, examination, diagnosis, management',
       ke: `/med-study?bagian=diseases&q=${encodeURIComponent(nama)}`,
       cari: nama.toLowerCase(),
     })
@@ -146,7 +146,7 @@ async function bangun(): Promise<Butir[]> {
     out.push({
       jenis: 'kalkulator',
       judul: nama,
-      ringkas: 'Ada di halaman Kalkulator Klinis',
+      ringkas: 'Found on the Clinical Calculators page',
       ke: `/clinical-calculators?q=${encodeURIComponent(nama)}`,
       cari: nama.toLowerCase(),
     })

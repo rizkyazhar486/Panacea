@@ -19,8 +19,8 @@ import {
 // ─────────────────────────────────────────────────────────────────────────────
 
 const KELOMPOK: { id: Benchmark['kelompok'] | 'semua'; label: string }[] = [
-  { id: 'semua', label: 'Semua' },
-  { id: 'pemula', label: 'Mulai di sini' },
+  { id: 'semua', label: 'All' },
+  { id: 'pemula', label: 'Start here' },
   { id: 'girls', label: 'The Girls' },
   { id: 'hero', label: 'Hero WOD' },
 ]
@@ -47,7 +47,7 @@ export function CrossFit() {
       <SectionTitle
         icon={<IconActivity />}
         title="CrossFit & AMRAP"
-        subtitle="Bentuk latihan, tolok ukur bernama, dan cara menurunkan takarannya dengan aman"
+        subtitle="Workout formats, named benchmarks, and how to scale them safely"
       />
 
       {/* Peringatan didahulukan, bukan disembunyikan di bawah. */}
@@ -68,7 +68,7 @@ export function CrossFit() {
       <Card>
         <div className="text-[11px] font-black uppercase tracking-wide text-neutral-500">Workout formats</div>
         <p className="mt-1 text-[12px] text-neutral-500">
-          Semua sesi CrossFit adalah salah satu dari ini. Memahami formatnya lebih berguna daripada menghafal nama workout.
+          Every CrossFit session is one of these. Understanding the format is more useful than memorising workout names.
         </p>
         <div className="mt-3 space-y-1.5">
           {FORMAT.map((f) => {
@@ -110,8 +110,8 @@ export function CrossFit() {
       <Card>
         <div className="text-[11px] font-black uppercase tracking-wide text-neutral-500">Pick your style</div>
         <p className="mt-1 text-[12px] leading-relaxed text-neutral-500">
-          Enam arketipe, masing-masing menunjuk ke format yang cocok. Pilih yang paling terasa seperti
-          Anda — bukan yang paling keren.
+          Six archetypes, each pointing to a matching format. Pick the one that feels most like
+          you — not the one that sounds coolest.
         </p>
         <div className="mt-3 grid gap-1.5 sm:grid-cols-2">
           {ARKETIPE.map((a) => (
@@ -160,12 +160,12 @@ export function CrossFit() {
             className={`rounded-lg px-2.5 py-1 text-[11px] font-bold transition ${
               hanyaBodyweight ? 'bg-brand text-white' : 'bg-white/5 text-neutral-600'
             }`}>
-            Tanpa alat
+            Bodyweight only
           </button>
         </div>
 
         {daftar.length === 0 && (
-          <p className="mt-3 text-[12px] text-neutral-500">Tidak ada yang cocok dengan "{cari}".</p>
+          <p className="mt-3 text-[12px] text-neutral-500">Nothing matches "{cari}".</p>
         )}
 
         <div className="mt-3 space-y-1.5">
@@ -194,7 +194,7 @@ export function CrossFit() {
                 {buka && (
                   <div className="space-y-2 border-t border-white/10 px-3 py-2.5">
                     {b.gambar && (
-                      <img src={b.gambar} alt={`Ilustrasi gerakan khas ${b.nama}`} loading="lazy"
+                      <img src={b.gambar} alt={`Typical movement illustration for ${b.nama}`} loading="lazy"
                         className="aspect-square w-full rounded-xl object-cover" />
                     )}
                     <ul className="space-y-0.5">
@@ -239,7 +239,7 @@ export function CrossFit() {
             <li key={r} className="text-[10px] leading-relaxed text-slate-500">{r}</li>
           ))}
         </ul>
-        <Prosa kelas="mt-3 text-[11px] leading-relaxed text-neutral-500">"The Girls" dan "Hero WOD" adalah benchmark bernama milik CrossFit Inc. yang sudah lama beredar umum; yang dimuat di sini hanya daftar gerakan dan repetisinya. Hero WOD dinamai dari anggota militer dan petugas penyelamat yang gugur — asal namanya disebutkan karena memang pantas diketahui. Halaman ini bersifat edukatif dan bukan pengganti penilaian pelatih atau dokter.</Prosa>
+        <Prosa kelas="mt-3 text-[11px] leading-relaxed text-neutral-500">"The Girls" and "Hero WOD" are named benchmarks belonging to CrossFit Inc. that have long circulated publicly; what appears here is only the list of movements and reps. Hero WODs are named after fallen military members and first responders — their origin is stated because it deserves to be known. This page is educational and not a substitute for the judgement of a coach or doctor.</Prosa>
       </Card>
     </div>
   )

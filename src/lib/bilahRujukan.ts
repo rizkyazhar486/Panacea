@@ -62,9 +62,9 @@ export interface BilahRujukan {
   sumber: string
 }
 
-const SUMBER_WHO_ASIA = 'batas IMT Asia-Pasifik (WHO/IASO/IOTF 2000), dipakai luas di Indonesia'
-const SUMBER_WHO_WHR = 'batas rasio pinggang-panggul WHO 2008'
-const SUMBER_LEMAK = 'nilai lazim dalam ajaran gizi dan fisiologi olahraga baku, bukan kutipan satu penelitian'
+const SUMBER_WHO_ASIA = 'Asia-Pacific BMI thresholds (WHO/IASO/IOTF 2000), widely used in Indonesia'
+const SUMBER_WHO_WHR = 'WHO 2008 waist-to-hip ratio thresholds'
+const SUMBER_LEMAK = 'typical values from standard nutrition and exercise-physiology teaching, not a single-study citation'
 
 /**
  * Zona tempat sebuah nilai berada.
@@ -104,15 +104,15 @@ export function bilahImt(beratKg?: number, tinggiCm?: number): BilahRujukan | nu
   const imt = beratKg / (m * m)
   if (!Number.isFinite(imt) || imt <= 0) return null
   const zona: ZonaRujukan[] = [
-    { dari: 0, label: 'kurang (<18,5)' },
-    { dari: 18.5, label: 'cukup (18,5-22,9)' },
-    { dari: 23, label: 'berlebih (23-24,9)' },
-    { dari: 25, label: 'obesitas (>=25)' },
+    { dari: 0, label: 'underweight (<18.5)' },
+    { dari: 18.5, label: 'normal (18.5-22.9)' },
+    { dari: 23, label: 'overweight (23-24.9)' },
+    { dari: 25, label: 'obese (>=25)' },
   ]
   const tampil = bulat(imt, 1)
   return {
     kunci: 'imt',
-    label: 'Indeks massa tubuh',
+    label: 'Body mass index',
     nilai: tampil,
     desimal: 1,
     satuan: 'kg/m²',
@@ -120,7 +120,7 @@ export function bilahImt(beratKg?: number, tinggiCm?: number): BilahRujukan | nu
     maksGambar: 35,
     zona,
     zonaKini: zonaDari(zona, tampil),
-    populasi: 'dewasa Asia-Pasifik; batas berbeda pada anak, ibu hamil, dan atlet berotot besar',
+    populasi: 'Asia-Pacific adults; thresholds differ for children, pregnancy, and highly muscular athletes',
     sumber: SUMBER_WHO_ASIA,
   }
 }
@@ -130,19 +130,19 @@ export function bilahLemakTubuh(persen?: number, sex?: string): BilahRujukan | n
   const perempuan = sex === 'F'
   const zona: ZonaRujukan[] = perempuan
     ? [
-        { dari: 0, label: 'sangat rendah (<21%)' },
-        { dari: 21, label: 'lazim (21-32%)' },
-        { dari: 33, label: 'tinggi (>=33%)' },
+        { dari: 0, label: 'very low (<21%)' },
+        { dari: 21, label: 'typical (21-32%)' },
+        { dari: 33, label: 'high (>=33%)' },
       ]
     : [
-        { dari: 0, label: 'sangat rendah (<8%)' },
-        { dari: 8, label: 'lazim (8-19%)' },
-        { dari: 20, label: 'tinggi (>=20%)' },
+        { dari: 0, label: 'very low (<8%)' },
+        { dari: 8, label: 'typical (8-19%)' },
+        { dari: 20, label: 'high (>=20%)' },
       ]
   const tampilLemak = bulat(persen, 1)
   return {
     kunci: 'bodyFatPct',
-    label: 'Lemak tubuh',
+    label: 'Body fat',
     nilai: tampilLemak,
     desimal: 1,
     satuan: '%',
@@ -150,7 +150,7 @@ export function bilahLemakTubuh(persen?: number, sex?: string): BilahRujukan | n
     maksGambar: perempuan ? 45 : 40,
     zona,
     zonaKini: zonaDari(zona, tampilLemak),
-    populasi: perempuan ? 'perempuan dewasa' : 'laki-laki dewasa',
+    populasi: perempuan ? 'adult women' : 'adult men',
     sumber: SUMBER_LEMAK,
   }
 }
@@ -175,7 +175,7 @@ export function bilahRasioPinggang(pinggangCm?: number, panggulCm?: number, sex?
   const tampilRasio = bulat(rasio, 2)
   return {
     kunci: 'whr',
-    label: 'Rasio pinggang-panggul',
+    label: 'Waist-to-hip ratio',
     nilai: tampilRasio,
     desimal: 2,
     satuan: '',
@@ -183,7 +183,7 @@ export function bilahRasioPinggang(pinggangCm?: number, panggulCm?: number, sex?
     maksGambar: 1.2,
     zona,
     zonaKini: zonaDari(zona, tampilRasio),
-    populasi: sex === 'F' ? 'perempuan dewasa' : 'laki-laki dewasa',
+    populasi: sex === 'F' ? 'adult women' : 'adult men',
     sumber: SUMBER_WHO_WHR,
   }
 }
