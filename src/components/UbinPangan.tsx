@@ -81,7 +81,7 @@ export function UbinPangan() {
       protein: Math.round((pilih.protein100 ?? 0) * skala),
       fat: Math.round((pilih.lemak100 ?? 0) * skala),
     })
-    setPesan(`${pilih.nama} ${g} g dicatat`)
+    setPesan(`${pilih.nama} ${g} g logged`)
     setPilih(null)
     setQ('')
     setHasil(null)
@@ -91,7 +91,7 @@ export function UbinPangan() {
   return (
     <section>
       <div className="mb-2 flex items-baseline justify-between gap-2">
-        <h2 className="t-kecil font-black uppercase tracking-wide text-neutral-500">Cari pangan kemasan</h2>
+        <h2 className="t-kecil font-black uppercase tracking-wide text-neutral-500">Search packaged food</h2>
         <span className="t-mikro text-neutral-400">Open Food Facts</span>
       </div>
 
@@ -99,8 +99,8 @@ export function UbinPangan() {
         <input
           value={q}
           onChange={(e) => { setQ(e.target.value); setPilih(null) }}
-          placeholder="Nama produk atau nomor barcode"
-          aria-label="Cari pangan kemasan"
+          placeholder="Product name or barcode number"
+          aria-label="Search packaged food"
           className="t-kecil w-full rounded-xl border border-neutral-200 bg-transparent px-2.5 py-2 text-ink outline-none placeholder:text-neutral-400 focus:border-brand dark:border-white/12 dark:text-white"
         />
 
@@ -116,12 +116,12 @@ export function UbinPangan() {
                 inputMode="decimal"
                 value={gram}
                 onChange={(e) => setGram(e.target.value)}
-                aria-label="Berapa gram"
+                aria-label="How many grams"
                 className="t-kecil w-20 shrink-0 rounded-xl border border-neutral-200 bg-transparent px-2 py-2 tabular-nums text-ink dark:border-white/12 dark:text-white"
               />
               <span className="t-mikro shrink-0 text-neutral-400">gram</span>
               <button onClick={simpan} className="t-kecil ml-auto min-h-[40px] shrink-0 rounded-xl bg-brand px-3 font-bold text-white">
-                Catat
+                Log
               </button>
             </div>
 
@@ -139,15 +139,15 @@ export function UbinPangan() {
               ))}
             </div>
             <p className="t-mikro mt-1.5 leading-snug text-neutral-400">
-              Dihitung dari angka per 100 g milik sumbernya, dikalikan gram yang Anda isi — tidak ada takaran porsi yang ditebak aplikasi ini.
+              Calculated from the source's per-100-g figures, multiplied by the grams you entered — this app never guesses a serving size.
             </p>
           </div>
         ) : hasil === null ? (
           <p className="t-mikro mt-2 leading-snug text-neutral-400">
-            {sibuk ? 'Mencari…' : 'Ketik nama produk kemasan, atau angka barcode-nya. Basis data terbuka yang diisi sukarelawan — periksa mereknya sebelum mencatat.'}
+            {sibuk ? 'Searching…' : 'Type the packaged product name or its barcode number. An open, volunteer-maintained database — check the brand before logging.'}
           </p>
         ) : hasil.length === 0 ? (
-          <p className="t-kecil mt-2 text-neutral-500">Tidak ditemukan. Coba nama merek, atau catat manual di halaman Gizi.</p>
+          <p className="t-kecil mt-2 text-neutral-500">Not found. Try the brand name, or log it manually on the Nutrition page.</p>
         ) : (
           <div className="mt-2 flex flex-col gap-1">
             {hasil.map((p, i) => (

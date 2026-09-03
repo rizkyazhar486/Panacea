@@ -110,7 +110,7 @@ export interface RentangPribadi {
   /** Berapa hari yang menjadi dasarnya. */
   hari: number
   /** Nilai terakhir dibanding rentangnya. */
-  posisi: 'di bawah kebiasaan' | 'dalam kebiasaan' | 'di atas kebiasaan'
+  posisi: 'below your usual' | 'within your usual' | 'above your usual'
 }
 
 /**
@@ -135,7 +135,7 @@ export function rentangPribadi(kunci: string, nilaiKini?: number): RentangPribad
   const atas = ambil(0.9)
 
   const kini = typeof nilaiKini === 'number' ? nilaiKini : deret[deret.length - 1]
-  const posisi = kini < bawah ? 'di bawah kebiasaan' : kini > atas ? 'di atas kebiasaan' : 'dalam kebiasaan'
+  const posisi = kini < bawah ? 'below your usual' : kini > atas ? 'above your usual' : 'within your usual'
   return { bawah, atas, hari: deret.length, posisi }
 }
 
@@ -149,5 +149,5 @@ export function rentangPribadi(kunci: string, nilaiKini?: number): RentangPribad
  */
 export function bacaRentang(r: RentangPribadi, satuan: string, bulat = 0): string {
   const f = (n: number) => (bulat ? n.toFixed(bulat) : String(Math.round(n)))
-  return `${r.posisi} Anda: ${f(r.bawah)}-${f(r.atas)} ${satuan} dalam ${r.hari} hari terakhir`
+  return `${r.posisi}: ${f(r.bawah)}-${f(r.atas)} ${satuan} over the last ${r.hari} days`
 }

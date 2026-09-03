@@ -144,9 +144,9 @@ export function growthSet(sex: 'L' | 'P'): GrowthSet {
 export type GrowthMetric = 'weightForAge' | 'heightForAge' | 'bmiForAge'
 
 export const METRIC_LABEL: Record<GrowthMetric, { title: string; unit: string; short: string }> = {
-  weightForAge: { title: 'Berat Badan menurut Age (BB/U)', unit: 'kg', short: 'BB/U' },
-  heightForAge: { title: 'Tinggi Badan menurut Age (TB/U)', unit: 'cm', short: 'TB/U' },
-  bmiForAge: { title: 'IMT menurut Age (IMT/U)', unit: 'kg/m²', short: 'IMT/U' },
+  weightForAge: { title: 'Weight-for-Age', unit: 'kg', short: 'W/A' },
+  heightForAge: { title: 'Height-for-Age', unit: 'cm', short: 'H/A' },
+  bmiForAge: { title: 'BMI-for-Age', unit: 'kg/m²', short: 'BMI/A' },
 }
 
 // ---------------------------------------------------------------------------
@@ -250,22 +250,22 @@ export function classifyZ(
   z: number,
 ): { kesan: string; tone: 'low' | 'normal' | 'high' | 'critical' } {
   if (metric === 'heightForAge') {
-    if (z < -3) return { kesan: 'Sangat pendek (severely stunted)', tone: 'critical' }
-    if (z < -2) return { kesan: 'Pendek (stunted)', tone: 'high' }
-    if (z > 3) return { kesan: 'Tinggi (tall)', tone: 'normal' }
+    if (z < -3) return { kesan: 'Severely stunted', tone: 'critical' }
+    if (z < -2) return { kesan: 'Stunted', tone: 'high' }
+    if (z > 3) return { kesan: 'Tall', tone: 'normal' }
     return { kesan: 'Normal', tone: 'normal' }
   }
   if (metric === 'bmiForAge') {
-    if (z < -3) return { kesan: 'Gizi buruk (severely wasted)', tone: 'critical' }
-    if (z < -2) return { kesan: 'Gizi kurang (wasted)', tone: 'high' }
-    if (z <= 1) return { kesan: 'Gizi baik (normal)', tone: 'normal' }
-    if (z <= 2) return { kesan: 'Berisiko gizi lebih', tone: 'low' }
-    if (z <= 3) return { kesan: 'Gizi lebih (overweight)', tone: 'high' }
-    return { kesan: 'Obesitas', tone: 'critical' }
+    if (z < -3) return { kesan: 'Severely wasted', tone: 'critical' }
+    if (z < -2) return { kesan: 'Wasted', tone: 'high' }
+    if (z <= 1) return { kesan: 'Normal nutrition', tone: 'normal' }
+    if (z <= 2) return { kesan: 'At risk of overweight', tone: 'low' }
+    if (z <= 3) return { kesan: 'Overweight', tone: 'high' }
+    return { kesan: 'Obese', tone: 'critical' }
   }
   // weightForAge
-  if (z < -3) return { kesan: 'Berat badan sangat kurang', tone: 'critical' }
-  if (z < -2) return { kesan: 'Berat badan kurang (underweight)', tone: 'high' }
-  if (z > 1) return { kesan: 'Risiko berat lebih', tone: 'low' }
+  if (z < -3) return { kesan: 'Severely underweight', tone: 'critical' }
+  if (z < -2) return { kesan: 'Underweight', tone: 'high' }
+  if (z > 1) return { kesan: 'At risk of overweight', tone: 'low' }
   return { kesan: 'Normal', tone: 'normal' }
 }

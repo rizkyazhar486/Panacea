@@ -88,9 +88,9 @@ export function UbinPuasa() {
   return (
     <section>
       <div className="mb-2 flex items-baseline justify-between gap-2">
-        <h2 className="t-kecil font-black uppercase tracking-wide text-neutral-500">Puasa</h2>
+        <h2 className="t-kecil font-black uppercase tracking-wide text-neutral-500">Fasting</h2>
         <Link to="/prayer-times" className="t-kecil flex min-h-[40px] items-center font-bold text-brand">
-          Jadwal →
+          Schedule →
         </Link>
       </div>
 
@@ -102,7 +102,7 @@ export function UbinPuasa() {
                 {sisaMenit != null ? fmtMenit(sisaMenit) : '—'}
               </span>
               <span className="t-mikro font-bold text-neutral-400">
-                {sedangSiang ? 'menuju Magrib' : 'menuju Subuh'}
+                {sedangSiang ? 'until Maghrib' : 'until Fajr'}
               </span>
               <span className="t-mikro ml-auto shrink-0 truncate text-neutral-400">{jadwal?.kota}</span>
             </div>
@@ -114,12 +114,12 @@ export function UbinPuasa() {
             )}
 
             <p className="t-mikro mt-1.5 tabular-nums text-neutral-400">
-              Subuh {String(Math.floor(subuh / 60)).padStart(2, '0')}.{String(subuh % 60).padStart(2, '0')} · Magrib{' '}
-              {String(Math.floor(magrib / 60)).padStart(2, '0')}.{String(magrib % 60).padStart(2, '0')} · sumber jadwal salat kota Anda
+              Fajr {String(Math.floor(subuh / 60)).padStart(2, '0')}.{String(subuh % 60).padStart(2, '0')} · Maghrib{' '}
+              {String(Math.floor(magrib / 60)).padStart(2, '0')}.{String(magrib % 60).padStart(2, '0')} · from your city's prayer schedule
             </p>
           </>
         ) : (
-          <p className="t-kecil text-neutral-500">Jadwal salat belum termuat — bagian puasa syariat menunggu jadwal kota Anda.</p>
+          <p className="t-kecil text-neutral-500">Prayer schedule not loaded yet — the religious fasting section is waiting on your city's schedule.</p>
         )}
 
         {/* Jendela makan, terpisah dan tidak dicampur dengan puasa syariat:
@@ -128,11 +128,11 @@ export function UbinPuasa() {
         <div className="mt-3 border-t border-neutral-100 pt-2 dark:border-white/10">
           <div className="flex items-center gap-2">
             <span className="min-w-0 flex-1">
-              <span className="t-kecil block font-bold text-ink dark:text-white">Jendela makan</span>
+              <span className="t-kecil block font-bold text-ink dark:text-white">Eating window</span>
               <span className="t-mikro block truncate text-neutral-400">
                 {mulai
-                  ? `Berhenti makan pukul ${new Date(mulai).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' })} · ${jamMenit(lamaJendela)} berjalan`
-                  : 'Tekan saat berhenti makan'}
+                  ? `Stopped eating at ${new Date(mulai).toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' })} · ${jamMenit(lamaJendela)} elapsed`
+                  : 'Press when you stop eating'}
               </span>
             </span>
             <button
@@ -141,13 +141,13 @@ export function UbinPuasa() {
                 mulai ? 'bg-neutral-100 text-neutral-600 dark:bg-white/10 dark:text-neutral-200' : 'bg-brand text-white'
               }`}
             >
-              {mulai ? 'Buka' : 'Mulai'}
+              {mulai ? 'Break' : 'Start'}
             </button>
           </div>
         </div>
 
         <p className="t-mikro mt-2 leading-snug text-neutral-400">
-          Hanya lamanya yang ditampilkan — tidak ada klaim manfaat pada jam ke sekian. Pengguna insulin atau sulfonilurea, ibu hamil, dan yang punya riwayat gangguan makan sebaiknya berbicara dengan dokternya dahulu.
+          Only the duration is shown — no benefit claim is made at any given hour. People on insulin or sulfonylureas, pregnant women, and those with a history of eating disorders should talk to their doctor first.
         </p>
       </div>
     </section>

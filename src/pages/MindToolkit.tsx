@@ -409,7 +409,7 @@ function FingerTappingTest() {
 
   return (
     <Card className="!p-6 text-center">
-      <Prosa kelas="text-[13px] text-neutral-500">Ketuk secepat dan seteratur mungkin selama 10 detik. Kecepatan mengetuk dan keajekan iramanya adalah ukuran kecepatan motorik halus yang sungguhan dan luas dipakai.</Prosa>
+      <Prosa kelas="text-[13px] text-neutral-500">Tap as fast and as steadily as possible for 10 seconds. Tap speed and rhythm consistency are genuine, widely used measures of fine motor speed.</Prosa>
       {phase === 'idle' && (
         <button onClick={start} className="mt-4 w-full rounded-xl bg-brand py-3 text-sm font-bold text-white">Start 10s test</button>
       )}

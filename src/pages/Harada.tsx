@@ -212,13 +212,13 @@ export function Harada() {
       <Card>
         <div className="flex items-center justify-between gap-3">
           <div className="text-[11px] font-black uppercase tracking-wide text-neutral-500">Progress</div>
-          {tersimpan && <span className="text-[10px] font-bold text-emerald-500" role="status">tersimpan</span>}
+          {tersimpan && <span className="text-[10px] font-bold text-emerald-500" role="status">saved</span>}
         </div>
         <div className="mt-2 grid grid-cols-3 gap-2 text-center">
           {[
-            { l: 'Penopang', v: `${stat.judul}/8` },
-            { l: 'Tindakan', v: `${stat.aksi}/64` },
-            { l: 'Dijalankan', v: `${stat.selesai}` },
+            { l: 'Pillars', v: `${stat.judul}/8` },
+            { l: 'Actions', v: `${stat.aksi}/64` },
+            { l: 'Completed', v: `${stat.selesai}` },
           ].map((x) => (
             <div key={x.l} className="rounded-xl bg-white/5 p-2.5">
               <div className="text-lg font-black text-ink">{x.v}</div>
@@ -247,7 +247,7 @@ export function Harada() {
               return (
                 <div key={i} className="grid aspect-square place-items-center rounded-xl bg-brand p-1.5 text-center">
                   <div>
-                    <div className="text-[10px] font-black uppercase tracking-wide text-ink/70">Sasaran</div>
+                    <div className="text-[10px] font-black uppercase tracking-wide text-ink/70">Goal</div>
                     <div className="mt-0.5 line-clamp-3 text-[10px] font-bold leading-tight text-ink">
                       {d.sasaran || '—'}
                     </div>
@@ -283,11 +283,11 @@ export function Harada() {
         <Card>
           <div className="flex items-center justify-between gap-3">
             <div className="text-[11px] font-black uppercase tracking-wide text-neutral-500">
-              Penopang {buka + 1}
+              Pillar {buka + 1}
             </div>
             <button onClick={() => setBuka(null)}
               className="rounded-lg bg-white/5 px-2.5 py-1 text-[11px] font-bold text-neutral-600">
-              Tutup
+              Close
             </button>
           </div>
           <input
@@ -316,7 +316,7 @@ export function Harada() {
                   </button>
                   <input
                     className={`${inputClass} ${sudah ? 'line-through opacity-60' : ''}`}
-                    placeholder={`Tindakan ${j + 1}`}
+                    placeholder={`Action ${j + 1}`}
                     value={a}
                     onChange={(e) => ubahAksi(buka, j, e.target.value)}
                     aria-label={`Action ${j + 1} of pillar ${buka + 1}`}
@@ -336,7 +336,7 @@ export function Harada() {
             Clear the grid
           </button>
         </div>
-        <Prosa kelas="mt-2 text-[11px] leading-relaxed text-neutral-500">Stored on this device only — not sent to a server and not visible to anyone else. Unduh salinannya bila Anda ingin menyimpannya di luar aplikasi.</Prosa>
+        <Prosa kelas="mt-2 text-[11px] leading-relaxed text-neutral-500">Stored on this device only — not sent to a server and not visible to anyone else. Download a copy if you want to keep it outside the app.</Prosa>
       </Card>
 
       <Card>
@@ -346,7 +346,7 @@ export function Harada() {
         </div>
         <ol className="mt-2 space-y-1.5 text-[12px] leading-relaxed text-neutral-600">
           <li><b>1.</b> Write a goal that can be judged true or false. "Fitter" cannot be; "sub-1:45" can.</li>
-          <li><b>2.</b> Fill the eight pillars in as <i>bidang</i>, not steps. Strength, recovery, nutrition — not "Tuesday run".</li>
+          <li><b>2.</b> Fill the eight pillars in as <i>domains</i>, not steps. Strength, recovery, nutrition — not "Tuesday run".</li>
           <li><b>3.</b> Only then fill in the actions. This is where steps you could take this week belong.</li>
           <li><b>4.</b> Review it each week. Tick what worked and replace what turned out unrealistic — swapping a box is not a failure, it is part of the method.</li>
         </ol>

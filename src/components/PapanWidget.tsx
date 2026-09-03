@@ -188,7 +188,7 @@ function Tren({ persen, jangka }: { persen: number; jangka: string }) {
   // atas berapa lama tidak berarti apa-apa, dan pembaca akan mengiranya
   // perubahan sejak kemarin.
   return (
-    <span className="t-mikro whitespace-nowrap font-bold text-neutral-400" title={`Dibanding awal ${jangka} terakhir`}>
+    <span className="t-mikro whitespace-nowrap font-bold text-neutral-400" title={`Compared to the start of the last ${jangka}`}>
       {persen === 0 ? 'tetap' : <><span aria-hidden>{persen > 0 ? '↑' : '↓'}</span>{Math.abs(persen)}%</>}
       {' '}/{jangka.replace(' hari', 'h').replace(' malam', 'm')}
     </span>
@@ -258,9 +258,9 @@ export function UbinRangkaian({ tanggal }: { tanggal: string[] }) {
     return <UbinKosong ke="/logs" judul="Log" garis="No days recorded yet. One entry today is enough to begin." />
   }
   return (
-    <Ubin ke="/logs" judul="Catatan" lebar tanda={r.hariIniSudah ? 'hari ini' : undefined}>
+    <Ubin ke="/logs" judul="Logs" lebar tanda={r.hariIniSudah ? 'today' : undefined}>
       <div className="flex items-end gap-4">
-        <Angka label="hari berturut" nilai={String(r.berjalan)} />
+        <Angka label="day streak" nilai={String(r.berjalan)} />
         <Angka label="terpanjang" nilai={String(r.terpanjang)} />
         <Angka label="seluruhnya" nilai={String(r.total)} />
       </div>
@@ -311,7 +311,7 @@ export function UbinKlinis() {
           <Angka label="stations" nilai={String(n.stasiun)} />
         </div>
       ) : (
-        <p className="t-kecil text-neutral-400">Menghitung isi…</p>
+        <p className="t-kecil text-neutral-400">Calculating…</p>
       )}
     </Ubin>
   )
@@ -374,8 +374,8 @@ function DaftarRincian({ baris }: { baris: BarisRincian[] }) {
   return (
     <section>
       <div className="mb-2 flex items-baseline justify-between gap-2">
-        <h2 className="t-kecil font-black uppercase tracking-wide text-neutral-500">Rincian tubuh</h2>
-        <span className="t-mikro text-neutral-400">{baris.length} angka tercatat</span>
+        <h2 className="t-kecil font-black uppercase tracking-wide text-neutral-500">Body details</h2>
+        <span className="t-mikro text-neutral-400">{baris.length} figures logged</span>
       </div>
       <div className="kaca overflow-hidden rounded-3xl">
         {tampil.map((b, i) => (
@@ -396,7 +396,7 @@ function DaftarRincian({ baris }: { baris: BarisRincian[] }) {
                   angkanya berbeda dari biasanya. */}
               {b.rentang && (
                 <span className={`t-mikro block truncate ${
-                  b.rentang.posisi === 'dalam kebiasaan' ? 'text-neutral-400' : 'font-bold text-neutral-500 dark:text-neutral-300'
+                  b.rentang.posisi === 'within your usual' ? 'text-neutral-400' : 'font-bold text-neutral-500 dark:text-neutral-300'
                 }`}>
                   {b.rentang.baca}
                 </span>
