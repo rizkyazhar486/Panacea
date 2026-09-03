@@ -114,9 +114,9 @@ export function VocalBiomarkers() {
   return (
     <div className="mx-auto max-w-2xl space-y-5 pb-24">
       <Card className="!p-5">
-        <SectionTitle icon={<IconActivity size={20} />} title="Vocal Biomarker Analyzer (experimental)" subtitle="Nada dasar, jitter & shimmer dari sampel suara 5 detik" />
+        <SectionTitle icon={<IconActivity size={20} />} title="Vocal Biomarker Analyzer (experimental)" subtitle="Fundamental pitch, jitter & shimmer from a 5-second voice sample" />
         <p className="mt-2 text-[13px] leading-relaxed text-amber-700 dark:text-amber-300">
-          <b>Percobaan, bukan alat diagnosis.</b> Jitter and shimmer are real acoustic measures used
+          <b>Experimental, not a diagnostic tool.</b> Jitter and shimmer are real acoustic measures used
           in clinical voice science, but this consumer-microphone estimate is far noisier than a lab
           setup — background noise, mic quality, and technique all affect the result. It cannot diagnose
           any neurological or vocal condition.

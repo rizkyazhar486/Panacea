@@ -323,7 +323,7 @@ export function Chatbot() {
     if (messages.length === 0) return
     let text = `Anamnesis Chat — ${activePatient.name}\nDate: ${new Date().toLocaleDateString('en-US')}\n${'═'.repeat(50)}\n\n`
     for (const m of messages) { const t = m.at ? new Date(m.at).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }) : ''; text += `[${t}] ${m.role === 'user' ? '👤 Patient' : '🤖 AI'}:\n${m.content.replace(/[*_#>`~]/g, '')}\n\n` }
-    void simpanTeks(text, `chat-${activePatient.name}-${hariIni()}.txt`, 'text/plain;charset=utf-8', 'Transkrip chat')
+    void simpanTeks(text, `chat-${activePatient.name}-${hariIni()}.txt`, 'text/plain;charset=utf-8', 'Chat transcript')
   }
 
   function startNewChat() {

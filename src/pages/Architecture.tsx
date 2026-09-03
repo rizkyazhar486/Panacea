@@ -59,11 +59,11 @@ export function Architecture() {
           subtitle="The foundation of Panaceamed.id: safe prescribing support (a doctor stays in the loop) + personalised patient education"
         />
         <div className="flex flex-wrap gap-2">
-          <Badge tone="brand">Dokter tetap di dalam alurnya</Badge>
+          <Badge tone="brand">The doctor stays in the loop</Badge>
           <Badge tone="brand">SMART on FHIR</Badge>
           <Badge tone="brand">RAG + Knowledge Graph</Badge>
           <Badge tone="brand">Federated Learning + DP</Badge>
-          <Badge tone="high">AI = pendukung keputusan, bukan peresepan mandiri</Badge>
+          <Badge tone="high">AI = decision support, not autonomous prescribing</Badge>
         </div>
       </Card>
 
@@ -140,7 +140,7 @@ export function Architecture() {
       <div className="grid gap-6 lg:grid-cols-2">
         {/* Roadmap */}
         <Card>
-          <SectionTitle title="Roadmap MVP → Scale" />
+          <SectionTitle title="Roadmap: MVP → Scale" />
           <div className="space-y-3">
             {ROADMAP.map(([phase, desc, tone]) => (
               <div key={phase} className="rounded-xl border border-neutral-100 p-3">
@@ -176,7 +176,7 @@ export function Architecture() {
             </li>
           ))}
         </ul>
-        <Prosa kelas="mt-3 text-xs text-neutral-500">Privasi & pelatihan model: federated learning untuk pembaruan adapter LLM & pemerkira interaksi obat; datanya tetap di perangkat, dipadukan dengan Differential Privacy & agregasi aman. Diuji pada himpunan uji yang menitikberatkan keselamatan sebelum digulirkan, dengan penomoran versi & jalan untuk mundur.</Prosa>
+        <Prosa kelas="mt-3 text-xs text-neutral-500">Privacy & model training: federated learning for LLM adapter updates & the drug-interaction estimator; data stays on-device, combined with Differential Privacy & secure aggregation. Tested on a safety-focused evaluation set before rollout, with version numbering & a rollback path.</Prosa>
       </Card>
     </div>
   )
