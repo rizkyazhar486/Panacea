@@ -151,10 +151,16 @@ export interface CareEpisode {
   problemId?: string // links back to a ProblemEntry.id when known
   diagnosisCode?: string // links back to EMRRecord.primaryDiagnosis.code, when auto-created from one
   providerName?: string
+  facilityId?: string // links to a Hospital.id from lib/hospitals.ts, when picked from the real directory
   facilityName?: string
   estimatedCostLow?: number // in the patient's local currency, whole units
   estimatedCostHigh?: number
   currency?: string // e.g. 'IDR'
+  // Never fabricate a specific price — every cost figure must say where it
+  // came from and whether it's a rough estimate or a confirmed quote. See
+  // CLAUDE.md / the price-intelligence principle: source, date, confidence.
+  costConfidence?: 'estimated' | 'verified'
+  costSource?: string
   stages: CareEpisodeStage[]
 }
 

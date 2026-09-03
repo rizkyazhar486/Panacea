@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
-import { useStore, uid } from '../lib/store'
+import { useStore } from '../lib/store'
 import { Card, SectionTitle, Badge, Button, Field, inputClass } from '../components/ui'
 import { IconPlan, IconPlus } from '../components/icons'
 import {
@@ -11,7 +11,10 @@ import {
   nextStages,
   isComplete,
   setStageStatus,
+  setProvider,
+  setCostEstimate,
   formatCostRange,
+  providerOptions,
 } from '../lib/careEpisode'
 import type { CareEpisode, CareEpisodeStageId, CareEpisodeStageStatus } from '../lib/types'
 
@@ -166,6 +169,90 @@ function EpisodeCard({
           )
         })}
       </div>
+
+      <div className="mt-4 grid gap-3 border-t border-neutral-100 pt-4 sm:grid-cols-2">
+        <Field label="Provider (real facility directory)">
+          <select
+            className={inputClass}
+            value={episode.facilityId ?? ''}
+            onChange={(e) => onChange(setProvider(episode, e.target.value))}
+          >
+            <option value="" disabled>
+              Choose a facility…
+            </option>
+            {providerOptions().map((h) => (
+              <option key={h.id} value={h.id}>
+                {h.name} · {h.city}
+              </option>
+            ))}
+          </select>
+        </Field>
+
+        <CostEstimateField episode={episode} onChange={onChange} />
+      </div>
     </Card>
+  )
+}
+
+function CostEstimateField({
+  episode,
+  onChange,
+}: {
+  episode: CareEpisode
+  onChange: (next: CareEpisode) => void
+}) {
+  const [low, setLow] = useState(episode.estimatedCostLow?.toString() ?? '')
+  const [high, setHigh] = useState(episode.estimatedCostHigh?.toString() ?? '')
+  const [source, setSource] = useState(episode.costSource ?? '')
+
+  function commit(confidence: 'estimated' | 'verified') {
+    onChange(
+      setCostEstimate(episode, {
+        low: low ? Number(low) : undefined,
+        high: high ? Number(high) : undefined,
+        confidence,
+        source: source.trim() || undefined,
+      }),
+    )
+  }
+
+  return (
+    <Field label="Estimated cost (IDR) — never a guess without a source">
+      <div className="flex gap-2">
+        <input
+          className={inputClass}
+          type="number"
+          placeholder="Low"
+          value={low}
+          onChange={(e) => setLow(e.target.value)}
+          onBlur={() => commit(episode.costConfidence ?? 'estimated')}
+        />
+        <input
+          className={inputClass}
+          type="number"
+          placeholder="High"
+          value={high}
+          onChange={(e) => setHigh(e.target.value)}
+          onBlur={() => commit(episode.costConfidence ?? 'estimated')}
+        />
+      </div>
+      <div className="mt-2 flex items-center gap-2">
+        <input
+          className={`${inputClass} min-w-0 flex-1`}
+          placeholder="Source (e.g. hospital quote, insurer estimate)"
+          value={source}
+          onChange={(e) => setSource(e.target.value)}
+          onBlur={() => commit(episode.costConfidence ?? 'estimated')}
+        />
+        <select
+          className={`${inputClass} !w-auto shrink-0`}
+          value={episode.costConfidence ?? 'estimated'}
+          onChange={(e) => commit(e.target.value as 'estimated' | 'verified')}
+        >
+          <option value="estimated">Estimated</option>
+          <option value="verified">Verified</option>
+        </select>
+      </div>
+    </Field>
   )
 }

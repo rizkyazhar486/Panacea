@@ -8,6 +8,7 @@
 // system. It reuses the existing EMRRecord rather than adding a parallel
 // store, per the "smallest architectural change" principle.
 
+import { HOSPITALS, type Hospital } from './hospitals'
 import type { CareEpisode, CareEpisodeStage, CareEpisodeStageId, CareEpisodeStageStatus, EMRRecord } from './types'
 
 export const CARE_EPISODE_STAGES: CareEpisodeStageId[] = [
@@ -157,6 +158,44 @@ export function formatCostRange(episode: CareEpisode): string | undefined {
   const { estimatedCostLow: lo, estimatedCostHigh: hi, currency = 'IDR' } = episode
   if (lo == null && hi == null) return undefined
   const fmt = (n: number) => n.toLocaleString('en-US')
-  if (lo != null && hi != null && lo !== hi) return `${currency} ${fmt(lo)}–${fmt(hi)}`
-  return `${currency} ${fmt(lo ?? hi ?? 0)}`
+  const range = lo != null && hi != null && lo !== hi ? `${currency} ${fmt(lo)}–${fmt(hi)}` : `${currency} ${fmt(lo ?? hi ?? 0)}`
+  return episode.costConfidence === 'verified' ? range : `~${range}`
+}
+
+// Real facility directory the Provider stage picks from (see lib/hospitals.ts)
+// — never a made-up name. The Cost stage stays a manual entry: this app has
+// no real price feed to wire in yet, so making up a number would violate the
+// "never fabricate prices" rule. What CAN be enforced instead is provenance:
+// every cost figure must carry a confidence level and, ideally, a source.
+export function providerOptions(): Hospital[] {
+  return HOSPITALS
+}
+
+export function setProvider(episode: CareEpisode, facilityId: string): CareEpisode {
+  const facility = HOSPITALS.find((h) => h.id === facilityId)
+  if (!facility) return episode
+  const now = new Date().toISOString()
+  const stages = episode.stages.map((s): CareEpisodeStage =>
+    s.stage === 'provider' && s.status === 'pending' ? { ...s, status: 'active', updatedAt: now } : s,
+  )
+  return { ...episode, facilityId, facilityName: facility.name, providerName: facility.name, stages, updatedAt: now }
+}
+
+export function setCostEstimate(
+  episode: CareEpisode,
+  input: { low?: number; high?: number; confidence: 'estimated' | 'verified'; source?: string },
+): CareEpisode {
+  const now = new Date().toISOString()
+  const stages = episode.stages.map((s): CareEpisodeStage =>
+    s.stage === 'cost' && s.status === 'pending' ? { ...s, status: 'active', updatedAt: now } : s,
+  )
+  return {
+    ...episode,
+    estimatedCostLow: input.low,
+    estimatedCostHigh: input.high,
+    costConfidence: input.confidence,
+    costSource: input.source,
+    stages,
+    updatedAt: now,
+  }
 }
