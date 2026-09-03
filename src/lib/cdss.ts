@@ -74,20 +74,20 @@ export function scorePlanItem(item: PlanItem, patient: Patient): CdssScore {
   const highAlert = HIGH_ALERT.some((d) => text.includes(d))
   if (highAlert) {
     S -= 0.25
-    reasons.push('Obat high-alert / indeks terapi sempit — butuh dosis terverifikasi klinisi.')
+    reasons.push('High-alert drug / narrow therapeutic index — needs a clinician-verified dose.')
   }
   // allergy conflict
   const allergyHit = patient.allergies.find((a) => text.includes(a.toLowerCase().slice(0, 5)))
   if (allergyHit) {
     S -= 0.7
-    reasons.push(`Potensi kontraindikasi alergi: ${allergyHit}.`)
+    reasons.push(`Potential allergy contraindication: ${allergyHit}.`)
   }
   // unverified dose on a drug order
   const looksLikeDrug = /mg|iv|po|gram|mcg|unit|tablet|kapsul|infus/.test(text)
   const hasVerifyNote = /verifikasi|diverifikasi|formularium|dokter/.test(text)
   if (looksLikeDrug && highAlert && !hasVerifyNote) {
     S -= 0.15
-    reasons.push('Order obat high-alert tanpa catatan verifikasi dosis.')
+    reasons.push('High-alert drug order with no dose-verification note.')
   }
   if (item.status === 'ditolak') {
     S -= 0.2

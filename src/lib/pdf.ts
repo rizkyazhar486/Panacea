@@ -33,12 +33,12 @@ function pageContent(title: string, meta: string, body: string[], watermark: str
     L.push(`BT /F2 18 Tf 50 ${y} Td (${esc(title)}) Tj ET`); y -= 26
     L.push(`BT /F1 10 Tf 50 ${y} Td (${esc(meta)}) Tj ET`); y -= 24
   } else {
-    L.push(`BT /F1 9 Tf 50 ${y} Td (${esc(title)} - hal ${page + 1}) Tj ET`); y -= 24
+    L.push(`BT /F1 9 Tf 50 ${y} Td (${esc(title)} - page ${page + 1}) Tj ET`); y -= 24
   }
   L.push(`BT /F1 11 Tf 50 ${y} Td 15 TL`)
   for (const line of body) L.push(`(${esc(line)}) Tj T*`)
   L.push('ET')
-  L.push(`BT /F1 8 Tf 50 28 Td (${esc('Lisensi untuk: ' + watermark + ' - Dilarang menyebarluaskan. (c) Panaceamed.id')}) Tj ET`)
+  L.push(`BT /F1 8 Tf 50 28 Td (${esc('Licensed to: ' + watermark + ' - Unauthorized distribution prohibited. (c) Panaceamed.id')}) Tj ET`)
   return L.join('\n')
 }
 

@@ -41,14 +41,14 @@ export function PeringatanPenyimpanan() {
     <div className="mx-auto mb-2 flex max-w-3xl items-start gap-2 rounded-2xl border border-amber-300 bg-amber-50 px-3 py-2 dark:border-amber-500/40 dark:bg-amber-500/10">
       <span aria-hidden>⚠️</span>
       <p className="t-mikro flex-1 leading-snug text-amber-900 dark:text-amber-200">
-        <strong>Server berjalan tanpa basis data tetap.</strong> Akun dan data yang tersimpan di server akan hilang
-        pada deploy ulang berikutnya — itulah sebabnya sebuah akun bisa mendadak gagal masuk. Catatan di perangkat
-        ini sendiri tetap aman. Perbaikannya satu langkah di sisi server: isi <code>MONGODB_URI</code> (MongoDB Atlas
-        punya tingkat gratis) lalu deploy ulang.
+        <strong>The server is running without a persistent database.</strong> Accounts and data stored on the server will be lost
+        on the next redeploy — that's why an account can suddenly fail to sign in. Records on this device itself
+        stay safe. The fix is one step on the server side: set <code>MONGODB_URI</code> (MongoDB Atlas
+        has a free tier) then redeploy.
       </p>
       <button
         onClick={() => { setTampil(false); try { localStorage.setItem(KUNCI, 'tutup') } catch { /* kuota */ } }}
-        aria-label="Tutup peringatan"
+        aria-label="Dismiss warning"
         className="t-mikro shrink-0 font-black text-amber-900 dark:text-amber-200"
       >
         ✕

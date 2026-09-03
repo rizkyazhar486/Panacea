@@ -828,7 +828,7 @@ export function Shell({ children }: { children: ReactNode }) {
                 className="flex w-full items-center gap-3 rounded-xl px-4 py-2.5 text-left text-sm font-semibold text-neutral-600 hover:bg-neutral-50"
               >
                 {theme === 'dark' ? <IconSun size={18} /> : <IconMoon size={18} />}
-                {theme === 'dark' ? 'Mode terang' : 'Mode gelap'}
+                {theme === 'dark' ? 'Light mode' : 'Dark mode'}
               </button>
               <button onClick={doLogout} className="flex w-full items-center justify-center gap-2 rounded-xl bg-neutral-100 px-3 py-3 text-sm font-bold text-neutral-600">
                 <IconLogout size={18} /> Log Out
@@ -854,7 +854,7 @@ export function Shell({ children }: { children: ReactNode }) {
             { to: '/', label: 'Home', ikon: <IconHome size={19} />, end: true },
             { to: '/community', label: 'Community', ikon: <IconUsers size={19} /> },
             { to: '/vitapulse', label: 'VitaPulse', ikon: <IconActivity size={19} /> },
-            { to: '/health-data', label: 'Perangkat', ikon: <IconHeart size={19} /> },
+            { to: '/health-data', label: 'Device', ikon: <IconHeart size={19} /> },
             { to: '/latihan', label: 'Training', ikon: <IconRun size={19} /> },
             { to: '/sports-scores', label: 'Skor Langsung', ikon: <IconFlame size={19} /> },
             { to: '/profile', label: 'Profile', ikon: <IconUser size={19} /> },

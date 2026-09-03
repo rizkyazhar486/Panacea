@@ -15,14 +15,14 @@ import { getVitals, vitalsAge, type Vitals } from '../lib/healthVitals'
 // ─────────────────────────────────────────────────────────────────────────────
 
 const BARIS: { kunci: keyof Vitals; label: string; satuan: string; bulat?: boolean }[] = [
-  { kunci: 'weightKg', label: 'Berat', satuan: 'kg' },
+  { kunci: 'weightKg', label: 'Weight', satuan: 'kg' },
   { kunci: 'heightCm', label: 'Height', satuan: 'cm', bulat: true },
-  { kunci: 'restingHr', label: 'Denyut istirahat', satuan: 'bpm', bulat: true },
+  { kunci: 'restingHr', label: 'Resting HR', satuan: 'bpm', bulat: true },
   { kunci: 'spo2Pct', label: 'SpO₂', satuan: '%', bulat: true },
-  { kunci: 'respRate', label: 'Napas', satuan: '/mnt', bulat: true },
-  { kunci: 'bodyTempC', label: 'Suhu', satuan: '°C' },
-  { kunci: 'systolic', label: 'Sistolik', satuan: 'mmHg', bulat: true },
-  { kunci: 'diastolic', label: 'Diastolik', satuan: 'mmHg', bulat: true },
+  { kunci: 'respRate', label: 'Breathing', satuan: '/min', bulat: true },
+  { kunci: 'bodyTempC', label: 'Temperature', satuan: '°C' },
+  { kunci: 'systolic', label: 'Systolic', satuan: 'mmHg', bulat: true },
+  { kunci: 'diastolic', label: 'Diastolic', satuan: 'mmHg', bulat: true },
   { kunci: 'vo2max', label: 'VO₂max', satuan: '' },
 ]
 
@@ -65,8 +65,8 @@ export function KartuDataPerangkat() {
         })}
       </div>
       <p className="mt-2 text-[10px] leading-relaxed text-neutral-500">
-        Sengaja tidak diisikan otomatis ke kolom di bawah: kalkulator ini dipakai untuk menghitung
-        pasien, dan angka tubuh Anda bukan angka mereka. Salin manual bila memang untuk diri sendiri.
+        Deliberately not auto-filled into the fields below: this calculator is used to work out
+        figures for patients, and your own body's numbers aren't theirs. Copy it manually if it really is for yourself.
       </p>
     </div>
   )
