@@ -69,7 +69,7 @@ export const FORMAT: Format[] = [
     caraKerja: 'Eight rounds of 20 seconds all-out work and 10 seconds rest, four minutes per movement. Your score is the LOWEST rep count of the eight rounds.',
     bagusUntuk: 'Very little time required. The "lowest round" score is clever: it punishes an opening burst you cannot sustain.',
     jebakan: 'The original Tabata protocol (Tabata 1996) used a cycle ergometer at roughly 170% VO₂max — the bodyweight version is not the same thing and should not be claimed to give the same results.',
-    contoh: 'Tabata air squat, lalu Tabata push-up.',
+    contoh: 'Tabata air squat, then Tabata push-up.',
   },
   {
     id: 'chipper',
@@ -213,8 +213,8 @@ export const BENCHMARK: Benchmark[] = [
     gambar: 'https://d8j0ntlcm91z4.cloudfront.net/user_3FaS56ACS5VALa5WTIecT6KKkQf/hf_20260807_083519_006b461e-5a1b-4564-8103-38fb0cb31604.png',
   },
   {
-    nama: 'Helen', kelompok: 'girls', format: '3 ronde For Time', bodyweight: false,
-    isi: ['Lari 400 m', '21 kettlebell swings', '12 pull-up'], bebanRx: 'KB 24 kg / 16 kg',
+    nama: 'Helen', kelompok: 'girls', format: '3 rounds For Time', bodyweight: false,
+    isi: ['400 m run', '21 kettlebell swings', '12 pull-up'], bebanRx: 'KB 24 kg / 16 kg',
     targetWaktu: 'Beginner 14–18 min · intermediate 10–12 · advanced <9',
     skala: 'Cut the run to 200–300 m; lower the kettlebell so 21 swings can be done unbroken.',
     catatan: 'A triplet with a good balance of running, pulling and hip hinging.',
@@ -232,7 +232,7 @@ export const BENCHMARK: Benchmark[] = [
   },
   {
     nama: 'Karen', kelompok: 'girls', format: 'For Time', bodyweight: false,
-    isi: ['150 wall ball'], bebanRx: '9 kg ke target 3 m / 6 kg ke 2,7 m',
+    isi: ['150 wall ball'], bebanRx: '9 kg to a 3 m target / 6 kg to 2.7 m',
     targetWaktu: 'Beginner 12–18 min · advanced <7',
     skala: 'Drop to 100 or 75 reps before you drop the weight of the ball.',
     catatan: 'Simple and brutal. The quad soreness afterwards usually lasts several days.',
@@ -242,7 +242,7 @@ export const BENCHMARK: Benchmark[] = [
   // ── Hero WOD ──────────────────────────────────────────────────────────────
   {
     nama: 'Murph', kelompok: 'hero', format: 'For Time', bodyweight: false,
-    isi: ['Lari 1,6 km', '100 pull-up', '200 push-up', '300 air squat', 'Lari 1,6 km'],
+    isi: ['1.6 km run', '100 pull-up', '200 push-up', '300 air squat', '1.6 km run'],
     bebanRx: 'With a 9 kg / 6 kg vest',
     targetWaktu: 'Beginner 55–75 min · intermediate 40–50 · advanced <35',
     skala: 'No vest, break it into 20 rounds of 5-10-15, and halve it ("Half Murph") on a first attempt. This is the single session that causes the most rhabdomyolysis in a year.',
@@ -272,14 +272,14 @@ export const BENCHMARK: Benchmark[] = [
   {
     nama: 'Baby Cindy', kelompok: 'pemula', format: '10-minute AMRAP', bodyweight: true,
     isi: ['3 ring rows', '6 push-ups (incline allowed)', '9 air squats'],
-    targetWaktu: '6-10 ronde',
+    targetWaktu: '6-10 rounds',
     skala: 'If 10 rounds feels easy, extend the time to 15 minutes before adding reps.',
     catatan: 'Start here if this is your first week. There is nothing embarrassing about starting here.',
     jam: { jenis: 'amrap', menit: 10 },
     gambar: 'https://d8j0ntlcm91z4.cloudfront.net/user_3FaS56ACS5VALa5WTIecT6KKkQf/hf_20260807_083727_eedc9d38-876e-498e-8a66-8892d96d4d2e.png',
   },
   {
-    nama: 'EMOM Pengenalan', kelompok: 'pemula', format: '10-minute EMOM', bodyweight: true,
+    nama: 'Intro EMOM', kelompok: 'pemula', format: '10-minute EMOM', bodyweight: true,
     isi: ['Odd minutes: 8 air squats + 4 push-ups', 'Even minutes: full rest'],
     targetWaktu: 'Finish without gasping',
     skala: 'Only add reps if you still have 30 seconds of rest in each working minute.',
