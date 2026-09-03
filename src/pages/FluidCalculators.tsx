@@ -78,7 +78,7 @@ function FluidResuscitation() {
 
   return (
     <Card className="!p-5">
-      <Prosa kelas="text-[13px] text-neutral-500">Volume resusitasi kristaloid menurut berat badan untuk keadaan syok/luka bakar yang lazim. Selalu nilai ulang perfusi (MAP, laktat, keluaran urin, waktu pengisian kapiler) di antara pemberian bolus — ini perkiraan titik mulai, bukan resep yang dipatok.</Prosa>
+      <Prosa kelas="text-[13px] text-neutral-500">Crystalloid resuscitation volume by body weight for typical shock/burn scenarios. Always reassess perfusion (MAP, lactate, urine output, capillary refill time) between boluses — this is a starting-point estimate, not a fixed prescription.</Prosa>
       <div className="mt-3 flex flex-wrap gap-2">
         <button onClick={() => setScenario('adult-sepsis')} className={`rounded-full px-3 py-1.5 text-[11px] font-bold ${scenario === 'adult-sepsis' ? 'bg-brand text-white' : 'bg-neutral-100 text-neutral-600 dark:bg-white/10'}`}>Adult Sepsis/Shock</button>
         <button onClick={() => setScenario('peds-shock')} className={`rounded-full px-3 py-1.5 text-[11px] font-bold ${scenario === 'peds-shock' ? 'bg-brand text-white' : 'bg-neutral-100 text-neutral-600 dark:bg-white/10'}`}>Pediatric Shock (PALS)</button>
@@ -150,7 +150,7 @@ function Electrolytes() {
 
       {eTab === 'na-correction-rate' && (
         <div className="mt-4">
-          <Prosa kelas="text-[13px] text-neutral-500">Perkiraan Adrogue-Madias yang disederhanakan — berapa kenaikan Na serum untuk tiap liter salin 0,9% (Na 154 mEq/L) yang diberikan. Koreksi hiponatremia menahun tidak boleh lebih cepat dari 8-10 mEq/L per 24 jam untuk menghindari mielinolisis osmotik.</Prosa>
+          <Prosa kelas="text-[13px] text-neutral-500">A simplified Adrogue-Madias estimate — how much serum Na rises per liter of 0.9% saline (Na 154 mEq/L) given. Correction of chronic hyponatremia must not exceed 8-10 mEq/L per 24 hours to avoid osmotic demyelination.</Prosa>
           <div className="mt-3 grid grid-cols-2 gap-3">
             <Field label="Current Na (mEq/L)"><input className={inputClass} type="number" value={currentNa || ''} onChange={(e) => setCurrentNa(Number(e.target.value) || 0)} /></Field>
             <Field label="Target Na (mEq/L)"><input className={inputClass} type="number" value={targetNa || ''} onChange={(e) => setTargetNa(Number(e.target.value) || 0)} /></Field>

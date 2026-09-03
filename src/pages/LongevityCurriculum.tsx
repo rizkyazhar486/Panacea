@@ -182,7 +182,7 @@ export function LongevityCurriculum() {
         })}
       </div>
 
-      <Prosa kelas="text-center text-[10px] leading-relaxed text-neutral-500">Sitasi di halaman ini adalah rujukan penting yang mendasari tiap topik — periksa rinciannya (DOI, volume, edisi terbaru) langsung di PubMed/situs penerbit untuk keperluan akademik resmi. Bahan ini disusun sebagai orientasi bagi tenaga medis/institusi pendidikan, bukan pengganti tinjauan pustaka sistematis maupun pedoman resmi keprofesian.</Prosa>
+      <Prosa kelas="text-center text-[10px] leading-relaxed text-neutral-500">The citations on this page are key references underlying each topic — verify the details (DOI, volume, latest edition) directly on PubMed/the publisher's site for formal academic use. This material is compiled as orientation for healthcare professionals/educational institutions, not a substitute for a systematic literature review or official professional guidelines.</Prosa>
     </div>
   )
 }

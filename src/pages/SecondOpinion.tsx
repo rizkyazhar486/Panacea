@@ -50,7 +50,7 @@ function PatientView({ email }: { email: string }) {
   return (
     <>
       <Card className="!p-5">
-        <SectionTitle icon={<IconStethoscope size={20} />} title="Request a Second Opinion" subtitle="AI menyusun draf secara tertutup, dokter sungguhan memeriksanya sebelum Anda melihat apa pun" />
+        <SectionTitle icon={<IconStethoscope size={20} />} title="Request a Second Opinion" subtitle="The AI drafts privately; a real doctor reviews it before you see anything" />
         <p className="mt-2 text-[13px] leading-relaxed text-neutral-500">
           Describe your current diagnosis, treatment, symptoms, and relevant history. An AI assistant
           drafts a structured analysis, but <b>you will never see that draft</b> — a licensed doctor
@@ -60,13 +60,13 @@ function PatientView({ email }: { email: string }) {
       </Card>
 
       <Card className="!p-5">
-        <Field label="Diagnosis Anda saat ini (bila ada)">
+        <Field label="Your current diagnosis (if any)">
           <textarea className={`${inputClass} min-h-16`} placeholder="e.g. Diagnosed with type 2 diabetes 6 months ago" value={currentDiagnosis} onChange={(e) => setCurrentDiagnosis(e.target.value)} />
         </Field>
-        <Field label="Pengobatan/obat Anda saat ini (bila ada)">
+        <Field label="Your current treatment/medication (if any)">
           <textarea className={`${inputClass} mt-3 min-h-16`} placeholder="e.g. Metformin 500mg twice daily" value={currentTreatment} onChange={(e) => setCurrentTreatment(e.target.value)} />
         </Field>
-        <Field label="Gejala yang Anda rasakan">
+        <Field label="Symptoms you're experiencing">
           <textarea className={`${inputClass} mt-3 min-h-16`} placeholder="e.g. Persistent fatigue and tingling in both feet for the last month" value={symptoms} onChange={(e) => setSymptoms(e.target.value)} />
         </Field>
         <Field label="Relevant history (other conditions, family history, allergies)">
@@ -135,8 +135,8 @@ function DoctorView({ name, email }: { name: string; email: string }) {
   return (
     <>
       <Card className="!p-5">
-        <SectionTitle icon={<IconStethoscope size={20} />} title="Second Opinion — Review Queue" subtitle="AI menyusun draf secara tertutup; jawaban Anda yang sudah disuntinglah yang diterima pasien" />
-        <Prosa kelas="mt-2 text-[13px] leading-relaxed text-neutral-500">Tiap permintaan di bawah disertai analisis draf dari AI sebagai titik mulai. Suntinglah sebebasnya — pasien hanya melihat apa yang Anda kirim, tidak pernah drafnya.</Prosa>
+        <SectionTitle icon={<IconStethoscope size={20} />} title="Second Opinion — Review Queue" subtitle="The AI drafts privately; only your edited answer reaches the patient" />
+        <Prosa kelas="mt-2 text-[13px] leading-relaxed text-neutral-500">Every request below comes with an AI draft analysis as a starting point. Edit it freely — the patient only ever sees what you send, never the draft.</Prosa>
       </Card>
 
       {loading && <Card className="!p-5 text-center text-sm text-neutral-500">Loading…</Card>}
