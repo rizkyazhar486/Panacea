@@ -31,8 +31,8 @@ export function GymEquipment() {
 
       <Card className="!p-4">
         <SectionTitle icon={<IconRun size={18} />} title={`${EQUIPMENT.length} machines & stations`}
-          subtitle="Termasuk seluruh stasiun resmi Hyrox" />
-        <Prosa kelas="mt-2 text-[12px] leading-relaxed text-neutral-600 dark:text-neutral-300">Tiap mesin di sini dibandingkan dengan padanan tanpa alatnya ke dua arah: di mana mesinnya benar-benar unggul, di mana gerakan berat badan yang unggul, dan kapan selisihnya terlalu kecil untuk diperdebatkan. "Mesin selalu lebih rendah" dan "mesin selalu lebih aman" sama-sama tidak tepat — yang benar-benar berbeda, dan dapat diukur, adalah seberapa banyak kerja otot penstabil yang dituntut gerakan itu, semudah apa bebannya ditambah, seberapa besar keterampilan yang diperlukan, dan sebaik apa ia terbawa ke kehidupan nyata.</Prosa>
+          subtitle="Includes every official Hyrox station" />
+        <Prosa kelas="mt-2 text-[12px] leading-relaxed text-neutral-600 dark:text-neutral-300">Every machine here is compared against its bodyweight equivalent both ways: where the machine genuinely wins, where the bodyweight movement wins, and when the difference is too small to argue over. "Machines are always inferior" and "machines are always safer" are both wrong — what genuinely differs, and can be measured, is how much stabilizer-muscle work the movement demands, how easily the load can be increased, how much skill it requires, and how well it carries over to real life.</Prosa>
         <input
           className={inputClass + ' mt-3'}
           placeholder="Search equipment (e.g. treadmill, sled, rower, glutes)…"
@@ -42,7 +42,7 @@ export function GymEquipment() {
         <div className="mt-3 flex flex-wrap gap-2">
           <button onClick={() => setGroup(null)}
             className={`rounded-full px-3 py-1.5 text-[11px] font-bold ${!group ? 'bg-brand text-white' : 'bg-neutral-100 text-neutral-600 dark:bg-white/10'}`}>
-            Semua
+            All
           </button>
           {GROUPS.map((g) => (
             <button key={g} onClick={() => setGroup(group === g ? null : g)}
@@ -69,7 +69,7 @@ export function GymEquipment() {
               </div>
               <div className="flex shrink-0 flex-col items-end gap-1">
                 <Badge tone={e.group === 'hyrox' ? 'brand' : 'low'}>{GROUP_LABEL[e.group]}</Badge>
-                <span className="text-[11px] font-bold text-neutral-500">{open ? 'Tutup ▲' : 'Buka ▼'}</span>
+                <span className="text-[11px] font-bold text-neutral-500">{open ? 'Close ▲' : 'Open ▼'}</span>
               </div>
             </button>
 

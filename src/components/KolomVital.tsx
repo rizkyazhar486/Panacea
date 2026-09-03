@@ -52,7 +52,7 @@ export function KolomVitalTerikat({
         <span>{label}</span>
         {dariPerangkat && (
           <span className="rounded bg-brand-50 px-1 text-[10px] font-bold text-brand-dark"
-            title="Terisi sendiri dari perangkat Anda">⌚</span>
+            title="Auto-filled from your device">⌚</span>
         )}
       </span>
     }>
@@ -68,8 +68,8 @@ export function KolomVitalTerikat({
         />
         {belumDisimpan && (
           <button type="button" onClick={komit}
-            title="Simpan nilai ini untuk seluruh aplikasi (atau tekan Enter)"
-            aria-label={`Simpan ${label}`}
+            title="Save this value for the whole app (or press Enter)"
+            aria-label={`Save ${label}`}
             className="shrink-0 rounded-lg bg-brand px-2 py-1.5 text-[12px] font-black text-white">↵</button>
         )}
         {tersimpan && <span className="shrink-0 text-[10px] font-bold text-emerald-600" role="status">✓</span>}
@@ -110,7 +110,7 @@ export function KolomVital({
         <span>{label}</span>
         {dariPerangkat && (
           <span className="rounded bg-brand-50 px-1 text-[10px] font-bold text-brand-dark"
-            title="Terisi sendiri dari perangkat Anda">⌚</span>
+            title="Auto-filled from your device">⌚</span>
         )}
       </span>
     }>
@@ -126,15 +126,15 @@ export function KolomVital({
         />
         {belumDisimpan && (
           <button type="button" onClick={komit}
-            title="Simpan nilai ini untuk seluruh aplikasi (atau tekan Enter)"
-            aria-label={`Simpan ${label}`}
+            title="Save this value for the whole app (or press Enter)"
+            aria-label={`Save ${label}`}
             className="shrink-0 rounded-lg bg-brand px-2.5 py-2 text-[12px] font-black text-white">↵</button>
         )}
-        {tersimpan && <span className="shrink-0 text-[11px] font-bold text-emerald-600" role="status">tersimpan</span>}
+        {tersimpan && <span className="shrink-0 text-[11px] font-bold text-emerald-600" role="status">saved</span>}
       </div>
       {belumDisimpan && (
         <span className="mt-1 block text-[10px] text-neutral-500">
-          Tekan Enter untuk memakai angka ini di semua halaman.
+          Press Enter to use this number on every page.
         </span>
       )}
     </Field>

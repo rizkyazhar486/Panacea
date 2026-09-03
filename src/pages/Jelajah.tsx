@@ -54,8 +54,8 @@ export function Jelajah() {
     })
   }, [posts, tag, orang])
 
-  const judul = tag ? `#${tag}` : orang || 'Jelajah'
-  const sub = tag ? 'Kiriman dengan tagar ini' : orang ? 'Kiriman dari orang ini' : 'Cari lewat tombol 🔍 di atas'
+  const judul = tag ? `#${tag}` : orang || 'Explore'
+  const sub = tag ? 'Posts with this hashtag' : orang ? 'Posts from this person' : 'Search using the 🔍 button above'
 
   return (
     <div className="mx-auto max-w-xl space-y-4 pb-24">
@@ -64,8 +64,8 @@ export function Jelajah() {
       {!tag && !orang && (
         <Card>
           <p className="text-[13px] leading-relaxed text-neutral-600">
-            Halaman ini menampilkan hasil pencarian orang dan tagar. Ketuk tombol pencarian di
-            bilah atas, lalu pilih salah satu hasilnya.
+            This page shows search results for people and hashtags. Tap the search button in
+            the top bar, then pick one of the results.
           </p>
         </Card>
       )}
@@ -75,16 +75,16 @@ export function Jelajah() {
       )}
 
       {galat && (
-        <Card><p className="text-[13px] text-neutral-500">Gagal memuat kiriman. Coba lagi nanti.</p></Card>
+        <Card><p className="text-[13px] text-neutral-500">Failed to load posts. Try again later.</p></Card>
       )}
 
       {posts !== null && (tag || orang) && hasil.length === 0 && !galat && (
         <Card>
           <p className="text-[13px] leading-relaxed text-neutral-600">
-            Belum ada kiriman {tag ? <>dengan tagar <b>#{tag}</b></> : <>dari <b>{orang}</b></>}.
+            No posts yet {tag ? <>with the hashtag <b>#{tag}</b></> : <>from <b>{orang}</b></>}.
           </p>
           <Link to="/community" className="mt-2 inline-block text-[12px] font-bold text-brand underline">
-            Buka Community
+            Open Community
           </Link>
         </Card>
       )}
@@ -92,7 +92,7 @@ export function Jelajah() {
       {hasil.map((p) => (
         <Card key={p.id}>
           <div className="flex items-baseline justify-between gap-2">
-            <div className="text-[13px] font-black text-ink">{p.authorName ?? 'Tanpa nama'}</div>
+            <div className="text-[13px] font-black text-ink">{p.authorName ?? 'No name'}</div>
             {p.at && <div className="text-[10px] text-slate-500">{p.at.slice(0, 10)}</div>}
           </div>
           {p.activity && <div className="mt-0.5 text-[11px] font-bold text-brand">{p.activity}</div>}
@@ -104,7 +104,7 @@ export function Jelajah() {
       ))}
 
       {hasil.length > 0 && (
-        <p className="text-center text-[11px] text-slate-500">{hasil.length} kiriman</p>
+        <p className="text-center text-[11px] text-slate-500">{hasil.length} posts</p>
       )}
     </div>
   )

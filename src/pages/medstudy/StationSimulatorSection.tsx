@@ -43,7 +43,7 @@ export default function StationSimulatorSection() {
         </div>
 
         <div className="mt-3">
-          <div className="text-[11px] font-black uppercase tracking-wide text-neutral-500">Tugas</div>
+          <div className="text-[11px] font-black uppercase tracking-wide text-neutral-500">Task</div>
           <ol className="mt-1 list-decimal space-y-1 pl-4 text-[13px] leading-relaxed text-neutral-700 dark:text-neutral-200">
             {station.tasks.map((t, i) => <li key={i}>{t}</li>)}
           </ol>
@@ -57,19 +57,19 @@ export default function StationSimulatorSection() {
           <div className="mt-4 space-y-3 border-t border-neutral-200 pt-3 dark:border-white/10">
             {station.examinerFindings.anamnesis && (
               <div>
-                <div className="text-[11px] font-black uppercase tracking-wide text-brand-dark">Anamnesis (jawaban PS)</div>
+                <div className="text-[11px] font-black uppercase tracking-wide text-brand-dark">History (SP answers)</div>
                 <p className="mt-1 text-[12px] leading-relaxed text-neutral-600 dark:text-neutral-300">{station.examinerFindings.anamnesis}</p>
               </div>
             )}
             {station.examinerFindings.physicalExam && (
               <div>
-                <div className="text-[11px] font-black uppercase tracking-wide text-brand-dark">Pemeriksaan Fisik</div>
+                <div className="text-[11px] font-black uppercase tracking-wide text-brand-dark">Physical Exam</div>
                 <p className="mt-1 text-[12px] leading-relaxed text-neutral-600 dark:text-neutral-300">{station.examinerFindings.physicalExam}</p>
               </div>
             )}
             {station.examinerFindings.supportingExam && (
               <div>
-                <div className="text-[11px] font-black uppercase tracking-wide text-brand-dark">Pemeriksaan Penunjang</div>
+                <div className="text-[11px] font-black uppercase tracking-wide text-brand-dark">Supporting Exam</div>
                 <p className="mt-1 text-[12px] leading-relaxed text-neutral-600 dark:text-neutral-300">{station.examinerFindings.supportingExam}</p>
               </div>
             )}
@@ -84,30 +84,30 @@ export default function StationSimulatorSection() {
             )}
             {station.examinerFindings.treatment && (
               <div>
-                <div className="text-[11px] font-black uppercase tracking-wide text-brand-dark">Tatalaksana</div>
+                <div className="text-[11px] font-black uppercase tracking-wide text-brand-dark">Management</div>
                 <p className="mt-1 text-[12px] leading-relaxed text-neutral-600 dark:text-neutral-300">{station.examinerFindings.treatment}</p>
               </div>
             )}
             {station.standardPatient && (
               <div className="rounded-lg bg-neutral-50 p-3 dark:bg-white/5">
-                <div className="text-[11px] font-black uppercase tracking-wide text-neutral-500">Naskah Pasien Standar</div>
+                <div className="text-[11px] font-black uppercase tracking-wide text-neutral-500">Standard Patient Script</div>
                 <p className="mt-1 text-[12px] text-neutral-500">
                   {station.standardPatient.nama} · {station.standardPatient.usia} · {station.standardPatient.jenisKelamin} · {station.standardPatient.pekerjaan}
                 </p>
-                {station.standardPatient.keluhanUtama && <p className="mt-1 text-[12px] text-neutral-600 dark:text-neutral-300"><b>Keluhan utama:</b> {station.standardPatient.keluhanUtama}</p>}
+                {station.standardPatient.keluhanUtama && <p className="mt-1 text-[12px] text-neutral-600 dark:text-neutral-300"><b>Chief complaint:</b> {station.standardPatient.keluhanUtama}</p>}
                 {station.standardPatient.riwayatPenyakitSekarang && <p className="mt-1 text-[12px] leading-relaxed text-neutral-600 dark:text-neutral-300">{station.standardPatient.riwayatPenyakitSekarang}</p>}
                 {station.standardPatient.pertanyaanWajib && <p className="mt-1 text-[12px] italic text-neutral-500">"{station.standardPatient.pertanyaanWajib}"</p>}
-                {station.standardPatient.peranWajib && <p className="mt-1 text-[12px] text-neutral-500">Peran: {station.standardPatient.peranWajib}</p>}
+                {station.standardPatient.peranWajib && <p className="mt-1 text-[12px] text-neutral-500">Role: {station.standardPatient.peranWajib}</p>}
               </div>
             )}
-            {station.author && <p className="text-[10px] text-neutral-500">Penulis: {station.author}{station.reference ? ` · Referensi: ${station.reference}` : ''}</p>}
+            {station.author && <p className="text-[10px] text-neutral-500">Author: {station.author}{station.reference ? ` · Reference: ${station.reference}` : ''}</p>}
           </div>
         )}
       </Card>
 
       <div className="rounded-2xl border border-neutral-100 bg-white p-4 text-center text-[11px] leading-relaxed text-neutral-500 dark:border-white/10 dark:bg-white/5">
-        Diadaptasi dari template station OSCE UKMPPD resmi lintas fakultas kedokteran. Gunakan sebagai
-        simulasi latihan — kompetensi & pemahaman klinis tetap yang utama, bukan hafalan kasus ini saja.
+        Adapted from official OSCE UKMPPD station templates used across medical schools. Use it as
+        practice simulation — clinical competence & understanding still matter most, not memorizing this specific case.
       </div>
     </div>
   )

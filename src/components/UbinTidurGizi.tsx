@@ -85,9 +85,9 @@ export function UbinTidurLebar() {
   return (
     <section>
       <div className="mb-2 flex items-baseline justify-between gap-2">
-        <h2 className="t-kecil font-black uppercase tracking-wide text-neutral-500">Tidur 14 malam</h2>
+        <h2 className="t-kecil font-black uppercase tracking-wide text-neutral-500">14-night sleep</h2>
         <Link to="/pola-tidur" className="t-kecil flex min-h-[40px] items-center font-bold text-brand">
-          Buka →
+          Open →
         </Link>
       </div>
 
@@ -96,10 +96,10 @@ export function UbinTidurLebar() {
           <span className="text-[26px] font-black leading-none tabular-nums nyala text-ink dark:text-white">
             {semalam > 0 ? semalam.toFixed(1) : '—'}
           </span>
-          <span className="t-mikro font-bold text-neutral-400">jam semalam</span>
+          <span className="t-mikro font-bold text-neutral-400">hrs last night</span>
           {selisih != null && (
             <span className="t-mikro ml-auto shrink-0 tabular-nums text-neutral-500">
-              {selisih >= 0 ? '+' : '−'}{Math.abs(selisih).toFixed(1)} j dari kebiasaan
+              {selisih >= 0 ? '+' : '−'}{Math.abs(selisih).toFixed(1)}h from usual
             </span>
           )}
         </div>
@@ -109,8 +109,8 @@ export function UbinTidurLebar() {
         </div>
 
         <p className="t-mikro mt-1.5 truncate text-neutral-400">
-          Garis putus-putus = kebiasaan Anda {biasa > 0 ? `${biasa.toFixed(1)} j` : '—'}
-          {konsisten != null && jumlahMalam > 0 ? ` · jam tidur seragam ${konsisten}/${jumlahMalam} malam` : ''}
+          Dashed line = your usual {biasa > 0 ? `${biasa.toFixed(1)}h` : '—'}
+          {konsisten != null && jumlahMalam > 0 ? ` · consistent bedtime ${konsisten}/${jumlahMalam} nights` : ''}
         </p>
       </div>
     </section>
@@ -156,21 +156,21 @@ export function UbinGiziLebar() {
   return (
     <section>
       <div className="mb-2 flex items-baseline justify-between gap-2">
-        <h2 className="t-kecil font-black uppercase tracking-wide text-neutral-500">Asupan hari ini</h2>
+        <h2 className="t-kecil font-black uppercase tracking-wide text-neutral-500">Today's intake</h2>
         <Link to="/nutrition" className="t-kecil flex min-h-[40px] items-center font-bold text-brand">
-          Catat →
+          Log →
         </Link>
       </div>
 
       <div className="kaca rounded-3xl p-3">
         <div className="flex items-baseline gap-1.5">
           <span className="text-[26px] font-black leading-none tabular-nums nyala text-ink dark:text-white">
-            {adaHariIni ? Math.round(kkal).toLocaleString('id-ID') : '—'}
+            {adaHariIni ? Math.round(kkal).toLocaleString('en-GB') : '—'}
           </span>
           <span className="t-mikro font-bold text-neutral-400">kkal</span>
           {biasa > 0 && (
             <span className="t-mikro ml-auto shrink-0 tabular-nums text-neutral-500">
-              biasanya {Math.round(biasa).toLocaleString('id-ID')}
+              usually {Math.round(biasa).toLocaleString('en-GB')}
             </span>
           )}
         </div>
@@ -209,9 +209,9 @@ export function UbinGiziLebar() {
             </span>
             <div className="mt-1.5 flex items-baseline justify-between gap-2">
               {[
-                { l: 'Karbo', g: karbo, n: 'bg-amber-400' },
+                { l: 'Carbs', g: karbo, n: 'bg-amber-400' },
                 { l: 'Protein', g: protein, n: 'bg-brand' },
-                { l: 'Lemak', g: lemak, n: 'bg-rose-400' },
+                { l: 'Fat', g: lemak, n: 'bg-rose-400' },
               ].map((x) => (
                 <span key={x.l} className="flex min-w-0 items-center gap-1.5">
                   <span className={`h-2 w-2 shrink-0 rounded-full ${x.n}`} />
@@ -222,7 +222,7 @@ export function UbinGiziLebar() {
             </div>
           </>
         ) : (
-          <p className="t-kecil mt-2 text-neutral-500">Belum ada yang dicatat hari ini.</p>
+          <p className="t-kecil mt-2 text-neutral-500">Nothing logged today.</p>
         )}
       </div>
     </section>

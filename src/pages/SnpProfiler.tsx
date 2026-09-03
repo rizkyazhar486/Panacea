@@ -128,9 +128,9 @@ export function SnpProfiler() {
         <p className="mt-2 text-[13px] leading-relaxed text-neutral-500">
           Upload a raw genotype export (23andMe, AncestryDNA, or similar — usually a "Download Raw Data"
           option in your account settings). It's matched locally against {SNP_DB.length} well-documented
-          research SNPs. <b>Berkasnya diolah sepenuhnya di perangkat Anda dan tidak pernah dikirim ke mana pun.</b>
+          research SNPs. <b>The file is processed entirely on your device and never sent anywhere.</b>
         </p>
-        <Prosa kelas="mt-2 text-[12px] leading-relaxed text-amber-700 dark:text-amber-300">SNP tunggal dari uji larik konsumen umumnya punya pengaruh perorangan yang kecil, dan penentuan genotipe konsumen (tidak seperti pengurutan klinis) dapat memiliki tingkat kekeliruan yang nyata pada posisi tertentu. Ini penelusuran pustaka untuk belajar, bukan pemeriksaan genetik klinis maupun skor risiko poligenik.</Prosa>
+        <Prosa kelas="mt-2 text-[12px] leading-relaxed text-amber-700 dark:text-amber-300">A single SNP from a consumer array test generally has a small individual effect, and consumer genotyping (unlike clinical sequencing) can have a real error rate at specific positions. This is an educational literature lookup, not a clinical genetic test or a polygenic risk score.</Prosa>
       </Card>
 
       <Card className="!p-5">

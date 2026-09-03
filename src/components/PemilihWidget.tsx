@@ -68,17 +68,17 @@ export function PemilihWidget({ tutup }: { tutup: () => void }) {
   // pohon DOM dan menemukannya. Yang tidak diperiksa adalah apakah lembar itu
   // benar-benar menutupi layar. Kini itu yang diuji.
   return createPortal(
-    <div className="fixed inset-0 z-[70] flex items-end justify-center bg-black/60 sm:items-center sm:p-4" role="dialog" aria-label="Pilih widget beranda">
+    <div className="fixed inset-0 z-[70] flex items-end justify-center bg-black/60 sm:items-center sm:p-4" role="dialog" aria-label="Choose home widgets">
       <div className="flex max-h-[88vh] w-full max-w-lg flex-col rounded-t-3xl bg-white shadow-2xl dark:bg-neutral-900 sm:rounded-3xl">
         <div className="flex items-center justify-between gap-2 border-b border-neutral-200 p-4 dark:border-white/10">
           <div className="min-w-0">
-            <h2 className="text-[15px] font-black text-ink dark:text-white">Widget beranda</h2>
+            <h2 className="text-[15px] font-black text-ink dark:text-white">Home widgets</h2>
             <p className="text-[11px] text-neutral-500">
-              {aktif.length} dipilih dari {WIDGETS.length} fitur
+              {aktif.length} selected out of {WIDGETS.length} features
             </p>
           </div>
           <button onClick={tutup} className="flex h-10 shrink-0 items-center rounded-full bg-neutral-100 px-4 text-[12px] font-bold text-ink dark:bg-white/10 dark:text-white">
-            Selesai
+            Done
           </button>
         </div>
 
@@ -86,7 +86,7 @@ export function PemilihWidget({ tutup }: { tutup: () => void }) {
           <input
             value={cari}
             onChange={(e) => setCari(e.target.value)}
-            placeholder="Cari fitur…"
+            placeholder="Search features…"
             aria-label="Search features"
             className="h-11 w-full rounded-xl border border-neutral-200 bg-white px-3 text-[13px] text-ink placeholder:text-neutral-400 dark:border-white/15 dark:bg-white/10 dark:text-white"
           />
@@ -128,7 +128,7 @@ export function PemilihWidget({ tutup }: { tutup: () => void }) {
             </section>
           ))}
           {kelompok.length === 0 && (
-            <p className="py-6 text-center text-[13px] text-neutral-500">Tidak ada fitur yang cocok.</p>
+            <p className="py-6 text-center text-[13px] text-neutral-500">No matching features.</p>
           )}
         </div>
 
@@ -137,13 +137,13 @@ export function PemilihWidget({ tutup }: { tutup: () => void }) {
             onClick={() => { const b = widgetBawaan(); simpanWidget(b); setAktif(b) }}
             className="flex h-10 items-center text-[12px] font-bold text-neutral-500"
           >
-            Kembalikan bawaan
+            Restore defaults
           </button>
           <button
             onClick={() => { simpanWidget([]); setAktif([]) }}
             className="flex h-10 items-center text-[12px] font-bold text-neutral-500"
           >
-            Kosongkan semua
+            Clear all
           </button>
         </div>
       </div>
