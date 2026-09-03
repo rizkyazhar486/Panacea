@@ -86,7 +86,7 @@ const TIERS: Tier[] = [
     features: [
       <>AI Chatbot — history-taking &amp; health education</>,
       <>Community, Facility GPS &amp; Emergency SOS</>,
-      <>Kalkulator Klinis — gratis untuk 50 pendaftar pertama</>,
+      <>Clinical Calculators — free for the first 50 sign-ups</>,
     ],
   },
   {
@@ -96,10 +96,10 @@ const TIERS: Tier[] = [
     note: '/month',
     highlight: true,
     features: [
-      <>Semua isi paket Gratis</>,
+      <>Everything in the Free plan</>,
       <>AI Longevity Calculator — diet, exercise, sleep &amp; sun exposure</>,
       <>2× In-depth AI Consultations per month (worth Rp98,000)</>,
-      <>Akses penuh Kalkulator Klinis (melampaui jatah gratis)</>,
+      <>Full access to Clinical Calculators (beyond the free allowance)</>,
     ],
   },
   {
@@ -108,7 +108,7 @@ const TIERS: Tier[] = [
     price: 'Rp199,000',
     note: '/month',
     features: [
-      <>Semua isi paket Plus</>,
+      <>Everything in the Plus plan</>,
       <>Chronic Monitoring — biomarker trends &amp; ongoing recommendations</>,
       <>Unlimited in-depth AI Consultations</>,
       <>Priority support</>,
