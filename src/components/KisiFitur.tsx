@@ -192,13 +192,13 @@ export function KisiFitur() {
                 value={cari}
                 onChange={(e) => setCari(e.target.value)}
                 onKeyDown={(e) => { if (e.key === 'Escape') { setCari(''); setCariBuka(false) } }}
-                placeholder={`Cari di ${WIDGETS.length} fitur`}
+                placeholder={`Search ${WIDGETS.length} features`}
                 aria-label="Search features"
                 className="t-kecil min-h-[40px] w-full min-w-0 bg-transparent font-semibold text-ink outline-none dark:text-white"
               />
               <button
                 onClick={() => { setCari(''); setCariBuka(false) }}
-                aria-label="Tutup pencarian"
+                aria-label="Close search"
                 className="grid h-10 w-8 shrink-0 place-items-center text-lg leading-none text-neutral-400"
               >
                 ×
@@ -232,7 +232,7 @@ export function KisiFitur() {
         cocok.length ? (
           <div className="rounded-3xl bg-white p-3 dark:bg-white/5">
             <p className="t-mikro mb-2 font-bold text-neutral-500">
-              {cocok.length} fitur cocok dengan "{cari.trim()}"
+              {cocok.length} features match "{cari.trim()}"
             </p>
             <div className="grid grid-cols-4 gap-1">
               {cocok.map((w) => <Lambang key={w.id} w={w} />)}
@@ -240,7 +240,7 @@ export function KisiFitur() {
           </div>
         ) : (
           <p className="t-kecil rounded-3xl bg-white px-3 py-4 text-center leading-snug text-neutral-500 dark:bg-white/5">
-            Tidak ada fitur yang cocok dengan "{cari.trim()}". Coba kata yang lebih pendek.
+            No features match "{cari.trim()}". Try a shorter word.
           </p>
         )
       ) : (

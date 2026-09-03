@@ -30,13 +30,13 @@ export function evaluateVitals(v: VitalSign, conditions: string[]): VitalEval[] 
   if (v.systolic >= 160 || v.diastolic >= 100) bp = 'alert'
   else if (v.systolic >= (hyper ? 140 : 135) || v.diastolic >= 90) bp = 'warn'
   if (v.systolic < 90 || v.diastolic < 60) bp = 'alert' // hypotension
-  out.push({ label: 'Tekanan Darah', value: `${v.systolic}/${v.diastolic}`, unit: 'mmHg', status: bp, target: bpTarget })
+  out.push({ label: 'Blood Pressure', value: `${v.systolic}/${v.diastolic}`, unit: 'mmHg', status: bp, target: bpTarget })
 
   // Heart rate
   let hr: VitalStatus = 'ok'
   if (v.heartRate > 120 || v.heartRate < 50) hr = 'alert'
   else if (v.heartRate > 100 || v.heartRate < 60) hr = 'warn'
-  out.push({ label: 'Nadi', value: `${v.heartRate}`, unit: 'x/mnt', status: hr, target: '60–100' })
+  out.push({ label: 'Heart Rate', value: `${v.heartRate}`, unit: 'bpm', status: hr, target: '60–100' })
 
   // SpO2
   let spo2: VitalStatus = 'ok'
@@ -48,7 +48,7 @@ export function evaluateVitals(v: VitalSign, conditions: string[]): VitalEval[] 
   let temp: VitalStatus = 'ok'
   if (v.tempC >= 39 || v.tempC < 35) temp = 'alert'
   else if (v.tempC >= 37.5) temp = 'warn'
-  out.push({ label: 'Suhu', value: `${v.tempC}`, unit: '°C', status: temp, target: '36–37.4' })
+  out.push({ label: 'Temperature', value: `${v.tempC}`, unit: '°C', status: temp, target: '36–37.4' })
 
   // Glucose (only when measured)
   if (v.glucose != null) {
@@ -68,4 +68,4 @@ export function overallStatus(evals: VitalEval[]): VitalStatus {
 }
 
 export const STATUS_COLOR: Record<VitalStatus, string> = { ok: '#00BF63', warn: '#f59e0b', alert: '#FF3131' }
-export const STATUS_LABEL: Record<VitalStatus, string> = { ok: 'Terkontrol', warn: 'Perlu perhatian', alert: 'Bahaya' }
+export const STATUS_LABEL: Record<VitalStatus, string> = { ok: 'Controlled', warn: 'Needs attention', alert: 'Danger' }

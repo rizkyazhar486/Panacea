@@ -338,7 +338,7 @@ export function UbinNapas() {
           <div className="flex items-center gap-3">
             <span
               className="grid shrink-0 place-items-center rounded-full bg-brand text-white transition-all duration-500 cahaya-hijau"
-              style={{ width: fase.label.startsWith('Buang') ? 56 : 84, height: fase.label.startsWith('Buang') ? 56 : 84 }}
+              style={{ width: fase.label.startsWith('Long exhale') ? 56 : 84, height: fase.label.startsWith('Long exhale') ? 56 : 84 }}
             >
               <span className="text-[18px] font-black tabular-nums">{Math.ceil(sisaFase)}</span>
             </span>

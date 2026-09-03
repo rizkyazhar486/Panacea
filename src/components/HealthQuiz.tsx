@@ -63,8 +63,8 @@ export function HealthQuiz() {
   return (
     <div className="space-y-3">
       <div className="flex items-center justify-between">
-        <div className="text-xs font-black text-ink">🧠 Kuis Fakta vs Mitos</div>
-        <span className="rounded-full bg-neutral-100 px-2 py-0.5 text-[10px] font-bold text-neutral-500">Skor {tier}: {tierScore.correct}/{tierScore.total}</span>
+        <div className="text-xs font-black text-ink">🧠 Fact vs Myth Quiz</div>
+        <span className="rounded-full bg-neutral-100 px-2 py-0.5 text-[10px] font-bold text-neutral-500">Score {tier}: {tierScore.correct}/{tierScore.total}</span>
       </div>
 
       {/* Band selector */}
@@ -92,9 +92,9 @@ export function HealthQuiz() {
       {q.type === 'tf' ? (
         <div className="flex gap-2">
           <button onClick={() => answer(true)} disabled={selected !== null}
-            className={`flex-1 rounded-xl py-2 text-xs font-bold transition disabled:opacity-60 ${selected !== null && q.answer === true ? 'bg-brand text-white' : 'bg-brand/10 text-brand-dark'}`}>Fakta</button>
+            className={`flex-1 rounded-xl py-2 text-xs font-bold transition disabled:opacity-60 ${selected !== null && q.answer === true ? 'bg-brand text-white' : 'bg-brand/10 text-brand-dark'}`}>Fact</button>
           <button onClick={() => answer(false)} disabled={selected !== null}
-            className={`flex-1 rounded-xl py-2 text-xs font-bold transition disabled:opacity-60 ${selected !== null && q.answer === false ? 'bg-rose-500 text-white' : 'bg-neutral-100 text-neutral-600'}`}>Mitos</button>
+            className={`flex-1 rounded-xl py-2 text-xs font-bold transition disabled:opacity-60 ${selected !== null && q.answer === false ? 'bg-rose-500 text-white' : 'bg-neutral-100 text-neutral-600'}`}>Myth</button>
         </div>
       ) : (
         <div className="space-y-1.5">
@@ -116,9 +116,9 @@ export function HealthQuiz() {
 
       {selected !== null && (
         <div className={`rounded-xl border p-3 text-[12px] leading-relaxed ${isCorrect ? 'border-brand/20 bg-brand-50/60 text-brand-dark' : 'border-rose-200 bg-rose-50 text-rose-700'}`}>
-          <div className="font-bold">{isCorrect ? '✓ Benar!' : '✕ Kurang tepat.'}</div>
+          <div className="font-bold">{isCorrect ? '✓ Correct!' : '✕ Not quite.'}</div>
           <p className="mt-1 opacity-90">{q.explanation}</p>
-          {q.source && <p className="mt-1 text-[10px] opacity-60">Sumber: {q.source}</p>}
+          {q.source && <p className="mt-1 text-[10px] opacity-60">Source: {q.source}</p>}
           <button onClick={next} className="mt-2 rounded-full bg-white/60 px-3 py-1 text-[11px] font-bold text-inherit">Next →</button>
         </div>
       )}
