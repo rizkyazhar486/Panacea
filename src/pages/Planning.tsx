@@ -79,7 +79,7 @@ export function Planning() {
         <SectionTitle
           icon={<IconPlan size={20} />}
           title="Planning — AI Recommendations, Physician Verification"
-          subtitle="AI mengusulkan rencana tatalaksana; dokter yang memeriksa ulang, menolak, atau menambahinya"
+          subtitle="AI proposes the management plan; the doctor reviews, rejects, or adds to it"
           right={
             <div className="flex gap-2">
               <Badge tone="brand">{verified} verified</Badge>
@@ -163,7 +163,7 @@ export function Planning() {
                 value={newText}
                 onChange={(e) => setNewText(e.target.value)}
                 onKeyDown={(e) => e.key === 'Enter' && add()}
-                placeholder="mis. Furosemid 40 mg IV — periksa dosisnya terhadap formularium"
+                placeholder="e.g. Furosemide 40 mg IV — check the dose against the formulary"
               />
             </Field>
           </div>
@@ -187,7 +187,7 @@ function DDICheck({ texts }: { texts: string[] }) {
       <SectionTitle
         icon={<IconShield size={18} />}
         title="Drug–Drug Interaction (DDI) Checker"
-        subtitle="Penapisan otomatis atas rencana + riwayat obat & alergi"
+        subtitle="Automatic screening of the plan against medication history & allergies"
         right={hits.length === 0 ? <Badge tone="brand">No interactions</Badge> : <Badge tone="critical">{hits.length} interactions</Badge>}
       />
       {hits.length === 0 ? (
@@ -253,7 +253,7 @@ function SurgeryCard() {
       <SectionTitle
         icon={<IconShield size={18} />}
         title="Surgery Recommended"
-        subtitle="Edukasi & persetujuan muncul di akun pasien"
+        subtitle="Education & consent appear in the patient’s account"
         right={<Badge tone={agreed === s.consent.length ? 'brand' : 'high'}>{agreed}/{s.consent.length} consent</Badge>}
       />
       <div className="grid gap-3 md:grid-cols-2">
