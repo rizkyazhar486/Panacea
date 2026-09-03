@@ -80,9 +80,9 @@ export function UbinLab() {
   return (
     <section>
       <div className="mb-2 flex items-baseline justify-between gap-2">
-        <h2 className="t-kecil font-black uppercase tracking-wide text-neutral-500">Hasil lab</h2>
+        <h2 className="t-kecil font-black uppercase tracking-wide text-neutral-500">Lab results</h2>
         <button onClick={() => setBuka((v) => !v)} className="t-kecil flex min-h-[40px] items-center font-bold text-brand">
-          {buka ? 'Tutup' : '+ Tambah'}
+          {buka ? 'Close' : '+ Add'}
         </button>
       </div>
 
@@ -92,7 +92,7 @@ export function UbinLab() {
             <select
               value={jenisId}
               onChange={(e) => setJenisId(e.target.value)}
-              aria-label="Jenis pemeriksaan"
+              aria-label="Test type"
               className="t-kecil w-full rounded-xl border border-neutral-200 bg-transparent px-2.5 py-2 text-ink dark:border-white/12 dark:text-white"
             >
               {JENIS_LAB.map((j) => (
@@ -104,27 +104,27 @@ export function UbinLab() {
                 inputMode="decimal"
                 value={nilai}
                 onChange={(e) => setNilai(e.target.value)}
-                placeholder="Nilai"
-                aria-label="Nilai hasil"
+                placeholder="Value"
+                aria-label="Result value"
                 className="t-kecil min-w-0 flex-1 rounded-xl border border-neutral-200 bg-transparent px-2.5 py-2 text-ink dark:border-white/12 dark:text-white"
               />
               <input
                 type="date"
                 value={tanggal}
                 onChange={(e) => setTanggal(e.target.value)}
-                aria-label="Tanggal pengambilan"
+                aria-label="Collection date"
                 className="t-kecil min-w-0 flex-1 rounded-xl border border-neutral-200 bg-transparent px-2 py-2 text-ink dark:border-white/12 dark:text-white"
               />
-              <button onClick={simpanBaru} className="t-kecil shrink-0 rounded-xl bg-brand px-3 font-bold text-white">Simpan</button>
+              <button onClick={simpanBaru} className="t-kecil shrink-0 rounded-xl bg-brand px-3 font-bold text-white">Save</button>
             </div>
             <p className="t-mikro mt-1.5 leading-snug text-neutral-400">
-              Tanggal PENGAMBILAN darah, bukan tanggal hasil keluar — jarak keduanya bisa berhari-hari.
+              The date blood was TAKEN, not the date the result came out — the gap between them can be days.
             </p>
           </div>
         )}
 
         {!aktif ? (
-          <p className="t-kecil text-neutral-500">Belum ada hasil. Tekan “+ Tambah” untuk memasukkan hasil lab pertama.</p>
+          <p className="t-kecil text-neutral-500">No results yet. Press “+ Add” to enter your first lab result.</p>
         ) : (
           <>
             {terisi.length > 1 && (
@@ -159,7 +159,7 @@ export function UbinLab() {
                     </span>
                     <span className="t-mikro font-bold text-neutral-400">{j.satuan}</span>
                     <span className="t-mikro ml-auto shrink-0 text-neutral-400">
-                      {umur === 0 ? 'hari ini' : umur === 1 ? 'kemarin' : `${umur} hari lalu`}
+                      {umur === 0 ? 'today' : umur === 1 ? 'yesterday' : `${umur} d ago`}
                     </span>
                   </div>
 
@@ -170,7 +170,7 @@ export function UbinLab() {
                   </p>
                   {j.catatan && <p className="t-mikro mt-0.5 leading-snug text-neutral-400">{j.catatan}</p>}
                   <p className="t-mikro mt-1 leading-snug text-neutral-400">
-                    Bandingkan dengan rentang di lembar hasil Anda sendiri — tiap laboratorium punya rentangnya sendiri menurut alat dan populasinya.
+                    Compare against the range on your own result sheet — every laboratory has its own range, based on its equipment and population.
                   </p>
                 </>
               )

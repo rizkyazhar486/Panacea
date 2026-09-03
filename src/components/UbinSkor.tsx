@@ -32,8 +32,8 @@ interface Laga {
 
 const KEADAAN: Record<Laga['state'], { label: string; kelas: string }> = {
   in: { label: 'LANGSUNG', kelas: 'bg-rose-500 text-white' },
-  post: { label: 'Selesai', kelas: 'bg-neutral-200 text-neutral-600 dark:bg-white/10 dark:text-neutral-300' },
-  pre: { label: 'Akan main', kelas: 'bg-brand/15 text-brand-dark dark:text-brand' },
+  post: { label: 'Finished', kelas: 'bg-neutral-200 text-neutral-600 dark:bg-white/10 dark:text-neutral-300' },
+  pre: { label: 'Upcoming', kelas: 'bg-brand/15 text-brand-dark dark:text-brand' },
 }
 
 /* Liga sepak bola yang timnya juga dapat bermain di Liga Champions. Dipakai
@@ -209,11 +209,11 @@ export function UbinSkor() {
             .map((t) => ({ nama: t.nama, sebab: gagal.has(t.liga) ? 'gagal' : 'kosong' as 'gagal' | 'kosong' })),
         )
         setLaga(terpilih)
-        setGalat(gagal.size && !terpilih.length ? 'Sumber skor sedang tidak dapat dihubungi.' : '')
+        setGalat(gagal.size && !terpilih.length ? 'The scores source cannot be reached right now.' : '')
 
         if (terpilih.some((e) => e.state === 'in')) jam = window.setTimeout(muat, 60_000)
       } catch {
-        if (hidup) { setGalat('Tidak dapat menghubungi server skor.'); setLaga([]); setKosongTim([]) }
+        if (hidup) { setGalat('Could not reach the scores server.'); setLaga([]); setKosongTim([]) }
       }
     }
 
@@ -229,7 +229,7 @@ export function UbinSkor() {
   return (
     <section>
       <div className="mb-2 flex items-baseline justify-between gap-2">
-        <h2 className="t-kecil font-black uppercase tracking-wide text-neutral-500">Skor tim Anda</h2>
+        <h2 className="t-kecil font-black uppercase tracking-wide text-neutral-500">Your teams’ scores</h2>
         <div className="ml-auto flex items-center gap-2">
           {/* Penanda halaman: berapa laga yang ada dan di mana kita sekarang.
               Tanpa ini, satu-satunya cara mengetahui masih ada tim lain di
@@ -245,7 +245,7 @@ export function UbinSkor() {
             </span>
           )}
           <Link to="/sports-scores" className="t-kecil flex min-h-[40px] items-center font-bold text-brand">
-            Semua →
+            All →
           </Link>
         </div>
       </div>
@@ -255,16 +255,16 @@ export function UbinSkor() {
           <p className="t-kecil text-neutral-500">{galat}</p>
         ) : adaFavorit === false ? (
           <Link to="/sports-scores" className="t-kecil block text-neutral-500">
-            Belum ada tim favorit. Pilih tim di halaman Skor Olahraga →
+            No favourite teams yet. Pick teams on the Sports Scores page →
           </Link>
         ) : laga.length === 0 ? (
           <div className="flex flex-col gap-1.5">
             <p className="t-kecil text-neutral-500">
-              Tidak ada pertandingan tim Anda dalam 30 hari ke depan menurut sumber skor.
+              None of your teams have a match in the next 30 days according to the scores source.
             </p>
             {kosongTim.map((t) => (
               <p key={t.nama} className="t-mikro text-neutral-400">
-                {t.nama} — {t.sebab === 'gagal' ? 'liganya tidak dapat diambil dari sumber skor saat ini' : 'tidak ada jadwal'}
+                {t.nama} — {t.sebab === 'gagal' ? 'its league could not be fetched from the scores source right now' : 'no fixtures'}
               </p>
             ))}
           </div>
@@ -318,7 +318,7 @@ export function UbinSkor() {
             jadwal" — dan kedua hal itu harus dapat dibedakan tanpa menebak. */}
         {laga.length > 0 && kosongTim.length > 0 && (
           <p className="t-mikro mt-2 border-t border-neutral-200 pt-2 leading-snug text-neutral-400 dark:border-white/10">
-            {kosongTim.map((t) => `${t.nama} (${t.sebab === 'gagal' ? 'sumber gagal' : 'tanpa jadwal'})`).join(' · ')}
+            {kosongTim.map((t) => `${t.nama} (${t.sebab === 'gagal' ? 'source failed' : 'no fixtures'})`).join(' · ')}
           </p>
         )}
       </div>

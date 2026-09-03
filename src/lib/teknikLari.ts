@@ -34,17 +34,17 @@ export interface Bagian {
 }
 
 export const LABEL_BUKTI: Record<Bukti, { label: string; warna: string; arti: string }> = {
-  kuat: { label: 'Bukti kuat', warna: 'text-emerald-700',
-    arti: 'Beberapa uji terkendali menunjukkan manfaatnya. Layak diprioritaskan.' },
+  kuat: { label: 'Strong evidence', warna: 'text-emerald-700',
+    arti: 'Several controlled trials show a benefit. Worth prioritising.' },
   sedang: { label: 'Moderate evidence', warna: 'text-amber-700',
     arti: 'Biomechanically plausible and supported by some research, but not settled.' },
-  lemah: { label: 'Kebiasaan pelatih', warna: 'text-neutral-500',
+  lemah: { label: 'Coaching tradition', warna: 'text-neutral-500',
     arti: 'Widely taught, but thinly evidenced. Do not change it if your running is comfortable and injury-free.' },
 }
 
 export const BAGIAN: Bagian[] = [
   {
-    id: 'irama', nama: 'Irama langkah (cadence)', emoji: '🥁', bukti: 'kuat',
+    id: 'irama', nama: 'Cadence', emoji: '🥁', bukti: 'kuat',
     ringkas: 'The single best-evidenced adjustment there is',
     intinya: 'Raising steps per minute by roughly 5–10% measurably lowers load on the knee and hip, because each step becomes shorter and lands closer to under the body. It is also the easiest way to fix overstriding without thinking about any body part at all.',
     langkah: [
@@ -112,7 +112,7 @@ export const BAGIAN: Bagian[] = [
     video: 'https://d8j0ntlcm91z4.cloudfront.net/user_3FaS56ACS5VALa5WTIecT6KKkQf/hf_20260807_132546_f809197f-3183-4982-bbc3-278389826065.mp4',
   },
   {
-    id: 'napas', nama: 'Pernapasan & tekniknya', emoji: '🫁', bukti: 'sedang',
+    id: 'napas', nama: 'Breathing & technique', emoji: '🫁', bukti: 'sedang',
     ringkas: 'From the belly, through the mouth, in rhythm',
     intinya: 'Shallow chest breathing recruits the neck and shoulder muscles — expensive and inefficient. Diaphragmatic breathing (the belly expanding) moves more air for less effort. The mouth is allowed and should be used: the nose alone is not enough above easy intensity.',
     langkah: [
@@ -140,7 +140,7 @@ export const BAGIAN: Bagian[] = [
     gambar: 'https://d8j0ntlcm91z4.cloudfront.net/user_3FaS56ACS5VALa5WTIecT6KKkQf/hf_20260807_133020_61c28730-5b8a-433e-96f0-71dd168daeb3.png',
   },
   {
-    id: 'aero', nama: 'Aerodinamis & hambatan udara', emoji: '💨', bukti: 'sedang',
+    id: 'aero', nama: 'Aerodynamics & air resistance', emoji: '💨', bukti: 'sedang',
     ringkas: 'It only matters when you are fast or it is windy',
     intinya: 'Air resistance rises with the square of speed, so at 6:00/km it barely matters — around 2% of your effort. At 3:30/km, or into a strong headwind, it can exceed 8%. Running just behind somebody (drafting) removes most of that, and the effect is measurable rather than imagined.',
     langkah: [
@@ -167,7 +167,7 @@ export interface Fisiologi {
 export const FISIOLOGI: Fisiologi[] = [
   {
     id: 'kuantitas', judul: 'Quantity — how much', emoji: '📊',
-    pertanyaan: 'Berapa kilometer sepekan?',
+    pertanyaan: 'How many kilometres a week?',
     jawaban: 'Volume is the single largest driver of endurance: it increases capillaries, mitochondria, and aerobic enzymes in muscle. But those adaptations happen in tissues that adapt at different rates — heart and lungs adjust in weeks, tendon and bone in months. Running injuries almost always come from the gap between those rates, not from high volume itself.',
     aturan: [
       'Raise the weekly total by at most 10% over the previous week, and not every week.',
@@ -177,7 +177,7 @@ export const FISIOLOGI: Fisiologi[] = [
     ],
   },
   {
-    id: 'kualitas', judul: 'Kualitas — seberapa keras', emoji: '🔥',
+    id: 'kualitas', judul: 'Quality — how hard', emoji: '🔥',
     pertanyaan: 'How many hard sessions?',
     jawaban: 'The runners who train the most run about 80% of it easy — slow enough to speak a full sentence. The other 20% is genuinely hard. What costs you is the middle: hard enough to tire you, not hard enough to trigger speed adaptation. Most recreational runners spend the bulk of their time there.',
     aturan: [
@@ -188,8 +188,8 @@ export const FISIOLOGI: Fisiologi[] = [
     ],
   },
   {
-    id: 'durasi', judul: 'Durasi — berapa lama',  emoji: '⏱️',
-    pertanyaan: 'Seberapa panjang lari panjangnya?',
+    id: 'durasi', judul: 'Duration — how long',  emoji: '⏱️',
+    pertanyaan: 'How long should the long run be?',
     jawaban: 'The long run trains what short sessions cannot: the ability to burn fat as fuel, tendon durability, and the mental readiness for the closing hours. But the benefit comes from TIME ON FEET rather than distance — so for a slower runner, a time target fits better than a kilometre target.',
     aturan: [
       'Start at 60–75 minutes and add 10 minutes every two weeks.',
@@ -199,7 +199,7 @@ export const FISIOLOGI: Fisiologi[] = [
     ],
   },
   {
-    id: 'pemulihan', judul: 'Pemulihan — kapan adaptasi terjadi', emoji: '😴',
+    id: 'pemulihan', judul: 'Recovery — when adaptation happens', emoji: '😴',
     pertanyaan: 'Why am I not improving despite the work?',
     jawaban: 'Training only provides the stimulus; the fitness is built while you sleep. Short sleep lowers muscle protein synthesis, raises stress hormones, and lengthens recovery. Adding sessions while cutting sleep almost always produces a worse result than training less and sleeping properly.',
     aturan: [

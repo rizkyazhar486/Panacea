@@ -19,7 +19,7 @@ interface NewsItem {
   /** editorial status label — honest curation, not a fake citation */
   kind: 'Nobel' | 'Clinical Trial' | 'Research' | 'Device' | 'New'
   /** international vs domestic (Indonesia) coverage — default international */
-  region?: 'Internasional' | 'Domestic'
+  region?: 'International' | 'Domestic'
 }
 
 const CURATED: NewsItem[] = [
@@ -149,7 +149,7 @@ export function MedicalNews() {
   // Fresh draw each mount → the section "keeps updating". Guarantee a mix of
   // international and domestic (Indonesia) coverage every time.
   const { lead, rest } = useMemo(() => {
-    const intl = shuffle(CURATED.filter((n) => (n.region ?? 'Internasional') === 'Internasional'))
+    const intl = shuffle(CURATED.filter((n) => (n.region ?? 'International') === 'International'))
     const dom = shuffle(CURATED.filter((n) => n.region === 'Domestic'))
     const mixed = shuffle([...intl.slice(1, 5), ...dom.slice(0, 3)]).slice(0, 6)
     return { lead: intl[0], rest: mixed }
@@ -187,7 +187,7 @@ export function MedicalNews() {
             <a href={liveMix.lead.link} target="_blank" rel="noreferrer" className="group relative flex flex-col">
               <div className="flex items-center gap-2">
                 <span className="text-[10px] font-bold uppercase tracking-[0.14em] text-brand-dark">Breaking</span>
-                <RegionTag region={liveMix.lead.region === 'domestic' ? 'Domestic' : 'Internasional'} />
+                <RegionTag region={liveMix.lead.region === 'domestic' ? 'Domestic' : 'International'} />
               </div>
               <h3 className="mt-3 text-2xl font-bold leading-tight tracking-tight sm:text-[28px]">
                 {cleanTitle(liveMix.lead.title, liveMix.lead.source)}
@@ -213,7 +213,7 @@ export function MedicalNews() {
                     <div className="min-w-0">
                       <div className="flex items-center gap-2">
                         <span className="truncate text-[10px] font-bold uppercase tracking-[0.14em] text-neutral-500">{n.source || 'Health'}</span>
-                        <RegionTag region={n.region === 'domestic' ? 'Domestic' : 'Internasional'} />
+                        <RegionTag region={n.region === 'domestic' ? 'Domestic' : 'International'} />
                       </div>
                       <h4 className="mt-1 text-[15px] font-semibold leading-snug transition-colors group-hover:text-brand-dark">
                         {cleanTitle(n.title, n.source)}
