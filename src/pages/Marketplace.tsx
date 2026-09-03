@@ -11,6 +11,7 @@ const EXAMS: (ExamTrack | 'Semua')[] = ['Semua', 'USMLE', 'UKMPPD', 'Umum']
 const CATS: (MaterialCategory | 'Semua')[] = ['Semua', 'Catatan', 'Materi', 'Jurnal', 'Artikel']
 const EXAM_LABELS: Record<string, string> = { Semua: 'All', USMLE: 'USMLE', UKMPPD: 'UKMPPD', Umum: 'General' }
 const CAT_LABELS: Record<string, string> = { Semua: 'All', Catatan: 'Notes', Materi: 'Study Material', Jurnal: 'Journal', Artikel: 'Article' }
+const ROLE_LABELS: Record<string, string> = { Spesialis: 'Specialist', Subspesialis: 'Subspecialist' }
 
 function fileTypeFromName(name: string): FileType {
   const n = name.toLowerCase()
@@ -20,10 +21,10 @@ function fileTypeFromName(name: string): FileType {
 }
 
 function downloadOwned(m: Material, buyerId: string) {
-  const meta = `Category: ${CAT_LABELS[m.category] ?? m.category} · ${m.exam} · ${m.specialty} · Author: ${m.authorName}`
+  const meta = `Category: ${CAT_LABELS[m.category] ?? m.category} · ${EXAM_LABELS[m.exam] ?? m.exam} · ${m.specialty} · Author: ${m.authorName}`
   const body =
     `${m.description}\n\n` +
-    `This material has been verified by Claude AI & a specialist verifier (${m.verifierReview?.verifierRole ?? 'Specialist'}).\n` +
+    `This material has been verified by Claude AI & a specialist verifier (${ROLE_LABELS[m.verifierReview?.verifierRole ?? ''] ?? m.verifierReview?.verifierRole ?? 'Specialist'}).\n` +
     `Original file: ${m.fileName} (${m.fileType}).\n\n` +
     `This document is licensed to the buyer with the ID below. Each page is watermarked with the buyer's ID; ` +
     `unauthorized copying or redistribution may be subject to legal action.`
@@ -119,7 +120,7 @@ export function Marketplace() {
           return (
             <Card key={m.id} className="flex flex-col">
               <div className="mb-2 flex items-center gap-2">
-                <Badge tone="brand">{m.exam}</Badge>
+                <Badge tone="brand">{EXAM_LABELS[m.exam] ?? m.exam}</Badge>
                 <Badge tone="neutral">{CAT_LABELS[m.category] ?? m.category}</Badge>
                 <span className="ml-auto rounded-md bg-neutral-100 px-1.5 py-0.5 text-[10px] font-bold text-neutral-500">
                   {m.fileType}
@@ -129,7 +130,7 @@ export function Marketplace() {
               <p className="mt-1 line-clamp-3 text-sm text-neutral-500">{m.description}</p>
               <div className="mt-3 flex items-center gap-1.5 text-xs text-neutral-500">
                 <IconShield size={13} className="text-brand" />
-                AI-verified + {m.verifierReview?.verifierRole ?? 'Specialist'} · {m.specialty}
+                AI-verified + {ROLE_LABELS[m.verifierReview?.verifierRole ?? ''] ?? m.verifierReview?.verifierRole ?? 'Specialist'} · {m.specialty}
               </div>
               <div className="mt-1 text-xs text-neutral-500">
                 by {m.authorName} · ★ {m.rating || '—'} · {m.downloads}× downloaded

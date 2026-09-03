@@ -6,6 +6,8 @@ import type { Material, MaterialStatus } from '../lib/types'
 
 // English display labels for the stored (Indonesian) category enum values.
 const CAT_LABELS: Record<string, string> = { Catatan: 'Notes', Materi: 'Study Material', Jurnal: 'Journal', Artikel: 'Article' }
+const EXAM_LABELS: Record<string, string> = { USMLE: 'USMLE', UKMPPD: 'UKMPPD', Umum: 'General' }
+const ROLE_LABELS: Record<string, string> = { Spesialis: 'Specialist', Subspesialis: 'Subspecialist' }
 
 const statusMeta: Record<MaterialStatus, { label: string; tone: 'high' | 'brand' | 'critical' }> = {
   'pending-ai': { label: 'Awaiting Claude AI', tone: 'high' },
@@ -91,7 +93,7 @@ export function MyMaterials() {
                 <div>
                   <div className="mb-1 flex items-center gap-2">
                     <Badge tone="neutral">{CAT_LABELS[m.category] ?? m.category}</Badge>
-                    <Badge tone="brand">{m.exam}</Badge>
+                    <Badge tone="brand">{EXAM_LABELS[m.exam] ?? m.exam}</Badge>
                     <span className="text-xs text-neutral-500">{m.fileType}</span>
                   </div>
                   <h4 className="font-bold">{m.title}</h4>
@@ -115,7 +117,7 @@ export function MyMaterials() {
                   ok={Boolean(m.verifierReview?.approved)}
                   icon="verify"
                   label="Verifier"
-                  sub={m.verifierReview?.verifierRole}
+                  sub={m.verifierReview ? (ROLE_LABELS[m.verifierReview.verifierRole] ?? m.verifierReview.verifierRole) : undefined}
                 />
                 <Bar ok={m.status === 'verified'} />
                 <Step ok={m.status === 'verified'} label="Published" />
