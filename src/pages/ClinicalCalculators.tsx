@@ -46,7 +46,7 @@ function ApgarCalc() {
   const interp = total >= 7 ? { l: 'Normal', tone: 'normal' as const } : total >= 4 ? { l: 'Needs assistance', tone: 'low' as const } : { l: 'Severe depression', tone: 'critical' as const }
   return (
     <Card>
-      <SectionTitle icon={<IconStethoscope size={18} />} title="APGAR Score" subtitle="Dinilai pada menit ke-1 dan ke-5 sesudah lahir (Apgar, 1953)" />
+      <SectionTitle icon={<IconStethoscope size={18} />} title="APGAR Score" subtitle="Assessed at 1 and 5 minutes after birth (Apgar, 1953)" />
       <div className="space-y-3">
         {criteria.map((c) => (
           <Field key={c.key} label={c.label}>
@@ -125,7 +125,7 @@ function Curb65Calc() {
   )
   return (
     <Card>
-      <SectionTitle icon={<IconStethoscope size={18} />} title="CURB-65" subtitle="Penentuan derajat berat pneumonia komunitas (Lim dkk. 2003, British Thoracic Society)" />
+      <SectionTitle icon={<IconStethoscope size={18} />} title="CURB-65" subtitle="Severity assessment for community-acquired pneumonia (Lim et al. 2003, British Thoracic Society)" />
       <div className="space-y-2">
         <Row label="Confusion" sub="Acute confusion/new disorientation" checked={confusion} onChange={setConfusion} />
         <Row label="Urea" sub="BUN >19 mg/dL (urea >7 mmol/L)" checked={urea} onChange={setUrea} />
@@ -164,7 +164,7 @@ function BishopCalc() {
     : { l: 'Unfavorable', tone: 'critical' as const, note: 'Consider cervical ripening agents (e.g. prostaglandins) before induction.' }
   return (
     <Card>
-      <SectionTitle icon={<IconStethoscope size={18} />} title="Bishop Score" subtitle="Kesiapan serviks untuk induksi persalinan (Bishop, 1964)" />
+      <SectionTitle icon={<IconStethoscope size={18} />} title="Bishop Score" subtitle="Cervical readiness for labor induction (Bishop, 1964)" />
       <div className="space-y-3">
         <Field label="Cervical dilation"><SegButtons value={dilation} onChange={setDilation} options={dilationOpts} /></Field>
         <Field label="Effacement"><SegButtons value={effacement} onChange={setEffacement} options={effacementOpts} /></Field>
@@ -313,7 +313,7 @@ function WhoGrowthCalc() {
 
   return (
     <Card>
-      <SectionTitle icon={<IconStethoscope size={18} />} title="Antropometri WHO (Permenkes 2/2020)" subtitle="WHO Child Growth Standards 2006, 0–60 bulan — sesuai Standar Antropometri Anak Kemenkes RI (Permenkes 2/2020)" />
+      <SectionTitle icon={<IconStethoscope size={18} />} title="WHO Anthropometry (Permenkes 2/2020)" subtitle="WHO Child Growth Standards 2006, 0–60 months — per Indonesia's Child Anthropometry Standard (Permenkes 2/2020)" />
       <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
         <Field label="Sex"><SegButtons value={sex} onChange={setSex} options={[{ v: 'M', l: 'Male' }, { v: 'F', l: 'Female' }]} /></Field>
         <Field label="Age (months)"><input className={inputClass} type="number" min={0} max={60} value={ageMo} onChange={(e) => setAgeMo(+e.target.value)} /></Field>
@@ -347,7 +347,7 @@ function WhoGrowthCalc() {
       {masked && (
         <div className="mt-3 rounded-xl border border-amber-300 bg-amber-50 p-3">
           <p className="text-xs font-black text-amber-800">⚠️ Possible masked stunting (masked malnutrition)</p>
-          <Prosa kelas="mt-1 text-[11px] leading-relaxed text-amber-700">Tinggi/umur menunjukkan perawakan pendek (HAZ ≤ −2 SD), tetapi berat/umur tampak normal — ini menyesatkan bila berat/umur dibaca sendirian, karena berat dinilai terhadap umur kronologis, bukan terhadap lintasan pertumbuhan anak yang memang sudah terganggu. Pertimbangkan penilaian gizi lanjutan meskipun berat/umur tampak baik.</Prosa>
+          <Prosa kelas="mt-1 text-[11px] leading-relaxed text-amber-700">Height-for-age indicates short stature (HAZ ≤ −2 SD), but weight-for-age still looks normal — this is misleading if weight-for-age is read on its own, because weight is being judged against chronological age, not against the child's already-impaired growth trajectory. Consider a further nutritional assessment even if weight-for-age looks fine.</Prosa>
         </div>
       )}
 
@@ -364,7 +364,7 @@ function WhoGrowthCalc() {
         </ResponsiveContainer>
       </div>
       <button onClick={() => window.print()} className="liquid-glass-btn liquid-glass-btn--outline mt-4 w-full rounded-full py-2.5 text-xs font-bold text-brand-dark">🖨️ Print / Save as PDF</button>
-      <Prosa kelas="mt-2 text-[10px] leading-relaxed text-neutral-500">Kurva ini menampilkan median rujukan WHO (bukan data anak ini). Perkiraan yang disederhanakan dari titik rujukan baku — untuk keputusan klinis, bandingkan dengan grafik pertumbuhan WHO/KMS resmi atau Buku KIA sesuai Standar Antropometri Anak (Permenkes RI No. 2/2020).</Prosa>
+      <Prosa kelas="mt-2 text-[10px] leading-relaxed text-neutral-500">This curve shows the WHO reference median (not this child's data). A simplified estimate from standard reference points — for clinical decisions, compare against the official WHO/KMS growth chart or the MCH handbook per the Child Anthropometry Standard (Permenkes RI No. 2/2020).</Prosa>
     </Card>
   )
 }
@@ -399,7 +399,7 @@ function WhoNeonateCalc() {
 
   return (
     <Card>
-      <SectionTitle icon={<IconStethoscope size={18} />} title="Neonatus WHO (0–30 Hari)" subtitle="Lintasan berat neonatus dini — penurunan fisiologis & kembalinya ke berat lahir" />
+      <SectionTitle icon={<IconStethoscope size={18} />} title="WHO Neonate (0–30 Days)" subtitle="Early neonatal weight trajectory — physiologic weight loss & return to birth weight" />
       <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
         <Field label="Birth Weight (g)"><input className={inputClass} type="number" value={birthWeightG} onChange={(e) => setBirthWeightG(+e.target.value)} /></Field>
         <Field label="Age (days)"><input className={inputClass} type="number" min={0} max={30} value={days} onChange={(e) => setDays(+e.target.value)} /></Field>
@@ -442,7 +442,7 @@ function WhoNeonateCalc() {
         </ResponsiveContainer>
       </div>
       <button onClick={() => window.print()} className="liquid-glass-btn liquid-glass-btn--outline mt-4 w-full rounded-full py-2.5 text-xs font-bold text-brand-dark">🖨️ Print / Save as PDF</button>
-      <Prosa kelas="mt-2 text-[10px] leading-relaxed text-neutral-500">Penurunan fisiologis sampai sekitar 7-10% berat lahir pada hari ke-3 sampai ke-5 adalah normal (kehilangan cairan ekstravaskular), dan berat lahir biasanya tercapai kembali sekitar hari ke-10 sampai ke-14. Perkiraan ini disederhanakan dari titik rujukan baku — bandingkan dengan grafik neonatus resmi (WHO/Fenton) pada kasus yang berada di batas.</Prosa>
+      <Prosa kelas="mt-2 text-[10px] leading-relaxed text-neutral-500">A physiologic loss of up to about 7-10% of birth weight by day 3-5 is normal (extravascular fluid loss), and birth weight is usually regained by around day 10-14. This estimate is simplified from standard reference points — compare against the official neonate chart (WHO/Fenton) for borderline cases.</Prosa>
     </Card>
   )
 }
@@ -488,7 +488,7 @@ function CdcAnthropometryCalc() {
 
   return (
     <Card>
-      <SectionTitle icon={<IconStethoscope size={18} />} title="Antropometri CDC (2–20 Tahun)" subtitle="Rujukan Pertumbuhan CDC 2000 — persentil IMT menurut umur untuk anak & remaja" />
+      <SectionTitle icon={<IconStethoscope size={18} />} title="CDC Anthropometry (2–20 Years)" subtitle="CDC 2000 Growth Reference — BMI-for-age percentiles for children & adolescents" />
       <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
         <Field label="Sex"><SegButtons value={sex} onChange={setSex} options={[{ v: 'M', l: 'Male' }, { v: 'F', l: 'Female' }]} /></Field>
         <Field label="Age (years)"><input className={inputClass} type="number" min={2} max={20} value={ageYr} onChange={(e) => setAgeYr(+e.target.value)} /></Field>
@@ -518,7 +518,7 @@ function CdcAnthropometryCalc() {
         </ResponsiveContainer>
       </div>
       <button onClick={() => window.print()} className="liquid-glass-btn liquid-glass-btn--outline mt-4 w-full rounded-full py-2.5 text-xs font-bold text-brand-dark">🖨️ Print / Save as PDF</button>
-      <Prosa kelas="mt-2 text-[10px] leading-relaxed text-neutral-500">Rujukan Pertumbuhan CDC 2000 (2-20 tahun), dipakai secara internasional untuk IMT menurut umur. Indonesia (Permenkes 2/2020) memakai standar WHO untuk seluruh rentang umur anak — pakailah tab Antropometri WHO untuk rujukan nasional. Persentil di atas diperkirakan dari titik rujukan baku, bukan dari tabel LMS lengkap.</Prosa>
+      <Prosa kelas="mt-2 text-[10px] leading-relaxed text-neutral-500">CDC 2000 Growth Reference (2-20 years), used internationally for BMI-for-age. Indonesia (Permenkes 2/2020) uses the WHO standard across the full pediatric age range — use the WHO Anthropometry tab for the national reference. The percentiles above are estimated from standard reference points, not the full LMS table.</Prosa>
     </Card>
   )
 }
@@ -614,7 +614,7 @@ P (Plan):
 
   return (
     <Card>
-      <SectionTitle icon={<IconStethoscope size={18} />} title="Ballard Score + Lubchenco → SOAP" subtitle="New Ballard Score (1991) untuk usia gestasi, klasifikasi Lubchenco, diringkas otomatis menjadi catatan SOAP" />
+      <SectionTitle icon={<IconStethoscope size={18} />} title="Ballard Score + Lubchenco → SOAP" subtitle="New Ballard Score (1991) for gestational age, Lubchenco classification, auto-summarized into a SOAP note" />
 
       <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
         <Field label="Baby's Name (optional)"><input className={inputClass} value={babyName} onChange={(e) => setBabyName(e.target.value)} placeholder="—" /></Field>
@@ -665,7 +665,7 @@ P (Plan):
         <h4 className="mb-2 text-xs font-black uppercase tracking-wide text-neutral-500">Auto-Drafted SOAP Note</h4>
         <pre className="whitespace-pre-wrap rounded-xl bg-neutral-900 p-3 text-[11px] leading-relaxed text-neutral-100">{soapNote}</pre>
       </div>
-      <Prosa kelas="mt-2 text-[10px] leading-relaxed text-neutral-500">Perkiraan usia gestasi & klasifikasi Lubchenco disederhanakan dari titik rujukan baku — periksa terhadap tabel/grafik resmi pada kasus di batas. Draf SOAP wajib ditinjau dan dilengkapi dokter sebelum masuk ke rekam medis resmi.</Prosa>
+      <Prosa kelas="mt-2 text-[10px] leading-relaxed text-neutral-500">The gestational age estimate & Lubchenco classification are simplified from standard reference points — check against the official table/chart for borderline cases. The SOAP draft must be reviewed and completed by a physician before entering the official medical record.</Prosa>
     </Card>
   )
 }
@@ -687,7 +687,7 @@ function QsofaCalc() {
   )
   return (
     <Card>
-      <SectionTitle icon={<IconStethoscope size={18} />} title="qSOFA" subtitle="Quick SOFA — penapisan cepat disfungsi organ akibat infeksi (Sepsis-3, 2016)" />
+      <SectionTitle icon={<IconStethoscope size={18} />} title="qSOFA" subtitle="Quick SOFA — rapid screening for infection-related organ dysfunction (Sepsis-3, 2016)" />
       <div className="space-y-2">
         <Row label="Respiratory rate ≥22/min" sub="Tachypnea" checked={rr22} onChange={setRr22} />
         <Row label="Altered mental status" sub="GCS <15 / acute confusion" checked={alteredMental} onChange={setAlteredMental} />
@@ -728,7 +728,7 @@ function HollidaySegarCalc() {
           <div className="text-[10px] font-bold uppercase text-neutral-500">mL / hour (maintenance rate)</div>
         </div>
       </div>
-      <Prosa kelas="mt-3 text-[10px] leading-relaxed text-neutral-500">10 kg pertama: 100 mL/kg · 10 kg kedua: +50 mL/kg · tiap kg di atas 20: +20 mL/kg. Sesuaikan dengan status hidrasi, demam, dan keadaan klinis.</Prosa>
+      <Prosa kelas="mt-3 text-[10px] leading-relaxed text-neutral-500">First 10 kg: 100 mL/kg · Second 10 kg: +50 mL/kg · Each kg above 20: +20 mL/kg. Adjust for hydration status, fever, and clinical condition.</Prosa>
     </Card>
   )
 }
@@ -743,7 +743,7 @@ function ParklandCalc() {
   const next16hRate = (total24h - first8h) / 16
   return (
     <Card>
-      <SectionTitle icon={<IconStethoscope size={18} />} title="Parkland Formula" subtitle="Resusitasi cairan pada luka bakar ≥20% LPB (Baxter, 1968)" />
+      <SectionTitle icon={<IconStethoscope size={18} />} title="Parkland Formula" subtitle="Fluid resuscitation for burns ≥20% TBSA (Baxter, 1968)" />
       <div className="grid grid-cols-2 gap-2">
         <Field label="Body Weight (kg)"><input className={inputClass} type="number" value={weight} onChange={(e) => setWeight(+e.target.value)} /></Field>
         <Field label="% TBSA (burn surface area)"><input className={inputClass} type="number" min={0} max={100} value={tbsa} onChange={(e) => setTbsa(+e.target.value)} /></Field>
@@ -762,7 +762,7 @@ function ParklandCalc() {
           <div className="text-[10px] font-bold uppercase text-neutral-500">mL/hour (following 16 hours)</div>
         </div>
       </div>
-      <Prosa kelas="mt-3 text-[10px] leading-relaxed text-neutral-500">Total = 4 mL × berat(kg) × %LPB, cairan kristaloid (RL). Separuh diberikan dalam 8 jam pertama SEJAK SAAT TRAUMA (bukan sejak tiba di rumah sakit), separuh sisanya dalam 16 jam berikutnya. Titrasi terhadap keluaran urin (sasaran ~0,5 mL/kg/jam pada dewasa).</Prosa>
+      <Prosa kelas="mt-3 text-[10px] leading-relaxed text-neutral-500">Total = 4 mL × weight(kg) × %TBSA, crystalloid fluid (Ringer's Lactate). Half is given in the first 8 hours FROM THE TIME OF INJURY (not from hospital arrival), the remaining half over the following 16 hours. Titrate against urine output (target ~0.5 mL/kg/hour in adults).</Prosa>
     </Card>
   )
 }
@@ -785,7 +785,7 @@ function NaegeleCalc() {
   }
   return (
     <Card>
-      <SectionTitle icon={<IconStethoscope size={18} />} title="Naegele's Rule" subtitle="Perkiraan hari lahir (HPL) & usia gestasi dari HPHT" />
+      <SectionTitle icon={<IconStethoscope size={18} />} title="Naegele's Rule" subtitle="Estimated due date (EDD) & gestational age from LMP" />
       <div className="grid grid-cols-2 gap-2">
         <Field label="LMP (last menstrual period)"><input className={inputClass} type="date" value={lmp} onChange={(e) => setLmp(e.target.value)} /></Field>
         <Field label="Menstrual Cycle Length (days)"><input className={inputClass} type="number" value={cycleLen} onChange={(e) => setCycleLen(+e.target.value)} /></Field>
@@ -802,7 +802,7 @@ function NaegeleCalc() {
           </div>
         </div>
       )}
-      <Prosa kelas="mt-3 text-[10px] leading-relaxed text-neutral-500">Rumus Naegele: HPL = HPHT + 280 hari (disesuaikan bila siklus haid bukan 28 hari). Pastikan dengan USG trimester pertama bila memungkinkan — lebih tepat daripada HPHT saja, terutama pada siklus yang tidak teratur.</Prosa>
+      <Prosa kelas="mt-3 text-[10px] leading-relaxed text-neutral-500">Naegele's rule: EDD = LMP + 280 days (adjusted if the menstrual cycle is not 28 days). Confirm with a first-trimester ultrasound where possible — more accurate than LMP alone, especially with irregular cycles.</Prosa>
     </Card>
   )
 }
@@ -857,7 +857,7 @@ function AlvaradoCalc() {
     : { l: 'High probability', tone: 'critical' as const, note: 'Consider surgical consultation for appendectomy.' }
   return (
     <Card>
-      <SectionTitle icon={<IconStethoscope size={18} />} title="Alvarado Score" subtitle="Skor klinis untuk dugaan apendisitis akut (Alvarado, 1986)" />
+      <SectionTitle icon={<IconStethoscope size={18} />} title="Alvarado Score" subtitle="Clinical score for suspected acute appendicitis (Alvarado, 1986)" />
       <div className="space-y-2">
         {criteria.map((c) => (
           <label key={c.key} className="flex cursor-pointer items-center gap-3 rounded-xl border border-neutral-100 p-3 hover:bg-neutral-50">
@@ -941,8 +941,8 @@ function SirirajCalc() {
       </div>
 
       <ul className="mt-3 list-disc space-y-1 pl-4 text-[11px] leading-relaxed text-neutral-500">
-        <li><b>Ini tidak menggantikan CT scan.</b> It was built for settings where imaging is unavailable or delayed, and it is wrong often enough that giving antiplatelets or thrombolysis on the strength of it alone can kill a patient with a bleed.</li>
-        <li>Nilai antara −1 dan +1 secara tegas tidak menentukan — rentang itu sering terjadi, dan artinya "lakukan pencitraan", bukan "pilih yang lebih mungkin".</li>
+        <li><b>This does not replace a CT scan.</b> It was built for settings where imaging is unavailable or delayed, and it is wrong often enough that giving antiplatelets or thrombolysis on the strength of it alone can kill a patient with a bleed.</li>
+        <li>A score strictly between −1 and +1 is genuinely indeterminate — that range occurs often, and it means "obtain imaging," not "pick the more likely option".</li>
         <li>Accuracy falls in the elderly, in posterior-circulation stroke, and where hypertension is untreated and diastolic pressure is high for reasons unrelated to the stroke.</li>
       </ul>
       <p className="mt-2 text-[10px] leading-relaxed text-neutral-500">
@@ -965,12 +965,12 @@ function GadjahMadaCalc() {
   // The published algorithm: any of LOC / headache / Babinski present in the
   // specific combinations below decides the branch.
   const result = (() => {
-    if (loc && headache) return { l: 'Perdarahan intraserebral (haemorrhagic)', tone: 'critical' as const, why: 'Penurunan kesadaran + nyeri kepala' }
-    if (loc && !headache && !babinski) return { l: 'Perdarahan intraserebral (haemorrhagic)', tone: 'critical' as const, why: 'Penurunan kesadaran tanpa nyeri kepala dan Babinski negatif' }
-    if (loc && !headache && babinski) return { l: 'Perdarahan intraserebral (haemorrhagic)', tone: 'critical' as const, why: 'Penurunan kesadaran dengan Babinski positif' }
-    if (!loc && headache) return { l: 'Perdarahan intraserebral (haemorrhagic)', tone: 'critical' as const, why: 'Nyeri kepala tanpa penurunan kesadaran' }
-    if (!loc && !headache && babinski) return { l: 'Stroke iskemik (infark)', tone: 'low' as const, why: 'Tanpa penurunan kesadaran dan nyeri kepala, Babinski positif' }
-    return { l: 'Stroke iskemik (infark)', tone: 'low' as const, why: 'Ketiga tanda negatif' }
+    if (loc && headache) return { l: 'Intracerebral hemorrhage (haemorrhagic)', tone: 'critical' as const, why: 'Decreased consciousness + headache' }
+    if (loc && !headache && !babinski) return { l: 'Intracerebral hemorrhage (haemorrhagic)', tone: 'critical' as const, why: 'Decreased consciousness without headache and Babinski negative' }
+    if (loc && !headache && babinski) return { l: 'Intracerebral hemorrhage (haemorrhagic)', tone: 'critical' as const, why: 'Decreased consciousness with Babinski positive' }
+    if (!loc && headache) return { l: 'Intracerebral hemorrhage (haemorrhagic)', tone: 'critical' as const, why: 'Headache without decreased consciousness' }
+    if (!loc && !headache && babinski) return { l: 'Ischemic stroke (infarct)', tone: 'low' as const, why: 'No decreased consciousness or headache, Babinski positive' }
+    return { l: 'Ischemic stroke (infarct)', tone: 'low' as const, why: 'All three signs negative' }
   })()
 
   return (
@@ -979,27 +979,27 @@ function GadjahMadaCalc() {
         subtitle="Bedside algorithm — three signs, taught widely in Indonesia" />
       <div className="mt-3 space-y-3">
         {[
-          { l: 'Penurunan kesadaran (decreased consciousness)', v: loc, set: setLoc },
-          { l: 'Nyeri kepala (headache)', v: headache, set: setHeadache },
-          { l: 'Refleks Babinski positif', v: babinski, set: setBabinski },
+          { l: 'Decreased consciousness', v: loc, set: setLoc },
+          { l: 'Headache', v: headache, set: setHeadache },
+          { l: 'Babinski reflex positive', v: babinski, set: setBabinski },
         ].map((r) => (
           <div key={r.l}>
             <div className="text-[12px] font-bold text-ink dark:text-ink">{r.l}</div>
             <div className="mt-1"><SegButtons value={r.v ? 1 : 0} onChange={(n) => r.set(n === 1)}
-              options={[{ v: 0, l: 'Tidak' }, { v: 1, l: 'Ya' }]} /></div>
+              options={[{ v: 0, l: 'No' }, { v: 1, l: 'Yes' }]} /></div>
           </div>
         ))}
       </div>
 
       <div className="mt-4 rounded-xl bg-neutral-50 p-3 dark:bg-white/5">
-        <div className="text-[12px] font-bold text-neutral-500">Kesimpulan algoritma</div>
+        <div className="text-[12px] font-bold text-neutral-500">Algorithm conclusion</div>
         <div className="mt-1"><Badge tone={result.tone}>{result.l}</Badge></div>
         <div className="mt-2 text-[11px] leading-relaxed text-neutral-500">{result.why}</div>
       </div>
 
       <ul className="mt-3 list-disc space-y-1 pl-4 text-[11px] leading-relaxed text-neutral-500">
-        <li><b>Bukan pengganti CT scan.</b> Sama seperti Siriraj, algoritma ini untuk fasilitas tanpa pencitraan — keputusan memberi antiplatelet atau trombolisis tidak boleh berdasarkan algoritma ini saja.</li>
-        <li>Bila hasil algoritma dan Siriraj berbeda, itu justru sinyal kuat bahwa pasien perlu segera dirujuk untuk pencitraan, bukan alasan memilih salah satunya.</li>
+        <li><b>Not a substitute for a CT scan.</b> Like Siriraj, this algorithm is meant for facilities without imaging — the decision to give antiplatelets or thrombolysis must not be based on this algorithm alone.</li>
+        <li>If the algorithm and Siriraj results disagree, that is a strong signal the patient needs urgent referral for imaging, not a reason to pick one over the other.</li>
       </ul>
       <p className="mt-2 text-[10px] leading-relaxed text-neutral-500">
         Source: Lamsudin R. Algoritma Stroke Gadjah Mada. Fakultas Kedokteran, Universitas Gadjah Mada,
@@ -1111,7 +1111,7 @@ function NaCorrectionCalc() {
           <Badge tone={kSeverity.tone}>{kSeverity.l}</Badge>
         </div>
       </div>
-      <Prosa kelas="mt-2 text-[10px] leading-relaxed text-neutral-500">Perkiraan kasar: tiap penurunan 1 mEq/L K⁺ serum di bawah 4,0 ≈ defisit total tubuh 200-400 mEq (hubungannya tidak linear dan dipengaruhi status asam-basa). Koreksi kalium intravena umumnya dibatasi ≤10-20 mEq/jam lewat vena perifer (lebih tinggi lewat akses sentral dengan pemantauan EKG terus-menerus) — jangan mengoreksi seluruh defisit sekaligus.</Prosa>
+      <Prosa kelas="mt-2 text-[10px] leading-relaxed text-neutral-500">Rough estimate: each 1 mEq/L drop in serum K⁺ below 4.0 ≈ a 200-400 mEq total-body deficit (the relationship is nonlinear and affected by acid-base status). IV potassium correction is generally limited to ≤10-20 mEq/hour via peripheral vein (higher via central access with continuous ECG monitoring) — do not correct the entire deficit at once.</Prosa>
     </Card>
   )
 }
@@ -1124,7 +1124,7 @@ function BrocaCalc() {
   const ibw = sex === 'M' ? base - base * 0.1 : base - base * 0.15
   return (
     <Card>
-      <SectionTitle icon={<IconStethoscope size={18} />} title="Broca's Formula (Ideal Body Weight)" subtitle="Indeks Broca, dimodifikasi menurut jenis kelamin" />
+      <SectionTitle icon={<IconStethoscope size={18} />} title="Broca's Formula (Ideal Body Weight)" subtitle="Broca index, modified by sex" />
       <div className="grid grid-cols-2 gap-2">
         <Field label="Height (cm)"><input className={inputClass} type="number" value={height} onChange={(e) => setHeight(+e.target.value)} /></Field>
         <Field label="Sex"><SegButtons value={sex} onChange={setSex} options={[{ v: 'M', l: 'Male' }, { v: 'F', l: 'Female' }]} /></Field>
@@ -1133,7 +1133,7 @@ function BrocaCalc() {
         <div className="text-2xl font-black text-ink">{ibw.toFixed(1)} <span className="text-sm font-semibold text-neutral-500">kg</span></div>
         <div className="mt-1 text-[10px] font-bold uppercase text-neutral-500">Ideal Body Weight (Broca)</div>
       </div>
-      <Prosa kelas="mt-3 text-[10px] leading-relaxed text-neutral-500">Laki-laki: (Tinggi − 100) − 10%. Perempuan: (Tinggi − 100) − 15%. Pendekatan sederhana — bila dibutuhkan ketelitian klinis lebih tinggi (mis. penghitungan dosis obat), pertimbangkan rumus Devine/Robinson.</Prosa>
+      <Prosa kelas="mt-3 text-[10px] leading-relaxed text-neutral-500">Male: (Height − 100) − 10%. Female: (Height − 100) − 15%. A simple approach — when higher clinical precision is needed (e.g. drug dosing calculations), consider the Devine/Robinson formula.</Prosa>
     </Card>
   )
 }
@@ -1148,7 +1148,7 @@ function MidParentalCalc() {
   const rangeHi = mph + 8.5
   return (
     <Card>
-      <SectionTitle icon={<IconStethoscope size={18} />} title="Mid-Parental Height" subtitle="Perkiraan sasaran tinggi dewasa seorang anak dari tinggi kedua orang tuanya" />
+      <SectionTitle icon={<IconStethoscope size={18} />} title="Mid-Parental Height" subtitle="Estimated adult target height for a child from both parents' heights" />
       <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
         <Field label="Father's Height (cm)"><input className={inputClass} type="number" value={fatherCm} onChange={(e) => setFatherCm(+e.target.value)} /></Field>
         <Field label="Mother's Height (cm)"><input className={inputClass} type="number" value={motherCm} onChange={(e) => setMotherCm(+e.target.value)} /></Field>
@@ -1158,7 +1158,7 @@ function MidParentalCalc() {
         <div className="text-2xl font-black text-ink">{mph.toFixed(1)} cm</div>
         <div className="mt-1 text-[10px] font-bold uppercase text-neutral-500">Target Height (±8.5cm range: {rangeLo.toFixed(0)}–{rangeHi.toFixed(0)} cm)</div>
       </div>
-      <Prosa kelas="mt-3 text-[10px] leading-relaxed text-neutral-500">Laki-laki: (tinggi ayah + tinggi ibu + 13) / 2. Perempuan: (tinggi ayah + tinggi ibu − 13) / 2. Rentang ±8,5 cm mencakup sekitar 90% sasaran genetik — anak yang jauh menyimpang dari rentang ini perlu penilaian endokrin/gizi.</Prosa>
+      <Prosa kelas="mt-3 text-[10px] leading-relaxed text-neutral-500">Male: (father's height + mother's height + 13) / 2. Female: (father's height + mother's height − 13) / 2. The ±8.5 cm range covers about 90% of the genetic target — a child far outside this range needs an endocrine/nutritional evaluation.</Prosa>
     </Card>
   )
 }
@@ -1335,7 +1335,7 @@ function FourScoreCalc() {
   const total = e + m + b + r
   return (
     <Card>
-      <SectionTitle icon={<IconStethoscope size={18} />} title="FOUR Score" subtitle="Full Outline of UnResponsiveness (Wijdicks dkk., 2005) — alternatif GCS yang menilai batang otak & pola napas" />
+      <SectionTitle icon={<IconStethoscope size={18} />} title="FOUR Score" subtitle="Full Outline of UnResponsiveness (Wijdicks et al., 2005) — a GCS alternative that assesses brainstem function & breathing pattern" />
       <div className="space-y-3">
         <Field label="Eye Response (E)"><SegButtons value={e} onChange={setE} options={eye} /></Field>
         <Field label="Motor Response (M)"><SegButtons value={m} onChange={setM} options={motor} /></Field>
@@ -1356,13 +1356,13 @@ function McDonaldCalc() {
   const gaWeeksEst = fundalCm // McDonald's rule: fundal height (cm) ≈ GA (weeks), valid ~20-36 weeks
   return (
     <Card>
-      <SectionTitle icon={<IconStethoscope size={18} />} title="McDonald's Rule" subtitle="Perkirakan usia gestasi dari tinggi fundus uteri (20-36 minggu)" />
+      <SectionTitle icon={<IconStethoscope size={18} />} title="McDonald's Rule" subtitle="Estimate gestational age from fundal height (20-36 weeks)" />
       <Field label="Fundal Height (cm, symphysis-fundal)"><input className={inputClass} type="number" value={fundalCm} onChange={(e) => setFundalCm(+e.target.value)} /></Field>
       <div className="mt-4 rounded-xl bg-neutral-50 p-3 text-center">
         <div className="text-2xl font-black text-ink">≈ {gaWeeksEst} <span className="text-sm font-semibold text-neutral-500">weeks</span></div>
         <div className="mt-1 text-[10px] font-bold uppercase text-neutral-500">Estimated Gestational Age</div>
       </div>
-      <Prosa kelas="mt-3 text-[10px] leading-relaxed text-neutral-500">Rumus McDonald: tinggi fundus (cm) ≈ usia gestasi (minggu) pada 20-36 minggu, kehamilan tunggal dengan pertumbuhan janin normal. Simpangan &gt;3 cm dari usia gestasi sebenarnya (dari HPHT/USG) perlu penilaian lanjut (oligo/polihidramnion, IUGR, makrosomia, kehamilan ganda).</Prosa>
+      <Prosa kelas="mt-3 text-[10px] leading-relaxed text-neutral-500">McDonald's rule: fundal height (cm) ≈ gestational age (weeks) between 20-36 weeks, singleton pregnancy with normal fetal growth. A deviation &gt;3 cm from the true gestational age (from LMP/ultrasound) needs further evaluation (oligo/polyhydramnios, IUGR, macrosomia, multiple pregnancy).</Prosa>
     </Card>
   )
 }
@@ -1376,7 +1376,7 @@ function ParadiseCalc() {
   const meets = documented && (y1 >= 7 || (y1 >= 5 && y2 >= 5) || (y1 >= 3 && y2 >= 3 && y3 >= 3))
   return (
     <Card>
-      <SectionTitle icon={<IconStethoscope size={18} />} title="Paradise Criteria" subtitle="Indikasi tonsilektomi pada faringitis/tonsilitis berulang (Paradise dkk., 1984)" />
+      <SectionTitle icon={<IconStethoscope size={18} />} title="Paradise Criteria" subtitle="Indication for tonsillectomy in recurrent pharyngitis/tonsillitis (Paradise et al., 1984)" />
       <div className="grid grid-cols-3 gap-2">
         <Field label="Episodes This Year"><input className={inputClass} type="number" value={y1} onChange={(e) => setY1(+e.target.value)} /></Field>
         <Field label="Episodes Last Year"><input className={inputClass} type="number" value={y2} onChange={(e) => setY2(+e.target.value)} /></Field>
@@ -1388,7 +1388,7 @@ function ParadiseCalc() {
       </label>
       <div className="mt-4 rounded-xl bg-neutral-50 p-3">
         <Badge tone={meets ? 'critical' : 'normal'}>{meets ? 'Meets Paradise criteria' : 'Does not yet meet criteria'}</Badge>
-        <Prosa kelas="mt-2 text-[11px] leading-relaxed text-neutral-500">Kriteria: ≥7 episode dalam 1 tahun, ATAU ≥5/tahun selama 2 tahun berturut-turut, ATAU ≥3/tahun selama 3 tahun berturut-turut — dengan tiap episode terdokumentasi baik. Ini satu indikasi; keputusan tonsilektomi tetap bersifat perorangan bersama dokter THT.</Prosa>
+        <Prosa kelas="mt-2 text-[11px] leading-relaxed text-neutral-500">Criteria: ≥7 episodes in 1 year, OR ≥5/year for 2 consecutive years, OR ≥3/year for 3 consecutive years — with each episode well documented. This is one indication; the decision to proceed with tonsillectomy remains individualized together with an ENT physician.</Prosa>
       </div>
     </Card>
   )
@@ -1442,9 +1442,9 @@ function NihssCalc() {
       </div>
       <ul className="mt-3 list-disc space-y-1 pl-4 text-[11px] leading-relaxed text-neutral-500">
         <li>Score the <b>first</b> response, not the best — do not coach the patient, and do not go back to change an item once scored.</li>
-        <li>Butir motorik: lengan pada 90° saat duduk (45° saat berbaring) ditahan 10 detik; tungkai pada 30° saat berbaring ditahan 5 detik. Anggota gerak yang tidak dapat diuji (amputasi, sendi terfiksasi) dikecualikan menurut ketentuan NIH — beri nilai 0 dan tuliskan alasannya.</li>
+        <li>Motor items: arm held at 90° while sitting (45° while supine) for 10 seconds; leg held at 30° while supine for 5 seconds. Limbs that cannot be tested (amputation, joint fusion) are excluded per NIH convention — score 0 and document the reason.</li>
         <li>NIHSS <b>under-weights posterior-circulation stroke</b>: a basilar or cerebellar occlusion can be devastating yet score low. A low score never rules out large-vessel occlusion.</li>
-        <li>Skor ini satu masukan bagi keputusan trombolisis, bukan keputusannya — waktu awitan, pencitraan, dan kontraindikasi yang menentukan.</li>
+        <li>This score is one input into the thrombolysis decision, not the decision itself — time of onset, imaging, and contraindications are what determine it.</li>
       </ul>
       <Prosa kelas="mt-2 text-[10px] leading-relaxed text-neutral-500">Source: Brott T, Adams HP, Olinger CP, et al. Measurements of acute cerebral infarction: a clinical examination scale. Stroke. 1989;20(7):864-70. Instrument as published by NIH/NINDS.</Prosa>
     </Card>
@@ -1484,7 +1484,7 @@ function FluidBalanceCalc() {
         <div className="rounded-xl bg-neutral-50 p-3 text-center"><div className="text-lg font-black text-ink">{totalOut}</div><div className="text-[10px] font-bold uppercase text-neutral-500">Total Output</div></div>
         <div className="rounded-xl bg-neutral-50 p-3 text-center"><div className={`text-lg font-black ${balance >= 0 ? 'text-brand-dark' : 'text-red-600'}`}>{balance >= 0 ? '+' : ''}{balance}</div><div className="text-[10px] font-bold uppercase text-neutral-500">Balance (mL)</div></div>
       </div>
-      <Prosa kelas="mt-3 text-[10px] text-neutral-500">Perkiraan kehilangan cairan tak kasatmata pada dewasa ~500-800 mL/hari (bertambah pada demam/takipnea). Keseimbangan positif yang besar dan berkepanjangan → risiko kelebihan cairan; keseimbangan negatif → risiko dehidrasi/hipoperfusi.</Prosa>
+      <Prosa kelas="mt-3 text-[10px] text-neutral-500">Estimated insensible fluid loss in adults ~500-800 mL/day (higher with fever/tachypnea). A large, sustained positive balance → risk of fluid overload; a negative balance → risk of dehydration/hypoperfusion.</Prosa>
     </Card>
   )
 }
@@ -1514,7 +1514,7 @@ function PedsDoseCalc() {
         <div className="rounded-xl bg-neutral-50 p-3 text-center"><div className="text-lg font-black text-ink">{perDoseMg.toFixed(1)}</div><div className="text-[10px] font-bold uppercase text-neutral-500">mg/dose</div></div>
         <div className="rounded-xl bg-neutral-50 p-3 text-center"><div className="text-lg font-black text-ink">{perDoseMl.toFixed(2)}</div><div className="text-[10px] font-bold uppercase text-neutral-500">mL/dose (syrup)</div></div>
       </div>
-      <Prosa kelas="mt-3 text-[10px] leading-relaxed text-neutral-500">Total mg/hari = berat × dosis(mg/kg/hari). mg/kali = total ÷ frekuensi. mL/kali = mg/kali ÷ kadar sirop. Untuk sediaan puyer: bagi mg/kali sesuai jumlah bungkus menurut frekuensi yang diresepkan. SELALU periksa terhadap dosis maksimum dewasa & formularium — kalkulator ini tidak menggantikan pertimbangan klinis maupun rujukan obat resmi.</Prosa>
+      <Prosa kelas="mt-3 text-[10px] leading-relaxed text-neutral-500">Total mg/day = weight × dose (mg/kg/day). mg/dose = total ÷ frequency. mL/dose = mg/dose ÷ syrup concentration. For powdered preparations: divide mg/dose across the number of sachets per the prescribed frequency. ALWAYS check against the adult maximum dose & formulary — this calculator does not replace clinical judgment or an official drug reference.</Prosa>
     </Card>
   )
 }
@@ -1538,7 +1538,7 @@ function VbacCalc() {
 
   return (
     <Card>
-      <SectionTitle icon={<IconStethoscope size={18} />} title="VBAC — Flamm-Geiger Score" subtitle="Perkiraan keberhasilan persalinan pervaginam pascaseksio (Flamm & Geiger, 1997)" />
+      <SectionTitle icon={<IconStethoscope size={18} />} title="VBAC — Flamm-Geiger Score" subtitle="Predicted success of vaginal birth after cesarean (Flamm & Geiger, 1997)" />
       <div className="space-y-3">
         <label className="flex cursor-pointer items-center gap-3 rounded-xl border border-neutral-100 p-3 hover:bg-neutral-50">
           <input type="checkbox" checked={ageU40} onChange={(e) => setAgeU40(e.target.checked)} className="h-5 w-5 accent-brand" />
@@ -1564,7 +1564,7 @@ function VbacCalc() {
           <div className="text-2xl font-black text-ink">{total}<span className="text-sm font-semibold text-neutral-500">/10</span></div>
           <Badge tone={total >= 7 ? 'normal' : total >= 4 ? 'low' : 'critical'}>Estimated success {successPct}</Badge>
         </div>
-        <Prosa kelas="mt-2 text-[11px] leading-relaxed text-neutral-500">Skor lebih tinggi → perkiraan keberhasilan VBAC lebih besar. Model perkiraan ini satu alat bantu keputusan — keputusan percobaan persalinan pascaseksio (TOLAC) tetap bersifat perorangan bersama dokter kandungan, dengan memperhitungkan ketersediaan fasilitas seksio darurat.</Prosa>
+        <Prosa kelas="mt-2 text-[11px] leading-relaxed text-neutral-500">A higher score → a greater predicted VBAC success rate. This prediction model is one decision-support tool — the decision to attempt a trial of labor after cesarean (TOLAC) remains individualized together with an obstetrician, accounting for the availability of emergency cesarean facilities.</Prosa>
       </div>
     </Card>
   )
@@ -1644,7 +1644,7 @@ function DenverCalc() {
 
   return (
     <Card>
-      <SectionTitle icon={<IconStethoscope size={18} />} title="Denver II (Simplified)" subtitle="Penapisan perkembangan yang disederhanakan — tonggak yang mewakili tiap ranah, bukan instrumen Denver II lengkap" />
+      <SectionTitle icon={<IconStethoscope size={18} />} title="Denver II (Simplified)" subtitle="A simplified developmental screen — representative milestones per domain, not the full Denver II instrument" />
       <Field label="Child's Age (months)"><input className={inputClass} type="number" min={0} max={72} value={ageMo} onChange={(e) => setAgeMo(+e.target.value)} /></Field>
 
       {domainFlags.map(({ domain, applicable }) => (
@@ -1672,10 +1672,10 @@ function DenverCalc() {
       {anyDelay && (
         <div className="mt-4 rounded-xl border border-amber-300 bg-amber-50 p-3">
           <p className="text-xs font-black text-amber-800">⚠️ Consider further developmental evaluation</p>
-          <Prosa kelas="mt-1 text-[11px] leading-relaxed text-amber-700">Ada tonggak perkembangan yang lazimnya tercapai jauh di bawah umur anak sekarang (≥6 bulan lebih awal) tetapi belum tercapai. Ini pola penapisan yang disederhanakan — rujuk ke dokter anak/spesialis tumbuh kembang untuk penilaian Denver II lengkap atau instrumen penapisan baku lain (mis. KPSP, M-CHAT bila sesuai).</Prosa>
+          <Prosa kelas="mt-1 text-[11px] leading-relaxed text-amber-700">There is a developmental milestone typically achieved well below the child's current age (≥6 months earlier) that has not yet been achieved. This is a simplified screening pattern — refer to a pediatrician/developmental specialist for a full Denver II assessment or another standard screening instrument (e.g. KPSP, M-CHAT where appropriate).</Prosa>
         </div>
       )}
-      <Prosa kelas="mt-3 text-[10px] leading-relaxed text-neutral-500">Ini BUKAN instrumen Denver II resmi (yang memakai sekitar 125 butir dengan bilah persentil umur & bahan uji baku) — alat ini penapisan awal yang disederhanakan berdasarkan tonggak perkembangan yang mewakili, untuk kewaspadaan, bukan diagnosis keterlambatan perkembangan.</Prosa>
+      <Prosa kelas="mt-3 text-[10px] leading-relaxed text-neutral-500">This is NOT the official Denver II instrument (which uses about 125 items with age-percentile bars & standardized test materials) — this tool is a simplified initial screen based on representative developmental milestones, meant to raise awareness, not to diagnose a developmental delay.</Prosa>
     </Card>
   )
 }
@@ -1747,7 +1747,7 @@ function AtlsCalc() {
 
   return (
     <Card>
-      <SectionTitle icon={<IconStethoscope size={18} />} title="Trauma Primary Survey (XABCDE)" subtitle="X = pengendalian perdarahan masif mendahului Airway — urutan prioritas yang menggerakkan tindakan, bukan sekadar daftar periksa" />
+      <SectionTitle icon={<IconStethoscope size={18} />} title="Trauma Primary Survey (XABCDE)" subtitle="X = massive hemorrhage control precedes Airway — an action-driving priority order, not just a checklist" />
 
       {criticalFindings.length > 0 && (
         <div className="mb-4 rounded-xl border border-red-300 bg-red-50 p-3">
@@ -1789,7 +1789,7 @@ function AtlsCalc() {
         <p className="mt-2 text-[10px] text-neutral-500">{assessedCount}/{totalCount} items assessed.</p>
       </div>
 
-      <Prosa kelas="mt-3 text-[10px] leading-relaxed text-neutral-500">Prinsip trauma modern (&lt;C&gt;ABCDE / MARCH): pengendalian perdarahan luar masif MENDAHULUI Airway bila mengancam nyawa seketika, lalu tangani tiap masalah SAAT DITEMUKAN dengan urutan X→A→B→C→D→E sebelum beranjak ke langkah berikutnya. Alat ini bantuan daftar periksa, bukan pengganti pelatihan ATLS/TCCC bersertifikat & pertimbangan klinis langsung di lapangan.</Prosa>
+      <Prosa kelas="mt-3 text-[10px] leading-relaxed text-neutral-500">Modern trauma principle (&lt;C&gt;ABCDE / MARCH): control of massive external hemorrhage PRECEDES Airway when immediately life-threatening, then address each problem AS IT IS FOUND in the order X→A→B→C→D→E before moving to the next step. This tool is a checklist aid, not a substitute for certified ATLS/TCCC training & direct clinical judgment in the field.</Prosa>
     </Card>
   )
 }
@@ -1884,7 +1884,7 @@ function AbgCalc() {
           <p className="mt-1 text-[12px] font-semibold text-ink">{deltaRatioNote}</p>
         </div>
       )}
-      <Prosa kelas="mt-3 text-[10px] leading-relaxed text-neutral-500">Anion gap tinggi (MUDPILES: metanol, uremia, KAD, propilen glikol/paraldehid, isoniazid/besi, laktat, etilen glikol, salisilat). Anion gap normal/hiperkloremik: diare, RTA, asetazolamid, pengenceran salin. Anion gap terkoreksi = AG + 2,5×(4 − albumin g/dL). Alat bantu penafsiran — selalu padukan dengan keseluruhan keadaan klinis.</Prosa>
+      <Prosa kelas="mt-3 text-[10px] leading-relaxed text-neutral-500">High anion gap (MUDPILES: methanol, uremia, DKA, propylene glycol/paraldehyde, isoniazid/iron, lactate, ethylene glycol, salicylates). Normal/hyperchloremic anion gap: diarrhea, RTA, acetazolamide, saline dilution. Corrected anion gap = AG + 2.5×(4 − albumin g/dL). An interpretation aid — always correlate with the overall clinical picture.</Prosa>
     </Card>
   )
 }
@@ -1986,7 +1986,7 @@ function BurnCalc() {
           <Field label="Total %TBSA (clinical estimate)">
             <input className={inputClass} type="number" min={0} max={100} value={manualTbsa} onChange={(e) => setManualTbsa(+e.target.value)} />
           </Field>
-          <Prosa kelas="mt-1.5 text-[10px] text-neutral-500">Untuk kasus yang perkiraan %LPB-nya sudah ada (mis. rujukan dari rumah sakit lain) — masukkan langsung tanpa perlu menandai bagan tubuh.</Prosa>
+          <Prosa kelas="mt-1.5 text-[10px] text-neutral-500">For cases where a %TBSA estimate is already available (e.g. a referral from another hospital) — enter it directly without needing to mark the body diagram.</Prosa>
         </div>
       ) : (
         <>
@@ -1995,7 +1995,7 @@ function BurnCalc() {
               <Field label="Age (years)">
                 <input className={inputClass} type="number" min={0} max={17} step={0.5} value={ageYears} onChange={(e) => setAgeYears(+e.target.value)} />
               </Field>
-              <Prosa kelas="mt-1.5 text-[10px] text-neutral-500">Lund &amp; Browder (1944) mengoreksi perbandingan tubuh anak — kepala relatif lebih besar dan tungkai lebih kecil dibanding dewasa. Kelompok umur: &lt;1, 1-4, 5-9, 10-14, 15-17, ≥18 tahun.</Prosa>
+              <Prosa kelas="mt-1.5 text-[10px] text-neutral-500">Lund &amp; Browder (1944) corrects for a child's body proportions — the head is relatively larger and the legs relatively smaller than in an adult. Age bands: &lt;1, 1-4, 5-9, 10-14, 15-17, ≥18 years.</Prosa>
             </div>
           )}
           <div className="mt-3 flex gap-2">
@@ -2063,7 +2063,7 @@ function BurnCalc() {
 
       <button onClick={() => window.print()} className="liquid-glass-btn liquid-glass-btn--outline mt-4 w-full rounded-full py-2.5 text-xs font-bold text-brand-dark">🖨️ Print / Save as PDF</button>
 
-      <Prosa kelas="mt-3 text-[10px] leading-relaxed text-neutral-500">Rule of Nines (Wallace) adalah perkiraan baku untuk dewasa. Lund-Browder mengoreksi perbandingan tubuh anak menurut kelompok umur. Parkland: Total = 4 mL × berat(kg) × %LPB (kristaloid RL), separuh dalam 8 jam pertama SEJAK SAAT TRAUMA, sisanya dalam 16 jam berikutnya, dititrasi terhadap keluaran urin.</Prosa>
+      <Prosa kelas="mt-3 text-[10px] leading-relaxed text-neutral-500">The Rule of Nines (Wallace) is the standard estimate for adults. Lund-Browder corrects for a child's body proportions by age band. Parkland: Total = 4 mL × weight(kg) × %TBSA (Ringer's Lactate crystalloid), half given in the first 8 hours FROM THE TIME OF INJURY, the rest over the following 16 hours, titrated against urine output.</Prosa>
     </Card>
   )
 }
@@ -2113,7 +2113,7 @@ ${meningealPositive.length > 0 ? '⚠️ Meningeal signs POSITIVE — consider m
 
   return (
     <Card>
-      <SectionTitle icon={<IconStethoscope size={18} />} title="Cranial Nerves + Meningeal Signs" subtitle="Pemeriksaan 12 saraf kranial & tanda rangsang meningeal, otomatis disusun menjadi catatan" />
+      <SectionTitle icon={<IconStethoscope size={18} />} title="Cranial Nerves + Meningeal Signs" subtitle="Examination of the 12 cranial nerves & meningeal signs, auto-compiled into a note" />
 
       <div className="space-y-2.5">
         {CRANIAL_NERVES.map((n) => (
@@ -2152,7 +2152,7 @@ ${meningealPositive.length > 0 ? '⚠️ Meningeal signs POSITIVE — consider m
         <h4 className="mb-2 text-xs font-black uppercase tracking-wide text-neutral-500">Auto-Generated Note</h4>
         <pre className="whitespace-pre-wrap rounded-xl bg-neutral-900 p-3 text-[11px] leading-relaxed text-neutral-100">{formattedNote}</pre>
       </div>
-      <Prosa kelas="mt-2 text-[10px] leading-relaxed text-neutral-500">Draf catatan yang dibuat otomatis ini wajib ditinjau & dilengkapi dokter sebelum masuk ke rekam medis resmi. Parese fasialis sentral dan perifer dibedakan dari keterlibatan dahi (dahi tidak terkena = sentral, karena persarafan dahi bilateral dari korteks; dahi ikut lumpuh = perifer/Bell's palsy).</Prosa>
+      <Prosa kelas="mt-2 text-[10px] leading-relaxed text-neutral-500">This auto-generated note draft must be reviewed & completed by a physician before entering the official medical record. Central and peripheral facial palsy are distinguished by forehead involvement (forehead spared = central, due to bilateral cortical innervation of the forehead; forehead also paralyzed = peripheral/Bell's palsy).</Prosa>
     </Card>
   )
 }
@@ -2267,7 +2267,7 @@ function CompetencyTracker() {
         )
       })}
 
-      <Prosa kelas="mt-4 text-[10px] leading-relaxed text-neutral-500">Kerangka 7 Area Kompetensi mengikuti SKDI (Standar Kompetensi Dokter Indonesia, ditetapkan KKI berdasarkan masukan AIPKI) — standar nasional yang berlaku di seluruh institusi pendidikan kedokteran, bukan daftar yang berbeda tiap kampus. Subkompetensi di atas ringkasan yang mewakili; lihat dokumen SKDI resmi & logbook institusi Anda untuk daftar lengkap yang sah. Kemajuan disimpan di perangkat ini.</Prosa>
+      <Prosa kelas="mt-4 text-[10px] leading-relaxed text-neutral-500">The 7 Competency Areas framework follows SKDI (Indonesian Doctor Competency Standard, set by KKI based on AIPKI input) — a national standard applied across all medical education institutions, not a list that differs by campus. The sub-competencies above are a representative summary; see the official SKDI document & your institution's logbook for the authoritative full list. Progress is saved on this device.</Prosa>
     </Card>
   )
 }
@@ -2374,7 +2374,7 @@ function BrocaLorentzCalorieCalc() {
           <div className="text-[10px] font-bold uppercase text-neutral-500">Total Calorie Requirement</div>
         </div>
       </div>
-      <Prosa kelas="mt-3 text-[10px] leading-relaxed text-neutral-500">Broca: (Tinggi−100)±10-15%. Lorentz: (Tinggi−100) − (Tinggi−150)/4 (laki-laki) atau /2,5 (perempuan) — mengoreksi tinggi badan ekstrem dan umumnya dianggap lebih tepat daripada Broca polos. Kalori = BB ideal × faktor aktivitas (25 kkal/kg basal + penyesuaian aktivitas). Sesuaikan lagi pada stres metabolik, luka, atau keadaan katabolik.</Prosa>
+      <Prosa kelas="mt-3 text-[10px] leading-relaxed text-neutral-500">Broca: (Height−100)±10-15%. Lorentz: (Height−100) − (Height−150)/4 (male) or /2.5 (female) — corrects for extreme heights and is generally considered more accurate than plain Broca. Calories = ideal body weight × activity factor (25 kcal/kg basal + activity adjustment). Adjust further for metabolic stress, wounds, or catabolic states.</Prosa>
     </Card>
   )
 }
@@ -2390,7 +2390,7 @@ function IvDripCalc() {
 
   return (
     <Card>
-      <SectionTitle icon={<IconStethoscope size={18} />} title="IV Fluid Drip Rate" subtitle="Ubah volume & lama infus menjadi tetes/menit menurut faktor tetes set infus" />
+      <SectionTitle icon={<IconStethoscope size={18} />} title="IV Fluid Drip Rate" subtitle="Convert infusion volume & duration into drops/minute based on the giving set's drop factor" />
       <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
         <Field label="Total Volume (mL)"><input className={inputClass} type="number" value={volumeMl} onChange={(e) => setVolumeMl(+e.target.value)} /></Field>
         <Field label="Duration (hours)"><input className={inputClass} type="number" step="0.5" value={hours} onChange={(e) => setHours(+e.target.value)} /></Field>
@@ -2408,7 +2408,7 @@ function IvDripCalc() {
           <div className="text-[10px] font-bold uppercase text-neutral-500">Drops/min (no pump)</div>
         </div>
       </div>
-      <Prosa kelas="mt-3 text-[10px] leading-relaxed text-neutral-500">Tetes/menit = (Volume mL × faktor tetes) / (lama jam × 60). Set makro baku umumnya 15 atau 20 tetes/mL (dewasa/umum), set mikro 60 tetes/mL (anak/neonatus, titrasi tepat). Selalu pastikan faktor tetes yang tercetak pada kemasan set infus yang Anda pakai.</Prosa>
+      <Prosa kelas="mt-3 text-[10px] leading-relaxed text-neutral-500">Drops/minute = (Volume mL × drop factor) / (duration hours × 60). Standard macro sets are usually 15 or 20 drops/mL (adult/general use), micro sets 60 drops/mL (pediatric/neonatal, precise titration). Always confirm the drop factor printed on the packaging of the giving set you are using.</Prosa>
     </Card>
   )
 }
@@ -2437,7 +2437,7 @@ function AriaCalc() {
 
   return (
     <Card>
-      <SectionTitle icon={<IconStethoscope size={18} />} title="ARIA Criteria" subtitle="Allergic Rhinitis and its Impact on Asthma (Bousquet dkk., WHO 2008)" />
+      <SectionTitle icon={<IconStethoscope size={18} />} title="ARIA Criteria" subtitle="Allergic Rhinitis and its Impact on Asthma (Bousquet et al., WHO 2008)" />
       <Field label="Symptom Duration">
         <SegButtons value={duration} onChange={setDuration} options={[
           { v: 'intermiten', l: 'Intermittent (<4 days/week or <4 weeks)' },
@@ -2465,7 +2465,7 @@ function AriaCalc() {
         </div>
         <p className="mt-2 text-[11px] leading-relaxed text-neutral-600">{treatmentNote[classification]}</p>
       </div>
-      <Prosa kelas="mt-3 text-[10px] leading-relaxed text-neutral-500">Klasifikasi ARIA: lama (intermiten vs persisten) × derajat berat (ringan bila 0 dari 4 butir dampak kualitas hidup terkena; sedang-berat bila ≥1 dari 4). Menggantikan istilah lama "musiman/sepanjang tahun" karena tidak selalu cocok dengan pola gejala di lapangan.</Prosa>
+      <Prosa kelas="mt-3 text-[10px] leading-relaxed text-neutral-500">ARIA classification: duration (intermittent vs persistent) × severity (mild if 0 of 4 quality-of-life impact items are present; moderate-severe if ≥1 of 4). This replaces the older "seasonal/perennial" terminology, which does not always match real-world symptom patterns.</Prosa>
     </Card>
   )
 }
@@ -2522,7 +2522,7 @@ function AclsCalc() {
           ))}
         </ol>
       </div>
-      <Prosa kelas="mt-3 text-[10px] leading-relaxed text-neutral-500">Ringkasan algoritma AHA ACLS 2020 — melengkapi survei primer trauma XABCDE untuk keadaan henti jantung/perihenti. Bukan pengganti pelatihan ACLS bersertifikat & tidak mencakup seluruh kekhususan/dosis anak (lihat PALS terpisah).</Prosa>
+      <Prosa kelas="mt-3 text-[10px] leading-relaxed text-neutral-500">Summary of the AHA ACLS 2020 algorithms — complements the XABCDE trauma primary survey for cardiac arrest/peri-arrest situations. Not a substitute for certified ACLS training & does not cover all pediatric-specific details/dosing (see separate PALS).</Prosa>
     </Card>
   )
 }
@@ -2570,7 +2570,7 @@ export function ClinicalCalculators() {
   if (access && !access.unlocked) {
     return (
       <div className="mx-auto max-w-xl space-y-6 px-4 py-4 sm:px-[30px]">
-        <SectionTitle icon={<IconStethoscope size={20} />} title="Kalkulator Klinis" subtitle={`${TABS.length} skor dan alat baku, dikelompokkan per sistem organ`} />
+        <SectionTitle icon={<IconStethoscope size={20} />} title="Clinical Calculators" subtitle={`${TABS.length} standard scores and tools, grouped by organ system`} />
         <ClinicalCalcPaywall access={access} onUnlocked={() => setAccess({ ...access, unlocked: true })} />
       </div>
     )
@@ -2580,20 +2580,20 @@ export function ClinicalCalculators() {
     <div className="mx-auto max-w-xl space-y-6 px-4 py-4 sm:px-[30px]">
       {access?.free && (
         <div className="flex items-center gap-2 rounded-xl bg-brand-50 px-3 py-2 text-[11px] font-semibold text-brand-dark">
-          <IconCheck size={14} /> Anda termasuk {access.limit} pendaftar pertama — akses gratis selamanya.
+          <IconCheck size={14} /> You're among the first {access.limit} registrants — free access forever.
         </div>
       )}
-      <SectionTitle icon={<IconStethoscope size={20} />} title="Kalkulator Klinis" subtitle={`${TABS.length} skor dan alat baku, dikelompokkan per sistem organ`} />
+      <SectionTitle icon={<IconStethoscope size={20} />} title="Clinical Calculators" subtitle={`${TABS.length} standard scores and tools, grouped by organ system`} />
       <KartuDataPerangkat />
       <input
         className={inputClass}
-        placeholder={`Cari ${TABS.length} alat: sepsis, luka bakar, stroke, bayi, dosis…`}
+        placeholder={`Search ${TABS.length} tools: sepsis, burns, stroke, newborn, dosing…`}
         value={query}
         onChange={(e) => setQuery(e.target.value)}
       />
       {visibleTabs.length === 0 && (
         <p className="rounded-xl bg-neutral-50 px-3 py-2.5 text-center text-[12px] text-neutral-500">
-          Tidak ada yang cocok dengan "{query}" — coba nama organ, gejala, atau situasi.
+          No matches for "{query}" — try an organ name, symptom, or situation.
         </p>
       )}
       {/* PEMILIH ALAT — kisi berkelompok, bukan satu baris gulir mendatar.
