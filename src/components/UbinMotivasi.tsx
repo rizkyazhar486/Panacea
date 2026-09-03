@@ -24,7 +24,7 @@ const KUTIPAN: { teks: string; sumber: string }[] = [
   { teks: 'Maka sesungguhnya bersama kesulitan ada kemudahan.', sumber: 'QS Al-Insyirah 94:5' },
   { teks: 'Allah tidak membebani seseorang melainkan sesuai kesanggupannya.', sumber: 'QS Al-Baqarah 2:286' },
   { teks: 'Allah tidak mengubah keadaan suatu kaum sehingga mereka mengubah apa yang ada pada diri mereka.', sumber: 'QS Ar-Ra’d 13:11' },
-  { teks: 'Hidup itu singkat, seni kedokteran panjang, kesempatan berlalu cepat, percobaan berbahaya, keputusan sukar.', sumber: 'Hippokrates, Aforisme I.1' },
+  { teks: 'Life is short, the art of medicine long, opportunity fleeting, experiment dangerous, judgement difficult.', sumber: 'Hippocrates, Aphorisms I.1' },
 ]
 
 const HARI = 864e5

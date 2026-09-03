@@ -72,32 +72,32 @@ const W = {
 }
 
 const PRIBADI: Pintu[] = [
-  { ke: '/latihan', Logo: LogoLatihan, judul: 'Latihan', warna: W.gerak },
-  { ke: '/nutrition', Logo: LogoGizi, judul: 'Gizi', warna: W.makan },
-  { ke: '/recovery', Logo: LogoTidur, judul: 'Tidur', warna: W.tidur },
-  { ke: '/tubuh', Logo: LogoTubuh, judul: 'Tubuh', warna: W.tubuh },
+  { ke: '/latihan', Logo: LogoLatihan, judul: 'Training', warna: W.gerak },
+  { ke: '/nutrition', Logo: LogoGizi, judul: 'Nutrition', warna: W.makan },
+  { ke: '/recovery', Logo: LogoTidur, judul: 'Sleep', warna: W.tidur },
+  { ke: '/tubuh', Logo: LogoTubuh, judul: 'Body', warna: W.tubuh },
 ]
 
 const KLINIS: Pintu[] = [
-  { ke: '/med-study', Logo: LogoPenyakit, judul: 'Penyakit', warna: W.otak },
-  { ke: '/med-study', Logo: LogoTindakan, judul: 'Tindakan', warna: W.alat },
-  { ke: '/calculator-hub', Logo: LogoKalkulator, judul: 'Kalkulator', warna: W.alat },
-  { ke: '/drug-info', Logo: LogoObat, judul: 'Obat', warna: W.obat },
+  { ke: '/med-study', Logo: LogoPenyakit, judul: 'Diseases', warna: W.otak },
+  { ke: '/med-study', Logo: LogoTindakan, judul: 'Procedures', warna: W.alat },
+  { ke: '/calculator-hub', Logo: LogoKalkulator, judul: 'Calculators', warna: W.alat },
+  { ke: '/drug-info', Logo: LogoObat, judul: 'Drugs', warna: W.obat },
 ]
 
 /** Pintu yang sama dengan nama sehari-hari. Halaman tujuannya persis sama. */
 const KLINIS_AWAM: Pintu[] = [
-  { ke: '/med-study', Logo: LogoPenyakit, judul: 'Penyakit', warna: W.otak },
-  { ke: '/med-study', Logo: LogoTindakan, judul: 'Pertolongan', warna: W.alat },
-  { ke: '/calculator-hub', Logo: LogoKalkulator, judul: 'Risiko', warna: W.alat },
-  { ke: '/drug-info', Logo: LogoObat, judul: 'Obat', warna: W.obat },
+  { ke: '/med-study', Logo: LogoPenyakit, judul: 'Diseases', warna: W.otak },
+  { ke: '/med-study', Logo: LogoTindakan, judul: 'First aid', warna: W.alat },
+  { ke: '/calculator-hub', Logo: LogoKalkulator, judul: 'Risk', warna: W.alat },
+  { ke: '/drug-info', Logo: LogoObat, judul: 'Drugs', warna: W.obat },
 ]
 
 const LAINNYA: Pintu[] = [
-  { ke: '/emergency', Logo: LogoDarurat, judul: 'Darurat', warna: W.darurat },
-  { ke: '/scripture', Logo: LogoIbadah, judul: 'Ibadah', warna: W.tidur },
-  { ke: '/feed', Logo: LogoKabar, judul: 'Kabar', warna: W.gerak },
-  { ke: '/semua-fitur', Logo: LogoSemua, judul: 'Semua', warna: W.alat },
+  { ke: '/emergency', Logo: LogoDarurat, judul: 'Emergency', warna: W.darurat },
+  { ke: '/scripture', Logo: LogoIbadah, judul: 'Worship', warna: W.tidur },
+  { ke: '/feed', Logo: LogoKabar, judul: 'News', warna: W.gerak },
+  { ke: '/semua-fitur', Logo: LogoSemua, judul: 'All', warna: W.alat },
 ]
 
 // ── Angka utama ─────────────────────────────────────────────────────────────
@@ -241,10 +241,10 @@ export default function Beranda() {
   const klinisDulu = tujuan ? tujuan === 'belajar' : account?.role === 'dokter'
   const awam = modeAwam(tujuan)
   const klinis = awam ? KLINIS_AWAM : KLINIS
-  const judulKlinis = awam ? 'Kesehatan & Penyakit' : 'Klinis'
+  const judulKlinis = awam ? 'Health & Disease' : 'Clinical'
   const isiKlinis = awam
-    ? '623 penyakit — apa, sebabnya, tandanya, obatnya'
-    : '623 penyakit SKDI · OSCE · SOFA, Wells, Child-Pugh · resep'
+    ? '623 diseases — what they are, their causes, their signs, their treatment'
+    : '623 SKDI diseases · OSCE · SOFA, Wells, Child-Pugh · prescriptions'
 
   /**
    * Angka yang benar-benar ada, bukan tempat kosong yang menunggu diisi.
@@ -289,11 +289,11 @@ export default function Beranda() {
           return s ? s.kesegaran : 0
         })
         out.push({
-          label: 'Segar', nilai: String(Math.round(st.kesegaran)),
+          label: 'Fresh', nilai: String(Math.round(st.kesegaran)),
           nada: st.kesegaran >= -10 ? 'text-emerald-600 dark:text-emerald-400' : 'text-amber-600 dark:text-amber-400',
           deret: hari,
         })
-        out.push({ label: 'Bugar', nilai: String(Math.round(st.kebugaran)), nada: 'text-sky-600 dark:text-sky-400' })
+        out.push({ label: 'Fit', nilai: String(Math.round(st.kebugaran)), nada: 'text-sky-600 dark:text-sky-400' })
       }
     }
     // Garisnya diambil dari riwayat yang benar-benar tercatat; Garis sendiri
@@ -314,7 +314,7 @@ export default function Beranda() {
     if (tidur[0]) {
       const jam = Math.round(tidur[0].hours * 10) / 10
       out.push({
-        label: 'Tidur', nilai: String(jam), satuan: tidur[0].date === hariIni ? 'jam' : 'jam (terakhir)',
+        label: 'Sleep', nilai: String(jam), satuan: tidur[0].date === hariIni ? 'h' : 'h (last)',
         nada: jam >= 7 ? 'text-emerald-600 dark:text-emerald-400' : 'text-amber-600 dark:text-amber-400',
         deret: tidur.slice(0, 14).map((l) => l.hours).reverse(),
       })
@@ -323,27 +323,27 @@ export default function Beranda() {
     const w0 = state.wellness?.[hariIni] as { steps?: number; waterMl?: number } | undefined
     const langkah = Number(w0?.steps) || Number(v.steps) || 0
     if (langkah > 0) {
-      out.push({ label: 'Langkah', nilai: langkah >= 10000 ? `${(langkah / 1000).toFixed(1)}k` : String(langkah), satuan: 'hari ini', nada: 'text-ink dark:text-white' })
+      out.push({ label: 'Steps', nilai: langkah >= 10000 ? `${(langkah / 1000).toFixed(1)}k` : String(langkah), satuan: 'today', nada: 'text-ink dark:text-white' })
     }
 
     let protein = 0
     for (const f of state.foods ?? []) if (f?.date === hariIni) protein += Number(f.protein) || 0
-    if (protein > 0) out.push({ label: 'Protein', nilai: String(Math.round(protein)), satuan: 'g hari ini', nada: 'text-ink dark:text-white' })
+    if (protein > 0) out.push({ label: 'Protein', nilai: String(Math.round(protein)), satuan: 'g today', nada: 'text-ink dark:text-white' })
 
     const air = Number(w0?.waterMl) || 0
-    if (air > 0) out.push({ label: 'Air', nilai: (air / 1000).toFixed(1), satuan: 'L hari ini', nada: 'text-sky-600 dark:text-sky-400' })
+    if (air > 0) out.push({ label: 'Water', nilai: (air / 1000).toFixed(1), satuan: 'L today', nada: 'text-sky-600 dark:text-sky-400' })
 
-    if (v.weightKg) out.push({ label: 'Berat', nilai: String(v.weightKg), satuan: 'kg', nada: 'text-ink dark:text-white', deret: deretMetrik('weightKg').map((t) => t.nilai) })
-    if (v.restingHr) out.push({ label: 'Nadi', nilai: String(v.restingHr), satuan: 'bpm', nada: 'text-rose-600 dark:text-rose-400', deret: deretMetrik('restingHr').map((t) => t.nilai) })
+    if (v.weightKg) out.push({ label: 'Weight', nilai: String(v.weightKg), satuan: 'kg', nada: 'text-ink dark:text-white', deret: deretMetrik('weightKg').map((t) => t.nilai) })
+    if (v.restingHr) out.push({ label: 'Resting HR', nilai: String(v.restingHr), satuan: 'bpm', nada: 'text-rose-600 dark:text-rose-400', deret: deretMetrik('restingHr').map((t) => t.nilai) })
     if (v.systolic && v.diastolic) {
-      out.push({ label: 'Tensi', nilai: `${v.systolic}/${v.diastolic}`, nada: 'text-ink dark:text-white' })
+      out.push({ label: 'BP', nilai: `${v.systolic}/${v.diastolic}`, nada: 'text-ink dark:text-white' })
     }
 
     if (typeof v.vo2max === 'number' && v.vo2max > 0) {
-      out.push({ label: 'VO₂maks', nilai: String(Math.round(v.vo2max * 10) / 10), satuan: 'mL/kg/mnt', nada: 'text-ink dark:text-white', deret: deretMetrik('vo2max').map((t) => t.nilai) })
+      out.push({ label: 'VO₂max', nilai: String(Math.round(v.vo2max * 10) / 10), satuan: 'mL/kg/min', nada: 'text-ink dark:text-white', deret: deretMetrik('vo2max').map((t) => t.nilai) })
     }
 
-    if (w.length) out.push({ label: 'Sesi', nilai: String(w.length), satuan: 'tercatat', nada: 'text-ink dark:text-white' })
+    if (w.length) out.push({ label: 'Sessions', nilai: String(w.length), satuan: 'recorded', nada: 'text-ink dark:text-white' })
 
     // Delapan adalah batas yang dapat dilihat sekali sapu pada layar 390 px:
     // dua lajur, empat baris. Lebih dari itu panelnya berhenti menjadi

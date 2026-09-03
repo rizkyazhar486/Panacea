@@ -19,12 +19,12 @@ import { api, backendEnabled, type Notif } from '../lib/api'
 
 function timeAgo(iso: string): string {
   const m = Math.floor((Date.now() - new Date(iso).getTime()) / 60000)
-  if (m < 1) return 'baru saja'
-  if (m < 60) return `${m} menit lalu`
+  if (m < 1) return 'just now'
+  if (m < 60) return `${m} min ago`
   const h = Math.floor(m / 60)
-  if (h < 24) return `${h} jam lalu`
+  if (h < 24) return `${h} h ago`
   const d = Math.floor(h / 24)
-  return d < 7 ? `${d} hari lalu` : new Date(iso).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })
+  return d < 7 ? `${d} d ago` : new Date(iso).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })
 }
 
 function fullTime(iso: string): string {
@@ -43,7 +43,7 @@ function dayLabel(iso: string): string {
   const sameDay = (a: Date, b: Date) => a.toDateString() === b.toDateString()
   const kemarin = new Date(now); kemarin.setDate(now.getDate() - 1)
   if (sameDay(d, now)) return 'Today'
-  if (sameDay(d, kemarin)) return 'Kemarin'
+  if (sameDay(d, kemarin)) return 'Yesterday'
   return d.toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })
 }
 
@@ -54,13 +54,13 @@ function dayLabel(iso: string): string {
  */
 function kategori(n: Notif): { ikon: string; label: string } {
   const t = `${n.title} ${n.body}`.toLowerCase()
-  if (/obat|medic|reminder|minum/.test(t)) return { ikon: '💊', label: 'Pengingat obat' }
-  if (/janji|appointment|konsul|consult|jadwal/.test(t)) return { ikon: '🩺', label: 'Konsultasi' }
-  if (/bayar|invoice|billing|tagihan|pembayaran/.test(t)) return { ikon: '💳', label: 'Pembayaran' }
-  if (/pesan|message|chat|balas/.test(t)) return { ikon: '💬', label: 'Pesan' }
-  if (/hasil|lab|result|rujuk/.test(t)) return { ikon: '🧪', label: 'Hasil pemeriksaan' }
-  if (/latihan|workout|langkah|target|sehat/.test(t)) return { ikon: '🏃', label: 'Aktivitas' }
-  return { ikon: '🔔', label: 'Pemberitahuan' }
+  if (/obat|medic|reminder|minum/.test(t)) return { ikon: '💊', label: 'Medication reminder' }
+  if (/janji|appointment|konsul|consult|jadwal/.test(t)) return { ikon: '🩺', label: 'Consultation' }
+  if (/bayar|invoice|billing|tagihan|pembayaran/.test(t)) return { ikon: '💳', label: 'Payment' }
+  if (/pesan|message|chat|balas/.test(t)) return { ikon: '💬', label: 'Message' }
+  if (/hasil|lab|result|rujuk/.test(t)) return { ikon: '🧪', label: 'Test result' }
+  if (/latihan|workout|langkah|target|sehat/.test(t)) return { ikon: '🏃', label: 'Activity' }
+  return { ikon: '🔔', label: 'Notification' }
 }
 
 export function NotificationBell() {
@@ -193,14 +193,14 @@ export function NotificationBell() {
       <div
         ref={panelRef}
         role="dialog"
-        aria-label="Pemberitahuan"
+        aria-label="Notifications"
         className="fixed z-[71] flex max-h-[70vh] w-[min(22rem,calc(100vw-1rem))] flex-col overflow-hidden rounded-2xl border border-black/5 bg-white shadow-2xl ring-1 ring-black/5 dark:border-white/10 dark:bg-neutral-900"
         style={{ top: pos.top, right: pos.right }}
       >
         <div className="flex shrink-0 items-center justify-between border-b border-neutral-100 px-4 py-2.5 dark:border-white/10">
-          <span className="text-sm font-bold text-ink dark:text-white">Pemberitahuan</span>
+          <span className="text-sm font-bold text-ink dark:text-white">Notifications</span>
           <span className="text-[11px] text-neutral-500">
-            {memuat ? 'memuat…' : `${items.length} item`}
+            {memuat ? 'loading…' : `${items.length} items`}
           </span>
         </div>
 
@@ -216,17 +216,17 @@ export function NotificationBell() {
         <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain">
           {gagal ? (
             <div className="px-4 py-8 text-center">
-              <p className="text-sm text-neutral-500">Pemberitahuan tidak dapat dimuat.</p>
-              <p className="mt-1 text-[11px] text-neutral-500">Periksa sambungan internet Anda.</p>
+              <p className="text-sm text-neutral-500">Notifications could not be loaded.</p>
+              <p className="mt-1 text-[11px] text-neutral-500">Check your internet connection.</p>
               <button onClick={load} className="mt-3 rounded-lg bg-neutral-100 px-3 py-1.5 text-xs font-bold text-neutral-700 dark:bg-white/10 dark:text-neutral-200">
-                Coba lagi
+                Try again
               </button>
             </div>
           ) : items.length === 0 ? (
             <div className="px-4 py-10 text-center">
-              <p className="text-sm text-neutral-500">Belum ada pemberitahuan.</p>
+              <p className="text-sm text-neutral-500">No notifications yet.</p>
               <p className="mt-1 text-[11px] leading-relaxed text-neutral-500">
-                Pengingat obat, jadwal konsultasi, dan pembaruan akun akan muncul di sini.
+                Medication reminders, consultation schedules, and account updates will appear here.
               </p>
             </div>
           ) : (
@@ -271,11 +271,11 @@ export function NotificationBell() {
                               onClick={() => bukaTautan(n)}
                               className="mt-2 rounded-lg bg-brand px-3 py-1.5 text-xs font-bold text-white"
                             >
-                              Buka halamannya →
+                              Open its page →
                             </button>
                           ) : (
                             <p className="mt-1.5 text-[11px] text-neutral-500">
-                              Pemberitahuan ini tidak menautkan ke halaman mana pun.
+                              This notification does not link to any page.
                             </p>
                           )}
                         </div>
@@ -293,7 +293,7 @@ export function NotificationBell() {
             onClick={() => { setOpen(false); nav('/notifikasi') }}
             className="shrink-0 border-t border-neutral-100 py-2.5 text-center text-xs font-bold text-brand-dark dark:border-white/10"
           >
-            Lihat semua pemberitahuan
+            See all notifications
           </button>
         )}
       </div>
@@ -308,8 +308,8 @@ export function NotificationBell() {
         aria-expanded={open}
         aria-haspopup="dialog"
         className="relative grid h-9 w-9 shrink-0 place-items-center rounded-full border border-black/5 bg-white text-neutral-500 transition hover:text-brand-dark"
-        title="Pemberitahuan"
-        aria-label={unread > 0 ? `Pemberitahuan, ${unread} belum dibaca` : 'Pemberitahuan'}
+        title="Notifications"
+        aria-label={unread > 0 ? `Notifications, ${unread} unread` : 'Notifications'}
       >
         <IconBell size={18} />
         {unread > 0 && (

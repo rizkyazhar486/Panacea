@@ -121,13 +121,13 @@ export function UbinMata() {
   return (
     <section>
       <Kepala
-        judul="Mata 20-20-20"
+        judul="Eyes 20-20-20"
         kanan={mulai !== null ? (
           <button
             onClick={() => { simpanAngka(KUNCI_MATA, null); setMulai(null); setJeda(null); ditandai.current = 0; setPutaran(0) }}
             className="t-kecil flex min-h-[40px] items-center font-bold text-neutral-500"
           >
-            Berhenti
+            Stop
           </button>
         ) : null}
       />
@@ -135,16 +135,16 @@ export function UbinMata() {
         {mulai === null ? (
           <>
             <p className="t-kecil leading-snug text-neutral-600 dark:text-neutral-300">
-              Tiap 20 menit, lihat sesuatu sejauh ±6 meter selama 20 detik.
+              Every 20 minutes, look at something about 6 metres away for 20 seconds.
             </p>
             <button
               onClick={() => { const t = Date.now(); simpanAngka(KUNCI_MATA, t); setMulai(t); ditandai.current = 0; bunyi(880, 1) }}
               className="t-kecil mt-2 min-h-[44px] w-full rounded-2xl bg-brand font-bold text-white transition active:scale-[0.98]"
             >
-              Mulai menemani layar
+              Start watching over screen time
             </button>
             <p className="t-mikro mt-2 leading-snug text-neutral-400">
-              Anjuran optometri untuk keluhan mata akibat layar. Yang diringankan gejalanya — mata kering dan pegal — bukan rabun jauhnya.
+              An optometry recommendation for screen-related eye complaints. What it eases are the symptoms — dry, tired eyes — not short-sightedness itself.
             </p>
           </>
         ) : jeda ? (
@@ -153,20 +153,20 @@ export function UbinMata() {
               {Math.ceil(sisaJeda)}
             </span>
             <span className="min-w-0">
-              <span className="t-kecil block font-black text-ink dark:text-white">Alihkan pandangan sekarang</span>
-              <span className="t-mikro block text-neutral-400">±6 meter, sampai hitungan habis</span>
+              <span className="t-kecil block font-black text-ink dark:text-white">Look away now</span>
+              <span className="t-mikro block text-neutral-400">About 6 metres, until the count runs out</span>
             </span>
           </div>
         ) : (
           <div className="flex items-center gap-3">
             <span className="text-[26px] font-black leading-none tabular-nums text-ink dark:text-white">{mmss(sisaSiklus)}</span>
             <span className="min-w-0 flex-1">
-              <span className="t-mikro block text-neutral-400">menuju jeda mata berikutnya</span>
+              <span className="t-mikro block text-neutral-400">until the next eye break</span>
               <span className="mt-1 block h-2 w-full rounded-full bg-neutral-200 dark:bg-white/10">
                 <span className="block h-full rounded-full bg-brand" style={{ width: `${100 - (sisaSiklus / (SIKLUS_MS / 1000)) * 100}%` }} />
               </span>
             </span>
-            <span className="t-mikro shrink-0 tabular-nums text-neutral-400">{putaran}× hari ini</span>
+            <span className="t-mikro shrink-0 tabular-nums text-neutral-400">{putaran}× today</span>
           </div>
         )}
       </div>
@@ -209,13 +209,13 @@ export function UbinFokus() {
   return (
     <section>
       <Kepala
-        judul="Sesi fokus"
+        judul="Focus session"
         kanan={akhir !== null ? (
           <button
             onClick={() => { simpanAngka(KUNCI_FOKUS, null); setAkhir(null); berbunyi.current = false }}
             className="t-kecil flex min-h-[40px] items-center font-bold text-neutral-500"
           >
-            Berhenti
+            Stop
           </button>
         ) : null}
       />
@@ -230,12 +230,12 @@ export function UbinFokus() {
                   className="flex min-h-[54px] flex-col items-center justify-center rounded-2xl border border-neutral-200 transition active:scale-95 dark:border-white/12"
                 >
                   <span className="text-[19px] font-black leading-none tabular-nums text-ink dark:text-white">{m}</span>
-                  <span className="t-mikro text-neutral-400">menit</span>
+                  <span className="t-mikro text-neutral-400">min</span>
                 </button>
               ))}
             </div>
             <p className="t-mikro mt-2 leading-snug text-neutral-400">
-              Lama sesi dipilih sendiri; tidak ada lama yang terbukti benar untuk semua orang.
+              You choose the session length; no single length is proven right for everyone.
             </p>
           </>
         ) : (
@@ -245,10 +245,10 @@ export function UbinFokus() {
             </span>
             <span className="min-w-0 flex-1">
               <span className="t-kecil block font-black text-ink dark:text-white">
-                {habis ? 'Waktunya berdiri dan menjauh dari layar' : 'Sedang fokus'}
+                {habis ? 'Time to stand up and step away from the screen' : 'Focusing'}
               </span>
               <span className="t-mikro block truncate text-neutral-400">
-                {habis ? 'Getar dan bunyi sudah dibunyikan' : `Selesai pukul ${new Date(akhir).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' })}`}
+                {habis ? 'Vibration and sound have already played' : `Ends at ${new Date(akhir).toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' })}`}
               </span>
             </span>
           </div>
@@ -276,26 +276,26 @@ export function UbinKopi() {
   return (
     <section>
       <Kepala
-        judul="Kopi"
+        judul="Coffee"
         kanan={
           <button
             onClick={() => { const t = Date.now(); simpanAngka(KUNCI_KOPI, t); setTerakhir(t) }}
             className="t-kecil flex min-h-[40px] items-center font-bold text-brand"
           >
-            Baru minum ☕
+            Just drank one ☕
           </button>
         }
       />
       <div className="kaca rounded-3xl p-3">
         {terakhir === null ? (
-          <p className="t-kecil text-neutral-500">Belum ada catatan. Tekan “Baru minum” saat menyeruput yang pertama.</p>
+          <p className="t-kecil text-neutral-500">Nothing logged yet. Press “Just drank one” with your first sip.</p>
         ) : (
           <>
             <div className="flex items-baseline gap-1.5">
               <span className="text-[26px] font-black leading-none tabular-nums nyala text-ink dark:text-white">
-                {jamLalu < 1 ? `${Math.round(jamLalu * 60)} mnt` : `${jamLalu.toFixed(1)} jam`}
+                {jamLalu < 1 ? `${Math.round(jamLalu * 60)} min` : `${jamLalu.toFixed(1)} h`}
               </span>
-              <span className="t-mikro font-bold text-neutral-400">sejak kopi terakhir</span>
+              <span className="t-mikro font-bold text-neutral-400">since the last coffee</span>
             </div>
 
             {/* Peluruhan kafein sebagai satu bilah — dasar nol, seratus persen
@@ -306,11 +306,11 @@ export function UbinKopi() {
               <span className="block h-full rounded-full bg-amber-500" style={{ width: `${Math.max(2, sisaPersen)}%` }} />
             </span>
             <p className="t-mikro mt-1.5 leading-snug text-neutral-500 dark:text-neutral-400">
-              Perkiraan sisa {Math.round(sisaPersen)}% · paruh waktu 5 jam (lazimnya 3–7 jam; berbeda tiap orang)
+              Roughly {Math.round(sisaPersen)}% left · 5-hour half-life (typically 3–7 hours; it differs per person)
             </p>
             <p className="t-mikro mt-1 text-neutral-400">
-              Diminum pukul {new Date(terakhir).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' })} ·{' '}
-              <Link to="/pola-tidur" className="font-bold text-brand">pola tidur →</Link>
+              Drunk at {new Date(terakhir).toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' })} ·{' '}
+              <Link to="/pola-tidur" className="font-bold text-brand">sleep pattern →</Link>
             </p>
           </>
         )}

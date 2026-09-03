@@ -121,8 +121,8 @@ export function JamWod({ nama, setelan, ronde }: {
   }
 
   const skor = useMemo(() => {
-    if (setelan.jenis === 'amrap') return `${catatan.length} ronde`
-    if (setelan.jenis === 'emom') return `${catatan.length} menit done`
+    if (setelan.jenis === 'amrap') return `${catatan.length} rounds`
+    if (setelan.jenis === 'emom') return `${catatan.length} min done`
     return jam(sekarang)
   }, [setelan.jenis, catatan.length, sekarang])
 
@@ -157,13 +157,13 @@ export function JamWod({ nama, setelan, ronde }: {
       <div className="text-center">
         <div className={`tabular-nums text-5xl font-black leading-none transition-colors ${
           hampirHabis ? 'text-rose-500' : fase === 'jalan' ? 'text-brand' : 'text-white'
-        }`} role="timer" aria-label="Waktu">
+        }`} role="timer" aria-label="Time">
           {jam(tampil)}
         </div>
         <div className="mt-1 text-[10px] font-bold uppercase tracking-wide text-slate-400">
-          {setelan.jenis === 'amrap' && `AMRAP ${setelan.menit} menit · sisa waktu`}
-          {setelan.jenis === 'fortime' && (setelan.batas ? `For Time · batas ${setelan.batas} mnt` : 'For Time')}
-          {setelan.jenis === 'emom' && `EMOM ${setelan.menit} menit`}
+          {setelan.jenis === 'amrap' && `AMRAP ${setelan.menit} min · time remaining`}
+          {setelan.jenis === 'fortime' && (setelan.batas ? `For Time · ${setelan.batas} min cap` : 'For Time')}
+          {setelan.jenis === 'emom' && `EMOM ${setelan.menit} min`}
           {setelan.jenis === 'tabata' && 'Tabata 20/10 × 8'}
         </div>
       </div>
@@ -195,20 +195,20 @@ export function JamWod({ nama, setelan, ronde }: {
       {/* Tombol utama */}
       <div className="mt-3 flex gap-2">
         {fase === 'siap' && (
-          <button onClick={mulai} aria-label="Mulai"
+          <button onClick={mulai} aria-label="Start"
             className="flex-1 rounded-xl bg-brand py-3 text-[14px] font-black text-white">
-            ▶ Mulai
+            ▶ Start
           </button>
         )}
         {fase === 'jalan' && (
           <>
-            <button onClick={jeda} aria-label="Jeda"
+            <button onClick={jeda} aria-label="Pause"
               className="rounded-xl bg-white/10 px-4 py-3 text-[14px] font-black text-white">
-              ⏸ Jeda
+              ⏸ Pause
             </button>
             <button onClick={ketuk} aria-label="Tap round"
               className="flex-1 rounded-xl bg-emerald-500 py-3 text-[14px] font-black text-white active:scale-[0.98]">
-              ⊕ Ketuk — ronde {catatan.length + 1}
+              ⊕ Tap — round {catatan.length + 1}
             </button>
           </>
         )}
@@ -228,11 +228,11 @@ export function JamWod({ nama, setelan, ronde }: {
           <>
             <button onClick={simpan} aria-label="Save result"
               className="flex-1 rounded-xl bg-brand py-3 text-[14px] font-black text-white">
-              Simpan · {skor}
+              Save · {skor}
             </button>
-            <button onClick={ulang} aria-label="Ulang"
+            <button onClick={ulang} aria-label="Reset"
               className="rounded-xl bg-white/10 px-4 py-3 text-[14px] font-black text-white">
-              Ulang
+              Reset
             </button>
           </>
         )}
@@ -241,12 +241,12 @@ export function JamWod({ nama, setelan, ronde }: {
       {fase === 'jalan' && setelan.jenis === 'fortime' && (
         <button onClick={donekan}
           className="mt-2 w-full rounded-xl bg-white/5 py-2 text-[12px] font-bold text-slate-300">
-          Berhenti — sesi done
+          Stop — session done
         </button>
       )}
       {fase === 'jalan' && (
         <p className="mt-2 text-center text-[10px] text-slate-500">
-          Tekan spasi juga mencatat ronde.
+          Pressing space also logs a round.
         </p>
       )}
 
@@ -255,12 +255,12 @@ export function JamWod({ nama, setelan, ronde }: {
         <div className="mt-3">
           <div className="flex items-center justify-between">
             <div className="text-[10px] font-black uppercase tracking-wide text-slate-400">
-              {catatan.length} tercatat
+              {catatan.length} logged
             </div>
             {fase !== 'done' && (
-              <button onClick={batalKetuk} aria-label="Cancelkan ketukan terakhir"
+              <button onClick={batalKetuk} aria-label="Undo the last tap"
                 className="rounded-lg bg-white/5 px-2 py-0.5 text-[10px] font-bold text-slate-400">
-                batalkan terakhir
+                undo last
               </button>
             )}
           </div>
@@ -284,9 +284,9 @@ export function JamWod({ nama, setelan, ronde }: {
           </div>
           {catatan.length >= 3 && (
             <p className="mt-1 text-[10px] leading-relaxed text-slate-500">
-              Kolom kanan adalah split tiap ronde. Ronde awal yang jauh lebih cepat dari rata-rata
-              (hijau) biasanya berarti Anda memulai terlalu berani — total akhirnya hampir selalu
-              lebih rendah, bukan lebih tinggi.
+              The right column is the split for each round. Early rounds far faster than the average
+              (green) usually mean you started too boldly — the final total is almost always
+              lower, not higher.
             </p>
           )}
         </div>

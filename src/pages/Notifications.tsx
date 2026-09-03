@@ -32,19 +32,19 @@ function dayLabel(iso: string): string {
   const same = (a: Date, b: Date) => a.toDateString() === b.toDateString()
   const kemarin = new Date(now); kemarin.setDate(now.getDate() - 1)
   if (same(d, now)) return 'Today'
-  if (same(d, kemarin)) return 'Kemarin'
+  if (same(d, kemarin)) return 'Yesterday'
   return d.toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })
 }
 
 function kategori(n: Notif): { ikon: string; label: string } {
   const t = `${n.title} ${n.body}`.toLowerCase()
-  if (/obat|medic|reminder|minum/.test(t)) return { ikon: '💊', label: 'Pengingat obat' }
-  if (/janji|appointment|konsul|consult|jadwal/.test(t)) return { ikon: '🩺', label: 'Konsultasi' }
-  if (/bayar|invoice|billing|tagihan|pembayaran/.test(t)) return { ikon: '💳', label: 'Pembayaran' }
-  if (/pesan|message|chat|balas/.test(t)) return { ikon: '💬', label: 'Pesan' }
-  if (/hasil|lab|result|rujuk/.test(t)) return { ikon: '🧪', label: 'Hasil pemeriksaan' }
-  if (/latihan|workout|langkah|target|sehat/.test(t)) return { ikon: '🏃', label: 'Aktivitas' }
-  return { ikon: '🔔', label: 'Pemberitahuan' }
+  if (/obat|medic|reminder|minum/.test(t)) return { ikon: '💊', label: 'Medication reminder' }
+  if (/janji|appointment|konsul|consult|jadwal/.test(t)) return { ikon: '🩺', label: 'Consultation' }
+  if (/bayar|invoice|billing|tagihan|pembayaran/.test(t)) return { ikon: '💳', label: 'Payment' }
+  if (/pesan|message|chat|balas/.test(t)) return { ikon: '💬', label: 'Message' }
+  if (/hasil|lab|result|rujuk/.test(t)) return { ikon: '🧪', label: 'Test result' }
+  if (/latihan|workout|langkah|target|sehat/.test(t)) return { ikon: '🏃', label: 'Activity' }
+  return { ikon: '🔔', label: 'Notification' }
 }
 
 export function Notifications() {
@@ -96,9 +96,9 @@ export function Notifications() {
   if (!backendEnabled) {
     return (
       <div className="space-y-4">
-        <SectionTitle icon={<IconBell />} title="Pemberitahuan" />
+        <SectionTitle icon={<IconBell />} title="Notifications" />
         <Card>
-          <Prosa kelas="text-sm text-neutral-500">Pemberitahuan memerlukan sambungan ke server, dan saat ini aplikasi berjalan dalam mode tanpa server. Data kesehatan Anda tetap tersimpan di perangkat ini seperti biasa.</Prosa>
+          <Prosa kelas="text-sm text-neutral-500">Notifications need a connection to the server, and the app is currently running without one. Your health data is still saved on this device as usual.</Prosa>
         </Card>
       </div>
     )
@@ -108,15 +108,15 @@ export function Notifications() {
     <div className="space-y-4">
       <SectionTitle
         icon={<IconBell />}
-        title="Pemberitahuan"
-        subtitle={belum > 0 ? `${belum} belum dibaca dari ${items.length}` : `${items.length} pemberitahuan`}
+        title="Notifications"
+        subtitle={belum > 0 ? `${belum} unread of ${items.length}` : `${items.length} notifications`}
       />
 
       <HealthAlertSettings />
 
       <Card>
         <div className="flex flex-wrap items-center gap-2">
-          {([['semua', 'Semua'], ['belum', 'Belum dibaca'], ['sudah', 'Sudah dibaca']] as [Saring, string][]).map(([k, l]) => (
+          {([['semua', 'All'], ['belum', 'Unread'], ['sudah', 'Read']] as [Saring, string][]).map(([k, l]) => (
             <button
               key={k}
               onClick={() => setSaring(k)}
@@ -133,32 +133,32 @@ export function Notifications() {
           <span className="flex-1" />
           {belum > 0 && (
             <button onClick={tandaiSemua} className="rounded-lg bg-neutral-100 px-3 py-1.5 text-xs font-bold text-neutral-700 dark:bg-white/10 dark:text-neutral-200">
-              Tandai semua dibaca
+              Mark all as read
             </button>
           )}
           <button onClick={load} className="rounded-lg bg-neutral-100 px-3 py-1.5 text-xs font-bold text-neutral-700 dark:bg-white/10 dark:text-neutral-200">
-            Muat ulang
+            Reload
           </button>
         </div>
       </Card>
 
       {gagal ? (
         <Card>
-          <p className="text-sm text-neutral-500">Tidak bisa memuat pemberitahuan. Periksa sambungan internet Anda.</p>
-          <button onClick={load} className="mt-3 rounded-lg bg-brand px-3 py-1.5 text-xs font-bold text-white">Coba lagi</button>
+          <p className="text-sm text-neutral-500">Notifications could not be loaded. Check your internet connection.</p>
+          <button onClick={load} className="mt-3 rounded-lg bg-brand px-3 py-1.5 text-xs font-bold text-white">Try again</button>
         </Card>
       ) : memuat ? (
         <Card><p className="text-sm text-neutral-500">Loading…</p></Card>
       ) : tersaring.length === 0 ? (
         <Card>
           <p className="text-sm text-neutral-500">
-            {saring === 'belum' ? 'Tidak ada pemberitahuan yang belum dibaca.'
-              : saring === 'sudah' ? 'Belum ada pemberitahuan yang sudah dibaca.'
-                : 'Belum ada pemberitahuan.'}
+            {saring === 'belum' ? 'No unread notifications.'
+              : saring === 'sudah' ? 'No read notifications yet.'
+                : 'No notifications yet.'}
           </p>
           {saring === 'semua' && (
             <p className="mt-1.5 text-[12px] leading-relaxed text-neutral-500">
-              Pengingat obat, jadwal konsultasi, pembaruan pembayaran, dan pesan baru akan muncul di sini.
+              Medication reminders, consultation schedules, payment updates, and new messages will appear here.
             </p>
           )}
         </Card>
@@ -179,7 +179,7 @@ export function Notifications() {
                       <div className="min-w-0 flex-1">
                         <div className="flex flex-wrap items-center gap-2">
                           <span className="text-sm font-bold text-ink dark:text-ink">{n.title}</span>
-                          {!n.read && <Badge tone="brand">Baru</Badge>}
+                          {!n.read && <Badge tone="brand">New</Badge>}
                         </div>
                         <p className="mt-1 text-[12px] leading-relaxed text-neutral-600 dark:text-neutral-300">{n.body}</p>
                         <p className="mt-1.5 text-[11px] text-neutral-500">{kat.label} · {fullTime(n.at)}</p>
@@ -191,7 +191,7 @@ export function Notifications() {
                             }}
                             className="mt-2 rounded-lg bg-brand px-3 py-1.5 text-xs font-bold text-white"
                           >
-                            Buka halamannya →
+                            Open its page →
                           </button>
                         )}
                       </div>

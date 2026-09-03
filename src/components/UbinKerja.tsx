@@ -29,7 +29,7 @@ function Kepala({ judul, ke, kanan }: { judul: string; ke: string; kanan?: React
       <h2 className="t-kecil font-black uppercase tracking-wide text-neutral-500">{judul}</h2>
       {kanan ?? (
         <Link to={ke} className="t-kecil flex min-h-[40px] items-center font-bold text-brand">
-          Buka →
+          Open →
         </Link>
       )}
     </div>
@@ -73,20 +73,20 @@ export function UbinObat() {
 
   return (
     <section>
-      <Kepala judul="Obat & dosis" ke="/med-study?bagian=therapy" />
+      <Kepala judul="Drugs & doses" ke="/med-study?bagian=therapy" />
       <div className="kaca rounded-3xl p-3">
         <div className="flex gap-2">
           <input
             value={q}
             onChange={(e) => setQ(e.target.value)}
             placeholder="Tifoid, amoksisilin, kejang…"
-            aria-label="Cari obat atau penyakit"
+            aria-label="Search a drug or disease"
             className={KELAS_ISIAN}
           />
         </div>
 
         {tampil.length === 0 ? (
-          <p className="t-kecil mt-2 text-neutral-500">Tidak ada yang cocok.</p>
+          <p className="t-kecil mt-2 text-neutral-500">No match.</p>
         ) : (
           <div className="mt-2 flex flex-col gap-2">
             {tampil.map((e, i) => (
@@ -114,12 +114,12 @@ export function UbinObat() {
           <div className="mt-2">
             <PemutarBaca
               teks={tampil.map((e) => `${e.diagnosis}. ${e.classification ?? ''}. ${e.therapy}`).join('. ')}
-              label="Dengarkan dosis"
+              label="Listen to the dose"
             />
           </div>
         )}
         <p className="t-mikro mt-2 text-neutral-400">
-          {hasil.length ? `${hasil.length} dari ${SKDI_ENTRIES.length} baris` : `Sumber: acuan tatalaksana SKDI · ${SKDI_ENTRIES.length} baris`}
+          {hasil.length ? `${hasil.length} of ${SKDI_ENTRIES.length} rows` : `Source: SKDI management reference · ${SKDI_ENTRIES.length} rows`}
         </p>
       </div>
     </section>
@@ -148,46 +148,46 @@ type Rumus = {
 const RUMUS: Rumus[] = [
   {
     id: 'imt',
-    label: 'IMT',
+    label: 'BMI',
     medan: [
-      { kunci: 'bb', label: 'Berat', satuan: 'kg' },
-      { kunci: 'tb', label: 'Tinggi', satuan: 'cm' },
+      { kunci: 'bb', label: 'Weight', satuan: 'kg' },
+      { kunci: 'tb', label: 'Height', satuan: 'cm' },
     ],
     satuan: 'kg/m²',
-    sumber: 'BB ÷ TB²',
+    sumber: 'weight ÷ height²',
     hitung: (v) => (v.bb > 0 && v.tb > 0 ? v.bb / (v.tb / 100) ** 2 : null),
   },
   {
     id: 'map',
     label: 'MAP',
     medan: [
-      { kunci: 'sis', label: 'Sistolik', satuan: 'mmHg' },
-      { kunci: 'dia', label: 'Diastolik', satuan: 'mmHg' },
+      { kunci: 'sis', label: 'Systolic', satuan: 'mmHg' },
+      { kunci: 'dia', label: 'Diastolic', satuan: 'mmHg' },
     ],
     satuan: 'mmHg',
-    sumber: 'MAP = (2×diastolik + sistolik) ÷ 3',
+    sumber: 'MAP = (2×diastolic + systolic) ÷ 3',
     hitung: (v) => (v.sis > 0 && v.dia > 0 ? (2 * v.dia + v.sis) / 3 : null),
   },
   {
     id: 'lpb',
-    label: 'LPB',
+    label: 'BSA',
     medan: [
-      { kunci: 'bb', label: 'Berat', satuan: 'kg' },
-      { kunci: 'tb', label: 'Tinggi', satuan: 'cm' },
+      { kunci: 'bb', label: 'Weight', satuan: 'kg' },
+      { kunci: 'tb', label: 'Height', satuan: 'cm' },
     ],
     satuan: 'm²',
-    sumber: 'Mosteller: √(TB×BB ÷ 3600)',
+    sumber: 'Mosteller: √(height×weight ÷ 3600)',
     hitung: (v) => (v.bb > 0 && v.tb > 0 ? Math.sqrt((v.tb * v.bb) / 3600) : null),
   },
   {
     id: 'dosis',
-    label: 'Dosis/kg',
+    label: 'Dose/kg',
     medan: [
-      { kunci: 'bb', label: 'Berat', satuan: 'kg' },
-      { kunci: 'dos', label: 'Dosis', satuan: 'mg/kg' },
+      { kunci: 'bb', label: 'Weight', satuan: 'kg' },
+      { kunci: 'dos', label: 'Dose', satuan: 'mg/kg' },
     ],
     satuan: 'mg',
-    sumber: 'BB × dosis per kg',
+    sumber: 'weight × dose per kg',
     hitung: (v) => (v.bb > 0 && v.dos > 0 ? v.bb * v.dos : null),
   },
 ]
@@ -203,7 +203,7 @@ export function UbinKalkulator() {
 
   return (
     <section>
-      <Kepala judul="Hitung cepat" ke="/clinical-calculators" />
+      <Kepala judul="Quick calculations" ke="/clinical-calculators" />
       <div className="kaca rounded-3xl p-3">
         <div className="geser-aman -mx-1 flex gap-1.5 overflow-x-auto px-1 pb-1">
           {RUMUS.map((x) => (
@@ -279,7 +279,7 @@ export function UbinStasiun() {
 
   return (
     <section>
-      <Kepala judul="Stasiun tersering" ke="/osce-ukmppd" />
+      <Kepala judul="Most common stations" ke="/osce-ukmppd" />
       <div className="kaca rounded-3xl p-3">
         <div className="geser-aman -mx-1 flex gap-1.5 overflow-x-auto px-1 pb-1">
           {sistemTeratas.map(([nama, n]) => (
