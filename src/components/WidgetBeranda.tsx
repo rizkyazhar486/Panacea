@@ -120,7 +120,7 @@ export function WidgetBeranda() {
     if (pr.length) {
       kartu.push(
         <Card key="pr">
-          <div className="text-[10px] font-black uppercase tracking-wide text-slate-500">Usaha terbaik</div>
+          <div className="text-[10px] font-black uppercase tracking-wide text-slate-500">Personal bests</div>
           <div className="mt-2 flex flex-wrap gap-2">
             {pr.map((p) => (
               <div key={p.label} className="rounded-xl bg-white/5 px-3 py-1.5">
@@ -143,7 +143,7 @@ export function WidgetBeranda() {
   if (pintasan.length) {
     kartu.push(
       <Card key="pintasan">
-        <div className="text-[10px] font-black uppercase tracking-wide text-slate-500">Pintasan</div>
+        <div className="text-[10px] font-black uppercase tracking-wide text-slate-500">Shortcuts</div>
         <div className="mt-2 grid grid-cols-2 gap-2">
           {pintasan.map((w) => (
             <Link key={w.id} to={w.ke}
@@ -178,13 +178,13 @@ export function WidgetBeranda() {
             onClick={(e) => e.stopPropagation()}>
             <div className="flex items-start justify-between gap-3">
               <div>
-                <h2 className="text-base font-black text-white">Atur kartu beranda</h2>
+                <h2 className="text-base font-black text-white">Customize home cards</h2>
                 <p className="mt-0.5 text-[12px] leading-relaxed text-slate-400">
-                  Pilih yang ingin Anda lihat setiap membuka aplikasi. Kartu tanpa data tidak akan
-                  tampil meski dinyalakan.
+                  Choose what you want to see every time you open the app. Cards with no data won't
+                  appear even when turned on.
                 </p>
               </div>
-              <button onClick={() => setBuka(false)} aria-label="Tutup"
+              <button onClick={() => setBuka(false)} aria-label="Close"
                 className="shrink-0 rounded-full bg-white/10 px-3 py-1 text-sm font-bold text-white">✕</button>
             </div>
 
@@ -209,9 +209,9 @@ export function WidgetBeranda() {
 
             <div className="mt-4 flex gap-2">
               <button onClick={() => { simpanWidget([]); setAktif([]) }}
-                className="flex-1 rounded-xl bg-white/10 py-2.5 text-[12px] font-bold text-white">Kosongkan</button>
+                className="flex-1 rounded-xl bg-white/10 py-2.5 text-[12px] font-bold text-white">Clear</button>
               <button onClick={() => { simpanWidget(widgetBawaan()); setAktif(widgetBawaan()) }}
-                className="flex-1 rounded-xl bg-white/10 py-2.5 text-[12px] font-bold text-white">Bawaan</button>
+                className="flex-1 rounded-xl bg-white/10 py-2.5 text-[12px] font-bold text-white">Default</button>
               <button onClick={() => setBuka(false)}
                 className="flex-1 rounded-xl bg-brand py-2.5 text-[12px] font-bold text-white">Done</button>
             </div>

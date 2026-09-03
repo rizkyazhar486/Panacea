@@ -21,7 +21,7 @@ function Kepala({ judul, ke, kanan }: { judul: string; ke?: string; kanan?: Reac
   return (
     <div className="mb-2 flex items-baseline justify-between gap-2">
       <h2 className="t-kecil font-black uppercase tracking-wide text-neutral-500">{judul}</h2>
-      {kanan ?? (ke ? <Link to={ke} className="t-kecil flex min-h-[40px] items-center font-bold text-brand">Buka →</Link> : null)}
+      {kanan ?? (ke ? <Link to={ke} className="t-kecil flex min-h-[40px] items-center font-bold text-brand">Open →</Link> : null)}
     </div>
   )
 }
@@ -51,7 +51,7 @@ export function UbinObatPengingat() {
 
   return (
     <section>
-      <Kepala judul="Obat" ke="/med-reminders" />
+      <Kepala judul="Medication" ke="/med-reminders" />
       <div className="kaca rounded-3xl p-3">
         <div className="flex items-baseline gap-1.5">
           <span className="t-sedang min-w-0 truncate font-black text-ink dark:text-white">{berikut.medName}</span>
@@ -71,7 +71,7 @@ export function UbinObatPengingat() {
           ))}
         </div>
         <p className="t-mikro mt-2 text-neutral-400">
-          {daftar.length} pengingat aktif · dikirim server, sampai walau aplikasi ditutup
+          {daftar.length} active reminders · sent by the server, even if the app is closed
         </p>
       </div>
     </section>

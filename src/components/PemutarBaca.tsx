@@ -19,7 +19,7 @@ import { didukung, langganan, mulai, hentikan, jeda, lanjut, ambilLaju, aturLaju
 // tombol yang tidak melakukan apa-apa.
 // ─────────────────────────────────────────────────────────────────────────────
 
-export function PemutarBaca({ teks, label = 'Dengarkan', kecil = false }: { teks: string; label?: string; kecil?: boolean }) {
+export function PemutarBaca({ teks, label = 'Listen', kecil = false }: { teks: string; label?: string; kecil?: boolean }) {
   const [keadaan, setKeadaan] = useState({ jalan: false, bagian: 0, jumlah: 0 })
   const [laju, setLaju] = useState(ambilLaju)
   const [milikSaya, setMilikSaya] = useState(false)
@@ -47,20 +47,20 @@ export function PemutarBaca({ teks, label = 'Dengarkan', kecil = false }: { teks
     <span className={`flex items-center gap-1.5 ${kecil ? '' : 'flex-wrap'}`}>
       <button
         onClick={tekan}
-        aria-label={sedang && keadaan.jalan ? 'Jeda pembacaan' : label}
+        aria-label={sedang && keadaan.jalan ? 'Pause reading' : label}
         className={`t-kecil flex min-h-[40px] items-center gap-1.5 rounded-xl px-2.5 font-bold transition ${
           sedang && keadaan.jalan ? 'bg-brand text-white' : 'bg-neutral-100 text-neutral-600 dark:bg-white/10 dark:text-neutral-200'
         }`}
       >
         <span aria-hidden>{sedang && keadaan.jalan ? '⏸' : '▶'}</span>
-        {kecil ? null : <span>{sedang && keadaan.jalan ? 'Jeda' : label}</span>}
+        {kecil ? null : <span>{sedang && keadaan.jalan ? 'Pause' : label}</span>}
       </button>
 
       {sedang && (
         <>
           <button
             onClick={() => { hentikan(); setMilikSaya(false) }}
-            aria-label="Hentikan pembacaan"
+            aria-label="Stop reading"
             className="t-kecil flex min-h-[40px] items-center px-1 font-bold text-neutral-500"
           >
             ■
@@ -74,7 +74,7 @@ export function PemutarBaca({ teks, label = 'Dengarkan', kecil = false }: { teks
       <select
         value={String(laju)}
         onChange={(e) => { const v = Number(e.target.value); setLaju(v); aturLaju(v) }}
-        aria-label="Kecepatan baca"
+        aria-label="Reading speed"
         className="t-mikro min-h-[40px] rounded-lg border border-neutral-200 bg-transparent px-1 tabular-nums text-neutral-500 dark:border-white/12 dark:text-neutral-300"
       >
         {[0.8, 1, 1.25, 1.5, 1.75].map((v) => <option key={v} value={v}>{v}×</option>)}

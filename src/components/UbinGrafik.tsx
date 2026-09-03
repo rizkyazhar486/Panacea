@@ -164,21 +164,21 @@ export function UbinGrafik() {
   }[] = []
 
   const menitPekan = latihan.reduce((a, b) => a + b, 0)
-  if (menitPekan > 0) ubin.push({ id: 'grafikLatihan', ke: '/latihan', judul: 'Latihan', nilai: String(menitPekan), satuan: 'mnt / 7 hari', deret: latihan, nada: 'bg-brand' })
+  if (menitPekan > 0) ubin.push({ id: 'grafikLatihan', ke: '/latihan', judul: 'Training', nilai: String(menitPekan), satuan: 'min / 7 days', deret: latihan, nada: 'bg-brand' })
 
   const malam = tidur.filter((x) => x > 0)
-  if (malam.length) ubin.push({ id: 'grafikTidur', ke: '/pola-tidur', judul: 'Tidur', nilai: (malam.reduce((a, b) => a + b, 0) / malam.length).toFixed(1), satuan: 'jam rata-rata', deret: tidur, nada: 'bg-indigo-400' })
+  if (malam.length) ubin.push({ id: 'grafikTidur', ke: '/pola-tidur', judul: 'Sleep', nilai: (malam.reduce((a, b) => a + b, 0) / malam.length).toFixed(1), satuan: 'avg hrs', deret: tidur, nada: 'bg-indigo-400' })
 
   const hariLangkah = langkah.filter((x) => x > 0)
-  if (hariLangkah.length) ubin.push({ id: 'grafikLangkah', ke: '/tubuh', judul: 'Langkah', nilai: Math.round(hariLangkah.reduce((a, b) => a + b, 0) / hariLangkah.length).toLocaleString('id-ID'), satuan: 'per hari', deret: langkah, nada: 'bg-cyan-400' })
+  if (hariLangkah.length) ubin.push({ id: 'grafikLangkah', ke: '/tubuh', judul: 'Steps', nilai: Math.round(hariLangkah.reduce((a, b) => a + b, 0) / hariLangkah.length).toLocaleString('en-GB'), satuan: 'per day', deret: langkah, nada: 'bg-cyan-400' })
 
   const hariGizi = gizi.filter((x) => x > 0)
-  if (hariGizi.length) ubin.push({ id: 'grafikGizi', ke: '/nutrition', judul: 'Gizi', nilai: Math.round(hariGizi.reduce((a, b) => a + b, 0) / hariGizi.length).toLocaleString('id-ID'), satuan: 'kkal / hari', deret: gizi, nada: 'bg-amber-400' })
+  if (hariGizi.length) ubin.push({ id: 'grafikGizi', ke: '/nutrition', judul: 'Nutrition', nilai: Math.round(hariGizi.reduce((a, b) => a + b, 0) / hariGizi.length).toLocaleString('en-GB'), satuan: 'kcal / day', deret: gizi, nada: 'bg-amber-400' })
 
   if (denyut.length >= 3) {
     const akhir = denyut[denyut.length - 1]
     ubin.push({
-      id: 'grafikDenyut', ke: '/tubuh', judul: 'Denyut istirahat', nilai: String(Math.round(akhir)),
+      id: 'grafikDenyut', ke: '/tubuh', judul: 'Resting HR', nilai: String(Math.round(akhir)),
       satuan: 'bpm', deret: denyut, nada: 'bg-rose-400', bentuk: 'garis',
     })
   }
@@ -188,7 +188,7 @@ export function UbinGrafik() {
 
   return (
     <section>
-      <h2 className="t-kecil mb-2 font-black uppercase tracking-wide text-neutral-500">Tujuh hari</h2>
+      <h2 className="t-kecil mb-2 font-black uppercase tracking-wide text-neutral-500">Seven days</h2>
       <div className="grid grid-cols-2 gap-fluid">
         {tampil.map((u, i) => <Ubin key={u.id} {...u} cahaya={i === 0} />)}
       </div>

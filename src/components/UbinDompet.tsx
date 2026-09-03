@@ -44,9 +44,9 @@ type Keadaan =
   | { jenis: 'luring'; saldo: number }
 
 const TINDAKAN = [
-  { ke: '/billing', label: 'Isi Ulang', emoji: '➕' },
-  { ke: '/billing', label: 'Tarik Dana', emoji: '🏦' },
-  { ke: '/keuangan', label: 'Riwayat', emoji: '🧾' },
+  { ke: '/billing', label: 'Top Up', emoji: '➕' },
+  { ke: '/billing', label: 'Withdraw', emoji: '🏦' },
+  { ke: '/keuangan', label: 'History', emoji: '🧾' },
 ]
 
 export function UbinDompet({ saldoLokal }: { saldoLokal: number }) {
@@ -68,21 +68,21 @@ export function UbinDompet({ saldoLokal }: { saldoLokal: number }) {
 
   return (
     <section>
-      <h2 className="t-kecil mb-2 font-black uppercase tracking-wide text-neutral-500">Dompet</h2>
+      <h2 className="t-kecil mb-2 font-black uppercase tracking-wide text-neutral-500">Wallet</h2>
       <div className="kaca overflow-hidden rounded-3xl">
         <Link to="/billing" className="block px-4 py-3.5 transition-transform duration-200 active:scale-[0.985]">
           <div className="flex items-center justify-between gap-3">
             <div className="min-w-0">
-              <p className="t-kecil font-semibold text-neutral-500">Saldo PanaceaToken</p>
+              <p className="t-kecil font-semibold text-neutral-500">PanaceaToken Balance</p>
               <p className="mt-0.5 flex items-baseline gap-1.5">
                 {saldo === null ? (
                   <span className="t-sedang font-bold text-neutral-400">
-                    {keadaan.jenis === 'memuat' ? 'Memuat…' : 'Tidak terbaca'}
+                    {keadaan.jenis === 'memuat' ? 'Loading…' : 'Unavailable'}
                   </span>
                 ) : (
                   <>
                     <span className="text-2xl font-black tabular-nums leading-none text-ink dark:text-white">
-                      {saldo.toLocaleString('id-ID')}
+                      {saldo.toLocaleString('en-GB')}
                     </span>
                     <span className="t-mikro font-bold text-neutral-400">PNC</span>
                   </>
@@ -95,12 +95,12 @@ export function UbinDompet({ saldoLokal }: { saldoLokal: number }) {
           </div>
           <p className="t-mikro mt-2 leading-snug text-neutral-500 dark:text-neutral-400">
             {keadaan.jenis === 'gagal'
-              ? 'Saldo tidak dapat diambil dari server sekarang. Angka lama tidak ditampilkan supaya tidak keliru dibaca sebagai saldo terkini — ketuk untuk mencoba lagi di halaman Tagihan.'
+              ? "Balance can't be fetched from the server right now. The old number isn't shown so it isn't mistaken for the current balance — tap to try again on the Billing page."
               : keadaan.jenis === 'luring'
-                ? 'Tercatat di perangkat ini saja; server tidak sedang tersambung.'
+                ? 'Recorded on this device only; the server is not currently connected.'
                 : saldo === 0
-                  ? 'Belum ada saldo. PNC dipakai untuk konsultasi dan langganan.'
-                  : 'Menurut server. Ketuk untuk rincian transaksinya.'}
+                  ? 'No balance yet. PNC is used for consultations and subscriptions.'
+                  : 'According to the server. Tap for transaction details.'}
           </p>
         </Link>
 
@@ -123,7 +123,7 @@ export function UbinDompet({ saldoLokal }: { saldoLokal: number }) {
         </div>
       </div>
       <p className="t-mikro mt-1 leading-snug text-neutral-400">
-        Kirim PNC antar pengguna dan permintaan uang belum ada di aplikasi ini, jadi tombolnya tidak dipasang.
+        Sending PNC between users and money requests don't exist in this app yet, so the button isn't shown.
       </p>
     </section>
   )

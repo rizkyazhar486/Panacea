@@ -20,15 +20,15 @@ export function PemilihAksiFab({ tutup }: { tutup: () => void }) {
   }, [tutup])
 
   return createPortal(
-    <div className="fixed inset-0 z-[80] flex items-end justify-center bg-black/60 sm:items-center sm:p-4" role="dialog" aria-label="Pilih tindakan tombol">
+    <div className="fixed inset-0 z-[80] flex items-end justify-center bg-black/60 sm:items-center sm:p-4" role="dialog" aria-label="Choose button actions">
       <div className="flex max-h-[85vh] w-full max-w-md flex-col rounded-t-3xl bg-white shadow-2xl dark:bg-neutral-900 sm:rounded-3xl">
         <div className="flex items-center justify-between gap-2 border-b border-neutral-200 p-4 dark:border-white/10">
           <div className="min-w-0">
-            <h2 className="text-[15px] font-black text-ink dark:text-white">Tindakan tombol</h2>
-            <p className="text-[11px] text-neutral-500">{aktif.length} dari {MAKS_AKSI} slot terpakai</p>
+            <h2 className="text-[15px] font-black text-ink dark:text-white">Button actions</h2>
+            <p className="text-[11px] text-neutral-500">{aktif.length} of {MAKS_AKSI} slots used</p>
           </div>
           <button onClick={tutup} className="flex h-10 shrink-0 items-center rounded-full bg-neutral-100 px-4 text-[12px] font-bold text-ink dark:bg-white/10 dark:text-white">
-            Selesai
+            Done
           </button>
         </div>
 
@@ -56,15 +56,15 @@ export function PemilihAksiFab({ tutup }: { tutup: () => void }) {
             })}
           </div>
           <p className="mt-3 text-[11px] leading-snug text-neutral-500">
-            Lima belas slot di atas dua halaman menu yang digeser mendatar; tempat terakhir selalu dipakai tombol Ubah
-            ini. Bila sudah penuh dan Anda menyalakan yang baru, yang paling lama dipilih otomatis dilepas — supaya tidak
-            perlu mematikan sesuatu lebih dahulu.
+            Fifteen slots across two horizontally-swiped menu pages; the last slot always holds this
+            Edit button. If it's already full and you turn on a new one, the oldest selected is automatically
+            dropped — so you never have to turn something off first.
           </p>
         </div>
 
         <div className="border-t border-neutral-200 p-3 dark:border-white/10">
           <button onClick={() => setAktif(kembalikanBawaan())} className="flex h-10 items-center text-[12px] font-bold text-neutral-500">
-            Kembalikan bawaan
+            Restore defaults
           </button>
         </div>
       </div>
