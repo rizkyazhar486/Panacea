@@ -73,7 +73,7 @@ export function MacroLab() {
       {tab === 'dagang' && <TradeTab />}
 
       <Card className="!p-4">
-        <div className="text-[11px] font-black uppercase tracking-wide text-neutral-500">Sumber data</div>
+        <div className="text-[11px] font-black uppercase tracking-wide text-neutral-500">Data source</div>
         <ol className="mt-1.5 list-decimal space-y-1 pl-4 text-[11px] leading-relaxed text-neutral-500">
           {DATA_SOURCES.map((s) => <li key={s}>{s}</li>)}
         </ol>
@@ -157,11 +157,11 @@ function CountryTab() {
               </div>
               <div className="mt-1 grid grid-cols-2 gap-x-3 gap-y-0.5 text-[11px] text-neutral-600 dark:text-neutral-300">
                 <span>PDB: ${c.gdpUsdTn.toFixed(1)} T</span>
-                <span>Per kapita: ${Math.round(gdpPerCapitaUsd(c)).toLocaleString('en-GB')}</span>
-                <span>Inflasi: {c.inflationPct}%</span>
-                <span>Suku bunga: {c.policyRatePct}%</span>
-                <span>Pengangguran: {c.unemploymentPct}%</span>
-                <span>Utang: {c.govDebtPctGdp}% PDB</span>
+                <span>Per capita: ${Math.round(gdpPerCapitaUsd(c)).toLocaleString('en-GB')}</span>
+                <span>Inflation: {c.inflationPct}%</span>
+                <span>Policy rate: {c.policyRatePct}%</span>
+                <span>Unemployment: {c.unemploymentPct}%</span>
+                <span>Debt: {c.govDebtPctGdp}% of GDP</span>
               </div>
               <div className="mt-1 text-[10px] text-neutral-500">{c.centralBank}</div>
             </div>
@@ -227,7 +227,7 @@ function RateTab() {
             <div key={c.name} className="rounded-xl bg-neutral-50 p-3 dark:bg-white/5">
               <div className="flex items-center justify-between">
                 <span className="text-[12px] font-bold text-ink dark:text-ink">{c.name}</span>
-                <Badge tone={c.direction === 'naik' ? 'high' : 'low'}>{c.direction}</Badge>
+                <Badge tone={c.direction === 'up' ? 'high' : 'low'}>{c.direction}</Badge>
               </div>
               <p className="mt-1 text-[11px] leading-relaxed text-neutral-500">{c.note}</p>
             </div>

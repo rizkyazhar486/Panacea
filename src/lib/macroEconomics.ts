@@ -56,22 +56,22 @@ export const DATA_SOURCES = [
 // Rounded, indicative values for teaching comparison — verify against the
 // primary sources above before using any of these in a real decision.
 export const COUNTRIES: Country[] = [
-  { code: 'US', name: 'Amerika Serikat', blocs: ['top10', 'nato'], gdpUsdTn: 29.2, population: 342, inflationPct: 2.9, policyRatePct: 4.75, unemploymentPct: 4.1, govDebtPctGdp: 121, currentAccountPctGdp: -3.3, centralBank: 'Federal Reserve' },
-  { code: 'CN', name: 'Tiongkok', blocs: ['top10', 'brics'], gdpUsdTn: 18.7, population: 1410, inflationPct: 0.3, policyRatePct: 3.1, unemploymentPct: 5.1, govDebtPctGdp: 88, currentAccountPctGdp: 1.4, centralBank: "People's Bank of China" },
-  { code: 'DE', name: 'Jerman', blocs: ['top10', 'nato'], gdpUsdTn: 4.7, population: 84, inflationPct: 2.4, policyRatePct: 3.4, unemploymentPct: 3.4, govDebtPctGdp: 63, currentAccountPctGdp: 6.1, centralBank: 'European Central Bank' },
-  { code: 'JP', name: 'Jepang', blocs: ['top10'], gdpUsdTn: 4.1, population: 124, inflationPct: 2.7, policyRatePct: 0.25, unemploymentPct: 2.5, govDebtPctGdp: 251, currentAccountPctGdp: 3.6, centralBank: 'Bank of Japan' },
+  { code: 'US', name: 'United States', blocs: ['top10', 'nato'], gdpUsdTn: 29.2, population: 342, inflationPct: 2.9, policyRatePct: 4.75, unemploymentPct: 4.1, govDebtPctGdp: 121, currentAccountPctGdp: -3.3, centralBank: 'Federal Reserve' },
+  { code: 'CN', name: 'China', blocs: ['top10', 'brics'], gdpUsdTn: 18.7, population: 1410, inflationPct: 0.3, policyRatePct: 3.1, unemploymentPct: 5.1, govDebtPctGdp: 88, currentAccountPctGdp: 1.4, centralBank: "People's Bank of China" },
+  { code: 'DE', name: 'Germany', blocs: ['top10', 'nato'], gdpUsdTn: 4.7, population: 84, inflationPct: 2.4, policyRatePct: 3.4, unemploymentPct: 3.4, govDebtPctGdp: 63, currentAccountPctGdp: 6.1, centralBank: 'European Central Bank' },
+  { code: 'JP', name: 'Japan', blocs: ['top10'], gdpUsdTn: 4.1, population: 124, inflationPct: 2.7, policyRatePct: 0.25, unemploymentPct: 2.5, govDebtPctGdp: 251, currentAccountPctGdp: 3.6, centralBank: 'Bank of Japan' },
   { code: 'IN', name: 'India', blocs: ['top10', 'brics'], gdpUsdTn: 3.9, population: 1440, inflationPct: 4.9, policyRatePct: 6.5, unemploymentPct: 4.2, govDebtPctGdp: 83, currentAccountPctGdp: -1.1, centralBank: 'Reserve Bank of India' },
-  { code: 'GB', name: 'Britania Raya', blocs: ['top10', 'nato'], gdpUsdTn: 3.6, population: 69, inflationPct: 2.5, policyRatePct: 4.75, unemploymentPct: 4.3, govDebtPctGdp: 101, currentAccountPctGdp: -2.7, centralBank: 'Bank of England' },
-  { code: 'FR', name: 'Prancis', blocs: ['top10', 'nato'], gdpUsdTn: 3.2, population: 68, inflationPct: 2.1, policyRatePct: 3.4, unemploymentPct: 7.4, govDebtPctGdp: 112, currentAccountPctGdp: -0.9, centralBank: 'European Central Bank' },
-  { code: 'IT', name: 'Italia', blocs: ['top10', 'nato'], gdpUsdTn: 2.4, population: 59, inflationPct: 1.1, policyRatePct: 3.4, unemploymentPct: 6.6, govDebtPctGdp: 139, currentAccountPctGdp: 1.1, centralBank: 'European Central Bank' },
-  { code: 'BR', name: 'Brasil', blocs: ['top10', 'brics'], gdpUsdTn: 2.3, population: 217, inflationPct: 4.4, policyRatePct: 12.25, unemploymentPct: 6.2, govDebtPctGdp: 87, currentAccountPctGdp: -1.9, centralBank: 'Banco Central do Brasil' },
-  { code: 'CA', name: 'Kanada', blocs: ['top10', 'nato'], gdpUsdTn: 2.2, population: 41, inflationPct: 2.0, policyRatePct: 3.25, unemploymentPct: 6.8, govDebtPctGdp: 105, currentAccountPctGdp: -0.6, centralBank: 'Bank of Canada' },
+  { code: 'GB', name: 'United Kingdom', blocs: ['top10', 'nato'], gdpUsdTn: 3.6, population: 69, inflationPct: 2.5, policyRatePct: 4.75, unemploymentPct: 4.3, govDebtPctGdp: 101, currentAccountPctGdp: -2.7, centralBank: 'Bank of England' },
+  { code: 'FR', name: 'France', blocs: ['top10', 'nato'], gdpUsdTn: 3.2, population: 68, inflationPct: 2.1, policyRatePct: 3.4, unemploymentPct: 7.4, govDebtPctGdp: 112, currentAccountPctGdp: -0.9, centralBank: 'European Central Bank' },
+  { code: 'IT', name: 'Italy', blocs: ['top10', 'nato'], gdpUsdTn: 2.4, population: 59, inflationPct: 1.1, policyRatePct: 3.4, unemploymentPct: 6.6, govDebtPctGdp: 139, currentAccountPctGdp: 1.1, centralBank: 'European Central Bank' },
+  { code: 'BR', name: 'Brazil', blocs: ['top10', 'brics'], gdpUsdTn: 2.3, population: 217, inflationPct: 4.4, policyRatePct: 12.25, unemploymentPct: 6.2, govDebtPctGdp: 87, currentAccountPctGdp: -1.9, centralBank: 'Banco Central do Brasil' },
+  { code: 'CA', name: 'Canada', blocs: ['top10', 'nato'], gdpUsdTn: 2.2, population: 41, inflationPct: 2.0, policyRatePct: 3.25, unemploymentPct: 6.8, govDebtPctGdp: 105, currentAccountPctGdp: -0.6, centralBank: 'Bank of Canada' },
   { code: 'ID', name: 'Indonesia', blocs: ['brics', 'asean'], gdpUsdTn: 1.4, population: 283, inflationPct: 1.6, policyRatePct: 6.0, unemploymentPct: 4.9, govDebtPctGdp: 39, currentAccountPctGdp: -0.6, centralBank: 'Bank Indonesia' },
-  { code: 'RU', name: 'Rusia', blocs: ['brics'], gdpUsdTn: 2.2, population: 144, inflationPct: 8.4, policyRatePct: 21.0, unemploymentPct: 2.3, govDebtPctGdp: 20, currentAccountPctGdp: 2.6, centralBank: 'Bank of Russia' },
-  { code: 'ZA', name: 'Afrika Selatan', blocs: ['brics'], gdpUsdTn: 0.4, population: 63, inflationPct: 4.4, policyRatePct: 7.75, unemploymentPct: 32.1, govDebtPctGdp: 75, currentAccountPctGdp: -1.6, centralBank: 'South African Reserve Bank' },
-  { code: 'SA', name: 'Arab Saudi', blocs: ['brics'], gdpUsdTn: 1.1, population: 34, inflationPct: 1.7, policyRatePct: 5.0, unemploymentPct: 3.5, govDebtPctGdp: 30, currentAccountPctGdp: -0.5, centralBank: 'Saudi Central Bank' },
-  { code: 'TR', name: 'Turki', blocs: ['nato'], gdpUsdTn: 1.3, population: 86, inflationPct: 44.4, policyRatePct: 47.5, unemploymentPct: 8.6, govDebtPctGdp: 26, currentAccountPctGdp: -1.0, centralBank: 'Central Bank of Türkiye' },
-  { code: 'SG', name: 'Singapura', blocs: ['asean'], gdpUsdTn: 0.55, population: 6, inflationPct: 2.4, policyRatePct: 3.1, unemploymentPct: 2.0, govDebtPctGdp: 175, currentAccountPctGdp: 17.5, centralBank: 'Monetary Authority of Singapore' },
+  { code: 'RU', name: 'Russia', blocs: ['brics'], gdpUsdTn: 2.2, population: 144, inflationPct: 8.4, policyRatePct: 21.0, unemploymentPct: 2.3, govDebtPctGdp: 20, currentAccountPctGdp: 2.6, centralBank: 'Bank of Russia' },
+  { code: 'ZA', name: 'South Africa', blocs: ['brics'], gdpUsdTn: 0.4, population: 63, inflationPct: 4.4, policyRatePct: 7.75, unemploymentPct: 32.1, govDebtPctGdp: 75, currentAccountPctGdp: -1.6, centralBank: 'South African Reserve Bank' },
+  { code: 'SA', name: 'Saudi Arabia', blocs: ['brics'], gdpUsdTn: 1.1, population: 34, inflationPct: 1.7, policyRatePct: 5.0, unemploymentPct: 3.5, govDebtPctGdp: 30, currentAccountPctGdp: -0.5, centralBank: 'Saudi Central Bank' },
+  { code: 'TR', name: 'Türkiye', blocs: ['nato'], gdpUsdTn: 1.3, population: 86, inflationPct: 44.4, policyRatePct: 47.5, unemploymentPct: 8.6, govDebtPctGdp: 26, currentAccountPctGdp: -1.0, centralBank: 'Central Bank of Türkiye' },
+  { code: 'SG', name: 'Singapore', blocs: ['asean'], gdpUsdTn: 0.55, population: 6, inflationPct: 2.4, policyRatePct: 3.1, unemploymentPct: 2.0, govDebtPctGdp: 175, currentAccountPctGdp: 17.5, centralBank: 'Monetary Authority of Singapore' },
   { code: 'TH', name: 'Thailand', blocs: ['asean'], gdpUsdTn: 0.53, population: 72, inflationPct: 0.4, policyRatePct: 2.25, unemploymentPct: 1.0, govDebtPctGdp: 62, currentAccountPctGdp: 2.1, centralBank: 'Bank of Thailand' },
   { code: 'VN', name: 'Vietnam', blocs: ['asean'], gdpUsdTn: 0.47, population: 101, inflationPct: 3.6, policyRatePct: 4.5, unemploymentPct: 2.2, govDebtPctGdp: 35, currentAccountPctGdp: 4.7, centralBank: 'State Bank of Vietnam' },
 ]
@@ -93,7 +93,7 @@ export interface RateScenario {
 
 export interface RateImpact {
   lendingRateChangePp: number
-  channels: { name: string; direction: 'naik' | 'turun'; note: string }[]
+  channels: { name: string; direction: 'up' | 'down'; note: string }[]
   /** Rough, clearly-labelled magnitude on a household's monthly payment. */
   monthlyPaymentChangePct: number
   lagNote: string
@@ -112,19 +112,19 @@ export function rateImpact(s: RateScenario): RateImpact {
     lendingRateChangePp,
     monthlyPaymentChangePct,
     channels: [
-      { name: 'Biaya kredit rumah tangga', direction: up ? 'naik' : 'turun',
-        note: up ? 'Cicilan KPR dan kredit konsumsi bertambah, menekan konsumsi.' : 'Cicilan turun, menyisakan ruang belanja rumah tangga.' },
-      { name: 'Investasi usaha', direction: up ? 'turun' : 'naik',
-        note: up ? 'Proyek dengan imbal hasil tipis menjadi tidak layak sehingga ditunda.' : 'Proyek yang tadinya marginal menjadi layak dibiayai.' },
-      { name: 'Nilai tukar', direction: up ? 'naik' : 'turun',
-        note: up ? 'Imbal hasil lebih tinggi menarik modal masuk sehingga mata uang cenderung menguat — ini juga menekan inflasi impor.' : 'Modal cenderung keluar, mata uang melemah, harga barang impor naik.' },
-      { name: 'Harga aset', direction: up ? 'turun' : 'naik',
-        note: up ? 'Tingkat diskonto naik sehingga penilaian saham dan properti tertekan.' : 'Tingkat diskonto turun sehingga penilaian aset terangkat.' },
-      { name: 'Inflasi', direction: up ? 'turun' : 'naik',
-        note: 'Arah yang dituju kebijakan — namun ini kanal yang paling lambat dan paling tidak pasti.' },
+      { name: 'Household borrowing costs', direction: up ? 'up' : 'down',
+        note: up ? 'Mortgage and consumer-loan payments rise, squeezing consumption.' : 'Payments fall, freeing up household spending.' },
+      { name: 'Business investment', direction: up ? 'down' : 'up',
+        note: up ? 'Projects with thin returns become unviable and get postponed.' : 'Previously marginal projects become viable to finance.' },
+      { name: 'Exchange rate', direction: up ? 'up' : 'down',
+        note: up ? 'Higher yields attract capital inflows, so the currency tends to strengthen — this also curbs imported inflation.' : 'Capital tends to flow out, the currency weakens, and import prices rise.' },
+      { name: 'Asset prices', direction: up ? 'down' : 'up',
+        note: up ? 'The discount rate rises, pressuring stock and property valuations.' : 'The discount rate falls, lifting asset valuations.' },
+      { name: 'Inflation', direction: up ? 'down' : 'up',
+        note: 'The direction policy is aiming for — but this is the slowest and least certain channel.' },
     ],
     lagNote:
-      'Kebijakan moneter bekerja dengan jeda panjang dan berubah-ubah — umumnya 4 sampai 8 kuartal sebelum dampak penuhnya pada inflasi terlihat. Karena itu menilai keberhasilan kenaikan suku bunga dari data satu atau dua bulan berikutnya hampir selalu menyesatkan.',
+      'Monetary policy works with long and variable lags — typically 4 to 8 quarters before its full impact on inflation shows up. That is why judging the success of a rate hike from one or two months of subsequent data is almost always misleading.',
   }
 }
 
@@ -215,7 +215,7 @@ export function analyseTrade(t: TradeInput): TradeAnalysis {
       ? `Surplus ${balancePctGdp.toFixed(1)}% dari PDB.`
       : `Defisit ${Math.abs(balancePctGdp).toFixed(1)}% dari PDB.`,
     caution: balanceUsdBn >= 0
-      ? 'Surplus perdagangan sering dianggap otomatis baik, padahal belum tentu. Surplus bisa berasal dari permintaan domestik yang lemah sehingga impor turun — gejala perlambatan, bukan kekuatan. Yang perlu dilihat adalah dari mana surplus itu datang.'
-      : 'Defisit perdagangan tidak otomatis buruk. Defisit yang membiayai impor barang modal dan mesin membangun kapasitas produksi di masa depan; defisit yang membiayai konsumsi barang jadi tidak. Komposisinya lebih menentukan daripada angkanya.',
+      ? "A trade surplus is often assumed to automatically be good, but it isn't necessarily. A surplus can come from weak domestic demand pulling imports down — a symptom of slowdown, not strength. What matters is where the surplus comes from."
+      : "A trade deficit isn't automatically bad. A deficit that finances imports of capital goods and machinery builds future production capacity; one that finances consumption of finished goods does not. Composition matters more than the number.",
   }
 }

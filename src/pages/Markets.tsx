@@ -18,13 +18,13 @@ import { api, backendEnabled, type MarketQuote, type MarketInstrument, type Live
 const REFRESH_MS = 60_000
 
 const GROUP_LABEL: Record<string, string> = {
-  indeks: 'Indeks', 'saham-id': 'Saham Indonesia', 'saham-us': 'Saham AS',
-  kripto: 'Kripto', valas: 'Valas', komoditas: 'Komoditas',
+  indeks: 'Indices', 'saham-id': 'Indonesian Stocks', 'saham-us': 'US Stocks',
+  kripto: 'Crypto', valas: 'Forex', komoditas: 'Commodities',
 }
 
 const RANGES = [
-  { v: '1d', l: '1H' }, { v: '5d', l: '5H' }, { v: '1mo', l: '1B' },
-  { v: '6mo', l: '6B' }, { v: '1y', l: '1T' }, { v: '5y', l: '5T' },
+  { v: '1d', l: '1D' }, { v: '5d', l: '5D' }, { v: '1mo', l: '1M' },
+  { v: '6mo', l: '6M' }, { v: '1y', l: '1Y' }, { v: '5y', l: '5Y' },
 ]
 
 function fmtPrice(v: number | null, currency: string): string {
@@ -39,10 +39,10 @@ function ago(iso: string | number | null): string {
   const t = typeof iso === 'number' ? iso : Date.parse(iso)
   if (Number.isNaN(t)) return ''
   const s = Math.floor((Date.now() - t) / 1000)
-  if (s < 60) return 'baru saja'
-  if (s < 3600) return `${Math.floor(s / 60)} menit lalu`
-  if (s < 86400) return `${Math.floor(s / 3600)} jam lalu`
-  return `${Math.floor(s / 86400)} hari lalu`
+  if (s < 60) return 'just now'
+  if (s < 3600) return `${Math.floor(s / 60)} minutes ago`
+  if (s < 86400) return `${Math.floor(s / 3600)} hours ago`
+  return `${Math.floor(s / 86400)} days ago`
 }
 
 export function Markets() {
@@ -81,7 +81,7 @@ export function Markets() {
       setFetchedAt(Date.now())
       setErr('')
     } catch {
-      setErr('Data pasar sedang tidak dapat diambil. Angka yang tampil di bawah adalah pengambilan terakhir yang berhasil.')
+      setErr('Market data could not be fetched right now. The numbers shown below are from the last successful fetch.')
     } finally {
       setLoading(false)
     }
@@ -151,8 +151,8 @@ export function Markets() {
       <div className="mx-auto max-w-xl p-4">
         <Card className="!p-5">
           <p className="text-[13px] leading-relaxed text-neutral-600 dark:text-neutral-300">
-            Data pasar memerlukan backend aktif. Halaman ini mengambil harga melalui server
-            Panaceamed agar kunci dan pembatasan laju tidak terekspos di browser.
+            Market data requires an active backend. This page fetches prices through the
+            Panaceamed server so API keys and rate limits aren't exposed in the browser.
           </p>
         </Card>
       </div>
@@ -164,8 +164,8 @@ export function Markets() {
       <div className="flex items-center gap-3">
         <span className="grid h-11 w-11 place-items-center rounded-2xl bg-brand-50 text-2xl">📈</span>
         <div>
-          <h1 className="text-lg font-black text-ink dark:text-ink">Data Pasar</h1>
-          <p className="text-xs text-neutral-500">Harga, grafik, dan berita — diperbarui otomatis</p>
+          <h1 className="text-lg font-black text-ink dark:text-ink">Market Data</h1>
+          <p className="text-xs text-neutral-500">Prices, charts, and news — auto-updated</p>
         </div>
       </div>
 
@@ -175,16 +175,16 @@ export function Markets() {
         <div className="flex items-start gap-2 rounded-xl bg-amber-50 p-3 dark:bg-amber-500/10">
           <span className="text-base">⚠️</span>
           <p className="text-[12px] leading-relaxed text-amber-900 dark:text-amber-200">
-            Harga di halaman ini <b>tertunda dan bersifat indikatif</b> — sumber gratis umumnya
-            tertinggal sekitar 15 menit dari bursa dan sesekali bisa kosong. Adequate untuk memantau
-            dan belajar, <b>tidak layak dipakai untuk keputusan jual-beli yang bergantung pada harga
-            saat ini</b>. Halaman ini juga tidak memberi rekomendasi membeli maupun menjual apa pun.
+            Prices on this page are <b>delayed and indicative</b> — free sources typically lag
+            about 15 minutes behind the exchange and can occasionally be empty. Adequate for monitoring
+            and learning, <b>not suitable for buy/sell decisions that depend on the current
+            price</b>. This page also does not recommend buying or selling anything.
           </p>
         </div>
         {fetchedAt && (
           <div className="mt-2 flex items-center justify-between text-[11px] text-neutral-500">
-            <span>Diperbarui {ago(fetchedAt)} · sumber Yahoo Finance</span>
-            <button onClick={loadWatchlist} className="font-bold text-brand-dark hover:underline">Muat ulang</button>
+            <span>Updated {ago(fetchedAt)} · source Yahoo Finance</span>
+            <button onClick={loadWatchlist} className="font-bold text-brand-dark hover:underline">Reload</button>
           </div>
         )}
       </Card>
@@ -194,12 +194,12 @@ export function Markets() {
       )}
 
       <Card className="!p-4">
-        <input className={inputClass} placeholder="Cari apa pun (mis. Solana, ringgit, BBCA, emas)…"
+        <input className={inputClass} placeholder="Search anything (e.g. Solana, ringgit, BBCA, gold)…"
           value={search} onChange={(e) => setSearch(e.target.value)} />
         <div className="mt-2 flex flex-wrap gap-1.5">
           <button onClick={() => setGroup(null)}
             className={`rounded-full px-3 py-1.5 text-[11px] font-bold ${!group ? 'bg-brand text-white' : 'bg-neutral-100 text-neutral-600 dark:bg-white/10'}`}>
-            Semua
+            All
           </button>
           {Object.keys(GROUP_LABEL).map((g) => (
             <button key={g} onClick={() => setGroup(group === g ? null : g)}
@@ -218,23 +218,23 @@ export function Markets() {
         </div>
       </Card>
 
-      {loading && <Card className="!p-4"><p className="text-[12px] text-neutral-500">Memuat data pasar…</p></Card>}
+      {loading && <Card className="!p-4"><p className="text-[12px] text-neutral-500">Loading market data…</p></Card>}
 
       {search.trim().length >= 2 && (
         <Card className="!p-4">
           <div className="text-[11px] font-black uppercase tracking-wide text-neutral-500">
-            Hasil pencarian "{search.trim()}"
+            Search results for "{search.trim()}"
           </div>
-          {searching && <p className="mt-2 text-[12px] text-neutral-500">Mencari…</p>}
+          {searching && <p className="mt-2 text-[12px] text-neutral-500">Searching…</p>}
           {!searching && !hitsBaru.length && !visible.length && (
             <p className="mt-2 text-[12px] leading-relaxed text-neutral-500">
-              Tidak ada yang cocok. Coba nama lain, kode bursanya, atau bahasa Inggris —
-              misalnya "Solana", "SOL-USD", atau "gold".
+              Nothing matches. Try another name, its ticker symbol, or English —
+              for example "Solana", "SOL-USD", or "gold".
             </p>
           )}
           {!searching && !!hitsBaru.length && (
             <>
-              <p className="mt-1 text-[11px] text-neutral-500">Di luar daftar pantau — ketuk untuk membuka</p>
+              <p className="mt-1 text-[11px] text-neutral-500">Not on your watchlist — tap to open</p>
               <div className="mt-2 space-y-1.5">
                 {hitsBaru.map((h) => (
                   <button key={h.symbol} onClick={() => { setSelected(h.symbol); setSearch('') }}
@@ -295,7 +295,7 @@ export function Markets() {
                     <Tooltip
                       contentStyle={{ fontSize: 11 }}
                       labelFormatter={(v) => new Date(v as number).toLocaleString('en-GB')}
-                      formatter={(v) => [fmtPrice(typeof v === 'number' ? v : null, q.currency), 'Harga']} />
+                      formatter={(v) => [fmtPrice(typeof v === 'number' ? v : null, q.currency), 'Price']} />
                     <Area type="monotone" dataKey="c" stroke={up ? '#00BF63' : '#ef4444'} strokeWidth={2} fill={`url(#g-${q.symbol})`} />
                   </AreaChart>
                 </ResponsiveContainer>
@@ -304,11 +304,11 @@ export function Markets() {
 
             {isOpen && detail && (
               <div className="mt-2 grid grid-cols-2 gap-x-3 gap-y-1 rounded-xl bg-neutral-50 p-3 text-[11px] dark:bg-white/5">
-                <span className="text-neutral-500">Penutupan sebelumnya</span>
+                <span className="text-neutral-500">Previous close</span>
                 <span className="text-right font-bold text-ink dark:text-ink">{fmtPrice(detail.previousClose, detail.currency)}</span>
-                <span className="text-neutral-500">Titik data</span>
+                <span className="text-neutral-500">Data points</span>
                 <span className="text-right font-bold text-ink dark:text-ink">{detail.series.length}</span>
-                <span className="text-neutral-500">Waktu pasar</span>
+                <span className="text-neutral-500">Market time</span>
                 <span className="text-right font-bold text-ink dark:text-ink">{detail.marketTime ? ago(detail.marketTime) : '—'}</span>
               </div>
             )}
@@ -319,23 +319,23 @@ export function Markets() {
       {failed.length > 0 && (
         <Card className="!p-4">
           <p className="text-[11px] leading-relaxed text-neutral-500">
-            Tidak dapat diambil saat ini: {failed.join(', ')}. Ditampilkan apa adanya, bukan
-            disembunyikan — kegagalan pengambilan yang disamarkan membuat Anda mengira data lengkap
-            padahal tidak.
+            Could not be fetched right now: {failed.join(', ')}. Shown as-is rather than
+            hidden — a disguised fetch failure would make you think the data is complete
+            when it isn't.
           </p>
         </Card>
       )}
 
       {news.length > 0 && (
         <Card className="!p-4">
-          <SectionTitle icon={<IconToken size={18} />} title="Berita ekonomi & bisnis" subtitle="Google News — dalam dan luar negeri" />
+          <SectionTitle icon={<IconToken size={18} />} title="Economic & business news" subtitle="Google News — domestic and international" />
           <div className="mt-2 space-y-2">
             {news.slice(0, 14).map((n, i) => (
               <a key={i} href={n.link} target="_blank" rel="noopener noreferrer"
                 className="block rounded-xl bg-neutral-50 p-3 transition hover:bg-neutral-100 dark:bg-white/5">
                 <div className="text-[12px] font-semibold leading-snug text-ink dark:text-ink">{n.title}</div>
                 <div className="mt-0.5 flex items-center gap-2 text-[10px] text-neutral-500">
-                  <Badge tone="low">{n.region === 'domestic' ? 'Domestik' : 'Internasional'}</Badge>
+                  <Badge tone="low">{n.region === 'domestic' ? 'Domestic' : 'International'}</Badge>
                   {n.source && <span>{n.source}</span>}
                   {n.pubDate && <span>· {ago(n.pubDate)}</span>}
                 </div>
@@ -346,9 +346,9 @@ export function Markets() {
       )}
 
       <div className="rounded-2xl border border-neutral-100 bg-white p-4 text-center text-[11px] leading-relaxed text-neutral-500 dark:border-white/10 dark:bg-white/5">
-        Data harga disediakan melalui Yahoo Finance dan bersifat tertunda serta indikatif.
-        Panaceamed tidak memberikan nasihat investasi, tidak merekomendasikan pembelian maupun
-        penjualan efek, dan bukan perusahaan efek berizin.
+        Price data is provided via Yahoo Finance and is delayed and indicative.
+        Panaceamed does not provide investment advice, does not recommend buying or
+        selling securities, and is not a licensed securities firm.
       </div>
     </div>
   )
