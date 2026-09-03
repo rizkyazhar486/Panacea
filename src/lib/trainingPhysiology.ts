@@ -237,22 +237,22 @@ export function statusLatihan(b: BebanRingkas, vo2Tren: number | null): StatusLa
   }
   const r = b.acwrDapatDipercaya ? b.acwr : null
   if (!b.acwrDapatDipercaya && b.hariAktif7 > 0) {
-    return { key: 'pemeliharaan', label: 'Sedang membangun dasar', warna: W.biru,
+    return { key: 'pemeliharaan', label: 'Building a base', warna: W.biru,
       penjelasan: `Your history covers only ${b.rentangHariData} days so far. The 7:28-day load ratio means little until there are about four weeks behind it — early on it always looks like a spike, simply because the comparison window is nearly empty, not because you are overdoing it.`,
       saran: 'Carry on, adding at most 10% volume per week. Load assessment starts to mean something after four weeks.' }
   }
   if (b.hariAktif7 === 0) {
-    return { key: 'istirahat', label: 'Istirahat', warna: W.abu,
+    return { key: 'istirahat', label: 'Resting', warna: W.abu,
       penjelasan: 'No sessions in the past seven days. Fitness you have already built lasts several weeks, so a short break does not erase it.',
       saran: 'If this was deliberate, nothing needs fixing. If it was not, start again with one easy session.' }
   }
   if (r != null && r < 0.8) {
-    return { key: 'menurun', label: 'Menurun', warna: W.biru,
+    return { key: 'menurun', label: 'Declining', warna: W.biru,
       penjelasan: `This week's load (${b.akut.toFixed(0)}/day) is well below your usual (${b.kronis.toFixed(0)}/day). Fitness starts to decay if that continues for weeks.`,
       saran: 'If this is a deliberate recovery week, leave it. If not, bring the volume back gradually.' }
   }
   if (r != null && r > 1.5) {
-    return { key: 'berlebih', label: 'Beban melonjak', warna: W.merah,
+    return { key: 'berlebih', label: 'Load spiking', warna: W.merah,
       penjelasan: `The last seven days sit at ${r.toFixed(2)}× your usual load. A jump this size is associated with raised injury risk across several studies, although the exact threshold is still debated.`,
       saran: 'Reduce volume next week rather than adding. Connective tissue adapts far more slowly than the heart and lungs.' }
   }
@@ -263,11 +263,11 @@ export function statusLatihan(b: BebanRingkas, vo2Tren: number | null): StatusLa
   }
   if (vo2Tren != null && vo2Tren > 0.3) {
     return { key: r != null && r > 1.3 ? 'puncak' : 'produktif', warna: W.hijau,
-      label: r != null && r > 1.3 ? 'Puncak' : 'Produktif',
+      label: r != null && r > 1.3 ? 'Peaking' : 'Productive',
       penjelasan: `Your VO2max rose by ${vo2Tren.toFixed(1)} over this period on a controlled load. This is exactly the state to aim for.`,
       saran: 'Keep it as it is. Big changes are not needed while something is working.' }
   }
-  return { key: 'pemeliharaan', label: 'Pemeliharaan', warna: W.biru,
+  return { key: 'pemeliharaan', label: 'Maintaining', warna: W.biru,
     penjelasan: `Your load matches your usual (${(r ?? 1).toFixed(2)}×) and fitness is flat. This maintains rather than builds.`,
     saran: 'To progress, add at most 10% volume per week — or one quality session, but not both at once.' }
 }
@@ -281,7 +281,7 @@ export interface TrainingEffect {
   labelAnaerobik: string
 }
 
-const TE_LABEL = ['None', 'Ringan', 'Mempertahankan', 'Meningkatkan', 'Sangat meningkatkan', 'Berlebih']
+const TE_LABEL = ['None', 'Minor', 'Maintaining', 'Improving', 'Highly improving', 'Overreaching']
 
 export function labelTE(v: number): string {
   return TE_LABEL[Math.min(5, Math.max(0, Math.round(v)))]
@@ -480,7 +480,7 @@ export function kesiapan(opsi: {
   if (opsi.tidurJam != null) {
     const d = opsi.tidurJam >= 7.5 ? 12 : opsi.tidurJam >= 6.5 ? 4 : opsi.tidurJam >= 5.5 ? -8 : -18
     skor += d
-    faktor.push({ nama: 'Last night’s sleep', nilai: `${opsi.tidurJam.toFixed(1)} jam`, bobot: d > 0 ? `+${d}` : `${d}`,
+    faktor.push({ nama: 'Last night’s sleep', nilai: `${opsi.tidurJam.toFixed(1)} h`, bobot: d > 0 ? `+${d}` : `${d}`,
       arah: d > 4 ? 'baik' : d >= 0 ? 'netral' : 'kurang' })
   }
   if (opsi.hrvMs != null && opsi.hrvBaseline != null && opsi.hrvBaseline > 0) {
@@ -500,7 +500,7 @@ export function kesiapan(opsi: {
   if (opsi.pemulihanSisaJam != null && opsi.pemulihanSisaJam > 0) {
     const d = opsi.pemulihanSisaJam > 24 ? -18 : opsi.pemulihanSisaJam > 12 ? -10 : -4
     skor += d
-    faktor.push({ nama: 'Recovery time remaining', nilai: `${Math.round(opsi.pemulihanSisaJam)} jam`, bobot: `${d}`, arah: 'kurang' })
+    faktor.push({ nama: 'Recovery time remaining', nilai: `${Math.round(opsi.pemulihanSisaJam)} h`, bobot: `${d}`, arah: 'kurang' })
   }
   if (opsi.acwr != null) {
     const d = opsi.acwr > 1.5 ? -12 : opsi.acwr > 1.3 ? -5 : opsi.acwr < 0.8 ? 3 : 2
@@ -510,7 +510,7 @@ export function kesiapan(opsi: {
   }
 
   skor = Math.max(1, Math.min(100, Math.round(skor)))
-  const label = skor >= 80 ? 'Siap' : skor >= 65 ? 'Adequate siap' : skor >= 45 ? 'Sedang' : skor >= 25 ? 'Rendah' : 'Sangat rendah'
+  const label = skor >= 80 ? 'Ready' : skor >= 65 ? 'Fairly ready' : skor >= 45 ? 'Moderate' : skor >= 25 ? 'Low' : 'Very low'
   const warna = skor >= 80 ? '#34d399' : skor >= 65 ? '#a3e635' : skor >= 45 ? '#fbbf24' : '#f87171'
   const saran = skor >= 80 ? 'A good day for a quality session if one is scheduled.'
     : skor >= 65 ? 'The scheduled session can go ahead; reassess after the warm-up.'
@@ -550,7 +550,7 @@ export function saranSesiHarian(k: Kesiapan, b: BebanRingkas, pemulihanSisaJam: 
       alasan: 'Readiness is moderate — easy volume still builds the aerobic base without adding meaningful fatigue.' }
   }
   return { judul: 'Easy session 20–30 minutes, or rest',
-    rincian: 'Zona 1-2 saja.',
+    rincian: 'Zones 1-2 only.',
     alasan: 'Readiness is below your normal. An easy session still aids recovery; a hard one does not.' }
 }
 
@@ -588,7 +588,7 @@ export function skorKetahanan(sesi: SesiTerhitung[], sekarang = Date.now()): Ket
   const aVolume = Math.min(25, (s90.reduce((a, s) => a + s.durasiDetik, 0) / 3600 / 60) * 25)
   const skor = Math.round(aDurasi + aKonsisten + aVolume)
 
-  const label = skor >= 75 ? 'Sangat baik' : skor >= 55 ? 'Baik' : skor >= 35 ? 'Sedang' : 'Berkembang'
+  const label = skor >= 75 ? 'Very good' : skor >= 55 ? 'Good' : skor >= 35 ? 'Moderate' : 'Developing'
   return {
     skor, label,
     terpanjangKm: terpanjangKm > 0 ? +terpanjangKm.toFixed(2) : null,
@@ -633,7 +633,7 @@ export const UNAVAILABLE: { fitur: string; kenapa: string; syarat: string; adaDi
     adaDi: '/alat-endurance',
   },
   {
-    fitur: 'Catatan saturasi oksigen',
+    fitur: 'Oxygen saturation log',
     kenapa: 'CONTINUOUS monitoring is not possible — an Apple Watch measures only occasionally. What is provided is a log and a trend of readings, together with an altitude adjustment and a list of causes of falsely low readings.',
     syarat: 'Readings from any device, logged by you.',
     adaDi: '/pelacak-klinis',
@@ -645,7 +645,7 @@ export const UNAVAILABLE: { fitur: string; kenapa: string; syarat: string; adaDi
     adaDi: '/pelacak-klinis',
   },
   {
-    fitur: 'Penasihat jet lag',
+    fitur: 'Jet lag adviser',
     kenapa: 'Location data is not synced, so travel is not detected on its own. You enter the time zones, and a daily light and sleep plan is drawn up for before, during, and after the flight.',
     syarat: 'Your origin and destination time zones.',
     adaDi: '/pelacak-klinis',
@@ -657,7 +657,7 @@ export const UNAVAILABLE: { fitur: string; kenapa: string; syarat: string; adaDi
     adaDi: '/pelacak-klinis',
   },
   {
-    fitur: 'Fisiologi kursi roda',
+    fitur: 'Wheelchair physiology',
     kenapa: 'This needs its own reference rather than an estimate from running data. Zones are computed from peak heart rate while pushing, alongside shoulder-care guidance and a warning about autonomic dysreflexia.',
     syarat: 'The peak heart rate you observe while pushing.',
     adaDi: '/pelacak-klinis',

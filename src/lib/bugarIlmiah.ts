@@ -51,58 +51,58 @@ export interface Sumber {
 export const SUMBER: Record<string, Sumber> = {
   kodama: {
     kunci: 'kodama',
-    kutipan: 'Kodama S, dkk. JAMA. 2009;301(19):2024-35.',
-    n: 'meta-analisis 33 kohort, 102.980 orang',
-    catatan: 'Setiap kenaikan 1 MET kapasitas aerobik berkaitan dengan kematian segala sebab 13% lebih rendah (HR 0,87; IK95% 0,84-0,90).',
+    kutipan: 'Kodama S, et al. JAMA. 2009;301(19):2024-35.',
+    n: 'meta-analysis of 33 cohorts, 102,980 people',
+    catatan: 'Each 1 MET rise in aerobic capacity is associated with 13% lower all-cause mortality (HR 0.87; 95% CI 0.84-0.90).',
   },
   mandsager: {
     kunci: 'mandsager',
-    kutipan: 'Mandsager K, dkk. JAMA Netw Open. 2018;1(6):e183605.',
-    n: '122.007 uji treadmill',
-    catatan: 'Kebugaran kelompok elite dibanding kelompok terendah berkaitan dengan kematian jauh lebih rendah (HR sekitar 0,20). Kebugaran rendah berkaitan dengan risiko yang sebanding atau melebihi merokok dan diabetes.',
+    kutipan: 'Mandsager K, et al. JAMA Netw Open. 2018;1(6):e183605.',
+    n: '122,007 treadmill tests',
+    catatan: 'Elite fitness versus the lowest group is associated with far lower mortality (HR around 0.20). Low fitness carries risk comparable to, or exceeding, smoking and diabetes.',
   },
   ross: {
     kunci: 'ross',
-    kutipan: 'Ross R, dkk. Circulation. 2016;134:e653-99 (pernyataan ilmiah AHA).',
-    catatan: 'Kapasitas aerobik dianjurkan diperlakukan sebagai TANDA VITAL KLINIS, bukan sekadar ukuran olahraga.',
+    kutipan: 'Ross R, et al. Circulation. 2016;134:e653-99 (AHA scientific statement).',
+    catatan: 'Aerobic capacity is recommended to be treated as a CLINICAL VITAL SIGN, not merely a measure of exercise.',
   },
   friend: {
     kunci: 'friend',
-    kutipan: 'Kaminsky LA, dkk. Mayo Clin Proc — registri FRIEND.',
-    catatan: 'Nilai rujukan VO2max menurut usia dan jenis kelamin. Angka di berkas ini adalah TITIK TENGAH PENDEKATAN dari data serupa, bukan persentil hasil ukur, dan berlaku untuk uji TREADMILL — uji sepeda menghasilkan nilai sekitar 10-15% lebih rendah.',
+    kutipan: 'Kaminsky LA, et al. Mayo Clin Proc — the FRIEND registry.',
+    catatan: 'VO2max reference values by age and sex. The numbers in this file are APPROXIMATE MIDPOINTS drawn from comparable data, not measured percentiles, and apply to TREADMILL testing — cycle testing yields values roughly 10-15% lower.',
   },
   uth: {
     kunci: 'uth',
-    kutipan: 'Uth N, dkk. Eur J Appl Physiol. 2004;91(1):111-5.',
-    catatan: 'VO2max diperkirakan dari 15,3 x (denyut maksimal / denyut istirahat). Perkiraan, bukan pengukuran: selisihnya terhadap uji langsung dapat mencapai belasan persen.',
+    kutipan: 'Uth N, et al. Eur J Appl Physiol. 2004;91(1):111-5.',
+    catatan: 'VO2max estimated from 15.3 × (maximum heart rate / resting heart rate). An estimate, not a measurement: it can differ from direct testing by well over ten per cent.',
   },
   leong: {
     kunci: 'leong',
-    kutipan: 'Leong DP, dkk. Lancet. 2015;386(9990):266-73 (studi PURE).',
-    n: '139.691 orang, 17 negara',
-    catatan: 'Setiap 5 kg kekuatan genggam yang LEBIH RENDAH berkaitan dengan kematian segala sebab 16% lebih tinggi (HR 1,16; IK95% 1,13-1,20).',
+    kutipan: 'Leong DP, et al. Lancet. 2015;386(9990):266-73 (the PURE study).',
+    n: '139,691 people, 17 countries',
+    catatan: 'Each 5 kg LOWER grip strength is associated with 16% higher all-cause mortality (HR 1.16; 95% CI 1.13-1.20).',
   },
   paluch: {
     kunci: 'paluch',
-    kutipan: 'Paluch AE, dkk. Lancet Public Health. 2022;7(3):e219-28.',
-    n: 'meta-analisis 15 kohort, 47.471 orang',
-    catatan: 'Kematian menurun seiring bertambahnya langkah harian, lalu MENDATAR: sekitar 6.000-8.000 langkah pada usia 60 tahun ke atas, dan sekitar 8.000-10.000 langkah pada usia di bawah 60 tahun. Kecepatan langkah tidak menambah manfaat setelah jumlahnya diperhitungkan.',
+    kutipan: 'Paluch AE, et al. Lancet Public Health. 2022;7(3):e219-28.',
+    n: 'meta-analysis of 15 cohorts, 47,471 people',
+    catatan: 'Mortality falls as daily steps rise, then PLATEAUS: around 6,000-8,000 steps at age 60 and above, and around 8,000-10,000 steps below 60. Stepping pace adds no further benefit once the count is accounted for.',
   },
   wen: {
     kunci: 'wen',
-    kutipan: 'Wen CP, dkk. Lancet. 2011;378(9798):1244-53.',
-    n: '416.175 orang',
-    catatan: 'Aktivitas 15 menit sehari berkaitan dengan kematian segala sebab 14% lebih rendah dibanding tidak beraktivitas.',
+    kutipan: 'Wen CP, et al. Lancet. 2011;378(9798):1244-53.',
+    n: '416,175 people',
+    catatan: 'Fifteen minutes of activity a day is associated with 14% lower all-cause mortality than being inactive.',
   },
   seiler: {
     kunci: 'seiler',
     kutipan: 'Seiler S. Int J Sports Physiol Perform. 2010;5(3):276-91.',
-    catatan: 'Atlet ketahanan berprestasi umumnya menempatkan sekitar 80% sesi pada intensitas RENDAH dan sekitar 20% pada intensitas tinggi. Ini gambaran pola yang diamati, bukan resep yang teruji untuk bukan atlet.',
+    catatan: 'Accomplished endurance athletes generally place about 80% of sessions at LOW intensity and about 20% at high intensity. This describes an observed pattern, not a tested prescription for non-athletes.',
   },
   garber: {
     kunci: 'garber',
-    kutipan: 'Garber CE, dkk. Med Sci Sports Exerc. 2011;43(7):1334-59 (ACSM).',
-    catatan: 'Anjuran 150 menit aktivitas sedang atau 75 menit berat per minggu, ditambah latihan kekuatan 2 hari per minggu.',
+    kutipan: 'Garber CE, et al. Med Sci Sports Exerc. 2011;43(7):1334-59 (ACSM).',
+    catatan: 'Recommends 150 minutes of moderate or 75 minutes of vigorous activity per week, plus strength training on 2 days per week.',
   },
 }
 
@@ -138,7 +138,7 @@ export function titikTengahVo2(usia: number, jk: JK): number {
   return baris[baris.length - 1][1]
 }
 
-export type Pita = 'jauh di bawah' | 'di bawah' | 'sekitar' | 'di atas' | 'jauh di atas'
+export type Pita = 'well below' | 'below' | 'around' | 'above' | 'well above'
 
 export interface HasilKebugaran {
   vo2: number
@@ -170,7 +170,7 @@ export function nilaiKebugaran(vo2: number, usia: number, jk: JK): HasilKebugara
   const metTitik = titik / ML_PER_MET
   const selisih = met - metTitik
   const pita: Pita =
-    selisih <= -2 ? 'jauh di bawah' : selisih <= -0.75 ? 'di bawah' : selisih < 0.75 ? 'sekitar' : selisih < 2 ? 'di atas' : 'jauh di atas'
+    selisih <= -2 ? 'well below' : selisih <= -0.75 ? 'below' : selisih < 0.75 ? 'around' : selisih < 2 ? 'above' : 'well above'
   return {
     vo2,
     met,
@@ -208,9 +208,9 @@ export function vo2DariDenyut(hrMaks: number, hrIstirahat: number): PerkiraanVo2
   if (!(hrMaks > 0) || !(hrIstirahat > 0) || hrMaks <= hrIstirahat) return null
   return {
     nilai: 15.3 * (hrMaks / hrIstirahat),
-    cara: 'Perbandingan denyut maksimal terhadap denyut istirahat',
+    cara: 'Ratio of maximum heart rate to resting heart rate',
     sumber: 'uth',
-    ketidakpastian: 'Perkiraan, bukan pengukuran. Selisih terhadap uji langsung dapat mencapai belasan persen, dan paling berguna untuk melihat PERUBAHAN pada orang yang sama.',
+    ketidakpastian: 'An estimate, not a measurement. It can differ from direct testing by well over ten per cent, and is most useful for tracking CHANGE in the same person.',
   }
 }
 
@@ -226,7 +226,7 @@ export function denyutMaksPerkiraan(usia: number): { nilai: number; ketidakpasti
   if (!(usia > 0)) return null
   return {
     nilai: 208 - 0.7 * usia, // Tanaka H, dkk. J Am Coll Cardiol. 2001;37:153-6.
-    ketidakpastian: 'Simpangan baku sekitar 10 denyut. Bila denyut maksimal Anda pernah TERUKUR saat latihan berat, pakailah angka itu — ia jauh lebih baik daripada rumus mana pun.',
+    ketidakpastian: 'Standard deviation is about 10 beats. If your maximum heart rate has ever been MEASURED during hard training, use that figure — it is far better than any formula.',
   }
 }
 
@@ -317,10 +317,10 @@ export function bacaSebaran(menitPerZona: number[]): BacaanSebaran | null {
     selisih: pRendah - 80,
     keterangan:
       pRendah < 65
-        ? 'Bagian intensitas rendah lebih sedikit daripada pola yang diamati pada atlet ketahanan. Pada sebagian orang, pola seperti ini menumpuk kelelahan lebih cepat daripada kebugaran yang didapat.'
+        ? 'Less of the work sits at low intensity than the pattern observed in endurance athletes. In some people this accumulates fatigue faster than the fitness it returns.'
         : pRendah > 92
-          ? 'Hampir seluruhnya intensitas rendah. Pola yang diamati pada atlet ketahanan menyisakan sekitar seperlima sesi pada intensitas tinggi.'
-          : 'Sebaran ini berada di sekitar pola yang diamati pada atlet ketahanan.',
+          ? 'Almost entirely low intensity. The pattern observed in endurance athletes leaves about a fifth of sessions at high intensity.'
+          : 'This distribution sits close to the pattern observed in endurance athletes.',
   }
 }
 

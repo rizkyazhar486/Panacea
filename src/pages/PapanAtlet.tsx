@@ -36,17 +36,6 @@ import { nilaiKebugaran, vo2DariDenyut } from '../lib/bugarIlmiah'
 // jingga upaya.
 // ─────────────────────────────────────────────────────────────────────────────
 
-// Nilai `pita` dari bugarIlmiah adalah DATA berbahasa Indonesia yang dipakai
-// juga di tempat lain; ia tidak diterjemahkan di sumbernya, melainkan
-// dipetakan ke antarmuka di sini. Menerjemahkan nilainya sendiri akan
-// mematahkan setiap perbandingan yang memakainya.
-const PITA_EN: Record<string, string> = {
-  'jauh di bawah': 'well below',
-  'di bawah': 'below',
-  sekitar: 'around',
-  'di atas': 'above',
-  'jauh di atas': 'well above',
-}
 
 const NEON = {
   biru: '#38bdf8',
@@ -408,7 +397,7 @@ export function PapanAtlet() {
             (kardio.perkiraan
               ? 'Estimated from your maximum and resting heart rate, not measured — it can differ from a lab test by over ten percent, and is most useful for watching direction rather than comparing with other people. '
               : '') +
-            `You are ${PITA_EN[kardio.pita] ?? kardio.pita} the midpoint for your age and sex, by ${Math.abs(kardio.selisihMet).toFixed(1)} MET. Kodama 2009 puts each MET at a hazard ratio of 0.87 for all-cause mortality, which places you near ${kardio.hr.toFixed(2)} relative to that midpoint — a figure that applies to GROUPS, never to one person's future.`
+            `You are ${kardio.pita} the midpoint for your age and sex, by ${Math.abs(kardio.selisihMet).toFixed(1)} MET. Kodama 2009 puts each MET at a hazard ratio of 0.87 for all-cause mortality, which places you near ${kardio.hr.toFixed(2)} relative to that midpoint — a figure that applies to GROUPS, never to one person's future.`
           }
         >
           {/* Posisi terhadap titik tengah seusia, bukan terhadap pita tetap.
