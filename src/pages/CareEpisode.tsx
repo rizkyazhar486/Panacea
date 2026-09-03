@@ -8,7 +8,7 @@ import {
   STAGE_LABEL,
   STATUS_LABEL,
   newCareEpisode,
-  nextStage,
+  nextStages,
   isComplete,
   setStageStatus,
   formatCostRange,
@@ -17,7 +17,8 @@ import type { CareEpisode, CareEpisodeStageId, CareEpisodeStageStatus } from '..
 
 // The Care Episode Graph: connects a clinical plan to what actually has to
 // happen to carry it out — provider, cost, schedule, treatment, recovery,
-// follow-up, outcome. Prototype scope: one linear stage list per episode,
+// follow-up, outcome. Recovery and follow-up run in parallel once treatment
+// is done (see lib/careEpisode.ts's STAGE_DEPENDENCIES). One episode is
 // tracked against the active patient's EMR record. See lib/careEpisode.ts.
 
 export function CareEpisodePage() {
@@ -110,7 +111,7 @@ function EpisodeCard({
   onChange: (next: CareEpisode) => void
   onRemove: () => void
 }) {
-  const next = nextStage(episode)
+  const next = nextStages(episode)
   const done = isComplete(episode)
   const cost = formatCostRange(episode)
 
@@ -129,7 +130,11 @@ function EpisodeCard({
         <div>
           <h3 className="font-bold text-ink">{episode.title}</h3>
           <p className="text-xs text-neutral-500">
-            {done ? 'Complete' : next ? `Next: ${STAGE_LABEL[next.stage]}` : 'On track'}
+            {done
+              ? 'Complete'
+              : next.length > 0
+                ? `Next: ${next.map((s) => STAGE_LABEL[s.stage]).join(' + ')}`
+                : 'On track'}
             {cost ? ` · Est. ${cost}` : ''}
           </p>
         </div>

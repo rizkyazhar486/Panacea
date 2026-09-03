@@ -23,6 +23,25 @@ export const CARE_EPISODE_STAGES: CareEpisodeStageId[] = [
   'outcome',
 ]
 
+// Real care journeys aren't strictly linear: recovery and follow-up both
+// start once treatment is done, and can proceed independently of each
+// other — a patient can complete physiotherapy before their follow-up
+// appointment happens, or vice versa. This map is the source of truth for
+// activation order; CARE_EPISODE_STAGES above stays a flat list purely for
+// display order. Every stage not listed here depends on the one before it.
+const STAGE_DEPENDENCIES: Partial<Record<CareEpisodeStageId, CareEpisodeStageId[]>> = {
+  recovery: ['treatment'],
+  followUp: ['treatment'],
+  outcome: ['recovery', 'followUp'],
+}
+
+function dependenciesOf(stage: CareEpisodeStageId): CareEpisodeStageId[] {
+  const explicit = STAGE_DEPENDENCIES[stage]
+  if (explicit) return explicit
+  const idx = CARE_EPISODE_STAGES.indexOf(stage)
+  return idx > 0 ? [CARE_EPISODE_STAGES[idx - 1]] : []
+}
+
 export const STAGE_LABEL: Record<CareEpisodeStageId, string> = {
   problem: 'Problem',
   diagnosis: 'Diagnosis',
@@ -60,14 +79,16 @@ export function newCareEpisode(title: string, problemId?: string): CareEpisode {
 }
 
 // The single most useful thing this graph can answer: "what should happen
-// next?" — the first stage that isn't done yet. Blocked stages take
-// priority since they're what's actually stalling the journey.
-export function nextStage(episode: CareEpisode): CareEpisodeStage | undefined {
-  return (
-    episode.stages.find((s) => s.status === 'blocked') ??
-    episode.stages.find((s) => s.status === 'active') ??
-    episode.stages.find((s) => s.status === 'pending')
-  )
+// next?" — every stage that's currently actionable. Since recovery and
+// follow-up can run in parallel, this can return more than one stage at a
+// time; blocked stages are listed first since they're what's actually
+// stalling the journey.
+export function nextStages(episode: CareEpisode): CareEpisodeStage[] {
+  const blocked = episode.stages.filter((s) => s.status === 'blocked')
+  const active = episode.stages.filter((s) => s.status === 'active')
+  if (blocked.length || active.length) return [...blocked, ...active]
+  const pending = episode.stages.find((s) => s.status === 'pending')
+  return pending ? [pending] : []
 }
 
 export function isComplete(episode: CareEpisode): boolean {
@@ -92,11 +113,19 @@ export function setStageStatus(
         }
       : s,
   )
-  // Moving a stage to 'done' activates the next pending stage automatically,
-  // so the journey keeps advancing without manual bookkeeping.
-  const idx = CARE_EPISODE_STAGES.indexOf(stage)
-  if (status === 'done' && idx >= 0 && idx + 1 < stages.length && stages[idx + 1].status === 'pending') {
-    stages[idx + 1] = { ...stages[idx + 1], status: 'active' }
+  // Moving a stage to 'done' activates every pending stage whose
+  // dependencies are now all satisfied — not just the next one in display
+  // order, so parallel branches (recovery + follow-up) both switch on as
+  // soon as treatment finishes, independently of each other from then on.
+  if (status === 'done') {
+    for (let i = 0; i < stages.length; i++) {
+      const s = stages[i]
+      if (s.status !== 'pending') continue
+      const deps = dependenciesOf(s.stage)
+      if (deps.every((dep) => stages.find((x) => x.stage === dep)?.status === 'done')) {
+        stages[i] = { ...s, status: 'active' }
+      }
+    }
   }
   return { ...episode, stages, updatedAt: now }
 }
