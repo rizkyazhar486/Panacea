@@ -57,24 +57,24 @@ export function CariSemua() {
             autoFocus
             value={q}
             onChange={(e) => setQ(e.target.value)}
-            placeholder="Cari fitur, penyakit, obat, skor…"
-            aria-label="Cari di seluruh aplikasi"
+            placeholder="Search features, diseases, drugs, scores…"
+            aria-label="Search the whole app"
             className="h-12 w-full bg-transparent text-[15px] text-ink outline-none placeholder:text-neutral-400 dark:text-white"
           />
           {q && (
-            <button onClick={() => setQ('')} aria-label="Kosongkan" className="shrink-0 px-1 text-lg leading-none text-neutral-400">×</button>
+            <button onClick={() => setQ('')} aria-label="Clear" className="shrink-0 px-1 text-lg leading-none text-neutral-400">×</button>
           )}
         </div>
         <p className="t-mikro mt-1.5 text-neutral-500">
-          {siap === -1 ? 'Indeks gagal dimuat.' : siap === 0 ? 'Menyiapkan indeks…' : `${siap.toLocaleString('id-ID')} butir terindeks`}
-          {q.trim().length >= 2 && siap > 0 && ` · ${hasil.length} hasil`}
+          {siap === -1 ? 'Index failed to load.' : siap === 0 ? 'Preparing index…' : `${siap.toLocaleString('en-GB')} entries indexed`}
+          {q.trim().length >= 2 && siap > 0 && ` · ${hasil.length} results`}
         </p>
       </div>
 
       {q.trim().length < 2 ? (
-        <p className="t-kecil px-1 text-neutral-500">Ketik sedikitnya dua huruf.</p>
+        <p className="t-kecil px-1 text-neutral-500">Type at least two letters.</p>
       ) : hasil.length === 0 ? (
-        <p className="t-kecil px-1 text-neutral-500">Tidak ada yang cocok dengan “{q.trim()}”.</p>
+        <p className="t-kecil px-1 text-neutral-500">Nothing matches "{q.trim()}".</p>
       ) : (
         kelompok.map(([jenis, daftar]) => (
           <section key={jenis}>
@@ -96,7 +96,7 @@ export function CariSemua() {
                   <button
                     onClick={() => { setPantau(alihkanPantauan({ jenis: h.jenis, judul: h.judul, ke: h.ke }).map((p) => p.ke)) }}
                     aria-pressed={pantau.includes(h.ke)}
-                    aria-label={pantau.includes(h.ke) ? `Berhenti memantau ${h.judul}` : `Pantau ${h.judul}`}
+                    aria-label={pantau.includes(h.ke) ? `Stop watching ${h.judul}` : `Watch ${h.judul}`}
                     className={`grid h-10 w-10 shrink-0 place-items-center rounded-full text-[16px] leading-none transition ${
                       pantau.includes(h.ke) ? 'text-amber-400' : 'text-neutral-300 dark:text-neutral-600'
                     }`}

@@ -81,8 +81,8 @@ export function DekConnect() {
             {status === 'menunggu' ? 'Your submission is under review.' : 'Your account is not verified yet.'}
           </p>
           <p className="mt-1 text-[12px] leading-relaxed text-neutral-600">
-            Connect hanya mempertemukan akun terverifikasi. Itu satu-satunya alasan fitur ini ada:
-            supaya orang yang Anda temui benar orangnya.
+            Connect only introduces verified accounts. That's the only reason this feature exists:
+            so the person you meet is really who they say they are.
           </p>
           {status !== 'menunggu' && (
             <Link to="/verifikasi-connect" className="mt-2 inline-block text-[12px] font-bold text-brand underline">
@@ -106,11 +106,11 @@ export function DekConnect() {
               ))}
             </div>
             <p className="mt-2 text-[11px] leading-relaxed text-slate-500">
-              Jarak dihitung antar <b>pusat kota</b>, bukan dari GPS — aplikasi ini tidak pernah
-              meminta letak persis Anda, karena jarak presisi bisa dipakai melacak tempat tinggal
-              seseorang. Akibatnya: semua orang di same city tercatat 0 km. Radius juga
-              berlaku <b>dua arah</b> — memasangnya lebar tidak menembus batas sempit orang lain.
-              Batas terjauh 500 km.
+              Distance is calculated between <b>city centers</b>, not GPS — this app never
+              asks for your exact location, because a precise distance can be used to track down
+              where someone lives. As a result, everyone in the same city shows as 0 km. The radius
+              also works <b>both ways</b> — setting yours wide doesn't break through someone else's
+              narrow one. The maximum radius is 500 km.
             </p>
           </Card>
 
@@ -119,7 +119,7 @@ export function DekConnect() {
               People you could meet ({kartu.length})
             </div>
             {kartu.length === 0 && (
-              <Prosa kelas="mt-2 text-[12px] leading-relaxed text-neutral-500">Belum ada yang cocok. Yang muncul di sini hanya akun terverifikasi, dengan kredit kepercayaan di atas ambang bahaya, preferensi yang saling cocok, dan berada di dalam radius Anda maupun radius mereka. Melebarkan radius biasanya yang paling berpengaruh.</Prosa>
+              <Prosa kelas="mt-2 text-[12px] leading-relaxed text-neutral-500">No matches yet. Only verified accounts appear here, with a trust credit above the danger threshold, mutually compatible preferences, and within both your radius and theirs. Widening your radius usually makes the biggest difference.</Prosa>
             )}
             <div className="mt-2 space-y-2">
               {kartu.map((k) => (
@@ -149,7 +149,7 @@ export function DekConnect() {
           </Card>
 
           <Card>
-            <Prosa kelas="text-[11px] leading-relaxed text-neutral-500">Memblokir seseorang membuatnya hilang dari kedua sisi sekaligus — ia tidak lagi melihat Anda dan tidak bisa menghubungi Anda dari perangkat mana pun yang tersambung ke akunnya. Bila ada yang mengganggu, laporkan; laporan dinilai pemilik, dan pengurangan kredit dicatat beserta alasannya.</Prosa>
+            <Prosa kelas="text-[11px] leading-relaxed text-neutral-500">Blocking someone removes them from both sides at once — they no longer see you and can't contact you from any device linked to their account. If someone is bothering you, report them; reports are reviewed by the owner, and credit deductions are logged with their reason.</Prosa>
             <Link to="/verifikasi-connect" className="mt-2 inline-block text-[12px] font-bold text-brand underline">
               See my trust credit →
             </Link>

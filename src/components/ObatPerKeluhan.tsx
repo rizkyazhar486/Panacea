@@ -36,19 +36,19 @@ function KartuGolongan({ g, buka, ketuk }: { g: GolonganObat; buka: boolean; ket
               benar tanpa angka tidak bisa ditulis di kertas resep; inilah yang
               sebenarnya dicari orang saat membuka bagian ini. */}
           <p className="rounded-lg bg-brand/10 p-2.5 text-[11.5px] leading-snug text-ink dark:text-white">
-            <span className="font-black text-brand-dark dark:text-brand">💊 Dosis: </span>
+            <span className="font-black text-brand-dark dark:text-brand">💊 Dosage: </span>
             {g.dosis}
           </p>
 
           <p className="text-[11.5px] leading-snug text-neutral-700 dark:text-neutral-200">
-            <span className="font-bold text-brand-dark dark:text-brand">Kapan dipakai: </span>
+            <span className="font-bold text-brand-dark dark:text-brand">When used: </span>
             {g.kapan}
           </p>
 
           <Rantai langkah={g.rantai} />
 
           <p className="text-[11.5px] leading-snug text-neutral-700 dark:text-neutral-200">
-            <span className="font-bold">Memilih di dalam golongan: </span>
+            <span className="font-bold">Choosing within the class: </span>
             {g.memilih}
           </p>
 
@@ -56,7 +56,7 @@ function KartuGolongan({ g, buka, ketuk }: { g: GolonganObat; buka: boolean; ket
               daftar obat mengajarkan apa yang harus dipilih, bukan apa yang akan
               keliru dipilih. */}
           <p className="rounded-lg bg-amber-50 p-2.5 text-[11.5px] leading-snug text-amber-900 dark:bg-amber-500/10 dark:text-amber-200">
-            <span className="font-black">⚠️ Yang sering keliru: </span>
+            <span className="font-black">⚠️ Common mistakes: </span>
             {g.salahnya}
           </p>
         </div>
@@ -124,12 +124,12 @@ export function ObatPerKeluhan({ cari: cariLuar }: { cari?: string } = {}) {
   return (
     <section className="space-y-4">
       <div className={dikendalikan ? 'hidden' : undefined}>
-        <h3 className="text-[15px] font-black text-ink dark:text-white">Obat menurut keluhan</h3>
+        <h3 className="text-[15px] font-black text-ink dark:text-white">Drugs by complaint</h3>
         <p className="mt-1 text-[11.5px] leading-snug text-neutral-500">
-          Dari keluhan menuju GOLONGAN, baru menuju obatnya. Yang menentukan di depan pasien adalah
-          keputusan tingkat golongan — mukolitik atau antitusif, loop atau aldosteron, vasopresor
-          atau inotropik, beta-laktam atau makrolid. Salah golongan jauh lebih merugikan daripada
-          salah merek.
+          From the complaint to the DRUG CLASS, then to the specific drug. What matters at the
+          bedside is the class-level decision — mucolytic or antitussive, loop or aldosterone,
+          vasopressor or inotrope, beta-lactam or macrolide. Picking the wrong class is far more
+          harmful than picking the wrong brand.
         </p>
       </div>
 
@@ -138,13 +138,13 @@ export function ObatPerKeluhan({ cari: cariLuar }: { cari?: string } = {}) {
           type="search"
           value={cari}
           onChange={(e) => setCari(e.target.value)}
-          placeholder="Cari golongan atau obat (mis. furosemid, kuinolon, syok)…"
+          placeholder="Search a class or drug (e.g. furosemide, quinolone, shock)…"
           className="min-h-[44px] w-full rounded-xl border border-neutral-200 bg-white px-3 text-[13px] text-ink placeholder:text-neutral-400 dark:border-white/10 dark:bg-neutral-900 dark:text-white"
         />
       )}
 
       {tampil.length === 0 && !dikendalikan && (
-        <p className="text-center text-[12.5px] text-neutral-500">Tidak ada hasil — coba kata lain.</p>
+        <p className="text-center text-[12.5px] text-neutral-500">No results — try another word.</p>
       )}
 
       {tampil.map((k) => (

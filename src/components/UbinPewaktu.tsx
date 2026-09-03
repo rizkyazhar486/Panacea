@@ -139,10 +139,10 @@ export function UbinPewaktu() {
   return (
     <section>
       <div className="mb-2 flex items-baseline justify-between gap-2">
-        <h2 className="t-kecil font-black uppercase tracking-wide text-neutral-500">Pewaktu</h2>
+        <h2 className="t-kecil font-black uppercase tracking-wide text-neutral-500">Timer</h2>
         {keadaan && (
           <button onClick={berhenti} className="t-kecil flex min-h-[40px] items-center font-bold text-neutral-500">
-            Berhenti
+            Stop
           </button>
         )}
       </div>
@@ -159,7 +159,7 @@ export function UbinPewaktu() {
                     m === mode ? 'bg-brand text-white' : 'bg-neutral-100 text-neutral-500 dark:bg-white/8 dark:text-neutral-300'
                   }`}
                 >
-                  {m === 'nap' ? 'Tidur singkat' : 'AMRAP'}
+                  {m === 'nap' ? 'Power nap' : 'AMRAP'}
                 </button>
               ))}
             </div>
@@ -172,15 +172,15 @@ export function UbinPewaktu() {
                   className="flex min-h-[54px] flex-col items-center justify-center rounded-2xl border border-neutral-200 transition active:scale-95 dark:border-white/12"
                 >
                   <span className="text-[19px] font-black leading-none tabular-nums text-ink dark:text-white">{menit}</span>
-                  <span className="t-mikro text-neutral-400">menit</span>
+                  <span className="t-mikro text-neutral-400">minutes</span>
                 </button>
               ))}
             </div>
 
             <p className="t-mikro mt-2 leading-snug text-neutral-400">
               {mode === 'nap'
-                ? '10–20 menit umumnya tidak menimbulkan rasa berat bangun tidur; 90 menit kira-kira satu putaran tidur.'
-                : 'As Many Rounds As Possible — kerjakan putaran sebanyak mungkin sampai waktunya habis.'}
+                ? '10–20 minutes typically avoids grogginess on waking; 90 minutes is roughly one full sleep cycle.'
+                : 'As Many Rounds As Possible — complete as many rounds as you can before time runs out.'}
             </p>
           </>
         ) : (
@@ -202,19 +202,19 @@ export function UbinPewaktu() {
 
             <div className="min-w-0 flex-1">
               <span className="t-kecil block font-black text-ink dark:text-white">
-                {selesai ? 'Waktu habis' : keadaan.mode === 'nap' ? 'Tidur singkat' : 'AMRAP berjalan'}
+                {selesai ? 'Time\'s up' : keadaan.mode === 'nap' ? 'Power nap' : 'AMRAP running'}
               </span>
               <span className="t-mikro block text-neutral-400">
                 {selesai
-                  ? 'Getar dan bunyi sudah dibunyikan.'
-                  : `Selesai pukul ${new Date(keadaan.akhir).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' })}`}
+                  ? 'Vibration and sound have played.'
+                  : `Ends at ${new Date(keadaan.akhir).toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' })}`}
               </span>
               {selesai && (
                 <button
                   onClick={berhenti}
                   className="t-kecil mt-2 min-h-[40px] rounded-xl bg-brand px-3 font-bold text-white"
                 >
-                  Selesai
+                  Done
                 </button>
               )}
             </div>
