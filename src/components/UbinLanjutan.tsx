@@ -28,7 +28,7 @@ function Kepala({ judul, ke, kanan }: { judul: string; ke?: string; kanan?: Reac
     <div className="mb-2 flex items-baseline justify-between gap-2">
       <h2 className="t-kecil font-black uppercase tracking-wide text-neutral-500">{judul}</h2>
       {kanan ?? (ke ? (
-        <Link to={ke} className="t-kecil flex min-h-[40px] items-center font-bold text-brand">Buka →</Link>
+        <Link to={ke} className="t-kecil flex min-h-[40px] items-center font-bold text-brand">Open →</Link>
       ) : null)}
     </div>
   )
@@ -124,7 +124,7 @@ export function UbinPemulihanDenyut() {
       <div className="kaca rounded-3xl p-3">
         <div className="flex items-baseline gap-1.5">
           <span className="text-[26px] font-black leading-none tabular-nums nyala text-ink dark:text-white">−{akhir}</span>
-          <span className="t-mikro font-bold text-neutral-400">bpm, sesi terakhir</span>
+          <span className="t-mikro font-bold text-neutral-400">bpm, last session</span>
           <span className="t-mikro ml-auto shrink-0 text-neutral-400">{deret.length} sesi</span>
         </div>
         <span className="mt-2 flex h-10 items-end gap-[3px]" aria-hidden>
@@ -199,7 +199,7 @@ export function UbinUtangTidur() {
           })}
         </span>
         <p className="t-mikro mt-1.5 text-neutral-400">
-          Kebiasaan Anda {biasa.toFixed(1)} jam · di atas garis lebih panjang, di bawah lebih pendek
+          Your baseline is {biasa.toFixed(1)} h · above the line is longer, below is shorter
         </p>
       </div>
     </section>
@@ -225,7 +225,7 @@ export function UbinTekanan() {
 
   return (
     <section>
-      <Kepala judul="Tekanan darah" ke="/tubuh" />
+      <Kepala judul="Blood pressure" ke="/tubuh" />
       <div className="kaca rounded-3xl p-3">
         <div className="flex items-baseline gap-1.5">
           <span className="text-[26px] font-black leading-none tabular-nums nyala text-ink dark:text-white">{sis}/{dia}</span>
@@ -234,7 +234,7 @@ export function UbinTekanan() {
         {deret.length >= 3 && (
           /* Dua garis pada satu sumbu, bukan dua grafik: sistolik dan
              diastolik hanya bermakna dibaca berpasangan. */
-          <svg viewBox="0 0 100 40" preserveAspectRatio="none" className="mt-2 h-12 w-full" role="img" aria-label="Tekanan darah 14 bacaan terakhir">
+          <svg viewBox="0 0 100 40" preserveAspectRatio="none" className="mt-2 h-12 w-full" role="img" aria-label="Blood pressure, last 14 readings">
             {(['s', 'd'] as const).map((kunci, idx) => {
               const nilai = deret.map((p) => p[kunci])
               const semua = [...deret.map((p) => p.s), ...deret.map((p) => p.d)]
@@ -272,9 +272,9 @@ export function UbinTekanan() {
 // yang diukur pada percobaan terkendalinya. Tidak ada klaim menurunkan
 // tekanan darah jangka panjang atau memperbaiki HRV semalaman.
 const POLA: { label: string; detik: number }[] = [
-  { label: 'Tarik lewat hidung', detik: 4 },
-  { label: 'Tarik pendek lagi', detik: 1 },
-  { label: 'Buang panjang lewat mulut', detik: 7 },
+  { label: 'Inhale through the nose', detik: 4 },
+  { label: 'One more short inhale', detik: 1 },
+  { label: 'Long exhale through the mouth', detik: 7 },
 ]
 
 export function UbinNapas() {
@@ -315,7 +315,7 @@ export function UbinNapas() {
       <Kepala
         judul="2-minute breathing"
         kanan={jalan ? (
-          <button onClick={() => setJalan(false)} className="t-kecil flex min-h-[40px] items-center font-bold text-neutral-500">Berhenti</button>
+          <button onClick={() => setJalan(false)} className="t-kecil flex min-h-[40px] items-center font-bold text-neutral-500">Stop</button>
         ) : undefined}
       />
       <div className="kaca rounded-3xl p-3">
@@ -344,7 +344,7 @@ export function UbinNapas() {
             </span>
             <span className="min-w-0 flex-1">
               <span className="t-kecil block font-black text-ink dark:text-white">{fase.label}</span>
-              <span className="t-mikro block text-neutral-400">Sisa {Math.max(0, Math.ceil(120 - lewat))} detik</span>
+              <span className="t-mikro block text-neutral-400">{Math.max(0, Math.ceil(120 - lewat))} seconds left</span>
             </span>
           </div>
         )}
@@ -393,7 +393,7 @@ export function UbinDuduk() {
   return (
     <section>
       <Kepala
-        judul="Duduk"
+        judul="Sitting"
         kanan={<button onClick={tandai} className="t-kecil flex min-h-[40px] items-center font-bold text-brand">Stood up</button>}
       />
       <div className="kaca rounded-3xl p-3">
@@ -401,7 +401,7 @@ export function UbinDuduk() {
           <span className={`text-[26px] font-black leading-none tabular-nums ${menit >= 30 ? 'text-rose-500' : 'text-ink dark:text-white'}`}>
             {Math.floor(menit)}
           </span>
-          <span className="t-mikro font-bold text-neutral-400">menit sejak terakhir berdiri</span>
+          <span className="t-mikro font-bold text-neutral-400">minutes since you last stood up</span>
         </div>
         <span className="mt-2 block h-2.5 w-full rounded-full bg-neutral-200 dark:bg-white/10" aria-hidden>
           <span

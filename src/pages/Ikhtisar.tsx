@@ -32,21 +32,21 @@ interface Medan {
 }
 
 const MEDAN: Medan[] = [
-  { kunci: 'weightKg', label: 'Berat', satuan: 'kg', bulat: 1, warna: '#f59e0b' },
-  { kunci: 'restingHr', label: 'Denyut istirahat', satuan: 'bpm', bulat: 0, warna: '#f87171' },
+  { kunci: 'weightKg', label: 'Weight', satuan: 'kg', bulat: 1, warna: '#f59e0b' },
+  { kunci: 'restingHr', label: 'Resting HR', satuan: 'bpm', bulat: 0, warna: '#f87171' },
   { kunci: 'hrvMs', label: 'HRV', satuan: 'ms', bulat: 0, warna: '#34d399' },
-  { kunci: 'sleepH', label: 'Tidur', satuan: 'jam', bulat: 1, warna: '#a78bfa' },
-  { kunci: 'steps', label: 'Langkah', satuan: '', bulat: 0, warna: '#22d3ee' },
-  { kunci: 'vo2max', label: 'VO₂max', satuan: 'mL/kg/mnt', bulat: 1, warna: '#4ade80' },
-  { kunci: 'systolic', label: 'Sistolik', satuan: 'mmHg', bulat: 0, warna: '#fb7185' },
-  { kunci: 'bodyFatPct', label: 'Lemak tubuh', satuan: '%', bulat: 1, warna: '#facc15' },
+  { kunci: 'sleepH', label: 'Sleep', satuan: 'h', bulat: 1, warna: '#a78bfa' },
+  { kunci: 'steps', label: 'Steps', satuan: '', bulat: 0, warna: '#22d3ee' },
+  { kunci: 'vo2max', label: 'VO₂max', satuan: 'mL/kg/min', bulat: 1, warna: '#4ade80' },
+  { kunci: 'systolic', label: 'Systolic', satuan: 'mmHg', bulat: 0, warna: '#fb7185' },
+  { kunci: 'bodyFatPct', label: 'Body fat', satuan: '%', bulat: 1, warna: '#facc15' },
 ]
 
 const JANGKA = [
-  { hari: 7, label: '7 hari' },
-  { hari: 30, label: '30 hari' },
-  { hari: 90, label: '90 hari' },
-  { hari: 9999, label: 'Semua' },
+  { hari: 7, label: '7 days' },
+  { hari: 30, label: '30 days' },
+  { hari: 90, label: '90 days' },
+  { hari: 9999, label: 'All' },
 ]
 
 interface Deret {
@@ -58,7 +58,7 @@ interface Deret {
 }
 
 function fmt(n: number, bulat: number): string {
-  return bulat ? n.toFixed(bulat) : Math.round(n).toLocaleString('id-ID')
+  return bulat ? n.toFixed(bulat) : Math.round(n).toLocaleString('en-GB')
 }
 
 export function Ikhtisar() {
@@ -89,14 +89,14 @@ export function Ikhtisar() {
   if (!deret.length) {
     return (
       <div className="mx-auto max-w-3xl space-y-4 px-fluid pb-24">
-        <SectionTitle icon={<IconChartUp size={20} />} title="Ikhtisar" subtitle="Seluruh angka tubuh pada satu layar" />
+        <SectionTitle icon={<IconChartUp size={20} />} title="Overview" subtitle="All your body figures in one screen" />
         <KartuTidurPemulihan />
         <KartuKlinisTubuh />
         <Card>
           <p className="text-[13px] leading-relaxed text-neutral-500">
-            Belum ada riwayat angka tubuh yang tersimpan. Riwayat terkumpul sendiri begitu data masuk — dari impor
-            perangkat, atau dari angka yang Anda catat di halaman Tubuh. Halaman ini sengaja kosong alih-alih menampilkan
-            contoh: angka contoh tidak dapat dibedakan dari angka Anda.
+            No body-metrics history is stored yet. History accumulates on its own once data arrives — from a device
+            import, or from figures you log on the Body page. This page is deliberately empty instead of showing
+            sample data: sample numbers cannot be told apart from your own.
           </p>
         </Card>
       </div>
@@ -107,8 +107,8 @@ export function Ikhtisar() {
     <div className="mx-auto max-w-3xl space-y-4 px-fluid pb-24">
       <SectionTitle
         icon={<IconChartUp size={20} />}
-        title="Ikhtisar"
-        subtitle={`${deret.length} metrik tercatat · ${riwayat.length} hari riwayat`}
+        title="Overview"
+        subtitle={`${deret.length} metrics recorded · ${riwayat.length} days of history`}
       />
 
       {/* Pemilih jangka. Mengubah jangka mengubah RATA-RATA PEMBANDING juga,
@@ -146,7 +146,7 @@ export function Ikhtisar() {
               {d.medan.satuan && <span className="text-[10px] font-bold text-neutral-400">{d.medan.satuan}</span>}
             </span>
             <span className="mt-0.5 block truncate text-[10px] leading-tight text-neutral-500">
-              rata {jangkaTerpakai.toLowerCase()} {fmt(d.rata, d.medan.bulat)}
+              avg {jangkaTerpakai.toLowerCase()} {fmt(d.rata, d.medan.bulat)}
               {' · '}
               <span className="font-bold">
                 {d.selisih >= 0 ? '+' : '−'}{fmt(Math.abs(d.selisih), d.medan.bulat)}
@@ -162,7 +162,7 @@ export function Ikhtisar() {
             <span className="text-[11px] font-black uppercase tracking-wide text-neutral-500">
               {d.medan.label} {d.medan.satuan && `· ${d.medan.satuan}`}
             </span>
-            <span className="text-[11px] tabular-nums text-neutral-400">{d.titik.length} bacaan</span>
+            <span className="text-[11px] tabular-nums text-neutral-400">{d.titik.length} readings</span>
           </div>
           <div className="h-32">
             <ResponsiveContainer width="100%" height="100%">

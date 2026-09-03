@@ -34,9 +34,9 @@ const WARNA_ASAL: Record<Baris['asal'], string> = {
   catat: 'text-amber-600 dark:text-amber-400',
 }
 const NAMA_ASAL: Record<Baris['asal'], string> = {
-  ukur: 'diukur',
-  hitung: 'dihitung',
-  catat: 'dicatat',
+  ukur: 'measured',
+  hitung: 'calculated',
+  catat: 'logged',
 }
 
 function num(x: unknown): number | null {
@@ -45,9 +45,9 @@ function num(x: unknown): number | null {
 
 /** Golongan IMT. Dua-duanya disebut karena ambangnya memang berbeda. */
 function golonganImt(imt: number): string {
-  const who = imt < 18.5 ? 'kurang' : imt < 25 ? 'normal' : imt < 30 ? 'lebih' : 'obesitas'
-  const asia = imt < 18.5 ? 'kurang' : imt < 23 ? 'normal' : imt < 27.5 ? 'lebih' : 'obesitas'
-  return who === asia ? `${who} (WHO & Asia-Pasifik)` : `${who} menurut WHO, ${asia} menurut ambang Asia-Pasifik`
+  const who = imt < 18.5 ? 'underweight' : imt < 25 ? 'normal' : imt < 30 ? 'overweight' : 'obese'
+  const asia = imt < 18.5 ? 'underweight' : imt < 23 ? 'normal' : imt < 27.5 ? 'overweight' : 'obese'
+  return who === asia ? `${who} (WHO & Asia-Pacific)` : `${who} by WHO, ${asia} by the Asia-Pacific threshold`
 }
 
 export function KartuKlinisTubuh() {
@@ -72,9 +72,9 @@ export function KartuKlinisTubuh() {
     const imt = imtTersimpan ?? (beratKg && tinggiCm ? beratKg / (tinggiCm / 100) ** 2 : null)
     if (imt) {
       out.push({
-        label: 'IMT', nilai: imt.toFixed(1), satuan: 'kg/m²',
+        label: 'BMI', nilai: imt.toFixed(1), satuan: 'kg/m²',
         asal: imtTersimpan ? 'ukur' : 'hitung',
-        catatan: `${golonganImt(imt)}. IMT tidak membedakan otot dari lemak — pada orang berotot ia menyesatkan.`,
+        catatan: `${golonganImt(imt)}. BMI does not distinguish muscle from fat — it is misleading in muscular people.`,
       })
     }
 
@@ -86,58 +86,58 @@ export function KartuKlinisTubuh() {
     const bmr = bmrTimbangan ?? bmrHitung
     if (bmr) {
       out.push({
-        label: 'BMR', nilai: Math.round(bmr).toLocaleString('id-ID'), satuan: 'kkal/hari',
+        label: 'BMR', nilai: Math.round(bmr).toLocaleString('en-GB'), satuan: 'kcal/day',
         asal: bmrTimbangan ? 'ukur' : 'hitung',
         catatan: bmrTimbangan
-          ? 'Dugaan timbangan bioimpedansi.'
-          : 'Mifflin-St Jeor (1990), Am J Clin Nutr 51(2):241-7 — simpangan lazim ±10% pada orang sehat.',
+          ? 'A bioimpedance scale’s estimate.'
+          : 'Mifflin-St Jeor (1990), Am J Clin Nutr 51(2):241-7 — typical error ±10% in healthy people.',
       })
     }
 
     const lemak = num(v.bodyFatPct)
     if (lemak) out.push({
-      label: 'Lemak tubuh', nilai: lemak.toFixed(1), satuan: '%', asal: 'ukur',
-      catatan: 'Bioimpedansi: simpangan lazim 3–5 poin terhadap DXA. Bacalah arahnya pada alat yang sama.',
+      label: 'Body fat', nilai: lemak.toFixed(1), satuan: '%', asal: 'ukur',
+      catatan: 'Bioimpedance: typical error of 3–5 points against DXA. Read the direction, on the same device.',
     })
 
     const otot = num(v.skeletalMuscleKg)
-    if (otot) out.push({ label: 'Otot rangka', nilai: otot.toFixed(1), satuan: 'kg', asal: 'ukur' })
+    if (otot) out.push({ label: 'Skeletal muscle', nilai: otot.toFixed(1), satuan: 'kg', asal: 'ukur' })
 
     const ototPct = num(v.skeletalMusclePct) ?? num(v.musclePct)
-    if (ototPct) out.push({ label: 'Otot rangka', nilai: ototPct.toFixed(1), satuan: '% massa', asal: 'ukur' })
+    if (ototPct) out.push({ label: 'Skeletal muscle', nilai: ototPct.toFixed(1), satuan: '% mass', asal: 'ukur' })
 
     const tanpaLemak = num(v.leanMassKg)
-    if (tanpaLemak) out.push({ label: 'Massa tanpa lemak', nilai: tanpaLemak.toFixed(1), satuan: 'kg', asal: 'ukur' })
+    if (tanpaLemak) out.push({ label: 'Lean mass', nilai: tanpaLemak.toFixed(1), satuan: 'kg', asal: 'ukur' })
 
     const viseral = num(v.visceralFatLevel) ?? num(v.visceralFatIndex)
     if (viseral) out.push({
-      label: 'Lemak viseral', nilai: String(Math.round(viseral)), satuan: 'tingkat', asal: 'ukur',
-      catatan: 'Skala timbangan, bukan satuan fisik — tidak dapat dibandingkan antarmerek.',
+      label: 'Visceral fat', nilai: String(Math.round(viseral)), satuan: 'level', asal: 'ukur',
+      catatan: 'A scale-specific index, not a physical unit — cannot be compared across brands.',
     })
 
     const air = num(v.bodyWaterPct)
-    if (air) out.push({ label: 'Air tubuh', nilai: air.toFixed(1), satuan: '%', asal: 'ukur' })
+    if (air) out.push({ label: 'Body water', nilai: air.toFixed(1), satuan: '%', asal: 'ukur' })
 
     const aktif = num(v.activeKcal)
     if (aktif) out.push({
-      label: 'Kalori aktivitas', nilai: Math.round(aktif).toLocaleString('id-ID'), satuan: 'kkal', asal: 'ukur',
-      catatan: 'Dugaan perangkat dari denyut dan gerak, bukan pengukuran kalorimetri.',
+      label: 'Activity calories', nilai: Math.round(aktif).toLocaleString('en-GB'), satuan: 'kcal', asal: 'ukur',
+      catatan: 'A device estimate from heart rate and motion, not a calorimetry measurement.',
     })
 
     const menit = num(v.exerciseMin)
-    if (menit) out.push({ label: 'Menit latihan', nilai: String(Math.round(menit)), satuan: 'mnt', asal: 'ukur' })
+    if (menit) out.push({ label: 'Exercise minutes', nilai: String(Math.round(menit)), satuan: 'min', asal: 'ukur' })
 
     if (kaloriMasuk > 0) {
       out.push({
-        label: 'Kalori masuk', nilai: Math.round(kaloriMasuk).toLocaleString('id-ID'), satuan: 'kkal hari ini', asal: 'catat',
-        catatan: 'Dari catatan makan Anda. Penakaran porsi sendiri lazim meleset 20% ke bawah.',
+        label: 'Calories in', nilai: Math.round(kaloriMasuk).toLocaleString('en-GB'), satuan: 'kcal today', asal: 'catat',
+        catatan: 'From your own food log. Self-estimated portions are typically 20% short.',
       })
       if (bmr) {
         const keluar = bmr + (aktif ?? 0)
         out.push({
-          label: 'Selisih energi', nilai: `${kaloriMasuk - keluar >= 0 ? '+' : '−'}${Math.abs(Math.round(kaloriMasuk - keluar)).toLocaleString('id-ID')}`,
-          satuan: 'kkal', asal: 'hitung',
-          catatan: `Masuk ${Math.round(kaloriMasuk).toLocaleString('id-ID')} − (BMR ${Math.round(bmr).toLocaleString('id-ID')}${aktif ? ` + aktivitas ${Math.round(aktif).toLocaleString('id-ID')}` : ''}). Ketiganya perkiraan, jadi selisihnya mewarisi seluruh kesalahannya — jangan dibaca sebagai neraca.`,
+          label: 'Energy balance', nilai: `${kaloriMasuk - keluar >= 0 ? '+' : '−'}${Math.abs(Math.round(kaloriMasuk - keluar)).toLocaleString('en-GB')}`,
+          satuan: 'kcal', asal: 'hitung',
+          catatan: `In ${Math.round(kaloriMasuk).toLocaleString('en-GB')} − (BMR ${Math.round(bmr).toLocaleString('en-GB')}${aktif ? ` + activity ${Math.round(aktif).toLocaleString('en-GB')}` : ''}). All three are estimates, so the difference inherits all their error — do not read it as a precise balance.`,
         })
       }
     }
@@ -150,8 +150,8 @@ export function KartuKlinisTubuh() {
   return (
     <div className="kaca rounded-3xl p-3">
       <div className="mb-2 flex items-baseline justify-between gap-2">
-        <h2 className="text-[13px] font-black text-ink dark:text-white">Komposisi tubuh &amp; energi</h2>
-        <span className="text-[10px] text-neutral-500">{baris.length} angka</span>
+        <h2 className="text-[13px] font-black text-ink dark:text-white">Body composition &amp; energy</h2>
+        <span className="text-[10px] text-neutral-500">{baris.length} figures</span>
       </div>
 
       <div className="divide-y divide-neutral-100 dark:divide-white/10">
@@ -171,10 +171,10 @@ export function KartuKlinisTubuh() {
       </div>
 
       <p className="mt-2 text-[10.5px] leading-snug text-neutral-500">
-        <b className="text-emerald-600 dark:text-emerald-400">Diukur</b> berasal dari alat,{' '}
-        <b className="text-sky-600 dark:text-sky-400">dihitung</b> dari persamaan terbitan atas tinggi dan berat,{' '}
-        <b className="text-amber-600 dark:text-amber-400">dicatat</b> dari catatan Anda sendiri. Ketiganya punya derajat
-        kepercayaan yang berbeda jauh.
+        <b className="text-emerald-600 dark:text-emerald-400">Measured</b> comes from a device,{' '}
+        <b className="text-sky-600 dark:text-sky-400">calculated</b> from a published equation over height and weight,{' '}
+        <b className="text-amber-600 dark:text-amber-400">logged</b> from your own records. The three carry very
+        different degrees of confidence.
       </p>
     </div>
   )
