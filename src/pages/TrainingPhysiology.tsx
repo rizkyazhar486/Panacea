@@ -175,11 +175,11 @@ export function TrainingPhysiology() {
           </div>
         )}
         <p className="mt-3 text-[11px] leading-relaxed text-slate-500">
-          Rinciannya ditampilkan dengan sengaja: satu angka tanpa alasannya tidak bisa ditindaklanjuti.
+          The breakdown is shown deliberately: a single number with no reason behind it can't be acted on.
           {(baseline.hrv == null || baseline.resting == null) && (
-            <> Variabilitas denyut dan denyut istirahat baru ikut dinilai setelah ada sekitar lima hari
-            riwayat — sebelum itu tidak ada pembanding, dan membandingkan angka dengan dirinya sendiri
-            hanya akan menghasilkan penilaian palsu.</>
+            <> Heart rate variability and resting heart rate only start counting once there are about five
+            days of history — before that there's nothing to compare against, and comparing a number with
+            itself would only produce a false reading.</>
           )}
         </p>
       </Card>
@@ -226,8 +226,8 @@ export function TrainingPhysiology() {
         </div>
 
         <div className="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-4">
-          <Stat label="Acute load (7d)" value={beban.akut.toFixed(0)} sub="per hari" />
-          <Stat label="Chronic load (28d)" value={beban.kronis.toFixed(0)} sub="per hari" />
+          <Stat label="Acute load (7d)" value={beban.akut.toFixed(0)} sub="per day" />
+          <Stat label="Chronic load (28d)" value={beban.kronis.toFixed(0)} sub="per day" />
           <Stat label="7:28 ratio" value={beban.acwr != null ? beban.acwr.toFixed(2) : '—'} sub={beban.acwrDapatDipercaya ? 'target 0.8–1.3' : 'not yet meaningful'} />
           <Stat label="Active days" value={`${beban.hariAktif7}/7`} />
         </div>
@@ -241,15 +241,15 @@ export function TrainingPhysiology() {
               <div style={{ width: `${beban.pctAnaerobik}%`, background: '#f87171' }} />
             </div>
             <div className="mt-1.5 flex flex-wrap gap-x-3 gap-y-1 text-[11px]">
-              <span className="text-emerald-300">Mudah (Z1-2) {beban.pctAerobikRendah}%</span>
-              <span className="text-amber-300">Aerobik tinggi (Z3-4) {beban.pctAerobikTinggi}%</span>
-              <span className="text-rose-300">Anaerobik (Z5) {beban.pctAnaerobik}%</span>
+              <span className="text-emerald-300">Easy (Z1-2) {beban.pctAerobikRendah}%</span>
+              <span className="text-amber-300">High aerobic (Z3-4) {beban.pctAerobikTinggi}%</span>
+              <span className="text-rose-300">Anaerobic (Z5) {beban.pctAnaerobik}%</span>
             </div>
             {beban.pctAerobikRendah < 60 && (
               <p className="mt-2 text-sm leading-relaxed text-amber-100/90">
-                Sasaran yang lazim dipakai adalah sekitar 80% waktu pada zona mudah. Punya Anda {beban.pctAerobikRendah}%.
-                Ini pola yang terasa produktif namun paling sering membuat kemajuan mandek — terlalu berat untuk
-                pemulihan, terlalu ringan untuk memicu adaptasi kecepatan.
+                The commonly used target is around 80% of time in the easy zone. Yours is {beban.pctAerobikRendah}%.
+                This pattern feels productive but is the one most likely to stall progress — too hard for
+                recovery, too easy to trigger speed adaptations.
               </p>
             )}
           </div>
@@ -305,8 +305,8 @@ export function TrainingPhysiology() {
             <p className="mt-1 text-sm leading-relaxed text-neutral-500">{performa.arti}</p>
             {performa.ef != null && performa.efBaseline != null && (
               <p className="mt-1.5 text-[11px] text-slate-500">
-                Efisiensi sesi terakhir {performa.ef} meter per menit per denyut, dibanding kebiasaan {performa.efBaseline}.
-                Efisiensi berubah lebih dahulu daripada VO2max, sehingga ia tanda kebugaran yang paling awal terlihat.
+                Last session's efficiency was {performa.ef} meters per minute per heartbeat, versus your usual {performa.efBaseline}.
+                Efficiency shifts before VO2max does, which makes it the earliest visible fitness signal.
               </p>
             )}
           </div>
