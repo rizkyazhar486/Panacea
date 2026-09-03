@@ -22,9 +22,9 @@ const ARAH_STYLE: Record<string, string> = {
   netral: 'bg-slate-500/10 border-slate-500/30 text-neutral-600',
 }
 const ARAH_LABEL: Record<string, string> = {
-  memperbaiki: 'Memperbaiki postur',
-  merusak: 'Berisiko merusak postur',
-  netral: 'Netral terhadap postur',
+  memperbaiki: 'Improves posture',
+  merusak: 'Risks harming posture',
+  netral: 'Neutral for posture',
 }
 
 export function MultiSport() {
@@ -32,7 +32,7 @@ export function MultiSport() {
 
   return (
     <div className="space-y-4">
-      <SectionTitle icon={<IconRun />} title="Running, Cycling, Swimming" subtitle="Zona intensitas, latihan kecepatan, dan postur untuk tiga cabang" />
+      <SectionTitle icon={<IconRun />} title="Running, Cycling, Swimming" subtitle="Intensity zones, speed work, and posture across three sports" />
 
       <Card>
         <p className="text-sm text-neutral-600 leading-relaxed">
@@ -46,12 +46,12 @@ export function MultiSport() {
 
       <div className="flex flex-wrap gap-2">
         {([
-          ['banding', '⚖️ Perbandingan'],
-          ['lari', '🏃 Lari'],
-          ['sepeda', '🚴 Sepeda'],
-          ['renang', '🏊 Renang'],
-          ['kecepatan', '⚡ Kerja Kecepatan'],
-          ['jadwal', '🗓️ Jadwal'],
+          ['banding', '⚖️ Comparison'],
+          ['lari', '🏃 Running'],
+          ['sepeda', '🚴 Cycling'],
+          ['renang', '🏊 Swimming'],
+          ['kecepatan', '⚡ Speed Work'],
+          ['jadwal', '🗓️ Schedule'],
         ] as [Tab, string][]).map(([k, label]) => (
           <button
             key={k}
@@ -73,7 +73,7 @@ export function MultiSport() {
       {tab === 'jadwal' && <ScheduleTab />}
 
       <Card>
-        <SectionTitle icon={<IconHeart />} title="Aturan yang berlaku pada ketiganya" />
+        <SectionTitle icon={<IconHeart />} title="Rules that apply to all three" />
         <div className="space-y-3 mt-2">
           {CROSS_RULES.map((r) => (
             <div key={r.judul} className="rounded-lg border border-white/10 bg-white/[0.03] p-3">
@@ -131,7 +131,7 @@ function RunTab() {
 
   return (
     <Card>
-      <SectionTitle icon={<IconTimer />} title="Running pace zones" subtitle="Dari pace lomba Anda" />
+      <SectionTitle icon={<IconTimer />} title="Running pace zones" subtitle="From your race pace" />
       <Field label="Race pace (min:sec per km)">
         <input className={inputClass} value={racePace} onChange={(e) => setRacePace(e.target.value)} inputMode="numeric" />
       </Field>
@@ -170,7 +170,7 @@ function BikeTab() {
   return (
     <div className="space-y-4">
       <Card>
-        <SectionTitle icon={<IconChartUp />} title="Cycling power zones" subtitle="Dari tes 20 menit sekuat tenaga" />
+        <SectionTitle icon={<IconChartUp />} title="Cycling power zones" subtitle="From an all-out 20-minute test" />
 
         <div className="grid grid-cols-2 gap-3">
           <Field label="Average 20-minute power (watts)">
@@ -228,7 +228,7 @@ function BikeTab() {
       </Card>
 
       <Card>
-        <SectionTitle icon={<IconActivity />} title="Bike fit" subtitle="Angka di balik nyeri lutut, leher, dan punggung" />
+        <SectionTitle icon={<IconActivity />} title="Bike fit" subtitle="The numbers behind knee, neck, and back pain" />
         <div className="space-y-2 mt-2">
           {BIKE_FIT.map((f) => (
             <div key={f.bagian} className="rounded-lg border border-white/10 bg-white/[0.03] p-3">
@@ -243,7 +243,7 @@ function BikeTab() {
       <Card>
         <div className="rounded-lg border border-rose-500/30 bg-rose-500/10 p-3">
           <div className="text-sm font-semibold text-rose-300">Cycling needs a counterweight — swimming does not</div>
-          <Prosa kelas="text-sm text-neutral-600 mt-1 leading-relaxed">Bersepeda menahan punggung membulat dengan leher menengadah selama berjam-jam — persis pola postur yang sedang Anda perbaiki. Tanpa penyeimbang, makin banyak bersepeda makin kuat pola itu tertanam.</Prosa>
+          <Prosa kelas="text-sm text-neutral-600 mt-1 leading-relaxed">Cycling holds the back rounded and the neck craned for hours at a time — precisely the postural pattern you are trying to correct. Without a counterweight, the more you ride the deeper that pattern sets.</Prosa>
         </div>
         <div className="space-y-2 mt-3">
           {CYCLING_COUNTER.map((c) => (
@@ -323,15 +323,15 @@ function SwimTab() {
         <div className="rounded-lg border border-emerald-500/30 bg-emerald-500/10 p-3">
           <div className="text-sm font-semibold text-emerald-700 dark:text-emerald-300">Swimming is the only one of the three that improves posture</div>
           <p className="text-sm text-neutral-600 mt-1 leading-relaxed">
-            Gaya bebas dan gaya punggung menarik lengan ke belakang melawan tahanan air, sehingga menguatkan
-            latissimus dorsi, rhomboid, dan trapezius bawah — otot yang justru melemah akibat duduk dan berdiri
-            membungkuk. Gerakannya juga meregangkan dada dan melatih rotasi punggung atas yang biasanya kaku.
-            Untuk tujuan postur, <strong className="text-ink">gaya punggung adalah yang paling bermanfaat</strong>.
+            Freestyle and backstroke pull the arms backwards against the resistance of water, strengthening
+            the latissimus dorsi, rhomboids, and lower trapezius — the very muscles weakened by sitting and
+            standing hunched. The movement also opens the chest and trains upper-back rotation, which is
+            usually stiff. For posture, <strong className="text-ink">backstroke is the most useful of all</strong>.
           </p>
         </div>
         <div className="rounded-lg border border-amber-500/30 bg-amber-500/10 p-3 mt-3">
           <div className="text-sm font-semibold text-amber-700 dark:text-amber-300">One thing to watch</div>
-          <Prosa kelas="text-sm text-neutral-600 mt-1 leading-relaxed">Nyeri bahu pada perenang hampir selalu berasal dari jarak tempuh yang naik terlalu cepat dan dari tangan yang melewati garis tengah tubuh saat masuk air. Bila bahu mulai nyeri, yang perlu dibenahi lebih dahulu adalah teknik dan jarak tempuh — bukan menambah latihan bahu.</Prosa>
+          <Prosa kelas="text-sm text-neutral-600 mt-1 leading-relaxed">Shoulder pain in swimmers almost always comes from distance increasing too fast and from the hand crossing the body’s midline on entry. If a shoulder starts to hurt, what needs fixing first is technique and distance — not more shoulder exercises.</Prosa>
         </div>
       </Card>
     </div>
@@ -353,7 +353,7 @@ function SpeedTab() {
       </Card>
 
       <div className="flex flex-wrap gap-2">
-        {([['semua', 'Semua'], ['lari', '🏃 Lari'], ['sepeda', '🚴 Sepeda'], ['renang', '🏊 Renang']] as [Sport | 'semua', string][]).map(([k, l]) => (
+        {([['semua', 'Semua'], ['lari', '🏃 Running'], ['sepeda', '🚴 Cycling'], ['renang', '🏊 Renang']] as [Sport | 'semua', string][]).map(([k, l]) => (
           <button
             key={k}
             onClick={() => setF(k)}
@@ -394,13 +394,13 @@ function ScheduleTab() {
 
   return (
     <Card>
-      <SectionTitle icon={<IconTimer />} title="Bagaimana satu pekan disusun" subtitle="Berubah mengikuti sasaran Anda" />
+      <SectionTitle icon={<IconTimer />} title="How a week is put together" subtitle="Changes with your goal" />
 
       <div className="flex flex-wrap gap-2 mt-3">
         {([
-          ['kecepatan', '⚡ Kecepatan'],
-          ['kebugaran', '❤️ Kebugaran umum'],
-          ['postur', '🧍 Postur'],
+          ['kecepatan', '⚡ Speed'],
+          ['kebugaran', '❤️ General fitness'],
+          ['postur', '🧍 Posture'],
         ] as [Goal, string][]).map(([k, l]) => (
           <button
             key={k}

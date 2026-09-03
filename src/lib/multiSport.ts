@@ -41,7 +41,7 @@ export interface SportProfile {
 export const SPORTS: SportProfile[] = [
   {
     key: 'lari',
-    nama: 'Lari',
+    nama: 'Running',
     emoji: '🏃',
     satuan: 'Pace (minutes per km)',
     tesAmbang: 'Run 5 km or 10 km as hard as you can; the average pace becomes your reference',
@@ -54,7 +54,7 @@ export const SPORTS: SportProfile[] = [
   },
   {
     key: 'sepeda',
-    nama: 'Sepeda',
+    nama: 'Cycling',
     emoji: '🚴',
     satuan: 'Power (watts) or heart rate',
     tesAmbang:
@@ -68,7 +68,7 @@ export const SPORTS: SportProfile[] = [
   },
   {
     key: 'renang',
-    nama: 'Renang',
+    nama: 'Swimming',
     emoji: '🏊',
     satuan: 'Time per 100 metres',
     tesAmbang:
@@ -96,13 +96,13 @@ export interface PowerZone {
 
 /** Zona daya klasik (kerangka Coggan), dinyatakan sebagai persen dari FTP. */
 export const POWER_ZONES: PowerZone[] = [
-  { n: 1, nama: 'Pemulihan aktif', pctLo: 0, pctHi: 55, tujuan: 'Speeds recovery without adding fatigue', durasi: '30–60 minutes', rasa: 'Very easy — you can hold a conversation throughout' },
-  { n: 2, nama: 'Endurance', pctLo: 56, pctHi: 75, tujuan: 'Builds the aerobic base and fat-burning capacity', durasi: '1-5 jam', rasa: 'Easy — you can still speak in full sentences' },
-  { n: 3, nama: 'Tempo', pctLo: 76, pctHi: 90, tujuan: 'Menaikkan efisiensi aerobik', durasi: '20–60 minutes', rasa: 'Moderate — speech starts breaking up' },
-  { n: 4, nama: 'Ambang laktat', pctLo: 91, pctHi: 105, tujuan: 'Menaikkan ambang laktat — penentu terbesar performa', durasi: '8–30 minute blocks', rasa: 'Hard but controlled — 3–5 words at a time' },
-  { n: 5, nama: 'VO₂max', pctLo: 106, pctHi: 120, tujuan: 'Menaikkan kapasitas aerobik maksimal', durasi: '3–8 minute blocks', rasa: 'Very hard — one or two words only' },
-  { n: 6, nama: 'Anaerobik', pctLo: 121, pctHi: 150, tujuan: 'Anaerobic capacity and lactate tolerance', durasi: 'Blocks of 30 seconds to 3 minutes', rasa: 'Very hard — you cannot speak' },
-  { n: 7, nama: 'Neuromuskular', pctLo: 151, pctHi: null, tujuan: 'Peak speed and fast-twitch fibre recruitment', durasi: '5–15 second sprints', rasa: 'Maksimal' },
+  { n: 1, nama: 'Active recovery', pctLo: 0, pctHi: 55, tujuan: 'Speeds recovery without adding fatigue', durasi: '30–60 minutes', rasa: 'Very easy — you can hold a conversation throughout' },
+  { n: 2, nama: 'Endurance', pctLo: 56, pctHi: 75, tujuan: 'Builds the aerobic base and fat-burning capacity', durasi: '1-5 hours', rasa: 'Easy — you can still speak in full sentences' },
+  { n: 3, nama: 'Tempo', pctLo: 76, pctHi: 90, tujuan: 'Raises aerobic efficiency', durasi: '20–60 minutes', rasa: 'Moderate — speech starts breaking up' },
+  { n: 4, nama: 'Lactate threshold', pctLo: 91, pctHi: 105, tujuan: 'Raises the lactate threshold — the largest determinant of performance', durasi: '8–30 minute blocks', rasa: 'Hard but controlled — 3–5 words at a time' },
+  { n: 5, nama: 'VO₂max', pctLo: 106, pctHi: 120, tujuan: 'Raises maximal aerobic capacity', durasi: '3–8 minute blocks', rasa: 'Very hard — one or two words only' },
+  { n: 6, nama: 'Anaerobic', pctLo: 121, pctHi: 150, tujuan: 'Anaerobic capacity and lactate tolerance', durasi: 'Blocks of 30 seconds to 3 minutes', rasa: 'Very hard — you cannot speak' },
+  { n: 7, nama: 'Neuromuscular', pctLo: 151, pctHi: null, tujuan: 'Peak speed and fast-twitch fibre recruitment', durasi: '5–15 second sprints', rasa: 'Maximal' },
 ]
 
 /** FTP diperkirakan sebesar 95% dari daya rata-rata pada tes 20 menit. */
@@ -147,11 +147,11 @@ export interface SwimZone {
  * Nilai positif berarti LEBIH LAMBAT daripada CSS.
  */
 export const SWIM_ZONES: SwimZone[] = [
-  { nama: 'Aerobik ringan', offset: [6, 10], tujuan: 'Aerobic base and technique work', contoh: '8–10 × 100 m, 20 seconds rest' },
-  { nama: 'Aerobik', offset: [3, 6], tujuan: 'Daya tahan aerobik', contoh: '5–6 × 200 m, 20 seconds rest' },
-  { nama: 'Ambang', offset: [-1, 2], tujuan: 'Menaikkan ambang laktat', contoh: '10–16 × 100 m, 15 seconds rest' },
-  { nama: 'VO₂max', offset: [-5, -2], tujuan: 'Kapasitas aerobik maksimal', contoh: '8–12 × 50 m, 20 seconds rest' },
-  { nama: 'Kecepatan', offset: [-12, -6], tujuan: 'Peak speed and technique at speed', contoh: '10-16 × 25 m, jeda penuh' },
+  { nama: 'Easy aerobic', offset: [6, 10], tujuan: 'Aerobic base and technique work', contoh: '8–10 × 100 m, 20 seconds rest' },
+  { nama: 'Aerobic', offset: [3, 6], tujuan: 'Aerobic endurance', contoh: '5–6 × 200 m, 20 seconds rest' },
+  { nama: 'Threshold', offset: [-1, 2], tujuan: 'Raises the lactate threshold', contoh: '10–16 × 100 m, 15 seconds rest' },
+  { nama: 'VO₂max', offset: [-5, -2], tujuan: 'Maximal aerobic capacity', contoh: '8–12 × 50 m, 20 seconds rest' },
+  { nama: 'Speed', offset: [-12, -6], tujuan: 'Peak speed and technique at speed', contoh: '10-16 × 25 m, full rest' },
 ]
 
 export interface CssResult {
@@ -199,7 +199,7 @@ export const SPEED_WORK: SpeedWork[] = [
   },
   {
     sport: 'sepeda',
-    nama: 'Sprint neuromuskular',
+    nama: 'Neuromuscular sprints',
     isi: '6–10 × 10–15 seconds all-out from low speed, 3–5 minutes rest',
     kapan: 'Once a week',
     kenapa:
@@ -241,17 +241,17 @@ export interface FitPoint {
 
 export const BIKE_FIT: FitPoint[] = [
   {
-    bagian: 'Tinggi sadel',
+    bagian: 'Saddle height',
     patokan: 'A slight knee bend of about 25–35 degrees at the bottom of the stroke; hips should not rock as you pedal',
     bilaSalah: 'Too low causes pain at the FRONT of the knee; too high causes pain BEHIND the knee and rocking hips',
   },
   {
-    bagian: 'Maju-mundur sadel',
+    bagian: 'Saddle fore-aft',
     patokan: 'With the cranks level, the kneecap sits directly over the pedal axle',
     bilaSalah: 'Too far forward loads the knee; too far back loads the back and the hamstring tendons',
   },
   {
-    bagian: 'Jangkauan setang',
+    bagian: 'Bar reach',
     patokan: 'A slight elbow bend, relaxed shoulders, and a back that is not overstretched',
     bilaSalah: 'Too far forward forces excessive neck extension, and is the most common cause of neck pain in cyclists',
   },
@@ -261,7 +261,7 @@ export const BIKE_FIT: FitPoint[] = [
     bilaSalah: 'Bars set too low from the start force excessive rounding of the back and worsen an already poor posture pattern',
   },
   {
-    bagian: 'Kecepatan mengayuh',
+    bagian: 'Pedalling cadence',
     patokan: '80–95 rpm on an ordinary ride',
     bilaSalah: 'Pushing too big a gear too slowly loads the knee and holds back aerobic development',
   },
@@ -295,34 +295,34 @@ export type Goal = 'kecepatan' | 'kebugaran' | 'postur'
 export function weeklyMultiSport(goal: Goal): Session[] {
   if (goal === 'kecepatan') {
     return [
-      { hari: 'Senin', sport: 'renang', isi: 'Technique + threshold: 10 × 100 m at CSS pace', fokus: 'Ambang laktat' },
-      { hari: 'Selasa', sport: 'lari', isi: 'Intervals: 5 × 1000 m at interval pace', fokus: 'VO₂max' },
-      { hari: 'Rabu', sport: 'sepeda', isi: 'Zone 2 for 60–90 minutes + 5 neuromuscular sprints', fokus: 'Basis + kecepatan' },
-      { hari: 'Kamis', sport: 'kekuatan', isi: 'Lifting and pulling work + the posture programme', fokus: 'Kekuatan' },
-      { hari: 'Jumat', sport: 'lari', isi: '25-minute tempo + 6 strides', fokus: 'Ambang laktat' },
-      { hari: 'Sabtu', sport: 'sepeda', isi: 'Threshold blocks: 3 × 12 minutes in zone 4', fokus: 'FTP' },
-      { hari: 'Minggu', sport: 'pulih', isi: 'Easy swim or a gentle walk', fokus: 'Pemulihan' },
+      { hari: 'Monday', sport: 'renang', isi: 'Technique + threshold: 10 × 100 m at CSS pace', fokus: 'Lactate threshold' },
+      { hari: 'Tuesday', sport: 'lari', isi: 'Intervals: 5 × 1000 m at interval pace', fokus: 'VO₂max' },
+      { hari: 'Wednesday', sport: 'sepeda', isi: 'Zone 2 for 60–90 minutes + 5 neuromuscular sprints', fokus: 'Base + speed' },
+      { hari: 'Thursday', sport: 'kekuatan', isi: 'Lifting and pulling work + the posture programme', fokus: 'Kekuatan' },
+      { hari: 'Friday', sport: 'lari', isi: '25-minute tempo + 6 strides', fokus: 'Lactate threshold' },
+      { hari: 'Saturday', sport: 'sepeda', isi: 'Threshold blocks: 3 × 12 minutes in zone 4', fokus: 'FTP' },
+      { hari: 'Sunday', sport: 'pulih', isi: 'Easy swim or a gentle walk', fokus: 'Recovery' },
     ]
   }
   if (goal === 'postur') {
     return [
-      { hari: 'Senin', sport: 'renang', isi: 'Freestyle and backstroke, 1,500–2,000 m, plenty of drills', fokus: 'Opens the chest, strengthens the upper back' },
-      { hari: 'Selasa', sport: 'kekuatan', isi: 'Pull-up progresi, row, face pull, prone Y-T-W', fokus: 'The scapular retractors' },
-      { hari: 'Rabu', sport: 'lari', isi: 'Easy run 30–40 minutes, eyes ahead, cadence 170–180', fokus: 'Aerobik' },
-      { hari: 'Kamis', sport: 'renang', isi: 'Extra backstroke, 1,500 m', fokus: 'Thoracic rotation, external shoulder rotators' },
-      { hari: 'Jumat', sport: 'kekuatan', isi: 'Pulling work + chest and hip flexor stretching', fokus: 'Pasangan regang-kuat' },
-      { hari: 'Sabtu', sport: 'sepeda', isi: 'Zone 2, 60 minutes maximum, and MUST be followed by chest stretching and face pulls', fokus: 'Aerobic work with its counterweight' },
-      { hari: 'Minggu', sport: 'pulih', isi: 'A gentle walk and mobility work', fokus: 'Pemulihan' },
+      { hari: 'Monday', sport: 'renang', isi: 'Freestyle and backstroke, 1,500–2,000 m, plenty of drills', fokus: 'Opens the chest, strengthens the upper back' },
+      { hari: 'Tuesday', sport: 'kekuatan', isi: 'Pull-up progressions, rows, face pulls, prone Y-T-W', fokus: 'The scapular retractors' },
+      { hari: 'Wednesday', sport: 'lari', isi: 'Easy run 30–40 minutes, eyes ahead, cadence 170–180', fokus: 'Aerobic' },
+      { hari: 'Thursday', sport: 'renang', isi: 'Extra backstroke, 1,500 m', fokus: 'Thoracic rotation, external shoulder rotators' },
+      { hari: 'Friday', sport: 'kekuatan', isi: 'Pulling work + chest and hip flexor stretching', fokus: 'Stretch-and-strengthen pairing' },
+      { hari: 'Saturday', sport: 'sepeda', isi: 'Zone 2, 60 minutes maximum, and MUST be followed by chest stretching and face pulls', fokus: 'Aerobic work with its counterweight' },
+      { hari: 'Sunday', sport: 'pulih', isi: 'A gentle walk and mobility work', fokus: 'Recovery' },
     ]
   }
   return [
-    { hari: 'Senin', sport: 'renang', isi: 'Aerobik 1500 m campuran gaya', fokus: 'Aerobic work with no joint load' },
-    { hari: 'Selasa', sport: 'lari', isi: 'Easy run, 30–40 minutes', fokus: 'Basis aerobik' },
-    { hari: 'Rabu', sport: 'kekuatan', isi: 'Full-body training + the posture programme', fokus: 'Strength and muscle mass' },
-    { hari: 'Kamis', sport: 'sepeda', isi: 'Zone 2 for 60 minutes', fokus: 'Basis aerobik' },
-    { hari: 'Jumat', sport: 'pulih', isi: 'A gentle walk or an easy swim', fokus: 'Pemulihan' },
-    { hari: 'Sabtu', sport: 'lari', isi: 'Long run, 60–75 minutes', fokus: 'Daya tahan' },
-    { hari: 'Minggu', sport: 'pulih', isi: 'Istirahat', fokus: 'Pemulihan' },
+    { hari: 'Monday', sport: 'renang', isi: 'Aerobic 1,500 m, mixed strokes', fokus: 'Aerobic work with no joint load' },
+    { hari: 'Tuesday', sport: 'lari', isi: 'Easy run, 30–40 minutes', fokus: 'Aerobic base' },
+    { hari: 'Wednesday', sport: 'kekuatan', isi: 'Full-body training + the posture programme', fokus: 'Strength and muscle mass' },
+    { hari: 'Thursday', sport: 'sepeda', isi: 'Zone 2 for 60 minutes', fokus: 'Aerobic base' },
+    { hari: 'Friday', sport: 'pulih', isi: 'A gentle walk or an easy swim', fokus: 'Recovery' },
+    { hari: 'Saturday', sport: 'lari', isi: 'Long run, 60–75 minutes', fokus: 'Endurance' },
+    { hari: 'Sunday', sport: 'pulih', isi: 'Rest', fokus: 'Recovery' },
   ]
 }
 

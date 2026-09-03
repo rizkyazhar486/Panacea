@@ -130,7 +130,7 @@ function mergePosts(server: SocialPost[], local: SocialPost[]): SocialPost[] {
 // Placeholder identities used only as safe fallbacks when no real data exists
 // yet (e.g. a doctor before adding any patient). These are NOT seeded content.
 const PLACEHOLDER_PATIENT: Patient = {
-  id: 'none', name: 'Belum ada pasien', sex: 'L', dob: '1990-01-01', mrn: '—',
+  id: 'none', name: 'No patient yet', sex: 'L', dob: '1990-01-01', mrn: '—',
   heightCm: 165, weightKg: 60, allergies: [], chronicConditions: [], riskFlags: [], avatarColor: '#94a3b8',
 }
 const PLACEHOLDER_CONTRIBUTOR: Contributor = {
@@ -534,10 +534,10 @@ export function StoreProvider({ children }: { children: ReactNode }) {
         })),
       buyMaterial: (materialId) => {
         const m = state.materials.find((x) => x.id === materialId)
-        if (!m) return { ok: false, reason: 'Materi tidak ditemukan.' }
-        if (state.ownedMaterialIds.includes(materialId)) return { ok: false, reason: 'Sudah dimiliki.' }
+        if (!m) return { ok: false, reason: 'Material not found.' }
+        if (state.ownedMaterialIds.includes(materialId)) return { ok: false, reason: 'Already owned.' }
         if (state.wallet.balance < m.priceTokens)
-          return { ok: false, reason: 'Saldo token tidak cukup. Silakan deposit.' }
+          return { ok: false, reason: 'Not enough tokens. Please top up.' }
         setState((st) => {
           const now = new Date().toISOString()
           // Flat 5 PNC platform fee per article; author keeps the remainder.
@@ -557,7 +557,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
                   id: uid(),
                   type: 'payout',
                   amount: payout,
-                  note: `Royalti penulis ${m.authorName} (${m.title}) — setelah biaya platform ${fee} PNC`,
+                  note: `Author royalty for ${m.authorName} (${m.title}) — after the ${fee} PNC platform fee`,
                   at: now,
                 },
                 ...st.wallet.transactions,
@@ -700,7 +700,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
           ...st,
           longevitySubExpires: expires,
           orders: [
-            { id: uid(), category: 'Langganan' as const, title: 'Langganan AI Longevity 30 hari', detail: 'Nilai Longevity bertenaga AI', amountIdr: 49000, status: 'Selesai' as const, at: now.toISOString() },
+            { id: uid(), category: 'Langganan' as const, title: 'AI Longevity subscription, 30 days', detail: 'AI-powered Longevity score', amountIdr: 49000, status: 'Selesai' as const, at: now.toISOString() },
             ...st.orders,
           ],
           wallet: {
@@ -710,7 +710,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
                 id: uid(),
                 type: 'subscription' as TxType,
                 amount: 0,
-                note: 'Langganan AI Longevity 30 hari — Rp49.000 (dibayar)',
+                note: 'AI Longevity subscription, 30 days — Rp49,000 (paid)',
                 at: now.toISOString(),
               },
               ...st.wallet.transactions,
@@ -729,13 +729,13 @@ export function StoreProvider({ children }: { children: ReactNode }) {
           chronicLifetime: lifetime ? true : st.chronicLifetime,
           chronicSubExpires: lifetime ? st.chronicSubExpires : expires,
           orders: [
-            { id: uid(), category: 'Langganan' as const, title: lifetime ? 'Pemantauan Kronis — Lifetime' : 'Pemantauan Kronis 30 hari', detail: 'Monitoring TTV harian pasien kronis & longevity', amountIdr: priceIdr, status: 'Selesai' as const, at: now.toISOString() },
+            { id: uid(), category: 'Langganan' as const, title: lifetime ? 'Chronic Monitoring — Lifetime' : 'Chronic Monitoring, 30 days', detail: 'Daily vital-sign monitoring for chronic and longevity patients', amountIdr: priceIdr, status: 'Selesai' as const, at: now.toISOString() },
             ...st.orders,
           ],
           wallet: {
             balance: st.wallet.balance,
             transactions: [
-              { id: uid(), type: 'subscription' as TxType, amount: 0, note: `${lifetime ? 'Pemantauan Kronis Lifetime' : 'Pemantauan Kronis 30 hari'} — Rp${priceIdr.toLocaleString('en-GB')} (dibayar)`, at: now.toISOString() },
+              { id: uid(), type: 'subscription' as TxType, amount: 0, note: `${lifetime ? 'Chronic Monitoring Lifetime' : 'Chronic Monitoring, 30 days'} — Rp${priceIdr.toLocaleString('en-GB')} (paid)`, at: now.toISOString() },
               ...st.wallet.transactions,
             ],
           },
@@ -953,8 +953,8 @@ export function StoreProvider({ children }: { children: ReactNode }) {
         })),
       sendEmail: (e) => setState((st) => ({ ...st, emails: [e, ...st.emails] })),
       withdrawTokens: (amount, bank) => {
-        if (amount <= 0) return { ok: false, reason: 'Jumlah tidak valid.' }
-        if (state.wallet.balance < amount) return { ok: false, reason: 'Saldo tidak cukup.' }
+        if (amount <= 0) return { ok: false, reason: 'Invalid amount.' }
+        if (state.wallet.balance < amount) return { ok: false, reason: 'Not enough balance.' }
         setState((st) => ({
           ...st,
           wallet: {
@@ -1016,20 +1016,20 @@ export function StoreProvider({ children }: { children: ReactNode }) {
         setState((st) => ({ ...st, authorSubPrices: { ...st.authorSubPrices, [authorEmail]: Math.max(0, Math.round(priceTokens)) } })),
       subscribeAuthor: (authorEmail) => {
         const price = state.authorSubPrices[authorEmail] ?? 0
-        if (state.wallet.balance < price) return { ok: false, reason: 'Saldo PNC tidak cukup. Silakan deposit di Billing.' }
+        if (state.wallet.balance < price) return { ok: false, reason: 'Not enough PNC. Please top up in Billing.' }
         const now = new Date()
         const expires = new Date(now.getTime() + 30 * 86400000).toISOString()
         setState((st) => ({
           ...st,
           authorSubs: { ...st.authorSubs, [authorEmail]: expires },
           orders: [
-            { id: uid(), category: 'Langganan' as const, title: `Langganan penulis ${authorEmail}`, detail: 'Akses semua materi penulis 30 hari', amountIdr: price * TOKEN_TO_IDR, status: 'Selesai' as const, at: now.toISOString() },
+            { id: uid(), category: 'Langganan' as const, title: `Subscription to author ${authorEmail}`, detail: 'Access to all of the author’s materials for 30 days', amountIdr: price * TOKEN_TO_IDR, status: 'Selesai' as const, at: now.toISOString() },
             ...st.orders,
           ],
           wallet: {
             balance: st.wallet.balance - price,
             transactions: [
-              { id: uid(), type: 'subscription' as TxType, amount: -price, note: `Langganan penulis ${authorEmail} (30 hari)`, at: now.toISOString() },
+              { id: uid(), type: 'subscription' as TxType, amount: -price, note: `Subscription to author ${authorEmail} (30 days)`, at: now.toISOString() },
               ...st.wallet.transactions,
             ],
           },
