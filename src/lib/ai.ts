@@ -28,36 +28,36 @@ function ageFromDob(dob: string): number {
 }
 
 function ageGroup(age: number): string {
-  if (age < 1) return 'bayi (neonatus/infant)'
-  if (age < 5) return 'balita'
-  if (age < 12) return 'anak'
-  if (age < 18) return 'remaja'
-  if (age < 60) return 'dewasa'
-  return 'lansia (geriatri)'
+  if (age < 1) return 'infant (neonate/infant)'
+  if (age < 5) return 'toddler'
+  if (age < 12) return 'child'
+  if (age < 18) return 'adolescent'
+  if (age < 60) return 'adult'
+  return 'elderly (geriatric)'
 }
 
 function contextBlock(ctx: PatientContext): string {
   const { patient: p, latestVitals: v, supportive } = ctx
   const age = ageFromDob(p.dob)
   const lines = [
-    `KONTEKS PASIEN (continuous identity):`,
-    `- Nama: ${p.name} | ${p.sex === 'L' ? 'Laki-laki' : 'Perempuan'} | Usia ${age} th (${ageGroup(age)}) | MRN ${p.mrn}`,
-    `- WAJIB sesuaikan gaya & isi pertanyaan dengan kelompok usia ini (mis. anamnesis anak ditanyakan ke orang tua/wali, pertimbangan tumbuh-kembang & imunisasi; pada lansia perhatikan polifarmasi, jatuh, fungsi kognitif & kemandirian). Gunakan bahasa yang sesuai usia.`,
-    `- TB ${p.heightCm} cm, BB ${p.weightKg} kg`,
-    `- Kondisi kronis: ${p.chronicConditions.join(', ') || '-'}`,
-    `- Alergi: ${p.allergies.join(', ') || '-'}`,
+    `PATIENT CONTEXT (continuous identity):`,
+    `- Name: ${p.name} | ${p.sex === 'L' ? 'Male' : 'Female'} | Age ${age} yr (${ageGroup(age)}) | MRN ${p.mrn}`,
+    `- MUST adapt the style & content of questions to this age group (e.g. a child's history is taken from a parent/guardian, with growth/development & immunization considerations; for the elderly, watch for polypharmacy, falls, cognitive function & independence). Use age-appropriate language.`,
+    `- Height ${p.heightCm} cm, Weight ${p.weightKg} kg`,
+    `- Chronic conditions: ${p.chronicConditions.join(', ') || '-'}`,
+    `- Allergies: ${p.allergies.join(', ') || '-'}`,
     `- Risk flags: ${p.riskFlags.join(', ') || '-'}`,
   ]
   if (v) {
     lines.push(
-      `- Vital terbaru: TD ${v.systolic}/${v.diastolic} mmHg, HR ${v.heartRate}/min, RR ${v.respRate}/min, T ${v.tempC}°C, SpO2 ${v.spo2}%${
-        v.glucose ? `, GDS ${v.glucose} mg/dL` : ''
+      `- Latest vitals: BP ${v.systolic}/${v.diastolic} mmHg, HR ${v.heartRate}/min, RR ${v.respRate}/min, T ${v.tempC}°C, SpO2 ${v.spo2}%${
+        v.glucose ? `, glucose ${v.glucose} mg/dL` : ''
       }`,
     )
   }
   if (supportive.length) {
     lines.push(
-      `- Penunjang terbaru: ${supportive
+      `- Latest supporting results: ${supportive
         .slice(0, 8)
         .map((s) => `${s.name} ${s.value}${s.unit ?? ''}${s.flag && s.flag !== 'normal' ? ` (${s.flag})` : ''}`)
         .join('; ')}`,
@@ -82,7 +82,7 @@ async function callClaude(
   const system = SYSTEM_PROMPT + (systemExtra ? `\n\n${systemExtra}` : '')
   const model = modelOverride || settings.model
   const { text } = await api.aiMessages({ model, system, messages, max_tokens: 2048 })
-  return text || '(tidak ada respons)'
+  return text || '(no response)'
 }
 
 export async function sendChat(
@@ -129,12 +129,12 @@ export async function draftEMR(
 ): Promise<EMRDraft> {
   if (!aiAvailable()) return demoDraft(ctx)
   const transcript = history
-    .map((m) => `${m.role === 'user' ? 'Pasien' : 'AI'}: ${m.content}`)
+    .map((m) => `${m.role === 'user' ? 'Patient' : 'AI'}: ${m.content}`)
     .join('\n')
   const msgs = [
     {
       role: 'user' as const,
-      content: `${contextBlock(ctx)}\n\nTRANSKRIP ANAMNESIS:\n${transcript}\n\n${EMR_DRAFT_INSTRUCTION}`,
+      content: `${contextBlock(ctx)}\n\nHISTORY-TAKING TRANSCRIPT:\n${transcript}\n\n${EMR_DRAFT_INSTRUCTION}`,
     },
   ]
   try {
@@ -154,7 +154,7 @@ export async function verifyMaterial(settings: AISettings, m: Material): Promise
   const msgs = [
     {
       role: 'user' as const,
-      content: `Tinjau kelayakan materi medis untuk dijual di platform edukasi kedokteran. Nilai akurasi, kemutakhiran, keamanan klinis, dan kelengkapan. Judul: "${m.title}". Kategori: ${m.category}. Jalur: ${m.exam}. Spesialti: ${m.specialty}. Deskripsi: ${m.description}.\n\nKeluarkan HANYA JSON minified: {"verdict":"approved"|"revise","score":0-100,"notes":"alasan singkat bilingual"}`,
+      content: `Review the suitability of this medical material for sale on a medical education platform. Assess accuracy, currency, clinical safety, and completeness. Title: "${m.title}". Category: ${m.category}. Track: ${m.exam}. Specialty: ${m.specialty}. Description: ${m.description}.\n\nOutput ONLY minified JSON: {"verdict":"approved"|"revise","score":0-100,"notes":"brief reason in English"}`,
     },
   ]
   try {
@@ -179,12 +179,11 @@ export async function generateEducation(
   const msgs = [
     {
       role: 'user' as const,
-      // SATU BAHASA, BUKAN DUA. Permintaan "bilingual ID+EN" membuat model
-      // menuliskan tiap kalimat dua kali dipisahkan tanda |, sehingga pasien
-      // membaca hal yang sama berturut-turut dan panjang halaman berlipat.
-      // Aplikasinya berbahasa Indonesia; terjemahan Inggris tidak dibaca
-      // siapa pun di sini.
-      content: `${contextBlock(ctx)}\n\nBuat EDUKASI PASIEN dalam BAHASA INDONESIA saja (bahasa awam, empatik) untuk diagnosis: "${diagnosis}". Singkat namun mendalam, agar pasien memahami penyakitnya dan cara menjaga kesehatan. Jangan menuliskan terjemahan Inggris dan jangan memakai tanda | sebagai pemisah bahasa.\n\nKeluarkan HANYA JSON minified: {"diagnosis":string,"ringkas":string,"mendalam":string,"caraMenjaga":string[],"tandaBahaya":string[]}`,
+      // ONE LANGUAGE, NOT TWO. A "bilingual" request makes the model write
+      // every sentence twice separated by a |, so the patient reads the same
+      // thing back to back and the page length doubles. The app's interface
+      // is English; nobody here reads a second-language translation.
+      content: `${contextBlock(ctx)}\n\nWrite PATIENT EDUCATION in ENGLISH only (plain language, empathetic) for the diagnosis: "${diagnosis}". Brief but substantive, so the patient understands their condition and how to take care of their health. Do not write a translation into another language and do not use | as a language separator.\n\nOutput ONLY minified JSON: {"diagnosis":string,"ringkas":string,"mendalam":string,"caraMenjaga":string[],"tandaBahaya":string[]}`,
     },
   ]
   try {
@@ -207,7 +206,7 @@ function demoVerify(m: Material): AIReview {
     verdict: score >= 80 ? 'approved' : 'approved',
     score: Math.min(96, score),
     notes:
-      '⚠️ Mode Demo. Konten dinilai konsisten dengan pedoman terkini; sitasi & dosis perlu konfirmasi verifikator spesialis. / Content appears consistent with current guidelines; citations & doses to be confirmed by a specialist verifier.',
+      '⚠️ Demo Mode. Content appears consistent with current guidelines; citations & doses to be confirmed by a specialist verifier.',
     at: new Date().toISOString(),
   }
 }
@@ -215,21 +214,21 @@ function demoVerify(m: Material): AIReview {
 function demoEducation(diagnosis: string): EducationSheet {
   return {
     diagnosis,
-    ringkas: `⚠️ Mode Demo. ${diagnosis} adalah kondisi yang perlu dipahami dan dikontrol bersama tim medis. Dengan pengobatan teratur dan gaya hidup sehat, kualitas hidup Anda dapat terjaga.`,
+    ringkas: `⚠️ Demo Mode. ${diagnosis} is a condition that needs to be understood and controlled together with your medical team. With regular treatment and a healthy lifestyle, your quality of life can be maintained.`,
     mendalam:
-      'Penyakit ini berkembang dari interaksi faktor risiko (genetik, gaya hidup, lingkungan) yang memengaruhi fungsi organ secara bertahap. Memahami pemicu, mengenali gejala dini, dan patuh pada terapi membantu mencegah komplikasi serta memperpanjang masa sehat (healthspan).',
+      'This condition develops from an interaction of risk factors (genetic, lifestyle, environmental) that gradually affect organ function. Understanding your triggers, recognizing early symptoms, and adhering to therapy help prevent complications and extend your healthy years (healthspan).',
     caraMenjaga: [
-      'Minum obat sesuai jadwal; jangan berhenti tanpa anjuran dokter.',
-      'Pola makan seimbang — kurangi garam, gula, dan lemak jenuh.',
-      'Aktivitas fisik teratur (mis. jalan cepat 30 menit, 5×/minggu).',
-      'Tidur cukup 7–8 jam dan kelola stres.',
-      'Pantau tanda vital di rumah dan catat keluhan.',
+      'Take medication on schedule; do not stop without your doctor\'s advice.',
+      'Eat a balanced diet — reduce salt, sugar, and saturated fat.',
+      'Regular physical activity (e.g. 30 minutes of brisk walking, 5x/week).',
+      'Get 7–8 hours of sleep and manage stress.',
+      'Monitor your vital signs at home and note any symptoms.',
     ],
     tandaBahaya: [
-      'Sesak napas berat atau nyeri dada.',
-      'Penurunan kesadaran atau kebingungan mendadak.',
-      'Demam tinggi yang tidak membaik.',
-      'Gejala memburuk cepat — segera ke fasilitas kesehatan.',
+      'Severe shortness of breath or chest pain.',
+      'Loss of consciousness or sudden confusion.',
+      'High fever that does not improve.',
+      'Symptoms worsening quickly — seek care immediately.',
     ],
     generatedAt: new Date().toISOString(),
   }
@@ -238,7 +237,7 @@ function demoEducation(diagnosis: string): EducationSheet {
 function extractJson(raw: string): unknown {
   const start = raw.indexOf('{')
   const end = raw.lastIndexOf('}')
-  if (start === -1 || end === -1) throw new Error('Respons AI tidak mengandung JSON yang valid.')
+  if (start === -1 || end === -1) throw new Error('The AI response does not contain valid JSON.')
   return JSON.parse(raw.slice(start, end + 1))
 }
 
@@ -250,63 +249,63 @@ function demoChatReply(history: ChatMessage[], ctx: PatientContext): string {
   const turn = history.filter((m) => m.role === 'user').length
   const name = ctx.patient.name.split(' ')[0]
   const scripts = [
-    `Halo ${name}, saya asisten klinis–longevity Anda — mendukung, bukan menggantikan, dokter pemeriksa. Boleh ceritakan **keluhan utama** Anda hari ini? Sejak kapan dirasakan?\n\n_(Catatan: respons AI penuh sedang tidak terjangkau saat ini — ini balasan contoh. Coba lagi sesaat lagi.)_`,
-    `Terima kasih. Mari perdalam dengan **SOCRATES**:\n- **Site** — di mana persisnya?\n- **Onset** — mendadak atau bertahap?\n- **Character** — seperti apa rasanya (tertekan, terbakar, tertusuk)?\n- **Radiation** — menjalar ke mana?\n\nSilakan jawab satu per satu.`,
-    `Baik. Beberapa pertanyaan penyaring:\n- Apakah ada **demam**, penurunan berat badan, atau keringat malam?\n- Bagaimana **pola makan, tidur, dan aktivitas** belakangan ini?\n- Adakah riwayat penyakit serupa di keluarga?`,
-    `Adequate lengkap untuk hipotesis awal. Berdasarkan keluhan dan konteks (${ctx.patient.chronicConditions.join(
+    `Hello ${name}, I'm your clinical-longevity assistant — supporting, not replacing, the examining doctor. Could you tell me your **chief complaint** today? Since when have you felt it?\n\n_(Note: full AI responses are unavailable right now — this is a sample reply. Please try again shortly.)_`,
+    `Thank you. Let's dig deeper with **SOCRATES**:\n- **Site** — where exactly?\n- **Onset** — sudden or gradual?\n- **Character** — what does it feel like (pressure, burning, stabbing)?\n- **Radiation** — does it spread anywhere?\n\nPlease answer one at a time.`,
+    `Good. A few screening questions:\n- Any **fever**, weight loss, or night sweats?\n- How has your **diet, sleep, and activity** been lately?\n- Any family history of a similar condition?`,
+    `That's enough for an initial hypothesis. Based on the complaint and context (${ctx.patient.chronicConditions.join(
       ', ',
-    ) || 'tanpa komorbid tercatat'}), saya rekomendasikan **pemeriksaan penunjang**: pemeriksaan fisik terarah, lab dasar (darah lengkap, fungsi ginjal, elektrolit, GDS), dan EKG bila ada keluhan kardiovaskular.\n\nKetuk **“Susun Draft AI-EMR”** di atas — saya akan menyusun anamnesis terstruktur + daftar masalah + usulan rencana, untuk **diverifikasi dan dilengkapi oleh dokter**.`,
+    ) || 'no comorbidities recorded'}), I recommend **supporting exams**: a focused physical exam, basic labs (CBC, renal function, electrolytes, random glucose), and an ECG if there are cardiovascular complaints.\n\nTap **"Draft AI-EMR"** above — I'll put together a structured history + problem list + suggested plan, to be **verified and completed by the doctor**.`,
   ]
   return scripts[Math.min(turn - 1, scripts.length - 1)] ?? scripts[scripts.length - 1]
 }
 
 function demoDraft(ctx: PatientContext): EMRDraft {
-  const chronic = ctx.patient.chronicConditions[0] ?? 'Hipertensi'
+  const chronic = ctx.patient.chronicConditions[0] ?? 'Hypertension'
   return {
-    keluhanUtama: 'Nyeri kepala dan mudah lelah sejak 1 minggu (simulasi demo).',
+    keluhanUtama: 'Headache and fatigue for 1 week (demo simulation).',
     rps:
-      '⚠️ SIMULASI EDUKASI — temuan direkayasa untuk pembelajaran. Pasien mengeluh nyeri kepala (Site: oksipital; Onset: bertahap; Character: tertekan; Radiation: tidak menjalar; Associations: pusing berputar ringan; Time: memberat pagi hari; Exacerbating: aktivitas; Severity: 5/10). Disertai mudah lelah dan tengkuk terasa kaku.',
-    rpd: `History ${chronic}, kontrol tidak teratur.`,
-    rpk: 'Ibu dengan hipertensi dan DM tipe 2.',
-    riwayatPengobatan: 'Amlodipin 5 mg/hari (sering lupa minum).',
-    riwayatAlergi: ctx.patient.allergies.join(', ') || 'Tidak ada alergi diketahui.',
-    riwayatNutrisi: 'Asupan tinggi garam dan rendah serat; kurang aktivitas fisik.',
-    riwayatSosialEkonomi: 'Tinggal bersama keluarga, perokok pasif, stres pekerjaan sedang.',
+      '⚠️ EDUCATIONAL SIMULATION — findings fabricated for learning. Patient reports headache (Site: occipital; Onset: gradual; Character: pressure-like; Radiation: none; Associations: mild vertigo; Time: worse in the morning; Exacerbating: activity; Severity: 5/10). Accompanied by fatigue and neck stiffness.',
+    rpd: `History of ${chronic}, poorly controlled.`,
+    rpk: 'Mother with hypertension and type 2 diabetes.',
+    riwayatPengobatan: 'Amlodipine 5 mg/day (often misses doses).',
+    riwayatAlergi: ctx.patient.allergies.join(', ') || 'No known allergies.',
+    riwayatNutrisi: 'High-salt, low-fiber diet; insufficient physical activity.',
+    riwayatSosialEkonomi: 'Lives with family, passive smoker, moderate work stress.',
     suggestedExams: [
-      'Pemeriksaan fisik terarah: TD kedua lengan, funduskopi, auskultasi karotis & jantung',
-      'Lab: darah lengkap, ureum/kreatinin, elektrolit, profil lipid, GDP/HbA1c, urinalisis',
-      'EKG 12 sadapan (cari LVH/iskemia)',
-      'Pertimbangkan ekokardiografi bila ada tanda hypertensive heart disease',
+      'Focused physical exam: BP in both arms, fundoscopy, carotid & cardiac auscultation',
+      'Labs: CBC, urea/creatinine, electrolytes, lipid profile, fasting glucose/HbA1c, urinalysis',
+      '12-lead ECG (look for LVH/ischemia)',
+      'Consider echocardiography if signs of hypertensive heart disease',
     ],
     problems: [
       {
-        title: 'Hipertensi tidak terkontrol',
+        title: 'Uncontrolled hypertension',
         probability: 80,
         basis:
-          'Anamnesis nyeri kepala oksipital + tengkuk kaku; riwayat hipertensi dengan kepatuhan rendah; vital TD meningkat.',
+          'History of occipital headache + neck stiffness; hypertension history with poor adherence; elevated BP on vitals.',
         assessment:
-          'Dipikirkan hipertensi esensial tidak terkontrol sebagai penyebab utama, mengingat pola nyeri kepala oksipital pagi hari, riwayat keluarga, dan kepatuhan obat yang rendah, lebih daripada nyeri kepala tipe tegang primer — meski keduanya dapat tumpang tindih. Patofisiologi: peningkatan resistensi vaskular perifer dan remodeling arteriolar meningkatkan afterload; perlu disingkirkan penyebab sekunder (renoparenkimal, renovaskular, endokrin) melalui penunjang. (Evidence level B)',
+          'Uncontrolled essential hypertension is considered the main cause, given the morning occipital headache pattern, family history, and poor medication adherence, more so than primary tension-type headache — though the two can overlap. Pathophysiology: increased peripheral vascular resistance and arteriolar remodeling raise afterload; secondary causes (renoparenchymal, renovascular, endocrine) should be ruled out via supporting tests. (Evidence level B)',
         differentials: [
-          'Nyeri kepala tipe tegang — bilateral, tidak berdenyut, tanpa lonjakan TD bermakna.',
-          'Hipertensi sekunder (renovaskular/endokrin) — onset muda/resisten, bruit abdomen, hipokalemia.',
+          'Tension-type headache — bilateral, non-pulsatile, without a significant BP spike.',
+          'Secondary hypertension (renovascular/endocrine) — young-onset/resistant, abdominal bruit, hypokalemia.',
         ],
       },
     ],
     prognosis:
-      'Fair — baik bila kepatuhan & target TD tercapai; risiko komplikasi kardio-serebro-vaskular meningkat bila tidak terkontrol.',
+      'Fair — good if adherence & BP targets are achieved; risk of cardio-cerebrovascular complications rises if uncontrolled.',
     draftPlan: [
-      { category: 'Suportif', text: 'Diet DASH, restriksi garam <5 g/hari, target keseimbangan cairan euvolemia.' },
+      { category: 'Suportif', text: 'DASH diet, salt restriction <5 g/day, target euvolemic fluid balance.' },
       {
         category: 'Definitif',
-        text: 'Optimalkan antihipertensi (mis. ACE-inhibitor/ARB ± CCB) — DOSIS DIVERIFIKASI DOKTER terhadap formularium & fungsi ginjal.',
+        text: 'Optimize antihypertensives (e.g. ACE-inhibitor/ARB ± CCB) — DOSE VERIFIED BY DOCTOR against the formulary & renal function.',
       },
-      { category: 'Edukasi', text: 'Kepatuhan obat, monitoring TD rumah 2×/hari, berhenti paparan rokok.' },
-      { category: 'Follow-up', text: 'Kontrol 1–2 minggu; lebih cepat bila TD >180/120 atau gejala neurologis.' },
-      { category: 'Monitoring', text: 'TD harian, fungsi ginjal & elektrolit 2–4 minggu setelah titrasi.' },
+      { category: 'Edukasi', text: 'Medication adherence, home BP monitoring 2x/day, stop smoke exposure.' },
+      { category: 'Follow-up', text: 'Follow up in 1–2 weeks; sooner if BP >180/120 or neurological symptoms.' },
+      { category: 'Monitoring', text: 'Daily BP, renal function & electrolytes 2–4 weeks after titration.' },
     ],
     references: [
       'Mancia G, et al. 2023 ESH Guidelines for the management of arterial hypertension. J Hypertens. 2023.',
-      "Whelton PK, et al. ACC/AHA Hypertension Guideline. 2017 (update terkait).",
+      "Whelton PK, et al. ACC/AHA Hypertension Guideline. 2017 (related update).",
     ],
   }
 }
