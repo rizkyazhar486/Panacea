@@ -125,10 +125,10 @@ export function BioSimulators() {
   return (
     <div className="mx-auto max-w-2xl space-y-5 pb-24">
       <Card className="!p-5">
-        <SectionTitle icon={<IconSparkle size={20} />} title="Bio-Simulators" subtitle="Gambaran mekanisme, bukan pengukuran" />
+        <SectionTitle icon={<IconSparkle size={20} />} title="Bio-Simulators" subtitle="An illustration of mechanism, not a measurement" />
         <p className="mt-2 rounded-xl bg-amber-500/10 px-3 py-2 text-[11px] leading-snug text-amber-800 dark:text-amber-300">
-          Kurva di halaman ini <b>dibuat untuk menerangkan bentuk hubungannya</b>, bukan dihitung dari tubuh Anda dan bukan
-          diambil dari data penelitian. Jangan dibaca sebagai kadar atau laju yang sesungguhnya.
+          The curves on this page <b>are built to illustrate the shape of the relationship</b>, not calculated from your body and not
+          drawn from research data. Do not read them as actual levels or rates.
         </p>
         <p className="mt-2 text-[13px] leading-relaxed text-amber-700 dark:text-amber-300">
           These are teaching illustrations built from simple published-average math, not real

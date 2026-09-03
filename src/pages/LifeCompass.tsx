@@ -102,7 +102,7 @@ export function LifeCompass() {
 
       <Card className="!p-5">
         <div className="text-xs font-black uppercase tracking-wide text-neutral-500">When you're worried about the future</div>
-        <Prosa kelas="mt-1 text-[12px] text-neutral-500">Tiap tradisi merumuskannya dengan cara berbeda — ditampilkan berdampingan, bukan untuk memberi tahu mana yang harus Anda yakini, melainkan agar Anda dapat mengambil dari yang mana pun yang berbicara kepada Anda.</Prosa>
+        <Prosa kelas="mt-1 text-[12px] text-neutral-500">Each tradition frames it differently — shown side by side, not to tell you which to believe, but so you can draw from whichever one speaks to you.</Prosa>
         <div className="mt-3 space-y-3">
           {WISDOM.map((w) => (
             <div key={w.tradition} className="rounded-xl bg-neutral-50 px-3 py-2.5 dark:bg-white/5">

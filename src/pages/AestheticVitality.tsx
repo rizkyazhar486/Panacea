@@ -222,7 +222,7 @@ export function AestheticVitality() {
           <div className="text-sm leading-relaxed text-neutral-600 dark:text-neutral-300">
             {score == null
               ? 'Enter or sync at least three indicators below to see your Aesthetic Vitality Index — a blend of proportion, body composition, skin-repair, and vitality signals that research links to a healthy, attractive appearance.'
-              : <>Indeks Anda menggabungkan <b>{indicators.length}</b> health-linked signals. It reflects the modifiable, health-driven part of appearance — improving sleep, recovery, and body composition moves it, and each also adds years of healthspan.</>}
+              : <>Your index combines <b>{indicators.length}</b> health-linked signals. It reflects the modifiable, health-driven part of appearance — improving sleep, recovery, and body composition moves it, and each also adds years of healthspan.</>}
           </div>
         </div>
       </Card>
@@ -284,7 +284,7 @@ export function AestheticVitality() {
 
       {/* Concept pillars */}
       <Card className="!p-5">
-        <SectionTitle icon={<IconHeart size={20} />} title="What Makes Something Look Beautiful?" subtitle="Sisi evolusi, budaya, psikologi, filsafat & rancangan" />
+        <SectionTitle icon={<IconHeart size={20} />} title="What Makes Something Look Beautiful?" subtitle="The evolutionary, cultural, psychological, philosophical & design angles" />
         <div className="mt-3 space-y-3">
           {PILLARS.map((p) => (
             <div key={p.title} className="rounded-xl bg-neutral-50 p-3 dark:bg-white/5">

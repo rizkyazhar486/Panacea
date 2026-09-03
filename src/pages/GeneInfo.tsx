@@ -77,7 +77,7 @@ export function GeneInfo() {
               </div>
             )}
           </Card>
-          <Section title="Apa fungsinya" body={gene.summary} />
+          <Section title="What it does" body={gene.summary} />
           {(gene.entrezId || gene.ensemblId) && (
             <Card className="!p-5">
               <div className="text-xs font-black uppercase tracking-wide text-neutral-500">External references</div>
