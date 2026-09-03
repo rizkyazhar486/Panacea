@@ -88,7 +88,7 @@ export function Perubahan() {
         ? <TinjauPekan pekan={jatuhTempo} onSimpan={(t) => setS((x) => ({ ...x, tinjauan: [...x.tinjauan, t] }))} />
         : (
           <Card>
-            <Prosa kelas="text-[13px] leading-relaxed text-neutral-600">Belum ada tinjauan yang jatuh tempo. Tinjauan terbuka setelah satu pekan selesai — meninjau pekan yang masih berjalan mengukur suasana hati Anda, bukan pekannya.</Prosa>
+            <Prosa kelas="text-[13px] leading-relaxed text-neutral-600">No review is due yet. A review opens once a full week has passed — reviewing a week still in progress measures your mood, not the week.</Prosa>
           </Card>
         )}
 
@@ -115,9 +115,9 @@ export function Perubahan() {
       <Ringkas ikon="🚫" judul="Why there is no streak, badge, or celebration here"
         anak={
           <div className="space-y-1.5">
-            <Poin ikon="🔗">Rangkaian yang putus mengubah satu hari terlewat menjadi vonis tentang diri Anda — dan justru itu yang membuat orang berhenti sama sekali alih-alih melanjutkan.</Poin>
-            <Poin ikon="🎁">Lencana dan hadiah memindahkan dorongan dari dalam ke luar diri, dan dorongan dari luar runtuh begitu hadiahnya berhenti.</Poin>
-            <Poin ikon="📉">Sebagai gantinya, yang ditawarkan di sini adalah satu hal yang tidak diberikan kebanyakan aplikasi: kemungkinan diberi tahu bahwa ini tidak berhasil.</Poin>
+            <Poin ikon="🔗">A broken streak turns one missed day into a verdict about who you are — and that is exactly what makes people quit entirely instead of continuing.</Poin>
+            <Poin ikon="🎁">Badges and rewards shift motivation from internal to external, and external motivation collapses the moment the reward stops.</Poin>
+            <Poin ikon="📉">Instead, what's offered here is something most apps don't give you: the possibility of being told this isn't working.</Poin>
           </div>
         } />
 
@@ -195,7 +195,7 @@ function Susun({
 
       {langkah === 0 && (
         <Card>
-          <Prosa kelas="text-[13px] leading-relaxed text-neutral-600">Membaca saja tidak mengubah apa pun — ia lebih sering hanya memunculkan perasaan telah berubah. Yang menyusul di bawah ini adalah susunan paling kecil yang memang didukung bukti: satu sasaran, waktu yang disebutkan, versi yang cukup kecil untuk bertahan pada pekan yang buruk, dan tinjauan yang boleh menyimpulkan bahwa ini tidak berhasil.</Prosa>
+          <Prosa kelas="text-[13px] leading-relaxed text-neutral-600">Reading alone changes nothing — it more often just produces a feeling of having changed. What follows below is the smallest structure that is actually evidence-supported: one goal, a stated time, a version small enough to survive a bad week, and a review that is allowed to conclude this isn't working.</Prosa>
           <div className="mt-3">
             <div className="text-[11px] font-bold uppercase tracking-wide text-neutral-500">Area</div>
             <div className="mt-1.5 flex flex-wrap gap-1.5">
@@ -232,15 +232,15 @@ function Susun({
           )}
           {langkah < LANGKAH.length - 1
             ? <Button onClick={() => setLangkah(langkah + 1)} disabled={!bolehLanjut}>Next</Button>
-            : <Button onClick={onSelesai} disabled={!bolehLanjut}>Mulai dua belas pekan</Button>}
+            : <Button onClick={onSelesai} disabled={!bolehLanjut}>Start twelve weeks</Button>}
         </div>
       </Card>
 
       <Ringkas ikon="📚" judul="Where this structure comes from"
         anak={
           <div className="space-y-1.5">
-            <Poin ikon="🕒"><b>Menyebutkan kapan dan di mana</b> — one of the better-supported findings in behaviour change, though its effect is modest and shrinks in the most rigorous studies.</Poin>
-            <Poin ikon="🔻"><b>Versi paling kecil</b> — reasoning from maintenance research: far less work preserves what you built than was needed to build it.</Poin>
+            <Poin ikon="🕒"><b>Stating when and where</b> — one of the better-supported findings in behaviour change, though its effect is modest and shrinks in the most rigorous studies.</Poin>
+            <Poin ikon="🔻"><b>The smallest version</b> — reasoning from maintenance research: far less work preserves what you built than was needed to build it.</Poin>
             <Poin ikon="🔎"><b>The falsifier</b> — borrowed from trial pre-registration. Sound reasoning, but no study shows individuals who do this develop faster.</Poin>
             <Poin ikon="⚠️"><b>Twelve weeks</b> — a convention, not a finding. It is long enough to see change in most physical measures and short enough to stay real.</Poin>
           </div>
@@ -286,7 +286,7 @@ function TinjauPekan({ pekan, onSimpan }: { pekan: number; onSimpan: (t: import(
           arah, halangan: halangan.trim(), penyesuaian: penyesuaian.trim(),
         })}>Save review</Button>
       </div>
-      <Prosa kelas="mt-2 text-[10px] leading-relaxed text-neutral-500">Jawablah dengan apa yang terjadi, bukan apa yang Anda niatkan. Catatan yang disunting agar tampak lebih baik adalah catatan yang tidak lagi dapat memberi tahu apa pun.</Prosa>
+      <Prosa kelas="mt-2 text-[10px] leading-relaxed text-neutral-500">Answer with what actually happened, not what you intended. A note edited to look better is a note that can no longer tell you anything.</Prosa>
     </Card>
   )
 }

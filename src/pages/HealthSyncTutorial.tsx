@@ -161,22 +161,22 @@ export function HealthSyncTutorial() {
       <Card className="!p-5">
         <div className="flex items-start justify-between gap-3">
           <div>
-            <div className="text-sm font-black text-ink dark:text-ink">Diagnosa sinkronisasi</div>
+            <div className="text-sm font-black text-ink dark:text-ink">Sync diagnosis</div>
             <p className="mt-0.5 text-[12px] text-neutral-500">
-              Diperiksa dari kiriman yang benar-benar sampai ke server, bukan dari tebakan.
+              Checked against deliveries that actually reached the server, not a guess.
             </p>
           </div>
           <button onClick={jalankanDiagnosa} disabled={cek}
             className="shrink-0 rounded-xl bg-neutral-100 px-3 py-1.5 text-[11px] font-bold text-ink disabled:opacity-50 dark:bg-white/10 dark:text-white">
-            {cek ? 'Memeriksa…' : 'Periksa lagi'}
+            {cek ? 'Checking…' : 'Check again'}
           </button>
         </div>
 
         {diag && (
           <>
             <div className="mt-2 text-[11px] text-neutral-500">
-              {diag.deliveries} kiriman tercatat
-              {diag.lastAt ? ` · terakhir ${new Date(diag.lastAt).toLocaleString('en-GB')}` : ''}
+              {diag.deliveries} deliveries recorded
+              {diag.lastAt ? ` · last ${new Date(diag.lastAt).toLocaleString('en-GB')}` : ''}
             </div>
             <div className="mt-3 space-y-2">
               {diag.findings.map((f, i) => {
@@ -191,9 +191,9 @@ export function HealthSyncTutorial() {
                     <p className="mt-1 text-[12px] leading-relaxed text-neutral-600 dark:text-neutral-300">{f.detail}</p>
                     {f.setelan && (
                       <div className="mt-2 rounded-lg bg-black/5 px-2.5 py-2 text-[12px] dark:bg-white/10">
-                        <div className="text-neutral-500">Setelan di Health Auto Export</div>
+                        <div className="text-neutral-500">Setting in Health Auto Export</div>
                         <div className="font-black text-ink dark:text-ink">{f.setelan}</div>
-                        <div className="mt-0.5 text-neutral-600 dark:text-neutral-300">Ubah ke: <b>{f.ubahKe}</b></div>
+                        <div className="mt-0.5 text-neutral-600 dark:text-neutral-300">Change to: <b>{f.ubahKe}</b></div>
                       </div>
                     )}
                   </div>
@@ -203,7 +203,7 @@ export function HealthSyncTutorial() {
           </>
         )}
         {!diag && !cek && (
-          <p className="mt-3 text-[12px] text-neutral-500">Diagnosa belum bisa diambil. Pastikan Anda sudah masuk.</p>
+          <p className="mt-3 text-[12px] text-neutral-500">Diagnosis is not available yet. Make sure you are signed in.</p>
         )}
       </Card>
 
