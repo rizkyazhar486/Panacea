@@ -88,7 +88,7 @@ function Bilah({ b }: { b: BilahRujukan }) {
           sebagai title (muncul saat ditahan/ditunjuk) dan tertulis utuh di
           halaman Tubuh, satu ketukan dari sini. Sumber yang dihapus akan
           membuat angka ini tidak dapat diperiksa lagi, dan itu tidak boleh. */}
-      <p className="t-mikro mt-1 truncate text-neutral-500 dark:text-neutral-400" title={`${b.populasi} · Batas: ${b.sumber}`}>
+      <p className="t-mikro mt-1 truncate text-neutral-500 dark:text-neutral-400" title={`${b.populasi} · Source: ${b.sumber}`}>
         <span className="font-bold">{b.zonaKini}</span>
         {' · '}
         {b.populasi}
@@ -109,9 +109,9 @@ export function BilahTubuh({ daftar }: { daftar: BilahRujukan[] }) {
   return (
     <section>
       <div className="mb-2 flex items-baseline justify-between gap-2">
-        <h2 className="t-kecil font-black uppercase tracking-wide text-neutral-500">Terhadap rentang rujukan</h2>
+        <h2 className="t-kecil font-black uppercase tracking-wide text-neutral-500">Against reference ranges</h2>
         <Link to="/tubuh" className="t-kecil flex min-h-[40px] items-center font-bold text-brand">
-          Selengkapnya →
+          More →
         </Link>
       </div>
       <div className="kaca rounded-3xl px-3 py-1">

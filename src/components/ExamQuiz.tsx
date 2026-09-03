@@ -39,7 +39,7 @@ export function ExamQuiz() {
     <div className="space-y-3">
       <div className="flex items-center justify-between">
         <div className="text-xs font-black text-ink">🎓 International Medical Exam Practice</div>
-        <span className="rounded-full bg-neutral-100 px-2 py-0.5 text-[10px] font-bold text-neutral-500">Skor: {score.correct}/{score.total}</span>
+        <span className="rounded-full bg-neutral-100 px-2 py-0.5 text-[10px] font-bold text-neutral-500">Score: {score.correct}/{score.total}</span>
       </div>
 
       <div className="flex flex-wrap gap-1.5">
@@ -76,7 +76,7 @@ export function ExamQuiz() {
 
       {selected !== null && (
         <div className={`rounded-xl border p-3 text-[12px] leading-relaxed ${selected === q.answer ? 'border-brand/20 bg-brand-50/60 text-brand-dark' : 'border-rose-200 bg-rose-50 text-rose-700'}`}>
-          <div className="font-bold">{selected === q.answer ? '✓ Benar!' : '✕ Kurang tepat.'}</div>
+          <div className="font-bold">{selected === q.answer ? '✓ Correct!' : '✕ Not quite.'}</div>
           <p className="mt-1 opacity-90">{q.explanation}</p>
           <button onClick={next} className="mt-2 rounded-full bg-white/60 px-3 py-1 text-[11px] font-bold text-inherit">Next →</button>
         </div>

@@ -58,7 +58,7 @@ export function MenuPeran({
         className="grid h-10 w-10 place-items-center rounded-full border border-brand/30 bg-brand-50 text-brand-dark transition-transform duration-200 hover:scale-105 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/40 dark:bg-brand/10"
         aria-haspopup="menu"
         aria-expanded={buka}
-        aria-label={`Ganti mode akses — sekarang ${label[peran]}`}
+        aria-label={`Switch access mode — currently ${label[peran]}`}
         title={`Mode: ${label[peran]}`}
       >
         <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -85,7 +85,7 @@ export function MenuPeran({
              dibaca satu per satu. */
           className="fixed right-3 top-14 z-50 border border-black/10 bg-white dark:border-white/10 dark:bg-neutral-900 w-52 origin-top-right overflow-hidden rounded-2xl p-1 shadow-xl menu-turun"
         >
-          <p className="px-3 py-2 text-[10px] font-black uppercase tracking-wide text-neutral-500">Mode akses</p>
+          <p className="px-3 py-2 text-[10px] font-black uppercase tracking-wide text-neutral-500">Access mode</p>
           {daftar.map((r) => {
             const aktif = r === peran
             return (
