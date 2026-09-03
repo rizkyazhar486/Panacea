@@ -49,23 +49,23 @@ export interface BarisRincian {
  * dan tahapan tidur hanya bermakna di sebelah lama tidurnya.
  */
 const MEDAN: { kunci: string; label: string; satuan: string; ke: string; bulat?: number }[] = [
-  { kunci: 'restingHr', label: 'Denyut istirahat', satuan: 'bpm', ke: '/tubuh' },
+  { kunci: 'restingHr', label: 'Resting HR', satuan: 'bpm', ke: '/tubuh' },
   { kunci: 'hrvMs', label: 'HRV', satuan: 'ms', ke: '/tubuh' },
-  { kunci: 'spo2Pct', label: 'Saturasi oksigen', satuan: '%', ke: '/tubuh' },
-  { kunci: 'respRate', label: 'Laju napas', satuan: '/menit', ke: '/tubuh' },
-  { kunci: 'bodyTempC', label: 'Suhu tubuh', satuan: '°C', ke: '/tubuh', bulat: 1 },
-  { kunci: 'vo2max', label: 'VO2max', satuan: 'mL/kg/mnt', ke: '/lab', bulat: 1 },
-  { kunci: 'sleepH', label: 'Lama tidur', satuan: 'jam', ke: '/pola-tidur', bulat: 1 },
-  { kunci: 'sleepDeepH', label: 'Tidur dalam', satuan: 'jam', ke: '/pola-tidur', bulat: 1 },
-  { kunci: 'sleepRemH', label: 'Tidur REM', satuan: 'jam', ke: '/pola-tidur', bulat: 1 },
-  { kunci: 'sleepAwakeH', label: 'Terjaga saat tidur', satuan: 'jam', ke: '/pola-tidur', bulat: 1 },
-  { kunci: 'steps', label: 'Langkah', satuan: 'langkah', ke: '/latihan' },
-  { kunci: 'exerciseMin', label: 'Menit aktif', satuan: 'menit', ke: '/latihan' },
-  { kunci: 'activeKcal', label: 'Kalori aktif', satuan: 'kkal', ke: '/latihan' },
-  { kunci: 'distanceKm', label: 'Jarak', satuan: 'km', ke: '/latihan', bulat: 1 },
-  { kunci: 'weightKg', label: 'Berat badan', satuan: 'kg', ke: '/body', bulat: 1 },
-  { kunci: 'bodyFatPct', label: 'Lemak tubuh', satuan: '%', ke: '/body', bulat: 1 },
-  { kunci: 'leanMassKg', label: 'Massa tanpa lemak', satuan: 'kg', ke: '/body', bulat: 1 },
+  { kunci: 'spo2Pct', label: 'Oxygen saturation', satuan: '%', ke: '/tubuh' },
+  { kunci: 'respRate', label: 'Respiratory rate', satuan: '/min', ke: '/tubuh' },
+  { kunci: 'bodyTempC', label: 'Body temperature', satuan: '°C', ke: '/tubuh', bulat: 1 },
+  { kunci: 'vo2max', label: 'VO2max', satuan: 'mL/kg/min', ke: '/lab', bulat: 1 },
+  { kunci: 'sleepH', label: 'Sleep duration', satuan: 'hrs', ke: '/pola-tidur', bulat: 1 },
+  { kunci: 'sleepDeepH', label: 'Deep sleep', satuan: 'hrs', ke: '/pola-tidur', bulat: 1 },
+  { kunci: 'sleepRemH', label: 'REM sleep', satuan: 'hrs', ke: '/pola-tidur', bulat: 1 },
+  { kunci: 'sleepAwakeH', label: 'Awake during sleep', satuan: 'hrs', ke: '/pola-tidur', bulat: 1 },
+  { kunci: 'steps', label: 'Steps', satuan: 'steps', ke: '/latihan' },
+  { kunci: 'exerciseMin', label: 'Active minutes', satuan: 'min', ke: '/latihan' },
+  { kunci: 'activeKcal', label: 'Active calories', satuan: 'kcal', ke: '/latihan' },
+  { kunci: 'distanceKm', label: 'Distance', satuan: 'km', ke: '/latihan', bulat: 1 },
+  { kunci: 'weightKg', label: 'Body weight', satuan: 'kg', ke: '/body', bulat: 1 },
+  { kunci: 'bodyFatPct', label: 'Body fat', satuan: '%', ke: '/body', bulat: 1 },
+  { kunci: 'leanMassKg', label: 'Lean mass', satuan: 'kg', ke: '/body', bulat: 1 },
 ]
 
 /**
@@ -103,7 +103,7 @@ export function barisTekananDarah(): BarisRincian | null {
   if (!(v.systolic > 0 && v.diastolic > 0)) return null
   return {
     kunci: 'td',
-    label: 'Tekanan darah',
+    label: 'Blood pressure',
     nilai: `${Math.round(v.systolic)}/${Math.round(v.diastolic)}`,
     satuan: 'mmHg',
     ke: '/tubuh',
