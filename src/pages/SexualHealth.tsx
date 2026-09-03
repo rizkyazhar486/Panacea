@@ -196,7 +196,7 @@ function PeriodTracker() {
               )}
             </>
           )}
-          <Prosa kelas="mt-2 text-[10px] text-neutral-500">Rumus Naegele: HPL = HPHT + 280 hari. Pembandingan ukuran janin bersifat edukatif/gambaran — pertumbuhan sesungguhnya dipantau lewat USG & pemeriksaan ANC rutin, bukan dari hitungan kalender saja.</Prosa>
+          <Prosa kelas="mt-2 text-[10px] text-neutral-500">Naegele's rule: EDD = LMP + 280 days. The fetal-size comparison is educational/illustrative — actual growth is monitored via ultrasound & routine ANC checkups, not calendar calculation alone.</Prosa>
         </div>
       )}
 
@@ -213,7 +213,7 @@ function PeriodTracker() {
           </div>
         ))}
       </div>
-      <Prosa kelas="mt-3 text-[10px] leading-relaxed text-neutral-500">Data siklus disimpan di perangkat ini. Ini alat edukasi & perencanaan — bukan metode kontrasepsi tunggal yang dapat diandalkan (lihat "Metode Kalender" di atas), dan bukan pengganti penilaian medis pada siklus tidak teratur, nyeri hebat, atau dugaan PCOS/endometriosis.</Prosa>
+      <Prosa kelas="mt-3 text-[10px] leading-relaxed text-neutral-500">Cycle data is stored on this device. This is an educational & planning tool — not a reliable standalone contraceptive method (see "Calendar Method" above), and not a substitute for medical evaluation of irregular cycles, severe pain, or suspected PCOS/endometriosis.</Prosa>
     </Card>
   )
 }
@@ -322,7 +322,7 @@ export function SexualHealth() {
             </div>
           ))}
         </div>
-        <Prosa kelas="mt-3 text-[11px] text-neutral-500">Panduan WHO/Kementerian Kesehatan RI menganjurkan sedikitnya 6 kali kontak ANC selama kehamilan. Segera cari pertolongan bila ada perdarahan, nyeri kepala hebat, pandangan kabur, atau gerak janin berkurang.</Prosa>
+        <Prosa kelas="mt-3 text-[11px] text-neutral-500">WHO/Indonesia Ministry of Health guidance recommends at least 6 ANC contacts during pregnancy. Seek help immediately if there is bleeding, severe headache, blurred vision, or reduced fetal movement.</Prosa>
       </Card>
     </div>
   )
