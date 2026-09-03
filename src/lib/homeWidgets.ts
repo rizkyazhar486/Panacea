@@ -100,6 +100,11 @@ export const WIDGETS: WidgetDef[] = [
   { id: 'grafikLangkah', label: '7-Day Steps Chart', ringkas: 'Steps per day', ke: '/tubuh', emoji: '👣', kategori: 'Body & Data', bawaan: true },
   { id: 'grafikGizi', label: '7-Day Nutrition Chart', ringkas: 'Calories logged per day', ke: '/nutrition', emoji: '🍽️', kategori: 'Nutrition' },
   { id: 'grafikDenyut', label: '14-Day Heart Rate Chart', ringkas: 'Resting heart rate over time', ke: '/tubuh', emoji: '❤️', kategori: 'Body & Data' },
+  { id: 'langkahRingkas', label: 'Steps Today (vs usual)', ringkas: "Today's step count against your own 7-day median", ke: '/tubuh', emoji: '👣', kategori: 'Body & Data' },
+  { id: 'latihanRingkas', label: 'Training, 7 Days (Quick)', ringkas: 'Session count, minutes, distance & pace at a glance', ke: '/riwayat-latihan', emoji: '🏃', kategori: 'Training' },
+  { id: 'tidurRingkas', label: 'Sleep Last Night (Quick)', ringkas: 'Hours slept with a 14-night trend line', ke: '/pola-tidur', emoji: '🌙', kategori: 'Sleep & Recovery' },
+  { id: 'denyutRingkas', label: 'Resting Heart Rate (Quick)', ringkas: 'Latest reading with a 14-day trend line', ke: '/log-detak-jantung', emoji: '❤️', kategori: 'Body & Data' },
+  { id: 'aerobikRingkas', label: 'Aerobic Capacity (vs age)', ringkas: 'VO2max compared to the median for your age & sex', ke: '/longevity', emoji: '🌱', kategori: 'Body & Data' },
   { id: 'pantauan', label: 'Watchlist', ringkas: 'The conditions, drugs, and scores you picked yourself', ke: '/cari', emoji: '★', kategori: 'Clinical & Learning', bawaan: true },
   { id: 'harian', label: 'Daily', ringkas: 'Any day you like: what was measured and what was felt', ke: '/harian', emoji: '📅', kategori: 'Body & Data' },
   { id: 'ikhtisar', label: 'Overview', ringkas: 'Every body number and its chart on one screen', ke: '/ikhtisar', emoji: '📈', kategori: 'Body & Data' },
@@ -342,6 +347,7 @@ export const WIDGET_HIDUP = [
   'nadiPanjang', 'tidur14', 'muatanPekan', 'kaloriBanding', 'tdee', 'kepatuhan', 'beratTren',
   // ── Grafik tujuh hari (kisi dua kolom, bukan tumpukan) ──────────────────
   'grafikLatihan', 'grafikTidur', 'grafikLangkah', 'grafikGizi', 'grafikDenyut',
+  'langkahRingkas', 'latihanRingkas', 'tidurRingkas', 'denyutRingkas', 'aerobikRingkas',
   // ── Belajar & klinis ────────────────────────────────────────────────────
   'obatCepat', 'kalkulatorCepat', 'stasiunSering', 'kartuBelajar', 'soalHarian', 'inspirasi', 'ringkasanKarya',
   // ── Hidup & lingkungan ──────────────────────────────────────────────────

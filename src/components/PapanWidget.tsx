@@ -466,6 +466,7 @@ export function PapanWidget({ pratinjau, tanggalCatatan }: { pratinjau: Pratinja
   const BERKARTU = [
     'grafikOlahraga',
     'grafikLatihan', 'grafikTidur', 'grafikLangkah', 'grafikGizi', 'grafikDenyut',
+    'langkahRingkas', 'latihanRingkas', 'tidurRingkas', 'denyutRingkas', 'aerobikRingkas',
     'pantauan', 'kebugaran', 'salat', 'konsistensi',
     'kabar', 'motivasi', 'obatCepat', 'kalkulatorCepat', 'stasiunSering',
     'skorTim', 'tidurLebar', 'giziLebar',
@@ -625,6 +626,17 @@ export function PapanWidget({ pratinjau, tanggalCatatan }: { pratinjau: Pratinja
     <BilahTubuh daftar={bilah} />
 
     <UbinGrafik />
+
+    {/* Ubin ringkas: pintu biasa yang menunjukkan angkanya sendiri (cincin,
+        batang tujuh hari, atau garis tren) alih-alih hanya lambang dan nama.
+        Masing-masing menyerah (mengembalikan null) bila datanya belum ada. */}
+    <div className="grid grid-cols-2 gap-fluid">
+      {pilihan.includes('langkahRingkas') && <UBIN_LANGSUNG.langkahRingkas />}
+      {pilihan.includes('latihanRingkas') && <UBIN_LANGSUNG.latihanRingkas />}
+      {pilihan.includes('tidurRingkas') && <UBIN_LANGSUNG.tidurRingkas />}
+      {pilihan.includes('denyutRingkas') && <UBIN_LANGSUNG.denyutRingkas />}
+      {pilihan.includes('aerobikRingkas') && <UBIN_LANGSUNG.aerobikRingkas />}
+    </div>
 
     {/* JUDUL "KEADAAN ANDA" DIHAPUS, BUKAN DIKOSONGKAN.
         Sesudah wilayah yang bergrafik dikeluarkan, bagian ini kerap hanya

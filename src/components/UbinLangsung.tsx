@@ -114,7 +114,7 @@ function menitTujuhHari(): number[] {
 }
 
 // ── Langkah ────────────────────────────────────────────────────────────────
-function UbinLangkah() {
+export function UbinLangkah() {
   const v = getVitals()
   const kini = typeof v.steps === 'number' ? v.steps : 0
   if (!(kini > 0)) return null
@@ -134,7 +134,7 @@ function UbinLangkah() {
 }
 
 // ── Latihan 7 hari ─────────────────────────────────────────────────────────
-function UbinLatihan() {
+export function UbinLatihan() {
   const sesi = getWorkouts().filter((w) => Date.now() - Date.parse(w.mulai) < 7 * HARI)
   if (!sesi.length) return null
   const km = sesi.reduce((a, w) => a + (w.jarakKm ?? 0), 0)
@@ -156,7 +156,7 @@ function UbinLatihan() {
 }
 
 // ── Tidur ──────────────────────────────────────────────────────────────────
-function UbinTidur() {
+export function UbinTidur() {
   const deret = deretMetrik('sleepH').map((t) => t.nilai)
   const v = getVitals()
   const kini = typeof v.sleepH === 'number' && v.sleepH > 0 ? v.sleepH : deret[deret.length - 1]
@@ -172,7 +172,7 @@ function UbinTidur() {
 }
 
 // ── Denyut istirahat ───────────────────────────────────────────────────────
-function UbinDenyut() {
+export function UbinDenyut() {
   const v = getVitals()
   const kini = typeof v.restingHr === 'number' ? v.restingHr : 0
   if (!(kini > 0)) return null
@@ -187,7 +187,7 @@ function UbinDenyut() {
 }
 
 // ── Kapasitas aerobik ──────────────────────────────────────────────────────
-function UbinLongevity() {
+export function UbinLongevity() {
   const v = getVitals()
   const vo2 = typeof v.vo2max === 'number' ? v.vo2max : 0
   const usia = typeof v.age === 'number' ? v.age : 0
@@ -197,7 +197,7 @@ function UbinLongevity() {
   const selisihMet = titik ? (vo2 - titik) / ML_PER_MET : null
   return (
     <Bingkai ke="/longevity" judul="Aerobic capacity">
-      <Angka nilai={vo2.toFixed(1)} satuan="mL/kg/mnt" />
+      <Angka nilai={vo2.toFixed(1)} satuan="mL/kg/min" />
       {titik == null ? (
         <span className="t-mikro truncate text-neutral-400">{(vo2 / ML_PER_MET).toFixed(1)} MET</span>
       ) : (
@@ -217,7 +217,7 @@ function UbinLongevity() {
             />
           </span>
           <span className="t-mikro truncate text-neutral-400">
-            {`${(selisihMet ?? 0) >= 0 ? '+' : ''}${(selisihMet ?? 0).toFixed(1)} MET · titik tengah usia`}
+            {`${(selisihMet ?? 0) >= 0 ? '+' : ''}${(selisihMet ?? 0).toFixed(1)} MET · age median`}
           </span>
         </>
       )}
@@ -339,11 +339,11 @@ export function UbinPelatihLebar() {
  * pintu biasa — dan itu keadaan yang benar bagi kebanyakan fitur.
  */
 export const UBIN_LANGSUNG: Record<string, () => JSX.Element | null> = {
-  tubuh: UbinLangkah,
-  pelatih: UbinLatihan,
-  tidur: UbinTidur,
-  detakJantung: UbinDenyut,
-  longevity: UbinLongevity,
+  langkahRingkas: UbinLangkah,
+  latihanRingkas: UbinLatihan,
+  tidurRingkas: UbinTidur,
+  denyutRingkas: UbinDenyut,
+  aerobikRingkas: UbinLongevity,
   kebugaran: UbinPelatihLebar,
   salat: UbinSalat,
 }
