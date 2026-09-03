@@ -33,6 +33,7 @@ const SexualHealth = lazy(() => import('./pages/SexualHealth').then((m) => ({ de
 const ShapeForming = lazy(() => import('./pages/ShapeForming').then((m) => ({ default: m.ShapeForming })))
 const EMR = lazy(() => import('./pages/EMR').then((m) => ({ default: m.EMR })))
 const Planning = lazy(() => import('./pages/Planning').then((m) => ({ default: m.Planning })))
+const CareEpisodePage = lazy(() => import('./pages/CareEpisode').then((m) => ({ default: m.CareEpisodePage })))
 const Marketplace = lazy(() => import('./pages/Marketplace').then((m) => ({ default: m.Marketplace })))
 const MyMaterials = lazy(() => import('./pages/MyMaterials').then((m) => ({ default: m.MyMaterials })))
 const Verification = lazy(() => import('./pages/Verification').then((m) => ({ default: m.Verification })))
@@ -261,6 +262,7 @@ createRoot(document.getElementById('root')!).render(
               <Route path="/chatbot" element={<Chatbot />} />
               <Route path="/emr" element={<EMR />} />
               <Route path="/planning" element={<Planning />} />
+              <Route path="/care-episode" element={<CareEpisodePage />} />
               <Route path="/marketplace" element={<Marketplace />} />
               <Route path="/my-materials" element={<MyMaterials />} />
               <Route path="/verification" element={<Verification />} />

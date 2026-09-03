@@ -110,6 +110,51 @@ export interface EMRRecord {
   references: string[]
   signedBy?: string
   signedAt?: string
+  // The downstream half of the care journey — everything the clinical plan
+  // above triggers in the real world (who, where, how much, when, and
+  // whether it's actually happening). Optional: only present once a plan
+  // item is actually being carried out.
+  careEpisodes?: CareEpisode[]
+}
+
+// One stage in a patient's path from problem to prevention. Stage order is
+// fixed (see CARE_EPISODE_STAGES); status tracks whether that stage is done,
+// or stuck — 'blocked' + blockedReason is what a "care failure detector"
+// would surface (missed follow-up, lab not done, payment pending, etc).
+export type CareEpisodeStageId =
+  | 'problem'
+  | 'diagnosis'
+  | 'plan'
+  | 'provider'
+  | 'cost'
+  | 'schedule'
+  | 'treatment'
+  | 'recovery'
+  | 'followUp'
+  | 'outcome'
+
+export type CareEpisodeStageStatus = 'pending' | 'active' | 'done' | 'blocked'
+
+export interface CareEpisodeStage {
+  stage: CareEpisodeStageId
+  status: CareEpisodeStageStatus
+  note?: string
+  blockedReason?: string
+  updatedAt?: string
+}
+
+export interface CareEpisode {
+  id: string
+  title: string
+  createdAt: string
+  updatedAt: string
+  problemId?: string // links back to a ProblemEntry.id when known
+  providerName?: string
+  facilityName?: string
+  estimatedCostLow?: number // in the patient's local currency, whole units
+  estimatedCostHigh?: number
+  currency?: string // e.g. 'IDR'
+  stages: CareEpisodeStage[]
 }
 
 // Supportive therapy numbers: resuscitation, fluid balance, calories, urine output.

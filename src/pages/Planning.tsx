@@ -81,9 +81,12 @@ export function Planning() {
           title="Planning — AI Recommendations, Physician Verification"
           subtitle="AI proposes the management plan; the doctor reviews, rejects, or adds to it"
           right={
-            <div className="flex gap-2">
+            <div className="flex items-center gap-2">
               <Badge tone="brand">{verified} verified</Badge>
               {pending > 0 && <Badge tone="high">{pending} pending</Badge>}
+              <Link to="/care-episode" className="text-xs font-semibold text-brand-dark underline">
+                Track journey
+              </Link>
             </div>
           }
         />
