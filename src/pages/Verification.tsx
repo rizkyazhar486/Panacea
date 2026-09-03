@@ -40,7 +40,7 @@ export function Verification() {
         <SectionTitle
           icon={<IconShield size={20} />}
           title="Verification Center"
-          subtitle="Dua lapis: AI (ketepatan & keselamatan) lalu verifikator Spesialis/Subspesialis"
+          subtitle="Two layers: AI (accuracy & safety) then a Specialist/Subspecialist verifier"
           right={
             <label className="flex items-center gap-2 text-sm">
               <span className="text-neutral-500">Acting as:</span>

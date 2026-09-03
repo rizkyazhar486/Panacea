@@ -84,7 +84,7 @@ export function TinjauConnect() {
   return (
     <div className="mx-auto max-w-2xl space-y-5 pb-24">
       <SectionTitle icon={<IconShield />} title="Connect Review"
-        subtitle="Verifikasi akun dan keputusan atas laporan — khusus pemilik" />
+        subtitle="Account verification and decisions on reports — owner only" />
 
       {galat && <Card className="!border-rose-500/30 !bg-rose-500/5"><p className="text-[12px] text-rose-600">{galat}</p></Card>}
       {muat && <Card><p className="text-[13px] text-neutral-500">Loading…</p></Card>}
@@ -130,12 +130,12 @@ export function TinjauConnect() {
                     </a>
                   )
                 })}
-                <Prosa kelas="mt-1 text-[10px] leading-relaxed text-slate-500">Cocokkan wajah pada swafoto dengan foto di akun media sosialnya. Perhatikan juga riwayat unggahan dan tanggal bergabungnya — akun yang dibuat kemarin tidak membuktikan apa pun.</Prosa>
-                <Prosa kelas="mt-1 text-[10px] leading-relaxed text-amber-700/80">Phone number tidak dibuktikan lewat kode SMS — ia hanya diketik pemohon. Jadi nomor itu bukan bukti identitas, dan sistem hanya memastikan nomor yang sama tidak dipakai dua akun. Penahan akun ganda yang sebenarnya adalah penilaian Anda di halaman ini.</Prosa>
+                <Prosa kelas="mt-1 text-[10px] leading-relaxed text-slate-500">Match the face in the selfie with photos on their social media account. Also check their posting history and join date — an account created yesterday doesn't prove anything.</Prosa>
+                <Prosa kelas="mt-1 text-[10px] leading-relaxed text-amber-700/80">The phone number is not verified by an SMS code — it is only typed in by the applicant. So the number is not proof of identity, and the system only ensures the same number isn't used by two accounts. Your judgment on this page is the real safeguard against duplicate accounts.</Prosa>
               </div>
 
               <input className={`${inputClass} mt-2`} placeholder="Reason if rejected (shown to the user)"
-                value={alasanReject[a.email] ?? ''} aria-label={`Alasan tolak ${a.data.nama}`}
+                value={alasanReject[a.email] ?? ''} aria-label={`Rejection reason for ${a.data.nama}`}
                 onChange={(e) => setAlasanReject((s) => ({ ...s, [a.email]: e.target.value }))} />
               <div className="mt-2 flex gap-2">
                 <Button onClick={() => void putusVerifikasi(a.email, true)}>Approve</Button>
@@ -169,10 +169,10 @@ export function TinjauConnect() {
                   <div className="w-28">
                     <div className="text-[10px] font-bold uppercase text-neutral-500">Points deducted</div>
                     <KolomAngka nilai={poin[l.id]} onNilai={(n) => setPoin((s) => ({ ...s, [l.id]: n }))}
-                      ariaLabel={`Poin untuk laporan ${l.id}`} />
+                      ariaLabel={`Points for report ${l.id}`} />
                   </div>
                   <Button onClick={() => void putusLaporan(l.id, l.terlaporEmail)}>
-                    {p > 0 ? `Potong ${p}` : 'Reject laporan'}
+                    {p > 0 ? `Deduct ${p}` : 'Reject report'}
                   </Button>
                 </div>
                 <p className="mt-1 text-[10px] leading-relaxed text-slate-500">

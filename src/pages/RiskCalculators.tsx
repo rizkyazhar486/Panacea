@@ -79,7 +79,7 @@ export function RiskCalculators() {
   return (
     <div className="mx-auto max-w-2xl space-y-5 pb-24">
       <Card className="!p-5">
-        <SectionTitle icon={<IconShield size={20} />} title="Clinical Risk Calculators" subtitle="Skor tervalidasi beserta rumus terbitannya yang sebenarnya — untuk dibicarakan dengan dokter Anda" />
+        <SectionTitle icon={<IconShield size={20} />} title="Clinical Risk Calculators" subtitle="Validated scores with their actual published formulas — to discuss with your doctor" />
         <div className="mt-3 grid grid-cols-3 gap-3">
           {numField('Age', age, setAge)}
           <Field label="Sex">
@@ -117,7 +117,7 @@ export function RiskCalculators() {
 
       {/* FIB-4 */}
       <Card className="!p-5">
-        <SectionTitle icon={<IconActivity size={20} />} title="FIB-4 Liver Fibrosis Index" subtitle="Sterling 2006 — menapis fibrosis hati lanjut" />
+        <SectionTitle icon={<IconActivity size={20} />} title="FIB-4 Liver Fibrosis Index" subtitle="Sterling 2006 — screens for advanced liver fibrosis" />
         <div className="mt-3 grid grid-cols-3 gap-3">
           {numField('AST (U/L)', ast, setAst)}
           {numField('ALT (U/L)', alt, setAlt)}
@@ -136,7 +136,7 @@ export function RiskCalculators() {
 
       {/* OST */}
       <Card className="!p-5">
-        <SectionTitle icon={<IconShield size={20} />} title="Osteoporosis Risk (OST)" subtitle="Indeks Osteoporosis Self-assessment Tool — dari umur & berat badan" />
+        <SectionTitle icon={<IconShield size={20} />} title="Osteoporosis Risk (OST)" subtitle="Osteoporosis Self-assessment Tool index — from age & body weight" />
         {ost != null ? (
           <div className="mt-3 flex items-center gap-4 rounded-2xl bg-neutral-50 p-4 dark:bg-white/5">
             <div className="text-4xl font-black" style={{ color: ostBand(ost).tone === 'brand' ? '#00BF63' : ostBand(ost).tone === 'low' ? '#f59e0b' : '#ef4444' }}>{ost}</div>
