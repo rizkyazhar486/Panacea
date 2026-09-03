@@ -42,7 +42,7 @@ function AutophagyTiming() {
           ? <div className="text-lg font-black text-brand-dark">Likely in early autophagy range</div>
           : <><div className="text-2xl font-black text-brand-dark">~{hoursRemaining.toFixed(1)}h</div><div className="text-[11px] text-neutral-500">until likely glycogen depletion / autophagy upregulation begins</div></>}
       </div>
-      <Prosa kelas="mt-3 text-[12px] leading-relaxed text-neutral-500">Perkiraan sebagai gambaran, berdasarkan waktu habisnya glikogen hati yang lazim (kira-kira 12-16 jam puasa, berbeda menurut komposisi tubuh dan aktivitas) — bukan pengukuran glikogen atau keadaan autofagi Anda, yang hanya dapat dinilai di laboratorium penelitian.</Prosa>
+      <Prosa kelas="mt-3 text-[12px] leading-relaxed text-neutral-500">An illustrative estimate, based on typical liver-glycogen depletion time (roughly 12-16 hours of fasting, varying with body composition and activity) — not a measurement of your glycogen or autophagy state, which can only be assessed in a research lab.</Prosa>
     </Card>
   )
 }
@@ -76,7 +76,7 @@ function CortisolAwakening() {
         <polyline fill="none" stroke="#00BF63" strokeWidth="2" points={points.map((p) => `${p.min * 2.4},${100 - p.level}`).join(' ')} />
       </svg>
       <p className="mt-2 text-center text-[11px] text-neutral-500">Illustrative shape from {wakeTime} · 0-120 min after waking</p>
-      <Prosa kelas="mt-3 text-[12px] leading-relaxed text-neutral-500">Gambaran yang disederhanakan dari pola cortisol awakening response yang sudah banyak didokumentasikan (kenaikan alami yang memuncak sekitar 30-45 menit sesudah bangun) — bukan kadar kortisol Anda yang terukur, yang memerlukan pemeriksaan air liur atau darah pada beberapa waktu.</Prosa>
+      <Prosa kelas="mt-3 text-[12px] leading-relaxed text-neutral-500">A simplified illustration of the well-documented cortisol awakening response (a natural rise that peaks around 30-45 minutes after waking) — not your measured cortisol level, which requires saliva or blood testing at several timepoints.</Prosa>
     </Card>
   )
 }
@@ -99,7 +99,7 @@ function SaunaEquivalent() {
         <div className="text-2xl font-black text-brand-dark">≈ {equivalentWalkMin} min brisk walk</div>
         <div className="text-[11px] text-neutral-500">Estimated cardiovascular strain equivalence</div>
       </div>
-      <Prosa kelas="mt-3 text-[12px] leading-relaxed text-neutral-500">Berdasarkan data denyut jantung terbitan dari penelitian sauna (denyut meningkat serupa latihan aerobik ringan-sedang) — pembandingan kasar terhadap rata-rata populasi, bukan pengukuran kalori atau kebugaran Anda. Pemakaian sauna teratur (4-7 kali sepekan) secara terpisah dikaitkan dengan kematian akibat penyakit jantung-pembuluh darah yang lebih rendah pada kohort pengamatan.</Prosa>
+      <Prosa kelas="mt-3 text-[12px] leading-relaxed text-neutral-500">Based on published heart-rate data from sauna research (heart rate rises similarly to light-to-moderate aerobic exercise) — a rough comparison against population averages, not a measurement of your calories burned or fitness. Separately, regular sauna use (4-7 times a week) has been linked to lower cardiovascular-disease mortality in observational cohorts.</Prosa>
     </Card>
   )
 }
@@ -165,7 +165,7 @@ function GlycemicOptimizer() {
         <div className="text-2xl font-black text-brand-dark">{gl.toFixed(1)}</div>
         <Badge tone={band[1] as 'brand' | 'low' | 'critical'}>{band[0]} glycemic load</Badge>
       </div>
-      <Prosa kelas="mt-2 text-[12px] leading-relaxed text-neutral-500">Beban glikemik = (IG × karbohidrat per sajian) / 100 — menambahkan serat atau lemak/protein sebelum atau bersama makanan ber-IG tinggi sudah banyak didokumentasikan menumpulkan lonjakan glukosanya, dan di sini dimodelkan sebagai penurunan sebagai gambaran, bukan pengukuran tanggapan gula darah Anda yang sebenarnya.</Prosa>
+      <Prosa kelas="mt-2 text-[12px] leading-relaxed text-neutral-500">Glycemic load = (GI × carbohydrate per serving) / 100 — adding fiber or fat/protein before or alongside a high-GI food is well documented to blunt its glucose spike, and is modeled here as an illustrative reduction, not a measurement of your actual blood-sugar response.</Prosa>
     </Card>
   )
 }
@@ -180,7 +180,7 @@ function HealthspanDividend() {
 
   return (
     <Card className="!p-5">
-      <Prosa kelas="text-[13px] text-neutral-500">Nyalakan kebiasaan yang benar-benar Anda jaga terus-menerus — berdasarkan besaran pengaruh gabungan faktor gaya hidup pada penelitian kohort besar (mis. tidak pernah merokok, olahraga teratur, pola makan sehat, IMT sehat, alkohol terbatas).</Prosa>
+      <Prosa kelas="text-[13px] text-neutral-500">Turn on the habits you genuinely maintain consistently — based on the combined effect size of lifestyle factors in large cohort studies (e.g. never smoking, regular exercise, a healthy diet, a healthy BMI, limited alcohol).</Prosa>
       <div className="mt-3 grid grid-cols-2 gap-2">
         {(Object.keys(habits) as (keyof typeof habits)[]).map((k) => (
           <button key={k} onClick={() => setHabits((h) => ({ ...h, [k]: !h[k] }))} className={`rounded-xl py-2 text-[12px] font-bold capitalize ${habits[k] ? 'bg-brand text-white' : 'bg-neutral-100 text-neutral-600 dark:bg-white/10'}`}>
@@ -214,12 +214,12 @@ export function PredictiveModelsToolkit() {
   return (
     <div className="mx-auto max-w-2xl space-y-5 pb-24">
       <Card className="!p-5">
-        <SectionTitle icon={<IconGauge size={20} />} title="Predictive Models Toolkit" subtitle="Enam model matematis — bentuk kurvanya, bukan angka Anda" />
+        <SectionTitle icon={<IconGauge size={20} />} title="Predictive Models Toolkit" subtitle="Six mathematical models — the shape of the curve, not your number" />
         <p className="mt-2 rounded-xl bg-amber-500/10 px-3 py-2 text-[11px] leading-snug text-amber-800 dark:text-amber-300">
-          Tetapan pada model-model ini <b>dipilih penulis</b> agar bentuk kurvanya masuk akal; keluarannya bukan hasil
-          pengukuran dan tidak dapat dipakai untuk menentukan tindakan.
+          The constants in these models were <b>chosen by the author</b> to make the curve shape plausible; the output is not a
+          measurement and cannot be used to guide action.
         </p>
-        <Prosa kelas="mt-2 text-[13px] leading-relaxed text-amber-700 dark:text-amber-300">Setiap model di sini menerapkan pola rata-rata populasi yang sudah terbit pada masukan Anda — tidak satu pun mengukur biologi Anda secara langsung. Anggaplah semuanya gambaran yang berdasar, bukan hasil laboratorium.</Prosa>
+        <Prosa kelas="mt-2 text-[13px] leading-relaxed text-amber-700 dark:text-amber-300">Every model here applies a published population-average pattern to your inputs — none of them measure your biology directly. Treat all of it as an informed illustration, not a lab result.</Prosa>
         <div className="mt-3 flex flex-wrap gap-2">
           {TABS.map((t) => (
             <button key={t.id} onClick={() => setTab(t.id)} className={`rounded-full px-3 py-1.5 text-[12px] font-bold transition ${tab === t.id ? 'bg-brand text-white' : 'bg-neutral-100 text-neutral-600 dark:bg-white/10 dark:text-neutral-300'}`}>{t.label}</button>
