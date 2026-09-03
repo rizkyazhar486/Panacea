@@ -201,8 +201,8 @@ export function Ikhtisar() {
       ))}
 
       <p className="text-[11px] leading-snug text-neutral-500">
-        Sumbu tegak mengikuti rentang datanya sendiri, bukan dimulai dari nol — pada berat badan dan denyut istirahat, nol
-        bukan titik yang bermakna. Akibatnya perubahan kecil tampak besar, jadi bacalah angkanya, bukan kemiringannya.
+        The vertical axis follows its own data range rather than starting at zero — for weight and resting heart rate, zero
+        isn't a meaningful point. As a result small changes look large, so read the numbers, not the slope.
       </p>
     </div>
   )

@@ -107,7 +107,7 @@ export function HealthSimulator() {
     <div className="mx-auto max-w-2xl space-y-5 pb-24">
       <Card className="!p-5">
         <SectionTitle icon={<IconSparkle size={20} />} title="Simulator Bagaimana-Jika" subtitle="See how today's choices change your 10-year risk" />
-        <Prosa kelas="mt-2 text-[13px] leading-relaxed text-neutral-500">Langkah pertama sebuah "kembaran digital" yang terbuka: masukkan angka Anda sekarang, lalu nyalakan perubahan nyata yang berdasar bukti dan lihat risiko jantung-pembuluh darah 10 tahun Anda bergerak. Setiap angka berasal dari persamaan Framingham yang sudah terbit — tidak ada tebakan dari kotak hitam.</Prosa>
+        <Prosa kelas="mt-2 text-[13px] leading-relaxed text-neutral-500">A first step toward an open "digital twin": enter your current numbers, then toggle real evidence-based changes and watch your 10-year cardiovascular risk move. Every number comes from the published Framingham equation — no black-box guessing.</Prosa>
         <div className="mt-3 grid grid-cols-2 gap-3">
           {num('Age (years)', 'age')}
           <Field label="Sex">

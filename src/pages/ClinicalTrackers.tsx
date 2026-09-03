@@ -326,8 +326,8 @@ function TabHamil() {
       <Card>
         <SectionTitle icon={<IconActivity />} title={`Activity — trimester ${status?.trimester ?? 1}`} />
         <p className="mt-2 rounded-lg border border-white/10 bg-white/[0.03] p-3 text-sm leading-relaxed text-neutral-600">{panduan.catatanTrimester}</p>
-        <Daftar judul="Dianjurkan" isi={panduan.anjuran} warna="emerald" />
-        <Daftar judul="Dihindari" isi={panduan.hindari} warna="amber" />
+        <Daftar judul="Recommended" isi={panduan.anjuran} warna="emerald" />
+        <Daftar judul="Avoid" isi={panduan.hindari} warna="amber" />
       </Card>
 
       <Card>

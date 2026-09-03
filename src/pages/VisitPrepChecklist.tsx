@@ -97,8 +97,8 @@ export function VisitPrepChecklist() {
     <div className="mx-auto max-w-2xl space-y-5 pb-24">
       <Card className="!p-5">
         <SectionTitle icon={<IconStethoscope size={20} />} title="Doctor-Visit Prep Checklist" subtitle="What to bring and what to ask, before you go in" />
-        <Prosa kelas="mt-2 text-[13px] leading-relaxed text-neutral-500">Konsultasi berjalan lebih baik bila Anda datang dengan persiapan — halaman ini mengubah alasan kunjungan Anda menjadi daftar periksa yang nyata beserta pertanyaan yang layak diajukan, supaya tidak baru teringat di mobil dalam perjalanan pulang.</Prosa>
-        <Field label="Kunjungan ini tentang apa?">
+        <Prosa kelas="mt-2 text-[13px] leading-relaxed text-neutral-500">A consultation goes better when you show up prepared — this page turns your reason for the visit into a real checklist along with questions worth asking, so they don't only come to mind in the car on the way home.</Prosa>
+        <Field label="What is this visit about?">
           <select className={`${inputClass} mt-1`} value={type} onChange={(e) => setType(e.target.value as VisitType)}>
             {VISIT_TYPES.map((v) => <option key={v.id} value={v.id}>{v.label}</option>)}
           </select>

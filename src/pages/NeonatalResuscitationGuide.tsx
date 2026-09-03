@@ -68,8 +68,8 @@ export function NeonatalResuscitationGuide() {
   return (
     <div className="mx-auto max-w-2xl space-y-5 pb-24">
       <Card className="!p-5">
-        <SectionTitle icon={<IconActivity size={20} />} title="Neonatal Resuscitation (NRP) Guide" subtitle="Algoritma langkah awal & Golden Minute, sebagai alat bantu belajar/latihan" />
-        <Prosa kelas="mt-2 text-[13px] leading-relaxed text-amber-700 dark:text-amber-300">Rujukan untuk belajar saja, disesuaikan dengan algoritma langkah awal NRP AAP/ILCOR baku — bukan pengganti sertifikasi NRP, protokol institusi Anda, maupun pertimbangan klinis seketika saat resusitasi sungguhan.</Prosa>
+        <SectionTitle icon={<IconActivity size={20} />} title="Neonatal Resuscitation (NRP) Guide" subtitle="The initial-steps algorithm & Golden Minute, as a learning/practice aid" />
+        <Prosa kelas="mt-2 text-[13px] leading-relaxed text-amber-700 dark:text-amber-300">A learning reference only, adapted from the standard AAP/ILCOR NRP initial-steps algorithm — not a substitute for NRP certification, your institution's protocol, or real-time clinical judgment during an actual resuscitation.</Prosa>
       </Card>
 
       <GoldenMinuteTimer />

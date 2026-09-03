@@ -83,7 +83,7 @@ export function Chronotype() {
     <div className="mx-auto max-w-2xl space-y-5 pb-24">
       <Card className="!p-5">
         <SectionTitle icon={<IconMoon size={20} />} title="Chronotype Quiz" subtitle="Reduced Morningness-Eveningness Questionnaire (rMEQ)" />
-        <Prosa kelas="mt-2 text-[13px] leading-relaxed text-neutral-500">Bentuk pendek 5 butir yang tervalidasi (Adan &amp; Almirall, 1991) dari kuesioner klasik Horne &amp; Östberg, dipakai dalam penelitian kronobiologi untuk menggolongkan kecenderungan sirkadian alami seseorang. Jawablah menurut yang Anda rasakan secara alami — bukan menurut jadwal Anda sekarang.</Prosa>
+        <Prosa kelas="mt-2 text-[13px] leading-relaxed text-neutral-500">A validated 5-item short form (Adan &amp; Almirall, 1991) of the classic Horne &amp; Östberg questionnaire, used in chronobiology research to classify a person's natural circadian tendency. Answer according to how you naturally feel — not your current schedule.</Prosa>
       </Card>
 
       {QUESTIONS.map((q, qi) => (
@@ -123,8 +123,8 @@ export function Chronotype() {
 
       <div className="rounded-2xl border border-neutral-100 bg-white p-4 text-center text-[11px] leading-relaxed text-neutral-500 dark:border-white/10 dark:bg-white/5">
         Adan, A., &amp; Almirall, H. (1991). Horne &amp; Östberg morningness-eveningness questionnaire: A
-        reduced scale. <i>Personality and Individual Differences</i>, 12(3), 241-253. Penilaian
-        diri untuk belajar, bukan diagnosis gangguan tidur klinis.
+        reduced scale. <i>Personality and Individual Differences</i>, 12(3), 241-253. A self-assessment
+        for learning, not a clinical sleep-disorder diagnosis.
       </div>
     </div>
   )
