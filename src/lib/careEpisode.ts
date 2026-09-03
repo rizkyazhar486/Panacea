@@ -8,7 +8,7 @@
 // system. It reuses the existing EMRRecord rather than adding a parallel
 // store, per the "smallest architectural change" principle.
 
-import type { CareEpisode, CareEpisodeStage, CareEpisodeStageId, CareEpisodeStageStatus } from './types'
+import type { CareEpisode, CareEpisodeStage, CareEpisodeStageId, CareEpisodeStageStatus, EMRRecord } from './types'
 
 export const CARE_EPISODE_STAGES: CareEpisodeStageId[] = [
   'problem',
@@ -128,6 +128,29 @@ export function setStageStatus(
     }
   }
   return { ...episode, stages, updatedAt: now }
+}
+
+// The moment a doctor verifies a plan item, the journey has already left
+// "planning" and entered the real world — the problem and diagnosis are
+// settled, and the plan itself is now underway (not finished — there may
+// be more items to verify yet, which is why 'plan' is left active rather
+// than done). This finds-or-creates the matching episode from the record's
+// primaryDiagnosis and fast-forwards it to that point, so the patient
+// doesn't have to start a journey by hand for something that's already
+// begun. Returns the record unchanged if there's no primary diagnosis yet,
+// or if it's already been seeded once.
+export function ensureEpisodeFromVerifiedPlan(record: EMRRecord): EMRRecord {
+  const dx = record.primaryDiagnosis
+  if (!dx) return record
+  const episodes = record.careEpisodes ?? []
+  if (episodes.some((e) => e.diagnosisCode === dx.code)) return record
+
+  let episode = newCareEpisode(dx.title)
+  episode = { ...episode, diagnosisCode: dx.code, problemId: record.problems[0]?.id }
+  episode = setStageStatus(episode, 'problem', 'done')
+  episode = setStageStatus(episode, 'diagnosis', 'done') // cascades 'plan' to active
+
+  return { ...record, careEpisodes: [...episodes, episode] }
 }
 
 export function formatCostRange(episode: CareEpisode): string | undefined {

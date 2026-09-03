@@ -6,6 +6,7 @@ import { Card, SectionTitle, Badge, Button, Field, inputClass } from '../compone
 import { IconPlan, IconCheck, IconPlus, IconSparkle, IconShield } from '../components/icons'
 import { scorePlanItem, WEIGHTS, S_THRESHOLD } from '../lib/cdss'
 import { checkInteractions } from '../lib/ddi'
+import { ensureEpisodeFromVerifiedPlan } from '../lib/careEpisode'
 import type { PlanItem, Patient } from '../lib/types'
 
 const CATEGORIES: PlanItem['category'][] = [
@@ -49,7 +50,12 @@ export function Planning() {
   }
 
   function update(plan: PlanItem[]) {
-    saveRecord({ ...record!, plan, updatedAt: new Date().toISOString() })
+    let next = { ...record!, plan, updatedAt: new Date().toISOString() }
+    // The first plan item verified for a diagnosis is the moment the care
+    // journey actually starts — seed its Care Episode automatically rather
+    // than requiring a manual "Start" on a separate screen.
+    if (plan.some((p) => p.status === 'diverifikasi')) next = ensureEpisodeFromVerifiedPlan(next)
+    saveRecord(next)
   }
   function setStatus(id: string, status: PlanItem['status']) {
     update(record!.plan.map((p) => (p.id === id ? { ...p, status } : p)))

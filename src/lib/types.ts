@@ -149,6 +149,7 @@ export interface CareEpisode {
   createdAt: string
   updatedAt: string
   problemId?: string // links back to a ProblemEntry.id when known
+  diagnosisCode?: string // links back to EMRRecord.primaryDiagnosis.code, when auto-created from one
   providerName?: string
   facilityName?: string
   estimatedCostLow?: number // in the patient's local currency, whole units
