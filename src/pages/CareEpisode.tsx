@@ -23,9 +23,13 @@ import {
   detectStalls,
   episodeHealth,
   stallReason,
+  COST_ITEM_PRESETS,
+  addCostItem,
+  updateCostItem,
+  removeCostItem,
   type CandidateView,
 } from '../lib/careEpisode'
-import type { CareEpisode, CareEpisodeStageId, CareEpisodeStageStatus } from '../lib/types'
+import type { CareEpisode, CareEpisodeStageId, CareEpisodeStageStatus, CostItem } from '../lib/types'
 
 // The Care Episode Graph: connects a clinical plan to what actually has to
 // happen to carry it out — provider, cost, schedule, treatment, recovery,
@@ -467,6 +471,139 @@ function formatSubmission(p: FacilityPriceSubmission): string {
   return `${p.currency} ${fmt(p.low ?? p.high ?? 0)} `
 }
 
+function CostBreakdown({
+  episode,
+  onChange,
+}: {
+  episode: CareEpisode
+  onChange: (next: CareEpisode) => void
+}) {
+  const items = episode.costItems ?? []
+  const total = formatCostRange(episode)
+  const priced = items.filter((i) => i.low != null || i.high != null).length
+  const usedLabels = new Set(items.map((i) => i.label))
+  const availablePresets = COST_ITEM_PRESETS.filter((p) => !usedLabels.has(p))
+
+  return (
+    <div>
+      <div className="space-y-2">
+        {items.map((item) => (
+          <CostItemRow
+            key={item.id}
+            item={item}
+            onChange={(patch) => onChange(updateCostItem(episode, item.id, patch))}
+            onRemove={() => onChange(removeCostItem(episode, item.id))}
+          />
+        ))}
+      </div>
+
+      <div className="mt-2 flex items-center gap-2">
+        {availablePresets.length > 0 && (
+          <select
+            className={`${inputClass} min-w-0 flex-1`}
+            value=""
+            onChange={(e) => {
+              if (!e.target.value) return
+              if (e.target.value === '__other__') {
+                const label = window.prompt('Name this cost component:')?.trim()
+                if (label) onChange(addCostItem(episode, label))
+                return
+              }
+              onChange(addCostItem(episode, e.target.value))
+            }}
+          >
+            <option value="" disabled>
+              Add a component…
+            </option>
+            {availablePresets.map((p) => (
+              <option key={p} value={p}>
+                {p}
+              </option>
+            ))}
+            <option value="__other__">Other…</option>
+          </select>
+        )}
+      </div>
+
+      <p className="mt-3 border-t border-neutral-100 pt-2 text-sm font-bold text-ink">
+        Total: {total ?? '—'}
+        <span className="ml-2 text-xs font-normal text-neutral-500">
+          ({priced} of {items.length} component{items.length === 1 ? '' : 's'} priced)
+        </span>
+      </p>
+    </div>
+  )
+}
+
+function CostItemRow({
+  item,
+  onChange,
+  onRemove,
+}: {
+  item: CostItem
+  onChange: (patch: Partial<CostItem>) => void
+  onRemove: () => void
+}) {
+  const [low, setLow] = useState(item.low?.toString() ?? '')
+  const [high, setHigh] = useState(item.high?.toString() ?? '')
+  const [source, setSource] = useState(item.source ?? '')
+
+  function commit(confidence: 'estimated' | 'verified') {
+    onChange({
+      low: low ? Number(low) : undefined,
+      high: high ? Number(high) : undefined,
+      confidence,
+      source: source.trim() || undefined,
+    })
+  }
+
+  return (
+    <div className="rounded-xl border border-neutral-200 p-2.5">
+      <div className="mb-1.5 flex items-center justify-between gap-2">
+        <span className="text-xs font-bold text-ink">{item.label}</span>
+        <button type="button" onClick={onRemove} className="text-xs text-neutral-400 hover:text-accent">
+          Remove
+        </button>
+      </div>
+      <div className="flex gap-2">
+        <input
+          className={`${inputClass} !min-h-[38px]`}
+          type="number"
+          placeholder="Low"
+          value={low}
+          onChange={(e) => setLow(e.target.value)}
+          onBlur={() => commit(item.confidence ?? 'estimated')}
+        />
+        <input
+          className={`${inputClass} !min-h-[38px]`}
+          type="number"
+          placeholder="High"
+          value={high}
+          onChange={(e) => setHigh(e.target.value)}
+          onBlur={() => commit(item.confidence ?? 'estimated')}
+        />
+      </div>
+      <div className="mt-1.5 flex items-center gap-2">
+        <input
+          className={`${inputClass} !min-h-[38px] min-w-0 flex-1`}
+          placeholder="Source"
+          value={source}
+          onChange={(e) => setSource(e.target.value)}
+          onBlur={() => commit(item.confidence ?? 'estimated')}
+        />
+        <select
+          className={`${inputClass} !min-h-[38px] !w-auto shrink-0`}
+          value={item.confidence ?? 'estimated'}
+          onChange={(e) => commit(e.target.value as 'estimated' | 'verified')}
+        >
+          <option value="estimated">Estimated</option>
+          <option value="verified">Verified</option>
+        </select>
+      </div>
+    </div>
+  )
+}
+
 function CostEstimateField({
   episode,
   onChange,
@@ -477,6 +614,7 @@ function CostEstimateField({
   const [low, setLow] = useState(episode.estimatedCostLow?.toString() ?? '')
   const [high, setHigh] = useState(episode.estimatedCostHigh?.toString() ?? '')
   const [source, setSource] = useState(episode.costSource ?? '')
+  const itemized = (episode.costItems ?? []).length > 0
 
   function commit(confidence: 'estimated' | 'verified') {
     onChange(
@@ -491,41 +629,54 @@ function CostEstimateField({
 
   return (
     <Field label="Final cost with chosen provider (IDR) — never a guess without a source">
-      <div className="flex gap-2">
-        <input
-          className={inputClass}
-          type="number"
-          placeholder="Low"
-          value={low}
-          onChange={(e) => setLow(e.target.value)}
-          onBlur={() => commit(episode.costConfidence ?? 'estimated')}
-        />
-        <input
-          className={inputClass}
-          type="number"
-          placeholder="High"
-          value={high}
-          onChange={(e) => setHigh(e.target.value)}
-          onBlur={() => commit(episode.costConfidence ?? 'estimated')}
-        />
-      </div>
-      <div className="mt-2 flex items-center gap-2">
-        <input
-          className={`${inputClass} min-w-0 flex-1`}
-          placeholder="Source (e.g. hospital quote, insurer estimate)"
-          value={source}
-          onChange={(e) => setSource(e.target.value)}
-          onBlur={() => commit(episode.costConfidence ?? 'estimated')}
-        />
-        <select
-          className={`${inputClass} !w-auto shrink-0`}
-          value={episode.costConfidence ?? 'estimated'}
-          onChange={(e) => commit(e.target.value as 'estimated' | 'verified')}
-        >
-          <option value="estimated">Estimated</option>
-          <option value="verified">Verified</option>
-        </select>
-      </div>
+      {itemized ? (
+        <CostBreakdown episode={episode} onChange={onChange} />
+      ) : (
+        <>
+          <div className="flex gap-2">
+            <input
+              className={inputClass}
+              type="number"
+              placeholder="Low"
+              value={low}
+              onChange={(e) => setLow(e.target.value)}
+              onBlur={() => commit(episode.costConfidence ?? 'estimated')}
+            />
+            <input
+              className={inputClass}
+              type="number"
+              placeholder="High"
+              value={high}
+              onChange={(e) => setHigh(e.target.value)}
+              onBlur={() => commit(episode.costConfidence ?? 'estimated')}
+            />
+          </div>
+          <div className="mt-2 flex items-center gap-2">
+            <input
+              className={`${inputClass} min-w-0 flex-1`}
+              placeholder="Source (e.g. hospital quote, insurer estimate)"
+              value={source}
+              onChange={(e) => setSource(e.target.value)}
+              onBlur={() => commit(episode.costConfidence ?? 'estimated')}
+            />
+            <select
+              className={`${inputClass} !w-auto shrink-0`}
+              value={episode.costConfidence ?? 'estimated'}
+              onChange={(e) => commit(e.target.value as 'estimated' | 'verified')}
+            >
+              <option value="estimated">Estimated</option>
+              <option value="verified">Verified</option>
+            </select>
+          </div>
+          <button
+            type="button"
+            className="mt-2 text-xs font-semibold text-brand-dark underline"
+            onClick={() => onChange(addCostItem(episode, COST_ITEM_PRESETS[0]))}
+          >
+            Break down into components (professional fee, lab, meds, …)
+          </button>
+        </>
+      )}
 
       {episode.facilityId && (
         <CommunityPrices

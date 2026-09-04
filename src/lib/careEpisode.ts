@@ -14,6 +14,7 @@ import type {
   CareEpisodeStage,
   CareEpisodeStageId,
   CareEpisodeStageStatus,
+  CostItem,
   EMRRecord,
   ProviderCandidate,
 } from './types'
@@ -212,6 +213,54 @@ export function setCostEstimate(
     stages: activate(episode, 'cost'),
     updatedAt: new Date().toISOString(),
   }
+}
+
+// Total Cost of Care: don't show only the professional fee. Break the real
+// cost into its actual components and let the total be their sum, not a
+// separate guess — see CareEpisode.costItems in ./types.
+export const COST_ITEM_PRESETS = [
+  'Professional fee',
+  'Facility/room',
+  'Laboratory',
+  'Imaging',
+  'Medication',
+  'Transportation',
+  'Follow-up',
+] as const
+
+function recomputeFromItems(episode: CareEpisode): CareEpisode {
+  const items = episode.costItems ?? []
+  const withLow = items.filter((i) => i.low != null)
+  const withHigh = items.filter((i) => i.high != null)
+  const low = withLow.length ? withLow.reduce((sum, i) => sum + (i.low ?? 0), 0) : undefined
+  const high = withHigh.length ? withHigh.reduce((sum, i) => sum + (i.high ?? 0), 0) : undefined
+  const priced = items.filter((i) => i.low != null || i.high != null)
+  const confidence: 'estimated' | 'verified' =
+    priced.length > 0 && priced.every((i) => i.confidence === 'verified') ? 'verified' : 'estimated'
+  return {
+    ...episode,
+    estimatedCostLow: low,
+    estimatedCostHigh: high,
+    costConfidence: confidence,
+    costSource: `${priced.length} of ${items.length} component${items.length === 1 ? '' : 's'} priced`,
+    stages: activate(episode, 'cost'),
+    updatedAt: new Date().toISOString(),
+  }
+}
+
+export function addCostItem(episode: CareEpisode, label: string): CareEpisode {
+  const item: CostItem = { id: `ci_${Math.random().toString(36).slice(2, 10)}`, label }
+  return recomputeFromItems({ ...episode, costItems: [...(episode.costItems ?? []), item] })
+}
+
+export function updateCostItem(episode: CareEpisode, id: string, patch: Partial<CostItem>): CareEpisode {
+  const costItems = (episode.costItems ?? []).map((i) => (i.id === id ? { ...i, ...patch } : i))
+  return recomputeFromItems({ ...episode, costItems })
+}
+
+export function removeCostItem(episode: CareEpisode, id: string): CareEpisode {
+  const costItems = (episode.costItems ?? []).filter((i) => i.id !== id)
+  return recomputeFromItems({ ...episode, costItems })
 }
 
 // Provider comparison: the patient adds a few real facilities as candidates,

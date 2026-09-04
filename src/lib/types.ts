@@ -155,6 +155,18 @@ export interface ProviderCandidate {
   costSource?: string
 }
 
+// One real cost component of an episode — never just "the doctor's fee".
+// Each line has its own confidence/source since a lab quote and a
+// transportation guess don't carry the same certainty.
+export interface CostItem {
+  id: string
+  label: string // e.g. "Professional fee", "Laboratory" — free text, not an enum
+  low?: number
+  high?: number
+  confidence?: 'estimated' | 'verified'
+  source?: string
+}
+
 export interface CareEpisode {
   id: string
   title: string
@@ -174,6 +186,11 @@ export interface CareEpisode {
   // CLAUDE.md / the price-intelligence principle: source, date, confidence.
   costConfidence?: 'estimated' | 'verified'
   costSource?: string
+  // Total Cost of Care: when present, estimatedCostLow/High/Confidence are
+  // DERIVED as the sum of these items — the single number is a rollup of
+  // real components, not a separate guess. Optional: a simple total (above)
+  // is still valid for episodes that never itemize.
+  costItems?: CostItem[]
   stages: CareEpisodeStage[]
 }
 
