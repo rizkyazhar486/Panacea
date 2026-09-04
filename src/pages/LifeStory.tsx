@@ -10,6 +10,7 @@ import {
   chapterForAge,
   lifeEventToStoryItem,
   careEpisodeToStoryItems,
+  domainCounts,
   type StoryItem,
   type LifeChapter,
 } from '../lib/lifeStory'
@@ -89,6 +90,8 @@ export function LifeStory() {
           onRemove={(id) => removeQuest(activePatient.id, id)}
         />
 
+        <DomainBalance events={events} />
+
         <NewEventForm onAdd={(e) => addLifeEvent(activePatient.id, e)} />
 
         {chapters.length === 0 && (
@@ -166,6 +169,40 @@ function PrintableStory({ name, chapters }: { name: string; chapters: LifeChapte
 // the user updates themselves — never inferred from other data, for the
 // same reason a LifeEvent's impact is self-rated: only the person living it
 // can say how far along a relationship, a skill, or a habit really is.
+// Domain balance: a real count of what you've actually logged, nothing
+// more. Not a wellbeing score, not "you're neglecting relationships" — an
+// algorithm inferring that from a handful of journal entries would be a
+// guess dressed up as insight. This just shows the mirror; what you do
+// with what you see in it is yours to decide.
+function DomainBalance({ events }: { events: LifeEvent[] }) {
+  const counts = domainCounts(events)
+  if (counts.length === 0) return null
+  const max = counts[0].count
+
+  return (
+    <Card>
+      <SectionTitle
+        icon={<span className="text-lg">📊</span>}
+        title="Domain balance"
+        subtitle="How many moments you've logged in each part of life — a count, not a judgment"
+      />
+      <div className="space-y-2.5">
+        {counts.map((c) => (
+          <div key={c.domain} className="flex items-center gap-3">
+            <span className="w-32 shrink-0 truncate text-xs font-semibold text-neutral-600">
+              {DOMAIN_EMOJI[c.domain]} {DOMAIN_LABEL[c.domain]}
+            </span>
+            <div className="h-2 flex-1 overflow-hidden rounded-full bg-neutral-100">
+              <div className="h-full rounded-full bg-brand" style={{ width: `${(c.count / max) * 100}%` }} />
+            </div>
+            <span className="w-6 shrink-0 text-right text-xs font-bold text-neutral-500">{c.count}</span>
+          </div>
+        ))}
+      </div>
+    </Card>
+  )
+}
+
 function QuestBoard({
   quests,
   onAdd,

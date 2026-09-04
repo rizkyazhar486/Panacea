@@ -4,7 +4,7 @@
 // merging real Care Episode timestamps into the same timeline only ever
 // surfaces real, dated moments (started/blocked/completed) — never a
 // fabricated one.
-import { chapterForAge, groupIntoChapters, lifeEventToStoryItem, careEpisodeToStoryItems } from '../../src/lib/lifeStory.ts'
+import { chapterForAge, groupIntoChapters, lifeEventToStoryItem, careEpisodeToStoryItems, domainCounts } from '../../src/lib/lifeStory.ts'
 import type { LifeEvent, CareEpisode } from '../../src/lib/types.ts'
 
 const chk = (n: string, c: boolean, x = '') => console.log(c ? 'PASS' : 'FAIL', n, x)
@@ -85,4 +85,23 @@ function episode(overrides: Partial<CareEpisode>): CareEpisode {
   const chapters = groupIntoChapters([lifeItem, ...healthItems], dob)
   chk('life and health moments land in the same chapter when they happened around the same age', chapters.length === 1)
   chk('within that chapter, they are ordered by real date regardless of kind', chapters[0].items[0].kind === 'health' && chapters[0].items[0].healthStatus === 'started')
+}
+
+// --- domain balance: a real count, not a score ---
+{
+  const events: LifeEvent[] = [
+    { id: '1', at: '2020-01-01', title: 'x', domains: ['career'], impact: 'positive' },
+    { id: '2', at: '2020-02-01', title: 'x', domains: ['career', 'money'], impact: 'positive' },
+    { id: '3', at: '2020-03-01', title: 'x', domains: ['career'], impact: 'negative' },
+    { id: '4', at: '2020-04-01', title: 'x', domains: ['money'], impact: 'neutral' },
+  ]
+  const counts = domainCounts(events)
+  chk('counts every domain touch across events, including multi-domain entries', counts.find((c) => c.domain === 'career')?.count === 3)
+  chk('a domain touched fewer times gets a lower count', counts.find((c) => c.domain === 'money')?.count === 2)
+  chk('sorted highest count first', counts[0].domain === 'career')
+  chk('a domain never logged does not appear at all (no fabricated zero)', !counts.some((c) => c.domain === 'relationships'))
+}
+
+{
+  chk('no events produces no domain counts', domainCounts([]).length === 0)
 }

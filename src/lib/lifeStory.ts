@@ -113,6 +113,25 @@ export function chapterForAge(age: number): { name: string; ageRange: string } {
   return { name: bound.name, ageRange: range }
 }
 
+// A real count of what's actually been logged per domain — not a wellbeing
+// score, not an inferred "you're neglecting X." Just arithmetic on the
+// user's own entries, sorted highest first, domains never logged omitted
+// entirely rather than shown as a zero that implies a judgment.
+export interface DomainCount {
+  domain: LifeDomain
+  count: number
+}
+
+export function domainCounts(events: LifeEvent[]): DomainCount[] {
+  const counts = new Map<LifeDomain, number>()
+  for (const e of events) {
+    for (const d of e.domains) counts.set(d, (counts.get(d) ?? 0) + 1)
+  }
+  return [...counts.entries()]
+    .map(([domain, count]) => ({ domain, count }))
+    .sort((a, b) => b.count - a.count)
+}
+
 // Groups items (life moments and/or health-episode moments, merged) into
 // chapters, oldest chapter first, items within a chapter oldest first —
 // read top-to-bottom like a story.
