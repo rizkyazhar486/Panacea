@@ -154,8 +154,9 @@ function PrintableStory({ name, chapters }: { name: string; chapters: LifeChapte
               <p className="text-xs text-neutral-500">
                 {new Date(item.at).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}
                 {item.kind === 'health' ? ' · Health record' : ` · ${item.domains.map((d) => DOMAIN_LABEL[d]).join(', ')}`}
+                {item.kind === 'life' && item.isTurningPoint ? ' · ⭐ Turning point' : ''}
               </p>
-              <h3 className="text-base font-bold">{item.title}</h3>
+              <h3 className={item.kind === 'life' && item.isTurningPoint ? 'text-xl font-bold' : 'text-base font-bold'}>{item.title}</h3>
               {item.note && <p className="text-sm leading-relaxed">{item.note}</p>}
             </article>
           ))}
@@ -421,11 +422,14 @@ const HEALTH_STATUS_LABEL: Record<NonNullable<StoryItem['healthStatus']>, string
 // timestamp, real status) — visually distinct so it's always clear which
 // is which, but on one shared timeline.
 function StoryItemCard({ item, onRemove }: { item: StoryItem; onRemove?: () => void }) {
+  const turningPoint = item.kind === 'life' && item.isTurningPoint
+
   return (
-    <Card className="!p-4">
+    <Card className={`!p-4 ${turningPoint ? '!border-2 !border-amber-300 bg-amber-50/40' : ''}`}>
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0">
           <div className="mb-1 flex flex-wrap items-center gap-1.5">
+            {turningPoint && <span className="text-xs font-bold text-amber-600">⭐ TURNING POINT</span>}
             {item.kind === 'health' ? (
               <span className="text-xs">🏥 Health record</span>
             ) : (
@@ -436,7 +440,7 @@ function StoryItemCard({ item, onRemove }: { item: StoryItem; onRemove?: () => v
               ))
             )}
           </div>
-          <h4 className="font-bold text-ink">{item.title}</h4>
+          <h4 className={`font-bold text-ink ${turningPoint ? 'text-lg' : ''}`}>{item.title}</h4>
           {item.note && <p className="mt-1 text-sm text-neutral-600">{item.note}</p>}
           <p className="mt-1.5 text-xs text-neutral-400">{new Date(item.at).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })}</p>
         </div>
@@ -462,6 +466,7 @@ function NewEventForm({ onAdd }: { onAdd: (e: Omit<LifeEvent, 'id'>) => void }) 
   const [domains, setDomains] = useState<LifeDomain[]>([])
   const [impact, setImpact] = useState<LifeEvent['impact']>('positive')
   const [date, setDate] = useState(new Date().toISOString().slice(0, 10))
+  const [isTurningPoint, setIsTurningPoint] = useState(false)
 
   function toggleDomain(d: LifeDomain) {
     setDomains((prev) => (prev.includes(d) ? prev.filter((x) => x !== d) : [...prev, d]))
@@ -475,11 +480,13 @@ function NewEventForm({ onAdd }: { onAdd: (e: Omit<LifeEvent, 'id'>) => void }) 
       note: note.trim() || undefined,
       domains,
       impact,
+      isTurningPoint: isTurningPoint || undefined,
     })
     setTitle('')
     setNote('')
     setDomains([])
     setImpact('positive')
+    setIsTurningPoint(false)
   }
 
   return (
@@ -536,6 +543,11 @@ function NewEventForm({ onAdd }: { onAdd: (e: Omit<LifeEvent, 'id'>) => void }) 
           </select>
         </Field>
       </div>
+
+      <label className="mt-3 flex cursor-pointer items-center gap-2 text-sm text-neutral-600">
+        <input type="checkbox" checked={isTurningPoint} onChange={(e) => setIsTurningPoint(e.target.checked)} className="h-4 w-4" />
+        ⭐ This was a turning point — a moment that changed everything
+      </label>
 
       <Button onClick={submit} className="mt-3 w-full">
         <IconPlus size={16} /> Add to your story

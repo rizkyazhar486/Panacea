@@ -370,6 +370,10 @@ export interface LifeEvent {
   note?: string
   domains: LifeDomain[] // one moment can touch more than one area of life
   impact: 'positive' | 'neutral' | 'negative' // self-rated, never inferred
+  // The user's own call, not an algorithm's — real lives have a handful of
+  // moments that reorganize everything versus the ordinary ones, and only
+  // the person living it can say which is which.
+  isTurningPoint?: boolean
 }
 
 // A self-set goal, not an algorithm-assigned task. Progress is a number the

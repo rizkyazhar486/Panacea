@@ -50,10 +50,20 @@ export interface StoryItem {
   domains: LifeDomain[]
   impact?: LifeEvent['impact'] // only 'life' items carry a self-rated impact
   healthStatus?: 'started' | 'blocked' | 'completed' // only 'health' items
+  isTurningPoint?: boolean // only 'life' items — the user's own call, never inferred
 }
 
 export function lifeEventToStoryItem(e: LifeEvent): StoryItem {
-  return { id: e.id, at: e.at, title: e.title, note: e.note, kind: 'life', domains: e.domains, impact: e.impact }
+  return {
+    id: e.id,
+    at: e.at,
+    title: e.title,
+    note: e.note,
+    kind: 'life',
+    domains: e.domains,
+    impact: e.impact,
+    isTurningPoint: e.isTurningPoint,
+  }
 }
 
 // Real timestamps from the episode's own stage history — nothing inferred.
