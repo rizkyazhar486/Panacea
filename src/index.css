@@ -29,17 +29,14 @@
   --font-judul: 'Space Grotesk', 'Inter', ui-sans-serif, system-ui, sans-serif;
   --font-angka: 'JetBrains Mono', ui-monospace, 'SF Mono', monospace;
   /* Judul level-1 (satu per halaman, singkat: "Home", "Community", "Market
-     Data") — huruf geometris sci-fi. Referensi (Avonger/Coder/Researcher)
-     berbayar tanpa sumber CDN yang sah, jadi dicari penggantinya di Google
-     Fonts berdasarkan ciri yang PALING diminta langsung: sudut terpotong
-     miring (chamfered) di setiap huruf, bukan sekadar tipis. Turret Road
-     dirancang tepat seputar itu — bujursangkarnya dipotong diagonal di
-     setiap sudut, mirip persis dengan potongan pada "A", "R", "N" di
-     referensi. TIDAK dipakai untuk h2/h3: subjudul di aplikasi ini padat
-     dan sering berupa kalimat ("Nothing here can be broken or lost"), dan
-     huruf sekaku ini mengorbankan keterbacaan begitu barisnya lebih dari
-     2-3 kata. */
-  --font-hero: 'Turret Road', 'Space Grotesk', 'Inter', ui-sans-serif, system-ui, sans-serif;
+     Data") — huruf geometris sci-fi. Diminta langsung: Orbitron — huruf
+     blok/persegi klasik untuk tampilan "futuristik UI", tersedia bebas
+     lewat Google Fonts (Avonger/Coder/Researcher tetap berbayar tanpa
+     sumber CDN yang sah). TIDAK dipakai untuk h2/h3: subjudul di aplikasi
+     ini padat dan sering berupa kalimat ("Nothing here can be broken or
+     lost"), dan huruf sekaku ini mengorbankan keterbacaan begitu barisnya
+     lebih dari 2-3 kata. */
+  --font-hero: 'Orbitron', 'Space Grotesk', 'Inter', ui-sans-serif, system-ui, sans-serif;
 
   /* Panaceamed "pnc" design tokens — calmer, green-tinted neutral system.
      Light surfaces stay airy; dark mode uses warm green-tinted greys (not
