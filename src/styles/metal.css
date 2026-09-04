@@ -3,12 +3,23 @@
    dipetakan ke tingkatan yang SUDAH ADA dan dihitung dari data nyata (mis.
    tingkatan VO2max Elite/Excellent/Good) — bukan skor baru yang dikarang. */
 
+@keyframes metal-hue-drift {
+  0%, 100% { filter: hue-rotate(0deg); }
+  50% { filter: hue-rotate(30deg); }
+}
+
+@keyframes metal-edge-flow {
+  0% { background-position: 0% 50%; }
+  100% { background-position: 300% 50%; }
+}
+
 .metal-forge {
   position: relative;
   overflow: hidden;
   /* Liquid-chrome, not black-with-a-tint: three saturated color blooms
      (violet, cyan, magenta) over a deep indigo base — every surface here
-     carries real color gradation, never a flat black or gray fill. */
+     carries real color gradation, never a flat black or gray fill. The hue
+     slowly drifts (motion, per direct request) instead of sitting static. */
   background:
     radial-gradient(130% 150% at 12% -15%, rgba(168, 85, 247, 0.4) 0%, transparent 52%),
     radial-gradient(110% 110% at 105% -10%, rgba(56, 189, 248, 0.38) 0%, transparent 55%),
@@ -17,6 +28,7 @@
     repeating-linear-gradient(115deg, rgba(255, 255, 255, 0.035) 0px, rgba(255, 255, 255, 0.035) 1px, transparent 1px, transparent 5px),
     linear-gradient(160deg, #1b1240 0%, #16143f 30%, #0e1a3a 65%, #070a1c 100%);
   color: #fff;
+  animation: metal-hue-drift 14s ease-in-out infinite;
 }
 
 .metal-forge::after {
@@ -25,6 +37,33 @@
   inset: 0;
   pointer-events: none;
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08), inset 0 0 60px rgba(0, 0, 0, 0.5);
+}
+
+/* Cincin pelangi yang bergerak di setiap tepi kartu metal — ini yang membuat
+   "more rainbow" nyata terlihat di mana-mana, bukan hanya pada satu
+   pencapaian langka. Hanya tepinya, bukan isinya, supaya teks tetap terbaca. */
+.metal-forge::before,
+.metal-spotlight::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  border-radius: inherit;
+  padding: 1.5px;
+  background: linear-gradient(115deg, #ff5f6d, #ffc371, #f9f871, #6bffb8, #6bd7ff, #a86bff, #ff5f6d);
+  background-size: 300% 300%;
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  opacity: 0.55;
+  pointer-events: none;
+  animation: metal-edge-flow 7s linear infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .metal-forge, .metal-spotlight, .metal-forge::before, .metal-spotlight::before, .metal-prism, .metal-emboss-prism {
+    animation: none !important;
+  }
 }
 
 .metal-tag {
@@ -95,6 +134,7 @@
     repeating-linear-gradient(115deg, rgba(255, 255, 255, 0.025) 0px, rgba(255, 255, 255, 0.025) 1px, transparent 1px, transparent 5px),
     linear-gradient(180deg, #150f30 0%, #0d1230 45%, #060815 100%);
   color: #fff;
+  animation: metal-hue-drift 14s ease-in-out infinite;
 }
 
 .metal-spotlight::after {
@@ -124,9 +164,14 @@
   color: rgba(255, 255, 255, 0.06);
 }
 
+@keyframes metal-glow-pulse {
+  0%, 100% { text-shadow: 0 0 14px rgba(255, 255, 255, 0.3); }
+  50% { text-shadow: 0 0 22px rgba(168, 107, 255, 0.45); }
+}
+
 .metal-motto span[data-active='true'] {
   color: #fff;
-  text-shadow: 0 0 18px rgba(255, 255, 255, 0.35);
+  animation: metal-glow-pulse 3.2s ease-in-out infinite;
 }
 
 /* Empat warna yang diminta secara eksplisit, masing-masing dengan artinya
@@ -158,10 +203,16 @@
 /* Pelangi — dipakai HANYA untuk pencapaian paling langka (mis. Elite Lungs),
    bukan hiasan tersebar. Warnanya nyata dan bergradasi penuh spektrum, sesuai
    permintaan langsung: "more rainbows", tidak ada hitam/putih polos di sini. */
+@keyframes metal-prism-spin {
+  0% { filter: hue-rotate(0deg) drop-shadow(0 1px 2px rgba(0, 0, 0, 0.4)); }
+  100% { filter: hue-rotate(360deg) drop-shadow(0 1px 2px rgba(0, 0, 0, 0.4)); }
+}
+
 .metal-prism {
   background: conic-gradient(from 200deg at 50% 50%, #ff5f6d, #ffc371, #f9f871, #6bffb8, #6bd7ff, #a86bff, #ff5f6d);
   color: #1a0b2e;
   box-shadow: 0 2px 14px rgba(168, 107, 255, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.7);
+  animation: metal-prism-spin 4s linear infinite;
 }
 
 .metal-emboss-prism {
@@ -169,7 +220,7 @@
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
-  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.4));
+  animation: metal-prism-spin 4s linear infinite;
 }
 
 .metal-emboss-red {
