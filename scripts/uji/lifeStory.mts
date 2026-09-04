@@ -105,3 +105,12 @@ function episode(overrides: Partial<CareEpisode>): CareEpisode {
 {
   chk('no events produces no domain counts', domainCounts([]).length === 0)
 }
+
+// --- turning points: the user's own call, never inferred ---
+{
+  const marked: LifeEvent = { id: 't1', at: '2020-01-01', title: 'x', domains: ['purpose'], impact: 'positive', isTurningPoint: true }
+  const unmarked: LifeEvent = { id: 't2', at: '2020-01-01', title: 'x', domains: ['purpose'], impact: 'positive' }
+  chk('a marked turning point carries isTurningPoint through to the story item', lifeEventToStoryItem(marked).isTurningPoint === true)
+  chk('an ordinary event has no isTurningPoint fabricated for it', lifeEventToStoryItem(unmarked).isTurningPoint === undefined)
+  chk('a health item never carries isTurningPoint (only self-reported life items can)', careEpisodeToStoryItems(episode({})).every((i) => i.isTurningPoint === undefined))
+}
