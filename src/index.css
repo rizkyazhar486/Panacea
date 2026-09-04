@@ -745,10 +745,10 @@ input:focus, textarea:focus, select:focus {
     radial-gradient(65% 60% at 8% -10%, rgba(255, 102, 0, 0.16) 0%, transparent 55%),
     radial-gradient(60% 55% at 100% 108%, rgba(0, 133, 255, 0.14) 0%, transparent 55%),
     radial-gradient(50% 50% at 100% -8%, rgba(157, 0, 255, 0.1) 0%, transparent 55%),
-    linear-gradient(165deg, #fdfdfe 0%, #f7f8fb 55%, #f3f4f8 100%);
+    linear-gradient(165deg, rgba(253,253,254,0.72) 0%, rgba(247,248,251,0.68) 55%, rgba(243,244,248,0.68) 100%);
   animation: kaca-aurora 16s ease-in-out infinite;
-  backdrop-filter: blur(20px) saturate(1.3);
-  -webkit-backdrop-filter: blur(20px) saturate(1.3);
+  backdrop-filter: blur(26px) saturate(1.5);
+  -webkit-backdrop-filter: blur(26px) saturate(1.5);
   border: 1px solid rgba(255,255,255,0.6);
   box-shadow:
     0 1px 2px rgba(12,20,16,0.06),
@@ -1469,10 +1469,10 @@ html { -webkit-overflow-scrolling: touch; }
     radial-gradient(65% 60% at 8% -10%, rgba(255, 102, 0, 0.18) 0%, transparent 55%),
     radial-gradient(60% 55% at 100% 108%, rgba(0, 133, 255, 0.16) 0%, transparent 55%),
     radial-gradient(50% 50% at 100% -8%, rgba(157, 0, 255, 0.11) 0%, transparent 55%),
-    linear-gradient(165deg, #fdfdfe 0%, #f7f8fb 55%, #f3f4f8 100%);
+    linear-gradient(165deg, rgba(253,253,254,0.72) 0%, rgba(247,248,251,0.68) 55%, rgba(243,244,248,0.68) 100%);
   animation: kaca-aurora 16s ease-in-out infinite;
-  backdrop-filter: blur(20px) saturate(1.3);
-  -webkit-backdrop-filter: blur(20px) saturate(1.3);
+  backdrop-filter: blur(26px) saturate(1.5);
+  -webkit-backdrop-filter: blur(26px) saturate(1.5);
   border-color: rgba(12,20,16,0.07);
   box-shadow:
     0 1px 2px rgba(12,20,16,0.05),
