@@ -47,6 +47,44 @@ export function BodyExplorer() {
   const [diseases, setDiseases] = useState<OntologyTerm[]>([])
   const [phenotypes, setPhenotypes] = useState<OntologyTerm[]>([])
   const [explanation, setExplanation] = useState('')
+  const [askedLabel, setAskedLabel] = useState('')
+
+  const [question, setQuestion] = useState('')
+  const [asking, setAsking] = useState(false)
+
+  // "Ask" — pencarian bebas (bahasa natural atau gejala/fungsi, bukan hanya
+  // nama region tubuh) yang mengisi PANEL YANG SAMA dengan klik region: satu
+  // tempat untuk membaca hasilnya, dua cara untuk sampai ke sana. Kalau
+  // istilah yang diambil balik cocok dengan salah satu region di siluet
+  // (dicocokkan lewat kata kunci region itu sendiri, bukan tebakan AI), region
+  // itu ikut disorot — inilah bagian "mulai dari penyakit/gejala, lihat organ
+  // yang terlibat", kebalikan dari mengklik organ dulu.
+  async function ask() {
+    const q = question.trim()
+    if (!q) return
+    setAsking(true)
+    setActive(null)
+    setAskedLabel(q)
+    setExplanation('')
+    setDiseases([])
+    setPhenotypes([])
+    try {
+      const { diseases: d, phenotypes: p } = await api.anatomyOntology([q])
+      setDiseases(d)
+      setPhenotypes(p)
+      const matched = BODY_REGIONS.find((r) =>
+        r.searchTerms.some((t) => t.toLowerCase().includes(q.toLowerCase()) || q.toLowerCase().includes(t.toLowerCase())) ||
+        [...d, ...p].some((term) => term.label.toLowerCase().includes(r.label.split(' ')[0].toLowerCase())),
+      )
+      if (matched) setActive(matched)
+      const text = await explainBodyRegion(state.settings, q, d, p)
+      setExplanation(text)
+    } catch {
+      setExplanation('Could not reach the ontology service right now. Please try again in a moment.')
+    } finally {
+      setAsking(false)
+    }
+  }
 
   const [drugQuery, setDrugQuery] = useState('')
   const [drugLoading, setDrugLoading] = useState(false)
@@ -56,6 +94,8 @@ export function BodyExplorer() {
 
   async function pick(region: BodyRegion) {
     setActive(region)
+    setAskedLabel('')
+    setQuestion('')
     setLoading(true)
     setExplanation('')
     setDiseases([])
@@ -100,7 +140,30 @@ export function BodyExplorer() {
         subtitle="Tap a region to see real terms from the Human Disease & Phenotype Ontologies"
       />
       <Card>
-        <div className="grid gap-4 sm:grid-cols-[220px_1fr]">
+        <form onSubmit={(e) => { e.preventDefault(); ask() }} className="flex gap-2">
+          <div className="relative min-w-0 flex-1">
+            <IconSearch size={16} className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-neutral-400" />
+            <input
+              value={question}
+              onChange={(e) => setQuestion(e.target.value)}
+              placeholder="Ask about anatomy, a symptom, or a disease…"
+              className="h-11 w-full rounded-xl border border-neutral-200 bg-white pl-9 pr-3 text-sm text-ink outline-none focus:border-brand dark:border-white/10 dark:bg-white/5 dark:text-white"
+            />
+          </div>
+          <button
+            type="submit"
+            disabled={asking || !question.trim()}
+            className="liquid-glass-btn liquid-glass-btn--primary flex h-11 shrink-0 items-center rounded-xl px-4 text-sm font-bold text-white disabled:opacity-50"
+          >
+            {asking ? 'Asking…' : 'Ask'}
+          </button>
+        </form>
+        <p className="mt-2 text-[11px] leading-relaxed text-neutral-400">
+          Ask in your own words — e.g. "where is the median nerve", "symptoms of liver disease", "what does the
+          pancreas do". If the terms retrieved match a region below, it lights up on the silhouette.
+        </p>
+
+        <div className="mt-4 grid gap-4 sm:grid-cols-[220px_1fr]">
           <div className="relative mx-auto">
             <svg viewBox="0 0 200 440" className="h-[340px] w-auto">
               <g fill="#eef4f0" stroke="#d6e4dc" strokeWidth="1.5" className="dark:fill-white/5 dark:stroke-white/10">
@@ -133,27 +196,27 @@ export function BodyExplorer() {
           </div>
 
           <div className="min-w-0">
-            {!active && (
+            {!active && !askedLabel && (
               <p className="text-sm leading-relaxed text-neutral-500">
-                Tap a marker on the silhouette to look up real disease and symptom terms for that region, and get a
-                plain-language explanation grounded in those terms — not a diagnosis for you personally.
+                Tap a marker on the silhouette, or ask a question above, to look up real disease and symptom terms —
+                and get a plain-language explanation grounded in those terms, not a diagnosis for you personally.
               </p>
             )}
-            {active && (
+            {(active || askedLabel) && (
               <div className="space-y-3">
-                <h3 className="text-base font-black text-ink dark:text-white">{active.label}</h3>
-                {loading && <p className="text-sm text-neutral-500">Looking up ontology terms…</p>}
-                {!loading && explanation && (
+                <h3 className="text-base font-black capitalize text-ink dark:text-white">{active?.label ?? askedLabel}</h3>
+                {(loading || asking) && <p className="text-sm text-neutral-500">Looking up ontology terms…</p>}
+                {!loading && !asking && explanation && (
                   <p className="rounded-xl bg-brand/5 p-3 text-sm leading-relaxed text-ink dark:bg-brand/10 dark:text-white">
                     {explanation}
                   </p>
                 )}
-                {!loading && (
+                {!loading && !asking && (
                   <>
                     <TermList title="Related diseases (DOID)" terms={diseases} />
                     <TermList title="Related symptoms (HPO)" terms={phenotypes} />
                     {!diseases.length && !phenotypes.length && (
-                      <p className="text-sm text-neutral-500">No ontology terms were found for this region.</p>
+                      <p className="text-sm text-neutral-500">No ontology terms were found for this.</p>
                     )}
                   </>
                 )}
