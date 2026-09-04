@@ -606,23 +606,27 @@ button:active, a[href]:active, [role='button']:active { transform: scale(0.985);
   100% { background-position: 400% 50%; }
 }
 
+/* "Bukan pelangi lemah" — langsung diminta setelah versi pastel dianggap
+   masih lembek. Warnanya sekarang jenuh penuh (bukan corak Tailwind-400
+   yang lembut), alpha dinaikkan, dan saturate() dilipatkan supaya benar-
+   benar neon seperti referensi, bukan pastel yang dicuci. */
 .kaca {
   --kx: 50%;
   --ky: 0%;
   isolation: isolate;
   background:
     linear-gradient(135deg,
-      rgba(167, 139, 250, 0.85) 0%,
-      rgba(99, 102, 241, 0.82) 16%,
-      rgba(56, 130, 246, 0.8) 32%,
-      rgba(34, 211, 238, 0.82) 48%,
-      rgba(52, 211, 153, 0.8) 64%,
-      rgba(251, 191, 36, 0.82) 80%,
-      rgba(244, 63, 94, 0.55) 92%,
-      rgba(232, 121, 249, 0.75) 100%);
+      rgba(139, 92, 246, 0.92) 0%,
+      rgba(79, 70, 229, 0.9) 16%,
+      rgba(37, 99, 235, 0.88) 32%,
+      rgba(6, 182, 212, 0.9) 48%,
+      rgba(16, 185, 129, 0.88) 64%,
+      rgba(245, 158, 11, 0.9) 80%,
+      rgba(225, 29, 72, 0.7) 92%,
+      rgba(217, 70, 239, 0.85) 100%);
   animation: kaca-aurora 16s ease-in-out infinite;
-  backdrop-filter: blur(20px) saturate(1.7);
-  -webkit-backdrop-filter: blur(20px) saturate(1.7);
+  backdrop-filter: blur(20px) saturate(2.2);
+  -webkit-backdrop-filter: blur(20px) saturate(2.2);
   border: 1px solid rgba(255,255,255,0.6);
   box-shadow:
     0 1px 2px rgba(12,20,16,0.06),
@@ -693,14 +697,14 @@ button:active, a[href]:active, [role='button']:active { transform: scale(0.985);
   padding: 1px;
   background: linear-gradient(
     100deg,
-    #a78bfa, #6366f1, #3b82f6, #22d3ee, #34d399, #fbbf24, #fb7185, #e879f9, #a78bfa);
+    #8b5cf6, #4f46e5, #2563eb, #06b6d4, #10b981, #f59e0b, #e11d48, #d946ef, #8b5cf6);
   background-size: 400% 100%;
   animation: kaca-edge-aurora 12s linear infinite;
   -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
   mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
   -webkit-mask-composite: xor;
   mask-composite: exclude;
-  opacity: 0.75;
+  opacity: 0.95;
 }
 
 /* Di layar sentuh pantulan digerakkan oleh gulir, bukan kursor. */
@@ -724,17 +728,23 @@ button:active, a[href]:active, [role='button']:active { transform: scale(0.985);
 /* Amber tetap dominan (diminta langsung), tapi kini enam gumpalan bukan
    empat — zamrud dan magenta ditambahkan supaya spektrumnya lebih penuh —
    dan seluruhnya bergeser pelan lewat kaca-aurora. */
+/* Neon penuh, seperti referensi (petir biru-magenta di atas hitam pekat) —
+   opacity gumpalannya hampir dua kali lipat dari sebelumnya. Basisnya
+   tetap nyaris hitam (ruang angkasa sungguhan), supaya cahayanya terasa
+   MEMANCAR dari kegelapan, bukan mengaburkannya. */
 .dark .kaca {
   background:
-    radial-gradient(110% 95% at 8% -10%, rgba(251, 146, 60, 0.42) 0%, transparent 58%),
-    radial-gradient(90% 85% at 100% 0%, rgba(245, 158, 11, 0.34) 0%, transparent 55%),
-    radial-gradient(100% 95% at 105% 105%, rgba(56, 189, 248, 0.3) 0%, transparent 55%),
-    radial-gradient(85% 85% at -5% 100%, rgba(168, 85, 247, 0.28) 0%, transparent 55%),
-    radial-gradient(70% 70% at 50% -20%, rgba(52, 211, 153, 0.2) 0%, transparent 55%),
-    radial-gradient(70% 70% at 30% 120%, rgba(232, 121, 249, 0.2) 0%, transparent 55%),
-    linear-gradient(160deg, rgba(20,14,10,0.85), rgba(10,8,14,0.68) 55%, rgba(14,10,18,0.75) 100%);
+    radial-gradient(110% 95% at 8% -10%, rgba(251, 146, 60, 0.6) 0%, transparent 58%),
+    radial-gradient(90% 85% at 100% 0%, rgba(245, 158, 11, 0.5) 0%, transparent 55%),
+    radial-gradient(100% 95% at 105% 105%, rgba(6, 182, 212, 0.5) 0%, transparent 55%),
+    radial-gradient(85% 85% at -5% 100%, rgba(168, 85, 247, 0.48) 0%, transparent 55%),
+    radial-gradient(70% 70% at 50% -20%, rgba(16, 185, 129, 0.34) 0%, transparent 55%),
+    radial-gradient(70% 70% at 30% 120%, rgba(217, 70, 239, 0.36) 0%, transparent 55%),
+    linear-gradient(160deg, rgba(12,8,6,0.82), rgba(4,4,8,0.62) 55%, rgba(8,6,12,0.7) 100%);
   animation: kaca-aurora 18s ease-in-out infinite;
-  border-color: rgba(255,255,255,0.14);
+  backdrop-filter: blur(20px) saturate(2.4);
+  -webkit-backdrop-filter: blur(20px) saturate(2.4);
+  border-color: rgba(255,255,255,0.16);
   box-shadow:
     0 1px 2px rgba(0,0,0,0.5),
     0 12px 32px -8px rgba(0,0,0,0.55),
@@ -752,10 +762,10 @@ button:active, a[href]:active, [role='button']:active { transform: scale(0.985);
 .dark .kaca::after {
   background: linear-gradient(
     100deg,
-    #a78bfa, #6366f1, #3b82f6, #22d3ee, #34d399, #fbbf24, #fb7185, #e879f9, #a78bfa);
+    #8b5cf6, #4f46e5, #2563eb, #06b6d4, #10b981, #f59e0b, #e11d48, #d946ef, #8b5cf6);
   background-size: 400% 100%;
   animation: kaca-edge-aurora 12s linear infinite;
-  opacity: 0.6;
+  opacity: 1;
 }
 
 /* Melayang: naik saat disentuh perhatian, turun saat ditekan. Kurva
@@ -1244,23 +1254,22 @@ html { -webkit-overflow-scrolling: touch; }
 }
 
 :root:not(.dark) .kaca {
-  /* Spektrum penuh (ungu→indigo→biru→sian→zamrud→emas→jingga→magenta),
-     bergeser pelan lewat kaca-aurora — "permainan warna", bukan satu
-     gradien statis. Alpha tetap tinggi supaya kartu tetap opak dan tulisan
-     gelap tetap kontras. */
+  /* Neon jenuh penuh, bukan pastel — "not weak rainbow, strong colors".
+     Sama seperti .kaca dasar; diulang di sini karena inilah aturan yang
+     benar-benar menang di mode terang (lihat catatan spesifisitas di atas). */
   background:
     linear-gradient(135deg,
-      rgba(167, 139, 250, 0.92) 0%,
-      rgba(99, 102, 241, 0.9) 16%,
-      rgba(56, 130, 246, 0.88) 32%,
-      rgba(34, 211, 238, 0.9) 48%,
-      rgba(52, 211, 153, 0.88) 64%,
-      rgba(251, 191, 36, 0.9) 80%,
-      rgba(244, 63, 94, 0.6) 92%,
-      rgba(232, 121, 249, 0.82) 100%);
+      rgba(139, 92, 246, 0.95) 0%,
+      rgba(79, 70, 229, 0.93) 16%,
+      rgba(37, 99, 235, 0.92) 32%,
+      rgba(6, 182, 212, 0.94) 48%,
+      rgba(16, 185, 129, 0.92) 64%,
+      rgba(245, 158, 11, 0.94) 80%,
+      rgba(225, 29, 72, 0.75) 92%,
+      rgba(217, 70, 239, 0.9) 100%);
   animation: kaca-aurora 16s ease-in-out infinite;
-  backdrop-filter: blur(20px) saturate(1.6);
-  -webkit-backdrop-filter: blur(20px) saturate(1.6);
+  backdrop-filter: blur(20px) saturate(2.2);
+  -webkit-backdrop-filter: blur(20px) saturate(2.2);
   border-color: rgba(12,20,16,0.07);
   box-shadow:
     0 1px 2px rgba(12,20,16,0.05),
