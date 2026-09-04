@@ -1,6 +1,7 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useStore } from '../lib/store'
+import { api, backendEnabled, type FacilityPriceSubmission } from '../lib/api'
 import { Card, SectionTitle, Badge, Button, Field, inputClass } from '../components/ui'
 import { IconPlan, IconPlus } from '../components/icons'
 import {
@@ -234,6 +235,8 @@ function ProviderComparison({
             key={c.facilityId}
             candidate={c}
             chosen={episode.facilityId === c.facilityId}
+            diagnosisCode={episode.diagnosisCode}
+            diagnosisTitle={episode.title}
             onChoose={() => onChange(chooseCandidate(episode, c.facilityId))}
             onRemove={() => onChange(removeCandidate(episode, c.facilityId))}
             onCostChange={(cost) => onChange(updateCandidateCost(episode, c.facilityId, cost))}
@@ -247,12 +250,16 @@ function ProviderComparison({
 function CandidateRow({
   candidate,
   chosen,
+  diagnosisCode,
+  diagnosisTitle,
   onChoose,
   onRemove,
   onCostChange,
 }: {
   candidate: CandidateView
   chosen: boolean
+  diagnosisCode?: string
+  diagnosisTitle?: string
   onChoose: () => void
   onRemove: () => void
   onCostChange: (cost: { low?: number; high?: number; confidence: 'estimated' | 'verified'; source?: string }) => void
@@ -330,8 +337,110 @@ function CandidateRow({
           <option value="verified">Verified</option>
         </select>
       </div>
+
+      <CommunityPrices
+        facilityId={candidate.facilityId}
+        diagnosisCode={diagnosisCode}
+        diagnosisTitle={diagnosisTitle}
+        myPrice={{ low: low ? Number(low) : undefined, high: high ? Number(high) : undefined, confidence: candidate.costConfidence ?? 'estimated', source: source.trim() || undefined }}
+      />
     </div>
   )
+}
+
+// The actual "real-time price" feature: no external pricing API exists for
+// Indonesian facilities to poll, so this is a shared board instead — every
+// patient/doctor's submitted price for this facility is visible to every
+// other user immediately (see api.ts's FacilityPriceSubmission). Requires
+// the live backend; in demo mode (no VITE_API_URL) it stays hidden rather
+// than pretending to show something that isn't actually shared.
+function CommunityPrices({
+  facilityId,
+  diagnosisCode,
+  diagnosisTitle,
+  myPrice,
+}: {
+  facilityId: string
+  diagnosisCode?: string
+  diagnosisTitle?: string
+  myPrice: { low?: number; high?: number; confidence: 'estimated' | 'verified'; source?: string }
+}) {
+  const [prices, setPrices] = useState<FacilityPriceSubmission[]>([])
+  const [loading, setLoading] = useState(false)
+  const [sharing, setSharing] = useState(false)
+  const [error, setError] = useState('')
+
+  function load() {
+    if (!backendEnabled) return
+    setLoading(true)
+    api
+      .facilityPrices(facilityId, diagnosisCode)
+      .then(setPrices)
+      .catch(() => setError('Could not load community prices.'))
+      .finally(() => setLoading(false))
+  }
+
+  useEffect(load, [facilityId, diagnosisCode])
+
+  async function share() {
+    if (myPrice.low == null && myPrice.high == null) {
+      setError('Enter a low or high amount above before sharing.')
+      return
+    }
+    setSharing(true)
+    setError('')
+    try {
+      await api.submitFacilityPrice({ facilityId, diagnosisCode, diagnosisTitle, ...myPrice })
+      load()
+    } catch {
+      setError('Could not share your price — please try again.')
+    } finally {
+      setSharing(false)
+    }
+  }
+
+  if (!backendEnabled) return null
+
+  return (
+    <div className="mt-3 border-t border-neutral-100 pt-3">
+      <div className="mb-2 flex items-center justify-between gap-2">
+        <span className="text-[11px] font-semibold uppercase tracking-[0.14em] text-neutral-500">
+          Community prices — real submissions, shared live
+        </span>
+        <Button variant="ghost" onClick={share} disabled={sharing} className="!min-h-0 !px-2 !py-1 text-xs">
+          {sharing ? 'Sharing…' : 'Share mine'}
+        </Button>
+      </div>
+      {error && <p className="text-xs text-accent">{error}</p>}
+      {loading && <p className="text-xs text-neutral-500">Loading…</p>}
+      {!loading && prices.length === 0 && (
+        <p className="text-xs text-neutral-500">No one has shared a price for this facility yet — be the first.</p>
+      )}
+      <div className="space-y-1.5">
+        {prices.map((p) => (
+          <div key={p.id} className="flex items-center justify-between gap-2 text-xs">
+            <span className="text-neutral-700">
+              {formatSubmission(p)}
+              {p.confidence === 'verified' ? (
+                <Badge tone="normal">Verified</Badge>
+              ) : (
+                <span className="ml-1 text-neutral-400">(estimated)</span>
+              )}
+            </span>
+            <span className="shrink-0 text-neutral-400">
+              {p.submittedByName} · {new Date(p.at).toLocaleDateString('en-US')}
+            </span>
+          </div>
+        ))}
+      </div>
+    </div>
+  )
+}
+
+function formatSubmission(p: FacilityPriceSubmission): string {
+  const fmt = (n: number) => n.toLocaleString('en-US')
+  if (p.low != null && p.high != null && p.low !== p.high) return `${p.currency} ${fmt(p.low)}–${fmt(p.high)} `
+  return `${p.currency} ${fmt(p.low ?? p.high ?? 0)} `
 }
 
 function CostEstimateField({

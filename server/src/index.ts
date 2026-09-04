@@ -17,6 +17,8 @@ import {
   credit,
   listPosts,
   addPost,
+  listFacilityPrices,
+  addFacilityPrice,
   likePost,
   reactPost,
   deletePost,
@@ -404,6 +406,40 @@ app.post('/api/payments/webhook', paymentWebhook)
 app.get('/api/payments/status/:orderId', orderStatus)
 
 // --- social posts (persisted) ---
+// Crowd-sourced provider price board — see store.ts's FacilityPriceSubmission
+// for why this, not a live external feed, is what "real-time price" means
+// here: every submission is visible to every user the moment it's saved.
+app.get('/api/facility-prices', (req, res) => {
+  const facilityId = String(req.query.facilityId || '')
+  if (!facilityId) return res.status(400).json({ error: 'missing_facilityId' })
+  const diagnosisCode = req.query.diagnosisCode ? String(req.query.diagnosisCode) : undefined
+  res.json({ prices: listFacilityPrices(facilityId, diagnosisCode) })
+})
+app.post('/api/facility-prices', requireAuth, (req, res) => {
+  const u = (req as express.Request & { user: User }).user
+  const b = req.body as Partial<import('./store.js').FacilityPriceSubmission>
+  if (!b.facilityId) return res.status(400).json({ error: 'missing_facilityId' })
+  if (b.confidence !== 'estimated' && b.confidence !== 'verified') {
+    return res.status(400).json({ error: 'invalid_confidence' })
+  }
+  const p = {
+    id: uid(),
+    facilityId: String(b.facilityId),
+    diagnosisCode: b.diagnosisCode ? String(b.diagnosisCode) : undefined,
+    diagnosisTitle: b.diagnosisTitle ? String(b.diagnosisTitle) : undefined,
+    currency: String(b.currency || 'IDR'),
+    low: typeof b.low === 'number' ? b.low : undefined,
+    high: typeof b.high === 'number' ? b.high : undefined,
+    confidence: b.confidence,
+    source: b.source ? String(b.source).slice(0, 200) : undefined,
+    submittedByEmail: u.email,
+    submittedByName: u.name,
+    at: new Date().toISOString(),
+  }
+  addFacilityPrice(p)
+  res.json({ price: p })
+})
+
 app.get('/api/posts', (_req, res) => res.json({ posts: listPosts() }))
 app.post('/api/posts', requireAuth, (req, res) => {
   const u = (req as express.Request & { user: User }).user

@@ -1,4 +1,23 @@
 
+// A real price submission shared across every user comparing the same
+// facility — this IS the "real-time price" feature: no external pricing API
+// exists to connect to, so every visitor sees every submission the instant
+// it's saved, timestamped and attributed, instead of a single device's guess.
+export interface FacilityPriceSubmission {
+  id: string
+  facilityId: string
+  diagnosisCode?: string
+  diagnosisTitle?: string
+  currency: string
+  low?: number
+  high?: number
+  confidence: 'estimated' | 'verified'
+  source?: string
+  submittedByEmail: string
+  submittedByName: string
+  at: string
+}
+
 export interface MarketInstrument { symbol: string; label: string; group: string; unggulan?: boolean }
 export interface KatalogMetrik { kunci: string; label: string; kategori: string; satuan: string }
 export interface SyncFinding { level: 'error' | 'warn' | 'ok'; judul: string; detail: string; setelan?: string; ubahKe?: string }
@@ -279,6 +298,20 @@ export const api = {
   saveSettings: (settings: Record<string, unknown>) =>
     req<{ ok: boolean }>('/api/settings', { method: 'PUT', body: JSON.stringify({ settings }) }),
   posts: () => req<{ posts: BackendPost[] }>('/api/posts').then((r) => r.posts),
+  // Shared provider price board — see FacilityPriceSubmission above.
+  facilityPrices: (facilityId: string, diagnosisCode?: string) =>
+    req<{ prices: FacilityPriceSubmission[] }>(
+      `/api/facility-prices?facilityId=${encodeURIComponent(facilityId)}${diagnosisCode ? `&diagnosisCode=${encodeURIComponent(diagnosisCode)}` : ''}`,
+    ).then((r) => r.prices),
+  submitFacilityPrice: (p: {
+    facilityId: string
+    diagnosisCode?: string
+    diagnosisTitle?: string
+    low?: number
+    high?: number
+    confidence: 'estimated' | 'verified'
+    source?: string
+  }) => req<{ price: FacilityPriceSubmission }>('/api/facility-prices', { method: 'POST', body: JSON.stringify(p) }).then((r) => r.price),
   // ── Connect: verifikasi, kredit kepercayaan, laporan, blokir ──────────────
   connectSaya: () => req<{
     status: string; alasanReject?: string; kredit: number; bahaya: boolean

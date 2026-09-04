@@ -118,6 +118,27 @@ interface DB {
   deviceWorkouts?: Record<string, Record<string, any>[]> // email -> raw workout objects pushed by the exporter
   hrNotifications?: Record<string, Record<string, any>[]> // email -> raw high/low/irregular HR notifications
   webhookDeliveries?: Record<string, WebhookDelivery[]> // email -> what recent syncs actually contained
+  facilityPrices?: FacilityPriceSubmission[] // crowd-sourced provider price board — real submissions, no fabricated numbers
+}
+
+// A real patient/doctor-submitted price for a facility, optionally scoped to
+// a diagnosis (ICD-10 code). This is the whole "real-time price" story: there
+// is no external pricing API to connect to, so "real-time" here means every
+// submission is visible to every user immediately — a shared, timestamped
+// board, not a live feed from a hospital system.
+export interface FacilityPriceSubmission {
+  id: string
+  facilityId: string // Hospital.id from the frontend's lib/hospitals.ts catalog
+  diagnosisCode?: string
+  diagnosisTitle?: string
+  currency: string // e.g. 'IDR'
+  low?: number
+  high?: number
+  confidence: 'estimated' | 'verified'
+  source?: string
+  submittedByEmail: string
+  submittedByName: string
+  at: string
 }
 
 // A single daily medication reminder. `nextFireAt` is a UTC ISO timestamp —
@@ -441,6 +462,20 @@ export function txsFor(userId: string): Tx[] {
 export function credit(userId: string, amountPnc: number, type: TxType, note: string, ref?: string) {
   db.wallets[userId] = (db.wallets[userId] ?? 0) + amountPnc
   db.txs.unshift({ id: uid(), userId, type, amountPnc, note, at: new Date().toISOString(), ref })
+  save()
+}
+
+// Newest first, optionally narrowed to one diagnosis. Capped at 50 — this is
+// a comparison aid, not an archive.
+export function listFacilityPrices(facilityId: string, diagnosisCode?: string): FacilityPriceSubmission[] {
+  const all = db.facilityPrices ?? []
+  return all
+    .filter((p) => p.facilityId === facilityId && (!diagnosisCode || p.diagnosisCode === diagnosisCode))
+    .slice(0, 50)
+}
+export function addFacilityPrice(p: FacilityPriceSubmission) {
+  if (!db.facilityPrices) db.facilityPrices = []
+  db.facilityPrices.unshift(p)
   save()
 }
 
