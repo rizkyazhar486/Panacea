@@ -28,7 +28,7 @@ export function MetalStatPanel({ angka, maks = 4 }: { angka: Angka[]; maks?: num
   return (
     <div className="metal-forge flex gap-2 overflow-hidden rounded-2xl p-3">
       {angka.slice(0, maks).map((a) => (
-        <div key={a.label} className="relative flex min-w-0 flex-1 flex-col gap-1.5 rounded-xl bg-white/[0.05] p-2.5">
+        <div key={a.label} className="metal-tile relative flex min-w-0 flex-1 flex-col gap-1.5 rounded-xl bg-white/[0.05] p-2.5">
           <span className="truncate text-[10px] font-bold uppercase tracking-wide text-white/50">{a.label}</span>
           <span className="flex min-w-0 flex-wrap items-baseline gap-x-1">
             <span className={`text-[20px] font-black leading-none tabular-nums ${EMBOSS[a.nada] ?? 'metal-emboss'}`}>{a.nilai}</span>

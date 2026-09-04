@@ -46,6 +46,13 @@
     linear-gradient(160deg, #1b1240 0%, #16143f 30%, #0e1a3a 65%, #070a1c 100%);
   color: #fff;
   animation: metal-hue-drift 14s ease-in-out infinite;
+  /* Lifts the whole panel off the page (soft cast shadow below + a hint of
+     depth on the sides) instead of it reading as a flat colored rectangle. */
+  box-shadow:
+    0 14px 30px -10px rgba(6, 4, 20, 0.65),
+    0 2px 8px rgba(6, 4, 20, 0.4);
+  transform-style: preserve-3d;
+  perspective: 800px;
 }
 
 .metal-forge::after {
@@ -54,6 +61,18 @@
   inset: 0;
   pointer-events: none;
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08), inset 0 0 60px rgba(0, 0, 0, 0.5);
+}
+
+/* Each stat tile reads as its own recessed slab: a dark cavity shadow at the
+   top (light falling in) and a bright bevel underneath (light bouncing back
+   up), so the numbers sit inside real depth rather than flat glass. */
+.metal-tile {
+  position: relative;
+  box-shadow:
+    inset 0 2px 4px rgba(0, 0, 0, 0.45),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.08),
+    0 1px 0 rgba(255, 255, 255, 0.04);
+  transform: translateZ(0);
 }
 
 /* Cincin pelangi yang bergerak di setiap tepi kartu metal — ini yang membuat
@@ -128,7 +147,7 @@
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
-  filter: drop-shadow(0 1px 0 rgba(0, 0, 0, 0.5));
+  filter: drop-shadow(0 1px 0 rgba(243, 232, 255, 0.3)) drop-shadow(0 2px 1px rgba(0, 0, 0, 0.6)) drop-shadow(0 5px 8px rgba(0, 0, 0, 0.4));
 }
 
 .metal-steel {
@@ -138,13 +157,15 @@
 }
 
 /* Nomor besar bergaya "diukir logam" — dipakai untuk angka nyata (VO2max,
-   volume, jumlah sesi), bukan sekadar dekorasi tipografi. */
+   volume, jumlah sesi), bukan sekadar dekorasi tipografi. Dua drop-shadow
+   bertumpuk (gelap dekat + gelap jauh) menirukan cahaya dari atas yang
+   mengukir angkanya ke dalam permukaan, bukan hanya menempel di atasnya. */
 .metal-emboss {
   background: linear-gradient(180deg, #fff 0%, #cfd3d8 45%, #8b9096 100%);
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
-  filter: drop-shadow(0 1px 0 rgba(0, 0, 0, 0.6));
+  filter: drop-shadow(0 1px 0 rgba(255, 255, 255, 0.35)) drop-shadow(0 2px 1px rgba(0, 0, 0, 0.7)) drop-shadow(0 5px 8px rgba(0, 0, 0, 0.45));
 }
 
 .metal-emboss-gold {
@@ -152,7 +173,7 @@
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
-  filter: drop-shadow(0 1px 0 rgba(0, 0, 0, 0.5));
+  filter: drop-shadow(0 1px 0 rgba(255, 246, 218, 0.3)) drop-shadow(0 2px 1px rgba(0, 0, 0, 0.6)) drop-shadow(0 5px 8px rgba(0, 0, 0, 0.4));
 }
 
 /* Satu sumber cahaya dari atas, tapi panggungnya sendiri tetap liquid-chrome
@@ -262,7 +283,7 @@
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
-  filter: drop-shadow(0 1px 0 rgba(0, 0, 0, 0.5));
+  filter: drop-shadow(0 1px 0 rgba(255, 214, 210, 0.3)) drop-shadow(0 2px 1px rgba(0, 0, 0, 0.6)) drop-shadow(0 5px 8px rgba(0, 0, 0, 0.4));
 }
 
 .metal-emboss-green {
@@ -270,7 +291,7 @@
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
-  filter: drop-shadow(0 1px 0 rgba(0, 0, 0, 0.5));
+  filter: drop-shadow(0 1px 0 rgba(217, 249, 217, 0.3)) drop-shadow(0 2px 1px rgba(0, 0, 0, 0.6)) drop-shadow(0 5px 8px rgba(0, 0, 0, 0.4));
 }
 
 /* Bukan bagian dari bahasa "prajurit" (merah/emas/hitam) — ini nada yang
