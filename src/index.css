@@ -29,12 +29,16 @@
   --font-judul: 'Space Grotesk', 'Inter', ui-sans-serif, system-ui, sans-serif;
   --font-angka: 'JetBrains Mono', ui-monospace, 'SF Mono', monospace;
   /* Judul level-1 (satu per halaman, singkat: "Home", "Community", "Market
-     Data") — huruf geometris sci-fi, dekat dengan referensi (Avonger/Coder/
-     Researcher) tapi tersedia bebas & berlisensi lewat Google Fonts. TIDAK
-     dipakai untuk h2/h3: subjudul di aplikasi ini padat dan sering berupa
-     kalimat ("Nothing here can be broken or lost"), dan huruf sekaku ini
-     mengorbankan keterbacaan begitu barisnya lebih dari 2-3 kata. */
-  --font-hero: 'Orbitron', 'Space Grotesk', 'Inter', ui-sans-serif, system-ui, sans-serif;
+     Data") — huruf geometris sci-fi tipis, dipilih karena paling dekat
+     dengan referensi "Researcher" (yang berbayar, tanpa sumber CDN yang sah)
+     di antara pilihan Google Fonts gratis: sama-sama tipis dan bersudut,
+     bukan tebal/blok seperti Orbitron. TIDAK dipakai untuk h2/h3: subjudul
+     di aplikasi ini padat dan sering berupa kalimat ("Nothing here can be
+     broken or lost"), dan huruf sekaku ini mengorbankan keterbacaan begitu
+     barisnya lebih dari 2-3 kata. Aldrich hanya punya satu ketebalan (400),
+     jadi h1 sengaja tidak diberi font-weight tebal lagi — huruf ini memang
+     dirancang tipis, menebalkannya lewat CSS hanya membuatnya kabur. */
+  --font-hero: 'Aldrich', 'Space Grotesk', 'Inter', ui-sans-serif, system-ui, sans-serif;
 
   /* Panaceamed "pnc" design tokens — calmer, green-tinted neutral system.
      Light surfaces stay airy; dark mode uses warm green-tinted greys (not
