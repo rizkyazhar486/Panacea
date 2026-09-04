@@ -92,10 +92,23 @@ html {
   text-size-adjust: 100%;
 }
 
+/* Kanvas terang — sebelumnya nyaris putih polos (0,06 alpha satu warna), yang
+   terukur membosankan begitu dibandingkan dengan kartu kaca yang duduk di
+   atasnya. Sekarang empat gumpalan warna nyata (hijau merek, biru langit,
+   magenta, ungu) di atas dasar hijau-mint pucat — tetap TERANG (kontras teks
+   tidak berubah, kartu kaca masih ~46-78% putih di atasnya) tapi tidak lagi
+   datar. Ini gaya "liquid glass" yang sama dipakai di area Fitness, dibawa
+   ke seluruh aplikasi sesuai permintaan langsung, bukan hanya untuk area itu. */
 body {
   margin: 0;
   font-family: var(--font-sans);
-  background: radial-gradient(circle at 50% 0%, rgba(0, 191, 99, 0.06) 0%, #f4f7f5 55%) fixed;
+  background:
+    radial-gradient(90% 55% at 12% -8%, rgba(0, 191, 99, 0.18) 0%, transparent 55%),
+    radial-gradient(80% 55% at 100% -5%, rgba(56, 189, 248, 0.15) 0%, transparent 55%),
+    radial-gradient(75% 60% at 90% 100%, rgba(236, 72, 153, 0.09) 0%, transparent 55%),
+    radial-gradient(75% 60% at 0% 100%, rgba(168, 85, 247, 0.1) 0%, transparent 55%),
+    linear-gradient(160deg, #eefcf4 0%, #eef8f5 45%, #eff5fb 100%)
+    fixed;
   color: var(--color-ink);
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
@@ -639,7 +652,10 @@ button:active, a[href]:active, [role='button']:active { transform: scale(0.985);
   transition: background 0.35s cubic-bezier(0.32,0.72,0,1);
 }
 
-/* Tepi spekular: gradien yang hanya terlihat di garis batas, lewat mask. */
+/* Tepi spekular: gradien yang hanya terlihat di garis batas, lewat mask.
+   Sengaja diberi rona pelangi tipis (bukan putih polos) — meniru tepi kaca
+   cair yang membiaskan cahaya pada gambar referensi. Ini murni cincin 1 px
+   bertopeng; isi kartu dan kontras tulisan di dalamnya tidak tersentuh. */
 .kaca::after {
   content: '';
   position: absolute;
@@ -651,9 +667,11 @@ button:active, a[href]:active, [role='button']:active { transform: scale(0.985);
   background: linear-gradient(
     160deg,
     rgba(255,255,255,0.95),
-    rgba(255,255,255,0.1) 40%,
-    rgba(255,255,255,0) 60%,
-    rgba(255,255,255,0.35));
+    rgba(134, 239, 172, 0.35) 22%,
+    rgba(147, 197, 253, 0.3) 40%,
+    rgba(232, 121, 249, 0.22) 58%,
+    rgba(255,255,255,0) 72%,
+    rgba(255,255,255,0.4));
   -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
   mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
   -webkit-mask-composite: xor;
