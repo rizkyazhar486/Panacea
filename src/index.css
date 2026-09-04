@@ -638,7 +638,10 @@ button:active, a[href]:active, [role='button']:active { transform: scale(0.985);
     rgba(139, 92, 246, 0.95) 54deg 57deg, transparent 57deg 63deg);
   -webkit-mask-image: radial-gradient(130% 130% at 0% 100%, #000 35%, transparent 82%);
   mask-image: radial-gradient(130% 130% at 0% 100%, #000 35%, transparent 82%);
-  mix-blend-mode: screen;
+  /* "screen" butuh latar gelap untuk terlihat — di atas kartu terang ia
+     memucat ke putih, itu sebabnya sinarnya terasa lemah di mode terang.
+     "hard-light" mempertahankan kejenuhan warna di kedua latar. */
+  mix-blend-mode: hard-light;
   animation: prism-breathe 7s ease-in-out infinite;
 }
 
