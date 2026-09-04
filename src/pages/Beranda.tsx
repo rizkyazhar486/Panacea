@@ -154,7 +154,7 @@ function Garis({ deret, kelas }: { deret: number[]; kelas: string }) {
  */
 function KartuKpi({ k, utama }: { k: Kpi; utama?: boolean }) {
   return (
-    <div className={`flex min-w-0 flex-col ${DALAM} rounded-2xl bg-white/70 p-3 dark:bg-white/5`}>
+    <div className={`flex min-w-0 flex-col ${DALAM} rounded-2xl bg-gradient-to-br from-cyan-100/70 via-fuchsia-100/50 to-amber-100/60 p-3 dark:from-cyan-400/10 dark:via-fuchsia-400/10 dark:to-transparent`}>
       <span className="t-mikro truncate font-bold uppercase tracking-wide text-neutral-500">{k.label}</span>
       {/* flex-wrap, bukan satu baris kaku: pada kartu sempit "12" dan satuannya
           "tercatat" saling menimpa — terlihat di tangkapan layar, tidak pernah
@@ -393,7 +393,7 @@ export default function Beranda() {
       {/* ── PANEL ATAS — dibaca menyilang (Z) ───────────────────────────────
           kiri-atas: siapa saya · kanan-atas: aksi utama
           kiri-bawah: angka       · kanan-bawah: ke mana lanjut          */}
-      <section className="p-fluid overflow-hidden rounded-3xl bg-gradient-to-br from-brand-50 to-brand-100/50 dark:from-brand/15 dark:to-brand/5">
+      <section className="kaca p-fluid overflow-hidden rounded-3xl">
         <div className="flex items-start justify-between gap-3">
           <div className="min-w-0">
             <h1 className="t-judul truncate font-black leading-tight text-ink dark:text-white">
