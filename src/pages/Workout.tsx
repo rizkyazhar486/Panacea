@@ -4,6 +4,7 @@ import { Card, SectionTitle, Button, Badge, inputClass } from '../components/ui'
 import { PoseGerak, poseUntuk } from '../components/PoseGerak'
 import { IconActivity, IconFlame, IconRun, IconCheck, IconPlus } from '../components/icons'
 import { VideoGallery } from '../components/VideoGallery'
+import '../styles/metal.css'
 
 type Muscle = 'Chest' | 'Back' | 'Shoulders' | 'Arms' | 'Legs' | 'Glutes' | 'Core' | 'Full Body'
 type Modality =
@@ -204,18 +205,21 @@ export function Workout() {
           </select>
         </div>
 
-        <div className="mt-4 grid grid-cols-3 gap-2">
-          <div className="rounded-2xl bg-orange-400/20 p-3 text-center">
-            <div className="text-lg font-black text-orange-800 dark:text-orange-300">{todayLog.length}</div>
-            <div className="text-[10px] font-bold text-neutral-600 dark:text-neutral-300">Sets today</div>
+        {/* Forjaan gelap, bukan kartu pastel — tiga angka ini nyata (dari
+            logExercise di bawah), warnanya hanya mengganti nuansa jadi
+            gold/silver/bronze, bukan menambah data. */}
+        <div className="metal-forge mt-4 grid grid-cols-3 gap-2 rounded-2xl p-3">
+          <div className="relative text-center">
+            <div className="metal-emboss-gold text-xl font-black">{todayLog.length}</div>
+            <div className="mt-0.5 text-[10px] font-bold uppercase tracking-wide text-white/50">Sets Today</div>
           </div>
-          <div className="rounded-2xl bg-violet-400/20 p-3 text-center">
-            <div className="text-lg font-black text-violet-800 dark:text-violet-300">{weekLog.length}</div>
-            <div className="text-[10px] font-bold text-neutral-600 dark:text-neutral-300">Sessions this week</div>
+          <div className="relative text-center">
+            <div className="metal-emboss text-xl font-black">{weekLog.length}</div>
+            <div className="mt-0.5 text-[10px] font-bold uppercase tracking-wide text-white/50">Sessions This Week</div>
           </div>
-          <div className="rounded-2xl bg-lime-400/20 p-3 text-center">
-            <div className="text-lg font-black text-lime-800 dark:text-lime-300">{weeklyVolume.toLocaleString('en-US')}</div>
-            <div className="text-[10px] font-bold text-neutral-600 dark:text-neutral-300">Weekly volume</div>
+          <div className="relative text-center">
+            <div className="metal-emboss text-xl font-black">{weeklyVolume.toLocaleString('en-US')}</div>
+            <div className="mt-0.5 text-[10px] font-bold uppercase tracking-wide text-white/50">Weekly Volume</div>
           </div>
         </div>
       </Card>

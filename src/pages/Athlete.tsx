@@ -6,6 +6,8 @@ import { PrefillBadge } from '../components/HealthSnapshot'
 import { hasHealth, pushBiometrics } from '../lib/profile'
 import { Portal } from '../components/Portal'
 import { useStore } from '../lib/store'
+import { MetalBadge } from '../components/MetalBadge'
+import '../styles/metal.css'
 
 import { KUTIPAN_ATLET as ATHLETE_QUOTES } from '../lib/kutipanAtlet'
 
@@ -288,10 +290,13 @@ export function Athlete() {
         </div>
 
         <div className="mt-4 grid grid-cols-2 gap-3">
-          <div className="rounded-2xl bg-ink p-4 text-white">
-            <div className="text-xs font-semibold uppercase tracking-wide text-ink/50">Estimated VO₂max</div>
-            <div className="text-3xl font-extrabold text-brand">{v.toFixed(1)}<span className="ml-1 text-sm font-medium text-ink/50">ml/kg/min</span></div>
-            <Badge tone="brand">{tier}</Badge>
+          {/* Tingkatan (Elite/Excellent/Good/Fair) dihitung dari VO2max nyata
+              di atas — warna logam hanya menampilkan tingkatan itu, tidak
+              menambah skor baru. Lihat vo2Tier() & metalToneForTier(). */}
+          <div className="metal-forge rounded-2xl p-4">
+            <div className="relative text-xs font-bold uppercase tracking-wide text-white/50">Estimated VO₂max</div>
+            <div className="relative text-3xl font-black metal-emboss-gold">{v.toFixed(1)}<span className="ml-1 text-sm font-medium text-white/40">ml/kg/min</span></div>
+            <div className="relative mt-1.5"><MetalBadge tier={tier} /></div>
           </div>
           <div className="rounded-2xl border border-neutral-100 p-4">
             <div className="text-xs font-semibold uppercase tracking-wide text-neutral-500">Max HR</div>

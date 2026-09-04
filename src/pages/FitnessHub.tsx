@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { Card, SectionTitle, inputClass } from '../components/ui'
 import { IconRun } from '../components/icons'
 import { ambilTersembunyi, saring, langgananFitur } from '../lib/fiturTersembunyi'
+import '../styles/metal.css'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Fitness Hub — one searchable index for the training/performance suite,
@@ -89,8 +90,17 @@ export function FitnessHub() {
 
   return (
     <div className="mx-auto max-w-2xl space-y-5 pb-24">
+      <div className="metal-forge rounded-2xl p-5">
+        <div className="relative flex items-center gap-3">
+          <span className="metal-tag metal-gold">Forge</span>
+          <span className="text-[11px] font-bold uppercase tracking-[0.2em] text-white/50">{total} tools</span>
+        </div>
+        <h2 className="relative mt-3 text-2xl font-black uppercase tracking-tight metal-emboss">Fitness Hub</h2>
+        <p className="relative mt-1 text-[13px] text-white/50">Training & performance, searchable by what you need — one index, no digging.</p>
+      </div>
+
       <Card className="!p-5">
-        <SectionTitle icon={<IconRun size={20} />} title="Fitness Hub" subtitle={`${total} training & performance tools, searchable by what you need`} />
+        <SectionTitle icon={<IconRun size={20} />} title="Find a Tool" />
         <input
           className={`${inputClass} mt-3`}
           placeholder="Search: recovery, body composition, VO2max, plan…"
