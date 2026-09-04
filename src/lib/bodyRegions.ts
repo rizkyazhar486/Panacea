@@ -17,10 +17,10 @@ export interface BodyRegion {
 }
 
 export const BODY_REGIONS: BodyRegion[] = [
-  { key: 'head', label: 'Head & Brain', x: 50, y: 9, pos3d: [0, 3.3, 0], searchTerms: ['headache', 'brain disease'] },
+  { key: 'head', label: 'Head & Brain', x: 50, y: 9, pos3d: [0, 3.22, 0], searchTerms: ['headache', 'brain disease'] },
   { key: 'neck', label: 'Neck & Thyroid', x: 50, y: 17, pos3d: [0, 2.75, 0], searchTerms: ['thyroid disease'] },
   { key: 'chest', label: 'Chest & Lungs', x: 50, y: 26, pos3d: [0, 2.05, 0.35], searchTerms: ['respiratory disease', 'chest pain'] },
-  { key: 'heart', label: 'Heart', x: 42, y: 27, pos3d: [-0.25, 2.05, 0.4], searchTerms: ['heart disease', 'cardiac arrhythmia'] },
+  { key: 'heart', label: 'Heart', x: 42, y: 27, pos3d: [-0.1, 2.1, 0.02], searchTerms: ['heart disease', 'cardiac arrhythmia'] },
   { key: 'abdomen', label: 'Abdomen & Digestion', x: 50, y: 38, pos3d: [0, 1.35, 0.35], searchTerms: ['gastrointestinal disease', 'abdominal pain'] },
   { key: 'liver', label: 'Liver', x: 40, y: 36, searchTerms: ['liver disease'] },
   { key: 'kidney', label: 'Kidneys', x: 60, y: 40, searchTerms: ['kidney disease'] },
