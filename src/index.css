@@ -28,6 +28,13 @@
   --font-sans: 'Inter', ui-sans-serif, system-ui, sans-serif;
   --font-judul: 'Space Grotesk', 'Inter', ui-sans-serif, system-ui, sans-serif;
   --font-angka: 'JetBrains Mono', ui-monospace, 'SF Mono', monospace;
+  /* Judul level-1 (satu per halaman, singkat: "Home", "Community", "Market
+     Data") — huruf geometris sci-fi, dekat dengan referensi (Avonger/Coder/
+     Researcher) tapi tersedia bebas & berlisensi lewat Google Fonts. TIDAK
+     dipakai untuk h2/h3: subjudul di aplikasi ini padat dan sering berupa
+     kalimat ("Nothing here can be broken or lost"), dan huruf sekaku ini
+     mengorbankan keterbacaan begitu barisnya lebih dari 2-3 kata. */
+  --font-hero: 'Orbitron', 'Space Grotesk', 'Inter', ui-sans-serif, system-ui, sans-serif;
 
   /* Panaceamed "pnc" design tokens — calmer, green-tinted neutral system.
      Light surfaces stay airy; dark mode uses warm green-tinted greys (not
@@ -1775,10 +1782,20 @@ html { -webkit-overflow-scrolling: touch; }
    dirakit dari potongan.
    ───────────────────────────────────────────────────────────────────────────── */
 
-h1, h2, h3,
+h2, h3,
 .font-judul {
   font-family: var(--font-judul);
   letter-spacing: -0.015em;
+}
+
+/* h1 sendiri — satu per halaman, judul utama, cukup pendek untuk memakai
+   huruf sci-fi tanpa mengorbankan keterbacaan (lihat catatan --font-hero
+   di atas). Letter-spacing POSITIF, bukan negatif: huruf geometris macam
+   ini dirancang renggang (lihat referensi "A V O N G E R"), merapatkannya
+   membuat huruf berdempetan dan sudut-sudutnya saling menabrak. */
+h1 {
+  font-family: var(--font-hero);
+  letter-spacing: 0.01em;
 }
 
 /* Angka besar. Dipakai pada bacaan tunggal yang berubah — bukan pada angka di
