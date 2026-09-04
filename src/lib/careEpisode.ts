@@ -248,8 +248,12 @@ function recomputeFromItems(episode: CareEpisode): CareEpisode {
   }
 }
 
-export function addCostItem(episode: CareEpisode, label: string): CareEpisode {
-  const item: CostItem = { id: `ci_${Math.random().toString(36).slice(2, 10)}`, label }
+export function addCostItem(
+  episode: CareEpisode,
+  label: string,
+  seed?: { low?: number; high?: number; confidence?: 'estimated' | 'verified'; source?: string },
+): CareEpisode {
+  const item: CostItem = { id: `ci_${Math.random().toString(36).slice(2, 10)}`, label, ...seed }
   return recomputeFromItems({ ...episode, costItems: [...(episode.costItems ?? []), item] })
 }
 
@@ -309,10 +313,13 @@ export function updateCandidateCost(
 }
 
 // Picking a candidate promotes it to the episode's actual provider + cost —
-// the comparison is over, this is the choice.
+// the comparison is over, this is the choice. Any itemized breakdown from
+// before is cleared: it belonged to whatever cost picture existed prior to
+// this choice, and leaving it in place would let the next item edit
+// silently recompute over — and erase — the total this choice just set.
 export function chooseCandidate(episode: CareEpisode, facilityId: string): CareEpisode {
   const candidate = (episode.candidates ?? []).find((c) => c.facilityId === facilityId)
-  let next = setProvider(episode, facilityId)
+  let next = setProvider({ ...episode, costItems: undefined }, facilityId)
   if (candidate) {
     next = setCostEstimate(next, {
       low: candidate.estimatedCostLow,

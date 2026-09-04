@@ -671,7 +671,16 @@ function CostEstimateField({
           <button
             type="button"
             className="mt-2 text-xs font-semibold text-brand-dark underline"
-            onClick={() => onChange(addCostItem(episode, COST_ITEM_PRESETS[0]))}
+            onClick={() =>
+              onChange(
+                addCostItem(episode, COST_ITEM_PRESETS[0], {
+                  low: low ? Number(low) : undefined,
+                  high: high ? Number(high) : undefined,
+                  confidence: episode.costConfidence ?? 'estimated',
+                  source: source.trim() || undefined,
+                }),
+              )
+            }
           >
             Break down into components (professional fee, lab, meds, …)
           </button>
@@ -683,11 +692,14 @@ function CostEstimateField({
           facilityId={episode.facilityId}
           diagnosisCode={episode.diagnosisCode}
           diagnosisTitle={episode.title}
+          // The episode's own fields, not the manual-entry local state above —
+          // those go stale the moment costs are itemized, since the total is
+          // then computed from costItems instead of typed directly here.
           myPrice={{
-            low: low ? Number(low) : undefined,
-            high: high ? Number(high) : undefined,
+            low: episode.estimatedCostLow,
+            high: episode.estimatedCostHigh,
             confidence: episode.costConfidence ?? 'estimated',
-            source: source.trim() || undefined,
+            source: episode.costSource,
           }}
         />
       )}
