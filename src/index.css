@@ -684,23 +684,26 @@ button:active, a[href]:active, [role='button']:active { transform: scale(0.985);
    itulah yang terbaca "feminin". Urutannya sekarang mengikuti spektrum
    nyata: merah → jingga → emas → hijau neon → sian → biru → ungu →
    magenta, ditutup jadi lingkaran. */
+/* Sama seperti perbaikan mode gelap: pelangi penuh yang menyapu SELURUH
+   kartu membuat label abu-abu (text-neutral-500, dirancang untuk latar
+   putih) kehilangan kontras begitu latarnya berubah jenuh — itulah yang
+   dikeluhkan ("banyak menu tidak terbaca jelas") pada borang "Log a
+   session". Warna kini jadi dua aksen lembut di pojok (bukan sapuan
+   8-warna), dengan dasar nyaris putih supaya teks abu-abu tetap kontras;
+   spektrum penuhnya dipindah ke garis tepi (.kaca::after), yang memang
+   dirancang untuk itu. */
 .kaca {
   --kx: 50%;
   --ky: 0%;
   isolation: isolate;
   background:
-    linear-gradient(135deg,
-      rgba(255, 26, 0, 0.9) 0%,
-      rgba(255, 102, 0, 0.9) 14%,
-      rgba(255, 215, 0, 0.85) 28%,
-      rgba(57, 255, 20, 0.75) 42%,
-      rgba(0, 210, 255, 0.88) 57%,
-      rgba(0, 85, 255, 0.88) 71%,
-      rgba(157, 0, 255, 0.85) 85%,
-      rgba(255, 0, 127, 0.85) 100%);
+    radial-gradient(65% 60% at 8% -10%, rgba(255, 102, 0, 0.16) 0%, transparent 55%),
+    radial-gradient(60% 55% at 100% 108%, rgba(0, 133, 255, 0.14) 0%, transparent 55%),
+    radial-gradient(50% 50% at 100% -8%, rgba(157, 0, 255, 0.1) 0%, transparent 55%),
+    linear-gradient(165deg, #fdfdfe 0%, #f7f8fb 55%, #f3f4f8 100%);
   animation: kaca-aurora 16s ease-in-out infinite;
-  backdrop-filter: blur(20px) saturate(2.2);
-  -webkit-backdrop-filter: blur(20px) saturate(2.2);
+  backdrop-filter: blur(20px) saturate(1.3);
+  -webkit-backdrop-filter: blur(20px) saturate(1.3);
   border: 1px solid rgba(255,255,255,0.6);
   box-shadow:
     0 1px 2px rgba(12,20,16,0.06),
@@ -1347,21 +1350,18 @@ html { -webkit-overflow-scrolling: touch; }
 }
 
 :root:not(.dark) .kaca {
-  /* Sama seperti .kaca dasar (merah-jingga-emas dulu, bukan ungu) — diulang
-     di sini karena inilah aturan yang benar-benar menang di mode terang. */
+  /* Sama seperti .kaca dasar di atas (dua aksen lembut, bukan sapuan
+     8-warna) — diulang di sini karena inilah aturan yang benar-benar
+     menang di mode terang (spesifisitasnya lebih tinggi). Lihat catatan
+     di .kaca dasar: ini yang memperbaiki "banyak menu tidak terbaca". */
   background:
-    linear-gradient(135deg,
-      rgba(255, 26, 0, 0.92) 0%,
-      rgba(255, 102, 0, 0.92) 14%,
-      rgba(255, 215, 0, 0.88) 28%,
-      rgba(57, 255, 20, 0.78) 42%,
-      rgba(0, 210, 255, 0.9) 57%,
-      rgba(0, 85, 255, 0.9) 71%,
-      rgba(157, 0, 255, 0.88) 85%,
-      rgba(255, 0, 127, 0.88) 100%);
+    radial-gradient(65% 60% at 8% -10%, rgba(255, 102, 0, 0.18) 0%, transparent 55%),
+    radial-gradient(60% 55% at 100% 108%, rgba(0, 133, 255, 0.16) 0%, transparent 55%),
+    radial-gradient(50% 50% at 100% -8%, rgba(157, 0, 255, 0.11) 0%, transparent 55%),
+    linear-gradient(165deg, #fdfdfe 0%, #f7f8fb 55%, #f3f4f8 100%);
   animation: kaca-aurora 16s ease-in-out infinite;
-  backdrop-filter: blur(20px) saturate(2.2);
-  -webkit-backdrop-filter: blur(20px) saturate(2.2);
+  backdrop-filter: blur(20px) saturate(1.3);
+  -webkit-backdrop-filter: blur(20px) saturate(1.3);
   border-color: rgba(12,20,16,0.07);
   box-shadow:
     0 1px 2px rgba(12,20,16,0.05),
