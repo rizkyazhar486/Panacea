@@ -5,6 +5,8 @@ import { PoseGerak, poseUntuk } from '../components/PoseGerak'
 import { IconActivity, IconFlame, IconRun, IconCheck, IconPlus } from '../components/icons'
 import { VideoGallery } from '../components/VideoGallery'
 import { FightHero } from '../components/FightHero'
+import { AchievementToasts } from '../components/AchievementToasts'
+import { evaluateWorkoutAchievements, newlyUnlocked, unlockedCount, type Achievement } from '../lib/achievements'
 import '../styles/metal.css'
 
 type Muscle = 'Chest' | 'Back' | 'Shoulders' | 'Arms' | 'Legs' | 'Glutes' | 'Core' | 'Full Body'
@@ -157,6 +159,8 @@ export function Workout() {
   const [open, setOpen] = useState<string | null>(null)
   const [log, setLog] = useState<LogEntry[]>(loadLog)
   const [sets, setSets] = useState(3); const [reps, setReps] = useState(12); const [weight, setWeight] = useState(0)
+  const [toasts, setToasts] = useState<Achievement[]>([])
+  const [badgeCount, setBadgeCount] = useState(unlockedCount)
 
   const filtered = useMemo(() => EX.filter((e) =>
     (muscle === 'All' || e.muscle === muscle) &&
@@ -168,6 +172,14 @@ export function Workout() {
     const entry: LogEntry = { id: `${Date.now()}`, exId, date: hariIni(), sets, reps, weight }
     const next = [entry, ...log]
     setLog(next); saveLog(next)
+    // Real arithmetic over the log that was just saved — see
+    // lib/achievements.ts. A popup fires only the first time each
+    // condition becomes true, never again after that.
+    const fresh = newlyUnlocked(evaluateWorkoutAchievements(next))
+    if (fresh.length > 0) {
+      setToasts((t) => [...t, ...fresh])
+      setBadgeCount(unlockedCount())
+    }
   }
 
   const todayStr = hariIni()
@@ -177,11 +189,17 @@ export function Workout() {
 
   return (
     <div className="mx-auto max-w-2xl space-y-5 pb-24">
+      <AchievementToasts toasts={toasts} onDismiss={(id) => setToasts((t) => t.filter((x) => x.id !== id))} />
       <FightHero
         tag="Arena"
         title="Workout"
         motto="Veni. Vidi. Vici."
-        right={todayLog.length > 0 && <span className="text-[11px] font-bold uppercase tracking-[0.2em] text-white/50">{todayLog.length} sets logged today</span>}
+        right={
+          <div className="flex flex-col items-end gap-1">
+            {badgeCount > 0 && <span className="metal-tag metal-gold">🏆 {badgeCount} unlocked</span>}
+            {todayLog.length > 0 && <span className="text-[11px] font-bold uppercase tracking-[0.2em] text-white/50">{todayLog.length} sets logged today</span>}
+          </div>
+        }
       />
 
       <VideoGallery

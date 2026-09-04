@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Card, SectionTitle, Field, inputClass, Badge } from '../components/ui'
 import { IconRun, IconActivity, IconHeart, IconX } from '../components/icons'
 import { ShareStatCard } from '../components/ShareStatCard'
@@ -8,6 +8,8 @@ import { Portal } from '../components/Portal'
 import { useStore } from '../lib/store'
 import { MetalBadge } from '../components/MetalBadge'
 import { FightHero } from '../components/FightHero'
+import { AchievementToasts } from '../components/AchievementToasts'
+import { evaluateAthleteAchievements, newlyUnlocked, unlockedCount, type Achievement } from '../lib/achievements'
 import '../styles/metal.css'
 
 import { KUTIPAN_ATLET as ATHLETE_QUOTES } from '../lib/kutipanAtlet'
@@ -249,6 +251,18 @@ export function Athlete() {
   const acwrZ = acwrZone(acwr)
   const status = trainingStatus(acwr, p.vo2Trend)
   const hrvZ = hrvStatus(p.hrv, p.hrvBaseline)
+  const [toasts, setToasts] = useState<Achievement[]>([])
+  const [badgeCount, setBadgeCount] = useState(unlockedCount)
+
+  // Re-checked whenever the real VO2max tier changes — not on every
+  // keystroke, since intermediate values while typing aren't a real reading.
+  useEffect(() => {
+    const fresh = newlyUnlocked(evaluateAthleteAchievements(tier))
+    if (fresh.length > 0) {
+      setToasts((t) => [...t, ...fresh])
+      setBadgeCount(unlockedCount())
+    }
+  }, [tier])
 
   function upd(next: Partial<AthleteProfile>) {
     const merged = { ...p, ...next }
@@ -262,11 +276,17 @@ export function Athlete() {
   return (
     <div className="mx-auto max-w-2xl space-y-5 pb-24">
       <AthleteQuotePopup />
+      <AchievementToasts toasts={toasts} onDismiss={(id) => setToasts((t) => t.filter((x) => x.id !== id))} />
       <FightHero
         tag="Battlefield"
         title="Athlete"
         motto="Veni. Vidi. Vici."
-        right={<MetalBadge tier={tier} />}
+        right={
+          <div className="flex flex-col items-end gap-1">
+            {badgeCount > 0 && <span className="metal-tag metal-gold">🏆 {badgeCount} unlocked</span>}
+            <MetalBadge tier={tier} />
+          </div>
+        }
       />
       <div className="flex justify-end">
         <ShareStatCard
