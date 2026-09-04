@@ -7,7 +7,7 @@
 export interface ResilienceQuote {
   quote: string
   source: string
-  tradition: 'Roman' | 'Arabic' | 'Samurai' | 'Nordic' | 'Proverb'
+  tradition: 'Roman' | 'Arabic' | 'Samurai' | 'Nordic' | 'Proverb' | 'Reminder'
   original?: string // teks asli, bila bukan bahasa Inggris
 }
 
@@ -48,5 +48,13 @@ export const KUTIPAN_KETAHANAN: ResilienceQuote[] = [
     tradition: 'Nordic',
     quote: "Cattle die, kinsmen die, and so one dies oneself; but the fair fame never dies of him who has earned it.",
     source: 'Hávamál (Poetic Edda), st. 76-77',
+  },
+  // Bukan naskah kuno — dan diberi label seperti itu apa adanya. Fighting
+  // for yourself and being kind to people you don't know are the same
+  // instinct pointed in two directions, so it belongs in this rotation.
+  {
+    tradition: 'Reminder',
+    quote: "We don't know others' struggle and pain in life, and everyone is being tested by one thing or another. Where others are harsh — be the light.",
+    source: 'A reminder worth keeping',
   },
 ]

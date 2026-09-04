@@ -160,3 +160,12 @@
   color: transparent;
   filter: drop-shadow(0 1px 0 rgba(0, 0, 0, 0.5));
 }
+
+/* Bukan bagian dari bahasa "prajurit" (merah/emas/hitam) — ini nada yang
+   berbeda sengaja: cahaya biru lembut, bukan logam. Dipakai untuk satu
+   pengingat tentang kebaikan pada orang lain, bukan pencapaian diri sendiri. */
+.metal-blue {
+  background: linear-gradient(135deg, #dff3ff 0%, #7fc8f8 35%, #2f7ec9 70%, #123a63 100%);
+  color: #06233f;
+  box-shadow: 0 2px 14px rgba(127, 200, 248, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.6);
+}

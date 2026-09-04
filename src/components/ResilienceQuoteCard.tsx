@@ -8,6 +8,7 @@ const TONE: Record<string, string> = {
   Samurai: 'metal-steel',
   Nordic: 'metal-bronze',
   Proverb: 'metal-gold',
+  Reminder: 'metal-blue',
 }
 
 // Satu kutipan nyata (dengan sumber yang bisa diperiksa) dari salah satu
