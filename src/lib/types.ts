@@ -191,6 +191,14 @@ export interface CareEpisode {
   // real components, not a separate guess. Optional: a simple total (above)
   // is still valid for episodes that never itemize.
   costItems?: CostItem[]
+  // Care failure detection compares real elapsed time against an expected
+  // duration per stage — but one flat table (see STAGE_EXPECTED_DAYS in
+  // careEpisode.ts) can't fit every diagnosis: 21 days for "treatment" is
+  // reasonable for a course of antibiotics and absurd for a transplant.
+  // Rather than fabricate a diagnosis-severity dataset that doesn't exist,
+  // this lets a clinician override specific stages for a specific episode
+  // when the default is known to be wrong for this case.
+  expectedDaysOverride?: Partial<Record<CareEpisodeStageId, number>>
   stages: CareEpisodeStage[]
 }
 

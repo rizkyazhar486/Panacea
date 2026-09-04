@@ -23,11 +23,13 @@ import {
   detectStalls,
   episodeHealth,
   stallReason,
+  setExpectedDays,
   COST_ITEM_PRESETS,
   addCostItem,
   updateCostItem,
   removeCostItem,
   type CandidateView,
+  type StageStall,
 } from '../lib/careEpisode'
 import type { CareEpisode, CareEpisodeStageId, CareEpisodeStageStatus, CostItem } from '../lib/types'
 
@@ -63,9 +65,20 @@ export function CareEpisodePage() {
     saveRecord({ ...record!, careEpisodes: episodes, updatedAt: new Date().toISOString() })
   }
 
+  const [duplicateWarning, setDuplicateWarning] = useState(false)
+
   function addEpisode() {
-    if (!newTitle.trim()) return
-    update([...episodes, newCareEpisode(newTitle.trim())])
+    const title = newTitle.trim()
+    if (!title) return
+    // Auto-seeding from a verified plan already guards against duplicates by
+    // diagnosis code; a manually-typed title has no such key, so guard by
+    // title instead — same journey shouldn't get two separate trackers.
+    if (episodes.some((e) => e.title.trim().toLowerCase() === title.toLowerCase())) {
+      setDuplicateWarning(true)
+      return
+    }
+    setDuplicateWarning(false)
+    update([...episodes, newCareEpisode(title)])
     setNewTitle('')
   }
 
@@ -92,13 +105,21 @@ export function CareEpisodePage() {
               className={inputClass}
               placeholder="e.g. Gallstone — surgical evaluation"
               value={newTitle}
-              onChange={(e) => setNewTitle(e.target.value)}
+              onChange={(e) => {
+                setNewTitle(e.target.value)
+                setDuplicateWarning(false)
+              }}
               onKeyDown={(e) => e.key === 'Enter' && addEpisode()}
             />
             <Button onClick={addEpisode} className="shrink-0">
               <IconPlus size={16} /> Start
             </Button>
           </div>
+          {duplicateWarning && (
+            <p className="mt-2 text-xs text-accent">
+              An episode with this title already exists — track it below instead of starting a duplicate.
+            </p>
+          )}
         </Field>
       </Card>
 
@@ -138,9 +159,10 @@ function EpisodeCard({
     const order: CareEpisodeStageStatus[] = ['pending', 'active', 'done', 'blocked']
     const idx = order.indexOf(current)
     const status = order[(idx + 1) % order.length]
-    const blockedReason =
-      status === 'blocked' ? window.prompt('What is blocking this stage?') ?? undefined : undefined
-    onChange(setStageStatus(episode, stage, status, { blockedReason }))
+    // No native prompt() — the reason gets typed inline in the blocked-stage
+    // panel below, which also makes it editable later instead of fixed at
+    // the moment the stage was marked blocked.
+    onChange(setStageStatus(episode, stage, status))
   }
 
   return (
@@ -189,17 +211,21 @@ function EpisodeCard({
       </div>
 
       {(blockedStages.length > 0 || stalls.length > 0) && (
-        <div className="mt-3 space-y-1 rounded-xl bg-accent/5 p-3">
+        <div className="mt-3 space-y-2 rounded-xl bg-accent/5 p-3">
           {blockedStages.map((s) => (
-            <p key={s.stage} className="text-xs text-accent">
-              <b>{STAGE_LABEL[s.stage]} blocked</b>
-              {s.blockedReason ? ` — ${s.blockedReason}` : ' — no reason given yet.'}
-            </p>
+            <BlockedReasonEditor
+              key={s.stage}
+              stage={s.stage}
+              reason={s.blockedReason}
+              onChange={(reason) => onChange(setStageStatus(episode, s.stage, 'blocked', { blockedReason: reason }))}
+            />
           ))}
           {stalls.map((s) => (
-            <p key={s.stage} className={`text-xs ${s.severity === 'stalled' ? 'text-accent' : 'text-amber-700'}`}>
-              {stallReason(s)}
-            </p>
+            <StallLine
+              key={s.stage}
+              stall={s}
+              onAdjust={(days) => onChange(setExpectedDays(episode, s.stage, days))}
+            />
           ))}
         </div>
       )}
@@ -214,6 +240,69 @@ function EpisodeCard({
         </div>
       )}
     </Card>
+  )
+}
+
+function BlockedReasonEditor({
+  stage,
+  reason,
+  onChange,
+}: {
+  stage: CareEpisodeStageId
+  reason: string | undefined
+  onChange: (reason: string | undefined) => void
+}) {
+  const [text, setText] = useState(reason ?? '')
+  return (
+    <div className="text-xs text-accent">
+      <b>{STAGE_LABEL[stage]} blocked</b>
+      <input
+        className={`${inputClass} !mt-1 !min-h-[36px] !border-accent/30 !text-xs`}
+        placeholder="What is blocking this stage?"
+        value={text}
+        onChange={(e) => setText(e.target.value)}
+        onBlur={() => onChange(text.trim() || undefined)}
+      />
+    </div>
+  )
+}
+
+function StallLine({ stall, onAdjust }: { stall: StageStall; onAdjust: (days: number | undefined) => void }) {
+  const [editing, setEditing] = useState(false)
+  const [days, setDays] = useState(stall.expectedDays.toString())
+
+  if (editing) {
+    return (
+      <div className="flex items-center gap-2 text-xs">
+        <span className="text-neutral-600">Usually takes about</span>
+        <input
+          className={`${inputClass} !min-h-[32px] !w-16 !px-2 !py-1 text-center`}
+          type="number"
+          value={days}
+          onChange={(e) => setDays(e.target.value)}
+        />
+        <span className="text-neutral-600">days for this case</span>
+        <button
+          type="button"
+          className="font-semibold text-brand-dark underline"
+          onClick={() => {
+            onAdjust(days ? Number(days) : undefined)
+            setEditing(false)
+          }}
+        >
+          Save
+        </button>
+      </div>
+    )
+  }
+
+  return (
+    <p className={`text-xs ${stall.severity === 'stalled' ? 'text-accent' : 'text-amber-700'}`}>
+      {stallReason(stall)}{' '}
+      <button type="button" className="font-semibold underline" onClick={() => setEditing(true)}>
+        Adjust
+      </button>
+    </p>
   )
 }
 
@@ -483,6 +572,8 @@ function CostBreakdown({
   const priced = items.filter((i) => i.low != null || i.high != null).length
   const usedLabels = new Set(items.map((i) => i.label))
   const availablePresets = COST_ITEM_PRESETS.filter((p) => !usedLabels.has(p))
+  const [addingCustom, setAddingCustom] = useState(false)
+  const [customLabel, setCustomLabel] = useState('')
 
   return (
     <div>
@@ -497,33 +588,61 @@ function CostBreakdown({
         ))}
       </div>
 
-      <div className="mt-2 flex items-center gap-2">
-        {availablePresets.length > 0 && (
-          <select
+      {addingCustom ? (
+        <div className="mt-2 flex items-center gap-2">
+          <input
             className={`${inputClass} min-w-0 flex-1`}
-            value=""
-            onChange={(e) => {
-              if (!e.target.value) return
-              if (e.target.value === '__other__') {
-                const label = window.prompt('Name this cost component:')?.trim()
-                if (label) onChange(addCostItem(episode, label))
-                return
-              }
-              onChange(addCostItem(episode, e.target.value))
+            placeholder="Name this cost component…"
+            value={customLabel}
+            autoFocus
+            onChange={(e) => setCustomLabel(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key !== 'Enter' || !customLabel.trim()) return
+              onChange(addCostItem(episode, customLabel.trim()))
+              setCustomLabel('')
+              setAddingCustom(false)
             }}
+          />
+          <Button
+            onClick={() => {
+              if (!customLabel.trim()) return
+              onChange(addCostItem(episode, customLabel.trim()))
+              setCustomLabel('')
+              setAddingCustom(false)
+            }}
+            className="!min-h-0 !px-3 !py-2 text-xs shrink-0"
           >
-            <option value="" disabled>
-              Add a component…
-            </option>
-            {availablePresets.map((p) => (
-              <option key={p} value={p}>
-                {p}
+            Add
+          </Button>
+        </div>
+      ) : (
+        availablePresets.length > 0 && (
+          <div className="mt-2 flex items-center gap-2">
+            <select
+              className={`${inputClass} min-w-0 flex-1`}
+              value=""
+              onChange={(e) => {
+                if (!e.target.value) return
+                if (e.target.value === '__other__') {
+                  setAddingCustom(true)
+                  return
+                }
+                onChange(addCostItem(episode, e.target.value))
+              }}
+            >
+              <option value="" disabled>
+                Add a component…
               </option>
-            ))}
-            <option value="__other__">Other…</option>
-          </select>
-        )}
-      </div>
+              {availablePresets.map((p) => (
+                <option key={p} value={p}>
+                  {p}
+                </option>
+              ))}
+              <option value="__other__">Other…</option>
+            </select>
+          </div>
+        )
+      )}
 
       <p className="mt-3 border-t border-neutral-100 pt-2 text-sm font-bold text-ink">
         Total: {total ?? '—'}

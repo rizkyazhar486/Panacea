@@ -292,10 +292,33 @@ export function addCandidate(episode: CareEpisode, facilityId: string): CareEpis
 }
 
 export function removeCandidate(episode: CareEpisode, facilityId: string): CareEpisode {
+  const candidates = (episode.candidates ?? []).filter((c) => c.facilityId !== facilityId)
+  const now = new Date().toISOString()
+  if (episode.facilityId !== facilityId) {
+    return { ...episode, candidates, updatedAt: now }
+  }
+  // Removing the chosen candidate un-chooses it — otherwise the episode
+  // keeps pointing at a provider that no longer even appears in the
+  // comparison list, with no visible "Chosen" marker anywhere to explain
+  // why the Provider/Cost stages still look settled.
+  const stages = episode.stages.map((s): CareEpisodeStage =>
+    (s.stage === 'provider' || s.stage === 'cost') && s.status !== 'pending'
+      ? { ...s, status: 'active', updatedAt: now }
+      : s,
+  )
   return {
     ...episode,
-    candidates: (episode.candidates ?? []).filter((c) => c.facilityId !== facilityId),
-    updatedAt: new Date().toISOString(),
+    candidates,
+    facilityId: undefined,
+    facilityName: undefined,
+    providerName: undefined,
+    estimatedCostLow: undefined,
+    estimatedCostHigh: undefined,
+    costConfidence: undefined,
+    costSource: undefined,
+    costItems: undefined,
+    stages,
+    updatedAt: now,
   }
 }
 
@@ -364,16 +387,25 @@ export interface StageStall {
 // Only 'active' stages can stall — 'blocked' already says why it's stuck,
 // 'pending'/'done' aren't in motion. 'watch' at 70% of the expected time,
 // 'stalled' past 100%, so the UI can warn before it's actually a problem.
+// expectedDaysOverride (see CareEpisode in ./types) takes precedence over
+// the generic default for whichever stages a clinician has adjusted.
 export function detectStalls(episode: CareEpisode, now: Date = new Date()): StageStall[] {
   const out: StageStall[] = []
   for (const s of episode.stages) {
     if (s.status !== 'active' || !s.updatedAt) continue
     const daysSinceUpdate = (now.getTime() - new Date(s.updatedAt).getTime()) / 86_400_000
-    const expectedDays = STAGE_EXPECTED_DAYS[s.stage]
+    const expectedDays = episode.expectedDaysOverride?.[s.stage] ?? STAGE_EXPECTED_DAYS[s.stage]
     if (daysSinceUpdate >= expectedDays) out.push({ stage: s.stage, daysSinceUpdate, expectedDays, severity: 'stalled' })
     else if (daysSinceUpdate >= expectedDays * 0.7) out.push({ stage: s.stage, daysSinceUpdate, expectedDays, severity: 'watch' })
   }
   return out
+}
+
+export function setExpectedDays(episode: CareEpisode, stage: CareEpisodeStageId, days: number | undefined): CareEpisode {
+  const overrides = { ...episode.expectedDaysOverride }
+  if (days == null || Number.isNaN(days)) delete overrides[stage]
+  else overrides[stage] = days
+  return { ...episode, expectedDaysOverride: overrides, updatedAt: new Date().toISOString() }
 }
 
 export type EpisodeHealth = 'on_track' | 'at_risk' | 'stalled'
