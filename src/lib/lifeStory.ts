@@ -8,7 +8,8 @@
 // moment falls into: real age math from the patient's actual date of birth,
 // mapped onto ordinary human life stages. Everything else is the user's own
 // words.
-import type { LifeDomain, LifeEvent } from './types'
+import { isComplete } from './careEpisode'
+import type { CareEpisode, LifeDomain, LifeEvent } from './types'
 
 export const LIFE_DOMAINS: { key: LifeDomain; label: string; emoji: string }[] = [
   { key: 'physical', label: 'Physical', emoji: '💪' },
@@ -33,10 +34,59 @@ export const DOMAIN_EMOJI: Record<LifeDomain, string> = Object.fromEntries(
   LIFE_DOMAINS.map((d) => [d.key, d.emoji]),
 ) as Record<LifeDomain, string>
 
+// One thread in the story. "life" items are entirely the user's own words;
+// "health" items are derived from real Care Episode timestamps (when a
+// journey actually started, actually got blocked, actually completed) —
+// never a diagnosis or vital sign restated as a "life moment," just the
+// real shape of when something in their care happened. A single life
+// shouldn't live in two separate timelines just because one thread is
+// medical — this is what makes it one story instead of two apps.
+export interface StoryItem {
+  id: string
+  at: string
+  title: string
+  note?: string
+  kind: 'life' | 'health'
+  domains: LifeDomain[]
+  impact?: LifeEvent['impact'] // only 'life' items carry a self-rated impact
+  healthStatus?: 'started' | 'blocked' | 'completed' // only 'health' items
+}
+
+export function lifeEventToStoryItem(e: LifeEvent): StoryItem {
+  return { id: e.id, at: e.at, title: e.title, note: e.note, kind: 'life', domains: e.domains, impact: e.impact }
+}
+
+// Real timestamps from the episode's own stage history — nothing inferred.
+// Started when the episode was created; blocked at the moment a stage was
+// actually marked blocked (with whatever reason was actually given);
+// completed at the timestamp every stage actually finished.
+export function careEpisodeToStoryItems(ep: CareEpisode): StoryItem[] {
+  const items: StoryItem[] = [
+    { id: `${ep.id}_started`, at: ep.createdAt, title: `Started: ${ep.title}`, kind: 'health', domains: ['physical'], healthStatus: 'started' },
+  ]
+  for (const stage of ep.stages) {
+    if (stage.status === 'blocked' && stage.updatedAt) {
+      items.push({
+        id: `${ep.id}_blocked_${stage.stage}`,
+        at: stage.updatedAt,
+        title: `Blocked: ${ep.title}`,
+        note: stage.blockedReason,
+        kind: 'health',
+        domains: ['physical'],
+        healthStatus: 'blocked',
+      })
+    }
+  }
+  if (isComplete(ep)) {
+    items.push({ id: `${ep.id}_completed`, at: ep.updatedAt, title: `Completed: ${ep.title}`, kind: 'health', domains: ['physical'], healthStatus: 'completed' })
+  }
+  return items
+}
+
 export interface LifeChapter {
   name: string
   ageRange: string
-  events: LifeEvent[]
+  items: StoryItem[]
 }
 
 // Ordinary, widely-recognized life stages — not a fabricated "personality
@@ -63,18 +113,19 @@ export function chapterForAge(age: number): { name: string; ageRange: string } {
   return { name: bound.name, ageRange: range }
 }
 
-// Groups events into chapters, oldest chapter first, events within a
-// chapter oldest first — read top-to-bottom like a story.
-export function groupIntoChapters(events: LifeEvent[], dob: string): LifeChapter[] {
-  const sorted = [...events].sort((a, b) => new Date(a.at).getTime() - new Date(b.at).getTime())
+// Groups items (life moments and/or health-episode moments, merged) into
+// chapters, oldest chapter first, items within a chapter oldest first —
+// read top-to-bottom like a story.
+export function groupIntoChapters(items: StoryItem[], dob: string): LifeChapter[] {
+  const sorted = [...items].sort((a, b) => new Date(a.at).getTime() - new Date(b.at).getTime())
   const chapters = new Map<string, LifeChapter>()
-  for (const ev of sorted) {
-    const age = ageAt(dob, ev.at)
+  for (const it of sorted) {
+    const age = ageAt(dob, it.at)
     const { name, ageRange } = chapterForAge(age)
-    if (!chapters.has(name)) chapters.set(name, { name, ageRange, events: [] })
-    chapters.get(name)!.events.push(ev)
+    if (!chapters.has(name)) chapters.set(name, { name, ageRange, items: [] })
+    chapters.get(name)!.items.push(it)
   }
   // Emit in chronological chapter order (CHAPTER_BOUNDS order), skipping any
-  // chapter with no events rather than showing empty chapters.
+  // chapter with no items rather than showing empty chapters.
   return CHAPTER_BOUNDS.map((b) => chapters.get(b.name)).filter((c): c is LifeChapter => !!c)
 }

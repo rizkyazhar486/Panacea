@@ -2,7 +2,16 @@ import { useState } from 'react'
 import { useStore } from '../lib/store'
 import { Card, SectionTitle, Badge, Button, Field, inputClass } from '../components/ui'
 import { IconBook, IconPlus } from '../components/icons'
-import { LIFE_DOMAINS, DOMAIN_LABEL, DOMAIN_EMOJI, groupIntoChapters, chapterForAge } from '../lib/lifeStory'
+import {
+  LIFE_DOMAINS,
+  DOMAIN_LABEL,
+  DOMAIN_EMOJI,
+  groupIntoChapters,
+  chapterForAge,
+  lifeEventToStoryItem,
+  careEpisodeToStoryItems,
+  type StoryItem,
+} from '../lib/lifeStory'
 import { ageFromDob } from '../lib/anthro'
 import type { LifeDomain, LifeEvent, Quest } from '../lib/types'
 
@@ -25,6 +34,11 @@ export function LifeStory() {
   } = useStore()
   const events = state.lifeEvents[activePatient.id] ?? []
   const quests = state.quests[activePatient.id] ?? []
+  // One story, not two apps: real Care Episode timestamps (started/blocked/
+  // completed) merge into the same timeline as self-logged life moments —
+  // see lib/lifeStory.ts's careEpisodeToStoryItems for why only real,
+  // already-dated events cross over, never a diagnosis or vital restated.
+  const careEpisodes = state.records[activePatient.id]?.careEpisodes ?? []
   const hasPatient = activePatient.id !== 'none'
 
   if (!hasPatient) {
@@ -37,7 +51,11 @@ export function LifeStory() {
     )
   }
 
-  const chapters = groupIntoChapters(events, activePatient.dob)
+  const storyItems: StoryItem[] = [
+    ...events.map(lifeEventToStoryItem),
+    ...careEpisodes.flatMap(careEpisodeToStoryItems),
+  ]
+  const chapters = groupIntoChapters(storyItems, activePatient.dob)
   const currentChapter = chapterForAge(ageFromDob(activePatient.dob))
 
   return (
@@ -78,8 +96,12 @@ export function LifeStory() {
               <span className="text-xs font-semibold text-neutral-400">Age {chapter.ageRange}</span>
             </div>
             <div className="space-y-2">
-              {[...chapter.events].reverse().map((ev) => (
-                <EventCard key={ev.id} event={ev} onRemove={() => removeLifeEvent(activePatient.id, ev.id)} />
+              {[...chapter.items].reverse().map((item) => (
+                <StoryItemCard
+                  key={item.id}
+                  item={item}
+                  onRemove={item.kind === 'life' ? () => removeLifeEvent(activePatient.id, item.id) : undefined}
+                />
               ))}
             </div>
           </div>
@@ -295,27 +317,51 @@ const IMPACT_LABEL: Record<LifeEvent['impact'], string> = {
   negative: 'Hard',
 }
 
-function EventCard({ event, onRemove }: { event: LifeEvent; onRemove: () => void }) {
+const HEALTH_STATUS_TONE: Record<NonNullable<StoryItem['healthStatus']>, 'normal' | 'high' | 'brand'> = {
+  started: 'brand',
+  blocked: 'high',
+  completed: 'normal',
+}
+const HEALTH_STATUS_LABEL: Record<NonNullable<StoryItem['healthStatus']>, string> = {
+  started: 'Care started',
+  blocked: 'Care blocked',
+  completed: 'Care completed',
+}
+
+// Renders both threads of the same story: a self-logged life moment (its
+// own words, self-rated impact) and a real Care Episode moment (real
+// timestamp, real status) — visually distinct so it's always clear which
+// is which, but on one shared timeline.
+function StoryItemCard({ item, onRemove }: { item: StoryItem; onRemove?: () => void }) {
   return (
     <Card className="!p-4">
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0">
           <div className="mb-1 flex flex-wrap items-center gap-1.5">
-            {event.domains.map((d) => (
-              <span key={d} className="text-xs">
-                {DOMAIN_EMOJI[d]} {DOMAIN_LABEL[d]}
-              </span>
-            ))}
+            {item.kind === 'health' ? (
+              <span className="text-xs">🏥 Health record</span>
+            ) : (
+              item.domains.map((d) => (
+                <span key={d} className="text-xs">
+                  {DOMAIN_EMOJI[d]} {DOMAIN_LABEL[d]}
+                </span>
+              ))
+            )}
           </div>
-          <h4 className="font-bold text-ink">{event.title}</h4>
-          {event.note && <p className="mt-1 text-sm text-neutral-600">{event.note}</p>}
-          <p className="mt-1.5 text-xs text-neutral-400">{new Date(event.at).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })}</p>
+          <h4 className="font-bold text-ink">{item.title}</h4>
+          {item.note && <p className="mt-1 text-sm text-neutral-600">{item.note}</p>}
+          <p className="mt-1.5 text-xs text-neutral-400">{new Date(item.at).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })}</p>
         </div>
         <div className="flex shrink-0 flex-col items-end gap-2">
-          <Badge tone={IMPACT_TONE[event.impact]}>{IMPACT_LABEL[event.impact]}</Badge>
-          <button type="button" onClick={onRemove} className="text-xs text-neutral-400 hover:text-accent">
-            Remove
-          </button>
+          {item.kind === 'life' && item.impact && <Badge tone={IMPACT_TONE[item.impact]}>{IMPACT_LABEL[item.impact]}</Badge>}
+          {item.kind === 'health' && item.healthStatus && (
+            <Badge tone={HEALTH_STATUS_TONE[item.healthStatus]}>{HEALTH_STATUS_LABEL[item.healthStatus]}</Badge>
+          )}
+          {onRemove && (
+            <button type="button" onClick={onRemove} className="text-xs text-neutral-400 hover:text-accent">
+              Remove
+            </button>
+          )}
         </div>
       </div>
     </Card>
