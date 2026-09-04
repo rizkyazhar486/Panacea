@@ -595,7 +595,7 @@ export function Shell({ children }: { children: ReactNode }) {
             {/* Mobile: buka drawer */}
             <button
               onClick={() => setMenuOpen(true)}
-              className="grid h-10 w-10 shrink-0 place-items-center rounded-full text-ink hover:bg-neutral-100 lg:hidden"
+              className="header-icon-btn grid h-10 w-10 shrink-0 place-items-center rounded-full text-ink lg:hidden"
               aria-label="Open menu"
             >
               <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round">
@@ -606,7 +606,7 @@ export function Shell({ children }: { children: ReactNode }) {
             {!sidebarOpen && (
               <button
                 onClick={() => setSidebarOpen(true)}
-                className="hidden h-10 w-10 shrink-0 place-items-center rounded-full text-ink hover:bg-neutral-100 lg:grid"
+                className="header-icon-btn hidden h-10 w-10 shrink-0 place-items-center rounded-full text-ink lg:grid"
                 aria-label="Open sidebar menu"
               >
                 <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round">
@@ -619,7 +619,7 @@ export function Shell({ children }: { children: ReactNode }) {
             {bisaKembali && (
               <button
                 onClick={kembali}
-                className="grid h-10 w-10 shrink-0 place-items-center rounded-full text-ink hover:bg-neutral-100"
+                className="header-icon-btn grid h-10 w-10 shrink-0 place-items-center rounded-full text-ink"
                 aria-label="Go back"
                 title="Back"
               >
@@ -634,7 +634,7 @@ export function Shell({ children }: { children: ReactNode }) {
               dulu. Ditaruh di header supaya tersedia dari halaman mana pun. */}
           <button
             onClick={() => setCariBuka(true)}
-            className="grid h-10 w-10 shrink-0 place-items-center rounded-full text-ink hover:bg-neutral-100"
+            className="header-icon-btn grid h-10 w-10 shrink-0 place-items-center rounded-full text-ink"
             aria-label="Search features, people, or hashtags"
           >
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round">
