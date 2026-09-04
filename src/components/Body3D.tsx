@@ -20,7 +20,7 @@ import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
 // ─────────────────────────────────────────────────────────────────────────────
 
 export interface AnatomyLayer {
-  key: 'skeletal' | 'muscular' | 'cardiovascular' | 'nervous' | 'visceral'
+  key: 'skeletal' | 'muscular' | 'cardiovascular' | 'nervous' | 'visceral' | 'lymphoid'
   label: string
   file: string
   defaultOn: boolean
@@ -32,6 +32,7 @@ export const ANATOMY_LAYERS: AnatomyLayer[] = [
   { key: 'cardiovascular', label: 'Vessels', file: 'cardiovascular.glb', defaultOn: false },
   { key: 'nervous', label: 'Nerves', file: 'nervous.glb', defaultOn: false },
   { key: 'visceral', label: 'Organs', file: 'visceral.glb', defaultOn: false },
+  { key: 'lymphoid', label: 'Lymphatic', file: 'lymphoid.glb', defaultOn: false },
 ]
 
 /** "Rectus femoris muscle.l" -> "Rectus femoris muscle (left)" */
@@ -90,15 +91,24 @@ interface Props {
   layers: Set<AnatomyLayer['key']>
   /** Node names (exact, e.g. "Rectus femoris muscle.l") to highlight in green — 0, 1 or many at once. */
   highlighted: string[]
+  /**
+   * Substring keywords (case-insensitive) matched against every structure's
+   * real name — for organs split into many named parts (lungs, liver
+   * segments, brain gyri) where listing every exact name isn't practical.
+   * When set, matching structures are highlighted AND the camera zooms to
+   * frame just that organ; clearing it restores the whole-body framing.
+   */
+  focusKeywords: string[] | null
   /** Fires with the raw node name and a human-readable label when the user taps a structure. */
   onPick: (rawName: string, label: string) => void
 }
 
-export function Body3D({ layers, highlighted, onPick }: Props) {
+export function Body3D({ layers, highlighted, focusKeywords, onPick }: Props) {
   const containerRef = useRef<HTMLDivElement>(null)
   const groupsRef = useRef<Partial<Record<AnatomyLayer['key'], THREE.Group>>>({})
   const sceneRef = useRef<THREE.Scene | null>(null)
   const cameraRef = useRef<THREE.PerspectiveCamera | null>(null)
+  const homeFramingRef = useRef<{ position: THREE.Vector3; target: THREE.Vector3; minDistance: number; maxDistance: number } | null>(null)
   const controlsRef = useRef<OrbitControls | null>(null)
   const hasFitRef = useRef(false)
   const highlightedMeshesRef = useRef<Map<THREE.Mesh, { original: THREE.Color; matchedName: string }>>(new Map())
@@ -247,6 +257,12 @@ export function Body3D({ layers, highlighted, onPick }: Props) {
                 controls.maxDistance = dist * 4
                 controls.update()
                 hasFitRef.current = true
+                homeFramingRef.current = {
+                  position: camera.position.clone(),
+                  target: center.clone(),
+                  minDistance: controls.minDistance,
+                  maxDistance: controls.maxDistance,
+                }
               }
             }
           })
@@ -272,11 +288,13 @@ export function Body3D({ layers, highlighted, onPick }: Props) {
   // supaya proses "lepas sorotan" tidak bergantung pada mesh.name (yang bisa
   // saja kosong untuk anak dari node multi-primitif).
   useEffect(() => {
-    const want = new Set(highlighted)
+    const exact = new Set(highlighted)
+    const keywords = (focusKeywords ?? []).map((k) => k.toLowerCase())
+    const matches = (name: string) => exact.has(name) || keywords.some((k) => name.toLowerCase().includes(k))
     const current = highlightedMeshesRef.current
 
     for (const [mesh, entry] of current) {
-      if (!want.has(entry.matchedName)) {
+      if (!matches(entry.matchedName)) {
         const mat = mesh.material as THREE.MeshStandardMaterial
         mat.emissive.copy(entry.original)
         mat.emissiveIntensity = 0
@@ -284,33 +302,65 @@ export function Body3D({ layers, highlighted, onPick }: Props) {
       }
     }
 
-    if (want.size > 0) {
-      const groups = Object.values(groupsRef.current).filter((g): g is THREE.Group => !!g)
-      for (const group of groups) {
-        group.traverse((obj) => {
-          const originalName = obj.userData.originalName as string | undefined
-          if (!originalName || !want.has(originalName)) return
-          obj.traverse((child) => {
-            if (!(child instanceof THREE.Mesh)) return
-            if (current.has(child)) return
-            const shared = child.material as THREE.MeshStandardMaterial
-            if (!shared || !('emissive' in shared)) return
-            // Materialnya BERBAGI satu instance dengan ratusan mesh lain
-            // yang warnanya sama (mis. "Flat_Internal rotator" dipakai 232
-            // otot) -- kalau emissive-nya diubah langsung, semua yang
-            // berbagi material itu ikut menyala hijau, bukan cuma struktur
-            // yang disentuh. Kloning dulu supaya sorotan benar-benar presisi
-            // ke satu struktur saja.
-            const mat = shared.clone()
-            child.material = mat
-            current.set(child, { original: mat.emissive.clone(), matchedName: originalName })
-            mat.emissive = HIGHLIGHT.clone()
-            mat.emissiveIntensity = 0.55
-          })
+    const groups = Object.values(groupsRef.current).filter((g): g is THREE.Group => !!g)
+    const focusBox = focusKeywords && focusKeywords.length > 0 ? new THREE.Box3() : null
+    for (const group of groups) {
+      group.traverse((obj) => {
+        const originalName = obj.userData.originalName as string | undefined
+        if (!originalName || !matches(originalName)) return
+        if (focusBox) focusBox.expandByObject(obj)
+        obj.traverse((child) => {
+          if (!(child instanceof THREE.Mesh)) return
+          if (current.has(child)) return
+          const shared = child.material as THREE.MeshStandardMaterial
+          if (!shared || !('emissive' in shared)) return
+          // Materialnya BERBAGI satu instance dengan ratusan mesh lain
+          // yang warnanya sama (mis. "Flat_Internal rotator" dipakai 232
+          // otot) -- kalau emissive-nya diubah langsung, semua yang
+          // berbagi material itu ikut menyala hijau, bukan cuma struktur
+          // yang disentuh/ditarget. Kloning dulu supaya sorotan benar-benar
+          // presisi.
+          const mat = shared.clone()
+          child.material = mat
+          current.set(child, { original: mat.emissive.clone(), matchedName: originalName })
+          mat.emissive = HIGHLIGHT.clone()
+          mat.emissiveIntensity = 0.55
         })
-      }
+      })
     }
-  }, [highlighted, loadingLayers])
+
+    // Zoom kamera ke organ yang ditarget, atau kembali ke bingkai seluruh
+    // tubuh kalau target organnya dibersihkan.
+    const camera = cameraRef.current
+    const controls = controlsRef.current
+    if (!camera || !controls) return
+    if (focusBox && !focusBox.isEmpty()) {
+      const center = focusBox.getCenter(new THREE.Vector3())
+      const size = focusBox.getSize(new THREE.Vector3())
+      const radius = Math.max(size.length() * 0.5, 0.03)
+      // Banyak organ target (jantung, paru, ginjal, hati) ada DI DALAM
+      // rongga tubuh, di balik tulang rusuk/otot yang masih terlihat. Jarak
+      // kamera dihitung dari ukuran organ itu sendiri saja akan menaruh
+      // kamera di tengah dinding dada -- dikalikan lebih besar supaya kamera
+      // tetap di luar jaringan yang menutupinya, bukan menembusnya.
+      const dist = Math.max(radius * 8, 0.35)
+      let dir = camera.position.clone().sub(controls.target)
+      if (dir.lengthSq() < 1e-8) dir = new THREE.Vector3(0, 0.15, 1)
+      dir.normalize()
+      camera.position.copy(center.clone().add(dir.multiplyScalar(dist)))
+      controls.target.copy(center)
+      controls.minDistance = dist * 0.3
+      controls.maxDistance = dist * 8
+      controls.update()
+    } else if (!focusKeywords && homeFramingRef.current) {
+      const home = homeFramingRef.current
+      camera.position.copy(home.position)
+      controls.target.copy(home.target)
+      controls.minDistance = home.minDistance
+      controls.maxDistance = home.maxDistance
+      controls.update()
+    }
+  }, [highlighted, focusKeywords, loadingLayers])
 
   const isLoading = loadingLayers.size > 0
 

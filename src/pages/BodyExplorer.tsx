@@ -7,6 +7,7 @@ import { useStore } from '../lib/store'
 import { Body3D, ANATOMY_LAYERS, type AnatomyLayer } from '../components/Body3D'
 import { WORKOUT_MUSCLE_GROUPS } from '../lib/workoutMuscles'
 import { TISSUE_TYPES, ORGAN_SYSTEMS, BODY_REGIONS, type AnatomyEntry } from '../lib/anatomyHierarchy'
+import { ORGAN_FOCUS } from '../lib/organFocus'
 import { IconChevronRight } from '../components/icons'
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -111,6 +112,8 @@ export function BodyExplorer() {
 
   const [activeWorkout, setActiveWorkout] = useState<string | null>(null)
   const [highlighted, setHighlighted] = useState<string[]>([])
+  const [activeOrgan, setActiveOrgan] = useState<string | null>(null)
+  const [focusKeywords, setFocusKeywords] = useState<string[] | null>(null)
 
   async function lookup(label: string, searchTerms: string[]) {
     setSelectedLabel(label)
@@ -133,12 +136,14 @@ export function BodyExplorer() {
   }
 
   // Tap langsung pada satu struktur di model 3D (tulang/otot/pembuluh/
-  // saraf/organ spesifik, bukan hanya sistemnya).
+  // saraf/organ spesifik, bukan hanya sistemnya). Layer-nya sudah pasti
+  // menyala (raycast cuma mengenai apa yang sedang terlihat), jadi tidak
+  // perlu memaksa lapisan tertentu di sini.
   function onPickStructure(rawName: string, label: string) {
     setActiveWorkout(null)
+    setActiveOrgan(null)
+    setFocusKeywords(null)
     setHighlighted([rawName])
-    // Pastikan lapisan otot dinyalakan supaya sorotan target latihan terlihat.
-    if (!layers.has('muscular')) toggleLayer('muscular')
     lookup(label, [toSearchTerm(rawName)])
   }
 
@@ -146,9 +151,25 @@ export function BodyExplorer() {
     const group = WORKOUT_MUSCLE_GROUPS.find((g) => g.key === groupKey)
     if (!group) return
     setActiveWorkout(groupKey)
+    setActiveOrgan(null)
+    setFocusKeywords(null)
     setHighlighted(group.nodeNames)
     if (!layers.has('muscular')) toggleLayer('muscular')
     lookup(`${group.label} muscles`, group.searchTerms)
+  }
+
+  // Satu organ utama dipilih -- menyalakan lapisan 3D yang relevan, menyorot
+  // & memperbesar (zoom) ke organ itu lewat kecocokan kata kunci nama nyata
+  // (lihat organFocus.ts untuk kenapa substring, bukan nama persis).
+  function onPickOrgan(organKey: string) {
+    const organ = ORGAN_FOCUS.find((o) => o.key === organKey)
+    if (!organ) return
+    setActiveWorkout(null)
+    setHighlighted([])
+    setActiveOrgan(organKey)
+    setFocusKeywords(organ.keywords)
+    if (!layers.has(organ.layer)) toggleLayer(organ.layer)
+    lookup(organ.label, organ.searchTerms)
   }
 
   // Satu entri hierarki anatomi (jaringan/sistem organ/region tubuh) diklik —
@@ -156,6 +177,8 @@ export function BodyExplorer() {
   // tapi tetap mengambil istilah ontologi nyata untuk level tersebut.
   function onPickHierarchyEntry(entry: AnatomyEntry) {
     setActiveWorkout(null)
+    setActiveOrgan(null)
+    setFocusKeywords(null)
     setHighlighted([])
     lookup(entry.label, entry.searchTerms)
   }
@@ -172,6 +195,8 @@ export function BodyExplorer() {
     if (!q) return
     setAsking(true)
     setActiveWorkout(null)
+    setActiveOrgan(null)
+    setFocusKeywords(null)
     setHighlighted([])
     setSelectedLabel(q)
     setExplanation('')
@@ -184,10 +209,15 @@ export function BodyExplorer() {
       const matchedGroup = WORKOUT_MUSCLE_GROUPS.find((g) =>
         q.toLowerCase().includes(g.label.toLowerCase()) || g.searchTerms.some((t) => q.toLowerCase().includes(t)),
       )
+      const matchedOrgan = ORGAN_FOCUS.find((o) => q.toLowerCase().includes(o.label.toLowerCase()))
       if (matchedGroup) {
         setActiveWorkout(matchedGroup.key)
         setHighlighted(matchedGroup.nodeNames)
         if (!layers.has('muscular')) toggleLayer('muscular')
+      } else if (matchedOrgan) {
+        setActiveOrgan(matchedOrgan.key)
+        setFocusKeywords(matchedOrgan.keywords)
+        if (!layers.has(matchedOrgan.layer)) toggleLayer(matchedOrgan.layer)
       }
       const text = await explainBodyRegion(state.settings, q, d, p)
       setExplanation(text)
@@ -254,7 +284,7 @@ export function BodyExplorer() {
           pancreas do". Real anatomical structures light up in green on the model when a match is found.
         </p>
 
-        <Body3D layers={layers} highlighted={highlighted} onPick={onPickStructure} />
+        <Body3D layers={layers} highlighted={highlighted} focusKeywords={focusKeywords} onPick={onPickStructure} />
 
         <div className="mt-3 flex flex-wrap justify-center gap-1.5 sm:justify-start">
           {ANATOMY_LAYERS.map((l) => (
@@ -289,6 +319,26 @@ export function BodyExplorer() {
                 }`}
               >
                 {g.label}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        <div className="mt-4">
+          <div className="t-mikro font-bold uppercase tracking-wide text-neutral-500">Focus organ</div>
+          <p className="mt-0.5 text-[11px] text-neutral-400">Zooms in on that organ specifically and highlights every part of it.</p>
+          <div className="mt-1.5 flex flex-wrap gap-1.5">
+            {ORGAN_FOCUS.map((o) => (
+              <button
+                key={o.key}
+                onClick={() => onPickOrgan(o.key)}
+                className={`min-h-[32px] rounded-full border px-3 text-xs font-bold transition ${
+                  activeOrgan === o.key
+                    ? 'border-brand bg-brand text-white'
+                    : 'border-neutral-200 text-neutral-600 dark:border-white/10 dark:text-neutral-300'
+                }`}
+              >
+                {o.label}
               </button>
             ))}
           </div>
