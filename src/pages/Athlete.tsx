@@ -279,6 +279,7 @@ export function Athlete() {
       <AchievementToasts toasts={toasts} onDismiss={(id) => setToasts((t) => t.filter((x) => x.id !== id))} />
       <FightHero
         tag="Battlefield"
+        tagTone="purple"
         title="Athlete"
         motto="Veni. Vidi. Vici."
         right={

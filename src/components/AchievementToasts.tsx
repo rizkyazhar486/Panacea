@@ -28,7 +28,7 @@ function Toast({ a, onDone }: { a: Achievement; onDone: () => void }) {
           <span className={`metal-tag ${TAG_CLASS[a.tone]}`}>Unlocked</span>
           <span className="text-[10px] font-bold uppercase tracking-wide text-white/50">{LABEL[a.tone]}</span>
         </div>
-        <div className={`mt-1 text-sm font-black ${a.tone === 'prism' ? 'metal-emboss-prism' : 'text-white'}`}>{a.title}</div>
+        <div className={`metal-display mt-1 text-sm ${a.tone === 'prism' ? 'metal-emboss-prism' : 'text-white'}`}>{a.title}</div>
         <div className="text-xs text-white/70">{a.desc}</div>
       </div>
     </div>

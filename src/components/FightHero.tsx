@@ -9,12 +9,14 @@ import '../styles/metal.css'
 // dunia, bukan tiga eksperimen berbeda.
 export function FightHero({
   tag,
+  tagTone = 'gold',
   title,
   motto,
   subtitle,
   right,
 }: {
   tag: string
+  tagTone?: 'gold' | 'purple'
   title: string
   motto: string
   subtitle?: string
@@ -24,10 +26,10 @@ export function FightHero({
     <div className="metal-spotlight rounded-2xl p-5">
       <WarriorMark className="pointer-events-none absolute -right-2 bottom-0 h-full w-auto text-white/[0.05]" />
       <div className="relative flex items-start justify-between gap-3">
-        <span className="metal-tag metal-gold">{tag}</span>
+        <span className={`metal-tag ${tagTone === 'purple' ? 'metal-purple' : 'metal-gold'}`}>{tag}</span>
         {right}
       </div>
-      <h2 className="relative mt-3 text-2xl font-black uppercase tracking-tight metal-emboss">{title}</h2>
+      <h2 className="metal-display relative mt-3 text-2xl uppercase tracking-tight metal-emboss">{title}</h2>
       <div className="relative mt-4">
         <MetalMotto text={motto} />
       </div>
