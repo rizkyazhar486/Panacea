@@ -6,11 +6,16 @@
 .metal-forge {
   position: relative;
   overflow: hidden;
+  /* Liquid-chrome, not black-with-a-tint: three saturated color blooms
+     (violet, cyan, magenta) over a deep indigo base — every surface here
+     carries real color gradation, never a flat black or gray fill. */
   background:
-    radial-gradient(120% 140% at 15% -20%, rgba(255, 200, 87, 0.14) 0%, transparent 55%),
-    radial-gradient(90% 90% at 100% 110%, rgba(255, 70, 60, 0.12) 0%, transparent 60%),
-    repeating-linear-gradient(115deg, rgba(255, 255, 255, 0.025) 0px, rgba(255, 255, 255, 0.025) 1px, transparent 1px, transparent 5px),
-    linear-gradient(160deg, #17181c 0%, #0a0a0c 60%, #050506 100%);
+    radial-gradient(130% 150% at 12% -15%, rgba(168, 85, 247, 0.4) 0%, transparent 52%),
+    radial-gradient(110% 110% at 105% -10%, rgba(56, 189, 248, 0.38) 0%, transparent 55%),
+    radial-gradient(120% 120% at 90% 115%, rgba(236, 72, 153, 0.3) 0%, transparent 58%),
+    radial-gradient(90% 90% at 0% 110%, rgba(250, 204, 21, 0.16) 0%, transparent 55%),
+    repeating-linear-gradient(115deg, rgba(255, 255, 255, 0.035) 0px, rgba(255, 255, 255, 0.035) 1px, transparent 1px, transparent 5px),
+    linear-gradient(160deg, #1b1240 0%, #16143f 30%, #0e1a3a 65%, #070a1c 100%);
   color: #fff;
 }
 
@@ -77,15 +82,18 @@
   filter: drop-shadow(0 1px 0 rgba(0, 0, 0, 0.5));
 }
 
-/* Panggung gelap dengan satu sumber cahaya dari atas — bukan latar warna-warni,
-   meniru foto studio (satu spot light, sisanya hitam total) dari referensi. */
+/* Satu sumber cahaya dari atas, tapi panggungnya sendiri tetap liquid-chrome
+   berwarna (indigo/violet/cyan) — cahayanya putih, latarnya tidak pernah
+   hitam polos. */
 .metal-spotlight {
   position: relative;
   overflow: hidden;
   background:
-    radial-gradient(60% 55% at 50% 0%, rgba(255, 246, 224, 0.16) 0%, rgba(255, 246, 224, 0.05) 35%, transparent 65%),
-    repeating-linear-gradient(115deg, rgba(255, 255, 255, 0.02) 0px, rgba(255, 255, 255, 0.02) 1px, transparent 1px, transparent 5px),
-    #000;
+    radial-gradient(60% 55% at 50% 0%, rgba(255, 246, 224, 0.18) 0%, rgba(255, 246, 224, 0.06) 35%, transparent 65%),
+    radial-gradient(120% 90% at 100% 100%, rgba(56, 189, 248, 0.22) 0%, transparent 55%),
+    radial-gradient(100% 90% at 0% 100%, rgba(168, 85, 247, 0.22) 0%, transparent 55%),
+    repeating-linear-gradient(115deg, rgba(255, 255, 255, 0.025) 0px, rgba(255, 255, 255, 0.025) 1px, transparent 1px, transparent 5px),
+    linear-gradient(180deg, #150f30 0%, #0d1230 45%, #060815 100%);
   color: #fff;
 }
 
@@ -139,10 +147,29 @@
   box-shadow: 0 2px 10px rgba(47, 174, 78, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.5);
 }
 
+/* "Kegelapan/waktu" tanpa memakai abu-abu polos — indigo tua ke ungu gelap,
+   supaya tetap terasa gelap tanpa menjadi kartu hitam-putih yang datar. */
 .metal-black {
-  background: linear-gradient(135deg, #5a5a5a 0%, #202020 55%, #000 100%);
-  color: #e8e9eb;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.65), inset 0 1px 0 rgba(255, 255, 255, 0.12);
+  background: linear-gradient(135deg, #6d5a9e 0%, #362a63 45%, #14102b 85%, #05040d 100%);
+  color: #e9e4ff;
+  box-shadow: 0 2px 10px rgba(54, 42, 99, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.15);
+}
+
+/* Pelangi — dipakai HANYA untuk pencapaian paling langka (mis. Elite Lungs),
+   bukan hiasan tersebar. Warnanya nyata dan bergradasi penuh spektrum, sesuai
+   permintaan langsung: "more rainbows", tidak ada hitam/putih polos di sini. */
+.metal-prism {
+  background: conic-gradient(from 200deg at 50% 50%, #ff5f6d, #ffc371, #f9f871, #6bffb8, #6bd7ff, #a86bff, #ff5f6d);
+  color: #1a0b2e;
+  box-shadow: 0 2px 14px rgba(168, 107, 255, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.7);
+}
+
+.metal-emboss-prism {
+  background: conic-gradient(from 200deg at 50% 50%, #ff8a93, #ffd89a, #fbfba0, #8affce, #8ae4ff, #c39bff, #ff8a93);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.4));
 }
 
 .metal-emboss-red {

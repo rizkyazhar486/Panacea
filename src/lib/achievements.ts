@@ -6,7 +6,7 @@
 // atas jeda itu sendiri. Lihat CLAUDE.md "never fabricate": setiap syarat di
 // bawah ini adalah aritmetika sederhana atas data lokal, tidak lebih.
 
-export type AchievementTone = 'red' | 'green' | 'gold' | 'black'
+export type AchievementTone = 'red' | 'green' | 'gold' | 'black' | 'prism'
 
 export interface Achievement {
   id: string
@@ -74,7 +74,8 @@ export function evaluateWorkoutAchievements(log: LoggedSet[]): Achievement[] {
 export function evaluateAthleteAchievements(tier: string): Achievement[] {
   const out: Achievement[] = []
   if (tier === 'Elite') {
-    out.push({ id: 'elite-lungs', title: 'Elite Lungs', desc: 'Your estimated VO2max is in the Elite band.', tone: 'gold' })
+    // The rarest real tier gets the rainbow — not decoration, the reward.
+    out.push({ id: 'elite-lungs', title: 'Elite Lungs', desc: 'Your estimated VO2max is in the Elite band.', tone: 'prism' })
   } else if (tier === 'Excellent') {
     out.push({ id: 'excellent-lungs', title: 'Full Chest', desc: 'Your estimated VO2max is in the Excellent band.', tone: 'red' })
   }
