@@ -1904,6 +1904,13 @@ h1 {
    harus dibaca. Opasitasnya sengaja di bawah ambang sadar: bila kisinya
    terlihat sebagai kisi, ia sudah terlalu terang.
    ───────────────────────────────────────────────────────────────────────────── */
+/* Sebelumnya kisi teknis 32px — garis lurus di seluruh latar itulah yang
+   membuat gradasi terasa terpotong-potong, dilaporkan langsung sebagai
+   "seperti ada garis yang membuat kesan wallpaper tidak rapih". Diminta
+   langsung: gradasi yang menerus tanpa jahitan, seperti langit penuh
+   bintang — jadi diganti sebaran titik terang kecil (bintang) yang benar-
+   benar acak posisinya, bukan pola kisi berulang yang mata langsung
+   kenali sebagai garis. */
 .dark body::before {
   content: '';
   position: fixed;
@@ -1911,9 +1918,23 @@ h1 {
   pointer-events: none;
   z-index: 0;
   background-image:
-    linear-gradient(rgba(0, 255, 136, 0.022) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(0, 255, 136, 0.022) 1px, transparent 1px);
-  background-size: 32px 32px;
+    radial-gradient(1.6px 1.6px at 8% 12%, rgba(255,255,255,0.9) 0%, transparent 100%),
+    radial-gradient(1.2px 1.2px at 22% 68%, rgba(255,255,255,0.7) 0%, transparent 100%),
+    radial-gradient(1.8px 1.8px at 35% 30%, rgba(255,255,255,0.85) 0%, transparent 100%),
+    radial-gradient(1.3px 1.3px at 48% 82%, rgba(255,255,255,0.65) 0%, transparent 100%),
+    radial-gradient(1.5px 1.5px at 61% 15%, rgba(255,255,255,0.8) 0%, transparent 100%),
+    radial-gradient(1.1px 1.1px at 74% 55%, rgba(255,255,255,0.6) 0%, transparent 100%),
+    radial-gradient(1.7px 1.7px at 87% 40%, rgba(255,255,255,0.85) 0%, transparent 100%),
+    radial-gradient(1.2px 1.2px at 95% 78%, rgba(255,255,255,0.65) 0%, transparent 100%),
+    radial-gradient(1.4px 1.4px at 15% 92%, rgba(255,255,255,0.7) 0%, transparent 100%),
+    radial-gradient(1.6px 1.6px at 5% 45%, rgba(255,255,255,0.75) 0%, transparent 100%),
+    radial-gradient(1.3px 1.3px at 43% 5%, rgba(255,255,255,0.6) 0%, transparent 100%),
+    radial-gradient(1.5px 1.5px at 68% 90%, rgba(255,255,255,0.7) 0%, transparent 100%),
+    radial-gradient(1.2px 1.2px at 80% 8%, rgba(255,255,255,0.6) 0%, transparent 100%),
+    radial-gradient(1.9px 1.9px at 92% 60%, rgba(255,255,255,0.85) 0%, transparent 100%),
+    radial-gradient(1.1px 1.1px at 28% 48%, rgba(255,255,255,0.55) 0%, transparent 100%);
+  background-repeat: repeat;
+  background-size: 340px 340px;
 }
 
 /* Butiran film halus — "Pitch Black... dengan tekstur grain halus" — supaya
