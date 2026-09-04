@@ -490,15 +490,22 @@ export function Shell({ children }: { children: ReactNode }) {
           berapi biru-merah) di samping hijau/emas/magenta/ungu yang sudah
           ada, supaya kesannya benar-benar ruang angkasa berwarna, bukan
           taman musim semi. */}
+      {/* Dark mode: delapan orb warna-warni yang tumpang tindih dulu adalah
+          sumber utama tampilan "muram/kotor" yang dikeluhkan — begitu
+          backdrop-blur kartu menyerapnya sekaligus, hasilnya coklat-kehijauan,
+          bukan hitam pekat. `dark:bg-*` di sini MENGGANTI warnanya (bukan
+          hanya opacity) jadi hanya dua logam: emas dan cyan/violet — selaras
+          dengan identitas "Neoclassical Cyber-Organic Glass". Mode terang
+          tidak disentuh, warnanya tetap seperti semula. */}
       <div className="pointer-events-none fixed inset-0 z-0 overflow-hidden">
-        <div className="orb absolute -left-32 top-10 h-80 w-80 rounded-full bg-brand/20 blur-3xl dark:bg-brand/14" />
-        <div className="orb absolute right-0 top-1/3 h-96 w-96 rounded-full bg-cyan-400/22 blur-3xl dark:bg-cyan-400/15" style={{ animationDelay: '-8s' }} />
-        <div className="orb absolute bottom-0 left-1/2 h-72 w-72 rounded-full bg-red-500/16 blur-3xl dark:bg-red-500/12" style={{ animationDelay: '-14s' }} />
-        <div className="orb absolute right-10 bottom-10 h-72 w-72 rounded-full bg-amber-300/18 blur-3xl dark:bg-amber-400/22" style={{ animationDelay: '-4s' }} />
-        <div className="orb absolute left-1/4 top-0 h-72 w-72 rounded-full bg-orange-500/16 blur-3xl dark:bg-orange-500/24" style={{ animationDelay: '-6s' }} />
-        <div className="orb absolute left-10 top-1/2 h-80 w-80 rounded-full bg-fuchsia-500/18 blur-3xl dark:bg-fuchsia-500/13" style={{ animationDelay: '-18s' }} />
-        <div className="orb absolute right-1/3 top-0 h-64 w-64 rounded-full bg-indigo-500/16 blur-3xl dark:bg-indigo-500/12" style={{ animationDelay: '-11s' }} />
-        <div className="orb absolute left-1/3 bottom-1/4 h-60 w-60 rounded-full bg-blue-400/18 blur-3xl dark:bg-blue-400/13" style={{ animationDelay: '-21s' }} />
+        <div className="orb absolute -left-32 top-10 h-80 w-80 rounded-full bg-brand/20 blur-3xl dark:bg-amber-400/12" />
+        <div className="orb absolute right-0 top-1/3 h-96 w-96 rounded-full bg-cyan-400/22 blur-3xl dark:bg-sky-400/13" style={{ animationDelay: '-8s' }} />
+        <div className="orb absolute bottom-0 left-1/2 h-72 w-72 rounded-full bg-red-500/16 blur-3xl dark:bg-violet-500/10" style={{ animationDelay: '-14s' }} />
+        <div className="orb absolute right-10 bottom-10 h-72 w-72 rounded-full bg-amber-300/18 blur-3xl dark:bg-amber-400/16" style={{ animationDelay: '-4s' }} />
+        <div className="orb absolute left-1/4 top-0 h-72 w-72 rounded-full bg-orange-500/16 blur-3xl dark:bg-amber-500/10" style={{ animationDelay: '-6s' }} />
+        <div className="orb absolute left-10 top-1/2 h-80 w-80 rounded-full bg-fuchsia-500/18 blur-3xl dark:bg-violet-500/9" style={{ animationDelay: '-18s' }} />
+        <div className="orb absolute right-1/3 top-0 h-64 w-64 rounded-full bg-indigo-500/16 blur-3xl dark:bg-sky-500/9" style={{ animationDelay: '-11s' }} />
+        <div className="orb absolute left-1/3 bottom-1/4 h-60 w-60 rounded-full bg-blue-400/18 blur-3xl dark:bg-sky-400/9" style={{ animationDelay: '-21s' }} />
       </div>
       <aside className={`sticky top-0 z-10 hidden h-screen shrink-0 flex-col border-r border-black/5 bg-white/80 py-6 backdrop-blur-xl transition-all duration-300 lg:flex ${sidebarOpen ? 'w-64 px-4' : 'w-0 overflow-hidden border-r-0 px-0 opacity-0'}`}>
         <div className="mb-6 flex items-center justify-between gap-2 px-2">

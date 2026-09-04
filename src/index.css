@@ -142,15 +142,18 @@ button:active, a[href]:active, [role='button']:active { transform: scale(0.985);
    masih abu-abu). Tepi kartu kaca tetap dapat memantul karena kartu itu
    sendiri kini sudah berwarna (lihat .dark .kaca), bukan mengandalkan
    kanvas di baliknya lagi. */
+/* Enam titik warna yang saling tumpang tindih di sini dulu adalah sumber
+   utama "muram/kotor" yang dikeluhkan — begitu backdrop-blur kartu di
+   atasnya menyerap semuanya sekaligus, hasilnya coklat-kehijauan, bukan
+   hitam. Diringkas jadi dua: satu bara emas (identitas logam baru), satu
+   aura sejuk cyan/violet (nebula) — dengan hitam pekat yang benar-benar
+   mendominasi di antara keduanya. */
 .dark body {
   background:
-    radial-gradient(70% 55% at 10% -5%, rgba(255, 26, 0, 0.16) 0%, transparent 55%),
-    radial-gradient(65% 55% at 90% 0%, rgba(255, 102, 0, 0.14) 0%, transparent 55%),
-    radial-gradient(60% 50% at 100% 40%, rgba(255, 215, 0, 0.1) 0%, transparent 55%),
-    radial-gradient(65% 55% at 95% 90%, rgba(0, 210, 255, 0.16) 0%, transparent 55%),
-    radial-gradient(70% 55% at 5% 95%, rgba(157, 0, 255, 0.16) 0%, transparent 55%),
-    radial-gradient(60% 50% at 0% 45%, rgba(255, 0, 127, 0.14) 0%, transparent 55%),
-    radial-gradient(circle at 50% 0%, rgba(198, 255, 52, 0.05) 0%, #050505 60%) fixed;
+    radial-gradient(65% 50% at 12% -8%, rgba(255, 199, 44, 0.14) 0%, transparent 55%),
+    radial-gradient(60% 50% at 92% 100%, rgba(0, 163, 255, 0.12) 0%, transparent 55%),
+    radial-gradient(55% 45% at 100% 0%, rgba(157, 0, 255, 0.08) 0%, transparent 55%),
+    radial-gradient(circle at 50% 0%, rgba(255, 199, 44, 0.03) 0%, #000000 60%) fixed;
   color: #eef2ef;
 }
 
@@ -809,31 +812,32 @@ button:active, a[href]:active, [role='button']:active { transform: scale(0.985);
    yang lama) dengan enam gumpalan HEX persis dari referensi — merah-api,
    jingga, sian, ungu, hijau neon, magenta. Ini yang dimaksud "deep-black
    cosmic void" plus "flaming fire of rainbow colors" sekaligus. */
-/* "Cybernetic Chromatic Glassmorphism" — pitch-OLED-black obsidian glass
-   with the full spectrum pushed to the EDGES (see .kaca::after) instead of
-   washing the whole surface. Lesson from the popup-contrast fix: once every
-   pixel carries color, anything sitting on top (a button, an icon, a
-   number) loses a stable background to read against. The blooms below are
-   now accents at the corners — low enough opacity that black is what
-   actually dominates the card — not a full-bleed gradient fill. */
+/* "Neoclassical Cyber-Organic Glass" — the previous pass (three overlapping
+   hue blooms + saturate(1.8) backdrop-filter) amplified whatever colorful
+   thing sat behind the card (the ambient orbs in Shell.tsx, the wallpaper)
+   into a muddy, brownish haze instead of a clean black. Fixed by (1)
+   dropping the backdrop saturate so it stops amplifying the backdrop, (2)
+   making the base itself near-opaque true black so little of that backdrop
+   shows through at all, and (3) reducing to ONE warm gold volumetric glow
+   (the "sacred/metallic" accent) plus one cool cyan/violet ethereal aura,
+   never both fighting in the same corner. */
 .dark .kaca {
   background:
-    radial-gradient(70% 60% at 6% -8%, rgba(255, 77, 0, 0.22) 0%, transparent 55%),
-    radial-gradient(65% 55% at 102% 105%, rgba(0, 240, 255, 0.18) 0%, transparent 55%),
-    radial-gradient(55% 50% at 100% -6%, rgba(208, 0, 255, 0.14) 0%, transparent 55%),
-    linear-gradient(165deg, rgba(255,255,255,0.055) 0%, rgba(255,255,255,0.02) 40%, transparent 70%),
-    linear-gradient(160deg, #0a0a0c 0%, #060608 55%, #050506 100%);
-  animation: kaca-aurora 20s ease-in-out infinite;
-  backdrop-filter: blur(20px) saturate(1.8);
-  -webkit-backdrop-filter: blur(20px) saturate(1.8);
-  border-color: rgba(255,255,255,0.14);
+    radial-gradient(65% 55% at 8% -10%, rgba(255, 199, 44, 0.14) 0%, transparent 58%),
+    radial-gradient(60% 55% at 100% 108%, rgba(0, 163, 255, 0.12) 0%, transparent 58%),
+    linear-gradient(165deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.015) 40%, transparent 70%),
+    linear-gradient(160deg, #0c0c0e 0%, #060608 55%, #000000 100%);
+  animation: kaca-aurora 24s ease-in-out infinite;
+  backdrop-filter: blur(20px) saturate(1.1);
+  -webkit-backdrop-filter: blur(20px) saturate(1.1);
+  border-color: rgba(212, 175, 55, 0.22);
   box-shadow:
-    0 1px 2px rgba(0,0,0,0.5),
-    0 4px 12px -4px rgba(0,0,0,0.55),
-    0 20px 44px -10px rgba(0,0,0,0.6),
-    0 0 26px -6px rgba(0, 240, 255, 0.16),
-    inset 0 1px 0 rgba(255,255,255,0.09),
-    inset 0 -12px 20px -12px rgba(0,0,0,0.5);
+    0 1px 2px rgba(0,0,0,0.6),
+    0 4px 12px -4px rgba(0,0,0,0.6),
+    0 20px 44px -10px rgba(0,0,0,0.65),
+    0 0 24px -8px rgba(255, 199, 44, 0.18),
+    inset 0 1px 0 rgba(255,255,255,0.08),
+    inset 0 -12px 20px -12px rgba(0,0,0,0.55);
 }
 .dark .kaca::before {
   background: radial-gradient(
@@ -844,13 +848,17 @@ button:active, a[href]:active, [role='button']:active { transform: scale(0.985);
 }
 /* Sama seperti mode terang — pita aurora yang mengalir, bukan putih redup
    yang tak pernah terlihat berwarna di layar gelap. */
+/* Bingkai logam — emas dipoles bertukar perlahan dengan krom dan sekilas
+   biru air, BUKAN pelangi 8-warna yang berputar di setiap kartu. Delapan
+   warna yang bersaing di garis setipis 1px terbaca ramai/berisik pada
+   kartu gelap; tiga logam yang saling bertukar terbaca mewah. */
 .dark .kaca::after {
   background: linear-gradient(
     100deg,
-    #FF1A00, #FF6600, #FFD700, #39FF14, #00D2FF, #0055FF, #9D00FF, #FF007F, #FF1A00);
-  background-size: 400% 100%;
-  animation: kaca-edge-aurora 12s linear infinite;
-  opacity: 1;
+    #D4AF37, #FFE082, #E0E0E0, #FFD700, #00A3FF, #E0E0E0, #D4AF37);
+  background-size: 300% 100%;
+  animation: kaca-edge-aurora 16s linear infinite;
+  opacity: 0.85;
 }
 
 /* Melayang: naik saat disentuh perhatian, turun saat ditekan. Kurva
@@ -1576,15 +1584,18 @@ html { -webkit-overflow-scrolling: touch; }
     0 0 34px rgba(255, 45, 85, 0.18);
 }
 
-/* Tepi kartu: satu garis rambut hijau, sangat tipis. Yang membuat sebuah
-   antarmuka terasa "futuristik" bukan banyaknya cahaya, melainkan ketipisan
-   garisnya. */
+/* Tepi kartu: dulu garis rambut hijau — sekarang mengikuti tema logam emas
+   yang sama dengan .dark .kaca di atas (baris ~819). Aturan lama ini
+   menang begitu saja karena datang belakangan dengan spesifisitas yang
+   sama, dan diam-diam membatalkan glow emas/cyan yang baru; disamakan di
+   sini alih-alih dihapus supaya niat "satu garis rambut tipis" tetap ada. */
 .dark .kaca {
-  border-color: rgba(0, 255, 136, 0.14);
+  border-color: rgba(212, 175, 55, 0.22);
   box-shadow:
     0 1px 2px rgba(0, 0, 0, 0.6),
     0 12px 32px -8px rgba(0, 0, 0, 0.6),
-    inset 0 1px 0 rgba(0, 255, 136, 0.07);
+    0 0 24px -8px rgba(255, 199, 44, 0.18),
+    inset 0 1px 0 rgba(255,255,255,0.08);
 }
 
 /* Tombol utama benar-benar memancar; ia satu-satunya benda di layar yang
