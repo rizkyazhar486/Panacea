@@ -112,6 +112,7 @@ import { emailOtpStart, emailOtpVerify, emailOtpLive } from './otp.js'
 import { putusanPengingat } from './jadwal.js'
 import { aiMessages, aiConsult, aiVision, aiOperator, reviewApplicationText, draftSecondOpinion, generateOperatorBriefing, aiConfigured, aiStatus } from './ai.js'
 import { anatomyOntologyLookup } from './anatomyOntology.js'
+import { lookupDrugLabel } from './drugInfo.js'
 import { sendEmail } from './email.js'
 import { sendPush, notify, keadaanPush } from './push.js'
 import { submitEmr } from './satusehat.js'
@@ -250,6 +251,21 @@ app.get('/api/anatomy/ontology', async (req, res) => {
     res.json(hasil)
   } catch (e) {
     res.status(502).json({ error: 'Ontology lookup gagal', detail: (e as Error).message })
+  }
+})
+
+// Drug lookup — mekanisme kerja, organ sasaran, efek samping. Sumbernya
+// openFDA (label resmi FDA, dokumen pemerintah AS), bukan konten berhak
+// cipta pihak ketiga. Publik, tanpa auth.
+app.get('/api/anatomy/drug', async (req, res) => {
+  const name = String(req.query.name ?? '').trim()
+  if (!name) return res.status(400).json({ error: 'name wajib diisi' })
+  try {
+    const hasil = await lookupDrugLabel(name)
+    if (!hasil) return res.status(404).json({ error: 'Tidak ditemukan di openFDA' })
+    res.json(hasil)
+  } catch (e) {
+    res.status(502).json({ error: 'Drug lookup gagal', detail: (e as Error).message })
   }
 })
 

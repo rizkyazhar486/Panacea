@@ -1,9 +1,9 @@
 import { useState } from 'react'
 import { Card, SectionTitle } from '../components/ui'
-import { IconActivity } from '../components/icons'
+import { IconActivity, IconSearch, IconStethoscope } from '../components/icons'
 import { BODY_REGIONS, type BodyRegion } from '../lib/bodyRegions'
-import { api, type OntologyTerm } from '../lib/api'
-import { explainBodyRegion } from '../lib/ai'
+import { api, type OntologyTerm, type DrugLabelInfo } from '../lib/api'
+import { explainBodyRegion, explainDrug } from '../lib/ai'
 import { useStore } from '../lib/store'
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -48,6 +48,12 @@ export function BodyExplorer() {
   const [phenotypes, setPhenotypes] = useState<OntologyTerm[]>([])
   const [explanation, setExplanation] = useState('')
 
+  const [drugQuery, setDrugQuery] = useState('')
+  const [drugLoading, setDrugLoading] = useState(false)
+  const [drugInfo, setDrugInfoState] = useState<DrugLabelInfo | null>(null)
+  const [drugExplanation, setDrugExplanation] = useState('')
+  const [drugError, setDrugError] = useState('')
+
   async function pick(region: BodyRegion) {
     setActive(region)
     setLoading(true)
@@ -64,6 +70,25 @@ export function BodyExplorer() {
       setExplanation('Could not reach the ontology service right now. Please try again in a moment.')
     } finally {
       setLoading(false)
+    }
+  }
+
+  async function lookupDrug() {
+    const name = drugQuery.trim()
+    if (!name) return
+    setDrugLoading(true)
+    setDrugError('')
+    setDrugInfoState(null)
+    setDrugExplanation('')
+    try {
+      const info = await api.drugInfo(name)
+      setDrugInfoState(info)
+      const text = await explainDrug(state.settings, info)
+      setDrugExplanation(text)
+    } catch {
+      setDrugError(`No FDA label found for "${name}" — try the generic or brand name spelled exactly (e.g. "ibuprofen", "metformin").`)
+    } finally {
+      setDrugLoading(false)
     }
   }
 
@@ -140,6 +165,85 @@ export function BodyExplorer() {
           Disease and symptom terms are retrieved live from the Human Disease Ontology and Human Phenotype Ontology
           via EBI's public Ontology Lookup Service (OLS4) — general medical reference data, not a diagnosis. Always
           consult a licensed clinician about your own symptoms.
+        </p>
+      </Card>
+
+      <Card>
+        <SectionTitle
+          icon={<IconStethoscope />}
+          title="Medicine Lookup"
+          subtitle="How a medicine works, which organ it acts on, and its side effects — from the official FDA label"
+        />
+        <form
+          onSubmit={(e) => { e.preventDefault(); lookupDrug() }}
+          className="mt-3 flex gap-2"
+        >
+          <div className="relative min-w-0 flex-1">
+            <IconSearch size={16} className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-neutral-400" />
+            <input
+              value={drugQuery}
+              onChange={(e) => setDrugQuery(e.target.value)}
+              placeholder="e.g. ibuprofen, metformin, amlodipine…"
+              className="h-11 w-full rounded-xl border border-neutral-200 bg-white pl-9 pr-3 text-sm text-ink outline-none focus:border-brand dark:border-white/10 dark:bg-white/5 dark:text-white"
+            />
+          </div>
+          <button
+            type="submit"
+            disabled={drugLoading || !drugQuery.trim()}
+            className="liquid-glass-btn liquid-glass-btn--primary flex h-11 shrink-0 items-center rounded-xl px-4 text-sm font-bold text-white disabled:opacity-50"
+          >
+            {drugLoading ? 'Looking up…' : 'Search'}
+          </button>
+        </form>
+
+        {drugError && <p className="mt-3 text-sm text-neutral-500">{drugError}</p>}
+
+        {drugInfo && (
+          <div className="mt-4 space-y-3">
+            <h3 className="text-base font-black text-ink dark:text-white">
+              {drugInfo.brandName}
+              {drugInfo.genericName && drugInfo.genericName.toLowerCase() !== drugInfo.brandName.toLowerCase() && (
+                <span className="ml-1.5 text-sm font-semibold text-neutral-500">({drugInfo.genericName})</span>
+              )}
+            </h3>
+            {drugExplanation && (
+              <p className="rounded-xl bg-brand/5 p-3 text-sm leading-relaxed text-ink dark:bg-brand/10 dark:text-white">
+                {drugExplanation}
+              </p>
+            )}
+            <div className="grid gap-2 sm:grid-cols-2">
+              {drugInfo.purpose && (
+                <div className="rounded-xl bg-neutral-50 p-2.5 dark:bg-white/5">
+                  <div className="t-mikro font-bold uppercase tracking-wide text-neutral-500">Purpose</div>
+                  <p className="mt-0.5 text-xs leading-relaxed text-neutral-600 dark:text-neutral-300">{drugInfo.purpose}</p>
+                </div>
+              )}
+              {drugInfo.mechanismOfAction && (
+                <div className="rounded-xl bg-neutral-50 p-2.5 dark:bg-white/5">
+                  <div className="t-mikro font-bold uppercase tracking-wide text-neutral-500">Mechanism of action</div>
+                  <p className="mt-0.5 text-xs leading-relaxed text-neutral-600 dark:text-neutral-300">{drugInfo.mechanismOfAction}</p>
+                </div>
+              )}
+              {drugInfo.adverseReactions && (
+                <div className="rounded-xl bg-neutral-50 p-2.5 dark:bg-white/5">
+                  <div className="t-mikro font-bold uppercase tracking-wide text-neutral-500">Adverse reactions</div>
+                  <p className="mt-0.5 text-xs leading-relaxed text-neutral-600 dark:text-neutral-300">{drugInfo.adverseReactions}</p>
+                </div>
+              )}
+              {drugInfo.warnings && (
+                <div className="rounded-xl bg-red-50 p-2.5 dark:bg-red-500/10">
+                  <div className="t-mikro font-bold uppercase tracking-wide text-red-500">Warnings</div>
+                  <p className="mt-0.5 text-xs leading-relaxed text-red-700 dark:text-red-300">{drugInfo.warnings}</p>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+
+        <p className="mt-4 text-[11px] leading-relaxed text-neutral-400">
+          Drug information is retrieved live from the official FDA drug label via openFDA — general reference
+          information, not medical advice. Always follow your prescriber's instructions and the physical package
+          insert; ask a doctor or pharmacist about your own medications and doses.
         </p>
       </Card>
     </div>

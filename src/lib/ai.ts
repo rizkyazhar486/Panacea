@@ -1,5 +1,5 @@
 import { SYSTEM_PROMPT, EMR_DRAFT_INSTRUCTION, EMR_FRAMEWORK } from './systemPrompt'
-import { api, backendEnabled, type OntologyTerm } from './api'
+import { api, backendEnabled, type OntologyTerm, type DrugLabelInfo } from './api'
 import type {
   ChatMessage,
   Patient,
@@ -350,5 +350,44 @@ export async function explainBodyRegion(
       return '⏳ Too many requests in a short time. Please wait a moment and try again.'
     }
     return 'Could not generate an explanation right now — the retrieved terms below are still real ontology entries you can read directly.'
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Drug lookup — sama seperti explainBodyRegion di atas: hanya merangkai
+// potongan RESMI dari label FDA (via openFDA, lihat drugInfo di server) jadi
+// bahasa awam, WAJIB tetap merujuk field aslinya, dan tidak menambah dosis
+// atau saran yang tidak ada di sumbernya. Ini bukan pengganti label resmi
+// atau apoteker/dokter.
+// ─────────────────────────────────────────────────────────────────────────────
+function drugGroundingBlock(info: DrugLabelInfo): string {
+  return [
+    `RETRIEVED FDA DRUG LABEL EXCERPTS (via openFDA) for "${info.brandName}"${info.genericName ? ` (${info.genericName})` : ''}:`,
+    info.purpose ? `Purpose: ${info.purpose}` : '',
+    info.mechanismOfAction ? `Mechanism of action: ${info.mechanismOfAction}` : '',
+    info.adverseReactions ? `Adverse reactions: ${info.adverseReactions}` : '',
+    info.warnings ? `Warnings: ${info.warnings}` : '',
+    '',
+    'INSTRUCTIONS: In 100-160 words, explain in plain language: (1) what this medicine is generally used for, (2) how it works and which organ/system it acts on, based ONLY on the excerpts above, and (3) common side effects to be aware of. Do not invent a dose, a brand you were not given, or any claim not present in the excerpts. End with: "This is general reference information from the official FDA label, not medical advice — talk to a doctor or pharmacist about your own situation."',
+  ].filter(Boolean).join('\n')
+}
+
+export async function explainDrug(settings: AISettings, info: DrugLabelInfo): Promise<string> {
+  if (!aiAvailable()) {
+    return `${info.brandName}: AI is offline right now, but the excerpts below are from the official FDA drug label.`
+  }
+  try {
+    const { text } = await api.aiMessages({
+      model: settings.model,
+      system: 'You are a medical educator explaining medicines in plain language, strictly grounded in the retrieved label excerpts you are given. Never invent doses or claims not present in the excerpts.',
+      messages: [{ role: 'user', content: drugGroundingBlock(info) }],
+      max_tokens: 350,
+    })
+    return text || 'No explanation was generated.'
+  } catch (e) {
+    if (String((e as Error)?.message).includes('rate_limited')) {
+      return '⏳ Too many requests in a short time. Please wait a moment and try again.'
+    }
+    return 'Could not generate an explanation right now — the excerpts below are still from the official FDA label.'
   }
 }
