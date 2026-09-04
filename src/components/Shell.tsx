@@ -480,7 +480,7 @@ export function Shell({ children }: { children: ReactNode }) {
       <div className="print-letterhead">
         <LogoMark size={28} />
         <div className="leading-tight">
-          <div className="text-sm font-extrabold tracking-tight">Panaceamed<span className="text-brand">.id</span></div>
+          <div className="text-sm font-extrabold tracking-tight" style={{ fontFamily: 'var(--font-wordmark)' }}>Panaceamed<span className="text-brand">.id</span></div>
           <div className="text-[10px] font-semibold uppercase tracking-wider text-neutral-500">Longevity Medical-AI · Official Document</div>
         </div>
       </div>
@@ -516,7 +516,7 @@ export function Shell({ children }: { children: ReactNode }) {
           <div className="flex items-center gap-2.5">
             <LogoMark size={36} />
             <div className="leading-tight">
-              <div className="text-base font-extrabold tracking-tight">
+              <div className="text-base font-extrabold tracking-tight" style={{ fontFamily: 'var(--font-wordmark)' }}>
                 Panacea<span className="text-brand">med</span>
                 <span className="text-accent">.id</span>
               </div>
@@ -827,7 +827,7 @@ export function Shell({ children }: { children: ReactNode }) {
               <div className="flex items-center gap-2.5">
                 <LogoMark size={34} />
                 <div className="leading-tight">
-                  <div className="text-base font-extrabold tracking-tight">Panacea<span className="text-brand">med</span><span className="text-accent">.id</span></div>
+                  <div className="text-base font-extrabold tracking-tight" style={{ fontFamily: 'var(--font-wordmark)' }}>Panacea<span className="text-brand">med</span><span className="text-accent">.id</span></div>
                   <div className="text-[10px] font-semibold uppercase tracking-wider text-neutral-500">{roleLabel[account.role]}</div>
                 </div>
               </div>
