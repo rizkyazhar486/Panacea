@@ -445,6 +445,13 @@ export function Shell({ children }: { children: ReactNode }) {
     return () => window.removeEventListener('scroll', onScroll)
   }, [])
 
+  // Halaman demo mandiri: butuh kanvas penuh sendiri (video layar penuh,
+  // tanpa header/nav aplikasi), dan harus dapat diakses lewat URL langsung
+  // tanpa login. `fixed inset-0` di dalamnya tidak akan menutupi header/nav
+  // Shell karena leluhurnya di sini memakai stacking context sendiri —
+  // jadi baris ini melewati Shell sepenuhnya untuk rute ini saja.
+  if (loc.pathname === '/design-demo') return <>{children}</>
+
   if (!account) return <PublicEntry />
   const items = saring(nav.filter((n) => n.roles.includes(account.role)), tersembunyi)
   const title = items.find((n) => navMatches(n, loc.pathname))

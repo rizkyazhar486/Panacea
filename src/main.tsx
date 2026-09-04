@@ -216,6 +216,7 @@ const SnpProfiler = lazy(() => import('./pages/SnpProfiler').then((m) => ({ defa
 const PredictiveModelsToolkit = lazy(() => import('./pages/PredictiveModelsToolkit').then((m) => ({ default: m.PredictiveModelsToolkit })))
 const DataLabAdvanced = lazy(() => import('./pages/DataLabAdvanced').then((m) => ({ default: m.DataLabAdvanced })))
 const BioSimulators = lazy(() => import('./pages/BioSimulators').then((m) => ({ default: m.BioSimulators })))
+const DesignDemo = lazy(() => import('./pages/DesignDemo').then((m) => ({ default: m.DesignDemo })))
 
 // Apply the saved appearance (theme, text size, motion) and language before first paint.
 applyAppearance()
@@ -464,6 +465,8 @@ createRoot(document.getElementById('root')!).render(
               <Route path="/admin" element={<Admin />} />
               <Route path="/settings" element={<Settings />} />
               <Route path="/legal" element={<Legal />} />
+              {/* Halaman demo terisolasi, sengaja tidak ditautkan dari navigasi mana pun. */}
+              <Route path="/design-demo" element={<DesignDemo />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </Suspense>

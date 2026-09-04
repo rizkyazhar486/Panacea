@@ -3,7 +3,7 @@
   "private": true,
   "version": "0.1.0",
   "type": "module",
-  "description": "Panaceamed.id \u2014 Longevity Medical-AI Co-Physician platform (AI Chatbot + AI-EMR)",
+  "description": "Panaceamed.id — Longevity Medical-AI Co-Physician platform (AI Chatbot + AI-EMR)",
   "scripts": {
     "dev": "vite",
     "build": "node scripts/gen-note-index.mjs --check && tsc -b && vite build",
@@ -15,6 +15,7 @@
     "cakupan": "node scripts/cakupanSkdi.mjs"
   },
   "dependencies": {
+    "framer-motion": "^13.2.0",
     "leaflet": "^1.9.4",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
