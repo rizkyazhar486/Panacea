@@ -27,6 +27,16 @@ interface SupportiveResult {
    UTILITIES
    ═══════════════════════════════════════════ */
 
+// Real clock, not a fabricated mood — the only thing this greeting knows is
+// what time it actually is right now.
+function greeting(): string {
+  const h = new Date().getHours()
+  if (h < 5) return 'Still up'
+  if (h < 12) return 'Good morning'
+  if (h < 18) return 'Good afternoon'
+  return 'Good evening'
+}
+
 function fmt(iso: string): string {
   return new Date(iso).toLocaleString('en-GB', {
     day: '2-digit',
@@ -98,7 +108,7 @@ function LongevityRing({ score, band }: { score: number; band: string }) {
       </svg>
       <div className="absolute flex flex-col items-center">
         <span className="text-[28px] font-black leading-none tabular-nums" style={{ color }}>{animated}</span>
-        <span className="mt-0.5 text-[10px] font-bold uppercase tracking-[0.18em] text-neutral-500">{band}</span>
+        <span className="mt-0.5 text-[10px] font-bold uppercase tracking-[0.18em] text-white/60">{band}</span>
       </div>
     </div>
   )
@@ -502,61 +512,104 @@ export function Dashboard() {
         </Card>
       )}
 
-      {/* Patient Profile Hero */}
-      <Card className="overflow-hidden">
-        <div className="relative">
-          <div className="h-28" style={{ background: `linear-gradient(135deg, ${p.avatarColor}18, ${p.avatarColor}08 60%, transparent)` }} />
-          <div className="relative -mt-12 px-5 pb-5">
-            <div className="flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between">
-              <div className="flex items-end gap-4">
-                <span className="grid h-24 w-24 shrink-0 place-items-center rounded-[18px] text-2xl font-black text-ink transition-transform duration-300 hover:scale-[1.04]" style={{ background: `linear-gradient(145deg, ${p.avatarColor}, ${p.avatarColor}bb)`, boxShadow: `0 8px 24px ${p.avatarColor}44` }}>
-                  {p.name.replace(/^[^ ]+ /, '').slice(0, 2).toUpperCase()}
-                </span>
-                <div className="pb-1">
-                  <h2 className="text-[22px] font-black leading-tight tracking-tight">{p.name}</h2>
-                  <p className="mt-1 flex flex-wrap items-center gap-x-1.5 gap-y-0.5 text-sm text-neutral-500">
-                    <span>{p.sex === 'L' ? 'Male' : 'Female'}</span>
-                    <span className="text-neutral-200">·</span>
-                    <span>{ageFromDob(p.dob)} years old</span>
-                    {p.bloodType && (<><span className="text-neutral-200">·</span><span className="font-semibold text-neutral-600">Type {p.bloodType}</span></>)}
-                    <span className="text-neutral-200">·</span>
-                    <span className="font-mono text-xs text-neutral-500">{p.mrn}</span>
-                  </p>
+      {/* Patient Profile Hero — an atmospheric banner instead of a flat tint,
+          built from real patient data (name, vitals, conditions). Nothing
+          drawn here is decorative fabrication: the glow color and the
+          "signal" chips are the patient's own avatar color and latest
+          recorded vitals. */}
+      <div className="relative overflow-hidden rounded-2xl" style={{ background: '#0b191e' }}>
+        {/* Layered radial glow — a deep-space feel using the patient's own
+            accent color plus the brand green, not arbitrary decoration. */}
+        <div
+          className="pointer-events-none absolute inset-0"
+          style={{
+            background: `
+              radial-gradient(120% 90% at 15% -10%, ${p.avatarColor}3d 0%, transparent 55%),
+              radial-gradient(90% 70% at 100% 0%, rgba(0,191,99,0.28) 0%, transparent 60%),
+              radial-gradient(140% 100% at 50% 120%, rgba(0,0,0,0.4) 0%, transparent 60%)
+            `,
+          }}
+        />
+        <div
+          className="pointer-events-none absolute inset-0 opacity-[0.05]"
+          style={{ backgroundImage: 'radial-gradient(rgba(255,255,255,0.9) 1px, transparent 1px)', backgroundSize: '18px 18px' }}
+        />
+
+        <div className="relative px-5 pb-5 pt-6 text-white">
+          <div className="flex items-center justify-between">
+            <span className="text-[11px] font-semibold uppercase tracking-[0.2em] text-white/50">{greeting()}</span>
+            <span className="flex items-center gap-1.5 rounded-full bg-white/10 px-2.5 py-1 text-[10px] font-semibold text-white/70 backdrop-blur-sm">
+              <IconShield size={11} className="text-[#5be08a]" /> Confidential
+            </span>
+          </div>
+
+          <div className="mt-4 flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between">
+            <div className="flex items-end gap-4">
+              <span
+                className="grid h-20 w-20 shrink-0 place-items-center rounded-[18px] text-2xl font-black text-ink transition-transform duration-300 hover:scale-[1.04]"
+                style={{ background: `linear-gradient(145deg, ${p.avatarColor}, ${p.avatarColor}bb)`, boxShadow: `0 8px 28px ${p.avatarColor}55, 0 0 0 1px rgba(255,255,255,0.15)` }}
+              >
+                {p.name.replace(/^[^ ]+ /, '').slice(0, 2).toUpperCase()}
+              </span>
+              <div className="pb-1">
+                <h2 className="text-[22px] font-black leading-tight tracking-tight text-white">{p.name}</h2>
+                <p className="mt-1 flex flex-wrap items-center gap-x-1.5 gap-y-0.5 text-sm text-white/60">
+                  <span>{p.sex === 'L' ? 'Male' : 'Female'}</span>
+                  <span className="text-white/25">·</span>
+                  <span>{ageFromDob(p.dob)} years old</span>
+                  {p.bloodType && (<><span className="text-white/25">·</span><span className="font-semibold text-white/80">Type {p.bloodType}</span></>)}
+                  <span className="text-white/25">·</span>
+                  <span className="font-mono text-xs text-white/50">{p.mrn}</span>
+                </p>
+              </div>
+            </div>
+            <div className="flex flex-col items-center gap-1 rounded-2xl bg-white/[0.06] px-4 py-3 backdrop-blur-sm sm:items-end">
+              <LongevityRing score={longevity.score} band={longevity.band} />
+              <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-white/50">Longevity Score</span>
+            </div>
+          </div>
+
+          {/* Live signal strip — same real numbers as the Vital Signs card
+              below, surfaced here so the hero isn't just a name plate. */}
+          {latest && (
+            <div className="mt-5 grid grid-cols-3 gap-2 sm:grid-cols-5">
+              {[
+                { label: 'BP', value: `${latest.systolic}/${latest.diastolic}` },
+                { label: 'Pulse', value: `${latest.heartRate}` },
+                { label: 'SpO₂', value: `${latest.spo2}%` },
+                { label: 'Temp', value: `${latest.tempC}°C` },
+                { label: 'RR', value: `${latest.respRate}/min` },
+              ].map((s) => (
+                <div key={s.label} className="rounded-xl border border-white/10 bg-white/[0.04] px-3 py-2 text-center backdrop-blur-sm">
+                  <div className="text-[9px] font-bold uppercase tracking-[0.14em] text-white/40">{s.label}</div>
+                  <div className="mt-0.5 text-sm font-bold tabular-nums text-white">{s.value}</div>
                 </div>
-              </div>
-              <div className="flex flex-col items-center gap-1 sm:pb-1">
-                <LongevityRing score={longevity.score} band={longevity.band} />
-                <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-neutral-500">Longevity Score</span>
-              </div>
+              ))}
             </div>
+          )}
 
-            <div className="mt-5 flex flex-wrap gap-1.5">
-              {p.chronicConditions.length === 0 && p.allergies.length === 0 ? (
-                <span className="inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-[11px] font-semibold" style={{ background: 'rgba(0,191,99,0.06)', color: '#0B7A4B' }}>
-                  <span className="h-1.5 w-1.5 rounded-full bg-[#00BF63]" />No chronic conditions / allergies recorded
-                </span>
-              ) : (
-                <>
-                  {p.chronicConditions.map((c) => (
-                    <span key={c} className="inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-[11px] font-semibold" style={{ background: 'rgba(255,49,49,0.05)', color: '#FF3131' }}>
-                      <span className="h-1.5 w-1.5 rounded-full" style={{ background: '#FF3131' }} />{c}
-                    </span>
-                  ))}
-                  {p.allergies.map((a) => (
-                    <span key={a} className="inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-[11px] font-semibold" style={{ background: 'rgba(245,158,11,0.06)', color: '#b45309' }}>
-                      <span className="h-1.5 w-1.5 rounded-full bg-amber-400" />Allergy: {a}
-                    </span>
-                  ))}
-                </>
-              )}
-            </div>
-
-            <p className="mt-4 flex items-center gap-1.5 text-[10px] text-neutral-500">
-              <IconShield size={11} className="text-[#00BF63]" /> Health data is confidential — only shared with the patient's consent.
-            </p>
+          <div className="mt-5 flex flex-wrap gap-1.5">
+            {p.chronicConditions.length === 0 && p.allergies.length === 0 ? (
+              <span className="inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-[11px] font-semibold" style={{ background: 'rgba(0,191,99,0.16)', color: '#7ce8a4' }}>
+                <span className="h-1.5 w-1.5 rounded-full bg-[#00BF63]" />No chronic conditions / allergies recorded
+              </span>
+            ) : (
+              <>
+                {p.chronicConditions.map((c) => (
+                  <span key={c} className="inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-[11px] font-semibold" style={{ background: 'rgba(255,49,49,0.14)', color: '#ff8a8a' }}>
+                    <span className="h-1.5 w-1.5 rounded-full" style={{ background: '#FF3131' }} />{c}
+                  </span>
+                ))}
+                {p.allergies.map((a) => (
+                  <span key={a} className="inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-[11px] font-semibold" style={{ background: 'rgba(245,158,11,0.16)', color: '#fbc36f' }}>
+                    <span className="h-1.5 w-1.5 rounded-full bg-amber-400" />Allergy: {a}
+                  </span>
+                ))}
+              </>
+            )}
           </div>
         </div>
-      </Card>
+      </div>
 
       {/* AI Clinical Insight */}
       {backendEnabled && <AiClinicalInsight patient={p} vitals={vitals} supportive={supportive} />}
