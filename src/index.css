@@ -615,6 +615,15 @@ button:active, a[href]:active, [role='button']:active { transform: scale(0.985);
   100% { background-position: 400% 50%; }
 }
 
+/* "Flying in" entrance — a popup arriving from above with a slight tilt and
+   overshoot, not a plain fade. Used by DailyQuoteBanner. */
+@keyframes fly-in-drop {
+  0% { opacity: 0; transform: translateY(-64px) scale(0.92) rotate(-3deg); }
+  60% { opacity: 1; transform: translateY(6px) scale(1.015) rotate(0.5deg); }
+  100% { opacity: 1; transform: translateY(0) scale(1) rotate(0deg); }
+}
+.reduce-motion .fly-in-drop { animation: none !important; }
+
 /* Cahaya dibiaskan lewat prisma — motif langsung diminta lewat referensi
    (piramida kaca yang memecah satu berkas cahaya jadi pita pelangi). Dipakai
    sebagai aksen sudut pada kartu-kartu hero utama (bukan semua kartu), lewat

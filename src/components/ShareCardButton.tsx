@@ -103,7 +103,7 @@ export function ShareCardButton({
       disabled={busy}
       aria-label="Share this card"
       title="Share this card"
-      className={`grid h-8 w-8 shrink-0 place-items-center rounded-full bg-black/30 text-white/80 backdrop-blur-sm transition hover:bg-black/45 hover:text-white disabled:opacity-50 ${className}`}
+      className={`grid h-8 w-8 shrink-0 place-items-center rounded-full border border-white/15 bg-black/55 text-white backdrop-blur-sm transition hover:bg-black/75 disabled:opacity-50 ${className}`}
     >
       {busy ? <span className="h-3.5 w-3.5 animate-spin rounded-full border-2 border-white/40 border-t-white" /> : <IconShare2 size={15} />}
     </button>
