@@ -111,6 +111,7 @@ import { googleLogin, devLogin, currentUser, clearSession, requireAuth } from '.
 import { emailOtpStart, emailOtpVerify, emailOtpLive } from './otp.js'
 import { putusanPengingat } from './jadwal.js'
 import { aiMessages, aiConsult, aiVision, aiOperator, reviewApplicationText, draftSecondOpinion, generateOperatorBriefing, aiConfigured, aiStatus } from './ai.js'
+import { anatomyOntologyLookup } from './anatomyOntology.js'
 import { sendEmail } from './email.js'
 import { sendPush, notify, keadaanPush } from './push.js'
 import { submitEmr } from './satusehat.js'
@@ -232,6 +233,24 @@ app.get('/api/health', (_req, res) => {
     googleClientId: features.googleLive ? config.googleClientId : null,
     promo: earlyAdopterInfo(),
   })
+})
+
+// Body Explorer — retrieval/grounding layer, bukan endpoint AI. Mengambil
+// istilah asli dari dua ontologi kedokteran gratis (Human Disease Ontology &
+// Human Phenotype Ontology, lewat EBI OLS4) untuk satu region tubuh, supaya
+// penjelasan yang dirangkai LLM di layar bisa mengutip sumber nyata alih-alih
+// mengarang hubungan organ-penyakit sendiri. Data publik, tanpa data pasien —
+// tidak perlu requireAuth.
+app.get('/api/anatomy/ontology', async (req, res) => {
+  const raw = String(req.query.terms ?? '')
+  const terms = raw.split(',').map((t) => t.trim()).filter(Boolean)
+  if (!terms.length) return res.status(400).json({ error: 'terms wajib diisi (dipisah koma)' })
+  try {
+    const hasil = await anatomyOntologyLookup(terms)
+    res.json(hasil)
+  } catch (e) {
+    res.status(502).json({ error: 'Ontology lookup gagal', detail: (e as Error).message })
+  }
 })
 
 // Per-user promo status (am I one of the first 25? → 75% off everything).

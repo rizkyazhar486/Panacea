@@ -17,6 +17,7 @@ const NotFound = lazy(() => import('./pages/NotFound').then((m) => ({ default: m
 const Chatbot = lazy(() => import('./pages/Chatbot').then((m) => ({ default: m.Chatbot })))
 const Dashboard = lazy(() => import('./pages/Dashboard').then((m) => ({ default: m.Dashboard })))
 const Nutrition = lazy(() => import('./pages/Nutrition').then((m) => ({ default: m.Nutrition })))
+const BodyExplorer = lazy(() => import('./pages/BodyExplorer').then((m) => ({ default: m.BodyExplorer })))
 const Consult = lazy(() => import('./pages/Consult').then((m) => ({ default: m.Consult })))
 const Hospitals = lazy(() => import('./pages/Hospitals').then((m) => ({ default: m.Hospitals })))
 const Pharmacy = lazy(() => import('./pages/Pharmacy').then((m) => ({ default: m.Pharmacy })))
@@ -451,6 +452,7 @@ createRoot(document.getElementById('root')!).render(
               <Route path="/thermal-therapy" element={<ThermalTherapy />} />
               <Route path="/trials" element={<ClinicalTrials />} />
               <Route path="/nutrition" element={<Nutrition />} />
+              <Route path="/body-explorer" element={<BodyExplorer />} />
               <Route path="/athlete" element={<Athlete />} />
               <Route path="/recovery" element={<Recovery />} />
               <Route path="/workout" element={<Workout />} />

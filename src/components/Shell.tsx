@@ -119,6 +119,7 @@ const nav: Nav[] = [
   { to: '/recovery', label: 'Sleep & Recovery', icon: IconMoon, roles: ['pasien', 'dokter'], group: 'Move' },
   { to: '/tubuh', label: 'Your Numbers', icon: IconActivity, roles: ['pasien', 'dokter', 'owner'], group: 'Your Body' },
   { to: '/nutrition', label: 'Nutrition', icon: IconFood, roles: ['pasien', 'dokter', 'owner'], group: 'Your Body' },
+  { to: '/body-explorer', label: 'Body Explorer', icon: IconActivity, roles: ['pasien', 'dokter', 'owner'], group: 'Your Body' },
   { to: '/health-data', label: 'Health Data', icon: IconHeart, roles: ['pasien', 'dokter', 'owner'], group: 'Your Body' },
   { to: '/emergency', label: 'Emergency Card', icon: IconShield, roles: ['pasien', 'dokter', 'owner'], group: 'Services' },
   // Pengetahuan — dahulu "Klinis". Isinya sama, perkenalannya berbeda.
@@ -169,6 +170,7 @@ const KATALOG: Nav[] = [
   { to: '/keuangan', label: 'Finance', icon: IconToken, roles: ['pasien', 'dokter', 'owner'], group: 'Money' },
   { to: '/owner-analytics', label: 'Owner Analytics', icon: IconShield, roles: ['owner'], group: 'Manage' },
   { to: '/nutrition', label: 'Nutrition', icon: IconFood, roles: ['pasien'], group: 'Health' },
+  { to: '/body-explorer', label: 'Body Explorer', icon: IconActivity, roles: ['pasien'], group: 'Health' },
   { to: '/emergency', label: 'Emergency Card & SOS', icon: IconShield, roles: ['pasien', 'dokter', 'owner'], group: 'Health' },
   { to: '/education', label: 'Education', icon: IconBook, roles: ['pasien'], group: 'Content' },
   { to: '/recovery', label: 'Recovery', icon: IconMoon, roles: ['pasien', 'dokter'], group: 'Health' },

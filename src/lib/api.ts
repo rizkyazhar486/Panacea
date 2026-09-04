@@ -31,6 +31,7 @@ export interface WebhookDelivery {
   newestSampleDate: string | null
 }
 export interface SymbolHit { symbol: string; name: string; exchange: string | null; type: string | null }
+export interface OntologyTerm { id: string; label: string; ontology: 'doid' | 'hp'; description: string; iri: string }
 export interface MarketCandle { t: number; c: number; o?: number; h?: number; l?: number; v?: number }
 export interface MarketQuote {
   symbol: string; name: string; currency: string
@@ -237,6 +238,9 @@ export const api = {
   marketSearch: (q: string) =>
     req<{ results: SymbolHit[] }>(`/api/markets/search?q=${encodeURIComponent(q)}`),
   marketNews: () => req<{ items: LiveNewsItem[]; fetchedAt: number }>('/api/markets/news'),
+  anatomyOntology: (terms: string[]) =>
+    req<{ diseases: OntologyTerm[]; phenotypes: OntologyTerm[] }>(
+      `/api/anatomy/ontology?terms=${encodeURIComponent(terms.join(','))}`),
   // in-app notification inbox
   notifications: () => req<{ notifications: Notif[] }>('/api/notifications').then((r) => r.notifications),
   // Heart-rate log. `since` is epoch ms; omit for the last 24 hours.

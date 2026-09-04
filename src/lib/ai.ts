@@ -1,5 +1,5 @@
 import { SYSTEM_PROMPT, EMR_DRAFT_INSTRUCTION, EMR_FRAMEWORK } from './systemPrompt'
-import { api, backendEnabled } from './api'
+import { api, backendEnabled, type OntologyTerm } from './api'
 import type {
   ChatMessage,
   Patient,
@@ -307,5 +307,48 @@ function demoDraft(ctx: PatientContext): EMRDraft {
       'Mancia G, et al. 2023 ESH Guidelines for the management of arterial hypertension. J Hypertens. 2023.',
       "Whelton PK, et al. ACC/AHA Hypertension Guideline. 2017 (related update).",
     ],
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Body Explorer — penjelasan yang DIGROUNDING pada istilah nyata dari
+// /api/anatomy/ontology, bukan tebakan bebas model. Terminologi yang
+// diambilkan (DOID/HP) disuntikkan sebagai konteks WAJIB DIRUJUK; model
+// dilarang mendiagnosis pasien tertentu di sini — ini penjelasan edukatif
+// umum tentang satu region tubuh, bukan konsultasi.
+// ─────────────────────────────────────────────────────────────────────────────
+function groundingBlock(regionLabel: string, diseases: OntologyTerm[], phenotypes: OntologyTerm[]): string {
+  const fmt = (t: OntologyTerm) => `- [${t.id}] ${t.label}${t.description ? `: ${t.description}` : ''}`
+  return [
+    `RETRIEVED ONTOLOGY TERMS for "${regionLabel}" (Human Disease Ontology + Human Phenotype Ontology, via EBI OLS4):`,
+    diseases.length ? `Diseases:\n${diseases.map(fmt).join('\n')}` : 'Diseases: none retrieved.',
+    phenotypes.length ? `Phenotypes/symptoms:\n${phenotypes.map(fmt).join('\n')}` : 'Phenotypes: none retrieved.',
+    '',
+    'INSTRUCTIONS: Write a short (120-180 words), plain-language educational explanation of this body region — what it does, and how the retrieved terms above relate to it. Cite each term you use by its bracketed ID, e.g. "[DOID:9351]". Do NOT diagnose the specific reader or invent terms not in the list above. This is general anatomy/health education, not a consultation for an individual patient.',
+  ].join('\n\n')
+}
+
+export async function explainBodyRegion(
+  settings: AISettings,
+  regionLabel: string,
+  diseases: OntologyTerm[],
+  phenotypes: OntologyTerm[],
+): Promise<string> {
+  if (!aiAvailable()) {
+    return `${regionLabel}: general educational information about this region isn't available right now (AI is offline), but the retrieved terms below are real entries from the Human Disease Ontology and Human Phenotype Ontology.`
+  }
+  try {
+    const { text } = await api.aiMessages({
+      model: settings.model,
+      system: 'You are a medical educator. Explain anatomy and terminology in plain, accessible language for a general audience. Always cite retrieved term IDs when you use them.',
+      messages: [{ role: 'user', content: groundingBlock(regionLabel, diseases, phenotypes) }],
+      max_tokens: 400,
+    })
+    return text || 'No explanation was generated.'
+  } catch (e) {
+    if (String((e as Error)?.message).includes('rate_limited')) {
+      return '⏳ Too many requests in a short time. Please wait a moment and try again.'
+    }
+    return 'Could not generate an explanation right now — the retrieved terms below are still real ontology entries you can read directly.'
   }
 }
