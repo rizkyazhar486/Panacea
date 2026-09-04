@@ -502,6 +502,20 @@ function CostEstimateField({
           <option value="verified">Verified</option>
         </select>
       </div>
+
+      {episode.facilityId && (
+        <CommunityPrices
+          facilityId={episode.facilityId}
+          diagnosisCode={episode.diagnosisCode}
+          diagnosisTitle={episode.title}
+          myPrice={{
+            low: low ? Number(low) : undefined,
+            high: high ? Number(high) : undefined,
+            confidence: episode.costConfidence ?? 'estimated',
+            source: source.trim() || undefined,
+          }}
+        />
+      )}
     </Field>
   )
 }
