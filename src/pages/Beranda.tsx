@@ -154,8 +154,8 @@ function Garis({ deret, kelas }: { deret: number[]; kelas: string }) {
  */
 function KartuKpi({ k, utama }: { k: Kpi; utama?: boolean }) {
   return (
-    <div className={`tile-inset flex min-w-0 flex-col ${DALAM} rounded-2xl bg-gradient-to-br from-cyan-100/70 via-fuchsia-100/50 to-amber-100/60 p-3 dark:from-cyan-400/10 dark:via-fuchsia-400/10 dark:to-transparent`}>
-      <span className="t-mikro truncate font-bold uppercase tracking-wide text-neutral-500">{k.label}</span>
+    <div className={`tile-inset flex min-w-0 flex-col ${DALAM} rounded-2xl bg-white/75 p-3 dark:bg-black/45`}>
+      <span className="t-mikro truncate font-bold uppercase tracking-wide text-neutral-600 dark:text-white/70">{k.label}</span>
       {/* flex-wrap, bukan satu baris kaku: pada kartu sempit "12" dan satuannya
           "tercatat" saling menimpa — terlihat di tangkapan layar, tidak pernah
           terlihat dari kode. */}
@@ -164,7 +164,7 @@ function KartuKpi({ k, utama }: { k: Kpi; utama?: boolean }) {
             di index.css: pada ukuran yang sama, "118/76" tidak muat di petak
             yang memuat "72" dengan lapang. */}
         <span className={`${k.nilai.length >= 5 ? 't-angka-panjang' : 't-angka'} num-carved ${utama ? 'nyala' : ''} min-w-0 font-black leading-none tabular-nums ${k.nada}`}>{k.nilai}</span>
-        {k.satuan && <span className="t-mikro min-w-0 truncate font-bold text-neutral-400">{k.satuan}</span>}
+        {k.satuan && <span className="t-mikro min-w-0 truncate font-bold text-neutral-500 dark:text-white/50">{k.satuan}</span>}
       </span>
       {k.deret && <Garis deret={k.deret} kelas={k.nada} />}
     </div>
