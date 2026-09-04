@@ -606,6 +606,51 @@ button:active, a[href]:active, [role='button']:active { transform: scale(0.985);
   100% { background-position: 400% 50%; }
 }
 
+/* Cahaya dibiaskan lewat prisma — motif langsung diminta lewat referensi
+   (piramida kaca yang memecah satu berkas cahaya jadi pita pelangi). Dipakai
+   sebagai aksen sudut pada kartu-kartu hero utama (bukan semua kartu), lewat
+   mix-blend-mode supaya menyatu dengan warna kartu, bukan menumpuk di
+   atasnya. Bekerja di kedua tema karena "screen" pada dasarnya menambah
+   cahaya, bukan mengganti warna. */
+@keyframes prism-breathe {
+  0%, 100% { opacity: 0.4; }
+  50% { opacity: 0.7; }
+}
+
+.prism-rays {
+  position: relative;
+  overflow: hidden;
+}
+
+.prism-rays::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1;
+  background: repeating-conic-gradient(from 205deg at 0% 100%,
+    rgba(244, 63, 94, 0.95) 0deg 3deg, transparent 3deg 9deg,
+    rgba(245, 158, 11, 0.95) 9deg 12deg, transparent 12deg 18deg,
+    rgba(250, 204, 21, 0.9) 18deg 21deg, transparent 21deg 27deg,
+    rgba(16, 185, 129, 0.95) 27deg 30deg, transparent 30deg 36deg,
+    rgba(6, 182, 212, 0.95) 36deg 39deg, transparent 39deg 45deg,
+    rgba(37, 99, 235, 0.95) 45deg 48deg, transparent 48deg 54deg,
+    rgba(139, 92, 246, 0.95) 54deg 57deg, transparent 57deg 63deg);
+  -webkit-mask-image: radial-gradient(130% 130% at 0% 100%, #000 35%, transparent 82%);
+  mask-image: radial-gradient(130% 130% at 0% 100%, #000 35%, transparent 82%);
+  mix-blend-mode: screen;
+  animation: prism-breathe 7s ease-in-out infinite;
+}
+
+.dark .prism-rays::before {
+  mix-blend-mode: plus-lighter;
+  opacity: 0.85;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .prism-rays::before { animation: none; }
+}
+
 /* "Bukan pelangi lemah" — langsung diminta setelah versi pastel dianggap
    masih lembek. Warnanya sekarang jenuh penuh (bukan corak Tailwind-400
    yang lembut), alpha dinaikkan, dan saturate() dilipatkan supaya benar-

@@ -518,7 +518,7 @@ export function Dashboard() {
           drawn here is decorative fabrication: the glow color and the
           "signal" chips are the patient's own avatar color and latest
           recorded vitals. */}
-      <div className="relative overflow-hidden rounded-2xl" style={{ background: '#0b191e' }}>
+      <div className="prism-rays relative overflow-hidden rounded-2xl" style={{ background: '#0b191e' }}>
         {/* Layered radial glow — a deep-space feel using the patient's own
             accent color plus the brand green, not arbitrary decoration. */}
         <div
