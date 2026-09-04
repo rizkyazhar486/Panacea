@@ -393,10 +393,10 @@ export default function Beranda() {
       {/* ── PANEL ATAS — dibaca menyilang (Z) ───────────────────────────────
           kiri-atas: siapa saya · kanan-atas: aksi utama
           kiri-bawah: angka       · kanan-bawah: ke mana lanjut          */}
-      <section className="kaca prism-rays p-fluid overflow-hidden rounded-3xl">
+      <section className="kaca-hero prism-rays p-fluid overflow-hidden rounded-3xl">
         <div className="flex items-start justify-between gap-3">
           <div className="min-w-0">
-            <h1 className="t-judul truncate font-black leading-tight text-ink dark:text-white">
+            <h1 className="t-judul truncate font-black leading-tight text-white drop-shadow-sm">
               Hi{nama && `, ${nama}`}
             </h1>
           </div>

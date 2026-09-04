@@ -103,10 +103,19 @@ html {
    sian/magenta/emas/ungu, bintang, dan dua guratan cahaya prismatik.
    Kartu .kaca di atasnya tetap opak (lihat aturan di bawah), jadi
    wallpaper gelap ini hanya terlihat di celah, bukan di balik tulisan. */
+/* Referensi "glass ribbon" yang diminta: kanvasnya nyaris PUTIH polos —
+   warnanya ada di bentuk kaca yang melayang di atasnya (.kaca), bukan di
+   latar itu sendiri. Wallpaper berwarna yang dulu dipakai di sini
+   bertentangan langsung dengan itu, jadi diganti putih bersih dengan
+   sedikit sekali gradasi (bukan nol, supaya tidak terasa seperti kertas
+   HTML kosong). */
 body {
   margin: 0;
   font-family: var(--font-sans);
-  background: url('/space-wallpaper.svg') no-repeat top center / cover fixed, #eef3fb;
+  background:
+    radial-gradient(60% 45% at 15% -10%, rgba(255, 102, 0, 0.05) 0%, transparent 60%),
+    radial-gradient(55% 45% at 100% 10%, rgba(0, 133, 255, 0.05) 0%, transparent 60%),
+    #fcfcfd;
   color: var(--color-ink);
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
@@ -786,6 +795,55 @@ button:active, a[href]:active, [role='button']:active { transform: scale(0.985);
   opacity: 0.95;
 }
 
+/* "Glass ribbon" — dipakai HANYA pada satu-dua kartu hero per halaman
+   (mis. "Hi, {name}" di Home, kartu pasien di Dashboard), bukan kartu
+   berisi data/borang. .kaca sendiri sengaja dibuat nyaris-putih supaya
+   label abu-abu tetap terbaca (lihat catatan di atas) — tapi hero yang
+   isinya cuma judul singkat + angka besar boleh memakai warna jenuh
+   penuh seperti pita kaca di referensi, karena tidak ada label kecil
+   yang dipertaruhkan di situ. Teks di dalamnya HARUS putih tegas
+   (lihat pemakaian), bukan text-ink, karena latarnya gelap/jenuh lagi. */
+.kaca-hero {
+  position: relative;
+  overflow: hidden;
+  background:
+    linear-gradient(125deg,
+      rgba(255, 26, 0, 0.94) 0%,
+      rgba(255, 102, 0, 0.94) 20%,
+      rgba(255, 199, 44, 0.88) 38%,
+      rgba(0, 163, 255, 0.9) 62%,
+      rgba(157, 0, 255, 0.88) 82%,
+      rgba(255, 0, 127, 0.88) 100%);
+  animation: kaca-aurora 16s ease-in-out infinite;
+  border: 1px solid rgba(255,255,255,0.55);
+  box-shadow:
+    0 1px 2px rgba(12,20,16,0.08),
+    0 14px 30px -10px rgba(12,20,16,0.28),
+    0 28px 56px -18px rgba(12,20,16,0.24),
+    inset 0 1px 0 rgba(255,255,255,0.7);
+}
+/* Kilau kaca diagonal — satu garis terang yang melintas dari sudut ke
+   sudut, seperti cahaya memantul di permukaan pita kaca referensi.
+   Statis (bukan animasi sapuan) supaya tidak bersaing dengan teks. */
+.kaca-hero::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(115deg,
+    rgba(255,255,255,0.35) 0%,
+    rgba(255,255,255,0.08) 22%,
+    transparent 42%);
+}
+.dark .kaca-hero {
+  border-color: rgba(255,255,255,0.14);
+  box-shadow:
+    0 1px 2px rgba(0,0,0,0.5),
+    0 14px 30px -10px rgba(0,0,0,0.5),
+    0 28px 56px -18px rgba(0,0,0,0.45),
+    inset 0 1px 0 rgba(255,255,255,0.12);
+}
+
 /* Di layar sentuh pantulan digerakkan oleh gulir, bukan kursor. */
 @media (pointer: coarse) {
   .kaca { --ky: var(--kilau-gulir, 30%); }
@@ -1345,8 +1403,14 @@ html { -webkit-overflow-scrolling: touch; }
    tapi warnanya sendiri sekarang hijau/biru/ungu/emas yang jenuh, bukan
    putih. Orb tidak lagi perlu diredupkan ke 0,3 karena kartu tidak lagi
    tembus terhadapnya. */
+/* Referensi "glass ribbon" terbaru: kanvasnya nyaris putih, warnanya ada
+   di bentuk kaca yang melayang, bukan di latar. 0,85 di sini dulu justru
+   membuat latar belakang penuh warna sebelum satu kartu pun dibuka —
+   diredupkan jauh supaya kanvas tetap bersih dan kartu .kaca yang
+   menjadi satu-satunya sumber warna, seperti pita kaca di atas kertas
+   putih pada referensi. */
 :root:not(.dark) .orb {
-  opacity: 0.85;
+  opacity: 0.22;
 }
 
 :root:not(.dark) .kaca {
