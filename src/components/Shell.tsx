@@ -503,9 +503,13 @@ export function Shell({ children }: { children: ReactNode }) {
         <div className="orb absolute bottom-0 left-1/2 h-72 w-72 rounded-full bg-red-500/16 blur-3xl dark:bg-violet-500/10" style={{ animationDelay: '-14s' }} />
         <div className="orb absolute right-10 bottom-10 h-72 w-72 rounded-full bg-amber-300/18 blur-3xl dark:bg-amber-400/16" style={{ animationDelay: '-4s' }} />
         <div className="orb absolute left-1/4 top-0 h-72 w-72 rounded-full bg-orange-500/16 blur-3xl dark:bg-amber-500/10" style={{ animationDelay: '-6s' }} />
-        <div className="orb absolute left-10 top-1/2 h-80 w-80 rounded-full bg-fuchsia-500/18 blur-3xl dark:bg-violet-500/9" style={{ animationDelay: '-18s' }} />
-        <div className="orb absolute right-1/3 top-0 h-64 w-64 rounded-full bg-indigo-500/16 blur-3xl dark:bg-sky-500/9" style={{ animationDelay: '-11s' }} />
-        <div className="orb absolute left-1/3 bottom-1/4 h-60 w-60 rounded-full bg-blue-400/18 blur-3xl dark:bg-sky-400/9" style={{ animationDelay: '-21s' }} />
+        {/* Fuchsia/indigo pastel di sini dulu adalah sumber "terasa feminin" yang
+            dikeluhkan — bukan warnanya yang salah, tapi pilihan nada pastel-
+            lembutnya. Diganti violet gelap dan biru-baja yang lebih tegas,
+            sejalan dengan urutan api-dulu yang sudah dipakai di .kaca. */}
+        <div className="orb absolute left-10 top-1/2 h-80 w-80 rounded-full bg-violet-700/18 blur-3xl dark:bg-violet-500/9" style={{ animationDelay: '-18s' }} />
+        <div className="orb absolute right-1/3 top-0 h-64 w-64 rounded-full bg-blue-700/16 blur-3xl dark:bg-sky-500/9" style={{ animationDelay: '-11s' }} />
+        <div className="orb absolute left-1/3 bottom-1/4 h-60 w-60 rounded-full bg-sky-600/18 blur-3xl dark:bg-sky-400/9" style={{ animationDelay: '-21s' }} />
       </div>
       <aside className={`sticky top-0 z-10 hidden h-screen shrink-0 flex-col border-r border-black/5 bg-white/80 py-6 backdrop-blur-xl transition-all duration-300 lg:flex ${sidebarOpen ? 'w-64 px-4' : 'w-0 overflow-hidden border-r-0 px-0 opacity-0'}`}>
         <div className="mb-6 flex items-center justify-between gap-2 px-2">
