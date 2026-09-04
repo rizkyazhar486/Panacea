@@ -244,6 +244,25 @@ button:active, a[href]:active, [role='button']:active { transform: scale(0.985);
   outline: none;
 }
 
+/* "Cahaya bergairah" saat difokus — pinjaman dari referensi "Liquid Glass UI
+   Kit": bidang isian menyala dengan gradasi cyan-ke-ungu yang lembut saat
+   disentuh, bukan cincin solid datar. HANYA saat :focus (bukan keadaan
+   diam), jadi tidak menambah warna permanen yang bisa mengulang masalah
+   kontras sebelumnya — begitu fokus lepas, tampilannya kembali seperti
+   semula. */
+input:focus, textarea:focus, select:focus {
+  box-shadow:
+    0 0 0 3px rgba(0, 163, 255, 0.16),
+    0 0 18px -2px rgba(0, 163, 255, 0.35),
+    0 0 28px -4px rgba(157, 0, 255, 0.25);
+}
+.dark input:focus, .dark textarea:focus, .dark select:focus {
+  box-shadow:
+    0 0 0 3px rgba(0, 163, 255, 0.22),
+    0 0 20px -2px rgba(0, 210, 255, 0.5),
+    0 0 32px -4px rgba(157, 0, 255, 0.35);
+}
+
 /* Hide scrollbar visually while staying scrollable — used by the bottom nav
    strip so it can grow with the app without ever looking cramped. */
 .no-scrollbar { scrollbar-width: none; -ms-overflow-style: none; }
