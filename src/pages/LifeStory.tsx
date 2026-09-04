@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { useStore } from '../lib/store'
 import { Card, SectionTitle, Badge, Button, Field, inputClass } from '../components/ui'
-import { IconBook, IconPlus } from '../components/icons'
+import { IconBook, IconPlus, IconDownload } from '../components/icons'
 import {
   LIFE_DOMAINS,
   DOMAIN_LABEL,
@@ -11,6 +11,7 @@ import {
   lifeEventToStoryItem,
   careEpisodeToStoryItems,
   type StoryItem,
+  type LifeChapter,
 } from '../lib/lifeStory'
 import { ageFromDob } from '../lib/anthro'
 import type { LifeDomain, LifeEvent, Quest } from '../lib/types'
@@ -59,54 +60,104 @@ export function LifeStory() {
   const currentChapter = chapterForAge(ageFromDob(activePatient.dob))
 
   return (
-    <div className="space-y-5">
-      <SectionTitle
-        icon={<IconBook size={18} />}
-        title="Your Story"
-        subtitle="Not vitals and labs — the moments that actually shape a life. You're the protagonist."
-      />
+    <>
+      {/* Screen view — the working, editable app. Hidden entirely when
+          printing/exporting, so the two never render on top of each other. */}
+      <div className="story-screen-only space-y-5">
+        <SectionTitle
+          icon={<IconBook size={18} />}
+          title="Your Story"
+          subtitle="Not vitals and labs — the moments that actually shape a life. You're the protagonist."
+          right={
+            <Button variant="outline" onClick={() => window.print()} className="!min-h-0 !px-3 !py-1.5 text-xs">
+              <IconDownload size={14} /> Export
+            </Button>
+          }
+        />
 
-      <Card className="bg-brand-50/40 text-center">
-        <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-neutral-500">Current chapter</p>
-        <h2 className="mt-1 text-2xl font-black tracking-tight text-ink">{currentChapter.name}</h2>
-        <p className="text-sm text-neutral-500">Age {currentChapter.ageRange}</p>
-      </Card>
+        <Card className="bg-brand-50/40 text-center">
+          <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-neutral-500">Current chapter</p>
+          <h2 className="mt-1 text-2xl font-black tracking-tight text-ink">{currentChapter.name}</h2>
+          <p className="text-sm text-neutral-500">Age {currentChapter.ageRange}</p>
+        </Card>
 
-      <QuestBoard
-        quests={quests}
-        onAdd={(q) => addQuest(activePatient.id, q)}
-        onProgress={(id, n) => updateQuestProgress(activePatient.id, id, n)}
-        onStatus={(id, s) => setQuestStatus(activePatient.id, id, s)}
-        onRemove={(id) => removeQuest(activePatient.id, id)}
-      />
+        <QuestBoard
+          quests={quests}
+          onAdd={(q) => addQuest(activePatient.id, q)}
+          onProgress={(id, n) => updateQuestProgress(activePatient.id, id, n)}
+          onStatus={(id, s) => setQuestStatus(activePatient.id, id, s)}
+          onRemove={(id) => removeQuest(activePatient.id, id)}
+        />
 
-      <NewEventForm onAdd={(e) => addLifeEvent(activePatient.id, e)} />
+        <NewEventForm onAdd={(e) => addLifeEvent(activePatient.id, e)} />
 
-      {chapters.length === 0 && (
-        <p className="text-center text-sm text-neutral-500">
-          No chapters written yet — log your first moment above and your story begins.
-        </p>
-      )}
+        {chapters.length === 0 && (
+          <p className="text-center text-sm text-neutral-500">
+            No chapters written yet — log your first moment above and your story begins.
+          </p>
+        )}
 
-      <div className="space-y-6">
-        {[...chapters].reverse().map((chapter) => (
-          <div key={chapter.name}>
-            <div className="mb-2 flex items-baseline gap-2">
-              <h3 className="text-lg font-black tracking-tight text-ink">{chapter.name}</h3>
-              <span className="text-xs font-semibold text-neutral-400">Age {chapter.ageRange}</span>
+        <div className="space-y-6">
+          {[...chapters].reverse().map((chapter) => (
+            <div key={chapter.name}>
+              <div className="mb-2 flex items-baseline gap-2">
+                <h3 className="text-lg font-black tracking-tight text-ink">{chapter.name}</h3>
+                <span className="text-xs font-semibold text-neutral-400">Age {chapter.ageRange}</span>
+              </div>
+              <div className="space-y-2">
+                {[...chapter.items].reverse().map((item) => (
+                  <StoryItemCard
+                    key={item.id}
+                    item={item}
+                    onRemove={item.kind === 'life' ? () => removeLifeEvent(activePatient.id, item.id) : undefined}
+                  />
+                ))}
+              </div>
             </div>
-            <div className="space-y-2">
-              {[...chapter.items].reverse().map((item) => (
-                <StoryItemCard
-                  key={item.id}
-                  item={item}
-                  onRemove={item.kind === 'life' ? () => removeLifeEvent(activePatient.id, item.id) : undefined}
-                />
-              ))}
-            </div>
-          </div>
-        ))}
+          ))}
+        </div>
       </div>
+
+      {/* Print/export view — nothing computed here beyond the same chapter
+          grouping already used above; reads oldest-first, like a book,
+          rather than newest-first like the scanning-friendly screen view. */}
+      <PrintableStory name={activePatient.name} chapters={chapters} />
+
+      <style>{`
+        .story-print-only { display: none; }
+        @media print {
+          .story-screen-only, header, nav, aside, footer { display: none !important; }
+          .story-print-only { display: block !important; }
+        }
+      `}</style>
+    </>
+  )
+}
+
+function PrintableStory({ name, chapters }: { name: string; chapters: LifeChapter[] }) {
+  return (
+    <div className="story-print-only px-8 py-10 text-neutral-900" style={{ fontFamily: 'Georgia, serif' }}>
+      <h1 className="text-3xl font-bold">{name}'s Story</h1>
+      <p className="mb-8 text-sm text-neutral-500">Written in {name.split(' ')[0]}'s own words · generated {new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}</p>
+      {chapters.length === 0 && <p>No chapters written yet.</p>}
+      {chapters.map((chapter) => (
+        <section key={chapter.name} className="mb-8 break-inside-avoid-page">
+          <h2 className="mb-1 text-xl font-bold">
+            {chapter.name} <span className="font-normal text-neutral-500">— Age {chapter.ageRange}</span>
+          </h2>
+          <hr className="mb-3 border-neutral-300" />
+          {chapter.items.map((item) => (
+            <article key={item.id} className="mb-4 break-inside-avoid-page">
+              <p className="text-xs text-neutral-500">
+                {new Date(item.at).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}
+                {item.kind === 'health' ? ' · Health record' : ` · ${item.domains.map((d) => DOMAIN_LABEL[d]).join(', ')}`}
+              </p>
+              <h3 className="text-base font-bold">{item.title}</h3>
+              {item.note && <p className="text-sm leading-relaxed">{item.note}</p>}
+            </article>
+          ))}
+        </section>
+      ))}
     </div>
   )
 }
