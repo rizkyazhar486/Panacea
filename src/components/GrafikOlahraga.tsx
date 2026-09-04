@@ -214,7 +214,7 @@ export function GrafikOlahraga({
         <div className="text-slate-400">
           {cakup.jarak.ada === 0
             ? <Kosong pesan="No session has recorded a distance yet." />
-            : <Batang nilai={pekanan.map((p) => p.km)} label={labelPekan} warna="#60a5fa" format={(n) => n.toFixed(0) + ' km'} />}
+            : <Batang nilai={pekanan.map((p) => p.km)} label={labelPekan} warna="#0F52BA" format={(n) => n.toFixed(0) + ' km'} />}
         </div>
 
         {zona.sesiDipakai > 0 && (
@@ -285,7 +285,7 @@ export function GrafikOlahraga({
         anak={
           cakup.jarak.ada === 0
             ? <Kosong pesan="Not a single session has recorded a distance. This chart appears once there is a session with distance (running, walking, cycling)." />
-            : <Batang nilai={pekanan.map((p) => p.km)} label={labelPekan} warna="#60a5fa" format={(n) => n.toFixed(0) + ' km'} />
+            : <Batang nilai={pekanan.map((p) => p.km)} label={labelPekan} warna="#0F52BA" format={(n) => n.toFixed(0) + ' km'} />
         }
       />
 
@@ -295,7 +295,7 @@ export function GrafikOlahraga({
         anak={
           cakup.langkah.ada < MIN_SESI
             ? <Kosong pesan={`Only ${cakup.langkah.ada} sessions have recorded steps — not enough to call a trend. Some watches only record steps in walking mode.`} />
-            : <Garis nilai={harian.map((d) => d.langkah)} warna="#a78bfa" format={(n) => (n / 1000).toFixed(1) + 'k'} />
+            : <Garis nilai={harian.map((d) => d.langkah)} warna="#7C3AED" format={(n) => (n / 1000).toFixed(1) + 'k'} />
         }
       />
 
@@ -305,7 +305,7 @@ export function GrafikOlahraga({
         anak={
           cakup.pace.ada < MIN_SESI
             ? <Kosong pesan={`Only ${cakup.pace.ada} sessions have a pace. Pace is only computed for sessions that record both distance and time.`} />
-            : <Garis nilai={harian.map((d) => d.paceSec)} warna="#34d399" balik format={(n) => tulisPace(n).replace('/km', '')} />
+            : <Garis nilai={harian.map((d) => d.paceSec)} warna="#2EDC85" balik format={(n) => tulisPace(n).replace('/km', '')} />
         }
       />
 
@@ -315,7 +315,7 @@ export function GrafikOlahraga({
         anak={
           cakup.denyut.ada < MIN_SESI
             ? <Kosong pesan={`Only ${cakup.denyut.ada} sessions have recorded a heart rate. Sessions logged by hand have none.`} />
-            : <Garis nilai={harian.map((d) => d.avgHr)} warna="#f87171" format={(n) => Math.round(n) + '' } />
+            : <Garis nilai={harian.map((d) => d.avgHr)} warna="#D7263D" format={(n) => Math.round(n) + '' } />
         }
       />
 
@@ -325,7 +325,7 @@ export function GrafikOlahraga({
         anak={
           cakup.kadens.ada < MIN_SESI
             ? <Kosong pesan={`Only ${cakup.kadens.ada} sessions have recorded cadence — not enough to draw as a trend. Cadence is usually only captured by a running watch or a foot pod.`} />
-            : <Garis nilai={harian.map((d) => d.kadens)} warna="#fbbf24" format={(n) => Math.round(n) + ''} />
+            : <Garis nilai={harian.map((d) => d.kadens)} warna="#E1AD01" format={(n) => Math.round(n) + ''} />
         }
       />
 

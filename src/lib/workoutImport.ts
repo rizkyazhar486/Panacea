@@ -204,12 +204,18 @@ export function parseWorkouts(text: string): ImportedWorkout[] {
 
 // ── Zona ────────────────────────────────────────────────────────────────────
 
+// Setiap zona dulu memakai satu warna Tailwind generik (slate/emerald/blue/
+// amber/red-400) — cukup untuk membedakan, tapi datar dibanding palet
+// bernama yang diminta langsung ("shades of blue/green psychology sheet").
+// Warna di bawah dipilih dari keluarga yang sama tapi lebih spesifik dan
+// bermakna: hijau segar untuk aerobik dasar, biru tegas (bukan biru muda
+// polos) untuk tempo, emas untuk ambang, merah balap untuk usaha maksimal.
 const ZONA: { zona: 1 | 2 | 3 | 4 | 5; nama: string; dariPct: number; hinggaPct: number; warna: string }[] = [
   { zona: 1, nama: 'Pemulihan', dariPct: 0, hinggaPct: 60, warna: '#94a3b8' },
-  { zona: 2, nama: 'Aerobik dasar', dariPct: 60, hinggaPct: 70, warna: '#34d399' },
-  { zona: 3, nama: 'Tempo', dariPct: 70, hinggaPct: 80, warna: '#60a5fa' },
-  { zona: 4, nama: 'Ambang', dariPct: 80, hinggaPct: 90, warna: '#fbbf24' },
-  { zona: 5, nama: 'Maksimal', dariPct: 90, hinggaPct: 200, warna: '#f87171' },
+  { zona: 2, nama: 'Aerobik dasar', dariPct: 60, hinggaPct: 70, warna: '#3CB043' },
+  { zona: 3, nama: 'Tempo', dariPct: 70, hinggaPct: 80, warna: '#0F52BA' },
+  { zona: 4, nama: 'Ambang', dariPct: 80, hinggaPct: 90, warna: '#E8A33D' },
+  { zona: 5, nama: 'Maksimal', dariPct: 90, hinggaPct: 200, warna: '#E0115F' },
 ]
 
 /**
