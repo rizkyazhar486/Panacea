@@ -1,8 +1,9 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { Prosa } from '../components/Prosa'
 import { Link } from 'react-router-dom'
 import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, ReferenceArea } from 'recharts'
 import { Card, SectionTitle } from '../components/ui'
+import { ShareCardButton } from '../components/ShareCardButton'
 import { IconRun, IconHeart, IconActivity, IconTimer } from '../components/icons'
 import { getWorkouts, getHrNotifications, clearWorkouts, mergeWorkouts, mergeHrNotifications } from '../lib/workoutStore'
 import {
@@ -285,29 +286,33 @@ function WorkoutRow({ w, hrMax, terbuka, onToggle }: { w: ImportedWorkout; hrMax
   const zones = useMemo(() => (terbuka ? zoneBreakdown(w.hr, hrMax) : []), [terbuka, w.hr, hrMax])
   const chart = useMemo(() => w.hr.map((p) => ({ menit: +(p.t / 60).toFixed(1), bpm: p.bpm })), [w.hr])
   const tgl = new Date(w.mulai)
+  const shareRef = useRef<HTMLDivElement>(null)
 
   return (
-    <div className="rounded-lg border border-white/10 bg-white/[0.03] overflow-hidden">
-      <button onClick={onToggle} className="w-full text-left p-3">
-        <div className="flex flex-wrap items-baseline justify-between gap-2">
-          <span className="font-semibold text-ink text-sm">
-            {w.nama}
-            {w.diDalamRuangan === false && <span className="text-slate-500 font-normal"> · outdoors</span>}
-          </span>
-          <span className="text-xs text-slate-500">
-            {tgl.toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short' })}
-          </span>
-        </div>
-        <div className="mt-1.5 flex flex-wrap gap-x-3 gap-y-1 text-xs text-neutral-500">
-          <span>{fmtDurasi(w.durasi)}</span>
-          {w.jarakKm != null && <span>{w.jarakKm} km</span>}
-          {w.paceSec != null && <span>{fmtPace(w.paceSec)}/km</span>}
-          {w.avgHr != null && <span>♥ {w.avgHr} rata-rata</span>}
-          {w.maxHr != null && <span>↑ {w.maxHr} maks</span>}
-          {w.kcal != null && <span>{w.kcal} kkal</span>}
-          {w.kadens != null && <span>{w.kadens} spm</span>}
-        </div>
-      </button>
+    <div ref={shareRef} className="rounded-lg border border-white/10 bg-white/[0.03] overflow-hidden">
+      <div className="flex items-start gap-2 p-3">
+        <button onClick={onToggle} className="min-w-0 flex-1 text-left">
+          <div className="flex flex-wrap items-baseline justify-between gap-2">
+            <span className="font-semibold text-ink text-sm">
+              {w.nama}
+              {w.diDalamRuangan === false && <span className="text-slate-500 font-normal"> · outdoors</span>}
+            </span>
+            <span className="text-xs text-slate-500">
+              {tgl.toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short' })}
+            </span>
+          </div>
+          <div className="mt-1.5 flex flex-wrap gap-x-3 gap-y-1 text-xs text-neutral-500">
+            <span>{fmtDurasi(w.durasi)}</span>
+            {w.jarakKm != null && <span>{w.jarakKm} km</span>}
+            {w.paceSec != null && <span>{fmtPace(w.paceSec)}/km</span>}
+            {w.avgHr != null && <span>♥ {w.avgHr} rata-rata</span>}
+            {w.maxHr != null && <span>↑ {w.maxHr} maks</span>}
+            {w.kcal != null && <span>{w.kcal} kkal</span>}
+            {w.kadens != null && <span>{w.kadens} spm</span>}
+          </div>
+        </button>
+        {terbuka && <ShareCardButton targetRef={shareRef} fileName={`panaceamed-${w.nama.replace(/\s+/g, '-').toLowerCase()}.png`} title={w.nama} />}
+      </div>
 
       {terbuka && (
         <div className="px-3 pb-3 space-y-3">

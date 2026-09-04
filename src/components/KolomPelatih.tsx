@@ -1,6 +1,7 @@
-import { useMemo } from 'react'
+import { useMemo, useRef } from 'react'
 import { Link } from 'react-router-dom'
 import { Card, SectionTitle } from './ui'
+import { ShareCardButton } from './ShareCardButton'
 import { IconRun, IconActivity, IconTimer } from './icons'
 import type { ImportedWorkout } from '../lib/workoutImport'
 import type { Konteks } from '../lib/trainingPhysiology'
@@ -28,6 +29,7 @@ export function KolomPelatih({
     [workouts],
   )
   const terakhir = urut[0]
+  const debriefRef = useRef<HTMLDivElement>(null)
   // Angka di bawah dihitung terhadap waktu sekarang, jadi `sekarang` harus ikut
   // menjadi dependensi — kalau tidak, halaman yang dibiarkan terbuka semalaman
   // akan menampilkan kelelahan kemarin dan terlihat seolah tidak pernah turun.
@@ -125,8 +127,12 @@ export function KolomPelatih({
       {/* 2. Rangkuman sesi terakhir */}
       {db && (
         <Card>
-          <SectionTitle icon={<IconActivity />} title={db.judul}
-            subtitle={terakhir ? new Date(terakhir.mulai).toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long' }) : ''} />
+          <div ref={debriefRef}>
+          <div className="flex items-start justify-between gap-2">
+            <SectionTitle icon={<IconActivity />} title={db.judul}
+              subtitle={terakhir ? new Date(terakhir.mulai).toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long' }) : ''} />
+            <ShareCardButton targetRef={debriefRef} fileName={`panaceamed-${db.judul.replace(/\s+/g, '-').toLowerCase()}.png`} title={db.judul} />
+          </div>
           <div className="mt-2 flex flex-wrap items-center gap-2">
             <span className="rounded-full px-2.5 py-1 text-[11px] font-black"
               style={{ background: `${db.klasifikasi.warna}22`, color: db.klasifikasi.warna }}>
@@ -152,6 +158,7 @@ export function KolomPelatih({
               {db.banding}
             </p>
           )}
+          </div>
         </Card>
       )}
 

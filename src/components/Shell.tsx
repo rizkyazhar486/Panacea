@@ -52,6 +52,7 @@ import { ContactService } from './ContactService'
 import { NotificationBell } from './NotificationBell'
 import { InstallBanner } from './InstallApp'
 import { PeringatanPenyimpanan } from './PeringatanPenyimpanan'
+import { DailyQuoteBanner } from './DailyQuoteBanner'
 import { OnboardingTour, AssessmentPrompt } from './OnboardingTour'
 import { api, backendEnabled } from '../lib/api'
 import { trackVisit, rankByUsage } from '../lib/usage'
@@ -474,6 +475,7 @@ export function Shell({ children }: { children: ReactNode }) {
 
   return (
     <div className="relative flex min-h-screen">
+      <DailyQuoteBanner />
       {/* Kop surat untuk cetak/PDF — tampil hanya saat mencetak, di tiap halaman */}
       <div className="print-letterhead">
         <LogoMark size={28} />
