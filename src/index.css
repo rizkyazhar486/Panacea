@@ -136,12 +136,21 @@ button:active, a[href]:active, [role='button']:active { transform: scale(0.985);
 /* Dark palette — deep near-black canvas (#060606) with graphite surfaces
    (#24272C) and a bright mint/teal accent trio (#68FE9A, #17E7B7, #51E5A1)
    layered over the Panaceamed brand green for contrast & depth. */
+/* Kode HEX diberikan langsung: merah-api, jingga, emas, hijau neon, sian,
+   biru elektrik, ungu, magenta — "flaming fire of rainbow colors" di atas
+   ruang hampa yang benar-benar nyaris hitam (#050505, bukan #171717 yang
+   masih abu-abu). Tepi kartu kaca tetap dapat memantul karena kartu itu
+   sendiri kini sudah berwarna (lihat .dark .kaca), bukan mengandalkan
+   kanvas di baliknya lagi. */
 .dark body {
-  /* #171717, bukan #060606. Diukur di layar OLED: pada latar mendekati hitam
-     murni, tepi spekular kartu kaca tidak lagi punya nilai untuk dipantulkan
-     sehingga kartu terbaca sebagai persegi datar dan seluruh kedalaman
-     glassmorphism hilang. */
-  background: radial-gradient(circle at 50% 0%, rgba(198, 255, 52, 0.06) 0%, var(--color-malam) 55%) fixed;
+  background:
+    radial-gradient(70% 55% at 10% -5%, rgba(255, 26, 0, 0.16) 0%, transparent 55%),
+    radial-gradient(65% 55% at 90% 0%, rgba(255, 102, 0, 0.14) 0%, transparent 55%),
+    radial-gradient(60% 50% at 100% 40%, rgba(255, 215, 0, 0.1) 0%, transparent 55%),
+    radial-gradient(65% 55% at 95% 90%, rgba(0, 210, 255, 0.16) 0%, transparent 55%),
+    radial-gradient(70% 55% at 5% 95%, rgba(157, 0, 255, 0.16) 0%, transparent 55%),
+    radial-gradient(60% 50% at 0% 45%, rgba(255, 0, 127, 0.14) 0%, transparent 55%),
+    radial-gradient(circle at 50% 0%, rgba(198, 255, 52, 0.05) 0%, #050505 60%) fixed;
   color: #eef2ef;
 }
 
@@ -629,13 +638,13 @@ button:active, a[href]:active, [role='button']:active { transform: scale(0.985);
   pointer-events: none;
   z-index: 1;
   background: repeating-conic-gradient(from 205deg at 0% 100%,
-    rgba(244, 63, 94, 0.95) 0deg 3deg, transparent 3deg 9deg,
-    rgba(245, 158, 11, 0.95) 9deg 12deg, transparent 12deg 18deg,
-    rgba(250, 204, 21, 0.9) 18deg 21deg, transparent 21deg 27deg,
-    rgba(16, 185, 129, 0.95) 27deg 30deg, transparent 30deg 36deg,
-    rgba(6, 182, 212, 0.95) 36deg 39deg, transparent 39deg 45deg,
-    rgba(37, 99, 235, 0.95) 45deg 48deg, transparent 48deg 54deg,
-    rgba(139, 92, 246, 0.95) 54deg 57deg, transparent 57deg 63deg);
+    rgba(255, 26, 0, 0.95) 0deg 3deg, transparent 3deg 9deg,
+    rgba(255, 102, 0, 0.95) 9deg 12deg, transparent 12deg 18deg,
+    rgba(255, 215, 0, 0.9) 18deg 21deg, transparent 21deg 27deg,
+    rgba(57, 255, 20, 0.85) 27deg 30deg, transparent 30deg 36deg,
+    rgba(0, 210, 255, 0.95) 36deg 39deg, transparent 39deg 45deg,
+    rgba(0, 85, 255, 0.95) 45deg 48deg, transparent 48deg 54deg,
+    rgba(157, 0, 255, 0.95) 54deg 57deg, transparent 57deg 63deg);
   -webkit-mask-image: radial-gradient(130% 130% at 0% 100%, #000 35%, transparent 82%);
   mask-image: radial-gradient(130% 130% at 0% 100%, #000 35%, transparent 82%);
   /* "screen" butuh latar gelap untuk terlihat — di atas kartu terang ia
@@ -658,20 +667,25 @@ button:active, a[href]:active, [role='button']:active { transform: scale(0.985);
    masih lembek. Warnanya sekarang jenuh penuh (bukan corak Tailwind-400
    yang lembut), alpha dinaikkan, dan saturate() dilipatkan supaya benar-
    benar neon seperti referensi, bukan pastel yang dicuci. */
+/* Kode HEX diberikan langsung dari referensi (bukan corak Tailwind lagi):
+   merah-api dulu, bukan ungu — sebelumnya ungu di posisi paling dominan
+   itulah yang terbaca "feminin". Urutannya sekarang mengikuti spektrum
+   nyata: merah → jingga → emas → hijau neon → sian → biru → ungu →
+   magenta, ditutup jadi lingkaran. */
 .kaca {
   --kx: 50%;
   --ky: 0%;
   isolation: isolate;
   background:
     linear-gradient(135deg,
-      rgba(139, 92, 246, 0.92) 0%,
-      rgba(79, 70, 229, 0.9) 16%,
-      rgba(37, 99, 235, 0.88) 32%,
-      rgba(6, 182, 212, 0.9) 48%,
-      rgba(16, 185, 129, 0.88) 64%,
-      rgba(245, 158, 11, 0.9) 80%,
-      rgba(225, 29, 72, 0.7) 92%,
-      rgba(217, 70, 239, 0.85) 100%);
+      rgba(255, 26, 0, 0.9) 0%,
+      rgba(255, 102, 0, 0.9) 14%,
+      rgba(255, 215, 0, 0.85) 28%,
+      rgba(57, 255, 20, 0.75) 42%,
+      rgba(0, 210, 255, 0.88) 57%,
+      rgba(0, 85, 255, 0.88) 71%,
+      rgba(157, 0, 255, 0.85) 85%,
+      rgba(255, 0, 127, 0.85) 100%);
   animation: kaca-aurora 16s ease-in-out infinite;
   backdrop-filter: blur(20px) saturate(2.2);
   -webkit-backdrop-filter: blur(20px) saturate(2.2);
@@ -745,7 +759,7 @@ button:active, a[href]:active, [role='button']:active { transform: scale(0.985);
   padding: 1px;
   background: linear-gradient(
     100deg,
-    #8b5cf6, #4f46e5, #2563eb, #06b6d4, #10b981, #f59e0b, #e11d48, #d946ef, #8b5cf6);
+    #FF1A00, #FF6600, #FFD700, #39FF14, #00D2FF, #0055FF, #9D00FF, #FF007F, #FF1A00);
   background-size: 400% 100%;
   animation: kaca-edge-aurora 12s linear infinite;
   -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
@@ -780,15 +794,19 @@ button:active, a[href]:active, [role='button']:active { transform: scale(0.985);
    opacity gumpalannya hampir dua kali lipat dari sebelumnya. Basisnya
    tetap nyaris hitam (ruang angkasa sungguhan), supaya cahayanya terasa
    MEMANCAR dari kegelapan, bukan mengaburkannya. */
+/* Ruang hampa yang benar-benar hitam (#020202, bukan coklat-hitam #0c0806
+   yang lama) dengan enam gumpalan HEX persis dari referensi — merah-api,
+   jingga, sian, ungu, hijau neon, magenta. Ini yang dimaksud "deep-black
+   cosmic void" plus "flaming fire of rainbow colors" sekaligus. */
 .dark .kaca {
   background:
-    radial-gradient(110% 95% at 8% -10%, rgba(251, 146, 60, 0.6) 0%, transparent 58%),
-    radial-gradient(90% 85% at 100% 0%, rgba(245, 158, 11, 0.5) 0%, transparent 55%),
-    radial-gradient(100% 95% at 105% 105%, rgba(6, 182, 212, 0.5) 0%, transparent 55%),
-    radial-gradient(85% 85% at -5% 100%, rgba(168, 85, 247, 0.48) 0%, transparent 55%),
-    radial-gradient(70% 70% at 50% -20%, rgba(16, 185, 129, 0.34) 0%, transparent 55%),
-    radial-gradient(70% 70% at 30% 120%, rgba(217, 70, 239, 0.36) 0%, transparent 55%),
-    linear-gradient(160deg, rgba(12,8,6,0.82), rgba(4,4,8,0.62) 55%, rgba(8,6,12,0.7) 100%);
+    radial-gradient(110% 95% at 8% -10%, rgba(255, 26, 0, 0.55) 0%, transparent 58%),
+    radial-gradient(90% 85% at 100% 0%, rgba(255, 102, 0, 0.5) 0%, transparent 55%),
+    radial-gradient(100% 95% at 105% 105%, rgba(0, 210, 255, 0.5) 0%, transparent 55%),
+    radial-gradient(85% 85% at -5% 100%, rgba(157, 0, 255, 0.48) 0%, transparent 55%),
+    radial-gradient(70% 70% at 50% -20%, rgba(57, 255, 20, 0.3) 0%, transparent 55%),
+    radial-gradient(70% 70% at 30% 120%, rgba(255, 0, 127, 0.4) 0%, transparent 55%),
+    linear-gradient(160deg, rgba(8,4,4,0.86), rgba(2,2,2,0.68) 55%, rgba(4,2,6,0.75) 100%);
   animation: kaca-aurora 18s ease-in-out infinite;
   backdrop-filter: blur(20px) saturate(2.4);
   -webkit-backdrop-filter: blur(20px) saturate(2.4);
@@ -810,7 +828,7 @@ button:active, a[href]:active, [role='button']:active { transform: scale(0.985);
 .dark .kaca::after {
   background: linear-gradient(
     100deg,
-    #8b5cf6, #4f46e5, #2563eb, #06b6d4, #10b981, #f59e0b, #e11d48, #d946ef, #8b5cf6);
+    #FF1A00, #FF6600, #FFD700, #39FF14, #00D2FF, #0055FF, #9D00FF, #FF007F, #FF1A00);
   background-size: 400% 100%;
   animation: kaca-edge-aurora 12s linear infinite;
   opacity: 1;
@@ -1302,19 +1320,18 @@ html { -webkit-overflow-scrolling: touch; }
 }
 
 :root:not(.dark) .kaca {
-  /* Neon jenuh penuh, bukan pastel — "not weak rainbow, strong colors".
-     Sama seperti .kaca dasar; diulang di sini karena inilah aturan yang
-     benar-benar menang di mode terang (lihat catatan spesifisitas di atas). */
+  /* Sama seperti .kaca dasar (merah-jingga-emas dulu, bukan ungu) — diulang
+     di sini karena inilah aturan yang benar-benar menang di mode terang. */
   background:
     linear-gradient(135deg,
-      rgba(139, 92, 246, 0.95) 0%,
-      rgba(79, 70, 229, 0.93) 16%,
-      rgba(37, 99, 235, 0.92) 32%,
-      rgba(6, 182, 212, 0.94) 48%,
-      rgba(16, 185, 129, 0.92) 64%,
-      rgba(245, 158, 11, 0.94) 80%,
-      rgba(225, 29, 72, 0.75) 92%,
-      rgba(217, 70, 239, 0.9) 100%);
+      rgba(255, 26, 0, 0.92) 0%,
+      rgba(255, 102, 0, 0.92) 14%,
+      rgba(255, 215, 0, 0.88) 28%,
+      rgba(57, 255, 20, 0.78) 42%,
+      rgba(0, 210, 255, 0.9) 57%,
+      rgba(0, 85, 255, 0.9) 71%,
+      rgba(157, 0, 255, 0.88) 85%,
+      rgba(255, 0, 127, 0.88) 100%);
   animation: kaca-aurora 16s ease-in-out infinite;
   backdrop-filter: blur(20px) saturate(2.2);
   -webkit-backdrop-filter: blur(20px) saturate(2.2);
