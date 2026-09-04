@@ -6,6 +6,8 @@ import { explainBodyRegion, explainDrug } from '../lib/ai'
 import { useStore } from '../lib/store'
 import { Body3D, ANATOMY_LAYERS, type AnatomyLayer } from '../components/Body3D'
 import { WORKOUT_MUSCLE_GROUPS } from '../lib/workoutMuscles'
+import { TISSUE_TYPES, ORGAN_SYSTEMS, BODY_REGIONS, type AnatomyEntry } from '../lib/anatomyHierarchy'
+import { IconChevronRight } from '../components/icons'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Body Explorer — model 3D anatomi NYATA (lihat Body3D.tsx untuk sumber data
@@ -40,6 +42,47 @@ function TermList({ title, terms }: { title: string; terms: OntologyTerm[] }) {
         ))}
       </ul>
     </div>
+  )
+}
+
+// Satu kelompok hierarki anatomi (jaringan / sistem organ / region tubuh)
+// sebagai <details> yang bisa dibuka-tutup -- native, tanpa JS tambahan untuk
+// animasi buka-tutupnya, konsisten dengan gaya ringan aplikasi ini.
+function HierarchyGroup({
+  title, entries, onPick, onView3d,
+}: {
+  title: string
+  entries: AnatomyEntry[]
+  onPick: (entry: AnatomyEntry) => void
+  onView3d: (layer: AnatomyLayer['key']) => void
+}) {
+  return (
+    <details className="group rounded-xl border border-neutral-200 dark:border-white/10">
+      <summary className="flex cursor-pointer list-none items-center justify-between gap-2 px-3 py-2.5 text-sm font-bold text-ink dark:text-white">
+        {title}
+        <IconChevronRight size={16} className="text-neutral-400 transition-transform group-open:rotate-90" />
+      </summary>
+      <div className="space-y-1.5 border-t border-neutral-100 p-2.5 dark:border-white/5">
+        {entries.map((e) => (
+          <div key={e.key} className="rounded-lg bg-neutral-50 p-2.5 dark:bg-white/5">
+            <div className="flex items-start justify-between gap-2">
+              <button onClick={() => onPick(e)} className="min-w-0 flex-1 text-left">
+                <div className="text-sm font-bold text-ink dark:text-white">{e.label}</div>
+                <p className="mt-0.5 text-xs leading-relaxed text-neutral-500">{e.description}</p>
+              </button>
+              {e.layer3d && (
+                <button
+                  onClick={() => onView3d(e.layer3d!)}
+                  className="shrink-0 rounded-full border border-brand px-2.5 py-1 text-[10px] font-bold text-brand"
+                >
+                  View in 3D
+                </button>
+              )}
+            </div>
+          </div>
+        ))}
+      </div>
+    </details>
   )
 }
 
@@ -106,6 +149,19 @@ export function BodyExplorer() {
     setHighlighted(group.nodeNames)
     if (!layers.has('muscular')) toggleLayer('muscular')
     lookup(`${group.label} muscles`, group.searchTerms)
+  }
+
+  // Satu entri hierarki anatomi (jaringan/sistem organ/region tubuh) diklik —
+  // tidak menyorot satu struktur 3D spesifik (levelnya lebih umum dari itu),
+  // tapi tetap mengambil istilah ontologi nyata untuk level tersebut.
+  function onPickHierarchyEntry(entry: AnatomyEntry) {
+    setActiveWorkout(null)
+    setHighlighted([])
+    lookup(entry.label, entry.searchTerms)
+  }
+
+  function onViewLayer3d(layer: AnatomyLayer['key']) {
+    if (!layers.has(layer)) toggleLayer(layer)
   }
 
   // "Ask" — pencarian bebas (bahasa natural atau gejala/fungsi). Kalau
@@ -238,11 +294,19 @@ export function BodyExplorer() {
           </div>
         </div>
 
+        <div className="mt-4 space-y-2">
+          <div className="t-mikro font-bold uppercase tracking-wide text-neutral-500">Anatomy reference</div>
+          <HierarchyGroup title="Tissue types (4)" entries={TISSUE_TYPES} onPick={onPickHierarchyEntry} onView3d={onViewLayer3d} />
+          <HierarchyGroup title="Organ systems (11)" entries={ORGAN_SYSTEMS} onPick={onPickHierarchyEntry} onView3d={onViewLayer3d} />
+          <HierarchyGroup title="Body regions (8)" entries={BODY_REGIONS} onPick={onPickHierarchyEntry} onView3d={onViewLayer3d} />
+        </div>
+
         <div className="mt-4 min-w-0">
           {!selectedLabel && (
             <p className="text-sm leading-relaxed text-neutral-500">
-              Tap a structure on the model, pick a workout target above, or ask a question — and get a
-              plain-language explanation grounded in real ontology terms, not a diagnosis for you personally.
+              Tap a structure on the model, pick a workout target, browse the anatomy reference above, or ask a
+              question — and get a plain-language explanation grounded in real ontology terms, not a diagnosis for
+              you personally.
             </p>
           )}
           {selectedLabel && (
