@@ -92,23 +92,17 @@ html {
   text-size-adjust: 100%;
 }
 
-/* Kanvas terang — sebelumnya nyaris putih polos (0,06 alpha satu warna), yang
-   terukur membosankan begitu dibandingkan dengan kartu kaca yang duduk di
-   atasnya. Sekarang empat gumpalan warna nyata (hijau merek, biru langit,
-   magenta, ungu) di atas dasar hijau-mint pucat — tetap TERANG (kontras teks
-   tidak berubah, kartu kaca masih ~46-78% putih di atasnya) tapi tidak lagi
-   datar. Ini gaya "liquid glass" yang sama dipakai di area Fitness, dibawa
-   ke seluruh aplikasi sesuai permintaan langsung, bukan hanya untuk area itu. */
+/* PENTING — DITEMUKAN SETELAH DIUKUR NYATA DI PERANGKAT PENGGUNA: latar
+   `body` di sini duduk di BELAKANG lapisan orb (Shell.tsx, `fixed inset-0
+   z-0`, tiga bola blur) yang menutupinya secara visual. Mewarnai `body`
+   TIDAK terlihat sama sekali — itulah sebab laporan "tidak berubah apa-apa".
+   Warna ambient yang benar-benar terlihat harus diubah di lapisan orb itu,
+   bukan di sini. Dikembalikan ke satu radial lembut agar tidak menambah
+   risiko kontras tanpa manfaat visual apa pun. */
 body {
   margin: 0;
   font-family: var(--font-sans);
-  background:
-    radial-gradient(90% 55% at 12% -8%, rgba(0, 191, 99, 0.18) 0%, transparent 55%),
-    radial-gradient(80% 55% at 100% -5%, rgba(56, 189, 248, 0.15) 0%, transparent 55%),
-    radial-gradient(75% 60% at 90% 100%, rgba(236, 72, 153, 0.09) 0%, transparent 55%),
-    radial-gradient(75% 60% at 0% 100%, rgba(168, 85, 247, 0.1) 0%, transparent 55%),
-    linear-gradient(160deg, #eefcf4 0%, #eef8f5 45%, #eff5fb 100%)
-    fixed;
+  background: radial-gradient(circle at 50% 0%, rgba(0, 191, 99, 0.06) 0%, #f4f7f5 55%) fixed;
   color: var(--color-ink);
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
