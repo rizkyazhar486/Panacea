@@ -340,6 +340,38 @@ export interface CheckIn {
   date: string // yyyy-mm-dd, one per day
 }
 
+// Life Story: health reframed as one thread in a person's whole life, not a
+// sequence of clinical events. Every field here is self-reported by the
+// user — "impact" is how THEY rate the moment, never a computed score —
+// because meaning, relationships, and purpose aren't things an algorithm
+// can measure the way it measures a lab value, and pretending otherwise
+// would be the same kind of fabrication the rest of this app refuses to do
+// with prices or health outcomes. The "chapter" a moment falls into is
+// real, computed math (age at the time, from the patient's actual date of
+// birth), not an invented narrative label.
+export type LifeDomain =
+  | 'physical'
+  | 'mental'
+  | 'social'
+  | 'relationships'
+  | 'sex'
+  | 'money'
+  | 'career'
+  | 'study'
+  | 'recreation'
+  | 'family'
+  | 'purpose'
+  | 'creativity'
+
+export interface LifeEvent {
+  id: string
+  at: string // ISO date the moment happened (or was logged)
+  title: string
+  note?: string
+  domains: LifeDomain[] // one moment can touch more than one area of life
+  impact: 'positive' | 'neutral' | 'negative' // self-rated, never inferred
+}
+
 // 4. Daily mood log + 6. private "send support" one-tap messages.
 export interface MoodEntry {
   id: string
@@ -687,6 +719,7 @@ export interface AppState {
   gpsActivities: GpsActivity[] // auto-recorded GPS sport activities (competitive charts)
   trainingLogs: TrainingLog[] // Training Intensity (RPE) journal
   activeProgram?: string // training program the user is currently following
+  lifeEvents: Record<string, LifeEvent[]> // patientId -> the user's own life story (see LifeEvent below)
   foods: FoodEntry[]
   wellness: Record<string, WellnessDay> // daily sleep/water/exercise by date
   consults: ConsultSession[]

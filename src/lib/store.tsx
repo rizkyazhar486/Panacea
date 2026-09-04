@@ -33,6 +33,7 @@ import type {
   HealthGoal,
   GpsActivity,
   TrainingLog,
+  LifeEvent,
   FoodEntry,
   WellnessDay,
   ConsultSession,
@@ -195,6 +196,7 @@ function seed(): AppState {
     goals: [],
     gpsActivities: [],
     trainingLogs: [],
+    lifeEvents: {},
     foods: [],
     wellness: {},
     consults: [],
@@ -330,6 +332,8 @@ interface Store {
   addGpsActivity: (a: Omit<GpsActivity, 'id'>) => void // auto from GPS, never manual
   addTrainingLog: (rpe: number, type: string, note?: string) => void // RPE journal
   setActiveProgram: (program: string) => void
+  addLifeEvent: (patientId: string, e: Omit<LifeEvent, 'id'>) => void
+  removeLifeEvent: (patientId: string, id: string) => void
   buyLongevitySub: () => { ok: boolean; reason?: string }
   buyChronicSub: (plan: 'monthly' | 'lifetime') => { ok: boolean; reason?: string }
   addFood: (f: FoodEntry) => void
@@ -916,6 +920,16 @@ export function StoreProvider({ children }: { children: ReactNode }) {
           trainingLogs: [{ id: uid(), date: hariIni(), rpe: Math.max(1, Math.min(10, Math.round(rpe))), type: type.trim() || 'Latihan', note: note?.trim() || undefined }, ...st.trainingLogs].slice(0, 365),
         })),
       setActiveProgram: (program) => setState((st) => ({ ...st, activeProgram: program })),
+      addLifeEvent: (patientId, e) =>
+        setState((st) => ({
+          ...st,
+          lifeEvents: { ...st.lifeEvents, [patientId]: [{ id: uid(), ...e }, ...(st.lifeEvents[patientId] ?? [])] },
+        })),
+      removeLifeEvent: (patientId, id) =>
+        setState((st) => ({
+          ...st,
+          lifeEvents: { ...st.lifeEvents, [patientId]: (st.lifeEvents[patientId] ?? []).filter((e) => e.id !== id) },
+        })),
       addFood: (f) => setState((st) => ({ ...st, foods: [f, ...st.foods] })),
       removeFood: (id) => setState((st) => ({ ...st, foods: st.foods.filter((f) => f.id !== id) })),
       logWellness: (date, patch) =>

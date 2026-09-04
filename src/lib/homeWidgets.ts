@@ -39,6 +39,7 @@ export interface WidgetDef {
 
 export const WIDGETS: WidgetDef[] = [
   { id: 'semangat', label: 'Three Small Things', ringkas: 'Something good you can do right now — it takes minutes', ke: '/all-features', emoji: '✨', kategori: 'Mind & Habits', bawaan: true },
+  { id: 'lifeStory', label: 'Your Story', ringkas: 'Health is one thread in a whole life — log the moments that shape yours', ke: '/my-story', emoji: '📖', kategori: 'Mind & Habits' },
   { id: 'medStudy', label: 'Med Study Hub', ringkas: 'Question bank, OSCE technique, and exam plans', ke: '/med-study', emoji: '📚', kategori: 'Clinical & Learning' },
   { id: 'tatalaksana', label: 'SKDI Therapy', ringkas: 'Find drugs and doses by disease', ke: '/med-study?bagian=therapy', emoji: '💊', kategori: 'Clinical & Learning' },
   { id: 'penyakit', label: 'SKDI Disease List', ringkas: 'Full notes for each disease', ke: '/med-study?bagian=diseases', emoji: '📖', kategori: 'Clinical & Learning' },
@@ -333,7 +334,7 @@ export const WIDGETS: WidgetDef[] = [
  */
 export const WIDGET_HIDUP = [
   // ── Ringkasan hari ini ──────────────────────────────────────────────────
-  'semangat', 'ringHarian', 'pantauan', 'kebugaran', 'salat', 'konsistensi', 'motivasi',
+  'semangat', 'lifeStory', 'ringHarian', 'pantauan', 'kebugaran', 'salat', 'konsistensi', 'motivasi',
   // ── Tidur & pemulihan ───────────────────────────────────────────────────
   'tidurLebar', 'utangTidur', 'hrv', 'tahapTidur', 'efisiensiTidur', 'suhuEkstrem',
   // ── Latihan ─────────────────────────────────────────────────────────────
