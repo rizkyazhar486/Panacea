@@ -5,7 +5,35 @@
 // Ini murni retrieval — potongan ringkas dari label resminya — bukan saran
 // dosis; lapisan AI di atasnya (lihat explainDrug di src/lib/ai.ts) yang
 // merangkainya jadi bahasa awam dan WAJIB mengutip sumbernya.
+//
+// DUA API, bukan satu: pencarian openFDA cocok persis (exact match) pada
+// brand_name/generic_name, jadi nama dagang lokal, singkatan, atau salah
+// eja sedikit saja membuatnya kosong. RxNorm (juga NLM, gratis, tanpa API
+// key) dipakai untuk menormalkan nama yang diketik ke nama generik baku
+// SEBELUM mencoba lagi ke openFDA kalau percobaan pertama kosong — bukan
+// menggantikan openFDA, hanya membuat pencariannya lebih toleran.
 const OPENFDA_BASE = 'https://api.fda.gov/drug/label.json'
+const RXNAV_BASE = 'https://rxnav.nlm.nih.gov/REST'
+
+async function normalizeToGenericName(name: string): Promise<string | null> {
+  try {
+    const res = await fetch(`${RXNAV_BASE}/approximateTerm.json?term=${encodeURIComponent(name)}&maxEntries=1`, {
+      signal: AbortSignal.timeout(6000),
+    })
+    if (!res.ok) return null
+    const data = (await res.json()) as { approximateGroup?: { candidate?: { rxcui?: string }[] } }
+    const rxcui = data.approximateGroup?.candidate?.[0]?.rxcui
+    if (!rxcui) return null
+    const propRes = await fetch(`${RXNAV_BASE}/rxcui/${rxcui}/property.json?propName=RxNorm%20Name`, {
+      signal: AbortSignal.timeout(6000),
+    })
+    if (!propRes.ok) return null
+    const propData = (await propRes.json()) as { propConceptGroup?: { propConcept?: { propValue?: string }[] } }
+    return propData.propConceptGroup?.propConcept?.[0]?.propValue ?? null
+  } catch {
+    return null
+  }
+}
 
 export interface DrugLabelInfo {
   brandName: string
@@ -22,7 +50,7 @@ function firstSentences(text: string | undefined, max = 3): string {
   return sentences.slice(0, max).join(' ').trim()
 }
 
-export async function lookupDrugLabel(name: string): Promise<DrugLabelInfo | null> {
+async function queryOpenFda(name: string): Promise<DrugLabelInfo | null> {
   const q = encodeURIComponent(`openfda.brand_name:"${name}" openfda.generic_name:"${name}"`)
   const url = `${OPENFDA_BASE}?search=${q}&limit=1`
   const res = await fetch(url, { signal: AbortSignal.timeout(8000) })
@@ -48,4 +76,15 @@ export async function lookupDrugLabel(name: string): Promise<DrugLabelInfo | nul
     adverseReactions: firstSentences(r.adverse_reactions?.[0], 4),
     warnings: firstSentences(r.warnings?.[0] ?? r.warnings_and_cautions?.[0], 3),
   }
+}
+
+export async function lookupDrugLabel(name: string): Promise<DrugLabelInfo | null> {
+  const direct = await queryOpenFda(name)
+  if (direct) return direct
+  // Percobaan pertama kosong — coba lagi dengan nama generik baku dari
+  // RxNorm (API kedua), bukan menyerah pada percobaan pertama. Menangkap
+  // nama dagang lokal/salah eja yang tidak persis cocok dengan openFDA.
+  const normalized = await normalizeToGenericName(name)
+  if (!normalized || normalized.toLowerCase() === name.toLowerCase()) return null
+  return queryOpenFda(normalized)
 }
