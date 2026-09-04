@@ -964,35 +964,42 @@ function FoodTracker({ body, activeProtocol }: { body: Body; activeProtocol?: Ch
         </span>
         <span className="text-[10px] text-neutral-400">number = kcal per 100 g</span>
       </div>
-      <div className="mt-1 flex flex-wrap gap-1.5 max-h-44 overflow-y-auto rounded-xl border border-neutral-100 bg-neutral-50/50 p-2" style={{ scrollbarWidth: 'thin' }}>
+      <div className="mt-1 grid grid-cols-2 gap-1.5 max-h-44 overflow-y-auto rounded-xl border border-neutral-100 bg-neutral-50/50 p-2 content-start" style={{ scrollbarWidth: 'thin' }}>
         {filtered.map(f => {
           const rec = activeProtocol && activeProtocol.specialFoods.some(sf => f.name.includes(sf))
           const avo = activeProtocol && activeProtocol.avoidFoods.some(af => f.name.includes(af))
           return (
-            <button key={f.name} onClick={() => setName(f.name)} className={'inline-flex min-h-[40px] items-center rounded-lg border px-2 text-[11px] font-medium transition active:scale-95 ' + (name === f.name ? 'border-brand bg-brand/10 text-brand-dark' : avo ? 'border-red-200 text-red-600 bg-red-50/50' : rec ? 'border-green-200 text-green-600 bg-green-50/50' : 'border-transparent text-neutral-600 hover:bg-white')}>
-              {f.emoji} {f.name} <span className="ml-1 tabular-nums text-neutral-500">{f.k}</span>
-              {rec && <span className="ml-0.5 text-green-500">{'\u2705'}</span>}
-              {avo && <span className="ml-0.5 text-red-600">{'\u274C'}</span>}
+            <button key={f.name} onClick={() => setName(f.name)} className={'flex min-h-[40px] min-w-0 items-center gap-1 rounded-lg border px-2 text-[11px] font-medium transition active:scale-95 ' + (name === f.name ? 'border-brand bg-brand/10 text-brand-dark' : avo ? 'border-red-200 text-red-600 bg-red-50/50' : rec ? 'border-green-200 text-green-600 bg-green-50/50' : 'border-transparent text-neutral-600 hover:bg-white')}>
+              <span className="min-w-0 flex-1 truncate text-left">{f.emoji} {f.name}</span>
+              <span className="shrink-0 tabular-nums text-neutral-500">{f.k}</span>
+              {rec && <span className="shrink-0 text-green-500">{'\u2705'}</span>}
+              {avo && <span className="shrink-0 text-red-600">{'\u274C'}</span>}
             </button>
           )
         })}
       </div>
-      <div className="mt-3 flex items-end gap-3">
-        <div className="flex-1 rounded-xl bg-neutral-50 px-4 py-3">
-          <div className="flex items-baseline gap-2"><span className="text-sm font-bold text-neutral-800">{fd.emoji} {name}</span><Badge tone="neutral">{fd.cat}</Badge>{fd.gi > 0 && <Badge tone={fd.gi > 70 ? 'high' : fd.gi > 55 ? 'neutral' : 'normal'}>GI {fd.gi}</Badge>}{isRecommended && <Badge tone="brand">Recommended</Badge>}{isAvoided && <Badge tone="high">Avoid</Badge>}</div>
-          <div className="mt-1 flex flex-wrap gap-2 text-xs tabular-nums font-semibold">
-            <span style={{ color: 'var(--teks-ok)' }}>{pv.k} kcal</span>
-            <span className="text-amber-500">K{pv.c}</span>
-            <span className="text-green-600">P{pv.p}</span>
-            <span className="text-red-600">L{pv.f}</span>
-            <span className="text-purple-500">S{pv.fb}</span>
-            <span className="text-blue-700">Na{pv.na}</span>
-            {pv.omega3 > 0 && <span className="text-cyan-500">{'\u{1F41F}'}{pv.omega3}g</span>}
-          </div>
-          {fd.tags.length > 0 && <div className="mt-1.5 flex flex-wrap gap-1">{fd.tags.slice(0, 4).map(t => <span key={t} className="rounded-full bg-neutral-100 px-2 py-0.5 text-[10px] text-neutral-500">{t}</span>)}</div>}
+      <div className="mt-3 rounded-xl bg-neutral-50 p-3">
+        <div className="flex flex-wrap items-center gap-1.5">
+          <span className="text-sm font-bold text-neutral-800">{fd.emoji} {name}</span>
+          <Badge tone="neutral">{fd.cat}</Badge>
+          {fd.gi > 0 && <Badge tone={fd.gi > 70 ? 'high' : fd.gi > 55 ? 'neutral' : 'normal'}>GI {fd.gi}</Badge>}
+          {isRecommended && <Badge tone="brand">Recommended</Badge>}
+          {isAvoided && <Badge tone="high">Avoid</Badge>}
         </div>
-        <div className="w-20 shrink-0"><Field label="Gram"><input className={inputClass} type="number" value={g} onChange={e => setG(+e.target.value)} /></Field></div>
-        <Button onClick={() => addFood({ id: uid(), date: today(), name, grams: g, kcal: pv.k, carbs: pv.c, protein: pv.p, fat: pv.f })} className="h-[42px] shrink-0 rounded-xl"><IconPlus size={15} /></Button>
+        <div className="mt-1.5 flex flex-wrap gap-2 text-xs tabular-nums font-semibold">
+          <span style={{ color: 'var(--teks-ok)' }}>{pv.k} kcal</span>
+          <span className="text-amber-500">K{pv.c}</span>
+          <span className="text-green-600">P{pv.p}</span>
+          <span className="text-red-600">L{pv.f}</span>
+          <span className="text-purple-500">S{pv.fb}</span>
+          <span className="text-blue-700">Na{pv.na}</span>
+          {pv.omega3 > 0 && <span className="text-cyan-500">{'\u{1F41F}'}{pv.omega3}g</span>}
+        </div>
+        {fd.tags.length > 0 && <div className="mt-1.5 flex flex-wrap gap-1">{fd.tags.slice(0, 4).map(t => <span key={t} className="rounded-full bg-neutral-100 px-2 py-0.5 text-[10px] text-neutral-500">{t}</span>)}</div>}
+        <div className="mt-3 flex items-end gap-3">
+          <div className="w-20 shrink-0"><Field label="Gram"><input className={inputClass} type="number" value={g} onChange={e => setG(+e.target.value)} /></Field></div>
+          <Button onClick={() => addFood({ id: uid(), date: today(), name, grams: g, kcal: pv.k, carbs: pv.c, protein: pv.p, fat: pv.f })} className="h-[42px] shrink-0 rounded-xl flex-1 sm:flex-none sm:w-auto"><IconPlus size={15} /> Add</Button>
+        </div>
       </div>
       <div className="mt-3 flex items-baseline justify-between gap-2">
         <span className="text-[10px] font-black uppercase tracking-wide text-neutral-500">Logged today</span>
