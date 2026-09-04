@@ -30,9 +30,9 @@ export function MetalStatPanel({ angka, maks = 4 }: { angka: Angka[]; maks?: num
       {angka.slice(0, maks).map((a) => (
         <div key={a.label} className="relative flex min-w-0 flex-1 flex-col gap-1.5 rounded-xl bg-white/[0.05] p-2.5">
           <span className="truncate text-[10px] font-bold uppercase tracking-wide text-white/50">{a.label}</span>
-          <span className="flex items-baseline gap-1">
+          <span className="flex min-w-0 flex-wrap items-baseline gap-x-1">
             <span className={`text-[20px] font-black leading-none tabular-nums ${EMBOSS[a.nada] ?? 'metal-emboss'}`}>{a.nilai}</span>
-            {a.satuan && <span className="text-[9px] font-bold text-white/40">{a.satuan}</span>}
+            {a.satuan && <span className="truncate text-[9px] font-bold text-white/40">{a.satuan}</span>}
           </span>
           {a.deret && <Garis deret={a.deret} kelas={LINE_TONE[a.nada] ?? 'text-white/60'} />}
         </div>
