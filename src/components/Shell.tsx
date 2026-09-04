@@ -701,7 +701,7 @@ export function Shell({ children }: { children: ReactNode }) {
             satu baris dan memberi dua jalan ke tujuan yang sama. Di halaman
             lain ia tetap berguna, karena di sana kisinya tidak ada. */}
         {!onHome && (
-        <div data-pintasan className="relative border-b border-black/5 bg-white lg:hidden">
+        <div data-pintasan className="kaca relative rounded-none border-x-0 border-t-0 lg:hidden">
           <div className="flex gap-2 overflow-x-auto px-3 py-2.5">
             {quick.map((n) => (
               <NavLink
@@ -807,7 +807,7 @@ export function Shell({ children }: { children: ReactNode }) {
       {menuOpen && (
         <div className="fixed inset-0 z-40 lg:hidden">
           <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={() => setMenuOpen(false)} />
-          <aside className="absolute left-0 top-0 flex h-full w-[82%] max-w-xs flex-col bg-white shadow-2xl drawer-in">
+          <aside className="kaca absolute left-0 top-0 flex h-full w-[82%] max-w-xs flex-col rounded-none shadow-2xl drawer-in">
             <div className="flex items-center justify-between border-b border-black/5 px-4 py-4">
               <div className="flex items-center gap-2.5">
                 <LogoMark size={34} />

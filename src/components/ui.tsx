@@ -161,4 +161,4 @@ export function SkeletonRows({ rows = 3 }: { rows?: number }) {
 }
 
 export const inputClass =
-  'w-full min-h-[44px] rounded-xl border border-neutral-200 bg-white px-3.5 py-2.5 text-sm outline-none transition-colors duration-200 placeholder:text-neutral-500 focus:border-brand focus:ring-2 focus:ring-brand/20'
+  'w-full min-h-[44px] rounded-xl border border-neutral-200 bg-gradient-to-br from-emerald-50/70 via-sky-50/60 to-violet-50/60 px-3.5 py-2.5 text-sm outline-none transition-colors duration-200 placeholder:text-neutral-500 focus:border-brand focus:ring-2 focus:ring-brand/20'
