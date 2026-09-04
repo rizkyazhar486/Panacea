@@ -34,6 +34,7 @@ import type {
   GpsActivity,
   TrainingLog,
   LifeEvent,
+  Quest,
   FoodEntry,
   WellnessDay,
   ConsultSession,
@@ -197,6 +198,7 @@ function seed(): AppState {
     gpsActivities: [],
     trainingLogs: [],
     lifeEvents: {},
+    quests: {},
     foods: [],
     wellness: {},
     consults: [],
@@ -334,6 +336,10 @@ interface Store {
   setActiveProgram: (program: string) => void
   addLifeEvent: (patientId: string, e: Omit<LifeEvent, 'id'>) => void
   removeLifeEvent: (patientId: string, id: string) => void
+  addQuest: (patientId: string, q: Omit<Quest, 'id' | 'createdAt' | 'status' | 'progressCurrent'>) => void
+  updateQuestProgress: (patientId: string, id: string, progressCurrent: number) => void
+  setQuestStatus: (patientId: string, id: string, status: Quest['status']) => void
+  removeQuest: (patientId: string, id: string) => void
   buyLongevitySub: () => { ok: boolean; reason?: string }
   buyChronicSub: (plan: 'monthly' | 'lifetime') => { ok: boolean; reason?: string }
   addFood: (f: FoodEntry) => void
@@ -929,6 +935,50 @@ export function StoreProvider({ children }: { children: ReactNode }) {
         setState((st) => ({
           ...st,
           lifeEvents: { ...st.lifeEvents, [patientId]: (st.lifeEvents[patientId] ?? []).filter((e) => e.id !== id) },
+        })),
+      addQuest: (patientId, q) =>
+        setState((st) => ({
+          ...st,
+          quests: {
+            ...st.quests,
+            [patientId]: [
+              { id: uid(), createdAt: new Date().toISOString(), status: 'active', progressCurrent: 0, ...q },
+              ...(st.quests[patientId] ?? []),
+            ],
+          },
+        })),
+      updateQuestProgress: (patientId, id, progressCurrent) =>
+        setState((st) => ({
+          ...st,
+          quests: {
+            ...st.quests,
+            [patientId]: (st.quests[patientId] ?? []).map((q) => {
+              if (q.id !== id) return q
+              const clamped = Math.max(0, Math.min(progressCurrent, q.progressTarget))
+              const done = clamped >= q.progressTarget
+              return {
+                ...q,
+                progressCurrent: clamped,
+                status: done ? 'done' : q.status === 'done' ? 'active' : q.status,
+                completedAt: done ? q.completedAt ?? new Date().toISOString() : undefined,
+              }
+            }),
+          },
+        })),
+      setQuestStatus: (patientId, id, status) =>
+        setState((st) => ({
+          ...st,
+          quests: {
+            ...st.quests,
+            [patientId]: (st.quests[patientId] ?? []).map((q) =>
+              q.id === id ? { ...q, status, completedAt: status === 'done' ? q.completedAt ?? new Date().toISOString() : undefined } : q,
+            ),
+          },
+        })),
+      removeQuest: (patientId, id) =>
+        setState((st) => ({
+          ...st,
+          quests: { ...st.quests, [patientId]: (st.quests[patientId] ?? []).filter((q) => q.id !== id) },
         })),
       addFood: (f) => setState((st) => ({ ...st, foods: [f, ...st.foods] })),
       removeFood: (id) => setState((st) => ({ ...st, foods: st.foods.filter((f) => f.id !== id) })),

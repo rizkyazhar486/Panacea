@@ -1,10 +1,10 @@
 import { useState } from 'react'
-import { useStore, uid } from '../lib/store'
+import { useStore } from '../lib/store'
 import { Card, SectionTitle, Badge, Button, Field, inputClass } from '../components/ui'
 import { IconBook, IconPlus } from '../components/icons'
 import { LIFE_DOMAINS, DOMAIN_LABEL, DOMAIN_EMOJI, groupIntoChapters, chapterForAge } from '../lib/lifeStory'
 import { ageFromDob } from '../lib/anthro'
-import type { LifeDomain, LifeEvent } from '../lib/types'
+import type { LifeDomain, LifeEvent, Quest } from '../lib/types'
 
 // Life Story: health reframed as one thread in a whole life. The user is
 // the protagonist, not a patient — no vitals, no labs, no diagnoses here.
@@ -13,8 +13,18 @@ import type { LifeDomain, LifeEvent } from '../lib/types'
 // into. See lib/lifeStory.ts for why "impact" is self-rated, never inferred.
 
 export function LifeStory() {
-  const { state, activePatient, addLifeEvent, removeLifeEvent } = useStore()
+  const {
+    state,
+    activePatient,
+    addLifeEvent,
+    removeLifeEvent,
+    addQuest,
+    updateQuestProgress,
+    setQuestStatus,
+    removeQuest,
+  } = useStore()
   const events = state.lifeEvents[activePatient.id] ?? []
+  const quests = state.quests[activePatient.id] ?? []
   const hasPatient = activePatient.id !== 'none'
 
   if (!hasPatient) {
@@ -44,6 +54,14 @@ export function LifeStory() {
         <p className="text-sm text-neutral-500">Age {currentChapter.ageRange}</p>
       </Card>
 
+      <QuestBoard
+        quests={quests}
+        onAdd={(q) => addQuest(activePatient.id, q)}
+        onProgress={(id, n) => updateQuestProgress(activePatient.id, id, n)}
+        onStatus={(id, s) => setQuestStatus(activePatient.id, id, s)}
+        onRemove={(id) => removeQuest(activePatient.id, id)}
+      />
+
       <NewEventForm onAdd={(e) => addLifeEvent(activePatient.id, e)} />
 
       {chapters.length === 0 && (
@@ -67,6 +85,201 @@ export function LifeStory() {
           </div>
         ))}
       </div>
+    </div>
+  )
+}
+
+// Quests: self-set goals, not algorithm-assigned tasks. Progress is a number
+// the user updates themselves — never inferred from other data, for the
+// same reason a LifeEvent's impact is self-rated: only the person living it
+// can say how far along a relationship, a skill, or a habit really is.
+function QuestBoard({
+  quests,
+  onAdd,
+  onProgress,
+  onStatus,
+  onRemove,
+}: {
+  quests: Quest[]
+  onAdd: (q: Omit<Quest, 'id' | 'createdAt' | 'status' | 'progressCurrent'>) => void
+  onProgress: (id: string, n: number) => void
+  onStatus: (id: string, s: Quest['status']) => void
+  onRemove: (id: string) => void
+}) {
+  const active = quests.filter((q) => q.status === 'active')
+  const done = quests.filter((q) => q.status === 'done')
+  const [showForm, setShowForm] = useState(false)
+
+  return (
+    <Card>
+      <SectionTitle
+        icon={<span className="text-lg">🗺️</span>}
+        title="Quests"
+        subtitle="Goals you set for yourself — progress you update, not a score anyone computes for you"
+        right={
+          <Button variant="ghost" onClick={() => setShowForm((s) => !s)} className="!min-h-0 !px-2 !py-1 text-xs">
+            {showForm ? 'Cancel' : '+ New quest'}
+          </Button>
+        }
+      />
+
+      {showForm && (
+        <div className="mb-4">
+          <NewQuestForm
+            onAdd={(q) => {
+              onAdd(q)
+              setShowForm(false)
+            }}
+          />
+        </div>
+      )}
+
+      {active.length === 0 && !showForm && (
+        <p className="text-sm text-neutral-500">No active quests yet — set one for something that matters to you.</p>
+      )}
+
+      <div className="space-y-2">
+        {active.map((q) => (
+          <QuestRow key={q.id} quest={q} onProgress={(n) => onProgress(q.id, n)} onStatus={(s) => onStatus(q.id, s)} onRemove={() => onRemove(q.id)} />
+        ))}
+      </div>
+
+      {done.length > 0 && (
+        <div className="mt-4 border-t border-neutral-100 pt-3">
+          <p className="mb-2 text-[11px] font-semibold uppercase tracking-[0.14em] text-neutral-500">Completed</p>
+          <div className="space-y-2">
+            {done.map((q) => (
+              <QuestRow key={q.id} quest={q} onProgress={(n) => onProgress(q.id, n)} onStatus={(s) => onStatus(q.id, s)} onRemove={() => onRemove(q.id)} />
+            ))}
+          </div>
+        </div>
+      )}
+    </Card>
+  )
+}
+
+function QuestRow({
+  quest,
+  onProgress,
+  onStatus,
+  onRemove,
+}: {
+  quest: Quest
+  onProgress: (n: number) => void
+  onStatus: (s: Quest['status']) => void
+  onRemove: () => void
+}) {
+  const pct = Math.min(100, Math.round((quest.progressCurrent / quest.progressTarget) * 100))
+  const domainMeta = LIFE_DOMAINS.find((d) => d.key === quest.domain)
+
+  return (
+    <div className={`rounded-xl border p-3 ${quest.status === 'done' ? 'border-brand/30 bg-brand-50/30' : 'border-neutral-200'}`}>
+      <div className="flex items-start justify-between gap-2">
+        <div className="min-w-0">
+          <span className="text-xs">
+            {domainMeta?.emoji} {domainMeta?.label}
+          </span>
+          <h4 className="font-bold text-ink">{quest.title}</h4>
+          <p className="text-xs text-neutral-500">{quest.targetNote}</p>
+        </div>
+        <div className="flex shrink-0 items-center gap-2">
+          {quest.status === 'done' && <Badge tone="normal">Done ✓</Badge>}
+          <button type="button" onClick={onRemove} className="text-xs text-neutral-400 hover:text-accent">
+            Remove
+          </button>
+        </div>
+      </div>
+
+      <div className="mt-2 h-2 overflow-hidden rounded-full bg-neutral-100">
+        <div className="h-full rounded-full bg-brand transition-all" style={{ width: `${pct}%` }} />
+      </div>
+
+      <div className="mt-2 flex items-center justify-between gap-2">
+        <span className="text-xs font-semibold text-neutral-500">
+          {quest.progressCurrent} / {quest.progressTarget} {quest.unit}
+        </span>
+        {quest.status !== 'abandoned' && (
+          <div className="flex items-center gap-1.5">
+            <button
+              type="button"
+              onClick={() => onProgress(quest.progressCurrent - 1)}
+              className="grid h-7 w-7 place-items-center rounded-full border border-neutral-200 text-sm font-bold text-neutral-600"
+            >
+              −
+            </button>
+            <button
+              type="button"
+              onClick={() => onProgress(quest.progressCurrent + 1)}
+              className="grid h-7 w-7 place-items-center rounded-full border border-neutral-200 text-sm font-bold text-neutral-600"
+            >
+              +
+            </button>
+            {quest.status === 'active' && (
+              <button type="button" onClick={() => onStatus('abandoned')} className="ml-1 text-xs text-neutral-400 hover:text-accent">
+                Let it go
+              </button>
+            )}
+          </div>
+        )}
+        {quest.status === 'abandoned' && <span className="text-xs text-neutral-400">Let go</span>}
+      </div>
+    </div>
+  )
+}
+
+function NewQuestForm({ onAdd }: { onAdd: (q: Omit<Quest, 'id' | 'createdAt' | 'status' | 'progressCurrent'>) => void }) {
+  const [title, setTitle] = useState('')
+  const [domain, setDomain] = useState<LifeDomain>('purpose')
+  const [targetNote, setTargetNote] = useState('')
+  const [progressTarget, setProgressTarget] = useState('1')
+  const [unit, setUnit] = useState('done')
+
+  function submit() {
+    const target = Number(progressTarget)
+    if (!title.trim() || !targetNote.trim() || !(target > 0)) return
+    onAdd({ title: title.trim(), domain, targetNote: targetNote.trim(), progressTarget: target, unit: unit.trim() || 'done' })
+  }
+
+  return (
+    <div className="space-y-3 rounded-xl border border-neutral-200 p-3">
+      <Field label="What do you want to work toward?">
+        <input
+          className={inputClass}
+          placeholder="e.g. Rebuild a friendship, Finish a certification, Run a 10k"
+          value={title}
+          onChange={(e) => setTitle(e.target.value)}
+        />
+      </Field>
+      <Field label="What does 'done' look like, in your own words?">
+        <input
+          className={inputClass}
+          placeholder="e.g. We talk again without it being awkward"
+          value={targetNote}
+          onChange={(e) => setTargetNote(e.target.value)}
+        />
+      </Field>
+      <div className="flex gap-2">
+        <Field label="Which part of life?">
+          <select className={inputClass} value={domain} onChange={(e) => setDomain(e.target.value as LifeDomain)}>
+            {LIFE_DOMAINS.map((d) => (
+              <option key={d.key} value={d.key}>
+                {d.emoji} {d.label}
+              </option>
+            ))}
+          </select>
+        </Field>
+      </div>
+      <div className="flex gap-2">
+        <Field label="Target number">
+          <input className={inputClass} type="number" min={1} value={progressTarget} onChange={(e) => setProgressTarget(e.target.value)} />
+        </Field>
+        <Field label="Unit">
+          <input className={inputClass} placeholder="sessions, days, done…" value={unit} onChange={(e) => setUnit(e.target.value)} />
+        </Field>
+      </div>
+      <Button onClick={submit} className="w-full">
+        <IconPlus size={16} /> Start this quest
+      </Button>
     </div>
   )
 }

@@ -372,6 +372,23 @@ export interface LifeEvent {
   impact: 'positive' | 'neutral' | 'negative' // self-rated, never inferred
 }
 
+// A self-set goal, not an algorithm-assigned task. Progress is a number the
+// USER updates ("I'm 3 of 5 sessions in") — never inferred from other data,
+// for the same reason LifeEvent.impact is self-rated: only the person living
+// it can say how far along a relationship, a skill, or a habit really is.
+export interface Quest {
+  id: string
+  title: string
+  domain: LifeDomain
+  createdAt: string
+  targetNote: string // what "done" looks like, in the user's own words
+  progressCurrent: number
+  progressTarget: number // e.g. 5 (sessions), 1 (binary "done"), 30 (days)
+  unit: string // e.g. "sessions", "days", "chapters" — free text
+  status: 'active' | 'done' | 'abandoned'
+  completedAt?: string
+}
+
 // 4. Daily mood log + 6. private "send support" one-tap messages.
 export interface MoodEntry {
   id: string
@@ -720,6 +737,7 @@ export interface AppState {
   trainingLogs: TrainingLog[] // Training Intensity (RPE) journal
   activeProgram?: string // training program the user is currently following
   lifeEvents: Record<string, LifeEvent[]> // patientId -> the user's own life story (see LifeEvent below)
+  quests: Record<string, Quest[]> // patientId -> self-set goals tied to life domains (see Quest below)
   foods: FoodEntry[]
   wellness: Record<string, WellnessDay> // daily sleep/water/exercise by date
   consults: ConsultSession[]
