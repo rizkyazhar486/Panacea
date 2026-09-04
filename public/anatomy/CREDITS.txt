@@ -1,0 +1,28 @@
+3D anatomy assets in this folder (skeletal.glb, muscular.glb, cardiovascular.glb,
+nervous.glb, visceral.glb) are derived from:
+
+  Z-Anatomy — The libre 3D atlas of anatomy
+  https://github.com/Z-Anatomy/Models-of-human-anatomy
+  License: Creative Commons Attribution-ShareAlike 4.0 International (CC BY-SA 4.0)
+  https://creativecommons.org/licenses/by-sa/4.0/
+
+  Which is itself derived from:
+  BodyParts3D — The Database Center for Life Science
+  https://dbarchive.biosciencedbc.jp/en/bodyparts3d/download.html
+  License: CC BY-SA 2.1 Japan
+
+Authors (Z-Anatomy): Kousaku Okubo (original BodyParts3D model), Gauthier Kervyn
+(design, 3D, anatomy), Marcin Zielinski (Blender add-on), Lluis Vinent (app dev).
+
+What was changed for Panaceamed.id: exported five system-separated GLB files
+(skeletal, muscular, cardiovascular, nervous, visceral) from the original
+Z-Anatomy Blender project, applied Meshopt mesh compression, and replaced the
+original Blender node-based shaders (which depend on Blender-viewport-only
+effects) with flat PBR materials colored per anatomical structure type
+(muscle red, artery red, vein blue, nerve yellow, bone tan, etc.) so the
+models render correctly in a web WebGL viewer (three.js).
+
+Per the CC BY-SA 4.0 terms, this derivative work (the five .glb files in this
+folder) is itself licensed under CC BY-SA 4.0 — attribution above must be kept,
+and any redistribution of these specific files must carry the same license.
+This does not extend to the rest of the Panaceamed.id application/codebase.

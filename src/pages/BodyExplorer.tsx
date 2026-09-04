@@ -5,7 +5,7 @@ import { BODY_REGIONS, type BodyRegion } from '../lib/bodyRegions'
 import { api, type OntologyTerm, type DrugLabelInfo } from '../lib/api'
 import { explainBodyRegion, explainDrug } from '../lib/ai'
 import { useStore } from '../lib/store'
-import { Body3D } from '../components/Body3D'
+import { Body3D, ANATOMY_LAYERS, type AnatomyLayer } from '../components/Body3D'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Body Explorer — klik satu region tubuh, dapatkan istilah NYATA dari dua
@@ -53,6 +53,17 @@ export function BodyExplorer() {
   const [question, setQuestion] = useState('')
   const [asking, setAsking] = useState(false)
   const [view, setView] = useState<'2d' | '3d'>('3d')
+  const [layers, setLayers] = useState<Set<AnatomyLayer['key']>>(
+    () => new Set(ANATOMY_LAYERS.filter((l) => l.defaultOn).map((l) => l.key)),
+  )
+  function toggleLayer(key: AnatomyLayer['key']) {
+    setLayers((prev) => {
+      const next = new Set(prev)
+      if (next.has(key)) next.delete(key)
+      else next.add(key)
+      return next
+    })
+  }
 
   // "Ask" — pencarian bebas (bahasa natural atau gejala/fungsi, bukan hanya
   // nama region tubuh) yang mengisi PANEL YANG SAMA dengan klik region: satu
@@ -183,8 +194,25 @@ export function BodyExplorer() {
         <div className="mt-4 grid gap-4 sm:grid-cols-[280px_1fr]">
           {view === '3d' ? (
             <div>
-              <Body3D active={active} onPick={pick} />
-              <p className="mt-1.5 text-center text-[10px] text-neutral-400">Drag to rotate · scroll/pinch to zoom · tap a shape</p>
+              <Body3D layers={layers} />
+              <div className="mt-2 flex flex-wrap justify-center gap-1.5 sm:justify-start">
+                {ANATOMY_LAYERS.map((l) => (
+                  <button
+                    key={l.key}
+                    onClick={() => toggleLayer(l.key)}
+                    className={`min-h-[32px] rounded-full border px-3 text-xs font-bold transition ${
+                      layers.has(l.key)
+                        ? 'border-brand bg-brand text-white'
+                        : 'border-neutral-200 text-neutral-500 dark:border-white/10'
+                    }`}
+                  >
+                    {l.label}
+                  </button>
+                ))}
+              </div>
+              <p className="mt-1.5 text-center text-[10px] text-neutral-400">
+                Drag to rotate · scroll/pinch to zoom · toggle layers above
+              </p>
             </div>
           ) : (
           <div className="relative mx-auto">
@@ -253,6 +281,12 @@ export function BodyExplorer() {
           via EBI's public Ontology Lookup Service (OLS4) — general medical reference data, not a diagnosis. Always
           consult a licensed clinician about your own symptoms.
         </p>
+        {view === '3d' && (
+          <p className="mt-1 text-[11px] leading-relaxed text-neutral-400">
+            3D anatomy model: <a href={`${import.meta.env.BASE_URL}anatomy/CREDITS.txt`} target="_blank" rel="noreferrer" className="underline">Z-Anatomy</a>,
+            based on BodyParts3D — licensed under CC BY-SA 4.0.
+          </p>
+        )}
       </Card>
 
       <Card>
