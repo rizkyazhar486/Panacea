@@ -590,21 +590,37 @@ button:active, a[href]:active, [role='button']:active { transform: scale(0.985);
    dianimasikan terus-menerus. Yang bergerak hanya bereaksi pada masukan.
    ───────────────────────────────────────────────────────────────────────── */
 
-/* PERUBAHAN LANGSUNG DIMINTA: kaca ini sebelumnya kartu putih tembus —
-   dan "putih" itulah tepatnya yang ditolak. Isinya kini gradien warna nyata
-   (hijau-mint, biru langit, ungu pucat), bukan putih dengan alpha berbeda.
-   Kecerahannya (bukan warnanya) dijaga tetap tinggi supaya tulisan gelap di
-   atasnya tidak kehilangan kontras — pastel, bukan redup. */
+/* "Bukan hanya gradasi, tapi permainan warna yang warna-warni" — langsung
+   diminta. Delapan corak (ungu, indigo, biru, sian, zamrud, emas, jingga,
+   magenta) alih-alih empat, DAN warnanya bergeser pelan sepanjang waktu
+   (aurora, bukan gambar diam) via hue-rotate — kartu terasa hidup, bukan
+   dicat sekali lalu diam. prefers-reduced-motion mematikannya lewat aturan
+   .reduce-motion & @media yang sudah ada secara global. */
+@keyframes kaca-aurora {
+  0%, 100% { filter: hue-rotate(0deg) saturate(1); }
+  50% { filter: hue-rotate(35deg) saturate(1.15); }
+}
+
+@keyframes kaca-edge-aurora {
+  0% { background-position: 0% 50%; }
+  100% { background-position: 400% 50%; }
+}
+
 .kaca {
   --kx: 50%;
   --ky: 0%;
   isolation: isolate;
   background:
-    linear-gradient(150deg,
-      rgba(103, 232, 249, 0.9) 0%,
-      rgba(232, 121, 249, 0.8) 35%,
-      rgba(129, 140, 248, 0.84) 65%,
-      rgba(253, 224, 71, 0.7) 100%);
+    linear-gradient(135deg,
+      rgba(167, 139, 250, 0.85) 0%,
+      rgba(99, 102, 241, 0.82) 16%,
+      rgba(56, 130, 246, 0.8) 32%,
+      rgba(34, 211, 238, 0.82) 48%,
+      rgba(52, 211, 153, 0.8) 64%,
+      rgba(251, 191, 36, 0.82) 80%,
+      rgba(244, 63, 94, 0.55) 92%,
+      rgba(232, 121, 249, 0.75) 100%);
+  animation: kaca-aurora 16s ease-in-out infinite;
   backdrop-filter: blur(20px) saturate(1.7);
   -webkit-backdrop-filter: blur(20px) saturate(1.7);
   border: 1px solid rgba(255,255,255,0.6);
@@ -664,6 +680,9 @@ button:active, a[href]:active, [role='button']:active { transform: scale(0.985);
    Sengaja diberi rona pelangi tipis (bukan putih polos) — meniru tepi kaca
    cair yang membiaskan cahaya pada gambar referensi. Ini murni cincin 1 px
    bertopeng; isi kartu dan kontras tulisan di dalamnya tidak tersentuh. */
+/* Tepi kartu mengalir seperti pita aurora — bukan gradasi diam — via
+   background-size besar + animasi posisi. Tetap hanya cincin 1px bertopeng,
+   jadi tidak menyentuh isi/kontras kartu. */
 .kaca::after {
   content: '';
   position: absolute;
@@ -673,17 +692,15 @@ button:active, a[href]:active, [role='button']:active { transform: scale(0.985);
   pointer-events: none;
   padding: 1px;
   background: linear-gradient(
-    160deg,
-    rgba(255,255,255,0.95),
-    rgba(134, 239, 172, 0.35) 22%,
-    rgba(147, 197, 253, 0.3) 40%,
-    rgba(232, 121, 249, 0.22) 58%,
-    rgba(255,255,255,0) 72%,
-    rgba(255,255,255,0.4));
+    100deg,
+    #a78bfa, #6366f1, #3b82f6, #22d3ee, #34d399, #fbbf24, #fb7185, #e879f9, #a78bfa);
+  background-size: 400% 100%;
+  animation: kaca-edge-aurora 12s linear infinite;
   -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
   mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
   -webkit-mask-composite: xor;
   mask-composite: exclude;
+  opacity: 0.75;
 }
 
 /* Di layar sentuh pantulan digerakkan oleh gulir, bukan kursor. */
@@ -704,13 +721,19 @@ button:active, a[href]:active, [role='button']:active { transform: scale(0.985);
    emas/oranye sebagai warna DOMINAN (bukan aksen kecil seperti sebelumnya),
    dipadukan petir biru-elektrik/ungu, di atas dasar nyaris hitam (ruang
    angkasa sungguhan, bukan abu-abu gelap). */
+/* Amber tetap dominan (diminta langsung), tapi kini enam gumpalan bukan
+   empat — zamrud dan magenta ditambahkan supaya spektrumnya lebih penuh —
+   dan seluruhnya bergeser pelan lewat kaca-aurora. */
 .dark .kaca {
   background:
-    radial-gradient(110% 95% at 8% -10%, rgba(251, 146, 60, 0.4) 0%, transparent 58%),
-    radial-gradient(90% 85% at 100% 0%, rgba(245, 158, 11, 0.32) 0%, transparent 55%),
+    radial-gradient(110% 95% at 8% -10%, rgba(251, 146, 60, 0.42) 0%, transparent 58%),
+    radial-gradient(90% 85% at 100% 0%, rgba(245, 158, 11, 0.34) 0%, transparent 55%),
     radial-gradient(100% 95% at 105% 105%, rgba(56, 189, 248, 0.3) 0%, transparent 55%),
     radial-gradient(85% 85% at -5% 100%, rgba(168, 85, 247, 0.28) 0%, transparent 55%),
+    radial-gradient(70% 70% at 50% -20%, rgba(52, 211, 153, 0.2) 0%, transparent 55%),
+    radial-gradient(70% 70% at 30% 120%, rgba(232, 121, 249, 0.2) 0%, transparent 55%),
     linear-gradient(160deg, rgba(20,14,10,0.85), rgba(10,8,14,0.68) 55%, rgba(14,10,18,0.75) 100%);
+  animation: kaca-aurora 18s ease-in-out infinite;
   border-color: rgba(255,255,255,0.14);
   box-shadow:
     0 1px 2px rgba(0,0,0,0.5),
@@ -724,13 +747,15 @@ button:active, a[href]:active, [role='button']:active { transform: scale(0.985);
     rgba(255,255,255,0.05) 38%,
     transparent 70%);
 }
+/* Sama seperti mode terang — pita aurora yang mengalir, bukan putih redup
+   yang tak pernah terlihat berwarna di layar gelap. */
 .dark .kaca::after {
   background: linear-gradient(
-    160deg,
-    rgba(255,255,255,0.28),
-    rgba(255,255,255,0.04) 40%,
-    rgba(255,255,255,0) 60%,
-    rgba(255,255,255,0.1));
+    100deg,
+    #a78bfa, #6366f1, #3b82f6, #22d3ee, #34d399, #fbbf24, #fb7185, #e879f9, #a78bfa);
+  background-size: 400% 100%;
+  animation: kaca-edge-aurora 12s linear infinite;
+  opacity: 0.6;
 }
 
 /* Melayang: naik saat disentuh perhatian, turun saat ditekan. Kurva
@@ -1219,17 +1244,23 @@ html { -webkit-overflow-scrolling: touch; }
 }
 
 :root:not(.dark) .kaca {
-  /* Nebula, bukan taman: sian elektrik ke magenta ke indigo ke emas —
-     spektrum "outer space" dari referensi, tetap pada alpha tinggi supaya
-     kartu tetap opak dan tulisan gelap tetap kontras. */
+  /* Spektrum penuh (ungu→indigo→biru→sian→zamrud→emas→jingga→magenta),
+     bergeser pelan lewat kaca-aurora — "permainan warna", bukan satu
+     gradien statis. Alpha tetap tinggi supaya kartu tetap opak dan tulisan
+     gelap tetap kontras. */
   background:
-    linear-gradient(150deg,
-      rgba(103, 232, 249, 0.94),
-      rgba(232, 121, 249, 0.85) 35%,
-      rgba(129, 140, 248, 0.88) 65%,
-      rgba(253, 224, 71, 0.85) 100%);
-  backdrop-filter: blur(20px) saturate(1.5);
-  -webkit-backdrop-filter: blur(20px) saturate(1.5);
+    linear-gradient(135deg,
+      rgba(167, 139, 250, 0.92) 0%,
+      rgba(99, 102, 241, 0.9) 16%,
+      rgba(56, 130, 246, 0.88) 32%,
+      rgba(34, 211, 238, 0.9) 48%,
+      rgba(52, 211, 153, 0.88) 64%,
+      rgba(251, 191, 36, 0.9) 80%,
+      rgba(244, 63, 94, 0.6) 92%,
+      rgba(232, 121, 249, 0.82) 100%);
+  animation: kaca-aurora 16s ease-in-out infinite;
+  backdrop-filter: blur(20px) saturate(1.6);
+  -webkit-backdrop-filter: blur(20px) saturate(1.6);
   border-color: rgba(12,20,16,0.07);
   box-shadow:
     0 1px 2px rgba(12,20,16,0.05),
