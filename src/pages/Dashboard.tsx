@@ -195,7 +195,7 @@ function VitalCard({ label, value, unit, series, tone }: { label: string; value:
 
   return (
     <div
-      className="group relative overflow-hidden rounded-2xl border p-4 transition-all duration-300 hover:-translate-y-0.5 hover:shadow-lg"
+      className="tile-inset group relative overflow-hidden rounded-2xl border p-4 transition-all duration-300 hover:-translate-y-0.5 hover:shadow-lg"
       style={{ background: bg, borderColor: border }}
       role="status"
       aria-label={`${label}: ${value} ${unit}`}
@@ -208,7 +208,7 @@ function VitalCard({ label, value, unit, series, tone }: { label: string; value:
             <span className="text-[10px] font-bold uppercase tracking-[0.14em] text-neutral-500">{label}</span>
           </div>
           <div className="mt-2.5 flex items-baseline gap-1">
-            <span className={`text-[26px] font-black leading-none tabular-nums ${tone === 'high' ? '' : 'text-ink dark:text-white'}`} style={tone === 'high' ? { color: '#FF3131' } : undefined}>{value}</span>
+            <span className={`num-carved text-[26px] font-black leading-none tabular-nums ${tone === 'high' ? '' : 'text-ink dark:text-white'}`} style={tone === 'high' ? { color: '#FF3131' } : undefined}>{value}</span>
             <span className="text-[10px] font-medium text-neutral-500">{unit}</span>
           </div>
         </div>
