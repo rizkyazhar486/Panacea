@@ -5,6 +5,7 @@ import { IconHeart, IconShield, IconPlus, IconSparkle } from '../components/icon
 import { computeBmi, ageFromDob } from '../lib/anthro'
 import { GrowthChart } from '../components/GrowthChart'
 import { api, backendEnabled } from '../lib/api'
+import { detectDrift, driftSummary } from '../lib/physiologicalDrift'
 import type { VitalSign, Patient } from '../lib/types'
 
 /* ═══════════════════════════════════════════
@@ -205,6 +206,50 @@ function VitalCard({ label, value, unit, series, tone }: { label: string; value:
         </div>
       </div>
     </div>
+  )
+}
+
+/* ═══════════════════════════════════════════
+   PHYSIOLOGICAL DRIFT
+   ═══════════════════════════════════════════ */
+
+// Shows nothing until there's a real baseline (5+ prior readings) and a real
+// statistical deviation (z-score) — no placeholder "everything looks fine"
+// message, since that would imply a check happened when it didn't yet.
+function DriftPanel({ vitals }: { vitals: VitalSign[] }) {
+  const findings = detectDrift(vitals)
+  if (findings.length === 0) return null
+
+  return (
+    <Card className="overflow-hidden">
+      <div className="border-b border-neutral-100 px-5 py-4">
+        <SectionTitle
+          icon={<IconSparkle size={18} />}
+          title="Physiological Drift"
+          subtitle="Compared to this patient's own recent baseline — not a population norm"
+        />
+      </div>
+      <div className="space-y-2 p-5">
+        {findings.map((f) => (
+          <div
+            key={f.key}
+            className="rounded-xl border p-3"
+            style={{
+              background: f.severity === 'drift' ? 'rgba(255,49,49,0.04)' : 'rgba(245,158,11,0.05)',
+              borderColor: f.severity === 'drift' ? 'rgba(255,49,49,0.12)' : 'rgba(245,158,11,0.15)',
+            }}
+          >
+            <div className="flex items-center justify-between gap-2">
+              <span className="text-xs font-bold text-ink">{f.label}</span>
+              <Badge tone={f.severity === 'drift' ? 'high' : 'low'}>
+                {f.severity === 'drift' ? 'Drifting' : 'Watch'}
+              </Badge>
+            </div>
+            <p className="mt-1 text-xs text-neutral-600">{driftSummary(f)}</p>
+          </div>
+        ))}
+      </div>
+    </Card>
   )
 }
 
@@ -549,6 +594,11 @@ export function Dashboard() {
           </div>
         )}
       </Card>
+
+      {/* Physiological Drift — compares the latest reading to the patient's
+          OWN recent baseline, not a population threshold. See lib/physiologicalDrift.ts
+          for why this uses real z-scores instead of any invented "healthspan" score. */}
+      <DriftPanel vitals={vitals} />
 
       {/* Anthropometry + BMI Gauge */}
       <Card className="overflow-hidden">
