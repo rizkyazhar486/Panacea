@@ -700,13 +700,17 @@ button:active, a[href]:active, [role='button']:active { transform: scale(0.985);
    dengan dasar gelap. Diganti dengan gumpalan warna bercahaya yang jelas
    (sian, magenta, indigo), pola yang sama seperti metal-forge di area
    Fitness yang sudah terbukti terlihat berwarna di layar gelap. */
+/* "Amber flame + space", langsung diminta lewat referensi: nyala
+   emas/oranye sebagai warna DOMINAN (bukan aksen kecil seperti sebelumnya),
+   dipadukan petir biru-elektrik/ungu, di atas dasar nyaris hitam (ruang
+   angkasa sungguhan, bukan abu-abu gelap). */
 .dark .kaca {
   background:
-    radial-gradient(120% 100% at 12% -15%, rgba(34, 211, 238, 0.32) 0%, transparent 55%),
-    radial-gradient(100% 90% at 105% -10%, rgba(232, 121, 249, 0.28) 0%, transparent 55%),
-    radial-gradient(95% 90% at 90% 110%, rgba(129, 140, 248, 0.26) 0%, transparent 55%),
-    radial-gradient(80% 80% at 0% 105%, rgba(250, 204, 21, 0.14) 0%, transparent 55%),
-    linear-gradient(160deg, rgba(28,26,42,0.8), rgba(18,18,28,0.62) 55%, rgba(22,24,32,0.7) 100%);
+    radial-gradient(110% 95% at 8% -10%, rgba(251, 146, 60, 0.4) 0%, transparent 58%),
+    radial-gradient(90% 85% at 100% 0%, rgba(245, 158, 11, 0.32) 0%, transparent 55%),
+    radial-gradient(100% 95% at 105% 105%, rgba(56, 189, 248, 0.3) 0%, transparent 55%),
+    radial-gradient(85% 85% at -5% 100%, rgba(168, 85, 247, 0.28) 0%, transparent 55%),
+    linear-gradient(160deg, rgba(20,14,10,0.85), rgba(10,8,14,0.68) 55%, rgba(14,10,18,0.75) 100%);
   border-color: rgba(255,255,255,0.14);
   box-shadow:
     0 1px 2px rgba(0,0,0,0.5),

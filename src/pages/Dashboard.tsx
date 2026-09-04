@@ -208,7 +208,7 @@ function VitalCard({ label, value, unit, series, tone }: { label: string; value:
             <span className="text-[10px] font-bold uppercase tracking-[0.14em] text-neutral-500">{label}</span>
           </div>
           <div className="mt-2.5 flex items-baseline gap-1">
-            <span className="text-[26px] font-black leading-none tabular-nums" style={{ color: tone === 'high' ? '#FF3131' : '#171717' }}>{value}</span>
+            <span className={`text-[26px] font-black leading-none tabular-nums ${tone === 'high' ? '' : 'text-ink dark:text-white'}`} style={tone === 'high' ? { color: '#FF3131' } : undefined}>{value}</span>
             <span className="text-[10px] font-medium text-neutral-500">{unit}</span>
           </div>
         </div>
