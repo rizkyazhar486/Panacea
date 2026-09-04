@@ -20,6 +20,9 @@ import {
   removeCandidate,
   updateCandidateCost,
   chooseCandidate,
+  detectStalls,
+  episodeHealth,
+  stallReason,
   type CandidateView,
 } from '../lib/careEpisode'
 import type { CareEpisode, CareEpisodeStageId, CareEpisodeStageStatus } from '../lib/types'
@@ -123,6 +126,9 @@ function EpisodeCard({
   const next = nextStages(episode)
   const done = isComplete(episode)
   const cost = formatCostRange(episode)
+  const health = episodeHealth(episode)
+  const stalls = detectStalls(episode)
+  const blockedStages = episode.stages.filter((s) => s.status === 'blocked')
 
   function cycle(stage: CareEpisodeStageId, current: CareEpisodeStageStatus) {
     const order: CareEpisodeStageStatus[] = ['pending', 'active', 'done', 'blocked']
@@ -149,6 +155,8 @@ function EpisodeCard({
         </div>
         <div className="flex items-center gap-2">
           {done && <Badge tone="normal">Done</Badge>}
+          {!done && health === 'at_risk' && <Badge tone="low">At risk</Badge>}
+          {!done && health === 'stalled' && <Badge tone="high">Stalled</Badge>}
           <Button variant="ghost" onClick={onRemove} className="!min-h-0 !px-2 !py-1 text-xs">
             Remove
           </Button>
@@ -175,6 +183,22 @@ function EpisodeCard({
           )
         })}
       </div>
+
+      {(blockedStages.length > 0 || stalls.length > 0) && (
+        <div className="mt-3 space-y-1 rounded-xl bg-accent/5 p-3">
+          {blockedStages.map((s) => (
+            <p key={s.stage} className="text-xs text-accent">
+              <b>{STAGE_LABEL[s.stage]} blocked</b>
+              {s.blockedReason ? ` — ${s.blockedReason}` : ' — no reason given yet.'}
+            </p>
+          ))}
+          {stalls.map((s) => (
+            <p key={s.stage} className={`text-xs ${s.severity === 'stalled' ? 'text-accent' : 'text-amber-700'}`}>
+              {stallReason(s)}
+            </p>
+          ))}
+        </div>
+      )}
 
       <div className="mt-4 border-t border-neutral-100 pt-4">
         <ProviderComparison episode={episode} onChange={onChange} />

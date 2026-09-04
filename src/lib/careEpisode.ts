@@ -82,6 +82,7 @@ export function newCareEpisode(title: string, problemId?: string): CareEpisode {
     stages: CARE_EPISODE_STAGES.map((stage, i): CareEpisodeStage => ({
       stage,
       status: i === 0 ? 'active' : 'pending',
+      updatedAt: i === 0 ? now : undefined,
     })),
   }
 }
@@ -272,4 +273,66 @@ export function chooseCandidate(episode: CareEpisode, facilityId: string): CareE
     })
   }
   return next
+}
+
+// Care failure detection: there's no real scheduling/reminder data to check
+// a stage against ("did the patient miss their 2pm appointment?"), so this
+// doesn't pretend to know that. What IS real: every stage's `updatedAt` is
+// the timestamp it actually became active, and how long a step like
+// "choose a provider" or "have the surgery" should reasonably take is a
+// fact about the step itself, not the patient. Comparing the two — genuine
+// elapsed time against a stated expectation — is an honest stall signal,
+// distinct from a "blocked" stage the patient or clinician marked by hand.
+export const STAGE_EXPECTED_DAYS: Record<CareEpisodeStageId, number> = {
+  problem: 1,
+  diagnosis: 2,
+  plan: 3,
+  provider: 5,
+  cost: 5,
+  schedule: 7,
+  treatment: 21,
+  recovery: 21,
+  followUp: 21,
+  outcome: 14,
+}
+
+export type StallSeverity = 'watch' | 'stalled'
+
+export interface StageStall {
+  stage: CareEpisodeStageId
+  daysSinceUpdate: number
+  expectedDays: number
+  severity: StallSeverity
+}
+
+// Only 'active' stages can stall — 'blocked' already says why it's stuck,
+// 'pending'/'done' aren't in motion. 'watch' at 70% of the expected time,
+// 'stalled' past 100%, so the UI can warn before it's actually a problem.
+export function detectStalls(episode: CareEpisode, now: Date = new Date()): StageStall[] {
+  const out: StageStall[] = []
+  for (const s of episode.stages) {
+    if (s.status !== 'active' || !s.updatedAt) continue
+    const daysSinceUpdate = (now.getTime() - new Date(s.updatedAt).getTime()) / 86_400_000
+    const expectedDays = STAGE_EXPECTED_DAYS[s.stage]
+    if (daysSinceUpdate >= expectedDays) out.push({ stage: s.stage, daysSinceUpdate, expectedDays, severity: 'stalled' })
+    else if (daysSinceUpdate >= expectedDays * 0.7) out.push({ stage: s.stage, daysSinceUpdate, expectedDays, severity: 'watch' })
+  }
+  return out
+}
+
+export type EpisodeHealth = 'on_track' | 'at_risk' | 'stalled'
+
+export function episodeHealth(episode: CareEpisode): EpisodeHealth {
+  if (isComplete(episode)) return 'on_track'
+  if (episode.stages.some((s) => s.status === 'blocked')) return 'stalled'
+  const stalls = detectStalls(episode)
+  if (stalls.some((s) => s.severity === 'stalled')) return 'stalled'
+  if (stalls.length > 0) return 'at_risk'
+  return 'on_track'
+}
+
+export function stallReason(stall: StageStall): string {
+  const days = Math.floor(stall.daysSinceUpdate)
+  const verb = stall.severity === 'stalled' ? 'No update in' : 'Been open'
+  return `${verb} ${days} day${days === 1 ? '' : 's'} on ${STAGE_LABEL[stall.stage]} — usually takes about ${stall.expectedDays} day${stall.expectedDays === 1 ? '' : 's'}.`
 }
