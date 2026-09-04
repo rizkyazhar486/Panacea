@@ -695,13 +695,19 @@ button:active, a[href]:active, [role='button']:active { transform: scale(0.985);
    tidak ikut berwarna walau lapisan orb di baliknya sudah diwarnai. Sekarang
    kaca gelap bertitik warna nyata (sian, magenta, ungu) supaya cocok dengan
    nebula di belakangnya, bukan menutupinya dengan abu-abu polos. */
+/* Versi sebelumnya masih terbaca "hijau-hitam kusam" (dilaporkan langsung
+   dari tangkapan layar nyata) — tint-nya terlalu redup untuk bersaing
+   dengan dasar gelap. Diganti dengan gumpalan warna bercahaya yang jelas
+   (sian, magenta, indigo), pola yang sama seperti metal-forge di area
+   Fitness yang sudah terbukti terlihat berwarna di layar gelap. */
 .dark .kaca {
   background:
-    linear-gradient(160deg,
-      rgba(45, 55, 72, 0.75),
-      rgba(60, 35, 70, 0.5) 45%,
-      rgba(30, 50, 55, 0.55) 100%);
-  border-color: rgba(255,255,255,0.12);
+    radial-gradient(120% 100% at 12% -15%, rgba(34, 211, 238, 0.32) 0%, transparent 55%),
+    radial-gradient(100% 90% at 105% -10%, rgba(232, 121, 249, 0.28) 0%, transparent 55%),
+    radial-gradient(95% 90% at 90% 110%, rgba(129, 140, 248, 0.26) 0%, transparent 55%),
+    radial-gradient(80% 80% at 0% 105%, rgba(250, 204, 21, 0.14) 0%, transparent 55%),
+    linear-gradient(160deg, rgba(28,26,42,0.8), rgba(18,18,28,0.62) 55%, rgba(22,24,32,0.7) 100%);
+  border-color: rgba(255,255,255,0.14);
   box-shadow:
     0 1px 2px rgba(0,0,0,0.5),
     0 12px 32px -8px rgba(0,0,0,0.55),
