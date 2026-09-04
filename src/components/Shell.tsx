@@ -483,18 +483,19 @@ export function Shell({ children }: { children: ReactNode }) {
         </div>
       </div>
       {/* Ambient animated backdrop — sits behind every page */}
-      {/* Lapisan warna ambient yang BENAR-BENAR terlihat (lihat catatan di
-          index.css) — sebelumnya hanya tiga bola hijau/emerald/teal pada
-          10% alpha, nyaris tidak terasa sebagai "berwarna". Ditambah emas
-          dan magenta supaya terasa pelangi, dan alpha-nya dinaikkan lewat
-          dark: supaya tetap terlihat di kanvas gelap, bukan hanya terang. */}
+      {/* "Outer space" — nebula multi-warna, bukan pelangi pastel lembut.
+          Menambah sian elektrik dan merah-kobalt (lihat referensi: sosok
+          berapi biru-merah) di samping hijau/emas/magenta/ungu yang sudah
+          ada, supaya kesannya benar-benar ruang angkasa berwarna, bukan
+          taman musim semi. */}
       <div className="pointer-events-none fixed inset-0 z-0 overflow-hidden">
         <div className="orb absolute -left-32 top-10 h-80 w-80 rounded-full bg-brand/20 blur-3xl dark:bg-brand/14" />
-        <div className="orb absolute right-0 top-1/3 h-96 w-96 rounded-full bg-emerald-400/20 blur-3xl dark:bg-emerald-400/14" style={{ animationDelay: '-8s' }} />
-        <div className="orb absolute bottom-0 left-1/2 h-72 w-72 rounded-full bg-teal-300/20 blur-3xl dark:bg-teal-300/14" style={{ animationDelay: '-14s' }} />
+        <div className="orb absolute right-0 top-1/3 h-96 w-96 rounded-full bg-cyan-400/22 blur-3xl dark:bg-cyan-400/15" style={{ animationDelay: '-8s' }} />
+        <div className="orb absolute bottom-0 left-1/2 h-72 w-72 rounded-full bg-red-500/16 blur-3xl dark:bg-red-500/12" style={{ animationDelay: '-14s' }} />
         <div className="orb absolute right-10 bottom-10 h-72 w-72 rounded-full bg-amber-300/18 blur-3xl dark:bg-amber-300/12" style={{ animationDelay: '-4s' }} />
-        <div className="orb absolute left-10 top-1/2 h-80 w-80 rounded-full bg-fuchsia-400/16 blur-3xl dark:bg-fuchsia-400/11" style={{ animationDelay: '-18s' }} />
-        <div className="orb absolute right-1/3 top-0 h-64 w-64 rounded-full bg-violet-400/14 blur-3xl dark:bg-violet-400/10" style={{ animationDelay: '-11s' }} />
+        <div className="orb absolute left-10 top-1/2 h-80 w-80 rounded-full bg-fuchsia-500/18 blur-3xl dark:bg-fuchsia-500/13" style={{ animationDelay: '-18s' }} />
+        <div className="orb absolute right-1/3 top-0 h-64 w-64 rounded-full bg-indigo-500/16 blur-3xl dark:bg-indigo-500/12" style={{ animationDelay: '-11s' }} />
+        <div className="orb absolute left-1/3 bottom-1/4 h-60 w-60 rounded-full bg-blue-400/18 blur-3xl dark:bg-blue-400/13" style={{ animationDelay: '-21s' }} />
       </div>
       <aside className={`sticky top-0 z-10 hidden h-screen shrink-0 flex-col border-r border-black/5 bg-white/80 py-6 backdrop-blur-xl transition-all duration-300 lg:flex ${sidebarOpen ? 'w-64 px-4' : 'w-0 overflow-hidden border-r-0 px-0 opacity-0'}`}>
         <div className="mb-6 flex items-center justify-between gap-2 px-2">

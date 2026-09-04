@@ -97,15 +97,28 @@ html {
    lebih dulu. Kanvas di sini TETAP diwarnai juga (bukan dibiarkan putih)
    untuk celah di antara orb dan di halaman yang tidak memakai Shell (mis.
    layar cetak/PDF) — tidak boleh ada satu jengkal pun yang masih putih polos. */
+/* "Outer space" taste, langsung diminta: bintang halus (titik putih acak,
+   sangat kecil) di atas nebula warna jenuh (sian, magenta, emas, ungu) —
+   bukan mint pucat lagi. Tetap TERANG secara keseluruhan (dasar linear-nya
+   masih dekat putih) karena inilah yang melindungi kontras kartu .kaca di
+   atasnya; ruangnya yang bertekstur, bukan gelombang gelapnya. */
 body {
   margin: 0;
   font-family: var(--font-sans);
   background:
-    radial-gradient(90% 55% at 10% -5%, rgba(0, 191, 99, 0.12) 0%, transparent 55%),
-    radial-gradient(80% 55% at 100% 0%, rgba(56, 189, 248, 0.1) 0%, transparent 55%),
-    radial-gradient(75% 60% at 90% 100%, rgba(250, 204, 21, 0.08) 0%, transparent 55%),
-    radial-gradient(75% 60% at 0% 100%, rgba(168, 85, 247, 0.08) 0%, transparent 55%),
-    linear-gradient(160deg, #eefcf5 0%, #eef6f8 45%, #f3eefc 100%)
+    radial-gradient(1.5px 1.5px at 20% 15%, rgba(255,255,255,0.9) 0%, transparent 100%),
+    radial-gradient(1px 1px at 65% 8%, rgba(255,255,255,0.8) 0%, transparent 100%),
+    radial-gradient(1.5px 1.5px at 85% 30%, rgba(255,255,255,0.85) 0%, transparent 100%),
+    radial-gradient(1px 1px at 40% 45%, rgba(255,255,255,0.7) 0%, transparent 100%),
+    radial-gradient(1.5px 1.5px at 10% 65%, rgba(255,255,255,0.8) 0%, transparent 100%),
+    radial-gradient(1px 1px at 75% 70%, rgba(255,255,255,0.7) 0%, transparent 100%),
+    radial-gradient(1.5px 1.5px at 55% 85%, rgba(255,255,255,0.85) 0%, transparent 100%),
+    radial-gradient(1px 1px at 90% 90%, rgba(255,255,255,0.7) 0%, transparent 100%),
+    radial-gradient(95% 60% at 8% -8%, rgba(6, 182, 212, 0.16) 0%, transparent 55%),
+    radial-gradient(85% 55% at 100% 0%, rgba(236, 72, 153, 0.14) 0%, transparent 55%),
+    radial-gradient(80% 65% at 92% 100%, rgba(250, 204, 21, 0.1) 0%, transparent 55%),
+    radial-gradient(80% 65% at 0% 100%, rgba(139, 92, 246, 0.12) 0%, transparent 55%),
+    linear-gradient(160deg, #eefcf9 0%, #eef3fb 45%, #f6eefc 100%)
     fixed;
   color: var(--color-ink);
   -webkit-font-smoothing: antialiased;
@@ -601,9 +614,9 @@ button:active, a[href]:active, [role='button']:active { transform: scale(0.985);
   isolation: isolate;
   background:
     linear-gradient(150deg,
-      rgba(110, 231, 183, 0.92) 0%,
-      rgba(125, 211, 252, 0.88) 35%,
-      rgba(196, 181, 253, 0.86) 65%,
+      rgba(103, 232, 249, 0.9) 0%,
+      rgba(232, 121, 249, 0.8) 35%,
+      rgba(129, 140, 248, 0.84) 65%,
       rgba(253, 224, 71, 0.7) 100%);
   backdrop-filter: blur(20px) saturate(1.7);
   -webkit-backdrop-filter: blur(20px) saturate(1.7);
@@ -1202,14 +1215,17 @@ html { -webkit-overflow-scrolling: touch; }
 }
 
 :root:not(.dark) .kaca {
+  /* Nebula, bukan taman: sian elektrik ke magenta ke indigo ke emas —
+     spektrum "outer space" dari referensi, tetap pada alpha tinggi supaya
+     kartu tetap opak dan tulisan gelap tetap kontras. */
   background:
     linear-gradient(150deg,
-      rgba(110, 231, 183, 0.95),
-      rgba(125, 211, 252, 0.92) 35%,
-      rgba(196, 181, 253, 0.9) 65%,
+      rgba(103, 232, 249, 0.94),
+      rgba(232, 121, 249, 0.85) 35%,
+      rgba(129, 140, 248, 0.88) 65%,
       rgba(253, 224, 71, 0.85) 100%);
-  backdrop-filter: blur(20px) saturate(1.4);
-  -webkit-backdrop-filter: blur(20px) saturate(1.4);
+  backdrop-filter: blur(20px) saturate(1.5);
+  -webkit-backdrop-filter: blur(20px) saturate(1.5);
   border-color: rgba(12,20,16,0.07);
   box-shadow:
     0 1px 2px rgba(12,20,16,0.05),
