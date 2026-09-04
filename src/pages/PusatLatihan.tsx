@@ -1,7 +1,9 @@
 import { lazy, useMemo } from 'react'
 import { Link } from 'react-router-dom'
 import { HalamanTab, type TabDef } from '../components/HalamanTab'
-import { PanelAngka, NADA, type Angka } from '../components/PanelAngka'
+import { NADA, type Angka } from '../components/PanelAngka'
+import { MetalStatPanel } from '../components/MetalStatPanel'
+import { FightHero } from '../components/FightHero'
 import { KartuAngkaKlinis } from '../components/AngkaKlinis'
 import { RaporRamalanKesegaran } from '../components/RaporRamalan'
 import { auditKebugaran, auditKelelahan, auditKesegaran, bacaanJujur, type BahanAudit } from '../lib/auditKebugaran'
@@ -129,7 +131,13 @@ export function PusatLatihan() {
       judul="Training"
       subjudul="Coach, analysis, physiology and endurance on one page"
       ikon={<IconRun />}
-      ringkasan={<PanelAngka angka={angka} />}
+      theme="metal"
+      ringkasan={
+        <div className="space-y-3">
+          <FightHero tag="Arena" title="Training" motto="Veni. Vidi. Vici." />
+          <MetalStatPanel angka={angka} />
+        </div>
+      }
       tabs={TABS}
       kaki={
         <div className="space-y-3">

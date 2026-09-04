@@ -2,6 +2,7 @@ import { Suspense, useEffect, useMemo, useState, type ComponentType } from 'reac
 import { useLocation, useNavigate } from 'react-router-dom'
 import { SectionTitle } from './ui'
 import { RangkaDaftar } from './Rangka'
+import '../styles/metal.css'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Rangka halaman bertab.
@@ -33,12 +34,18 @@ export interface TabDef {
 }
 
 export function HalamanTab({
-  judul, subjudul, ikon, tabs, ringkasan, kaki,
+  judul, subjudul, ikon, tabs, ringkasan, kaki, theme,
 }: {
   judul: string
   subjudul: string
   ikon: React.ReactNode
   tabs: TabDef[]
+  /**
+   * 'metal' mewarnai keping tab aktif dengan gaya Fitness/Training (lihat
+   * styles/metal.css) — opt-in per halaman, jadi Body Hub yang juga memakai
+   * komponen ini tidak ikut berubah kecuali dimintai.
+   */
+  theme?: 'metal'
   /**
    * Panel angka yang berlaku untuk SELURUH tab, ditampilkan di atasnya.
    *
@@ -98,7 +105,7 @@ export function HalamanTab({
                  terukur 2,45:1. Dibuat memakai pasangan yang bekerja di kedua
                  tema, seperti keping tab di halaman lain. */
               t.id === aktif
-                ? 'bg-brand text-ink'
+                ? theme === 'metal' ? 'metal-tag metal-gold !text-[12px] normal-case tracking-normal' : 'bg-brand text-ink'
                 : 'bg-neutral-100 text-neutral-600 hover:bg-neutral-200 dark:bg-white/10 dark:text-neutral-300'
             }`}>
             <span className="text-[13px]">{t.emoji}</span>{t.label}
