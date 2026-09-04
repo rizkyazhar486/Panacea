@@ -2,6 +2,8 @@ import { useEffect, useMemo, useState } from 'react'
 import { Card, SectionTitle, inputClass } from '../components/ui'
 import { IconRun } from '../components/icons'
 import { ambilTersembunyi, saring, langgananFitur } from '../lib/fiturTersembunyi'
+import { MetalMotto } from '../components/MetalMotto'
+import { WarriorMark } from '../components/WarriorMark'
 import '../styles/metal.css'
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -90,13 +92,16 @@ export function FitnessHub() {
 
   return (
     <div className="mx-auto max-w-2xl space-y-5 pb-24">
-      <div className="metal-forge rounded-2xl p-5">
+      <div className="metal-spotlight rounded-2xl p-5">
+        <WarriorMark className="pointer-events-none absolute -right-2 bottom-0 h-full w-auto text-white/[0.05]" />
         <div className="relative flex items-center gap-3">
           <span className="metal-tag metal-gold">Forge</span>
           <span className="text-[11px] font-bold uppercase tracking-[0.2em] text-white/50">{total} tools</span>
         </div>
         <h2 className="relative mt-3 text-2xl font-black uppercase tracking-tight metal-emboss">Fitness Hub</h2>
-        <p className="relative mt-1 text-[13px] text-white/50">Training & performance, searchable by what you need — one index, no digging.</p>
+        <div className="relative mt-4">
+          <MetalMotto text="Focus on the mission" />
+        </div>
       </div>
 
       <Card className="!p-5">

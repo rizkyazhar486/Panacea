@@ -76,3 +76,47 @@
   color: transparent;
   filter: drop-shadow(0 1px 0 rgba(0, 0, 0, 0.5));
 }
+
+/* Panggung gelap dengan satu sumber cahaya dari atas — bukan latar warna-warni,
+   meniru foto studio (satu spot light, sisanya hitam total) dari referensi. */
+.metal-spotlight {
+  position: relative;
+  overflow: hidden;
+  background:
+    radial-gradient(60% 55% at 50% 0%, rgba(255, 246, 224, 0.16) 0%, rgba(255, 246, 224, 0.05) 35%, transparent 65%),
+    repeating-linear-gradient(115deg, rgba(255, 255, 255, 0.02) 0px, rgba(255, 255, 255, 0.02) 1px, transparent 1px, transparent 5px),
+    #000;
+  color: #fff;
+}
+
+.metal-spotlight::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  box-shadow: inset 0 0 90px rgba(0, 0, 0, 0.75);
+}
+
+/* Motto berlapis — satu baris terang di tengah, gema baris yang sama makin
+   pudar ke atas & bawah. Dipakai untuk satu kalimat singkat saja (bukan
+   paragraf): efeknya hilang begitu barisnya lebih dari satu baris layar. */
+.metal-motto {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  font-family: 'JetBrains Mono', monospace;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  line-height: 1.9;
+}
+
+.metal-motto span {
+  color: rgba(255, 255, 255, 0.06);
+}
+
+.metal-motto span[data-active='true'] {
+  color: #fff;
+  text-shadow: 0 0 18px rgba(255, 255, 255, 0.35);
+}
