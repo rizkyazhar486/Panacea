@@ -11,11 +11,13 @@ export function FightHero({
   tag,
   title,
   motto,
+  subtitle,
   right,
 }: {
   tag: string
   title: string
   motto: string
+  subtitle?: string
   right?: ReactNode
 }) {
   return (
@@ -29,6 +31,7 @@ export function FightHero({
       <div className="relative mt-4">
         <MetalMotto text={motto} />
       </div>
+      {subtitle && <p className="relative mt-2 text-center text-[13px] font-semibold text-white/70">{subtitle}</p>}
     </div>
   )
 }

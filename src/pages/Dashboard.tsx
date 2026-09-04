@@ -6,6 +6,7 @@ import { computeBmi, ageFromDob } from '../lib/anthro'
 import { GrowthChart } from '../components/GrowthChart'
 import { api, backendEnabled } from '../lib/api'
 import { detectDrift, driftSummary } from '../lib/physiologicalDrift'
+import { ResilienceQuoteCard } from '../components/ResilienceQuoteCard'
 import type { VitalSign, Patient } from '../lib/types'
 
 /* ═══════════════════════════════════════════
@@ -610,6 +611,20 @@ export function Dashboard() {
           </div>
         </div>
       </div>
+
+      {/* A quiet nudge, shown only when this patient actually has a real
+          chronic condition on record — never presumed, never shown to
+          someone with nothing logged. Fighting something long-term is
+          different from an ordinary checkup, and the app should say so
+          once, not pretend it's the same. */}
+      {p.chronicConditions.length > 0 && (
+        <div className="space-y-2">
+          <ResilienceQuoteCard />
+          <a href="#/resilience-stories" className="block text-center text-xs font-bold text-[#00BF63] hover:underline">
+            Read real stories of people who fought back →
+          </a>
+        </div>
+      )}
 
       {/* AI Clinical Insight */}
       {backendEnabled && <AiClinicalInsight patient={p} vitals={vitals} supportive={supportive} />}
