@@ -7,6 +7,7 @@ import { hasHealth, pushBiometrics } from '../lib/profile'
 import { Portal } from '../components/Portal'
 import { useStore } from '../lib/store'
 import { MetalBadge } from '../components/MetalBadge'
+import { FightHero } from '../components/FightHero'
 import '../styles/metal.css'
 
 import { KUTIPAN_ATLET as ATHLETE_QUOTES } from '../lib/kutipanAtlet'
@@ -261,6 +262,12 @@ export function Athlete() {
   return (
     <div className="mx-auto max-w-2xl space-y-5 pb-24">
       <AthleteQuotePopup />
+      <FightHero
+        tag="Battlefield"
+        title="Athlete"
+        motto="Veni. Vidi. Vici."
+        right={<MetalBadge tier={tier} />}
+      />
       <div className="flex justify-end">
         <ShareStatCard
           activity="🏃 Athlete Performance"

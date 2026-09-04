@@ -4,6 +4,7 @@ import { Card, SectionTitle, Button, Badge, inputClass } from '../components/ui'
 import { PoseGerak, poseUntuk } from '../components/PoseGerak'
 import { IconActivity, IconFlame, IconRun, IconCheck, IconPlus } from '../components/icons'
 import { VideoGallery } from '../components/VideoGallery'
+import { FightHero } from '../components/FightHero'
 import '../styles/metal.css'
 
 type Muscle = 'Chest' | 'Back' | 'Shoulders' | 'Arms' | 'Legs' | 'Glutes' | 'Core' | 'Full Body'
@@ -176,6 +177,13 @@ export function Workout() {
 
   return (
     <div className="mx-auto max-w-2xl space-y-5 pb-24">
+      <FightHero
+        tag="Arena"
+        title="Workout"
+        motto="Veni. Vidi. Vici."
+        right={todayLog.length > 0 && <span className="text-[11px] font-bold uppercase tracking-[0.2em] text-white/50">{todayLog.length} sets logged today</span>}
+      />
+
       <VideoGallery
         icon={<IconFlame size={20} />}
         title="Movement Demo Videos"
