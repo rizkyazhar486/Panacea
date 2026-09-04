@@ -11,10 +11,15 @@ import {
   nextStages,
   isComplete,
   setStageStatus,
-  setProvider,
   setCostEstimate,
   formatCostRange,
   providerOptions,
+  candidateViews,
+  addCandidate,
+  removeCandidate,
+  updateCandidateCost,
+  chooseCandidate,
+  type CandidateView,
 } from '../lib/careEpisode'
 import type { CareEpisode, CareEpisodeStageId, CareEpisodeStageStatus } from '../lib/types'
 
@@ -170,27 +175,162 @@ function EpisodeCard({
         })}
       </div>
 
-      <div className="mt-4 grid gap-3 border-t border-neutral-100 pt-4 sm:grid-cols-2">
-        <Field label="Provider (real facility directory)">
-          <select
-            className={inputClass}
-            value={episode.facilityId ?? ''}
-            onChange={(e) => onChange(setProvider(episode, e.target.value))}
-          >
-            <option value="" disabled>
-              Choose a facility…
-            </option>
-            {providerOptions().map((h) => (
-              <option key={h.id} value={h.id}>
-                {h.name} · {h.city}
-              </option>
-            ))}
-          </select>
-        </Field>
-
-        <CostEstimateField episode={episode} onChange={onChange} />
+      <div className="mt-4 border-t border-neutral-100 pt-4">
+        <ProviderComparison episode={episode} onChange={onChange} />
       </div>
+
+      {episode.facilityId && (
+        <div className="mt-4 border-t border-neutral-100 pt-4">
+          <CostEstimateField episode={episode} onChange={onChange} />
+        </div>
+      )}
     </Card>
+  )
+}
+
+function ProviderComparison({
+  episode,
+  onChange,
+}: {
+  episode: CareEpisode
+  onChange: (next: CareEpisode) => void
+}) {
+  const candidates = candidateViews(episode)
+  const alreadyAdded = new Set(candidates.map((c) => c.facilityId))
+  const options = providerOptions().filter((h) => !alreadyAdded.has(h.id))
+
+  return (
+    <div>
+      <div className="mb-2 flex items-center justify-between gap-2">
+        <span className="text-[11px] font-semibold uppercase tracking-[0.14em] text-neutral-500">
+          Compare providers — real distance & rating, cost you enter
+        </span>
+      </div>
+
+      {options.length > 0 && (
+        <select
+          className={`${inputClass} mb-3`}
+          value=""
+          onChange={(e) => e.target.value && onChange(addCandidate(episode, e.target.value))}
+        >
+          <option value="" disabled>
+            Add a facility to compare…
+          </option>
+          {options.map((h) => (
+            <option key={h.id} value={h.id}>
+              {h.name} · {h.city} · {h.distanceKm} km
+            </option>
+          ))}
+        </select>
+      )}
+
+      {candidates.length === 0 && (
+        <p className="text-sm text-neutral-500">No facilities added yet — add at least two to compare.</p>
+      )}
+
+      <div className="space-y-3">
+        {candidates.map((c) => (
+          <CandidateRow
+            key={c.facilityId}
+            candidate={c}
+            chosen={episode.facilityId === c.facilityId}
+            onChoose={() => onChange(chooseCandidate(episode, c.facilityId))}
+            onRemove={() => onChange(removeCandidate(episode, c.facilityId))}
+            onCostChange={(cost) => onChange(updateCandidateCost(episode, c.facilityId, cost))}
+          />
+        ))}
+      </div>
+    </div>
+  )
+}
+
+function CandidateRow({
+  candidate,
+  chosen,
+  onChoose,
+  onRemove,
+  onCostChange,
+}: {
+  candidate: CandidateView
+  chosen: boolean
+  onChoose: () => void
+  onRemove: () => void
+  onCostChange: (cost: { low?: number; high?: number; confidence: 'estimated' | 'verified'; source?: string }) => void
+}) {
+  const [low, setLow] = useState(candidate.estimatedCostLow?.toString() ?? '')
+  const [high, setHigh] = useState(candidate.estimatedCostHigh?.toString() ?? '')
+  const [source, setSource] = useState(candidate.costSource ?? '')
+
+  function commit(confidence: 'estimated' | 'verified') {
+    onCostChange({
+      low: low ? Number(low) : undefined,
+      high: high ? Number(high) : undefined,
+      confidence,
+      source: source.trim() || undefined,
+    })
+  }
+
+  return (
+    <div className={`rounded-xl border p-3 ${chosen ? 'border-brand/40 bg-brand-50/40' : 'border-neutral-200'}`}>
+      <div className="mb-2 flex items-start justify-between gap-2">
+        <div>
+          <p className="text-sm font-bold text-ink">{candidate.facility.name}</p>
+          <p className="text-xs text-neutral-500">
+            {candidate.facility.city} · {candidate.facility.distanceKm} km · ★ {candidate.facility.rating}
+            {candidate.facility.emergency ? ' · A&E' : ''}
+          </p>
+        </div>
+        <div className="flex shrink-0 items-center gap-2">
+          <Button
+            variant={chosen ? 'outline' : 'primary'}
+            onClick={onChoose}
+            disabled={chosen}
+            className="!min-h-0 !px-3 !py-1.5 text-xs"
+          >
+            {chosen ? 'Chosen ✓' : 'Choose'}
+          </Button>
+          <Button variant="ghost" onClick={onRemove} className="!min-h-0 !px-2 !py-1 text-xs">
+            Remove
+          </Button>
+        </div>
+      </div>
+
+      <div className="flex gap-2">
+        <input
+          className={`${inputClass} !min-h-[38px]`}
+          type="number"
+          placeholder="Low"
+          value={low}
+          onChange={(e) => setLow(e.target.value)}
+          onBlur={() => commit(candidate.costConfidence ?? 'estimated')}
+        />
+        <input
+          className={`${inputClass} !min-h-[38px]`}
+          type="number"
+          placeholder="High"
+          value={high}
+          onChange={(e) => setHigh(e.target.value)}
+          onBlur={() => commit(candidate.costConfidence ?? 'estimated')}
+        />
+      </div>
+      <div className="mt-2 flex items-center gap-2">
+        <input
+          className={`${inputClass} !min-h-[38px] min-w-0 flex-1`}
+          placeholder="Source (e.g. front-desk quote)"
+          value={source}
+          onChange={(e) => setSource(e.target.value)}
+          onBlur={() => commit(candidate.costConfidence ?? 'estimated')}
+        />
+        <select
+          className={`${inputClass} !min-h-[38px] !w-auto shrink-0`}
+          value={candidate.costConfidence ?? 'estimated'}
+          onChange={(e) => commit(e.target.value as 'estimated' | 'verified')}
+        >
+          <option value="estimated">Estimated</option>
+          <option value="verified">Verified</option>
+        </select>
+      </div>
+    </div>
   )
 }
 
@@ -217,7 +357,7 @@ function CostEstimateField({
   }
 
   return (
-    <Field label="Estimated cost (IDR) — never a guess without a source">
+    <Field label="Final cost with chosen provider (IDR) — never a guess without a source">
       <div className="flex gap-2">
         <input
           className={inputClass}

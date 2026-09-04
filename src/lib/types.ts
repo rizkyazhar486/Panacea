@@ -143,6 +143,18 @@ export interface CareEpisodeStage {
   updatedAt?: string
 }
 
+// One facility being compared before the patient chooses a provider. Real
+// location/distance/rating comes from lib/hospitals.ts; cost is always
+// entered by a person (doctor, patient, or admin from a real quote) and
+// never fabricated — see the note on CareEpisode's cost fields below.
+export interface ProviderCandidate {
+  facilityId: string // links to a Hospital.id from lib/hospitals.ts
+  estimatedCostLow?: number
+  estimatedCostHigh?: number
+  costConfidence?: 'estimated' | 'verified'
+  costSource?: string
+}
+
 export interface CareEpisode {
   id: string
   title: string
@@ -150,6 +162,7 @@ export interface CareEpisode {
   updatedAt: string
   problemId?: string // links back to a ProblemEntry.id when known
   diagnosisCode?: string // links back to EMRRecord.primaryDiagnosis.code, when auto-created from one
+  candidates?: ProviderCandidate[] // facilities being compared before one is chosen
   providerName?: string
   facilityId?: string // links to a Hospital.id from lib/hospitals.ts, when picked from the real directory
   facilityName?: string

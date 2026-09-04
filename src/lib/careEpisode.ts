@@ -9,7 +9,14 @@
 // store, per the "smallest architectural change" principle.
 
 import { HOSPITALS, type Hospital } from './hospitals'
-import type { CareEpisode, CareEpisodeStage, CareEpisodeStageId, CareEpisodeStageStatus, EMRRecord } from './types'
+import type {
+  CareEpisode,
+  CareEpisodeStage,
+  CareEpisodeStageId,
+  CareEpisodeStageStatus,
+  EMRRecord,
+  ProviderCandidate,
+} from './types'
 
 export const CARE_EPISODE_STAGES: CareEpisodeStageId[] = [
   'problem',
@@ -171,31 +178,98 @@ export function providerOptions(): Hospital[] {
   return HOSPITALS
 }
 
+function activate(episode: CareEpisode, stage: CareEpisodeStageId): CareEpisodeStage[] {
+  const now = new Date().toISOString()
+  return episode.stages.map((s): CareEpisodeStage =>
+    s.stage === stage && s.status === 'pending' ? { ...s, status: 'active', updatedAt: now } : s,
+  )
+}
+
 export function setProvider(episode: CareEpisode, facilityId: string): CareEpisode {
   const facility = HOSPITALS.find((h) => h.id === facilityId)
   if (!facility) return episode
-  const now = new Date().toISOString()
-  const stages = episode.stages.map((s): CareEpisodeStage =>
-    s.stage === 'provider' && s.status === 'pending' ? { ...s, status: 'active', updatedAt: now } : s,
-  )
-  return { ...episode, facilityId, facilityName: facility.name, providerName: facility.name, stages, updatedAt: now }
+  return {
+    ...episode,
+    facilityId,
+    facilityName: facility.name,
+    providerName: facility.name,
+    stages: activate(episode, 'provider'),
+    updatedAt: new Date().toISOString(),
+  }
 }
 
 export function setCostEstimate(
   episode: CareEpisode,
   input: { low?: number; high?: number; confidence: 'estimated' | 'verified'; source?: string },
 ): CareEpisode {
-  const now = new Date().toISOString()
-  const stages = episode.stages.map((s): CareEpisodeStage =>
-    s.stage === 'cost' && s.status === 'pending' ? { ...s, status: 'active', updatedAt: now } : s,
-  )
   return {
     ...episode,
     estimatedCostLow: input.low,
     estimatedCostHigh: input.high,
     costConfidence: input.confidence,
     costSource: input.source,
-    stages,
-    updatedAt: now,
+    stages: activate(episode, 'cost'),
+    updatedAt: new Date().toISOString(),
   }
+}
+
+// Provider comparison: the patient adds a few real facilities as candidates,
+// enters what each one quoted (or an estimate, tagged as such), compares
+// them side by side by distance/rating/price, then picks one — instead of
+// jumping straight to a single provider with no visibility into alternatives.
+
+export interface CandidateView extends ProviderCandidate {
+  facility: Hospital
+}
+
+// Sorted by distance — the one thing that's always real and comparable even
+// before any price has been entered.
+export function candidateViews(episode: CareEpisode): CandidateView[] {
+  return (episode.candidates ?? [])
+    .map((c) => ({ ...c, facility: HOSPITALS.find((h) => h.id === c.facilityId) }))
+    .filter((c): c is CandidateView => !!c.facility)
+    .sort((a, b) => a.facility.distanceKm - b.facility.distanceKm)
+}
+
+export function addCandidate(episode: CareEpisode, facilityId: string): CareEpisode {
+  const candidates = episode.candidates ?? []
+  if (candidates.some((c) => c.facilityId === facilityId)) return episode
+  return { ...episode, candidates: [...candidates, { facilityId }], updatedAt: new Date().toISOString() }
+}
+
+export function removeCandidate(episode: CareEpisode, facilityId: string): CareEpisode {
+  return {
+    ...episode,
+    candidates: (episode.candidates ?? []).filter((c) => c.facilityId !== facilityId),
+    updatedAt: new Date().toISOString(),
+  }
+}
+
+export function updateCandidateCost(
+  episode: CareEpisode,
+  facilityId: string,
+  cost: { low?: number; high?: number; confidence: 'estimated' | 'verified'; source?: string },
+): CareEpisode {
+  const candidates = (episode.candidates ?? []).map((c): ProviderCandidate =>
+    c.facilityId === facilityId
+      ? { ...c, estimatedCostLow: cost.low, estimatedCostHigh: cost.high, costConfidence: cost.confidence, costSource: cost.source }
+      : c,
+  )
+  return { ...episode, candidates, updatedAt: new Date().toISOString() }
+}
+
+// Picking a candidate promotes it to the episode's actual provider + cost —
+// the comparison is over, this is the choice.
+export function chooseCandidate(episode: CareEpisode, facilityId: string): CareEpisode {
+  const candidate = (episode.candidates ?? []).find((c) => c.facilityId === facilityId)
+  let next = setProvider(episode, facilityId)
+  if (candidate) {
+    next = setCostEstimate(next, {
+      low: candidate.estimatedCostLow,
+      high: candidate.estimatedCostHigh,
+      confidence: candidate.costConfidence ?? 'estimated',
+      source: candidate.costSource,
+    })
+  }
+  return next
 }
