@@ -5,6 +5,7 @@ import { BODY_REGIONS, type BodyRegion } from '../lib/bodyRegions'
 import { api, type OntologyTerm, type DrugLabelInfo } from '../lib/api'
 import { explainBodyRegion, explainDrug } from '../lib/ai'
 import { useStore } from '../lib/store'
+import { Body3D } from '../components/Body3D'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Body Explorer — klik satu region tubuh, dapatkan istilah NYATA dari dua
@@ -51,6 +52,7 @@ export function BodyExplorer() {
 
   const [question, setQuestion] = useState('')
   const [asking, setAsking] = useState(false)
+  const [view, setView] = useState<'2d' | '3d'>('3d')
 
   // "Ask" — pencarian bebas (bahasa natural atau gejala/fungsi, bukan hanya
   // nama region tubuh) yang mengisi PANEL YANG SAMA dengan klik region: satu
@@ -163,7 +165,28 @@ export function BodyExplorer() {
           pancreas do". If the terms retrieved match a region below, it lights up on the silhouette.
         </p>
 
-        <div className="mt-4 grid gap-4 sm:grid-cols-[220px_1fr]">
+        <div className="mt-4 flex justify-center gap-1 rounded-full bg-neutral-100 p-1 dark:bg-white/5 sm:justify-start">
+          <button
+            onClick={() => setView('3d')}
+            className={`min-h-[36px] rounded-full px-4 text-xs font-bold transition ${view === '3d' ? 'bg-brand text-white' : 'text-neutral-500'}`}
+          >
+            3D (rotate & zoom)
+          </button>
+          <button
+            onClick={() => setView('2d')}
+            className={`min-h-[36px] rounded-full px-4 text-xs font-bold transition ${view === '2d' ? 'bg-brand text-white' : 'text-neutral-500'}`}
+          >
+            2D silhouette
+          </button>
+        </div>
+
+        <div className="mt-4 grid gap-4 sm:grid-cols-[280px_1fr]">
+          {view === '3d' ? (
+            <div>
+              <Body3D active={active} onPick={pick} />
+              <p className="mt-1.5 text-center text-[10px] text-neutral-400">Drag to rotate · scroll/pinch to zoom · tap a shape</p>
+            </div>
+          ) : (
           <div className="relative mx-auto">
             <svg viewBox="0 0 200 440" className="h-[340px] w-auto">
               <g fill="#eef4f0" stroke="#d6e4dc" strokeWidth="1.5" className="dark:fill-white/5 dark:stroke-white/10">
@@ -194,6 +217,7 @@ export function BodyExplorer() {
               })}
             </svg>
           </div>
+          )}
 
           <div className="min-w-0">
             {!active && !askedLabel && (
