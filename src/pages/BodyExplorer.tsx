@@ -1,25 +1,27 @@
 import { useState } from 'react'
 import { Card, SectionTitle } from '../components/ui'
 import { IconActivity, IconSearch, IconStethoscope } from '../components/icons'
-import { BODY_REGIONS, type BodyRegion } from '../lib/bodyRegions'
 import { api, type OntologyTerm, type DrugLabelInfo } from '../lib/api'
 import { explainBodyRegion, explainDrug } from '../lib/ai'
 import { useStore } from '../lib/store'
 import { Body3D, ANATOMY_LAYERS, type AnatomyLayer } from '../components/Body3D'
+import { WORKOUT_MUSCLE_GROUPS } from '../lib/workoutMuscles'
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Body Explorer — klik satu region tubuh, dapatkan istilah NYATA dari dua
-// ontologi kedokteran gratis (Human Disease Ontology + Human Phenotype
-// Ontology, lewat EBI OLS4 di server) beserta penjelasan bahasa awam yang
-// WAJIB mengutip istilah itu (lihat groundingBlock di lib/ai.ts).
-//
-// Ini SENGAJA bukan model anatomi 3D. Model 3D nyata (mis. Z-Anatomy/
-// BodyParts3D) adalah berkas mesh besar (puluhan-ratusan MB) dengan lisensi
-// dan hosting-nya sendiri — memuatnya di sini butuh pipeline aset terpisah,
-// bukan sesuatu yang bisa ditulis sebagai kode dalam satu sesi. Siluet 2D
-// yang bisa diklik ini memberi kemampuan yang sama (satu titik tubuh →
-// istilah medis bertaut) tanpa aset 3D yang belum ada.
+// Body Explorer — model 3D anatomi NYATA (lihat Body3D.tsx untuk sumber data
+// dan lisensinya). Tap satu struktur (tulang/otot/pembuluh/saraf/organ) atau
+// pilih target latihan otot untuk mendapat istilah NYATA dari dua ontologi
+// kedokteran gratis (Human Disease Ontology + Human Phenotype Ontology, lewat
+// EBI OLS4 di server) beserta penjelasan bahasa awam yang WAJIB mengutip
+// istilah itu (lihat groundingBlock di lib/ai.ts). Tidak ada lagi tampilan
+// siluet 2D — itu gambar skematik, bukan anatomi nyata.
 // ─────────────────────────────────────────────────────────────────────────────
+
+/** "Rectus femoris muscle.l" -> "rectus femoris muscle" (buang penanda sisi
+ *  kiri/kanan supaya query ke ontologi tidak kebanyakan kata). */
+function toSearchTerm(rawName: string): string {
+  return rawName.replace(/\.[lr]$/, '').replace(/^\(|\)$/g, '').toLowerCase()
+}
 
 function TermList({ title, terms }: { title: string; terms: OntologyTerm[] }) {
   if (!terms.length) return null
@@ -43,16 +45,15 @@ function TermList({ title, terms }: { title: string; terms: OntologyTerm[] }) {
 
 export function BodyExplorer() {
   const { state } = useStore()
-  const [active, setActive] = useState<BodyRegion | null>(null)
   const [loading, setLoading] = useState(false)
   const [diseases, setDiseases] = useState<OntologyTerm[]>([])
   const [phenotypes, setPhenotypes] = useState<OntologyTerm[]>([])
   const [explanation, setExplanation] = useState('')
-  const [askedLabel, setAskedLabel] = useState('')
+  const [selectedLabel, setSelectedLabel] = useState('')
 
   const [question, setQuestion] = useState('')
   const [asking, setAsking] = useState(false)
-  const [view, setView] = useState<'2d' | '3d'>('3d')
+
   const [layers, setLayers] = useState<Set<AnatomyLayer['key']>>(
     () => new Set(ANATOMY_LAYERS.filter((l) => l.defaultOn).map((l) => l.key)),
   )
@@ -65,19 +66,58 @@ export function BodyExplorer() {
     })
   }
 
-  // "Ask" — pencarian bebas (bahasa natural atau gejala/fungsi, bukan hanya
-  // nama region tubuh) yang mengisi PANEL YANG SAMA dengan klik region: satu
-  // tempat untuk membaca hasilnya, dua cara untuk sampai ke sana. Kalau
-  // istilah yang diambil balik cocok dengan salah satu region di siluet
-  // (dicocokkan lewat kata kunci region itu sendiri, bukan tebakan AI), region
-  // itu ikut disorot — inilah bagian "mulai dari penyakit/gejala, lihat organ
-  // yang terlibat", kebalikan dari mengklik organ dulu.
+  const [activeWorkout, setActiveWorkout] = useState<string | null>(null)
+  const [highlighted, setHighlighted] = useState<string[]>([])
+
+  async function lookup(label: string, searchTerms: string[]) {
+    setSelectedLabel(label)
+    setQuestion('')
+    setLoading(true)
+    setExplanation('')
+    setDiseases([])
+    setPhenotypes([])
+    try {
+      const { diseases: d, phenotypes: p } = await api.anatomyOntology(searchTerms)
+      setDiseases(d)
+      setPhenotypes(p)
+      const text = await explainBodyRegion(state.settings, label, d, p)
+      setExplanation(text)
+    } catch {
+      setExplanation('Could not reach the ontology service right now. Please try again in a moment.')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  // Tap langsung pada satu struktur di model 3D (tulang/otot/pembuluh/
+  // saraf/organ spesifik, bukan hanya sistemnya).
+  function onPickStructure(rawName: string, label: string) {
+    setActiveWorkout(null)
+    setHighlighted([rawName])
+    // Pastikan lapisan otot dinyalakan supaya sorotan target latihan terlihat.
+    if (!layers.has('muscular')) toggleLayer('muscular')
+    lookup(label, [toSearchTerm(rawName)])
+  }
+
+  function onPickWorkoutMuscle(groupKey: string) {
+    const group = WORKOUT_MUSCLE_GROUPS.find((g) => g.key === groupKey)
+    if (!group) return
+    setActiveWorkout(groupKey)
+    setHighlighted(group.nodeNames)
+    if (!layers.has('muscular')) toggleLayer('muscular')
+    lookup(`${group.label} muscles`, group.searchTerms)
+  }
+
+  // "Ask" — pencarian bebas (bahasa natural atau gejala/fungsi). Kalau
+  // pertanyaannya cocok dengan salah satu target latihan otot, otot itu ikut
+  // disorot di model 3D.
   async function ask() {
     const q = question.trim()
     if (!q) return
     setAsking(true)
-    setActive(null)
-    setAskedLabel(q)
+    setActiveWorkout(null)
+    setHighlighted([])
+    setSelectedLabel(q)
     setExplanation('')
     setDiseases([])
     setPhenotypes([])
@@ -85,11 +125,14 @@ export function BodyExplorer() {
       const { diseases: d, phenotypes: p } = await api.anatomyOntology([q])
       setDiseases(d)
       setPhenotypes(p)
-      const matched = BODY_REGIONS.find((r) =>
-        r.searchTerms.some((t) => t.toLowerCase().includes(q.toLowerCase()) || q.toLowerCase().includes(t.toLowerCase())) ||
-        [...d, ...p].some((term) => term.label.toLowerCase().includes(r.label.split(' ')[0].toLowerCase())),
+      const matchedGroup = WORKOUT_MUSCLE_GROUPS.find((g) =>
+        q.toLowerCase().includes(g.label.toLowerCase()) || g.searchTerms.some((t) => q.toLowerCase().includes(t)),
       )
-      if (matched) setActive(matched)
+      if (matchedGroup) {
+        setActiveWorkout(matchedGroup.key)
+        setHighlighted(matchedGroup.nodeNames)
+        if (!layers.has('muscular')) toggleLayer('muscular')
+      }
       const text = await explainBodyRegion(state.settings, q, d, p)
       setExplanation(text)
     } catch {
@@ -104,27 +147,6 @@ export function BodyExplorer() {
   const [drugInfo, setDrugInfoState] = useState<DrugLabelInfo | null>(null)
   const [drugExplanation, setDrugExplanation] = useState('')
   const [drugError, setDrugError] = useState('')
-
-  async function pick(region: BodyRegion) {
-    setActive(region)
-    setAskedLabel('')
-    setQuestion('')
-    setLoading(true)
-    setExplanation('')
-    setDiseases([])
-    setPhenotypes([])
-    try {
-      const { diseases: d, phenotypes: p } = await api.anatomyOntology(region.searchTerms)
-      setDiseases(d)
-      setPhenotypes(p)
-      const text = await explainBodyRegion(state.settings, region.label, d, p)
-      setExplanation(text)
-    } catch {
-      setExplanation('Could not reach the ontology service right now. Please try again in a moment.')
-    } finally {
-      setLoading(false)
-    }
-  }
 
   async function lookupDrug() {
     const name = drugQuery.trim()
@@ -150,7 +172,7 @@ export function BodyExplorer() {
       <SectionTitle
         icon={<IconActivity />}
         title="Body Explorer"
-        subtitle="Tap a region to see real terms from the Human Disease & Phenotype Ontologies"
+        subtitle="A real 3D anatomy model — tap any bone, muscle, vessel, nerve, or organ"
       />
       <Card>
         <form onSubmit={(e) => { e.preventDefault(); ask() }} className="flex gap-2">
@@ -173,120 +195,87 @@ export function BodyExplorer() {
         </form>
         <p className="mt-2 text-[11px] leading-relaxed text-neutral-400">
           Ask in your own words — e.g. "where is the median nerve", "symptoms of liver disease", "what does the
-          pancreas do". If the terms retrieved match a region below, it lights up on the silhouette.
+          pancreas do". Real anatomical structures light up in green on the model when a match is found.
         </p>
 
-        <div className="mt-4 flex justify-center gap-1 rounded-full bg-neutral-100 p-1 dark:bg-white/5 sm:justify-start">
-          <button
-            onClick={() => setView('3d')}
-            className={`min-h-[36px] rounded-full px-4 text-xs font-bold transition ${view === '3d' ? 'bg-brand text-white' : 'text-neutral-500'}`}
-          >
-            3D (rotate & zoom)
-          </button>
-          <button
-            onClick={() => setView('2d')}
-            className={`min-h-[36px] rounded-full px-4 text-xs font-bold transition ${view === '2d' ? 'bg-brand text-white' : 'text-neutral-500'}`}
-          >
-            2D silhouette
-          </button>
+        <Body3D layers={layers} highlighted={highlighted} onPick={onPickStructure} />
+
+        <div className="mt-3 flex flex-wrap justify-center gap-1.5 sm:justify-start">
+          {ANATOMY_LAYERS.map((l) => (
+            <button
+              key={l.key}
+              onClick={() => toggleLayer(l.key)}
+              className={`min-h-[32px] rounded-full border px-3 text-xs font-bold transition ${
+                layers.has(l.key)
+                  ? 'border-brand bg-brand text-white'
+                  : 'border-neutral-200 text-neutral-500 dark:border-white/10'
+              }`}
+            >
+              {l.label}
+            </button>
+          ))}
+        </div>
+        <p className="mt-1.5 text-center text-[10px] text-neutral-400 sm:text-left">
+          Drag to rotate · scroll/pinch to zoom · tap any structure to identify it
+        </p>
+
+        <div className="mt-4">
+          <div className="t-mikro font-bold uppercase tracking-wide text-neutral-500">Target workout muscle</div>
+          <div className="mt-1.5 flex flex-wrap gap-1.5">
+            {WORKOUT_MUSCLE_GROUPS.map((g) => (
+              <button
+                key={g.key}
+                onClick={() => onPickWorkoutMuscle(g.key)}
+                className={`min-h-[32px] rounded-full border px-3 text-xs font-bold transition ${
+                  activeWorkout === g.key
+                    ? 'border-brand bg-brand text-white'
+                    : 'border-neutral-200 text-neutral-600 dark:border-white/10 dark:text-neutral-300'
+                }`}
+              >
+                {g.label}
+              </button>
+            ))}
+          </div>
         </div>
 
-        <div className="mt-4 grid gap-4 sm:grid-cols-[280px_1fr]">
-          {view === '3d' ? (
-            <div>
-              <Body3D layers={layers} />
-              <div className="mt-2 flex flex-wrap justify-center gap-1.5 sm:justify-start">
-                {ANATOMY_LAYERS.map((l) => (
-                  <button
-                    key={l.key}
-                    onClick={() => toggleLayer(l.key)}
-                    className={`min-h-[32px] rounded-full border px-3 text-xs font-bold transition ${
-                      layers.has(l.key)
-                        ? 'border-brand bg-brand text-white'
-                        : 'border-neutral-200 text-neutral-500 dark:border-white/10'
-                    }`}
-                  >
-                    {l.label}
-                  </button>
-                ))}
-              </div>
-              <p className="mt-1.5 text-center text-[10px] text-neutral-400">
-                Drag to rotate · scroll/pinch to zoom · toggle layers above
-              </p>
-            </div>
-          ) : (
-          <div className="relative mx-auto">
-            <svg viewBox="0 0 200 440" className="h-[340px] w-auto">
-              <g fill="#eef4f0" stroke="#d6e4dc" strokeWidth="1.5" className="dark:fill-white/5 dark:stroke-white/10">
-                <circle cx="100" cy="40" r="26" />
-                <rect x="86" y="64" width="28" height="16" rx="6" />
-                <path d="M62 84 Q100 74 138 84 L150 150 Q152 200 142 250 L132 250 Q126 200 124 170 L120 250 L116 360 Q116 380 104 380 L96 380 Q84 380 84 360 L80 250 L76 170 Q74 200 68 250 L58 250 Q48 200 50 150 Z" />
-                <path d="M62 86 L40 180 Q38 196 48 198 Q58 198 60 184 L70 120" />
-                <path d="M138 86 L160 180 Q162 196 152 198 Q142 198 140 184 L130 120" />
-              </g>
-              {BODY_REGIONS.map((r) => {
-                const isActive = active?.key === r.key
-                return (
-                  <g key={r.key} className="cursor-pointer" onClick={() => pick(r)}>
-                    <circle
-                      cx={(r.x / 100) * 200}
-                      cy={(r.y / 100) * 440}
-                      r={isActive ? 9 : 6}
-                      fill={isActive ? '#00BF63' : '#94a3b8'}
-                      stroke="#fff"
-                      strokeWidth="2"
-                      opacity={isActive ? 1 : 0.75}
-                    />
-                    {isActive && (
-                      <circle cx={(r.x / 100) * 200} cy={(r.y / 100) * 440} r="14" fill="none" stroke="#00BF63" strokeWidth="1.5" opacity="0.5" />
-                    )}
-                  </g>
-                )
-              })}
-            </svg>
-          </div>
+        <div className="mt-4 min-w-0">
+          {!selectedLabel && (
+            <p className="text-sm leading-relaxed text-neutral-500">
+              Tap a structure on the model, pick a workout target above, or ask a question — and get a
+              plain-language explanation grounded in real ontology terms, not a diagnosis for you personally.
+            </p>
           )}
-
-          <div className="min-w-0">
-            {!active && !askedLabel && (
-              <p className="text-sm leading-relaxed text-neutral-500">
-                Tap a marker on the silhouette, or ask a question above, to look up real disease and symptom terms —
-                and get a plain-language explanation grounded in those terms, not a diagnosis for you personally.
-              </p>
-            )}
-            {(active || askedLabel) && (
-              <div className="space-y-3">
-                <h3 className="text-base font-black capitalize text-ink dark:text-white">{active?.label ?? askedLabel}</h3>
-                {(loading || asking) && <p className="text-sm text-neutral-500">Looking up ontology terms…</p>}
-                {!loading && !asking && explanation && (
-                  <p className="rounded-xl bg-brand/5 p-3 text-sm leading-relaxed text-ink dark:bg-brand/10 dark:text-white">
-                    {explanation}
-                  </p>
-                )}
-                {!loading && !asking && (
-                  <>
-                    <TermList title="Related diseases (DOID)" terms={diseases} />
-                    <TermList title="Related symptoms (HPO)" terms={phenotypes} />
-                    {!diseases.length && !phenotypes.length && (
-                      <p className="text-sm text-neutral-500">No ontology terms were found for this.</p>
-                    )}
-                  </>
-                )}
-              </div>
-            )}
-          </div>
+          {selectedLabel && (
+            <div className="space-y-3">
+              <h3 className="text-base font-black capitalize text-ink dark:text-white">{selectedLabel}</h3>
+              {(loading || asking) && <p className="text-sm text-neutral-500">Looking up ontology terms…</p>}
+              {!loading && !asking && explanation && (
+                <p className="rounded-xl bg-brand/5 p-3 text-sm leading-relaxed text-ink dark:bg-brand/10 dark:text-white">
+                  {explanation}
+                </p>
+              )}
+              {!loading && !asking && (
+                <>
+                  <TermList title="Related diseases (DOID)" terms={diseases} />
+                  <TermList title="Related symptoms (HPO)" terms={phenotypes} />
+                  {!diseases.length && !phenotypes.length && (
+                    <p className="text-sm text-neutral-500">No ontology terms were found for this.</p>
+                  )}
+                </>
+              )}
+            </div>
+          )}
         </div>
+
         <p className="mt-4 text-[11px] leading-relaxed text-neutral-400">
           Disease and symptom terms are retrieved live from the Human Disease Ontology and Human Phenotype Ontology
           via EBI's public Ontology Lookup Service (OLS4) — general medical reference data, not a diagnosis. Always
           consult a licensed clinician about your own symptoms.
         </p>
-        {view === '3d' && (
-          <p className="mt-1 text-[11px] leading-relaxed text-neutral-400">
-            3D anatomy model: <a href={`${import.meta.env.BASE_URL}anatomy/CREDITS.txt`} target="_blank" rel="noreferrer" className="underline">Z-Anatomy</a>,
-            based on BodyParts3D — licensed under CC BY-SA 4.0.
-          </p>
-        )}
+        <p className="mt-1 text-[11px] leading-relaxed text-neutral-400">
+          3D anatomy model: <a href={`${import.meta.env.BASE_URL}anatomy/CREDITS.txt`} target="_blank" rel="noreferrer" className="underline">Z-Anatomy</a>,
+          based on BodyParts3D — licensed under CC BY-SA 4.0.
+        </p>
       </Card>
 
       <Card>

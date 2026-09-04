@@ -5,24 +5,18 @@ import { MeshoptDecoder } from 'three/examples/jsm/libs/meshopt_decoder.module.j
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Model 3D anatomi NYATA — bukan lagi bentuk geometris buatan sendiri (bola/
-// kapsul/Lathe). Berkas .glb di /public/anatomy/*.glb diturunkan dari Z-Anatomy
-// (proyek atlas anatomi 3D open-source, sendiri diturunkan dari BodyParts3D),
-// lisensi CC BY-SA 4.0 — lihat /public/anatomy/CREDITS.txt untuk atribusi
-// lengkap dan syarat lisensinya. Rangka, otot, pembuluh darah, saraf, dan organ
-// benar-benar model anatomi yang dipahat, bukan pendekatan bentuk sederhana.
+// Model 3D anatomi NYATA — bukan bentuk geometris buatan sendiri (bola/kapsul/
+// Lathe), dan bukan siluet 2D. Berkas .glb di /public/anatomy/*.glb diturunkan
+// dari Z-Anatomy (atlas anatomi 3D open-source, sendiri diturunkan dari
+// BodyParts3D), lisensi CC BY-SA 4.0 — lihat /public/anatomy/CREDITS.txt.
 //
-// Shader asli file sumbernya memakai efek Blender (rim light, ambient
-// occlusion berbasis viewport) yang tidak bisa direproduksi identik di web,
-// jadi tiap struktur diwarnai ulang jadi warna PBR datar memakai konvensi
+// Tiap tulang/otot/pembuluh/saraf/organ adalah NODE TERPISAH dengan nama asli
+// (mis. "Rectus femoris muscle.l", "Femur.r") -- tidak digabung saat ekspor --
+// supaya raycast klik bisa mengidentifikasi satu struktur spesifik, bukan
+// cuma satu lapisan sistem. Warna materialnya diganti dari shader Blender asli
+// (yang bergantung efek viewport Blender) ke warna PBR datar memakai konvensi
 // atlas anatomi baku (otot=merah, arteri=merah, vena=biru, saraf=kuning,
-// tulang=krem, dst) — lihat alat/ekspor di riwayat sesi ini untuk detail.
-//
-// Karena geometri digabung per-material saat ekspor (supaya ukuran berkas
-// tetap wajar untuk web/mobile — total ~18MB terbagi 5 lapisan), model ini
-// TIDAK mendukung klik untuk mengidentifikasi satu otot/pembuluh spesifik;
-// yang bisa dipilih hanya lapisan sistemnya (rangka/otot/pembuluh/saraf/
-// organ). Untuk identifikasi per-region, pakai tampilan silhouette 2D.
+// tulang=krem, dst).
 // ─────────────────────────────────────────────────────────────────────────────
 
 export interface AnatomyLayer {
@@ -40,8 +34,35 @@ export const ANATOMY_LAYERS: AnatomyLayer[] = [
   { key: 'visceral', label: 'Organs', file: 'visceral.glb', defaultOn: false },
 ]
 
+/** "Rectus femoris muscle.l" -> "Rectus femoris muscle (left)" */
+export function humanizeStructureName(raw: string): string {
+  let n = raw
+  if (n.endsWith('.l')) n = n.slice(0, -2) + ' (left)'
+  else if (n.endsWith('.r')) n = n.slice(0, -2) + ' (right)'
+  return n.charAt(0).toUpperCase() + n.slice(1)
+}
+
 const loader = new GLTFLoader()
 loader.setMeshoptDecoder(MeshoptDecoder)
+
+// GLTFLoader selalu men-sanitasi nama node lewat PropertyBinding.sanitizeNodeName
+// (spasi -> "_", lalu buang karakter "[]. :/" termasuk titik pemisah ".l"/".r")
+// supaya aman dipakai sebagai target animasi -- jadi object3D.name di scene
+// yang sudah dimuat TIDAK LAGI sama dengan nama asli di file ("Femur.r" jadi
+// "Femurr"). Nama asli (dengan spasi & titik utuh) diselamatkan ke
+// userData.originalName lewat parser.associations sebelum informasi itu
+// hilang, supaya identifikasi/pencarian tetap presisi ke nama anatomi nyata.
+function restoreOriginalNames(gltf: import('three/examples/jsm/loaders/GLTFLoader.js').GLTF) {
+  const nodes = gltf.parser.json.nodes as Array<{ name?: string }> | undefined
+  if (!nodes) return
+  gltf.scene.traverse((obj) => {
+    const assoc = gltf.parser.associations.get(obj) as { nodes?: number } | undefined
+    const nodeIndex = assoc?.nodes
+    if (nodeIndex !== undefined && nodes[nodeIndex]?.name) {
+      obj.userData.originalName = nodes[nodeIndex].name
+    }
+  })
+}
 
 const modelCache = new Map<string, Promise<THREE.Group>>()
 function loadLayer(file: string): Promise<THREE.Group> {
@@ -50,7 +71,10 @@ function loadLayer(file: string): Promise<THREE.Group> {
     p = new Promise((resolve, reject) => {
       loader.load(
         `${import.meta.env.BASE_URL}anatomy/${file}`,
-        (gltf) => resolve(gltf.scene),
+        (gltf) => {
+          restoreOriginalNames(gltf)
+          resolve(gltf.scene)
+        },
         undefined,
         reject,
       )
@@ -60,13 +84,26 @@ function loadLayer(file: string): Promise<THREE.Group> {
   return p
 }
 
-export function Body3D({ layers }: { layers: Set<AnatomyLayer['key']> }) {
+const HIGHLIGHT = new THREE.Color(0x00bf63)
+
+interface Props {
+  layers: Set<AnatomyLayer['key']>
+  /** Node names (exact, e.g. "Rectus femoris muscle.l") to highlight in green — 0, 1 or many at once. */
+  highlighted: string[]
+  /** Fires with the raw node name and a human-readable label when the user taps a structure. */
+  onPick: (rawName: string, label: string) => void
+}
+
+export function Body3D({ layers, highlighted, onPick }: Props) {
   const containerRef = useRef<HTMLDivElement>(null)
   const groupsRef = useRef<Partial<Record<AnatomyLayer['key'], THREE.Group>>>({})
   const sceneRef = useRef<THREE.Scene | null>(null)
   const cameraRef = useRef<THREE.PerspectiveCamera | null>(null)
   const controlsRef = useRef<OrbitControls | null>(null)
   const hasFitRef = useRef(false)
+  const highlightedMeshesRef = useRef<Map<THREE.Mesh, { original: THREE.Color; matchedName: string }>>(new Map())
+  const onPickRef = useRef(onPick)
+  onPickRef.current = onPick
   const [loadingLayers, setLoadingLayers] = useState<Set<string>>(new Set())
   const [failedLayers, setFailedLayers] = useState<Set<string>>(new Set())
 
@@ -121,6 +158,38 @@ export function Body3D({ layers }: { layers: Set<AnatomyLayer['key']> }) {
     const ro = new ResizeObserver(resize)
     ro.observe(container)
 
+    // Raycast pada tap/klik (bukan drag-rotate) untuk mengidentifikasi satu
+    // struktur spesifik yang disentuh pengguna.
+    const raycaster = new THREE.Raycaster()
+    const pointer = new THREE.Vector2()
+    let downPos: { x: number; y: number } | null = null
+
+    const toPointer = (e: PointerEvent) => {
+      const rect = container.getBoundingClientRect()
+      pointer.x = ((e.clientX - rect.left) / rect.width) * 2 - 1
+      pointer.y = -((e.clientY - rect.top) / rect.height) * 2 + 1
+    }
+    const onPointerDown = (e: PointerEvent) => { downPos = { x: e.clientX, y: e.clientY } }
+    const onPointerUp = (e: PointerEvent) => {
+      if (!downPos) return
+      const moved = Math.hypot(e.clientX - downPos.x, e.clientY - downPos.y)
+      downPos = null
+      if (moved > 6) return // drag-to-rotate, not a tap
+      toPointer(e)
+      raycaster.setFromCamera(pointer, camera)
+      const targets = Object.values(groupsRef.current).filter((g): g is THREE.Group => !!g)
+      const hits = raycaster.intersectObjects(targets, true)
+      if (hits.length === 0) return
+      let obj: THREE.Object3D | null = hits[0].object
+      while (obj && !obj.userData.originalName) obj = obj.parent
+      if (obj) {
+        const rawName = obj.userData.originalName as string
+        onPickRef.current(rawName, humanizeStructureName(rawName))
+      }
+    }
+    renderer.domElement.addEventListener('pointerdown', onPointerDown)
+    renderer.domElement.addEventListener('pointerup', onPointerUp)
+
     let raf = 0
     function animate() {
       controls.update()
@@ -132,6 +201,8 @@ export function Body3D({ layers }: { layers: Set<AnatomyLayer['key']> }) {
     return () => {
       cancelAnimationFrame(raf)
       ro.disconnect()
+      renderer.domElement.removeEventListener('pointerdown', onPointerDown)
+      renderer.domElement.removeEventListener('pointerup', onPointerUp)
       controls.dispose()
       renderer.dispose()
       container.removeChild(renderer.domElement)
@@ -190,11 +261,62 @@ export function Body3D({ layers }: { layers: Set<AnatomyLayer['key']> }) {
     }
   }, [layers])
 
+  // Sorot (hijau) struktur yang sedang dipilih/ditarget, pulihkan warna
+  // struktur yang sebelumnya disorot tapi sudah tidak lagi ada di daftar.
+  //
+  // Satu node bernama (mis. "Long head of biceps brachii.l") bisa berupa
+  // Mesh langsung (mesh 1 primitif) ATAU Group berisi beberapa Mesh anak
+  // tak-bernama (mesh multi-primitif) -- jadi pencocokan nama dilakukan di
+  // level node manapun, lalu semua Mesh di BAWAHNYA (termasuk dirinya
+  // sendiri) yang disorot. Nama node yang cocok disimpan bersama tiap mesh
+  // supaya proses "lepas sorotan" tidak bergantung pada mesh.name (yang bisa
+  // saja kosong untuk anak dari node multi-primitif).
+  useEffect(() => {
+    const want = new Set(highlighted)
+    const current = highlightedMeshesRef.current
+
+    for (const [mesh, entry] of current) {
+      if (!want.has(entry.matchedName)) {
+        const mat = mesh.material as THREE.MeshStandardMaterial
+        mat.emissive.copy(entry.original)
+        mat.emissiveIntensity = 0
+        current.delete(mesh)
+      }
+    }
+
+    if (want.size > 0) {
+      const groups = Object.values(groupsRef.current).filter((g): g is THREE.Group => !!g)
+      for (const group of groups) {
+        group.traverse((obj) => {
+          const originalName = obj.userData.originalName as string | undefined
+          if (!originalName || !want.has(originalName)) return
+          obj.traverse((child) => {
+            if (!(child instanceof THREE.Mesh)) return
+            if (current.has(child)) return
+            const shared = child.material as THREE.MeshStandardMaterial
+            if (!shared || !('emissive' in shared)) return
+            // Materialnya BERBAGI satu instance dengan ratusan mesh lain
+            // yang warnanya sama (mis. "Flat_Internal rotator" dipakai 232
+            // otot) -- kalau emissive-nya diubah langsung, semua yang
+            // berbagi material itu ikut menyala hijau, bukan cuma struktur
+            // yang disentuh. Kloning dulu supaya sorotan benar-benar presisi
+            // ke satu struktur saja.
+            const mat = shared.clone()
+            child.material = mat
+            current.set(child, { original: mat.emissive.clone(), matchedName: originalName })
+            mat.emissive = HIGHLIGHT.clone()
+            mat.emissiveIntensity = 0.55
+          })
+        })
+      }
+    }
+  }, [highlighted, loadingLayers])
+
   const isLoading = loadingLayers.size > 0
 
   return (
-    <div className="relative h-[420px] w-full overflow-hidden rounded-2xl bg-gradient-to-b from-neutral-900 to-neutral-950">
-      <div ref={containerRef} className="h-full w-full" />
+    <div className="relative h-[65vh] max-h-[780px] min-h-[460px] w-full overflow-hidden rounded-2xl bg-gradient-to-b from-neutral-900 to-neutral-950">
+      <div ref={containerRef} className="h-full w-full touch-none" />
       {isLoading && (
         <div className="pointer-events-none absolute inset-0 flex items-center justify-center bg-black/30">
           <span className="rounded-full bg-black/60 px-3 py-1.5 text-xs font-semibold text-white">Loading anatomy…</span>
