@@ -21,9 +21,9 @@ export const ORGAN_ATLAS: OrganModel[] = [
         "id": "right-corona-ciliaris",
         "ta": "Right corona ciliaris",
         "position": [
-          -0.731,
-          -0.148,
-          0.604
+          -0.7313,
+          -0.1476,
+          0.6044
         ],
         "color": "#b86858"
       },
@@ -32,8 +32,8 @@ export const ORGAN_ATLAS: OrganModel[] = [
         "ta": "Left corona ciliaris",
         "position": [
           0.727,
-          -0.141,
-          0.604
+          -0.1408,
+          0.6038
         ],
         "color": "#d89bc4"
       },
@@ -41,9 +41,9 @@ export const ORGAN_ATLAS: OrganModel[] = [
         "id": "left-sclera",
         "ta": "Left sclera",
         "position": [
-          0.698,
-          -0.133,
-          0.44
+          0.6979,
+          -0.1328,
+          0.4404
         ],
         "color": "#f2a33b"
       },
@@ -51,8 +51,8 @@ export const ORGAN_ATLAS: OrganModel[] = [
         "id": "right-sclera",
         "ta": "Right sclera",
         "position": [
-          -0.693,
-          -0.133,
+          -0.6927,
+          -0.1334,
           0.448
         ],
         "color": "#c69a5e"
@@ -62,8 +62,8 @@ export const ORGAN_ATLAS: OrganModel[] = [
         "ta": "Left choroid",
         "position": [
           0.7,
-          -0.135,
-          0.424
+          -0.1349,
+          0.4242
         ],
         "color": "#f2a33b"
       },
@@ -71,9 +71,9 @@ export const ORGAN_ATLAS: OrganModel[] = [
         "id": "right-choroid",
         "ta": "Right choroid",
         "position": [
-          -0.692,
-          -0.13,
-          0.44
+          -0.6915,
+          -0.1302,
+          0.4395
         ],
         "color": "#7294b9"
       },
@@ -81,9 +81,9 @@ export const ORGAN_ATLAS: OrganModel[] = [
         "id": "optic-part-of-left-retina",
         "ta": "Optic part of left retina",
         "position": [
-          0.693,
-          -0.13,
-          0.381
+          0.6933,
+          -0.1298,
+          0.3808
         ],
         "color": "#ee7c6a"
       },
@@ -91,7 +91,7 @@ export const ORGAN_ATLAS: OrganModel[] = [
         "id": "optic-part-of-right-retina",
         "ta": "Optic part of right retina",
         "position": [
-          -0.694,
+          -0.6941,
           -0.128,
           0.381
         ],
@@ -113,9 +113,9 @@ export const ORGAN_ATLAS: OrganModel[] = [
         "id": "optic-part-of-left-retina",
         "ta": "Optic part of left retina",
         "position": [
-          0.67,
-          -0.169,
-          0.818
+          0.6699,
+          -0.1695,
+          0.8181
         ],
         "color": "#f2a33b"
       },
@@ -123,9 +123,9 @@ export const ORGAN_ATLAS: OrganModel[] = [
         "id": "optic-part-of-right-retina",
         "ta": "Optic part of right retina",
         "position": [
-          -0.671,
-          -0.168,
-          0.818
+          -0.6706,
+          -0.1678,
+          0.8182
         ],
         "color": "#d89bc4"
       },
@@ -133,9 +133,9 @@ export const ORGAN_ATLAS: OrganModel[] = [
         "id": "left-optic-tract",
         "ta": "Left optic tract",
         "position": [
-          0.338,
-          0.327,
-          -0.631
+          0.3379,
+          0.3266,
+          -0.6311
         ],
         "color": "#7294b9"
       },
@@ -143,9 +143,9 @@ export const ORGAN_ATLAS: OrganModel[] = [
         "id": "right-optic-tract",
         "ta": "Right optic tract",
         "position": [
-          -0.335,
-          0.327,
-          -0.628
+          -0.3351,
+          0.3271,
+          -0.6278
         ],
         "color": "#f2a33b"
       },
@@ -153,9 +153,9 @@ export const ORGAN_ATLAS: OrganModel[] = [
         "id": "optic-chiasm",
         "ta": "Optic chiasm",
         "position": [
-          0.089,
-          0.322,
-          -0.199
+          0.0893,
+          0.3216,
+          -0.1987
         ],
         "color": "#7fa88a"
       },
@@ -163,9 +163,9 @@ export const ORGAN_ATLAS: OrganModel[] = [
         "id": "optic-chiasm",
         "ta": "Optic chiasm",
         "position": [
-          -0.089,
-          0.321,
-          -0.196
+          -0.0893,
+          0.3207,
+          -0.1963
         ],
         "color": "#b86858"
       },
@@ -173,9 +173,9 @@ export const ORGAN_ATLAS: OrganModel[] = [
         "id": "right-optic-nerve",
         "ta": "Right optic nerve",
         "position": [
-          -0.346,
-          0.105,
-          0.225
+          -0.3457,
+          0.1052,
+          0.2255
         ],
         "color": "#ee7c6a"
       },
@@ -183,8 +183,8 @@ export const ORGAN_ATLAS: OrganModel[] = [
         "id": "left-optic-nerve",
         "ta": "Left optic nerve",
         "position": [
-          0.347,
-          0.105,
+          0.3465,
+          0.1046,
           0.224
         ],
         "color": "#c69a5e"
@@ -206,8 +206,8 @@ export const ORGAN_ATLAS: OrganModel[] = [
         "ta": "Spleen",
         "position": [
           0.039,
-          -0.069,
-          -0.059
+          -0.0688,
+          -0.0587
         ],
         "color": "#ee7c6a"
       }
@@ -227,9 +227,9 @@ export const ORGAN_ATLAS: OrganModel[] = [
         "id": "stomach",
         "ta": "Stomach",
         "position": [
-          0.01,
-          -0.001,
-          0.038
+          0.0102,
+          -0.0007,
+          0.0378
         ],
         "color": "#ee7c6a"
       }
@@ -249,9 +249,9 @@ export const ORGAN_ATLAS: OrganModel[] = [
         "id": "gallbladder",
         "ta": "Gallbladder",
         "position": [
-          -0.19,
-          -0.065,
-          0.034
+          -0.1895,
+          -0.0652,
+          0.0339
         ],
         "color": "#ee7c6a"
       },
@@ -259,9 +259,9 @@ export const ORGAN_ATLAS: OrganModel[] = [
         "id": "cystic-duct",
         "ta": "Cystic duct",
         "position": [
-          0.666,
-          0.586,
-          -0.811
+          0.6664,
+          0.5859,
+          -0.8107
         ],
         "color": "#f2a33b"
       }
@@ -281,9 +281,9 @@ export const ORGAN_ATLAS: OrganModel[] = [
         "id": "right-ureter",
         "ta": "Right ureter",
         "position": [
-          -0.265,
-          0.43,
-          -0.175
+          -0.2647,
+          0.4301,
+          -0.1751
         ],
         "color": "#f2a33b"
       },
@@ -291,9 +291,9 @@ export const ORGAN_ATLAS: OrganModel[] = [
         "id": "left-ureter",
         "ta": "Left ureter",
         "position": [
-          0.257,
-          0.536,
-          -0.205
+          0.2571,
+          0.5358,
+          -0.2052
         ],
         "color": "#ee7c6a"
       },
@@ -301,9 +301,9 @@ export const ORGAN_ATLAS: OrganModel[] = [
         "id": "urethra",
         "ta": "Urethra",
         "position": [
-          -0.022,
-          -0.706,
-          0.095
+          -0.0217,
+          -0.7064,
+          0.0945
         ],
         "color": "#6393d8"
       },
@@ -311,9 +311,9 @@ export const ORGAN_ATLAS: OrganModel[] = [
         "id": "urinary-bladder",
         "ta": "Urinary bladder",
         "position": [
-          -0.005,
-          -0.421,
-          -0.19
+          -0.0054,
+          -0.4206,
+          -0.1897
         ],
         "color": "#d89bc4"
       }
@@ -333,9 +333,9 @@ export const ORGAN_ATLAS: OrganModel[] = [
         "id": "left-deferent-duct",
         "ta": "Left deferent duct",
         "position": [
-          0.318,
-          0.044,
-          0.194
+          0.3183,
+          0.0441,
+          0.1939
         ],
         "color": "#ee7c6a"
       },
@@ -344,8 +344,8 @@ export const ORGAN_ATLAS: OrganModel[] = [
         "ta": "Right deferent duct",
         "position": [
           -0.428,
-          -0.005,
-          0.171
+          -0.0051,
+          0.1712
         ],
         "color": "#d89bc4"
       },
@@ -353,9 +353,9 @@ export const ORGAN_ATLAS: OrganModel[] = [
         "id": "prostate",
         "ta": "Prostate",
         "position": [
-          -0.107,
-          0.055,
-          -0.253
+          -0.1074,
+          0.0554,
+          -0.2534
         ],
         "color": "#6393d8"
       },
@@ -363,9 +363,9 @@ export const ORGAN_ATLAS: OrganModel[] = [
         "id": "left-seminal-vesicle",
         "ta": "Left seminal vesicle",
         "position": [
-          0.085,
-          0.276,
-          -0.429
+          0.0852,
+          0.2759,
+          -0.4291
         ],
         "color": "#f2a33b"
       },
@@ -373,9 +373,9 @@ export const ORGAN_ATLAS: OrganModel[] = [
         "id": "right-seminal-vesicle",
         "ta": "Right seminal vesicle",
         "position": [
-          -0.307,
-          0.282,
-          -0.43
+          -0.3072,
+          0.2825,
+          -0.4304
         ],
         "color": "#7fa88a"
       }
@@ -395,9 +395,9 @@ export const ORGAN_ATLAS: OrganModel[] = [
         "id": "left-epididymis",
         "ta": "Left epididymis",
         "position": [
-          0.702,
-          0.237,
-          -0.152
+          0.7023,
+          0.2375,
+          -0.1519
         ],
         "color": "#ee7c6a"
       },
@@ -405,9 +405,9 @@ export const ORGAN_ATLAS: OrganModel[] = [
         "id": "right-testis",
         "ta": "Right testis",
         "position": [
-          -0.648,
-          -0.068,
-          0.023
+          -0.6484,
+          -0.0678,
+          0.0231
         ],
         "color": "#d89bc4"
       },
@@ -416,8 +416,8 @@ export const ORGAN_ATLAS: OrganModel[] = [
         "ta": "Left testis",
         "position": [
           0.654,
-          -0.072,
-          0.014
+          -0.0716,
+          0.0142
         ],
         "color": "#f2a33b"
       },
@@ -425,9 +425,9 @@ export const ORGAN_ATLAS: OrganModel[] = [
         "id": "right-epididymis",
         "ta": "Right epididymis",
         "position": [
-          -0.67,
-          0.129,
-          -0.174
+          -0.6699,
+          0.1287,
+          -0.1742
         ],
         "color": "#6393d8"
       }
@@ -447,9 +447,9 @@ export const ORGAN_ATLAS: OrganModel[] = [
         "id": "left-adrenal-gland",
         "ta": "Left adrenal gland",
         "position": [
-          0.612,
-          0.167,
-          -0.152
+          0.6122,
+          0.1668,
+          -0.1517
         ],
         "color": "#ee7c6a"
       },
@@ -457,9 +457,9 @@ export const ORGAN_ATLAS: OrganModel[] = [
         "id": "right-adrenal-gland",
         "ta": "Right adrenal gland",
         "position": [
-          -0.712,
-          -0.124,
-          0.101
+          -0.7118,
+          -0.1237,
+          0.1005
         ],
         "color": "#f2a33b"
       }
@@ -479,9 +479,9 @@ export const ORGAN_ATLAS: OrganModel[] = [
         "id": "pituitary-gland",
         "ta": "Pituitary gland",
         "position": [
-          0.003,
-          -0.269,
-          0.797
+          0.0026,
+          -0.2688,
+          0.7967
         ],
         "color": "#f2a33b"
       },
@@ -489,9 +489,9 @@ export const ORGAN_ATLAS: OrganModel[] = [
         "id": "pineal-body",
         "ta": "Pineal body",
         "position": [
-          -0.001,
-          0.343,
-          -0.796
+          -0.0013,
+          0.3432,
+          -0.7956
         ],
         "color": "#ee7c6a"
       }
@@ -512,8 +512,8 @@ export const ORGAN_ATLAS: OrganModel[] = [
         "ta": "Right thyro-arytenoid",
         "position": [
           -0.217,
-          0.195,
-          -0.066
+          0.1955,
+          -0.0664
         ],
         "color": "#c69a5e"
       },
@@ -521,9 +521,9 @@ export const ORGAN_ATLAS: OrganModel[] = [
         "id": "left-thyro-arytenoid",
         "ta": "Left thyro-arytenoid",
         "position": [
-          0.217,
-          0.197,
-          -0.075
+          0.2169,
+          0.1967,
+          -0.0748
         ],
         "color": "#6393d8"
       },
@@ -531,9 +531,9 @@ export const ORGAN_ATLAS: OrganModel[] = [
         "id": "left-aryepiglotticus",
         "ta": "Left aryepiglotticus",
         "position": [
-          0.262,
-          0.504,
-          -0.07
+          0.2624,
+          0.5042,
+          -0.0698
         ],
         "color": "#7fa88a"
       },
@@ -541,9 +541,9 @@ export const ORGAN_ATLAS: OrganModel[] = [
         "id": "oblique-part-of-left-cricothyroid",
         "ta": "Oblique part of left cricothyroid",
         "position": [
-          0.406,
+          0.4063,
           -0.717,
-          -0.23
+          -0.2303
         ],
         "color": "#b86858"
       },
@@ -551,9 +551,9 @@ export const ORGAN_ATLAS: OrganModel[] = [
         "id": "oblique-part-of-right-cricothyroid",
         "ta": "Oblique part of right cricothyroid",
         "position": [
-          -0.409,
-          -0.713,
-          -0.232
+          -0.4093,
+          -0.7129,
+          -0.2321
         ],
         "color": "#6393d8"
       },
@@ -561,9 +561,9 @@ export const ORGAN_ATLAS: OrganModel[] = [
         "id": "straight-part-of-left-cricothyroid",
         "ta": "Straight part of left cricothyroid",
         "position": [
-          0.275,
-          -0.706,
-          0.073
+          0.2755,
+          -0.7059,
+          0.0729
         ],
         "color": "#ee7c6a"
       },
@@ -571,9 +571,9 @@ export const ORGAN_ATLAS: OrganModel[] = [
         "id": "right-aryepiglotticus",
         "ta": "Right aryepiglotticus",
         "position": [
-          -0.257,
-          0.489,
-          -0.074
+          -0.2568,
+          0.4889,
+          -0.0744
         ],
         "color": "#7294b9"
       },
@@ -581,9 +581,9 @@ export const ORGAN_ATLAS: OrganModel[] = [
         "id": "thyroid-cartilage",
         "ta": "Thyroid cartilage",
         "position": [
-          0.002,
-          -0.149,
-          -0.193
+          0.0022,
+          -0.1488,
+          -0.1927
         ],
         "color": "#ee7c6a"
       }
@@ -603,9 +603,9 @@ export const ORGAN_ATLAS: OrganModel[] = [
         "id": "vomer",
         "ta": "Vomer",
         "position": [
-          -0.007,
-          -0.18,
-          -0.513
+          -0.0074,
+          -0.1796,
+          -0.5135
         ],
         "color": "#b86858"
       },
@@ -613,9 +613,9 @@ export const ORGAN_ATLAS: OrganModel[] = [
         "id": "left-inferior-nasal-concha",
         "ta": "Left inferior nasal concha",
         "position": [
-          0.221,
+          0.2209,
           -0.279,
-          -0.103
+          -0.1032
         ],
         "color": "#d89bc4"
       },
@@ -623,9 +623,9 @@ export const ORGAN_ATLAS: OrganModel[] = [
         "id": "right-inferior-nasal-concha",
         "ta": "Right inferior nasal concha",
         "position": [
-          -0.236,
-          -0.281,
-          -0.172
+          -0.2364,
+          -0.2812,
+          -0.1723
         ],
         "color": "#c69a5e"
       },
@@ -633,9 +633,9 @@ export const ORGAN_ATLAS: OrganModel[] = [
         "id": "right-lateral-nasal-cartilage",
         "ta": "Right lateral nasal cartilage",
         "position": [
-          -0.128,
-          -0.205,
-          0.641
+          -0.1278,
+          -0.2049,
+          0.6408
         ],
         "color": "#6393d8"
       },
@@ -644,8 +644,8 @@ export const ORGAN_ATLAS: OrganModel[] = [
         "ta": "Right nasal bone",
         "position": [
           -0.079,
-          0.282,
-          0.404
+          0.2817,
+          0.4042
         ],
         "color": "#7294b9"
       },
@@ -653,9 +653,9 @@ export const ORGAN_ATLAS: OrganModel[] = [
         "id": "left-nasal-bone",
         "ta": "Left nasal bone",
         "position": [
-          0.031,
-          0.312,
-          0.385
+          0.0308,
+          0.3121,
+          0.3845
         ],
         "color": "#7fa88a"
       },
@@ -663,9 +663,9 @@ export const ORGAN_ATLAS: OrganModel[] = [
         "id": "left-lateral-nasal-cartilage",
         "ta": "Left lateral nasal cartilage",
         "position": [
-          0.107,
-          -0.214,
-          0.665
+          0.1069,
+          -0.2138,
+          0.6652
         ],
         "color": "#ee7c6a"
       },
@@ -673,9 +673,9 @@ export const ORGAN_ATLAS: OrganModel[] = [
         "id": "septal-nasal-cartilage",
         "ta": "Septal nasal cartilage",
         "position": [
-          -0.007,
-          -0.263,
-          0.544
+          -0.0066,
+          -0.2626,
+          0.5438
         ],
         "color": "#f2a33b"
       }
@@ -695,9 +695,9 @@ export const ORGAN_ATLAS: OrganModel[] = [
         "id": "left-palatopharyngeus",
         "ta": "Left palatopharyngeus",
         "position": [
-          0.154,
-          -0.192,
-          -0.168
+          0.1537,
+          -0.1924,
+          -0.1679
         ],
         "color": "#6393d8"
       },
@@ -705,9 +705,9 @@ export const ORGAN_ATLAS: OrganModel[] = [
         "id": "right-palatopharyngeus",
         "ta": "Right palatopharyngeus",
         "position": [
-          -0.154,
-          -0.193,
-          -0.167
+          -0.1542,
+          -0.1929,
+          -0.1671
         ],
         "color": "#f2a33b"
       },
@@ -715,9 +715,9 @@ export const ORGAN_ATLAS: OrganModel[] = [
         "id": "right-stylopharyngeus",
         "ta": "Right stylopharyngeus",
         "position": [
-          -0.371,
+          -0.3713,
           0.071,
-          -0.11
+          -0.1096
         ],
         "color": "#d89bc4"
       },
@@ -725,8 +725,8 @@ export const ORGAN_ATLAS: OrganModel[] = [
         "id": "pharyngeal-raphe",
         "ta": "Pharyngeal raphe",
         "position": [
-          0.002,
-          -0.155,
+          0.0016,
+          -0.1553,
           -0.251
         ],
         "color": "#7294b9"
@@ -735,9 +735,9 @@ export const ORGAN_ATLAS: OrganModel[] = [
         "id": "right-superior-pharyngeal-constrictor",
         "ta": "Right superior pharyngeal constrictor",
         "position": [
-          -0.201,
-          0.526,
-          -0.037
+          -0.2012,
+          0.5259,
+          -0.0369
         ],
         "color": "#7fa88a"
       },
@@ -745,9 +745,9 @@ export const ORGAN_ATLAS: OrganModel[] = [
         "id": "left-superior-pharyngeal-constrictor",
         "ta": "Left superior pharyngeal constrictor",
         "position": [
-          0.211,
-          0.513,
-          -0.028
+          0.2111,
+          0.5131,
+          -0.0281
         ],
         "color": "#c69a5e"
       },
@@ -755,9 +755,9 @@ export const ORGAN_ATLAS: OrganModel[] = [
         "id": "right-middle-pharyngeal-constrictor",
         "ta": "Right middle pharyngeal constrictor",
         "position": [
-          0.181,
-          0.038,
-          -0.081
+          0.1808,
+          0.0376,
+          -0.0809
         ],
         "color": "#f2a33b"
       },
@@ -765,8 +765,8 @@ export const ORGAN_ATLAS: OrganModel[] = [
         "id": "left-middle-pharyngeal-constrictor",
         "ta": "Left middle pharyngeal constrictor",
         "position": [
-          -0.174,
-          0.038,
+          -0.1735,
+          0.0379,
           -0.09
         ],
         "color": "#ee7c6a"

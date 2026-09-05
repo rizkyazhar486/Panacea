@@ -9,8 +9,9 @@
 //
 // Jalankan:  node scripts/atlasOrgan.mjs <folder-human-atlas>
 
-import { readFileSync, writeFileSync, mkdirSync } from 'node:fs'
+import { writeFileSync, mkdirSync } from 'node:fs'
 import { join } from 'node:path'
+import { bacaAtlas, ambilBagian, pusat, tulisGlb, HAK_CIPTA } from './atlasGlb.mjs'
 
 const WARNA = ['#ee7c6a', '#f2a33b', '#6393d8', '#d89bc4', '#7fa88a', '#c69a5e', '#7294b9', '#b86858']
 
@@ -42,27 +43,11 @@ const BATAS = {
   pharynx: (n) => !/muscle of pharynx of/.test(n) || true,
 }
 
-const atlas = JSON.parse(readFileSync(join(SUMBER, 'public/models/atlas.json'), 'utf8'))
-const potongan = atlas.chunks.map((c) => readFileSync(join(SUMBER, 'public', c.url)))
+const { atlas, potongan } = bacaAtlas(SUMBER)
 
-function ambil(p) {
-  const b = potongan[p.chunk]
-  const pos = new Float32Array(b.buffer.slice(b.byteOffset + p.positions, b.byteOffset + p.positions + p.vertexCount * 12))
-  const nor16 = new Int16Array(b.buffer.slice(b.byteOffset + p.normals, b.byteOffset + p.normals + p.vertexCount * 6))
-  const idx = new Uint32Array(b.buffer.slice(b.byteOffset + p.indices, b.byteOffset + p.indices + p.indexCount * 4))
-  const nor = new Float32Array(nor16.length)
-  for (let i = 0; i < nor16.length; i++) nor[i] = Math.max(-1, nor16[i] / 32767)
-  return { pos, nor, idx }
-}
 
 // Sebutan yang tampil di titik penanda. Nama BodyParts3D memakai bahasa
 // Inggris; sisi kiri/kanan dipertahankan karena itulah yang dilihat pembaca.
-function pusat(d) {
-  let n = 0
-  const c = [0, 0, 0]
-  for (let i = 0; i < d.pos.length; i += 3) { c[0] += d.pos[i]; c[1] += d.pos[i + 1]; c[2] += d.pos[i + 2]; n++ }
-  return c.map((v) => Number((v / n).toFixed(3)))
-}
 
 function sejajarkan(dipilih) {
   // Pusatkan pada titik asal dan skalakan ke tinggi 2 satuan, sama seperti
@@ -77,60 +62,6 @@ function sejajarkan(dipilih) {
     for (let a = 0; a < 3; a++) d.pos[i + a] = (d.pos[i + a] - c[a]) * s
 }
 
-const HEX = (h) => [1, 3, 5].map((i) => Math.pow(parseInt(h.slice(i, i + 2), 16) / 255, 2.2))
-
-function tulisGlb(nama, bagian) {
-  const buf = [], views = [], accs = [], meshes = [], nodes = []
-  let ofs = 0
-  const tambah = (ta, target) => {
-    const pad = (4 - (ofs % 4)) % 4
-    if (pad) { buf.push(Buffer.alloc(pad)); ofs += pad }
-    const b = Buffer.from(ta.buffer, ta.byteOffset, ta.byteLength)
-    buf.push(b); views.push({ buffer: 0, byteOffset: ofs, byteLength: b.length, target })
-    ofs += b.length
-    return views.length - 1
-  }
-  const minMax = (a, n) => {
-    const mn = new Array(n).fill(Infinity), mx = new Array(n).fill(-Infinity)
-    for (let i = 0; i < a.length; i += n) for (let k = 0; k < n; k++) {
-      if (a[i + k] < mn[k]) mn[k] = a[i + k]; if (a[i + k] > mx[k]) mx[k] = a[i + k]
-    }
-    return [mn, mx]
-  }
-  // Tiap mesh diberi warna sendiri. Dengan satu warna untuk semuanya, organ
-  // bermesh banyak seperti mata terbaca sebagai gumpalan tunggal — sklera,
-  // kornea, iris, dan saraf optik tidak bisa dibedakan, padahal justru itu
-  // yang ingin dipelajari. Warnanya sama dengan warna titik penandanya.
-  const bahan = []
-  for (const { nama: nm, pos, nor, idx } of bagian) {
-    const [pmin, pmax] = minMax(pos, 3)
-    const aPos = accs.push({ bufferView: tambah(pos, 34962), componentType: 5126, count: pos.length / 3, type: 'VEC3', min: pmin, max: pmax }) - 1
-    const aNor = accs.push({ bufferView: tambah(nor, 34962), componentType: 5126, count: nor.length / 3, type: 'VEC3' }) - 1
-    const aIdx = accs.push({ bufferView: tambah(idx, 34963), componentType: 5125, count: idx.length, type: 'SCALAR' }) - 1
-    meshes.push({ name: nm, primitives: [{ attributes: { POSITION: aPos, NORMAL: aNor }, indices: aIdx, material: bahan.length }] })
-    const w = HEX(WARNA[bahan.length % WARNA.length])
-    bahan.push({ name: nm, pbrMetallicRoughness: { baseColorFactor: [...w, 1], metallicFactor: 0.05, roughnessFactor: 0.72 }, doubleSided: true })
-    nodes.push({ name: nm, mesh: meshes.length - 1 })
-  }
-  const bin = Buffer.concat(buf)
-  const json = {
-    asset: { version: '2.0', generator: 'panacea atlasOrgan', copyright: 'BodyParts3D, (c) The Database Center for Life Science, CC BY 4.0' },
-    scene: 0, scenes: [{ nodes: nodes.map((_, i) => i) }], nodes, meshes, accessors: accs,
-    bufferViews: views, buffers: [{ byteLength: bin.length }],
-    materials: bahan,
-  }
-  let jb = Buffer.from(JSON.stringify(json), 'utf8')
-  if (jb.length % 4) jb = Buffer.concat([jb, Buffer.alloc(4 - (jb.length % 4), 0x20)])
-  const bb = bin.length % 4 ? Buffer.concat([bin, Buffer.alloc(4 - (bin.length % 4))]) : bin
-  const kepala = Buffer.alloc(12)
-  kepala.writeUInt32LE(0x46546c67, 0); kepala.writeUInt32LE(2, 4)
-  kepala.writeUInt32LE(12 + 8 + jb.length + 8 + bb.length, 8)
-  const cj = Buffer.alloc(8); cj.writeUInt32LE(jb.length, 0); cj.writeUInt32LE(0x4e4f534a, 4)
-  const cb = Buffer.alloc(8); cb.writeUInt32LE(bb.length, 0); cb.writeUInt32LE(0x004e4942, 4)
-  const out = Buffer.concat([kepala, cj, jb, cb, bb])
-  writeFileSync(join(KELUAR, `${nama}.glb`), out)
-  return out.length
-}
 
 mkdirSync(KELUAR, { recursive: true })
 // Sebutan di layar ditulis bahasa Inggris (bahasa dasar aplikasi) dengan
@@ -164,9 +95,17 @@ for (const [kunci, pola] of Object.entries(ORGAN)) {
     return true
   })
   if (!cocok.length) { console.warn(`lewat ${kunci}: tidak ada bagian cocok`); continue }
-  const data = cocok.map((p) => ({ nama: p.name, ...ambil(p) }))
+  const data = cocok.map((p) => ambilBagian(potongan, p))
   sejajarkan(data)
-  const bytes = tulisGlb(kunci, data)
+  // Tiap mesh diberi warnanya sendiri. Dengan satu warna untuk semuanya, organ
+  // bermesh banyak seperti mata terbaca sebagai gumpalan tunggal — sklera,
+  // kornea, iris, dan saraf optik tidak bisa dibedakan, padahal justru itu
+  // yang ingin dipelajari. Warnanya sama dengan warna titik penandanya.
+  const bytes = tulisGlb(
+    join(KELUAR, `${kunci}.glb`),
+    data.map((d, i) => ({ ...d, warna: WARNA[i % WARNA.length] })),
+    HAK_CIPTA,
+  )
   // Titik penanda diambil dari bagian TERBESAR: pada organ dengan puluhan
   // mesh, menandai semuanya membuat layar penuh label yang saling tumpuk.
   // Warnanya diambil dari urutan mesh di dalam berkas, bukan dari urutan
