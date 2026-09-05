@@ -18,6 +18,7 @@ const PhysiologySection = lazy(() => import('./bodyhub/PhysiologySection'))
 const DrugSection = lazy(() => import('./bodyhub/DrugSection'))
 const DiseaseSection = lazy(() => import('./bodyhub/DiseaseSection'))
 const OrganClinicalPanel = lazy(() => import('./bodyhub/OrganClinicalPanel'))
+const SimulatorSection = lazy(() => import('./bodyhub/SimulatorSection'))
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Body Explorer — model 3D anatomi NYATA (lihat Body3D.tsx untuk sumber data
@@ -64,13 +65,14 @@ function Chip({
 // sama-sama menyorot struktur pada figur yang itu-itu juga. Itulah maksud
 // "satu simulasi tubuh yang utuh" — bukan enam halaman yang saling menyebut,
 // melainkan satu tubuh yang ditanyai dari enam sudut.
-type PanelTab = 'layers' | 'muscles' | 'organs' | 'physiology' | 'drugs' | 'diseases' | 'reference'
+type PanelTab = 'layers' | 'muscles' | 'organs' | 'physiology' | 'simulator' | 'drugs' | 'diseases' | 'reference'
 
 const PANEL_TABS: Array<{ key: PanelTab; label: string }> = [
   { key: 'layers', label: 'Layers' },
   { key: 'muscles', label: 'Workout' },
   { key: 'organs', label: 'Organs' },
   { key: 'physiology', label: 'Physiology' },
+  { key: 'simulator', label: 'Simulator' },
   { key: 'drugs', label: 'Drugs' },
   { key: 'diseases', label: 'Diseases' },
   { key: 'reference', label: 'Study' },
@@ -200,8 +202,15 @@ export function BodyExplorer() {
   // antara istirahat dan latihan JUSTRU yang mengajarkan faalnya — denyut
   // dan napas yang sama-sama naik, dan otot yang mulai berkontraksi.
   const [motionMode, setMotionMode] = useState<'off' | 'rest' | 'exercise'>('off')
-  const motion: MotionState =
-    motionMode === 'rest' ? MOTION_REST : motionMode === 'exercise' ? MOTION_EXERCISE : MOTION_OFF
+  // Laju dari simulator, kalau sedang dipakai. Ini yang membuat figurnya
+  // benar-benar berdetak pada keadaan yang sedang dihitung — syok berdetak
+  // cepat dan dangkal, bukan sekadar angka yang berubah di sebelahnya.
+  const [simVitals, setSimVitals] = useState<{ hr: number; rr: number } | null>(null)
+  const motion: MotionState = simVitals
+    ? { heartRate: simVitals.hr, respRate: simVitals.rr, contractionRate: 0 }
+    : motionMode === 'rest' ? MOTION_REST
+    : motionMode === 'exercise' ? MOTION_EXERCISE
+    : MOTION_OFF
   // Organ yang isi klinisnya sedang terbuka. Diisi oleh KETUKAN pada figur 3D
   // maupun oleh tombol organ — keduanya masuk lewat pintu yang sama supaya
   // hasilnya identik, tidak peduli dari mana orang datang.
@@ -484,7 +493,7 @@ export function BodyExplorer() {
             ] as Array<{ key: 'off' | 'rest' | 'exercise'; label: string }>).map((m) => (
               <button
                 key={m.key}
-                onClick={() => setMotionMode(m.key)}
+                onClick={() => { setSimVitals(null); setMotionMode(m.key) }}
                 className={`min-h-[30px] rounded-full border px-2.5 text-[11px] font-bold transition ${
                   motionMode === m.key
                     ? 'border-brand bg-brand text-white'
@@ -495,7 +504,12 @@ export function BodyExplorer() {
               </button>
             ))}
           </div>
-          {motionMode !== 'off' && (
+          {simVitals && (
+            <p className="mt-1 text-center text-[10px] leading-relaxed text-brand">
+              Driven by the simulator — the figure is beating at {simVitals.hr}/min and breathing at {simVitals.rr}/min.
+            </p>
+          )}
+          {!simVitals && motionMode !== 'off' && (
             <p className="mt-1 text-center text-[10px] leading-relaxed text-neutral-400">
               Heart {motion.heartRate}/min · breathing {motion.respRate}/min
               {motion.contractionRate > 0 && ` · highlighted muscle contracting ${motion.contractionRate}/min`}
@@ -683,6 +697,19 @@ export function BodyExplorer() {
             {panelTab === 'physiology' && (
               <Suspense fallback={<p className="text-sm text-neutral-500">Loading physiology…</p>}>
                 <PhysiologySection onPickSystem={onPickSystem} />
+              </Suspense>
+            )}
+
+            {panelTab === 'simulator' && (
+              <Suspense fallback={<p className="text-sm text-neutral-500">Loading simulator…</p>}>
+                <SimulatorSection
+                  onVitals={(hr, rr) => {
+                    setSimVitals({ hr, rr })
+                    // Lapisan jantung & paru dinyalakan, kalau tidak simulasinya
+                    // menggerakkan struktur yang tidak terlihat.
+                    setLayers((prev) => new Set(prev).add('cardiovascular').add('visceral'))
+                  }}
+                />
               </Suspense>
             )}
 
