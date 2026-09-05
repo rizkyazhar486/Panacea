@@ -904,67 +904,63 @@ header.kaca {
   position: relative;
   overflow: hidden;
   background:
-    /* Vignette: menurunkan kilau tepat di belakang teks. */
-    radial-gradient(110% 90% at 50% 55%, rgba(6, 4, 1, 0.55) 0%, rgba(6, 4, 1, 0.1) 55%, transparent 82%),
-    /* Sorot cahaya tunggal dari atas — arah cahaya yang sama seperti pada
-       kartu metal-spotlight, supaya satu halaman terasa satu dunia. */
-    radial-gradient(90% 70% at 50% -15%, rgba(255, 246, 218, 0.4) 0%, transparent 60%),
-    /* Pita perak dingin yang melintas di atas emas. */
-    linear-gradient(118deg,
-      transparent 30%,
-      rgba(120, 128, 136, 0.25) 39%,
-      rgba(226, 232, 240, 0.85) 43.5%,
-      rgba(255, 255, 255, 0.98) 45.5%,
-      rgba(203, 213, 225, 0.8) 47.5%,
-      rgba(71, 78, 86, 0.35) 53%,
-      transparent 64%),
-    /* Emas tempa. */
-    linear-gradient(125deg,
-      #0d0903 0%,
-      #4a3510 6%,
-      #b98d2c 12%,
-      #f5d987 17%,
-      #fffdf2 20%,
-      #edc662 24%,
-      #6d5118 33%,
-      #201703 41%,
-      #150e02 48%,
-      #7d5c1c 55%,
-      #dcb04a 61%,
-      #fff8e2 66%,
-      #f0c869 70%,
-      #86641f 78%,
-      #35260a 87%,
-      #0b0702 100%),
-    #120d05;
-  background-size: 100% 100%, 100% 100%, 220% 100%, 190% 100%, 100% 100%;
-  background-position: 50% 50%, 50% 0%, 0% 50%, 0% 50%, 50% 50%;
-  /* Kilau bergeser pelan. BUKAN hue-rotate seperti versi pelangi: memutar
-     rona pada emas justru mengubahnya jadi hijau/merah muda. */
-  animation: kaca-tempa 22s ease-in-out infinite;
-  border: 1px solid rgba(240, 200, 105, 0.45);
+    /* TIRAI AURORA — empat pita cahaya lembut, masing-masing melayang dengan
+       kecepatan berbeda supaya geraknya berlapis, bukan satu blok bergeser. */
+    radial-gradient(58% 130% at 20% -12%, rgba(16, 185, 129, 0.55) 0%, rgba(16, 185, 129, 0.2) 34%, transparent 68%),
+    radial-gradient(42% 115% at 44% -18%, rgba(45, 212, 191, 0.5) 0%, rgba(34, 211, 238, 0.16) 38%, transparent 70%),
+    radial-gradient(52% 125% at 70% -14%, rgba(129, 140, 248, 0.45) 0%, rgba(139, 92, 246, 0.16) 40%, transparent 72%),
+    radial-gradient(64% 100% at 92% 22%, rgba(94, 234, 212, 0.3) 0%, transparent 66%),
+    /* Semburat hijau rendah di kaki langit — aurora paling terang di bawah. */
+    radial-gradient(120% 55% at 50% 108%, rgba(16, 185, 129, 0.24) 0%, transparent 68%),
+    /* Langit malam. Gelapnya harus MENDOMINASI: aurora hanya terbaca sebagai
+       aurora kalau ada banyak langit hitam di sekelilingnya. */
+    linear-gradient(180deg, #061020 0%, #050c17 42%, #02050c 100%);
+  background-size:
+    170% 100%, 150% 100%, 160% 100%, 140% 100%, 100% 100%, 100% 100%;
+  background-position:
+    10% 0%, 40% 0%, 70% 0%, 95% 0%, 50% 100%, 50% 50%;
+  /* Tirainya bergoyang pelan dan tidak serempak — aurora nyata tidak bergerak
+     sebagai satu lembar. BUKAN hue-rotate: memutar rona pada palet ini justru
+     menyeretnya balik ke arah pelangi yang tadi ditolak. */
+  animation: kaca-aurora-tirai 26s ease-in-out infinite;
+  border: 1px solid rgba(94, 234, 212, 0.28);
   box-shadow:
-    0 1px 2px rgba(12,20,16,0.1),
-    0 14px 30px -10px rgba(12,20,16,0.35),
-    0 28px 56px -18px rgba(12,20,16,0.3),
-    inset 0 1px 0 rgba(255, 246, 218, 0.45);
+    0 1px 2px rgba(2,6,14,0.4),
+    0 14px 30px -10px rgba(2,6,14,0.6),
+    0 28px 56px -18px rgba(2,6,14,0.5),
+    inset 0 1px 0 rgba(167, 243, 208, 0.22);
 }
 
-@keyframes kaca-tempa {
-  0%, 100% { background-position: 50% 50%, 50% 0%, 0% 50%, 0% 50%, 50% 50%; }
-  50%      { background-position: 50% 50%, 50% 0%, 100% 50%, 60% 50%, 50% 50%; }
+@keyframes kaca-aurora-tirai {
+  0%, 100% { background-position: 10% 0%, 40% 0%, 70% 0%, 95% 0%, 50% 100%, 50% 50%; }
+  33%      { background-position: 26% 0%, 30% 0%, 58% 0%, 84% 0%, 50% 100%, 50% 50%; }
+  66%      { background-position:  2% 0%, 54% 0%, 80% 0%, 99% 0%, 50% 100%, 50% 50%; }
 }
 
-/* Satu sorot tajam di tepi atas — pantulan cahaya pada bibir logam. */
+@media (prefers-reduced-motion: reduce) {
+  .kaca-hero { animation: none; }
+}
+
+/* Taburan bintang di balik tirai — yang menjadikan latarnya LANGIT MALAM,
+   bukan sekadar gradasi hijau gelap. Titiknya kecil dan tidak rata. */
 .kaca-hero::before {
   content: '';
   position: absolute;
   inset: 0;
   pointer-events: none;
-  background: linear-gradient(180deg,
-    rgba(255, 246, 218, 0.5) 0%,
-    rgba(255, 246, 218, 0.06) 6%,
-    transparent 14%);
+  background-image:
+    radial-gradient(1.6px 1.6px at 12% 22%, rgba(255,255,255,0.85), transparent),
+    radial-gradient(1.2px 1.2px at 27% 9%, rgba(255,255,255,0.6), transparent),
+    radial-gradient(1.7px 1.7px at 41% 31%, rgba(255,255,255,0.75), transparent),
+    radial-gradient(1.1px 1.1px at 58% 14%, rgba(255,255,255,0.55), transparent),
+    radial-gradient(1.5px 1.5px at 73% 27%, rgba(255,255,255,0.8), transparent),
+    radial-gradient(1.2px 1.2px at 86% 12%, rgba(255,255,255,0.6), transparent),
+    radial-gradient(1.3px 1.3px at 95% 36%, rgba(255,255,255,0.65), transparent),
+    radial-gradient(1.1px 1.1px at 6% 44%, rgba(255,255,255,0.5), transparent),
+    radial-gradient(1.4px 1.4px at 34% 52%, rgba(255,255,255,0.55), transparent),
+    radial-gradient(1.2px 1.2px at 64% 47%, rgba(255,255,255,0.5), transparent),
+    /* Sorot tipis di bibir atas kartu. */
+    linear-gradient(180deg, rgba(209, 250, 229, 0.3) 0%, rgba(209, 250, 229, 0.04) 5%, transparent 12%);
 }
 
 .dark .kaca-hero {
