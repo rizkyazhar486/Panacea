@@ -41,4 +41,20 @@ export const ORGAN_FOCUS: OrganFocus[] = [
   { key: 'external-nose', label: 'Nose (external)', layer: 'surface', keywords: ['nose', 'nasal region', 'nostril', 'ala of nose'], searchTerms: ['nose disease', 'nasal disease'] },
   { key: 'external-ear', label: 'Ear (external)', layer: 'surface', keywords: ['auricle', 'auricular region', 'antihelix', 'antitragus', 'tragus'], searchTerms: ['external ear disease'] },
   { key: 'larynx', label: 'Larynx', layer: 'visceral', keywords: ['larynx', 'vocal', 'thyroid cartilage', 'cricoid', 'arytenoid'], searchTerms: ['laryngeal disease'] },
+
+  // ── THT: struktur yang TERNYATA SUDAH ADA di data ───────────────────────
+  // Sesi sebelumnya menyatakan tidak ada geometri THT khusus di dataset ini.
+  // Itu KELIRU, dan diperiksa ulang dengan membaca nama node di berkas .glb:
+  // ketiga tulang pendengaran, gendang telinga, saraf koklea & vestibular,
+  // septum & konka hidung, serta ketiga bagian faring semuanya ada sebagai
+  // node bernama tersendiri. Yang memang TIDAK ada hanyalah bola matanya —
+  // hanya saraf optik dan kiasma yang tersedia. Entri di bawah membuka
+  // struktur yang benar-benar ada, alih-alih membiarkannya tidak terjangkau
+  // karena satu pernyataan yang tidak diperiksa.
+  { key: 'ossicles', label: 'Ear ossicles', layer: 'skeletal', keywords: ['malleus', 'incus', 'stapes'], searchTerms: ['ossicle disease', 'conductive hearing loss'] },
+  { key: 'eardrum', label: 'Eardrum & middle ear', layer: 'nervous', keywords: ['tympanic membrane', 'chorda tympani'], searchTerms: ['tympanic membrane disease', 'otitis media'] },
+  { key: 'inner-ear-nerve', label: 'Hearing & balance nerves', layer: 'nervous', keywords: ['cochlear nerve', 'vestibular nerve', 'vestibulocochlear', 'cochlear nucleus', 'vestibular nuclei'], searchTerms: ['vestibulocochlear nerve disease', 'sensorineural hearing loss'] },
+  { key: 'nasal-septum', label: 'Nasal septum & conchae', layer: 'skeletal', keywords: ['nasal septal cartilage', 'nasal concha', 'nasal bone'], searchTerms: ['nasal septum deviation', 'nasal obstruction'] },
+  { key: 'pharynx', label: 'Pharynx (naso/oro/laryngo)', layer: 'visceral', keywords: ['nasopharynx', 'oropharynx', 'laryngopharynx', 'epiglottis'], searchTerms: ['pharyngeal disease', 'pharyngitis'] },
+  { key: 'optic-pathway', label: 'Optic pathway', layer: 'nervous', keywords: ['optic nerve', 'optic chiasm', 'optic tract'], searchTerms: ['optic nerve disease', 'visual pathway disorder'] },
 ]

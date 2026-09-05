@@ -3,6 +3,11 @@ import { Prosa } from '../components/Prosa'
 import { Link } from 'react-router-dom'
 import { useStore } from '../lib/store'
 import { Card, SectionTitle, Badge, Button } from '../components/ui'
+import { lazy, Suspense } from 'react'
+
+// Papan alur otonom dimuat saat halaman dibuka saja — ia membawa tabel rentang
+// rujukan dan aturan pemesanan yang tidak diperlukan sebelum rekamnya dibuka.
+const AutonomousFlow = lazy(() => import('./emr/AutonomousFlow'))
 import { IconEMR, IconCheck, IconSparkle, IconShield, IconBook } from '../components/icons'
 import { BodyDiagram, type SystemFinding } from '../components/BodyDiagram'
 import { GrowthChart } from '../components/GrowthChart'
@@ -231,6 +236,20 @@ export function EMR() {
           signing.
         </div>
       </Card>
+
+      {/* Alur otonom: apa yang berjalan sendiri, dan di mana dokter WAJIB
+          turun tangan. Diletakkan sebelum bagian S/O/A/P karena ia menjelaskan
+          bagaimana bagian-bagian itu terisi. */}
+      <Suspense fallback={<Card><p className="text-sm text-neutral-500">Loading clinical flow…</p></Card>}>
+        <AutonomousFlow
+          anamnesis={draft.anamnesis}
+          fisik={draft.physicalExam}
+          masalah={draft.problems}
+          resep={draft.plan.filter((p) => p.category === 'Definitif').map((p) => p.text)}
+          resepDitandatangani={Boolean(draft.signedBy)}
+          onSignResep={sign}
+        />
+      </Suspense>
 
       {/* S — Subjective */}
       <Card>
