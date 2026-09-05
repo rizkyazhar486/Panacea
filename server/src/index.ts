@@ -112,7 +112,7 @@ import { emailOtpStart, emailOtpVerify, emailOtpLive } from './otp.js'
 import { putusanPengingat } from './jadwal.js'
 import { aiMessages, aiConsult, aiVision, aiOperator, reviewApplicationText, draftSecondOpinion, generateOperatorBriefing, aiConfigured, aiStatus } from './ai.js'
 import { anatomyOntologyLookup, anatomyStructureLookup } from './anatomyOntology.js'
-import { anatomyImageLookup, pathologyImageLookup, histologyImageLookup, xrayImageLookup, ctImageLookup, mriImageLookup } from './anatomyImages.js'
+import { anatomyImageLookup, pathologyImageLookup, histologyImageLookup, xrayImageLookup, ctImageLookup, mriImageLookup, exerciseImageLookup } from './anatomyImages.js'
 import { cariDiagnosis, icd11Configured } from './icd11.js'
 import { profilFarmakologi, cariZatAktif, daftarSemuaZatAktif } from './rxclass.js'
 import { terjemahkan, BAHASA, REGISTER, type Register } from './translate.js'
@@ -287,6 +287,7 @@ app.get('/api/anatomy/images', async (req, res) => {
       : kind === 'xray' ? await xrayImageLookup(q)
       : kind === 'ct' ? await ctImageLookup(q)
       : kind === 'mri' ? await mriImageLookup(q)
+      : kind === 'exercise' ? await exerciseImageLookup(q)
       : await anatomyImageLookup(q)
     res.json({ images })
   } catch (e) {

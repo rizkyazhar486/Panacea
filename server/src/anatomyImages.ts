@@ -242,3 +242,26 @@ export async function mriImageLookup(structure: string): Promise<AnatomyImage[]>
     (judul, q) => sebut(judul, q) && /\bMRI\b|magnetic resonance/i.test(judul),
   )
 }
+
+/**
+ * Foto GERAKAN LATIHAN yang nyata — orang sungguhan, bukan gambar garis.
+ *
+ * Kartu latihan selama ini memakai siluet tongkat yang digambar sendiri di
+ * PoseGerak.tsx. Itu memang aman dari hak cipta dan ringan, tapi ia tetap
+ * gambar garis, dan bentuk tubuh nyata dalam sebuah gerakan justru yang perlu
+ * dilihat: sudut siku, posisi tulang belikat, kedalaman pinggul.
+ *
+ * Commons memuat banyak foto dan animasi peragaan latihan berlisensi bebas
+ * (a.l. koleksi Everkinetic yang CC BY-SA). Penyaringnya ketat: judulnya harus
+ * menyebut latihannya DAN satu kata yang menandakan peragaan, supaya "row"
+ * tidak mengembalikan foto perahu dan "press" tidak mengembalikan mesin cetak.
+ */
+export async function exerciseImageLookup(exercise: string): Promise<AnatomyImage[]> {
+  return cariGabungan(
+    exercise,
+    (q) => [`${q} exercise`, `${q} weight training`, `${q} fitness demonstration`],
+    (judul, q) =>
+      sebut(judul, q) &&
+      /exercise|workout|training|fitness|gym|calisthenic|barbell|dumbbell|bodyweight|muscle/i.test(judul),
+  )
+}

@@ -20,6 +20,7 @@ const DrugSection = lazy(() => import('./bodyhub/DrugSection'))
 const DiseaseSection = lazy(() => import('./bodyhub/DiseaseSection'))
 const OrganDossier = lazy(() => import('./bodyhub/OrganDossier'))
 const SimulatorSection = lazy(() => import('./bodyhub/SimulatorSection'))
+const WorkoutSimSection = lazy(() => import('./bodyhub/WorkoutSimSection'))
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Body Explorer — model 3D anatomi NYATA (lihat Body3D.tsx untuk sumber data
@@ -66,11 +67,12 @@ function Chip({
 // sama-sama menyorot struktur pada figur yang itu-itu juga. Itulah maksud
 // "satu simulasi tubuh yang utuh" — bukan enam halaman yang saling menyebut,
 // melainkan satu tubuh yang ditanyai dari enam sudut.
-type PanelTab = 'layers' | 'muscles' | 'organs' | 'physiology' | 'simulator' | 'drugs' | 'diseases' | 'reference'
+type PanelTab = 'layers' | 'muscles' | 'workout-sim' | 'organs' | 'physiology' | 'simulator' | 'drugs' | 'diseases' | 'reference'
 
 const PANEL_TABS: Array<{ key: PanelTab; label: string }> = [
   { key: 'layers', label: 'Layers' },
-  { key: 'muscles', label: 'Workout' },
+  { key: 'muscles', label: 'Muscles' },
+  { key: 'workout-sim', label: 'Workout' },
   { key: 'organs', label: 'Organs' },
   { key: 'physiology', label: 'Physiology' },
   { key: 'simulator', label: 'Simulator' },
@@ -233,11 +235,16 @@ export function BodyExplorer() {
   // benar-benar berdetak pada keadaan yang sedang dihitung — syok berdetak
   // cepat dan dangkal, bukan sekadar angka yang berubah di sebelahnya.
   const [simVitals, setSimVitals] = useState<{ hr: number; rr: number } | null>(null)
-  const motion: MotionState = simVitals
+  // Tempo kontraksi dari simulator latihan, repetisi per menit.
+  const [repTempo, setRepTempo] = useState(0)
+  const dasarMotion: MotionState = simVitals
     ? { heartRate: simVitals.hr, respRate: simVitals.rr, contractionRate: 0 }
     : motionMode === 'rest' ? MOTION_REST
     : motionMode === 'exercise' ? MOTION_EXERCISE
     : MOTION_OFF
+  // Simulator latihan menyetir tempo kontraksi otot yang sedang disorot,
+  // tanpa mengganggu denyut & napas yang mungkin sedang disetir simulator faal.
+  const motion: MotionState = repTempo > 0 ? { ...dasarMotion, contractionRate: repTempo } : dasarMotion
   // Organ yang isi klinisnya sedang terbuka. Diisi oleh KETUKAN pada figur 3D
   // maupun oleh tombol organ — keduanya masuk lewat pintu yang sama supaya
   // hasilnya identik, tidak peduli dari mana orang datang.
@@ -714,6 +721,21 @@ export function BodyExplorer() {
                   ))}
                 </div>
               </>
+            )}
+
+            {panelTab === 'workout-sim' && (
+              <Suspense fallback={<p className="text-sm text-neutral-500">Loading workout simulator…</p>}>
+                <WorkoutSimSection
+                  onHighlight={(nodes) => {
+                    setActiveWorkout(null)
+                    setActiveOrgan(null)
+                    setFocusKeywords(null)
+                    setHighlighted(nodes)
+                    if (nodes.length && !layers.has('muscular')) toggleLayer('muscular')
+                  }}
+                  onTempo={setRepTempo}
+                />
+              </Suspense>
             )}
 
             {panelTab === 'organs' && (

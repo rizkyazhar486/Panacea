@@ -36,7 +36,7 @@ export interface OntologyTerm { id: string; label: string; ontology: 'doid' | 'h
  *  ditampilkan bersama gambarnya — itu syarat lisensi CC-nya, bukan hiasan. */
 /** Ragam citra yang bisa diminta untuk satu struktur. 'xray'/'ct'/'mri'
  *  mengambil citra modalitas NYATA, bukan render 3D bergaya radiologi. */
-export type ImageKind = 'anatomy' | 'pathology' | 'histology' | 'xray' | 'ct' | 'mri'
+export type ImageKind = 'anatomy' | 'pathology' | 'histology' | 'xray' | 'ct' | 'mri' | 'exercise'
 
 export interface IcdEntry {
   code: string
