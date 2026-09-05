@@ -17,6 +17,10 @@ const NotFound = lazy(() => import('./pages/NotFound').then((m) => ({ default: m
 const Chatbot = lazy(() => import('./pages/Chatbot').then((m) => ({ default: m.Chatbot })))
 const Dashboard = lazy(() => import('./pages/Dashboard').then((m) => ({ default: m.Dashboard })))
 const Nutrition = lazy(() => import('./pages/Nutrition').then((m) => ({ default: m.Nutrition })))
+// Komponen tiap skor tidak lagi diimpor di sini: halaman gabungan yang
+// memuatnya sendiri secara lazy, sehingga hanya skor yang benar-benar dibuka
+// yang diunduh.
+const ClinicalScores = lazy(() => import('./pages/ClinicalScores').then((m) => ({ default: m.ClinicalScores })))
 const Translator = lazy(() => import('./pages/Translator').then((m) => ({ default: m.Translator })))
 const BodyExplorer = lazy(() => import('./pages/BodyExplorer').then((m) => ({ default: m.BodyExplorer })))
 const Consult = lazy(() => import('./pages/Consult').then((m) => ({ default: m.Consult })))
@@ -133,49 +137,22 @@ const Chronotype = lazy(() => import('./pages/Chronotype').then((m) => ({ defaul
 const SleepApneaScreen = lazy(() => import('./pages/SleepApneaScreen').then((m) => ({ default: m.SleepApneaScreen })))
 const MentalHealthScreen = lazy(() => import('./pages/MentalHealthScreen').then((m) => ({ default: m.MentalHealthScreen })))
 const SubstanceUseScreen = lazy(() => import('./pages/SubstanceUseScreen').then((m) => ({ default: m.SubstanceUseScreen })))
-const EpworthSleepiness = lazy(() => import('./pages/EpworthSleepiness').then((m) => ({ default: m.EpworthSleepiness })))
 const StrokeRiskCalculator = lazy(() => import('./pages/StrokeRiskCalculator').then((m) => ({ default: m.StrokeRiskCalculator })))
-const WellsScore = lazy(() => import('./pages/WellsScore').then((m) => ({ default: m.WellsScore })))
 const OttawaAnkleRules = lazy(() => import('./pages/OttawaAnkleRules').then((m) => ({ default: m.OttawaAnkleRules })))
 const ChildGrowthTracker = lazy(() => import('./pages/ChildGrowthTracker').then((m) => ({ default: m.ChildGrowthTracker })))
-const QTcCalculator = lazy(() => import('./pages/QTcCalculator').then((m) => ({ default: m.QTcCalculator })))
-const CreatinineClearance = lazy(() => import('./pages/CreatinineClearance').then((m) => ({ default: m.CreatinineClearance })))
-const CorrectedCalcium = lazy(() => import('./pages/CorrectedCalcium').then((m) => ({ default: m.CorrectedCalcium })))
-const MeldScore = lazy(() => import('./pages/MeldScore').then((m) => ({ default: m.MeldScore })))
-const ChildPughScore = lazy(() => import('./pages/ChildPughScore').then((m) => ({ default: m.ChildPughScore })))
-const FenaCalculator = lazy(() => import('./pages/FenaCalculator').then((m) => ({ default: m.FenaCalculator })))
 const PediatricDkaCalculator = lazy(() => import('./pages/PediatricDkaCalculator').then((m) => ({ default: m.PediatricDkaCalculator })))
 const FluidCalculators = lazy(() => import('./pages/FluidCalculators').then((m) => ({ default: m.FluidCalculators })))
 const NeonatalResuscitationGuide = lazy(() => import('./pages/NeonatalResuscitationGuide').then((m) => ({ default: m.NeonatalResuscitationGuide })))
 const EmpiricTherapyReference = lazy(() => import('./pages/EmpiricTherapyReference').then((m) => ({ default: m.EmpiricTherapyReference })))
 const DermatologyLesionMapper = lazy(() => import('./pages/DermatologyLesionMapper').then((m) => ({ default: m.DermatologyLesionMapper })))
 const PsychiatricStatusExam = lazy(() => import('./pages/PsychiatricStatusExam').then((m) => ({ default: m.PsychiatricStatusExam })))
-const RansonCriteria = lazy(() => import('./pages/RansonCriteria').then((m) => ({ default: m.RansonCriteria })))
-const HasBledScore = lazy(() => import('./pages/HasBledScore').then((m) => ({ default: m.HasBledScore })))
-const BisapScore = lazy(() => import('./pages/BisapScore').then((m) => ({ default: m.BisapScore })))
-const GlasgowBlatchfordScore = lazy(() => import('./pages/GlasgowBlatchfordScore').then((m) => ({ default: m.GlasgowBlatchfordScore })))
-const TimiRiskScore = lazy(() => import('./pages/TimiRiskScore').then((m) => ({ default: m.TimiRiskScore })))
-const PercRule = lazy(() => import('./pages/PercRule').then((m) => ({ default: m.PercRule })))
-const SofaScore = lazy(() => import('./pages/SofaScore').then((m) => ({ default: m.SofaScore })))
-const LightsCriteria = lazy(() => import('./pages/LightsCriteria').then((m) => ({ default: m.LightsCriteria })))
-const FourTsScore = lazy(() => import('./pages/FourTsScore').then((m) => ({ default: m.FourTsScore })))
 const News2Score = lazy(() => import('./pages/News2Score').then((m) => ({ default: m.News2Score })))
-const SerumOsmolality = lazy(() => import('./pages/SerumOsmolality').then((m) => ({ default: m.SerumOsmolality })))
 const LdlCalculator = lazy(() => import('./pages/LdlCalculator').then((m) => ({ default: m.LdlCalculator })))
 const AaGradient = lazy(() => import('./pages/AaGradient').then((m) => ({ default: m.AaGradient })))
-const PaduaScore = lazy(() => import('./pages/PaduaScore').then((m) => ({ default: m.PaduaScore })))
-const RockallScore = lazy(() => import('./pages/RockallScore').then((m) => ({ default: m.RockallScore })))
-const CharlsonIndex = lazy(() => import('./pages/CharlsonIndex').then((m) => ({ default: m.CharlsonIndex })))
-const CapriniScore = lazy(() => import('./pages/CapriniScore').then((m) => ({ default: m.CapriniScore })))
-const DukeCriteria = lazy(() => import('./pages/DukeCriteria').then((m) => ({ default: m.DukeCriteria })))
-const BradenScale = lazy(() => import('./pages/BradenScale').then((m) => ({ default: m.BradenScale })))
-const GraceScore = lazy(() => import('./pages/GraceScore').then((m) => ({ default: m.GraceScore })))
 const ClubHub = lazy(() => import('./pages/ClubHub').then((m) => ({ default: m.ClubHub })))
 const CalculatorHub = lazy(() => import('./pages/CalculatorHub').then((m) => ({ default: m.CalculatorHub })))
 const WellnessHub = lazy(() => import('./pages/WellnessHub').then((m) => ({ default: m.WellnessHub })))
 const HealthSimulator = lazy(() => import('./pages/HealthSimulator').then((m) => ({ default: m.HealthSimulator })))
-const Findrisc = lazy(() => import('./pages/Findrisc').then((m) => ({ default: m.Findrisc })))
-const MaddreyScore = lazy(() => import('./pages/MaddreyScore').then((m) => ({ default: m.MaddreyScore })))
 const ResilienceStories = lazy(() => import('./pages/ResilienceStories').then((m) => ({ default: m.ResilienceStories })))
 const LifeCompass = lazy(() => import('./pages/LifeCompass').then((m) => ({ default: m.LifeCompass })))
 const Breathwork = lazy(() => import('./pages/Breathwork').then((m) => ({ default: m.Breathwork })))
@@ -402,49 +379,49 @@ createRoot(document.getElementById('root')!).render(
               <Route path="/sleep-apnea-screen" element={<SleepApneaScreen />} />
               <Route path="/mental-health-screen" element={<MentalHealthScreen />} />
               <Route path="/substance-use-screen" element={<SubstanceUseScreen />} />
-              <Route path="/epworth-sleepiness" element={<EpworthSleepiness />} />
+              <Route path="/epworth-sleepiness" element={<Navigate to="/clinical-scores?s=epworth" replace />} />
               <Route path="/stroke-risk" element={<StrokeRiskCalculator />} />
-              <Route path="/wells-score" element={<WellsScore />} />
+              <Route path="/wells-score" element={<Navigate to="/clinical-scores?s=wells" replace />} />
               <Route path="/ottawa-ankle" element={<OttawaAnkleRules />} />
               <Route path="/child-growth" element={<ChildGrowthTracker />} />
-              <Route path="/qtc-calculator" element={<QTcCalculator />} />
-              <Route path="/creatinine-clearance" element={<CreatinineClearance />} />
-              <Route path="/corrected-calcium" element={<CorrectedCalcium />} />
-              <Route path="/meld-score" element={<MeldScore />} />
-              <Route path="/child-pugh-score" element={<ChildPughScore />} />
-              <Route path="/fena-calculator" element={<FenaCalculator />} />
+              <Route path="/qtc-calculator" element={<Navigate to="/clinical-scores?s=qtc" replace />} />
+              <Route path="/creatinine-clearance" element={<Navigate to="/clinical-scores?s=creatinine-clearance" replace />} />
+              <Route path="/corrected-calcium" element={<Navigate to="/clinical-scores?s=corrected-calcium" replace />} />
+              <Route path="/meld-score" element={<Navigate to="/clinical-scores?s=meld" replace />} />
+              <Route path="/child-pugh-score" element={<Navigate to="/clinical-scores?s=child-pugh" replace />} />
+              <Route path="/fena-calculator" element={<Navigate to="/clinical-scores?s=fena" replace />} />
               <Route path="/pediatric-dka-calculator" element={<PediatricDkaCalculator />} />
               <Route path="/fluid-calculators" element={<FluidCalculators />} />
               <Route path="/neonatal-resuscitation-guide" element={<NeonatalResuscitationGuide />} />
               <Route path="/empiric-therapy-reference" element={<EmpiricTherapyReference />} />
               <Route path="/dermatology-lesion-mapper" element={<DermatologyLesionMapper />} />
               <Route path="/psychiatric-status-exam" element={<PsychiatricStatusExam />} />
-              <Route path="/ranson-criteria" element={<RansonCriteria />} />
-              <Route path="/has-bled-score" element={<HasBledScore />} />
-              <Route path="/bisap-score" element={<BisapScore />} />
-              <Route path="/glasgow-blatchford-score" element={<GlasgowBlatchfordScore />} />
-              <Route path="/timi-risk-score" element={<TimiRiskScore />} />
-              <Route path="/perc-rule" element={<PercRule />} />
-              <Route path="/sofa-score" element={<SofaScore />} />
-              <Route path="/lights-criteria" element={<LightsCriteria />} />
-              <Route path="/4ts-score" element={<FourTsScore />} />
+              <Route path="/ranson-criteria" element={<Navigate to="/clinical-scores?s=ranson" replace />} />
+              <Route path="/has-bled-score" element={<Navigate to="/clinical-scores?s=hasbled" replace />} />
+              <Route path="/bisap-score" element={<Navigate to="/clinical-scores?s=bisap" replace />} />
+              <Route path="/glasgow-blatchford-score" element={<Navigate to="/clinical-scores?s=blatchford" replace />} />
+              <Route path="/timi-risk-score" element={<Navigate to="/clinical-scores?s=timi" replace />} />
+              <Route path="/perc-rule" element={<Navigate to="/clinical-scores?s=perc" replace />} />
+              <Route path="/sofa-score" element={<Navigate to="/clinical-scores?s=sofa" replace />} />
+              <Route path="/lights-criteria" element={<Navigate to="/clinical-scores?s=lights" replace />} />
+              <Route path="/4ts-score" element={<Navigate to="/clinical-scores?s=4ts" replace />} />
               <Route path="/news2-score" element={<News2Score />} />
-              <Route path="/serum-osmolality" element={<SerumOsmolality />} />
+              <Route path="/serum-osmolality" element={<Navigate to="/clinical-scores?s=serum-osmolality" replace />} />
               <Route path="/ldl-calculator" element={<LdlCalculator />} />
               <Route path="/aa-gradient" element={<AaGradient />} />
-              <Route path="/padua-score" element={<PaduaScore />} />
-              <Route path="/rockall-score" element={<RockallScore />} />
-              <Route path="/charlson-index" element={<CharlsonIndex />} />
-              <Route path="/caprini-score" element={<CapriniScore />} />
-              <Route path="/duke-criteria" element={<DukeCriteria />} />
-              <Route path="/braden-scale" element={<BradenScale />} />
-              <Route path="/grace-score" element={<GraceScore />} />
+              <Route path="/padua-score" element={<Navigate to="/clinical-scores?s=padua" replace />} />
+              <Route path="/rockall-score" element={<Navigate to="/clinical-scores?s=rockall" replace />} />
+              <Route path="/charlson-index" element={<Navigate to="/clinical-scores?s=charlson" replace />} />
+              <Route path="/caprini-score" element={<Navigate to="/clinical-scores?s=caprini" replace />} />
+              <Route path="/duke-criteria" element={<Navigate to="/clinical-scores?s=duke" replace />} />
+              <Route path="/braden-scale" element={<Navigate to="/clinical-scores?s=braden" replace />} />
+              <Route path="/grace-score" element={<Navigate to="/clinical-scores?s=grace" replace />} />
               <Route path="/clubs" element={<ClubHub />} />
               <Route path="/calculator-hub" element={<CalculatorHub />} />
               <Route path="/wellness-hub" element={<WellnessHub />} />
               <Route path="/health-simulator" element={<HealthSimulator />} />
-              <Route path="/findrisc" element={<Findrisc />} />
-              <Route path="/maddrey-score" element={<MaddreyScore />} />
+              <Route path="/findrisc" element={<Navigate to="/clinical-scores?s=findrisc" replace />} />
+              <Route path="/maddrey-score" element={<Navigate to="/clinical-scores?s=maddrey" replace />} />
               <Route path="/resilience-stories" element={<ResilienceStories />} />
               <Route path="/life-compass" element={<LifeCompass />} />
               <Route path="/breathwork" element={<Breathwork />} />
@@ -455,6 +432,11 @@ createRoot(document.getElementById('root')!).render(
               <Route path="/nutrition" element={<Nutrition />} />
               <Route path="/body-explorer" element={<BodyExplorer />} />
               <Route path="/translator" element={<Translator />} />
+              {/* Dua puluh satu skor klinis yang dulu punya rute sendiri kini
+                  digabung ke satu halaman. Rute lamanya SENGAJA dipertahankan
+                  sebagai pengalihan supaya tautan yang sudah tersebar — di
+                  catatan, pesan, maupun penanda — tidak mati. */}
+              <Route path="/clinical-scores" element={<ClinicalScores />} />
               <Route path="/athlete" element={<Athlete />} />
               <Route path="/recovery" element={<Recovery />} />
               <Route path="/workout" element={<Workout />} />
