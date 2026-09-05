@@ -48,7 +48,6 @@ const SportsScience = lazy(() => import('./SportsScience').then((m) => ({ defaul
 const SportsLab = lazy(() => import('./SportsLab').then((m) => ({ default: m.SportsLab })))
 const GymEquipment = lazy(() => import('./GymEquipment').then((m) => ({ default: m.GymEquipment })))
 const MovementToolkit = lazy(() => import('./MovementToolkit').then((m) => ({ default: m.MovementToolkit })))
-const GaitAnalysis = lazy(() => import('./GaitAnalysis').then((m) => ({ default: m.GaitAnalysis })))
 const ShapeForming = lazy(() => import('./ShapeForming').then((m) => ({ default: m.ShapeForming })))
 const Rekomposisi = lazy(() => import('./Rekomposisi').then((m) => ({ default: m.Rekomposisi })))
 
@@ -95,8 +94,6 @@ const TABS: TabDef[] = [
     ringkas: 'Gym equipment — what each machine loads and how to set it up' },
   { id: 'gerak', label: 'Movement', emoji: '🦵', komponen: MovementToolkit,
     ringkas: 'Movement quality screens and corrective work' },
-  { id: 'gait', label: 'Gait', emoji: '🚶', komponen: GaitAnalysis,
-    ringkas: 'Walking and running gait analysis' },
   { id: 'bentuk', label: 'Shaping', emoji: '📐', komponen: ShapeForming,
     ringkas: 'Body shaping goals and the training that actually changes them' },
   { id: 'rekomposisi', label: 'Recomp', emoji: '⚖️', komponen: Rekomposisi,

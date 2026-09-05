@@ -22,6 +22,18 @@ const HeartRateLog = lazy(() => import('./HeartRateLog').then((m) => ({ default:
 const SleepPattern = lazy(() => import('./SleepPattern').then((m) => ({ default: m.SleepPattern })))
 const GaitAnalysis = lazy(() => import('./GaitAnalysis').then((m) => ({ default: m.GaitAnalysis })))
 const ClinicalTrackers = lazy(() => import('./ClinicalTrackers').then((m) => ({ default: m.ClinicalTrackers })))
+// Pemulihan dan tidur yang dulu tersebar sebagai rute sendiri-sendiri. Halaman
+// ini sudah memiliki tab Tidur sejak awal, jadi di sinilah tempatnya — bukan di
+// hub baru. Isinya tidak ditulis ulang; komponennya dipasang apa adanya.
+const SleepDebt = lazy(() => import('./SleepDebt').then((m) => ({ default: m.SleepDebt })))
+const SleepApneaScreen = lazy(() => import('./SleepApneaScreen').then((m) => ({ default: m.SleepApneaScreen })))
+const SleepToolkit = lazy(() => import('./SleepToolkit').then((m) => ({ default: m.SleepToolkit })))
+const Chronotype = lazy(() => import('./Chronotype').then((m) => ({ default: m.Chronotype })))
+const Recovery = lazy(() => import('./Recovery').then((m) => ({ default: m.Recovery })))
+const Breathwork = lazy(() => import('./Breathwork').then((m) => ({ default: m.Breathwork })))
+const ThermalTherapy = lazy(() => import('./ThermalTherapy').then((m) => ({ default: m.ThermalTherapy })))
+const PostureBreaks = lazy(() => import('./PostureBreaks').then((m) => ({ default: m.PostureBreaks })))
+const FastingTimer = lazy(() => import('./FastingTimer').then((m) => ({ default: m.FastingTimer })))
 
 const TABS: TabDef[] = [
   { id: 'energi', label: 'Energy', emoji: '🔋', komponen: BodyBattery,
@@ -30,6 +42,28 @@ const TABS: TabDef[] = [
     ringkas: 'Every heart-rate sample the watch sends, and how dense it is' },
   { id: 'tidur', label: 'Sleep', emoji: '😴', komponen: SleepPattern,
     ringkas: 'Duration, stages, and how consistent your bedtime is' },
+  // ── Tidur, diperinci ──────────────────────────────────────────────────────
+  { id: 'utang-tidur', label: 'Sleep debt', emoji: '📉', komponen: SleepDebt,
+    ringkas: 'Accumulated shortfall against your own need, and what repays it' },
+  { id: 'apnea', label: 'Apnoea screen', emoji: '🫁', komponen: SleepApneaScreen,
+    ringkas: 'STOP-BANG style screening for obstructive sleep apnoea' },
+  { id: 'kronotipe', label: 'Chronotype', emoji: '🌗', komponen: Chronotype,
+    ringkas: 'Your body clock, and why forcing it costs more than it saves' },
+  { id: 'alat-tidur', label: 'Sleep toolkit', emoji: '🛏️', komponen: SleepToolkit,
+    ringkas: 'Sleep hygiene, light, temperature and timing — what changes it' },
+
+  // ── Pemulihan ─────────────────────────────────────────────────────────────
+  { id: 'pulih', label: 'Recovery', emoji: '🌱', komponen: Recovery,
+    ringkas: 'Recovering from surgery, injury, illness or overtraining' },
+  { id: 'napas', label: 'Breathwork', emoji: '💨', komponen: Breathwork,
+    ringkas: 'Breathing patterns that shift autonomic balance, and their limits' },
+  { id: 'termal', label: 'Heat & cold', emoji: '🔥', komponen: ThermalTherapy,
+    ringkas: 'Sauna and cold exposure — what the evidence supports' },
+  { id: 'postur', label: 'Posture breaks', emoji: '🪑', komponen: PostureBreaks,
+    ringkas: 'Breaking up sitting — the intervention with the best evidence' },
+  { id: 'puasa', label: 'Fasting', emoji: '⏳', komponen: FastingTimer,
+    ringkas: 'Fasting windows and what actually happens in each' },
+
   { id: 'gerak', label: 'Movement', emoji: '🦶', komponen: GaitAnalysis,
     ringkas: 'Step asymmetry, walking quality, running form, heart-rate recovery' },
   { id: 'klinis', label: 'Clinical', emoji: '🩺', komponen: ClinicalTrackers,
