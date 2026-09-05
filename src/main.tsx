@@ -16,10 +16,10 @@ const Home = lazy(() => import('./pages/Home').then((m) => ({ default: m.Home })
 const NotFound = lazy(() => import('./pages/NotFound').then((m) => ({ default: m.NotFound })))
 const Chatbot = lazy(() => import('./pages/Chatbot').then((m) => ({ default: m.Chatbot })))
 const Dashboard = lazy(() => import('./pages/Dashboard').then((m) => ({ default: m.Dashboard })))
-const Nutrition = lazy(() => import('./pages/Nutrition').then((m) => ({ default: m.Nutrition })))
 // Komponen tiap skor tidak lagi diimpor di sini: halaman gabungan yang
 // memuatnya sendiri secara lazy, sehingga hanya skor yang benar-benar dibuka
 // yang diunduh.
+const PusatGizi = lazy(() => import('./pages/PusatGizi').then((m) => ({ default: m.PusatGizi })))
 const ClinicalScores = lazy(() => import('./pages/ClinicalScores').then((m) => ({ default: m.ClinicalScores })))
 const Translator = lazy(() => import('./pages/Translator').then((m) => ({ default: m.Translator })))
 const BodyExplorer = lazy(() => import('./pages/BodyExplorer').then((m) => ({ default: m.BodyExplorer })))
@@ -63,7 +63,6 @@ const TrainingPhysiology = lazy(() => import('./pages/TrainingPhysiology').then(
 const EnduranceTools = lazy(() => import('./pages/EnduranceTools').then((m) => ({ default: m.EnduranceTools })))
 const ClinicalTrackers = lazy(() => import('./pages/ClinicalTrackers').then((m) => ({ default: m.ClinicalTrackers })))
 const Connect = lazy(() => import('./pages/Connect').then((m) => ({ default: m.Connect })))
-const MacroLabGizi = lazy(() => import('./pages/MacroLabGizi').then((m) => ({ default: m.MacroLabGizi })))
 const OwnerAnalytics = lazy(() => import('./pages/OwnerAnalytics').then((m) => ({ default: m.OwnerAnalytics })))
 const Messages = lazy(() => import('./pages/Messages').then((m) => ({ default: m.Messages })))
 const Profile = lazy(() => import('./pages/Profile').then((m) => ({ default: m.Profile })))
@@ -80,7 +79,6 @@ const SportsScores = lazy(() => import('./pages/SportsScores').then((m) => ({ de
 const ClinicalCalculators = lazy(() => import('./pages/ClinicalCalculators').then((m) => ({ default: m.ClinicalCalculators })))
 const LongevityCurriculum = lazy(() => import('./pages/LongevityCurriculum').then((m) => ({ default: m.LongevityCurriculum })))
 const MedStudyHub = lazy(() => import('./pages/MedStudyHub').then((m) => ({ default: m.MedStudyHub })))
-const DietarySupplements = lazy(() => import('./pages/DietarySupplements').then((m) => ({ default: m.DietarySupplements })))
 const AestheticVitality = lazy(() => import('./pages/AestheticVitality').then((m) => ({ default: m.AestheticVitality })))
 const ClinicalEvidence = lazy(() => import('./pages/ClinicalEvidence').then((m) => ({ default: m.ClinicalEvidence })))
 const BiologicalAge = lazy(() => import('./pages/BiologicalAge').then((m) => ({ default: m.BiologicalAge })))
@@ -109,10 +107,6 @@ const Perubahan = lazy(() => import('./pages/Perubahan').then((m) => ({ default:
 const Learn = lazy(() => import('./pages/Learn').then((m) => ({ default: m.Learn })))
 const DekConnect = lazy(() => import('./pages/DekConnect').then((m) => ({ default: m.DekConnect })))
 const TinjauConnect = lazy(() => import('./pages/TinjauConnect').then((m) => ({ default: m.TinjauConnect })))
-const CarbonDiet = lazy(() => import('./pages/CarbonDiet').then((m) => ({ default: m.CarbonDiet })))
-const CaffeineCalculator = lazy(() => import('./pages/CaffeineCalculator').then((m) => ({ default: m.CaffeineCalculator })))
-const HydrationCalculator = lazy(() => import('./pages/HydrationCalculator').then((m) => ({ default: m.HydrationCalculator })))
-const AlcoholCalculator = lazy(() => import('./pages/AlcoholCalculator').then((m) => ({ default: m.AlcoholCalculator })))
 const SunExposure = lazy(() => import('./pages/SunExposure').then((m) => ({ default: m.SunExposure })))
 const MedicationReminders = lazy(() => import('./pages/MedicationReminders').then((m) => ({ default: m.MedicationReminders })))
 const MentalHealthScreen = lazy(() => import('./pages/MentalHealthScreen').then((m) => ({ default: m.MentalHealthScreen })))
@@ -156,7 +150,6 @@ const AnalisisPro = lazy(() => import('./pages/AnalisisPro').then((m) => ({ defa
 const BodyBattery = lazy(() => import('./pages/BodyBattery').then((m) => ({ default: m.BodyBattery })))
 const ClinicalHub = lazy(() => import('./pages/ClinicalHub').then((m) => ({ default: m.ClinicalHub })))
 const MindToolkit = lazy(() => import('./pages/MindToolkit').then((m) => ({ default: m.MindToolkit })))
-const NutritionToolkit = lazy(() => import('./pages/NutritionToolkit').then((m) => ({ default: m.NutritionToolkit })))
 const ToxinChecklist = lazy(() => import('./pages/ToxinChecklist').then((m) => ({ default: m.ToxinChecklist })))
 const LongevityScience = lazy(() => import('./pages/LongevityScience').then((m) => ({ default: m.LongevityScience })))
 const SelfAssessmentToolkit = lazy(() => import('./pages/SelfAssessmentToolkit').then((m) => ({ default: m.SelfAssessmentToolkit })))
@@ -241,7 +234,7 @@ createRoot(document.getElementById('root')!).render(
               <Route path="/notifikasi" element={<Notifications />} />
               <Route path="/sports-lab" element={<Navigate to="/latihan?t=sportlab" replace />} />
               <Route path="/connect" element={<Connect />} />
-              <Route path="/macro-lab" element={<MacroLabGizi />} />
+              <Route path="/macro-lab" element={<Navigate to="/gizi?t=makro" replace />} />
               <Route path="/owner-analytics" element={<OwnerAnalytics />} />
               <Route path="/messages" element={<Messages />} />
               <Route path="/profile" element={<Profile />} />
@@ -263,7 +256,7 @@ createRoot(document.getElementById('root')!).render(
               <Route path="/longevity-curriculum" element={<LongevityCurriculum />} />
               <Route path="/med-study" element={<MedStudyHub />} />
               <Route path="/osce-ukmppd" element={<OsceUkmppd />} />
-              <Route path="/supplements" element={<DietarySupplements />} />
+              <Route path="/supplements" element={<Navigate to="/gizi?t=suplemen" replace />} />
               <Route path="/aesthetic" element={<AestheticVitality />} />
               <Route path="/evidence" element={<ClinicalEvidence />} />
               <Route path="/biological-age" element={<BiologicalAge />} />
@@ -311,7 +304,7 @@ createRoot(document.getElementById('root')!).render(
               <Route path="/sleep-toolkit" element={<Navigate to="/tubuh?t=alat-tidur" replace />} />
               <Route path="/movement-toolkit" element={<Navigate to="/latihan?t=gerak" replace />} />
               <Route path="/mind-toolkit" element={<MindToolkit />} />
-              <Route path="/nutrition-toolkit" element={<NutritionToolkit />} />
+              <Route path="/nutrition-toolkit" element={<Navigate to="/gizi?t=alat" replace />} />
               <Route path="/toxin-checklist" element={<ToxinChecklist />} />
               <Route path="/longevity-science" element={<LongevityScience />} />
               <Route path="/self-assessment-toolkit" element={<SelfAssessmentToolkit />} />
@@ -342,10 +335,10 @@ createRoot(document.getElementById('root')!).render(
               <Route path="/dek-connect" element={<DekConnect />} />
               <Route path="/verifikasi-connect" element={<VerifikasiConnect />} />
               <Route path="/tinjau-connect" element={<TinjauConnect />} />
-              <Route path="/carbon-diet" element={<CarbonDiet />} />
-              <Route path="/caffeine" element={<CaffeineCalculator />} />
-              <Route path="/hydration" element={<HydrationCalculator />} />
-              <Route path="/alcohol" element={<AlcoholCalculator />} />
+              <Route path="/carbon-diet" element={<Navigate to="/gizi?t=jejak" replace />} />
+              <Route path="/caffeine" element={<Navigate to="/gizi?t=kafein" replace />} />
+              <Route path="/hydration" element={<Navigate to="/gizi?t=cairan" replace />} />
+              <Route path="/alcohol" element={<Navigate to="/gizi?t=alkohol" replace />} />
               <Route path="/sun-exposure" element={<SunExposure />} />
               <Route path="/med-reminders" element={<MedicationReminders />} />
               <Route path="/chronotype" element={<Navigate to="/tubuh?t=kronotipe" replace />} />
@@ -402,7 +395,7 @@ createRoot(document.getElementById('root')!).render(
               <Route path="/sleep-debt" element={<Navigate to="/tubuh?t=utang-tidur" replace />} />
               <Route path="/thermal-therapy" element={<Navigate to="/tubuh?t=termal" replace />} />
               <Route path="/trials" element={<ClinicalTrials />} />
-              <Route path="/nutrition" element={<Nutrition />} />
+              <Route path="/nutrition" element={<Navigate to="/gizi?t=makan" replace />} />
               <Route path="/body-explorer" element={<BodyExplorer />} />
               <Route path="/translator" element={<Translator />} />
               {/* Dua puluh satu skor klinis yang dulu punya rute sendiri kini
@@ -410,6 +403,7 @@ createRoot(document.getElementById('root')!).render(
                   sebagai pengalihan supaya tautan yang sudah tersebar — di
                   catatan, pesan, maupun penanda — tidak mati. */}
               <Route path="/clinical-scores" element={<ClinicalScores />} />
+              <Route path="/gizi" element={<PusatGizi />} />
               <Route path="/athlete" element={<Athlete />} />
               <Route path="/recovery" element={<Navigate to="/tubuh?t=pulih" replace />} />
               <Route path="/workout" element={<Navigate to="/latihan?t=sesi" replace />} />
