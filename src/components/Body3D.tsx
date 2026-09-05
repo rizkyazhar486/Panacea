@@ -88,6 +88,100 @@ function loadLayer(file: string): Promise<THREE.Group> {
 
 const HIGHLIGHT = new THREE.Color(0x00bf63)
 
+// ─── Mode tampilan radiologi ────────────────────────────────────────────────
+//
+// Model 3D-nya diwarnai ulang meniru cara tiap modalitas pencitraan
+// "melihat" jaringan. Ini RENDER, bukan hasil pindai: bentuk dan letaknya
+// nyata (dari data BodyParts3D), tapi derajat keabuannya pendekatan, bukan
+// ukuran atenuasi atau intensitas sinyal sungguhan. Karena itu tab citra di
+// bawah viewer mengambil rontgen/CT/MRI ASLI dari arsip — yang ini untuk
+// memahami ruang tiga dimensinya, yang itu untuk mengenali tampilan aslinya.
+//
+// Nilainya mengikuti perilaku fisik tiap modalitas, bukan selera warna:
+//   - Rontgen: berkasnya menembus dan MENUMPUK, jadi lapisannya digambar
+//     additive & tembus pandang — makin banyak jaringan bertumpuk, makin
+//     terang. Tulang menyerap paling banyak, jadi paling jelas.
+//   - CT: skala abu-abu mengikuti radiodensitas (tulang putih, otot abu
+//     madya, lemak/rongga gelap).
+//   - MRI: nyaris kebalikan CT. Tulang kortikal hampir tanpa sinyal (gelap),
+//     jaringan lunak dan saraf justru paling terang; darah yang mengalir
+//     memberi flow void yang gelap.
+export type RenderMode = 'anatomy' | 'xray' | 'ct' | 'mri'
+
+export const RENDER_MODES: Array<{ key: RenderMode; label: string; hint: string }> = [
+  { key: 'anatomy', label: 'Anatomy', hint: 'True anatomical colours' },
+  { key: 'xray', label: 'X-ray', hint: 'Overlapping tissue accumulates — bone reads brightest' },
+  { key: 'ct', label: 'CT', hint: 'Greyscale by radiodensity — bone white, soft tissue mid-grey' },
+  { key: 'mri', label: 'MRI', hint: 'Soft tissue and nerves bright; cortical bone nearly signal-free' },
+]
+
+type LayerKey = AnatomyLayer['key']
+
+/** Warna per lapisan untuk tiap modalitas. */
+const RADIOLOGY_TONES: Record<Exclude<RenderMode, 'anatomy'>, Record<LayerKey, { color: number; opacity: number }>> = {
+  xray: {
+    skeletal: { color: 0xdce8ff, opacity: 0.9 },
+    muscular: { color: 0x8fa6cc, opacity: 0.14 },
+    surface: { color: 0x7f93b8, opacity: 0.07 },
+    cardiovascular: { color: 0xa8bce0, opacity: 0.24 },
+    nervous: { color: 0x9aaed2, opacity: 0.16 },
+    visceral: { color: 0xb0c2e4, opacity: 0.3 },
+    lymphoid: { color: 0x93a7cb, opacity: 0.13 },
+  },
+  ct: {
+    skeletal: { color: 0xf4f4f4, opacity: 1 },
+    muscular: { color: 0x6e6e6e, opacity: 1 },
+    surface: { color: 0x3a3a3a, opacity: 1 },
+    cardiovascular: { color: 0x8c8c8c, opacity: 1 },
+    nervous: { color: 0x707070, opacity: 1 },
+    visceral: { color: 0x5d5d5d, opacity: 1 },
+    lymphoid: { color: 0x585858, opacity: 1 },
+  },
+  mri: {
+    skeletal: { color: 0x303030, opacity: 1 },
+    muscular: { color: 0x9a9a9a, opacity: 1 },
+    surface: { color: 0x6a6a6a, opacity: 1 },
+    cardiovascular: { color: 0x484848, opacity: 1 },
+    nervous: { color: 0xdcdcdc, opacity: 1 },
+    visceral: { color: 0xbcbcbc, opacity: 1 },
+    lymphoid: { color: 0xa8a8a8, opacity: 1 },
+  },
+}
+
+const MODE_BACKGROUND: Record<RenderMode, number> = {
+  anatomy: 0x0a0a0f,
+  xray: 0x04060c,
+  ct: 0x000000,
+  mri: 0x000000,
+}
+
+// Materialnya dibuat sekali per (lapisan x modalitas) lalu dipakai bersama —
+// puluhan ribu mesh tidak boleh masing-masing punya salinan sendiri. Sorotan
+// hijau tetap presisi karena efek sorot mengkloning dulu sebelum mengubah.
+const radiologyMaterialCache = new Map<string, THREE.MeshStandardMaterial>()
+function radiologyMaterial(layer: LayerKey, mode: Exclude<RenderMode, 'anatomy'>): THREE.MeshStandardMaterial {
+  const cacheKey = `${mode}:${layer}`
+  let mat = radiologyMaterialCache.get(cacheKey)
+  if (!mat) {
+    const tone = RADIOLOGY_TONES[mode][layer]
+    mat = new THREE.MeshStandardMaterial({
+      color: new THREE.Color(tone.color),
+      roughness: 0.95,
+      metalness: 0,
+      transparent: mode === 'xray',
+      opacity: tone.opacity,
+      // Rontgen menumpuk: berkas yang lolos beberapa lapis jaringan
+      // menghasilkan gambar yang lebih terang, jadi additive tanpa menulis
+      // depth supaya urutan gambar tidak menyembunyikan lapisan di belakang.
+      blending: mode === 'xray' ? THREE.AdditiveBlending : THREE.NormalBlending,
+      depthWrite: mode !== 'xray',
+      side: mode === 'xray' ? THREE.DoubleSide : THREE.FrontSide,
+    })
+    radiologyMaterialCache.set(cacheKey, mat)
+  }
+  return mat
+}
+
 interface Props {
   layers: Set<AnatomyLayer['key']>
   /** Node names (exact, e.g. "Rectus femoris muscle.l") to highlight in green — 0, 1 or many at once. */
@@ -100,17 +194,21 @@ interface Props {
    * frame just that organ; clearing it restores the whole-body framing.
    */
   focusKeywords: string[] | null
+  /** Imaging look applied to the model: true colour, or X-ray / CT / MRI. */
+  renderMode: RenderMode
   /** Fires with the raw node name and a human-readable label when the user taps a structure. */
   onPick: (rawName: string, label: string) => void
 }
 
-export function Body3D({ layers, highlighted, focusKeywords, onPick }: Props) {
+export function Body3D({ layers, highlighted, focusKeywords, renderMode, onPick }: Props) {
   const containerRef = useRef<HTMLDivElement>(null)
   const groupsRef = useRef<Partial<Record<AnatomyLayer['key'], THREE.Group>>>({})
   const sceneRef = useRef<THREE.Scene | null>(null)
   const cameraRef = useRef<THREE.PerspectiveCamera | null>(null)
   const homeFramingRef = useRef<{ position: THREE.Vector3; target: THREE.Vector3; minDistance: number; maxDistance: number } | null>(null)
   const controlsRef = useRef<OrbitControls | null>(null)
+  const rendererRef = useRef<THREE.WebGLRenderer | null>(null)
+  const lightsRef = useRef<{ ambient: THREE.AmbientLight; key: THREE.DirectionalLight; fill: THREE.DirectionalLight } | null>(null)
   const hasFitRef = useRef(false)
   const highlightedMeshesRef = useRef<Map<THREE.Mesh, { original: THREE.Color; matchedName: string }>>(new Map())
   const onPickRef = useRef(onPick)
@@ -136,17 +234,20 @@ export function Body3D({ layers, highlighted, focusKeywords, onPick }: Props) {
     renderer.toneMapping = THREE.ACESFilmicToneMapping
     renderer.toneMappingExposure = 1.0
     container.appendChild(renderer.domElement)
+    rendererRef.current = renderer
 
     // Cahaya dijaga tetap moderat -- terlalu terang membuat channel merah
     // pada material otot "clip" ke putih lebih cepat dari channel hijau/biru,
     // sehingga merah pekat terlihat pudar jadi oranye/cokelat.
-    scene.add(new THREE.AmbientLight(0xffffff, 0.45))
+    const ambient = new THREE.AmbientLight(0xffffff, 0.45)
+    scene.add(ambient)
     const key = new THREE.DirectionalLight(0xffffff, 0.65)
     key.position.set(2, 4, 3)
     scene.add(key)
     const fill = new THREE.DirectionalLight(0xffffff, 0.25)
     fill.position.set(-3, 1, -2)
     scene.add(fill)
+    lightsRef.current = { ambient, key, fill }
 
     const controls = new OrbitControls(camera, renderer.domElement)
     controls.enablePan = false
@@ -234,6 +335,24 @@ export function Body3D({ layers, highlighted, focusKeywords, onPick }: Props) {
         loadLayer(def.file)
           .then((group) => {
             const clone = group.clone(true)
+            // Material anatomi asli disimpan di tiap mesh SEBELUM mode
+            // radiologi sempat menggantinya, supaya kembali ke "Anatomy"
+            // selalu memulihkan warna yang benar dan bukan salinan abu-abu.
+            clone.traverse((child) => {
+              if (child instanceof THREE.Mesh) child.userData.baseMaterial = child.material
+              // Z-Anatomy menitipkan satu objek teks petunjuk ("HOW TO ...")
+              // di tiap koleksi. Itu bukan struktur anatomi: ia bisa ikut
+              // terkena raycast, dan pada mode rontgen yang additive ia malah
+              // menyala terang di antara tungkai. Disembunyikan di semua mode.
+              const name = child.userData.originalName as string | undefined
+              if (name && name.startsWith('HOW TO')) child.visible = false
+            })
+            // Nama itu menempel di node induknya, bukan di mesh anaknya, jadi
+            // node bernama itu sendiri juga perlu dipadamkan.
+            clone.traverse((obj) => {
+              const name = obj.userData.originalName as string | undefined
+              if (name && name.startsWith('HOW TO')) obj.visible = false
+            })
             groupsRef.current[def.key] = clone
             scene.add(clone)
             setLoadingLayers((s) => { const n = new Set(s); n.delete(def.key); return n })
@@ -277,6 +396,39 @@ export function Body3D({ layers, highlighted, focusKeywords, onPick }: Props) {
       }
     }
   }, [layers])
+
+  // Terapkan modalitas pencitraan ke seluruh mesh yang sedang tampil.
+  //
+  // Sorotan hijau dibersihkan lebih dulu: materialnya memang sedang diganti,
+  // jadi catatan "warna emissive sebelumnya" milik material lama tidak lagi
+  // menunjuk ke apa pun yang terpasang. Efek sorot di bawah ikut bergantung
+  // pada renderMode, jadi sorotannya langsung dipasang ulang di atas material
+  // yang baru.
+  useEffect(() => {
+    highlightedMeshesRef.current.clear()
+    for (const def of ANATOMY_LAYERS) {
+      const group = groupsRef.current[def.key]
+      if (!group) continue
+      group.traverse((child) => {
+        if (!(child instanceof THREE.Mesh)) return
+        child.material =
+          renderMode === 'anatomy'
+            ? (child.userData.baseMaterial as THREE.Material)
+            : radiologyMaterial(def.key, renderMode)
+      })
+    }
+    rendererRef.current?.setClearColor(MODE_BACKGROUND[renderMode], 1)
+    // Rontgen butuh cahaya lebih rata: bayangan terarah membuat tumpukan
+    // jaringan terbaca sebagai bentuk padat bercahaya, bukan sebagai bayangan
+    // yang saling menembus.
+    const lights = lightsRef.current
+    if (lights) {
+      const flat = renderMode === 'xray'
+      lights.ambient.intensity = flat ? 1.1 : 0.45
+      lights.key.intensity = flat ? 0.15 : 0.65
+      lights.fill.intensity = flat ? 0.1 : 0.25
+    }
+  }, [renderMode, loadingLayers])
 
   // Sorot (hijau) struktur yang sedang dipilih/ditarget, pulihkan warna
   // struktur yang sebelumnya disorot tapi sudah tidak lagi ada di daftar.
@@ -361,7 +513,7 @@ export function Body3D({ layers, highlighted, focusKeywords, onPick }: Props) {
       controls.maxDistance = home.maxDistance
       controls.update()
     }
-  }, [highlighted, focusKeywords, loadingLayers])
+  }, [highlighted, focusKeywords, loadingLayers, renderMode])
 
   const isLoading = loadingLayers.size > 0
 

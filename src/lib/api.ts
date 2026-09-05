@@ -34,6 +34,10 @@ export interface SymbolHit { symbol: string; name: string; exchange: string | nu
 export interface OntologyTerm { id: string; label: string; ontology: 'doid' | 'hp' | 'uberon' | 'fma'; description: string; iri: string }
 /** Gambar anatomi/patologi dari Wikimedia Commons. license & artist WAJIB
  *  ditampilkan bersama gambarnya — itu syarat lisensi CC-nya, bukan hiasan. */
+/** Ragam citra yang bisa diminta untuk satu struktur. 'xray'/'ct'/'mri'
+ *  mengambil citra modalitas NYATA, bukan render 3D bergaya radiologi. */
+export type ImageKind = 'anatomy' | 'pathology' | 'histology' | 'xray' | 'ct' | 'mri'
+
 export interface AnatomyImage {
   title: string
   url: string
@@ -258,7 +262,7 @@ export const api = {
   anatomyStructure: (terms: string[]) =>
     req<{ structures: OntologyTerm[] }>(
       `/api/anatomy/structure?terms=${encodeURIComponent(terms.join(','))}`),
-  anatomyImages: (q: string, kind: 'anatomy' | 'pathology' | 'histology' = 'anatomy') =>
+  anatomyImages: (q: string, kind: ImageKind = 'anatomy') =>
     req<{ images: AnatomyImage[] }>(
       `/api/anatomy/images?q=${encodeURIComponent(q)}&kind=${kind}`),
   // in-app notification inbox

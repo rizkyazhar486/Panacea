@@ -112,7 +112,7 @@ import { emailOtpStart, emailOtpVerify, emailOtpLive } from './otp.js'
 import { putusanPengingat } from './jadwal.js'
 import { aiMessages, aiConsult, aiVision, aiOperator, reviewApplicationText, draftSecondOpinion, generateOperatorBriefing, aiConfigured, aiStatus } from './ai.js'
 import { anatomyOntologyLookup, anatomyStructureLookup } from './anatomyOntology.js'
-import { anatomyImageLookup, pathologyImageLookup, histologyImageLookup } from './anatomyImages.js'
+import { anatomyImageLookup, pathologyImageLookup, histologyImageLookup, xrayImageLookup, ctImageLookup, mriImageLookup } from './anatomyImages.js'
 import { lookupDrugLabel } from './drugInfo.js'
 import { sendEmail } from './email.js'
 import { sendPush, notify, keadaanPush } from './push.js'
@@ -280,6 +280,9 @@ app.get('/api/anatomy/images', async (req, res) => {
     const images =
       kind === 'pathology' ? await pathologyImageLookup(q)
       : kind === 'histology' ? await histologyImageLookup(q)
+      : kind === 'xray' ? await xrayImageLookup(q)
+      : kind === 'ct' ? await ctImageLookup(q)
+      : kind === 'mri' ? await mriImageLookup(q)
       : await anatomyImageLookup(q)
     res.json({ images })
   } catch (e) {

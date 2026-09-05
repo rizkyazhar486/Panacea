@@ -161,3 +161,30 @@ async function cariGabungan(term: string, varian: (q: string) => string[]): Prom
   }
   return gabung.slice(0, 8)
 }
+
+/**
+ * Gambar RADIOLOGI nyata untuk satu struktur — radiograf, potongan CT, dan
+ * potongan MRI dari arsip bebas, bukan hasil render.
+ *
+ * Ini melengkapi mode radiologi pada model 3D. Model 3D-nya bisa DIWARNAI
+ * menyerupai foto rontgen/CT/MRI, tapi itu tetap render dari data mesh —
+ * bentuknya benar, sedangkan derajat keabuannya adalah pendekatan, bukan
+ * ukuran atenuasi sungguhan. Citra di bawahnya harus benar-benar berasal dari
+ * pesawat rontgen/CT/MRI supaya yang dipelajari orang adalah tampilan asli
+ * modalitasnya, termasuk artefak dan deraunya.
+ *
+ * Kata kuncinya dipisah per modalitas (bukan satu "radiology") karena tampilan
+ * ketiganya berbeda jauh — tulang paling jelas di rontgen/CT, jaringan lunak
+ * dan saraf justru paling jelas di MRI — jadi tabnya pun dipisah di layar.
+ */
+export async function xrayImageLookup(structure: string): Promise<AnatomyImage[]> {
+  return cariGabungan(structure, (q) => [`${q} radiograph`, `${q} x-ray`, `${q} plain film radiography`])
+}
+
+export async function ctImageLookup(structure: string): Promise<AnatomyImage[]> {
+  return cariGabungan(structure, (q) => [`${q} CT scan`, `${q} computed tomography`, `${q} CT axial`])
+}
+
+export async function mriImageLookup(structure: string): Promise<AnatomyImage[]> {
+  return cariGabungan(structure, (q) => [`${q} MRI`, `${q} magnetic resonance imaging`, `${q} MRI sagittal`])
+}

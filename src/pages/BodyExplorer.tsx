@@ -1,10 +1,10 @@
 import { useState } from 'react'
 import { Card, SectionTitle } from '../components/ui'
 import { IconActivity, IconSearch, IconStethoscope } from '../components/icons'
-import { api, type OntologyTerm, type DrugLabelInfo, type AnatomyImage } from '../lib/api'
+import { api, type OntologyTerm, type DrugLabelInfo, type AnatomyImage, type ImageKind } from '../lib/api'
 import { explainBodyRegion, explainDrug } from '../lib/ai'
 import { useStore } from '../lib/store'
-import { Body3D, ANATOMY_LAYERS, type AnatomyLayer } from '../components/Body3D'
+import { Body3D, ANATOMY_LAYERS, RENDER_MODES, type AnatomyLayer, type RenderMode } from '../components/Body3D'
 import { WORKOUT_MUSCLE_GROUPS } from '../lib/workoutMuscles'
 import { TISSUE_TYPES, TISSUE_SUBTYPES, ORGAN_SYSTEMS, BODY_REGIONS, IMAGE_ONLY_STRUCTURES, type AnatomyEntry } from '../lib/anatomyHierarchy'
 import { ORGAN_FOCUS } from '../lib/organFocus'
@@ -25,6 +25,48 @@ import { IconChevronRight } from '../components/icons'
 function toSearchTerm(rawName: string): string {
   return rawName.replace(/\.[lr]$/, '').replace(/^\(|\)$/g, '').toLowerCase()
 }
+
+// Satu "pil" pilihan. Semua tombol pilihan di halaman ini bentuknya sama —
+// dulu tiap deret menulis ulang kelasnya sendiri, dan itu yang membuat
+// halaman terasa ramai: bentuk yang sama tampil sedikit berbeda-beda.
+function Chip({
+  active, onClick, children,
+}: { active: boolean; onClick: () => void; children: React.ReactNode }) {
+  return (
+    <button
+      onClick={onClick}
+      className={`min-h-[34px] rounded-full border px-3 text-xs font-bold transition ${
+        active
+          ? 'border-brand bg-brand text-white'
+          : 'border-neutral-200 text-neutral-600 dark:border-white/10 dark:text-neutral-300'
+      }`}
+    >
+      {children}
+    </button>
+  )
+}
+
+// Empat deret pilihan (lapisan, otot, organ, referensi) dulu ditumpuk semua
+// sekaligus, jadi viewer terdorong jauh ke atas layar dan halaman terasa
+// panjang tanpa ujung. Sekarang keempatnya berbagi satu panel bertab: isinya
+// tetap lengkap, yang terlihat sekaligus hanya satu.
+type PanelTab = 'layers' | 'muscles' | 'organs' | 'reference'
+
+const PANEL_TABS: Array<{ key: PanelTab; label: string }> = [
+  { key: 'layers', label: 'Layers' },
+  { key: 'muscles', label: 'Muscles' },
+  { key: 'organs', label: 'Organs' },
+  { key: 'reference', label: 'Reference' },
+]
+
+const IMAGE_KINDS: Array<{ key: ImageKind; label: string }> = [
+  { key: 'anatomy', label: 'Anatomy' },
+  { key: 'xray', label: 'X-ray' },
+  { key: 'ct', label: 'CT' },
+  { key: 'mri', label: 'MRI' },
+  { key: 'histology', label: 'Histology' },
+  { key: 'pathology', label: 'Pathology' },
+]
 
 function TermList({ title, terms }: { title: string; terms: OntologyTerm[] }) {
   if (!terms.length) return null
@@ -116,9 +158,27 @@ export function BodyExplorer() {
   const [focusKeywords, setFocusKeywords] = useState<string[] | null>(null)
   const [images, setImages] = useState<AnatomyImage[]>([])
   const [imagesLoading, setImagesLoading] = useState(false)
-  const [imageKind, setImageKind] = useState<'anatomy' | 'pathology' | 'histology'>('anatomy')
+  const [imageKind, setImageKind] = useState<ImageKind>('anatomy')
 
-  async function lookup(label: string, searchTerms: string[], kind: 'anatomy' | 'histology' = 'anatomy') {
+  // Modalitas pencitraan untuk model 3D. Mengubahnya juga mengganti citra
+  // NYATA yang ditampilkan di bawah kalau ada struktur yang sedang dipilih —
+  // memilih "CT" lalu masih melihat foto anatomi berwarna akan membingungkan.
+  const [renderMode, setRenderMode] = useState<RenderMode>('anatomy')
+  const [panelTab, setPanelTab] = useState<PanelTab>('layers')
+
+  function pickRenderMode(mode: RenderMode) {
+    setRenderMode(mode)
+    if (!selectedLabel) return
+    const kind: ImageKind = mode === 'anatomy' ? 'anatomy' : mode
+    if (kind !== imageKind) loadImages(selectedLabel, kind)
+  }
+
+  async function lookup(label: string, searchTerms: string[], kind?: ImageKind) {
+    // Kalau pemanggilnya tidak memaksa ragam citra tertentu (entri histologi
+    // memaksa 'histology'), ikuti modalitas yang sedang aktif di model 3D —
+    // menekan sebuah tulang saat mode CT menyala semestinya memunculkan
+    // potongan CT, bukan ilustrasi berwarna.
+    const effectiveKind: ImageKind = kind ?? (renderMode === 'anatomy' ? 'anatomy' : renderMode)
     setSelectedLabel(label)
     setQuestion('')
     setLoading(true)
@@ -126,10 +186,10 @@ export function BodyExplorer() {
     setDiseases([])
     setPhenotypes([])
     setImages([])
-    setImageKind(kind)
+    setImageKind(effectiveKind)
     // Gambar diambil paralel dan TIDAK ikut menggagalkan lookup kalau
     // sumbernya sedang tidak bisa dijangkau — istilah ontologinya tetap muncul.
-    loadImages(label, kind)
+    loadImages(label, effectiveKind)
     try {
       const { diseases: d, phenotypes: p } = await api.anatomyOntology(searchTerms)
       setDiseases(d)
@@ -143,7 +203,7 @@ export function BodyExplorer() {
     }
   }
 
-  async function loadImages(term: string, kind: 'anatomy' | 'pathology' | 'histology') {
+  async function loadImages(term: string, kind: ImageKind) {
     setImagesLoading(true)
     setImageKind(kind)
     try {
@@ -305,83 +365,125 @@ export function BodyExplorer() {
           pancreas do". Real anatomical structures light up in green on the model when a match is found.
         </p>
 
-        <Body3D layers={layers} highlighted={highlighted} focusKeywords={focusKeywords} onPick={onPickStructure} />
+        <Body3D
+          layers={layers}
+          highlighted={highlighted}
+          focusKeywords={focusKeywords}
+          renderMode={renderMode}
+          onPick={onPickStructure}
+        />
 
-        <div className="mt-3 flex flex-wrap justify-center gap-1.5 sm:justify-start">
-          {ANATOMY_LAYERS.map((l) => (
+        {/* Modalitas pencitraan — deret tunggal tepat di bawah viewer, karena
+            inilah yang paling sering diganti saat mengamati satu struktur. */}
+        <div className="mt-2.5 flex gap-1 rounded-xl bg-neutral-100 p-1 dark:bg-white/5">
+          {RENDER_MODES.map((m) => (
             <button
-              key={l.key}
-              onClick={() => toggleLayer(l.key)}
-              className={`min-h-[32px] rounded-full border px-3 text-xs font-bold transition ${
-                layers.has(l.key)
-                  ? 'border-brand bg-brand text-white'
-                  : 'border-neutral-200 text-neutral-500 dark:border-white/10'
+              key={m.key}
+              onClick={() => pickRenderMode(m.key)}
+              className={`min-h-[34px] flex-1 rounded-lg text-xs font-bold transition ${
+                renderMode === m.key
+                  ? 'bg-white text-ink shadow-sm dark:bg-white/15 dark:text-white'
+                  : 'text-neutral-500'
               }`}
             >
-              {l.label}
+              {m.label}
             </button>
           ))}
         </div>
-        <p className="mt-1.5 text-center text-[10px] text-neutral-400 sm:text-left">
-          Drag to rotate · scroll/pinch to zoom · tap any structure to identify it
+        <p className="mt-1.5 text-center text-[10.5px] leading-relaxed text-neutral-400">
+          {RENDER_MODES.find((m) => m.key === renderMode)?.hint}
+          {renderMode !== 'anatomy' && ' · a rendering of the real model, not a scan — real images below'}
+        </p>
+        <p className="mt-1 text-center text-[10px] text-neutral-400">
+          Drag to rotate · scroll or pinch to zoom · tap any structure to identify it
         </p>
 
+        {/* Satu panel bertab menggantikan empat deret pilihan yang dulu
+            ditumpuk sekaligus. Isinya sama persis, cuma tidak semuanya
+            berteriak bersamaan. */}
         <div className="mt-4">
-          <div className="t-mikro font-bold uppercase tracking-wide text-neutral-500">Target workout muscle</div>
-          <div className="mt-1.5 flex flex-wrap gap-1.5">
-            {WORKOUT_MUSCLE_GROUPS.map((g) => (
+          <div className="flex gap-1 rounded-xl bg-neutral-100 p-1 dark:bg-white/5">
+            {PANEL_TABS.map((t) => (
               <button
-                key={g.key}
-                onClick={() => onPickWorkoutMuscle(g.key)}
-                className={`min-h-[32px] rounded-full border px-3 text-xs font-bold transition ${
-                  activeWorkout === g.key
-                    ? 'border-brand bg-brand text-white'
-                    : 'border-neutral-200 text-neutral-600 dark:border-white/10 dark:text-neutral-300'
+                key={t.key}
+                onClick={() => setPanelTab(t.key)}
+                className={`min-h-[34px] flex-1 rounded-lg text-xs font-bold transition ${
+                  panelTab === t.key
+                    ? 'bg-white text-ink shadow-sm dark:bg-white/15 dark:text-white'
+                    : 'text-neutral-500'
                 }`}
               >
-                {g.label}
+                {t.label}
               </button>
             ))}
           </div>
-        </div>
 
-        <div className="mt-4">
-          <div className="t-mikro font-bold uppercase tracking-wide text-neutral-500">Focus organ</div>
-          <p className="mt-0.5 text-[11px] text-neutral-400">Zooms in on that organ specifically and highlights every part of it.</p>
-          <div className="mt-1.5 flex flex-wrap gap-1.5">
-            {ORGAN_FOCUS.map((o) => (
-              <button
-                key={o.key}
-                onClick={() => onPickOrgan(o.key)}
-                className={`min-h-[32px] rounded-full border px-3 text-xs font-bold transition ${
-                  activeOrgan === o.key
-                    ? 'border-brand bg-brand text-white'
-                    : 'border-neutral-200 text-neutral-600 dark:border-white/10 dark:text-neutral-300'
-                }`}
-              >
-                {o.label}
-              </button>
-            ))}
+          <div className="mt-3">
+            {panelTab === 'layers' && (
+              <>
+                <p className="mb-1.5 text-[11px] text-neutral-400">
+                  Turn body systems on or off. Only what you can see can be tapped.
+                </p>
+                <div className="flex flex-wrap gap-1.5">
+                  {ANATOMY_LAYERS.map((l) => (
+                    <Chip key={l.key} active={layers.has(l.key)} onClick={() => toggleLayer(l.key)}>
+                      {l.label}
+                    </Chip>
+                  ))}
+                </div>
+              </>
+            )}
+
+            {panelTab === 'muscles' && (
+              <>
+                <p className="mb-1.5 text-[11px] text-neutral-400">
+                  Pick the muscle group a workout targets — every muscle in it lights up on the model.
+                </p>
+                <div className="flex flex-wrap gap-1.5">
+                  {WORKOUT_MUSCLE_GROUPS.map((g) => (
+                    <Chip key={g.key} active={activeWorkout === g.key} onClick={() => onPickWorkoutMuscle(g.key)}>
+                      {g.label}
+                    </Chip>
+                  ))}
+                </div>
+              </>
+            )}
+
+            {panelTab === 'organs' && (
+              <>
+                <p className="mb-1.5 text-[11px] text-neutral-400">
+                  Zooms in on that organ specifically and highlights every part of it.
+                </p>
+                <div className="flex flex-wrap gap-1.5">
+                  {ORGAN_FOCUS.map((o) => (
+                    <Chip key={o.key} active={activeOrgan === o.key} onClick={() => onPickOrgan(o.key)}>
+                      {o.label}
+                    </Chip>
+                  ))}
+                </div>
+              </>
+            )}
+
+            {panelTab === 'reference' && (
+              <div className="space-y-2">
+                <HierarchyGroup title="Tissue types (4)" entries={TISSUE_TYPES} onPick={onPickHierarchyEntry} onView3d={onViewLayer3d} />
+                <HierarchyGroup title="Tissues under the microscope (23)" entries={TISSUE_SUBTYPES} onPick={onPickHierarchyEntry} onView3d={onViewLayer3d} />
+                <HierarchyGroup title="Organ systems (11)" entries={ORGAN_SYSTEMS} onPick={onPickHierarchyEntry} onView3d={onViewLayer3d} />
+                <HierarchyGroup title="Body regions (8)" entries={BODY_REGIONS} onPick={onPickHierarchyEntry} onView3d={onViewLayer3d} />
+                <HierarchyGroup
+                  title="Female reproductive & skin"
+                  entries={IMAGE_ONLY_STRUCTURES}
+                  onPick={onPickHierarchyEntry}
+                  onView3d={onViewLayer3d}
+                />
+                <p className="px-1 text-[10.5px] leading-relaxed text-neutral-400">
+                  These structures have no geometry in the 3D dataset — female reproductive anatomy is absent from
+                  BodyParts3D entirely, and skin is deliberately stripped so the anatomy beneath it is visible. They
+                  are covered here with real anatomical terms (UBERON/FMA) and freely-licensed images instead.
+                </p>
+              </div>
+            )}
           </div>
-        </div>
-
-        <div className="mt-4 space-y-2">
-          <div className="t-mikro font-bold uppercase tracking-wide text-neutral-500">Anatomy reference</div>
-          <HierarchyGroup title="Tissue types (4)" entries={TISSUE_TYPES} onPick={onPickHierarchyEntry} onView3d={onViewLayer3d} />
-          <HierarchyGroup title="Tissues under the microscope (23)" entries={TISSUE_SUBTYPES} onPick={onPickHierarchyEntry} onView3d={onViewLayer3d} />
-          <HierarchyGroup title="Organ systems (11)" entries={ORGAN_SYSTEMS} onPick={onPickHierarchyEntry} onView3d={onViewLayer3d} />
-          <HierarchyGroup title="Body regions (8)" entries={BODY_REGIONS} onPick={onPickHierarchyEntry} onView3d={onViewLayer3d} />
-          <HierarchyGroup
-            title="Female reproductive & skin (images + reference)"
-            entries={IMAGE_ONLY_STRUCTURES}
-            onPick={onPickHierarchyEntry}
-            onView3d={onViewLayer3d}
-          />
-          <p className="px-1 text-[10.5px] leading-relaxed text-neutral-400">
-            These structures have no geometry in the 3D dataset — female reproductive anatomy is absent from
-            BodyParts3D entirely, and skin is deliberately stripped so the anatomy beneath it is visible. They are
-            covered here with real anatomical terms (UBERON/FMA) and freely-licensed images instead.
-          </p>
         </div>
 
         <div className="mt-4 min-w-0">
@@ -412,32 +514,25 @@ export function BodyExplorer() {
               )}
 
               <div>
-                <div className="flex flex-wrap items-center gap-1.5">
-                  <span className="t-mikro font-bold uppercase tracking-wide text-neutral-500">Images</span>
-                  <button
-                    onClick={() => loadImages(selectedLabel, 'anatomy')}
-                    className={`min-h-[28px] rounded-full border px-2.5 text-[11px] font-bold transition ${
-                      imageKind === 'anatomy' ? 'border-brand bg-brand text-white' : 'border-neutral-200 text-neutral-500 dark:border-white/10'
-                    }`}
-                  >
-                    Anatomy
-                  </button>
-                  <button
-                    onClick={() => loadImages(selectedLabel, 'histology')}
-                    className={`min-h-[28px] rounded-full border px-2.5 text-[11px] font-bold transition ${
-                      imageKind === 'histology' ? 'border-brand bg-brand text-white' : 'border-neutral-200 text-neutral-500 dark:border-white/10'
-                    }`}
-                  >
-                    Histology
-                  </button>
-                  <button
-                    onClick={() => loadImages(selectedLabel, 'pathology')}
-                    className={`min-h-[28px] rounded-full border px-2.5 text-[11px] font-bold transition ${
-                      imageKind === 'pathology' ? 'border-brand bg-brand text-white' : 'border-neutral-200 text-neutral-500 dark:border-white/10'
-                    }`}
-                  >
-                    Pathology
-                  </button>
+                <div className="t-mikro mb-1 font-bold uppercase tracking-wide text-neutral-500">Real images</div>
+                {/* Enam ragam citra NYATA untuk struktur yang sedang dipilih.
+                    Tiga di antaranya radiologi — inilah pasangan dari mode
+                    radiologi pada model 3D: bentuknya dipelajari di model,
+                    tampilan asli modalitasnya dipelajari di sini. */}
+                <div className="-mx-1 flex gap-1.5 overflow-x-auto px-1 pb-1">
+                  {IMAGE_KINDS.map((k) => (
+                    <button
+                      key={k.key}
+                      onClick={() => loadImages(selectedLabel, k.key)}
+                      className={`min-h-[30px] shrink-0 rounded-full border px-2.5 text-[11px] font-bold transition ${
+                        imageKind === k.key
+                          ? 'border-brand bg-brand text-white'
+                          : 'border-neutral-200 text-neutral-500 dark:border-white/10'
+                      }`}
+                    >
+                      {k.label}
+                    </button>
+                  ))}
                 </div>
                 {imagesLoading && <p className="mt-1.5 text-sm text-neutral-500">Loading images…</p>}
                 {!imagesLoading && images.length === 0 && (
@@ -469,20 +564,37 @@ export function BodyExplorer() {
           )}
         </div>
 
-        <p className="mt-4 text-[11px] leading-relaxed text-neutral-400">
-          Disease and symptom terms are retrieved live from the Human Disease Ontology and Human Phenotype Ontology
-          via EBI's public Ontology Lookup Service (OLS4) — general medical reference data, not a diagnosis. Always
-          consult a licensed clinician about your own symptoms.
-        </p>
-        <p className="mt-1 text-[11px] leading-relaxed text-neutral-400">
-          3D anatomy model: <a href={`${import.meta.env.BASE_URL}anatomy/CREDITS.txt`} target="_blank" rel="noreferrer" className="underline">Z-Anatomy</a>,
-          based on BodyParts3D — licensed under CC BY-SA 4.0.
-        </p>
-        <p className="mt-1 text-[11px] leading-relaxed text-neutral-400">
-          Anatomy and pathology images come from <a href="https://commons.wikimedia.org" target="_blank" rel="noreferrer" className="underline">Wikimedia Commons</a> —
-          public-domain or Creative Commons files, each shown with its own author and licence. They are teaching
-          images from a public archive, not photographs of you or of any patient of this clinic.
-        </p>
+        {/* Empat paragraf sumber & sangkalan dulu tergelar penuh di kaki
+            halaman dan itu bagian paling berisik dari layar ini. Atribusi CC
+            tetap WAJIB ada, tapi tidak wajib selalu terbuka — di sini masih
+            satu ketukan dari tempat gambarnya muncul, dan lisensi tiap berkas
+            tetap tercetak pada gambarnya masing-masing. */}
+        <details className="mt-4 rounded-xl border border-neutral-200 dark:border-white/10">
+          <summary className="cursor-pointer list-none px-3 py-2 text-[11px] font-bold text-neutral-500">
+            Sources, licences &amp; medical disclaimer
+          </summary>
+          <div className="space-y-1.5 border-t border-neutral-100 p-3 dark:border-white/5">
+            <p className="text-[11px] leading-relaxed text-neutral-400">
+              Disease and symptom terms are retrieved live from the Human Disease Ontology and Human Phenotype
+              Ontology via EBI's public Ontology Lookup Service (OLS4) — general medical reference data, not a
+              diagnosis. Always consult a licensed clinician about your own symptoms.
+            </p>
+            <p className="text-[11px] leading-relaxed text-neutral-400">
+              3D anatomy model: <a href={`${import.meta.env.BASE_URL}anatomy/CREDITS.txt`} target="_blank" rel="noreferrer" className="underline">Z-Anatomy</a>,
+              based on BodyParts3D — licensed under CC BY-SA 4.0.
+            </p>
+            <p className="text-[11px] leading-relaxed text-neutral-400">
+              The X-ray, CT and MRI options recolour that same 3D model to match how each modality sees tissue. They
+              are renderings, not scans: the shapes are real, the greyscale is an approximation. The X-ray, CT and
+              MRI image tabs below a selected structure show genuine radiographs and scan slices.
+            </p>
+            <p className="text-[11px] leading-relaxed text-neutral-400">
+              Anatomy, radiology, histology and pathology images come from <a href="https://commons.wikimedia.org" target="_blank" rel="noreferrer" className="underline">Wikimedia Commons</a> —
+              public-domain or Creative Commons files, each shown with its own author and licence. They are teaching
+              images from a public archive, not photographs of you or of any patient of this clinic.
+            </p>
+          </div>
+        </details>
       </Card>
 
       <Card>
