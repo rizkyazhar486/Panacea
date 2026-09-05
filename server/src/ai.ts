@@ -131,6 +131,16 @@ async function callAnthropic(model: string, system: string, messages: Msg[], max
   return (data.content || []).find((b) => b.type === 'text')?.text ?? ''
 }
 
+/**
+ * Panggilan model umum untuk modul lain (mis. penerjemah), supaya mereka tidak
+ * perlu tahu penyedia mana yang aktif atau bagaimana kuncinya disimpan.
+ * `json: true` mengarahkannya ke model penalaran — balasan yang harus diurai
+ * mesin tidak boleh dijawab model cepat yang bebas membungkusnya dengan prosa.
+ */
+export async function panggilModel(system: string, prompt: string, maxTokens: number, json = true): Promise<string> {
+  return callAnthropic('opus', system, [{ role: 'user', content: prompt }], maxTokens, json)
+}
+
 // Vision: analyze a supportive-exam image (EKG, CT, MRI, X-ray, USG, lab photo)
 // and describe objective findings for the AI-EMR Objective → Assessment flow.
 const VISION_SYSTEM = `Anda adalah AI co-physician Panaceamed yang menganalisis CITRA PEMERIKSAAN PENUNJANG (EKG, CT-scan, MRI, X-ray/Rontgen, USG, foto lab, dll). Jawab berbahasa Indonesia, terstruktur dengan judul tebal (markdown):

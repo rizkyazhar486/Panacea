@@ -115,6 +115,8 @@ import { anatomyOntologyLookup, anatomyStructureLookup } from './anatomyOntology
 import { anatomyImageLookup, pathologyImageLookup, histologyImageLookup, xrayImageLookup, ctImageLookup, mriImageLookup } from './anatomyImages.js'
 import { cariDiagnosis, icd11Configured } from './icd11.js'
 import { profilFarmakologi, cariZatAktif, daftarSemuaZatAktif } from './rxclass.js'
+import { terjemahkan, BAHASA, REGISTER, type Register } from './translate.js'
+import { panggilModel } from './ai.js'
 import { lookupDrugLabel } from './drugInfo.js'
 import { sendEmail } from './email.js'
 import { sendPush, notify, keadaanPush } from './push.js'
@@ -336,6 +338,42 @@ app.get('/api/drug/ingredients', async (req, res) => {
     res.json({ results, total: semua.length })
   } catch (e) {
     res.status(502).json({ error: 'Ingredient lookup gagal', detail: (e as Error).message })
+  }
+})
+
+// Penerjemah kedokteran. Yang tidak boleh berubah — dosis, kode, satuan, nama
+// zat aktif — dicabut lebih dulu dan dikembalikan sesudahnya; kalau ada yang
+// hilang, terjemahannya DITOLAK. Lihat server/src/translate.ts.
+app.get('/api/translate/languages', (_req, res) => {
+  res.json({ languages: BAHASA, registers: REGISTER.map((r) => ({ key: r.key, label: r.label })) })
+})
+
+app.post('/api/translate', requireAuth, async (req, res) => {
+  if (!aiConfigured()) return res.status(503).json({ error: 'ai_not_configured' })
+  const { text, from, to, register, terms } = req.body ?? {}
+  if (typeof text !== 'string' || !text.trim()) return res.status(400).json({ error: 'text wajib diisi' })
+  if (text.length > 12000) return res.status(413).json({ error: 'Teks terlalu panjang (maks 12.000 karakter)' })
+  if (typeof from !== 'string' || typeof to !== 'string') return res.status(400).json({ error: 'from & to wajib diisi' })
+  try {
+    const hasil = await terjemahkan(
+      (system, prompt, maxTokens) => panggilModel(system, prompt, maxTokens, true),
+      text, from, to,
+      (REGISTER.some((r) => r.key === register) ? register : 'klinis') as Register,
+      Array.isArray(terms) ? terms.filter((t: unknown): t is string => typeof t === 'string') : [],
+    )
+    res.json(hasil)
+  } catch (e) {
+    const pesan = (e as Error).message
+    // Kegagalan perisai dilaporkan APA ADANYA, bukan disamarkan jadi galat
+    // umum: pengguna berhak tahu terjemahannya ditahan karena ada dosis atau
+    // kode yang berubah, bukan karena jaringannya bermasalah.
+    if (pesan.startsWith('perisai_hilang:')) {
+      return res.status(422).json({
+        error: 'protected_terms_altered',
+        detail: pesan.slice('perisai_hilang:'.length),
+      })
+    }
+    res.status(502).json({ error: 'translate_failed', detail: pesan.slice(0, 200) })
   }
 })
 

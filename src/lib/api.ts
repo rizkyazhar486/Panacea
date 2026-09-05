@@ -66,6 +66,15 @@ export interface PharmProfile {
   indikasi: DrugClass[]
 }
 
+export interface TranslateLanguage { kode: string; nama: string; asli: string }
+export interface TranslateResult {
+  teks: string; dari: string; ke: string; register: string
+  /** Istilah yang dilindungi dan dikembalikan utuh — ditampilkan supaya
+   *  pembaca bisa melihat sendiri apa yang TIDAK diserahkan ke model. */
+  dilindungi: string[]
+  catatan: string[]
+}
+
 export interface PubmedArticle { pmid: string; title: string; authors: string; journal: string; year: string; url: string }
 
 export interface AnatomyImage {
@@ -462,6 +471,14 @@ export const api = {
     ),
   getF1Info: () => req<{ next?: { raceName: string; circuit: string; location: string; date: string; time?: string }; lastRaceName?: string; lastPodium?: { position: string; driver: string; constructor: string }[]; error?: string }>('/api/sports/f1'),
   getMotoGpInfo: () => req<{ next?: { name: string; circuit: string; country: string; date: string }; lastRaceName?: string; lastRaceDate?: string; error?: string }>('/api/sports/motogp'),
+  translateLanguages: () =>
+    req<{ languages: TranslateLanguage[]; registers: { key: string; label: string }[] }>('/api/translate/languages'),
+  translate: (text: string, from: string, to: string, register: string, terms: string[] = []) =>
+    req<TranslateResult>('/api/translate', {
+      method: 'POST',
+      body: JSON.stringify({ text, from, to, register, terms }),
+    }),
+
   searchPubmed: (q: string) => req<{ articles: { pmid: string; title: string; authors: string; journal: string; year: string; url: string }[]; error?: string }>(`/api/evidence/pubmed?q=${encodeURIComponent(q)}`),
   searchTrials: (q: string, recruiting: boolean, country: string) => req<{ trials: { nctId: string; title: string; status: string; conditions: string; phase: string; locations: string; url: string }[]; error?: string }>(`/api/trials?q=${encodeURIComponent(q)}${recruiting ? '&recruiting=1' : ''}${country ? `&country=${encodeURIComponent(country)}` : ''}`),
   lookupDrug: (q: string) => req<{ drug: { brand: string; generic: string; purpose: string; usage: string; warnings: string; dosage: string; adverse: string; manufacturer: string } | null; error?: string }>(`/api/drugs/label?q=${encodeURIComponent(q)}`),
