@@ -121,7 +121,7 @@ export async function searchAnatomyImages(query: string, limit = 8): Promise<Ana
  * yang dibutuhkan halaman ini adalah gambar anatomi/ilustrasi medis.
  */
 export async function anatomyImageLookup(structure: string): Promise<AnatomyImage[]> {
-  return cariGabungan(structure, (q) => [`${q} anatomy diagram`, `${q} anatomy`])
+  return cariGabungan(structure, (q) => [`${q} anatomy diagram`, `${q} anatomy`], sebut)
 }
 
 /**
@@ -129,7 +129,15 @@ export async function anatomyImageLookup(structure: string): Promise<AnatomyImag
  * ("pathology", "histopathology"), bukan anatomi normalnya.
  */
 export async function pathologyImageLookup(organ: string): Promise<AnatomyImage[]> {
-  return cariGabungan(organ, (q) => [`${q} pathology`, `${q} histopathology`])
+  return cariGabungan(
+    organ,
+    (q) => [`${q} histopathology`, `${q} pathology gross specimen`, `${q} pathology micrograph`],
+    // Tanpa penyaring ini, "pathology" saja menarik foto gedung departemen
+    // patologi, potret tokoh, dan diagram tak berkaitan — itu yang membuat
+    // banyak gambar tampak salah. Judul berkasnya harus benar-benar
+    // menyebut organnya DAN satu kata yang menandakan sediaan.
+    (judul, q) => sebut(judul, q) && /histopath|patholog|carcinoma|tumou?r|lesion|specimen|biopsy|infarct|necros/i.test(judul),
+  )
 }
 
 /**
@@ -142,16 +150,48 @@ export async function pathologyImageLookup(organ: string): Promise<AnatomyImage[
  * "histology"/"micrograph"/"H&E stain", bukan ke diagram anatomi.
  */
 export async function histologyImageLookup(tissue: string): Promise<AnatomyImage[]> {
-  return cariGabungan(tissue, (q) => [`${q} histology`, `${q} micrograph`, `${q} histology stain`])
+  return cariGabungan(
+    tissue,
+    (q) => [`${q} histology`, `${q} histology micrograph`, `${q} H&E stain`],
+    (judul, q) => sebut(judul, q) && /histolog|micrograph|stain|H&E|section|slide|microscop/i.test(judul),
+  )
+}
+
+/**
+ * Judul berkas benar-benar menyebut apa yang dicari.
+ *
+ * Pencarian teks penuh Commons mencocokkan deskripsi, kategori, dan nama
+ * pengunggah — jadi mencari "thyroid histology" bisa mengembalikan berkas yang
+ * hanya BERADA di kategori yang menyinggung tiroid. Memeriksa judulnya
+ * menyaring itu, dan judul di Commons memang deskriptif.
+ *
+ * Kata terlalu pendek (<4 huruf, mis. "ear", "eye") dilewati: mencocokkan
+ * substring sependek itu justru menerima "search", "year", "eyelet".
+ */
+function sebut(judul: string, q: string): boolean {
+  const kata = q.toLowerCase().split(/\s+/).filter((w) => w.length >= 4)
+  if (!kata.length) return true
+  const j = judul.toLowerCase()
+  return kata.some((w) => j.includes(w))
 }
 
 /** Menjalankan beberapa varian kata kunci sekaligus lalu menggabung hasilnya
- *  tanpa duplikat — satu varian yang kosong tidak mengosongkan hasilnya. */
-async function cariGabungan(term: string, varian: (q: string) => string[]): Promise<AnatomyImage[]> {
+ *  tanpa duplikat — satu varian yang kosong tidak mengosongkan hasilnya.
+ *
+ *  `saring` membuang hasil yang lolos mesin cari tapi jelas bukan yang dicari.
+ *  Kalau penyaringan menyisakan NOL sedangkan hasil mentahnya ada, hasil
+ *  mentah dikembalikan: daftar yang kurang tepat masih lebih berguna daripada
+ *  layar kosong, dan tiap gambar tetap membawa judul serta sumbernya sendiri
+ *  supaya pembaca bisa menilai. */
+async function cariGabungan(
+  term: string,
+  varian: (q: string) => string[],
+  saring?: (judul: string, q: string) => boolean,
+): Promise<AnatomyImage[]> {
   const q = term.trim()
   if (!q) return []
   const hasil = await Promise.all(
-    varian(q).map((v) => searchAnatomyImages(v, 6).catch(() => [] as AnatomyImage[])),
+    varian(q).map((v) => searchAnatomyImages(v, 8).catch(() => [] as AnatomyImage[])),
   )
   const gabung: AnatomyImage[] = []
   for (const daftar of hasil) {
@@ -159,7 +199,9 @@ async function cariGabungan(term: string, varian: (q: string) => string[]): Prom
       if (!gabung.some((x) => x.url === img.url)) gabung.push(img)
     }
   }
-  return gabung.slice(0, 8)
+  if (!saring) return gabung.slice(0, 8)
+  const tersaring = gabung.filter((img) => saring(`${img.title} ${img.description}`, q))
+  return (tersaring.length ? tersaring : gabung).slice(0, 8)
 }
 
 /**
@@ -178,13 +220,25 @@ async function cariGabungan(term: string, varian: (q: string) => string[]): Prom
  * dan saraf justru paling jelas di MRI — jadi tabnya pun dipisah di layar.
  */
 export async function xrayImageLookup(structure: string): Promise<AnatomyImage[]> {
-  return cariGabungan(structure, (q) => [`${q} radiograph`, `${q} x-ray`, `${q} plain film radiography`])
+  return cariGabungan(
+    structure,
+    (q) => [`${q} radiograph`, `${q} x-ray`, `${q} plain film radiography`],
+    (judul, q) => sebut(judul, q) && /radiograph|x-?ray|röntgen|roentgen/i.test(judul),
+  )
 }
 
 export async function ctImageLookup(structure: string): Promise<AnatomyImage[]> {
-  return cariGabungan(structure, (q) => [`${q} CT scan`, `${q} computed tomography`, `${q} CT axial`])
+  return cariGabungan(
+    structure,
+    (q) => [`${q} CT scan`, `${q} computed tomography`, `${q} CT axial`],
+    (judul, q) => sebut(judul, q) && /\bCT\b|computed tomograph|tomodensito/i.test(judul),
+  )
 }
 
 export async function mriImageLookup(structure: string): Promise<AnatomyImage[]> {
-  return cariGabungan(structure, (q) => [`${q} MRI`, `${q} magnetic resonance imaging`, `${q} MRI sagittal`])
+  return cariGabungan(
+    structure,
+    (q) => [`${q} MRI`, `${q} magnetic resonance imaging`, `${q} MRI sagittal`],
+    (judul, q) => sebut(judul, q) && /\bMRI\b|magnetic resonance/i.test(judul),
+  )
 }

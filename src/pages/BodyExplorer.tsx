@@ -4,7 +4,7 @@ import { IconActivity, IconSearch, IconStethoscope } from '../components/icons'
 import { api, type OntologyTerm, type DrugLabelInfo, type AnatomyImage, type ImageKind } from '../lib/api'
 import { explainBodyRegion, explainDrug } from '../lib/ai'
 import { useStore } from '../lib/store'
-import { Body3D, ANATOMY_LAYERS, RENDER_MODES, type AnatomyLayer, type RenderMode } from '../components/Body3D'
+import { Body3D, ANATOMY_LAYERS, RENDER_MODES, CT_WINDOWS, MOTION_OFF, MOTION_REST, MOTION_EXERCISE, type AnatomyLayer, type RenderMode, type SlicePlane, type MotionState } from '../components/Body3D'
 import { WORKOUT_MUSCLE_GROUPS } from '../lib/workoutMuscles'
 import { TISSUE_TYPES, TISSUE_SUBTYPES, ORGAN_SYSTEMS, BODY_REGIONS, IMAGE_ONLY_STRUCTURES, type AnatomyEntry } from '../lib/anatomyHierarchy'
 import { ORGAN_FOCUS } from '../lib/organFocus'
@@ -17,6 +17,7 @@ import { Link } from 'react-router-dom'
 const PhysiologySection = lazy(() => import('./bodyhub/PhysiologySection'))
 const DrugSection = lazy(() => import('./bodyhub/DrugSection'))
 const DiseaseSection = lazy(() => import('./bodyhub/DiseaseSection'))
+const OrganClinicalPanel = lazy(() => import('./bodyhub/OrganClinicalPanel'))
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Body Explorer — model 3D anatomi NYATA (lihat Body3D.tsx untuk sumber data
@@ -83,6 +84,14 @@ const IMAGE_KINDS: Array<{ key: ImageKind; label: string }> = [
   { key: 'histology', label: 'Histology' },
   { key: 'pathology', label: 'Pathology' },
 ]
+
+/** T1 dan T2 sama-sama mengambil citra MRI nyata — pembobotannya membedakan
+ *  tampilan, bukan ada tidaknya arsipnya. */
+function imageKindForMode(mode: RenderMode): ImageKind {
+  if (mode === 'anatomy') return 'anatomy'
+  if (mode === 'mriT1' || mode === 'mriT2') return 'mri'
+  return mode
+}
 
 function TermList({ title, terms }: { title: string; terms: OntologyTerm[] }) {
   if (!terms.length) return null
@@ -181,11 +190,27 @@ export function BodyExplorer() {
   // memilih "CT" lalu masih melihat foto anatomi berwarna akan membingungkan.
   const [renderMode, setRenderMode] = useState<RenderMode>('anatomy')
   const [panelTab, setPanelTab] = useState<PanelTab>('layers')
+  // Kendali radiologi. Window CT dan bidang potong adalah dua hal yang
+  // benar-benar diputar radiolog di stasiun kerja — bukan hiasan.
+  const [ctWindowKey, setCtWindowKey] = useState(CT_WINDOWS[0].key)
+  const [slicePlane, setSlicePlane] = useState<SlicePlane>('none')
+  const [slicePos, setSlicePos] = useState(0.5)
+
+  // Gerak fisiologis. Tiga keadaan, bukan sakelar hidup/mati: perbedaan
+  // antara istirahat dan latihan JUSTRU yang mengajarkan faalnya — denyut
+  // dan napas yang sama-sama naik, dan otot yang mulai berkontraksi.
+  const [motionMode, setMotionMode] = useState<'off' | 'rest' | 'exercise'>('off')
+  const motion: MotionState =
+    motionMode === 'rest' ? MOTION_REST : motionMode === 'exercise' ? MOTION_EXERCISE : MOTION_OFF
+  // Organ yang isi klinisnya sedang terbuka. Diisi oleh KETUKAN pada figur 3D
+  // maupun oleh tombol organ — keduanya masuk lewat pintu yang sama supaya
+  // hasilnya identik, tidak peduli dari mana orang datang.
+  const [clinicalOrgan, setClinicalOrgan] = useState<{ key: string; label: string } | null>(null)
 
   function pickRenderMode(mode: RenderMode) {
     setRenderMode(mode)
     if (!selectedLabel) return
-    const kind: ImageKind = mode === 'anatomy' ? 'anatomy' : mode
+    const kind = imageKindForMode(mode)
     if (kind !== imageKind) loadImages(selectedLabel, kind)
   }
 
@@ -194,7 +219,7 @@ export function BodyExplorer() {
     // memaksa 'histology'), ikuti modalitas yang sedang aktif di model 3D —
     // menekan sebuah tulang saat mode CT menyala semestinya memunculkan
     // potongan CT, bukan ilustrasi berwarna.
-    const effectiveKind: ImageKind = kind ?? (renderMode === 'anatomy' ? 'anatomy' : renderMode)
+    const effectiveKind: ImageKind = kind ?? imageKindForMode(renderMode)
     setSelectedLabel(label)
     setQuestion('')
     setLoading(true)
@@ -241,6 +266,12 @@ export function BodyExplorer() {
     setActiveOrgan(null)
     setFocusKeywords(null)
     setHighlighted([rawName])
+    // Struktur yang disentuh dicocokkan balik ke katalog organ lewat kata
+    // kuncinya, supaya mengetuk "Inferior lobe of left lung" langsung membuka
+    // penyakit dan obat PARU — bukan menyuruh orang mengetik "lung" dulu.
+    const n = rawName.toLowerCase()
+    const cocok = ORGAN_FOCUS.find((o) => o.keywords.some((k) => n.includes(k.trim().toLowerCase())))
+    setClinicalOrgan(cocok ? { key: cocok.key, label: cocok.label } : null)
     lookup(label, [toSearchTerm(rawName)])
   }
 
@@ -266,6 +297,7 @@ export function BodyExplorer() {
     setActiveOrgan(organKey)
     setFocusKeywords(organ.keywords)
     if (!layers.has(organ.layer)) toggleLayer(organ.layer)
+    setClinicalOrgan({ key: organ.key, label: organ.label })
     lookup(organ.label, organ.searchTerms)
   }
 
@@ -414,6 +446,10 @@ export function BodyExplorer() {
           highlighted={highlighted}
           focusKeywords={focusKeywords}
           renderMode={renderMode}
+          ctWindow={CT_WINDOWS.find((w) => w.key === ctWindowKey) ?? CT_WINDOWS[0]}
+          slicePlane={slicePlane}
+          slicePos={slicePos}
+          motion={motion}
           onPick={onPickStructure}
         />
 
@@ -436,11 +472,143 @@ export function BodyExplorer() {
         </div>
         <p className="mt-1.5 text-center text-[10.5px] leading-relaxed text-neutral-400">
           {RENDER_MODES.find((m) => m.key === renderMode)?.hint}
-          {renderMode !== 'anatomy' && ' · a rendering of the real model, not a scan — real images below'}
+        </p>
+
+        {/* Gerak fisiologis — irama nyata pada figur yang sama. */}
+        <div className="mt-2">
+          <div className="flex flex-wrap items-center justify-center gap-1.5">
+            {([
+              { key: 'off', label: 'Still' },
+              { key: 'rest', label: 'Resting' },
+              { key: 'exercise', label: 'Exercising' },
+            ] as Array<{ key: 'off' | 'rest' | 'exercise'; label: string }>).map((m) => (
+              <button
+                key={m.key}
+                onClick={() => setMotionMode(m.key)}
+                className={`min-h-[30px] rounded-full border px-2.5 text-[11px] font-bold transition ${
+                  motionMode === m.key
+                    ? 'border-brand bg-brand text-white'
+                    : 'border-neutral-200 text-neutral-500 dark:border-white/10'
+                }`}
+              >
+                {m.label}
+              </button>
+            ))}
+          </div>
+          {motionMode !== 'off' && (
+            <p className="mt-1 text-center text-[10px] leading-relaxed text-neutral-400">
+              Heart {motion.heartRate}/min · breathing {motion.respRate}/min
+              {motion.contractionRate > 0 && ` · highlighted muscle contracting ${motion.contractionRate}/min`}
+              {' — '}turn on Vessels or Organs to watch the heart and lungs move.
+            </p>
+          )}
+        </div>
+
+        {/* Window CT: mengubahnya mengubah apa yang KELIHATAN dari data yang
+            sama, persis seperti di konsol. Itu keterampilan yang dilatih. */}
+        {renderMode === 'ct' && (
+          <div className="mt-2">
+            <div className="flex flex-wrap items-center justify-center gap-1.5">
+              {CT_WINDOWS.map((w) => (
+                <button
+                  key={w.key}
+                  onClick={() => setCtWindowKey(w.key)}
+                  className={`min-h-[30px] rounded-full border px-2.5 text-[11px] font-bold transition ${
+                    ctWindowKey === w.key
+                      ? 'border-brand bg-brand text-white'
+                      : 'border-neutral-200 text-neutral-500 dark:border-white/10'
+                  }`}
+                >
+                  {w.label}
+                </button>
+              ))}
+            </div>
+            <p className="mt-1 text-center text-[10px] text-neutral-400">
+              W{CT_WINDOWS.find((w) => w.key === ctWindowKey)?.width} /
+              L{CT_WINDOWS.find((w) => w.key === ctWindowKey)?.level} HU — window width and level, as on a CT console
+            </p>
+          </div>
+        )}
+
+        {/* Bidang potong. CT dan MRI dibaca sebagai irisan, bukan sebagai
+            permukaan 3D — tanpa ini modenya cuma pewarnaan. */}
+        {(renderMode === 'ct' || renderMode === 'mriT1' || renderMode === 'mriT2') && (
+          <div className="mt-2">
+            <div className="flex flex-wrap items-center justify-center gap-1.5">
+              {([
+                { key: 'none', label: 'Whole body' },
+                { key: 'axial', label: 'Axial' },
+                { key: 'coronal', label: 'Coronal' },
+                { key: 'sagittal', label: 'Sagittal' },
+              ] as Array<{ key: SlicePlane; label: string }>).map((p) => (
+                <button
+                  key={p.key}
+                  onClick={() => setSlicePlane(p.key)}
+                  className={`min-h-[30px] rounded-full border px-2.5 text-[11px] font-bold transition ${
+                    slicePlane === p.key
+                      ? 'border-brand bg-brand text-white'
+                      : 'border-neutral-200 text-neutral-500 dark:border-white/10'
+                  }`}
+                >
+                  {p.label}
+                </button>
+              ))}
+            </div>
+            {slicePlane !== 'none' && (
+              <div className="mt-1.5 px-1">
+                <input
+                  type="range"
+                  min={0}
+                  max={1}
+                  step={0.01}
+                  value={slicePos}
+                  onChange={(e) => setSlicePos(Number(e.target.value))}
+                  aria-label="Slice level"
+                  className="w-full accent-[var(--brand,#00bf63)]"
+                />
+                <p className="text-center text-[10px] text-neutral-400">
+                  Slice level — drag to move through the body, the way a scan is scrolled
+                </p>
+              </div>
+            )}
+          </div>
+        )}
+
+        <p className="mt-1.5 text-center text-[10px] leading-relaxed text-neutral-400">
+          {renderMode !== 'anatomy' &&
+            'Greyscale is computed from standard tissue values (Hounsfield units for CT, relative T1/T2 signal for MRI) — a rendering of real geometry, not a scan of a patient. Real radiographs and scan slices are in the image tabs.'}
         </p>
         <p className="mt-1 text-center text-[10px] text-neutral-400">
           Drag to rotate · scroll or pinch to zoom · tap any structure to identify it
         </p>
+
+        {/* Hasil ketukan organ muncul TEPAT DI SINI — di bawah figur, di atas
+            deret tab. Kalau ia diletakkan setelah tab, orang harus menggulir
+            melewati seluruh panel kendali untuk melihat akibat ketukannya
+            sendiri, dan itu terbaca seolah ketukannya tidak melakukan apa-apa. */}
+        {clinicalOrgan && (
+          <div className="mt-3 rounded-2xl border border-brand/30 bg-brand/[0.03] p-3 dark:bg-brand/[0.07]">
+            <div className="mb-2 flex items-start justify-between gap-2">
+              <div className="min-w-0">
+                <div className="t-mikro font-bold uppercase tracking-wide text-brand">Selected structure</div>
+                <h3 className="text-base font-black text-ink dark:text-white">{clinicalOrgan.label}</h3>
+              </div>
+              <button
+                onClick={() => setClinicalOrgan(null)}
+                className="shrink-0 rounded-full border border-neutral-200 px-2.5 py-1 text-[11px] font-bold text-neutral-500 dark:border-white/10"
+              >
+                Close
+              </button>
+            </div>
+            <Suspense fallback={<p className="text-sm text-neutral-500">Opening clinical notes…</p>}>
+              <OrganClinicalPanel
+                organKey={clinicalOrgan.key}
+                organLabel={clinicalOrgan.label}
+                onLocate={(keywords, layer) => onHighlightSites(keywords, [layer])}
+              />
+            </Suspense>
+          </div>
+        )}
 
         {/* Satu panel bertab menggantikan empat deret pilihan yang dulu
             ditumpuk sekaligus. Isinya sama persis, cuma tidak semuanya

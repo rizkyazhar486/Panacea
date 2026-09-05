@@ -66,6 +66,8 @@ export interface PharmProfile {
   indikasi: DrugClass[]
 }
 
+export interface PubmedArticle { pmid: string; title: string; authors: string; journal: string; year: string; url: string }
+
 export interface AnatomyImage {
   title: string
   url: string
