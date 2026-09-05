@@ -3,7 +3,7 @@ import { Card, SectionTitle } from '../components/ui'
 import { IconLeaf } from '../components/icons'
 import { FASE, TANGGA, JUMLAH_GERAKAN, ATURAN, type Tangga, type FaseId } from '../lib/kalistenik'
 import { bacaKemajuan, tandaiLevel, hitungTuntas, type Kemajuan } from '../lib/kalistenikProgres'
-import { GerakDasar } from '../components/GerakDasar'
+import { FotoLatihanPenuh } from '../components/FotoLatihan'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Kalistenik pemula sampai mahir — empat fase, dua belas tangga, 109 gerakan.
@@ -193,12 +193,18 @@ export function Kalistenik() {
         </p>
       </Card>
 
-      {/* Lima gerakan dasar, digambar. Ditaruh SEBELUM fase dan tangga:
-          yang baru mulai perlu melihat bentuk gerakannya lebih dahulu, sebelum
+      {/* Lima gerakan dasar sebagai FOTO orang sungguhan. Diagram garis yang
+          dulu di sini sudah dihapus. Ditaruh SEBELUM fase dan tangga: yang
+          baru mulai perlu melihat bentuk gerakannya lebih dahulu, sebelum
           diminta memilih anak tangga mana yang ia kuasai. */}
-      <div className="space-y-2">
-        <h2 className="text-[13px] font-black uppercase tracking-wide text-brand">The five basics, drawn</h2>
-        <GerakDasar />
+      <div className="space-y-3">
+        <h2 className="text-[13px] font-black uppercase tracking-wide text-brand">The five basics</h2>
+        {['Push-up', 'Sit-up', 'Pull-up', 'Burpee', 'Jumping jack'].map((g) => (
+          <div key={g}>
+            <div className="t-mikro mb-1 font-bold uppercase tracking-wide text-neutral-500">{g}</div>
+            <FotoLatihanPenuh nama={g} maksimal={3} />
+          </div>
+        ))}
       </div>
 
       {/* Fase */}
