@@ -6,7 +6,7 @@ import { explainBodyRegion, explainDrug } from '../lib/ai'
 import { useStore } from '../lib/store'
 import { Body3D, ANATOMY_LAYERS, type AnatomyLayer } from '../components/Body3D'
 import { WORKOUT_MUSCLE_GROUPS } from '../lib/workoutMuscles'
-import { TISSUE_TYPES, ORGAN_SYSTEMS, BODY_REGIONS, IMAGE_ONLY_STRUCTURES, type AnatomyEntry } from '../lib/anatomyHierarchy'
+import { TISSUE_TYPES, TISSUE_SUBTYPES, ORGAN_SYSTEMS, BODY_REGIONS, IMAGE_ONLY_STRUCTURES, type AnatomyEntry } from '../lib/anatomyHierarchy'
 import { ORGAN_FOCUS } from '../lib/organFocus'
 import { IconChevronRight } from '../components/icons'
 
@@ -116,9 +116,9 @@ export function BodyExplorer() {
   const [focusKeywords, setFocusKeywords] = useState<string[] | null>(null)
   const [images, setImages] = useState<AnatomyImage[]>([])
   const [imagesLoading, setImagesLoading] = useState(false)
-  const [imageKind, setImageKind] = useState<'anatomy' | 'pathology'>('anatomy')
+  const [imageKind, setImageKind] = useState<'anatomy' | 'pathology' | 'histology'>('anatomy')
 
-  async function lookup(label: string, searchTerms: string[]) {
+  async function lookup(label: string, searchTerms: string[], kind: 'anatomy' | 'histology' = 'anatomy') {
     setSelectedLabel(label)
     setQuestion('')
     setLoading(true)
@@ -126,10 +126,10 @@ export function BodyExplorer() {
     setDiseases([])
     setPhenotypes([])
     setImages([])
-    setImageKind('anatomy')
+    setImageKind(kind)
     // Gambar diambil paralel dan TIDAK ikut menggagalkan lookup kalau
     // sumbernya sedang tidak bisa dijangkau — istilah ontologinya tetap muncul.
-    loadImages(label, 'anatomy')
+    loadImages(label, kind)
     try {
       const { diseases: d, phenotypes: p } = await api.anatomyOntology(searchTerms)
       setDiseases(d)
@@ -143,7 +143,7 @@ export function BodyExplorer() {
     }
   }
 
-  async function loadImages(term: string, kind: 'anatomy' | 'pathology') {
+  async function loadImages(term: string, kind: 'anatomy' | 'pathology' | 'histology') {
     setImagesLoading(true)
     setImageKind(kind)
     try {
@@ -201,7 +201,7 @@ export function BodyExplorer() {
     setActiveOrgan(null)
     setFocusKeywords(null)
     setHighlighted([])
-    lookup(entry.label, entry.searchTerms)
+    lookup(entry.label, entry.searchTerms, entry.imageKind ?? 'anatomy')
   }
 
   function onViewLayer3d(layer: AnatomyLayer['key']) {
@@ -368,6 +368,7 @@ export function BodyExplorer() {
         <div className="mt-4 space-y-2">
           <div className="t-mikro font-bold uppercase tracking-wide text-neutral-500">Anatomy reference</div>
           <HierarchyGroup title="Tissue types (4)" entries={TISSUE_TYPES} onPick={onPickHierarchyEntry} onView3d={onViewLayer3d} />
+          <HierarchyGroup title="Tissues under the microscope (23)" entries={TISSUE_SUBTYPES} onPick={onPickHierarchyEntry} onView3d={onViewLayer3d} />
           <HierarchyGroup title="Organ systems (11)" entries={ORGAN_SYSTEMS} onPick={onPickHierarchyEntry} onView3d={onViewLayer3d} />
           <HierarchyGroup title="Body regions (8)" entries={BODY_REGIONS} onPick={onPickHierarchyEntry} onView3d={onViewLayer3d} />
           <HierarchyGroup
@@ -420,6 +421,14 @@ export function BodyExplorer() {
                     }`}
                   >
                     Anatomy
+                  </button>
+                  <button
+                    onClick={() => loadImages(selectedLabel, 'histology')}
+                    className={`min-h-[28px] rounded-full border px-2.5 text-[11px] font-bold transition ${
+                      imageKind === 'histology' ? 'border-brand bg-brand text-white' : 'border-neutral-200 text-neutral-500 dark:border-white/10'
+                    }`}
+                  >
+                    Histology
                   </button>
                   <button
                     onClick={() => loadImages(selectedLabel, 'pathology')}

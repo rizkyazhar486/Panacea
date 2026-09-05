@@ -121,33 +121,38 @@ export async function searchAnatomyImages(query: string, limit = 8): Promise<Ana
  * yang dibutuhkan halaman ini adalah gambar anatomi/ilustrasi medis.
  */
 export async function anatomyImageLookup(structure: string): Promise<AnatomyImage[]> {
-  const q = structure.trim()
-  if (!q) return []
-  const hasil = await Promise.all([
-    searchAnatomyImages(`${q} anatomy diagram`, 6).catch(() => [] as AnatomyImage[]),
-    searchAnatomyImages(`${q} anatomy`, 6).catch(() => [] as AnatomyImage[]),
-  ])
-  const gabung: AnatomyImage[] = []
-  for (const daftar of hasil) {
-    for (const img of daftar) {
-      if (!gabung.some((x) => x.url === img.url)) gabung.push(img)
-    }
-  }
-  return gabung.slice(0, 8)
+  return cariGabungan(structure, (q) => [`${q} anatomy diagram`, `${q} anatomy`])
 }
 
 /**
- * Pencarian gambar PATOLOGI untuk satu organ — kata kuncinya dijamak
- * ("pathology", "histopathology") supaya yang terambil gambar penyakit pada
- * organ itu, bukan anatomi normalnya.
+ * Gambar PATOLOGI untuk satu organ — kata kuncinya diarahkan ke penyakitnya
+ * ("pathology", "histopathology"), bukan anatomi normalnya.
  */
 export async function pathologyImageLookup(organ: string): Promise<AnatomyImage[]> {
-  const q = organ.trim()
+  return cariGabungan(organ, (q) => [`${q} pathology`, `${q} histopathology`])
+}
+
+/**
+ * Gambar HISTOLOGI untuk satu jaringan — sediaan mikroskopik berpewarnaan.
+ *
+ * Ini yang menutup sisi "jaringan" dari materi anatomi: jaringan itu wujudnya
+ * mikroskopik, jadi tidak ada bentuk 3D-nya yang masuk akal (tidak ada model
+ * 3D "epitel skuamosa simpleks") — yang ada dan memang dipakai untuk belajar
+ * adalah mikrograf sediaan berpewarnaan. Karena itu kata kuncinya diarahkan ke
+ * "histology"/"micrograph"/"H&E stain", bukan ke diagram anatomi.
+ */
+export async function histologyImageLookup(tissue: string): Promise<AnatomyImage[]> {
+  return cariGabungan(tissue, (q) => [`${q} histology`, `${q} micrograph`, `${q} histology stain`])
+}
+
+/** Menjalankan beberapa varian kata kunci sekaligus lalu menggabung hasilnya
+ *  tanpa duplikat — satu varian yang kosong tidak mengosongkan hasilnya. */
+async function cariGabungan(term: string, varian: (q: string) => string[]): Promise<AnatomyImage[]> {
+  const q = term.trim()
   if (!q) return []
-  const hasil = await Promise.all([
-    searchAnatomyImages(`${q} pathology`, 6).catch(() => [] as AnatomyImage[]),
-    searchAnatomyImages(`${q} histopathology`, 6).catch(() => [] as AnatomyImage[]),
-  ])
+  const hasil = await Promise.all(
+    varian(q).map((v) => searchAnatomyImages(v, 6).catch(() => [] as AnatomyImage[])),
+  )
   const gabung: AnatomyImage[] = []
   for (const daftar of hasil) {
     for (const img of daftar) {

@@ -112,7 +112,7 @@ import { emailOtpStart, emailOtpVerify, emailOtpLive } from './otp.js'
 import { putusanPengingat } from './jadwal.js'
 import { aiMessages, aiConsult, aiVision, aiOperator, reviewApplicationText, draftSecondOpinion, generateOperatorBriefing, aiConfigured, aiStatus } from './ai.js'
 import { anatomyOntologyLookup, anatomyStructureLookup } from './anatomyOntology.js'
-import { anatomyImageLookup, pathologyImageLookup } from './anatomyImages.js'
+import { anatomyImageLookup, pathologyImageLookup, histologyImageLookup } from './anatomyImages.js'
 import { lookupDrugLabel } from './drugInfo.js'
 import { sendEmail } from './email.js'
 import { sendPush, notify, keadaanPush } from './push.js'
@@ -277,7 +277,10 @@ app.get('/api/anatomy/images', async (req, res) => {
   const kind = String(req.query.kind ?? 'anatomy').trim()
   if (!q) return res.status(400).json({ error: 'q wajib diisi' })
   try {
-    const images = kind === 'pathology' ? await pathologyImageLookup(q) : await anatomyImageLookup(q)
+    const images =
+      kind === 'pathology' ? await pathologyImageLookup(q)
+      : kind === 'histology' ? await histologyImageLookup(q)
+      : await anatomyImageLookup(q)
     res.json({ images })
   } catch (e) {
     res.status(502).json({ error: 'Image lookup gagal', detail: (e as Error).message })

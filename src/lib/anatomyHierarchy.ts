@@ -12,6 +12,9 @@ export interface AnatomyEntry {
   searchTerms: string[]
   /** Kalau level ini punya lapisan 3D yang cocok, tombol "View in 3D" muncul. */
   layer3d?: AnatomyLayer['key']
+  /** Jenis gambar yang paling masuk akal dimuat lebih dulu untuk entri ini.
+   *  Jaringan defaultnya histologi (mikrograf), bukan diagram anatomi. */
+  imageKind?: 'anatomy' | 'histology'
 }
 
 export const TISSUE_TYPES: AnatomyEntry[] = [
@@ -41,6 +44,47 @@ export const TISSUE_TYPES: AnatomyEntry[] = [
     searchTerms: ['nervous system disease'],
     layer3d: 'nervous',
   },
+]
+
+// Jaringan tingkat MIKROSKOPIK — ini sisi "jaringan" dari materi anatomi yang
+// tidak bisa diwakili model 3D: tidak ada bentuk 3D dari "epitel skuamosa
+// simpleks". Yang dipakai untuk mempelajarinya adalah mikrograf sediaan
+// berpewarnaan, jadi tiap entri di sini mengambil gambar lewat mode histologi
+// (lihat histologyImageLookup di server), bukan diagram anatomi.
+//
+// Daftarnya mengikuti pembagian histologi baku: empat jaringan dasar, masing-
+// masing dengan subtipe yang benar-benar dibedakan di bawah mikroskop.
+export const TISSUE_SUBTYPES: AnatomyEntry[] = [
+  // — Epitel: diklasifikasikan oleh jumlah lapisan × bentuk selnya.
+  { key: 'simple-squamous', label: 'Simple squamous epithelium', description: 'One layer of flat cells — thin enough for diffusion. Lines the alveoli and the inside of blood vessels (endothelium).', searchTerms: ['simple squamous epithelium'], imageKind: 'histology' },
+  { key: 'simple-cuboidal', label: 'Simple cuboidal epithelium', description: 'One layer of cube-shaped cells, built for secretion and absorption. Lines kidney tubules and many glands.', searchTerms: ['simple cuboidal epithelium'], imageKind: 'histology' },
+  { key: 'simple-columnar', label: 'Simple columnar epithelium', description: 'One layer of tall cells lining the stomach and intestine, often with microvilli for absorption.', searchTerms: ['simple columnar epithelium'], imageKind: 'histology' },
+  { key: 'pseudostratified', label: 'Pseudostratified columnar epithelium', description: 'Looks layered but every cell touches the base. Ciliated, it lines the airways and sweeps mucus upward.', searchTerms: ['pseudostratified columnar epithelium'], imageKind: 'histology' },
+  { key: 'stratified-squamous', label: 'Stratified squamous epithelium', description: 'Many layers, built to survive abrasion. Keratinised in the epidermis, non-keratinised in the mouth and oesophagus.', searchTerms: ['stratified squamous epithelium'], imageKind: 'histology' },
+  { key: 'transitional', label: 'Transitional epithelium (urothelium)', description: 'Changes shape as it stretches — lines the bladder and ureters so they can fill without tearing.', searchTerms: ['transitional epithelium urothelium'], imageKind: 'histology' },
+  { key: 'glandular-epithelium', label: 'Glandular epithelium', description: 'Epithelium specialised for secretion, forming exocrine glands (ducts) and endocrine glands (into the blood).', searchTerms: ['glandular epithelium'], imageKind: 'histology' },
+
+  // — Ikat: sel yang jarang di dalam matriks; sifat matriksnya yang membedakan.
+  { key: 'areolar', label: 'Loose (areolar) connective tissue', description: 'The loose packing tissue under epithelia — fibres in a gel matrix, holding vessels, nerves, and immune cells.', searchTerms: ['areolar connective tissue'], imageKind: 'histology' },
+  { key: 'dense-regular', label: 'Dense regular connective tissue', description: 'Collagen bundles in parallel, built for pull in one direction — tendons and ligaments.', searchTerms: ['dense regular connective tissue', 'tendon histology'], imageKind: 'histology' },
+  { key: 'dense-irregular', label: 'Dense irregular connective tissue', description: 'Collagen running in every direction, resisting stress from all sides — the dermis and organ capsules.', searchTerms: ['dense irregular connective tissue'], imageKind: 'histology' },
+  { key: 'adipose', label: 'Adipose tissue', description: 'Fat-storing cells with the nucleus pushed to the rim. Stores energy, insulates, and acts as an endocrine organ.', searchTerms: ['adipose tissue histology'], imageKind: 'histology' },
+  { key: 'reticular', label: 'Reticular connective tissue', description: 'A fine mesh of reticular fibres forming the scaffold of lymph nodes, spleen, and bone marrow.', searchTerms: ['reticular connective tissue'], imageKind: 'histology' },
+  { key: 'hyaline-cartilage', label: 'Hyaline cartilage', description: 'Glassy, smooth cartilage covering joint surfaces and forming the airway rings and costal cartilages.', searchTerms: ['hyaline cartilage histology'], imageKind: 'histology' },
+  { key: 'elastic-cartilage', label: 'Elastic cartilage', description: 'Cartilage packed with elastic fibres so it springs back — the external ear and the epiglottis.', searchTerms: ['elastic cartilage histology'], imageKind: 'histology' },
+  { key: 'fibrocartilage', label: 'Fibrocartilage', description: 'The toughest cartilage, built to absorb compression — intervertebral discs and the knee menisci.', searchTerms: ['fibrocartilage histology'], imageKind: 'histology' },
+  { key: 'compact-bone', label: 'Compact bone', description: 'Dense bone built from osteons — concentric rings around a central canal carrying vessels and nerves.', searchTerms: ['compact bone histology osteon'], imageKind: 'histology' },
+  { key: 'spongy-bone', label: 'Spongy (cancellous) bone', description: 'An open lattice of trabeculae — lighter than compact bone, and where red marrow sits.', searchTerms: ['spongy bone trabecular histology'], imageKind: 'histology' },
+  { key: 'blood-tissue', label: 'Blood', description: 'A connective tissue whose matrix is liquid plasma, carrying red cells, white cells, and platelets.', searchTerms: ['blood smear histology'], imageKind: 'histology' },
+
+  // — Otot: tiga jenis, dibedakan lurik/tidak dan kendali sadar/tidak.
+  { key: 'skeletal-muscle-tissue', label: 'Skeletal muscle tissue', description: 'Long striated fibres with many nuclei at the edge — under voluntary control, moving the skeleton.', searchTerms: ['skeletal muscle histology'], imageKind: 'histology' },
+  { key: 'cardiac-muscle-tissue', label: 'Cardiac muscle tissue', description: 'Striated, branching cells joined by intercalated discs so the heart contracts as one unit. Involuntary.', searchTerms: ['cardiac muscle histology intercalated disc'], imageKind: 'histology' },
+  { key: 'smooth-muscle-tissue', label: 'Smooth muscle tissue', description: 'Spindle-shaped cells with no striations, in the walls of vessels, gut, and airways. Involuntary.', searchTerms: ['smooth muscle histology'], imageKind: 'histology' },
+
+  // — Saraf: sel penghantar sinyal + sel penyokongnya.
+  { key: 'neuron', label: 'Neuron', description: 'The signalling cell — dendrites receive, the cell body integrates, and one axon carries the impulse away.', searchTerms: ['neuron histology'], imageKind: 'histology' },
+  { key: 'neuroglia', label: 'Neuroglia (glial cells)', description: 'The support cells that outnumber neurons — astrocytes, oligodendrocytes, microglia, and Schwann cells.', searchTerms: ['neuroglia astrocyte histology'], imageKind: 'histology' },
 ]
 
 export const ORGAN_SYSTEMS: AnatomyEntry[] = [

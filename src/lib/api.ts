@@ -258,7 +258,7 @@ export const api = {
   anatomyStructure: (terms: string[]) =>
     req<{ structures: OntologyTerm[] }>(
       `/api/anatomy/structure?terms=${encodeURIComponent(terms.join(','))}`),
-  anatomyImages: (q: string, kind: 'anatomy' | 'pathology' = 'anatomy') =>
+  anatomyImages: (q: string, kind: 'anatomy' | 'pathology' | 'histology' = 'anatomy') =>
     req<{ images: AnatomyImage[] }>(
       `/api/anatomy/images?q=${encodeURIComponent(q)}&kind=${kind}`),
   // in-app notification inbox
