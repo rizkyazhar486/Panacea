@@ -34,9 +34,7 @@ const Settings = lazy(() => import('./pages/Settings').then((m) => ({ default: m
 // small; they're fetched on demand when first navigated to.
 const Athlete = lazy(() => import('./pages/Athlete').then((m) => ({ default: m.Athlete })))
 const Recovery = lazy(() => import('./pages/Recovery').then((m) => ({ default: m.Recovery })))
-const Workout = lazy(() => import('./pages/Workout').then((m) => ({ default: m.Workout })))
 const SexualHealth = lazy(() => import('./pages/SexualHealth').then((m) => ({ default: m.SexualHealth })))
-const ShapeForming = lazy(() => import('./pages/ShapeForming').then((m) => ({ default: m.ShapeForming })))
 const EMR = lazy(() => import('./pages/EMR').then((m) => ({ default: m.EMR })))
 const Planning = lazy(() => import('./pages/Planning').then((m) => ({ default: m.Planning })))
 const CareEpisodePage = lazy(() => import('./pages/CareEpisode').then((m) => ({ default: m.CareEpisodePage })))
@@ -59,29 +57,20 @@ const Tutorial = lazy(() => import('./pages/Tutorial'))
 const VitaPulse = lazy(() => import('./pages/VitaPulse').then((m) => ({ default: m.VitaPulse })))
 const RealisticHealth = lazy(() => import('./pages/RealisticHealth').then((m) => ({ default: m.RealisticHealth })))
 const MoneyHub = lazy(() => import('./pages/MoneyHub').then((m) => ({ default: m.MoneyHub })))
-const GymEquipment = lazy(() => import('./pages/GymEquipment').then((m) => ({ default: m.GymEquipment })))
-const BaseTraining = lazy(() => import('./pages/BaseTraining').then((m) => ({ default: m.BaseTraining })))
-const MultiSport = lazy(() => import('./pages/MultiSport').then((m) => ({ default: m.MultiSport })))
-const GaitAnalysis = lazy(() => import('./pages/GaitAnalysis').then((m) => ({ default: m.GaitAnalysis })))
 const Notifications = lazy(() => import('./pages/Notifications').then((m) => ({ default: m.Notifications })))
 const HeartRateLog = lazy(() => import('./pages/HeartRateLog').then((m) => ({ default: m.HeartRateLog })))
 const SleepPattern = lazy(() => import('./pages/SleepPattern').then((m) => ({ default: m.SleepPattern })))
 const TrainingPhysiology = lazy(() => import('./pages/TrainingPhysiology').then((m) => ({ default: m.TrainingPhysiology })))
 const EnduranceTools = lazy(() => import('./pages/EnduranceTools').then((m) => ({ default: m.EnduranceTools })))
 const ClinicalTrackers = lazy(() => import('./pages/ClinicalTrackers').then((m) => ({ default: m.ClinicalTrackers })))
-const SportsLab = lazy(() => import('./pages/SportsLab').then((m) => ({ default: m.SportsLab })))
 const Connect = lazy(() => import('./pages/Connect').then((m) => ({ default: m.Connect })))
 const MacroLabGizi = lazy(() => import('./pages/MacroLabGizi').then((m) => ({ default: m.MacroLabGizi })))
 const OwnerAnalytics = lazy(() => import('./pages/OwnerAnalytics').then((m) => ({ default: m.OwnerAnalytics })))
 const Messages = lazy(() => import('./pages/Messages').then((m) => ({ default: m.Messages })))
 const Profile = lazy(() => import('./pages/Profile').then((m) => ({ default: m.Profile })))
-const FitnessTest = lazy(() => import('./pages/FitnessTest').then((m) => ({ default: m.FitnessTest })))
 const Search = lazy(() => import('./pages/Search').then((m) => ({ default: m.Search })))
 const Logs = lazy(() => import('./pages/Logs').then((m) => ({ default: m.Logs })))
-const SportsScience = lazy(() => import('./pages/SportsScience').then((m) => ({ default: m.SportsScience })))
-const TrainingPlan = lazy(() => import('./pages/TrainingPlan').then((m) => ({ default: m.TrainingPlan })))
 const BodyComposition = lazy(() => import('./pages/BodyComposition').then((m) => ({ default: m.BodyComposition })))
-const PerformanceLab = lazy(() => import('./pages/PerformanceLab').then((m) => ({ default: m.PerformanceLab })))
 const InitialAssessment = lazy(() => import('./pages/InitialAssessment').then((m) => ({ default: m.InitialAssessment })))
 const Readiness = lazy(() => import('./pages/Readiness').then((m) => ({ default: m.Readiness })))
 const Longevity = lazy(() => import('./pages/Longevity').then((m) => ({ default: m.Longevity })))
@@ -108,20 +97,15 @@ const DrugInfo = lazy(() => import('./pages/DrugInfo').then((m) => ({ default: m
 const GeneInfo = lazy(() => import('./pages/GeneInfo').then((m) => ({ default: m.GeneInfo })))
 const Ikigai = lazy(() => import('./pages/Ikigai').then((m) => ({ default: m.Ikigai })))
 const Harada = lazy(() => import('./pages/Harada').then((m) => ({ default: m.Harada })))
-const CrossFit = lazy(() => import('./pages/CrossFit').then((m) => ({ default: m.CrossFit })))
-const Peregangan = lazy(() => import('./pages/Peregangan').then((m) => ({ default: m.Peregangan })))
 const Jelajah = lazy(() => import('./pages/Jelajah').then((m) => ({ default: m.Jelajah })))
-const TeknikLari = lazy(() => import('./pages/TeknikLari').then((m) => ({ default: m.TeknikLari })))
 const VerifikasiConnect = lazy(() => import('./pages/VerifikasiConnect').then((m) => ({ default: m.VerifikasiConnect })))
 const Kitab = lazy(() => import('./pages/Kitab').then((m) => ({ default: m.Kitab })))
 const Hadis = lazy(() => import('./pages/Hadis').then((m) => ({ default: m.Hadis })))
 const Adzan = lazy(() => import('./pages/Adzan').then((m) => ({ default: m.Adzan })))
 const AturanAngka = lazy(() => import('./pages/AturanAngka').then((m) => ({ default: m.AturanAngka })))
-const Kalistenik = lazy(() => import('./pages/Kalistenik').then((m) => ({ default: m.Kalistenik })))
 const PapanAtlet = lazy(() => import('./pages/PapanAtlet').then((m) => ({ default: m.PapanAtlet })))
 const Menyelam = lazy(() => import('./pages/Menyelam').then((m) => ({ default: m.Menyelam })))
 const KisahNabi = lazy(() => import('./pages/KisahNabi').then((m) => ({ default: m.KisahNabi })))
-const Rekomposisi = lazy(() => import('./pages/Rekomposisi').then((m) => ({ default: m.Rekomposisi })))
 const EdukasiAwam = lazy(() => import('./pages/EdukasiAwam').then((m) => ({ default: m.EdukasiAwam })))
 const Perubahan = lazy(() => import('./pages/Perubahan').then((m) => ({ default: m.Perubahan })))
 const Learn = lazy(() => import('./pages/Learn').then((m) => ({ default: m.Learn })))
@@ -175,13 +159,11 @@ const PusatTubuh = lazy(() => import('./pages/PusatTubuh').then((m) => ({ defaul
 const Ikhtisar = lazy(() => import('./pages/Ikhtisar').then((m) => ({ default: m.Ikhtisar })))
 const Harian = lazy(() => import('./pages/Harian').then((m) => ({ default: m.Harian })))
 const CariSemua = lazy(() => import('./pages/CariSemua').then((m) => ({ default: m.CariSemua })))
-const LatihanBeban = lazy(() => import('./pages/LatihanBeban').then((m) => ({ default: m.LatihanBeban })))
 const AturFitur = lazy(() => import('./pages/AturFitur').then((m) => ({ default: m.AturFitur })))
 const AnalisisPro = lazy(() => import('./pages/AnalisisPro').then((m) => ({ default: m.AnalisisPro })))
 const BodyBattery = lazy(() => import('./pages/BodyBattery').then((m) => ({ default: m.BodyBattery })))
 const ClinicalHub = lazy(() => import('./pages/ClinicalHub').then((m) => ({ default: m.ClinicalHub })))
 const SleepToolkit = lazy(() => import('./pages/SleepToolkit').then((m) => ({ default: m.SleepToolkit })))
-const MovementToolkit = lazy(() => import('./pages/MovementToolkit').then((m) => ({ default: m.MovementToolkit })))
 const MindToolkit = lazy(() => import('./pages/MindToolkit').then((m) => ({ default: m.MindToolkit })))
 const NutritionToolkit = lazy(() => import('./pages/NutritionToolkit').then((m) => ({ default: m.NutritionToolkit })))
 const ToxinChecklist = lazy(() => import('./pages/ToxinChecklist').then((m) => ({ default: m.ToxinChecklist })))
@@ -262,23 +244,23 @@ createRoot(document.getElementById('root')!).render(
               <Route path="/vitapulse" element={<VitaPulse />} />
               <Route path="/sehat-sibuk" element={<RealisticHealth />} />
               <Route path="/keuangan" element={<MoneyHub />} />
-              <Route path="/alat-fitness" element={<GymEquipment />} />
-              <Route path="/latihan-dasar" element={<BaseTraining />} />
-              <Route path="/lari-sepeda-renang" element={<MultiSport />} />
+              <Route path="/alat-fitness" element={<Navigate to="/latihan?t=alat" replace />} />
+              <Route path="/latihan-dasar" element={<Navigate to="/latihan?t=dasar" replace />} />
+              <Route path="/lari-sepeda-renang" element={<Navigate to="/latihan?t=multisport" replace />} />
               <Route path="/notifikasi" element={<Notifications />} />
-              <Route path="/sports-lab" element={<SportsLab />} />
+              <Route path="/sports-lab" element={<Navigate to="/latihan?t=sportlab" replace />} />
               <Route path="/connect" element={<Connect />} />
               <Route path="/macro-lab" element={<MacroLabGizi />} />
               <Route path="/owner-analytics" element={<OwnerAnalytics />} />
               <Route path="/messages" element={<Messages />} />
               <Route path="/profile" element={<Profile />} />
-              <Route path="/fitness-test" element={<FitnessTest />} />
+              <Route path="/fitness-test" element={<Navigate to="/latihan?t=tes" replace />} />
               <Route path="/search" element={<Search />} />
               <Route path="/logs" element={<Logs />} />
-              <Route path="/sports-science" element={<SportsScience />} />
-              <Route path="/training-plan" element={<TrainingPlan />} />
+              <Route path="/sports-science" element={<Navigate to="/latihan?t=sains" replace />} />
+              <Route path="/training-plan" element={<Navigate to="/latihan?t=rencana" replace />} />
               <Route path="/body" element={<BodyComposition />} />
-              <Route path="/lab" element={<PerformanceLab />} />
+              <Route path="/lab" element={<Navigate to="/latihan?t=lab" replace />} />
               <Route path="/assessment" element={<InitialAssessment />} />
               <Route path="/readiness" element={<Readiness />} />
               <Route path="/longevity" element={<Longevity />} />
@@ -314,7 +296,7 @@ createRoot(document.getElementById('root')!).render(
               <Route path="/ikhtisar" element={<Ikhtisar />} />
               <Route path="/harian" element={<Harian />} />
               <Route path="/cari" element={<CariSemua />} />
-              <Route path="/latihan-beban" element={<LatihanBeban />} />
+              <Route path="/latihan-beban" element={<Navigate to="/latihan?t=beban" replace />} />
               <Route path="/atur-fitur" element={<AturFitur />} />
               {/* Rute lama tetap hidup dan mengalihkan ke tab yang tepat, agar
                   penanda halaman dan tautan lama tidak ada yang putus. */}
@@ -327,16 +309,16 @@ createRoot(document.getElementById('root')!).render(
               <Route path="/analisis-gerak" element={<Navigate to="/tubuh?t=gerak" replace />} />
               <Route path="/pelacak-klinis" element={<Navigate to="/tubuh?t=klinis" replace />} />
               <Route path="/how-numbers-work" element={<AturanAngka />} />
-              <Route path="/calisthenics" element={<Kalistenik />} />
+              <Route path="/calisthenics" element={<Navigate to="/latihan?t=kalistenik" replace />} />
               <Route path="/athlete-board" element={<PapanAtlet />} />
               <Route path="/dive-log" element={<Menyelam />} />
               <Route path="/prophet-stories" element={<KisahNabi />} />
-              <Route path="/recomposition" element={<Rekomposisi />} />
+              <Route path="/recomposition" element={<Navigate to="/latihan?t=rekomposisi" replace />} />
               <Route path="/health-explained" element={<EdukasiAwam />} />
               <Route path="/analisis-pro" element={<Navigate to="/latihan?t=analisis" replace />} />
               <Route path="/clinical-hub" element={<ClinicalHub />} />
               <Route path="/sleep-toolkit" element={<SleepToolkit />} />
-              <Route path="/movement-toolkit" element={<MovementToolkit />} />
+              <Route path="/movement-toolkit" element={<Navigate to="/latihan?t=gerak" replace />} />
               <Route path="/mind-toolkit" element={<MindToolkit />} />
               <Route path="/nutrition-toolkit" element={<NutritionToolkit />} />
               <Route path="/toxin-checklist" element={<ToxinChecklist />} />
@@ -357,10 +339,10 @@ createRoot(document.getElementById('root')!).render(
               <Route path="/gene-info" element={<GeneInfo />} />
               <Route path="/ikigai" element={<Ikigai />} />
               <Route path="/harada" element={<Harada />} />
-              <Route path="/crossfit" element={<CrossFit />} />
-              <Route path="/peregangan" element={<Peregangan />} />
+              <Route path="/crossfit" element={<Navigate to="/latihan?t=crossfit" replace />} />
+              <Route path="/peregangan" element={<Navigate to="/latihan?t=peregangan" replace />} />
               <Route path="/jelajah" element={<Jelajah />} />
-              <Route path="/teknik-lari" element={<TeknikLari />} />
+              <Route path="/teknik-lari" element={<Navigate to="/latihan?t=lari" replace />} />
               <Route path="/learn" element={<Learn />} />
               <Route path="/change" element={<Perubahan />} />
               <Route path="/scripture" element={<Kitab />} />
@@ -439,9 +421,9 @@ createRoot(document.getElementById('root')!).render(
               <Route path="/clinical-scores" element={<ClinicalScores />} />
               <Route path="/athlete" element={<Athlete />} />
               <Route path="/recovery" element={<Recovery />} />
-              <Route path="/workout" element={<Workout />} />
+              <Route path="/workout" element={<Navigate to="/latihan?t=sesi" replace />} />
               <Route path="/sexual-health" element={<SexualHealth />} />
-              <Route path="/shape-forming" element={<ShapeForming />} />
+              <Route path="/shape-forming" element={<Navigate to="/latihan?t=bentuk" replace />} />
               <Route path="/consult" element={<Consult />} />
               <Route path="/hospitals" element={<Hospitals />} />
               <Route path="/pharmacy" element={<Pharmacy />} />

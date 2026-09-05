@@ -30,6 +30,27 @@ const WorkoutHistory = lazy(() => import('./WorkoutHistory').then((m) => ({ defa
 const AnalisisPro = lazy(() => import('./AnalisisPro').then((m) => ({ default: m.AnalisisPro })))
 const TrainingPhysiology = lazy(() => import('./TrainingPhysiology').then((m) => ({ default: m.TrainingPhysiology })))
 const EnduranceTools = lazy(() => import('./EnduranceTools').then((m) => ({ default: m.EnduranceTools })))
+// Sisa suite latihan yang dulu tersebar sebagai rute sendiri-sendiri. Semuanya
+// dipasang apa adanya — tidak satu pun isinya ditulis ulang, sama seperti
+// penggabungan skor klinis: yang digabung adalah TEMPATNYA, bukan isinya.
+const Workout = lazy(() => import('./Workout').then((m) => ({ default: m.Workout })))
+const LatihanBeban = lazy(() => import('./LatihanBeban').then((m) => ({ default: m.LatihanBeban })))
+const Kalistenik = lazy(() => import('./Kalistenik').then((m) => ({ default: m.Kalistenik })))
+const CrossFit = lazy(() => import('./CrossFit').then((m) => ({ default: m.CrossFit })))
+const Peregangan = lazy(() => import('./Peregangan').then((m) => ({ default: m.Peregangan })))
+const TeknikLari = lazy(() => import('./TeknikLari').then((m) => ({ default: m.TeknikLari })))
+const MultiSport = lazy(() => import('./MultiSport').then((m) => ({ default: m.MultiSport })))
+const BaseTraining = lazy(() => import('./BaseTraining').then((m) => ({ default: m.BaseTraining })))
+const TrainingPlan = lazy(() => import('./TrainingPlan').then((m) => ({ default: m.TrainingPlan })))
+const FitnessTest = lazy(() => import('./FitnessTest').then((m) => ({ default: m.FitnessTest })))
+const PerformanceLab = lazy(() => import('./PerformanceLab').then((m) => ({ default: m.PerformanceLab })))
+const SportsScience = lazy(() => import('./SportsScience').then((m) => ({ default: m.SportsScience })))
+const SportsLab = lazy(() => import('./SportsLab').then((m) => ({ default: m.SportsLab })))
+const GymEquipment = lazy(() => import('./GymEquipment').then((m) => ({ default: m.GymEquipment })))
+const MovementToolkit = lazy(() => import('./MovementToolkit').then((m) => ({ default: m.MovementToolkit })))
+const GaitAnalysis = lazy(() => import('./GaitAnalysis').then((m) => ({ default: m.GaitAnalysis })))
+const ShapeForming = lazy(() => import('./ShapeForming').then((m) => ({ default: m.ShapeForming })))
+const Rekomposisi = lazy(() => import('./Rekomposisi').then((m) => ({ default: m.Rekomposisi })))
 
 const TABS: TabDef[] = [
   { id: 'pelatih', label: 'Coach', emoji: '🏃', komponen: WorkoutHistory,
@@ -40,6 +61,46 @@ const TABS: TabDef[] = [
     ringkas: 'Training load, status, recovery time, lactate threshold, readiness' },
   { id: 'endurance', label: 'Endurance', emoji: '⛽', komponen: EnduranceTools,
     ringkas: 'Fuelling, sweat rate, FTP, power guidance, acclimatisation' },
+
+  // ── Yang dulu berdiri sebagai rute sendiri ────────────────────────────────
+  // Urutannya mengikuti cara latihan benar-benar dijalani: apa yang dikerjakan
+  // hari ini, dengan cara apa, lalu bagaimana ia diukur dan direncanakan.
+  { id: 'sesi', label: 'Exercises', emoji: '🏋️', komponen: Workout,
+    ringkas: 'The exercise library by muscle group, with form cues and photographs' },
+  { id: 'beban', label: 'Weights', emoji: '🔩', komponen: LatihanBeban,
+    ringkas: 'Barbell and dumbbell work — loading, progression, technique' },
+  { id: 'kalistenik', label: 'Calisthenics', emoji: '🤸', komponen: Kalistenik,
+    ringkas: 'Bodyweight progressions from the five basics upward' },
+  { id: 'crossfit', label: 'CrossFit', emoji: '⏱️', komponen: CrossFit,
+    ringkas: 'Benchmark workouts, scaling, and the metabolic demand of each' },
+  { id: 'peregangan', label: 'Mobility', emoji: '🧘', komponen: Peregangan,
+    ringkas: 'Stretching and mobility work, and when each type actually helps' },
+  { id: 'lari', label: 'Running', emoji: '👟', komponen: TeknikLari,
+    ringkas: 'Running technique — cadence, foot strike, common faults' },
+  { id: 'multisport', label: 'Multi-sport', emoji: '🚴', komponen: MultiSport,
+    ringkas: 'Running, cycling and swimming together' },
+  { id: 'dasar', label: 'Base', emoji: '🧱', komponen: BaseTraining,
+    ringkas: 'Aerobic base building — the slow work that everything else rests on' },
+  { id: 'rencana', label: 'Plan', emoji: '🗓️', komponen: TrainingPlan,
+    ringkas: 'Periodised training plans and how a block is structured' },
+  { id: 'tes', label: 'Testing', emoji: '📋', komponen: FitnessTest,
+    ringkas: 'Field tests of strength, endurance and mobility, with norms' },
+  { id: 'lab', label: 'Performance', emoji: '🔬', komponen: PerformanceLab,
+    ringkas: 'Performance metrics — VO₂max, thresholds, power and pace' },
+  { id: 'sains', label: 'Science', emoji: '📚', komponen: SportsScience,
+    ringkas: 'The evidence behind training methods' },
+  { id: 'sportlab', label: 'Sports lab', emoji: '🧪', komponen: SportsLab,
+    ringkas: 'Sport-specific analysis and benchmarks' },
+  { id: 'alat', label: 'Equipment', emoji: '🏟️', komponen: GymEquipment,
+    ringkas: 'Gym equipment — what each machine loads and how to set it up' },
+  { id: 'gerak', label: 'Movement', emoji: '🦵', komponen: MovementToolkit,
+    ringkas: 'Movement quality screens and corrective work' },
+  { id: 'gait', label: 'Gait', emoji: '🚶', komponen: GaitAnalysis,
+    ringkas: 'Walking and running gait analysis' },
+  { id: 'bentuk', label: 'Shaping', emoji: '📐', komponen: ShapeForming,
+    ringkas: 'Body shaping goals and the training that actually changes them' },
+  { id: 'rekomposisi', label: 'Recomp', emoji: '⚖️', komponen: Rekomposisi,
+    ringkas: 'Losing fat and gaining muscle at once — when it is possible' },
 ]
 
 export function PusatLatihan() {
