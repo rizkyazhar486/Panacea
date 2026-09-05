@@ -47,8 +47,9 @@ export const ORGAN_SYSTEMS: AnatomyEntry[] = [
   {
     key: 'integumentary',
     label: 'Integumentary system',
-    description: 'Skin, hair, and nails — the body\'s outer barrier against injury, infection, and fluid loss, and a major organ for temperature regulation.',
+    description: 'Skin, hair, and nails — the body\'s outer barrier against injury, infection, and fluid loss, and a major organ for temperature regulation. The 3D model shows the body\'s external surface and its named regions, not microscopic skin layers (epidermis/dermis) or glands.',
     searchTerms: ['skin disease', 'integumentary system disease'],
+    layer3d: 'surface',
   },
   {
     key: 'skeletal',

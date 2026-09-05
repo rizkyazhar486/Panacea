@@ -20,13 +20,14 @@ import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
 // ─────────────────────────────────────────────────────────────────────────────
 
 export interface AnatomyLayer {
-  key: 'skeletal' | 'muscular' | 'cardiovascular' | 'nervous' | 'visceral' | 'lymphoid'
+  key: 'surface' | 'skeletal' | 'muscular' | 'cardiovascular' | 'nervous' | 'visceral' | 'lymphoid'
   label: string
   file: string
   defaultOn: boolean
 }
 
 export const ANATOMY_LAYERS: AnatomyLayer[] = [
+  { key: 'surface', label: 'Skin', file: 'surface.glb', defaultOn: false },
   { key: 'skeletal', label: 'Skeleton', file: 'skeletal.glb', defaultOn: true },
   { key: 'muscular', label: 'Muscles', file: 'muscular.glb', defaultOn: true },
   { key: 'cardiovascular', label: 'Vessels', file: 'cardiovascular.glb', defaultOn: false },

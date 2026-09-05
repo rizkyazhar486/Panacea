@@ -38,4 +38,7 @@ export const ORGAN_FOCUS: OrganFocus[] = [
   { key: 'spinal-cord', label: 'Spinal cord', layer: 'nervous', keywords: ['spinal cord'], searchTerms: ['spinal cord disease'] },
   { key: 'eye', label: 'Eye', layer: 'nervous', keywords: ['eyeball', 'cornea', 'iris', 'retina', 'lens of eye'], searchTerms: ['eye disease'] },
   { key: 'ear', label: 'Ear', layer: 'nervous', keywords: ['cochlea', 'tympanic', 'vestibul', 'semicircular duct'], searchTerms: ['ear disease', 'hearing loss'] },
+  { key: 'external-nose', label: 'Nose (external)', layer: 'surface', keywords: ['nose', 'nasal region', 'nostril', 'ala of nose'], searchTerms: ['nose disease', 'nasal disease'] },
+  { key: 'external-ear', label: 'Ear (external)', layer: 'surface', keywords: ['auricle', 'auricular region', 'antihelix', 'antitragus', 'tragus'], searchTerms: ['external ear disease'] },
+  { key: 'larynx', label: 'Larynx', layer: 'visceral', keywords: ['larynx', 'vocal', 'thyroid cartilage', 'cricoid', 'arytenoid'], searchTerms: ['laryngeal disease'] },
 ]
