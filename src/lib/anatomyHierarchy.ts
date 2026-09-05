@@ -121,6 +121,28 @@ export const ORGAN_SYSTEMS: AnatomyEntry[] = [
   },
 ]
 
+// Struktur yang TIDAK punya geometri di model 3D Z-Anatomy/BodyParts3D —
+// sudah diperiksa sampai tingkat koleksi, bukan diasumsikan: reproduksi wanita
+// memang tidak dimodelkan sama sekali (kategori "Vulva" ada tapi kosong), dan
+// kulit sengaja dilepas supaya struktur di bawahnya terlihat.
+//
+// Keduanya tetap dilayani di sini lewat jalur yang TIDAK butuh mesh 3D:
+// istilah anatomi nyata dari UBERON/FMA (OLS4) + gambar berlisensi bebas dari
+// Wikimedia Commons. Jadi bagian tubuh ini tidak lagi hilang dari aplikasi
+// hanya karena bentuk 3D-nya belum ada.
+export const IMAGE_ONLY_STRUCTURES: AnatomyEntry[] = [
+  { key: 'uterus', label: 'Uterus', description: 'The muscular organ where a fetus develops. Its lining (endometrium) thickens and sheds across the menstrual cycle.', searchTerms: ['uterine disease', 'endometriosis'] },
+  { key: 'ovary', label: 'Ovary', description: 'Paired glands that release eggs and produce oestrogen and progesterone — both a reproductive and an endocrine organ.', searchTerms: ['ovarian disease', 'polycystic ovary syndrome'] },
+  { key: 'fallopian-tube', label: 'Fallopian tube', description: 'Carries the egg from ovary to uterus, and is usually where fertilisation happens.', searchTerms: ['fallopian tube disease'] },
+  { key: 'cervix', label: 'Cervix', description: 'The lower neck of the uterus opening into the vagina — the site screened by a Pap smear.', searchTerms: ['cervical disease', 'cervical cancer'] },
+  { key: 'vagina', label: 'Vagina', description: 'The muscular canal connecting the cervix to the outside of the body.', searchTerms: ['vaginal disease'] },
+  { key: 'breast', label: 'Breast', description: 'Glandular tissue and ducts that produce and carry milk, over a bed of fat and connective tissue.', searchTerms: ['breast disease', 'breast cancer'] },
+  { key: 'epidermis', label: 'Epidermis', description: 'The outermost skin layer — a self-renewing barrier of keratinocytes, with the pigment cells (melanocytes) at its base.', searchTerms: ['epidermis disease', 'skin disease'] },
+  { key: 'dermis', label: 'Dermis', description: 'The layer beneath the epidermis, holding collagen, blood vessels, nerve endings, and the roots of hair and glands.', searchTerms: ['dermis disease'] },
+  { key: 'hair-follicle', label: 'Hair follicle', description: 'The tube-shaped structure in the dermis that grows a hair, with a sebaceous gland attached to it.', searchTerms: ['hair follicle disease', 'alopecia'] },
+  { key: 'sebaceous-gland', label: 'Sebaceous & sweat glands', description: 'Sebaceous glands oil the skin and hair; sweat glands cool the body. Blocked sebaceous glands are central to acne.', searchTerms: ['sebaceous gland disease', 'acne'] },
+]
+
 export const BODY_REGIONS: AnatomyEntry[] = [
   { key: 'caput', label: 'Head (Caput)', description: 'Skull, brain, face, and special sense organs (eyes, ears, nose).', searchTerms: ['head disease', 'headache'] },
   { key: 'collum', label: 'Neck (Collum/Cervix)', description: 'Cervical spine, throat, thyroid, and major vessels/nerves passing to the head.', searchTerms: ['neck disease', 'thyroid disease'] },

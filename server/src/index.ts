@@ -111,7 +111,8 @@ import { googleLogin, devLogin, currentUser, clearSession, requireAuth } from '.
 import { emailOtpStart, emailOtpVerify, emailOtpLive } from './otp.js'
 import { putusanPengingat } from './jadwal.js'
 import { aiMessages, aiConsult, aiVision, aiOperator, reviewApplicationText, draftSecondOpinion, generateOperatorBriefing, aiConfigured, aiStatus } from './ai.js'
-import { anatomyOntologyLookup } from './anatomyOntology.js'
+import { anatomyOntologyLookup, anatomyStructureLookup } from './anatomyOntology.js'
+import { anatomyImageLookup, pathologyImageLookup } from './anatomyImages.js'
 import { lookupDrugLabel } from './drugInfo.js'
 import { sendEmail } from './email.js'
 import { sendPush, notify, keadaanPush } from './push.js'
@@ -251,6 +252,35 @@ app.get('/api/anatomy/ontology', async (req, res) => {
     res.json(hasil)
   } catch (e) {
     res.status(502).json({ error: 'Ontology lookup gagal', detail: (e as Error).message })
+  }
+})
+
+// Struktur anatomi (bukan penyakit) dari UBERON + FMA lewat OLS4 — menutup
+// dua sistem yang memang tidak punya geometri di model 3D: reproduksi wanita
+// dan struktur mikroskopik kulit. Publik, tanpa auth.
+app.get('/api/anatomy/structure', async (req, res) => {
+  const raw = String(req.query.terms ?? '')
+  const terms = raw.split(',').map((t) => t.trim()).filter(Boolean)
+  if (!terms.length) return res.status(400).json({ error: 'terms wajib diisi (dipisah koma)' })
+  try {
+    res.json({ structures: await anatomyStructureLookup(terms) })
+  } catch (e) {
+    res.status(502).json({ error: 'Structure lookup gagal', detail: (e as Error).message })
+  }
+})
+
+// Gambar anatomi/patologi nyata dari Wikimedia Commons (domain publik/CC,
+// tanpa API key). Lisensi & pembuat ikut dikembalikan karena WAJIB
+// ditampilkan di layar. Publik, tanpa auth.
+app.get('/api/anatomy/images', async (req, res) => {
+  const q = String(req.query.q ?? '').trim()
+  const kind = String(req.query.kind ?? 'anatomy').trim()
+  if (!q) return res.status(400).json({ error: 'q wajib diisi' })
+  try {
+    const images = kind === 'pathology' ? await pathologyImageLookup(q) : await anatomyImageLookup(q)
+    res.json({ images })
+  } catch (e) {
+    res.status(502).json({ error: 'Image lookup gagal', detail: (e as Error).message })
   }
 })
 

@@ -31,7 +31,18 @@ export interface WebhookDelivery {
   newestSampleDate: string | null
 }
 export interface SymbolHit { symbol: string; name: string; exchange: string | null; type: string | null }
-export interface OntologyTerm { id: string; label: string; ontology: 'doid' | 'hp'; description: string; iri: string }
+export interface OntologyTerm { id: string; label: string; ontology: 'doid' | 'hp' | 'uberon' | 'fma'; description: string; iri: string }
+/** Gambar anatomi/patologi dari Wikimedia Commons. license & artist WAJIB
+ *  ditampilkan bersama gambarnya — itu syarat lisensi CC-nya, bukan hiasan. */
+export interface AnatomyImage {
+  title: string
+  url: string
+  sourcePage: string
+  license: string
+  licenseUrl: string
+  artist: string
+  description: string
+}
 export interface DrugLabelInfo { brandName: string; genericName: string; purpose: string; mechanismOfAction: string; adverseReactions: string; warnings: string }
 export interface MarketCandle { t: number; c: number; o?: number; h?: number; l?: number; v?: number }
 export interface MarketQuote {
@@ -244,6 +255,12 @@ export const api = {
       `/api/anatomy/ontology?terms=${encodeURIComponent(terms.join(','))}`),
   drugInfo: (name: string) =>
     req<DrugLabelInfo>(`/api/anatomy/drug?name=${encodeURIComponent(name)}`),
+  anatomyStructure: (terms: string[]) =>
+    req<{ structures: OntologyTerm[] }>(
+      `/api/anatomy/structure?terms=${encodeURIComponent(terms.join(','))}`),
+  anatomyImages: (q: string, kind: 'anatomy' | 'pathology' = 'anatomy') =>
+    req<{ images: AnatomyImage[] }>(
+      `/api/anatomy/images?q=${encodeURIComponent(q)}&kind=${kind}`),
   // in-app notification inbox
   notifications: () => req<{ notifications: Notif[] }>('/api/notifications').then((r) => r.notifications),
   // Heart-rate log. `since` is epoch ms; omit for the last 24 hours.

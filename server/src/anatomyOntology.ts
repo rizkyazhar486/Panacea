@@ -21,7 +21,7 @@ const CTSS_BASE = 'https://clinicaltables.nlm.nih.gov/api'
 export interface OntologyTerm {
   id: string // CURIE, mis. "DOID:9351" atau "HP:0001945"
   label: string
-  ontology: 'doid' | 'hp'
+  ontology: 'doid' | 'hp' | 'uberon' | 'fma'
   description: string
   iri: string
 }
@@ -34,7 +34,7 @@ interface Ols4Doc {
   iri?: string
 }
 
-async function searchOntology(query: string, ontology: 'doid' | 'hp', rows = 5): Promise<OntologyTerm[]> {
+async function searchOntology(query: string, ontology: OntologyTerm['ontology'], rows = 5): Promise<OntologyTerm[]> {
   const url = `${OLS4_BASE}?q=${encodeURIComponent(query)}&ontology=${ontology}&rows=${rows}&exact=false`
   const res = await fetch(url, { signal: AbortSignal.timeout(8000) })
   if (!res.ok) throw new Error(`OLS4 ${ontology} search failed: ${res.status}`)
@@ -111,4 +111,36 @@ export async function anatomyOntologyLookup(terms: string[]): Promise<{ diseases
     }
   }
   return { diseases: diseases.slice(0, 8), phenotypes: phenotypes.slice(0, 8) }
+}
+
+/**
+ * Istilah STRUKTUR ANATOMI (bukan penyakit/gejala) dari dua ontologi anatomi
+ * yang juga dilayani OLS4 tanpa API key:
+ *
+ *   - UBERON — ontologi anatomi lintas spesies.
+ *   - FMA (Foundational Model of Anatomy) — ontologi anatomi manusia paling
+ *     rinci yang tersedia bebas.
+ *
+ * Ini menutup dua celah yang memang TIDAK ADA geometrinya di model 3D
+ * Z-Anatomy/BodyParts3D (sudah diperiksa sampai tingkat koleksi, bukan
+ * diasumsikan): organ reproduksi wanita (uterus, ovarium, tuba uterina,
+ * serviks, vagina) dan struktur mikroskopik kulit (epidermis, dermis, folikel
+ * rambut, kelenjar sebasea/keringat). Untuk keduanya, aplikasi kini punya
+ * istilah anatomi nyata berikut definisinya, meski bentuk 3D-nya belum ada.
+ */
+export async function anatomyStructureLookup(terms: string[]): Promise<OntologyTerm[]> {
+  const unik = [...new Set(terms.map((t) => t.trim()).filter(Boolean))].slice(0, 4)
+  const hasil = await Promise.all(
+    unik.flatMap((t) => [
+      searchOntology(t, 'uberon', 4).catch(() => [] as OntologyTerm[]),
+      searchOntology(t, 'fma', 4).catch(() => [] as OntologyTerm[]),
+    ]),
+  )
+  const out: OntologyTerm[] = []
+  for (const daftar of hasil) {
+    for (const term of daftar) {
+      if (!out.some((x) => x.label.toLowerCase() === term.label.toLowerCase())) out.push(term)
+    }
+  }
+  return out.slice(0, 10)
 }

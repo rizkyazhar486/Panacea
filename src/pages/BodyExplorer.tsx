@@ -1,12 +1,12 @@
 import { useState } from 'react'
 import { Card, SectionTitle } from '../components/ui'
 import { IconActivity, IconSearch, IconStethoscope } from '../components/icons'
-import { api, type OntologyTerm, type DrugLabelInfo } from '../lib/api'
+import { api, type OntologyTerm, type DrugLabelInfo, type AnatomyImage } from '../lib/api'
 import { explainBodyRegion, explainDrug } from '../lib/ai'
 import { useStore } from '../lib/store'
 import { Body3D, ANATOMY_LAYERS, type AnatomyLayer } from '../components/Body3D'
 import { WORKOUT_MUSCLE_GROUPS } from '../lib/workoutMuscles'
-import { TISSUE_TYPES, ORGAN_SYSTEMS, BODY_REGIONS, type AnatomyEntry } from '../lib/anatomyHierarchy'
+import { TISSUE_TYPES, ORGAN_SYSTEMS, BODY_REGIONS, IMAGE_ONLY_STRUCTURES, type AnatomyEntry } from '../lib/anatomyHierarchy'
 import { ORGAN_FOCUS } from '../lib/organFocus'
 import { IconChevronRight } from '../components/icons'
 
@@ -114,6 +114,9 @@ export function BodyExplorer() {
   const [highlighted, setHighlighted] = useState<string[]>([])
   const [activeOrgan, setActiveOrgan] = useState<string | null>(null)
   const [focusKeywords, setFocusKeywords] = useState<string[] | null>(null)
+  const [images, setImages] = useState<AnatomyImage[]>([])
+  const [imagesLoading, setImagesLoading] = useState(false)
+  const [imageKind, setImageKind] = useState<'anatomy' | 'pathology'>('anatomy')
 
   async function lookup(label: string, searchTerms: string[]) {
     setSelectedLabel(label)
@@ -122,6 +125,11 @@ export function BodyExplorer() {
     setExplanation('')
     setDiseases([])
     setPhenotypes([])
+    setImages([])
+    setImageKind('anatomy')
+    // Gambar diambil paralel dan TIDAK ikut menggagalkan lookup kalau
+    // sumbernya sedang tidak bisa dijangkau — istilah ontologinya tetap muncul.
+    loadImages(label, 'anatomy')
     try {
       const { diseases: d, phenotypes: p } = await api.anatomyOntology(searchTerms)
       setDiseases(d)
@@ -132,6 +140,19 @@ export function BodyExplorer() {
       setExplanation('Could not reach the ontology service right now. Please try again in a moment.')
     } finally {
       setLoading(false)
+    }
+  }
+
+  async function loadImages(term: string, kind: 'anatomy' | 'pathology') {
+    setImagesLoading(true)
+    setImageKind(kind)
+    try {
+      const { images: imgs } = await api.anatomyImages(term, kind)
+      setImages(imgs)
+    } catch {
+      setImages([])
+    } finally {
+      setImagesLoading(false)
     }
   }
 
@@ -349,6 +370,17 @@ export function BodyExplorer() {
           <HierarchyGroup title="Tissue types (4)" entries={TISSUE_TYPES} onPick={onPickHierarchyEntry} onView3d={onViewLayer3d} />
           <HierarchyGroup title="Organ systems (11)" entries={ORGAN_SYSTEMS} onPick={onPickHierarchyEntry} onView3d={onViewLayer3d} />
           <HierarchyGroup title="Body regions (8)" entries={BODY_REGIONS} onPick={onPickHierarchyEntry} onView3d={onViewLayer3d} />
+          <HierarchyGroup
+            title="Female reproductive & skin (images + reference)"
+            entries={IMAGE_ONLY_STRUCTURES}
+            onPick={onPickHierarchyEntry}
+            onView3d={onViewLayer3d}
+          />
+          <p className="px-1 text-[10.5px] leading-relaxed text-neutral-400">
+            These structures have no geometry in the 3D dataset — female reproductive anatomy is absent from
+            BodyParts3D entirely, and skin is deliberately stripped so the anatomy beneath it is visible. They are
+            covered here with real anatomical terms (UBERON/FMA) and freely-licensed images instead.
+          </p>
         </div>
 
         <div className="mt-4 min-w-0">
@@ -377,6 +409,53 @@ export function BodyExplorer() {
                   )}
                 </>
               )}
+
+              <div>
+                <div className="flex flex-wrap items-center gap-1.5">
+                  <span className="t-mikro font-bold uppercase tracking-wide text-neutral-500">Images</span>
+                  <button
+                    onClick={() => loadImages(selectedLabel, 'anatomy')}
+                    className={`min-h-[28px] rounded-full border px-2.5 text-[11px] font-bold transition ${
+                      imageKind === 'anatomy' ? 'border-brand bg-brand text-white' : 'border-neutral-200 text-neutral-500 dark:border-white/10'
+                    }`}
+                  >
+                    Anatomy
+                  </button>
+                  <button
+                    onClick={() => loadImages(selectedLabel, 'pathology')}
+                    className={`min-h-[28px] rounded-full border px-2.5 text-[11px] font-bold transition ${
+                      imageKind === 'pathology' ? 'border-brand bg-brand text-white' : 'border-neutral-200 text-neutral-500 dark:border-white/10'
+                    }`}
+                  >
+                    Pathology
+                  </button>
+                </div>
+                {imagesLoading && <p className="mt-1.5 text-sm text-neutral-500">Loading images…</p>}
+                {!imagesLoading && images.length === 0 && (
+                  <p className="mt-1.5 text-sm text-neutral-500">No freely-licensed images found for this.</p>
+                )}
+                {!imagesLoading && images.length > 0 && (
+                  <div className="mt-1.5 grid grid-cols-2 gap-2">
+                    {images.map((img) => (
+                      <figure key={img.url} className="overflow-hidden rounded-xl bg-neutral-50 dark:bg-white/5">
+                        <img src={img.url} alt={img.title} loading="lazy" className="h-32 w-full bg-white object-contain" />
+                        {/* Lisensi & pembuat WAJIB tampil — syarat CC, bukan hiasan. */}
+                        <figcaption className="p-1.5">
+                          <div className="line-clamp-2 text-[11px] font-semibold text-ink dark:text-white">{img.title}</div>
+                          <a
+                            href={img.sourcePage}
+                            target="_blank"
+                            rel="noreferrer"
+                            className="mt-0.5 block truncate text-[10px] text-neutral-400 underline"
+                          >
+                            {img.artist} · {img.license}
+                          </a>
+                        </figcaption>
+                      </figure>
+                    ))}
+                  </div>
+                )}
+              </div>
             </div>
           )}
         </div>
@@ -389,6 +468,11 @@ export function BodyExplorer() {
         <p className="mt-1 text-[11px] leading-relaxed text-neutral-400">
           3D anatomy model: <a href={`${import.meta.env.BASE_URL}anatomy/CREDITS.txt`} target="_blank" rel="noreferrer" className="underline">Z-Anatomy</a>,
           based on BodyParts3D — licensed under CC BY-SA 4.0.
+        </p>
+        <p className="mt-1 text-[11px] leading-relaxed text-neutral-400">
+          Anatomy and pathology images come from <a href="https://commons.wikimedia.org" target="_blank" rel="noreferrer" className="underline">Wikimedia Commons</a> —
+          public-domain or Creative Commons files, each shown with its own author and licence. They are teaching
+          images from a public archive, not photographs of you or of any patient of this clinic.
         </p>
       </Card>
 
