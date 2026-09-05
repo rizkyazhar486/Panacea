@@ -10,6 +10,7 @@ import { deretMetrik } from '../lib/riwayatVitals'
 import { getVitals } from '../lib/healthVitals'
 import { getWorkouts } from '../lib/workoutStore'
 import { statusSingkat } from '../lib/pelatih'
+import '../styles/metal.css'
 import { hrMaxFromAge } from '../lib/workoutImport'
 import { ageFromDob } from '../lib/anthro'
 import { ambilTujuan, modeAwam } from '../lib/tujuan'
@@ -393,7 +394,10 @@ export default function Beranda() {
       {/* ── PANEL ATAS — dibaca menyilang (Z) ───────────────────────────────
           kiri-atas: siapa saya · kanan-atas: aksi utama
           kiri-bawah: angka       · kanan-bawah: ke mana lanjut          */}
-      <section className="kaca-hero prism-rays p-fluid overflow-hidden rounded-3xl">
+      {/* prism-rays (sinar pelangi) dilepas dari sini: motifnya terbaca sebagai
+          bendera pride, bukan "kejayaan". Kilau emas/peraknya kini ada di
+          .kaca-hero itu sendiri. */}
+      <section className="kaca-hero p-fluid overflow-hidden rounded-3xl">
         <div className="flex items-start justify-between gap-3">
           <div className="min-w-0">
             <h1 className="t-judul truncate font-black leading-tight text-white drop-shadow-sm">
@@ -404,9 +408,13 @@ export default function Beranda() {
               halaman pencarian. Berpindah halaman untuk mencari berarti
               kehilangan tempat yang sedang dibaca, dan sesudah selesai harus
               kembali lagi. */}
+          {/* Hijau merek di atas panel emas terbaca seperti dua tema yang
+              bertabrakan. Tombolnya memakai emas tempa yang sama dari
+              styles/metal.css — sistem yang sudah ada di aplikasi ini, bukan
+              warna baru yang dikarang di sini. */}
           <button
             onClick={() => window.dispatchEvent(new Event('panacea:cari'))}
-            className="t-sedang flex h-11 shrink-0 items-center rounded-full bg-brand px-5 font-bold text-white transition active:scale-95"
+            className="metal-gold t-sedang flex h-11 shrink-0 items-center rounded-full px-5 font-black transition active:scale-95"
           >
             Search
           </button>
