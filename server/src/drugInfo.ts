@@ -42,6 +42,10 @@ export interface DrugLabelInfo {
   mechanismOfAction: string
   adverseReactions: string
   warnings: string
+  /** Dosis & cara pakai, dikutip dari label. Kosong kalau labelnya tidak memuat. */
+  dosage: string
+  /** Untuk keadaan apa dan kapan dipakai, dikutip dari label. */
+  indications: string
 }
 
 function firstSentences(text: string | undefined, max = 3): string {
@@ -64,6 +68,8 @@ async function queryOpenFda(name: string): Promise<DrugLabelInfo | null> {
       adverse_reactions?: string[]
       warnings?: string[]
       warnings_and_cautions?: string[]
+      dosage_and_administration?: string[]
+      indications_and_usage?: string[]
     }[]
   }
   const r = data.results?.[0]
@@ -75,6 +81,12 @@ async function queryOpenFda(name: string): Promise<DrugLabelInfo | null> {
     mechanismOfAction: firstSentences(r.mechanism_of_action?.[0], 3),
     adverseReactions: firstSentences(r.adverse_reactions?.[0], 4),
     warnings: firstSentences(r.warnings?.[0] ?? r.warnings_and_cautions?.[0], 3),
+    // Dosis diberi jatah kalimat lebih banyak daripada bagian lain: aturan
+    // dosis nyata hampir selalu bercabang (dewasa/anak, ginjal, dosis awal
+    // vs rumatan), dan memotongnya di kalimat ketiga bisa menyisakan separuh
+    // aturan yang terbaca seolah aturan utuh.
+    dosage: firstSentences(r.dosage_and_administration?.[0], 6),
+    indications: firstSentences(r.indications_and_usage?.[0], 4),
   }
 }
 

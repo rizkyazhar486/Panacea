@@ -32,6 +32,14 @@ export const config = {
     subject: process.env.VAPID_SUBJECT || 'mailto:admin@panaceamed.id',
   },
   emailFrom: process.env.EMAIL_FROM || 'Panaceamed.id <onboarding@resend.dev>',
+  // ICD-11 WHO. Gratis, tapi lewat OAuth2 client credentials yang perlu
+  // didaftarkan sekali di https://icd.who.int/icdapi. Kalau kosong, pencarian
+  // diagnosis jatuh ke ICD-10-CM (NLM, tanpa kunci) dan layarnya berkata
+  // demikian — lihat server/src/icd11.ts.
+  whoIcd: {
+    clientId: process.env.WHO_ICD_CLIENT_ID || '',
+    clientSecret: process.env.WHO_ICD_CLIENT_SECRET || '',
+  },
 }
 
 // Feature is "live" only when its credentials are present; otherwise mock mode.
@@ -42,4 +50,5 @@ export const features = {
   pushLive: Boolean(config.vapid.publicKey && config.vapid.privateKey),
   emailLive: Boolean(process.env.RESEND_API_KEY),
   payoutLive: Boolean(process.env.IRIS_API_KEY || process.env.IRIS_CREATOR_KEY),
+  icd11Live: Boolean(process.env.WHO_ICD_CLIENT_ID && process.env.WHO_ICD_CLIENT_SECRET),
 }

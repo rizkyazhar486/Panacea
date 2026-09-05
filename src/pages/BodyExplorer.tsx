@@ -9,6 +9,14 @@ import { WORKOUT_MUSCLE_GROUPS } from '../lib/workoutMuscles'
 import { TISSUE_TYPES, TISSUE_SUBTYPES, ORGAN_SYSTEMS, BODY_REGIONS, IMAGE_ONLY_STRUCTURES, type AnatomyEntry } from '../lib/anatomyHierarchy'
 import { ORGAN_FOCUS } from '../lib/organFocus'
 import { IconChevronRight } from '../components/icons'
+import { lazy, Suspense } from 'react'
+import { Link } from 'react-router-dom'
+
+// Bagian berat dimuat saat dibuka saja — pengguna yang cuma memutar model 3D
+// tidak perlu ikut mengunduh tabel fisiologi dan pencarian obat.
+const PhysiologySection = lazy(() => import('./bodyhub/PhysiologySection'))
+const DrugSection = lazy(() => import('./bodyhub/DrugSection'))
+const DiseaseSection = lazy(() => import('./bodyhub/DiseaseSection'))
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Body Explorer — model 3D anatomi NYATA (lihat Body3D.tsx untuk sumber data
@@ -50,13 +58,21 @@ function Chip({
 // sekaligus, jadi viewer terdorong jauh ke atas layar dan halaman terasa
 // panjang tanpa ujung. Sekarang keempatnya berbagi satu panel bertab: isinya
 // tetap lengkap, yang terlihat sekaligus hanya satu.
-type PanelTab = 'layers' | 'muscles' | 'organs' | 'reference'
+// Satu model 3D, banyak cara memakainya. Semua tab di bawah berbagi viewer
+// yang SAMA di atas layar: memilih otot latihan, organ, sistem faal, atau obat
+// sama-sama menyorot struktur pada figur yang itu-itu juga. Itulah maksud
+// "satu simulasi tubuh yang utuh" — bukan enam halaman yang saling menyebut,
+// melainkan satu tubuh yang ditanyai dari enam sudut.
+type PanelTab = 'layers' | 'muscles' | 'organs' | 'physiology' | 'drugs' | 'diseases' | 'reference'
 
 const PANEL_TABS: Array<{ key: PanelTab; label: string }> = [
   { key: 'layers', label: 'Layers' },
-  { key: 'muscles', label: 'Muscles' },
+  { key: 'muscles', label: 'Workout' },
   { key: 'organs', label: 'Organs' },
-  { key: 'reference', label: 'Reference' },
+  { key: 'physiology', label: 'Physiology' },
+  { key: 'drugs', label: 'Drugs' },
+  { key: 'diseases', label: 'Diseases' },
+  { key: 'reference', label: 'Study' },
 ]
 
 const IMAGE_KINDS: Array<{ key: ImageKind; label: string }> = [
@@ -268,6 +284,34 @@ export function BodyExplorer() {
     if (!layers.has(layer)) toggleLayer(layer)
   }
 
+  // Obat memilih struktur lewat KATA KUNCI (tempat kerjanya bisa tersebar di
+  // beberapa organ sekaligus), dan lapisan yang memuatnya dinyalakan dulu —
+  // menyorot ginjal saat lapisan Organs mati berarti tidak menyorot apa pun.
+  function onHighlightSites(keywords: string[], perluLayer: Array<AnatomyLayer['key']>) {
+    setActiveWorkout(null)
+    setActiveOrgan(null)
+    setHighlighted([])
+    setFocusKeywords(keywords.length ? keywords : null)
+    if (perluLayer.length) {
+      setLayers((prev) => {
+        const next = new Set(prev)
+        for (const l of perluLayer) next.add(l)
+        return next
+      })
+    }
+  }
+
+  // Satu sistem faal dibuka — lapisannya dinyalakan dan istilah/gambarnya
+  // diambil, sama seperti entri anatomi mana pun.
+  function onPickSystem(layer: AnatomyLayer['key'] | undefined, searchTerms: string[], label: string) {
+    setActiveWorkout(null)
+    setActiveOrgan(null)
+    setHighlighted([])
+    setFocusKeywords(null)
+    if (layer && !layers.has(layer)) toggleLayer(layer)
+    lookup(label, searchTerms)
+  }
+
   // "Ask" — pencarian bebas (bahasa natural atau gejala/fungsi). Kalau
   // pertanyaannya cocok dengan salah satu target latihan otot, otot itu ikut
   // disorot di model 3D.
@@ -402,12 +446,16 @@ export function BodyExplorer() {
             ditumpuk sekaligus. Isinya sama persis, cuma tidak semuanya
             berteriak bersamaan. */}
         <div className="mt-4">
-          <div className="flex gap-1 rounded-xl bg-neutral-100 p-1 dark:bg-white/5">
+          {/* Tujuh tab tidak muat dibagi rata di layar 390px — dipaksa
+              flex-1 membuat halamannya menggulir ke samping, dan itu terukur:
+              scrollWidth 427 pada clientWidth 390. Jadi barisnya digulirkan
+              sendiri secara mendatar dan tiap tab memakai lebar teksnya. */}
+          <div className="-mx-1 flex gap-1 overflow-x-auto rounded-xl bg-neutral-100 p-1 dark:bg-white/5">
             {PANEL_TABS.map((t) => (
               <button
                 key={t.key}
                 onClick={() => setPanelTab(t.key)}
-                className={`min-h-[34px] flex-1 rounded-lg text-xs font-bold transition ${
+                className={`min-h-[34px] shrink-0 rounded-lg px-3 text-xs font-bold transition ${
                   panelTab === t.key
                     ? 'bg-white text-ink shadow-sm dark:bg-white/15 dark:text-white'
                     : 'text-neutral-500'
@@ -464,6 +512,24 @@ export function BodyExplorer() {
               </>
             )}
 
+            {panelTab === 'physiology' && (
+              <Suspense fallback={<p className="text-sm text-neutral-500">Loading physiology…</p>}>
+                <PhysiologySection onPickSystem={onPickSystem} />
+              </Suspense>
+            )}
+
+            {panelTab === 'drugs' && (
+              <Suspense fallback={<p className="text-sm text-neutral-500">Loading drug bank…</p>}>
+                <DrugSection onHighlightSites={onHighlightSites} />
+              </Suspense>
+            )}
+
+            {panelTab === 'diseases' && (
+              <Suspense fallback={<p className="text-sm text-neutral-500">Loading diagnosis search…</p>}>
+                <DiseaseSection onPickDiagnosis={(title) => lookup(title, [title])} />
+              </Suspense>
+            )}
+
             {panelTab === 'reference' && (
               <div className="space-y-2">
                 <HierarchyGroup title="Tissue types (4)" entries={TISSUE_TYPES} onPick={onPickHierarchyEntry} onView3d={onViewLayer3d} />
@@ -476,6 +542,34 @@ export function BodyExplorer() {
                   onPick={onPickHierarchyEntry}
                   onView3d={onViewLayer3d}
                 />
+                {/* Catatan & kurikulum kedokteran tetap tinggal di Med Study
+                    Hub — isinya ratusan kilobyte dan tidak pantas ikut termuat
+                    tiap kali orang memutar model 3D. Yang digabung di sini
+                    adalah PINTUNYA, tepat di sebelah anatominya. */}
+                <div className="rounded-xl border border-brand/30 bg-brand/5 p-2.5 dark:bg-brand/10">
+                  <div className="text-sm font-bold text-ink dark:text-white">Notes &amp; curriculum</div>
+                  <p className="mt-0.5 text-[11px] leading-relaxed text-neutral-500">
+                    Disease notes, therapy reference, OSCE stations and the preclinical curriculum, opened straight
+                    at the section you need.
+                  </p>
+                  <div className="mt-1.5 flex flex-wrap gap-1.5">
+                    {[
+                      { to: '/med-study?bagian=diseases', label: 'Disease notes' },
+                      { to: '/med-study?bagian=therapy', label: 'Therapy reference' },
+                      { to: '/med-study?bagian=usmle', label: 'Preclinical curriculum' },
+                      { to: '/med-study?bagian=osce', label: 'OSCE' },
+                      { to: '/med-study?bagian=practice', label: 'Question bank' },
+                    ].map((l) => (
+                      <Link
+                        key={l.to}
+                        to={l.to}
+                        className="rounded-full border border-brand px-2.5 py-1 text-[11px] font-bold text-brand"
+                      >
+                        {l.label}
+                      </Link>
+                    ))}
+                  </div>
+                </div>
                 <p className="px-1 text-[10.5px] leading-relaxed text-neutral-400">
                   These structures have no geometry in the 3D dataset — female reproductive anatomy is absent from
                   BodyParts3D entirely, and skin is deliberately stripped so the anatomy beneath it is visible. They

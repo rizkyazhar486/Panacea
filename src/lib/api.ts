@@ -38,6 +38,34 @@ export interface OntologyTerm { id: string; label: string; ontology: 'doid' | 'h
  *  mengambil citra modalitas NYATA, bukan render 3D bergaya radiologi. */
 export type ImageKind = 'anatomy' | 'pathology' | 'histology' | 'xray' | 'ct' | 'mri'
 
+export interface IcdEntry {
+  code: string
+  title: string
+  chapter?: string
+  definition?: string
+  uri?: string
+  /** 'icd11' = WHO ICD-11 MMS; 'icd10cm' = jalur cadangan NLM. Selalu tampil. */
+  sumber: 'icd11' | 'icd10cm'
+}
+
+export interface DrugClass {
+  id: string
+  nama: string
+  jenis: string
+  relasi: string
+  sumber: string
+}
+
+export interface PharmProfile {
+  nama: string
+  rxcui: string
+  mekanisme: DrugClass[]
+  efekFisiologis: DrugClass[]
+  kelasFarmakologi: DrugClass[]
+  atc: DrugClass[]
+  indikasi: DrugClass[]
+}
+
 export interface AnatomyImage {
   title: string
   url: string
@@ -47,7 +75,7 @@ export interface AnatomyImage {
   artist: string
   description: string
 }
-export interface DrugLabelInfo { brandName: string; genericName: string; purpose: string; mechanismOfAction: string; adverseReactions: string; warnings: string }
+export interface DrugLabelInfo { brandName: string; genericName: string; purpose: string; mechanismOfAction: string; adverseReactions: string; warnings: string; dosage: string; indications: string }
 export interface MarketCandle { t: number; c: number; o?: number; h?: number; l?: number; v?: number }
 export interface MarketQuote {
   symbol: string; name: string; currency: string
@@ -262,6 +290,20 @@ export const api = {
   anatomyStructure: (terms: string[]) =>
     req<{ structures: OntologyTerm[] }>(
       `/api/anatomy/structure?terms=${encodeURIComponent(terms.join(','))}`),
+  // ICD-11 (WHO) dengan jalur cadangan ICD-10-CM. `icd11` menyatakan jalur
+  // mana yang benar-benar dipakai — layar WAJIB menampilkannya apa adanya.
+  icdSearch: (q: string) =>
+    req<{ results: IcdEntry[]; icd11: boolean }>(`/api/icd/search?q=${encodeURIComponent(q)}`),
+
+  // Profil farmakologi RxClass — dasar untuk menyorot tempat kerja obat di 3D.
+  drugPharmacology: (name: string) =>
+    req<PharmProfile>(`/api/drug/pharmacology?name=${encodeURIComponent(name)}`),
+
+  // Bank data zat aktif RxNorm (belasan ribu entri).
+  drugIngredients: (q: string) =>
+    req<{ results: Array<{ rxcui: string; nama: string }>; total: number }>(
+      `/api/drug/ingredients?q=${encodeURIComponent(q)}`),
+
   anatomyImages: (q: string, kind: ImageKind = 'anatomy') =>
     req<{ images: AnatomyImage[] }>(
       `/api/anatomy/images?q=${encodeURIComponent(q)}&kind=${kind}`),

@@ -113,6 +113,8 @@ import { putusanPengingat } from './jadwal.js'
 import { aiMessages, aiConsult, aiVision, aiOperator, reviewApplicationText, draftSecondOpinion, generateOperatorBriefing, aiConfigured, aiStatus } from './ai.js'
 import { anatomyOntologyLookup, anatomyStructureLookup } from './anatomyOntology.js'
 import { anatomyImageLookup, pathologyImageLookup, histologyImageLookup, xrayImageLookup, ctImageLookup, mriImageLookup } from './anatomyImages.js'
+import { cariDiagnosis, icd11Configured } from './icd11.js'
+import { profilFarmakologi, cariZatAktif, daftarSemuaZatAktif } from './rxclass.js'
 import { lookupDrugLabel } from './drugInfo.js'
 import { sendEmail } from './email.js'
 import { sendPush, notify, keadaanPush } from './push.js'
@@ -287,6 +289,53 @@ app.get('/api/anatomy/images', async (req, res) => {
     res.json({ images })
   } catch (e) {
     res.status(502).json({ error: 'Image lookup gagal', detail: (e as Error).message })
+  }
+})
+
+// Pencarian diagnosis ICD-11 (WHO). Kalau kredensial WHO tidak dipasang,
+// jatuh ke ICD-10-CM lewat NLM — tiap hasil membawa penanda `sumber`-nya
+// sendiri supaya layar tidak pernah menyebut ICD-10 sebagai ICD-11.
+// Publik, tanpa auth.
+app.get('/api/icd/search', async (req, res) => {
+  const q = String(req.query.q ?? '').trim()
+  if (!q) return res.status(400).json({ error: 'q wajib diisi' })
+  try {
+    const results = await cariDiagnosis(q, Math.min(Number(req.query.limit) || 20, 50))
+    res.json({ results, icd11: icd11Configured })
+  } catch (e) {
+    res.status(502).json({ error: 'ICD lookup gagal', detail: (e as Error).message })
+  }
+})
+
+// Profil farmakologi satu obat dari RxClass (NLM): mekanisme kerja, efek
+// fisiologis, kelas farmakologi FDA, kelompok ATC, dan indikasinya. Inilah
+// yang dipakai layar untuk menentukan struktur 3D mana yang disorot.
+// Publik, tanpa auth.
+app.get('/api/drug/pharmacology', async (req, res) => {
+  const name = String(req.query.name ?? '').trim()
+  if (!name) return res.status(400).json({ error: 'name wajib diisi' })
+  try {
+    const profil = await profilFarmakologi(name)
+    if (!profil) return res.status(404).json({ error: 'Tidak ada data kelas untuk nama itu' })
+    res.json(profil)
+  } catch (e) {
+    res.status(502).json({ error: 'Pharmacology lookup gagal', detail: (e as Error).message })
+  }
+})
+
+// Bank data zat aktif RxNorm — belasan ribu entri, bukan daftar tulisan
+// tangan. Tanpa q, mengembalikan cuplikan awal beserta jumlah totalnya
+// supaya layar bisa menyebut angka yang sebenarnya. Publik, tanpa auth.
+app.get('/api/drug/ingredients', async (req, res) => {
+  const q = String(req.query.q ?? '').trim()
+  try {
+    const [results, semua] = await Promise.all([
+      cariZatAktif(q, Math.min(Number(req.query.limit) || 40, 100)),
+      daftarSemuaZatAktif(),
+    ])
+    res.json({ results, total: semua.length })
+  } catch (e) {
+    res.status(502).json({ error: 'Ingredient lookup gagal', detail: (e as Error).message })
   }
 })
 
