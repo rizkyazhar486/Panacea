@@ -3,6 +3,7 @@ import * as THREE from 'three'
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'
 import { MeshoptDecoder } from 'three/examples/jsm/libs/meshopt_decoder.module.js'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
+import { SEBAR_PERISTALTIK } from '../lib/motionWave'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Model 3D anatomi NYATA — bukan bentuk geometris buatan sendiri (bola/kapsul/
@@ -90,6 +91,8 @@ function loadLayer(file: string, onProgress?: (pct: number) => void): Promise<TH
 }
 
 const HIGHLIGHT = new THREE.Color(0x00bf63)
+
+function batasSatu(x: number) { return Math.max(0, Math.min(1, x)) }
 
 function isDescendantOf(obj: THREE.Object3D, ancestor: THREE.Object3D): boolean {
   let p: THREE.Object3D | null = obj
@@ -281,14 +284,34 @@ export interface MotionState {
   respRate: number
   /** Repetisi per menit untuk otot yang disorot. 0 mematikan. */
   contractionRate: number
+  /**
+   * Gelombang peristaltik saluran cerna, per menit. 0 mematikan.
+   *
+   * Ini gerak yang paling sering keliru dibayangkan orang: usus tidak
+   * meremas seluruhnya bersamaan, melainkan MENJALARKAN gelombang dari
+   * lambung ke arah anus. Karena itu tiap ruas diberi selisih fase menurut
+   * letaknya di sepanjang saluran — selisih fase itulah peristaltiknya, dan
+   * meremas serempak justru menggambarkan hal yang salah.
+   */
+  peristalsisRate?: number
 }
 
-export const MOTION_OFF: MotionState = { heartRate: 0, respRate: 0, contractionRate: 0 }
-export const MOTION_REST: MotionState = { heartRate: 70, respRate: 14, contractionRate: 0 }
-export const MOTION_EXERCISE: MotionState = { heartRate: 160, respRate: 40, contractionRate: 30 }
+export const MOTION_OFF: MotionState = { heartRate: 0, respRate: 0, contractionRate: 0, peristalsisRate: 0 }
+// Peristaltik istirahat ~3/menit di lambung dan ~8-12/menit di usus halus;
+// dipakai satu nilai madya karena modelnya tidak memisahkan keduanya.
+export const MOTION_REST: MotionState = { heartRate: 70, respRate: 14, contractionRate: 0, peristalsisRate: 8 }
+// Saat olahraga aliran darah dialihkan dari usus ke otot dan motilitasnya
+// TURUN — itulah sebab kram dan mual saat berlari sesudah makan. Angkanya
+// sengaja lebih kecil daripada saat istirahat, bukan lebih besar.
+export const MOTION_EXERCISE: MotionState = { heartRate: 160, respRate: 40, contractionRate: 30, peristalsisRate: 3 }
 
 const KATA_JANTUNG = ['atrium', 'ventricle', 'heart', 'papillary muscle']
 const KATA_PARU = [' lung', 'lung ', 'bronch', 'alveol', 'diaphragm']
+// Saluran cerna, dari lambung sampai rektum. Ureter ikut karena ia juga
+// mendorong isinya dengan gelombang, bukan mengalirkannya pasif.
+const KATA_CERNA = ['stomach', 'duodenum', 'jejunum', 'ileum', 'colon', 'caecum', 'cecum', 'sigmoid', 'rectum', 'ureter']
+// Arteri besar. Denyutnya MENYUSUL denyut jantung, tidak serentak dengannya.
+const KATA_ARTERI = ['artery', 'arteria', 'aorta', 'trunk']
 
 function cocokSalahSatu(nama: string, kata: string[]): boolean {
   const n = nama.toLowerCase()
@@ -341,7 +364,11 @@ export function Body3D({ layers, highlighted, focusKeywords, renderMode, ctWindo
   const animatedRef = useRef<{
     heart: THREE.Object3D[]
     lungs: THREE.Object3D[]
-  }>({ heart: [], lungs: [] })
+    /** Ruas saluran cerna beserta fase relatifnya (0..1) menurut letaknya. */
+    gut: Array<{ obj: THREE.Object3D; fase: number }>
+    /** Arteri beserta jeda denyutnya dari jantung, dalam detik. */
+    artery: Array<{ obj: THREE.Object3D; jeda: number }>
+  }>({ heart: [], lungs: [], gut: [], artery: [] })
   const hasFitRef = useRef(false)
   const highlightedMeshesRef = useRef<Map<THREE.Mesh, { original: THREE.Color; matchedName: string }>>(new Map())
   const onPickRef = useRef(onPick)
@@ -500,6 +527,42 @@ export function Body3D({ layers, highlighted, focusKeywords, renderMode, ctWindo
         }
       }
 
+      // Peristaltik: SATU gelombang yang menjalar, bukan seluruh usus meremas
+      // bersamaan. Tiap ruas memakai fase yang sama tapi digeser menurut
+      // letaknya di sepanjang saluran, sehingga yang terlihat adalah
+      // gelombang berjalan dari lambung ke arah rektum — yang memang itulah
+      // peristaltik. Meremas serempak akan menggambarkan hal yang keliru.
+      if ((m.peristalsisRate ?? 0) > 0 && animatedRef.current.gut.length) {
+        const laju = (m.peristalsisRate ?? 0) / 60
+        for (const g of animatedRef.current.gut) {
+          const dasar = g.obj.userData.baseScale as THREE.Vector3 | undefined
+          if (!dasar) continue
+          // Gelombangnya sempit: hanya sebagian kecil saluran yang sedang
+          // meremas pada satu saat, sisanya melebar menerima isinya.
+          const fase = ((t * laju) - g.fase * SEBAR_PERISTALTIK) % 1
+          const remas = fase > 0 && fase < 0.25 ? Math.sin((fase / 0.25) * Math.PI) : 0
+          const k = 1 - remas * 0.12
+          g.obj.scale.set(dasar.x * k, dasar.y * k, dasar.z * k)
+        }
+      }
+
+      // Denyut arteri MENYUSUL denyut jantung, tidak serentak dengannya.
+      // Gelombang nadi merambat sekitar 5 m/detik, jadi arteri di tungkai
+      // berdenyut puluhan milidetik sesudah aorta. Jeda itu dihitung dari
+      // jarak sebenarnya tiap pembuluh ke jantung.
+      if (m.heartRate > 0 && animatedRef.current.artery.length) {
+        const periode = 60 / m.heartRate
+        for (const a of animatedRef.current.artery) {
+          const dasar = a.obj.userData.baseScale as THREE.Vector3 | undefined
+          if (!dasar) continue
+          const fase = (((t - a.jeda) % periode) + periode) % periode / periode
+          // Naik cepat, turun perlahan — bentuk gelombang nadi, bukan sinus.
+          const nadi = fase < 0.2 ? Math.sin((fase / 0.2) * Math.PI) : 0
+          const k = 1 + nadi * 0.035
+          a.obj.scale.set(dasar.x * k, dasar.y * k, dasar.z * k)
+        }
+      }
+
       // Otot yang sedang disorot berkontraksi pada tempo latihan. Fase
       // konsentrik cepat, eksentrik dua kali lebih lambat — tempo angkatan
       // yang dianjurkan, bukan getaran hias.
@@ -578,6 +641,17 @@ export function Body3D({ layers, highlighted, focusKeywords, renderMode, ctWindo
               } else if (cocokSalahSatu(nama, KATA_PARU)) {
                 obj.userData.baseScale = obj.scale.clone()
                 animatedRef.current.lungs.push(obj)
+              } else if (cocokSalahSatu(nama, KATA_CERNA)) {
+                obj.userData.baseScale = obj.scale.clone()
+                // Fase ditentukan KETINGGIAN ruas itu di tubuh. Saluran cerna
+                // berjalan dari atas (lambung) ke bawah (rektum), jadi tinggi
+                // adalah pendekatan yang layak untuk urutan sepanjang saluran
+                // tanpa perlu tahu topologi ususnya. Nilainya diisi setelah
+                // kotak batas tubuh diketahui, di bawah.
+                animatedRef.current.gut.push({ obj, fase: 0 })
+              } else if (cocokSalahSatu(nama, KATA_ARTERI)) {
+                obj.userData.baseScale = obj.scale.clone()
+                animatedRef.current.artery.push({ obj, jeda: 0 })
               }
             })
             scene.add(clone)
@@ -604,6 +678,28 @@ export function Body3D({ layers, highlighted, focusKeywords, renderMode, ctWindo
                 controls.update()
                 hasFitRef.current = true
                 bodyBoxRef.current = box.clone()
+
+                // Fase peristaltik dan jeda denyut arteri dihitung SEKALI di
+                // sini, saat ukuran tubuh sudah diketahui — bukan tiap frame.
+                const pusat = new THREE.Vector3()
+                const kotak = new THREE.Box3()
+                const tinggiTubuh = Math.max(size.y, 0.1)
+                for (const g of animatedRef.current.gut) {
+                  kotak.setFromObject(g.obj).getCenter(pusat)
+                  // 0 di ujung atas saluran, 1 di ujung bawah.
+                  g.fase = batasSatu((box.max.y - pusat.y) / tinggiTubuh)
+                }
+                // Jeda denyut = jarak dari jantung dibagi kecepatan rambat
+                // gelombang nadi. Pada aorta ia sekitar 5 m/detik, jadi denyut
+                // di pergelangan kaki tiba puluhan milidetik SESUDAH di dada.
+                // Itulah sebabnya nadi diraba, bukan dilihat serentak.
+                const jantung = new THREE.Vector3(center.x, center.y + tinggiTubuh * 0.18, center.z)
+                const PWV = 5
+                const skalaMeter = 1.7 / tinggiTubuh
+                for (const a of animatedRef.current.artery) {
+                  kotak.setFromObject(a.obj).getCenter(pusat)
+                  a.jeda = (pusat.distanceTo(jantung) * skalaMeter) / PWV
+                }
                 homeFramingRef.current = {
                   position: camera.position.clone(),
                   target: center.clone(),
@@ -629,6 +725,8 @@ export function Body3D({ layers, highlighted, focusKeywords, renderMode, ctWindo
         // menahan memorinya.
         const masih = (o: THREE.Object3D) => o.parent !== null && !isDescendantOf(o, have)
         animatedRef.current.heart = animatedRef.current.heart.filter(masih)
+        animatedRef.current.gut = animatedRef.current.gut.filter((g) => masih(g.obj))
+        animatedRef.current.artery = animatedRef.current.artery.filter((a) => masih(a.obj))
         animatedRef.current.lungs = animatedRef.current.lungs.filter(masih)
       }
     }

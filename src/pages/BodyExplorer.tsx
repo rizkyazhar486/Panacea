@@ -245,6 +245,10 @@ export function BodyExplorer() {
   // Simulator latihan menyetir tempo kontraksi otot yang sedang disorot,
   // tanpa mengganggu denyut & napas yang mungkin sedang disetir simulator faal.
   const motion: MotionState = repTempo > 0 ? { ...dasarMotion, contractionRate: repTempo } : dasarMotion
+  // Lapisan yang perlu menyala agar gerak yang dipilih benar-benar KELIHATAN.
+  // Menganimasikan struktur yang lapisannya mati sama saja dengan tidak
+  // menganimasikan apa pun, dan orang akan menyimpulkan fiturnya rusak.
+  const lapisanGerak: Array<AnatomyLayer['key']> = ['cardiovascular', 'visceral']
   // Organ yang isi klinisnya sedang terbuka. Diisi oleh KETUKAN pada figur 3D
   // maupun oleh tombol organ — keduanya masuk lewat pintu yang sama supaya
   // hasilnya identik, tidak peduli dari mana orang datang.
@@ -553,11 +557,25 @@ export function BodyExplorer() {
               Driven by the simulator — the figure is beating at {simVitals.hr}/min and breathing at {simVitals.rr}/min.
             </p>
           )}
+          {motionMode !== 'off' && !layers.has('cardiovascular') && !layers.has('visceral') && (
+            <button
+              onClick={() => setLayers((prev) => { const n = new Set(prev); for (const l of lapisanGerak) n.add(l); return n })}
+              className="mt-1 w-full rounded-full border border-brand px-2.5 py-1 text-[11px] font-bold text-brand"
+            >
+              Turn on Vessels &amp; Organs to see it move →
+            </button>
+          )}
+          {motionMode !== 'off' && (layers.has('cardiovascular') || layers.has('visceral')) && (
+            <p className="mt-1 text-center text-[10px] leading-relaxed text-neutral-400">
+              The arteries pulse a fraction of a second AFTER the heart — the pulse wave travels at about 5 m/s, so
+              the ankle beats later than the chest. The gut squeezes as a travelling wave, not all at once.
+            </p>
+          )}
           {!simVitals && motionMode !== 'off' && (
             <p className="mt-1 text-center text-[10px] leading-relaxed text-neutral-400">
               Heart {motion.heartRate}/min · breathing {motion.respRate}/min
               {motion.contractionRate > 0 && ` · highlighted muscle contracting ${motion.contractionRate}/min`}
-              {' — '}turn on Vessels or Organs to watch the heart and lungs move.
+              {(motion.peristalsisRate ?? 0) > 0 && ` · gut peristalsis ${motion.peristalsisRate}/min`}
             </p>
           )}
         </div>
