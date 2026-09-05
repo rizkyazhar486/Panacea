@@ -159,7 +159,11 @@ export const ORGAN_MODELS: OrganModel[] = [
   },
   {
     id: 'skin',
-    focusKey: null,
+    // Ditautkan belakangan: saat pemetaan ini dibuat, sasaran organ "skin"
+    // belum ada, sehingga berkas skin.glb (5,8 MB) sudah tersalin tapi tidak
+    // pernah bisa dijangkau siapa pun. Sasarannya ditambahkan bersama kelainan
+    // bawaan kulit, dan tautannya sempat tertinggal.
+    focusKey: 'skin',
     label: 'Skin',
     scientificName: 'Integumentum',
     accent: '#c99277',
