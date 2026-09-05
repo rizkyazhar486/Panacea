@@ -1,0 +1,44 @@
+Detailed single-organ models and illustrations
+==============================================
+
+Source
+------
+thebuggeddev/anatomy (https://github.com/thebuggeddev/anatomy)
+Used with the permission of the repository owner, who also owns this
+application. The repository carries no LICENSE file; permission was given
+directly rather than by public licence.
+
+Files
+-----
+  <organ>.glb                  3D model, one per organ
+  <organ>/organ.webp           the organ itself
+  <organ>/location.webp        where it sits in the body
+  <organ>/microscopic.webp     tissue appearance
+  <organ>/compare.webp         size comparison
+
+Organs: brain, eyeball, heart, intestine, kidneys, liver, lungs,
+        pancreas, skin
+
+What these models ARE, and are NOT
+----------------------------------
+These models are AI-GENERATED. Each .glb contains a single mesh named
+"tripo_node_<uuid>", produced by the Tripo 3D generator. They are NOT
+derived from scans, dissection, or any measured human anatomy.
+
+Two consequences, both stated on screen rather than hidden:
+
+  1. The shapes are APPROXIMATIONS that resemble the organ. They are good
+     for recognising general form and position. They are not a reference
+     for anything that depends on exact morphology — vessel branching,
+     chamber proportions, calyceal number, and the like.
+
+  2. Each file is one undivided mesh with no named substructures, so the
+     surface cannot be tapped to identify a part the way the full-body
+     figure can. Parts are marked instead with manually placed coordinate
+     hotspots, each carrying its Terminologia Anatomica term as a
+     language-independent identity.
+
+The full-body figure elsewhere in this application is NOT from this
+source. It uses Z-Anatomy / BodyParts3D (CC BY-SA 4.0), which is derived
+from real human data — see public/anatomy/CREDITS.txt. The two are kept
+separate deliberately, and the difference is declared to the reader.

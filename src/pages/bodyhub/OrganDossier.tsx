@@ -6,6 +6,8 @@ import { SISTEM_FISIOLOGI } from '../../lib/physiology'
 import { ORGAN_FOCUS } from '../../lib/organFocus'
 import type { AnatomyLayer } from '../../components/Body3D'
 import OrganClinicalPanel from './OrganClinicalPanel'
+import { modelForFocus, ILUSTRASI } from '../../lib/organModels'
+import OrganModel3D from '../../components/OrganModel3D'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // BERKAS LENGKAP SATU STRUKTUR — seluruh lapis pengetahuan dalam SATU aliran.
@@ -134,6 +136,10 @@ export function OrganDossier({ organKey, organLabel, onLocate }: Props) {
     (['ossicles', 'nasal-septum'].includes(organKey) && f.key === 'skeletal'),
   )
   const term = organLabel
+  // Model organ tunggal beresolusi tinggi, kalau organ ini punya. Terpisah
+  // dari figur tubuh utuh dan asalnya berbeda — lihat organModels.ts.
+  const model = modelForFocus(organKey)
+  const [hotspot, setHotspot] = useState<string | null>(null)
 
   return (
     <div className="space-y-2">
@@ -158,6 +164,46 @@ export function OrganDossier({ organKey, organLabel, onLocate }: Props) {
       </div>
 
       <Bagian judul="1 · Anatomy" sub="What it is, and where it sits" terbukaAwal>
+        {model && (
+          <>
+            <OrganModel3D organ={model} selected={hotspot} onSelect={setHotspot} />
+            <div className="flex flex-wrap items-center gap-1.5">
+              <span className="text-[11px] font-bold text-neutral-500">{model.scientificName}</span>
+              {model.hotspots.map((h) => (
+                <button
+                  key={h.id}
+                  onClick={() => setHotspot(hotspot === h.id ? null : h.id)}
+                  className={`min-h-[28px] rounded-full border px-2 text-[10.5px] font-bold transition ${
+                    hotspot === h.id ? 'border-brand bg-brand text-white' : 'border-neutral-200 text-neutral-600 dark:border-white/10 dark:text-neutral-300'
+                  }`}
+                >
+                  {h.ta}
+                </button>
+              ))}
+            </div>
+            {/* Asal model dinyatakan di layar. Aplikasi kedokteran harus bisa
+                mengatakan dari mana gambarnya datang, dan model bangkitan AI
+                adalah pendekatan bentuk, bukan geometri terverifikasi. */}
+            <p className="text-[10px] leading-relaxed text-neutral-400">
+              Detailed organ view — an AI-generated model (Tripo), used with the owner’s permission. It is a shape
+              approximation for recognising form and position, not verified anatomy. The full-body figure above uses
+              BodyParts3D, which is derived from real human data.
+            </p>
+            <div className="grid grid-cols-2 gap-2">
+              {ILUSTRASI.map((il) => (
+                <figure key={il.key} className="overflow-hidden rounded-xl bg-neutral-50 dark:bg-white/5">
+                  <img
+                    src={`${import.meta.env.BASE_URL}organs/${model.id}/${il.key}.webp`}
+                    alt={`${model.label} — ${il.label}`}
+                    loading="lazy"
+                    className="h-24 w-full object-cover"
+                  />
+                  <figcaption className="p-1 text-center text-[10px] font-semibold text-neutral-500">{il.label}</figcaption>
+                </figure>
+              ))}
+            </div>
+          </>
+        )}
         {penjelasan ? (
           <>
             <Blok judul="Definition" isi={penjelasan.definisi} />
