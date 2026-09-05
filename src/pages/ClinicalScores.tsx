@@ -25,7 +25,7 @@ import { IconSearch, IconActivity } from '../components/icons'
 // ─────────────────────────────────────────────────────────────────────────────
 
 type Kategori = 'Kardiovaskular' | 'Respirasi' | 'Cerna & Hati' | 'Ginjal' | 'Neurologi'
-              | 'Hematologi' | 'Perawatan & Risiko' | 'Muskuloskeletal'
+              | 'Hematologi' | 'Perawatan & Risiko' | 'Muskuloskeletal' | 'Cairan & Anak'
 
 interface Skor {
   /** Dipakai di ?s= — DATA, bukan teks layar. Jangan diterjemahkan. */
@@ -107,12 +107,22 @@ export const SKOR: Skor[] = [
   { key: 'findrisc', nama: 'FINDRISC', untuk: 'Ten-year risk of type 2 diabetes', kategori: 'Perawatan & Risiko', ruteLama: '/findrisc',
     Komponen: L(() => import('./Findrisc'), 'Findrisc') },
 
+  // Kalkulator yang bentuknya sama tapi sempat tertinggal di rutenya sendiri.
+  { key: 'fluid', nama: 'Fluid Calculators', untuk: 'Maintenance fluids, deficit and replacement', kategori: 'Cairan & Anak', ruteLama: '/fluid-calculators',
+    Komponen: L(() => import('./FluidCalculators'), 'FluidCalculators') },
+  { key: 'dka-anak', nama: 'Paediatric DKA', untuk: 'Fluid and insulin in paediatric diabetic ketoacidosis', kategori: 'Cairan & Anak', ruteLama: '/pediatric-dka-calculator',
+    Komponen: L(() => import('./PediatricDkaCalculator'), 'PediatricDkaCalculator') },
+  { key: 'ldl', nama: 'LDL Calculator', untuk: 'Calculated LDL cholesterol — and when the calculation fails', kategori: 'Kardiovaskular', ruteLama: '/ldl-calculator',
+    Komponen: L(() => import('./LdlCalculator'), 'LdlCalculator') },
+  { key: 'risiko', nama: 'Risk Calculators', untuk: 'Cardiovascular and general risk estimation', kategori: 'Perawatan & Risiko', ruteLama: '/risk',
+    Komponen: L(() => import('./RiskCalculators'), 'RiskCalculators') },
+
   { key: 'ottawa-ankle', nama: 'Ottawa Ankle Rules', untuk: 'Whether an ankle injury needs a radiograph at all', kategori: 'Muskuloskeletal', ruteLama: '/ottawa-ankle-rules',
     Komponen: L(() => import('./OttawaAnkleRules'), 'OttawaAnkleRules') },
 ]
 
 const KATEGORI: Kategori[] = [
-  'Kardiovaskular', 'Respirasi', 'Cerna & Hati', 'Ginjal', 'Hematologi', 'Neurologi', 'Perawatan & Risiko', 'Muskuloskeletal',
+  'Kardiovaskular', 'Respirasi', 'Cerna & Hati', 'Ginjal', 'Hematologi', 'Neurologi', 'Perawatan & Risiko', 'Cairan & Anak', 'Muskuloskeletal',
 ]
 
 export function ClinicalScores() {
