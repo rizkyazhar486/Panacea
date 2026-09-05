@@ -18,6 +18,73 @@
 const OLS4_BASE = 'https://www.ebi.ac.uk/ols4/api/search'
 const CTSS_BASE = 'https://clinicaltables.nlm.nih.gov/api'
 
+/**
+ * Merapikan definisi ontologi untuk dibaca manusia.
+ *
+ * Definisi DOID ditulis untuk mesin dan memuat nama relasi apa adanya:
+ * "The disease has_symptom fever, has_symptom malaise, has_symptom back pain."
+ * Itu tampil di layar sebagai teks rusak. Relasinya diubah jadi bahasa biasa
+ * dan pengulangannya diringkas, tanpa membuang satu pun isinya.
+ */
+export function rapikanDefinisi(teks: string): string {
+  if (!teks) return ''
+  let t = teks
+    .replace(/\bhas_symptom\b/g, 'symptom:')
+    .replace(/\bhas_material_basis_in\b/g, 'caused by')
+    .replace(/\btransmitted_by\b/g, 'transmitted by')
+    .replace(/\bresults_in\b/g, 'resulting in')
+    .replace(/\blocated_in\b/g, 'located in')
+    .replace(/\bhas_?_?part\b/g, 'includes')
+    .replace(/\bderives_from\b/g, 'derived from')
+    .replace(/_/g, ' ')
+  // "symptom: fever, symptom: malaise, symptom: back pain" -> satu daftar.
+  t = t.replace(/symptom:\s*/g, (function () {
+    let pertama = true
+    return () => (pertama ? ((pertama = false), 'symptoms include ') : '')
+  })())
+  return t.replace(/\s+/g, ' ').trim()
+}
+
+/**
+ * Mengurutkan hasil menurut relevansi terhadap yang dicari.
+ *
+ * Tanpa ini, mencari "back pain" mengembalikan demam Lassa dan brucellosis —
+ * keduanya memang MENYEBUT nyeri punggung di antara daftar gejalanya, jadi
+ * mesin cari menganggapnya cocok. Yang dicari pengguna adalah penyakit yang
+ * MEMANG TENTANG bagian itu, bukan penyakit apa saja yang kebetulan
+ * menyinggungnya.
+ *
+ * Aturannya sederhana dan bisa diperiksa: cocok pada LABEL jauh lebih berarti
+ * daripada cocok pada definisi, dan cocok seluruh frasa lebih berarti daripada
+ * cocok satu kata.
+ */
+export function urutkanRelevansi(terms: OntologyTerm[], kueri: string[]): OntologyTerm[] {
+  const frasa = kueri.map((k) => k.toLowerCase().trim()).filter(Boolean)
+  const kata = [...new Set(frasa.flatMap((f) => f.split(/\s+/)).filter((w) => w.length >= 4))]
+  const skor = (t: OntologyTerm): number => {
+    const label = t.label.toLowerCase()
+    const def = t.description.toLowerCase()
+    let n = 0
+    for (const f of frasa) {
+      if (label === f) n += 100
+      else if (label.includes(f)) n += 50
+      else if (def.includes(f)) n += 5
+    }
+    for (const w of kata) {
+      if (label.includes(w)) n += 10
+      else if (def.includes(w)) n += 1
+    }
+    return n
+  }
+  return terms
+    .map((t) => ({ t, n: skor(t) }))
+    // Skor nol berarti tidak ada satu pun kata pencarian yang muncul di label
+    // MAUPUN definisinya — hasil seperti itu tidak menjelaskan apa pun.
+    .filter((x) => x.n > 0)
+    .sort((a, b) => b.n - a.n)
+    .map((x) => x.t)
+}
+
 export interface OntologyTerm {
   id: string // CURIE, mis. "DOID:9351" atau "HP:0001945"
   label: string
@@ -46,7 +113,7 @@ async function searchOntology(query: string, ontology: OntologyTerm['ontology'],
       id: d.obo_id as string,
       label: d.label as string,
       ontology,
-      description: d.description?.[0] ?? '',
+      description: rapikanDefinisi(d.description?.[0] ?? ''),
       iri: d.iri ?? '',
     }))
 }
@@ -110,7 +177,13 @@ export async function anatomyOntologyLookup(terms: string[]): Promise<{ diseases
       if (!bucket.some((x) => x.label.toLowerCase() === term.label.toLowerCase())) bucket.push(term)
     }
   }
-  return { diseases: diseases.slice(0, 8), phenotypes: phenotypes.slice(0, 8) }
+  // Diurutkan menurut relevansi terhadap yang dicari SEBELUM dipotong, supaya
+  // delapan yang tampil adalah delapan yang paling berkaitan — bukan delapan
+  // pertama yang kebetulan dikembalikan mesin cari.
+  return {
+    diseases: urutkanRelevansi(diseases, terms).slice(0, 8),
+    phenotypes: urutkanRelevansi(phenotypes, terms).slice(0, 8),
+  }
 }
 
 /**

@@ -8,6 +8,7 @@ import { Body3D, ANATOMY_LAYERS, RENDER_MODES, CT_WINDOWS, MOTION_OFF, MOTION_RE
 import { WORKOUT_MUSCLE_GROUPS } from '../lib/workoutMuscles'
 import { TISSUE_TYPES, TISSUE_SUBTYPES, ORGAN_SYSTEMS, BODY_REGIONS, IMAGE_ONLY_STRUCTURES, type AnatomyEntry } from '../lib/anatomyHierarchy'
 import { ORGAN_FOCUS } from '../lib/organFocus'
+import { penjelasanTertulis } from '../lib/explainFallback'
 import { IconChevronRight } from '../components/icons'
 import { lazy, Suspense } from 'react'
 import { Link } from 'react-router-dom'
@@ -93,6 +94,32 @@ function imageKindForMode(mode: RenderMode): ImageKind {
   if (mode === 'anatomy') return 'anatomy'
   if (mode === 'mriT1' || mode === 'mriT2') return 'mri'
   return mode
+}
+
+/**
+ * Menampilkan penjelasan yang memakai penanda **tebal**.
+ *
+ * Sebelumnya teksnya dicetak mentah di satu <p>, sehingga "**What they do.**"
+ * tampil apa adanya dengan bintangnya — penanda yang seharusnya menjadi
+ * struktur justru menjadi sampah di layar. Penjelasan tertulis maupun balasan
+ * model sama-sama memakai penanda ini, jadi keduanya perlu dirender.
+ */
+function Penjelasan({ teks }: { teks: string }) {
+  return (
+    <>
+      {teks.split(/\n{2,}/).map((paragraf, i) => (
+        <p key={i} className="text-sm leading-relaxed text-ink dark:text-white">
+          {paragraf.split(/(\*\*[^*]+\*\*)/g).map((bagian, j) =>
+            bagian.startsWith('**') && bagian.endsWith('**') ? (
+              <strong key={j} className="font-bold">{bagian.slice(2, -2)}</strong>
+            ) : (
+              <span key={j}>{bagian}</span>
+            ),
+          )}
+        </p>
+      ))}
+    </>
+  )
 }
 
 function TermList({ title, terms }: { title: string; terms: OntologyTerm[] }) {
@@ -223,7 +250,7 @@ export function BodyExplorer() {
     if (kind !== imageKind) loadImages(selectedLabel, kind)
   }
 
-  async function lookup(label: string, searchTerms: string[], kind?: ImageKind) {
+  async function lookup(label: string, searchTerms: string[], kind?: ImageKind, rawNameUntukPenjelasan?: string) {
     // Kalau pemanggilnya tidak memaksa ragam citra tertentu (entri histologi
     // memaksa 'histology'), ikuti modalitas yang sedang aktif di model 3D —
     // menekan sebuah tulang saat mode CT menyala semestinya memunculkan
@@ -232,7 +259,11 @@ export function BodyExplorer() {
     setSelectedLabel(label)
     setQuestion('')
     setLoading(true)
-    setExplanation('')
+    // Penjelasan tertulis dipasang SEKARANG, bukan sesudah menunggu jaringan.
+    // Halaman ini dulu menampilkan "No explanation was generated" begitu model
+    // bahasa mati — pesan yang tidak memberi tahu apa pun dan tidak bisa
+    // diperbaiki pembacanya. Sekarang isinya sudah ada sebelum AI dipanggil.
+    setExplanation(penjelasanTertulis(label, rawNameUntukPenjelasan))
     setDiseases([])
     setPhenotypes([])
     setImages([])
@@ -245,9 +276,15 @@ export function BodyExplorer() {
       setDiseases(d)
       setPhenotypes(p)
       const text = await explainBodyRegion(state.settings, label, d, p)
-      setExplanation(text)
+      // Teks AI hanya dipakai kalau ia benar-benar menambah sesuatu. Balasan
+      // kosong maupun pesan kegagalannya sendiri TIDAK boleh menghapus
+      // penjelasan tertulis yang sudah terpasang.
+      if (text && !/No explanation was generated|isn't available right now|Too many requests/i.test(text)) {
+        setExplanation(text)
+      }
     } catch {
-      setExplanation('Could not reach the ontology service right now. Please try again in a moment.')
+      // Ontologi gagal tidak berarti halamannya kosong — penjelasan tertulis
+      // tetap berdiri sendiri.
     } finally {
       setLoading(false)
     }
@@ -281,7 +318,7 @@ export function BodyExplorer() {
     const n = rawName.toLowerCase()
     const cocok = ORGAN_FOCUS.find((o) => o.keywords.some((k) => n.includes(k.trim().toLowerCase())))
     setClinicalOrgan(cocok ? { key: cocok.key, label: cocok.label } : null)
-    lookup(label, [toSearchTerm(rawName)])
+    lookup(label, [toSearchTerm(rawName)], undefined, rawName)
   }
 
   function onPickWorkoutMuscle(groupKey: string) {
@@ -788,9 +825,9 @@ export function BodyExplorer() {
               <h3 className="text-base font-black capitalize text-ink dark:text-white">{selectedLabel}</h3>
               {(loading || asking) && <p className="text-sm text-neutral-500">Looking up ontology terms…</p>}
               {!loading && !asking && explanation && (
-                <p className="rounded-xl bg-brand/5 p-3 text-sm leading-relaxed text-ink dark:bg-brand/10 dark:text-white">
-                  {explanation}
-                </p>
+                <div className="space-y-1.5 rounded-xl bg-brand/5 p-3 dark:bg-brand/10">
+                  <Penjelasan teks={explanation} />
+                </div>
               )}
               {!loading && !asking && (
                 <>
