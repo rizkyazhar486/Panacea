@@ -31,6 +31,10 @@ interface Props {
   organLabel: string
   /** Menyorot letak satu kelainan bawaan pada model 3D. */
   onLocate?: (keywords: string[], layer: AnatomyLayer['key']) => void
+  /** Tingkat pembaca yang ditentukan berkas induk. Kalau diisi, pemilih
+   *  tingkat milik panel ini disembunyikan — dua pemilih di satu halaman bisa
+   *  saling bertentangan, dan pembaca tidak tahu yang mana yang berlaku. */
+  audienceLuar?: Audience
 }
 
 function Blok({ judul, isi }: { judul: string; isi?: string }) {
@@ -236,8 +240,9 @@ function KartuObat({ o, audience }: { o: OrganObat; audience: Audience }) {
   )
 }
 
-export function OrganClinicalPanel({ organKey, organLabel, onLocate }: Props) {
-  const [audience, setAudience] = useState<Audience>('student')
+export function OrganClinicalPanel({ organKey, organLabel, onLocate, audienceLuar }: Props) {
+  const [audienceLokal, setAudience] = useState<Audience>('student')
+  const audience = audienceLuar ?? audienceLokal
   const [bukaPenyakit, setBukaPenyakit] = useState<string | null>(null)
   const { penyakit, obat, belumDipetakan } = clinicalForOrgan(organKey)
   const penjelasan = penjelasanOrgan(organKey)
@@ -261,6 +266,7 @@ export function OrganClinicalPanel({ organKey, organLabel, onLocate }: Props) {
 
   return (
     <div className="space-y-3">
+      {!audienceLuar && (
       <div>
         <div className="-mx-1 flex gap-1 overflow-x-auto rounded-xl bg-neutral-100 p-1 dark:bg-white/5">
           {AUDIENCES.map((a) => (
@@ -279,11 +285,12 @@ export function OrganClinicalPanel({ organKey, organLabel, onLocate }: Props) {
         </div>
         <p className="mt-1 text-[10.5px] text-neutral-400">{AUDIENCES.find((a) => a.key === audience)?.hint}</p>
       </div>
+      )}
 
       {/* Penjelasan organnya lebih dulu. Membuka tiroid atau mata dulu tidak
           menampilkan apa pun kalau organ itu kebetulan tidak punya banyak
           entri penyakit — padahal yang paling dasar justru ini. */}
-      {penjelasan && (
+      {penjelasan && !audienceLuar && (
         <div className="space-y-2 rounded-xl bg-neutral-50 p-2.5 dark:bg-white/5">
           <Blok judul={`What the ${organLabel.toLowerCase()} is`} isi={penjelasan.definisi} />
           <Daftar judul="What it does" isi={penjelasan.fungsi} />
@@ -343,7 +350,7 @@ export function OrganClinicalPanel({ organKey, organLabel, onLocate }: Props) {
         </div>
       </div>
 
-      {obat.length > 0 && (
+      {obat.length > 0 && !audienceLuar && (
         <div>
           <div className="t-mikro font-bold uppercase tracking-wide text-neutral-500">
             Drugs used for conditions of the {organLabel.toLowerCase()} · {obat.length}

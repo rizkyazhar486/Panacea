@@ -163,6 +163,100 @@ export function clinicalForOrgan(organKey: string): OrganClinical {
   return { penyakit, obat, belumDipetakan: false }
 }
 
+// Pemeriksaan penunjang yang benar-benar dipakai untuk organ ini. Bukan daftar
+// semua tes yang ada, melainkan yang MENGUBAH penatalaksanaan — daftar panjang
+// tanpa indikasi justru mengajarkan kebiasaan yang salah.
+export interface LabOrgan { nama: string; untuk: string }
+
+const LAB_ORGAN: Record<string, LabOrgan[]> = {
+  heart: [
+    { nama: 'ECG (12-lead)', untuk: 'Rhythm, ischaemia, chamber enlargement — first test in almost any cardiac complaint' },
+    { nama: 'Troponin I/T', untuk: 'Myocardial injury. Interpret the RISE AND FALL, never a single value' },
+    { nama: 'NT-proBNP', untuk: 'Ventricular wall stress — a normal value largely excludes heart failure' },
+    { nama: 'Echocardiography', untuk: 'Ejection fraction, valves, wall motion, pericardial fluid' },
+    { nama: 'Lipid profile', untuk: 'Cardiovascular risk, and the target of statin therapy' },
+  ],
+  lungs: [
+    { nama: 'Chest X-ray', untuk: 'Consolidation, effusion, pneumothorax, heart size' },
+    { nama: 'Blood gas analysis', untuk: 'Oxygenation, ventilation and acid–base state together' },
+    { nama: 'Spirometry', untuk: 'Obstructive versus restrictive pattern; reversibility in asthma' },
+    { nama: 'Sputum AFB / GeneXpert', untuk: 'Tuberculosis — mandatory for a cough beyond two weeks' },
+    { nama: 'D-dimer', untuk: 'Only useful to EXCLUDE embolism in low-probability patients' },
+  ],
+  kidneys: [
+    { nama: 'Urea, creatinine & eGFR', untuk: 'Filtration function — but creatinine lags injury by ~48 hours' },
+    { nama: 'Urinalysis', untuk: 'Protein, blood, casts — the cheapest window on the nephron' },
+    { nama: 'Urine protein/creatinine ratio', untuk: 'Quantifies proteinuria without a 24-hour collection' },
+    { nama: 'Serum electrolytes', untuk: 'Potassium first — it is what kills before uraemia does' },
+    { nama: 'Renal ultrasound', untuk: 'Size, obstruction, cysts. Small kidneys mean chronic, not acute' },
+  ],
+  liver: [
+    { nama: 'ALT & AST', untuk: 'Hepatocellular injury' },
+    { nama: 'ALP & GGT', untuk: 'Cholestatic pattern — GGT confirms ALP is hepatic, not bone' },
+    { nama: 'Bilirubin (total & direct)', untuk: 'Separates unconjugated from conjugated jaundice' },
+    { nama: 'Albumin & INR', untuk: 'Synthetic FUNCTION — the enzymes measure damage, these measure capacity' },
+    { nama: 'Hepatitis B & C serology', untuk: 'The commonest treatable causes of chronic liver disease' },
+  ],
+  thyroid: [
+    { nama: 'TSH', untuk: 'The single best first test — it moves before free T4 does' },
+    { nama: 'Free T4', untuk: 'Confirms and grades the abnormality TSH has flagged' },
+    { nama: 'Anti-TPO antibody', untuk: 'Autoimmune thyroiditis' },
+    { nama: 'Thyroid ultrasound', untuk: 'Nodules and their features; guides fine-needle aspiration' },
+  ],
+  pancreas: [
+    { nama: 'Fasting glucose & HbA1c', untuk: 'Diagnosis and 3-month control of diabetes' },
+    { nama: 'Serum lipase', untuk: 'More specific than amylase for acute pancreatitis' },
+    { nama: 'Abdominal CT with contrast', untuk: 'Necrosis and complications, best after 72 hours' },
+  ],
+  stomach: [
+    { nama: 'Upper endoscopy', untuk: 'Direct view plus biopsy — the definitive test' },
+    { nama: 'H. pylori urea breath test', untuk: 'Active infection; stop PPI two weeks beforehand or it reads falsely negative' },
+    { nama: 'Full blood count', untuk: 'Iron-deficiency anaemia from occult bleeding' },
+  ],
+  brain: [
+    { nama: 'Non-contrast head CT', untuk: 'First in acute deficit — excludes haemorrhage before thrombolysis' },
+    { nama: 'Brain MRI', untuk: 'Far better for early infarct, posterior fossa, tumour and demyelination' },
+    { nama: 'Lumbar puncture', untuk: 'Meningitis, subarachnoid haemorrhage with a normal CT' },
+    { nama: 'EEG', untuk: 'Seizure classification, not seizure exclusion' },
+  ],
+  eye: [
+    { nama: 'Visual acuity', untuk: 'The vital sign of the eye — record before anything else' },
+    { nama: 'Intraocular pressure', untuk: 'Glaucoma screening and acute angle closure' },
+    { nama: 'Fundoscopy', untuk: 'Retina, disc and vessels — also a direct view of systemic vascular disease' },
+    { nama: 'Slit-lamp examination', untuk: 'Anterior segment: cornea, chamber, lens' },
+  ],
+  ear: [
+    { nama: 'Otoscopy', untuk: 'Canal, drum, and middle-ear effusion' },
+    { nama: 'Rinne & Weber tests', untuk: 'Separates conductive from sensorineural loss at the bedside' },
+    { nama: 'Pure-tone audiometry', untuk: 'Quantifies and characterises the loss' },
+    { nama: 'Tympanometry', untuk: 'Middle-ear pressure and drum compliance' },
+  ],
+  bladder: [
+    { nama: 'Urinalysis & culture', untuk: 'Infection and the organism with its sensitivities' },
+    { nama: 'Post-void residual (ultrasound)', untuk: 'Retention and outlet obstruction' },
+    { nama: 'Cystoscopy', untuk: 'Painless visible haematuria until proven otherwise' },
+  ],
+  prostate: [
+    { nama: 'PSA', untuk: 'Raised in cancer, but also in BPH, infection and after examination' },
+    { nama: 'Digital rectal examination', untuk: 'Size, symmetry and consistency' },
+    { nama: 'IPSS symptom score', untuk: 'Grades severity and tracks response to treatment' },
+  ],
+  spleen: [
+    { nama: 'Full blood count with film', untuk: 'The film shows what the count cannot' },
+    { nama: 'Reticulocyte count', untuk: 'Separates marrow failure from peripheral destruction' },
+    { nama: 'Abdominal ultrasound', untuk: 'Splenomegaly and portal hypertension' },
+  ],
+  'large-intestine': [
+    { nama: 'Faecal occult blood / FIT', untuk: 'Colorectal cancer screening' },
+    { nama: 'Colonoscopy', untuk: 'Diagnostic and therapeutic in one procedure' },
+    { nama: 'Stool culture & microscopy', untuk: 'Infective diarrhoea and parasites' },
+  ],
+}
+
+export function labsForOrgan(organKey: string): LabOrgan[] {
+  return LAB_ORGAN[organKey] ?? []
+}
+
 /** Organ yang sudah punya pemetaan — dipakai layar untuk menandai mana yang
  *  akan langsung membuka isi klinis saat diketuk. */
 export function organsWithClinical(): string[] {

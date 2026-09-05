@@ -17,7 +17,7 @@ import { Link } from 'react-router-dom'
 const PhysiologySection = lazy(() => import('./bodyhub/PhysiologySection'))
 const DrugSection = lazy(() => import('./bodyhub/DrugSection'))
 const DiseaseSection = lazy(() => import('./bodyhub/DiseaseSection'))
-const OrganClinicalPanel = lazy(() => import('./bodyhub/OrganClinicalPanel'))
+const OrganDossier = lazy(() => import('./bodyhub/OrganDossier'))
 const SimulatorSection = lazy(() => import('./bodyhub/SimulatorSection'))
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -604,7 +604,7 @@ export function BodyExplorer() {
           <div className="mt-3 rounded-2xl border border-brand/30 bg-brand/[0.03] p-3 dark:bg-brand/[0.07]">
             <div className="mb-2 flex items-start justify-between gap-2">
               <div className="min-w-0">
-                <div className="t-mikro font-bold uppercase tracking-wide text-brand">Selected structure</div>
+                <div className="t-mikro font-bold uppercase tracking-wide text-brand">Full dossier</div>
                 <h3 className="text-base font-black text-ink dark:text-white">{clinicalOrgan.label}</h3>
               </div>
               <button
@@ -615,7 +615,7 @@ export function BodyExplorer() {
               </button>
             </div>
             <Suspense fallback={<p className="text-sm text-neutral-500">Opening clinical notes…</p>}>
-              <OrganClinicalPanel
+              <OrganDossier
                 organKey={clinicalOrgan.key}
                 organLabel={clinicalOrgan.label}
                 onLocate={(keywords, layer) => onHighlightSites(keywords, [layer])}
