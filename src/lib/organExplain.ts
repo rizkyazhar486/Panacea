@@ -846,6 +846,378 @@ export const ORGAN_PENJELASAN: OrganPenjelasan[] = [
       },
     ],
   },
+  // ── Cerna: lambung, pankreas, empedu ──────────────────────────────────────
+  {
+    key: 'stomach',
+    definisi: 'A muscular reservoir that holds a meal, sterilises it, and releases it into the duodenum a little at a time.',
+    fungsi: [
+      'Stores a meal so eating can be fast while digestion is slow.',
+      'Secretes acid and pepsinogen, and kills most swallowed microbes.',
+      'Controls the rate at which chyme reaches the small intestine.',
+      'Secretes intrinsic factor — the only route by which vitamin B12 can be absorbed.',
+    ],
+    caraKerja:
+      'Parietal cells run a H⁺/K⁺-ATPase that pumps protons against a millionfold gradient, giving a luminal pH near 1.5. The stomach survives its own acid through a mucus-bicarbonate layer maintained by prostaglandins — which is exactly why NSAIDs, by blocking prostaglandin synthesis, cause ulcers. Emptying is regulated rather than passive: fat and acid in the duodenum feed back to slow the pylorus, so a fatty meal sits far longer than a carbohydrate one.',
+    fakta: [
+      'Resting volume ~50 mL, expanding to ~1.5 L',
+      'Luminal pH 1.5–3.5 — among the most acidic environments in biology',
+      'Intrinsic factor loss causes pernicious anaemia no matter how much B12 is eaten',
+    ],
+    bawaan: [
+      {
+        nama: 'Infantile hypertrophic pyloric stenosis',
+        apa: 'The pyloric muscle thickens and obstructs gastric outflow.',
+        embriologi: 'Not present at birth — the muscle hypertrophies over the first weeks, which is why symptoms begin at 3–6 weeks rather than on day one.',
+        akibat: 'Obstruction ABOVE the duodenum → vomiting of gastric contents only, so acid and chloride are lost while bile is not → HYPOCHLORAEMIC HYPOKALAEMIC METABOLIC ALKALOSIS. That electrolyte picture is the diagnosis, and correcting it comes before surgery.',
+        tanda: 'Projectile NON-BILIOUS vomiting in a hungry infant, a palpable olive in the right upper quadrant, visible gastric peristalsis. Ultrasound confirms. This is a medical emergency first and a surgical one second.',
+        lokasi3d: ['stomach', 'gastric', 'pylor'],
+        layer: 'visceral',
+      },
+    ],
+  },
+  {
+    key: 'pancreas',
+    definisi: 'Two organs in one — an exocrine gland that digests food, wrapped around endocrine islets that control blood glucose.',
+    fungsi: [
+      'Secretes amylase, lipase and proteases into the duodenum.',
+      'Secretes bicarbonate to neutralise gastric acid so those enzymes can work.',
+      'Produces insulin, glucagon and somatostatin from the islets of Langerhans.',
+    ],
+    caraKerja:
+      'Pancreatic lipase is the ONLY enzyme that can digest fat meaningfully, which is why pancreatic failure shows up as steatorrhoea before anything else. Proteases are secreted as inactive zymogens and only activated in the duodenum by enterokinase — a safeguard, because activation inside the gland is precisely what acute pancreatitis is. The islets are less than 2% of the organ by mass yet receive a disproportionate blood supply, and they sense glucose directly rather than waiting for a nerve signal.',
+    fakta: [
+      'Secretes ~1.5 L of enzyme-rich fluid a day',
+      'Islets are ~1–2% of pancreatic mass',
+      'Symptoms of exocrine failure appear only after ~90% of function is lost',
+    ],
+    bawaan: [
+      {
+        nama: 'Annular pancreas',
+        apa: 'A ring of pancreatic tissue encircles the duodenum.',
+        embriologi: 'The ventral pancreatic bud normally rotates behind the duodenum to fuse with the dorsal bud. If it splits and passes on both sides, the duodenum ends up encircled.',
+        akibat: 'The ring constricts the duodenum → obstruction, often the same double-bubble picture as duodenal atresia. Many cases stay silent into adulthood and present as pancreatitis or late obstruction.',
+        tanda: 'Bilious vomiting in a newborn, or unexplained duodenal narrowing later. Associated with Down syndrome.',
+        lokasi3d: ['pancrea', 'duodenum'],
+        layer: 'visceral',
+      },
+      {
+        nama: 'Cystic fibrosis — pancreatic insufficiency',
+        apa: 'Thick secretions block the pancreatic ducts from before birth.',
+        embriologi: 'CFTR failure means ducts cannot secrete chloride and water, so enzymes cannot be flushed out and instead digest the gland itself.',
+        akibat: 'Progressive destruction of exocrine tissue → no lipase reaching the gut → fat malabsorption, steatorrhoea, failure to thrive, and deficiency of vitamins A, D, E and K. Islets are damaged later, giving CF-related diabetes.',
+        tanda: 'Meconium ileus at birth in 15–20%, then greasy offensive stools and poor weight gain despite a good appetite. Faecal elastase is low.',
+        lokasi3d: ['pancrea'],
+        layer: 'visceral',
+      },
+    ],
+  },
+  {
+    key: 'gallbladder',
+    definisi: 'A small reservoir that concentrates bile between meals and squirts it into the duodenum when fat arrives.',
+    fungsi: [
+      'Stores and concentrates bile roughly fivefold.',
+      'Contracts in response to cholecystokinin when fat enters the duodenum.',
+    ],
+    caraKerja:
+      'Bile is made continuously by the liver but needed only intermittently, and the gallbladder solves that mismatch. It concentrates bile by absorbing water and sodium — which is also why stones form here and not in the ducts: concentrating cholesterol past its solubility is exactly what precipitates it. Contraction is hormonal, not neural: fat and protein in the duodenum release cholecystokinin, which contracts the gallbladder and relaxes the sphincter of Oddi at the same time.',
+    fakta: [
+      'Holds only ~30–50 mL, yet handles the bile of a whole day',
+      'Concentrates bile about fivefold',
+      'The body can function without it — bile simply drains continuously instead',
+    ],
+    bawaan: [
+      {
+        nama: 'Choledochal cyst',
+        apa: 'Congenital dilatation of the bile ducts.',
+        embriologi: 'An abnormal pancreaticobiliary junction lets pancreatic enzymes reflux into the bile duct, weakening and dilating its wall.',
+        akibat: 'Bile stasis in a dilated duct → stones, cholangitis, pancreatitis, and a genuinely raised risk of cholangiocarcinoma — which is why these are excised rather than drained.',
+        tanda: 'The classic triad of abdominal pain, jaundice and a right upper quadrant mass appears in a minority; most present with only one or two.',
+        lokasi3d: ['bile duct', 'gallbladder', 'cystic duct'],
+        layer: 'visceral',
+      },
+    ],
+  },
+
+  // ── Limfoid ───────────────────────────────────────────────────────────────
+  {
+    key: 'spleen',
+    definisi: 'A blood filter and immune organ — the body’s quality control for red cells and its main defence against encapsulated bacteria.',
+    fungsi: [
+      'Removes aged and abnormal red cells and recycles their iron.',
+      'Mounts antibody responses against blood-borne organisms.',
+      'Holds a reserve of platelets and monocytes.',
+    ],
+    caraKerja:
+      'Red pulp filters, white pulp defends. Red cells must squeeze through narrow splenic cords to re-enter the circulation, and those too stiff or damaged to pass are eaten — a mechanical test no other organ performs. White pulp holds the B cells that make antibody against POLYSACCHARIDE capsules, a response that needs no T-cell help and that the spleen does better than anywhere else. That single fact explains why splenectomy leaves people vulnerable specifically to pneumococcus, meningococcus and Haemophilus, and why those three vaccines are given before the operation.',
+    fakta: [
+      'Filters the entire blood volume many times a day',
+      'Holds about a third of the body’s platelets',
+      'Post-splenectomy sepsis carries a mortality approaching 50%',
+    ],
+    bawaan: [
+      {
+        nama: 'Congenital asplenia and polysplenia (heterotaxy)',
+        apa: 'The spleen is absent, or replaced by several small ones, as part of disordered left–right patterning.',
+        embriologi: 'Failure of the normal left–right axis in early development. Asplenia tends to accompany bilateral right-sidedness, polysplenia bilateral left-sidedness — and both usually come with complex congenital heart disease.',
+        akibat: 'No functioning spleen → no filtration of encapsulated organisms → overwhelming sepsis risk from infancy, which is the thing that actually kills these children.',
+        tanda: 'Howell–Jolly bodies on the blood film in a child who has never had surgery. Look for dextrocardia, midline liver and abnormal venous return. Lifelong prophylactic antibiotics and full vaccination are mandatory.',
+        lokasi3d: ['spleen'],
+        layer: 'lymphoid',
+      },
+    ],
+  },
+  {
+    key: 'lymph-nodes',
+    definisi: 'Filters set along the lymphatic vessels, where the immune system meets what has been collected from the tissues.',
+    fungsi: [
+      'Filter lymph before it returns to the bloodstream.',
+      'Present antigen to lymphocytes and launch the adaptive response.',
+      'House the proliferation that makes an infected node swell and hurt.',
+    ],
+    caraKerja:
+      'A node is arranged so that antigen and lymphocytes are forced to meet. Lymph enters through several afferent vessels and leaves by one efferent, so flow slows inside — time for dendritic cells to display what they carry. B cells sit in follicles in the cortex, T cells in the paracortex. A node that is tender and enlarged is proliferating; a node that is hard, fixed and painless is more likely infiltrated, and that distinction is most of the clinical value of examining one.',
+    fakta: [
+      '500–600 nodes in an adult',
+      'Lymph moves without a pump — muscle contraction and breathing drive it',
+      'A node above the clavicle on the left (Virchow’s) drains the abdomen and is never ignored',
+    ],
+    bawaan: [
+      {
+        nama: 'Primary lymphoedema (Milroy disease)',
+        apa: 'Lymphatic vessels fail to form properly, so limbs swell from birth or puberty.',
+        embriologi: 'Mutations in VEGFR3 (FLT4) prevent normal lymphatic vessel development.',
+        akibat: 'Lymph cannot be returned → protein-rich fluid accumulates in tissue → chronic swelling, fibrosis, and repeated cellulitis because stagnant lymph is not being surveyed by the immune system.',
+        tanda: 'Non-pitting swelling of the lower limbs, thickened skin, and a positive Stemmer sign — the skin over the second toe cannot be pinched.',
+        lokasi3d: ['lymph', 'node'],
+        layer: 'lymphoid',
+      },
+    ],
+  },
+
+  // ── Endokrin ──────────────────────────────────────────────────────────────
+  {
+    key: 'adrenal',
+    definisi: 'Two glands sitting on the kidneys, each really two organs — a cortex making steroids and a medulla making catecholamines.',
+    fungsi: [
+      'Cortex: cortisol (stress and glucose), aldosterone (salt and pressure), androgens.',
+      'Medulla: adrenaline and noradrenaline, in seconds.',
+      'Maintains blood pressure and glucose during illness and fasting.',
+    ],
+    caraKerja:
+      'The cortex has three zones and the mnemonic is the physiology: Glomerulosa makes aldosterone (salt), Fasciculata cortisol (sugar), Reticularis androgens (sex) — Salt, Sugar, Sex, deeper you go the sweeter it gets. Aldosterone answers to the renin–angiotensin system, cortisol to pituitary ACTH. The medulla is a modified sympathetic ganglion: its cells are postganglionic neurons that lost their axons and secrete into blood instead, which is why its response is measured in seconds while the cortex takes hours.',
+    fakta: [
+      'Cortisol peaks in the early morning and troughs around midnight',
+      'The medulla secretes ~80% adrenaline, ~20% noradrenaline',
+      'Aldosterone acts on only ~2% of filtered sodium, yet sets blood pressure',
+    ],
+    bawaan: [
+      {
+        nama: 'Congenital adrenal hyperplasia (21-hydroxylase deficiency)',
+        apa: 'A missing enzyme blocks cortisol synthesis, and everything upstream is diverted into androgens.',
+        embriologi: '21-hydroxylase deficiency accounts for over 90% of cases. Without it, cortisol and aldosterone cannot be made, so precursors accumulate and are shunted down the androgen pathway — the only route still open.',
+        akibat: 'No cortisol → no negative feedback → ACTH rises → the gland hypertrophies and makes still more androgen. Two consequences follow: VIRILISATION of a female fetus, and SALT-WASTING CRISIS in the first weeks — hyponatraemia, hyperkalaemia, hypotension and shock.',
+        tanda: 'Ambiguous genitalia in a newborn girl, or a boy collapsing at 1–3 weeks with vomiting and dehydration and a low sodium with a HIGH potassium. Newborn screening measures 17-hydroxyprogesterone. The salt-wasting crisis kills, and it is treated with hydrocortisone and saline before the diagnosis is confirmed.',
+        lokasi3d: ['adrenal', 'suprarenal'],
+        layer: 'visceral',
+      },
+    ],
+  },
+  {
+    key: 'pituitary',
+    definisi: 'A pea-sized gland beneath the brain that directs most of the other endocrine glands.',
+    fungsi: [
+      'Anterior lobe: ACTH, TSH, LH, FSH, growth hormone, prolactin.',
+      'Posterior lobe: stores and releases ADH and oxytocin made in the hypothalamus.',
+      'Translates hypothalamic signals into hormonal commands.',
+    ],
+    caraKerja:
+      'The two lobes have entirely different origins and that explains their behaviour. The anterior lobe grows up from the roof of the mouth (Rathke’s pouch) and is glandular; it receives no direct nerve supply and is controlled by hypothalamic hormones delivered through a private portal circulation. The posterior lobe grows down from the brain and is nervous tissue — it makes nothing, it only stores and releases what hypothalamic neurons have sent down their axons. Sitting in the sella turcica directly beneath the optic chiasm, a growing pituitary compresses the crossing fibres first, which is why the field defect is bitemporal.',
+    fakta: [
+      'Weighs about 0.5 g',
+      'Prolactin is the only anterior hormone under tonic INHIBITION — by dopamine',
+      'A lesion compressing the chiasm gives bitemporal hemianopia',
+    ],
+    bawaan: [
+      {
+        nama: 'Congenital hypopituitarism',
+        apa: 'The pituitary fails to form or to function from birth.',
+        embriologi: 'Mutations in the transcription factors that pattern Rathke’s pouch (PROP1, POU1F1) or midline defects such as septo-optic dysplasia, where the optic nerves and septum pellucidum are also affected.',
+        akibat: 'Absent growth hormone → severe growth failure. Absent ACTH → hypoglycaemia and adrenal crisis. Absent TSH → hypothyroidism with its own neurological cost. In a newborn the hypoglycaemia is what threatens life first.',
+        tanda: 'Neonatal hypoglycaemia, prolonged jaundice, micropenis in boys, and later profound short stature with a normal body proportion. Septo-optic dysplasia adds nystagmus and optic nerve hypoplasia.',
+        lokasi3d: ['hypophysis', 'pituitary'],
+        layer: 'visceral',
+      },
+    ],
+  },
+
+  // ── Prostat ───────────────────────────────────────────────────────────────
+  {
+    key: 'prostate',
+    definisi: 'A walnut-sized gland surrounding the male urethra just below the bladder.',
+    fungsi: [
+      'Adds about 30% of semen volume — an alkaline fluid that protects sperm from vaginal acidity.',
+      'Secretes prostate-specific antigen, which liquefies semen.',
+      'Its smooth muscle contributes to ejaculation and to urinary continence.',
+    ],
+    caraKerja:
+      'The prostate sits where the urinary and reproductive tracts cross, and its anatomy explains its two great diseases. The TRANSITION zone surrounds the urethra and is where benign hyperplasia grows — which is why BPH obstructs early despite being benign. The PERIPHERAL zone lies posteriorly and is where about 70% of cancers arise — which is why cancer is felt on rectal examination and why it obstructs late, often after it has already spread.',
+    fakta: [
+      'About 20 g in a young adult, growing lifelong under androgen influence',
+      'Contributes ~30% of ejaculate volume',
+      'PSA rises in cancer, but also in BPH, infection, and after examination or cycling',
+    ],
+    bawaan: [],
+  },
+
+  // ── THT & jalur penglihatan ───────────────────────────────────────────────
+  {
+    key: 'external-ear',
+    definisi: 'The visible ear and canal — a funnel shaped to collect sound and tell you where it came from.',
+    fungsi: [
+      'Collects sound and channels it to the eardrum.',
+      'Its folds filter sound direction-dependently, which is how the brain locates a source vertically.',
+      'The canal protects the drum and self-cleans with migrating skin and cerumen.',
+    ],
+    caraKerja:
+      'The pinna is not a passive dish. Its ridges reflect and delay sound by fractions of a millisecond depending on where the source is, and the brain reads those cues to judge elevation — something two ears alone cannot do. The canal resonates at roughly 2–4 kHz, amplifying exactly the frequencies of human speech by around 10–15 dB. Cerumen is mildly acidic and antibacterial, and canal skin migrates outward, so an ear canal cleans itself; cotton buds defeat both mechanisms.',
+    fakta: [
+      'Canal resonance amplifies speech frequencies by ~10–15 dB',
+      'Canal skin migrates outward at roughly the rate fingernails grow',
+      'The pinna is the reason you can tell up from down in sound',
+    ],
+    bawaan: [],
+  },
+  {
+    key: 'ossicles',
+    definisi: 'The three smallest bones in the body — malleus, incus and stapes — which carry sound from eardrum to inner ear.',
+    fungsi: [
+      'Transmit vibration from the tympanic membrane to the oval window.',
+      'Match the impedance of air to that of cochlear fluid.',
+      'Protect the inner ear from loud sound through the stapedius reflex.',
+    ],
+    caraKerja:
+      'Sound arriving from air would almost entirely reflect off fluid — a mismatch of about 30 dB, meaning 99.9% of the energy lost. The middle ear recovers it two ways: the tympanic membrane is roughly 17 times larger than the stapes footplate, concentrating force onto a small area, and the ossicular lever adds a further ~1.3-fold. Without this, hearing would be profoundly impaired even with a perfect cochlea. The stapedius muscle contracts reflexly to loud sound, stiffening the chain — protection that is too slow for a gunshot but effective for sustained noise.',
+    fakta: [
+      'The stapes is ~3 mm — the smallest bone in the body',
+      'Overcomes a ~30 dB air-to-fluid impedance mismatch',
+      'Ossicles are full adult size at birth and never grow',
+    ],
+    bawaan: [
+      {
+        nama: 'Congenital ossicular fixation',
+        apa: 'One of the ossicles is fused to the surrounding bone and cannot vibrate.',
+        embriologi: 'The ossicles derive from the first and second pharyngeal arches; incomplete separation from the surrounding cartilage leaves a bony bridge, most often fixing the stapes footplate.',
+        akibat: 'A fixed chain cannot transmit vibration → CONDUCTIVE hearing loss with a normal cochlea. Because the inner ear is intact, bone conduction is normal — and that gap between air and bone conduction is the diagnosis.',
+        tanda: 'Non-progressive conductive loss from childhood with a normal eardrum on otoscopy. Distinguished from otosclerosis, which is acquired and progressive.',
+        lokasi3d: ['malleus', 'incus', 'stapes'],
+        layer: 'skeletal',
+      },
+    ],
+  },
+  {
+    key: 'eardrum',
+    definisi: 'A thin three-layered membrane that converts sound pressure into mechanical movement.',
+    fungsi: [
+      'Vibrates in response to sound and drives the ossicular chain.',
+      'Separates and protects the middle ear from the outside world.',
+    ],
+    caraKerja:
+      'The drum works only if the pressure behind it equals the pressure in front — otherwise it is stretched taut and cannot vibrate. That is the entire job of the Eustachian tube, which opens on swallowing and yawning. In children the tube is shorter, wider and more horizontal, so it both fails to ventilate and lets nasopharyngeal organisms up: the reason otitis media is a childhood disease and largely stops being one as the skull grows.',
+    fakta: [
+      'About 9 mm across and 0.1 mm thick',
+      'Moves less than the diameter of a hydrogen atom at threshold sound',
+      'The pars flaccida is the thin upper part where cholesteatoma usually begins',
+    ],
+    bawaan: [],
+  },
+  {
+    key: 'inner-ear-nerve',
+    definisi: 'The eighth cranial nerve — two nerves in one sheath, one for hearing and one for balance.',
+    fungsi: [
+      'Cochlear division carries sound information to the brainstem.',
+      'Vestibular division reports head position and movement.',
+      'Drives the reflex that keeps vision steady while the head moves.',
+    ],
+    caraKerja:
+      'Hearing is mapped by PLACE, not by frequency of firing: the basilar membrane is stiff and narrow at the base and floppy at the apex, so each frequency peaks at its own point and each nerve fibre reports one narrow band. Balance uses a different trick — the semicircular canals sit in three planes and work in pairs, so any rotation excites one canal while inhibiting its partner, and the brain reads the difference. The vestibulo-ocular reflex uses that signal to move the eyes opposite to the head within about 10 milliseconds, far faster than vision could manage on its own.',
+    fakta: [
+      'The vestibulo-ocular reflex operates in ~10 ms',
+      'Around 30,000 fibres in the cochlear nerve',
+      'Vestibular schwannoma typically arises on the vestibular division but presents with hearing loss',
+    ],
+    bawaan: [],
+  },
+  {
+    key: 'nasal-septum',
+    definisi: 'The bone-and-cartilage partition dividing the nose into two airways, with the turbinates projecting into each.',
+    fungsi: [
+      'Divides and directs airflow through both sides of the nose.',
+      'Supports the shape of the external nose.',
+      'The turbinates warm, humidify and filter inspired air.',
+    ],
+    caraKerja:
+      'The turbinates make airflow deliberately turbulent, throwing particles onto mucus and bringing air into contact with a large warm wet surface — inspired air reaches body temperature and full saturation within a few centimetres. The two sides also alternate their congestion every few hours in a nasal cycle most people never notice, resting one side while the other works. A deviated septum matters only when it disturbs that flow enough to obstruct or to dry one side.',
+    fakta: [
+      'Conditions air to ~37 °C and ~100% humidity within centimetres',
+      'The nasal cycle alternates sides every 2–6 hours',
+      'Kiesselbach’s plexus on the anterior septum is the source of most nosebleeds',
+    ],
+    bawaan: [],
+  },
+  {
+    key: 'pharynx',
+    definisi: 'The shared corridor of air and food, and the one place where breathing and swallowing must be coordinated or aspiration follows.',
+    fungsi: [
+      'Conducts air from nose to larynx and food from mouth to oesophagus.',
+      'Closes the airway during swallowing.',
+      'Houses the tonsils, the first immune tissue to meet what is inhaled or swallowed.',
+    ],
+    caraKerja:
+      'Swallowing is a reflex that cannot be halted once triggered. The soft palate lifts to seal the nasopharynx, the larynx rises and the epiglottis folds back to close the airway, and breathing stops for about a second. Because air and food cross here, any weakness of that sequence sends material into the trachea rather than the oesophagus — which is why stroke, bulbar disease and reduced consciousness all cause aspiration pneumonia.',
+    fakta: [
+      'Swallowing suspends breathing for roughly one second',
+      'Waldeyer’s ring — adenoid, tubal, palatine and lingual tonsils',
+      'The Eustachian tube opens into the nasopharynx, linking throat infection to ear infection',
+    ],
+    bawaan: [
+      {
+        nama: 'Branchial cleft anomaly',
+        apa: 'A cyst, sinus or fistula in the lateral neck, left over from the pharyngeal apparatus.',
+        embriologi: 'The pharyngeal clefts should obliterate; a persistent second cleft leaves a tract running from the tonsillar fossa to the skin at the anterior border of sternocleidomastoid.',
+        akibat: 'A retained epithelial tract secretes and can become infected → a lateral neck lump that swells with upper respiratory infections.',
+        tanda: 'A smooth painless lump at the anterior border of sternocleidomastoid, often first noticed when it enlarges during a cold. A lateral neck cyst appearing for the first time in an adult over 40 is treated as metastatic cancer until proven otherwise.',
+        lokasi3d: ['pharynx', 'nasopharynx', 'oropharynx'],
+        layer: 'visceral',
+      },
+    ],
+  },
+  {
+    key: 'optic-pathway',
+    definisi: 'The route from retina to visual cortex — optic nerve, chiasm, tract and radiation.',
+    fungsi: [
+      'Carries visual information from the eye to the brain.',
+      'Sorts the visual field so each half of the brain sees the opposite half of the world.',
+      'Drives the pupillary light reflex without involving conscious vision.',
+    ],
+    caraKerja:
+      'At the chiasm, fibres from the NASAL half of each retina cross while temporal fibres stay on their own side. Since the nasal retina sees the temporal field, the result is that each optic tract carries the entire opposite half of the visual world. That single crossing makes visual field loss beautifully localising: a lesion BEFORE the chiasm affects one eye, AT the chiasm gives bitemporal hemianopia, and AFTER it gives a homonymous defect on the opposite side. The optic nerve is not really a nerve at all — it is a white matter tract of the brain, myelinated by oligodendrocytes, which is why it is affected in multiple sclerosis and why it does not regenerate.',
+    fakta: [
+      'About 1.2 million axons per optic nerve',
+      'It is a CNS tract, not a peripheral nerve — and cannot regenerate',
+      'A relative afferent pupillary defect localises disease to the nerve, not the retina',
+    ],
+    bawaan: [
+      {
+        nama: 'Optic nerve hypoplasia',
+        apa: 'The optic nerve contains too few axons and the disc is small.',
+        embriologi: 'Failure of retinal ganglion cell axons to develop or survive during migration to the brain. Frequently part of septo-optic dysplasia, alongside absent septum pellucidum and pituitary failure.',
+        akibat: 'Fewer axons → reduced vision from birth that does not improve, plus nystagmus because the eyes never acquire steady fixation. When it accompanies pituitary failure, the hypoglycaemia is the more urgent problem.',
+        tanda: 'A small, pale disc with a "double ring" sign on fundoscopy, poor vision and nystagmus in infancy. Any child found to have it is investigated for pituitary dysfunction.',
+        lokasi3d: ['optic nerve', 'optic chiasm', 'optic tract'],
+        layer: 'nervous',
+      },
+    ],
+  },
 ]
 
 export function penjelasanOrgan(key: string): OrganPenjelasan | undefined {
