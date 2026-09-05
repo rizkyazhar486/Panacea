@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import * as THREE from 'three'
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
-import type { OrganModel } from '../lib/organModels'
+import { folderModel, type OrganModel } from '../lib/organModels'
 
 // Penampil satu organ dari dekat. Lihat src/lib/organModels.ts untuk asal
 // modelnya dan kenapa bagiannya ditandai titik, bukan lewat raycast nama.
@@ -74,7 +74,7 @@ export function OrganModel3D({ organ, selected, onSelect }: Props) {
     let group: THREE.Group | null = null
     const loader = new GLTFLoader()
     loader.load(
-      `${import.meta.env.BASE_URL}organs/${organ.id}.glb`,
+      `${import.meta.env.BASE_URL}${folderModel(organ)}/${organ.id}.glb`,
       (gltf) => {
         group = gltf.scene
         // Model dinormalkan ke ukuran & titik pusat yang sama, karena berkas

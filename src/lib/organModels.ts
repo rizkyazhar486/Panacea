@@ -43,7 +43,22 @@ export interface OrganModel {
   hotspots: OrganHotspot[]
   /** Punya ilustrasi /organs/<id>/*.webp (organ, location, microscopic, compare). */
   illustrated: boolean
+  /**
+   * Dari mana geometrinya datang. 'ai' = model bangkitan Tripo di /organs/;
+   * 'bodyparts3d' = potongan anatomi rujukan nyata di /organs-atlas/, dibangun
+   * oleh scripts/atlasOrgan.mjs. Bedanya dinyatakan di layar, bukan disamarkan.
+   */
+  sumber?: 'ai' | 'bodyparts3d'
+  /** Jumlah mesh bernama di dalam berkas — hanya untuk model bodyparts3d. */
+  jumlahBagian?: number
 }
+
+/** Folder publik tempat berkas .glb organ ini berada. */
+export function folderModel(m: OrganModel): string {
+  return m.sumber === 'bodyparts3d' ? 'organs-atlas' : 'organs'
+}
+
+import { ORGAN_ATLAS } from './organAtlas.gen'
 
 export const ORGAN_MODELS: OrganModel[] = [
   {
@@ -177,8 +192,19 @@ export const ORGAN_MODELS: OrganModel[] = [
   },
 ]
 
+/**
+ * Model organ untuk satu sasaran. Potongan BodyParts3D DIDAHULUKAN atas model
+ * bangkitan AI: keduanya sama-sama menampilkan organ dari dekat, tapi hanya
+ * yang pertama merupakan geometri manusia rujukan, dan tiap bagiannya bernama.
+ */
 export function modelForFocus(focusKey: string): OrganModel | undefined {
-  return ORGAN_MODELS.find((m) => m.focusKey === focusKey)
+  return ORGAN_ATLAS.find((m) => m.focusKey === focusKey)
+    ?? ORGAN_MODELS.find((m) => m.focusKey === focusKey)
+}
+
+/** Model bangkitan AI saja — dipakai untuk mencari ilustrasi /organs/<id>/. */
+export function modelIlustrasi(focusKey: string): OrganModel | undefined {
+  return ORGAN_MODELS.find((m) => m.focusKey === focusKey && m.illustrated)
 }
 
 /** Empat ilustrasi yang tersedia per organ, sesuai isi foldernya. */

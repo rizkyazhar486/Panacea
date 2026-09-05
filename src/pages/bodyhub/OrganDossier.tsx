@@ -6,7 +6,7 @@ import { SISTEM_FISIOLOGI } from '../../lib/physiology'
 import { ORGAN_FOCUS } from '../../lib/organFocus'
 import type { AnatomyLayer } from '../../components/Body3D'
 import OrganClinicalPanel from './OrganClinicalPanel'
-import { modelForFocus, ILUSTRASI } from '../../lib/organModels'
+import { modelForFocus, modelIlustrasi, ILUSTRASI } from '../../lib/organModels'
 import OrganModel3D from '../../components/OrganModel3D'
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -139,6 +139,10 @@ export function OrganDossier({ organKey, organLabel, onLocate }: Props) {
   // Model organ tunggal beresolusi tinggi, kalau organ ini punya. Terpisah
   // dari figur tubuh utuh dan asalnya berbeda — lihat organModels.ts.
   const model = modelForFocus(organKey)
+  // Ilustrasi selalu datang dari berkas /organs/<id>/, yang hanya dimiliki
+  // model bangkitan AI. Saat organ ini memakai potongan BodyParts3D untuk 3D-nya,
+  // ilustrasinya tetap dicari terpisah supaya tidak ikut hilang.
+  const ilustrasi = modelIlustrasi(organKey)
   const [hotspot, setHotspot] = useState<string | null>(null)
 
   return (
@@ -185,23 +189,33 @@ export function OrganDossier({ organKey, organLabel, onLocate }: Props) {
                 mengatakan dari mana gambarnya datang, dan model bangkitan AI
                 adalah pendekatan bentuk, bukan geometri terverifikasi. */}
             <p className="text-[10px] leading-relaxed text-neutral-400">
-              Detailed organ view — an AI-generated model (Tripo), used with the owner’s permission. It is a shape
-              approximation for recognising form and position, not verified anatomy. The full-body figure above uses
-              BodyParts3D, which is derived from real human data.
+              {model.sumber === 'bodyparts3d' ? (
+                <>
+                  Detailed organ view — {model.jumlahBagian === 1 ? 'one named structure' : `${model.jumlahBagian} individually named structures`} cut from BodyParts3D 4.0
+                  (Database Center for Life Science, CC BY 4.0), the same reference anatomy as the full-body figure
+                  above. Real human reference geometry, not an artistic impression.
+                </>
+              ) : (
+                <>
+                  Detailed organ view — an AI-generated model (Tripo), used with the owner’s permission. It is a shape
+                  approximation for recognising form and position, not verified anatomy. The full-body figure above uses
+                  BodyParts3D, which is derived from real human data.
+                </>
+              )}
             </p>
-            <div className="grid grid-cols-2 gap-2">
+            {ilustrasi && <div className="grid grid-cols-2 gap-2">
               {ILUSTRASI.map((il) => (
                 <figure key={il.key} className="overflow-hidden rounded-xl bg-neutral-50 dark:bg-white/5">
                   <img
-                    src={`${import.meta.env.BASE_URL}organs/${model.id}/${il.key}.webp`}
-                    alt={`${model.label} — ${il.label}`}
+                    src={`${import.meta.env.BASE_URL}organs/${ilustrasi.id}/${il.key}.webp`}
+                    alt={`${ilustrasi.label} — ${il.label}`}
                     loading="lazy"
                     className="h-24 w-full object-cover"
                   />
                   <figcaption className="p-1 text-center text-[10px] font-semibold text-neutral-500">{il.label}</figcaption>
                 </figure>
               ))}
-            </div>
+            </div>}
           </>
         )}
         {penjelasan ? (

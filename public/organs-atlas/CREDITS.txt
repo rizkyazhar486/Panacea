@@ -1,0 +1,23 @@
+Organ close-up models in this folder
+====================================
+
+Geometry: BodyParts3D 4.0
+  (c) The Database Center for Life Science (DBCLS)
+  Licence: CC BY 4.0 — https://creativecommons.org/licenses/by/4.0/
+  Dataset: https://dbarchive.biosciencedbc.jp/en/bodyparts3d/download.html
+  Publication: Mitsuhashi et al. (2009), BodyParts3D: 3D structure database
+  for anatomical concepts. https://doi.org/10.1093/nar/gkn613
+
+Packaging: ashemag/human-atlas (MIT, Copyright (c) 2026 ashemag), which
+converted the source OBJ meshes to metre/Y-up axes, simplified them with
+meshoptimizer at a 0.2% relative error limit, quantised normals to signed
+16-bit, and packed them into binary chunks with a manifest.
+
+Adaptation in this repository: scripts/atlasOrgan.mjs selects the named parts
+belonging to one organ, centres and scales them to a common size, and writes
+one glTF-binary file per organ. Each mesh keeps its BodyParts3D name, so the
+labelled points in the viewer are placed at the actual centroid of the mesh
+they name rather than by hand.
+
+This is an adult male reference anatomy. It is educational material, not a
+clinical tool, and it does not represent every anatomical variation.
