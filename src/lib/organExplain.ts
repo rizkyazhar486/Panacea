@@ -475,6 +475,377 @@ export const ORGAN_PENJELASAN: OrganPenjelasan[] = [
       },
     ],
   },
+  // ── Rangka ────────────────────────────────────────────────────────────────
+  {
+    key: 'skeleton',
+    definisi: 'A living framework of 206 bones that carries load, protects organs, banks calcium, and manufactures blood.',
+    fungsi: [
+      'Bears weight and gives muscles the levers they pull against.',
+      'Shields the brain, spinal cord, heart and lungs.',
+      'Stores 99% of the body’s calcium and releases it on demand.',
+      'Produces red cells, white cells and platelets in red marrow.',
+    ],
+    caraKerja:
+      'Two ways bone forms, and the difference explains most congenital bone disease. INTRAMEMBRANOUS ossification lays bone straight into mesenchyme — that is how the skull vault and clavicle form. ENDOCHONDRAL ossification first makes a cartilage model and then replaces it, which is how every long bone forms; the growth plate is the surviving cartilage that keeps lengthening the bone until it fuses. Anything that disturbs cartilage signalling therefore shortens the limbs while sparing the skull. After growth ends, bone still turns over continuously: osteoclasts resorb, osteoblasts rebuild, and the whole skeleton is replaced roughly every ten years.',
+    fakta: [
+      '206 bones in an adult, 270 at birth — many fuse during growth',
+      'Type I collagen is ~90% of bone’s organic matrix',
+      'Peak bone mass is reached at roughly 25–30 years, and never regained if lost',
+    ],
+    bawaan: [
+      {
+        nama: 'Osteogenesis imperfecta',
+        apa: 'Bones fracture with little or no force — “brittle bone disease”.',
+        embriologi: 'Mutations in COL1A1 or COL1A2 disrupt type I collagen. A glycine substitution in the triple helix is worse than making none at all, because the abnormal chain poisons the normal ones assembled with it — a dominant negative effect.',
+        akibat: 'Defective collagen scaffold → mineral has nothing sound to deposit on → bones are brittle despite normal mineral content. Because type I collagen is also in sclera, teeth and ligaments, the disease is never confined to bone.',
+        tanda: 'Recurrent fractures from trivial trauma, BLUE SCLERAE (thin sclera showing the choroid beneath), poorly formed teeth, joint hypermobility, and early hearing loss. It is the single most important differential for suspected non-accidental injury.',
+        lokasi3d: ['bone', 'femur', 'humerus', 'rib'],
+        layer: 'skeletal',
+      },
+      {
+        nama: 'Achondroplasia',
+        apa: 'The commonest form of disproportionate short stature.',
+        embriologi: 'A GAIN-of-function mutation in FGFR3. FGFR3 normally restrains chondrocyte proliferation at the growth plate; overactivity brakes it far too hard. Over 80% of cases are new mutations, and paternal age is the main risk factor.',
+        akibat: 'Endochondral ossification is inhibited while intramembranous ossification is untouched → LIMBS are short while the SKULL VAULT grows normally. That single fact explains the whole phenotype: short proximal limbs, normal trunk length, large head with frontal bossing.',
+        tanda: 'Rhizomelic shortening, trident hand, midface hypoplasia. Watch for foramen magnum stenosis in infancy — it compresses the cord and can cause sudden death, and it is the reason these children are imaged rather than simply measured.',
+        lokasi3d: ['femur', 'humerus', 'skull', 'vertebra'],
+        layer: 'skeletal',
+      },
+      {
+        nama: 'Developmental dysplasia of the hip',
+        apa: 'The femoral head sits abnormally in a shallow acetabulum, or dislocates from it.',
+        embriologi: 'Not a fixed malformation but a developmental relationship: the acetabulum only deepens if a well-seated femoral head presses into it. Breech position and swaddling with the legs extended both prevent that.',
+        akibat: 'A shallow socket → the head subluxes → the socket deepens even less. The loop is self-reinforcing, which is why treatment works when it is early and fails when it is late.',
+        tanda: 'Asymmetric skin creases, limited abduction, Ortolani and Barlow tests in the newborn. Ultrasound before ossification, radiograph after. Untreated it causes early osteoarthritis in a young adult.',
+        lokasi3d: ['pelvis', 'ilium', 'femur'],
+        layer: 'skeletal',
+      },
+      {
+        nama: 'Craniosynostosis',
+        apa: 'One or more skull sutures fuse too early.',
+        embriologi: 'Sutures are the growth plates of the skull vault; they must stay open while the brain expands. Premature fusion is sometimes syndromic (FGFR2 in Apert and Crouzon), often isolated.',
+        akibat: 'Growth is blocked ACROSS the fused suture and continues parallel to it → a predictable head shape for each suture. Sagittal fusion gives a long narrow head; coronal fusion a short wide one. Multiple sutures raise intracranial pressure.',
+        tanda: 'An abnormal head shape present from birth that does NOT correct with positioning — that is what separates it from positional plagiocephaly, which does.',
+        lokasi3d: ['skull', 'frontal bone', 'parietal bone'],
+        layer: 'skeletal',
+      },
+      {
+        nama: 'Talipes equinovarus (clubfoot)',
+        apa: 'The foot is turned inward and downward and cannot be passively corrected.',
+        embriologi: 'Abnormal development of the talus and of the medial soft tissues, sometimes with an underlying neuromuscular cause such as spina bifida or arthrogryposis.',
+        akibat: 'A fixed deformity means the child would walk on the outer border of the foot → skin breakdown and disability. Corrected early, the foot is functional for life.',
+        tanda: 'Present at birth, rigid rather than positional. Ponseti serial casting is the standard treatment and usually avoids major surgery.',
+        lokasi3d: ['talus', 'calcaneus', 'tibia', 'foot'],
+        layer: 'skeletal',
+      },
+    ],
+  },
+
+  // ── Kulit ─────────────────────────────────────────────────────────────────
+  {
+    key: 'skin',
+    definisi: 'The body’s largest organ — a self-repairing barrier that keeps water in, pathogens out, and regulates temperature.',
+    fungsi: [
+      'Forms a physical, chemical and immunological barrier.',
+      'Controls heat loss through blood flow and sweating.',
+      'Senses touch, temperature, pressure and pain.',
+      'Synthesises vitamin D from ultraviolet light.',
+    ],
+    caraKerja:
+      'The barrier is the outermost layer only, about as thick as a sheet of paper. Keratinocytes are born at the basal layer, migrate upward over roughly four weeks, die deliberately, and end as flattened corneocytes embedded in a lipid matrix — the "bricks and mortar" arrangement. Below, the dermis carries the collagen that gives strength, the vessels, the nerve endings, and the appendages. Holding the two together is the dermal–epidermal junction, a protein complex whose components are precisely what inherited blistering diseases destroy.',
+    fakta: [
+      'About 1.5–2 m² and ~15% of body weight',
+      'The epidermis renews itself roughly every 28 days',
+      'Skin blood flow ranges from ~0.3 L/min at rest to ~8 L/min in heat',
+    ],
+    bawaan: [
+      {
+        nama: 'Epidermolysis bullosa',
+        apa: 'The skin blisters and shears away from minor friction.',
+        embriologi: 'Inherited defects in the proteins that anchor epidermis to dermis. The level of the failing protein sets the type: keratin 5/14 (simplex, within the epidermis), laminin-332 (junctional), and type VII collagen (dystrophic, below the lamina densa).',
+        akibat: 'No mechanical anchorage → separation with ordinary handling → blisters, erosions, fluid and protein loss, infection. Dystrophic forms scar as they heal → fused digits (mitten deformity), oesophageal strictures, and a very high lifetime risk of squamous cell carcinoma.',
+        tanda: 'Blistering from birth at sites of friction, including the mouth. Diagnosis is by immunofluorescence mapping or genetic testing — the level of the split is the diagnosis.',
+        lokasi3d: ['skin', 'region'],
+        layer: 'surface',
+      },
+      {
+        nama: 'Ichthyosis',
+        apa: 'Dry, thickened, fish-scale skin.',
+        embriologi: 'Defective desquamation or defective barrier lipids. Ichthyosis vulgaris involves filaggrin, the same gene central to atopic eczema; X-linked ichthyosis lacks steroid sulfatase, so cholesterol sulfate accumulates and glues corneocytes together.',
+        akibat: 'Corneocytes fail to detach → the stratum corneum piles up → visible scale plus a leaky barrier → water loss and easier entry for allergens and microbes.',
+        tanda: 'Generalised scaling, worse in dry cold air, sparing the flexures in the vulgaris form. X-linked ichthyosis affects boys and may accompany delayed labour, since the placenta needs the same enzyme.',
+        lokasi3d: ['skin', 'region'],
+        layer: 'surface',
+      },
+      {
+        nama: 'Oculocutaneous albinism',
+        apa: 'Little or no melanin in skin, hair and eyes.',
+        embriologi: 'Melanocytes migrate normally from the neural crest but cannot make pigment — most often a tyrosinase (TYR) defect, tyrosinase being the rate-limiting enzyme of melanin synthesis.',
+        akibat: 'No melanin means no ultraviolet protection → early photodamage and a high skin-cancer risk. Melanin is also required for normal routing of the optic nerves and for foveal development, so the eye problems are structural, not merely cosmetic: nystagmus, reduced acuity, and excessive decussation at the chiasm.',
+        tanda: 'White hair, very pale skin, iris transillumination, nystagmus and photophobia from birth. Lifelong sun protection is the single most important intervention.',
+        lokasi3d: ['skin', 'region'],
+        layer: 'surface',
+      },
+      {
+        nama: 'Ectodermal dysplasia',
+        apa: 'Abnormal development of several ectodermal structures at once — hair, teeth, nails and sweat glands.',
+        embriologi: 'Defects in the EDA/EDAR signalling pathway, which directs the ectoderm to form appendages. Because one pathway serves all of them, the features travel together.',
+        akibat: 'Absent or scanty sweat glands → the child CANNOT LOSE HEAT BY SWEATING → unexplained recurrent fevers and heat intolerance, which is the dangerous part and often the presenting complaint.',
+        tanda: 'Sparse fine hair, missing or conical teeth, dystrophic nails, periorbital wrinkling, and hyperthermia in warm weather.',
+        lokasi3d: ['skin', 'region'],
+        layer: 'surface',
+      },
+    ],
+  },
+
+  // ── Saluran cerna ─────────────────────────────────────────────────────────
+  {
+    key: 'large-intestine',
+    definisi: 'The final 1.5 metres of gut, which reclaims water and salt and houses the microbiome.',
+    fungsi: [
+      'Absorbs water and electrolytes, turning liquid chyme into formed stool.',
+      'Ferments residual fibre into short-chain fatty acids that feed the colonocytes themselves.',
+      'Stores stool and controls continence.',
+    ],
+    caraKerja:
+      'The colon has no villi — it is a slow absorptive tube, not a digestive one. Its intrinsic nervous system, the myenteric and submucosal plexuses, coordinates propulsion largely without the brain, which is why the gut still works after spinal injury. Those plexuses are built from neural crest cells that migrate the whole length of the gut during weeks 5–12, from mouth to anus. The migration ends last at the rectum, and that ordering is the key to Hirschsprung disease.',
+    fakta: [
+      'About 1.5 m long, and reabsorbs ~1.5 L of water a day',
+      'Around 10^14 bacteria, outnumbering the body’s own cells',
+      'Transit takes 12–48 hours, far longer than the small bowel',
+    ],
+    bawaan: [
+      {
+        nama: 'Hirschsprung disease',
+        apa: 'A segment of distal bowel has no ganglion cells and cannot relax.',
+        embriologi: 'Neural crest cells migrate craniocaudally and arrive at the rectum LAST. If migration arrests early, the aganglionic segment is always distal and always CONTINUOUS with the anus — there are no skip lesions, and that single fact tells you where to biopsy.',
+        akibat: 'No ganglia → no receptive relaxation → the segment stays tonically contracted → functional obstruction. The bowel PROXIMAL to it dilates, so the megacolon on imaging is the healthy bowel, not the diseased one — a classic trap.',
+        tanda: 'Failure to pass meconium within 48 hours, abdominal distension, bilious vomiting. Rectal biopsy showing absent ganglion cells is diagnostic. Enterocolitis is the complication that kills.',
+        lokasi3d: ['colon', 'rectum', 'sigmoid'],
+        layer: 'visceral',
+      },
+      {
+        nama: 'Anorectal malformation (imperforate anus)',
+        apa: 'The anus is absent, misplaced, or opens as a fistula.',
+        embriologi: 'The urorectal septum fails to divide the cloaca completely, so hindgut and urogenital tract stay connected.',
+        akibat: 'No patent outlet → obstruction. A fistula to bladder, urethra or vagina may vent stool and delay recognition, at the cost of urinary infection.',
+        tanda: 'Absent anal opening on the newborn check, or meconium appearing in urine or at the vulva. Screen for the VACTERL associations, which cluster with it.',
+        lokasi3d: ['rectum', 'anal'],
+        layer: 'visceral',
+      },
+      {
+        nama: 'Malrotation with midgut volvulus',
+        apa: 'The intestine is fixed on too narrow a base and twists on its own blood supply.',
+        embriologi: 'The midgut herniates into the umbilical cord, rotates 270° anticlockwise around the superior mesenteric artery, and returns by week 10. Incomplete rotation leaves the mesenteric root short instead of broad.',
+        akibat: 'A narrow pedicle lets the whole midgut rotate around the superior mesenteric artery → arterial occlusion → infarction of the entire small bowel within hours. This is one of the few true abdominal emergencies of infancy.',
+        tanda: 'BILIOUS VOMITING IN A NEWBORN IS VOLVULUS UNTIL PROVEN OTHERWISE. Upper GI contrast study is the test; delay costs the bowel.',
+        lokasi3d: ['duodenum', 'jejunum', 'ileum'],
+        layer: 'visceral',
+      },
+    ],
+  },
+  {
+    key: 'small-intestine',
+    definisi: 'Six metres of gut where essentially all nutrient absorption happens.',
+    fungsi: [
+      'Completes digestion with pancreatic enzymes and bile.',
+      'Absorbs carbohydrate, protein, fat, vitamins and minerals.',
+      'Hosts most of the body’s immune tissue in its wall.',
+    ],
+    caraKerja:
+      'Surface area is everything. Folds, then villi, then microvilli multiply a plain tube’s area roughly 600-fold to about 250 m². Each villus has a central lacteal for fat and a capillary network for everything else, so fat leaves by lymphatics and bypasses the liver on first pass while sugars and amino acids do not.',
+    fakta: [
+      'Absorptive surface ≈ 250 m²',
+      'The epithelium is replaced every 3–5 days — the fastest in the body',
+      'Transit takes 3–5 hours',
+    ],
+    bawaan: [
+      {
+        nama: 'Duodenal atresia',
+        apa: 'The duodenum ends blindly and does not communicate onward.',
+        embriologi: 'The duodenal lumen is normally obliterated by proliferating epithelium in week 6 and then RECANALISES. Failure to recanalise leaves an atretic segment — unlike more distal atresias, which are vascular accidents.',
+        akibat: 'Obstruction above the level of the stomach outlet → bilious vomiting if distal to the ampulla → polyhydramnios before birth, because the fetus cannot swallow and absorb amniotic fluid.',
+        tanda: '“DOUBLE BUBBLE” on plain radiograph — gas in stomach and proximal duodenum with nothing beyond. Roughly a third of cases have Down syndrome.',
+        lokasi3d: ['duodenum'],
+        layer: 'visceral',
+      },
+      {
+        nama: 'Meckel diverticulum',
+        apa: 'A true diverticulum of the ileum, a remnant of the vitelline duct.',
+        embriologi: 'The vitelline duct connects the midgut to the yolk sac and should disappear by week 7. A persistent proximal portion becomes a diverticulum containing all three bowel layers.',
+        akibat: 'About half contain ECTOPIC GASTRIC MUCOSA. That mucosa secretes acid into ileum with no defence against it → ulceration of adjacent normal bowel → painless bleeding.',
+        tanda: 'The rule of 2s: 2% of people, 2 feet from the ileocaecal valve, 2 inches long, usually under 2 years, 2 tissue types. Painless rectal bleeding in a toddler. A technetium-99m scan finds the gastric mucosa.',
+        lokasi3d: ['ileum'],
+        layer: 'visceral',
+      },
+    ],
+  },
+  {
+    key: 'liver',
+    definisi: 'The body’s chemical plant — it processes everything absorbed from the gut before the rest of the body sees it.',
+    fungsi: [
+      'Metabolises drugs, hormones and toxins.',
+      'Makes albumin, clotting factors and bile.',
+      'Stores glycogen and releases glucose between meals.',
+    ],
+    caraKerja:
+      'The liver receives a dual blood supply, and roughly three quarters of it is venous blood from the gut arriving by the portal vein. Everything absorbed passes hepatocytes before entering the systemic circulation — the first-pass effect, which is why some drugs cannot be given by mouth at all. Bile made by hepatocytes drains the opposite way, through canaliculi into ducts and on to the gut.',
+    fakta: [
+      'Receives ~1.5 L of blood per minute, ~75% of it portal',
+      'The only human organ that regenerates substantially',
+      'Makes all clotting factors except von Willebrand factor',
+    ],
+    bawaan: [
+      {
+        nama: 'Biliary atresia',
+        apa: 'The extrahepatic bile ducts are progressively destroyed and obliterated.',
+        embriologi: 'Not a failure to form but a postnatal inflammatory obliteration of ducts that were patent — which is why the jaundice appears after, not at, birth.',
+        akibat: 'No bile drainage → conjugated bilirubin backs up → cholestasis → biliary cirrhosis within months. Fat-soluble vitamin absorption fails, and vitamin K deficiency causes bleeding.',
+        tanda: 'Jaundice persisting beyond 14 days with PALE STOOLS AND DARK URINE. Conjugated hyperbilirubinaemia in a newborn is never physiological. The Kasai portoenterostomy works far better before 60 days, so this is a diagnosis measured in weeks.',
+        lokasi3d: ['liver', 'bile duct', 'gallbladder'],
+        layer: 'visceral',
+      },
+    ],
+  },
+
+  // ── Urogenital ────────────────────────────────────────────────────────────
+  {
+    key: 'bladder',
+    definisi: 'A muscular reservoir that stores urine at low pressure and empties it under voluntary control.',
+    fungsi: [
+      'Stores 400–600 mL without a rise in pressure.',
+      'Empties completely and voluntarily.',
+      'Protects the kidneys by never letting pressure rise back up the ureters.',
+    ],
+    caraKerja:
+      'Storage depends on compliance: the detrusor relaxes as it fills, so pressure stays low even as volume climbs. The ureters enter obliquely through the bladder wall, so rising bladder pressure compresses them shut — a flap valve made of geometry rather than muscle. That single arrangement is what protects the kidneys, and its failure is what causes reflux.',
+    fakta: [
+      'Capacity ~400–600 mL in an adult',
+      'First urge at around 150–250 mL',
+      'Sympathetic fibres store, parasympathetic fibres void — S2–S4',
+    ],
+    bawaan: [
+      {
+        nama: 'Bladder exstrophy',
+        apa: 'The bladder is open on the lower abdominal wall.',
+        embriologi: 'The cloacal membrane fails to be reinforced by mesoderm and ruptures, so the anterior bladder wall and abdominal wall never close.',
+        akibat: 'An open bladder plate → continuous urine leakage, exposed mucosa, and an associated wide pubic symphysis. Untreated it causes upper-tract damage and malignancy.',
+        tanda: 'Obvious at birth. Almost always with epispadias, and requires staged reconstruction.',
+        lokasi3d: ['bladder', 'pelvis'],
+        layer: 'visceral',
+      },
+    ],
+  },
+  {
+    key: 'testis',
+    definisi: 'Paired glands that make sperm and testosterone, held outside the body because sperm need to be cooler than core temperature.',
+    fungsi: [
+      'Produces sperm in the seminiferous tubules.',
+      'Secretes testosterone from Leydig cells.',
+      'Maintains the blood–testis barrier that hides developing sperm from the immune system.',
+    ],
+    caraKerja:
+      'The testis develops on the posterior abdominal wall and DESCENDS through the inguinal canal in the third trimester, dragging its blood supply from the aorta with it — which is why testicular arteries arise so high, and why testicular pain refers to the abdomen. Spermatogenesis takes about 70 days and fails above roughly 35 °C, so the scrotum, cremaster and pampiniform plexus exist purely to keep it a few degrees cooler.',
+    fakta: [
+      'Spermatogenesis takes ~64–72 days',
+      'Needs a temperature ~2–3 °C below core',
+      'Around 1,500 sperm are produced per second',
+    ],
+    bawaan: [
+      {
+        nama: 'Cryptorchidism (undescended testis)',
+        apa: 'One or both testes have not reached the scrotum.',
+        embriologi: 'Descent is a two-stage, hormone-dependent process. Failure leaves the testis anywhere along the path from abdomen to inguinal canal.',
+        akibat: 'An abdominal testis sits at core temperature → germ cell loss begins within the first year → reduced fertility. Malignancy risk rises several-fold, and orchidopexy does NOT abolish it — it makes the testis examinable.',
+        tanda: 'Empty hemiscrotum. Distinguish from a retractile testis, which can be milked down and needs no surgery. Operate at 6–12 months; waiting costs germ cells.',
+        lokasi3d: ['testis', 'epididymis'],
+        layer: 'visceral',
+      },
+      {
+        nama: 'Hypospadias',
+        apa: 'The urethral opening lies on the underside of the penis rather than at the tip.',
+        embriologi: 'The urethral folds fail to fuse in the midline, a process driven by dihydrotestosterone in weeks 8–14. The more proximal the opening, the earlier the failure.',
+        akibat: 'A misplaced meatus with an abnormal spray, often with chordee (ventral curvature) that impairs function later. The foreskin is incomplete dorsally — a hooded prepuce.',
+        tanda: 'The triad of ventral meatus, hooded foreskin and chordee. DO NOT CIRCUMCISE — the foreskin is the tissue used for repair. Bilateral undescended testes with hypospadias raises the question of a difference of sex development.',
+        lokasi3d: ['urethra', 'testis'],
+        layer: 'visceral',
+      },
+    ],
+  },
+
+  // ── Saraf tepi & medula spinalis ──────────────────────────────────────────
+  {
+    key: 'spinal-cord',
+    definisi: 'The cable between brain and body, and a reflex processor in its own right.',
+    fungsi: [
+      'Carries motor commands down and sensory information up.',
+      'Executes reflexes without waiting for the brain.',
+      'Houses the autonomic outflow that controls bladder, bowel and blood pressure.',
+    ],
+    caraKerja:
+      'Tracts are arranged by function and by side, and that arrangement is what makes cord lesions localisable. The corticospinal tract has already crossed in the medulla, so it carries motor commands for the SAME side below the lesion. The dorsal columns carry vibration and proprioception up the same side and cross in the medulla. Spinothalamic fibres cross within a segment or two of entry, so pain and temperature loss appears on the OPPOSITE side. The cord also stops growing before the vertebral column does, ending near L1–L2 in an adult — which is why lumbar puncture below that level is safe.',
+    fakta: [
+      'About 45 cm long, ending at L1–L2 in an adult',
+      '31 pairs of spinal nerves',
+      'Conduction in myelinated fibres reaches ~120 m/s',
+    ],
+    bawaan: [
+      {
+        nama: 'Tethered cord syndrome',
+        apa: 'The cord is anchored at its lower end and cannot ride up as the spine grows.',
+        embriologi: 'A thickened filum terminale, lipoma or dermal sinus fixes the conus. The vertebral column outgrows the cord, so the cord is stretched rather than displaced.',
+        akibat: 'Traction → ischaemia of the conus → progressive and often IRREVERSIBLE loss of bladder, bowel and lower limb function. Symptoms typically appear during growth spurts, which is the clue.',
+        tanda: 'A cutaneous marker over the lower back — hairy patch, dimple above the natal cleft, lipoma or haemangioma — with new incontinence, foot deformity or leg weakness. MRI is diagnostic.',
+        lokasi3d: ['spinal cord', 'vertebra'],
+        layer: 'nervous',
+      },
+      {
+        nama: 'Chiari malformation',
+        apa: 'Hindbrain tissue is displaced downward through the foramen magnum.',
+        embriologi: 'A posterior fossa too small for its contents. Type II accompanies spina bifida and is thought to follow CSF leakage through the open neural tube, which prevents the fossa expanding normally.',
+        akibat: 'Crowding at the foramen magnum obstructs CSF flow → hydrocephalus, and pressure waves may split the cord centrally to form a SYRINX. A syrinx damages the crossing spinothalamic fibres first, giving a "cape" of lost pain and temperature sensation with touch preserved.',
+        tanda: 'Occipital headache made worse by coughing or straining, neck pain, and a dissociated sensory loss over the shoulders and arms.',
+        lokasi3d: ['cerebell', 'spinal cord'],
+        layer: 'nervous',
+      },
+    ],
+  },
+  {
+    key: 'peripheral-nerves',
+    definisi: 'The wiring that connects the central nervous system to every muscle, gland and sensory ending.',
+    fungsi: [
+      'Carries motor commands to muscle and sensation back from the periphery.',
+      'Runs the autonomic supply to viscera, vessels and glands.',
+      'Regenerates after injury — unlike central axons.',
+    ],
+    caraKerja:
+      'Each axon is wrapped by Schwann cells, and one Schwann cell myelinates exactly one segment of one axon — unlike oligodendrocytes centrally, which serve many. That difference is why peripheral nerve can regrow along its old sheath at roughly 1 mm a day, while central axons cannot. Nerves are bundled in fascicles with connective tissue sheaths; the perineurium forms the blood–nerve barrier.',
+    fakta: [
+      'Regeneration proceeds at roughly 1 mm per day',
+      'The sciatic nerve is the largest, about as thick as a thumb',
+      'Schwann cells derive from the neural crest',
+    ],
+    bawaan: [
+      {
+        nama: 'Neurofibromatosis type 1',
+        apa: 'Tumours grow along nerves throughout the body.',
+        embriologi: 'Loss of the NF1 tumour-suppressor gene, which normally restrains RAS signalling. Neural-crest-derived Schwann cells lose that brake and proliferate.',
+        akibat: 'Unrestrained RAS activity → neurofibromas along peripheral nerves, and a raised risk of optic glioma and malignant peripheral nerve sheath tumour. It is fully penetrant but extremely variable, so severity cannot be predicted from a parent.',
+        tanda: 'Six or more café-au-lait macules, axillary or inguinal freckling, Lisch nodules on the iris, and cutaneous neurofibromas. Skin signs usually precede tumours by years.',
+        lokasi3d: ['nerve', 'plexus'],
+        layer: 'nervous',
+      },
+      {
+        nama: 'Brachial plexus birth injury (Erb palsy)',
+        apa: 'Traction on the upper brachial plexus during delivery.',
+        embriologi: 'Not a malformation but a birth injury — included here because it presents at birth and is confused with congenital weakness.',
+        akibat: 'C5–C6 injury → deltoid, biceps and supraspinatus denervated → the arm hangs adducted and internally rotated, elbow extended, forearm pronated — the "waiter’s tip" position. GRIP IS PRESERVED, because C8–T1 is spared, and that is what distinguishes it from a lower (Klumpke) injury.',
+        tanda: 'Unilateral absent Moro reflex with an intact grasp, after shoulder dystocia or a large baby. Most recover; failure to regain biceps function by 3 months prompts surgical referral.',
+        lokasi3d: ['brachial plexus', 'nerve'],
+        layer: 'nervous',
+      },
+    ],
+  },
 ]
 
 export function penjelasanOrgan(key: string): OrganPenjelasan | undefined {

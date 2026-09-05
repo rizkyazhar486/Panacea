@@ -57,4 +57,11 @@ export const ORGAN_FOCUS: OrganFocus[] = [
   { key: 'nasal-septum', label: 'Nasal septum & conchae', layer: 'skeletal', keywords: ['nasal septal cartilage', 'nasal concha', 'nasal bone'], searchTerms: ['nasal septum deviation', 'nasal obstruction'] },
   { key: 'pharynx', label: 'Pharynx (naso/oro/laryngo)', layer: 'visceral', keywords: ['nasopharynx', 'oropharynx', 'laryngopharynx', 'epiglottis'], searchTerms: ['pharyngeal disease', 'pharyngitis'] },
   { key: 'optic-pathway', label: 'Optic pathway', layer: 'nervous', keywords: ['optic nerve', 'optic chiasm', 'optic tract'], searchTerms: ['optic nerve disease', 'visual pathway disorder'] },
+
+  // Rangka dan kulit sebagai SASARAN yang bisa diketuk. Keduanya punya lapisan
+  // 3D-nya sendiri sejak awal, tapi tidak pernah punya entri organ — sehingga
+  // kelainan bawaan tulang dan kulit tidak punya tempat untuk ditampilkan.
+  { key: 'skeleton', label: 'Skeleton', layer: 'skeletal', keywords: ['bone', 'vertebra', 'femur', 'humerus', 'tibia', 'rib', 'skull', 'pelvis', 'ilium', 'sternum'], searchTerms: ['bone disease', 'skeletal dysplasia'] },
+  { key: 'skin', label: 'Skin', layer: 'surface', keywords: ['skin', 'region'], searchTerms: ['skin disease', 'genodermatosis'] },
+  { key: 'peripheral-nerves', label: 'Peripheral nerves', layer: 'nervous', keywords: ['nerve', 'plexus', 'ganglion'], searchTerms: ['peripheral nervous system disease', 'neuropathy'] },
 ]
