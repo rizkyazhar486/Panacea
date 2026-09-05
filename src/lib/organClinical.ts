@@ -249,7 +249,116 @@ const LAB_ORGAN: Record<string, LabOrgan[]> = {
   'large-intestine': [
     { nama: 'Faecal occult blood / FIT', untuk: 'Colorectal cancer screening' },
     { nama: 'Colonoscopy', untuk: 'Diagnostic and therapeutic in one procedure' },
-    { nama: 'Stool culture & microscopy', untuk: 'Infective diarrhoea and parasites' },
+    { nama: 'Faecal calprotectin', untuk: 'Separates inflammatory bowel disease from irritable bowel syndrome' },
+    { nama: 'Stool culture & microscopy', untuk: 'Infective diarrhoea, parasites, C. difficile toxin' },
+    { nama: 'Rectal suction biopsy', untuk: 'Absent ganglion cells confirm Hirschsprung disease' },
+  ],
+  adrenal: [
+    { nama: 'Morning cortisol', untuk: 'Screens adrenal insufficiency — must be drawn early, when it should be highest' },
+    { nama: 'Short Synacthen test', untuk: 'The definitive test: does the gland respond to ACTH at all' },
+    { nama: 'Plasma ACTH', untuk: 'Separates primary (adrenal, ACTH high) from secondary (pituitary, ACTH low)' },
+    { nama: 'Aldosterone/renin ratio', untuk: 'Primary hyperaldosteronism — a curable cause of hypertension that is routinely missed' },
+    { nama: '17-hydroxyprogesterone', untuk: 'Congenital adrenal hyperplasia; part of newborn screening' },
+  ],
+  pituitary: [
+    { nama: 'Pituitary hormone panel', untuk: 'TSH, ACTH, LH, FSH, GH, prolactin — the axis fails in a predictable order' },
+    { nama: 'Prolactin', untuk: 'Prolactinoma, but also raised by stalk compression from any mass' },
+    { nama: 'IGF-1', untuk: 'A stable proxy for growth hormone, which is too pulsatile to measure directly' },
+    { nama: 'Pituitary MRI', untuk: 'Adenoma, stalk and the relation to the optic chiasm' },
+    { nama: 'Formal visual fields', untuk: 'Bitemporal loss appears before the patient notices it' },
+  ],
+  gallbladder: [
+    { nama: 'Abdominal ultrasound', untuk: 'First test for stones, wall thickening and duct dilatation' },
+    { nama: 'Liver function tests', untuk: 'A cholestatic pattern points to duct obstruction, not the gallbladder alone' },
+    { nama: 'MRCP', untuk: 'Non-invasive imaging of the biliary tree when a duct stone is suspected' },
+  ],
+  'small-intestine': [
+    { nama: 'Coeliac serology (tTG-IgA)', untuk: 'Must be taken while still eating gluten, or it reads falsely negative' },
+    { nama: 'Faecal elastase', untuk: 'Separates pancreatic insufficiency from mucosal malabsorption' },
+    { nama: 'Small bowel imaging (MR enterography)', untuk: 'Crohn disease, strictures and fistulae' },
+    { nama: 'Technetium-99m scan', untuk: 'Finds ectopic gastric mucosa in a Meckel diverticulum' },
+  ],
+  testis: [
+    { nama: 'Scrotal ultrasound with Doppler', untuk: 'Mass, hydrocele, varicocele — and blood flow in suspected torsion' },
+    { nama: 'Tumour markers (AFP, β-hCG, LDH)', untuk: 'Germ cell tumours; drawn BEFORE orchidectomy so they can be interpreted' },
+    { nama: 'Morning testosterone, LH & FSH', untuk: 'Separates testicular failure from a pituitary cause' },
+    { nama: 'Semen analysis', untuk: 'Count, motility and morphology in infertility' },
+  ],
+  'spinal-cord': [
+    { nama: 'MRI whole spine', untuk: 'Compression, myelitis, syrinx, tethering — the only test that shows the cord itself' },
+    { nama: 'Neurological examination by level', untuk: 'Localises the lesion before any scan is ordered' },
+    { nama: 'Bladder scan / post-void residual', untuk: 'Retention is often the earliest sign of cord compression' },
+    { nama: 'Lumbar puncture', untuk: 'Inflammatory and infective causes — only after imaging excludes a block' },
+  ],
+  'peripheral-nerves': [
+    { nama: 'Nerve conduction studies & EMG', untuk: 'Separates axonal from demyelinating disease, and nerve from muscle' },
+    { nama: 'HbA1c and B12', untuk: 'The two commonest treatable causes of a peripheral neuropathy' },
+    { nama: 'Nerve ultrasound or MRI', untuk: 'Entrapment, tumour, or a nerve sheath lesion' },
+  ],
+  skeleton: [
+    { nama: 'Plain radiograph', untuk: 'Fracture, alignment, bone quality — still the first test in most bone complaints' },
+    { nama: 'DXA bone density', untuk: 'Osteoporosis, and the T-score that guides treatment' },
+    { nama: 'Calcium, phosphate, ALP, vitamin D, PTH', untuk: 'The metabolic panel behind most non-traumatic bone disease' },
+    { nama: 'Skeletal survey', untuk: 'Multiple fractures of differing ages — non-accidental injury or osteogenesis imperfecta' },
+  ],
+  skin: [
+    { nama: 'Dermoscopy', untuk: 'Raises accuracy for melanoma well above the naked eye' },
+    { nama: 'Skin biopsy', untuk: 'Punch or excision — the definitive test for most rashes and all suspicious lesions' },
+    { nama: 'Skin scraping / KOH', untuk: 'Fungal infection, which is frequently treated as eczema instead' },
+    { nama: 'Patch testing', untuk: 'Allergic contact dermatitis — distinct from irritant, and managed differently' },
+  ],
+  larynx: [
+    { nama: 'Flexible nasolaryngoscopy', untuk: 'Direct view of the cords and their movement' },
+    { nama: 'Stroboscopy', untuk: 'Shows the mucosal wave, which ordinary light cannot' },
+    { nama: 'CT neck and chest', untuk: 'Hoarseness with a normal larynx — the recurrent laryngeal nerve runs through the chest' },
+  ],
+  pharynx: [
+    { nama: 'Throat swab / rapid strep test', untuk: 'Group A streptococcus, applied with Centor criteria rather than to everyone' },
+    { nama: 'Flexible nasendoscopy', untuk: 'Persistent unilateral symptoms, or a neck lump with no obvious source' },
+    { nama: 'Videofluoroscopic swallow', untuk: 'Aspiration and swallow safety after stroke or bulbar disease' },
+  ],
+  'external-nose': [
+    { nama: 'Anterior rhinoscopy', untuk: 'Septum, turbinates, polyps and the bleeding point' },
+    { nama: 'Nasendoscopy', untuk: 'Posterior bleeding and the postnasal space' },
+    { nama: 'CT sinuses', untuk: 'Chronic rhinosinusitis and anatomy before surgery' },
+    { nama: 'Allergy testing', untuk: 'Skin prick or specific IgE where allergic rhinitis is suspected' },
+  ],
+  'nasal-septum': [
+    { nama: 'Anterior rhinoscopy', untuk: 'Deviation, spurs, perforation and Kiesselbach plexus' },
+    { nama: 'Peak nasal inspiratory flow', untuk: 'Measures obstruction rather than assuming it from appearance' },
+    { nama: 'CT sinuses', untuk: 'Bony anatomy before septal surgery' },
+  ],
+  'external-ear': [
+    { nama: 'Otoscopy', untuk: 'Canal, wax, discharge and the drum beyond it' },
+    { nama: 'Ear swab', untuk: 'Otitis externa that fails first-line treatment — pseudomonas and fungi' },
+  ],
+  eardrum: [
+    { nama: 'Otoscopy', untuk: 'Perforation, effusion, retraction and cholesteatoma' },
+    { nama: 'Tympanometry', untuk: 'Middle-ear pressure and drum compliance — detects effusion a normal-looking drum hides' },
+    { nama: 'Pure-tone audiometry', untuk: 'Quantifies the conductive loss an abnormal drum produces' },
+  ],
+  ossicles: [
+    { nama: 'Rinne & Weber tests', untuk: 'Separates conductive from sensorineural loss at the bedside, before any machine' },
+    { nama: 'Pure-tone audiometry', untuk: 'The air-bone gap is the measurement that defines ossicular disease' },
+    { nama: 'CT temporal bone', untuk: 'Ossicular chain integrity, fixation and erosion' },
+  ],
+  'inner-ear-nerve': [
+    { nama: 'Pure-tone audiometry', untuk: 'Asymmetry is the finding that triggers everything else' },
+    { nama: 'MRI internal auditory meatus', untuk: 'Vestibular schwannoma — the reason asymmetric loss is imaged' },
+    { nama: 'Head impulse test & Dix-Hallpike', untuk: 'Separates peripheral from central vertigo at the bedside' },
+    { nama: 'Auditory brainstem response', untuk: 'Newborn screening, and hearing in those who cannot respond' },
+  ],
+  'optic-pathway': [
+    { nama: 'Formal visual fields (perimetry)', untuk: 'The pattern localises the lesion along the pathway' },
+    { nama: 'Relative afferent pupillary defect', untuk: 'A bedside sign that localises to the nerve rather than the retina' },
+    { nama: 'Optical coherence tomography', untuk: 'Retinal nerve fibre layer thinning, which precedes visible pallor' },
+    { nama: 'MRI orbits and brain', untuk: 'Optic neuritis, compression, and demyelination elsewhere' },
+  ],
+  'lymph-nodes': [
+    { nama: 'Full blood count with film', untuk: 'The film shows what the count cannot' },
+    { nama: 'Lymph node ultrasound', untuk: 'Shape, hilum and vascularity separate reactive from malignant' },
+    { nama: 'Excision biopsy', untuk: 'Preferred over fine-needle aspiration in lymphoma — architecture is the diagnosis' },
+    { nama: 'LDH', untuk: 'Reflects tumour burden and prognosis in lymphoma' },
   ],
 }
 
