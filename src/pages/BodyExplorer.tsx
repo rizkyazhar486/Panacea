@@ -20,6 +20,9 @@ const DrugSection = lazy(() => import('./bodyhub/DrugSection'))
 const DiseaseSection = lazy(() => import('./bodyhub/DiseaseSection'))
 const OrganDossier = lazy(() => import('./bodyhub/OrganDossier'))
 const SimulatorSection = lazy(() => import('./bodyhub/SimulatorSection'))
+// Ruang kardiovaskular: figur pembuluh tersendiri dengan aliran dan lesi, jadi
+// dimuat hanya ketika tabnya dibuka — GLB-nya 3,6 MB.
+const CardioLab = lazy(() => import('./bodyhub/CardioLab'))
 const WorkoutSimSection = lazy(() => import('./bodyhub/WorkoutSimSection'))
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -67,7 +70,7 @@ function Chip({
 // sama-sama menyorot struktur pada figur yang itu-itu juga. Itulah maksud
 // "satu simulasi tubuh yang utuh" — bukan enam halaman yang saling menyebut,
 // melainkan satu tubuh yang ditanyai dari enam sudut.
-type PanelTab = 'layers' | 'muscles' | 'workout-sim' | 'organs' | 'physiology' | 'simulator' | 'drugs' | 'diseases' | 'reference'
+type PanelTab = 'layers' | 'muscles' | 'workout-sim' | 'organs' | 'physiology' | 'simulator' | 'cardio' | 'drugs' | 'diseases' | 'reference'
 
 const PANEL_TABS: Array<{ key: PanelTab; label: string }> = [
   { key: 'layers', label: 'Layers' },
@@ -76,6 +79,7 @@ const PANEL_TABS: Array<{ key: PanelTab; label: string }> = [
   { key: 'organs', label: 'Organs' },
   { key: 'physiology', label: 'Physiology' },
   { key: 'simulator', label: 'Simulator' },
+  { key: 'cardio', label: 'Cardio lab' },
   { key: 'drugs', label: 'Drugs' },
   { key: 'diseases', label: 'Diseases' },
   { key: 'reference', label: 'Study' },
@@ -787,6 +791,12 @@ export function BodyExplorer() {
                     setLayers((prev) => new Set(prev).add('cardiovascular').add('visceral'))
                   }}
                 />
+              </Suspense>
+            )}
+
+            {panelTab === 'cardio' && (
+              <Suspense fallback={<p className="text-sm text-neutral-500">Loading the cardiovascular lab…</p>}>
+                <CardioLab onBukaOrgan={onPickOrgan} />
               </Suspense>
             )}
 

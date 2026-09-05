@@ -1,0 +1,29 @@
+Cardiovascular model (cardio.glb)
+=================================
+
+131 individually named vessels and heart structures, cut from:
+
+  BodyParts3D 4.0
+  (c) The Database Center for Life Science (DBCLS)
+  Licence: CC BY 4.0 — https://creativecommons.org/licenses/by/4.0/
+  Dataset: https://dbarchive.biosciencedbc.jp/en/bodyparts3d/download.html
+  Publication: Mitsuhashi et al. (2009), BodyParts3D: 3D structure database
+  for anatomical concepts. https://doi.org/10.1093/nar/gkn613
+
+Packaging: ashemag/human-atlas (MIT, Copyright (c) 2026 ashemag), which
+converted the source meshes to metre/Y-up axes, simplified them with
+meshoptimizer at a 0.2% relative error limit, and packed them into binary
+chunks with a manifest.
+
+Adaptation in this repository: scripts/atlasCardio.mjs selects the vessels
+that carry the teaching, centres the whole set as one piece so that the
+relative positions stay true, colours each structure by its OXYGEN CONTENT
+rather than by "artery red, vein blue" (so the pulmonary artery is blue and
+the pulmonary veins are red), and computes a centreline for every vessel
+along its longest axis so blood can be animated flowing through it.
+
+Mesh names are the BodyParts3D names, unchanged. src/lib/cardioAtlas.gen.ts
+carries the same names, which is how a condition in src/lib/cardioPathology.ts
+can light up the exact vessel it damages.
+
+Adult male reference anatomy. Educational material, not a clinical tool.
