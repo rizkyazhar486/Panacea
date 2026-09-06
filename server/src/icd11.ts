@@ -5,9 +5,8 @@
 // ICD-11 TIDAK punya API publik tanpa kunci. WHO membuka datanya cuma-cuma,
 // tapi lewat OAuth2 client credentials: akun didaftarkan sendiri di
 // https://icd.who.int/icdapi, lalu client id & secret-nya dipasang sebagai
-// variabel lingkungan. Itu gratis dan tanpa batas kuota untuk pemakaian
-// normal — tapi tetap perlu didaftarkan satu kali oleh pemilik aplikasi,
-// dan tidak ada jalan memutarnya.
+// variabel lingkungan. Itu gratis untuk pemakaian normal, tetapi tetap perlu
+// didaftarkan satu kali oleh pemilik aplikasi.
 //
 // Karena kredensialnya bisa saja belum dipasang, ada jalur kedua yang selalu
 // hidup: NLM Clinical Tables (ICD-10-CM, tanpa kunci, domain publik). Itu
@@ -19,11 +18,11 @@ import { config } from './config.js'
 
 const TOKEN_URL = 'https://icdaccessmanagement.who.int/connect/token'
 const ICD_BASE = 'https://id.who.int/icd/release/11'
-// Rilis MMS (Mortality & Morbidity Statistics) — linearisasi ICD-11 yang
-// dipakai untuk pengkodean klinis. "2024-01" adalah rilis stabil; dibiarkan
-// eksplisit supaya kode yang ditampilkan tidak diam-diam berubah arti saat
-// WHO menerbitkan rilis berikutnya.
-const ICD_RELEASE = '2024-01'
+// MMS (Mortality & Morbidity Statistics) 2026-01 adalah release ICD-11 terbaru
+// yang dipublikasikan WHO pada 2026. Release ID dibuat eksplisit agar hasil
+// pencarian reproducible dan tidak berubah diam-diam ketika WHO merilis versi
+// berikutnya. Naikkan hanya setelah release baru diverifikasi terhadap API WHO.
+const ICD_RELEASE = '2026-01'
 const CLINICAL_TABLES = 'https://clinicaltables.nlm.nih.gov/api/icd10cm/v3/search'
 
 export interface IcdEntry {
@@ -39,6 +38,7 @@ export interface IcdEntry {
 }
 
 export const icd11Configured = Boolean(config.whoIcd.clientId && config.whoIcd.clientSecret)
+export const icd11Release = ICD_RELEASE
 
 // Token WHO berlaku ~1 jam. Disimpan di memori dan diperbarui lebih awal
 // (60 detik sebelum kedaluwarsa) supaya tidak ada permintaan yang jatuh tepat
@@ -140,7 +140,7 @@ async function cariIcd10cm(q: string, limit: number): Promise<IcdEntry[]> {
  * Pencarian diagnosis. Memakai ICD-11 kalau kredensial WHO terpasang, dan
  * jatuh ke ICD-10-CM kalau tidak — atau kalau WHO sedang tidak bisa dihubungi,
  * karena hasil yang benar dari klasifikasi terdahulu masih jauh lebih berguna
- * daripada layar kosong.
+ * daripada layar kosong. Sumber tidak pernah disamarkan.
  */
 export async function cariDiagnosis(q: string, limit = 20): Promise<IcdEntry[]> {
   const kueri = q.trim()
