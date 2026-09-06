@@ -1,0 +1,109 @@
+/* PanaceaMed global readability + mobile wallpaper guardrails.
+   Loaded outside the JS bundle so the backdrop exists before React paints.
+   The fixed viewport layer avoids the visible seam/edge produced when a long
+   mobile page scrolls beyond a finite document-sized gradient. */
+
+html,
+body,
+#root {
+  min-height: 100%;
+}
+
+body {
+  position: relative;
+  isolation: isolate;
+  min-height: 100dvh;
+  background: #fcfcfd !important;
+}
+
+body::before {
+  content: '';
+  position: fixed;
+  inset: -2px;
+  z-index: -1;
+  pointer-events: none;
+  background:
+    radial-gradient(70% 55% at 10% -8%, rgba(255, 126, 34, 0.065) 0%, transparent 62%),
+    radial-gradient(68% 55% at 102% 8%, rgba(0, 133, 255, 0.065) 0%, transparent 63%),
+    radial-gradient(70% 62% at 48% 108%, rgba(0, 191, 99, 0.045) 0%, transparent 66%),
+    linear-gradient(180deg, #fcfcfd 0%, #f8fbf9 52%, #fcfcfd 100%);
+  background-repeat: no-repeat;
+  background-size: cover;
+  transform: translateZ(0);
+  -webkit-transform: translateZ(0);
+}
+
+#root {
+  min-height: 100dvh;
+}
+
+/* Dark backdrop is also viewport-fixed: no repeated stripe when Safari's
+   dynamic address bar changes the layout viewport while scrolling. */
+.dark body {
+  background: #050706 !important;
+}
+
+.dark body::before {
+  background:
+    radial-gradient(72% 58% at 8% -10%, rgba(255, 199, 44, 0.16) 0%, transparent 58%),
+    radial-gradient(68% 58% at 100% 104%, rgba(0, 163, 255, 0.13) 0%, transparent 60%),
+    radial-gradient(55% 45% at 98% -5%, rgba(157, 0, 255, 0.085) 0%, transparent 60%),
+    linear-gradient(180deg, #050706 0%, #090b0a 48%, #050706 100%);
+  background-repeat: no-repeat;
+  background-size: cover;
+}
+
+/* Text that was visually too close to pale card/background values gets an
+   accessible ink floor. Semantic accent colours are intentionally untouched. */
+html:not(.dark) body .text-neutral-500 {
+  color: #526159 !important;
+}
+
+html:not(.dark) body .text-neutral-600 {
+  color: #3f4d46 !important;
+}
+
+html:not(.dark) body .text-neutral-400 {
+  color: #68766f !important;
+}
+
+/* Panacea green is bright enough that dark ink is markedly clearer than white
+   for compact active-menu pills and primary controls. Gradient hero surfaces
+   are not changed because their darker endpoint needs light text. */
+html:not(.dark) body .bg-brand.text-white {
+  color: #07160e !important;
+}
+
+/* Small-screen ergonomics: maintain safe-area space and prevent clipped text
+   or horizontal wallpaper discontinuities from accidental page overflow. */
+@media (max-width: 640px) {
+  html,
+  body {
+    max-width: 100%;
+    overflow-x: clip;
+  }
+
+  body {
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+
+  button,
+  a[href],
+  [role='button'] {
+    text-wrap: pretty;
+  }
+}
+
+@supports (-webkit-touch-callout: none) {
+  body::before {
+    min-height: 100svh;
+    height: 100lvh;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  body::before {
+    transform: none;
+    -webkit-transform: none;
+  }
+}
