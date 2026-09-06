@@ -1,5 +1,9 @@
-import { useState } from 'react'
+import { lazy, Suspense, useState } from 'react'
 import { parseSequenceEvidence, type SequenceEvidenceReport } from '../../lib/sequenceEvidence'
+
+const VariantEvidenceWorkbench = lazy(() =>
+  import('./VariantEvidenceWorkbench').then((module) => ({ default: module.VariantEvidenceWorkbench })),
+)
 
 const MAX_ANALYSIS_BYTES = 32 * 1024 * 1024
 
@@ -30,6 +34,7 @@ function metricCards(report: SequenceEvidenceReport) {
       ['PASS / unfiltered sites', number(report.passSites)],
       ['Ti/Tv', report.tiTv == null ? '—' : report.tiTv.toFixed(3)],
       ['Samples', number(report.sampleCount)],
+      ['Assembly hint', report.assemblyHint || 'unknown'],
     ]
   }
   const cards = [
@@ -96,10 +101,10 @@ export function SequenceEvidenceWorkbench() {
           <div className="max-w-4xl">
             <div className="text-[9px] font-black uppercase tracking-[.18em] text-emerald-700 dark:text-emerald-300">Local sequencing evidence</div>
             <h3 className="mt-1 text-xl font-black tracking-tight text-neutral-950 dark:text-white">Read real FASTA, FASTQ or VCF data in the browser.</h3>
-            <p className="mt-1 text-[10px] leading-relaxed text-neutral-500 dark:text-neutral-400">This workbench reads the selected file locally and computes transparent summary metrics. FASTQ from an Oxford Nanopore basecalling workflow can be inspected here, but Panacea is not performing basecalling itself. No sequence file is uploaded by this component.</p>
+            <p className="mt-1 text-[10px] leading-relaxed text-neutral-500 dark:text-neutral-400">This workbench reads the selected file locally and computes transparent summary metrics. FASTQ from an Oxford Nanopore basecalling workflow can be inspected here, but Panacea is not performing basecalling itself. No sequence file is uploaded by this component. VCF consequence annotation is a separate, explicit-consent action.</p>
           </div>
           <div className="flex flex-wrap gap-1.5 text-[8px] font-black uppercase tracking-[.12em] text-neutral-500 dark:text-neutral-300">
-            {['FASTA', 'FASTQ', 'VCF', 'local only'].map((item) => <span key={item} className="rounded-full border border-neutral-200 bg-neutral-50 px-2.5 py-1.5 dark:border-white/10 dark:bg-white/[.04]">{item}</span>)}
+            {['FASTA', 'FASTQ', 'VCF', 'local first'].map((item) => <span key={item} className="rounded-full border border-neutral-200 bg-neutral-50 px-2.5 py-1.5 dark:border-white/10 dark:bg-white/[.04]">{item}</span>)}
           </div>
         </div>
 
@@ -118,7 +123,7 @@ export function SequenceEvidenceWorkbench() {
             <div>
               <div className="text-[8px] font-black uppercase tracking-[.16em] text-neutral-400">File provenance</div>
               <div className="mt-1 text-sm font-black text-neutral-950 dark:text-white">{fileName}</div>
-              <div className="mt-1 text-[9px] text-neutral-500 dark:text-neutral-400">{bytesLabel(fileSize)} · {report.format} · {sampled ? `${bytesLabel(analyzedBytes)} preview analyzed` : 'complete file analyzed'}</div>
+              <div className="mt-1 text-[9px] text-neutral-500 dark:text-neutral-400">{bytesLabel(fileSize)} · {report.format} · {sampled ? `${bytesLabel(analyzedBytes)} preview analyzed` : 'complete file analyzed'}{report.format === 'VCF' ? ` · ${report.assemblyHint || 'assembly unknown'}` : ''}</div>
             </div>
             <span className={`rounded-full px-3 py-1.5 text-[8px] font-black uppercase ${sampled ? 'bg-amber-100 text-amber-800 dark:bg-amber-300/10 dark:text-amber-200' : 'bg-emerald-100 text-emerald-800 dark:bg-emerald-300/10 dark:text-emerald-200'}`}>{sampled ? 'sampled' : 'complete'}</span>
             <div className="w-full break-all rounded-xl bg-white px-3 py-2 font-mono text-[8px] text-neutral-500 dark:bg-black/20 dark:text-neutral-400">SHA-256 of analyzed bytes: {hash}</div>
@@ -162,6 +167,12 @@ export function SequenceEvidenceWorkbench() {
               {sampled && <div>Large-file boundary: metrics describe only the first {bytesLabel(analyzedBytes)} of this file, not the entire sequencing run.</div>}
               {report.warnings.map((warning) => <div key={warning}>{warning}</div>)}
             </div>
+          )}
+
+          {report.format === 'VCF' && report.variants && report.variants.length > 0 && (
+            <Suspense fallback={<div className="rounded-[28px] border border-neutral-200 p-6 text-center text-[10px] font-semibold text-neutral-500 dark:border-white/10">Loading variant evidence tools…</div>}>
+              <VariantEvidenceWorkbench variants={report.variants} assemblyHint={report.assemblyHint} referenceHeader={report.referenceHeader} />
+            </Suspense>
           )}
         </div>
       )}
