@@ -5,14 +5,14 @@ import { Card, SectionTitle, Badge } from '../components/ui'
 import { IconBell } from '../components/icons'
 import { api, backendEnabled, type Notif } from '../lib/api'
 import { HealthAlertSettings } from '../components/HealthAlertSettings'
+import { SmartNotificationSettings } from '../components/SmartNotificationSettings'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Halaman penuh untuk seluruh pemberitahuan.
 //
-// Panel di lonceng dibatasi tinggi dan menutup begitu berpindah halaman, jadi
-// ia bukan tempat yang tepat untuk mencari kembali sesuatu yang pernah muncul —
-// misalnya "kapan tepatnya pengingat obat itu dikirim". Di sini isinya utuh,
-// bisa disaring, dan tiap butir menampilkan waktu lengkapnya.
+// Server notifications remain the durable history for push/messages. Smart
+// combinations are local-first and intentionally stay useful even when the
+// backend is unavailable, so their controls are never hidden behind backendEnabled.
 // ─────────────────────────────────────────────────────────────────────────────
 
 type Saring = 'semua' | 'belum' | 'sudah'
@@ -55,6 +55,7 @@ export function Notifications() {
   const nav = useNavigate()
 
   const load = useCallback(() => {
+    if (!backendEnabled) { setMemuat(false); return }
     setMemuat(true)
     api.notifications()
       .then((r) => { setItems(r); setGagal(false) })
@@ -62,10 +63,7 @@ export function Notifications() {
       .finally(() => setMemuat(false))
   }, [])
 
-  useEffect(() => {
-    if (!backendEnabled) { setMemuat(false); return }
-    load()
-  }, [load])
+  useEffect(() => { load() }, [load])
 
   const tersaring = useMemo(() => {
     const urut = [...items].sort((a, b) => Date.parse(b.at) - Date.parse(a.at))
@@ -88,20 +86,10 @@ export function Notifications() {
   const belum = items.filter((n) => !n.read).length
 
   function tandaiSemua() {
+    if (!backendEnabled) return
     api.markNotificationsRead()
       .then(() => setItems((p) => p.map((n) => ({ ...n, read: true }))))
       .catch(() => {})
-  }
-
-  if (!backendEnabled) {
-    return (
-      <div className="space-y-4">
-        <SectionTitle icon={<IconBell />} title="Notifications" />
-        <Card>
-          <Prosa kelas="text-sm text-neutral-500">Notifications need a connection to the server, and the app is currently running without one. Your health data is still saved on this device as usual.</Prosa>
-        </Card>
-      </div>
-    )
   }
 
   return (
@@ -109,99 +97,108 @@ export function Notifications() {
       <SectionTitle
         icon={<IconBell />}
         title="Notifications"
-        subtitle={belum > 0 ? `${belum} unread of ${items.length}` : `${items.length} notifications`}
+        subtitle={backendEnabled ? (belum > 0 ? `${belum} unread of ${items.length}` : `${items.length} server notifications`) : 'Smart combinations stay available locally'}
       />
 
+      <SmartNotificationSettings />
       <HealthAlertSettings />
 
-      <Card>
-        <div className="flex flex-wrap items-center gap-2">
-          {([['semua', 'All'], ['belum', 'Unread'], ['sudah', 'Read']] as [Saring, string][]).map(([k, l]) => (
-            <button
-              key={k}
-              onClick={() => setSaring(k)}
-              className={`rounded-lg border px-3 py-1.5 text-xs font-bold transition ${
-                saring === k
-                  ? 'border-brand bg-brand-50 text-brand-dark'
-                  : 'border-neutral-200 text-neutral-500 dark:border-white/10 dark:text-neutral-500'
-              }`}
-            >
-              {l}
-              {k === 'belum' && belum > 0 && <span className="ml-1.5 text-[10px]">({belum})</span>}
-            </button>
-          ))}
-          <span className="flex-1" />
-          {belum > 0 && (
-            <button onClick={tandaiSemua} className="rounded-lg bg-neutral-100 px-3 py-1.5 text-xs font-bold text-neutral-700 dark:bg-white/10 dark:text-neutral-200">
-              Mark all as read
-            </button>
-          )}
-          <button onClick={load} className="rounded-lg bg-neutral-100 px-3 py-1.5 text-xs font-bold text-neutral-700 dark:bg-white/10 dark:text-neutral-200">
-            Reload
-          </button>
-        </div>
-      </Card>
-
-      {gagal ? (
+      {!backendEnabled ? (
         <Card>
-          <p className="text-sm text-neutral-500">Notifications could not be loaded. Check your internet connection.</p>
-          <button onClick={load} className="mt-3 rounded-lg bg-brand px-3 py-1.5 text-xs font-bold text-white">Try again</button>
-        </Card>
-      ) : memuat ? (
-        <Card><p className="text-sm text-neutral-500">Loading…</p></Card>
-      ) : tersaring.length === 0 ? (
-        <Card>
-          <p className="text-sm text-neutral-500">
-            {saring === 'belum' ? 'No unread notifications.'
-              : saring === 'sudah' ? 'No read notifications yet.'
-                : 'No notifications yet.'}
-          </p>
-          {saring === 'semua' && (
-            <p className="mt-1.5 text-[12px] leading-relaxed text-neutral-500">
-              Medication reminders, consultation schedules, payment updates, and new messages will appear here.
-            </p>
-          )}
+          <Prosa kelas="text-sm text-neutral-500">Server notification history is unavailable while the app is running without its backend. Smart combinations above still evaluate local app signals while Panacea is active; background medication and server reminders need the backend connection.</Prosa>
         </Card>
       ) : (
-        grup.map((g) => (
-          <Card key={g.hari}>
-            <div className="mb-2 text-[10px] font-bold uppercase tracking-wide text-neutral-500">{g.hari}</div>
-            <div className="space-y-2">
-              {g.list.map((n) => {
-                const kat = kategori(n)
-                return (
-                  <div
-                    key={n.id}
-                    className={`rounded-xl border p-3 ${n.read ? 'border-neutral-100 dark:border-white/10' : 'border-brand/30 bg-brand-50/40 dark:bg-brand/10'}`}
-                  >
-                    <div className="flex gap-3">
-                      <span className="mt-0.5 text-base leading-none shrink-0">{kat.ikon}</span>
-                      <div className="min-w-0 flex-1">
-                        <div className="flex flex-wrap items-center gap-2">
-                          <span className="text-sm font-bold text-ink dark:text-ink">{n.title}</span>
-                          {!n.read && <Badge tone="brand">New</Badge>}
-                        </div>
-                        <p className="mt-1 text-[12px] leading-relaxed text-neutral-600 dark:text-neutral-300">{n.body}</p>
-                        <p className="mt-1.5 text-[11px] text-neutral-500">{kat.label} · {fullTime(n.at)}</p>
-                        {n.url && (
-                          <button
-                            onClick={() => {
-                              const i = n.url!.indexOf('#/')
-                              if (i >= 0) nav(n.url!.slice(i + 1))
-                            }}
-                            className="mt-2 rounded-lg bg-brand px-3 py-1.5 text-xs font-bold text-white"
-                          >
-                            Open its page →
-                          </button>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                )
-              })}
+        <>
+          <Card>
+            <div className="flex flex-wrap items-center gap-2">
+              {([['semua', 'All'], ['belum', 'Unread'], ['sudah', 'Read']] as [Saring, string][]).map(([k, l]) => (
+                <button
+                  key={k}
+                  onClick={() => setSaring(k)}
+                  className={`rounded-lg border px-3 py-1.5 text-xs font-bold transition ${
+                    saring === k
+                      ? 'border-brand bg-brand-50 text-brand-dark'
+                      : 'border-neutral-200 text-neutral-500 dark:border-white/10 dark:text-neutral-500'
+                  }`}
+                >
+                  {l}
+                  {k === 'belum' && belum > 0 && <span className="ml-1.5 text-[10px]">({belum})</span>}
+                </button>
+              ))}
+              <span className="flex-1" />
+              {belum > 0 && (
+                <button onClick={tandaiSemua} className="rounded-lg bg-neutral-100 px-3 py-1.5 text-xs font-bold text-neutral-700 dark:bg-white/10 dark:text-neutral-200">
+                  Mark all as read
+                </button>
+              )}
+              <button onClick={load} className="rounded-lg bg-neutral-100 px-3 py-1.5 text-xs font-bold text-neutral-700 dark:bg-white/10 dark:text-neutral-200">
+                Reload
+              </button>
             </div>
           </Card>
-        ))
+
+          {gagal ? (
+            <Card>
+              <p className="text-sm text-neutral-500">Notifications could not be loaded. Check your internet connection.</p>
+              <button onClick={load} className="mt-3 rounded-lg bg-brand px-3 py-1.5 text-xs font-bold text-white">Try again</button>
+            </Card>
+          ) : memuat ? (
+            <Card><p className="text-sm text-neutral-500">Loading…</p></Card>
+          ) : tersaring.length === 0 ? (
+            <Card>
+              <p className="text-sm text-neutral-500">
+                {saring === 'belum' ? 'No unread notifications.'
+                  : saring === 'sudah' ? 'No read notifications yet.'
+                    : 'No server notifications yet.'}
+              </p>
+              {saring === 'semua' && (
+                <p className="mt-1.5 text-[12px] leading-relaxed text-neutral-500">
+                  Medication reminders, consultation schedules, payment updates, and new messages will appear here.
+                </p>
+              )}
+            </Card>
+          ) : (
+            grup.map((g) => (
+              <Card key={g.hari}>
+                <div className="mb-2 text-[10px] font-bold uppercase tracking-wide text-neutral-500">{g.hari}</div>
+                <div className="space-y-2">
+                  {g.list.map((n) => {
+                    const kat = kategori(n)
+                    return (
+                      <div
+                        key={n.id}
+                        className={`rounded-xl border p-3 ${n.read ? 'border-neutral-100 dark:border-white/10' : 'border-brand/30 bg-brand-50/40 dark:bg-brand/10'}`}
+                      >
+                        <div className="flex gap-3">
+                          <span className="mt-0.5 text-base leading-none shrink-0">{kat.ikon}</span>
+                          <div className="min-w-0 flex-1">
+                            <div className="flex flex-wrap items-center gap-2">
+                              <span className="text-sm font-bold text-ink dark:text-ink">{n.title}</span>
+                              {!n.read && <Badge tone="brand">New</Badge>}
+                            </div>
+                            <p className="mt-1 text-[12px] leading-relaxed text-neutral-600 dark:text-neutral-300">{n.body}</p>
+                            <p className="mt-1.5 text-[11px] text-neutral-500">{kat.label} · {fullTime(n.at)}</p>
+                            {n.url && (
+                              <button
+                                onClick={() => {
+                                  const i = n.url!.indexOf('#/')
+                                  if (i >= 0) nav(n.url!.slice(i + 1))
+                                }}
+                                className="mt-2 rounded-lg bg-brand px-3 py-1.5 text-xs font-bold text-white"
+                              >
+                                Open its page →
+                              </button>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    )
+                  })}
+                </div>
+              </Card>
+            ))
+          )}
+        </>
       )}
     </div>
   )
