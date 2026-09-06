@@ -1,6 +1,6 @@
 # Panacea Body Exposure — HRA source contract
 
-Body Exposure keeps source anatomy, evidence, and simulation as separate layers.
+Body Exposure keeps source anatomy, measured data, derived calculations, educational context and simulations as separate layers.
 
 ## Source anatomy
 
@@ -22,17 +22,38 @@ Body Exposure keeps source anatomy, evidence, and simulation as separate layers.
 
 `HraSourceSearch` gives the Anatomy page an explicit multi-release structure search. A user can search labels or ontology IDs and see the source release, ontology identity, model name and whether an actual browser-loadable GLB exists.
 
+## Physiology source boundary
+
+`PhysiologyHraWorkbench` replaces the previous animated-body physiology viewport in Body Exposure. The selected cardiovascular, respiratory, neuromuscular, gastrointestinal, renal or thermoregulation system resolves its own HRA source anatomy. The GLB never changes with heart rate, respiratory rate, blood pressure, exercise state or teaching phase.
+
+Physiology is shown beside the fixed source model using explicit provenance labels:
+
+- `measured`: connected source value actually exists;
+- `derived`: calculated from displayed inputs with an explicit formula;
+- `educational`: reference physiology or teaching context;
+- `unavailable`: Panacea does not fabricate a value.
+
+The formulas remain defined in `src/lib/bodyPhysiology.ts`, including `MAP ≈ DBP + (SBP − DBP) / 3`, `PP = SBP − DBP`, `CO = HR × SV`, `V̇E = RR × VT`, `V̇A = RR × (VT − VD)`, `τ = r × F`, `P = F · v`, `FF = GFR / RPF`, `Cx = (Ux × V) / Px`, and the heat-balance relation `S = M − W ± R ± C ± K − E`. A numerical result is not produced when required inputs are unavailable.
+
 ## Cell and DNA evidence-first rule
 
 Body → Cell and Cell → DNA render the Human Protein Atlas + Ensembl evidence workspace first. The generated cell/chromatin/DNA scene is collapsed under an explicit `Educational structural model` control. The model is never presented as microscopy, sequencing output or patient evidence.
 
-## Workout-specific anatomy
+## Workout-specific anatomy and data replay
 
-`WorkoutHraWorkbench` reads an imported workout instead of fabricating activity. The recorded workout name is classified only to choose HRA anatomy queries; recorded duration, distance, heart rate and recovery remain measured workout fields. The workbench now loads a resolved upstream HRA GLB when available, while the workout replay stays in a separate collapsed educational model layer. The source GLB does not change with heart rate, pace, distance or recovery values.
+`WorkoutHraWorkbench` reads an imported workout instead of fabricating activity. The recorded workout name is classified only to choose HRA anatomy queries; recorded duration, distance, heart rate and recovery remain measured workout fields. The workbench loads a resolved upstream HRA GLB when available.
 
-## Operation-specific surgery anatomy
+`WorkoutSignalReplay` replaces the old Body3D replay in Body Exposure. Its playhead changes data cards and the recorded heart-rate trace only. The source GLB never pulses or deforms. Signals from `src/lib/workout4d.ts` retain their `measured`, `derived` or `educational` provenance.
 
-`getSurgicalHraTerms()` derives source queries from each surgical procedure and phase using focus anatomy, structures at risk, and the operative region. `SurgicalHraWorkbench` lets the learner choose an operation and phase, inspect the generated source terms, and load resolved HRA GLB geometry before the procedural simulation is opened. The same source-first workbench is used before surgical rehearsal. Generic whole-body HRA is no longer repeated above these focused modes because the workbench already provides source-resolved anatomy.
+## Operation-specific surgery anatomy and timeline
+
+`getSurgicalHraTerms()` derives source queries from each surgical procedure and phase using focus anatomy, structures at risk, and the operative region. `SurgicalHraWorkbench` lets the learner choose an operation and phase, inspect the source terms, and load resolved HRA GLB geometry.
+
+`SurgicalProcedureTimeline` replaces the old Body3D procedural viewport in Body Exposure. It presents phase objectives, orientation narrative, anatomy focus, structures at risk, checkpoints, instrument families, complications and patient-specific source-data gates without pretending those text records are anatomy or patient-specific surgical guidance.
+
+## Surgical rehearsal boundary
+
+`CinematicSurgicalRehearsal` no longer creates a second Body3D orientation viewport. The HRA workbench above is the anatomy source. Rehearsal is limited to active recall, risk-map review, operation comparison and local curriculum coverage through `SurgicalRehearsalLab`.
 
 ## What-if source boundary
 
@@ -40,8 +61,8 @@ Body → Cell and Cell → DNA render the Human Protein Atlas + Ensembl evidence
 
 ## Regeneration source boundary
 
-`RegenerationHraWorkbench` resolves the selected organ against HRA and displays fixed upstream geometry first. Aging hallmarks, research hypotheses, evidence tiers, safety gates and normalized time-state values are modeled separately. A lower modeled burden is never labeled as measured age reversal or rejuvenation.
+`RegenerationHraWorkbench` resolves the selected organ against HRA and displays fixed upstream geometry first. Aging hallmarks, research hypotheses, evidence tiers, safety gates and normalized time-state values are modeled separately. A lower modeled burden is never labelled as measured age reversal or rejuvenation.
 
-## Simulation boundary
+## Body Exposure routing boundary
 
-Exercise, Surgery and Practice now use focused source-resolved HRA GLB workbenches before their optional model/simulation layers. What-if and Research use source-resolved HRA workbenches as their primary visual experience rather than the legacy `Body3D` renderer. Cell/DNA modes follow evidence-first presentation. A generated scene is never presented as the authoritative anatomical source.
+The Body Exposure route no longer uses the legacy Body3D renderer as the primary visual for Physiology, Exercise, Surgery, Practice, What-if or Research. Physiology uses HRA source geometry plus provenance-aware functional data; Exercise uses HRA plus a data replay; Surgery uses HRA plus a procedure timeline; Practice uses HRA plus active recall; What-if and Research use source-resolved HRA workbenches. Legacy renderers may still exist elsewhere in the repository for compatibility, but they are not the authoritative anatomy source for these Body Exposure modes.
