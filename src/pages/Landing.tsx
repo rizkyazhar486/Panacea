@@ -164,7 +164,7 @@ export function Landing({ onMasuk }: { onMasuk: () => void }) {
 
       <MedicalNews />
 
-      <section id="pricing" className="border-t border-white/[.06]"><PricingSection /></section>
+      <section id="pricing" className="border-t border-white/[.06]"><PricingSection onMasuk={onMasuk} promo={promo} /></section>
 
       <section className="mx-auto max-w-5xl px-5 py-24 text-center sm:px-8">
         <div className="mx-auto grid h-12 w-12 place-items-center rounded-full border border-[#d8bb70]/20 bg-[#d8bb70]/10 text-[#f0d68a]"><IconSparkle size={24} /></div>
