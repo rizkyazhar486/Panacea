@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react'
 import { getWorkouts } from '../../lib/workoutStore'
 import type { ImportedWorkout } from '../../lib/workoutImport'
 import { HraContextBridge } from './HraContextBridge'
+import { HraResolvedAnatomyViewer } from './HraResolvedAnatomyViewer'
 
 function workoutTerms(workout: ImportedWorkout) {
   const name = workout.nama.toLowerCase()
@@ -48,12 +49,12 @@ export function WorkoutHraWorkbench() {
   }
 
   return (
-    <section className="rounded-[28px] border border-neutral-200 bg-white p-4 shadow-sm dark:border-white/10 dark:bg-white/[.035] sm:p-5">
+    <section className="space-y-4 rounded-[28px] border border-neutral-200 bg-white p-4 shadow-sm dark:border-white/10 dark:bg-white/[.035] sm:p-5">
       <div className="flex flex-col gap-3 xl:flex-row xl:items-end xl:justify-between">
         <div>
           <div className="text-[9px] font-black uppercase tracking-[.16em] text-cyan-700 dark:text-cyan-300">Measured workout → source anatomy</div>
           <h3 className="mt-1 text-lg font-black text-neutral-950 dark:text-white">{selected.nama}</h3>
-          <p className="mt-1 max-w-3xl text-[10px] leading-relaxed text-neutral-500 dark:text-neutral-400">The workout chooses an HRA anatomical context; HR, distance and duration below come from the imported session only. The HRA match is educational anatomy, not a claim that these structures were individually measured.</p>
+          <p className="mt-1 max-w-3xl text-[10px] leading-relaxed text-neutral-500 dark:text-neutral-400">The imported workout chooses an HRA anatomical context. HR, distance and duration below come from the session; the GLB remains fixed reference anatomy and is not presented as measured muscle activation.</p>
         </div>
         {workouts.length > 1 && (
           <select value={selected.id} onChange={(event) => setSelectedId(event.target.value)} className="h-10 rounded-2xl border border-neutral-200 bg-neutral-50 px-3 text-[10px] font-bold text-neutral-800 dark:border-white/10 dark:bg-white/[.04] dark:text-white">
@@ -62,7 +63,7 @@ export function WorkoutHraWorkbench() {
         )}
       </div>
 
-      <div className="mt-3 flex gap-2 overflow-x-auto pb-1">
+      <div className="no-scrollbar flex gap-2 overflow-x-auto pb-1">
         <div className="min-w-[120px] rounded-2xl border border-neutral-200 bg-neutral-50 p-3 dark:border-white/10 dark:bg-white/[.025]">
           <div className="text-[8px] font-black uppercase tracking-wide text-neutral-400">Duration</div>
           <div className="mt-1 text-sm font-black text-neutral-950 dark:text-white">{durationLabel(selected.durasi)}</div>
@@ -73,13 +74,17 @@ export function WorkoutHraWorkbench() {
         {selected.hrr1 != null && <div className="min-w-[120px] rounded-2xl border border-neutral-200 bg-neutral-50 p-3 dark:border-white/10 dark:bg-white/[.025]"><div className="text-[8px] font-black uppercase tracking-wide text-neutral-400">1-min recovery</div><div className="mt-1 text-sm font-black text-neutral-950 dark:text-white">{selected.hrr1} bpm</div></div>}
       </div>
 
-      <div className="mt-3 flex flex-wrap gap-1.5">
+      <div className="flex flex-wrap gap-1.5">
         {terms.map((term) => <span key={term} className="rounded-full border border-neutral-200 bg-white px-2.5 py-1.5 text-[9px] font-bold text-neutral-600 dark:border-white/10 dark:bg-white/[.04] dark:text-neutral-300">{term}</span>)}
       </div>
 
-      <div className="mt-4">
-        <HraContextBridge title={`${selected.nama} · anatomical context`} terms={terms} maxResults={12} />
-      </div>
+      <HraResolvedAnatomyViewer
+        title={`${selected.nama} · resolved reference anatomy`}
+        description="The viewer selects upstream HRA GLB geometry from the activity context. It stays static regardless of heart rate, pace, distance or recovery values."
+        terms={terms}
+        maxResults={12}
+      />
+      <HraContextBridge title={`${selected.nama} · mapped source structures`} terms={terms} maxResults={12} />
     </section>
   )
 }
