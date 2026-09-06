@@ -14,10 +14,18 @@ Body Exposure keeps source anatomy, evidence, and simulation as separate layers.
 
 `src/lib/hraResolver.ts` combines the existing v1.2/v2 evidence index with the v1.4 GitHub model catalog and crosswalk. Resolution ranks exact anatomical matches, prefers renderable geometry, preserves ontology identifiers, and exposes source URLs. `HraContextBridge` shows the HRA release and whether each result is `3D available` or `mapping only`.
 
+## Anatomy search
+
+`HraSourceSearch` gives the Anatomy page an explicit multi-release structure search. A user can search labels or ontology IDs and see the source release, ontology identity, model name and whether an actual browser-loadable GLB exists.
+
+## Workout-specific anatomy
+
+`WorkoutHraWorkbench` reads an imported workout instead of fabricating activity. The recorded workout name is classified only to choose HRA anatomy queries; recorded duration, distance, heart rate and recovery remain measured workout fields. HRA structures are displayed as educational reference anatomy and are not described as measured muscle activation.
+
 ## Operation-specific surgery anatomy
 
-`getSurgicalHraTerms()` derives source queries from each surgical procedure and phase using focus anatomy, structures at risk, and the operative region. `SurgicalHraWorkbench` lets the learner choose an operation and phase, inspect the generated source terms, and resolve them against HRA before the procedural simulation is opened.
+`getSurgicalHraTerms()` derives source queries from each surgical procedure and phase using focus anatomy, structures at risk, and the operative region. `SurgicalHraWorkbench` lets the learner choose an operation and phase, inspect the generated source terms, and resolve them against HRA before the procedural simulation is opened. The same source-first workbench is used before surgical rehearsal.
 
 ## Simulation boundary
 
-Exercise, Surgery, Practice, What-if, and Research show HRA reference anatomy first. Their model/simulation layers remain collapsed and explicitly separate from HRA source geometry. For Surgery, operation-specific HRA resolution now appears before the simulation so a generated scene is never presented as the authoritative anatomical source.
+Exercise, Surgery, Practice, What-if, and Research show HRA reference anatomy first. Their model/simulation layers remain collapsed and explicitly separate from HRA source geometry. Exercise now maps a real imported workout to source anatomy; Surgery and Practice map the selected operation and phase. A generated scene is never presented as the authoritative anatomical source.
