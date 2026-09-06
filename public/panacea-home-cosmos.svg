@@ -1,0 +1,100 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1200" preserveAspectRatio="xMidYMid slice">
+  <defs>
+    <linearGradient id="space" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#02040a"/>
+      <stop offset="0.42" stop-color="#071025"/>
+      <stop offset="0.72" stop-color="#16051d"/>
+      <stop offset="1" stop-color="#090208"/>
+    </linearGradient>
+    <radialGradient id="blueNebula" cx="0.32" cy="0.34" r="0.58">
+      <stop offset="0" stop-color="#0b8cff" stop-opacity="0.78"/>
+      <stop offset="0.32" stop-color="#1445d8" stop-opacity="0.42"/>
+      <stop offset="0.68" stop-color="#4d1ee5" stop-opacity="0.14"/>
+      <stop offset="1" stop-color="#000" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="redNebula" cx="0.8" cy="0.46" r="0.62">
+      <stop offset="0" stop-color="#ff4f17" stop-opacity="0.88"/>
+      <stop offset="0.24" stop-color="#ff164d" stop-opacity="0.62"/>
+      <stop offset="0.52" stop-color="#9a16ff" stop-opacity="0.34"/>
+      <stop offset="0.84" stop-color="#42002c" stop-opacity="0.08"/>
+      <stop offset="1" stop-color="#000" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="aurora" cx="0.58" cy="0.28" r="0.6">
+      <stop offset="0" stop-color="#00e5ff" stop-opacity="0.28"/>
+      <stop offset="0.36" stop-color="#7048ff" stop-opacity="0.22"/>
+      <stop offset="0.7" stop-color="#ff2f9d" stop-opacity="0.14"/>
+      <stop offset="1" stop-color="#000" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="planet" cx="0.35" cy="0.3" r="0.8">
+      <stop offset="0" stop-color="#17325a"/>
+      <stop offset="0.62" stop-color="#06101e"/>
+      <stop offset="1" stop-color="#000"/>
+    </radialGradient>
+    <linearGradient id="rim" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#53d9ff"/>
+      <stop offset="0.45" stop-color="#6d55ff"/>
+      <stop offset="0.72" stop-color="#ff3b69"/>
+      <stop offset="1" stop-color="#ffb43b"/>
+    </linearGradient>
+    <linearGradient id="gold" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#ffe29b"/>
+      <stop offset="0.45" stop-color="#ffb243"/>
+      <stop offset="1" stop-color="#c76611"/>
+    </linearGradient>
+    <filter id="blur80"><feGaussianBlur stdDeviation="80"/></filter>
+    <filter id="blur35"><feGaussianBlur stdDeviation="35"/></filter>
+    <filter id="glow"><feGaussianBlur stdDeviation="7" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+    <pattern id="stars" width="180" height="150" patternUnits="userSpaceOnUse">
+      <circle cx="12" cy="24" r="1.5" fill="#fff" opacity="0.72"/>
+      <circle cx="88" cy="58" r="1" fill="#9ed8ff" opacity="0.72"/>
+      <circle cx="145" cy="18" r="0.8" fill="#ffd091" opacity="0.82"/>
+      <circle cx="166" cy="118" r="1.3" fill="#fff" opacity="0.58"/>
+      <circle cx="44" cy="126" r="0.7" fill="#fff" opacity="0.5"/>
+      <path d="M118 99h8M122 95v8" stroke="#fff" stroke-width="0.8" opacity="0.45"/>
+    </pattern>
+  </defs>
+
+  <rect width="1920" height="1200" fill="url(#space)"/>
+  <rect width="1920" height="1200" fill="url(#stars)" opacity="0.95"/>
+
+  <ellipse cx="520" cy="380" rx="690" ry="470" fill="url(#blueNebula)" filter="url(#blur80)"/>
+  <ellipse cx="1450" cy="500" rx="760" ry="560" fill="url(#redNebula)" filter="url(#blur80)"/>
+  <ellipse cx="1040" cy="180" rx="770" ry="430" fill="url(#aurora)" filter="url(#blur80)"/>
+
+  <path d="M-70 800 C360 545 690 710 980 590 C1250 477 1460 175 1990 210" fill="none" stroke="url(#rim)" stroke-width="170" opacity="0.16" filter="url(#blur35)"/>
+  <path d="M-70 810 C350 570 700 726 987 607 C1290 480 1458 208 1984 228" fill="none" stroke="url(#rim)" stroke-width="12" opacity="0.34"/>
+
+  <g opacity="0.86">
+    <circle cx="-90" cy="1230" r="610" fill="url(#planet)"/>
+    <circle cx="-90" cy="1230" r="616" fill="none" stroke="#63d7ff" stroke-width="8" opacity="0.65" filter="url(#glow)"/>
+    <path d="M-35 655 C175 715 320 840 410 1015" fill="none" stroke="#3fb7ff" stroke-width="2" opacity="0.32"/>
+  </g>
+
+  <g transform="translate(1615 330)" opacity="0.54">
+    <circle r="165" fill="none" stroke="#ffb44f" stroke-width="1.5"/>
+    <circle r="115" fill="none" stroke="#ff7a54" stroke-width="1" opacity="0.8"/>
+    <circle r="55" fill="#04050a" stroke="#ff497b" stroke-width="3"/>
+    <circle cx="0" cy="-165" r="5" fill="#ffd687"/>
+    <circle cx="115" cy="0" r="3.5" fill="#ff7966"/>
+  </g>
+
+  <g transform="translate(1750 555)" opacity="0.82" filter="url(#glow)">
+    <path d="M0 -190 L18 -145 L6 -136 L6 154 L-6 154 L-6 -136 L-18 -145 Z" fill="url(#gold)"/>
+    <path d="M-54 154 Q0 118 54 154 L38 171 Q0 151 -38 171 Z" fill="url(#gold)" opacity="0.62"/>
+  </g>
+
+  <g transform="translate(1490 920)" opacity="0.28">
+    <path d="M0 -130 C75 -110 123 -72 140 -4 C122 78 68 138 0 166 C-68 138 -122 78 -140 -4 C-123 -72 -75 -110 0 -130Z" fill="none" stroke="url(#gold)" stroke-width="4"/>
+    <path d="M-72 10 L0 -74 L72 10 L0 104 Z" fill="none" stroke="#f8c15c" stroke-width="2"/>
+  </g>
+
+  <g fill="#fff" filter="url(#glow)">
+    <circle cx="580" cy="270" r="2.2" opacity="0.9"/>
+    <circle cx="1050" cy="330" r="2.6" opacity="0.85"/>
+    <circle cx="1335" cy="170" r="1.9" opacity="0.75"/>
+    <circle cx="1500" cy="700" r="2.1" opacity="0.74"/>
+    <circle cx="810" cy="810" r="1.6" opacity="0.78"/>
+  </g>
+
+  <rect width="1920" height="1200" fill="url(#space)" opacity="0.08"/>
+</svg>
