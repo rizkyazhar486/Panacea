@@ -1,8 +1,20 @@
 export type SequenceEvidenceFormat = 'FASTQ' | 'FASTA' | 'VCF'
+export type GenomeAssemblyHint = 'GRCh37' | 'GRCh38' | 'unknown'
 
 export interface SequenceEvidencePreview {
   label: string
   value: string
+}
+
+export interface VcfVariantRecord {
+  chrom: string
+  pos: number
+  id: string
+  ref: string
+  alt: string
+  qual: string
+  filter: string
+  info: string
 }
 
 export interface SequenceEvidenceReport {
@@ -25,6 +37,9 @@ export interface SequenceEvidenceReport {
   transversions?: number
   tiTv?: number
   sampleCount?: number
+  assemblyHint?: GenomeAssemblyHint
+  referenceHeader?: string
+  variants?: VcfVariantRecord[]
   preview: SequenceEvidencePreview[]
   warnings: string[]
 }
@@ -60,12 +75,7 @@ function baseComposition(sequence: string) {
   }
   const canonical = a + c + g + t
   const total = canonical + ambiguous
-  return {
-    canonical,
-    total,
-    gc: c + g,
-    ambiguous,
-  }
+  return { canonical, total, gc: c + g, ambiguous }
 }
 
 function cleanLines(text: string) {
@@ -212,6 +222,14 @@ function parseFastq(text: string): SequenceEvidenceReport {
 
 const TRANSITIONS = new Set(['AG', 'GA', 'CT', 'TC'])
 
+function inferAssembly(lines: string[]) {
+  const referenceHeader = lines.find((line) => line.startsWith('##reference='))?.slice('##reference='.length).trim() || ''
+  const metadata = lines.filter((line) => line.startsWith('##')).slice(0, 200).join(' ').toLowerCase()
+  const haystack = `${referenceHeader} ${metadata}`.toLowerCase()
+  const assemblyHint: GenomeAssemblyHint = /grch37|hg19/.test(haystack) ? 'GRCh37' : /grch38|hg38/.test(haystack) ? 'GRCh38' : 'unknown'
+  return { referenceHeader, assemblyHint }
+}
+
 function parseVcf(text: string): SequenceEvidenceReport {
   const lines = cleanLines(text)
   const records = lines.filter((line) => line && !line.startsWith('#'))
@@ -226,6 +244,7 @@ function parseVcf(text: string): SequenceEvidenceReport {
   let transversions = 0
   const preview: SequenceEvidencePreview[] = []
   const warnings: string[] = []
+  const variants: VcfVariantRecord[] = []
 
   for (const line of records) {
     const fields = line.split('\t')
@@ -233,7 +252,12 @@ function parseVcf(text: string): SequenceEvidenceReport {
       warnings.push('One or more VCF rows had fewer than 8 required columns and were ignored.')
       continue
     }
-    const [chrom, pos, id, ref, altField, , filter] = fields
+    const [chrom, posRaw, id, ref, altField, qual, filter, info] = fields
+    const pos = Number(posRaw)
+    if (!Number.isFinite(pos) || pos <= 0) {
+      warnings.push('One or more VCF rows had an invalid POS value and were ignored for external annotation.')
+      continue
+    }
     const alts = altField.split(',').filter((alt) => alt && alt !== '.')
     alternateAlleles += alts.length
     if (filter === 'PASS' || filter === '.') passSites += 1
@@ -247,6 +271,19 @@ function parseVcf(text: string): SequenceEvidenceReport {
       } else if (ref.length !== alt.length) {
         indelAlleles += 1
       }
+
+      if (variants.length < 200) {
+        variants.push({
+          chrom,
+          pos,
+          id: id || '.',
+          ref,
+          alt,
+          qual: qual || '.',
+          filter: filter || '.',
+          info: info || '.',
+        })
+      }
     }
 
     if (preview.length < 10) {
@@ -259,6 +296,8 @@ function parseVcf(text: string): SequenceEvidenceReport {
 
   const columns = header.split('\t')
   const sampleCount = Math.max(0, columns.length - 9)
+  const { referenceHeader, assemblyHint } = inferAssembly(lines)
+  if (alternateAlleles > variants.length) warnings.push(`External-annotation preview is capped at the first ${variants.length.toLocaleString()} ALT alleles parsed from this file.`)
 
   return {
     format: 'VCF',
@@ -272,6 +311,9 @@ function parseVcf(text: string): SequenceEvidenceReport {
     transversions,
     tiTv: transversions > 0 ? transitions / transversions : undefined,
     sampleCount,
+    assemblyHint,
+    referenceHeader,
+    variants,
     preview,
     warnings: [...new Set(warnings)],
   }
