@@ -14,13 +14,17 @@ Body Exposure keeps source anatomy, evidence, and simulation as separate layers.
 
 `src/lib/hraResolver.ts` combines the existing v1.2/v2 evidence index with the v1.4 GitHub model catalog and crosswalk. Resolution ranks exact anatomical matches, prefers renderable geometry, preserves ontology identifiers, and exposes source URLs. `HraContextBridge` shows the HRA release and whether each result is `3D available` or `mapping only`.
 
+## Source-resolved GLB viewer
+
+`HraResolvedAnatomyViewer` resolves context terms through the multi-release HRA engine, selects only records with a real browser-loadable upstream GLB, and renders that source geometry with neutral lighting, orbit controls and automatic camera fit. Source GLBs are static: no auto-spin, pulse, bounce, hypothesis deformation or fabricated tissue response. The inspector exposes HRA release, ontology ID, model file, file size and GitHub SHA.
+
 ## Anatomy search
 
 `HraSourceSearch` gives the Anatomy page an explicit multi-release structure search. A user can search labels or ontology IDs and see the source release, ontology identity, model name and whether an actual browser-loadable GLB exists.
 
 ## Cell and DNA evidence-first rule
 
-Body → Cell and Cell → DNA now render the Human Protein Atlas + Ensembl evidence workspace first. The generated cell/chromatin/DNA scene is collapsed under an explicit `Educational structural model` control. The model is never presented as microscopy, sequencing output or patient evidence.
+Body → Cell and Cell → DNA render the Human Protein Atlas + Ensembl evidence workspace first. The generated cell/chromatin/DNA scene is collapsed under an explicit `Educational structural model` control. The model is never presented as microscopy, sequencing output or patient evidence.
 
 ## Workout-specific anatomy
 
@@ -30,6 +34,14 @@ Body → Cell and Cell → DNA now render the Human Protein Atlas + Ensembl evid
 
 `getSurgicalHraTerms()` derives source queries from each surgical procedure and phase using focus anatomy, structures at risk, and the operative region. `SurgicalHraWorkbench` lets the learner choose an operation and phase, inspect the generated source terms, and resolve them against HRA before the procedural simulation is opened. The same source-first workbench is used before surgical rehearsal.
 
+## What-if source boundary
+
+`CounterfactualHraWorkbench` binds the selected scenario and perturbation to HRA source terms, displays a real resolved HRA GLB when available, and keeps the executable causal graph numerical. Only the causal states change with the perturbation. Source anatomy is not stretched, recolored, pulsed or deformed to imply biological response. Falsification measurements and evidence anchors remain visible alongside the model.
+
+## Regeneration source boundary
+
+`RegenerationHraWorkbench` resolves the selected organ against HRA and displays fixed upstream geometry first. Aging hallmarks, research hypotheses, evidence tiers, safety gates and normalized time-state values are modeled separately. A lower modeled burden is never labeled as measured age reversal or rejuvenation.
+
 ## Simulation boundary
 
-Exercise, Surgery, Practice, What-if, and Research show HRA reference anatomy first. Their model/simulation layers remain collapsed and explicitly separate from HRA source geometry. Exercise maps a real imported workout to source anatomy; Surgery and Practice map the selected operation and phase. Cell/DNA modes also follow evidence-first presentation. A generated scene is never presented as the authoritative anatomical source.
+Exercise, Surgery and Practice show HRA reference anatomy before their optional model/simulation layers. What-if and Research now use source-resolved HRA workbenches as their primary visual experience rather than the legacy `Body3D` renderer. Cell/DNA modes follow evidence-first presentation. A generated scene is never presented as the authoritative anatomical source.
