@@ -7,8 +7,10 @@ import { RoomEnvironment } from 'three/examples/jsm/environments/RoomEnvironment
 import { ANATOMY_LAYERS, humanizeStructureName, type AnatomyLayer } from '../Body3D'
 import { pasangTriplanar } from '../../lib/triplanar'
 import type { JenisJaringan } from '../../lib/tissueTexture'
-import { setelAnisotropi } from '../../lib/triplanar'
+import { ikatSumbu, setelAnisotropi } from '../../lib/triplanar'
 import { BATAS_BAKU, JamBingkai, keadaanAwal, langkahSkala, skalaAwal } from '../../lib/renderScale'
+import { TissuePreview } from './TissuePreview'
+import { kelonjongan, sumbuUtama } from '../../lib/mainAxis'
 
 type LayerKey = AnatomyLayer['key']
 type RenderQuality = 'balanced' | 'cinematic'
@@ -231,6 +233,7 @@ export function RealisticAnatomyAtlas() {
   const jamRef = useRef(new JamBingkai(30))
   const waktuBingkaiRef = useRef(0)
   const [skalaTampil, setSkalaTampil] = useState(1)
+  const [contohBahan, setContohBahan] = useState(false)
   const sceneRef = useRef<THREE.Scene | null>(null)
   const cameraRef = useRef<THREE.PerspectiveCamera | null>(null)
   const rendererRef = useRef<THREE.WebGLRenderer | null>(null)
@@ -476,6 +479,19 @@ export function RealisticAnatomyAtlas() {
               obj.userData.tissueKind = tissue
               if (!obj.geometry.getAttribute('normal')) obj.geometry.computeVertexNormals()
               obj.material = realisticMaterial(tissue, opacity[definition.key], quality)
+              // Arah serat struktur ini, dihitung sekali dari kotak
+              // pembatasnya. Tanpa ini teksturnya teranyam seperti kain,
+              // karena triplanar tidak tahu apa-apa tentang anatomi.
+              obj.geometry.computeBoundingBox()
+              const bb = obj.geometry.boundingBox
+              if (bb) {
+                const kotak = {
+                  min: [bb.min.x, bb.min.y, bb.min.z] as [number, number, number],
+                  maks: [bb.max.x, bb.max.y, bb.max.z] as [number, number, number],
+                }
+                const a = sumbuUtama(kotak)
+                ikatSumbu(obj, new THREE.Vector3(a[0], a[1], a[2]), kelonjongan(kotak))
+              }
               obj.frustumCulled = true
             })
             groupsRef.current[definition.key] = clone
@@ -563,6 +579,12 @@ export function RealisticAnatomyAtlas() {
                 tidak sanggup menahan kerapatan penuh, angka ini turun dan
                 pengguna melihat sendiri apa yang terjadi alih-alih menduga
                 aplikasinya rusak. */}
+            <button
+              onClick={() => setContohBahan((v) => !v)}
+              className={`rounded-full border px-4 py-2 text-xs font-black ${contohBahan ? 'border-amber-300 bg-amber-300 text-black' : 'border-white/15 bg-white/5'}`}
+            >
+              Tissue samples
+            </button>
             <span
               className="rounded-full border border-white/15 bg-black/40 px-3 py-2 text-[10px] font-black tabular-nums text-white/70"
               title="Drawing-buffer pixels per CSS pixel, adapting to what this device can actually sustain"
@@ -598,6 +620,15 @@ export function RealisticAnatomyAtlas() {
         </aside>
 
         <main className="min-w-0">
+          {/* Contoh bahan ditaruh DI ATAS penampil tubuh, bukan di dalam
+              panel terpisah: pertanyaannya "seperti apa jaringan ini", dan
+              jawabannya harus bisa dibandingkan langsung dengan tubuh di
+              bawahnya. */}
+          {contohBahan && (
+            <div className="mb-3 rounded-3xl border border-white/10 bg-[#080b10] p-3">
+              <TissuePreview tinggi={240} />
+            </div>
+          )}
           <div className="relative min-h-[620px] overflow-hidden rounded-3xl border border-white/10 bg-[#080b10] shadow-2xl" style={{ backgroundImage: 'radial-gradient(circle at 50% 35%, rgba(80,102,120,.24), rgba(8,11,16,.98) 56%, #05070a 100%)' }}>
             <div ref={containerRef} className="h-[72vh] min-h-[620px] w-full touch-none" />
             <div className="pointer-events-none absolute left-4 top-4 rounded-full border border-white/10 bg-black/45 px-3 py-1.5 text-[10px] font-black uppercase tracking-wide text-white/65 backdrop-blur">PBR tissue render · educational atlas</div>

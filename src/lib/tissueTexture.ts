@@ -75,6 +75,13 @@ export interface Resep {
 }
 
 // Angka-angka ini adalah pilihan visual, bukan pengukuran, dan ditulis begitu.
+// Oktaf jaringan BERSERAT sengaja sedikit. Dengan empat oktaf, oktaf
+// tertingginya berperiode 208 pada tekstur selebar 512 — sekitar dua setengah
+// piksel per sel — dan derau sehalus itu praktis tak berarah lagi. Ia menutupi
+// keterarahan oktaf dasarnya, sehingga hasilnya teranyam seperti kain alih-alih
+// berserat seperti otot. Parenkim boleh berlapis-lapis justru karena ia memang
+// tidak berarah.
+//
 // Nilai pertama terlalu lemah dan itu TERUKUR: energi perincian gambar hanya
 // naik dari 13,77 ke 14,68 — teksturnya sampai ke piksel, tetapi tidak cukup
 // untuk terbaca sebagai jaringan. Nilai sekarang kira-kira satu setengah kali
@@ -84,13 +91,13 @@ export interface Resep {
 // itulah arah seratnya. Otot 26:3 berarti garis memanjang; organ 7:7 berarti
 // bercak tanpa arah, karena parenkim memang tidak berserat searah.
 export const RESEP: Record<JenisJaringan, Resep> = {
-  otot: { ulangU: 26, ulangV: 3, oktaf: 4, kontras: 0.48, variasiKasar: 0.44 },
-  tendon: { ulangU: 34, ulangV: 2, oktaf: 3, kontras: 0.3, variasiKasar: 0.34 },
+  otot: { ulangU: 30, ulangV: 2, oktaf: 2, kontras: 0.48, variasiKasar: 0.44 },
+  tendon: { ulangU: 38, ulangV: 2, oktaf: 2, kontras: 0.3, variasiKasar: 0.34 },
   tulang: { ulangU: 9, ulangV: 9, oktaf: 5, kontras: 0.2, variasiKasar: 0.34 },
   organ: { ulangU: 7, ulangV: 7, oktaf: 4, kontras: 0.34, variasiKasar: 0.36 },
-  pembuluh: { ulangU: 18, ulangV: 4, oktaf: 3, kontras: 0.24, variasiKasar: 0.28 },
+  pembuluh: { ulangU: 22, ulangV: 3, oktaf: 2, kontras: 0.24, variasiKasar: 0.28 },
   lemak: { ulangU: 5, ulangV: 5, oktaf: 3, kontras: 0.4, variasiKasar: 0.26 },
-  saraf: { ulangU: 22, ulangV: 3, oktaf: 3, kontras: 0.22, variasiKasar: 0.24 },
+  saraf: { ulangU: 26, ulangV: 2, oktaf: 2, kontras: 0.22, variasiKasar: 0.24 },
 }
 
 /** Peta tinggi fBm periodik, nilai 0..1, ukuran N x N. */

@@ -23,7 +23,23 @@ const N = 64
 ok('tujuh jenis jaringan punya resep', Object.keys(RESEP).length === 7)
 ok('setiap jenis punya pengulangan positif',
   SEMUA.every((j) => RESEP[j].ulangU > 0 && RESEP[j].ulangV > 0))
-ok('setiap jenis punya minimal tiga oktaf', SEMUA.every((j) => RESEP[j].oktaf >= 3))
+ok('setiap jenis punya minimal satu oktaf', SEMUA.every((j) => RESEP[j].oktaf >= 1))
+// Aturan ini dipelajari dari kegagalan, bukan dirancang di awal. Oktaf tinggi
+// berperiode sangat pendek, dan derau sependek itu praktis tidak berarah lagi;
+// pada jaringan berserat ia MENUTUPI keterarahan oktaf dasarnya sehingga
+// hasilnya teranyam seperti kain. Parenkim boleh berlapis-lapis justru karena
+// ia memang tidak berarah.
+{
+  const berserat: JenisJaringan[] = ['otot', 'tendon', 'saraf', 'pembuluh']
+  const takBerserat: JenisJaringan[] = ['organ', 'tulang', 'lemak']
+  ok('jaringan berserat memakai sedikit oktaf', berserat.every((j) => RESEP[j].oktaf <= 2))
+  ok('jaringan tak berarah boleh berlapis lebih banyak',
+    takBerserat.every((j) => RESEP[j].oktaf >= 3))
+  ok('setiap jaringan berserat jauh lebih rapat pada satu sumbu',
+    berserat.every((j) => RESEP[j].ulangU / RESEP[j].ulangV >= 6))
+  ok('jaringan tak berarah punya pengulangan seimbang',
+    takBerserat.every((j) => RESEP[j].ulangU === RESEP[j].ulangV))
+}
 ok('kontras selalu di bawah setengah — tekstur menghias, bukan menguasai',
   SEMUA.every((j) => RESEP[j].kontras > 0 && RESEP[j].kontras < 0.5))
 

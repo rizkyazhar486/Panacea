@@ -102,6 +102,11 @@ export function pasangTriplanar(bahan: THREE.Material, opsi: OpsiTriplanar): voi
   bahan.onBeforeCompile = (shader) => {
     shader.uniforms.uPola = { value: tex.pola }
     shader.uniforms.uSkala = { value: skala }
+    // Arah serat struktur ini. Diperbarui per mesh sesaat sebelum digambar,
+    // sehingga satu bahan bersama tetap bisa melayani ratusan otot yang
+    // arahnya berbeda-beda.
+    shader.uniforms.uSumbu = { value: new THREE.Vector3(0, 1, 0) }
+    shader.uniforms.uLonjong = { value: 0 }
     shader.uniforms.uAmp = { value: amp }
     shader.uniforms.uAmpKasar = { value: ampKasar }
 
@@ -113,22 +118,49 @@ varying vec3 vNorDunia;`)
 vPosDunia = (modelMatrix * vec4(transformed, 1.0)).xyz;
 vNorDunia = normalize(mat3(modelMatrix) * objectNormal);`)
 
+    // Rujukan ke shader disimpan supaya uniform per-mesh bisa ditulis saat
+    // menggambar; tanpa ini tidak ada jalan sah untuk menyentuhnya.
+    ;(bahan as THREE.Material & { userData: Record<string, unknown> }).userData.shader = shader
+
     shader.fragmentShader = shader.fragmentShader
       .replace('#include <common>', `#include <common>
 uniform sampler2D uPola;
 uniform float uSkala;
+uniform vec3 uSumbu;
+uniform float uLonjong;
 uniform float uAmp;
 uniform float uAmpKasar;
 varying vec3 vPosDunia;
 varying vec3 vNorDunia;
 
+// Basis ortonormal dengan sumbu serat sebagai sumbu Y-nya. Posisi dan normal
+// diputar ke dalam basis ini SEBELUM diambil triplanar, sehingga sumbu halus
+// tekstur selalu memotong serat dan tidak pernah berjalan searah dengannya.
+mat3 basisSerat(vec3 sumbu) {
+  vec3 y = normalize(sumbu);
+  // Sumbu bantu dipilih yang paling tidak sejajar dengan y; memakai satu
+  // sumbu tetap membuat basisnya runtuh setiap kali serat kebetulan sejajar
+  // dengannya, dan runtuhnya tidak melempar galat — teksturnya hanya lenyap.
+  vec3 bantu = abs(y.y) > 0.9 ? vec3(1.0, 0.0, 0.0) : vec3(0.0, 1.0, 0.0);
+  vec3 x = normalize(cross(bantu, y));
+  vec3 z = cross(y, x);
+  return mat3(x, y, z);
+}
+
 // Pengambilan triplanar. Pangkat empat pada bobot membuat peralihan antar
 // sumbu tegas; bobot linear menghasilkan daerah kabur selebar sepertiga
 // permukaan di setiap lengkungan.
 vec3 ambilTriplanar(sampler2D peta, vec3 pos, vec3 nor) {
-  vec3 bobot = pow(abs(nor), vec3(4.0));
+  mat3 basis = basisSerat(uSumbu);
+  // Diputar hanya sejauh strukturnya memang memanjang. Tulang karpal atau
+  // kelenjar yang hampir sekubus tidak punya arah serat, dan memaksakan arah
+  // padanya cuma menambahkan pola yang keliru.
+  vec3 p = mix(pos, pos * basis, uLonjong) * uSkala;
+  vec3 n = normalize(mix(nor, nor * basis, uLonjong));
+  vec3 bobot = pow(abs(n), vec3(4.0));
   bobot /= max(bobot.x + bobot.y + bobot.z, 1e-4);
-  vec3 p = pos * uSkala;
+  // Sumbu V tekstur (yang variasinya lambat) dipetakan ke sumbu Y basis,
+  // yaitu arah serat. Karena itu semua bidang memakai .y pada slot kedua.
   vec3 cx = texture2D(peta, p.zy).rgb;
   vec3 cy = texture2D(peta, p.xz).rgb;
   vec3 cz = texture2D(peta, p.xy).rgb;
@@ -155,4 +187,24 @@ vec3 ambilTriplanar(sampler2D peta, vec3 pos, vec3 nor) {
   // definisinya sama tetapi teksturnya berbeda.
   bahan.customProgramCacheKey = () => `triplanar-${jenis}-${skala}-${amp}-${ampKasar}`
   bahan.needsUpdate = true
+}
+
+/**
+ * Menghubungkan satu mesh ke arah seratnya sendiri.
+ *
+ * Nilai uniform-nya ditulis tepat sebelum mesh itu digambar, bukan sekali di
+ * awal: satu bahan dipakai bersama oleh ratusan otot, dan tiap otot punya
+ * arah yang berbeda. Menyimpannya di bahan berarti otot terakhir yang
+ * disiapkan akan menentukan arah serat semua otot lain.
+ */
+export function ikatSumbu(mesh: THREE.Mesh, sumbu: THREE.Vector3, lonjong: number): void {
+  mesh.userData.sumbuSerat = sumbu.clone().normalize()
+  mesh.userData.lonjong = Math.max(0, Math.min(1, lonjong))
+  mesh.onBeforeRender = (_r, _s, _c, _g, material) => {
+    const u = (material as THREE.Material & { userData: { shader?: { uniforms: Record<string, { value: unknown }> } } })
+      .userData.shader?.uniforms
+    if (!u) return
+    if (u.uSumbu) (u.uSumbu.value as THREE.Vector3).copy(mesh.userData.sumbuSerat as THREE.Vector3)
+    if (u.uLonjong) u.uLonjong.value = mesh.userData.lonjong
+  }
 }
