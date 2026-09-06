@@ -27,6 +27,8 @@ const CardioLab = lazy(() => import('./bodyhub/CardioLab'))
 const SpecialtyLab = lazy(() => import('./bodyhub/SpecialtyLab'))
 // Ruang molekul: geometri 3D obat, dibangkitkan RDKit dan diperiksa rumusnya.
 const MolecularLab = lazy(() => import('./bodyhub/MolecularLab'))
+// Ruang genomika: varian klinis, alat urutan, perancang CRISPR, dan jalur sinyal.
+const GenomicsLab = lazy(() => import('./bodyhub/GenomicsLab'))
 const WorkoutSimSection = lazy(() => import('./bodyhub/WorkoutSimSection'))
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -74,7 +76,7 @@ function Chip({
 // sama-sama menyorot struktur pada figur yang itu-itu juga. Itulah maksud
 // "satu simulasi tubuh yang utuh" — bukan enam halaman yang saling menyebut,
 // melainkan satu tubuh yang ditanyai dari enam sudut.
-type PanelTab = 'layers' | 'muscles' | 'workout-sim' | 'organs' | 'physiology' | 'simulator' | 'cardio' | 'spesialisasi' | 'molekul' | 'drugs' | 'diseases' | 'reference'
+type PanelTab = 'layers' | 'muscles' | 'workout-sim' | 'organs' | 'physiology' | 'simulator' | 'cardio' | 'spesialisasi' | 'molekul' | 'genomik' | 'drugs' | 'diseases' | 'reference'
 
 const PANEL_TABS: Array<{ key: PanelTab; label: string }> = [
   { key: 'layers', label: 'Layers' },
@@ -86,6 +88,7 @@ const PANEL_TABS: Array<{ key: PanelTab; label: string }> = [
   { key: 'cardio', label: 'Cardio lab' },
   { key: 'spesialisasi', label: 'Specialty labs' },
   { key: 'molekul', label: 'Molecules' },
+  { key: 'genomik', label: 'Genomics' },
   { key: 'drugs', label: 'Drugs' },
   { key: 'diseases', label: 'Diseases' },
   { key: 'reference', label: 'Study' },
@@ -824,6 +827,15 @@ export function BodyExplorer() {
             {panelTab === 'molekul' && (
               <Suspense fallback={<p className="text-sm text-neutral-500">Loading the molecular lab…</p>}>
                 <MolecularLab onBukaOrgan={onPickOrgan} awal={molekulAwal} key={molekulAwal ?? 'molekul'} />
+              </Suspense>
+            )}
+
+            {panelTab === 'genomik' && (
+              <Suspense fallback={<p className="text-sm text-neutral-500">Loading the genomics lab…</p>}>
+                <GenomicsLab
+                  onBukaOrgan={onPickOrgan}
+                  onBukaObat={(id) => { setMolekulAwal(id); setPanelTab('molekul') }}
+                />
               </Suspense>
             )}
 
