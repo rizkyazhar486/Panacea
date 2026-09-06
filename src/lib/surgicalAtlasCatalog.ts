@@ -41,6 +41,49 @@ export function searchAllSurgicalProcedures(query: string, specialty: 'all' | Su
   })
 }
 
+const GENERIC_HRA_TERMS = new Set([
+  'operative field',
+  'adjacent structures',
+  'nearby structures',
+  'neurovascular structures',
+  'neurovascular structures relevant to the approach',
+  'deep neurovascular structures',
+  'target anatomy',
+  'surrounding anatomy',
+])
+
+function cleanHraTerm(value: string) {
+  return value
+    .replace(/\([^)]*\)/g, ' ')
+    .replace(/\bstructures?\s+relevant\s+to\s+the\s+approach\b/gi, ' ')
+    .replace(/\s*\/\s*/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim()
+}
+
+export function getSurgicalHraTerms(procedure: SurgicalProcedure, phaseIndex = 0, limit = 14) {
+  const phase = procedure.phases[Math.min(Math.max(phaseIndex, 0), procedure.phases.length - 1)]
+  const candidates = [
+    ...(phase?.focusKeywords ?? []),
+    ...(phase?.structuresAtRisk ?? []),
+    ...procedure.phases.flatMap((item) => item.focusKeywords),
+    ...procedure.phases.flatMap((item) => item.structuresAtRisk),
+    procedure.region,
+  ]
+
+  const result: string[] = []
+  const seen = new Set<string>()
+  for (const raw of candidates) {
+    const term = cleanHraTerm(raw)
+    const key = term.toLowerCase()
+    if (!term || term.length < 3 || term.length > 64 || GENERIC_HRA_TERMS.has(key) || seen.has(key)) continue
+    seen.add(key)
+    result.push(term)
+    if (result.length >= limit) break
+  }
+  return result
+}
+
 export interface SurgicalCatalogStats {
   procedures: number
   specialties: number
