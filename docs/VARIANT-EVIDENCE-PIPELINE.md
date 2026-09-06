@@ -13,10 +13,12 @@ Panacea keeps variant evidence source-labelled and separates evidence retrieval 
 ## Reliability rules
 
 - Each external request has a timeout and independent error boundary.
-- ClinVar batch requests are paced and limited to five variants to avoid aggressive unauthenticated E-utilities traffic.
-- CPIC requests are cached by gene for the browser session.
+- ClinVar ESearch and ESummary calls share a serial request gate with at least 360 ms between request starts; the UI also limits enrichment to five variants per action.
+- ClinVar and CPIC results are cached in the browser session so repeated inspection does not repeatedly hit the upstream service.
+- CPIC requests are isolated per gene and merged with `Promise.allSettled`, so one failed gene does not erase successful gene-drug context from the others.
 - Partial API failure does not hide evidence returned successfully by other sources.
 - Population allele frequency is descriptive evidence and is not treated as a pathogenicity formula.
+- If an upstream API is unavailable or browser CORS/network policy blocks it, Panacea keeps the local/VEP result visible and shows the source failure instead of fabricating fallback data.
 
 ## Sources
 
