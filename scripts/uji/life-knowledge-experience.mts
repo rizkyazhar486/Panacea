@@ -44,6 +44,8 @@ const wrappers = [
   ['src/pages/Learn.tsx', /LifeLibraryWorkbench/],
   ['src/pages/KnowledgeBridge.tsx', /KnowledgeBridgeWorkbench/],
   ['src/pages/MedStudyHub.tsx', /StudyCommandCenter/],
+  ['src/pages/MedStudyHub.tsx', /MedicalLibraryWorkbench/],
+  ['src/pages/MedStudyHub.tsx', /bagian.*evidence/],
   ['src/pages/EdukasiAwam.tsx', /HealthLiteracyCoach/],
   ['src/pages/LifeStory.tsx', /StoryReflectionStudio/],
   ['src/pages/ResilienceStories.tsx', /ResilienceActionLab/],
@@ -54,5 +56,11 @@ for (const [path, pattern] of wrappers) assert.match(readFileSync(path, 'utf8'),
 const frontierSource = readFileSync('src/lib/panaceaFrontierSeven.ts', 'utf8')
 assert.match(frontierSource, /does not claim that no comparable idea exists anywhere in the world/)
 assert.doesNotMatch(frontierSource, /guaranteed cure|autonomously diagnose|autonomously prescribe/i)
+
+const medicalLibrarySource = readFileSync('src/components/MedicalLibraryWorkbench.tsx', 'utf8')
+assert.match(medicalLibrarySource, /Diagnosis/)
+assert.match(medicalLibrarySource, /Therapy/)
+assert.match(medicalLibrarySource, /Appraisal before conclusion/)
+assert.match(medicalLibrarySource, /Effect size is read with uncertainty/)
 
 console.log('life/knowledge experience: all assertions passed')
