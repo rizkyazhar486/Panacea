@@ -14,8 +14,8 @@ const PhysiologyHraWorkbench = lazy(() =>
 const CellGenomeEvidenceLab = lazy(() =>
   import('../components/digital-twin/CellGenomeEvidenceLab').then((m) => ({ default: m.CellGenomeEvidenceLab })),
 )
-const CinematicCellGenomeExplorer = lazy(() =>
-  import('../components/digital-twin/CinematicCellGenomeExplorer').then((m) => ({ default: m.CinematicCellGenomeExplorer })),
+const SequenceEvidenceWorkbench = lazy(() =>
+  import('../components/digital-twin/SequenceEvidenceWorkbench').then((m) => ({ default: m.SequenceEvidenceWorkbench })),
 )
 const CounterfactualHraWorkbench = lazy(() =>
   import('../components/digital-twin/CounterfactualHraWorkbench').then((m) => ({ default: m.CounterfactualHraWorkbench })),
@@ -50,8 +50,8 @@ type Mode = {
 const PRIMARY: Mode[] = [
   { key: 'realistic-atlas', label: 'Anatomy', hint: 'Multi-release HRA source anatomy with browser-loadable GLB provenance' },
   { key: 'physiology', label: 'Physiology', hint: 'HRA source anatomy + explicit physiology phases, formulas and provenance' },
-  { key: 'digital-twin', label: 'Body → Cell', hint: 'Human Protein Atlas evidence first; optional structural 3D model is secondary' },
-  { key: 'cell-genome', label: 'Cell → DNA', hint: 'HPA + Ensembl source evidence first; optional 3D model stays secondary' },
+  { key: 'digital-twin', label: 'Body → Cell', hint: 'Human Protein Atlas microscopy/metadata + real local sequence evidence; no generated cell required' },
+  { key: 'cell-genome', label: 'Cell → DNA', hint: 'HPA + Ensembl reference sequence + local FASTA/FASTQ/VCF evidence' },
   { key: 'workout-4d', label: 'Exercise', hint: 'Measured workout → resolved HRA GLB → data replay; no body deformation' },
   { key: 'surgery', label: 'Surgery', hint: 'Operation/phase → resolved HRA GLB → procedure timeline' },
 ]
@@ -108,28 +108,14 @@ function SecondaryLayer({
 }
 
 function CellEvidenceMode({ mode }: { mode: 'body-cell' | 'cell-genome' }) {
-  const initialStage = mode === 'body-cell' ? 'cell' : 'dna'
   return (
     <div className="space-y-4">
       <Suspense fallback={<LoadingLab label="HPA and Ensembl source evidence" />}>
         <CellGenomeEvidenceLab mode={mode} />
       </Suspense>
-
-      <details className="group rounded-[26px] border border-neutral-200 bg-white p-4 shadow-sm dark:border-white/10 dark:bg-white/[.035]">
-        <summary className="flex cursor-pointer list-none items-center justify-between gap-3">
-          <div>
-            <div className="text-[9px] font-black uppercase tracking-[.15em] text-amber-700 dark:text-amber-300">Educational structural model</div>
-            <div className="mt-1 text-[15px] font-black text-neutral-950 dark:text-white">Optional 3D {mode === 'body-cell' ? 'cell' : 'chromatin / DNA'} model</div>
-            <p className="mt-1 max-w-3xl text-[10px] leading-relaxed text-neutral-500 dark:text-neutral-400">Open this only for spatial teaching. It is a generated structural model, not microscopy, sequencing output, or patient evidence. HPA and Ensembl remain the source layer above.</p>
-          </div>
-          <span className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-neutral-100 text-lg text-neutral-700 transition group-open:rotate-45 dark:bg-white/10 dark:text-white">＋</span>
-        </summary>
-        <div className="mt-4 border-t border-neutral-100 pt-4 dark:border-white/10">
-          <Suspense fallback={<LoadingLab label="educational cellular 3D model" />}>
-            <CinematicCellGenomeExplorer initialStage={initialStage} />
-          </Suspense>
-        </div>
-      </details>
+      <Suspense fallback={<LoadingLab label="local sequencing evidence" />}>
+        <SequenceEvidenceWorkbench />
+      </Suspense>
     </div>
   )
 }
@@ -161,6 +147,7 @@ export function BodyExplorer() {
             <span className="rounded-full border border-neutral-200 bg-neutral-50 px-2.5 py-1.5 dark:border-white/10 dark:bg-white/[.04]">GitHub models API</span>
             <span className="rounded-full border border-neutral-200 bg-neutral-50 px-2.5 py-1.5 dark:border-white/10 dark:bg-white/[.04]">HRA v1.2 · v1.4 · v2</span>
             <span className="rounded-full border border-neutral-200 bg-neutral-50 px-2.5 py-1.5 dark:border-white/10 dark:bg-white/[.04]">HPA · Ensembl</span>
+            <span className="rounded-full border border-neutral-200 bg-neutral-50 px-2.5 py-1.5 dark:border-white/10 dark:bg-white/[.04]">FASTA · FASTQ · VCF</span>
           </div>
         </div>
 
