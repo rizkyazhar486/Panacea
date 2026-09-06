@@ -27,6 +27,10 @@ const ClinicalScores = lazy(() => import('./pages/ClinicalScores').then((m) => (
 const Translator = lazy(() => import('./pages/Translator').then((m) => ({ default: m.Translator })))
 const BodyExplorer = lazy(() => import('./pages/BodyExplorer').then((m) => ({ default: m.BodyExplorer })))
 const Radiology = lazy(() => import('./pages/Radiology').then((m) => ({ default: m.Radiology })))
+// Dua halaman ini sudah rampung dan sudah punya ujinya, tetapi tidak pernah
+// dipasang ke rute mana pun sehingga tidak ada satu pun jalan menuju ke sana.
+const FrontierHealthOS = lazy(() => import('./pages/FrontierHealthOS').then((m) => ({ default: m.FrontierHealthOS })))
+const KnowledgeBridge = lazy(() => import('./pages/KnowledgeBridge').then((m) => ({ default: m.KnowledgeBridge })))
 const Consult = lazy(() => import('./pages/Consult').then((m) => ({ default: m.Consult })))
 const Hospitals = lazy(() => import('./pages/Hospitals').then((m) => ({ default: m.Hospitals })))
 const Pharmacy = lazy(() => import('./pages/Pharmacy').then((m) => ({ default: m.Pharmacy })))
@@ -370,6 +374,8 @@ createRoot(document.getElementById('root')!).render(
               <Route path="/nutrition" element={<Navigate to="/gizi?t=makan" replace />} />
               <Route path="/body-explorer" element={<BodyExplorer />} />
               <Route path="/radiology" element={<Radiology />} />
+              <Route path="/frontier-health" element={<FrontierHealthOS />} />
+              <Route path="/knowledge-bridge" element={<KnowledgeBridge />} />
               <Route path="/translator" element={<Translator />} />
               {/* Dua puluh satu skor klinis yang dulu punya rute sendiri kini
                   digabung ke satu halaman. Rute lamanya SENGAJA dipertahankan

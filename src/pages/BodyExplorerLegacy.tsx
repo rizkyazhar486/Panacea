@@ -33,6 +33,10 @@ const GenomicsLab = lazy(() => import('./bodyhub/GenomicsLab'))
 const CellLab = lazy(() => import('./bodyhub/CellLab'))
 // Pencari struktur: 2.587 nama yang benar-benar ada di berkas geometrinya.
 const StructureFinder = lazy(() => import('./bodyhub/StructureFinder'))
+// Dua ruang ini sudah rampung tetapi tidak pernah dipasang ke tab mana pun,
+// sehingga tidak ada satu pun cara membukanya dari dalam aplikasi.
+const WholeBodyPrecisionLab = lazy(() => import('./bodyhub/WholeBodyPrecisionLab'))
+const BiomedicalEngineLab = lazy(() => import('./bodyhub/BiomedicalEngineLab'))
 // Ruang bedah: urutan lapisan yang ditemui pisau, per pendekatan.
 const SurgicalLab = lazy(() => import('./bodyhub/SurgicalLab'))
 const WorkoutSimSection = lazy(() => import('./bodyhub/WorkoutSimSection'))
@@ -82,7 +86,7 @@ function Chip({
 // sama-sama menyorot struktur pada figur yang itu-itu juga. Itulah maksud
 // "satu simulasi tubuh yang utuh" — bukan enam halaman yang saling menyebut,
 // melainkan satu tubuh yang ditanyai dari enam sudut.
-type PanelTab = 'layers' | 'muscles' | 'workout-sim' | 'organs' | 'physiology' | 'simulator' | 'cardio' | 'spesialisasi' | 'molekul' | 'genomik' | 'sel' | 'bedah' | 'cari' | 'drugs' | 'diseases' | 'reference'
+type PanelTab = 'layers' | 'muscles' | 'workout-sim' | 'organs' | 'physiology' | 'simulator' | 'cardio' | 'spesialisasi' | 'molekul' | 'genomik' | 'sel' | 'bedah' | 'cari' | 'presisi' | 'mesin' | 'drugs' | 'diseases' | 'reference'
 
 const PANEL_TABS: Array<{ key: PanelTab; label: string }> = [
   { key: 'layers', label: 'Layers' },
@@ -96,6 +100,8 @@ const PANEL_TABS: Array<{ key: PanelTab; label: string }> = [
   { key: 'molekul', label: 'Molecules' },
   { key: 'genomik', label: 'Genomics' },
   { key: 'cari', label: 'Find structure' },
+  { key: 'presisi', label: 'Whole-body precision' },
+  { key: 'mesin', label: 'Biomedical engine' },
   { key: 'sel', label: 'Cell & metabolism' },
   { key: 'bedah', label: 'Surgical layers' },
   { key: 'drugs', label: 'Drugs' },
@@ -892,6 +898,23 @@ export function BodyExplorer() {
                   onSorot={(nama) => { setActiveWorkout(null); setActiveOrgan(null); setFocusKeywords(null); setHighlighted(nama) }}
                   onLapisan={(l) => setLayers((s) => (s.has(l) ? s : new Set(s).add(l)))}
                 />
+              </Suspense>
+            )}
+
+            {panelTab === 'presisi' && (
+              <Suspense fallback={<p className="text-sm text-neutral-500">Loading the precision lab…</p>}>
+                <WholeBodyPrecisionLab
+                  onHighlight={(nodes) => { setActiveWorkout(null); setActiveOrgan(null); setFocusKeywords(null); setHighlighted(nodes) }}
+                  onEnableLayer={(l) => setLayers((prev) => (prev.has(l) ? prev : new Set(prev).add(l)))}
+                  onSetUnfold={setUnfold}
+                  onSetDissectionDepth={setDissect}
+                />
+              </Suspense>
+            )}
+
+            {panelTab === 'mesin' && (
+              <Suspense fallback={<p className="text-sm text-neutral-500">Loading the biomedical engine…</p>}>
+                <BiomedicalEngineLab />
               </Suspense>
             )}
 

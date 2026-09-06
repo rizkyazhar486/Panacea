@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "type": "module",
-  "description": "Panaceamed.id backend \u2014 Google OAuth login + Midtrans payments (real, with mock fallback)",
+  "description": "Panaceamed.id backend — Google OAuth login + Midtrans payments (real, with mock fallback)",
   "engines": {
     "node": ">=20"
   },
@@ -12,7 +12,7 @@
     "start": "tsx src/index.ts",
     "build": "tsc -p tsconfig.json",
     "typecheck": "tsc -p tsconfig.json --noEmit",
-    "uji": "tsx uji/aturanNotif.uji.ts && tsx uji/motionWave.uji.ts && tsx uji/cardioFlow.uji.ts && tsx uji/specialtyPathology.uji.ts && tsx uji/drugTargets.uji.ts && tsx uji/atlasSearch.uji.ts && tsx uji/genomics.uji.ts && tsx uji/longevity.uji.ts && tsx uji/dicom.uji.ts && tsx uji/fhir.uji.ts && tsx uji/mentalTrend.uji.ts && tsx uji/dissection.uji.ts && tsx uji/cellBio.uji.ts && tsx uji/bodySearch.uji.ts && tsx uji/tissueTexture.uji.ts && tsx uji/renderScale.uji.ts && tsx uji/mainAxis.uji.ts"
+    "uji": "tsx uji/aturanNotif.uji.ts && tsx uji/motionWave.uji.ts && tsx uji/cardioFlow.uji.ts && tsx uji/specialtyPathology.uji.ts && tsx uji/drugTargets.uji.ts && tsx uji/atlasSearch.uji.ts && tsx uji/genomics.uji.ts && tsx uji/longevity.uji.ts && tsx uji/dicom.uji.ts && tsx uji/fhir.uji.ts && tsx uji/mentalTrend.uji.ts && tsx uji/dissection.uji.ts && tsx uji/cellBio.uji.ts && tsx uji/bodySearch.uji.ts && tsx uji/tissueTexture.uji.ts && tsx uji/renderScale.uji.ts && tsx uji/mainAxis.uji.ts && tsx uji/biomedicalEvidence.uji.ts && tsx uji/frontierHealthOS.uji.ts && tsx uji/healthGapNavigator.uji.ts && tsx uji/knowledgeBridge.uji.ts && tsx uji/medical3DFrontier.uji.ts && tsx uji/recentHealthInnovations.uji.ts"
   },
   "dependencies": {
     "cookie-parser": "^1.4.7",

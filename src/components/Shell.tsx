@@ -121,6 +121,8 @@ const nav: Nav[] = [
   { to: '/nutrition', label: 'Nutrition', icon: IconFood, roles: ['pasien', 'dokter', 'owner'], group: 'Your Body' },
   { to: '/body-explorer', label: 'Body Explorer', icon: IconActivity, roles: ['pasien', 'dokter', 'owner'], group: 'Your Body' },
   { to: '/radiology', label: 'Radiology Viewer', icon: IconSearch, roles: ['pasien', 'dokter', 'owner'], group: 'Your Body' },
+  { to: '/knowledge-bridge', label: 'Knowledge Bridge', icon: IconBook, roles: ['pasien', 'dokter', 'owner'], group: 'Learn & Look Up' },
+  { to: '/frontier-health', label: 'Frontier Health OS', icon: IconSparkle, roles: ['dokter', 'owner'], group: 'Learn & Look Up' },
   { to: '/health-data', label: 'Health Data', icon: IconHeart, roles: ['pasien', 'dokter', 'owner'], group: 'Your Body' },
   { to: '/emergency', label: 'Emergency Card', icon: IconShield, roles: ['pasien', 'dokter', 'owner'], group: 'Services' },
   // Pengetahuan — dahulu "Klinis". Isinya sama, perkenalannya berbeda.
