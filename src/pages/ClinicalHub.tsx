@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Card, SectionTitle, inputClass } from '../components/ui'
 import { IconStethoscope } from '../components/icons'
+import { HealthGapNavigator } from '../components/HealthGapNavigator'
 import { ambilTersembunyi, saring, langgananFitur } from '../lib/fiturTersembunyi'
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -67,9 +68,9 @@ export function ClinicalHub() {
   const total = GROUPS.reduce((s, g) => s + g.tools.length, 0)
 
   return (
-    <div className="mx-auto max-w-2xl space-y-5 pb-24">
+    <div className="mx-auto max-w-5xl space-y-5 pb-24">
       <Card className="!p-5">
-        <SectionTitle icon={<IconStethoscope size={20} />} title="Clinical Hub" subtitle={`${total} clinical & AI tools, searchable by what you need`} />
+        <SectionTitle icon={<IconStethoscope size={20} />} title="Clinical Hub" subtitle={`${total} clinical & AI tools, plus Panacea gap-navigation`} />
         <input
           className={`${inputClass} mt-3`}
           placeholder="Search: bukti, uji klinis, kalkulator, EMR…"
@@ -79,32 +80,38 @@ export function ClinicalHub() {
         />
       </Card>
 
+      <div id="gap-navigator">
+        <HealthGapNavigator />
+      </div>
+
       {filtered.length === 0 && (
         <Card className="!p-5 text-center text-sm text-neutral-500">
           Nothing matches "{query}" — try "bukti", "kalkulator", or "EMR".
         </Card>
       )}
 
-      {filtered.map((g) => (
-        <Card key={g.title} className="!p-5">
-          <div className="text-xs font-black uppercase tracking-wide text-neutral-500">{g.emoji} {g.title}</div>
-          <div className="mt-3 space-y-1.5">
-            {g.tools.map((t) => (
-              <a key={t.to} href={`#${t.to}`} className="group flex items-start justify-between gap-3 rounded-xl bg-neutral-50 px-3 py-2.5 transition hover:bg-brand/10 dark:bg-white/5">
-                <div className="min-w-0">
-                  <div className="text-sm font-bold text-ink group-hover:text-brand-dark dark:text-white">{t.name}</div>
-                  <div className="text-[12px] leading-snug text-neutral-500">{t.what}</div>
-                </div>
-                <span className="mt-1 shrink-0 text-neutral-300 transition group-hover:text-brand-dark">→</span>
-              </a>
-            ))}
-          </div>
-        </Card>
-      ))}
+      <div className="grid gap-4 md:grid-cols-2">
+        {filtered.map((g) => (
+          <Card key={g.title} className="!p-5">
+            <div className="text-xs font-black uppercase tracking-wide text-neutral-500">{g.emoji} {g.title}</div>
+            <div className="mt-3 space-y-1.5">
+              {g.tools.map((t) => (
+                <a key={t.to} href={`#${t.to}`} className="group flex items-start justify-between gap-3 rounded-xl bg-neutral-50 px-3 py-2.5 transition hover:bg-brand/10 dark:bg-white/5">
+                  <div className="min-w-0">
+                    <div className="text-sm font-bold text-ink group-hover:text-brand-dark dark:text-white">{t.name}</div>
+                    <div className="text-[12px] leading-snug text-neutral-500">{t.what}</div>
+                  </div>
+                  <span className="mt-1 shrink-0 text-neutral-300 transition group-hover:text-brand-dark">→</span>
+                </a>
+              ))}
+            </div>
+          </Card>
+        ))}
+      </div>
 
       <div className="rounded-2xl border border-neutral-100 bg-white p-4 text-center text-[11px] leading-relaxed text-neutral-500 dark:border-white/10 dark:bg-white/5">
-        Some tools here are intended for healthcare professionals and only appear once your account is verified.
-        Everything is educational and not a substitute for direct clinical judgment.
+        Gap Navigator measures information and implementation gaps, not disease severity. Some clinical tools are intended for healthcare professionals and only appear once your account is verified.
+        Everything is educational and does not replace direct clinical judgment.
       </div>
     </div>
   )
