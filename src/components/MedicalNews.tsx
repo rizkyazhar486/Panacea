@@ -8,6 +8,14 @@ interface Brief {
   status: 'Established' | 'Emerging' | 'Research frontier'
 }
 
+interface NewsCache {
+  items: LiveNewsItem[]
+  savedAt: number
+}
+
+const NEWS_CACHE_KEY = 'pmd_medical_news_last_good_v1'
+const MAX_CACHE_AGE_MS = 24 * 60 * 60 * 1000
+
 const LEARNING_BRIEFS: Brief[] = [
   { tag: 'Genomics', title: 'CRISPR has moved from laboratory concept to approved therapy', summary: 'Gene editing is now clinically real for selected inherited blood disorders, while many broader applications remain experimental and disease-specific.', status: 'Established' },
   { tag: 'Metabolic health', title: 'GLP-1–based therapies now affect more than body weight', summary: 'Cardiovascular, kidney and sleep-apnea outcomes are increasingly part of how the drug class is evaluated, alongside adverse effects and long-term follow-up.', status: 'Emerging' },
@@ -17,6 +25,25 @@ const LEARNING_BRIEFS: Brief[] = [
   { tag: 'Medical AI', title: 'The strongest medical AI products expose sources and uncertainty', summary: 'A useful system separates patient-derived observations, educational explanations and clinical inference instead of presenting generated text as measured fact.', status: 'Emerging' },
 ]
 
+function readCache(): NewsCache | null {
+  try {
+    const raw = localStorage.getItem(NEWS_CACHE_KEY)
+    if (!raw) return null
+    const parsed = JSON.parse(raw) as NewsCache
+    if (!Array.isArray(parsed.items) || !parsed.items.length || !Number.isFinite(parsed.savedAt)) return null
+    if (Date.now() - parsed.savedAt > MAX_CACHE_AGE_MS) return null
+    return parsed
+  } catch {
+    return null
+  }
+}
+
+function writeCache(items: LiveNewsItem[]) {
+  try {
+    localStorage.setItem(NEWS_CACHE_KEY, JSON.stringify({ items, savedAt: Date.now() } satisfies NewsCache))
+  } catch { /* private mode / storage full */ }
+}
+
 function relativeTime(pubDate: string) {
   const t = Date.parse(pubDate)
   if (Number.isNaN(t)) return ''
@@ -25,6 +52,14 @@ function relativeTime(pubDate: string) {
   const hours = Math.floor(minutes / 60)
   if (hours < 24) return `${hours}h ago`
   return `${Math.floor(hours / 24)}d ago`
+}
+
+function cacheAge(savedAt: number | null) {
+  if (!savedAt) return ''
+  const minutes = Math.max(0, Math.floor((Date.now() - savedAt) / 60000))
+  if (minutes < 60) return `${minutes}m ago`
+  const hours = Math.floor(minutes / 60)
+  return `${hours}h ago`
 }
 
 function cleanTitle(title: string, source: string) {
@@ -45,22 +80,33 @@ function LiveCard({ item }: { item: LiveNewsItem }) {
 }
 
 export function MedicalNews() {
-  const [live, setLive] = useState<LiveNewsItem[] | null>(null)
+  const cached = useMemo(() => readCache(), [])
+  const [live, setLive] = useState<LiveNewsItem[] | null>(cached?.items ?? null)
+  const [cacheSavedAt, setCacheSavedAt] = useState<number | null>(cached?.savedAt ?? null)
   const [failed, setFailed] = useState(false)
+  const [fresh, setFresh] = useState(false)
 
   useEffect(() => {
     let alive = true
     api.news()
       .then((response) => {
         if (!alive) return
-        if (response.items?.length) setLive(response.items)
-        else setFailed(true)
+        if (response.items?.length) {
+          setLive(response.items)
+          setFresh(true)
+          setFailed(false)
+          setCacheSavedAt(Date.now())
+          writeCache(response.items)
+        } else {
+          setFailed(true)
+        }
       })
       .catch(() => { if (alive) setFailed(true) })
     return () => { alive = false }
   }, [])
 
   const headlines = useMemo(() => live?.slice(0, 6) ?? [], [live])
+  const usingCached = Boolean(live?.length) && !fresh
 
   return (
     <section id="news" className="mx-auto max-w-6xl px-5 py-20 sm:px-8">
@@ -68,10 +114,16 @@ export function MedicalNews() {
         <div className="max-w-2xl">
           <div className="panacea-kicker">Health briefing</div>
           <h2 className="mt-3 text-3xl font-black tracking-[-.035em] text-white sm:text-5xl">Know what is live. Know what is evergreen.</h2>
-          <p className="mt-3 text-sm leading-relaxed text-white/55">PanaceaMed no longer disguises editorial summaries as current news. Live headlines show their publisher and recency; when the feed is unavailable, the page clearly switches to evergreen learning briefs.</p>
+          <p className="mt-3 text-sm leading-relaxed text-white/55">PanaceaMed does not disguise editorial summaries as current news. Live headlines show their publisher and recency; if the upstream feed briefly fails, the last successful headlines remain visible and are explicitly marked as cached.</p>
         </div>
-        <div className={`rounded-full border px-3 py-2 text-[10px] font-black uppercase tracking-[.14em] ${live ? 'border-emerald-300/20 bg-emerald-300/10 text-emerald-200' : 'border-white/10 bg-white/[.04] text-white/55'}`}>
-          {live ? 'Live feed connected' : failed ? 'Live feed unavailable · learning briefs shown' : 'Checking live sources…'}
+        <div className={`rounded-full border px-3 py-2 text-[10px] font-black uppercase tracking-[.14em] ${fresh ? 'border-emerald-300/20 bg-emerald-300/10 text-emerald-200' : usingCached ? 'border-amber-200/20 bg-amber-200/10 text-amber-100' : 'border-white/10 bg-white/[.04] text-white/55'}`}>
+          {fresh
+            ? 'Live feed connected'
+            : usingCached
+              ? `Cached headlines${cacheSavedAt ? ` · synced ${cacheAge(cacheSavedAt)}` : ''}${failed ? ' · refresh unavailable' : ' · refreshing…'}`
+              : failed
+                ? 'Live feed unavailable · learning briefs shown'
+                : 'Checking live sources…'}
         </div>
       </div>
 
