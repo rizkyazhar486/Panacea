@@ -28,11 +28,11 @@ Body → Cell and Cell → DNA render the Human Protein Atlas + Ensembl evidence
 
 ## Workout-specific anatomy
 
-`WorkoutHraWorkbench` reads an imported workout instead of fabricating activity. The recorded workout name is classified only to choose HRA anatomy queries; recorded duration, distance, heart rate and recovery remain measured workout fields. HRA structures are displayed as educational reference anatomy and are not described as measured muscle activation.
+`WorkoutHraWorkbench` reads an imported workout instead of fabricating activity. The recorded workout name is classified only to choose HRA anatomy queries; recorded duration, distance, heart rate and recovery remain measured workout fields. The workbench now loads a resolved upstream HRA GLB when available, while the workout replay stays in a separate collapsed educational model layer. The source GLB does not change with heart rate, pace, distance or recovery values.
 
 ## Operation-specific surgery anatomy
 
-`getSurgicalHraTerms()` derives source queries from each surgical procedure and phase using focus anatomy, structures at risk, and the operative region. `SurgicalHraWorkbench` lets the learner choose an operation and phase, inspect the generated source terms, and resolve them against HRA before the procedural simulation is opened. The same source-first workbench is used before surgical rehearsal.
+`getSurgicalHraTerms()` derives source queries from each surgical procedure and phase using focus anatomy, structures at risk, and the operative region. `SurgicalHraWorkbench` lets the learner choose an operation and phase, inspect the generated source terms, and load resolved HRA GLB geometry before the procedural simulation is opened. The same source-first workbench is used before surgical rehearsal. Generic whole-body HRA is no longer repeated above these focused modes because the workbench already provides source-resolved anatomy.
 
 ## What-if source boundary
 
@@ -44,4 +44,4 @@ Body → Cell and Cell → DNA render the Human Protein Atlas + Ensembl evidence
 
 ## Simulation boundary
 
-Exercise, Surgery and Practice show HRA reference anatomy before their optional model/simulation layers. What-if and Research now use source-resolved HRA workbenches as their primary visual experience rather than the legacy `Body3D` renderer. Cell/DNA modes follow evidence-first presentation. A generated scene is never presented as the authoritative anatomical source.
+Exercise, Surgery and Practice now use focused source-resolved HRA GLB workbenches before their optional model/simulation layers. What-if and Research use source-resolved HRA workbenches as their primary visual experience rather than the legacy `Body3D` renderer. Cell/DNA modes follow evidence-first presentation. A generated scene is never presented as the authoritative anatomical source.
