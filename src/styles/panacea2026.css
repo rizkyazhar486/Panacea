@@ -1,0 +1,98 @@
+/* PanaceaMed 2026 — restrained cinematic product language.
+   The goal is depth and legibility, not decorative gradient noise. */
+
+:root {
+  --pmd-space: #061019;
+  --pmd-space-2: #0a1720;
+  --pmd-aurora: #00bf63;
+  --pmd-cyan: #68e7f4;
+  --pmd-gold: #d8bb70;
+  --pmd-gold-soft: #f1dd9b;
+  --pmd-glass: rgba(255, 255, 255, 0.68);
+  --pmd-glass-border: rgba(255, 255, 255, 0.62);
+  --pmd-shadow: 0 24px 70px rgba(15, 35, 43, 0.12);
+}
+.dark {
+  --pmd-glass: rgba(10, 22, 31, 0.62);
+  --pmd-glass-border: rgba(255, 255, 255, 0.10);
+  --pmd-shadow: 0 26px 90px rgba(0, 0, 0, 0.36);
+}
+.panacea-app-surface { position: relative; isolation: isolate; }
+.panacea-app-surface::before {
+  content: ''; position: fixed; inset: 0; z-index: -2; pointer-events: none;
+  background:
+    radial-gradient(60rem 42rem at 8% -8%, rgba(0, 191, 99, .11), transparent 58%),
+    radial-gradient(52rem 38rem at 94% 4%, rgba(216, 187, 112, .11), transparent 60%),
+    radial-gradient(42rem 30rem at 58% 94%, rgba(104, 231, 244, .07), transparent 62%),
+    linear-gradient(180deg, #f9fbfb 0%, #f5f9f8 46%, #f9faf8 100%);
+}
+.dark .panacea-app-surface::before {
+  background:
+    radial-gradient(54rem 40rem at 4% -6%, rgba(0, 191, 99, .17), transparent 58%),
+    radial-gradient(48rem 36rem at 96% 1%, rgba(216, 187, 112, .13), transparent 60%),
+    radial-gradient(38rem 32rem at 64% 96%, rgba(104, 231, 244, .08), transparent 62%),
+    linear-gradient(180deg, #061019 0%, #07131b 48%, #050d13 100%);
+}
+.liquid-panel, .learning-depth {
+  position: relative; overflow: hidden; border: 1px solid rgba(255,255,255,.58);
+  background: linear-gradient(145deg, rgba(255,255,255,.76), rgba(255,255,255,.48));
+  box-shadow: var(--pmd-shadow), inset 0 1px 0 rgba(255,255,255,.86), inset 0 -1px 0 rgba(10,30,40,.035);
+  backdrop-filter: blur(26px) saturate(142%); -webkit-backdrop-filter: blur(26px) saturate(142%); border-radius: 26px;
+}
+.dark .liquid-panel, .dark .learning-depth {
+  border-color: rgba(255,255,255,.10); background: linear-gradient(145deg, rgba(17,34,44,.72), rgba(7,18,27,.58));
+  box-shadow: var(--pmd-shadow), inset 0 1px 0 rgba(255,255,255,.09), inset 0 -1px 0 rgba(0,0,0,.3);
+}
+.liquid-panel::after, .learning-depth::after {
+  content: ''; position: absolute; pointer-events: none; inset: 0; border-radius: inherit;
+  background: linear-gradient(118deg, rgba(255,255,255,.22), transparent 28%, transparent 72%, rgba(216,187,112,.055)); mix-blend-mode: screen;
+}
+.panacea-kicker { display: inline-flex; align-items: center; gap: .45rem; font-size: 10px; line-height: 1; font-weight: 900; text-transform: uppercase; letter-spacing: .18em; color: rgba(255,255,255,.66); }
+.panacea-kicker::before { content: ''; width: 5px; height: 5px; border-radius: 999px; background: var(--pmd-gold); box-shadow: 0 0 14px rgba(216,187,112,.6); }
+.liquid-orbit-button {
+  align-items: center; justify-content: center; gap: .45rem; min-height: 38px; border-radius: 999px; border: 1px solid rgba(255,255,255,.28); padding: .55rem .9rem;
+  color: white; font-size: 11px; font-weight: 900; letter-spacing: .01em; background: linear-gradient(135deg, rgba(255,255,255,.18), rgba(255,255,255,.07));
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.32), 0 10px 28px rgba(0,0,0,.18); backdrop-filter: blur(18px) saturate(150%); -webkit-backdrop-filter: blur(18px) saturate(150%);
+  transition: transform .22s ease, border-color .22s ease, background .22s ease;
+}
+.liquid-orbit-button:hover { transform: translateY(-1px); border-color: rgba(216,187,112,.52); background: linear-gradient(135deg, rgba(216,187,112,.22), rgba(0,191,99,.12)); }
+.panacea-body-widget {
+  border-radius: 28px; border: 1px solid rgba(255,255,255,.12);
+  background: radial-gradient(circle at 50% 38%, rgba(0,191,99,.12), transparent 27%), radial-gradient(circle at 72% 18%, rgba(216,187,112,.12), transparent 22%), linear-gradient(160deg, #07121a 0%, #081924 48%, #050c12 100%);
+  box-shadow: 0 30px 80px rgba(1,10,17,.32), inset 0 1px 0 rgba(255,255,255,.08);
+}
+.panacea-orbit-field::before, .panacea-orbit-field::after {
+  content: ''; position: absolute; left: 50%; top: 50%; width: 78%; aspect-ratio: 1; border-radius: 50%; border: 1px solid rgba(216,187,112,.13);
+  transform: translate(-50%,-50%) rotateX(68deg) rotateZ(-18deg); box-shadow: 0 0 40px rgba(216,187,112,.035);
+}
+.panacea-orbit-field::after { width: 56%; border-color: rgba(104,231,244,.11); transform: translate(-50%,-50%) rotateX(72deg) rotateZ(24deg); }
+.panacea-dashboard-hero {
+  position: relative; overflow: hidden; min-height: 250px; border-radius: 30px;
+  background: radial-gradient(34rem 22rem at 9% 10%, rgba(0,191,99,.22), transparent 64%), radial-gradient(28rem 24rem at 92% 18%, rgba(216,187,112,.20), transparent 62%), linear-gradient(135deg, #07121a, #0a1a23 54%, #09141c);
+  box-shadow: 0 30px 90px rgba(4,16,24,.28), inset 0 1px rgba(255,255,255,.08); color: white;
+}
+.panacea-dashboard-hero::before {
+  content: ''; position: absolute; inset: 0; pointer-events: none; opacity: .42;
+  background-image: radial-gradient(circle at 20% 40%, rgba(255,255,255,.65) 0 1px, transparent 1.25px), radial-gradient(circle at 70% 20%, rgba(255,255,255,.45) 0 1px, transparent 1.25px), radial-gradient(circle at 80% 72%, rgba(216,187,112,.7) 0 1px, transparent 1.3px), radial-gradient(circle at 35% 82%, rgba(104,231,244,.55) 0 1px, transparent 1.2px);
+  background-size: 110px 110px, 150px 150px, 170px 170px, 190px 190px;
+}
+.panacea-quick-action { display: flex; min-width: 0; align-items: center; gap: .7rem; border-radius: 20px; border: 1px solid rgba(0,0,0,.05); padding: .85rem; background: rgba(255,255,255,.5); transition: transform .2s ease, background .2s ease, border-color .2s ease; }
+.panacea-quick-action:hover { transform: translateY(-2px); background: rgba(255,255,255,.8); border-color: rgba(216,187,112,.25); }
+.dark .panacea-quick-action { border-color: rgba(255,255,255,.08); background: rgba(255,255,255,.035); }
+.dark .panacea-quick-action:hover { background: rgba(255,255,255,.07); }
+.panacea-landing {
+  position: relative; min-height: 100vh; overflow-x: clip; color: #edf7f4;
+  background: radial-gradient(70rem 42rem at 0% -8%, rgba(0,191,99,.15), transparent 58%), radial-gradient(56rem 40rem at 96% 2%, rgba(216,187,112,.13), transparent 58%), linear-gradient(180deg, #061019 0%, #07141d 44%, #050b10 100%);
+}
+.panacea-landing::before {
+  content: ''; position: fixed; inset: 0; pointer-events: none; opacity: .35;
+  background-image: radial-gradient(circle at 15% 30%, rgba(255,255,255,.8) 0 .7px, transparent .9px), radial-gradient(circle at 78% 22%, rgba(255,255,255,.55) 0 .8px, transparent 1px), radial-gradient(circle at 62% 76%, rgba(216,187,112,.7) 0 .8px, transparent 1px);
+  background-size: 160px 160px, 210px 210px, 260px 260px;
+}
+.panacea-landing-nav { border: 1px solid rgba(255,255,255,.10); background: rgba(6,16,25,.56); box-shadow: inset 0 1px rgba(255,255,255,.08), 0 16px 60px rgba(0,0,0,.18); backdrop-filter: blur(24px) saturate(130%); -webkit-backdrop-filter: blur(24px) saturate(130%); }
+.panacea-hero-title { max-width: 12ch; font-size: clamp(2.7rem, 7vw, 6.7rem); line-height: .94; letter-spacing: -.055em; font-weight: 900; text-wrap: balance; }
+.panacea-gold-text { color: transparent; background: linear-gradient(112deg, #fff4c7 0%, #d8bb70 42%, #f0d994 74%, #a98743 100%); -webkit-background-clip: text; background-clip: text; }
+.panacea-feature-card { border: 1px solid rgba(255,255,255,.09); border-radius: 24px; background: linear-gradient(145deg, rgba(255,255,255,.065), rgba(255,255,255,.025)); box-shadow: inset 0 1px rgba(255,255,255,.07); backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px); }
+.panacea-timeline-line { background: linear-gradient(90deg, rgba(0,191,99,.2), rgba(216,187,112,.85), rgba(104,231,244,.2)); }
+@media (max-width: 640px) { .liquid-panel, .learning-depth { border-radius: 22px; } .panacea-dashboard-hero { border-radius: 24px; } .panacea-body-widget { border-radius: 24px; } }
+@media (prefers-reduced-motion: reduce) { .liquid-orbit-button, .panacea-quick-action { transition: none !important; transform: none !important; } .panacea-orbit-field::before, .panacea-orbit-field::after { animation: none !important; } }
