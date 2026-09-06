@@ -32,7 +32,16 @@ function loadSurface() {
 
 export function BodyExposureWidget({ className = '', hero = false, interactive = true, showCta = true }: Props) {
   const mountRef = useRef<HTMLDivElement>(null)
+  const rotationRef = useRef(0)
+  const hasInteractedRef = useRef(false)
+  const dragRef = useRef({ active: false, startX: 0, startRotation: 0 })
   const [status, setStatus] = useState<'loading' | 'ready' | 'error'>('loading')
+
+  function showView(angle: number) {
+    if (!interactive) return
+    hasInteractedRef.current = true
+    rotationRef.current = angle
+  }
 
   useEffect(() => {
     const mount = mountRef.current
@@ -44,7 +53,7 @@ export function BodyExposureWidget({ className = '', hero = false, interactive =
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, hero ? 2 : 1.5))
     renderer.outputColorSpace = THREE.SRGBColorSpace
     renderer.toneMapping = THREE.ACESFilmicToneMapping
-    renderer.toneMappingExposure = 1.05
+    renderer.toneMappingExposure = 1.08
     renderer.setClearColor(0x000000, 0)
     mount.appendChild(renderer.domElement)
 
@@ -89,16 +98,16 @@ export function BodyExposureWidget({ className = '', hero = false, interactive =
         if (!(obj instanceof THREE.Mesh)) return
         obj.material = new THREE.MeshPhysicalMaterial({
           color: 0xb87568,
-          roughness: 0.43,
+          roughness: 0.4,
           metalness: 0,
-          clearcoat: 0.18,
-          clearcoatRoughness: 0.42,
-          sheen: 0.3,
+          clearcoat: 0.2,
+          clearcoatRoughness: 0.38,
+          sheen: 0.32,
           sheenColor: new THREE.Color(0xffd8c6),
-          transmission: 0.025,
+          transmission: 0.03,
           thickness: 0.35,
           transparent: true,
-          opacity: hero ? 0.94 : 0.91,
+          opacity: hero ? 0.95 : 0.92,
           side: THREE.DoubleSide,
         })
       })
@@ -116,22 +125,48 @@ export function BodyExposureWidget({ className = '', hero = false, interactive =
       setStatus('ready')
     }).catch(() => { if (!disposed) setStatus('error') })
 
-    const pointer = { x: 0, y: 0 }
+    const parallax = { x: 0, y: 0 }
+    const onPointerDown = (event: PointerEvent) => {
+      if (!interactive) return
+      dragRef.current = { active: true, startX: event.clientX, startRotation: rotationRef.current }
+      hasInteractedRef.current = true
+      mount.setPointerCapture?.(event.pointerId)
+    }
     const onPointerMove = (event: PointerEvent) => {
       if (!interactive) return
       const rect = mount.getBoundingClientRect()
-      pointer.x = ((event.clientX - rect.left) / Math.max(rect.width, 1) - 0.5) * 2
-      pointer.y = ((event.clientY - rect.top) / Math.max(rect.height, 1) - 0.5) * 2
+      parallax.x = ((event.clientX - rect.left) / Math.max(rect.width, 1) - 0.5) * 2
+      parallax.y = ((event.clientY - rect.top) / Math.max(rect.height, 1) - 0.5) * 2
+      if (dragRef.current.active) {
+        rotationRef.current = dragRef.current.startRotation + (event.clientX - dragRef.current.startX) * 0.012
+      }
     }
+    const onPointerUp = (event: PointerEvent) => {
+      if (!interactive) return
+      dragRef.current.active = false
+      if (mount.hasPointerCapture?.(event.pointerId)) mount.releasePointerCapture?.(event.pointerId)
+    }
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (!interactive) return
+      if (event.key !== 'ArrowLeft' && event.key !== 'ArrowRight') return
+      event.preventDefault()
+      hasInteractedRef.current = true
+      rotationRef.current += event.key === 'ArrowLeft' ? -Math.PI / 8 : Math.PI / 8
+    }
+    mount.addEventListener('pointerdown', onPointerDown)
     mount.addEventListener('pointermove', onPointerMove)
+    mount.addEventListener('pointerup', onPointerUp)
+    mount.addEventListener('pointercancel', onPointerUp)
+    mount.addEventListener('keydown', onKeyDown)
 
     const clock = new THREE.Clock()
     const animate = () => {
       const t = clock.getElapsedTime()
       if (visible) {
-        const targetY = t * 0.11 + pointer.x * 0.12
-        pivot.rotation.y += (targetY - pivot.rotation.y) * 0.025
-        pivot.rotation.x += ((pointer.y * 0.035) - pivot.rotation.x) * 0.025
+        const baseRotation = hasInteractedRef.current ? rotationRef.current : t * 0.075
+        const targetY = baseRotation + (dragRef.current.active ? 0 : parallax.x * 0.055)
+        pivot.rotation.y += (targetY - pivot.rotation.y) * 0.075
+        pivot.rotation.x += ((parallax.y * 0.025) - pivot.rotation.x) * 0.04
         pivot.position.y = Math.sin(t * 0.9) * 0.008
         renderer.render(scene, camera)
       }
@@ -144,7 +179,11 @@ export function BodyExposureWidget({ className = '', hero = false, interactive =
       cancelAnimationFrame(raf)
       ro.disconnect()
       observer.disconnect()
+      mount.removeEventListener('pointerdown', onPointerDown)
       mount.removeEventListener('pointermove', onPointerMove)
+      mount.removeEventListener('pointerup', onPointerUp)
+      mount.removeEventListener('pointercancel', onPointerUp)
+      mount.removeEventListener('keydown', onKeyDown)
       environment.dispose()
       pmrem.dispose()
       renderer.dispose()
@@ -155,22 +194,59 @@ export function BodyExposureWidget({ className = '', hero = false, interactive =
   return (
     <div className={`panacea-body-widget relative overflow-hidden ${className}`}>
       <div className="pointer-events-none absolute inset-0 panacea-orbit-field" aria-hidden />
-      <div ref={mountRef} className={`relative z-10 w-full ${hero ? 'h-[clamp(360px,62vh,720px)]' : 'h-[250px]'}`} aria-label="Interactive reference human anatomy preview" />
-      <div className="pointer-events-none absolute inset-x-4 top-4 z-20 flex items-center justify-between gap-2">
-        <span className="panacea-kicker">Reference anatomy · 3D</span>
-        <span className="rounded-full border border-white/15 bg-black/20 px-2.5 py-1 text-[10px] font-bold text-white/70 backdrop-blur-xl">
-          {status === 'ready' ? 'Live model' : status === 'error' ? 'Preview unavailable' : 'Loading atlas…'}
+      <div
+        ref={mountRef}
+        className={`relative z-10 w-full select-none ${interactive ? 'cursor-grab touch-none active:cursor-grabbing' : ''} ${hero ? 'h-[clamp(360px,62vh,720px)]' : 'h-[250px]'}`}
+        aria-label="Interactive 3D reference human body. Drag left or right to rotate."
+        role={interactive ? 'application' : 'img'}
+        tabIndex={interactive ? 0 : -1}
+      />
+
+      <div className="pointer-events-none absolute inset-x-4 top-4 z-20 flex items-start justify-between gap-2">
+        <div>
+          <span className="panacea-kicker">3D body preview</span>
+          <div className="mt-1 text-[10px] font-semibold text-white/55">{interactive ? 'Drag to rotate · use arrows on keyboard' : 'Reference anatomy'}</div>
+        </div>
+        <span className="rounded-full border border-white/15 bg-black/25 px-2.5 py-1 text-[10px] font-bold text-white/70 backdrop-blur-xl">
+          {status === 'ready' ? 'Ready' : status === 'error' ? 'Preview unavailable' : 'Loading…'}
         </span>
       </div>
-      {!hero && (
-        <div className="pointer-events-none absolute bottom-4 left-4 right-4 z-20">
-          <div className="text-sm font-black text-white">Your body, from whole-person to molecular scale</div>
-          <div className="mt-1 text-[11px] leading-relaxed text-white/65">Rotate the reference model here, then open the full Digital Twin for anatomy, radiology and 4D physiology.</div>
+
+      {interactive && status === 'ready' && (
+        <div className="absolute right-3 top-1/2 z-30 hidden -translate-y-1/2 flex-col gap-1.5 sm:flex" aria-label="3D view shortcuts">
+          {[
+            ['Front', 0],
+            ['Side', Math.PI / 2],
+            ['Back', Math.PI],
+          ].map(([label, angle]) => (
+            <button
+              key={String(label)}
+              type="button"
+              onClick={() => showView(Number(angle))}
+              className="rounded-full border border-white/12 bg-black/30 px-3 py-1.5 text-[9px] font-black text-white/70 backdrop-blur-xl transition hover:border-white/30 hover:bg-white/10 hover:text-white"
+            >
+              {String(label)}
+            </button>
+          ))}
         </div>
       )}
+
+      {!hero && (
+        <div className="pointer-events-none absolute bottom-4 left-4 right-4 z-20 pr-0 sm:pr-32">
+          <div className="text-sm font-black text-white">See where things are before opening the details</div>
+          <div className="mt-1 max-w-md text-[11px] leading-relaxed text-white/65">This is a reference human model—not your scan. Rotate it here, then open the atlas for anatomy, physiology, radiology and workout views.</div>
+        </div>
+      )}
+
+      {interactive && hero && (
+        <div className="pointer-events-none absolute bottom-4 right-4 z-20 rounded-full border border-white/10 bg-black/25 px-3 py-1.5 text-[9px] font-bold text-white/55 backdrop-blur-xl sm:hidden">
+          Swipe body left ↔ right
+        </div>
+      )}
+
       {showCta && (
         <Link to="/body-explorer" className="liquid-orbit-button pointer-events-auto absolute bottom-4 right-4 z-30 hidden sm:inline-flex">
-          Open 4D atlas <span aria-hidden>→</span>
+          Explore the body <span aria-hidden>→</span>
         </Link>
       )}
     </div>
