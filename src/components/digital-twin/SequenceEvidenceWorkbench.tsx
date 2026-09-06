@@ -24,6 +24,52 @@ async function sha256(buffer: ArrayBuffer) {
   return Array.from(new Uint8Array(digest)).map((byte) => byte.toString(16).padStart(2, '0')).join('')
 }
 
+async function readSequencingPreview(file: File) {
+  const isGzip = /\.gz$/i.test(file.name)
+  if (!isGzip) {
+    const sampled = file.size > MAX_ANALYSIS_BYTES
+    const buffer = await (sampled ? file.slice(0, MAX_ANALYSIS_BYTES) : file).arrayBuffer()
+    return { buffer, sampled, compressed: false }
+  }
+
+  const Decompression = (globalThis as unknown as { DecompressionStream?: new (format: string) => TransformStream<Uint8Array, Uint8Array> }).DecompressionStream
+  if (!Decompression) throw new Error('This browser cannot decode gzip locally. Open Panacea in a current browser or provide an uncompressed FASTA/FASTQ/VCF file.')
+
+  const reader = file.stream().pipeThrough(new Decompression('gzip')).getReader()
+  const chunks: Uint8Array[] = []
+  let total = 0
+  let sampled = false
+
+  while (true) {
+    const { done, value } = await reader.read()
+    if (done) break
+    if (!value?.byteLength) continue
+    const remaining = MAX_ANALYSIS_BYTES - total
+    if (remaining <= 0) {
+      sampled = true
+      await reader.cancel()
+      break
+    }
+    if (value.byteLength > remaining) {
+      chunks.push(value.slice(0, remaining))
+      total += remaining
+      sampled = true
+      await reader.cancel()
+      break
+    }
+    chunks.push(value)
+    total += value.byteLength
+  }
+
+  const merged = new Uint8Array(total)
+  let offset = 0
+  for (const chunk of chunks) {
+    merged.set(chunk, offset)
+    offset += chunk.byteLength
+  }
+  return { buffer: merged.buffer, sampled, compressed: true }
+}
+
 function metricCards(report: SequenceEvidenceReport) {
   if (report.format === 'VCF') {
     return [
@@ -62,6 +108,7 @@ export function SequenceEvidenceWorkbench() {
   const [analyzedBytes, setAnalyzedBytes] = useState(0)
   const [hash, setHash] = useState('')
   const [sampled, setSampled] = useState(false)
+  const [compressed, setCompressed] = useState(false)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
 
@@ -71,19 +118,18 @@ export function SequenceEvidenceWorkbench() {
     setError('')
     setReport(null)
     setHash('')
+    setCompressed(false)
     try {
-      if (/\.gz$/i.test(file.name)) throw new Error('Compressed .gz is not decoded in this browser workbench yet. Use an uncompressed FASTA, FASTQ or VCF export.')
-      const useSample = file.size > MAX_ANALYSIS_BYTES
-      const blob = useSample ? file.slice(0, MAX_ANALYSIS_BYTES) : file
-      const buffer = await blob.arrayBuffer()
-      const text = new TextDecoder().decode(buffer)
+      const preview = await readSequencingPreview(file)
+      const text = new TextDecoder().decode(preview.buffer)
       const parsed = parseSequenceEvidence(text)
-      const digest = await sha256(buffer)
+      const digest = await sha256(preview.buffer)
       setReport(parsed)
       setFileName(file.name)
       setFileSize(file.size)
-      setAnalyzedBytes(buffer.byteLength)
-      setSampled(useSample)
+      setAnalyzedBytes(preview.buffer.byteLength)
+      setSampled(preview.sampled)
+      setCompressed(preview.compressed)
       setHash(digest)
     } catch (cause) {
       setError(cause instanceof Error ? cause.message : 'Unable to parse sequencing file.')
@@ -101,17 +147,17 @@ export function SequenceEvidenceWorkbench() {
           <div className="max-w-4xl">
             <div className="text-[9px] font-black uppercase tracking-[.18em] text-emerald-700 dark:text-emerald-300">Local sequencing evidence</div>
             <h3 className="mt-1 text-xl font-black tracking-tight text-neutral-950 dark:text-white">Read real FASTA, FASTQ or VCF data in the browser.</h3>
-            <p className="mt-1 text-[10px] leading-relaxed text-neutral-500 dark:text-neutral-400">This workbench reads the selected file locally and computes transparent summary metrics. FASTQ from an Oxford Nanopore basecalling workflow can be inspected here, but Panacea is not performing basecalling itself. No sequence file is uploaded by this component. VCF consequence annotation is a separate, explicit-consent action.</p>
+            <p className="mt-1 text-[10px] leading-relaxed text-neutral-500 dark:text-neutral-400">This workbench reads the selected file locally and computes transparent summary metrics. FASTQ from an Oxford Nanopore basecalling workflow can be inspected here, including gzip-compressed exports. Panacea is not performing basecalling itself. VCF consequence annotation is a separate, explicit-consent action.</p>
           </div>
           <div className="flex flex-wrap gap-1.5 text-[8px] font-black uppercase tracking-[.12em] text-neutral-500 dark:text-neutral-300">
-            {['FASTA', 'FASTQ', 'VCF', 'local first'].map((item) => <span key={item} className="rounded-full border border-neutral-200 bg-neutral-50 px-2.5 py-1.5 dark:border-white/10 dark:bg-white/[.04]">{item}</span>)}
+            {['FASTA', 'FASTQ', 'VCF', 'gzip', 'local first'].map((item) => <span key={item} className="rounded-full border border-neutral-200 bg-neutral-50 px-2.5 py-1.5 dark:border-white/10 dark:bg-white/[.04]">{item}</span>)}
           </div>
         </div>
 
         <label className="mt-4 flex cursor-pointer flex-col items-center justify-center rounded-[24px] border border-dashed border-emerald-300 bg-emerald-50/60 px-4 py-7 text-center transition hover:bg-emerald-50 dark:border-emerald-300/25 dark:bg-emerald-300/[.055] dark:hover:bg-emerald-300/[.08]">
-          <input type="file" className="sr-only" accept=".fa,.fasta,.fna,.fq,.fastq,.vcf,.txt" onChange={(event) => void loadFile(event.target.files?.[0])} />
+          <input type="file" className="sr-only" accept=".fa,.fasta,.fna,.fq,.fastq,.vcf,.txt,.gz" onChange={(event) => void loadFile(event.target.files?.[0])} />
           <div className="text-[13px] font-black text-neutral-950 dark:text-white">{loading ? 'Reading sequence…' : 'Choose sequencing file'}</div>
-          <div className="mt-1 text-[9px] text-neutral-500 dark:text-neutral-400">Uncompressed FASTA / FASTQ / VCF · files above 32 MB are analyzed as an explicitly labelled preview sample</div>
+          <div className="mt-1 text-[9px] text-neutral-500 dark:text-neutral-400">FASTA / FASTQ / VCF or .gz · decoded locally · analysis is capped at 32 MB of decoded evidence and labelled when sampled</div>
         </label>
       </header>
 
@@ -123,10 +169,10 @@ export function SequenceEvidenceWorkbench() {
             <div>
               <div className="text-[8px] font-black uppercase tracking-[.16em] text-neutral-400">File provenance</div>
               <div className="mt-1 text-sm font-black text-neutral-950 dark:text-white">{fileName}</div>
-              <div className="mt-1 text-[9px] text-neutral-500 dark:text-neutral-400">{bytesLabel(fileSize)} · {report.format} · {sampled ? `${bytesLabel(analyzedBytes)} preview analyzed` : 'complete file analyzed'}{report.format === 'VCF' ? ` · ${report.assemblyHint || 'assembly unknown'}` : ''}</div>
+              <div className="mt-1 text-[9px] text-neutral-500 dark:text-neutral-400">source file {bytesLabel(fileSize)} · {report.format}{compressed ? ' · gzip decoded locally' : ''} · {sampled ? `${bytesLabel(analyzedBytes)} decoded preview analyzed` : `${bytesLabel(analyzedBytes)} analyzed`}{report.format === 'VCF' ? ` · ${report.assemblyHint || 'assembly unknown'}` : ''}</div>
             </div>
-            <span className={`rounded-full px-3 py-1.5 text-[8px] font-black uppercase ${sampled ? 'bg-amber-100 text-amber-800 dark:bg-amber-300/10 dark:text-amber-200' : 'bg-emerald-100 text-emerald-800 dark:bg-emerald-300/10 dark:text-emerald-200'}`}>{sampled ? 'sampled' : 'complete'}</span>
-            <div className="w-full break-all rounded-xl bg-white px-3 py-2 font-mono text-[8px] text-neutral-500 dark:bg-black/20 dark:text-neutral-400">SHA-256 of analyzed bytes: {hash}</div>
+            <span className={`rounded-full px-3 py-1.5 text-[8px] font-black uppercase ${sampled ? 'bg-amber-100 text-amber-800 dark:bg-amber-300/10 dark:text-amber-200' : 'bg-emerald-100 text-emerald-800 dark:bg-emerald-300/10 dark:text-emerald-200'}`}>{sampled ? 'sampled' : 'complete decoded evidence'}</span>
+            <div className="w-full break-all rounded-xl bg-white px-3 py-2 font-mono text-[8px] text-neutral-500 dark:bg-black/20 dark:text-neutral-400">SHA-256 of analyzed decoded bytes: {hash}</div>
           </div>
 
           <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
@@ -164,7 +210,7 @@ export function SequenceEvidenceWorkbench() {
 
           {(sampled || report.warnings.length > 0) && (
             <div className="rounded-2xl border border-amber-200 bg-amber-50 p-3 text-[9px] leading-relaxed text-amber-900 dark:border-amber-300/20 dark:bg-amber-300/[.055] dark:text-amber-100">
-              {sampled && <div>Large-file boundary: metrics describe only the first {bytesLabel(analyzedBytes)} of this file, not the entire sequencing run.</div>}
+              {sampled && <div>Large-file boundary: metrics describe only the first {bytesLabel(analyzedBytes)} of decoded evidence, not the entire sequencing run.</div>}
               {report.warnings.map((warning) => <div key={warning}>{warning}</div>)}
             </div>
           )}
