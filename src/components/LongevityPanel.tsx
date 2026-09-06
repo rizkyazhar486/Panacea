@@ -6,6 +6,7 @@ import {
   konversi, phenoAge, egfrCkdEpi2021, fib4, hrMaksTanaka, vo2maxUth,
   sindromMetabolikIdf, type Hasil, type HasilAngka,
 } from '../lib/longevity'
+import { bangunBundel, ringkasBundel, keJson } from '../lib/fhir'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Panel ini berdiri terpisah dari model poin di halaman yang sama, dan
@@ -103,6 +104,43 @@ export function LongevityPanel({ age, sex, restingHr, waistCm, systolic }: Longe
       glukosaPuasaMgdL: lab.glukosaPuasaMgdL,
     })
     : null
+
+  // Ekspor FHIR. Data yang tidak bisa dibawa keluar hanya berguna selama
+  // pengguna memakai aplikasi ini; klinik yang menerimanya membutuhkan bentuk
+  // yang bisa dibaca mesin lain, bukan tangkapan layar.
+  const bundel = useMemo(() => {
+    let bio: Record<string, number> = {}
+    try { bio = JSON.parse(localStorage.getItem('pmd_bioage_v1') || '{}') } catch { /* abaikan */ }
+    const bersih = (x: unknown) => (typeof x === 'number' && x > 0 ? x : undefined)
+    return bangunBundel({
+      nilai: {
+        weightKg: bersih(bio.weightKg), heightCm: bersih(bio.heightCm),
+        systolic: bersih(systolic), diastolic: bersih(lab.diastolik),
+        heartRate: bersih(restingHr), waistCm: bersih(waistCm), hba1c: bersih(bio.hba1c),
+        albuminGdL: bersih(lab.albuminGdL), kreatininMgdL: bersih(lab.kreatininMgdL),
+        glukosaPuasaMgdL: bersih(lab.glukosaPuasaMgdL), crpMgL: bersih(lab.crpMgL),
+        limfositPersen: bersih(lab.limfositPersen), mcv: bersih(lab.mcv), rdw: bersih(lab.rdw),
+        alp: bersih(lab.alp), wbc: bersih(lab.wbc), ast: bersih(lab.ast), alt: bersih(lab.alt),
+        trombosit: bersih(lab.trombosit), trigliserida: bersih(lab.trigliserida), hdl: bersih(lab.hdl),
+        phenoAge: pheno?.ok ? pheno.data.phenoAge : undefined,
+        egfr: egfr?.ok ? egfr.data.nilai : undefined,
+        fib4: fib?.ok ? fib.data.nilai : undefined,
+        vo2max: vo2?.ok ? vo2.data.nilai : undefined,
+      },
+      pasien: { kelamin: sex },
+    })
+  }, [lab, systolic, restingHr, waistCm, sex, pheno, egfr, fib, vo2])
+  const ringkas = ringkasBundel(bundel)
+
+  function unduh() {
+    const blob = new Blob([keJson(bundel)], { type: 'application/fhir+json' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = `panaceamed-fhir-${new Date().toISOString().slice(0, 10)}.json`
+    a.click()
+    URL.revokeObjectURL(url)
+  }
 
   const kolom = (label: string, k: keyof Lab, step = 1) => (
     <Field label={label} key={k}>
@@ -211,6 +249,30 @@ export function LongevityPanel({ age, sex, restingHr, waistCm, systolic }: Longe
           <p className="mt-3 rounded-xl bg-neutral-100/60 px-3 py-2 text-[11px] leading-snug text-neutral-500 dark:bg-white/5">
             Fill in the blood panel above to see these. Each equation appears only once it has every value it needs — a partial panel gives a wrong answer, not a rough one.
           </p>
+        )}
+
+        {ringkas.observasi > 0 && (
+          <div className="mt-3 rounded-xl border border-neutral-100 p-3 dark:border-white/10">
+            <div className="flex items-center justify-between gap-3">
+              <div className="min-w-0">
+                <div className="text-sm font-bold text-ink dark:text-ink">Export as FHIR</div>
+                <div className="text-[11px] leading-snug text-neutral-500">
+                  {ringkas.observasi} observations — {ringkas.berkode} LOINC-coded, {ringkas.lokal} locally
+                  coded because they are derived scores, not laboratory results.
+                </div>
+              </div>
+              <button
+                onClick={unduh}
+                className="shrink-0 rounded-full border border-brand/30 bg-brand-50 px-3 py-1.5 text-[11px] font-bold text-brand-dark active:scale-95"
+              >
+                Download
+              </button>
+            </div>
+            <p className="mt-1.5 text-[10px] leading-snug text-neutral-500">
+              A FHIR R4 collection Bundle any clinic system or SMART on FHIR app can read. Derived scores
+              never claim a LOINC code — a wrong code files a number under the wrong row with no warning.
+            </p>
+          </div>
         )}
 
         <p className="mt-3 rounded-xl bg-neutral-100/60 px-3 py-2 text-[11px] leading-snug text-neutral-500 dark:bg-white/5">
