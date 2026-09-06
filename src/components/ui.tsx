@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react'
 import { rupaRute } from '../lib/warnaRute'
 import { Prosa } from './Prosa'
+import '../styles/readability.css'
 
 export function Card({
   children,
@@ -13,7 +14,7 @@ export function Card({
 }) {
   return (
     <div
-      className={`kaca relative overflow-hidden rounded-[28px] border border-white/65 bg-white/70 shadow-[0_18px_55px_rgba(15,35,45,.075)] ring-1 ring-black/[.025] backdrop-blur-2xl dark:border-white/10 dark:bg-white/[.045] dark:shadow-[0_22px_70px_rgba(0,0,0,.26)] dark:ring-white/[.025] ${pad ? 'p-5 sm:p-6' : ''} ${className}`}
+      className={`kaca relative overflow-hidden rounded-[28px] border border-white/75 bg-white/90 shadow-[0_18px_55px_rgba(15,35,45,.075)] ring-1 ring-black/[.035] backdrop-blur-2xl dark:border-white/12 dark:bg-[#111315]/95 dark:shadow-[0_22px_70px_rgba(0,0,0,.26)] dark:ring-white/[.035] ${pad ? 'p-5 sm:p-6' : ''} ${className}`}
     >
       {children}
     </div>
@@ -46,7 +47,7 @@ export function SectionTitle({
             <span>{title}</span>
           </h2>
           {subtitle && (
-            <Prosa kelas="mt-1.5 max-w-3xl text-[13px] leading-relaxed text-neutral-500 dark:text-neutral-400">
+            <Prosa kelas="mt-1.5 max-w-3xl text-[13px] leading-relaxed text-neutral-600 dark:text-neutral-300">
               {subtitle}
             </Prosa>
           )}
@@ -58,11 +59,11 @@ export function SectionTitle({
 }
 
 const toneMap: Record<string, string> = {
-  low: 'bg-amber-100 text-amber-700',
+  low: 'bg-amber-100 text-amber-800 dark:bg-amber-400/15 dark:text-amber-200',
   normal: 'bg-brand-100 text-brand-dark',
-  high: 'bg-red-100 text-accent',
+  high: 'bg-red-100 text-red-800 dark:bg-red-400/15 dark:text-red-200',
   critical: 'bg-accent text-white',
-  neutral: 'bg-neutral-100 text-neutral-600 dark:bg-white/10 dark:text-neutral-300',
+  neutral: 'bg-neutral-100 text-neutral-700 dark:bg-white/10 dark:text-neutral-200',
   brand: 'bg-brand-100 text-brand-dark',
 }
 
@@ -99,7 +100,7 @@ export function Button({
     primary: 'text-white',
     danger: 'text-white',
     outline: 'text-brand-dark dark:text-emerald-300',
-    ghost: 'text-neutral-600 dark:text-neutral-300',
+    ghost: 'text-neutral-700 dark:text-neutral-200',
   }
   return (
     <button
@@ -122,7 +123,7 @@ export function Field({
 }) {
   return (
     <label className="block">
-      <span className="mb-1.5 block text-[10px] font-black uppercase tracking-[0.16em] text-neutral-500 dark:text-neutral-400">
+      <span className="mb-1.5 block text-[10px] font-black uppercase tracking-[0.16em] text-neutral-600 dark:text-neutral-300">
         {label}
       </span>
       {children}
@@ -152,4 +153,4 @@ export function SkeletonRows({ rows = 3 }: { rows?: number }) {
 }
 
 export const inputClass =
-  'w-full min-h-[46px] rounded-2xl border border-black/[.08] bg-white/80 px-3.5 py-2.5 text-sm text-ink shadow-[inset_0_1px_rgba(255,255,255,.8),0_6px_20px_rgba(20,40,50,.035)] outline-none backdrop-blur-xl transition duration-200 placeholder:text-neutral-400 hover:border-black/[.12] focus:border-brand/55 focus:ring-4 focus:ring-brand/10 dark:border-white/10 dark:bg-white/[.055] dark:text-white dark:placeholder:text-white/30'
+  'w-full min-h-[46px] rounded-2xl border border-black/[.10] bg-white/95 px-3.5 py-2.5 text-sm text-ink shadow-[inset_0_1px_rgba(255,255,255,.8),0_6px_20px_rgba(20,40,50,.035)] outline-none backdrop-blur-xl transition duration-200 placeholder:text-neutral-500 hover:border-black/[.16] focus:border-brand/55 focus:ring-4 focus:ring-brand/10 dark:border-white/12 dark:bg-[#111315]/95 dark:text-white dark:placeholder:text-neutral-500'
