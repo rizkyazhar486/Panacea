@@ -1,4 +1,5 @@
-import { lazy, Suspense, useState } from 'react'
+import { lazy, Suspense } from 'react'
+import { useSearchParams } from 'react-router-dom'
 import { DigitalTwinEngine } from '../components/digital-twin/DigitalTwinEngine'
 
 const RegenerationResearchSandbox = lazy(() =>
@@ -21,23 +22,40 @@ const SurgicalOperationAtlas = lazy(() =>
   import('../components/digital-twin/SurgicalOperationAtlasV2').then((m) => ({ default: m.SurgicalOperationAtlasV2 })),
 )
 
-type LabMode = 'digital-twin' | 'realistic-atlas' | 'workout-4d' | 'surgery' | 'counterfactual' | 'regeneration'
+const SurgicalRehearsalLab = lazy(() =>
+  import('../components/digital-twin/SurgicalRehearsalLab').then((m) => ({ default: m.SurgicalRehearsalLab })),
+)
+
+type LabMode = 'digital-twin' | 'realistic-atlas' | 'workout-4d' | 'surgery' | 'surgery-rehearsal' | 'counterfactual' | 'regeneration'
 
 const MODES: Array<{ key: LabMode; label: string; active: string }> = [
   { key: 'digital-twin', label: 'Digital Twin', active: 'border-brand bg-brand text-white' },
   { key: 'realistic-atlas', label: 'Realistic Atlas', active: 'border-cyan-500 bg-cyan-500 text-white' },
-  { key: 'workout-4d', label: 'Inside Workout 4D', active: 'border-emerald-500 bg-emerald-500 text-white' },
+  { key: 'workout-4d', label: 'Workout + Human Replay', active: 'border-emerald-500 bg-emerald-500 text-white' },
   { key: 'surgery', label: 'Operation Universe', active: 'border-amber-400 bg-amber-400 text-neutral-950' },
+  { key: 'surgery-rehearsal', label: 'Surgical Rehearsal', active: 'border-orange-400 bg-orange-400 text-neutral-950' },
   { key: 'counterfactual', label: 'Counterfactual Lab', active: 'border-sky-500 bg-sky-500 text-white' },
   { key: 'regeneration', label: 'Regeneration Lab', active: 'border-violet-500 bg-violet-500 text-white' },
 ]
+
+function isLabMode(value: string | null): value is LabMode {
+  return MODES.some((item) => item.key === value)
+}
 
 function LoadingLab({ label }: { label: string }) {
   return <div className="rounded-2xl border border-neutral-200 p-8 text-center text-sm text-neutral-500 dark:border-white/10">Loading {label}…</div>
 }
 
 export function BodyExplorer() {
-  const [mode, setMode] = useState<LabMode>('digital-twin')
+  const [searchParams, setSearchParams] = useSearchParams()
+  const requested = searchParams.get('mode')
+  const mode: LabMode = isLabMode(requested) ? requested : 'digital-twin'
+
+  function setMode(next: LabMode) {
+    const params = new URLSearchParams(searchParams)
+    params.set('mode', next)
+    setSearchParams(params, { replace: true })
+  }
 
   return (
     <div className="space-y-4">
@@ -45,7 +63,7 @@ export function BodyExplorer() {
         <div className="flex flex-wrap items-start justify-between gap-3">
           <div className="min-w-0">
             <div className="text-sm font-black text-ink dark:text-white">PanaceaMed Human Biology Engine</div>
-            <div className="mt-0.5 max-w-3xl text-[11px] text-neutral-500">Reference anatomy, 4D workout replay + Workout DNA, a scalable surgical Operation Universe, executable counterfactual biology and multi-scale research — kept separate from patient-specific claims unless real validated data exist.</div>
+            <div className="mt-0.5 max-w-3xl text-[11px] text-neutral-500">Reference anatomy, Workout DNA + Human Replay, Operation Universe + active-recall surgical rehearsal, executable counterfactual biology and multi-scale research — separated from patient-specific claims unless real validated data exist.</div>
           </div>
           <div className="rounded-full border border-emerald-500/15 bg-emerald-500/[.06] px-3 py-1.5 text-[9px] font-black uppercase tracking-wide text-emerald-700 dark:text-emerald-300">Executable human biology</div>
         </div>
@@ -69,12 +87,16 @@ export function BodyExplorer() {
           <RealisticAnatomyAtlas />
         </Suspense>
       ) : mode === 'workout-4d' ? (
-        <Suspense fallback={<LoadingLab label="Inside My Workout 4D" />}>
+        <Suspense fallback={<LoadingLab label="Workout 4D and Human Replay" />}>
           <Workout4DLab />
         </Suspense>
       ) : mode === 'surgery' ? (
         <Suspense fallback={<LoadingLab label="Operation Universe" />}>
           <SurgicalOperationAtlas />
+        </Suspense>
+      ) : mode === 'surgery-rehearsal' ? (
+        <Suspense fallback={<LoadingLab label="Surgical Rehearsal" />}>
+          <SurgicalRehearsalLab />
         </Suspense>
       ) : mode === 'counterfactual' ? (
         <Suspense fallback={<LoadingLab label="counterfactual biology lab" />}>
