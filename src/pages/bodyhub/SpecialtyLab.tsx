@@ -26,9 +26,10 @@ interface Props {
 
 /** Urutan tampil modul: mengikuti cara orang mencari, bukan abjad. */
 const URUTAN = [
-  'respirasi', 'paru', 'gastro', 'nefrologi', 'endokrin', 'tiroid', 'neurologi',
+  'jantung-ruang', 'respirasi', 'paru', 'gastro', 'bilier', 'nefrologi',
+  'endokrin', 'tiroid', 'neurologi',
   'tht', 'telinga', 'mata', 'ortopedi', 'lutut', 'medula-spinalis',
-  'urogenital', 'obstetri', 'obgin', 'payudara', 'imunologi', 'kulit',
+  'urogenital', 'prostat', 'obstetri', 'obgin', 'payudara', 'imunologi', 'kulit',
 ] as const
 
 // Keterangan per modul, termasuk ASAL GEOMETRINYA. Empat modul terakhir tidak
@@ -39,30 +40,40 @@ const CATATAN_MODUL: Record<string, string> = {
     'This module holds the airway tree, diaphragm and chest wall. For the lobes themselves and the pleura, open ' +
     'the Lungs & pleura module.',
   paru:
-    'Geometry from Z-Anatomy (CC BY-SA 4.0), the same source as the full-body figure — five lobes, the pleural ' +
+    'The same source as the full-body figure — five lobes, the pleural ' +
     'sac and the bronchial tree down to the lobar bronchi.',
   endokrin:
     'The thyroid and parathyroids have their own module (Thyroid & parathyroid), because their geometry comes ' +
     'from a different reference body and the two spaces must not be mixed.',
-  tiroid: 'Geometry from Z-Anatomy (CC BY-SA 4.0): thyroid, all four parathyroids, laryngeal cartilages, trachea and oesophagus.',
+  tiroid: 'Thyroid gland, all four parathyroids, laryngeal cartilages, trachea and oesophagus.',
   tht: 'The nose, pharynx and larynx. The middle and inner ear are in their own module (Middle & inner ear).',
   telinga:
-    'Geometry from Z-Anatomy (CC BY-SA 4.0): the three ossicles, tympanic membrane, cochlea, vestibule and the ' +
+    'The three ossicles, tympanic membrane, cochlea, vestibule and the ' +
     'cochlear, vestibular and chorda tympani nerves, inside the temporal bone.',
   obstetri:
     'This is the male reference pelvis — bone, pelvic floor and vessels, which is where obstetric mechanics happen. ' +
     'For the female organs themselves, open the Female pelvis module.',
   obgin:
-    'Geometry from the HuBMAP Human Reference Atlas female reference body (CC BY 4.0): uterus, ovaries, uterine ' +
+    'Uterus, ovaries, uterine ' +
     'tubes, vagina, their ligaments, the bladder and the female bony pelvis.',
+  'jantung-ruang':
+    'All four chambers, the interventricular septum, ' +
+    'all four valves and the five papillary muscles.',
+  bilier:
+    'Hepatic ducts, cystic duct, common bile duct, the ' +
+    'hepatopancreatic ampulla and both pancreatic ducts, with the gallbladder, pancreas and liver around them.',
+  prostat:
+    'The prostate by ZONE — ' +
+    'transition, central, peripheral and anterior fibromuscular stroma — with the prostatic urethra, bladder trigone ' +
+    'and ureteric orifices. This is what makes benign hyperplasia obstruct and carcinoma stay silent.',
   lutut:
-    'Geometry from the HuBMAP Human Reference Atlas (CC BY 4.0): cruciate and collateral ligaments, meniscus, ' +
+    'Cruciate and collateral ligaments, meniscus, ' +
     'articular cartilage, patellar ligament and quadriceps tendon — the structures sports injuries actually involve.',
   payudara:
-    'Geometry from the HuBMAP Human Reference Atlas (CC BY 4.0): nipple, areola, mammary lobes, lactiferous ducts ' +
+    'Nipple, areola, mammary lobes, lactiferous ducts ' +
     'and sinuses, suspensory ligaments and fat. Breast previously had no target anywhere in the app.',
   'medula-spinalis':
-    'Geometry from the HuBMAP Human Reference Atlas (CC BY 4.0): every cord segment from C1 to S4 as its own ' +
+    'Every cord segment from C1 to S4 as its own ' +
     'structure, so the level of a lesion can be pointed at rather than described.',
   imunologi: 'Bone marrow is shown at its major adult sites — femur, pelvis and sternum — since marrow itself has no separate mesh.',
   kulit: 'Skin is a single surface mesh; dermatological conditions are located by their pattern and distribution rather than by depth.',
@@ -76,6 +87,7 @@ const SUMBER: Record<string, string> = {
   'bodyparts3d': 'BodyParts3D 4.0 (Database Center for Life Science, CC BY 4.0)',
   'z-anatomy': 'Z-Anatomy (CC BY-SA 4.0), derived from BodyParts3D',
   'hra-female': 'HuBMAP Human Reference Atlas, female reference body (CC BY 4.0)',
+  'hra-male': 'HuBMAP Human Reference Atlas, male reference body (CC BY 4.0)',
 }
 
 const NAMA_LESI: Record<string, string> = {

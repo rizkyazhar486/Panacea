@@ -1047,13 +1047,17 @@ export const SYSTEM_CONDITIONS: SystemCondition[] = [
   // ══ UROGENITAL ════════════════════════════════════════════════════════════
   {
     id: 'bph',
-    module: 'urogenital',
+    // Dipindah ke modul zona prostat: mekanisme penyakit ini SELURUHNYA soal
+    // zona — hiperplasia tumbuh di zona transisi yang melingkari uretra —
+    // dan itu tidak bisa ditunjukkan pada mesh prostat yang utuh.
+    module: 'prostat',
     label: 'Benign prostatic hyperplasia',
     ringkas: 'The prostate enlarges around the urethra; the stream weakens and the bladder never quite empties.',
     lesi: [
-      { struktur: 'Prostate', jenis: 'hypertrophy', catatan: 'Nodular hyperplasia of the transition zone, compressing the prostatic urethra.' },
+      { struktur: 'Left transition zone of prostate', jenis: 'hypertrophy', catatan: 'Nodular hyperplasia begins here — the zone that surrounds the urethra.' },
+      { struktur: 'Right transition zone of prostate', jenis: 'hypertrophy', catatan: 'Bilateral transition-zone growth compressing the lumen between the lobes.' },
     ],
-    hilir: ['Urethra', 'Urinary bladder', 'Left kidney', 'Right kidney'],
+    hilir: ['Prostatic urethra', 'Trigone of urinary bladder', 'Dome of urinary bladder', 'Left ureteral orifice'],
     mekanisme:
       'Hyperplasia arises in the transition zone that surrounds the urethra, which is why a modest volume can ' +
       'obstruct badly while a large peripheral cancer causes no symptoms at all. Chronic outflow resistance drives ' +
@@ -2198,13 +2202,14 @@ export const SYSTEM_CONDITIONS: SystemCondition[] = [
   },
   {
     id: 'ca-prostat',
-    module: 'urogenital',
+    module: 'prostat',
     label: 'Prostate carcinoma',
     ringkas: 'A cancer of the outer prostate — which is why it causes no symptoms until late.',
     lesi: [
-      { struktur: 'Prostate', jenis: 'occlusion', catatan: 'Adenocarcinoma of the peripheral zone, away from the urethra.' },
+      { struktur: 'Left peripheral zone of prostate', jenis: 'occlusion', catatan: 'Some 70% of adenocarcinomas arise here, at the back of the gland — away from the urethra and next to the rectum.' },
+      { struktur: 'Right peripheral zone of prostate', jenis: 'occlusion', catatan: 'The zone the examining finger reaches and the biopsy needle samples.' },
     ],
-    hilir: ['Urethra', 'Urinary bladder', 'Left seminal vesicle'],
+    hilir: ['Seminal vesicle', 'Base of prostate', 'Prostatic urethra'],
     mekanisme:
       'Benign hyperplasia arises centrally around the urethra and obstructs early; carcinoma arises in the peripheral ' +
       'zone and therefore causes symptoms only when locally advanced. That zonal anatomy is also why the posterior ' +
@@ -3373,6 +3378,289 @@ export const SYSTEM_CONDITIONS: SystemCondition[] = [
     ],
     organKey: 'spinal-cord',
     skdi: ['Siringomielia', 'Mielopati'],
+  },
+  // ══ RUANG JANTUNG, SALURAN EMPEDU, ZONA PROSTAT ═══════════════════════════
+  // Tiga modul terakhir dari pustaka HuBMAP. Ketiganya menunjukkan hal yang
+  // sebelumnya hanya bisa DITULIS: sekat antar-bilik, muara duktus di ampula,
+  // dan zona prostat yang menentukan kenapa pembesaran jinak menyumbat
+  // sementara kanker tidak.
+
+  {
+    id: 'vsd',
+    module: 'jantung-ruang',
+    label: 'Ventricular septal defect (congenital)',
+    ringkas: 'A hole in the wall between the pumping chambers; blood crosses to the lung side and the lungs flood.',
+    lesi: [
+      { struktur: 'Interventricular septum', jenis: 'shunt', catatan: 'Defect in the membranous septum in most cases — where the septum is thinnest.' },
+    ],
+    hilir: ['Right ventricle', 'Pulmonary valve', 'Left cardiac atrium'],
+    mekanisme:
+      'Shunt volume depends on the size of the hole and on the ratio of pulmonary to systemic vascular resistance, not ' +
+      'on the pressure gradient alone. Newborn pulmonary resistance is high, so the murmur and the failure appear only ' +
+      'after it falls at 4–6 weeks. A small restrictive defect is loud and harmless; a large one is quiet and dangerous ' +
+      '— which is why murmur intensity is inversely related to severity here.',
+    temuan: [
+      'Harsh pansystolic murmur at the left sternal edge with a thrill',
+      'Large defect: poor feeding, sweating, failure to thrive and tachypnoea from about six weeks',
+      'A quiet murmur with a loud pulmonary second sound suggests rising pulmonary resistance — Eisenmenger physiology',
+    ],
+    penunjang: ['Echocardiography for site, size and shunt fraction; ECG and chest radiograph for chamber enlargement'],
+    tata: [
+      'Small muscular defects often close spontaneously — observe with growth monitoring',
+      'Surgical or device closure for large shunts, failure to thrive or pulmonary hypertension, before resistance becomes fixed',
+      'Assess pulmonary vascular resistance first: closing an Eisenmenger shunt is fatal',
+    ],
+    organKey: 'heart',
+    skdi: ['Kelainan jantung kongenital (Ventricular Septal Defect, Atrial Septal Defect, Patent Ductus Arteriosus, Tetralogy of Fallot)', 'Gagal jantung kronik'],
+  },
+  {
+    id: 'hcm',
+    module: 'jantung-ruang',
+    label: 'Hypertrophic cardiomyopathy',
+    ringkas: 'The muscle of the dividing wall thickens abnormally and can obstruct the way out of the heart.',
+    lesi: [
+      { struktur: 'Interventricular septum', jenis: 'hypertrophy', catatan: 'Asymmetric septal hypertrophy with disarray of myocyte architecture.' },
+      { struktur: 'Mitral valve', jenis: 'incompetence', catatan: 'Systolic anterior motion of the anterior leaflet worsens both obstruction and regurgitation.' },
+    ],
+    hilir: ['Left ventricle', 'Aortic valve', 'Left cardiac atrium'],
+    mekanisme:
+      'Sarcomeric protein mutations produce hypertrophy with myocyte disarray and interstitial fibrosis — a substrate ' +
+      'for re-entrant ventricular arrhythmia, which is what causes sudden death rather than the obstruction itself. ' +
+      'The gradient is dynamic: anything that reduces preload or afterload, or increases contractility, worsens it. ' +
+      'That is why the murmur increases on standing and Valsalva, unlike aortic stenosis, and why nitrates and diuretics are hazardous.',
+    temuan: [
+      'Exertional breathlessness, chest pain, palpitations, syncope — especially during or just after exercise',
+      'Jerky pulse, double apex beat, ejection systolic murmur louder on standing and Valsalva',
+      'Family history of sudden death; autosomal dominant inheritance means relatives need screening',
+    ],
+    penunjang: ['Echocardiography for wall thickness, gradient and systolic anterior motion; ECG almost always abnormal', 'Cardiac MRI for fibrosis; ambulatory monitoring and genetic testing with family screening'],
+    tata: [
+      'Beta blocker or verapamil for symptoms; avoid dehydration, nitrates and high-dose diuretics',
+      'Implantable defibrillator by validated risk score, not by gradient',
+      'Septal reduction (myectomy or alcohol ablation) for drug-refractory obstruction',
+    ],
+    organKey: 'heart',
+    skdi: ['Kardiomiopati', 'Gagal jantung kronik', 'Takikardi: supraventrikular, ventrikular'],
+  },
+  {
+    id: 'ruptur-papiler',
+    module: 'jantung-ruang',
+    label: 'Papillary muscle rupture',
+    ringkas: 'A few days after a heart attack the anchor of a valve snaps and the lungs flood in minutes.',
+    lesi: [
+      { struktur: 'Posteromedial papillary muscle', jenis: 'occlusion', catatan: 'It has a single blood supply, so it ruptures far more often than the anterolateral one.' },
+      { struktur: 'Mitral valve', jenis: 'incompetence', catatan: 'Flail leaflet with torrential acute regurgitation.' },
+    ],
+    hilir: ['Left cardiac atrium', 'Left ventricle', 'Pulmonary valve'],
+    mekanisme:
+      'The anterolateral papillary muscle has a dual supply from the LAD and circumflex; the posteromedial has only the ' +
+      'posterior descending artery. That single detail explains why inferior infarction is the one that ruptures a ' +
+      'papillary muscle. The regurgitation is acute, so a small non-compliant left atrium transmits the pressure ' +
+      'straight to the lungs — the murmur may be soft or absent precisely because the pressures equalise so fast.',
+    temuan: [
+      'Sudden pulmonary oedema and shock 2–7 days after myocardial infarction',
+      'New murmur that may be quiet; giant v waves on wedge tracing',
+      'Distinguish from ventricular septal rupture — both present the same way and both are surgical',
+    ],
+    penunjang: ['Urgent echocardiography, transoesophageal if the window is poor', 'Do not delay for angiography if the patient is crashing'],
+    tata: [
+      'Stabilise with afterload reduction and mechanical support, then emergency valve surgery',
+      'Medical management alone has an extremely high mortality',
+    ],
+    organKey: 'heart',
+    skdi: ['Infark miokard', 'Penyakit katup jantung (Mitral stenosis, Mitral regurgitation, Aortic stenosis, Aortic regurgitation)', 'Gagal jantung akut'],
+  },
+  {
+    id: 'endokarditis',
+    module: 'jantung-ruang',
+    label: 'Infective endocarditis',
+    ringkas: 'Bacteria settle on a heart valve and grow a vegetation that showers fragments around the body.',
+    lesi: [
+      { struktur: 'Mitral valve', jenis: 'incompetence', catatan: 'Vegetation on the atrial surface with leaflet destruction and regurgitation.' },
+      { struktur: 'Aortic valve', jenis: 'incompetence', catatan: 'The other commonly affected left-sided valve.' },
+    ],
+    hilir: ['Left cardiac atrium', 'Left ventricle', 'Tricuspid valve'],
+    mekanisme:
+      'Endothelial injury lets platelets and fibrin form a sterile thrombus that circulating bacteria colonise; once ' +
+      'inside, the vegetation is avascular, so phagocytes cannot reach the organisms and antibiotics must be ' +
+      'bactericidal and prolonged. Vegetations sit downstream of turbulent flow, which is why left-sided disease ' +
+      'embolises to brain and kidney while right-sided disease — typical of injecting drug use — embolises to the lungs.',
+    temuan: [
+      'Fever with a new or changing murmur; splinter haemorrhages, Janeway lesions, Osler nodes, Roth spots',
+      'Embolic stroke, splenic or renal infarction, glomerulonephritis',
+      'Any fever with a prosthetic valve is endocarditis until proven otherwise',
+    ],
+    penunjang: ['Three sets of blood cultures from separate sites BEFORE antibiotics; echocardiography, transoesophageal if negative', 'Modified Duke criteria to combine microbiology and imaging'],
+    tata: [
+      'Prolonged intravenous bactericidal antibiotics guided by culture and sensitivities',
+      'Surgery for heart failure, uncontrolled infection, abscess, or recurrent embolism with a large vegetation',
+      'Prophylaxis only for genuinely high-risk patients undergoing defined procedures',
+    ],
+    organKey: 'heart',
+    skdi: ['Radang pada dinding jantung (Endokarditis, Miokarditis, Perikarditis)', 'Penyakit jantung reumatik', 'Sepsis'],
+  },
+  {
+    id: 'koledokolitiasis',
+    module: 'bilier',
+    label: 'Common bile duct stone',
+    ringkas: 'A stone slips out of the gallbladder and blocks the main drain — the eyes go yellow and the urine dark.',
+    lesi: [
+      { struktur: 'Common bile duct', jenis: 'occlusion', catatan: 'Stone impacted in the duct, most often at its distal end near the ampulla.' },
+    ],
+    hilir: ['Common hepatic duct', 'Left hepatic duct', 'Right hepatic duct', 'Gallbladder'],
+    mekanisme:
+      'Conjugated bilirubin cannot reach the gut, so it refluxes into blood and is excreted renally — dark urine — ' +
+      'while stercobilin is absent from stool, which turns pale. Bile salts deposit in skin and itch. Because the ' +
+      'obstruction is below the cystic duct, the gallbladder may distend, and if the stone sits at the ampulla it can obstruct the pancreatic duct at the same time and precipitate pancreatitis.',
+    temuan: [
+      'Right upper quadrant pain with jaundice, dark urine, pale stools and pruritus',
+      'Fever with pain and jaundice (Charcot triad) means cholangitis — an emergency',
+      'Raised bilirubin with a cholestatic liver profile: ALP and GGT out of proportion to transaminases',
+    ],
+    penunjang: ['Ultrasound first (duct dilatation), then MRCP or endoscopic ultrasound to see the stone', 'Liver function tests, amylase or lipase, coagulation before intervention'],
+    tata: [
+      'ERCP with sphincterotomy and stone extraction',
+      'Cholecystectomy afterwards to prevent recurrence, on the same admission where possible',
+    ],
+    organKey: 'gallbladder',
+    skdi: ['Kole(doko)litiasis', 'Kolesistitis', 'Pankreatitis'],
+  },
+  {
+    id: 'kolangitis',
+    module: 'bilier',
+    label: 'Ascending cholangitis',
+    ringkas: 'Infected bile behind a blockage — fever, jaundice and pain, and it becomes septic shock fast.',
+    lesi: [
+      { struktur: 'Common bile duct', jenis: 'occlusion', catatan: 'Obstruction with infected bile under pressure; the duct is a closed space.' },
+      { struktur: 'Common hepatic duct', jenis: 'dilatation', catatan: 'Dilatation upstream of the obstruction.' },
+    ],
+    hilir: ['Left hepatic duct', 'Right hepatic duct', 'Hepatopancreatic ampulla'],
+    mekanisme:
+      'Bile is normally sterile and flowing; obstruction lets bacteria multiply, and the rising intraductal pressure ' +
+      'forces them into hepatic sinusoids and the bloodstream — cholangiovenous reflux. This is why antibiotics alone ' +
+      'fail and why the definitive treatment is DRAINAGE: no antibiotic can sterilise a closed, pressurised system, and delay is measured in hours.',
+    temuan: [
+      'Charcot triad: fever with rigors, jaundice, right upper quadrant pain',
+      'Reynolds pentad adds hypotension and confusion — that is established sepsis',
+    ],
+    penunjang: ['Blood cultures, full blood count, liver profile, lactate; ultrasound then urgent MRCP or direct to ERCP'],
+    tata: [
+      'Resuscitation and broad antibiotics immediately, then BILIARY DRAINAGE within hours (ERCP, or percutaneous if ERCP fails)',
+      'Definitive treatment of the cause once the sepsis is controlled',
+    ],
+    organKey: 'gallbladder',
+    skdi: ['Kolesistitis', 'Kole(doko)litiasis', 'Sepsis'],
+  },
+  {
+    id: 'atresia-bilier',
+    module: 'bilier',
+    label: 'Biliary atresia (congenital)',
+    ringkas: 'A newborn stays jaundiced past two weeks with pale stools — the bile ducts are obliterating, and the clock is running.',
+    lesi: [
+      { struktur: 'Common hepatic duct', jenis: 'occlusion', catatan: 'Progressive inflammatory obliteration of the extrahepatic ducts.' },
+      { struktur: 'Common bile duct', jenis: 'occlusion', catatan: 'Fibrous cord replaces the lumen.' },
+    ],
+    hilir: ['Gallbladder', 'Left hepatic duct', 'Right hepatic duct', 'Caudate lobe'],
+    mekanisme:
+      'Progressive fibro-obliteration of the extrahepatic ducts causes conjugated hyperbilirubinaemia and, untreated, ' +
+      'biliary cirrhosis within months. Outcome after the Kasai portoenterostomy depends steeply on age at surgery — ' +
+      'best before 60 days — so the diagnostic task is simply to separate this from physiological jaundice early. ' +
+      'That is what the two-week rule and the stool colour chart exist for.',
+    temuan: [
+      'Jaundice persisting beyond 14 days of life with PALE stools and dark urine',
+      'Otherwise well-looking, thriving baby in the early weeks — which is exactly why it is missed',
+      'Conjugated (direct) bilirubin is raised — this is the test that separates it from breast-milk jaundice',
+    ],
+    penunjang: ['Split (conjugated) bilirubin in any baby jaundiced past 14 days — non-negotiable', 'Ultrasound, hepatobiliary scintigraphy, liver biopsy and operative cholangiogram'],
+    tata: [
+      'Kasai portoenterostomy as early as possible; refer the day the conjugated fraction returns raised',
+      'Fat-soluble vitamin supplementation and nutrition; many still require liver transplantation',
+    ],
+    organKey: 'liver',
+    skdi: ['Atresia biliaris', 'Sirosis hepatis'],
+  },
+  {
+    id: 'ca-pankreas',
+    module: 'bilier',
+    label: 'Pancreatic head carcinoma',
+    ringkas: 'Painless yellowing with weight loss — a tumour in the head of the pancreas squeezing the bile duct.',
+    lesi: [
+      { struktur: 'Head of pancreas', jenis: 'occlusion', catatan: 'Ductal adenocarcinoma at the head, compressing the intrapancreatic bile duct.' },
+      { struktur: 'Common bile duct', jenis: 'stenosis', derajat: 0.85, catatan: 'Extrinsic compression rather than a stone — the duct narrows smoothly.' },
+    ],
+    hilir: ['Gallbladder', 'Common hepatic duct', 'Hepatopancreatic ampulla', 'Dorsal pancreatic duct'],
+    mekanisme:
+      'The bile duct runs through the head of the pancreas, so a tumour there obstructs it early — which is the one ' +
+      'piece of luck in this disease, since body and tail tumours stay silent until incurable. Courvoisier\'s law ' +
+      'follows from the mechanism: a gallbladder that is palpable and painless in a jaundiced patient means gradual ' +
+      'malignant obstruction, because a gallbladder scarred by stones cannot distend.',
+    temuan: [
+      'Painless progressive obstructive jaundice with weight loss and anorexia',
+      'Palpable non-tender gallbladder (Courvoisier); new-onset diabetes in an older adult; migratory thrombophlebitis',
+      'Back pain suggests retroperitoneal invasion and unresectability',
+    ],
+    penunjang: ['Pancreatic-protocol CT for staging and resectability; endoscopic ultrasound with biopsy', 'CA 19-9 for monitoring, never for diagnosis'],
+    tata: [
+      'Whipple pancreaticoduodenectomy for the minority that are resectable, with adjuvant chemotherapy',
+      'Biliary stenting, pancreatic enzyme replacement, nutrition and early palliative care for the rest',
+    ],
+    organKey: 'pancreas',
+    skdi: ['Karsinoma pankreas', 'Kole(doko)litiasis'],
+  },
+  {
+    id: 'prostatitis',
+    module: 'prostat',
+    label: 'Prostatitis',
+    ringkas: 'An inflamed prostate: pain deep in the pelvis, burning on passing urine, and fever if it is acute.',
+    lesi: [
+      { struktur: 'Left peripheral zone of prostate', jenis: 'hypertrophy', catatan: 'Acute bacterial inflammation, usually ascending through the prostatic ducts.' },
+      { struktur: 'Left prostate duct', jenis: 'occlusion', catatan: 'Intraprostatic reflux of urine through the ducts is the accepted route.' },
+    ],
+    hilir: ['Prostatic urethra', 'Seminal vesicle', 'Trigone of urinary bladder'],
+    mekanisme:
+      'Prostatic ducts open into the posterior urethra at right angles, which permits intraprostatic urinary reflux — ' +
+      'the accepted mechanism for both acute bacterial prostatitis and chronic pelvic pain. The gland\'s poor ' +
+      'antibiotic penetration explains the long courses required; only lipophilic drugs that cross the epithelium reliably reach it.',
+    temuan: [
+      'Acute: fever, rigors, perineal and low back pain, dysuria, an exquisitely tender prostate — do not massage it',
+      'Chronic: pelvic pain for months, ejaculatory pain, obstructive symptoms without fever',
+      'Acute retention can complicate the acute form',
+    ],
+    penunjang: ['Urine culture; blood cultures if febrile; ultrasound for abscess if not improving', 'Avoid vigorous rectal examination in acute bacterial prostatitis — it can precipitate bacteraemia'],
+    tata: [
+      'Acute: fluoroquinolone or trimethoprim for 2–4 weeks; admit if septic or in retention',
+      'Chronic pelvic pain: multimodal — alpha blocker, pelvic floor physiotherapy, analgesia, and address distress',
+    ],
+    organKey: 'prostate',
+    skdi: ['Prostatitis', 'Infeksi saluran kemih'],
+  },
+  {
+    id: 'obstruksi-buli',
+    module: 'prostat',
+    label: 'Bladder outlet obstruction and its consequences',
+    ringkas: 'When the bladder must push against resistance for years, its wall thickens and then gives up.',
+    lesi: [
+      { struktur: 'Prostatic urethra', jenis: 'stenosis', derajat: 0.7, catatan: 'Chronic obstruction at the prostatic urethra.' },
+      { struktur: 'Bladder neck smooth muscle', jenis: 'hypertrophy', catatan: 'Detrusor and bladder neck hypertrophy, then trabeculation.' },
+    ],
+    hilir: ['Trigone of urinary bladder', 'Dome of urinary bladder', 'Left ureteral orifice', 'Right ureteral orifice'],
+    mekanisme:
+      'The detrusor hypertrophies to overcome resistance and becomes stiff and overactive — which is why storage ' +
+      'symptoms (frequency, urgency, nocturia) often trouble the patient more than the weak stream itself. Eventually ' +
+      'it decompensates and retains urine. The ureteric orifices tunnel obliquely through the bladder wall, and once ' +
+      'high pressure defeats that valve mechanism the damage is transmitted upstream: hydronephrosis and obstructive renal failure.',
+    temuan: [
+      'Weak stream, hesitancy, incomplete emptying, plus frequency, urgency and nocturia',
+      'Palpable bladder, high post-void residual, overflow incontinence',
+      'Raised creatinine with bilateral hydronephrosis means high-pressure chronic retention — decompress and watch for post-obstructive diuresis',
+    ],
+    penunjang: ['Post-void residual, renal function, urinalysis; ultrasound of kidneys and bladder', 'Flow rate and pressure-flow studies where the diagnosis or the plan is unclear'],
+    tata: [
+      'Relieve retention by catheterisation; monitor for post-obstructive diuresis and haematuria ex vacuo',
+      'Treat the cause — medical therapy or surgery for prostatic obstruction, urethrotomy for stricture',
+    ],
+    organKey: 'bladder',
+    skdi: ['Hiperplasia prostat jinak', 'Striktura uretra', 'Acute kidney injury'],
   },
 ]
 
