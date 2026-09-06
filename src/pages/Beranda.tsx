@@ -5,6 +5,7 @@ import { getVitals } from '../lib/healthVitals'
 import { getWorkouts } from '../lib/workoutStore'
 import { ActivityAchievementWidget } from '../components/dashboard/ActivityAchievementWidget'
 import { LibraryDiscoveryWidget } from '../components/dashboard/LibraryDiscoveryWidget'
+import { SignatureExperiencesWidget } from '../components/dashboard/SignatureExperiencesWidget'
 import { HumanPassportWidget } from '../components/growth/HumanPassportWidget'
 import { LearningModeSwitch } from '../components/LearningModeSwitch'
 import {
@@ -106,6 +107,7 @@ export default function Beranda() {
       </section>
 
       <HumanPassportWidget name={name} />
+      <SignatureExperiencesWidget />
 
       <section className="grid gap-4 lg:grid-cols-2">
         <div className="liquid-panel p-4 sm:p-5">
