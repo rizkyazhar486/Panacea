@@ -12,6 +12,7 @@
 import { mkdirSync, writeFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { bacaAtlas, ambilBagian, garisTengah, pusat, tulisGlb, HAK_CIPTA } from './atlasGlb.mjs'
+import { bacaGlb, bacaOrganGlb, gabung, klaster } from './atlasBacaGlb.mjs'
 
 const SUMBER = process.argv[2] ?? '/home/user/ashemag/human-atlas'
 const KELUAR = new URL('../public/atlas/', import.meta.url).pathname
@@ -173,6 +174,123 @@ const MODUL = {
   },
 }
 
+// ─────────────────────────────────────────────────────────────────────────────
+// MODUL DARI SUMBER LAIN
+//
+// Empat hal yang dulu saya nyatakan tidak ada memang tidak ada di BodyParts3D
+// versi human-atlas — tapi ADA di dua sumber lain yang sudah/boleh dipakai:
+//
+//   Z-Anatomy (CC BY-SA 4.0, sudah dipakai figur tubuh utuh di aplikasi ini)
+//     kelenjar tiroid & paratiroid, lobus paru dan pleura, tulang pendengaran,
+//     gendang telinga, koklea, dan saraf-sarafnya.
+//   HuBMAP Human Reference Atlas (CC BY 4.0)
+//     rujukan PEREMPUAN: rahim, ovarium, tuba uterina, vagina, ligamen, dan
+//     panggul perempuan.
+//
+// Tiap sumber punya ruang koordinatnya sendiri, dan menggabungkan dua ruang di
+// dalam satu modul akan menempatkan organ di tempat yang salah. Karena itu
+// modul-modul ini berdiri SENDIRI, tidak dicampur ke modul BodyParts3D — bukan
+// karena lebih mudah, tapi karena satu-satunya cara untuk menggabungkannya
+// adalah menebak transformasinya, dan tebakan pada atlas anatomi adalah
+// kebohongan yang terlihat rapi.
+// ─────────────────────────────────────────────────────────────────────────────
+
+const Z = (n) => new URL(`../public/anatomy/${n}.glb`, import.meta.url).pathname
+const HRA = '/home/user/hubmapconsortium/ccf-3d-reference-object-library/VH_Female/v1.2/'
+
+/**
+ * Nama Z-Anatomy menjadi nama yang dibaca orang.
+ *
+ * Akhiran "l" dan "r" pada Z-Anatomy menandai sisi kiri dan kanan, tapi menebak
+ * dari huruf terakhir tidak bisa diandalkan: "Cochleal" adalah koklea kiri
+ * sementara "Cochlear" adalah koklea kanan, dan keduanya juga kata sifat yang
+ * sah dalam bahasa Inggris. Struktur yang dipakai modul karena itu diberi nama
+ * secara EKSPLISIT; tebakan hanya dipakai untuk sisanya.
+ */
+const NAMA_Z = {
+  Cochleal: 'Left cochlea', Cochlear: 'Right cochlea',
+  Vestibulel: 'Left vestibule', Vestibuler: 'Right vestibule',
+  Tympanic_membranel: 'Left tympanic membrane', Tympanic_membraner: 'Right tympanic membrane',
+  Chorda_tympanil: 'Left chorda tympani', Chorda_tympanir: 'Right chorda tympani',
+  Cochlear_nervel: 'Left cochlear nerve', Cochlear_nerver: 'Right cochlear nerve',
+  Vestibular_nervel: 'Left vestibular nerve', Vestibular_nerver: 'Right vestibular nerve',
+  'Vestibulocochlear_nerve_(VIII)l': 'Left vestibulocochlear nerve',
+  'Vestibulocochlear_nerve_(VIII)r': 'Right vestibulocochlear nerve',
+  Malleusl: 'Left malleus', Malleusr: 'Right malleus',
+  Incusl: 'Left incus', Incusr: 'Right incus',
+  Stapesl: 'Left stapes', Stapesr: 'Right stapes',
+  Temporal_bonel: 'Left temporal bone', Temporal_boner: 'Right temporal bone',
+  Superior_parathyroid_glandl: 'Left superior parathyroid gland',
+  Superior_parathyroid_glandr: 'Right superior parathyroid gland',
+  Inferior_parathyroid_glandl: 'Left inferior parathyroid gland',
+  Inferior_parathyroid_glandr: 'Right inferior parathyroid gland',
+  Thyroid_gland: 'Thyroid gland', Thyroid_cartilage: 'Thyroid cartilage',
+  Cricoid_cartilage: 'Cricoid cartilage', Hyoid_bone: 'Hyoid bone',
+  Oesophagus: 'Oesophagus', Trachea: 'Trachea',
+  Left_main_bronchus: 'Left main bronchus', Right_main_bronchus: 'Right main bronchus',
+}
+
+function rapikanZ(n) {
+  const bersih = n.replace(/_instance_\d+$/, '').replace(/_\d+$/, '')
+  if (NAMA_Z[bersih]) return NAMA_Z[bersih]
+  const s = bersih.replace(/_/g, ' ')
+  return s.charAt(0).toUpperCase() + s.slice(1)
+}
+
+const MODUL_GLB = {
+  paru: {
+    label: 'Lungs & pleura',
+    asal: 'z-anatomy',
+    isi: [
+      { berkas: Z('visceral'), pola: /^(Superior|Middle|Inferior)_lobe_of_(left|right)_lung$/, kind: 'viscera', sel: 0.003 },
+      { berkas: Z('visceral'), pola: /^Pleura$/, kind: 'viscera', sel: 0.005 },
+      { berkas: Z('visceral'), pola: /^(Trachea|Left_main_bronchus|Right_main_bronchus)$/, kind: 'airway', sel: 0.0015 },
+      { berkas: Z('visceral'), pola: /^(Left|Right)_(superior|inferior|middle)_lobar_bronchus$/, kind: 'airway', sel: 0.0015 },
+    ],
+  },
+  tiroid: {
+    label: 'Thyroid & parathyroid',
+    asal: 'z-anatomy',
+    isi: [
+      { berkas: Z('visceral'), pola: /^Thyroid_gland$/, kind: 'gland' },
+      { berkas: Z('visceral'), pola: /^(Superior|Inferior)_parathyroid_gland[lr]$/, kind: 'gland' },
+      { berkas: Z('visceral'), pola: /^(Trachea|Oesophagus)$/, kind: 'airway', sel: 0.001 },
+      { berkas: Z('skeletal'), pola: /^(Thyroid_cartilage|Cricoid_cartilage|Hyoid_bone)$/, kind: 'cartilage' },
+    ],
+  },
+  telinga: {
+    label: 'Middle & inner ear',
+    asal: 'z-anatomy',
+    isi: [
+      { berkas: Z('skeletal'), pola: /^(Malleus|Incus|Stapes)[lr]$/, kind: 'bone' },
+      { berkas: Z('nervous'), pola: /^(Tympanic_membrane|Cochlea|Vestibule)[lr]$/, kind: 'viscera' },
+      { berkas: Z('nervous'), pola: /^(Cochlear_nerve|Vestibular_nerve|Chorda_tympani)[lr]$/, kind: 'nerve' },
+      { berkas: Z('nervous'), pola: /^Vestibulocochlear_nerve_\(VIII\)[lr]$/, kind: 'nerve', sel: 0.0005 },
+      { berkas: Z('skeletal'), pola: /^Temporal_bone[lr]$/, kind: 'bone', sel: 0.002 },
+    ],
+  },
+  obgin: {
+    label: 'Female pelvis (obstetrics & gynaecology)',
+    asal: 'hra-female',
+    isi: [
+      { berkas: HRA + 'VH_F_Uterus.glb', nama: 'Uterus', kind: 'repro', sel: 0.0015 },
+      { berkas: HRA + 'VH_F_Ovary_L.glb', nama: 'Left ovary', kind: 'repro' },
+      { berkas: HRA + 'VH_F_Ovary_R.glb', nama: 'Right ovary', kind: 'repro' },
+      { berkas: HRA + 'VH_F_Fallopian_Tube_L.glb', nama: 'Left uterine tube', kind: 'repro', sel: 0.001 },
+      { berkas: HRA + 'VH_F_Fallopian_Tube_R.glb', nama: 'Right uterine tube', kind: 'repro', sel: 0.001 },
+      { berkas: HRA + 'VH_F_Vagina.glb', nama: 'Vagina', kind: 'repro', sel: 0.0015 },
+      { berkas: HRA + 'VH_F_Urinary_Bladder.glb', nama: 'Urinary bladder', kind: 'urine', sel: 0.0015 },
+      { berkas: HRA + 'VH_F_Ligaments_Uterus_Ovaries.glb', nama: 'Ligaments of uterus and ovaries', kind: 'connective', sel: 0.002 },
+      { berkas: HRA + 'VH_F_Pelvis.glb', nama: 'Female bony pelvis', kind: 'bone', sel: 0.003 },
+    ],
+  },
+}
+
+const HAK_CIPTA_Z =
+  'Z-Anatomy (CC BY-SA 4.0), derived from BodyParts3D (c) The Database Center for Life Science'
+const HAK_CIPTA_HRA =
+  'HuBMAP Human Reference Atlas, 3D Reference Organ Set for Female (CC BY 4.0)'
+
 const { atlas, potongan } = bacaAtlas(SUMBER)
 
 mkdirSync(KELUAR, { recursive: true })
@@ -215,9 +333,56 @@ for (const [id, m] of Object.entries(MODUL)) {
       centroid: pusat(data[i]),
       line: garisTengah(data[i], 6),
       triangles: p.indexCount / 3,
+      source: 'bodyparts3d',
     })
   })
   ringkas.push({ id, label: m.label, struktur: cocok.length, tri, kb: Math.round(bytes / 1024) })
+}
+
+// ── Modul dari berkas GLB (Z-Anatomy dan HRA) ────────────────────────────────
+for (const [id, m] of Object.entries(MODUL_GLB)) {
+  const data = []
+  for (const bagian of m.isi) {
+    let mesh = []
+    if (bagian.pola) {
+      mesh = await bacaOrganGlb(bagian.berkas, bagian.pola)
+      mesh = mesh.map((x) => ({ ...x, nama: rapikanZ(x.nama) }))
+    } else {
+      // Satu berkas = satu organ (bentuk berkas HRA). Dibaca sebagai DAFTAR
+      // MESH DATAR, bukan lewat pencocokan nama simpul: mencocokkan semua nama
+      // akan mengambil simpul induk dan anaknya sekaligus, dan geometri yang
+      // sama terhitung dua kali.
+      const semua = await bacaGlb(bagian.berkas)
+      if (!semua.length) continue
+      mesh = [gabung(bagian.nama, semua)]
+    }
+    for (let x of mesh) {
+      if (bagian.sel) x = klaster(x, bagian.sel)
+      if (!x.idx.length) continue
+      data.push({ ...x, warna: WARNA[bagian.kind] ?? WARNA.viscera, kind: bagian.kind })
+    }
+  }
+  if (!data.length) { console.warn(`lewat ${id}: tidak ada mesh`); continue }
+
+  const min = [Infinity, Infinity, Infinity], max = [-Infinity, -Infinity, -Infinity]
+  for (const d of data) for (let i = 0; i < d.pos.length; i += 3)
+    for (let a = 0; a < 3; a++) { const v = d.pos[i + a]; if (v < min[a]) min[a] = v; if (v > max[a]) max[a] = v }
+  const rentang = Math.max(max[0] - min[0], max[1] - min[1], max[2] - min[2]) || 1
+  const skala = 2 / rentang
+  const tengah = [0, 1, 2].map((a) => (min[a] + max[a]) / 2)
+  for (const d of data) for (let i = 0; i < d.pos.length; i += 3)
+    for (let a = 0; a < 3; a++) d.pos[i + a] = (d.pos[i + a] - tengah[a]) * skala
+
+  const bytes = tulisGlb(join(KELUAR, `${id}.glb`), data, m.asal === 'hra-female' ? HAK_CIPTA_HRA : HAK_CIPTA_Z)
+  let tri = 0
+  for (const d of data) {
+    tri += d.idx.length / 3
+    semuaBagian.push({
+      name: d.nama, module: id, kind: d.kind, color: d.warna,
+      centroid: pusat(d), line: garisTengah(d, 6), triangles: d.idx.length / 3, source: m.asal,
+    })
+  }
+  ringkas.push({ id, label: m.label, struktur: data.length, tri, kb: Math.round(bytes / 1024) })
 }
 
 writeFileSync(new URL('../src/lib/systemAtlas.gen.ts', import.meta.url).pathname,
@@ -232,6 +397,8 @@ export interface AtlasPart {
   module: string
   kind: string
   color: string
+  /** Dari sumber geometri mana bagian ini datang. */
+  source: 'bodyparts3d' | 'z-anatomy' | 'hra-female'
   centroid: [number, number, number]
   line: [number, number, number][]
   triangles: number

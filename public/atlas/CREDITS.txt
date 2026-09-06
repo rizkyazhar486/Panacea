@@ -26,3 +26,44 @@ medical application must not imply coverage it lacks:
 
 Educational material. Not a clinical tool, and not a substitute for imaging
 of an individual patient.
+
+
+ADDITIONAL MODULES FROM OTHER REFERENCE BODIES
+==============================================
+
+Four modules do not come from BodyParts3D as packaged by human-atlas, because
+the structures they show are not in it. Each reference body has its own
+coordinate space, so these modules stand alone and are never mixed into the
+BodyParts3D modules — aligning them would mean guessing a transform, and a
+guess in an anatomical atlas is a lie that looks tidy.
+
+  paru     (Lungs & pleura)          Z-Anatomy, CC BY-SA 4.0
+  tiroid   (Thyroid & parathyroid)   Z-Anatomy, CC BY-SA 4.0
+  telinga  (Middle & inner ear)      Z-Anatomy, CC BY-SA 4.0
+
+    Z-Anatomy — the libre 3D atlas of anatomy
+    https://github.com/Z-Anatomy/Models-of-human-anatomy
+    CC BY-SA 4.0 — https://creativecommons.org/licenses/by-sa/4.0/
+    Itself derived from BodyParts3D (DBCLS). These three files are
+    ShareAlike: derivatives of them must carry the same licence.
+    The same source already provides this application's full-body figure
+    (see public/anatomy/CREDITS.txt).
+
+  obgin    (Female pelvis)           HuBMAP HRA, CC BY 4.0
+
+    HuBMAP Consortium / Human Reference Atlas,
+    CCF 3D Reference Object Library, VH_Female v1.2
+    https://github.com/hubmapconsortium/ccf-3d-reference-object-library
+    CC BY 4.0 — https://creativecommons.org/licenses/by/4.0/
+    Uterus, ovaries, uterine tubes, vagina, their ligaments, urinary bladder
+    and female bony pelvis, from the Visible Human female reference body.
+
+Adaptation for all four: meshes were read from the published GLB files in
+world coordinates, simplified by grid vertex clustering where they were too
+dense for a phone (the cell size is recorded in scripts/atlasSystem.mjs),
+centred and scaled as one piece so relative position is preserved, and written
+as one file per module.
+
+The library's placenta object was deliberately LEFT OUT: it is modelled apart
+from the uterus rather than inside it, and a placenta floating twenty
+centimetres above the womb would teach a false anatomy.

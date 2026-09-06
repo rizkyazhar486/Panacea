@@ -2504,6 +2504,545 @@ export const SYSTEM_CONDITIONS: SystemCondition[] = [
     organKey: 'skin',
     skdi: ['Skabies', 'Pedikulosis pubis'],
   },
+  // ══ MODUL SUMBER LAIN ═════════════════════════════════════════════════════
+  // Empat modul di bawah ini berdiri di atas geometri yang TIDAK ADA di
+  // BodyParts3D versi human-atlas: paru dan pleura, tiroid, telinga tengah dan
+  // dalam (semuanya dari Z-Anatomy), serta panggul perempuan (HuBMAP HRA).
+  // Inilah yang dulu tercatat sebagai "tidak tersedia" — sekarang tersedia.
+
+  {
+    id: 'pneumotoraks',
+    module: 'paru',
+    label: 'Pneumothorax',
+    ringkas: 'Air leaks into the space around the lung and the lung collapses away from the chest wall.',
+    lesi: [
+      { struktur: 'Pleura', jenis: 'incompetence', catatan: 'Breach of the visceral pleura lets air into the pleural space and abolishes the negative pressure.' },
+      { struktur: 'Superior lobe of left lung', jenis: 'occlusion', catatan: 'The lung recoils inward once the pressure holding it expanded is lost.' },
+    ],
+    hilir: ['Inferior lobe of left lung', 'Left main bronchus', 'Trachea'],
+    mekanisme:
+      'The lung is held expanded only by negative intrapleural pressure; puncture that seal and elastic recoil collapses ' +
+      'it. In a tension pneumothorax a one-way flap lets air in but not out, pressure rises above atmospheric, the ' +
+      'mediastinum shifts and venous return to the heart falls — which is why tension pneumothorax kills through ' +
+      'obstructed circulation rather than through hypoxia, and why it is decompressed on clinical grounds without waiting for a film.',
+    temuan: [
+      'Sudden pleuritic chest pain and breathlessness; reduced expansion, hyperresonance, absent breath sounds',
+      'Tension: hypotension, distended neck veins, tracheal deviation away from the side — decompress immediately',
+      'Tall thin young men for primary spontaneous; COPD for secondary',
+    ],
+    penunjang: ['Erect chest radiograph; ultrasound at the bedside is faster and more sensitive', 'Never delay treatment of a tension pneumothorax for imaging'],
+    tata: [
+      'Tension: immediate needle decompression, then chest drain',
+      'Small primary pneumothorax may be observed; aspiration or drain by size, symptoms and underlying lung disease',
+      'Smoking cessation and pleurodesis discussion after recurrence',
+    ],
+    organKey: 'lungs',
+    skdi: ['Pneumothorax', 'Pneumothorax ventil'],
+  },
+  {
+    id: 'efusi-pleura',
+    module: 'paru',
+    label: 'Pleural effusion',
+    ringkas: 'Fluid collects between lung and chest wall, pressing the lung upward.',
+    lesi: [
+      { struktur: 'Pleura', jenis: 'dilatation', catatan: 'Fluid accumulating in the pleural space, dependent and layering.' },
+    ],
+    hilir: ['Inferior lobe of right lung', 'Inferior lobe of left lung'],
+    mekanisme:
+      'Pleural fluid turnover normally balances hydrostatic filtration against lymphatic drainage. Transudates come from ' +
+      'altered Starling forces with intact membranes (heart failure, cirrhosis, nephrotic syndrome); exudates come from ' +
+      'a leaky or obstructed membrane (infection, malignancy, infarction). Light\'s criteria separate the two, and that ' +
+      'separation — not the volume — is what decides the entire investigation.',
+    temuan: [
+      'Breathlessness, stony dull percussion, reduced breath sounds and vocal resonance at the base',
+      'Look for the cause: heart failure, malignancy, infection, tuberculosis, pulmonary embolism',
+    ],
+    penunjang: ['Chest radiograph and ultrasound; ultrasound-guided diagnostic aspiration', 'Light\'s criteria, cell count, glucose, pH, cytology, and mycobacterial culture when relevant'],
+    tata: [
+      'Treat the cause; therapeutic drainage for symptomatic effusion, slowly to avoid re-expansion oedema',
+      'Empyema or complicated parapneumonic effusion needs a chest drain, not antibiotics alone',
+    ],
+    organKey: 'lungs',
+    skdi: ['Efusi pleura', 'Efusi pleura masif', 'Tuberkulosis paru tanpa komplikasi'],
+  },
+  {
+    id: 'ca-paru',
+    module: 'paru',
+    label: 'Lung carcinoma',
+    ringkas: 'A tumour growing in the lung, most often found late because the lung itself does not hurt.',
+    lesi: [
+      { struktur: 'Superior lobe of right lung', jenis: 'occlusion', catatan: 'Upper lobe predominance; a central tumour obstructs the lobar bronchus.' },
+      { struktur: 'Right superior lobar bronchus', jenis: 'stenosis', derajat: 0.8, catatan: 'Endobronchial obstruction with distal collapse and post-obstructive pneumonia.' },
+    ],
+    hilir: ['Middle lobe of right lung', 'Right main bronchus', 'Pleura'],
+    mekanisme:
+      'Lung parenchyma has no somatic pain fibres, so a tumour grows silently until it obstructs an airway, invades the ' +
+      'pleura or chest wall, or metastasises. Location dictates the syndrome: apical tumours invade the brachial plexus ' +
+      'and sympathetic chain (Pancoast, Horner), central tumours obstruct and collapse, and small cell tumours announce ' +
+      'themselves through paraneoplastic syndromes such as SIADH before any mass is felt.',
+    temuan: [
+      'Persistent cough, haemoptysis, weight loss, new chest pain; clubbing',
+      'Hoarseness (recurrent laryngeal), facial swelling (superior vena cava obstruction), Horner syndrome',
+      'Any smoker with a cough that changes deserves a chest radiograph, not another antibiotic',
+    ],
+    penunjang: ['Chest radiograph then CT; PET-CT for staging; bronchoscopy or CT-guided biopsy for tissue', 'Molecular testing (EGFR, ALK, ROS1, PD-L1) drives modern treatment'],
+    tata: [
+      'Surgery for early non-small cell disease; chemoradiotherapy, targeted therapy or immunotherapy by stage and molecular profile',
+      'Smoking cessation at any stage; early palliative care improves both quality and length of life',
+    ],
+    organKey: 'lungs',
+    skdi: ['Karsinoma paru', 'Atelektasis', 'Efusi pleura'],
+  },
+  {
+    id: 'atelektasis',
+    module: 'paru',
+    label: 'Lobar collapse (atelectasis)',
+    ringkas: 'A blocked bronchus and the lobe beyond it empties of air and shrinks.',
+    lesi: [
+      { struktur: 'Left inferior lobar bronchus', jenis: 'occlusion', catatan: 'Mucus plug, aspirated material or tumour obstructing the lobar bronchus.' },
+    ],
+    hilir: ['Inferior lobe of left lung', 'Pleura'],
+    mekanisme:
+      'Behind a complete obstruction, alveolar gas is absorbed into blood within hours because the sum of venous gas ' +
+      'partial pressures is below atmospheric. Collateral ventilation through pores of Kohn delays it, which is why ' +
+      'collapse is faster in children and after high inspired oxygen. The collapsed lobe still receives blood, so it shunts — hypoxaemia without a matching drop in carbon dioxide.',
+    temuan: [
+      'Reduced expansion, dullness and absent breath sounds over the affected lobe; tracheal shift toward the side',
+      'Post-operative and ventilated patients are the classic setting; consider inhaled foreign body in a child',
+    ],
+    penunjang: ['Chest radiograph showing volume loss and displaced fissures; CT or bronchoscopy if obstruction is suspected'],
+    tata: [
+      'Physiotherapy, deep breathing, adequate analgesia so the patient can cough; treat infection',
+      'Bronchoscopy to remove a plug or foreign body; treat the underlying tumour when that is the cause',
+    ],
+    organKey: 'lungs',
+    skdi: ['Atelektasis', 'Benda asing', 'Pneumonia, bronkopneumonia'],
+  },
+  {
+    id: 'hipotiroid',
+    module: 'tiroid',
+    label: 'Hypothyroidism',
+    ringkas: 'The thyroid makes too little hormone and everything slows — thought, gut, heart, and mood.',
+    lesi: [
+      { struktur: 'Thyroid gland', jenis: 'occlusion', catatan: 'Autoimmune destruction (Hashimoto), iodine deficiency, or post-surgical or post-radioiodine loss.' },
+    ],
+    hilir: ['Thyroid cartilage', 'Trachea'],
+    mekanisme:
+      'Thyroid hormone sets the basal metabolic rate through nuclear receptors in almost every tissue, so deficiency ' +
+      'produces a diffuse slowing rather than one organ\'s failure. Loss of negative feedback raises TSH before free T4 ' +
+      'falls, which is why TSH is the sensitive first test — and why the pituitary tells you about the thyroid earlier than the thyroid does.',
+    temuan: [
+      'Fatigue, cold intolerance, weight gain, constipation, dry skin, hair loss, low mood, menorrhagia',
+      'Bradycardia, slow-relaxing reflexes, non-pitting oedema; goitre in Hashimoto and iodine deficiency',
+      'Congenital hypothyroidism must be found by newborn screening — the damage is irreversible',
+    ],
+    penunjang: ['TSH first; free T4 if abnormal. Anti-TPO antibodies for autoimmune cause', 'Do not screen with thyroid ultrasound — it answers a different question'],
+    tata: [
+      'Levothyroxine once daily on an empty stomach, retitrated by TSH after 6–8 weeks',
+      'Start low in the elderly and in ischaemic heart disease; raise the dose early in pregnancy',
+    ],
+    organKey: 'thyroid',
+    skdi: ['Hipotiroid', 'Goiter', 'Tiroiditis'],
+  },
+  {
+    id: 'hipertiroid',
+    module: 'tiroid',
+    label: 'Hyperthyroidism and Graves disease',
+    ringkas: 'Too much thyroid hormone: weight falls, the heart races, and the hands tremble.',
+    lesi: [
+      { struktur: 'Thyroid gland', jenis: 'hypertrophy', catatan: 'Diffuse hyperplasia from TSH-receptor stimulating antibodies in Graves disease.' },
+    ],
+    hilir: ['Thyroid cartilage', 'Trachea', 'Oesophagus'],
+    mekanisme:
+      'In Graves disease an IgG antibody activates the TSH receptor continuously, escaping feedback entirely. The same ' +
+      'receptor on orbital fibroblasts explains the eye disease, which is why Graves ophthalmopathy runs its own course ' +
+      'independent of thyroid function. Excess hormone upregulates beta receptors, so much of the clinical picture — tremor, tachycardia, sweating — is adrenergic amplification rather than a direct hormonal effect.',
+    temuan: [
+      'Weight loss with good appetite, heat intolerance, palpitations, tremor, anxiety, loose stools',
+      'Diffuse goitre with bruit, eye signs and pretibial myxoedema point to Graves specifically',
+      'Atrial fibrillation and osteoporosis are the complications that persist',
+    ],
+    penunjang: ['Suppressed TSH with raised free T4/T3; TSH-receptor antibodies for Graves', 'Radionuclide uptake scan to separate Graves, toxic nodule and thyroiditis — they are treated differently'],
+    tata: [
+      'Beta blocker for symptoms while definitive treatment takes effect',
+      'Antithyroid drugs (watch for agranulocytosis — a sore throat is an emergency), radioiodine, or surgery',
+      'Treat thyroid storm as a medical emergency; avoid radioiodine in active eye disease',
+    ],
+    organKey: 'thyroid',
+    skdi: ['Hipertiroid', 'Tirotoksikosis', 'Goiter'],
+  },
+  {
+    id: 'ca-tiroid',
+    module: 'tiroid',
+    label: 'Thyroid nodule and carcinoma',
+    ringkas: 'A lump in the thyroid — usually harmless, and the job is to identify the few that are not.',
+    lesi: [
+      { struktur: 'Thyroid gland', jenis: 'dilatation', catatan: 'Nodule within the gland; most are benign colloid nodules.' },
+    ],
+    hilir: ['Trachea', 'Oesophagus', 'Thyroid cartilage'],
+    mekanisme:
+      'Differentiated thyroid cancers retain iodine uptake and thyroglobulin production, which is what makes radioiodine ' +
+      'both a treatment and a surveillance tool — a biology no other solid tumour offers. The recurrent laryngeal nerve ' +
+      'runs in the tracheo-oesophageal groove behind the gland, so a hoarse voice with a thyroid mass suggests invasion, and the same anatomy is what makes voice change a recognised surgical complication.',
+    temuan: [
+      'Painless neck lump moving on swallowing; hoarseness, fixation, or cervical nodes raise concern',
+      'Rapid growth in an older patient suggests anaplastic carcinoma or lymphoma — an emergency',
+    ],
+    penunjang: ['TSH first, then ultrasound with a risk-stratification score; fine-needle aspiration by that score', 'Do not biopsy a hot nodule on a hyperfunctioning gland — treat the hyperthyroidism'],
+    tata: [
+      'Lobectomy or total thyroidectomy by size, histology and risk; radioiodine for selected differentiated cancers',
+      'TSH suppression and thyroglobulin monitoring afterwards; lifelong follow-up',
+    ],
+    organKey: 'thyroid',
+    skdi: ['Karsinoma tiroid', 'Adenoma tiroid', 'Goiter'],
+  },
+  {
+    id: 'hiperparatiroid',
+    module: 'tiroid',
+    label: 'Primary hyperparathyroidism',
+    ringkas: 'A tiny gland behind the thyroid oversecretes and pulls calcium out of the bones.',
+    lesi: [
+      { struktur: 'Left inferior parathyroid gland', jenis: 'hypertrophy', catatan: 'Solitary adenoma in about 85% of cases — one gland, not four.' },
+    ],
+    hilir: ['Thyroid gland', 'Right inferior parathyroid gland'],
+    mekanisme:
+      'Autonomous PTH secretion raises calcium by three routes at once: bone resorption, renal tubular reabsorption, and ' +
+      'vitamin D activation that increases gut absorption. Phosphate falls because PTH is phosphaturic — the ' +
+      'combination of high calcium with low phosphate and a non-suppressed PTH is what distinguishes it from malignancy, where PTH is suppressed.',
+    temuan: [
+      '"Stones, bones, abdominal groans and psychic moans" — but most cases today are asymptomatic and found on testing',
+      'Renal stones, osteoporosis, constipation, polyuria, depression and cognitive slowing',
+    ],
+    penunjang: ['Corrected calcium, PTH, phosphate, vitamin D, renal function and 24-hour urinary calcium', 'Sestamibi scan and ultrasound to localise before surgery — never to make the diagnosis'],
+    tata: [
+      'Parathyroidectomy for symptoms, young age, renal or bone involvement, or marked hypercalcaemia',
+      'Hydration and monitoring otherwise; avoid thiazides and lithium; cinacalcet when surgery is not possible',
+    ],
+    organKey: 'thyroid',
+    skdi: ['Hiperparatiroid', 'Osteoporosis', 'Kolik renal'],
+  },
+  {
+    id: 'otitis-media',
+    module: 'telinga',
+    label: 'Otitis media',
+    ringkas: 'Infection behind the eardrum: a child with earache, fever and a bulging red drum.',
+    lesi: [
+      { struktur: 'Left tympanic membrane', jenis: 'dilatation', catatan: 'Bulging, erythematous drum with middle-ear effusion under pressure.' },
+    ],
+    hilir: ['Left malleus', 'Left incus', 'Left stapes'],
+    mekanisme:
+      'The eustachian tube in a child is short, horizontal and floppy, so nasopharyngeal secretions reach the middle ear ' +
+      'easily and drain badly. Trapped effusion becomes infected, pressure rises against the drum, and the pain stops ' +
+      'abruptly if the drum perforates. Persisting effusion after the infection settles is what dampens ossicular movement and causes the conductive hearing loss that matters for speech development.',
+    temuan: [
+      'Otalgia, fever and irritability in a young child; bulging opaque drum with lost light reflex',
+      'Discharge with sudden relief of pain means perforation',
+      'Mastoid tenderness, protruding pinna or facial palsy signal complications',
+    ],
+    penunjang: ['Otoscopy; pneumatic otoscopy or tympanometry for effusion', 'Audiometry if effusion persists beyond three months'],
+    tata: [
+      'Analgesia for all; delayed or immediate antibiotics by age, severity and bilaterality',
+      'Grommets for persistent effusion with hearing loss affecting speech and learning',
+    ],
+    organKey: 'eardrum',
+    skdi: ['Otitis media akut', 'Otitis media serosa', 'Perforasi membran timpani'],
+  },
+  {
+    id: 'kolesteatoma',
+    module: 'telinga',
+    label: 'Cholesteatoma',
+    ringkas: 'Skin grows where it should not, into the middle ear, and slowly eats bone.',
+    lesi: [
+      { struktur: 'Left tympanic membrane', jenis: 'occlusion', catatan: 'Retraction pocket in the pars flaccida filling with keratin.' },
+      { struktur: 'Left incus', jenis: 'occlusion', catatan: 'The long process of the incus is the first ossicle eroded.' },
+    ],
+    hilir: ['Left malleus', 'Left stapes', 'Left temporal bone', 'Left cochlea'],
+    mekanisme:
+      'Keratinising squamous epithelium trapped in the middle ear behaves like skin — it grows and sheds — but has ' +
+      'nowhere to shed to. The expanding keratin sac releases osteolytic enzymes and erodes whatever it touches: ' +
+      'ossicles first, then the facial nerve canal, labyrinth and tegmen. That is why cholesteatoma is a surgical disease and why "chronic ear discharge that smells" is never treated with drops alone.',
+    temuan: [
+      'Persistent foul-smelling discharge with conductive hearing loss; attic retraction or crust on otoscopy',
+      'Vertigo, facial weakness or headache indicate erosion into labyrinth, facial canal or intracranially',
+    ],
+    penunjang: ['Otoscopy with microsuction; audiometry; CT temporal bone to map erosion before surgery'],
+    tata: [
+      'Surgery — mastoidectomy with removal of the sac; it does not resolve medically',
+      'Long-term follow-up for residual and recurrent disease',
+    ],
+    organKey: 'ear',
+    skdi: ['Kolesteatoma', 'Otitis media kronik', 'Mastoiditis'],
+  },
+  {
+    id: 'otosklerosis',
+    module: 'telinga',
+    label: 'Otosclerosis',
+    ringkas: 'New bone fixes the smallest bone in the body, and sound stops reaching the inner ear.',
+    lesi: [
+      { struktur: 'Left stapes', jenis: 'stenosis', derajat: 0.9, catatan: 'Bony fixation of the stapes footplate at the oval window.' },
+      { struktur: 'Right stapes', jenis: 'stenosis', derajat: 0.9, catatan: 'Bilateral in most patients, often asymmetric.' },
+    ],
+    hilir: ['Left cochlea', 'Left incus', 'Left tympanic membrane'],
+    mekanisme:
+      'Abnormal remodelling at the otic capsule fixes the stapes footplate, so the ossicular chain can no longer ' +
+      'transmit vibration into the cochlear fluid — a purely mechanical, conductive loss with a normal drum. Because ' +
+      'bone conduction bypasses the fixed stapes, the tuning fork tests invert (Rinne negative), and speech in noise can paradoxically seem easier, which delays presentation.',
+    temuan: [
+      'Progressive conductive hearing loss in a young adult with a normal eardrum; often a family history',
+      'Tinnitus; hearing sometimes better in noisy places (paracusis of Willis)',
+    ],
+    penunjang: ['Pure tone audiometry showing conductive loss with a Carhart notch; tympanometry with absent reflexes'],
+    tata: [
+      'Hearing aid is a legitimate first choice',
+      'Stapedotomy with prosthesis for suitable patients — high success rate, small risk of total hearing loss',
+    ],
+    organKey: 'ossicles',
+    skdi: ['Otosklerosis', 'Tuli (kongenital, perseptif, konduktif)'],
+  },
+  {
+    id: 'presbiakusis',
+    module: 'telinga',
+    label: 'Sensorineural hearing loss',
+    ringkas: 'The hair cells of the cochlea die and do not grow back; high notes and speech in noise go first.',
+    lesi: [
+      { struktur: 'Left cochlea', jenis: 'occlusion', catatan: 'Loss of outer hair cells, beginning at the high-frequency basal turn.' },
+      { struktur: 'Right cochlea', jenis: 'occlusion', catatan: 'Bilateral and symmetrical in age-related and noise-induced loss.' },
+    ],
+    hilir: ['Left cochlear nerve', 'Left vestibulocochlear nerve'],
+    mekanisme:
+      'The cochlea is tonotopic: high frequencies are transduced at the base, which also bears the greatest mechanical ' +
+      'and metabolic load, so it fails first. Outer hair cells provide the active amplification that gives fine ' +
+      'frequency discrimination — losing them costs clarity more than volume, which is exactly why patients say "I can hear you but I cannot understand you" and why simply shouting does not help.',
+    temuan: [
+      'Gradual bilateral high-frequency loss, difficulty with speech in background noise, tinnitus',
+      'SUDDEN unilateral sensorineural loss is an emergency, not presbyacusis — refer the same day',
+    ],
+    penunjang: ['Pure tone audiometry with speech testing; MRI for asymmetric loss to exclude vestibular schwannoma'],
+    tata: [
+      'Hearing aids early — untreated hearing loss is linked with social withdrawal and cognitive decline',
+      'Cochlear implant for severe-profound loss; hearing protection to prevent noise-induced damage',
+      'High-dose corticosteroid for sudden sensorineural loss, started within days',
+    ],
+    organKey: 'inner-ear-nerve',
+    skdi: ['Presbiakusis', 'Tuli (kongenital, perseptif, konduktif)', 'Trauma akustik akut'],
+  },
+  {
+    id: 'bppv',
+    module: 'telinga',
+    label: 'Benign paroxysmal positional vertigo',
+    ringkas: 'Crystals loose in the balance organ: the room spins for seconds whenever the head turns.',
+    lesi: [
+      { struktur: 'Left vestibule', jenis: 'occlusion', catatan: 'Otoconia displaced from the utricle into a semicircular canal, usually the posterior one.' },
+    ],
+    hilir: ['Left vestibular nerve', 'Left cochlea'],
+    mekanisme:
+      'Free otoconia make a canal respond to gravity as well as to rotation, so a head movement produces a brief, ' +
+      'intense mismatch between the two labyrinths. The latency and fatigability of the nystagmus follow directly from ' +
+      'particles settling, and this is also why a repositioning manoeuvre — not a drug — is the treatment: the problem is mechanical and the particles can be moved back.',
+    temuan: [
+      'Seconds-long rotational vertigo on lying down, rolling over or looking up; no hearing loss',
+      'Dix-Hallpike test provokes upbeating torsional nystagmus with latency and fatigue',
+      'Continuous vertigo, deafness or neurological signs mean it is not BPPV',
+    ],
+    penunjang: ['Dix-Hallpike and supine roll test; imaging only when central features are present'],
+    tata: [
+      'Epley or equivalent repositioning manoeuvre — effective in most patients at the first attempt',
+      'Vestibular sedatives are not treatment and delay compensation; falls-risk assessment in older patients',
+    ],
+    organKey: 'inner-ear-nerve',
+    skdi: ['Vertigo (Benign paroxysmal positional vertigo)', 'Labirintitis'],
+  },
+  {
+    id: 'kehamilan-ektopik',
+    module: 'obgin',
+    label: 'Ectopic pregnancy',
+    ringkas: 'A pregnancy implants in the tube instead of the womb; if it ruptures, the bleeding is internal and fast.',
+    lesi: [
+      { struktur: 'Left uterine tube', jenis: 'dilatation', catatan: 'Implantation in the ampulla — the commonest site by far.' },
+    ],
+    hilir: ['Uterus', 'Left ovary', 'Ligaments of uterus and ovaries'],
+    mekanisme:
+      'The tube has no decidua and cannot distend, so trophoblast invades the wall directly and erodes vessels. Rupture ' +
+      'therefore bleeds arterially into the peritoneum with no tamponade — a young woman can lose litres while her ' +
+      'blood pressure still looks normal, because compensation in the young fails late and then suddenly. Any woman of reproductive age with abdominal pain needs a pregnancy test before anything else.',
+    temuan: [
+      'Amenorrhoea then unilateral pelvic pain and vaginal bleeding at 6–8 weeks',
+      'Shoulder-tip pain, syncope, cervical excitation and adnexal tenderness suggest rupture',
+      'Risk: previous ectopic, tubal surgery, pelvic inflammatory disease, IUD in situ, assisted conception',
+    ],
+    penunjang: ['Urine or serum hCG, then transvaginal ultrasound; an empty uterus with hCG above the discriminatory zone is ectopic until proven otherwise', 'Serial hCG for pregnancy of unknown location'],
+    tata: [
+      'Rupture: resuscitate and operate — laparoscopic salpingectomy',
+      'Stable and small with low hCG: methotrexate or expectant management with strict follow-up',
+      'Anti-D for rhesus-negative women',
+    ],
+    organKey: 'bladder',
+    skdi: ['Kehamilan ektopik', 'Aborsi spontan inkomplit'],
+  },
+  {
+    id: 'mioma',
+    module: 'obgin',
+    label: 'Uterine fibroids',
+    ringkas: 'Benign muscle tumours of the womb — heavy periods, pressure, and sometimes infertility.',
+    lesi: [
+      { struktur: 'Uterus', jenis: 'hypertrophy', catatan: 'Monoclonal smooth-muscle tumours; site matters more than size.' },
+    ],
+    hilir: ['Urinary bladder', 'Left uterine tube', 'Ligaments of uterus and ovaries'],
+    mekanisme:
+      'Fibroids are oestrogen and progesterone dependent, which is why they grow through reproductive life and regress ' +
+      'after the menopause. Position decides the symptom: submucosal fibroids distort the cavity and cause heavy ' +
+      'bleeding and implantation failure, intramural ones enlarge the uterus, and subserosal ones press on bladder or bowel while barely affecting periods at all.',
+    temuan: [
+      'Heavy menstrual bleeding with clots, pelvic pressure, urinary frequency, subfertility',
+      'Enlarged firm irregular uterus on examination; iron deficiency anaemia is common',
+      'Rapid growth after the menopause is a red flag for sarcoma',
+    ],
+    penunjang: ['Transvaginal ultrasound; saline sonohysterography or hysteroscopy for submucosal disease; MRI before intervention', 'Full blood count and ferritin — treat the anaemia as well as the fibroid'],
+    tata: [
+      'Tranexamic acid, hormonal treatment or a levonorgestrel intrauterine system for bleeding',
+      'Hysteroscopic resection for submucosal fibroids; myomectomy when fertility is to be preserved; embolisation or hysterectomy otherwise',
+    ],
+    organKey: 'bladder',
+    skdi: ['Adenomiosis, mioma', 'Anemia defisiensi besi'],
+  },
+  {
+    id: 'endometriosis',
+    module: 'obgin',
+    label: 'Endometriosis',
+    ringkas: 'Womb lining grows outside the womb and bleeds where it should not — pain that follows the cycle.',
+    lesi: [
+      { struktur: 'Left ovary', jenis: 'dilatation', catatan: 'Endometrioma — a chocolate cyst of old blood within the ovary.' },
+      { struktur: 'Ligaments of uterus and ovaries', jenis: 'occlusion', catatan: 'Deposits on the uterosacral ligaments with fibrosis and adhesions.' },
+    ],
+    hilir: ['Uterus', 'Right ovary', 'Left uterine tube'],
+    mekanisme:
+      'Ectopic endometrial tissue responds to the same hormonal cycle, so it proliferates and bleeds into closed spaces; ' +
+      'the resulting inflammation lays down adhesions and sensitises nerves. That is why pain correlates poorly with ' +
+      'the amount of disease seen at laparoscopy, why deep infiltrating nodules hurt disproportionately, and why suppressing the cycle relieves symptoms without removing the lesions.',
+    temuan: [
+      'Cyclical pelvic pain, dysmenorrhoea, deep dyspareunia, dyschezia, subfertility',
+      'Tender nodularity in the pouch of Douglas, fixed retroverted uterus',
+      'Average delay to diagnosis is measured in years — believing the patient shortens it',
+    ],
+    penunjang: ['Transvaginal ultrasound for endometrioma; MRI for deep disease; laparoscopy remains definitive', 'Normal imaging does not exclude it'],
+    tata: [
+      'Analgesia and hormonal suppression (combined pill, progestogen, LNG-IUS, GnRH analogue with add-back)',
+      'Laparoscopic excision or ablation for persistent pain or subfertility; multidisciplinary care for deep disease',
+    ],
+    organKey: 'bladder',
+    skdi: ['Endometriosis', 'Infertilitas', 'Kista ovarium'],
+  },
+  {
+    id: 'pcos',
+    module: 'obgin',
+    label: 'Polycystic ovary syndrome',
+    ringkas: 'Irregular cycles, excess androgen and insulin resistance — the commonest hormonal disorder in young women.',
+    lesi: [
+      { struktur: 'Left ovary', jenis: 'dilatation', catatan: 'Multiple small antral follicles arrested before dominance; the ovary is not full of true cysts.' },
+      { struktur: 'Right ovary', jenis: 'dilatation', catatan: 'Bilateral in most patients.' },
+    ],
+    hilir: ['Uterus', 'Left uterine tube'],
+    mekanisme:
+      'Insulin resistance and hyperinsulinaemia amplify ovarian androgen production and lower sex hormone binding ' +
+      'globulin, so free androgen rises further. Follicles are recruited but none becomes dominant, so ovulation fails ' +
+      'and the endometrium sees oestrogen without the opposing progesterone of a luteal phase — which is why unopposed endometrial hyperplasia, and eventually carcinoma, is the long-term risk that must be prevented.',
+    temuan: [
+      'Oligomenorrhoea or amenorrhoea, hirsutism and acne, subfertility, weight gain',
+      'Rotterdam criteria: two of oligo-anovulation, clinical or biochemical hyperandrogenism, polycystic ovarian morphology',
+      'Screen for impaired glucose tolerance, dyslipidaemia, sleep apnoea and mood disorder',
+    ],
+    penunjang: ['Testosterone and SHBG with free androgen index; LH, FSH, prolactin, TSH; exclude congenital adrenal hyperplasia and Cushing', 'Transvaginal ultrasound; oral glucose tolerance test'],
+    tata: [
+      'Weight reduction and exercise improve ovulation, androgen levels and metabolic risk more than any drug',
+      'Combined pill or cyclical progestogen to protect the endometrium; letrozole first line for ovulation induction',
+      'Treat hirsutism and metabolic risk in their own right',
+    ],
+    organKey: 'bladder',
+    skdi: ['Polikistik ovarium', 'Infertilitas', 'Sindrom metabolik'],
+  },
+  {
+    id: 'ca-serviks',
+    module: 'obgin',
+    label: 'Cervical carcinoma',
+    ringkas: 'A cancer caused by a virus, preceded by years of changes that screening can catch.',
+    lesi: [
+      { struktur: 'Uterus', jenis: 'occlusion', catatan: 'Tumour of the cervix at the transformation zone, growing into the vagina and parametria.' },
+      { struktur: 'Vagina', jenis: 'occlusion', catatan: 'Upper vaginal extension in locally advanced disease.' },
+    ],
+    hilir: ['Urinary bladder', 'Ligaments of uterus and ovaries'],
+    mekanisme:
+      'Persistent high-risk HPV integrates into host DNA; E6 and E7 proteins inactivate p53 and Rb, so cell cycle ' +
+      'control is lost at the transformation zone where columnar epithelium is being replaced by squamous. That change ' +
+      'takes a decade or more to become invasive, which is precisely the window in which cytology or HPV testing finds it — and why vaccination before exposure prevents it outright.',
+    temuan: [
+      'Postcoital, intermenstrual or postmenopausal bleeding; offensive discharge; pelvic pain late',
+      'A visible cervical lesion must be biopsied — a normal smear does not exclude cancer',
+      'Ureteric obstruction and renal failure in advanced disease',
+    ],
+    penunjang: ['Colposcopy with biopsy; examination under anaesthesia and MRI for staging', 'HPV testing and cytology for screening, not for diagnosing a visible lesion'],
+    tata: [
+      'Early disease: surgery, with fertility-sparing trachelectomy in selected cases',
+      'Locally advanced: chemoradiotherapy with brachytherapy',
+      'Prevention is the real answer: HPV vaccination and organised screening',
+    ],
+    organKey: 'bladder',
+    skdi: ['Karsinoma serviks', 'Servisitis'],
+  },
+  {
+    id: 'pid',
+    module: 'obgin',
+    label: 'Pelvic inflammatory disease',
+    ringkas: 'Infection ascending from the cervix into the tubes — and every episode costs future fertility.',
+    lesi: [
+      { struktur: 'Left uterine tube', jenis: 'occlusion', catatan: 'Salpingitis with pus in the lumen; scarring follows even after cure.' },
+      { struktur: 'Right uterine tube', jenis: 'occlusion', catatan: 'Usually bilateral in ascending infection.' },
+    ],
+    hilir: ['Left ovary', 'Right ovary', 'Uterus'],
+    mekanisme:
+      'Chlamydia and gonorrhoea ascend through the cervix and damage the tubal ciliated epithelium; healing replaces ' +
+      'cilia with fibrous adhesions. The tube then neither transports nor protects, which converts a treated infection ' +
+      'into lifelong risk: infertility and ectopic pregnancy rise stepwise with each episode. That is why treatment is started on clinical suspicion rather than waiting for swab results.',
+    temuan: [
+      'Lower abdominal pain, deep dyspareunia, abnormal discharge or bleeding, fever',
+      'Cervical excitation and adnexal tenderness; right upper quadrant pain suggests perihepatitis (Fitz-Hugh-Curtis)',
+      'A tubo-ovarian abscess presents as a tender adnexal mass with sepsis',
+    ],
+    penunjang: ['Pregnancy test first; endocervical swabs for chlamydia and gonorrhoea; inflammatory markers', 'Ultrasound for abscess; laparoscopy where the diagnosis is uncertain'],
+    tata: [
+      'Start broad empirical antibiotics on suspicion — delay is what causes the tubal damage',
+      'Treat partners and test for other sexually transmitted infections; remove an IUD only if no improvement',
+      'Drain a tubo-ovarian abscess',
+    ],
+    organKey: 'bladder',
+    skdi: ['Penyakit radang panggul', 'Salpingitis', 'Infertilitas'],
+  },
+  {
+    id: 'atonia-uteri',
+    module: 'obgin',
+    label: 'Postpartum haemorrhage',
+    ringkas: 'After birth the womb fails to clamp down, and blood is lost faster than it can be replaced.',
+    lesi: [
+      { struktur: 'Uterus', jenis: 'incompetence', catatan: 'Uterine atony — the myometrium does not contract on the placental bed.' },
+    ],
+    hilir: ['Vagina', 'Urinary bladder', 'Ligaments of uterus and ovaries'],
+    mekanisme:
+      'Haemostasis after delivery is mechanical before it is coagulative: myometrial fibres contract around the spiral ' +
+      'arteries and occlude them — the "living ligature". At term the uterus receives around 700 mL of blood per minute, ' +
+      'so an atonic uterus can empty the circulation within minutes. That single fact explains why the first action is to rub up a contraction and give uterotonics, not to transfuse.',
+    temuan: [
+      'Blood loss over 500 mL after vaginal birth, or any loss causing haemodynamic change',
+      'The four Ts: tone, trauma, tissue, thrombin — atony causes most of it',
+      'A boggy high uterus means atony; a contracted uterus with continued bleeding means trauma',
+    ],
+    penunjang: ['Clinical, and continuous: quantify loss rather than estimate it', 'Full blood count, coagulation, fibrinogen and cross-match; check for retained tissue'],
+    tata: [
+      'Uterine massage and bimanual compression, oxytocin then second-line uterotonics, tranexamic acid early',
+      'Examine for tears and retained placenta; balloon tamponade, compression sutures, or hysterectomy if escalation fails',
+      'Active management of the third stage prevents most of it',
+    ],
+    organKey: 'bladder',
+    skdi: ['Perdarahan post partum', 'Retensi plasenta', 'Syok (septik, hipovolemik, kardiogenik, neurogenik)'],
+  },
 ]
 
 /** Semua struktur yang disebut satu keadaan, lesi maupun hilirnya. */
