@@ -8,6 +8,9 @@ const HraClinicalAtlas = lazy(() =>
 const CellGenomeEvidenceLab = lazy(() =>
   import('../components/digital-twin/CellGenomeEvidenceLab').then((m) => ({ default: m.CellGenomeEvidenceLab })),
 )
+const CinematicCellGenomeExplorer = lazy(() =>
+  import('../components/digital-twin/CinematicCellGenomeExplorer').then((m) => ({ default: m.CinematicCellGenomeExplorer })),
+)
 const RegenerationResearchSandbox = lazy(() =>
   import('../components/digital-twin/RegenerationResearchSandbox').then((m) => ({ default: m.RegenerationResearchSandbox })),
 )
@@ -20,8 +23,8 @@ const Workout4DLab = lazy(() =>
 const SurgicalOperationAtlas = lazy(() =>
   import('../components/digital-twin/SurgicalOperationAtlasV2').then((m) => ({ default: m.SurgicalOperationAtlasV2 })),
 )
-const SurgicalRehearsalLab = lazy(() =>
-  import('../components/digital-twin/SurgicalRehearsalLab').then((m) => ({ default: m.SurgicalRehearsalLab })),
+const CinematicSurgicalRehearsal = lazy(() =>
+  import('../components/digital-twin/CinematicSurgicalRehearsal').then((m) => ({ default: m.CinematicSurgicalRehearsal })),
 )
 
 type LabMode = BodyEvidenceMode
@@ -34,14 +37,14 @@ type Mode = {
 
 const PRIMARY: Mode[] = [
   { key: 'realistic-atlas', label: 'Anatomy', hint: 'HuBMAP HRA reference objects · rotate, isolate, inspect' },
-  { key: 'digital-twin', label: 'Body → Cell', hint: 'Human Protein Atlas microscopy and real cell/gene records' },
-  { key: 'cell-genome', label: 'Cell → DNA', hint: 'Human Protein Atlas + Ensembl coordinates and genomic sequence' },
+  { key: 'digital-twin', label: 'Body → Cell', hint: 'Cinematic cell structure + Human Protein Atlas evidence' },
+  { key: 'cell-genome', label: 'Cell → DNA', hint: '3D cell/chromatin/DNA + HPA and Ensembl evidence' },
   { key: 'workout-4d', label: 'Exercise', hint: 'Reference anatomy first; measured workout replay is a separate layer' },
   { key: 'surgery', label: 'Surgery', hint: 'Reference anatomy first; procedural simulation is explicitly separated' },
 ]
 
 const MORE: Mode[] = [
-  { key: 'surgery-rehearsal', label: 'Practice', hint: 'HRA anatomy first; rehearsal tools remain an explicit simulation layer' },
+  { key: 'surgery-rehearsal', label: 'Practice', hint: 'Cinematic anatomy orientation + explicit rehearsal layer' },
   { key: 'counterfactual', label: 'What-if', hint: 'Reference anatomy and real evidence stay separate from scenario modelling' },
   { key: 'regeneration', label: 'Research', hint: 'Reference anatomy and live trials stay separate from experimental concepts' },
 ]
@@ -66,7 +69,7 @@ function SourceBackedMode({ title, detail, children }: { title: string; detail: 
       <Suspense fallback={<LoadingLab label="HuBMAP Human Reference Atlas" />}>
         <HraClinicalAtlas />
       </Suspense>
-      <details className="group rounded-[26px] border border-neutral-200 bg-white p-4 shadow-sm dark:border-white/10 dark:bg-white/[.035]">
+      <details className="group rounded-[26px] border border-neutral-200 bg-white p-4 shadow-sm dark:border-white/10 dark:bg-white/[.035]" open>
         <summary className="flex cursor-pointer list-none items-center justify-between gap-3">
           <div>
             <div className="text-[9px] font-black uppercase tracking-[.15em] text-amber-700 dark:text-amber-300">Model / simulation layer</div>
@@ -76,6 +79,32 @@ function SourceBackedMode({ title, detail, children }: { title: string; detail: 
           <span className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-neutral-100 text-lg text-neutral-700 transition group-open:rotate-45 dark:bg-white/10 dark:text-white">＋</span>
         </summary>
         <div className="mt-4 border-t border-neutral-100 pt-4 dark:border-white/10">{children}</div>
+      </details>
+    </div>
+  )
+}
+
+function CellEvidenceMode({ mode }: { mode: 'body-cell' | 'cell-genome' }) {
+  const initialStage = mode === 'body-cell' ? 'cell' : 'dna'
+  return (
+    <div className="space-y-4">
+      <Suspense fallback={<LoadingLab label="cinematic cellular 3D" />}>
+        <CinematicCellGenomeExplorer initialStage={initialStage} />
+      </Suspense>
+      <details className="group rounded-[26px] border border-neutral-200 bg-white p-4 shadow-sm dark:border-white/10 dark:bg-white/[.035]" open>
+        <summary className="flex cursor-pointer list-none items-center justify-between gap-3">
+          <div>
+            <div className="text-[9px] font-black uppercase tracking-[.15em] text-emerald-700 dark:text-emerald-300">Source evidence layer</div>
+            <div className="mt-1 text-[15px] font-black text-neutral-950 dark:text-white">Human Protein Atlas + Ensembl</div>
+            <p className="mt-1 max-w-3xl text-[10px] leading-relaxed text-neutral-500 dark:text-neutral-400">The 3D scene above is a structural educational model. Source-backed microscopy, gene records and genomic coordinates remain separately identified here so the render is never presented as patient evidence.</p>
+          </div>
+          <span className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-neutral-100 text-lg text-neutral-700 transition group-open:rotate-45 dark:bg-white/10 dark:text-white">＋</span>
+        </summary>
+        <div className="mt-4 border-t border-neutral-100 pt-4 dark:border-white/10">
+          <Suspense fallback={<LoadingLab label="HPA and Ensembl evidence" />}>
+            <CellGenomeEvidenceLab mode={mode} />
+          </Suspense>
+        </div>
       </details>
     </div>
   )
@@ -107,7 +136,7 @@ export function BodyExplorer() {
             <span className="rounded-full border border-neutral-200 bg-neutral-50 px-2.5 py-1.5 dark:border-white/10 dark:bg-white/[.04]">HRA / HuBMAP</span>
             <span className="rounded-full border border-neutral-200 bg-neutral-50 px-2.5 py-1.5 dark:border-white/10 dark:bg-white/[.04]">Human Protein Atlas</span>
             <span className="rounded-full border border-neutral-200 bg-neutral-50 px-2.5 py-1.5 dark:border-white/10 dark:bg-white/[.04]">Ensembl</span>
-            <span className="rounded-full border border-neutral-200 bg-neutral-50 px-2.5 py-1.5 dark:border-white/10 dark:bg-white/[.04]">Europe PMC</span>
+            <span className="rounded-full border border-cyan-300/30 bg-cyan-50 px-2.5 py-1.5 text-cyan-800 dark:bg-cyan-300/10 dark:text-cyan-200">Cinematic PBR</span>
           </div>
         </div>
 
@@ -133,17 +162,13 @@ export function BodyExplorer() {
       </section>
 
       {mode === 'digital-twin' ? (
-        <Suspense fallback={<LoadingLab label="Human Protein Atlas cell evidence" />}>
-          <CellGenomeEvidenceLab mode="body-cell" />
-        </Suspense>
+        <CellEvidenceMode mode="body-cell" />
       ) : mode === 'realistic-atlas' ? (
         <Suspense fallback={<LoadingLab label="HuBMAP Human Reference Atlas" />}>
           <HraClinicalAtlas />
         </Suspense>
       ) : mode === 'cell-genome' ? (
-        <Suspense fallback={<LoadingLab label="HPA and Ensembl genomic evidence" />}>
-          <CellGenomeEvidenceLab mode="cell-genome" />
-        </Suspense>
+        <CellEvidenceMode mode="cell-genome" />
       ) : mode === 'workout-4d' ? (
         <SourceBackedMode title="Measured workout replay" detail="Workout-derived animation is useful only after the anatomical reference is established. Measured device signals, derived physiology and educational context remain explicitly separated.">
           <Suspense fallback={<LoadingLab label="exercise physiology replay" />}><Workout4DLab /></Suspense>
@@ -153,8 +178,8 @@ export function BodyExplorer() {
           <Suspense fallback={<LoadingLab label="surgical procedure atlas" />}><SurgicalOperationAtlas /></Suspense>
         </SourceBackedMode>
       ) : mode === 'surgery-rehearsal' ? (
-        <SourceBackedMode title="Surgical rehearsal" detail="Rehearsal is intentionally collapsed by default so a simulated sequence is never mistaken for the HRA reference anatomy above.">
-          <Suspense fallback={<LoadingLab label="surgical rehearsal" />}><SurgicalRehearsalLab /></Suspense>
+        <SourceBackedMode title="Surgical rehearsal" detail="Rehearsal remains clearly separated from the HRA reference anatomy. The practice viewport below uses named anatomical meshes rather than cartoon stand-ins.">
+          <Suspense fallback={<LoadingLab label="cinematic surgical rehearsal" />}><CinematicSurgicalRehearsal /></Suspense>
         </SourceBackedMode>
       ) : mode === 'counterfactual' ? (
         <SourceBackedMode title="Counterfactual biology model" detail="What-if outputs are modelling hypotheses. They are not observed anatomy, diagnosis or treatment response; live evidence remains separately visible below.">
