@@ -24,6 +24,9 @@ const Workout4DLab = lazy(() =>
 const SurgicalOperationAtlas = lazy(() =>
   import('../components/digital-twin/SurgicalOperationAtlasV2').then((m) => ({ default: m.SurgicalOperationAtlasV2 })),
 )
+const SurgicalHraWorkbench = lazy(() =>
+  import('../components/digital-twin/SurgicalHraWorkbench').then((m) => ({ default: m.SurgicalHraWorkbench })),
+)
 const CinematicSurgicalRehearsal = lazy(() =>
   import('../components/digital-twin/CinematicSurgicalRehearsal').then((m) => ({ default: m.CinematicSurgicalRehearsal })),
 )
@@ -41,7 +44,7 @@ const PRIMARY: Mode[] = [
   { key: 'digital-twin', label: 'Body → Cell', hint: 'Cinematic cell structure + Human Protein Atlas evidence' },
   { key: 'cell-genome', label: 'Cell → DNA', hint: '3D cell/chromatin/DNA + HPA and Ensembl evidence' },
   { key: 'workout-4d', label: 'Exercise', hint: 'HRA reference anatomy first; measured workout replay is a separate layer' },
-  { key: 'surgery', label: 'Surgery', hint: 'HRA source anatomy first; procedural simulation is explicitly separated' },
+  { key: 'surgery', label: 'Surgery', hint: 'Operation-specific HRA source anatomy first; simulation stays secondary' },
 ]
 
 const MORE: Mode[] = [
@@ -54,7 +57,6 @@ const ALL = [...PRIMARY, ...MORE]
 
 const HRA_CONTEXT: Partial<Record<LabMode, string[]>> = {
   'workout-4d': ['heart', 'lung', 'blood vasculature', 'skeletal muscle', 'femur'],
-  surgery: ['meniscus', 'femur', 'patella', 'heart valve', 'colon', 'thyroid', 'prostate', 'uterus'],
   'surgery-rehearsal': ['meniscus', 'femur', 'patella', 'heart valve', 'kidney', 'colon'],
   counterfactual: ['heart', 'liver', 'kidney', 'brain', 'lung', 'pancreas'],
   regeneration: ['skin', 'liver', 'kidney', 'heart', 'brain', 'pancreas'],
@@ -72,13 +74,26 @@ function LoadingLab({ label }: { label: string }) {
   )
 }
 
-function SourceBackedMode({ title, detail, evidenceTerms, children }: { title: string; detail: string; evidenceTerms: string[]; children: ReactNode }) {
+function SourceBackedMode({
+  title,
+  detail,
+  evidenceTerms = [],
+  sourcePanel,
+  children,
+}: {
+  title: string
+  detail: string
+  evidenceTerms?: string[]
+  sourcePanel?: ReactNode
+  children: ReactNode
+}) {
   return (
     <div className="space-y-4">
       <Suspense fallback={<LoadingLab label="HuBMAP Human Reference Atlas" />}>
         <HraClinicalAtlas />
       </Suspense>
-      <HraContextBridge title="Mapped anatomy for this experience" terms={evidenceTerms} />
+      {sourcePanel}
+      {evidenceTerms.length > 0 && <HraContextBridge title="Mapped anatomy for this experience" terms={evidenceTerms} />}
       <details className="group rounded-[26px] border border-neutral-200 bg-white p-4 shadow-sm dark:border-white/10 dark:bg-white/[.035]">
         <summary className="flex cursor-pointer list-none items-center justify-between gap-3">
           <div>
@@ -145,7 +160,7 @@ export function BodyExplorer() {
           <div className="flex flex-wrap gap-1.5 text-[8px] font-black uppercase tracking-[.1em] text-neutral-500">
             <span className="rounded-full border border-neutral-200 bg-neutral-50 px-2.5 py-1.5 dark:border-white/10 dark:bg-white/[.04]">HuBMAP HRA</span>
             <span className="rounded-full border border-neutral-200 bg-neutral-50 px-2.5 py-1.5 dark:border-white/10 dark:bg-white/[.04]">GitHub models API</span>
-            <span className="rounded-full border border-neutral-200 bg-neutral-50 px-2.5 py-1.5 dark:border-white/10 dark:bg-white/[.04]">ASCT+B v1.2 + v2</span>
+            <span className="rounded-full border border-neutral-200 bg-neutral-50 px-2.5 py-1.5 dark:border-white/10 dark:bg-white/[.04]">HRA v1.2 · v1.4 · v2</span>
             <span className="rounded-full border border-neutral-200 bg-neutral-50 px-2.5 py-1.5 dark:border-white/10 dark:bg-white/[.04]">HPA · Ensembl</span>
           </div>
         </div>
@@ -184,7 +199,11 @@ export function BodyExplorer() {
           <Suspense fallback={<LoadingLab label="exercise physiology replay" />}><Workout4DLab /></Suspense>
         </SourceBackedMode>
       ) : mode === 'surgery' ? (
-        <SourceBackedMode evidenceTerms={HRA_CONTEXT.surgery ?? []} title="Procedural surgery atlas" detail="This section is a procedural education layer, not source anatomy. The HRA cards above resolve representative surgical structures against actual ASCT+B mappings before the simulation is opened.">
+        <SourceBackedMode
+          title="Procedural surgery atlas"
+          detail="The simulation remains an educational model. Operation- and phase-specific HRA resolution is shown above it, so the source anatomy can be inspected before any generated scene is opened."
+          sourcePanel={<Suspense fallback={<LoadingLab label="operation-specific HRA workbench" />}><SurgicalHraWorkbench /></Suspense>}
+        >
           <Suspense fallback={<LoadingLab label="surgical procedure atlas" />}><SurgicalOperationAtlas /></Suspense>
         </SourceBackedMode>
       ) : mode === 'surgery-rehearsal' ? (
