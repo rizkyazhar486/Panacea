@@ -27,8 +27,8 @@ interface Props {
 /** Urutan tampil modul: mengikuti cara orang mencari, bukan abjad. */
 const URUTAN = [
   'respirasi', 'paru', 'gastro', 'nefrologi', 'endokrin', 'tiroid', 'neurologi',
-  'tht', 'telinga', 'mata', 'ortopedi', 'urogenital', 'obstetri', 'obgin',
-  'imunologi', 'kulit',
+  'tht', 'telinga', 'mata', 'ortopedi', 'lutut', 'medula-spinalis',
+  'urogenital', 'obstetri', 'obgin', 'payudara', 'imunologi', 'kulit',
 ] as const
 
 // Keterangan per modul, termasuk ASAL GEOMETRINYA. Empat modul terakhir tidak
@@ -55,6 +55,15 @@ const CATATAN_MODUL: Record<string, string> = {
   obgin:
     'Geometry from the HuBMAP Human Reference Atlas female reference body (CC BY 4.0): uterus, ovaries, uterine ' +
     'tubes, vagina, their ligaments, the bladder and the female bony pelvis.',
+  lutut:
+    'Geometry from the HuBMAP Human Reference Atlas (CC BY 4.0): cruciate and collateral ligaments, meniscus, ' +
+    'articular cartilage, patellar ligament and quadriceps tendon — the structures sports injuries actually involve.',
+  payudara:
+    'Geometry from the HuBMAP Human Reference Atlas (CC BY 4.0): nipple, areola, mammary lobes, lactiferous ducts ' +
+    'and sinuses, suspensory ligaments and fat. Breast previously had no target anywhere in the app.',
+  'medula-spinalis':
+    'Geometry from the HuBMAP Human Reference Atlas (CC BY 4.0): every cord segment from C1 to S4 as its own ' +
+    'structure, so the level of a lesion can be pointed at rather than described.',
   imunologi: 'Bone marrow is shown at its major adult sites — femur, pelvis and sternum — since marrow itself has no separate mesh.',
   kulit: 'Skin is a single surface mesh; dermatological conditions are located by their pattern and distribution rather than by depth.',
 }

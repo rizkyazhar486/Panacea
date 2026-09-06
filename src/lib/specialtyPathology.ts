@@ -3043,6 +3043,337 @@ export const SYSTEM_CONDITIONS: SystemCondition[] = [
     organKey: 'bladder',
     skdi: ['Perdarahan post partum', 'Retensi plasenta', 'Syok (septik, hipovolemik, kardiogenik, neurogenik)'],
   },
+  // ══ SENDI LUTUT, PAYUDARA, MEDULA SPINALIS ════════════════════════════════
+  // Tiga modul dari rujukan tubuh perempuan HuBMAP (CC BY 4.0). Ketiganya
+  // mengisi kekosongan yang nyata: cedera lutut adalah cedera olahraga yang
+  // paling sering, payudara sebelumnya tidak punya sasaran organ sama sekali,
+  // dan tingkat lesi medula spinalis hanya bisa dipahami kalau segmennya
+  // benar-benar terlihat satu per satu.
+
+  {
+    id: 'acl',
+    module: 'lutut',
+    label: 'Anterior cruciate ligament rupture',
+    ringkas: 'A twist on a planted foot, a pop, and the knee swells within an hour and gives way.',
+    lesi: [
+      { struktur: 'Left anterior cruciate ligament of knee', jenis: 'occlusion', catatan: 'Mid-substance tear, typically from a non-contact pivot with the knee near extension.' },
+    ],
+    hilir: ['Left meniscus', 'Left articular cartilage of knee', 'Left tibial collateral ligament'],
+    mekanisme:
+      'The ACL resists anterior translation of the tibia and internal rotation. It is intra-articular but ' +
+      'extrasynovial with a poor blood supply, so a mid-substance tear does not heal — unlike the medial collateral ' +
+      'ligament, which is extra-articular and usually does. Haemarthrosis within an hour means an intra-articular ' +
+      'bleed, and instability afterwards accelerates meniscal and cartilage damage, which is why young pivoting athletes are reconstructed.',
+    temuan: [
+      'Audible pop with immediate swelling (haemarthrosis) and a knee that gives way on turning',
+      'Positive Lachman test — more sensitive than the anterior drawer; pivot shift when relaxed',
+      'Look for the unhappy triad: ACL, medial meniscus and medial collateral ligament together',
+    ],
+    penunjang: ['MRI confirms and shows associated meniscal and cartilage injury; radiographs to exclude avulsion fracture'],
+    tata: [
+      'Early: rest, ice, compression, analgesia; regain range and quadriceps control',
+      'Reconstruction for young pivoting athletes or persistent instability; rehabilitation alone for lower-demand knees',
+      'Return to sport by criteria and strength testing, not by the calendar',
+    ],
+    organKey: 'skeleton',
+    skdi: ['Trauma sendi', 'Lesi meniskus, medial, dan lateral'],
+  },
+  {
+    id: 'meniskus',
+    module: 'lutut',
+    label: 'Meniscal tear',
+    ringkas: 'The cartilage cushion tears; the knee catches, locks and hurts along the joint line.',
+    lesi: [
+      { struktur: 'Left meniscus', jenis: 'occlusion', catatan: 'Tear of the fibrocartilage, most often the posterior horn of the medial meniscus.' },
+    ],
+    hilir: ['Left articular cartilage of knee', 'Left femur', 'Left tibia'],
+    mekanisme:
+      'The menisci convert the flat tibial plateau into a congruent socket and spread load over a wider area; removing ' +
+      'one raises contact stress several-fold, which is why total meniscectomy reliably produces osteoarthritis. Only ' +
+      'the outer third has a blood supply — the red zone — so peripheral tears can be repaired while inner white-zone ' +
+      'tears cannot, and that vascular map decides the operation.',
+    temuan: [
+      'Twisting injury with delayed swelling over hours, joint-line tenderness, catching or true locking',
+      'Positive Thessaly or McMurray test; degenerate tears in older patients may have no injury at all',
+    ],
+    penunjang: ['MRI where the diagnosis changes management; weight-bearing radiographs first in older patients to look for osteoarthritis'],
+    tata: [
+      'Degenerate tears: exercise therapy first — arthroscopic meniscectomy is no better in trials',
+      'Repair rather than resect a peripheral tear in a young knee; a truly locked knee needs early surgery',
+    ],
+    organKey: 'skeleton',
+    skdi: ['Lesi meniskus, medial, dan lateral', 'Artritis, osteoarthritis'],
+  },
+  {
+    id: 'mcl',
+    module: 'lutut',
+    label: 'Medial collateral ligament injury',
+    ringkas: 'A blow to the outside of the knee stretches the ligament on the inside.',
+    lesi: [
+      { struktur: 'Left tibial collateral ligament', jenis: 'incompetence', catatan: 'Valgus-force injury; graded by the degree of opening on stress testing.' },
+    ],
+    hilir: ['Left meniscus', 'Left anterior cruciate ligament of knee'],
+    mekanisme:
+      'The medial collateral ligament is extra-articular with a broad attachment and good blood supply, so it heals ' +
+      'well with protected motion — the opposite of the ACL. Its deep fibres blend with the medial meniscus, which is ' +
+      'why the two are injured together and why medial joint-line pain persists after the ligament itself has healed.',
+    temuan: [
+      'Medial knee pain after a valgus force, tenderness over the ligament rather than the joint line',
+      'Laxity on valgus stress at 30° of flexion; laxity in full extension implies a more serious injury',
+    ],
+    penunjang: ['Clinical grading is usually enough; MRI for suspected combined injury or persistent instability'],
+    tata: [
+      'Hinged brace and early protected motion — most heal without surgery',
+      'Assess for associated ACL and meniscal injury before accepting a simple diagnosis',
+    ],
+    organKey: 'skeleton',
+    skdi: ['Trauma sendi', 'Dislokasi pada sendi ekstremitas'],
+  },
+  {
+    id: 'tendinopati-patella',
+    module: 'lutut',
+    label: 'Patellar tendinopathy',
+    ringkas: 'Jumper\'s knee: pain at the bottom of the kneecap that warms up and then returns after activity.',
+    lesi: [
+      { struktur: 'Left patellar ligament', jenis: 'incompetence', catatan: 'Degenerative tendinopathy at the deep posterior fibres of the proximal insertion.' },
+    ],
+    hilir: ['Left patella', 'Left tendon of quadriceps femoris', 'Left rectus femoris'],
+    mekanisme:
+      'This is degeneration rather than inflammation: collagen disorganisation, neovascularisation and ingrowth of ' +
+      'sensory nerves, driven by repeated energy-storage loading in jumping. Because there is little inflammation, ' +
+      'anti-inflammatory drugs and corticosteroid injection give short relief and may weaken the tendon, while progressive loading — which remodels the collagen — is what actually works.',
+    temuan: [
+      'Well-localised pain at the inferior pole of the patella, worse with jumping and decelerating',
+      'Pain that warms up during activity and is worst the morning after — the tendinopathy pattern',
+    ],
+    penunjang: ['Clinical diagnosis; ultrasound or MRI only when the picture is atypical or surgery is considered'],
+    tata: [
+      'Progressive loading: isometric for pain, then heavy slow resistance and energy-storage work',
+      'Modify training load rather than resting completely; avoid corticosteroid injection into the tendon',
+    ],
+    organKey: 'skeleton',
+    skdi: ['Tendinitis Achilles', 'Trauma sendi'],
+  },
+  {
+    id: 'ca-payudara',
+    module: 'payudara',
+    label: 'Breast carcinoma',
+    ringkas: 'A hard, painless lump that does not move — and the commonest cancer in women.',
+    lesi: [
+      { struktur: 'Left mammary lobes', jenis: 'occlusion', catatan: 'Invasive carcinoma arising in the terminal duct lobular unit.' },
+      { struktur: 'Left main lactiferous ducts', jenis: 'occlusion', catatan: 'Ductal carcinoma in situ spreading along the duct system before invading.' },
+    ],
+    // Lemak payudara SENGAJA tidak disorot: ia membungkus lobus dan duktus,
+    // dan menyorotnya sebagai struktur pekat justru menyembunyikan tumor yang
+    // sedang ditunjuk. Yang ditarik tumor adalah ligamen suspensorium dan
+    // puting — itu pula yang terlihat sebagai lesung kulit dan puting tertarik.
+    hilir: ['Left nipple', 'Left suspensory ligaments', 'Left areola'],
+    mekanisme:
+      'Almost all breast cancer begins in the terminal duct lobular unit. Its spread explains every classic sign: ' +
+      'tethering of Cooper\'s suspensory ligaments dimples the skin, lymphatic obstruction gives peau d\'orange, and ' +
+      'ductal involvement retracts the nipple. Receptor status — ER, PR and HER2 — defines the biology far better than ' +
+      'size does, which is why the biopsy, not the lump, determines the treatment.',
+    temuan: [
+      'Hard, irregular, fixed painless lump; skin dimpling, nipple retraction, peau d\'orange',
+      'Bloody single-duct nipple discharge; eczema of the nipple suggests Paget disease',
+      'Axillary nodes; the breast of a man is not exempt',
+    ],
+    penunjang: ['Triple assessment: examination, imaging (ultrasound under 40, mammography over 40) and core biopsy', 'Staging by receptor status; CT and bone scan when locally advanced'],
+    tata: [
+      'Surgery (breast-conserving with radiotherapy, or mastectomy) with axillary staging by sentinel node',
+      'Systemic therapy guided by receptors: endocrine therapy, anti-HER2 therapy, chemotherapy',
+      'Screening and genetic assessment for high-risk families',
+    ],
+    organKey: 'breast',
+    skdi: ['Karsinoma payudara', 'Penyakit Paget', 'Tumor Filoides'],
+  },
+  {
+    id: 'fam',
+    module: 'payudara',
+    label: 'Fibroadenoma',
+    ringkas: 'A smooth, firm lump that slips under the fingers — the commonest breast lump in young women.',
+    lesi: [
+      { struktur: 'Right mammary lobes', jenis: 'dilatation', catatan: 'Benign proliferation of both stromal and epithelial elements of a lobule.' },
+    ],
+    hilir: ['Right main lactiferous ducts', 'Right nipple'],
+    mekanisme:
+      'A fibroadenoma is a hormone-responsive overgrowth of one lobule with no invasion, so it stays encapsulated, ' +
+      'mobile and painless — the "breast mouse". It grows in pregnancy and involutes after the menopause, which is ' +
+      'itself reassuring. A phyllodes tumour looks similar but grows rapidly and can recur or metastasise, so rapid enlargement changes the diagnosis and the operation.',
+    temuan: [
+      'Smooth, firm, highly mobile, painless lump in a woman under 30',
+      'Rapid growth or size over 4 cm raises the possibility of a phyllodes tumour',
+    ],
+    penunjang: ['Ultrasound with core biopsy where indicated; triple assessment for any discrete lump'],
+    tata: [
+      'Reassurance and observation once benign histology is confirmed',
+      'Excision for large, growing, symptomatic lesions or patient preference',
+    ],
+    organKey: 'breast',
+    skdi: ['Fibroadenoma mammae (FAM)', 'Fibrokista', 'Tumor Filoides'],
+  },
+  {
+    id: 'mastitis',
+    module: 'payudara',
+    label: 'Lactational mastitis and breast abscess',
+    ringkas: 'A hot, red, painful wedge of breast in a feeding mother — keep feeding, and treat early.',
+    lesi: [
+      { struktur: 'Left mammary lobes', jenis: 'occlusion', catatan: 'Milk stasis in a segment, then bacterial infection through a cracked nipple.' },
+      { struktur: 'Left main lactiferous ducts', jenis: 'occlusion', catatan: 'Blocked duct is the starting point, not a separate disease.' },
+    ],
+    hilir: ['Left nipple', 'Left areola'],
+    mekanisme:
+      'Milk stasis comes first: a poorly drained segment raises intraductal pressure, milk leaks into surrounding ' +
+      'tissue and inflames it, and Staphylococcus entering through a nipple fissure then infects it. That sequence is ' +
+      'the reason continued effective drainage is treatment rather than a risk — stopping feeding worsens stasis and converts mastitis into an abscess.',
+    temuan: [
+      'Wedge-shaped area of redness, heat and pain with fever and flu-like symptoms in a breastfeeding woman',
+      'A fluctuant mass or failure to improve in 48 hours suggests abscess',
+      'Non-lactational mastitis in a smoker suggests periductal mastitis; inflammatory carcinoma mimics all of it',
+    ],
+    penunjang: ['Clinical; ultrasound if abscess suspected; milk culture in severe, recurrent or hospital-acquired cases'],
+    tata: [
+      'Continue breastfeeding or expressing from the affected side, effective attachment, analgesia',
+      'Antistaphylococcal antibiotics if not improving within 12–24 hours or systemically unwell',
+      'Ultrasound-guided aspiration for abscess; consider carcinoma if it does not resolve',
+    ],
+    organKey: 'breast',
+    skdi: ['Mastitis', 'Cracked nipple', 'Inflamasi, abses'],
+  },
+  {
+    id: 'fibrokista',
+    module: 'payudara',
+    label: 'Fibrocystic change and duct ectasia',
+    ringkas: 'Lumpy, tender breasts that change with the cycle — common, benign, and worth explaining properly.',
+    lesi: [
+      { struktur: 'Right main lactiferous sinuses', jenis: 'dilatation', catatan: 'Dilated subareolar ducts with inspissated secretion in duct ectasia.' },
+      { struktur: 'Right mammary lobes', jenis: 'dilatation', catatan: 'Cyst formation and stromal fibrosis with hormonal cycling.' },
+    ],
+    hilir: ['Right nipple', 'Right areola'],
+    mekanisme:
+      'Cyclical oestrogen and progesterone drive proliferation and involution of the lobules; when the two get out of ' +
+      'step, cysts and fibrosis accumulate. Duct ectasia is an involutional change of the large subareolar ducts, so ' +
+      'its discharge is typically green or creamy and from multiple ducts — quite unlike the single-duct bloody discharge that demands investigation for carcinoma.',
+    temuan: [
+      'Bilateral lumpy tenderness worse premenstrually; discrete smooth cysts that may be tender',
+      'Green or creamy multi-duct nipple discharge with slit-like nipple retraction in duct ectasia',
+      'Any discrete new lump still needs triple assessment — "fibrocystic" is not a diagnosis made by reassurance',
+    ],
+    penunjang: ['Ultrasound; aspiration of a symptomatic cyst is both diagnostic and therapeutic', 'Investigate bloody or single-duct discharge properly'],
+    tata: [
+      'Explanation, good support bra, simple analgesia; aspirate symptomatic cysts',
+      'Stop smoking in periductal mastitis; surgery only for persistent troublesome discharge',
+    ],
+    organKey: 'breast',
+    skdi: ['Fibrokista', 'Inverted nipple', 'Fibroadenoma mammae (FAM)'],
+  },
+  {
+    id: 'cedera-medula',
+    module: 'medula-spinalis',
+    label: 'Traumatic spinal cord injury',
+    ringkas: 'The level of the damage decides what still works — and what is lost below it.',
+    lesi: [
+      { struktur: 'C5 segment of cervical spinal cord', jenis: 'occlusion', catatan: 'A cervical injury at C5 leaves elbow flexion but not extension; below C4 spontaneous breathing is preserved.' },
+    ],
+    hilir: ['C6 segment of cervical spinal cord', 'C7 segment of cervical spinal cord', 'First thoracic spinal cord segment'],
+    mekanisme:
+      'Primary mechanical damage is followed over hours by a secondary injury of oedema, ischaemia and excitotoxicity ' +
+      'that spreads above and below the level — which is why immobilisation and perfusion matter in the first hours. ' +
+      'Injuries above T6 also disconnect sympathetic outflow: neurogenic shock gives hypotension with bradycardia, the ' +
+      'opposite of haemorrhagic shock, and later the same disconnection produces autonomic dysreflexia.',
+    temuan: [
+      'Motor and sensory level with sphincter involvement; ASIA examination defines level and completeness',
+      'Neurogenic shock: hypotension with bradycardia and warm peripheries above T6',
+      'Sacral sparing distinguishes incomplete from complete injury and changes the prognosis',
+    ],
+    penunjang: ['CT for bony injury and MRI for cord and ligamentous injury; serial ASIA charting'],
+    tata: [
+      'Immobilise, maintain oxygenation and mean arterial pressure, refer to a spinal injuries unit',
+      'Early surgical decompression and stabilisation where indicated; prevent pressure injury, VTE and bladder complications',
+      'Rehabilitation from day one — the level determines the achievable function',
+    ],
+    organKey: 'spinal-cord',
+    skdi: ['Trauma Medula Spinalis', 'Complete spinal transaction', 'Acute medulla compression'],
+  },
+  {
+    id: 'kauda-equina',
+    module: 'medula-spinalis',
+    label: 'Cauda equina syndrome',
+    ringkas: 'Compression of the nerve roots below the cord: saddle numbness and bladder failure — operate within hours.',
+    lesi: [
+      { struktur: 'First sacral spinal cord segment', jenis: 'occlusion', catatan: 'The S2–S4 roots carrying bladder, bowel and perineal function are compressed below the conus.' },
+      { struktur: 'Second sacral spinal cord segment', jenis: 'occlusion', catatan: 'Sacral root compression is what makes this an emergency rather than sciatica.' },
+    ],
+    hilir: ['Third sacral spinal cord segment', 'Fourth sacral spinal cord segment', 'Fifth lumbar spinal cord segment'],
+    mekanisme:
+      'The cord ends at about L1–L2; below that the canal contains the lumbosacral roots. Compression there produces a ' +
+      'lower motor neurone picture — flaccid, areflexic — rather than the spasticity of cord compression. The sacral ' +
+      'roots have the least reserve, so painless urinary retention with overflow appears early, and once it is established recovery of continence is often incomplete: the surgery is timed in hours, not days.',
+    temuan: [
+      'Bilateral sciatica, saddle anaesthesia, painless retention with overflow incontinence, loss of anal tone',
+      'Ask every back pain patient about bladder function and perineal sensation — this is how it is missed',
+    ],
+    penunjang: ['Emergency MRI of the whole lumbosacral spine; post-void bladder scan while arranging it'],
+    tata: [
+      'Immediate surgical decompression — delay converts a recoverable deficit into a permanent one',
+      'Catheterise, document the neurology carefully, and transfer to a spinal service without waiting for the morning',
+    ],
+    organKey: 'spinal-cord',
+    skdi: ['Sindrom kauda equine', 'Hernia nucleus pulposus (HNP)', 'Neurogenic bladder'],
+  },
+  {
+    id: 'mielitis',
+    module: 'medula-spinalis',
+    label: 'Transverse myelitis',
+    ringkas: 'Inflammation across one level of the cord: weakness, a sensory level, and bladder failure over days.',
+    lesi: [
+      { struktur: 'Fifth thoracic spinal cord segment', jenis: 'occlusion', catatan: 'Inflammatory demyelination across the cord, commonly mid-thoracic.' },
+    ],
+    hilir: ['Sixth thoracic spinal cord segment', 'Seventh thoracic spinal cord segment', 'First lumbar spinal cord segment'],
+    mekanisme:
+      'Inflammation interrupts every long tract crossing that level, so motor, sensory and autonomic function are all ' +
+      'lost below it — hence a crisp sensory level, which is the sign that localises the lesion to the cord rather ' +
+      'than to nerve or brain. Spinal shock makes the limbs flaccid and areflexic at first, and only later do they become spastic with upgoing plantars, which misleads if the patient is seen early.',
+    temuan: [
+      'Bilateral weakness and numbness with a sensory level developing over hours to days, plus bladder dysfunction',
+      'Back pain at the level; ask about preceding infection, vaccination or known demyelinating disease',
+    ],
+    penunjang: ['Urgent MRI of the whole spine with contrast to exclude compression FIRST — that is surgical', 'Lumbar puncture, aquaporin-4 and MOG antibodies, and screening for infection and autoimmunity'],
+    tata: [
+      'Exclude compression, then high-dose intravenous corticosteroid; plasma exchange if no response',
+      'Treat the underlying cause; early rehabilitation, bladder care and pressure-area management',
+    ],
+    organKey: 'spinal-cord',
+    skdi: ['Mielopati', 'Sklerosis multipel', 'Trauma Medula Spinalis'],
+  },
+  {
+    id: 'siringomielia',
+    module: 'medula-spinalis',
+    label: 'Syringomyelia',
+    ringkas: 'A fluid cavity forms inside the cord and destroys the fibres crossing it — pain and temperature go, touch stays.',
+    lesi: [
+      { struktur: 'C7 segment of cervical spinal cord', jenis: 'dilatation', catatan: 'Expanding central cavity in the lower cervical cord.' },
+      { struktur: 'C8 segment of cervical spinal cord', jenis: 'dilatation', catatan: 'The syrinx typically spans several segments.' },
+    ],
+    hilir: ['First thoracic spinal cord segment', 'C6 segment of cervical spinal cord'],
+    mekanisme:
+      'The cavity begins centrally and first interrupts the spinothalamic fibres decussating in the anterior white ' +
+      'commissure, while the dorsal columns run posteriorly and are spared. That anatomy produces the ' +
+      'dissociated sensory loss in a cape distribution — no pain or temperature, preserved light touch and ' +
+      'proprioception — and explains painless burns to the hands as a presenting complaint.',
+    temuan: [
+      'Cape-like loss of pain and temperature with preserved touch; painless burns and injuries',
+      'Wasting and weakness of the small hand muscles; later spasticity in the legs and scoliosis',
+      'Associated Chiari malformation in most cases',
+    ],
+    penunjang: ['MRI of the whole neuraxis, including the craniocervical junction to look for Chiari malformation'],
+    tata: [
+      'Treat the cause — foramen magnum decompression for Chiari-associated syrinx',
+      'Shunting for progressive symptomatic cavities; protect insensate skin and monitor neurologically',
+    ],
+    organKey: 'spinal-cord',
+    skdi: ['Siringomielia', 'Mielopati'],
+  },
 ]
 
 /** Semua struktur yang disebut satu keadaan, lesi maupun hilirnya. */
