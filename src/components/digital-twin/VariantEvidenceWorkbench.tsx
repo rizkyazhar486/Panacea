@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { lazy, Suspense, useEffect, useMemo, useState } from 'react'
 import type { GenomeAssemblyHint, VcfVariantRecord } from '../../lib/sequenceEvidence'
 import {
   annotateVariantsWithVep,
@@ -17,6 +17,10 @@ import {
   type ClinVarSummary,
   type CpicGeneDrugPair,
 } from '../../lib/clinicalVariantEvidence'
+
+const CivicSomaticEvidencePanel = lazy(() =>
+  import('./CivicSomaticEvidencePanel').then((module) => ({ default: module.CivicSomaticEvidencePanel })),
+)
 
 type Props = {
   variants: VcfVariantRecord[]
@@ -155,7 +159,7 @@ export function VariantEvidenceWorkbench({ variants, assemblyHint = 'unknown', r
           <div className="max-w-4xl">
             <div className="text-[9px] font-black uppercase tracking-[.18em] text-violet-700 dark:text-violet-300">VCF → Ensembl VEP</div>
             <h3 className="mt-1 text-xl font-black tracking-tight text-neutral-950 dark:text-white">Annotate variants that actually exist in the loaded VCF.</h3>
-            <p className="mt-1 text-[10px] leading-relaxed text-neutral-500 dark:text-neutral-400">Nothing is sent automatically. After explicit consent, Panacea sends only selected VCF locus/ref/alt records to Ensembl VEP. Returned consequence, transcript, population-frequency and colocated-variant metadata stay source-labelled. This does not perform variant calling or ACMG classification.</p>
+            <p className="mt-1 text-[10px] leading-relaxed text-neutral-500 dark:text-neutral-400">Nothing is sent automatically. After explicit consent, Panacea sends only selected small-variant VCF locus/ref/alt records to Ensembl VEP. Structural/CNV alleles are routed to the local SV workbench. Returned consequence, transcript, population-frequency and colocated-variant metadata stay source-labelled. This does not perform variant calling or ACMG classification.</p>
           </div>
           <div className="flex flex-wrap gap-1.5 text-[8px] font-black uppercase tracking-[.12em] text-neutral-500 dark:text-neutral-300">
             {['Ensembl REST', 'VEP', 'gnomAD/1000G metadata', 'explicit consent'].map((item) => <span key={item} className="rounded-full border border-neutral-200 bg-neutral-50 px-2.5 py-1.5 dark:border-white/10 dark:bg-white/[.04]">{item}</span>)}
@@ -203,7 +207,7 @@ export function VariantEvidenceWorkbench({ variants, assemblyHint = 'unknown', r
         <div className="space-y-4 p-4 sm:p-5">
           <div className="flex flex-wrap gap-2">
             <span className="rounded-full bg-violet-100 px-3 py-1.5 text-[8px] font-black uppercase text-violet-800 dark:bg-violet-300/10 dark:text-violet-200">{results.length} annotated · {assembly}</span>
-            {skipped > 0 && <span className="rounded-full bg-amber-100 px-3 py-1.5 text-[8px] font-black uppercase text-amber-800 dark:bg-amber-300/10 dark:text-amber-200">{skipped} unsupported skipped</span>}
+            {skipped > 0 && <span className="rounded-full bg-amber-100 px-3 py-1.5 text-[8px] font-black uppercase text-amber-800 dark:bg-amber-300/10 dark:text-amber-200">{skipped} structural/unsupported routed away</span>}
             {consequenceCounts.map(([term, count]) => <span key={term} className="rounded-full border border-neutral-200 px-3 py-1.5 text-[8px] font-bold text-neutral-500 dark:border-white/10 dark:text-neutral-300">{prettyTerm(term)} · {count}</span>)}
           </div>
 
@@ -327,7 +331,11 @@ export function VariantEvidenceWorkbench({ variants, assemblyHint = 'unknown', r
             )}
           </section>
 
-          <div className="rounded-2xl border border-neutral-200 bg-neutral-50 p-3 text-[9px] leading-relaxed text-neutral-600 dark:border-white/10 dark:bg-white/[.025] dark:text-neutral-300"><b>Interpretation boundary:</b> VEP consequence terms are predicted genomic/transcript consequences. Population frequencies are descriptive. ClinVar classifications are external aggregate database assertions with review status and condition context. CPIC gene–drug pairs indicate guideline relevance, not an inferred patient phenotype or prescription. Panacea does not convert these layers into pathogenic/benign classification, treatment selection, or diagnosis.</div>
+          <Suspense fallback={<div className="rounded-[28px] border border-neutral-200 p-6 text-center text-[10px] font-semibold text-neutral-500 dark:border-white/10">Loading CIViC cancer-evidence tools…</div>}>
+            <CivicSomaticEvidencePanel results={results} />
+          </Suspense>
+
+          <div className="rounded-2xl border border-neutral-200 bg-neutral-50 p-3 text-[9px] leading-relaxed text-neutral-600 dark:border-white/10 dark:bg-white/[.025] dark:text-neutral-300"><b>Interpretation boundary:</b> VEP consequence terms are predicted genomic/transcript consequences. Population frequencies are descriptive. ClinVar classifications are external aggregate database assertions with review status and condition context. CPIC gene–drug pairs indicate guideline relevance, not an inferred patient phenotype or prescription. CIViC evidence is curated cancer evidence tied to molecular profiles and study context. Panacea does not convert these layers into pathogenic/benign classification, treatment selection, or diagnosis.</div>
         </div>
       )}
     </section>
