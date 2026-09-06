@@ -5,6 +5,7 @@ import { PapanWidget } from '../components/PapanWidget'
 import { KisiFitur } from '../components/KisiFitur'
 import { CatatanHarian } from '../components/CatatanHarian'
 import { CatatanLatihan } from '../components/CatatanLatihan'
+import { HomeFeatureUniverse } from '../components/dashboard/HomeFeatureUniverse'
 import { pratinjauBeranda } from '../lib/pratinjauBeranda'
 import { getVitals } from '../lib/healthVitals'
 import { getWorkouts } from '../lib/workoutStore'
@@ -26,7 +27,7 @@ const PINTASAN = [
   { to: '/recovery', emoji: '🌙', label: 'Recovery', tone: 'bg-indigo-100 text-indigo-800 dark:bg-indigo-500/15 dark:text-indigo-200' },
   { to: '/planning', emoji: '🗓️', label: 'Plan', tone: 'bg-sky-100 text-sky-800 dark:bg-sky-500/15 dark:text-sky-200' },
   { to: '/keuangan', emoji: '💰', label: 'Money', tone: 'bg-lime-100 text-lime-800 dark:bg-lime-500/15 dark:text-lime-200' },
-  { to: '/med-study', emoji: '📚', label: 'Study', tone: 'bg-violet-100 text-violet-800 dark:bg-violet-500/15 dark:text-violet-200' },
+  { to: '/learn', emoji: '📚', label: 'Life', tone: 'bg-violet-100 text-violet-800 dark:bg-violet-500/15 dark:text-violet-200' },
   { to: '/community', emoji: '👥', label: 'People', tone: 'bg-fuchsia-100 text-fuchsia-800 dark:bg-fuchsia-500/15 dark:text-fuchsia-200' },
   { to: '/body-explorer', emoji: '🫀', label: '3D Body', tone: 'bg-cyan-100 text-cyan-800 dark:bg-cyan-500/15 dark:text-cyan-200' },
   { to: '/chatbot', emoji: '✨', label: 'Ask', tone: 'bg-orange-100 text-orange-800 dark:bg-orange-500/15 dark:text-orange-200' },
@@ -95,7 +96,6 @@ export default function Beranda() {
 
   return (
     <main className="mx-auto w-full max-w-4xl space-y-6 pb-24">
-      {/* Compact old-style top panel: useful information, not a showcase. */}
       <section className="overflow-hidden rounded-[28px] border border-emerald-200/60 bg-gradient-to-br from-emerald-50 via-white to-sky-50 p-4 shadow-[0_18px_45px_rgba(15,80,60,.08)] dark:border-white/10 dark:from-emerald-500/12 dark:via-[#0b1518] dark:to-sky-500/10 sm:p-5">
         <div className="flex items-center justify-between gap-3">
           <div className="min-w-0">
@@ -139,7 +139,6 @@ export default function Beranda() {
         )}
       </section>
 
-      {/* Old home behaviour: compact, colourful, swipeable launch shelf. */}
       <section>
         <div className="mb-2 flex items-center justify-between px-1">
           <h2 className="text-[13px] font-black text-neutral-900 dark:text-white">Quick access</h2>
@@ -155,12 +154,10 @@ export default function Beranda() {
         </div>
       </section>
 
-      {/* This is the original functional widget system. Tumpukan inside it is
-          horizontally swipeable and keeps the user's widget selection. */}
       <section className="rounded-[28px] border border-neutral-200 bg-white p-4 shadow-[0_12px_35px_rgba(25,45,55,.06)] dark:border-white/10 dark:bg-white/[.035] sm:p-5">
         <div className="mb-3 flex items-center justify-between gap-3">
           <div>
-            <div className="text-[10px] font-black uppercase tracking-[.14em] text-neutral-400">Widgets</div>
+            <div className="text-[10px] font-black uppercase tracking-[.14em] text-neutral-500 dark:text-neutral-400">Widgets</div>
             <h2 className="mt-1 text-[18px] font-black tracking-tight text-neutral-950 dark:text-white">My dashboard</h2>
           </div>
           <Link to="/atur-fitur" className="shrink-0 rounded-full bg-neutral-100 px-3 py-2 text-[10px] font-black text-neutral-700 dark:bg-white/10 dark:text-neutral-200">Customize</Link>
@@ -168,11 +165,12 @@ export default function Beranda() {
         <PapanWidget pratinjau={pratinjau} tanggalCatatan={tanggalCatatan} />
       </section>
 
-      {/* Logging remains functional, but is no longer allowed to dominate Home. */}
+      <HomeFeatureUniverse />
+
       <details className="group rounded-[26px] border border-neutral-200 bg-white p-4 dark:border-white/10 dark:bg-white/[.035]">
         <summary className="flex cursor-pointer list-none items-center justify-between gap-3">
           <div>
-            <div className="text-[10px] font-black uppercase tracking-[.14em] text-neutral-400">Today</div>
+            <div className="text-[10px] font-black uppercase tracking-[.14em] text-neutral-500 dark:text-neutral-400">Today</div>
             <div className="mt-1 text-[16px] font-black text-neutral-950 dark:text-white">Log my day or workout</div>
           </div>
           <span className="grid h-9 w-9 place-items-center rounded-full bg-neutral-100 text-lg text-neutral-700 transition group-open:rotate-45 dark:bg-white/10 dark:text-white">＋</span>
@@ -183,8 +181,6 @@ export default function Beranda() {
         </div>
       </details>
 
-      {/* Full catalog remains available without putting research/3D showcase
-          cards ahead of daily widgets. */}
       <KisiFitur />
     </main>
   )
