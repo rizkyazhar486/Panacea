@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react'
+import { MedicalEvidenceExplorer } from '../components/MedicalEvidenceExplorer'
 import {
   DEFAULT_TEACH_BACK,
   KNOWLEDGE_BRIDGE_MODULES,
@@ -13,10 +14,10 @@ function pct(value: number) {
 
 function Metric({ label, value, detail }: { label: string; value: string; detail: string }) {
   return (
-    <div className="rounded-2xl border border-neutral-200 bg-white p-3 dark:border-white/10 dark:bg-white/[0.04]">
-      <div className="text-[10px] font-bold uppercase tracking-[0.14em] text-neutral-400">{label}</div>
-      <div className="mt-1 text-xl font-black tabular-nums text-ink dark:text-white">{value}</div>
-      <div className="mt-1 text-[10.5px] leading-relaxed text-neutral-500">{detail}</div>
+    <div className="rounded-[20px] border border-neutral-200 bg-neutral-50 p-3 dark:border-white/10 dark:bg-white/[.035]">
+      <div className="text-[9px] font-black uppercase tracking-[.13em] text-neutral-400">{label}</div>
+      <div className="mt-1 text-xl font-black tabular-nums text-neutral-950 dark:text-white">{value}</div>
+      <div className="mt-1 text-[10px] leading-relaxed text-neutral-500 dark:text-neutral-400">{detail}</div>
     </div>
   )
 }
@@ -40,133 +41,94 @@ export function KnowledgeBridge() {
   }
 
   return (
-    <div className="mx-auto max-w-6xl space-y-5 p-4 md:p-6">
-      <section className="overflow-hidden rounded-3xl border border-neutral-200 bg-gradient-to-br from-neutral-950 via-neutral-900 to-emerald-950 p-5 text-white shadow-xl dark:border-white/10 md:p-7">
-        <div className="text-[10px] font-bold uppercase tracking-[0.2em] text-emerald-300">Panacea Knowledge Bridge</div>
-        <h1 className="mt-2 max-w-4xl text-2xl font-black leading-tight md:text-4xl">Make the medical conversation understandable without making it less precise.</h1>
-        <p className="mt-3 max-w-3xl text-sm leading-relaxed text-neutral-300">
-          One bridge between patient language, clinical language, evidence, choices, cost, consent and follow-up. The original source stays visible; simplification never becomes a new fact.
-        </p>
-        <div className="mt-4 grid gap-2 text-[11px] sm:grid-cols-3">
-          <div className="rounded-xl bg-white/10 p-3"><b className="block text-emerald-300">Patient side</b>Understand what happened, what matters, what to ask and what to do next.</div>
-          <div className="rounded-xl bg-white/10 p-3"><b className="block text-emerald-300">Clinician side</b>Receive a structured story, preference map and comprehension gaps instead of a blank slate.</div>
-          <div className="rounded-xl bg-white/10 p-3"><b className="block text-emerald-300">Trust layer</b>Every claim keeps provenance, uncertainty, time horizon and source context.</div>
-        </div>
+    <main className="mx-auto max-w-6xl space-y-4 pb-24">
+      <section className="rounded-[30px] border border-neutral-200 bg-neutral-950 p-5 text-white shadow-[0_24px_70px_rgba(20,25,30,.18)] dark:border-white/10 sm:p-7">
+        <div className="text-[9px] font-black uppercase tracking-[.2em] text-emerald-300">Panacea Knowledge Bridge</div>
+        <h1 className="mt-2 max-w-4xl text-3xl font-black tracking-[-.045em] sm:text-5xl">Start from a real source. Then explain it.</h1>
+        <p className="mt-3 max-w-3xl text-[12px] leading-relaxed text-white/60">This page now searches live biomedical sources instead of pretending that a static concept card is a knowledge engine. Search a disease, drug, anatomy term, procedure or physiology concept and inspect the underlying ontology, literature, clinical trials and FDA label data.</p>
       </section>
 
-      <section className="rounded-2xl border border-neutral-200 bg-white p-3 dark:border-white/10 dark:bg-white/[0.03]">
-        <div className="-mx-1 flex gap-1.5 overflow-x-auto px-1 pb-1">
+      <MedicalEvidenceExplorer
+        autoRun
+        initialQuery="hypertension"
+        title="Search the medical evidence layer"
+        subtitle="One query fans out to Europe PMC, EMBL-EBI Ontology Lookup Service, ClinicalTrials.gov and openFDA. Results keep their source identity and external link."
+      />
+
+      <section className="rounded-[28px] border border-neutral-200 bg-white p-4 shadow-sm dark:border-white/10 dark:bg-white/[.035] sm:p-5">
+        <div className="flex flex-wrap items-start justify-between gap-3">
+          <div>
+            <div className="text-[9px] font-black uppercase tracking-[.15em] text-neutral-400">Communication lens</div>
+            <h2 className="mt-1 text-[18px] font-black tracking-tight text-neutral-950 dark:text-white">What should happen after you find the source?</h2>
+          </div>
+          <div className="text-[9px] font-semibold text-neutral-400">These are workflow lenses, not simulated API outputs.</div>
+        </div>
+
+        <div className="no-scrollbar -mx-1 mt-3 flex gap-1.5 overflow-x-auto px-1 pb-1">
           {KNOWLEDGE_BRIDGE_MODULES.map((item) => (
-            <button
-              key={item.key}
-              type="button"
-              aria-pressed={active === item.key}
-              onClick={() => setActive(item.key)}
-              className={`shrink-0 rounded-full border px-3 py-2 text-[11px] font-bold transition ${active === item.key ? 'border-brand bg-brand text-white' : 'border-neutral-200 text-neutral-600 dark:border-white/10 dark:text-neutral-300'}`}
-            >
+            <button key={item.key} type="button" aria-pressed={active === item.key} onClick={() => setActive(item.key)} className={`shrink-0 rounded-full border px-3 py-2 text-[10px] font-black transition ${active === item.key ? 'border-neutral-950 bg-neutral-950 text-white dark:border-white dark:bg-white dark:text-neutral-950' : 'border-neutral-200 bg-neutral-50 text-neutral-600 dark:border-white/10 dark:bg-white/[.04] dark:text-neutral-300'}`}>
               {item.label}
             </button>
           ))}
         </div>
 
-        <div className="mt-3 grid gap-3 lg:grid-cols-[1fr_1fr]">
-          <div className="rounded-2xl bg-neutral-50 p-4 dark:bg-white/5">
-            <div className="text-[10px] font-bold uppercase tracking-wide text-brand">Why the patient needs it</div>
-            <p className="mt-1 text-sm leading-relaxed text-ink dark:text-white">{module.patientProblem}</p>
+        <div className="mt-3 grid gap-3 md:grid-cols-2">
+          <div className="rounded-[22px] bg-neutral-50 p-4 dark:bg-white/[.035]">
+            <div className="text-[9px] font-black uppercase tracking-[.12em] text-emerald-700 dark:text-emerald-300">Patient problem</div>
+            <p className="mt-2 text-[12px] leading-relaxed text-neutral-700 dark:text-neutral-200">{module.patientProblem}</p>
           </div>
-          <div className="rounded-2xl bg-neutral-50 p-4 dark:bg-white/5">
-            <div className="text-[10px] font-bold uppercase tracking-wide text-brand">Why the clinician needs it</div>
-            <p className="mt-1 text-sm leading-relaxed text-ink dark:text-white">{module.clinicianValue}</p>
+          <div className="rounded-[22px] bg-neutral-50 p-4 dark:bg-white/[.035]">
+            <div className="text-[9px] font-black uppercase tracking-[.12em] text-sky-700 dark:text-sky-300">Clinical value</div>
+            <p className="mt-2 text-[12px] leading-relaxed text-neutral-700 dark:text-neutral-200">{module.clinicianValue}</p>
           </div>
         </div>
 
-        <div className="mt-3 grid gap-3 lg:grid-cols-[1fr_1fr]">
-          <div className="rounded-2xl border border-neutral-200 p-4 dark:border-white/10">
-            <div className="text-[10px] font-bold uppercase tracking-wide text-neutral-500">Outputs</div>
-            <div className="mt-2 flex flex-wrap gap-1.5">
-              {module.outputs.map((output) => <span key={output} className="rounded-full bg-brand/10 px-2.5 py-1 text-[10.5px] font-bold text-brand">{output}</span>)}
-            </div>
-          </div>
-          <div className="rounded-2xl border border-amber-200 bg-amber-50 p-4 text-amber-950 dark:border-amber-500/20 dark:bg-amber-500/10 dark:text-amber-100">
-            <div className="text-[10px] font-bold uppercase tracking-wide">Truth boundary</div>
-            <p className="mt-1 text-xs leading-relaxed">{module.truthBoundary}</p>
-          </div>
-        </div>
+        <div className="mt-3 flex flex-wrap gap-1.5">{module.outputs.map((output) => <span key={output} className="rounded-full bg-neutral-100 px-2.5 py-1.5 text-[9px] font-black text-neutral-600 dark:bg-white/10 dark:text-neutral-300">{output}</span>)}</div>
+        <div className="mt-3 rounded-[20px] border border-amber-200 bg-amber-50 p-3 text-[10px] leading-relaxed text-amber-900 dark:border-amber-400/20 dark:bg-amber-400/10 dark:text-amber-100"><b>Truth boundary:</b> {module.truthBoundary}</div>
       </section>
 
-      <section className="grid gap-4 xl:grid-cols-[1.15fr_0.85fr]">
-        <div className="rounded-2xl border border-neutral-200 bg-white p-4 dark:border-white/10 dark:bg-white/[0.03]">
+      <section className="grid gap-4 xl:grid-cols-[1.15fr_.85fr]">
+        <div className="rounded-[28px] border border-neutral-200 bg-white p-4 shadow-sm dark:border-white/10 dark:bg-white/[.035] sm:p-5">
           <div className="flex flex-wrap items-end justify-between gap-2">
-            <div>
-              <div className="text-[10px] font-bold uppercase tracking-[0.14em] text-brand">Shared Decision Demo</div>
-              <h2 className="text-lg font-black text-ink dark:text-white">Absolute risk before relative-risk headlines</h2>
-            </div>
-            <span className="rounded-full bg-neutral-100 px-3 py-1 text-[10px] font-bold text-neutral-500 dark:bg-white/10">Teaching example · not treatment advice</span>
+            <div><div className="text-[9px] font-black uppercase tracking-[.14em] text-neutral-400">Working calculator</div><h2 className="mt-1 text-[18px] font-black text-neutral-950 dark:text-white">Absolute risk before relative-risk headlines</h2></div>
+            <span className="rounded-full bg-neutral-100 px-3 py-1.5 text-[9px] font-black text-neutral-500 dark:bg-white/10">Teaching calculation</span>
           </div>
 
           <div className="mt-4 grid gap-3 md:grid-cols-2">
-            <label className="rounded-xl bg-neutral-50 p-3 text-xs font-bold text-ink dark:bg-white/5 dark:text-white">
-              Event risk without option: {controlPct}%
-              <input className="mt-2 w-full accent-[var(--brand)]" type="range" min="1" max="80" value={controlPct} onChange={(e) => setControlPct(Number(e.target.value))} />
-            </label>
-            <label className="rounded-xl bg-neutral-50 p-3 text-xs font-bold text-ink dark:bg-white/5 dark:text-white">
-              Event risk with option: {treatmentPct}%
-              <input className="mt-2 w-full accent-[var(--brand)]" type="range" min="0" max="80" value={treatmentPct} onChange={(e) => setTreatmentPct(Number(e.target.value))} />
-            </label>
+            <label className="rounded-[20px] bg-neutral-50 p-3 text-[11px] font-black text-neutral-800 dark:bg-white/[.04] dark:text-white">Control event risk: {controlPct}%<input className="mt-3 w-full accent-emerald-600" type="range" min="1" max="80" value={controlPct} onChange={(e) => setControlPct(Number(e.target.value))} /></label>
+            <label className="rounded-[20px] bg-neutral-50 p-3 text-[11px] font-black text-neutral-800 dark:bg-white/[.04] dark:text-white">Treatment event risk: {treatmentPct}%<input className="mt-3 w-full accent-emerald-600" type="range" min="0" max="80" value={treatmentPct} onChange={(e) => setTreatmentPct(Number(e.target.value))} /></label>
           </div>
 
           <div className="mt-3 grid grid-cols-2 gap-2 lg:grid-cols-4">
             <Metric label="Absolute change" value={pct(risks.absoluteRiskReduction)} detail={`${risks.preventedPer1000} fewer events per 1,000 when positive`} />
-            <Metric label="Relative change" value={risks.relativeRiskReduction === null ? '—' : pct(risks.relativeRiskReduction)} detail="Can look large even when the absolute change is small" />
-            <Metric label="Natural frequency" value={`${risks.controlPer1000} → ${risks.treatmentPer1000}`} detail="Expected events per 1,000 in the source population" />
-            <Metric label="NNT" value={risks.nnt ? risks.nnt.toFixed(1) : '—'} detail="Only meaningful when ARR is positive and source assumptions apply" />
+            <Metric label="Relative change" value={risks.relativeRiskReduction === null ? '—' : pct(risks.relativeRiskReduction)} detail="Relative change must be read beside absolute change." />
+            <Metric label="Natural frequency" value={`${risks.controlPer1000} → ${risks.treatmentPer1000}`} detail="Expected events per 1,000 in the source population." />
+            <Metric label="NNT" value={risks.nnt ? risks.nnt.toFixed(1) : '—'} detail="Defined only when the absolute risk reduction is positive." />
           </div>
 
-          <div className="mt-3 rounded-xl bg-neutral-950 p-3 font-mono text-[11px] leading-relaxed text-neutral-200">
-            ARR = CER − EER = {pct(risks.controlRisk)} − {pct(risks.treatmentRisk)} = {pct(risks.absoluteRiskReduction)}<br />
-            RRR = ARR / CER{risks.relativeRiskReduction !== null ? ` = ${pct(risks.relativeRiskReduction)}` : ''}<br />
-            NNT = 1 / ARR{risks.nnt ? ` = ${risks.nnt.toFixed(1)}` : ' · undefined when no absolute benefit'}
-          </div>
+          <div className="mt-3 rounded-[20px] bg-neutral-950 p-3 font-mono text-[10px] leading-relaxed text-neutral-200">ARR = CER − EER = {pct(risks.controlRisk)} − {pct(risks.treatmentRisk)} = {pct(risks.absoluteRiskReduction)}<br />RRR = ARR / CER{risks.relativeRiskReduction !== null ? ` = ${pct(risks.relativeRiskReduction)}` : ''}<br />NNT = 1 / ARR{risks.nnt ? ` = ${risks.nnt.toFixed(1)}` : ' · undefined when no absolute benefit'}</div>
         </div>
 
-        <div className="rounded-2xl border border-neutral-200 bg-white p-4 dark:border-white/10 dark:bg-white/[0.03]">
-          <div className="text-[10px] font-bold uppercase tracking-[0.14em] text-brand">Teach-Back Loop</div>
-          <h2 className="text-lg font-black text-ink dark:text-white">Do not ask “Do you understand?”</h2>
-          <p className="mt-1 text-xs leading-relaxed text-neutral-500">Ask the person to reconstruct the plan. Misunderstanding becomes visible before they leave.</p>
+        <div className="rounded-[28px] border border-neutral-200 bg-white p-4 shadow-sm dark:border-white/10 dark:bg-white/[.035] sm:p-5">
+          <div className="text-[9px] font-black uppercase tracking-[.14em] text-neutral-400">Working comprehension loop</div>
+          <h2 className="mt-1 text-[18px] font-black text-neutral-950 dark:text-white">Teach-back checklist</h2>
+          <p className="mt-1 text-[10px] leading-relaxed text-neutral-500">Mark each concept only after the person can reconstruct it in their own words.</p>
           <div className="mt-3 space-y-2">
             {DEFAULT_TEACH_BACK.map((item) => (
-              <button key={item.id} type="button" onClick={() => toggleTeachBack(item.id)} className={`w-full rounded-xl border p-3 text-left transition ${teachBackDone.has(item.id) ? 'border-brand bg-brand/[0.05]' : 'border-neutral-200 dark:border-white/10'}`}>
-                <div className="flex gap-2"><span className={`mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full border text-[10px] font-black ${teachBackDone.has(item.id) ? 'border-brand bg-brand text-white' : 'border-neutral-300 text-neutral-400 dark:border-white/20'}`}>{teachBackDone.has(item.id) ? '✓' : '?'}</span><div><div className="text-xs font-bold text-ink dark:text-white">{item.prompt}</div><div className="mt-1 text-[10.5px] leading-relaxed text-neutral-500">{item.whyItMatters}</div></div></div>
+              <button key={item.id} type="button" onClick={() => toggleTeachBack(item.id)} className={`w-full rounded-[18px] border p-3 text-left transition ${teachBackDone.has(item.id) ? 'border-emerald-300 bg-emerald-50 dark:border-emerald-400/25 dark:bg-emerald-400/10' : 'border-neutral-200 bg-neutral-50 dark:border-white/10 dark:bg-white/[.03]'}`}>
+                <div className="flex gap-2"><span className={`mt-0.5 grid h-5 w-5 shrink-0 place-items-center rounded-full text-[9px] font-black ${teachBackDone.has(item.id) ? 'bg-emerald-600 text-white' : 'border border-neutral-300 text-neutral-400 dark:border-white/20'}`}>{teachBackDone.has(item.id) ? '✓' : '?'}</span><div><div className="text-[11px] font-black text-neutral-900 dark:text-white">{item.prompt}</div><div className="mt-1 text-[9px] leading-relaxed text-neutral-500">{item.whyItMatters}</div></div></div>
               </button>
             ))}
           </div>
-          <div className="mt-3 text-xs font-bold text-brand">{teachBackDone.size}/{DEFAULT_TEACH_BACK.length} concepts checked</div>
+          <div className="mt-3 text-[10px] font-black text-emerald-700 dark:text-emerald-300">{teachBackDone.size}/{DEFAULT_TEACH_BACK.length} checked</div>
         </div>
       </section>
 
-      <section className="rounded-2xl border border-neutral-200 bg-white p-4 dark:border-white/10 dark:bg-white/[0.03]">
-        <div className="text-[10px] font-bold uppercase tracking-[0.14em] text-brand">System-level integrations to build next</div>
-        <div className="mt-3 grid gap-2 md:grid-cols-2 xl:grid-cols-4">
-          {[
-            ['Record translator', 'EMR/FHIR note → original text + patient explanation + glossary + questions.'],
-            ['Imaging bridge', 'Radiology report → annotated anatomy → plain explanation → original images/report provenance.'],
-            ['Medication bridge', 'Prescription → why/how/monitoring/interactions/cost alternatives with source dates.'],
-            ['Care graph', 'Referral → labs → imaging → specialist → procedure → pharmacy → home follow-up as one visible path.'],
-            ['Visit packet', 'Symptoms + timeline + wearable/lab data → concise pre-visit brief and must-ask questions.'],
-            ['Consent replay', 'Procedure risks/benefits/alternatives → visual simulation + teach-back checkpoint.'],
-            ['Second-opinion export', 'One provenance-preserving packet containing reports, images, pathology, genomics and open questions.'],
-            ['Language/culture layer', 'Medical meaning preserved across language, literacy level and culturally different ways of describing symptoms.'],
-          ].map(([title, text]) => <div key={title} className="rounded-xl bg-neutral-50 p-3 dark:bg-white/5"><div className="text-xs font-black text-ink dark:text-white">{title}</div><p className="mt-1 text-[10.5px] leading-relaxed text-neutral-500">{text}</p></div>)}
-        </div>
-      </section>
-
-      <section className="rounded-2xl border border-neutral-200 bg-white p-4 dark:border-white/10 dark:bg-white/[0.03]">
-        <div className="text-[10px] font-bold uppercase tracking-[0.14em] text-neutral-500">Non-negotiable truth rules</div>
-        <div className="mt-2 grid gap-2 md:grid-cols-2">
-          {KNOWLEDGE_BRIDGE_TRUTH_RULES.map((rule, index) => <div key={rule} className="flex gap-2 rounded-xl bg-neutral-50 p-3 text-[11px] leading-relaxed text-neutral-600 dark:bg-white/5 dark:text-neutral-300"><span className="font-black text-brand">{index + 1}</span><span>{rule}</span></div>)}
-        </div>
-      </section>
-    </div>
+      <details className="rounded-[24px] border border-neutral-200 bg-white p-4 dark:border-white/10 dark:bg-white/[.035]">
+        <summary className="cursor-pointer text-[11px] font-black text-neutral-700 dark:text-neutral-200">Source and truth rules</summary>
+        <div className="mt-3 grid gap-2 md:grid-cols-2">{KNOWLEDGE_BRIDGE_TRUTH_RULES.map((rule, index) => <div key={rule} className="flex gap-2 rounded-[18px] bg-neutral-50 p-3 text-[10px] leading-relaxed text-neutral-600 dark:bg-white/[.035] dark:text-neutral-300"><span className="font-black text-emerald-700 dark:text-emerald-300">{index + 1}</span><span>{rule}</span></div>)}</div>
+      </details>
+    </main>
   )
 }
 

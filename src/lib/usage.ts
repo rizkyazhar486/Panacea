@@ -3,14 +3,23 @@
 // localStorage (no server, no PII).
 const KEY = 'pmd-usage-v1'
 
-type Counts = Record<string, number>
+export type UsageCounts = Record<string, number>
 
-function read(): Counts {
+function read(): UsageCounts {
   try {
-    return JSON.parse(localStorage.getItem(KEY) || '{}') as Counts
+    return JSON.parse(localStorage.getItem(KEY) || '{}') as UsageCounts
   } catch {
     return {}
   }
+}
+
+/**
+ * Read-only snapshot for privacy-safe local product features such as the Human
+ * Passport. This never uploads route history; callers receive only the counts
+ * already stored on this device.
+ */
+export function getUsageCounts(): UsageCounts {
+  return { ...read() }
 }
 
 export function trackVisit(path: string) {

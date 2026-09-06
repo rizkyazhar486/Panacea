@@ -5,475 +5,190 @@ import { PapanWidget } from '../components/PapanWidget'
 import { KisiFitur } from '../components/KisiFitur'
 import { CatatanHarian } from '../components/CatatanHarian'
 import { CatatanLatihan } from '../components/CatatanLatihan'
+import { PanaceaGrowthRail } from '../components/dashboard/PanaceaGrowthWidgets'
+import { PanaceaUtilityShelf } from '../components/dashboard/PanaceaUtilityShelf'
+import { DeferredBodyExposureWidget, DeferredHomeFeatureUniverse, DeferredPanaceaLearningRail } from '../components/dashboard/DeferredHomeSections'
 import { pratinjauBeranda } from '../lib/pratinjauBeranda'
-import { deretMetrik } from '../lib/riwayatVitals'
 import { getVitals } from '../lib/healthVitals'
 import { getWorkouts } from '../lib/workoutStore'
-import { statusSingkat } from '../lib/pelatih'
-import '../styles/metal.css'
-import { hrMaxFromAge } from '../lib/workoutImport'
 import { ageFromDob } from '../lib/anthro'
-import { ambilTujuan, modeAwam } from '../lib/tujuan'
-import {
-  LogoLatihan, LogoGizi, LogoTidur, LogoTubuh, LogoPenyakit, LogoTindakan,
-  LogoKalkulator, LogoObat, LogoDarurat, LogoIbadah, LogoKabar, LogoSemua, LogoPanduan,
-} from '../components/LogoFitur'
 
 /**
- * Dasbor: piramida terbalik, dibaca Z lalu F.
+ * Home klasik Panacea.
  *
- * PIRAMIDA TERBALIK. Yang paling menentukan keputusan ada paling atas, dan
- * seterusnya menurun: angka hari ini -> tindakan berikutnya -> pintu fitur ->
- * pelengkap. Orang yang berhenti membaca setelah satu layar tetap memperoleh
- * bagian yang paling berguna.
- *
- * Z DI ATAS, F DI BAWAH — dua pola, karena bentuk isinya memang dua macam.
- * Bagian atas berupa panel lebar, dan mata menyapunya menyilang: kiri-atas
- * (siapa saya) -> kanan-atas (aksi utama) -> kiri-bawah (angka) -> kanan-bawah
- * (kesimpulan). Bagian bawah berupa daftar kisi, dan daftar dibaca menurun
- * dengan sapuan pendek ke kanan di tiap barisnya — karena itu judul kelompok
- * ditaruh rata kiri dan label lambang dijaga pendek.
- *
- * JARAK. Permintaannya 6 px antar-elemen dan 8 px antar-grup. Yang pertama
- * dipakai apa adanya; yang kedua tidak bisa. Pengelompokan visual bekerja lewat
- * PERBEDAAN jarak, dan 8/6 hanya 1,33x — pada layar 390 px selisihnya 2 px,
- * setara 0,5% lebar layar, sehingga kelompok berhenti terbaca sebagai kelompok
- * dan seluruh halaman kembali menjadi satu daftar rapat. Sistem desain yang
- * mapan memakai 2,5x-3x (Material 8/24, Apple 8/20). Di sini: 6 px di dalam
- * widget, 24 px antar-grup — 4x, dan hierarkinya terbaca.
- *
- * FLUID. Angka-angka di atas adalah BATAS BAWAHNYA, bukan nilai matinya.
- * Seluruh ukuran halaman ini — huruf, jarak, wadah, ubin lambang, jumlah kolom
- * — mengalir mengikuti lebar wadahnya lewat clamp() dan satuan cqw; lihat
- * "MODEL FLUID" di index.css. Yang berubah bukan sekadar nilainya melainkan
- * modelnya: sebelumnya sebuah ukuran hanya benar tepat di lebar yang diuji dan
- * meleset di antaranya, karena ditetapkan sebagai angka mati padahal yang
- * menentukan keterbacaan adalah perbandingannya terhadap ruang yang ada.
- *
- * Tidak ada satu pun titik patah yang ditulis di berkas ini. Kisi empat kolom
- * pada telepon terbentuk dengan sendirinya dari lebar ubin, dan menambah kolom
- * sendiri pada layar yang lebih lega.
+ * Home adalah dashboard, bukan halaman showcase. Konten 3D, anatomy research,
+ * explanation depth, dan pengalaman signature tetap hidup di halaman mereka
+ * sendiri; di sini ruang pertama diberikan kepada data pribadi, pintasan, dan
+ * widget yang memang dipakai setiap hari.
  */
 
-// ── Jarak di dalam satu widget. Batas bawah 6 px, tumbuh sampai 10 px. ──
-const DALAM = 'gap-fluid'
-
-type Pintu = { ke: string; Logo: (p: { size?: number }) => JSX.Element; judul: string; warna: string }
-
-/** Warna latar lambang — tetap per wilayah, supaya letaknya ikut terhafal. */
-const W = {
-  gerak: 'bg-emerald-100 text-emerald-700 dark:bg-emerald-500/20 dark:text-emerald-300',
-  makan: 'bg-amber-100 text-amber-700 dark:bg-amber-500/20 dark:text-amber-300',
-  tidur: 'bg-indigo-100 text-indigo-700 dark:bg-indigo-500/20 dark:text-indigo-300',
-  tubuh: 'bg-rose-100 text-rose-700 dark:bg-rose-500/20 dark:text-rose-300',
-  otak: 'bg-violet-100 text-violet-700 dark:bg-violet-500/20 dark:text-violet-300',
-  alat: 'bg-sky-100 text-sky-700 dark:bg-sky-500/20 dark:text-sky-300',
-  obat: 'bg-teal-100 text-teal-700 dark:bg-teal-500/20 dark:text-teal-300',
-  darurat: 'bg-red-100 text-red-700 dark:bg-red-500/20 dark:text-red-300',
-}
-
-const PRIBADI: Pintu[] = [
-  { ke: '/latihan', Logo: LogoLatihan, judul: 'Training', warna: W.gerak },
-  { ke: '/nutrition', Logo: LogoGizi, judul: 'Nutrition', warna: W.makan },
-  { ke: '/recovery', Logo: LogoTidur, judul: 'Sleep', warna: W.tidur },
-  { ke: '/tubuh', Logo: LogoTubuh, judul: 'Body', warna: W.tubuh },
+const PINTASAN = [
+  { to: '/latihan', emoji: '🏃', label: 'Training', tone: 'bg-emerald-100 text-emerald-800 dark:bg-emerald-500/15 dark:text-emerald-200' },
+  { to: '/tubuh', emoji: '❤️', label: 'Body', tone: 'bg-rose-100 text-rose-800 dark:bg-rose-500/15 dark:text-rose-200' },
+  { to: '/nutrition', emoji: '🥗', label: 'Nutrition', tone: 'bg-amber-100 text-amber-800 dark:bg-amber-500/15 dark:text-amber-200' },
+  { to: '/recovery', emoji: '🌙', label: 'Recovery', tone: 'bg-indigo-100 text-indigo-800 dark:bg-indigo-500/15 dark:text-indigo-200' },
+  { to: '/planning', emoji: '🗓️', label: 'Plan', tone: 'bg-sky-100 text-sky-800 dark:bg-sky-500/15 dark:text-sky-200' },
+  { to: '/keuangan', emoji: '💰', label: 'Money', tone: 'bg-lime-100 text-lime-800 dark:bg-lime-500/15 dark:text-lime-200' },
+  { to: '/learn', emoji: '📚', label: 'Life', tone: 'bg-violet-100 text-violet-800 dark:bg-violet-500/15 dark:text-violet-200' },
+  { to: '/community', emoji: '👥', label: 'People', tone: 'bg-fuchsia-100 text-fuchsia-800 dark:bg-fuchsia-500/15 dark:text-fuchsia-200' },
+  { to: '/body-explorer', emoji: '🫀', label: '3D Body', tone: 'bg-cyan-100 text-cyan-800 dark:bg-cyan-500/15 dark:text-cyan-200' },
+  { to: '/chatbot', emoji: '✨', label: 'Ask', tone: 'bg-orange-100 text-orange-800 dark:bg-orange-500/15 dark:text-orange-200' },
 ]
 
-const KLINIS: Pintu[] = [
-  { ke: '/med-study', Logo: LogoPenyakit, judul: 'Diseases', warna: W.otak },
-  { ke: '/med-study', Logo: LogoTindakan, judul: 'Procedures', warna: W.alat },
-  { ke: '/calculator-hub', Logo: LogoKalkulator, judul: 'Calculators', warna: W.alat },
-  { ke: '/drug-info', Logo: LogoObat, judul: 'Drugs', warna: W.obat },
-]
-
-/** Pintu yang sama dengan nama sehari-hari. Halaman tujuannya persis sama. */
-const KLINIS_AWAM: Pintu[] = [
-  { ke: '/med-study', Logo: LogoPenyakit, judul: 'Diseases', warna: W.otak },
-  { ke: '/med-study', Logo: LogoTindakan, judul: 'First aid', warna: W.alat },
-  { ke: '/calculator-hub', Logo: LogoKalkulator, judul: 'Risk', warna: W.alat },
-  { ke: '/drug-info', Logo: LogoObat, judul: 'Drugs', warna: W.obat },
-]
-
-const LAINNYA: Pintu[] = [
-  { ke: '/emergency', Logo: LogoDarurat, judul: 'Emergency', warna: W.darurat },
-  { ke: '/scripture', Logo: LogoIbadah, judul: 'Worship', warna: W.tidur },
-  { ke: '/feed', Logo: LogoKabar, judul: 'News', warna: W.gerak },
-  { ke: '/semua-fitur', Logo: LogoSemua, judul: 'All', warna: W.alat },
-]
-
-// ── Angka utama ─────────────────────────────────────────────────────────────
-
-type Kpi = { label: string; nilai: string; satuan?: string; nada: string; deret?: number[] }
-
-/**
- * Grafik garis kecil, digambar sendiri sebagai SVG.
- *
- * Sengaja tanpa sumbu, tanpa kisi, tanpa label: pada lebar 70 px semua itu
- * tidak terbaca dan hanya menambah coretan. Yang perlu terbaca dari sini cuma
- * ARAHNYA — naik atau turun — dan angka persisnya sudah tercetak di sebelahnya.
- */
-function Garis({ deret, kelas }: { deret: number[]; kelas: string }) {
-  if (deret.length < 2) return null
-  const min = Math.min(...deret)
-  const max = Math.max(...deret)
-  const rentang = max - min || 1
-  const titik = deret
-    .map((v, i) => `${(i / (deret.length - 1)) * 68 + 1},${19 - ((v - min) / rentang) * 17}`)
-    .join(' ')
-  return (
-    // Melebar mengikuti kartunya, dengan tinggi tetap. preserveAspectRatio
-    // "none" membuat gambarnya diregangkan mendatar — yang justru diinginkan di
-    // sini, karena yang dibaca hanyalah arahnya. Agar peregangan itu tidak ikut
-    // menipiskan garisnya, tebalnya dikunci dengan vector-effect.
-    <svg
-      viewBox="0 0 70 20"
-      preserveAspectRatio="none"
-      fill="none"
-      className={`h-[clamp(18px,5cqw,26px)] w-full ${kelas}`}
-      aria-hidden="true"
-    >
-      <polyline
-        points={titik}
-        stroke="currentColor"
-        strokeWidth="1.8"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        vectorEffect="non-scaling-stroke"
-      />
-    </svg>
-  )
-}
-
-/*
- * CAHAYA HANYA UNTUK ANGKA PERTAMA.
- *
- * Percobaan pertama menyalakan seluruh kartu KPI sekaligus, dan hasilnya
- * terlihat di tangkapan layar: empat angka bersinar sama terang, sehingga tidak
- * ada satu pun yang menonjol — persis kebalikan dari maksudnya. Cahaya bekerja
- * sebagai PEMBEDA, dan pembeda yang diberikan kepada semua orang berhenti
- * membedakan.
- */
-function KartuKpi({ k, utama }: { k: Kpi; utama?: boolean }) {
-  return (
-    <div className={`tile-inset flex min-w-0 flex-col ${DALAM} rounded-2xl bg-white/75 p-3 dark:bg-black/45`}>
-      <span className="t-mikro truncate font-bold uppercase tracking-wide text-neutral-600 dark:text-white/70">{k.label}</span>
-      {/* flex-wrap, bukan satu baris kaku: pada kartu sempit "12" dan satuannya
-          "tercatat" saling menimpa — terlihat di tangkapan layar, tidak pernah
-          terlihat dari kode. */}
-      <span className="flex flex-wrap items-baseline gap-x-1">
-        {/* Ukurannya mengikuti panjang nilainya. Lihat catatan "Angka panjang"
-            di index.css: pada ukuran yang sama, "118/76" tidak muat di petak
-            yang memuat "72" dengan lapang. */}
-        <span className={`${k.nilai.length >= 5 ? 't-angka-panjang' : 't-angka'} num-carved ${utama ? 'nyala' : ''} min-w-0 font-black leading-none tabular-nums ${k.nada}`}>{k.nilai}</span>
-        {k.satuan && <span className="t-mikro min-w-0 truncate font-bold text-neutral-500 dark:text-white/50">{k.satuan}</span>}
-      </span>
-      {k.deret && <Garis deret={k.deret} kelas={k.nada} />}
-    </div>
-  )
-}
-
-// ── Kisi lambang ────────────────────────────────────────────────────────────
-
-function Lambang({ p }: { p: Pintu }) {
-  const { Logo } = p
-  return (
-    <Link
-      to={p.ke}
-      className={`flex w-full max-w-[calc(var(--ubin)*1.5)] flex-col items-center ${DALAM} rounded-2xl py-1 transition active:scale-95`}
-    >
-      {/* Ubin dan lambangnya tumbuh bersama: ukuran svg ditentukan dalam persen
-          oleh .ubin-fluid, jadi tidak ada angka kedua yang bisa berselisih
-          dengan ukuran ubinnya. Nilai size di bawah hanya bekal bila CSS-nya
-          belum termuat. */}
-      <span className={`ubin-fluid grid place-items-center rounded-2xl ${p.warna}`}>
-        <Logo size={26} />
-      </span>
-      <span className="t-kecil text-center font-bold leading-tight text-ink dark:text-neutral-200">
-        {p.judul}
-      </span>
-    </Link>
-  )
-}
-
-/**
- * Satu baris keterangan di bawah judul kisi.
- *
- * Label lambang harus pendek supaya muat empat kolom, dan itu menghilangkan
- * keterangan yang dulu ada. Yang paling terasa hilangnya adalah "SKDI": bagi
- * mahasiswa kedokteran kata itu yang menandakan isinya memang bahan ujiannya,
- * dan tanpa itu kisi klinis terbaca seperti ensiklopedia umum. Baris ini
- * pernah dihapus tanpa sengaja saat berkas ini ditulis ulang, dan yang
- * menangkapnya adalah uji yang mencari kata itu di layar.
- */
-function Kisi({ judul, isi, pintu }: { judul: string; isi?: string; pintu: Pintu[] }) {
-  return (
-    <section>
-      {/* Rata kiri: pemindaian pola F bertumpu pada tepi kiri yang lurus. */}
-      <h2 className="t-kecil mb-2 font-black uppercase tracking-wide text-neutral-500">{judul}</h2>
-      {isi && <p className="t-kecil mb-2 leading-snug text-neutral-400">{isi}</p>}
-      <div className="kisi-fluid">
-        {pintu.map((p) => <Lambang key={p.judul} p={p} />)}
-      </div>
-    </section>
-  )
-}
+type Signal = { label: string; value: string; unit?: string; tone: string; to: string }
 
 export default function Beranda() {
   const { account, state } = useStore()
-  const nama = account?.name?.split(' ')[0] ?? ''
-  // Tidak ada lagi pertanyaan "Anda memakai ini untuk apa?" di beranda:
-  // beranda bukan tempat mewawancarai orang. Urutan dasbor mengikuti peran
-  // akun, dan tujuan yang pernah tersimpan tetap dihormati bila ada.
-  const tujuan = ambilTujuan()
+  const [refresh, setRefresh] = useState(0)
 
-  /*
-   * Tanggal yang dihitung sebagai "hari tercatat" — dipakai ubin rangkaian.
-   * Sumbernya dua, bukan satu: seseorang yang hanya mencatat tenaganya tanpa
-   * mencatat tidur tetap mencatat hari itu. Aturan yang sama dipakai
-   * CatatanHarian, dan bila keduanya berbeda maka angka yang sama akan tampil
-   * dua nilai di satu layar.
-   */
-  const tanggalCatatan = useMemo(() => {
-    const dari = new Set<string>()
-    for (const s of state.sleepLogs ?? []) if (s?.date) dari.add(s.date)
-    for (const k of Object.keys(state.wellness ?? {})) dari.add(k)
-    return [...dari]
-  }, [state.sleepLogs, state.wellness])
-  const klinisDulu = tujuan ? tujuan === 'belajar' : account?.role === 'dokter'
-  const awam = modeAwam(tujuan)
-  const klinis = awam ? KLINIS_AWAM : KLINIS
-  const judulKlinis = awam ? 'Health & Disease' : 'Clinical'
-  const isiKlinis = awam
-    ? '623 diseases — what they are, their causes, their signs, their treatment'
-    : '623 SKDI diseases · OSCE · SOFA, Wells, Child-Pugh · prescriptions'
-
-  /**
-   * Angka yang benar-benar ada, bukan tempat kosong yang menunggu diisi.
-   *
-   * Panel angka hanya muncul bila datanya memang ada. Dasbor yang menampilkan
-   * "—" di setiap kolom pada hari pertama justru mengajarkan pemakainya bahwa
-   * bagian itu boleh diabaikan, dan sesudah itu ia tidak akan dilihat lagi
-   * walau kemudian terisi.
-   */
-  const [segar, setSegar] = useState(0)
   useEffect(() => {
-    const ubah = () => setSegar((v) => v + 1)
-    window.addEventListener('panacea:health-updated', ubah)
-    return () => window.removeEventListener('panacea:health-updated', ubah)
+    const update = () => setRefresh((x) => x + 1)
+    window.addEventListener('panacea:health-updated', update)
+    return () => window.removeEventListener('panacea:health-updated', update)
   }, [])
 
-  const kpi = useMemo<Kpi[]>(() => {
-    const out: Kpi[] = []
-    const w = getWorkouts()
-    const v = getVitals()
-    if (w.length) {
-      // Konteks dihitung sungguhan, bukan objek kosong.
-      //
-      // Percobaan pertama meneruskan `{}` sebagai konteks, dan seluruh skor
-      // upaya jatuh ke nol -- kartu Kesegaran memajang "0" dengan penuh
-      // percaya diri di layar pertama. Angka yang salah lebih buruk daripada
-      // angka yang tidak ada, karena tidak ada apa pun di layar yang
-      // memberitahu pembacanya bahwa itu keliru.
-      const teramati = w.reduce((a, x) => Math.max(a, x.maxHr ?? 0), 0)
-      const umur = account?.dob ? ageFromDob(account.dob) : 30
-      const sex = (v.sex === 'F' ? 'F' : 'M') as 'M' | 'F'
-      const k = {
-        hrMax: Math.max(teramati, hrMaxFromAge(umur || 30, sex)),
-        hrRest: typeof v.restingHr === 'number' && v.restingHr > 0 ? v.restingHr : 60,
-        sex,
-      }
-      const st = statusSingkat(w, k)
-      if (st) {
-        // Empat belas hari terakhir, untuk arah — bukan untuk dibaca per titik.
-        const hari = Array.from({ length: 14 }, (_, i) => {
-          const s = statusSingkat(w, k, Date.now() - (13 - i) * 86400_000)
-          return s ? s.kesegaran : 0
-        })
-        out.push({
-          label: 'Fresh', nilai: String(Math.round(st.kesegaran)),
-          nada: st.kesegaran >= -10 ? 'text-emerald-600 dark:text-emerald-400' : 'text-amber-600 dark:text-amber-400',
-          deret: hari,
-        })
-        out.push({ label: 'Fit', nilai: String(Math.round(st.kebugaran)), nada: 'text-sky-600 dark:text-sky-400' })
-      }
-    }
-    // Garisnya diambil dari riwayat yang benar-benar tercatat; Garis sendiri
-    // yang menolak menggambar bila titiknya kurang dari dua.
-    /* ANGKA HARI INI DIDAHULUKAN.
-       Panel ini sebelumnya hanya berisi angka yang jarang berubah — berat,
-       nadi, jumlah sesi — sehingga membukanya dua kali sehari menampilkan
-       layar yang sama persis, sedangkan yang benar-benar berubah hari itu
-       harus dicari jauh ke bawah. Urutannya kini: keadaan latihan, lalu apa
-       yang terjadi HARI INI, baru angka tubuh yang berubah mingguan.
-       Tidak ada satu pun angka gabungan; tiap kartu satu besaran yang dapat
-       ditunjuk asalnya. */
-    const hariIni = new Date().toISOString().slice(0, 10)
+  const vitals = useMemo(() => getVitals(), [refresh])
+  const workouts = useMemo(() => getWorkouts(), [refresh])
+  const name = account?.name?.trim().split(/\s+/)[0] || ''
 
-    const tidur = (state.sleepLogs ?? [])
-      .filter((l) => typeof l?.hours === 'number' && l.hours > 0)
-      .sort((a, b) => (a.date < b.date ? 1 : -1))
-    if (tidur[0]) {
-      const jam = Math.round(tidur[0].hours * 10) / 10
-      out.push({
-        label: 'Sleep', nilai: String(jam), satuan: tidur[0].date === hariIni ? 'h' : 'h (last)',
-        nada: jam >= 7 ? 'text-emerald-600 dark:text-emerald-400' : 'text-amber-600 dark:text-amber-400',
-        deret: tidur.slice(0, 14).map((l) => l.hours).reverse(),
-      })
-    }
+  const tanggalCatatan = useMemo(() => {
+    const dates = new Set<string>()
+    for (const sleep of state.sleepLogs ?? []) if (sleep?.date) dates.add(sleep.date)
+    for (const date of Object.keys(state.wellness ?? {})) dates.add(date)
+    return [...dates]
+  }, [state.sleepLogs, state.wellness])
 
-    const w0 = state.wellness?.[hariIni] as { steps?: number; waterMl?: number } | undefined
-    const langkah = Number(w0?.steps) || Number(v.steps) || 0
-    if (langkah > 0) {
-      out.push({ label: 'Steps', nilai: langkah >= 10000 ? `${(langkah / 1000).toFixed(1)}k` : String(langkah), satuan: 'today', nada: 'text-ink dark:text-white' })
-    }
-
-    let protein = 0
-    for (const f of state.foods ?? []) if (f?.date === hariIni) protein += Number(f.protein) || 0
-    if (protein > 0) out.push({ label: 'Protein', nilai: String(Math.round(protein)), satuan: 'g today', nada: 'text-ink dark:text-white' })
-
-    const air = Number(w0?.waterMl) || 0
-    if (air > 0) out.push({ label: 'Water', nilai: (air / 1000).toFixed(1), satuan: 'L today', nada: 'text-sky-600 dark:text-sky-400' })
-
-    if (v.weightKg) out.push({ label: 'Weight', nilai: String(v.weightKg), satuan: 'kg', nada: 'text-ink dark:text-white', deret: deretMetrik('weightKg').map((t) => t.nilai) })
-    if (v.restingHr) out.push({ label: 'Resting HR', nilai: String(v.restingHr), satuan: 'bpm', nada: 'text-rose-600 dark:text-rose-400', deret: deretMetrik('restingHr').map((t) => t.nilai) })
-    if (v.systolic && v.diastolic) {
-      out.push({ label: 'BP', nilai: `${v.systolic}/${v.diastolic}`, nada: 'text-ink dark:text-white' })
-    }
-
-    if (typeof v.vo2max === 'number' && v.vo2max > 0) {
-      out.push({ label: 'VO₂max', nilai: String(Math.round(v.vo2max * 10) / 10), satuan: 'mL/kg/min', nada: 'text-ink dark:text-white', deret: deretMetrik('vo2max').map((t) => t.nilai) })
-    }
-
-    if (w.length) out.push({ label: 'Sessions', nilai: String(w.length), satuan: 'recorded', nada: 'text-ink dark:text-white' })
-
-    // Delapan adalah batas yang dapat dilihat sekali sapu pada layar 390 px:
-    // dua lajur, empat baris. Lebih dari itu panelnya berhenti menjadi
-    // ringkasan dan menjadi daftar.
-    return out.slice(0, 8)
-  }, [account, segar, state.sleepLogs, state.wellness, state.foods])
-
-  /**
-   * Pratinjau dihitung sekali per kunjungan.
-   *
-   * Bergantung pada state.foods dan state.sleepLogs supaya ikut menyegar begitu
-   * pemakainya mencatat sesuatu lalu kembali ke beranda — kartu yang tetap
-   * memajang angka lama sesudah pencatatan membuat orang mencatat dua kali.
-   */
-  /**
-   * Penanda segar untuk data yang TIDAK berada di dalam state React.
-   *
-   * Sesi latihan dan tanda tubuh disimpan langsung di penyimpanan peramban,
-   * bukan di dalam store. Akibatnya terukur: sesi baru tersimpan dengan benar,
-   * namun kartu Latihan tetap berbunyi "belum ada sesi tersimpan" sampai
-   * halaman dimuat ulang — pemakainya menyimpulkan simpanannya gagal, lalu
-   * menyimpannya lagi. Peristiwa yang sama yang dipakai seluruh aplikasi untuk
-   * menandai perubahan data kesehatan dipakai di sini sebagai pemicu baca ulang.
-   */
   const pratinjau = useMemo(
     () => pratinjauBeranda({
       foods: state.foods ?? [],
       sleepLogs: state.sleepLogs ?? [],
       umur: account?.dob ? ageFromDob(account.dob) : undefined,
     }),
-    [state.foods, state.sleepLogs, account, segar],
+    [state.foods, state.sleepLogs, account?.dob, refresh],
   )
 
-  // Kartu "Tubuh" dibuang bila angkanya sama dengan yang sudah berdiri besar di
-  // panel atas. Denyut 58 yang muncul dua kali dalam satu layar tidak menambah
-  // keterangan apa pun; ia hanya membuat layar terasa lebih penuh daripada
-  // isinya. Bila angka tubuhnya lain (mis. hanya tekanan darah), kartunya tetap.
-  const angkaAtas = kpi.map((k) => k.nilai)
-  const pratinjauTampil = pratinjau.filter((p) => p.id !== 'tubuh' || !angkaAtas.includes(p.nilai))
+  const signals = useMemo<Signal[]>(() => {
+    const out: Signal[] = []
+    const lastSleep = [...(state.sleepLogs ?? [])]
+      .filter((x) => typeof x?.hours === 'number' && x.hours > 0)
+      .sort((a, b) => (a.date < b.date ? 1 : -1))[0]
+
+    if (typeof vitals.steps === 'number' && vitals.steps > 0) {
+      out.push({ label: 'Steps', value: Math.round(vitals.steps).toLocaleString(), unit: 'today', tone: 'text-emerald-700 dark:text-emerald-300', to: '/tubuh?t=gerak' })
+    }
+    if (lastSleep) {
+      out.push({ label: 'Sleep', value: (Math.round(lastSleep.hours * 10) / 10).toString(), unit: 'hours', tone: 'text-indigo-700 dark:text-indigo-300', to: '/tubuh?t=tidur' })
+    } else if (typeof vitals.sleepH === 'number' && vitals.sleepH > 0) {
+      out.push({ label: 'Sleep', value: (Math.round(vitals.sleepH * 10) / 10).toString(), unit: 'hours', tone: 'text-indigo-700 dark:text-indigo-300', to: '/tubuh?t=tidur' })
+    }
+    if (typeof vitals.restingHr === 'number' && vitals.restingHr > 0) {
+      out.push({ label: 'Resting HR', value: Math.round(vitals.restingHr).toString(), unit: 'bpm', tone: 'text-rose-700 dark:text-rose-300', to: '/tubuh?t=jantung' })
+    }
+    if (typeof vitals.vo2max === 'number' && vitals.vo2max > 0) {
+      out.push({ label: 'VO₂max', value: (Math.round(vitals.vo2max * 10) / 10).toString(), unit: 'mL/kg/min', tone: 'text-sky-700 dark:text-sky-300', to: '/latihan?t=lab' })
+    }
+    if (typeof vitals.weightKg === 'number' && vitals.weightKg > 0) {
+      out.push({ label: 'Weight', value: vitals.weightKg.toString(), unit: 'kg', tone: 'text-neutral-900 dark:text-white', to: '/body' })
+    }
+    if (workouts.length > 0) {
+      out.push({ label: 'Sessions', value: workouts.length.toString(), unit: 'recorded', tone: 'text-violet-700 dark:text-violet-300', to: '/latihan' })
+    }
+    return out
+  }, [vitals, workouts, state.sleepLogs])
 
   return (
-    // `fluid` menjadikan pembungkus ini WADAH UKUR: seluruh cqw di dalamnya
-    // mengukur lebar kotak ini, bukan lebar layar. Itulah sebabnya halaman ini
-    // tetap benar saat isinya duduk di samping bilah sisi selebar 280 px.
-    <div className="fluid mx-auto max-w-3xl">
-      <div className="j-grup px-fluid pb-6">
-      {/* ── PANEL ATAS — dibaca menyilang (Z) ───────────────────────────────
-          kiri-atas: siapa saya · kanan-atas: aksi utama
-          kiri-bawah: angka       · kanan-bawah: ke mana lanjut          */}
-      {/* prism-rays (sinar pelangi) dilepas dari sini: motifnya terbaca sebagai
-          bendera pride, bukan "kejayaan". Kilau emas/peraknya kini ada di
-          .kaca-hero itu sendiri. */}
-      <section className="kaca-hero p-fluid overflow-hidden rounded-3xl">
-        <div className="flex items-start justify-between gap-3">
+    <main className="mx-auto w-full max-w-4xl space-y-6 pb-24">
+      <section className="overflow-hidden rounded-[28px] border border-emerald-200/60 bg-gradient-to-br from-emerald-50 via-white to-sky-50 p-4 shadow-[0_18px_45px_rgba(15,80,60,.08)] dark:border-white/10 dark:from-emerald-500/12 dark:via-[#0b1518] dark:to-sky-500/10 sm:p-5">
+        <div className="flex items-center justify-between gap-3">
           <div className="min-w-0">
-            <h1 className="t-judul truncate font-black leading-tight text-white drop-shadow-sm">
-              Hi{nama && `, ${nama}`}
+            <div className="text-[10px] font-black uppercase tracking-[.16em] text-emerald-700/70 dark:text-emerald-300/70">My Panacea</div>
+            <h1 className="mt-1 truncate text-[26px] font-black tracking-[-.045em] text-neutral-950 dark:text-white sm:text-[32px]">
+              Hi{name ? `, ${name}` : ''}
             </h1>
           </div>
-          {/* Membuka kotak pencarian di atas halaman ini, BUKAN pindah ke
-              halaman pencarian. Berpindah halaman untuk mencari berarti
-              kehilangan tempat yang sedang dibaca, dan sesudah selesai harus
-              kembali lagi. */}
-          {/* Hijau merek di atas panel emas terbaca seperti dua tema yang
-              bertabrakan. Tombolnya memakai emas tempa yang sama dari
-              styles/metal.css — sistem yang sudah ada di aplikasi ini, bukan
-              warna baru yang dikarang di sini. */}
-          <button
-            onClick={() => window.dispatchEvent(new Event('panacea:cari'))}
-            className="metal-gold t-sedang flex h-11 shrink-0 items-center rounded-full px-5 font-black transition active:scale-95"
-          >
-            Search
-          </button>
+          <div className="flex shrink-0 gap-2">
+            <button
+              onClick={() => window.dispatchEvent(new Event('panacea:cari'))}
+              className="grid h-11 w-11 place-items-center rounded-full border border-neutral-200 bg-white text-lg text-neutral-800 shadow-sm transition active:scale-95 dark:border-white/10 dark:bg-white/10 dark:text-white"
+              aria-label="Search"
+            >⌕</button>
+            <Link
+              to="/atur-fitur"
+              className="grid h-11 w-11 place-items-center rounded-full bg-neutral-950 text-lg text-white shadow-sm transition active:scale-95 dark:bg-white dark:text-neutral-950"
+              aria-label="Manage Home widgets"
+            >＋</Link>
+          </div>
         </div>
 
-        {kpi.length > 0 && (
-          <div className="angka-fluid mt-3">
-            {kpi.map((k, i) => <KartuKpi key={k.label} k={k} utama={i === 0} />)}
+        {signals.length > 0 ? (
+          <div className="no-scrollbar -mx-1 mt-4 flex snap-x gap-2.5 overflow-x-auto px-1 pb-1">
+            {signals.map((s) => (
+              <Link
+                key={s.label}
+                to={s.to}
+                className="min-h-[112px] w-[142px] shrink-0 snap-start rounded-[22px] border border-black/[.06] bg-white/90 p-3.5 shadow-sm transition active:scale-[.98] dark:border-white/10 dark:bg-white/[.07]"
+              >
+                <div className="text-[9px] font-black uppercase tracking-[.13em] text-neutral-500 dark:text-neutral-400">{s.label}</div>
+                <div className={`mt-4 text-[30px] font-black leading-none tracking-[-.045em] tabular-nums ${s.tone}`}>{s.value}</div>
+                {s.unit && <div className="mt-2 text-[10px] font-semibold text-neutral-500 dark:text-neutral-400">{s.unit}</div>}
+              </Link>
+            ))}
           </div>
-        )}
-
-        {kpi.length === 0 && (
-          <Link
-            to="/tutorial"
-            className="mt-3 flex min-h-[44px] items-center justify-between gap-3 rounded-2xl bg-white/70 px-3 py-2.5 dark:bg-white/5"
-          >
-            <span className="t-sedang font-semibold text-ink dark:text-white">
-              No numbers yet. Start with 3 short steps.
-            </span>
-            <span className="text-brand">›</span>
+        ) : (
+          <Link to="/harian" className="mt-4 flex min-h-[58px] items-center justify-between rounded-2xl bg-white/90 px-4 text-sm font-bold text-neutral-800 shadow-sm dark:bg-white/[.07] dark:text-white">
+            Add your first health or daily entry <span className="text-lg">›</span>
           </Link>
         )}
       </section>
 
-      {/* Pratinjau isi fitur, tepat di bawah panel angka: pertanyaan "bagaimana
-          keadaan saya" terjawab tanpa satu pun ketukan, dan kisi lambang di
-          bawahnya tinggal mengurus "ke mana saya pergi". */}
-      <PapanWidget pratinjau={pratinjauTampil} tanggalCatatan={tanggalCatatan} />
+      <section>
+        <div className="mb-2 flex items-center justify-between px-1">
+          <h2 className="text-[13px] font-black text-neutral-900 dark:text-white">Quick access</h2>
+          <Link to="/semua-fitur" className="text-[11px] font-black text-emerald-700 dark:text-emerald-300">All features ›</Link>
+        </div>
+        <div className="no-scrollbar -mx-1 flex snap-x gap-3 overflow-x-auto px-1 pb-2">
+          {PINTASAN.map((p) => (
+            <Link key={p.to + p.label} to={p.to} className="w-[84px] shrink-0 snap-start text-center active:scale-95">
+              <span className={`mx-auto grid h-[62px] w-[62px] place-items-center rounded-[20px] text-[25px] shadow-sm ${p.tone}`}>{p.emoji}</span>
+              <span className="mt-1.5 block truncate text-[10px] font-bold text-neutral-700 dark:text-neutral-200">{p.label}</span>
+            </Link>
+          ))}
+        </div>
+      </section>
 
-      {/* Catatan harian ditaruh SESUDAH pratinjau, bukan sebelumnya.
-          Kartu pratinjau menjawab "bagaimana keadaan saya"; catatan harian
-          meminta sesuatu. Layar yang meminta lebih dahulu sebelum memberi apa
-          pun terbaca sebagai pekerjaan, dan pekerjaan ditunda. */}
-      <CatatanHarian />
+      <PanaceaGrowthRail />
+      <PanaceaUtilityShelf />
 
-      {/* Catatan latihan memakai bentuk yang sama persis dengan catatan harian
-          di atasnya. Dua borang serupa dengan tata letak berbeda memaksa orang
-          belajar dua kali, dan yang kedua tidak pernah benar-benar dipelajari. */}
-      <CatatanLatihan />
+      <section className="rounded-[28px] border border-neutral-200 bg-white p-4 shadow-[0_12px_35px_rgba(25,45,55,.06)] dark:border-white/10 dark:bg-white/[.035] sm:p-5">
+        <div className="mb-3 flex items-center justify-between gap-3">
+          <div>
+            <div className="text-[10px] font-black uppercase tracking-[.14em] text-neutral-500 dark:text-neutral-400">Widgets</div>
+            <h2 className="mt-1 text-[18px] font-black tracking-tight text-neutral-950 dark:text-white">My dashboard</h2>
+          </div>
+          <Link to="/atur-fitur" className="shrink-0 rounded-full bg-neutral-100 px-3 py-2 text-[10px] font-black text-neutral-700 dark:bg-white/10 dark:text-neutral-200">Customize</Link>
+        </div>
+        <PapanWidget pratinjau={pratinjau} tanggalCatatan={tanggalCatatan} />
+      </section>
 
+      <DeferredBodyExposureWidget />
+      <DeferredHomeFeatureUniverse />
+      <DeferredPanaceaLearningRail />
 
-      {/* ── KISI FITUR ───────────────────────────────────────────────────
-          Tiga kisi tetap (Klinis, Badan Anda, Lainnya) diganti satu kisi yang
-          diturunkan dari KATALOG WIDGET. Alasannya bukan tampilan: ketiga kisi
-          lama ditulis tangan dan hanya memuat 16 dari 115 fitur, sehingga
-          sebagian besar isi aplikasi ini tidak pernah punya jalan masuk dari
-          beranda — dan setiap fitur baru harus didaftarkan di dua tempat, yang
-          satu di antaranya selalu ketinggalan. */}
+      <details className="group rounded-[26px] border border-neutral-200 bg-white p-4 dark:border-white/10 dark:bg-white/[.035]">
+        <summary className="flex cursor-pointer list-none items-center justify-between gap-3">
+          <div>
+            <div className="text-[10px] font-black uppercase tracking-[.14em] text-neutral-500 dark:text-neutral-400">Today</div>
+            <div className="mt-1 text-[16px] font-black text-neutral-950 dark:text-white">Log my day or workout</div>
+          </div>
+          <span className="grid h-9 w-9 place-items-center rounded-full bg-neutral-100 text-lg text-neutral-700 transition group-open:rotate-45 dark:bg-white/10 dark:text-white">＋</span>
+        </summary>
+        <div className="mt-4 space-y-4 border-t border-neutral-100 pt-4 dark:border-white/10">
+          <CatatanHarian />
+          <CatatanLatihan />
+        </div>
+      </details>
+
       <KisiFitur />
-
-      {kpi.length === 0 && (
-        <Link
-          to="/tutorial"
-          className="t-sedang flex min-h-[44px] items-center justify-center gap-2 font-bold text-brand"
-        >
-          <LogoPanduan size={16} /> New here? Open the 6-step guide
-        </Link>
-      )}
-      </div>
-    </div>
+    </main>
   )
 }

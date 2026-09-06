@@ -1,10 +1,14 @@
 import { useEffect, useState } from 'react'
+import type { AutoSyncStatus } from '../lib/autoIsi'
 
-// Small ambient status layer: an offline banner and a "new version available"
-// toast (driven by the service worker). Both are non-blocking and dismissible.
+// Small ambient status layer: offline state, service-worker updates, and a
+// non-blocking automation-sync notice. The sync notice appears only after an
+// actual partial/failed refresh event; it does not occupy dashboard space and
+// does not turn a stale status from an old session into a permanent warning.
 export function AppStatus() {
   const [offline, setOffline] = useState(typeof navigator !== 'undefined' && !navigator.onLine)
   const [update, setUpdate] = useState(false)
+  const [syncIssue, setSyncIssue] = useState<AutoSyncStatus | null>(null)
 
   useEffect(() => {
     const on = () => setOffline(false)
@@ -15,6 +19,17 @@ export function AppStatus() {
       window.removeEventListener('online', on)
       window.removeEventListener('offline', off)
     }
+  }, [])
+
+  useEffect(() => {
+    const onSync = (event: Event) => {
+      const detail = (event as CustomEvent<AutoSyncStatus>).detail
+      if (!detail) return
+      if (detail.state === 'partial' || detail.state === 'offline') setSyncIssue(detail)
+      else if (detail.state === 'ok') setSyncIssue(null)
+    }
+    window.addEventListener('panacea:auto-sync', onSync)
+    return () => window.removeEventListener('panacea:auto-sync', onSync)
   }, [])
 
   useEffect(() => {
@@ -43,9 +58,21 @@ export function AppStatus() {
     <>
       {offline && (
         <div className="fixed inset-x-0 top-0 z-[60] flex items-center justify-center gap-2 bg-ink px-4 py-1.5 text-center text-xs font-semibold text-white">
-          <span className="h-2 w-2 rounded-full bg-amber-400" /> You are offline — some features may be unavailable.
+          <span className="h-2 w-2 rounded-full bg-amber-400" /> You are offline — last saved data stays available.
         </div>
       )}
+
+      {syncIssue && !offline && (
+        <div className="fixed bottom-20 left-1/2 z-[60] flex w-[min(92vw,560px)] -translate-x-1/2 items-center gap-3 rounded-2xl border border-amber-200/20 bg-[#10130f]/95 px-4 py-3 text-xs text-white shadow-2xl backdrop-blur-xl">
+          <span className="h-2.5 w-2.5 shrink-0 rounded-full bg-amber-300 shadow-[0_0_12px_rgba(252,211,77,.55)]" />
+          <div className="min-w-0 flex-1">
+            <div className="font-bold">Automatic sync is temporarily incomplete</div>
+            <div className="mt-0.5 text-white/60">PanaceaMed is keeping your last known-good data and will retry automatically when the connection recovers.</div>
+          </div>
+          <button onClick={() => setSyncIssue(null)} className="shrink-0 text-white/45 hover:text-white" aria-label="Close sync notice">✕</button>
+        </div>
+      )}
+
       {update && (
         <div className="fixed bottom-5 left-1/2 z-[60] flex -translate-x-1/2 items-center gap-3 rounded-full bg-ink px-4 py-2.5 text-sm font-semibold text-white shadow-xl">
           <span>✨ A new version is available</span>
