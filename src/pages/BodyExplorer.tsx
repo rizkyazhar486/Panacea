@@ -1,6 +1,7 @@
 import { lazy, Suspense, type ReactNode } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { BodyEvidenceDock, type BodyEvidenceMode } from '../components/digital-twin/BodyEvidenceDock'
+import { HraContextBridge } from '../components/digital-twin/HraContextBridge'
 
 const HraClinicalAtlas = lazy(() =>
   import('../components/digital-twin/HraClinicalAtlas').then((m) => ({ default: m.HraClinicalAtlas })),
@@ -51,6 +52,14 @@ const MORE: Mode[] = [
 
 const ALL = [...PRIMARY, ...MORE]
 
+const HRA_CONTEXT: Partial<Record<LabMode, string[]>> = {
+  'workout-4d': ['heart', 'lung', 'blood vasculature', 'skeletal muscle', 'femur'],
+  surgery: ['meniscus', 'femur', 'patella', 'heart valve', 'colon', 'thyroid', 'prostate', 'uterus'],
+  'surgery-rehearsal': ['meniscus', 'femur', 'patella', 'heart valve', 'kidney', 'colon'],
+  counterfactual: ['heart', 'liver', 'kidney', 'brain', 'lung', 'pancreas'],
+  regeneration: ['skin', 'liver', 'kidney', 'heart', 'brain', 'pancreas'],
+}
+
 function isLabMode(value: string | null): value is LabMode {
   return ALL.some((item) => item.key === value)
 }
@@ -63,12 +72,13 @@ function LoadingLab({ label }: { label: string }) {
   )
 }
 
-function SourceBackedMode({ title, detail, children }: { title: string; detail: string; children: ReactNode }) {
+function SourceBackedMode({ title, detail, evidenceTerms, children }: { title: string; detail: string; evidenceTerms: string[]; children: ReactNode }) {
   return (
     <div className="space-y-4">
       <Suspense fallback={<LoadingLab label="HuBMAP Human Reference Atlas" />}>
         <HraClinicalAtlas />
       </Suspense>
+      <HraContextBridge title="Mapped anatomy for this experience" terms={evidenceTerms} />
       <details className="group rounded-[26px] border border-neutral-200 bg-white p-4 shadow-sm dark:border-white/10 dark:bg-white/[.035]">
         <summary className="flex cursor-pointer list-none items-center justify-between gap-3">
           <div>
@@ -135,7 +145,7 @@ export function BodyExplorer() {
           <div className="flex flex-wrap gap-1.5 text-[8px] font-black uppercase tracking-[.1em] text-neutral-500">
             <span className="rounded-full border border-neutral-200 bg-neutral-50 px-2.5 py-1.5 dark:border-white/10 dark:bg-white/[.04]">HuBMAP HRA</span>
             <span className="rounded-full border border-neutral-200 bg-neutral-50 px-2.5 py-1.5 dark:border-white/10 dark:bg-white/[.04]">GitHub models API</span>
-            <span className="rounded-full border border-neutral-200 bg-neutral-50 px-2.5 py-1.5 dark:border-white/10 dark:bg-white/[.04]">ASCT+B mapping</span>
+            <span className="rounded-full border border-neutral-200 bg-neutral-50 px-2.5 py-1.5 dark:border-white/10 dark:bg-white/[.04]">ASCT+B v1.2 + v2</span>
             <span className="rounded-full border border-neutral-200 bg-neutral-50 px-2.5 py-1.5 dark:border-white/10 dark:bg-white/[.04]">HPA · Ensembl</span>
           </div>
         </div>
@@ -170,23 +180,23 @@ export function BodyExplorer() {
       ) : mode === 'cell-genome' ? (
         <CellEvidenceMode mode="cell-genome" />
       ) : mode === 'workout-4d' ? (
-        <SourceBackedMode title="Measured workout replay" detail="Workout-derived animation is useful only after the HRA anatomical reference is established. Measured device signals, derived physiology and educational context remain explicitly separated.">
+        <SourceBackedMode evidenceTerms={HRA_CONTEXT['workout-4d'] ?? []} title="Measured workout replay" detail="Workout-derived animation is useful only after the HRA anatomical reference is established. Measured device signals, derived physiology and educational context remain explicitly separated.">
           <Suspense fallback={<LoadingLab label="exercise physiology replay" />}><Workout4DLab /></Suspense>
         </SourceBackedMode>
       ) : mode === 'surgery' ? (
-        <SourceBackedMode title="Procedural surgery atlas" detail="This section is a procedural education layer, not source anatomy. Use the live HRA search above for structures such as meniscus, femur, patella, valves or other mapped anatomy before opening the simulation.">
+        <SourceBackedMode evidenceTerms={HRA_CONTEXT.surgery ?? []} title="Procedural surgery atlas" detail="This section is a procedural education layer, not source anatomy. The HRA cards above resolve representative surgical structures against actual ASCT+B mappings before the simulation is opened.">
           <Suspense fallback={<LoadingLab label="surgical procedure atlas" />}><SurgicalOperationAtlas /></Suspense>
         </SourceBackedMode>
       ) : mode === 'surgery-rehearsal' ? (
-        <SourceBackedMode title="Surgical rehearsal" detail="Rehearsal remains clearly separated from the HRA reference anatomy. Search and inspect the source anatomy first; open this layer only for procedural practice.">
+        <SourceBackedMode evidenceTerms={HRA_CONTEXT['surgery-rehearsal'] ?? []} title="Surgical rehearsal" detail="Rehearsal remains clearly separated from the HRA reference anatomy. Source mappings are visible first; open this layer only for procedural practice.">
           <Suspense fallback={<LoadingLab label="cinematic surgical rehearsal" />}><CinematicSurgicalRehearsal /></Suspense>
         </SourceBackedMode>
       ) : mode === 'counterfactual' ? (
-        <SourceBackedMode title="Counterfactual biology model" detail="What-if outputs are modelling hypotheses. They are not observed anatomy, diagnosis or treatment response; live evidence remains separately visible below.">
+        <SourceBackedMode evidenceTerms={HRA_CONTEXT.counterfactual ?? []} title="Counterfactual biology model" detail="What-if outputs are modelling hypotheses. They are not observed anatomy, diagnosis or treatment response; HRA source matches stay visibly separate above.">
           <Suspense fallback={<LoadingLab label="what-if model" />}><CounterfactualBiologyLab /></Suspense>
         </SourceBackedMode>
       ) : (
-        <SourceBackedMode title="Regeneration research sandbox" detail="Experimental regeneration concepts are kept behind the reference anatomy and are paired with current literature and registered clinical trials below.">
+        <SourceBackedMode evidenceTerms={HRA_CONTEXT.regeneration ?? []} title="Regeneration research sandbox" detail="Experimental regeneration concepts are kept behind the reference anatomy and are paired with source-mapped HRA structures plus current literature and registered clinical trials.">
           <Suspense fallback={<LoadingLab label="regeneration research" />}><RegenerationResearchSandbox /></Suspense>
         </SourceBackedMode>
       )}
