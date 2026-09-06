@@ -3,14 +3,16 @@ import { useSearchParams } from 'react-router-dom'
 import { Prosa } from '../components/Prosa'
 import { Card, Badge } from '../components/ui'
 import { RangkaDaftar } from '../components/Rangka'
+import { MedicalEvidenceExplorer } from '../components/MedicalEvidenceExplorer'
 import { StudyStartPanel, type StudyStartSection } from '../components/medstudy/StudyStartPanel'
 import { STUDY_TECHNIQUES, OSCE_TECHNIQUE, MOTIVATION, EXAM_TIMELINE } from '../lib/studyContent'
 import { EXAM_INFO, EXAM_ORDER, questionsForExam, type ExamTrack } from '../lib/examBank'
 import '../styles/panacea2026.css'
 
-type Section = 'practice' | 'osce' | 'case-bank' | 'station-sim' | 'skills' | 'procedures' | 'therapy' | 'diseases' | 'mnemonik' | 'techniques' | 'timeline' | 'usmle'
+type Section = 'evidence' | 'practice' | 'osce' | 'case-bank' | 'station-sim' | 'skills' | 'procedures' | 'therapy' | 'diseases' | 'mnemonik' | 'techniques' | 'timeline' | 'usmle'
 
 const SECTIONS: { id: Section; label: string; emoji: string }[] = [
+  { id: 'evidence', label: 'Live Evidence', emoji: '🔎' },
   { id: 'practice', label: 'Questions', emoji: '❓' },
   { id: 'diseases', label: 'Diseases', emoji: '🧬' },
   { id: 'therapy', label: 'Drugs & Therapy', emoji: '💊' },
@@ -44,7 +46,7 @@ function SectionFallback() { return <RangkaDaftar jumlah={4} /> }
 export function MedStudyHub() {
   const [params, setParams] = useSearchParams()
   const requested = params.get('bagian') as Section | null
-  const [section, setSectionState] = useState<Section>(requested && SECTIONS.some((s) => s.id === requested) ? requested : 'practice')
+  const [section, setSectionState] = useState<Section>(requested && SECTIONS.some((s) => s.id === requested) ? requested : 'evidence')
   const motivation = useMemo(() => MOTIVATION[new Date().getDate() % Math.max(MOTIVATION.length, 1)], [])
 
   function setSection(next: Section) {
@@ -56,24 +58,32 @@ export function MedStudyHub() {
 
   return (
     <main className="panacea-app-surface mx-auto max-w-5xl space-y-4 px-3 pb-24 pt-2 sm:px-5">
-      <section className="panacea-dashboard-hero p-5 sm:p-7">
-        <div className="relative z-10 max-w-3xl">
-          <div className="panacea-kicker">PanaceaMed learning system</div>
-          <h1 className="mt-3 text-3xl font-black tracking-[-.04em] text-white sm:text-5xl">Learn difficult medicine without making the interface difficult.</h1>
-          <p className="mt-3 max-w-2xl text-sm leading-relaxed text-white/58">The existing disease, therapy, question, OSCE and foundational datasets stay available. The interface now starts with your intention and explanation depth instead of a wall of categories.</p>
-          {motivation && <div className="mt-5 inline-flex max-w-xl rounded-2xl border border-white/10 bg-white/[.05] px-4 py-3 text-xs leading-relaxed text-white/65">“{motivation.quote}”</div>}
+      <section className="rounded-[30px] border border-neutral-200 bg-neutral-950 p-5 text-white shadow-[0_24px_70px_rgba(20,25,30,.18)] dark:border-white/10 sm:p-7">
+        <div className="max-w-3xl">
+          <div className="text-[9px] font-black uppercase tracking-[.18em] text-amber-300">PanaceaMed learning system</div>
+          <h1 className="mt-3 text-3xl font-black tracking-[-.045em] text-white sm:text-5xl">Medical study should search, test, explain and verify.</h1>
+          <p className="mt-3 max-w-2xl text-[12px] leading-relaxed text-white/60">The local disease, treatment, OSCE and question libraries remain. A live evidence layer now sits beside them so the page is not only a collection of static cards.</p>
+          {motivation && <div className="mt-5 inline-flex max-w-xl rounded-2xl border border-white/10 bg-white/[.05] px-4 py-3 text-[11px] leading-relaxed text-white/65">“{motivation.quote}”</div>}
         </div>
       </section>
 
       <StudyStartPanel onSelect={(next: StudyStartSection) => setSection(next)} current={section} />
 
       <section className="liquid-panel p-3 sm:p-4">
-        <div className="mb-3 flex items-center justify-between gap-3"><div className="panacea-kicker !text-neutral-500 dark:!text-white/50">Full library</div><div className="text-[10px] text-neutral-400">Nothing removed · reorganized by purpose</div></div>
+        <div className="mb-3 flex items-center justify-between gap-3"><div className="panacea-kicker !text-neutral-500 dark:!text-white/50">Medical workspace</div><div className="text-[10px] text-neutral-400">Live sources + local structured learning</div></div>
         <div className="flex gap-1.5 overflow-x-auto pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-          {SECTIONS.map((item) => <button key={item.id} onClick={() => setSection(item.id)} className={`shrink-0 rounded-full border px-3 py-2 text-[11px] font-black transition ${section === item.id ? 'border-[#d8bb70]/35 bg-[#d8bb70]/12 text-[#8a6a20] dark:text-[#f0d68a]' : 'border-black/[.05] bg-white/45 text-neutral-500 dark:border-white/10 dark:bg-white/[.035] dark:text-white/50'}`}>{item.emoji} {item.label}</button>)}
+          {SECTIONS.map((item) => <button key={item.id} onClick={() => setSection(item.id)} className={`shrink-0 rounded-full border px-3 py-2 text-[11px] font-black transition ${section === item.id ? 'border-neutral-950 bg-neutral-950 text-white dark:border-white dark:bg-white dark:text-neutral-950' : 'border-black/[.05] bg-white/55 text-neutral-500 dark:border-white/10 dark:bg-white/[.035] dark:text-white/50'}`}>{item.emoji} {item.label}</button>)}
         </div>
       </section>
 
+      {section === 'evidence' && (
+        <MedicalEvidenceExplorer
+          autoRun
+          initialQuery={params.get('cari') || 'acute coronary syndrome'}
+          title="Medical library · live evidence"
+          subtitle="Search current biomedical literature, ontology terms, registered clinical trials and FDA structured product labels. Use the local Panacea notes for learning structure and the live sources for verification."
+        />
+      )}
       {section === 'practice' && <PracticeBank />}
       {section === 'osce' && <OsceSection />}
       {section === 'techniques' && <TechniquesSection />}
