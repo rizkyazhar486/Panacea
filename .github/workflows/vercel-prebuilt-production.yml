@@ -6,10 +6,11 @@ on:
       - main
   workflow_dispatch:
 
-# This workflow is a fallback for Vercel remote-build rate limits.
-# It builds on GitHub Actions, then uploads the prebuilt artifact to Vercel.
-# Required repository secret: VERCEL_TOKEN
-# Optional repository variables can continue to feed Vite at build time.
+# Fallback for Vercel remote-build rate limits.
+# The application is built on GitHub Actions and the Build Output API artifact
+# is uploaded to Vercel. Production secrets belong in Vercel Environment
+# Variables; do not mirror TURN credentials into ordinary GitHub variables.
+# Required GitHub repository secret: VERCEL_TOKEN
 
 permissions:
   contents: read
@@ -22,6 +23,8 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     timeout-minutes: 30
+    env:
+      VERCEL_TELEMETRY_DISABLED: 1
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -58,15 +61,13 @@ jobs:
           VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
         run: vercel pull --yes --environment=production --scope=panaceamed --token="$VERCEL_TOKEN"
 
-      # The expensive application build happens on the GitHub runner rather
-      # than in Vercel's remote build queue. Vercel then receives .vercel/output.
-      - name: Build production artifact locally
+      # `vercel pull` writes the production environment into .vercel locally.
+      # VITE_API_URL is public and may still be overridden by a GitHub variable;
+      # TURN credentials and other secrets must stay in Vercel Production env.
+      - name: Build production artifact on GitHub runner
         env:
           VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
           VITE_API_URL: ${{ vars.VITE_API_URL }}
-          VITE_TURN_URL: ${{ vars.VITE_TURN_URL }}
-          VITE_TURN_USER: ${{ vars.VITE_TURN_USER }}
-          VITE_TURN_CRED: ${{ vars.VITE_TURN_CRED }}
         run: vercel build --prod --scope=panaceamed --token="$VERCEL_TOKEN"
 
       - name: Deploy prebuilt artifact to production
@@ -78,7 +79,17 @@ jobs:
           echo "url=$URL" >> "$GITHUB_OUTPUT"
           echo "Production deployment: $URL"
 
+      - name: Smoke-test deployed production artifact
+        env:
+          DEPLOYMENT_URL: ${{ steps.deploy.outputs.url }}
+        run: |
+          test -n "$DEPLOYMENT_URL"
+          curl --fail --silent --show-error --location --retry 4 --retry-delay 3 --max-time 30 "$DEPLOYMENT_URL" >/dev/null
+          echo "Deployment responded successfully: $DEPLOYMENT_URL"
+
       - name: Deployment summary
         run: |
           echo "## Vercel production" >> "$GITHUB_STEP_SUMMARY"
-          echo "${{ steps.deploy.outputs.url }}" >> "$GITHUB_STEP_SUMMARY"
+          echo "Deployment: ${{ steps.deploy.outputs.url }}" >> "$GITHUB_STEP_SUMMARY"
+          echo "Alias: https://www.panaceamed.id" >> "$GITHUB_STEP_SUMMARY"
+          echo "Smoke test: passed" >> "$GITHUB_STEP_SUMMARY"
