@@ -21,7 +21,6 @@ async function showNativeNotification(item: FiredNotification) {
       icon: `${import.meta.env.BASE_URL}logo-mark.png`,
       badge: `${import.meta.env.BASE_URL}logo-mark.png`,
       tag: `panacea-smart:${item.ruleId}`,
-      renotify: false,
       data: { url: `./#${item.route}`, ruleId: item.ruleId, source: 'smart-combination' },
     })
   } catch { /* in-app notification still exists */ }
