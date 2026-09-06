@@ -1,4 +1,4 @@
-import { lazy, Suspense } from 'react'
+import { lazy, Suspense, type ReactNode } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { BodyEvidenceDock, type BodyEvidenceMode } from '../components/digital-twin/BodyEvidenceDock'
 
@@ -36,14 +36,14 @@ const PRIMARY: Mode[] = [
   { key: 'realistic-atlas', label: 'Anatomy', hint: 'HuBMAP HRA reference objects · rotate, isolate, inspect' },
   { key: 'digital-twin', label: 'Body → Cell', hint: 'Human Protein Atlas microscopy and real cell/gene records' },
   { key: 'cell-genome', label: 'Cell → DNA', hint: 'Human Protein Atlas + Ensembl coordinates and genomic sequence' },
-  { key: 'workout-4d', label: 'Exercise', hint: 'Movement physiology paired with current literature' },
-  { key: 'surgery', label: 'Surgery', hint: 'Surgical anatomy and procedural sequence with live evidence' },
+  { key: 'workout-4d', label: 'Exercise', hint: 'Reference anatomy first; measured workout replay is a separate layer' },
+  { key: 'surgery', label: 'Surgery', hint: 'Reference anatomy first; procedural simulation is explicitly separated' },
 ]
 
 const MORE: Mode[] = [
-  { key: 'surgery-rehearsal', label: 'Practice', hint: 'Surgical rehearsal separated from source evidence' },
-  { key: 'counterfactual', label: 'What-if', hint: 'Scenario modelling with real evidence shown separately' },
-  { key: 'regeneration', label: 'Research', hint: 'Experimental regeneration concepts with current trials and literature' },
+  { key: 'surgery-rehearsal', label: 'Practice', hint: 'HRA anatomy first; rehearsal tools remain an explicit simulation layer' },
+  { key: 'counterfactual', label: 'What-if', hint: 'Reference anatomy and real evidence stay separate from scenario modelling' },
+  { key: 'regeneration', label: 'Research', hint: 'Reference anatomy and live trials stay separate from experimental concepts' },
 ]
 
 const ALL = [...PRIMARY, ...MORE]
@@ -56,6 +56,27 @@ function LoadingLab({ label }: { label: string }) {
   return (
     <div className="rounded-[28px] border border-neutral-200 bg-white p-10 text-center text-sm font-semibold text-neutral-500 shadow-sm dark:border-white/10 dark:bg-white/[0.035]">
       Loading {label}…
+    </div>
+  )
+}
+
+function SourceBackedMode({ title, detail, children }: { title: string; detail: string; children: ReactNode }) {
+  return (
+    <div className="space-y-4">
+      <Suspense fallback={<LoadingLab label="HuBMAP Human Reference Atlas" />}>
+        <HraClinicalAtlas />
+      </Suspense>
+      <details className="group rounded-[26px] border border-neutral-200 bg-white p-4 shadow-sm dark:border-white/10 dark:bg-white/[.035]">
+        <summary className="flex cursor-pointer list-none items-center justify-between gap-3">
+          <div>
+            <div className="text-[9px] font-black uppercase tracking-[.15em] text-amber-700 dark:text-amber-300">Model / simulation layer</div>
+            <div className="mt-1 text-[15px] font-black text-neutral-950 dark:text-white">{title}</div>
+            <p className="mt-1 max-w-3xl text-[10px] leading-relaxed text-neutral-500 dark:text-neutral-400">{detail}</p>
+          </div>
+          <span className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-neutral-100 text-lg text-neutral-700 transition group-open:rotate-45 dark:bg-white/10 dark:text-white">＋</span>
+        </summary>
+        <div className="mt-4 border-t border-neutral-100 pt-4 dark:border-white/10">{children}</div>
+      </details>
     </div>
   )
 }
@@ -124,25 +145,25 @@ export function BodyExplorer() {
           <CellGenomeEvidenceLab mode="cell-genome" />
         </Suspense>
       ) : mode === 'workout-4d' ? (
-        <Suspense fallback={<LoadingLab label="exercise physiology" />}>
-          <Workout4DLab />
-        </Suspense>
+        <SourceBackedMode title="Measured workout replay" detail="Workout-derived animation is useful only after the anatomical reference is established. Measured device signals, derived physiology and educational context remain explicitly separated.">
+          <Suspense fallback={<LoadingLab label="exercise physiology replay" />}><Workout4DLab /></Suspense>
+        </SourceBackedMode>
       ) : mode === 'surgery' ? (
-        <Suspense fallback={<LoadingLab label="surgical anatomy" />}>
-          <SurgicalOperationAtlas />
-        </Suspense>
+        <SourceBackedMode title="Procedural surgery atlas" detail="This section is a procedural education layer, not source anatomy. The HuBMAP reference atlas above remains the anatomical ground truth shown first.">
+          <Suspense fallback={<LoadingLab label="surgical procedure atlas" />}><SurgicalOperationAtlas /></Suspense>
+        </SourceBackedMode>
       ) : mode === 'surgery-rehearsal' ? (
-        <Suspense fallback={<LoadingLab label="surgical rehearsal" />}>
-          <SurgicalRehearsalLab />
-        </Suspense>
+        <SourceBackedMode title="Surgical rehearsal" detail="Rehearsal is intentionally collapsed by default so a simulated sequence is never mistaken for the HRA reference anatomy above.">
+          <Suspense fallback={<LoadingLab label="surgical rehearsal" />}><SurgicalRehearsalLab /></Suspense>
+        </SourceBackedMode>
       ) : mode === 'counterfactual' ? (
-        <Suspense fallback={<LoadingLab label="what-if lab" />}>
-          <CounterfactualBiologyLab />
-        </Suspense>
+        <SourceBackedMode title="Counterfactual biology model" detail="What-if outputs are modelling hypotheses. They are not observed anatomy, diagnosis or treatment response; live evidence remains separately visible below.">
+          <Suspense fallback={<LoadingLab label="what-if model" />}><CounterfactualBiologyLab /></Suspense>
+        </SourceBackedMode>
       ) : (
-        <Suspense fallback={<LoadingLab label="regeneration research" />}>
-          <RegenerationResearchSandbox />
-        </Suspense>
+        <SourceBackedMode title="Regeneration research sandbox" detail="Experimental regeneration concepts are kept behind the reference anatomy and are paired with current literature and registered clinical trials below.">
+          <Suspense fallback={<LoadingLab label="regeneration research" />}><RegenerationResearchSandbox /></Suspense>
+        </SourceBackedMode>
       )}
 
       <BodyEvidenceDock mode={mode} />
