@@ -6,46 +6,14 @@ import { FITUR_DARI_HUB } from '../lib/katalogFitur'
 import { penjelasan } from '../lib/penjelasanFitur'
 import { rupa } from '../lib/kategoriRupa'
 
-/**
- * Direktori seluruh fitur, dapat dicari.
- *
- * Ini pasangan dari pemangkasan menu. Menu kini hanya memuat tujuan harian;
- * halaman ini yang menjamin sisanya tetap dapat ditemukan, sehingga memangkas
- * menu tidak sama dengan menghapus fitur.
- *
- * Sumbernya KATALOG yang sama dengan pencarian global — bukan daftar yang
- * ditulis ulang. Daftar kedua yang ditulis tangan pasti akan tertinggal begitu
- * ada fitur baru, dan yang tertinggal itu menjadi fitur yang tidak pernah
- * ditemukan siapa pun.
- */
-
-/*
- * NAMA DAN WARNA GRUP TIDAK LAGI DITULIS DI SINI.
- *
- * Sebelumnya halaman ini punya petanya sendiri, dan akibatnya satu gagasan
- * yang sama memakai dua nama di dua layar — "Klinis & AI" di sini, sesuatu
- * yang lain di kisi beranda. Sekarang keduanya membaca lib/kategoriRupa.ts,
- * jadi menamai ulang sebuah kelompok cukup dilakukan sekali.
- */
-
-/**
- * Toko, farmasi, dan transaksi dipisahkan ke grupnya sendiri.
- *
- * Keduanya bukan bagian dari apa yang dipakai orang untuk belajar atau menjaga
- * kesehatannya — mereka jalur jual-beli, dengan alur, kewajiban, dan risiko
- * yang berbeda. Mencampurnya ke dalam menu kesehatan membuat orang mengira
- * setiap ketukan berujung tagihan.
- */
 const TOKO = new Set(['/pharmacy', '/orders', '/marketplace', '/billing', '/pricing', '/consult', '/hospitals'])
 
 export default function SemuaFitur() {
   const { account } = useStore()
   const [q, setQ] = useState('')
+  const [kategori, setKategori] = useState<string | null>(null)
   const peran = account?.role ?? 'pasien'
 
-  // Dua sumber digabung menurut `to`, dengan menu didahulukan karena labelnya
-  // yang dipakai di navigasi. Tanpa penggabungan ini halaman "Semua Fitur"
-  // hanya memuat 59 dari 187 tujuan -- namanya berjanji lebih daripada isinya.
   const semua = useMemo(() => {
     const peta = new Map<string, { to: string; label: string; group: string; kw: string; apa: string; roles: string[] }>()
     for (const f of FITUR_DARI_HUB) {
@@ -53,123 +21,159 @@ export default function SemuaFitur() {
     }
     for (const n of NAV_UNTUK_PENGATURAN) {
       const ada = peta.get(n.to)
-      // Label menu didahulukan, namun keterangan dari hub DIPERTAHANKAN.
-      // Sebelumnya keterangan itu ikut terhapus setiap kali sebuah tujuan juga
-      // ada di menu, sehingga tujuan yang paling sering dipakai justru yang
-      // paling sering kehilangan penjelasannya.
       peta.set(n.to, { to: n.to, label: n.label, group: n.group, kw: ada?.kw ?? '', apa: ada?.apa ?? '', roles: n.roles })
     }
     return [...peta.values()]
   }, [])
 
-  const grup = useMemo(() => {
-    const kata = q.toLowerCase().trim()
-    const cocok = semua.filter((n) => {
-      // Tujuan yang datang dari hub tidak membawa daftar peran; hub itu
-      // sendiri sudah membatasi siapa yang bisa membukanya, jadi daftar kosong
-      // di sini berarti "tidak dibatasi", bukan "tidak boleh siapa pun".
-      if (n.roles.length && !n.roles.includes(peran)) return false
-      if (n.to === '/semua-fitur') return false
-      if (!kata) return true
-      // Dicocokkan PER KATA, bukan sebagai frasa utuh. Dengan `includes`,
-      // mengetik "pulmonary embolism" tidak menemukan Wells Score meskipun
-      // kedua katanya ada di sana -- hanya urutannya yang tidak persis sama.
-      // Semua kata harus ada, jadi menambah kata tetap mempersempit hasil.
-      // Penjelasan bahasa Indonesia WAJIB ikut dicari. Tanpa ini, kalimat
-      // yang ditulis khusus agar orang awam mengerti justru tidak dapat
-      // dipakai untuk menemukan fiturnya: mengetik "darurat" tidak menemukan
-      // "Emergency Card & SOS" meskipun penjelasannya diawali kata itu.
-      const teks = `${n.label} ${n.group} ${n.to} ${n.kw} ${penjelasan(n.to, n.apa)}`.toLowerCase()
-      return kata.split(/\s+/).every((w) => teks.includes(w))
-    })
-    const peta = new Map<string, typeof cocok>()
-    for (const n of cocok) {
-      const g = TOKO.has(n.to) ? 'Shop' : n.group
-      if (!peta.has(g)) peta.set(g, [])
-      peta.get(g)!.push(n)
-    }
-    // Toko diletakkan paling belakang: ia yang paling jarang dituju, dan
-    // menaruhnya di atas membuat halaman ini terbaca sebagai etalase.
-    return [...peta.entries()].sort((a, b) => (a[0] === 'Shop' ? 1 : 0) - (b[0] === 'Shop' ? 1 : 0))
-  }, [q, peran, semua])
+  const tersedia = useMemo(() => semua.filter((n) => {
+    if (n.roles.length && !n.roles.includes(peran)) return false
+    return n.to !== '/semua-fitur'
+  }), [semua, peran])
 
-  const total = grup.reduce((a, [, v]) => a + v.length, 0)
+  const daftarKategori = useMemo(() => {
+    const hitung = new Map<string, number>()
+    for (const n of tersedia) {
+      const group = TOKO.has(n.to) ? 'Shop' : n.group
+      hitung.set(group, (hitung.get(group) ?? 0) + 1)
+    }
+    return [...hitung.entries()].sort((a, b) => {
+      if (a[0] === 'Shop') return 1
+      if (b[0] === 'Shop') return -1
+      return b[1] - a[1]
+    })
+  }, [tersedia])
+
+  const hasil = useMemo(() => {
+    const kata = q.toLowerCase().trim()
+    return tersedia.filter((n) => {
+      const group = TOKO.has(n.to) ? 'Shop' : n.group
+      if (kategori && group !== kategori) return false
+      if (!kata) return true
+      const teks = `${n.label} ${group} ${n.to} ${n.kw} ${penjelasan(n.to, n.apa)}`.toLowerCase()
+      return kata.split(/\s+/).every((word) => teks.includes(word))
+    })
+  }, [q, kategori, tersedia])
+
+  const grup = useMemo(() => {
+    const map = new Map<string, typeof hasil>()
+    for (const n of hasil) {
+      const group = TOKO.has(n.to) ? 'Shop' : n.group
+      if (!map.has(group)) map.set(group, [])
+      map.get(group)!.push(n)
+    }
+    return [...map.entries()].sort((a, b) => {
+      if (a[0] === 'Shop') return 1
+      if (b[0] === 'Shop') return -1
+      return b[1].length - a[1].length
+    })
+  }, [hasil])
 
   return (
-    <div className="space-y-4 pb-4">
-      <header>
-        <h1 className="text-[20px] font-black text-ink dark:text-white">Everything in here</h1>
-        <p className="text-[13px] text-neutral-500">
-          {total} pages. The menu holds only what you need daily — the rest lives here.
-        </p>
-      </header>
+    <div className="space-y-5 pb-8">
+      <section className="relative overflow-hidden rounded-[32px] border border-white/10 bg-[#07121b] p-5 text-white shadow-[0_28px_90px_rgba(5,18,28,.28)] sm:p-7">
+        <div className="pointer-events-none absolute -right-20 -top-24 h-72 w-72 rounded-full bg-violet-400/20 blur-3xl" />
+        <div className="pointer-events-none absolute -bottom-28 -left-16 h-72 w-72 rounded-full bg-emerald-400/20 blur-3xl" />
+        <div className="relative max-w-3xl">
+          <div className="text-[10px] font-black uppercase tracking-[.2em] text-emerald-300">Panacea product browser</div>
+          <h1 className="mt-2 text-[clamp(2rem,5vw,4rem)] font-black leading-[.96] tracking-[-.045em]">Find what you need. Ignore the rest.</h1>
+          <p className="mt-3 max-w-2xl text-sm leading-relaxed text-white/60">
+            {tersedia.length} available tools across life, movement, body, learning, prevention, services and medicine. Search by what you want to do—not by technical feature name.
+          </p>
 
-      <input
-        value={q}
-        onChange={(e) => setQ(e.target.value)}
-        placeholder="Search…"
-        className="w-full rounded-2xl border border-neutral-200 bg-white px-4 py-3 text-[13px] outline-none focus:border-brand dark:border-white/10 dark:bg-white/5"
-      />
+          <div className="mt-5 flex items-center gap-3 rounded-[22px] border border-white/12 bg-white/[.07] px-4 backdrop-blur-xl">
+            <span aria-hidden className="text-lg text-white/40">⌕</span>
+            <input
+              value={q}
+              onChange={(e) => setQ(e.target.value)}
+              placeholder="Try: sleep, running, money, focus, heart, cancer, prayer…"
+              className="min-h-[52px] w-full bg-transparent text-sm font-semibold text-white outline-none placeholder:text-white/35"
+            />
+            {q && <button onClick={() => setQ('')} className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-white/10 text-white/60" aria-label="Clear search">×</button>}
+          </div>
+        </div>
+      </section>
 
-      {grup.map(([nama, isi]) => (
-        <section key={nama}>
-          {/* Judulnya membawa warna dan lambang kelompoknya, sama seperti di
-              kisi beranda — supaya kedua layar terasa satu tempat. */}
-          <h2 className="mb-1.5 flex items-center gap-1.5 text-[12px] font-black">
-            <span aria-hidden className={`h-4 w-1.5 shrink-0 rounded-full ${rupa(nama).garis}`} />
-            <span aria-hidden>{rupa(nama).emoji}</span>
-            <span className={rupa(nama).teks}>{rupa(nama).label}</span>
-            <span className="text-[10px] font-bold text-neutral-400">· {isi.length}</span>
-          </h2>
-          {/* Tabel, bukan deretan keping.
-              Keping hanya memuat nama, dan nama seperti "VitaPulse" maupun
-              "Braden Scale" tidak memberi tahu siapa pun apa isinya — sehingga
-              halaman yang namanya berjanji memuat semua fitur justru tidak
-              membantu menemukan satu pun. Setiap baris kini membawa
-              penjelasannya sendiri.
+      <section>
+        <div className="mb-2 flex items-center justify-between gap-3 px-1">
+          <div>
+            <div className="text-[10px] font-black uppercase tracking-[.16em] text-neutral-400">Browse by area</div>
+            <div className="mt-0.5 text-sm font-black text-ink dark:text-white">Swipe the categories</div>
+          </div>
+          {kategori && <button onClick={() => setKategori(null)} className="rounded-full border border-black/[.06] bg-white/70 px-3 py-2 text-[10px] font-black text-brand-dark dark:border-white/10 dark:bg-white/[.05] dark:text-emerald-300">Show all</button>}
+        </div>
+        <div className="no-scrollbar -mx-1 flex snap-x gap-2 overflow-x-auto px-1 pb-2 pt-1">
+          {daftarKategori.map(([nama, count]) => {
+            const active = kategori === nama
+            const visual = rupa(nama)
+            return (
+              <button
+                key={nama}
+                onClick={() => setKategori(active ? null : nama)}
+                className={`shrink-0 snap-start rounded-full border px-4 py-2.5 text-[11px] font-black transition ${active ? `${visual.bg} ${visual.teks} border-transparent shadow-sm` : 'border-black/[.06] bg-white/70 text-neutral-600 dark:border-white/10 dark:bg-white/[.045] dark:text-neutral-300'}`}
+              >
+                <span aria-hidden>{visual.emoji}</span> {visual.label} <span className="opacity-50">{count}</span>
+              </button>
+            )
+          })}
+        </div>
+      </section>
 
-              Dibangun dengan <ul>, bukan <table>: pada lebar 390 px tabel
-              sungguhan memaksa dua kolom berdampingan, dan kolom penjelasan
-              tersisa ±150 px sehingga tiap kalimat pecah menjadi enam baris.
-              Susunan menurun membuat penjelasan memakai lebar penuh. */}
-          <ul className={`relative isolate overflow-hidden rounded-2xl border border-neutral-200 bg-gradient-to-br dark:border-white/10 ${rupa(nama).kilau[0]} ${rupa(nama).kilau[1]}`}>
-            {isi.map((n, i) => {
-              const apa = penjelasan(n.to, n.apa)
-              return (
-                <li key={n.to} className={i > 0 ? 'border-t border-neutral-200 dark:border-white/10' : ''}>
+      <div className="flex items-end justify-between gap-3 px-1">
+        <div>
+          <div className="text-[10px] font-black uppercase tracking-[.16em] text-neutral-400">Results</div>
+          <h2 className="mt-1 text-xl font-black tracking-[-.025em] text-ink dark:text-white">{hasil.length} useful destinations</h2>
+        </div>
+        {(q || kategori) && <div className="text-right text-[10px] text-neutral-400">Filtered from {tersedia.length}</div>}
+      </div>
+
+      {grup.map(([nama, isi]) => {
+        const visual = rupa(nama)
+        return (
+          <section key={nama} className="space-y-2.5">
+            <div className="flex items-center justify-between gap-2 px-1">
+              <h3 className={`flex items-center gap-2 text-[13px] font-black ${visual.teks}`}>
+                <span aria-hidden className={`h-5 w-1.5 rounded-full ${visual.garis}`} />
+                <span aria-hidden>{visual.emoji}</span>
+                {visual.label}
+              </h3>
+              <span className="text-[10px] font-bold text-neutral-400">{isi.length}</span>
+            </div>
+
+            <div className="grid gap-2.5 sm:grid-cols-2 xl:grid-cols-3">
+              {isi.map((n) => {
+                const apa = penjelasan(n.to, n.apa)
+                return (
                   <Link
+                    key={n.to}
                     to={n.to}
-                    /* min-h-[56px]: dua baris teks pada 390 px, sekaligus jauh
-                       di atas batas bawah sasaran sentuh 40 px. */
-                    className="flex min-h-[56px] items-center gap-3 bg-white/75 px-3 py-2.5 transition active:bg-white/50 dark:bg-white/5 dark:active:bg-white/10"
+                    className="group relative min-h-[132px] overflow-hidden rounded-[26px] border border-black/[.055] bg-white/75 p-4 shadow-[0_12px_36px_rgba(20,35,45,.055)] backdrop-blur-xl transition duration-300 hover:-translate-y-1 hover:border-black/[.09] hover:shadow-[0_20px_52px_rgba(20,55,50,.11)] dark:border-white/10 dark:bg-white/[.045]"
                   >
-                    {/* Lambang kelompoknya diulang tiap baris: pada daftar
-                        panjang yang digulir, judul bagiannya sudah lama keluar
-                        dari layar saat orang membaca baris ke-sepuluh. */}
-                    <span aria-hidden className={`grid h-8 w-8 shrink-0 place-items-center rounded-xl text-[15px] ${rupa(nama).bg}`}>
-                      {rupa(nama).emoji}
-                    </span>
-                    <span className="min-w-0 flex-1">
-                      <span className="block text-[13px] font-bold leading-tight text-ink dark:text-white">
-                        {n.label}
-                      </span>
-                      {apa && (
-                        <span className="mt-0.5 block text-[11px] leading-snug text-neutral-500 dark:text-neutral-400">
-                          {apa}
-                        </span>
-                      )}
-                    </span>
-                    <span aria-hidden="true" className="shrink-0 text-[13px] font-black text-neutral-300 dark:text-neutral-600">›</span>
+                    <div className={`pointer-events-none absolute -right-12 -top-12 h-36 w-36 rounded-full opacity-40 blur-3xl ${visual.bg}`} aria-hidden />
+                    <div className="relative flex h-full flex-col">
+                      <div className="flex items-start justify-between gap-3">
+                        <span aria-hidden className={`grid h-10 w-10 shrink-0 place-items-center rounded-2xl text-lg shadow-[inset_0_1px_rgba(255,255,255,.7)] ${visual.bg}`}>{visual.emoji}</span>
+                        <span aria-hidden className="text-lg text-neutral-300 transition group-hover:translate-x-1 group-hover:text-brand dark:text-white/25">→</span>
+                      </div>
+                      <div className="mt-3 text-[14px] font-black leading-tight tracking-[-.015em] text-ink dark:text-white">{n.label}</div>
+                      {apa && <p className="mt-1 line-clamp-3 text-[11px] leading-relaxed text-neutral-500 dark:text-neutral-400">{apa}</p>}
+                      <div className={`mt-auto pt-3 text-[9px] font-black uppercase tracking-[.12em] ${visual.teks}`}>Open</div>
+                    </div>
                   </Link>
-                </li>
-              )
-            })}
-          </ul>
-        </section>
-      ))}
+                )
+              })}
+            </div>
+          </section>
+        )
+      })}
 
-      {total === 0 && (
-        <p className="text-center text-[13px] text-neutral-500">Nothing matches — try another word.</p>
+      {hasil.length === 0 && (
+        <section className="rounded-[28px] border border-dashed border-neutral-300 bg-white/60 p-8 text-center dark:border-white/15 dark:bg-white/[.03]">
+          <div className="text-3xl" aria-hidden>⌕</div>
+          <div className="mt-3 text-base font-black text-ink dark:text-white">Nothing matches yet</div>
+          <p className="mt-1 text-sm text-neutral-500">Try a shorter phrase, or clear the category filter.</p>
+          <button onClick={() => { setQ(''); setKategori(null) }} className="mt-4 rounded-full bg-brand px-4 py-2.5 text-xs font-black text-white">Reset browser</button>
+        </section>
       )}
     </div>
   )
