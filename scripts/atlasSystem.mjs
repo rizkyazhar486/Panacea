@@ -198,6 +198,7 @@ const MODUL = {
 const Z = (n) => new URL(`../public/anatomy/${n}.glb`, import.meta.url).pathname
 const HRA = '/home/user/hubmapconsortium/ccf-3d-reference-object-library/VH_Female/v1.2/'
 const HRA_13 = '/home/user/hubmapconsortium/ccf-3d-reference-object-library/VH_Female/v1.3/'
+const HRA_M = '/home/user/hubmapconsortium/ccf-3d-reference-object-library/VH_Male/v1.2/'
 
 /**
  * Nama Z-Anatomy menjadi nama yang dibaca orang.
@@ -243,8 +244,26 @@ function rapikanZ(n) {
  * "Left meniscus". Awalan VH_F_ hanyalah penanda berkas rujukan, dan akhiran
  * _L/_R adalah sisi — keduanya bukan bagian dari nama anatominya.
  */
+// Beberapa nama HRA disingkat atau bernomor di berkasnya; ditulis ulang di
+// sini supaya yang terbaca pengguna adalah istilah anatominya, bukan singkatan
+// internal berkas.
+const NAMA_HRA = {
+  papillary_muscle_of_heart_ant: 'Anterior papillary muscle',
+  papillary_muscle_of_heart_antlat: 'Anterolateral papillary muscle',
+  papillary_muscle_of_heart_med: 'Medial papillary muscle',
+  papillary_muscle_of_heart_pos: 'Posterior papillary muscle',
+  papillary_muscle_of_heart_posmed: 'Posteromedial papillary muscle',
+  fundus_of_urinary_bladder_dome: 'Dome of urinary bladder',
+  fundus_of_urinary_bladder_base1: 'Base of urinary bladder',
+  urinary_bladder_neck_smooth_muscle: 'Bladder neck smooth muscle',
+  other_urethra: 'Membranous and penile urethra',
+  'transition_zone__of_prostate_L': 'Left transition zone of prostate',
+  'transition_zone_of_prostate_R': 'Right transition zone of prostate',
+}
+
 function rapikanHra(n) {
   let s = n.replace(/^VH_[FM]_/, '')
+  if (NAMA_HRA[s]) return NAMA_HRA[s]
   let sisi = ''
   const m = s.match(/_(L|R)$/)
   if (m) { sisi = m[1] === 'L' ? 'Left ' : 'Right '; s = s.slice(0, -2) }
@@ -307,6 +326,32 @@ const MODUL_GLB = {
     asal: 'hra-female',
     isi: [
       { berkas: HRA + 'VH_F_Spinal_Cord.glb', perMesh: true, kind: 'nerve', sel: 0.0009 },
+    ],
+  },
+  'jantung-ruang': {
+    label: 'Heart chambers & valves',
+    asal: 'hra-female',
+    isi: [
+      { berkas: HRA + 'VH_F_Heart.glb', perMesh: true, kind: 'chamber', sel: 0.0012 },
+    ],
+  },
+  bilier: {
+    label: 'Biliary tree & pancreatic ducts',
+    asal: 'hra-female',
+    isi: [
+      { berkas: HRA + 'VH_F_Biliary_Tree.glb', perMesh: true, kind: 'liver' },
+      { berkas: HRA + 'VH_F_Gallbladder.glb', perMesh: true, kind: 'liver' },
+      { berkas: HRA + 'VH_F_Pancreas.glb', perMesh: true, kind: 'gland', sel: 0.0015 },
+      { berkas: HRA + 'VH_F_Liver.glb', perMesh: true, kind: 'liver', sel: 0.004 },
+    ],
+  },
+  prostat: {
+    label: 'Prostate zones & bladder',
+    asal: 'hra-male',
+    isi: [
+      { berkas: HRA_M + 'VH_M_Prostate.glb', perMesh: true, kind: 'repro', sel: 0.0008 },
+      { berkas: HRA_M + 'VH_M_Urinary_Bladder.glb', perMesh: true, kind: 'urine', sel: 0.0015 },
+      { berkas: HRA_M + 'VH_M_Urethra.glb', perMesh: true, kind: 'urine', sel: 0.0008 },
     ],
   },
   obgin: {
@@ -418,7 +463,7 @@ for (const [id, m] of Object.entries(MODUL_GLB)) {
   for (const d of data) for (let i = 0; i < d.pos.length; i += 3)
     for (let a = 0; a < 3; a++) d.pos[i + a] = (d.pos[i + a] - tengah[a]) * skala
 
-  const bytes = tulisGlb(join(KELUAR, `${id}.glb`), data, m.asal === 'hra-female' ? HAK_CIPTA_HRA : HAK_CIPTA_Z)
+  const bytes = tulisGlb(join(KELUAR, `${id}.glb`), data, m.asal.startsWith('hra') ? HAK_CIPTA_HRA : HAK_CIPTA_Z)
   let tri = 0
   for (const d of data) {
     tri += d.idx.length / 3
@@ -443,7 +488,7 @@ export interface AtlasPart {
   kind: string
   color: string
   /** Dari sumber geometri mana bagian ini datang. */
-  source: 'bodyparts3d' | 'z-anatomy' | 'hra-female'
+  source: 'bodyparts3d' | 'z-anatomy' | 'hra-female' | 'hra-male'
   centroid: [number, number, number]
   line: [number, number, number][]
   triangles: number
