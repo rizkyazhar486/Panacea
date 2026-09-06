@@ -24,7 +24,7 @@ function challengeUrl(duel: ClinicalDuelCase): string {
 }
 
 function proofCode(duel: ClinicalDuelCase, seconds: number) {
-  return `PAN-${localDayKey().replaceAll('-', '')}-${duel.id.slice(0, 6).toUpperCase()}-${String(seconds).padStart(2, '0')}`
+  return `PAN-${localDayKey().split('-').join('')}-${duel.id.slice(0, 6).toUpperCase()}-${String(seconds).padStart(2, '0')}`
 }
 
 async function createProofCard(
