@@ -66,3 +66,5 @@ Body → Cell and Cell → DNA render the Human Protein Atlas + Ensembl evidence
 ## Body Exposure routing boundary
 
 The Body Exposure route no longer uses the legacy Body3D renderer as the primary visual for Physiology, Exercise, Surgery, Practice, What-if or Research. Physiology uses HRA source geometry plus provenance-aware functional data; Exercise uses HRA plus a data replay; Surgery uses HRA plus a procedure timeline; Practice uses HRA plus active recall; What-if and Research use source-resolved HRA workbenches. Legacy renderers may still exist elsewhere in the repository for compatibility, but they are not the authoritative anatomy source for these Body Exposure modes.
+
+Release marker: HRA-native physiology, workout data replay, surgical procedure timeline and rehearsal cleanup are included in this production batch.
