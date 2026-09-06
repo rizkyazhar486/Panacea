@@ -18,11 +18,11 @@ const CellGenomeEvidenceLab = lazy(() =>
 const CinematicCellGenomeExplorer = lazy(() =>
   import('../components/digital-twin/CinematicCellGenomeExplorer').then((m) => ({ default: m.CinematicCellGenomeExplorer })),
 )
-const RegenerationResearchSandbox = lazy(() =>
-  import('../components/digital-twin/RegenerationResearchSandbox').then((m) => ({ default: m.RegenerationResearchSandbox })),
+const CounterfactualHraWorkbench = lazy(() =>
+  import('../components/digital-twin/CounterfactualHraWorkbench').then((m) => ({ default: m.CounterfactualHraWorkbench })),
 )
-const CounterfactualBiologyLab = lazy(() =>
-  import('../components/digital-twin/CounterfactualBiologyLab').then((m) => ({ default: m.CounterfactualBiologyLab })),
+const RegenerationHraWorkbench = lazy(() =>
+  import('../components/digital-twin/RegenerationHraWorkbench').then((m) => ({ default: m.RegenerationHraWorkbench })),
 )
 const Workout4DLab = lazy(() =>
   import('../components/digital-twin/Workout4DLab').then((m) => ({ default: m.Workout4DLab })),
@@ -59,16 +59,14 @@ const PRIMARY: Mode[] = [
 
 const MORE: Mode[] = [
   { key: 'surgery-rehearsal', label: 'Practice', hint: 'Operation-specific HRA source anatomy first; rehearsal remains a separate model layer' },
-  { key: 'counterfactual', label: 'What-if', hint: 'Reference anatomy and real evidence stay separate from scenario modelling' },
-  { key: 'regeneration', label: 'Research', hint: 'Reference anatomy and live trials stay separate from experimental concepts' },
+  { key: 'counterfactual', label: 'What-if', hint: 'Scenario-resolved HRA geometry + executable causal model, kept separate' },
+  { key: 'regeneration', label: 'Research', hint: 'Organ-resolved HRA geometry + explicit aging/recovery hypotheses' },
 ]
 
 const ALL = [...PRIMARY, ...MORE]
 
 const HRA_CONTEXT: Partial<Record<LabMode, string[]>> = {
   physiology: ['heart', 'lung', 'blood vasculature', 'skeletal muscle', 'kidney', 'colon', 'skin', 'brain'],
-  counterfactual: ['heart', 'liver', 'kidney', 'brain', 'lung', 'pancreas'],
-  regeneration: ['skin', 'liver', 'kidney', 'heart', 'brain', 'pancreas'],
 }
 
 function isLabMode(value: string | null): value is LabMode {
@@ -245,13 +243,13 @@ export function BodyExplorer() {
           <Suspense fallback={<LoadingLab label="cinematic surgical rehearsal" />}><CinematicSurgicalRehearsal /></Suspense>
         </SourceBackedMode>
       ) : mode === 'counterfactual' ? (
-        <SourceBackedMode evidenceTerms={HRA_CONTEXT.counterfactual ?? []} title="Counterfactual biology model" detail="What-if outputs are modelling hypotheses. They are not observed anatomy, diagnosis or treatment response; HRA source matches stay visibly separate above.">
-          <Suspense fallback={<LoadingLab label="what-if model" />}><CounterfactualBiologyLab /></Suspense>
-        </SourceBackedMode>
+        <Suspense fallback={<LoadingLab label="source-resolved What-if workbench" />}>
+          <CounterfactualHraWorkbench />
+        </Suspense>
       ) : (
-        <SourceBackedMode evidenceTerms={HRA_CONTEXT.regeneration ?? []} title="Regeneration research sandbox" detail="Experimental regeneration concepts are kept behind the reference anatomy and are paired with source-mapped HRA structures plus current literature and registered clinical trials.">
-          <Suspense fallback={<LoadingLab label="regeneration research" />}><RegenerationResearchSandbox /></Suspense>
-        </SourceBackedMode>
+        <Suspense fallback={<LoadingLab label="source-resolved regeneration research" />}>
+          <RegenerationHraWorkbench />
+        </Suspense>
       )}
 
       <BodyEvidenceDock mode={mode} />
