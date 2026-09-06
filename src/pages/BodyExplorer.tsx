@@ -6,6 +6,9 @@ import { HraContextBridge } from '../components/digital-twin/HraContextBridge'
 const HraClinicalAtlas = lazy(() =>
   import('../components/digital-twin/HraClinicalAtlas').then((m) => ({ default: m.HraClinicalAtlas })),
 )
+const PhysiologyBodyLab = lazy(() =>
+  import('../components/digital-twin/PhysiologyBodyLab').then((m) => ({ default: m.PhysiologyBodyLab })),
+)
 const CellGenomeEvidenceLab = lazy(() =>
   import('../components/digital-twin/CellGenomeEvidenceLab').then((m) => ({ default: m.CellGenomeEvidenceLab })),
 )
@@ -41,6 +44,7 @@ type Mode = {
 
 const PRIMARY: Mode[] = [
   { key: 'realistic-atlas', label: 'Anatomy', hint: 'Live GitHub HRA GLB catalog + published ASCT+B structure mapping' },
+  { key: 'physiology', label: 'Physiology 4D', hint: 'Cardiovascular, respiratory, neuromuscular, GI, renal and thermoregulation' },
   { key: 'digital-twin', label: 'Body → Cell', hint: 'Cinematic cell structure + Human Protein Atlas evidence' },
   { key: 'cell-genome', label: 'Cell → DNA', hint: '3D cell/chromatin/DNA + HPA and Ensembl evidence' },
   { key: 'workout-4d', label: 'Exercise', hint: 'HRA reference anatomy first; measured workout replay is a separate layer' },
@@ -56,6 +60,7 @@ const MORE: Mode[] = [
 const ALL = [...PRIMARY, ...MORE]
 
 const HRA_CONTEXT: Partial<Record<LabMode, string[]>> = {
+  physiology: ['heart', 'lung', 'blood vasculature', 'skeletal muscle', 'kidney', 'colon', 'skin', 'brain'],
   'workout-4d': ['heart', 'lung', 'blood vasculature', 'skeletal muscle', 'femur'],
   'surgery-rehearsal': ['meniscus', 'femur', 'patella', 'heart valve', 'kidney', 'colon'],
   counterfactual: ['heart', 'liver', 'kidney', 'brain', 'lung', 'pancreas'],
@@ -80,12 +85,14 @@ function SourceBackedMode({
   evidenceTerms = [],
   sourcePanel,
   children,
+  openDefault = false,
 }: {
   title: string
   detail: string
   evidenceTerms?: string[]
   sourcePanel?: ReactNode
   children: ReactNode
+  openDefault?: boolean
 }) {
   return (
     <div className="space-y-4">
@@ -94,7 +101,7 @@ function SourceBackedMode({
       </Suspense>
       {sourcePanel}
       {evidenceTerms.length > 0 && <HraContextBridge title="Mapped anatomy for this experience" terms={evidenceTerms} />}
-      <details className="group rounded-[26px] border border-neutral-200 bg-white p-4 shadow-sm dark:border-white/10 dark:bg-white/[.035]">
+      <details className="group rounded-[26px] border border-neutral-200 bg-white p-4 shadow-sm dark:border-white/10 dark:bg-white/[.035]" open={openDefault}>
         <summary className="flex cursor-pointer list-none items-center justify-between gap-3">
           <div>
             <div className="text-[9px] font-black uppercase tracking-[.15em] text-amber-700 dark:text-amber-300">Model / simulation layer</div>
@@ -192,6 +199,15 @@ export function BodyExplorer() {
         <Suspense fallback={<LoadingLab label="HuBMAP Human Reference Atlas" />}>
           <HraClinicalAtlas />
         </Suspense>
+      ) : mode === 'physiology' ? (
+        <SourceBackedMode
+          openDefault
+          evidenceTerms={HRA_CONTEXT.physiology ?? []}
+          title="Whole-body 4D physiology"
+          detail="HRA source anatomy stays visible first. The physiology layer animates timing and system relationships while separating connected measurements, derived calculations, educational reference values and unavailable measurements."
+        >
+          <Suspense fallback={<LoadingLab label="whole-body physiology" />}><PhysiologyBodyLab /></Suspense>
+        </SourceBackedMode>
       ) : mode === 'cell-genome' ? (
         <CellEvidenceMode mode="cell-genome" />
       ) : mode === 'workout-4d' ? (
