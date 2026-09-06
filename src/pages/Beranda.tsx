@@ -5,9 +5,9 @@ import { PapanWidget } from '../components/PapanWidget'
 import { KisiFitur } from '../components/KisiFitur'
 import { CatatanHarian } from '../components/CatatanHarian'
 import { CatatanLatihan } from '../components/CatatanLatihan'
-import { HomeFeatureUniverse } from '../components/dashboard/HomeFeatureUniverse'
 import { PanaceaGrowthRail } from '../components/dashboard/PanaceaGrowthWidgets'
 import { PanaceaUtilityShelf } from '../components/dashboard/PanaceaUtilityShelf'
+import { DeferredHomeFeatureUniverse, DeferredPanaceaLearningRail } from '../components/dashboard/DeferredHomeSections'
 import { pratinjauBeranda } from '../lib/pratinjauBeranda'
 import { getVitals } from '../lib/healthVitals'
 import { getWorkouts } from '../lib/workoutStore'
@@ -170,7 +170,8 @@ export default function Beranda() {
         <PapanWidget pratinjau={pratinjau} tanggalCatatan={tanggalCatatan} />
       </section>
 
-      <HomeFeatureUniverse />
+      <DeferredHomeFeatureUniverse />
+      <DeferredPanaceaLearningRail />
 
       <details className="group rounded-[26px] border border-neutral-200 bg-white p-4 dark:border-white/10 dark:bg-white/[.035]">
         <summary className="flex cursor-pointer list-none items-center justify-between gap-3">
