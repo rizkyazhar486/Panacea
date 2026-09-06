@@ -1,0 +1,28 @@
+Specialty anatomy modules
+=========================
+
+Twelve modules, 497 individually named structures, cut from:
+
+  BodyParts3D 4.0
+  (c) The Database Center for Life Science (DBCLS)
+  Licence: CC BY 4.0 — https://creativecommons.org/licenses/by/4.0/
+  Publication: Mitsuhashi et al. (2009). https://doi.org/10.1093/nar/gkn613
+
+Packaging: ashemag/human-atlas (MIT, Copyright (c) 2026 ashemag).
+Adaptation: scripts/atlasSystem.mjs (see src/lib/systemAtlas.gen.ts).
+
+WHAT THIS REFERENCE ANATOMY DOES NOT CONTAIN, stated plainly because a
+medical application must not imply coverage it lacks:
+
+  - Female reproductive organs. BodyParts3D 4.0 as packaged here is an adult
+    male reference. The obstetrics module therefore shows the bony pelvis,
+    pelvic floor and pelvic vessels only.
+  - The thyroid and parathyroid glands.
+  - The middle ear (ossicles, tympanic membrane) in this module set; the
+    ossicles do exist in the full-body figure's skeletal layer.
+  - Lung parenchyma and pleura. The respiratory module has the airway tree
+    down to segmental bronchi, the diaphragm and the chest wall, so segmental
+    disease is shown at the bronchus that supplies the segment.
+
+Educational material. Not a clinical tool, and not a substitute for imaging
+of an individual patient.
