@@ -36,15 +36,15 @@ type Mode = {
 }
 
 const PRIMARY: Mode[] = [
-  { key: 'realistic-atlas', label: 'Anatomy', hint: 'HuBMAP HRA reference objects · rotate, isolate, inspect' },
+  { key: 'realistic-atlas', label: 'Anatomy', hint: 'Live GitHub HRA GLB catalog + published ASCT+B structure mapping' },
   { key: 'digital-twin', label: 'Body → Cell', hint: 'Cinematic cell structure + Human Protein Atlas evidence' },
   { key: 'cell-genome', label: 'Cell → DNA', hint: '3D cell/chromatin/DNA + HPA and Ensembl evidence' },
-  { key: 'workout-4d', label: 'Exercise', hint: 'Reference anatomy first; measured workout replay is a separate layer' },
-  { key: 'surgery', label: 'Surgery', hint: 'Reference anatomy first; procedural simulation is explicitly separated' },
+  { key: 'workout-4d', label: 'Exercise', hint: 'HRA reference anatomy first; measured workout replay is a separate layer' },
+  { key: 'surgery', label: 'Surgery', hint: 'HRA source anatomy first; procedural simulation is explicitly separated' },
 ]
 
 const MORE: Mode[] = [
-  { key: 'surgery-rehearsal', label: 'Practice', hint: 'Cinematic anatomy orientation + explicit rehearsal layer' },
+  { key: 'surgery-rehearsal', label: 'Practice', hint: 'HRA source anatomy first; rehearsal remains a separate simulation layer' },
   { key: 'counterfactual', label: 'What-if', hint: 'Reference anatomy and real evidence stay separate from scenario modelling' },
   { key: 'regeneration', label: 'Research', hint: 'Reference anatomy and live trials stay separate from experimental concepts' },
 ]
@@ -69,7 +69,7 @@ function SourceBackedMode({ title, detail, children }: { title: string; detail: 
       <Suspense fallback={<LoadingLab label="HuBMAP Human Reference Atlas" />}>
         <HraClinicalAtlas />
       </Suspense>
-      <details className="group rounded-[26px] border border-neutral-200 bg-white p-4 shadow-sm dark:border-white/10 dark:bg-white/[.035]" open>
+      <details className="group rounded-[26px] border border-neutral-200 bg-white p-4 shadow-sm dark:border-white/10 dark:bg-white/[.035]">
         <summary className="flex cursor-pointer list-none items-center justify-between gap-3">
           <div>
             <div className="text-[9px] font-black uppercase tracking-[.15em] text-amber-700 dark:text-amber-300">Model / simulation layer</div>
@@ -133,10 +133,10 @@ export function BodyExplorer() {
             <div className="mt-0.5 text-[10px] font-medium text-neutral-500 dark:text-neutral-400">{active.hint}</div>
           </div>
           <div className="flex flex-wrap gap-1.5 text-[8px] font-black uppercase tracking-[.1em] text-neutral-500">
-            <span className="rounded-full border border-neutral-200 bg-neutral-50 px-2.5 py-1.5 dark:border-white/10 dark:bg-white/[.04]">HRA / HuBMAP</span>
-            <span className="rounded-full border border-neutral-200 bg-neutral-50 px-2.5 py-1.5 dark:border-white/10 dark:bg-white/[.04]">Human Protein Atlas</span>
-            <span className="rounded-full border border-neutral-200 bg-neutral-50 px-2.5 py-1.5 dark:border-white/10 dark:bg-white/[.04]">Ensembl</span>
-            <span className="rounded-full border border-cyan-300/30 bg-cyan-50 px-2.5 py-1.5 text-cyan-800 dark:bg-cyan-300/10 dark:text-cyan-200">Cinematic PBR</span>
+            <span className="rounded-full border border-neutral-200 bg-neutral-50 px-2.5 py-1.5 dark:border-white/10 dark:bg-white/[.04]">HuBMAP HRA</span>
+            <span className="rounded-full border border-neutral-200 bg-neutral-50 px-2.5 py-1.5 dark:border-white/10 dark:bg-white/[.04]">GitHub models API</span>
+            <span className="rounded-full border border-neutral-200 bg-neutral-50 px-2.5 py-1.5 dark:border-white/10 dark:bg-white/[.04]">ASCT+B mapping</span>
+            <span className="rounded-full border border-neutral-200 bg-neutral-50 px-2.5 py-1.5 dark:border-white/10 dark:bg-white/[.04]">HPA · Ensembl</span>
           </div>
         </div>
 
@@ -170,15 +170,15 @@ export function BodyExplorer() {
       ) : mode === 'cell-genome' ? (
         <CellEvidenceMode mode="cell-genome" />
       ) : mode === 'workout-4d' ? (
-        <SourceBackedMode title="Measured workout replay" detail="Workout-derived animation is useful only after the anatomical reference is established. Measured device signals, derived physiology and educational context remain explicitly separated.">
+        <SourceBackedMode title="Measured workout replay" detail="Workout-derived animation is useful only after the HRA anatomical reference is established. Measured device signals, derived physiology and educational context remain explicitly separated.">
           <Suspense fallback={<LoadingLab label="exercise physiology replay" />}><Workout4DLab /></Suspense>
         </SourceBackedMode>
       ) : mode === 'surgery' ? (
-        <SourceBackedMode title="Procedural surgery atlas" detail="This section is a procedural education layer, not source anatomy. The HuBMAP reference atlas above remains the anatomical ground truth shown first.">
+        <SourceBackedMode title="Procedural surgery atlas" detail="This section is a procedural education layer, not source anatomy. Use the live HRA search above for structures such as meniscus, femur, patella, valves or other mapped anatomy before opening the simulation.">
           <Suspense fallback={<LoadingLab label="surgical procedure atlas" />}><SurgicalOperationAtlas /></Suspense>
         </SourceBackedMode>
       ) : mode === 'surgery-rehearsal' ? (
-        <SourceBackedMode title="Surgical rehearsal" detail="Rehearsal remains clearly separated from the HRA reference anatomy. The practice viewport below uses named anatomical meshes rather than cartoon stand-ins.">
+        <SourceBackedMode title="Surgical rehearsal" detail="Rehearsal remains clearly separated from the HRA reference anatomy. Search and inspect the source anatomy first; open this layer only for procedural practice.">
           <Suspense fallback={<LoadingLab label="cinematic surgical rehearsal" />}><CinematicSurgicalRehearsal /></Suspense>
         </SourceBackedMode>
       ) : mode === 'counterfactual' ? (
