@@ -27,7 +27,7 @@ export interface VepColocatedVariant {
   clin_sig?: string[]
   phenotype_or_disease?: number
   somatic?: number
-  frequencies?: Record<string, Record<string, number>>
+  frequencies?: Record<string, Record<string, number | string>>
 }
 
 export interface VepRawResult {
@@ -43,6 +43,19 @@ export interface VepRawResult {
   colocated_variants?: VepColocatedVariant[]
 }
 
+export interface PopulationFrequencyEntry {
+  source: string
+  label: string
+  frequency: number
+}
+
+export interface PopulationFrequencySummary {
+  allele: string
+  entries: PopulationFrequencyEntry[]
+  maxFrequency?: number
+  maxSource?: string
+}
+
 export interface VariantEvidenceResult {
   sourceVariant: VcfVariantRecord
   input: string
@@ -54,11 +67,39 @@ export interface VariantEvidenceResult {
   transcripts: VepTranscriptConsequence[]
   colocatedIds: string[]
   clinicalSignificance: string[]
+  populationFrequency?: PopulationFrequencySummary
   raw: VepRawResult
 }
 
 const CURRENT_VEP = 'https://rest.ensembl.org/vep/homo_sapiens/region'
 const GRCH37_VEP = 'https://grch37.rest.ensembl.org/vep/homo_sapiens/region'
+
+const FREQUENCY_LABELS: Record<string, string> = {
+  af: '1000 Genomes global',
+  afr: '1000G African',
+  amr: '1000G American',
+  eas: '1000G East Asian',
+  eur: '1000G European',
+  sas: '1000G South Asian',
+  gnomade: 'gnomAD exomes global',
+  gnomadg: 'gnomAD genomes global',
+  gnomade_afr: 'gnomAD exomes African/African American',
+  gnomade_amr: 'gnomAD exomes Latino/Admixed American',
+  gnomade_asj: 'gnomAD exomes Ashkenazi Jewish',
+  gnomade_eas: 'gnomAD exomes East Asian',
+  gnomade_fin: 'gnomAD exomes Finnish',
+  gnomade_mid: 'gnomAD exomes Middle Eastern',
+  gnomade_nfe: 'gnomAD exomes non-Finnish European',
+  gnomade_sas: 'gnomAD exomes South Asian',
+  gnomadg_afr: 'gnomAD genomes African/African American',
+  gnomadg_amr: 'gnomAD genomes Latino/Admixed American',
+  gnomadg_asj: 'gnomAD genomes Ashkenazi Jewish',
+  gnomadg_eas: 'gnomAD genomes East Asian',
+  gnomadg_fin: 'gnomAD genomes Finnish',
+  gnomadg_mid: 'gnomAD genomes Middle Eastern',
+  gnomadg_nfe: 'gnomAD genomes non-Finnish European',
+  gnomadg_sas: 'gnomAD genomes South Asian',
+}
 
 function normalizeChromosome(value: string) {
   return value.replace(/^chr/i, '')
@@ -90,6 +131,50 @@ function prioritizedTranscripts(result: VepRawResult) {
     return impact + (item.mane_select ? 8 : 0) + (item.canonical ? 4 : 0) + (item.gene_symbol ? 2 : 0)
   }
   return transcripts.sort((a, b) => rank(b) - rank(a)).slice(0, 6)
+}
+
+function asFrequency(value: number | string | undefined) {
+  if (value == null || value === '') return null
+  const parsed = typeof value === 'number' ? value : Number(value)
+  if (!Number.isFinite(parsed) || parsed < 0 || parsed > 1) return null
+  return parsed
+}
+
+function populationFrequency(result: VepRawResult, sourceVariant: VcfVariantRecord): PopulationFrequencySummary | undefined {
+  const alt = sourceVariant.alt.toUpperCase()
+  const entries = new Map<string, PopulationFrequencyEntry>()
+
+  for (const colocated of result.colocated_variants || []) {
+    const alleleFrequency = colocated.frequencies?.[alt] || colocated.frequencies?.[sourceVariant.alt]
+    if (!alleleFrequency) continue
+    for (const [source, rawValue] of Object.entries(alleleFrequency)) {
+      const frequency = asFrequency(rawValue)
+      if (frequency == null) continue
+      const existing = entries.get(source)
+      if (!existing || frequency > existing.frequency) {
+        entries.set(source, {
+          source,
+          label: FREQUENCY_LABELS[source] || source.replace(/_/g, ' '),
+          frequency,
+        })
+      }
+    }
+  }
+
+  const ranked = [...entries.values()].sort((a, b) => {
+    const aPrimary = ['gnomade', 'gnomadg', 'af'].includes(a.source) ? 1 : 0
+    const bPrimary = ['gnomade', 'gnomadg', 'af'].includes(b.source) ? 1 : 0
+    return bPrimary - aPrimary || b.frequency - a.frequency || a.label.localeCompare(b.label)
+  })
+  if (!ranked.length) return undefined
+
+  const max = ranked.reduce((best, item) => item.frequency > best.frequency ? item : best, ranked[0])
+  return {
+    allele: sourceVariant.alt,
+    entries: ranked.slice(0, 18),
+    maxFrequency: max.frequency,
+    maxSource: max.label,
+  }
 }
 
 export function externalVepAssembly(hint: GenomeAssemblyHint): 'GRCh37' | 'GRCh38' | null {
@@ -140,6 +225,7 @@ export async function annotateVariantsWithVep(
         transcripts,
         colocatedIds: unique((result.colocated_variants || []).map((item) => item.id)),
         clinicalSignificance: clinicalTerms(result),
+        populationFrequency: populationFrequency(result, sourceVariant),
         raw: result,
       }
     })
