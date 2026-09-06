@@ -4,6 +4,9 @@ import { parseSequenceEvidence, type SequenceEvidenceReport } from '../../lib/se
 const VariantEvidenceWorkbench = lazy(() =>
   import('./VariantEvidenceWorkbench').then((module) => ({ default: module.VariantEvidenceWorkbench })),
 )
+const AdvancedGenomicsWorkbench = lazy(() =>
+  import('./AdvancedGenomicsWorkbench').then((module) => ({ default: module.AdvancedGenomicsWorkbench })),
+)
 
 const MAX_ANALYSIS_BYTES = 32 * 1024 * 1024
 
@@ -216,9 +219,14 @@ export function SequenceEvidenceWorkbench() {
           )}
 
           {report.format === 'VCF' && report.variants && report.variants.length > 0 && (
-            <Suspense fallback={<div className="rounded-[28px] border border-neutral-200 p-6 text-center text-[10px] font-semibold text-neutral-500 dark:border-white/10">Loading variant evidence tools…</div>}>
-              <VariantEvidenceWorkbench variants={report.variants} assemblyHint={report.assemblyHint} referenceHeader={report.referenceHeader} />
-            </Suspense>
+            <>
+              <Suspense fallback={<div className="rounded-[28px] border border-neutral-200 p-6 text-center text-[10px] font-semibold text-neutral-500 dark:border-white/10">Loading variant evidence tools…</div>}>
+                <VariantEvidenceWorkbench variants={report.variants} assemblyHint={report.assemblyHint} referenceHeader={report.referenceHeader} />
+              </Suspense>
+              <Suspense fallback={<div className="rounded-[28px] border border-neutral-200 p-6 text-center text-[10px] font-semibold text-neutral-500 dark:border-white/10">Loading advanced genomics tools…</div>}>
+                <AdvancedGenomicsWorkbench report={report} fileName={fileName} />
+              </Suspense>
+            </>
           )}
         </div>
       )}
