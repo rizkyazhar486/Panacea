@@ -37,7 +37,9 @@ export interface AutoSyncStatus {
 }
 
 const STATUS_KEY = 'pmd_auto_sync_status_v2'
+const HEALTH_PROFILE_CACHE_KEY = 'pmd_health_profile'
 const PERIODIC_MS = 5 * 60 * 1000
+const REQUEST_TIMEOUT_MS = 10_000
 
 let sudahJalan = false
 let pemantauTerpasang = false
@@ -70,11 +72,18 @@ function tunggu(ms: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, ms))
 }
 
+function denganBatasWaktu<T>(promise: Promise<T>, ms = REQUEST_TIMEOUT_MS): Promise<T> {
+  return Promise.race([
+    promise,
+    new Promise<T>((_, reject) => setTimeout(() => reject(new Error('sync_timeout')), ms)),
+  ])
+}
+
 async function cobaUlang<T>(fn: () => Promise<T>, attempts = 3): Promise<T> {
   let terakhir: unknown
   for (let i = 0; i < attempts; i++) {
     try {
-      return await fn()
+      return await denganBatasWaktu(fn())
     } catch (e) {
       terakhir = e
       if (i < attempts - 1) await tunggu(350 * (2 ** i))
@@ -93,7 +102,7 @@ async function tarikProfilDenganRetry(): Promise<Record<string, unknown>> {
   let lastError: unknown
   for (let i = 0; i < 3; i++) {
     try {
-      const p = (await api.getHealthProfile()) as Record<string, unknown>
+      const p = await denganBatasWaktu(api.getHealthProfile()) as Record<string, unknown>
       if (p && typeof p === 'object') {
         lastEmpty = p
         if (Object.keys(saringProfil(p)).length > 0) return p
@@ -109,6 +118,25 @@ async function tarikProfilDenganRetry(): Promise<Record<string, unknown>> {
   throw lastError
 }
 
+/**
+ * HealthProfile mempunyai cache lokalnya sendiri. Sinkronisasi otomatis lama
+ * hanya menulis ke healthVitals, sehingga halaman /health-data dapat kembali
+ * kosong saat server sedang gagal walaupun dashboard masih punya angka lama.
+ * Simpan hanya snapshot server yang bermakna, dan jangan menimpa cache lokal
+ * yang memiliki timestamp lebih baru.
+ */
+function simpanSnapshotProfilLokal(profil: Record<string, unknown>) {
+  try {
+    const current = JSON.parse(localStorage.getItem(HEALTH_PROFILE_CACHE_KEY) || '{}') as Record<string, unknown>
+    const remoteStamp = String(profil.lastDeviceSyncAt ?? profil.updatedAt ?? '')
+    const localStamp = String(current.lastDeviceSyncAt ?? current.updatedAt ?? '')
+    const remoteTime = Date.parse(remoteStamp)
+    const localTime = Date.parse(localStamp)
+    if (!Number.isNaN(remoteTime) && !Number.isNaN(localTime) && remoteTime < localTime) return
+    localStorage.setItem(HEALTH_PROFILE_CACHE_KEY, JSON.stringify({ ...current, ...profil }))
+  } catch { /* cache optional; never block sync */ }
+}
+
 function terapkanProfil(profil: Record<string, unknown>): number {
   const bersih = saringProfil(profil)
   const jumlah = Object.keys(bersih).length
@@ -121,6 +149,7 @@ function terapkanProfil(profil: Record<string, unknown>): number {
   // menghapus last-known-good values yang sudah tersimpan di browser.
   mergeVitals({ ...bersih, source: sumber, measuredAt: kapan })
   mergeHealthCache(bersih)
+  simpanSnapshotProfilLokal(profil)
 
   const demo = getDemoTersimpan() as Record<string, unknown>
   const tambahan: Record<string, number> = {}
