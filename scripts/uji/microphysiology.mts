@@ -1,4 +1,5 @@
 import assert from 'node:assert/strict'
+import { readFileSync } from 'node:fs'
 import {
   bicarbonatePH,
   cardiacCycleSeconds,
@@ -50,4 +51,16 @@ assert.ok(Number.isFinite(bicarbonatePH(0, 0)))
 near(oxygenContent(15, 150, 0), oxygenContent(15, 100, 0), 1e-9, 'oxygen saturation clamp')
 assert.equal(ejectionFraction(120, 140), 0, 'ESV above EDV is clamped to EDV')
 
-console.log('microphysiology formulas: all assertions passed')
+// Integration regressions: microphysiology stays attached to Body Exposure and
+// remains explicitly educational rather than masquerading as patient-derived data.
+const dockSource = readFileSync('src/components/digital-twin/BodyEvidenceDock.tsx', 'utf8')
+const explorerSource = readFileSync('src/components/digital-twin/PhysiologyScaleExplorer.tsx', 'utf8')
+assert.match(dockSource, /PhysiologyScaleExplorer/)
+assert.match(dockSource, /mode === 'digital-twin' \|\| mode === 'cell-genome'/)
+assert.match(explorerSource, /REFERENCE MODEL · NOT PATIENT-DERIVED/)
+assert.match(explorerSource, /Type I pneumocyte/)
+assert.match(explorerSource, /Na⁺\/K⁺/)
+assert.match(explorerSource, /RNA Pol II/)
+assert.doesNotMatch(explorerSource, /setScalar\(/, 'microphysiology must not use toy-like whole-object scale pulsing')
+
+console.log('microphysiology formulas + Body Exposure integration: all assertions passed')
