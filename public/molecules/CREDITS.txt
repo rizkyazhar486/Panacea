@@ -1,0 +1,27 @@
+Drug molecule geometry
+======================
+
+Each .json file holds one molecule: element symbols with 3D coordinates in
+ångström, plus the bond table with bond orders.
+
+How it was produced (scripts/molekul.py):
+
+  1. A SMILES string is recorded in the script for each drug, alongside its
+     reference molecular formula and molecular mass.
+  2. RDKit parses the SMILES, computes the formula and mass, and the build
+     FAILS if either disagrees with the reference values. A mistyped SMILES
+     stops the build rather than becoming a plausible-looking wrong molecule.
+  3. A 3D conformer is generated with ETKDG v3 (fixed random seed, so the
+     geometry is reproducible) and relaxed with the MMFF94 force field.
+  4. Coordinates are centred on the origin and rounded to 0.001 Å.
+
+So bond lengths, bond angles and ring geometry on screen are computed
+chemistry. What this is NOT: an experimentally determined structure. It is a
+low-energy computed conformer of an isolated molecule, not a crystal structure
+and not the bound conformation inside a protein.
+
+RDKit is BSD-3-Clause licensed. Element colours follow the CPK convention;
+van der Waals radii are the standard Bondi-derived values used for display
+scaling only.
+
+Educational material, not prescribing advice.
