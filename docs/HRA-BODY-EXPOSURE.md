@@ -37,7 +37,23 @@ The formulas remain defined in `src/lib/bodyPhysiology.ts`, including `MAP ≈ D
 
 ## Cell and DNA evidence-first rule
 
-Body → Cell and Cell → DNA render the Human Protein Atlas + Ensembl evidence workspace first. The generated cell/chromatin/DNA scene is collapsed under an explicit `Educational structural model` control. The model is never presented as microscopy, sequencing output or patient evidence.
+Body → Cell and Cell → DNA no longer require the generated cell/chromatin/DNA renderer in Body Exposure. The primary experience is now:
+
+1. Human Protein Atlas metadata and source microscopy links where the browser source exposes them;
+2. Ensembl gene identity, coordinates and reference genomic sequence;
+3. local sequence-file evidence through `SequenceEvidenceWorkbench`.
+
+`SequenceEvidenceWorkbench` reads uncompressed FASTA, FASTQ and VCF files in the browser. The component does not upload the selected file. FASTQ produced after Oxford Nanopore basecalling can be inspected, but Panacea does not claim to perform Nanopore basecalling in this module.
+
+`src/lib/sequenceEvidence.ts` keeps the summary calculations explicit:
+
+- FASTQ Phred decoding: `Q = ASCII − 33`;
+- Q20/Q30: `bases with Q ≥ threshold / quality-coded bases × 100%`;
+- GC percentage: `(G + C) / (A + C + G + T) × 100%`, with ambiguous bases reported separately;
+- N50: after sorting reads/sequences longest to shortest, the length at which cumulative bases reach at least 50% of analyzed bases;
+- VCF Ti/Tv: `transition SNP alleles / transversion SNP alleles`.
+
+The parser reports file provenance, format, byte coverage and SHA-256 of analyzed bytes. Files above 32 MB are explicitly labelled as sampled because only the first 32 MB are analyzed in the browser preview. The workbench does not perform variant calling, pathogenicity assignment, diagnosis or patient attribution.
 
 ## Workout-specific anatomy and data replay
 
@@ -65,6 +81,6 @@ Body → Cell and Cell → DNA render the Human Protein Atlas + Ensembl evidence
 
 ## Body Exposure routing boundary
 
-The Body Exposure route no longer uses the legacy Body3D renderer as the primary visual for Physiology, Exercise, Surgery, Practice, What-if or Research. Physiology uses HRA source geometry plus provenance-aware functional data; Exercise uses HRA plus a data replay; Surgery uses HRA plus a procedure timeline; Practice uses HRA plus active recall; What-if and Research use source-resolved HRA workbenches. Legacy renderers may still exist elsewhere in the repository for compatibility, but they are not the authoritative anatomy source for these Body Exposure modes.
+The Body Exposure route no longer uses the legacy Body3D renderer as the primary visual for Physiology, Body → Cell, Cell → DNA, Exercise, Surgery, Practice, What-if or Research. Physiology uses HRA source geometry plus provenance-aware functional data; Cell/DNA use HPA + Ensembl + local sequencing evidence; Exercise uses HRA plus a data replay; Surgery uses HRA plus a procedure timeline; Practice uses HRA plus active recall; What-if and Research use source-resolved HRA workbenches. Legacy renderers may still exist elsewhere in the repository for compatibility, but they are not the authoritative evidence layer for these Body Exposure modes.
 
-Release marker: HRA-native physiology, workout data replay, surgical procedure timeline and rehearsal cleanup are included in this production batch.
+Release marker: HRA-native physiology, local sequence evidence, workout data replay, surgical procedure timeline and rehearsal cleanup are included in the current production batch.
