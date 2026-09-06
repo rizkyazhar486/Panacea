@@ -5,6 +5,9 @@ import { BodyEvidenceDock, type BodyEvidenceMode } from '../components/digital-t
 const HraClinicalAtlas = lazy(() =>
   import('../components/digital-twin/HraClinicalAtlas').then((m) => ({ default: m.HraClinicalAtlas })),
 )
+const PhysiologyBodyLab = lazy(() =>
+  import('../components/digital-twin/PhysiologyBodyLab').then((m) => ({ default: m.PhysiologyBodyLab })),
+)
 const CellGenomeEvidenceLab = lazy(() =>
   import('../components/digital-twin/CellGenomeEvidenceLab').then((m) => ({ default: m.CellGenomeEvidenceLab })),
 )
@@ -37,6 +40,7 @@ type Mode = {
 
 const PRIMARY: Mode[] = [
   { key: 'realistic-atlas', label: 'Anatomy', hint: 'HuBMAP HRA reference objects · rotate, isolate, inspect' },
+  { key: 'physiology', label: 'Physiology 4D', hint: 'Cardiovascular, respiratory, neuromuscular, GI, renal and thermoregulation' },
   { key: 'digital-twin', label: 'Body → Cell', hint: 'Cinematic cell structure + Human Protein Atlas evidence' },
   { key: 'cell-genome', label: 'Cell → DNA', hint: '3D cell/chromatin/DNA + HPA and Ensembl evidence' },
   { key: 'workout-4d', label: 'Exercise', hint: 'Reference anatomy first; measured workout replay is a separate layer' },
@@ -167,6 +171,10 @@ export function BodyExplorer() {
         <Suspense fallback={<LoadingLab label="HuBMAP Human Reference Atlas" />}>
           <HraClinicalAtlas />
         </Suspense>
+      ) : mode === 'physiology' ? (
+        <SourceBackedMode title="Whole-body 4D physiology" detail="Reference anatomy is shown first. The physiology layer below animates timing and system relationships while keeping connected measurements, derived calculations and educational values visibly separate.">
+          <Suspense fallback={<LoadingLab label="whole-body physiology" />}><PhysiologyBodyLab /></Suspense>
+        </SourceBackedMode>
       ) : mode === 'cell-genome' ? (
         <CellEvidenceMode mode="cell-genome" />
       ) : mode === 'workout-4d' ? (
