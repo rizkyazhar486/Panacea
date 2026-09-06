@@ -31,6 +31,8 @@ const MolecularLab = lazy(() => import('./bodyhub/MolecularLab'))
 const GenomicsLab = lazy(() => import('./bodyhub/GenomicsLab'))
 // Ruang sel: organel dalam 3D dan biokimia yang berjalan di tiap kompartemen.
 const CellLab = lazy(() => import('./bodyhub/CellLab'))
+// Pencari struktur: 2.587 nama yang benar-benar ada di berkas geometrinya.
+const StructureFinder = lazy(() => import('./bodyhub/StructureFinder'))
 // Ruang bedah: urutan lapisan yang ditemui pisau, per pendekatan.
 const SurgicalLab = lazy(() => import('./bodyhub/SurgicalLab'))
 const WorkoutSimSection = lazy(() => import('./bodyhub/WorkoutSimSection'))
@@ -80,7 +82,7 @@ function Chip({
 // sama-sama menyorot struktur pada figur yang itu-itu juga. Itulah maksud
 // "satu simulasi tubuh yang utuh" — bukan enam halaman yang saling menyebut,
 // melainkan satu tubuh yang ditanyai dari enam sudut.
-type PanelTab = 'layers' | 'muscles' | 'workout-sim' | 'organs' | 'physiology' | 'simulator' | 'cardio' | 'spesialisasi' | 'molekul' | 'genomik' | 'sel' | 'bedah' | 'drugs' | 'diseases' | 'reference'
+type PanelTab = 'layers' | 'muscles' | 'workout-sim' | 'organs' | 'physiology' | 'simulator' | 'cardio' | 'spesialisasi' | 'molekul' | 'genomik' | 'sel' | 'bedah' | 'cari' | 'drugs' | 'diseases' | 'reference'
 
 const PANEL_TABS: Array<{ key: PanelTab; label: string }> = [
   { key: 'layers', label: 'Layers' },
@@ -93,6 +95,7 @@ const PANEL_TABS: Array<{ key: PanelTab; label: string }> = [
   { key: 'spesialisasi', label: 'Specialty labs' },
   { key: 'molekul', label: 'Molecules' },
   { key: 'genomik', label: 'Genomics' },
+  { key: 'cari', label: 'Find structure' },
   { key: 'sel', label: 'Cell & metabolism' },
   { key: 'bedah', label: 'Surgical layers' },
   { key: 'drugs', label: 'Drugs' },
@@ -879,6 +882,15 @@ export function BodyExplorer() {
                 <GenomicsLab
                   onBukaOrgan={onPickOrgan}
                   onBukaObat={(id) => { setMolekulAwal(id); setPanelTab('molekul') }}
+                />
+              </Suspense>
+            )}
+
+            {panelTab === 'cari' && (
+              <Suspense fallback={<p className="text-sm text-neutral-500">Loading the structure index…</p>}>
+                <StructureFinder
+                  onSorot={(nama) => { setActiveWorkout(null); setActiveOrgan(null); setFocusKeywords(null); setHighlighted(nama) }}
+                  onLapisan={(l) => setLayers((s) => (s.has(l) ? s : new Set(s).add(l)))}
                 />
               </Suspense>
             )}
