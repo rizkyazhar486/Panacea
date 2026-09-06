@@ -47,8 +47,8 @@ type Mode = {
 
 const PRIMARY: Mode[] = [
   { key: 'realistic-atlas', label: 'Anatomy', hint: 'Multi-release HRA source anatomy with browser-loadable GLB provenance' },
-  { key: 'digital-twin', label: 'Body → Cell', hint: 'Cinematic cell structure + Human Protein Atlas evidence' },
-  { key: 'cell-genome', label: 'Cell → DNA', hint: '3D cell/chromatin/DNA + HPA and Ensembl evidence' },
+  { key: 'digital-twin', label: 'Body → Cell', hint: 'Human Protein Atlas evidence first; optional structural 3D model is secondary' },
+  { key: 'cell-genome', label: 'Cell → DNA', hint: 'HPA + Ensembl source evidence first; optional 3D model stays secondary' },
   { key: 'workout-4d', label: 'Exercise', hint: 'Measured workout → HRA anatomy first; replay remains a separate model layer' },
   { key: 'surgery', label: 'Surgery', hint: 'Operation-specific HRA source anatomy first; simulation stays secondary' },
 ]
@@ -117,21 +117,22 @@ function CellEvidenceMode({ mode }: { mode: 'body-cell' | 'cell-genome' }) {
   const initialStage = mode === 'body-cell' ? 'cell' : 'dna'
   return (
     <div className="space-y-4">
-      <Suspense fallback={<LoadingLab label="cinematic cellular 3D" />}>
-        <CinematicCellGenomeExplorer initialStage={initialStage} />
+      <Suspense fallback={<LoadingLab label="HPA and Ensembl source evidence" />}>
+        <CellGenomeEvidenceLab mode={mode} />
       </Suspense>
-      <details className="group rounded-[26px] border border-neutral-200 bg-white p-4 shadow-sm dark:border-white/10 dark:bg-white/[.035]" open>
+
+      <details className="group rounded-[26px] border border-neutral-200 bg-white p-4 shadow-sm dark:border-white/10 dark:bg-white/[.035]">
         <summary className="flex cursor-pointer list-none items-center justify-between gap-3">
           <div>
-            <div className="text-[9px] font-black uppercase tracking-[.15em] text-emerald-700 dark:text-emerald-300">Source evidence layer</div>
-            <div className="mt-1 text-[15px] font-black text-neutral-950 dark:text-white">Human Protein Atlas + Ensembl</div>
-            <p className="mt-1 max-w-3xl text-[10px] leading-relaxed text-neutral-500 dark:text-neutral-400">The 3D scene above is a structural educational model. Source-backed microscopy, gene records and genomic coordinates remain separately identified here so the render is never presented as patient evidence.</p>
+            <div className="text-[9px] font-black uppercase tracking-[.15em] text-amber-700 dark:text-amber-300">Educational structural model</div>
+            <div className="mt-1 text-[15px] font-black text-neutral-950 dark:text-white">Optional 3D {mode === 'body-cell' ? 'cell' : 'chromatin / DNA'} model</div>
+            <p className="mt-1 max-w-3xl text-[10px] leading-relaxed text-neutral-500 dark:text-neutral-400">Open this only for spatial teaching. It is a generated structural model, not microscopy, sequencing output, or patient evidence. HPA and Ensembl remain the source layer above.</p>
           </div>
           <span className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-neutral-100 text-lg text-neutral-700 transition group-open:rotate-45 dark:bg-white/10 dark:text-white">＋</span>
         </summary>
         <div className="mt-4 border-t border-neutral-100 pt-4 dark:border-white/10">
-          <Suspense fallback={<LoadingLab label="HPA and Ensembl evidence" />}>
-            <CellGenomeEvidenceLab mode={mode} />
+          <Suspense fallback={<LoadingLab label="educational cellular 3D model" />}>
+            <CinematicCellGenomeExplorer initialStage={initialStage} />
           </Suspense>
         </div>
       </details>
