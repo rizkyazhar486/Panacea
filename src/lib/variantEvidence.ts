@@ -111,6 +111,7 @@ function vcfInput(variant: VcfVariantRecord) {
 
 function supportedForVep(variant: VcfVariantRecord) {
   if (!variant.chrom || !variant.pos || !variant.ref || !variant.alt) return false
+  if (variant.alt === '*' || /^<[^>]+>$/.test(variant.alt)) return false
   if (/[\[\]]/.test(variant.alt)) return false
   if (variant.ref.length > 10000 || variant.alt.length > 10000) return false
   return true
@@ -190,7 +191,7 @@ export async function annotateVariantsWithVep(
   const selected = variants.slice(0, Math.max(1, Math.min(limit, 20)))
   const supported = selected.filter(supportedForVep)
   const skipped = selected.length - supported.length
-  if (!supported.length) throw new Error('No selected VCF ALT alleles can be submitted to Ensembl VEP.')
+  if (!supported.length) throw new Error('No selected small-variant VCF ALT alleles can be submitted to Ensembl VEP. Structural/CNV alleles remain in the dedicated local SV workbench.')
 
   const controller = new AbortController()
   const timer = window.setTimeout(() => controller.abort(), 25000)
