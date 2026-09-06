@@ -5,6 +5,7 @@ import {
   kondisiUntukModul, kondisiUntukStrukturSistem, strukturKondisiSistem, type SystemCondition,
 } from '../../lib/specialtyPathology'
 import { SKDI_DISEASE_LIST } from '../../lib/skdiDiseaseList'
+import { drugsForCondition } from '../../lib/drugTargets'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // RUANG SPESIALISASI — patologi tiap bidang, di atas anatomi manusia nyata.
@@ -99,6 +100,8 @@ export function SpecialtyLab({ onBukaOrgan }: Props) {
       entri: SKDI_DISEASE_LIST.find((e) => e.disease === nama) ?? null,
     }))
   }, [kondisi])
+
+  const obatKondisi = useMemo(() => (kondisi ? drugsForCondition(kondisi.id) : []), [kondisi])
 
   const padaStruktur = struktur ? kondisiUntukStrukturSistem(modul, struktur) : []
 
@@ -244,6 +247,28 @@ export function SpecialtyLab({ onBukaOrgan }: Props) {
           <Daftar judul="What you find" isi={kondisi.temuan} />
           <Daftar judul="What confirms it" isi={kondisi.penunjang} />
           <Daftar judul="What you do" isi={kondisi.tata} />
+
+
+          {obatKondisi.length > 0 && (
+            <div>
+              {/* Tautan balik ke ruang molekul: penyakit yang sedang dibuka
+                  membawa serta obat yang melawannya, lengkap dengan target
+                  molekulnya — supaya "diberi obat apa" dan "bekerja di mana"
+                  tidak lagi menjadi dua halaman yang terpisah. */}
+              <div className="t-mikro font-bold uppercase tracking-wide text-neutral-500">Drugs used against this</div>
+              <ul className="mt-1 space-y-1">
+                {obatKondisi.map((d) => (
+                  <li key={d.id} className="rounded-lg bg-neutral-50 px-2 py-1.5 dark:bg-white/5">
+                    <span className="text-[11.5px] font-bold text-ink dark:text-white">{d.katalog}</span>
+                    <span className="ml-1 text-[10.5px] text-neutral-500">→ {d.target}</span>
+                  </li>
+                ))}
+              </ul>
+              <p className="mt-1 text-[10px] text-neutral-400">
+                Open the Molecules tab to see any of these in 3D with its binding target.
+              </p>
+            </div>
+          )}
 
           {skdi.length > 0 && (
             <div>
