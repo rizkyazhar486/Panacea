@@ -196,5 +196,33 @@ ok('kunci yang tidak dikenal mengembalikan undefined', urutanDari('entah') === u
   ok('daftar struktur berisiko terurut', [...bahaya].sort().join('|') === bahaya.join('|'))
 }
 
+// ── Pemetaan langkah bedah ke kedalaman model ───────────────────────────────
+{
+  const { kedalamanUntukLangkah } = await import('../../src/pages/bodyhub/SurgicalLab')
+  // Perjalanannya yang disamakan, bukan satu lapisan untuk satu lapisan:
+  // langkah pertama selalu di permukaan, langkah terakhir selalu di dalam.
+  ok('langkah pertama berada di permukaan', kedalamanUntukLangkah(0, 9) === 0)
+  ok('langkah terakhir mencapai kedalaman organ dalam',
+    kedalamanUntukLangkah(8, 9) === KEDALAMAN.visceral)
+  ok('kedalaman tidak pernah mundur', (() => {
+    let sebelum = -1
+    for (let i = 0; i < 9; i++) {
+      const d = kedalamanUntukLangkah(i, 9)
+      if (d < sebelum) return false
+      sebelum = d
+    }
+    return true
+  })())
+  ok('urutan berlapis sedikit tetap terpetakan penuh',
+    kedalamanUntukLangkah(4, 5) === KEDALAMAN.visceral)
+  ok('urutan satu langkah tidak membagi dengan nol',
+    kedalamanUntukLangkah(0, 1) === 0)
+  ok('semua urutan nyata terpetakan tanpa nilai di luar jangkauan',
+    URUTAN.every((u) => u.lapis.every((_, i) => {
+      const d = kedalamanUntukLangkah(i, u.lapis.length)
+      return d >= 0 && d <= KEDALAMAN.skeletal
+    })))
+}
+
 console.log(`\n${lulus} lulus, ${gagal} gagal`)
 if (gagal) process.exit(1)

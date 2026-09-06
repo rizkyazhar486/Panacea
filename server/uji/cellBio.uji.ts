@@ -202,5 +202,77 @@ ok('TCA dan rantai respirasi ditempatkan di mitokondria',
   ok('penolakan menyebut alasannya', (neracaAsamLemak(15).alasan?.length ?? 0) > 20)
 }
 
+// ── Tata letak organel ──────────────────────────────────────────────────────
+{
+  const { acakTetap, tempatkan, cuplikan, sahSecaraRuang, RADIUS_SEL, RADIUS_INTI } =
+    await import('../../src/lib/cellLayout')
+
+  // Sel yang menyusun ulang dirinya tiap kali digambar mengajarkan bahwa letak
+  // organel memang acak. Determinisme di sini adalah keputusan, bukan kebetulan.
+  const a = acakTetap(42), b = acakTetap(42), c = acakTetap(43)
+  const deretA = [a(), a(), a()], deretB = [b(), b(), b()], deretC = [c(), c(), c()]
+  ok('acak tetap memberi deret yang sama untuk benih yang sama',
+    deretA.join(',') === deretB.join(','))
+  ok('benih berbeda memberi deret berbeda', deretA.join(',') !== deretC.join(','))
+  ok('nilainya berada di antara 0 dan 1', deretA.every((x) => x >= 0 && x < 1))
+
+  const permintaan = [
+    { kunci: 'mitokondria', jumlah: 40, diameterUm: 1 },
+    { kunci: 'lisosom', jumlah: 20, diameterUm: 0.5 },
+    { kunci: 'peroksisom', jumlah: 15, diameterUm: 0.5 },
+  ]
+  const letak = tempatkan(permintaan)
+  ok('jumlah penempatan sesuai permintaan', letak.length === 75)
+  ok('penempatan mengingat kuncinya',
+    letak.filter((p) => p.kunci === 'mitokondria').length === 40)
+  ok('penempatan sama persis bila diulang', (() => {
+    const lagi = tempatkan(permintaan)
+    return lagi.every((p, i) => p.x === letak[i].x && p.y === letak[i].y && p.z === letak[i].z)
+  })())
+  ok('benih berbeda memberi susunan berbeda', (() => {
+    const lain = tempatkan(permintaan, 7)
+    return lain.some((p, i) => p.x !== letak[i].x)
+  })())
+
+  // Dua kesalahan yang langsung terlihat salah oleh siapa pun yang pernah
+  // melihat sel: organel menembus inti, dan organel menonjol keluar membran.
+  ok('tidak ada organel yang menembus inti',
+    letak.every((p) => Math.hypot(p.x, p.y, p.z) - p.radius >= RADIUS_INTI - 1e-9))
+  ok('tidak ada organel yang menonjol keluar membran',
+    letak.every((p) => Math.hypot(p.x, p.y, p.z) + p.radius <= RADIUS_SEL + 1e-9))
+  ok('pemeriksa ruang menyetujui seluruh penempatan', letak.every(sahSecaraRuang))
+  ok('pemeriksa ruang menolak titik di luar membran',
+    !sahSecaraRuang({ kunci: 'x', x: RADIUS_SEL + 1, y: 0, z: 0, radius: 0.5, putaran: 0 }))
+  ok('pemeriksa ruang menolak titik di dalam inti',
+    !sahSecaraRuang({ kunci: 'x', x: 0, y: 0, z: 0, radius: 0.5, putaran: 0 }))
+
+  // Sebaran harus mengisi seluruh sitoplasma. Tanpa pangkat sepertiga pada
+  // jari-jari, organel menumpuk dekat inti dan tepi luar tampak kosong —
+  // salah, dan tidak akan pernah terlihat sebagai galat.
+  const jarak = letak.map((p) => Math.hypot(p.x, p.y, p.z))
+  const luar = jarak.filter((d) => d > (RADIUS_INTI + RADIUS_SEL) / 2).length
+  ok('sebaran mengisi separuh luar sitoplasma, bukan menumpuk di dekat inti',
+    luar / jarak.length > 0.5, `${luar}/${jarak.length}`)
+  ok('sebaran menyentuh ketiga sumbu',
+    letak.some((p) => Math.abs(p.x) > 2) && letak.some((p) => Math.abs(p.y) > 2) &&
+    letak.some((p) => Math.abs(p.z) > 2))
+  ok('putaran tiap organel berbeda-beda',
+    new Set(letak.map((p) => Math.round(p.putaran * 1000))).size > 50)
+
+  ok('jarak maksimal dihormati', (() => {
+    const dekat = tempatkan([{ kunci: 'golgi', jumlah: 10, diameterUm: 1, jarakMaksimal: 5 }])
+    return dekat.every((p) => Math.hypot(p.x, p.y, p.z) <= 5 + 1e-9)
+  })())
+
+  // Jumlah yang digambar harus dikatakan apa adanya: sepuluh juta ribosom
+  // tidak bisa dirender, dan berpura-pura menggambarnya adalah kebohongan.
+  const rib = cuplikan(10000000, 400)
+  ok('cuplikan dibatasi jumlah yang bisa digambar', rib.digambar === 400)
+  ok('cuplikan mengatakan bahwa ia hanya cuplikan', rib.kalimat.includes('a sample'))
+  ok('cuplikan menyebut jumlah aslinya', rib.kalimat.includes('10,000,000'))
+  const sedikit = cuplikan(12, 400)
+  ok('jumlah kecil digambar seluruhnya', sedikit.digambar === 12 && sedikit.kalimat.includes('All 12'))
+}
+
 console.log(`\n${lulus} lulus, ${gagal} gagal`)
 if (gagal) process.exit(1)

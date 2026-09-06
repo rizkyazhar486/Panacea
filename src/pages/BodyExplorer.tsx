@@ -29,6 +29,10 @@ const SpecialtyLab = lazy(() => import('./bodyhub/SpecialtyLab'))
 const MolecularLab = lazy(() => import('./bodyhub/MolecularLab'))
 // Ruang genomika: varian klinis, alat urutan, perancang CRISPR, dan jalur sinyal.
 const GenomicsLab = lazy(() => import('./bodyhub/GenomicsLab'))
+// Ruang sel: organel dalam 3D dan biokimia yang berjalan di tiap kompartemen.
+const CellLab = lazy(() => import('./bodyhub/CellLab'))
+// Ruang bedah: urutan lapisan yang ditemui pisau, per pendekatan.
+const SurgicalLab = lazy(() => import('./bodyhub/SurgicalLab'))
 const WorkoutSimSection = lazy(() => import('./bodyhub/WorkoutSimSection'))
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -76,7 +80,7 @@ function Chip({
 // sama-sama menyorot struktur pada figur yang itu-itu juga. Itulah maksud
 // "satu simulasi tubuh yang utuh" — bukan enam halaman yang saling menyebut,
 // melainkan satu tubuh yang ditanyai dari enam sudut.
-type PanelTab = 'layers' | 'muscles' | 'workout-sim' | 'organs' | 'physiology' | 'simulator' | 'cardio' | 'spesialisasi' | 'molekul' | 'genomik' | 'drugs' | 'diseases' | 'reference'
+type PanelTab = 'layers' | 'muscles' | 'workout-sim' | 'organs' | 'physiology' | 'simulator' | 'cardio' | 'spesialisasi' | 'molekul' | 'genomik' | 'sel' | 'bedah' | 'drugs' | 'diseases' | 'reference'
 
 const PANEL_TABS: Array<{ key: PanelTab; label: string }> = [
   { key: 'layers', label: 'Layers' },
@@ -89,6 +93,8 @@ const PANEL_TABS: Array<{ key: PanelTab; label: string }> = [
   { key: 'spesialisasi', label: 'Specialty labs' },
   { key: 'molekul', label: 'Molecules' },
   { key: 'genomik', label: 'Genomics' },
+  { key: 'sel', label: 'Cell & metabolism' },
+  { key: 'bedah', label: 'Surgical layers' },
   { key: 'drugs', label: 'Drugs' },
   { key: 'diseases', label: 'Diseases' },
   { key: 'reference', label: 'Study' },
@@ -873,6 +879,21 @@ export function BodyExplorer() {
                 <GenomicsLab
                   onBukaOrgan={onPickOrgan}
                   onBukaObat={(id) => { setMolekulAwal(id); setPanelTab('molekul') }}
+                />
+              </Suspense>
+            )}
+
+            {panelTab === 'sel' && (
+              <Suspense fallback={<p className="text-sm text-neutral-500">Loading the cell lab…</p>}>
+                <CellLab />
+              </Suspense>
+            )}
+
+            {panelTab === 'bedah' && (
+              <Suspense fallback={<p className="text-sm text-neutral-500">Loading surgical layers…</p>}>
+                <SurgicalLab
+                  onKedalaman={setDissect}
+                  onSorot={(nama) => { setActiveWorkout(null); setActiveOrgan(null); setFocusKeywords(null); setHighlighted(nama) }}
                 />
               </Suspense>
             )}
