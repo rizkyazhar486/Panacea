@@ -1,7 +1,6 @@
 import { lazy, Suspense, type ReactNode } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { BodyEvidenceDock, type BodyEvidenceMode } from '../components/digital-twin/BodyEvidenceDock'
-import { HraContextBridge } from '../components/digital-twin/HraContextBridge'
 
 const HraClinicalAtlas = lazy(() =>
   import('../components/digital-twin/HraClinicalAtlas').then((m) => ({ default: m.HraClinicalAtlas })),
@@ -9,8 +8,8 @@ const HraClinicalAtlas = lazy(() =>
 const HraSourceSearch = lazy(() =>
   import('../components/digital-twin/HraSourceSearch').then((m) => ({ default: m.HraSourceSearch })),
 )
-const PhysiologyBodyLab = lazy(() =>
-  import('../components/digital-twin/PhysiologyBodyLab').then((m) => ({ default: m.PhysiologyBodyLab })),
+const PhysiologyHraWorkbench = lazy(() =>
+  import('../components/digital-twin/PhysiologyHraWorkbench').then((m) => ({ default: m.PhysiologyHraWorkbench })),
 )
 const CellGenomeEvidenceLab = lazy(() =>
   import('../components/digital-twin/CellGenomeEvidenceLab').then((m) => ({ default: m.CellGenomeEvidenceLab })),
@@ -24,17 +23,17 @@ const CounterfactualHraWorkbench = lazy(() =>
 const RegenerationHraWorkbench = lazy(() =>
   import('../components/digital-twin/RegenerationHraWorkbench').then((m) => ({ default: m.RegenerationHraWorkbench })),
 )
-const Workout4DLab = lazy(() =>
-  import('../components/digital-twin/Workout4DLab').then((m) => ({ default: m.Workout4DLab })),
-)
 const WorkoutHraWorkbench = lazy(() =>
   import('../components/digital-twin/WorkoutHraWorkbench').then((m) => ({ default: m.WorkoutHraWorkbench })),
 )
-const SurgicalOperationAtlas = lazy(() =>
-  import('../components/digital-twin/SurgicalOperationAtlasV2').then((m) => ({ default: m.SurgicalOperationAtlasV2 })),
+const WorkoutSignalReplay = lazy(() =>
+  import('../components/digital-twin/WorkoutSignalReplay').then((m) => ({ default: m.WorkoutSignalReplay })),
 )
 const SurgicalHraWorkbench = lazy(() =>
   import('../components/digital-twin/SurgicalHraWorkbench').then((m) => ({ default: m.SurgicalHraWorkbench })),
+)
+const SurgicalProcedureTimeline = lazy(() =>
+  import('../components/digital-twin/SurgicalProcedureTimeline').then((m) => ({ default: m.SurgicalProcedureTimeline })),
 )
 const CinematicSurgicalRehearsal = lazy(() =>
   import('../components/digital-twin/CinematicSurgicalRehearsal').then((m) => ({ default: m.CinematicSurgicalRehearsal })),
@@ -50,24 +49,20 @@ type Mode = {
 
 const PRIMARY: Mode[] = [
   { key: 'realistic-atlas', label: 'Anatomy', hint: 'Multi-release HRA source anatomy with browser-loadable GLB provenance' },
-  { key: 'physiology', label: 'Physiology 4D', hint: 'Cardiovascular, respiratory, neuromuscular, GI, renal and thermoregulation' },
+  { key: 'physiology', label: 'Physiology', hint: 'HRA source anatomy + explicit physiology phases, formulas and provenance' },
   { key: 'digital-twin', label: 'Body → Cell', hint: 'Human Protein Atlas evidence first; optional structural 3D model is secondary' },
   { key: 'cell-genome', label: 'Cell → DNA', hint: 'HPA + Ensembl source evidence first; optional 3D model stays secondary' },
-  { key: 'workout-4d', label: 'Exercise', hint: 'Measured workout → resolved HRA GLB first; replay remains a separate model layer' },
-  { key: 'surgery', label: 'Surgery', hint: 'Operation/phase → resolved HRA GLB first; procedural simulation stays secondary' },
+  { key: 'workout-4d', label: 'Exercise', hint: 'Measured workout → resolved HRA GLB → data replay; no body deformation' },
+  { key: 'surgery', label: 'Surgery', hint: 'Operation/phase → resolved HRA GLB → procedure timeline' },
 ]
 
 const MORE: Mode[] = [
-  { key: 'surgery-rehearsal', label: 'Practice', hint: 'Operation/phase → resolved HRA GLB first; rehearsal remains a separate model layer' },
+  { key: 'surgery-rehearsal', label: 'Practice', hint: 'Operation-specific HRA source anatomy → active recall and risk-map practice' },
   { key: 'counterfactual', label: 'What-if', hint: 'Scenario-resolved HRA geometry + executable causal model, kept separate' },
   { key: 'regeneration', label: 'Research', hint: 'Organ-resolved HRA geometry + explicit aging/recovery hypotheses' },
 ]
 
 const ALL = [...PRIMARY, ...MORE]
-
-const HRA_CONTEXT: Partial<Record<LabMode, string[]>> = {
-  physiology: ['heart', 'lung', 'blood vasculature', 'skeletal muscle', 'kidney', 'colon', 'skin', 'brain'],
-}
 
 function isLabMode(value: string | null): value is LabMode {
   return ALL.some((item) => item.key === value)
@@ -81,36 +76,26 @@ function LoadingLab({ label }: { label: string }) {
   )
 }
 
-function SourceBackedMode({
+function SecondaryLayer({
+  eyebrow,
   title,
   detail,
-  evidenceTerms = [],
   sourcePanel,
   children,
-  openDefault = false,
-  showAtlas = true,
 }: {
+  eyebrow: string
   title: string
   detail: string
-  evidenceTerms?: string[]
-  sourcePanel?: ReactNode
+  sourcePanel: ReactNode
   children: ReactNode
-  openDefault?: boolean
-  showAtlas?: boolean
 }) {
   return (
     <div className="space-y-4">
-      {showAtlas && (
-        <Suspense fallback={<LoadingLab label="HuBMAP Human Reference Atlas" />}>
-          <HraClinicalAtlas />
-        </Suspense>
-      )}
       {sourcePanel}
-      {evidenceTerms.length > 0 && <HraContextBridge title="Mapped anatomy for this experience" terms={evidenceTerms} />}
-      <details className="group rounded-[26px] border border-neutral-200 bg-white p-4 shadow-sm dark:border-white/10 dark:bg-white/[.035]" open={openDefault}>
+      <details className="group rounded-[26px] border border-neutral-200 bg-white p-4 shadow-sm dark:border-white/10 dark:bg-white/[.035]">
         <summary className="flex cursor-pointer list-none items-center justify-between gap-3">
           <div>
-            <div className="text-[9px] font-black uppercase tracking-[.15em] text-amber-700 dark:text-amber-300">Model / simulation layer</div>
+            <div className="text-[9px] font-black uppercase tracking-[.15em] text-amber-700 dark:text-amber-300">{eyebrow}</div>
             <div className="mt-1 text-[15px] font-black text-neutral-950 dark:text-white">{title}</div>
             <p className="mt-1 max-w-3xl text-[10px] leading-relaxed text-neutral-500 dark:text-neutral-400">{detail}</p>
           </div>
@@ -181,20 +166,12 @@ export function BodyExplorer() {
 
         <div className="no-scrollbar -mx-1 mt-3 flex gap-1.5 overflow-x-auto px-1 pb-1">
           {PRIMARY.map((item) => (
-            <button
-              key={item.key}
-              onClick={() => setMode(item.key)}
-              className={`shrink-0 rounded-full border px-3.5 py-2 text-[10px] font-black transition ${mode === item.key ? 'border-neutral-950 bg-neutral-950 text-white dark:border-white dark:bg-white dark:text-neutral-950' : 'border-neutral-200 bg-neutral-50 text-neutral-600 hover:border-neutral-300 dark:border-white/10 dark:bg-white/[.04] dark:text-neutral-300'}`}
-            >
-              {item.label}
-            </button>
+            <button key={item.key} onClick={() => setMode(item.key)} className={`shrink-0 rounded-full border px-3.5 py-2 text-[10px] font-black transition ${mode === item.key ? 'border-neutral-950 bg-neutral-950 text-white dark:border-white dark:bg-white dark:text-neutral-950' : 'border-neutral-200 bg-neutral-50 text-neutral-600 hover:border-neutral-300 dark:border-white/10 dark:bg-white/[.04] dark:text-neutral-300'}`}>{item.label}</button>
           ))}
           <details className="shrink-0">
             <summary className="list-none cursor-pointer rounded-full border border-neutral-200 bg-neutral-50 px-3.5 py-2 text-[10px] font-black text-neutral-600 dark:border-white/10 dark:bg-white/[.04] dark:text-neutral-300">More ▾</summary>
             <div className="absolute right-3 mt-2 flex min-w-[170px] flex-col gap-1 rounded-2xl border border-neutral-200 bg-white p-2 shadow-xl dark:border-white/10 dark:bg-[#111519]">
-              {MORE.map((item) => (
-                <button key={item.key} onClick={() => setMode(item.key)} className={`rounded-xl px-3 py-2 text-left text-[10px] font-black ${mode === item.key ? 'bg-neutral-950 text-white dark:bg-white dark:text-neutral-950' : 'text-neutral-600 hover:bg-neutral-100 dark:text-neutral-300 dark:hover:bg-white/10'}`}>{item.label}</button>
-              ))}
+              {MORE.map((item) => <button key={item.key} onClick={() => setMode(item.key)} className={`rounded-xl px-3 py-2 text-left text-[10px] font-black ${mode === item.key ? 'bg-neutral-950 text-white dark:bg-white dark:text-neutral-950' : 'text-neutral-600 hover:bg-neutral-100 dark:text-neutral-300 dark:hover:bg-white/10'}`}>{item.label}</button>)}
             </div>
           </details>
         </div>
@@ -204,59 +181,44 @@ export function BodyExplorer() {
         <CellEvidenceMode mode="body-cell" />
       ) : mode === 'realistic-atlas' ? (
         <div className="space-y-4">
-          <Suspense fallback={<LoadingLab label="HuBMAP Human Reference Atlas" />}>
-            <HraClinicalAtlas />
-          </Suspense>
-          <Suspense fallback={<LoadingLab label="multi-release HRA source search" />}>
-            <HraSourceSearch />
-          </Suspense>
+          <Suspense fallback={<LoadingLab label="HuBMAP Human Reference Atlas" />}><HraClinicalAtlas /></Suspense>
+          <Suspense fallback={<LoadingLab label="multi-release HRA source search" />}><HraSourceSearch /></Suspense>
         </div>
       ) : mode === 'physiology' ? (
-        <SourceBackedMode
-          openDefault
-          evidenceTerms={HRA_CONTEXT.physiology ?? []}
-          title="Whole-body 4D physiology"
-          detail="HRA source anatomy stays visible first. The physiology layer animates timing and system relationships while separating connected measurements, derived calculations, educational reference values and unavailable measurements."
-        >
-          <Suspense fallback={<LoadingLab label="whole-body physiology" />}><PhysiologyBodyLab /></Suspense>
-        </SourceBackedMode>
+        <Suspense fallback={<LoadingLab label="HRA-native physiology workbench" />}><PhysiologyHraWorkbench /></Suspense>
       ) : mode === 'cell-genome' ? (
         <CellEvidenceMode mode="cell-genome" />
       ) : mode === 'workout-4d' ? (
-        <SourceBackedMode
-          showAtlas={false}
-          title="Measured workout replay"
-          detail="The workout-specific workbench above already loads resolved HRA source geometry. The replay below is a separate educational model and never changes the upstream GLB."
+        <SecondaryLayer
+          eyebrow="Data replay"
+          title="Replay measured workout signals"
+          detail="The source-anatomy workbench above loads fixed HRA geometry. This optional timeline replays measured, derived and educational data only; it does not animate or deform the anatomy."
           sourcePanel={<Suspense fallback={<LoadingLab label="workout-specific HRA workbench" />}><WorkoutHraWorkbench /></Suspense>}
         >
-          <Suspense fallback={<LoadingLab label="exercise physiology replay" />}><Workout4DLab /></Suspense>
-        </SourceBackedMode>
+          <Suspense fallback={<LoadingLab label="workout signal replay" />}><WorkoutSignalReplay /></Suspense>
+        </SecondaryLayer>
       ) : mode === 'surgery' ? (
-        <SourceBackedMode
-          showAtlas={false}
-          title="Procedural surgery atlas"
-          detail="The operation-specific workbench above loads resolved HRA source geometry for the selected operation and phase. The procedural scene below remains an educational model."
+        <SecondaryLayer
+          eyebrow="Procedure education"
+          title="Operation timeline"
+          detail="The source-anatomy workbench above resolves the operation and phase to HRA GLB geometry. This optional timeline handles objectives, risks and checkpoints without a second generated body renderer."
           sourcePanel={<Suspense fallback={<LoadingLab label="operation-specific HRA workbench" />}><SurgicalHraWorkbench /></Suspense>}
         >
-          <Suspense fallback={<LoadingLab label="surgical procedure atlas" />}><SurgicalOperationAtlas /></Suspense>
-        </SourceBackedMode>
+          <Suspense fallback={<LoadingLab label="procedure timeline" />}><SurgicalProcedureTimeline /></Suspense>
+        </SecondaryLayer>
       ) : mode === 'surgery-rehearsal' ? (
-        <SourceBackedMode
-          showAtlas={false}
-          title="Surgical rehearsal"
-          detail="The operation-specific workbench above loads resolved HRA source geometry. Rehearsal stays separate and opens only when requested."
+        <SecondaryLayer
+          eyebrow="Practice lab"
+          title="Active recall and risk-map rehearsal"
+          detail="The HRA workbench above remains the anatomy source. Practice below is limited to active recall, atlas coverage and operation comparison—without a duplicate Body3D viewport."
           sourcePanel={<Suspense fallback={<LoadingLab label="operation-specific HRA workbench" />}><SurgicalHraWorkbench /></Suspense>}
         >
-          <Suspense fallback={<LoadingLab label="cinematic surgical rehearsal" />}><CinematicSurgicalRehearsal /></Suspense>
-        </SourceBackedMode>
+          <Suspense fallback={<LoadingLab label="surgical rehearsal" />}><CinematicSurgicalRehearsal /></Suspense>
+        </SecondaryLayer>
       ) : mode === 'counterfactual' ? (
-        <Suspense fallback={<LoadingLab label="source-resolved What-if workbench" />}>
-          <CounterfactualHraWorkbench />
-        </Suspense>
+        <Suspense fallback={<LoadingLab label="source-resolved What-if workbench" />}><CounterfactualHraWorkbench /></Suspense>
       ) : (
-        <Suspense fallback={<LoadingLab label="source-resolved regeneration research" />}>
-          <RegenerationHraWorkbench />
-        </Suspense>
+        <Suspense fallback={<LoadingLab label="source-resolved regeneration research" />}><RegenerationHraWorkbench /></Suspense>
       )}
 
       <BodyEvidenceDock mode={mode} />
