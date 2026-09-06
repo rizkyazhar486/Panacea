@@ -7,7 +7,7 @@ import { CatatanHarian } from '../components/CatatanHarian'
 import { CatatanLatihan } from '../components/CatatanLatihan'
 import { PanaceaGrowthRail } from '../components/dashboard/PanaceaGrowthWidgets'
 import { PanaceaUtilityShelf } from '../components/dashboard/PanaceaUtilityShelf'
-import { DeferredHomeFeatureUniverse, DeferredPanaceaLearningRail } from '../components/dashboard/DeferredHomeSections'
+import { DeferredBodyExposureWidget, DeferredHomeFeatureUniverse, DeferredPanaceaLearningRail } from '../components/dashboard/DeferredHomeSections'
 import { pratinjauBeranda } from '../lib/pratinjauBeranda'
 import { getVitals } from '../lib/healthVitals'
 import { getWorkouts } from '../lib/workoutStore'
@@ -170,6 +170,7 @@ export default function Beranda() {
         <PapanWidget pratinjau={pratinjau} tanggalCatatan={tanggalCatatan} />
       </section>
 
+      <DeferredBodyExposureWidget />
       <DeferredHomeFeatureUniverse />
       <DeferredPanaceaLearningRail />
 
