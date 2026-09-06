@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { HraContextBridge } from './HraContextBridge'
+import { HraResolvedAnatomyViewer } from './HraResolvedAnatomyViewer'
 import {
   ALL_SURGICAL_PROCEDURES,
   SURGICAL_SPECIALTIES,
@@ -40,7 +41,7 @@ export function SurgicalHraWorkbench() {
           <div>
             <div className="text-[9px] font-black uppercase tracking-[.18em] text-cyan-700 dark:text-cyan-300">Surgical source anatomy</div>
             <h2 className="mt-1 text-xl font-black tracking-tight text-neutral-950 dark:text-white sm:text-2xl">Operation → phase → HRA structures</h2>
-            <p className="mt-1 max-w-3xl text-[11px] leading-relaxed text-neutral-500 dark:text-neutral-400">Select an operation and phase. Panacea derives anatomy terms from the procedure record and resolves them against HuBMAP HRA releases instead of drawing an unverified operative scene.</p>
+            <p className="mt-1 max-w-3xl text-[11px] leading-relaxed text-neutral-500 dark:text-neutral-400">Select an operation and phase. Panacea derives anatomy terms from the procedure record, resolves them against HuBMAP HRA, and loads upstream GLB geometry when the source release actually provides one.</p>
           </div>
           <div className="rounded-2xl border border-neutral-200 bg-neutral-50 px-3 py-2 text-right dark:border-white/10 dark:bg-white/[.035]">
             <div className="text-[8px] font-black uppercase tracking-wide text-neutral-400">Current source context</div>
@@ -125,7 +126,13 @@ export function SurgicalHraWorkbench() {
             </div>
           </div>
 
-          <HraContextBridge title={`${procedure.name} · ${phase.title}`} terms={terms} maxResults={12} />
+          <HraResolvedAnatomyViewer
+            title={`${procedure.name} · ${phase.title}`}
+            description="Static upstream HRA geometry selected from the operation and phase terms. The procedural simulator below does not modify this source model."
+            terms={terms}
+            maxResults={14}
+          />
+          <HraContextBridge title={`${procedure.name} · mapped source structures`} terms={terms} maxResults={12} />
         </div>
       </div>
     </section>
