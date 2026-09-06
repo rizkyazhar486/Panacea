@@ -40,6 +40,7 @@ export interface SequenceEvidenceReport {
   assemblyHint?: GenomeAssemblyHint
   referenceHeader?: string
   variants?: VcfVariantRecord[]
+  structuralVariants?: VcfVariantRecord[]
   preview: SequenceEvidencePreview[]
   warnings: string[]
 }
@@ -221,6 +222,8 @@ function parseFastq(text: string): SequenceEvidenceReport {
 }
 
 const TRANSITIONS = new Set(['AG', 'GA', 'CT', 'TC'])
+const SMALL_VARIANT_PREVIEW_LIMIT = 200
+const STRUCTURAL_VARIANT_PREVIEW_LIMIT = 2000
 
 function inferAssembly(lines: string[]) {
   const referenceHeader = lines.find((line) => line.startsWith('##reference='))?.slice('##reference='.length).trim() || ''
@@ -228,6 +231,11 @@ function inferAssembly(lines: string[]) {
   const haystack = `${referenceHeader} ${metadata}`.toLowerCase()
   const assemblyHint: GenomeAssemblyHint = /grch37|hg19/.test(haystack) ? 'GRCh37' : /grch38|hg38/.test(haystack) ? 'GRCh38' : 'unknown'
   return { referenceHeader, assemblyHint }
+}
+
+function looksStructural(alt: string, info: string) {
+  if (/^<[^>]+>$/.test(alt) || /[\[\]]/.test(alt)) return true
+  return /(?:^|;)SVTYPE=|(?:^|;)SVLEN=|(?:^|;)END=|(?:^|;)CN=|(?:^|;)COPY_NUMBER=/i.test(info)
 }
 
 function parseVcf(text: string): SequenceEvidenceReport {
@@ -245,6 +253,8 @@ function parseVcf(text: string): SequenceEvidenceReport {
   const preview: SequenceEvidencePreview[] = []
   const warnings: string[] = []
   const variants: VcfVariantRecord[] = []
+  const structuralVariants: VcfVariantRecord[] = []
+  let structuralOverflow = 0
 
   for (const line of records) {
     const fields = line.split('\t')
@@ -268,21 +278,25 @@ function parseVcf(text: string): SequenceEvidenceReport {
         const pair = `${ref}${alt}`.toUpperCase()
         if (TRANSITIONS.has(pair)) transitions += 1
         else transversions += 1
-      } else if (ref.length !== alt.length) {
+      } else if (ref.length !== alt.length && !looksStructural(alt, info)) {
         indelAlleles += 1
       }
 
-      if (variants.length < 200) {
-        variants.push({
-          chrom,
-          pos,
-          id: id || '.',
-          ref,
-          alt,
-          qual: qual || '.',
-          filter: filter || '.',
-          info: info || '.',
-        })
+      const variant: VcfVariantRecord = {
+        chrom,
+        pos,
+        id: id || '.',
+        ref,
+        alt,
+        qual: qual || '.',
+        filter: filter || '.',
+        info: info || '.',
+      }
+
+      if (variants.length < SMALL_VARIANT_PREVIEW_LIMIT) variants.push(variant)
+      if (looksStructural(alt, info)) {
+        if (structuralVariants.length < STRUCTURAL_VARIANT_PREVIEW_LIMIT) structuralVariants.push(variant)
+        else structuralOverflow += 1
       }
     }
 
@@ -297,7 +311,8 @@ function parseVcf(text: string): SequenceEvidenceReport {
   const columns = header.split('\t')
   const sampleCount = Math.max(0, columns.length - 9)
   const { referenceHeader, assemblyHint } = inferAssembly(lines)
-  if (alternateAlleles > variants.length) warnings.push(`External-annotation preview is capped at the first ${variants.length.toLocaleString()} ALT alleles parsed from this file.`)
+  if (alternateAlleles > variants.length) warnings.push(`Small-variant external-annotation preview is capped at the first ${variants.length.toLocaleString()} ALT alleles parsed from this file.`)
+  if (structuralOverflow > 0) warnings.push(`Structural-event preview is capped at ${STRUCTURAL_VARIANT_PREVIEW_LIMIT.toLocaleString()} events; ${structuralOverflow.toLocaleString()} additional structural ALT records were not retained in memory.`)
 
   return {
     format: 'VCF',
@@ -314,6 +329,7 @@ function parseVcf(text: string): SequenceEvidenceReport {
     assemblyHint,
     referenceHeader,
     variants,
+    structuralVariants,
     preview,
     warnings: [...new Set(warnings)],
   }
