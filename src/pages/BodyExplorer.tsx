@@ -53,12 +53,12 @@ const PRIMARY: Mode[] = [
   { key: 'physiology', label: 'Physiology 4D', hint: 'Cardiovascular, respiratory, neuromuscular, GI, renal and thermoregulation' },
   { key: 'digital-twin', label: 'Body → Cell', hint: 'Human Protein Atlas evidence first; optional structural 3D model is secondary' },
   { key: 'cell-genome', label: 'Cell → DNA', hint: 'HPA + Ensembl source evidence first; optional 3D model stays secondary' },
-  { key: 'workout-4d', label: 'Exercise', hint: 'Measured workout → HRA anatomy first; replay remains a separate model layer' },
-  { key: 'surgery', label: 'Surgery', hint: 'Operation-specific HRA source anatomy first; simulation stays secondary' },
+  { key: 'workout-4d', label: 'Exercise', hint: 'Measured workout → resolved HRA GLB first; replay remains a separate model layer' },
+  { key: 'surgery', label: 'Surgery', hint: 'Operation/phase → resolved HRA GLB first; procedural simulation stays secondary' },
 ]
 
 const MORE: Mode[] = [
-  { key: 'surgery-rehearsal', label: 'Practice', hint: 'Operation-specific HRA source anatomy first; rehearsal remains a separate model layer' },
+  { key: 'surgery-rehearsal', label: 'Practice', hint: 'Operation/phase → resolved HRA GLB first; rehearsal remains a separate model layer' },
   { key: 'counterfactual', label: 'What-if', hint: 'Scenario-resolved HRA geometry + executable causal model, kept separate' },
   { key: 'regeneration', label: 'Research', hint: 'Organ-resolved HRA geometry + explicit aging/recovery hypotheses' },
 ]
@@ -88,6 +88,7 @@ function SourceBackedMode({
   sourcePanel,
   children,
   openDefault = false,
+  showAtlas = true,
 }: {
   title: string
   detail: string
@@ -95,12 +96,15 @@ function SourceBackedMode({
   sourcePanel?: ReactNode
   children: ReactNode
   openDefault?: boolean
+  showAtlas?: boolean
 }) {
   return (
     <div className="space-y-4">
-      <Suspense fallback={<LoadingLab label="HuBMAP Human Reference Atlas" />}>
-        <HraClinicalAtlas />
-      </Suspense>
+      {showAtlas && (
+        <Suspense fallback={<LoadingLab label="HuBMAP Human Reference Atlas" />}>
+          <HraClinicalAtlas />
+        </Suspense>
+      )}
       {sourcePanel}
       {evidenceTerms.length > 0 && <HraContextBridge title="Mapped anatomy for this experience" terms={evidenceTerms} />}
       <details className="group rounded-[26px] border border-neutral-200 bg-white p-4 shadow-sm dark:border-white/10 dark:bg-white/[.035]" open={openDefault}>
@@ -220,24 +224,27 @@ export function BodyExplorer() {
         <CellEvidenceMode mode="cell-genome" />
       ) : mode === 'workout-4d' ? (
         <SourceBackedMode
+          showAtlas={false}
           title="Measured workout replay"
-          detail="Workout-derived animation is useful only after the HRA anatomical reference is established. Measured device signals, derived physiology and educational context remain explicitly separated."
+          detail="The workout-specific workbench above already loads resolved HRA source geometry. The replay below is a separate educational model and never changes the upstream GLB."
           sourcePanel={<Suspense fallback={<LoadingLab label="workout-specific HRA workbench" />}><WorkoutHraWorkbench /></Suspense>}
         >
           <Suspense fallback={<LoadingLab label="exercise physiology replay" />}><Workout4DLab /></Suspense>
         </SourceBackedMode>
       ) : mode === 'surgery' ? (
         <SourceBackedMode
+          showAtlas={false}
           title="Procedural surgery atlas"
-          detail="The simulation remains an educational model. Operation- and phase-specific HRA resolution is shown above it, so the source anatomy can be inspected before any generated scene is opened."
+          detail="The operation-specific workbench above loads resolved HRA source geometry for the selected operation and phase. The procedural scene below remains an educational model."
           sourcePanel={<Suspense fallback={<LoadingLab label="operation-specific HRA workbench" />}><SurgicalHraWorkbench /></Suspense>}
         >
           <Suspense fallback={<LoadingLab label="surgical procedure atlas" />}><SurgicalOperationAtlas /></Suspense>
         </SourceBackedMode>
       ) : mode === 'surgery-rehearsal' ? (
         <SourceBackedMode
+          showAtlas={false}
           title="Surgical rehearsal"
-          detail="Rehearsal remains clearly separated from HRA anatomy. The operation-specific source workbench is shown first; open the rehearsal only after reviewing mapped anatomy."
+          detail="The operation-specific workbench above loads resolved HRA source geometry. Rehearsal stays separate and opens only when requested."
           sourcePanel={<Suspense fallback={<LoadingLab label="operation-specific HRA workbench" />}><SurgicalHraWorkbench /></Suspense>}
         >
           <Suspense fallback={<LoadingLab label="cinematic surgical rehearsal" />}><CinematicSurgicalRehearsal /></Suspense>
