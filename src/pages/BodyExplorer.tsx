@@ -508,29 +508,6 @@ export function BodyExplorer() {
         subtitle="A real 3D anatomy model — tap any bone, muscle, vessel, nerve, or organ"
       />
       <Card>
-        <form onSubmit={(e) => { e.preventDefault(); ask() }} className="flex gap-2">
-          <div className="relative min-w-0 flex-1">
-            <IconSearch size={16} className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-neutral-400" />
-            <input
-              value={question}
-              onChange={(e) => setQuestion(e.target.value)}
-              placeholder="Ask about anatomy, a symptom, or a disease…"
-              className="h-11 w-full rounded-xl border border-neutral-200 bg-white pl-9 pr-3 text-sm text-ink outline-none focus:border-brand dark:border-white/10 dark:bg-white/5 dark:text-white"
-            />
-          </div>
-          <button
-            type="submit"
-            disabled={asking || !question.trim()}
-            className="liquid-glass-btn liquid-glass-btn--primary flex h-11 shrink-0 items-center rounded-xl px-4 text-sm font-bold text-white disabled:opacity-50"
-          >
-            {asking ? 'Asking…' : 'Ask'}
-          </button>
-        </form>
-        <p className="mt-2 text-[11px] leading-relaxed text-neutral-400">
-          Ask in your own words — e.g. "where is the median nerve", "symptoms of liver disease", "what does the
-          pancreas do". Real anatomical structures light up in green on the model when a match is found.
-        </p>
-
         <Body3D
           layers={layers}
           highlighted={highlighted}
@@ -564,6 +541,29 @@ export function BodyExplorer() {
         </div>
         <p className="mt-1.5 text-center text-[10.5px] leading-relaxed text-neutral-400">
           {RENDER_MODES.find((m) => m.key === renderMode)?.hint}
+        </p>
+
+        <form onSubmit={(e) => { e.preventDefault(); ask() }} className="flex gap-2">
+          <div className="relative min-w-0 flex-1">
+            <IconSearch size={16} className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-neutral-400" />
+            <input
+              value={question}
+              onChange={(e) => setQuestion(e.target.value)}
+              placeholder="Ask about anatomy, a symptom, or a disease…"
+              className="h-11 w-full rounded-xl border border-neutral-200 bg-white pl-9 pr-3 text-sm text-ink outline-none focus:border-brand dark:border-white/10 dark:bg-white/5 dark:text-white"
+            />
+          </div>
+          <button
+            type="submit"
+            disabled={asking || !question.trim()}
+            className="liquid-glass-btn liquid-glass-btn--primary flex h-11 shrink-0 items-center rounded-xl px-4 text-sm font-bold text-white disabled:opacity-50"
+          >
+            {asking ? 'Asking…' : 'Ask'}
+          </button>
+        </form>
+        <p className="mt-2 text-[11px] leading-relaxed text-neutral-400">
+          Ask in your own words — e.g. "where is the median nerve", "symptoms of liver disease", "what does the
+          pancreas do". Real anatomical structures light up in green on the model when a match is found.
         </p>
 
         {/* Gerak fisiologis — irama nyata pada figur yang sama. */}
@@ -974,7 +974,11 @@ export function BodyExplorer() {
 
         <div className="mt-4 min-w-0">
           {!selectedLabel && (
-            <p className="text-sm leading-relaxed text-neutral-500">
+            // Dulu text-sm (14 px) sementara seluruh teks bantuan di panel yang
+            // sama memakai 10-11 px. Satu paragraf yang setengah lebih besar
+            // daripada tetangganya tidak terbaca sebagai penekanan, melainkan
+            // sebagai kelalaian.
+            <p className="text-[11px] leading-relaxed text-neutral-500">
               Tap a structure on the model, pick a workout target, browse the anatomy reference above, or ask a
               question — and get a plain-language explanation grounded in real ontology terms, not a diagnosis for
               you personally.

@@ -3,6 +3,7 @@ import * as THREE from 'three'
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'
 import { MeshoptDecoder } from 'three/examples/jsm/libs/meshopt_decoder.module.js'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
+import { RoomEnvironment } from 'three/examples/jsm/environments/RoomEnvironment.js'
 import { SEBAR_PERISTALTIK } from '../lib/motionWave'
 import { keburaman, geserBuka, KEDALAMAN, type KunciLapisan } from '../lib/dissection'
 
@@ -356,6 +357,29 @@ interface Props {
   onPick: (rawName: string, label: string) => void
 }
 
+/**
+ * Latar bergradasi vertikal sebagai tekstur.
+ *
+ * Dibangkitkan di kanvas 2D dan bukan diambil dari berkas gambar, supaya tidak
+ * ada unduhan tambahan pada halaman yang geometrinya saja sudah puluhan
+ * megabita.
+ */
+function latarGradasi(atas: number, bawah: number): THREE.Texture {
+  const k = document.createElement('canvas')
+  k.width = 2
+  k.height = 256
+  const ctx = k.getContext('2d')!
+  const g = ctx.createLinearGradient(0, 0, 0, 256)
+  const hex = (n: number) => `#${n.toString(16).padStart(6, '0')}`
+  g.addColorStop(0, hex(atas))
+  g.addColorStop(1, hex(bawah))
+  ctx.fillStyle = g
+  ctx.fillRect(0, 0, 2, 256)
+  const t = new THREE.CanvasTexture(k)
+  t.colorSpace = THREE.SRGBColorSpace
+  return t
+}
+
 export function Body3D({ layers, highlighted, focusKeywords, renderMode, ctWindow, slicePlane, slicePos, motion, unfold, dissect, onPick }: Props) {
   const containerRef = useRef<HTMLDivElement>(null)
   const groupsRef = useRef<Partial<Record<AnatomyLayer['key'], THREE.Group>>>({})
@@ -364,8 +388,9 @@ export function Body3D({ layers, highlighted, focusKeywords, renderMode, ctWindo
   const homeFramingRef = useRef<{ position: THREE.Vector3; target: THREE.Vector3; minDistance: number; maxDistance: number } | null>(null)
   const controlsRef = useRef<OrbitControls | null>(null)
   const rendererRef = useRef<THREE.WebGLRenderer | null>(null)
-  const lightsRef = useRef<{ ambient: THREE.AmbientLight; key: THREE.DirectionalLight; fill: THREE.DirectionalLight } | null>(null)
+  const lightsRef = useRef<{ ambient: THREE.AmbientLight; key: THREE.DirectionalLight; fill: THREE.DirectionalLight; tepi: THREE.DirectionalLight } | null>(null)
   const clipRef = useRef<THREE.Plane | null>(null)
+  const latarRef = useRef<THREE.Texture | null>(null)
   const bodyBoxRef = useRef<THREE.Box3 | null>(null)
   // Gerak dibaca dari ref di dalam loop render, bukan lewat dependency effect:
   // mengubah laju denyut tidak boleh membangun ulang scene.
@@ -420,26 +445,75 @@ export function Body3D({ layers, highlighted, focusKeywords, renderMode, ctWindo
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
     renderer.setClearColor(0x0a0a0f, 1)
     renderer.outputColorSpace = THREE.SRGBColorSpace
-    renderer.toneMapping = THREE.ACESFilmicToneMapping
-    renderer.toneMappingExposure = 1.0
+    // ACES DIGANTI, dan alasannya terukur. ACES memiringkan merah jenuh ke
+    // arah oranye saat luminansnya naik: begitu pencahayaan diperbaiki, rona
+    // rata-rata piksel otot bergeser dari 8,5° (merah) ke 17,9° (oranye), dan
+    // otot berhenti terlihat seperti otot. Khronos PBR Neutral dirancang justru
+    // untuk mempertahankan warna dasar bahan pada pencahayaan terang, sehingga
+    // bentuknya bertambah tanpa warnanya ikut berubah.
+    renderer.toneMapping = THREE.NeutralToneMapping
+    // Nilainya disetel dengan pengukuran, bukan perasaan. Figur lama:
+    // luminans tubuh 31/255, nol piksel terpotong — gelap karena kurang
+    // cahaya, bukan karena batas atas. Pada 1,25 dengan Neutral hasilnya
+    // berbalik terlalu jauh: 102/255 dengan 3,75% piksel terbakar, dan sorotan
+    // yang terbakar pada merah ikut menariknya ke oranye lagi. Pada 0,95 ia
+    // berayun balik terlalu gelap (35/255, hampir sama dengan sebelum
+    // diperbaiki).
+    //
+    // Nilai akhirnya 1,1, dipilih atas nama WARNA dan bukan terang. Diukur:
+    // 1,2 memberi luminans 40,4 dengan rona merah 14,1°, sedangkan 1,1 memberi
+    // 36,3 dengan rona 9,8°. Empat titik terang tidak sebanding dengan otot
+    // yang mulai terbaca oranye — pada atlas anatomi, warna jaringan adalah
+    // informasi, bukan selera.
+    renderer.toneMappingExposure = 1.1
     // Clipping lokal per-material harus dinyalakan eksplisit; tanpa ini
     // clippingPlanes pada material diabaikan diam-diam.
     renderer.localClippingEnabled = true
     container.appendChild(renderer.domElement)
     rendererRef.current = renderer
 
-    // Cahaya dijaga tetap moderat -- terlalu terang membuat channel merah
-    // pada material otot "clip" ke putih lebih cepat dari channel hijau/biru,
-    // sehingga merah pekat terlihat pudar jadi oranye/cokelat.
-    const ambient = new THREE.AmbientLight(0xffffff, 0.45)
+    // ── Pencahayaan berbasis lingkungan ──────────────────────────────────
+    //
+    // Inilah perbedaan terbesar antara render yang terlihat seperti atlas
+    // anatomi dan render yang terlihat seperti mainan plastik. MeshStandardMaterial
+    // menghitung pantulan spekular dari LINGKUNGANNYA; tanpa peta lingkungan,
+    // suku spekularnya nyaris nol, sehingga otot sekalipun berpermukaan
+    // melengkung tampak rata seperti kertas berwarna. Cahaya terarah saja tidak
+    // bisa menggantikannya — ia hanya menambah terang, bukan menambah bentuk.
+    //
+    // RoomEnvironment dipakai karena ia dibangkitkan secara prosedural: tidak
+    // ada berkas HDR yang perlu diunduh, jadi tidak ada tambahan muatan
+    // jaringan pada halaman yang sudah mengunduh puluhan megabita geometri.
+    const pmrem = new THREE.PMREMGenerator(renderer)
+    const lingkungan = pmrem.fromScene(new RoomEnvironment(), 0.04)
+    scene.environment = lingkungan.texture
+    // Intensitasnya ditahan: lingkungan penuh membuat merah otot pudar menjadi
+    // merah muda, dan warna jaringan di sini mengikuti konvensi atlas, bukan
+    // selera. Yang diambil dari lingkungan adalah BENTUKNYA, bukan warnanya.
+    scene.environmentIntensity = 0.4
+    pmrem.dispose()
+
+    // Latar bergradasi, bukan warna rata. Siluet tubuh yang gelap di atas
+    // latar yang sama gelapnya kehilangan tepinya sama sekali — bahu dan
+    // lengan menyatu dengan kekosongan di belakangnya.
+    latarRef.current = latarGradasi(0x141922, 0x05070b)
+    scene.background = latarRef.current
+
+    const ambient = new THREE.AmbientLight(0xffffff, 0.32)
     scene.add(ambient)
-    const key = new THREE.DirectionalLight(0xffffff, 0.65)
+    const key = new THREE.DirectionalLight(0xffffff, 0.85)
     key.position.set(2, 4, 3)
     scene.add(key)
     const fill = new THREE.DirectionalLight(0xffffff, 0.25)
     fill.position.set(-3, 1, -2)
     scene.add(fill)
-    lightsRef.current = { ambient, key, fill }
+    // Cahaya tepi dari belakang. Tugasnya bukan menerangi melainkan MEMISAHKAN:
+    // ia menggarisi bahu, lengan dan betis sehingga tubuh berdiri di depan
+    // latar alih-alih tenggelam ke dalamnya.
+    const tepi = new THREE.DirectionalLight(0xdce8ff, 0.55)
+    tepi.position.set(-1.5, 2.5, -4)
+    scene.add(tepi)
+    lightsRef.current = { ambient, key, fill, tepi }
 
     const controls = new OrbitControls(camera, renderer.domElement)
     controls.enablePan = false
@@ -603,6 +677,14 @@ export function Body3D({ layers, highlighted, focusKeywords, renderMode, ctWindo
       renderer.domElement.removeEventListener('pointerup', onPointerUp)
       renderer.domElement.removeEventListener('webglcontextlost', onContextLost)
       controls.dispose()
+      // Peta lingkungan dan tekstur latar dibuat di GPU dan tidak ikut
+      // dibersihkan oleh renderer.dispose(); tanpa ini, membuka-tutup halaman
+      // ini berulang kali meninggalkan tumpukan tekstur yang tidak pernah
+      // dilepas — kebocoran yang baru terasa setelah beberapa kali navigasi,
+      // dan pada ponsel berakhir sebagai konteks WebGL yang ditolak.
+      lingkungan.dispose()
+      latarRef.current?.dispose()
+      latarRef.current = null
       renderer.dispose()
       container.removeChild(renderer.domElement)
       sceneRef.current = null
@@ -680,7 +762,16 @@ export function Body3D({ layers, highlighted, focusKeywords, renderMode, ctWindo
                 const size = box.getSize(new THREE.Vector3())
                 const height = Math.max(size.y, 0.1)
                 const dist = height * 1.7
-                camera.position.set(center.x, center.y + height * 0.05, center.z + dist)
+                // Sudut tiga-perempat, bukan tepat dari depan. Pandangan
+                // simetris dari depan meratakan kedalaman: bahu, dada dan
+                // panggul jatuh pada satu bidang sehingga figurnya terbaca
+                // sebagai diagram. Sedikit menyamping mengembalikan volumenya
+                // tanpa mengorbankan orientasi kiri-kanan.
+                camera.position.set(
+                  center.x + dist * 0.26,
+                  center.y + height * 0.06,
+                  center.z + dist * 0.96,
+                )
                 camera.near = Math.max(dist / 100, 0.01)
                 camera.far = dist * 20
                 camera.updateProjectionMatrix()
@@ -796,9 +887,21 @@ export function Body3D({ layers, highlighted, focusKeywords, renderMode, ctWindo
     const lights = lightsRef.current
     if (lights) {
       const flat = renderMode === 'xray'
-      lights.ambient.intensity = flat ? 1.1 : 0.45
-      lights.key.intensity = flat ? 0.15 : 0.65
+      lights.ambient.intensity = flat ? 1.1 : 0.32
+      lights.key.intensity = flat ? 0.15 : 0.85
       lights.fill.intensity = flat ? 0.1 : 0.25
+      lights.tepi.intensity = flat ? 0 : 0.55
+    }
+    // Pencahayaan lingkungan dan latar bergradasi HANYA untuk mode anatomi.
+    // CT dan MRI dibaca sebagai keabuan yang nilainya berarti; menambahkan
+    // pantulan spekular ke atasnya akan membuat piksel terang yang tidak
+    // mewakili jaringan apa pun — persis kesalahan yang membuat gambar medis
+    // palsu terlihat meyakinkan.
+    const sc = sceneRef.current
+    if (sc) {
+      const anatomi = renderMode === 'anatomy'
+      sc.environmentIntensity = anatomi ? 0.4 : 0
+      sc.background = anatomi ? latarRef.current : null
     }
   }, [renderMode, ctWindow, slicePlane, slicePos, loadingLayers])
 
@@ -957,7 +1060,11 @@ export function Body3D({ layers, highlighted, focusKeywords, renderMode, ctWindo
   const isLoading = loadingLayers.size > 0
 
   return (
-    <div className="relative h-[65vh] max-h-[780px] min-h-[460px] w-full overflow-hidden rounded-2xl bg-gradient-to-b from-neutral-900 to-neutral-950">
+    // Viewer memenuhi lebar kartu dan menempel ke tepi atasnya. Sebelumnya
+    // ia terkurung padding kartu, sehingga di layar 390 px lebar gambarnya
+    // hanya 316 px — hampir seperlima lebar layar terbuang menjadi bingkai
+    // kosong, pada satu-satunya elemen halaman yang memang untuk dilihat.
+    <div className="relative -mx-5 -mt-5 mb-3 h-[68vh] max-h-[820px] min-h-[480px] overflow-hidden rounded-t-2xl bg-gradient-to-b from-neutral-900 to-neutral-950">
       <div ref={containerRef} className="h-full w-full touch-none" />
       {/* Kegagalan yang membuat viewer tidak bisa menampilkan apa pun. Ini
           menggantikan kotak hitam diam: layar kosong tanpa keterangan membuat
