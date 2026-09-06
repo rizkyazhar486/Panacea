@@ -27,6 +27,14 @@ const CardioLab = lazy(() => import('./bodyhub/CardioLab'))
 const SpecialtyLab = lazy(() => import('./bodyhub/SpecialtyLab'))
 // Ruang molekul: geometri 3D obat, dibangkitkan RDKit dan diperiksa rumusnya.
 const MolecularLab = lazy(() => import('./bodyhub/MolecularLab'))
+// Ruang genomika: varian klinis, alat urutan, perancang CRISPR, dan jalur sinyal.
+const GenomicsLab = lazy(() => import('./bodyhub/GenomicsLab'))
+// Ruang sel: organel dalam 3D dan biokimia yang berjalan di tiap kompartemen.
+const CellLab = lazy(() => import('./bodyhub/CellLab'))
+// Pencari struktur: 2.587 nama yang benar-benar ada di berkas geometrinya.
+const StructureFinder = lazy(() => import('./bodyhub/StructureFinder'))
+// Ruang bedah: urutan lapisan yang ditemui pisau, per pendekatan.
+const SurgicalLab = lazy(() => import('./bodyhub/SurgicalLab'))
 const WorkoutSimSection = lazy(() => import('./bodyhub/WorkoutSimSection'))
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -74,7 +82,7 @@ function Chip({
 // sama-sama menyorot struktur pada figur yang itu-itu juga. Itulah maksud
 // "satu simulasi tubuh yang utuh" — bukan enam halaman yang saling menyebut,
 // melainkan satu tubuh yang ditanyai dari enam sudut.
-type PanelTab = 'layers' | 'muscles' | 'workout-sim' | 'organs' | 'physiology' | 'simulator' | 'cardio' | 'spesialisasi' | 'molekul' | 'drugs' | 'diseases' | 'reference'
+type PanelTab = 'layers' | 'muscles' | 'workout-sim' | 'organs' | 'physiology' | 'simulator' | 'cardio' | 'spesialisasi' | 'molekul' | 'genomik' | 'sel' | 'bedah' | 'cari' | 'drugs' | 'diseases' | 'reference'
 
 const PANEL_TABS: Array<{ key: PanelTab; label: string }> = [
   { key: 'layers', label: 'Layers' },
@@ -86,6 +94,10 @@ const PANEL_TABS: Array<{ key: PanelTab; label: string }> = [
   { key: 'cardio', label: 'Cardio lab' },
   { key: 'spesialisasi', label: 'Specialty labs' },
   { key: 'molekul', label: 'Molecules' },
+  { key: 'genomik', label: 'Genomics' },
+  { key: 'cari', label: 'Find structure' },
+  { key: 'sel', label: 'Cell & metabolism' },
+  { key: 'bedah', label: 'Surgical layers' },
   { key: 'drugs', label: 'Drugs' },
   { key: 'diseases', label: 'Diseases' },
   { key: 'reference', label: 'Study' },
@@ -195,6 +207,9 @@ function HierarchyGroup({
   )
 }
 
+// Label kedalaman diseksi, mengikuti urutan KEDALAMAN di lib/dissection.
+const DEPTH_LABELS = ['Intact', 'Skin off', 'Muscle open', 'Vessels shown', 'Nerves shown', 'Viscera open', 'Skeleton']
+
 export function BodyExplorer() {
   const { state } = useStore()
   const [loading, setLoading] = useState(false)
@@ -231,11 +246,19 @@ export function BodyExplorer() {
   // memilih "CT" lalu masih melihat foto anatomi berwarna akan membingungkan.
   const [renderMode, setRenderMode] = useState<RenderMode>('anatomy')
   const [panelTab, setPanelTab] = useState<PanelTab>('layers')
+  // Hasil pencarian atlas bisa menunjuk ke ruang lain. Kedua nilai ini membawa
+  // pilihannya menyeberang tab, supaya menekan hasil pencarian benar-benar
+  // membuka apa yang ditunjuk dan bukan sekadar berpindah tab kosong.
+  const [cardioAwal, setCardioAwal] = useState<string | null>(null)
+  const [molekulAwal, setMolekulAwal] = useState<string | null>(null)
   // Kendali radiologi. Window CT dan bidang potong adalah dua hal yang
   // benar-benar diputar radiolog di stasiun kerja — bukan hiasan.
   const [ctWindowKey, setCtWindowKey] = useState(CT_WINDOWS[0].key)
   const [slicePlane, setSlicePlane] = useState<SlicePlane>('none')
   const [slicePos, setSlicePos] = useState(0.5)
+  // Membuka tubuh: geser radial tiap struktur, dan kedalaman diseksi 0..6.
+  const [unfold, setUnfold] = useState(0)
+  const [dissect, setDissect] = useState(0)
 
   // Gerak fisiologis. Tiga keadaan, bukan sakelar hidup/mati: perbedaan
   // antara istirahat dan latihan JUSTRU yang mengajarkan faalnya — denyut
@@ -516,6 +539,8 @@ export function BodyExplorer() {
           ctWindow={CT_WINDOWS.find((w) => w.key === ctWindowKey) ?? CT_WINDOWS[0]}
           slicePlane={slicePlane}
           slicePos={slicePos}
+          unfold={unfold}
+          dissect={dissect}
           motion={motion}
           onPick={onPickStructure}
         />
@@ -733,6 +758,36 @@ export function BodyExplorer() {
                     </Chip>
                   ))}
                 </div>
+
+                {/* Membuka tubuh. Dua kendali terpisah karena keduanya
+                    menjawab pertanyaan berbeda: "apa bentuknya sendirian"
+                    dan "apa yang ada tepat di bawahnya". */}
+                <div className="mt-3 space-y-3 border-t border-neutral-100 pt-3 dark:border-white/10">
+                  <label className="block text-[11px] font-bold uppercase tracking-wide text-neutral-500">
+                    Unfold {unfold > 0 ? `· ${Math.round((unfold / 0.35) * 100)}%` : ''}
+                    <input
+                      type="range" min={0} max={0.35} step={0.005} value={unfold}
+                      onChange={(e) => setUnfold(Number(e.target.value))}
+                      className="mt-1 w-full accent-brand" aria-label="Unfold"
+                    />
+                    <span className="block text-[10px] font-normal normal-case tracking-normal text-neutral-400">
+                      Slides every structure outward from the body axis. Height never changes, so what sits above
+                      what stays true — midline structures barely move, because they have no side.
+                    </span>
+                  </label>
+                  <label className="block text-[11px] font-bold uppercase tracking-wide text-neutral-500">
+                    Dissection depth · {DEPTH_LABELS[Math.round(dissect)]}
+                    <input
+                      type="range" min={0} max={6} step={1} value={dissect}
+                      onChange={(e) => setDissect(Number(e.target.value))}
+                      className="mt-1 w-full accent-brand" aria-label="Dissection depth"
+                    />
+                    <span className="block text-[10px] font-normal normal-case tracking-normal text-neutral-400">
+                      Fades the layers above that depth in the order a scalpel meets them. They never vanish
+                      completely — without a surface to refer to, the deep structures stop being a body.
+                    </span>
+                  </label>
+                </div>
               </>
             )}
 
@@ -802,19 +857,56 @@ export function BodyExplorer() {
 
             {panelTab === 'cardio' && (
               <Suspense fallback={<p className="text-sm text-neutral-500">Loading the cardiovascular lab…</p>}>
-                <CardioLab onBukaOrgan={onPickOrgan} />
+                <CardioLab onBukaOrgan={onPickOrgan} awal={cardioAwal} key={cardioAwal ?? 'cardio'} />
               </Suspense>
             )}
 
             {panelTab === 'spesialisasi' && (
               <Suspense fallback={<p className="text-sm text-neutral-500">Loading the specialty atlas…</p>}>
-                <SpecialtyLab onBukaOrgan={onPickOrgan} />
+                <SpecialtyLab
+                  onBukaOrgan={onPickOrgan}
+                  onBukaCardio={(id) => { setCardioAwal(id || null); setPanelTab('cardio') }}
+                  onBukaObat={(id) => { setMolekulAwal(id); setPanelTab('molekul') }}
+                />
               </Suspense>
             )}
 
             {panelTab === 'molekul' && (
               <Suspense fallback={<p className="text-sm text-neutral-500">Loading the molecular lab…</p>}>
-                <MolecularLab onBukaOrgan={onPickOrgan} />
+                <MolecularLab onBukaOrgan={onPickOrgan} awal={molekulAwal} key={molekulAwal ?? 'molekul'} />
+              </Suspense>
+            )}
+
+            {panelTab === 'genomik' && (
+              <Suspense fallback={<p className="text-sm text-neutral-500">Loading the genomics lab…</p>}>
+                <GenomicsLab
+                  onBukaOrgan={onPickOrgan}
+                  onBukaObat={(id) => { setMolekulAwal(id); setPanelTab('molekul') }}
+                />
+              </Suspense>
+            )}
+
+            {panelTab === 'cari' && (
+              <Suspense fallback={<p className="text-sm text-neutral-500">Loading the structure index…</p>}>
+                <StructureFinder
+                  onSorot={(nama) => { setActiveWorkout(null); setActiveOrgan(null); setFocusKeywords(null); setHighlighted(nama) }}
+                  onLapisan={(l) => setLayers((s) => (s.has(l) ? s : new Set(s).add(l)))}
+                />
+              </Suspense>
+            )}
+
+            {panelTab === 'sel' && (
+              <Suspense fallback={<p className="text-sm text-neutral-500">Loading the cell lab…</p>}>
+                <CellLab />
+              </Suspense>
+            )}
+
+            {panelTab === 'bedah' && (
+              <Suspense fallback={<p className="text-sm text-neutral-500">Loading surgical layers…</p>}>
+                <SurgicalLab
+                  onKedalaman={setDissect}
+                  onSorot={(nama) => { setActiveWorkout(null); setActiveOrgan(null); setFocusKeywords(null); setHighlighted(nama) }}
+                />
               </Suspense>
             )}
 

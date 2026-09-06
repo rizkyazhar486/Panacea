@@ -5,6 +5,7 @@ import {
   kondisiUntukModul, kondisiUntukStrukturSistem, strukturKondisiSistem, type SystemCondition,
 } from '../../lib/specialtyPathology'
 import { SKDI_DISEASE_LIST } from '../../lib/skdiDiseaseList'
+import { cariAtlas, cakupanAtlas, type HasilCari } from '../../lib/atlasSearch'
 import { drugsForCondition } from '../../lib/drugTargets'
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -22,14 +23,26 @@ import { drugsForCondition } from '../../lib/drugTargets'
 
 interface Props {
   onBukaOrgan?: (organKey: string) => void
+  /** Membuka satu keadaan di ruang kardiovaskular (modul terpisah). */
+  onBukaCardio?: (conditionId: string) => void
+  /** Membuka satu obat di ruang molekul. */
+  onBukaObat?: (drugId: string) => void
 }
 
-/** Urutan tampil modul: mengikuti cara orang mencari, bukan abjad. */
-const URUTAN = [
-  'respirasi', 'paru', 'gastro', 'nefrologi', 'endokrin', 'tiroid', 'neurologi',
-  'tht', 'telinga', 'mata', 'ortopedi', 'urogenital', 'obstetri', 'obgin',
-  'imunologi', 'kulit',
-] as const
+// Dua puluh tiga modul tidak muat dalam satu baris keping yang bisa dibaca.
+// Dikelompokkan menurut cara orang mencarinya — bidang klinis, bukan abjad dan
+// bukan urutan pembuatannya.
+const KELOMPOK: Array<{ label: string; modul: string[] }> = [
+  { label: 'Chest', modul: ['jantung-ruang', 'respirasi', 'paru'] },
+  { label: 'Abdomen', modul: ['gastro', 'bilier', 'nefrologi'] },
+  { label: 'Endocrine', modul: ['endokrin', 'tiroid'] },
+  { label: 'Neuro & senses', modul: ['neurologi', 'medula-spinalis', 'mata', 'tht', 'telinga'] },
+  { label: 'Musculoskeletal', modul: ['ortopedi', 'lutut'] },
+  { label: 'Urogenital', modul: ['urogenital', 'prostat'] },
+  { label: 'Women’s health', modul: ['obstetri', 'obgin', 'payudara'] },
+  { label: 'Systemic', modul: ['imunologi', 'kulit'] },
+]
+
 
 // Keterangan per modul, termasuk ASAL GEOMETRINYA. Empat modul terakhir tidak
 // berasal dari BodyParts3D versi human-atlas, dan itu dikatakan apa adanya —
@@ -39,22 +52,41 @@ const CATATAN_MODUL: Record<string, string> = {
     'This module holds the airway tree, diaphragm and chest wall. For the lobes themselves and the pleura, open ' +
     'the Lungs & pleura module.',
   paru:
-    'Geometry from Z-Anatomy (CC BY-SA 4.0), the same source as the full-body figure — five lobes, the pleural ' +
+    'The same source as the full-body figure — five lobes, the pleural ' +
     'sac and the bronchial tree down to the lobar bronchi.',
   endokrin:
     'The thyroid and parathyroids have their own module (Thyroid & parathyroid), because their geometry comes ' +
     'from a different reference body and the two spaces must not be mixed.',
-  tiroid: 'Geometry from Z-Anatomy (CC BY-SA 4.0): thyroid, all four parathyroids, laryngeal cartilages, trachea and oesophagus.',
+  tiroid: 'Thyroid gland, all four parathyroids, laryngeal cartilages, trachea and oesophagus.',
   tht: 'The nose, pharynx and larynx. The middle and inner ear are in their own module (Middle & inner ear).',
   telinga:
-    'Geometry from Z-Anatomy (CC BY-SA 4.0): the three ossicles, tympanic membrane, cochlea, vestibule and the ' +
+    'The three ossicles, tympanic membrane, cochlea, vestibule and the ' +
     'cochlear, vestibular and chorda tympani nerves, inside the temporal bone.',
   obstetri:
     'This is the male reference pelvis — bone, pelvic floor and vessels, which is where obstetric mechanics happen. ' +
     'For the female organs themselves, open the Female pelvis module.',
   obgin:
-    'Geometry from the HuBMAP Human Reference Atlas female reference body (CC BY 4.0): uterus, ovaries, uterine ' +
+    'Uterus, ovaries, uterine ' +
     'tubes, vagina, their ligaments, the bladder and the female bony pelvis.',
+  'jantung-ruang':
+    'All four chambers, the interventricular septum, ' +
+    'all four valves and the five papillary muscles.',
+  bilier:
+    'Hepatic ducts, cystic duct, common bile duct, the ' +
+    'hepatopancreatic ampulla and both pancreatic ducts, with the gallbladder, pancreas and liver around them.',
+  prostat:
+    'The prostate by ZONE — ' +
+    'transition, central, peripheral and anterior fibromuscular stroma — with the prostatic urethra, bladder trigone ' +
+    'and ureteric orifices. This is what makes benign hyperplasia obstruct and carcinoma stay silent.',
+  lutut:
+    'Cruciate and collateral ligaments, meniscus, ' +
+    'articular cartilage, patellar ligament and quadriceps tendon — the structures sports injuries actually involve.',
+  payudara:
+    'Nipple, areola, mammary lobes, lactiferous ducts ' +
+    'and sinuses, suspensory ligaments and fat. Breast previously had no target anywhere in the app.',
+  'medula-spinalis':
+    'Every cord segment from C1 to S4 as its own ' +
+    'structure, so the level of a lesion can be pointed at rather than described.',
   imunologi: 'Bone marrow is shown at its major adult sites — femur, pelvis and sternum — since marrow itself has no separate mesh.',
   kulit: 'Skin is a single surface mesh; dermatological conditions are located by their pattern and distribution rather than by depth.',
 }
@@ -67,6 +99,7 @@ const SUMBER: Record<string, string> = {
   'bodyparts3d': 'BodyParts3D 4.0 (Database Center for Life Science, CC BY 4.0)',
   'z-anatomy': 'Z-Anatomy (CC BY-SA 4.0), derived from BodyParts3D',
   'hra-female': 'HuBMAP Human Reference Atlas, female reference body (CC BY 4.0)',
+  'hra-male': 'HuBMAP Human Reference Atlas, male reference body (CC BY 4.0)',
 }
 
 const NAMA_LESI: Record<string, string> = {
@@ -104,8 +137,10 @@ function Daftar({ judul, isi }: { judul: string; isi: string[] }) {
   )
 }
 
-export function SpecialtyLab({ onBukaOrgan }: Props) {
+export function SpecialtyLab({ onBukaOrgan, onBukaCardio, onBukaObat }: Props) {
   const [modul, setModul] = useState<string>('respirasi')
+  const [kelompok, setKelompok] = useState<string>('Chest')
+  const [cari, setCari] = useState('')
   const [kondisiId, setKondisiId] = useState<string | null>(null)
   const [struktur, setStruktur] = useState<string | null>(null)
 
@@ -129,6 +164,19 @@ export function SpecialtyLab({ onBukaOrgan }: Props) {
   const obatKondisi = useMemo(() => (kondisi ? drugsForCondition(kondisi.id) : []), [kondisi])
 
   const padaStruktur = struktur ? kondisiUntukStrukturSistem(modul, struktur) : []
+  const hasil = useMemo(() => cariAtlas(cari), [cari])
+  const cakupan = useMemo(() => cakupanAtlas(), [])
+
+  function bukaHasil(h: HasilCari) {
+    setCari('')
+    if (h.jenis === 'obat') { onBukaObat?.(h.id); return }
+    if (h.module === 'cardio') { onBukaCardio?.(h.jenis === 'kondisi' ? h.id : ''); return }
+    const grup = KELOMPOK.find((g) => g.modul.includes(h.module))
+    if (grup) setKelompok(grup.label)
+    setModul(h.module)
+    if (h.jenis === 'kondisi') { setKondisiId(h.id); setStruktur(null) }
+    else { setStruktur(h.id); setKondisiId(null) }
+  }
 
   function pilihModul(id: string) {
     setModul(id)
@@ -151,8 +199,54 @@ export function SpecialtyLab({ onBukaOrgan }: Props) {
         </p>
       </div>
 
+      {/* Satu kotak untuk seluruh atlas: penyakit, struktur, dan obat sekaligus.
+          Tanpa ini, isi yang sudah ada hanya bisa ditemukan oleh orang yang
+          sudah tahu ada di modul mana. */}
+      <div>
+        <input
+          value={cari}
+          onChange={(e) => setCari(e.target.value)}
+          placeholder={`Search ${cakupan.kondisi} conditions, ${cakupan.struktur} structures, ${cakupan.obat} drugs`}
+          className="min-h-[40px] w-full rounded-xl border border-neutral-200 bg-white px-3 text-[12.5px] text-ink placeholder:text-neutral-400 dark:border-white/10 dark:bg-white/5 dark:text-white"
+        />
+        {cari.trim().length >= 2 && (
+          <div className="mt-1.5 space-y-1">
+            {hasil.length === 0 && (
+              <p className="px-1 text-[11.5px] text-neutral-500">
+                Nothing in the atlas matches “{cari.trim()}”.
+              </p>
+            )}
+            {hasil.map((h) => (
+              <button
+                key={`${h.jenis}:${h.id}`}
+                onClick={() => bukaHasil(h)}
+                className="flex w-full items-center justify-between gap-2 rounded-lg border border-neutral-200 px-2.5 py-2 text-left dark:border-white/10"
+              >
+                <span className="min-w-0">
+                  <span className="block truncate text-[12px] font-bold text-ink dark:text-white">{h.label}</span>
+                  <span className="block truncate text-[10.5px] text-neutral-500">{h.sub}</span>
+                </span>
+                <span className="shrink-0 rounded-full bg-neutral-100 px-2 py-0.5 text-[9.5px] font-bold uppercase tracking-wide text-neutral-500 dark:bg-white/10">
+                  {h.jenis === 'kondisi' ? 'condition' : h.jenis === 'struktur' ? 'structure' : 'drug'}
+                </span>
+              </button>
+            ))}
+          </div>
+        )}
+      </div>
+
       <div className="-mx-1 flex gap-1.5 overflow-x-auto px-1 pb-1">
-        {URUTAN.filter((m) => ATLAS_MODULE_INFO[m]).map((m) => (
+        {KELOMPOK.map((g) => (
+          <Chip key={g.label} aktif={kelompok === g.label} onClick={() => {
+            setKelompok(g.label)
+            const pertama = g.modul.find((m) => ATLAS_MODULE_INFO[m])
+            if (pertama) pilihModul(pertama)
+          }}>{g.label}</Chip>
+        ))}
+      </div>
+
+      <div className="-mx-1 flex gap-1.5 overflow-x-auto px-1 pb-1">
+        {(KELOMPOK.find((g) => g.label === kelompok)?.modul ?? []).filter((m) => ATLAS_MODULE_INFO[m]).map((m) => (
           <Chip key={m} aktif={modul === m} onClick={() => pilihModul(m)}>{ATLAS_MODULE_INFO[m].label}</Chip>
         ))}
       </div>

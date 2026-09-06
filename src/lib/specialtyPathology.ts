@@ -1047,13 +1047,17 @@ export const SYSTEM_CONDITIONS: SystemCondition[] = [
   // ══ UROGENITAL ════════════════════════════════════════════════════════════
   {
     id: 'bph',
-    module: 'urogenital',
+    // Dipindah ke modul zona prostat: mekanisme penyakit ini SELURUHNYA soal
+    // zona — hiperplasia tumbuh di zona transisi yang melingkari uretra —
+    // dan itu tidak bisa ditunjukkan pada mesh prostat yang utuh.
+    module: 'prostat',
     label: 'Benign prostatic hyperplasia',
     ringkas: 'The prostate enlarges around the urethra; the stream weakens and the bladder never quite empties.',
     lesi: [
-      { struktur: 'Prostate', jenis: 'hypertrophy', catatan: 'Nodular hyperplasia of the transition zone, compressing the prostatic urethra.' },
+      { struktur: 'Left transition zone of prostate', jenis: 'hypertrophy', catatan: 'Nodular hyperplasia begins here — the zone that surrounds the urethra.' },
+      { struktur: 'Right transition zone of prostate', jenis: 'hypertrophy', catatan: 'Bilateral transition-zone growth compressing the lumen between the lobes.' },
     ],
-    hilir: ['Urethra', 'Urinary bladder', 'Left kidney', 'Right kidney'],
+    hilir: ['Prostatic urethra', 'Trigone of urinary bladder', 'Dome of urinary bladder', 'Left ureteral orifice'],
     mekanisme:
       'Hyperplasia arises in the transition zone that surrounds the urethra, which is why a modest volume can ' +
       'obstruct badly while a large peripheral cancer causes no symptoms at all. Chronic outflow resistance drives ' +
@@ -2198,13 +2202,14 @@ export const SYSTEM_CONDITIONS: SystemCondition[] = [
   },
   {
     id: 'ca-prostat',
-    module: 'urogenital',
+    module: 'prostat',
     label: 'Prostate carcinoma',
     ringkas: 'A cancer of the outer prostate — which is why it causes no symptoms until late.',
     lesi: [
-      { struktur: 'Prostate', jenis: 'occlusion', catatan: 'Adenocarcinoma of the peripheral zone, away from the urethra.' },
+      { struktur: 'Left peripheral zone of prostate', jenis: 'occlusion', catatan: 'Some 70% of adenocarcinomas arise here, at the back of the gland — away from the urethra and next to the rectum.' },
+      { struktur: 'Right peripheral zone of prostate', jenis: 'occlusion', catatan: 'The zone the examining finger reaches and the biopsy needle samples.' },
     ],
-    hilir: ['Urethra', 'Urinary bladder', 'Left seminal vesicle'],
+    hilir: ['Seminal vesicle', 'Base of prostate', 'Prostatic urethra'],
     mekanisme:
       'Benign hyperplasia arises centrally around the urethra and obstructs early; carcinoma arises in the peripheral ' +
       'zone and therefore causes symptoms only when locally advanced. That zonal anatomy is also why the posterior ' +
@@ -3042,6 +3047,620 @@ export const SYSTEM_CONDITIONS: SystemCondition[] = [
     ],
     organKey: 'bladder',
     skdi: ['Perdarahan post partum', 'Retensi plasenta', 'Syok (septik, hipovolemik, kardiogenik, neurogenik)'],
+  },
+  // ══ SENDI LUTUT, PAYUDARA, MEDULA SPINALIS ════════════════════════════════
+  // Tiga modul dari rujukan tubuh perempuan HuBMAP (CC BY 4.0). Ketiganya
+  // mengisi kekosongan yang nyata: cedera lutut adalah cedera olahraga yang
+  // paling sering, payudara sebelumnya tidak punya sasaran organ sama sekali,
+  // dan tingkat lesi medula spinalis hanya bisa dipahami kalau segmennya
+  // benar-benar terlihat satu per satu.
+
+  {
+    id: 'acl',
+    module: 'lutut',
+    label: 'Anterior cruciate ligament rupture',
+    ringkas: 'A twist on a planted foot, a pop, and the knee swells within an hour and gives way.',
+    lesi: [
+      { struktur: 'Left anterior cruciate ligament of knee', jenis: 'occlusion', catatan: 'Mid-substance tear, typically from a non-contact pivot with the knee near extension.' },
+    ],
+    hilir: ['Left meniscus', 'Left articular cartilage of knee', 'Left tibial collateral ligament'],
+    mekanisme:
+      'The ACL resists anterior translation of the tibia and internal rotation. It is intra-articular but ' +
+      'extrasynovial with a poor blood supply, so a mid-substance tear does not heal — unlike the medial collateral ' +
+      'ligament, which is extra-articular and usually does. Haemarthrosis within an hour means an intra-articular ' +
+      'bleed, and instability afterwards accelerates meniscal and cartilage damage, which is why young pivoting athletes are reconstructed.',
+    temuan: [
+      'Audible pop with immediate swelling (haemarthrosis) and a knee that gives way on turning',
+      'Positive Lachman test — more sensitive than the anterior drawer; pivot shift when relaxed',
+      'Look for the unhappy triad: ACL, medial meniscus and medial collateral ligament together',
+    ],
+    penunjang: ['MRI confirms and shows associated meniscal and cartilage injury; radiographs to exclude avulsion fracture'],
+    tata: [
+      'Early: rest, ice, compression, analgesia; regain range and quadriceps control',
+      'Reconstruction for young pivoting athletes or persistent instability; rehabilitation alone for lower-demand knees',
+      'Return to sport by criteria and strength testing, not by the calendar',
+    ],
+    organKey: 'skeleton',
+    skdi: ['Trauma sendi', 'Lesi meniskus, medial, dan lateral'],
+  },
+  {
+    id: 'meniskus',
+    module: 'lutut',
+    label: 'Meniscal tear',
+    ringkas: 'The cartilage cushion tears; the knee catches, locks and hurts along the joint line.',
+    lesi: [
+      { struktur: 'Left meniscus', jenis: 'occlusion', catatan: 'Tear of the fibrocartilage, most often the posterior horn of the medial meniscus.' },
+    ],
+    hilir: ['Left articular cartilage of knee', 'Left femur', 'Left tibia'],
+    mekanisme:
+      'The menisci convert the flat tibial plateau into a congruent socket and spread load over a wider area; removing ' +
+      'one raises contact stress several-fold, which is why total meniscectomy reliably produces osteoarthritis. Only ' +
+      'the outer third has a blood supply — the red zone — so peripheral tears can be repaired while inner white-zone ' +
+      'tears cannot, and that vascular map decides the operation.',
+    temuan: [
+      'Twisting injury with delayed swelling over hours, joint-line tenderness, catching or true locking',
+      'Positive Thessaly or McMurray test; degenerate tears in older patients may have no injury at all',
+    ],
+    penunjang: ['MRI where the diagnosis changes management; weight-bearing radiographs first in older patients to look for osteoarthritis'],
+    tata: [
+      'Degenerate tears: exercise therapy first — arthroscopic meniscectomy is no better in trials',
+      'Repair rather than resect a peripheral tear in a young knee; a truly locked knee needs early surgery',
+    ],
+    organKey: 'skeleton',
+    skdi: ['Lesi meniskus, medial, dan lateral', 'Artritis, osteoarthritis'],
+  },
+  {
+    id: 'mcl',
+    module: 'lutut',
+    label: 'Medial collateral ligament injury',
+    ringkas: 'A blow to the outside of the knee stretches the ligament on the inside.',
+    lesi: [
+      { struktur: 'Left tibial collateral ligament', jenis: 'incompetence', catatan: 'Valgus-force injury; graded by the degree of opening on stress testing.' },
+    ],
+    hilir: ['Left meniscus', 'Left anterior cruciate ligament of knee'],
+    mekanisme:
+      'The medial collateral ligament is extra-articular with a broad attachment and good blood supply, so it heals ' +
+      'well with protected motion — the opposite of the ACL. Its deep fibres blend with the medial meniscus, which is ' +
+      'why the two are injured together and why medial joint-line pain persists after the ligament itself has healed.',
+    temuan: [
+      'Medial knee pain after a valgus force, tenderness over the ligament rather than the joint line',
+      'Laxity on valgus stress at 30° of flexion; laxity in full extension implies a more serious injury',
+    ],
+    penunjang: ['Clinical grading is usually enough; MRI for suspected combined injury or persistent instability'],
+    tata: [
+      'Hinged brace and early protected motion — most heal without surgery',
+      'Assess for associated ACL and meniscal injury before accepting a simple diagnosis',
+    ],
+    organKey: 'skeleton',
+    skdi: ['Trauma sendi', 'Dislokasi pada sendi ekstremitas'],
+  },
+  {
+    id: 'tendinopati-patella',
+    module: 'lutut',
+    label: 'Patellar tendinopathy',
+    ringkas: 'Jumper\'s knee: pain at the bottom of the kneecap that warms up and then returns after activity.',
+    lesi: [
+      { struktur: 'Left patellar ligament', jenis: 'incompetence', catatan: 'Degenerative tendinopathy at the deep posterior fibres of the proximal insertion.' },
+    ],
+    hilir: ['Left patella', 'Left tendon of quadriceps femoris', 'Left rectus femoris'],
+    mekanisme:
+      'This is degeneration rather than inflammation: collagen disorganisation, neovascularisation and ingrowth of ' +
+      'sensory nerves, driven by repeated energy-storage loading in jumping. Because there is little inflammation, ' +
+      'anti-inflammatory drugs and corticosteroid injection give short relief and may weaken the tendon, while progressive loading — which remodels the collagen — is what actually works.',
+    temuan: [
+      'Well-localised pain at the inferior pole of the patella, worse with jumping and decelerating',
+      'Pain that warms up during activity and is worst the morning after — the tendinopathy pattern',
+    ],
+    penunjang: ['Clinical diagnosis; ultrasound or MRI only when the picture is atypical or surgery is considered'],
+    tata: [
+      'Progressive loading: isometric for pain, then heavy slow resistance and energy-storage work',
+      'Modify training load rather than resting completely; avoid corticosteroid injection into the tendon',
+    ],
+    organKey: 'skeleton',
+    skdi: ['Tendinitis Achilles', 'Trauma sendi'],
+  },
+  {
+    id: 'ca-payudara',
+    module: 'payudara',
+    label: 'Breast carcinoma',
+    ringkas: 'A hard, painless lump that does not move — and the commonest cancer in women.',
+    lesi: [
+      { struktur: 'Left mammary lobes', jenis: 'occlusion', catatan: 'Invasive carcinoma arising in the terminal duct lobular unit.' },
+      { struktur: 'Left main lactiferous ducts', jenis: 'occlusion', catatan: 'Ductal carcinoma in situ spreading along the duct system before invading.' },
+    ],
+    // Lemak payudara SENGAJA tidak disorot: ia membungkus lobus dan duktus,
+    // dan menyorotnya sebagai struktur pekat justru menyembunyikan tumor yang
+    // sedang ditunjuk. Yang ditarik tumor adalah ligamen suspensorium dan
+    // puting — itu pula yang terlihat sebagai lesung kulit dan puting tertarik.
+    hilir: ['Left nipple', 'Left suspensory ligaments', 'Left areola'],
+    mekanisme:
+      'Almost all breast cancer begins in the terminal duct lobular unit. Its spread explains every classic sign: ' +
+      'tethering of Cooper\'s suspensory ligaments dimples the skin, lymphatic obstruction gives peau d\'orange, and ' +
+      'ductal involvement retracts the nipple. Receptor status — ER, PR and HER2 — defines the biology far better than ' +
+      'size does, which is why the biopsy, not the lump, determines the treatment.',
+    temuan: [
+      'Hard, irregular, fixed painless lump; skin dimpling, nipple retraction, peau d\'orange',
+      'Bloody single-duct nipple discharge; eczema of the nipple suggests Paget disease',
+      'Axillary nodes; the breast of a man is not exempt',
+    ],
+    penunjang: ['Triple assessment: examination, imaging (ultrasound under 40, mammography over 40) and core biopsy', 'Staging by receptor status; CT and bone scan when locally advanced'],
+    tata: [
+      'Surgery (breast-conserving with radiotherapy, or mastectomy) with axillary staging by sentinel node',
+      'Systemic therapy guided by receptors: endocrine therapy, anti-HER2 therapy, chemotherapy',
+      'Screening and genetic assessment for high-risk families',
+    ],
+    organKey: 'breast',
+    skdi: ['Karsinoma payudara', 'Penyakit Paget', 'Tumor Filoides'],
+  },
+  {
+    id: 'fam',
+    module: 'payudara',
+    label: 'Fibroadenoma',
+    ringkas: 'A smooth, firm lump that slips under the fingers — the commonest breast lump in young women.',
+    lesi: [
+      { struktur: 'Right mammary lobes', jenis: 'dilatation', catatan: 'Benign proliferation of both stromal and epithelial elements of a lobule.' },
+    ],
+    hilir: ['Right main lactiferous ducts', 'Right nipple'],
+    mekanisme:
+      'A fibroadenoma is a hormone-responsive overgrowth of one lobule with no invasion, so it stays encapsulated, ' +
+      'mobile and painless — the "breast mouse". It grows in pregnancy and involutes after the menopause, which is ' +
+      'itself reassuring. A phyllodes tumour looks similar but grows rapidly and can recur or metastasise, so rapid enlargement changes the diagnosis and the operation.',
+    temuan: [
+      'Smooth, firm, highly mobile, painless lump in a woman under 30',
+      'Rapid growth or size over 4 cm raises the possibility of a phyllodes tumour',
+    ],
+    penunjang: ['Ultrasound with core biopsy where indicated; triple assessment for any discrete lump'],
+    tata: [
+      'Reassurance and observation once benign histology is confirmed',
+      'Excision for large, growing, symptomatic lesions or patient preference',
+    ],
+    organKey: 'breast',
+    skdi: ['Fibroadenoma mammae (FAM)', 'Fibrokista', 'Tumor Filoides'],
+  },
+  {
+    id: 'mastitis',
+    module: 'payudara',
+    label: 'Lactational mastitis and breast abscess',
+    ringkas: 'A hot, red, painful wedge of breast in a feeding mother — keep feeding, and treat early.',
+    lesi: [
+      { struktur: 'Left mammary lobes', jenis: 'occlusion', catatan: 'Milk stasis in a segment, then bacterial infection through a cracked nipple.' },
+      { struktur: 'Left main lactiferous ducts', jenis: 'occlusion', catatan: 'Blocked duct is the starting point, not a separate disease.' },
+    ],
+    hilir: ['Left nipple', 'Left areola'],
+    mekanisme:
+      'Milk stasis comes first: a poorly drained segment raises intraductal pressure, milk leaks into surrounding ' +
+      'tissue and inflames it, and Staphylococcus entering through a nipple fissure then infects it. That sequence is ' +
+      'the reason continued effective drainage is treatment rather than a risk — stopping feeding worsens stasis and converts mastitis into an abscess.',
+    temuan: [
+      'Wedge-shaped area of redness, heat and pain with fever and flu-like symptoms in a breastfeeding woman',
+      'A fluctuant mass or failure to improve in 48 hours suggests abscess',
+      'Non-lactational mastitis in a smoker suggests periductal mastitis; inflammatory carcinoma mimics all of it',
+    ],
+    penunjang: ['Clinical; ultrasound if abscess suspected; milk culture in severe, recurrent or hospital-acquired cases'],
+    tata: [
+      'Continue breastfeeding or expressing from the affected side, effective attachment, analgesia',
+      'Antistaphylococcal antibiotics if not improving within 12–24 hours or systemically unwell',
+      'Ultrasound-guided aspiration for abscess; consider carcinoma if it does not resolve',
+    ],
+    organKey: 'breast',
+    skdi: ['Mastitis', 'Cracked nipple', 'Inflamasi, abses'],
+  },
+  {
+    id: 'fibrokista',
+    module: 'payudara',
+    label: 'Fibrocystic change and duct ectasia',
+    ringkas: 'Lumpy, tender breasts that change with the cycle — common, benign, and worth explaining properly.',
+    lesi: [
+      { struktur: 'Right main lactiferous sinuses', jenis: 'dilatation', catatan: 'Dilated subareolar ducts with inspissated secretion in duct ectasia.' },
+      { struktur: 'Right mammary lobes', jenis: 'dilatation', catatan: 'Cyst formation and stromal fibrosis with hormonal cycling.' },
+    ],
+    hilir: ['Right nipple', 'Right areola'],
+    mekanisme:
+      'Cyclical oestrogen and progesterone drive proliferation and involution of the lobules; when the two get out of ' +
+      'step, cysts and fibrosis accumulate. Duct ectasia is an involutional change of the large subareolar ducts, so ' +
+      'its discharge is typically green or creamy and from multiple ducts — quite unlike the single-duct bloody discharge that demands investigation for carcinoma.',
+    temuan: [
+      'Bilateral lumpy tenderness worse premenstrually; discrete smooth cysts that may be tender',
+      'Green or creamy multi-duct nipple discharge with slit-like nipple retraction in duct ectasia',
+      'Any discrete new lump still needs triple assessment — "fibrocystic" is not a diagnosis made by reassurance',
+    ],
+    penunjang: ['Ultrasound; aspiration of a symptomatic cyst is both diagnostic and therapeutic', 'Investigate bloody or single-duct discharge properly'],
+    tata: [
+      'Explanation, good support bra, simple analgesia; aspirate symptomatic cysts',
+      'Stop smoking in periductal mastitis; surgery only for persistent troublesome discharge',
+    ],
+    organKey: 'breast',
+    skdi: ['Fibrokista', 'Inverted nipple', 'Fibroadenoma mammae (FAM)'],
+  },
+  {
+    id: 'cedera-medula',
+    module: 'medula-spinalis',
+    label: 'Traumatic spinal cord injury',
+    ringkas: 'The level of the damage decides what still works — and what is lost below it.',
+    lesi: [
+      { struktur: 'C5 segment of cervical spinal cord', jenis: 'occlusion', catatan: 'A cervical injury at C5 leaves elbow flexion but not extension; below C4 spontaneous breathing is preserved.' },
+    ],
+    hilir: ['C6 segment of cervical spinal cord', 'C7 segment of cervical spinal cord', 'First thoracic spinal cord segment'],
+    mekanisme:
+      'Primary mechanical damage is followed over hours by a secondary injury of oedema, ischaemia and excitotoxicity ' +
+      'that spreads above and below the level — which is why immobilisation and perfusion matter in the first hours. ' +
+      'Injuries above T6 also disconnect sympathetic outflow: neurogenic shock gives hypotension with bradycardia, the ' +
+      'opposite of haemorrhagic shock, and later the same disconnection produces autonomic dysreflexia.',
+    temuan: [
+      'Motor and sensory level with sphincter involvement; ASIA examination defines level and completeness',
+      'Neurogenic shock: hypotension with bradycardia and warm peripheries above T6',
+      'Sacral sparing distinguishes incomplete from complete injury and changes the prognosis',
+    ],
+    penunjang: ['CT for bony injury and MRI for cord and ligamentous injury; serial ASIA charting'],
+    tata: [
+      'Immobilise, maintain oxygenation and mean arterial pressure, refer to a spinal injuries unit',
+      'Early surgical decompression and stabilisation where indicated; prevent pressure injury, VTE and bladder complications',
+      'Rehabilitation from day one — the level determines the achievable function',
+    ],
+    organKey: 'spinal-cord',
+    skdi: ['Trauma Medula Spinalis', 'Complete spinal transaction', 'Acute medulla compression'],
+  },
+  {
+    id: 'kauda-equina',
+    module: 'medula-spinalis',
+    label: 'Cauda equina syndrome',
+    ringkas: 'Compression of the nerve roots below the cord: saddle numbness and bladder failure — operate within hours.',
+    lesi: [
+      { struktur: 'First sacral spinal cord segment', jenis: 'occlusion', catatan: 'The S2–S4 roots carrying bladder, bowel and perineal function are compressed below the conus.' },
+      { struktur: 'Second sacral spinal cord segment', jenis: 'occlusion', catatan: 'Sacral root compression is what makes this an emergency rather than sciatica.' },
+    ],
+    hilir: ['Third sacral spinal cord segment', 'Fourth sacral spinal cord segment', 'Fifth lumbar spinal cord segment'],
+    mekanisme:
+      'The cord ends at about L1–L2; below that the canal contains the lumbosacral roots. Compression there produces a ' +
+      'lower motor neurone picture — flaccid, areflexic — rather than the spasticity of cord compression. The sacral ' +
+      'roots have the least reserve, so painless urinary retention with overflow appears early, and once it is established recovery of continence is often incomplete: the surgery is timed in hours, not days.',
+    temuan: [
+      'Bilateral sciatica, saddle anaesthesia, painless retention with overflow incontinence, loss of anal tone',
+      'Ask every back pain patient about bladder function and perineal sensation — this is how it is missed',
+    ],
+    penunjang: ['Emergency MRI of the whole lumbosacral spine; post-void bladder scan while arranging it'],
+    tata: [
+      'Immediate surgical decompression — delay converts a recoverable deficit into a permanent one',
+      'Catheterise, document the neurology carefully, and transfer to a spinal service without waiting for the morning',
+    ],
+    organKey: 'spinal-cord',
+    skdi: ['Sindrom kauda equine', 'Hernia nucleus pulposus (HNP)', 'Neurogenic bladder'],
+  },
+  {
+    id: 'mielitis',
+    module: 'medula-spinalis',
+    label: 'Transverse myelitis',
+    ringkas: 'Inflammation across one level of the cord: weakness, a sensory level, and bladder failure over days.',
+    lesi: [
+      { struktur: 'Fifth thoracic spinal cord segment', jenis: 'occlusion', catatan: 'Inflammatory demyelination across the cord, commonly mid-thoracic.' },
+    ],
+    hilir: ['Sixth thoracic spinal cord segment', 'Seventh thoracic spinal cord segment', 'First lumbar spinal cord segment'],
+    mekanisme:
+      'Inflammation interrupts every long tract crossing that level, so motor, sensory and autonomic function are all ' +
+      'lost below it — hence a crisp sensory level, which is the sign that localises the lesion to the cord rather ' +
+      'than to nerve or brain. Spinal shock makes the limbs flaccid and areflexic at first, and only later do they become spastic with upgoing plantars, which misleads if the patient is seen early.',
+    temuan: [
+      'Bilateral weakness and numbness with a sensory level developing over hours to days, plus bladder dysfunction',
+      'Back pain at the level; ask about preceding infection, vaccination or known demyelinating disease',
+    ],
+    penunjang: ['Urgent MRI of the whole spine with contrast to exclude compression FIRST — that is surgical', 'Lumbar puncture, aquaporin-4 and MOG antibodies, and screening for infection and autoimmunity'],
+    tata: [
+      'Exclude compression, then high-dose intravenous corticosteroid; plasma exchange if no response',
+      'Treat the underlying cause; early rehabilitation, bladder care and pressure-area management',
+    ],
+    organKey: 'spinal-cord',
+    skdi: ['Mielopati', 'Sklerosis multipel', 'Trauma Medula Spinalis'],
+  },
+  {
+    id: 'siringomielia',
+    module: 'medula-spinalis',
+    label: 'Syringomyelia',
+    ringkas: 'A fluid cavity forms inside the cord and destroys the fibres crossing it — pain and temperature go, touch stays.',
+    lesi: [
+      { struktur: 'C7 segment of cervical spinal cord', jenis: 'dilatation', catatan: 'Expanding central cavity in the lower cervical cord.' },
+      { struktur: 'C8 segment of cervical spinal cord', jenis: 'dilatation', catatan: 'The syrinx typically spans several segments.' },
+    ],
+    hilir: ['First thoracic spinal cord segment', 'C6 segment of cervical spinal cord'],
+    mekanisme:
+      'The cavity begins centrally and first interrupts the spinothalamic fibres decussating in the anterior white ' +
+      'commissure, while the dorsal columns run posteriorly and are spared. That anatomy produces the ' +
+      'dissociated sensory loss in a cape distribution — no pain or temperature, preserved light touch and ' +
+      'proprioception — and explains painless burns to the hands as a presenting complaint.',
+    temuan: [
+      'Cape-like loss of pain and temperature with preserved touch; painless burns and injuries',
+      'Wasting and weakness of the small hand muscles; later spasticity in the legs and scoliosis',
+      'Associated Chiari malformation in most cases',
+    ],
+    penunjang: ['MRI of the whole neuraxis, including the craniocervical junction to look for Chiari malformation'],
+    tata: [
+      'Treat the cause — foramen magnum decompression for Chiari-associated syrinx',
+      'Shunting for progressive symptomatic cavities; protect insensate skin and monitor neurologically',
+    ],
+    organKey: 'spinal-cord',
+    skdi: ['Siringomielia', 'Mielopati'],
+  },
+  // ══ RUANG JANTUNG, SALURAN EMPEDU, ZONA PROSTAT ═══════════════════════════
+  // Tiga modul terakhir dari pustaka HuBMAP. Ketiganya menunjukkan hal yang
+  // sebelumnya hanya bisa DITULIS: sekat antar-bilik, muara duktus di ampula,
+  // dan zona prostat yang menentukan kenapa pembesaran jinak menyumbat
+  // sementara kanker tidak.
+
+  {
+    id: 'vsd',
+    module: 'jantung-ruang',
+    label: 'Ventricular septal defect (congenital)',
+    ringkas: 'A hole in the wall between the pumping chambers; blood crosses to the lung side and the lungs flood.',
+    lesi: [
+      { struktur: 'Interventricular septum', jenis: 'shunt', catatan: 'Defect in the membranous septum in most cases — where the septum is thinnest.' },
+    ],
+    hilir: ['Right ventricle', 'Pulmonary valve', 'Left cardiac atrium'],
+    mekanisme:
+      'Shunt volume depends on the size of the hole and on the ratio of pulmonary to systemic vascular resistance, not ' +
+      'on the pressure gradient alone. Newborn pulmonary resistance is high, so the murmur and the failure appear only ' +
+      'after it falls at 4–6 weeks. A small restrictive defect is loud and harmless; a large one is quiet and dangerous ' +
+      '— which is why murmur intensity is inversely related to severity here.',
+    temuan: [
+      'Harsh pansystolic murmur at the left sternal edge with a thrill',
+      'Large defect: poor feeding, sweating, failure to thrive and tachypnoea from about six weeks',
+      'A quiet murmur with a loud pulmonary second sound suggests rising pulmonary resistance — Eisenmenger physiology',
+    ],
+    penunjang: ['Echocardiography for site, size and shunt fraction; ECG and chest radiograph for chamber enlargement'],
+    tata: [
+      'Small muscular defects often close spontaneously — observe with growth monitoring',
+      'Surgical or device closure for large shunts, failure to thrive or pulmonary hypertension, before resistance becomes fixed',
+      'Assess pulmonary vascular resistance first: closing an Eisenmenger shunt is fatal',
+    ],
+    organKey: 'heart',
+    skdi: ['Kelainan jantung kongenital (Ventricular Septal Defect, Atrial Septal Defect, Patent Ductus Arteriosus, Tetralogy of Fallot)', 'Gagal jantung kronik'],
+  },
+  {
+    id: 'hcm',
+    module: 'jantung-ruang',
+    label: 'Hypertrophic cardiomyopathy',
+    ringkas: 'The muscle of the dividing wall thickens abnormally and can obstruct the way out of the heart.',
+    lesi: [
+      { struktur: 'Interventricular septum', jenis: 'hypertrophy', catatan: 'Asymmetric septal hypertrophy with disarray of myocyte architecture.' },
+      { struktur: 'Mitral valve', jenis: 'incompetence', catatan: 'Systolic anterior motion of the anterior leaflet worsens both obstruction and regurgitation.' },
+    ],
+    hilir: ['Left ventricle', 'Aortic valve', 'Left cardiac atrium'],
+    mekanisme:
+      'Sarcomeric protein mutations produce hypertrophy with myocyte disarray and interstitial fibrosis — a substrate ' +
+      'for re-entrant ventricular arrhythmia, which is what causes sudden death rather than the obstruction itself. ' +
+      'The gradient is dynamic: anything that reduces preload or afterload, or increases contractility, worsens it. ' +
+      'That is why the murmur increases on standing and Valsalva, unlike aortic stenosis, and why nitrates and diuretics are hazardous.',
+    temuan: [
+      'Exertional breathlessness, chest pain, palpitations, syncope — especially during or just after exercise',
+      'Jerky pulse, double apex beat, ejection systolic murmur louder on standing and Valsalva',
+      'Family history of sudden death; autosomal dominant inheritance means relatives need screening',
+    ],
+    penunjang: ['Echocardiography for wall thickness, gradient and systolic anterior motion; ECG almost always abnormal', 'Cardiac MRI for fibrosis; ambulatory monitoring and genetic testing with family screening'],
+    tata: [
+      'Beta blocker or verapamil for symptoms; avoid dehydration, nitrates and high-dose diuretics',
+      'Implantable defibrillator by validated risk score, not by gradient',
+      'Septal reduction (myectomy or alcohol ablation) for drug-refractory obstruction',
+    ],
+    organKey: 'heart',
+    skdi: ['Kardiomiopati', 'Gagal jantung kronik', 'Takikardi: supraventrikular, ventrikular'],
+  },
+  {
+    id: 'ruptur-papiler',
+    module: 'jantung-ruang',
+    label: 'Papillary muscle rupture',
+    ringkas: 'A few days after a heart attack the anchor of a valve snaps and the lungs flood in minutes.',
+    lesi: [
+      { struktur: 'Posteromedial papillary muscle', jenis: 'occlusion', catatan: 'It has a single blood supply, so it ruptures far more often than the anterolateral one.' },
+      { struktur: 'Mitral valve', jenis: 'incompetence', catatan: 'Flail leaflet with torrential acute regurgitation.' },
+    ],
+    hilir: ['Left cardiac atrium', 'Left ventricle', 'Pulmonary valve'],
+    mekanisme:
+      'The anterolateral papillary muscle has a dual supply from the LAD and circumflex; the posteromedial has only the ' +
+      'posterior descending artery. That single detail explains why inferior infarction is the one that ruptures a ' +
+      'papillary muscle. The regurgitation is acute, so a small non-compliant left atrium transmits the pressure ' +
+      'straight to the lungs — the murmur may be soft or absent precisely because the pressures equalise so fast.',
+    temuan: [
+      'Sudden pulmonary oedema and shock 2–7 days after myocardial infarction',
+      'New murmur that may be quiet; giant v waves on wedge tracing',
+      'Distinguish from ventricular septal rupture — both present the same way and both are surgical',
+    ],
+    penunjang: ['Urgent echocardiography, transoesophageal if the window is poor', 'Do not delay for angiography if the patient is crashing'],
+    tata: [
+      'Stabilise with afterload reduction and mechanical support, then emergency valve surgery',
+      'Medical management alone has an extremely high mortality',
+    ],
+    organKey: 'heart',
+    skdi: ['Infark miokard', 'Penyakit katup jantung (Mitral stenosis, Mitral regurgitation, Aortic stenosis, Aortic regurgitation)', 'Gagal jantung akut'],
+  },
+  {
+    id: 'endokarditis',
+    module: 'jantung-ruang',
+    label: 'Infective endocarditis',
+    ringkas: 'Bacteria settle on a heart valve and grow a vegetation that showers fragments around the body.',
+    lesi: [
+      { struktur: 'Mitral valve', jenis: 'incompetence', catatan: 'Vegetation on the atrial surface with leaflet destruction and regurgitation.' },
+      { struktur: 'Aortic valve', jenis: 'incompetence', catatan: 'The other commonly affected left-sided valve.' },
+    ],
+    hilir: ['Left cardiac atrium', 'Left ventricle', 'Tricuspid valve'],
+    mekanisme:
+      'Endothelial injury lets platelets and fibrin form a sterile thrombus that circulating bacteria colonise; once ' +
+      'inside, the vegetation is avascular, so phagocytes cannot reach the organisms and antibiotics must be ' +
+      'bactericidal and prolonged. Vegetations sit downstream of turbulent flow, which is why left-sided disease ' +
+      'embolises to brain and kidney while right-sided disease — typical of injecting drug use — embolises to the lungs.',
+    temuan: [
+      'Fever with a new or changing murmur; splinter haemorrhages, Janeway lesions, Osler nodes, Roth spots',
+      'Embolic stroke, splenic or renal infarction, glomerulonephritis',
+      'Any fever with a prosthetic valve is endocarditis until proven otherwise',
+    ],
+    penunjang: ['Three sets of blood cultures from separate sites BEFORE antibiotics; echocardiography, transoesophageal if negative', 'Modified Duke criteria to combine microbiology and imaging'],
+    tata: [
+      'Prolonged intravenous bactericidal antibiotics guided by culture and sensitivities',
+      'Surgery for heart failure, uncontrolled infection, abscess, or recurrent embolism with a large vegetation',
+      'Prophylaxis only for genuinely high-risk patients undergoing defined procedures',
+    ],
+    organKey: 'heart',
+    skdi: ['Radang pada dinding jantung (Endokarditis, Miokarditis, Perikarditis)', 'Penyakit jantung reumatik', 'Sepsis'],
+  },
+  {
+    id: 'koledokolitiasis',
+    module: 'bilier',
+    label: 'Common bile duct stone',
+    ringkas: 'A stone slips out of the gallbladder and blocks the main drain — the eyes go yellow and the urine dark.',
+    lesi: [
+      { struktur: 'Common bile duct', jenis: 'occlusion', catatan: 'Stone impacted in the duct, most often at its distal end near the ampulla.' },
+    ],
+    hilir: ['Common hepatic duct', 'Left hepatic duct', 'Right hepatic duct', 'Gallbladder'],
+    mekanisme:
+      'Conjugated bilirubin cannot reach the gut, so it refluxes into blood and is excreted renally — dark urine — ' +
+      'while stercobilin is absent from stool, which turns pale. Bile salts deposit in skin and itch. Because the ' +
+      'obstruction is below the cystic duct, the gallbladder may distend, and if the stone sits at the ampulla it can obstruct the pancreatic duct at the same time and precipitate pancreatitis.',
+    temuan: [
+      'Right upper quadrant pain with jaundice, dark urine, pale stools and pruritus',
+      'Fever with pain and jaundice (Charcot triad) means cholangitis — an emergency',
+      'Raised bilirubin with a cholestatic liver profile: ALP and GGT out of proportion to transaminases',
+    ],
+    penunjang: ['Ultrasound first (duct dilatation), then MRCP or endoscopic ultrasound to see the stone', 'Liver function tests, amylase or lipase, coagulation before intervention'],
+    tata: [
+      'ERCP with sphincterotomy and stone extraction',
+      'Cholecystectomy afterwards to prevent recurrence, on the same admission where possible',
+    ],
+    organKey: 'gallbladder',
+    skdi: ['Kole(doko)litiasis', 'Kolesistitis', 'Pankreatitis'],
+  },
+  {
+    id: 'kolangitis',
+    module: 'bilier',
+    label: 'Ascending cholangitis',
+    ringkas: 'Infected bile behind a blockage — fever, jaundice and pain, and it becomes septic shock fast.',
+    lesi: [
+      { struktur: 'Common bile duct', jenis: 'occlusion', catatan: 'Obstruction with infected bile under pressure; the duct is a closed space.' },
+      { struktur: 'Common hepatic duct', jenis: 'dilatation', catatan: 'Dilatation upstream of the obstruction.' },
+    ],
+    hilir: ['Left hepatic duct', 'Right hepatic duct', 'Hepatopancreatic ampulla'],
+    mekanisme:
+      'Bile is normally sterile and flowing; obstruction lets bacteria multiply, and the rising intraductal pressure ' +
+      'forces them into hepatic sinusoids and the bloodstream — cholangiovenous reflux. This is why antibiotics alone ' +
+      'fail and why the definitive treatment is DRAINAGE: no antibiotic can sterilise a closed, pressurised system, and delay is measured in hours.',
+    temuan: [
+      'Charcot triad: fever with rigors, jaundice, right upper quadrant pain',
+      'Reynolds pentad adds hypotension and confusion — that is established sepsis',
+    ],
+    penunjang: ['Blood cultures, full blood count, liver profile, lactate; ultrasound then urgent MRCP or direct to ERCP'],
+    tata: [
+      'Resuscitation and broad antibiotics immediately, then BILIARY DRAINAGE within hours (ERCP, or percutaneous if ERCP fails)',
+      'Definitive treatment of the cause once the sepsis is controlled',
+    ],
+    organKey: 'gallbladder',
+    skdi: ['Kolesistitis', 'Kole(doko)litiasis', 'Sepsis'],
+  },
+  {
+    id: 'atresia-bilier',
+    module: 'bilier',
+    label: 'Biliary atresia (congenital)',
+    ringkas: 'A newborn stays jaundiced past two weeks with pale stools — the bile ducts are obliterating, and the clock is running.',
+    lesi: [
+      { struktur: 'Common hepatic duct', jenis: 'occlusion', catatan: 'Progressive inflammatory obliteration of the extrahepatic ducts.' },
+      { struktur: 'Common bile duct', jenis: 'occlusion', catatan: 'Fibrous cord replaces the lumen.' },
+    ],
+    hilir: ['Gallbladder', 'Left hepatic duct', 'Right hepatic duct', 'Caudate lobe'],
+    mekanisme:
+      'Progressive fibro-obliteration of the extrahepatic ducts causes conjugated hyperbilirubinaemia and, untreated, ' +
+      'biliary cirrhosis within months. Outcome after the Kasai portoenterostomy depends steeply on age at surgery — ' +
+      'best before 60 days — so the diagnostic task is simply to separate this from physiological jaundice early. ' +
+      'That is what the two-week rule and the stool colour chart exist for.',
+    temuan: [
+      'Jaundice persisting beyond 14 days of life with PALE stools and dark urine',
+      'Otherwise well-looking, thriving baby in the early weeks — which is exactly why it is missed',
+      'Conjugated (direct) bilirubin is raised — this is the test that separates it from breast-milk jaundice',
+    ],
+    penunjang: ['Split (conjugated) bilirubin in any baby jaundiced past 14 days — non-negotiable', 'Ultrasound, hepatobiliary scintigraphy, liver biopsy and operative cholangiogram'],
+    tata: [
+      'Kasai portoenterostomy as early as possible; refer the day the conjugated fraction returns raised',
+      'Fat-soluble vitamin supplementation and nutrition; many still require liver transplantation',
+    ],
+    organKey: 'liver',
+    skdi: ['Atresia biliaris', 'Sirosis hepatis'],
+  },
+  {
+    id: 'ca-pankreas',
+    module: 'bilier',
+    label: 'Pancreatic head carcinoma',
+    ringkas: 'Painless yellowing with weight loss — a tumour in the head of the pancreas squeezing the bile duct.',
+    lesi: [
+      { struktur: 'Head of pancreas', jenis: 'occlusion', catatan: 'Ductal adenocarcinoma at the head, compressing the intrapancreatic bile duct.' },
+      { struktur: 'Common bile duct', jenis: 'stenosis', derajat: 0.85, catatan: 'Extrinsic compression rather than a stone — the duct narrows smoothly.' },
+    ],
+    hilir: ['Gallbladder', 'Common hepatic duct', 'Hepatopancreatic ampulla', 'Dorsal pancreatic duct'],
+    mekanisme:
+      'The bile duct runs through the head of the pancreas, so a tumour there obstructs it early — which is the one ' +
+      'piece of luck in this disease, since body and tail tumours stay silent until incurable. Courvoisier\'s law ' +
+      'follows from the mechanism: a gallbladder that is palpable and painless in a jaundiced patient means gradual ' +
+      'malignant obstruction, because a gallbladder scarred by stones cannot distend.',
+    temuan: [
+      'Painless progressive obstructive jaundice with weight loss and anorexia',
+      'Palpable non-tender gallbladder (Courvoisier); new-onset diabetes in an older adult; migratory thrombophlebitis',
+      'Back pain suggests retroperitoneal invasion and unresectability',
+    ],
+    penunjang: ['Pancreatic-protocol CT for staging and resectability; endoscopic ultrasound with biopsy', 'CA 19-9 for monitoring, never for diagnosis'],
+    tata: [
+      'Whipple pancreaticoduodenectomy for the minority that are resectable, with adjuvant chemotherapy',
+      'Biliary stenting, pancreatic enzyme replacement, nutrition and early palliative care for the rest',
+    ],
+    organKey: 'pancreas',
+    skdi: ['Karsinoma pankreas', 'Kole(doko)litiasis'],
+  },
+  {
+    id: 'prostatitis',
+    module: 'prostat',
+    label: 'Prostatitis',
+    ringkas: 'An inflamed prostate: pain deep in the pelvis, burning on passing urine, and fever if it is acute.',
+    lesi: [
+      { struktur: 'Left peripheral zone of prostate', jenis: 'hypertrophy', catatan: 'Acute bacterial inflammation, usually ascending through the prostatic ducts.' },
+      { struktur: 'Left prostate duct', jenis: 'occlusion', catatan: 'Intraprostatic reflux of urine through the ducts is the accepted route.' },
+    ],
+    hilir: ['Prostatic urethra', 'Seminal vesicle', 'Trigone of urinary bladder'],
+    mekanisme:
+      'Prostatic ducts open into the posterior urethra at right angles, which permits intraprostatic urinary reflux — ' +
+      'the accepted mechanism for both acute bacterial prostatitis and chronic pelvic pain. The gland\'s poor ' +
+      'antibiotic penetration explains the long courses required; only lipophilic drugs that cross the epithelium reliably reach it.',
+    temuan: [
+      'Acute: fever, rigors, perineal and low back pain, dysuria, an exquisitely tender prostate — do not massage it',
+      'Chronic: pelvic pain for months, ejaculatory pain, obstructive symptoms without fever',
+      'Acute retention can complicate the acute form',
+    ],
+    penunjang: ['Urine culture; blood cultures if febrile; ultrasound for abscess if not improving', 'Avoid vigorous rectal examination in acute bacterial prostatitis — it can precipitate bacteraemia'],
+    tata: [
+      'Acute: fluoroquinolone or trimethoprim for 2–4 weeks; admit if septic or in retention',
+      'Chronic pelvic pain: multimodal — alpha blocker, pelvic floor physiotherapy, analgesia, and address distress',
+    ],
+    organKey: 'prostate',
+    skdi: ['Prostatitis', 'Infeksi saluran kemih'],
+  },
+  {
+    id: 'obstruksi-buli',
+    module: 'prostat',
+    label: 'Bladder outlet obstruction and its consequences',
+    ringkas: 'When the bladder must push against resistance for years, its wall thickens and then gives up.',
+    lesi: [
+      { struktur: 'Prostatic urethra', jenis: 'stenosis', derajat: 0.7, catatan: 'Chronic obstruction at the prostatic urethra.' },
+      { struktur: 'Bladder neck smooth muscle', jenis: 'hypertrophy', catatan: 'Detrusor and bladder neck hypertrophy, then trabeculation.' },
+    ],
+    hilir: ['Trigone of urinary bladder', 'Dome of urinary bladder', 'Left ureteral orifice', 'Right ureteral orifice'],
+    mekanisme:
+      'The detrusor hypertrophies to overcome resistance and becomes stiff and overactive — which is why storage ' +
+      'symptoms (frequency, urgency, nocturia) often trouble the patient more than the weak stream itself. Eventually ' +
+      'it decompensates and retains urine. The ureteric orifices tunnel obliquely through the bladder wall, and once ' +
+      'high pressure defeats that valve mechanism the damage is transmitted upstream: hydronephrosis and obstructive renal failure.',
+    temuan: [
+      'Weak stream, hesitancy, incomplete emptying, plus frequency, urgency and nocturia',
+      'Palpable bladder, high post-void residual, overflow incontinence',
+      'Raised creatinine with bilateral hydronephrosis means high-pressure chronic retention — decompress and watch for post-obstructive diuresis',
+    ],
+    penunjang: ['Post-void residual, renal function, urinalysis; ultrasound of kidneys and bladder', 'Flow rate and pressure-flow studies where the diagnosis or the plan is unclear'],
+    tata: [
+      'Relieve retention by catheterisation; monitor for post-obstructive diuresis and haematuria ex vacuo',
+      'Treat the cause — medical therapy or surgery for prostatic obstruction, urethrotomy for stricture',
+    ],
+    organKey: 'bladder',
+    skdi: ['Hiperplasia prostat jinak', 'Striktura uretra', 'Acute kidney injury'],
   },
 ]
 

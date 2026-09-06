@@ -26,6 +26,7 @@ const PusatGizi = lazy(() => import('./pages/PusatGizi').then((m) => ({ default:
 const ClinicalScores = lazy(() => import('./pages/ClinicalScores').then((m) => ({ default: m.ClinicalScores })))
 const Translator = lazy(() => import('./pages/Translator').then((m) => ({ default: m.Translator })))
 const BodyExplorer = lazy(() => import('./pages/BodyExplorer').then((m) => ({ default: m.BodyExplorer })))
+const Radiology = lazy(() => import('./pages/Radiology').then((m) => ({ default: m.Radiology })))
 const Consult = lazy(() => import('./pages/Consult').then((m) => ({ default: m.Consult })))
 const Hospitals = lazy(() => import('./pages/Hospitals').then((m) => ({ default: m.Hospitals })))
 const Pharmacy = lazy(() => import('./pages/Pharmacy').then((m) => ({ default: m.Pharmacy })))
@@ -368,6 +369,7 @@ createRoot(document.getElementById('root')!).render(
               <Route path="/trials" element={<Navigate to="/rujukan?t=uji" replace />} />
               <Route path="/nutrition" element={<Navigate to="/gizi?t=makan" replace />} />
               <Route path="/body-explorer" element={<BodyExplorer />} />
+              <Route path="/radiology" element={<Radiology />} />
               <Route path="/translator" element={<Translator />} />
               {/* Dua puluh satu skor klinis yang dulu punya rute sendiri kini
                   digabung ke satu halaman. Rute lamanya SENGAJA dipertahankan

@@ -83,6 +83,11 @@ const PETA: Record<string, PetaOrgan> = {
   gallbladder: { systems: ['Gastrointestinal & Hepatobilier'], kata: ['kolesist', 'empedu', 'kolelitiasis', 'koledok', 'kolangitis'], obat: ['empedu'] },
   kidneys: { systems: ['Ginjal & Saluran Kemih'], kata: ['ginjal', 'nefr', 'glomerul', 'renal', 'pielonefritis', 'batu'], obat: ['ginjal', 'diuretik'] },
   bladder: { systems: ['Ginjal & Saluran Kemih'], kata: ['kandung kemih', 'sistitis', 'uretr', 'inkontinensia', 'kemih'], obat: ['saluran kemih', 'infeksi kemih'] },
+  breast: {
+    systems: ['Reproduksi & Obstetri'],
+    kata: ['payudara', 'mammae', 'mastitis', 'nipple', 'filoides', 'paget', 'ginekomastia', 'fibrokista'],
+    obat: ['payudara', 'mastitis'],
+  },
   prostate: { systems: ['Ginjal & Saluran Kemih', 'Reproduksi & Obstetri'], kata: ['prostat'], obat: ['prostat'] },
   testis: { systems: ['Reproduksi & Obstetri'], kata: ['testis', 'skrotum', 'varikokel', 'hidrokel', 'epididim', 'torsio'], obat: [] },
   spleen: { systems: ['Hematologi & Imunologi'], kata: ['limpa', 'splen', 'anemia', 'talasemia', 'hemolitik'], obat: ['anemia', 'besi'] },
@@ -169,6 +174,13 @@ export function clinicalForOrgan(organKey: string): OrganClinical {
 export interface LabOrgan { nama: string; untuk: string }
 
 const LAB_ORGAN: Record<string, LabOrgan[]> = {
+  breast: [
+    { nama: 'Triple assessment', untuk: 'Clinical examination, imaging and needle biopsy together — no one leg of it is enough alone' },
+    { nama: 'Ultrasound', untuk: 'First imaging under 40 and in pregnancy; distinguishes cyst from solid mass' },
+    { nama: 'Mammography', untuk: 'First imaging over 40 and for screening; poor in dense young breast tissue' },
+    { nama: 'Core needle biopsy', untuk: 'Gives histology, grade and receptor status — fine-needle aspiration cannot' },
+    { nama: 'ER, PR and HER2', untuk: 'Decides endocrine and anti-HER2 therapy; the single most treatment-changing result' },
+  ],
   heart: [
     { nama: 'ECG (12-lead)', untuk: 'Rhythm, ischaemia, chamber enlargement — first test in almost any cardiac complaint' },
     { nama: 'Troponin I/T', untuk: 'Myocardial injury. Interpret the RISE AND FALL, never a single value' },
