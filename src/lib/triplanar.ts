@@ -23,7 +23,25 @@ import { buatTekstur, type JenisJaringan } from './tissueTexture'
 interface Terikat { pola: THREE.DataTexture; kontras: number; variasiKasar: number }
 const cache = new Map<string, Terikat>()
 
-export function teksturJaringan(jenis: JenisJaringan, N = 256): Terikat {
+/**
+ * Penyaringan anisotropik maksimum yang didukung perangkatnya.
+ *
+ * Ini penting justru untuk triplanar. Permukaan tubuh sebagian besar terlihat
+ * MIRING dari kamera, dan pada sudut miring penyaringan biasa merata-ratakan
+ * sepanjang satu arah saja sehingga seratnya lumer menjadi kelabu — tepat pada
+ * bidang yang paling luas terlihat. Nilainya disuntikkan dari luar karena
+ * hanya renderer yang tahu kemampuan perangkatnya.
+ */
+let anisotropiMaks = 1
+export function setelAnisotropi(n: number): void {
+  anisotropiMaks = Math.max(1, Math.floor(n))
+  for (const t of cache.values()) {
+    t.pola.anisotropy = anisotropiMaks
+    t.pola.needsUpdate = true
+  }
+}
+
+export function teksturJaringan(jenis: JenisJaringan, N = 512): Terikat {
   const kunci = `${jenis}-${N}`
   const ada = cache.get(kunci)
   if (ada) return ada
@@ -32,9 +50,15 @@ export function teksturJaringan(jenis: JenisJaringan, N = 256): Terikat {
     const tex = new THREE.DataTexture(data, N, N, THREE.RGBAFormat)
     tex.wrapS = THREE.RepeatWrapping
     tex.wrapT = THREE.RepeatWrapping
+    // Mipmap dinyalakan: tanpa itu serat sehalus ini berkelip setiap kali model
+    // diputar, dan kelipan jauh lebih merusak daripada sedikit kelembutan.
+    // Sempat dimatikan atas dugaan bahwa mipmap-lah yang meratakan teksturnya
+    // menjadi kelabu; diuji, dan ternyata bukan — penyebabnya pengkodean
+    // tekstur yang terpotong.
     tex.minFilter = THREE.LinearMipmapLinearFilter
     tex.magFilter = THREE.LinearFilter
     tex.generateMipmaps = true
+    tex.anisotropy = anisotropiMaks
     tex.needsUpdate = true
     return tex
   }

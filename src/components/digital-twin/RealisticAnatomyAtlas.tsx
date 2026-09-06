@@ -7,6 +7,8 @@ import { RoomEnvironment } from 'three/examples/jsm/environments/RoomEnvironment
 import { ANATOMY_LAYERS, humanizeStructureName, type AnatomyLayer } from '../Body3D'
 import { pasangTriplanar } from '../../lib/triplanar'
 import type { JenisJaringan } from '../../lib/tissueTexture'
+import { setelAnisotropi } from '../../lib/triplanar'
+import { BATAS_BAKU, JamBingkai, keadaanAwal, langkahSkala, skalaAwal } from '../../lib/renderScale'
 
 type LayerKey = AnatomyLayer['key']
 type RenderQuality = 'balanced' | 'cinematic'
@@ -224,6 +226,11 @@ function setFrom<T>(source: Set<T>, item: T, on: boolean) {
 
 export function RealisticAnatomyAtlas() {
   const containerRef = useRef<HTMLDivElement>(null)
+  // Kerapatan piksel yang berlaku sekarang, beserta pengukur waktu bingkainya.
+  const skalaRef = useRef(keadaanAwal(1))
+  const jamRef = useRef(new JamBingkai(30))
+  const waktuBingkaiRef = useRef(0)
+  const [skalaTampil, setSkalaTampil] = useState(1)
   const sceneRef = useRef<THREE.Scene | null>(null)
   const cameraRef = useRef<THREE.PerspectiveCamera | null>(null)
   const rendererRef = useRef<THREE.WebGLRenderer | null>(null)
@@ -267,10 +274,28 @@ export function RealisticAnatomyAtlas() {
     // 17,9° hanya karena penggantian pemeta nada. Khronos PBR Neutral
     // dirancang mempertahankan warna dasar bahan pada pencahayaan terang —
     // dan warna jaringan di sini adalah keterangan klinis, bukan gaya.
+    // Anisotropi maksimum perangkat ini diberikan ke pembuat tekstur. Hanya
+    // renderer yang tahu angkanya, dan tanpa itu serat jaringan lumer justru
+    // pada permukaan miring — yaitu sebagian besar permukaan tubuh.
+    setelAnisotropi(renderer.capabilities.getMaxAnisotropy())
     renderer.toneMapping = THREE.NeutralToneMapping
     renderer.toneMappingExposure = 0.92
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
     renderer.setClearColor(0x000000, 0)
+    // Ukuran CSS kanvas ditetapkan di sini, dan itu WAJIB karena setSize
+    // dipanggil dengan updateStyle = false sehingga three sengaja tidak
+    // menyentuh gayanya.
+    //
+    // Tanpa ini kanvas tidak punya ukuran CSS sama sekali, sehingga ia ditata
+    // memakai ukuran ATRIBUTNYA — yang satuannya piksel perangkat. Akibatnya
+    // dua hal sekaligus, dan keduanya terukur: 1.068 piksel perangkat
+    // ditampilkan pada 1.068 piksel CSS, yaitu satu banding satu, sehingga
+    // SELURUH kerapatan tambahan yang sudah susah payah digambar terbuang
+    // begitu saja; dan kanvas selebar 1.068 piksel itu memenuhi layar selebar
+    // 390 piksel, sehingga halamannya melebar ke samping.
+    renderer.domElement.style.width = '100%'
+    renderer.domElement.style.height = '100%'
+    renderer.domElement.style.display = 'block'
     container.appendChild(renderer.domElement)
     rendererRef.current = renderer
 
@@ -360,6 +385,24 @@ export function RealisticAnatomyAtlas() {
       }
       controls.update()
       renderer.render(scene, camera)
+
+      // Kerapatan piksel disesuaikan dari waktu bingkai yang SEBENARNYA
+      // terukur di perangkat ini, bukan ditebak dari nama perangkatnya.
+      // Gambar tajam yang tersendat lebih buruk daripada gambar sedikit
+      // lembut yang mulus, jadi ketajamannya dilepas hanya kalau memang
+      // tidak sanggup dipertahankan.
+      const sekarang = performance.now()
+      if (waktuBingkaiRef.current > 0) jamRef.current.catat(sekarang - waktuBingkaiRef.current)
+      waktuBingkaiRef.current = sekarang
+      if (jamRef.current.siap) {
+        const sebelum = skalaRef.current.skala
+        skalaRef.current = langkahSkala(skalaRef.current, jamRef.current.rataMs, BATAS_BAKU)
+        if (skalaRef.current.skala !== sebelum) {
+          renderer.setPixelRatio(skalaRef.current.skala)
+          setSkalaTampil(skalaRef.current.skala)
+          jamRef.current.bersihkan()
+        }
+      }
       frame = requestAnimationFrame(render)
     }
     render()
@@ -387,8 +430,17 @@ export function RealisticAnatomyAtlas() {
     const container = containerRef.current
     const camera = cameraRef.current
     if (!renderer || !container || !camera) return
-    const ratio = quality === 'cinematic' ? 2 : 1.35
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, ratio))
+    // Mulai dari kerapatan ASLI layarnya. Batas lama 2 berarti ponsel
+    // berkerapatan 3 menggambar sepertiga lebih sedikit piksel daripada yang
+    // mampu ditampilkan layarnya, lalu merentangkannya — dan itulah yang
+    // terbaca sebagai kurang tajam, bukan kekurangan pada bahan atau tekstur.
+    const batas = quality === 'cinematic'
+      ? BATAS_BAKU
+      : { ...BATAS_BAKU, maksimum: Math.min(1.75, BATAS_BAKU.maksimum) }
+    const awal = skalaAwal(window.devicePixelRatio, batas)
+    skalaRef.current = keadaanAwal(awal)
+    setSkalaTampil(awal)
+    renderer.setPixelRatio(awal)
     renderer.setSize(Math.max(container.clientWidth, 1), Math.max(container.clientHeight, 1), false)
     camera.aspect = Math.max(container.clientWidth, 1) / Math.max(container.clientHeight, 1)
     camera.updateProjectionMatrix()
@@ -507,6 +559,16 @@ export function RealisticAnatomyAtlas() {
             <button onClick={() => setQuality('balanced')} className={`rounded-full border px-4 py-2 text-xs font-black ${quality === 'balanced' ? 'border-cyan-300 bg-cyan-300 text-black' : 'border-white/15 bg-white/5'}`}>Balanced</button>
             <button onClick={() => setQuality('cinematic')} className={`rounded-full border px-4 py-2 text-xs font-black ${quality === 'cinematic' ? 'border-cyan-300 bg-cyan-300 text-black' : 'border-white/15 bg-white/5'}`}>Cinematic</button>
             <button onClick={() => setMotion((value) => !value)} className={`rounded-full border px-4 py-2 text-xs font-black ${motion ? 'border-rose-300 bg-rose-300 text-black' : 'border-white/15 bg-white/5'}`}>{motion ? '4D motion ON' : '4D motion OFF'}</button>
+            {/* Resolusi yang SEDANG dipakai, bukan janji. Kalau perangkatnya
+                tidak sanggup menahan kerapatan penuh, angka ini turun dan
+                pengguna melihat sendiri apa yang terjadi alih-alih menduga
+                aplikasinya rusak. */}
+            <span
+              className="rounded-full border border-white/15 bg-black/40 px-3 py-2 text-[10px] font-black tabular-nums text-white/70"
+              title="Drawing-buffer pixels per CSS pixel, adapting to what this device can actually sustain"
+            >
+              {skalaTampil.toFixed(2)}× · {skalaTampil >= 2.5 ? 'full native' : skalaTampil >= 1.75 ? 'high' : skalaTampil >= 1.25 ? 'standard' : 'reduced'}
+            </span>
           </div>
         </div>
       </header>

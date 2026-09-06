@@ -12,7 +12,7 @@
     "start": "tsx src/index.ts",
     "build": "tsc -p tsconfig.json",
     "typecheck": "tsc -p tsconfig.json --noEmit",
-    "uji": "tsx uji/aturanNotif.uji.ts && tsx uji/motionWave.uji.ts && tsx uji/cardioFlow.uji.ts && tsx uji/specialtyPathology.uji.ts && tsx uji/drugTargets.uji.ts && tsx uji/atlasSearch.uji.ts && tsx uji/genomics.uji.ts && tsx uji/longevity.uji.ts && tsx uji/dicom.uji.ts && tsx uji/fhir.uji.ts && tsx uji/mentalTrend.uji.ts && tsx uji/dissection.uji.ts && tsx uji/cellBio.uji.ts && tsx uji/bodySearch.uji.ts && tsx uji/tissueTexture.uji.ts"
+    "uji": "tsx uji/aturanNotif.uji.ts && tsx uji/motionWave.uji.ts && tsx uji/cardioFlow.uji.ts && tsx uji/specialtyPathology.uji.ts && tsx uji/drugTargets.uji.ts && tsx uji/atlasSearch.uji.ts && tsx uji/genomics.uji.ts && tsx uji/longevity.uji.ts && tsx uji/dicom.uji.ts && tsx uji/fhir.uji.ts && tsx uji/mentalTrend.uji.ts && tsx uji/dissection.uji.ts && tsx uji/cellBio.uji.ts && tsx uji/bodySearch.uji.ts && tsx uji/tissueTexture.uji.ts && tsx uji/renderScale.uji.ts"
   },
   "dependencies": {
     "cookie-parser": "^1.4.7",
