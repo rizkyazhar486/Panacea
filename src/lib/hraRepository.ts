@@ -26,12 +26,25 @@ export type HraPreset = {
   files: Record<HraSex, string[]>
 }
 
+export type HraEvidenceRecord = {
+  release: 'v1.2' | 'v2.0'
+  label: string
+  nodeName: string
+  ontologyId: string
+  representationOf: string
+  sourceSpatialEntity: string
+  modelStem: string
+  model?: HraRepositoryFile
+}
+
 export const HRA_REPOSITORY = 'https://github.com/hubmapconsortium/ccf-releases'
 export const HRA_MODELS_REPOSITORY = `${HRA_REPOSITORY}/tree/main/v1.2/models`
 export const HRA_LIBRARY = 'https://humanatlas.io/3d-reference-library'
 export const HRA_MODELS_API = 'https://api.github.com/repos/hubmapconsortium/ccf-releases/contents/v1.2/models'
 export const HRA_MAPPING_CSV = 'https://raw.githubusercontent.com/hubmapconsortium/ccf-releases/main/v1.2/models/ASCT-B_3D_Models_Mapping.csv'
 export const HRA_RAW_MODELS = 'https://raw.githubusercontent.com/hubmapconsortium/ccf-releases/main/v1.2/models/'
+export const HRA_V2_MODELS_REPOSITORY = `${HRA_REPOSITORY}/tree/main/v2.0/models`
+export const HRA_V2_CROSSWALK_CSV = 'https://raw.githubusercontent.com/hubmapconsortium/ccf-releases/main/v2.0/models/asct-b-3d-models-crosswalk.csv'
 
 export const HRA_PRESETS: HraPreset[] = [
   {
@@ -128,6 +141,7 @@ type GithubFile = {
 
 let filePromise: Promise<HraRepositoryFile[]> | null = null
 let structurePromise: Promise<HraStructureRecord[]> | null = null
+let v2CrosswalkPromise: Promise<HraEvidenceRecord[]> | null = null
 
 function normalize(value: string) {
   return value.toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim()
@@ -220,6 +234,21 @@ function resolveModelFile(value: string, files: HraRepositoryFile[]) {
   return undefined
 }
 
+function mappedColumns(rows: string[][]) {
+  const headerIndex = rows.findIndex((row) => row.includes('anatomical_structure_of') && row.includes('glb file of single organs'))
+  if (headerIndex < 0) throw new Error('HRA mapping header was not found.')
+  const header = rows[headerIndex]
+  return {
+    headerIndex,
+    labelIndex: header.indexOf('label'),
+    nodeIndex: header.indexOf('node_name'),
+    ontologyIndex: header.indexOf('OntologyID'),
+    representationIndex: header.indexOf('representation_of'),
+    sourceIndex: header.indexOf('source_spatial_entity'),
+    modelIndex: header.indexOf('glb file of single organs'),
+  }
+}
+
 export function fetchHraStructureIndex() {
   if (structurePromise) return structurePromise
   structurePromise = Promise.all([
@@ -227,16 +256,7 @@ export function fetchHraStructureIndex() {
     checkedFetch(HRA_MAPPING_CSV, 'text/csv,text/plain;q=0.9,*/*;q=0.1').then((response) => response.text()),
   ]).then(([files, csv]) => {
     const rows = parseCsv(csv)
-    const headerIndex = rows.findIndex((row) => row.includes('anatomical_structure_of') && row.includes('glb file of single organs'))
-    if (headerIndex < 0) throw new Error('HRA mapping header was not found.')
-    const header = rows[headerIndex]
-    const indexOf = (name: string) => header.indexOf(name)
-    const labelIndex = indexOf('label')
-    const nodeIndex = indexOf('node_name')
-    const ontologyIndex = indexOf('OntologyID')
-    const representationIndex = indexOf('representation_of')
-    const sourceIndex = indexOf('source_spatial_entity')
-    const modelIndex = indexOf('glb file of single organs')
+    const { headerIndex, labelIndex, nodeIndex, ontologyIndex, representationIndex, sourceIndex, modelIndex } = mappedColumns(rows)
 
     const result: HraStructureRecord[] = []
     const seen = new Set<string>()
@@ -265,6 +285,43 @@ export function fetchHraStructureIndex() {
   return structurePromise
 }
 
+export function fetchHraV2Crosswalk() {
+  if (v2CrosswalkPromise) return v2CrosswalkPromise
+  v2CrosswalkPromise = checkedFetch(HRA_V2_CROSSWALK_CSV, 'text/csv,text/plain;q=0.9,*/*;q=0.1')
+    .then((response) => response.text())
+    .then((csv) => {
+      const rows = parseCsv(csv)
+      const { headerIndex, labelIndex, nodeIndex, ontologyIndex, representationIndex, sourceIndex, modelIndex } = mappedColumns(rows)
+      const result: HraEvidenceRecord[] = []
+      const seen = new Set<string>()
+      for (const row of rows.slice(headerIndex + 1)) {
+        const modelStem = (row[modelIndex] || '').trim()
+        const label = (row[labelIndex] || row[nodeIndex] || '').trim()
+        const ontologyId = (row[ontologyIndex] || '').trim()
+        if (!label || modelStem === '-' || !modelStem) continue
+        const record: HraEvidenceRecord = {
+          release: 'v2.0',
+          label,
+          nodeName: row[nodeIndex] || '',
+          ontologyId,
+          representationOf: row[representationIndex] || '',
+          sourceSpatialEntity: row[sourceIndex] || '',
+          modelStem,
+        }
+        const key = `${record.label}|${record.ontologyId}|${record.modelStem}`
+        if (seen.has(key)) continue
+        seen.add(key)
+        result.push(record)
+      }
+      return result
+    })
+    .catch((error) => {
+      v2CrosswalkPromise = null
+      throw error
+    })
+  return v2CrosswalkPromise
+}
+
 export async function searchHraStructures(rawQuery: string, limit = 40) {
   const query = normalize(rawQuery)
   if (!query) return []
@@ -281,6 +338,51 @@ export async function searchHraStructures(rawQuery: string, limit = 40) {
     .sort((a, b) => b.score - a.score || a.record.label.localeCompare(b.record.label))
     .slice(0, limit)
     .map((item) => item.record)
+}
+
+export async function searchHraEvidence(rawQuery: string, limit = 30) {
+  const query = normalize(rawQuery)
+  if (!query) return []
+  const terms = query.split(' ').filter(Boolean)
+  const [v12, v20] = await Promise.allSettled([fetchHraStructureIndex(), fetchHraV2Crosswalk()])
+  const combined: HraEvidenceRecord[] = []
+
+  if (v12.status === 'fulfilled') {
+    combined.push(...v12.value.map((record) => ({
+      release: 'v1.2' as const,
+      label: record.label,
+      nodeName: record.nodeName,
+      ontologyId: record.ontologyId,
+      representationOf: record.representationOf,
+      sourceSpatialEntity: record.sourceSpatialEntity,
+      modelStem: record.model.name.replace(/\.glb$/i, ''),
+      model: record.model,
+    })))
+  }
+  if (v20.status === 'fulfilled') combined.push(...v20.value)
+  if (!combined.length) throw new Error('HRA source indexes are unavailable.')
+
+  const scored = combined
+    .map((record) => {
+      const haystack = normalize(`${record.label} ${record.nodeName} ${record.ontologyId} ${record.modelStem}`)
+      const matched = terms.filter((term) => haystack.includes(term)).length
+      const exactBoost = normalize(record.label) === query ? 100 : haystack.startsWith(query) ? 20 : 0
+      const releaseBoost = record.release === 'v2.0' ? 1 : 0
+      return { record, score: matched * 10 + exactBoost + releaseBoost }
+    })
+    .filter((item) => item.score > 0)
+    .sort((a, b) => b.score - a.score || a.record.label.localeCompare(b.record.label))
+
+  const deduped: HraEvidenceRecord[] = []
+  const seen = new Set<string>()
+  for (const item of scored) {
+    const key = `${normalize(item.record.label)}|${item.record.ontologyId || normalize(item.record.modelStem)}`
+    if (seen.has(key)) continue
+    seen.add(key)
+    deduped.push(item.record)
+    if (deduped.length >= limit) break
+  }
+  return deduped
 }
 
 export function rawHraModelUrl(fileName: string) {
