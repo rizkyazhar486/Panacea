@@ -4,6 +4,7 @@ import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'
 import { MeshoptDecoder } from 'three/examples/jsm/libs/meshopt_decoder.module.js'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
 import { SEBAR_PERISTALTIK } from '../lib/motionWave'
+import { keburaman, geserBuka, KEDALAMAN, type KunciLapisan } from '../lib/dissection'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Model 3D anatomi NYATA — bukan bentuk geometris buatan sendiri (bola/kapsul/
@@ -340,11 +341,22 @@ interface Props {
   slicePos: number
   /** Physiological motion — heartbeat, breathing, muscle contraction. */
   motion: MotionState
+  /**
+   * Membuka tubuh: tiap struktur bergeser RADIAL menjauhi sumbu tubuh sejauh
+   * ini (dalam satuan dunia). Nol berarti tubuh utuh.
+   */
+  unfold: number
+  /**
+   * Kedalaman diseksi 0..6 — sejauh mana lapisan luar dipudarkan supaya yang
+   * di bawahnya terlihat. Bukan penghapusan: lapisan luar tetap disisakan
+   * samar sebagai orientasi.
+   */
+  dissect: number
   /** Fires with the raw node name and a human-readable label when the user taps a structure. */
   onPick: (rawName: string, label: string) => void
 }
 
-export function Body3D({ layers, highlighted, focusKeywords, renderMode, ctWindow, slicePlane, slicePos, motion, onPick }: Props) {
+export function Body3D({ layers, highlighted, focusKeywords, renderMode, ctWindow, slicePlane, slicePos, motion, unfold, dissect, onPick }: Props) {
   const containerRef = useRef<HTMLDivElement>(null)
   const groupsRef = useRef<Partial<Record<AnatomyLayer['key'], THREE.Group>>>({})
   const sceneRef = useRef<THREE.Scene | null>(null)
@@ -789,6 +801,67 @@ export function Body3D({ layers, highlighted, focusKeywords, renderMode, ctWindo
       lights.fill.intensity = flat ? 0.1 : 0.25
     }
   }, [renderMode, ctWindow, slicePlane, slicePos, loadingLayers])
+
+  // ── Membuka tubuh dan kedalaman diseksi ───────────────────────────────────
+  //
+  // Dua hal dikerjakan di satu tempat karena keduanya menyentuh mesh yang
+  // sama: pergeseran radial ("unfold") dan keburaman per lapisan.
+  //
+  // Posisi asli tiap node disimpan sekali di userData sebelum digeser. Tanpa
+  // itu, menggeser dari posisi yang sudah tergeser akan menumpuk kesalahan
+  // dan tubuh perlahan terbang berantakan — kesalahan yang tidak melempar
+  // galat apa pun, hanya membuat anatominya salah.
+  useEffect(() => {
+    const kotak = bodyBoxRef.current
+    if (!kotak) return
+    const pusat = kotak.getCenter(new THREE.Vector3())
+    const sementara = new THREE.Vector3()
+
+    for (const def of ANATOMY_LAYERS) {
+      const group = groupsRef.current[def.key]
+      if (!group) continue
+      const kunci = def.key as KunciLapisan
+      const buram = keburaman(kunci, dissect)
+      const dalam = KEDALAMAN[kunci]
+
+      group.traverse((obj) => {
+        // Node bernama adalah satuan anatomi; itulah yang digeser, bukan tiap
+        // primitif di bawahnya — menggeser primitif akan mencabik satu organ
+        // menjadi kepingan yang tidak berarti apa-apa.
+        const nama = obj.userData.originalName as string | undefined
+        if (nama && !obj.userData.posisiAsli) {
+          obj.userData.posisiAsli = obj.position.clone()
+          obj.getWorldPosition(sementara)
+          obj.userData.pusatDunia = sementara.clone()
+        }
+        if (nama && obj.userData.posisiAsli) {
+          const asal = obj.userData.posisiAsli as THREE.Vector3
+          const pd = obj.userData.pusatDunia as THREE.Vector3
+          const g = geserBuka(
+            { x: pd.x, y: pd.y, z: pd.z },
+            { x: pusat.x, y: pusat.y, z: pusat.z },
+            unfold, dalam,
+          )
+          obj.position.set(asal.x + g.x, asal.y + g.y, asal.z + g.z)
+        }
+
+        if (obj instanceof THREE.Mesh) {
+          const bahan = obj.material as THREE.Material | THREE.Material[]
+          const daftar = Array.isArray(bahan) ? bahan : [bahan]
+          for (const b of daftar) {
+            if (!b) continue
+            b.transparent = buram < 0.999
+            b.opacity = buram
+            // Struktur separuh tembus yang tetap menulis kedalaman akan
+            // menutupi apa pun di belakangnya — persis lapisan yang sedang
+            // dibuka supaya terlihat.
+            b.depthWrite = buram >= 0.999
+            b.needsUpdate = true
+          }
+        }
+      })
+    }
+  }, [unfold, dissect, layers, loadingLayers, renderMode])
 
   // Sorot (hijau) struktur yang sedang dipilih/ditarget, pulihkan warna
   // struktur yang sebelumnya disorot tapi sudah tidak lagi ada di daftar.

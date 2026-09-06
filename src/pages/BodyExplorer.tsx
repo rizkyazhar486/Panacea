@@ -198,6 +198,9 @@ function HierarchyGroup({
   )
 }
 
+// Label kedalaman diseksi, mengikuti urutan KEDALAMAN di lib/dissection.
+const DEPTH_LABELS = ['Intact', 'Skin off', 'Muscle open', 'Vessels shown', 'Nerves shown', 'Viscera open', 'Skeleton']
+
 export function BodyExplorer() {
   const { state } = useStore()
   const [loading, setLoading] = useState(false)
@@ -244,6 +247,9 @@ export function BodyExplorer() {
   const [ctWindowKey, setCtWindowKey] = useState(CT_WINDOWS[0].key)
   const [slicePlane, setSlicePlane] = useState<SlicePlane>('none')
   const [slicePos, setSlicePos] = useState(0.5)
+  // Membuka tubuh: geser radial tiap struktur, dan kedalaman diseksi 0..6.
+  const [unfold, setUnfold] = useState(0)
+  const [dissect, setDissect] = useState(0)
 
   // Gerak fisiologis. Tiga keadaan, bukan sakelar hidup/mati: perbedaan
   // antara istirahat dan latihan JUSTRU yang mengajarkan faalnya — denyut
@@ -524,6 +530,8 @@ export function BodyExplorer() {
           ctWindow={CT_WINDOWS.find((w) => w.key === ctWindowKey) ?? CT_WINDOWS[0]}
           slicePlane={slicePlane}
           slicePos={slicePos}
+          unfold={unfold}
+          dissect={dissect}
           motion={motion}
           onPick={onPickStructure}
         />
@@ -740,6 +748,36 @@ export function BodyExplorer() {
                       {l.label}
                     </Chip>
                   ))}
+                </div>
+
+                {/* Membuka tubuh. Dua kendali terpisah karena keduanya
+                    menjawab pertanyaan berbeda: "apa bentuknya sendirian"
+                    dan "apa yang ada tepat di bawahnya". */}
+                <div className="mt-3 space-y-3 border-t border-neutral-100 pt-3 dark:border-white/10">
+                  <label className="block text-[11px] font-bold uppercase tracking-wide text-neutral-500">
+                    Unfold {unfold > 0 ? `· ${Math.round((unfold / 0.35) * 100)}%` : ''}
+                    <input
+                      type="range" min={0} max={0.35} step={0.005} value={unfold}
+                      onChange={(e) => setUnfold(Number(e.target.value))}
+                      className="mt-1 w-full accent-brand" aria-label="Unfold"
+                    />
+                    <span className="block text-[10px] font-normal normal-case tracking-normal text-neutral-400">
+                      Slides every structure outward from the body axis. Height never changes, so what sits above
+                      what stays true — midline structures barely move, because they have no side.
+                    </span>
+                  </label>
+                  <label className="block text-[11px] font-bold uppercase tracking-wide text-neutral-500">
+                    Dissection depth · {DEPTH_LABELS[Math.round(dissect)]}
+                    <input
+                      type="range" min={0} max={6} step={1} value={dissect}
+                      onChange={(e) => setDissect(Number(e.target.value))}
+                      className="mt-1 w-full accent-brand" aria-label="Dissection depth"
+                    />
+                    <span className="block text-[10px] font-normal normal-case tracking-normal text-neutral-400">
+                      Fades the layers above that depth in the order a scalpel meets them. They never vanish
+                      completely — without a surface to refer to, the deep structures stop being a body.
+                    </span>
+                  </label>
                 </div>
               </>
             )}
