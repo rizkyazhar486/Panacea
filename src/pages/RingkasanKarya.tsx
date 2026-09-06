@@ -1,29 +1,20 @@
 import { useMemo, useState } from 'react'
 import { KARYA, TEMA, JENIS_LABEL, type Karya } from '../lib/ringkasanKarya'
+import { LIFE_LIBRARY, WEALTH_DOMAINS, type LifeReading, type WealthDomain } from '../lib/lifeWealthLibrary'
 import { PemutarBaca } from '../components/PemutarBaca'
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Ringkasan buku dan film pengembangan diri — satu paragraf per karya.
+// Life library + ringkasan buku dan film.
 //
 // UNTUK APA HALAMAN INI. Bukan pengganti bacaan, melainkan alat MEMILIH:
 // membaca satu paragraf jauh lebih murah daripada memulai buku tiga ratus
 // halaman yang ternyata bukan yang dibutuhkan bulan ini. Karena itu tiap
 // ringkasan menjawab satu pertanyaan: apa gagasan intinya, dan untuk siapa.
 //
-// KEJUJURAN YANG DIPEGANG DI SINI, sama dengan seluruh aplikasi:
-//   · Tidak ada angka penilaian yang dikarang. Nilai Goodreads dan IMDb
-//     berubah tiap hari dan tidak dapat diperiksa dari dalam aplikasi ini
-//     tanpa layanan berbayar; menuliskan "4,37" yang tidak pernah diambil dari
-//     mana pun sama saja mengarang.
-//   · Buku yang gagasannya dibantah bukti disebutkan bantahannya di
-//     ringkasannya sendiri, bukan disembunyikan supaya daftarnya terlihat
-//     mulus. Beberapa judul paling terkenal di sini justru yang paling banyak
-//     catatannya.
-//   · Tidak ada urutan "terbaik nomor satu". Urutannya menurut tema.
-//
-// Setiap ringkasan dapat DIDENGARKAN, memakai mesin suara bawaan perangkat —
-// berguna justru pada saat orang paling mungkin memilih bacaan berikutnya:
-// dalam perjalanan, bukan di depan meja.
+// Panacea menambah satu rak praktis yang sengaja mengikuti tujuh bentuk
+// kekayaan Life OS: waktu, kesehatan, keuangan, pengetahuan, sosial, keluarga,
+// dan karir. Ringkasannya ditulis ulang secara orisinal; sumber tetap merupakan
+// karya primernya dan kartu praktik Panacea tidak dipresentasikan sebagai buku.
 // ─────────────────────────────────────────────────────────────────────────────
 
 type Saring = 'semua' | 'buku' | 'film'
@@ -51,11 +42,35 @@ function Kartu({ k }: { k: Karya }) {
   )
 }
 
+function LifeGuideCard({ item }: { item: LifeReading }) {
+  return (
+    <article className="w-[286px] shrink-0 snap-start rounded-[24px] border border-neutral-200 bg-white p-4 shadow-sm dark:border-white/10 dark:bg-[#111315]">
+      <div className="flex items-start justify-between gap-2">
+        <div className="min-w-0">
+          <div className="text-[9px] font-black uppercase tracking-[.14em] text-fuchsia-700 dark:text-fuchsia-300">{item.domain} · {item.kind.replace('-', ' ')}</div>
+          <h3 className="mt-1 text-[15px] font-black leading-tight text-neutral-950 dark:text-white">{item.title}</h3>
+          <p className="mt-1 text-[10px] font-semibold text-neutral-400">{item.by}{item.year ? ` · ${item.year}` : ''}</p>
+        </div>
+        <span className="text-xl" aria-hidden>{item.kind === 'practice' ? '⚡' : item.kind === 'research-guide' ? '🔎' : '📖'}</span>
+      </div>
+      <p className="mt-3 text-[11px] font-medium leading-relaxed text-neutral-650 dark:text-neutral-300">{item.summary}</p>
+      <div className="mt-3 rounded-2xl bg-fuchsia-50 p-3 dark:bg-fuchsia-400/[.08]">
+        <div className="text-[9px] font-black uppercase tracking-wide text-fuchsia-700 dark:text-fuchsia-300">Try this</div>
+        <p className="mt-1 text-[10px] font-semibold leading-relaxed text-neutral-700 dark:text-neutral-200">{item.tryThis}</p>
+      </div>
+      <div className="mt-3">
+        <PemutarBaca teks={`${item.title}, ${item.by}. ${item.summary}. Try this: ${item.tryThis}`} label="Listen" />
+      </div>
+    </article>
+  )
+}
+
 export function RingkasanKarya() {
   const [q, setQ] = useState('')
   const [jenis, setJenis] = useState<Saring>('semua')
   const [tema, setTema] = useState<string | null>(null)
   const [batas, setBatas] = useState(20)
+  const [wealthDomain, setWealthDomain] = useState<WealthDomain>('Time')
 
   const hasil = useMemo(() => {
     const kata = q.trim().toLowerCase()
@@ -71,26 +86,51 @@ export function RingkasanKarya() {
     })
   }, [q, jenis, tema])
 
+  const wealthReadings = useMemo(() => LIFE_LIBRARY.filter((item) => item.domain === wealthDomain), [wealthDomain])
   const jumlahBuku = KARYA.filter((k) => k.jenis === 'buku').length
   const jumlahFilm = KARYA.length - jumlahBuku
 
   return (
-    <div className="mx-auto max-w-2xl space-y-4 pb-24">
-      <section className="p-fluid rounded-3xl bg-gradient-to-br from-brand-50 to-brand-100/50 dark:from-brand/15 dark:to-brand/5">
-        <h1 className="t-judul font-black leading-tight text-ink dark:text-white">Work summaries</h1>
-        <p className="t-kecil mt-1 leading-relaxed text-neutral-600 dark:text-neutral-300">
-          {KARYA.length} books and films on personal development, one paragraph each: what the core idea is, and who
-          it is for. Enough to decide whether to read or watch it — not a replacement for doing so.
-        </p>
-        <p className="t-mikro mt-2 leading-relaxed text-neutral-500 dark:text-neutral-400">
-          There are no rating numbers on this page. Goodreads and IMDb scores change daily and cannot be verified
-          from inside this app, so writing one down would mean inventing it. What was selected instead: titles that
-          consistently rate highly and have stayed in conversation for years. Books whose ideas have been contradicted
-          by evidence are still included — with the contradiction written in.
+    <div className="mx-auto max-w-3xl space-y-4 pb-24">
+      <section className="p-fluid rounded-3xl bg-gradient-to-br from-brand-50 via-white to-fuchsia-50 dark:from-brand/15 dark:via-white/[.025] dark:to-fuchsia-400/[.08]">
+        <div className="text-[10px] font-black uppercase tracking-[.16em] text-brand">Panacea Life Library</div>
+        <h1 className="t-judul mt-1 font-black leading-tight text-ink dark:text-white">Read for the life you are building</h1>
+        <p className="t-kecil mt-1 max-w-2xl leading-relaxed text-neutral-600 dark:text-neutral-300">
+          {LIFE_LIBRARY.length} short guides across seven forms of wealth, plus {KARYA.length} book and film summaries. Use the page to choose what deserves deeper reading, listening or practice.
         </p>
       </section>
 
+      <section className="overflow-hidden rounded-[28px] border border-neutral-200 bg-white/90 p-4 shadow-sm dark:border-white/10 dark:bg-white/[.035] sm:p-5">
+        <div className="flex items-end justify-between gap-3">
+          <div>
+            <div className="text-[10px] font-black uppercase tracking-[.15em] text-fuchsia-700 dark:text-fuchsia-300">Seven forms of wealth</div>
+            <h2 className="mt-1 text-[18px] font-black tracking-tight text-neutral-950 dark:text-white">Time · health · money · knowledge · social · family · career</h2>
+          </div>
+          <span className="shrink-0 rounded-full bg-fuchsia-100 px-2.5 py-1 text-[9px] font-black text-fuchsia-800 dark:bg-fuchsia-400/15 dark:text-fuchsia-200">{LIFE_LIBRARY.length} guides</span>
+        </div>
+        <p className="mt-2 max-w-2xl text-[11px] leading-relaxed text-neutral-500 dark:text-neutral-400">These short guides are original Panacea descriptions and exercises. They help you decide what to explore next; they do not replace the underlying books, research or professional advice.</p>
+
+        <div className="no-scrollbar -mx-1 mt-3 flex gap-1.5 overflow-x-auto px-1 pb-1">
+          {WEALTH_DOMAINS.map((domain) => (
+            <button key={domain} onClick={() => setWealthDomain(domain)} className={`shrink-0 rounded-full px-3 py-2 text-[10px] font-black transition ${wealthDomain === domain ? 'bg-neutral-950 text-white dark:bg-white dark:text-neutral-950' : 'bg-neutral-100 text-neutral-600 dark:bg-white/10 dark:text-neutral-300'}`}>
+              {domain}
+            </button>
+          ))}
+        </div>
+
+        <div className="no-scrollbar -mx-1 mt-3 flex snap-x gap-2.5 overflow-x-auto px-1 pb-2">
+          {wealthReadings.map((item) => <LifeGuideCard key={item.id} item={item} />)}
+        </div>
+      </section>
+
       <section className="kaca sticky top-2 z-10 rounded-3xl p-3">
+        <div className="mb-2 flex items-center justify-between gap-3">
+          <div>
+            <div className="text-[10px] font-black uppercase tracking-[.14em] text-neutral-500 dark:text-neutral-400">Books & films</div>
+            <div className="text-[13px] font-black text-neutral-950 dark:text-white">Search the larger work-summary shelf</div>
+          </div>
+          <span className="text-[9px] font-black text-neutral-400">{KARYA.length} works</span>
+        </div>
         <input
           value={q}
           onChange={(e) => { setQ(e.target.value); setBatas(20) }}
@@ -131,15 +171,12 @@ export function RingkasanKarya() {
         {hasil.slice(0, batas).map((k) => <Kartu key={k.id} k={k} />)}
       </div>
 
-      {/* DIMUAT BERTAHAP. Seratus tiga puluh paragraf sekaligus membuat halaman
-          ini setinggi tiga puluh layar dan berat digulir pada telepon lama;
-          yang dicari orang biasanya ada di dua puluh pertama sesudah menyaring. */}
       {hasil.length > batas && (
         <button
           onClick={() => setBatas((b) => b + 20)}
           className="t-kecil min-h-[44px] w-full rounded-2xl border border-neutral-200 font-bold text-brand dark:border-white/12"
         >
-          Tampilkan {Math.min(20, hasil.length - batas)} lagi
+          Show {Math.min(20, hasil.length - batas)} more
         </button>
       )}
 
