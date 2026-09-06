@@ -15,6 +15,12 @@ on:
 permissions:
   contents: read
 
+# Only the newest main commit should reach production. In normal development a
+# single feature is often committed as several small files within a short burst.
+# Without a settling window each completed intermediate run consumes one Vercel
+# deployment and can exhaust the free daily deployment quota even though only
+# the final commit matters. cancel-in-progress + the short coalescing delay means
+# a newer push cancels the older run before it uploads anything to Vercel.
 concurrency:
   group: vercel-production
   cancel-in-progress: true
@@ -28,6 +34,10 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+
+      - name: Coalesce rapid main pushes
+        if: github.event_name == 'push'
+        run: sleep 90
 
       - name: Setup Node
         uses: actions/setup-node@v4
