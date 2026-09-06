@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Body3D, CT_WINDOWS, type AnatomyLayer, type MotionState } from '../Body3D'
-import { IconActivity, IconHeart, IconRun, IconShield, IconSparkle, IconTimer } from '../icons'
+import { IconActivity, IconHeart, IconShield, IconSparkle } from '../icons'
 import { buildWorkout4DReplay, formatWorkoutClock, frameAt, type Workout4DProvenance } from '../../lib/workout4d'
 import type { ImportedWorkout } from '../../lib/workoutImport'
 
@@ -182,6 +182,13 @@ export function InsideWorkout4D({ workouts, hrMax }: Props) {
 
   if (!workout || !replay || !frame) return null
 
+  // Snapshot the narrowed values for asynchronous event handlers. TypeScript
+  // correctly refuses to assume React state-derived values remain non-null
+  // inside a later callback unless we capture them here.
+  const activeWorkout = workout
+  const activeReplay = replay
+  const activeFrame = frame
+
   const focus = focusKeywords(frame.focus, frame.muscleKeywords)
   const motion: MotionState = {
     heartRate: Math.round(frame.heartRate.value),
@@ -199,13 +206,13 @@ export function InsideWorkout4D({ workouts, hrMax }: Props) {
   ] as const
 
   async function shareStory() {
-    const blob = await storyPoster(workout, frame.heartRate.value, replay.duration, replay.hasMeasuredHr)
+    const blob = await storyPoster(activeWorkout, activeFrame.heartRate.value, activeReplay.duration, activeReplay.hasMeasuredHr)
     if (!blob) {
       setShareStatus('Story export unavailable on this browser')
       return
     }
     const file = new File([blob], 'panacea-inside-my-workout.png', { type: 'image/png' })
-    const text = `Inside my ${workout.nama}: a 4D physiology replay made with PanaceaMed. Measured signals stay separate from derived and educational physiology.`
+    const text = `Inside my ${activeWorkout.nama}: a 4D physiology replay made with PanaceaMed. Measured signals stay separate from derived and educational physiology.`
     try {
       if (navigator.share && navigator.canShare?.({ files: [file] })) {
         await navigator.share({ title: 'Inside My Workout · PanaceaMed', text, files: [file] })
