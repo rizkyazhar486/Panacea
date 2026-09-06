@@ -24,6 +24,8 @@ import { drugsForCondition } from '../../lib/drugTargets'
 interface Props {
   /** Membuka berkas klinis lengkap satu organ di Body Explorer. */
   onBukaOrgan?: (organKey: string) => void
+  /** Keadaan yang langsung dibuka — dipakai saat datang dari pencarian atlas. */
+  awal?: string | null
 }
 
 const KATEGORI: Array<{ key: CardioCondition['kategori'] | 'all'; label: string }> = [
@@ -87,9 +89,9 @@ function Daftar({ judul, isi }: { judul: string; isi: string[] }) {
   )
 }
 
-export function CardioLab({ onBukaOrgan }: Props) {
+export function CardioLab({ onBukaOrgan, awal = null }: Props) {
   const [kategori, setKategori] = useState<CardioCondition['kategori'] | 'all'>('all')
-  const [kondisiId, setKondisiId] = useState<string | null>(null)
+  const [kondisiId, setKondisiId] = useState<string | null>(awal)
   const [jalurId, setJalurId] = useState<string | null>('systemic')
   const [hr, setHr] = useState(72)
   const [wilayah, setWilayah] = useState<string | null>(null)

@@ -12,7 +12,7 @@
     "start": "tsx src/index.ts",
     "build": "tsc -p tsconfig.json",
     "typecheck": "tsc -p tsconfig.json --noEmit",
-    "uji": "tsx uji/aturanNotif.uji.ts && tsx uji/motionWave.uji.ts && tsx uji/cardioFlow.uji.ts && tsx uji/specialtyPathology.uji.ts && tsx uji/drugTargets.uji.ts"
+    "uji": "tsx uji/aturanNotif.uji.ts && tsx uji/motionWave.uji.ts && tsx uji/cardioFlow.uji.ts && tsx uji/specialtyPathology.uji.ts && tsx uji/drugTargets.uji.ts && tsx uji/atlasSearch.uji.ts"
   },
   "dependencies": {
     "cookie-parser": "^1.4.7",
