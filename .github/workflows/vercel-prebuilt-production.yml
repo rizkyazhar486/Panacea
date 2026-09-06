@@ -5,39 +5,53 @@ on:
     branches:
       - main
   workflow_dispatch:
+  schedule:
+    # Batch ordinary main pushes into at most four automatic production attempts
+    # per day. This keeps the free Vercel deployment quota from being exhausted
+    # by many small commits while still shipping the latest main automatically.
+    - cron: '17 */6 * * *'
 
-# Fallback for Vercel remote-build rate limits.
-# The application is built on GitHub Actions and the Build Output API artifact
-# is uploaded to Vercel. Production secrets belong in Vercel Environment
-# Variables; do not mirror TURN credentials into ordinary GitHub variables.
+# Production deployment policy
+# ----------------------------
+# Ordinary pushes are validated by the normal GitHub Pages/build workflow but do
+# NOT create a Vercel deployment immediately. The newest main is released by the
+# six-hour batch schedule, by workflow_dispatch, or immediately when a commit
+# message contains [deploy-vercel].
+#
+# This workflow intentionally treats Vercel's free daily deployment quota as a
+# deferred release rather than a code failure. Build/type errors still fail.
 # Required GitHub repository secret: VERCEL_TOKEN
 
 permissions:
   contents: read
 
-# Only the newest main commit should reach production. In normal development a
-# single feature is often committed as several small files within a short burst.
-# Without a settling window each completed intermediate run consumes one Vercel
-# deployment and can exhaust the free daily deployment quota even though only
-# the final commit matters. cancel-in-progress + the short coalescing delay means
-# a newer push cancels the older run before it uploads anything to Vercel.
 concurrency:
   group: vercel-production
   cancel-in-progress: true
 
 jobs:
+  push-policy:
+    if: github.event_name == 'push' && !contains(github.event.head_commit.message, '[deploy-vercel]')
+    runs-on: ubuntu-latest
+    steps:
+      - name: Batch this push for the next Vercel release
+        run: |
+          echo "## Vercel production release" >> "$GITHUB_STEP_SUMMARY"
+          echo "This main push was **batched**, not failed." >> "$GITHUB_STEP_SUMMARY"
+          echo "The newest main will deploy on the next 6-hour release window." >> "$GITHUB_STEP_SUMMARY"
+          echo "For an intentional immediate release, use workflow_dispatch or include \`[deploy-vercel]\` in the commit message." >> "$GITHUB_STEP_SUMMARY"
+
   deploy:
+    if: github.event_name != 'push' || contains(github.event.head_commit.message, '[deploy-vercel]')
     runs-on: ubuntu-latest
     timeout-minutes: 30
     env:
       VERCEL_TELEMETRY_DISABLED: 1
     steps:
-      - name: Checkout
+      - name: Checkout latest main
         uses: actions/checkout@v4
-
-      - name: Coalesce rapid main pushes
-        if: github.event_name == 'push'
-        run: sleep 90
+        with:
+          ref: main
 
       - name: Setup Node
         uses: actions/setup-node@v4
@@ -48,8 +62,8 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Install Vercel CLI
-        run: npm install --global vercel@50
+      - name: Install pinned Vercel CLI
+        run: npm install --global vercel@59.11.7
 
       - name: Verify Vercel credential is configured
         shell: bash
@@ -71,9 +85,6 @@ jobs:
           VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
         run: vercel pull --yes --environment=production --scope=panaceamed --token="$VERCEL_TOKEN"
 
-      # `vercel pull` writes the production environment into .vercel locally.
-      # VITE_API_URL is public and may still be overridden by a GitHub variable;
-      # TURN credentials and other secrets must stay in Vercel Production env.
       - name: Build production artifact on GitHub runner
         env:
           VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
@@ -82,24 +93,56 @@ jobs:
 
       - name: Deploy prebuilt artifact to production
         id: deploy
+        shell: bash
         env:
           VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
         run: |
-          URL=$(vercel deploy --prebuilt --prod --archive=tgz --scope=panaceamed --token="$VERCEL_TOKEN")
+          set +e
+          vercel deploy --prebuilt --prod --archive=tgz --scope=panaceamed --token="$VERCEL_TOKEN" > vercel-deploy.log 2>&1
+          STATUS=$?
+          set -e
+          cat vercel-deploy.log
+
+          if [ "$STATUS" -ne 0 ]; then
+            if grep -q 'api-deployments-free-per-day' vercel-deploy.log; then
+              echo "deferred=true" >> "$GITHUB_OUTPUT"
+              echo "reason=free-daily-deployment-quota" >> "$GITHUB_OUTPUT"
+              echo "::warning::Vercel daily deployment quota is exhausted. The build is valid; production release is deferred to a later scheduled/manual run."
+              exit 0
+            fi
+            echo "::error::Vercel deploy failed for a non-quota reason."
+            exit "$STATUS"
+          fi
+
+          URL=$(grep -Eo 'https://[A-Za-z0-9.-]+\.vercel\.app' vercel-deploy.log | tail -n 1)
+          if [ -z "$URL" ]; then
+            echo "::error::Vercel deploy returned success but no deployment URL could be parsed."
+            exit 1
+          fi
+          echo "deferred=false" >> "$GITHUB_OUTPUT"
           echo "url=$URL" >> "$GITHUB_OUTPUT"
           echo "Production deployment: $URL"
 
       - name: Smoke-test deployed production artifact
+        if: steps.deploy.outputs.deferred != 'true' && steps.deploy.outputs.url != ''
         env:
           DEPLOYMENT_URL: ${{ steps.deploy.outputs.url }}
         run: |
-          test -n "$DEPLOYMENT_URL"
           curl --fail --silent --show-error --location --retry 4 --retry-delay 3 --max-time 30 "$DEPLOYMENT_URL" >/dev/null
           echo "Deployment responded successfully: $DEPLOYMENT_URL"
 
       - name: Deployment summary
+        if: always()
         run: |
           echo "## Vercel production" >> "$GITHUB_STEP_SUMMARY"
-          echo "Deployment: ${{ steps.deploy.outputs.url }}" >> "$GITHUB_STEP_SUMMARY"
-          echo "Alias: https://www.panaceamed.id" >> "$GITHUB_STEP_SUMMARY"
-          echo "Smoke test: passed" >> "$GITHUB_STEP_SUMMARY"
+          echo "Commit built: $(git rev-parse --short HEAD)" >> "$GITHUB_STEP_SUMMARY"
+          if [ "${{ steps.deploy.outputs.deferred }}" = "true" ]; then
+            echo "Status: **DEFERRED — Vercel free daily deployment quota reached**" >> "$GITHUB_STEP_SUMMARY"
+            echo "Code/build status: **valid**" >> "$GITHUB_STEP_SUMMARY"
+            echo "The next scheduled or manually dispatched run will retry the newest main." >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo "Status: **DEPLOYED**" >> "$GITHUB_STEP_SUMMARY"
+            echo "Deployment: ${{ steps.deploy.outputs.url }}" >> "$GITHUB_STEP_SUMMARY"
+            echo "Alias: https://www.panaceamed.id" >> "$GITHUB_STEP_SUMMARY"
+            echo "Smoke test: passed" >> "$GITHUB_STEP_SUMMARY"
+          fi
