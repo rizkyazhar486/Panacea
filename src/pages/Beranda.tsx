@@ -6,6 +6,7 @@ import { KisiFitur } from '../components/KisiFitur'
 import { CatatanHarian } from '../components/CatatanHarian'
 import { CatatanLatihan } from '../components/CatatanLatihan'
 import { HomeFeatureUniverse } from '../components/dashboard/HomeFeatureUniverse'
+import { PanaceaGrowthRail } from '../components/dashboard/PanaceaGrowthWidgets'
 import { pratinjauBeranda } from '../lib/pratinjauBeranda'
 import { getVitals } from '../lib/healthVitals'
 import { getWorkouts } from '../lib/workoutStore'
@@ -153,6 +154,8 @@ export default function Beranda() {
           ))}
         </div>
       </section>
+
+      <PanaceaGrowthRail />
 
       <section className="rounded-[28px] border border-neutral-200 bg-white p-4 shadow-[0_12px_35px_rgba(25,45,55,.06)] dark:border-white/10 dark:bg-white/[.035] sm:p-5">
         <div className="mb-3 flex items-center justify-between gap-3">
