@@ -3,6 +3,7 @@ import { MedicalEvidenceExplorer } from '../MedicalEvidenceExplorer'
 export type BodyEvidenceMode =
   | 'digital-twin'
   | 'realistic-atlas'
+  | 'physiology'
   | 'cell-genome'
   | 'workout-4d'
   | 'surgery'
@@ -15,6 +16,11 @@ const QUERY: Record<BodyEvidenceMode, { term: string; title: string; subtitle: s
     term: 'human anatomy heart lung vasculature',
     title: 'Atlas references',
     subtitle: 'Terminology and anatomy evidence are pulled live from EMBL-EBI OLS and Europe PMC.',
+  },
+  physiology: {
+    term: 'human physiology cardiovascular respiratory renal gastrointestinal thermoregulation',
+    title: 'Whole-body physiology references',
+    subtitle: 'Live literature sits beside the 4D physiology model so educational motion and published evidence remain separate.',
   },
   'digital-twin': {
     term: 'human tissue cell atlas organ cell type',
