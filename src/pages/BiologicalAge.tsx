@@ -4,6 +4,7 @@ import { Card, SectionTitle, Field, inputClass, Badge } from '../components/ui'
 import { IconHeart, IconActivity, IconChartUp } from '../components/icons'
 import { getHealthCache, getDemo, pushBiometrics } from '../lib/profile'
 import { getVitals } from '../lib/healthVitals'
+import { LongevityPanel } from '../components/LongevityPanel'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Biological & Metabolic Age — estimates how old your body "acts" versus your
@@ -261,6 +262,8 @@ export function BiologicalAge() {
           </div>
         </Card>
       )}
+
+      <LongevityPanel age={d.age} sex={d.sex} restingHr={d.rhr} waistCm={d.waist} systolic={d.sbp} />
 
       <div className="rounded-2xl border border-neutral-100 bg-white p-4 text-center text-[11px] leading-relaxed text-neutral-500 dark:border-white/10 dark:bg-white/5">
         Educational estimate from transparent, published-evidence-direction formulas (Mifflin-St Jeor, VO₂max mortality data, standard risk markers) — <b>not</b> a validated clinical biological-age clock or a diagnosis. Data stays on your device. For a true epigenetic age, use a laboratory DNA-methylation test.
