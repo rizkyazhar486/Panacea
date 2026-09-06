@@ -1,5 +1,6 @@
 import { useMemo } from 'react'
 import { InsideWorkout4D } from './InsideWorkout4D'
+import { WorkoutDNA } from './WorkoutDNA'
 import { getWorkouts } from '../../lib/workoutStore'
 import { getDemo } from '../../lib/profile'
 import { hrMaxFromAge } from '../../lib/workoutImport'
@@ -26,5 +27,10 @@ export function Workout4DLab() {
     )
   }
 
-  return <InsideWorkout4D workouts={workouts} hrMax={hrMax} />
+  return (
+    <div className="space-y-4">
+      <InsideWorkout4D workouts={workouts} hrMax={hrMax} />
+      <WorkoutDNA workouts={workouts} hrMax={hrMax} />
+    </div>
+  )
 }

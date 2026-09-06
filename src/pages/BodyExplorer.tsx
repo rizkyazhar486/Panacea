@@ -18,7 +18,7 @@ const Workout4DLab = lazy(() =>
 )
 
 const SurgicalOperationAtlas = lazy(() =>
-  import('../components/digital-twin/SurgicalOperationAtlas').then((m) => ({ default: m.SurgicalOperationAtlas })),
+  import('../components/digital-twin/SurgicalOperationAtlasV2').then((m) => ({ default: m.SurgicalOperationAtlasV2 })),
 )
 
 type LabMode = 'digital-twin' | 'realistic-atlas' | 'workout-4d' | 'surgery' | 'counterfactual' | 'regeneration'
@@ -27,7 +27,7 @@ const MODES: Array<{ key: LabMode; label: string; active: string }> = [
   { key: 'digital-twin', label: 'Digital Twin', active: 'border-brand bg-brand text-white' },
   { key: 'realistic-atlas', label: 'Realistic Atlas', active: 'border-cyan-500 bg-cyan-500 text-white' },
   { key: 'workout-4d', label: 'Inside Workout 4D', active: 'border-emerald-500 bg-emerald-500 text-white' },
-  { key: 'surgery', label: 'Surgical Atlas', active: 'border-amber-400 bg-amber-400 text-neutral-950' },
+  { key: 'surgery', label: 'Operation Universe', active: 'border-amber-400 bg-amber-400 text-neutral-950' },
   { key: 'counterfactual', label: 'Counterfactual Lab', active: 'border-sky-500 bg-sky-500 text-white' },
   { key: 'regeneration', label: 'Regeneration Lab', active: 'border-violet-500 bg-violet-500 text-white' },
 ]
@@ -45,7 +45,7 @@ export function BodyExplorer() {
         <div className="flex flex-wrap items-start justify-between gap-3">
           <div className="min-w-0">
             <div className="text-sm font-black text-ink dark:text-white">PanaceaMed Human Biology Engine</div>
-            <div className="mt-0.5 max-w-3xl text-[11px] text-neutral-500">Reference anatomy, 4D workout replay, surgical education, executable counterfactual biology and multi-scale research — kept separate from patient-specific claims unless real validated data exist.</div>
+            <div className="mt-0.5 max-w-3xl text-[11px] text-neutral-500">Reference anatomy, 4D workout replay + Workout DNA, a scalable surgical Operation Universe, executable counterfactual biology and multi-scale research — kept separate from patient-specific claims unless real validated data exist.</div>
           </div>
           <div className="rounded-full border border-emerald-500/15 bg-emerald-500/[.06] px-3 py-1.5 text-[9px] font-black uppercase tracking-wide text-emerald-700 dark:text-emerald-300">Executable human biology</div>
         </div>
@@ -73,7 +73,7 @@ export function BodyExplorer() {
           <Workout4DLab />
         </Suspense>
       ) : mode === 'surgery' ? (
-        <Suspense fallback={<LoadingLab label="Surgical Operation Atlas" />}>
+        <Suspense fallback={<LoadingLab label="Operation Universe" />}>
           <SurgicalOperationAtlas />
         </Suspense>
       ) : mode === 'counterfactual' ? (
