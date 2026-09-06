@@ -77,19 +77,19 @@ export default function SemuaFitur() {
         <div className="relative max-w-3xl">
           <div className="text-[10px] font-black uppercase tracking-[.2em] text-emerald-300">Panacea product browser</div>
           <h1 className="mt-2 text-[clamp(2rem,5vw,4rem)] font-black leading-[.96] tracking-[-.045em]">Find what you need. Ignore the rest.</h1>
-          <p className="mt-3 max-w-2xl text-sm leading-relaxed text-white/60">
+          <p className="mt-3 max-w-2xl text-sm leading-relaxed text-white/75">
             {tersedia.length} available tools across life, movement, body, learning, prevention, services and medicine. Search by what you want to do—not by technical feature name.
           </p>
 
-          <div className="mt-5 flex items-center gap-3 rounded-[22px] border border-white/12 bg-white/[.07] px-4 backdrop-blur-xl">
-            <span aria-hidden className="text-lg text-white/40">⌕</span>
+          <div className="mt-5 flex items-center gap-3 rounded-[22px] border border-white/15 bg-white/[.10] px-4 backdrop-blur-xl">
+            <span aria-hidden className="text-lg text-white/65">⌕</span>
             <input
               value={q}
               onChange={(e) => setQ(e.target.value)}
               placeholder="Try: sleep, running, money, focus, heart, cancer, prayer…"
-              className="min-h-[52px] w-full bg-transparent text-sm font-semibold text-white outline-none placeholder:text-white/35"
+              className="min-h-[52px] w-full bg-transparent text-sm font-semibold text-white outline-none placeholder:text-white/55"
             />
-            {q && <button onClick={() => setQ('')} className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-white/10 text-white/60" aria-label="Clear search">×</button>}
+            {q && <button onClick={() => setQ('')} className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-white/15 text-white/80" aria-label="Clear search">×</button>}
           </div>
         </div>
       </section>
@@ -97,10 +97,10 @@ export default function SemuaFitur() {
       <section>
         <div className="mb-2 flex items-center justify-between gap-3 px-1">
           <div>
-            <div className="text-[10px] font-black uppercase tracking-[.16em] text-neutral-400">Browse by area</div>
+            <div className="text-[10px] font-black uppercase tracking-[.16em] text-neutral-500 dark:text-neutral-400">Browse by area</div>
             <div className="mt-0.5 text-sm font-black text-ink dark:text-white">Swipe the categories</div>
           </div>
-          {kategori && <button onClick={() => setKategori(null)} className="rounded-full border border-black/[.06] bg-white/70 px-3 py-2 text-[10px] font-black text-brand-dark dark:border-white/10 dark:bg-white/[.05] dark:text-emerald-300">Show all</button>}
+          {kategori && <button onClick={() => setKategori(null)} className="rounded-full border border-neutral-200 bg-white/95 px-3 py-2 text-[10px] font-black text-brand-dark shadow-sm dark:border-white/10 dark:bg-[#111315] dark:text-emerald-300">Show all</button>}
         </div>
         <div className="no-scrollbar -mx-1 flex snap-x gap-2 overflow-x-auto px-1 pb-2 pt-1">
           {daftarKategori.map(([nama, count]) => {
@@ -110,9 +110,9 @@ export default function SemuaFitur() {
               <button
                 key={nama}
                 onClick={() => setKategori(active ? null : nama)}
-                className={`shrink-0 snap-start rounded-full border px-4 py-2.5 text-[11px] font-black transition ${active ? `${visual.bg} ${visual.teks} border-transparent shadow-sm` : 'border-black/[.06] bg-white/70 text-neutral-600 dark:border-white/10 dark:bg-white/[.045] dark:text-neutral-300'}`}
+                className={`shrink-0 snap-start rounded-full border px-4 py-2.5 text-[11px] font-black transition ${active ? `${visual.bg} ${visual.teks} border-transparent shadow-sm` : 'border-neutral-200 bg-white/95 text-neutral-800 shadow-sm dark:border-white/10 dark:bg-[#111315] dark:text-neutral-200'}`}
               >
-                <span aria-hidden>{visual.emoji}</span> {visual.label} <span className="opacity-50">{count}</span>
+                <span aria-hidden>{visual.emoji}</span> {visual.label} <span className="opacity-60">{count}</span>
               </button>
             )
           })}
@@ -121,10 +121,10 @@ export default function SemuaFitur() {
 
       <div className="flex items-end justify-between gap-3 px-1">
         <div>
-          <div className="text-[10px] font-black uppercase tracking-[.16em] text-neutral-400">Results</div>
+          <div className="text-[10px] font-black uppercase tracking-[.16em] text-neutral-500 dark:text-neutral-400">Results</div>
           <h2 className="mt-1 text-xl font-black tracking-[-.025em] text-ink dark:text-white">{hasil.length} useful destinations</h2>
         </div>
-        {(q || kategori) && <div className="text-right text-[10px] text-neutral-400">Filtered from {tersedia.length}</div>}
+        {(q || kategori) && <div className="text-right text-[10px] font-semibold text-neutral-600 dark:text-neutral-300">Filtered from {tersedia.length}</div>}
       </div>
 
       {grup.map(([nama, isi]) => {
@@ -137,7 +137,7 @@ export default function SemuaFitur() {
                 <span aria-hidden>{visual.emoji}</span>
                 {visual.label}
               </h3>
-              <span className="text-[10px] font-bold text-neutral-400">{isi.length}</span>
+              <span className="text-[10px] font-bold text-neutral-600 dark:text-neutral-300">{isi.length}</span>
             </div>
 
             <div className="grid gap-2.5 sm:grid-cols-2 xl:grid-cols-3">
@@ -147,16 +147,16 @@ export default function SemuaFitur() {
                   <Link
                     key={n.to}
                     to={n.to}
-                    className="group relative min-h-[132px] overflow-hidden rounded-[26px] border border-black/[.055] bg-white/75 p-4 shadow-[0_12px_36px_rgba(20,35,45,.055)] backdrop-blur-xl transition duration-300 hover:-translate-y-1 hover:border-black/[.09] hover:shadow-[0_20px_52px_rgba(20,55,50,.11)] dark:border-white/10 dark:bg-white/[.045]"
+                    className="panacea-readable-card group relative min-h-[132px] overflow-hidden rounded-[26px] border p-4 shadow-[0_12px_36px_rgba(20,35,45,.07)] transition duration-300 hover:-translate-y-1 hover:shadow-[0_20px_52px_rgba(20,55,50,.12)]"
                   >
-                    <div className={`pointer-events-none absolute -right-12 -top-12 h-36 w-36 rounded-full opacity-40 blur-3xl ${visual.bg}`} aria-hidden />
+                    <div className={`pointer-events-none absolute -right-12 -top-12 h-36 w-36 rounded-full opacity-25 blur-3xl ${visual.bg}`} aria-hidden />
                     <div className="relative flex h-full flex-col">
                       <div className="flex items-start justify-between gap-3">
                         <span aria-hidden className={`grid h-10 w-10 shrink-0 place-items-center rounded-2xl text-lg shadow-[inset_0_1px_rgba(255,255,255,.7)] ${visual.bg}`}>{visual.emoji}</span>
-                        <span aria-hidden className="text-lg text-neutral-300 transition group-hover:translate-x-1 group-hover:text-brand dark:text-white/25">→</span>
+                        <span aria-hidden className="text-lg text-neutral-500 transition group-hover:translate-x-1 group-hover:text-brand dark:text-neutral-400">→</span>
                       </div>
-                      <div className="mt-3 text-[14px] font-black leading-tight tracking-[-.015em] text-ink dark:text-white">{n.label}</div>
-                      {apa && <p className="mt-1 line-clamp-3 text-[11px] leading-relaxed text-neutral-500 dark:text-neutral-400">{apa}</p>}
+                      <div className="mt-3 text-[14px] font-black leading-tight tracking-[-.015em] text-neutral-950 dark:text-white">{n.label}</div>
+                      {apa && <p className="mt-1 line-clamp-3 text-[11px] font-medium leading-relaxed text-neutral-700 dark:text-neutral-300">{apa}</p>}
                       <div className={`mt-auto pt-3 text-[9px] font-black uppercase tracking-[.12em] ${visual.teks}`}>Open</div>
                     </div>
                   </Link>
@@ -168,10 +168,10 @@ export default function SemuaFitur() {
       })}
 
       {hasil.length === 0 && (
-        <section className="rounded-[28px] border border-dashed border-neutral-300 bg-white/60 p-8 text-center dark:border-white/15 dark:bg-white/[.03]">
+        <section className="panacea-readable-card rounded-[28px] border border-dashed p-8 text-center">
           <div className="text-3xl" aria-hidden>⌕</div>
-          <div className="mt-3 text-base font-black text-ink dark:text-white">Nothing matches yet</div>
-          <p className="mt-1 text-sm text-neutral-500">Try a shorter phrase, or clear the category filter.</p>
+          <div className="mt-3 text-base font-black text-neutral-950 dark:text-white">Nothing matches yet</div>
+          <p className="mt-1 text-sm text-neutral-700 dark:text-neutral-300">Try a shorter phrase, or clear the category filter.</p>
           <button onClick={() => { setQ(''); setKategori(null) }} className="mt-4 rounded-full bg-brand px-4 py-2.5 text-xs font-black text-white">Reset browser</button>
         </section>
       )}
