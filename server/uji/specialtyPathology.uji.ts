@@ -31,6 +31,23 @@ for (const m of modul) {
   ok(`berkas ${m}.glb ada dan tidak kosong`, existsSync(berkas) && statSync(berkas).size > 10_000)
 }
 
+// ── Sumber geometri ─────────────────────────────────────────────────────────
+// Satu modul HARUS berasal dari satu rujukan tubuh saja. Mencampur dua ruang
+// koordinat dalam satu modul menempatkan organ di tempat yang salah tanpa satu
+// pun galat — figurnya tetap tampil rapi sambil berbohong.
+for (const m of modul) {
+  const sumber = new Set(partsForModule(m).map((p) => p.source))
+  ok(`modul ${m} memakai satu sumber geometri`, sumber.size === 1, [...sumber].join(', '))
+}
+ok('modul yang mengisi kekosongan benar-benar ada',
+  ['paru', 'tiroid', 'telinga', 'obgin'].every((m) => modul.includes(m) && partsForModule(m).length >= 5))
+ok('panggul perempuan memuat rahim, ovarium, dan tuba',
+  ['Uterus', 'Left ovary', 'Left uterine tube', 'Vagina'].every(
+    (n) => partsForModule('obgin').some((p) => p.name === n)))
+ok('telinga memuat ketiga tulang pendengaran dan koklea',
+  ['Left malleus', 'Left incus', 'Left stapes', 'Left cochlea'].every(
+    (n) => partsForModule('telinga').some((p) => p.name === n)))
+
 // ── Tautan ke struktur ──────────────────────────────────────────────────────
 const hilang = strukturSistemTakDikenal()
 ok('setiap struktur yang disebut patologi ada di modulnya', hilang.length === 0, hilang.join(' | '))

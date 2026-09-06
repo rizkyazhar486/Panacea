@@ -43,7 +43,13 @@ export function pusat(d) {
  * lengkungan pembuluh — arkus aorta melengkung, bukan memotong lurus.
  */
 export function garisTengah(d, jumlah = 8) {
+  // Mesh kosong atau berisi koordinat tak hingga muncul saat geometri disaring
+  // atau disederhanakan terlalu jauh. Tanpa penjagaan ini, indeks laci menjadi
+  // NaN dan seluruh pembangunan berhenti dengan galat yang tidak menyebut
+  // organ mana yang bermasalah.
+  if (!d.pos || d.pos.length < 3) return []
   const c = pusat(d)
+  if (!c.every(Number.isFinite)) return []
   const n = d.pos.length / 3
   // Kovarians 3x3.
   const cov = [0, 0, 0, 0, 0, 0, 0, 0, 0]
@@ -76,7 +82,9 @@ export function garisTengah(d, jumlah = 8) {
   const jml = new Array(jumlah).fill(0)
   const sum = Array.from({ length: jumlah }, () => [0, 0, 0])
   for (let i = 0, k = 0; i < d.pos.length; i += 3, k++) {
-    const b = Math.min(jumlah - 1, Math.max(0, Math.floor((t[k] - tMin) / lebar)))
+    const mentah = Math.floor((t[k] - tMin) / lebar)
+    if (!Number.isFinite(mentah)) continue
+    const b = Math.min(jumlah - 1, Math.max(0, mentah))
     sum[b][0] += d.pos[i]; sum[b][1] += d.pos[i + 1]; sum[b][2] += d.pos[i + 2]; jml[b]++
   }
   const garis = []

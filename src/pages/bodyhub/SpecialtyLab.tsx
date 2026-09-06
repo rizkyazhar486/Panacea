@@ -26,23 +26,47 @@ interface Props {
 
 /** Urutan tampil modul: mengikuti cara orang mencari, bukan abjad. */
 const URUTAN = [
-  'respirasi', 'gastro', 'nefrologi', 'endokrin', 'neurologi',
-  'tht', 'mata', 'ortopedi', 'urogenital', 'obstetri', 'imunologi', 'kulit',
+  'respirasi', 'paru', 'gastro', 'nefrologi', 'endokrin', 'tiroid', 'neurologi',
+  'tht', 'telinga', 'mata', 'ortopedi', 'urogenital', 'obstetri', 'obgin',
+  'imunologi', 'kulit',
 ] as const
 
+// Keterangan per modul, termasuk ASAL GEOMETRINYA. Empat modul terakhir tidak
+// berasal dari BodyParts3D versi human-atlas, dan itu dikatakan apa adanya —
+// pembaca berhak tahu rujukan tubuh siapa yang sedang ia lihat.
 const CATATAN_MODUL: Record<string, string> = {
   respirasi:
-    'BodyParts3D contains the airway tree, diaphragm and chest wall, but no lung parenchyma or pleura — ' +
-    'segmental disease is shown at the segmental bronchus that supplies it.',
+    'This module holds the airway tree, diaphragm and chest wall. For the lobes themselves and the pleura, open ' +
+    'the Lungs & pleura module.',
+  paru:
+    'Geometry from Z-Anatomy (CC BY-SA 4.0), the same source as the full-body figure — five lobes, the pleural ' +
+    'sac and the bronchial tree down to the lobar bronchi.',
   endokrin:
-    'The thyroid and parathyroid glands are absent from this reference dataset; thyroid disease is covered in ' +
-    'the clinical library rather than shown here.',
-  tht: 'The middle ear and cochlea are not in this module — they are in the full-body figure’s skeletal layer.',
+    'The thyroid and parathyroids have their own module (Thyroid & parathyroid), because their geometry comes ' +
+    'from a different reference body and the two spaces must not be mixed.',
+  tiroid: 'Geometry from Z-Anatomy (CC BY-SA 4.0): thyroid, all four parathyroids, laryngeal cartilages, trachea and oesophagus.',
+  tht: 'The nose, pharynx and larynx. The middle and inner ear are in their own module (Middle & inner ear).',
+  telinga:
+    'Geometry from Z-Anatomy (CC BY-SA 4.0): the three ossicles, tympanic membrane, cochlea, vestibule and the ' +
+    'cochlear, vestibular and chorda tympani nerves, inside the temporal bone.',
   obstetri:
-    'This reference anatomy is an adult male: the uterus, ovaries and vagina are not present. What is shown is ' +
-    'the bony pelvis, pelvic floor and pelvic vessels, which is where the obstetric mechanics actually happen.',
+    'This is the male reference pelvis — bone, pelvic floor and vessels, which is where obstetric mechanics happen. ' +
+    'For the female organs themselves, open the Female pelvis module.',
+  obgin:
+    'Geometry from the HuBMAP Human Reference Atlas female reference body (CC BY 4.0): uterus, ovaries, uterine ' +
+    'tubes, vagina, their ligaments, the bladder and the female bony pelvis.',
   imunologi: 'Bone marrow is shown at its major adult sites — femur, pelvis and sternum — since marrow itself has no separate mesh.',
   kulit: 'Skin is a single surface mesh; dermatological conditions are located by their pattern and distribution rather than by depth.',
+}
+
+// Sebutan sumber geometri, ditulis per SUMBER dan bukan disamakan untuk semua.
+// Modul paru, tiroid, telinga dan panggul perempuan bukan berasal dari
+// BodyParts3D, dan mencantumkan lisensi yang keliru pada karya orang lain
+// bukan sekadar kurang rapi — ia melanggar syarat pemakaiannya.
+const SUMBER: Record<string, string> = {
+  'bodyparts3d': 'BodyParts3D 4.0 (Database Center for Life Science, CC BY 4.0)',
+  'z-anatomy': 'Z-Anatomy (CC BY-SA 4.0), derived from BodyParts3D',
+  'hra-female': 'HuBMAP Human Reference Atlas, female reference body (CC BY 4.0)',
 }
 
 const NAMA_LESI: Record<string, string> = {
@@ -92,6 +116,7 @@ export function SpecialtyLab({ onBukaOrgan }: Props) {
   const daftar = useMemo(() => kondisiUntukModul(modul), [modul])
   const kondisi = kondisiId ? daftar.find((k) => k.id === kondisiId) ?? null : null
   const info = ATLAS_MODULE_INFO[modul]
+  const asal = partsForModule(modul)[0]?.source ?? 'bodyparts3d'
 
   const skdi = useMemo(() => {
     if (!kondisi) return []
@@ -142,8 +167,8 @@ export function SpecialtyLab({ onBukaOrgan }: Props) {
       />
 
       <p className="text-[10.5px] leading-relaxed text-neutral-400">
-        {info?.structures} named structures · {info?.kb} kB · BodyParts3D 4.0 (Database Center for Life Science,
-        CC BY 4.0). {CATATAN_MODUL[modul] ?? ''}
+        {info?.structures} named structures · {info?.kb} kB · {SUMBER[asal] ?? SUMBER['bodyparts3d']}.{' '}
+        {CATATAN_MODUL[modul] ?? ''}
       </p>
 
       {struktur && (
