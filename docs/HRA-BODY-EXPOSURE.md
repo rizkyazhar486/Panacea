@@ -18,6 +18,10 @@ Body Exposure keeps source anatomy, evidence, and simulation as separate layers.
 
 `HraSourceSearch` gives the Anatomy page an explicit multi-release structure search. A user can search labels or ontology IDs and see the source release, ontology identity, model name and whether an actual browser-loadable GLB exists.
 
+## Cell and DNA evidence-first rule
+
+Body → Cell and Cell → DNA now render the Human Protein Atlas + Ensembl evidence workspace first. The generated cell/chromatin/DNA scene is collapsed under an explicit `Educational structural model` control. The model is never presented as microscopy, sequencing output or patient evidence.
+
 ## Workout-specific anatomy
 
 `WorkoutHraWorkbench` reads an imported workout instead of fabricating activity. The recorded workout name is classified only to choose HRA anatomy queries; recorded duration, distance, heart rate and recovery remain measured workout fields. HRA structures are displayed as educational reference anatomy and are not described as measured muscle activation.
@@ -28,4 +32,4 @@ Body Exposure keeps source anatomy, evidence, and simulation as separate layers.
 
 ## Simulation boundary
 
-Exercise, Surgery, Practice, What-if, and Research show HRA reference anatomy first. Their model/simulation layers remain collapsed and explicitly separate from HRA source geometry. Exercise now maps a real imported workout to source anatomy; Surgery and Practice map the selected operation and phase. A generated scene is never presented as the authoritative anatomical source.
+Exercise, Surgery, Practice, What-if, and Research show HRA reference anatomy first. Their model/simulation layers remain collapsed and explicitly separate from HRA source geometry. Exercise maps a real imported workout to source anatomy; Surgery and Practice map the selected operation and phase. Cell/DNA modes also follow evidence-first presentation. A generated scene is never presented as the authoritative anatomical source.
