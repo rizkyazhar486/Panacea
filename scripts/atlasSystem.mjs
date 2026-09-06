@@ -197,6 +197,7 @@ const MODUL = {
 
 const Z = (n) => new URL(`../public/anatomy/${n}.glb`, import.meta.url).pathname
 const HRA = '/home/user/hubmapconsortium/ccf-3d-reference-object-library/VH_Female/v1.2/'
+const HRA_13 = '/home/user/hubmapconsortium/ccf-3d-reference-object-library/VH_Female/v1.3/'
 
 /**
  * Nama Z-Anatomy menjadi nama yang dibaca orang.
@@ -237,6 +238,21 @@ function rapikanZ(n) {
   return s.charAt(0).toUpperCase() + s.slice(1)
 }
 
+/**
+ * Nama HuBMAP HRA menjadi nama yang dibaca orang: "VH_F_meniscus_L" menjadi
+ * "Left meniscus". Awalan VH_F_ hanyalah penanda berkas rujukan, dan akhiran
+ * _L/_R adalah sisi — keduanya bukan bagian dari nama anatominya.
+ */
+function rapikanHra(n) {
+  let s = n.replace(/^VH_[FM]_/, '')
+  let sisi = ''
+  const m = s.match(/_(L|R)$/)
+  if (m) { sisi = m[1] === 'L' ? 'Left ' : 'Right '; s = s.slice(0, -2) }
+  s = s.replace(/^(left|right)_/i, (x) => { sisi = x.toLowerCase().startsWith('left') ? 'Left ' : 'Right '; return '' })
+  s = s.replace(/_/g, ' ').trim()
+  return (sisi + s).replace(/^(.)/, (c) => c.toUpperCase())
+}
+
 const MODUL_GLB = {
   paru: {
     label: 'Lungs & pleura',
@@ -267,6 +283,30 @@ const MODUL_GLB = {
       { berkas: Z('nervous'), pola: /^(Cochlear_nerve|Vestibular_nerve|Chorda_tympani)[lr]$/, kind: 'nerve' },
       { berkas: Z('nervous'), pola: /^Vestibulocochlear_nerve_\(VIII\)[lr]$/, kind: 'nerve', sel: 0.0005 },
       { berkas: Z('skeletal'), pola: /^Temporal_bone[lr]$/, kind: 'bone', sel: 0.002 },
+    ],
+  },
+  lutut: {
+    label: 'Knee joint',
+    asal: 'hra-female',
+    isi: [
+      { berkas: HRA + 'VH_F_Knee_L.glb', perMesh: true, kind: 'bone', sel: 0.0008 },
+      { berkas: HRA + 'VH_F_Ligaments_Knee_L.glb', perMesh: true, kind: 'connective', sel: 0.0008 },
+      { berkas: HRA + 'VH_F_Muscles_Knee_L.glb', perMesh: true, kind: 'muscle', sel: 0.0015 },
+    ],
+  },
+  payudara: {
+    label: 'Breast',
+    asal: 'hra-female',
+    isi: [
+      { berkas: HRA_13 + 'VH_F_mammary_gland_L.glb', perMesh: true, kind: 'gland', sel: 0.0025 },
+      { berkas: HRA_13 + 'VH_F_mammary_gland_R.glb', perMesh: true, kind: 'gland', sel: 0.0025 },
+    ],
+  },
+  'medula-spinalis': {
+    label: 'Spinal cord',
+    asal: 'hra-female',
+    isi: [
+      { berkas: HRA + 'VH_F_Spinal_Cord.glb', perMesh: true, kind: 'nerve', sel: 0.0009 },
     ],
   },
   obgin: {
@@ -347,6 +387,11 @@ for (const [id, m] of Object.entries(MODUL_GLB)) {
     if (bagian.pola) {
       mesh = await bacaOrganGlb(bagian.berkas, bagian.pola)
       mesh = mesh.map((x) => ({ ...x, nama: rapikanZ(x.nama) }))
+    } else if (bagian.perMesh) {
+      // Satu berkas berisi BANYAK struktur bernama (lutut, payudara, medula
+      // spinalis): tiap mesh berdiri sendiri sebagai struktur yang bisa
+      // disorot, bukan dilebur menjadi satu gumpalan.
+      mesh = (await bacaGlb(bagian.berkas)).map((x) => ({ ...x, nama: rapikanHra(x.nama) }))
     } else {
       // Satu berkas = satu organ (bentuk berkas HRA). Dibaca sebagai DAFTAR
       // MESH DATAR, bukan lewat pencocokan nama simpul: mencocokkan semua nama

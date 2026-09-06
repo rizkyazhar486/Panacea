@@ -63,5 +63,9 @@ export const ORGAN_FOCUS: OrganFocus[] = [
   // kelainan bawaan tulang dan kulit tidak punya tempat untuk ditampilkan.
   { key: 'skeleton', label: 'Skeleton', layer: 'skeletal', keywords: ['bone', 'vertebra', 'femur', 'humerus', 'tibia', 'rib', 'skull', 'pelvis', 'ilium', 'sternum'], searchTerms: ['bone disease', 'skeletal dysplasia'] },
   { key: 'skin', label: 'Skin', layer: 'surface', keywords: ['skin', 'region'], searchTerms: ['skin disease', 'genodermatosis'] },
+  // Payudara sebelumnya tidak punya sasaran sama sekali, padahal karsinoma
+  // payudara adalah salah satu penyakit terpenting yang ditangani dokter umum.
+  // Kata kuncinya menunjuk region mammaria pada lapisan permukaan figur.
+  { key: 'breast', label: 'Breast', layer: 'surface', keywords: ['mammary region', 'inframammary', 'nipple', 'areola'], searchTerms: ['breast disease', 'breast neoplasm'] },
   { key: 'peripheral-nerves', label: 'Peripheral nerves', layer: 'nervous', keywords: ['nerve', 'plexus', 'ganglion'], searchTerms: ['peripheral nervous system disease', 'neuropathy'] },
 ]
