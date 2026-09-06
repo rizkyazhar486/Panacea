@@ -8,6 +8,9 @@ const RegenerationResearchSandbox = lazy(() =>
 const RealisticAnatomyAtlas = lazy(() =>
   import('../components/digital-twin/RealisticAnatomyAtlas').then((m) => ({ default: m.RealisticAnatomyAtlas })),
 )
+const CellGenomeExplorer = lazy(() =>
+  import('../components/digital-twin/CellGenomeExplorer').then((m) => ({ default: m.CellGenomeExplorer })),
+)
 const CounterfactualBiologyLab = lazy(() =>
   import('../components/digital-twin/CounterfactualBiologyLab').then((m) => ({ default: m.CounterfactualBiologyLab })),
 )
@@ -21,7 +24,7 @@ const SurgicalRehearsalLab = lazy(() =>
   import('../components/digital-twin/SurgicalRehearsalLab').then((m) => ({ default: m.SurgicalRehearsalLab })),
 )
 
-type LabMode = 'digital-twin' | 'realistic-atlas' | 'workout-4d' | 'surgery' | 'surgery-rehearsal' | 'counterfactual' | 'regeneration'
+type LabMode = 'digital-twin' | 'realistic-atlas' | 'cell-genome' | 'workout-4d' | 'surgery' | 'surgery-rehearsal' | 'counterfactual' | 'regeneration'
 
 type Mode = {
   key: LabMode
@@ -33,6 +36,7 @@ type Mode = {
 const PRIMARY: Mode[] = [
   { key: 'realistic-atlas', label: 'Anatomy', hint: 'Rotate, zoom and tap structures', active: 'bg-cyan-500 text-white border-cyan-500' },
   { key: 'digital-twin', label: 'Body → Cell', hint: 'Organ, tissue, cell and pathway', active: 'bg-emerald-500 text-white border-emerald-500' },
+  { key: 'cell-genome', label: 'Cell → DNA', hint: 'Cell, nucleus, chromatin, DNA and sequencing evidence', active: 'bg-violet-500 text-white border-violet-500' },
   { key: 'workout-4d', label: 'Exercise', hint: 'See what changes during movement', active: 'bg-lime-400 text-neutral-950 border-lime-400' },
   { key: 'surgery', label: 'Surgery', hint: 'Anatomy and procedural sequence', active: 'bg-amber-400 text-neutral-950 border-amber-400' },
 ]
@@ -75,7 +79,7 @@ export function BodyExplorer() {
       <section className="sticky top-0 z-40 overflow-hidden rounded-2xl border border-neutral-200 bg-white/95 p-3 shadow-sm backdrop-blur-xl dark:border-white/10 dark:bg-[#071017]/95">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div>
-            <div className="text-sm font-black text-ink dark:text-white">Body Atlas</div>
+            <div className="text-sm font-black text-ink dark:text-white">Body Exposure · Atlas</div>
             <div className="mt-0.5 text-[10px] text-neutral-500">{active.hint}</div>
           </div>
           <div className="text-[9px] font-bold text-neutral-400">Drag to rotate · pinch/scroll to zoom · tap a structure</div>
@@ -114,6 +118,10 @@ export function BodyExplorer() {
       ) : mode === 'realistic-atlas' ? (
         <Suspense fallback={<LoadingLab label="anatomy" />}>
           <RealisticAnatomyAtlas />
+        </Suspense>
+      ) : mode === 'cell-genome' ? (
+        <Suspense fallback={<LoadingLab label="cell-to-genome explorer" />}>
+          <CellGenomeExplorer />
         </Suspense>
       ) : mode === 'workout-4d' ? (
         <Suspense fallback={<LoadingLab label="exercise view" />}>
