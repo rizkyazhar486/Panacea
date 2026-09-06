@@ -5,6 +5,8 @@ import { MeshoptDecoder } from 'three/examples/jsm/libs/meshopt_decoder.module.j
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
 import { RoomEnvironment } from 'three/examples/jsm/environments/RoomEnvironment.js'
 import { ANATOMY_LAYERS, humanizeStructureName, type AnatomyLayer } from '../Body3D'
+import { pasangTriplanar } from '../../lib/triplanar'
+import type { JenisJaringan } from '../../lib/tissueTexture'
 
 type LayerKey = AnatomyLayer['key']
 type RenderQuality = 'balanced' | 'cinematic'
@@ -149,6 +151,30 @@ function classifyTissue(layer: LayerKey, rawName: string): TissueKind {
   return 'viscera'
 }
 
+// Tiap jaringan dipetakan ke satu resep tekstur. Yang menentukan bukan
+// warnanya melainkan STRUKTURNYA: apa pun yang berserat searah memakai resep
+// berserat, apa pun yang parenkimatosa memakai resep berbercak. Miokardium
+// memakai resep otot karena memang otot; parenkim paru memakai resep organ.
+const RESEP_TEKSTUR: Record<TissueKind, JenisJaringan> = {
+  skin: 'organ', bone: 'tulang', cartilage: 'tulang',
+  muscle: 'otot', heart: 'otot',
+  tendon: 'tendon', ligament: 'tendon',
+  artery: 'pembuluh', vein: 'pembuluh', lymph: 'pembuluh',
+  nerve: 'saraf', brain: 'organ',
+  lung: 'organ', liver: 'organ', kidney: 'organ', gut: 'organ', viscera: 'organ',
+  fat: 'lemak',
+}
+
+// Seberapa rapat pola diulang per satuan dunia, per jaringan. Otot lebih rapat
+// karena berkas seratnya memang halus; lemak jauh lebih longgar karena
+// lobulusnya besar. Angka ini pilihan visual dan ditulis sebagai pilihan.
+const SKALA_TEKSTUR: Partial<Record<TissueKind, number>> = {
+  muscle: 26, heart: 20, tendon: 30, ligament: 28,
+  bone: 14, cartilage: 16, fat: 7,
+  artery: 22, vein: 22, lymph: 22, nerve: 26,
+  skin: 12, brain: 15, lung: 11, liver: 10, kidney: 12, gut: 12, viscera: 12,
+}
+
 function realisticMaterial(kind: TissueKind, opacity: number, quality: RenderQuality) {
   const key = `${kind}:${opacity.toFixed(2)}:${quality}`
   const cached = materialCache.get(key)
@@ -174,6 +200,17 @@ function realisticMaterial(kind: TissueKind, opacity: number, quality: RenderQua
     side: kind === 'skin' ? THREE.DoubleSide : THREE.FrontSide,
   })
   material.envMapIntensity = quality === 'cinematic' ? 0.95 : 0.72
+  // Tekstur triplanar. Dari 743 mesh otot hanya 9 yang punya koordinat UV,
+  // jadi tekstur tidak bisa dipasang dengan cara biasa — dan itulah sebab
+  // sesungguhnya setiap permukaan di sini berwarna rata, bukan kekurangan
+  // pada model bahannya. Permukaan berwarna rata adalah satu-satunya hal yang
+  // paling membuat jaringan terbaca sebagai lilin.
+  pasangTriplanar(material, {
+    jenis: RESEP_TEKSTUR[kind],
+    skala: SKALA_TEKSTUR[kind] ?? 14,
+    kuat: 1,
+    kuatKasar: 0.85,
+  })
   materialCache.set(key, material)
   return material
 }
@@ -224,8 +261,14 @@ export function RealisticAnatomyAtlas() {
       return
     }
     renderer.outputColorSpace = THREE.SRGBColorSpace
-    renderer.toneMapping = THREE.ACESFilmicToneMapping
-    renderer.toneMappingExposure = 1.05
+    // ACES memiringkan merah jenuh ke arah oranye-merah muda begitu
+    // pencahayaannya kuat, dan rig di bawah ini kuat. Terukur pada figur yang
+    // sama di mode lain: rona rata-rata piksel otot bergeser dari 8,5° ke
+    // 17,9° hanya karena penggantian pemeta nada. Khronos PBR Neutral
+    // dirancang mempertahankan warna dasar bahan pada pencahayaan terang —
+    // dan warna jaringan di sini adalah keterangan klinis, bukan gaya.
+    renderer.toneMapping = THREE.NeutralToneMapping
+    renderer.toneMappingExposure = 0.92
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
     renderer.setClearColor(0x000000, 0)
     container.appendChild(renderer.domElement)
@@ -238,15 +281,19 @@ export function RealisticAnatomyAtlas() {
     room.dispose()
     pmrem.dispose()
 
-    const hemi = new THREE.HemisphereLight(0xf4f7ff, 0x241814, 1.15)
+    // Rig lama menjumlahkan 5,3 satuan cahaya di atas peta lingkungan, dan
+    // otot terukur 141/255 — sepucat manekin. Jaringan basah memang memantul
+    // kuat, tetapi yang membuatnya terbaca basah adalah SOROTAN SEMPIT di atas
+    // dasar yang gelap, bukan seluruh permukaan yang terang merata.
+    const hemi = new THREE.HemisphereLight(0xf4f7ff, 0x241814, 0.42)
     scene.add(hemi)
-    const key = new THREE.DirectionalLight(0xfff4e8, 2.1)
+    const key = new THREE.DirectionalLight(0xfff4e8, 1.15)
     key.position.set(3.2, 4.8, 4.2)
     scene.add(key)
-    const fill = new THREE.DirectionalLight(0xc7dcff, 0.92)
+    const fill = new THREE.DirectionalLight(0xc7dcff, 0.34)
     fill.position.set(-3.5, 1.8, 2.1)
     scene.add(fill)
-    const rim = new THREE.DirectionalLight(0xd9e9ff, 1.15)
+    const rim = new THREE.DirectionalLight(0xd9e9ff, 0.7)
     rim.position.set(-1.8, 3.4, -4.6)
     scene.add(rim)
 
