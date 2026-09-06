@@ -14,25 +14,14 @@ import { statusSingkat } from '../lib/pelatih'
 import { upayaRelatif } from '../lib/analisisPro'
 import { hrMaxFromAge } from '../lib/workoutImport'
 
-// ─────────────────────────────────────────────────────────────────────────────
-// Pusat Latihan — empat halaman yang selama ini terpisah, padahal semuanya
-// menjawab pertanyaan yang sama: "latihan saya bagaimana".
-//
-//   Pelatih    — apa berikutnya, rangkuman sesi terakhir, riwayat, target, PR
-//   Analisis   — kebugaran & kesegaran, upaya relatif, log, zona pace
-//   Fisiologi  — beban, status, pemulihan, ambang, kesiapan
-//   Endurance  — bahan bakar, keringat, FTP, panduan daya, aklimatisasi
-//
-// Isinya tidak ditulis ulang; tab memuat komponen halaman aslinya.
-// ─────────────────────────────────────────────────────────────────────────────
-
+// Training is organized decision-first rather than feature-first:
+// 1) what should I do today, 2) what does the data say, 3) what physiology
+// explains it, 4) what exercise / plan should I choose.
 const WorkoutHistory = lazy(() => import('./WorkoutHistory').then((m) => ({ default: m.WorkoutHistory })))
+const AthleteScience = lazy(() => import('./AthleteScience').then((m) => ({ default: m.AthleteScience })))
 const AnalisisPro = lazy(() => import('./AnalisisPro').then((m) => ({ default: m.AnalisisPro })))
 const TrainingPhysiology = lazy(() => import('./TrainingPhysiology').then((m) => ({ default: m.TrainingPhysiology })))
 const EnduranceTools = lazy(() => import('./EnduranceTools').then((m) => ({ default: m.EnduranceTools })))
-// Sisa suite latihan yang dulu tersebar sebagai rute sendiri-sendiri. Semuanya
-// dipasang apa adanya — tidak satu pun isinya ditulis ulang, sama seperti
-// penggabungan skor klinis: yang digabung adalah TEMPATNYA, bukan isinya.
 const Workout = lazy(() => import('./Workout').then((m) => ({ default: m.Workout })))
 const LatihanBeban = lazy(() => import('./LatihanBeban').then((m) => ({ default: m.LatihanBeban })))
 const Kalistenik = lazy(() => import('./Kalistenik').then((m) => ({ default: m.Kalistenik })))
@@ -52,62 +41,53 @@ const ShapeForming = lazy(() => import('./ShapeForming').then((m) => ({ default:
 const Rekomposisi = lazy(() => import('./Rekomposisi').then((m) => ({ default: m.Rekomposisi })))
 
 const TABS: TabDef[] = [
-  { id: 'pelatih', label: 'Coach', emoji: '🏃', komponen: WorkoutHistory,
-    ringkas: 'Next session, last session summary, history, targets, records' },
+  { id: 'pelatih', label: 'Today', emoji: '🎯', komponen: WorkoutHistory,
+    ringkas: 'Decision first: next session, recovery context, recent history and targets' },
+  { id: 'athlete-science', label: 'Athlete Science', emoji: '🧬', komponen: AthleteScience,
+    ringkas: 'VO₂, HRV, load and recovery with assumptions, confidence and physiological context' },
   { id: 'analisis', label: 'Analysis', emoji: '📈', komponen: AnalisisPro,
-    ringkas: 'Fitness & freshness, relative effort, training log, pace zones' },
+    ringkas: 'Fitness/fatigue trends, relative effort, training log and pace analysis' },
   { id: 'fisiologi', label: 'Physiology', emoji: '🫀', komponen: TrainingPhysiology,
-    ringkas: 'Training load, status, recovery time, lactate threshold, readiness' },
+    ringkas: 'Training load, recovery, thresholds, readiness and the physiology behind them' },
   { id: 'endurance', label: 'Endurance', emoji: '⛽', komponen: EnduranceTools,
-    ringkas: 'Fuelling, sweat rate, FTP, power guidance, acclimatisation' },
-
-  // ── Yang dulu berdiri sebagai rute sendiri ────────────────────────────────
-  // Urutannya mengikuti cara latihan benar-benar dijalani: apa yang dikerjakan
-  // hari ini, dengan cara apa, lalu bagaimana ia diukur dan direncanakan.
+    ringkas: 'Fuelling, sweat rate, FTP, power guidance and acclimatisation' },
   { id: 'sesi', label: 'Exercises', emoji: '🏋️', komponen: Workout,
-    ringkas: 'The exercise library by muscle group, with form cues and photographs' },
+    ringkas: 'Exercise library by muscle group, with technique and clinical context' },
   { id: 'beban', label: 'Weights', emoji: '🔩', komponen: LatihanBeban,
-    ringkas: 'Barbell and dumbbell work — loading, progression, technique' },
+    ringkas: 'Barbell and dumbbell work — loading, progression and technique' },
   { id: 'kalistenik', label: 'Calisthenics', emoji: '🤸', komponen: Kalistenik,
-    ringkas: 'Bodyweight progressions from the five basics upward' },
+    ringkas: 'Bodyweight progressions from fundamentals upward' },
   { id: 'crossfit', label: 'CrossFit', emoji: '⏱️', komponen: CrossFit,
-    ringkas: 'Benchmark workouts, scaling, and the metabolic demand of each' },
+    ringkas: 'Benchmark workouts, scaling and metabolic demand' },
   { id: 'peregangan', label: 'Mobility', emoji: '🧘', komponen: Peregangan,
-    ringkas: 'Stretching and mobility work, and when each type actually helps' },
+    ringkas: 'Mobility and stretching — what changes performance and what does not' },
   { id: 'lari', label: 'Running', emoji: '👟', komponen: TeknikLari,
-    ringkas: 'Running technique — cadence, foot strike, common faults' },
+    ringkas: 'Technique, cadence, pacing and common movement errors' },
   { id: 'multisport', label: 'Multi-sport', emoji: '🚴', komponen: MultiSport,
     ringkas: 'Running, cycling and swimming together' },
   { id: 'dasar', label: 'Base', emoji: '🧱', komponen: BaseTraining,
-    ringkas: 'Aerobic base building — the slow work that everything else rests on' },
+    ringkas: 'Aerobic-base development without presenting one intensity distribution as universal' },
   { id: 'rencana', label: 'Plan', emoji: '🗓️', komponen: TrainingPlan,
-    ringkas: 'Periodised training plans and how a block is structured' },
+    ringkas: 'Periodised plans, load progression and block structure' },
   { id: 'tes', label: 'Testing', emoji: '📋', komponen: FitnessTest,
-    ringkas: 'Field tests of strength, endurance and mobility, with norms' },
+    ringkas: 'Field tests with measurement limits and useful norms' },
   { id: 'lab', label: 'Performance', emoji: '🔬', komponen: PerformanceLab,
-    ringkas: 'Performance metrics — VO₂max, thresholds, power and pace' },
-  { id: 'sains', label: 'Science', emoji: '📚', komponen: SportsScience,
-    ringkas: 'The evidence behind training methods' },
+    ringkas: 'VO₂, thresholds, power, pace and performance trends' },
+  { id: 'sains', label: 'Evidence', emoji: '📚', komponen: SportsScience,
+    ringkas: 'Evidence quality, training methods and uncertainty' },
   { id: 'sportlab', label: 'Sports lab', emoji: '🧪', komponen: SportsLab,
     ringkas: 'Sport-specific analysis and benchmarks' },
   { id: 'alat', label: 'Equipment', emoji: '🏟️', komponen: GymEquipment,
-    ringkas: 'Gym equipment — what each machine loads and how to set it up' },
+    ringkas: 'Gym equipment — load, setup and movement mechanics' },
   { id: 'gerak', label: 'Movement', emoji: '🦵', komponen: MovementToolkit,
-    ringkas: 'Movement quality screens and corrective work' },
+    ringkas: 'Movement quality, asymmetry and corrective work' },
   { id: 'bentuk', label: 'Shaping', emoji: '📐', komponen: ShapeForming,
-    ringkas: 'Body shaping goals and the training that actually changes them' },
+    ringkas: 'Body-composition goals and realistic training effects' },
   { id: 'rekomposisi', label: 'Recomp', emoji: '⚖️', komponen: Rekomposisi,
-    ringkas: 'Losing fat and gaining muscle at once — when it is possible' },
+    ringkas: 'Fat loss and muscle gain with explicit assumptions' },
 ]
 
 export function PusatLatihan() {
-  /**
-   * Angka latihan terkini, di atas seluruh tab.
-   *
-   * Halaman ini setinggi 6,3 layar telepon, dan yang paling sering dicari --
-   * "boleh latihan keras hari ini atau tidak" -- terkubur di dalam tab
-   * pertama. Ditaruh di atas supaya jawabannya terbaca sebelum menggulir.
-   */
   const angka = useMemo<Angka[]>(() => {
     const w = getWorkouts()
     if (!w.length) return []
@@ -126,23 +106,14 @@ export function PusatLatihan() {
       return x ? x.kesegaran : 0
     })
     return [
-      { label: 'Fresh', nilai: String(Math.round(st.kesegaran)),
+      { label: 'Freshness', nilai: String(Math.round(st.kesegaran)),
         nada: st.kesegaran >= -10 ? NADA.baik : NADA.perhatian, deret },
-      { label: 'Fit', nilai: String(Math.round(st.kebugaran)), nada: NADA.biru },
-      { label: 'Fatigue', nilai: String(Math.round(st.kelelahan)), nada: NADA.jantung },
+      { label: 'Fitness trend', nilai: String(Math.round(st.kebugaran)), nada: NADA.biru },
+      { label: 'Fatigue load', nilai: String(Math.round(st.kelelahan)), nada: NADA.jantung },
       { label: 'Sessions', nilai: String(w.length), satuan: 'recorded', nada: NADA.netral },
     ]
   }, [])
 
-  /**
-   * Bahan untuk menjabarkan ketiga angka itu.
-   *
-   * Dihitung dari sumber yang SAMA PERSIS dengan angka ringkas di atas, bukan
-   * dihitung ulang secara terpisah. Penjabaran yang berasal dari perhitungan
-   * kedua pasti akan menyimpang dari angka yang dijabarkannya begitu salah satu
-   * diubah, dan penjabaran yang tidak cocok dengan angkanya lebih buruk
-   * daripada tidak ada penjabaran sama sekali.
-   */
   const audit = useMemo(() => {
     const w = getWorkouts()
     if (!w.length) return null
@@ -158,11 +129,6 @@ export function PusatLatihan() {
     const rentangHari = waktu.length
       ? Math.max(1, Math.round((Date.now() - Math.min(...waktu)) / 86400_000))
       : 0
-
-    // Beban hari ini: jumlah TRIMP seluruh sesi yang mulai pada tanggal
-    // kalender yang sama. Dihitung dengan fungsi yang SAMA dengan yang dipakai
-    // model, bukan ditaksir ulang — penjabaran yang memakai perhitungan kedua
-    // akan menyimpang dari angka yang dijabarkannya.
     const hariIni = new Date().toDateString()
     const upayaHariIni = w
       .filter((x) => new Date(Date.parse(x.mulai)).toDateString() === hariIni)
@@ -186,28 +152,39 @@ export function PusatLatihan() {
 
   return (
     <HalamanTab
-      judul="Training"
-      subjudul="Coach, analysis, physiology and endurance on one page"
+      judul="Training Lab"
+      subjudul="Decision → evidence → physiology → workout"
       ikon={<IconRun />}
       theme="metal"
       ringkasan={
         <div className="space-y-3">
-          <FightHero tag="Arena" title="Training" motto="Veni. Vidi. Vici." />
+          <FightHero tag="Human Performance" title="Training Lab" motto="Measure. Interpret. Adapt." />
           <MetalStatPanel angka={angka} />
+          <div className="grid gap-2 sm:grid-cols-3">
+            <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-3">
+              <div className="text-[10px] font-black uppercase tracking-[0.16em] text-neutral-500">1 · Decision</div>
+              <p className="mt-1 text-xs leading-relaxed text-neutral-500">What session makes sense today?</p>
+            </div>
+            <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-3">
+              <div className="text-[10px] font-black uppercase tracking-[0.16em] text-neutral-500">2 · Evidence</div>
+              <p className="mt-1 text-xs leading-relaxed text-neutral-500">What was measured, estimated, or inferred?</p>
+            </div>
+            <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-3">
+              <div className="text-[10px] font-black uppercase tracking-[0.16em] text-neutral-500">3 · Mechanism</div>
+              <p className="mt-1 text-xs leading-relaxed text-neutral-500">Which physiological system explains the result?</p>
+            </div>
+          </div>
         </div>
       }
       tabs={TABS}
       kaki={
         <div className="space-y-3">
-          {/* Penjabaran ketiga angka.
-              Ada karena pertanyaan "angka ini dari mana" adalah pertanyaan yang
-              sah, dan karena tidak menjawabnya membuat orang menyimpulkan
-              tubuhnya bermasalah atas sesuatu yang sebenarnya sifat model. */}
           {audit && (
             <section className="space-y-3">
-              <h2 className="text-[13px] font-black text-ink dark:text-white">
-                Where these numbers come from
-              </h2>
+              <h2 className="text-[13px] font-black text-ink dark:text-white">Model audit & uncertainty</h2>
+              <p className="rounded-2xl border border-white/10 bg-white/[0.03] p-3 text-[12px] leading-relaxed text-neutral-500">
+                Fitness, fatigue and freshness are model outputs, not direct biological measurements. Interpret trends within the same athlete and verify them against symptoms, sleep, session RPE and actual performance.
+              </p>
               {bacaanJujur(audit.bahan) && (
                 <p className="rounded-2xl border-l-4 border-amber-400 bg-amber-50/70 p-3 text-[12px] leading-relaxed text-amber-900 dark:bg-amber-500/10 dark:text-amber-200">
                   {bacaanJujur(audit.bahan)}
@@ -219,8 +196,6 @@ export function PusatLatihan() {
               <RaporRamalanKesegaran riwayat={audit.riwayat} k={audit.k} />
             </section>
           )}
-
-          {/* Pintu ke alat-alat yang tidak muat dalam empat tab di atas. */}
           <Link to="/fitness-hub"
             className="flex h-11 items-center justify-center rounded-2xl border border-dashed border-white/15 text-[12px] font-bold text-neutral-500 transition hover:border-white/30 hover:text-ink">
             🔎 All other training tools
