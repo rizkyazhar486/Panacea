@@ -1,0 +1,66 @@
+/* Readability guardrails for Panacea surfaces.
+   Color remains part of the product language, but body copy must never inherit
+   a low-contrast tint just because a glass card sits over a colorful backdrop. */
+
+.kaca .text-neutral-400,
+.liquid-glass .text-neutral-400 {
+  color: #68766f;
+}
+
+.kaca .text-neutral-500,
+.liquid-glass .text-neutral-500 {
+  color: #52615a;
+}
+
+.kaca .text-neutral-600,
+.liquid-glass .text-neutral-600 {
+  color: #3f4d46;
+}
+
+.kaca p,
+.liquid-glass p {
+  text-wrap: pretty;
+}
+
+.dark .kaca .text-neutral-400,
+.dark .liquid-glass .text-neutral-400 {
+  color: #aeb9b4 !important;
+}
+
+.dark .kaca .text-neutral-500,
+.dark .liquid-glass .text-neutral-500 {
+  color: #bac5c0 !important;
+}
+
+.dark .kaca .text-neutral-600,
+.dark .liquid-glass .text-neutral-600 {
+  color: #c8d2ce !important;
+}
+
+/* Utility for feature/product cards that must stay readable regardless of the
+   ambient glass/background treatment around them. */
+.panacea-readable-card {
+  background: rgba(255, 255, 255, 0.96);
+  color: #0c1410;
+  border-color: rgba(15, 23, 42, 0.10);
+}
+
+.panacea-readable-card .text-neutral-400 { color: #6b7671 !important; }
+.panacea-readable-card .text-neutral-500 { color: #56615c !important; }
+.panacea-readable-card .text-neutral-600 { color: #424c47 !important; }
+
+.dark .panacea-readable-card {
+  background: rgba(17, 19, 21, 0.97);
+  color: #f4f7f5;
+  border-color: rgba(255, 255, 255, 0.12);
+}
+
+.dark .panacea-readable-card .text-neutral-400 { color: #aeb9b4 !important; }
+.dark .panacea-readable-card .text-neutral-500 { color: #bac5c0 !important; }
+.dark .panacea-readable-card .text-neutral-600 { color: #c8d2ce !important; }
+
+/* Long copy needs a comfortable measure even when its parent card can grow. */
+.panacea-reading-copy {
+  max-width: 72ch;
+  line-height: 1.65;
+}
