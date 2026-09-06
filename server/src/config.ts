@@ -1,9 +1,10 @@
 import 'dotenv/config'
+import { randomBytes } from 'node:crypto'
 
 // Refuse to boot in production with the insecure default JWT secret — a real
 // secret MUST be provided via the JWT_SECRET env var, otherwise every session
 // token could be forged. Fail fast & loud rather than run insecurely.
-if (process.env.NODE_ENV === 'production' && !process.env.JWT_SECRET) {
+if (process.env.NODE_ENV === 'production' && (!process.env.JWT_SECRET || process.env.JWT_SECRET.trim().length < 32 || ['dev-insecure-secret', 'change-me-to-a-long-random-string'].includes(process.env.JWT_SECRET))) {
   throw new Error('FATAL: JWT_SECRET must be set in production. Refusing to start with the insecure development default.')
 }
 
@@ -13,9 +14,11 @@ export const config = {
     .split(',')
     .map((s) => s.trim())
     .filter(Boolean),
-  jwtSecret: process.env.JWT_SECRET || 'dev-insecure-secret',
+  jwtSecret: process.env.JWT_SECRET || randomBytes(32).toString('hex'),
+  devLoginEnabled: process.env.NODE_ENV !== 'production' && process.env.ALLOW_DEV_LOGIN === 'true',
+  mockPaymentsEnabled: process.env.NODE_ENV !== 'production' && process.env.ALLOW_MOCK_PAYMENTS === 'true',
   ownerEmail: (process.env.OWNER_EMAIL || 'rizkyazhar486@gmail.com').toLowerCase(),
-  cookieSecure: process.env.COOKIE_SECURE === 'true',
+  cookieSecure: process.env.NODE_ENV === 'production' || process.env.COOKIE_SECURE === 'true',
   googleClientId: process.env.GOOGLE_CLIENT_ID || '',
   midtrans: {
     serverKey: process.env.MIDTRANS_SERVER_KEY || '',

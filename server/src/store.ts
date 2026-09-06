@@ -8,7 +8,7 @@ import { randomBytes } from 'node:crypto'
 import { KATALOG } from './healthMetrics.js'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
-const DB_PATH = join(__dirname, '..', 'data.json')
+const DB_PATH = process.env.PANACEA_DATA_FILE || join(__dirname, '..', 'data.json')
 
 export type Role = 'pasien' | 'dokter' | 'kontributor' | 'verifikator' | 'admin' | 'owner'
 
@@ -19,6 +19,7 @@ export interface User {
   role: Role
   picture?: string
   createdAt: string
+  sessionVersion?: number
 }
 
 export type TxType = 'deposit' | 'withdraw' | 'purchase' | 'payout'
@@ -97,6 +98,7 @@ interface DB {
   orders: Order[]
   posts: Post[]
   clinical: Clinical
+  clinicalAccess?: Record<string, { patientUserId?: string; practitionerIds: string[] }>
   settings: Record<string, any> // userId -> preference blob (no secrets)
   connect?: any // Connect: verifikasi, kredit kepercayaan, laporan, blokir
   pushSubs: Record<string, any[]> // userId -> Web Push subscriptions
@@ -387,23 +389,29 @@ export function modePenyimpanan(): 'mongo' | 'berkas' {
 }
 
 export function uid(): string {
-  return Math.random().toString(36).slice(2) + Date.now().toString(36)
+  return randomBytes(18).toString('hex')
 }
 
 export function upsertUser(email: string, name: string, role: Role, picture?: string): User {
+  email = email.trim().toLowerCase()
   let u = db.users.find((x) => x.email === email)
   if (!u) {
-    u = { id: uid(), email, name, role, picture, createdAt: new Date().toISOString() }
+    const publicRole: Role = ['pasien', 'dokter', 'kontributor', 'verifikator'].includes(role) ? role : 'pasien'
+    u = { id: uid(), email, name, role: publicRole, picture, createdAt: new Date().toISOString() }
     db.users.push(u)
     db.wallets[u.id] = 25 // welcome bonus PNC
     db.txs.unshift({ id: uid(), userId: u.id, type: 'deposit', amountPnc: 25, note: 'Bonus pendaftaran', at: u.createdAt })
   } else {
     u.name = name
-    u.role = role
     if (picture) u.picture = picture
   }
   save()
   return u
+}
+
+export function revokeSessions(userId: string) {
+  const user = getUser(userId)
+  if (user) { user.sessionVersion = (user.sessionVersion ?? 0) + 1; save() }
 }
 
 export function getUser(id: string): User | undefined {
@@ -446,9 +454,8 @@ export function cariOrang(q: string, batas = 8): { id: string; name: string; rol
 }
 
 export function findUserBySelfPatientId(patientId: string): User | undefined {
-  if (!patientId?.startsWith('self-')) return undefined
-  const suffix = patientId.slice(5).toLowerCase()
-  return db.users.find((u) => u.email.toLowerCase().replace(/[^a-z0-9]/g, '').slice(0, 16) === suffix)
+  const userId = clinicalAccessFor(patientId)?.patientUserId
+  return userId ? getUser(userId) : undefined
 }
 
 export function balance(userId: string): number {
@@ -623,6 +630,14 @@ function ensureClinical() {
 }
 export function getClinical(): Clinical {
   return ensureClinical()
+}
+export function clinicalAccessFor(patientId: string) {
+  return db.clinicalAccess?.[patientId]
+}
+export function assignClinicalAccess(patientId: string, access: { patientUserId?: string; practitionerIds: string[] }) {
+  db.clinicalAccess ??= {}
+  db.clinicalAccess[patientId] = access
+  save()
 }
 export function saveRecord(patientId: string, record: any) {
   ensureClinical().records[patientId] = record

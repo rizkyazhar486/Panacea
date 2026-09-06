@@ -1,5 +1,6 @@
 import { config, features } from './config.js'
 import { listPushSubs, removePushSub, addNotification, getSettings } from './store.js'
+import { validPushSubscription } from './security.js'
 
 // Web Push sender. The `web-push` package is imported indirectly so the project
 // type-checks even before `npm install` adds it; pushes are no-ops unless VAPID
@@ -65,6 +66,7 @@ export async function sendPush(userId: string, payload: PushPayload): Promise<nu
   let sent = 0
   await Promise.all(
     subs.map(async (sub) => {
+      if (!validPushSubscription(sub)) { removePushSub(userId, sub?.endpoint); return }
       try {
         await webpush.sendNotification(sub, JSON.stringify(payload))
         sent += 1

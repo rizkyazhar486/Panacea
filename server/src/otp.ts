@@ -14,6 +14,7 @@
 // di ./telepon.ts supaya modul yang tidak mengirim apa-apa tidak perlu
 // mengimpor modul pengiriman.
 import type { Request, Response } from 'express'
+import { randomInt, createHash, timingSafeEqual } from 'node:crypto'
 import { upsertUser, userExistsByEmail, getUserByEmail, type Role } from './store.js'
 import { setSession } from './auth.js'
 import { sendWelcome, sendOtpCode } from './email.js'
@@ -25,19 +26,23 @@ export const emailOtpLive = Boolean(process.env.RESEND_API_KEY)
 // 6-digit code emailed via Resend, held in-memory with a 10-minute expiry.
 const emailCodes = new Map<string, { code: string; expires: number; tries: number }>()
 const emailLastStart = new Map<string, number>()
-const isEmail = (s: string) => /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(s)
+const isEmail = (s: string) => s.length <= 254 && /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(s)
+const digest = (s: string) => createHash('sha256').update(s).digest()
 
 export async function emailOtpStart(req: Request, res: Response) {
   if (!emailOtpLive) return res.status(503).json({ error: 'otp_not_configured' })
   const email = String((req.body as any)?.email || '').trim().toLowerCase()
   if (!isEmail(email)) return res.status(400).json({ error: 'bad_email' })
   const now = Date.now()
+  for (const [key, row] of emailCodes) if (row.expires < now) emailCodes.delete(key)
+  for (const [key, at] of emailLastStart) if (now - at > 600_000) emailLastStart.delete(key)
+  if (emailCodes.size >= 5000) return res.status(503).json({ error: 'try_again_later' })
   if (now - (emailLastStart.get(email) ?? 0) < 30_000) return res.status(429).json({ error: 'too_soon' })
   emailLastStart.set(email, now)
-  const code = String(Math.floor(100000 + Math.random() * 900000))
-  emailCodes.set(email, { code, expires: now + 10 * 60_000, tries: 0 })
+  const code = String(randomInt(100000, 1000000))
+  emailCodes.set(email, { code: digest(code).toString('hex'), expires: now + 10 * 60_000, tries: 0 })
   const ok = await sendOtpCode(email, code)
-  if (!ok) return res.status(502).json({ error: 'otp_send_failed' })
+  if (!ok) { emailCodes.delete(email); return res.status(502).json({ error: 'otp_send_failed' }) }
   res.json({ ok: true, email })
 }
 
@@ -46,12 +51,12 @@ export async function emailOtpVerify(req: Request, res: Response) {
   const b = req.body as { email?: string; code?: string; name?: string; role?: Role }
   const email = String(b.email || '').trim().toLowerCase()
   const code = String(b.code || '').trim()
-  if (!isEmail(email) || !code) return res.status(400).json({ error: 'bad_input' })
+  if (!isEmail(email) || !/^\d{6}$/.test(code) || (b.name !== undefined && (typeof b.name !== 'string' || b.name.length > 160))) return res.status(400).json({ error: 'bad_input' })
   const rec = emailCodes.get(email)
   if (!rec || rec.expires < Date.now()) return res.status(401).json({ error: 'otp_expired' })
   if (rec.tries >= 5) { emailCodes.delete(email); return res.status(429).json({ error: 'too_many_tries' }) }
   rec.tries += 1
-  if (rec.code !== code) return res.status(401).json({ error: 'otp_invalid' })
+  if (!timingSafeEqual(Buffer.from(rec.code, 'hex'), digest(code))) return res.status(401).json({ error: 'otp_invalid' })
   emailCodes.delete(email)
   const existing = getUserByEmail(email)
   const isNew = !userExistsByEmail(email)

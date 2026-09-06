@@ -143,7 +143,7 @@ const PLACEHOLDER_CONTRIBUTOR: Contributor = {
 function patientFromAccount(account: Account): Patient {
   const year = new Date().getFullYear() - (account.age ?? 30)
   return {
-    id: 'self-' + account.email.replace(/[^a-z0-9]/gi, '').slice(0, 16),
+    id: account.patientId || 'self-' + account.email.replace(/[^a-z0-9]/gi, '').slice(0, 16),
     name: account.name,
     sex: account.sex ?? 'L',
     // Prefer the real date of birth from the datepicker; fall back to age estimate.
@@ -249,6 +249,7 @@ function load(): AppState {
     const raw = localStorage.getItem(STORAGE_KEY)
     const base = raw ? { ...seed(), ...JSON.parse(raw) } : seed()
     // Restore a remembered login (≤7 days) so frequent users stay signed in.
+    if (backendEnabled) return { ...seed(), settings: { ...base.settings, apiKey: '' }, account: null }
     return { ...base, account: loadSession() }
   } catch {
     /* ignore */
@@ -372,14 +373,15 @@ export function StoreProvider({ children }: { children: ReactNode }) {
   // Persist everything EXCEPT the session account, so each visit starts at the
   // public landing and the role can be chosen freely (fixes role being "stuck").
   useEffect(() => {
-    const { account: _account, ...persist } = state
+    const { account: _account, ...rest } = state
+    const persist = backendEnabled ? { settings: { ...state.settings, apiKey: '' } } : { ...rest, settings: { ...state.settings, apiKey: '' } }
     try {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(persist))
     } catch {
       // Storage quota exceeded (e.g. many uploaded photos) — drop heavy media
       // from the persisted copy so the app keeps working.
       try {
-        const slim = { ...persist, posts: persist.posts.map((p) => ({ ...p, photos: undefined, videoUrl: undefined })) }
+        const slim = { ...persist, posts: backendEnabled ? [] : state.posts.map((p) => ({ ...p, photos: undefined, videoUrl: undefined })) }
         localStorage.setItem(STORAGE_KEY, JSON.stringify(slim))
       } catch {
         /* give up persisting this update */
@@ -403,16 +405,20 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     hydratedFor.current = email
     api
       .clinical()
-      .then((data) =>
-        setState((st) => ({
+      .then(async (data) => {
+        const account = state.account
+        if (account?.role === 'pasien' && !data.patients.some(p => p.id === account.patientId)) {
+          try { await api.addPatientRemote(patientFromAccount(account)); data = await api.clinical() } catch { /* Gagal disimpan tetap tampak kosong. */ }
+        }
+        setState((st) => st.account?.email !== email ? st : ({
           ...st,
-          patients: data.patients?.length ? data.patients : st.patients,
-          vitals: { ...st.vitals, ...(data.vitals ?? {}) },
-          supportive: { ...st.supportive, ...(data.supportive ?? {}) },
-          records: { ...st.records, ...(data.records ?? {}) },
-          education: { ...st.education, ...(data.education ?? {}) },
-        })),
-      )
+          patients: data.patients ?? [],
+          vitals: data.vitals ?? {},
+          supportive: data.supportive ?? {},
+          records: data.records ?? {},
+          education: data.education ?? {},
+        }))
+      })
       .catch(() => {
         hydratedFor.current = '' // allow retry on next change
       })
@@ -425,6 +431,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
       .then((remote) => {
         if (remote && Object.keys(remote).length) {
           setState((st) => {
+            if (st.account?.email !== email) return st
             const next = { ...st, settings: { ...st.settings, ...remote } }
             if (remote.strStatus && st.account?.role === 'dokter') {
               next.account = { ...st.account, strStatus: remote.strStatus as Account['strStatus'] }
@@ -442,7 +449,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     // the header balance stays accurate (e.g. after server-side AI charges).
     api
       .wallet()
-      .then((w) => setState((st) => ({ ...st, wallet: { ...st.wallet, balance: w.balance } })))
+      .then((w) => setState((st) => st.account?.email !== email ? st : ({ ...st, wallet: { ...st.wallet, balance: w.balance } })))
       .catch(() => {})
   }, [state.account?.email])
 
@@ -602,13 +609,14 @@ export function StoreProvider({ children }: { children: ReactNode }) {
         })),
       login: (account) =>
         setState((st) => {
+          if (backendEnabled && st.account?.email !== account.email) st = { ...seed(), settings: { ...st.settings, apiKey: '' } }
           // A patient gets their OWN record, built from registration details
           // (no dummy data). Doctors start with an empty patient list.
           if (account.role === 'pasien') {
             const self = patientFromAccount(account)
             const exists = st.patients.some((p) => p.id === self.id)
             const acc = { ...account, patientId: self.id }
-            saveSession(acc) // remember login for 7 days
+            if (!backendEnabled) saveSession(acc)
             return {
               ...st,
               account: acc,
@@ -616,10 +624,10 @@ export function StoreProvider({ children }: { children: ReactNode }) {
               activePatientId: self.id,
             }
           }
-          saveSession(account) // remember login for 7 days
+          if (!backendEnabled) saveSession(account)
           return { ...st, account }
         }),
-      logout: () => { clearSession(); return setState((st) => ({ ...st, account: null })) },
+      logout: () => { clearSession(); hydratedFor.current = ''; return setState((st) => backendEnabled ? { ...seed(), settings: { ...st.settings, apiKey: '' }, account: null } : ({ ...st, account: null })) },
       syncWalletBalance: (balance) =>
         setState((st) => (st.wallet.balance === balance ? st : { ...st, wallet: { ...st.wallet, balance } })),
       verifyStr: () => {

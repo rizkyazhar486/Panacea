@@ -53,9 +53,12 @@ function channels(method: string): string[] {
 }
 
 export async function createPayment(req: Request, res: Response) {
+  if (!snap && !config.mockPaymentsEnabled) return res.status(503).json({ error: 'payments_not_configured' })
   const user = (req as Request & { user: User }).user
   const { amountPnc, method, purpose } = req.body as { amountPnc?: number; method?: string; purpose?: string }
-  const isFixed = !!purpose && purpose in FIXED_PRICE
+  if (purpose !== undefined && purpose !== 'topup' && (typeof purpose !== 'string' || !Object.hasOwn(FIXED_PRICE, purpose))) return res.status(400).json({ error: 'invalid_purpose' })
+  const isFixed = !!purpose && Object.hasOwn(FIXED_PRICE, purpose)
+  if (!isFixed && (!Number.isSafeInteger(amountPnc) || amountPnc! <= 0 || amountPnc! > 1000000)) return res.status(400).json({ error: 'bad_amount' })
   const pnc = isFixed ? 0 : Math.max(1, Math.floor(Number(amountPnc) || 0))
   const baseIdr = isFixed ? FIXED_PRICE[purpose!] : pnc * config.tokenToIdr
   // Early-adopter promo: first 25 emails get 75% off everything (PNC still full).
@@ -84,45 +87,48 @@ export async function createPayment(req: Request, res: Response) {
       item_details: [item],
     })
     res.json({ live: true, orderId, token: tx.token, redirectUrl: tx.redirect_url, clientKey: config.midtrans.clientKey })
-  } catch (e) {
-    res.status(502).json({ error: 'midtrans_error', detail: String(e) })
+  } catch {
+    res.status(502).json({ error: 'midtrans_error' })
   }
 }
 
 // Mock-only: simulate a successful payment callback (no real gateway).
 export function confirmPayment(req: Request, res: Response) {
+  if (!config.mockPaymentsEnabled) return res.status(404).json({ error: 'not_found' })
   const user = (req as Request & { user: User }).user
   const { orderId } = req.body as { orderId?: string }
   const order = orderId ? getOrder(orderId) : undefined
   if (!order || order.userId !== user.id) return res.status(404).json({ error: 'order_not_found' })
   if (snap) return res.status(400).json({ error: 'use_real_gateway' })
-  if (order.status !== 'paid') {
+  if (order.status === 'pending') {
     setOrderStatus(order.id, 'paid')
     fulfillOrder(order)
   }
-  res.json({ ok: true, status: 'paid' })
+  res.json({ ok: true, status: order.status })
 }
 
 // Real Midtrans webhook (HTTP notification). Verifies signature, credits wallet.
 export function paymentWebhook(req: Request, res: Response) {
+  if (!features.paymentsLive) return res.status(503).json({ error: 'payments_not_configured' })
   const body = req.body as Record<string, string>
   const { order_id, status_code, gross_amount, signature_key, transaction_status } = body
-  if (!order_id) return res.status(400).json({ error: 'bad_request' })
+  if (![order_id, status_code, gross_amount, signature_key, transaction_status].every(v => typeof v === 'string') || !/^[a-f0-9]{128}$/.test(signature_key)) return res.status(400).json({ error: 'bad_request' })
   const expected = crypto
     .createHash('sha512')
     .update(order_id + status_code + gross_amount + config.midtrans.serverKey)
     .digest('hex')
-  if (signature_key !== expected) return res.status(403).json({ error: 'bad_signature' })
+  if (!crypto.timingSafeEqual(Buffer.from(signature_key, 'hex'), Buffer.from(expected, 'hex'))) return res.status(403).json({ error: 'bad_signature' })
 
   const order = getOrder(order_id)
   if (!order) return res.status(404).json({ error: 'order_not_found' })
+  if (Number(gross_amount) !== order.amountIdr) return res.status(400).json({ error: 'amount_mismatch' })
 
-  if (transaction_status === 'settlement' || transaction_status === 'capture') {
+  if (status_code === '200' && body.fraud_status !== 'challenge' && body.fraud_status !== 'deny' && (transaction_status === 'settlement' || (transaction_status === 'capture' && body.fraud_status === 'accept'))) {
     if (order.status !== 'paid') {
       setOrderStatus(order.id, 'paid')
       fulfillOrder(order)
     }
-  } else if (['deny', 'cancel', 'expire'].includes(transaction_status)) {
+  } else if (order.status !== 'paid' && ['deny', 'cancel', 'expire'].includes(transaction_status)) {
     setOrderStatus(order.id, 'failed')
   }
   res.json({ ok: true })
@@ -130,6 +136,7 @@ export function paymentWebhook(req: Request, res: Response) {
 
 export function orderStatus(req: Request, res: Response) {
   const order = getOrder(req.params.orderId)
-  if (!order) return res.status(404).json({ error: 'order_not_found' })
+  const user = (req as Request & { user: User }).user
+  if (!order || order.userId !== user.id) return res.status(404).json({ error: 'order_not_found' })
   res.json({ status: order.status })
 }

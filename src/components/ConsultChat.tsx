@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import { wsUrl } from '../lib/api'
+import { wsUrl, api } from '../lib/api'
 import { Button } from './ui'
 import { IconStethoscope } from './icons'
 
@@ -27,7 +27,7 @@ function iceServers(): RTCIceServer[] {
 // Real-time consultation room over WebSocket (doctor ↔ patient join the same room).
 // Text chat + optional WebRTC audio/video call. The WebSocket relays both chat
 // messages and WebRTC signaling (offer/answer/ICE) to the other peer in the room.
-export function ConsultChat({ room, name, title }: { room: string; name: string; title?: string }) {
+export function ConsultChat({ room, name, title, peerName }: { room: string; name: string; title?: string; peerName: string }) {
   const [lines, setLines] = useState<Line[]>([])
   const [input, setInput] = useState('')
   const [connected, setConnected] = useState(false)
@@ -125,14 +125,15 @@ export function ConsultChat({ room, name, title }: { room: string; name: string;
     const ws = new WebSocket(wsUrl())
     wsRef.current = ws
     ws.onopen = () => {
-      setConnected(true)
-      ws.send(JSON.stringify({ type: 'join', room, from: name }))
+      api.realtimeTicket(peerName).then(({ ticket }) => {
+        if (ws.readyState === WebSocket.OPEN) ws.send(JSON.stringify({ type: 'auth', ticket }))
+      }).catch(() => { setCallError('The recipient could not be verified. Use their exact registered name.'); ws.close() })
     }
     ws.onmessage = (ev) => {
       try {
         const m = JSON.parse(ev.data) as Line & { count?: number; sdp?: RTCSessionDescriptionInit; candidate?: RTCIceCandidateInit }
         if (m.from === name) return // ignore our own relayed messages
-        if (m.type === 'presence') setCount(m.count ?? 0)
+        if (m.type === 'presence') { setCount(m.count ?? 0); setConnected(true) }
         else if (m.type?.startsWith('rtc-')) handleSignal(m)
         else {
           setLines((l) => [...l, m])
@@ -151,7 +152,7 @@ export function ConsultChat({ room, name, title }: { room: string; name: string;
       localStreamRef.current?.getTracks().forEach((t) => t.stop())
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [room, name])
+  }, [room, name, peerName])
 
   useEffect(() => {
     scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight })

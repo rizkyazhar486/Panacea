@@ -208,7 +208,7 @@ export function Consult() {
                   <span className="text-lg font-extrabold">Rp{FEE.toLocaleString('en-GB')}<span className="text-xs font-medium text-neutral-500">/session</span></span>
                   <div className="flex gap-2">
                     {backendEnabled && (
-                      <Button variant="outline" onClick={() => setChatRoom('consult-' + slug(d.name))} disabled={!d.online}>Chat</Button>
+                      <Button variant="outline" onClick={() => setChatRoom(d.name)} disabled={!d.online}>Chat</Button>
                     )}
                     <Button onClick={() => book(d.name, d.specialty)} disabled={!d.online}>
                       <IconCheck size={14} /> Book & Pay
@@ -228,7 +228,7 @@ export function Consult() {
             title="Real-time Consultation"
             subtitle="Doctor and patient opening the same room connect instantly"
           />
-          <ConsultChat room={chatRoom} name={account?.name ?? 'Patient'} />
+          <ConsultChat room={chatRoom} peerName={chatRoom} name={account?.name ?? 'Patient'} />
         </Card>
       )}
 

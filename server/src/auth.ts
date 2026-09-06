@@ -9,7 +9,7 @@ const googleClient = new OAuth2Client(config.googleClientId)
 const COOKIE = 'pmd_session'
 
 function issueToken(userId: string): string {
-  return jwt.sign({ uid: userId }, config.jwtSecret, { expiresIn: '7d' })
+  return jwt.sign({ uid: userId, sv: getUser(userId)?.sessionVersion ?? 0 }, config.jwtSecret, { expiresIn: '8h', algorithm: 'HS256', issuer: 'panaceamed', audience: 'panaceamed-app' })
 }
 
 // Set the session cookie AND return the token so it can also be sent in the
@@ -21,13 +21,13 @@ export function setSession(res: Response, userId: string): string {
     httpOnly: true,
     secure: config.cookieSecure,
     sameSite: config.cookieSecure ? 'none' : 'lax',
-    maxAge: 7 * 24 * 3600 * 1000,
+    maxAge: 8 * 3600 * 1000,
   })
   return token
 }
 
 export function clearSession(res: Response) {
-  res.clearCookie(COOKIE)
+  res.clearCookie(COOKIE, { httpOnly: true, secure: config.cookieSecure, sameSite: config.cookieSecure ? 'none' : 'lax', path: '/' })
 }
 
 // Accept the session from a Bearer token (preferred, cross-domain safe) or the
@@ -38,8 +38,10 @@ export function currentUser(req: Request): User | undefined {
   const token = bearer || req.cookies?.[COOKIE]
   if (!token) return undefined
   try {
-    const { uid } = jwt.verify(token, config.jwtSecret) as { uid: string }
-    return getUser(uid)
+    const { uid, sv } = jwt.verify(token, config.jwtSecret, { algorithms: ['HS256'], issuer: 'panaceamed', audience: 'panaceamed-app' }) as { uid: string; sv: number }
+    if (typeof uid !== 'string') return undefined
+    const user = getUser(uid)
+    return user && sv === (user.sessionVersion ?? 0) ? user : undefined
   } catch {
     return undefined
   }
@@ -56,13 +58,13 @@ export function requireAuth(req: Request, res: Response, next: NextFunction) {
 export async function googleLogin(req: Request, res: Response) {
   const { credential, role } = req.body as { credential?: string; role?: Role }
   if (!features.googleLive) {
-    return res.status(400).json({ error: 'google_not_configured', hint: 'Set GOOGLE_CLIENT_ID or use /api/auth/dev-login' })
+    return res.status(400).json({ error: 'google_not_configured' })
   }
   if (!credential) return res.status(400).json({ error: 'missing_credential' })
   try {
     const ticket = await googleClient.verifyIdToken({ idToken: credential, audience: config.googleClientId })
     const payload = ticket.getPayload()
-    if (!payload?.email) return res.status(401).json({ error: 'invalid_token' })
+    if (!payload?.email || payload.email_verified !== true) return res.status(401).json({ error: 'invalid_token' })
     const isNew = !userExistsByEmail(payload.email)
     const user = upsertUser(payload.email, payload.name || payload.email, (role as Role) || 'pasien', payload.picture)
     if (isNew) sendWelcome(user.email, user.name, user.role).catch(() => {})
@@ -73,10 +75,13 @@ export async function googleLogin(req: Request, res: Response) {
   }
 }
 
-// Dev/mock login — always available so the app runs without Google configured.
+// Login pengembangan harus diaktifkan secara eksplisit, dan tidak tersedia di produksi.
 export function devLogin(req: Request, res: Response) {
+  if (!config.devLoginEnabled) return res.status(404).json({ error: 'not_found' })
   const { email, name, role } = req.body as { email?: string; name?: string; role?: Role }
-  if (!email) return res.status(400).json({ error: 'missing_email' })
+  if (typeof email !== 'string' || email.length > 254 || !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) return res.status(400).json({ error: 'invalid_email' })
+  if (email.trim().toLowerCase() === config.ownerEmail) return res.status(403).json({ error: 'verified_login_required' })
+  if (name !== undefined && (typeof name !== 'string' || name.length > 160)) return res.status(400).json({ error: 'invalid_name' })
   const isNew = !userExistsByEmail(email)
   const user = upsertUser(email, name || email, (role as Role) || 'pasien')
   if (isNew) sendWelcome(user.email, user.name, user.role).catch(() => {})

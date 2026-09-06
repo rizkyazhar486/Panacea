@@ -85,7 +85,7 @@ export function Messages() {
       {open ? (
         <div className="space-y-2">
           <button onClick={() => setOpen(null)} className="text-xs font-bold text-brand-dark">← All messages</button>
-          <ConsultChat room={dmRoom(me, open.peer)} name={me} title={`💬 ${open.peer}`} />
+          <ConsultChat room={dmRoom(me, open.peer)} name={me} peerName={open.peer} title={`💬 ${open.peer}`} />
           <p className="text-center text-[10px] text-neutral-500">Ask your friend to open a chat with the code/name <b>{me}</b> to connect to the same room.</p>
         </div>
       ) : threads.length === 0 ? (

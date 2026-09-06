@@ -136,9 +136,12 @@ import { searchTrials } from './trials.js'
 import { lookupDrug } from './openfda.js'
 import { lookupGene } from './mygene.js'
 import { findRelatedDrugs } from './rxnorm.js'
-import { attachRealtime } from './realtime.js'
+import { attachRealtime, realtimeTicket } from './realtime.js'
+import { requestBoundary, plainObject, validPushSubscription } from './security.js'
+import { clinicalFor, clinicalWrite, canAccessPatient, verifiedClinician } from './clinicalAccess.js'
+import { assignClinicalAccess, clinicalAccessFor, getUser, revokeSessions } from './store.js'
 
-const app = express()
+export const app = express()
 // Security headers (CSP disabled here — the SPA is served from GitHub Pages,
 // not this API host, so a strict API-side CSP would only add risk of breaking
 // JSON clients without protecting the frontend).
@@ -181,6 +184,7 @@ app.use('/api/health-webhook', express.json({ limit: '12mb' }))
 
 app.use(express.json({ limit: '12mb' })) // allow base64 images for AI vision
 app.use(cookieParser())
+app.use('/api', requestBoundary)
 app.use(
   cors({
     origin: (origin, cb) => {
@@ -422,6 +426,7 @@ app.post('/api/clinical-calculators/unlock-pnc', requireAuth, (req, res) => {
 
 // --- auth ---
 app.post('/api/auth/google', googleLogin)
+app.post('/api/realtime/ticket', requireAuth, realtimeTicket)
 app.post('/api/auth/dev-login', devLogin)
 app.post('/api/auth/otp/email/start', emailOtpStart)
 app.post('/api/auth/otp/email/verify', emailOtpVerify)
@@ -430,7 +435,9 @@ app.get('/api/auth/me', (req, res) => {
   if (!u) return res.status(401).json({ error: 'unauthorized' })
   res.json({ user: u })
 })
-app.post('/api/auth/logout', (_req, res) => {
+app.post('/api/auth/logout', (req, res) => {
+  const user = currentUser(req)
+  if (user) revokeSessions(user.id)
   clearSession(res)
   res.json({ ok: true })
 })
@@ -447,22 +454,24 @@ app.post('/api/wallet/withdraw', requireAuth, async (req, res) => {
   const bank = String(b.bank || '').trim()
   const accountNumber = String(b.accountNumber || '').replace(/\s/g, '')
   const accountHolder = String(b.accountHolder || '').trim()
-  if (amount <= 0) return res.status(400).json({ error: 'bad_amount' })
+  if (!Number.isSafeInteger(b.amountPnc) || amount <= 0 || amount > 1000000) return res.status(400).json({ error: 'bad_amount' })
   if (!bank || !accountNumber || !accountHolder) return res.status(400).json({ error: 'missing_account' })
   if (balance(u.id) < amount) return res.status(400).json({ error: 'insufficient_funds' })
 
   const amountIdr = amount * config.tokenToIdr
+  const reservation = uid()
+  credit(u.id, -amount, 'withdraw', 'Withdrawal reserved', reservation)
   // Try an automatic Iris bank disbursement; fall back to manual settlement.
   let payout
   try {
     payout = await disburse({ amountIdr, bank, accountNumber, accountHolder, email: u.email })
   } catch (e) {
-    return res.status(502).json({ error: 'payout_failed', detail: (e as Error).message })
+    addAudit(u, 'wallet.withdraw_pending_review', reservation)
+    return res.status(502).json({ error: 'payout_pending_review', reference: reservation })
   }
-  // Deduct only after the payout was accepted (or queued for manual handling).
+  // Saldo sudah dicadangkan sebelum permintaan asinkron agar tidak ditarik dua kali.
   const noteBase = `Tarik Rp${amountIdr.toLocaleString('id-ID')} ke ${bank} ${accountNumber} a.n. ${accountHolder}`
   const note = payout.status === 'manual' ? `${noteBase} (manual)` : `${noteBase} · Iris ${payout.referenceNo ?? payout.status}`
-  credit(u.id, -amount, 'withdraw', note)
   addAudit(u, 'wallet.withdraw', note)
   const body = payout.status === 'processed'
     ? `Rp${amountIdr.toLocaleString('id-ID')} sedang dikirim ke rekening ${bank} Anda.`
@@ -491,8 +500,8 @@ app.post('/api/wallet/withdraw', requireAuth, async (req, res) => {
 // User submits a request after transferring; the owner approves to credit PNC.
 app.post('/api/wallet/topup-request', requireAuth, (req, res) => {
   const u = (req as express.Request & { user: User }).user
-  const amount = Math.floor(Number((req.body as { amountPnc?: number }).amountPnc) || 0)
-  if (amount <= 0) return res.status(400).json({ error: 'bad_amount' })
+  const amount = (req.body as { amountPnc?: number }).amountPnc
+  if (typeof amount !== 'number' || !Number.isSafeInteger(amount) || amount <= 0 || amount > 1000000) return res.status(400).json({ error: 'bad_amount' })
   const row = addManualTopup({ userId: u.id, email: u.email, name: u.name, amountPnc: amount, amountIdr: amount * config.tokenToIdr })
   addAudit(u, 'wallet.topup_request', `${amount} PNC (Rp${row.amountIdr.toLocaleString('id-ID')})`)
   res.json({ ok: true, request: row })
@@ -562,7 +571,7 @@ app.post('/api/applications/decide', requireAuth, (req, res) => {
 app.post('/api/payments/create', requireAuth, createPayment)
 app.post('/api/payments/confirm', requireAuth, confirmPayment)
 app.post('/api/payments/webhook', paymentWebhook)
-app.get('/api/payments/status/:orderId', orderStatus)
+app.get('/api/payments/status/:orderId', requireAuth, orderStatus)
 
 // --- social posts (persisted) ---
 // Crowd-sourced provider price board — see store.ts's FacilityPriceSubmission
@@ -777,9 +786,9 @@ app.post('/api/second-opinion/:id/complete', requireAuth, (req, res) => {
 // --- clinical (patients + EMR + vitals/supportive + education) ---
 app.get('/api/clinical', requireAuth, (req, res) => {
   addAudit((req as express.Request & { user: User }).user, 'clinical.read')
-  res.json(getClinical())
+  res.json(clinicalFor((req as express.Request & { user: User }).user))
 })
-app.post('/api/clinical/record', requireAuth, (req, res) => {
+app.post('/api/clinical/record', requireAuth, clinicalWrite('record', true), (req, res) => {
   const { patientId, record } = req.body as { patientId?: string; record?: unknown }
   if (!patientId) return res.status(400).json({ error: 'missing_patientId' })
   const actor = (req as express.Request & { user: User }).user
@@ -796,19 +805,19 @@ app.post('/api/clinical/record', requireAuth, (req, res) => {
   }
   res.json({ ok: true })
 })
-app.post('/api/clinical/education', requireAuth, (req, res) => {
+app.post('/api/clinical/education', requireAuth, clinicalWrite('sheet', true), (req, res) => {
   const { patientId, sheet } = req.body as { patientId?: string; sheet?: unknown }
   if (!patientId) return res.status(400).json({ error: 'missing_patientId' })
   saveEducation(patientId, sheet)
   res.json({ ok: true })
 })
-app.post('/api/clinical/vital', requireAuth, (req, res) => {
+app.post('/api/clinical/vital', requireAuth, clinicalWrite('vital'), (req, res) => {
   const { patientId, vital } = req.body as { patientId?: string; vital?: unknown }
   if (!patientId) return res.status(400).json({ error: 'missing_patientId' })
   addVital(patientId, vital)
   res.json({ ok: true })
 })
-app.post('/api/clinical/supportive', requireAuth, (req, res) => {
+app.post('/api/clinical/supportive', requireAuth, clinicalWrite('result'), (req, res) => {
   const { patientId, result } = req.body as { patientId?: string; result?: unknown }
   if (!patientId) return res.status(400).json({ error: 'missing_patientId' })
   addSupportive(patientId, result)
@@ -816,8 +825,26 @@ app.post('/api/clinical/supportive', requireAuth, (req, res) => {
 })
 app.post('/api/clinical/patient', requireAuth, (req, res) => {
   const { patient } = req.body as { patient?: unknown }
-  if (!patient) return res.status(400).json({ error: 'missing_patient' })
+  const user = (req as express.Request & { user: User }).user
+  if (!plainObject(patient) || typeof patient.id !== 'string' || !/^[A-Za-z0-9_-]{1,100}$/.test(patient.id) || typeof patient.name !== 'string' || patient.name.length < 1 || patient.name.length > 160 || !['L', 'P'].includes(String(patient.sex)) || JSON.stringify(patient).length > 64000) return res.status(400).json({ error: 'invalid_patient' })
+  const self = patient.id === `self-${user.id}`
+  if (!self && !verifiedClinician(user)) return res.status(403).json({ error: 'patient_access_denied' })
+  if (getClinical().patients.some(p => p.id === patient.id)) return res.status(409).json({ error: 'patient_exists' })
   addPatient(patient)
+  assignClinicalAccess(patient.id, { patientUserId: self ? user.id : undefined, practitionerIds: self ? [] : [user.id] })
+  addAudit(user, 'patient.create', patient.id)
+  res.json({ ok: true })
+})
+
+app.post('/api/clinical/access', requireAuth, (req, res) => {
+  const user = (req as express.Request & { user: User }).user
+  const { patientId, practitionerId, action = 'grant' } = req.body ?? {}
+  if (typeof patientId !== 'string' || typeof practitionerId !== 'string' || !['grant', 'revoke'].includes(action)) return res.status(400).json({ error: 'invalid_access' })
+  const access = clinicalAccessFor(patientId)
+  const practitioner = getUser(practitionerId)
+  if (access?.patientUserId !== user.id || (action === 'grant' && (!practitioner || !verifiedClinician(practitioner)))) return res.status(403).json({ error: 'patient_access_denied' })
+  assignClinicalAccess(patientId, { ...access, practitionerIds: action === 'revoke' ? access.practitionerIds.filter(id => id !== practitionerId) : [...new Set([...access.practitionerIds, practitionerId])] })
+  addAudit(user, `patient.${action}_access`, patientId)
   res.json({ ok: true })
 })
 
@@ -1415,7 +1442,7 @@ app.get('/api/push/status', requireAuth, (req, res) => {
 app.post('/api/push/subscribe', requireAuth, (req, res) => {
   const u = (req as express.Request & { user: User }).user
   const sub = (req.body as { subscription?: unknown }).subscription
-  if (!sub || typeof sub !== 'object') return res.status(400).json({ error: 'bad_subscription' })
+  if (!validPushSubscription(sub)) return res.status(400).json({ error: 'bad_subscription' })
   addPushSub(u.id, sub)
   res.json({ ok: true })
 })
@@ -1485,7 +1512,7 @@ app.delete('/api/reminders/:id', requireAuth, (req, res) => {
 
 // Owner gate — by configured owner email OR an explicit owner role.
 function isOwner(u: User): boolean {
-  return u.email.toLowerCase() === config.ownerEmail || u.role === 'owner'
+  return u.email.toLowerCase() === config.ownerEmail
 }
 
 // ── Connect: verifikasi, kredit kepercayaan, laporan, blokir ────────────────
@@ -1665,7 +1692,8 @@ app.post('/api/satusehat/encounter', requireAuth, async (req, res) => {
   const u = (req as express.Request & { user: User }).user
   if (u.role !== 'dokter' && !isOwner(u)) return res.status(403).json({ error: 'forbidden' })
   const { patient, record } = req.body as { patient?: unknown; record?: unknown }
-  if (!patient || !record) return res.status(400).json({ error: 'missing_data' })
+  if (!plainObject(patient) || !plainObject(record)) return res.status(400).json({ error: 'missing_data' })
+  if (typeof patient.id !== 'string' || !canAccessPatient(u, patient.id, true)) return res.status(403).json({ error: 'patient_access_denied' })
   try {
     const out = await submitEmr(patient, record, u.name)
     addAudit(u, 'satusehat.submit', (patient as { id?: string })?.id)
@@ -1789,6 +1817,7 @@ app.use((err: unknown, req: express.Request, res: express.Response, _next: expre
   if (!res.headersSent) res.status(500).json({ error: 'internal_error' })
 })
 
+if (process.env.NODE_ENV !== 'test') {
 process.on('uncaughtException', (e) => alertOwner('Uncaught exception', e?.stack || String(e)))
 process.on('unhandledRejection', (e) => alertOwner('Unhandled promise rejection', e instanceof Error ? (e.stack || e.message) : String(e)))
 
@@ -1857,3 +1886,4 @@ server.listen(config.port, () => {
   console.log(`  Payments:     ${features.paymentsLive ? 'LIVE (Midtrans)' : 'mock'}`)
   console.log(`  Payout (Iris):${irisLive ? ' LIVE' : ' off (set IRIS_API_KEY for auto-disbursement)'}`)
 })
+}

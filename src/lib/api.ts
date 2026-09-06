@@ -144,7 +144,8 @@ interface BackendUser {
 const TOKEN_KEY = 'pmd-token'
 let authToken: string | null = (() => {
   try {
-    return localStorage.getItem(TOKEN_KEY)
+    localStorage.removeItem(TOKEN_KEY)
+    return null
   } catch {
     return null
   }
@@ -152,8 +153,7 @@ let authToken: string | null = (() => {
 export function setAuthToken(token: string | null) {
   authToken = token
   try {
-    if (token) localStorage.setItem(TOKEN_KEY, token)
-    else localStorage.removeItem(TOKEN_KEY)
+    localStorage.removeItem(TOKEN_KEY)
   } catch {
     /* ignore */
   }
@@ -181,12 +181,13 @@ function toAccount(u: BackendUser): Account {
     name: u.name,
     role: u.role,
     isSubscriber: false,
-    patientId: u.role === 'pasien' || u.role === 'dokter' ? 'p1' : undefined,
+    patientId: u.role === 'pasien' || u.role === 'dokter' ? `self-${u.id}` : undefined,
     loggedAt: new Date().toISOString(),
   }
 }
 
 export const api = {
+  realtimeTicket: (peerName: string) => req<{ ticket: string; room: string }>('/api/realtime/ticket', { method: 'POST', body: JSON.stringify({ peerName }) }),
   health: () => req<Health>('/api/health'),
   promo: () => req<{ limit: number; used: number; slotsLeft: number; discountPct: number; eligible: boolean }>('/api/promo'),
   me: () => req<{ user: BackendUser }>('/api/auth/me').then((r) => toAccount(r.user)),
