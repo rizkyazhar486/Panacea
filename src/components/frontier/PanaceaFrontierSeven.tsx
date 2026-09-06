@@ -74,7 +74,7 @@ export function PanaceaFrontierSeven() {
 
   const social = state.social ?? Object.fromEntries(SOCIAL_AXES.map((axis) => [axis, 5]))
   const socialAverage = SOCIAL_AXES.reduce((sum, axis) => sum + (social[axis] ?? 0), 0) / SOCIAL_AXES.length
-  const weeklyHours = Number.isFinite(state.weeklyHours) ? Math.max(0, state.weeklyHours ?? 0) : 0
+  const weeklyHours = typeof state.weeklyHours === 'number' && Number.isFinite(state.weeklyHours) ? Math.max(0, state.weeklyHours) : 0
   const yearlyHours = weeklyHours * 52
   const yearlyDays = yearlyHours / 24
 
