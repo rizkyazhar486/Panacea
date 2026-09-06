@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { Card, SectionTitle, inputClass } from '../components/ui'
 import { IconStethoscope } from '../components/icons'
 import { HealthGapNavigator } from '../components/HealthGapNavigator'
+import { Medical3DFrontierLab } from '../components/Medical3DFrontierLab'
 import { RecentInnovationLab } from './RecentInnovationLab'
 import { ambilTersembunyi, saring, langgananFitur } from '../lib/fiturTersembunyi'
 
@@ -71,7 +72,7 @@ export function ClinicalHub() {
   return (
     <div className="mx-auto max-w-5xl space-y-5 pb-24">
       <Card className="!p-5">
-        <SectionTitle icon={<IconStethoscope size={20} />} title="Clinical Hub" subtitle={`${total} clinical & AI tools, Panacea gap-navigation, and the 2020–2026 innovation pack`} />
+        <SectionTitle icon={<IconStethoscope size={20} />} title="Clinical Hub" subtitle={`${total} clinical & AI tools, gap-navigation, 3D frontier medicine, and the 2020–2026 innovation pack`} />
         <input
           className={`${inputClass} mt-3`}
           placeholder="Search: bukti, uji klinis, kalkulator, EMR…"
@@ -83,6 +84,10 @@ export function ClinicalHub() {
 
       <div id="gap-navigator">
         <HealthGapNavigator />
+      </div>
+
+      <div id="medical-3d-frontier">
+        <Medical3DFrontierLab />
       </div>
 
       {filtered.length === 0 && (
@@ -115,7 +120,7 @@ export function ClinicalHub() {
       </div>
 
       <div className="rounded-2xl border border-neutral-100 bg-white p-4 text-center text-[11px] leading-relaxed text-neutral-500 dark:border-white/10 dark:bg-white/5">
-        Gap Navigator measures information and implementation gaps, not disease severity. Innovation cards are execution contracts, not claims that external clinical services are already connected. Some clinical tools are intended for healthcare professionals and only appear once your account is verified.
+        Gap Navigator measures information and implementation gaps, not disease severity. Procedural 3D frontier scenes are teaching schematics unless explicitly backed by validated patient-specific imaging or other source data. Innovation cards are execution contracts, not claims that external clinical services are already connected. Some clinical tools are intended for healthcare professionals and only appear once your account is verified.
         Everything is educational and does not replace direct clinical judgment.
       </div>
     </div>
