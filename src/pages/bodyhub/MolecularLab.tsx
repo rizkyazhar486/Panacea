@@ -21,6 +21,8 @@ import { SYSTEM_CONDITIONS } from '../../lib/specialtyPathology'
 
 interface Props {
   onBukaOrgan?: (organKey: string) => void
+  /** Obat yang langsung dibuka — dipakai saat datang dari pencarian atlas. */
+  awal?: string | null
 }
 
 const KELAS: Array<{ key: DrugTarget['targetKelas'] | 'all'; label: string }> = [
@@ -57,9 +59,9 @@ function Chip({ aktif, onClick, children }: { aktif: boolean; onClick: () => voi
   )
 }
 
-export function MolecularLab({ onBukaOrgan }: Props) {
+export function MolecularLab({ onBukaOrgan, awal = null }: Props) {
   const [kelas, setKelas] = useState<DrugTarget['targetKelas'] | 'all'>('all')
-  const [pilih, setPilih] = useState<string>('aspirin')
+  const [pilih, setPilih] = useState<string>(awal ?? 'aspirin')
   const [tanpaH, setTanpaH] = useState(true)
 
   const daftar = useMemo(

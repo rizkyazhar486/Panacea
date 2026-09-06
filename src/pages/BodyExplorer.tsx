@@ -231,6 +231,11 @@ export function BodyExplorer() {
   // memilih "CT" lalu masih melihat foto anatomi berwarna akan membingungkan.
   const [renderMode, setRenderMode] = useState<RenderMode>('anatomy')
   const [panelTab, setPanelTab] = useState<PanelTab>('layers')
+  // Hasil pencarian atlas bisa menunjuk ke ruang lain. Kedua nilai ini membawa
+  // pilihannya menyeberang tab, supaya menekan hasil pencarian benar-benar
+  // membuka apa yang ditunjuk dan bukan sekadar berpindah tab kosong.
+  const [cardioAwal, setCardioAwal] = useState<string | null>(null)
+  const [molekulAwal, setMolekulAwal] = useState<string | null>(null)
   // Kendali radiologi. Window CT dan bidang potong adalah dua hal yang
   // benar-benar diputar radiolog di stasiun kerja — bukan hiasan.
   const [ctWindowKey, setCtWindowKey] = useState(CT_WINDOWS[0].key)
@@ -802,19 +807,23 @@ export function BodyExplorer() {
 
             {panelTab === 'cardio' && (
               <Suspense fallback={<p className="text-sm text-neutral-500">Loading the cardiovascular lab…</p>}>
-                <CardioLab onBukaOrgan={onPickOrgan} />
+                <CardioLab onBukaOrgan={onPickOrgan} awal={cardioAwal} key={cardioAwal ?? 'cardio'} />
               </Suspense>
             )}
 
             {panelTab === 'spesialisasi' && (
               <Suspense fallback={<p className="text-sm text-neutral-500">Loading the specialty atlas…</p>}>
-                <SpecialtyLab onBukaOrgan={onPickOrgan} />
+                <SpecialtyLab
+                  onBukaOrgan={onPickOrgan}
+                  onBukaCardio={(id) => { setCardioAwal(id || null); setPanelTab('cardio') }}
+                  onBukaObat={(id) => { setMolekulAwal(id); setPanelTab('molekul') }}
+                />
               </Suspense>
             )}
 
             {panelTab === 'molekul' && (
               <Suspense fallback={<p className="text-sm text-neutral-500">Loading the molecular lab…</p>}>
-                <MolecularLab onBukaOrgan={onPickOrgan} />
+                <MolecularLab onBukaOrgan={onPickOrgan} awal={molekulAwal} key={molekulAwal ?? 'molekul'} />
               </Suspense>
             )}
 
