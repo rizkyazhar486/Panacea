@@ -83,4 +83,4 @@ The parser reports file provenance, format, byte coverage and SHA-256 of analyze
 
 The Body Exposure route no longer uses the legacy Body3D renderer as the primary visual for Physiology, Body → Cell, Cell → DNA, Exercise, Surgery, Practice, What-if or Research. Physiology uses HRA source geometry plus provenance-aware functional data; Cell/DNA use HPA + Ensembl + local sequencing evidence; Exercise uses HRA plus a data replay; Surgery uses HRA plus a procedure timeline; Practice uses HRA plus active recall; What-if and Research use source-resolved HRA workbenches. Legacy renderers may still exist elsewhere in the repository for compatibility, but they are not the authoritative evidence layer for these Body Exposure modes.
 
-Release marker: HRA-native physiology, local sequence evidence, workout data replay, surgical procedure timeline and rehearsal cleanup are included in the current production batch.
+Release marker: HRA-native physiology, local sequence evidence, workout data replay, surgical procedure timeline and rehearsal cleanup are included in the current production batch. Immediate Vercel release requested for the Cell/DNA evidence-native update.
