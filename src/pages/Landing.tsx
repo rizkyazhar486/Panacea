@@ -3,6 +3,7 @@ import { Wordmark } from '../components/Logo'
 import { BodyExposureWidget } from '../components/dashboard/BodyExposureWidget'
 import { MedicalNews } from '../components/MedicalNews'
 import { PricingSection } from '../components/PricingSection'
+import { ClinicalDuel } from '../components/growth/ClinicalDuel'
 import { api, backendEnabled, type Health } from '../lib/api'
 import {
   IconActivity,
@@ -74,6 +75,7 @@ export function Landing({ onMasuk }: { onMasuk: () => void }) {
         <nav className="panacea-landing-nav mx-auto flex max-w-6xl items-center justify-between gap-3 rounded-full px-3 py-2.5 sm:px-4">
           <Wordmark size={34} onDark />
           <div className="hidden items-center gap-5 text-[11px] font-bold text-white/55 md:flex">
+            <a href="#duel" className="hover:text-white">Daily Duel</a>
             <a href="#system" className="hover:text-white">System</a>
             <a href="#mission" className="hover:text-white">Mission</a>
             <a href="#news" className="hover:text-white">Briefing</a>
@@ -96,6 +98,7 @@ export function Landing({ onMasuk }: { onMasuk: () => void }) {
           <p className="mt-6 max-w-xl text-base leading-relaxed text-white/58 sm:text-lg">PanaceaMed is built as one calm interface for health, medical learning, 4D anatomy, training and clinician-supported tools—without forcing every user to think like a doctor.</p>
           <div className="mt-7 flex flex-wrap gap-2">
             <button onClick={onMasuk} className="liquid-orbit-button !min-h-[44px] !px-5 !text-xs">Start your health space <span aria-hidden>→</span></button>
+            <a href="#duel" className="liquid-orbit-button !min-h-[44px] !px-5 !text-xs">Try today's clinical duel</a>
             <a href="#system" className="liquid-orbit-button !min-h-[44px] !px-5 !text-xs">See how it works</a>
           </div>
           <div className="mt-8 grid max-w-xl grid-cols-3 gap-2">
@@ -105,6 +108,10 @@ export function Landing({ onMasuk }: { onMasuk: () => void }) {
           </div>
         </div>
         <BodyExposureWidget hero interactive showCta={false} className="min-h-[420px]" />
+      </section>
+
+      <section id="duel" className="mx-auto max-w-6xl px-5 py-8 sm:px-8 sm:py-12">
+        <ClinicalDuel />
       </section>
 
       <section id="system" className="mx-auto max-w-6xl px-5 py-20 sm:px-8">
