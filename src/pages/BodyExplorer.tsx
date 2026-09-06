@@ -6,6 +6,9 @@ import { HraContextBridge } from '../components/digital-twin/HraContextBridge'
 const HraClinicalAtlas = lazy(() =>
   import('../components/digital-twin/HraClinicalAtlas').then((m) => ({ default: m.HraClinicalAtlas })),
 )
+const HraSourceSearch = lazy(() =>
+  import('../components/digital-twin/HraSourceSearch').then((m) => ({ default: m.HraSourceSearch })),
+)
 const CellGenomeEvidenceLab = lazy(() =>
   import('../components/digital-twin/CellGenomeEvidenceLab').then((m) => ({ default: m.CellGenomeEvidenceLab })),
 )
@@ -20,6 +23,9 @@ const CounterfactualBiologyLab = lazy(() =>
 )
 const Workout4DLab = lazy(() =>
   import('../components/digital-twin/Workout4DLab').then((m) => ({ default: m.Workout4DLab })),
+)
+const WorkoutHraWorkbench = lazy(() =>
+  import('../components/digital-twin/WorkoutHraWorkbench').then((m) => ({ default: m.WorkoutHraWorkbench })),
 )
 const SurgicalOperationAtlas = lazy(() =>
   import('../components/digital-twin/SurgicalOperationAtlasV2').then((m) => ({ default: m.SurgicalOperationAtlasV2 })),
@@ -40,15 +46,15 @@ type Mode = {
 }
 
 const PRIMARY: Mode[] = [
-  { key: 'realistic-atlas', label: 'Anatomy', hint: 'Live GitHub HRA GLB catalog + published ASCT+B structure mapping' },
+  { key: 'realistic-atlas', label: 'Anatomy', hint: 'Multi-release HRA source anatomy with browser-loadable GLB provenance' },
   { key: 'digital-twin', label: 'Body → Cell', hint: 'Cinematic cell structure + Human Protein Atlas evidence' },
   { key: 'cell-genome', label: 'Cell → DNA', hint: '3D cell/chromatin/DNA + HPA and Ensembl evidence' },
-  { key: 'workout-4d', label: 'Exercise', hint: 'HRA reference anatomy first; measured workout replay is a separate layer' },
+  { key: 'workout-4d', label: 'Exercise', hint: 'Measured workout → HRA anatomy first; replay remains a separate model layer' },
   { key: 'surgery', label: 'Surgery', hint: 'Operation-specific HRA source anatomy first; simulation stays secondary' },
 ]
 
 const MORE: Mode[] = [
-  { key: 'surgery-rehearsal', label: 'Practice', hint: 'HRA source anatomy first; rehearsal remains a separate simulation layer' },
+  { key: 'surgery-rehearsal', label: 'Practice', hint: 'Operation-specific HRA source anatomy first; rehearsal remains a separate model layer' },
   { key: 'counterfactual', label: 'What-if', hint: 'Reference anatomy and real evidence stay separate from scenario modelling' },
   { key: 'regeneration', label: 'Research', hint: 'Reference anatomy and live trials stay separate from experimental concepts' },
 ]
@@ -56,8 +62,6 @@ const MORE: Mode[] = [
 const ALL = [...PRIMARY, ...MORE]
 
 const HRA_CONTEXT: Partial<Record<LabMode, string[]>> = {
-  'workout-4d': ['heart', 'lung', 'blood vasculature', 'skeletal muscle', 'femur'],
-  'surgery-rehearsal': ['meniscus', 'femur', 'patella', 'heart valve', 'kidney', 'colon'],
   counterfactual: ['heart', 'liver', 'kidney', 'brain', 'lung', 'pancreas'],
   regeneration: ['skin', 'liver', 'kidney', 'heart', 'brain', 'pancreas'],
 }
@@ -189,13 +193,22 @@ export function BodyExplorer() {
       {mode === 'digital-twin' ? (
         <CellEvidenceMode mode="body-cell" />
       ) : mode === 'realistic-atlas' ? (
-        <Suspense fallback={<LoadingLab label="HuBMAP Human Reference Atlas" />}>
-          <HraClinicalAtlas />
-        </Suspense>
+        <div className="space-y-4">
+          <Suspense fallback={<LoadingLab label="HuBMAP Human Reference Atlas" />}>
+            <HraClinicalAtlas />
+          </Suspense>
+          <Suspense fallback={<LoadingLab label="multi-release HRA source search" />}>
+            <HraSourceSearch />
+          </Suspense>
+        </div>
       ) : mode === 'cell-genome' ? (
         <CellEvidenceMode mode="cell-genome" />
       ) : mode === 'workout-4d' ? (
-        <SourceBackedMode evidenceTerms={HRA_CONTEXT['workout-4d'] ?? []} title="Measured workout replay" detail="Workout-derived animation is useful only after the HRA anatomical reference is established. Measured device signals, derived physiology and educational context remain explicitly separated.">
+        <SourceBackedMode
+          title="Measured workout replay"
+          detail="Workout-derived animation is useful only after the HRA anatomical reference is established. Measured device signals, derived physiology and educational context remain explicitly separated."
+          sourcePanel={<Suspense fallback={<LoadingLab label="workout-specific HRA workbench" />}><WorkoutHraWorkbench /></Suspense>}
+        >
           <Suspense fallback={<LoadingLab label="exercise physiology replay" />}><Workout4DLab /></Suspense>
         </SourceBackedMode>
       ) : mode === 'surgery' ? (
@@ -207,7 +220,11 @@ export function BodyExplorer() {
           <Suspense fallback={<LoadingLab label="surgical procedure atlas" />}><SurgicalOperationAtlas /></Suspense>
         </SourceBackedMode>
       ) : mode === 'surgery-rehearsal' ? (
-        <SourceBackedMode evidenceTerms={HRA_CONTEXT['surgery-rehearsal'] ?? []} title="Surgical rehearsal" detail="Rehearsal remains clearly separated from the HRA reference anatomy. Source mappings are visible first; open this layer only for procedural practice.">
+        <SourceBackedMode
+          title="Surgical rehearsal"
+          detail="Rehearsal remains clearly separated from HRA anatomy. The operation-specific source workbench is shown first; open the rehearsal only after reviewing mapped anatomy."
+          sourcePanel={<Suspense fallback={<LoadingLab label="operation-specific HRA workbench" />}><SurgicalHraWorkbench /></Suspense>}
+        >
           <Suspense fallback={<LoadingLab label="cinematic surgical rehearsal" />}><CinematicSurgicalRehearsal /></Suspense>
         </SourceBackedMode>
       ) : mode === 'counterfactual' ? (
