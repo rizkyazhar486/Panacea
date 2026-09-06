@@ -3,9 +3,9 @@ import { Link } from 'react-router-dom'
 import { useStore } from '../lib/store'
 import { getVitals } from '../lib/healthVitals'
 import { getWorkouts } from '../lib/workoutStore'
-import { BodyExposureWidget } from '../components/dashboard/BodyExposureWidget'
 import { ActivityAchievementWidget } from '../components/dashboard/ActivityAchievementWidget'
 import { LibraryDiscoveryWidget } from '../components/dashboard/LibraryDiscoveryWidget'
+import { HumanPassportWidget } from '../components/growth/HumanPassportWidget'
 import { LearningModeSwitch } from '../components/LearningModeSwitch'
 import {
   IconActivity,
@@ -105,20 +105,21 @@ export default function Beranda() {
         </div>
       </section>
 
-      <section className="grid gap-4 lg:grid-cols-[1.08fr_.92fr]">
-        <BodyExposureWidget />
+      <HumanPassportWidget name={name} />
+
+      <section className="grid gap-4 lg:grid-cols-2">
         <div className="liquid-panel p-4 sm:p-5">
           <LearningModeSwitch />
-          <div className="mt-5 border-t border-black/[.05] pt-4 dark:border-white/10">
-            <div className="flex items-center gap-2">
-              <IconSparkle size={17} />
-              <h2 className="text-sm font-black text-neutral-900 dark:text-white">Today at a glance</h2>
-            </div>
-            <div className="mt-3 grid grid-cols-3 gap-2">
-              <div className="rounded-2xl bg-white/45 p-3 text-center dark:bg-white/[.035]"><div className="text-xl font-black tabular-nums text-neutral-900 dark:text-white">{totalKm.toFixed(1)}</div><div className="mt-1 text-[9px] font-bold uppercase tracking-wide text-neutral-400">km logged</div></div>
-              <div className="rounded-2xl bg-white/45 p-3 text-center dark:bg-white/[.035]"><div className="text-xl font-black tabular-nums text-neutral-900 dark:text-white">{Math.round(activeMinutes)}</div><div className="mt-1 text-[9px] font-bold uppercase tracking-wide text-neutral-400">active min</div></div>
-              <div className="rounded-2xl bg-white/45 p-3 text-center dark:bg-white/[.035]"><div className="text-xl font-black tabular-nums text-neutral-900 dark:text-white">{workouts.length}</div><div className="mt-1 text-[9px] font-bold uppercase tracking-wide text-neutral-400">sessions</div></div>
-            </div>
+        </div>
+        <div className="liquid-panel p-4 sm:p-5">
+          <div className="flex items-center gap-2">
+            <IconSparkle size={17} />
+            <h2 className="text-sm font-black text-neutral-900 dark:text-white">Today at a glance</h2>
+          </div>
+          <div className="mt-3 grid grid-cols-3 gap-2">
+            <div className="rounded-2xl bg-white/45 p-3 text-center dark:bg-white/[.035]"><div className="text-xl font-black tabular-nums text-neutral-900 dark:text-white">{totalKm.toFixed(1)}</div><div className="mt-1 text-[9px] font-bold uppercase tracking-wide text-neutral-400">km logged</div></div>
+            <div className="rounded-2xl bg-white/45 p-3 text-center dark:bg-white/[.035]"><div className="text-xl font-black tabular-nums text-neutral-900 dark:text-white">{Math.round(activeMinutes)}</div><div className="mt-1 text-[9px] font-bold uppercase tracking-wide text-neutral-400">active min</div></div>
+            <div className="rounded-2xl bg-white/45 p-3 text-center dark:bg-white/[.035]"><div className="text-xl font-black tabular-nums text-neutral-900 dark:text-white">{workouts.length}</div><div className="mt-1 text-[9px] font-bold uppercase tracking-wide text-neutral-400">sessions</div></div>
           </div>
         </div>
       </section>
