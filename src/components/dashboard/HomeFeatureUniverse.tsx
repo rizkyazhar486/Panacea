@@ -6,6 +6,7 @@ import { getVitals } from '../../lib/healthVitals'
 import { getWorkouts } from '../../lib/workoutStore'
 import { getUsageCounts } from '../../lib/usage'
 import { buildHumanPassport } from '../../lib/humanPassport'
+import { LifeWealthCompass } from './LifeWealthCompass'
 
 const LIFE_WEALTH = [
   { to: '/keuangan', emoji: '💰', title: 'Money', hint: 'Cashflow, saving, resilience', tone: 'bg-lime-100 text-lime-900 dark:bg-lime-400/15 dark:text-lime-100' },
@@ -78,6 +79,8 @@ export function HomeFeatureUniverse() {
           ))}
         </div>
       </section>
+
+      <LifeWealthCompass />
 
       <section>
         <div className="mb-2 flex items-end justify-between gap-3 px-1">
