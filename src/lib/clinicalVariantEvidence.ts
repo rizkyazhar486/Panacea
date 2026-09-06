@@ -39,6 +39,8 @@ const CLINVAR_EUTILS = 'https://eutils.ncbi.nlm.nih.gov/entrez/eutils'
 const CPIC_API = 'https://api.cpicpgx.org/v1'
 const clinVarCache = new Map<string, Promise<ClinVarSummary[]>>()
 const cpicCache = new Map<string, Promise<CpicGeneDrugPair[]>>()
+let eutilsQueue: Promise<void> = Promise.resolve()
+let lastEutilsStartedAt = 0
 
 function normalizeChromosome(value: string) {
   return value.replace(/^chr/i, '')
@@ -62,6 +64,18 @@ async function fetchJson<T>(url: string, milliseconds = 15000): Promise<T> {
   } finally {
     clear()
   }
+}
+
+function eutilsFetchJson<T>(url: string, milliseconds = 15000): Promise<T> {
+  const task = eutilsQueue.then(async () => {
+    const elapsed = Date.now() - lastEutilsStartedAt
+    const wait = Math.max(0, 360 - elapsed)
+    if (wait) await new Promise((resolve) => window.setTimeout(resolve, wait))
+    lastEutilsStartedAt = Date.now()
+    return fetchJson<T>(url, milliseconds)
+  })
+  eutilsQueue = task.then(() => undefined, () => undefined)
+  return task
 }
 
 function classification(raw: unknown): ClinVarClassification | undefined {
@@ -121,12 +135,12 @@ export function fetchClinVarForVariant(
 
   const promise = (async () => {
     const searchUrl = `${CLINVAR_EUTILS}/esearch.fcgi?db=clinvar&retmode=json&retmax=3&tool=PanaceaMed&term=${encodeURIComponent(query)}`
-    const search = await fetchJson<{ esearchresult?: { idlist?: string[] } }>(searchUrl)
+    const search = await eutilsFetchJson<{ esearchresult?: { idlist?: string[] } }>(searchUrl)
     const ids = search.esearchresult?.idlist || []
     if (!ids.length) return []
 
     const summaryUrl = `${CLINVAR_EUTILS}/esummary.fcgi?db=clinvar&retmode=json&tool=PanaceaMed&id=${encodeURIComponent(ids.join(','))}`
-    const payload = await fetchJson<{ result?: Record<string, unknown> & { uids?: string[] } }>(summaryUrl)
+    const payload = await eutilsFetchJson<{ result?: Record<string, unknown> & { uids?: string[] } }>(summaryUrl)
     const result = payload.result || {}
     const orderedIds = Array.isArray(result.uids) ? result.uids : ids
     return orderedIds
@@ -151,8 +165,7 @@ export async function fetchClinVarBatch(
   const selected = variants.slice(0, Math.max(1, Math.min(limit, 5)))
   const results: Array<{ key: string; records: ClinVarSummary[]; error?: string }> = []
 
-  for (let index = 0; index < selected.length; index += 1) {
-    const item = selected[index]
+  for (const item of selected) {
     const key = `${item.variant.chrom}:${item.variant.pos}:${item.variant.ref}>${item.variant.alt}`
     try {
       const records = await fetchClinVarForVariant(item.variant, item.assembly, item.externalId)
@@ -160,7 +173,6 @@ export async function fetchClinVarBatch(
     } catch (cause) {
       results.push({ key, records: [], error: cause instanceof Error ? cause.message : 'ClinVar lookup failed.' })
     }
-    if (index < selected.length - 1) await new Promise((resolve) => window.setTimeout(resolve, 380))
   }
   return results
 }
