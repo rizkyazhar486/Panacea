@@ -55,7 +55,8 @@ for (const [path, pattern] of wrappers) assert.match(readFileSync(path, 'utf8'),
 
 const frontierSource = readFileSync('src/lib/panaceaFrontierSeven.ts', 'utf8')
 assert.match(frontierSource, /does not claim that no comparable idea exists anywhere in the world/)
-assert.doesNotMatch(frontierSource, /guaranteed cure|autonomously diagnose|autonomously prescribe/i)
+assert.doesNotMatch(frontierSource, /guaranteed cure|will diagnose|will prescribe|autonomous diagnosis|autonomous prescribing/i)
+assert.match(frontierSource, /must not autonomously diagnose or prescribe/)
 
 const medicalLibrarySource = readFileSync('src/components/MedicalLibraryWorkbench.tsx', 'utf8')
 assert.match(medicalLibrarySource, /Diagnosis/)
