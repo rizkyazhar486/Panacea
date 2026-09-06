@@ -1,12 +1,13 @@
 import { lazy, Suspense } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { DigitalTwinEngine } from '../components/digital-twin/DigitalTwinEngine'
+import { BodyEvidenceDock, type BodyEvidenceMode } from '../components/digital-twin/BodyEvidenceDock'
 
+const HraClinicalAtlas = lazy(() =>
+  import('../components/digital-twin/HraClinicalAtlas').then((m) => ({ default: m.HraClinicalAtlas })),
+)
 const RegenerationResearchSandbox = lazy(() =>
   import('../components/digital-twin/RegenerationResearchSandbox').then((m) => ({ default: m.RegenerationResearchSandbox })),
-)
-const RealisticAnatomyAtlas = lazy(() =>
-  import('../components/digital-twin/RealisticAnatomyAtlas').then((m) => ({ default: m.RealisticAnatomyAtlas })),
 )
 const CellGenomeExplorer = lazy(() =>
   import('../components/digital-twin/CellGenomeExplorer').then((m) => ({ default: m.CellGenomeExplorer })),
@@ -24,27 +25,26 @@ const SurgicalRehearsalLab = lazy(() =>
   import('../components/digital-twin/SurgicalRehearsalLab').then((m) => ({ default: m.SurgicalRehearsalLab })),
 )
 
-type LabMode = 'digital-twin' | 'realistic-atlas' | 'cell-genome' | 'workout-4d' | 'surgery' | 'surgery-rehearsal' | 'counterfactual' | 'regeneration'
+type LabMode = BodyEvidenceMode
 
 type Mode = {
   key: LabMode
   label: string
   hint: string
-  active: string
 }
 
 const PRIMARY: Mode[] = [
-  { key: 'realistic-atlas', label: 'Anatomy', hint: 'Rotate, zoom and tap structures', active: 'bg-cyan-500 text-white border-cyan-500' },
-  { key: 'digital-twin', label: 'Body → Cell', hint: 'Organ, tissue, cell and pathway', active: 'bg-emerald-500 text-white border-emerald-500' },
-  { key: 'cell-genome', label: 'Cell → DNA', hint: 'Cell, nucleus, chromatin, DNA and sequencing evidence', active: 'bg-violet-500 text-white border-violet-500' },
-  { key: 'workout-4d', label: 'Exercise', hint: 'See what changes during movement', active: 'bg-lime-400 text-neutral-950 border-lime-400' },
-  { key: 'surgery', label: 'Surgery', hint: 'Anatomy and procedural sequence', active: 'bg-amber-400 text-neutral-950 border-amber-400' },
+  { key: 'realistic-atlas', label: 'Anatomy', hint: 'HuBMAP HRA reference objects · rotate, isolate, inspect' },
+  { key: 'digital-twin', label: 'Body → Cell', hint: 'Organ, tissue, cell and pathway with live source references' },
+  { key: 'cell-genome', label: 'Cell → DNA', hint: 'Cell, nucleus, chromatin, sequencing and genomics evidence' },
+  { key: 'workout-4d', label: 'Exercise', hint: 'Movement physiology paired with current literature' },
+  { key: 'surgery', label: 'Surgery', hint: 'Surgical anatomy and procedural sequence with live evidence' },
 ]
 
 const MORE: Mode[] = [
-  { key: 'surgery-rehearsal', label: 'Practice', hint: 'Recall surgical steps', active: 'bg-orange-400 text-neutral-950 border-orange-400' },
-  { key: 'counterfactual', label: 'What-if', hint: 'Compare biological scenarios', active: 'bg-sky-500 text-white border-sky-500' },
-  { key: 'regeneration', label: 'Research', hint: 'Experimental concepts', active: 'bg-violet-500 text-white border-violet-500' },
+  { key: 'surgery-rehearsal', label: 'Practice', hint: 'Surgical rehearsal separated from source evidence' },
+  { key: 'counterfactual', label: 'What-if', hint: 'Scenario modelling with real evidence shown separately' },
+  { key: 'regeneration', label: 'Research', hint: 'Experimental regeneration concepts with current trials and literature' },
 ]
 
 const ALL = [...PRIMARY, ...MORE]
@@ -55,7 +55,7 @@ function isLabMode(value: string | null): value is LabMode {
 
 function LoadingLab({ label }: { label: string }) {
   return (
-    <div className="rounded-3xl border border-neutral-200 bg-white p-10 text-center text-sm text-neutral-500 shadow-sm dark:border-white/10 dark:bg-white/[0.035]">
+    <div className="rounded-[28px] border border-neutral-200 bg-white p-10 text-center text-sm font-semibold text-neutral-500 shadow-sm dark:border-white/10 dark:bg-white/[0.035]">
       Loading {label}…
     </div>
   )
@@ -75,64 +75,63 @@ export function BodyExplorer() {
   }
 
   return (
-    <div className="space-y-3 pb-10">
-      <section className="sticky top-0 z-40 overflow-hidden rounded-2xl border border-neutral-200 bg-white/95 p-3 shadow-sm backdrop-blur-xl dark:border-white/10 dark:bg-[#071017]/95">
-        <div className="flex flex-wrap items-center justify-between gap-3">
+    <main className="mx-auto w-full max-w-[1500px] space-y-4 pb-12">
+      <section className="sticky top-0 z-40 rounded-[22px] border border-neutral-200 bg-white/95 px-3 py-3 shadow-[0_10px_30px_rgba(20,30,40,.07)] backdrop-blur-xl dark:border-white/10 dark:bg-[#080b0e]/95 sm:px-4">
+        <div className="flex flex-wrap items-start justify-between gap-3">
           <div>
-            <div className="text-sm font-black text-ink dark:text-white">Body Exposure · Atlas</div>
-            <div className="mt-0.5 text-[10px] text-neutral-500">{active.hint}</div>
+            <div className="text-[9px] font-black uppercase tracking-[.18em] text-neutral-400">Panacea Body Exposure</div>
+            <div className="mt-0.5 text-[15px] font-black tracking-tight text-neutral-950 dark:text-white">{active.label}</div>
+            <div className="mt-0.5 text-[10px] font-medium text-neutral-500 dark:text-neutral-400">{active.hint}</div>
           </div>
-          <div className="text-[9px] font-bold text-neutral-400">Drag to rotate · pinch/scroll to zoom · tap a structure</div>
+          <div className="flex flex-wrap gap-1.5 text-[8px] font-black uppercase tracking-[.1em] text-neutral-500">
+            <span className="rounded-full border border-neutral-200 bg-neutral-50 px-2.5 py-1.5 dark:border-white/10 dark:bg-white/[.04]">HRA / HuBMAP</span>
+            <span className="rounded-full border border-neutral-200 bg-neutral-50 px-2.5 py-1.5 dark:border-white/10 dark:bg-white/[.04]">EMBL-EBI</span>
+            <span className="rounded-full border border-neutral-200 bg-neutral-50 px-2.5 py-1.5 dark:border-white/10 dark:bg-white/[.04]">Europe PMC</span>
+            <span className="rounded-full border border-neutral-200 bg-neutral-50 px-2.5 py-1.5 dark:border-white/10 dark:bg-white/[.04]">ClinicalTrials.gov</span>
+          </div>
         </div>
 
-        <div className="mt-3 flex gap-2 overflow-x-auto pb-1" style={{ scrollbarWidth: 'none' }}>
+        <div className="no-scrollbar -mx-1 mt-3 flex gap-1.5 overflow-x-auto px-1 pb-1">
           {PRIMARY.map((item) => (
             <button
               key={item.key}
               onClick={() => setMode(item.key)}
-              className={`shrink-0 rounded-full border px-4 py-2 text-[11px] font-black transition ${mode === item.key ? item.active : 'border-neutral-200 bg-neutral-50 text-neutral-600 hover:border-neutral-300 dark:border-white/10 dark:bg-white/[.04] dark:text-neutral-300'}`}
+              className={`shrink-0 rounded-full border px-3.5 py-2 text-[10px] font-black transition ${mode === item.key ? 'border-neutral-950 bg-neutral-950 text-white dark:border-white dark:bg-white dark:text-neutral-950' : 'border-neutral-200 bg-neutral-50 text-neutral-600 hover:border-neutral-300 dark:border-white/10 dark:bg-white/[.04] dark:text-neutral-300'}`}
             >
               {item.label}
             </button>
           ))}
+          <details className="shrink-0">
+            <summary className="list-none cursor-pointer rounded-full border border-neutral-200 bg-neutral-50 px-3.5 py-2 text-[10px] font-black text-neutral-600 dark:border-white/10 dark:bg-white/[.04] dark:text-neutral-300">More ▾</summary>
+            <div className="absolute right-3 mt-2 flex min-w-[170px] flex-col gap-1 rounded-2xl border border-neutral-200 bg-white p-2 shadow-xl dark:border-white/10 dark:bg-[#111519]">
+              {MORE.map((item) => (
+                <button key={item.key} onClick={() => setMode(item.key)} className={`rounded-xl px-3 py-2 text-left text-[10px] font-black ${mode === item.key ? 'bg-neutral-950 text-white dark:bg-white dark:text-neutral-950' : 'text-neutral-600 hover:bg-neutral-100 dark:text-neutral-300 dark:hover:bg-white/10'}`}>{item.label}</button>
+              ))}
+            </div>
+          </details>
         </div>
-
-        <details className="mt-2">
-          <summary className="cursor-pointer select-none text-[10px] font-black text-neutral-500">More tools</summary>
-          <div className="mt-2 flex gap-2 overflow-x-auto pb-1">
-            {MORE.map((item) => (
-              <button
-                key={item.key}
-                onClick={() => setMode(item.key)}
-                className={`shrink-0 rounded-full border px-3 py-1.5 text-[10px] font-black transition ${mode === item.key ? item.active : 'border-neutral-200 text-neutral-500 dark:border-white/10 dark:text-neutral-300'}`}
-              >
-                {item.label}
-              </button>
-            ))}
-          </div>
-        </details>
       </section>
 
       {mode === 'digital-twin' ? (
         <DigitalTwinEngine />
       ) : mode === 'realistic-atlas' ? (
-        <Suspense fallback={<LoadingLab label="anatomy" />}>
-          <RealisticAnatomyAtlas />
+        <Suspense fallback={<LoadingLab label="HuBMAP Human Reference Atlas" />}>
+          <HraClinicalAtlas />
         </Suspense>
       ) : mode === 'cell-genome' ? (
         <Suspense fallback={<LoadingLab label="cell-to-genome explorer" />}>
           <CellGenomeExplorer />
         </Suspense>
       ) : mode === 'workout-4d' ? (
-        <Suspense fallback={<LoadingLab label="exercise view" />}>
+        <Suspense fallback={<LoadingLab label="exercise physiology" />}>
           <Workout4DLab />
         </Suspense>
       ) : mode === 'surgery' ? (
-        <Suspense fallback={<LoadingLab label="surgery atlas" />}>
+        <Suspense fallback={<LoadingLab label="surgical anatomy" />}>
           <SurgicalOperationAtlas />
         </Suspense>
       ) : mode === 'surgery-rehearsal' ? (
-        <Suspense fallback={<LoadingLab label="practice mode" />}>
+        <Suspense fallback={<LoadingLab label="surgical rehearsal" />}>
           <SurgicalRehearsalLab />
         </Suspense>
       ) : mode === 'counterfactual' ? (
@@ -140,10 +139,12 @@ export function BodyExplorer() {
           <CounterfactualBiologyLab />
         </Suspense>
       ) : (
-        <Suspense fallback={<LoadingLab label="research lab" />}>
+        <Suspense fallback={<LoadingLab label="regeneration research" />}>
           <RegenerationResearchSandbox />
         </Suspense>
       )}
-    </div>
+
+      <BodyEvidenceDock mode={mode} />
+    </main>
   )
 }
