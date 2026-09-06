@@ -23,17 +23,17 @@ export function Owner() {
   const monthlyTarget = 50000000
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-5 pb-8 sm:space-y-6">
       <Card>
         <SectionTitle
           icon={<IconChartUp size={20} />}
           title="Owner — Company Profit"
           subtitle="Panaceamed monetary summary (all revenue streams)"
         />
-        <div className="rounded-2xl bg-gradient-to-br from-[#00BF63] to-[#0b7a4b] p-6 text-white">
+        <div className="rounded-2xl bg-gradient-to-br from-[#00BF63] to-[#0b7a4b] p-5 text-white sm:p-6">
           <div className="text-xs font-semibold uppercase tracking-wide text-white/90">Estimated Gross Revenue</div>
-          <div className="text-4xl font-extrabold">Rp{grossIdr.toLocaleString('en-GB')}</div>
-          <div className="mt-1 text-sm text-white/90">≈ {grossPNC} PNC + Rp{consultRevenue.toLocaleString('en-GB')} consultations</div>
+          <div className="mt-1 break-words text-3xl font-extrabold sm:text-4xl">Rp{grossIdr.toLocaleString('en-GB')}</div>
+          <div className="mt-1 text-sm leading-relaxed text-white/90">≈ {grossPNC} PNC + Rp{consultRevenue.toLocaleString('en-GB')} consultations</div>
           <div className="mt-3 h-2 overflow-hidden rounded-full bg-white/20">
             <div className="h-full rounded-full bg-white" style={{ width: `${Math.min(100, (grossIdr / monthlyTarget) * 100)}%` }} />
           </div>
@@ -76,7 +76,7 @@ export function Owner() {
             title="Manage Admin Access"
             subtitle="Only email addresses you allow here can sign in as Admin."
           />
-          <div className="flex gap-2">
+          <div className="flex flex-col gap-2 sm:flex-row">
             <input
               className={inputClass}
               value={newAdmin}
@@ -90,12 +90,12 @@ export function Owner() {
           </div>
           <div className="mt-3 space-y-2">
             {state.adminEmails.map((e) => (
-              <div key={e} className="flex items-center justify-between rounded-xl bg-neutral-50 px-3 py-2 text-sm">
-                <span className="font-medium">{e}</span>
+              <div key={e} className="flex items-center justify-between gap-3 rounded-xl bg-neutral-50 px-3 py-2 text-sm">
+                <span className="min-w-0 truncate font-medium text-ink">{e}</span>
                 {e === OWNER_EMAIL ? (
                   <Badge tone="brand">Owner</Badge>
                 ) : (
-                  <button onClick={() => removeAdminEmail(e)} className="text-xs font-semibold text-accent hover:underline">
+                  <button onClick={() => removeAdminEmail(e)} className="shrink-0 text-xs font-semibold text-accent hover:underline">
                     Remove
                   </button>
                 )}
@@ -216,9 +216,9 @@ function RealtimeStats() {
         <>
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
             {tiles.map((t) => (
-              <div key={t.label} className="rounded-xl bg-neutral-50 p-3">
-                <div className="text-lg font-extrabold leading-tight">{t.value}</div>
-                <div className="text-[10px] font-semibold uppercase tracking-wide text-neutral-500">{t.label}</div>
+              <div key={t.label} className="min-w-0 rounded-xl bg-neutral-50 p-3">
+                <div className="break-words text-lg font-extrabold leading-tight text-ink">{t.value}</div>
+                <div className="mt-1 text-[10px] font-semibold uppercase tracking-wide text-neutral-500">{t.label}</div>
               </div>
             ))}
           </div>
@@ -326,6 +326,15 @@ function AIOperatorPanel() {
   )
 }
 
+const OWNER_USER_ALERT_KEY = 'pmd-owner-new-user-alerts-v1'
+const OWNER_USER_SEEN_KEY = 'pmd-owner-new-user-seen-v1'
+const USER_MILESTONES = [
+  { target: 100, label: 'Validasi awal', detail: 'Pastikan onboarding, aktivasi fitur inti, dan alasan pengguna kembali sudah terlihat.' },
+  { target: 250, label: 'Beta penjualan', detail: 'Uji paket berbayar, trial-to-paid, dan pesan promosi pada cohort nyata.' },
+  { target: 500, label: 'Growth loop', detail: 'Perkuat referral, share card, komunitas, dan retention sebelum menambah acquisition.' },
+  { target: 1000, label: 'Scale komersial', detail: 'Ukur CAC, conversion, retention, revenue per user, dan channel yang repeatable.' },
+] as const
+
 // Owner-only directory: every registered account (email, role, signup date),
 // with real transaction/subscription status pulled from the server (never
 // client-local-only demo data the owner couldn't otherwise see).
@@ -334,9 +343,75 @@ function UserDirectoryPanel() {
   const [err, setErr] = useState('')
   const [filter, setFilter] = useState<'semua' | 'transaksi' | 'berlangganan'>('semua')
   const [q, setQ] = useState('')
+  const [alertsEnabled, setAlertsEnabled] = useState(() => {
+    try { return localStorage.getItem(OWNER_USER_ALERT_KEY) === '1' } catch { return false }
+  })
+  const [alertStatus, setAlertStatus] = useState('')
 
-  function load() { api.ownerUsers().then(setRows).catch(() => setErr('Failed to load (requires an Owner account).')) }
-  useEffect(load, [])
+  async function load(notifyNew = false) {
+    try {
+      const next = [...await api.ownerUsers()].sort((a, b) => Date.parse(b.createdAt) - Date.parse(a.createdAt))
+
+      if (alertsEnabled && next[0]) {
+        try {
+          const lastSeen = localStorage.getItem(OWNER_USER_SEEN_KEY)
+          const lastSeenMs = lastSeen ? Date.parse(lastSeen) : Number.NaN
+          const fresh = Number.isFinite(lastSeenMs)
+            ? next.filter((r) => Date.parse(r.createdAt) > lastSeenMs)
+            : []
+
+          if (notifyNew && fresh.length > 0 && typeof Notification !== 'undefined' && Notification.permission === 'granted') {
+            const newest = fresh[0]
+            const body = fresh.length === 1
+              ? `${newest.name} · ${ROLE_LABEL[newest.role] ?? newest.role}`
+              : `${fresh.length} akun baru sejak pemeriksaan terakhir · terbaru: ${newest.name}`
+            new Notification(fresh.length === 1 ? 'Pengguna baru PanaceaMed' : `${fresh.length} pengguna baru PanaceaMed`, {
+              body,
+              tag: `pmd-owner-user-${newest.id}`,
+            })
+          }
+          localStorage.setItem(OWNER_USER_SEEN_KEY, next[0].createdAt)
+        } catch {
+          // Local notification storage is an enhancement; live directory must still work without it.
+        }
+      }
+
+      setRows(next)
+      setErr('')
+    } catch {
+      setErr('Failed to load (requires an Owner account).')
+    }
+  }
+
+  useEffect(() => {
+    load(false)
+    const id = setInterval(() => load(true), 30_000)
+    return () => clearInterval(id)
+  }, [alertsEnabled])
+
+  async function enableAlerts() {
+    if (typeof window === 'undefined' || !('Notification' in window)) {
+      setAlertStatus('Browser ini belum mendukung notifikasi web.')
+      return
+    }
+    const permission = await Notification.requestPermission()
+    if (permission !== 'granted') {
+      setAlertStatus('Izin notifikasi belum diberikan. Data pengguna tetap diperbarui di halaman ini.')
+      return
+    }
+    setAlertsEnabled(true)
+    try {
+      localStorage.setItem(OWNER_USER_ALERT_KEY, '1')
+      if (rows?.[0]) localStorage.setItem(OWNER_USER_SEEN_KEY, rows[0].createdAt)
+    } catch { /* ignore */ }
+    setAlertStatus('Alert aktif — hanya akun yang mendaftar setelah aktivasi yang akan memicu notifikasi.')
+  }
+
+  function disableAlerts() {
+    setAlertsEnabled(false)
+    try { localStorage.setItem(OWNER_USER_ALERT_KEY, '0') } catch { /* ignore */ }
+    setAlertStatus('Alert browser dimatikan. Live user list tetap aktif.')
+  }
 
   const filtered = (rows ?? []).filter((r) => {
     if (q.trim() && !`${r.email} ${r.name}`.toLowerCase().includes(q.trim().toLowerCase())) return false
@@ -345,54 +420,176 @@ function UserDirectoryPanel() {
     return true
   })
 
+  const total = rows?.length ?? 0
+  const now = Date.now()
+  const startToday = new Date()
+  startToday.setHours(0, 0, 0, 0)
+  const newToday = (rows ?? []).filter((r) => Date.parse(r.createdAt) >= startToday.getTime()).length
+  const new7d = (rows ?? []).filter((r) => now - Date.parse(r.createdAt) <= 7 * 24 * 60 * 60 * 1000).length
+  const paidUsers = (rows ?? []).filter((r) => r.paidOrdersCount > 0).length
+  const subscribedUsers = (rows ?? []).filter((r) => r.subscriptions.longevityActive || r.subscriptions.chronicActive || r.subscriptions.clinicalCalcUnlocked).length
+  const paidConversion = total > 0 ? (paidUsers / total) * 100 : 0
+  const recent = (rows ?? []).slice(0, 6)
+  const completedMilestones = USER_MILESTONES.filter((m) => total >= m.target)
+  const nextMilestone = USER_MILESTONES.find((m) => total < m.target)
+  const previousTarget = completedMilestones.length > 0 ? completedMilestones[completedMilestones.length - 1].target : 0
+  const milestoneProgress = nextMilestone
+    ? Math.max(0, Math.min(100, ((total - previousTarget) / (nextMilestone.target - previousTarget)) * 100))
+    : 100
+
   return (
-    <Card className="border-2 border-brand/30">
+    <Card className="border-2 border-brand/30 !p-4 sm:!p-5">
       <SectionTitle
         icon={<IconUsers size={20} />}
-        title="User Directory"
-        subtitle="Every account that registers, transacts and subscribes"
-        right={<Badge tone="brand">{rows?.length ?? 0} accounts</Badge>}
+        title="Owner Growth & User Directory"
+        subtitle="Live registered accounts, conversion signals, new-user alerts and growth milestones — sourced from the server"
+        right={<Badge tone="brand">{total} accounts</Badge>}
       />
-      {err && <p className="mb-2 text-xs text-accent">{err}</p>}
-      {!rows && !err && <SkeletonRows rows={3} />}
+      {err && <p className="mb-2 text-xs font-semibold text-accent">{err}</p>}
+      {!rows && !err && <SkeletonRows rows={4} />}
       {rows && (
         <>
-          <div className="flex flex-wrap items-center gap-2">
-            <input className={inputClass} placeholder="Search email/name…" value={q} onChange={(e) => setQ(e.target.value)} />
-            <div className="flex gap-1.5">
-              {(['semua', 'transaksi', 'berlangganan'] as const).map((f) => (
-                <button key={f} onClick={() => setFilter(f)} className={`rounded-full px-3 py-1.5 text-xs font-bold ${filter === f ? 'bg-brand text-white' : 'bg-neutral-100 text-neutral-500'}`}>
-                  {f === 'semua' ? 'All' : f === 'transaksi' ? 'Has transacted' : 'Active subscription'}
-                </button>
-              ))}
-            </div>
-          </div>
-          <div className="mt-3 space-y-2">
-            {filtered.length === 0 && <p className="py-6 text-center text-sm text-neutral-500">No accounts match the filter.</p>}
-            {filtered.map((r) => (
-              <div key={r.id} className="rounded-xl border border-neutral-100 p-3">
-                <div className="flex flex-wrap items-center justify-between gap-2">
-                  <div className="min-w-0">
-                    <div className="truncate font-bold text-ink">{r.name}</div>
-                    <div className="truncate text-xs text-neutral-500">{r.email}</div>
-                  </div>
-                  <Badge tone="neutral">{ROLE_LABEL[r.role] ?? r.role}</Badge>
-                </div>
-                <div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1 text-[11px] text-neutral-500">
-                  <span>Joined {new Date(r.createdAt).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}</span>
-                  <span>Balance {r.walletBalance} PNC</span>
-                  <span>{r.paidOrdersCount} paid transactions{r.totalPaidIdr > 0 ? ` (Rp${r.totalPaidIdr.toLocaleString('en-GB')})` : ''}</span>
-                </div>
-                {(r.subscriptions.longevityActive || r.subscriptions.chronicActive || r.subscriptions.clinicalCalcUnlocked) && (
-                  <div className="mt-2 flex flex-wrap gap-1.5">
-                    {r.subscriptions.longevityActive && <Badge tone="brand">Longevity active</Badge>}
-                    {r.subscriptions.chronicLifetime && <Badge tone="brand">Chronic Lifetime</Badge>}
-                    {r.subscriptions.chronicActive && !r.subscriptions.chronicLifetime && <Badge tone="brand">Chronic active</Badge>}
-                    {r.subscriptions.clinicalCalcUnlocked && <Badge tone="brand">Clinical Calculator unlocked</Badge>}
-                  </div>
-                )}
+          <div className="grid grid-cols-2 gap-2 sm:grid-cols-5">
+            {[
+              ['Total users', total.toLocaleString('en-GB')],
+              ['New today', newToday.toLocaleString('en-GB')],
+              ['New 7 days', new7d.toLocaleString('en-GB')],
+              ['Paid users', paidUsers.toLocaleString('en-GB')],
+              ['Paid conversion', `${paidConversion.toFixed(1)}%`],
+            ].map(([label, value]) => (
+              <div key={label} className="min-w-0 rounded-2xl border border-neutral-100 bg-neutral-50 p-3">
+                <div className="break-words text-xl font-black leading-none text-ink">{value}</div>
+                <div className="mt-1 text-[10px] font-bold uppercase tracking-wide text-neutral-500">{label}</div>
               </div>
             ))}
+          </div>
+
+          <div className="mt-3 flex flex-col gap-3 rounded-2xl border border-neutral-100 bg-white/70 p-3 sm:flex-row sm:items-center sm:justify-between">
+            <div className="min-w-0">
+              <div className="flex items-center gap-2 text-sm font-black text-ink"><IconBell size={16} /> Notifikasi pengguna baru</div>
+              <p className="mt-1 text-[11px] leading-relaxed text-neutral-500">
+                Directory diperbarui tiap 30 detik. Browser alert hanya dipicu untuk pendaftaran baru setelah alert diaktifkan — akun lama tidak dikirim ulang.
+              </p>
+              {alertStatus && <p className="mt-1 text-[11px] font-semibold text-brand-dark">{alertStatus}</p>}
+            </div>
+            <div className="shrink-0">
+              {alertsEnabled ? (
+                <Button variant="outline" onClick={disableAlerts}><IconBell size={15} /> Alert aktif</Button>
+              ) : (
+                <Button onClick={enableAlerts}><IconBell size={15} /> Aktifkan alert</Button>
+              )}
+            </div>
+          </div>
+
+          <div className="mt-4 rounded-2xl border border-brand/20 bg-brand-50/60 p-4">
+            <div className="flex flex-wrap items-start justify-between gap-2">
+              <div>
+                <div className="text-sm font-black text-ink">Pathway pertumbuhan → penjualan</div>
+                <p className="mt-0.5 max-w-2xl text-[11px] leading-relaxed text-neutral-600">
+                  Milestone ini memakai jumlah akun nyata sebagai checkpoint operasional, bukan bukti product-market fit. Keputusan penjualan tetap harus membaca conversion, retention, dan revenue nyata.
+                </p>
+              </div>
+              <a href="#/owner-analytics" className="rounded-full border border-brand/30 bg-white px-3 py-1.5 text-[11px] font-black text-brand-dark shadow-sm hover:bg-brand-50">
+                Buka Owner Analytics →
+              </a>
+            </div>
+
+            <div className="mt-3 h-2 overflow-hidden rounded-full bg-white/80 ring-1 ring-black/5">
+              <div className="h-full rounded-full bg-brand transition-all" style={{ width: `${milestoneProgress}%` }} />
+            </div>
+            <div className="mt-1 flex items-center justify-between gap-2 text-[10px] font-semibold text-neutral-500">
+              <span>{nextMilestone ? `${total}/${nextMilestone.target} menuju ${nextMilestone.label}` : '1.000+ akun tercapai'}</span>
+              <span>{subscribedUsers} subscription/unlock aktif</span>
+            </div>
+
+            <div className="mt-3 grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
+              {USER_MILESTONES.map((m) => {
+                const done = total >= m.target
+                const current = nextMilestone?.target === m.target
+                return (
+                  <div key={m.target} className={`rounded-xl border p-3 ${done ? 'border-brand/30 bg-white' : current ? 'border-amber-300 bg-amber-50' : 'border-neutral-100 bg-white/70'}`}>
+                    <div className="flex items-center justify-between gap-2">
+                      <span className="text-lg font-black text-ink">{m.target.toLocaleString('en-GB')}</span>
+                      <Badge tone={done ? 'brand' : current ? 'high' : 'neutral'}>{done ? 'Tercapai' : current ? 'Berikutnya' : 'Nanti'}</Badge>
+                    </div>
+                    <div className="mt-1 text-xs font-black text-ink">{m.label}</div>
+                    <p className="mt-1 text-[10px] leading-relaxed text-neutral-500">{m.detail}</p>
+                  </div>
+                )
+              })}
+            </div>
+          </div>
+
+          <div className="mt-4">
+            <div className="mb-2 flex items-center justify-between gap-2">
+              <div>
+                <div className="text-xs font-black uppercase tracking-wide text-neutral-500">Pendaftaran terbaru</div>
+                <div className="text-[10px] text-neutral-500">Enam akun terbaru berdasarkan timestamp server</div>
+              </div>
+              <button onClick={() => load(false)} className="rounded-full bg-neutral-100 px-3 py-1.5 text-[11px] font-bold text-neutral-600 hover:bg-neutral-200">Refresh</button>
+            </div>
+            <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
+              {recent.map((r) => {
+                const isToday = Date.parse(r.createdAt) >= startToday.getTime()
+                return (
+                  <div key={`recent-${r.id}`} className="min-w-0 rounded-xl border border-neutral-100 bg-neutral-50 p-3">
+                    <div className="flex items-start justify-between gap-2">
+                      <div className="min-w-0">
+                        <div className="truncate text-sm font-black text-ink">{r.name}</div>
+                        <div className="truncate text-[11px] text-neutral-500">{r.email}</div>
+                      </div>
+                      {isToday ? <Badge tone="brand">Baru</Badge> : <Badge tone="neutral">{ROLE_LABEL[r.role] ?? r.role}</Badge>}
+                    </div>
+                    <div className="mt-2 flex flex-wrap gap-x-3 gap-y-1 text-[10px] text-neutral-500">
+                      <span>{new Date(r.createdAt).toLocaleString('en-GB', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}</span>
+                      {r.paidOrdersCount > 0 && <span className="font-bold text-brand-dark">Paid ×{r.paidOrdersCount}</span>}
+                    </div>
+                  </div>
+                )
+              })}
+              {recent.length === 0 && <p className="col-span-full py-4 text-center text-sm text-neutral-500">Belum ada akun terdaftar.</p>}
+            </div>
+          </div>
+
+          <div className="mt-5 border-t border-neutral-100 pt-4">
+            <div className="mb-2 text-xs font-black uppercase tracking-wide text-neutral-500">Semua pengguna</div>
+            <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
+              <input className={`${inputClass} min-w-0 flex-1`} placeholder="Search email/name…" value={q} onChange={(e) => setQ(e.target.value)} />
+              <div className="no-scrollbar flex max-w-full gap-1.5 overflow-x-auto pb-1 sm:pb-0">
+                {(['semua', 'transaksi', 'berlangganan'] as const).map((f) => (
+                  <button key={f} onClick={() => setFilter(f)} className={`shrink-0 rounded-full px-3 py-1.5 text-xs font-bold ${filter === f ? 'bg-brand text-white' : 'bg-neutral-100 text-neutral-600'}`}>
+                    {f === 'semua' ? 'All' : f === 'transaksi' ? 'Has transacted' : 'Active subscription'}
+                  </button>
+                ))}
+              </div>
+            </div>
+            <div className="mt-3 max-h-[38rem] space-y-2 overflow-y-auto pr-1">
+              {filtered.length === 0 && <p className="py-6 text-center text-sm text-neutral-500">No accounts match the filter.</p>}
+              {filtered.map((r) => (
+                <div key={r.id} className="rounded-xl border border-neutral-100 bg-white/70 p-3">
+                  <div className="flex flex-wrap items-center justify-between gap-2">
+                    <div className="min-w-0">
+                      <div className="truncate font-bold text-ink">{r.name}</div>
+                      <div className="truncate text-xs text-neutral-500">{r.email}</div>
+                    </div>
+                    <Badge tone="neutral">{ROLE_LABEL[r.role] ?? r.role}</Badge>
+                  </div>
+                  <div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1 text-[11px] text-neutral-500">
+                    <span>Joined {new Date(r.createdAt).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}</span>
+                    <span>Balance {r.walletBalance} PNC</span>
+                    <span>{r.paidOrdersCount} paid transactions{r.totalPaidIdr > 0 ? ` (Rp${r.totalPaidIdr.toLocaleString('en-GB')})` : ''}</span>
+                  </div>
+                  {(r.subscriptions.longevityActive || r.subscriptions.chronicActive || r.subscriptions.clinicalCalcUnlocked) && (
+                    <div className="mt-2 flex flex-wrap gap-1.5">
+                      {r.subscriptions.longevityActive && <Badge tone="brand">Longevity active</Badge>}
+                      {r.subscriptions.chronicLifetime && <Badge tone="brand">Chronic Lifetime</Badge>}
+                      {r.subscriptions.chronicActive && !r.subscriptions.chronicLifetime && <Badge tone="brand">Chronic active</Badge>}
+                      {r.subscriptions.clinicalCalcUnlocked && <Badge tone="brand">Clinical Calculator unlocked</Badge>}
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
           </div>
         </>
       )}
@@ -626,7 +823,7 @@ function BroadcastPanel() {
       <div className="space-y-2">
         <input className={inputClass} value={title} onChange={(e) => setTitle(e.target.value)} placeholder="Title (e.g. Service Update)" maxLength={60} />
         <textarea className={`${inputClass} min-h-[72px]`} value={body} onChange={(e) => setBody(e.target.value)} placeholder="Announcement content…" maxLength={180} />
-        <div className="flex items-center gap-3">
+        <div className="flex flex-wrap items-center gap-3">
           <Button onClick={send} disabled={busy || !body.trim()}>
             <IconSend size={15} /> {busy ? 'Sending…' : 'Send to All'}
           </Button>
@@ -723,7 +920,7 @@ function Stat({ icon, label, value, sub }: { icon: ReactNode; label: string; val
   return (
     <Card>
       <div className="flex items-center gap-2 text-neutral-500">{icon}<span className="text-[11px] font-semibold uppercase tracking-wide">{label}</span></div>
-      <div className="mt-1 text-2xl font-extrabold">{value}</div>
+      <div className="mt-1 break-words text-2xl font-extrabold text-ink">{value}</div>
       <div className="text-[11px] text-neutral-500">{sub}</div>
     </Card>
   )
@@ -733,9 +930,9 @@ function Bar({ label, value, total, color }: { label: string; value: number; tot
   const pct = total > 0 ? Math.round((value / total) * 100) : 0
   return (
     <div>
-      <div className="mb-1 flex justify-between text-sm">
+      <div className="mb-1 flex flex-col gap-0.5 text-sm sm:flex-row sm:justify-between sm:gap-3">
         <span>{label}</span>
-        <span className="font-bold">Rp{value.toLocaleString('en-GB')} ({pct}%)</span>
+        <span className="break-words font-bold">Rp{value.toLocaleString('en-GB')} ({pct}%)</span>
       </div>
       <div className="h-2 overflow-hidden rounded-full bg-neutral-100">
         <div className="h-full rounded-full" style={{ width: `${pct}%`, background: color }} />
