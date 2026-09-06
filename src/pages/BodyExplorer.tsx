@@ -1,16 +1,15 @@
 import { lazy, Suspense } from 'react'
 import { useSearchParams } from 'react-router-dom'
-import { DigitalTwinEngine } from '../components/digital-twin/DigitalTwinEngine'
 import { BodyEvidenceDock, type BodyEvidenceMode } from '../components/digital-twin/BodyEvidenceDock'
 
 const HraClinicalAtlas = lazy(() =>
   import('../components/digital-twin/HraClinicalAtlas').then((m) => ({ default: m.HraClinicalAtlas })),
 )
+const CellGenomeEvidenceLab = lazy(() =>
+  import('../components/digital-twin/CellGenomeEvidenceLab').then((m) => ({ default: m.CellGenomeEvidenceLab })),
+)
 const RegenerationResearchSandbox = lazy(() =>
   import('../components/digital-twin/RegenerationResearchSandbox').then((m) => ({ default: m.RegenerationResearchSandbox })),
-)
-const CellGenomeExplorer = lazy(() =>
-  import('../components/digital-twin/CellGenomeExplorer').then((m) => ({ default: m.CellGenomeExplorer })),
 )
 const CounterfactualBiologyLab = lazy(() =>
   import('../components/digital-twin/CounterfactualBiologyLab').then((m) => ({ default: m.CounterfactualBiologyLab })),
@@ -35,8 +34,8 @@ type Mode = {
 
 const PRIMARY: Mode[] = [
   { key: 'realistic-atlas', label: 'Anatomy', hint: 'HuBMAP HRA reference objects · rotate, isolate, inspect' },
-  { key: 'digital-twin', label: 'Body → Cell', hint: 'Organ, tissue, cell and pathway with live source references' },
-  { key: 'cell-genome', label: 'Cell → DNA', hint: 'Cell, nucleus, chromatin, sequencing and genomics evidence' },
+  { key: 'digital-twin', label: 'Body → Cell', hint: 'Human Protein Atlas microscopy and real cell/gene records' },
+  { key: 'cell-genome', label: 'Cell → DNA', hint: 'Human Protein Atlas + Ensembl coordinates and genomic sequence' },
   { key: 'workout-4d', label: 'Exercise', hint: 'Movement physiology paired with current literature' },
   { key: 'surgery', label: 'Surgery', hint: 'Surgical anatomy and procedural sequence with live evidence' },
 ]
@@ -85,9 +84,9 @@ export function BodyExplorer() {
           </div>
           <div className="flex flex-wrap gap-1.5 text-[8px] font-black uppercase tracking-[.1em] text-neutral-500">
             <span className="rounded-full border border-neutral-200 bg-neutral-50 px-2.5 py-1.5 dark:border-white/10 dark:bg-white/[.04]">HRA / HuBMAP</span>
-            <span className="rounded-full border border-neutral-200 bg-neutral-50 px-2.5 py-1.5 dark:border-white/10 dark:bg-white/[.04]">EMBL-EBI</span>
+            <span className="rounded-full border border-neutral-200 bg-neutral-50 px-2.5 py-1.5 dark:border-white/10 dark:bg-white/[.04]">Human Protein Atlas</span>
+            <span className="rounded-full border border-neutral-200 bg-neutral-50 px-2.5 py-1.5 dark:border-white/10 dark:bg-white/[.04]">Ensembl</span>
             <span className="rounded-full border border-neutral-200 bg-neutral-50 px-2.5 py-1.5 dark:border-white/10 dark:bg-white/[.04]">Europe PMC</span>
-            <span className="rounded-full border border-neutral-200 bg-neutral-50 px-2.5 py-1.5 dark:border-white/10 dark:bg-white/[.04]">ClinicalTrials.gov</span>
           </div>
         </div>
 
@@ -113,14 +112,16 @@ export function BodyExplorer() {
       </section>
 
       {mode === 'digital-twin' ? (
-        <DigitalTwinEngine />
+        <Suspense fallback={<LoadingLab label="Human Protein Atlas cell evidence" />}>
+          <CellGenomeEvidenceLab mode="body-cell" />
+        </Suspense>
       ) : mode === 'realistic-atlas' ? (
         <Suspense fallback={<LoadingLab label="HuBMAP Human Reference Atlas" />}>
           <HraClinicalAtlas />
         </Suspense>
       ) : mode === 'cell-genome' ? (
-        <Suspense fallback={<LoadingLab label="cell-to-genome explorer" />}>
-          <CellGenomeExplorer />
+        <Suspense fallback={<LoadingLab label="HPA and Ensembl genomic evidence" />}>
+          <CellGenomeEvidenceLab mode="cell-genome" />
         </Suspense>
       ) : mode === 'workout-4d' ? (
         <Suspense fallback={<LoadingLab label="exercise physiology" />}>
