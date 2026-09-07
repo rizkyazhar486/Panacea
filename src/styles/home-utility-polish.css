@@ -1,0 +1,218 @@
+.home-command-panel,
+.home-loading-card {
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  border-radius: 24px;
+  background: rgba(255, 255, 255, 0.82);
+  box-shadow: 0 14px 34px rgba(15, 23, 42, 0.06);
+}
+
+.home-command-panel {
+  padding: 16px;
+}
+
+.dark .home-command-panel,
+.dark .home-loading-card {
+  border-color: rgba(255, 255, 255, 0.09);
+  background: rgba(9, 12, 20, 0.76);
+  box-shadow: 0 14px 36px rgba(0, 0, 0, 0.22);
+}
+
+.home-icon-button {
+  display: grid;
+  width: 42px;
+  height: 42px;
+  place-items: center;
+  border: 1px solid rgba(15, 23, 42, 0.1);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.82);
+  color: #182235;
+  font-size: 18px;
+  font-weight: 800;
+  box-shadow: 0 6px 18px rgba(15, 23, 42, 0.08);
+}
+
+.home-icon-button-strong {
+  border-color: transparent;
+  background: #111827;
+  color: white;
+}
+
+.dark .home-icon-button {
+  border-color: rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.08);
+  color: white;
+}
+
+.dark .home-icon-button-strong {
+  background: white;
+  color: #111827;
+}
+
+.home-action-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.home-action-card {
+  display: flex;
+  min-height: 70px;
+  align-items: center;
+  gap: 10px;
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  border-radius: 18px;
+  background: rgba(248, 250, 252, 0.82);
+  padding: 10px;
+  transition: transform 140ms ease, border-color 140ms ease, background 140ms ease;
+}
+
+.home-action-card:hover {
+  border-color: rgba(37, 99, 235, 0.22);
+  background: rgba(255, 255, 255, 0.96);
+}
+
+.home-action-card:active {
+  transform: scale(0.985);
+}
+
+.home-action-card:focus-visible,
+.home-icon-button:focus-visible,
+.home-pill-button:focus-visible,
+.home-text-link:focus-visible,
+.home-details-summary:focus-visible {
+  outline: 3px solid rgba(59, 130, 246, 0.42);
+  outline-offset: 2px;
+}
+
+.dark .home-action-card {
+  border-color: rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.045);
+}
+
+.dark .home-action-card:hover {
+  border-color: rgba(125, 211, 252, 0.2);
+  background: rgba(255, 255, 255, 0.07);
+}
+
+.home-action-icon {
+  display: grid;
+  width: 40px;
+  height: 40px;
+  flex: 0 0 auto;
+  place-items: center;
+  border-radius: 14px;
+  color: white;
+  font-size: 20px;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.28), 0 8px 20px rgba(15, 23, 42, 0.1);
+}
+
+.home-text-link {
+  min-height: 38px;
+  display: inline-flex;
+  align-items: center;
+  color: #047857;
+  font-size: 10px;
+  font-weight: 900;
+}
+
+.dark .home-text-link {
+  color: #6ee7b7;
+}
+
+.home-pill-button {
+  min-height: 40px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  border-radius: 999px;
+  background: #f3f4f6;
+  padding: 0 13px;
+  color: #374151;
+  font-size: 10px;
+  font-weight: 900;
+}
+
+.dark .home-pill-button {
+  border-color: rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.08);
+  color: #e5e7eb;
+}
+
+.home-details-summary {
+  display: flex;
+  min-height: 54px;
+  cursor: pointer;
+  list-style: none;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.home-details-summary::-webkit-details-marker {
+  display: none;
+}
+
+.home-summary-plus {
+  display: grid;
+  width: 38px;
+  height: 38px;
+  flex: 0 0 auto;
+  place-items: center;
+  border-radius: 999px;
+  background: #f3f4f6;
+  color: #4b5563;
+  font-size: 18px;
+  transition: transform 160ms ease;
+}
+
+.group[open] .home-summary-plus {
+  transform: rotate(45deg);
+}
+
+.dark .home-summary-plus {
+  background: rgba(255, 255, 255, 0.08);
+  color: #f3f4f6;
+}
+
+/* Home widgets remain visible; this only cleans their frame consistency. */
+.home-command-panel .kaca {
+  border: 1px solid rgba(15, 23, 42, 0.08) !important;
+  border-radius: 20px !important;
+  background: rgba(255, 255, 255, 0.88) !important;
+  box-shadow: 0 8px 22px rgba(15, 23, 42, 0.055) !important;
+}
+
+.dark .home-command-panel .kaca {
+  border-color: rgba(255, 255, 255, 0.08) !important;
+  background: rgba(255, 255, 255, 0.045) !important;
+  box-shadow: 0 8px 22px rgba(0, 0, 0, 0.18) !important;
+}
+
+.home-command-panel a,
+.home-command-panel button,
+.home-command-panel summary {
+  -webkit-tap-highlight-color: transparent;
+}
+
+@media (min-width: 720px) {
+  .home-action-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (pointer: coarse) {
+  .home-action-card,
+  .home-icon-button,
+  .home-pill-button,
+  .home-details-summary {
+    min-height: 44px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .home-action-card,
+  .home-summary-plus {
+    transition: none;
+  }
+}
