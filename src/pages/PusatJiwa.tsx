@@ -9,18 +9,15 @@ import { IconSparkle } from '../components/icons'
 // (PsychiatricStatusExam) SENGAJA TIDAK ADA di sini meskipun namanya paling
 // dekat: ia perkakas dokumentasi untuk klinisi yang sedang memeriksa orang
 // lain, bukan halaman yang dibaca seseorang tentang dirinya. Menaruhnya di
-// sini akan mencampur dua pembaca yang berbeda dalam satu tempat, dan orang
-// yang sedang tidak baik-baik saja akan menemukan formulir pemeriksaan alih-
-// alih sesuatu yang menolongnya.
+// sini akan mencampur dua pembaca yang berbeda dalam satu tempat.
 //
-// Urutannya dari yang paling mendesak ke yang paling panjang: penyaringan
-// lebih dulu (kalau ada yang perlu ditangani, itu didahulukan), lalu perkakas
-// harian, lalu hal-hal yang dibangun perlahan — arah hidup, rasa syukur, dan
-// cerita.
-//
-// Isinya tidak ditulis ulang; komponennya dipasang apa adanya dan tetap lazy.
+// Safety plan diletakkan paling depan karena Panacea adalah produk yang ingin
+// mempertahankan hidup dan fungsi. Ia local-first, tidak mengklaim memprediksi
+// bunuh diri, tidak dimonitor diam-diam, dan tidak menggantikan pertolongan
+// darurat. Setelah itu baru screening, toolkit harian, arah hidup dan cerita.
 // ─────────────────────────────────────────────────────────────────────────────
 
+const MentalSafetyPlan = lazy(() => import('./MentalSafetyPlan').then((m) => ({ default: m.MentalSafetyPlan })))
 const MentalHealthScreen = lazy(() => import('./MentalHealthScreen').then((m) => ({ default: m.MentalHealthScreen })))
 const SubstanceUseScreen = lazy(() => import('./SubstanceUseScreen').then((m) => ({ default: m.SubstanceUseScreen })))
 const MindToolkit = lazy(() => import('./MindToolkit').then((m) => ({ default: m.MindToolkit })))
@@ -31,6 +28,8 @@ const ResilienceStories = lazy(() => import('./ResilienceStories').then((m) => (
 const LifeStory = lazy(() => import('./LifeStory').then((m) => ({ default: m.LifeStory })))
 
 const TABS: TabDef[] = [
+  { id: 'aman', label: 'Safety plan', emoji: '🛟', komponen: MentalSafetyPlan,
+    ringkas: 'A private local-first plan for warning signs, coping, trusted support and urgent escalation' },
   { id: 'saring', label: 'Screening', emoji: '📝', komponen: MentalHealthScreen,
     ringkas: 'Validated self-report screens for mood and anxiety — a starting point, not a diagnosis' },
   { id: 'zat', label: 'Substance use', emoji: '🚭', komponen: SubstanceUseScreen,
@@ -53,7 +52,7 @@ export function PusatJiwa() {
   return (
     <HalamanTab
       judul="Mind"
-      subjudul="Screening, everyday tools, and the longer work of direction and meaning"
+      subjudul="Safety, screening, everyday tools, connection, direction and meaning"
       ikon={<IconSparkle />}
       tabs={TABS}
     />
