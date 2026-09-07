@@ -18,6 +18,17 @@ const KEY_N = 'pmd_hr_notifications_v1'
 const MAX_WORKOUTS = 200
 const MAX_NOTIFS = 100
 
+// Banyak widget Home membaca riwayat latihan yang sama pada render yang sama.
+// Sebelumnya setiap getWorkouts() melakukan localStorage.getItem + JSON.parse +
+// validasi seluruh sesi lagi. Dengan sampai 200 sesi dan deret HR per menit,
+// pengulangan itu dapat memblokir main thread di iPhone. Cache ini aman karena
+// ia selalu dibandingkan dengan string mentah localStorage: perubahan dari
+// tab lain atau kode lama otomatis membuat cache tidak cocok dan diparse ulang.
+let cachedWorkoutRaw: string | null | undefined
+let cachedWorkouts: ImportedWorkout[] | undefined
+let cachedNotifRaw: string | null | undefined
+let cachedNotifs: HrNotification[] | undefined
+
 /**
  * Benar bila entri ini aman dipakai perhitungan.
  *
@@ -44,11 +55,21 @@ function bentuknyaBenar(w: unknown): w is ImportedWorkout {
 export function getWorkouts(): ImportedWorkout[] {
   try {
     const raw = localStorage.getItem(KEY_W)
+    if (raw === cachedWorkoutRaw && cachedWorkouts) return cachedWorkouts.slice()
+
     const v = raw ? JSON.parse(raw) : []
     // Yang cacat dibuang, bukan diloloskan: kehilangan satu sesi jauh lebih
     // ringan daripada kehilangan akses ke seluruh halaman.
-    return Array.isArray(v) ? v.filter(bentuknyaBenar) : []
+    const parsed = Array.isArray(v) ? v.filter(bentuknyaBenar) : []
+    cachedWorkoutRaw = raw
+    cachedWorkouts = parsed
+    // Kembalikan salinan array dangkal agar consumer yang melakukan sort/splice
+    // tidak dapat merusak urutan cache bersama. Objek sesi sendiri diperlakukan
+    // sebagai data baca-saja sebagaimana sebelum optimasi ini.
+    return parsed.slice()
   } catch {
+    cachedWorkoutRaw = undefined
+    cachedWorkouts = undefined
     return []
   }
 }
@@ -56,9 +77,16 @@ export function getWorkouts(): ImportedWorkout[] {
 export function getHrNotifications(): HrNotification[] {
   try {
     const raw = localStorage.getItem(KEY_N)
+    if (raw === cachedNotifRaw && cachedNotifs) return cachedNotifs.slice()
+
     const v = raw ? JSON.parse(raw) : []
-    return Array.isArray(v) ? (v as HrNotification[]) : []
+    const parsed = Array.isArray(v) ? (v as HrNotification[]) : []
+    cachedNotifRaw = raw
+    cachedNotifs = parsed
+    return parsed.slice()
   } catch {
+    cachedNotifRaw = undefined
+    cachedNotifs = undefined
     return []
   }
 }
@@ -76,7 +104,12 @@ export function mergeWorkouts(incoming: ImportedWorkout[]): number {
   const next = [...byId.values()]
     .sort((a, b) => Date.parse(b.mulai) - Date.parse(a.mulai))
     .slice(0, MAX_WORKOUTS)
-  try { localStorage.setItem(KEY_W, JSON.stringify(next)) } catch { /* kuota penuh */ }
+  try {
+    const raw = JSON.stringify(next)
+    localStorage.setItem(KEY_W, raw)
+    cachedWorkoutRaw = raw
+    cachedWorkouts = next
+  } catch { /* kuota penuh — pertahankan cache storage lama */ }
   broadcastHealthUpdate()
   return baru
 }
@@ -94,12 +127,21 @@ export function mergeHrNotifications(incoming: HrNotification[]): number {
   const next = [...byKey.values()]
     .sort((a, b) => Date.parse(b.mulai) - Date.parse(a.mulai))
     .slice(0, MAX_NOTIFS)
-  try { localStorage.setItem(KEY_N, JSON.stringify(next)) } catch { /* kuota penuh */ }
+  try {
+    const raw = JSON.stringify(next)
+    localStorage.setItem(KEY_N, raw)
+    cachedNotifRaw = raw
+    cachedNotifs = next
+  } catch { /* kuota penuh — pertahankan cache storage lama */ }
   broadcastHealthUpdate()
   return baru
 }
 
 export function clearWorkouts() {
   try { localStorage.removeItem(KEY_W); localStorage.removeItem(KEY_N) } catch { /* abaikan */ }
+  cachedWorkoutRaw = null
+  cachedWorkouts = []
+  cachedNotifRaw = null
+  cachedNotifs = []
   broadcastHealthUpdate()
 }
