@@ -1,0 +1,52 @@
+{
+  "id": "apple_healthkit",
+  "name": "Apple HealthKit",
+  "category": "wearable",
+  "kind": ["framework"],
+  "homepage": "https://developer.apple.com/documentation/healthkit/",
+  "repository": null,
+  "features": ["apple-health", "health-samples", "workouts", "activity", "heart-rate", "hrv", "sleep", "respiratory-metrics", "mobility", "clinical-records", "permissioned-health-sync"],
+  "formats": ["native-healthkit-objects", "fhir-clinical-records"],
+  "usage": {
+    "runtime": false,
+    "buildTime": false,
+    "networkRequired": false,
+    "notes": "HealthKit is a native Apple platform framework and is not directly accessible from Panacea's Vite/React browser runtime. Any Panacea integration must run through a separately reviewed native iOS/watchOS bridge or companion app with the HealthKit capability. The web client must never imply that a browser-only button can read HealthKit. Server synchronization, if added, is a separate explicit user-authorized operation and should transmit only the minimum fields needed for the selected feature."
+  },
+  "license": {
+    "status": "CHECK_REQUIRED",
+    "identifier": "Apple Developer Program terms + App Store Review Guidelines + HealthKit requirements",
+    "commercialUse": "CONDITIONAL",
+    "attributionRequired": null,
+    "shareAlike": null,
+    "scope": "HealthKit is a proprietary Apple platform API governed by Apple developer agreements and App Store rules rather than an open-data/software license. Public HealthKit guidance requires health/fitness purpose, fine-grained user authorization, clear disclosure and privacy protection. Apple prohibits using HealthKit-derived information for advertising or similar services, selling it to advertising platforms/data brokers/resellers, or disclosing it to third parties without the user's express permission and an appropriate health/fitness purpose.",
+    "verificationUrl": "https://developer.apple.com/documentation/healthkit/protecting-user-privacy",
+    "verifiedAt": "2026-09-08",
+    "notes": "Re-check the current Apple Developer Program License Agreement and App Store Review Guidelines before shipping each native integration release. Do not treat framework access as permission to reuse third-party device/app data for unrelated purposes."
+  },
+  "validation": {
+    "level": "REFERENCE",
+    "clinicalDecisionUse": "NO",
+    "notes": "HealthKit is a permissioned storage/access framework, not a validator of physiological accuracy or clinical significance. Samples can originate from different devices, apps, manual entry or algorithms with different quality characteristics. Panacea must preserve source/device metadata and must not convert availability of a HealthKit sample into a diagnosis or clinically validated measurement claim."
+  },
+  "provenance": {
+    "authority": "Apple",
+    "sourceIdentityRequired": true,
+    "versionPinRequired": true,
+    "notes": "For each imported sample preserve HealthKit object/sample type, identifier/UUID where permitted, start/end timestamp, unit and value/category, sourceRevision/source bundle identity, device metadata when available, relevant sample metadata, synchronization/import timestamp and native adapter version. Keep the user's permission scope separate from data provenance; missing samples must not be interpreted as permission denial because HealthKit intentionally hides read-authorization state to protect privacy."
+  },
+  "adapter": {
+    "status": "PLANNED",
+    "normalizedTarget": "PanaceaHealthObservation",
+    "module": null,
+    "notes": "Planned flow: native iOS capability check -> contextual request for the smallest required read/write data types -> native HealthKit query -> source-aware normalization -> local review/deduplication -> optional explicitly authorized sync -> PanaceaHealthObservation. Respect limited-history authorization and permission changes. Keep read and write permissions separate. Never request all health types on first launch. Do not use browser storage as the primary store for raw sensitive HealthKit payloads. HealthKit clinical-record FHIR objects must still pass the Panacea FHIR/version/provenance boundary before use."
+  },
+  "trust": {
+    "authority": 5,
+    "evidenceQuality": 1,
+    "recency": 5,
+    "licenseClarity": 3,
+    "reproducibility": 3,
+    "notes": "High-authority platform access layer with strong privacy controls. Evidence quality is intentionally low because HealthKit itself is not an evidence source and sample accuracy depends on the originating source/device. License clarity is conservative because deployment remains subject to evolving Apple agreements and review rules rather than a simple open license."
+  }
+}
