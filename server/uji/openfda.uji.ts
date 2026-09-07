@@ -36,6 +36,8 @@ await denganFetchPalsu(async (input, init) => {
   ok('404 brand berlanjut ke generic fallback', search === 'openfda.generic_name:"metformin XR"', search)
   return new Response(JSON.stringify({
     results: [{
+      id: 'record-id-fallback',
+      set_id: '12345678-abcd-4321-9876-abcdef123456',
       openfda: {
         brand_name: ['Example Brand'],
         generic_name: ['metformin hydrochloride'],
@@ -53,7 +55,19 @@ await denganFetchPalsu(async (input, init) => {
   ok('brand dan generic dinormalisasi dari label', hasil?.brand === 'Example Brand' && hasil.generic === 'metformin hydrochloride')
   ok('manufacturer dipertahankan', hasil?.manufacturer === 'Example Manufacturer')
   ok('purpose dipertahankan', hasil?.purpose === 'Antihyperglycemic')
+  ok('SPL set_id diprioritaskan sebagai source identity', hasil?.labelId === '12345678-abcd-4321-9876-abcdef123456', hasil?.labelId)
+  const sourceUrl = hasil?.sourceUrl ? new URL(hasil.sourceUrl) : null
+  ok('source URL menunjuk exact set_id', sourceUrl?.searchParams.get('search') === 'set_id:"12345678-abcd-4321-9876-abcdef123456"')
+  ok('source URL tidak pernah membawa API key', sourceUrl?.searchParams.has('api_key') === false)
   ok('brand→generic membutuhkan tepat dua request', panggilan === 2, String(panggilan))
+})
+
+await denganFetchPalsu(async () => new Response(JSON.stringify({
+  results: [{ id: 'record-only-id', openfda: { brand_name: ['Record Only'] } }],
+}), { status: 200, headers: { 'content-type': 'application/json' } }), async () => {
+  const hasil = await lookupDrug('record only')
+  ok('record id menjadi fallback identity bila set_id tidak tersedia', hasil?.labelId === 'record-only-id')
+  ok('source URL tidak dibuat tanpa set_id yang stabil', hasil?.sourceUrl === undefined)
 })
 
 await denganFetchPalsu(async (input) => {
