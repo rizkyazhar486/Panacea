@@ -8,6 +8,9 @@ const HumanAnatomyMasterAtlas = lazy(() =>
 const HumanAnatomyLayerNavigator = lazy(() =>
   import('../components/digital-twin/HumanAnatomyLayerNavigator').then((m) => ({ default: m.HumanAnatomyLayerNavigator })),
 )
+const BodyParts3DDeepAtlas = lazy(() =>
+  import('../components/digital-twin/BodyParts3DDeepAtlas').then((m) => ({ default: m.BodyParts3DDeepAtlas })),
+)
 const Ocular4DAtlas = lazy(() =>
   import('../components/digital-twin/Ocular4DAtlas').then((m) => ({ default: m.Ocular4DAtlas })),
 )
@@ -57,7 +60,7 @@ type Mode = {
 }
 
 const PRIMARY: Mode[] = [
-  { key: 'realistic-atlas', label: 'Anatomy', hint: 'Whole-body master atlas → skin/fat/soft tissue/muscle/bone/nerves/vessels/organs → source-resolved HRA geometry' },
+  { key: 'realistic-atlas', label: 'Anatomy', hint: 'Whole-body master atlas → skin/fat/soft tissue/muscle/bone/nerves/vessels/organs → HRA + optional BodyParts3D deep source geometry' },
   { key: 'physiology', label: 'Physiology', hint: 'Anatomy-linked physiology → organ function → micro-3D mechanisms → pathology comparison' },
   { key: 'vision', label: 'Eye 4D', hint: 'HRA ocular anatomy → optical media → retina → optic pathway → acuity/color/stereopsis/field examination bridge' },
   { key: 'digital-twin', label: 'Body → Cell', hint: 'Human Protein Atlas microscopy/metadata + real local sequence evidence; no generated cell required' },
@@ -154,7 +157,7 @@ export function BodyExplorer() {
           </div>
           <div className="flex flex-wrap gap-1.5 text-[8px] font-black uppercase tracking-[.1em] text-neutral-500">
             <span className="rounded-full border border-neutral-200 bg-neutral-50 px-2.5 py-1.5 dark:border-white/10 dark:bg-white/[.04]">HuBMAP HRA</span>
-            <span className="rounded-full border border-neutral-200 bg-neutral-50 px-2.5 py-1.5 dark:border-white/10 dark:bg-white/[.04]">GitHub models API</span>
+            <span className="rounded-full border border-neutral-200 bg-neutral-50 px-2.5 py-1.5 dark:border-white/10 dark:bg-white/[.04]">BodyParts3D</span>
             <span className="rounded-full border border-neutral-200 bg-neutral-50 px-2.5 py-1.5 dark:border-white/10 dark:bg-white/[.04]">HRA v1.2 · v1.4 · v2</span>
             <span className="rounded-full border border-neutral-200 bg-neutral-50 px-2.5 py-1.5 dark:border-white/10 dark:bg-white/[.04]">HPA · Ensembl</span>
             <span className="rounded-full border border-neutral-200 bg-neutral-50 px-2.5 py-1.5 dark:border-white/10 dark:bg-white/[.04]">FASTA · FASTQ · VCF</span>
@@ -183,6 +186,9 @@ export function BodyExplorer() {
           </Suspense>
           <Suspense fallback={<LoadingLab label="human anatomy layers" />}>
             <HumanAnatomyLayerNavigator />
+          </Suspense>
+          <Suspense fallback={<LoadingLab label="BodyParts3D deep anatomy launcher" />}>
+            <BodyParts3DDeepAtlas />
           </Suspense>
           <details className="group rounded-[28px] border border-neutral-200 bg-white p-4 shadow-sm dark:border-white/10 dark:bg-white/[.035]">
             <summary className="flex cursor-pointer list-none items-center justify-between gap-3">
