@@ -22,8 +22,10 @@ assert.match(source, /renderLists\.dispose\(\)/)
 assert.match(source, /forceContextLoss\(\)/)
 
 // Never present the primitive reconstruction as microscopy-derived anatomy.
+// Keep these guards formatting-safe: comments may wrap through a `//` prefix.
 assert.match(source, /rekonstruksi edukasi berbasis SKALA REFERENSI/)
-assert.match(source, /bukan segmentasi\s+mikroskopi/)
+assert.match(source, /bukan segmentasi/)
+assert.match(source, /mikroskopi atau mesh pasien/)
 assert.doesNotMatch(lab, /Sizes are the real ones/)
 assert.doesNotMatch(lab, /No openly licensed cell mesh exists/)
 assert.match(lab, /Reference-scale dimensions are typical estimates/)
