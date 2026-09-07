@@ -139,9 +139,11 @@ export function CatatanLatihan() {
           <div className="t-mikro font-bold uppercase tracking-wide text-neutral-500">Latest logged</div>
           <div className="mt-1 flex items-start justify-between gap-3">
             <div className="min-w-0">
-              <div className="truncate text-sm font-black text-ink dark:text-white">{ringkas.terbaru.nama.trim() || 'Training session'}</div>
+              <div className="truncate text-sm font-black text-ink dark:text-white">
+                {typeof ringkas.terbaru.nama === 'string' && ringkas.terbaru.nama.trim() ? ringkas.terbaru.nama.trim() : 'Training session'}
+              </div>
               <div className="mt-1 flex flex-wrap gap-x-3 gap-y-1 text-[10px] font-semibold text-neutral-500">
-                <span>{Math.round(ringkas.terbaru.durasi / 60)} min</span>
+                <span>{Number.isFinite(ringkas.terbaru.durasi) && ringkas.terbaru.durasi > 0 ? `${Math.round(ringkas.terbaru.durasi / 60)} min` : 'Duration unavailable'}</span>
                 {Number.isFinite(ringkas.terbaru.jarakKm) && (ringkas.terbaru.jarakKm ?? 0) > 0 && <span>{ringkas.terbaru.jarakKm?.toFixed(1)} km</span>}
                 {Number.isFinite(ringkas.terbaru.rpe) && (ringkas.terbaru.rpe ?? 0) > 0 && <span>RPE {ringkas.terbaru.rpe}/10</span>}
               </div>
