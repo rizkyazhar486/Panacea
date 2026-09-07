@@ -1,0 +1,69 @@
+name: Apply Body Explorer Recovery
+
+on:
+  push:
+    branches:
+      - stabilization/body-explorer-recovery-20260908
+    paths:
+      - scripts/stabilization/apply-body-explorer-recovery.mjs
+      - .github/workflows/apply-body-explorer-recovery.yml
+
+permissions:
+  contents: write
+
+jobs:
+  patch-test-commit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - name: Checkout branch
+        uses: actions/checkout@v4
+        with:
+          ref: stabilization/body-explorer-recovery-20260908
+          fetch-depth: 0
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Apply guarded patch
+        run: node scripts/stabilization/apply-body-explorer-recovery.mjs
+
+      - name: Install frontend dependencies
+        run: npm ci
+
+      - name: Frontend TypeScript
+        run: npx tsc --noEmit
+
+      - name: Frontend production build
+        run: npm run build
+
+      - name: Frontend tests
+        run: npm run uji
+
+      - name: Install server dependencies
+        working-directory: server
+        run: npm ci
+
+      - name: Server TypeScript
+        working-directory: server
+        run: npm run typecheck
+
+      - name: Server build
+        working-directory: server
+        run: npm run build
+
+      - name: Server tests
+        working-directory: server
+        run: npm run uji
+
+      - name: Commit validated source only
+        run: |
+          git config user.name "rizkyazhar486"
+          git config user.email "rizkyazhar486@gmail.com"
+          git rm scripts/stabilization/apply-body-explorer-recovery.mjs .github/workflows/apply-body-explorer-recovery.yml
+          git add src/pages/BodyExplorer.tsx src/pages/bodyhub/WholeBodyPrecisionLab.tsx scripts/uji/body-explorer-recovery.mts
+          git commit -m "fix(body): isolate labs and connect precision atlas controls"
+          git push origin HEAD:stabilization/body-explorer-recovery-20260908
