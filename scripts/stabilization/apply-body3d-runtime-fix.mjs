@@ -27,7 +27,7 @@ replaceOnce(
 replaceOnce(
   'WebGL restoration handler',
   "    renderer.domElement.addEventListener('webglcontextlost', onContextLost)\n\n    let raf = 0",
-  "    renderer.domElement.addEventListener('webglcontextlost', onContextLost)\n    const onContextRestored = () => {\n      setFatal(null)\n      startRendering()\n    }\n    renderer.domElement.addEventListener('webglcontextrestored', onContextRestored)\n\n    let raf = 0",
+  "    renderer.domElement.addEventListener('webglcontextlost', onContextLost)\n    const onContextRestored = () => {\n      setFatal('')\n      startRendering()\n    }\n    renderer.domElement.addEventListener('webglcontextrestored', onContextRestored)\n\n    let raf = 0",
 )
 
 const animationBlock = /    let raf = 0\n    const jam = new THREE\.Clock\(\)\n    function animate\(\) \{[\s\S]*?    animate\(\)\n\n    return \(\) => \{\n      cancelAnimationFrame\(raf\)/
