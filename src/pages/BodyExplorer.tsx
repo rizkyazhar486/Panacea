@@ -2,6 +2,9 @@ import { lazy, Suspense, useState, type ReactNode } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { BodyEvidenceDock, type BodyEvidenceMode } from '../components/digital-twin/BodyEvidenceDock'
 
+const HeadToToeAnatomyWorkbench = lazy(() =>
+  import('../components/digital-twin/HeadToToeAnatomyWorkbench').then((m) => ({ default: m.HeadToToeAnatomyWorkbench })),
+)
 const HumanAnatomyMasterAtlas = lazy(() =>
   import('../components/digital-twin/HumanAnatomyMasterAtlas').then((m) => ({ default: m.HumanAnatomyMasterAtlas })),
 )
@@ -60,7 +63,7 @@ type Mode = {
 }
 
 const PRIMARY: Mode[] = [
-  { key: 'realistic-atlas', label: 'Anatomy', hint: 'Explore the whole body first, then open deeper source tools only when you need them.' },
+  { key: 'realistic-atlas', label: 'Anatomy', hint: 'Navigate precise named anatomy from scalp and brain to ankle and toes, then switch source tools without stacking heavy viewers.' },
   { key: 'physiology', label: 'Physiology', hint: 'Connect anatomy to organ function, mechanisms and pathology.' },
   { key: 'vision', label: 'Eye 4D', hint: 'Ocular anatomy, optics, retina, visual pathways and examination.' },
   { key: 'digital-twin', label: 'Body → Cell', hint: 'Move from body structures into microscopy and molecular evidence.' },
@@ -77,12 +80,14 @@ const MORE: Mode[] = [
 
 const ALL = [...PRIMARY, ...MORE]
 
-type AnatomyTool = 'none' | 'layers' | 'deep' | 'hra' | 'search'
+type AnatomyTool = 'head-to-toe' | 'systems' | 'layers' | 'deep' | 'hra' | 'search'
 
-const ANATOMY_TOOLS: { key: Exclude<AnatomyTool, 'none'>; label: string; detail: string }[] = [
+const ANATOMY_TOOLS: { key: AnatomyTool; label: string; detail: string }[] = [
+  { key: 'head-to-toe', label: 'Head → toe', detail: 'Ordered named structures from scalp and brain through limbs to toes.' },
+  { key: 'systems', label: 'System atlas', detail: 'Regional anatomy, organ systems and special senses grouped clinically.' },
   { key: 'layers', label: 'Layers', detail: 'Skin → soft tissue → muscle → bone → vessels → nerves → organs.' },
-  { key: 'deep', label: 'Deep atlas', detail: 'Open BodyParts3D source geometry for a selected system or structure.' },
-  { key: 'hra', label: 'HRA canvas', detail: 'Load the multi-layer HuBMAP HRA canvas only when simultaneous structures are needed.' },
+  { key: 'deep', label: 'Deep atlas', detail: 'BodyParts3D source geometry for a selected system or structure.' },
+  { key: 'hra', label: 'HRA canvas', detail: 'Multi-layer HuBMAP HRA canvas when simultaneous structures are needed.' },
   { key: 'search', label: 'Source search', detail: 'Find anatomy across supported HRA releases and source records.' },
 ]
 
@@ -171,28 +176,21 @@ function CellEvidenceMode({ mode }: { mode: 'body-cell' | 'cell-genome' }) {
 }
 
 function AnatomyMode({ onOpenPhysiology }: { onOpenPhysiology: () => void }) {
-  const [tool, setTool] = useState<AnatomyTool>('none')
+  const [tool, setTool] = useState<AnatomyTool>('head-to-toe')
+  const activeTool = ANATOMY_TOOLS.find((item) => item.key === tool) ?? ANATOMY_TOOLS[0]
 
   return (
     <div className="space-y-4">
-      <Suspense fallback={<LoadingLab label="human anatomy master atlas" />}>
-        <HumanAnatomyMasterAtlas onOpenPhysiology={onOpenPhysiology} />
-      </Suspense>
-
       <section className="rounded-[24px] border border-neutral-200 bg-white p-4 shadow-sm dark:border-white/10 dark:bg-white/[.035] sm:p-5">
         <div className="flex flex-wrap items-end justify-between gap-3">
           <div>
-            <div className="text-[9px] font-medium uppercase tracking-[.14em] text-neutral-400">Advanced anatomy tools</div>
-            <h2 className="mt-1 text-[16px] font-semibold tracking-tight text-neutral-950 dark:text-white">Open one deeper viewer at a time</h2>
+            <div className="text-[9px] font-medium uppercase tracking-[.14em] text-neutral-400">Whole-body anatomy source selector</div>
+            <h2 className="mt-1 text-[16px] font-semibold tracking-tight text-neutral-950 dark:text-white">One anatomy workspace at a time</h2>
             <p className="mt-1 max-w-3xl text-[11px] leading-relaxed text-neutral-500 dark:text-neutral-400">
-              The master atlas stays primary. A deeper viewer is mounted only after you choose it, reducing simultaneous WebGL and network load.
+              Head → toe is the default. Switching tools unmounts the previous workspace before loading the next, keeping WebGL and network use predictable on mobile.
             </p>
           </div>
-          {tool !== 'none' && (
-            <button type="button" onClick={() => setTool('none')} className="rounded-full border border-neutral-200 px-3 py-2 text-[10px] font-medium text-neutral-600 dark:border-white/10 dark:text-neutral-300">
-              Close tool
-            </button>
-          )}
+          <div className="rounded-full border border-neutral-200 bg-neutral-50 px-3 py-2 text-[9px] font-medium text-neutral-500 dark:border-white/10 dark:bg-white/[.04] dark:text-neutral-300">Active · {activeTool.label}</div>
         </div>
 
         <div className="no-scrollbar -mx-1 mt-4 flex gap-2 overflow-x-auto px-1 pb-1">
@@ -200,7 +198,7 @@ function AnatomyMode({ onOpenPhysiology }: { onOpenPhysiology: () => void }) {
             <button
               key={item.key}
               type="button"
-              onClick={() => setTool((current) => current === item.key ? 'none' : item.key)}
+              onClick={() => setTool(item.key)}
               className={`min-w-[150px] shrink-0 rounded-2xl border p-3 text-left transition ${tool === item.key ? 'border-neutral-950 bg-neutral-950 text-white dark:border-white dark:bg-white dark:text-neutral-950' : 'border-neutral-200 bg-neutral-50 text-neutral-800 hover:border-neutral-300 dark:border-white/10 dark:bg-white/[.04] dark:text-neutral-200'}`}
             >
               <div className="text-[12px] font-semibold">{item.label}</div>
@@ -210,22 +208,27 @@ function AnatomyMode({ onOpenPhysiology }: { onOpenPhysiology: () => void }) {
         </div>
       </section>
 
-      {tool === 'layers' && (
+      {tool === 'head-to-toe' ? (
+        <Suspense fallback={<LoadingLab label="head-to-toe anatomy" />}>
+          <HeadToToeAnatomyWorkbench onOpenPhysiology={onOpenPhysiology} />
+        </Suspense>
+      ) : tool === 'systems' ? (
+        <Suspense fallback={<LoadingLab label="human anatomy master atlas" />}>
+          <HumanAnatomyMasterAtlas onOpenPhysiology={onOpenPhysiology} />
+        </Suspense>
+      ) : tool === 'layers' ? (
         <Suspense fallback={<LoadingLab label="human anatomy layers" />}>
           <HumanAnatomyLayerNavigator />
         </Suspense>
-      )}
-      {tool === 'deep' && (
+      ) : tool === 'deep' ? (
         <Suspense fallback={<LoadingLab label="BodyParts3D deep anatomy" />}>
           <BodyParts3DDeepAtlas />
         </Suspense>
-      )}
-      {tool === 'hra' && (
+      ) : tool === 'hra' ? (
         <Suspense fallback={<LoadingLab label="HuBMAP Human Reference Atlas" />}>
           <HraClinicalAtlas />
         </Suspense>
-      )}
-      {tool === 'search' && (
+      ) : (
         <Suspense fallback={<LoadingLab label="multi-release HRA source search" />}>
           <HraSourceSearch />
         </Suspense>
@@ -258,6 +261,7 @@ export function BodyExplorer() {
           </div>
           <div className="hidden shrink-0 gap-1.5 sm:flex">
             <span className="rounded-full border border-neutral-200 bg-neutral-50 px-2.5 py-1.5 text-[8px] font-medium uppercase tracking-[.1em] text-neutral-500 dark:border-white/10 dark:bg-white/[.04]">HRA</span>
+            <span className="rounded-full border border-neutral-200 bg-neutral-50 px-2.5 py-1.5 text-[8px] font-medium uppercase tracking-[.1em] text-neutral-500 dark:border-white/10 dark:bg-white/[.04]">BodyParts3D</span>
             <span className="rounded-full border border-neutral-200 bg-neutral-50 px-2.5 py-1.5 text-[8px] font-medium uppercase tracking-[.1em] text-neutral-500 dark:border-white/10 dark:bg-white/[.04]">HPA</span>
             <span className="rounded-full border border-neutral-200 bg-neutral-50 px-2.5 py-1.5 text-[8px] font-medium uppercase tracking-[.1em] text-neutral-500 dark:border-white/10 dark:bg-white/[.04]">Ensembl</span>
           </div>
