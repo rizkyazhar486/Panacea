@@ -19,7 +19,7 @@ for (const marker of [
   'MedicalNews',
   'PanaceaToken',
   'hf_20260702_023227_88b54135-7489-48de-9476-ca0657fc0d29.mp4',
-]) assert.match(landing, new RegExp(marker.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')), `Claude landing marker missing: ${marker}`)
+]) assert.ok(landing.includes(marker), `Claude landing marker missing: ${marker}`)
 
 // Payment content remains intact; layout is repaired rather than price/product being rewritten.
 assert.match(pricing, /Equivalent bank transfer/)
@@ -39,7 +39,7 @@ for (const marker of [
   'HraClinicalAtlas',
   'HraSourceSearch',
   "useState<AnatomyTool>('head-to-toe')",
-]) assert.match(body, new RegExp(marker.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')), `Body Exposure regression: ${marker}`)
+]) assert.ok(body.includes(marker), `Body Exposure regression: ${marker}`)
 
 // iPhone safeguards: search fields should not trigger Safari focus zoom and 3D viewports stay bounded.
 assert.match(polish, /font-size: 16px !important/)
