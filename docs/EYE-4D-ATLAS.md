@@ -6,7 +6,8 @@ This release adds a dedicated Eye 4D mode to Body Exposure and extends whole-bod
 
 - Gross ocular geometry and structure identity resolve from HuBMAP Human Reference Atlas (HRA) source models and ASCT+B / ontology mappings.
 - Ocular coverage includes ocular surface, fibrous coat, uvea, optical media, aqueous outflow, retina/macula, optic nerve/chiasm context and adnexal structures when mapped upstream.
-- 4D means an explicit physiology sequence (light entry → aperture → accommodation → posterior media → retinal reception → neural output → binocular integration). Source GLB geometry is not deformed to imitate physiology.
+- HRA extraocular-muscle source geometry is resolved separately for medial/lateral/superior/inferior rectus, superior/inferior oblique and levator palpebrae superioris, with an explicit gaze-mechanics teaching module.
+- 4D means an explicit physiology sequence (light entry → aperture → accommodation → posterior media → retinal reception → neural output → binocular integration) plus explicit ocular-motility states. Source GLB geometry is not deformed to imitate physiology.
 - `200× inspection` is an educational detail level, not a claim of histological magnification or patient-specific metric reconstruction.
 
 ## Perfect Human Vision teaching bridge
