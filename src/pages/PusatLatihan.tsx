@@ -18,6 +18,7 @@ import { hrMaxFromAge } from '../lib/workoutImport'
 // 1) what should I do today, 2) what does the data say, 3) what physiology
 // explains it, 4) what exercise / plan should I choose.
 const WorkoutHistory = lazy(() => import('./WorkoutHistory').then((m) => ({ default: m.WorkoutHistory })))
+const GpsTracker = lazy(() => import('../components/GpsTracker').then((m) => ({ default: m.GpsTracker })))
 const AthleteScience = lazy(() => import('./AthleteScience').then((m) => ({ default: m.AthleteScience })))
 const AnalisisPro = lazy(() => import('./AnalisisPro').then((m) => ({ default: m.AnalisisPro })))
 const TrainingPhysiology = lazy(() => import('./TrainingPhysiology').then((m) => ({ default: m.TrainingPhysiology })))
@@ -43,6 +44,8 @@ const Rekomposisi = lazy(() => import('./Rekomposisi').then((m) => ({ default: m
 const TABS: TabDef[] = [
   { id: 'pelatih', label: 'Today', emoji: '🎯', komponen: WorkoutHistory,
     ringkas: 'Decision first: next session, recovery context, recent history and targets' },
+  { id: 'gps', label: 'GPS', emoji: '📍', komponen: GpsTracker,
+    ringkas: 'Live device GPS with fix quality control, auto-pause, moving pace, kilometre splits and privacy-first sharing' },
   { id: 'athlete-science', label: 'Athlete Science', emoji: '🧬', komponen: AthleteScience,
     ringkas: 'VO₂, HRV, load and recovery with assumptions, confidence and physiological context' },
   { id: 'analisis', label: 'Analysis', emoji: '📈', komponen: AnalisisPro,
