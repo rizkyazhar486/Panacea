@@ -193,6 +193,24 @@ export function Workout() {
     const safeWeight = Number.isFinite(l.weight) && l.weight > 0 ? l.weight : 0
     return total + safeSets * safeReps * safeWeight
   }, 0)
+  const weeklyMuscleSets = useMemo(() => {
+    const totals = new Map<Muscle, number>()
+    for (const entry of weekLog) {
+      const safeSets = Number.isFinite(entry.sets) && entry.sets > 0 ? entry.sets : 0
+      if (safeSets === 0) continue
+      const exercise = EX.find((candidate) => candidate.id === entry.exId)
+      if (!exercise) continue
+      totals.set(exercise.muscle, (totals.get(exercise.muscle) ?? 0) + safeSets)
+    }
+    const total = [...totals.values()].reduce((sum, muscleSets) => sum + muscleSets, 0)
+    return MUSCLES
+      .map((muscleName) => {
+        const muscleSets = totals.get(muscleName) ?? 0
+        return { muscle: muscleName, sets: muscleSets, pct: total > 0 ? (muscleSets / total) * 100 : 0 }
+      })
+      .filter((item) => item.sets > 0)
+      .sort((a, b) => b.sets - a.sets)
+  }, [log])
 
   return (
     <div className="mx-auto max-w-2xl space-y-5 pb-24">
@@ -256,6 +274,28 @@ export function Workout() {
           </div>
         </div>
       </Card>
+
+      {weeklyMuscleSets.length > 0 && (
+        <Card className="!p-5">
+          <SectionTitle icon={<IconActivity size={18} />} title="Weekly Muscle Distribution" subtitle="Working sets logged during the last 7 days" />
+          <div className="mt-4 space-y-3">
+            {weeklyMuscleSets.map((item) => (
+              <div key={item.muscle}>
+                <div className="mb-1.5 flex items-center justify-between gap-3 text-xs">
+                  <span className={`font-bold ${OTOT[item.muscle].teks}`}>{OTOT[item.muscle].emoji} {item.muscle}</span>
+                  <span className="shrink-0 tabular-nums text-neutral-500">{item.sets} sets · {item.pct.toFixed(0)}%</span>
+                </div>
+                <div className="h-2 overflow-hidden rounded-full bg-neutral-100 dark:bg-white/10" role="img" aria-label={`${item.muscle}: ${item.sets} sets, ${item.pct.toFixed(0)} percent of weekly sets`}>
+                  <div className={`h-full rounded-full ${OTOT[item.muscle].garis}`} style={{ width: `${item.pct}%` }} />
+                </div>
+              </div>
+            ))}
+          </div>
+          <p className="mt-3 text-[11px] leading-relaxed text-neutral-500">
+            Set distribution is descriptive, not a prescription. Use it to spot repeated emphasis or neglected areas; appropriate weekly set targets depend on training goal, exercise selection, intensity, and recovery.
+          </p>
+        </Card>
+      )}
 
       <div className="space-y-2.5">
         {filtered.map((e) => (
