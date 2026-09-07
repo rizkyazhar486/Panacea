@@ -10,9 +10,6 @@ await mkdir('artifacts', { recursive: true })
 const browser = await chromium.launch({
   headless: true,
   args: [
-    // Current headless Chromium routes software WebGL through ANGLE. The
-    // unsafe flag is explicit because CI has no hardware GPU and this is a
-    // trusted, local preview—not user-controlled web content.
     '--use-gl=angle',
     '--use-angle=swiftshader',
     '--enable-webgl',
@@ -30,9 +27,7 @@ const context = await browser.newContext({
 
 // Shell intentionally sends anonymous visitors to the public welcome page.
 // Seed the same remembered-session format used by StoreProvider so this smoke
-// test exercises the authenticated Body Explorer instead of weakening/bypassing
-// the application's auth guard. The account exists only inside this disposable
-// browser context and carries no production credentials or patient data.
+// exercises the authenticated Body Explorer without weakening the auth guard.
 await context.addInitScript(() => {
   const account = {
     email: 'body3d-qa@localhost.test',
@@ -55,34 +50,54 @@ let failure = null
 let screenshotCaptured = false
 let screenshotError = null
 
-async function captureViewport() {
-  // Use Chromium's DevTools protocol directly. Page.screenshot occasionally
-  // fails to persist a WebGL-backed mobile frame in headless CI even though
-  // the renderer is healthy. CDP captures the actual compositor surface and
-  // gives us deterministic visual evidence for the 390x844 acceptance gate.
+async function capturePng(clip = null) {
   const cdp = await context.newCDPSession(page)
   try {
-    const shot = await cdp.send('Page.captureScreenshot', {
+    const options = {
       format: 'png',
       fromSurface: true,
       captureBeyondViewport: false,
-    })
-    await writeFile(screenshotPath, Buffer.from(shot.data, 'base64'))
-    screenshotCaptured = true
+    }
+    if (clip) {
+      options.clip = {
+        x: clip.x,
+        y: clip.y,
+        width: clip.width,
+        height: clip.height,
+        scale: 1,
+      }
+    }
+    const shot = await cdp.send('Page.captureScreenshot', options)
+    return Buffer.from(shot.data, 'base64')
   } finally {
     await cdp.detach()
   }
+}
+
+async function captureViewport() {
+  await writeFile(screenshotPath, await capturePng())
+  screenshotCaptured = true
 }
 
 try {
   const response = await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 45_000 })
   if (response && !response.ok()) throw new Error(`Body Explorer returned HTTP ${response.status()}`)
 
+  // The normal first-login tour is part of the real product. Dismiss it through
+  // its own CTA so the QA test exercises the same path a user takes before
+  // touching the 3D viewer; do not hide the modal with CSS or mutate app state.
+  const getStarted = page.getByRole('button', { name: /Get Started/i }).first()
+  if (await getStarted.isVisible().catch(() => false)) {
+    await getStarted.click()
+    await getStarted.waitFor({ state: 'hidden', timeout: 5_000 })
+  }
+
   // Do not use the first canvas on the page: other visual components may own
   // canvases too. Body3D mounts its renderer directly inside this unique
   // touch-none viewer container.
   const canvas = page.locator('div.h-full.w-full.touch-none > canvas').first()
   await canvas.waitFor({ state: 'visible', timeout: 45_000 })
+  await canvas.scrollIntoViewIfNeeded()
 
   // Give Skeleton + Muscles time to enter loading, then require them to settle.
   await page.waitForTimeout(1_500)
@@ -90,10 +105,16 @@ try {
 
   const fatal = page.getByText(/This device could not start 3D graphics|The browser dropped the 3D context/i)
   if (await fatal.count()) throw new Error(`Body3D fatal fallback is visible: ${await fatal.first().innerText()}`)
+  const layerFailure = page.getByText(/Couldn.t load:/i).first()
+  if (await layerFailure.isVisible().catch(() => false)) {
+    throw new Error(`Body3D anatomy layer failed to load: ${await layerFailure.innerText()}`)
+  }
 
   metrics = await canvas.evaluate((node) => {
     const c = node
     const gl = c.getContext('webgl2') || c.getContext('webgl')
+    const rect = c.getBoundingClientRect()
+    const center = document.elementFromPoint(rect.left + rect.width / 2, rect.top + rect.height / 2)
     return {
       viewport: { width: window.innerWidth, height: window.innerHeight, devicePixelRatio: window.devicePixelRatio },
       canvas: {
@@ -106,10 +127,12 @@ try {
       documentScrollWidth: document.documentElement.scrollWidth,
       canvasCount: document.querySelectorAll('canvas').length,
       route: window.location.hash,
+      canvasCenterUnobstructed: center === c,
     }
   })
 
   if (!metrics.webgl) throw new Error('Body3D renderer canvas did not expose its WebGL context')
+  if (!metrics.canvasCenterUnobstructed) throw new Error('Body3D canvas center is obstructed by another UI layer')
   if (metrics.viewport.width !== 390 || metrics.viewport.height !== 844) {
     throw new Error(`Unexpected viewport ${metrics.viewport.width}x${metrics.viewport.height}`)
   }
@@ -125,23 +148,26 @@ try {
     throw new Error(`Page overflows horizontally: ${metrics.documentScrollWidth}px > ${metrics.viewport.width}px`)
   }
 
-  // Exercise OrbitControls so the demand-render path is tested, not merely the
-  // initial static frame.
+  // Exercise OrbitControls and prove the compositor surface actually changes.
+  // This verifies the demand-render path, rather than merely dispatching a drag
+  // that could be swallowed by an overlay or render no new frame.
   const box = await canvas.boundingBox()
   if (!box) throw new Error('Body3D canvas has no measurable bounding box')
+  const beforeOrbit = await capturePng(box)
   const x = box.x + box.width * 0.5
   const y = box.y + box.height * 0.45
   await page.mouse.move(x, y)
   await page.mouse.down()
   await page.mouse.move(x + Math.min(48, box.width * 0.15), y + 18, { steps: 6 })
   await page.mouse.up()
-  await page.waitForTimeout(250)
+  await page.waitForTimeout(300)
+  const afterOrbit = await capturePng(box)
+  metrics.orbitChangedFrame = !beforeOrbit.equals(afterOrbit)
+  if (!metrics.orbitChangedFrame) throw new Error('Orbit drag did not produce a new Body3D compositor frame')
 
   if (pageErrors.length) throw new Error(`Browser page errors: ${pageErrors.join(' | ')}`)
 
-  // A green mobile gate must include inspectable visual evidence, not metrics
-  // alone. This screenshot is the exact 390x844 compositor surface after a
-  // real orbit interaction.
+  // Capture the exact 390x844 viewport after the verified orbit interaction.
   await captureViewport()
   if (!screenshotCaptured) throw new Error('Body3D mobile visual evidence was not captured')
 
@@ -150,7 +176,6 @@ try {
   failure = error instanceof Error ? error.message : String(error)
   throw error
 } finally {
-  // On a failure, still try once to preserve the rendered state that led to it.
   if (!screenshotCaptured) {
     try {
       await captureViewport()
