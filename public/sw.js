@@ -1,27 +1,25 @@
-// Conservative PWA service worker for Panaceamed.
-// Navigations are network-first so every launch prefers the newest Vercel shell.
-// Fingerprinted same-origin assets are cached, but HTML is NEVER cached under an
-// asset URL. That prevents an SPA fallback page from poisoning a .js/.css cache
-// entry after a deployment.
-const CACHE = 'panaceamed-v16'
+// Panaceamed stability-first service worker.
+//
+// Important: this worker intentionally does NOT intercept fetch requests.
+// iOS WebKit can keep an older installed service worker alive across deploys;
+// combining that with SPA/chunk changes can create stale-response loops and,
+// under memory pressure, terminate the WebContent process with Safari's
+// "A problem repeatedly occurred" screen. Network requests therefore pass
+// directly to the browser/CDN. Push + notification routing remain supported.
 const CACHE_PREFIX = 'panaceamed-'
-const SHELL = ['./', './index.html', './manifest.webmanifest', './logo-mark.png']
 
-self.addEventListener('install', (event) => {
-  event.waitUntil(caches.open(CACHE).then((c) => c.addAll(SHELL)).catch(() => {}))
+self.addEventListener('install', () => {
   self.skipWaiting()
 })
 
 self.addEventListener('activate', (event) => {
   event.waitUntil(
-    caches.keys().then((keys) =>
-      Promise.all(keys.filter((k) => k.startsWith(CACHE_PREFIX) && k !== CACHE).map((k) => caches.delete(k))),
-    ),
+    caches.keys()
+      .then((keys) => Promise.all(keys.filter((key) => key.startsWith(CACHE_PREFIX)).map((key) => caches.delete(key))))
+      .then(() => self.clients.claim()),
   )
-  self.clients.claim()
 })
 
-// ── Web Push ────────────────────────────────────────────────────────────
 self.addEventListener('push', (event) => {
   let data = { title: 'Panaceamed.id', body: 'Anda punya pembaruan baru.', url: './' }
   try {
@@ -29,6 +27,7 @@ self.addEventListener('push', (event) => {
   } catch {
     /* keep defaults */
   }
+
   event.waitUntil(
     self.registration.showNotification(data.title, {
       body: data.body,
@@ -62,71 +61,6 @@ self.addEventListener('notificationclick', (event) => {
         if ('focus' in client) return client.focus()
       }
       if (self.clients.openWindow) return self.clients.openWindow(destination)
-    }),
-  )
-})
-
-function isHtmlResponse(response) {
-  return (response.headers.get('content-type') || '').toLowerCase().includes('text/html')
-}
-
-function isAssetRequest(request, url) {
-  return (
-    request.destination === 'script' ||
-    request.destination === 'style' ||
-    request.destination === 'worker' ||
-    url.pathname.includes('/assets/') ||
-    /\.(?:js|mjs|css)$/i.test(url.pathname)
-  )
-}
-
-self.addEventListener('fetch', (event) => {
-  const request = event.request
-  if (request.method !== 'GET') return
-
-  const url = new URL(request.url)
-  if (url.origin !== self.location.origin) return // backend, Cloudinary, fonts, etc.
-  if (url.pathname.includes('/api/')) return
-
-  if (request.mode === 'navigate') {
-    event.respondWith(
-      fetch(request, { cache: 'no-store' })
-        .then((response) => {
-          if (response.ok && isHtmlResponse(response)) {
-            const copy = response.clone()
-            caches.open(CACHE).then((cache) => cache.put('./index.html', copy)).catch(() => {})
-          }
-          return response
-        })
-        .catch(() => caches.match('./index.html').then((cached) => cached || caches.match('./'))),
-    )
-    return
-  }
-
-  event.respondWith(
-    caches.match(request).then((cached) => {
-      if (cached && !(isAssetRequest(request, url) && isHtmlResponse(cached))) return cached
-
-      // Remove poisoned entries left by an older service worker before retrying.
-      if (cached) caches.open(CACHE).then((cache) => cache.delete(request)).catch(() => {})
-
-      return fetch(request).then((response) => {
-        // A script/style request must never receive index.html. Treat such a
-        // response as a missing asset instead of caching/executing HTML as JS.
-        if (isAssetRequest(request, url) && isHtmlResponse(response)) {
-          return new Response('', {
-            status: 404,
-            statusText: 'Static asset resolved to HTML',
-            headers: { 'Content-Type': 'text/plain; charset=utf-8' },
-          })
-        }
-
-        if (response.ok && response.type === 'basic' && !isHtmlResponse(response)) {
-          const copy = response.clone()
-          caches.open(CACHE).then((cache) => cache.put(request, copy)).catch(() => {})
-        }
-        return response
-      })
     }),
   )
 })
