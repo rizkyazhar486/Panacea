@@ -21,13 +21,13 @@ on:
 # This workflow intentionally treats Vercel's free daily deployment quota as a
 # deferred release rather than a code failure. Build/type errors still fail.
 # Required GitHub repository secret: VERCEL_TOKEN
+#
+# Concurrency is intentionally scoped to the deploy job. A normal push only runs
+# push-policy, so it must never cancel a production deployment that is already in
+# progress. Only another real deploy attempt can supersede an older deploy.
 
 permissions:
   contents: read
-
-concurrency:
-  group: vercel-production
-  cancel-in-progress: true
 
 jobs:
   push-policy:
@@ -45,13 +45,16 @@ jobs:
     if: github.event_name != 'push' || contains(github.event.head_commit.message, '[deploy-vercel]')
     runs-on: ubuntu-latest
     timeout-minutes: 30
+    concurrency:
+      group: vercel-production
+      cancel-in-progress: true
     env:
       VERCEL_TELEMETRY_DISABLED: 1
     steps:
-      - name: Checkout latest main
+      - name: Checkout triggering revision
         uses: actions/checkout@v4
         with:
-          ref: main
+          ref: ${{ github.sha }}
 
       - name: Setup Node
         uses: actions/setup-node@v4
