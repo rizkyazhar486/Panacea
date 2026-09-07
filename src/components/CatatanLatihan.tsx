@@ -52,10 +52,13 @@ export function CatatanLatihan() {
       .filter((x) => kunciTanggal(new Date(x.mulai)) === tanggal)
       .sort((a, b) => Date.parse(b.mulai) - Date.parse(a.mulai))
     const detikTanggal = detikPerTanggal.get(tanggal) ?? 0
+    const acuan = new Date()
+    acuan.setHours(12, 0, 0, 0)
+    acuan.setDate(acuan.getDate() - (untukKemarin ? 1 : 0))
+
     const tren = Array.from({ length: 7 }, (_, i) => {
-      const d = new Date()
-      d.setHours(12, 0, 0, 0)
-      d.setDate(d.getDate() - (6 - i))
+      const d = new Date(acuan)
+      d.setDate(acuan.getDate() - (6 - i))
       const kunci = kunciTanggal(d)
       return {
         kunci,
@@ -64,6 +67,33 @@ export function CatatanLatihan() {
       }
     })
     const maxMenit7 = Math.max(1, ...tren.map((x) => x.menit))
+
+    const blok28 = Array.from({ length: 4 }, (_, i) => {
+      const mulaiOffset = 27 - i * 7
+      const akhirOffset = 21 - i * 7
+      let detikBlok = 0
+      let hariAktif = 0
+      let awal = ''
+      let akhir = ''
+
+      for (let offset = mulaiOffset; offset >= akhirOffset; offset -= 1) {
+        const d = new Date(acuan)
+        d.setDate(acuan.getDate() - offset)
+        const kunci = kunciTanggal(d)
+        const detikHari = detikPerTanggal.get(kunci) ?? 0
+        detikBlok += detikHari
+        if (detikHari > 0) hariAktif += 1
+        if (offset === mulaiOffset) awal = d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
+        if (offset === akhirOffset) akhir = d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
+      }
+
+      return {
+        label: `${awal}–${akhir}`,
+        menit: Math.round(detikBlok / 60),
+        hariAktif,
+      }
+    })
+    const maxMenit28 = Math.max(1, ...blok28.map((x) => x.menit))
 
     return {
       total: w.length,
@@ -74,10 +104,14 @@ export function CatatanLatihan() {
       tren,
       maxMenit7,
       hariAktif7: tren.filter((x) => x.menit > 0).length,
+      blok28,
+      maxMenit28,
+      menit28: blok28.reduce((total, x) => total + x.menit, 0),
+      hariAktif28: blok28.reduce((total, x) => total + x.hariAktif, 0),
     }
     // versi ikut menjadi kebergantungan supaya daftarnya dibaca ulang setelah
     // satu sesi disimpan — tanpa itu ringkasannya tertinggal satu langkah.
-  }, [versi, tanggal])
+  }, [versi, tanggal, untukKemarin])
 
   const bolehSimpan = menit.trim() !== '' && rpe !== null
 
@@ -180,6 +214,38 @@ export function CatatanLatihan() {
         </div>
         <p className="mt-2 text-[9px] leading-relaxed text-neutral-500 dark:text-neutral-400">
           Bar height is relative to your busiest logged day in this 7-day window. It shows recorded duration, not training quality or recovery.
+        </p>
+      </div>
+
+      <div className="mt-3 rounded-2xl border border-neutral-100 p-3 dark:border-white/10" aria-label="Training duration across four consecutive 7-day blocks">
+        <div className="flex items-end justify-between gap-3">
+          <div>
+            <div className="t-mikro font-bold uppercase tracking-wide text-neutral-500">Last 28 days</div>
+            <div className="mt-0.5 text-sm font-black text-ink dark:text-white">Duration rhythm</div>
+          </div>
+          <div className="text-right">
+            <div className="text-lg font-black tabular-nums text-brand-dark">{ringkas.menit28}<span className="ml-1 text-xs text-neutral-500">min</span></div>
+            <div className="t-mikro text-neutral-500">{ringkas.hariAktif28} active days</div>
+          </div>
+        </div>
+        <div className="mt-3 space-y-2.5">
+          {ringkas.blok28.map((blok) => (
+            <div key={blok.label}>
+              <div className="mb-1 flex items-center justify-between gap-3 text-[10px]">
+                <span className="font-bold text-neutral-500">{blok.label}</span>
+                <span className="font-black tabular-nums text-ink dark:text-white">{blok.menit} min · {blok.hariAktif}/7 days</span>
+              </div>
+              <div className="h-2.5 overflow-hidden rounded-full bg-neutral-100 dark:bg-white/5">
+                <div
+                  className="h-full rounded-full bg-brand/80"
+                  style={{ width: blok.menit > 0 ? `${Math.max(3, (blok.menit / ringkas.maxMenit28) * 100)}%` : '0%' }}
+                />
+              </div>
+            </div>
+          ))}
+        </div>
+        <p className="mt-2 text-[9px] leading-relaxed text-neutral-500 dark:text-neutral-400">
+          Each row is one consecutive 7-day block, oldest to newest. Bar length compares recorded duration within this 28-day window; active days show frequency, not adherence quality.
         </p>
       </div>
 
