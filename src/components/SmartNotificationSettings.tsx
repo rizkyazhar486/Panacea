@@ -5,7 +5,7 @@ import {
   matchesRule,
   type NotificationDomain,
   type NotificationSettings,
-} from '../lib/notificationEngine'
+} from '../lib/notificationEngineExtended'
 import {
   collectNotificationSnapshot,
   loadNotificationHistory,
