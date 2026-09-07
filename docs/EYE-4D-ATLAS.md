@@ -17,3 +17,7 @@ The functional-examination map is based on the uploaded *Perfect Human Vision* t
 ## Whole-body anatomy coverage
 
 The Body Exposure Anatomy mode keeps the existing Human Anatomy Master Atlas and adds a live HRA layer navigator for integument, adipose/soft tissue, muscle, skeleton, nervous, cardiovascular, respiratory, digestive, urinary, reproductive, endocrine and immune/lymphatic anatomy. Mapping-only structures remain visibly distinct from browser-renderable GLB geometry.
+
+## BodyParts3D deep source layer
+
+An additional on-demand deep atlas uses the browser-ready BodyParts3D 4.0 packaging from `ashemag/human-atlas`: 2,234 individual source meshes, 15 display systems and 3,432 named concepts. It is not loaded at app launch. Users can search and load a single structure (lighter) or explicitly load a whole system. BodyParts3D data attribution is preserved as CC BY 4.0 and upstream application-source attribution is preserved as MIT. The source represents an adult male reference and is not patient-specific anatomy.
