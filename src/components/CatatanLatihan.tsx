@@ -64,6 +64,20 @@ export function CatatanLatihan() {
       .filter((x) => kunciTanggal(new Date(x.mulai)) === tanggal)
       .sort((a, b) => Date.parse(b.mulai) - Date.parse(a.mulai))
     const detikTanggal = detikPerTanggal.get(tanggal) ?? 0
+    const terbaru = sesiTanggal[0] ?? null
+    const hrValid = terbaru?.hr.filter((p) => Number.isFinite(p.bpm) && p.bpm > 0) ?? []
+    const hrSpark = hrValid.length <= 24
+      ? hrValid
+      : Array.from({ length: 24 }, (_, i) => hrValid[Math.round((i * (hrValid.length - 1)) / 23)])
+    const hrMinSpark = hrValid.length > 0 ? Math.min(...hrValid.map((p) => p.bpm)) : null
+    const hrMaxSpark = hrValid.length > 0 ? Math.max(...hrValid.map((p) => p.bpm)) : null
+    const terbaruRpe = terbaru && typeof terbaru.rpe === 'number' && Number.isFinite(terbaru.rpe) && terbaru.rpe >= 1 && terbaru.rpe <= 10
+      ? terbaru.rpe
+      : null
+    const terbaruSrpe = terbaru && terbaruRpe !== null && Number.isFinite(terbaru.durasi) && terbaru.durasi > 0
+      ? Math.round((terbaru.durasi / 60) * terbaruRpe)
+      : null
+
     const acuan = new Date()
     acuan.setHours(12, 0, 0, 0)
     acuan.setDate(acuan.getDate() - (untukKemarin ? 1 : 0))
@@ -122,7 +136,12 @@ export function CatatanLatihan() {
       tangan: w.filter((x) => sesiTangan(x.id)).length,
       hari: sesiTanggal.length,
       menit: Math.round(detikTanggal / 60),
-      terbaru: sesiTanggal[0] ?? null,
+      terbaru,
+      terbaruHr: hrSpark,
+      hrMinSpark,
+      hrMaxSpark,
+      terbaruRpe,
+      terbaruSrpe,
       tren,
       maxMenit7,
       hariAktif7: tren.filter((x) => x.menit > 0).length,
@@ -195,21 +214,69 @@ export function CatatanLatihan() {
       )}
 
       {ringkas.terbaru && (
-        <div className="mt-3 rounded-2xl border border-neutral-100 p-3 dark:border-white/10">
-          <div className="t-mikro font-bold uppercase tracking-wide text-neutral-500">Latest logged</div>
-          <div className="mt-1 flex items-start justify-between gap-3">
+        <div className="mt-3 rounded-2xl border border-neutral-100 p-3 dark:border-white/10" aria-label="Latest training session recorded and perceived signals">
+          <div className="flex items-start justify-between gap-3">
             <div className="min-w-0">
-              <div className="truncate text-sm font-black text-ink dark:text-white">
+              <div className="t-mikro font-bold uppercase tracking-wide text-neutral-500">Latest session signals</div>
+              <div className="mt-1 truncate text-sm font-black text-ink dark:text-white">
                 {typeof ringkas.terbaru.nama === 'string' && ringkas.terbaru.nama.trim() ? ringkas.terbaru.nama.trim() : 'Training session'}
               </div>
-              <div className="mt-1 flex flex-wrap gap-x-3 gap-y-1 text-[10px] font-semibold text-neutral-500">
-                <span>{Number.isFinite(ringkas.terbaru.durasi) && ringkas.terbaru.durasi > 0 ? `${Math.round(ringkas.terbaru.durasi / 60)} min` : 'Duration unavailable'}</span>
-                {Number.isFinite(ringkas.terbaru.jarakKm) && (ringkas.terbaru.jarakKm ?? 0) > 0 && <span>{ringkas.terbaru.jarakKm?.toFixed(1)} km</span>}
-                {Number.isFinite(ringkas.terbaru.rpe) && (ringkas.terbaru.rpe ?? 0) > 0 && <span>RPE {ringkas.terbaru.rpe}/10</span>}
-              </div>
             </div>
-            <div className="shrink-0 rounded-full bg-brand-50 px-2.5 py-1 text-[10px] font-black text-brand-dark">Latest</div>
+            <div className="shrink-0 rounded-full bg-brand-50 px-2.5 py-1 text-[10px] font-black text-brand-dark">Recorded vs felt</div>
           </div>
+
+          <div className="mt-3 grid grid-cols-2 gap-2">
+            <div className="rounded-2xl bg-sky-50/70 p-3 dark:bg-sky-400/[0.05]">
+              <div className="text-[10px] font-black uppercase tracking-wide text-sky-700 dark:text-sky-300">Recorded</div>
+              <div className="mt-1 text-lg font-black tabular-nums text-ink dark:text-white">
+                {Number.isFinite(ringkas.terbaru.durasi) && ringkas.terbaru.durasi > 0 ? `${Math.round(ringkas.terbaru.durasi / 60)} min` : '—'}
+              </div>
+              <div className="mt-1 flex flex-wrap gap-x-2 gap-y-1 text-[9px] font-semibold text-neutral-500">
+                {Number.isFinite(ringkas.terbaru.jarakKm) && (ringkas.terbaru.jarakKm ?? 0) > 0 && <span>{ringkas.terbaru.jarakKm?.toFixed(1)} km</span>}
+                {Number.isFinite(ringkas.terbaru.avgHr) && (ringkas.terbaru.avgHr ?? 0) > 0 && <span>Avg {Math.round(ringkas.terbaru.avgHr ?? 0)} bpm</span>}
+                {Number.isFinite(ringkas.terbaru.maxHr) && (ringkas.terbaru.maxHr ?? 0) > 0 && <span>Max {Math.round(ringkas.terbaru.maxHr ?? 0)} bpm</span>}
+              </div>
+              {ringkas.terbaruHr.length > 1 && ringkas.hrMinSpark !== null && ringkas.hrMaxSpark !== null ? (
+                <div className="mt-3">
+                  <div className="flex h-11 items-end gap-px overflow-hidden rounded-lg bg-white/70 px-1.5 pt-1 dark:bg-white/5" aria-label={`Heart rate series from ${Math.round(ringkas.hrMinSpark)} to ${Math.round(ringkas.hrMaxSpark)} beats per minute`}>
+                    {ringkas.terbaruHr.map((p, i) => {
+                      const rentang = Math.max(1, ringkas.hrMaxSpark! - ringkas.hrMinSpark!)
+                      const tinggi = 20 + ((p.bpm - ringkas.hrMinSpark!) / rentang) * 80
+                      return <div key={`${p.t}-${i}`} className="min-w-0 flex-1 rounded-t-sm bg-sky-500/75" style={{ height: `${tinggi}%` }} />
+                    })}
+                  </div>
+                  <div className="mt-1 flex justify-between text-[8px] font-bold tabular-nums text-neutral-500">
+                    <span>{Math.round(ringkas.hrMinSpark)} bpm</span>
+                    <span>{Math.round(ringkas.hrMaxSpark)} bpm</span>
+                  </div>
+                </div>
+              ) : (
+                <p className="mt-3 text-[9px] leading-relaxed text-neutral-500">No HR time-series captured for this session.</p>
+              )}
+            </div>
+
+            <div className="rounded-2xl bg-amber-50/70 p-3 dark:bg-amber-400/[0.05]">
+              <div className="text-[10px] font-black uppercase tracking-wide text-amber-700 dark:text-amber-300">Perceived</div>
+              <div className="mt-1 text-lg font-black tabular-nums text-ink dark:text-white">
+                {ringkas.terbaruRpe !== null ? `RPE ${ringkas.terbaruRpe}/10` : 'No RPE'}
+              </div>
+              <div className="mt-1 text-[9px] font-semibold text-neutral-500">
+                {ringkas.terbaruSrpe !== null ? `${ringkas.terbaruSrpe} AU session-RPE load` : 'Perceived load unavailable'}
+              </div>
+              <div className="mt-3 flex h-11 items-end rounded-lg bg-white/70 p-1.5 dark:bg-white/5">
+                <div
+                  className="w-full rounded-md bg-amber-500/75"
+                  style={{ height: ringkas.terbaruRpe !== null ? `${Math.max(10, ringkas.terbaruRpe * 10)}%` : '0%' }}
+                  aria-label={ringkas.terbaruRpe !== null ? `Perceived exertion ${ringkas.terbaruRpe} out of 10` : 'No perceived exertion rating'}
+                />
+              </div>
+              <p className="mt-2 text-[9px] leading-relaxed text-neutral-500">RPE is self-reported effort, not a physiological measurement.</p>
+            </div>
+          </div>
+
+          <p className="mt-2 text-[9px] leading-relaxed text-neutral-500 dark:text-neutral-400">
+            Recorded and perceived signals are shown side by side but are not merged into a readiness, recovery, or injury-risk score.
+          </p>
         </div>
       )}
 
