@@ -136,6 +136,40 @@ export function CatatanLatihan() {
         }
       })
 
+    const namaAktivitas = (nilai: unknown) => typeof nilai === 'string' ? nilai.trim().replace(/\s+/g, ' ') : ''
+    const movementBernama = w
+      .filter((x) => {
+        if (kunciTanggal(new Date(x.mulai)) > tanggal || !namaAktivitas(x.nama)) return false
+        return (
+          (typeof x.paceSec === 'number' && Number.isFinite(x.paceSec) && x.paceSec > 0) ||
+          (typeof x.kecepatanKmh === 'number' && Number.isFinite(x.kecepatanKmh) && x.kecepatanKmh > 0) ||
+          (typeof x.kadens === 'number' && Number.isFinite(x.kadens) && x.kadens > 0)
+        )
+      })
+      .sort((a, b) => Date.parse(b.mulai) - Date.parse(a.mulai))
+    const aktivitasAcuan = movementBernama[0] ?? null
+    const kunciAktivitas = aktivitasAcuan ? namaAktivitas(aktivitasAcuan.nama).toLocaleLowerCase() : ''
+    const labelBandingAktivitas = aktivitasAcuan ? namaAktivitas(aktivitasAcuan.nama) : ''
+    const bandingAktivitas = kunciAktivitas
+      ? movementBernama
+          .filter((x) => namaAktivitas(x.nama).toLocaleLowerCase() === kunciAktivitas)
+          .slice(0, 3)
+          .map((x) => {
+            const paceDetik = typeof x.paceSec === 'number' && Number.isFinite(x.paceSec) && x.paceSec > 0 ? Math.round(x.paceSec) : null
+            return {
+              id: x.id,
+              tanggal: new Date(x.mulai).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
+              menit: Number.isFinite(x.durasi) && x.durasi > 0 ? Math.round(x.durasi / 60) : null,
+              jarakKm: typeof x.jarakKm === 'number' && Number.isFinite(x.jarakKm) && x.jarakKm > 0 ? x.jarakKm : null,
+              pace: paceDetik !== null ? `${Math.floor(paceDetik / 60)}:${String(paceDetik % 60).padStart(2, '0')}` : null,
+              speed: typeof x.kecepatanKmh === 'number' && Number.isFinite(x.kecepatanKmh) && x.kecepatanKmh > 0 ? x.kecepatanKmh : null,
+              cadence: typeof x.kadens === 'number' && Number.isFinite(x.kadens) && x.kadens > 0 ? Math.round(x.kadens) : null,
+              avgHr: typeof x.avgHr === 'number' && Number.isFinite(x.avgHr) && x.avgHr > 0 ? Math.round(x.avgHr) : null,
+              indoor: typeof x.diDalamRuangan === 'boolean' ? x.diDalamRuangan : null,
+            }
+          })
+      : []
+
     const acuan = new Date()
     acuan.setHours(12, 0, 0, 0)
     acuan.setDate(acuan.getDate() - (untukKemarin ? 1 : 0))
@@ -211,6 +245,8 @@ export function CatatanLatihan() {
       terbaruIndoor,
       punyaMovement,
       riwayatMovement,
+      labelBandingAktivitas,
+      bandingAktivitas,
       tren,
       maxMenit7,
       hariAktif7: tren.filter((x) => x.menit > 0).length,
@@ -468,6 +504,57 @@ export function CatatanLatihan() {
 
           <p className="mt-2 text-[9px] leading-relaxed text-neutral-500 dark:text-neutral-400">
             Sessions are listed newest to oldest up to the selected date. Metrics stay session-specific: this timeline does not rank mixed activities or turn pace, cadence, heart rate, distance, and duration into a single performance score.
+          </p>
+        </div>
+      )}
+
+      {ringkas.bandingAktivitas.length > 1 && (
+        <div className="mt-3 rounded-2xl border border-sky-100/80 p-3 dark:border-sky-400/15" aria-label={`Same activity comparison for ${ringkas.labelBandingAktivitas}`}>
+          <div className="flex items-end justify-between gap-3">
+            <div className="min-w-0">
+              <div className="t-mikro font-bold uppercase tracking-wide text-neutral-500">Same activity</div>
+              <div className="mt-0.5 truncate text-sm font-black text-ink dark:text-white">{ringkas.labelBandingAktivitas}</div>
+            </div>
+            <div className="text-right">
+              <div className="text-lg font-black tabular-nums text-sky-700 dark:text-sky-300">{ringkas.bandingAktivitas.length}</div>
+              <div className="t-mikro text-neutral-500">recent sessions</div>
+            </div>
+          </div>
+
+          <div className="mt-3 space-y-2">
+            {ringkas.bandingAktivitas.map((sesi) => (
+              <div key={sesi.id} className="rounded-xl bg-neutral-50/80 p-2.5 dark:bg-white/[0.04]">
+                <div className="flex items-center justify-between gap-2">
+                  <div className="text-[10px] font-black text-ink dark:text-white">{sesi.tanggal}</div>
+                  {sesi.indoor !== null && <div className="text-[8px] font-bold uppercase tracking-wide text-neutral-500">{sesi.indoor ? 'Indoor' : 'Outdoor'}</div>}
+                </div>
+                <div className="mt-2 grid grid-cols-2 gap-1.5">
+                  <div className="rounded-lg bg-white/90 p-2 dark:bg-white/5">
+                    <div className="text-[8px] font-bold uppercase tracking-wide text-neutral-500">Pace / speed</div>
+                    <div className="mt-0.5 text-xs font-black tabular-nums text-ink dark:text-white">
+                      {sesi.pace !== null ? `${sesi.pace}/km` : sesi.speed !== null ? `${sesi.speed.toFixed(1)} km/h` : '—'}
+                    </div>
+                  </div>
+                  <div className="rounded-lg bg-white/90 p-2 dark:bg-white/5">
+                    <div className="text-[8px] font-bold uppercase tracking-wide text-neutral-500">Cadence</div>
+                    <div className="mt-0.5 text-xs font-black tabular-nums text-ink dark:text-white">{sesi.cadence !== null ? `${sesi.cadence} spm` : '—'}</div>
+                  </div>
+                  <div className="rounded-lg bg-white/90 p-2 dark:bg-white/5">
+                    <div className="text-[8px] font-bold uppercase tracking-wide text-neutral-500">Avg HR</div>
+                    <div className="mt-0.5 text-xs font-black tabular-nums text-ink dark:text-white">{sesi.avgHr !== null ? `${sesi.avgHr} bpm` : '—'}</div>
+                  </div>
+                  <div className="rounded-lg bg-white/90 p-2 dark:bg-white/5">
+                    <div className="text-[8px] font-bold uppercase tracking-wide text-neutral-500">Session</div>
+                    <div className="mt-0.5 text-xs font-black tabular-nums text-ink dark:text-white">{sesi.menit !== null ? `${sesi.menit} min` : '—'}</div>
+                    {sesi.jarakKm !== null && <div className="mt-0.5 text-[8px] font-semibold tabular-nums text-neutral-500">{sesi.jarakKm.toFixed(1)} km</div>}
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          <p className="mt-2 text-[9px] leading-relaxed text-neutral-500 dark:text-neutral-400">
+            Only sessions with the same normalized activity name are grouped. Route, duration, environment, and session purpose can still differ, so values are shown without ranking or causal interpretation.
           </p>
         </div>
       )}
