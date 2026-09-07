@@ -53,6 +53,15 @@ const baseEntry = {
   },
 }
 
+const activeEntry = (module) => ({
+  ...baseEntry,
+  adapter: {
+    ...baseEntry.adapter,
+    status: 'ACTIVE',
+    module,
+  },
+})
+
 async function runFixture(fixtures) {
   const root = await mkdtemp(join(tmpdir(), 'panacea-source-registry-'))
   try {
@@ -109,6 +118,49 @@ test('rejects ACTIVE adapter without a module', async () => {
   ])
   assert.notEqual(result.status, 0)
   assert.match(result.stderr, /ACTIVE adapter must declare a non-null adapter\.module/)
+})
+
+test('accepts ACTIVE adapter whose repository-relative module is a real file', async () => {
+  const result = await runFixture([
+    {
+      filename: 'active-existing-module.json',
+      entry: activeEntry('scripts/validate-source-registry.mjs'),
+    },
+  ])
+  assert.equal(result.status, 0, result.stderr)
+})
+
+test('rejects ACTIVE adapter whose module file does not exist', async () => {
+  const result = await runFixture([
+    {
+      filename: 'active-missing-module.json',
+      entry: activeEntry('server/src/definitely-not-a-panacea-adapter.ts'),
+    },
+  ])
+  assert.notEqual(result.status, 0)
+  assert.match(result.stderr, /ACTIVE adapter\.module does not exist/)
+})
+
+test('rejects ACTIVE adapter module that escapes repository root', async () => {
+  const result = await runFixture([
+    {
+      filename: 'active-outside-repo.json',
+      entry: activeEntry('../outside-panacea-adapter.ts'),
+    },
+  ])
+  assert.notEqual(result.status, 0)
+  assert.match(result.stderr, /ACTIVE adapter\.module must stay inside the repository/)
+})
+
+test('rejects ACTIVE adapter module that points to a directory', async () => {
+  const result = await runFixture([
+    {
+      filename: 'active-directory.json',
+      entry: activeEntry('scripts'),
+    },
+  ])
+  assert.notEqual(result.status, 0)
+  assert.match(result.stderr, /ACTIVE adapter\.module must reference a file/)
 })
 
 test('rejects commercial use ALLOWED without verified licensing', async () => {
