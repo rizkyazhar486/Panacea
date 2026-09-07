@@ -17,10 +17,15 @@ type ViewApi = {
   controls: OrbitControls
   root: THREE.Object3D
   render: () => void
+  focus: (term: string) => boolean
 }
 
 function unique(values: string[]) {
   return [...new Set(values.map((value) => value.trim()).filter(Boolean))]
+}
+
+function normalizeLookup(value: string) {
+  return value.toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim()
 }
 
 function boundingSphere(object: THREE.Object3D) {
@@ -29,19 +34,19 @@ function boundingSphere(object: THREE.Object3D) {
   return box.getBoundingSphere(new THREE.Sphere())
 }
 
-function fitCamera(camera: THREE.PerspectiveCamera, controls: OrbitControls, object: THREE.Object3D) {
+function fitCamera(camera: THREE.PerspectiveCamera, controls: OrbitControls, object: THREE.Object3D, padding = 1.15) {
   const sphere = boundingSphere(object)
   if (!sphere) return
   const radius = Math.max(sphere.radius, 0.001)
   const fov = THREE.MathUtils.degToRad(camera.fov)
-  const distance = radius / Math.sin(fov / 2) * 1.15
+  const distance = radius / Math.sin(fov / 2) * padding
   camera.near = Math.max(radius / 1000, 0.0001)
-  camera.far = Math.max(distance * 12, radius * 20)
+  camera.far = Math.max(distance * 16, radius * 24)
   camera.position.set(sphere.center.x + distance * 0.12, sphere.center.y + distance * 0.05, sphere.center.z + distance)
   camera.updateProjectionMatrix()
   controls.target.copy(sphere.center)
-  controls.minDistance = radius * 0.08
-  controls.maxDistance = radius * 12
+  controls.minDistance = Math.max(radius * 0.06, 0.0001)
+  controls.maxDistance = Math.max(radius * 20, distance * 8)
   controls.update()
 }
 
@@ -66,10 +71,32 @@ function meshLabel(object: THREE.Object3D) {
   return object.name || 'Anatomical mesh'
 }
 
+function bestMeshForTerm(root: THREE.Object3D, term: string) {
+  const wanted = normalizeLookup(term)
+  if (!wanted) return null
+  const wantedTokens = wanted.split(' ').filter((token) => token.length > 2)
+  let best: { mesh: THREE.Mesh; score: number } | null = null
+
+  root.traverse((object) => {
+    if (!(object instanceof THREE.Mesh)) return
+    const haystack = normalizeLookup(`${object.name} ${object.parent?.name || ''}`)
+    if (!haystack) return
+    let score = 0
+    if (haystack === wanted) score += 100
+    if (haystack.includes(wanted)) score += 60
+    for (const token of wantedTokens) if (haystack.includes(token)) score += 8
+    if (!score) return
+    if (!best || score > best.score) best = { mesh: object, score }
+  })
+
+  return best?.mesh ?? null
+}
+
 export function HraResolvedAnatomyViewer({ terms, title, description, maxResults = 12 }: Props) {
   const mountRef = useRef<HTMLDivElement>(null)
   const viewApiRef = useRef<ViewApi | null>(null)
-  const normalizedTerms = useMemo(() => unique(terms).slice(0, 16), [terms])
+  const termsKey = terms.map((value) => value.trim()).filter(Boolean).join('\u001f')
+  const normalizedTerms = useMemo(() => unique(termsKey.split('\u001f')).slice(0, 16), [termsKey])
   const [records, setRecords] = useState<HraResolvedRecord[]>([])
   const [selectedKey, setSelectedKey] = useState('')
   const [state, setState] = useState<'loading' | 'ready' | 'empty' | 'error'>('loading')
@@ -84,7 +111,10 @@ export function HraResolvedAnatomyViewer({ terms, title, description, maxResults
         if (cancelled) return
         setRecords(result)
         const firstRenderable = result.find((record) => record.renderable && record.model)
-        setSelectedKey(firstRenderable ? `${firstRenderable.release}|${firstRenderable.model!.name}` : '')
+        setSelectedKey((current) => {
+          if (current && result.some((record) => record.renderable && record.model && `${record.release}|${record.model.name}` === current)) return current
+          return firstRenderable ? `${firstRenderable.release}|${firstRenderable.model!.name}` : ''
+        })
         setState(result.length ? 'ready' : 'empty')
       })
       .catch(() => {
@@ -94,18 +124,26 @@ export function HraResolvedAnatomyViewer({ terms, title, description, maxResults
         setState('error')
       })
     return () => { cancelled = true }
-  }, [normalizedTerms, maxResults])
+  }, [termsKey, maxResults])
 
   const renderable = useMemo(() => records.filter((record) => record.renderable && record.model), [records])
   const selected = useMemo(
     () => renderable.find((record) => `${record.release}|${record.model!.name}` === selectedKey) ?? renderable[0],
     [renderable, selectedKey],
   )
+  const selectedModelUrl = selected?.model?.downloadUrl ?? ''
+  const focusTerm = normalizedTerms[0] ?? ''
+
+  useEffect(() => {
+    const api = viewApiRef.current
+    if (!api || !focusTerm) return
+    api.focus(focusTerm)
+  }, [focusTerm])
 
   useEffect(() => {
     const mount = mountRef.current
     const model = selected?.model
-    if (!mount || !model) return
+    if (!mount || !model || !selectedModelUrl) return
 
     let disposed = false
     let observer: ResizeObserver | null = null
@@ -153,9 +191,6 @@ export function HraResolvedAnatomyViewer({ terms, title, description, maxResults
     scene.add(rim)
 
     const controls = new OrbitControls(camera, renderer.domElement)
-    // Deliberately no damping/continuous animation. The atlas redraws only on
-    // interaction, resize, model load or selection so an idle eye/body does not
-    // consume a permanent animation loop on mobile Safari.
     controls.enableDamping = false
     controls.enablePan = true
 
@@ -185,9 +220,35 @@ export function HraResolvedAnatomyViewer({ terms, title, description, maxResults
     world.name = 'HRA source anatomy'
     scene.add(world)
 
+    const clearHelper = () => {
+      if (!pickedHelper) return
+      scene.remove(pickedHelper)
+      pickedHelper.geometry.dispose()
+      ;(pickedHelper.material as THREE.Material).dispose()
+      pickedHelper = null
+    }
+
+    const inspectMesh = (mesh: THREE.Object3D, refocus: boolean) => {
+      clearHelper()
+      pickedHelper = new THREE.BoxHelper(mesh, 0x62ddff)
+      pickedHelper.renderOrder = 50
+      scene.add(pickedHelper)
+      setPicked(meshLabel(mesh))
+      if (refocus) fitCamera(camera, controls, mesh, 1.8)
+      render()
+    }
+
+    const focus = (term: string) => {
+      if (!loadedRoot) return false
+      const mesh = bestMeshForTerm(loadedRoot, term)
+      if (!mesh) return false
+      inspectMesh(mesh, true)
+      return true
+    }
+
     const loader = new GLTFLoader()
     loader.load(
-      model.downloadUrl,
+      selectedModelUrl,
       (gltf) => {
         if (disposed) return
         loadedRoot = gltf.scene
@@ -205,7 +266,8 @@ export function HraResolvedAnatomyViewer({ terms, title, description, maxResults
         })
         world.add(gltf.scene)
         fitCamera(camera, controls, gltf.scene)
-        viewApiRef.current = { camera, controls, root: gltf.scene, render }
+        viewApiRef.current = { camera, controls, root: gltf.scene, render, focus }
+        if (focusTerm) focus(focusTerm)
         render()
       },
       undefined,
@@ -227,18 +289,7 @@ export function HraResolvedAnatomyViewer({ terms, title, description, maxResults
       pointer.y = -((event.clientY - rect.top) / rect.height) * 2 + 1
       raycaster.setFromCamera(pointer, camera)
       const hit = raycaster.intersectObject(loadedRoot, true).find((item) => item.object instanceof THREE.Mesh)?.object
-      if (!hit) return
-
-      if (pickedHelper) {
-        scene.remove(pickedHelper)
-        pickedHelper.geometry.dispose()
-        ;(pickedHelper.material as THREE.Material).dispose()
-      }
-      pickedHelper = new THREE.BoxHelper(hit, 0x62ddff)
-      pickedHelper.renderOrder = 50
-      scene.add(pickedHelper)
-      setPicked(meshLabel(hit))
-      render()
+      if (hit) inspectMesh(hit, false)
     }
 
     const onContextLost = (event: Event) => {
@@ -258,11 +309,7 @@ export function HraResolvedAnatomyViewer({ terms, title, description, maxResults
       renderer.domElement.removeEventListener('webglcontextlost', onContextLost)
       controls.removeEventListener('change', render)
       controls.dispose()
-      if (pickedHelper) {
-        scene.remove(pickedHelper)
-        pickedHelper.geometry.dispose()
-        ;(pickedHelper.material as THREE.Material).dispose()
-      }
+      clearHelper()
       world.traverse((object) => {
         if (!(object instanceof THREE.Mesh)) return
         object.geometry?.dispose()
@@ -276,12 +323,16 @@ export function HraResolvedAnatomyViewer({ terms, title, description, maxResults
       renderer.forceContextLoss()
       mount.innerHTML = ''
     }
-  }, [selected])
+  // Rebuild WebGL only when the actual GLB changes. A cornea→iris→lens selection
+  // within the same eye source focuses a mesh instead of reparsing the whole organ.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedModelUrl])
 
   function orient(view: 'front' | 'side' | 'back' | 'reset') {
     const api = viewApiRef.current
     if (!api) return
     if (view === 'reset') {
+      setPicked('')
       fitCamera(api.camera, api.controls, api.root)
       api.render()
       return
@@ -312,7 +363,7 @@ export function HraResolvedAnatomyViewer({ terms, title, description, maxResults
             <h3 className="mt-1 text-lg font-black text-neutral-950 dark:text-white">{title}</h3>
             {description && <p className="mt-1 max-w-3xl text-[10px] leading-relaxed text-neutral-500 dark:text-neutral-400">{description}</p>}
           </div>
-          <div className="rounded-full border border-neutral-200 bg-neutral-50 px-3 py-1.5 text-[9px] font-black text-neutral-500 dark:border-white/10 dark:bg-white/[.04] dark:text-neutral-300">Static source model · redraw on interaction only</div>
+          <div className="rounded-full border border-neutral-200 bg-neutral-50 px-3 py-1.5 text-[9px] font-black text-neutral-500 dark:border-white/10 dark:bg-white/[.04] dark:text-neutral-300">One GLB · submesh focus · redraw on interaction</div>
         </div>
 
         {renderable.length > 1 && (
@@ -360,7 +411,7 @@ export function HraResolvedAnatomyViewer({ terms, title, description, maxResults
               {picked && <div className="rounded-xl border border-cyan-200 bg-cyan-50 p-2.5 dark:border-cyan-300/20 dark:bg-cyan-300/10"><dt className="font-black uppercase tracking-wide text-cyan-700 dark:text-cyan-300">Inspected mesh</dt><dd className="mt-1 break-all font-semibold text-neutral-800 dark:text-neutral-100">{picked}</dd></div>}
             </dl>
             <a href={selected.sourceUrl} target="_blank" rel="noreferrer" className="mt-4 inline-flex rounded-full bg-neutral-950 px-3 py-2 text-[9px] font-black text-white dark:bg-white dark:text-neutral-950">Open HRA source ↗</a>
-            <p className="mt-4 text-[9px] leading-relaxed text-neutral-400">This viewer preserves upstream HRA geometry. Tap selection adds an inspection outline only; Panacea does not morph or invent patient-specific anatomy.</p>
+            <p className="mt-4 text-[9px] leading-relaxed text-neutral-400">This viewer preserves upstream HRA geometry. Structure changes within the same organ focus matching source meshes without reloading the whole GLB. Panacea does not invent patient-specific anatomy.</p>
           </aside>
         </div>
       ) : (
