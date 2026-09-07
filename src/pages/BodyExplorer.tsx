@@ -4,6 +4,7 @@ import { BodyEvidenceDock, type BodyEvidenceMode } from '../components/digital-t
 import { HraContextBridge } from '../components/digital-twin/HraContextBridge'
 
 const BiomedicalEngineLab = lazy(() => import('./bodyhub/BiomedicalEngineLab').then(m => ({ default: m.BiomedicalEngineLab })))
+const PhysiologyLab = lazy(() => import('../components/physiology/PhysiologyLab').then(m => ({ default: m.PhysiologyLab })))
 
 const HraClinicalAtlas = lazy(() =>
   import('../components/digital-twin/HraClinicalAtlas').then((m) => ({ default: m.HraClinicalAtlas })),
@@ -39,7 +40,7 @@ const CinematicSurgicalRehearsal = lazy(() =>
   import('../components/digital-twin/CinematicSurgicalRehearsal').then((m) => ({ default: m.CinematicSurgicalRehearsal })),
 )
 
-type LabMode = BodyEvidenceMode | 'imported-data'
+type LabMode = BodyEvidenceMode | 'imported-data' | 'physiology'
 
 type Mode = {
   key: LabMode
@@ -48,6 +49,7 @@ type Mode = {
 }
 
 const PRIMARY: Mode[] = [
+  { key: 'physiology', label: 'Physiology', hint: 'Explore mechanisms, mathematical relationships and their limits.' },
   { key: 'realistic-atlas', label: 'Anatomy', hint: 'Multi-release HRA source anatomy with browser-loadable GLB provenance' },
   { key: 'digital-twin', label: 'Body → Cell', hint: 'Cinematic cell structure + Human Protein Atlas evidence' },
   { key: 'cell-genome', label: 'Cell → DNA', hint: '3D cell/chromatin/DNA + HPA and Ensembl evidence' },
@@ -194,7 +196,9 @@ export function BodyExplorer() {
         </div>
       </section>
 
-      {mode === 'imported-data' ? (
+      {mode === 'physiology' ? (
+        <Suspense fallback={<LoadingLab label="physiology" />}><PhysiologyLab /></Suspense>
+      ) : mode === 'imported-data' ? (
         <Suspense fallback={<LoadingLab label="research data" />}><BiomedicalEngineLab /></Suspense>
       ) : mode === 'digital-twin' ? (
         <CellEvidenceMode mode="body-cell" />
@@ -243,7 +247,7 @@ export function BodyExplorer() {
         </SourceBackedMode>
       )}
 
-      {mode !== 'imported-data' && <BodyEvidenceDock mode={mode} />}
+      {mode !== 'imported-data' && mode !== 'physiology' && <BodyEvidenceDock mode={mode} />}
     </main>
   )
 }
