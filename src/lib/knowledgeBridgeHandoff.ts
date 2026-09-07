@@ -8,6 +8,7 @@ export interface BridgeEvidenceRef {
   source: string
   url: string
   year?: string
+  query?: string
 }
 
 const KEY = 'pmd_knowledge_bridge_evidence_v1'
@@ -31,7 +32,8 @@ function isBridgeEvidenceRef(value: unknown): value is BridgeEvidenceRef {
     typeof item.title === 'string' && item.title.length > 0 &&
     typeof item.source === 'string' && item.source.length > 0 &&
     validUrl(item.url) &&
-    (item.year === undefined || typeof item.year === 'string')
+    (item.year === undefined || typeof item.year === 'string') &&
+    (item.query === undefined || (typeof item.query === 'string' && item.query.trim().length > 0))
   )
 }
 
