@@ -43,6 +43,8 @@ jobs:
         run: npm run build
       - name: Test ClinicalTrials adapter
         run: npm run uji:trials
+      - name: Test PubMed adapter
+        run: npm run uji:pubmed
       - name: Runtime smoke-test genomics control plane
         env:
           JWT_SECRET: ci-only-panacea-genomics-secret
