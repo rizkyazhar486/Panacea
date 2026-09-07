@@ -1,0 +1,52 @@
+{
+  "id": "human_protein_atlas",
+  "name": "Human Protein Atlas",
+  "category": "molecular",
+  "kind": ["api", "dataset"],
+  "homepage": "https://www.proteinatlas.org/",
+  "repository": null,
+  "features": ["protein-atlas", "tissue-expression", "single-cell-expression", "subcellular-localization", "cancer-expression", "blood-protein", "cell-line-expression", "protein-interaction", "protein-structure-context"],
+  "formats": ["json", "xml", "rdf", "tsv", "gzip"],
+  "usage": {
+    "runtime": true,
+    "buildTime": true,
+    "networkRequired": true,
+    "notes": "Use targeted programmatic access for single-gene or small search-result views and version-pinned downloadable snapshots for repeatable atlas features. Do not ship the full HPA corpus in the primary web bundle. Current registry target is HPA version 25.1 (release 2026-05-25, Ensembl 109); later releases require explicit re-validation of schema, provenance and licensing."
+  },
+  "license": {
+    "status": "VERIFIED",
+    "identifier": "CC BY 4.0 for copyrightable HPA-owned database content; third-party source terms remain separate",
+    "commercialUse": "CONDITIONAL",
+    "attributionRequired": true,
+    "shareAlike": false,
+    "scope": "The current Human Protein Atlas states that copyrightable parts of its database are licensed CC BY 4.0 and encourages research and commercial use with proper citation. The database also contains third-party data with independent terms, including sources such as Ensembl, UniProt, GTEx, TCGA, CPTAC, Tabula Sapiens, AlphaFold, IntAct and others. Those fields must retain their source-specific rights and must not inherit the HPA CC BY 4.0 license automatically.",
+    "verificationUrl": "https://www.proteinatlas.org/about/licence",
+    "verifiedAt": "2026-09-08",
+    "notes": "For any displayed HPA content, retain HPA citation and website reference. Specific images, genes or downloaded data require the corresponding specific URL/citation; HPA images require Human Protein Atlas image credit. Archived HPA versions had different license terms, so never back-apply the current v25.1 license to older snapshots."
+  },
+  "validation": {
+    "level": "REFERENCE",
+    "clinicalDecisionUse": "CONTEXT_ONLY",
+    "notes": "HPA provides reference expression, localization, proteomics, interaction and related molecular context. Expression or localization alone does not establish disease causality, diagnosis, prognosis, treatment selection or patient-specific targetability. Any clinical interpretation must be supported by separate validated clinical evidence."
+  },
+  "provenance": {
+    "authority": "Human Protein Atlas consortium / SciLifeLab / KTH Royal Institute of Technology",
+    "sourceIdentityRequired": true,
+    "versionPinRequired": true,
+    "notes": "Persist HPA release version, Ensembl gene ID/version context, retrieval date, atlas section/data type, and source attribution for each field. Preserve HPA-owned versus externally sourced fields separately. Third-party overlays such as GTEx, TCGA or AlphaFold must retain their original source identity and applicable license/terms."
+  },
+  "adapter": {
+    "status": "PLANNED",
+    "normalizedTarget": "PanaceaProteinExpressionProfile",
+    "module": null,
+    "notes": "Planned flow: Ensembl gene ID or constrained HPA search -> HPA XML/JSON/TSV -> normalize tissue, cell-type, subcellular, cancer, blood, cell-line, interaction and structure-context measurements/annotations -> PanaceaProteinExpressionProfile. Every normalized datum carries sourceOwner, sourceDataset, HPA release, measurement/annotation type and source URL. Do not merge transcript, protein, antibody, mass-spectrometry or external-prediction signals into one synthetic certainty score."
+  },
+  "trust": {
+    "authority": 5,
+    "evidenceQuality": 4,
+    "recency": 5,
+    "licenseClarity": 4,
+    "reproducibility": 5,
+    "notes": "High-authority integrated reference atlas with versioned downloadable data and programmatic access. License clarity is reduced from maximum because individual records can contain third-party datasets under separate terms, requiring per-field provenance and license handling."
+  }
+}
