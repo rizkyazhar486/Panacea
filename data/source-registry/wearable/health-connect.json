@@ -1,0 +1,52 @@
+{
+  "id": "android_health_connect",
+  "name": "Android Health Connect",
+  "category": "wearable",
+  "kind": ["framework", "library"],
+  "homepage": "https://developer.android.com/health-and-fitness/health-connect",
+  "repository": null,
+  "features": ["android-health", "health-records", "activity", "workouts", "heart-rate", "sleep", "steps", "nutrition", "body-measurements", "medical-records", "permissioned-health-sync"],
+  "formats": ["health-connect-records", "native-android-records"],
+  "usage": {
+    "runtime": false,
+    "buildTime": false,
+    "networkRequired": false,
+    "notes": "Health Connect is a native Android data layer and is not directly accessible from Panacea's Vite/React browser runtime. Use a separately reviewed Android companion/native bridge. Android 14+ includes Health Connect as a framework module; Android 13 and lower rely on the Health Connect app where supported. Production baseline should prefer the current stable AndroidX Health Connect client (1.1.0 at verification) rather than depending on alpha APIs without a feature-specific reason."
+  },
+  "license": {
+    "status": "CHECK_REQUIRED",
+    "identifier": "AndroidX/platform licensing plus Google Play Health Connect policy/declaration requirements",
+    "commercialUse": "CONDITIONAL",
+    "attributionRequired": null,
+    "shareAlike": null,
+    "scope": "Health Connect access is governed not only by SDK/library licensing but also Android platform permissions and Google Play health-app declaration requirements. Published apps must declare the Health Connect data types they access and provide valid use cases. Panacea must treat these deployment/policy obligations separately from open-source SDK code licensing.",
+    "verificationUrl": "https://developer.android.com/health-and-fitness/health-connect/data-types",
+    "verifiedAt": "2026-09-08",
+    "notes": "Re-check AndroidX release, platform behavior and Play Console health-app declaration requirements before each production release. Access only data types needed for an explicit feature; do not interpret platform availability as permission to use health data for unrelated purposes."
+  },
+  "validation": {
+    "level": "REFERENCE",
+    "clinicalDecisionUse": "NO",
+    "notes": "Health Connect is a data exchange/storage framework, not a validator of sensor accuracy, data quality, diagnosis or clinical meaning. Records can originate from different apps/devices and may overlap. Panacea must retain origin and avoid treating aggregate or raw records as clinically validated measurements without source-specific evidence."
+  },
+  "provenance": {
+    "authority": "Google / Android Health & Fitness",
+    "sourceIdentityRequired": true,
+    "versionPinRequired": true,
+    "notes": "Preserve record type, record ID/metadata where available, start/end timestamps and zones, units, values, DataOrigin/package identity, device metadata, recording method when available, native adapter/SDK version, import timestamp and transformation/deduplication history. Account for the June 2026 attribution change: on-device step records use a device-specific Synthetic Package Name rather than the old generic android origin."
+  },
+  "adapter": {
+    "status": "PLANNED",
+    "normalizedTarget": "PanaceaHealthObservation",
+    "module": null,
+    "notes": "Planned flow: native Health Connect availability check -> manifest + Play-declaration aligned minimal permissions -> contextual user permission -> native query -> source-aware normalization/deduplication -> optional explicitly authorized sync -> PanaceaHealthObservation. Re-check permission before each protected operation because users can revoke it. Request READ_HEALTH_DATA_HISTORY only when a feature genuinely needs records older than the default historical window, and READ_HEALTH_DATA_IN_BACKGROUND only for a justified background-use case. Fail gracefully when module/app/version/permission is unavailable."
+  },
+  "trust": {
+    "authority": 5,
+    "evidenceQuality": 1,
+    "recency": 5,
+    "licenseClarity": 3,
+    "reproducibility": 3,
+    "notes": "High-authority Android platform interoperability layer. Evidence quality is intentionally low because Health Connect itself does not validate originating measurements. License/policy clarity is conservative because production use spans SDK licensing, Android behavior and Google Play health-data declarations."
+  }
+}
