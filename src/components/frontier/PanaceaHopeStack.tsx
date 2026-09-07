@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react'
+import { HopeEvidencePanel } from './HopeEvidencePanel'
 import { HopeWorkbench } from './HopeWorkbench'
 import {
   HOPE_DOMAINS,
@@ -163,7 +164,7 @@ export function PanaceaHopeStack() {
                       key={reference.url}
                       href={reference.url}
                       target="_blank"
-                      rel="noreferrer"
+                      rel="noreferrer noopener"
                       className="block rounded-xl border border-neutral-200 px-3 py-2 text-[11px] font-bold text-brand hover:border-brand/50 dark:border-white/10"
                     >
                       {reference.label} ↗
@@ -177,6 +178,7 @@ export function PanaceaHopeStack() {
       </div>
 
       <HopeWorkbench domain={selected.key} />
+      <HopeEvidencePanel domain={selected.key} />
     </section>
   )
 }
