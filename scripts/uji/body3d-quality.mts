@@ -11,15 +11,17 @@ import {
 
 assert.equal(BODY3D_DESKTOP_MAX_DPR, 2)
 assert.equal(BODY3D_MOBILE_MAX_DPR, 1.5)
-assert.equal(BODY3D_MAX_RENDER_PIXELS, 4_500_000)
+assert.equal(BODY3D_MAX_RENDER_PIXELS, 5_250_000)
 
-// Phone: keep the conservative 1.5x cap for GPU/memory stability.
+// Phone: preserve the conservative 1.5x cap already validated by mobile WebGL smoke.
 assert.equal(body3dPixelRatio(390, 574, 3, true), 1.5)
-// Tablet/desktop Retina may use 2x while still inside the pixel budget.
+// Tablet Retina stays at the established 2x ceiling.
 assert.equal(body3dPixelRatio(1024, 768, 2, false), 2)
-// Large desktop reduces supersampling gradually rather than reducing CSS size.
-const desktop = body3dPixelRatio(1440, 900, 2, false)
-assert.ok(desktop > 1.8 && desktop < 1.9, `unexpected desktop DPR ${desktop}`)
+// Common 1440×900 Retina desktop now has enough guarded budget for full 2x HD.
+assert.equal(body3dPixelRatio(1440, 900, 2, false), 2)
+// Larger 1080p desktop still scales down supersampling instead of exceeding the budget.
+const fullHd = body3dPixelRatio(1920, 1080, 2, false)
+assert.ok(fullHd > 1.59 && fullHd < 1.60, `unexpected 1080p DPR ${fullHd}`)
 // CSS 4K never falls below native 1x.
 assert.equal(body3dPixelRatio(3840, 2160, 2, false), 1)
 assert.equal(body3dPixelRatio(0, 0, Number.NaN, false), 1)
