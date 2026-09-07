@@ -45,6 +45,8 @@ jobs:
         run: npm run uji:trials
       - name: Test PubMed adapter
         run: npm run uji:pubmed
+      - name: Test openFDA adapter
+        run: npm run uji:openfda
       - name: Runtime smoke-test genomics control plane
         env:
           JWT_SECRET: ci-only-panacea-genomics-secret
