@@ -1,5 +1,5 @@
 import { FormEvent, useEffect, useMemo, useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useLocation } from 'react-router-dom'
 import {
   searchMedicalSources,
   type MedicalSourceBundle,
@@ -46,8 +46,9 @@ export function MedicalEvidenceExplorer({
   compact = false,
   title = 'Live medical evidence',
   subtitle = 'Search trusted public biomedical sources instead of reading static placeholder cards.',
-  allowBridgeSelection = false,
+  allowBridgeSelection = true,
 }: Props) {
+  const location = useLocation()
   const [query, setQuery] = useState(initialQuery)
   const [active, setActive] = useState<SourceKey>('all')
   const [bundle, setBundle] = useState<MedicalSourceBundle | null>(null)
@@ -55,6 +56,7 @@ export function MedicalEvidenceExplorer({
   const [error, setError] = useState('')
   const [selectedKey, setSelectedKey] = useState('')
   const [bridgeEvidence, setBridgeEvidence] = useState<BridgeEvidenceRef[]>(loadBridgeEvidence)
+  const bridgeSelectionEnabled = allowBridgeSelection && location.pathname !== '/knowledge-bridge'
 
   async function run(nextQuery = query) {
     const clean = nextQuery.trim()
@@ -178,7 +180,7 @@ export function MedicalEvidenceExplorer({
             ))}
           </div>
 
-          {allowBridgeSelection && evidenceOptions.length > 0 && (
+          {bridgeSelectionEnabled && evidenceOptions.length > 0 && (
             <div className="mt-3 rounded-[22px] border border-emerald-200 bg-emerald-50/60 p-3 dark:border-emerald-400/20 dark:bg-emerald-400/[.06]">
               <div className="flex flex-wrap items-start justify-between gap-2">
                 <div>
