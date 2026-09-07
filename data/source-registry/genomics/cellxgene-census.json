@@ -1,0 +1,52 @@
+{
+  "id": "cellxgene_census",
+  "name": "CZ CELLxGENE Discover Census",
+  "category": "genomics",
+  "kind": ["api", "dataset"],
+  "homepage": "https://chanzuckerberg.github.io/cellxgene-census/",
+  "repository": "https://github.com/chanzuckerberg/cellxgene-census",
+  "features": ["single-cell", "cell-types", "gene-expression", "tissue-cell-atlas", "cell-ontology", "disease-context", "spatial-single-cell", "organ-cell-gene", "molecular-digital-twin-research"],
+  "formats": ["soma", "h5ad", "anndata", "arrow"],
+  "usage": {
+    "runtime": true,
+    "buildTime": true,
+    "networkRequired": true,
+    "notes": "Use CELLxGENE Census for targeted, version-pinned single-cell slices and reproducible build-time summaries. The Census is designed for server/cloud-scale access; Panacea should query only the required organism/tissue/cell-type/gene subset and return compact normalized aggregates to the browser rather than loading whole Census matrices. Prefer a named/LTS Census release for scientific reproducibility instead of the moving latest alias."
+  },
+  "license": {
+    "status": "VERIFIED",
+    "identifier": "Census code MIT; Census data CC BY",
+    "commercialUse": "ALLOWED",
+    "attributionRequired": true,
+    "shareAlike": false,
+    "scope": "The official CELLxGENE Census repository states that repository code is reusable under the MIT license and Census data are available for reuse under CC BY. Individual studies/datasets remain scientifically attributable to their original authors and should retain dataset-level citations even when accessed through Census.",
+    "verificationUrl": "https://github.com/chanzuckerberg/cellxgene-census",
+    "verifiedAt": "2026-09-08",
+    "notes": "Cite CELLxGENE Census and preserve citations for each underlying study/dataset contributing materially to an analysis. Do not imply that CC BY Census availability removes scientific attribution obligations or licenses unrelated linked content."
+  },
+  "validation": {
+    "level": "RESEARCH",
+    "clinicalDecisionUse": "CONTEXT_ONLY",
+    "notes": "Single-cell expression is research/reference evidence affected by tissue sampling, disease state, assay chemistry, sequencing depth, preprocessing, ontology annotation and study design. A Census cell annotation or expression value is not patient-specific anatomy, pathology or diagnosis and must not independently determine treatment."
+  },
+  "provenance": {
+    "authority": "Chan Zuckerberg Initiative / CZ CELLxGENE Discover",
+    "sourceIdentityRequired": true,
+    "versionPinRequired": true,
+    "notes": "Persist the named Census data release/build, Census schema version, CELLxGENE dataset schema version, organism ontology ID, source dataset/collection ID and citation, tissue/tissue_general ontology IDs, cell-type ontology ID, disease ontology ID, assay ontology ID, donor/sample metadata used in the slice, feature/gene identifiers, measurement layer semantics, query/filter expression, retrieval date and Panacea adapter version. Census release version and Census schema version are separate concepts and must never be conflated."
+  },
+  "adapter": {
+    "status": "PLANNED",
+    "normalizedTarget": "PanaceaSingleCellReference",
+    "module": null,
+    "notes": "Planned flow: organ/tissue/cell/gene research query -> choose explicit stable/LTS Census release -> apply ontology-based SOMA slice server-side or in an isolated analysis worker -> retain dataset/study and ontology provenance -> compute only required deterministic summaries -> normalize to PanaceaSingleCellReference -> deliver compact aggregates/metadata to UI. Never treat author-normalized values from an unrelated study as directly comparable to raw counts from another study without a documented harmonization method. Do not silently merge cell types across ontology versions or disease contexts."
+  },
+  "trust": {
+    "authority": 5,
+    "evidenceQuality": 4,
+    "recency": 5,
+    "licenseClarity": 5,
+    "reproducibility": 5,
+    "notes": "High-authority, versioned and ontology-rich single-cell corpus with strong reproducibility when Census release, schema and source datasets are pinned. Biological/technical heterogeneity across contributing studies remains substantial, so evidence quality is contextual rather than equivalent to a validated patient assay."
+  }
+}
