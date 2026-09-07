@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
-import { evaluateNotificationRules, type FiredNotification } from '../lib/notificationEngine'
+import { evaluateNotificationRules, type FiredNotification } from '../lib/notificationEngineExtended'
 import {
   appendNotificationHistory,
   collectNotificationSnapshot,
