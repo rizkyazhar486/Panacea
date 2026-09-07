@@ -42,10 +42,22 @@ export function CatatanLatihan() {
   const ringkas = useMemo(() => {
     const w = getWorkouts()
     const detikPerTanggal = new Map<string, number>()
+    const srpePerTanggal = new Map<string, number>()
+    const sesiDenganRpePerTanggal = new Map<string, number>()
+    const sesiBerdurasiPerTanggal = new Map<string, number>()
     for (const x of w) {
       const kunci = kunciTanggal(new Date(x.mulai))
       const aman = Number.isFinite(x.durasi) && x.durasi > 0 ? x.durasi : 0
       detikPerTanggal.set(kunci, (detikPerTanggal.get(kunci) ?? 0) + aman)
+
+      if (aman > 0) {
+        sesiBerdurasiPerTanggal.set(kunci, (sesiBerdurasiPerTanggal.get(kunci) ?? 0) + 1)
+        const rpeAman = typeof x.rpe === 'number' && Number.isFinite(x.rpe) && x.rpe >= 1 && x.rpe <= 10 ? x.rpe : null
+        if (rpeAman !== null) {
+          srpePerTanggal.set(kunci, (srpePerTanggal.get(kunci) ?? 0) + (aman / 60) * rpeAman)
+          sesiDenganRpePerTanggal.set(kunci, (sesiDenganRpePerTanggal.get(kunci) ?? 0) + 1)
+        }
+      }
     }
 
     const sesiTanggal = w
@@ -73,6 +85,9 @@ export function CatatanLatihan() {
       const akhirOffset = 21 - i * 7
       let detikBlok = 0
       let hariAktif = 0
+      let srpeBlok = 0
+      let sesiDenganRpe = 0
+      let sesiBerdurasi = 0
       let awal = ''
       let akhir = ''
 
@@ -83,6 +98,9 @@ export function CatatanLatihan() {
         const detikHari = detikPerTanggal.get(kunci) ?? 0
         detikBlok += detikHari
         if (detikHari > 0) hariAktif += 1
+        srpeBlok += srpePerTanggal.get(kunci) ?? 0
+        sesiDenganRpe += sesiDenganRpePerTanggal.get(kunci) ?? 0
+        sesiBerdurasi += sesiBerdurasiPerTanggal.get(kunci) ?? 0
         if (offset === mulaiOffset) awal = d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
         if (offset === akhirOffset) akhir = d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
       }
@@ -91,9 +109,13 @@ export function CatatanLatihan() {
         label: `${awal}–${akhir}`,
         menit: Math.round(detikBlok / 60),
         hariAktif,
+        srpe: Math.round(srpeBlok),
+        sesiDenganRpe,
+        sesiBerdurasi,
       }
     })
     const maxMenit28 = Math.max(1, ...blok28.map((x) => x.menit))
+    const maxSrpe28 = Math.max(1, ...blok28.map((x) => x.srpe))
 
     return {
       total: w.length,
@@ -106,8 +128,12 @@ export function CatatanLatihan() {
       hariAktif7: tren.filter((x) => x.menit > 0).length,
       blok28,
       maxMenit28,
+      maxSrpe28,
       menit28: blok28.reduce((total, x) => total + x.menit, 0),
       hariAktif28: blok28.reduce((total, x) => total + x.hariAktif, 0),
+      srpe28: blok28.reduce((total, x) => total + x.srpe, 0),
+      sesiDenganRpe28: blok28.reduce((total, x) => total + x.sesiDenganRpe, 0),
+      sesiBerdurasi28: blok28.reduce((total, x) => total + x.sesiBerdurasi, 0),
     }
     // versi ikut menjadi kebergantungan supaya daftarnya dibaca ulang setelah
     // satu sesi disimpan — tanpa itu ringkasannya tertinggal satu langkah.
@@ -248,6 +274,40 @@ export function CatatanLatihan() {
           Each row is one consecutive 7-day block, oldest to newest. Bar length compares recorded duration within this 28-day window; active days show frequency, not adherence quality.
         </p>
       </div>
+
+      {ringkas.sesiDenganRpe28 > 0 && (
+        <div className="mt-3 rounded-2xl border border-amber-200/70 bg-amber-50/40 p-3 dark:border-amber-400/15 dark:bg-amber-400/[0.03]" aria-label="Session RPE training load across four consecutive 7-day blocks">
+          <div className="flex items-end justify-between gap-3">
+            <div>
+              <div className="t-mikro font-bold uppercase tracking-wide text-neutral-500">Perceived load</div>
+              <div className="mt-0.5 text-sm font-black text-ink dark:text-white">Session-RPE × duration</div>
+            </div>
+            <div className="text-right">
+              <div className="text-lg font-black tabular-nums text-amber-700 dark:text-amber-300">{ringkas.srpe28}<span className="ml-1 text-xs text-neutral-500">AU</span></div>
+              <div className="t-mikro text-neutral-500">{ringkas.sesiDenganRpe28}/{ringkas.sesiBerdurasi28} rated sessions</div>
+            </div>
+          </div>
+          <div className="mt-3 space-y-2.5">
+            {ringkas.blok28.map((blok) => (
+              <div key={blok.label} aria-label={`${blok.label}: ${blok.srpe} arbitrary units from ${blok.sesiDenganRpe} rated of ${blok.sesiBerdurasi} duration-valid sessions`}>
+                <div className="mb-1 flex items-center justify-between gap-3 text-[10px]">
+                  <span className="font-bold text-neutral-500">{blok.label}</span>
+                  <span className="font-black tabular-nums text-ink dark:text-white">{blok.srpe} AU · {blok.sesiDenganRpe}/{blok.sesiBerdurasi} rated</span>
+                </div>
+                <div className="h-2.5 overflow-hidden rounded-full bg-amber-100/80 dark:bg-amber-200/10">
+                  <div
+                    className="h-full rounded-full bg-amber-500/80"
+                    style={{ width: blok.srpe > 0 ? `${Math.max(3, (blok.srpe / ringkas.maxSrpe28) * 100)}%` : '0%' }}
+                  />
+                </div>
+              </div>
+            ))}
+          </div>
+          <p className="mt-2 text-[9px] leading-relaxed text-neutral-500 dark:text-neutral-400">
+            sRPE load = session RPE (1–10) × duration in minutes; AU means arbitrary units. Sessions without a valid RPE are excluded, so compare blocks only when rating coverage is similar. This is perceived training load, not a recovery or injury-risk score.
+          </p>
+        </div>
+      )}
 
       <div className="mt-3 space-y-3">
         <div>
