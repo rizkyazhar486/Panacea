@@ -1,5 +1,6 @@
 import { WebSocketServer, WebSocket } from 'ws'
 import type { Server } from 'node:http'
+import { attachGenomicsComputeRoutes } from './genomicsCompute.js'
 
 interface ChatMsg {
   // 'rtc-*' = WebRTC signaling for video/audio calls (relayed to the other peer).
@@ -29,7 +30,11 @@ function relayToOthers(room: string, sender: WebSocket, raw: string) {
 }
 
 // Real-time consultation rooms over WebSocket (doctor ↔ patient).
+// The same HTTP server is also the Render backend entrypoint, so attach the
+// genomics control-plane routes here without duplicating an Express server.
 export function attachRealtime(server: Server) {
+  attachGenomicsComputeRoutes(server)
+
   const wss = new WebSocketServer({ server, path: '/ws' })
   wss.on('connection', (ws) => {
     let room: string | null = null
