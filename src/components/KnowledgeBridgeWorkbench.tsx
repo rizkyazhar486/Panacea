@@ -1,27 +1,47 @@
 import { useMemo, useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useSearchParams } from 'react-router-dom'
 import { BRIDGE_TOPICS, bridgeSummary, resolveBridgeTopic } from '../lib/knowledgeBridgeMap'
 
 type Depth = 'plain' | 'student' | 'clinical'
 const NOTE_KEY = 'pmd_knowledge_bridge_notes_v1'
 
 function readNotes(): Record<string, string> {
-  try { return JSON.parse(localStorage.getItem(NOTE_KEY) || '{}') } catch { return {} }
+  try {
+    const parsed: unknown = JSON.parse(localStorage.getItem(NOTE_KEY) || '{}')
+    if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) return {}
+    return Object.fromEntries(Object.entries(parsed).filter((entry): entry is [string, string] => typeof entry[1] === 'string'))
+  } catch {
+    return {}
+  }
 }
 
 export function KnowledgeBridgeWorkbench() {
-  const [query, setQuery] = useState('hypertension')
-  const [selectedId, setSelectedId] = useState('hypertension')
+  const [params] = useSearchParams()
+  const initialQuery = params.get('q')?.trim() || 'hypertension'
+  const initialTopic = resolveBridgeTopic(initialQuery)
+  const [query, setQuery] = useState(initialQuery)
+  const [selectedId, setSelectedId] = useState(initialTopic?.id ?? 'hypertension')
   const [depth, setDepth] = useState<Depth>('student')
   const [notes, setNotes] = useState<Record<string, string>>(readNotes)
   const [copied, setCopied] = useState(false)
+  const [status, setStatus] = useState(initialTopic || initialQuery === 'hypertension' ? '' : `No curated causal map matches “${initialQuery}” yet. You can still verify this query in Medical Library.`)
 
   const topic = useMemo(() => BRIDGE_TOPICS.find((item) => item.id === selectedId) ?? resolveBridgeTopic(query) ?? BRIDGE_TOPICS[0], [selectedId, query])
   const note = notes[topic.id] ?? ''
 
   function search() {
-    const found = resolveBridgeTopic(query)
-    if (found) setSelectedId(found.id)
+    const clean = query.trim()
+    if (!clean) {
+      setStatus('Enter a disease, mechanism or clinical topic first.')
+      return
+    }
+    const found = resolveBridgeTopic(clean)
+    if (found) {
+      setSelectedId(found.id)
+      setStatus('')
+      return
+    }
+    setStatus(`No curated causal map matches “${clean}” yet. Use Medical Library for the live evidence search instead.`)
   }
   function saveNote(value: string) {
     const next = { ...notes, [topic.id]: value }
@@ -46,31 +66,40 @@ export function KnowledgeBridgeWorkbench() {
     <section className="mx-auto max-w-6xl rounded-[30px] border border-neutral-200 bg-white p-4 shadow-[0_22px_60px_rgba(15,23,42,.07)] dark:border-white/10 dark:bg-[#0d1117] sm:p-6">
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div className="max-w-3xl">
-          <div className="text-[9px] font-black uppercase tracking-[.18em] text-cyan-700 dark:text-cyan-300">Knowledge Bridge · usable mode</div>
-          <h2 className="mt-1 text-2xl font-black tracking-[-.035em] text-neutral-950 dark:text-white">Turn a medical term into a causal map you can actually study.</h2>
-          <p className="mt-2 text-[11px] leading-relaxed text-neutral-500 dark:text-neutral-400">This layer does not diagnose. It connects anatomy → physiology → pathology → clinical signals → diagnostics → management → evidence so the live library has a purpose beyond returning search results.</p>
+          <div className="text-[9px] font-black uppercase tracking-[.18em] text-cyan-700 dark:text-cyan-300">Knowledge Bridge · causal understanding</div>
+          <h2 className="mt-1 text-2xl font-black tracking-[-.035em] text-neutral-950 dark:text-white">Connect a medical topic from structure to evidence without hiding the reasoning path.</h2>
+          <p className="mt-2 text-[11px] leading-relaxed text-neutral-500 dark:text-neutral-400">Knowledge Bridge is the interpretation layer. It maps anatomy → physiology → pathology → clinical signals → diagnostics → management → evidence. Medical Library remains the place to search and inspect live sources.</p>
         </div>
         <span className="rounded-full border border-amber-200 bg-amber-50 px-3 py-2 text-[9px] font-black uppercase tracking-wide text-amber-800 dark:border-amber-400/20 dark:bg-amber-400/10 dark:text-amber-200">Educational · not patient-specific</span>
       </div>
 
+      <div className="mt-4 grid gap-2 sm:grid-cols-3">
+        <GuideCard label="Function" text="Build a causal map that shows how a topic moves from normal biology to clinical findings and evidence." />
+        <GuideCard label="How to use" text="Choose or search a curated topic → follow the stages → verify uncertain claims in Medical Library." />
+        <GuideCard label="Benefit" text="Makes the reasoning path visible, so facts are easier to study, challenge and connect to their sources." />
+      </div>
+
       <div className="mt-4 grid gap-2 sm:grid-cols-[1fr_auto]">
         <div className="relative">
-          <input value={query} onChange={(event) => setQuery(event.target.value)} onKeyDown={(event) => { if (event.key === 'Enter') search() }} placeholder="Try hypertension, asthma, anemia, sepsis…" className="min-h-12 w-full rounded-2xl border border-neutral-200 bg-neutral-50 px-4 pr-24 text-[12px] font-semibold text-neutral-900 outline-none focus:border-cyan-400 dark:border-white/10 dark:bg-white/[.04] dark:text-white" />
-          <button type="button" onClick={search} className="absolute right-1.5 top-1.5 min-h-9 rounded-xl bg-neutral-950 px-4 text-[10px] font-black text-white dark:bg-white dark:text-neutral-950">Build</button>
+          <input value={query} onChange={(event) => { setQuery(event.target.value); if (status) setStatus('') }} onKeyDown={(event) => { if (event.key === 'Enter') search() }} placeholder="Try hypertension, asthma, anemia, sepsis…" className="min-h-12 w-full rounded-2xl border border-neutral-200 bg-neutral-50 px-4 pr-24 text-[12px] font-semibold text-neutral-900 outline-none focus:border-cyan-400 dark:border-white/10 dark:bg-white/[.04] dark:text-white" />
+          <button type="button" onClick={search} className="absolute right-1.5 top-1.5 min-h-9 rounded-xl bg-neutral-950 px-4 text-[10px] font-black text-white dark:bg-white dark:text-neutral-950">Build map</button>
         </div>
         <div className="flex rounded-2xl bg-neutral-100 p-1 dark:bg-white/[.06]">
           {(['plain', 'student', 'clinical'] as Depth[]).map((item) => <button key={item} type="button" onClick={() => setDepth(item)} className={`rounded-xl px-3 py-2 text-[9px] font-black capitalize ${depth === item ? 'bg-white text-neutral-950 shadow-sm dark:bg-neutral-800 dark:text-white' : 'text-neutral-500'}`}>{item}</button>)}
         </div>
       </div>
 
+      {status && <div role="status" className="mt-2 flex flex-wrap items-center justify-between gap-2 rounded-2xl border border-amber-200 bg-amber-50 px-3 py-2 text-[9.5px] leading-relaxed text-amber-900 dark:border-amber-400/20 dark:bg-amber-400/10 dark:text-amber-100"><span>{status}</span>{query.trim() && <Link to={`/med-study?bagian=evidence&cari=${encodeURIComponent(query.trim())}`} className="shrink-0 rounded-full bg-amber-900 px-3 py-1.5 text-[9px] font-black text-white dark:bg-amber-100 dark:text-amber-950">Search evidence →</Link>}</div>}
+
       <div className="no-scrollbar -mx-1 mt-3 flex gap-1.5 overflow-x-auto px-1 pb-1">
-        {BRIDGE_TOPICS.map((item) => <button key={item.id} type="button" onClick={() => { setSelectedId(item.id); setQuery(item.title) }} className={`shrink-0 rounded-full border px-3 py-2 text-[10px] font-black ${topic.id === item.id ? 'border-cyan-600 bg-cyan-600 text-white' : 'border-neutral-200 bg-neutral-50 text-neutral-600 dark:border-white/10 dark:bg-white/[.04] dark:text-neutral-300'}`}>{item.title}</button>)}
+        {BRIDGE_TOPICS.map((item) => <button key={item.id} type="button" onClick={() => { setSelectedId(item.id); setQuery(item.title); setStatus('') }} className={`shrink-0 rounded-full border px-3 py-2 text-[10px] font-black ${topic.id === item.id ? 'border-cyan-600 bg-cyan-600 text-white' : 'border-neutral-200 bg-neutral-50 text-neutral-600 dark:border-white/10 dark:bg-white/[.04] dark:text-neutral-300'}`}>{item.title}</button>)}
       </div>
 
       <div className="mt-4 rounded-[24px] bg-neutral-950 p-4 text-white dark:bg-black/30">
-        <div className="text-[9px] font-black uppercase tracking-[.14em] text-cyan-300">{topic.title}</div>
-        <p className="mt-2 text-[13px] font-semibold leading-relaxed text-white/80">{topic.oneLiner}</p>
-        <p className="mt-2 text-[10px] leading-relaxed text-white/45">{depthHint}</p>
+        <div className="flex flex-wrap items-start justify-between gap-3">
+          <div className="max-w-3xl"><div className="text-[9px] font-black uppercase tracking-[.14em] text-cyan-300">{topic.title}</div><p className="mt-2 text-[13px] font-semibold leading-relaxed text-white/80">{topic.oneLiner}</p><p className="mt-2 text-[10px] leading-relaxed text-white/45">{depthHint}</p></div>
+          <Link to={`/med-study?bagian=evidence&cari=${encodeURIComponent(query.trim() || topic.title)}`} className="shrink-0 rounded-full bg-white/10 px-3 py-2 text-[9px] font-black text-white/80 ring-1 ring-white/10">Verify in Medical Library →</Link>
+        </div>
       </div>
 
       <div className="no-scrollbar -mx-1 mt-3 flex snap-x gap-2.5 overflow-x-auto px-1 pb-2">
@@ -91,12 +120,16 @@ export function KnowledgeBridgeWorkbench() {
         </label>
         <div className="rounded-[22px] border border-neutral-200 bg-neutral-50 p-3 dark:border-white/10 dark:bg-white/[.035]">
           <div className="text-[9px] font-black uppercase tracking-[.13em] text-neutral-400">Use the bridge</div>
-          <ol className="mt-2 space-y-1.5 text-[10px] leading-relaxed text-neutral-600 dark:text-neutral-300"><li>1. Reconstruct the seven stages without looking.</li><li>2. Open the live evidence layer below for claims you need to verify.</li><li>3. Compare source population and clinical context before applying a result.</li><li>4. Save the uncertainty, not only the answer.</li></ol>
+          <ol className="mt-2 space-y-1.5 text-[10px] leading-relaxed text-neutral-600 dark:text-neutral-300"><li>1. Reconstruct the seven stages without looking.</li><li>2. Open Medical Library for claims you need to verify.</li><li>3. Compare source population and clinical context before applying a result.</li><li>4. Save the uncertainty, not only the answer.</li></ol>
           <button type="button" onClick={copySummary} className="mt-3 w-full rounded-2xl bg-cyan-600 px-3 py-2.5 text-[10px] font-black text-white">{copied ? 'Copied ✓' : 'Copy bridge summary'}</button>
         </div>
       </div>
     </section>
   )
+}
+
+function GuideCard({ label, text }: { label: string; text: string }) {
+  return <div className="rounded-[18px] border border-neutral-200 bg-neutral-50 p-3 dark:border-white/10 dark:bg-white/[.035]"><div className="text-[8px] font-black uppercase tracking-[.12em] text-cyan-700 dark:text-cyan-300">{label}</div><p className="mt-1 text-[9.5px] leading-relaxed text-neutral-600 dark:text-neutral-300">{text}</p></div>
 }
 
 export default KnowledgeBridgeWorkbench
