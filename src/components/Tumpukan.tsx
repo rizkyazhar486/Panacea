@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, type CSSProperties, type ReactNode } from 'react'
+import { Suspense, useEffect, useRef, useState, type CSSProperties, type ReactNode } from 'react'
 import '../styles/widget-living-instrument-v5.css'
 import '../styles/widget-concepts-v8.css'
 
@@ -112,33 +112,25 @@ export function Tumpukan({ judul, anak, aksi }: { judul?: string; anak: WidgetIt
   const wadah = useRef<HTMLDivElement>(null)
   const halaman = useRef<(HTMLDivElement | null)[]>([])
   const digeser = useRef(false)
+  const hemat = typeof document !== 'undefined' && document.documentElement.classList.contains('pmd-low-memory')
+  const preload = hemat ? 1 : 2
   const [aktif, setAktif] = useState(0)
   const [tinggi, setTinggi] = useState<number | undefined>(undefined)
   const [kosong, setKosong] = useState<Record<number, boolean>>({})
-  const [siap, setSiap] = useState(() => Math.min(anak.length, 3))
+  const [siap, setSiap] = useState(() => Math.min(anak.length, preload))
 
   useEffect(() => {
-    setSiap((s) => Math.max(s, Math.min(anak.length, 3)))
-  }, [anak.length])
+    setSiap((s) => Math.max(s, Math.min(anak.length, preload)))
+  }, [anak.length, preload])
 
+  // Do not progressively mount every selected widget in the background.
+  // Only the active slide and a small look-ahead are allowed to become live.
+  // This keeps timers, observers, calculations and network hooks dormant until
+  // the user actually approaches that widget.
   useEffect(() => {
-    if (siap >= anak.length) return
-    const w = window as unknown as {
-      requestIdleCallback?: (cb: () => void, o?: { timeout: number }) => number
-      cancelIdleCallback?: (id: number) => void
-    }
-    const lanjut = () => setSiap((s) => Math.min(anak.length, s + 3))
-    if (w.requestIdleCallback) {
-      const id = w.requestIdleCallback(lanjut, { timeout: 400 })
-      return () => w.cancelIdleCallback?.(id)
-    }
-    const id = window.setTimeout(lanjut, 120)
-    return () => window.clearTimeout(id)
-  }, [siap, anak.length])
-
-  useEffect(() => {
-    setSiap((s) => Math.max(s, Math.min(anak.length, aktif + 3)))
-  }, [aktif, anak.length])
+    const lookAhead = hemat ? 1 : 2
+    setSiap((s) => Math.max(s, Math.min(anak.length, aktif + lookAhead + 1)))
+  }, [aktif, anak.length, hemat])
 
   useEffect(() => {
     const periksa = () => {
@@ -155,34 +147,47 @@ export function Tumpukan({ judul, anak, aksi }: { judul?: string; anak: WidgetIt
     }
     periksa()
     const mo = new MutationObserver(periksa)
-    for (const el of halaman.current) if (el) mo.observe(el, { childList: true })
+    halaman.current.forEach((el, i) => {
+      if (el && i < siap) mo.observe(el, { childList: true })
+    })
     return () => mo.disconnect()
   }, [anak, siap])
 
   const tampil = anak.map((a, i) => ({ ...a, i })).filter((a) => !kosong[a.i])
   const TINGGI_MIN = 184
-  const TINGGI_MAKS = 332
+  const TINGGI_MAKS = hemat ? 390 : 440
+  const aktifItem = tampil[Math.min(aktif, Math.max(0, tampil.length - 1))]
 
+  // Measure only the active widget. The old implementation measured every
+  // mounted slide and used the tallest one for the whole carousel, which both
+  // forced repeated layout work and left large empty areas under short widgets.
   useEffect(() => {
+    const index = aktifItem?.i
+    if (index == null || index >= siap) return
+    const el = halaman.current[index]
+    if (!el) return
+
+    let frame = 0
     const ukur = () => {
-      let maks = 0
-      tampil.forEach((t) => {
-        const el = halaman.current[t.i]
-        if (!el) return
+      if (frame) cancelAnimationFrame(frame)
+      frame = requestAnimationFrame(() => {
         const first = el.firstElementChild as HTMLElement | null
         const alami = first ? Math.max(first.scrollHeight, first.getBoundingClientRect().height) : el.scrollHeight
-        maks = Math.max(maks, alami + 32)
+        if (alami > 0) setTinggi(Math.min(TINGGI_MAKS, Math.max(TINGGI_MIN, alami + 32)))
+        frame = 0
       })
-      if (maks) setTinggi(Math.min(TINGGI_MAKS, Math.max(TINGGI_MIN, maks)))
     }
+
     ukur()
     const ro = new ResizeObserver(ukur)
-    for (const t of tampil) {
-      const el = halaman.current[t.i]
-      if (el) ro.observe(el)
+    ro.observe(el)
+    const first = el.firstElementChild as HTMLElement | null
+    if (first) ro.observe(first)
+    return () => {
+      ro.disconnect()
+      if (frame) cancelAnimationFrame(frame)
     }
-    return () => ro.disconnect()
-  }, [tampil.length, siap])
+  }, [aktifItem?.i, siap, TINGGI_MAKS])
 
   useEffect(() => {
     const el = wadah.current
@@ -229,10 +234,13 @@ export function Tumpukan({ judul, anak, aksi }: { judul?: string; anak: WidgetIt
     digeser.current = true
     setAktif(next)
     const el = wadah.current
-    if (el) el.scrollTo({ left: next * el.clientWidth, behavior: 'smooth' })
+    if (el) {
+      const reduced = typeof window !== 'undefined' && window.matchMedia?.('(prefers-reduced-motion: reduce)').matches
+      el.scrollTo({ left: next * el.clientWidth, behavior: hemat || reduced ? 'auto' : 'smooth' })
+    }
   }
 
-  const current = tampil[Math.min(aktif, Math.max(0, tampil.length - 1))]
+  const current = aktifItem
   const meta = metaFor(current?.kunci)
   const progress = tampil.length ? ((aktif + 1) / tampil.length) * 100 : 0
   const nextMeta = tampil.length > 1 ? metaFor(tampil[Math.min(aktif + 1, tampil.length - 1)]?.kunci) : meta
@@ -277,8 +285,13 @@ export function Tumpukan({ judul, anak, aksi }: { judul?: string; anak: WidgetIt
               ref={(el) => { halaman.current[i] = el }}
               className={`${kosong[i] ? 'hidden' : ''} widget-instrument-slide-v5`}
               data-widget={a.kunci}
+              aria-hidden={aktifItem?.i !== i}
             >
-              {i < siap ? a.isi : null}
+              {i < siap ? (
+                <Suspense fallback={<div className="min-h-[120px]" aria-hidden />}>
+                  {a.isi}
+                </Suspense>
+              ) : null}
             </div>
           ))}
         </div>
