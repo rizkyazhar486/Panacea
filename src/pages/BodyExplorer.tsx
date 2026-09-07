@@ -2,6 +2,9 @@ import { lazy, Suspense, type ReactNode } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { BodyEvidenceDock, type BodyEvidenceMode } from '../components/digital-twin/BodyEvidenceDock'
 
+const HumanAnatomyMasterAtlas = lazy(() =>
+  import('../components/digital-twin/HumanAnatomyMasterAtlas').then((m) => ({ default: m.HumanAnatomyMasterAtlas })),
+)
 const HraClinicalAtlas = lazy(() =>
   import('../components/digital-twin/HraClinicalAtlas').then((m) => ({ default: m.HraClinicalAtlas })),
 )
@@ -48,8 +51,8 @@ type Mode = {
 }
 
 const PRIMARY: Mode[] = [
-  { key: 'realistic-atlas', label: 'Anatomy', hint: 'Multi-release HRA source anatomy with browser-loadable GLB provenance' },
-  { key: 'physiology', label: 'Physiology', hint: 'HRA source anatomy + explicit physiology phases, formulas and provenance' },
+  { key: 'realistic-atlas', label: 'Anatomy', hint: 'Whole-body master anatomy atlas → source-resolved HRA geometry → regional and system coverage' },
+  { key: 'physiology', label: 'Physiology', hint: 'Anatomy-linked physiology → organ function → micro-3D mechanisms → pathology comparison' },
   { key: 'digital-twin', label: 'Body → Cell', hint: 'Human Protein Atlas microscopy/metadata + real local sequence evidence; no generated cell required' },
   { key: 'cell-genome', label: 'Cell → DNA', hint: 'HPA + Ensembl reference sequence + local FASTA/FASTQ/VCF evidence' },
   { key: 'workout-4d', label: 'Exercise', hint: 'Measured workout → resolved HRA GLB → data replay; no body deformation' },
@@ -168,7 +171,22 @@ export function BodyExplorer() {
         <CellEvidenceMode mode="body-cell" />
       ) : mode === 'realistic-atlas' ? (
         <div className="space-y-4">
-          <Suspense fallback={<LoadingLab label="HuBMAP Human Reference Atlas" />}><HraClinicalAtlas /></Suspense>
+          <Suspense fallback={<LoadingLab label="human anatomy master atlas" />}>
+            <HumanAnatomyMasterAtlas onOpenPhysiology={() => setMode('physiology')} />
+          </Suspense>
+          <details className="group rounded-[28px] border border-neutral-200 bg-white p-4 shadow-sm dark:border-white/10 dark:bg-white/[.035]">
+            <summary className="flex cursor-pointer list-none items-center justify-between gap-3">
+              <div>
+                <div className="text-[9px] font-black uppercase tracking-[.15em] text-cyan-700 dark:text-cyan-300">Whole-body source canvas</div>
+                <div className="mt-1 text-[15px] font-black text-neutral-950 dark:text-white">HuBMAP HRA multi-layer body</div>
+                <p className="mt-1 max-w-3xl text-[10px] leading-relaxed text-neutral-500 dark:text-neutral-400">Open the full source canvas when you need multiple HRA structures visible together. The master atlas above remains the primary anatomy navigation layer.</p>
+              </div>
+              <span className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-neutral-100 text-lg text-neutral-700 transition group-open:rotate-45 dark:bg-white/10 dark:text-white">＋</span>
+            </summary>
+            <div className="mt-4 border-t border-neutral-100 pt-4 dark:border-white/10">
+              <Suspense fallback={<LoadingLab label="HuBMAP Human Reference Atlas" />}><HraClinicalAtlas /></Suspense>
+            </div>
+          </details>
           <Suspense fallback={<LoadingLab label="multi-release HRA source search" />}><HraSourceSearch /></Suspense>
         </div>
       ) : mode === 'physiology' ? (
