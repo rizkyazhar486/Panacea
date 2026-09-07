@@ -2,7 +2,11 @@ import assert from 'node:assert/strict'
 import { readFileSync } from 'node:fs'
 import { HEAD_TO_TOE_REGIONS, HEAD_TO_TOE_STRUCTURES, findHeadToToeRegionForStructure } from '../../src/lib/headToToeAnatomy.ts'
 
-assert.ok(HEAD_TO_TOE_REGIONS.length >= 10, 'Body Exposure should cover at least ten ordered anatomical regions')
+// Keep the structured head-to-toe catalogue available even though the active
+// Body Exposure UI has been restored to Claude Code's original shared-body
+// workspace. The catalogue remains useful data; it must not dictate a later UI
+// architecture that replaced Claude's implementation.
+assert.ok(HEAD_TO_TOE_REGIONS.length >= 10, 'Body Exposure should retain at least ten ordered anatomical regions')
 assert.equal(HEAD_TO_TOE_REGIONS[0]?.id, 'head-brain', 'coverage must begin at the head')
 assert.equal(HEAD_TO_TOE_REGIONS.at(-1)?.id, 'ankle-foot', 'coverage must end at the foot')
 assert.deepEqual(HEAD_TO_TOE_REGIONS.map((region) => region.order), [...HEAD_TO_TOE_REGIONS].map((region) => region.order).sort((a, b) => a - b), 'regions must stay in anatomical head-to-toe order')
@@ -16,44 +20,45 @@ for (const id of ['retina', 'optic-nerve', 'larynx', 'carotids', 'mitral', 'left
   assert.ok(region, `${id} must be represented in head-to-toe coverage`)
 }
 
+// Regression lock for the Claude Code Body Exposure that is intentionally the
+// active /body-explorer implementation. Do not make this test require the later
+// HRA/digital-twin replacement: that would silently force the restored UI away
+// from the version the product owner asked to preserve.
 const bodyPage = readFileSync('src/pages/BodyExplorer.tsx', 'utf8')
-assert.match(bodyPage, /HeadToToeAnatomyWorkbench/)
-assert.match(bodyPage, /BodyParts3DDeepAtlas/)
-assert.match(bodyPage, /HumanAnatomyLayerNavigator/)
-assert.match(bodyPage, /Ocular4DAtlas/)
-assert.match(bodyPage, /HumanAnatomyMasterAtlas/)
-assert.match(bodyPage, /HraClinicalAtlas/)
-assert.match(bodyPage, /function AnatomyMode/)
-assert.match(bodyPage, /useState<AnatomyTool>\('head-to-toe'\)/, 'head-to-toe must be the default anatomy workspace')
-assert.match(bodyPage, /tool === 'head-to-toe' \? \(/)
-assert.match(bodyPage, /tool === 'systems' \? \(/)
-assert.match(bodyPage, /tool === 'layers' \? \(/)
-assert.match(bodyPage, /tool === 'deep' \? \(/)
-assert.match(bodyPage, /tool === 'hra' \? \(/)
-assert.match(bodyPage, /One anatomy workspace at a time/)
-assert.match(bodyPage, /open && <div/, 'optional non-primary panels should unmount when closed')
+assert.match(bodyPage, /from '\.\.\/components\/Body3D'/, 'active Body Exposure must use the original shared Body3D viewer')
+assert.match(bodyPage, /const PhysiologySection = lazy/)
+assert.match(bodyPage, /const CardioLab = lazy/)
+assert.match(bodyPage, /const SpecialtyLab = lazy/)
+assert.match(bodyPage, /const MolecularLab = lazy/)
+assert.match(bodyPage, /const GenomicsLab = lazy/)
+assert.match(bodyPage, /const CellLab = lazy/)
+assert.match(bodyPage, /const SurgicalLab = lazy/)
+assert.match(bodyPage, /const StructureFinder = lazy/)
+assert.match(bodyPage, /const WholeBodyPrecisionLab = lazy/)
+assert.match(bodyPage, /const BiomedicalEngineLab = lazy/)
+assert.match(bodyPage, /Cell & metabolism/)
+assert.match(bodyPage, /Surgical layers/)
+assert.match(bodyPage, /Whole-body precision/)
+assert.match(bodyPage, /Biomedical engine/)
+assert.match(bodyPage, /Find structure/)
+assert.match(bodyPage, /Diseases/)
+assert.match(bodyPage, /Study/)
+assert.match(bodyPage, /satu simulasi tubuh yang utuh/, 'Claude shared-body design contract should remain documented in the active page')
 
-const workbench = readFileSync('src/components/digital-twin/HeadToToeAnatomyWorkbench.tsx', 'utf8')
-assert.match(workbench, /HraResolvedAnatomyViewer/)
-assert.match(workbench, /HraContextBridge/)
-assert.match(workbench, /Continue this structure into physiology/)
+const body3d = readFileSync('src/components/Body3D.tsx', 'utf8')
+assert.match(body3d, /GLTFLoader/)
+assert.match(body3d, /MeshoptDecoder/)
+assert.match(body3d, /RoomEnvironment/)
+assert.match(body3d, /SEBAR_PERISTALTIK/)
+assert.match(body3d, /keburaman/)
+assert.match(body3d, /geserBuka/)
+assert.match(body3d, /Unit Hounsfield|Hounsfield/i, 'Claude renderer must retain physically grounded CT windowing')
+assert.match(body3d, /type SlicePlane = 'none' \| 'axial' \| 'coronal' \| 'sagittal'/)
+assert.match(body3d, /try \{\s*renderer = new THREE\.WebGLRenderer/, 'WebGL creation must remain crash-safe')
+assert.match(body3d, /This device could not start 3D graphics \(WebGL\)/, 'unsupported or memory-constrained devices need a readable fallback')
+assert.match(body3d, /webglcontextlost/, 'lost GPU contexts must be handled instead of leaving a black viewer')
+assert.match(body3d, /ResizeObserver/, 'viewer must resize safely across phone, tablet and desktop layouts')
+assert.match(body3d, /renderer\.setPixelRatio\(Math\.min\(window\.devicePixelRatio, 2\)\)/, 'pixel ratio must stay capped for mobile GPU stability')
+assert.doesNotMatch(body3d, /new THREE\.(?:SphereGeometry|CapsuleGeometry|LatheGeometry)/, 'macro anatomy must stay on the real GLB meshes, never primitive stand-ins')
 
-const navigator = readFileSync('src/components/digital-twin/HeadToToeAnatomyNavigator.tsx', 'utf8')
-assert.match(navigator, /Head-to-toe precision map/)
-assert.match(navigator, /Search any structure/)
-assert.match(navigator, /Head/)
-assert.match(navigator, /Toe/)
-
-const viewer = readFileSync('src/components/digital-twin/HraResolvedAnatomyViewer.tsx', 'utf8')
-assert.match(viewer, /try \{\s*renderer = new THREE\.WebGLRenderer/)
-assert.match(viewer, /3D renderer unavailable/)
-assert.match(viewer, /mobile \? 1\.15 : 1\.65/, 'HRA viewer should keep the lower mobile/desktop DPR caps used by the crash-safety pass')
-assert.match(viewer, /ResizeObserver/)
-
-const deepAtlas = readFileSync('src/components/digital-twin/BodyParts3DDeepAtlas.tsx', 'utf8')
-assert.match(deepAtlas, /if \(!activated\)/, 'deep BodyParts3D must stay explicitly on demand')
-assert.match(deepAtlas, /Load deep anatomy/)
-assert.match(deepAtlas, /Educational reference · not patient anatomy/)
-assert.match(deepAtlas, /window\.innerWidth < 768 \? 1\.25 : 1\.75/, 'deep atlas should cap mobile pixel ratio')
-
-console.log(`Body Exposure: ${HEAD_TO_TOE_REGIONS.length} ordered regions, ${HEAD_TO_TOE_STRUCTURES.length} named structures; exclusive-viewer safeguards passed`)
+console.log(`Body Exposure: Claude shared-body workspace preserved; ${HEAD_TO_TOE_REGIONS.length} ordered regions and ${HEAD_TO_TOE_STRUCTURES.length} named catalogue structures retained`)
