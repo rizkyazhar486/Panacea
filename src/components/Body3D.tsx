@@ -308,6 +308,7 @@ export function Body3D({
   onPickRef.current = onPick
   const [loadingLayers, setLoadingLayers] = useState<Set<string>>(new Set())
   const [failedLayers, setFailedLayers] = useState<Set<string>>(new Set())
+  const [retryNonce, setRetryNonce] = useState(0)
   const [progress, setProgress] = useState<Record<string, number>>({})
   const [fatal, setFatal] = useState<string>('')
 
@@ -622,7 +623,7 @@ export function Body3D({
         requestRenderRef.current()
       }
     }
-  }, [layers])
+  }, [layers, retryNonce])
 
   // Terapkan modalitas radiologi. Plane yang sama diperbarui in-place supaya
   // cache material selalu membaca posisi slice slider terbaru.
@@ -832,9 +833,22 @@ export function Body3D({
         </div>
       )}
       {failedLayers.size > 0 && (
-        <div className="absolute bottom-2 left-2 right-2 rounded-lg bg-red-950/85 px-2.5 py-1.5 text-[11px] text-red-200">
-          Couldn’t load: {[...failedLayers].map((k) => ANATOMY_LAYERS.find((l) => l.key === k)?.label ?? k).join(', ')} —
-          check the connection and toggle the layer off and on to retry.
+        <div
+          className="absolute bottom-2 left-2 right-2 flex items-center justify-between gap-2 rounded-lg bg-red-950/90 px-2.5 py-2 text-[11px] text-red-200"
+          role="status"
+          aria-live="polite"
+        >
+          <span className="min-w-0 leading-relaxed">
+            Couldn’t load: {[...failedLayers].map((k) => ANATOMY_LAYERS.find((l) => l.key === k)?.label ?? k).join(', ')}.
+          </span>
+          <button
+            type="button"
+            onClick={() => setRetryNonce((n) => n + 1)}
+            disabled={isLoading}
+            className="min-h-[34px] shrink-0 rounded-full border border-red-300/40 bg-red-100/10 px-3 font-bold text-red-100 transition hover:bg-red-100/20 disabled:cursor-wait disabled:opacity-50"
+          >
+            {isLoading ? 'Retrying…' : 'Retry'}
+          </button>
         </div>
       )}
       {!fatal && !isLoading && failedLayers.size === 0 && layers.size === 0 && (
