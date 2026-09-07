@@ -6,6 +6,7 @@ import {
 } from '../lib/adzan'
 import '../styles/widget-concepts-v6.css'
 import '../styles/widget-archetypes-v6.css'
+import '../styles/widget-concepts-v7.css'
 
 export function UbinSalat() {
   const setelan = useMemo(() => muatSetelan(), [])
