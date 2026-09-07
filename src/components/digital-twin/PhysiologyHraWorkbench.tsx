@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react'
 import { HraContextBridge } from './HraContextBridge'
 import { HraResolvedAnatomyViewer } from './HraResolvedAnatomyViewer'
 import { ClinicalPhysiologyMechanisms } from './ClinicalPhysiologyMechanisms'
+import { MicroPhysiologyExplorer } from './MicroPhysiologyExplorer'
 import { useVitals } from '../../lib/useVitals'
 import { vitalsAge } from '../../lib/healthVitals'
 import {
@@ -176,6 +177,8 @@ export function PhysiologyHraWorkbench() {
       />
 
       <HraContextBridge title={`${system.label} · mapped source structures`} terms={sourceTerms} maxResults={12} />
+
+      <MicroPhysiologyExplorer />
 
       <section className="rounded-[28px] border border-neutral-200 bg-white p-4 shadow-sm dark:border-white/10 dark:bg-[#090d11] sm:p-5">
         <div className="flex flex-wrap items-start justify-between gap-3">
