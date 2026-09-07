@@ -1,0 +1,52 @@
+{
+  "id": "mygene-info",
+  "name": "MyGene.info v3 API",
+  "category": "genomics",
+  "kind": ["api", "dataset"],
+  "homepage": "https://mygene.info/",
+  "repository": null,
+  "features": ["gene-annotation", "gene-lookup", "genomics-education", "precision-health-reference", "gene-provenance"],
+  "formats": ["json", "http-rest"],
+  "usage": {
+    "runtime": true,
+    "buildTime": false,
+    "networkRequired": true,
+    "notes": "Panacea accesses MyGene.info through its server adapter for human gene lookup and selected annotation fields. Requests are bounded, time-limited, human-species scoped and normalized before reaching the UI."
+  },
+  "license": {
+    "status": "CHECK_REQUIRED",
+    "identifier": null,
+    "commercialUse": "CONDITIONAL",
+    "attributionRequired": true,
+    "shareAlike": null,
+    "scope": "MyGene.info provides access to gene-centric annotation data maintained by Scripps Research and aggregates information from multiple third-party sources. Its Terms of Use authorize access and use subject to conditions, require generated copies to retain applicable copyright/proprietary notices, and do not grant blanket rights to third-party intellectual property.",
+    "verificationUrl": "https://docs.mygene.info/en/latest/terms.html",
+    "verifiedAt": "2026-09-08",
+    "notes": "Do not infer a single reusable commercial license for every returned field. Preserve source/proprietary notices where applicable and re-check rights before redistributing, caching at scale, training models on, or commercially republishing third-party annotation payloads."
+  },
+  "validation": {
+    "level": "REFERENCE",
+    "clinicalDecisionUse": "CONTEXT_ONLY",
+    "notes": "MyGene.info is a gene-annotation aggregation service. A returned symbol, summary, alias, coordinate or identifier is reference context and does not establish pathogenicity, diagnosis, treatment suitability or patient-specific genomic interpretation."
+  },
+  "provenance": {
+    "authority": "MyGene.info / Scripps Research, with annotations aggregated from named upstream biological databases",
+    "sourceIdentityRequired": true,
+    "versionPinRequired": true,
+    "notes": "Preserve the MyGene document ID, query, API version, retrieval timestamp and relevant upstream field identity. Because MyGene aggregates third-party annotations that can change independently, downstream clinical or research workflows should record the observed release/source context rather than treating a gene summary as timeless."
+  },
+  "adapter": {
+    "status": "ACTIVE",
+    "normalizedTarget": "PanaceaGeneAnnotation",
+    "module": "server/src/mygene.ts",
+    "notes": "Production adapter performs literal human-gene lookup, validates upstream document IDs before path use, fetches a bounded annotation field set, applies request timeouts, normalizes/deduplicates aliases and retains Entrez/Ensembl identifiers plus chromosome coordinates when supplied."
+  },
+  "trust": {
+    "authority": 4,
+    "evidenceQuality": 3,
+    "recency": 5,
+    "licenseClarity": 2,
+    "reproducibility": 4,
+    "notes": "Useful, current aggregation layer for gene annotation, but authority and reproducibility depend partly on its upstream sources. License clarity is intentionally conservative because third-party rights are not replaced by one blanket MyGene license."
+  }
+}
