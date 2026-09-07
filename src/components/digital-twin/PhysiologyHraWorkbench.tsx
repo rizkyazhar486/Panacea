@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react'
 import { HraContextBridge } from './HraContextBridge'
 import { HraResolvedAnatomyViewer } from './HraResolvedAnatomyViewer'
+import { ClinicalPhysiologyMechanisms } from './ClinicalPhysiologyMechanisms'
 import { useVitals } from '../../lib/useVitals'
 import { vitalsAge } from '../../lib/healthVitals'
 import {
@@ -218,6 +219,8 @@ export function PhysiologyHraWorkbench() {
           ))}
         </div>
       </section>
+
+      <ClinicalPhysiologyMechanisms />
     </div>
   )
 }
