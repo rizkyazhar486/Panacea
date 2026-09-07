@@ -10,7 +10,11 @@ await mkdir('artifacts', { recursive: true })
 const browser = await chromium.launch({
   headless: true,
   args: [
-    '--use-gl=swiftshader',
+    // Current headless Chromium routes software WebGL through ANGLE. The
+    // unsafe flag is explicit because CI has no hardware GPU and this is a
+    // trusted, local preview—not user-controlled web content.
+    '--use-gl=angle',
+    '--use-angle=swiftshader',
     '--enable-webgl',
     '--enable-unsafe-swiftshader',
     '--ignore-gpu-blocklist',
@@ -27,22 +31,27 @@ const page = await context.newPage()
 const pageErrors = []
 page.on('pageerror', (error) => pageErrors.push(error.message))
 
+let metrics = null
+let failure = null
+
 try {
   const response = await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 45_000 })
   if (response && !response.ok()) throw new Error(`Body Explorer returned HTTP ${response.status()}`)
 
-  const canvas = page.locator('canvas').first()
+  // Do not use the first canvas on the page: other visual components may own
+  // canvases too. Body3D mounts its renderer directly inside this unique
+  // touch-none viewer container.
+  const canvas = page.locator('div.h-full.w-full.touch-none > canvas').first()
   await canvas.waitFor({ state: 'visible', timeout: 45_000 })
 
-  // Give the initial Skeleton + Muscles requests time to enter the loading
-  // state, then require them to settle. The assets are served locally by Vite.
+  // Give Skeleton + Muscles time to enter loading, then require them to settle.
   await page.waitForTimeout(1_500)
   await page.getByText('Loading anatomy…').waitFor({ state: 'hidden', timeout: 120_000 })
 
   const fatal = page.getByText(/This device could not start 3D graphics|The browser dropped the 3D context/i)
   if (await fatal.count()) throw new Error(`Body3D fatal fallback is visible: ${await fatal.first().innerText()}`)
 
-  const metrics = await canvas.evaluate((node) => {
+  metrics = await canvas.evaluate((node) => {
     const c = node
     const gl = c.getContext('webgl2') || c.getContext('webgl')
     return {
@@ -55,10 +64,11 @@ try {
       },
       webgl: Boolean(gl),
       documentScrollWidth: document.documentElement.scrollWidth,
+      canvasCount: document.querySelectorAll('canvas').length,
     }
   })
 
-  if (!metrics.webgl) throw new Error('Body3D canvas did not expose a WebGL context')
+  if (!metrics.webgl) throw new Error('Body3D renderer canvas did not expose its WebGL context')
   if (metrics.viewport.width !== 390 || metrics.viewport.height !== 844) {
     throw new Error(`Unexpected viewport ${metrics.viewport.width}x${metrics.viewport.height}`)
   }
@@ -66,6 +76,7 @@ try {
     throw new Error(`Body3D canvas is too small on mobile: ${metrics.canvas.clientWidth}x${metrics.canvas.clientHeight}`)
   }
   const renderDpr = metrics.canvas.backingWidth / Math.max(1, metrics.canvas.clientWidth)
+  metrics.renderDpr = renderDpr
   if (renderDpr < 1 || renderDpr > 1.51) {
     throw new Error(`Mobile Body3D backing-store ratio ${renderDpr.toFixed(3)} is outside the safe 1.0–1.5 range`)
   }
@@ -74,7 +85,7 @@ try {
   }
 
   // Exercise OrbitControls so the demand-render path is tested, not merely the
-  // first static frame.
+  // initial static frame.
   const box = await canvas.boundingBox()
   if (!box) throw new Error('Body3D canvas has no measurable bounding box')
   const x = box.x + box.width * 0.5
@@ -87,10 +98,20 @@ try {
 
   if (pageErrors.length) throw new Error(`Browser page errors: ${pageErrors.join(' | ')}`)
 
-  await page.screenshot({ path: screenshotPath, fullPage: false })
-  await writeFile(metricsPath, `${JSON.stringify({ ...metrics, renderDpr }, null, 2)}\n`)
-  console.log(JSON.stringify({ ok: true, url, ...metrics, renderDpr }))
+  console.log(JSON.stringify({ ok: true, url, ...metrics }))
+} catch (error) {
+  failure = error instanceof Error ? error.message : String(error)
+  throw error
 } finally {
+  // Keep evidence even on failure so CI never turns a visual/runtime problem
+  // into an opaque red status with no inspectable artifact.
+  try {
+    await page.screenshot({ path: screenshotPath, fullPage: false })
+  } catch {
+    // Navigation/renderer failure may make screenshot impossible; metrics still
+    // record the failure reason below.
+  }
+  await writeFile(metricsPath, `${JSON.stringify({ ok: !failure, url, failure, pageErrors, metrics }, null, 2)}\n`)
   await context.close()
   await browser.close()
 }
