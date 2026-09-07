@@ -51,6 +51,10 @@ export interface MedicalSourceBundle {
   fetchedAt: string
 }
 
+export interface MedicalSourceSearchOptions {
+  signal?: AbortSignal
+}
+
 const EUROPE_PMC = 'https://www.ebi.ac.uk/europepmc/webservices/rest/search'
 const OLS = 'https://www.ebi.ac.uk/ols4/api/search'
 const CLINICAL_TRIALS = 'https://clinicaltrials.gov/api/v2/studies'
@@ -60,9 +64,18 @@ function cleanQuery(value: string) {
   return value.replace(/[<>\\]/g, ' ').replace(/\s+/g, ' ').trim().slice(0, 160)
 }
 
-async function fetchJson<T>(url: string, timeoutMs = 12000): Promise<T> {
+function isAbortError(error: unknown) {
+  return typeof error === 'object' && error !== null && 'name' in error && error.name === 'AbortError'
+}
+
+async function fetchJson<T>(url: string, timeoutMs = 12000, signal?: AbortSignal): Promise<T> {
   const controller = new AbortController()
-  const timer = window.setTimeout(() => controller.abort(), timeoutMs)
+  const abortFromCaller = () => controller.abort()
+
+  if (signal?.aborted) controller.abort()
+  else signal?.addEventListener('abort', abortFromCaller, { once: true })
+
+  const timer = globalThis.setTimeout(() => controller.abort(), timeoutMs)
   try {
     const response = await fetch(url, {
       signal: controller.signal,
@@ -71,7 +84,8 @@ async function fetchJson<T>(url: string, timeoutMs = 12000): Promise<T> {
     if (!response.ok) throw new Error(`${response.status} ${response.statusText}`)
     return await response.json() as T
   } finally {
-    window.clearTimeout(timer)
+    globalThis.clearTimeout(timer)
+    signal?.removeEventListener('abort', abortFromCaller)
   }
 }
 
@@ -83,7 +97,7 @@ function firstText(value: unknown): string | undefined {
   return typeof value === 'string' && value.trim() ? value.trim() : undefined
 }
 
-async function searchEuropePmc(query: string): Promise<LiteratureResult[]> {
+async function searchEuropePmc(query: string, signal?: AbortSignal): Promise<LiteratureResult[]> {
   type EuropePmcResponse = {
     resultList?: {
       result?: Array<{
@@ -101,7 +115,7 @@ async function searchEuropePmc(query: string): Promise<LiteratureResult[]> {
     }
   }
   const url = `${EUROPE_PMC}?query=${encodeURIComponent(query)}&format=json&pageSize=5&resultType=core`
-  const data = await fetchJson<EuropePmcResponse>(url)
+  const data = await fetchJson<EuropePmcResponse>(url, 12000, signal)
   return (data.resultList?.result ?? []).map((item, index) => {
     const source = item.source || (item.pmid ? 'MED' : item.pmcid ? 'PMC' : 'Europe PMC')
     const id = item.id || item.pmid || item.pmcid || `epmc-${index}`
@@ -119,7 +133,7 @@ async function searchEuropePmc(query: string): Promise<LiteratureResult[]> {
   })
 }
 
-async function searchOls(query: string): Promise<OntologyResult[]> {
+async function searchOls(query: string, signal?: AbortSignal): Promise<OntologyResult[]> {
   type OlsResponse = {
     response?: {
       docs?: Array<{
@@ -134,7 +148,7 @@ async function searchOls(query: string): Promise<OntologyResult[]> {
     }
   }
   const url = `${OLS}?q=${encodeURIComponent(query)}&ontology=uberon,cl,efo&rows=6&queryFields=label,synonym,description`
-  const data = await fetchJson<OlsResponse>(url)
+  const data = await fetchJson<OlsResponse>(url, 12000, signal)
   return (data.response?.docs ?? []).map((item, index) => ({
     id: item.obo_id || item.short_form || `ols-${index}`,
     label: item.label || item.obo_id || 'Ontology term',
@@ -145,7 +159,7 @@ async function searchOls(query: string): Promise<OntologyResult[]> {
   }))
 }
 
-async function searchTrials(query: string): Promise<TrialResult[]> {
+async function searchTrials(query: string, signal?: AbortSignal): Promise<TrialResult[]> {
   type TrialsResponse = {
     studies?: Array<{
       protocolSection?: {
@@ -158,7 +172,7 @@ async function searchTrials(query: string): Promise<TrialResult[]> {
     }>
   }
   const url = `${CLINICAL_TRIALS}?query.term=${encodeURIComponent(query)}&pageSize=5&format=json`
-  const data = await fetchJson<TrialsResponse>(url)
+  const data = await fetchJson<TrialsResponse>(url, 12000, signal)
   return (data.studies ?? []).map((study, index) => {
     const section = study.protocolSection
     const identification = section?.identificationModule
@@ -175,7 +189,7 @@ async function searchTrials(query: string): Promise<TrialResult[]> {
   })
 }
 
-async function searchDrugLabels(query: string): Promise<DrugLabelResult[]> {
+async function searchDrugLabels(query: string, signal?: AbortSignal): Promise<DrugLabelResult[]> {
   type OpenFdaResponse = {
     results?: Array<{
       id?: string
@@ -198,9 +212,10 @@ async function searchDrugLabels(query: string): Promise<DrugLabelResult[]> {
   let lastError: unknown
   for (const search of searches) {
     try {
-      data = await fetchJson<OpenFdaResponse>(`${OPENFDA}?search=${encodeURIComponent(search)}&limit=3`)
+      data = await fetchJson<OpenFdaResponse>(`${OPENFDA}?search=${encodeURIComponent(search)}&limit=3`, 12000, signal)
       if ((data.results?.length ?? 0) > 0) break
     } catch (error) {
+      if (signal?.aborted || isAbortError(error)) throw error
       lastError = error
     }
   }
@@ -220,19 +235,23 @@ async function searchDrugLabels(query: string): Promise<DrugLabelResult[]> {
 }
 
 function message(error: unknown) {
-  if (error instanceof DOMException && error.name === 'AbortError') return 'Request timed out.'
+  if (isAbortError(error)) return 'Request cancelled or timed out.'
   return error instanceof Error ? error.message : 'Source request failed.'
 }
 
-export async function searchMedicalSources(rawQuery: string): Promise<MedicalSourceBundle> {
+export async function searchMedicalSources(
+  rawQuery: string,
+  options: MedicalSourceSearchOptions = {},
+): Promise<MedicalSourceBundle> {
   const query = cleanQuery(rawQuery)
   if (!query) throw new Error('Enter a medical, anatomy, drug, disease, procedure, or physiology term.')
+  if (options.signal?.aborted) throw new DOMException('Request cancelled.', 'AbortError')
 
   const [literature, ontology, trials, drugLabels] = await Promise.allSettled([
-    searchEuropePmc(query),
-    searchOls(query),
-    searchTrials(query),
-    searchDrugLabels(query),
+    searchEuropePmc(query, options.signal),
+    searchOls(query, options.signal),
+    searchTrials(query, options.signal),
+    searchDrugLabels(query, options.signal),
   ])
 
   return {
