@@ -14,7 +14,6 @@
       name="description"
       content="Panaceamed.id — AI-Klinik Praktis untuk Akses Kesehatan. AI anamnesis, AI-EMR, longevity & faskes darurat, diverifikasi klinisi berlisensi."
     />
-    <!-- Open Graph / social sharing -->
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content="Panaceamed.id" />
     <meta property="og:title" content="Panaceamed.id — Longevity Medical-AI" />
@@ -35,22 +34,50 @@
   </head>
   <body>
     <div id="root"></div>
-    <!-- Splash is inline so the installed PWA paints immediately before JS. -->
     <div id="pmd-splash" style="position:fixed;inset:0;z-index:9999;display:flex;align-items:center;justify-content:center;background:linear-gradient(160deg,#00BF63,#0B7A4B);transition:opacity .45s ease;">
       <img src="./logo-mark.png" alt="" width="72" height="72" style="border-radius:20px;animation:pmd-splash-pulse 1.3s ease-in-out infinite;box-shadow:0 12px 32px rgba(0,0,0,0.25);" />
     </div>
     <style>@keyframes pmd-splash-pulse{0%,100%{transform:scale(1);opacity:1}50%{transform:scale(1.08);opacity:.88}}</style>
 
     <!--
-      Boot recovery is deliberately independent of React. If a stale installed
-      PWA shell points at a chunk removed by a newer deployment, main.tsx never
-      runs and the splash would otherwise stay forever. Recover once by clearing
-      only Panacea caches, ask the existing service worker to update, then reload.
-      Push registration is preserved because the worker is not unregistered.
+      iOS emergency migration. It executes before React and only once per device.
+      Older Panacea service workers may still control Safari/PWA tabs after a
+      deploy. We unregister them and clear only Panacea caches, then reload once.
+      main.tsx registers the current stability worker on the clean load.
     -->
     <script>
       (() => {
-        const RECOVERY_KEY = 'pmd-boot-recovery-v1'
+        const IOS_RESET_KEY = 'pmd-ios-stability-reset-v2'
+        const CACHE_PREFIX = 'panaceamed-'
+        const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent)
+
+        if (!isIOS) return
+
+        let alreadyReset = false
+        try { alreadyReset = localStorage.getItem(IOS_RESET_KEY) === '1' } catch {}
+        if (alreadyReset) return
+
+        try { localStorage.setItem(IOS_RESET_KEY, '1') } catch {}
+
+        Promise.resolve()
+          .then(async () => {
+            if ('caches' in window) {
+              const keys = await caches.keys()
+              await Promise.all(keys.filter((key) => key.startsWith(CACHE_PREFIX)).map((key) => caches.delete(key)))
+            }
+            if ('serviceWorker' in navigator) {
+              const registrations = await navigator.serviceWorker.getRegistrations()
+              await Promise.all(registrations.map((registration) => registration.unregister().catch(() => false)))
+            }
+          })
+          .finally(() => location.reload())
+      })()
+    </script>
+
+    <!-- Generic recovery if the JS application still fails to mount. -->
+    <script>
+      (() => {
+        const RECOVERY_KEY = 'pmd-boot-recovery-v2'
         const CACHE_PREFIX = 'panaceamed-'
 
         const readRecovered = () => {
