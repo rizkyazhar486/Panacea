@@ -1,0 +1,224 @@
+/* Panacea Home visual v25
+   Final corrective layer for Home only.
+   Goals: one continuous 4K-ready wallpaper, no decorative widget lines,
+   no stacked page-level overlays, readable glass surfaces, and no extra
+   runtime/GPU work. CSS only. */
+
+/* ── ONE CONTINUOUS WALLPAPER ───────────────────────────────────────────── */
+.panacea-home {
+  position: relative;
+  isolation: isolate;
+  background: #030812 !important;
+}
+
+.panacea-home::before,
+.panacea-home::after {
+  content: none !important;
+  display: none !important;
+}
+
+.panacea-home-backdrop {
+  position: absolute !important;
+  inset: 0 !important;
+  z-index: -1 !important;
+  transform: none !important;
+  will-change: auto !important;
+  pointer-events: none !important;
+  background-image: url('/panacea-home-cosmos-4k.svg') !important;
+  background-position: center top !important;
+  background-size: 100% auto !important;
+  background-repeat: repeat-y !important;
+  background-attachment: scroll !important;
+  opacity: .52 !important;
+  filter: none !important;
+}
+
+.dark .panacea-home-backdrop {
+  opacity: .96 !important;
+}
+
+/* Large Home sections must not form a second wallpaper. */
+.panacea-home .home-command-panel,
+.panacea-home .widget-instrument-v5,
+.panacea-home .widget-instrument-shell-v5,
+.panacea-home .widget-instrument-slide-v5 {
+  background-image: none !important;
+}
+
+.panacea-home .home-command-panel {
+  background: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
+}
+
+.panacea-home .widget-instrument-shell-v5 {
+  background: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
+}
+
+/* Only the actual information surface receives glass. One surface, not a
+   panel on top of another panel. */
+.panacea-home .widget-instrument-slide-v5 section > .kaca,
+.panacea-home .widget-instrument-slide-v5 > .kaca,
+.panacea-home .home-action-card,
+.panacea-home .home-signal-card,
+.panacea-home .home-loading-card {
+  border: 0 !important;
+  background: rgba(255,255,255,.62) !important;
+  box-shadow: 0 14px 34px rgba(15,23,42,.08) !important;
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
+}
+
+.dark .panacea-home .widget-instrument-slide-v5 section > .kaca,
+.dark .panacea-home .widget-instrument-slide-v5 > .kaca,
+.dark .panacea-home .home-action-card,
+.dark .panacea-home .home-signal-card,
+.dark .panacea-home .home-loading-card {
+  background: rgba(5,9,17,.58) !important;
+  box-shadow: 0 16px 38px rgba(0,0,0,.22) !important;
+}
+
+/* ── REMOVE ALL DECORATIVE LINES / WATERMARK PSEUDOS ───────────────────── */
+.panacea-home .widget-instrument-shell-v5::before,
+.panacea-home .widget-instrument-shell-v5::after,
+.panacea-home .widget-instrument-slide-v5::before,
+.panacea-home .widget-instrument-slide-v5::after,
+.panacea-home .widget-instrument-slide-v5 .kaca::before,
+.panacea-home .widget-instrument-slide-v5 .kaca::after,
+.panacea-home .widget-instrument-slide-v5 section > .kaca::before,
+.panacea-home .widget-instrument-slide-v5 section > .kaca::after,
+.panacea-home .widget-instrument-slide-v5 button::before,
+.panacea-home .widget-instrument-slide-v5 button::after {
+  content: none !important;
+  display: none !important;
+  border: 0 !important;
+  background: none !important;
+  box-shadow: none !important;
+}
+
+/* Decorative row separators are removed; meaningful charts, progress bars,
+   thresholds and SVG data traces remain untouched. */
+.panacea-home .widget-instrument-slide-v5 .border-t:not(svg *),
+.panacea-home .widget-instrument-slide-v5 .border-b:not(svg *) {
+  border-top-color: transparent !important;
+  border-bottom-color: transparent !important;
+}
+
+/* ── HIGH-END READABILITY / PROPORTION ─────────────────────────────────── */
+.panacea-home .widget-instrument-slide-v5 {
+  padding: clamp(14px, 3.4vw, 20px) !important;
+}
+
+.panacea-home .widget-instrument-title-v5 {
+  font-size: clamp(19px, 4.8vw, 24px) !important;
+  line-height: 1.05 !important;
+  letter-spacing: -.025em !important;
+}
+
+.panacea-home .widget-instrument-kicker-v5 {
+  font-size: 11px !important;
+  line-height: 1.2 !important;
+  letter-spacing: .09em !important;
+}
+
+.panacea-home .widget-instrument-state-v5,
+.panacea-home .widget-instrument-count-v5,
+.panacea-home .widget-instrument-label-v5 {
+  font-size: 11px !important;
+  line-height: 1.25 !important;
+}
+
+.panacea-home .widget-instrument-slide-v5 .t-mikro {
+  font-size: 12px !important;
+  line-height: 1.42 !important;
+}
+
+.panacea-home .widget-instrument-slide-v5 .t-kecil {
+  font-size: 14px !important;
+  line-height: 1.45 !important;
+}
+
+.panacea-home .widget-instrument-slide-v5 section > :is(.mb-1,.mb-2,.mb-3):first-child h2 {
+  font-size: 13px !important;
+  line-height: 1.2 !important;
+  letter-spacing: .065em !important;
+}
+
+.panacea-home .widget-instrument-slide-v5 section > .kaca {
+  border-radius: 26px !important;
+  padding: clamp(16px, 4vw, 20px) !important;
+}
+
+/* Keep data graphics crisp. This does not add pixels or animation. */
+.panacea-home .widget-instrument-slide-v5 svg,
+.panacea-home .widget-instrument-slide-v5 canvas {
+  shape-rendering: geometricPrecision;
+  text-rendering: geometricPrecision;
+}
+
+/* Navigation is useful but should not create a horizontal line across the card. */
+.panacea-home .widget-instrument-line-v5 {
+  height: 3px !important;
+  background: rgba(148,163,184,.12) !important;
+  border: 0 !important;
+}
+
+.panacea-home .widget-instrument-line-fill-v5 {
+  border: 0 !important;
+}
+
+/* ── PHONE / TABLET ─────────────────────────────────────────────────────── */
+@media (max-width: 900px) {
+  .panacea-home-backdrop {
+    /* Keep the vector crisp while avoiding a 4K raster allocation on phones. */
+    background-size: auto 1320px !important;
+    background-position: center top !important;
+    background-repeat: repeat-y !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .panacea-home .widget-instrument-title-v5 {
+    font-size: 20px !important;
+  }
+
+  .panacea-home .widget-instrument-slide-v5 {
+    padding: 13px !important;
+  }
+
+  .panacea-home .widget-instrument-slide-v5 section > .kaca {
+    padding: 16px !important;
+    border-radius: 24px !important;
+  }
+}
+
+/* ── LOW MEMORY / ACCESSIBILITY ─────────────────────────────────────────── */
+html.pmd-low-memory .panacea-home-backdrop {
+  opacity: .82 !important;
+  filter: none !important;
+}
+
+html.pmd-low-memory .panacea-home .widget-instrument-slide-v5 section > .kaca,
+html.pmd-low-memory .panacea-home .widget-instrument-slide-v5 > .kaca,
+html.pmd-low-memory .panacea-home .home-action-card,
+html.pmd-low-memory .panacea-home .home-signal-card,
+html.pmd-low-memory .panacea-home .home-loading-card {
+  box-shadow: none !important;
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .panacea-home *,
+  .panacea-home *::before,
+  .panacea-home *::after {
+    animation: none !important;
+    transition-duration: .001ms !important;
+  }
+}
