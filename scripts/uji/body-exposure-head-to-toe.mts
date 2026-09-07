@@ -41,8 +41,10 @@ assert.match(workbench, /Later · physiology bridge/, 'physiology should remain 
 assert.match(workbench, /Open physiology for this anatomy/, 'the bridge should stay actionable without making physiology the primary workspace')
 
 const navigator = readFileSync('src/components/digital-twin/HeadToToeAnatomyNavigator.tsx', 'utf8')
-assert.match(navigator, /Head-to-toe precision map/)
-assert.match(navigator, /Search any structure/)
+assert.match(navigator, /Head-to-toe anatomy/)
+assert.match(navigator, /Region first, then exact named structure/)
+assert.match(navigator, /Search head-to-toe anatomy/)
+assert.match(navigator, /detail targets/)
 assert.match(navigator, /Head/)
 assert.match(navigator, /Toe/)
 
