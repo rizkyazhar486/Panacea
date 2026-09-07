@@ -1,117 +1,87 @@
-import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react'
-import { SaklarNotifikasi } from './SaklarNotifikasi'
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { useLocation, useNavigate } from 'react-router-dom'
-import { IconBell } from './icons'
 import { api, backendEnabled, type Notif } from '../lib/api'
-
-// ─────────────────────────────────────────────────────────────────────────────
-// Header bell: unread badge + inbox, backed by /api/notifications.
-//
-// The panel is rendered through a PORTAL, and that is not a stylistic choice.
-// The bell lives inside the header's action row, which is `overflow-x-auto` so
-// the row can scroll on narrow screens. An absolutely-positioned child of a
-// scroll container is clipped to that container — about 40 px tall here — so
-// the panel opened correctly and was then cut down to nothing. The badge
-// counted fine, which is exactly why it looked like "the bell works but shows
-// no detail". Portalling to <body> takes the panel out of that clip entirely.
-// ─────────────────────────────────────────────────────────────────────────────
-
-function timeAgo(iso: string): string {
-  const m = Math.floor((Date.now() - new Date(iso).getTime()) / 60000)
-  if (m < 1) return 'just now'
-  if (m < 60) return `${m} min ago`
-  const h = Math.floor(m / 60)
-  if (h < 24) return `${h} h ago`
-  const d = Math.floor(h / 24)
-  return d < 7 ? `${d} d ago` : new Date(iso).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })
-}
-
-function fullTime(iso: string): string {
-  const d = new Date(iso)
-  if (Number.isNaN(d.getTime())) return ''
-  return d.toLocaleString('en-GB', {
-    weekday: 'long', day: 'numeric', month: 'long', year: 'numeric',
-    hour: '2-digit', minute: '2-digit',
-  })
-}
-
-/** Kelompokkan menurut hari supaya daftar panjang tetap terbaca. */
-function dayLabel(iso: string): string {
-  const d = new Date(iso)
-  const now = new Date()
-  const sameDay = (a: Date, b: Date) => a.toDateString() === b.toDateString()
-  const kemarin = new Date(now); kemarin.setDate(now.getDate() - 1)
-  if (sameDay(d, now)) return 'Today'
-  if (sameDay(d, kemarin)) return 'Yesterday'
-  return d.toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })
-}
+import { loadNotificationHistory } from '../lib/notificationSignals'
+import {
+  notificationDayLabel,
+  notificationFullTime,
+  notificationPresentation,
+  notificationTimeAgo,
+  serverNotification,
+  smartNotification,
+  sortNotifications,
+  type UnifiedNotification,
+} from '../lib/notificationPresentation'
+import { IconBell } from './icons'
+import { NotificationUtilityProducer } from './NotificationUtilityProducer'
+import { SaklarNotifikasi } from './SaklarNotifikasi'
 
 /**
- * Menebak jenis pemberitahuan dari judulnya, semata untuk memberi ikon dan
- * label. Server belum mengirimkan kategori; menebak di sini lebih baik daripada
- * menampilkan sederet baris yang seluruhnya tampak sama.
+ * Header inbox for both durable server notifications and local-first smart
+ * combinations. Server unread state remains authoritative for the red badge;
+ * smart items are already surfaced when fired and therefore do not create a
+ * second artificial unread count.
  */
-function kategori(n: Notif): { ikon: string; label: string } {
-  const t = `${n.title} ${n.body}`.toLowerCase()
-  if (/obat|medic|reminder|minum/.test(t)) return { ikon: '💊', label: 'Medication reminder' }
-  if (/janji|appointment|konsul|consult|jadwal/.test(t)) return { ikon: '🩺', label: 'Consultation' }
-  if (/bayar|invoice|billing|tagihan|pembayaran/.test(t)) return { ikon: '💳', label: 'Payment' }
-  if (/pesan|message|chat|balas/.test(t)) return { ikon: '💬', label: 'Message' }
-  if (/hasil|lab|result|rujuk/.test(t)) return { ikon: '🧪', label: 'Test result' }
-  if (/latihan|workout|langkah|target|sehat/.test(t)) return { ikon: '🏃', label: 'Activity' }
-  return { ikon: '🔔', label: 'Notification' }
-}
-
 export function NotificationBell() {
-  const [items, setItems] = useState<Notif[]>([])
+  const [serverItems, setServerItems] = useState<Notif[]>([])
+  const [smartItems, setSmartItems] = useState(loadNotificationHistory)
   const [open, setOpen] = useState(false)
-  const [gagal, setGagal] = useState(false)
-  const [memuat, setMemuat] = useState(false)
-  const [terbuka, setTerbuka] = useState<string | null>(null)
+  const [serverError, setServerError] = useState(false)
+  const [loading, setLoading] = useState(false)
+  const [expanded, setExpanded] = useState<string | null>(null)
   const [pos, setPos] = useState<{ top: number; right: number } | null>(null)
   const btnRef = useRef<HTMLButtonElement>(null)
   const panelRef = useRef<HTMLDivElement>(null)
   const nav = useNavigate()
   const loc = useLocation()
 
-  /* PANEL DITUTUP SETIAP KALI HALAMAN BERGANTI.
-     Panel ini hidup di kerangka aplikasi, bukan di halamannya, sehingga ia
-     bertahan menyeberangi perpindahan halaman — termasuk perpindahan yang
-     BUKAN karena menekan isinya, misalnya tombol kembali peramban. Yang
-     tertinggal adalah tirai sepenuh layar di atas halaman baru: setiap ketukan
-     tertelan olehnya, dan halamannya tampak membeku tanpa sebab. */
-  useEffect(() => { setOpen(false) }, [loc.pathname])
-  const unread = items.filter((n) => !n.read).length
+  const items = useMemo(
+    () => sortNotifications([
+      ...serverItems.map(serverNotification),
+      ...smartItems.map(smartNotification),
+    ]),
+    [serverItems, smartItems],
+  )
+  const unread = serverItems.filter((n) => !n.read).length
 
   const load = useCallback(() => {
-    setMemuat(true)
+    setSmartItems(loadNotificationHistory())
+    if (!backendEnabled) {
+      setServerError(false)
+      setLoading(false)
+      return
+    }
+    setLoading(true)
     api.notifications()
-      .then((r) => { setItems(r); setGagal(false) })
-      .catch(() => setGagal(true))
-      .finally(() => setMemuat(false))
+      .then((result) => { setServerItems(result); setServerError(false) })
+      .catch(() => setServerError(true))
+      .finally(() => setLoading(false))
   }, [])
 
   useEffect(() => {
-    if (!backendEnabled) return
     load()
-    const id = setInterval(load, 45_000)
-    return () => clearInterval(id)
+    const interval = backendEnabled ? window.setInterval(load, 45_000) : null
+    const onHistory = () => setSmartItems(loadNotificationHistory())
+    window.addEventListener('panacea:notification-history', onHistory)
+    return () => {
+      if (interval != null) window.clearInterval(interval)
+      window.removeEventListener('panacea:notification-history', onHistory)
+    }
   }, [load])
 
-  // Anchor the portalled panel to the button, clamped inside the viewport.
+  // A route change must never leave a full-screen mobile backdrop blocking the
+  // destination page.
+  useEffect(() => { setOpen(false) }, [loc.pathname, loc.search])
+
   const place = useCallback(() => {
-    const r = btnRef.current?.getBoundingClientRect()
-    if (!r) return
-    const vw = window.innerWidth
-    // Mirrors the panel's own width rule below.
-    const lebar = Math.min(352, vw - 16)
-    // Anchor to the button, but never let the panel run off either edge — the
-    // bell sits in a horizontally scrollable row, so it is often nowhere near
-    // the right margin and a naive right-align pushes the panel off-screen.
-    const inginRight = vw - r.right
-    const right = Math.min(Math.max(8, inginRight), Math.max(8, vw - lebar - 8))
-    setPos({ top: r.bottom + 8, right })
+    const rect = btnRef.current?.getBoundingClientRect()
+    if (!rect) return
+    const viewport = window.innerWidth
+    const width = Math.min(352, viewport - 16)
+    const wantedRight = viewport - rect.right
+    const right = Math.min(Math.max(8, wantedRight), Math.max(8, viewport - width - 8))
+    setPos({ top: rect.bottom + 8, right })
   }, [])
 
   useLayoutEffect(() => {
@@ -127,19 +97,16 @@ export function NotificationBell() {
 
   useEffect(() => {
     if (!open) return
-    // pointerdown rather than mousedown: on touch devices mousedown is
-    // synthesised late, so a tap outside could close the panel only after it
-    // had already handled the tap.
-    function onDoc(e: PointerEvent) {
-      const t = e.target as Node
-      if (panelRef.current?.contains(t) || btnRef.current?.contains(t)) return
+    function onPointer(e: PointerEvent) {
+      const target = e.target as Node
+      if (panelRef.current?.contains(target) || btnRef.current?.contains(target)) return
       setOpen(false)
     }
     function onKey(e: KeyboardEvent) { if (e.key === 'Escape') setOpen(false) }
-    document.addEventListener('pointerdown', onDoc)
+    document.addEventListener('pointerdown', onPointer)
     document.addEventListener('keydown', onKey)
     return () => {
-      document.removeEventListener('pointerdown', onDoc)
+      document.removeEventListener('pointerdown', onPointer)
       document.removeEventListener('keydown', onKey)
     }
   }, [open])
@@ -147,173 +114,160 @@ export function NotificationBell() {
   function toggle() {
     const next = !open
     setOpen(next)
-    setTerbuka(null)
-    if (next) {
-      load()
-      if (unread > 0) {
-        api.markNotificationsRead().catch(() => {})
-        setTimeout(() => setItems((prev) => prev.map((n) => ({ ...n, read: true }))), 800)
-      }
+    setExpanded(null)
+    if (!next) return
+    load()
+    if (backendEnabled && unread > 0) {
+      api.markNotificationsRead().catch(() => {})
+      // Keep the badge long enough for the user to perceive which entries were
+      // new, then mirror the successful optimistic read locally.
+      window.setTimeout(() => setServerItems((prev) => prev.map((n) => ({ ...n, read: true }))), 800)
     }
   }
 
-  /* PEMBERITAHUAN LAMA TETAP DAPAT DIBUKA.
-     Sebagian pemberitahuan yang sudah tersimpan memuat alamat gaya lama
-     ('/owner', '/billing') yang pada aplikasi ber-HashRouter ini tidak ada.
-     Server sekarang membakukannya sebelum mengirim, tetapi yang TERLANJUR
-     tersimpan tidak ikut berubah — dan yang menekannya akan mendarat di
-     halaman 404, persis seperti sebelum perbaikan. Karena itu pembakuan yang
-     sama dikerjakan sekali lagi di sini, saat dibuka. */
-  function bukaTautan(n: Notif) {
-    if (!n.url) return
-    const u = n.url.trim()
-    const i = u.indexOf('#/')
-    const rute = i >= 0 ? u.slice(i + 1) : u.startsWith('/') ? u : null
-    if (!rute) return
+  function openRoute(item: UnifiedNotification) {
+    if (!item.route) return
     setOpen(false)
-    nav(rute)
+    nav(item.route)
   }
 
-  if (!backendEnabled) return null
+  const groups = useMemo(() => {
+    const result: { day: string; list: UnifiedNotification[] }[] = []
+    for (const item of items) {
+      const day = notificationDayLabel(item.at)
+      const last = result[result.length - 1]
+      if (last?.day === day) last.list.push(item)
+      else result.push({ day, list: [item] })
+    }
+    return result
+  }, [items])
 
-  // Group by day, newest first.
-  const grup: { hari: string; list: Notif[] }[] = []
-  for (const n of [...items].sort((a, b) => Date.parse(b.at) - Date.parse(a.at))) {
-    const h = dayLabel(n.at)
-    const last = grup[grup.length - 1]
-    if (last && last.hari === h) last.list.push(n)
-    else grup.push({ hari: h, list: [n] })
-  }
-
-  const panel = open && pos && (
+  const panel = open && pos ? (
     <>
-      {/* Backdrop: on a phone a tap-anywhere-to-close target is far more
-          reliable than hit-testing outside a floating panel. */}
-      <div className="fixed inset-0 z-[70] bg-black/20 sm:bg-transparent" aria-hidden onPointerDown={() => setOpen(false)} />
+      <div className="fixed inset-0 z-[70] bg-black/25 sm:bg-transparent" aria-hidden onPointerDown={() => setOpen(false)} />
       <div
         ref={panelRef}
         role="dialog"
         aria-label="Notifications"
-        className="fixed z-[71] flex max-h-[70vh] w-[min(22rem,calc(100vw-1rem))] flex-col overflow-hidden rounded-2xl border border-black/5 bg-white shadow-2xl ring-1 ring-black/5 dark:border-white/10 dark:bg-neutral-900"
+        className="fixed z-[71] flex max-h-[min(72dvh,42rem)] w-[min(22rem,calc(100vw-1rem))] flex-col overflow-hidden rounded-[24px] border border-black/10 bg-white/98 shadow-2xl ring-1 ring-black/5 backdrop-blur-2xl dark:border-white/12 dark:bg-[#111315]/98 dark:ring-white/5"
         style={{ top: pos.top, right: pos.right }}
       >
-        <div className="flex shrink-0 items-center justify-between border-b border-neutral-100 px-4 py-2.5 dark:border-white/10">
-          <span className="text-sm font-bold text-ink dark:text-white">Notifications</span>
-          <span className="text-[11px] text-neutral-500">
-            {memuat ? 'loading…' : `${items.length} items`}
-          </span>
-        </div>
-
-        {/* MENGHIDUPKAN NOTIFIKASI DITARUH DI SINI, bukan hanya di widget
-            beranda. Lonceng ini ada di bilah atas SETIAP halaman, sehingga
-            inilah satu-satunya tempat yang selalu berjarak satu ketukan dari
-            mana pun orang berada — dan orang yang membuka lonceng lalu
-            menemukannya kosong justru orang yang paling ingin menyalakannya. */}
-        <div className="shrink-0 px-3 pt-3 empty:hidden">
-          <SaklarNotifikasi ringkas onSelesai={load} />
-        </div>
-
-        <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain">
-          {gagal ? (
-            <div className="px-4 py-8 text-center">
-              <p className="text-sm text-neutral-500">Notifications could not be loaded.</p>
-              <p className="mt-1 text-[11px] text-neutral-500">Check your internet connection.</p>
-              <button onClick={load} className="mt-3 rounded-lg bg-neutral-100 px-3 py-1.5 text-xs font-bold text-neutral-700 dark:bg-white/10 dark:text-neutral-200">
-                Try again
-              </button>
+        <div className="flex shrink-0 items-center justify-between border-b border-neutral-200/80 px-4 py-3 dark:border-white/10">
+          <div className="min-w-0">
+            <div className="text-sm font-black text-ink dark:text-white">Notifications</div>
+            <div className="mt-0.5 text-[10px] font-medium text-neutral-600 dark:text-neutral-300">
+              {unread > 0 ? `${unread} unread · ` : ''}{items.length} total
             </div>
-          ) : items.length === 0 ? (
-            <div className="px-4 py-10 text-center">
-              <p className="text-sm text-neutral-500">No notifications yet.</p>
-              <p className="mt-1 text-[11px] leading-relaxed text-neutral-500">
-                Medication reminders, consultation schedules, and account updates will appear here.
+          </div>
+          {loading && <span className="shrink-0 text-[10px] font-bold text-neutral-500 dark:text-neutral-300">Syncing…</span>}
+        </div>
+
+        {backendEnabled && (
+          <div className="shrink-0 px-3 pt-3">
+            <SaklarNotifikasi ringkas onSelesai={load} />
+          </div>
+        )}
+
+        {serverError && (
+          <div className="mx-3 mt-3 shrink-0 rounded-xl border border-amber-200 bg-amber-50 px-3 py-2 text-[10px] font-medium leading-relaxed text-amber-900 dark:border-amber-400/20 dark:bg-amber-400/10 dark:text-amber-100">
+            Server history could not refresh. Local smart and achievement history below is still available.
+          </div>
+        )}
+
+        <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain pb-[env(safe-area-inset-bottom)]">
+          {items.length === 0 ? (
+            <div className="px-5 py-10 text-center">
+              <div className="text-2xl" aria-hidden>🔔</div>
+              <p className="mt-2 text-sm font-bold text-ink dark:text-white">Nothing needs your attention.</p>
+              <p className="mt-1 text-[11px] leading-relaxed text-neutral-600 dark:text-neutral-300">
+                Achievements, recovery signals, reminders, owner milestones and account updates will collect here when real source data triggers them.
               </p>
             </div>
           ) : (
-            grup.map((g) => (
-              <div key={g.hari}>
-                <div className="sticky top-0 z-10 bg-neutral-50/95 px-4 py-1 text-[10px] font-bold uppercase tracking-wide text-neutral-500 backdrop-blur dark:bg-neutral-900/95">
-                  {g.hari}
+            groups.map((group) => (
+              <section key={group.day}>
+                <div className="sticky top-0 z-10 bg-neutral-50/95 px-4 py-1.5 text-[10px] font-black uppercase tracking-[.12em] text-neutral-600 backdrop-blur dark:bg-[#111315]/95 dark:text-neutral-300">
+                  {group.day}
                 </div>
-                {g.list.map((n) => {
-                  const kat = kategori(n)
-                  const buka = terbuka === n.id
+                {group.list.map((item) => {
+                  const presentation = notificationPresentation(item)
+                  const isExpanded = expanded === item.id
                   return (
-                    <div key={n.id} className={`border-b border-neutral-50 dark:border-white/5 ${n.read ? '' : 'bg-brand-50/40 dark:bg-brand/10'}`}>
+                    <article key={item.id} className={`border-b border-neutral-100 dark:border-white/[.07] ${item.source === 'server' && !item.read ? 'bg-brand-50/55 dark:bg-brand/10' : ''}`}>
                       <button
-                        onClick={() => setTerbuka(buka ? null : n.id)}
-                        aria-expanded={buka}
-                        className="flex w-full gap-3 px-4 py-3 text-left transition hover:bg-neutral-50 dark:hover:bg-white/5"
+                        type="button"
+                        onClick={() => setExpanded(isExpanded ? null : item.id)}
+                        aria-expanded={isExpanded}
+                        className="flex w-full gap-3 px-4 py-3.5 text-left hover:bg-neutral-50/80 dark:hover:bg-white/[.035]"
                       >
-                        <span className="mt-0.5 text-base leading-none shrink-0">{kat.ikon}</span>
+                        <span className="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-neutral-100 text-base dark:bg-white/[.07]" aria-hidden>{presentation.icon}</span>
                         <span className="min-w-0 flex-1">
-                          <span className="flex items-center gap-1.5">
-                            {!n.read && <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-brand" />}
-                            <span className="block text-sm font-bold leading-snug text-ink dark:text-white">{n.title}</span>
+                          <span className="flex flex-wrap items-center gap-1.5">
+                            {item.source === 'server' && !item.read && <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-brand" />}
+                            <span className="min-w-0 break-words text-[13px] font-black leading-snug text-ink dark:text-white">{item.title}</span>
                           </span>
-                          <span className={`mt-0.5 block text-[12px] leading-snug text-neutral-500 dark:text-neutral-500 ${buka ? '' : 'line-clamp-2'}`}>
-                            {n.body}
-                          </span>
-                          <span className="mt-1 flex items-center gap-2 text-[10px] text-neutral-500">
-                            <span>{kat.label}</span>
+                          <span className={`mt-1 block break-words text-[11px] leading-relaxed text-neutral-600 dark:text-neutral-300 ${isExpanded ? '' : 'line-clamp-2'}`}>{item.body}</span>
+                          <span className="mt-1.5 flex flex-wrap items-center gap-1.5 text-[9px] font-bold text-neutral-500 dark:text-neutral-400">
+                            <span>{presentation.label}</span>
                             <span>·</span>
-                            <span>{timeAgo(n.at)}</span>
+                            <span>{notificationTimeAgo(item.at)}</span>
+                            <span className="rounded-full bg-neutral-100 px-1.5 py-0.5 uppercase tracking-wide text-neutral-600 dark:bg-white/10 dark:text-neutral-300">{item.source}</span>
+                            {item.priority === 'high' && <span className="rounded-full bg-red-100 px-1.5 py-0.5 uppercase tracking-wide text-red-800 dark:bg-red-400/15 dark:text-red-200">high</span>}
                           </span>
                         </span>
-                        <span className="mt-1 shrink-0 text-[10px] text-neutral-500">{buka ? '▲' : '▼'}</span>
+                        <span className="mt-1 shrink-0 text-[10px] text-neutral-500 dark:text-neutral-400" aria-hidden>{isExpanded ? '▲' : '▼'}</span>
                       </button>
 
-                      {buka && (
-                        <div className="px-4 pb-3 pl-11">
-                          <p className="text-[11px] text-neutral-500">{fullTime(n.at)}</p>
-                          {n.url ? (
-                            <button
-                              onClick={() => bukaTautan(n)}
-                              className="mt-2 rounded-lg bg-brand px-3 py-1.5 text-xs font-bold text-white"
-                            >
+                      {isExpanded && (
+                        <div className="px-4 pb-4 pl-16">
+                          <p className="text-[10px] font-medium text-neutral-500 dark:text-neutral-400">{notificationFullTime(item.at)}</p>
+                          {item.explanation && (
+                            <p className="mt-1.5 break-words text-[10px] leading-relaxed text-neutral-600 dark:text-neutral-300">Why: {item.explanation}</p>
+                          )}
+                          {item.route ? (
+                            <button type="button" onClick={() => openRoute(item)} className="mt-2.5 min-h-9 rounded-xl bg-brand px-3 py-2 text-[11px] font-black text-white">
                               Open its page →
                             </button>
                           ) : (
-                            <p className="mt-1.5 text-[11px] text-neutral-500">
-                              This notification does not link to any page.
-                            </p>
+                            <p className="mt-1.5 text-[10px] text-neutral-500 dark:text-neutral-400">No safe internal destination is attached to this item.</p>
                           )}
                         </div>
                       )}
-                    </div>
+                    </article>
                   )
                 })}
-              </div>
+              </section>
             ))
           )}
         </div>
 
-        {items.length > 0 && (
-          <button
-            onClick={() => { setOpen(false); nav('/notifikasi') }}
-            className="shrink-0 border-t border-neutral-100 py-2.5 text-center text-xs font-bold text-brand-dark dark:border-white/10"
-          >
-            See all notifications
-          </button>
-        )}
+        <button
+          type="button"
+          onClick={() => { setOpen(false); nav('/notifikasi') }}
+          className="shrink-0 border-t border-neutral-200/80 bg-white/95 py-3 text-center text-xs font-black text-brand-dark dark:border-white/10 dark:bg-[#111315]/95 dark:text-emerald-300"
+        >
+          Open Notification Center →
+        </button>
       </div>
     </>
-  )
+  ) : null
 
   return (
     <>
+      <NotificationUtilityProducer />
       <button
         ref={btnRef}
+        type="button"
         onClick={toggle}
         aria-expanded={open}
         aria-haspopup="dialog"
-        className="relative grid h-9 w-9 shrink-0 place-items-center rounded-full border border-black/5 bg-white text-neutral-500 transition hover:text-brand-dark"
+        className="relative grid h-9 w-9 shrink-0 place-items-center rounded-full border border-black/10 bg-white text-neutral-700 shadow-sm transition hover:text-brand-dark dark:border-white/12 dark:bg-[#17191c] dark:text-neutral-200 dark:hover:text-emerald-300"
         title="Notifications"
         aria-label={unread > 0 ? `Notifications, ${unread} unread` : 'Notifications'}
       >
         <IconBell size={18} />
         {unread > 0 && (
-          <span className="absolute -right-0.5 -top-0.5 grid h-4 min-w-4 place-items-center rounded-full bg-accent px-1 text-[10px] font-bold text-white">
+          <span className="absolute -right-0.5 -top-0.5 grid h-4 min-w-4 place-items-center rounded-full bg-accent px-1 text-[10px] font-black text-white">
             {unread > 9 ? '9+' : unread}
           </span>
         )}
