@@ -254,12 +254,11 @@ function cloneLayerMaterials(root: THREE.Group) {
     if (!(obj instanceof THREE.Mesh)) return
     const sumber = Array.isArray(obj.material) ? obj.material : [obj.material]
     const salinan = sumber.map((material) => {
-      let copy = lokal.get(material)
-      if (!copy) {
-        copy = material.clone()
-        copy.userData = { ...material.userData, body3dBaseOpacity: material.opacity }
-        lokal.set(material, copy)
-      }
+      const existing = lokal.get(material)
+      if (existing) return existing
+      const copy = material.clone()
+      copy.userData = { ...material.userData, body3dBaseOpacity: material.opacity }
+      lokal.set(material, copy)
       return copy
     })
     obj.material = Array.isArray(obj.material) ? salinan : salinan[0]
