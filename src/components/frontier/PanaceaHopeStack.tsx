@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react'
+import { HopeWorkbench } from './HopeWorkbench'
 import {
   HOPE_DOMAINS,
   HOPE_GATE_LABEL,
@@ -174,6 +175,8 @@ export function PanaceaHopeStack() {
           </div>
         </div>
       </div>
+
+      <HopeWorkbench domain={selected.key} />
     </section>
   )
 }
