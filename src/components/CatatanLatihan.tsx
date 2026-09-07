@@ -107,6 +107,35 @@ export function CatatanLatihan() {
     const terbaruIndoor = terbaru && typeof terbaru.diDalamRuangan === 'boolean' ? terbaru.diDalamRuangan : null
     const punyaMovement = terbaruPace !== null || terbaruSpeed !== null || terbaruCadence !== null
 
+    const riwayatMovement = w
+      .filter((x) => {
+        if (kunciTanggal(new Date(x.mulai)) > tanggal) return false
+        return (
+          (typeof x.paceSec === 'number' && Number.isFinite(x.paceSec) && x.paceSec > 0) ||
+          (typeof x.kecepatanKmh === 'number' && Number.isFinite(x.kecepatanKmh) && x.kecepatanKmh > 0) ||
+          (typeof x.kadens === 'number' && Number.isFinite(x.kadens) && x.kadens > 0)
+        )
+      })
+      .sort((a, b) => Date.parse(b.mulai) - Date.parse(a.mulai))
+      .slice(0, 5)
+      .map((x) => {
+        const paceDetik = typeof x.paceSec === 'number' && Number.isFinite(x.paceSec) && x.paceSec > 0 ? Math.round(x.paceSec) : null
+        const pace = paceDetik !== null
+          ? `${Math.floor(paceDetik / 60)}:${String(paceDetik % 60).padStart(2, '0')}`
+          : null
+        return {
+          id: x.id,
+          nama: typeof x.nama === 'string' && x.nama.trim() ? x.nama.trim() : 'Movement session',
+          tanggal: new Date(x.mulai).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
+          menit: Number.isFinite(x.durasi) && x.durasi > 0 ? Math.round(x.durasi / 60) : null,
+          jarakKm: typeof x.jarakKm === 'number' && Number.isFinite(x.jarakKm) && x.jarakKm > 0 ? x.jarakKm : null,
+          pace,
+          speed: typeof x.kecepatanKmh === 'number' && Number.isFinite(x.kecepatanKmh) && x.kecepatanKmh > 0 ? x.kecepatanKmh : null,
+          cadence: typeof x.kadens === 'number' && Number.isFinite(x.kadens) && x.kadens > 0 ? Math.round(x.kadens) : null,
+          avgHr: typeof x.avgHr === 'number' && Number.isFinite(x.avgHr) && x.avgHr > 0 ? Math.round(x.avgHr) : null,
+        }
+      })
+
     const acuan = new Date()
     acuan.setHours(12, 0, 0, 0)
     acuan.setDate(acuan.getDate() - (untukKemarin ? 1 : 0))
@@ -181,6 +210,7 @@ export function CatatanLatihan() {
       terbaruCadence,
       terbaruIndoor,
       punyaMovement,
+      riwayatMovement,
       tren,
       maxMenit7,
       hariAktif7: tren.filter((x) => x.menit > 0).length,
@@ -394,6 +424,50 @@ export function CatatanLatihan() {
 
           <p className="mt-2 text-[9px] leading-relaxed text-neutral-500 dark:text-neutral-400">
             Recorded and perceived signals are shown side by side but are not merged into a readiness, recovery, or injury-risk score.
+          </p>
+        </div>
+      )}
+
+      {ringkas.riwayatMovement.length > 1 && (
+        <div className="mt-3 rounded-2xl border border-emerald-100/80 p-3 dark:border-emerald-400/15" aria-label="Recent movement session history">
+          <div className="flex items-end justify-between gap-3">
+            <div>
+              <div className="t-mikro font-bold uppercase tracking-wide text-neutral-500">Recent movement sessions</div>
+              <div className="mt-0.5 text-sm font-black text-ink dark:text-white">Recorded timeline</div>
+            </div>
+            <div className="text-right">
+              <div className="text-lg font-black tabular-nums text-emerald-700 dark:text-emerald-300">{ringkas.riwayatMovement.length}</div>
+              <div className="t-mikro text-neutral-500">latest shown</div>
+            </div>
+          </div>
+
+          <div className="mt-3 space-y-0">
+            {ringkas.riwayatMovement.map((sesi, i) => (
+              <div key={sesi.id} className="grid grid-cols-[16px_1fr] gap-2">
+                <div className="flex flex-col items-center" aria-hidden="true">
+                  <div className="mt-1 h-2.5 w-2.5 shrink-0 rounded-full border-2 border-emerald-500 bg-white dark:bg-neutral-900" />
+                  {i < ringkas.riwayatMovement.length - 1 && <div className="min-h-8 w-px flex-1 bg-emerald-200 dark:bg-emerald-300/20" />}
+                </div>
+                <div className={`${i < ringkas.riwayatMovement.length - 1 ? 'pb-3' : ''} min-w-0`}>
+                  <div className="flex items-baseline justify-between gap-2">
+                    <div className="truncate text-xs font-black text-ink dark:text-white">{sesi.nama}</div>
+                    <div className="shrink-0 text-[9px] font-bold text-neutral-500">{sesi.tanggal}</div>
+                  </div>
+                  <div className="mt-1.5 flex flex-wrap gap-1.5 text-[9px] font-bold tabular-nums">
+                    {sesi.menit !== null && <span className="rounded-full bg-neutral-100 px-2 py-1 text-neutral-600 dark:bg-white/10 dark:text-neutral-300">{sesi.menit} min</span>}
+                    {sesi.jarakKm !== null && <span className="rounded-full bg-neutral-100 px-2 py-1 text-neutral-600 dark:bg-white/10 dark:text-neutral-300">{sesi.jarakKm.toFixed(1)} km</span>}
+                    {sesi.pace !== null && <span className="rounded-full bg-emerald-50 px-2 py-1 text-emerald-700 dark:bg-emerald-400/10 dark:text-emerald-300">{sesi.pace}/km</span>}
+                    {sesi.pace === null && sesi.speed !== null && <span className="rounded-full bg-emerald-50 px-2 py-1 text-emerald-700 dark:bg-emerald-400/10 dark:text-emerald-300">{sesi.speed.toFixed(1)} km/h</span>}
+                    {sesi.cadence !== null && <span className="rounded-full bg-sky-50 px-2 py-1 text-sky-700 dark:bg-sky-400/10 dark:text-sky-300">{sesi.cadence} spm</span>}
+                    {sesi.avgHr !== null && <span className="rounded-full bg-rose-50 px-2 py-1 text-rose-700 dark:bg-rose-400/10 dark:text-rose-300">Avg {sesi.avgHr} bpm</span>}
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          <p className="mt-2 text-[9px] leading-relaxed text-neutral-500 dark:text-neutral-400">
+            Sessions are listed newest to oldest up to the selected date. Metrics stay session-specific: this timeline does not rank mixed activities or turn pace, cadence, heart rate, distance, and duration into a single performance score.
           </p>
         </div>
       )}
