@@ -1,9 +1,10 @@
 {
   "id": "clinicaltrials-gov-api-v2",
   "name": "ClinicalTrials.gov API v2",
-  "source": "U.S. National Library of Medicine / National Institutes of Health",
-  "type": ["api", "clinical-trial-registry"],
   "category": "evidence",
+  "kind": ["api"],
+  "homepage": "https://clinicaltrials.gov/",
+  "repository": null,
   "features": [
     "hope-stack",
     "geroscience-pharma",
@@ -12,19 +13,46 @@
     "aging-technology",
     "clinical-trial-discovery"
   ],
-  "homepage": "https://clinicaltrials.gov/",
-  "repository": null,
-  "license": "PUBLIC_GOVERNMENT_REGISTRY_VERIFY_TERMS",
-  "licenseUrl": "https://clinicaltrials.gov/data-api/about-api",
-  "access": "public-api",
-  "accessNotes": "Panacea accesses the public v2 API through its server adapter. The browser does not query ClinicalTrials.gov directly.",
-  "commercialUse": "VERIFY_CURRENT_TERMS_AND_ATTRIBUTION",
-  "implementation": "server/src/trials.ts",
-  "runtimeUse": true,
-  "buildTimeUse": false,
-  "integrationLayer": "server-adapter",
-  "attributionRequired": true,
-  "medicalValidation": "REGISTERED_STUDY_RECORDS_NOT_TREATMENT_RECOMMENDATIONS",
-  "status": "ACTIVE",
-  "notes": "Registration does not establish efficacy, safety, approval, recruitment suitability, or individual treatment appropriateness. Trial records must remain linked to their NCT identifiers and official registry pages."
+  "usage": {
+    "runtime": true,
+    "buildTime": false,
+    "networkRequired": true,
+    "notes": "Panacea accesses ClinicalTrials.gov through its server adapter. The browser does not query the registry API directly."
+  },
+  "license": {
+    "status": "CHECK_REQUIRED",
+    "identifier": null,
+    "commercialUse": "CONDITIONAL",
+    "attributionRequired": true,
+    "shareAlike": null,
+    "scope": "Registered study metadata retrieved from the public ClinicalTrials.gov API v2.",
+    "verificationUrl": "https://clinicaltrials.gov/data-api/about-api",
+    "verifiedAt": null,
+    "notes": "Verify current API terms, attribution expectations and any downstream redistribution limits before expanding use."
+  },
+  "validation": {
+    "level": "REFERENCE",
+    "clinicalDecisionUse": "CONTEXT_ONLY",
+    "notes": "Registration does not establish efficacy, safety, approval, recruitment suitability, or individual treatment appropriateness."
+  },
+  "provenance": {
+    "authority": "U.S. National Library of Medicine / National Institutes of Health",
+    "sourceIdentityRequired": true,
+    "versionPinRequired": false,
+    "notes": "Preserve NCT identifier, official record URL, query and retrieval timestamp for every displayed study."
+  },
+  "adapter": {
+    "status": "ACTIVE",
+    "normalizedTarget": "panacea.evidence.registered-study",
+    "module": "server/src/trials.ts",
+    "notes": "Existing production adapter normalizes NCT ID, title, recruitment status, condition, phase and location."
+  },
+  "trust": {
+    "authority": 5,
+    "evidenceQuality": 3,
+    "recency": 5,
+    "licenseClarity": 3,
+    "reproducibility": 5,
+    "notes": "Trust score applies to registry provenance and reproducibility of retrieval; it must not be interpreted as proof that a registered intervention works."
+  }
 }
