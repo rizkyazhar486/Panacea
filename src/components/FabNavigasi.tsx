@@ -87,6 +87,12 @@ export interface TujuanFab {
 export function FabNavigasi({ tujuan, onTambah, onCari }: { tujuan: TujuanFab[]; onTambah?: () => void; onCari?: () => void }) {
   const lokasi = useLocation()
   const navigasi = useNavigate()
+  // Body Explorer sudah memiliki hamburger, tombol kembali, pencarian dan
+  // quick-navigation sendiri. Pada layar ponsel, FAB global menutupi sudut
+  // kanan-bawah kanvas WebGL dan mengganggu inspeksi anatomi. Karena FAB ini
+  // sendiri memang `lg:hidden`, menonaktifkannya pada route ini hanya mengubah
+  // pengalaman mobile dan tidak mengurangi navigasi desktop/sidebar.
+  const sembunyikanDiBodyExplorer = lokasi.pathname.startsWith('/body-explorer')
   // Letak bawaan: sudut kanan bawah, bukan melayang 96 px di atasnya.
   //
   // Tombol yang beristirahat di tengah tinggi layar menutupi isi yang sedang
@@ -262,6 +268,8 @@ export function FabNavigasi({ tujuan, onTambah, onCari }: { tujuan: TujuanFab[];
   for (let i = 0; i < aksi.length; i += SLOT_PER_HALAMAN) {
     halamanAksi.push(aksi.slice(i, i + SLOT_PER_HALAMAN))
   }
+
+  if (sembunyikanDiBodyExplorer) return null
 
   return (
     <>
