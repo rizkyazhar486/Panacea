@@ -1,4 +1,4 @@
-import { FormEvent, useEffect, useMemo, useState } from 'react'
+import { FormEvent, useEffect, useMemo, useRef, useState } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import {
   searchMedicalSources,
@@ -56,25 +56,42 @@ export function MedicalEvidenceExplorer({
   const [error, setError] = useState('')
   const [selectedKey, setSelectedKey] = useState('')
   const [bridgeEvidence, setBridgeEvidence] = useState<BridgeEvidenceRef[]>(loadBridgeEvidence)
+  const requestRef = useRef<AbortController | null>(null)
   const bridgeSelectionEnabled = allowBridgeSelection && location.pathname !== '/knowledge-bridge'
 
   async function run(nextQuery = query) {
     const clean = nextQuery.trim()
     if (!clean) return
+
+    requestRef.current?.abort()
+    const controller = new AbortController()
+    requestRef.current = controller
     setLoading(true)
     setError('')
+
     try {
-      const result = await searchMedicalSources(clean)
+      const result = await searchMedicalSources(clean, { signal: controller.signal })
+      if (controller.signal.aborted) return
       setBundle(result)
       setSelectedKey('')
     } catch (err) {
+      if (controller.signal.aborted || (err instanceof Error && err.name === 'AbortError')) return
       setError(err instanceof Error ? err.message : 'Search failed.')
     } finally {
-      setLoading(false)
+      if (requestRef.current === controller) {
+        requestRef.current = null
+        setLoading(false)
+      }
     }
   }
 
+  useEffect(() => () => {
+    requestRef.current?.abort()
+    requestRef.current = null
+  }, [])
+
   useEffect(() => {
+    setQuery(initialQuery)
     if (autoRun && initialQuery.trim()) void run(initialQuery)
     // The initial query intentionally runs only when the mounted context changes.
     // eslint-disable-next-line react-hooks/exhaustive-deps
