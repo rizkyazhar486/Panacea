@@ -1,4 +1,5 @@
 import { FormEvent, useEffect, useMemo, useState } from 'react'
+import { HighDefinitionCellAtlas } from './HighDefinitionCellAtlas'
 
 type Props = { mode?: 'body-cell' | 'cell-genome' }
 
@@ -155,67 +156,71 @@ export function CellGenomeEvidenceLab({ mode = 'cell-genome' }: Props) {
   const currentImage = result?.images[imageIndex]
 
   return (
-    <section className="overflow-hidden rounded-[28px] border border-neutral-200 bg-[#080b0e] text-white shadow-[0_24px_70px_rgba(0,0,0,.2)] dark:border-white/10">
-      <header className="border-b border-white/10 bg-[#0c1116] p-4 sm:p-5">
-        <div className="flex flex-wrap items-start justify-between gap-3">
-          <div>
-            <div className="text-[9px] font-black uppercase tracking-[.18em] text-fuchsia-300">Human Protein Atlas × Ensembl</div>
-            <h2 className="mt-1 text-[19px] font-black tracking-[-.03em] sm:text-[24px]">{mode === 'body-cell' ? 'Real cell evidence, not a drawn cell' : 'Cell → gene → genomic sequence'}</h2>
-            <p className="mt-1 max-w-3xl text-[10px] leading-relaxed text-white/55">Protein/cell metadata and microscopy links come from the Human Protein Atlas. Gene coordinates and genomic sequence come from Ensembl REST.</p>
+    <div className="space-y-4">
+      {mode === 'body-cell' && <HighDefinitionCellAtlas />}
+
+      <section className="overflow-hidden rounded-[28px] border border-neutral-200 bg-[#080b0e] text-white shadow-[0_24px_70px_rgba(0,0,0,.2)] dark:border-white/10">
+        <header className="border-b border-white/10 bg-[#0c1116] p-4 sm:p-5">
+          <div className="flex flex-wrap items-start justify-between gap-3">
+            <div>
+              <div className="text-[9px] font-medium uppercase tracking-[.14em] text-fuchsia-300">Human Protein Atlas × Ensembl</div>
+              <h2 className="mt-1 text-[19px] font-semibold tracking-tight sm:text-[24px]">{mode === 'body-cell' ? 'Real microscopy → molecular evidence' : 'Cell → gene → genomic sequence'}</h2>
+              <p className="mt-1 max-w-3xl text-[10px] leading-relaxed text-white/55">Human Protein Atlas microscopy remains the real-source visual reference. Gene coordinates and genomic sequence come from Ensembl REST; the 3D model above is a spatial reconstruction layer, not a substitute for microscopy.</p>
+            </div>
+            <div className="flex gap-2 text-[8px] font-medium uppercase tracking-[.1em] text-white/45"><span className="rounded-full border border-white/10 px-2.5 py-1.5">HPA microscopy</span><span className="rounded-full border border-white/10 px-2.5 py-1.5">Ensembl REST</span></div>
           </div>
-          <div className="flex gap-2 text-[8px] font-black uppercase tracking-[.1em] text-white/45"><span className="rounded-full border border-white/10 px-2.5 py-1.5">HPA</span><span className="rounded-full border border-white/10 px-2.5 py-1.5">Ensembl REST</span></div>
-        </div>
-        <form onSubmit={submit} className="mt-3 flex max-w-xl gap-2">
-          <input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="TP53" className="min-w-0 flex-1 rounded-2xl border border-white/10 bg-white/[.06] px-3 py-2.5 text-[11px] font-black uppercase text-white outline-none focus:border-fuchsia-300/50" aria-label="Human gene symbol" />
-          <button disabled={loading || !query.trim()} className="rounded-2xl bg-white px-4 py-2.5 text-[10px] font-black text-neutral-950 disabled:opacity-40">{loading ? 'Loading…' : 'Load gene'}</button>
-        </form>
-      </header>
+          <form onSubmit={submit} className="mt-3 flex max-w-xl gap-2">
+            <input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="TP53" className="min-w-0 flex-1 rounded-2xl border border-white/10 bg-white/[.06] px-3 py-2.5 text-[11px] font-semibold uppercase text-white outline-none focus:border-fuchsia-300/50" aria-label="Human gene symbol" />
+            <button disabled={loading || !query.trim()} className="rounded-2xl bg-white px-4 py-2.5 text-[10px] font-semibold text-neutral-950 disabled:opacity-40">{loading ? 'Loading…' : 'Load gene'}</button>
+          </form>
+        </header>
 
-      {error && <div className="m-4 rounded-2xl border border-rose-300/20 bg-rose-400/10 p-3 text-[10px] font-semibold text-rose-100">{error}</div>}
+        {error && <div className="m-4 rounded-2xl border border-rose-300/20 bg-rose-400/10 p-3 text-[10px] font-semibold text-rose-100">{error}</div>}
 
-      {result && (
-        <div className="grid lg:grid-cols-[minmax(0,1.25fr)_minmax(330px,.75fr)]">
-          <div className="min-w-0 border-b border-white/10 p-4 lg:border-b-0 lg:border-r sm:p-5">
-            <div className="flex flex-wrap items-end justify-between gap-3">
-              <div><div className="text-[9px] font-black uppercase tracking-[.15em] text-white/35">Human gene</div><div className="mt-1 text-3xl font-black tracking-[-.045em]">{result.symbol}</div><div className="mt-1 font-mono text-[9px] text-fuchsia-200">{result.ensemblId}</div></div>
-              <a href={`${HPA_BASE}/${result.ensemblId}`} target="_blank" rel="noreferrer" className="rounded-full border border-white/10 bg-white/[.05] px-3 py-2 text-[9px] font-black text-white/70">Open HPA record ↗</a>
-            </div>
-            <p className="mt-3 text-[11px] leading-relaxed text-white/62">{result.description}</p>
-
-            <div className="mt-4 grid grid-cols-2 gap-2 sm:grid-cols-4">
-              {[['Chromosome', result.chromosome], ['Position', result.position], ['Biotype', result.lookup?.biotype || '—'], ['Protein class', result.proteinClass]].map(([label, value]) => <div key={label} className="rounded-[18px] border border-white/[.08] bg-white/[.035] p-3"><div className="text-[8px] font-black uppercase tracking-[.12em] text-white/32">{label}</div><div className="mt-1 line-clamp-3 text-[10px] font-black text-white/82">{value}</div></div>)}
-            </div>
-
-            <div className="mt-4">
-              <div className="flex items-center justify-between gap-3"><div><div className="text-[9px] font-black uppercase tracking-[.15em] text-white/35">Subcellular microscopy</div><div className="mt-1 text-[13px] font-black">Human Protein Atlas assay images</div></div>{result.images.length > 0 && <div className="text-[9px] font-black text-white/35">{imageIndex + 1}/{result.images.length}</div>}</div>
-              {currentImage ? (
-                <div className="mt-3 overflow-hidden rounded-[22px] border border-white/10 bg-black">
-                  <img src={currentImage} alt={`Human Protein Atlas microscopy for ${result.symbol}`} className="aspect-[4/3] w-full object-contain" loading="lazy" referrerPolicy="no-referrer" />
-                </div>
-              ) : (
-                <div className="mt-3 grid min-h-64 place-items-center rounded-[22px] border border-dashed border-white/15 bg-white/[.025] p-6 text-center"><div><div className="text-[11px] font-black text-white/70">Microscopy link not exposed to this browser session</div><p className="mt-2 max-w-md text-[9px] leading-relaxed text-white/40">The HPA gene metadata remains live. Use “Open HPA record” for the source microscopy if cross-origin XML access is blocked.</p></div></div>
-              )}
-              {result.images.length > 1 && <div className="no-scrollbar mt-2 flex gap-2 overflow-x-auto">{result.images.map((url, index) => <button key={url} onClick={() => setImageIndex(index)} className={`h-12 w-16 shrink-0 overflow-hidden rounded-lg border ${index === imageIndex ? 'border-fuchsia-300' : 'border-white/10'}`}><img src={url} alt="" className="h-full w-full object-cover" loading="lazy" referrerPolicy="no-referrer" /></button>)}</div>}
-            </div>
-          </div>
-
-          <aside className="min-w-0 bg-[#0b0f13] p-4 sm:p-5">
-            <div className="text-[9px] font-black uppercase tracking-[.15em] text-white/35">Genomic sequence</div>
-            <h3 className="mt-1 text-[15px] font-black">Actual Ensembl sequence response</h3>
-            <p className="mt-1 text-[9px] leading-relaxed text-white/42">The viewer shows only the first 600 bases to keep the page usable. It does not invent variants or claim sequencing was performed on the user.</p>
-            {rows.length > 0 ? (
-              <div className="mt-3 max-h-[510px] overflow-auto rounded-[20px] border border-white/[.08] bg-black/35 p-3 font-mono text-[9px] leading-5">
-                {rows.map((row) => <div key={row.start} className="flex gap-3"><span className="w-10 shrink-0 text-right text-white/25">{row.start}</span><span className="break-all tracking-[.08em] text-emerald-200/85">{row.seq}</span></div>)}
+        {result && (
+          <div className="grid lg:grid-cols-[minmax(0,1.25fr)_minmax(330px,.75fr)]">
+            <div className="min-w-0 border-b border-white/10 p-4 lg:border-b-0 lg:border-r sm:p-5">
+              <div className="flex flex-wrap items-end justify-between gap-3">
+                <div><div className="text-[9px] font-medium uppercase tracking-[.14em] text-white/35">Human gene</div><div className="mt-1 text-3xl font-semibold tracking-tight">{result.symbol}</div><div className="mt-1 font-mono text-[9px] text-fuchsia-200">{result.ensemblId}</div></div>
+                <a href={`${HPA_BASE}/${result.ensemblId}`} target="_blank" rel="noreferrer" className="rounded-full border border-white/10 bg-white/[.05] px-3 py-2 text-[9px] font-semibold text-white/70">Open HPA record ↗</a>
               </div>
-            ) : <div className="mt-3 rounded-[20px] border border-white/[.08] bg-white/[.025] p-4 text-[9px] text-white/45">Ensembl sequence endpoint did not return a sequence for this record.</div>}
-            <div className="mt-3 flex flex-wrap gap-2">
-              <a href={`https://www.ensembl.org/Homo_sapiens/Gene/Summary?g=${encodeURIComponent(result.ensemblId)}`} target="_blank" rel="noreferrer" className="rounded-full bg-white px-3 py-2 text-[9px] font-black text-neutral-950">Ensembl ↗</a>
-              <a href={`${HPA_BASE}/${result.ensemblId}`} target="_blank" rel="noreferrer" className="rounded-full border border-white/10 px-3 py-2 text-[9px] font-black text-white/70">HPA ↗</a>
+              <p className="mt-3 text-[11px] leading-relaxed text-white/62">{result.description}</p>
+
+              <div className="mt-4 grid grid-cols-2 gap-2 sm:grid-cols-4">
+                {[['Chromosome', result.chromosome], ['Position', result.position], ['Biotype', result.lookup?.biotype || '—'], ['Protein class', result.proteinClass]].map(([label, value]) => <div key={label} className="rounded-[18px] border border-white/[.08] bg-white/[.035] p-3"><div className="text-[8px] font-medium uppercase tracking-[.1em] text-white/32">{label}</div><div className="mt-1 line-clamp-3 text-[10px] font-semibold text-white/82">{value}</div></div>)}
+              </div>
+
+              <div className="mt-4">
+                <div className="flex items-center justify-between gap-3"><div><div className="text-[9px] font-medium uppercase tracking-[.14em] text-white/35">Real-source microscopy</div><div className="mt-1 text-[13px] font-semibold">Human Protein Atlas assay images</div></div>{result.images.length > 0 && <div className="text-[9px] font-medium text-white/35">{imageIndex + 1}/{result.images.length}</div>}</div>
+                {currentImage ? (
+                  <div className="mt-3 overflow-hidden rounded-[22px] border border-white/10 bg-black">
+                    <img src={currentImage} alt={`Human Protein Atlas microscopy for ${result.symbol}`} className="aspect-[4/3] w-full object-contain" loading="lazy" referrerPolicy="no-referrer" />
+                  </div>
+                ) : (
+                  <div className="mt-3 grid min-h-64 place-items-center rounded-[22px] border border-dashed border-white/15 bg-white/[.025] p-6 text-center"><div><div className="text-[11px] font-semibold text-white/70">Microscopy link not exposed to this browser session</div><p className="mt-2 max-w-md text-[9px] leading-relaxed text-white/40">The HPA gene metadata remains live. Use “Open HPA record” for the source microscopy if cross-origin XML access is blocked.</p></div></div>
+                )}
+                {result.images.length > 1 && <div className="no-scrollbar mt-2 flex gap-2 overflow-x-auto">{result.images.map((url, index) => <button key={url} onClick={() => setImageIndex(index)} className={`h-12 w-16 shrink-0 overflow-hidden rounded-lg border ${index === imageIndex ? 'border-fuchsia-300' : 'border-white/10'}`}><img src={url} alt="" className="h-full w-full object-cover" loading="lazy" referrerPolicy="no-referrer" /></button>)}</div>}
+              </div>
             </div>
-          </aside>
-        </div>
-      )}
-    </section>
+
+            <aside className="min-w-0 bg-[#0b0f13] p-4 sm:p-5">
+              <div className="text-[9px] font-medium uppercase tracking-[.14em] text-white/35">Genomic sequence</div>
+              <h3 className="mt-1 text-[15px] font-semibold">Actual Ensembl sequence response</h3>
+              <p className="mt-1 text-[9px] leading-relaxed text-white/42">The viewer shows only the first 600 bases to keep the page usable. It does not invent variants or claim sequencing was performed on the user.</p>
+              {rows.length > 0 ? (
+                <div className="mt-3 max-h-[510px] overflow-auto rounded-[20px] border border-white/[.08] bg-black/35 p-3 font-mono text-[9px] leading-5">
+                  {rows.map((row) => <div key={row.start} className="flex gap-3"><span className="w-10 shrink-0 text-right text-white/25">{row.start}</span><span className="break-all tracking-[.08em] text-emerald-200/85">{row.seq}</span></div>)}
+                </div>
+              ) : <div className="mt-3 rounded-[20px] border border-white/[.08] bg-white/[.025] p-4 text-[9px] text-white/45">Ensembl sequence endpoint did not return a sequence for this record.</div>}
+              <div className="mt-3 flex flex-wrap gap-2">
+                <a href={`https://www.ensembl.org/Homo_sapiens/Gene/Summary?g=${encodeURIComponent(result.ensemblId)}`} target="_blank" rel="noreferrer" className="rounded-full bg-white px-3 py-2 text-[9px] font-semibold text-neutral-950">Ensembl ↗</a>
+                <a href={`${HPA_BASE}/${result.ensemblId}`} target="_blank" rel="noreferrer" className="rounded-full border border-white/10 px-3 py-2 text-[9px] font-semibold text-white/70">HPA ↗</a>
+              </div>
+            </aside>
+          </div>
+        )}
+      </section>
+    </div>
   )
 }
 
