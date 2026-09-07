@@ -4,30 +4,20 @@ import { KESENANGAN, WARNA, tawaranHariIni, hariIniSelesai, tandai } from '../li
 import { Cincin, Gelembung } from './Rupa'
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Ubin yang membuka beranda.
+// Optional daily prompts at the start of Home.
 //
-// Sebelumnya yang pertama terlihat di beranda adalah grafik denyut dan tekanan
-// darah. Sekarang yang pertama terlihat adalah tiga hal kecil yang bisa
-// dilakukan sekarang dan terasa enak. Alasannya panjang dan ditulis di kepala
-// lib/semangat.ts; ringkasnya: aplikasi yang menyapa dengan angka penyakit
-// membuat orang merasa seperti pasien, dan orang yang merasa seperti pasien
-// menutup aplikasinya.
-//
-// WARNANYA BERBEDA-BEDA DENGAN SENGAJA. Beranda satu warna terbaca seperti
-// borang. Tiap kartu membawa warnanya sendiri, dan warna itu melekat pada
-// jenis kegiatannya sehingga lama-lama dikenali tanpa dibaca.
-//
-// TIDAK ADA YANG BISA GAGAL DI LAYAR INI. Tidak ada rangkaian yang putus,
-// tidak ada target yang meleset, tidak ada warna merah. Yang belum dilakukan
-// tampak persis seperti tawaran yang belum diambil — karena memang itu.
+// The art stays expressive — color, bubbles and a simple completion ring — but
+// the copy must remain literal. Completing a prompt is not a health score, a
+// success score or evidence that the day is “good”. These are optional actions,
+// not clinical advice or a behavioural judgement.
 // ─────────────────────────────────────────────────────────────────────────────
 
 function sapaan(jam: number): string {
-  if (jam < 4) return 'Still up'
+  if (jam < 4) return 'Late night'
   if (jam < 11) return 'Good morning'
   if (jam < 15) return 'Good afternoon'
   if (jam < 19) return 'Good evening'
-  return 'Winding down'
+  return 'Evening'
 }
 
 export function UbinSemangat() {
@@ -48,24 +38,21 @@ export function UbinSemangat() {
         </Link>
       </div>
 
-      {/* overflow-hidden supaya gelembung dekoratifnya terpotong rapi oleh
-          lengkung kartunya sendiri, bukan meluber ke halaman. */}
       <div className="kaca relative overflow-hidden rounded-3xl p-3">
         <Gelembung warna="bg-amber-300/30" kelas="-right-8 -top-10 h-28 w-28" />
         <Gelembung warna="bg-sky-300/25" kelas="-left-10 top-16 h-24 w-24" />
 
         <div className="relative flex items-center gap-3">
-          {/* Cincin, bukan angka: pertanyaan yang sebenarnya diajukan orang
-              adalah "sudahkah aku melakukan sesuatu hari ini", dan itu dijawab
-              bentuk jauh lebih cepat daripada pecahan 2/3. */}
-          <Cincin isi={jumlah / 3} ukuran={46} tebal={6}
-            anak={<span aria-hidden className="text-[16px]">{jumlah === 3 ? '🎉' : '✨'}</span>} />
-          <p className="t-sedang min-w-0 flex-1 font-black leading-snug text-ink dark:text-white">
-            {jumlah === 0 && 'Three small things, if you feel like it.'}
-            {jumlah === 1 && 'One done. That already counts.'}
-            {jumlah === 2 && 'Two done. Nice day so far.'}
-            {jumlah === 3 && 'All three. Go enjoy the rest of it.'}
-          </p>
+          <Cincin isi={jumlah / Math.max(1, tawaran.length)} ukuran={46} tebal={6}
+            anak={<span aria-hidden className="text-[16px]">{jumlah === tawaran.length ? '✓' : '✨'}</span>} />
+          <div className="min-w-0 flex-1">
+            <p className="t-sedang font-black leading-snug text-ink dark:text-white">
+              {jumlah} of {tawaran.length} optional prompts logged
+            </p>
+            <p className="t-mikro mt-0.5 leading-snug text-neutral-500 dark:text-neutral-400">
+              Completion is not a health score. Use only what is useful today.
+            </p>
+          </div>
         </div>
 
         <div className="relative mt-2.5 space-y-2">
@@ -76,8 +63,6 @@ export function UbinSemangat() {
             return (
               <div key={k.id} className={`rounded-2xl p-3 transition ${w.bg}`}>
                 <div className="flex items-start gap-2.5">
-                  {/* Tombolnya besar dan bundar: yang paling sering ditekan di
-                      layar ini, jadi ia yang paling mudah dikenai jempol. */}
                   <button
                     onClick={() => setSelesai(tandai(k.id))}
                     aria-pressed={sudah}
@@ -101,7 +86,7 @@ export function UbinSemangat() {
                       {k.ajakan}
                     </span>
                     <span className="mt-1 inline-flex items-center gap-1 rounded-full bg-white/60 px-2 py-0.5 text-[10px] font-black text-ink/70 dark:bg-white/10 dark:text-neutral-300">
-                      {k.menit} min · why ▾
+                      ~{k.menit} min · context ▾
                     </span>
                   </button>
                 </div>
@@ -111,7 +96,7 @@ export function UbinSemangat() {
                     <p className="text-[11.5px] leading-relaxed text-ink dark:text-neutral-200">{k.kenapa}</p>
                     {k.ke && (
                       <Link to={k.ke} className="mt-1.5 inline-flex min-h-[36px] items-center text-[11.5px] font-bold text-brand-dark dark:text-brand">
-                        Open the full thing →
+                        Open related tool →
                       </Link>
                     )}
                   </div>
@@ -122,8 +107,7 @@ export function UbinSemangat() {
         </div>
 
         <p className="t-mikro relative mt-2.5 leading-snug text-neutral-500">
-          Nothing here can be broken or lost. A day with none of these is still a fine day — these are offers, not
-          tasks, and there are {KESENANGAN.length} of them that take turns.
+          {KESENANGAN.length} prompts rotate by date. They are suggestions only and do not replace medical advice, treatment, or your own priorities.
         </p>
       </div>
     </section>
