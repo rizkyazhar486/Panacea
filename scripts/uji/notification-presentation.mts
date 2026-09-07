@@ -13,6 +13,7 @@ import { DEFAULT_NOTIFICATION_SETTINGS } from '../../src/lib/notificationEngine.
 assert.equal(normalizeNotificationRoute('https://panaceamed.id/#/owner'), '/owner')
 assert.equal(normalizeNotificationRoute('/latihan?t=analisis'), '/latihan?t=analisis')
 assert.equal(normalizeNotificationRoute('https://external.example/path'), null)
+assert.equal(normalizeNotificationRoute('//external.example/path'), null)
 assert.equal(normalizeNotificationRoute('javascript:alert(1)'), null)
 
 const base: UnifiedNotification = {
