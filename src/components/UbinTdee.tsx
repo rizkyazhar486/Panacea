@@ -9,25 +9,7 @@ import {
   type TujuanGizi,
   type TingkatAktivitas,
 } from '../lib/tdee'
-
-// ─────────────────────────────────────────────────────────────────────────────
-// Ubin TDEE — kalkulator kalori dan makro yang tinggal di beranda.
-//
-// Halaman Macro Lab sudah menghitung semuanya, tetapi angka yang harus dicari
-// lewat tiga ketukan adalah angka yang tidak pernah dilihat. Yang menentukan
-// pilihan makan adalah tahu sasaran kalori dan gram protein hari ini SEBELUM
-// memilih, bukan sesudah.
-//
-// Rumusnya TIDAK disalin: ia dipanggil dari lib/tdee.ts yang sama dengan yang
-// dipakai halaman. Dua salinan rumus pasti akan berbeda suatu hari, dan dua
-// angka kalori yang bertentangan di aplikasi yang sama lebih buruk daripada
-// tidak ada angka sama sekali.
-//
-// TUJUAN dan TINGKAT AKTIVITAS diubah langsung di ubin dan disimpan, sebab
-// keduanya berubah jauh lebih sering daripada berat dan tinggi — dan menyuruh
-// orang membuka halaman lain hanya untuk mengganti "defisit" menjadi "rawat"
-// adalah cara paling pasti membuat angkanya menjadi usang.
-// ─────────────────────────────────────────────────────────────────────────────
+import '../styles/widget-concepts-v6.css'
 
 const KUNCI = 'pmd_tdee_pilihan_v1'
 
@@ -48,17 +30,13 @@ function muatPilihan(): Pilihan {
       return { tujuan, aktivitas }
     }
   } catch {
-    /* penyimpanan tidak tersedia — pakai bawaan */
+    /* storage unavailable */
   }
   return { tujuan: 'rawat', aktivitas: 'sedang' }
 }
 
 function simpanPilihan(p: Pilihan) {
-  try {
-    localStorage.setItem(KUNCI, JSON.stringify(p))
-  } catch {
-    /* abaikan */
-  }
+  try { localStorage.setItem(KUNCI, JSON.stringify(p)) } catch { /* ignore */ }
 }
 
 export function UbinTdee() {
@@ -66,24 +44,18 @@ export function UbinTdee() {
   const [berat] = useVitalField('weightKg', demo.weightKg || 0)
   const [tinggi] = useVitalField('heightCm', demo.heightCm || 0)
   const [pilihan, setPilihan] = useState<Pilihan>(muatPilihan)
-
   const umur = demo.age || 0
-
-  // Tanpa berat dan tinggi, angkanya hanya akan menjadi tebakan yang tampak
-  // seperti pengukuran. Lebih baik ubin ini meminta datanya daripada
-  // menampilkan 70 kg milik orang lain.
   const lengkap = berat > 0 && tinggi > 0 && umur > 0
 
   const h = useMemo(
-    () =>
-      hitungTdee({
-        beratKg: berat,
-        tinggiCm: tinggi,
-        umur,
-        sex: demo.sex,
-        tujuan: pilihan.tujuan,
-        aktivitas: pilihan.aktivitas,
-      }),
+    () => hitungTdee({
+      beratKg: berat,
+      tinggiCm: tinggi,
+      umur,
+      sex: demo.sex,
+      tujuan: pilihan.tujuan,
+      aktivitas: pilihan.aktivitas,
+    }),
     [berat, tinggi, umur, demo.sex, pilihan],
   )
 
@@ -95,122 +67,90 @@ export function UbinTdee() {
 
   if (!lengkap) {
     return (
-      <section>
+      <section className="pw-concept">
         <div className="mb-2 flex items-baseline justify-between gap-2">
-          <h2 className="t-kecil font-black uppercase tracking-wide text-neutral-500">Daily energy</h2>
-          <Link to="/profil" className="t-kecil flex min-h-[40px] items-center font-bold text-brand">
-            Open →
-          </Link>
+          <h2 className="t-kecil font-black uppercase tracking-wide text-neutral-500">Metabolic compass</h2>
+          <Link to="/profil" className="t-kecil flex min-h-[40px] items-center font-bold text-brand">Complete profile →</Link>
         </div>
-        <div className="kaca rounded-3xl p-3">
-          <p className="t-kecil leading-snug text-neutral-500">
-            Needs your weight, height, and age. Without all three this would be someone else&apos;s number wearing your
-            name.
-          </p>
-        </div>
+        <p className="t-kecil leading-snug text-neutral-500">Weight, height and age are needed before Panacea can build your energy compass.</p>
       </section>
     )
   }
 
-  const bar = [
-    { l: 'Protein', g: h.proteinG, pct: h.pctP, kelas: 'bg-emerald-500' },
-    { l: 'Carbs', g: h.karboG, pct: h.pctK, kelas: 'bg-sky-500' },
-    { l: 'Fat', g: h.lemakG, pct: h.pctL, kelas: 'bg-amber-500' },
+  const makro = [
+    { l: 'Protein', g: h.proteinG, pct: h.pctP, color: '#10b981' },
+    { l: 'Carbs', g: h.karboG, pct: h.pctK, color: '#38bdf8' },
+    { l: 'Fat', g: h.lemakG, pct: h.pctL, color: '#f59e0b' },
   ]
+  const ringPct = Math.max(0, Math.min(100, Math.round((h.target / Math.max(1, h.tdee)) * 100)))
 
   return (
-    <section>
-      <div className="mb-2 flex items-baseline justify-between gap-2">
-        <h2 className="t-kecil font-black uppercase tracking-wide text-neutral-500">Daily energy</h2>
-        <Link to="/macro-lab" className="t-kecil flex min-h-[40px] items-center font-bold text-brand">
-          Open →
-        </Link>
+    <section className="pw-concept pw-metabolic">
+      <div className="flex items-center justify-between gap-2">
+        <div>
+          <div className="t-mikro font-black uppercase tracking-[.15em] text-teal-500">Metabolic compass</div>
+          <div className="t-kecil mt-1 font-bold text-neutral-500">Daily energy direction, not a calorie verdict</div>
+        </div>
+        <Link to="/macro-lab" className="t-kecil flex min-h-[40px] items-center font-bold text-brand">Open →</Link>
       </div>
 
-      <div className="kaca rounded-3xl p-3">
-        {/* Tiga angka besar lebih dahulu — inilah yang dicari orang. */}
-        <div className="grid grid-cols-3 gap-2 text-center">
-          {[
-            { l: 'BMR', v: h.bmr },
-            { l: 'TDEE', v: h.tdee },
-            { l: 'Target', v: h.target },
-          ].map((k) => (
-            <div key={k.l} className="rounded-2xl bg-white/60 p-2 dark:bg-white/5">
-              <div className="t-mikro font-bold uppercase tracking-wide text-neutral-400">{k.l}</div>
-              <div className="text-[19px] font-black leading-tight tabular-nums text-ink dark:text-white">
-                {k.v.toLocaleString()}
-              </div>
-              <div className="t-mikro text-neutral-400">kcal</div>
+      <div className="pw-metabolic-top">
+        <div>
+          <div className="pw-metabolic-target text-ink dark:text-white">{h.target.toLocaleString()}</div>
+          <div className="pw-metabolic-sub">kcal target today</div>
+        </div>
+        <div className="pw-metabolic-ring" style={{ '--p': ringPct } as React.CSSProperties} aria-label={`${ringPct}% of maintenance energy`}>
+          <div className="pw-metabolic-ring-center">
+            <span className="pw-metabolic-ring-big text-ink dark:text-white">{ringPct}%</span>
+            <span className="pw-metabolic-ring-small">of TDEE</span>
+          </div>
+        </div>
+      </div>
+
+      <div className="pw-metabolic-baseline">
+        <div>
+          <div className="pw-metabolic-key">Resting engine</div>
+          <div className="pw-metabolic-value text-ink dark:text-white">{h.bmr.toLocaleString()} kcal</div>
+        </div>
+        <div>
+          <div className="pw-metabolic-key">Maintenance field</div>
+          <div className="pw-metabolic-value text-ink dark:text-white">{h.tdee.toLocaleString()} kcal</div>
+        </div>
+      </div>
+
+      <div>
+        <div className="pw-macro-road" aria-hidden>
+          {makro.map((m) => <span key={m.l} style={{ width: `${m.pct}%`, background: m.color }} />)}
+        </div>
+        <div className="pw-macro-legend mt-2">
+          {makro.map((m) => (
+            <div key={m.l} className="pw-macro-item">
+              <span className="pw-macro-name">{m.l}</span>
+              <span className="pw-macro-grams text-ink dark:text-white">{m.g} g</span>
             </div>
           ))}
         </div>
+      </div>
 
-        {/* Satu batang bertumpuk: proporsi makro terbaca sekali lihat. */}
-        <div className="mt-3">
-          <span className="flex h-2.5 overflow-hidden rounded-full bg-neutral-200 dark:bg-white/10" aria-hidden>
-            {bar.map((b) => (
-              <span key={b.l} className={b.kelas} style={{ width: `${b.pct}%` }} />
-            ))}
-          </span>
-          <div className="mt-2 grid grid-cols-3 gap-2">
-            {bar.map((b) => (
-              <div key={b.l}>
-                <div className="flex items-center gap-1">
-                  <span className={`h-2 w-2 shrink-0 rounded-full ${b.kelas}`} aria-hidden />
-                  <span className="t-mikro font-bold text-neutral-500">{b.l}</span>
-                </div>
-                <div className="t-kecil font-black tabular-nums text-ink dark:text-white">{b.g} g</div>
-                <div className="t-mikro tabular-nums text-neutral-400">{b.pct}%</div>
-              </div>
-            ))}
-          </div>
-        </div>
+      <div className="flex items-center justify-between gap-3 text-[9px] font-bold text-neutral-500">
+        <span>Fibre {h.seratG} g</span>
+        <span>Water {h.airL} L</span>
+        <span>Protein range {h.proteinLo}-{h.proteinHi} g</span>
+      </div>
 
-        <div className="mt-3 flex items-baseline justify-between gap-2 border-t border-neutral-200 pt-2 dark:border-white/10">
-          <span className="t-mikro font-bold text-neutral-500">Fibre {h.seratG} g</span>
-          <span className="t-mikro font-bold text-neutral-500">Water {h.airL} L</span>
-          <span className="t-mikro font-bold text-neutral-500">
-            Protein {h.proteinLo}-{h.proteinHi} g
-          </span>
-        </div>
-
-        <div className="mt-2 flex flex-wrap gap-1">
-          {TUJUAN_GIZI.map((t) => (
-            <button
-              key={t.id}
-              onClick={() => ubah({ tujuan: t.id })}
-              aria-pressed={pilihan.tujuan === t.id}
-              className={`t-mikro min-h-[36px] rounded-full px-2.5 font-bold ${
-                pilihan.tujuan === t.id
-                  ? 'bg-brand text-white'
-                  : 'bg-neutral-100 text-neutral-600 dark:bg-white/10 dark:text-neutral-300'
-              }`}
-            >
-              {t.label}
-            </button>
-          ))}
-        </div>
-        <div className="mt-1 flex flex-wrap gap-1">
-          {AKTIVITAS_GIZI.map((a) => (
-            <button
-              key={a.id}
-              onClick={() => ubah({ aktivitas: a.id })}
-              aria-pressed={pilihan.aktivitas === a.id}
-              className={`t-mikro min-h-[36px] rounded-full px-2.5 font-bold ${
-                pilihan.aktivitas === a.id
-                  ? 'bg-brand text-white'
-                  : 'bg-neutral-100 text-neutral-600 dark:bg-white/10 dark:text-neutral-300'
-              }`}
-            >
-              {a.label}
-            </button>
-          ))}
-        </div>
-
-        <p className="t-mikro mt-2 leading-snug text-neutral-400">
-          Mifflin-St Jeor for BMR, then an activity factor. Both carry real error — the activity factor especially. Treat
-          this as a starting point to adjust against your own weight trend, not a measurement.
-        </p>
+      <div className="pw-metabolic-controls">
+        {TUJUAN_GIZI.map((t) => (
+          <button key={t.id} onClick={() => ubah({ tujuan: t.id })} aria-pressed={pilihan.tujuan === t.id} className="pw-metabolic-chip">
+            {t.label}
+          </button>
+        ))}
+      </div>
+      <div className="flex flex-wrap gap-1.5">
+        {AKTIVITAS_GIZI.map((a) => (
+          <button key={a.id} onClick={() => ubah({ aktivitas: a.id })} aria-pressed={pilihan.aktivitas === a.id} className="pw-metabolic-chip flex-1">
+            {a.label}
+          </button>
+        ))}
       </div>
     </section>
   )
