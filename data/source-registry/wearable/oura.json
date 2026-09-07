@@ -2,7 +2,7 @@
   "id": "oura_api_v2",
   "name": "Oura API V2",
   "category": "wearable",
-  "kind": ["api", "mcp-compatible-policy-boundary"],
+  "kind": ["api"],
   "homepage": "https://cloud.ouraring.com/v2/docs",
   "repository": null,
   "features": ["oura", "sleep", "readiness", "activity", "heart-rate", "workout", "session", "spo2", "stress", "resilience", "cardiovascular-age", "wearable-sync"],
@@ -11,7 +11,7 @@
     "runtime": true,
     "buildTime": false,
     "networkRequired": true,
-    "notes": "Use Oura API V2 only through a server-side OAuth/API adapter for deterministic Panacea application features. V2 is the current Oura API integration point; V1 is sunset. Do not expose client secrets or long-lived credentials in the Vite bundle or browser storage. Oura API-derived User Data/Oura Data must not be routed into an AI model, AI platform, prompt, embedding pipeline, evaluation set or training/fine-tuning workflow. If a future Panacea feature legitimately needs Oura data in an LLM context, evaluate Oura's MCP Server path separately under the current Oura API and MCP Agreement, user consent and legal review; do not repurpose the REST API path for AI use."
+    "notes": "Use Oura API V2 only through a server-side OAuth/API adapter for deterministic Panacea application features. V2 is the current Oura API integration point; V1 is sunset. Do not expose client secrets or long-lived credentials in the Vite bundle or browser storage. Oura API-derived User Data/Oura Data must not be routed into an AI model, AI platform, prompt, embedding pipeline, evaluation set or training/fine-tuning workflow. The agreement effective 2026-06-08 prohibits API data from being used as AI input and prohibits training, fine-tuning, evaluation and persistent model representations. If a future Panacea feature legitimately needs Oura data in an LLM context, evaluate Oura's MCP Server path separately under the current agreement, user consent and legal review; do not repurpose the REST API path for AI use."
   },
   "license": {
     "status": "CHECK_REQUIRED",
@@ -22,7 +22,7 @@
     "scope": "Oura API and MCP access is contractual rather than open-data licensed. The agreement effective 2026-06-08 defines authorized purposes, user-consent obligations, confidentiality/security duties, AI restrictions, redistribution limits, anti-aggregation restrictions, branding requirements and restrictions on charging users for access to Oura API/MCP/Oura Platform functionality. Panacea must not sell, redistribute or expose Oura User Data/Oura Data as a data product and must keep independent Panacea functionality legally and technically separable from access to Oura-provided functionality.",
     "verificationUrl": "https://cloud.ouraring.com/legal/api-agreement",
     "verifiedAt": "2026-09-08",
-    "notes": "Re-check the current agreement, privacy policy, branding guidelines, application approval requirements, retention/deletion duties and any product-specific restrictions before production. Agreement terms may change and take precedence over this registry summary."
+    "notes": "Re-check the current agreement, privacy policy, branding guidelines, application approval requirements, retention/deletion duties and any product-specific restrictions before production. Agreement terms may change and take precedence over this registry summary. Do not use API-derived Oura data for AI/LLM input; where Oura permits LLM use for a non-aggregator, it is through the MCP Server path and remains separately governed."
   },
   "validation": {
     "level": "REFERENCE",
@@ -39,16 +39,7 @@
     "status": "PLANNED",
     "normalizedTarget": "PanaceaWearableObservation",
     "module": null,
-    "notes": "Planned REST flow: server-side OAuth 2.0 authorization-code exchange with CSRF state -> encrypted token storage -> least-privilege scopes -> incremental API V2 synchronization -> deterministic/source-aware normalization -> PanaceaWearableObservation. API-derived Oura User Data/Oura Data is explicitly excluded from Panacea AI/LLM/embedding/evaluation/training paths. If an AI-assisted Oura feature is later proposed, implement it as a separate reviewed MCP integration rather than forwarding REST API payloads to an AI model. Enforce consent, retention/deletion, revocation and data-minimization rules; never log secrets or sensitive payloads."
-  },
-  "aiBoundary": {
-    "restApiToAiAllowed": false,
-    "trainingAllowed": false,
-    "fineTuningAllowed": false,
-    "embeddingAllowed": false,
-    "evaluationDatasetAllowed": false,
-    "mcpReviewRequired": true,
-    "notes": "The Oura agreement effective 2026-06-08 prohibits using Oura API User Data/Oura Data to train, fine-tune, develop, improve or evaluate AI systems and states that Oura API data must not be provided as input to an AI Model/AI Platform. Non-aggregator LLM use, where permitted, is through Oura's MCP Server and remains subject to the agreement. Aggregator use has additional restrictions and must not relay Oura data to AI systems. Fail closed when integration classification or permitted purpose is uncertain."
+    "notes": "Planned REST flow: server-side OAuth 2.0 authorization-code exchange with CSRF state -> encrypted token storage -> least-privilege scopes -> incremental API V2 synchronization -> deterministic/source-aware normalization -> PanaceaWearableObservation. API-derived Oura User Data/Oura Data is explicitly excluded from Panacea AI/LLM/prompt/embedding/evaluation/training paths. Training, fine-tuning, evaluation datasets and persistent AI representations are not allowed. If an AI-assisted Oura feature is later proposed, implement it as a separate reviewed MCP integration rather than forwarding REST API payloads to an AI model. Enforce consent, retention/deletion, revocation and data-minimization rules; never log secrets or sensitive payloads. Fail closed when integration classification or permitted purpose is uncertain."
   },
   "trust": {
     "authority": 5,
