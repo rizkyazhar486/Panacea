@@ -7,6 +7,8 @@ if (process.env.NODE_ENV === 'production' && !process.env.JWT_SECRET) {
   throw new Error('FATAL: JWT_SECRET must be set in production. Refusing to start with the insecure development default.')
 }
 
+const genomicsTimeout = Number(process.env.GENOMICS_WORKER_TIMEOUT_MS)
+
 export const config = {
   port: Number(process.env.PORT) || 8787,
   corsOrigins: (process.env.CORS_ORIGINS || 'http://localhost:5173')
@@ -32,6 +34,17 @@ export const config = {
     subject: process.env.VAPID_SUBJECT || 'mailto:admin@panaceamed.id',
   },
   emailFrom: process.env.EMAIL_FROM || 'Panaceamed.id <onboarding@resend.dev>',
+  // Render is the public backend/control plane. Heavy genomic jobs can be
+  // delegated to a private worker without exposing worker credentials to the
+  // browser. Empty worker URL means "unavailable", never simulated success.
+  genomics: {
+    workerUrl: (process.env.GENOMICS_WORKER_URL || '').replace(/\/+$/, ''),
+    workerToken: process.env.GENOMICS_WORKER_TOKEN || '',
+    provider: process.env.GENOMICS_WORKER_PROVIDER || 'render-worker',
+    timeoutMs: Number.isFinite(genomicsTimeout)
+      ? Math.max(5_000, Math.min(120_000, genomicsTimeout))
+      : 30_000,
+  },
   // ICD-11 WHO. Gratis, tapi lewat OAuth2 client credentials yang perlu
   // didaftarkan sekali di https://icd.who.int/icdapi. Kalau kosong, pencarian
   // diagnosis jatuh ke ICD-10-CM (NLM, tanpa kunci) dan layarnya berkata
@@ -51,4 +64,5 @@ export const features = {
   emailLive: Boolean(process.env.RESEND_API_KEY),
   payoutLive: Boolean(process.env.IRIS_API_KEY || process.env.IRIS_CREATOR_KEY),
   icd11Live: Boolean(process.env.WHO_ICD_CLIENT_ID && process.env.WHO_ICD_CLIENT_SECRET),
+  genomicsComputeLive: Boolean(config.genomics.workerUrl),
 }
