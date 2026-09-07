@@ -1,0 +1,553 @@
+/* Panacea Home + Widget HD v9
+   Optical-resolution pass only: no new JS, fetches, animation loops or assets.
+   Goals: sharper hierarchy, denser useful layout, better touch ergonomics,
+   stable mobile rendering, and consistent high-definition widget surfaces. */
+
+:root {
+  --pmd-hd-line: rgba(15, 23, 42, .105);
+  --pmd-hd-line-soft: rgba(15, 23, 42, .065);
+  --pmd-hd-surface: rgba(255, 255, 255, .91);
+  --pmd-hd-surface-soft: rgba(248, 250, 252, .82);
+  --pmd-hd-shadow: 0 12px 34px rgba(15, 23, 42, .065);
+}
+
+.dark {
+  --pmd-hd-line: rgba(255, 255, 255, .115);
+  --pmd-hd-line-soft: rgba(255, 255, 255, .072);
+  --pmd-hd-surface: rgba(10, 13, 20, .93);
+  --pmd-hd-surface-soft: rgba(255, 255, 255, .048);
+  --pmd-hd-shadow: 0 14px 38px rgba(0, 0, 0, .26);
+}
+
+/* ── Optical clarity ─────────────────────────────────────────────────────── */
+.panacea-home,
+.panacea-home .home-command-panel,
+.panacea-home .widget-instrument-v5 {
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.panacea-home {
+  --pmd-section-gap: clamp(15px, 2.4vw, 21px);
+}
+
+.panacea-home.space-y-5 > :not([hidden]) ~ :not([hidden]) {
+  margin-top: var(--pmd-section-gap) !important;
+}
+
+/* ── Home surfaces: clean depth, not layered blur ────────────────────────── */
+.panacea-home .home-command-panel,
+.panacea-home .home-loading-card {
+  border: 1px solid var(--pmd-hd-line) !important;
+  border-radius: 26px !important;
+  background: var(--pmd-hd-surface) !important;
+  box-shadow: var(--pmd-hd-shadow) !important;
+}
+
+.panacea-home .home-command-panel {
+  padding: clamp(14px, 2.6vw, 18px) !important;
+}
+
+.panacea-home .home-odyssey-hero {
+  border-color: color-mix(in srgb, var(--pmd-hd-line) 72%, transparent) !important;
+  box-shadow: 0 18px 56px rgba(20, 38, 84, .10), inset 0 1px 0 rgba(255,255,255,.72) !important;
+  backdrop-filter: blur(10px) saturate(112%) !important;
+  -webkit-backdrop-filter: blur(10px) saturate(112%) !important;
+}
+
+.dark .panacea-home .home-odyssey-hero {
+  box-shadow: 0 20px 62px rgba(0, 0, 0, .30), inset 0 1px 0 rgba(255,255,255,.075) !important;
+}
+
+.panacea-home .home-odyssey-title {
+  line-height: .99 !important;
+  letter-spacing: -.045em !important;
+  text-wrap: balance;
+}
+
+.panacea-home .home-odyssey-copy {
+  line-height: 1.55 !important;
+  text-wrap: pretty;
+}
+
+.panacea-home .home-odyssey-kicker {
+  border-color: var(--pmd-hd-line) !important;
+  letter-spacing: .135em !important;
+}
+
+/* Current signals: more data density, less glass cost. */
+.panacea-home .home-signal-card {
+  border-color: var(--pmd-hd-line) !important;
+  background: var(--pmd-hd-surface) !important;
+  box-shadow: 0 8px 24px rgba(15, 23, 42, .055) !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+.dark .panacea-home .home-signal-card {
+  background: rgba(10, 13, 20, .91) !important;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, .20) !important;
+}
+
+.panacea-home .home-signal-card > div:nth-child(2) {
+  font-family: var(--font-angka, ui-monospace, monospace);
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: 'tnum' 1, 'zero' 1;
+}
+
+/* ── Utility grid: many functions without visual noise ───────────────────── */
+.panacea-home .home-action-grid {
+  gap: 9px !important;
+}
+
+.panacea-home .home-action-card {
+  position: relative;
+  min-width: 0;
+  min-height: 72px !important;
+  gap: 10px !important;
+  border: 1px solid var(--pmd-hd-line-soft) !important;
+  border-radius: 19px !important;
+  background: var(--pmd-hd-surface-soft) !important;
+  padding: 10px 11px !important;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.45);
+}
+
+.dark .panacea-home .home-action-card {
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.035);
+}
+
+.panacea-home .home-action-card:hover {
+  border-color: color-mix(in srgb, #00bf63 30%, var(--pmd-hd-line)) !important;
+}
+
+.panacea-home .home-action-icon {
+  width: 42px !important;
+  height: 42px !important;
+  border-radius: 13px !important;
+  font-size: 19px !important;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.26), 0 6px 14px rgba(15,23,42,.09) !important;
+}
+
+.panacea-home .home-action-card span.min-w-0 > span:first-child {
+  font-family: var(--font-judul, ui-sans-serif, system-ui);
+  font-size: 11.5px !important;
+  letter-spacing: -.01em;
+}
+
+.panacea-home .home-action-card span.min-w-0 > span:nth-child(2) {
+  font-size: 9.5px !important;
+  line-height: 1.3;
+}
+
+.panacea-home .home-pill-button {
+  min-height: 42px !important;
+  white-space: nowrap;
+  border-color: var(--pmd-hd-line) !important;
+  background: var(--pmd-hd-surface-soft) !important;
+  padding-inline: 14px !important;
+}
+
+.panacea-home .home-details-summary {
+  border-radius: 16px;
+}
+
+.panacea-home .home-details-summary > div {
+  min-width: 0;
+}
+
+/* ── Living Instrument HD frame ──────────────────────────────────────────── */
+.panacea-home .widget-instrument-v5 {
+  gap: 11px !important;
+  min-width: 0;
+}
+
+.panacea-home .widget-instrument-head-v5 {
+  grid-template-columns: minmax(0, 1fr) auto !important;
+  gap: 10px !important;
+  padding: 1px 2px 0;
+}
+
+.panacea-home .widget-instrument-id-v5 {
+  gap: 10px !important;
+}
+
+.panacea-home .widget-instrument-icon-v5 {
+  width: 44px !important;
+  height: 44px !important;
+  border-width: 1px !important;
+  border-radius: 14px !important;
+  font-size: 19px !important;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.18) !important;
+}
+
+.panacea-home .widget-instrument-kicker-v5 {
+  font-size: 9px !important;
+  line-height: 1.05 !important;
+  letter-spacing: .145em !important;
+}
+
+.panacea-home .widget-instrument-title-v5 {
+  margin-top: 4px !important;
+  font-family: var(--font-judul, ui-sans-serif, system-ui);
+  font-size: clamp(16.5px, 4vw, 18.5px) !important;
+  line-height: 1.02 !important;
+  letter-spacing: -.025em !important;
+}
+
+.panacea-home .widget-instrument-state-v5 {
+  font-size: 9px !important;
+}
+
+.panacea-home .widget-instrument-count-v5,
+.panacea-home .widget-instrument-edit-v5 {
+  min-height: 36px;
+  border-color: var(--pmd-hd-line) !important;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.08);
+}
+
+.panacea-home .widget-instrument-shell-v5 {
+  contain: paint;
+  border: 1px solid var(--pmd-hd-line) !important;
+  border-radius: 27px !important;
+  background: linear-gradient(155deg, var(--pmd-hd-surface), color-mix(in srgb, var(--pmd-hd-surface) 91%, var(--wa-soft))) !important;
+  box-shadow: 0 13px 32px rgba(15,23,42,.065), inset 0 1px 0 rgba(255,255,255,.48) !important;
+}
+
+.dark .panacea-home .widget-instrument-shell-v5 {
+  box-shadow: 0 14px 34px rgba(0,0,0,.24), inset 0 1px 0 rgba(255,255,255,.045) !important;
+}
+
+.panacea-home .widget-instrument-shell-v5::before {
+  height: 3px !important;
+  opacity: .88;
+}
+
+.panacea-home .widget-instrument-shell-v5::after {
+  opacity: .52;
+}
+
+.panacea-home .widget-instrument-slide-v5 {
+  padding: clamp(14px, 3vw, 17px) !important;
+  scrollbar-gutter: stable;
+}
+
+/* Internal widget surface: one rhythm across all concepts. */
+.panacea-home .widget-instrument-slide-v5 section {
+  min-width: 0;
+}
+
+.panacea-home .widget-instrument-slide-v5 section > .kaca,
+.panacea-home .widget-instrument-slide-v5 section > .pw-concept {
+  border-radius: 20px !important;
+  padding: 14px !important;
+}
+
+.panacea-home .widget-instrument-slide-v5 section > div:first-child:not(.kaca):not(.pw-concept) {
+  min-width: 0;
+}
+
+.panacea-home .widget-instrument-slide-v5 section > .mb-2,
+.panacea-home .widget-instrument-slide-v5 section > .mb-3 {
+  min-height: 34px !important;
+  margin-bottom: 7px !important;
+  gap: 7px !important;
+}
+
+.panacea-home .widget-instrument-slide-v5 section > .mb-2 h2,
+.panacea-home .widget-instrument-slide-v5 section > .mb-3 h2 {
+  min-width: 0;
+  font-family: var(--font-judul, ui-sans-serif, system-ui);
+  font-size: 11px !important;
+  line-height: 1.2 !important;
+  letter-spacing: .085em !important;
+}
+
+.panacea-home .widget-instrument-slide-v5 section > .mb-2 a,
+.panacea-home .widget-instrument-slide-v5 section > .mb-2 button,
+.panacea-home .widget-instrument-slide-v5 section > .mb-3 a,
+.panacea-home .widget-instrument-slide-v5 section > .mb-3 button {
+  flex-shrink: 0;
+  min-height: 38px !important;
+  font-size: 10.5px !important;
+}
+
+/* Numbers: sharper and spatially stable when values update. */
+.panacea-home .widget-instrument-slide-v5 .tabular-nums,
+.panacea-home .widget-instrument-slide-v5 [class*='text-[26px]'],
+.panacea-home .widget-instrument-slide-v5 [class*='text-[27px]'],
+.panacea-home .widget-instrument-slide-v5 [class*='text-[30px]'] {
+  font-family: var(--font-angka, ui-monospace, monospace);
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: 'tnum' 1, 'zero' 1;
+  letter-spacing: -.035em;
+}
+
+.panacea-home .widget-instrument-slide-v5 [class*='text-[26px]'],
+.panacea-home .widget-instrument-slide-v5 [class*='text-[27px]'] {
+  font-size: clamp(28px, 7.5vw, 36px) !important;
+  line-height: .98 !important;
+}
+
+.panacea-home .widget-instrument-slide-v5 p {
+  line-height: 1.46 !important;
+  text-wrap: pretty;
+}
+
+/* Vector charts are the HD layer: keep them crisp rather than glowing. */
+.panacea-home .widget-instrument-slide-v5 svg {
+  shape-rendering: geometricPrecision;
+  text-rendering: geometricPrecision;
+}
+
+.panacea-home .widget-instrument-slide-v5 svg polyline,
+.panacea-home .widget-instrument-slide-v5 svg path,
+.panacea-home .widget-instrument-slide-v5 svg circle,
+.panacea-home .widget-instrument-slide-v5 svg line {
+  vector-effect: non-scaling-stroke;
+}
+
+.panacea-home .widget-instrument-slide-v5 img {
+  image-rendering: auto;
+  object-fit: contain;
+}
+
+/* Progress tracks: crisp 1px edges, no oversized glow. */
+.panacea-home .widget-instrument-slide-v5 .h-2,
+.panacea-home .widget-instrument-slide-v5 .h-2\.5,
+.panacea-home .widget-instrument-slide-v5 .h-3 {
+  box-shadow: inset 0 0 0 1px rgba(148,163,184,.08);
+}
+
+/* Controls stay accessible while fitting dense cards. */
+.panacea-home .widget-instrument-slide-v5 button,
+.panacea-home .widget-instrument-slide-v5 a[href] {
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+
+.panacea-home .widget-instrument-slide-v5 button {
+  min-height: 42px;
+}
+
+.panacea-home .widget-instrument-slide-v5 button:focus-visible,
+.panacea-home .widget-instrument-slide-v5 a[href]:focus-visible,
+.panacea-home .widget-instrument-nav-v5:focus-visible {
+  outline: 2px solid color-mix(in srgb, var(--wa) 78%, white);
+  outline-offset: 2px;
+}
+
+.panacea-home .widget-instrument-foot-v5 {
+  grid-template-columns: 42px minmax(0,1fr) 42px !important;
+  gap: 9px !important;
+}
+
+.panacea-home .widget-instrument-nav-v5 {
+  width: 42px !important;
+  height: 42px !important;
+  border-color: var(--pmd-hd-line) !important;
+  border-radius: 13px !important;
+  background: var(--pmd-hd-surface-soft) !important;
+}
+
+.panacea-home .widget-instrument-line-v5 {
+  height: 4px !important;
+  box-shadow: inset 0 0 0 1px rgba(148,163,184,.07);
+}
+
+.panacea-home .widget-instrument-label-v5 {
+  font-size: 9px !important;
+  line-height: 1.15;
+}
+
+/* ── Concept-specific HD cleanup ─────────────────────────────────────────── */
+.panacea-home .widget-instrument-slide-v5[data-widget='tenaga'] section > .kaca,
+.panacea-home .widget-instrument-slide-v5[data-widget='fokus'] section > .kaca,
+.panacea-home .widget-instrument-slide-v5[data-widget='kopi'] section > .kaca,
+.panacea-home .widget-instrument-slide-v5[data-widget='puasa'] section > .kaca,
+.panacea-home .widget-instrument-slide-v5[data-widget='lingkungan'] section > .kaca,
+.panacea-home .widget-instrument-slide-v5[data-widget='obatPengingat'] section > .kaca,
+.panacea-home .widget-instrument-slide-v5[data-widget='skrining'] section > .kaca,
+.panacea-home .widget-instrument-slide-v5[data-widget='komposisi'] section > .kaca,
+.panacea-home .widget-instrument-slide-v5[data-widget='ringHarian'] section > .kaca,
+.panacea-home .widget-instrument-slide-v5[data-widget='rangkaian'] section > .kaca,
+.panacea-home .widget-instrument-slide-v5[data-widget='tekanan'] section > .kaca,
+.panacea-home .widget-instrument-slide-v5[data-widget='vo2tren'] section > .kaca {
+  border: 1px solid color-mix(in srgb, var(--wa) 13%, var(--pmd-hd-line-soft)) !important;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.055) !important;
+}
+
+/* Energy Reactor: five levels become a single compact console. */
+.panacea-home .widget-instrument-slide-v5[data-widget='tenaga'] .grid-cols-5 {
+  gap: 5px !important;
+  padding: 4px;
+  border: 1px solid color-mix(in srgb, var(--wa) 13%, transparent);
+  border-radius: 16px;
+  background: color-mix(in srgb, var(--wa-soft) 52%, transparent);
+}
+
+.panacea-home .widget-instrument-slide-v5[data-widget='tenaga'] .grid-cols-5 > button {
+  min-height: 46px !important;
+  border-radius: 11px !important;
+}
+
+/* Focus Tunnel: time choices read like instrument presets. */
+.panacea-home .widget-instrument-slide-v5[data-widget='fokus'] .grid-cols-3 {
+  gap: 7px !important;
+}
+
+.panacea-home .widget-instrument-slide-v5[data-widget='fokus'] .grid-cols-3 > button {
+  min-height: 58px !important;
+  border-color: color-mix(in srgb, var(--wa) 18%, var(--pmd-hd-line)) !important;
+  background: color-mix(in srgb, var(--wa-soft) 38%, transparent);
+}
+
+/* Environment Radar: sensor columns align even with different data lengths. */
+.panacea-home .widget-instrument-slide-v5[data-widget='lingkungan'] section > .kaca > .flex.items-stretch {
+  gap: 10px !important;
+}
+
+.panacea-home .widget-instrument-slide-v5[data-widget='lingkungan'] section > .kaca > .flex.items-stretch > div {
+  padding: 10px;
+  border: 1px solid color-mix(in srgb, var(--wa) 11%, var(--pmd-hd-line-soft));
+  border-radius: 15px;
+  background: rgba(148,163,184,.025);
+}
+
+.panacea-home .widget-instrument-slide-v5[data-widget='lingkungan'] section > .kaca > .flex.items-stretch > div + div {
+  border-left-width: 1px !important;
+}
+
+/* Daily Orbit: rings stay separated and labels remain readable. */
+.panacea-home .widget-instrument-slide-v5[data-widget='ringHarian'] .grid-cols-4 {
+  gap: 4px !important;
+  align-items: start;
+}
+
+.panacea-home .widget-instrument-slide-v5[data-widget='ringHarian'] svg {
+  filter: none !important;
+}
+
+/* Body constellation: composition bar receives a precise edge. */
+.panacea-home .widget-instrument-slide-v5[data-widget='komposisi'] .h-3 {
+  height: 14px !important;
+  border-radius: 999px !important;
+}
+
+/* Prevention / medication lists: compact rows, generous touch targets. */
+.panacea-home .widget-instrument-slide-v5[data-widget='skrining'] section > .kaca > .flex.flex-col > div,
+.panacea-home .widget-instrument-slide-v5[data-widget='obatPengingat'] section > .kaca .flex.flex-col > span {
+  min-height: 42px;
+  align-items: center;
+}
+
+/* ── Responsive density ──────────────────────────────────────────────────── */
+@media (min-width: 720px) {
+  .panacea-home .home-action-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  }
+}
+
+@media (min-width: 860px) {
+  .panacea-home .home-action-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+  }
+}
+
+@media (max-width: 640px) {
+  .panacea-home {
+    --pmd-section-gap: 15px;
+  }
+
+  .panacea-home .home-command-panel {
+    border-radius: 23px !important;
+    padding: 13px !important;
+  }
+
+  .panacea-home .home-odyssey-hero {
+    border-radius: 27px !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+  }
+
+  .panacea-home .home-action-card {
+    min-height: 68px !important;
+    padding: 9px !important;
+  }
+
+  .panacea-home .home-action-icon {
+    width: 39px !important;
+    height: 39px !important;
+    border-radius: 12px !important;
+    font-size: 18px !important;
+  }
+
+  .panacea-home .widget-instrument-icon-v5 {
+    width: 40px !important;
+    height: 40px !important;
+  }
+
+  .panacea-home .widget-instrument-title-v5 {
+    font-size: 16px !important;
+  }
+
+  .panacea-home .widget-instrument-slide-v5 {
+    padding: 13px !important;
+  }
+
+  .panacea-home .widget-instrument-slide-v5 section > .kaca,
+  .panacea-home .widget-instrument-slide-v5 section > .pw-concept {
+    padding: 12px !important;
+    border-radius: 18px !important;
+  }
+
+  .panacea-home .widget-instrument-slide-v5 [class*='text-[26px]'],
+  .panacea-home .widget-instrument-slide-v5 [class*='text-[27px]'] {
+    font-size: 29px !important;
+  }
+}
+
+@media (max-width: 380px) {
+  .panacea-home .widget-instrument-count-v5 {
+    display: none !important;
+  }
+
+  .panacea-home .widget-instrument-head-v5 {
+    gap: 7px !important;
+  }
+
+  .panacea-home .widget-instrument-edit-v5 {
+    padding-inline: 7px !important;
+  }
+
+  .panacea-home .widget-instrument-slide-v5[data-widget='ringHarian'] .grid-cols-4 {
+    gap: 1px !important;
+  }
+}
+
+/* ── Stability fallbacks ─────────────────────────────────────────────────── */
+html.pmd-low-memory .panacea-home .home-command-panel,
+html.pmd-low-memory .panacea-home .home-loading-card,
+html.pmd-low-memory .panacea-home .home-signal-card,
+html.pmd-low-memory .panacea-home .widget-instrument-shell-v5,
+html.pmd-low-memory .panacea-home .widget-instrument-slide-v5 section > .kaca {
+  box-shadow: none !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+html.pmd-low-memory .panacea-home .widget-instrument-shell-v5::after,
+html.pmd-low-memory .panacea-home .home-signal-card::after {
+  display: none !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .panacea-home *,
+  .panacea-home *::before,
+  .panacea-home *::after {
+    scroll-behavior: auto !important;
+    transition-duration: .01ms !important;
+    animation-duration: .01ms !important;
+    animation-iteration-count: 1 !important;
+  }
+}
