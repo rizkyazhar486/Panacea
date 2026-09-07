@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
 import type { Pratinjau } from '../lib/pratinjauBeranda'
 import { hitungRangkaian, PERINGATAN_RANGKAIAN } from '../lib/rangkaian'
@@ -276,11 +276,36 @@ export function UbinRangkaian({ tanggal }: { tanggal: string[] }) {
  * yang salah di beranda merusak kepercayaan pada seluruh angka lain di sini.
  *
  * Berkas datanya berukuran ratusan kilobyte dan tidak boleh ikut terunduh oleh
- * orang yang hanya membuka beranda, jadi ia diambil setelah halaman tampil.
+ * orang yang hanya membuka beranda. Kartu tetap menempati tempat yang sama,
+ * tetapi ketiga sumber baru diminta ketika kartu mendekati viewport; pada mode
+ * low-memory kami menunggu sampai kartu benar-benar terlihat.
  */
 export function UbinKlinis() {
+  const ref = useRef<HTMLDivElement>(null)
+  const [siap, setSiap] = useState(false)
   const [n, setN] = useState<{ penyakit: number; obat: number; stasiun: number } | null>(null)
+
   useEffect(() => {
+    if (siap) return
+    const node = ref.current
+    if (!node || typeof IntersectionObserver === 'undefined') {
+      setSiap(true)
+      return
+    }
+
+    const lowMemory = document.documentElement.classList.contains('pmd-low-memory')
+    const observer = new IntersectionObserver(([entry]) => {
+      if (!entry.isIntersecting) return
+      observer.disconnect()
+      setSiap(true)
+    }, { rootMargin: lowMemory ? '0px' : '140px 0px' })
+
+    observer.observe(node)
+    return () => observer.disconnect()
+  }, [siap])
+
+  useEffect(() => {
+    if (!siap) return
     let batal = false
     Promise.all([
       import('../lib/skdiDiseaseNotes'),
@@ -297,23 +322,25 @@ export function UbinKlinis() {
       })
       .catch(() => { /* ubin tetap menampilkan keadaan memuat, tanpa angka palsu */ })
     return () => { batal = true }
-  }, [])
+  }, [siap])
 
   return (
-    <Ubin ke="/med-study" judul="Clinical" lebar>
-      {n ? (
-        /* Tiga angka pada satu baris. Ini isi katalog, bukan angka tubuh
-           siapa pun, jadi tidak ada tren yang dapat digambar — yang jujur
-           hanyalah jumlahnya. */
-        <div className="flex items-end justify-between gap-2">
-          <Angka label="diseases" nilai={String(n.penyakit)} />
-          <Angka label="drugs" nilai={String(n.obat)} />
-          <Angka label="stations" nilai={String(n.stasiun)} />
-        </div>
-      ) : (
-        <p className="t-kecil text-neutral-400">Calculating…</p>
-      )}
-    </Ubin>
+    <div ref={ref} className="col-span-2">
+      <Ubin ke="/med-study" judul="Clinical" lebar>
+        {n ? (
+          /* Tiga angka pada satu baris. Ini isi katalog, bukan angka tubuh
+             siapa pun, jadi tidak ada tren yang dapat digambar — yang jujur
+             hanyalah jumlahnya. */
+          <div className="flex items-end justify-between gap-2">
+            <Angka label="diseases" nilai={String(n.penyakit)} />
+            <Angka label="drugs" nilai={String(n.obat)} />
+            <Angka label="stations" nilai={String(n.stasiun)} />
+          </div>
+        ) : (
+          <p className="t-kecil text-neutral-400">{siap ? 'Calculating…' : 'Loads when visible.'}</p>
+        )}
+      </Ubin>
+    </div>
   )
 }
 
