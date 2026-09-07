@@ -13,6 +13,7 @@ export type BodyEvidenceMode =
   | 'digital-twin'
   | 'realistic-atlas'
   | 'physiology'
+  | 'vision'
   | 'cell-genome'
   | 'workout-4d'
   | 'surgery'
@@ -22,14 +23,19 @@ export type BodyEvidenceMode =
 
 const QUERY: Record<BodyEvidenceMode, { term: string; title: string; subtitle: string }> = {
   'realistic-atlas': {
-    term: 'human anatomy heart lung vasculature',
-    title: 'Atlas references',
-    subtitle: 'Terminology and anatomy evidence are pulled live from EMBL-EBI OLS and Europe PMC.',
+    term: 'human anatomy integument skin adipose fascia skeletal muscle bone joint nervous cardiovascular organ anatomy',
+    title: 'Whole-body atlas references',
+    subtitle: 'Live terminology and anatomy evidence sit beside the HRA source geometry and end-to-end layer navigator.',
   },
   physiology: {
     term: 'human physiology cardiovascular respiratory renal gastrointestinal thermoregulation endocrine hepatic metabolism autonomic immune reproductive',
     title: 'Whole-body physiology references',
     subtitle: 'Live literature sits beside the 4D physiology models so educational motion, regulatory physiology and published evidence remain separate.',
+  },
+  vision: {
+    term: 'ocular anatomy cornea iris lens aqueous vitreous retina macula fovea optic nerve optic chiasm visual acuity refraction color vision stereopsis visual field perimetry',
+    title: 'Ocular anatomy & visual physiology references',
+    subtitle: 'Live literature and ontology evidence accompany the HRA eye geometry, optical teaching model and functional examination map.',
   },
   'digital-twin': {
     term: 'human tissue cell atlas organ cell type physiology gas exchange membrane potential',
