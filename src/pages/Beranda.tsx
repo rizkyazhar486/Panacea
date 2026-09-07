@@ -1,35 +1,38 @@
-import { useEffect, useMemo, useState } from 'react'
+import { lazy, Suspense, useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
 import { Link } from 'react-router-dom'
 import { useStore } from '../lib/store'
-import { PapanWidget } from '../components/PapanWidget'
-import { KisiFitur } from '../components/KisiFitur'
-import { CatatanHarian } from '../components/CatatanHarian'
-import { CatatanLatihan } from '../components/CatatanLatihan'
-import { PanaceaGrowthRail } from '../components/dashboard/PanaceaGrowthWidgets'
-import { PanaceaUtilityShelf } from '../components/dashboard/PanaceaUtilityShelf'
 import { DeferredBodyExposureWidget, DeferredHomeFeatureUniverse, DeferredPanaceaLearningRail } from '../components/dashboard/DeferredHomeSections'
-import { PerformanceVisualizationDeck } from '../components/dashboard/PerformanceVisualizationDeck'
+import { HomeSectionBoundary } from '../components/HomeSectionBoundary'
 import { pratinjauBeranda } from '../lib/pratinjauBeranda'
 import { getVitals } from '../lib/healthVitals'
 import { getWorkouts } from '../lib/workoutStore'
 import { ageFromDob } from '../lib/anthro'
 import '../styles/home-odyssey.css'
 
+// Home is the page users open most often. Keep its first paint deliberately
+// small: the catalogue, configurable widget board, visual analytics and forms
+// are separate chunks and are requested only when they are actually useful.
+const LazyPapanWidget = lazy(() => import('../components/PapanWidget').then((m) => ({ default: m.PapanWidget })))
+const LazyKisiFitur = lazy(() => import('../components/KisiFitur').then((m) => ({ default: m.KisiFitur })))
+const LazyCatatanHarian = lazy(() => import('../components/CatatanHarian').then((m) => ({ default: m.CatatanHarian })))
+const LazyCatatanLatihan = lazy(() => import('../components/CatatanLatihan').then((m) => ({ default: m.CatatanLatihan })))
+const LazyPanaceaGrowthRail = lazy(() => import('../components/dashboard/PanaceaGrowthWidgets').then((m) => ({ default: m.PanaceaGrowthRail })))
+const LazyPanaceaUtilityShelf = lazy(() => import('../components/dashboard/PanaceaUtilityShelf').then((m) => ({ default: m.PanaceaUtilityShelf })))
+const LazyPerformanceVisualizationDeck = lazy(() => import('../components/dashboard/PerformanceVisualizationDeck').then((m) => ({ default: m.PerformanceVisualizationDeck })))
+
 /**
  * Home / dashboard Panacea.
  *
- * Prinsip visualnya sengaja sederhana seperti produk Apple: satu cerita utama,
- * data penting di depan, lalu fungsi yang dalam di bawahnya. Kosmos, aurora,
- * orbit, shield/spear geometry dan warna energi memberi rasa perjalanan seorang
- * warrior tanpa membuat Home berubah menjadi halaman showcase atau cosplay.
- * Seluruh widget lama tetap hidup dan tetap menjadi inti dashboard.
+ * First paint is sports-first and resilient: the user's key signals, Training,
+ * Body and Recovery remain usable even when a secondary visualisation or a
+ * large optional module fails to load.
  */
 
 const PINTASAN = [
   { to: '/latihan', emoji: '🏃', label: 'Training', tone: 'bg-gradient-to-br from-emerald-400 via-cyan-400 to-blue-600 text-white' },
   { to: '/tubuh', emoji: '❤️', label: 'Body', tone: 'bg-gradient-to-br from-rose-500 via-red-500 to-orange-500 text-white' },
-  { to: '/nutrition', emoji: '🥗', label: 'Nutrition', tone: 'bg-gradient-to-br from-lime-300 via-emerald-400 to-teal-500 text-neutral-950' },
   { to: '/recovery', emoji: '🌙', label: 'Recovery', tone: 'bg-gradient-to-br from-indigo-500 via-violet-500 to-fuchsia-500 text-white' },
+  { to: '/nutrition', emoji: '🥗', label: 'Nutrition', tone: 'bg-gradient-to-br from-lime-300 via-emerald-400 to-teal-500 text-neutral-950' },
   { to: '/planning', emoji: '🗓️', label: 'Plan', tone: 'bg-gradient-to-br from-sky-400 via-blue-500 to-indigo-600 text-white' },
   { to: '/keuangan', emoji: '💰', label: 'Money', tone: 'bg-gradient-to-br from-amber-300 via-yellow-400 to-orange-500 text-neutral-950' },
   { to: '/learn', emoji: '📚', label: 'Life', tone: 'bg-gradient-to-br from-violet-500 via-purple-500 to-pink-500 text-white' },
@@ -40,9 +43,69 @@ const PINTASAN = [
 
 type Signal = { label: string; value: string; unit?: string; tone: string; to: string }
 
+function HomeLoadingCard({ label, tall = false }: { label: string; tall?: boolean }) {
+  return (
+    <div
+      className={`rounded-[26px] border border-neutral-200/80 bg-white/55 p-4 dark:border-white/10 dark:bg-white/[.025] ${tall ? 'min-h-[180px]' : 'min-h-[82px]'}`}
+      aria-label={`${label} loading`}
+    >
+      <div className="h-2.5 w-24 rounded-full bg-neutral-200/80 dark:bg-white/10" />
+      <div className="mt-3 h-4 w-52 max-w-[68%] rounded-full bg-neutral-100 dark:bg-white/[.06]" />
+    </div>
+  )
+}
+
+function DeferredHomeBlock({
+  children,
+  label,
+  tall = false,
+  rootMargin = '180px 0px',
+  delayMs = 80,
+}: {
+  children: ReactNode
+  label: string
+  tall?: boolean
+  rootMargin?: string
+  delayMs?: number
+}) {
+  const ref = useRef<HTMLDivElement>(null)
+  const [ready, setReady] = useState(false)
+
+  useEffect(() => {
+    if (ready) return
+    const node = ref.current
+    if (!node || typeof IntersectionObserver === 'undefined') {
+      const timer = window.setTimeout(() => setReady(true), delayMs)
+      return () => window.clearTimeout(timer)
+    }
+
+    let timer = 0
+    const observer = new IntersectionObserver(([entry]) => {
+      if (!entry.isIntersecting) return
+      observer.disconnect()
+      // Let the hero, key metrics and Training shortcut paint before optional
+      // chunks start parsing/evaluating on lower-memory mobile browsers.
+      timer = window.setTimeout(() => setReady(true), delayMs)
+    }, { rootMargin })
+
+    observer.observe(node)
+    return () => {
+      observer.disconnect()
+      if (timer) window.clearTimeout(timer)
+    }
+  }, [delayMs, ready, rootMargin])
+
+  return (
+    <div ref={ref}>
+      {ready ? children : <HomeLoadingCard label={label} tall={tall} />}
+    </div>
+  )
+}
+
 export default function Beranda() {
   const { account, state } = useStore()
   const [refresh, setRefresh] = useState(0)
+  const [logsOpen, setLogsOpen] = useState(false)
 
   useEffect(() => {
     const update = () => setRefresh((x) => x + 1)
@@ -134,7 +197,8 @@ export default function Beranda() {
           </p>
 
           <div className="home-odyssey-actions">
-            <Link to="/harian" className="home-primary-action">Continue today <span aria-hidden>→</span></Link>
+            <Link to="/latihan" className="home-primary-action">Open training <span aria-hidden>→</span></Link>
+            <Link to="/harian" className="home-secondary-action">Log today <span aria-hidden>＋</span></Link>
             <Link to="/chatbot" className="home-secondary-action">Ask Panacea <span aria-hidden>✦</span></Link>
           </div>
 
@@ -166,15 +230,13 @@ export default function Beranda() {
         </div>
       </section>
 
-      <PerformanceVisualizationDeck mode="home" />
-
       <section>
         <div className="mb-2 flex items-center justify-between px-1">
           <div>
-            <div className="text-[9px] font-black uppercase tracking-[.16em] text-neutral-500 dark:text-neutral-400">Your arsenal</div>
-            <h2 className="mt-0.5 text-[13px] font-black text-neutral-900 dark:text-white">Quick access</h2>
+            <div className="text-[9px] font-black uppercase tracking-[.16em] text-neutral-500 dark:text-neutral-400">Daily movement</div>
+            <h2 className="mt-0.5 text-[13px] font-black text-neutral-900 dark:text-white">Training first</h2>
           </div>
-          <Link to="/semua-fitur" className="text-[11px] font-black text-emerald-700 dark:text-emerald-300">All features ›</Link>
+          <Link to="/latihan" className="text-[11px] font-black text-emerald-700 dark:text-emerald-300">Training hub ›</Link>
         </div>
         <div className="no-scrollbar -mx-1 flex snap-x gap-3 overflow-x-auto px-1 pb-2">
           {PINTASAN.map((p) => (
@@ -186,8 +248,29 @@ export default function Beranda() {
         </div>
       </section>
 
-      <PanaceaGrowthRail />
-      <PanaceaUtilityShelf />
+      <DeferredHomeBlock label="Performance" tall rootMargin="500px 0px" delayMs={120}>
+        <HomeSectionBoundary label="Performance analytics">
+          <Suspense fallback={<HomeLoadingCard label="Performance" tall />}>
+            <LazyPerformanceVisualizationDeck mode="home" />
+          </Suspense>
+        </HomeSectionBoundary>
+      </DeferredHomeBlock>
+
+      <DeferredHomeBlock label="Growth" rootMargin="240px 0px">
+        <HomeSectionBoundary label="Growth rail">
+          <Suspense fallback={<HomeLoadingCard label="Growth" />}>
+            <LazyPanaceaGrowthRail />
+          </Suspense>
+        </HomeSectionBoundary>
+      </DeferredHomeBlock>
+
+      <DeferredHomeBlock label="Utilities" rootMargin="180px 0px">
+        <HomeSectionBoundary label="Utility shelf">
+          <Suspense fallback={<HomeLoadingCard label="Utilities" />}>
+            <LazyPanaceaUtilityShelf />
+          </Suspense>
+        </HomeSectionBoundary>
+      </DeferredHomeBlock>
 
       <section className="home-section-shell rounded-[28px] p-4 sm:p-5">
         <div className="mb-3 flex items-center justify-between gap-3">
@@ -197,14 +280,29 @@ export default function Beranda() {
           </div>
           <Link to="/atur-fitur" className="shrink-0 rounded-full bg-neutral-100 px-3 py-2 text-[10px] font-black text-neutral-700 dark:bg-white/10 dark:text-neutral-200">Customize</Link>
         </div>
-        <PapanWidget pratinjau={pratinjau} tanggalCatatan={tanggalCatatan} />
+        <DeferredHomeBlock label="Dashboard widgets" tall rootMargin="160px 0px">
+          <HomeSectionBoundary label="Dashboard widgets">
+            <Suspense fallback={<HomeLoadingCard label="Dashboard widgets" tall />}>
+              <LazyPapanWidget pratinjau={pratinjau} tanggalCatatan={tanggalCatatan} />
+            </Suspense>
+          </HomeSectionBoundary>
+        </DeferredHomeBlock>
       </section>
 
-      <DeferredBodyExposureWidget />
-      <DeferredHomeFeatureUniverse />
-      <DeferredPanaceaLearningRail />
+      <HomeSectionBoundary label="Body Exposure">
+        <DeferredBodyExposureWidget />
+      </HomeSectionBoundary>
+      <HomeSectionBoundary label="Feature universe">
+        <DeferredHomeFeatureUniverse />
+      </HomeSectionBoundary>
+      <HomeSectionBoundary label="Learning shelf">
+        <DeferredPanaceaLearningRail />
+      </HomeSectionBoundary>
 
-      <details className="home-section-shell group rounded-[26px] p-4">
+      <details
+        className="home-section-shell group rounded-[26px] p-4"
+        onToggle={(event) => setLogsOpen(event.currentTarget.open)}
+      >
         <summary className="flex cursor-pointer list-none items-center justify-between gap-3">
           <div>
             <div className="text-[10px] font-black uppercase tracking-[.14em] text-neutral-500 dark:text-neutral-400">Today</div>
@@ -212,13 +310,29 @@ export default function Beranda() {
           </div>
           <span className="grid h-9 w-9 place-items-center rounded-full bg-neutral-100 text-lg text-neutral-700 transition group-open:rotate-45 dark:bg-white/10 dark:text-white">＋</span>
         </summary>
-        <div className="mt-4 space-y-4 border-t border-neutral-100 pt-4 dark:border-white/10">
-          <CatatanHarian />
-          <CatatanLatihan />
-        </div>
+        {logsOpen && (
+          <div className="mt-4 space-y-4 border-t border-neutral-100 pt-4 dark:border-white/10">
+            <HomeSectionBoundary label="Daily log">
+              <Suspense fallback={<HomeLoadingCard label="Daily log" />}>
+                <LazyCatatanHarian />
+              </Suspense>
+            </HomeSectionBoundary>
+            <HomeSectionBoundary label="Workout log">
+              <Suspense fallback={<HomeLoadingCard label="Workout log" />}>
+                <LazyCatatanLatihan />
+              </Suspense>
+            </HomeSectionBoundary>
+          </div>
+        )}
       </details>
 
-      <KisiFitur />
+      <DeferredHomeBlock label="Feature catalogue" tall rootMargin="120px 0px">
+        <HomeSectionBoundary label="Feature catalogue">
+          <Suspense fallback={<HomeLoadingCard label="Feature catalogue" tall />}>
+            <LazyKisiFitur />
+          </Suspense>
+        </HomeSectionBoundary>
+      </DeferredHomeBlock>
     </main>
   )
 }
