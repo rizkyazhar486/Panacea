@@ -254,6 +254,25 @@ export function Workout() {
       activeDays: rows.reduce((sum, row) => sum + row.activeDays, 0),
     }
   }, [log, todayStr])
+  const consistency28 = useMemo(() => {
+    const setsByDate = new Map<string, number>()
+    for (const entry of log) {
+      const safeSets = Number.isFinite(entry.sets) && entry.sets > 0 ? entry.sets : 0
+      if (safeSets === 0) continue
+      setsByDate.set(entry.date, (setsByDate.get(entry.date) ?? 0) + safeSets)
+    }
+
+    const days = Array.from({ length: 28 }, (_, index) => {
+      const date = hariLalu(27 - index)
+      return { date, sets: setsByDate.get(date) ?? 0 }
+    })
+
+    return {
+      days,
+      activeDays: days.filter((day) => day.sets > 0).length,
+      maxSets: Math.max(1, ...days.map((day) => day.sets)),
+    }
+  }, [log, todayStr])
 
   return (
     <div className="mx-auto max-w-2xl space-y-5 pb-24">
@@ -369,6 +388,41 @@ export function Workout() {
           </div>
           <p className="mt-3 text-[11px] leading-relaxed text-neutral-500">
             Set volume includes bodyweight and loaded exercise logs. External volume load is Σ(sets × reps × entered kg), so bodyweight work is not assigned an invented kilogram value.
+          </p>
+        </Card>
+      )}
+
+      {consistency28.activeDays > 0 && (
+        <Card className="!p-5">
+          <SectionTitle icon={<IconActivity size={18} />} title="28-Day Training Consistency" subtitle="Daily logged-set activity across the same local-calendar window" />
+          <div className="mt-3 flex items-center justify-between gap-3 text-[11px]">
+            <span className="rounded-full bg-brand-50 px-2.5 py-1 font-bold text-brand-dark">{consistency28.activeDays} active training days</span>
+            <span className="font-semibold text-neutral-500">Oldest → Today</span>
+          </div>
+          <div className="mt-4 grid grid-cols-7 gap-2" role="img" aria-label={`Training activity in the last 28 days: ${consistency28.activeDays} active days`}>
+            {consistency28.days.map((day) => {
+              const ratio = day.sets / consistency28.maxSets
+              const intensity = day.sets === 0
+                ? 'bg-neutral-100 text-neutral-400 dark:bg-white/10 dark:text-neutral-500'
+                : ratio >= 0.67
+                  ? 'bg-brand text-white'
+                  : ratio >= 0.34
+                    ? 'bg-brand-100 text-brand-dark'
+                    : 'bg-brand-50 text-brand-dark'
+              return (
+                <div
+                  key={day.date}
+                  className={`grid aspect-square min-w-0 place-items-center rounded-lg text-[9px] font-bold tabular-nums ${intensity}`}
+                  title={`${day.date}: ${day.sets} logged ${day.sets === 1 ? 'set' : 'sets'}`}
+                  aria-label={`${day.date}: ${day.sets} logged ${day.sets === 1 ? 'set' : 'sets'}`}
+                >
+                  {day.date.slice(8)}
+                </div>
+              )
+            })}
+          </div>
+          <p className="mt-3 text-[11px] leading-relaxed text-neutral-500">
+            Cell intensity is relative to your highest daily set count inside this 28-day window. A blank day means no valid sets were logged, not necessarily a missed workout or poor recovery.
           </p>
         </Card>
       )}
