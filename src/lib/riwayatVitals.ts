@@ -43,6 +43,14 @@ export interface HariVitals {
   nilai: Record<string, number>
 }
 
+// Widget Home meminta banyak deret/rentang dari riwayat yang sama. Tanpa cache,
+// setiap deretMetrik() mem-parse ulang JSON sampai 180 hari, sehingga HRV,
+// langkah, tidur, VO2max, berat, tekanan dan metrik lain saling menumpuk pada
+// main thread. String localStorage tetap menjadi sumber kebenaran: bila berubah
+// (termasuk dari tab lain), cache otomatis tidak cocok dan diparse ulang.
+let cachedRaw: string | null | undefined
+let cachedHistory: HariVitals[] | undefined
+
 function kunciTanggalLokal(d = new Date()): string {
   const p = (n: number) => String(n).padStart(2, '0')
   return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}`
@@ -51,9 +59,16 @@ function kunciTanggalLokal(d = new Date()): string {
 export function ambilRiwayat(): HariVitals[] {
   try {
     const raw = localStorage.getItem(KUNCI)
+    if (raw === cachedRaw && cachedHistory) return cachedHistory.slice()
+
     const arr = raw ? JSON.parse(raw) : []
-    return Array.isArray(arr) ? arr.filter((h) => h && typeof h.tanggal === 'string' && h.nilai) : []
+    const parsed = Array.isArray(arr) ? arr.filter((h) => h && typeof h.tanggal === 'string' && h.nilai) : []
+    cachedRaw = raw
+    cachedHistory = parsed
+    return parsed.slice()
   } catch {
+    cachedRaw = undefined
+    cachedHistory = undefined
     return []
   }
 }
@@ -82,13 +97,21 @@ export function catatRiwayat(v: Vitals = getVitals()): void {
   riwayat.push({ tanggal: hariIni, nilai: angka })
   riwayat.sort((a, b) => (a.tanggal < b.tanggal ? -1 : 1))
 
+  const penuh = riwayat.slice(-MAKS_HARI)
   try {
-    localStorage.setItem(KUNCI, JSON.stringify(riwayat.slice(-MAKS_HARI)))
+    const raw = JSON.stringify(penuh)
+    localStorage.setItem(KUNCI, raw)
+    cachedRaw = raw
+    cachedHistory = penuh
   } catch {
     // Kuota penuh: buang separuh tertua lalu coba sekali lagi. Gagal menyimpan
     // riwayat tidak boleh menggagalkan penyimpanan angka hari ini.
     try {
-      localStorage.setItem(KUNCI, JSON.stringify(riwayat.slice(-Math.floor(MAKS_HARI / 2))))
+      const ringkas = riwayat.slice(-Math.floor(MAKS_HARI / 2))
+      const raw = JSON.stringify(ringkas)
+      localStorage.setItem(KUNCI, raw)
+      cachedRaw = raw
+      cachedHistory = ringkas
     } catch { /* menyerah, tanpa mengganggu apa pun */ }
   }
 }
