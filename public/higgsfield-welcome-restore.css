@@ -1,0 +1,38 @@
+/*
+ * Paid Higgsfield welcome-page media visibility guard.
+ *
+ * The welcome-page videos are intentionally preserved in Landing.tsx. This
+ * override keeps the cinematic footage visibly present instead of burying it
+ * beneath an ~80-88% opaque scrim. Keep this file unless the welcome experience
+ * is deliberately redesigned with the paid media retained at equal prominence.
+ */
+
+.hero-video-scrim {
+  background: linear-gradient(
+    to bottom,
+    rgba(255, 255, 255, 0.54) 0%,
+    rgba(255, 255, 255, 0.62) 54%,
+    rgba(255, 255, 255, 0.90) 100%
+  ) !important;
+}
+
+.dark .hero-video-scrim {
+  background: linear-gradient(
+    to bottom,
+    rgba(12, 20, 16, 0.50) 0%,
+    rgba(12, 20, 16, 0.60) 54%,
+    rgba(12, 20, 16, 0.90) 100%
+  ) !important;
+}
+
+/* Do not let global presentation layers mute the paid cinematic footage. */
+video[src*="d8j0ntlcm91z4.cloudfront.net"] {
+  opacity: 1 !important;
+  filter: saturate(1.05) contrast(1.02);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  video[src*="d8j0ntlcm91z4.cloudfront.net"] {
+    filter: none;
+  }
+}
