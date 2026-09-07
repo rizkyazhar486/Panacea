@@ -127,7 +127,9 @@ assert.match(appStatus, /SmartNotificationOrchestrator/)
 
 const serviceWorker = readFileSync('public/sw.js', 'utf8')
 assert.match(serviceWorker, /notificationclick/)
-assert.match(serviceWorker, /c\.navigate\(tujuan\)/)
-assert.match(serviceWorker, /clients\.openWindow\(tujuan\)/)
+assert.match(serviceWorker, /new URL\(raw, self\.registration\.scope\)/, 'notification route must be resolved against the service-worker scope')
+assert.match(serviceWorker, /\.navigate\(destination\)/, 'an existing app window must navigate to the notification destination')
+assert.match(serviceWorker, /clients\.openWindow\(destination\)/, 'notification click must open the destination when no app window exists')
+assert.doesNotMatch(serviceWorker, /addEventListener\(['"]fetch['"]/, 'stability worker must not intercept fetch requests')
 
 console.log(`smart notifications: ${SMART_NOTIFICATION_RULES.length} rules (${EXTRA_SMART_NOTIFICATION_RULES.length} wave-2), ${defaultEnabledRuleIds().length} enabled by default; all assertions passed`)
