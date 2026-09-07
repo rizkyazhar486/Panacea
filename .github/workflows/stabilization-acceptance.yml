@@ -1,0 +1,55 @@
+name: Stabilization Acceptance
+
+on:
+  push:
+    branches:
+      - stabilization/integrate-body3d-20260908
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  full-acceptance:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install frontend dependencies
+        run: npm ci
+
+      - name: Frontend TypeScript
+        run: npx tsc --noEmit
+
+      - name: Frontend production build
+        run: npm run build
+
+      - name: Frontend tests
+        run: npm run uji
+
+      - name: Install server dependencies
+        working-directory: server
+        run: npm ci
+
+      - name: Server TypeScript
+        working-directory: server
+        run: npm run typecheck
+
+      - name: Server build
+        working-directory: server
+        run: npm run build
+
+      - name: Server tests
+        working-directory: server
+        run: npm run uji
