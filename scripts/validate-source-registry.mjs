@@ -1,7 +1,9 @@
+import { existsSync, realpathSync, statSync } from 'node:fs';
 import { readdir, readFile } from 'node:fs/promises';
 import path from 'node:path';
 import process from 'node:process';
 
+const REPO_ROOT = realpathSync(process.cwd());
 const ROOT = path.resolve(process.env.PANACEA_SOURCE_REGISTRY_ROOT || 'data/source-registry');
 const SCHEMA_PATH = path.join(ROOT, 'source.schema.json');
 
@@ -154,6 +156,56 @@ async function parseJson(filePath) {
   }
 }
 
+function validateActiveAdapterModule(modulePath, relativeRegistryPath) {
+  const errors = [];
+  if (typeof modulePath !== 'string' || !modulePath.trim()) return errors;
+
+  if (path.isAbsolute(modulePath)) {
+    errors.push(`${relativeRegistryPath}: ACTIVE adapter.module must be repository-relative`);
+    return errors;
+  }
+
+  const resolved = path.resolve(REPO_ROOT, modulePath);
+  const relativeToRepo = path.relative(REPO_ROOT, resolved);
+  if (
+    relativeToRepo === '..' ||
+    relativeToRepo.startsWith(`..${path.sep}`) ||
+    path.isAbsolute(relativeToRepo)
+  ) {
+    errors.push(`${relativeRegistryPath}: ACTIVE adapter.module must stay inside the repository`);
+    return errors;
+  }
+
+  if (!existsSync(resolved)) {
+    errors.push(`${relativeRegistryPath}: ACTIVE adapter.module does not exist: ${JSON.stringify(modulePath)}`);
+    return errors;
+  }
+
+  let realModulePath;
+  try {
+    realModulePath = realpathSync(resolved);
+  } catch {
+    errors.push(`${relativeRegistryPath}: ACTIVE adapter.module cannot be resolved: ${JSON.stringify(modulePath)}`);
+    return errors;
+  }
+
+  const realRelative = path.relative(REPO_ROOT, realModulePath);
+  if (
+    realRelative === '..' ||
+    realRelative.startsWith(`..${path.sep}`) ||
+    path.isAbsolute(realRelative)
+  ) {
+    errors.push(`${relativeRegistryPath}: ACTIVE adapter.module resolves outside the repository`);
+    return errors;
+  }
+
+  if (!statSync(realModulePath).isFile()) {
+    errors.push(`${relativeRegistryPath}: ACTIVE adapter.module must reference a file: ${JSON.stringify(modulePath)}`);
+  }
+
+  return errors;
+}
+
 function validateSemanticIntegrity(value, filePath, seenIds) {
   const errors = [];
   const relative = path.relative(process.cwd(), filePath);
@@ -175,8 +227,12 @@ function validateSemanticIntegrity(value, filePath, seenIds) {
     );
   }
 
-  if (value.adapter?.status === 'ACTIVE' && !value.adapter?.module) {
-    errors.push(`${relative}: ACTIVE adapter must declare a non-null adapter.module`);
+  if (value.adapter?.status === 'ACTIVE') {
+    if (!value.adapter?.module) {
+      errors.push(`${relative}: ACTIVE adapter must declare a non-null adapter.module`);
+    } else {
+      errors.push(...validateActiveAdapterModule(value.adapter.module, relative));
+    }
   }
 
   if (value.license?.status === 'VERIFIED') {
