@@ -75,7 +75,7 @@ function bestMeshForTerm(root: THREE.Object3D, term: string) {
   const wanted = normalizeLookup(term)
   if (!wanted) return null
   const wantedTokens = wanted.split(' ').filter((token) => token.length > 2)
-  let best: { mesh: THREE.Mesh; score: number } | null = null
+  const candidates: Array<{ mesh: THREE.Mesh; score: number }> = []
 
   root.traverse((object) => {
     if (!(object instanceof THREE.Mesh)) return
@@ -85,11 +85,11 @@ function bestMeshForTerm(root: THREE.Object3D, term: string) {
     if (haystack === wanted) score += 100
     if (haystack.includes(wanted)) score += 60
     for (const token of wantedTokens) if (haystack.includes(token)) score += 8
-    if (!score) return
-    if (!best || score > best.score) best = { mesh: object, score }
+    if (score > 0) candidates.push({ mesh: object, score })
   })
 
-  return best?.mesh ?? null
+  candidates.sort((a, b) => b.score - a.score)
+  return candidates[0]?.mesh ?? null
 }
 
 export function HraResolvedAnatomyViewer({ terms, title, description, maxResults = 12 }: Props) {
