@@ -39,6 +39,11 @@ function formatBytes(bytes: number) {
   return `${(bytes / 1_000_000).toFixed(bytes > 10_000_000 ? 0 : 1)} MB`
 }
 
+function rendererPixelRatio() {
+  const mobile = typeof window !== 'undefined' && window.matchMedia('(max-width: 767px)').matches
+  return Math.min(window.devicePixelRatio || 1, mobile ? 1.25 : 1.75)
+}
+
 export function HraResolvedAnatomyViewer({ terms, title, description, maxResults = 12 }: Props) {
   const mountRef = useRef<HTMLDivElement>(null)
   const normalizedTerms = useMemo(() => unique(terms).slice(0, 16), [terms])
@@ -46,6 +51,7 @@ export function HraResolvedAnatomyViewer({ terms, title, description, maxResults
   const [selectedKey, setSelectedKey] = useState('')
   const [state, setState] = useState<'loading' | 'ready' | 'empty' | 'error'>('loading')
   const [picked, setPicked] = useState('')
+  const [viewerError, setViewerError] = useState('')
 
   useEffect(() => {
     let cancelled = false
@@ -76,7 +82,10 @@ export function HraResolvedAnatomyViewer({ terms, title, description, maxResults
     if (!mount || !model) return
 
     let disposed = false
+    let frame = 0
+    let observer: ResizeObserver | null = null
     setPicked('')
+    setViewerError('')
     mount.innerHTML = ''
 
     const scene = new THREE.Scene()
@@ -84,8 +93,15 @@ export function HraResolvedAnatomyViewer({ terms, title, description, maxResults
     const camera = new THREE.PerspectiveCamera(30, 1, 0.001, 10000)
     camera.position.set(0, 0, 3)
 
-    const renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: 'high-performance' })
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
+    let renderer: THREE.WebGLRenderer
+    try {
+      renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: 'high-performance' })
+    } catch {
+      setViewerError('Interactive 3D is unavailable in this browser session. Source anatomy metadata remains available at right.')
+      return () => { mount.innerHTML = '' }
+    }
+
+    renderer.setPixelRatio(rendererPixelRatio())
     renderer.outputColorSpace = THREE.SRGBColorSpace
     renderer.toneMapping = THREE.ACESFilmicToneMapping
     renderer.toneMappingExposure = 1.04
@@ -111,6 +127,7 @@ export function HraResolvedAnatomyViewer({ terms, title, description, maxResults
     controls.enablePan = true
 
     const resize = () => {
+      if (disposed) return
       const width = Math.max(1, mount.clientWidth)
       const height = Math.max(1, mount.clientHeight)
       renderer.setSize(width, height, false)
@@ -118,8 +135,12 @@ export function HraResolvedAnatomyViewer({ terms, title, description, maxResults
       camera.updateProjectionMatrix()
     }
     resize()
-    const observer = new ResizeObserver(resize)
-    observer.observe(mount)
+    if (typeof ResizeObserver !== 'undefined') {
+      observer = new ResizeObserver(resize)
+      observer.observe(mount)
+    } else {
+      window.addEventListener('resize', resize)
+    }
 
     const world = new THREE.Group()
     scene.add(world)
@@ -163,7 +184,6 @@ export function HraResolvedAnatomyViewer({ terms, title, description, maxResults
     }
     renderer.domElement.addEventListener('pointerup', onPointerUp)
 
-    let frame = 0
     const animate = () => {
       if (disposed) return
       controls.update()
@@ -175,7 +195,8 @@ export function HraResolvedAnatomyViewer({ terms, title, description, maxResults
     return () => {
       disposed = true
       cancelAnimationFrame(frame)
-      observer.disconnect()
+      observer?.disconnect()
+      window.removeEventListener('resize', resize)
       renderer.domElement.removeEventListener('pointerup', onPointerUp)
       controls.dispose()
       world.traverse((object) => {
@@ -219,7 +240,17 @@ export function HraResolvedAnatomyViewer({ terms, title, description, maxResults
 
       {selected?.model ? (
         <div className="grid lg:grid-cols-[minmax(0,1fr)_300px]">
-          <div ref={mountRef} className="min-h-[440px] bg-[#070a0d]" aria-label={`HRA 3D model of ${selected.label}`} />
+          <div className="relative min-h-[440px] bg-[#070a0d]">
+            <div ref={mountRef} className="absolute inset-0" aria-label={`HRA 3D model of ${selected.label}`} />
+            {viewerError && (
+              <div className="absolute inset-0 grid place-items-center bg-[#070a0d] p-6 text-center">
+                <div>
+                  <div className="text-sm font-black text-white">3D renderer unavailable</div>
+                  <p className="mt-2 max-w-md text-[10px] leading-relaxed text-white/55">{viewerError}</p>
+                </div>
+              </div>
+            )}
+          </div>
           <aside className="border-t border-neutral-200 p-4 dark:border-white/10 lg:border-l lg:border-t-0 sm:p-5">
             <div className="text-[8px] font-black uppercase tracking-[.16em] text-neutral-400">Source structure</div>
             <div className="mt-1 text-base font-black text-neutral-950 dark:text-white">{selected.label}</div>
