@@ -1,4 +1,5 @@
 import { lazy, Suspense, useEffect, useRef, useState } from 'react'
+import { Link } from 'react-router-dom'
 
 const FeatureUniverse = lazy(() => import('./HomeFeatureUniverse').then((m) => ({ default: m.HomeFeatureUniverse })))
 const LearningRail = lazy(() => import('./PanaceaLearningRail').then((m) => ({ default: m.PanaceaLearningRail })))
@@ -39,21 +40,45 @@ function Placeholder({ label, tall = false }: { label: string; tall?: boolean })
   )
 }
 
+/**
+ * The HRA preview owns a WebGL renderer and several large GLB models. Do not
+ * create that GPU context just because Home happens to scroll near this block.
+ * iOS WebKit is especially sensitive to memory/GPU spikes and can terminate the
+ * whole page with "A problem repeatedly occurred" before React can show an
+ * error boundary. The preview is therefore opt-in; the full atlas stays one tap
+ * away and no medical functionality is removed.
+ */
 export function DeferredBodyExposureWidget() {
-  const { ref, ready } = useNearViewport('1050px 0px')
+  const [activated, setActivated] = useState(false)
+
+  if (activated) {
+    return (
+      <Suspense fallback={<Placeholder label="Body Exposure" tall />}>
+        <BodyExposure interactive showCta />
+      </Suspense>
+    )
+  }
+
   return (
-    <div ref={ref}>
-      {ready ? (
-        <Suspense fallback={<Placeholder label="Body Exposure" tall />}>
-          <BodyExposure interactive showCta />
-        </Suspense>
-      ) : <Placeholder label="Body Exposure" tall />}
-    </div>
+    <section className="overflow-hidden rounded-[28px] border border-neutral-200 bg-[#080b0e] p-5 text-white shadow-[0_16px_42px_rgba(4,10,14,.18)] dark:border-white/10">
+      <div className="text-[9px] font-black uppercase tracking-[.14em] text-cyan-300">3D anatomy · on demand</div>
+      <div className="mt-2 flex items-end justify-between gap-4">
+        <div className="min-w-0">
+          <h2 className="text-[18px] font-black tracking-tight">Reference human anatomy</h2>
+          <p className="mt-1 max-w-xl text-[10px] font-medium leading-relaxed text-white/60">The HuBMAP 3D model is kept off during app launch to protect mobile memory. Load it only when you want the interactive preview.</p>
+        </div>
+        <span className="shrink-0 text-4xl" aria-hidden>🫀</span>
+      </div>
+      <div className="mt-4 flex flex-wrap gap-2">
+        <button type="button" onClick={() => setActivated(true)} className="rounded-full bg-white px-4 py-2.5 text-[10px] font-black text-neutral-950 active:scale-95">Load 3D preview</button>
+        <Link to="/body-explorer?mode=realistic-atlas" className="rounded-full border border-white/15 px-4 py-2.5 text-[10px] font-black text-white/80 active:scale-95">Open full atlas →</Link>
+      </div>
+    </section>
   )
 }
 
 export function DeferredHomeFeatureUniverse() {
-  const { ref, ready } = useNearViewport()
+  const { ref, ready } = useNearViewport('220px 0px')
   return (
     <div ref={ref}>
       {ready ? <Suspense fallback={<Placeholder label="Feature universe" />}><FeatureUniverse /></Suspense> : <Placeholder label="Feature universe" />}
@@ -62,7 +87,7 @@ export function DeferredHomeFeatureUniverse() {
 }
 
 export function DeferredPanaceaLearningRail() {
-  const { ref, ready } = useNearViewport('750px 0px')
+  const { ref, ready } = useNearViewport('220px 0px')
   return (
     <div ref={ref}>
       {ready ? <Suspense fallback={<Placeholder label="Learning shelf" />}><LearningRail /></Suspense> : <Placeholder label="Learning shelf" />}
