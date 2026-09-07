@@ -50,7 +50,7 @@ export function OcularMotility4D() {
         <div>
           <div className="text-[9px] font-black uppercase tracking-[.17em] text-fuchsia-700 dark:text-fuchsia-300">Ocular motility 4D</div>
           <h3 className="mt-1 text-lg font-black text-neutral-950 dark:text-white">Extraocular muscles · gaze mechanics · eyelid elevator</h3>
-          <p className="mt-1 max-w-3xl text-[10px] leading-relaxed text-neutral-500 dark:text-neutral-400">HRA supplies separate eye-muscle reference objects. Gaze buttons explain coordinated actions but never convert them into invented EMG, force or nerve-firing percentages.</p>
+          <p className="mt-1 max-w-3xl text-[10px] leading-relaxed text-neutral-500 dark:text-neutral-400">HRA maps the extraocular muscles to FMA identities and source-model stems. Panacea renders an HRA muscle model only when that release exposes browser-loadable geometry; mapping-only records remain mapping-only. Gaze controls never invent EMG, force or nerve-firing percentages.</p>
         </div>
         <span className="rounded-full border border-neutral-200 bg-neutral-50 px-3 py-1.5 text-[9px] font-black text-neutral-500 dark:border-white/10 dark:bg-white/[.03] dark:text-neutral-300">CN III · IV · VI teaching map</span>
       </div>
@@ -68,9 +68,9 @@ export function OcularMotility4D() {
 
         <HraResolvedAnatomyViewer
           key={selectedMuscle.term}
-          title={`${selectedMuscle.label} · HRA source geometry`}
-          description={`${selectedMuscle.principal}. ${selectedMuscle.secondary} Innervation label: ${selectedMuscle.nerve}.`}
-          terms={[selectedMuscle.term, 'ocular muscle', 'eye']}
+          title={`${selectedMuscle.label} · source-resolved HRA geometry`}
+          description={`${selectedMuscle.principal}. ${selectedMuscle.secondary} Innervation label: ${selectedMuscle.nerve}. If the current HRA release contains only a mapping record, this panel deliberately shows no substitute 3D muscle.`}
+          terms={[selectedMuscle.term, 'ocular muscle']}
           maxResults={14}
         />
       </div>
