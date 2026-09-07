@@ -185,7 +185,14 @@ export function Workout() {
   const todayStr = hariIni()
   const todayLog = log.filter((l) => l.date === todayStr)
   const weekLog = log.filter((l) => Date.now() - new Date(l.date).getTime() <= 7 * 86400000)
-  const weeklyVolume = weekLog.reduce((a, l) => a + l.sets * l.reps * (l.weight || 1), 0)
+  const todaySets = todayLog.reduce((total, l) => total + (Number.isFinite(l.sets) && l.sets > 0 ? l.sets : 0), 0)
+  const weeklySets = weekLog.reduce((total, l) => total + (Number.isFinite(l.sets) && l.sets > 0 ? l.sets : 0), 0)
+  const weeklyLoadedVolume = weekLog.reduce((total, l) => {
+    const safeSets = Number.isFinite(l.sets) && l.sets > 0 ? l.sets : 0
+    const safeReps = Number.isFinite(l.reps) && l.reps > 0 ? l.reps : 0
+    const safeWeight = Number.isFinite(l.weight) && l.weight > 0 ? l.weight : 0
+    return total + safeSets * safeReps * safeWeight
+  }, 0)
 
   return (
     <div className="mx-auto max-w-2xl space-y-5 pb-24">
@@ -236,16 +243,16 @@ export function Workout() {
             gold/silver/bronze, bukan menambah data. */}
         <div className="metal-forge mt-4 grid grid-cols-3 gap-2 rounded-2xl p-3">
           <div className="relative text-center">
-            <div className="metal-emboss-gold text-xl font-black">{todayLog.length}</div>
+            <div className="metal-emboss-gold text-xl font-black">{todaySets}</div>
             <div className="mt-0.5 text-[10px] font-bold uppercase tracking-wide text-white/50">Sets Today</div>
           </div>
           <div className="relative text-center">
-            <div className="metal-emboss text-xl font-black">{weekLog.length}</div>
-            <div className="mt-0.5 text-[10px] font-bold uppercase tracking-wide text-white/50">Sessions This Week</div>
+            <div className="metal-emboss text-xl font-black">{weeklySets}</div>
+            <div className="mt-0.5 text-[10px] font-bold uppercase tracking-wide text-white/50">Sets This Week</div>
           </div>
           <div className="relative text-center">
-            <div className="metal-emboss text-xl font-black">{weeklyVolume.toLocaleString('en-US')}</div>
-            <div className="mt-0.5 text-[10px] font-bold uppercase tracking-wide text-white/50">Weekly Volume</div>
+            <div className="metal-emboss text-xl font-black">{weeklyLoadedVolume.toLocaleString('en-US', { maximumFractionDigits: 1 })}</div>
+            <div className="mt-0.5 text-[10px] font-bold uppercase tracking-wide text-white/50">External Load kg·reps</div>
           </div>
         </div>
       </Card>
