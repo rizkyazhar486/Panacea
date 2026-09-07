@@ -41,3 +41,43 @@ jobs:
         run: npm run typecheck
       - name: Build backend
         run: npm run build
+      - name: Runtime smoke-test genomics control plane
+        env:
+          JWT_SECRET: ci-only-panacea-genomics-secret
+          PORT: '8799'
+          CORS_ORIGINS: http://localhost:5173
+        run: |
+          set -euo pipefail
+          node dist/index.js >/tmp/panacea-backend.log 2>&1 &
+          SERVER_PID=$!
+          trap 'kill "$SERVER_PID" 2>/dev/null || true' EXIT
+
+          for attempt in $(seq 1 30); do
+            if curl -fsS http://127.0.0.1:8799/api/genomics/compute/capabilities >/tmp/genomics-capabilities.json; then
+              break
+            fi
+            sleep 1
+          done
+
+          if [ ! -s /tmp/genomics-capabilities.json ]; then
+            cat /tmp/panacea-backend.log
+            echo 'Genomics capabilities endpoint did not become ready.' >&2
+            exit 1
+          fi
+
+          node -e '
+            const fs = require("node:fs");
+            const body = JSON.parse(fs.readFileSync("/tmp/genomics-capabilities.json", "utf8"));
+            if (body.backend !== "render-control-plane") throw new Error(`Unexpected backend: ${body.backend}`);
+            if (body.configured !== false) throw new Error("CI must report genomics worker as unconfigured without secrets");
+            for (const kind of ["ont-basecalling", "pharmcat", "sv-calling"]) {
+              if (!body.jobKinds?.includes(kind)) throw new Error(`Missing genomics job kind: ${kind}`);
+            }
+          '
+
+          HTTP_CODE=$(curl -sS -o /tmp/genomics-unauth.json -w '%{http_code}' \
+            -H 'Content-Type: application/json' \
+            -d '{"kind":"ont-basecalling","input":{"uri":"https://example.test/input.pod5"}}' \
+            http://127.0.0.1:8799/api/genomics/compute/jobs)
+          test "$HTTP_CODE" = '401'
+          grep -q '"unauthorized"' /tmp/genomics-unauth.json
