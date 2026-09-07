@@ -99,6 +99,7 @@ export function MedicalEvidenceExplorer({
         source: `Europe PMC · ${item.source}`,
         url: item.url,
         year: item.year,
+        query: bundle.query,
       })),
       ...bundle.ontology.map((item) => ({
         key: `ontology:${item.ontology}:${item.id}`,
@@ -107,6 +108,7 @@ export function MedicalEvidenceExplorer({
         title: item.label,
         source: `${item.ontology} ontology`,
         url: item.url,
+        query: bundle.query,
       })),
       ...bundle.trials.map((item) => ({
         key: `trial:${item.id}`,
@@ -115,6 +117,7 @@ export function MedicalEvidenceExplorer({
         title: item.title,
         source: 'ClinicalTrials.gov',
         url: item.url,
+        query: bundle.query,
       })),
       ...bundle.drugLabels.map((item) => ({
         key: `drug-label:${item.id}`,
@@ -123,6 +126,7 @@ export function MedicalEvidenceExplorer({
         title: item.brand || item.generic,
         source: 'openFDA · structured product label',
         url: item.url,
+        query: bundle.query,
       })),
     ]
   }, [bundle])
