@@ -33,7 +33,7 @@ export function normalizeNotificationRoute(raw?: string | null): string | null {
   if (!value) return null
   const hashIndex = value.indexOf('#/')
   if (hashIndex >= 0) return value.slice(hashIndex + 1)
-  if (value.startsWith('/')) return value
+  if (value.startsWith('/') && !value.startsWith('//')) return value
   return null
 }
 
