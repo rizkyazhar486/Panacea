@@ -267,13 +267,12 @@ export function BodyExplorer() {
   const [unfold, setUnfold] = useState(0)
   const [dissect, setDissect] = useState(0)
 
-  // Gerak fisiologis. Tiga keadaan, bukan sakelar hidup/mati: perbedaan
-  // antara istirahat dan latihan JUSTRU yang mengajarkan faalnya — denyut
-  // dan napas yang sama-sama naik, dan otot yang mulai berkontraksi.
+  // Keadaan referensi fisiologi. HR, RR, tempo kontraksi, dan peristaltik
+  // dipakai sebagai teaching state; source atlas tetap stabil dimensinya dan
+  // tidak dideformasi untuk meniru denyut, ekspansi napas, atau kontraksi.
   const [motionMode, setMotionMode] = useState<'off' | 'rest' | 'exercise'>('off')
-  // Laju dari simulator, kalau sedang dipakai. Ini yang membuat figurnya
-  // benar-benar berdetak pada keadaan yang sedang dihitung — syok berdetak
-  // cepat dan dangkal, bukan sekadar angka yang berubah di sebelahnya.
+  // Nilai simulator mengganti physiology reference state, bukan bentuk atlas.
+  // Angka boleh berubah mengikuti skenario; geometri sumber tetap tidak berubah.
   const [simVitals, setSimVitals] = useState<{ hr: number; rr: number } | null>(null)
   // Tempo kontraksi dari simulator latihan, repetisi per menit.
   const [repTempo, setRepTempo] = useState(0)
@@ -285,9 +284,8 @@ export function BodyExplorer() {
   // Simulator latihan menyetir tempo kontraksi otot yang sedang disorot,
   // tanpa mengganggu denyut & napas yang mungkin sedang disetir simulator faal.
   const motion: MotionState = repTempo > 0 ? { ...dasarMotion, contractionRate: repTempo } : dasarMotion
-  // Lapisan yang perlu menyala agar gerak yang dipilih benar-benar KELIHATAN.
-  // Menganimasikan struktur yang lapisannya mati sama saja dengan tidak
-  // menganimasikan apa pun, dan orang akan menyimpulkan fiturnya rusak.
+  // Lapisan terkait dinyalakan agar pengguna dapat memeriksa struktur yang
+  // relevan dengan reference state. Menyalakan layer bukan animasi deformasi.
   const lapisanGerak: Array<AnatomyLayer['key']> = ['cardiovascular', 'visceral']
   // Organ yang isi klinisnya sedang terbuka. Diisi oleh KETUKAN pada figur 3D
   // maupun oleh tombol organ — keduanya masuk lewat pintu yang sama supaya
@@ -573,13 +571,13 @@ export function BodyExplorer() {
           pancreas do". Real anatomical structures light up in green on the model when a match is found.
         </p>
 
-        {/* Gerak fisiologis — irama nyata pada figur yang sama. */}
+        {/* Keadaan referensi fisiologi — angka berubah, atlas sumber tetap stabil. */}
         <div className="mt-2">
           <div className="flex flex-wrap items-center justify-center gap-1.5">
             {([
-              { key: 'off', label: 'Still' },
-              { key: 'rest', label: 'Resting' },
-              { key: 'exercise', label: 'Exercising' },
+              { key: 'off', label: 'Anatomy only' },
+              { key: 'rest', label: 'Rest refs' },
+              { key: 'exercise', label: 'Exercise refs' },
             ] as Array<{ key: 'off' | 'rest' | 'exercise'; label: string }>).map((m) => (
               <button
                 key={m.key}
@@ -596,7 +594,7 @@ export function BodyExplorer() {
           </div>
           {simVitals && (
             <p className="mt-1 text-center text-[10px] leading-relaxed text-brand">
-              Driven by the simulator — heart rate {simVitals.hr}/min and respiratory rate {simVitals.rr}/min. Source anatomy remains dimensionally stable.
+              Simulator reference — heart rate {simVitals.hr}/min and respiratory rate {simVitals.rr}/min. Source anatomy remains dimensionally stable.
             </p>
           )}
           {motionMode !== 'off' && !layers.has('cardiovascular') && !layers.has('visceral') && (
@@ -609,14 +607,14 @@ export function BodyExplorer() {
           )}
           {motionMode !== 'off' && (layers.has('cardiovascular') || layers.has('visceral')) && (
             <p className="mt-1 text-center text-[10px] leading-relaxed text-neutral-400">
-              Pulse-wave transit and peristaltic timing remain physiology teaching data. The source atlas is not scaled or deformed to simulate those processes.
+              Reference timing only — the source atlas stays dimensionally stable; it is not scaled or deformed to imitate beating, breathing expansion, muscle shortening, or peristalsis.
             </p>
           )}
           {!simVitals && motionMode !== 'off' && (
             <p className="mt-1 text-center text-[10px] leading-relaxed text-neutral-400">
-              Heart {motion.heartRate}/min · breathing {motion.respRate}/min
-              {motion.contractionRate > 0 && ` · highlighted muscle contracting ${motion.contractionRate}/min`}
-              {(motion.peristalsisRate ?? 0) > 0 && ` · gut peristalsis ${motion.peristalsisRate}/min`}
+              Reference: heart {motion.heartRate}/min · breathing {motion.respRate}/min
+              {motion.contractionRate > 0 && ` · highlighted muscle tempo ${motion.contractionRate}/min`}
+              {(motion.peristalsisRate ?? 0) > 0 && ` · gut peristalsis reference ${motion.peristalsisRate}/min`}
             </p>
           )}
         </div>
@@ -859,8 +857,8 @@ export function BodyExplorer() {
                 <SimulatorSection
                   onVitals={(hr, rr) => {
                     setSimVitals({ hr, rr })
-                    // Lapisan jantung & paru dinyalakan, kalau tidak simulasinya
-                    // menggerakkan struktur yang tidak terlihat.
+                    // Nyalakan struktur terkait agar angka referensi dapat
+                    // diperiksa terhadap anatominya; geometri tetap stabil.
                     setLayers((prev) => new Set(prev).add('cardiovascular').add('visceral'))
                   }}
                 />
