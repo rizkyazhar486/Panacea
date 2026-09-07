@@ -12,6 +12,7 @@
     <link rel="stylesheet" href="/home-widget-clean-v11.css?v=20260908-1" />
     <link rel="stylesheet" href="/home-performance-v12.css?v=20260908-1" />
     <link rel="stylesheet" href="/home-theme-v18.css?v=20260908-1" />
+    <link rel="stylesheet" href="/shell-theme-v18.css?v=20260908-1" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="default" />
     <meta name="apple-mobile-web-app-title" content="Panaceamed" />
@@ -32,13 +33,10 @@
     <meta name="twitter:image" content="./logo-mark.png" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <!-- Critical Home typography only. Keep the first paint small and predictable. -->
     <link
       href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@600;700&display=swap"
       rel="stylesheet"
     />
-    <!-- Specialty display faces are not needed to make Home usable. Load them
-         after first paint instead of competing with React, widgets and health data. -->
     <link
       href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Barlow:wght@300;400;500;600&family=Unbounded:wght@700;800;900&family=Oxanium:wght@600;700;800&family=Gugi&display=swap"
       rel="stylesheet"
@@ -65,13 +63,8 @@
         const saveData = Boolean(navigator.connection && navigator.connection.saveData)
         const reducedMotion = Boolean(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches)
         const lowMemory = isIOS || saveData || reducedMotion
-
         window.__PANACEA_LOW_MEMORY__ = lowMemory
         if (lowMemory) document.documentElement.classList.add('pmd-low-memory')
-
-        // Low-memory mode may simplify decorative animation elsewhere, but it
-        // must never hide, pause, detach or rewrite user-facing video/media.
-        // Curated landing media remains controlled by its own React component.
       })()
     </script>
   </head>
@@ -80,7 +73,6 @@
     <div id="pmd-splash" style="position:fixed;inset:0;z-index:9999;display:flex;align-items:center;justify-content:center;background:linear-gradient(160deg,#00BF63,#0B7A4B);transition:opacity .35s ease;">
       <img src="./logo-mark.png" alt="" width="72" height="72" style="border-radius:20px;animation:pmd-splash-pulse 1.3s ease-in-out infinite;box-shadow:0 12px 32px rgba(0,0,0,0.25);" />
     </div>
-
     <script>
       (() => {
         const CACHE_PREFIX = 'panaceamed-'
@@ -90,43 +82,27 @@
           const root = document.getElementById('root')
           return Boolean(root && root.childElementCount > 0)
         }
-
-        // Cache/SW maintenance used to run on every launch after 2.5 seconds.
-        // On iOS that means storage I/O and network work lands exactly when the
-        // user starts scrolling Home. Run it only once per build generation,
-        // and only when the browser has an idle window.
         const maintain = async () => {
           try {
             if ('caches' in window) {
               const keys = await caches.keys()
               for (const key of keys) {
-                if (key.startsWith(CACHE_PREFIX) && !key.includes('stability')) {
-                  await caches.delete(key)
-                }
+                if (key.startsWith(CACHE_PREFIX) && !key.includes('stability')) await caches.delete(key)
               }
             }
             if (navigator.onLine && 'serviceWorker' in navigator) {
               const registrations = await navigator.serviceWorker.getRegistrations()
-              for (const registration of registrations) {
-                await registration.update().catch(() => undefined)
-              }
+              for (const registration of registrations) await registration.update().catch(() => undefined)
             }
             try { localStorage.setItem(MAINTENANCE_KEY, MAINTENANCE_VERSION) } catch {}
           } catch {}
         }
-
         let alreadyMaintained = false
         try { alreadyMaintained = localStorage.getItem(MAINTENANCE_KEY) === MAINTENANCE_VERSION } catch {}
         if (!alreadyMaintained) {
-          if ('requestIdleCallback' in window) {
-            window.requestIdleCallback(() => { void maintain() }, { timeout: 15000 })
-          } else {
-            window.setTimeout(() => { void maintain() }, 12000)
-          }
+          if ('requestIdleCallback' in window) window.requestIdleCallback(() => { void maintain() }, { timeout: 15000 })
+          else window.setTimeout(() => { void maintain() }, 12000)
         }
-
-        // If React truly did not mount, keep the page usable and let the user retry.
-        // Do not mutate caches and reload automatically.
         window.setTimeout(() => {
           if (rootReady()) return
           const splash = document.getElementById('pmd-splash')
