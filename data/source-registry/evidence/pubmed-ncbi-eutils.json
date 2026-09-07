@@ -1,0 +1,63 @@
+{
+  "id": "pubmed-ncbi-eutils",
+  "name": "PubMed via NCBI E-utilities",
+  "category": "evidence",
+  "kind": ["api"],
+  "homepage": "https://pubmed.ncbi.nlm.nih.gov/",
+  "repository": null,
+  "features": [
+    "hope-stack",
+    "clinical-evidence",
+    "mental-health",
+    "geroscience-pharma",
+    "regenerative-medicine",
+    "early-detection",
+    "longevity-care",
+    "predictive-ai",
+    "longevity-finance",
+    "aging-technology",
+    "longevity-infrastructure"
+  ],
+  "usage": {
+    "runtime": true,
+    "buildTime": false,
+    "networkRequired": true,
+    "notes": "Panacea retrieves citation metadata through its server-side E-utilities adapter; the browser does not call NCBI directly."
+  },
+  "license": {
+    "status": "CHECK_REQUIRED",
+    "identifier": null,
+    "commercialUse": "CONDITIONAL",
+    "attributionRequired": true,
+    "shareAlike": null,
+    "scope": "Bibliographic metadata/API use. Full-text article rights are separate and must not be inferred from PubMed indexing.",
+    "verificationUrl": "https://www.ncbi.nlm.nih.gov/home/about/policies/",
+    "verifiedAt": null,
+    "notes": "Verify current NCBI database/API policies before expanding redistribution or caching beyond citation metadata."
+  },
+  "validation": {
+    "level": "REFERENCE",
+    "clinicalDecisionUse": "CONTEXT_ONLY",
+    "notes": "PubMed indexing establishes bibliographic provenance, not study quality, guideline status, causality, or individual clinical applicability."
+  },
+  "provenance": {
+    "authority": "U.S. National Library of Medicine / National Center for Biotechnology Information",
+    "sourceIdentityRequired": true,
+    "versionPinRequired": false,
+    "notes": "Preserve PMID, source, query and retrieval timestamp for every displayed record."
+  },
+  "adapter": {
+    "status": "ACTIVE",
+    "normalizedTarget": "panacea.evidence.citation",
+    "module": "server/src/pubmed.ts",
+    "notes": "Existing production adapter performs PubMed esearch then esummary and returns normalized citation metadata."
+  },
+  "trust": {
+    "authority": 5,
+    "evidenceQuality": 3,
+    "recency": 5,
+    "licenseClarity": 3,
+    "reproducibility": 5,
+    "notes": "Trust score applies to the bibliographic source and reproducibility of retrieval, not to the quality of every indexed study."
+  }
+}

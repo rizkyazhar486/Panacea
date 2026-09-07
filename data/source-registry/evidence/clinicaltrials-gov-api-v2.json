@@ -1,0 +1,58 @@
+{
+  "id": "clinicaltrials-gov-api-v2",
+  "name": "ClinicalTrials.gov API v2",
+  "category": "evidence",
+  "kind": ["api"],
+  "homepage": "https://clinicaltrials.gov/",
+  "repository": null,
+  "features": [
+    "hope-stack",
+    "geroscience-pharma",
+    "regenerative-medicine",
+    "early-detection",
+    "aging-technology",
+    "clinical-trial-discovery"
+  ],
+  "usage": {
+    "runtime": true,
+    "buildTime": false,
+    "networkRequired": true,
+    "notes": "Panacea accesses ClinicalTrials.gov through its server adapter. The browser does not query the registry API directly."
+  },
+  "license": {
+    "status": "CHECK_REQUIRED",
+    "identifier": null,
+    "commercialUse": "CONDITIONAL",
+    "attributionRequired": true,
+    "shareAlike": null,
+    "scope": "Registered study metadata retrieved from the public ClinicalTrials.gov API v2.",
+    "verificationUrl": "https://clinicaltrials.gov/data-api/about-api",
+    "verifiedAt": null,
+    "notes": "Verify current API terms, attribution expectations and any downstream redistribution limits before expanding use."
+  },
+  "validation": {
+    "level": "REFERENCE",
+    "clinicalDecisionUse": "CONTEXT_ONLY",
+    "notes": "Registration does not establish efficacy, safety, approval, recruitment suitability, or individual treatment appropriateness."
+  },
+  "provenance": {
+    "authority": "U.S. National Library of Medicine / National Institutes of Health",
+    "sourceIdentityRequired": true,
+    "versionPinRequired": false,
+    "notes": "Preserve NCT identifier, official record URL, query and retrieval timestamp for every displayed study."
+  },
+  "adapter": {
+    "status": "ACTIVE",
+    "normalizedTarget": "panacea.evidence.registered-study",
+    "module": "server/src/trials.ts",
+    "notes": "Existing production adapter normalizes NCT ID, title, recruitment status, condition, phase and location."
+  },
+  "trust": {
+    "authority": 5,
+    "evidenceQuality": 3,
+    "recency": 5,
+    "licenseClarity": 3,
+    "reproducibility": 5,
+    "notes": "Trust score applies to registry provenance and reproducibility of retrieval; it must not be interpreted as proof that a registered intervention works."
+  }
+}
