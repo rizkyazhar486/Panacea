@@ -41,16 +41,39 @@ export function CatatanLatihan() {
 
   const ringkas = useMemo(() => {
     const w = getWorkouts()
-    const sesiTanggal = w.filter((x) => kunciTanggal(new Date(x.mulai)) === tanggal)
-    const detikTanggal = sesiTanggal.reduce(
-      (total, x) => total + (Number.isFinite(x.durasi) && x.durasi > 0 ? x.durasi : 0),
-      0,
-    )
+    const detikPerTanggal = new Map<string, number>()
+    for (const x of w) {
+      const kunci = kunciTanggal(new Date(x.mulai))
+      const aman = Number.isFinite(x.durasi) && x.durasi > 0 ? x.durasi : 0
+      detikPerTanggal.set(kunci, (detikPerTanggal.get(kunci) ?? 0) + aman)
+    }
+
+    const sesiTanggal = w
+      .filter((x) => kunciTanggal(new Date(x.mulai)) === tanggal)
+      .sort((a, b) => Date.parse(b.mulai) - Date.parse(a.mulai))
+    const detikTanggal = detikPerTanggal.get(tanggal) ?? 0
+    const tren = Array.from({ length: 7 }, (_, i) => {
+      const d = new Date()
+      d.setHours(12, 0, 0, 0)
+      d.setDate(d.getDate() - (6 - i))
+      const kunci = kunciTanggal(d)
+      return {
+        kunci,
+        label: d.toLocaleDateString('en-US', { weekday: 'short' }),
+        menit: Math.round((detikPerTanggal.get(kunci) ?? 0) / 60),
+      }
+    })
+    const maxMenit7 = Math.max(1, ...tren.map((x) => x.menit))
+
     return {
       total: w.length,
       tangan: w.filter((x) => sesiTangan(x.id)).length,
       hari: sesiTanggal.length,
       menit: Math.round(detikTanggal / 60),
+      terbaru: sesiTanggal[0] ?? null,
+      tren,
+      maxMenit7,
+      hariAktif7: tren.filter((x) => x.menit > 0).length,
     }
     // versi ikut menjadi kebergantungan supaya daftarnya dibaca ulang setelah
     // satu sesi disimpan — tanpa itu ringkasannya tertinggal satu langkah.
@@ -110,6 +133,53 @@ export function CatatanLatihan() {
           {ringkas.total} session${ringkas.total === 1 ? '' : 's'} saved overall{ringkas.tangan ? ` · ${ringkas.tangan} entered by hand` : ''}.
         </p>
       )}
+
+      {ringkas.terbaru && (
+        <div className="mt-3 rounded-2xl border border-neutral-100 p-3 dark:border-white/10">
+          <div className="t-mikro font-bold uppercase tracking-wide text-neutral-500">Latest logged</div>
+          <div className="mt-1 flex items-start justify-between gap-3">
+            <div className="min-w-0">
+              <div className="truncate text-sm font-black text-ink dark:text-white">{ringkas.terbaru.nama.trim() || 'Training session'}</div>
+              <div className="mt-1 flex flex-wrap gap-x-3 gap-y-1 text-[10px] font-semibold text-neutral-500">
+                <span>{Math.round(ringkas.terbaru.durasi / 60)} min</span>
+                {Number.isFinite(ringkas.terbaru.jarakKm) && (ringkas.terbaru.jarakKm ?? 0) > 0 && <span>{ringkas.terbaru.jarakKm?.toFixed(1)} km</span>}
+                {Number.isFinite(ringkas.terbaru.rpe) && (ringkas.terbaru.rpe ?? 0) > 0 && <span>RPE {ringkas.terbaru.rpe}/10</span>}
+              </div>
+            </div>
+            <div className="shrink-0 rounded-full bg-brand-50 px-2.5 py-1 text-[10px] font-black text-brand-dark">Latest</div>
+          </div>
+        </div>
+      )}
+
+      <div className="mt-3 rounded-2xl border border-neutral-100 p-3 dark:border-white/10" aria-label="Training minutes over the last 7 days">
+        <div className="flex items-end justify-between gap-3">
+          <div>
+            <div className="t-mikro font-bold uppercase tracking-wide text-neutral-500">Last 7 days</div>
+            <div className="mt-0.5 text-sm font-black text-ink dark:text-white">Training minutes</div>
+          </div>
+          <div className="text-right">
+            <div className="text-lg font-black tabular-nums text-brand-dark">{ringkas.hariAktif7}<span className="text-xs text-neutral-500">/7</span></div>
+            <div className="t-mikro text-neutral-500">active days</div>
+          </div>
+        </div>
+        <div className="mt-3 grid grid-cols-7 gap-1.5">
+          {ringkas.tren.map((d) => (
+            <div key={d.kunci} className="min-w-0 text-center" aria-label={`${d.kunci}: ${d.menit} training minutes`}>
+              <div className="flex h-16 items-end overflow-hidden rounded-lg bg-neutral-100 dark:bg-white/5">
+                <div
+                  className="w-full rounded-t-lg bg-brand/80"
+                  style={{ height: d.menit > 0 ? `${Math.max(4, (d.menit / ringkas.maxMenit7) * 100)}%` : '0%' }}
+                />
+              </div>
+              <div className="mt-1 truncate text-[9px] font-bold text-neutral-500">{d.label}</div>
+              <div className="text-[9px] font-black tabular-nums text-ink dark:text-white">{d.menit || '—'}</div>
+            </div>
+          ))}
+        </div>
+        <p className="mt-2 text-[9px] leading-relaxed text-neutral-500 dark:text-neutral-400">
+          Bar height is relative to your busiest logged day in this 7-day window. It shows recorded duration, not training quality or recovery.
+        </p>
+      </div>
 
       <div className="mt-3 space-y-3">
         <div>
