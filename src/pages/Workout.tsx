@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react'
-import { hariIni } from '../lib/tanggal'
+import { hariIni, hariLalu } from '../lib/tanggal'
 import { Card, SectionTitle, Button, Badge, inputClass } from '../components/ui'
 import { FotoLatihanKecil } from '../components/FotoLatihan'
 import { IconActivity, IconFlame, IconRun, IconCheck, IconPlus } from '../components/icons'
@@ -211,6 +211,44 @@ export function Workout() {
       .filter((item) => item.sets > 0)
       .sort((a, b) => b.sets - a.sets)
   }, [log])
+  const progress28 = useMemo(() => {
+    const offsetByDate = new Map<string, number>()
+    for (let offset = 0; offset < 28; offset += 1) offsetByDate.set(hariLalu(offset), offset)
+
+    const buckets = [
+      { label: '0–6d', sets: 0, loadedVolume: 0, days: new Set<string>() },
+      { label: '7–13d', sets: 0, loadedVolume: 0, days: new Set<string>() },
+      { label: '14–20d', sets: 0, loadedVolume: 0, days: new Set<string>() },
+      { label: '21–27d', sets: 0, loadedVolume: 0, days: new Set<string>() },
+    ]
+
+    for (const entry of log) {
+      const offset = offsetByDate.get(entry.date)
+      if (offset === undefined) continue
+      const safeSets = Number.isFinite(entry.sets) && entry.sets > 0 ? entry.sets : 0
+      const safeReps = Number.isFinite(entry.reps) && entry.reps > 0 ? entry.reps : 0
+      const safeWeight = Number.isFinite(entry.weight) && entry.weight > 0 ? entry.weight : 0
+      if (safeSets === 0) continue
+      const bucket = buckets[Math.floor(offset / 7)]
+      bucket.sets += safeSets
+      bucket.loadedVolume += safeSets * safeReps * safeWeight
+      bucket.days.add(entry.date)
+    }
+
+    const rows = [...buckets].reverse().map((bucket) => ({
+      label: bucket.label,
+      sets: bucket.sets,
+      loadedVolume: bucket.loadedVolume,
+      activeDays: bucket.days.size,
+    }))
+
+    return {
+      rows,
+      maxSets: Math.max(1, ...rows.map((row) => row.sets)),
+      totalSets: rows.reduce((sum, row) => sum + row.sets, 0),
+      activeDays: rows.reduce((sum, row) => sum + row.activeDays, 0),
+    }
+  }, [log, todayStr])
 
   return (
     <div className="mx-auto max-w-2xl space-y-5 pb-24">
@@ -293,6 +331,39 @@ export function Workout() {
           </div>
           <p className="mt-3 text-[11px] leading-relaxed text-neutral-500">
             Set distribution is descriptive, not a prescription. Use it to spot repeated emphasis or neglected areas; appropriate weekly set targets depend on training goal, exercise selection, intensity, and recovery.
+          </p>
+        </Card>
+      )}
+
+      {progress28.totalSets > 0 && (
+        <Card className="!p-5">
+          <SectionTitle icon={<IconRun size={18} />} title="28-Day Volume Trend" subtitle="Four consecutive 7-day blocks using your local calendar" />
+          <div className="mt-3 flex flex-wrap gap-2 text-[11px]">
+            <span className="rounded-full bg-brand-50 px-2.5 py-1 font-bold text-brand-dark">{progress28.totalSets} sets / 28d</span>
+            <span className="rounded-full bg-neutral-100 px-2.5 py-1 font-bold text-neutral-600 dark:bg-white/10 dark:text-neutral-300">{progress28.activeDays} training days</span>
+          </div>
+          <div className="mt-4 space-y-3">
+            {progress28.rows.map((row) => (
+              <div key={row.label} className="rounded-xl border border-neutral-100 p-3 dark:border-white/10">
+                <div className="flex items-center justify-between gap-3 text-xs">
+                  <span className="font-bold text-ink dark:text-white">{row.label}</span>
+                  <span className="shrink-0 tabular-nums font-semibold text-neutral-600 dark:text-neutral-300">{row.sets} sets</span>
+                </div>
+                <div className="mt-2 h-2 overflow-hidden rounded-full bg-neutral-100 dark:bg-white/10" role="img" aria-label={`${row.label}: ${row.sets} logged sets across ${row.activeDays} training days`}>
+                  <div
+                    className="h-full rounded-full bg-brand"
+                    style={{ width: `${row.sets > 0 ? Math.max(4, (row.sets / progress28.maxSets) * 100) : 0}%` }}
+                  />
+                </div>
+                <div className="mt-1.5 flex flex-wrap items-center justify-between gap-x-3 gap-y-1 text-[10px] text-neutral-500">
+                  <span>{row.activeDays} training {row.activeDays === 1 ? 'day' : 'days'}</span>
+                  <span className="tabular-nums">{row.loadedVolume > 0 ? `${row.loadedVolume.toLocaleString('en-US', { maximumFractionDigits: 1 })} kg·reps external` : 'No external kg logged'}</span>
+                </div>
+              </div>
+            ))}
+          </div>
+          <p className="mt-3 text-[11px] leading-relaxed text-neutral-500">
+            Set volume includes bodyweight and loaded exercise logs. External volume load is Σ(sets × reps × entered kg), so bodyweight work is not assigned an invented kilogram value.
           </p>
         </Card>
       )}
