@@ -52,6 +52,27 @@ page.on('pageerror', (error) => pageErrors.push(error.message))
 
 let metrics = null
 let failure = null
+let screenshotCaptured = false
+let screenshotError = null
+
+async function captureViewport() {
+  // Use Chromium's DevTools protocol directly. Page.screenshot occasionally
+  // fails to persist a WebGL-backed mobile frame in headless CI even though
+  // the renderer is healthy. CDP captures the actual compositor surface and
+  // gives us deterministic visual evidence for the 390x844 acceptance gate.
+  const cdp = await context.newCDPSession(page)
+  try {
+    const shot = await cdp.send('Page.captureScreenshot', {
+      format: 'png',
+      fromSurface: true,
+      captureBeyondViewport: false,
+    })
+    await writeFile(screenshotPath, Buffer.from(shot.data, 'base64'))
+    screenshotCaptured = true
+  } finally {
+    await cdp.detach()
+  }
+}
 
 try {
   const response = await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 45_000 })
@@ -118,20 +139,34 @@ try {
 
   if (pageErrors.length) throw new Error(`Browser page errors: ${pageErrors.join(' | ')}`)
 
-  console.log(JSON.stringify({ ok: true, url, ...metrics }))
+  // A green mobile gate must include inspectable visual evidence, not metrics
+  // alone. This screenshot is the exact 390x844 compositor surface after a
+  // real orbit interaction.
+  await captureViewport()
+  if (!screenshotCaptured) throw new Error('Body3D mobile visual evidence was not captured')
+
+  console.log(JSON.stringify({ ok: true, url, screenshotCaptured, ...metrics }))
 } catch (error) {
   failure = error instanceof Error ? error.message : String(error)
   throw error
 } finally {
-  // Keep evidence even on failure so CI never turns a visual/runtime problem
-  // into an opaque red status with no inspectable artifact.
-  try {
-    await page.screenshot({ path: screenshotPath, fullPage: false })
-  } catch {
-    // Navigation/renderer failure may make screenshot impossible; metrics still
-    // record the failure reason below.
+  // On a failure, still try once to preserve the rendered state that led to it.
+  if (!screenshotCaptured) {
+    try {
+      await captureViewport()
+    } catch (error) {
+      screenshotError = error instanceof Error ? error.message : String(error)
+    }
   }
-  await writeFile(metricsPath, `${JSON.stringify({ ok: !failure, url, failure, pageErrors, metrics }, null, 2)}\n`)
+  await writeFile(metricsPath, `${JSON.stringify({
+    ok: !failure,
+    url,
+    failure,
+    pageErrors,
+    screenshotCaptured,
+    screenshotError,
+    metrics,
+  }, null, 2)}\n`)
   await context.close()
   await browser.close()
 }
