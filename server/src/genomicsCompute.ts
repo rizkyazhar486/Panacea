@@ -32,7 +32,7 @@ const INPUT_SCHEMES = new Set(['https:', 's3:', 'gs:'])
 const HANDLE_VERSION = 1
 const MAX_PARAMETER_BYTES = 32 * 1024
 const MAX_INPUT_URI_LENGTH = 4096
-const ATTACHED = Symbol.for('panacea.genomics.compute.routes')
+const attachedApps = new WeakSet<Express>()
 
 class WorkerNotConfiguredError extends Error {}
 class WorkerRequestError extends Error {
@@ -101,9 +101,9 @@ function decodeHandle(handle: string, ownerId: string): SignedJob | null {
   const [body, signature, extra] = handle.split('.')
   if (!body || !signature || extra) return null
   const expected = createHmac('sha256', config.jwtSecret).update(body).digest('base64url')
-  const a = Buffer.from(signature, 'utf8')
-  const b = Buffer.from(expected, 'utf8')
-  if (a.length !== b.length || !timingSafeEqual(a, b)) return null
+  const suppliedBuffer = Buffer.from(signature, 'utf8')
+  const expectedBuffer = Buffer.from(expected, 'utf8')
+  if (suppliedBuffer.length !== expectedBuffer.length || !timingSafeEqual(suppliedBuffer, expectedBuffer)) return null
 
   try {
     const parsed = JSON.parse(Buffer.from(body, 'base64url').toString('utf8')) as Partial<SignedJob>
@@ -119,6 +119,12 @@ function workerBaseUrl() {
   const base = config.genomics.workerUrl.replace(/\/+$/, '')
   if (!base) throw new WorkerNotConfiguredError('Genomics compute worker is not configured on the Render backend.')
   return base
+}
+
+function publicWorkerPayload(payload: WorkerPayload) {
+  return Object.fromEntries(
+    Object.entries(payload).filter(([key]) => !['id', 'jobId', 'ownerId'].includes(key)),
+  )
 }
 
 async function parseWorkerResponse(response: globalThis.Response) {
@@ -192,9 +198,8 @@ export function attachGenomicsComputeRoutes(server: Server) {
     return
   }
 
-  const registry = app as Express & { [ATTACHED]?: boolean }
-  if (registry[ATTACHED]) return
-  registry[ATTACHED] = true
+  if (attachedApps.has(app)) return
+  attachedApps.add(app)
 
   app.get('/api/genomics/compute/capabilities', (_req, res) => {
     res.json({
@@ -240,11 +245,10 @@ export function attachGenomicsComputeRoutes(server: Server) {
       if (!workerJobId) {
         throw new WorkerRequestError(502, 'invalid_genomics_worker_response', 'Genomics worker accepted the request but did not return a job id.', payload)
       }
-      const { id: _id, jobId: _jobId, ...publicPayload } = payload
       return res.status(202).json({
         jobHandle: encodeHandle({ v: HANDLE_VERSION, id: workerJobId, owner: ownerId }),
         status: typeof payload.status === 'string' ? payload.status : 'queued',
-        job: publicPayload,
+        job: publicWorkerPayload(payload),
       })
     } catch (error) {
       return respondError(res, error)
@@ -258,8 +262,7 @@ export function attachGenomicsComputeRoutes(server: Server) {
       const decoded = decodeHandle(req.params.jobHandle, ownerId)
       if (!decoded) return res.status(404).json({ error: 'genomics_job_not_found' })
       const payload = await workerRequest(`/jobs/${encodeURIComponent(decoded.id)}`)
-      const { id: _id, jobId: _jobId, ownerId: _ownerId, ...publicPayload } = payload
-      return res.json({ jobHandle: req.params.jobHandle, ...publicPayload })
+      return res.json({ jobHandle: req.params.jobHandle, ...publicWorkerPayload(payload) })
     } catch (error) {
       return respondError(res, error)
     }
@@ -272,8 +275,7 @@ export function attachGenomicsComputeRoutes(server: Server) {
       const decoded = decodeHandle(req.params.jobHandle, ownerId)
       if (!decoded) return res.status(404).json({ error: 'genomics_job_not_found' })
       const payload = await workerRequest(`/jobs/${encodeURIComponent(decoded.id)}/cancel`, { method: 'POST' })
-      const { id: _id, jobId: _jobId, ownerId: _ownerId, ...publicPayload } = payload
-      return res.json({ jobHandle: req.params.jobHandle, ...publicPayload })
+      return res.json({ jobHandle: req.params.jobHandle, ...publicWorkerPayload(payload) })
     } catch (error) {
       return respondError(res, error)
     }
