@@ -36,7 +36,9 @@ assert.match(bodyPage, /open && <div/, 'optional non-primary panels should unmou
 const workbench = readFileSync('src/components/digital-twin/HeadToToeAnatomyWorkbench.tsx', 'utf8')
 assert.match(workbench, /HraResolvedAnatomyViewer/)
 assert.match(workbench, /HraContextBridge/)
-assert.match(workbench, /Continue this structure into physiology/)
+assert.match(workbench, /onOpenPhysiology/)
+assert.match(workbench, /Later · physiology bridge/, 'physiology should remain an explicit secondary bridge from anatomy')
+assert.match(workbench, /Open physiology for this anatomy/, 'the bridge should stay actionable without making physiology the primary workspace')
 
 const navigator = readFileSync('src/components/digital-twin/HeadToToeAnatomyNavigator.tsx', 'utf8')
 assert.match(navigator, /Head-to-toe precision map/)
