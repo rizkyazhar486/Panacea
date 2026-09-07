@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { SISTEM_FISIOLOGI, type SistemFisiologi } from '../../lib/physiology'
 import type { AnatomyLayer } from '../../components/Body3D'
+import { PhysiologyDeepDivePanel } from './PhysiologyDeepDivePanel'
 
 // Fisiologi — apa yang tubuh KERJAKAN. Tiap sistem membawa nilai istirahat DAN
 // nilai saat olahraga bersebelahan, karena di situlah halaman ini bertemu
@@ -24,7 +25,7 @@ export function PhysiologySection({ onPickSystem }: Props) {
   const [open, setOpen] = useState<string | null>(null)
 
   return (
-    <div className="space-y-2">
+    <div className="space-y-3">
       <p className="text-[11px] leading-relaxed text-neutral-400">
         Anatomy is what the body is made of; physiology is what it does. Each system below shows its resting values
         and — in green — what changes under exercise, which is the same load the Workout tab measures.
@@ -38,7 +39,7 @@ export function PhysiologySection({ onPickSystem }: Props) {
                 setOpen(terbuka ? null : s.key)
                 if (!terbuka) onPickSystem(s.layer3d, s.searchTerms, s.label)
               }}
-              className="flex w-full items-center justify-between gap-2 px-3 py-2.5 text-left"
+              className="flex min-h-11 w-full items-center justify-between gap-2 px-3 py-2.5 text-left"
             >
               <span className="min-w-0">
                 <span className="block text-sm font-bold text-ink dark:text-white">{s.label}</span>
@@ -81,9 +82,15 @@ export function PhysiologySection({ onPickSystem }: Props) {
           </div>
         )
       })}
+
+      <PhysiologyDeepDivePanel
+        onFocus={(topic) => onPickSystem(topic.layer3d, topic.searchTerms, topic.label)}
+      />
+
       <p className="text-[10.5px] leading-relaxed text-neutral-400">
         Reference ranges are standard adult values from general physiology teaching, not diagnostic thresholds and
-        not targets for any individual.
+        not targets for any individual. Deep-dive formulas are transparent teaching relationships and require measured
+        inputs plus clinical context before they can be used for patient interpretation.
       </p>
     </div>
   )
