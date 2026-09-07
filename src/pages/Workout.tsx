@@ -161,6 +161,7 @@ export function Workout() {
   const [sets, setSets] = useState(3); const [reps, setReps] = useState(12); const [weight, setWeight] = useState(0)
   const [toasts, setToasts] = useState<Achievement[]>([])
   const [badgeCount, setBadgeCount] = useState(unlockedCount)
+  const validLogInput = Number.isInteger(sets) && sets > 0 && Number.isInteger(reps) && reps > 0 && Number.isFinite(weight) && weight >= 0
 
   const filtered = useMemo(() => EX.filter((e) =>
     (muscle === 'All' || e.muscle === muscle) &&
@@ -169,6 +170,7 @@ export function Workout() {
   ), [muscle, modality, type])
 
   function logExercise(exId: string) {
+    if (!validLogInput) return
     const entry: LogEntry = { id: `${Date.now()}`, exId, date: hariIni(), sets, reps, weight }
     const next = [entry, ...log]
     setLog(next); saveLog(next)
@@ -423,10 +425,10 @@ export function Workout() {
                 </div>
 
                 <div className="flex flex-wrap items-end gap-2 rounded-xl border border-neutral-100 p-3">
-                  <label className="text-xs">Sets<input className={inputClass + ' mt-1 w-16'} type="number" value={sets} onChange={(ev) => setSets(+ev.target.value)} /></label>
-                  <label className="text-xs">Reps<input className={inputClass + ' mt-1 w-16'} type="number" value={reps} onChange={(ev) => setReps(+ev.target.value)} /></label>
-                  <label className="text-xs">Load (kg)<input className={inputClass + ' mt-1 w-20'} type="number" value={weight} onChange={(ev) => setWeight(+ev.target.value)} /></label>
-                  <Button onClick={() => logExercise(e.id)} className="h-9"><IconPlus size={14} /> Log</Button>
+                  <label className="text-xs">Sets<input className={inputClass + ' mt-1 w-16'} type="number" min={1} step={1} value={sets} onChange={(ev) => setSets(+ev.target.value)} /></label>
+                  <label className="text-xs">Reps<input className={inputClass + ' mt-1 w-16'} type="number" min={1} step={1} value={reps} onChange={(ev) => setReps(+ev.target.value)} /></label>
+                  <label className="text-xs">Load (kg)<input className={inputClass + ' mt-1 w-20'} type="number" min={0} step="any" value={weight} onChange={(ev) => setWeight(+ev.target.value)} /></label>
+                  <Button disabled={!validLogInput} onClick={() => logExercise(e.id)} className="h-9"><IconPlus size={14} /> Log</Button>
                 </div>
               </div>
             )}
