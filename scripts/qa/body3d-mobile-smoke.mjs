@@ -27,6 +27,25 @@ const context = await browser.newContext({
   isMobile: true,
   hasTouch: true,
 })
+
+// Shell intentionally sends anonymous visitors to the public welcome page.
+// Seed the same remembered-session format used by StoreProvider so this smoke
+// test exercises the authenticated Body Explorer instead of weakening/bypassing
+// the application's auth guard. The account exists only inside this disposable
+// browser context and carries no production credentials or patient data.
+await context.addInitScript(() => {
+  const account = {
+    email: 'body3d-qa@localhost.test',
+    name: 'Body3D QA',
+    role: 'pasien',
+    isSubscriber: false,
+    loggedAt: new Date().toISOString(),
+    sex: 'L',
+    dob: '1990-01-01',
+  }
+  localStorage.setItem('panaceamed.session.v1', JSON.stringify({ account, loginAt: Date.now() }))
+})
+
 const page = await context.newPage()
 const pageErrors = []
 page.on('pageerror', (error) => pageErrors.push(error.message))
@@ -65,6 +84,7 @@ try {
       webgl: Boolean(gl),
       documentScrollWidth: document.documentElement.scrollWidth,
       canvasCount: document.querySelectorAll('canvas').length,
+      route: window.location.hash,
     }
   })
 
