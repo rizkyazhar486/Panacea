@@ -234,8 +234,12 @@ function inferAssembly(lines: string[]) {
 }
 
 function looksStructural(alt: string, info: string) {
+  const normalized = alt.toUpperCase()
+  if (normalized === '*' || normalized === '<*>' || normalized === '<NON_REF>') return false
   if (/^<[^>]+>$/.test(alt) || /[\[\]]/.test(alt)) return true
-  return /(?:^|;)SVTYPE=|(?:^|;)SVLEN=|(?:^|;)END=|(?:^|;)CN=|(?:^|;)COPY_NUMBER=/i.test(info)
+  // END alone is common in gVCF reference blocks and is not sufficient to
+  // establish a structural event. Require an explicit SV/CN signal.
+  return /(?:^|;)SVTYPE=|(?:^|;)SVLEN=|(?:^|;)CN=|(?:^|;)COPY_NUMBER=/i.test(info)
 }
 
 function parseVcf(text: string): SequenceEvidenceReport {
@@ -278,7 +282,7 @@ function parseVcf(text: string): SequenceEvidenceReport {
         const pair = `${ref}${alt}`.toUpperCase()
         if (TRANSITIONS.has(pair)) transitions += 1
         else transversions += 1
-      } else if (ref.length !== alt.length && !looksStructural(alt, info)) {
+      } else if (ref.length !== alt.length && !looksStructural(alt, info) && !/^<(?:NON_REF|\*)>$/i.test(alt) && alt !== '*') {
         indelAlleles += 1
       }
 
