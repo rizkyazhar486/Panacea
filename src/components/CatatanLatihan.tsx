@@ -41,10 +41,20 @@ export function CatatanLatihan() {
 
   const ringkas = useMemo(() => {
     const w = getWorkouts()
-    return { total: w.length, tangan: w.filter((x) => sesiTangan(x.id)).length }
+    const sesiTanggal = w.filter((x) => kunciTanggal(new Date(x.mulai)) === tanggal)
+    const detikTanggal = sesiTanggal.reduce(
+      (total, x) => total + (Number.isFinite(x.durasi) && x.durasi > 0 ? x.durasi : 0),
+      0,
+    )
+    return {
+      total: w.length,
+      tangan: w.filter((x) => sesiTangan(x.id)).length,
+      hari: sesiTanggal.length,
+      menit: Math.round(detikTanggal / 60),
+    }
     // versi ikut menjadi kebergantungan supaya daftarnya dibaca ulang setelah
     // satu sesi disimpan — tanpa itu ringkasannya tertinggal satu langkah.
-  }, [versi])
+  }, [versi, tanggal])
 
   const bolehSimpan = menit.trim() !== '' && rpe !== null
 
@@ -66,7 +76,7 @@ export function CatatanLatihan() {
   return (
     <section className="kaca rounded-3xl p-4">
       <div className="flex items-baseline justify-between gap-2">
-        <h2 className="t-sedang font-black text-ink dark:text-white">Log a session</h2>
+        <h2 className="t-sedang font-black text-ink dark:text-white">{untukKemarin ? "Yesterday's training" : "Today's training"}</h2>
         <button
           type="button"
           onClick={() => { setUntukKemarin((v) => !v); setPesan('') }}
@@ -79,11 +89,27 @@ export function CatatanLatihan() {
         </button>
       </div>
 
-      <p className="t-kecil mt-1 leading-snug text-neutral-600 dark:text-neutral-300">
-        {ringkas.total === 0
-          ? 'No sessions saved yet. One session is enough to start computing fitness.'
-          : `${ringkas.total} session${ringkas.total === 1 ? '' : 's'} saved${ringkas.tangan ? `, ${ringkas.tangan} of them entered by hand` : ''}.`}
+      <div className="mt-3 grid grid-cols-2 gap-2" aria-label={`Training logged for ${tanggal}`}>
+        <div className="rounded-2xl bg-neutral-100/80 p-3 dark:bg-white/10">
+          <div className="t-mikro font-bold uppercase tracking-wide text-neutral-500">Sessions</div>
+          <div className="mt-1 text-xl font-black tabular-nums text-ink dark:text-white">{ringkas.hari}</div>
+        </div>
+        <div className="rounded-2xl bg-neutral-100/80 p-3 dark:bg-white/10">
+          <div className="t-mikro font-bold uppercase tracking-wide text-neutral-500">Logged time</div>
+          <div className="mt-1 text-xl font-black tabular-nums text-ink dark:text-white">{ringkas.menit}<span className="ml-1 text-xs font-bold text-neutral-500">min</span></div>
+        </div>
+      </div>
+
+      <p className="t-kecil mt-2 leading-snug text-neutral-600 dark:text-neutral-300">
+        {ringkas.hari === 0
+          ? `No training logged ${untukKemarin ? 'yesterday' : 'today'} yet.`
+          : `${ringkas.hari} session${ringkas.hari === 1 ? '' : 's'} logged ${untukKemarin ? 'yesterday' : 'today'} across ${ringkas.menit} minute${ringkas.menit === 1 ? '' : 's'}.`}
       </p>
+      {ringkas.total > 0 && (
+        <p className="t-mikro mt-1 text-neutral-500 dark:text-neutral-400">
+          {ringkas.total} session${ringkas.total === 1 ? '' : 's'} saved overall{ringkas.tangan ? ` · ${ringkas.tangan} entered by hand` : ''}.
+        </p>
+      )}
 
       <div className="mt-3 space-y-3">
         <div>
