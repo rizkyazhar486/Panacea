@@ -5,6 +5,8 @@
 // intentionally does NOT attempt interaction checking, only name lookup.
 
 const BASE = 'https://rxnav.nlm.nih.gov/REST'
+const TIMEOUT_MS = 8000
+const MAX_QUERY_LENGTH = 160
 
 export interface RelatedDrug { name: string; tty: string }
 
@@ -15,31 +17,61 @@ interface RelatedResp {
   }
 }
 
+function cleanQuery(value: string): string {
+  return value
+    .replace(/[<>\u0000-\u001f]/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim()
+    .slice(0, MAX_QUERY_LENGTH)
+}
+
+function upstreamInit(): RequestInit {
+  return {
+    headers: { Accept: 'application/json' },
+    signal: AbortSignal.timeout(TIMEOUT_MS),
+  }
+}
+
 export async function findRelatedDrugs(name: string): Promise<RelatedDrug[]> {
-  const q = name.trim()
+  const q = cleanQuery(name)
   if (!q) return []
 
   // Step 1: resolve the drug name to an RxCUI (RxNorm's canonical concept ID).
-  const rxcuiRes = await fetch(`${BASE}/rxcui.json?name=${encodeURIComponent(q)}&search=1`, { headers: { Accept: 'application/json' } })
+  const rxcuiUrl = new URL(`${BASE}/rxcui.json`)
+  rxcuiUrl.searchParams.set('name', q)
+  rxcuiUrl.searchParams.set('search', '1')
+  const rxcuiRes = await fetch(rxcuiUrl, upstreamInit())
   if (!rxcuiRes.ok) throw new Error(`rxnorm_rxcui_${rxcuiRes.status}`)
   const rxcuiJson = (await rxcuiRes.json()) as RxcuiResp
-  const rxcui = rxcuiJson.idGroup?.rxnormId?.[0]
+
+  // RxCUI is numeric. Reject malformed upstream identifiers rather than
+  // interpolating arbitrary text into the second request path.
+  const rxcui = (rxcuiJson.idGroup?.rxnormId ?? []).find((id) => /^\d+$/.test(id))
   if (!rxcui) return []
 
   // Step 2: fetch related concepts — SCD (clinical/generic drug) and SBD
   // (branded drug) term types, i.e. other formulations/brands of the same
   // active ingredient.
-  const relRes = await fetch(`${BASE}/rxcui/${rxcui}/related.json?tty=SCD+SBD`, { headers: { Accept: 'application/json' } })
+  const relatedUrl = new URL(`${BASE}/rxcui/${rxcui}/related.json`)
+  relatedUrl.searchParams.set('tty', 'SCD SBD')
+  const relRes = await fetch(relatedUrl, upstreamInit())
   if (!relRes.ok) throw new Error(`rxnorm_related_${relRes.status}`)
   const relJson = (await relRes.json()) as RelatedResp
 
   const out: RelatedDrug[] = []
   for (const group of relJson.relatedGroup?.conceptGroup ?? []) {
     for (const prop of group.conceptProperties ?? []) {
-      out.push({ name: prop.name, tty: group.tty ?? '' })
+      const normalizedName = prop.name?.replace(/\s+/g, ' ').trim()
+      if (normalizedName) out.push({ name: normalizedName, tty: group.tty ?? '' })
     }
   }
-  // De-dupe by name, cap the list to a sane size for display.
+
+  // De-dupe case-insensitively and cap the list to a sane size for display.
   const seen = new Set<string>()
-  return out.filter((d) => (seen.has(d.name) ? false : (seen.add(d.name), true))).slice(0, 15)
+  return out.filter((drug) => {
+    const key = drug.name.toLocaleLowerCase('en-US')
+    if (seen.has(key)) return false
+    seen.add(key)
+    return true
+  }).slice(0, 15)
 }
