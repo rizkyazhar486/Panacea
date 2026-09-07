@@ -1,3 +1,5 @@
+import { api, backendEnabled } from './api'
+
 export type SourceStatus = 'idle' | 'loading' | 'ready' | 'partial' | 'error'
 
 export interface LiteratureResult {
@@ -57,7 +59,6 @@ export interface MedicalSourceSearchOptions {
 
 const EUROPE_PMC = 'https://www.ebi.ac.uk/europepmc/webservices/rest/search'
 const OLS = 'https://www.ebi.ac.uk/ols4/api/search'
-const CLINICAL_TRIALS = 'https://clinicaltrials.gov/api/v2/studies'
 const OPENFDA = 'https://api.fda.gov/drug/label.json'
 
 function cleanQuery(value: string) {
@@ -166,33 +167,21 @@ async function searchOls(query: string, signal?: AbortSignal): Promise<OntologyR
 }
 
 async function searchTrials(query: string, signal?: AbortSignal): Promise<TrialResult[]> {
-  type TrialsResponse = {
-    studies?: Array<{
-      protocolSection?: {
-        identificationModule?: { nctId?: string; briefTitle?: string; officialTitle?: string }
-        statusModule?: { overallStatus?: string }
-        conditionsModule?: { conditions?: string[] }
-        armsInterventionsModule?: { interventions?: Array<{ name?: string; type?: string }> }
-        designModule?: { phases?: string[] }
-      }
-    }>
-  }
-  const url = `${CLINICAL_TRIALS}?query.term=${encodeURIComponent(query)}&pageSize=5&format=json`
-  const data = await fetchJson<TrialsResponse>(url, 12000, signal)
-  return (data.studies ?? []).map((study, index) => {
-    const section = study.protocolSection
-    const identification = section?.identificationModule
-    const id = identification?.nctId || `trial-${index}`
-    return {
-      id,
-      title: identification?.briefTitle || identification?.officialTitle || 'Clinical study',
-      status: section?.statusModule?.overallStatus || 'Status not supplied',
-      conditions: section?.conditionsModule?.conditions ?? [],
-      interventions: (section?.armsInterventionsModule?.interventions ?? []).map((item) => item.name || item.type || '').filter(Boolean),
-      phase: section?.designModule?.phases?.join(', '),
-      url: `https://clinicaltrials.gov/study/${encodeURIComponent(id)}`,
-    }
-  })
+  if (!backendEnabled) throw new Error('ClinicalTrials.gov search requires the Panacea backend.')
+  if (signal?.aborted) throw abortError()
+
+  const data = await api.searchTrials(query, false, '')
+  if (signal?.aborted) throw abortError()
+
+  return data.trials.slice(0, 5).map((study) => ({
+    id: study.nctId,
+    title: study.title || 'Clinical study',
+    status: study.status || 'Status not supplied',
+    conditions: study.conditions ? [study.conditions] : [],
+    interventions: [],
+    phase: study.phase && study.phase !== 'N/A' ? study.phase : undefined,
+    url: study.url || `https://clinicaltrials.gov/study/${encodeURIComponent(study.nctId)}`,
+  }))
 }
 
 async function searchDrugLabels(query: string, signal?: AbortSignal): Promise<DrugLabelResult[]> {
