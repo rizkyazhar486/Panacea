@@ -12,14 +12,26 @@ type Props = {
   maxResults?: number
 }
 
+type ViewApi = {
+  camera: THREE.PerspectiveCamera
+  controls: OrbitControls
+  root: THREE.Object3D
+  render: () => void
+}
+
 function unique(values: string[]) {
   return [...new Set(values.map((value) => value.trim()).filter(Boolean))]
 }
 
-function fitCamera(camera: THREE.PerspectiveCamera, controls: OrbitControls, object: THREE.Object3D) {
+function boundingSphere(object: THREE.Object3D) {
   const box = new THREE.Box3().setFromObject(object)
-  if (box.isEmpty()) return
-  const sphere = box.getBoundingSphere(new THREE.Sphere())
+  if (box.isEmpty()) return null
+  return box.getBoundingSphere(new THREE.Sphere())
+}
+
+function fitCamera(camera: THREE.PerspectiveCamera, controls: OrbitControls, object: THREE.Object3D) {
+  const sphere = boundingSphere(object)
+  if (!sphere) return
   const radius = Math.max(sphere.radius, 0.001)
   const fov = THREE.MathUtils.degToRad(camera.fov)
   const distance = radius / Math.sin(fov / 2) * 1.15
@@ -41,11 +53,22 @@ function formatBytes(bytes: number) {
 
 function rendererPixelRatio() {
   const mobile = typeof window !== 'undefined' && window.matchMedia('(max-width: 767px)').matches
-  return Math.min(window.devicePixelRatio || 1, mobile ? 1.25 : 1.75)
+  return Math.min(window.devicePixelRatio || 1, mobile ? 1.15 : 1.65)
+}
+
+function meshLabel(object: THREE.Object3D) {
+  let current: THREE.Object3D | null = object
+  while (current) {
+    const label = current.name?.trim()
+    if (label && !/^mesh(_|\d|$)/i.test(label)) return label
+    current = current.parent
+  }
+  return object.name || 'Anatomical mesh'
 }
 
 export function HraResolvedAnatomyViewer({ terms, title, description, maxResults = 12 }: Props) {
   const mountRef = useRef<HTMLDivElement>(null)
+  const viewApiRef = useRef<ViewApi | null>(null)
   const normalizedTerms = useMemo(() => unique(terms).slice(0, 16), [terms])
   const [records, setRecords] = useState<HraResolvedRecord[]>([])
   const [selectedKey, setSelectedKey] = useState('')
@@ -74,7 +97,10 @@ export function HraResolvedAnatomyViewer({ terms, title, description, maxResults
   }, [normalizedTerms, maxResults])
 
   const renderable = useMemo(() => records.filter((record) => record.renderable && record.model), [records])
-  const selected = useMemo(() => renderable.find((record) => `${record.release}|${record.model!.name}` === selectedKey) ?? renderable[0], [renderable, selectedKey])
+  const selected = useMemo(
+    () => renderable.find((record) => `${record.release}|${record.model!.name}` === selectedKey) ?? renderable[0],
+    [renderable, selectedKey],
+  )
 
   useEffect(() => {
     const mount = mountRef.current
@@ -82,11 +108,13 @@ export function HraResolvedAnatomyViewer({ terms, title, description, maxResults
     if (!mount || !model) return
 
     let disposed = false
-    let frame = 0
     let observer: ResizeObserver | null = null
+    let loadedRoot: THREE.Object3D | null = null
+    let pickedHelper: THREE.BoxHelper | null = null
     setPicked('')
     setViewerError('')
     mount.innerHTML = ''
+    viewApiRef.current = null
 
     const scene = new THREE.Scene()
     scene.background = new THREE.Color(0x070a0d)
@@ -97,34 +125,44 @@ export function HraResolvedAnatomyViewer({ terms, title, description, maxResults
     try {
       renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: 'high-performance' })
     } catch {
-      setViewerError('Interactive 3D is unavailable in this browser session. Source anatomy metadata remains available at right.')
+      setViewerError('Interactive 3D is unavailable in this browser session. Source anatomy metadata remains available.')
       return () => { mount.innerHTML = '' }
     }
 
     renderer.setPixelRatio(rendererPixelRatio())
     renderer.outputColorSpace = THREE.SRGBColorSpace
     renderer.toneMapping = THREE.ACESFilmicToneMapping
-    renderer.toneMappingExposure = 1.04
+    renderer.toneMappingExposure = 1.02
+    renderer.domElement.style.touchAction = 'none'
     mount.appendChild(renderer.domElement)
 
     const pmrem = new THREE.PMREMGenerator(renderer)
-    const environment = pmrem.fromScene(new RoomEnvironment(), 0.04).texture
+    const room = new RoomEnvironment()
+    const environment = pmrem.fromScene(room, 0.04).texture
+    room.dispose()
     scene.environment = environment
-    scene.add(new THREE.HemisphereLight(0xf4f7fb, 0x0c1014, 1.5))
-    const key = new THREE.DirectionalLight(0xffffff, 2.5)
+    scene.add(new THREE.HemisphereLight(0xf4f7fb, 0x0c1014, 1.45))
+    const key = new THREE.DirectionalLight(0xffffff, 2.35)
     key.position.set(3.5, 5, 6)
     scene.add(key)
-    const fill = new THREE.DirectionalLight(0xbcdcf5, 1.05)
+    const fill = new THREE.DirectionalLight(0xbcdcf5, 0.95)
     fill.position.set(-4, 2, 3)
     scene.add(fill)
-    const rim = new THREE.DirectionalLight(0xffe0d0, 0.85)
+    const rim = new THREE.DirectionalLight(0xffe0d0, 0.75)
     rim.position.set(2, 4, -5)
     scene.add(rim)
 
     const controls = new OrbitControls(camera, renderer.domElement)
-    controls.enableDamping = true
-    controls.dampingFactor = 0.075
+    // Deliberately no damping/continuous animation. The atlas redraws only on
+    // interaction, resize, model load or selection so an idle eye/body does not
+    // consume a permanent animation loop on mobile Safari.
+    controls.enableDamping = false
     controls.enablePan = true
+
+    const render = () => {
+      if (!disposed) renderer.render(scene, camera)
+    }
+    controls.addEventListener('change', render)
 
     const resize = () => {
       if (disposed) return
@@ -133,6 +171,7 @@ export function HraResolvedAnatomyViewer({ terms, title, description, maxResults
       renderer.setSize(width, height, false)
       camera.aspect = width / height
       camera.updateProjectionMatrix()
+      render()
     }
     resize()
     if (typeof ResizeObserver !== 'undefined') {
@@ -143,8 +182,8 @@ export function HraResolvedAnatomyViewer({ terms, title, description, maxResults
     }
 
     const world = new THREE.Group()
+    world.name = 'HRA source anatomy'
     scene.add(world)
-    let loadedRoot: THREE.Object3D | null = null
 
     const loader = new GLTFLoader()
     loader.load(
@@ -154,20 +193,28 @@ export function HraResolvedAnatomyViewer({ terms, title, description, maxResults
         loadedRoot = gltf.scene
         gltf.scene.traverse((object) => {
           if (!(object instanceof THREE.Mesh) || !object.material) return
+          object.frustumCulled = true
           const materials = Array.isArray(object.material) ? object.material : [object.material]
           for (const material of materials) {
             if (material instanceof THREE.MeshStandardMaterial || material instanceof THREE.MeshPhysicalMaterial) {
-              material.envMapIntensity = 0.9
-              material.metalness = Math.min(material.metalness ?? 0, 0.04)
-              material.roughness = Math.max(material.roughness ?? 0.4, 0.26)
+              material.envMapIntensity = 0.85
+              material.metalness = Math.min(material.metalness ?? 0, 0.035)
+              material.roughness = Math.max(material.roughness ?? 0.4, 0.28)
             }
           }
         })
         world.add(gltf.scene)
         fitCamera(camera, controls, gltf.scene)
+        viewApiRef.current = { camera, controls, root: gltf.scene, render }
+        render()
       },
       undefined,
-      () => { if (!disposed) setPicked('Source GLB failed to load in this browser session.') },
+      () => {
+        if (!disposed) {
+          setViewerError('Source GLB failed to load in this browser session. Try another source model or reload this atlas view.')
+          render()
+        }
+      },
     )
 
     const raycaster = new THREE.Raycaster()
@@ -179,26 +226,43 @@ export function HraResolvedAnatomyViewer({ terms, title, description, maxResults
       pointer.x = ((event.clientX - rect.left) / rect.width) * 2 - 1
       pointer.y = -((event.clientY - rect.top) / rect.height) * 2 + 1
       raycaster.setFromCamera(pointer, camera)
-      const hit = raycaster.intersectObject(loadedRoot, true)[0]?.object
-      if (hit) setPicked(hit.name || 'Anatomical mesh')
-    }
-    renderer.domElement.addEventListener('pointerup', onPointerUp)
+      const hit = raycaster.intersectObject(loadedRoot, true).find((item) => item.object instanceof THREE.Mesh)?.object
+      if (!hit) return
 
-    const animate = () => {
-      if (disposed) return
-      controls.update()
-      renderer.render(scene, camera)
-      frame = requestAnimationFrame(animate)
+      if (pickedHelper) {
+        scene.remove(pickedHelper)
+        pickedHelper.geometry.dispose()
+        ;(pickedHelper.material as THREE.Material).dispose()
+      }
+      pickedHelper = new THREE.BoxHelper(hit, 0x62ddff)
+      pickedHelper.renderOrder = 50
+      scene.add(pickedHelper)
+      setPicked(meshLabel(hit))
+      render()
     }
-    animate()
+
+    const onContextLost = (event: Event) => {
+      event.preventDefault()
+      if (!disposed) setViewerError('WebGL context was released by the browser. Close another 3D view or reload this atlas view.')
+    }
+
+    renderer.domElement.addEventListener('pointerup', onPointerUp)
+    renderer.domElement.addEventListener('webglcontextlost', onContextLost)
 
     return () => {
       disposed = true
-      cancelAnimationFrame(frame)
+      viewApiRef.current = null
       observer?.disconnect()
       window.removeEventListener('resize', resize)
       renderer.domElement.removeEventListener('pointerup', onPointerUp)
+      renderer.domElement.removeEventListener('webglcontextlost', onContextLost)
+      controls.removeEventListener('change', render)
       controls.dispose()
+      if (pickedHelper) {
+        scene.remove(pickedHelper)
+        pickedHelper.geometry.dispose()
+        ;(pickedHelper.material as THREE.Material).dispose()
+      }
       world.traverse((object) => {
         if (!(object instanceof THREE.Mesh)) return
         object.geometry?.dispose()
@@ -207,10 +271,37 @@ export function HraResolvedAnatomyViewer({ terms, title, description, maxResults
       })
       environment.dispose()
       pmrem.dispose()
+      renderer.renderLists.dispose()
       renderer.dispose()
+      renderer.forceContextLoss()
       mount.innerHTML = ''
     }
   }, [selected])
+
+  function orient(view: 'front' | 'side' | 'back' | 'reset') {
+    const api = viewApiRef.current
+    if (!api) return
+    if (view === 'reset') {
+      fitCamera(api.camera, api.controls, api.root)
+      api.render()
+      return
+    }
+    const sphere = boundingSphere(api.root)
+    if (!sphere) return
+    const radius = Math.max(sphere.radius, 0.001)
+    const fov = THREE.MathUtils.degToRad(api.camera.fov)
+    const distance = radius / Math.sin(fov / 2) * 1.15
+    const direction = view === 'front'
+      ? new THREE.Vector3(0, 0, 1)
+      : view === 'back'
+        ? new THREE.Vector3(0, 0, -1)
+        : new THREE.Vector3(1, 0, 0)
+    api.controls.target.copy(sphere.center)
+    api.camera.position.copy(sphere.center).addScaledVector(direction, distance)
+    api.camera.lookAt(sphere.center)
+    api.controls.update()
+    api.render()
+  }
 
   return (
     <section className="overflow-hidden rounded-[28px] border border-neutral-200 bg-white shadow-sm dark:border-white/10 dark:bg-[#090d11]">
@@ -221,7 +312,7 @@ export function HraResolvedAnatomyViewer({ terms, title, description, maxResults
             <h3 className="mt-1 text-lg font-black text-neutral-950 dark:text-white">{title}</h3>
             {description && <p className="mt-1 max-w-3xl text-[10px] leading-relaxed text-neutral-500 dark:text-neutral-400">{description}</p>}
           </div>
-          <div className="rounded-full border border-neutral-200 bg-neutral-50 px-3 py-1.5 text-[9px] font-black text-neutral-500 dark:border-white/10 dark:bg-white/[.04] dark:text-neutral-300">Static source model · no auto-spin · no pulse</div>
+          <div className="rounded-full border border-neutral-200 bg-neutral-50 px-3 py-1.5 text-[9px] font-black text-neutral-500 dark:border-white/10 dark:bg-white/[.04] dark:text-neutral-300">Static source model · redraw on interaction only</div>
         </div>
 
         {renderable.length > 1 && (
@@ -242,6 +333,12 @@ export function HraResolvedAnatomyViewer({ terms, title, description, maxResults
         <div className="grid lg:grid-cols-[minmax(0,1fr)_300px]">
           <div className="relative min-h-[440px] bg-[#070a0d]">
             <div ref={mountRef} className="absolute inset-0" aria-label={`HRA 3D model of ${selected.label}`} />
+            <div className="pointer-events-none absolute left-3 top-3 rounded-xl bg-black/45 px-2.5 py-2 text-[9px] font-semibold text-white/80 backdrop-blur">Drag rotate · pinch/scroll zoom · tap structure inspect</div>
+            <div className="absolute bottom-3 left-3 right-3 flex flex-wrap gap-1.5 sm:right-auto">
+              {(['front', 'side', 'back', 'reset'] as const).map((view) => (
+                <button key={view} type="button" onClick={() => orient(view)} className="rounded-full border border-white/15 bg-black/55 px-3 py-2 text-[9px] font-bold capitalize text-white backdrop-blur hover:bg-black/70">{view}</button>
+              ))}
+            </div>
             {viewerError && (
               <div className="absolute inset-0 grid place-items-center bg-[#070a0d] p-6 text-center">
                 <div>
@@ -260,10 +357,10 @@ export function HraResolvedAnatomyViewer({ terms, title, description, maxResults
               <div><dt className="font-black uppercase tracking-wide text-neutral-400">GLB</dt><dd className="mt-1 break-all font-semibold text-neutral-700 dark:text-neutral-300">{selected.model.name}</dd></div>
               <div><dt className="font-black uppercase tracking-wide text-neutral-400">Size</dt><dd className="mt-1 font-semibold text-neutral-700 dark:text-neutral-300">{formatBytes(selected.model.size)}</dd></div>
               <div><dt className="font-black uppercase tracking-wide text-neutral-400">GitHub SHA</dt><dd className="mt-1 break-all font-mono text-[9px] text-neutral-500">{selected.model.sha || '—'}</dd></div>
-              {picked && <div><dt className="font-black uppercase tracking-wide text-neutral-400">Picked mesh</dt><dd className="mt-1 break-all font-semibold text-neutral-700 dark:text-neutral-300">{picked}</dd></div>}
+              {picked && <div className="rounded-xl border border-cyan-200 bg-cyan-50 p-2.5 dark:border-cyan-300/20 dark:bg-cyan-300/10"><dt className="font-black uppercase tracking-wide text-cyan-700 dark:text-cyan-300">Inspected mesh</dt><dd className="mt-1 break-all font-semibold text-neutral-800 dark:text-neutral-100">{picked}</dd></div>}
             </dl>
             <a href={selected.sourceUrl} target="_blank" rel="noreferrer" className="mt-4 inline-flex rounded-full bg-neutral-950 px-3 py-2 text-[9px] font-black text-white dark:bg-white dark:text-neutral-950">Open HRA source ↗</a>
-            <p className="mt-4 text-[9px] leading-relaxed text-neutral-400">This viewer preserves the upstream GLB geometry and materials. It does not morph anatomy according to a hypothesis, intervention, workout or patient state.</p>
+            <p className="mt-4 text-[9px] leading-relaxed text-neutral-400">This viewer preserves upstream HRA geometry. Tap selection adds an inspection outline only; Panacea does not morph or invent patient-specific anatomy.</p>
           </aside>
         </div>
       ) : (
