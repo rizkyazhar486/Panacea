@@ -4,12 +4,15 @@ import {
   HEAD_TO_TOE_STRUCTURES,
   findHeadToToeRegionForStructure,
   type AnatomyStructure,
-} from '../../lib/headToToeAnatomy'
+} from '../../lib/expandedAnatomy'
+import { countAnatomySubstructures } from '../../lib/anatomySubstructures'
 
 type Props = {
   selectedId?: string
   onSelect: (structure: AnatomyStructure) => void
 }
+
+const SUBSTRUCTURE_COUNT = countAnatomySubstructures()
 
 export function HeadToToeAnatomyNavigator({ selectedId, onSelect }: Props) {
   const initialRegion = findHeadToToeRegionForStructure(selectedId || '') ?? HEAD_TO_TOE_REGIONS[0]
@@ -42,17 +45,18 @@ export function HeadToToeAnatomyNavigator({ selectedId, onSelect }: Props) {
           <div className="max-w-3xl">
             <div className="text-[8px] font-medium uppercase tracking-[.13em] text-cyan-700 dark:text-cyan-300">Head-to-toe anatomy</div>
             <h3 className="mt-1 text-[15px] font-semibold tracking-tight text-neutral-950 dark:text-white">Region first, then exact named structure</h3>
-            <p className="mt-1 text-[9px] leading-relaxed text-neutral-500 dark:text-neutral-400">Search and select anatomy without stacking multiple viewers. Source geometry opens only for the active structure.</p>
+            <p className="mt-1 text-[9px] leading-relaxed text-neutral-500 dark:text-neutral-400">The readable index stays compact. Complex organs and joints open a second detail layer while the same source viewer remains mounted.</p>
           </div>
-          <div className="flex gap-1.5 text-[8px] font-medium text-neutral-500 dark:text-neutral-300">
+          <div className="flex flex-wrap gap-1.5 text-[8px] font-medium text-neutral-500 dark:text-neutral-300">
             <span className="rounded-full border border-neutral-200 bg-neutral-50 px-2.5 py-1.5 dark:border-white/10 dark:bg-white/[.04]">{HEAD_TO_TOE_REGIONS.length} regions</span>
             <span className="rounded-full border border-neutral-200 bg-neutral-50 px-2.5 py-1.5 dark:border-white/10 dark:bg-white/[.04]">{HEAD_TO_TOE_STRUCTURES.length} structures</span>
+            <span className="rounded-full border border-neutral-200 bg-neutral-50 px-2.5 py-1.5 dark:border-white/10 dark:bg-white/[.04]">{SUBSTRUCTURE_COUNT} detail targets</span>
           </div>
         </div>
         <input
           value={query}
           onChange={(event) => setQuery(event.target.value)}
-          placeholder="Search retina, mitral valve, appendix, ACL, tibial nerve, plantar fascia…"
+          placeholder="Search retina, optic chiasm, lumbar spine, mitral valve, appendix, ACL, tibial nerve…"
           className="mt-3 h-10 w-full rounded-xl border border-neutral-200 bg-neutral-50 px-3 text-[10px] font-medium text-neutral-800 outline-none focus:border-cyan-400 dark:border-white/10 dark:bg-white/[.04] dark:text-white"
           aria-label="Search head-to-toe anatomy"
         />
