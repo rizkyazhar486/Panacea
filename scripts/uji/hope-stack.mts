@@ -3,6 +3,7 @@ import { readFileSync } from 'node:fs'
 
 const data = readFileSync('src/lib/hopeStack.ts', 'utf8')
 const ui = readFileSync('src/components/frontier/PanaceaHopeStack.tsx', 'utf8')
+const workbench = readFileSync('src/components/frontier/HopeWorkbench.tsx', 'utf8')
 const frontier = readFileSync('src/pages/FrontierHealthOS.tsx', 'utf8')
 const mind = readFileSync('src/pages/PusatJiwa.tsx', 'utf8')
 const safety = readFileSync('src/pages/MentalSafetyPlan.tsx', 'utf8')
@@ -35,8 +36,19 @@ assert.match(data, /Personal health data must not be used for discriminatory und
 assert.match(ui, /HOPE_DOMAINS\.map/, 'Hope dashboard must render every evidence domain')
 assert.match(ui, /Transparent formulas/, 'Hope dashboard must expose formulas')
 assert.match(ui, /Truth & safety boundary/, 'Hope dashboard must keep safety boundary visible')
-assert.doesNotMatch(ui, /Canvas|WebGL|three\/|requestAnimationFrame/, 'Hope Stack must stay lightweight and add no renderer/animation loop')
+assert.match(ui, /<HopeWorkbench domain=\{selected\.key\} \/>/, 'selected Hope domain must expose its functional workbench')
+assert.doesNotMatch(`${ui}\n${workbench}`, /Canvas|WebGL|three\/|requestAnimationFrame/, 'Hope Stack must stay lightweight and add no renderer/animation loop')
 assert.match(frontier, /<PanaceaHopeStack \/>/, 'Hope Stack must be reachable from Frontier Health OS')
+
+assert.match(workbench, /PPV = Se×Prev/, 'early-detection workbench must calculate Bayesian PPV')
+assert.match(workbench, /const cohort = 10_000/, 'early-detection workbench needs an interpretable cohort denominator')
+assert.match(workbench, /BS = \(1\/N\) Σ\(pᵢ − yᵢ\)²/, 'prediction workbench must expose Brier score')
+assert.match(workbench, /gap = scenario lifespan − financed-through age/, 'finance workbench must show its longevity-gap assumption')
+assert.match(workbench, /OADR = population 65\+ \/ population 20–64 × 100/, 'infrastructure workbench must expose OADR')
+assert.match(workbench, /Not proof of lifespan extension/, 'geroscience pipeline must distinguish phase 1 from longevity efficacy')
+assert.match(workbench, /Lab-grown whole organs/, 'regeneration workbench must disclose the whole-organ frontier')
+assert.match(workbench, /avoid blanket hormone “optimization”/, 'preventive care must not normalize non-indicated hormone treatment')
+assert.match(workbench, /Heterogeneous evidence, device-specific safety/, 'aging-tech workbench must surface evidence limitations')
 
 assert.match(mind, /MentalSafetyPlan/, 'Mind hub must lazy-load the safety plan')
 assert.match(mind, /id: 'aman'/, 'Safety plan must be a visible Mind tab')
@@ -48,4 +60,4 @@ assert.match(safety, /Move toward other people, contact a trusted person/, 'imme
 assert.match(safety, /localStorage\.setItem/, 'safety plan must be local-first')
 assert.doesNotMatch(safety, /fetch\(|api\.|axios|WebSocket/, 'local safety plan must not silently transmit its contents')
 
-console.log('Panacea Hope Stack and local-first mental safety plan are evidence-gated and wired')
+console.log('Panacea Hope Stack, interactive workbenches and local-first mental safety plan are evidence-gated and wired')
