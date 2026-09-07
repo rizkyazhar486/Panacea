@@ -1,0 +1,52 @@
+{
+  "id": "opensim",
+  "name": "OpenSim Core",
+  "category": "biomechanics",
+  "kind": ["library", "framework"],
+  "homepage": "https://opensim.stanford.edu/",
+  "repository": "https://github.com/opensim-org/opensim-core",
+  "features": ["musculoskeletal-modeling", "movement-simulation", "inverse-kinematics", "inverse-dynamics", "static-optimization", "muscle-activation", "joint-mechanics", "gait-analysis", "running-analysis", "rehabilitation-research", "moco-optimal-control"],
+  "formats": ["osim", "trc", "mot", "sto", "xml", "csv", "simulation-results"],
+  "usage": {
+    "runtime": false,
+    "buildTime": true,
+    "networkRequired": false,
+    "notes": "Treat OpenSim as an isolated/offline biomechanics computation engine first. Do not add the native C++/Java/Python distribution to the main Vite browser bundle. Panacea web views should consume reviewed normalized simulation results or lightweight derived assets; interactive execution can be evaluated later behind a dedicated service/worker boundary if justified."
+  },
+  "license": {
+    "status": "VERIFIED",
+    "identifier": "Apache-2.0",
+    "commercialUse": "ALLOWED",
+    "attributionRequired": true,
+    "shareAlike": false,
+    "scope": "The official opensim-org/opensim-core repository identifies Apache License 2.0 for the OpenSim core software. This does not automatically license musculoskeletal models, geometry, motion-capture files, marker trajectories, force-plate recordings, third-party plugins, datasets, publications or patient/athlete data processed by OpenSim.",
+    "verificationUrl": "https://github.com/opensim-org/opensim-core",
+    "verifiedAt": "2026-09-08",
+    "notes": "Preserve Apache-2.0/NOTICE obligations when redistributing OpenSim software or derivatives. Every model and input dataset requires its own provenance/license/privacy manifest."
+  },
+  "validation": {
+    "level": "RESEARCH",
+    "clinicalDecisionUse": "NO",
+    "notes": "OpenSim is a scientific musculoskeletal modeling and simulation platform, not a guarantee that a selected model represents a particular user. Joint loads, muscle forces, activation estimates, kinematics and kinetics depend on model anatomy, scaling, marker placement, external loads, filtering, assumptions, optimization/solver settings and measurement quality. Panacea must not present simulated outputs as measured truth or individualized clinical findings without separate validation."
+  },
+  "provenance": {
+    "authority": "OpenSim / Stanford Neuromuscular Biomechanics Laboratory and open-source contributors",
+    "sourceIdentityRequired": true,
+    "versionPinRequired": true,
+    "notes": "Pin the OpenSim release and platform; baseline evaluation target is official release 4.6 (published 2026-07-09). Persist model filename/checksum/version, model source/citation/license, subject scaling inputs and scale factors, coordinate systems, marker-set definitions, marker trajectories and units, ground-reaction/external-load files, filtering/preprocessing, task/tool configuration, solver/optimizer settings, convergence diagnostics, output variables/units and all transformation steps."
+  },
+  "adapter": {
+    "status": "PLANNED",
+    "normalizedTarget": "PanaceaBiomechanicsSimulation",
+    "module": null,
+    "notes": "Planned gated flow: provenance-cleared generic or subject-specific model + motion/force inputs -> validation of units/coordinate systems/completeness -> pinned OpenSim 4.6 execution -> task-specific regression/quality checks -> PanaceaBiomechanicsSimulation -> lightweight charts/3D overlays. Preserve measured inputs separately from inferred/simulated outputs. Label inverse-kinematics, inverse-dynamics, static-optimization, Moco/optimal-control and forward-simulation outputs by method. Fail closed on non-convergence or missing required inputs; never fabricate a movement result to keep the UI animated."
+  },
+  "trust": {
+    "authority": 5,
+    "evidenceQuality": 2,
+    "recency": 5,
+    "licenseClarity": 5,
+    "reproducibility": 4,
+    "notes": "High-authority open musculoskeletal simulation framework with clear software licensing and active releases. Evidence quality is deliberately low because the engine is not experimental evidence; scientific validity depends on each model, input dataset, assumptions and analysis workflow."
+  }
+}
