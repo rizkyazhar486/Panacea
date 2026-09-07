@@ -1,4 +1,5 @@
 import { Component, type ReactNode } from 'react'
+import '../styles/home-mobile-stability.css'
 
 type Props = {
   children: ReactNode
