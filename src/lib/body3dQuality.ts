@@ -3,7 +3,10 @@
 
 export const BODY3D_DESKTOP_MAX_DPR = 2
 export const BODY3D_MOBILE_MAX_DPR = 1.5
-export const BODY3D_MAX_RENDER_PIXELS = 4_500_000
+// 5.25 MP membuat kanvas desktop umum 1440×900 dapat memakai 2x penuh
+// (5.184 MP) tanpa menyentuh cap mobile 1.5x. Viewer tetap demand-rendered,
+// jadi tambahan fill-rate hanya dibayar saat frame memang perlu digambar.
+export const BODY3D_MAX_RENDER_PIXELS = 5_250_000
 
 export type Body3dRenderMode = 'anatomy' | 'xray' | 'ct' | 'mriT1' | 'mriT2'
 export type Body3dSlicePlane = 'none' | 'axial' | 'coronal' | 'sagittal'
