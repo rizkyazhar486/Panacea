@@ -1,0 +1,52 @@
+{
+  "id": "physiome_model_repository",
+  "name": "Physiome Model Repository (PMR)",
+  "category": "physiology",
+  "kind": ["model-repository", "dataset"],
+  "homepage": "https://models.physiomeproject.org/",
+  "repository": null,
+  "features": ["physiology-model-source", "cellml-models", "electrophysiology", "cardiovascular-circulation", "metabolism", "endocrine", "ion-transport", "excitation-contraction", "pkpd", "signal-transduction", "reproducible-model-citation"],
+  "formats": ["cellml", "sedml", "combine-archive", "omex", "rdf", "xml"],
+  "usage": {
+    "runtime": false,
+    "buildTime": true,
+    "networkRequired": true,
+    "notes": "Use PMR primarily as an acquisition and provenance source. Pull only explicitly selected model exposures into a reviewed/versioned Panacea model cache; do not make core physiology features depend on a live PMR request or bulk-download the repository into the web bundle."
+  },
+  "license": {
+    "status": "CHECK_REQUIRED",
+    "identifier": "Repository-wide CC BY 3.0 statement plus model/exposure-specific license metadata",
+    "commercialUse": "CONDITIONAL",
+    "attributionRequired": true,
+    "shareAlike": null,
+    "scope": "PMR citation pages state that publicly accessible repository content is licensed under Creative Commons Attribution 3.0, but individual model/resource pages can also report their work-level terms as unspecified or provide a specific license. Panacea must therefore verify and persist the exact model/exposure/file license before production ingestion rather than assuming the repository-level statement resolves every uploaded resource or associated file.",
+    "verificationUrl": "https://models.physiomeproject.org/cellml",
+    "verifiedAt": "2026-09-08",
+    "notes": "A model with missing/unspecified work-level rights is blocked from production asset/model ingestion until reviewed. Keep model code/data, figures, experimental data, simulation outputs and session files as separately licensable artifacts when their metadata differs. Always retain model authors and repository citation."
+  },
+  "validation": {
+    "level": "REFERENCE",
+    "clinicalDecisionUse": "NO",
+    "notes": "PMR contains curated and community models across many physiological domains. Repository availability, functional status, or curator comments do not make a model clinically validated. Panacea must separately verify original publication, model equations/units, numerical reproducibility, calibration/validation population and intended use before using output beyond education/research context."
+  },
+  "provenance": {
+    "authority": "IUPS Physiome Project / Auckland Bioengineering Institute",
+    "sourceIdentityRequired": true,
+    "versionPinRequired": true,
+    "notes": "Persist exposure/workspace URL, changeset/revision, exact downloaded file names/checksums, model title, CellML authors, original paper/citation, retrieval date, curation/functional status, model-specific license and any COMBINE/SED-ML experiment metadata. Prefer immutable/versioned exposure identifiers over search-result titles."
+  },
+  "adapter": {
+    "status": "PLANNED",
+    "normalizedTarget": "PanaceaPhysiologyModelSource",
+    "module": null,
+    "notes": "Planned flow: PMR search/curated allowlist -> exposure/revision selection -> license + citation + curation gate -> checksum acquisition -> CellML/SED-ML/COMBINE validation -> PanaceaPhysiologyModelSource -> CellML normalization -> simulation engine. A model is not automatically runnable or trusted merely because it exists in PMR; surface validation failures and unsupported constructs explicitly."
+  },
+  "trust": {
+    "authority": 5,
+    "evidenceQuality": 3,
+    "recency": 4,
+    "licenseClarity": 3,
+    "reproducibility": 5,
+    "notes": "High-authority specialist model repository with strong revision/citation mechanisms. Evidence and license scores remain conservative because scientific validation and work-level license metadata vary by model/exposure."
+  }
+}
