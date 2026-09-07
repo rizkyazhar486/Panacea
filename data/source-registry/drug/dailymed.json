@@ -1,0 +1,52 @@
+{
+  "id": "dailymed",
+  "name": "DailyMed / Structured Product Labeling (SPL)",
+  "category": "drug",
+  "kind": ["api", "dataset"],
+  "homepage": "https://dailymed.nlm.nih.gov/dailymed/",
+  "repository": null,
+  "features": ["current-us-labels", "structured-product-labeling", "boxed-warnings", "contraindications", "dosage-and-administration", "drug-interactions-label-section", "pregnancy-and-lactation", "ndc", "packaging", "label-history", "rxcui-mapping"],
+  "formats": ["json", "xml", "spl", "zip", "pdf", "http-rest"],
+  "usage": {
+    "runtime": true,
+    "buildTime": true,
+    "networkRequired": true,
+    "notes": "Use DailyMed as Panacea's provenance-preserving source for current U.S. Structured Product Labeling (SPL), not as the medication identity resolver. Runtime lookups should be selective and cached; bulk daily/weekly/monthly label releases may be evaluated for controlled server-side synchronization when licensing, storage and update policy are explicitly approved. The current public REST service is version v2 and is retrieval-only (GET)."
+  },
+  "license": {
+    "status": "CHECK_REQUIRED",
+    "identifier": null,
+    "commercialUse": "UNKNOWN",
+    "attributionRequired": null,
+    "shareAlike": null,
+    "scope": "DailyMed is provided by the U.S. National Library of Medicine, but the SPL corpus contains labeling submitted by private companies. NLM web policy states U.S. government works may be freely reused in the U.S. with source acknowledgement, while non-government documents, illustrations, photographs or other contributed/licensed content can remain copyrighted. Therefore Panacea must not infer unrestricted commercial redistribution rights for every SPL label, image or attachment merely because it is accessible through DailyMed.",
+    "verificationUrl": "https://www.nlm.nih.gov/web_policies.html",
+    "verifiedAt": "2026-09-08",
+    "notes": "Before bulk redistribution or embedding label text/media in Panacea-owned datasets, verify the rights of the specific content class and preserve source attribution. Linking/querying official DailyMed records is preferred when redistribution rights are uncertain. NLM/FDA names or logos must not imply endorsement."
+  },
+  "validation": {
+    "level": "REFERENCE",
+    "clinicalDecisionUse": "CONTEXT_ONLY",
+    "notes": "DailyMed provides 'in use' labeling submitted to FDA and published by NLM. NLM states this labeling may not be identical to the most recent FDA-approved labeling, and NLM does not review SPL content before publication. A DailyMed record therefore supports label provenance and label-native facts but does not by itself establish current market availability, comparative safety/effectiveness, patient suitability or treatment recommendation."
+  },
+  "provenance": {
+    "authority": "U.S. National Library of Medicine (NLM) DailyMed; source SPL submitted to the U.S. Food and Drug Administration (FDA)",
+    "sourceIdentityRequired": true,
+    "versionPinRequired": true,
+    "notes": "Persist DailyMed set ID, SPL version, publication/effective date when available, labeler/manufacturer identity, application number when relevant, product/NDC identifiers and the section code/section identity supporting each extracted claim. When following a multi-call pagination flow, pin the observed label version so sections from different versions are never silently mixed. Preserve a canonical link back to the official DailyMed record."
+  },
+  "adapter": {
+    "status": "PLANNED",
+    "normalizedTarget": "PanaceaMedicationLabel",
+    "module": null,
+    "notes": "Planned flow: medication concept/RXCUI or NDC -> DailyMed label candidate discovery -> explicitly select material set ID -> retrieve current label sections/products/history -> PanaceaMedicationLabel retaining set ID + version + dates + section codes + labeler + NDC/product identity + source URL. RxNorm remains the preferred identity-normalization layer. Do not answer substantive label claims from discovery/search metadata alone; retrieve the underlying label sections/products. Do not use DailyMed as a drug-drug interaction engine, prescribing engine, guideline source, comparative-effectiveness source or adverse-event surveillance source."
+  },
+  "trust": {
+    "authority": 5,
+    "evidenceQuality": 4,
+    "recency": 5,
+    "licenseClarity": 2,
+    "reproducibility": 5,
+    "notes": "High authority and reproducibility for official DailyMed SPL provenance and versioned label retrieval. Evidence quality is label-context rather than comparative clinical evidence. License clarity is intentionally conservative because individual SPL content and media may originate from non-government rightsholders."
+  }
+}
