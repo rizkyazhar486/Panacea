@@ -79,17 +79,31 @@ async function captureViewport() {
   screenshotCaptured = true
 }
 
+async function dismissIfVisible(locator, timeout = 5_000) {
+  if (!(await locator.isVisible().catch(() => false))) return false
+  await locator.click()
+  await locator.waitFor({ state: 'hidden', timeout }).catch(() => undefined)
+  return true
+}
+
 try {
   const response = await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 45_000 })
   if (response && !response.ok()) throw new Error(`Body Explorer returned HTTP ${response.status()}`)
 
-  // The normal first-login tour is part of the real product. Dismiss it through
-  // its own CTA so the QA test exercises the same path a user takes before
-  // touching the 3D viewer; do not hide the modal with CSS or mutate app state.
-  const getStarted = page.getByRole('button', { name: /Get Started/i }).first()
-  if (await getStarted.isVisible().catch(() => false)) {
-    await getStarted.click()
-    await getStarted.waitFor({ state: 'hidden', timeout: 5_000 })
+  // Dismiss normal, user-facing first-run surfaces only through their own UI.
+  // This keeps the test representative: no CSS hiding and no production state
+  // mutation beyond the disposable login session above.
+  await dismissIfVisible(page.getByRole('button', { name: /Get Started/i }).first())
+  await dismissIfVisible(page.getByRole('button', { name: /Maybe later/i }).first())
+
+  // The daily reminder is dismissible and can float over the top of the viewer.
+  // Close it only if the reminder is actually present. Prefer a button inside
+  // the reminder container rather than clicking arbitrary × buttons elsewhere.
+  const reminderText = page.getByText(/TODAY.?S REMINDER/i).first()
+  if (await reminderText.isVisible().catch(() => false)) {
+    const reminder = reminderText.locator('xpath=ancestor::*[.//button][1]')
+    const close = reminder.locator('button').last()
+    if (await close.isVisible().catch(() => false)) await close.click()
   }
 
   // Do not use the first canvas on the page: other visual components may own
