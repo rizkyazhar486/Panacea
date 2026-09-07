@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react'
 import { PanaceaFrontierSeven } from '../components/frontier/PanaceaFrontierSeven'
+import { PanaceaHopeStack } from '../components/frontier/PanaceaHopeStack'
 import {
   FRONTIER_CATEGORIES,
   FRONTIER_FEATURES,
@@ -64,13 +65,14 @@ export function FrontierHealthOS() {
         <div className="text-[10px] font-black uppercase tracking-[0.2em] text-brand">Panacea Frontier Health OS</div>
         <h1 className="mt-1 text-2xl font-black tracking-tight text-ink dark:text-white">From health app → programmable human Life OS</h1>
         <p className="mt-2 max-w-4xl text-sm leading-relaxed text-neutral-500">
-          The frontier layer now has two tracks: usable local-first Life OS experiments and deeper execution contracts for clinical intelligence,
-          precision medicine, patient sovereignty, care automation, privacy infrastructure and population health. Experimental concepts are kept distinct
-          from clinically validated functions and external integrations.
+          The frontier layer now has three tracks: usable local-first Life OS experiments, the Hope Stack for life preservation and healthy longevity,
+          and deeper execution contracts for clinical intelligence, precision medicine, patient sovereignty, care automation, privacy infrastructure and population health.
+          Experimental concepts stay visibly distinct from clinically validated functions and external integrations.
         </p>
       </section>
 
       <PanaceaFrontierSeven />
+      <PanaceaHopeStack />
 
       <section className="space-y-4 rounded-[30px] border border-neutral-200 bg-white/70 p-4 dark:border-white/10 dark:bg-white/[.025] sm:p-5">
         <div>
