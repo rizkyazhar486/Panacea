@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react'
 import { MetalMotto } from './MetalMotto'
 import { PerformanceVisualizationDeck } from './dashboard/PerformanceVisualizationDeck'
+import { AdvancedPerformanceCockpit } from './dashboard/AdvancedPerformanceCockpit'
 import '../styles/metal.css'
 
 // Panggung pembuka bersama untuk FitnessHub/Workout/Athlete — satu sumber
@@ -56,7 +57,12 @@ export function FightHero({
         {subtitle && <p className="relative mt-2 text-center text-[13px] font-semibold text-white/70">{subtitle}</p>}
       </div>
 
-      {isAthlete && <PerformanceVisualizationDeck mode="athlete" />}
+      {isAthlete && (
+        <>
+          <PerformanceVisualizationDeck mode="athlete" />
+          <AdvancedPerformanceCockpit mode="athlete" />
+        </>
+      )}
     </>
   )
 }
