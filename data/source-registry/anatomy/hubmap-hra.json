@@ -1,0 +1,44 @@
+{
+  "id": "hubmap_hra",
+  "name": "HuBMAP Human Reference Atlas (HRA)",
+  "category": "anatomy",
+  "kind": ["api", "dataset", "mesh", "ontology"],
+  "homepage": "https://humanatlas.io/",
+  "repository": "https://github.com/hubmapconsortium/hra-kg",
+  "features": [51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 751, 752, 753, 754, 755, 756, 757, 758, 759, 760, 761],
+  "formats": ["jsonld", "ttl", "csv", "glb"],
+  "usage": {
+    "runtime": false,
+    "buildTime": true,
+    "networkRequired": true,
+    "notes": "Start with versioned build-time snapshots for stable anatomical IDs, spatial reference objects and semantic relationships. Runtime API access can be enabled later behind a Panacea adapter with caching, timeout and graceful fallback rather than coupling UI components directly to HRA services."
+  },
+  "license": {
+    "status": "VERIFIED",
+    "identifier": "MIT (code) + CC-BY-4.0 (HRA-KG data)",
+    "commercialUse": "ALLOWED",
+    "attributionRequired": true,
+    "shareAlike": false,
+    "scope": "The HuBMAP HRA-KG repository states that its code is MIT licensed and its data is CC BY 4.0. This registry entry covers that HRA-KG scope. Any third-party upstream source or separately hosted 3D asset must retain its own provenance/license record and must not inherit this permission automatically.",
+    "verificationUrl": "https://github.com/hubmapconsortium/hra-kg",
+    "verifiedAt": "2026-09-08",
+    "notes": "Preserve HRA attribution and version identity. Treat separately sourced reference objects as separate assets when their own entry/license metadata exists."
+  },
+  "validation": {
+    "level": "REFERENCE",
+    "clinicalDecisionUse": "CONTEXT_ONLY",
+    "notes": "Use HRA to organize reference anatomy, spatial relationships, anatomical structures, cell types and biomarkers. It is a reference atlas, not a patient-specific diagnostic model and not sufficient by itself for clinical decisions."
+  },
+  "provenance": {
+    "authority": "HuBMAP Consortium Human Reference Atlas",
+    "sourceIdentityRequired": true,
+    "versionPinRequired": true,
+    "notes": "Persist HRA release/version, digital object identifier, source ontology/atlas identifiers and transformation history. Preserve semantic IDs across mesh optimization so visual geometry remains linked to the reference graph."
+  },
+  "adapter": {
+    "status": "PLANNED",
+    "normalizedTarget": "PanaceaHumanGraphNode",
+    "module": null,
+    "notes": "Planned pipeline: HRA digital object/graph -> version and license gate -> normalize stable anatomical/cell/biomarker IDs -> map optional reference geometry -> Panacea Human Graph -> Body Explorer selection and zoom hierarchy."
+  }
+}
