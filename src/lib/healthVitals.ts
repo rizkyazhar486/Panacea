@@ -100,11 +100,23 @@ export interface Vitals {
 
 const KEY = 'pmd_vitals_v1'
 
+// Home and its widgets read the same current vitals many times. Keep one parsed
+// snapshot while the underlying localStorage string is unchanged; another tab
+// or an older code path still invalidates naturally because raw strings differ.
+let cachedRaw: string | null | undefined
+let cachedVitals: Vitals | undefined
+
 export function getVitals(): Vitals {
   try {
     const raw = localStorage.getItem(KEY)
-    return raw ? (JSON.parse(raw) as Vitals) : {}
+    if (raw === cachedRaw && cachedVitals) return { ...cachedVitals }
+    const parsed = raw ? (JSON.parse(raw) as Vitals) : {}
+    cachedRaw = raw
+    cachedVitals = parsed
+    return { ...parsed }
   } catch {
+    cachedRaw = undefined
+    cachedVitals = undefined
     return {}
   }
 }
@@ -125,7 +137,12 @@ export function mergeVitals(patch: Vitals): Vitals {
   if (!Object.keys(clean).length) return getVitals()
 
   const next: Vitals = { ...getVitals(), ...clean, syncedAt: new Date().toISOString() }
-  try { localStorage.setItem(KEY, JSON.stringify(next)) } catch { /* ignore */ }
+  try {
+    const raw = JSON.stringify(next)
+    localStorage.setItem(KEY, raw)
+    cachedRaw = raw
+    cachedVitals = next
+  } catch { /* ignore; leave cache aligned with persisted storage */ }
   /*
    * Riwayat dicatat DI SINI, bukan di pemanggilnya. mergeVitals adalah
    * satu-satunya jalan masuk angka tubuh ke dalam aplikasi; menaruh pencatatan
@@ -142,6 +159,8 @@ export function mergeVitals(patch: Vitals): Vitals {
 
 export function clearVitals(): void {
   try { localStorage.removeItem(KEY) } catch { /* ignore */ }
+  cachedRaw = null
+  cachedVitals = {}
   broadcastHealthUpdate()
 }
 
