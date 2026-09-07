@@ -92,6 +92,21 @@ export function CatatanLatihan() {
       : null
     const recoverySpanSec = recoveryValid.length > 0 ? Math.max(0, Math.round(recoveryValid[recoveryValid.length - 1].t)) : null
 
+    const paceSecAman = terbaru && typeof terbaru.paceSec === 'number' && Number.isFinite(terbaru.paceSec) && terbaru.paceSec > 0
+      ? Math.round(terbaru.paceSec)
+      : null
+    const terbaruPace = paceSecAman !== null
+      ? `${Math.floor(paceSecAman / 60)}:${String(paceSecAman % 60).padStart(2, '0')}`
+      : null
+    const terbaruSpeed = terbaru && typeof terbaru.kecepatanKmh === 'number' && Number.isFinite(terbaru.kecepatanKmh) && terbaru.kecepatanKmh > 0
+      ? terbaru.kecepatanKmh
+      : null
+    const terbaruCadence = terbaru && typeof terbaru.kadens === 'number' && Number.isFinite(terbaru.kadens) && terbaru.kadens > 0
+      ? Math.round(terbaru.kadens)
+      : null
+    const terbaruIndoor = terbaru && typeof terbaru.diDalamRuangan === 'boolean' ? terbaru.diDalamRuangan : null
+    const punyaMovement = terbaruPace !== null || terbaruSpeed !== null || terbaruCadence !== null
+
     const acuan = new Date()
     acuan.setHours(12, 0, 0, 0)
     acuan.setDate(acuan.getDate() - (untukKemarin ? 1 : 0))
@@ -161,6 +176,11 @@ export function CatatanLatihan() {
       recoveryMax,
       recoveryHrr1,
       recoverySpanSec,
+      terbaruPace,
+      terbaruSpeed,
+      terbaruCadence,
+      terbaruIndoor,
+      punyaMovement,
       tren,
       maxMenit7,
       hariAktif7: tren.filter((x) => x.menit > 0).length,
@@ -321,6 +341,53 @@ export function CatatanLatihan() {
               </div>
               <p className="mt-2 text-[9px] leading-relaxed text-neutral-500 dark:text-neutral-400">
                 This is the recorded post-exercise heart-rate trajectory. The ≈1-minute drop is shown only when a recovery sample exists around 45–75 seconds; posture and active vs passive cool-down can change the value, so no fitness or clinical grade is inferred here.
+              </p>
+            </div>
+          )}
+
+          {ringkas.punyaMovement && (
+            <div className="mt-2 rounded-2xl bg-emerald-50/70 p-3 dark:bg-emerald-400/[0.05]" aria-label="Latest session movement metrics">
+              <div className="flex items-center justify-between gap-3">
+                <div>
+                  <div className="text-[10px] font-black uppercase tracking-wide text-emerald-700 dark:text-emerald-300">Movement</div>
+                  <div className="mt-0.5 text-sm font-black text-ink dark:text-white">Pace · speed · cadence</div>
+                </div>
+                {ringkas.terbaruIndoor !== null && (
+                  <div className="rounded-full bg-white/80 px-2.5 py-1 text-[9px] font-black text-neutral-600 dark:bg-white/10 dark:text-neutral-300">
+                    {ringkas.terbaruIndoor ? 'Indoor' : 'Outdoor'}
+                  </div>
+                )}
+              </div>
+              <div className="mt-3 grid grid-cols-3 gap-1.5">
+                <div className="rounded-xl bg-white/75 p-2.5 dark:bg-white/5">
+                  <div className="text-[8px] font-black uppercase tracking-wide text-neutral-500">Pace</div>
+                  <div className="mt-1 truncate text-sm font-black tabular-nums text-ink dark:text-white">
+                    {ringkas.terbaruPace !== null ? ringkas.terbaruPace : '—'}
+                  </div>
+                  <div className="mt-0.5 text-[8px] font-semibold text-neutral-500">min/km</div>
+                </div>
+                <div className="rounded-xl bg-white/75 p-2.5 dark:bg-white/5">
+                  <div className="text-[8px] font-black uppercase tracking-wide text-neutral-500">Speed</div>
+                  <div className="mt-1 truncate text-sm font-black tabular-nums text-ink dark:text-white">
+                    {ringkas.terbaruSpeed !== null ? ringkas.terbaruSpeed.toFixed(1) : '—'}
+                  </div>
+                  <div className="mt-0.5 text-[8px] font-semibold text-neutral-500">km/h</div>
+                </div>
+                <div className="rounded-xl bg-white/75 p-2.5 dark:bg-white/5">
+                  <div className="text-[8px] font-black uppercase tracking-wide text-neutral-500">Cadence</div>
+                  <div className="mt-1 truncate text-sm font-black tabular-nums text-ink dark:text-white">
+                    {ringkas.terbaruCadence !== null ? ringkas.terbaruCadence : '—'}
+                  </div>
+                  <div className="mt-0.5 text-[8px] font-semibold text-neutral-500">steps/min</div>
+                </div>
+              </div>
+              <div className="mt-3 flex items-center gap-1" aria-hidden="true">
+                <div className="h-1.5 flex-1 rounded-full bg-emerald-200/90 dark:bg-emerald-300/20" />
+                <div className="h-2.5 w-2.5 rounded-full border-2 border-emerald-500 bg-white dark:bg-neutral-900" />
+                <div className="h-1.5 flex-1 rounded-full bg-emerald-400/80 dark:bg-emerald-300/35" />
+              </div>
+              <p className="mt-2 text-[9px] leading-relaxed text-neutral-500 dark:text-neutral-400">
+                Values come from imported session fields. Pace and speed can represent the same underlying distance-time data, and the importer may derive them when direct speed is absent. Cadence is shown only when captured; no efficiency score or target range is inferred.
               </p>
             </div>
           )}
