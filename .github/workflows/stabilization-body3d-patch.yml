@@ -1,12 +1,18 @@
-name: Stabilization Body3D Patch
+name: Stabilization Full Acceptance
 
 on:
   push:
     branches:
       - claude/continue-previous-task-un3s83
     paths:
-      - scripts/stabilization/apply-body3d-runtime-fix.mjs
-      - .github/workflows/stabilization-body3d-patch.yml
+      - 'src/**'
+      - 'scripts/uji/**'
+      - 'server/**'
+      - 'package.json'
+      - 'package-lock.json'
+      - 'tsconfig*.json'
+      - '.github/workflows/stabilization-body3d-patch.yml'
+  workflow_dispatch:
 
 permissions:
   contents: read
