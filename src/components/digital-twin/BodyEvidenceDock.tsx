@@ -1,12 +1,8 @@
 import { lazy, Suspense } from 'react'
 import { MedicalEvidenceExplorer } from '../MedicalEvidenceExplorer'
-import { HraContextBridge } from './HraContextBridge'
 
 const PhysiologyScaleExplorer = lazy(() =>
   import('./PhysiologyScaleExplorer').then((module) => ({ default: module.PhysiologyScaleExplorer })),
-)
-const AdvancedPhysiologySystems = lazy(() =>
-  import('./AdvancedPhysiologySystems').then((module) => ({ default: module.AdvancedPhysiologySystems })),
 )
 const OcularMotility4D = lazy(() =>
   import('./OcularMotility4D').then((module) => ({ default: module.OcularMotility4D })),
@@ -31,9 +27,9 @@ const QUERY: Record<BodyEvidenceMode, { term: string; title: string; subtitle: s
     subtitle: 'Live terminology and anatomy evidence sit beside the HRA source geometry and end-to-end layer navigator.',
   },
   physiology: {
-    term: 'human physiology cardiovascular respiratory renal gastrointestinal thermoregulation endocrine hepatic metabolism autonomic immune reproductive',
-    title: 'Whole-body physiology references',
-    subtitle: 'Live literature sits beside the 4D physiology models so educational motion, regulatory physiology and published evidence remain separate.',
+    term: 'normal human physiology cardiovascular respiratory renal gastrointestinal thermoregulation endocrine hepatic metabolism autonomic immune reproductive',
+    title: 'Whole-body normal physiology references',
+    subtitle: 'Published evidence remains separate from the normal-physiology workbench. Pathology, disease comparison and drugs are intentionally deferred to their own later layers.',
   },
   vision: {
     term: 'ocular anatomy extraocular muscle cornea iris lens aqueous vitreous retina macula fovea optic nerve optic chiasm visual acuity refraction color vision stereopsis visual field perimetry',
@@ -77,11 +73,6 @@ const QUERY: Record<BodyEvidenceMode, { term: string; title: string; subtitle: s
   },
 }
 
-const ADVANCED_HRA_TERMS = [
-  'hypothalamus', 'pituitary gland', 'thyroid gland', 'adrenal gland', 'pancreas',
-  'liver', 'gallbladder', 'spleen', 'bone marrow', 'lymph node', 'ovary', 'testis',
-]
-
 function PhysiologyLoading({ label = 'tissue, cellular and DNA physiology' }: { label?: string }) {
   return (
     <div className="rounded-[28px] border border-neutral-200 bg-white p-8 text-center text-sm font-semibold text-neutral-500 shadow-sm dark:border-white/10 dark:bg-white/[0.035]">
@@ -93,7 +84,6 @@ function PhysiologyLoading({ label = 'tissue, cellular and DNA physiology' }: { 
 export function BodyEvidenceDock({ mode }: { mode: BodyEvidenceMode }) {
   const config = QUERY[mode]
   const showMicrophysiology = mode === 'digital-twin' || mode === 'cell-genome'
-  const showAdvancedPhysiology = mode === 'physiology'
   const showOcularMotility = mode === 'vision'
 
   return (
@@ -102,15 +92,6 @@ export function BodyEvidenceDock({ mode }: { mode: BodyEvidenceMode }) {
         <Suspense fallback={<PhysiologyLoading />}>
           <PhysiologyScaleExplorer initialScale={mode === 'digital-twin' ? 'tissue' : 'gene'} />
         </Suspense>
-      )}
-
-      {showAdvancedPhysiology && (
-        <>
-          <HraContextBridge title="Mapped regulatory and metabolic anatomy" terms={ADVANCED_HRA_TERMS} />
-          <Suspense fallback={<PhysiologyLoading label="integrated endocrine, metabolic, immune, autonomic and reproductive physiology" />}>
-            <AdvancedPhysiologySystems />
-          </Suspense>
-        </>
       )}
 
       {showOcularMotility && (
