@@ -103,6 +103,7 @@ export function KnowledgeBridgeWorkbench() {
                     <div className="text-[8px] font-black uppercase tracking-wide text-cyan-700 dark:text-cyan-300">{item.source}{item.year ? ` · ${item.year}` : ''}</div>
                     <a href={item.url} target="_blank" rel="noreferrer" className="mt-1 block text-[10.5px] font-black leading-snug text-neutral-900 hover:underline dark:text-white">{item.title} ↗</a>
                     <div className="mt-1 text-[8.5px] font-semibold text-neutral-400">{item.id}</div>
+                    {item.query && <div className="mt-1 text-[8.5px] leading-relaxed text-neutral-500 dark:text-neutral-400">Found via search: “{item.query}”</div>}
                   </div>
                   <button type="button" onClick={() => setEvidence(removeBridgeEvidence(item.key))} className="grid h-7 w-7 shrink-0 place-items-center rounded-full bg-neutral-100 text-[12px] font-black text-neutral-500 dark:bg-white/10 dark:text-neutral-300" aria-label={`Remove ${item.title}`}>×</button>
                 </div>
