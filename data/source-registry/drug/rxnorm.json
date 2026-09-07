@@ -36,10 +36,10 @@
     "notes": "Persist RXCUI, concept status, term type (TTY) where used, source vocabulary when relevant, and the RxNorm release/API version observed during normalization. Preserve the original medication string so users can audit how a source name became a normalized RxNorm concept."
   },
   "adapter": {
-    "status": "PLANNED",
+    "status": "ACTIVE",
     "normalizedTarget": "PanaceaMedicationConcept",
-    "module": null,
-    "notes": "Planned flow: raw medication text/code -> exact/normalized RxNorm lookup -> optional approximate match with explicit confidence/match method -> PanaceaMedicationConcept retaining original input + RXCUI + normalized name + TTY + status + source/version. Cache stable lookup results within NLM guidance. Do not call proprietary endpoints unless a separately verified UMLS authorization path exists. Drug interactions, prescribing and clinical recommendations must come from independently validated sources/engines."
+    "module": "server/src/rxnorm.ts",
+    "notes": "Production adapter resolves normalized medication text to a numeric RXCUI, retrieves SCD/SBD related concepts, rejects malformed upstream identifiers, applies bounded requests and timeouts, and returns a de-duplicated related-drug list. It is a medication identity/normalization adapter only; it does not perform drug-drug interaction checking or prescribing recommendations."
   },
   "trust": {
     "authority": 5,
