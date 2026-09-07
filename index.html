@@ -33,7 +33,6 @@
     <title>Panaceamed.id — Longevity Medical-AI</title>
     <style>
       @keyframes pmd-splash-pulse{0%,100%{transform:scale(1);opacity:1}50%{transform:scale(1.06);opacity:.9}}
-      html.pmd-low-memory video{display:none!important}
       html.pmd-low-memory .orb{animation:none!important}
       @media (prefers-reduced-motion:reduce){*,*::before,*::after{scroll-behavior:auto!important;animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important}}
     </style>
@@ -46,32 +45,11 @@
         const lowMemory = isIOS || saveData || reducedMotion
 
         window.__PANACEA_LOW_MEMORY__ = lowMemory
-        if (!lowMemory) return
-        document.documentElement.classList.add('pmd-low-memory')
+        if (lowMemory) document.documentElement.classList.add('pmd-low-memory')
 
-        const quietVideo = (video) => {
-          try {
-            video.autoplay = false
-            video.preload = 'none'
-            video.pause()
-            video.removeAttribute('src')
-            video.querySelectorAll('source').forEach((source) => source.removeAttribute('src'))
-            video.load()
-          } catch {}
-        }
-
-        const observer = new MutationObserver((mutations) => {
-          for (const mutation of mutations) {
-            for (const node of mutation.addedNodes) {
-              if (!(node instanceof Element)) continue
-              if (node.tagName === 'VIDEO') quietVideo(node)
-              node.querySelectorAll?.('video').forEach(quietVideo)
-            }
-          }
-        })
-        observer.observe(document.documentElement, { childList: true, subtree: true })
-        // Startup governor only: do not suppress video features elsewhere in the app forever.
-        window.setTimeout(() => observer.disconnect(), 15000)
+        // Low-memory mode may simplify decorative animation elsewhere, but it
+        // must never hide, pause, detach or rewrite user-facing video/media.
+        // Curated landing media remains controlled by its own React component.
       })()
     </script>
   </head>
