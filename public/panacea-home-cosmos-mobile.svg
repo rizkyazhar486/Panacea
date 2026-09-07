@@ -1,0 +1,43 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1080 1600" preserveAspectRatio="xMidYMid slice">
+  <defs>
+    <linearGradient id="base" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#040713"/>
+      <stop offset="0.45" stop-color="#071226"/>
+      <stop offset="0.72" stop-color="#12091d"/>
+      <stop offset="1" stop-color="#040713"/>
+    </linearGradient>
+    <radialGradient id="blue" cx="0.28" cy="0.34" r="0.56">
+      <stop offset="0" stop-color="#0a83ff" stop-opacity="0.30"/>
+      <stop offset="0.45" stop-color="#5144ff" stop-opacity="0.12"/>
+      <stop offset="1" stop-color="#5144ff" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="red" cx="0.76" cy="0.58" r="0.56">
+      <stop offset="0" stop-color="#ff345d" stop-opacity="0.22"/>
+      <stop offset="0.48" stop-color="#8c2cff" stop-opacity="0.10"/>
+      <stop offset="1" stop-color="#8c2cff" stop-opacity="0"/>
+    </radialGradient>
+    <pattern id="stars" width="180" height="200" patternUnits="userSpaceOnUse">
+      <circle cx="18" cy="32" r="1.4" fill="#fff" opacity="0.52"/>
+      <circle cx="94" cy="74" r="1" fill="#9bd8ff" opacity="0.54"/>
+      <circle cx="154" cy="28" r="0.8" fill="#ffd49d" opacity="0.58"/>
+      <circle cx="46" cy="164" r="0.7" fill="#fff" opacity="0.42"/>
+      <circle cx="146" cy="142" r="1.1" fill="#fff" opacity="0.44"/>
+      <path d="M112 116h8M116 112v8" stroke="#fff" stroke-width="0.7" opacity="0.30"/>
+    </pattern>
+    <linearGradient id="arc" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#00c6ff" stop-opacity="0"/>
+      <stop offset="0.28" stop-color="#3d88ff" stop-opacity="0.18"/>
+      <stop offset="0.56" stop-color="#8a54ff" stop-opacity="0.20"/>
+      <stop offset="0.78" stop-color="#ff476d" stop-opacity="0.16"/>
+      <stop offset="1" stop-color="#ff8b35" stop-opacity="0"/>
+    </linearGradient>
+  </defs>
+  <rect width="1080" height="1600" fill="url(#base)"/>
+  <rect width="1080" height="1600" fill="url(#stars)"/>
+  <ellipse cx="230" cy="520" rx="520" ry="420" fill="url(#blue)"/>
+  <ellipse cx="860" cy="960" rx="560" ry="460" fill="url(#red)"/>
+  <path d="M-180 830 C180 640 410 760 620 665 C820 575 980 430 1260 520" fill="none" stroke="url(#arc)" stroke-width="84" opacity="0.55"/>
+  <path d="M-180 832 C180 648 412 768 622 674 C824 583 982 438 1260 528" fill="none" stroke="url(#arc)" stroke-width="3" opacity="0.72"/>
+  <rect y="0" width="1080" height="150" fill="#040713" opacity="0.16"/>
+  <rect y="1450" width="1080" height="150" fill="#040713" opacity="0.16"/>
+</svg>
