@@ -2,7 +2,7 @@ import { readdir, readFile } from 'node:fs/promises';
 import path from 'node:path';
 import process from 'node:process';
 
-const ROOT = path.resolve('data/source-registry');
+const ROOT = path.resolve(process.env.PANACEA_SOURCE_REGISTRY_ROOT || 'data/source-registry');
 const SCHEMA_PATH = path.join(ROOT, 'source.schema.json');
 
 const isPlainObject = (value) =>
