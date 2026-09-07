@@ -1,0 +1,52 @@
+{
+  "id": "molecularnodes",
+  "name": "MolecularNodes",
+  "category": "molecular",
+  "kind": ["tooling"],
+  "homepage": "https://bradyajohnston.github.io/MolecularNodes/",
+  "repository": "https://github.com/BradyAJohnston/MolecularNodes",
+  "features": ["molecular-asset-factory", "structural-biology-visualization", "molecular-dynamics-visualization", "em-density-visualization", "blender-geometry-nodes", "scientific-animation", "glb-asset-production"],
+  "formats": ["pdb", "mmcif", "molecular-dynamics-trajectories", "em-density", "blend", "glb", "gltf"],
+  "usage": {
+    "runtime": false,
+    "buildTime": true,
+    "networkRequired": false,
+    "notes": "Use MolecularNodes only in the offline/build-time Blender asset pipeline. Do not bundle Blender, bpy, MolecularNodes, its Python wheels or its large repository into the Panacea browser application. Network access may be needed by separate source acquisition steps, but the production web client consumes only reviewed exported assets and manifests."
+  },
+  "license": {
+    "status": "VERIFIED",
+    "identifier": "GPL-3.0",
+    "commercialUse": "CONDITIONAL",
+    "attributionRequired": true,
+    "shareAlike": true,
+    "scope": "The current official BradyAJohnston/MolecularNodes repository identifies GNU GPL v3.0 as its software license. Commercial use of GPL software is permitted, but distribution/conveyance of the software or derivatives must comply with GPL obligations. The license of MolecularNodes tooling does not replace or automatically determine licenses of imported PDB/mmCIF/trajectory/density data, Blender scene dependencies, textures, or exported scientific assets; those require their own provenance/license records.",
+    "verificationUrl": "https://github.com/BradyAJohnston/MolecularNodes",
+    "verifiedAt": "2026-09-08",
+    "notes": "Do not copy license metadata from older forks or historical versions: the current official repository is GPL-3.0. If Panacea redistributes the add-on/tooling, perform a dedicated GPL compliance review. Prefer keeping it as an external build tool and shipping only independently cleared output assets plus attribution/provenance manifests."
+  },
+  "validation": {
+    "level": "EDUCATIONAL",
+    "clinicalDecisionUse": "NO",
+    "notes": "MolecularNodes is visualization/tooling, not biological evidence, a molecular simulation validator, a diagnostic device or a clinical inference engine. Scientific validity comes from the source structure/trajectory/density data and any quantitative model used, not from the rendering tool."
+  },
+  "provenance": {
+    "authority": "Brady Johnston and MolecularNodes contributors",
+    "sourceIdentityRequired": true,
+    "versionPinRequired": true,
+    "notes": "Pin MolecularNodes and Blender versions in every asset build manifest. As of verification, latest release is v520.0.0 (published 2026-09-05), a breaking release requiring bpy/Blender 5.2-era APIs and changing world scale to 1 nm == 1 m. Record imported scientific accession/file checksum, input units, frame/trajectory information, transform history, MolecularNodes version, Blender version and export settings for every generated asset."
+  },
+  "adapter": {
+    "status": "PLANNED",
+    "normalizedTarget": "PanaceaMolecularAssetManifest",
+    "module": null,
+    "notes": "Planned build flow: provenance-cleared structural source/trajectory/density -> pinned MolecularNodes + Blender environment -> deterministic scene/style recipe -> export GLB/glTF/rendered media -> PanaceaMolecularAssetManifest -> web renderer. Never bake away source accession, biological assembly/chain identity, units, trajectory frame/time metadata or transform history. Visual interpolation, morphing or artistic styling must be labeled as visualization unless it corresponds to validated source/model states."
+  },
+  "trust": {
+    "authority": 4,
+    "evidenceQuality": 2,
+    "recency": 5,
+    "licenseClarity": 5,
+    "reproducibility": 4,
+    "notes": "Strong specialist scientific-visualization tooling with clear current software licensing and active releases. Evidence quality is intentionally low because the tool is not an evidence source. Reproducibility depends on pinning Blender, MolecularNodes, input data and the complete scene/export recipe."
+  }
+}
