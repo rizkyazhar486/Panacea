@@ -1,0 +1,109 @@
+name: QA original rich landing staging
+
+on:
+  push:
+    branches:
+      - staging/restore-rich-welcome-stable
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  visual-qa:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - run: npm ci
+      - name: Production build
+        run: npm run build
+      - name: Deterministic tests
+        run: npm run uji
+      - name: Install Playwright for visual QA
+        run: |
+          npm install --no-save --package-lock=false playwright@1.55.0
+          npx playwright install --with-deps webkit chromium
+      - name: Start preview server
+        run: |
+          npm run preview -- --host 127.0.0.1 --port 4173 > /tmp/panacea-preview.log 2>&1 &
+          for i in {1..30}; do
+            if curl -fsS http://127.0.0.1:4173/ >/dev/null; then exit 0; fi
+            sleep 1
+          done
+          cat /tmp/panacea-preview.log
+          exit 1
+      - name: Capture and assert rich welcome
+        run: |
+          cat > capture-landing.cjs <<'NODE'
+          const { webkit, chromium, devices } = require('playwright')
+          const BASE = 'http://127.0.0.1:4173/'
+          const HEADER_OFFSET = 120
+
+          function locatorFor(page, target) {
+            if (!target) return null
+            if (target.startsWith('text=')) return page.getByText(target.slice(5), { exact: false }).first()
+            return page.locator(target).first()
+          }
+
+          async function settleTarget(page, target) {
+            const locator = locatorFor(page, target)
+            await locator.waitFor({ state: 'attached', timeout: 15000 })
+            for (let pass = 0; pass < 2; pass += 1) {
+              await locator.evaluate((el) => el.scrollIntoView({ block: 'start', behavior: 'instant' }))
+              await page.evaluate((offset) => window.scrollBy(0, -offset), HEADER_OFFSET)
+              await page.waitForTimeout(700)
+            }
+            const box = await locator.boundingBox()
+            if (!box || box.y < 50 || box.y > 420) throw new Error(`${target}: target not positioned in viewport: ${JSON.stringify(box)}`)
+          }
+
+          async function capture(browserType, contextOptions, filename, target, label) {
+            const browser = await browserType.launch()
+            const context = await browser.newContext(contextOptions)
+            const page = await context.newPage()
+            const pageErrors = []
+            page.on('pageerror', (error) => pageErrors.push(String(error)))
+            await page.goto(BASE, { waitUntil: 'domcontentloaded' })
+            await page.locator('#about').waitFor({ state: 'attached', timeout: 15000 })
+            await page.waitForTimeout(3000)
+            if (target) await settleTarget(page, target)
+            const metrics = await page.evaluate(() => ({ innerWidth: innerWidth, documentWidth: document.documentElement.scrollWidth, bodyWidth: document.body.scrollWidth }))
+            if (metrics.documentWidth > metrics.innerWidth + 2 || metrics.bodyWidth > metrics.innerWidth + 2) throw new Error(`${label}: horizontal overflow ${JSON.stringify(metrics)}`)
+            if (pageErrors.length) throw new Error(`${label}: page errors: ${pageErrors.join(' | ')}`)
+            await page.screenshot({ path: filename, fullPage: false })
+            await browser.close()
+          }
+
+          ;(async () => {
+            const iphone = { ...devices['iPhone 13'] }
+            await capture(webkit, iphone, 'iphone-hero.png', null, 'iPhone hero')
+            await capture(webkit, iphone, 'iphone-film.png', 'video.aspect-video[src*="hf_20260702_023227"]', 'Higgsfield film')
+            await capture(webkit, iphone, 'iphone-pricing.png', '#pricing', 'Pricing')
+            await capture(webkit, iphone, 'iphone-news.png', '#news', 'Medical news')
+            await capture(webkit, iphone, 'iphone-history.png', 'text=A History of', 'History')
+            await capture(webkit, iphone, 'iphone-stem-cells.png', 'text=Stem Cells', 'Stem cells')
+            await capture(webkit, iphone, 'iphone-robotics.png', 'text=Robotics in', 'Robotics')
+            await capture(webkit, { viewport: { width: 390, height: 844 }, deviceScaleFactor: 1, isMobile: true, hasTouch: true }, 'mobile-390-history.png', 'text=A History of', '390px history')
+            await capture(chromium, { viewport: { width: 1440, height: 1000 } }, 'desktop-hero.png', null, 'Desktop hero')
+          })().catch((error) => { console.error(error); process.exit(1) })
+          NODE
+          node capture-landing.cjs
+      - uses: actions/upload-artifact@v4
+        with:
+          name: original-rich-landing-visual-qa
+          path: |
+            iphone-hero.png
+            iphone-film.png
+            iphone-pricing.png
+            iphone-news.png
+            iphone-history.png
+            iphone-stem-cells.png
+            iphone-robotics.png
+            mobile-390-history.png
+            desktop-hero.png
+          retention-days: 2
