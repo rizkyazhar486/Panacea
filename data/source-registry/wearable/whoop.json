@@ -1,0 +1,52 @@
+{
+  "id": "whoop_api",
+  "name": "WHOOP Developer API",
+  "category": "wearable",
+  "kind": ["api"],
+  "homepage": "https://developer.whoop.com/",
+  "repository": null,
+  "features": ["whoop", "recovery", "hrv", "resting-heart-rate", "cycles", "strain", "workouts", "sleep", "body-measurements", "wearable-sync"],
+  "formats": ["json", "http-rest", "oauth2"],
+  "usage": {
+    "runtime": true,
+    "buildTime": false,
+    "networkRequired": true,
+    "notes": "Use WHOOP through a server-side OAuth/API adapter, never by embedding client_secret or refresh tokens in the Vite bundle or browser storage. Default API limits documented by WHOOP are 100 requests/minute and 10,000 requests/day; honor returned rate-limit/cache headers and use incremental synchronization rather than polling every widget independently. Production launch beyond the development-member limit requires WHOOP app approval."
+  },
+  "license": {
+    "status": "CHECK_REQUIRED",
+    "identifier": "WHOOP API Terms of Use",
+    "commercialUse": "CONDITIONAL",
+    "attributionRequired": true,
+    "shareAlike": null,
+    "scope": "WHOOP API use is governed by contractual API Terms rather than an open-data license. End-user authorization is required before accessing user data. WHOOP prohibits selling, licensing or leasing data accessed through the API to third parties, restricts redistribution/permanent copies and requires appropriate privacy/security practices. Charging for independent Panacea functionality is not the same as selling access to WHOOP data and must remain within current WHOOP terms and app approval conditions.",
+    "verificationUrl": "https://developer.whoop.com/api-terms-of-use/",
+    "verifiedAt": "2026-09-08",
+    "notes": "Re-check WHOOP terms, app-approval requirements, branding/attribution rules and cache restrictions before production. Developer credentials may not be embedded in open-source projects. WHOOP data and third-party content can carry additional intellectual-property restrictions."
+  },
+  "validation": {
+    "level": "REFERENCE",
+    "clinicalDecisionUse": "CONTEXT_ONLY",
+    "notes": "WHOOP provides wearable measurements plus provider-derived scores such as Recovery, Strain and Sleep Performance. Panacea must distinguish objective/provider-reported measurements (for example RHR or HRV values) from WHOOP-derived scores and must not reverse-engineer or reinterpret a proprietary score as a clinically validated diagnosis, readiness prescription or causal physiological measurement."
+  },
+  "provenance": {
+    "authority": "WHOOP, Inc.",
+    "sourceIdentityRequired": true,
+    "versionPinRequired": true,
+    "notes": "Persist WHOOP API version/endpoint family, object type and provider object ID, created_at/updated_at, physiological-cycle/sleep/workout relationships, start/end timestamps and timezone offsets where supplied, measurement units, retrieval timestamp and adapter version. Mark each normalized field as providerMeasurement or providerDerivedScore. Preserve score state/readiness when an object is not yet fully scored rather than fabricating a value."
+  },
+  "adapter": {
+    "status": "PLANNED",
+    "normalizedTarget": "PanaceaWearableObservation",
+    "module": null,
+    "notes": "Planned flow: server-side OAuth 2.0 authorization-code exchange with CSRF state -> encrypted token storage -> least-privilege scopes -> incremental WHOOP API sync -> source-aware normalization -> PanaceaWearableObservation. Request only scopes needed by enabled features (for example read:recovery, read:cycles, read:workout, read:sleep, read:body_measurement). Request offline only when background synchronization is actually required. WHOOP rotates refresh tokens: serialize refresh operations per account and atomically replace both access and refresh tokens. Never log credentials/tokens. Honor 401/429 responses, rate-limit headers, revocation and API cache restrictions."
+  },
+  "trust": {
+    "authority": 5,
+    "evidenceQuality": 2,
+    "recency": 5,
+    "licenseClarity": 3,
+    "reproducibility": 3,
+    "notes": "High-authority source for WHOOP's own wearable records and derived scores. Evidence quality and reproducibility are conservative because device algorithms/derived scores are not equivalent to primary clinical measurements and may evolve. Commercial/data rights depend on current API terms and user consent."
+  }
+}
