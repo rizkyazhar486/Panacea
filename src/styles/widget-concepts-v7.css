@@ -1,0 +1,62 @@
+/* Panacea Widget Concepts v7 — richer internal metaphors, still zero extra runtime JS. */
+
+.widget-instrument-v5 .widget-instrument-slide-v5 section>.kaca,
+.widget-instrument-v5 .widget-instrument-slide-v5 section>.pw-concept{position:relative;isolation:isolate}
+.widget-instrument-v5 .widget-instrument-slide-v5 section>.kaca::after{content:'';position:absolute;inset:8px;border-radius:18px;pointer-events:none;border:1px solid color-mix(in srgb,var(--wa) 8%,transparent);mask:linear-gradient(#000 0 0) top left/22px 1px no-repeat,linear-gradient(#000 0 0) top left/1px 22px no-repeat,linear-gradient(#000 0 0) bottom right/22px 1px no-repeat,linear-gradient(#000 0 0) bottom right/1px 22px no-repeat}
+
+/* NIGHT LANDSCAPE */
+.widget-instrument-v5[data-kind='recovery'] .widget-instrument-slide-v5 section>.kaca{overflow:hidden;background:radial-gradient(120% 70% at 50% 115%,rgba(99,102,241,.14),transparent 62%),linear-gradient(180deg,rgba(79,70,229,.045),rgba(15,23,42,.015))!important}
+.widget-instrument-v5[data-kind='recovery'] .widget-instrument-slide-v5 section>.kaca::before{content:'NIGHT / RECOVERY';position:absolute;right:10px;top:8px;z-index:-1;font-size:25px;font-weight:950;letter-spacing:-.055em;color:rgba(99,102,241,.04);pointer-events:none}
+.widget-instrument-v5[data-kind='recovery'] .widget-instrument-slide-v5 section>.kaca>div:first-child>span:first-child{font-size:clamp(28px,8vw,42px)!important;letter-spacing:-.05em!important}
+.widget-instrument-v5[data-kind='recovery'] .widget-instrument-slide-v5 section>.kaca svg{border-radius:16px;background:linear-gradient(180deg,rgba(99,102,241,.08),rgba(99,102,241,.015));padding:5px 7px}
+.widget-instrument-v5[data-kind='recovery'] .widget-instrument-slide-v5 section>.kaca .bg-indigo-600,.widget-instrument-v5[data-kind='recovery'] .widget-instrument-slide-v5 section>.kaca .bg-violet-400,.widget-instrument-v5[data-kind='recovery'] .widget-instrument-slide-v5 section>.kaca .bg-sky-300{box-shadow:inset 0 0 0 1px rgba(255,255,255,.08)}
+
+/* RECOVERY PULSE */
+@supports selector(section:has(svg[aria-label^='last'])){
+.widget-instrument-v5[data-kind='recovery'] .widget-instrument-slide-v5 section:has(svg[aria-label^='last'])>.kaca{display:grid;grid-template-columns:minmax(0,1fr) 92px;align-items:center;gap:8px 12px}
+.widget-instrument-v5[data-kind='recovery'] .widget-instrument-slide-v5 section:has(svg[aria-label^='last'])>.kaca>div:first-child{grid-column:1;align-self:end}
+.widget-instrument-v5[data-kind='recovery'] .widget-instrument-slide-v5 section:has(svg[aria-label^='last'])>.kaca>svg{grid-column:1/-1;height:62px!important;margin-top:2px!important;background:linear-gradient(90deg,transparent 0 49.7%,rgba(139,92,246,.14) 50%,transparent 50.3%),linear-gradient(180deg,rgba(139,92,246,.10),rgba(139,92,246,.015))}
+.widget-instrument-v5[data-kind='recovery'] .widget-instrument-slide-v5 section:has(svg[aria-label^='last'])>.kaca>p:last-child{grid-column:1/-1;margin:0!important;padding:8px 10px;border-left:2px solid rgba(139,92,246,.35);border-radius:0 12px 12px 0;background:rgba(139,92,246,.055)}
+}
+
+/* FLUID RESERVOIR */
+@supports selector(section:has(>div:first-child button + button)){
+.widget-instrument-v5[data-kind='nutrition'] .widget-instrument-slide-v5 section:has(>div:first-child button + button)>.kaca{display:grid;grid-template-columns:minmax(0,1fr) 92px;gap:10px 14px;align-items:center;overflow:hidden;background:radial-gradient(100% 80% at 100% 100%,rgba(56,189,248,.13),transparent 65%)!important}
+.widget-instrument-v5[data-kind='nutrition'] .widget-instrument-slide-v5 section:has(>div:first-child button + button)>.kaca::before{content:'RESERVOIR';position:absolute;right:8px;top:8px;font-size:24px;font-weight:950;letter-spacing:-.05em;color:rgba(56,189,248,.045);pointer-events:none}
+.widget-instrument-v5[data-kind='nutrition'] .widget-instrument-slide-v5 section:has(>div:first-child button + button)>.kaca>div:first-child{grid-column:1/-1}
+.widget-instrument-v5[data-kind='nutrition'] .widget-instrument-slide-v5 section:has(>div:first-child button + button)>.kaca>div:first-child>span:first-child{font-size:clamp(34px,10vw,50px)!important;color:#38bdf8!important}
+.widget-instrument-v5[data-kind='nutrition'] .widget-instrument-slide-v5 section:has(>div:first-child button + button)>.kaca>span:nth-child(2){grid-column:1/-1;height:18px!important;padding:3px;border:1px solid rgba(56,189,248,.18);background:rgba(56,189,248,.06)!important}
+.widget-instrument-v5[data-kind='nutrition'] .widget-instrument-slide-v5 section:has(>div:first-child button + button)>.kaca>span:nth-child(2)>span{background:linear-gradient(90deg,#0ea5e9,#22d3ee)!important;box-shadow:0 0 14px rgba(34,211,238,.18)}
+.widget-instrument-v5[data-kind='nutrition'] .widget-instrument-slide-v5 section:has(>div:first-child button + button)>.kaca>p:last-child{grid-column:1/-1;margin:0!important}
+}
+
+/* MISSION CONTROL INBOX */
+@supports selector(section:has([role='switch'])){
+.widget-instrument-v5[data-kind='alerts'] .widget-instrument-slide-v5 section:has([role='switch'])>.kaca{padding:6px!important;background:linear-gradient(180deg,rgba(249,115,22,.045),rgba(249,115,22,.012))!important}
+.widget-instrument-v5[data-kind='alerts'] .widget-instrument-slide-v5 section:has([role='switch'])>.kaca::before{content:'MISSION CONTROL';display:block;padding:8px 9px 6px;font-size:8px;font-weight:950;letter-spacing:.17em;color:#f97316}
+.widget-instrument-v5[data-kind='alerts'] .widget-instrument-slide-v5 section:has([role='switch'])>.kaca>div{margin:3px 0;border:1px solid rgba(249,115,22,.08)!important;border-radius:14px;background:rgba(249,115,22,.025);padding-left:7px;padding-right:7px}
+.widget-instrument-v5[data-kind='alerts'] .widget-instrument-slide-v5 section:has([role='switch']) [role='switch']{box-shadow:inset 0 0 0 1px rgba(255,255,255,.12)}
+}
+
+/* HUMAN COCKPIT */
+.widget-instrument-v5[data-kind='body'] .widget-instrument-slide-v5 section>.kaca{overflow:hidden;background:linear-gradient(rgba(239,68,68,.025),rgba(239,68,68,.025)),repeating-linear-gradient(0deg,transparent 0 27px,rgba(239,68,68,.025) 28px)!important}
+.widget-instrument-v5[data-kind='body'] .widget-instrument-slide-v5 section>.kaca::before{content:'HUMAN / LIVE';position:absolute;right:9px;top:8px;font-size:8px;font-weight:950;letter-spacing:.16em;color:rgba(239,68,68,.48);pointer-events:none}
+.widget-instrument-v5[data-kind='body'] .widget-instrument-slide-v5 section>.kaca>div:first-child>span:first-child{font-size:clamp(28px,8vw,42px)!important;letter-spacing:-.045em!important}
+.widget-instrument-v5[data-kind='body'] .widget-instrument-slide-v5 section>.kaca svg{padding:5px 6px;border-radius:14px;background:linear-gradient(180deg,rgba(239,68,68,.055),transparent)}
+.widget-instrument-v5[data-kind='body'] .widget-instrument-slide-v5 section>.kaca>p:last-child{padding-top:6px;border-top:1px solid rgba(239,68,68,.08)}
+
+/* FUTURE SELF TELESCOPE */
+@supports selector(section:has(svg[aria-label*='VO2max'])){
+.widget-instrument-v5[data-kind='performance'] .widget-instrument-slide-v5 section:has(svg[aria-label*='VO2max'])>.kaca{overflow:hidden;background:radial-gradient(90% 100% at 100% 50%,rgba(59,130,246,.12),transparent 62%),linear-gradient(180deg,rgba(59,130,246,.035),transparent)!important}
+.widget-instrument-v5[data-kind='performance'] .widget-instrument-slide-v5 section:has(svg[aria-label*='VO2max'])>.kaca::before{content:'FUTURE TRAJECTORY';position:absolute;right:10px;top:9px;font-size:8px;font-weight:950;letter-spacing:.16em;color:rgba(59,130,246,.52)}
+.widget-instrument-v5[data-kind='performance'] .widget-instrument-slide-v5 section:has(svg[aria-label*='VO2max'])>.kaca>div:first-child>span:first-child{font-size:clamp(34px,10vw,52px)!important;color:#3b82f6!important}
+.widget-instrument-v5[data-kind='performance'] .widget-instrument-slide-v5 section:has(svg[aria-label*='VO2max'])>.kaca>svg{height:72px!important;margin-top:4px!important;padding:8px 8px 5px;border-radius:18px;background:linear-gradient(90deg,transparent 0 74%,rgba(59,130,246,.08) 74% 75%,transparent 75%),linear-gradient(180deg,rgba(59,130,246,.10),rgba(59,130,246,.015))}
+.widget-instrument-v5[data-kind='performance'] .widget-instrument-slide-v5 section:has(svg[aria-label*='VO2max'])>.kaca>p:last-child{margin-top:5px!important;padding:8px 10px;border-radius:12px;background:rgba(59,130,246,.055)}
+}
+
+@media(max-width:420px){
+.widget-instrument-v5[data-kind='recovery'] .widget-instrument-slide-v5 section>.kaca>div:first-child>span:first-child,.widget-instrument-v5[data-kind='body'] .widget-instrument-slide-v5 section>.kaca>div:first-child>span:first-child{font-size:30px!important}
+@supports selector(section:has(svg[aria-label^='last'])){.widget-instrument-v5[data-kind='recovery'] .widget-instrument-slide-v5 section:has(svg[aria-label^='last'])>.kaca{grid-template-columns:1fr}}
+}
+@media(prefers-reduced-motion:reduce){.widget-instrument-v5 .widget-instrument-slide-v5 *{scroll-behavior:auto!important}}
+html.pmd-low-memory .widget-instrument-v5 .widget-instrument-slide-v5 section>.kaca{box-shadow:none!important}
