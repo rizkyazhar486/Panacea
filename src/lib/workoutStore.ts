@@ -9,7 +9,7 @@
 // riwayat lama setiap kali seseorang mengekspor tujuh hari terakhir.
 
 import { broadcastHealthUpdate } from './profile'
-import type { ImportedWorkout, HrNotification } from './workoutImport'
+import type { ImportedWorkout, HrNotification, HrPoint } from './workoutImport'
 
 const KEY_W = 'pmd_workouts_v1'
 const KEY_N = 'pmd_hr_notifications_v1'
@@ -29,27 +29,85 @@ let cachedWorkouts: ImportedWorkout[] | undefined
 let cachedNotifRaw: string | null | undefined
 let cachedNotifs: HrNotification[] | undefined
 
+function angkaHingga(v: unknown): number | undefined {
+  return typeof v === 'number' && Number.isFinite(v) ? v : undefined
+}
+
+function angkaPositif(v: unknown): number | undefined {
+  const n = angkaHingga(v)
+  return n !== undefined && n > 0 ? n : undefined
+}
+
+function titikHr(v: unknown): HrPoint | null {
+  if (!v || typeof v !== 'object') return null
+  const x = v as Record<string, unknown>
+  const t = angkaHingga(x.t)
+  const bpm = angkaPositif(x.bpm)
+  if (t === undefined || t < 0 || bpm === undefined) return null
+  return { t, bpm }
+}
+
 /**
- * Benar bila entri ini aman dipakai perhitungan.
+ * Menormalkan satu sesi dari batas runtime yang tidak terpercaya.
  *
- * `hr` dan `pemulihan` WAJIB pada tipenya, dan yang membacanya langsung
- * memanggil `.length` tanpa penjagaan. Isi localStorage tidak dijamin
- * mengikuti tipe itu: ia bisa berasal dari versi aplikasi yang lebih lama,
- * dari impor yang terputus di tengah jalan, atau dari suntingan tangan.
- * Satu entri cacat cukup untuk melempar TypeError dan mengganti SELURUH
- * halaman latihan dengan layar "Something went wrong" — termasuk ratusan sesi
- * lain yang sebetulnya baik-baik saja.
+ * TypeScript hanya melindungi kode saat build; isi localStorage tetap dapat
+ * berasal dari versi lama, impor terputus, atau data yang disunting tangan.
+ * Satu `null` di hr[] cukup untuk membuat consumer yang membaca `p.bpm` crash.
+ * Karena itu titik sensor yang rusak dibuang per titik, bukan membuang seluruh
+ * sesi. Nilai optional yang bukan angka finite juga dihilangkan supaya `NaN`
+ * tidak merambat ke chart atau agregasi.
  */
-function bentuknyaBenar(w: unknown): w is ImportedWorkout {
-  if (!w || typeof w !== 'object') return false
+function normalisasiWorkout(w: unknown): ImportedWorkout | null {
+  if (!w || typeof w !== 'object') return null
   const x = w as Record<string, unknown>
-  return (
-    typeof x.id === 'string' &&
-    typeof x.mulai === 'string' &&
-    !Number.isNaN(Date.parse(x.mulai)) &&
-    Array.isArray(x.hr) &&
-    Array.isArray(x.pemulihan)
-  )
+  if (typeof x.id !== 'string' || !x.id.trim()) return null
+  if (typeof x.mulai !== 'string' || Number.isNaN(Date.parse(x.mulai))) return null
+
+  const durasi = angkaHingga(x.durasi)
+  const hasil: ImportedWorkout = {
+    id: x.id,
+    nama: typeof x.nama === 'string' ? x.nama : '',
+    mulai: x.mulai,
+    // Fallback ini hanya menjaga bentuk data; durasi tidak dihitung ulang dari
+    // waktu selesai sehingga kita tidak menciptakan lama sesi palsu.
+    selesai: typeof x.selesai === 'string' ? x.selesai : x.mulai,
+    durasi: durasi !== undefined && durasi >= 0 ? durasi : 0,
+    hr: (Array.isArray(x.hr) ? x.hr : [])
+      .map(titikHr)
+      .filter((p): p is HrPoint => p !== null)
+      .sort((a, b) => a.t - b.t),
+    pemulihan: (Array.isArray(x.pemulihan) ? x.pemulihan : [])
+      .map(titikHr)
+      .filter((p): p is HrPoint => p !== null)
+      .sort((a, b) => a.t - b.t),
+  }
+
+  const jarakKm = angkaPositif(x.jarakKm)
+  const kcal = angkaHingga(x.kcal)
+  const avgHr = angkaPositif(x.avgHr)
+  const maxHr = angkaPositif(x.maxHr)
+  const minHr = angkaPositif(x.minHr)
+  const kecepatanKmh = angkaPositif(x.kecepatanKmh)
+  const paceSec = angkaPositif(x.paceSec)
+  const kadens = angkaPositif(x.kadens)
+  const langkah = angkaHingga(x.langkah)
+  const hrr1 = angkaPositif(x.hrr1)
+  const rpe = angkaHingga(x.rpe)
+
+  if (jarakKm !== undefined) hasil.jarakKm = jarakKm
+  if (kcal !== undefined && kcal >= 0) hasil.kcal = kcal
+  if (avgHr !== undefined) hasil.avgHr = avgHr
+  if (maxHr !== undefined) hasil.maxHr = maxHr
+  if (minHr !== undefined) hasil.minHr = minHr
+  if (kecepatanKmh !== undefined) hasil.kecepatanKmh = kecepatanKmh
+  if (paceSec !== undefined) hasil.paceSec = paceSec
+  if (kadens !== undefined) hasil.kadens = kadens
+  if (langkah !== undefined && langkah >= 0) hasil.langkah = langkah
+  if (typeof x.diDalamRuangan === 'boolean') hasil.diDalamRuangan = x.diDalamRuangan
+  if (hrr1 !== undefined) hasil.hrr1 = hrr1
+  if (rpe !== undefined && rpe >= 1 && rpe <= 10) hasil.rpe = rpe
+
+  return hasil
 }
 
 export function getWorkouts(): ImportedWorkout[] {
@@ -58,14 +116,14 @@ export function getWorkouts(): ImportedWorkout[] {
     if (raw === cachedWorkoutRaw && cachedWorkouts) return cachedWorkouts.slice()
 
     const v = raw ? JSON.parse(raw) : []
-    // Yang cacat dibuang, bukan diloloskan: kehilangan satu sesi jauh lebih
-    // ringan daripada kehilangan akses ke seluruh halaman.
-    const parsed = Array.isArray(v) ? v.filter(bentuknyaBenar) : []
+    const parsed = Array.isArray(v)
+      ? v.map(normalisasiWorkout).filter((w): w is ImportedWorkout => w !== null)
+      : []
     cachedWorkoutRaw = raw
     cachedWorkouts = parsed
     // Kembalikan salinan array dangkal agar consumer yang melakukan sort/splice
-    // tidak dapat merusak urutan cache bersama. Objek sesi sendiri diperlakukan
-    // sebagai data baca-saja sebagaimana sebelum optimasi ini.
+    // tidak dapat merusak urutan cache bersama. normalisasiWorkout sudah membuat
+    // larik HR/pemulihan baru sehingga cache tidak berbagi larik mentah storage.
     return parsed.slice()
   } catch {
     cachedWorkoutRaw = undefined
@@ -94,10 +152,15 @@ export function getHrNotifications(): HrNotification[] {
 /** Menggabungkan hasil impor dengan yang sudah tersimpan. Mengembalikan jumlah yang benar-benar baru. */
 export function mergeWorkouts(incoming: ImportedWorkout[]): number {
   if (!incoming.length) return 0
+  const aman = incoming
+    .map(normalisasiWorkout)
+    .filter((w): w is ImportedWorkout => w !== null)
+  if (!aman.length) return 0
+
   const cur = getWorkouts()
   const byId = new Map(cur.map((w) => [w.id, w]))
   let baru = 0
-  for (const w of incoming) {
+  for (const w of aman) {
     if (!byId.has(w.id)) baru++
     byId.set(w.id, w) // impor ulang menyegarkan data sesi yang sama
   }
