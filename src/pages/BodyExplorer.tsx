@@ -11,11 +11,11 @@ const HumanAnatomyMasterAtlas = lazy(() =>
 const HumanAnatomyLayerNavigator = lazy(() =>
   import('../components/digital-twin/HumanAnatomyLayerNavigator').then((m) => ({ default: m.HumanAnatomyLayerNavigator })),
 )
-const BodyParts3DDeepAtlas = lazy(() =>
-  import('../components/digital-twin/BodyParts3DDeepAtlas').then((m) => ({ default: m.BodyParts3DDeepAtlas })),
+const StableBodyParts3DDeepAtlas = lazy(() =>
+  import('../components/digital-twin/StableBodyParts3DDeepAtlas').then((m) => ({ default: m.StableBodyParts3DDeepAtlas })),
 )
-const Ocular4DAtlas = lazy(() =>
-  import('../components/digital-twin/Ocular4DAtlas').then((m) => ({ default: m.Ocular4DAtlas })),
+const OcularAnatomyAtlas = lazy(() =>
+  import('../components/digital-twin/OcularAnatomyAtlas').then((m) => ({ default: m.OcularAnatomyAtlas })),
 )
 const HraClinicalAtlas = lazy(() =>
   import('../components/digital-twin/HraClinicalAtlas').then((m) => ({ default: m.HraClinicalAtlas })),
@@ -55,40 +55,34 @@ const CinematicSurgicalRehearsal = lazy(() =>
 )
 
 type LabMode = BodyEvidenceMode
-
-type Mode = {
-  key: LabMode
-  label: string
-  hint: string
-}
+type Mode = { key: LabMode; label: string; hint: string }
 
 const PRIMARY: Mode[] = [
-  { key: 'realistic-atlas', label: 'Anatomy', hint: 'Navigate precise named anatomy from scalp and brain to ankle and toes, then switch source tools without stacking heavy viewers.' },
-  { key: 'physiology', label: 'Physiology', hint: 'Connect anatomy to organ function, mechanisms and pathology.' },
-  { key: 'vision', label: 'Eye 4D', hint: 'Ocular anatomy, optics, retina, visual pathways and examination.' },
-  { key: 'digital-twin', label: 'Body → Cell', hint: 'Move from body structures into microscopy and molecular evidence.' },
-  { key: 'cell-genome', label: 'Cell → DNA', hint: 'HPA, Ensembl and local sequencing evidence without decorative fake biology.' },
-  { key: 'workout-4d', label: 'Exercise', hint: 'Replay measured exercise signals against fixed source anatomy.' },
-  { key: 'surgery', label: 'Surgery', hint: 'Operation-specific anatomy with procedure checkpoints.' },
+  { key: 'realistic-atlas', label: 'Anatomy', hint: 'Head-to-toe source anatomy first: region, system, layer and deep structure.' },
+  { key: 'digital-twin', label: 'Body → Cell', hint: 'Stable cell anatomy first, then real microscopy and molecular evidence.' },
+  { key: 'vision', label: 'Eye anatomy', hint: 'Specific ocular structures from surface to retina and optic pathway.' },
 ]
 
 const MORE: Mode[] = [
+  { key: 'physiology', label: 'Physiology', hint: 'Preserved for the next layer after anatomy.' },
+  { key: 'cell-genome', label: 'Cell → DNA', hint: 'Cell anatomy, HPA microscopy, Ensembl and local sequence evidence.' },
+  { key: 'workout-4d', label: 'Exercise', hint: 'Measured exercise replay against source anatomy.' },
+  { key: 'surgery', label: 'Surgery', hint: 'Operation-specific anatomy and checkpoints.' },
   { key: 'surgery-rehearsal', label: 'Practice', hint: 'Active recall and surgical risk-map practice.' },
-  { key: 'counterfactual', label: 'What-if', hint: 'Source anatomy plus explicit causal scenarios.' },
-  { key: 'regeneration', label: 'Research', hint: 'Aging and recovery hypotheses kept separate from measured facts.' },
+  { key: 'counterfactual', label: 'What-if', hint: 'Source anatomy with explicit causal scenarios.' },
+  { key: 'regeneration', label: 'Research', hint: 'Recovery and aging hypotheses kept separate from measured facts.' },
 ]
 
 const ALL = [...PRIMARY, ...MORE]
 
 type AnatomyTool = 'head-to-toe' | 'systems' | 'layers' | 'deep' | 'hra' | 'search'
-
 const ANATOMY_TOOLS: { key: AnatomyTool; label: string; detail: string }[] = [
-  { key: 'head-to-toe', label: 'Head → toe', detail: 'Ordered named structures from scalp and brain through limbs to toes.' },
-  { key: 'systems', label: 'System atlas', detail: 'Regional anatomy, organ systems and special senses grouped clinically.' },
-  { key: 'layers', label: 'Layers', detail: 'Skin → soft tissue → muscle → bone → vessels → nerves → organs.' },
-  { key: 'deep', label: 'Deep atlas', detail: 'BodyParts3D source geometry for a selected system or structure.' },
-  { key: 'hra', label: 'HRA canvas', detail: 'Multi-layer HuBMAP HRA canvas when simultaneous structures are needed.' },
-  { key: 'search', label: 'Source search', detail: 'Find anatomy across supported HRA releases and source records.' },
+  { key: 'head-to-toe', label: 'Head → toe', detail: 'Named structures arranged in anatomical order.' },
+  { key: 'systems', label: 'Systems', detail: 'Regional anatomy and organ systems.' },
+  { key: 'layers', label: 'Layers', detail: 'Surface → fascia → muscle → bone → vessels → nerves → organs.' },
+  { key: 'deep', label: 'Deep atlas', detail: 'BodyParts3D source meshes, one selection at a time.' },
+  { key: 'hra', label: 'HRA canvas', detail: 'HuBMAP HRA source geometry when multi-structure context is required.' },
+  { key: 'search', label: 'Source search', detail: 'Resolve named anatomy across supported HRA releases.' },
 ]
 
 function isLabMode(value: string | null): value is LabMode {
@@ -97,7 +91,7 @@ function isLabMode(value: string | null): value is LabMode {
 
 function LoadingLab({ label }: { label: string }) {
   return (
-    <div className="rounded-[24px] border border-neutral-200 bg-white p-8 text-center text-sm font-medium text-neutral-500 shadow-sm dark:border-white/10 dark:bg-white/[0.035]">
+    <div className="rounded-[22px] border border-neutral-200 bg-white p-7 text-center text-[12px] font-medium text-neutral-500 shadow-sm dark:border-white/10 dark:bg-white/[0.035]">
       Loading {label}…
     </div>
   )
@@ -106,7 +100,7 @@ function LoadingLab({ label }: { label: string }) {
 function OnDemandPanel({
   title,
   detail,
-  eyebrow = 'Optional tool',
+  eyebrow = 'Optional layer',
   children,
 }: {
   title: string
@@ -116,21 +110,23 @@ function OnDemandPanel({
 }) {
   const [open, setOpen] = useState(false)
   return (
-    <section className="overflow-hidden rounded-[24px] border border-neutral-200 bg-white shadow-sm dark:border-white/10 dark:bg-white/[.035]">
+    <section className="overflow-hidden rounded-[22px] border border-neutral-200 bg-white shadow-sm dark:border-white/10 dark:bg-white/[.035]">
       <button
         type="button"
         onClick={() => setOpen((value) => !value)}
-        className="flex w-full items-center justify-between gap-4 p-4 text-left sm:p-5"
+        className="flex w-full items-center justify-between gap-4 p-4 text-left"
         aria-expanded={open}
       >
-        <div>
-          <div className="text-[9px] font-medium uppercase tracking-[.14em] text-neutral-400">{eyebrow}</div>
-          <div className="mt-1 text-[15px] font-semibold text-neutral-950 dark:text-white">{title}</div>
-          <p className="mt-1 max-w-3xl text-[11px] leading-relaxed text-neutral-500 dark:text-neutral-400">{detail}</p>
+        <div className="min-w-0">
+          <div className="text-[8px] font-medium uppercase tracking-[.13em] text-neutral-400">{eyebrow}</div>
+          <div className="mt-1 text-[14px] font-semibold text-neutral-950 dark:text-white">{title}</div>
+          <p className="mt-1 max-w-3xl text-[10px] leading-relaxed text-neutral-500 dark:text-neutral-400">{detail}</p>
         </div>
-        <span className={`grid h-9 w-9 shrink-0 place-items-center rounded-full bg-neutral-100 text-lg text-neutral-700 transition dark:bg-white/10 dark:text-white ${open ? 'rotate-45' : ''}`}>＋</span>
+        <span className="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-neutral-100 text-sm font-medium text-neutral-700 dark:bg-white/10 dark:text-white">
+          {open ? '−' : '+'}
+        </span>
       </button>
-      {open && <div className="border-t border-neutral-100 p-4 dark:border-white/10 sm:p-5">{children}</div>}
+      {open && <div className="border-t border-neutral-100 p-4 dark:border-white/10">{children}</div>}
     </section>
   )
 }
@@ -159,13 +155,13 @@ function SecondaryLayer({
 function CellEvidenceMode({ mode }: { mode: 'body-cell' | 'cell-genome' }) {
   return (
     <div className="space-y-4">
-      <Suspense fallback={<LoadingLab label="HPA and Ensembl source evidence" />}>
+      <Suspense fallback={<LoadingLab label="cell anatomy and source evidence" />}>
         <CellGenomeEvidenceLab mode={mode} />
       </Suspense>
       <OnDemandPanel
         eyebrow="Sequencing"
-        title="Open local FASTA / FASTQ / VCF evidence"
-        detail="Kept off by default so microscopy and sequencing tools do not compete for memory on mobile."
+        title="FASTA / FASTQ / VCF evidence"
+        detail="Sequencing stays off until requested so the cell viewer and sequence tools never compete for mobile memory."
       >
         <Suspense fallback={<LoadingLab label="local sequencing evidence" />}>
           <SequenceEvidenceWorkbench />
@@ -181,28 +177,34 @@ function AnatomyMode({ onOpenPhysiology }: { onOpenPhysiology: () => void }) {
 
   return (
     <div className="space-y-4">
-      <section className="rounded-[24px] border border-neutral-200 bg-white p-4 shadow-sm dark:border-white/10 dark:bg-white/[.035] sm:p-5">
+      <section className="rounded-[22px] border border-neutral-200 bg-white p-4 shadow-sm dark:border-white/10 dark:bg-white/[.035]">
         <div className="flex flex-wrap items-end justify-between gap-3">
-          <div>
-            <div className="text-[9px] font-medium uppercase tracking-[.14em] text-neutral-400">Whole-body anatomy source selector</div>
-            <h2 className="mt-1 text-[16px] font-semibold tracking-tight text-neutral-950 dark:text-white">One anatomy workspace at a time</h2>
-            <p className="mt-1 max-w-3xl text-[11px] leading-relaxed text-neutral-500 dark:text-neutral-400">
-              Head → toe is the default. Switching tools unmounts the previous workspace before loading the next, keeping WebGL and network use predictable on mobile.
+          <div className="min-w-0">
+            <div className="text-[8px] font-medium uppercase tracking-[.13em] text-neutral-400">Anatomy foundation</div>
+            <h2 className="mt-1 text-[15px] font-semibold tracking-tight text-neutral-950 dark:text-white">One anatomical workspace at a time</h2>
+            <p className="mt-1 max-w-3xl text-[10px] leading-relaxed text-neutral-500 dark:text-neutral-400">
+              The selected workspace is the only heavy anatomy view mounted. No auto-spin, no pulse, and no background 3D viewer.
             </p>
           </div>
-          <div className="rounded-full border border-neutral-200 bg-neutral-50 px-3 py-2 text-[9px] font-medium text-neutral-500 dark:border-white/10 dark:bg-white/[.04] dark:text-neutral-300">Active · {activeTool.label}</div>
+          <div className="rounded-full border border-neutral-200 bg-neutral-50 px-3 py-1.5 text-[8px] font-medium text-neutral-500 dark:border-white/10 dark:bg-white/[.04] dark:text-neutral-300">
+            Active · {activeTool.label}
+          </div>
         </div>
 
-        <div className="no-scrollbar -mx-1 mt-4 flex gap-2 overflow-x-auto px-1 pb-1">
+        <div className="no-scrollbar -mx-1 mt-3 flex gap-2 overflow-x-auto px-1 pb-1">
           {ANATOMY_TOOLS.map((item) => (
             <button
               key={item.key}
               type="button"
               onClick={() => setTool(item.key)}
-              className={`min-w-[150px] shrink-0 rounded-2xl border p-3 text-left transition ${tool === item.key ? 'border-neutral-950 bg-neutral-950 text-white dark:border-white dark:bg-white dark:text-neutral-950' : 'border-neutral-200 bg-neutral-50 text-neutral-800 hover:border-neutral-300 dark:border-white/10 dark:bg-white/[.04] dark:text-neutral-200'}`}
+              className={`min-w-[138px] shrink-0 rounded-xl border px-3 py-2.5 text-left ${
+                tool === item.key
+                  ? 'border-neutral-950 bg-neutral-950 text-white dark:border-white dark:bg-white dark:text-neutral-950'
+                  : 'border-neutral-200 bg-neutral-50 text-neutral-800 dark:border-white/10 dark:bg-white/[.04] dark:text-neutral-200'
+              }`}
             >
-              <div className="text-[12px] font-semibold">{item.label}</div>
-              <div className={`mt-1 text-[10px] leading-relaxed ${tool === item.key ? 'text-white/65 dark:text-neutral-600' : 'text-neutral-500 dark:text-neutral-400'}`}>{item.detail}</div>
+              <div className="text-[11px] font-semibold">{item.label}</div>
+              <div className={`mt-1 text-[9px] leading-relaxed ${tool === item.key ? 'text-white/65 dark:text-neutral-600' : 'text-neutral-500 dark:text-neutral-400'}`}>{item.detail}</div>
             </button>
           ))}
         </div>
@@ -213,7 +215,7 @@ function AnatomyMode({ onOpenPhysiology }: { onOpenPhysiology: () => void }) {
           <HeadToToeAnatomyWorkbench onOpenPhysiology={onOpenPhysiology} />
         </Suspense>
       ) : tool === 'systems' ? (
-        <Suspense fallback={<LoadingLab label="human anatomy master atlas" />}>
+        <Suspense fallback={<LoadingLab label="human anatomy systems" />}>
           <HumanAnatomyMasterAtlas onOpenPhysiology={onOpenPhysiology} />
         </Suspense>
       ) : tool === 'layers' ? (
@@ -221,15 +223,15 @@ function AnatomyMode({ onOpenPhysiology }: { onOpenPhysiology: () => void }) {
           <HumanAnatomyLayerNavigator />
         </Suspense>
       ) : tool === 'deep' ? (
-        <Suspense fallback={<LoadingLab label="BodyParts3D deep anatomy" />}>
-          <BodyParts3DDeepAtlas />
+        <Suspense fallback={<LoadingLab label="deep BodyParts3D anatomy" />}>
+          <StableBodyParts3DDeepAtlas />
         </Suspense>
       ) : tool === 'hra' ? (
         <Suspense fallback={<LoadingLab label="HuBMAP Human Reference Atlas" />}>
           <HraClinicalAtlas />
         </Suspense>
       ) : (
-        <Suspense fallback={<LoadingLab label="multi-release HRA source search" />}>
+        <Suspense fallback={<LoadingLab label="HRA source search" />}>
           <HraSourceSearch />
         </Suspense>
       )}
@@ -241,7 +243,7 @@ export function BodyExplorer() {
   const [searchParams, setSearchParams] = useSearchParams()
   const requested = searchParams.get('mode')
   const mode: LabMode = isLabMode(requested) ? requested : 'realistic-atlas'
-  const active = ALL.find((item) => item.key === mode)!
+  const active = ALL.find((item) => item.key === mode) ?? PRIMARY[0]
 
   function setMode(next: LabMode) {
     const params = new URLSearchParams(searchParams)
@@ -251,42 +253,50 @@ export function BodyExplorer() {
   }
 
   return (
-    <main className="mx-auto w-full max-w-[1500px] space-y-4 pb-12">
-      <section className="sticky top-0 z-40 rounded-[22px] border border-neutral-200 bg-white/95 px-3 py-3 shadow-[0_8px_24px_rgba(20,30,40,.06)] backdrop-blur-xl dark:border-white/10 dark:bg-[#080b0e]/95 sm:px-4">
+    <main className="mx-auto w-full max-w-[1480px] space-y-4 pb-10">
+      <section className="sticky top-0 z-40 rounded-[20px] border border-neutral-200 bg-white/95 px-3 py-2.5 shadow-[0_8px_22px_rgba(20,30,40,.055)] backdrop-blur-xl dark:border-white/10 dark:bg-[#080b0e]/95 sm:px-4">
         <div className="flex items-start justify-between gap-3">
           <div className="min-w-0">
-            <div className="text-[9px] font-medium uppercase tracking-[.14em] text-neutral-400">Panacea Body Exposure</div>
-            <h1 className="mt-0.5 text-[18px] font-semibold tracking-tight text-neutral-950 dark:text-white sm:text-xl">{active.label}</h1>
-            <p className="mt-1 max-w-4xl text-[11px] leading-relaxed text-neutral-500 dark:text-neutral-400">{active.hint}</p>
+            <div className="text-[8px] font-medium uppercase tracking-[.13em] text-neutral-400">Panacea Body Exposure</div>
+            <h1 className="mt-0.5 text-[16px] font-semibold tracking-tight text-neutral-950 dark:text-white sm:text-[17px]">{active.label}</h1>
+            <p className="mt-0.5 max-w-4xl text-[10px] leading-relaxed text-neutral-500 dark:text-neutral-400">{active.hint}</p>
           </div>
-          <div className="hidden shrink-0 gap-1.5 sm:flex">
-            <span className="rounded-full border border-neutral-200 bg-neutral-50 px-2.5 py-1.5 text-[8px] font-medium uppercase tracking-[.1em] text-neutral-500 dark:border-white/10 dark:bg-white/[.04]">HRA</span>
-            <span className="rounded-full border border-neutral-200 bg-neutral-50 px-2.5 py-1.5 text-[8px] font-medium uppercase tracking-[.1em] text-neutral-500 dark:border-white/10 dark:bg-white/[.04]">BodyParts3D</span>
-            <span className="rounded-full border border-neutral-200 bg-neutral-50 px-2.5 py-1.5 text-[8px] font-medium uppercase tracking-[.1em] text-neutral-500 dark:border-white/10 dark:bg-white/[.04]">HPA</span>
-            <span className="rounded-full border border-neutral-200 bg-neutral-50 px-2.5 py-1.5 text-[8px] font-medium uppercase tracking-[.1em] text-neutral-500 dark:border-white/10 dark:bg-white/[.04]">Ensembl</span>
-          </div>
+          <span className="hidden shrink-0 rounded-full border border-emerald-200 bg-emerald-50 px-2.5 py-1.5 text-[8px] font-medium text-emerald-800 dark:border-emerald-300/20 dark:bg-emerald-300/10 dark:text-emerald-200 sm:inline-flex">
+            anatomy first
+          </span>
         </div>
 
-        <div className="no-scrollbar -mx-1 mt-3 flex gap-1.5 overflow-x-auto px-1 pb-1">
+        <div className="no-scrollbar -mx-1 mt-2.5 flex gap-1.5 overflow-x-auto px-1 pb-1">
           {PRIMARY.map((item) => (
             <button
               key={item.key}
               onClick={() => setMode(item.key)}
-              className={`shrink-0 rounded-full border px-3.5 py-2 text-[10px] font-semibold transition ${mode === item.key ? 'border-neutral-950 bg-neutral-950 text-white dark:border-white dark:bg-white dark:text-neutral-950' : 'border-neutral-200 bg-neutral-50 text-neutral-600 hover:border-neutral-300 dark:border-white/10 dark:bg-white/[.04] dark:text-neutral-300'}`}
+              className={`shrink-0 rounded-full border px-3 py-1.5 text-[10px] font-semibold ${
+                mode === item.key
+                  ? 'border-neutral-950 bg-neutral-950 text-white dark:border-white dark:bg-white dark:text-neutral-950'
+                  : 'border-neutral-200 bg-neutral-50 text-neutral-600 dark:border-white/10 dark:bg-white/[.04] dark:text-neutral-300'
+              }`}
             >
               {item.label}
             </button>
           ))}
           <details className="relative shrink-0">
-            <summary className="list-none cursor-pointer rounded-full border border-neutral-200 bg-neutral-50 px-3.5 py-2 text-[10px] font-semibold text-neutral-600 dark:border-white/10 dark:bg-white/[.04] dark:text-neutral-300">More ▾</summary>
-            <div className="absolute right-0 z-50 mt-2 flex min-w-[180px] flex-col gap-1 rounded-2xl border border-neutral-200 bg-white p-2 shadow-xl dark:border-white/10 dark:bg-[#111519]">
+            <summary className="list-none cursor-pointer rounded-full border border-neutral-200 bg-neutral-50 px-3 py-1.5 text-[10px] font-semibold text-neutral-600 dark:border-white/10 dark:bg-white/[.04] dark:text-neutral-300">
+              More tools ▾
+            </summary>
+            <div className="absolute right-0 z-50 mt-2 flex min-w-[190px] flex-col gap-1 rounded-2xl border border-neutral-200 bg-white p-2 shadow-xl dark:border-white/10 dark:bg-[#111519]">
               {MORE.map((item) => (
                 <button
                   key={item.key}
                   onClick={() => setMode(item.key)}
-                  className={`rounded-xl px-3 py-2 text-left text-[10px] font-semibold ${mode === item.key ? 'bg-neutral-950 text-white dark:bg-white dark:text-neutral-950' : 'text-neutral-600 hover:bg-neutral-100 dark:text-neutral-300 dark:hover:bg-white/10'}`}
+                  className={`rounded-xl px-3 py-2 text-left text-[10px] font-medium ${
+                    mode === item.key
+                      ? 'bg-neutral-950 text-white dark:bg-white dark:text-neutral-950'
+                      : 'text-neutral-600 hover:bg-neutral-100 dark:text-neutral-300 dark:hover:bg-white/10'
+                  }`}
                 >
-                  {item.label}
+                  <span className="block font-semibold">{item.label}</span>
+                  <span className="mt-0.5 block text-[8px] leading-relaxed opacity-65">{item.hint}</span>
                 </button>
               ))}
             </div>
@@ -294,42 +304,40 @@ export function BodyExplorer() {
         </div>
       </section>
 
-      {mode === 'digital-twin' ? (
-        <CellEvidenceMode mode="body-cell" />
-      ) : mode === 'realistic-atlas' ? (
+      {mode === 'realistic-atlas' ? (
         <AnatomyMode onOpenPhysiology={() => setMode('physiology')} />
-      ) : mode === 'physiology' ? (
-        <div id="body-physiology">
-          <Suspense fallback={<LoadingLab label="HRA-native physiology workbench" />}><PhysiologyHraWorkbench /></Suspense>
-        </div>
+      ) : mode === 'digital-twin' ? (
+        <CellEvidenceMode mode="body-cell" />
       ) : mode === 'vision' ? (
-        <Suspense fallback={<LoadingLab label="4D ocular anatomy and visual physiology" />}><Ocular4DAtlas /></Suspense>
+        <Suspense fallback={<LoadingLab label="ocular anatomy" />}><OcularAnatomyAtlas /></Suspense>
       ) : mode === 'cell-genome' ? (
         <CellEvidenceMode mode="cell-genome" />
+      ) : mode === 'physiology' ? (
+        <Suspense fallback={<LoadingLab label="HRA-native physiology workbench" />}><PhysiologyHraWorkbench /></Suspense>
       ) : mode === 'workout-4d' ? (
         <SecondaryLayer
-          eyebrow="Data replay"
-          title="Replay measured workout signals"
-          detail="The anatomy workbench stays fixed. Open replay only when you want the measured and derived timeline."
-          sourcePanel={<Suspense fallback={<LoadingLab label="workout-specific HRA workbench" />}><WorkoutHraWorkbench /></Suspense>}
+          eyebrow="Optional replay"
+          title="Measured workout timeline"
+          detail="The anatomy workbench stays primary. Replay mounts only when requested."
+          sourcePanel={<Suspense fallback={<LoadingLab label="exercise source anatomy" />}><WorkoutHraWorkbench /></Suspense>}
         >
           <Suspense fallback={<LoadingLab label="workout signal replay" />}><WorkoutSignalReplay /></Suspense>
         </SecondaryLayer>
       ) : mode === 'surgery' ? (
         <SecondaryLayer
-          eyebrow="Procedure education"
-          title="Open operation timeline"
-          detail="Keep the operation-specific anatomy primary; load objectives, risks and checkpoints only when needed."
-          sourcePanel={<Suspense fallback={<LoadingLab label="operation-specific HRA workbench" />}><SurgicalHraWorkbench /></Suspense>}
+          eyebrow="Optional procedure layer"
+          title="Operation timeline"
+          detail="Operation-specific anatomy stays primary; objectives, risks and checkpoints load only when opened."
+          sourcePanel={<Suspense fallback={<LoadingLab label="operation-specific anatomy" />}><SurgicalHraWorkbench /></Suspense>}
         >
           <Suspense fallback={<LoadingLab label="procedure timeline" />}><SurgicalProcedureTimeline /></Suspense>
         </SecondaryLayer>
       ) : mode === 'surgery-rehearsal' ? (
         <SecondaryLayer
-          eyebrow="Practice lab"
-          title="Open active-recall rehearsal"
-          detail="The HRA workbench remains the anatomy source. Practice is mounted separately to avoid duplicate heavy viewers."
-          sourcePanel={<Suspense fallback={<LoadingLab label="operation-specific HRA workbench" />}><SurgicalHraWorkbench /></Suspense>}
+          eyebrow="Optional practice"
+          title="Active-recall rehearsal"
+          detail="Practice is isolated from the source anatomy renderer to avoid duplicate heavy views."
+          sourcePanel={<Suspense fallback={<LoadingLab label="operation-specific anatomy" />}><SurgicalHraWorkbench /></Suspense>}
         >
           <Suspense fallback={<LoadingLab label="surgical rehearsal" />}><CinematicSurgicalRehearsal /></Suspense>
         </SecondaryLayer>
@@ -339,7 +347,15 @@ export function BodyExplorer() {
         <Suspense fallback={<LoadingLab label="source-resolved regeneration research" />}><RegenerationHraWorkbench /></Suspense>
       )}
 
-      <BodyEvidenceDock mode={mode} />
+      <OnDemandPanel
+        eyebrow="Evidence"
+        title="References & evidence dock"
+        detail="Kept available but closed by default so anatomy remains visually dominant and background data work does not compete with the active 3D view."
+      >
+        <Suspense fallback={<LoadingLab label="evidence dock" />}><BodyEvidenceDock mode={mode} /></Suspense>
+      </OnDemandPanel>
     </main>
   )
 }
+
+export default BodyExplorer
