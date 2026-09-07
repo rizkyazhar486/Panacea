@@ -1,0 +1,396 @@
+/* Panacea Home Widget v11 — corrective pass based on production iPhone screenshots.
+   Goals: remove stray decorative lines/watermarks, restore one continuous Home wallpaper,
+   scale content to the space it receives, and keep the dashboard lightweight.
+   CSS only: no calculation, store, API, timer, observer, or data changes. */
+
+:root {
+  --pmd-v11-label: 12px;
+  --pmd-v11-copy: 14px;
+  --pmd-v11-copy-lg: 15px;
+  --pmd-v11-title: 18px;
+  --pmd-v11-metric: clamp(40px, 10vw, 58px);
+  --pmd-v11-metric-sm: clamp(30px, 7vw, 42px);
+  --pmd-v11-card-pad: 17px;
+  --pmd-v11-card-radius: 24px;
+  --pmd-v11-line: rgba(255,255,255,.10);
+  --pmd-v11-surface-dark: rgba(10,14,22,.76);
+  --pmd-v11-surface-light: rgba(255,255,255,.84);
+}
+
+/* ── ONE HOME BACKGROUND ───────────────────────────────────────────────────
+   The cosmos wallpaper is already provided by .panacea-home-backdrop.
+   Remove the second full-page radial overlay and make the large section shells
+   transparent so the wallpaper remains continuous while scrolling. */
+.panacea-home::after {
+  content: none !important;
+  display: none !important;
+}
+
+.panacea-home > .home-command-panel {
+  background: transparent !important;
+  border-color: transparent !important;
+  box-shadow: none !important;
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
+}
+
+/* Actual actionable surfaces remain readable; only the page-sized wrappers
+   become transparent. */
+.dark .panacea-home .home-action-card,
+.dark .panacea-home .home-signal-card,
+.dark .panacea-home .home-loading-card {
+  background: rgba(10,14,22,.72) !important;
+  border-color: rgba(255,255,255,.09) !important;
+}
+
+/* ── REMOVE STRAY CORNER LINES / OLD WATERMARKS ──────────────────────────── */
+.home-command-panel:has(#my-dashboard-title) .widget-instrument-shell-v5::before,
+.home-command-panel:has(#my-dashboard-title) .widget-instrument-shell-v5::after,
+.home-command-panel:has(#my-dashboard-title) .widget-instrument-slide-v5 .kaca::before,
+.home-command-panel:has(#my-dashboard-title) .widget-instrument-slide-v5 .kaca::after,
+.home-command-panel:has(#my-dashboard-title) .widget-instrument-slide-v5 section > .kaca::before,
+.home-command-panel:has(#my-dashboard-title) .widget-instrument-slide-v5 section > .kaca::after {
+  content: none !important;
+  display: none !important;
+  background: none !important;
+  border: 0 !important;
+  box-shadow: none !important;
+}
+
+/* v8 used pseudo bars as decorative meters inside the five energy buttons.
+   Remove them: the button itself now carries state clearly. */
+.home-command-panel:has(#my-dashboard-title) [data-widget='tenaga'] .grid-cols-5 > button::before,
+.home-command-panel:has(#my-dashboard-title) [data-widget='tenaga'] .grid-cols-5 > button::after {
+  content: none !important;
+  display: none !important;
+}
+
+/* ── DASHBOARD SHELL ─────────────────────────────────────────────────────── */
+.home-command-panel:has(#my-dashboard-title) .widget-instrument-shell-v5 {
+  border: 1px solid rgba(255,255,255,.095) !important;
+  border-radius: 28px !important;
+  background: rgba(8,12,20,.64) !important;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.035), 0 12px 34px rgba(0,0,0,.16) !important;
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
+}
+
+.light .home-command-panel:has(#my-dashboard-title) .widget-instrument-shell-v5,
+:not(.dark) .home-command-panel:has(#my-dashboard-title) .widget-instrument-shell-v5 {
+  border-color: rgba(15,23,42,.09) !important;
+  background: rgba(255,255,255,.78) !important;
+}
+
+.home-command-panel:has(#my-dashboard-title) .widget-instrument-slide-v5 {
+  padding: clamp(15px, 4vw, 20px) !important;
+}
+
+.home-command-panel:has(#my-dashboard-title) .widget-instrument-slide-v5 > section {
+  min-width: 0;
+}
+
+.home-command-panel:has(#my-dashboard-title) .widget-instrument-slide-v5 section > .kaca {
+  padding: var(--pmd-v11-card-pad) !important;
+  border-radius: var(--pmd-v11-card-radius) !important;
+  background: transparent !important;
+}
+
+/* ── TYPOGRAPHY THAT MATCHES THE AVAILABLE SPACE ─────────────────────────── */
+.home-command-panel:has(#my-dashboard-title) .t-mikro {
+  font-size: var(--pmd-v11-label) !important;
+  line-height: 1.38 !important;
+  letter-spacing: 0 !important;
+}
+
+.home-command-panel:has(#my-dashboard-title) .t-kecil {
+  font-size: var(--pmd-v11-copy) !important;
+  line-height: 1.4 !important;
+}
+
+.home-command-panel:has(#my-dashboard-title) .t-sedang {
+  font-size: var(--pmd-v11-copy-lg) !important;
+  line-height: 1.28 !important;
+}
+
+.home-command-panel:has(#my-dashboard-title) :is(.t-angka,.t-angka-panjang) {
+  font-size: var(--pmd-v11-metric-sm) !important;
+  line-height: .95 !important;
+  letter-spacing: -.045em !important;
+}
+
+.home-command-panel:has(#my-dashboard-title) .widget-instrument-kicker-v5 {
+  font-size: 10px !important;
+  letter-spacing: .12em !important;
+}
+
+.home-command-panel:has(#my-dashboard-title) .widget-instrument-title-v5 {
+  font-size: 19px !important;
+  line-height: 1.05 !important;
+}
+
+.home-command-panel:has(#my-dashboard-title) .widget-instrument-count-v5,
+.home-command-panel:has(#my-dashboard-title) .widget-instrument-edit-v5 {
+  font-size: 11px !important;
+}
+
+/* Section headers should not look like tiny metadata beside large blank cards. */
+.home-command-panel:has(#my-dashboard-title) .widget-instrument-slide-v5 section > :is(.mb-1,.mb-2,.mb-3):first-child h2 {
+  font-size: 13px !important;
+  letter-spacing: .075em !important;
+  line-height: 1.2 !important;
+}
+
+.home-command-panel:has(#my-dashboard-title) .widget-instrument-slide-v5 section > :is(.mb-1,.mb-2,.mb-3):first-child :is(a,button) {
+  font-size: 13px !important;
+  min-height: 42px !important;
+}
+
+/* Default explanation scale: readable without taking over the instrument. */
+.home-command-panel:has(#my-dashboard-title) .widget-instrument-slide-v5 .kaca p {
+  font-size: 13.5px !important;
+  line-height: 1.42 !important;
+  max-width: 72ch;
+}
+
+/* ── WEEKLY TRAINING MINUTES ─────────────────────────────────────────────── */
+.home-command-panel:has(#my-dashboard-title) [data-widget='muatanPekan'] section > .kaca > .flex.items-baseline > span:first-child {
+  font-size: var(--pmd-v11-metric) !important;
+  line-height: .88 !important;
+  letter-spacing: -.06em !important;
+}
+
+.home-command-panel:has(#my-dashboard-title) [data-widget='muatanPekan'] section > .kaca > .flex.items-baseline {
+  gap: 9px !important;
+  align-items: flex-end !important;
+}
+
+.home-command-panel:has(#my-dashboard-title) [data-widget='muatanPekan'] section > .kaca > span.relative.mt-2.flex.h-14 {
+  height: 112px !important;
+  margin-top: 16px !important;
+  gap: 6px !important;
+}
+
+.home-command-panel:has(#my-dashboard-title) [data-widget='muatanPekan'] section > .kaca > span.relative.mt-2.flex.h-14 > span:not(.absolute) {
+  border-radius: 8px 8px 3px 3px !important;
+}
+
+.home-command-panel:has(#my-dashboard-title) [data-widget='muatanPekan'] .border-dashed {
+  border-top-width: 1px !important;
+}
+
+/* ── TODAY'S INTAKE ──────────────────────────────────────────────────────── */
+.home-command-panel:has(#my-dashboard-title) [data-widget='giziLebar'] section > .kaca > .flex.items-baseline > span:first-child {
+  font-size: var(--pmd-v11-metric) !important;
+  line-height: .9 !important;
+  letter-spacing: -.055em !important;
+}
+
+.home-command-panel:has(#my-dashboard-title) [data-widget='giziLebar'] section > .kaca > .flex.items-baseline {
+  gap: 9px !important;
+}
+
+.home-command-panel:has(#my-dashboard-title) [data-widget='giziLebar'] section > .kaca > .mt-2 {
+  margin-top: 15px !important;
+}
+
+.home-command-panel:has(#my-dashboard-title) [data-widget='giziLebar'] section > .kaca span.block.h-2,
+.home-command-panel:has(#my-dashboard-title) [data-widget='giziLebar'] section > .kaca span.flex.h-3 {
+  height: 14px !important;
+}
+
+.home-command-panel:has(#my-dashboard-title) [data-widget='giziLebar'] section > .kaca .mt-1\.5.flex {
+  margin-top: 11px !important;
+  gap: 12px !important;
+}
+
+.home-command-panel:has(#my-dashboard-title) [data-widget='giziLebar'] section > .kaca .mt-1\.5.flex > span {
+  flex: 1 1 0 !important;
+  justify-content: flex-start !important;
+}
+
+/* ── ZONE 2 ──────────────────────────────────────────────────────────────── */
+.home-command-panel:has(#my-dashboard-title) [data-widget='zona2'] section > .kaca > .flex.items-baseline > span:first-child {
+  font-size: var(--pmd-v11-metric) !important;
+  line-height: .88 !important;
+  letter-spacing: -.06em !important;
+}
+
+.home-command-panel:has(#my-dashboard-title) [data-widget='zona2'] section > .kaca > .flex.items-baseline {
+  gap: 10px !important;
+  align-items: flex-end !important;
+}
+
+.home-command-panel:has(#my-dashboard-title) [data-widget='zona2'] section > .kaca > span.relative.mt-2.block.h-2\.5 {
+  height: 14px !important;
+  margin-top: 17px !important;
+}
+
+.home-command-panel:has(#my-dashboard-title) [data-widget='zona2'] section > .kaca > p {
+  margin-top: 14px !important;
+  font-size: 14px !important;
+}
+
+/* ── DAILY ORBIT ─────────────────────────────────────────────────────────── */
+.home-command-panel:has(#my-dashboard-title) [data-widget='ringHarian'] section > .kaca {
+  padding-top: 14px !important;
+}
+
+.home-command-panel:has(#my-dashboard-title) [data-widget='ringHarian'] .grid-cols-4 {
+  gap: 12px !important;
+}
+
+.home-command-panel:has(#my-dashboard-title) [data-widget='ringHarian'] .grid-cols-4 > div {
+  transform: none !important;
+  padding: 10px 5px !important;
+}
+
+.home-command-panel:has(#my-dashboard-title) [data-widget='ringHarian'] .grid-cols-4 > div > div.relative {
+  width: 82px !important;
+  height: 82px !important;
+}
+
+.home-command-panel:has(#my-dashboard-title) [data-widget='ringHarian'] .tinta-aksen {
+  font-size: 18px !important;
+}
+
+.home-command-panel:has(#my-dashboard-title) [data-widget='ringHarian'] section > .kaca > p {
+  margin-top: 14px !important;
+  font-size: 13.5px !important;
+}
+
+/* ── ENERGY TODAY ────────────────────────────────────────────────────────── */
+.home-command-panel:has(#my-dashboard-title) [data-widget='tenaga'] section > .kaca {
+  background: transparent !important;
+}
+
+.home-command-panel:has(#my-dashboard-title) [data-widget='tenaga'] .grid-cols-5 {
+  gap: 8px !important;
+  padding-top: 5px !important;
+}
+
+.home-command-panel:has(#my-dashboard-title) [data-widget='tenaga'] .grid-cols-5 > button {
+  min-height: 72px !important;
+  padding: 9px 4px !important;
+  border-radius: 17px !important;
+  font-size: 13px !important;
+  line-height: 1.15 !important;
+  border-width: 1px !important;
+  background: rgba(255,255,255,.045) !important;
+  box-shadow: none !important;
+}
+
+.home-command-panel:has(#my-dashboard-title) [data-widget='tenaga'] .grid-cols-5 > button.bg-brand {
+  background: rgba(245,158,11,.16) !important;
+  border-color: rgba(245,158,11,.62) !important;
+  color: #fbbf24 !important;
+}
+
+.home-command-panel:has(#my-dashboard-title) [data-widget='tenaga'] .h-10.items-end {
+  height: 68px !important;
+  margin-top: 14px !important;
+}
+
+/* ── CONSISTENCY / ADHERENCE / STREAK-LIKE PANELS ───────────────────────── */
+.home-command-panel:has(#my-dashboard-title) [data-widget='konsistensi'] .kaca,
+.home-command-panel:has(#my-dashboard-title) [data-widget='kepatuhan'] .kaca,
+.home-command-panel:has(#my-dashboard-title) [data-widget='rangkaian'] .kaca {
+  padding: 18px !important;
+}
+
+.home-command-panel:has(#my-dashboard-title) [data-widget='konsistensi'] :is(.text-\[26px\],.t-angka),
+.home-command-panel:has(#my-dashboard-title) [data-widget='kepatuhan'] :is(.text-\[26px\],.t-angka),
+.home-command-panel:has(#my-dashboard-title) [data-widget='rangkaian'] :is(.text-\[26px\],.t-angka) {
+  font-size: var(--pmd-v11-metric-sm) !important;
+}
+
+/* ── CHARTS / PROGRESS ACROSS ALL WIDGETS ───────────────────────────────── */
+.home-command-panel:has(#my-dashboard-title) .widget-instrument-slide-v5 svg,
+.home-command-panel:has(#my-dashboard-title) .widget-instrument-slide-v5 canvas {
+  shape-rendering: geometricPrecision;
+  text-rendering: geometricPrecision;
+}
+
+.home-command-panel:has(#my-dashboard-title) .widget-instrument-slide-v5 :is(.h-2,.h-2\.5,.h-3) {
+  min-height: 10px;
+}
+
+/* Keep the instrument navigation subordinate to the data. */
+.home-command-panel:has(#my-dashboard-title) .widget-instrument-foot-v5 {
+  margin-top: 2px;
+}
+.home-command-panel:has(#my-dashboard-title) .widget-instrument-line-v5 {
+  height: 4px !important;
+}
+.home-command-panel:has(#my-dashboard-title) .widget-instrument-label-v5 {
+  font-size: 10.5px !important;
+}
+
+/* ── MOBILE OPTICAL LAYOUT ───────────────────────────────────────────────── */
+@media (max-width: 480px) {
+  :root {
+    --pmd-v11-label: 12px;
+    --pmd-v11-copy: 14px;
+    --pmd-v11-copy-lg: 15px;
+    --pmd-v11-card-pad: 16px;
+  }
+
+  .home-command-panel:has(#my-dashboard-title) .widget-instrument-head-v5 {
+    gap: 9px !important;
+  }
+
+  .home-command-panel:has(#my-dashboard-title) .widget-instrument-title-v5 {
+    font-size: 18px !important;
+  }
+
+  .home-command-panel:has(#my-dashboard-title) [data-widget='ringHarian'] .grid-cols-4 {
+    grid-template-columns: repeat(2,minmax(0,1fr)) !important;
+    gap: 10px !important;
+  }
+
+  .home-command-panel:has(#my-dashboard-title) [data-widget='ringHarian'] .grid-cols-4 > div > div.relative {
+    width: 88px !important;
+    height: 88px !important;
+  }
+
+  .home-command-panel:has(#my-dashboard-title) [data-widget='ringHarian'] section > .kaca > p {
+    font-size: 13px !important;
+    line-height: 1.4 !important;
+  }
+
+  .home-command-panel:has(#my-dashboard-title) [data-widget='tenaga'] .grid-cols-5 > button {
+    min-height: 66px !important;
+    font-size: 12px !important;
+    padding-inline: 2px !important;
+  }
+
+  .home-command-panel:has(#my-dashboard-title) [data-widget='muatanPekan'] section > .kaca > span.relative.mt-2.flex.h-14 {
+    height: 100px !important;
+  }
+}
+
+@media (max-width: 370px) {
+  .home-command-panel:has(#my-dashboard-title) [data-widget='tenaga'] .grid-cols-5 {
+    gap: 5px !important;
+  }
+  .home-command-panel:has(#my-dashboard-title) [data-widget='tenaga'] .grid-cols-5 > button {
+    min-height: 62px !important;
+    font-size: 10.5px !important;
+  }
+}
+
+/* ── LOW-MEMORY / REDUCED MOTION ────────────────────────────────────────── */
+html.pmd-low-memory .home-command-panel:has(#my-dashboard-title) .widget-instrument-shell-v5,
+html.pmd-low-memory .home-command-panel:has(#my-dashboard-title) .kaca {
+  box-shadow: none !important;
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .home-command-panel:has(#my-dashboard-title) *,
+  .home-command-panel:has(#my-dashboard-title) *::before,
+  .home-command-panel:has(#my-dashboard-title) *::after {
+    animation: none !important;
+    transition: none !important;
+  }
+}
