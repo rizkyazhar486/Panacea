@@ -100,6 +100,7 @@ export default function Beranda() {
   const [refresh, setRefresh] = useState(0)
   const [logsOpen, setLogsOpen] = useState(false)
   const [exploreOpen, setExploreOpen] = useState(false)
+  const lowMemory = typeof document !== 'undefined' && document.documentElement.classList.contains('pmd-low-memory')
 
   useEffect(() => {
     const update = () => setRefresh((x) => x + 1)
@@ -237,14 +238,6 @@ export default function Beranda() {
         </div>
       </section>
 
-      <DeferredHomeBlock label="Performance" tall rootMargin="420px 0px" delayMs={100}>
-        <HomeSectionBoundary label="Performance analytics">
-          <Suspense fallback={<HomeLoadingCard label="Performance" tall />}>
-            <LazyPerformanceVisualizationDeck mode="home" />
-          </Suspense>
-        </HomeSectionBoundary>
-      </DeferredHomeBlock>
-
       <section className="home-command-panel" aria-labelledby="my-dashboard-title">
         <div className="mb-3 flex items-center justify-between gap-3">
           <div>
@@ -254,7 +247,12 @@ export default function Beranda() {
           </div>
           <Link to="/atur-fitur" className="home-pill-button">Customize</Link>
         </div>
-        <DeferredHomeBlock label="Dashboard widgets" tall rootMargin="200px 0px">
+        <DeferredHomeBlock
+          label="Dashboard widgets"
+          tall
+          rootMargin={lowMemory ? '40px 0px' : '140px 0px'}
+          delayMs={lowMemory ? 120 : 60}
+        >
           <HomeSectionBoundary label="Dashboard widgets">
             <Suspense fallback={<HomeLoadingCard label="Dashboard widgets" tall />}>
               <LazyPapanWidget pratinjau={pratinjau} tanggalCatatan={tanggalCatatan} />
@@ -262,6 +260,19 @@ export default function Beranda() {
           </HomeSectionBoundary>
         </DeferredHomeBlock>
       </section>
+
+      <DeferredHomeBlock
+        label="Performance"
+        tall
+        rootMargin={lowMemory ? '0px' : '60px 0px'}
+        delayMs={lowMemory ? 260 : 160}
+      >
+        <HomeSectionBoundary label="Performance analytics">
+          <Suspense fallback={<HomeLoadingCard label="Performance" tall />}>
+            <LazyPerformanceVisualizationDeck mode="home" />
+          </Suspense>
+        </HomeSectionBoundary>
+      </DeferredHomeBlock>
 
       <details
         className="home-command-panel group"
@@ -315,7 +326,12 @@ export default function Beranda() {
         )}
       </details>
 
-      <DeferredHomeBlock label="Feature catalogue" tall rootMargin="120px 0px">
+      <DeferredHomeBlock
+        label="Feature catalogue"
+        tall
+        rootMargin={lowMemory ? '0px' : '80px 0px'}
+        delayMs={lowMemory ? 240 : 120}
+      >
         <HomeSectionBoundary label="Feature catalogue">
           <Suspense fallback={<HomeLoadingCard label="Feature catalogue" tall />}>
             <LazyKisiFitur />

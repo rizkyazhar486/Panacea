@@ -1,0 +1,52 @@
+{
+  "id": "vtk_js",
+  "name": "vtk.js",
+  "category": "imaging",
+  "kind": ["library", "framework", "tooling"],
+  "homepage": "https://kitware.github.io/vtk-js/",
+  "repository": "https://github.com/Kitware/vtk-js",
+  "features": [274, 275, 276, "volume-rendering", "scientific-visualization", "image-data", "polydata", "surface-rendering"],
+  "formats": ["vti", "vtp", "vtk", "stl", "obj", "image-data", "polydata"],
+  "usage": {
+    "runtime": true,
+    "buildTime": false,
+    "networkRequired": false,
+    "notes": "Use vtk.js for scientific and volumetric visualization where Three.js alone is not the best abstraction. Keep large volume data lazy and route all source data through Panacea imaging adapters. Default to WebGL-compatible behavior; treat WebGPU as an optional capability that requires feature and device testing rather than assuming parity."
+  },
+  "license": {
+    "status": "VERIFIED",
+    "identifier": "BSD-3-Clause",
+    "commercialUse": "ALLOWED",
+    "attributionRequired": true,
+    "shareAlike": false,
+    "scope": "vtk.js is distributed under a BSD-style 3-clause license. The software license does not grant rights to medical images, anatomical assets, datasets or models visualized through it.",
+    "verificationUrl": "https://github.com/Kitware/vtk-js/blob/master/LICENSE",
+    "verifiedAt": "2026-09-08",
+    "notes": "Retain the copyright notice, license conditions and disclaimer. Do not use Kitware or contributor names to endorse Panacea without permission."
+  },
+  "validation": {
+    "level": "REFERENCE",
+    "clinicalDecisionUse": "REQUIRES_SEPARATE_VALIDATION",
+    "notes": "vtk.js is scientific visualization infrastructure. Volume rendering, transfer functions, measurements and derived surfaces must be validated for the intended medical workflow separately."
+  },
+  "provenance": {
+    "authority": "Kitware vtk.js project",
+    "sourceIdentityRequired": true,
+    "versionPinRequired": true,
+    "notes": "Pin the package/release when integrated. Preserve imaging-study identity, voxel spacing/orientation, transform history and segmentation provenance before creating derived volume or surface representations."
+  },
+  "adapter": {
+    "status": "PLANNED",
+    "normalizedTarget": "PanaceaScientificVolume",
+    "module": null,
+    "notes": "Planned flow: PanaceaImagingStudy or processed spatial data -> normalized PanaceaScientificVolume -> vtk.js ImageData/PolyData adapter -> volume/surface renderer. Keep transfer-function presets and rendering choices outside raw clinical data so visualization settings cannot masquerade as measurements."
+  },
+  "trust": {
+    "authority": 5,
+    "evidenceQuality": 2,
+    "recency": 5,
+    "licenseClarity": 5,
+    "reproducibility": 5,
+    "notes": "Scores describe scientific-visualization infrastructure, not medical evidence."
+  }
+}

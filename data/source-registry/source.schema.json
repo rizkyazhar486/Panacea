@@ -62,6 +62,7 @@
           "ontology",
           "library",
           "framework",
+          "standard",
           "model-repository",
           "terminology-server",
           "viewer",
