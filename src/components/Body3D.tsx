@@ -4,7 +4,6 @@ import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'
 import { MeshoptDecoder } from 'three/examples/jsm/libs/meshopt_decoder.module.js'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
 import { RoomEnvironment } from 'three/examples/jsm/environments/RoomEnvironment.js'
-import { SEBAR_PERISTALTIK } from '../lib/motionWave'
 import { keburaman, geserBuka, KEDALAMAN, type KunciLapisan } from '../lib/dissection'
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -442,7 +441,8 @@ export function Body3D({ layers, highlighted, focusKeywords, renderMode, ctWindo
       )
       return
     }
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
+    const pixelRatioCap = window.matchMedia('(max-width: 640px)').matches ? 1.5 : 2
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, pixelRatioCap))
     renderer.setClearColor(0x0a0a0f, 1)
     renderer.outputColorSpace = THREE.SRGBColorSpace
     // ACES DIGANTI, dan alasannya terukur. ACES memiringkan merah jenuh ke
@@ -576,106 +576,68 @@ export function Body3D({ layers, highlighted, focusKeywords, renderMode, ctWindo
       setFatal('The browser dropped the 3D context, usually because memory ran low. Turn off some layers and reload.')
     }
     renderer.domElement.addEventListener('webglcontextlost', onContextLost)
+    const onContextRestored = () => {
+      setFatal('')
+      startRendering()
+    }
+    renderer.domElement.addEventListener('webglcontextrestored', onContextRestored)
 
     let raf = 0
-    const jam = new THREE.Clock()
-    function animate() {
-      const t = jam.getElapsedTime()
-      const m = motionRef.current
+    let inViewport = true
+    let documentVisible = !document.hidden
 
-      // Denyut jantung. Siklusnya SENGAJA tidak simetris: sistol menempati
-      // kira-kira sepertiga awal siklus dan berlangsung cepat, sisanya
-      // diastol yang mengisi lebih lambat — itu bentuk siklus jantung yang
-      // sebenarnya, dan sinus biasa akan menggambarkannya keliru.
-      if (m.heartRate > 0 && animatedRef.current.heart.length) {
-        const fase = (t * m.heartRate / 60) % 1
-        const kontraksi = fase < 0.33
-          ? Math.sin((fase / 0.33) * Math.PI)          // sistol: cepat
-          : -0.15 * Math.sin(((fase - 0.33) / 0.67) * Math.PI) // diastol: mengisi
-        const k = 1 - kontraksi * 0.07
-        for (const o of animatedRef.current.heart) {
-          const dasar = o.userData.baseScale as THREE.Vector3 | undefined
-          if (dasar) o.scale.set(dasar.x * k, dasar.y * k, dasar.z * k)
-        }
-      }
-
-      // Napas. Inspirasi aktif dan lebih pendek, ekspirasi pasif dan lebih
-      // panjang — perbandingan I:E kira-kira 1:2 saat istirahat.
-      if (m.respRate > 0 && animatedRef.current.lungs.length) {
-        const fase = (t * m.respRate / 60) % 1
-        const kembang = fase < 0.4
-          ? Math.sin((fase / 0.4) * (Math.PI / 2))
-          : Math.cos(((fase - 0.4) / 0.6) * (Math.PI / 2))
-        const k = 1 + kembang * 0.05
-        for (const o of animatedRef.current.lungs) {
-          const dasar = o.userData.baseScale as THREE.Vector3 | undefined
-          if (dasar) o.scale.set(dasar.x * k, dasar.y * k, dasar.z * k)
-        }
-      }
-
-      // Peristaltik: SATU gelombang yang menjalar, bukan seluruh usus meremas
-      // bersamaan. Tiap ruas memakai fase yang sama tapi digeser menurut
-      // letaknya di sepanjang saluran, sehingga yang terlihat adalah
-      // gelombang berjalan dari lambung ke arah rektum — yang memang itulah
-      // peristaltik. Meremas serempak akan menggambarkan hal yang keliru.
-      if ((m.peristalsisRate ?? 0) > 0 && animatedRef.current.gut.length) {
-        const laju = (m.peristalsisRate ?? 0) / 60
-        for (const g of animatedRef.current.gut) {
-          const dasar = g.obj.userData.baseScale as THREE.Vector3 | undefined
-          if (!dasar) continue
-          // Gelombangnya sempit: hanya sebagian kecil saluran yang sedang
-          // meremas pada satu saat, sisanya melebar menerima isinya.
-          const fase = ((t * laju) - g.fase * SEBAR_PERISTALTIK) % 1
-          const remas = fase > 0 && fase < 0.25 ? Math.sin((fase / 0.25) * Math.PI) : 0
-          const k = 1 - remas * 0.12
-          g.obj.scale.set(dasar.x * k, dasar.y * k, dasar.z * k)
-        }
-      }
-
-      // Denyut arteri MENYUSUL denyut jantung, tidak serentak dengannya.
-      // Gelombang nadi merambat sekitar 5 m/detik, jadi arteri di tungkai
-      // berdenyut puluhan milidetik sesudah aorta. Jeda itu dihitung dari
-      // jarak sebenarnya tiap pembuluh ke jantung.
-      if (m.heartRate > 0 && animatedRef.current.artery.length) {
-        const periode = 60 / m.heartRate
-        for (const a of animatedRef.current.artery) {
-          const dasar = a.obj.userData.baseScale as THREE.Vector3 | undefined
-          if (!dasar) continue
-          const fase = (((t - a.jeda) % periode) + periode) % periode / periode
-          // Naik cepat, turun perlahan — bentuk gelombang nadi, bukan sinus.
-          const nadi = fase < 0.2 ? Math.sin((fase / 0.2) * Math.PI) : 0
-          const k = 1 + nadi * 0.035
-          a.obj.scale.set(dasar.x * k, dasar.y * k, dasar.z * k)
-        }
-      }
-
-      // Otot yang sedang disorot berkontraksi pada tempo latihan. Fase
-      // konsentrik cepat, eksentrik dua kali lebih lambat — tempo angkatan
-      // yang dianjurkan, bukan getaran hias.
-      if (m.contractionRate > 0) {
-        const fase = (t * m.contractionRate / 60) % 1
-        const kontraksi = fase < 0.33
-          ? Math.sin((fase / 0.33) * (Math.PI / 2))
-          : Math.cos(((fase - 0.33) / 0.67) * (Math.PI / 2))
-        const k = 1 + kontraksi * 0.06
-        for (const [mesh] of highlightedMeshesRef.current) {
-          const dasar = mesh.userData.baseScale as THREE.Vector3 | undefined
-          if (dasar) mesh.scale.set(dasar.x * k, dasar.y * k, dasar.z * k)
-        }
-      }
-
+    // Source anatomy is evidence-bearing geometry. Do not resize the heart,
+    // lungs, arteries, bowel, or muscles to imply physiology: repeated mesh
+    // scaling makes real atlas structures look toy-like and changes anatomical
+    // dimensions. Physiology belongs in overlays/flow/conduction/data layers.
+    function renderFrame() {
+      raf = 0
+      if (!inViewport || !documentVisible) return
       controls.update()
       renderer.render(scene, camera)
-      raf = requestAnimationFrame(animate)
+      raf = requestAnimationFrame(renderFrame)
     }
-    animate()
+
+    function startRendering() {
+      if (raf !== 0 || !inViewport || !documentVisible) return
+      raf = requestAnimationFrame(renderFrame)
+    }
+
+    function stopRendering() {
+      if (raf === 0) return
+      cancelAnimationFrame(raf)
+      raf = 0
+    }
+
+    // Heavy WebGL work must stop when the viewer is not actually visible.
+    // A small root margin restarts it just before the user scrolls back.
+    const visibilityObserver = new IntersectionObserver(
+      ([entry]) => {
+        inViewport = entry?.isIntersecting ?? true
+        if (inViewport && documentVisible) startRendering()
+        else stopRendering()
+      },
+      { rootMargin: '128px 0px', threshold: 0.01 },
+    )
+    visibilityObserver.observe(container)
+
+    const onVisibilityChange = () => {
+      documentVisible = !document.hidden
+      if (documentVisible && inViewport) startRendering()
+      else stopRendering()
+    }
+    document.addEventListener('visibilitychange', onVisibilityChange)
+    startRendering()
 
     return () => {
-      cancelAnimationFrame(raf)
+      stopRendering()
+      visibilityObserver.disconnect()
+      document.removeEventListener('visibilitychange', onVisibilityChange)
       ro.disconnect()
       renderer.domElement.removeEventListener('pointerdown', onPointerDown)
       renderer.domElement.removeEventListener('pointerup', onPointerUp)
       renderer.domElement.removeEventListener('webglcontextlost', onContextLost)
+      renderer.domElement.removeEventListener('webglcontextrestored', onContextRestored)
       controls.dispose()
       // Peta lingkungan dan tekstur latar dibuat di GPU dan tidak ikut
       // dibersihkan oleh renderer.dispose(); tanpa ini, membuka-tutup halaman
