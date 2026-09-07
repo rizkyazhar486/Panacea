@@ -103,7 +103,9 @@ export async function lookupGene(query: string): Promise<GeneInfo | null> {
 
   const pos = asArray(doc.genomic_pos)[0]
   const ensembl = asArray(doc.ensembl)[0]
-  const hasCoordinates = finiteCoordinate(pos?.start) && finiteCoordinate(pos?.end)
+  const start = pos?.start
+  const end = pos?.end
+  const hasCoordinates = finiteCoordinate(start) && finiteCoordinate(end)
 
   return {
     symbol: doc.symbol || q.toUpperCase(),
@@ -112,7 +114,7 @@ export async function lookupGene(query: string): Promise<GeneInfo | null> {
     aliases: normalizedAliases(doc.alias),
     type: (doc.type_of_gene || '').replace(/_/g, ' '),
     chromosome: pos?.chr ? `Chromosome ${pos.chr}` : '',
-    location: hasCoordinates ? `${pos.start.toLocaleString('en-US')}–${pos.end.toLocaleString('en-US')}` : '',
+    location: hasCoordinates ? `${start.toLocaleString('en-US')}–${end.toLocaleString('en-US')}` : '',
     entrezId: doc.entrezgene != null ? String(doc.entrezgene) : '',
     ensemblId: ensembl?.gene || '',
   }
