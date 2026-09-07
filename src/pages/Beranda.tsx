@@ -8,37 +8,35 @@ import { getVitals } from '../lib/healthVitals'
 import { getWorkouts } from '../lib/workoutStore'
 import { ageFromDob } from '../lib/anthro'
 import '../styles/home-odyssey.css'
+import '../styles/home-utility-polish.css'
 
-// Home is the page users open most often. Keep its first paint deliberately
-// small: the catalogue, configurable widget board, visual analytics and forms
-// are separate chunks and are requested only when they are actually useful.
 const LazyPapanWidget = lazy(() => import('../components/PapanWidget').then((m) => ({ default: m.PapanWidget })))
 const LazyKisiFitur = lazy(() => import('../components/KisiFitur').then((m) => ({ default: m.KisiFitur })))
 const LazyCatatanHarian = lazy(() => import('../components/CatatanHarian').then((m) => ({ default: m.CatatanHarian })))
 const LazyCatatanLatihan = lazy(() => import('../components/CatatanLatihan').then((m) => ({ default: m.CatatanLatihan })))
-const LazyPanaceaGrowthRail = lazy(() => import('../components/dashboard/PanaceaGrowthWidgets').then((m) => ({ default: m.PanaceaGrowthRail })))
-const LazyPanaceaUtilityShelf = lazy(() => import('../components/dashboard/PanaceaUtilityShelf').then((m) => ({ default: m.PanaceaUtilityShelf })))
 const LazyPerformanceVisualizationDeck = lazy(() => import('../components/dashboard/PerformanceVisualizationDeck').then((m) => ({ default: m.PerformanceVisualizationDeck })))
 
-/**
- * Home / dashboard Panacea.
- *
- * First paint is sports-first and resilient: the user's key signals, Training,
- * Body and Recovery remain usable even when a secondary visualisation or a
- * large optional module fails to load.
- */
+type QuickAction = {
+  to: string
+  emoji: string
+  label: string
+  note: string
+  accent: string
+}
 
-const PINTASAN = [
-  { to: '/latihan', emoji: '🏃', label: 'Training', tone: 'bg-gradient-to-br from-emerald-400 via-cyan-400 to-blue-600 text-white' },
-  { to: '/tubuh', emoji: '❤️', label: 'Body', tone: 'bg-gradient-to-br from-rose-500 via-red-500 to-orange-500 text-white' },
-  { to: '/recovery', emoji: '🌙', label: 'Recovery', tone: 'bg-gradient-to-br from-indigo-500 via-violet-500 to-fuchsia-500 text-white' },
-  { to: '/nutrition', emoji: '🥗', label: 'Nutrition', tone: 'bg-gradient-to-br from-lime-300 via-emerald-400 to-teal-500 text-neutral-950' },
-  { to: '/planning', emoji: '🗓️', label: 'Plan', tone: 'bg-gradient-to-br from-sky-400 via-blue-500 to-indigo-600 text-white' },
-  { to: '/keuangan', emoji: '💰', label: 'Money', tone: 'bg-gradient-to-br from-amber-300 via-yellow-400 to-orange-500 text-neutral-950' },
-  { to: '/learn', emoji: '📚', label: 'Life', tone: 'bg-gradient-to-br from-violet-500 via-purple-500 to-pink-500 text-white' },
-  { to: '/community', emoji: '👥', label: 'People', tone: 'bg-gradient-to-br from-fuchsia-500 via-rose-500 to-red-500 text-white' },
-  { to: '/body-explorer', emoji: '🫀', label: '3D Body', tone: 'bg-gradient-to-br from-cyan-400 via-blue-500 to-violet-600 text-white' },
-  { to: '/chatbot', emoji: '✨', label: 'Ask', tone: 'bg-gradient-to-br from-orange-400 via-red-500 to-fuchsia-600 text-white' },
+const AKSI_UTAMA: QuickAction[] = [
+  { to: '/latihan', emoji: '🏃', label: 'Training', note: 'Start session · history · zones', accent: 'from-emerald-400 to-cyan-500' },
+  { to: '/readiness', emoji: '🔆', label: 'Readiness', note: 'Train hard or recover?', accent: 'from-amber-400 to-orange-500' },
+  { to: '/recovery', emoji: '🌙', label: 'Recovery', note: 'Sleep · recovery tools', accent: 'from-indigo-500 to-violet-600' },
+  { to: '/tubuh', emoji: '❤️', label: 'Body', note: 'Vitals · trends · health data', accent: 'from-rose-500 to-red-600' },
+  { to: '/pola-tidur', emoji: '😴', label: 'Sleep', note: 'Duration · stages · debt', accent: 'from-blue-500 to-indigo-600' },
+  { to: '/hydration', emoji: '💧', label: 'Hydration', note: 'Daily fluid target', accent: 'from-sky-400 to-blue-500' },
+  { to: '/nutrition', emoji: '🥗', label: 'Nutrition', note: 'Food · macros · intake', accent: 'from-lime-400 to-emerald-500' },
+  { to: '/med-reminders', emoji: '💊', label: 'Medication', note: 'Dose reminders', accent: 'from-fuchsia-500 to-pink-600' },
+  { to: '/planning', emoji: '🗓️', label: 'Plan', note: 'Turn goals into today', accent: 'from-cyan-500 to-blue-600' },
+  { to: '/emergency', emoji: '🆘', label: 'Emergency', note: 'Emergency health card', accent: 'from-red-500 to-orange-500' },
+  { to: '/body-explorer', emoji: '🫀', label: '3D Body', note: 'Explore anatomy visually', accent: 'from-violet-500 to-blue-600' },
+  { to: '/chatbot', emoji: '✨', label: 'Ask Panacea', note: 'Ask from your context', accent: 'from-orange-400 to-fuchsia-600' },
 ]
 
 type Signal = { label: string; value: string; unit?: string; tone: string; to: string }
@@ -46,8 +44,9 @@ type Signal = { label: string; value: string; unit?: string; tone: string; to: s
 function HomeLoadingCard({ label, tall = false }: { label: string; tall?: boolean }) {
   return (
     <div
-      className={`rounded-[26px] border border-neutral-200/80 bg-white/55 p-4 dark:border-white/10 dark:bg-white/[.025] ${tall ? 'min-h-[180px]' : 'min-h-[82px]'}`}
+      className={`home-loading-card ${tall ? 'min-h-[180px]' : 'min-h-[82px]'}`}
       aria-label={`${label} loading`}
+      aria-busy="true"
     >
       <div className="h-2.5 w-24 rounded-full bg-neutral-200/80 dark:bg-white/10" />
       <div className="mt-3 h-4 w-52 max-w-[68%] rounded-full bg-neutral-100 dark:bg-white/[.06]" />
@@ -83,8 +82,6 @@ function DeferredHomeBlock({
     const observer = new IntersectionObserver(([entry]) => {
       if (!entry.isIntersecting) return
       observer.disconnect()
-      // Let the hero, key metrics and Training shortcut paint before optional
-      // chunks start parsing/evaluating on lower-memory mobile browsers.
       timer = window.setTimeout(() => setReady(true), delayMs)
     }, { rootMargin })
 
@@ -95,17 +92,14 @@ function DeferredHomeBlock({
     }
   }, [delayMs, ready, rootMargin])
 
-  return (
-    <div ref={ref}>
-      {ready ? children : <HomeLoadingCard label={label} tall={tall} />}
-    </div>
-  )
+  return <div ref={ref}>{ready ? children : <HomeLoadingCard label={label} tall={tall} />}</div>
 }
 
 export default function Beranda() {
   const { account, state } = useStore()
   const [refresh, setRefresh] = useState(0)
   const [logsOpen, setLogsOpen] = useState(false)
+  const [exploreOpen, setExploreOpen] = useState(false)
 
   useEffect(() => {
     const update = () => setRefresh((x) => x + 1)
@@ -163,10 +157,10 @@ export default function Beranda() {
   }, [vitals, workouts, state.sleepLogs])
 
   return (
-    <main className="panacea-home mx-auto w-full max-w-4xl space-y-6 pb-24">
+    <main className="panacea-home mx-auto w-full max-w-4xl space-y-5 pb-24">
       <div className="panacea-home-backdrop" aria-hidden />
 
-      <section className="home-odyssey-hero p-5 sm:p-7">
+      <section className="home-odyssey-hero p-5 sm:p-7" aria-labelledby="panacea-home-title">
         <div className="home-orbit-core" aria-hidden>
           <span className="core" />
           <span className="satellite" />
@@ -174,81 +168,76 @@ export default function Beranda() {
 
         <div className="relative z-10">
           <div className="flex items-start justify-between gap-3">
-            <div className="home-odyssey-kicker">Panacea · Human Odyssey</div>
+            <div className="home-odyssey-kicker">Panacea · Daily command</div>
             <div className="flex shrink-0 gap-2">
               <button
+                type="button"
                 onClick={() => window.dispatchEvent(new Event('panacea:cari'))}
-                className="grid h-11 w-11 place-items-center rounded-full border border-black/[.07] bg-white/70 text-lg text-neutral-800 shadow-sm backdrop-blur-xl transition active:scale-95 dark:border-white/10 dark:bg-white/[.08] dark:text-white"
-                aria-label="Search"
+                className="home-icon-button"
+                aria-label="Search Panacea"
               >⌕</button>
-              <Link
-                to="/atur-fitur"
-                className="grid h-11 w-11 place-items-center rounded-full bg-neutral-950 text-lg text-white shadow-[0_10px_30px_rgba(20,20,35,.22)] transition active:scale-95 dark:bg-white dark:text-neutral-950"
-                aria-label="Manage Home widgets"
-              >＋</Link>
+              <Link to="/atur-fitur" className="home-icon-button home-icon-button-strong" aria-label="Customize Home widgets">＋</Link>
             </div>
           </div>
 
-          <h1 className="home-odyssey-title">
-            {name ? `Hi, ${name}. ` : ''}Build your <span className="energy-word">strongest life.</span>
+          <h1 id="panacea-home-title" className="home-odyssey-title">
+            {name ? `Hi, ${name}. ` : ''}Your <span className="energy-word">daily command center.</span>
           </h1>
           <p className="home-odyssey-copy">
-            Health, performance, recovery, knowledge, relationships and purpose — one evolving system for the life you are building.
+            Useful actions, live health signals and your own widgets — dense enough to work every day, light enough to stay smooth.
           </p>
 
           <div className="home-odyssey-actions">
-            <Link to="/latihan" className="home-primary-action">Open training <span aria-hidden>→</span></Link>
-            <Link to="/harian" className="home-secondary-action">Log today <span aria-hidden>＋</span></Link>
-            <Link to="/chatbot" className="home-secondary-action">Ask Panacea <span aria-hidden>✦</span></Link>
-          </div>
-
-          <div className="home-journey-strip" aria-label="Life journey dimensions">
-            <div className="home-journey-chip"><strong>Body</strong><span>Capacity · recovery</span></div>
-            <div className="home-journey-chip"><strong>Mind</strong><span>Focus · knowledge</span></div>
-            <div className="home-journey-chip"><strong>Legacy</strong><span>Purpose · people</span></div>
+            <Link to="/latihan" className="home-primary-action">Start training <span aria-hidden>→</span></Link>
+            <button type="button" onClick={() => setLogsOpen(true)} className="home-secondary-action">Quick log <span aria-hidden>＋</span></button>
+            <Link to="/readiness" className="home-secondary-action">Check readiness <span aria-hidden>↗</span></Link>
           </div>
 
           {signals.length > 0 ? (
-            <div className="home-signal-rail no-scrollbar -mx-1 mt-5 flex snap-x gap-2.5 overflow-x-auto px-1 pb-1">
-              {signals.map((s) => (
+            <div className="home-signal-rail no-scrollbar -mx-1 mt-4 flex snap-x gap-2.5 overflow-x-auto px-1 pb-1" aria-label="Current health signals">
+              {signals.slice(0, 5).map((s) => (
                 <Link
                   key={s.label}
                   to={s.to}
-                  className="home-signal-card min-h-[112px] w-[142px] shrink-0 snap-start rounded-[22px] p-3.5 transition active:scale-[.98]"
+                  className="home-signal-card min-h-[98px] w-[134px] shrink-0 snap-start rounded-[20px] p-3 transition active:scale-[.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
                 >
                   <div className="text-[9px] font-black uppercase tracking-[.13em] text-neutral-500 dark:text-neutral-400">{s.label}</div>
-                  <div className={`mt-4 text-[30px] font-black leading-none tracking-[-.045em] tabular-nums ${s.tone}`}>{s.value}</div>
-                  {s.unit && <div className="mt-2 text-[10px] font-semibold text-neutral-500 dark:text-neutral-400">{s.unit}</div>}
+                  <div className={`mt-3 text-[27px] font-black leading-none tracking-[-.045em] tabular-nums ${s.tone}`}>{s.value}</div>
+                  {s.unit && <div className="mt-1.5 truncate text-[9px] font-semibold text-neutral-500 dark:text-neutral-400">{s.unit}</div>}
                 </Link>
               ))}
             </div>
           ) : (
-            <Link to="/harian" className="home-signal-card mt-5 flex min-h-[58px] max-w-md items-center justify-between rounded-2xl px-4 text-sm font-bold text-neutral-800 dark:text-white">
+            <Link to="/harian" className="home-signal-card mt-4 flex min-h-[58px] max-w-md items-center justify-between rounded-2xl px-4 text-sm font-bold text-neutral-800 dark:text-white">
               Add your first health or daily entry <span className="text-lg">›</span>
             </Link>
           )}
         </div>
       </section>
 
-      <section>
-        <div className="mb-2 flex items-center justify-between px-1">
+      <section className="home-command-panel" aria-labelledby="daily-tools-title">
+        <div className="mb-3 flex items-end justify-between gap-3">
           <div>
-            <div className="text-[9px] font-black uppercase tracking-[.16em] text-neutral-500 dark:text-neutral-400">Daily movement</div>
-            <h2 className="mt-0.5 text-[13px] font-black text-neutral-900 dark:text-white">Training first</h2>
+            <div className="text-[9px] font-black uppercase tracking-[.16em] text-neutral-500 dark:text-neutral-400">High utility</div>
+            <h2 id="daily-tools-title" className="mt-0.5 text-[17px] font-black tracking-tight text-neutral-950 dark:text-white">What do you need now?</h2>
           </div>
-          <Link to="/latihan" className="text-[11px] font-black text-emerald-700 dark:text-emerald-300">Training hub ›</Link>
+          <Link to="/semua-fitur" className="home-text-link">All features ›</Link>
         </div>
-        <div className="no-scrollbar -mx-1 flex snap-x gap-3 overflow-x-auto px-1 pb-2">
-          {PINTASAN.map((p) => (
-            <Link key={p.to + p.label} to={p.to} className="w-[84px] shrink-0 snap-start text-center active:scale-95">
-              <span className={`home-shortcut-tile mx-auto h-[62px] w-[62px] rounded-[20px] text-[25px] ${p.tone}`}>{p.emoji}</span>
-              <span className="mt-1.5 block truncate text-[10px] font-bold text-neutral-700 dark:text-neutral-200">{p.label}</span>
+        <div className="home-action-grid">
+          {AKSI_UTAMA.map((item) => (
+            <Link key={item.to} to={item.to} className="home-action-card">
+              <span className={`home-action-icon bg-gradient-to-br ${item.accent}`} aria-hidden>{item.emoji}</span>
+              <span className="min-w-0">
+                <span className="block text-[11px] font-black text-neutral-900 dark:text-white">{item.label}</span>
+                <span className="mt-0.5 block truncate text-[9px] font-semibold text-neutral-500 dark:text-neutral-400">{item.note}</span>
+              </span>
+              <span className="ml-auto text-neutral-300 dark:text-neutral-600" aria-hidden>›</span>
             </Link>
           ))}
         </div>
       </section>
 
-      <DeferredHomeBlock label="Performance" tall rootMargin="500px 0px" delayMs={120}>
+      <DeferredHomeBlock label="Performance" tall rootMargin="420px 0px" delayMs={100}>
         <HomeSectionBoundary label="Performance analytics">
           <Suspense fallback={<HomeLoadingCard label="Performance" tall />}>
             <LazyPerformanceVisualizationDeck mode="home" />
@@ -256,31 +245,16 @@ export default function Beranda() {
         </HomeSectionBoundary>
       </DeferredHomeBlock>
 
-      <DeferredHomeBlock label="Growth" rootMargin="240px 0px">
-        <HomeSectionBoundary label="Growth rail">
-          <Suspense fallback={<HomeLoadingCard label="Growth" />}>
-            <LazyPanaceaGrowthRail />
-          </Suspense>
-        </HomeSectionBoundary>
-      </DeferredHomeBlock>
-
-      <DeferredHomeBlock label="Utilities" rootMargin="180px 0px">
-        <HomeSectionBoundary label="Utility shelf">
-          <Suspense fallback={<HomeLoadingCard label="Utilities" />}>
-            <LazyPanaceaUtilityShelf />
-          </Suspense>
-        </HomeSectionBoundary>
-      </DeferredHomeBlock>
-
-      <section className="home-section-shell rounded-[28px] p-4 sm:p-5">
+      <section className="home-command-panel" aria-labelledby="my-dashboard-title">
         <div className="mb-3 flex items-center justify-between gap-3">
           <div>
-            <div className="text-[10px] font-black uppercase tracking-[.14em] text-neutral-500 dark:text-neutral-400">Command deck</div>
-            <h2 className="mt-1 text-[18px] font-black tracking-tight text-neutral-950 dark:text-white">My dashboard</h2>
+            <div className="text-[9px] font-black uppercase tracking-[.16em] text-neutral-500 dark:text-neutral-400">Live widgets</div>
+            <h2 id="my-dashboard-title" className="mt-0.5 text-[17px] font-black tracking-tight text-neutral-950 dark:text-white">My dashboard</h2>
+            <p className="mt-1 text-[10px] font-semibold text-neutral-500 dark:text-neutral-400">Your selected metrics, trends, timers and reminders stay visible here.</p>
           </div>
-          <Link to="/atur-fitur" className="shrink-0 rounded-full bg-neutral-100 px-3 py-2 text-[10px] font-black text-neutral-700 dark:bg-white/10 dark:text-neutral-200">Customize</Link>
+          <Link to="/atur-fitur" className="home-pill-button">Customize</Link>
         </div>
-        <DeferredHomeBlock label="Dashboard widgets" tall rootMargin="160px 0px">
+        <DeferredHomeBlock label="Dashboard widgets" tall rootMargin="200px 0px">
           <HomeSectionBoundary label="Dashboard widgets">
             <Suspense fallback={<HomeLoadingCard label="Dashboard widgets" tall />}>
               <LazyPapanWidget pratinjau={pratinjau} tanggalCatatan={tanggalCatatan} />
@@ -289,39 +263,54 @@ export default function Beranda() {
         </DeferredHomeBlock>
       </section>
 
-      <HomeSectionBoundary label="Body Exposure">
-        <DeferredBodyExposureWidget />
-      </HomeSectionBoundary>
-      <HomeSectionBoundary label="Feature universe">
-        <DeferredHomeFeatureUniverse />
-      </HomeSectionBoundary>
-      <HomeSectionBoundary label="Learning shelf">
-        <DeferredPanaceaLearningRail />
-      </HomeSectionBoundary>
-
       <details
-        className="home-section-shell group rounded-[26px] p-4"
+        className="home-command-panel group"
+        open={logsOpen}
         onToggle={(event) => setLogsOpen(event.currentTarget.open)}
       >
-        <summary className="flex cursor-pointer list-none items-center justify-between gap-3">
+        <summary className="home-details-summary">
           <div>
-            <div className="text-[10px] font-black uppercase tracking-[.14em] text-neutral-500 dark:text-neutral-400">Today</div>
-            <div className="mt-1 text-[16px] font-black text-neutral-950 dark:text-white">Log my day or workout</div>
+            <div className="text-[9px] font-black uppercase tracking-[.16em] text-neutral-500 dark:text-neutral-400">Fast input</div>
+            <div className="mt-0.5 text-[15px] font-black text-neutral-950 dark:text-white">Log today or a workout</div>
           </div>
-          <span className="grid h-9 w-9 place-items-center rounded-full bg-neutral-100 text-lg text-neutral-700 transition group-open:rotate-45 dark:bg-white/10 dark:text-white">＋</span>
+          <span className="home-summary-plus">＋</span>
         </summary>
         {logsOpen && (
-          <div className="mt-4 space-y-4 border-t border-neutral-100 pt-4 dark:border-white/10">
-            <HomeSectionBoundary label="Daily log">
-              <Suspense fallback={<HomeLoadingCard label="Daily log" />}>
-                <LazyCatatanHarian />
-              </Suspense>
-            </HomeSectionBoundary>
+          <div className="mt-4 space-y-4 border-t border-neutral-200/70 pt-4 dark:border-white/10">
             <HomeSectionBoundary label="Workout log">
               <Suspense fallback={<HomeLoadingCard label="Workout log" />}>
                 <LazyCatatanLatihan />
               </Suspense>
             </HomeSectionBoundary>
+            <HomeSectionBoundary label="Daily log">
+              <Suspense fallback={<HomeLoadingCard label="Daily log" />}>
+                <LazyCatatanHarian />
+              </Suspense>
+            </HomeSectionBoundary>
+          </div>
+        )}
+      </details>
+
+      <HomeSectionBoundary label="Body Exposure">
+        <DeferredBodyExposureWidget />
+      </HomeSectionBoundary>
+
+      <details
+        className="home-command-panel group"
+        onToggle={(event) => setExploreOpen(event.currentTarget.open)}
+      >
+        <summary className="home-details-summary">
+          <div>
+            <div className="text-[9px] font-black uppercase tracking-[.16em] text-neutral-500 dark:text-neutral-400">Explore</div>
+            <div className="mt-0.5 text-[15px] font-black text-neutral-950 dark:text-white">Learning & Panacea universe</div>
+            <div className="mt-1 text-[9px] font-semibold text-neutral-500 dark:text-neutral-400">Loaded only when you want it.</div>
+          </div>
+          <span className="text-xl text-neutral-400 transition group-open:rotate-90" aria-hidden>›</span>
+        </summary>
+        {exploreOpen && (
+          <div className="mt-4 space-y-5 border-t border-neutral-200/70 pt-4 dark:border-white/10">
+            <HomeSectionBoundary label="Feature universe"><DeferredHomeFeatureUniverse /></HomeSectionBoundary>
+            <HomeSectionBoundary label="Learning shelf"><DeferredPanaceaLearningRail /></HomeSectionBoundary>
           </div>
         )}
       </details>
