@@ -263,7 +263,7 @@ export function Workout() {
         right={
           <div className="flex flex-col items-end gap-1">
             {badgeCount > 0 && <span className="metal-tag metal-gold">🏆 {badgeCount} unlocked</span>}
-            {todayLog.length > 0 && <span className="text-[11px] font-bold uppercase tracking-[0.2em] text-white/50">{todayLog.length} sets logged today</span>}
+            {todaySets > 0 && <span className="text-[11px] font-bold uppercase tracking-[0.2em] text-white/50">{todaySets} sets logged today</span>}
           </div>
         }
       />
