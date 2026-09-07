@@ -5,6 +5,7 @@ import { api, type OntologyTerm, type DrugLabelInfo, type AnatomyImage, type Ima
 import { explainBodyRegion, explainDrug } from '../lib/ai'
 import { useStore } from '../lib/store'
 import { Body3D, ANATOMY_LAYERS, RENDER_MODES, CT_WINDOWS, MOTION_OFF, MOTION_REST, MOTION_EXERCISE, type AnatomyLayer, type RenderMode, type SlicePlane, type MotionState } from '../components/Body3D'
+import { FeatureErrorBoundary } from '../components/FeatureErrorBoundary'
 import { WORKOUT_MUSCLE_GROUPS } from '../lib/workoutMuscles'
 import { TISSUE_TYPES, TISSUE_SUBTYPES, ORGAN_SYSTEMS, BODY_REGIONS, IMAGE_ONLY_STRUCTURES, type AnatomyEntry } from '../lib/anatomyHierarchy'
 import { ORGAN_FOCUS } from '../lib/organFocus'
@@ -595,7 +596,7 @@ export function BodyExplorer() {
           </div>
           {simVitals && (
             <p className="mt-1 text-center text-[10px] leading-relaxed text-brand">
-              Driven by the simulator — the figure is beating at {simVitals.hr}/min and breathing at {simVitals.rr}/min.
+              Driven by the simulator — heart rate {simVitals.hr}/min and respiratory rate {simVitals.rr}/min. Source anatomy remains dimensionally stable.
             </p>
           )}
           {motionMode !== 'off' && !layers.has('cardiovascular') && !layers.has('visceral') && (
@@ -603,13 +604,12 @@ export function BodyExplorer() {
               onClick={() => setLayers((prev) => { const n = new Set(prev); for (const l of lapisanGerak) n.add(l); return n })}
               className="mt-1 w-full rounded-full border border-brand px-2.5 py-1 text-[11px] font-bold text-brand"
             >
-              Turn on Vessels &amp; Organs to see it move →
+              Turn on Vessels &amp; Organs to inspect the system →
             </button>
           )}
           {motionMode !== 'off' && (layers.has('cardiovascular') || layers.has('visceral')) && (
             <p className="mt-1 text-center text-[10px] leading-relaxed text-neutral-400">
-              The arteries pulse a fraction of a second AFTER the heart — the pulse wave travels at about 5 m/s, so
-              the ankle beats later than the chest. The gut squeezes as a travelling wave, not all at once.
+              Pulse-wave transit and peristaltic timing remain physiology teaching data. The source atlas is not scaled or deformed to simulate those processes.
             </p>
           )}
           {!simVitals && motionMode !== 'off' && (
@@ -751,8 +751,14 @@ export function BodyExplorer() {
             ))}
           </div>
 
-          <div className="mt-3">
-            {panelTab === 'layers' && (
+          <FeatureErrorBoundary
+            key={panelTab}
+            featureName={`${PANEL_TABS.find((tab) => tab.key === panelTab)?.label ?? 'Body Exposure'} panel`}
+            onBack={() => setPanelTab('layers')}
+            onLightweight={() => setPanelTab('layers')}
+          >
+            <div className="mt-3">
+              {panelTab === 'layers' && (
               <>
                 <p className="mb-1.5 text-[11px] text-neutral-400">
                   Turn body systems on or off. Only what you can see can be tapped.
@@ -904,10 +910,13 @@ export function BodyExplorer() {
             {panelTab === 'presisi' && (
               <Suspense fallback={<p className="text-sm text-neutral-500">Loading the precision lab…</p>}>
                 <WholeBodyPrecisionLab
-                  onHighlight={(nodes) => { setActiveWorkout(null); setActiveOrgan(null); setFocusKeywords(null); setHighlighted(nodes) }}
+                  onHighlight={(nodes) => { setActiveWorkout(null); setActiveOrgan(null); setHighlighted(nodes) }}
+                  onFocusRegion={(keywords) => { setActiveWorkout(null); setActiveOrgan(null); setFocusKeywords(keywords) }}
                   onEnableLayer={(l) => setLayers((prev) => (prev.has(l) ? prev : new Set(prev).add(l)))}
                   onSetUnfold={setUnfold}
                   onSetDissectionDepth={setDissect}
+                  onOpenSurgical={() => setPanelTab('bedah')}
+                  onOpenMovement={() => setPanelTab('workout-sim')}
                 />
               </Suspense>
             )}
@@ -992,7 +1001,8 @@ export function BodyExplorer() {
                 </p>
               </div>
             )}
-          </div>
+            </div>
+          </FeatureErrorBoundary>
         </div>
 
         <div className="mt-4 min-w-0">
