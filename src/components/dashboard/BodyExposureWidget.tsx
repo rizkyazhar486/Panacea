@@ -57,6 +57,14 @@ function cloneModel(base: THREE.Group, kind: 'skin' | 'organ') {
   return model
 }
 
+function disposeClonedMaterials(root: THREE.Object3D) {
+  root.traverse((object) => {
+    if (!(object instanceof THREE.Mesh) || !object.material) return
+    const materials = Array.isArray(object.material) ? object.material : [object.material]
+    materials.forEach((material) => material.dispose())
+  })
+}
+
 const VIEW_SHORTCUTS = [
   { label: 'Front', angle: 0 },
   { label: 'Side', angle: Math.PI / 2 },
@@ -102,7 +110,9 @@ export function BodyExposureWidget({ className = '', hero = false, interactive =
     const scene = new THREE.Scene()
     const camera = new THREE.PerspectiveCamera(hero ? 28 : 29, 1, 0.001, 10000)
     const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, powerPreference: 'high-performance' })
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, hero ? 2 : 1.5))
+    const isPhone = window.matchMedia('(max-width: 767px)').matches
+    const pixelRatioCap = isPhone ? 1.2 : hero ? 1.5 : 1.35
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, pixelRatioCap))
     renderer.outputColorSpace = THREE.SRGBColorSpace
     renderer.toneMapping = THREE.ACESFilmicToneMapping
     renderer.toneMappingExposure = 1.0
@@ -110,7 +120,9 @@ export function BodyExposureWidget({ className = '', hero = false, interactive =
     mount.appendChild(renderer.domElement)
 
     const pmrem = new THREE.PMREMGenerator(renderer)
-    const environment = pmrem.fromScene(new RoomEnvironment(), 0.04).texture
+    const room = new RoomEnvironment()
+    const environment = pmrem.fromScene(room, 0.04).texture
+    room.dispose()
     scene.environment = environment
 
     const hemi = new THREE.HemisphereLight(0xf4f7fa, 0x11161b, 1.55)
@@ -147,7 +159,7 @@ export function BodyExposureWidget({ className = '', hero = false, interactive =
     const observer = new IntersectionObserver(([entry]) => { visible = entry.isIntersecting }, { threshold: 0.05 })
     observer.observe(mount)
 
-    void loadModel('VH_M_Skin.glb').then((base) => {
+    void loadModel('VH_M_Skin.glb').then(async (base) => {
       if (disposed) return
       const skin = cloneModel(base, 'skin')
       const box = new THREE.Box3().setFromObject(skin)
@@ -165,12 +177,23 @@ export function BodyExposureWidget({ className = '', hero = false, interactive =
       camera.far = height * 20
       camera.updateProjectionMatrix()
 
+      // The reference body is usable as soon as skin geometry is ready.
+      // Stream organs sequentially afterward instead of parsing several GLBs at
+      // once; this avoids short GPU/RAM spikes that are especially costly in
+      // iOS WebKit while preserving the same HRA source geometry.
+      setStatus('ready')
       const internals = HRA_MODELS.filter((item) => item.kind === 'organ')
-      void Promise.allSettled(internals.map(async (item) => {
-        const organBase = await loadModel(item.file)
+      for (const item of internals) {
         if (disposed) return
-        pivot.add(cloneModel(organBase, 'organ'))
-      })).then(() => { if (!disposed) setStatus('ready') })
+        try {
+          const organBase = await loadModel(item.file)
+          if (disposed) return
+          pivot.add(cloneModel(organBase, 'organ'))
+        } catch {
+          // Keep the already loaded reference body usable if one optional
+          // internal structure is temporarily unavailable.
+        }
+      }
     }).catch(() => { if (!disposed) setStatus('error') })
 
     const onPointerDown = (event: PointerEvent) => {
@@ -231,9 +254,12 @@ export function BodyExposureWidget({ className = '', hero = false, interactive =
       mount.removeEventListener('pointerup', onPointerUp)
       mount.removeEventListener('pointercancel', onPointerUp)
       mount.removeEventListener('keydown', onKeyDown)
+      disposeClonedMaterials(pivot)
       environment.dispose()
       pmrem.dispose()
+      renderer.renderLists.dispose()
       renderer.dispose()
+      renderer.forceContextLoss()
       if (renderer.domElement.parentElement === mount) mount.removeChild(renderer.domElement)
     }
   }, [hero, interactive])
@@ -244,33 +270,33 @@ export function BodyExposureWidget({ className = '', hero = false, interactive =
 
       <div className="pointer-events-none absolute inset-x-4 top-4 z-20 flex items-start justify-between gap-3">
         <div className="max-w-[72%]">
-          <span className="inline-flex rounded-full border border-white/12 bg-black/45 px-2.5 py-1 text-[9px] font-black uppercase tracking-[.14em] text-cyan-200 backdrop-blur-xl">HuBMAP Human Reference Atlas</span>
-          <h2 className="mt-2 text-[17px] font-black tracking-[-.025em] text-white sm:text-xl">Reference human anatomy</h2>
-          <p className="mt-1 max-w-md text-[10px] font-medium leading-relaxed text-white/55">Visible Human reference skin, heart, lungs and blood vasculature. Source geometry is loaded from the HRA release rather than generated as decorative anatomy.</p>
+          <span className="inline-flex rounded-full border border-white/12 bg-black/45 px-2.5 py-1 text-[9px] font-medium uppercase tracking-[.12em] text-cyan-200 backdrop-blur-xl">HuBMAP Human Reference Atlas</span>
+          <h2 className="mt-2 text-[17px] font-semibold tracking-[-.02em] text-white sm:text-xl">Reference human anatomy</h2>
+          <p className="mt-1 max-w-md text-[10px] font-normal leading-relaxed text-white/60">Visible Human reference skin, heart, lungs and blood vasculature. Source geometry is loaded from the HRA release rather than generated as decorative anatomy.</p>
         </div>
-        <span className="shrink-0 rounded-full border border-white/12 bg-black/45 px-2.5 py-1 text-[9px] font-black text-white/70 backdrop-blur-xl">{status === 'ready' ? 'HRA ready' : status === 'error' ? 'Source unavailable' : 'Loading HRA…'}</span>
+        <span className="shrink-0 rounded-full border border-white/12 bg-black/45 px-2.5 py-1 text-[9px] font-medium text-white/70 backdrop-blur-xl">{status === 'ready' ? 'HRA ready' : status === 'error' ? 'Source unavailable' : 'Loading HRA…'}</span>
       </div>
 
       {interactive && status === 'ready' && (
         <div className="absolute inset-x-3 bottom-3 z-30 flex justify-center" aria-label="3D body controls">
           <div className="flex flex-wrap justify-center gap-1 rounded-full border border-white/10 bg-black/55 p-1.5 backdrop-blur-xl">
-            {VIEW_SHORTCUTS.map((item) => <button key={item.label} type="button" onClick={() => showView(item.angle)} className="rounded-full px-3 py-2 text-[9px] font-black text-white/75 transition hover:bg-white/10 hover:text-white active:scale-95">{item.label}</button>)}
+            {VIEW_SHORTCUTS.map((item) => <button key={item.label} type="button" onClick={() => showView(item.angle)} className="rounded-full px-3 py-2 text-[9px] font-semibold text-white/75 transition hover:bg-white/10 hover:text-white active:scale-95">{item.label}</button>)}
             <span className="mx-0.5 h-7 w-px self-center bg-white/10" aria-hidden />
-            <button type="button" onClick={() => setZoom(zoomRef.current + 0.1)} className="grid h-8 w-8 place-items-center rounded-full text-sm font-black text-white/75 hover:bg-white/10" aria-label="Zoom out">−</button>
-            <button type="button" onClick={fitView} className="rounded-full px-2.5 py-2 text-[9px] font-black text-white/65 hover:bg-white/10">Fit</button>
-            <button type="button" onClick={() => setZoom(zoomRef.current - 0.1)} className="grid h-8 w-8 place-items-center rounded-full text-sm font-black text-white/75 hover:bg-white/10" aria-label="Zoom in">＋</button>
-            <span className="self-center px-1 text-[9px] font-black tabular-nums text-white/35">{zoomLabel}%</span>
+            <button type="button" onClick={() => setZoom(zoomRef.current + 0.1)} className="grid h-8 w-8 place-items-center rounded-full text-sm font-semibold text-white/75 hover:bg-white/10" aria-label="Zoom out">−</button>
+            <button type="button" onClick={fitView} className="rounded-full px-2.5 py-2 text-[9px] font-semibold text-white/65 hover:bg-white/10">Fit</button>
+            <button type="button" onClick={() => setZoom(zoomRef.current - 0.1)} className="grid h-8 w-8 place-items-center rounded-full text-sm font-semibold text-white/75 hover:bg-white/10" aria-label="Zoom in">＋</button>
+            <span className="self-center px-1 text-[9px] font-medium tabular-nums text-white/40">{zoomLabel}%</span>
           </div>
         </div>
       )}
 
-      {status === 'error' && <div className="absolute inset-x-4 bottom-4 z-30 rounded-2xl border border-rose-300/20 bg-black/65 p-3 text-[10px] font-semibold text-rose-100 backdrop-blur-xl">The external HRA model could not be loaded. Open the full atlas to retry or inspect the live source references.</div>}
+      {status === 'error' && <div className="absolute inset-x-4 bottom-4 z-30 rounded-2xl border border-rose-300/20 bg-black/65 p-3 text-[10px] font-medium text-rose-100 backdrop-blur-xl">The external HRA model could not be loaded. Open the full atlas to retry or inspect the live source references.</div>}
 
-      {hero && <div className="absolute bottom-16 left-3 right-3 z-30 hidden gap-2 sm:flex">{EXPLORE.map((item) => <Link key={item.to} to={item.to} className="flex min-w-0 flex-1 items-center justify-between rounded-2xl border border-white/10 bg-black/45 px-3 py-2.5 text-[9px] font-black text-white/75 backdrop-blur-xl transition hover:bg-white/10 hover:text-white"><span className="truncate">{item.label}</span><span>→</span></Link>)}</div>}
+      {hero && <div className="absolute bottom-16 left-3 right-3 z-30 hidden gap-2 sm:flex">{EXPLORE.map((item) => <Link key={item.to} to={item.to} className="flex min-w-0 flex-1 items-center justify-between rounded-2xl border border-white/10 bg-black/45 px-3 py-2.5 text-[9px] font-semibold text-white/75 backdrop-blur-xl transition hover:bg-white/10 hover:text-white"><span className="truncate">{item.label}</span><span>→</span></Link>)}</div>}
 
-      {showCta && !hero && <Link to="/body-explorer?mode=realistic-atlas" className="absolute bottom-[62px] right-4 z-30 hidden rounded-full border border-white/10 bg-white px-3.5 py-2 text-[9px] font-black text-neutral-950 shadow-sm sm:inline-flex">Open HRA anatomy →</Link>}
+      {showCta && !hero && <Link to="/body-explorer?mode=realistic-atlas" className="absolute bottom-[62px] right-4 z-30 hidden rounded-full border border-white/10 bg-white px-3.5 py-2 text-[9px] font-semibold text-neutral-950 shadow-sm sm:inline-flex">Open HRA anatomy →</Link>}
 
-      <a href="https://humanatlas.io/3d-reference-library" target="_blank" rel="noreferrer" className="absolute bottom-[66px] left-4 z-30 text-[8px] font-bold uppercase tracking-[.12em] text-white/35 hover:text-white/70">Source: HuBMAP HRA · CC BY 4.0 ↗</a>
+      <a href="https://humanatlas.io/3d-reference-library" target="_blank" rel="noreferrer" className="absolute bottom-[66px] left-4 z-30 text-[8px] font-medium uppercase tracking-[.1em] text-white/35 hover:text-white/70">Source: HuBMAP HRA · CC BY 4.0 ↗</a>
     </section>
   )
 }
