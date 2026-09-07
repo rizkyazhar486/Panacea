@@ -10,7 +10,6 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="default" />
     <meta name="apple-mobile-web-app-title" content="Panaceamed" />
     <link rel="apple-touch-icon" href="./logo-mark.png" />
-    <link rel="stylesheet" href="./continuous-surface.css" />
     <meta
       name="description"
       content="Panaceamed.id — AI-Klinik Praktis untuk Akses Kesehatan. AI anamnesis, AI-EMR, longevity & faskes darurat, diverifikasi klinisi berlisensi."
@@ -36,14 +35,65 @@
   </head>
   <body>
     <div id="root"></div>
-    <!-- Splash screen — pure inline HTML/CSS so it paints before any JS loads
-         (the actual first visual, not a fake one bolted on after mount).
-         Removed by main.tsx once the app has mounted, with a floor so it
-         never flashes imperceptibly on a fast connection. -->
+    <!-- Splash is inline so the installed PWA paints immediately before JS. -->
     <div id="pmd-splash" style="position:fixed;inset:0;z-index:9999;display:flex;align-items:center;justify-content:center;background:linear-gradient(160deg,#00BF63,#0B7A4B);transition:opacity .45s ease;">
       <img src="./logo-mark.png" alt="" width="72" height="72" style="border-radius:20px;animation:pmd-splash-pulse 1.3s ease-in-out infinite;box-shadow:0 12px 32px rgba(0,0,0,0.25);" />
     </div>
     <style>@keyframes pmd-splash-pulse{0%,100%{transform:scale(1);opacity:1}50%{transform:scale(1.08);opacity:.88}}</style>
+
+    <!--
+      Boot recovery is deliberately independent of React. If a stale installed
+      PWA shell points at a chunk removed by a newer deployment, main.tsx never
+      runs and the splash would otherwise stay forever. Recover once by clearing
+      only Panacea caches, ask the existing service worker to update, then reload.
+      Push registration is preserved because the worker is not unregistered.
+    -->
+    <script>
+      (() => {
+        const RECOVERY_KEY = 'pmd-boot-recovery-v1'
+        const CACHE_PREFIX = 'panaceamed-'
+
+        const readRecovered = () => {
+          try { return sessionStorage.getItem(RECOVERY_KEY) === '1' } catch { return false }
+        }
+        const markRecovered = () => {
+          try { sessionStorage.setItem(RECOVERY_KEY, '1') } catch {}
+        }
+        const clearRecovered = () => {
+          try { sessionStorage.removeItem(RECOVERY_KEY) } catch {}
+        }
+
+        window.addEventListener('pmd-app-mounted', clearRecovered, { once: true })
+
+        window.setTimeout(async () => {
+          const splash = document.getElementById('pmd-splash')
+          const root = document.getElementById('root')
+          if (!splash || (root && root.childElementCount > 0)) {
+            clearRecovered()
+            return
+          }
+
+          if (readRecovered()) {
+            splash.innerHTML = '<button type="button" onclick="location.reload()" style="border:0;border-radius:14px;padding:12px 18px;font:600 15px system-ui;color:#06351f;background:#fff;box-shadow:0 8px 28px rgba(0,0,0,.2)">Muat ulang Panacea</button>'
+            return
+          }
+
+          markRecovered()
+          try {
+            if ('caches' in window) {
+              const keys = await caches.keys()
+              await Promise.all(keys.filter((key) => key.startsWith(CACHE_PREFIX)).map((key) => caches.delete(key)))
+            }
+            if ('serviceWorker' in navigator) {
+              const registrations = await navigator.serviceWorker.getRegistrations()
+              await Promise.all(registrations.map((registration) => registration.update().catch(() => undefined)))
+            }
+          } finally {
+            location.reload()
+          }
+        }, 8000)
+      })()
+    </script>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>
