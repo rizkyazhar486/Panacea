@@ -64,6 +64,12 @@ function cleanQuery(value: string) {
   return value.replace(/[<>\\]/g, ' ').replace(/\s+/g, ' ').trim().slice(0, 160)
 }
 
+function abortError(message = 'Request cancelled.') {
+  const error = new Error(message)
+  error.name = 'AbortError'
+  return error
+}
+
 function isAbortError(error: unknown) {
   return typeof error === 'object' && error !== null && 'name' in error && error.name === 'AbortError'
 }
@@ -245,7 +251,7 @@ export async function searchMedicalSources(
 ): Promise<MedicalSourceBundle> {
   const query = cleanQuery(rawQuery)
   if (!query) throw new Error('Enter a medical, anatomy, drug, disease, procedure, or physiology term.')
-  if (options.signal?.aborted) throw new DOMException('Request cancelled.', 'AbortError')
+  if (options.signal?.aborted) throw abortError()
 
   const [literature, ontology, trials, drugLabels] = await Promise.allSettled([
     searchEuropePmc(query, options.signal),
@@ -253,6 +259,8 @@ export async function searchMedicalSources(
     searchTrials(query, options.signal),
     searchDrugLabels(query, options.signal),
   ])
+
+  if (options.signal?.aborted) throw abortError()
 
   return {
     query,
