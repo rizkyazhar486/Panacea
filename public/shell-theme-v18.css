@@ -1,0 +1,125 @@
+/* Panacea shell theme v18
+   Readability-only overrides for existing navigation surfaces. No routing or UI logic. */
+
+.dark aside[class*="bg-white/80"] {
+  border-color: rgba(255,255,255,.09) !important;
+  background: rgba(8,12,20,.90) !important;
+  color: #f7f9fc;
+}
+
+.dark aside[class*="bg-white/80"] .text-neutral-500,
+.dark aside[class*="bg-white/80"] .text-neutral-600 {
+  color: #b6c0ce !important;
+}
+
+.dark aside[class*="bg-white/80"] .text-neutral-800 {
+  color: #f3f6fa !important;
+}
+
+.dark aside[class*="bg-white/80"] .bg-brand-50 {
+  background: rgba(0,191,99,.14) !important;
+}
+
+.dark aside[class*="bg-white/80"] .text-brand-dark {
+  color: #7ee2aa !important;
+}
+
+.dark aside[class*="bg-white/80"] nav a:hover,
+.dark aside[class*="bg-white/80"] nav button:hover,
+.dark aside[class*="bg-white/80"] > button:hover {
+  background: rgba(255,255,255,.065) !important;
+  color: #ffffff !important;
+}
+
+.dark header.kaca {
+  border-color: rgba(255,255,255,.10) !important;
+  background: rgba(7,11,19,.86) !important;
+  color: #f7f9fc !important;
+}
+
+.dark header.kaca .header-icon-btn {
+  color: #eef3f8 !important;
+  background: rgba(255,255,255,.055);
+  border: 1px solid rgba(255,255,255,.075);
+}
+
+.dark header.kaca button[class*="bg-white"] {
+  border-color: rgba(255,255,255,.10) !important;
+  background: rgba(255,255,255,.07) !important;
+  color: #d9e1ea !important;
+}
+
+.dark header.kaca select {
+  color-scheme: dark;
+  color: #f7f9fc;
+}
+
+.dark .drawer-in {
+  border-color: rgba(255,255,255,.09) !important;
+  background: #090d16 !important;
+  color: #f7f9fc !important;
+}
+
+.dark .drawer-in [class*="border-black/5"] {
+  border-color: rgba(255,255,255,.09) !important;
+}
+
+.dark .drawer-in .text-neutral-500,
+.dark .drawer-in .text-neutral-600 {
+  color: #c0c9d5 !important;
+}
+
+.dark .drawer-in .bg-brand-50 {
+  background: rgba(0,191,99,.15) !important;
+}
+
+.dark .drawer-in .text-brand-dark {
+  color: #86e8b1 !important;
+}
+
+.dark .drawer-in nav a:hover,
+.dark .drawer-in nav button:hover,
+.dark .drawer-in > div button:hover,
+.dark .drawer-in > div a:hover {
+  background: rgba(255,255,255,.07) !important;
+  color: #ffffff !important;
+}
+
+.dark .drawer-in button[class*="bg-neutral-100"] {
+  background: rgba(255,255,255,.085) !important;
+  color: #e8edf3 !important;
+}
+
+.dark [data-pintasan].kaca {
+  background: rgba(8,12,20,.90) !important;
+}
+
+.dark [data-pintasan] a[class*="bg-neutral-100"] {
+  background: rgba(255,255,255,.075) !important;
+  color: #dce3eb !important;
+}
+
+.dark main a[class*="bg-white"][class*="border-black/5"] {
+  border-color: rgba(255,255,255,.09) !important;
+  background: rgba(255,255,255,.055) !important;
+  color: #f7f9fc !important;
+}
+
+.dark main a[class*="bg-white"][class*="border-black/5"] .text-neutral-600 {
+  color: #c0c9d5 !important;
+}
+
+aside a:focus-visible,
+aside button:focus-visible,
+header button:focus-visible,
+.drawer-in a:focus-visible,
+.drawer-in button:focus-visible {
+  outline: 3px solid rgba(0,191,99,.58) !important;
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  aside *, header *, .drawer-in * {
+    transition-duration: .001ms !important;
+  }
+}
