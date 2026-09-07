@@ -1,0 +1,172 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://panaceamed.id/schemas/anatomy-asset.schema.json",
+  "title": "Panacea Anatomy Asset Manifest",
+  "description": "Provenance-first contract for anatomical 3D assets before they are allowed into the Panacea renderer. Geometry, semantic identity, license, validation and runtime readiness are separate concerns and must remain traceable.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "id",
+    "label",
+    "classification",
+    "source",
+    "anatomy",
+    "artifact",
+    "license",
+    "validation",
+    "runtime",
+    "productionGate"
+  ],
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^[a-z0-9][a-z0-9._-]*$"
+    },
+    "label": {
+      "type": "string",
+      "minLength": 1
+    },
+    "classification": {
+      "type": "string",
+      "enum": ["REFERENCE_ANATOMY", "PATIENT_SPECIFIC", "SIMULATION_DERIVATIVE"]
+    },
+    "source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["registryId", "assetId", "url", "version", "creator"],
+      "properties": {
+        "registryId": { "type": "string", "minLength": 1 },
+        "assetId": { "type": "string", "minLength": 1 },
+        "url": { "type": "string", "format": "uri" },
+        "version": { "type": "string", "minLength": 1 },
+        "creator": { "type": "string", "minLength": 1 },
+        "citation": { "type": ["string", "null"] },
+        "acquiredAt": { "type": ["string", "null"], "format": "date-time" }
+      }
+    },
+    "anatomy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["canonicalId", "name", "structureType"],
+      "properties": {
+        "canonicalId": { "type": "string", "minLength": 1 },
+        "name": { "type": "string", "minLength": 1 },
+        "structureType": {
+          "type": "string",
+          "enum": ["body", "system", "organ", "tissue", "bone", "muscle", "vessel", "nerve", "lymphatic", "skin", "cell", "other"]
+        },
+        "laterality": {
+          "type": "string",
+          "enum": ["LEFT", "RIGHT", "MIDLINE", "BILATERAL", "NOT_APPLICABLE", "UNKNOWN"]
+        },
+        "system": { "type": ["string", "null"] },
+        "hraId": { "type": ["string", "null"] },
+        "uberonId": { "type": ["string", "null"] },
+        "otherOntologyIds": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": { "type": "string", "minLength": 1 }
+        }
+      }
+    },
+    "artifact": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "format", "sha256", "bytes"],
+      "properties": {
+        "path": { "type": "string", "minLength": 1 },
+        "format": { "type": "string", "enum": ["glb", "gltf"] },
+        "sha256": { "type": "string", "pattern": "^[a-fA-F0-9]{64}$" },
+        "bytes": { "type": "integer", "minimum": 1 },
+        "vertices": { "type": ["integer", "null"], "minimum": 0 },
+        "triangles": { "type": ["integer", "null"], "minimum": 0 },
+        "textureBytes": { "type": ["integer", "null"], "minimum": 0 },
+        "lod": { "type": ["integer", "null"], "minimum": 0 },
+        "compression": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": { "type": "string", "enum": ["draco", "meshopt", "ktx2"] }
+        }
+      }
+    },
+    "license": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status", "commercialUse", "attributionRequired", "sourceLicenseUrl"],
+      "properties": {
+        "status": { "type": "string", "enum": ["VERIFIED", "CHECK_REQUIRED", "BLOCKED"] },
+        "identifier": { "type": ["string", "null"] },
+        "commercialUse": { "type": "string", "enum": ["ALLOWED", "CONDITIONAL", "NOT_ALLOWED", "UNKNOWN"] },
+        "attributionRequired": { "type": ["boolean", "null"] },
+        "shareAlike": { "type": ["boolean", "null"] },
+        "sourceLicenseUrl": { "type": "string", "format": "uri" },
+        "attributionText": { "type": ["string", "null"] },
+        "checkedAt": { "type": ["string", "null"], "format": "date" },
+        "notes": { "type": "string" }
+      }
+    },
+    "transforms": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["action", "tool"],
+        "properties": {
+          "action": { "type": "string", "minLength": 1 },
+          "tool": { "type": "string", "minLength": 1 },
+          "toolVersion": { "type": ["string", "null"] },
+          "notes": { "type": "string" }
+        }
+      }
+    },
+    "validation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["level", "patientSpecific", "clinicalDecisionUse"],
+      "properties": {
+        "level": { "type": "string", "enum": ["EDUCATIONAL", "REFERENCE", "RESEARCH", "CLINICAL_SUPPORT"] },
+        "patientSpecific": { "type": "boolean" },
+        "clinicalDecisionUse": { "type": "string", "enum": ["NO", "CONTEXT_ONLY", "REQUIRES_SEPARATE_VALIDATION"] },
+        "reviewedBy": { "type": ["string", "null"] },
+        "reviewedAt": { "type": ["string", "null"], "format": "date" },
+        "notes": { "type": "string" }
+      }
+    },
+    "runtime": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["enabled", "lazyLoad"],
+      "properties": {
+        "enabled": { "type": "boolean" },
+        "lazyLoad": { "type": "boolean" },
+        "preload": { "type": "boolean" },
+        "fallbackAssetId": { "type": ["string", "null"] },
+        "notes": { "type": "string" }
+      }
+    },
+    "productionGate": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["provenanceComplete", "licenseCleared", "stableIdMapped", "artifactVerified", "performanceReviewed", "visualQaReviewed"],
+      "properties": {
+        "provenanceComplete": { "type": "boolean" },
+        "licenseCleared": { "type": "boolean" },
+        "stableIdMapped": { "type": "boolean" },
+        "artifactVerified": { "type": "boolean" },
+        "performanceReviewed": { "type": "boolean" },
+        "visualQaReviewed": { "type": "boolean" },
+        "notes": { "type": "string" }
+      }
+    }
+  },
+  "allOf": [
+    {
+      "if": { "properties": { "classification": { "const": "PATIENT_SPECIFIC" } } },
+      "then": { "properties": { "validation": { "properties": { "patientSpecific": { "const": true } } } } }
+    },
+    {
+      "if": { "properties": { "license": { "properties": { "status": { "const": "BLOCKED" } } } },
+      "then": { "properties": { "runtime": { "properties": { "enabled": { "const": false } } } }
+    }
+  ]
+}
