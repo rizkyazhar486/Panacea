@@ -1,0 +1,52 @@
+{
+  "id": "reactome",
+  "name": "Reactome Pathway Knowledgebase",
+  "category": "pathway",
+  "kind": ["api", "dataset"],
+  "homepage": "https://reactome.org/",
+  "repository": null,
+  "features": ["pathway-browser", "reaction-graph", "signaling-pathways", "metabolism-pathways", "disease-pathways", "molecular-participants", "pathway-evidence", "cellular-context"],
+  "formats": ["json", "http-rest", "biopax", "sbml", "sbgn", "psi-mitab"],
+  "usage": {
+    "runtime": true,
+    "buildTime": true,
+    "networkRequired": true,
+    "notes": "Use the public Reactome Content Service for targeted pathway/reaction retrieval and version discovery. Prefer version-pinned snapshots or cached normalized records for repeatable educational views; do not make high-frequency live calls directly from every React render."
+  },
+  "license": {
+    "status": "VERIFIED",
+    "identifier": "CC0-1.0 for Reactome database data; separate licenses for software, data dumps, illustrations, icons, art and branding",
+    "commercialUse": "CONDITIONAL",
+    "attributionRequired": false,
+    "shareAlike": false,
+    "scope": "Reactome states that data in the database and files derived from that data are CC0 and may be copied, modified and distributed commercially. Reactome software/code is generally Apache-2.0 except repositories with different dependency-driven terms. Database data dumps, pathway illustrations, icon library, art and branding materials have separate terms including CC BY 4.0 or repository-specific licenses and must not be treated as CC0 database data.",
+    "verificationUrl": "https://reactome.org/license",
+    "verifiedAt": "2026-09-08",
+    "notes": "Panacea should consume structured pathway data rather than copying Reactome pathway artwork by default. If a Reactome illustration/icon/art asset is used, record its specific license and required attribution separately. Cross-referenced external resources retain their own licenses."
+  },
+  "validation": {
+    "level": "REFERENCE",
+    "clinicalDecisionUse": "CONTEXT_ONLY",
+    "notes": "Reactome is a curated biological pathway knowledgebase and is appropriate for scientific education, pathway context and evidence navigation. Pathway membership or disease annotation does not by itself establish a diagnosis, treatment recommendation, patient-specific mechanism or therapeutic efficacy."
+  },
+  "provenance": {
+    "authority": "Reactome consortium / OICR / EMBL-EBI / OHSU / NYU Langone",
+    "sourceIdentityRequired": true,
+    "versionPinRequired": true,
+    "notes": "Persist Reactome stable IDs (for example R-HSA-*), species, schema class, pathway/reaction parentage, inferred status where applicable, source release/database version, retrieval date and any external cross-reference IDs used. Query /ContentService/data/database/version or equivalent release metadata and do not silently merge records from different releases."
+  },
+  "adapter": {
+    "status": "PLANNED",
+    "normalizedTarget": "PanaceaPathwayGraph",
+    "module": null,
+    "notes": "Planned flow: Reactome stable ID/query -> Content Service -> normalize events, reactions, physical entities, compartments, evidence/citations and cross-references -> PanaceaPathwayGraph -> pathway engine/UI. Preserve directionality, compartments and stable IDs. Keep pathway data separate from visual layout; any animation is an educational rendering of the graph unless driven by an explicit quantitative model."
+  },
+  "trust": {
+    "authority": 5,
+    "evidenceQuality": 4,
+    "recency": 5,
+    "licenseClarity": 5,
+    "reproducibility": 5,
+    "notes": "High-quality curated pathway reference with explicit release/versioning and clear structured-data licensing. Evidence quality is scored below primary experimental evidence because Reactome is a curated synthesis/reference layer rather than a substitute for the underlying studies."
+  }
+}
