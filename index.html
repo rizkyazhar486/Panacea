@@ -39,14 +39,9 @@
       href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@600;700&display=swap"
       rel="stylesheet"
     />
-    <!-- Specialty display faces are not needed to make Home usable. Load them
-         after first paint instead of competing with React, widgets and health data. -->
-    <link
-      href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Barlow:wght@300;400;500;600&family=Unbounded:wght@700;800;900&family=Oxanium:wght@600;700;800&family=Gugi&display=swap"
-      rel="stylesheet"
-      media="print"
-      onload="this.media='all'"
-    />
+    <!-- Specialty display faces are decorative. JavaScript schedules them only
+         after load + idle time on normal devices so they cannot compete with
+         React, Home widgets, or health data during startup. -->
     <noscript>
       <link
         href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Barlow:wght@300;400;500;600&family=Unbounded:wght@700;800;900&family=Oxanium:wght@600;700;800&family=Gugi&display=swap"
@@ -74,6 +69,35 @@
         // Low-memory mode may simplify decorative animation elsewhere, but it
         // must never hide, pause, detach or rewrite user-facing video/media.
         // Curated landing media remains controlled by its own React component.
+      })()
+    </script>
+    <script>
+      (() => {
+        // Decorative fonts must never delay or destabilize app startup. On
+        // low-memory / Save-Data devices the system font stack remains the
+        // intentional fallback. Normal devices receive specialty faces only
+        // after the page has loaded and the browser has idle capacity.
+        if (window.__PANACEA_LOW_MEMORY__) return
+
+        const loadSpecialtyFonts = () => {
+          if (document.getElementById('pmd-specialty-fonts')) return
+          const link = document.createElement('link')
+          link.id = 'pmd-specialty-fonts'
+          link.rel = 'stylesheet'
+          link.href = 'https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Barlow:wght@300;400;500;600&family=Unbounded:wght@700;800;900&family=Oxanium:wght@600;700;800&family=Gugi&display=swap'
+          document.head.appendChild(link)
+        }
+
+        const schedule = () => {
+          if ('requestIdleCallback' in window) {
+            window.requestIdleCallback(loadSpecialtyFonts, { timeout: 10000 })
+          } else {
+            window.setTimeout(loadSpecialtyFonts, 6000)
+          }
+        }
+
+        if (document.readyState === 'complete') schedule()
+        else window.addEventListener('load', schedule, { once: true })
       })()
     </script>
   </head>
