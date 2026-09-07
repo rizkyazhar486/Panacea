@@ -24,7 +24,7 @@ const AthleteScience = lazy(() => import('./AthleteScience').then((m) => ({ defa
 const AnalisisPro = lazy(() => import('./AnalisisPro').then((m) => ({ default: m.AnalisisPro })))
 const TrainingPhysiology = lazy(() => import('./TrainingPhysiology').then((m) => ({ default: m.TrainingPhysiology })))
 const EnduranceTools = lazy(() => import('./EnduranceTools').then((m) => ({ default: m.EnduranceTools })))
-const Workout = lazy(() => import('./Workout').then((m) => ({ default: m.Workout })))
+const Workout = lazy(() => import('./WorkoutSafe').then((m) => ({ default: m.WorkoutSafe })))
 const LatihanBeban = lazy(() => import('./LatihanBeban').then((m) => ({ default: m.LatihanBeban })))
 const Kalistenik = lazy(() => import('./Kalistenik').then((m) => ({ default: m.Kalistenik })))
 const CrossFit = lazy(() => import('./CrossFit').then((m) => ({ default: m.CrossFit })))
