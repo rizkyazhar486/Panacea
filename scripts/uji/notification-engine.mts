@@ -120,7 +120,11 @@ assert.match(settings, /Test device/)
 
 const notificationPage = readFileSync('src/pages/Notifications.tsx', 'utf8')
 assert.match(notificationPage, /SmartNotificationSettings/)
-assert.match(notificationPage, /Smart combinations above still evaluate local app signals/)
+assert.match(
+  notificationPage,
+  /Local smart combinations and achievement history remain available on this device/,
+  'notification fallback copy should still state that local smart evaluation/history remains available when the backend is offline',
+)
 
 const appStatus = readFileSync('src/components/AppStatus.tsx', 'utf8')
 assert.match(appStatus, /SmartNotificationOrchestrator/)
