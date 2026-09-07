@@ -1,7 +1,113 @@
-import { useEffect, useRef, useState, type ReactNode } from 'react'
-import '../styles/widget-system-v4.css'
+import { useEffect, useRef, useState, type CSSProperties, type ReactNode } from 'react'
+import '../styles/widget-living-instrument-v5.css'
 
-export function Tumpukan({ judul, anak, aksi }: { judul?: string; anak: { kunci: string; isi: ReactNode }[]; aksi?: ReactNode }) {
+type WidgetItem = { kunci: string; isi: ReactNode }
+type InstrumentMeta = {
+  name: string
+  kicker: string
+  icon: string
+  kind: 'performance' | 'recovery' | 'nutrition' | 'ritual' | 'reflection' | 'alerts' | 'sport' | 'body' | 'focus' | 'general'
+  accent: string
+  soft: string
+}
+
+const META: Record<string, Partial<InstrumentMeta>> = {
+  kebugaran: { name: 'Training today', kicker: 'Performance', icon: '🏃', kind: 'performance' },
+  salat: { name: 'Prayer rhythm', kicker: 'Time & ritual', icon: '◌', kind: 'ritual' },
+  pantauan: { name: 'Health watch', kicker: 'Monitoring', icon: '◎', kind: 'body' },
+  skorTim: { name: 'Team scores', kicker: 'Live sport', icon: '⚽', kind: 'sport' },
+  tidurLebar: { name: 'Sleep architecture', kicker: 'Recovery', icon: '☾', kind: 'recovery' },
+  giziLebar: { name: 'Daily energy', kicker: 'Metabolism', icon: '◐', kind: 'nutrition' },
+  motivasi: { name: 'Momentum', kicker: 'Mindset', icon: '✦', kind: 'focus' },
+  lingkungan: { name: 'Environment', kicker: 'Exposure', icon: '⌁', kind: 'body' },
+  pangan: { name: 'Food intelligence', kicker: 'Nutrition', icon: '◉', kind: 'nutrition' },
+  obatPengingat: { name: 'Medication', kicker: 'Adherence', icon: '✚', kind: 'alerts' },
+  beban: { name: 'Training load', kicker: 'Performance', icon: '⌁', kind: 'performance' },
+  ukurBerkala: { name: 'Measurements', kicker: 'Follow-up', icon: '◎', kind: 'body' },
+  skrining: { name: 'Screening', kicker: 'Prevention', icon: '◇', kind: 'body' },
+  amsler: { name: 'Vision check', kicker: 'Eye health', icon: '◫', kind: 'body' },
+  layar: { name: 'Screen balance', kicker: 'Digital health', icon: '▣', kind: 'focus' },
+  peregangan: { name: 'Mobility break', kicker: 'Movement', icon: '↗', kind: 'performance' },
+  tekananSebar: { name: 'Blood pressure', kicker: 'Circulation', icon: '♥', kind: 'body' },
+  rangkaian: { name: 'Habit chain', kicker: 'Consistency', icon: '∞', kind: 'focus' },
+  jetlag: { name: 'Jet lag', kicker: 'Circadian', icon: '◒', kind: 'recovery' },
+  nadiPanjang: { name: 'Heart-rate trend', kicker: 'Cardio', icon: '♥', kind: 'body' },
+  tidur14: { name: 'Sleep trend', kicker: '14 days', icon: '☾', kind: 'recovery' },
+  muatanPekan: { name: 'Weekly load', kicker: 'Training', icon: '▥', kind: 'performance' },
+  kaloriBanding: { name: 'Energy balance', kicker: 'Metabolism', icon: '◐', kind: 'nutrition' },
+  tdee: { name: 'Daily energy', kicker: 'Metabolism', icon: '◐', kind: 'nutrition' },
+  ayatHarian: { name: 'Daily reflection', kicker: 'Peace & meaning', icon: '✦', kind: 'reflection' },
+  hitungHari: { name: 'Countdown', kicker: 'Life timeline', icon: '⌛', kind: 'focus' },
+  ringHarian: { name: 'Today rings', kicker: 'Daily movement', icon: '◎', kind: 'performance' },
+  kepatuhan: { name: 'Consistency', kicker: 'Adherence', icon: '✓', kind: 'focus' },
+  beratTren: { name: 'Weight trend', kicker: 'Body', icon: '◒', kind: 'body' },
+  lab: { name: 'Lab watch', kicker: 'Clinical', icon: '⌬', kind: 'body' },
+  tenaga: { name: 'Daily energy', kicker: 'How you feel', icon: '⚡', kind: 'performance' },
+  hidrasi2: { name: 'Hydration', kicker: 'Fluid balance', icon: '◉', kind: 'nutrition' },
+  cahaya: { name: 'Light exposure', kicker: 'Circadian', icon: '☼', kind: 'recovery' },
+  tangga: { name: 'Daily climb', kicker: 'Movement', icon: '↗', kind: 'performance' },
+  vo2tren: { name: 'VO₂max trend', kicker: 'Aerobic fitness', icon: '△', kind: 'performance' },
+  komposisi: { name: 'Body composition', kicker: 'Body', icon: '◐', kind: 'body' },
+  suplemen: { name: 'Supplements', kicker: 'Routine', icon: '✚', kind: 'nutrition' },
+  suhuEkstrem: { name: 'Heat & cold', kicker: 'Environment', icon: '≈', kind: 'body' },
+  hrv: { name: 'HRV', kicker: 'Recovery signal', icon: '⌁', kind: 'recovery' },
+  tahapTidur: { name: 'Sleep stages', kicker: 'Recovery', icon: '☾', kind: 'recovery' },
+  efisiensiTidur: { name: 'Sleep efficiency', kicker: 'Recovery', icon: '◒', kind: 'recovery' },
+  lajuNapas: { name: 'Respiratory rate', kicker: 'Vitals', icon: '≈', kind: 'body' },
+  saturasi: { name: 'Oxygen saturation', kicker: 'Vitals', icon: 'O₂', kind: 'body' },
+  suhu: { name: 'Body temperature', kicker: 'Vitals', icon: '°', kind: 'body' },
+  zona2: { name: 'Zone 2 minutes', kicker: 'Aerobic base', icon: 'Z2', kind: 'performance' },
+  hrr: { name: 'Heart-rate recovery', kicker: 'Recovery', icon: '↘', kind: 'recovery' },
+  utangTidur: { name: 'Sleep debt', kicker: 'Recovery', icon: '☾', kind: 'recovery' },
+  tekanan: { name: 'Stress load', kicker: 'Recovery', icon: '≈', kind: 'recovery' },
+  napas: { name: 'Breathing', kicker: 'Reset', icon: '◌', kind: 'recovery' },
+  duduk: { name: 'Sitting time', kicker: 'Movement', icon: '▰', kind: 'performance' },
+  fokus: { name: 'Focus', kicker: 'Cognitive', icon: '◎', kind: 'focus' },
+  mata: { name: 'Eye break', kicker: 'Digital health', icon: '◉', kind: 'focus' },
+  puasa: { name: 'Fasting', kicker: 'Ritual & metabolism', icon: '◒', kind: 'ritual' },
+  kopi: { name: 'Caffeine', kicker: 'Timing', icon: '◐', kind: 'focus' },
+  pewaktu: { name: 'Timer', kicker: 'Action', icon: '◷', kind: 'focus' },
+  kabar: { name: 'Health brief', kicker: 'Updates', icon: '⌁', kind: 'alerts' },
+  pengingat: { name: 'Notifications', kicker: 'Needs attention', icon: '●', kind: 'alerts' },
+  inspirasi: { name: 'Inspiration', kicker: 'Learning', icon: '✦', kind: 'reflection' },
+  ringkasanKarya: { name: 'Learning summary', kicker: 'Knowledge', icon: '▤', kind: 'focus' },
+  soalHarian: { name: 'Daily question', kicker: 'Learning', icon: '?', kind: 'focus' },
+  kartuBelajar: { name: 'Study card', kicker: 'Learning', icon: '▧', kind: 'focus' },
+  obatCepat: { name: 'Drug lookup', kicker: 'Clinical tools', icon: '✚', kind: 'alerts' },
+  kalkulatorCepat: { name: 'Medical calculator', kicker: 'Clinical tools', icon: '∑', kind: 'body' },
+  stasiunSering: { name: 'OSCE station', kicker: 'Clinical learning', icon: '◇', kind: 'focus' },
+  konsistensi: { name: 'Consistency map', kicker: 'Your rhythm', icon: '▦', kind: 'focus' },
+  dompet: { name: 'Wallet', kicker: 'Prosperity', icon: '◇', kind: 'general' },
+}
+
+const KIND_ACCENT: Record<InstrumentMeta['kind'], { accent: string; soft: string }> = {
+  performance: { accent: '#3b82f6', soft: 'rgba(59,130,246,.11)' },
+  recovery: { accent: '#8b5cf6', soft: 'rgba(139,92,246,.11)' },
+  nutrition: { accent: '#14b8a6', soft: 'rgba(20,184,166,.11)' },
+  ritual: { accent: '#22c55e', soft: 'rgba(34,197,94,.10)' },
+  reflection: { accent: '#d4a72c', soft: 'rgba(212,167,44,.10)' },
+  alerts: { accent: '#f97316', soft: 'rgba(249,115,22,.10)' },
+  sport: { accent: '#06b6d4', soft: 'rgba(6,182,212,.10)' },
+  body: { accent: '#ef4444', soft: 'rgba(239,68,68,.10)' },
+  focus: { accent: '#a855f7', soft: 'rgba(168,85,247,.10)' },
+  general: { accent: '#00bf63', soft: 'rgba(0,191,99,.10)' },
+}
+
+function metaFor(key?: string): InstrumentMeta {
+  const partial = key ? META[key] : undefined
+  const kind = partial?.kind ?? 'general'
+  const palette = KIND_ACCENT[kind]
+  return {
+    name: partial?.name ?? 'Live widget',
+    kicker: partial?.kicker ?? 'Panacea instrument',
+    icon: partial?.icon ?? '◎',
+    kind,
+    accent: palette.accent,
+    soft: palette.soft,
+  }
+}
+
+export function Tumpukan({ judul, anak, aksi }: { judul?: string; anak: WidgetItem[]; aksi?: ReactNode }) {
   const wadah = useRef<HTMLDivElement>(null)
   const halaman = useRef<(HTMLDivElement | null)[]>([])
   const digeser = useRef(false)
@@ -53,8 +159,8 @@ export function Tumpukan({ judul, anak, aksi }: { judul?: string; anak: { kunci:
   }, [anak, siap])
 
   const tampil = anak.map((a, i) => ({ ...a, i })).filter((a) => !kosong[a.i])
-  const TINGGI_MIN = 168
-  const TINGGI_MAKS = 320
+  const TINGGI_MIN = 184
+  const TINGGI_MAKS = 332
 
   useEffect(() => {
     const ukur = () => {
@@ -64,7 +170,7 @@ export function Tumpukan({ judul, anak, aksi }: { judul?: string; anak: { kunci:
         if (!el) return
         const first = el.firstElementChild as HTMLElement | null
         const alami = first ? Math.max(first.scrollHeight, first.getBoundingClientRect().height) : el.scrollHeight
-        maks = Math.max(maks, alami + 28)
+        maks = Math.max(maks, alami + 32)
       })
       if (maks) setTinggi(Math.min(TINGGI_MAKS, Math.max(TINGGI_MIN, maks)))
     }
@@ -125,37 +231,44 @@ export function Tumpukan({ judul, anak, aksi }: { judul?: string; anak: { kunci:
     if (el) el.scrollTo({ left: next * el.clientWidth, behavior: 'smooth' })
   }
 
+  const current = tampil[Math.min(aktif, Math.max(0, tampil.length - 1))]
+  const meta = metaFor(current?.kunci)
   const progress = tampil.length ? ((aktif + 1) / tampil.length) * 100 : 0
+  const nextMeta = tampil.length > 1 ? metaFor(tampil[Math.min(aktif + 1, tampil.length - 1)]?.kunci) : meta
+  const cssVars = { '--wa': meta.accent, '--wa-soft': meta.soft } as CSSProperties
 
   return (
-    <section className="widget-stack-v4" aria-label={judul || 'Widgets'}>
-      <div className="widget-stack-head-v4">
-        <div className="widget-stack-title-v4">
-          <span className="widget-stack-mark-v4" aria-hidden />
-          <div className="widget-stack-title-copy-v4">
-            <div className="widget-stack-eyebrow-v4">Live dashboard</div>
-            <h2 className="widget-stack-name-v4">{judul || 'Summary'}</h2>
+    <section className="widget-instrument-v5" data-kind={meta.kind} style={cssVars} aria-label={judul || 'Widgets'}>
+      <div className="widget-instrument-head-v5">
+        <div className="widget-instrument-id-v5">
+          <span className="widget-instrument-icon-v5" aria-hidden>{meta.icon}</span>
+          <div className="widget-instrument-copy-v5">
+            <div className="widget-instrument-kicker-v5">{meta.kicker}</div>
+            <div className="widget-instrument-title-row-v5">
+              <h2 className="widget-instrument-title-v5">{meta.name}</h2>
+              <span className="widget-instrument-state-v5">{judul || 'Summary'}</span>
+            </div>
           </div>
         </div>
-        <div className="widget-stack-tools-v4">
-          <span className="widget-stack-page-v4" aria-label={`Widget ${aktif + 1} of ${Math.max(1, tampil.length)}`}>
+        <div className="widget-instrument-tools-v5">
+          <span className="widget-instrument-count-v5" aria-label={`Widget ${aktif + 1} of ${Math.max(1, tampil.length)}`}>
             {Math.min(aktif + 1, Math.max(1, tampil.length))}/{Math.max(1, tampil.length)}
           </span>
-          {aksi && <div className="widget-stack-edit-v4"><span aria-hidden>⚙</span><span>{aksi}</span></div>}
+          {aksi && <div className="widget-instrument-edit-v5"><span aria-hidden>⚙</span><span>{aksi}</span></div>}
         </div>
       </div>
 
-      <div className="widget-stage-v4">
+      <div className="widget-instrument-shell-v5">
         <div
           ref={wadah}
-          className="widget-stage-scroll-v4"
+          className="widget-instrument-scroll-v5"
           style={{ height: tinggi, minHeight: TINGGI_MIN }}
         >
           {anak.map((a, i) => (
             <div
               key={a.kunci}
               ref={(el) => { halaman.current[i] = el }}
-              className={`${kosong[i] ? 'hidden' : ''} widget-slide-v4`}
+              className={`${kosong[i] ? 'hidden' : ''} widget-instrument-slide-v5`}
             >
               {i < siap ? a.isi : null}
             </div>
@@ -164,24 +277,15 @@ export function Tumpukan({ judul, anak, aksi }: { judul?: string; anak: { kunci:
       </div>
 
       {tampil.length > 1 && (
-        <div className="widget-stack-nav-v4" aria-label="Widget navigation">
-          <button
-            type="button"
-            className="widget-nav-btn-v4"
-            onClick={() => ke(aktif - 1)}
-            disabled={aktif <= 0}
-            aria-label="Previous widget"
-          >‹</button>
-          <div className="widget-progress-v4" aria-hidden>
-            <div className="widget-progress-fill-v4" style={{ width: `${progress}%` }} />
+        <div className="widget-instrument-foot-v5" aria-label="Widget navigation">
+          <button type="button" className="widget-instrument-nav-v5" onClick={() => ke(aktif - 1)} disabled={aktif <= 0} aria-label="Previous widget">‹</button>
+          <div className="widget-instrument-track-v5">
+            <div className="widget-instrument-line-v5" aria-hidden>
+              <div className="widget-instrument-line-fill-v5" style={{ width: `${progress}%` }} />
+            </div>
+            <span className="widget-instrument-label-v5">Next · {nextMeta.name}</span>
           </div>
-          <button
-            type="button"
-            className="widget-nav-btn-v4"
-            onClick={() => ke(aktif + 1)}
-            disabled={aktif >= tampil.length - 1}
-            aria-label="Next widget"
-          >›</button>
+          <button type="button" className="widget-instrument-nav-v5" onClick={() => ke(aktif + 1)} disabled={aktif >= tampil.length - 1} aria-label="Next widget">›</button>
         </div>
       )}
     </section>
