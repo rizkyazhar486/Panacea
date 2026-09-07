@@ -1,0 +1,30 @@
+/*
+ * Home is used while moving, often on phones with tighter browser GPU budgets.
+ * The desktop visual language stays intact, but touch devices avoid stacking
+ * several full-screen backdrop filters/composited layers during long scrolls.
+ */
+@media (hover: none) and (pointer: coarse) {
+  .panacea-home-backdrop {
+    position: absolute !important;
+    transform: none !important;
+  }
+
+  .home-odyssey-hero,
+  .home-journey-chip,
+  .home-signal-card,
+  .home-section-shell {
+    -webkit-backdrop-filter: none !important;
+    backdrop-filter: none !important;
+  }
+
+  /* Keep the cosmic identity without a permanently animating compositor layer. */
+  .home-orbit-core .satellite {
+    animation: none !important;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .home-orbit-core .satellite {
+    animation: none !important;
+  }
+}
