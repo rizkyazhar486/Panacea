@@ -1,0 +1,44 @@
+{
+  "id": "nih_3d",
+  "name": "NIH 3D",
+  "category": "anatomy",
+  "kind": ["dataset", "mesh", "model-repository"],
+  "homepage": "https://3d.nih.gov/",
+  "repository": null,
+  "features": [751, 752, 753, 754, 755, 756, 757, 758, 759, 760, 761],
+  "formats": ["glb", "stl", "x3d", "wrl", "pdb", "cif", "sdf", "mol", "dicom-zip"],
+  "usage": {
+    "runtime": false,
+    "buildTime": true,
+    "networkRequired": true,
+    "notes": "Use NIH 3D as a discovery/acquisition source. Panacea should ingest only explicitly selected entries after per-entry provenance, version, citation and license checks. Production runtime should serve Panacea-controlled optimized derivatives rather than hot-linking portal assets."
+  },
+  "license": {
+    "status": "VERIFIED",
+    "identifier": "Per-entry license",
+    "commercialUse": "CONDITIONAL",
+    "attributionRequired": null,
+    "shareAlike": null,
+    "scope": "NIH 3D Terms state that licensing is assigned by contributors and varies by entry/file. Many entries are public domain or Creative Commons, while others may have more restrictive terms. No portal-wide commercial-use permission may be inferred for individual models.",
+    "verificationUrl": "https://3d.nih.gov/terms",
+    "verifiedAt": "2026-09-08",
+    "notes": "Block asset ingestion when the specific NIH 3D entry does not have a recorded license, attribution instruction, stable entry identifier and version. Store those fields on every derived Panacea asset manifest."
+  },
+  "validation": {
+    "level": "REFERENCE",
+    "clinicalDecisionUse": "NO",
+    "notes": "NIH 3D is a biomedical visualization repository with heterogeneous contributor content. Individual models may be useful for education or reference but must not be treated as patient-specific anatomy, diagnostic evidence or validated procedural guidance without separate validation."
+  },
+  "provenance": {
+    "authority": "NIH 3D, U.S. National Institutes of Health biomedical 3D model portal",
+    "sourceIdentityRequired": true,
+    "versionPinRequired": true,
+    "notes": "Record the NIH 3D accession/PID, entry version, creator, source-data attribution, citation instructions, original license and every Panacea transformation. Source authority does not erase contributor-level provenance requirements."
+  },
+  "adapter": {
+    "status": "PLANNED",
+    "normalizedTarget": "PanaceaAnatomyAssetManifest",
+    "module": null,
+    "notes": "Planned pipeline: select NIH 3D entry -> verify entry metadata/license -> acquire supported file -> normalize anatomical identity -> mesh cleanup/LOD/compression -> derived GLB/glTF -> Panacea anatomy renderer."
+  }
+}
