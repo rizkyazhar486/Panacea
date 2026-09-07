@@ -60,6 +60,7 @@ export interface MedicalSourceSearchOptions {
 const EUROPE_PMC = 'https://www.ebi.ac.uk/europepmc/webservices/rest/search'
 const OLS = 'https://www.ebi.ac.uk/ols4/api/search'
 const OPENFDA = 'https://api.fda.gov/drug/label.json'
+const OPENFDA_DOCS = 'https://open.fda.gov/apis/drug/label/'
 
 function cleanQuery(value: string) {
   return value.replace(/[<>\\]/g, ' ').replace(/\s+/g, ' ').trim().slice(0, 160)
@@ -102,6 +103,13 @@ function firstText(value: unknown): string | undefined {
     return typeof item === 'string' ? item.trim() : undefined
   }
   return typeof value === 'string' && value.trim() ? value.trim() : undefined
+}
+
+function openFdaSetUrl(setId: string | undefined) {
+  const clean = setId?.trim()
+  if (!clean) return undefined
+  const params = new URLSearchParams({ search: `set_id:"${clean}"`, limit: '1' })
+  return `${OPENFDA}?${params.toString()}`
 }
 
 async function searchEuropePmc(query: string, signal?: AbortSignal): Promise<LiteratureResult[]> {
@@ -185,6 +193,35 @@ async function searchTrials(query: string, signal?: AbortSignal): Promise<TrialR
 }
 
 async function searchDrugLabels(query: string, signal?: AbortSignal): Promise<DrugLabelResult[]> {
+  // Production deployments use the Panacea server adapter so request policy,
+  // upstream timeouts and source-identity handling stay in one tested place.
+  if (backendEnabled) {
+    if (signal?.aborted) throw abortError()
+    const data = await api.lookupDrug(query)
+    if (signal?.aborted) throw abortError()
+    if (data.error) throw new Error(data.error)
+
+    type BackendDrug = NonNullable<typeof data.drug> & {
+      labelId?: string
+      sourceUrl?: string
+    }
+    const drug = data.drug as BackendDrug | null
+    if (!drug) return []
+
+    return [{
+      id: drug.labelId || `query:${cleanQuery(query)}`,
+      brand: drug.brand || 'Brand not supplied',
+      generic: drug.generic || cleanQuery(query),
+      indication: drug.usage || drug.purpose || undefined,
+      warning: drug.warnings || undefined,
+      dosage: drug.dosage || undefined,
+      url: drug.sourceUrl || OPENFDA_DOCS,
+    }]
+  }
+
+  // Static demo fallback: openFDA is public/keyless, so GitHub Pages can still
+  // demonstrate label retrieval without pretending the production backend is
+  // present. This path retains the same bounded/cancellable client adapter.
   type OpenFdaResponse = {
     results?: Array<{
       id?: string
@@ -218,15 +255,18 @@ async function searchDrugLabels(query: string, signal?: AbortSignal): Promise<Dr
     if (lastError instanceof Error) throw lastError
     return []
   }
-  return data.results.map((item, index) => ({
-    id: item.id || item.set_id || `fda-${index}`,
-    brand: firstText(item.openfda?.brand_name) || 'Brand not supplied',
-    generic: firstText(item.openfda?.generic_name) || fdaTerm,
-    indication: firstText(item.indications_and_usage) || firstText(item.purpose),
-    warning: firstText(item.boxed_warning) || firstText(item.warnings_and_cautions) || firstText(item.warnings),
-    dosage: firstText(item.dosage_and_administration),
-    url: 'https://open.fda.gov/apis/drug/label/',
-  }))
+  return data.results.map((item, index) => {
+    const setId = item.set_id?.trim() || undefined
+    return {
+      id: setId || item.id || `fda-${index}`,
+      brand: firstText(item.openfda?.brand_name) || 'Brand not supplied',
+      generic: firstText(item.openfda?.generic_name) || fdaTerm,
+      indication: firstText(item.indications_and_usage) || firstText(item.purpose),
+      warning: firstText(item.boxed_warning) || firstText(item.warnings_and_cautions) || firstText(item.warnings),
+      dosage: firstText(item.dosage_and_administration),
+      url: openFdaSetUrl(setId) || OPENFDA_DOCS,
+    }
+  })
 }
 
 function message(error: unknown) {
