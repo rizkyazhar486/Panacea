@@ -2,6 +2,21 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import * as THREE from 'three'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
 import { RoomEnvironment } from 'three/examples/jsm/environments/RoomEnvironment.js'
+import { Pause, Play } from 'lucide-react'
+import { isAnatomyPickable } from '../../lib/anatomyMotion'
+
+function disposeMicroScene(root: THREE.Group) {
+  const geometries = new Set<THREE.BufferGeometry>()
+  const materials = new Set<THREE.Material>()
+  root.traverse(object => {
+    if (!(object instanceof THREE.Mesh || object instanceof THREE.Line || object instanceof THREE.Points)) return
+    geometries.add(object.geometry)
+    for (const material of Array.isArray(object.material) ? object.material : [object.material]) materials.add(material)
+  })
+  root.clear()
+  geometries.forEach(geometry => geometry.dispose())
+  materials.forEach(material => material.dispose())
+}
 
 export type MicroStage = 'cell' | 'nucleus' | 'chromatin' | 'dna' | 'sequencing'
 
@@ -456,8 +471,12 @@ function CurrentTrace() {
 export function CinematicCellGenomeExplorer({ initialStage = 'cell', compact = false }: { initialStage?: MicroStage; compact?: boolean }) {
   const containerRef = useRef<HTMLDivElement>(null)
   const [stage, setStage] = useState<MicroStage>(initialStage)
+  useEffect(() => { setStage(initialStage) }, [initialStage])
   const [selected, setSelected] = useState('')
   const [ready, setReady] = useState(false)
+  const [rotating, setRotating] = useState(false)
+  const rotatingRef = useRef(rotating)
+  rotatingRef.current = rotating
   const stageRef = useRef(stage)
   const rootRef = useRef<THREE.Group | null>(null)
   const cameraRef = useRef<THREE.PerspectiveCamera | null>(null)
@@ -480,7 +499,7 @@ export function CinematicCellGenomeExplorer({ initialStage = 'cell', compact = f
     renderer.outputColorSpace = THREE.SRGBColorSpace
     renderer.toneMapping = THREE.ACESFilmicToneMapping
     renderer.toneMappingExposure = 1.18
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2.5))
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, container.clientWidth < 640 ? 1.5 : 2))
     renderer.setSize(Math.max(container.clientWidth, 1), Math.max(container.clientHeight, 1), false)
     container.appendChild(renderer.domElement)
 
@@ -517,17 +536,24 @@ export function CinematicCellGenomeExplorer({ initialStage = 'cell', compact = f
 
     const raycaster = new THREE.Raycaster()
     const pointer = new THREE.Vector2()
+    let pointerStart: { x: number; y: number; id: number } | null = null
+    const startPick = (event: PointerEvent) => { pointerStart = event.isPrimary ? { x: event.clientX, y: event.clientY, id: event.pointerId } : null }
     const pick = (event: PointerEvent) => {
+      const start = pointerStart
+      pointerStart = null
+      if (!start || start.id !== event.pointerId || Math.hypot(event.clientX - start.x, event.clientY - start.y) > 5) return
       const rect = renderer.domElement.getBoundingClientRect()
+      if (!rect.width || !rect.height) return
       pointer.x = ((event.clientX - rect.left) / rect.width) * 2 - 1
       pointer.y = -((event.clientY - rect.top) / rect.height) * 2 + 1
       raycaster.setFromCamera(pointer, camera)
-      const hit = raycaster.intersectObject(root, true).find((item) => item.object.visible)
+      const hit = raycaster.intersectObject(root, true).find((item) => isAnatomyPickable(item.object, item.point))
       if (!hit) return
       let object: THREE.Object3D | null = hit.object
       while (object && !object.userData.label) object = object.parent
       if (object?.userData.label) setSelected(String(object.userData.label))
     }
+    renderer.domElement.addEventListener('pointerdown', startPick)
     renderer.domElement.addEventListener('pointerup', pick)
 
     const resize = () => {
@@ -535,7 +561,7 @@ export function CinematicCellGenomeExplorer({ initialStage = 'cell', compact = f
       const height = Math.max(container.clientHeight, 1)
       camera.aspect = width / height
       camera.updateProjectionMatrix()
-      renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2.5))
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, width < 640 ? 1.5 : 2))
       renderer.setSize(width, height, false)
     }
     const observer = new ResizeObserver(resize)
@@ -544,11 +570,14 @@ export function CinematicCellGenomeExplorer({ initialStage = 'cell', compact = f
 
     let animation = 0
     const clock = new THREE.Clock()
+    let visible = true
+    const visibilityObserver = new IntersectionObserver(([entry]) => { visible = entry.isIntersecting })
+    visibilityObserver.observe(container)
     const renderLoop = () => {
       animation = requestAnimationFrame(renderLoop)
-      const elapsed = clock.getElapsedTime()
-      if (rootRef.current && stageRef.current !== 'sequencing') rootRef.current.rotation.y += 0.00045
-      if (stageRef.current === 'sequencing' && rootRef.current) rootRef.current.position.y = Math.sin(elapsed * 0.45) * 0.015
+      const delta = Math.min(clock.getDelta(), 0.05)
+      if (document.hidden || !visible) return
+      if (rotatingRef.current) root.rotation.y += delta * 0.027
       controls.update()
       renderer.render(scene, camera)
     }
@@ -558,8 +587,11 @@ export function CinematicCellGenomeExplorer({ initialStage = 'cell', compact = f
     return () => {
       cancelAnimationFrame(animation)
       observer.disconnect()
+      visibilityObserver.disconnect()
+      renderer.domElement.removeEventListener('pointerdown', startPick)
       renderer.domElement.removeEventListener('pointerup', pick)
       controls.dispose()
+      disposeMicroScene(root)
       environment.dispose()
       pmrem.dispose()
       renderer.dispose()
@@ -576,7 +608,7 @@ export function CinematicCellGenomeExplorer({ initialStage = 'cell', compact = f
     const camera = cameraRef.current
     const controls = controlsRef.current
     if (!root || !camera || !controls) return
-    while (root.children.length) root.remove(root.children[0])
+    disposeMicroScene(root)
     root.position.set(0, 0, 0)
     root.rotation.set(0, 0, 0)
     setSelected('')
@@ -623,6 +655,9 @@ export function CinematicCellGenomeExplorer({ initialStage = 'cell', compact = f
       <div className={`grid ${stage === 'sequencing' ? 'xl:grid-cols-[1.3fr_.7fr]' : 'xl:grid-cols-[1fr_320px]'}`}>
         <div className={`relative ${compact ? 'h-[500px]' : 'h-[590px]'} min-w-0 border-b border-white/8 xl:border-b-0 xl:border-r`}>
           <div ref={containerRef} className="absolute inset-0" />
+          <button type="button" aria-label={rotating ? 'Pause rotation' : 'Rotate model'} title={rotating ? 'Pause rotation' : 'Rotate model'} aria-pressed={rotating} onClick={() => setRotating(value => !value)} className="absolute right-3 top-3 z-10 grid h-10 w-10 place-items-center rounded-lg border border-white/20 bg-black/70 text-white">
+            {rotating ? <Pause size={18} /> : <Play size={18} />}
+          </button>
           <div className="pointer-events-none absolute left-3 top-3 rounded-xl border border-white/10 bg-black/42 px-3 py-2 backdrop-blur-xl">
             <div className="text-[8px] font-black uppercase tracking-[.16em] text-violet-200">{meta.label} · {meta.scale}</div>
             <div className="mt-1 max-w-xs text-[9px] leading-relaxed text-white/42">Drag to orbit · pinch/scroll to zoom · tap a structure</div>

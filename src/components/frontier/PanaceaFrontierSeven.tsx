@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react'
+import { parseFrontierState } from '../../lib/frontierState'
 
 type ToolKey = 'time' | 'decision' | 'knowledge' | 'family' | 'social' | 'autopilot' | 'future'
 type Domain = 'Time' | 'Health' | 'Money' | 'Knowledge' | 'Social' | 'Family' | 'Career'
@@ -44,7 +45,7 @@ const MICRO: Record<Domain, string[]> = {
 
 function loadState(): StoredState {
   try {
-    return JSON.parse(localStorage.getItem(STORE) || '{}') as StoredState
+    return parseFrontierState(JSON.parse(localStorage.getItem(STORE) || '{}'))
   } catch {
     return {}
   }
@@ -66,7 +67,7 @@ export function PanaceaFrontierSeven() {
 
   function patch(partial: Partial<StoredState>) {
     setState((current) => {
-      const next = { ...current, ...partial }
+      const next = parseFrontierState({ ...current, ...partial })
       saveState(next)
       return next
     })

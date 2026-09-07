@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState, type ReactNode } from 'react'
+import { ChevronLeft, ChevronRight } from 'lucide-react'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Tumpukan widget — beberapa widget menempati SATU petak, digeser mendatar.
@@ -150,7 +151,7 @@ export function Tumpukan({ judul, anak, aksi }: { judul?: string; anak: { kunci:
       jalan = true
       requestAnimationFrame(() => {
         const i = Math.round(el.scrollLeft / Math.max(1, el.clientWidth))
-        setAktif(Math.max(0, i))
+        setAktif(Math.max(0, Math.min(i, tampil.length - 1)))
         jalan = false
       })
     }
@@ -168,7 +169,7 @@ export function Tumpukan({ judul, anak, aksi }: { judul?: string; anak: { kunci:
       el.removeEventListener('wheel', tandai)
       el.removeEventListener('keydown', tandai)
     }
-  }, [anak.length])
+  }, [anak.length, tampil.length])
 
   /* DIKUNCI ULANG KE TEPI HALAMAN SETELAH SUSUNANNYA BERUBAH.
      Halaman dipasang bertahap dan halaman kosong disembunyikan, jadi jumlah
@@ -195,15 +196,16 @@ export function Tumpukan({ judul, anak, aksi }: { judul?: string; anak: { kunci:
   const ke = (i: number) => {
     digeser.current = true
     const el = wadah.current
-    if (el) el.scrollTo({ left: i * el.clientWidth, behavior: 'smooth' })
+    if (el) el.scrollTo({ left: Math.max(0, Math.min(i, tampil.length - 1)) * el.clientWidth, behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches || document.documentElement.classList.contains('reduce-motion') ? 'auto' : 'smooth' })
   }
 
   return (
-    <section>
+    <section aria-roledescription="carousel" aria-label={judul || 'Dashboard widgets'}>
       {judul && (
-        <div className="mb-2 flex items-center justify-between gap-2">
+        <div className="mb-2 flex flex-wrap items-center justify-between gap-2">
           <h2 className="t-kecil font-black uppercase tracking-wide text-neutral-500">{judul}</h2>
           {aksi}
+          {tampil.length > 1 && <div className="flex gap-1"><button className="grid h-9 w-9 place-items-center rounded-lg border border-neutral-300 dark:border-white/20 disabled:opacity-30" aria-label="Previous widget" title="Previous widget" disabled={aktif === 0} onClick={() => ke(aktif - 1)}><ChevronLeft size={17} /></button><button className="grid h-9 w-9 place-items-center rounded-lg border border-neutral-300 dark:border-white/20 disabled:opacity-30" aria-label="Next widget" title="Next widget" disabled={aktif >= tampil.length - 1} onClick={() => ke(aktif + 1)}><ChevronRight size={17} /></button></div>}
           {/* Titik halaman: penanda letak DAN tombol. Pada iOS titik ini hanya
               penanda, tetapi di sini ia juga dapat ditekan — pada layar sentuh
               yang lebar, menggeser empat kali lebih lelah daripada menekan
@@ -214,7 +216,7 @@ export function Tumpukan({ judul, anak, aksi }: { judul?: string; anak: { kunci:
               layar. Di atas sepuluh halaman, penandanya menjadi bilah kemajuan
               beserta nomornya: satu benda kecil yang tetap terbaca berapa pun
               banyaknya. */}
-          {tampil.length > 10 ? (
+          {tampil.length > 4 ? (
             <div className="ml-auto flex shrink-0 items-center gap-1.5">
               <span className="t-mikro tabular-nums text-neutral-400">{aktif + 1}/{tampil.length}</span>
               <span className="block h-1.5 w-16 rounded-full bg-neutral-300 dark:bg-white/25" aria-hidden>
@@ -232,8 +234,8 @@ export function Tumpukan({ judul, anak, aksi }: { judul?: string; anak: { kunci:
                   onClick={() => ke(i)}
                   aria-label={`Widget ${i + 1} of ${tampil.length}`}
                   aria-current={i === aktif}
-                  className={`h-1.5 rounded-full transition-all ${i === aktif ? 'w-4 bg-brand' : 'w-1.5 bg-neutral-300 dark:bg-white/25'}`}
-                />
+                  className="grid h-7 w-7 place-items-center"
+                ><span className={`h-1.5 rounded-full ${i === aktif ? 'w-4 bg-brand' : 'w-1.5 bg-neutral-300 dark:bg-white/25'}`} /></button>
               ))}
             </div>
           )}
@@ -244,6 +246,9 @@ export function Tumpukan({ judul, anak, aksi }: { judul?: string; anak: { kunci:
           kembali milik sistem di tepi layar. */}
       <div
         ref={wadah}
+        tabIndex={0}
+        aria-label="Scrollable widgets"
+        onKeyDown={event => { if (event.target !== event.currentTarget) return; if (event.key === 'ArrowRight') { event.preventDefault(); ke(aktif + 1) } else if (event.key === 'ArrowLeft') { event.preventDefault(); ke(aktif - 1) } }}
         className="geser-halaman"
         /* Tanpa transisi tinggi: tingginya sekarang sama untuk semua halaman,
            jadi tidak ada yang perlu dianimasikan — dan animasi tinggi pada

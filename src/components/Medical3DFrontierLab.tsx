@@ -1,28 +1,35 @@
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import * as THREE from 'three'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
-import { Card, SectionTitle } from './ui'
+import { Pause, Play, RotateCcw, Scan } from 'lucide-react'
+import { advanceMedicalTime, flowParticlePhase, medicalCameraDistance, MEDICAL_4D_DURATION } from '../lib/medical4D'
+import './medical4D.css'
 import {
   MEDICAL_3D_FRONTIER,
   medical3DFrontierSpec,
   relativeFlowIndex,
   relativePoiseuilleResistance,
+  relativeVelocityIndex,
   type Medical3DFrontierId,
 } from '../lib/medical3DFrontier'
 
 function clearScene(scene: THREE.Scene) {
+  const geometries = new Set<THREE.BufferGeometry>()
+  const materials = new Set<THREE.Material>()
   const keep = new Set(scene.children.filter((x) => x.userData.keep))
   for (const child of [...scene.children]) {
     if (keep.has(child)) continue
     scene.remove(child)
     child.traverse((obj) => {
       const mesh = obj as THREE.Mesh
-      mesh.geometry?.dispose?.()
+      if (mesh.geometry) geometries.add(mesh.geometry)
       const material = mesh.material
-      if (Array.isArray(material)) material.forEach((m) => m.dispose())
-      else material?.dispose?.()
+      if (Array.isArray(material)) material.forEach((m) => materials.add(m))
+      else if (material) materials.add(material)
     })
   }
+  geometries.forEach(g => g.dispose())
+  materials.forEach(m => m.dispose())
 }
 
 function material(color: number, opacity = 1, emissive = 0) {
@@ -58,8 +65,7 @@ function addFlowParticles(scene: THREE.Scene, curve: THREE.Curve<THREE.Vector3>,
 }
 
 function buildHemodynamics(scene: THREE.Scene) {
-  const chamberMat = material(0x7f1d1d, 0.56)
-  const left = new THREE.Mesh(new THREE.SphereGeometry(0.78, 40, 40), chamberMat.clone())
+  const left = new THREE.Mesh(new THREE.SphereGeometry(0.78, 40, 40), material(0xb44444, 0.56))
   left.scale.set(0.85, 1.15, 0.78)
   left.position.set(-0.55, -0.25, 0)
   const right = left.clone()
@@ -170,158 +176,178 @@ export function Medical3DFrontierLab() {
   const [mode, setMode] = useState<Medical3DFrontierId>('hemodynamics-4d')
   const [deltaPressure, setDeltaPressure] = useState(1)
   const [radiusRatio, setRadiusRatio] = useState(1)
-  const spec = useMemo(() => medical3DFrontierSpec(mode), [mode])
+  const [playing, setPlaying] = useState(() => !window.matchMedia('(prefers-reduced-motion: reduce)').matches)
+  const [speed, setSpeed] = useState(1)
+  const [time, setTime] = useState(0)
+  const [retry, setRetry] = useState(0)
+  const [error, setError] = useState('')
+  const timeRef = useRef(0)
+  const settings = useRef({ playing, speed, deltaPressure, radiusRatio })
+  settings.current = { playing, speed, deltaPressure, radiusRatio }
+  const resetCamera = useRef<() => void>(() => {})
+  const spec = medical3DFrontierSpec(mode)
   const resistance = relativePoiseuilleResistance(radiusRatio)
   const flow = relativeFlowIndex(deltaPressure, radiusRatio)
+  const velocity = relativeVelocityIndex(deltaPressure, radiusRatio)
+
+  function seek(value: number) {
+    timeRef.current = value
+    setTime(value)
+  }
+
+  useEffect(() => {
+    const preference = window.matchMedia('(prefers-reduced-motion: reduce)')
+    const changed = () => { if (preference.matches) setPlaying(false) }
+    preference.addEventListener('change', changed)
+    return () => preference.removeEventListener('change', changed)
+  }, [])
 
   useEffect(() => {
     const mount = mountRef.current
     if (!mount) return
-
-    const scene = new THREE.Scene()
-    scene.background = new THREE.Color(0x05080c)
-    scene.fog = new THREE.Fog(0x05080c, 6, 12)
-    const camera = new THREE.PerspectiveCamera(38, 1, 0.1, 100)
-    camera.position.set(0, 0.4, 6.7)
-
-    const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false })
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
+    setError('')
+    let renderer: THREE.WebGLRenderer
+    try { renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false }) }
+    catch { setError('3D graphics are unavailable. Model parameters remain available.'); setPlaying(false); return }
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.75))
     renderer.outputColorSpace = THREE.SRGBColorSpace
+    renderer.domElement.setAttribute('role', 'img')
+    renderer.domElement.setAttribute('aria-label', medical3DFrontierSpec(mode).shortLabel + ' educational 4D scene')
     mount.appendChild(renderer.domElement)
 
-    const ambient = new THREE.AmbientLight(0xffffff, 1.5)
-    ambient.userData.keep = true
+    const scene = new THREE.Scene()
+    scene.background = new THREE.Color(0x111b1c)
+    const camera = new THREE.PerspectiveCamera(38, 1, 0.1, 100)
+    const ambient = new THREE.HemisphereLight(0xffffff, 0x657772, 2.2)
     const key = new THREE.DirectionalLight(0xffffff, 3.2)
     key.position.set(4, 6, 5)
-    key.userData.keep = true
-    const rim = new THREE.DirectionalLight(0x60a5fa, 2.2)
+    const rim = new THREE.DirectionalLight(0x9ee5d1, 2)
     rim.position.set(-5, 2, -4)
-    rim.userData.keep = true
+    buildMode(scene, mode)
+    const bounds = new THREE.Box3().setFromObject(scene).getBoundingSphere(new THREE.Sphere())
     scene.add(ambient, key, rim)
 
     const controls = new OrbitControls(camera, renderer.domElement)
     controls.enableDamping = true
-    controls.minDistance = 3.2
-    controls.maxDistance = 10
-
+    controls.enablePan = false
+    controls.target.copy(bounds.center)
+    const frameCamera = () => {
+      const distance = medicalCameraDistance(bounds.radius * 1.08, camera.aspect, camera.fov)
+      camera.position.copy(bounds.center).add(new THREE.Vector3(0, 0, distance))
+      controls.target.copy(bounds.center)
+      controls.minDistance = bounds.radius * 1.25
+      controls.maxDistance = distance * 3
+      camera.far = Math.max(100, distance * 5)
+      camera.updateProjectionMatrix()
+      controls.update()
+    }
+    resetCamera.current = frameCamera
     const resize = () => {
-      const w = Math.max(1, mount.clientWidth)
-      const h = Math.max(1, mount.clientHeight)
+      const w = mount.clientWidth, h = mount.clientHeight
+      if (!w || !h) return
       renderer.setSize(w, h, false)
       camera.aspect = w / h
-      camera.updateProjectionMatrix()
+      frameCamera()
     }
     const observer = new ResizeObserver(resize)
     observer.observe(mount)
     resize()
-    buildMode(scene, mode)
 
-    let raf = 0
-    const clock = new THREE.Clock()
-    const animate = () => {
-      raf = requestAnimationFrame(animate)
-      const t = clock.getElapsedTime()
-      scene.traverse((obj) => {
-        const group = obj as THREE.Group
-        const curve = group.userData.flowCurve as THREE.Curve<THREE.Vector3> | undefined
-        if (curve) {
-          group.children.forEach((child) => {
-            const phase = (child.userData.phase as number | undefined) ?? 0
-            const p = curve.getPoint((phase + t * 0.13) % 1)
-            child.position.copy(p)
-          })
-        }
-        const stage = obj.userData.embryoStage as number | undefined
-        if (stage !== undefined) {
-          const pulse = 1 + Math.sin(t * 1.4 + stage * 0.7) * 0.025
-          obj.scale.setScalar(pulse)
-        }
-      })
-      controls.update()
-      renderer.render(scene, camera)
+    const flows: THREE.Group[] = []
+    const stages: THREE.Object3D[] = []
+    const tubes: THREE.Mesh<THREE.TubeGeometry>[] = []
+    scene.traverse(obj => {
+      if (obj.userData.flowCurve) flows.push(obj as THREE.Group)
+      if (obj.userData.embryoStage !== undefined) stages.push(obj)
+      if (mode === 'hemodynamics-4d' && obj instanceof THREE.Mesh && obj.geometry instanceof THREE.TubeGeometry) {
+        obj.userData.baseRadius = obj.geometry.parameters.radius
+        tubes.push(obj)
+      }
+    })
+    let raf = 0, last = performance.now(), published = 0, previousRadius = 1, contextLost = false
+    const onContextLost = (event: Event) => {
+      event.preventDefault()
+      contextLost = true
+      cancelAnimationFrame(raf)
+      setPlaying(false)
+      setError('Graphics context lost. Reload the scene to continue.')
     }
-    animate()
-
+    renderer.domElement.addEventListener('webglcontextlost', onContextLost)
+    const animate = (now: number) => {
+      if (contextLost) return
+      const dt = (now - last) / 1000
+      last = now
+      const current = settings.current
+      const active = current.playing && !document.hidden && mount.clientWidth > 0
+      timeRef.current = advanceMedicalTime(timeRef.current, dt, current.speed, active)
+      const t = timeRef.current
+      if (active && t >= MEDICAL_4D_DURATION) setPlaying(false)
+      if (now - published >= 100) { setTime(t); published = now }
+      if (previousRadius !== current.radiusRatio) {
+        for (const tube of tubes) {
+          const path = tube.geometry.parameters.path
+          tube.geometry.dispose()
+          tube.geometry = new THREE.TubeGeometry(path, 96, tube.userData.baseRadius * current.radiusRatio, 12, false)
+        }
+        previousRadius = current.radiusRatio
+      }
+      const speedIndex = mode === 'hemodynamics-4d' ? relativeVelocityIndex(current.deltaPressure, current.radiusRatio) : 1
+      for (const group of flows) {
+        const curve = group.userData.flowCurve as THREE.Curve<THREE.Vector3>
+        for (const child of group.children) curve.getPointAt(flowParticlePhase(t, child.userData.phase, speedIndex), child.position)
+      }
+      for (const obj of stages) obj.scale.setScalar(1 + Math.sin(t * 1.4 + obj.userData.embryoStage * 0.7) * 0.025)
+      controls.update()
+      if (!document.hidden) renderer.render(scene, camera)
+      raf = requestAnimationFrame(animate)
+    }
+    raf = requestAnimationFrame(animate)
     return () => {
       cancelAnimationFrame(raf)
       observer.disconnect()
+      renderer.domElement.removeEventListener('webglcontextlost', onContextLost)
       controls.dispose()
       clearScene(scene)
       renderer.dispose()
       renderer.domElement.remove()
+      resetCamera.current = () => {}
     }
-  }, [mode])
+  }, [mode, retry])
 
   return (
-    <Card className="!p-0 overflow-hidden">
-      <div className="p-5 pb-3">
-        <SectionTitle
-          title="3D Frontier Medical Lab"
-          subtitle="Four high-value spatial modules that do not duplicate the existing anatomy, cell, surgery or biomechanics labs"
-        />
-        <div className="mt-4 flex flex-wrap gap-2">
-          {MEDICAL_3D_FRONTIER.map((item) => (
-            <button
-              key={item.id}
-              type="button"
-              onClick={() => setMode(item.id)}
-              className={`rounded-full border px-3 py-1.5 text-xs font-bold transition ${mode === item.id ? 'border-brand bg-brand/15 text-brand-dark dark:text-brand' : 'border-neutral-200 bg-white text-neutral-500 hover:border-brand/40 dark:border-white/10 dark:bg-white/5'}`}
-            >
-              {item.shortLabel}
-            </button>
-          ))}
-        </div>
+    <section className="medical-4d" aria-label="4D medical lab">
+      <header className="medical-4d-heading">
+        <div><span className="medical-4d-kicker">Educational simulation</span><h2>4D Medical Lab</h2></div>
+        <span className="medical-4d-origin">Procedural geometry / 3D + time</span>
+      </header>
+      <div className="medical-4d-modes" aria-label="Medical scene">
+        {MEDICAL_3D_FRONTIER.map(item => (
+          <button key={item.id} type="button" aria-pressed={mode === item.id} onClick={() => { setMode(item.id); seek(0) }}>{item.shortLabel}</button>
+        ))}
       </div>
-
-      <div className="relative border-y border-neutral-100 bg-[#05080c] dark:border-white/10">
-        <div ref={mountRef} className="h-[430px] w-full touch-none" aria-label={`${spec.label} interactive 3D teaching scene`} />
-        <div className="pointer-events-none absolute left-3 top-3 max-w-[72%] rounded-xl border border-white/10 bg-black/45 px-3 py-2 backdrop-blur">
-          <div className="text-xs font-black text-white">{spec.label}</div>
-          <div className="mt-1 text-[10px] leading-snug text-white/65">Drag to orbit · pinch/scroll to zoom · educational schematic</div>
-        </div>
+      <div className="medical-4d-stage">
+        <div className="medical-4d-caption">{spec.shortLabel}<span>Schematic, not patient data</span></div>
+        <div ref={mountRef} className="medical-4d-canvas" />
+        {error && <div className="medical-4d-error" role="alert"><p>{error}</p><button onClick={() => setRetry(n => n + 1)}><RotateCcw size={16} /> Reload scene</button></div>}
       </div>
-
-      <div className="grid gap-4 p-5 lg:grid-cols-[1.15fr_.85fr]">
-        <div className="space-y-3">
-          <p className="text-sm leading-relaxed text-neutral-600 dark:text-neutral-300">{spec.mission}</p>
-          <div>
-            <div className="text-[10px] font-black uppercase tracking-wider text-neutral-400">Layers</div>
-            <div className="mt-2 flex flex-wrap gap-1.5">
-              {spec.visualLayers.map((x) => <span key={x} className="rounded-full bg-neutral-100 px-2 py-1 text-[10px] font-bold text-neutral-600 dark:bg-white/5 dark:text-neutral-300">{x}</span>)}
-            </div>
-          </div>
-          <div className="rounded-xl border border-amber-200 bg-amber-50 p-3 text-[11px] leading-relaxed text-amber-900 dark:border-amber-500/20 dark:bg-amber-500/10 dark:text-amber-100">
-            <b>Truth boundary:</b> {spec.scientificBoundary}
-          </div>
-        </div>
-
-        <div className="space-y-3">
-          {mode === 'hemodynamics-4d' ? (
-            <div className="rounded-2xl border border-neutral-100 p-4 dark:border-white/10">
-              <div className="text-xs font-black">Relative hemodynamics teaching model</div>
-              <label className="mt-3 block text-[11px] font-bold text-neutral-500">Pressure gradient index: {deltaPressure.toFixed(1)}</label>
-              <input className="w-full accent-green-600" type="range" min="0" max="2" step="0.1" value={deltaPressure} onChange={(e) => setDeltaPressure(Number(e.target.value))} />
-              <label className="mt-3 block text-[11px] font-bold text-neutral-500">Radius ratio: {radiusRatio.toFixed(2)}×</label>
-              <input className="w-full accent-green-600" type="range" min="0.5" max="1.5" step="0.05" value={radiusRatio} onChange={(e) => setRadiusRatio(Number(e.target.value))} />
-              <div className="mt-3 grid grid-cols-2 gap-2 text-center">
-                <div className="rounded-xl bg-neutral-50 p-2 dark:bg-white/5"><div className="text-[9px] uppercase text-neutral-400">Relative R</div><div className="text-lg font-black">{resistance.toFixed(2)}</div></div>
-                <div className="rounded-xl bg-neutral-50 p-2 dark:bg-white/5"><div className="text-[9px] uppercase text-neutral-400">Flow index</div><div className="text-lg font-black">{flow.toFixed(2)}</div></div>
-              </div>
-              <div className="mt-2 text-[10px] leading-relaxed text-neutral-500">Teaching relationship: R ∝ 1/r⁴ and Q ∝ ΔP/R. This is not clinical flow quantification.</div>
-            </div>
-          ) : null}
-
-          <div className="rounded-2xl border border-neutral-100 p-4 dark:border-white/10">
-            <div className="text-[10px] font-black uppercase tracking-wider text-neutral-400">Astra target</div>
-            <p className="mt-1 text-[11px] leading-relaxed text-neutral-600 dark:text-neutral-300">{spec.astraTarget}</p>
-          </div>
-          <div className="rounded-2xl border border-neutral-100 p-4 dark:border-white/10">
-            <div className="text-[10px] font-black uppercase tracking-wider text-neutral-400">Integrate with</div>
-            <div className="mt-2 flex flex-wrap gap-1.5">{spec.integrations.map((x) => <span key={x} className="rounded-lg bg-brand/10 px-2 py-1 text-[10px] font-bold text-brand-dark dark:text-brand">{x}</span>)}</div>
-          </div>
-        </div>
+      <div className="medical-4d-timeline">
+        <button className="medical-4d-icon" disabled={!!error} title={playing ? 'Pause time' : 'Play time'} aria-label={playing ? 'Pause time' : 'Play time'} onClick={() => { if (timeRef.current >= MEDICAL_4D_DURATION) seek(0); setPlaying(!playing) }}>{playing ? <Pause size={18} /> : <Play size={18} />}</button>
+        <button className="medical-4d-icon" title="Restart time" aria-label="Restart time" onClick={() => seek(0)}><RotateCcw size={17} /></button>
+        <label className="medical-4d-scrubber">Simulation time
+          <input type="range" min="0" max={MEDICAL_4D_DURATION} step="0.01" value={time} onChange={e => { setPlaying(false); seek(Number(e.target.value)) }} />
+        </label>
+        <output className="medical-4d-time" aria-label="Elapsed simulation time">{time.toFixed(2)} s</output>
+        <label className="medical-4d-speed">Speed<select value={speed} onChange={e => setSpeed(Number(e.target.value))}><option value="0.25">0.25x</option><option value="0.5">0.5x</option><option value="1">1x</option><option value="2">2x</option></select></label>
+        <button className="medical-4d-icon" title="Fit model" aria-label="Fit model" onClick={() => resetCamera.current()}><Scan size={18} /></button>
       </div>
-    </Card>
+      {mode === 'hemodynamics-4d' && <div className="medical-4d-parameters">
+        <label>Pressure gradient index <output>{deltaPressure.toFixed(1)}</output><input aria-label="Pressure gradient index" type="range" min="0" max="2" step="0.1" value={deltaPressure} onChange={e => setDeltaPressure(Number(e.target.value))} /></label>
+        <label>Vessel radius ratio <output>{radiusRatio.toFixed(2)}x</output><input aria-label="Vessel radius ratio" type="range" min="0.5" max="1.5" step="0.05" value={radiusRatio} onChange={e => setRadiusRatio(Number(e.target.value))} /></label>
+        <dl><div><dt>Relative resistance</dt><dd>{resistance.toFixed(2)}</dd></div><div><dt>Flow index</dt><dd>{flow.toFixed(2)}</dd></div><div><dt>Mean-speed index</dt><dd>{velocity.toFixed(2)}</dd></div></dl>
+        <p className="medical-4d-assumption">Fixed length and viscosity; ideal steady laminar flow. R = 1/r⁴, Q = ΔP/R, mean speed = Q/r². Particle transit is illustrative; this is not pulsatile CFD or measured blood velocity. <a href="https://openstax.org/books/college-physics/pages/12-4-viscosity-and-laminar-flow-poiseuilles-law" target="_blank" rel="noreferrer">Model reference</a></p>
+      </div>}
+      <p className="medical-4d-boundary">{spec.scientificBoundary}</p>
+    </section>
   )
 }
 

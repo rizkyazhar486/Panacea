@@ -1,0 +1,1077 @@
+{
+  "generatedAt": "2026-09-06T07:20:52.394Z",
+  "repositories": [
+    {
+      "repo": "actigraph/pygt3x",
+      "url": "https://github.com/actigraph/pygt3x",
+      "status": "Reference only",
+      "version": null,
+      "license": "Not reviewed",
+      "verification": "User/reference candidate; existence, license and compatibility require review"
+    },
+    {
+      "repo": "agkirici/gene-expression-atlas",
+      "url": "https://github.com/agkirici/gene-expression-atlas",
+      "status": "Reference only",
+      "version": null,
+      "license": "Not reviewed",
+      "verification": "User/reference candidate; existence, license and compatibility require review"
+    },
+    {
+      "repo": "allenai/scispacy",
+      "url": "https://github.com/allenai/scispacy",
+      "status": "Reference only",
+      "version": null,
+      "license": "Not reviewed",
+      "verification": "User/reference candidate; existence, license and compatibility require review"
+    },
+    {
+      "repo": "apple/ml-heart-rate-models",
+      "url": "https://github.com/apple/ml-heart-rate-models",
+      "status": "Reference only",
+      "version": null,
+      "license": "Not reviewed",
+      "verification": "User/reference candidate; existence, license and compatibility require review"
+    },
+    {
+      "repo": "aqlaboratory/openfold",
+      "url": "https://github.com/aqlaboratory/openfold",
+      "status": "Reference only",
+      "version": null,
+      "license": "Not reviewed",
+      "verification": "User/reference candidate; existence, license and compatibility require review"
+    },
+    {
+      "repo": "ayush00git/ProtPocket",
+      "url": "https://github.com/ayush00git/ProtPocket",
+      "status": "Reference only",
+      "version": null,
+      "license": "Not reviewed",
+      "verification": "User/reference candidate; existence, license and compatibility require review"
+    },
+    {
+      "repo": "b55585wy/wearable-health-research",
+      "url": "https://github.com/b55585wy/wearable-health-research",
+      "status": "Reference only",
+      "version": null,
+      "license": "Not reviewed",
+      "verification": "User/reference candidate; existence, license and compatibility require review"
+    },
+    {
+      "repo": "BabylonJS/Babylon.js",
+      "url": "https://github.com/BabylonJS/Babylon.js",
+      "status": "Reference only",
+      "version": null,
+      "license": "Not reviewed",
+      "verification": "User/reference candidate; existence, license and compatibility require review"
+    },
+    {
+      "repo": "biopython/biopython",
+      "url": "https://github.com/biopython/biopython",
+      "status": "Reference only",
+      "version": null,
+      "license": "Not reviewed",
+      "verification": "User/reference candidate; existence, license and compatibility require review"
+    },
+    {
+      "repo": "biotite-dev/biotite",
+      "url": "https://github.com/biotite-dev/biotite",
+      "status": "Reference only",
+      "version": null,
+      "license": "Not reviewed",
+      "verification": "User/reference candidate; existence, license and compatibility require review"
+    },
+    {
+      "repo": "bowang-lab/MedSAM",
+      "url": "https://github.com/bowang-lab/MedSAM",
+      "status": "Reference only",
+      "version": null,
+      "license": "Not reviewed",
+      "verification": "User/reference candidate; existence, license and compatibility require review"
+    },
+    {
+      "repo": "Boyonbike/oAM-openAthleteMetrics",
+      "url": "https://github.com/Boyonbike/oAM-openAthleteMetrics",
+      "status": "Reference only",
+      "version": null,
+      "license": "Not reviewed",
+      "verification": "User/reference candidate; existence, license and compatibility require review"
+    },
+    {
+      "repo": "broadinstitute/cell-health",
+      "url": "https://github.com/broadinstitute/cell-health",
+      "status": "Reference only",
+      "version": null,
+      "license": "Not reviewed",
+      "verification": "User/reference candidate; existence, license and compatibility require review"
+    },
+    {
+      "repo": "broadinstitute/cromwell",
+      "url": "https://github.com/broadinstitute/cromwell",
+      "status": "Reference only",
+      "version": null,
+      "license": "Not reviewed",
+      "verification": "User/reference candidate; existence, license and compatibility require review"
+    },
+    {
+      "repo": "broadinstitute/firecloud-orchestration",
+      "url": "https://github.com/broadinstitute/firecloud-orchestration",
+      "status": "Reference only",
+      "version": null,
+      "license": "Not reviewed",
+      "verification": "User/reference candidate; existence, license and compatibility require review"
+    },
+    {
+      "repo": "broadinstitute/gatk",
+      "url": "https://github.com/broadinstitute/gatk",
+      "status": "Reference only",
+      "version": null,
+      "license": "Not reviewed",
+      "verification": "User/reference candidate; existence, license and compatibility require review"
+    },
+    {
+      "repo": "cambridgeltl/SapBERT",
+      "url": "https://github.com/cambridgeltl/SapBERT",
+      "status": "Reference only",
+      "version": null,
+      "license": "Not reviewed",
+      "verification": "User/reference candidate; existence, license and compatibility require review"
+    },
+    {
+      "repo": "cBioPortal/cbioportal",
+      "url": "https://github.com/cBioPortal/cbioportal",
+      "status": "Reference only",
+      "version": null,
+      "license": "Not reviewed",
+      "verification": "User/reference candidate; existence, license and compatibility require review"
+    },
+    {
+      "repo": "cBioPortal/datahub",
+      "url": "https://github.com/cBioPortal/datahub",
+      "status": "Reference only",
+      "version": null,
+      "license": "Not reviewed",
+      "verification": "User/reference candidate; existence, license and compatibility require review"
+    },
+    {
+      "repo": "chadepickering/clinical_trial_eligibility",
+      "url": "https://github.com/chadepickering/clinical_trial_eligibility",
+      "status": "Reference only",
+      "version": null,
+      "license": "Not reviewed",
+      "verification": "User/reference candidate; existence, license and compatibility require review"
+    },
+    {
+      "repo": "chanzuckerberg/cellxgene",
+      "url": "https://github.com/chanzuckerberg/cellxgene",
+      "status": "Reference only",
+      "version": null,
+      "license": "Not reviewed",
+      "verification": "User/reference candidate; existence, license and compatibility require review"
+    },
+    {
+      "repo": "chemprop/chemprop",
+      "url": "https://github.com/chemprop/chemprop",
+      "status": "Reference only",
+      "version": null,
+      "license": "Not reviewed",
+      "verification": "User/reference candidate; existence, license and compatibility require review"
+    },
+    {
+      "repo": "ChengLiLab/SCALE",
+      "url": "https://github.com/ChengLiLab/SCALE",
+      "status": "Reference only",
+      "version": null,
+      "license": "Not reviewed",
+      "verification": "User/reference candidate; existence, license and compatibility require review"
+    },
+    {
+      "repo": "ClinicDx/ClinicDx",
+      "url": "https://github.com/ClinicDx/ClinicDx",
+      "status": "Reference only",
+      "version": null,
+      "license": "Not reviewed",
+      "verification": "User/reference candidate; existence, license and compatibility require review"
+    },
+    {
+      "repo": "Dana-Farber-AIOS/pathml",
+      "url": "https://github.com/Dana-Farber-AIOS/pathml",
+      "status": "Reference only",
+      "version": null,
+      "license": "Not reviewed",
+      "verification": "User/reference candidate; existence, license and compatibility require review"
+    },
+    {
+      "repo": "datamol-io/datamol",
+      "url": "https://github.com/datamol-io/datamol",
+      "status": "Reference only",
+      "version": null,
+      "license": "Not reviewed",
+      "verification": "User/reference candidate; existence, license and compatibility require review"
+    },
+    {
+      "repo": "dauparas/ProteinMPNN",
+      "url": "https://github.com/dauparas/ProteinMPNN",
+      "status": "Reference only",
+      "version": null,
+      "license": "Not reviewed",
+      "verification": "User/reference candidate; existence, license and compatibility require review"
+    },
+    {
+      "repo": "dayoonkwon/BioAge",
+      "url": "https://github.com/dayoonkwon/BioAge",
+      "status": "Reference only",
+      "version": null,
+      "license": "Not reviewed",
+      "verification": "User/reference candidate; existence, license and compatibility require review"
+    },
+    {
+      "repo": "dbensoussan/rsna",
+      "url": "https://github.com/dbensoussan/rsna",
+      "status": "Reference only",
+      "version": null,
+      "license": "Not reviewed",
+      "verification": "User/reference candidate; existence, license and compatibility require review"
+    },
+    {
+      "repo": "dcm4che/dcm4che",
+      "url": "https://github.com/dcm4che/dcm4che",
+      "status": "Reference only",
+      "version": null,
+      "license": "Not reviewed",
+      "verification": "User/reference candidate; existence, license and compatibility require review"
+    },
+    {
+      "repo": "deepchem/deepchem",
+      "url": "https://github.com/deepchem/deepchem",
+      "status": "Reference only",
+      "version": null,
+      "license": "Not reviewed",
+      "verification": "User/reference candidate; existence, license and compatibility require review"
+    },
+    {
+      "repo": "DeepPSP/torch_ecg",
+      "url": "https://github.com/DeepPSP/torch_ecg",
+      "status": "Reference only",
+      "version": null,
+      "license": "Not reviewed",
+      "verification": "User/reference candidate; existence, license and compatibility require review"
+    },
+    {
+      "repo": "DigitalSlideArchive/HistomicsTK",
+      "url": "https://github.com/DigitalSlideArchive/HistomicsTK",
+      "status": "Reference only",
+      "version": null,
+      "license": "Not reviewed",
+      "verification": "User/reference candidate; existence, license and compatibility require review"
+    },
+    {
+      "repo": "dmis-lab/biobert",
+      "url": "https://github.com/dmis-lab/biobert",
+      "status": "Reference only",
+      "version": null,
+      "license": "Not reviewed",
+      "verification": "User/reference candidate; existence, license and compatibility require review"
+    },
+    {
+      "repo": "dotdigitize/phuckcancer",
+      "url": "https://github.com/dotdigitize/phuckcancer",
+      "status": "Reference only",
+      "version": null,
+      "license": "Not reviewed",
+      "verification": "User/reference candidate; existence, license and compatibility require review"
+    },
+    {
+      "repo": "echonet/dynamic",
+      "url": "https://github.com/echonet/dynamic",
+      "status": "Reference only",
+      "version": null,
+      "license": "Not reviewed",
+      "verification": "User/reference candidate; existence, license and compatibility require review"
+    },
+    {
+      "repo": "epam/miew",
+      "url": "https://github.com/epam/miew",
+      "status": "Reference only",
+      "version": null,
+      "license": "Not reviewed",
+      "verification": "User/reference candidate; existence, license and compatibility require review"
+    },
+    {
+      "repo": "epi2me-labs/wf-human-variation",
+      "url": "https://github.com/epi2me-labs/wf-human-variation",
+      "status": "Reference only",
+      "version": null,
+      "license": "Not reviewed",
+      "verification": "User/reference candidate; existence, license and compatibility require review"
+    },
+    {
+      "repo": "exprick/bio-age",
+      "url": "https://github.com/exprick/bio-age",
+      "status": "Reference only",
+      "version": null,
+      "license": "Not reviewed",
+      "verification": "User/reference candidate; existence, license and compatibility require review"
+    },
+    {
+      "repo": "facebookresearch/esm",
+      "url": "https://github.com/facebookresearch/esm",
+      "status": "Reference only",
+      "version": null,
+      "license": "Not reviewed",
+      "verification": "User/reference candidate; existence, license and compatibility require review"
+    },
+    {
+      "repo": "FHIR/genomics-operations",
+      "url": "https://github.com/FHIR/genomics-operations",
+      "status": "Reference only",
+      "version": null,
+      "license": "Not reviewed",
+      "verification": "User/reference candidate; existence, license and compatibility require review"
+    },
+    {
+      "repo": "galinilin/docgemma-connect",
+      "url": "https://github.com/galinilin/docgemma-connect",
+      "status": "Reference only",
+      "version": null,
+      "license": "Not reviewed",
+      "verification": "User/reference candidate; existence, license and compatibility require review"
+    },
+    {
+      "repo": "Georgetown-IR-Lab/QuickUMLS",
+      "url": "https://github.com/Georgetown-IR-Lab/QuickUMLS",
+      "status": "Reference only",
+      "version": null,
+      "license": "Not reviewed",
+      "verification": "User/reference candidate; existence, license and compatibility require review"
+    },
+    {
+      "repo": "GMOD/vcf-js",
+      "url": "https://github.com/GMOD/vcf-js",
+      "status": "Integrated package",
+      "version": "7.2.0",
+      "license": "MIT",
+      "verification": "Installed dependency; see lockfile"
+    },
+    {
+      "repo": "google-deepmind/alphafold",
+      "url": "https://github.com/google-deepmind/alphafold",
+      "status": "Reference only",
+      "version": null,
+      "license": "Not reviewed",
+      "verification": "User/reference candidate; existence, license and compatibility require review"
+    },
+    {
+      "repo": "google/fhir-py",
+      "url": "https://github.com/google/fhir-py",
+      "status": "Reference only",
+      "version": null,
+      "license": "Not reviewed",
+      "verification": "User/reference candidate; existence, license and compatibility require review"
+    },
+    {
+      "repo": "griffithlab/civic-v2",
+      "url": "https://github.com/griffithlab/civic-v2",
+      "status": "Reference only",
+      "version": null,
+      "license": "Not reviewed",
+      "verification": "User/reference candidate; existence, license and compatibility require review"
+    },
+    {
+      "repo": "hapifhir/hapi-fhir",
+      "url": "https://github.com/hapifhir/hapi-fhir",
+      "status": "Reference only",
+      "version": null,
+      "license": "Not reviewed",
+      "verification": "User/reference candidate; existence, license and compatibility require review"
+    },
+    {
+      "repo": "Healome/openage",
+      "url": "https://github.com/Healome/openage",
+      "status": "Reference only",
+      "version": null,
+      "license": "Not reviewed",
+      "verification": "User/reference candidate; existence, license and compatibility require review"
+    },
+    {
+      "repo": "health-assistant-io/health-assistant",
+      "url": "https://github.com/health-assistant-io/health-assistant",
+      "status": "Reference only",
+      "version": null,
+      "license": "Not reviewed",
+      "verification": "User/reference candidate; existence, license and compatibility require review"
+    },
+    {
+      "repo": "healthkey-ai/promop",
+      "url": "https://github.com/healthkey-ai/promop",
+      "status": "Reference only",
+      "version": null,
+      "license": "Not reviewed",
+      "verification": "User/reference candidate; existence, license and compatibility require review"
+    },
+    {
+      "repo": "holab-hku/starmapVis",
+      "url": "https://github.com/holab-hku/starmapVis",
+      "status": "Reference only",
+      "version": null,
+      "license": "Not reviewed",
+      "verification": "User/reference candidate; existence, license and compatibility require review"
+    },
+    {
+      "repo": "idekerlab/DrugCell",
+      "url": "https://github.com/idekerlab/DrugCell",
+      "status": "Reference only",
+      "version": null,
+      "license": "Not reviewed",
+      "verification": "User/reference candidate; existence, license and compatibility require review"
+    },
+    {
+      "repo": "isl-org/Open3D",
+      "url": "https://github.com/isl-org/Open3D",
+      "status": "Reference only",
+      "version": null,
+      "license": "Not reviewed",
+      "verification": "User/reference candidate; existence, license and compatibility require review"
+    },
+    {
+      "repo": "keyserfaty/aging-synthesis",
+      "url": "https://github.com/keyserfaty/aging-synthesis",
+      "status": "Reference only",
+      "version": null,
+      "license": "Not reviewed",
+      "verification": "User/reference candidate; existence, license and compatibility require review"
+    },
+    {
+      "repo": "Kitware/VTK",
+      "url": "https://github.com/Kitware/VTK",
+      "status": "Reference only",
+      "version": null,
+      "license": "Not reviewed",
+      "verification": "User/reference candidate; existence, license and compatibility require review"
+    },
+    {
+      "repo": "KonradHabel/rsna",
+      "url": "https://github.com/KonradHabel/rsna",
+      "status": "Reference only",
+      "version": null,
+      "license": "Not reviewed",
+      "verification": "User/reference candidate; existence, license and compatibility require review"
+    },
+    {
+      "repo": "LinuxForHealth/FHIR",
+      "url": "https://github.com/LinuxForHealth/FHIR",
+      "status": "Reference only",
+      "version": null,
+      "license": "Not reviewed",
+      "verification": "User/reference candidate; existence, license and compatibility require review"
+    },
+    {
+      "repo": "longevity-genie/longevity-forest",
+      "url": "https://github.com/longevity-genie/longevity-forest",
+      "status": "Reference only",
+      "version": null,
+      "license": "Not reviewed",
+      "verification": "User/reference candidate; existence, license and compatibility require review"
+    },
+    {
+      "repo": "mahmoodlab/CLAM",
+      "url": "https://github.com/mahmoodlab/CLAM",
+      "status": "Reference only",
+      "version": null,
+      "license": "Not reviewed",
+      "verification": "User/reference candidate; existence, license and compatibility require review"
+    },
+    {
+      "repo": "mahmoodlab/CONCH",
+      "url": "https://github.com/mahmoodlab/CONCH",
+      "status": "Reference only",
+      "version": null,
+      "license": "Not reviewed",
+      "verification": "User/reference candidate; existence, license and compatibility require review"
+    },
+    {
+      "repo": "mahmoodlab/UNI",
+      "url": "https://github.com/mahmoodlab/UNI",
+      "status": "Reference only",
+      "version": null,
+      "license": "Not reviewed",
+      "verification": "User/reference candidate; existence, license and compatibility require review"
+    },
+    {
+      "repo": "medplum/medplum",
+      "url": "https://github.com/medplum/medplum",
+      "status": "Reference only",
+      "version": null,
+      "license": "Not reviewed",
+      "verification": "User/reference candidate; existence, license and compatibility require review"
+    },
+    {
+      "repo": "medspacy/medspacy",
+      "url": "https://github.com/medspacy/medspacy",
+      "status": "Reference only",
+      "version": null,
+      "license": "Not reviewed",
+      "verification": "User/reference candidate; existence, license and compatibility require review"
+    },
+    {
+      "repo": "mholt/PapaParse",
+      "url": "https://github.com/mholt/PapaParse",
+      "status": "Integrated package",
+      "version": "5.7.0",
+      "license": "MIT",
+      "verification": "Installed dependency; see lockfile"
+    },
+    {
+      "repo": "MIC-DKFZ/nnUNet",
+      "url": "https://github.com/MIC-DKFZ/nnUNet",
+      "status": "Reference only",
+      "version": null,
+      "license": "Not reviewed",
+      "verification": "User/reference candidate; existence, license and compatibility require review"
+    },
+    {
+      "repo": "microsoft/fhir-server",
+      "url": "https://github.com/microsoft/fhir-server",
+      "status": "Reference only",
+      "version": null,
+      "license": "Not reviewed",
+      "verification": "User/reference candidate; existence, license and compatibility require review"
+    },
+    {
+      "repo": "microsoft/Graphormer",
+      "url": "https://github.com/microsoft/Graphormer",
+      "status": "Reference only",
+      "version": null,
+      "license": "Not reviewed",
+      "verification": "User/reference candidate; existence, license and compatibility require review"
+    },
+    {
+      "repo": "MIT-LCP/eicu-code",
+      "url": "https://github.com/MIT-LCP/eicu-code",
+      "status": "Reference only",
+      "version": null,
+      "license": "Not reviewed",
+      "verification": "User/reference candidate; existence, license and compatibility require review"
+    },
+    {
+      "repo": "MIT-LCP/mimic-code",
+      "url": "https://github.com/MIT-LCP/mimic-code",
+      "status": "Reference only",
+      "version": null,
+      "license": "Not reviewed",
+      "verification": "User/reference candidate; existence, license and compatibility require review"
+    },
+    {
+      "repo": "MIT-LCP/wfdb-python",
+      "url": "https://github.com/MIT-LCP/wfdb-python",
+      "status": "Reference only",
+      "version": null,
+      "license": "Not reviewed",
+      "verification": "User/reference candidate; existence, license and compatibility require review"
+    },
+    {
+      "repo": "mlmed/torchxrayvision",
+      "url": "https://github.com/mlmed/torchxrayvision",
+      "status": "Reference only",
+      "version": null,
+      "license": "Not reviewed",
+      "verification": "User/reference candidate; existence, license and compatibility require review"
+    },
+    {
+      "repo": "MolecularAI/REINVENT4",
+      "url": "https://github.com/MolecularAI/REINVENT4",
+      "status": "Reference only",
+      "version": null,
+      "license": "Not reviewed",
+      "verification": "User/reference candidate; existence, license and compatibility require review"
+    },
+    {
+      "repo": "molecularsets/moses",
+      "url": "https://github.com/molecularsets/moses",
+      "status": "Reference only",
+      "version": null,
+      "license": "Not reviewed",
+      "verification": "User/reference candidate; existence, license and compatibility require review"
+    },
+    {
+      "repo": "mrdoob/three.js",
+      "url": "https://github.com/mrdoob/three.js",
+      "status": "Integrated package",
+      "version": "0.185.1",
+      "license": "MIT",
+      "verification": "Installed dependency; see lockfile"
+    },
+    {
+      "repo": "nanoporetech/dorado",
+      "url": "https://github.com/nanoporetech/dorado",
+      "status": "Reference only",
+      "version": null,
+      "license": "Not reviewed",
+      "verification": "User/reference candidate; existence, license and compatibility require review"
+    },
+    {
+      "repo": "nanoporetech/pod5-file-format",
+      "url": "https://github.com/nanoporetech/pod5-file-format",
+      "status": "Reference only",
+      "version": null,
+      "license": "Not reviewed",
+      "verification": "User/reference candidate; existence, license and compatibility require review"
+    },
+    {
+      "repo": "NCI-GDC/gdc-client",
+      "url": "https://github.com/NCI-GDC/gdc-client",
+      "status": "Reference only",
+      "version": null,
+      "license": "Not reviewed",
+      "verification": "User/reference candidate; existence, license and compatibility require review"
+    },
+    {
+      "repo": "neuropsychology/NeuroKit",
+      "url": "https://github.com/neuropsychology/NeuroKit",
+      "status": "Reference only",
+      "version": null,
+      "license": "Not reviewed",
+      "verification": "User/reference candidate; existence, license and compatibility require review"
+    },
+    {
+      "repo": "nextflow-io/nextflow",
+      "url": "https://github.com/nextflow-io/nextflow",
+      "status": "Reference only",
+      "version": null,
+      "license": "Not reviewed",
+      "verification": "User/reference candidate; existence, license and compatibility require review"
+    },
+    {
+      "repo": "nf-core/rnaseq",
+      "url": "https://github.com/nf-core/rnaseq",
+      "status": "Reference only",
+      "version": null,
+      "license": "Not reviewed",
+      "verification": "User/reference candidate; existence, license and compatibility require review"
+    },
+    {
+      "repo": "nipy/nibabel",
+      "url": "https://github.com/nipy/nibabel",
+      "status": "Reference only",
+      "version": null,
+      "license": "Not reviewed",
+      "verification": "User/reference candidate; existence, license and compatibility require review"
+    },
+    {
+      "repo": "OHDSI/Achilles",
+      "url": "https://github.com/OHDSI/Achilles",
+      "status": "Reference only",
+      "version": null,
+      "license": "Not reviewed",
+      "verification": "User/reference candidate; existence, license and compatibility require review"
+    },
+    {
+      "repo": "OHDSI/Atlas",
+      "url": "https://github.com/OHDSI/Atlas",
+      "status": "Reference only",
+      "version": null,
+      "license": "Not reviewed",
+      "verification": "User/reference candidate; existence, license and compatibility require review"
+    },
+    {
+      "repo": "OHDSI/CommonDataModel",
+      "url": "https://github.com/OHDSI/CommonDataModel",
+      "status": "Reference only",
+      "version": null,
+      "license": "Not reviewed",
+      "verification": "User/reference candidate; existence, license and compatibility require review"
+    },
+    {
+      "repo": "OHDSI/WebAPI",
+      "url": "https://github.com/OHDSI/WebAPI",
+      "status": "Reference only",
+      "version": null,
+      "license": "Not reviewed",
+      "verification": "User/reference candidate; existence, license and compatibility require review"
+    },
+    {
+      "repo": "OHIF/Viewers",
+      "url": "https://github.com/OHIF/Viewers",
+      "status": "Reference only",
+      "version": null,
+      "license": "Not reviewed",
+      "verification": "User/reference candidate; existence, license and compatibility require review"
+    },
+    {
+      "repo": "Onco-Logic/Onco-Logic",
+      "url": "https://github.com/Onco-Logic/Onco-Logic",
+      "status": "Reference only",
+      "version": null,
+      "license": "Not reviewed",
+      "verification": "User/reference candidate; existence, license and compatibility require review"
+    },
+    {
+      "repo": "openEHR/gdl-guideline-models",
+      "url": "https://github.com/openEHR/gdl-guideline-models",
+      "status": "Reference only",
+      "version": null,
+      "license": "Not reviewed",
+      "verification": "User/reference candidate; existence, license and compatibility require review"
+    },
+    {
+      "repo": "openFHIR/openfhir",
+      "url": "https://github.com/openFHIR/openfhir",
+      "status": "Reference only",
+      "version": null,
+      "license": "Not reviewed",
+      "verification": "User/reference candidate; existence, license and compatibility require review"
+    },
+    {
+      "repo": "openslide/openslide",
+      "url": "https://github.com/openslide/openslide",
+      "status": "Reference only",
+      "version": null,
+      "license": "Not reviewed",
+      "verification": "User/reference candidate; existence, license and compatibility require review"
+    },
+    {
+      "repo": "openslide/openslide-python",
+      "url": "https://github.com/openslide/openslide-python",
+      "status": "Reference only",
+      "version": null,
+      "license": "Not reviewed",
+      "verification": "User/reference candidate; existence, license and compatibility require review"
+    },
+    {
+      "repo": "pavanbadempet/AI-Healthcare-System",
+      "url": "https://github.com/pavanbadempet/AI-Healthcare-System",
+      "status": "Reference only",
+      "version": null,
+      "license": "Not reviewed",
+      "verification": "User/reference candidate; existence, license and compatibility require review"
+    },
+    {
+      "repo": "physusp/physusp",
+      "url": "https://github.com/physusp/physusp",
+      "status": "Reference only",
+      "version": null,
+      "license": "Not reviewed",
+      "verification": "User/reference candidate; existence, license and compatibility require review"
+    },
+    {
+      "repo": "PIA-Group/BioSPPy",
+      "url": "https://github.com/PIA-Group/BioSPPy",
+      "status": "Reference only",
+      "version": null,
+      "license": "Not reviewed",
+      "verification": "User/reference candidate; existence, license and compatibility require review"
+    },
+    {
+      "repo": "Project-MONAI/model-zoo",
+      "url": "https://github.com/Project-MONAI/model-zoo",
+      "status": "Reference only",
+      "version": null,
+      "license": "Not reviewed",
+      "verification": "User/reference candidate; existence, license and compatibility require review"
+    },
+    {
+      "repo": "Project-MONAI/MONAI",
+      "url": "https://github.com/Project-MONAI/MONAI",
+      "status": "Reference only",
+      "version": null,
+      "license": "Not reviewed",
+      "verification": "User/reference candidate; existence, license and compatibility require review"
+    },
+    {
+      "repo": "Project-MONAI/monai-deploy-app-sdk",
+      "url": "https://github.com/Project-MONAI/monai-deploy-app-sdk",
+      "status": "Reference only",
+      "version": null,
+      "license": "Not reviewed",
+      "verification": "User/reference candidate; existence, license and compatibility require review"
+    },
+    {
+      "repo": "Project-MONAI/MONAILabel",
+      "url": "https://github.com/Project-MONAI/MONAILabel",
+      "status": "Reference only",
+      "version": null,
+      "license": "Not reviewed",
+      "verification": "User/reference candidate; existence, license and compatibility require review"
+    },
+    {
+      "repo": "Project-MONAI/research-contributions",
+      "url": "https://github.com/Project-MONAI/research-contributions",
+      "status": "Reference only",
+      "version": null,
+      "license": "Not reviewed",
+      "verification": "User/reference candidate; existence, license and compatibility require review"
+    },
+    {
+      "repo": "Project-MONAI/tutorials",
+      "url": "https://github.com/Project-MONAI/tutorials",
+      "status": "Reference only",
+      "version": null,
+      "license": "Not reviewed",
+      "verification": "User/reference candidate; existence, license and compatibility require review"
+    },
+    {
+      "repo": "pydicom/pydicom",
+      "url": "https://github.com/pydicom/pydicom",
+      "status": "Reference only",
+      "version": null,
+      "license": "Not reviewed",
+      "verification": "User/reference candidate; existence, license and compatibility require review"
+    },
+    {
+      "repo": "pysam-developers/pysam",
+      "url": "https://github.com/pysam-developers/pysam",
+      "status": "Reference only",
+      "version": null,
+      "license": "Not reviewed",
+      "verification": "User/reference candidate; existence, license and compatibility require review"
+    },
+    {
+      "repo": "qupath/qupath",
+      "url": "https://github.com/qupath/qupath",
+      "status": "Reference only",
+      "version": null,
+      "license": "Not reviewed",
+      "verification": "User/reference candidate; existence, license and compatibility require review"
+    },
+    {
+      "repo": "rdkit/rdkit",
+      "url": "https://github.com/rdkit/rdkit",
+      "status": "Reference only",
+      "version": null,
+      "license": "Not reviewed",
+      "verification": "User/reference candidate; existence, license and compatibility require review"
+    },
+    {
+      "repo": "rii-mango/NIFTI-Reader-JS",
+      "url": "https://github.com/rii-mango/NIFTI-Reader-JS",
+      "status": "Integrated package",
+      "version": "0.8.0",
+      "license": "MIT",
+      "verification": "Installed dependency; see lockfile"
+    },
+    {
+      "repo": "romeo111/OpenOnco",
+      "url": "https://github.com/romeo111/OpenOnco",
+      "status": "Reference only",
+      "version": null,
+      "license": "Not reviewed",
+      "verification": "User/reference candidate; existence, license and compatibility require review"
+    },
+    {
+      "repo": "RosettaCommons/RFdiffusion",
+      "url": "https://github.com/RosettaCommons/RFdiffusion",
+      "status": "Reference only",
+      "version": null,
+      "license": "Not reviewed",
+      "verification": "User/reference candidate; existence, license and compatibility require review"
+    },
+    {
+      "repo": "RSNA/AI-Challenge-Data",
+      "url": "https://github.com/RSNA/AI-Challenge-Data",
+      "status": "Reference only",
+      "version": null,
+      "license": "Not reviewed",
+      "verification": "User/reference candidate; existence, license and compatibility require review"
+    },
+    {
+      "repo": "RSNA/anonymizer",
+      "url": "https://github.com/RSNA/anonymizer",
+      "status": "Reference only",
+      "version": null,
+      "license": "Not reviewed",
+      "verification": "User/reference candidate; existence, license and compatibility require review"
+    },
+    {
+      "repo": "RSNA/ROADMAP",
+      "url": "https://github.com/RSNA/ROADMAP",
+      "status": "Reference only",
+      "version": null,
+      "license": "Not reviewed",
+      "verification": "User/reference candidate; existence, license and compatibility require review"
+    },
+    {
+      "repo": "sammwyy/biovis",
+      "url": "https://github.com/sammwyy/biovis",
+      "status": "Reference only",
+      "version": null,
+      "license": "Not reviewed",
+      "verification": "User/reference candidate; existence, license and compatibility require review"
+    },
+    {
+      "repo": "samtools/bcftools",
+      "url": "https://github.com/samtools/bcftools",
+      "status": "Reference only",
+      "version": null,
+      "license": "Not reviewed",
+      "verification": "User/reference candidate; existence, license and compatibility require review"
+    },
+    {
+      "repo": "samtools/samtools",
+      "url": "https://github.com/samtools/samtools",
+      "status": "Reference only",
+      "version": null,
+      "license": "Not reviewed",
+      "verification": "User/reference candidate; existence, license and compatibility require review"
+    },
+    {
+      "repo": "satijalab/seurat",
+      "url": "https://github.com/satijalab/seurat",
+      "status": "Reference only",
+      "version": null,
+      "license": "Not reviewed",
+      "verification": "User/reference candidate; existence, license and compatibility require review"
+    },
+    {
+      "repo": "SayamAlt/Healthcare-AI-Clinical-Decision-Support-System-using-LangGraph",
+      "url": "https://github.com/SayamAlt/Healthcare-AI-Clinical-Decision-Support-System-using-LangGraph",
+      "status": "Reference only",
+      "version": null,
+      "license": "Not reviewed",
+      "verification": "User/reference candidate; existence, license and compatibility require review"
+    },
+    {
+      "repo": "scverse/anndata",
+      "url": "https://github.com/scverse/anndata",
+      "status": "Reference only",
+      "version": null,
+      "license": "Not reviewed",
+      "verification": "User/reference candidate; existence, license and compatibility require review"
+    },
+    {
+      "repo": "scverse/scanpy",
+      "url": "https://github.com/scverse/scanpy",
+      "status": "Reference only",
+      "version": null,
+      "license": "Not reviewed",
+      "verification": "User/reference candidate; existence, license and compatibility require review"
+    },
+    {
+      "repo": "scverse/scvi-tools",
+      "url": "https://github.com/scverse/scvi-tools",
+      "status": "Reference only",
+      "version": null,
+      "license": "Not reviewed",
+      "verification": "User/reference candidate; existence, license and compatibility require review"
+    },
+    {
+      "repo": "sdimi/cardiofitness",
+      "url": "https://github.com/sdimi/cardiofitness",
+      "status": "Reference only",
+      "version": null,
+      "license": "Not reviewed",
+      "verification": "User/reference candidate; existence, license and compatibility require review"
+    },
+    {
+      "repo": "Sibusiso-K/RSNA-Knee-Abnormality-Detection",
+      "url": "https://github.com/Sibusiso-K/RSNA-Knee-Abnormality-Detection",
+      "status": "Reference only",
+      "version": null,
+      "license": "Not reviewed",
+      "verification": "User/reference candidate; existence, license and compatibility require review"
+    },
+    {
+      "repo": "SimpleITK/SimpleITK",
+      "url": "https://github.com/SimpleITK/SimpleITK",
+      "status": "Reference only",
+      "version": null,
+      "license": "Not reviewed",
+      "verification": "User/reference candidate; existence, license and compatibility require review"
+    },
+    {
+      "repo": "Slicer/Slicer",
+      "url": "https://github.com/Slicer/Slicer",
+      "status": "Reference only",
+      "version": null,
+      "license": "Not reviewed",
+      "verification": "User/reference candidate; existence, license and compatibility require review"
+    },
+    {
+      "repo": "smart-on-fhir/client-py",
+      "url": "https://github.com/smart-on-fhir/client-py",
+      "status": "Reference only",
+      "version": null,
+      "license": "Not reviewed",
+      "verification": "User/reference candidate; existence, license and compatibility require review"
+    },
+    {
+      "repo": "snakemake/snakemake",
+      "url": "https://github.com/snakemake/snakemake",
+      "status": "Reference only",
+      "version": null,
+      "license": "Not reviewed",
+      "verification": "User/reference candidate; existence, license and compatibility require review"
+    },
+    {
+      "repo": "Stanford-Health/wearipedia",
+      "url": "https://github.com/Stanford-Health/wearipedia",
+      "status": "Reference only",
+      "version": null,
+      "license": "Not reviewed",
+      "verification": "User/reference candidate; existence, license and compatibility require review"
+    },
+    {
+      "repo": "synthetichealth/synthea",
+      "url": "https://github.com/synthetichealth/synthea",
+      "status": "Reference only",
+      "version": null,
+      "license": "Not reviewed",
+      "verification": "User/reference candidate; existence, license and compatibility require review"
+    },
+    {
+      "repo": "tgirke/longevityTools",
+      "url": "https://github.com/tgirke/longevityTools",
+      "status": "Reference only",
+      "version": null,
+      "license": "Not reviewed",
+      "verification": "User/reference candidate; existence, license and compatibility require review"
+    },
+    {
+      "repo": "TheDongLab/VizIt",
+      "url": "https://github.com/TheDongLab/VizIt",
+      "status": "Reference only",
+      "version": null,
+      "license": "Not reviewed",
+      "verification": "User/reference candidate; existence, license and compatibility require review"
+    },
+    {
+      "repo": "TissueImageAnalytics/tiatoolbox",
+      "url": "https://github.com/TissueImageAnalytics/tiatoolbox",
+      "status": "Reference only",
+      "version": null,
+      "license": "Not reviewed",
+      "verification": "User/reference candidate; existence, license and compatibility require review"
+    },
+    {
+      "repo": "udaken10/RNSA",
+      "url": "https://github.com/udaken10/RNSA",
+      "status": "Reference only",
+      "version": null,
+      "license": "Not reviewed",
+      "verification": "User/reference candidate; existence, license and compatibility require review"
+    },
+    {
+      "repo": "uni-medical/SAM-Med3D",
+      "url": "https://github.com/uni-medical/SAM-Med3D",
+      "status": "Reference only",
+      "version": null,
+      "license": "Not reviewed",
+      "verification": "User/reference candidate; existence, license and compatibility require review"
+    },
+    {
+      "repo": "wadpac/GGIR",
+      "url": "https://github.com/wadpac/GGIR",
+      "status": "Reference only",
+      "version": null,
+      "license": "Not reviewed",
+      "verification": "User/reference candidate; existence, license and compatibility require review"
+    },
+    {
+      "repo": "Youssef-SH/radfusion-clinical",
+      "url": "https://github.com/Youssef-SH/radfusion-clinical",
+      "status": "Reference only",
+      "version": null,
+      "license": "Not reviewed",
+      "verification": "User/reference candidate; existence, license and compatibility require review"
+    }
+  ]
+}

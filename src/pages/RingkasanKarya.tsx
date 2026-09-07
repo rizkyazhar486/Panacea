@@ -2,6 +2,8 @@ import { useMemo, useState } from 'react'
 import { KARYA, TEMA, JENIS_LABEL, type Karya } from '../lib/ringkasanKarya'
 import { LIFE_LIBRARY, WEALTH_DOMAINS, type LifeReading, type WealthDomain } from '../lib/lifeWealthLibrary'
 import { PemutarBaca } from '../components/PemutarBaca'
+import { ORIGINAL_STORIES } from '../lib/openLearningBooks'
+import { BookOpen } from 'lucide-react'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Life library + ringkasan buku dan film.
@@ -34,6 +36,7 @@ function Kartu({ k }: { k: Karya }) {
       <p className="t-kecil mt-2 leading-relaxed text-neutral-600 dark:text-neutral-300">{k.ringkas}</p>
       <div className="mt-2 flex flex-wrap items-center gap-2">
         <PemutarBaca teks={`${k.judul}, oleh ${k.oleh}. ${k.ringkas}`} label="Listen" />
+        {k.url && <a href={k.url} target="_blank" rel="noreferrer" className="inline-flex min-h-10 items-center gap-2 text-sm font-bold text-brand"><BookOpen size={16} />Read free at OpenStax</a>}
         {k.tema.map((t) => (
           <span key={t} className="t-mikro rounded-full bg-brand/10 px-2 py-0.5 font-bold text-brand-dark dark:text-brand">{t}</span>
         ))}
@@ -166,6 +169,18 @@ export function RingkasanKarya() {
       </section>
 
       <p className="t-mikro px-1 text-neutral-400">{hasil.length} works</p>
+      <details className="border-y border-neutral-200 py-4 dark:border-white/15">
+        <summary className="cursor-pointer text-base font-bold">Short stories for an ordinary day</summary>
+        <div className="mt-4 grid gap-4 md:grid-cols-2">
+          {ORIGINAL_STORIES.map(story => <article key={story.id} className="border-b border-neutral-200 pb-4 dark:border-white/10">
+            <p className="text-xs text-neutral-500">Original fiction · {story.topic}</p>
+            <h3 className="mt-1 font-bold">{story.title}</h3>
+            <p className="mt-2 text-sm leading-7">{story.body}</p>
+            <p className="mt-2 text-sm font-semibold">{story.prompt}</p>
+            <PemutarBaca teks={`${story.title}. ${story.body}. ${story.prompt}`} label="Listen" />
+          </article>)}
+        </div>
+      </details>
 
       <div className="space-y-2">
         {hasil.slice(0, batas).map((k) => <Kartu key={k.id} k={k} />)}

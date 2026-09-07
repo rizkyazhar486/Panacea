@@ -24,6 +24,8 @@
 // berubah"), tidak ada urutan "terbaik nomor satu", dan buku yang gagasannya
 // dibantah bukti disebutkan bantahannya di ringkasannya sendiri.
 
+import { OPEN_LEARNING_BOOKS } from './openLearningBooks'
+
 export type JenisKarya = 'buku' | 'film'
 
 // Nilainya dipakai menyaring dan dibandingkan dengan ===, jadi tidak diubah.
@@ -38,6 +40,7 @@ export interface Karya {
   tahun?: number
   tema: string[]
   ringkas: string
+  url?: string
 }
 
 export const TEMA: string[] = [
@@ -46,6 +49,7 @@ export const TEMA: string[] = [
 ]
 
 export const KARYA: Karya[] = [
+  ...OPEN_LEARNING_BOOKS,
   // ── Kebiasaan & perubahan perilaku ────────────────────────────────────────
   {
     id: 'atomic-habits', jenis: 'buku', judul: 'Atomic Habits', oleh: 'James Clear', tahun: 2018,

@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { lazy, Suspense, useMemo, useState } from 'react'
 import {
   BIOMEDICAL_DATA_CONTRACTS,
   BIOMEDICAL_TRACKS,
@@ -11,12 +11,14 @@ import {
   variantAlleleFraction,
 } from '../../lib/biomedicalEvidence'
 
-type View = 'engine' | 'data' | 'evidence' | 'validation'
+const DataWorkbench = lazy(() => import('../../biomedical/DataWorkbench').then(m => ({ default: m.DataWorkbench })))
+type View = 'engine' | 'data' | 'evidence' | 'validation' | 'imports'
 
 const VIEWS: Array<{ key: View; label: string }> = [
   { key: 'engine', label: 'Engine map' },
   { key: 'data', label: 'Data contracts' },
   { key: 'evidence', label: 'Evidence lab' },
+  { key: 'imports', label: 'Imported data' },
   { key: 'validation', label: 'Validation gates' },
 ]
 
@@ -36,6 +38,7 @@ function Pill({ children }: { children: React.ReactNode }) {
 
 export function BiomedicalEngineLab() {
   const [view, setView] = useState<View>('engine')
+  const [importsOpened, setImportsOpened] = useState(false)
   const [selected, setSelected] = useState<BiomedicalDomain>('genomics')
   const [qScore, setQScore] = useState(20)
   const [referenceReads, setReferenceReads] = useState(70)
@@ -62,12 +65,16 @@ export function BiomedicalEngineLab() {
         </p>
       </div>
 
-      <div className="grid grid-cols-4 gap-1 rounded-xl bg-neutral-100 p-1 dark:bg-white/5">
+      <div className="grid grid-cols-2 gap-1 rounded-lg bg-neutral-100 p-1 sm:grid-cols-5 dark:bg-white/5">
         {VIEWS.map((item) => (
-          <button key={item.key} type="button" aria-pressed={view === item.key} onClick={() => setView(item.key)} className={`rounded-lg px-2 py-2 text-[10px] font-bold transition ${view === item.key ? 'bg-white text-ink shadow-sm dark:bg-white/10 dark:text-white' : 'text-neutral-500'}`}>
+          <button key={item.key} type="button" aria-pressed={view === item.key} onClick={() => { setView(item.key); if (item.key === 'imports') setImportsOpened(true) }} className={`rounded-lg px-2 py-2 text-[10px] font-bold transition ${view === item.key ? 'bg-white text-ink shadow-sm dark:bg-white/10 dark:text-white' : 'text-neutral-500'}`}>
             {item.label}
           </button>
         ))}
+      </div>
+
+      <div hidden={view !== 'imports'}>
+        {importsOpened && <Suspense fallback={<p role="status">Loading data workbench...</p>}><DataWorkbench /></Suspense>}
       </div>
 
       {view === 'engine' && (

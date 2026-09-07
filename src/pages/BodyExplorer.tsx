@@ -3,6 +3,8 @@ import { useSearchParams } from 'react-router-dom'
 import { BodyEvidenceDock, type BodyEvidenceMode } from '../components/digital-twin/BodyEvidenceDock'
 import { HraContextBridge } from '../components/digital-twin/HraContextBridge'
 
+const BiomedicalEngineLab = lazy(() => import('./bodyhub/BiomedicalEngineLab').then(m => ({ default: m.BiomedicalEngineLab })))
+
 const HraClinicalAtlas = lazy(() =>
   import('../components/digital-twin/HraClinicalAtlas').then((m) => ({ default: m.HraClinicalAtlas })),
 )
@@ -37,7 +39,7 @@ const CinematicSurgicalRehearsal = lazy(() =>
   import('../components/digital-twin/CinematicSurgicalRehearsal').then((m) => ({ default: m.CinematicSurgicalRehearsal })),
 )
 
-type LabMode = BodyEvidenceMode
+type LabMode = BodyEvidenceMode | 'imported-data'
 
 type Mode = {
   key: LabMode
@@ -54,6 +56,7 @@ const PRIMARY: Mode[] = [
 ]
 
 const MORE: Mode[] = [
+  { key: 'imported-data', label: 'Research data', hint: 'Local VCF, cell expression and imaging imports. Research use only.' },
   { key: 'surgery-rehearsal', label: 'Practice', hint: 'Operation-specific HRA source anatomy first; rehearsal remains a separate model layer' },
   { key: 'counterfactual', label: 'What-if', hint: 'Reference anatomy and real evidence stay separate from scenario modelling' },
   { key: 'regeneration', label: 'Research', hint: 'Reference anatomy and live trials stay separate from experimental concepts' },
@@ -149,7 +152,7 @@ export function BodyExplorer() {
     const params = new URLSearchParams(searchParams)
     params.set('mode', next)
     setSearchParams(params, { replace: true })
-    window.scrollTo({ top: 0, behavior: 'smooth' })
+    window.scrollTo({ top: 0, behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' })
   }
 
   return (
@@ -173,6 +176,7 @@ export function BodyExplorer() {
           {PRIMARY.map((item) => (
             <button
               key={item.key}
+              aria-pressed={mode === item.key}
               onClick={() => setMode(item.key)}
               className={`shrink-0 rounded-full border px-3.5 py-2 text-[10px] font-black transition ${mode === item.key ? 'border-neutral-950 bg-neutral-950 text-white dark:border-white dark:bg-white dark:text-neutral-950' : 'border-neutral-200 bg-neutral-50 text-neutral-600 hover:border-neutral-300 dark:border-white/10 dark:bg-white/[.04] dark:text-neutral-300'}`}
             >
@@ -190,7 +194,9 @@ export function BodyExplorer() {
         </div>
       </section>
 
-      {mode === 'digital-twin' ? (
+      {mode === 'imported-data' ? (
+        <Suspense fallback={<LoadingLab label="research data" />}><BiomedicalEngineLab /></Suspense>
+      ) : mode === 'digital-twin' ? (
         <CellEvidenceMode mode="body-cell" />
       ) : mode === 'realistic-atlas' ? (
         <div className="space-y-4">
@@ -237,7 +243,7 @@ export function BodyExplorer() {
         </SourceBackedMode>
       )}
 
-      <BodyEvidenceDock mode={mode} />
+      {mode !== 'imported-data' && <BodyEvidenceDock mode={mode} />}
     </main>
   )
 }

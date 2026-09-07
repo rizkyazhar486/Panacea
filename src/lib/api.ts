@@ -272,7 +272,7 @@ export const api = {
   creatorSubscribe: (authorEmail: string) =>
     req<{ ok: boolean; balance: number; expires: string; authorCut: number; adminCut: number }>('/api/creator/subscribe', { method: 'POST', body: JSON.stringify({ authorEmail }) }),
   // live medical news (server-proxied Google News RSS; free, keyless)
-  news: () => req<{ items: LiveNewsItem[]; fetchedAt: number }>('/api/news'),
+  news: () => req<{ items: LiveNewsItem[]; fetchedAt: number; stale?: boolean }>('/api/news'),
   // Live market data (server-proxied Yahoo Finance; free, keyless).
   // `delayed: true` always rides along so no caller can present it as live ticks.
   marketInstruments: () =>

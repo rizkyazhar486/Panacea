@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { api, type LiveNewsItem } from '../lib/api'
+import { validNews } from '../lib/newsFeed'
 
 interface Brief {
   tag: string
@@ -31,8 +32,9 @@ function readCache(): NewsCache | null {
     if (!raw) return null
     const parsed = JSON.parse(raw) as NewsCache
     if (!Array.isArray(parsed.items) || !parsed.items.length || !Number.isFinite(parsed.savedAt)) return null
-    if (Date.now() - parsed.savedAt > MAX_CACHE_AGE_MS) return null
-    return parsed
+    if (parsed.savedAt > Date.now() || Date.now() - parsed.savedAt > MAX_CACHE_AGE_MS) return null
+    const items = validNews(parsed.items)
+    return items.length ? { items, savedAt: parsed.savedAt } : null
   } catch {
     return null
   }
@@ -85,25 +87,31 @@ export function MedicalNews() {
   const [cacheSavedAt, setCacheSavedAt] = useState<number | null>(cached?.savedAt ?? null)
   const [failed, setFailed] = useState(false)
   const [fresh, setFresh] = useState(false)
+  const [attempt, setAttempt] = useState(0)
 
   useEffect(() => {
     let alive = true
+    setFailed(false)
+    setFresh(false)
+    const timeout = window.setTimeout(() => { alive = false; setFailed(true) }, 15000)
     api.news()
       .then((response) => {
         if (!alive) return
-        if (response.items?.length) {
-          setLive(response.items)
-          setFresh(true)
+        window.clearTimeout(timeout)
+        const items = validNews(response.items)
+        if (items.length) {
+          setLive(items)
+          setFresh(response.stale !== true)
           setFailed(false)
           setCacheSavedAt(Date.now())
-          writeCache(response.items)
+          writeCache(items)
         } else {
           setFailed(true)
         }
       })
-      .catch(() => { if (alive) setFailed(true) })
-    return () => { alive = false }
-  }, [])
+      .catch(() => { if (alive) { window.clearTimeout(timeout); setFailed(true) } })
+    return () => { alive = false; window.clearTimeout(timeout) }
+  }, [attempt])
 
   const headlines = useMemo(() => live?.slice(0, 6) ?? [], [live])
   const usingCached = Boolean(live?.length) && !fresh
@@ -127,6 +135,7 @@ export function MedicalNews() {
         </div>
       </div>
 
+      {failed && <button type="button" onClick={() => setAttempt(value => value + 1)} className="mt-4 rounded-lg border border-white/20 px-4 py-2 text-sm text-white">Retry sources</button>}
       {headlines.length ? (
         <div className="mt-8 grid gap-3 md:grid-cols-2 lg:grid-cols-3">
           {headlines.map((item) => <LiveCard key={item.link} item={item} />)}

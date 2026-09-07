@@ -25,6 +25,12 @@ jobs:
           node-version: 20
           cache: npm
       - run: npm ci
+      - name: Install server test dependencies
+        run: npm ci --prefix server
+      - name: Validate server types and regression tests
+        run: |
+          npm run typecheck --prefix server
+          npm run uji --prefix server
       # Set repo variable VITE_API_URL (Settings → Secrets and variables →
       # Actions → Variables) to your deployed backend URL to enable live mode.
       - run: npm run build

@@ -4,6 +4,7 @@ import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'
 import { MeshoptDecoder } from 'three/examples/jsm/libs/meshopt_decoder.module.js'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
 import { RoomEnvironment } from 'three/examples/jsm/environments/RoomEnvironment.js'
+import { isAnatomyPickable, scaleAnatomyAtCenter } from '../lib/anatomyMotion'
 
 /**
  * Shared Body Exposure renderer.
@@ -369,12 +370,15 @@ export function Body3D({
   const sceneSizeRef = useRef(1)
   const firstFitRef = useRef(false)
   const motionRef = useRef(motion)
-  const highlightRef = useRef<Array<{ mesh: THREE.Mesh; base: THREE.Material; baseScale: THREE.Vector3 }>>([])
+  const highlightRef = useRef<Array<{ mesh: THREE.Mesh; base: THREE.Material; clone: THREE.Material; baseScale: THREE.Vector3 }>>([])
   const animatedRef = useRef<{ heart: THREE.Object3D[]; lungs: THREE.Object3D[] }>({ heart: [], lungs: [] })
   const animationFrameRef = useRef(0)
   const [loading, setLoading] = useState<Record<string, number>>({})
   const [failed, setFailed] = useState<Set<LayerKey>>(new Set())
   const [selected, setSelected] = useState('')
+  const [modelRevision, setModelRevision] = useState(0)
+  const onPickRef = useRef(onPick)
+  onPickRef.current = onPick
 
   desiredLayersRef.current = layers
   motionRef.current = motion
@@ -399,7 +403,7 @@ export function Body3D({
     renderer.shadowMap.enabled = true
     renderer.shadowMap.type = THREE.PCFSoftShadowMap
     renderer.localClippingEnabled = true
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2.75))
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, container.clientWidth < 640 ? 1.5 : 2))
     renderer.setSize(Math.max(container.clientWidth, 1), Math.max(container.clientHeight, 1), false)
     container.appendChild(renderer.domElement)
     rendererRef.current = renderer
@@ -437,7 +441,7 @@ export function Body3D({
       const height = Math.max(container.clientHeight, 1)
       camera.aspect = width / height
       camera.updateProjectionMatrix()
-      renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2.75))
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, width < 640 ? 1.5 : 2))
       renderer.setSize(width, height, false)
     }
     const observer = new ResizeObserver(resize)
@@ -446,7 +450,12 @@ export function Body3D({
 
     const raycaster = new THREE.Raycaster()
     const pointer = new THREE.Vector2()
+    let pointerStart: { x: number; y: number; id: number } | null = null
+    const startPick = (event: PointerEvent) => { pointerStart = event.isPrimary ? { x: event.clientX, y: event.clientY, id: event.pointerId } : null }
     const pick = (event: PointerEvent) => {
+      const start = pointerStart
+      pointerStart = null
+      if (!start || event.pointerId !== start.id || Math.hypot(event.clientX - start.x, event.clientY - start.y) > 5) return
       const rect = renderer.domElement.getBoundingClientRect()
       if (!rect.width || !rect.height) return
       pointer.x = ((event.clientX - rect.left) / rect.width) * 2 - 1
@@ -454,47 +463,55 @@ export function Body3D({
       raycaster.setFromCamera(pointer, camera)
       const roots = Object.values(groupsRef.current).filter(Boolean) as THREE.Object3D[]
       const hits = raycaster.intersectObjects(roots, true)
-      const hit = hits.find((item) => item.object.visible && item.object instanceof THREE.Mesh)
+      const hit = hits.find((item) => isAnatomyPickable(item.object, item.point))
       if (!hit) return
       const name = rawName(hit.object)
       if (hiddenInstruction(name)) return
       const label = humanizeStructureName(name)
       setSelected(label)
-      onPick(name, label)
+      onPickRef.current(name, label)
     }
+    renderer.domElement.addEventListener('pointerdown', startPick)
     renderer.domElement.addEventListener('pointerup', pick)
 
     const clock = new THREE.Clock()
+    const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)')
+    let visible = true
+    let t = 0
+    const visibilityObserver = new IntersectionObserver(([entry]) => { visible = entry.isIntersecting })
+    visibilityObserver.observe(container)
     const animate = () => {
       animationFrameRef.current = requestAnimationFrame(animate)
-      const t = clock.getElapsedTime()
+      const delta = Math.min(clock.getDelta(), 0.05)
+      if (document.hidden || !visible) return
+      if (!reducedMotion.matches) t += delta
       const state = motionRef.current
+      for (const object of [...animatedRef.current.heart, ...animatedRef.current.lungs]) scaleAnatomyAtCenter(object, 1)
+      for (const item of highlightRef.current) scaleAnatomyAtCenter(item.mesh, 1)
 
       // Real mesh motion only. No substitute spheres and no vessel inflation.
-      if (state.heartRate > 0) {
+      if (!reducedMotion.matches && Number.isFinite(state.heartRate) && state.heartRate > 0) {
         const phase = (t * state.heartRate / 60) % 1
         const pulse = Math.exp(-Math.pow((phase - 0.14) / 0.095, 2))
         const scale = 1 + pulse * 0.012
         for (const object of animatedRef.current.heart) {
-          const base = object.userData.__baseScale as THREE.Vector3 | undefined
-          if (base) object.scale.set(base.x * scale, base.y * scale, base.z * scale)
+          scaleAnatomyAtCenter(object, scale)
         }
       }
-      if (state.respRate > 0) {
+      if (!reducedMotion.matches && Number.isFinite(state.respRate) && state.respRate > 0) {
         const breath = (1 + Math.sin(t * state.respRate / 60 * Math.PI * 2 - Math.PI / 2)) / 2
         for (const object of animatedRef.current.lungs) {
-          const base = object.userData.__baseScale as THREE.Vector3 | undefined
-          if (base) object.scale.set(base.x * (1 + breath * 0.004), base.y * (1 + breath * 0.013), base.z * (1 + breath * 0.009))
+          scaleAnatomyAtCenter(object, 1 + breath * 0.004, 1 + breath * 0.013, 1 + breath * 0.009)
         }
       }
-      if (state.contractionRate > 0) {
+      if (!reducedMotion.matches && Number.isFinite(state.contractionRate) && state.contractionRate > 0) {
         const phase = (t * state.contractionRate / 60) % 1
         const contraction = phase < 0.33
           ? Math.sin((phase / 0.33) * Math.PI / 2)
           : Math.cos(((phase - 0.33) / 0.67) * Math.PI / 2)
         for (const item of highlightRef.current) {
           const k = 1 + contraction * 0.018
-          item.mesh.scale.set(item.baseScale.x * k, item.baseScale.y * (2 - k), item.baseScale.z * k)
+          if (item.mesh.userData.__layer === 'muscular') scaleAnatomyAtCenter(item.mesh, k, 2 - k, k)
         }
       }
 
@@ -506,8 +523,12 @@ export function Body3D({
     return () => {
       cancelAnimationFrame(animationFrameRef.current)
       observer.disconnect()
+      visibilityObserver.disconnect()
+      renderer.domElement.removeEventListener('pointerdown', startPick)
       renderer.domElement.removeEventListener('pointerup', pick)
       controls.dispose()
+      for (const item of highlightRef.current) item.clone.dispose()
+      highlightRef.current = []
       environment.dispose()
       pmrem.dispose()
       background.dispose()
@@ -522,7 +543,7 @@ export function Body3D({
       animatedRef.current = { heart: [], lungs: [] }
       firstFitRef.current = false
     }
-  }, [onPick])
+  }, [])
 
   const fitCamera = (box: THREE.Box3, animate = false) => {
     const camera = cameraRef.current
@@ -532,7 +553,7 @@ export function Body3D({
     const center = box.getCenter(new THREE.Vector3())
     const maxDim = Math.max(size.x, size.y, size.z, 0.001)
     const fov = THREE.MathUtils.degToRad(camera.fov)
-    const distance = maxDim / (2 * Math.tan(fov / 2)) * 1.35
+    const distance = Math.max(size.y, size.x / camera.aspect, size.z) / (2 * Math.tan(fov / 2)) * 1.35
     const currentDirection = camera.position.clone().sub(controls.target).normalize()
     const direction = currentDirection.lengthSq() > 0.1 ? currentDirection : new THREE.Vector3(0.45, 0.12, 1).normalize()
     const nextPosition = center.clone().add(direction.multiplyScalar(distance))
@@ -595,6 +616,7 @@ export function Body3D({
         })
         groupsRef.current[definition.key] = clone
         sceneRef.current.add(clone)
+        setModelRevision((value) => value + 1)
         setLoading((current) => {
           const next = { ...current }
           delete next[definition.key]
@@ -663,7 +685,7 @@ export function Body3D({
           : radiologyMaterial(definition.key, renderMode, ctWindow)
       })
     }
-  }, [renderMode, ctWindow, dissect, unfold, layers])
+  }, [renderMode, ctWindow, dissect, unfold, layers, modelRevision])
 
   useEffect(() => {
     const renderer = rendererRef.current
@@ -715,15 +737,16 @@ export function Body3D({
         })
       })
     }
-  }, [slicePlane, slicePos, renderMode, layers])
+  }, [slicePlane, slicePos, renderMode, layers, modelRevision, ctWindow, dissect, unfold])
 
   useEffect(() => {
     // Restore any previous per-mesh highlight clone to its shared PBR material.
     for (const item of highlightRef.current) {
       const layer = item.mesh.userData.__layer as LayerKey | undefined
       const tissue = item.mesh.userData.__tissue as TissueKind | undefined
-      if (layer && tissue) item.mesh.material = anatomyMaterial(tissue, layerOpacity(layer, dissect))
-      item.mesh.scale.copy(item.baseScale)
+      if (item.mesh.material === item.clone && layer && tissue) item.mesh.material = anatomyMaterial(tissue, layerOpacity(layer, dissect))
+      item.clone.dispose()
+      scaleAnatomyAtCenter(item.mesh, 1)
     }
     highlightRef.current = []
 
@@ -742,17 +765,18 @@ export function Body3D({
         const shared = object.material
         if (!(shared instanceof THREE.MeshStandardMaterial || shared instanceof THREE.MeshPhysicalMaterial)) return
         const clone = shared.clone()
+        clone.userData.__highlight = true
         clone.emissive = HIGHLIGHT.clone()
         clone.emissiveIntensity = 0.24
         if ('clearcoat' in clone) clone.clearcoat = Math.max((clone as THREE.MeshPhysicalMaterial).clearcoat, 0.12)
         object.material = clone
         const baseScale = (object.userData.__baseScale as THREE.Vector3 | undefined)?.clone() ?? object.scale.clone()
-        highlightRef.current.push({ mesh: object, base: shared, baseScale })
+        highlightRef.current.push({ mesh: object, base: shared, clone, baseScale })
         focusBox.expandByObject(object)
       })
     }
-    if (keywords.length && !focusBox.isEmpty()) fitCamera(focusBox, true)
-  }, [highlighted, focusKeywords, renderMode, dissect, layers])
+    if ((keywords.length || exact.size) && !focusBox.isEmpty()) fitCamera(focusBox, true)
+  }, [highlighted, focusKeywords, renderMode, dissect, layers, modelRevision])
 
   const resetCamera = () => {
     const bounds = sceneBoundsRef.current

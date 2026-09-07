@@ -1,0 +1,42 @@
+.medical-4d{--m4-line:#d5dfdb;color:#263a34;background:#fff;min-width:0;letter-spacing:0}
+.medical-4d *{box-sizing:border-box;letter-spacing:0}
+.medical-4d-heading{padding:18px 0;display:flex;align-items:center;justify-content:space-between;gap:16px}
+.medical-4d h2{font-size:20px;font-weight:650;margin:2px 0 0}
+.medical-4d-kicker,.medical-4d-origin{font-size:11px;color:#526c60}
+.medical-4d-modes{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:2px;border-block:1px solid var(--m4-line);padding:4px 0}
+.medical-4d button{border:1px solid var(--m4-line);border-radius:4px;background:#fff;color:#344e43;min-height:38px;padding:7px 12px;display:inline-flex;align-items:center;justify-content:center;gap:8px;font-size:12px;cursor:pointer}
+.medical-4d button:disabled{opacity:.5;cursor:not-allowed}
+.medical-4d button:hover{background:#edf5f0}
+.medical-4d button:focus-visible,.medical-4d input:focus-visible,.medical-4d select:focus-visible{outline:2px solid #247b67;outline-offset:3px}
+.medical-4d-modes button{border-color:transparent}
+.medical-4d-modes button[aria-pressed=true]{background:#dcece4;color:#175640}
+.medical-4d-stage{position:relative;background:#111b1c}
+.medical-4d-caption{position:absolute;top:14px;left:16px;right:16px;color:#edf7f0;font-size:13px;pointer-events:none;z-index:1}
+.medical-4d-caption span{display:block;color:#9ebbad;font-size:10px;margin-top:2px}
+.medical-4d-canvas{width:100%;height:440px;overflow:hidden}
+.medical-4d-canvas canvas{display:block;max-width:100%;touch-action:none}
+.medical-4d-error{position:absolute;inset:0;background:#111b1c;color:#e3eee8;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;padding:32px;gap:16px}
+.medical-4d-timeline{display:flex;align-items:center;gap:10px;min-height:82px;padding:12px 0;border-bottom:1px solid var(--m4-line)}
+.medical-4d button.medical-4d-icon{width:38px;min-width:38px;height:38px;padding:0}
+.medical-4d label{font-size:11px;min-width:0;color:#4c655a}
+.medical-4d-scrubber{display:flex;flex:1;flex-direction:column;gap:6px}
+.medical-4d input[type=range]{width:100%;accent-color:#21856d;min-width:0}
+.medical-4d-time{width:62px;min-width:62px;font-size:12px;font-variant-numeric:tabular-nums;text-align:right}
+.medical-4d-speed{display:flex;align-items:center;gap:6px}
+.medical-4d select{border:1px solid var(--m4-line);padding:8px 4px;border-radius:4px;background:#fff;color:#263a34;font-size:12px}
+.medical-4d-parameters{display:grid;grid-template-columns:1fr 1fr 1.6fr;gap:24px;padding:20px 0}
+.medical-4d-parameters label{display:flex;flex-wrap:wrap;gap:9px;align-items:center}
+.medical-4d-parameters output{margin-left:auto;font-variant-numeric:tabular-nums;font-weight:650}
+.medical-4d dl{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin:0}
+.medical-4d dt{font-size:10px;color:#61766b}
+.medical-4d dd{font-size:22px;font-variant-numeric:tabular-nums;margin:3px 0 0}
+.medical-4d-assumption{grid-column:1/-1;font-size:11px;line-height:1.6;color:#587061;margin:0}
+.medical-4d-assumption a{color:#1b745e;text-decoration:underline}
+.medical-4d-boundary{margin:0;padding:14px 0;border-top:1px solid var(--m4-line);font-size:11px;line-height:1.7;color:#806022}
+@media(max-width:700px){.medical-4d-heading{align-items:start}.medical-4d-origin{max-width:110px;text-align:right}.medical-4d-modes{grid-template-columns:repeat(2,minmax(0,1fr))}.medical-4d-canvas{height:400px}.medical-4d-timeline{flex-wrap:wrap;gap:8px}.medical-4d-scrubber{min-width:120px}.medical-4d-time{width:58px;min-width:58px}.medical-4d-speed{margin-left:auto}.medical-4d-parameters{grid-template-columns:1fr 1fr;gap:18px}.medical-4d dl{grid-column:1/-1}.medical-4d button{font-size:11px;padding:7px 8px}}
+.dark .medical-4d{background:#131e1b;color:#e7efe9;--m4-line:#34493e}
+.dark .medical-4d :is(label,dt,.medical-4d-origin,.medical-4d-kicker,.medical-4d-assumption){color:#b0c4b5}
+.dark .medical-4d button,.dark .medical-4d select{background:#22362c;color:#e4f0e8}
+.dark .medical-4d-modes button[aria-pressed=true]{background:#42614b}
+.dark .medical-4d-boundary{color:#dfc293}
+@media(max-width:700px){.medical-4d-timeline{display:grid;grid-template-columns:38px 38px minmax(0,1fr) 62px}.medical-4d-speed{grid-column:3;justify-self:end}.medical-4d-timeline>button:last-child{grid-column:4;justify-self:end}}

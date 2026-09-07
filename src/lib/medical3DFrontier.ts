@@ -70,14 +70,22 @@ export function medical3DFrontierSpec(id: Medical3DFrontierId): Medical3DFrontie
 }
 
 export function relativePoiseuilleResistance(radiusRatioRaw: number): number {
+  if (!Number.isFinite(radiusRatioRaw)) throw new Error('Radius must be finite')
   const radiusRatio = Math.max(0.1, Math.min(3, radiusRatioRaw))
   return 1 / Math.pow(radiusRatio, 4)
 }
 
 export function relativeFlowIndex(deltaPressureRaw: number, radiusRatioRaw: number): number {
-  const deltaPressure = Math.max(0, deltaPressureRaw)
+  if (!Number.isFinite(deltaPressureRaw)) throw new Error('Pressure must be finite')
+  const deltaPressure = Math.max(0, Math.min(10, deltaPressureRaw))
   const resistance = relativePoiseuilleResistance(radiusRatioRaw)
   return resistance > 0 ? deltaPressure / resistance : 0
+}
+
+export function relativeVelocityIndex(deltaPressure: number, radiusRatio: number): number {
+  const flow = relativeFlowIndex(deltaPressure, radiusRatio)
+  const radius = Math.max(0.1, Math.min(3, radiusRatio))
+  return flow / (radius * radius)
 }
 
 export const MEDICAL_3D_TRUTH_RULES = [

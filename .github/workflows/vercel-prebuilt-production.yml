@@ -62,6 +62,12 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Validate regression tests before production
+        run: |
+          npm ci --prefix server
+          npm run typecheck --prefix server
+          npm run uji --prefix server
+
       - name: Install pinned Vercel CLI
         run: npm install --global vercel@59.11.7
 
