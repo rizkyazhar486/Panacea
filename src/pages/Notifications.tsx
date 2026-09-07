@@ -4,6 +4,7 @@ import { HealthAlertSettings } from '../components/HealthAlertSettings'
 import { IconBell } from '../components/icons'
 import { Prosa } from '../components/Prosa'
 import { SmartNotificationSettings } from '../components/SmartNotificationSettings'
+import { UtilityNotificationSettings } from '../components/UtilityNotificationSettings'
 import { Badge, Card, SectionTitle } from '../components/ui'
 import { api, backendEnabled, type Notif } from '../lib/api'
 import {
@@ -122,6 +123,7 @@ export function Notifications() {
         </div>
       </Card>
 
+      <UtilityNotificationSettings />
       <SmartNotificationSettings />
       <HealthAlertSettings />
 
@@ -177,7 +179,7 @@ export function Notifications() {
               {filter === 'unread' ? 'No unread server notifications.' : `No ${filter === 'all' ? '' : `${filter} `}notifications yet.`}
             </p>
             <p className="mx-auto mt-1 max-w-xl text-[12px] leading-relaxed text-neutral-600 dark:text-neutral-300">
-              Real achievements, recovery/training signals, medication and account events, daily Faith utilities and owner growth milestones can appear here when their actual source conditions are met.
+              Real achievements, recovery/training signals, medication and account events, opted-in daily Faith utilities and owner growth milestones can appear here when their actual source conditions are met.
             </p>
           </div>
         </Card>
