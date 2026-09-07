@@ -66,9 +66,11 @@ function cleanTitle(title: string, source: string) {
   return source && title.endsWith(` - ${source}`) ? title.slice(0, -(source.length + 3)) : title
 }
 
+const cardClass = 'block rounded-2xl border border-white/10 bg-white/[.055] p-4 shadow-[0_18px_50px_-30px_rgba(0,0,0,.9)] backdrop-blur-sm'
+
 function LiveCard({ item }: { item: LiveNewsItem }) {
   return (
-    <a href={item.link} target="_blank" rel="noreferrer" className="panacea-feature-card group block p-4 transition hover:-translate-y-0.5">
+    <a href={item.link} target="_blank" rel="noreferrer" className={`${cardClass} group transition hover:-translate-y-0.5 hover:border-emerald-300/25 hover:bg-white/[.075]`}>
       <div className="flex items-center justify-between gap-3 text-[10px] font-black uppercase tracking-[.14em] text-white/45">
         <span>{item.region === 'domestic' ? 'Indonesia' : 'International'}</span>
         <span>{relativeTime(item.pubDate)}</span>
@@ -109,12 +111,19 @@ export function MedicalNews() {
   const usingCached = Boolean(live?.length) && !fresh
 
   return (
-    <section id="news" className="mx-auto max-w-6xl px-5 py-20 sm:px-8">
+    <section id="news" className="mx-auto my-8 max-w-6xl overflow-hidden rounded-[2rem] border border-emerald-200/10 bg-[#06120c] px-5 py-16 shadow-[0_28px_80px_-40px_rgba(0,55,35,.75)] sm:px-8 sm:py-20">
+      {/* Legacy rich-welcome film uses the same Higgsfield asset as the hero.
+          Keep its caption readable on real video frames without changing the
+          hero or relying on the active light/dark theme. */}
+      <style>{`
+        video[src*="hf_20260702_023227_88b54135-7489-48de-9476-ca0657fc0d29.mp4"] ~ div.absolute.bottom-0 { color: #fff !important; }
+        video[src*="hf_20260702_023227_88b54135-7489-48de-9476-ca0657fc0d29.mp4"] ~ div.absolute.bottom-0 p { color: rgba(255,255,255,.82) !important; }
+      `}</style>
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div className="max-w-2xl">
-          <div className="panacea-kicker">Health briefing</div>
+          <div className="text-[10px] font-black uppercase tracking-[.18em] text-[#f0d68a]">Health briefing</div>
           <h2 className="mt-3 text-3xl font-black tracking-[-.035em] text-white sm:text-5xl">Know what is live. Know what is evergreen.</h2>
-          <p className="mt-3 text-sm leading-relaxed text-white/55">PanaceaMed does not disguise editorial summaries as current news. Live headlines show their publisher and recency; if the upstream feed briefly fails, the last successful headlines remain visible and are explicitly marked as cached.</p>
+          <p className="mt-3 text-sm leading-relaxed text-white/60">PanaceaMed does not disguise editorial summaries as current news. Live headlines show their publisher and recency; if the upstream feed briefly fails, the last successful headlines remain visible and are explicitly marked as cached.</p>
         </div>
         <div className={`rounded-full border px-3 py-2 text-[10px] font-black uppercase tracking-[.14em] ${fresh ? 'border-emerald-300/20 bg-emerald-300/10 text-emerald-200' : usingCached ? 'border-amber-200/20 bg-amber-200/10 text-amber-100' : 'border-white/10 bg-white/[.04] text-white/55'}`}>
           {fresh
@@ -136,10 +145,10 @@ export function MedicalNews() {
           <div className="mb-3 text-[10px] font-black uppercase tracking-[.16em] text-white/40">Evergreen editorial learning briefs · not live headlines</div>
           <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-3">
             {LEARNING_BRIEFS.map((brief) => (
-              <article key={brief.title} className="panacea-feature-card p-4">
-                <div className="flex items-center justify-between gap-3"><span className="text-[10px] font-black uppercase tracking-[.14em] text-[#f0d68a]">{brief.tag}</span><span className="text-[9px] font-bold text-white/35">{brief.status}</span></div>
+              <article key={brief.title} className={cardClass}>
+                <div className="flex items-center justify-between gap-3"><span className="text-[10px] font-black uppercase tracking-[.14em] text-[#f0d68a]">{brief.tag}</span><span className="text-[9px] font-bold text-white/40">{brief.status}</span></div>
                 <h3 className="mt-3 text-sm font-black leading-snug text-white">{brief.title}</h3>
-                <p className="mt-2 text-xs leading-relaxed text-white/52">{brief.summary}</p>
+                <p className="mt-2 text-xs leading-relaxed text-white/58">{brief.summary}</p>
               </article>
             ))}
           </div>
