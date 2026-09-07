@@ -70,7 +70,8 @@
           }
         })
         observer.observe(document.documentElement, { childList: true, subtree: true })
-        window.addEventListener('pmd-app-mounted', () => window.setTimeout(() => observer.disconnect(), 15000), { once: true })
+        // Startup governor only: do not suppress video features elsewhere in the app forever.
+        window.setTimeout(() => observer.disconnect(), 15000)
       })()
     </script>
   </head>
@@ -87,10 +88,6 @@
           const root = document.getElementById('root')
           return Boolean(root && root.childElementCount > 0)
         }
-
-        window.addEventListener('pmd-app-mounted', () => {
-          try { sessionStorage.removeItem('pmd-boot-failed') } catch {}
-        }, { once: true })
 
         // Cleanup is deliberately non-blocking. Never force an automatic reload here:
         // a reload loop can make an otherwise healthy iOS/PWA build impossible to open.
@@ -113,7 +110,6 @@
           if (rootReady()) return
           const splash = document.getElementById('pmd-splash')
           if (!splash) return
-          try { sessionStorage.setItem('pmd-boot-failed', '1') } catch {}
           splash.innerHTML = '<div style="max-width:330px;padding:24px;text-align:center;font-family:system-ui;color:white"><img src="./logo-mark.png" alt="" width="64" height="64" style="border-radius:18px;box-shadow:0 10px 28px rgba(0,0,0,.22)"/><div style="margin-top:16px;font-size:20px;font-weight:800">Panacea gagal memulai</div><div style="margin-top:7px;font-size:13px;line-height:1.5;opacity:.86">Tidak ada reload otomatis. Coba muat ulang satu kali.</div><button type="button" onclick="location.reload()" style="margin-top:16px;border:0;border-radius:14px;padding:12px 18px;font:700 14px system-ui;color:#06351f;background:#fff;box-shadow:0 8px 28px rgba(0,0,0,.2)">Muat ulang Panacea</button></div>'
         }, 12000)
       })()
