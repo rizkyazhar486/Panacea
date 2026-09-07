@@ -47,6 +47,51 @@ function titikHr(v: unknown): HrPoint | null {
   return { t, bpm }
 }
 
+const LABEL_NOTIF: Record<HrNotification['jenis'], string> = {
+  tinggi: 'High heart rate while inactive',
+  rendah: 'Denyut rendah',
+  iramaTidakTeratur: 'Irregular rhythm',
+  lain: 'Heart-rate alert',
+}
+
+function jenisNotif(v: unknown): HrNotification['jenis'] {
+  return v === 'tinggi' || v === 'rendah' || v === 'iramaTidakTeratur' || v === 'lain'
+    ? v
+    : 'lain'
+}
+
+/**
+ * Menormalkan satu notifikasi denyut dari localStorage/import runtime.
+ * Event tanpa waktu yang dapat dibaca tidak aman untuk timeline dan dibuang.
+ * Field angka optional yang cacat dihilangkan; jumlah sampel yang cacat menjadi
+ * nol agar tidak berubah menjadi NaN atau angka presisi palsu di consumer.
+ */
+function normalisasiNotif(v: unknown): HrNotification | null {
+  if (!v || typeof v !== 'object') return null
+  const x = v as Record<string, unknown>
+  if (typeof x.mulai !== 'string' || !x.mulai.trim() || Number.isNaN(Date.parse(x.mulai))) return null
+
+  const jenis = jenisNotif(x.jenis)
+  const label = typeof x.label === 'string' && x.label.trim()
+    ? x.label.trim()
+    : LABEL_NOTIF[jenis]
+  const ambang = angkaPositif(x.ambang)
+  const puncakBpm = angkaPositif(x.puncakBpm)
+  const sampel = typeof x.sampel === 'number' && Number.isInteger(x.sampel) && x.sampel >= 0
+    ? x.sampel
+    : 0
+
+  const hasil: HrNotification = {
+    jenis,
+    label,
+    mulai: x.mulai,
+    sampel,
+  }
+  if (ambang !== undefined) hasil.ambang = ambang
+  if (puncakBpm !== undefined) hasil.puncakBpm = puncakBpm
+  return hasil
+}
+
 /**
  * Menormalkan satu sesi dari batas runtime yang tidak terpercaya.
  *
@@ -138,7 +183,9 @@ export function getHrNotifications(): HrNotification[] {
     if (raw === cachedNotifRaw && cachedNotifs) return cachedNotifs.slice()
 
     const v = raw ? JSON.parse(raw) : []
-    const parsed = Array.isArray(v) ? (v as HrNotification[]) : []
+    const parsed = Array.isArray(v)
+      ? v.map(normalisasiNotif).filter((n): n is HrNotification => n !== null)
+      : []
     cachedNotifRaw = raw
     cachedNotifs = parsed
     return parsed.slice()
@@ -179,11 +226,16 @@ export function mergeWorkouts(incoming: ImportedWorkout[]): number {
 
 export function mergeHrNotifications(incoming: HrNotification[]): number {
   if (!incoming.length) return 0
+  const aman = incoming
+    .map(normalisasiNotif)
+    .filter((n): n is HrNotification => n !== null)
+  if (!aman.length) return 0
+
   const cur = getHrNotifications()
   const key = (n: HrNotification) => `${n.mulai}|${n.jenis}`
   const byKey = new Map(cur.map((n) => [key(n), n]))
   let baru = 0
-  for (const n of incoming) {
+  for (const n of aman) {
     if (!byKey.has(key(n))) baru++
     byKey.set(key(n), n)
   }
