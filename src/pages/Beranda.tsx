@@ -8,6 +8,7 @@ import { CatatanLatihan } from '../components/CatatanLatihan'
 import { PanaceaGrowthRail } from '../components/dashboard/PanaceaGrowthWidgets'
 import { PanaceaUtilityShelf } from '../components/dashboard/PanaceaUtilityShelf'
 import { DeferredBodyExposureWidget, DeferredHomeFeatureUniverse, DeferredPanaceaLearningRail } from '../components/dashboard/DeferredHomeSections'
+import { PerformanceVisualizationDeck } from '../components/dashboard/PerformanceVisualizationDeck'
 import { pratinjauBeranda } from '../lib/pratinjauBeranda'
 import { getVitals } from '../lib/healthVitals'
 import { getWorkouts } from '../lib/workoutStore'
@@ -164,6 +165,8 @@ export default function Beranda() {
           )}
         </div>
       </section>
+
+      <PerformanceVisualizationDeck mode="home" />
 
       <section>
         <div className="mb-2 flex items-center justify-between px-1">
