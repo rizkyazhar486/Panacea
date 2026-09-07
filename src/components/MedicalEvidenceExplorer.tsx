@@ -1,8 +1,15 @@
 import { FormEvent, useEffect, useMemo, useState } from 'react'
+import { Link } from 'react-router-dom'
 import {
   searchMedicalSources,
   type MedicalSourceBundle,
 } from '../lib/medicalSources'
+import {
+  addBridgeEvidence,
+  loadBridgeEvidence,
+  removeBridgeEvidence,
+  type BridgeEvidenceRef,
+} from '../lib/knowledgeBridgeHandoff'
 
 type SourceKey = 'all' | 'literature' | 'ontology' | 'trials' | 'drugLabels'
 
@@ -12,6 +19,7 @@ type Props = {
   compact?: boolean
   title?: string
   subtitle?: string
+  allowBridgeSelection?: boolean
 }
 
 const FILTERS: { key: SourceKey; label: string }[] = [
@@ -38,12 +46,15 @@ export function MedicalEvidenceExplorer({
   compact = false,
   title = 'Live medical evidence',
   subtitle = 'Search trusted public biomedical sources instead of reading static placeholder cards.',
+  allowBridgeSelection = false,
 }: Props) {
   const [query, setQuery] = useState(initialQuery)
   const [active, setActive] = useState<SourceKey>('all')
   const [bundle, setBundle] = useState<MedicalSourceBundle | null>(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
+  const [selectedKey, setSelectedKey] = useState('')
+  const [bridgeEvidence, setBridgeEvidence] = useState<BridgeEvidenceRef[]>(loadBridgeEvidence)
 
   async function run(nextQuery = query) {
     const clean = nextQuery.trim()
@@ -53,6 +64,7 @@ export function MedicalEvidenceExplorer({
     try {
       const result = await searchMedicalSources(clean)
       setBundle(result)
+      setSelectedKey('')
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Search failed.')
     } finally {
@@ -74,9 +86,55 @@ export function MedicalEvidenceExplorer({
     drugLabels: bundle?.drugLabels.length ?? 0,
   }), [bundle])
 
+  const evidenceOptions = useMemo<BridgeEvidenceRef[]>(() => {
+    if (!bundle) return []
+    return [
+      ...bundle.literature.map((item) => ({
+        key: `literature:${item.source}:${item.id}`,
+        kind: 'literature' as const,
+        id: item.id,
+        title: item.title,
+        source: `Europe PMC · ${item.source}`,
+        url: item.url,
+        year: item.year,
+      })),
+      ...bundle.ontology.map((item) => ({
+        key: `ontology:${item.ontology}:${item.id}`,
+        kind: 'ontology' as const,
+        id: item.id,
+        title: item.label,
+        source: `${item.ontology} ontology`,
+        url: item.url,
+      })),
+      ...bundle.trials.map((item) => ({
+        key: `trial:${item.id}`,
+        kind: 'trial' as const,
+        id: item.id,
+        title: item.title,
+        source: 'ClinicalTrials.gov',
+        url: item.url,
+      })),
+      ...bundle.drugLabels.map((item) => ({
+        key: `drug-label:${item.id}`,
+        kind: 'drug-label' as const,
+        id: item.id,
+        title: item.brand || item.generic,
+        source: 'openFDA · structured product label',
+        url: item.url,
+      })),
+    ]
+  }, [bundle])
+
   function submit(event: FormEvent) {
     event.preventDefault()
     void run()
+  }
+
+  function addSelectedEvidence() {
+    const candidate = evidenceOptions.find((item) => item.key === selectedKey)
+    if (!candidate) return
+    setBridgeEvidence(addBridgeEvidence(candidate))
+    setSelectedKey('')
   }
 
   return (
@@ -119,6 +177,38 @@ export function MedicalEvidenceExplorer({
               </button>
             ))}
           </div>
+
+          {allowBridgeSelection && evidenceOptions.length > 0 && (
+            <div className="mt-3 rounded-[22px] border border-emerald-200 bg-emerald-50/60 p-3 dark:border-emerald-400/20 dark:bg-emerald-400/[.06]">
+              <div className="flex flex-wrap items-start justify-between gap-2">
+                <div>
+                  <div className="text-[9px] font-black uppercase tracking-[.12em] text-emerald-800 dark:text-emerald-200">Evidence shelf → Knowledge Bridge</div>
+                  <p className="mt-1 text-[10px] leading-relaxed text-emerald-900/70 dark:text-emerald-100/65">Keep only the references you want to interpret. Panacea stores a small source pointer, not the full API response.</p>
+                </div>
+                <span className="rounded-full bg-white px-2.5 py-1 text-[9px] font-black text-emerald-800 dark:bg-white/10 dark:text-emerald-200">{bridgeEvidence.length}/8 selected</span>
+              </div>
+              <div className="mt-3 grid gap-2 sm:grid-cols-[1fr_auto]">
+                <select value={selectedKey} onChange={(event) => setSelectedKey(event.target.value)} className="min-h-10 min-w-0 rounded-xl border border-emerald-200 bg-white px-3 text-[10px] font-semibold text-neutral-800 outline-none dark:border-emerald-400/20 dark:bg-neutral-950 dark:text-white" aria-label="Choose evidence to send to Knowledge Bridge">
+                  <option value="">Choose a source from these results…</option>
+                  {evidenceOptions.map((item) => <option key={item.key} value={item.key}>{item.source} · {item.title.slice(0, 100)}</option>)}
+                </select>
+                <button type="button" disabled={!selectedKey || bridgeEvidence.length >= 8} onClick={addSelectedEvidence} className="rounded-xl bg-emerald-700 px-4 py-2.5 text-[10px] font-black text-white disabled:opacity-40">Add source</button>
+              </div>
+              {bridgeEvidence.length > 0 && (
+                <div className="mt-3 flex flex-wrap gap-1.5">
+                  {bridgeEvidence.map((item) => (
+                    <span key={item.key} className="inline-flex max-w-full items-center gap-1 rounded-full border border-emerald-200 bg-white px-2.5 py-1.5 text-[9px] font-bold text-neutral-700 dark:border-emerald-400/20 dark:bg-white/10 dark:text-neutral-200">
+                      <span className="max-w-[220px] truncate">{item.source} · {item.title}</span>
+                      <button type="button" onClick={() => setBridgeEvidence(removeBridgeEvidence(item.key))} className="ml-1 text-neutral-400" aria-label={`Remove ${item.title}`}>×</button>
+                    </span>
+                  ))}
+                </div>
+              )}
+              <div className="mt-3 flex justify-end">
+                <Link to={`/knowledge-bridge?q=${encodeURIComponent(bundle.query)}`} className="rounded-xl bg-neutral-950 px-4 py-2.5 text-[10px] font-black text-white dark:bg-white dark:text-neutral-950">Open Knowledge Bridge →</Link>
+              </div>
+            </div>
+          )}
 
           <div className={`${compact ? 'mt-3 max-h-[360px]' : 'mt-4 max-h-[620px]'} space-y-2 overflow-y-auto pr-0.5`}>
             {(active === 'all' || active === 'ontology') && bundle.ontology.map((item) => (
