@@ -6,7 +6,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
     <meta name="theme-color" content="#00BF63" />
     <link rel="manifest" href="./manifest.webmanifest" />
-    <link rel="stylesheet" href="./higgsfield-welcome-restore.css" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="default" />
     <meta name="apple-mobile-web-app-title" content="Panaceamed" />
@@ -32,94 +31,91 @@
       rel="stylesheet"
     />
     <title>Panaceamed.id — Longevity Medical-AI</title>
+    <style>
+      @keyframes pmd-splash-pulse{0%,100%{transform:scale(1);opacity:1}50%{transform:scale(1.06);opacity:.9}}
+      html.pmd-low-memory video{display:none!important}
+      html.pmd-low-memory .orb{animation:none!important}
+      @media (prefers-reduced-motion:reduce){*,*::before,*::after{scroll-behavior:auto!important;animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important}}
+    </style>
+    <script>
+      (() => {
+        const ua = navigator.userAgent || ''
+        const isIOS = /iPhone|iPad|iPod/i.test(ua) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1)
+        const saveData = Boolean(navigator.connection && navigator.connection.saveData)
+        const reducedMotion = Boolean(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches)
+        const lowMemory = isIOS || saveData || reducedMotion
+
+        window.__PANACEA_LOW_MEMORY__ = lowMemory
+        if (!lowMemory) return
+        document.documentElement.classList.add('pmd-low-memory')
+
+        const quietVideo = (video) => {
+          try {
+            video.autoplay = false
+            video.preload = 'none'
+            video.pause()
+            video.removeAttribute('src')
+            video.querySelectorAll('source').forEach((source) => source.removeAttribute('src'))
+            video.load()
+          } catch {}
+        }
+
+        const observer = new MutationObserver((mutations) => {
+          for (const mutation of mutations) {
+            for (const node of mutation.addedNodes) {
+              if (!(node instanceof Element)) continue
+              if (node.tagName === 'VIDEO') quietVideo(node)
+              node.querySelectorAll?.('video').forEach(quietVideo)
+            }
+          }
+        })
+        observer.observe(document.documentElement, { childList: true, subtree: true })
+        window.addEventListener('pmd-app-mounted', () => window.setTimeout(() => observer.disconnect(), 15000), { once: true })
+      })()
+    </script>
   </head>
   <body>
     <div id="root"></div>
-    <div id="pmd-splash" style="position:fixed;inset:0;z-index:9999;display:flex;align-items:center;justify-content:center;background:linear-gradient(160deg,#00BF63,#0B7A4B);transition:opacity .45s ease;">
+    <div id="pmd-splash" style="position:fixed;inset:0;z-index:9999;display:flex;align-items:center;justify-content:center;background:linear-gradient(160deg,#00BF63,#0B7A4B);transition:opacity .35s ease;">
       <img src="./logo-mark.png" alt="" width="72" height="72" style="border-radius:20px;animation:pmd-splash-pulse 1.3s ease-in-out infinite;box-shadow:0 12px 32px rgba(0,0,0,0.25);" />
     </div>
-    <style>@keyframes pmd-splash-pulse{0%,100%{transform:scale(1);opacity:1}50%{transform:scale(1.08);opacity:.88}}</style>
 
-    <!--
-      iOS emergency migration. It executes before React and only once per device.
-      Older Panacea service workers may still control Safari/PWA tabs after a
-      deploy. We unregister them and clear only Panacea caches, then reload once.
-      main.tsx registers the current stability worker on the clean load.
-    -->
     <script>
       (() => {
-        const IOS_RESET_KEY = 'pmd-ios-stability-reset-v2'
         const CACHE_PREFIX = 'panaceamed-'
-        const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent)
-
-        if (!isIOS) return
-
-        let alreadyReset = false
-        try { alreadyReset = localStorage.getItem(IOS_RESET_KEY) === '1' } catch {}
-        if (alreadyReset) return
-
-        try { localStorage.setItem(IOS_RESET_KEY, '1') } catch {}
-
-        Promise.resolve()
-          .then(async () => {
-            if ('caches' in window) {
-              const keys = await caches.keys()
-              await Promise.all(keys.filter((key) => key.startsWith(CACHE_PREFIX)).map((key) => caches.delete(key)))
-            }
-            if ('serviceWorker' in navigator) {
-              const registrations = await navigator.serviceWorker.getRegistrations()
-              await Promise.all(registrations.map((registration) => registration.unregister().catch(() => false)))
-            }
-          })
-          .finally(() => location.reload())
-      })()
-    </script>
-
-    <!-- Generic recovery if the JS application still fails to mount. -->
-    <script>
-      (() => {
-        const RECOVERY_KEY = 'pmd-boot-recovery-v2'
-        const CACHE_PREFIX = 'panaceamed-'
-
-        const readRecovered = () => {
-          try { return sessionStorage.getItem(RECOVERY_KEY) === '1' } catch { return false }
-        }
-        const markRecovered = () => {
-          try { sessionStorage.setItem(RECOVERY_KEY, '1') } catch {}
-        }
-        const clearRecovered = () => {
-          try { sessionStorage.removeItem(RECOVERY_KEY) } catch {}
-        }
-
-        window.addEventListener('pmd-app-mounted', clearRecovered, { once: true })
-
-        window.setTimeout(async () => {
-          const splash = document.getElementById('pmd-splash')
+        const rootReady = () => {
           const root = document.getElementById('root')
-          if (!splash || (root && root.childElementCount > 0)) {
-            clearRecovered()
-            return
-          }
+          return Boolean(root && root.childElementCount > 0)
+        }
 
-          if (readRecovered()) {
-            splash.innerHTML = '<button type="button" onclick="location.reload()" style="border:0;border-radius:14px;padding:12px 18px;font:600 15px system-ui;color:#06351f;background:#fff;box-shadow:0 8px 28px rgba(0,0,0,.2)">Muat ulang Panacea</button>'
-            return
-          }
+        window.addEventListener('pmd-app-mounted', () => {
+          try { sessionStorage.removeItem('pmd-boot-failed') } catch {}
+        }, { once: true })
 
-          markRecovered()
+        // Cleanup is deliberately non-blocking. Never force an automatic reload here:
+        // a reload loop can make an otherwise healthy iOS/PWA build impossible to open.
+        window.setTimeout(async () => {
           try {
             if ('caches' in window) {
               const keys = await caches.keys()
-              await Promise.all(keys.filter((key) => key.startsWith(CACHE_PREFIX)).map((key) => caches.delete(key)))
+              await Promise.all(keys.filter((key) => key.startsWith(CACHE_PREFIX) && !key.includes('stability')).map((key) => caches.delete(key)))
             }
             if ('serviceWorker' in navigator) {
               const registrations = await navigator.serviceWorker.getRegistrations()
               await Promise.all(registrations.map((registration) => registration.update().catch(() => undefined)))
             }
-          } finally {
-            location.reload()
-          }
-        }, 8000)
+          } catch {}
+        }, 2500)
+
+        // If React truly did not mount, keep the page usable and let the user retry.
+        // Do not mutate caches and reload automatically.
+        window.setTimeout(() => {
+          if (rootReady()) return
+          const splash = document.getElementById('pmd-splash')
+          if (!splash) return
+          try { sessionStorage.setItem('pmd-boot-failed', '1') } catch {}
+          splash.innerHTML = '<div style="max-width:330px;padding:24px;text-align:center;font-family:system-ui;color:white"><img src="./logo-mark.png" alt="" width="64" height="64" style="border-radius:18px;box-shadow:0 10px 28px rgba(0,0,0,.22)"/><div style="margin-top:16px;font-size:20px;font-weight:800">Panacea gagal memulai</div><div style="margin-top:7px;font-size:13px;line-height:1.5;opacity:.86">Tidak ada reload otomatis. Coba muat ulang satu kali.</div><button type="button" onclick="location.reload()" style="margin-top:16px;border:0;border-radius:14px;padding:12px 18px;font:700 14px system-ui;color:#06351f;background:#fff;box-shadow:0 8px 28px rgba(0,0,0,.2)">Muat ulang Panacea</button></div>'
+        }, 12000)
       })()
     </script>
     <script type="module" src="/src/main.tsx"></script>
