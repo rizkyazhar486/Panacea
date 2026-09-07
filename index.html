@@ -14,6 +14,7 @@
     <link rel="stylesheet" href="/home-theme-v18.css?v=20260908-2" />
     <link rel="stylesheet" href="/shell-theme-v18.css?v=20260908-2" />
     <link rel="stylesheet" href="/shell-performance-v20.css?v=20260908-1" />
+    <link rel="stylesheet" href="/home-visual-v25.css?v=20260908-1" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="default" />
     <meta name="apple-mobile-web-app-title" content="Panaceamed" />
@@ -65,18 +66,10 @@
 
         window.__PANACEA_LOW_MEMORY__ = lowMemory
         if (lowMemory) document.documentElement.classList.add('pmd-low-memory')
-
-        // Low-memory mode may simplify decorative animation elsewhere, but it
-        // must never hide, pause, detach or rewrite user-facing video/media.
-        // Curated landing media remains controlled by its own React component.
       })()
     </script>
     <script>
       (() => {
-        // Decorative fonts must never delay or destabilize app startup. On
-        // low-memory / Save-Data devices the system font stack remains the
-        // intentional fallback. Normal devices receive specialty faces only
-        // after the page has loaded and the browser has idle capacity.
         if (window.__PANACEA_LOW_MEMORY__) return
 
         const loadSpecialtyFonts = () => {
@@ -117,10 +110,6 @@
           return Boolean(root && root.childElementCount > 0)
         }
 
-        // Cache/SW maintenance used to run on every launch after 2.5 seconds.
-        // On iOS that means storage I/O and network work lands exactly when the
-        // user starts scrolling Home. Run it only once per build generation,
-        // and only when the browser has an idle window.
         const maintain = async () => {
           try {
             if ('caches' in window) {
@@ -151,8 +140,6 @@
           }
         }
 
-        // If React truly did not mount, keep the page usable and let the user retry.
-        // Do not mutate caches and reload automatically.
         window.setTimeout(() => {
           if (rootReady()) return
           const splash = document.getElementById('pmd-splash')
