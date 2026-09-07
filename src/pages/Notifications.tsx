@@ -130,7 +130,7 @@ export function Notifications() {
       {!backendEnabled && (
         <Card className="border-amber-200 bg-amber-50/95 dark:border-amber-400/20 dark:bg-amber-400/10">
           <Prosa kelas="text-sm text-amber-900 dark:text-amber-100">
-            The backend is unavailable, so server notification history cannot refresh. Smart combinations and achievement history remain available locally; no server event is being guessed or recreated.
+            The backend is unavailable, so server notification history cannot refresh. Smart combinations above still evaluate local app signals, and achievement history remains available locally; no server event is being guessed or recreated.
           </Prosa>
         </Card>
       )}
