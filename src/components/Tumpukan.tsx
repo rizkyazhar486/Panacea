@@ -18,41 +18,41 @@ const META: Record<string, Partial<InstrumentMeta>> = {
   pantauan: { name: 'Health watch', kicker: 'Monitoring', icon: '◎', kind: 'body' },
   skorTim: { name: 'Team scores', kicker: 'Live sport', icon: '⚽', kind: 'sport' },
   tidurLebar: { name: 'Sleep architecture', kicker: 'Recovery', icon: '☾', kind: 'recovery' },
-  giziLebar: { name: 'Daily energy', kicker: 'Metabolism', icon: '◐', kind: 'nutrition' },
-  motivasi: { name: 'Momentum', kicker: 'Mindset', icon: '✦', kind: 'focus' },
+  giziLebar: { name: 'Nutrition summary', kicker: 'Metabolism', icon: '◐', kind: 'nutrition' },
+  motivasi: { name: 'Motivation note', kicker: 'Reflection', icon: '✦', kind: 'focus' },
   lingkungan: { name: 'Environment radar', kicker: 'Exposure', icon: '⌁', kind: 'body' },
   pangan: { name: 'Food intelligence', kicker: 'Nutrition', icon: '◉', kind: 'nutrition' },
-  obatPengingat: { name: 'Dose runway', kicker: 'Medication', icon: '✚', kind: 'alerts' },
+  obatPengingat: { name: 'Dose schedule', kicker: 'Medication', icon: '✚', kind: 'alerts' },
   beban: { name: 'Training load', kicker: 'Performance', icon: '⌁', kind: 'performance' },
   ukurBerkala: { name: 'Measurements', kicker: 'Follow-up', icon: '◎', kind: 'body' },
-  skrining: { name: 'Prevention radar', kicker: 'Screening', icon: '◇', kind: 'body' },
+  skrining: { name: 'Screening status', kicker: 'Prevention', icon: '◇', kind: 'body' },
   amsler: { name: 'Vision check', kicker: 'Eye health', icon: '◫', kind: 'body' },
   layar: { name: 'Screen balance', kicker: 'Digital health', icon: '▣', kind: 'focus' },
   peregangan: { name: 'Mobility break', kicker: 'Movement', icon: '↗', kind: 'performance' },
   tekananSebar: { name: 'Blood pressure', kicker: 'Circulation', icon: '♥', kind: 'body' },
-  rangkaian: { name: 'Habit DNA', kicker: 'Consistency', icon: '∞', kind: 'focus' },
+  rangkaian: { name: 'Habit streak', kicker: 'Consistency', icon: '∞', kind: 'focus' },
   jetlag: { name: 'Jet lag', kicker: 'Circadian', icon: '◒', kind: 'recovery' },
   nadiPanjang: { name: 'Heart-rate trend', kicker: 'Cardio', icon: '♥', kind: 'body' },
   tidur14: { name: 'Sleep trend', kicker: '14 days', icon: '☾', kind: 'recovery' },
   muatanPekan: { name: 'Weekly load', kicker: 'Training', icon: '▥', kind: 'performance' },
   kaloriBanding: { name: 'Energy balance', kicker: 'Metabolism', icon: '◐', kind: 'nutrition' },
-  tdee: { name: 'Daily energy', kicker: 'Metabolism', icon: '◐', kind: 'nutrition' },
-  ayatHarian: { name: 'Daily reflection', kicker: 'Peace & meaning', icon: '✦', kind: 'reflection' },
-  hitungHari: { name: 'Countdown', kicker: 'Life timeline', icon: '⌛', kind: 'focus' },
-  ringHarian: { name: 'Daily orbit', kicker: 'Today', icon: '◎', kind: 'performance' },
+  tdee: { name: 'Daily energy estimate', kicker: 'Metabolism', icon: '◐', kind: 'nutrition' },
+  ayatHarian: { name: 'Daily reflection', kicker: 'Scripture', icon: '✦', kind: 'reflection' },
+  hitungHari: { name: 'Countdown', kicker: 'Timeline', icon: '⌛', kind: 'focus' },
+  ringHarian: { name: 'Daily summary', kicker: 'Today', icon: '◎', kind: 'performance' },
   kepatuhan: { name: 'Consistency', kicker: 'Adherence', icon: '✓', kind: 'focus' },
   beratTren: { name: 'Weight trend', kicker: 'Body', icon: '◒', kind: 'body' },
   lab: { name: 'Lab watch', kicker: 'Clinical', icon: '⌬', kind: 'body' },
-  tenaga: { name: 'Energy reactor', kicker: 'How you feel', icon: '⚡', kind: 'performance' },
-  hidrasi2: { name: 'Fluid reservoir', kicker: 'Hydration', icon: '◉', kind: 'nutrition' },
+  tenaga: { name: 'Energy check-in', kicker: 'Self-report', icon: '⚡', kind: 'performance' },
+  hidrasi2: { name: 'Hydration', kicker: 'Fluid intake', icon: '◉', kind: 'nutrition' },
   cahaya: { name: 'Light exposure', kicker: 'Circadian', icon: '☼', kind: 'recovery' },
-  tangga: { name: 'Daily climb', kicker: 'Movement', icon: '↗', kind: 'performance' },
-  vo2tren: { name: 'Future horizon', kicker: 'VO₂max trajectory', icon: '△', kind: 'performance' },
-  komposisi: { name: 'Body constellation', kicker: 'Composition', icon: '◐', kind: 'body' },
+  tangga: { name: 'Flights climbed', kicker: 'Movement', icon: '↗', kind: 'performance' },
+  vo2tren: { name: 'VO₂max trend', kicker: 'Cardiorespiratory fitness', icon: '△', kind: 'performance' },
+  komposisi: { name: 'Body composition', kicker: 'Body', icon: '◐', kind: 'body' },
   suplemen: { name: 'Supplements', kicker: 'Routine', icon: '✚', kind: 'nutrition' },
-  suhuEkstrem: { name: 'Heat & cold', kicker: 'Environment', icon: '≈', kind: 'body' },
-  hrv: { name: 'Recovery pulse', kicker: 'HRV signal', icon: '⌁', kind: 'recovery' },
-  tahapTidur: { name: 'Night landscape', kicker: 'Sleep stages', icon: '☾', kind: 'recovery' },
+  suhuEkstrem: { name: 'Heat & cold exposure', kicker: 'Environment', icon: '≈', kind: 'body' },
+  hrv: { name: 'HRV trend', kicker: 'Recovery signal', icon: '⌁', kind: 'recovery' },
+  tahapTidur: { name: 'Sleep stages', kicker: 'Recovery', icon: '☾', kind: 'recovery' },
   efisiensiTidur: { name: 'Sleep efficiency', kicker: 'Recovery', icon: '◒', kind: 'recovery' },
   lajuNapas: { name: 'Respiratory rate', kicker: 'Vitals', icon: '≈', kind: 'body' },
   saturasi: { name: 'Oxygen saturation', kicker: 'Vitals', icon: 'O₂', kind: 'body' },
@@ -60,25 +60,25 @@ const META: Record<string, Partial<InstrumentMeta>> = {
   zona2: { name: 'Zone 2 minutes', kicker: 'Aerobic base', icon: 'Z2', kind: 'performance' },
   hrr: { name: 'Heart-rate recovery', kicker: 'Recovery', icon: '↘', kind: 'recovery' },
   utangTidur: { name: 'Sleep debt', kicker: 'Recovery', icon: '☾', kind: 'recovery' },
-  tekanan: { name: 'Blood pressure trace', kicker: 'Circulation', icon: '♥', kind: 'body' },
-  napas: { name: 'Breathing', kicker: 'Reset', icon: '◌', kind: 'recovery' },
+  tekanan: { name: 'Blood pressure trend', kicker: 'Circulation', icon: '♥', kind: 'body' },
+  napas: { name: 'Breathing exercise', kicker: 'Recovery tool', icon: '◌', kind: 'recovery' },
   duduk: { name: 'Sitting time', kicker: 'Movement', icon: '▰', kind: 'performance' },
-  fokus: { name: 'Focus tunnel', kicker: 'Cognitive', icon: '◎', kind: 'focus' },
+  fokus: { name: 'Focus timer', kicker: 'Cognitive tool', icon: '◎', kind: 'focus' },
   mata: { name: 'Eye break', kicker: 'Digital health', icon: '◉', kind: 'focus' },
-  puasa: { name: 'Fasting horizon', kicker: 'Ritual & metabolism', icon: '◒', kind: 'ritual' },
-  kopi: { name: 'Caffeine decay clock', kicker: 'Timing', icon: '◐', kind: 'focus' },
+  puasa: { name: 'Fasting timer', kicker: 'Timing', icon: '◒', kind: 'ritual' },
+  kopi: { name: 'Caffeine timing', kicker: 'Estimated decay', icon: '◐', kind: 'focus' },
   pewaktu: { name: 'Timer', kicker: 'Action', icon: '◷', kind: 'focus' },
   kabar: { name: 'Health brief', kicker: 'Updates', icon: '⌁', kind: 'alerts' },
-  pengingat: { name: 'Mission control', kicker: 'Needs attention', icon: '●', kind: 'alerts' },
-  inspirasi: { name: 'Inspiration', kicker: 'Learning', icon: '✦', kind: 'reflection' },
+  pengingat: { name: 'Reminders', kicker: 'Needs attention', icon: '●', kind: 'alerts' },
+  inspirasi: { name: 'Learning prompt', kicker: 'Reflection', icon: '✦', kind: 'reflection' },
   ringkasanKarya: { name: 'Learning summary', kicker: 'Knowledge', icon: '▤', kind: 'focus' },
   soalHarian: { name: 'Daily question', kicker: 'Learning', icon: '?', kind: 'focus' },
   kartuBelajar: { name: 'Study card', kicker: 'Learning', icon: '▧', kind: 'focus' },
   obatCepat: { name: 'Drug lookup', kicker: 'Clinical tools', icon: '✚', kind: 'alerts' },
   kalkulatorCepat: { name: 'Medical calculator', kicker: 'Clinical tools', icon: '∑', kind: 'body' },
   stasiunSering: { name: 'OSCE station', kicker: 'Clinical learning', icon: '◇', kind: 'focus' },
-  konsistensi: { name: 'Consistency map', kicker: 'Your rhythm', icon: '▦', kind: 'focus' },
-  dompet: { name: 'Wallet', kicker: 'Prosperity', icon: '◇', kind: 'general' },
+  konsistensi: { name: 'Consistency map', kicker: 'Your records', icon: '▦', kind: 'focus' },
+  dompet: { name: 'Wallet', kicker: 'Balance', icon: '◇', kind: 'general' },
 }
 
 const KIND_ACCENT: Record<InstrumentMeta['kind'], { accent: string; soft: string }> = {
@@ -99,8 +99,8 @@ function metaFor(key?: string): InstrumentMeta {
   const kind = partial?.kind ?? 'general'
   const palette = KIND_ACCENT[kind]
   return {
-    name: partial?.name ?? 'Live widget',
-    kicker: partial?.kicker ?? 'Panacea instrument',
+    name: partial?.name ?? 'Widget',
+    kicker: partial?.kicker ?? 'Data & action',
     icon: partial?.icon ?? '◎',
     kind,
     accent: palette.accent,
@@ -113,7 +113,10 @@ export function Tumpukan({ judul, anak, aksi }: { judul?: string; anak: WidgetIt
   const halaman = useRef<(HTMLDivElement | null)[]>([])
   const digeser = useRef(false)
   const hemat = typeof document !== 'undefined' && document.documentElement.classList.contains('pmd-low-memory')
-  const preload = hemat ? 1 : 2
+  // One look-ahead is enough to keep a swipe responsive. Mounting two or three
+  // future widgets at once needlessly starts their timers, observers and data
+  // work before the user has approached them.
+  const preload = 1
   const [aktif, setAktif] = useState(0)
   const [tinggi, setTinggi] = useState<number | undefined>(undefined)
   const [kosong, setKosong] = useState<Record<number, boolean>>({})
@@ -124,13 +127,13 @@ export function Tumpukan({ judul, anak, aksi }: { judul?: string; anak: WidgetIt
   }, [anak.length, preload])
 
   // Do not progressively mount every selected widget in the background.
-  // Only the active slide and a small look-ahead are allowed to become live.
-  // This keeps timers, observers, calculations and network hooks dormant until
-  // the user actually approaches that widget.
+  // Only the active slide and one look-ahead are allowed to become live. This
+  // keeps timers, observers, calculations and network hooks dormant until the
+  // user actually approaches that widget.
   useEffect(() => {
-    const lookAhead = hemat ? 1 : 2
+    const lookAhead = 1
     setSiap((s) => Math.max(s, Math.min(anak.length, aktif + lookAhead + 1)))
-  }, [aktif, anak.length, hemat])
+  }, [aktif, anak.length])
 
   useEffect(() => {
     const periksa = () => {
