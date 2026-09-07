@@ -191,6 +191,15 @@ function authenticatedUserId(req: Request) {
   return currentUser(req)?.id || ''
 }
 
+function renderRuntime() {
+  return {
+    render: process.env.RENDER === 'true',
+    serviceName: process.env.RENDER_SERVICE_NAME || null,
+    serviceId: process.env.RENDER_SERVICE_ID || null,
+    revision: process.env.RENDER_GIT_COMMIT || null,
+  }
+}
+
 export function attachGenomicsComputeRoutes(server: Server) {
   const app = getExpressApp(server)
   if (!app) {
@@ -206,6 +215,7 @@ export function attachGenomicsComputeRoutes(server: Server) {
       backend: 'render-control-plane',
       configured: Boolean(config.genomics.workerUrl),
       provider: config.genomics.provider,
+      runtime: renderRuntime(),
       jobKinds: JOB_KINDS,
       inputSchemes: [...INPUT_SCHEMES].map((scheme) => scheme.replace(':', '')),
       inlineUpload: false,
