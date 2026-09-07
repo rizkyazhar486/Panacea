@@ -154,10 +154,59 @@ async function parseJson(filePath) {
   }
 }
 
+function validateSemanticIntegrity(value, filePath, seenIds) {
+  const errors = [];
+  const relative = path.relative(process.cwd(), filePath);
+  const relativeFromRegistry = path.relative(ROOT, filePath);
+  const categoryDirectory = relativeFromRegistry.split(path.sep)[0];
+
+  if (typeof value.id === 'string') {
+    const existing = seenIds.get(value.id);
+    if (existing) {
+      errors.push(`${relative}: duplicate source id ${JSON.stringify(value.id)}; already used by ${existing}`);
+    } else {
+      seenIds.set(value.id, relative);
+    }
+  }
+
+  if (typeof value.category === 'string' && categoryDirectory !== value.category) {
+    errors.push(
+      `${relative}: category ${JSON.stringify(value.category)} must match registry directory ${JSON.stringify(categoryDirectory)}`,
+    );
+  }
+
+  if (value.adapter?.status === 'ACTIVE' && !value.adapter?.module) {
+    errors.push(`${relative}: ACTIVE adapter must declare a non-null adapter.module`);
+  }
+
+  if (value.license?.status === 'VERIFIED') {
+    if (!value.license.identifier) {
+      errors.push(`${relative}: VERIFIED license must declare license.identifier`);
+    }
+    if (!value.license.verificationUrl) {
+      errors.push(`${relative}: VERIFIED license must declare license.verificationUrl`);
+    }
+    if (!value.license.verifiedAt) {
+      errors.push(`${relative}: VERIFIED license must declare license.verifiedAt`);
+    }
+  }
+
+  if (value.license?.commercialUse === 'ALLOWED' && value.license?.status !== 'VERIFIED') {
+    errors.push(`${relative}: commercialUse ALLOWED requires license.status VERIFIED`);
+  }
+
+  return errors;
+}
+
 async function main() {
   const schema = await parseJson(SCHEMA_PATH);
   const files = (await collectJsonFiles(ROOT)).sort();
   const failures = [];
+  const seenIds = new Map();
+
+  if (files.length === 0) {
+    failures.push('Source registry contains no entries.');
+  }
 
   for (const file of files) {
     const relative = path.relative(process.cwd(), file);
@@ -171,6 +220,10 @@ async function main() {
 
     const errors = validate(value, schema);
     failures.push(...errors.map((error) => `${relative}: ${error}`));
+
+    if (errors.length === 0) {
+      failures.push(...validateSemanticIntegrity(value, file, seenIds));
+    }
   }
 
   if (failures.length > 0) {
@@ -180,7 +233,7 @@ async function main() {
     return;
   }
 
-  console.log(`Source registry validation passed (${files.length} entries).`);
+  console.log(`Source registry validation passed (${files.length} entries, ${seenIds.size} unique ids).`);
 }
 
 main().catch((error) => {
