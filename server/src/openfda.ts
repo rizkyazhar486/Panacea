@@ -17,9 +17,15 @@ export interface DrugInfo {
   dosage: string
   adverse: string
   manufacturer: string
+  /** Stable source identity when openFDA supplies a SPL set_id or record id. */
+  labelId?: string
+  /** Exact openFDA source query for the SPL set_id; never contains an API key. */
+  sourceUrl?: string
 }
 
 interface FdaResult {
+  id?: string
+  set_id?: string
   openfda?: { brand_name?: string[]; generic_name?: string[]; manufacturer_name?: string[] }
   purpose?: string[]
   indications_and_usage?: string[]
@@ -38,6 +44,13 @@ function cleanQuery(value: string): string {
     .replace(/\s+/g, ' ')
     .trim()
     .slice(0, MAX_QUERY_LENGTH)
+}
+
+function sourceUrlForSetId(setId: string | undefined): string | undefined {
+  const clean = setId?.trim()
+  if (!clean) return undefined
+  const params = new URLSearchParams({ search: `set_id:"${clean}"`, limit: '1' })
+  return `${BASE}?${params.toString()}`
 }
 
 async function fetchLabel(search: string): Promise<FdaResult | null> {
@@ -72,6 +85,9 @@ export async function lookupDrug(name: string): Promise<DrugInfo | null> {
   }
   if (!r) return null
 
+  const setId = r.set_id?.trim() || undefined
+  const recordId = r.id?.trim() || undefined
+
   return {
     brand: first(r.openfda?.brand_name) || q,
     generic: first(r.openfda?.generic_name),
@@ -81,5 +97,7 @@ export async function lookupDrug(name: string): Promise<DrugInfo | null> {
     dosage: clip(first(r.dosage_and_administration)),
     adverse: clip(first(r.adverse_reactions)),
     manufacturer: first(r.openfda?.manufacturer_name),
+    labelId: setId || recordId,
+    sourceUrl: sourceUrlForSetId(setId),
   }
 }
