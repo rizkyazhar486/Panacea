@@ -1,0 +1,52 @@
+{
+  "id": "who_icd11",
+  "name": "WHO ICD-11",
+  "category": "terminology",
+  "kind": ["api", "standard", "terminology-server"],
+  "homepage": "https://icd.who.int/",
+  "repository": null,
+  "features": ["diagnosis-coding", "clinical-intelligence", "disease-directory", "epidemiology", "healthcare-infrastructure", "fhir-terminology"],
+  "formats": ["json", "json-ld", "http-rest", "fhir-prerelease"],
+  "usage": {
+    "runtime": true,
+    "buildTime": false,
+    "networkRequired": true,
+    "notes": "Use the official WHO ICD API v2 for cloud access and pin an explicit ICD-11 release such as 2026-01. WHO also provides local deployment options, but Panacea should treat those as a separately configured server boundary. Cloud API credentials must never be embedded in browser code."
+  },
+  "license": {
+    "status": "VERIFIED",
+    "identifier": "CC-BY-ND-3.0-IGO",
+    "commercialUse": "CONDITIONAL",
+    "attributionRequired": true,
+    "shareAlike": false,
+    "scope": "WHO licenses the digital ICD-11 classification under CC BY-ND 3.0 IGO for commercial and non-commercial use when appropriately cited and not adapted. The license has specific conditions: Panacea must preserve ICD codes/URIs and must not publish an altered classification as ICD-11. Mappings or crosswalks between ICD-11 and other classifications or terminologies are not automatically covered by this license and may require a separate written agreement with WHO.",
+    "verificationUrl": "https://icd.who.int/en/docs/icd11-license.pdf",
+    "verifiedAt": "2026-09-08",
+    "notes": "Do not modify WHO classification content in place. Panacea-specific annotations must be clearly separate from WHO-authored fields. Do not assume permission for generated ICD↔SNOMED or other crosswalk products without checking WHO mapping terms."
+  },
+  "validation": {
+    "level": "REFERENCE",
+    "clinicalDecisionUse": "CONTEXT_ONLY",
+    "notes": "ICD-11 is an authoritative classification/coding standard. A valid code does not by itself prove a patient diagnosis or treatment recommendation; diagnostic reasoning and clinical application require independent clinical evidence and validation."
+  },
+  "provenance": {
+    "authority": "World Health Organization (WHO)",
+    "sourceIdentityRequired": true,
+    "versionPinRequired": true,
+    "notes": "Record API major version, ICD release id, language, Foundation URI and/or MMS linearization URI/code. Do not collapse Foundation entities and MMS codes into one identifier because they represent different layers of ICD-11. The 2026-01 release is currently available through the WHO API."
+  },
+  "adapter": {
+    "status": "PLANNED",
+    "normalizedTarget": "PanaceaTerminologyConcept",
+    "module": null,
+    "notes": "Planned flow: server-side OAuth2 client-credentials -> WHO ICD API v2 -> release/language-aware response -> immutable WHO fields + separated Panacea annotations -> PanaceaTerminologyConcept. Preserve WHO entity URIs and release metadata. Never ship ICD API client secrets to React, localStorage or the public repository. WHO FHIR support is currently pre-release, so Panacea should not make it the primary production path yet."
+  },
+  "trust": {
+    "authority": 5,
+    "evidenceQuality": 4,
+    "recency": 5,
+    "licenseClarity": 4,
+    "reproducibility": 5,
+    "notes": "High authority as a WHO classification standard. EvidenceQuality reflects classification authority, not proof that a code is clinically correct for an individual patient. LicenseClarity is reduced because no-derivatives and mapping/crosswalk rules require use-case-specific care."
+  }
+}
