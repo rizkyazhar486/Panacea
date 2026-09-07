@@ -1,0 +1,182 @@
+/*
+ * Surgical responsive safeguards for legacy/Claude surfaces.
+ *
+ * This file deliberately does not redesign or replace existing experiences.
+ * It fixes narrow-screen overflow, one-character text collapse, touch zoom,
+ * and oversized heavy viewers while preserving the original component tree.
+ */
+
+html,
+body,
+#root {
+  max-width: 100%;
+  overflow-x: clip;
+}
+
+/* Pricing: never let the bank-transfer label collapse to one character/line. */
+#pricing,
+#pricing * {
+  min-width: 0;
+}
+
+@media (max-width: 640px) {
+  #pricing {
+    padding-left: 1rem !important;
+    padding-right: 1rem !important;
+  }
+
+  #pricing [class~="items-baseline"] {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    justify-content: flex-start !important;
+    gap: 0.3rem !important;
+  }
+
+  #pricing [class~="items-baseline"] > span {
+    width: 100%;
+    max-width: 100%;
+    text-align: left !important;
+    white-space: normal !important;
+    word-break: normal !important;
+    overflow-wrap: break-word !important;
+  }
+
+  #pricing [class~="items-baseline"] > span:last-child {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 0.2rem;
+  }
+
+  #pricing [class~="items-baseline"] > span:last-child > span {
+    margin-left: 0 !important;
+  }
+}
+
+@media (hover: none), (pointer: coarse) {
+  /* Pricing cards use pointer tilt on desktop. Do not retain an inline 3-D
+     transform on touch devices where it adds visual instability. */
+  #pricing [style*="perspective(900px)"] {
+    transform: none !important;
+  }
+}
+
+/* Claude welcome page: preserve all sections/media, only make the legacy
+   composition fit an iPhone-sized viewport cleanly. */
+@media (max-width: 640px) {
+  body:has(#panacea-track) header.sticky {
+    gap: 0.5rem;
+    padding: 0.65rem 0.75rem !important;
+    -webkit-backdrop-filter: blur(12px);
+    backdrop-filter: blur(12px);
+  }
+
+  body:has(#panacea-track) header.sticky > :first-child {
+    min-width: 0;
+    max-width: 56%;
+  }
+
+  body:has(#panacea-track) header.sticky > div:last-child {
+    flex-shrink: 0;
+    gap: 0.4rem !important;
+  }
+
+  body:has(#panacea-track) header.sticky button[aria-label="Ganti tema"] {
+    width: 2.35rem !important;
+    height: 2.35rem !important;
+  }
+
+  body:has(#panacea-track) header.sticky button:last-child {
+    padding: 0.68rem 0.9rem !important;
+    font-size: 0.82rem !important;
+    line-height: 1.05;
+    white-space: nowrap;
+  }
+
+  body:has(#panacea-track) section,
+  body:has(#panacea-track) footer,
+  body:has(#panacea-track) video {
+    max-width: 100%;
+  }
+
+  body:has(#panacea-track) section {
+    overflow-wrap: break-word;
+  }
+
+  body:has(#panacea-track) h1,
+  body:has(#panacea-track) h2,
+  body:has(#panacea-track) h3,
+  body:has(#panacea-track) p {
+    word-break: normal;
+  }
+
+  /* The paid Higgsfield film remains intact. Avoid object-cover focal drift
+     that can cut text/subject composition at phone widths. */
+  body:has(#panacea-track) video[src*="d8j0ntlcm91z4.cloudfront.net"] {
+    object-position: 50% 50%;
+  }
+
+  #panacea-track {
+    max-width: none;
+  }
+}
+
+/* Body Exposure: precision without a mobile scroll/zoom penalty. */
+main:has(input[aria-label="Search head-to-toe anatomy"]) {
+  min-width: 0;
+  max-width: 100%;
+  overflow-x: clip;
+}
+
+@media (max-width: 640px) {
+  main:has(input[aria-label="Search head-to-toe anatomy"]) input,
+  main:has(input[aria-label="Search head-to-toe anatomy"]) select,
+  main:has(input[aria-label="Search head-to-toe anatomy"]) textarea {
+    font-size: 16px !important;
+  }
+
+  section:has(input[aria-label="Search head-to-toe anatomy"]) {
+    border-radius: 1.25rem !important;
+  }
+
+  section:has(input[aria-label="Search head-to-toe anatomy"]) > header {
+    padding: 0.9rem !important;
+  }
+
+  section:has(input[aria-label="Search head-to-toe anatomy"]) aside {
+    padding: 0.65rem !important;
+  }
+
+  section:has(input[aria-label="Search head-to-toe anatomy"]) aside .no-scrollbar {
+    scroll-snap-type: x proximity;
+    overscroll-behavior-x: contain;
+  }
+
+  section:has(input[aria-label="Search head-to-toe anatomy"]) aside .no-scrollbar > button {
+    min-width: 9.25rem !important;
+    scroll-snap-align: start;
+  }
+
+  div[aria-label^="HRA 3D model of"] {
+    min-height: 330px !important;
+  }
+
+  div[aria-label="Interactive HuBMAP HRA 3D anatomy viewer"] {
+    min-height: 390px !important;
+  }
+
+  main:has(input[aria-label="Search head-to-toe anatomy"]) button,
+  main:has(input[aria-label="Search head-to-toe anatomy"]) p,
+  main:has(input[aria-label="Search head-to-toe anatomy"]) span {
+    word-break: normal;
+    overflow-wrap: break-word;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #panacea-track {
+    animation: none !important;
+    transform: none !important;
+  }
+}
