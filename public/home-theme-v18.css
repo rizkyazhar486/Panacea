@@ -1,0 +1,221 @@
+/* Panacea Home theme v18
+   Theme/readability + wallpaper continuity only. No data, routing or widget logic. */
+
+.panacea-home {
+  --pmd-home-text: #111827;
+  --pmd-home-muted: #566273;
+  --pmd-home-subtle: #6b7280;
+  --pmd-home-border: rgba(15, 23, 42, .10);
+  --pmd-home-surface: rgba(255, 255, 255, .78);
+  --pmd-home-surface-strong: rgba(255, 255, 255, .90);
+  --pmd-home-surface-soft: rgba(248, 250, 252, .74);
+  color: var(--pmd-home-text);
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+}
+
+.dark .panacea-home {
+  --pmd-home-text: #f7f9fc;
+  --pmd-home-muted: #b9c2cf;
+  --pmd-home-subtle: #9aa6b6;
+  --pmd-home-border: rgba(255, 255, 255, .11);
+  --pmd-home-surface: rgba(7, 11, 19, .72);
+  --pmd-home-surface-strong: rgba(10, 14, 23, .88);
+  --pmd-home-surface-soft: rgba(255, 255, 255, .055);
+}
+
+.panacea-home::after {
+  content: none !important;
+  display: none !important;
+}
+
+.panacea-home-backdrop {
+  transform: none !important;
+  will-change: auto !important;
+  opacity: .38;
+}
+
+.dark .panacea-home-backdrop {
+  opacity: .88;
+}
+
+.panacea-home .home-command-panel,
+.panacea-home .home-loading-card {
+  border-color: var(--pmd-home-border) !important;
+  background: var(--pmd-home-surface) !important;
+  color: var(--pmd-home-text);
+  box-shadow: 0 12px 34px rgba(15, 23, 42, .065) !important;
+}
+
+.dark .panacea-home .home-command-panel,
+.dark .panacea-home .home-loading-card {
+  box-shadow: 0 14px 34px rgba(0, 0, 0, .24) !important;
+}
+
+.panacea-home .home-command-panel .kaca,
+.panacea-home .widget-instrument-shell-v5,
+.panacea-home .widget-instrument-slide-v5 {
+  border-color: var(--pmd-home-border) !important;
+}
+
+.panacea-home .home-command-panel .kaca {
+  background: var(--pmd-home-surface-strong) !important;
+}
+
+.dark .panacea-home .home-command-panel .kaca {
+  background: rgba(12, 16, 25, .84) !important;
+}
+
+.panacea-home .home-odyssey-hero {
+  border-color: rgba(15, 23, 42, .11) !important;
+  background:
+    linear-gradient(118deg, rgba(255,255,255,.88), rgba(255,255,255,.68) 52%, rgba(255,255,255,.78)),
+    radial-gradient(circle at 82% 22%, rgba(255,57,95,.12), transparent 30%),
+    radial-gradient(circle at 68% 72%, rgba(31,99,255,.12), transparent 36%) !important;
+  box-shadow: 0 22px 70px rgba(20, 38, 84, .11) !important;
+}
+
+.dark .panacea-home .home-odyssey-hero {
+  border-color: rgba(255,255,255,.12) !important;
+  background:
+    linear-gradient(118deg, rgba(5,9,17,.84), rgba(8,11,22,.68) 52%, rgba(15,8,20,.72)),
+    radial-gradient(circle at 82% 22%, rgba(255,57,95,.14), transparent 32%),
+    radial-gradient(circle at 68% 72%, rgba(31,99,255,.16), transparent 38%) !important;
+  box-shadow: 0 24px 76px rgba(0,0,0,.26) !important;
+}
+
+.panacea-home .home-odyssey-title {
+  color: #0b1220 !important;
+}
+
+.dark .panacea-home .home-odyssey-title {
+  color: #fbfdff !important;
+  text-shadow: none !important;
+}
+
+.panacea-home .home-odyssey-copy {
+  color: #465365 !important;
+  font-size: clamp(13px, 2.7vw, 14px) !important;
+  line-height: 1.62 !important;
+}
+
+.dark .panacea-home .home-odyssey-copy {
+  color: #c5cedb !important;
+}
+
+.panacea-home .text-neutral-500 { color: #5b6676 !important; }
+.panacea-home .text-neutral-400 { color: #6b7482 !important; }
+.dark .panacea-home .dark\:text-neutral-400 { color: #b8c2d0 !important; }
+.dark .panacea-home .dark\:text-neutral-300 { color: #d2d8e1 !important; }
+.dark .panacea-home .text-neutral-500 { color: #aab5c4 !important; }
+.dark .panacea-home .text-neutral-400 { color: #b7c1cf !important; }
+
+.panacea-home .home-action-card {
+  border-color: var(--pmd-home-border) !important;
+  background: var(--pmd-home-surface-soft) !important;
+  min-height: 74px;
+}
+
+.dark .panacea-home .home-action-card {
+  background: rgba(255,255,255,.055) !important;
+}
+
+.panacea-home .home-action-card > span:nth-child(2) > span:first-child {
+  font-size: 12px !important;
+  line-height: 1.2;
+}
+
+.panacea-home .home-action-card > span:nth-child(2) > span:nth-child(2) {
+  color: var(--pmd-home-muted) !important;
+  font-size: 10px !important;
+  line-height: 1.25;
+}
+
+.panacea-home .home-pill-button,
+.panacea-home .home-text-link,
+.panacea-home .home-icon-button,
+.panacea-home .home-secondary-action {
+  font-weight: 800;
+}
+
+.dark .panacea-home .home-pill-button,
+.dark .panacea-home .home-secondary-action,
+.dark .panacea-home .home-icon-button {
+  color: #f7f9fc !important;
+  border-color: rgba(255,255,255,.13) !important;
+  background: rgba(255,255,255,.085) !important;
+}
+
+.dark .panacea-home .home-icon-button-strong {
+  color: #0a0f18 !important;
+  background: #f7f9fc !important;
+}
+
+.panacea-home .widget-instrument-title-v5 { color: var(--pmd-home-text) !important; }
+.panacea-home .widget-instrument-kicker-v5,
+.panacea-home .widget-instrument-state-v5,
+.panacea-home .widget-instrument-count-v5,
+.panacea-home .widget-instrument-label-v5 { color: var(--pmd-home-muted) !important; }
+
+.panacea-home .widget-instrument-title-v5 {
+  font-size: clamp(16px, 4.2vw, 20px) !important;
+  line-height: 1.08 !important;
+  letter-spacing: -.02em !important;
+}
+
+.panacea-home .widget-instrument-kicker-v5 {
+  font-size: 10px !important;
+  line-height: 1.2 !important;
+  letter-spacing: .10em !important;
+}
+
+.panacea-home button:focus-visible,
+.panacea-home a:focus-visible,
+.panacea-home summary:focus-visible,
+.panacea-home select:focus-visible,
+.panacea-home input:focus-visible {
+  outline: 3px solid rgba(0, 191, 99, .62) !important;
+  outline-offset: 2px;
+}
+
+@media (hover: none) and (pointer: coarse) {
+  .panacea-home-backdrop {
+    position: absolute !important;
+    inset: 0 !important;
+    background-image:
+      linear-gradient(180deg, rgba(250,252,255,.70), rgba(247,250,255,.42) 45%, rgba(252,250,252,.66)),
+      url('/panacea-home-cosmos-mobile.svg') !important;
+    background-size: 100% 100%, 100% auto !important;
+    background-position: center top, center top !important;
+    background-repeat: no-repeat, repeat-y !important;
+    opacity: .34 !important;
+  }
+
+  .dark .panacea-home-backdrop {
+    background-image:
+      linear-gradient(180deg, rgba(2,5,11,.06), rgba(3,5,12,.14) 52%, rgba(2,4,10,.10)),
+      url('/panacea-home-cosmos-mobile.svg') !important;
+    opacity: .92 !important;
+  }
+
+  .panacea-home .home-odyssey-hero,
+  .panacea-home .home-command-panel,
+  .panacea-home .home-loading-card {
+    -webkit-backdrop-filter: none !important;
+    backdrop-filter: none !important;
+  }
+}
+
+html.pmd-low-memory .panacea-home .home-odyssey-hero,
+html.pmd-low-memory .panacea-home .home-action-card,
+html.pmd-low-memory .panacea-home .widget-instrument-shell-v5 {
+  box-shadow: none !important;
+  filter: none !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .panacea-home *, .panacea-home *::before, .panacea-home *::after {
+    scroll-behavior: auto !important;
+  }
+}
