@@ -1,6 +1,12 @@
 import { useMemo, useState } from 'react'
 import { Link, useSearchParams } from 'react-router-dom'
 import { BRIDGE_TOPICS, bridgeSummary, resolveBridgeTopic } from '../lib/knowledgeBridgeMap'
+import {
+  clearBridgeEvidence,
+  loadBridgeEvidence,
+  removeBridgeEvidence,
+  type BridgeEvidenceRef,
+} from '../lib/knowledgeBridgeHandoff'
 
 type Depth = 'plain' | 'student' | 'clinical'
 const NOTE_KEY = 'pmd_knowledge_bridge_notes_v1'
@@ -23,6 +29,7 @@ export function KnowledgeBridgeWorkbench() {
   const [selectedId, setSelectedId] = useState(initialTopic?.id ?? 'hypertension')
   const [depth, setDepth] = useState<Depth>('student')
   const [notes, setNotes] = useState<Record<string, string>>(readNotes)
+  const [evidence, setEvidence] = useState<BridgeEvidenceRef[]>(loadBridgeEvidence)
   const [copied, setCopied] = useState(false)
   const [status, setStatus] = useState(initialTopic || initialQuery === 'hypertension' ? '' : `No curated causal map matches “${initialQuery}” yet. You can still verify this query in Medical Library.`)
 
@@ -78,6 +85,32 @@ export function KnowledgeBridgeWorkbench() {
         <GuideCard label="How to use" text="Choose or search a curated topic → follow the stages → verify uncertain claims in Medical Library." />
         <GuideCard label="Benefit" text="Makes the reasoning path visible, so facts are easier to study, challenge and connect to their sources." />
       </div>
+
+      {evidence.length > 0 && (
+        <div className="mt-4 rounded-[22px] border border-cyan-200 bg-cyan-50/55 p-3 dark:border-cyan-400/20 dark:bg-cyan-400/[.055]">
+          <div className="flex flex-wrap items-start justify-between gap-2">
+            <div>
+              <div className="text-[9px] font-black uppercase tracking-[.12em] text-cyan-800 dark:text-cyan-200">Selected evidence · {evidence.length}/8</div>
+              <p className="mt-1 text-[10px] leading-relaxed text-neutral-600 dark:text-neutral-300">These are source pointers selected from live search. Open the original source before treating a claim as verified.</p>
+            </div>
+            <button type="button" onClick={() => setEvidence(clearBridgeEvidence())} className="rounded-full border border-cyan-200 bg-white px-3 py-1.5 text-[9px] font-black text-cyan-800 dark:border-cyan-400/20 dark:bg-white/10 dark:text-cyan-200">Clear shelf</button>
+          </div>
+          <div className="mt-3 grid gap-2 md:grid-cols-2">
+            {evidence.map((item) => (
+              <article key={item.key} className="rounded-[18px] border border-cyan-100 bg-white p-3 dark:border-cyan-400/10 dark:bg-neutral-950">
+                <div className="flex items-start justify-between gap-2">
+                  <div className="min-w-0">
+                    <div className="text-[8px] font-black uppercase tracking-wide text-cyan-700 dark:text-cyan-300">{item.source}{item.year ? ` · ${item.year}` : ''}</div>
+                    <a href={item.url} target="_blank" rel="noreferrer" className="mt-1 block text-[10.5px] font-black leading-snug text-neutral-900 hover:underline dark:text-white">{item.title} ↗</a>
+                    <div className="mt-1 text-[8.5px] font-semibold text-neutral-400">{item.id}</div>
+                  </div>
+                  <button type="button" onClick={() => setEvidence(removeBridgeEvidence(item.key))} className="grid h-7 w-7 shrink-0 place-items-center rounded-full bg-neutral-100 text-[12px] font-black text-neutral-500 dark:bg-white/10 dark:text-neutral-300" aria-label={`Remove ${item.title}`}>×</button>
+                </div>
+              </article>
+            ))}
+          </div>
+        </div>
+      )}
 
       <div className="mt-4 grid gap-2 sm:grid-cols-[1fr_auto]">
         <div className="relative">
