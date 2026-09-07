@@ -1,0 +1,52 @@
+{
+  "id": "three_js",
+  "name": "Three.js",
+  "category": "rendering",
+  "kind": ["library", "framework"],
+  "homepage": "https://threejs.org/",
+  "repository": "https://github.com/mrdoob/three.js",
+  "features": [751, 752, 753, 754, 755, 756, 757, 758, 759, 760, 761, "body-explorer", "scientific-3d"],
+  "formats": ["glb", "gltf", "draco", "meshopt", "ktx2"],
+  "usage": {
+    "runtime": true,
+    "buildTime": false,
+    "networkRequired": false,
+    "notes": "Three.js is the browser rendering layer, not an anatomical or clinical data source. Keep source meshes and textures behind Panacea asset manifests. Prefer progressive loading, object visibility control, frustum culling, LOD, and compressed delivery where measured mobile performance benefits justify decoder cost."
+  },
+  "license": {
+    "status": "VERIFIED",
+    "identifier": "MIT",
+    "commercialUse": "ALLOWED",
+    "attributionRequired": true,
+    "shareAlike": false,
+    "scope": "The Three.js software is distributed under the MIT License. This permission applies to Three.js software only and does not grant any rights to anatomical meshes, textures, models, datasets, fonts, or other content rendered through it.",
+    "verificationUrl": "https://github.com/mrdoob/three.js/blob/master/LICENSE",
+    "verifiedAt": "2026-09-08",
+    "notes": "Retain the Three.js copyright and MIT permission notice as required. Track every rendered asset under its own provenance and license record."
+  },
+  "validation": {
+    "level": "REFERENCE",
+    "clinicalDecisionUse": "NO",
+    "notes": "Renderer correctness does not establish anatomical, physiological, diagnostic, or procedural validity. Scientific validation belongs to the source data and Panacea interpretation layer."
+  },
+  "provenance": {
+    "authority": "Three.js project (mrdoob/three.js)",
+    "sourceIdentityRequired": true,
+    "versionPinRequired": true,
+    "notes": "Panacea currently declares three ^0.185.1 and @types/three ^0.185.4. Preserve the lockfile and test loader/renderer behavior when upgrading because WebGL/WebGPU and loader behavior can change across releases."
+  },
+  "adapter": {
+    "status": "PLANNED",
+    "normalizedTarget": "Panacea3DRendererContract",
+    "module": null,
+    "notes": "Keep React components data-agnostic: PanaceaAnatomyAssetManifest -> renderer adapter -> Three.js scene. GLTFLoader supports Draco, Meshopt, and KTX2-related glTF extensions, but enable compression selectively after measuring transfer size, decode time, memory, and interaction latency on mobile devices."
+  },
+  "trust": {
+    "authority": 5,
+    "evidenceQuality": 2,
+    "recency": 5,
+    "licenseClarity": 5,
+    "reproducibility": 5,
+    "notes": "These dimensions describe suitability as a rendering dependency, not medical evidence quality. EvidenceQuality is intentionally low because Three.js is not a biomedical evidence source."
+  }
+}
