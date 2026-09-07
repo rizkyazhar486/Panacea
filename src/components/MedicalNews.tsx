@@ -112,6 +112,13 @@ export function MedicalNews() {
 
   return (
     <section id="news" className="mx-auto my-8 max-w-6xl overflow-hidden rounded-[2rem] border border-emerald-200/10 bg-[#06120c] px-5 py-16 shadow-[0_28px_80px_-40px_rgba(0,55,35,.75)] sm:px-8 sm:py-20">
+      {/* Legacy rich-welcome film uses the same Higgsfield asset as the hero.
+          Keep its caption readable on real video frames without changing the
+          hero or relying on the active light/dark theme. */}
+      <style>{`
+        video[src*="hf_20260702_023227_88b54135-7489-48de-9476-ca0657fc0d29.mp4"] ~ div.absolute.bottom-0 { color: #fff !important; }
+        video[src*="hf_20260702_023227_88b54135-7489-48de-9476-ca0657fc0d29.mp4"] ~ div.absolute.bottom-0 p { color: rgba(255,255,255,.82) !important; }
+      `}</style>
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div className="max-w-2xl">
           <div className="text-[10px] font-black uppercase tracking-[.18em] text-[#f0d68a]">Health briefing</div>
