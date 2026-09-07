@@ -47,7 +47,7 @@ assert.match(navigator, /Toe/)
 const viewer = readFileSync('src/components/digital-twin/HraResolvedAnatomyViewer.tsx', 'utf8')
 assert.match(viewer, /try \{\s*renderer = new THREE\.WebGLRenderer/)
 assert.match(viewer, /3D renderer unavailable/)
-assert.match(viewer, /mobile \? 1\.25 : 1\.75/)
+assert.match(viewer, /mobile \? 1\.15 : 1\.65/, 'resolved HRA viewer should retain the current lower mobile/desktop DPR caps')
 assert.match(viewer, /ResizeObserver/)
 
 const deepAtlas = readFileSync('src/components/digital-twin/BodyParts3DDeepAtlas.tsx', 'utf8')
