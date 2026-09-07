@@ -184,7 +184,10 @@ export function Workout() {
 
   const todayStr = hariIni()
   const todayLog = log.filter((l) => l.date === todayStr)
-  const weekLog = log.filter((l) => Date.now() - new Date(l.date).getTime() <= 7 * 86400000)
+  const weekLog = useMemo(() => {
+    const last7Days = new Set(Array.from({ length: 7 }, (_, offset) => hariLalu(offset)))
+    return log.filter((l) => last7Days.has(l.date))
+  }, [log, todayStr])
   const todaySets = todayLog.reduce((total, l) => total + (Number.isFinite(l.sets) && l.sets > 0 ? l.sets : 0), 0)
   const weeklySets = weekLog.reduce((total, l) => total + (Number.isFinite(l.sets) && l.sets > 0 ? l.sets : 0), 0)
   const weeklyLoadedVolume = weekLog.reduce((total, l) => {
@@ -210,7 +213,7 @@ export function Workout() {
       })
       .filter((item) => item.sets > 0)
       .sort((a, b) => b.sets - a.sets)
-  }, [log])
+  }, [weekLog])
   const progress28 = useMemo(() => {
     const offsetByDate = new Map<string, number>()
     for (let offset = 0; offset < 28; offset += 1) offsetByDate.set(hariLalu(offset), offset)
