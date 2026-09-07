@@ -9,18 +9,17 @@ on:
       - .github/workflows/stabilization-body3d-patch.yml
 
 permissions:
-  contents: write
+  contents: read
 
 jobs:
-  apply:
+  validate:
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 30
     steps:
       - name: Checkout working branch
         uses: actions/checkout@v4
         with:
           ref: claude/continue-previous-task-un3s83
-          fetch-depth: 0
 
       - name: Setup Node
         uses: actions/setup-node@v4
@@ -28,22 +27,30 @@ jobs:
           node-version: 20
           cache: npm
 
-      - name: Apply guarded source patch
-        run: node scripts/stabilization/apply-body3d-runtime-fix.mjs
+      - name: Install frontend dependencies
+        run: npm ci
 
-      - name: Verify TypeScript and production build
-        run: |
-          npm ci
-          npm run build
+      - name: Frontend TypeScript
+        run: npx tsc --noEmit
 
-      - name: Commit patched source
-        run: |
-          if git diff --quiet -- src/components/Body3D.tsx; then
-            echo 'No Body3D change was produced.'
-            exit 1
-          fi
-          git config user.name 'panacea-stabilization-bot'
-          git config user.email 'actions@users.noreply.github.com'
-          git add src/components/Body3D.tsx
-          git commit -m 'fix(body): preserve anatomy geometry and suspend hidden rendering'
-          git push origin HEAD:claude/continue-previous-task-un3s83
+      - name: Frontend production build
+        run: npm run build
+
+      - name: Frontend tests
+        run: npm run uji
+
+      - name: Install server dependencies
+        working-directory: server
+        run: npm ci
+
+      - name: Server TypeScript
+        working-directory: server
+        run: npm run typecheck
+
+      - name: Server build
+        working-directory: server
+        run: npm run build
+
+      - name: Server tests
+        working-directory: server
+        run: npm run uji
