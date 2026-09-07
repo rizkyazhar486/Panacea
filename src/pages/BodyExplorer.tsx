@@ -5,6 +5,12 @@ import { BodyEvidenceDock, type BodyEvidenceMode } from '../components/digital-t
 const HumanAnatomyMasterAtlas = lazy(() =>
   import('../components/digital-twin/HumanAnatomyMasterAtlas').then((m) => ({ default: m.HumanAnatomyMasterAtlas })),
 )
+const HumanAnatomyLayerNavigator = lazy(() =>
+  import('../components/digital-twin/HumanAnatomyLayerNavigator').then((m) => ({ default: m.HumanAnatomyLayerNavigator })),
+)
+const Ocular4DAtlas = lazy(() =>
+  import('../components/digital-twin/Ocular4DAtlas').then((m) => ({ default: m.Ocular4DAtlas })),
+)
 const HraClinicalAtlas = lazy(() =>
   import('../components/digital-twin/HraClinicalAtlas').then((m) => ({ default: m.HraClinicalAtlas })),
 )
@@ -51,8 +57,9 @@ type Mode = {
 }
 
 const PRIMARY: Mode[] = [
-  { key: 'realistic-atlas', label: 'Anatomy', hint: 'Whole-body master anatomy atlas → source-resolved HRA geometry → regional and system coverage' },
+  { key: 'realistic-atlas', label: 'Anatomy', hint: 'Whole-body master atlas → skin/fat/soft tissue/muscle/bone/nerves/vessels/organs → source-resolved HRA geometry' },
   { key: 'physiology', label: 'Physiology', hint: 'Anatomy-linked physiology → organ function → micro-3D mechanisms → pathology comparison' },
+  { key: 'vision', label: 'Eye 4D', hint: 'HRA ocular anatomy → optical media → retina → optic pathway → acuity/color/stereopsis/field examination bridge' },
   { key: 'digital-twin', label: 'Body → Cell', hint: 'Human Protein Atlas microscopy/metadata + real local sequence evidence; no generated cell required' },
   { key: 'cell-genome', label: 'Cell → DNA', hint: 'HPA + Ensembl reference sequence + local FASTA/FASTQ/VCF evidence' },
   { key: 'workout-4d', label: 'Exercise', hint: 'Measured workout → resolved HRA GLB → data replay; no body deformation' },
@@ -174,6 +181,9 @@ export function BodyExplorer() {
           <Suspense fallback={<LoadingLab label="human anatomy master atlas" />}>
             <HumanAnatomyMasterAtlas onOpenPhysiology={() => setMode('physiology')} />
           </Suspense>
+          <Suspense fallback={<LoadingLab label="human anatomy layers" />}>
+            <HumanAnatomyLayerNavigator />
+          </Suspense>
           <details className="group rounded-[28px] border border-neutral-200 bg-white p-4 shadow-sm dark:border-white/10 dark:bg-white/[.035]">
             <summary className="flex cursor-pointer list-none items-center justify-between gap-3">
               <div>
@@ -190,7 +200,11 @@ export function BodyExplorer() {
           <Suspense fallback={<LoadingLab label="multi-release HRA source search" />}><HraSourceSearch /></Suspense>
         </div>
       ) : mode === 'physiology' ? (
-        <Suspense fallback={<LoadingLab label="HRA-native physiology workbench" />}><PhysiologyHraWorkbench /></Suspense>
+        <div id="body-physiology">
+          <Suspense fallback={<LoadingLab label="HRA-native physiology workbench" />}><PhysiologyHraWorkbench /></Suspense>
+        </div>
+      ) : mode === 'vision' ? (
+        <Suspense fallback={<LoadingLab label="4D ocular anatomy and visual physiology" />}><Ocular4DAtlas /></Suspense>
       ) : mode === 'cell-genome' ? (
         <CellEvidenceMode mode="cell-genome" />
       ) : mode === 'workout-4d' ? (
