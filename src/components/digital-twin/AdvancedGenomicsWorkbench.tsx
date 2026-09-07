@@ -33,7 +33,10 @@ function compactPhenotypes(values: string[]) {
 }
 
 export function AdvancedGenomicsWorkbench({ report, fileName = 'sample.vcf' }: Props) {
-  const structural = useMemo(() => parseStructuralVariantEvidence(report.variants || []), [report.variants])
+  const structural = useMemo(
+    () => parseStructuralVariantEvidence(report.structuralVariants?.length ? report.structuralVariants : (report.variants || [])),
+    [report.structuralVariants, report.variants],
+  )
   const [pharmcat, setPharmcat] = useState<PharmcatPhenotypeReport | null>(null)
   const [pharmcatFile, setPharmcatFile] = useState('')
   const [pharmcatError, setPharmcatError] = useState('')
@@ -82,7 +85,7 @@ export function AdvancedGenomicsWorkbench({ report, fileName = 'sample.vcf' }: P
           <div className="max-w-4xl">
             <div className="text-[9px] font-black uppercase tracking-[.18em] text-sky-700 dark:text-sky-300">Structural variation / CNV</div>
             <h3 className="mt-1 text-xl font-black tracking-tight text-neutral-950 dark:text-white">Read structural events already present in the VCF.</h3>
-            <p className="mt-1 text-[10px] leading-relaxed text-neutral-500 dark:text-neutral-400">Panacea recognizes symbolic SV alleles, SVTYPE, END, SVLEN, copy-number fields and breakend notation. This is evidence parsing, not structural-variant calling. A caller such as Sniffles, cuteSV or another validated upstream pipeline must create the VCF first.</p>
+            <p className="mt-1 text-[10px] leading-relaxed text-neutral-500 dark:text-neutral-400">Panacea recognizes symbolic SV alleles, SVTYPE, END, SVLEN, copy-number fields and breakend notation. This is evidence parsing, not structural-variant calling. A caller such as Sniffles, cuteSV or another validated upstream pipeline must create the VCF first. gVCF &lt;NON_REF&gt; reference blocks and END-only records are not treated as SV calls.</p>
           </div>
           <span className="rounded-full border border-neutral-200 bg-neutral-50 px-3 py-1.5 text-[8px] font-black uppercase text-neutral-500 dark:border-white/10 dark:bg-white/[.04] dark:text-neutral-300">local VCF only</span>
         </div>
@@ -118,7 +121,7 @@ export function AdvancedGenomicsWorkbench({ report, fileName = 'sample.vcf' }: P
             ))}
           </div>
         ) : (
-          <div className="mt-3 rounded-2xl border border-dashed border-neutral-200 p-4 text-[10px] text-neutral-500 dark:border-white/10 dark:text-neutral-400">No structural-variant notation was found in the VCF preview. Panacea will not fabricate SV/CNV calls from SNP/indel data.</div>
+          <div className="mt-3 rounded-2xl border border-dashed border-neutral-200 p-4 text-[10px] text-neutral-500 dark:border-white/10 dark:text-neutral-400">No structural-variant notation was found in the analyzed VCF evidence. Panacea will not fabricate SV/CNV calls from SNP/indel or gVCF reference-block data.</div>
         )}
       </section>
 
