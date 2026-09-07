@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
 import type { Pratinjau } from '../lib/pratinjauBeranda'
 import { hitungRangkaian, PERINGATAN_RANGKAIAN } from '../lib/rangkaian'
@@ -275,12 +275,37 @@ export function UbinRangkaian({ tanggal }: { tanggal: string[] }) {
  * ditulis tangan akan menjadi salah pada penambahan data berikutnya, dan angka
  * yang salah di beranda merusak kepercayaan pada seluruh angka lain di sini.
  *
- * Berkas datanya berukuran ratusan kilobyte dan tidak boleh ikut terunduh oleh
- * orang yang hanya membuka beranda, jadi ia diambil setelah halaman tampil.
+ * Tiga sumber katalog ini berukuran besar. Memasang komponennya di Home tidak
+ * boleh otomatis mengunduh semuanya saat pengguna masih berada jauh di atas.
+ * Observer ringan di bawah menunggu kartu mendekati viewport; pada mode
+ * low-memory ia menunggu sampai benar-benar terlihat.
  */
 export function UbinKlinis() {
+  const ref = useRef<HTMLDivElement>(null)
+  const [siap, setSiap] = useState(false)
   const [n, setN] = useState<{ penyakit: number; obat: number; stasiun: number } | null>(null)
+
   useEffect(() => {
+    if (siap) return
+    const node = ref.current
+    if (!node || typeof IntersectionObserver === 'undefined') {
+      setSiap(true)
+      return
+    }
+
+    const lowMemory = document.documentElement.classList.contains('pmd-low-memory')
+    const observer = new IntersectionObserver(([entry]) => {
+      if (!entry.isIntersecting) return
+      observer.disconnect()
+      setSiap(true)
+    }, { rootMargin: lowMemory ? '0px' : '140px 0px' })
+
+    observer.observe(node)
+    return () => observer.disconnect()
+  }, [siap])
+
+  useEffect(() => {
+    if (!siap) return
     let batal = false
     Promise.all([
       import('../lib/skdiDiseaseNotes'),
@@ -295,25 +320,29 @@ export function UbinKlinis() {
           stasiun: o.RIWAYAT_OSCE.length,
         })
       })
-      .catch(() => { /* ubin tetap menampilkan keadaan memuat, tanpa angka palsu */ })
+      .catch(() => { /* ubin tetap tanpa angka palsu bila sumber gagal dimuat */ })
     return () => { batal = true }
-  }, [])
+  }, [siap])
 
   return (
-    <Ubin ke="/med-study" judul="Clinical" lebar>
-      {n ? (
-        /* Tiga angka pada satu baris. Ini isi katalog, bukan angka tubuh
-           siapa pun, jadi tidak ada tren yang dapat digambar — yang jujur
-           hanyalah jumlahnya. */
-        <div className="flex items-end justify-between gap-2">
-          <Angka label="diseases" nilai={String(n.penyakit)} />
-          <Angka label="drugs" nilai={String(n.obat)} />
-          <Angka label="stations" nilai={String(n.stasiun)} />
-        </div>
-      ) : (
-        <p className="t-kecil text-neutral-400">Calculating…</p>
-      )}
-    </Ubin>
+    <div ref={ref} className="col-span-2">
+      <Ubin ke="/med-study" judul="Clinical" lebar>
+        {n ? (
+          /* Tiga angka pada satu baris. Ini isi katalog, bukan angka tubuh
+             siapa pun, jadi tidak ada tren yang dapat digambar — yang jujur
+             hanyalah jumlahnya. */
+          <div className="flex items-end justify-between gap-2">
+            <Angka label="diseases" nilai={String(n.penyakit)} />
+            <Angka label="drugs" nilai={String(n.obat)} />
+            <Angka label="stations" nilai={String(n.stasiun)} />
+          </div>
+        ) : (
+          <p className="t-kecil text-neutral-400">
+            {siap ? 'Calculating…' : 'Clinical summary loads when visible.'}
+          </p>
+        )}
+      </Ubin>
+    </div>
   )
 }
 
@@ -388,12 +417,6 @@ function DaftarRincian({ baris }: { baris: BarisRincian[] }) {
           >
             <span className="min-w-0 flex-1">
               <span className="t-kecil block truncate font-semibold text-neutral-600 dark:text-neutral-300">{b.label}</span>
-              {/* Rentang KEBIASAAN ANDA SENDIRI, dan angkanya selalu ikut
-                  disebut. "Di luar kebiasaan" tanpa menyebut kebiasaannya
-                  berapa adalah penilaian yang tidak dapat diperiksa pembacanya.
-                  Ditandai dengan tebal-tipis huruf, bukan warna, karena ini
-                  BUKAN penilaian sehat atau sakit — hanya pernyataan bahwa
-                  angkanya berbeda dari biasanya. */}
               {b.rentang && (
                 <span className={`t-mikro block truncate ${
                   b.rentang.posisi === 'within your usual' ? 'text-neutral-400' : 'font-bold text-neutral-500 dark:text-neutral-300'
@@ -403,8 +426,6 @@ function DaftarRincian({ baris }: { baris: BarisRincian[] }) {
               )}
             </span>
             <span className="flex shrink-0 items-center gap-1.5">
-              {/* Bentuk perubahannya, dari bacaan yang benar-benar tercatat.
-                  Tidak muncul selama titiknya belum sampai tiga. */}
               <GrafikMini deret={deretMetrik(b.kunci).map((t) => t.nilai)} />
               <span className="t-sedang font-black tabular-nums text-ink dark:text-white">{b.nilai}</span>
               <span className="t-mikro font-bold text-neutral-400">{b.satuan}</span>
@@ -422,18 +443,6 @@ function DaftarRincian({ baris }: { baris: BarisRincian[] }) {
   )
 }
 
-/**
- * Papan widget.
- *
- * DUA LAPIS, DAN PEMISAHANNYA DISENGAJA. Lapis pertama berisi angka keadaan
- * Anda dan selalu tampil. Lapis kedua berisi pintasan yang DIPILIH SENDIRI dari
- * lebih dari seratus fitur — sebab tidak ada susunan bawaan yang benar untuk
- * semua orang, dan menebak berarti salah bagi sebagian besar.
- *
- * Bawaannya sedikit dengan sengaja: beranda yang penuh sejak hari pertama
- * membuat orang berhenti membacanya, dan sesudah itu widget yang benar-benar
- * penting pun ikut tidak terbaca.
- */
 export function PapanWidget({ pratinjau, tanggalCatatan }: { pratinjau: Pratinjau[]; tanggalCatatan: string[] }) {
   const { state } = useStore()
   const [pilihan, setPilihan] = useState<string[]>(ambilWidget)
@@ -445,24 +454,6 @@ export function PapanWidget({ pratinjau, tanggalCatatan }: { pratinjau: Pratinja
     return () => window.removeEventListener('panacea:home-widgets', on)
   }, [])
 
-  // Urutan mengikuti urutan katalog, bukan urutan penambahan — supaya letak
-  // sebuah ubin tidak berpindah-pindah dan tetap dapat dihafal tangannya.
-  /*
-   * KARTU YANG PUNYA ISI SENDIRI DIKELUARKAN DARI DAFTAR UBIN.
-   *
-   * Ubin pintasan hanyalah pintu: lambang, nama, dan satu baris ringkasan.
-   * Untuk sebagian besar fitur itu memang yang dibutuhkan. Tetapi grafik
-   * olahraga isinya justru angka pemakainya sendiri, dan angka itu tidak ada
-   * gunanya disembunyikan di balik pintu — yang membukanya sudah tahu apa yang
-   * dicarinya, sedangkan yang perlu diingatkan justru yang tidak membuka.
-   *
-   * Tanpa pengecualian ini ia dirender DUA KALI: sekali sebagai kartu, sekali
-   * sebagai ubin.
-   */
-  // Widget yang PUNYA TEMPATNYA SENDIRI di halaman ini tidak boleh muncul lagi
-  // sebagai ubin pintasan. Tanpa daftar ini, "Grafik Tidur 7 Hari" tampil dua
-  // kali: sekali sebagai grafik sungguhan, sekali sebagai kartu berisi lambang
-  // dan namanya — persis bentuk yang baru saja dibuang dari aplikasi ini.
   const BERKARTU = [
     'grafikOlahraga',
     'grafikLatihan', 'grafikTidur', 'grafikLangkah', 'grafikGizi', 'grafikDenyut',
@@ -477,26 +468,8 @@ export function PapanWidget({ pratinjau, tanggalCatatan }: { pratinjau: Pratinja
     'tenaga', 'hidrasi2', 'cahaya', 'tangga', 'vo2tren', 'komposisi', 'suplemen', 'suhuEkstrem',
   ]
   const adaGrafik = pilihan.includes('grafikOlahraga')
-
-  // Tekanan darah didahulukan karena ia satu-satunya baris berisi dua angka,
-  // dan menaruhnya di tengah daftar memutus keselarasan kolom angkanya.
-  /*
-   * BERAT, NADI DAN TENSI TIDAK DIULANG DI SINI.
-   *
-   * Ketiganya sudah berdiri sebagai angka besar di panel atas beranda. Sebelum
-   * ini denyut 58 muncul tiga kali pada satu layar dan berat dua kali, dan
-   * pengulangan itu membuat daftar rincian terbaca seperti salinan, bukan
-   * seperti keterangan tambahan. Yang tersisa di sini justru yang TIDAK ada di
-   * atas: VO2max, lama tidur, langkah, dan seterusnya.
-   */
-  // Wilayah yang sudah punya grafik tujuh hari tidak diulang sebagai ubin teks.
   const bergrafik = wilayahBergrafik(state)
 
-
-  /* Yang sudah berdiri besar di panel atas beranda tidak diulang sebagai
-     baris rincian. Daftarnya bertambah bersama panelnya: sesudah panel ikut
-     memuat langkah dan VO2max, dua baris itu muncul dua kali dalam satu
-     layar. */
   const DI_PANEL_ATAS = ['weightKg', 'restingHr', 'td', 'steps', 'vo2max', 'sleepH']
   const td = barisTekananDarah()
   const rincian = (td ? [td, ...rincianBeranda()] : rincianBeranda()).filter(
@@ -504,10 +477,6 @@ export function PapanWidget({ pratinjau, tanggalCatatan }: { pratinjau: Pratinja
   )
   const bilah = bilahTersedia(getVitals() as Record<string, unknown>)
 
-  // Peta konsistensi hanya masuk ke tumpukan bila ADA hari yang tercatat.
-  // Komponennya sendiri mengembalikan null saat kosong, dan halaman tumpukan
-  // yang kosong adalah halaman yang tetap bisa digeser ke sana lalu tidak
-  // menampilkan apa pun — cacat yang paling membingungkan dari tumpukan.
   const adaJejak =
     getWorkouts().length > 0 ||
     (state.sleepLogs ?? []).length > 0 ||
@@ -516,40 +485,15 @@ export function PapanWidget({ pratinjau, tanggalCatatan }: { pratinjau: Pratinja
 
   return (
     <>
-    {/* YANG PERTAMA TERLIHAT DI BERANDA, dan ia berdiri SENDIRI — tidak masuk
-        ke dalam tumpukan yang harus digeser.
-        Sebelumnya yang pertama terlihat adalah grafik denyut dan tekanan
-        darah. Keduanya berguna dan tetap ada, hanya tidak lagi menyapa lebih
-        dahulu: aplikasi yang membuka harinya dengan angka penyakit membuat
-        pemakainya merasa seperti pasien, dan orang yang merasa seperti pasien
-        menutup aplikasinya. Alasan lengkapnya di kepala lib/semangat.ts. */}
     {pilihan.includes('semangat') && <div className="mb-5"><UbinSemangat /></div>}
 
-    {/* TUMPUKAN: widget lebar berbagi satu petak dan digeser mendatar.
-        Empat widget lebar berdiri sendiri-sendiri memakai empat kali tinggi
-        yang sama; ditumpuk, ketiganya memakai tinggi satu widget. Yang masuk
-        ke sini hanya widget yang memang selebar layar — widget separuh lebar
-        tetap berdampingan seperti biasa, karena menumpuk dua benda yang muat
-        berdampingan justru menambah pekerjaan tangan tanpa menghemat apa pun. */}
     <Tumpukan
       judul="Summary"
-      /* Tombol pengaturnya ikut pindah ke sini bersama widgetnya. Sebelum ini
-         ia menumpang di kepala bagian "Widget" — dan ketika bagian itu dihapus
-         karena seluruh isinya sudah pindah ke tumpukan, satu-satunya jalan
-         mengatur widget ikut terhapus bersamanya. */
       aksi={
         <button onClick={() => setAturBuka(true)} className="t-kecil flex min-h-[40px] shrink-0 items-center whitespace-nowrap font-bold text-brand">
           Manage widgets
         </button>
       }
-      /* DITULIS SEBAGAI ELEMEN <Komponen />, BUKAN DIPANGGIL SEBAGAI FUNGSI.
-         Percobaan pertama memanggil UBIN_LEBAR.salat?.() untuk memeriksa
-         apakah ada isinya sebelum dimasukkan ke tumpukan. Itu memanggil
-         komponen React sebagai fungsi biasa, sedangkan komponen itu memakai
-         useState dan useEffect — dan hook yang dijalankan di luar pohon render
-         menjatuhkan seluruh halaman ke layar "Something went wrong".
-         Ketersediaan datanya diperiksa lewat lib, bukan dengan menjalankan
-         komponennya. */
       anak={[
         ...(pilihan.includes('kebugaran') && hitungPelatih()
           ? [{ kunci: 'kebugaran', isi: <UbinPelatihLebar /> }] : []),
@@ -627,9 +571,6 @@ export function PapanWidget({ pratinjau, tanggalCatatan }: { pratinjau: Pratinja
 
     <UbinGrafik />
 
-    {/* Ubin ringkas: pintu biasa yang menunjukkan angkanya sendiri (cincin,
-        batang tujuh hari, atau garis tren) alih-alih hanya lambang dan nama.
-        Masing-masing menyerah (mengembalikan null) bila datanya belum ada. */}
     <div className="grid grid-cols-2 gap-fluid">
       {pilihan.includes('langkahRingkas') && <UBIN_LANGSUNG.langkahRingkas />}
       {pilihan.includes('latihanRingkas') && <UBIN_LANGSUNG.latihanRingkas />}
@@ -638,12 +579,6 @@ export function PapanWidget({ pratinjau, tanggalCatatan }: { pratinjau: Pratinja
       {pilihan.includes('aerobikRingkas') && <UBIN_LANGSUNG.aerobikRingkas />}
     </div>
 
-    {/* JUDUL "KEADAAN ANDA" DIHAPUS, BUKAN DIKOSONGKAN.
-        Sesudah wilayah yang bergrafik dikeluarkan, bagian ini kerap hanya
-        berisi satu ubin — dan judul bagian di atas satu ubin adalah judul yang
-        tidak membagi apa pun. Ubin yang tersisa naik ke atas tanpa judul; isi
-        klinis pindah ke bawah rincian tubuh, tempat angka-angka katalog memang
-        lebih masuk akal dibaca. */}
     {pratinjau.some((p) => !bergrafik.includes(p.id)) && (
       <section>
         <div className="grid grid-cols-2 gap-fluid">
@@ -659,7 +594,6 @@ export function PapanWidget({ pratinjau, tanggalCatatan }: { pratinjau: Pratinja
     </section>
 
     {adaGrafik && <KartuGrafikOlahraga />}
-
 
     {aturBuka && <PemilihWidget tutup={() => setAturBuka(false)} />}
     </>
