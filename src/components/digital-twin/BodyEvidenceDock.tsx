@@ -8,6 +8,9 @@ const PhysiologyScaleExplorer = lazy(() =>
 const AdvancedPhysiologySystems = lazy(() =>
   import('./AdvancedPhysiologySystems').then((module) => ({ default: module.AdvancedPhysiologySystems })),
 )
+const OcularMotility4D = lazy(() =>
+  import('./OcularMotility4D').then((module) => ({ default: module.OcularMotility4D })),
+)
 
 export type BodyEvidenceMode =
   | 'digital-twin'
@@ -33,9 +36,9 @@ const QUERY: Record<BodyEvidenceMode, { term: string; title: string; subtitle: s
     subtitle: 'Live literature sits beside the 4D physiology models so educational motion, regulatory physiology and published evidence remain separate.',
   },
   vision: {
-    term: 'ocular anatomy cornea iris lens aqueous vitreous retina macula fovea optic nerve optic chiasm visual acuity refraction color vision stereopsis visual field perimetry',
+    term: 'ocular anatomy extraocular muscle cornea iris lens aqueous vitreous retina macula fovea optic nerve optic chiasm visual acuity refraction color vision stereopsis visual field perimetry',
     title: 'Ocular anatomy & visual physiology references',
-    subtitle: 'Live literature and ontology evidence accompany the HRA eye geometry, optical teaching model and functional examination map.',
+    subtitle: 'Live literature and ontology evidence accompany HRA globe/extraocular-muscle geometry, optical teaching, motility and functional examination modules.',
   },
   'digital-twin': {
     term: 'human tissue cell atlas organ cell type physiology gas exchange membrane potential',
@@ -91,6 +94,7 @@ export function BodyEvidenceDock({ mode }: { mode: BodyEvidenceMode }) {
   const config = QUERY[mode]
   const showMicrophysiology = mode === 'digital-twin' || mode === 'cell-genome'
   const showAdvancedPhysiology = mode === 'physiology'
+  const showOcularMotility = mode === 'vision'
 
   return (
     <div className="space-y-4">
@@ -107,6 +111,12 @@ export function BodyEvidenceDock({ mode }: { mode: BodyEvidenceMode }) {
             <AdvancedPhysiologySystems />
           </Suspense>
         </>
+      )}
+
+      {showOcularMotility && (
+        <Suspense fallback={<PhysiologyLoading label="HRA extraocular muscle and gaze mechanics" />}>
+          <OcularMotility4D />
+        </Suspense>
       )}
 
       <MedicalEvidenceExplorer
