@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import type { VariantEvidenceResult } from '../../lib/variantEvidence'
 import {
   CIVIC_EVIDENCE_DOCS,
@@ -19,6 +19,12 @@ function levelClass(level: string) {
   return 'bg-neutral-100 text-neutral-700 dark:bg-white/10 dark:text-neutral-300'
 }
 
+function civicHref(link: string) {
+  if (/^https?:\/\//i.test(link)) return link
+  if (link.startsWith('/')) return `https://civicdb.org${link}`
+  return `https://civicdb.org/${link}`
+}
+
 export function CivicSomaticEvidencePanel({ results }: Props) {
   const candidates = useMemo(() => results
     .map((result, index) => ({ index, result, ...civicQueryCandidate(result) }))
@@ -27,6 +33,12 @@ export function CivicSomaticEvidencePanel({ results }: Props) {
   const [loading, setLoading] = useState(false)
   const [data, setData] = useState<CivicVariantEvidence | null>(null)
   const [error, setError] = useState('')
+
+  useEffect(() => {
+    setSelectedIndex(candidates[0]?.index ?? -1)
+    setData(null)
+    setError('')
+  }, [candidates])
 
   const selected = results[selectedIndex]
 
@@ -95,7 +107,7 @@ export function CivicSomaticEvidencePanel({ results }: Props) {
                   <div className="text-[13px] font-black text-neutral-950 dark:text-white">{data.gene} {variant.name}</div>
                   <div className="mt-1 text-[8px] font-mono text-neutral-400">CIViC variant {variant.id}{variant.alleleRegistryId ? ` · ${variant.alleleRegistryId}` : ''}</div>
                 </div>
-                {variant.link && <a href={variant.link} target="_blank" rel="noreferrer" className="rounded-full border border-neutral-200 bg-white px-3 py-2 text-[8px] font-black text-neutral-600 dark:border-white/10 dark:bg-white/[.04] dark:text-neutral-300">Open CIViC ↗</a>}
+                {variant.link && <a href={civicHref(variant.link)} target="_blank" rel="noreferrer" className="rounded-full border border-neutral-200 bg-white px-3 py-2 text-[8px] font-black text-neutral-600 dark:border-white/10 dark:bg-white/[.04] dark:text-neutral-300">Open CIViC ↗</a>}
               </div>
 
               <div className="mt-3 space-y-2">
