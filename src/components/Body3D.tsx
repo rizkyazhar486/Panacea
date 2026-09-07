@@ -6,6 +6,12 @@ import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
 import { RoomEnvironment } from 'three/examples/jsm/environments/RoomEnvironment.js'
 import { SEBAR_PERISTALTIK } from '../lib/motionWave'
 import { keburaman, geserBuka, KEDALAMAN, type KunciLapisan } from '../lib/dissection'
+import {
+  Body3dLayerLoadGeneration,
+  body3dDissectionMaterialState,
+  body3dPixelRatio,
+  body3dSliceCoordinate,
+} from '../lib/body3dQuality'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Model 3D anatomi NYATA — bukan bentuk geometris buatan sendiri (bola/kapsul/
@@ -256,6 +262,10 @@ function radiologyMaterial(
       side: mode === 'xray' || clip ? THREE.DoubleSide : THREE.FrontSide,
       clippingPlanes: clip ? [clip] : null,
     })
+    // Simpan sifat dasar modalitas. Dissection nanti MENGALIKAN opacity ini,
+    // bukan menimpanya; khusus X-ray sifat transparan/additive tidak boleh
+    // berubah hanya karena slider kedalaman digeser.
+    mat.userData.body3dBaseOpacity = opacity
     radiologyMaterialCache.set(cacheKey, mat)
   }
   return mat
@@ -380,16 +390,50 @@ function latarGradasi(atas: number, bawah: number): THREE.Texture {
   return t
 }
 
+function cloneLayerMaterials(root: THREE.Group) {
+  // Object3D.clone(true) tetap berbagi instance material dengan model cache.
+  // Dissection mengubah opacity/depthWrite, jadi material harus lokal untuk
+  // instance viewer agar satu sesi tidak merusak cache atau sesi berikutnya.
+  const lokal = new Map<THREE.Material, THREE.Material>()
+  root.traverse((obj) => {
+    if (!(obj instanceof THREE.Mesh)) return
+    const sumber = Array.isArray(obj.material) ? obj.material : [obj.material]
+    const salinan = sumber.map((material) => {
+      let copy = lokal.get(material)
+      if (!copy) {
+        copy = material.clone()
+        copy.userData = { ...material.userData, body3dBaseOpacity: material.opacity }
+        lokal.set(material, copy)
+      }
+      return copy
+    })
+    obj.material = Array.isArray(obj.material) ? salinan : salinan[0]
+    obj.userData.baseMaterial = obj.material
+  })
+  root.userData.body3dOwnedMaterials = [...lokal.values()]
+}
+
+function disposeLayerMaterials(root: THREE.Group) {
+  const owned = root.userData.body3dOwnedMaterials as THREE.Material[] | undefined
+  if (!owned) return
+  for (const material of owned) material.dispose()
+  root.userData.body3dOwnedMaterials = []
+}
+
 export function Body3D({ layers, highlighted, focusKeywords, renderMode, ctWindow, slicePlane, slicePos, motion, unfold, dissect, onPick }: Props) {
   const containerRef = useRef<HTMLDivElement>(null)
   const groupsRef = useRef<Partial<Record<AnatomyLayer['key'], THREE.Group>>>({})
+  const layersRef = useRef(layers)
+  layersRef.current = layers
+  const loadGenerationRef = useRef(new Body3dLayerLoadGeneration())
   const sceneRef = useRef<THREE.Scene | null>(null)
   const cameraRef = useRef<THREE.PerspectiveCamera | null>(null)
   const homeFramingRef = useRef<{ position: THREE.Vector3; target: THREE.Vector3; minDistance: number; maxDistance: number } | null>(null)
   const controlsRef = useRef<OrbitControls | null>(null)
   const rendererRef = useRef<THREE.WebGLRenderer | null>(null)
   const lightsRef = useRef<{ ambient: THREE.AmbientLight; key: THREE.DirectionalLight; fill: THREE.DirectionalLight; tepi: THREE.DirectionalLight } | null>(null)
-  const clipRef = useRef<THREE.Plane | null>(null)
+  // Satu Plane stabil dipakai ulang supaya material cache selalu melihat posisi slice terbaru.
+  const clipRef = useRef<THREE.Plane>(new THREE.Plane())
   const latarRef = useRef<THREE.Texture | null>(null)
   const bodyBoxRef = useRef<THREE.Box3 | null>(null)
   // Gerak dibaca dari ref di dalam loop render, bukan lewat dependency effect:
@@ -407,7 +451,7 @@ export function Body3D({ layers, highlighted, focusKeywords, renderMode, ctWindo
     artery: Array<{ obj: THREE.Object3D; jeda: number }>
   }>({ heart: [], lungs: [], gut: [], artery: [] })
   const hasFitRef = useRef(false)
-  const highlightedMeshesRef = useRef<Map<THREE.Mesh, { original: THREE.Color; matchedName: string }>>(new Map())
+  const highlightedMeshesRef = useRef<Map<THREE.Mesh, { baseMaterial: THREE.Material; matchedName: string }>>(new Map())
   const onPickRef = useRef(onPick)
   onPickRef.current = onPick
   const [loadingLayers, setLoadingLayers] = useState<Set<string>>(new Set())
@@ -442,7 +486,6 @@ export function Body3D({ layers, highlighted, focusKeywords, renderMode, ctWindo
       )
       return
     }
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
     renderer.setClearColor(0x0a0a0f, 1)
     renderer.outputColorSpace = THREE.SRGBColorSpace
     // ACES DIGANTI, dan alasannya terukur. ACES memiringkan merah jenuh ke
@@ -485,7 +528,9 @@ export function Body3D({ layers, highlighted, focusKeywords, renderMode, ctWindo
     // ada berkas HDR yang perlu diunduh, jadi tidak ada tambahan muatan
     // jaringan pada halaman yang sudah mengunduh puluhan megabita geometri.
     const pmrem = new THREE.PMREMGenerator(renderer)
-    const lingkungan = pmrem.fromScene(new RoomEnvironment(), 0.04)
+    const ruang = new RoomEnvironment()
+    const lingkungan = pmrem.fromScene(ruang, 0.04)
+    ruang.dispose()
     scene.environment = lingkungan.texture
     // Intensitasnya ditahan: lingkungan penuh membuat merah otot pudar menjadi
     // merah muda, dan warna jaringan di sini mengikuti konvensi atlas, bukan
@@ -528,6 +573,9 @@ export function Body3D({ layers, highlighted, focusKeywords, renderMode, ctWindo
     const resize = () => {
       const w = container.clientWidth
       const h = container.clientHeight
+      if (w < 2 || h < 2) return
+      const pixelRatio = body3dPixelRatio(w, h, window.devicePixelRatio)
+      if (Math.abs(renderer.getPixelRatio() - pixelRatio) > 0.001) renderer.setPixelRatio(pixelRatio)
       renderer.setSize(w, h)
       camera.aspect = w / h
       camera.updateProjectionMatrix()
@@ -677,6 +725,20 @@ export function Body3D({ layers, highlighted, focusKeywords, renderMode, ctWindo
       renderer.domElement.removeEventListener('pointerup', onPointerUp)
       renderer.domElement.removeEventListener('webglcontextlost', onContextLost)
       controls.dispose()
+
+      // Material highlight adalah clone sementara; lepaskan sebelum material
+      // lokal layer ikut dibuang supaya navigasi berulang tidak menumpuk GPU resource.
+      for (const [mesh, entry] of highlightedMeshesRef.current) {
+        const active = mesh.material as THREE.Material
+        if (active !== entry.baseMaterial) active.dispose()
+      }
+      highlightedMeshesRef.current.clear()
+      for (const group of Object.values(groupsRef.current)) {
+        if (group) disposeLayerMaterials(group)
+      }
+      groupsRef.current = {}
+      animatedRef.current = { heart: [], lungs: [], gut: [], artery: [] }
+
       // Peta lingkungan dan tekstur latar dibuat di GPU dan tidak ikut
       // dibersihkan oleh renderer.dispose(); tanpa ini, membuka-tutup halaman
       // ini berulang kali meninggalkan tumpukan tekstur yang tidak pernah
@@ -685,11 +747,42 @@ export function Body3D({ layers, highlighted, focusKeywords, renderMode, ctWindo
       lingkungan.dispose()
       latarRef.current?.dispose()
       latarRef.current = null
+      scene.environment = null
+      scene.background = null
+      renderer.renderLists.dispose()
       renderer.dispose()
-      container.removeChild(renderer.domElement)
+      // SPA dapat membuka viewer berkali-kali; kembalikan konteks GPU segera
+      // setelah listener context-lost dilepas, bukan menunggu garbage collector.
+      renderer.forceContextLoss()
+      if (renderer.domElement.parentElement === container) container.removeChild(renderer.domElement)
+      rendererRef.current = null
+      controlsRef.current = null
+      cameraRef.current = null
       sceneRef.current = null
+      bodyBoxRef.current = null
+      homeFramingRef.current = null
+      hasFitRef.current = false
     }
   }, [])
+
+  // Saat gerak dimatikan, pulihkan skala dasar segera. Tanpa ini struktur
+  // dapat tertinggal pada frame kontraksi terakhir dan terlihat berubah bentuk
+  // walaupun mode sudah kembali ke Still.
+  useEffect(() => {
+    const pulihkan = (obj: THREE.Object3D) => {
+      const dasar = obj.userData.baseScale as THREE.Vector3 | undefined
+      if (dasar) obj.scale.copy(dasar)
+    }
+    if (motion.heartRate <= 0) {
+      animatedRef.current.heart.forEach(pulihkan)
+      animatedRef.current.artery.forEach((a) => pulihkan(a.obj))
+    }
+    if (motion.respRate <= 0) animatedRef.current.lungs.forEach(pulihkan)
+    if ((motion.peristalsisRate ?? 0) <= 0) animatedRef.current.gut.forEach((g) => pulihkan(g.obj))
+    if (motion.contractionRate <= 0) {
+      for (const [mesh] of highlightedMeshesRef.current) pulihkan(mesh)
+    }
+  }, [motion.heartRate, motion.respRate, motion.contractionRate, motion.peristalsisRate])
 
   // Muat/lepas lapisan sesuai toggle yang dipilih pengguna.
   useEffect(() => {
@@ -700,15 +793,26 @@ export function Body3D({ layers, highlighted, focusKeywords, renderMode, ctWindo
       const want = layers.has(def.key)
       const have = groupsRef.current[def.key]
       if (want && !have) {
+        const generation = loadGenerationRef.current.begin(def.key)
+        setFailedLayers((s) => { const n = new Set(s); n.delete(def.key); return n })
+        setProgress((p) => ({ ...p, [def.key]: 0 }))
         setLoadingLayers((s) => new Set(s).add(def.key))
-        loadLayer(def.file, (pct) => setProgress((p) => ({ ...p, [def.key]: pct })))
+        loadLayer(def.file, (pct) => {
+          if (!loadGenerationRef.current.isCurrent(def.key, generation)) return
+          setProgress((p) => ({ ...p, [def.key]: pct }))
+        })
           .then((group) => {
+            // Promise lama boleh selesai setelah layer dimatikan, komponen
+            // dibongkar, atau permintaan baru dimulai. Jangan pernah memasang
+            // hasil stale ke scene hanya karena unduhannya akhirnya selesai.
+            if (
+              sceneRef.current !== scene
+              || !layersRef.current.has(def.key)
+              || !loadGenerationRef.current.isCurrent(def.key, generation)
+            ) return
             const clone = group.clone(true)
-            // Material anatomi asli disimpan di tiap mesh SEBELUM mode
-            // radiologi sempat menggantinya, supaya kembali ke "Anatomy"
-            // selalu memulihkan warna yang benar dan bukan salinan abu-abu.
+            cloneLayerMaterials(clone)
             clone.traverse((child) => {
-              if (child instanceof THREE.Mesh) child.userData.baseMaterial = child.material
               // Z-Anatomy menitipkan satu objek teks petunjuk ("HOW TO ...")
               // di tiap koleksi. Itu bukan struktur anatomi: ia bisa ikut
               // terkena raycast, dan pada mode rontgen yang additive ia malah
@@ -749,7 +853,8 @@ export function Body3D({ layers, highlighted, focusKeywords, renderMode, ctWindo
               }
             })
             scene.add(clone)
-            setLoadingLayers((s) => { const n = new Set(s); n.delete(def.key); return n })
+            setFailedLayers((s) => { const n = new Set(s); n.delete(def.key); return n })
+            setProgress((p) => ({ ...p, [def.key]: 1 }))
             // Bingkai kamera sekali saja berdasar bounding box lapisan
             // pertama yang termuat (semua lapisan berbagi ruang koordinat
             // tubuh yang sama), supaya tampilan tidak melompat tiap toggle.
@@ -813,14 +918,38 @@ export function Body3D({ layers, highlighted, focusKeywords, renderMode, ctWindo
             }
           })
           .catch(() => {
-            setLoadingLayers((s) => { const n = new Set(s); n.delete(def.key); return n })
-            setFailedLayers((s) => new Set(s).add(def.key))
+            if (
+              loadGenerationRef.current.isCurrent(def.key, generation)
+              && layersRef.current.has(def.key)
+            ) {
+              setFailedLayers((s) => new Set(s).add(def.key))
+            }
             // Berkas yang gagal dibuang dari cache supaya percobaan berikutnya
             // benar-benar mengunduh lagi, bukan memakai ulang promise yang
             // sudah gagal selamanya.
             modelCache.delete(def.file)
           })
-      } else if (!want && have) {
+          .finally(() => {
+            if (!loadGenerationRef.current.isCurrent(def.key, generation)) return
+            setLoadingLayers((s) => { const n = new Set(s); n.delete(def.key); return n })
+          })
+      } else if (!want) {
+        // Invalidasi callback in-flight SEBELUM melepas scene. Jika pengguna
+        // menyalakan layer lagi, permintaan baru mendapat generasi baru dan
+        // hanya callback terbaru yang boleh memasang mesh.
+        loadGenerationRef.current.invalidate(def.key)
+        setLoadingLayers((s) => { const n = new Set(s); n.delete(def.key); return n })
+        setFailedLayers((s) => { const n = new Set(s); n.delete(def.key); return n })
+        if (!have) continue
+
+        // Lepaskan clone highlight yang mungkin masih menempel pada layer ini.
+        for (const [mesh, entry] of highlightedMeshesRef.current) {
+          if (!isDescendantOf(mesh, have)) continue
+          const active = mesh.material as THREE.Material
+          if (active !== entry.baseMaterial) active.dispose()
+          highlightedMeshesRef.current.delete(mesh)
+        }
+
         scene.remove(have)
         delete groupsRef.current[def.key]
         // Daftar animasi menyimpan referensi ke objek lapisan ini; kalau tidak
@@ -831,6 +960,7 @@ export function Body3D({ layers, highlighted, focusKeywords, renderMode, ctWindo
         animatedRef.current.gut = animatedRef.current.gut.filter((g) => masih(g.obj))
         animatedRef.current.artery = animatedRef.current.artery.filter((a) => masih(a.obj))
         animatedRef.current.lungs = animatedRef.current.lungs.filter(masih)
+        disposeLayerMaterials(have)
       }
     }
   }, [layers])
@@ -848,25 +978,27 @@ export function Body3D({ layers, highlighted, focusKeywords, renderMode, ctWindo
     // dari angka tetap — supaya posisi 0..1 berarti "dari ujung ke ujung
     // tubuh", bukan "dari titik nol dunia".
     const box = bodyBoxRef.current
-    if (slicePlane === 'none' || renderMode === 'anatomy' || renderMode === 'xray' || !box) {
-      clipRef.current = null
-    } else {
-      const min = box.min
-      const max = box.max
+    let clip: THREE.Plane | null = null
+    if (slicePlane !== 'none' && renderMode !== 'anatomy' && renderMode !== 'xray' && box) {
       // Aksial memotong mendatar (sumbu Y), koronal depan-belakang (Z),
       // sagital kiri-kanan (X) — konvensi radiologi baku.
       const normal =
         slicePlane === 'axial' ? new THREE.Vector3(0, -1, 0)
         : slicePlane === 'coronal' ? new THREE.Vector3(0, 0, -1)
         : new THREE.Vector3(-1, 0, 0)
-      const lo = slicePlane === 'axial' ? min.y : slicePlane === 'coronal' ? min.z : min.x
-      const hi = slicePlane === 'axial' ? max.y : slicePlane === 'coronal' ? max.z : max.x
-      const at = lo + (hi - lo) * Math.max(0, Math.min(1, slicePos))
-      // Plane didefinisikan sebagai normal·x + constant > 0 = sisi yang
-      // DIPERTAHANKAN. Karena ketiga normal menunjuk ke arah negatif sumbunya,
-      // syarat itu menjadi (koordinat < at) untuk ketiganya — jadi constant
-      // sama dengan posisi potongnya, tanpa kasus khusus per bidang.
-      clipRef.current = new THREE.Plane(normal, at)
+      const at = body3dSliceCoordinate(box, slicePlane, slicePos)
+      // Plane yang SAMA diperbarui in-place. Material radiologi dicache; bila
+      // membuat Plane baru tiap gerak slider, material cache akan terus
+      // menunjuk ke irisan lama walau UI menunjukkan posisi terbaru.
+      clip = clipRef.current
+      clip.set(normal, at)
+    }
+
+    // Render mode mengganti material seluruh mesh. Clone highlight lama harus
+    // dilepas dulu; clear() saja membuat material clone yatim di GPU.
+    for (const [mesh, entry] of highlightedMeshesRef.current) {
+      const active = mesh.material as THREE.Material
+      if (active !== entry.baseMaterial) active.dispose()
     }
     highlightedMeshesRef.current.clear()
     for (const def of ANATOMY_LAYERS) {
@@ -876,8 +1008,8 @@ export function Body3D({ layers, highlighted, focusKeywords, renderMode, ctWindo
         if (!(child instanceof THREE.Mesh)) return
         child.material =
           renderMode === 'anatomy'
-            ? (child.userData.baseMaterial as THREE.Material)
-            : radiologyMaterial(def.key, renderMode, ctWindow, clipRef.current)
+            ? (child.userData.baseMaterial as THREE.Material | THREE.Material[])
+            : radiologyMaterial(def.key, renderMode, ctWindow, clip)
       })
     }
     rendererRef.current?.setClearColor(MODE_BACKGROUND[renderMode], 1)
@@ -953,12 +1085,17 @@ export function Body3D({ layers, highlighted, focusKeywords, renderMode, ctWindo
           const daftar = Array.isArray(bahan) ? bahan : [bahan]
           for (const b of daftar) {
             if (!b) continue
-            b.transparent = buram < 0.999
-            b.opacity = buram
+            const baseOpacity =
+              typeof b.userData.body3dBaseOpacity === 'number'
+                ? b.userData.body3dBaseOpacity as number
+                : b.opacity
+            const state = body3dDissectionMaterialState(renderMode, baseOpacity, buram)
+            b.transparent = state.transparent
+            b.opacity = state.opacity
             // Struktur separuh tembus yang tetap menulis kedalaman akan
             // menutupi apa pun di belakangnya — persis lapisan yang sedang
-            // dibuka supaya terlihat.
-            b.depthWrite = buram >= 0.999
+            // dibuka supaya terlihat. X-ray juga selalu depthWrite=false.
+            b.depthWrite = state.depthWrite
             b.needsUpdate = true
           }
         }
@@ -984,9 +1121,9 @@ export function Body3D({ layers, highlighted, focusKeywords, renderMode, ctWindo
 
     for (const [mesh, entry] of current) {
       if (!matches(entry.matchedName)) {
-        const mat = mesh.material as THREE.MeshStandardMaterial
-        mat.emissive.copy(entry.original)
-        mat.emissiveIntensity = 0
+        const active = mesh.material as THREE.Material
+        mesh.material = entry.baseMaterial
+        if (active !== entry.baseMaterial) active.dispose()
         // Sorotan lepas -> ukurannya dikembalikan, kalau tidak otot yang
         // sempat berkontraksi akan tertinggal membesar selamanya.
         const dasar = mesh.userData.baseScale as THREE.Vector3 | undefined
@@ -1017,7 +1154,7 @@ export function Body3D({ layers, highlighted, focusKeywords, renderMode, ctWindo
           child.material = mat
           // Skala dasar disimpan supaya animasi kontraksi punya titik pulang.
           if (!child.userData.baseScale) child.userData.baseScale = child.scale.clone()
-          current.set(child, { original: mat.emissive.clone(), matchedName: originalName })
+          current.set(child, { baseMaterial: shared, matchedName: originalName })
           mat.emissive = HIGHLIGHT.clone()
           mat.emissiveIntensity = 0.55
         })
