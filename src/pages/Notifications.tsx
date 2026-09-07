@@ -1,224 +1,202 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
-import { HealthAlertSettings } from '../components/HealthAlertSettings'
-import { IconBell } from '../components/icons'
 import { Prosa } from '../components/Prosa'
-import { SmartNotificationSettings } from '../components/SmartNotificationSettings'
-import { UtilityNotificationSettings } from '../components/UtilityNotificationSettings'
-import { Badge, Card, SectionTitle } from '../components/ui'
+import { useNavigate } from 'react-router-dom'
+import { Card, SectionTitle, Badge } from '../components/ui'
+import { IconBell } from '../components/icons'
 import { api, backendEnabled, type Notif } from '../lib/api'
-import {
-  notificationDayLabel,
-  notificationFullTime,
-  notificationPresentation,
-  serverNotification,
-  smartNotification,
-  sortNotifications,
-  type UnifiedNotification,
-} from '../lib/notificationPresentation'
-import { loadNotificationHistory } from '../lib/notificationSignals'
+import { HealthAlertSettings } from '../components/HealthAlertSettings'
 
-type Filter = 'all' | 'unread' | 'server' | 'smart'
+// ─────────────────────────────────────────────────────────────────────────────
+// Halaman penuh untuk seluruh pemberitahuan.
+//
+// Panel di lonceng dibatasi tinggi dan menutup begitu berpindah halaman, jadi
+// ia bukan tempat yang tepat untuk mencari kembali sesuatu yang pernah muncul —
+// misalnya "kapan tepatnya pengingat obat itu dikirim". Di sini isinya utuh,
+// bisa disaring, dan tiap butir menampilkan waktu lengkapnya.
+// ─────────────────────────────────────────────────────────────────────────────
+
+type Saring = 'semua' | 'belum' | 'sudah'
+
+function fullTime(iso: string): string {
+  const d = new Date(iso)
+  if (Number.isNaN(d.getTime())) return '—'
+  return d.toLocaleString('en-GB', {
+    weekday: 'long', day: 'numeric', month: 'long', year: 'numeric',
+    hour: '2-digit', minute: '2-digit',
+  })
+}
+
+function dayLabel(iso: string): string {
+  const d = new Date(iso)
+  const now = new Date()
+  const same = (a: Date, b: Date) => a.toDateString() === b.toDateString()
+  const kemarin = new Date(now); kemarin.setDate(now.getDate() - 1)
+  if (same(d, now)) return 'Today'
+  if (same(d, kemarin)) return 'Yesterday'
+  return d.toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })
+}
+
+function kategori(n: Notif): { ikon: string; label: string } {
+  const t = `${n.title} ${n.body}`.toLowerCase()
+  if (/obat|medic|reminder|minum/.test(t)) return { ikon: '💊', label: 'Medication reminder' }
+  if (/janji|appointment|konsul|consult|jadwal/.test(t)) return { ikon: '🩺', label: 'Consultation' }
+  if (/bayar|invoice|billing|tagihan|pembayaran/.test(t)) return { ikon: '💳', label: 'Payment' }
+  if (/pesan|message|chat|balas/.test(t)) return { ikon: '💬', label: 'Message' }
+  if (/hasil|lab|result|rujuk/.test(t)) return { ikon: '🧪', label: 'Test result' }
+  if (/latihan|workout|langkah|target|sehat/.test(t)) return { ikon: '🏃', label: 'Activity' }
+  return { ikon: '🔔', label: 'Notification' }
+}
 
 export function Notifications() {
-  const [serverItems, setServerItems] = useState<Notif[]>([])
-  const [smartItems, setSmartItems] = useState(loadNotificationHistory)
-  const [filter, setFilter] = useState<Filter>('all')
-  const [loading, setLoading] = useState(backendEnabled)
-  const [serverError, setServerError] = useState(false)
+  const [items, setItems] = useState<Notif[]>([])
+  const [saring, setSaring] = useState<Saring>('semua')
+  const [memuat, setMemuat] = useState(true)
+  const [gagal, setGagal] = useState(false)
   const nav = useNavigate()
 
   const load = useCallback(() => {
-    setSmartItems(loadNotificationHistory())
-    if (!backendEnabled) {
-      setLoading(false)
-      setServerError(false)
-      return
-    }
-    setLoading(true)
+    setMemuat(true)
     api.notifications()
-      .then((result) => { setServerItems(result); setServerError(false) })
-      .catch(() => setServerError(true))
-      .finally(() => setLoading(false))
+      .then((r) => { setItems(r); setGagal(false) })
+      .catch(() => setGagal(true))
+      .finally(() => setMemuat(false))
   }, [])
 
   useEffect(() => {
+    if (!backendEnabled) { setMemuat(false); return }
     load()
-    const onHistory = () => setSmartItems(loadNotificationHistory())
-    window.addEventListener('panacea:notification-history', onHistory)
-    return () => window.removeEventListener('panacea:notification-history', onHistory)
   }, [load])
 
-  const combined = useMemo(
-    () => sortNotifications([
-      ...serverItems.map(serverNotification),
-      ...smartItems.map(smartNotification),
-    ]),
-    [serverItems, smartItems],
-  )
+  const tersaring = useMemo(() => {
+    const urut = [...items].sort((a, b) => Date.parse(b.at) - Date.parse(a.at))
+    if (saring === 'belum') return urut.filter((n) => !n.read)
+    if (saring === 'sudah') return urut.filter((n) => n.read)
+    return urut
+  }, [items, saring])
 
-  const unread = serverItems.filter((item) => !item.read).length
-
-  const visible = useMemo(() => {
-    if (filter === 'unread') return combined.filter((item) => item.source === 'server' && !item.read)
-    if (filter === 'server') return combined.filter((item) => item.source === 'server')
-    if (filter === 'smart') return combined.filter((item) => item.source === 'smart')
-    return combined
-  }, [combined, filter])
-
-  const groups = useMemo(() => {
-    const result: { day: string; list: UnifiedNotification[] }[] = []
-    for (const item of visible) {
-      const day = notificationDayLabel(item.at)
-      const last = result[result.length - 1]
-      if (last?.day === day) last.list.push(item)
-      else result.push({ day, list: [item] })
+  const grup = useMemo(() => {
+    const out: { hari: string; list: Notif[] }[] = []
+    for (const n of tersaring) {
+      const h = dayLabel(n.at)
+      const last = out[out.length - 1]
+      if (last && last.hari === h) last.list.push(n)
+      else out.push({ hari: h, list: [n] })
     }
-    return result
-  }, [visible])
+    return out
+  }, [tersaring])
 
-  function markAllRead() {
-    if (!backendEnabled || unread === 0) return
+  const belum = items.filter((n) => !n.read).length
+
+  function tandaiSemua() {
     api.markNotificationsRead()
-      .then(() => setServerItems((prev) => prev.map((item) => ({ ...item, read: true }))))
-      .catch(() => setServerError(true))
+      .then(() => setItems((p) => p.map((n) => ({ ...n, read: true }))))
+      .catch(() => {})
   }
 
-  function openRoute(item: UnifiedNotification) {
-    if (item.route) nav(item.route)
+  if (!backendEnabled) {
+    return (
+      <div className="space-y-4">
+        <SectionTitle icon={<IconBell />} title="Notifications" />
+        <Card>
+          <Prosa kelas="text-sm text-neutral-500">Notifications need a connection to the server, and the app is currently running without one. Your health data is still saved on this device as usual.</Prosa>
+        </Card>
+      </div>
+    )
   }
-
-  const filters: { id: Filter; label: string; count: number }[] = [
-    { id: 'all', label: 'All', count: combined.length },
-    { id: 'unread', label: 'Unread', count: unread },
-    { id: 'server', label: 'Server', count: serverItems.length },
-    { id: 'smart', label: 'Smart', count: smartItems.length },
-  ]
 
   return (
-    <div className="space-y-4 pb-[env(safe-area-inset-bottom)]">
+    <div className="space-y-4">
       <SectionTitle
         icon={<IconBell />}
-        title="Notification Center"
-        subtitle={`${unread} unread · ${serverItems.length} server · ${smartItems.length} smart / achievement history`}
+        title="Notifications"
+        subtitle={belum > 0 ? `${belum} unread of ${items.length}` : `${items.length} notifications`}
       />
 
-      <Card className="overflow-hidden">
-        <div className="grid gap-3 sm:grid-cols-3">
-          <div className="rounded-2xl bg-neutral-50 p-3.5 dark:bg-white/[.04]">
-            <div className="text-[9px] font-black uppercase tracking-[.14em] text-neutral-500 dark:text-neutral-400">Durable inbox</div>
-            <div className="mt-1 text-xl font-black text-ink dark:text-white">{serverItems.length}</div>
-            <p className="mt-1 text-[11px] leading-relaxed text-neutral-600 dark:text-neutral-300">Messages, reminders and account events received from the Panacea backend.</p>
-          </div>
-          <div className="rounded-2xl bg-neutral-50 p-3.5 dark:bg-white/[.04]">
-            <div className="text-[9px] font-black uppercase tracking-[.14em] text-neutral-500 dark:text-neutral-400">Smart history</div>
-            <div className="mt-1 text-xl font-black text-ink dark:text-white">{smartItems.length}</div>
-            <p className="mt-1 text-[11px] leading-relaxed text-neutral-600 dark:text-neutral-300">Deterministic signal combinations and real achievements generated from data already present in Panacea.</p>
-          </div>
-          <div className="rounded-2xl bg-neutral-50 p-3.5 dark:bg-white/[.04]">
-            <div className="text-[9px] font-black uppercase tracking-[.14em] text-neutral-500 dark:text-neutral-400">Needs attention</div>
-            <div className="mt-1 text-xl font-black text-ink dark:text-white">{unread}</div>
-            <p className="mt-1 text-[11px] leading-relaxed text-neutral-600 dark:text-neutral-300">Only unread server items count here. A smart alert is not counted twice after it already surfaced.</p>
-          </div>
-        </div>
-      </Card>
-
-      <UtilityNotificationSettings />
-      <SmartNotificationSettings />
       <HealthAlertSettings />
 
-      {!backendEnabled && (
-        <Card className="border-amber-200 bg-amber-50/95 dark:border-amber-400/20 dark:bg-amber-400/10">
-          <Prosa kelas="text-sm text-amber-900 dark:text-amber-100">
-            The backend is unavailable, so server notification history cannot refresh. Smart combinations above still evaluate local app signals, and achievement history remains available locally; no server event is being guessed or recreated.
-          </Prosa>
-        </Card>
-      )}
-
-      {serverError && (
-        <Card className="border-amber-200 bg-amber-50/95 dark:border-amber-400/20 dark:bg-amber-400/10">
-          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-            <p className="text-sm font-medium text-amber-900 dark:text-amber-100">Server history could not refresh. Local smart history below is still current on this device.</p>
-            <button type="button" onClick={load} className="min-h-10 shrink-0 rounded-xl bg-amber-900 px-3 py-2 text-xs font-black text-white dark:bg-amber-200 dark:text-amber-950">Try again</button>
-          </div>
-        </Card>
-      )}
-
       <Card>
-        <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
-          <div className="no-scrollbar flex min-w-0 flex-1 gap-2 overflow-x-auto pb-1 sm:pb-0">
-            {filters.map((item) => (
-              <button
-                key={item.id}
-                type="button"
-                onClick={() => setFilter(item.id)}
-                className={`min-h-10 shrink-0 rounded-full border px-3.5 py-2 text-xs font-black transition ${filter === item.id
-                  ? 'border-brand bg-brand-50 text-brand-dark dark:bg-brand/15 dark:text-emerald-300'
-                  : 'border-neutral-200 bg-white text-neutral-700 dark:border-white/10 dark:bg-white/[.04] dark:text-neutral-200'}`}
-              >
-                {item.label} <span className="ml-1 opacity-70">{item.count}</span>
-              </button>
-            ))}
-          </div>
-          <div className="flex shrink-0 flex-wrap gap-2">
-            {backendEnabled && unread > 0 && (
-              <button type="button" onClick={markAllRead} className="min-h-10 rounded-xl bg-neutral-100 px-3 py-2 text-xs font-black text-neutral-700 dark:bg-white/10 dark:text-neutral-200">Mark server read</button>
-            )}
-            <button type="button" onClick={load} className="min-h-10 rounded-xl bg-neutral-100 px-3 py-2 text-xs font-black text-neutral-700 dark:bg-white/10 dark:text-neutral-200">Refresh</button>
-          </div>
+        <div className="flex flex-wrap items-center gap-2">
+          {([['semua', 'All'], ['belum', 'Unread'], ['sudah', 'Read']] as [Saring, string][]).map(([k, l]) => (
+            <button
+              key={k}
+              onClick={() => setSaring(k)}
+              className={`rounded-lg border px-3 py-1.5 text-xs font-bold transition ${
+                saring === k
+                  ? 'border-brand bg-brand-50 text-brand-dark'
+                  : 'border-neutral-200 text-neutral-500 dark:border-white/10 dark:text-neutral-500'
+              }`}
+            >
+              {l}
+              {k === 'belum' && belum > 0 && <span className="ml-1.5 text-[10px]">({belum})</span>}
+            </button>
+          ))}
+          <span className="flex-1" />
+          {belum > 0 && (
+            <button onClick={tandaiSemua} className="rounded-lg bg-neutral-100 px-3 py-1.5 text-xs font-bold text-neutral-700 dark:bg-white/10 dark:text-neutral-200">
+              Mark all as read
+            </button>
+          )}
+          <button onClick={load} className="rounded-lg bg-neutral-100 px-3 py-1.5 text-xs font-bold text-neutral-700 dark:bg-white/10 dark:text-neutral-200">
+            Reload
+          </button>
         </div>
       </Card>
 
-      {loading && combined.length === 0 ? (
-        <Card><p className="text-sm font-medium text-neutral-600 dark:text-neutral-300">Loading server history…</p></Card>
-      ) : visible.length === 0 ? (
+      {gagal ? (
         <Card>
-          <div className="py-5 text-center">
-            <div className="text-3xl" aria-hidden>✓</div>
-            <p className="mt-2 text-sm font-black text-ink dark:text-white">
-              {filter === 'unread' ? 'No unread server notifications.' : `No ${filter === 'all' ? '' : `${filter} `}notifications yet.`}
+          <p className="text-sm text-neutral-500">Notifications could not be loaded. Check your internet connection.</p>
+          <button onClick={load} className="mt-3 rounded-lg bg-brand px-3 py-1.5 text-xs font-bold text-white">Try again</button>
+        </Card>
+      ) : memuat ? (
+        <Card><p className="text-sm text-neutral-500">Loading…</p></Card>
+      ) : tersaring.length === 0 ? (
+        <Card>
+          <p className="text-sm text-neutral-500">
+            {saring === 'belum' ? 'No unread notifications.'
+              : saring === 'sudah' ? 'No read notifications yet.'
+                : 'No notifications yet.'}
+          </p>
+          {saring === 'semua' && (
+            <p className="mt-1.5 text-[12px] leading-relaxed text-neutral-500">
+              Medication reminders, consultation schedules, payment updates, and new messages will appear here.
             </p>
-            <p className="mx-auto mt-1 max-w-xl text-[12px] leading-relaxed text-neutral-600 dark:text-neutral-300">
-              Real achievements, recovery/training signals, medication and account events, opted-in daily Faith utilities and owner growth milestones can appear here when their actual source conditions are met.
-            </p>
-          </div>
+          )}
         </Card>
       ) : (
-        groups.map((group) => (
-          <Card key={group.day}>
-            <div className="mb-3 text-[10px] font-black uppercase tracking-[.14em] text-neutral-500 dark:text-neutral-400">{group.day}</div>
-            <div className="space-y-2.5">
-              {group.list.map((item) => {
-                const presentation = notificationPresentation(item)
+        grup.map((g) => (
+          <Card key={g.hari}>
+            <div className="mb-2 text-[10px] font-bold uppercase tracking-wide text-neutral-500">{g.hari}</div>
+            <div className="space-y-2">
+              {g.list.map((n) => {
+                const kat = kategori(n)
                 return (
-                  <article
-                    key={item.id}
-                    className={`overflow-hidden rounded-2xl border p-3.5 sm:p-4 ${item.source === 'server' && !item.read
-                      ? 'border-brand/35 bg-brand-50/55 dark:border-brand/30 dark:bg-brand/10'
-                      : 'border-neutral-200 bg-white/80 dark:border-white/10 dark:bg-white/[.025]'}`}
+                  <div
+                    key={n.id}
+                    className={`rounded-xl border p-3 ${n.read ? 'border-neutral-100 dark:border-white/10' : 'border-brand/30 bg-brand-50/40 dark:bg-brand/10'}`}
                   >
-                    <div className="flex items-start gap-3">
-                      <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-neutral-100 text-lg dark:bg-white/[.07]" aria-hidden>{presentation.icon}</span>
+                    <div className="flex gap-3">
+                      <span className="mt-0.5 text-base leading-none shrink-0">{kat.ikon}</span>
                       <div className="min-w-0 flex-1">
-                        <div className="flex flex-wrap items-center gap-1.5">
-                          <h3 className="min-w-0 break-words text-sm font-black leading-snug text-ink dark:text-white">{item.title}</h3>
-                          {item.source === 'server' && !item.read && <Badge tone="brand">New</Badge>}
-                          <span className="rounded-full bg-neutral-100 px-2 py-1 text-[8px] font-black uppercase tracking-wide text-neutral-600 dark:bg-white/10 dark:text-neutral-300">{item.source}</span>
-                          {item.priority === 'high' && <span className="rounded-full bg-red-100 px-2 py-1 text-[8px] font-black uppercase tracking-wide text-red-800 dark:bg-red-400/15 dark:text-red-200">high</span>}
+                        <div className="flex flex-wrap items-center gap-2">
+                          <span className="text-sm font-bold text-ink dark:text-ink">{n.title}</span>
+                          {!n.read && <Badge tone="brand">New</Badge>}
                         </div>
-                        <p className="mt-1.5 break-words text-[12px] leading-relaxed text-neutral-700 dark:text-neutral-200">{item.body}</p>
-                        <div className="mt-2 flex flex-wrap items-center gap-x-2 gap-y-1 text-[10px] font-medium text-neutral-500 dark:text-neutral-400">
-                          <span>{presentation.label}</span><span>·</span><span>{notificationFullTime(item.at)}</span>
-                        </div>
-                        {item.explanation && (
-                          <p className="mt-2 rounded-xl bg-neutral-50 px-3 py-2 text-[10px] leading-relaxed text-neutral-600 dark:bg-white/[.04] dark:text-neutral-300"><strong>Why this appeared:</strong> {item.explanation}</p>
-                        )}
-                        {item.route && (
-                          <button type="button" onClick={() => openRoute(item)} className="mt-3 min-h-10 rounded-xl bg-brand px-3 py-2 text-xs font-black text-white">Open its page →</button>
+                        <p className="mt-1 text-[12px] leading-relaxed text-neutral-600 dark:text-neutral-300">{n.body}</p>
+                        <p className="mt-1.5 text-[11px] text-neutral-500">{kat.label} · {fullTime(n.at)}</p>
+                        {n.url && (
+                          <button
+                            onClick={() => {
+                              const i = n.url!.indexOf('#/')
+                              if (i >= 0) nav(n.url!.slice(i + 1))
+                            }}
+                            className="mt-2 rounded-lg bg-brand px-3 py-1.5 text-xs font-bold text-white"
+                          >
+                            Open its page →
+                          </button>
                         )}
                       </div>
                     </div>
-                  </article>
+                  </div>
                 )
               })}
             </div>
