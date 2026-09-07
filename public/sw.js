@@ -1,5 +1,5 @@
 // Panaceamed stability-first service worker.
-// Release: ios-webkit-stability-v17
+// Release: ios-webkit-stability-v18
 //
 // Important: this worker intentionally does NOT intercept fetch requests.
 // iOS WebKit can keep an older installed service worker alive across deploys;
