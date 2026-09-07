@@ -1,17 +1,22 @@
 import { useCallback, useEffect } from 'react'
 import { api, backendEnabled } from '../lib/api'
-import { isQuietTime, type FiredNotification, type NotificationSettings } from '../lib/notificationEngine'
+import type { FiredNotification } from '../lib/notificationEngine'
 import {
   appendNotificationHistory,
   loadNotificationHistory,
   loadNotificationSettings,
   notificationsToday,
 } from '../lib/notificationSignals'
+import {
+  canSurfaceUtilityNotification,
+  loadUtilityNotificationPreferences,
+  OWNER_USER_THRESHOLDS,
+  ownerMilestoneToSurface,
+} from '../lib/notificationUtilities'
 import { useStore } from '../lib/store'
 
 const FAITH_DAY_KEY = 'pmd_faith_daily_notified_v1'
 const OWNER_MILESTONE_KEY = 'pmd_owner_user_milestones_seen_v1'
-const OWNER_THRESHOLDS = [100, 250, 500, 1000] as const
 
 function localDateKey(now: Date): string {
   const year = now.getFullYear()
@@ -41,25 +46,6 @@ function writeNumbers(key: string, value: number[]) {
   try { localStorage.setItem(key, JSON.stringify(value)) } catch { /* ignore storage quota/private mode */ }
 }
 
-export function canSurfaceUtilityNotification(
-  settings: NotificationSettings,
-  now: Date,
-  todayCount: number,
-): boolean {
-  if (!settings.enabled) return false
-  if (todayCount >= Math.max(1, settings.maxPerDay)) return false
-  return !isQuietTime(now, settings.quietStart, settings.quietEnd)
-}
-
-export function ownerMilestoneToSurface(totalUsers: number, seen: number[]): number | null {
-  if (!Number.isFinite(totalUsers) || totalUsers < 0) return null
-  const reached = OWNER_THRESHOLDS.filter((threshold) => totalUsers >= threshold)
-  if (reached.length === 0) return null
-  const seenSet = new Set(seen)
-  const unseenReached = reached.filter((threshold) => !seenSet.has(threshold))
-  return unseenReached.length ? unseenReached[unseenReached.length - 1] : null
-}
-
 async function showNative(item: FiredNotification) {
   if (typeof Notification === 'undefined' || Notification.permission !== 'granted') return
   if (!('serviceWorker' in navigator)) return
@@ -83,19 +69,21 @@ function emit(item: FiredNotification) {
 }
 
 /**
- * Small global producer mounted with the header bell. It creates only two
- * notifications that cannot be expressed as ordinary health-signal rules:
- * a once-per-day Faith utility and owner-only real registration milestones.
- * It never asks for browser permission and never manufactures a measurement.
+ * Global producer mounted alongside the header bell. It creates only utility
+ * notifications that cannot be represented as ordinary health-signal rules:
+ * an explicitly opted-in daily Faith reminder and owner-only real registration
+ * milestones. It never asks for browser permission and never manufactures data.
  */
 export function NotificationUtilityProducer() {
   const { account } = useStore()
 
   const maybeFaith = useCallback(() => {
+    const preferences = loadUtilityNotificationPreferences()
+    if (!preferences.faithDaily) return
+
     const now = new Date()
-    // A daily verse is useful as a morning ritual, not as an interruption at
-    // arbitrary hours. If Panacea is not open in this window, nothing is faked
-    // or back-dated; the user can still open Faith normally.
+    // A daily verse is useful as a morning ritual, not an arbitrary interrupt.
+    // If Panacea is not open in this window, nothing is back-dated or invented.
     if (now.getHours() < 7 || now.getHours() >= 12) return
     const dateKey = localDateKey(now)
     if (readText(FAITH_DAY_KEY) === dateKey) return
@@ -113,30 +101,34 @@ export function NotificationUtilityProducer() {
       route: '/scripture',
       priority: 'low',
       domains: ['life'],
-      explanation: 'Daily utility reminder only. The notification does not invent a verse, prayer time, or qibla bearing; those are resolved inside the Faith tools.',
+      explanation: 'Opt-in daily utility reminder only. The notification does not invent a verse, prayer time, or qibla bearing; those are resolved inside the Faith tools.',
       at: now.toISOString(),
     })
   }, [])
 
   const maybeOwnerMilestone = useCallback(async () => {
-    if (!account?.isOwner || !backendEnabled) return
+    const preferences = loadUtilityNotificationPreferences()
+    if (!preferences.ownerMilestones || !account?.isOwner || !backendEnabled) return
+
     try {
       const stats = await api.stats()
       const seen = readNumbers(OWNER_MILESTONE_KEY)
       const milestone = ownerMilestoneToSurface(stats.totalUsers, seen)
       if (milestone == null) return
 
-      const reached = OWNER_THRESHOLDS.filter((threshold) => stats.totalUsers >= threshold)
-      // Persist every already-reached threshold, but only surface the highest
-      // unseen one. An owner joining the feature at 700 users should not get
-      // three historical popups for 100, 250 and 500.
-      writeNumbers(OWNER_MILESTONE_KEY, [...new Set([...seen, ...reached])])
-
       const now = new Date()
       const settings = loadNotificationSettings()
       const history = loadNotificationHistory()
+      // If quiet hours or the daily interruption budget blocks the alert, do
+      // NOT mark the milestone seen. It can surface later with the same real
+      // backend count instead of silently disappearing forever.
       if (!canSurfaceUtilityNotification(settings, now, notificationsToday(history, now))) return
 
+      const reached = OWNER_USER_THRESHOLDS.filter((threshold) => stats.totalUsers >= threshold)
+      // Persist every already-reached threshold only once one real milestone is
+      // actually surfaced. At 700 users this yields one 500-user alert, not
+      // three historical popups for 100, 250 and 500.
+      writeNumbers(OWNER_MILESTONE_KEY, [...new Set([...seen, ...reached])])
       emit({
         ruleId: `owner-users:${milestone}`,
         title: `Owner milestone · ${milestone.toLocaleString('en-GB')} users`,
@@ -157,10 +149,13 @@ export function NotificationUtilityProducer() {
     maybeFaith()
     const interval = window.setInterval(maybeFaith, 15 * 60_000)
     const onVisible = () => { if (document.visibilityState === 'visible') maybeFaith() }
+    const onSettings = () => maybeFaith()
     document.addEventListener('visibilitychange', onVisible)
+    window.addEventListener('panacea:utility-notification-settings', onSettings)
     return () => {
       window.clearInterval(interval)
       document.removeEventListener('visibilitychange', onVisible)
+      window.removeEventListener('panacea:utility-notification-settings', onSettings)
     }
   }, [maybeFaith])
 
@@ -168,7 +163,12 @@ export function NotificationUtilityProducer() {
     if (!account?.isOwner || !backendEnabled) return
     void maybeOwnerMilestone()
     const interval = window.setInterval(() => void maybeOwnerMilestone(), 5 * 60_000)
-    return () => window.clearInterval(interval)
+    const onSettings = () => void maybeOwnerMilestone()
+    window.addEventListener('panacea:utility-notification-settings', onSettings)
+    return () => {
+      window.clearInterval(interval)
+      window.removeEventListener('panacea:utility-notification-settings', onSettings)
+    }
   }, [account?.isOwner, maybeOwnerMilestone])
 
   return null
