@@ -78,6 +78,20 @@ export function CatatanLatihan() {
       ? Math.round((terbaru.durasi / 60) * terbaruRpe)
       : null
 
+    const recoveryValid = terbaru?.pemulihan
+      .filter((p) => Number.isFinite(p.t) && p.t >= 0 && Number.isFinite(p.bpm) && p.bpm > 0)
+      .sort((a, b) => a.t - b.t) ?? []
+    const recoverySpark = recoveryValid.length <= 20
+      ? recoveryValid
+      : Array.from({ length: 20 }, (_, i) => recoveryValid[Math.round((i * (recoveryValid.length - 1)) / 19)])
+    const recoveryMin = recoveryValid.length > 0 ? Math.min(...recoveryValid.map((p) => p.bpm)) : null
+    const recoveryMax = recoveryValid.length > 0 ? Math.max(...recoveryValid.map((p) => p.bpm)) : null
+    const recoveryNearMinute = recoveryValid.some((p) => p.t >= 45 && p.t <= 75)
+    const recoveryHrr1 = recoveryNearMinute && terbaru && typeof terbaru.hrr1 === 'number' && Number.isFinite(terbaru.hrr1) && terbaru.hrr1 > 0
+      ? Math.round(terbaru.hrr1)
+      : null
+    const recoverySpanSec = recoveryValid.length > 0 ? Math.max(0, Math.round(recoveryValid[recoveryValid.length - 1].t)) : null
+
     const acuan = new Date()
     acuan.setHours(12, 0, 0, 0)
     acuan.setDate(acuan.getDate() - (untukKemarin ? 1 : 0))
@@ -142,6 +156,11 @@ export function CatatanLatihan() {
       hrMaxSpark,
       terbaruRpe,
       terbaruSrpe,
+      recoveryHr: recoverySpark,
+      recoveryMin,
+      recoveryMax,
+      recoveryHrr1,
+      recoverySpanSec,
       tren,
       maxMenit7,
       hariAktif7: tren.filter((x) => x.menit > 0).length,
@@ -273,6 +292,38 @@ export function CatatanLatihan() {
               <p className="mt-2 text-[9px] leading-relaxed text-neutral-500">RPE is self-reported effort, not a physiological measurement.</p>
             </div>
           </div>
+
+          {ringkas.recoveryHr.length > 1 && ringkas.recoveryMin !== null && ringkas.recoveryMax !== null && (
+            <div className="mt-2 rounded-2xl bg-indigo-50/70 p-3 dark:bg-indigo-400/[0.05]" aria-label="Recorded post-exercise heart-rate recovery trace">
+              <div className="flex items-end justify-between gap-3">
+                <div>
+                  <div className="text-[10px] font-black uppercase tracking-wide text-indigo-700 dark:text-indigo-300">Post-exercise recovery</div>
+                  <div className="mt-0.5 text-sm font-black text-ink dark:text-white">Recorded HR trace</div>
+                </div>
+                <div className="text-right">
+                  <div className="text-lg font-black tabular-nums text-indigo-700 dark:text-indigo-300">
+                    {ringkas.recoveryHrr1 !== null ? `−${ringkas.recoveryHrr1}` : ringkas.recoverySpanSec !== null ? `${ringkas.recoverySpanSec}s` : '—'}
+                    <span className="ml-1 text-xs text-neutral-500">{ringkas.recoveryHrr1 !== null ? 'bpm' : 'trace'}</span>
+                  </div>
+                  <div className="t-mikro text-neutral-500">{ringkas.recoveryHrr1 !== null ? '≈1-min drop' : 'recorded span'}</div>
+                </div>
+              </div>
+              <div className="mt-3 flex h-14 items-end gap-px overflow-hidden rounded-lg bg-white/70 px-1.5 pt-1 dark:bg-white/5">
+                {ringkas.recoveryHr.map((p, i) => {
+                  const rentang = Math.max(1, ringkas.recoveryMax! - ringkas.recoveryMin!)
+                  const tinggi = 20 + ((p.bpm - ringkas.recoveryMin!) / rentang) * 80
+                  return <div key={`${p.t}-${i}`} className="min-w-0 flex-1 rounded-t-sm bg-indigo-500/75" style={{ height: `${tinggi}%` }} />
+                })}
+              </div>
+              <div className="mt-1 flex justify-between text-[8px] font-bold tabular-nums text-neutral-500">
+                <span>{Math.round(ringkas.recoveryHr[0].bpm)} bpm · +{Math.max(0, Math.round(ringkas.recoveryHr[0].t))}s</span>
+                <span>{Math.round(ringkas.recoveryHr[ringkas.recoveryHr.length - 1].bpm)} bpm · +{Math.max(0, Math.round(ringkas.recoveryHr[ringkas.recoveryHr.length - 1].t))}s</span>
+              </div>
+              <p className="mt-2 text-[9px] leading-relaxed text-neutral-500 dark:text-neutral-400">
+                This is the recorded post-exercise heart-rate trajectory. The ≈1-minute drop is shown only when a recovery sample exists around 45–75 seconds; posture and active vs passive cool-down can change the value, so no fitness or clinical grade is inferred here.
+              </p>
+            </div>
+          )}
 
           <p className="mt-2 text-[9px] leading-relaxed text-neutral-500 dark:text-neutral-400">
             Recorded and perceived signals are shown side by side but are not merged into a readiness, recovery, or injury-risk score.
