@@ -1,0 +1,247 @@
+/* Panacea Living Instrument v9
+   Second precision wave for high-frequency Home tools. These are presentation
+   metaphors only: no calculation, threshold, timer, store, API or clinical
+   interpretation is changed here. No animation loop or image asset. */
+
+.widget-instrument-slide-v5[data-widget] section>.kaca{
+  position:relative;
+  isolation:isolate;
+}
+
+/* ───────────────────────── AEROBIC RIVER ───────────────────────── */
+.widget-instrument-slide-v5[data-widget='zona2'] section>.kaca{
+  background:
+    linear-gradient(180deg,rgba(14,165,233,.035),transparent 46%),
+    radial-gradient(90% 68% at 8% 100%,rgba(34,197,94,.10),transparent 70%)!important;
+}
+.widget-instrument-slide-v5[data-widget='zona2'] section>.kaca::before{
+  content:'AEROBIC / RIVER';position:absolute;right:9px;top:8px;font-size:8px;font-weight:950;letter-spacing:.16em;color:rgba(14,165,233,.63)
+}
+.widget-instrument-slide-v5[data-widget='zona2'] section>.kaca>div:first-child>span:first-child{
+  font-size:clamp(38px,10vw,54px)!important;letter-spacing:-.06em;color:#0ea5e9!important
+}
+.widget-instrument-slide-v5[data-widget='zona2'] section>.kaca>span.relative.mt-2{
+  height:18px!important;padding:4px;border-radius:999px!important;border:1px solid rgba(14,165,233,.12);background:rgba(14,165,233,.055)!important
+}
+.widget-instrument-slide-v5[data-widget='zona2'] section>.kaca>span.relative.mt-2>span.block{
+  background:linear-gradient(90deg,#22c55e,#14b8a6,#0ea5e9)!important;box-shadow:0 0 14px rgba(14,165,233,.14)
+}
+.widget-instrument-slide-v5[data-widget='zona2'] section>.kaca>span.relative.mt-2>span.absolute{
+  width:2px!important;background:#f59e0b!important;box-shadow:0 0 0 3px rgba(245,158,11,.09)
+}
+
+/* ───────────────────────── COOLDOWN DROP ───────────────────────── */
+.widget-instrument-slide-v5[data-widget='hrr'] section>.kaca{
+  background:
+    linear-gradient(135deg,rgba(244,63,94,.055),transparent 42%),
+    radial-gradient(70% 100% at 100% 100%,rgba(59,130,246,.07),transparent 68%)!important;
+}
+.widget-instrument-slide-v5[data-widget='hrr'] section>.kaca::before{
+  content:'COOLDOWN / DROP';position:absolute;right:9px;top:8px;font-size:8px;font-weight:950;letter-spacing:.16em;color:rgba(244,63,94,.62)
+}
+.widget-instrument-slide-v5[data-widget='hrr'] section>.kaca>div:first-child>span:first-child{
+  font-size:clamp(38px,10vw,54px)!important;letter-spacing:-.06em;color:#f43f5e!important
+}
+.widget-instrument-slide-v5[data-widget='hrr'] section>.kaca>.mt-2.flex.h-10{
+  height:62px!important;align-items:flex-end!important;padding:9px 8px 6px;border-radius:17px;background:linear-gradient(180deg,rgba(244,63,94,.025),rgba(59,130,246,.035));border-bottom:1px solid rgba(59,130,246,.11)
+}
+.widget-instrument-slide-v5[data-widget='hrr'] section>.kaca>.mt-2.flex.h-10>span{
+  border-radius:4px 4px 1px 1px!important;background:linear-gradient(180deg,#fb7185,#60a5fa)!important
+}
+
+/* ───────────────────────── MOON LEDGER ───────────────────────── */
+.widget-instrument-slide-v5[data-widget='utangTidur'] section>.kaca{
+  background:
+    radial-gradient(circle at 88% 16%,rgba(196,181,253,.11) 0 8%,transparent 9%),
+    linear-gradient(180deg,rgba(76,29,149,.055),transparent)!important;
+}
+.widget-instrument-slide-v5[data-widget='utangTidur'] section>.kaca::before{
+  content:'MOON / LEDGER';position:absolute;right:9px;top:8px;font-size:8px;font-weight:950;letter-spacing:.16em;color:rgba(139,92,246,.68)
+}
+.widget-instrument-slide-v5[data-widget='utangTidur'] section>.kaca>div:first-child>span:first-child{
+  font-size:clamp(38px,10vw,54px)!important;letter-spacing:-.06em
+}
+.widget-instrument-slide-v5[data-widget='utangTidur'] section>.kaca>.mt-2.flex.h-12{
+  height:72px!important;padding:8px 6px;border-radius:17px;background:linear-gradient(180deg,rgba(139,92,246,.025),rgba(15,23,42,.02))
+}
+.widget-instrument-slide-v5[data-widget='utangTidur'] section>.kaca>.mt-2.flex.h-12>span>span:first-child{
+  background:rgba(167,139,250,.28)!important
+}
+
+/* ───────────────────────── RESONANCE BREATH ───────────────────────── */
+.widget-instrument-slide-v5[data-widget='napas'] section>.kaca{
+  background:
+    radial-gradient(circle at 18% 50%,rgba(34,197,94,.10) 0 13%,transparent 14% 24%,rgba(34,197,94,.035) 25% 26%,transparent 27%),
+    linear-gradient(180deg,rgba(34,197,94,.025),transparent)!important;
+}
+.widget-instrument-slide-v5[data-widget='napas'] section>.kaca::before{
+  content:'BREATH / WAVE';position:absolute;right:9px;top:8px;font-size:8px;font-weight:950;letter-spacing:.16em;color:rgba(34,197,94,.62)
+}
+.widget-instrument-slide-v5[data-widget='napas'] section>.kaca>.flex.items-center.gap-3{
+  min-height:120px;padding:8px 5px
+}
+.widget-instrument-slide-v5[data-widget='napas'] section>.kaca>.flex.items-center.gap-3>span:first-child{
+  outline:1px solid rgba(34,197,94,.18);outline-offset:7px;box-shadow:0 0 0 14px rgba(34,197,94,.035)!important
+}
+.widget-instrument-slide-v5[data-widget='napas'] section>.kaca>button.bg-brand{
+  background:linear-gradient(90deg,#16a34a,#14b8a6)!important;box-shadow:0 10px 24px rgba(20,184,166,.10)
+}
+
+/* ───────────────────────── MOVEMENT INTERRUPT ───────────────────────── */
+.widget-instrument-slide-v5[data-widget='duduk'] section>.kaca{
+  background:
+    linear-gradient(90deg,rgba(59,130,246,.04),transparent 64%),
+    repeating-linear-gradient(90deg,transparent 0 14%,rgba(59,130,246,.025) 14.2% 14.6%,transparent 14.8% 28%)!important;
+}
+.widget-instrument-slide-v5[data-widget='duduk'] section>.kaca::before{
+  content:'MOVE / INTERRUPT';position:absolute;right:9px;top:8px;font-size:8px;font-weight:950;letter-spacing:.16em;color:rgba(59,130,246,.62)
+}
+.widget-instrument-slide-v5[data-widget='duduk'] section>.kaca>div:first-child>span:first-child{
+  font-size:clamp(38px,10vw,54px)!important;letter-spacing:-.06em
+}
+.widget-instrument-slide-v5[data-widget='duduk'] section>.kaca>span.mt-2.block.h-2\.5{
+  height:16px!important;padding:3px;border:1px solid rgba(59,130,246,.11);background:rgba(59,130,246,.045)!important
+}
+.widget-instrument-slide-v5[data-widget='duduk'] section>.kaca>span.mt-2.block.h-2\.5>span{
+  background:linear-gradient(90deg,#22c55e,#3b82f6,#f43f5e)!important
+}
+
+/* ───────────────────────── CIRCADIAN SUNDIAL ───────────────────────── */
+.widget-instrument-slide-v5[data-widget='cahaya'] section>.kaca{
+  background:
+    radial-gradient(circle at 88% 20%,rgba(250,204,21,.18) 0 7%,rgba(250,204,21,.055) 8% 17%,transparent 18%),
+    linear-gradient(135deg,rgba(250,204,21,.045),transparent 46%)!important;
+}
+.widget-instrument-slide-v5[data-widget='cahaya'] section>.kaca::before{
+  content:'CIRCADIAN / SUN';position:absolute;right:9px;bottom:8px;font-size:8px;font-weight:950;letter-spacing:.16em;color:rgba(202,138,4,.56)
+}
+.widget-instrument-slide-v5[data-widget='cahaya'] section>.kaca>div:first-child>span:first-child{
+  font-size:clamp(38px,10vw,54px)!important;color:#ca8a04!important;letter-spacing:-.06em
+}
+.widget-instrument-slide-v5[data-widget='cahaya'] section>.kaca>p{
+  max-width:82%;padding-top:7px;border-top:1px solid rgba(202,138,4,.10)
+}
+
+/* ───────────────────────── VERTICAL GAIN ───────────────────────── */
+.widget-instrument-slide-v5[data-widget='tangga'] section>.kaca{
+  background:
+    linear-gradient(135deg,transparent 0 63%,rgba(20,184,166,.055) 63% 67%,transparent 67% 72%,rgba(20,184,166,.035) 72% 76%,transparent 76%),
+    linear-gradient(180deg,rgba(20,184,166,.025),transparent)!important;
+}
+.widget-instrument-slide-v5[data-widget='tangga'] section>.kaca::before{
+  content:'VERTICAL / GAIN';position:absolute;right:9px;top:8px;font-size:8px;font-weight:950;letter-spacing:.16em;color:rgba(20,184,166,.65)
+}
+.widget-instrument-slide-v5[data-widget='tangga'] section>.kaca>div:first-child>span:first-child{
+  font-size:clamp(38px,10vw,54px)!important;color:#14b8a6!important;letter-spacing:-.06em
+}
+.widget-instrument-slide-v5[data-widget='tangga'] section>.kaca>.mt-2.flex.h-10{
+  height:58px!important;align-items:flex-end!important;padding:7px;border-radius:16px;background:rgba(20,184,166,.035)
+}
+.widget-instrument-slide-v5[data-widget='tangga'] section>.kaca>.mt-2.flex.h-10>span{
+  border-radius:2px 2px 0 0!important;background:linear-gradient(180deg,#2dd4bf,#0f766e)!important
+}
+
+/* ───────────────────────── LAB CONSTELLATION ───────────────────────── */
+.widget-instrument-slide-v5[data-widget='lab'] section>.kaca{
+  background:
+    radial-gradient(circle at 92% 24%,rgba(14,165,233,.08) 0 4%,transparent 5%),
+    radial-gradient(circle at 82% 42%,rgba(245,158,11,.08) 0 3%,transparent 4%),
+    radial-gradient(circle at 94% 62%,rgba(34,197,94,.07) 0 3%,transparent 4%),
+    linear-gradient(180deg,rgba(14,165,233,.025),transparent)!important;
+}
+.widget-instrument-slide-v5[data-widget='lab'] section>.kaca::before{
+  content:'LAB / TREND';position:absolute;right:9px;bottom:8px;font-size:8px;font-weight:950;letter-spacing:.16em;color:rgba(14,165,233,.55)
+}
+.widget-instrument-slide-v5[data-widget='lab'] section>.kaca svg{
+  height:72px!important;padding:8px;border-radius:16px;background:linear-gradient(180deg,rgba(14,165,233,.025),transparent)
+}
+.widget-instrument-slide-v5[data-widget='lab'] section>.kaca .geser-aman button{
+  border:1px solid rgba(14,165,233,.09)
+}
+
+/* ───────────────────────── PHARMACOLOGY LENS ───────────────────────── */
+.widget-instrument-slide-v5[data-widget='obatCepat'] section>.kaca{
+  background:linear-gradient(135deg,rgba(249,115,22,.055),transparent 58%)!important;
+}
+.widget-instrument-slide-v5[data-widget='obatCepat'] section>.kaca::before{
+  content:'PHARMA / LENS';position:absolute;right:9px;top:8px;font-size:8px;font-weight:950;letter-spacing:.16em;color:rgba(249,115,22,.62)
+}
+.widget-instrument-slide-v5[data-widget='obatCepat'] section>.kaca>div:first-child input{
+  min-height:46px;border-radius:16px!important;border-color:rgba(249,115,22,.16)!important;background:rgba(249,115,22,.025)!important
+}
+.widget-instrument-slide-v5[data-widget='obatCepat'] section>.kaca>.mt-2.flex.flex-col>a{
+  padding:7px 9px;border-radius:13px;background:rgba(249,115,22,.028);border-left:2px solid rgba(249,115,22,.32)
+}
+
+/* ───────────────────────── FORMULA BENCH ───────────────────────── */
+.widget-instrument-slide-v5[data-widget='kalkulatorCepat'] section>.kaca{
+  background:
+    repeating-linear-gradient(0deg,transparent 0 27px,rgba(59,130,246,.022) 28px),
+    linear-gradient(180deg,rgba(59,130,246,.03),transparent)!important;
+}
+.widget-instrument-slide-v5[data-widget='kalkulatorCepat'] section>.kaca::before{
+  content:'FORMULA / BENCH';position:absolute;right:9px;top:8px;font-size:8px;font-weight:950;letter-spacing:.16em;color:rgba(59,130,246,.60)
+}
+.widget-instrument-slide-v5[data-widget='kalkulatorCepat'] section>.kaca>.mt-2.flex.items-center input{
+  min-height:46px;border-radius:15px!important;border-color:rgba(59,130,246,.14)!important;background:rgba(59,130,246,.025)!important
+}
+.widget-instrument-slide-v5[data-widget='kalkulatorCepat'] section>.kaca>.mt-2.flex.items-baseline>span:first-child{
+  font-size:clamp(36px,10vw,52px)!important;color:#3b82f6!important;letter-spacing:-.055em
+}
+
+/* ───────────────────────── OSCE FREQUENCY FIELD ───────────────────────── */
+.widget-instrument-slide-v5[data-widget='stasiunSering'] section>.kaca{
+  background:
+    linear-gradient(90deg,rgba(168,85,247,.04),transparent 60%),
+    radial-gradient(circle at 94% 80%,rgba(168,85,247,.07),transparent 28%)!important;
+}
+.widget-instrument-slide-v5[data-widget='stasiunSering'] section>.kaca::before{
+  content:'OSCE / ARCHIVE';position:absolute;right:9px;bottom:8px;font-size:8px;font-weight:950;letter-spacing:.16em;color:rgba(168,85,247,.58)
+}
+.widget-instrument-slide-v5[data-widget='stasiunSering'] section>.kaca>.mt-2.flex.flex-col>a{
+  padding:7px 8px;border-radius:12px;background:rgba(168,85,247,.025)
+}
+.widget-instrument-slide-v5[data-widget='stasiunSering'] section>.kaca>.mt-2.flex.flex-col>a span[class*='h-1']{
+  background:linear-gradient(90deg,#7c3aed,#c084fc)!important
+}
+
+/* Outer instrument identity follows each concept. */
+.widget-instrument-v5[data-active-widget='zona2']{--wa:#0ea5e9;--wa-soft:rgba(14,165,233,.10)}
+.widget-instrument-v5[data-active-widget='hrr']{--wa:#f43f5e;--wa-soft:rgba(244,63,94,.10)}
+.widget-instrument-v5[data-active-widget='utangTidur']{--wa:#8b5cf6;--wa-soft:rgba(139,92,246,.10)}
+.widget-instrument-v5[data-active-widget='napas']{--wa:#14b8a6;--wa-soft:rgba(20,184,166,.10)}
+.widget-instrument-v5[data-active-widget='duduk']{--wa:#3b82f6;--wa-soft:rgba(59,130,246,.10)}
+.widget-instrument-v5[data-active-widget='cahaya']{--wa:#ca8a04;--wa-soft:rgba(202,138,4,.10)}
+.widget-instrument-v5[data-active-widget='tangga']{--wa:#14b8a6;--wa-soft:rgba(20,184,166,.10)}
+.widget-instrument-v5[data-active-widget='lab']{--wa:#0ea5e9;--wa-soft:rgba(14,165,233,.10)}
+.widget-instrument-v5[data-active-widget='obatCepat']{--wa:#f97316;--wa-soft:rgba(249,115,22,.10)}
+.widget-instrument-v5[data-active-widget='kalkulatorCepat']{--wa:#3b82f6;--wa-soft:rgba(59,130,246,.10)}
+.widget-instrument-v5[data-active-widget='stasiunSering']{--wa:#a855f7;--wa-soft:rgba(168,85,247,.10)}
+
+@media(max-width:420px){
+  .widget-instrument-slide-v5[data-widget='zona2'] section>.kaca>div:first-child>span:first-child,
+  .widget-instrument-slide-v5[data-widget='hrr'] section>.kaca>div:first-child>span:first-child,
+  .widget-instrument-slide-v5[data-widget='utangTidur'] section>.kaca>div:first-child>span:first-child,
+  .widget-instrument-slide-v5[data-widget='duduk'] section>.kaca>div:first-child>span:first-child,
+  .widget-instrument-slide-v5[data-widget='cahaya'] section>.kaca>div:first-child>span:first-child,
+  .widget-instrument-slide-v5[data-widget='tangga'] section>.kaca>div:first-child>span:first-child{font-size:38px!important}
+  .widget-instrument-slide-v5[data-widget='cahaya'] section>.kaca>p{max-width:100%}
+}
+
+@media(prefers-reduced-motion:reduce){
+  .widget-instrument-slide-v5[data-widget='napas'] section>.kaca>.flex.items-center.gap-3>span:first-child{transition:none!important}
+}
+
+html.pmd-low-memory .widget-instrument-slide-v5[data-widget='zona2'] section>.kaca,
+html.pmd-low-memory .widget-instrument-slide-v5[data-widget='hrr'] section>.kaca,
+html.pmd-low-memory .widget-instrument-slide-v5[data-widget='utangTidur'] section>.kaca,
+html.pmd-low-memory .widget-instrument-slide-v5[data-widget='napas'] section>.kaca,
+html.pmd-low-memory .widget-instrument-slide-v5[data-widget='duduk'] section>.kaca,
+html.pmd-low-memory .widget-instrument-slide-v5[data-widget='cahaya'] section>.kaca,
+html.pmd-low-memory .widget-instrument-slide-v5[data-widget='tangga'] section>.kaca,
+html.pmd-low-memory .widget-instrument-slide-v5[data-widget='lab'] section>.kaca,
+html.pmd-low-memory .widget-instrument-slide-v5[data-widget='obatCepat'] section>.kaca,
+html.pmd-low-memory .widget-instrument-slide-v5[data-widget='kalkulatorCepat'] section>.kaca,
+html.pmd-low-memory .widget-instrument-slide-v5[data-widget='stasiunSering'] section>.kaca{
+  box-shadow:none!important;background-image:none!important
+}
