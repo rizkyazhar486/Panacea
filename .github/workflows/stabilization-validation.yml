@@ -1,0 +1,63 @@
+name: Stabilization Validation
+
+on:
+  push:
+    branches:
+      - claude/continue-previous-task-un3s83
+    paths:
+      - 'src/**'
+      - 'scripts/uji/**'
+      - 'server/**'
+      - 'package.json'
+      - 'package-lock.json'
+      - 'tsconfig*.json'
+      - '.github/workflows/stabilization-validation.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  frontend:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: claude/continue-previous-task-un3s83
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - name: Install frontend dependencies
+        run: npm ci
+      - name: Frontend TypeScript
+        run: npx tsc --noEmit
+      - name: Frontend production build
+        run: npm run build
+      - name: Frontend test suite
+        run: npm run uji
+
+  server:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    defaults:
+      run:
+        working-directory: server
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: claude/continue-previous-task-un3s83
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: server/package-lock.json
+      - name: Install server dependencies
+        run: npm ci
+      - name: Server TypeScript
+        run: npm run typecheck
+      - name: Server build
+        run: npm run build
+      - name: Server test suite
+        run: npm run uji
