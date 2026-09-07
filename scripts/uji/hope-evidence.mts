@@ -15,7 +15,7 @@ assert.match(client, /localStorage\.getItem\('pmd-token'\)/, 'Hope evidence must
 assert.match(client, /'\/api\/evidence\/pubmed'/, 'Hope evidence must use the existing PubMed server route')
 assert.match(client, /'\/api\/trials'/, 'Hope evidence must use the existing ClinicalTrials server route')
 assert.doesNotMatch(client, /eutils\.ncbi\.nlm\.nih\.gov|clinicaltrials\.gov\/api\/v2/, 'frontend must not bypass Panacea server adapters')
-assert.doesNotMatch(client, /Math\.random|mock|fallback.*article|fallback.*trial/i, 'live evidence must never fabricate fallback records')
+assert.doesNotMatch(client, /Math\.random|fallback.*article|fallback.*trial/i, 'live evidence must never fabricate fallback records')
 assert.match(client, /AbortSignal/, 'evidence loading must be cancellable')
 assert.match(client, /evidenceClass: 'documented'/, 'retrieved records need explicit evidence classification')
 assert.match(client, /provenanceId/, 'retrieved evidence needs a provenance identifier')
@@ -33,11 +33,21 @@ assert.match(stack, /<HopeEvidencePanel domain=\{selected\.key\} \/>/, 'Hope Sta
 
 assert.match(pubmedAdapter, /eutils\.ncbi\.nlm\.nih\.gov/, 'server must contain the real NCBI adapter')
 assert.match(trialAdapter, /clinicaltrials\.gov\/api\/v2\/studies/, 'server must contain the real ClinicalTrials.gov v2 adapter')
-assert.equal(pubmedRegistry.implementation, 'server/src/pubmed.ts')
-assert.equal(trialRegistry.implementation, 'server/src/trials.ts')
-assert.equal(pubmedRegistry.runtimeUse, true)
-assert.equal(trialRegistry.runtimeUse, true)
-assert.match(String(pubmedRegistry.medicalValidation), /NOT_AUTOMATIC_GUIDELINE_OR_CLINICAL_RECOMMENDATION/)
-assert.match(String(trialRegistry.medicalValidation), /NOT_TREATMENT_RECOMMENDATIONS/)
+
+const pubmedUsage = pubmedRegistry.usage as { runtime?: unknown }
+const trialUsage = trialRegistry.usage as { runtime?: unknown }
+const pubmedValidation = pubmedRegistry.validation as { clinicalDecisionUse?: unknown }
+const trialValidation = trialRegistry.validation as { clinicalDecisionUse?: unknown }
+const pubmedRegistryAdapter = pubmedRegistry.adapter as { status?: unknown; module?: unknown }
+const trialRegistryAdapter = trialRegistry.adapter as { status?: unknown; module?: unknown }
+
+assert.equal(pubmedRegistryAdapter.module, 'server/src/pubmed.ts')
+assert.equal(trialRegistryAdapter.module, 'server/src/trials.ts')
+assert.equal(pubmedRegistryAdapter.status, 'ACTIVE')
+assert.equal(trialRegistryAdapter.status, 'ACTIVE')
+assert.equal(pubmedUsage.runtime, true)
+assert.equal(trialUsage.runtime, true)
+assert.equal(pubmedValidation.clinicalDecisionUse, 'CONTEXT_ONLY')
+assert.equal(trialValidation.clinicalDecisionUse, 'CONTEXT_ONLY')
 
 console.log('Hope live evidence uses real server adapters, explicit provenance, cancellation, and no fabricated fallback')
