@@ -1,3 +1,5 @@
+import { appendNotificationHistory } from './notificationSignals'
+
 // Pencapaian nyata, dihitung dari data yang benar-benar sudah dicatat
 // pengguna (log latihan, tingkatan VO2max) — bukan progres yang dikarang.
 // Warnanya membawa arti: merah = darah & oksigen (usaha fisik nyata),
@@ -82,12 +84,33 @@ export function evaluateAthleteAchievements(tier: string): Achievement[] {
   return out
 }
 
+function recordAchievement(a: Achievement) {
+  const athlete = a.id === 'elite-lungs' || a.id === 'excellent-lungs'
+  appendNotificationHistory({
+    ruleId: `achievement:${a.id}`,
+    title: `Achievement unlocked · ${a.title}`,
+    body: a.desc,
+    route: athlete ? '/athlete' : '/latihan',
+    priority: 'normal',
+    domains: ['body'],
+    explanation: athlete
+      ? 'Unlocked from the VO₂max tier already calculated by Panacea; no measurement was invented for this alert.'
+      : 'Unlocked from workout entries already logged by the user; the alert adds no synthetic workout data.',
+    at: new Date().toISOString(),
+  })
+}
+
 // Compares candidates (everything currently true) against what has already
 // been shown, marks the new ones as seen, and returns only those — so a
 // popup fires exactly once per achievement, the first time it becomes true.
+// The same real unlock is also written into smart notification history so a
+// dismissed toast remains discoverable later in the notification centre.
 export function newlyUnlocked(candidates: Achievement[]): Achievement[] {
   const seen = new Set(loadSeen())
   const fresh = candidates.filter((a) => !seen.has(a.id))
-  if (fresh.length > 0) saveSeen([...seen, ...fresh.map((a) => a.id)])
+  if (fresh.length > 0) {
+    saveSeen([...seen, ...fresh.map((a) => a.id)])
+    for (const achievement of fresh) recordAchievement(achievement)
+  }
   return fresh
 }
