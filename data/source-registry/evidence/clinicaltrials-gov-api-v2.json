@@ -1,0 +1,30 @@
+{
+  "id": "clinicaltrials-gov-api-v2",
+  "name": "ClinicalTrials.gov API v2",
+  "source": "U.S. National Library of Medicine / National Institutes of Health",
+  "type": ["api", "clinical-trial-registry"],
+  "category": "evidence",
+  "features": [
+    "hope-stack",
+    "geroscience-pharma",
+    "regenerative-medicine",
+    "early-detection",
+    "aging-technology",
+    "clinical-trial-discovery"
+  ],
+  "homepage": "https://clinicaltrials.gov/",
+  "repository": null,
+  "license": "PUBLIC_GOVERNMENT_REGISTRY_VERIFY_TERMS",
+  "licenseUrl": "https://clinicaltrials.gov/data-api/about-api",
+  "access": "public-api",
+  "accessNotes": "Panacea accesses the public v2 API through its server adapter. The browser does not query ClinicalTrials.gov directly.",
+  "commercialUse": "VERIFY_CURRENT_TERMS_AND_ATTRIBUTION",
+  "implementation": "server/src/trials.ts",
+  "runtimeUse": true,
+  "buildTimeUse": false,
+  "integrationLayer": "server-adapter",
+  "attributionRequired": true,
+  "medicalValidation": "REGISTERED_STUDY_RECORDS_NOT_TREATMENT_RECOMMENDATIONS",
+  "status": "ACTIVE",
+  "notes": "Registration does not establish efficacy, safety, approval, recruitment suitability, or individual treatment appropriateness. Trial records must remain linked to their NCT identifiers and official registry pages."
+}
