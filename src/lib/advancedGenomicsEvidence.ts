@@ -96,13 +96,16 @@ function normalizeSvKind(raw: string): StructuralVariantKind {
 }
 
 function structuralKind(variant: VcfVariantRecord, info: Map<string, string>): StructuralVariantKind | null {
+  const normalizedAlt = variant.alt.toUpperCase()
+  if (normalizedAlt === '*' || normalizedAlt === '<*>' || normalizedAlt === '<NON_REF>') return null
+
   const explicit = info.get('SVTYPE')
   if (explicit) return normalizeSvKind(explicit)
 
   const symbolic = variant.alt.match(/^<([^>]+)>$/)?.[1]
   if (symbolic) return normalizeSvKind(symbolic)
 
-  if (/[[\]]/.test(variant.alt)) return 'BND'
+  if (/[\[\]]/.test(variant.alt)) return 'BND'
 
   const svLen = firstFinite(info.get('SVLEN'))
   if (svLen != null && Math.abs(svLen) >= 50) {
@@ -111,8 +114,11 @@ function structuralKind(variant: VcfVariantRecord, info: Map<string, string>): S
     return 'OTHER'
   }
 
-  const end = firstFinite(info.get('END'))
-  if (end != null && Math.abs(end - variant.pos) >= 50) return 'OTHER'
+  const copyNumber = firstFinite(info.get('CN') || info.get('COPY_NUMBER'))
+  if (copyNumber != null) return 'CNV'
+
+  // END alone is not sufficient evidence of a structural variant because
+  // gVCF reference blocks routinely use END without representing an SV.
   return null
 }
 
