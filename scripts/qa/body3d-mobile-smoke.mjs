@@ -184,9 +184,17 @@ try {
   metrics.progressiveLoadingCompact = Boolean(
     progressiveClass?.includes('top-2') && !progressiveClass?.includes('inset-0'),
   )
+  // Clicking the layer control legitimately scrolls that control into view.
+  // Re-center the viewer before testing its center; otherwise elementFromPoint
+  // can probe a coordinate outside the viewport and misreport it as an overlay.
+  await canvas.evaluate((node) => node.scrollIntoView({ block: 'center', inline: 'center' }))
+  await page.waitForTimeout(100)
   metrics.progressiveLoadingCenterUnobstructed = await canvas.evaluate((node) => {
     const rect = node.getBoundingClientRect()
-    return document.elementFromPoint(rect.left + rect.width / 2, rect.top + rect.height / 2) === node
+    const x = rect.left + rect.width / 2
+    const y = rect.top + rect.height / 2
+    if (x < 0 || x > window.innerWidth || y < 0 || y > window.innerHeight) return false
+    return document.elementFromPoint(x, y) === node
   })
   if (!metrics.progressiveLoadingCompact) {
     throw new Error(`Additional layer loading is not compact: ${progressiveClass ?? 'no class'}`)
