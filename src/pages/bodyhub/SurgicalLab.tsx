@@ -247,7 +247,7 @@ export function SurgicalLab({ onKedalaman, onSorot }: SurgicalLabProps) {
 
       {!dipilih && (
         <p className="rounded-xl bg-neutral-100/60 px-3 py-2 text-[11px] leading-snug text-neutral-500 dark:bg-white/5">
-          Pick an approach to study its anatomical layer sequence. This is educational orientation material, not operative instruction or a substitute for supervised surgical training.
+          Pick an approach to study its anatomical layer sequence. This is educational orientation material, not operative instructions or a substitute for supervised surgical training.
         </p>
       )}
     </div>
