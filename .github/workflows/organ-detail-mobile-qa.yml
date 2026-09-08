@@ -1,0 +1,59 @@
+name: Organ Detail Mobile QA
+
+on:
+  push:
+    branches:
+      - feat/body-exposure-organ-detail-20260908
+
+permissions:
+  contents: read
+
+jobs:
+  mobile-smoke:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - run: npm ci
+      - name: Production build
+        run: npm run build
+      - name: Install Playwright Chromium
+        run: |
+          npm install --no-save --no-package-lock @playwright/test@1.55.0
+          npx playwright install --with-deps chromium
+      - name: Start frontend preview
+        run: |
+          nohup npm run preview -- --host 127.0.0.1 --port 4173 > /tmp/panacea-organ-preview.log 2>&1 &
+          echo $! > /tmp/panacea-organ-preview.pid
+          for attempt in $(seq 1 45); do
+            if curl -fsS http://127.0.0.1:4173/ >/dev/null; then
+              exit 0
+            fi
+            sleep 1
+          done
+          cat /tmp/panacea-organ-preview.log
+          exit 1
+      - name: Eye exact-mesh mobile smoke
+        run: node scripts/qa/organ-detail-mobile-smoke.mjs
+        env:
+          ORGAN_QA_URL: http://127.0.0.1:4173/#/body-explorer
+          ORGAN_QA_SCREENSHOT: artifacts/organ-detail-eye-390x844.png
+          ORGAN_QA_METRICS: artifacts/organ-detail-mobile-metrics.json
+      - name: Upload visual evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: organ-detail-mobile-qa
+          path: artifacts/organ-detail-*
+          if-no-files-found: warn
+          retention-days: 7
+      - name: Stop frontend preview
+        if: always()
+        run: |
+          if [ -f /tmp/panacea-organ-preview.pid ]; then
+            kill "$(cat /tmp/panacea-organ-preview.pid)" 2>/dev/null || true
+          fi
