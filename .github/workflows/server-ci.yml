@@ -79,6 +79,8 @@ jobs:
         run: npm run uji:open-food-facts
       - name: Test Open-Meteo adapter
         run: npm run uji:open-meteo
+      - name: Test Connect privacy boundaries
+        run: npm run uji:connect-privacy
       - name: Runtime smoke-test genomics control plane
         env:
           JWT_SECRET: ci-only-panacea-genomics-secret

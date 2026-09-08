@@ -53,6 +53,12 @@ await context.addInitScript(() => {
 
 const page = await context.newPage()
 page.setDefaultTimeout(20_000)
+// Keep one normally-large optional layer in-flight long enough to prove that
+// progressive loading does not dim or cover anatomy that is already usable.
+await page.route('**/anatomy/cardio' + 'vascular.glb', async (route) => {
+  await new Promise((resolve) => setTimeout(resolve, 4_000))
+  await route.continue()
+})
 const pageErrors = []
 page.on('pageerror', (error) => pageErrors.push(error.message))
 
@@ -117,12 +123,16 @@ try {
     if (await close.isVisible().catch(() => false)) await close.click()
   }
 
-  const canvas = page.locator('div.h-full.w-full.touch-none > canvas').first()
+  const viewer = page.locator('div.h-full.w-full.touch-none').first()
+  const canvas = viewer.locator('> canvas').first()
   await canvas.waitFor({ state: 'visible', timeout: 45_000 })
   await canvas.scrollIntoViewIfNeeded()
 
   await page.waitForTimeout(1_500)
-  await page.getByText('Loading anatomy…').waitFor({ state: 'hidden', timeout: 120_000 })
+  const initialLoading = page.getByText('Loading anatomy…').first()
+  const progressiveLoading = page.getByText('Adding anatomy layer…').first()
+  await initialLoading.waitFor({ state: 'hidden', timeout: 120_000 })
+  await progressiveLoading.waitFor({ state: 'hidden', timeout: 120_000 })
 
   const fatal = page.getByText(/This device could not start 3D graphics|The browser dropped the 3D context/i)
   if (await fatal.count()) throw new Error(`Body3D fatal fallback is visible: ${await fatal.first().innerText()}`)
@@ -169,9 +179,37 @@ try {
     throw new Error(`Page overflows horizontally: ${metrics.documentScrollWidth}px > ${metrics.viewport.width}px`)
   }
 
+  const vessels = page.getByRole('button', { name: 'Vessels', exact: true }).first()
+  await vessels.click()
+  await progressiveLoading.waitFor({ state: 'visible', timeout: 5_000 })
+  const progressiveClass = await progressiveLoading.evaluate((node) =>
+    node.closest('[role="status"]')?.getAttribute('class') ?? '',
+  )
+  metrics.progressiveLoadingCompact = Boolean(
+    progressiveClass.includes('top-2') && !progressiveClass.includes('inset-0'),
+  )
+  await canvas.scrollIntoViewIfNeeded()
+  await page.waitForTimeout(100)
+  metrics.progressiveLoadingCenterUnobstructed = await canvas.evaluate((node) => {
+    const rect = node.getBoundingClientRect()
+    const x = rect.left + rect.width / 2
+    const y = rect.top + rect.height / 2
+    if (x < 0 || x > window.innerWidth || y < 0 || y > window.innerHeight) return false
+    const hit = document.elementFromPoint(x, y)
+    const viewerNode = node.parentElement
+    return Boolean(hit && viewerNode && (hit === node || hit === viewerNode || viewerNode.contains(hit)))
+  })
+  if (!metrics.progressiveLoadingCompact) {
+    throw new Error(`Additional layer loading is not compact: ${progressiveClass || 'no class'}`)
+  }
+  if (!metrics.progressiveLoadingCenterUnobstructed) {
+    throw new Error('Additional layer loading obstructed the Body3D viewer center')
+  }
+  await progressiveLoading.waitFor({ state: 'hidden', timeout: 120_000 })
+
   const box = await canvas.boundingBox()
   if (!box) throw new Error('Body3D canvas has no measurable bounding box')
-  const beforeOrbit = await capturePng(box)
+  const beforeOrbit = await capturePng()
   const x = box.x + box.width * 0.5
   const y = box.y + box.height * 0.45
   await page.mouse.move(x, y)
@@ -179,7 +217,7 @@ try {
   await page.mouse.move(x + Math.min(48, box.width * 0.15), y + 18, { steps: 6 })
   await page.mouse.up()
   await page.waitForTimeout(300)
-  const afterOrbit = await capturePng(box)
+  const afterOrbit = await capturePng()
   metrics.orbitChangedFrame = !beforeOrbit.equals(afterOrbit)
   if (!metrics.orbitChangedFrame) throw new Error('Orbit drag did not produce a new Body3D compositor frame')
 
@@ -200,7 +238,7 @@ try {
   await page.waitForTimeout(250)
   const beforeJointBox = await canvas.boundingBox()
   if (!beforeJointBox) throw new Error('Body3D canvas became unavailable before joint selection')
-  const beforeJointSelection = await capturePng(beforeJointBox)
+  const beforeJointSelection = await capturePng()
 
   const kneeButton = inspector.getByRole('button', { name: 'Knee', exact: true })
   await kneeButton.click()
@@ -209,7 +247,7 @@ try {
   await page.waitForTimeout(350)
   const afterJointBox = await canvas.boundingBox()
   if (!afterJointBox) throw new Error('Body3D canvas became unavailable after joint selection')
-  const afterJointSelection = await capturePng(afterJointBox)
+  const afterJointSelection = await capturePng()
   metrics.wholeBodyMotion = {
     precisionOpened: true,
     kneeSelected: true,
