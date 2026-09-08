@@ -1,7 +1,15 @@
 {
   "version": 1,
-  "updatedAt": "2026-09-08T13:37:00.000Z",
+  "updatedAt": "2026-09-08T15:10:00.000Z",
   "items": {
+    "ff-health-profile-timeline": {
+      "status": "done",
+      "commit": "a978908e55521c61f6ef213d9483a9c5921fe783",
+      "paths": ["src/pages/HealthProfile.tsx", "data/feature-factory/surfaces.json", "scripts/uji/feature-factory-health-profile-timeline.mts"],
+      "note": "Matured the existing /health-data dated history and Trends surface as the Feature Factory timeline capability rather than duplicating UI. Deterministic QA requires explicit date-stamped records, same-day replacement, a bounded latest-90-record history, a meaningful <2-record empty state, visible saved-record count, and user-controlled CSV history export with no hidden synthesis or seeded observations. No production health formula, threshold, API, persistence schema, dependency, biomedical interpretation or patient-specific inference was changed.",
+      "academicReview": {"status":"not-applicable-no-material-claim","sourceBasis":[],"aiUse":"ai-assisted","note":"This batch verifies software timeline persistence/presentation boundaries for user-entered or measured records only. It adds no biomedical threshold, diagnostic interpretation, treatment recommendation, causal claim, population norm or patient-specific inference.","humanReview":{"status":"not-recorded","reviewer":null,"credentials":null,"reviewedAt":null}},
+      "updatedAt": "2026-09-08T15:10:00.000Z"
+    },
     "ff-health-profile-snapshot": {
       "status": "done",
       "commit": "a6ba83a6fa6163e6b6491cc34d2ad6c598bbcbed",
