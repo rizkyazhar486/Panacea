@@ -1,0 +1,85 @@
+name: Brain Explorer Guarded Integration
+
+on:
+  push:
+    branches:
+      - feature/brain-explorer-higgsfield-inspired-20260908
+
+permissions:
+  contents: write
+
+jobs:
+  integrate:
+    if: ${{ !contains(github.event.head_commit.message, '[brain-integration-applied]') }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: feature/brain-explorer-higgsfield-inspired-20260908
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Apply guarded integrations
+        run: |
+          node <<'NODE'
+          const fs = require('node:fs')
+          function once(path, oldText, newText, label) {
+            let s = fs.readFileSync(path, 'utf8')
+            const at = s.indexOf(oldText)
+            if (at < 0) throw new Error(`${label}: expected block not found`)
+            if (s.indexOf(oldText, at + oldText.length) >= 0) throw new Error(`${label}: block not unique`)
+            s = s.slice(0, at) + newText + s.slice(at + oldText.length)
+            fs.writeFileSync(path, s)
+          }
+
+          once(
+            'src/main.tsx',
+            `const BodyExplorer = lazy(() => import('./pages/BodyExplorer').then((m) => ({ default: m.BodyExplorer })))\nconst Radiology = lazy(() => import('./pages/Radiology').then((m) => ({ default: m.Radiology })))`,
+            `const BodyExplorer = lazy(() => import('./pages/BodyExplorer').then((m) => ({ default: m.BodyExplorer })))\nconst BrainExplorer = lazy(() => import('./pages/BrainExplorer').then((m) => ({ default: m.BrainExplorer })))\nconst Radiology = lazy(() => import('./pages/Radiology').then((m) => ({ default: m.Radiology })))`,
+            'lazy BrainExplorer route import',
+          )
+          once(
+            'src/main.tsx',
+            `<Route path="/body-explorer" element={<BodyExplorer />} />\n              <Route path="/radiology" element={<Radiology />} />`,
+            `<Route path="/body-explorer" element={<BodyExplorer />} />\n              <Route path="/brain-explorer" element={<BrainExplorer />} />\n              <Route path="/radiology" element={<Radiology />} />`,
+            'BrainExplorer route',
+          )
+
+          once(
+            'src/pages/BodyExplorer.tsx',
+            `      <SectionTitle\n        icon={<IconActivity />}\n        title="Body Explorer"\n        subtitle="A real 3D anatomy model — tap any bone, muscle, vessel, nerve, or organ"\n      />\n      <Card>`,
+            `      <SectionTitle\n        icon={<IconActivity />}\n        title="Body Explorer"\n        subtitle="A real 3D anatomy model — tap any bone, muscle, vessel, nerve, or organ"\n      />\n      <div className="flex justify-end">\n        <Link\n          to="/brain-explorer"\n          className="rounded-full border border-brand/40 bg-brand/5 px-3 py-1.5 text-xs font-bold text-brand transition hover:bg-brand/10"\n        >\n          Open dedicated 3D Brain Explorer →\n        </Link>\n      </div>\n      <Card>`,
+            'Body Explorer brain link',
+          )
+
+          once(
+            'src/components/AtlasViewer3D.tsx',
+            `      const kunciBaru = \`${'${[...setLesi].sort().join(\'|\')}::${[...setHilir].sort().join(\'|\')}::${W ?? \'\'}::${J?.id ?? \'\'}'}\`\n      if (meshes.length && kunciBaru !== kunciBingkai) {\n        kunciBingkai = kunciBaru\n        if (adaSorot) bingkaiKe((m) => setLesi.has(m.name.toLowerCase()) || setHilir.has(m.name.toLowerCase()), 2.1)`,
+            `      const kunciBaru = \`${'${[...setLesi].sort().join(\'|\')}::${[...setHilir].sort().join(\'|\')}::${W ?? \'\'}::${J?.id ?? \'\'}::${D ?? \'\'}'}\`\n      if (meshes.length && kunciBaru !== kunciBingkai) {\n        kunciBingkai = kunciBaru\n        if (D) bingkaiKe((m) => m.name.toLowerCase() === D.toLowerCase(), 1.55)\n        else if (adaSorot) bingkaiKe((m) => setLesi.has(m.name.toLowerCase()) || setHilir.has(m.name.toLowerCase()), 2.1)`,
+            'exact AtlasViewer camera framing',
+          )
+          NODE
+          git diff --check
+
+      - name: TypeScript and deterministic tests
+        run: |
+          npx tsc --noEmit
+          npm run uji
+
+      - name: Commit integrated feature
+        run: |
+          git config user.name "Panacea Stabilization Bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add src/main.tsx src/pages/BodyExplorer.tsx src/components/AtlasViewer3D.tsx
+          git diff --cached --check
+          git commit -m "feat(brain): wire exact-focus brain workspace [brain-integration-applied]"
+          git push origin HEAD:feature/brain-explorer-higgsfield-inspired-20260908
