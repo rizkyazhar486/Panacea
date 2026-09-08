@@ -195,7 +195,7 @@ export function chooseAtlasLod(node: AtlasNode, projectedPixels: number, budget:
     && lod.maxTriangles <= budget.triangleBudget
     && lod.maxTextureMegabytes <= budget.textureBudgetMegabytes,
   )
-  return candidates.at(-1) ?? lodsFor(node)[0]
+  return candidates[candidates.length - 1] ?? lodsFor(node)[0]
 }
 
 function resolveNodeSource(node: AtlasNode, bundles: readonly AnatomySourceNodeBundle[]) {
