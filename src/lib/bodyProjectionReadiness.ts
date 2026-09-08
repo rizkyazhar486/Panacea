@@ -32,9 +32,9 @@ const nonBlank = (value: string | undefined) => Boolean(value?.trim())
  *
  * A roadmap target can only render as verified reference anatomy when an
  * asset-level record pins source identity/revision/license/attribution,
- * preserves transformation history, and satisfies the target's evidence and
- * academic-review contract. Repository-level licensing or a matching label is
- * intentionally insufficient.
+ * preserves transformation history, and both the target and the exact asset
+ * have a recorded qualified academic review. Repository-level licensing,
+ * source-checking alone, or a matching label is intentionally insufficient.
  */
 export function evaluateProjectionReadiness(
   target: BodyProjectionTarget,
@@ -70,8 +70,10 @@ export function evaluateProjectionReadiness(
   if (!['verified-native', 'verified-adjacent'].includes(provenance.geometryStatus)) reasons.push('Geometry is not verified.')
   if (!['source-checked', 'human-reviewed'].includes(provenance.evidenceStatus)) reasons.push('Evidence has not been source-checked.')
 
-  if (target.academicReview === 'recorded') {
-    if (provenance.academicReview !== 'recorded') reasons.push('Required academic review has not been recorded.')
+  if (target.academicReview !== 'recorded') reasons.push('Target academic review has not been recorded.')
+  if (provenance.academicReview !== 'recorded') reasons.push('Asset academic review has not been recorded.')
+
+  if (target.academicReview === 'recorded' && provenance.academicReview === 'recorded') {
     if (!nonBlank(provenance.reviewerName)) reasons.push('Reviewer identity is missing.')
     if (!nonBlank(provenance.reviewerCredentials)) reasons.push('Reviewer credentials are missing.')
     if (!nonBlank(provenance.reviewerDate)) reasons.push('Reviewer date is missing.')
@@ -81,7 +83,7 @@ export function evaluateProjectionReadiness(
   if (target.patientSpecificAllowed) reasons.push('Reference Body3D projection contract must not silently enable patient-specific geometry.')
 
   return reasons.length
-    ? { readiness: 'verification-required', renderAsVerifiedAnatomy: false, reasons }
+    ? { readiness: 'verification-required', renderAsVerifiedAnatomy: false, reasons: [...new Set(reasons)] }
     : { readiness: 'verified-reference', renderAsVerifiedAnatomy: true, reasons: [] }
 }
 
