@@ -96,23 +96,26 @@ async function captureMotionViewport() {
   motionScreenshotCaptured = true
 }
 
-async function dismissIfVisible(locator, timeout = 5_000) {
-  if (!(await locator.isVisible().catch(() => false))) return false
-  await withTimeout(
-    locator.evaluate((node) => node.click()),
-    'optional onboarding dismissal',
-    timeout,
-  )
-  await locator.waitFor({ state: 'hidden', timeout }).catch(() => undefined)
-  return true
+async function dismissOptionalButton(pattern) {
+  return withTimeout(
+    page.evaluate((source) => {
+      const re = new RegExp(source, 'i')
+      const button = Array.from(document.querySelectorAll('button')).find((node) => re.test(node.textContent || ''))
+      if (!button) return false
+      button.click()
+      return true
+    }, pattern.source),
+    'optional onboarding DOM dismissal',
+    5_000,
+  ).catch(() => false)
 }
 
 try {
   const response = await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 45_000 })
   if (response && !response.ok()) throw new Error(`Body Explorer returned HTTP ${response.status()}`)
 
-  await dismissIfVisible(page.getByRole('button', { name: /Get Started/i }).first())
-  await dismissIfVisible(page.getByRole('button', { name: /Maybe later/i }).first())
+  await dismissOptionalButton(/Get Started/i)
+  await dismissOptionalButton(/Maybe later/i)
 
   const reminderText = page.getByText(/TODAY.?S REMINDER/i).first()
   if (await reminderText.isVisible().catch(() => false)) {
