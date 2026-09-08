@@ -56,6 +56,15 @@ jobs:
           cat /tmp/panacea-vite-preview.log
           exit 1
 
+      # Run the heaviest multi-scenario atlas interaction first so it is not
+      # penalized by GPU/software-WebGL pressure left by earlier capture jobs.
+      - name: Surgical simulator mobile 390x844 smoke
+        env:
+          SURGERY_QA_URL: http://127.0.0.1:4173/#/body-explorer
+          SURGERY_QA_SCREENSHOT: artifacts/surgery-simulator-390x844.png
+          SURGERY_QA_METRICS: artifacts/surgery-simulator-metrics.json
+        run: node scripts/qa/surgery-simulator-mobile-smoke.mjs
+
       - name: Body Exposure mobile 390x844 smoke
         env:
           BODY3D_QA_URL: http://127.0.0.1:4173/#/body-explorer
@@ -68,13 +77,6 @@ jobs:
           BODY3D_QA_URL: http://127.0.0.1:4173/#/body-explorer
           BODY3D_QA_CANVAS_ARTIFACT: artifacts/body3d-mobile-canvas.png
         run: node scripts/qa/body3d-canvas-artifact.mjs
-
-      - name: Surgical simulator mobile 390x844 smoke
-        env:
-          SURGERY_QA_URL: http://127.0.0.1:4173/#/body-explorer
-          SURGERY_QA_SCREENSHOT: artifacts/surgery-simulator-390x844.png
-          SURGERY_QA_METRICS: artifacts/surgery-simulator-metrics.json
-        run: node scripts/qa/surgery-simulator-mobile-smoke.mjs
 
       - name: Upload Body Exposure mobile QA artifact
         if: always()
