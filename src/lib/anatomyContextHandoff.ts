@@ -27,10 +27,10 @@ interface CuratedHandoffRoute {
 /**
  * Explicit curated cross-module mappings only.
  *
- * "Curated" here means deterministic repository configuration. It does NOT
- * mean qualified human academic review. A mapping may only be described as
- * human-reviewed elsewhere when reviewer identity, credentials, date and scope
- * are recorded through the repository's academic-review gates.
+ * "Curated" here means deterministic repository configuration; it does NOT mean qualified human academic review.
+ * A mapping may only be described as human-reviewed elsewhere when reviewer
+ * identity, credentials, date and scope are recorded through the repository's
+ * academic-review gates.
  *
  * Do not infer a surgery or biomechanics destination from fuzzy node-name
  * similarity. A named source mesh proves only that geometry exists; it does not
