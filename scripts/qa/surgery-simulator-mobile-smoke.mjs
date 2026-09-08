@@ -99,7 +99,10 @@ try {
   await simulator.waitFor({ state: 'visible', timeout: 30_000 })
   await simulator.scrollIntoViewIfNeeded()
 
-  await page.getByText('Caesarean section — layered pelvic anatomy', { exact: true }).waitFor({ state: 'visible', timeout: 20_000 })
+  // Scenario order is product UX, not a test contract. Select Caesarean
+  // explicitly so adding a new default scenario cannot invalidate this smoke.
+  await simulator.getByRole('button', { name: 'Caesarean', exact: true }).click()
+  await simulator.getByText('Caesarean section — layered pelvic anatomy', { exact: true }).waitFor({ state: 'visible', timeout: 20_000 })
   let atlasCanvas = simulator.locator('canvas[data-atlas-viewer3d="true"]').first()
   await atlasCanvas.waitFor({ state: 'visible', timeout: 60_000 })
   await simulator.getByText(/Loading anatomy/i).waitFor({ state: 'hidden', timeout: 120_000 }).catch(() => undefined)
