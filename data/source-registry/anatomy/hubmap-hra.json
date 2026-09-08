@@ -11,7 +11,7 @@
     "runtime": false,
     "buildTime": true,
     "networkRequired": true,
-    "notes": "Start with versioned build-time snapshots for stable anatomical IDs, spatial reference objects and semantic relationships. Runtime API access can be enabled later behind a Panacea adapter with caching, timeout and graceful fallback rather than coupling UI components directly to HRA services."
+    "notes": "A bounded read-only prototype adapter now exists for the official HRA reference-organ endpoint, but it is intentionally not wired to a public Panacea runtime route or UI yet. Continue using versioned build-time snapshots for stable graph/asset work until caching, version pinning and product integration are designed. The prototype normalizes semantic reference-organ identity only and does not download or expose HRA meshes."
   },
   "license": {
     "status": "VERIFIED",
@@ -33,12 +33,12 @@
     "authority": "HuBMAP Consortium Human Reference Atlas",
     "sourceIdentityRequired": true,
     "versionPinRequired": true,
-    "notes": "Persist HRA release/version, digital object identifier, source ontology/atlas identifiers and transformation history. Preserve semantic IDs across mesh optimization so visual geometry remains linked to the reference graph."
+    "notes": "Persist HRA release/version, digital object identifier, source ontology/atlas identifiers and transformation history. Preserve semantic IDs across mesh optimization so visual geometry remains linked to the reference graph. The current prototype preserves the upstream HRA spatial-entity ID plus entity/annotation/reference-organ IRIs without inventing ontology mappings."
   },
   "adapter": {
-    "status": "PLANNED",
-    "normalizedTarget": "PanaceaHumanGraphNode",
-    "module": null,
-    "notes": "Planned pipeline: HRA digital object/graph -> version and license gate -> normalize stable anatomical/cell/biomarker IDs -> map optional reference geometry -> Panacea Human Graph -> Body Explorer selection and zoom hierarchy."
+    "status": "PROTOTYPE",
+    "normalizedTarget": "HraReferenceOrgan",
+    "module": "server/src/hraReference.ts",
+    "notes": "Read-only prototype for `https://apps.humanatlas.io/hra-api/v1/reference-organs`. It enforces a fixed upstream endpoint, timeout, bounded rows/annotations, record-type and ID validation, deduplication, explicit source provenance and fail-closed malformed-payload handling. It is covered by `server/uji/hraReference.uji.ts` and backend CI. No UI route, patient-specific inference or mesh ingestion is enabled by this status."
   }
 }
