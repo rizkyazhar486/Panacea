@@ -83,7 +83,7 @@ test('canonical Breath Atlas resolves real runtime source nodes and fails closed
     "id: 'pulmonary-vessels'",
     "id: 'alveolar-capillary'",
     "provenance: 'not-represented'",
-    'source mesh is not deformed to fake breathing',
+    'source body mesh is not deformed to fake breathing',
     'no patient-specific ventilation map',
     'Microscopic alveolar geometry is disclosed as unavailable at this scale',
   ]) {
