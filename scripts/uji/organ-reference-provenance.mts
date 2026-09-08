@@ -41,7 +41,16 @@ assert.match(dossier, /Regional relationships/, 'organ dossier must expose an ex
 assert.match(dossier, /model\.sumber === 'z-anatomy' \|\| model\.sumber === 'hra'/, 'Z-Anatomy and HRA must have a truthful reference-provenance branch')
 assert.match(dossier, /This is a reference atlas, not patient-specific imaging\./, 'reference anatomy must not masquerade as patient-specific imaging')
 assert.match(dossier, /Shape approximation — an AI-generated model \(Tripo\)/, 'legacy AI fallback must remain explicitly labeled as approximation')
-assert.doesNotMatch(dossier, /model\.sumber === 'bodyparts3d'[\s\S]{0,1000}\) : \([\s\S]{0,400}AI-generated model/, 'all non-BodyParts3D sources must not be collapsed into the AI provenance branch')
+
+// Structural ordering is more precise than a greedy negative regex: the UI must
+// branch BodyParts3D -> Z-Anatomy/HRA -> AI fallback in that order. This proves
+// reference sources are not collapsed into the final AI approximation branch.
+const bodypartsBranch = dossier.indexOf("model.sumber === 'bodyparts3d'")
+const referenceBranch = dossier.indexOf("model.sumber === 'z-anatomy' || model.sumber === 'hra'")
+const aiFallbackCopy = dossier.indexOf('Shape approximation — an AI-generated model (Tripo)')
+assert.ok(bodypartsBranch >= 0, 'BodyParts3D provenance branch must exist')
+assert.ok(referenceBranch > bodypartsBranch, 'Z-Anatomy/HRA provenance branch must follow BodyParts3D and remain distinct')
+assert.ok(aiFallbackCopy > referenceBranch, 'AI approximation copy must be the final fallback after all reference-source branches')
 
 // Generated metadata is the independent count source used by the atlas build.
 assert.match(systemAtlas, /"paru"\s*:\s*\{[\s\S]*?"structures"\s*:\s*13/, 'generated atlas metadata must agree on lung structure count')
