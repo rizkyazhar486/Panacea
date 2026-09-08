@@ -3,12 +3,17 @@ name: Stabilization Acceptance
 on:
   push:
     branches:
+      - main
       - stabilization/integrate-body3d-20260908
   pull_request:
     branches:
       - main
       - stabilization/unfinished-debt-safe-20260908
   workflow_dispatch:
+
+concurrency:
+  group: stabilization-acceptance-${{ github.ref }}
+  cancel-in-progress: true
 
 permissions:
   contents: read
