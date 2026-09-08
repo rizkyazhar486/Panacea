@@ -3,6 +3,7 @@ import { WHOLE_BODY_ASSET_MANIFEST, buildAtlasLoadPlan, validateAssetManifest } 
 import { resolveProjectionTargetToAtlas } from './bodyProjectionBridge'
 import { WHOLE_BODY_CORE_STRUCTURES } from './catalog'
 import { CARDIOVASCULAR_DEEP_RELATIONS, CARDIOVASCULAR_DEEP_STRUCTURES } from './cardiovascularAtlas'
+import { CIRCULATION_TOPOLOGY_RELATIONS } from './circulationTopology'
 import { AnatomyGraph } from './graph'
 import { equationsForStructure, traceMultiscalePath, validateMultiscaleAtlas } from './multiscale'
 import { RESPIRATORY_RELATIONS, RESPIRATORY_STRUCTURES } from './respiratoryAtlas'
@@ -19,6 +20,7 @@ export const WHOLE_BODY_STRUCTURES: readonly AnatomyStructure[] = [
 export const WHOLE_BODY_RELATIONS: readonly AnatomyRelation[] = [
   ...RESPIRATORY_RELATIONS,
   ...CARDIOVASCULAR_DEEP_RELATIONS,
+  ...CIRCULATION_TOPOLOGY_RELATIONS,
 ]
 
 export class WholeBodyAtlasEngine {
@@ -44,6 +46,7 @@ export class WholeBodyAtlasEngine {
   ancestors(id: string) { return this.graph.ancestors(id) }
   descendants(id: string) { return this.graph.descendants(id) }
   neighbors(id: string, types?: Parameters<AnatomyGraph['neighbors']>[1]) { return this.graph.neighbors(id, types) }
+  tracePath(fromId: string, toId: string, options?: Parameters<AnatomyGraph['tracePath']>[2]) { return this.graph.tracePath(fromId, toId, options) }
   buildLoadPlan(context: AtlasLoadContext) { return buildAtlasLoadPlan(this.assets, context) }
 
   /**
