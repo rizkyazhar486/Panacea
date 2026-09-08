@@ -1,0 +1,97 @@
+{
+  "version": 1,
+  "purpose": "Panacea Body Exposure multiscale anatomy + respiratory physiology reference federation",
+  "mandatoryReferences": [
+    {
+      "id": "thebuggeddev_anatomy",
+      "role": "ux-architecture-reference",
+      "evidenceAuthority": false,
+      "assetReuseAllowed": false
+    },
+    {
+      "id": "thebuggeddev_breath_atlas",
+      "role": "respiratory-ux-visualization-reference",
+      "evidenceAuthority": false,
+      "assetReuseAllowed": false
+    }
+  ],
+  "authoritativeBackbone": [
+    {
+      "id": "hubmap_hra",
+      "role": "multiscale-spatial-anatomy-cell-ontology",
+      "requiredFor": ["whole-body-structure", "organ", "tissue", "cell", "biomarker-spatial-context"]
+    },
+    {
+      "id": "nih_3d",
+      "role": "biomedical-3d-acquisition-reference",
+      "requiredFor": ["selected-3d-assets"]
+    },
+    {
+      "id": "z_anatomy",
+      "role": "educational-anatomy-mesh-reference",
+      "requiredFor": ["selected-anatomy-assets"]
+    },
+    {
+      "id": "cellml",
+      "role": "physiology-model-encoding-standard",
+      "requiredFor": ["reproducible-mathematical-physiology"]
+    },
+    {
+      "id": "physiome_model_repository",
+      "role": "published-physiology-model-source",
+      "requiredFor": ["selected-physiology-models"]
+    }
+  ],
+  "resolutionHierarchy": [
+    "whole-body",
+    "organ-system",
+    "organ",
+    "tissue",
+    "cell",
+    "subcellular",
+    "molecular-model"
+  ],
+  "respiratoryCoverage": [
+    "upper-airway",
+    "tracheobronchial-tree",
+    "lungs-lobes-and-segments",
+    "pleura",
+    "diaphragm-and-respiratory-muscles",
+    "pulmonary-vasculature",
+    "alveolar-capillary-interface",
+    "ventilation-mechanics",
+    "perfusion-context",
+    "gas-exchange-models",
+    "neural-respiratory-control-reference"
+  ],
+  "publicationRules": {
+    "visual-reference-is-not-evidence": true,
+    "unknown-license-blocks-asset-ingestion": true,
+    "asset-level-provenance-required": true,
+    "version-pin-required": true,
+    "transformation-history-required": true,
+    "source-identity-visible": true,
+    "patient-specific-geometry-disabled-by-default": true,
+    "clinical-decision-use-disabled-by-default": true,
+    "human-academic-review-required-for-academically-reviewed-label": true,
+    "unsupported-claims-fail-closed": true,
+    "no-fuzzy-anatomy-substitution": true,
+    "no-fabricated-missing-structures": true
+  },
+  "crossCheckPolicy": {
+    "single-source-production-promotion": false,
+    "require-independent-source-corroboration-when-available": true,
+    "preserve-disagreement": true,
+    "do-not-average-conflicting-anatomy-or-physiology": true,
+    "prefer-authoritative-primary-or-consortium-source": true,
+    "record-population-model-and-measurement-context": true
+  },
+  "performancePolicy": {
+    "progressive-loading-required": true,
+    "lod-required-for-heavy-meshes": true,
+    "draco-or-equivalent-compression-allowed-after-provenance-preservation": true,
+    "no-bulk-global-dataset-in-primary-web-bundle": true,
+    "bounded-runtime-memory-required": true,
+    "offline-fallback-must-not-fabricate-data": true
+  }
+}
