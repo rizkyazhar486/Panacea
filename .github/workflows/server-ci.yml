@@ -91,6 +91,8 @@ jobs:
         run: npm run uji:sports
       - name: Test auth privilege boundaries
         run: npm run uji:auth-access
+      - name: Test medical translation safety shield
+        run: npm run uji:translate
       - name: Runtime smoke-test genomics control plane
         env:
           JWT_SECRET: ci-only-panacea-genomics-secret
