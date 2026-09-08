@@ -26,28 +26,37 @@ jobs:
         shell: bash
         run: |
           python - <<'PY'
+          import re
           from pathlib import Path
 
           path = Path('src/pages/BodyExplorer.tsx')
           text = path.read_text()
-          old = """                <SurgicalLab
-                  onKedalaman={setDissect}
-                  onSorot={(nama) => { setActiveWorkout(null); setActiveOrgan(null); setFocusKeywords(null); setHighlighted(nama) }}
-                />"""
-          new = """                <SurgicalLab
-                  onKedalaman={setDissect}
-                  onSorot={(nama) => { setActiveWorkout(null); setActiveOrgan(null); setFocusKeywords(null); setHighlighted(nama) }}
-                  onSharedView={(view) => {
-                    setRenderMode(view.renderMode)
-                    setSlicePlane(view.slicePlane)
-                    setSlicePos(view.slicePos)
-                    setUnfold(view.unfold)
-                  }}
-                />"""
-          count = text.count(old)
-          if count != 1:
-              raise SystemExit(f'expected exactly one SurgicalLab mount, found {count}')
-          path.write_text(text.replace(old, new))
+          pattern = re.compile(
+              r'(?m)^([ \t]*)<SurgicalLab\n'
+              r'\1  onKedalaman=\{setDissect\}\n'
+              r'\1  onSorot=\{\(nama\) => \{ setActiveWorkout\(null\); setActiveOrgan\(null\); setFocusKeywords\(null\); setHighlighted\(nama\) \}\}\n'
+              r'\1/>$'
+          )
+          matches = list(pattern.finditer(text))
+          if len(matches) != 1:
+              raise SystemExit(f'expected exactly one SurgicalLab mount, found {len(matches)}')
+
+          match = matches[0]
+          indent = match.group(1)
+          replacement = (
+              indent + '<SurgicalLab\n'
+              + indent + '  onKedalaman={setDissect}\n'
+              + indent + '  onSorot={(nama) => { setActiveWorkout(null); setActiveOrgan(null); setFocusKeywords(null); setHighlighted(nama) }}\n'
+              + indent + '  onSharedView={(view) => {\n'
+              + indent + '    setRenderMode(view.renderMode)\n'
+              + indent + '    setSlicePlane(view.slicePlane)\n'
+              + indent + '    setSlicePos(view.slicePos)\n'
+              + indent + '    setUnfold(view.unfold)\n'
+              + indent + '  }}\n'
+              + indent + '/>'
+          )
+          updated = text[:match.start()] + replacement + text[match.end():]
+          path.write_text(updated)
           PY
 
       - name: Validate patched source
@@ -55,7 +64,7 @@ jobs:
           npm ci
           npx tsc --noEmit
           git diff --check
-          grep -F "onSharedView={(view) =>" src/pages/BodyExplorer.tsx
+          test "$(grep -Fc 'onSharedView={(view) =>' src/pages/BodyExplorer.tsx)" -eq 1
 
       - name: Remove one-shot workflow and commit
         shell: bash
