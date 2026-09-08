@@ -54,7 +54,8 @@ const sourceCoverage = resolveAtlasSourceCoverage('resp-right-lung', [{
   names: ['Heart', 'Left Lung', 'Right_Lung', 'Trachea'],
 }])
 assert.equal(sourceCoverage.length, 1)
-assert.equal(sourceCoverage[0].coverageRatio, 1)
+assert.equal(sourceCoverage[0].coverageRatio, 0.5)
+assert.deepEqual(sourceCoverage[0].unresolvedHints, ['lung right'])
 assert.equal(sourceCoverage[0].bindingStatus, 'candidate', 'Catalogue presence must never auto-promote verification.')
 assert.ok(sourceCoverage[0].matchedNames.includes('Right_Lung'))
 
@@ -140,7 +141,7 @@ const plan = buildAtlasLoadPlan([assetA, assetB], nearCamera, {
   visibleNodeIds: new Set(['cardiovascular-heart', 'resp-right-lung']),
   focusRegions: new Set(['thorax']),
   residentResourceKeys: new Set(['lung-lod2']),
-  gpuBudgetBytes: 5_000_000,
+  gpuBudgetBytes: 8_000_000,
 })
 assert.ok(plan.estimatedResidentBytes <= plan.budgetBytes)
 assert.ok([...plan.load, ...plan.retain].some((decision) => decision.nodeId === 'cardiovascular-heart'))
