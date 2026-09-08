@@ -82,7 +82,36 @@ assert.equal(overlay.publishable, true)
 assert.equal(overlay.renderAsVerifiedAnatomy, false)
 assert.equal(overlay.displayAsReferenceOnly, true)
 
-const overlayOnVerifiedAsset = evaluateBodyPublication({ mode: 'evidence-overlay', kind: 'physiology', target: reviewedCardiovascular, asset, evidence: [evidence] })
+// Once the target itself requires recorded academic review, pending evidence must
+// also fail closed even when the anatomy asset is fully reviewed.
+const pendingEvidenceOnReviewedTarget = evaluateBodyPublication({
+  mode: 'evidence-overlay',
+  kind: 'physiology',
+  target: reviewedCardiovascular,
+  asset,
+  evidence: [evidence],
+})
+assert.equal(pendingEvidenceOnReviewedTarget.publishable, false)
+assert.equal(pendingEvidenceOnReviewedTarget.renderAsVerifiedAnatomy, false)
+assert.ok(pendingEvidenceOnReviewedTarget.reasons.some((reason) => reason.includes('requires recorded academic review metadata')))
+
+const reviewedEvidence: BodyEvidenceMappingRecord = {
+  ...evidence,
+  academicReview: {
+    status: 'recorded',
+    reviewerName: 'Qualified reviewer fixture',
+    reviewerCredentials: 'Recorded professional credentials fixture',
+    reviewedAt: '2026-09-08',
+    scope: 'Validator fixture only: physiology evidence localization and publication boundary',
+  },
+}
+const overlayOnVerifiedAsset = evaluateBodyPublication({
+  mode: 'evidence-overlay',
+  kind: 'physiology',
+  target: reviewedCardiovascular,
+  asset,
+  evidence: [reviewedEvidence],
+})
 assert.equal(overlayOnVerifiedAsset.publishable, true)
 assert.equal(overlayOnVerifiedAsset.displayAsReferenceOnly, false)
 assert.equal(overlayOnVerifiedAsset.renderAsVerifiedAnatomy, false)
@@ -100,4 +129,4 @@ assert.equal(conceptualAnatomy.publishable, false)
 assert.equal(conceptualAnatomy.renderAsVerifiedAnatomy, false)
 assert.ok(conceptualAnatomy.reasons.some((reason) => reason.includes('Reference-only')))
 
-console.log('Body publication gate: verified anatomy requires reviewed target + reviewed asset; reference overlays, procedure fail-closed, and conceptual geometry boundaries verified.')
+console.log('Body publication gate: verified anatomy and reviewed-target overlays require recorded academic review; reference overlays, procedure fail-closed, and conceptual geometry boundaries verified.')
