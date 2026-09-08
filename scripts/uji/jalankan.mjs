@@ -16,20 +16,24 @@ import { readdirSync } from 'node:fs'
 import { spawnSync } from 'node:child_process'
 import { dirname, join } from 'node:path'
 import process from 'node:process'
-import { fileURLToPath } from 'node:url'
+import { fileURLToPath, pathToFileURL } from 'node:url'
 
 const di = dirname(fileURLToPath(import.meta.url))
 const akar = join(di, '..', '..')
+const resolver = pathToFileURL(join(di, 'typescript-resolver.mjs')).href
 const berkas = readdirSync(di).filter((f) => f.endsWith('.mts')).sort()
 
 let gagal = 0
 for (const f of berkas) {
   console.log(`\n─── ${f} ${'─'.repeat(Math.max(0, 60 - f.length))}`)
-  // `tsx` dipin sebagai devDependency dan sudah dipasang oleh `npm ci`.
-  // Menjalankannya melalui Node --import mempertahankan resolver TypeScript
-  // repo (extensionless imports / source .ts behind .js specifiers) tanpa
-  // `npx` dan tanpa mengunduh paket ketika regression gate sedang berjalan.
-  const r = spawnSync(process.execPath, ['--import=tsx', join(di, f)], {
+  // Node 24 menjalankan TypeScript secara native. Resolver yang dipreload hanya
+  // menutup perbedaan resolusi source repo (`./x` -> `./x.ts`, `.js` -> `.ts`)
+  // dan dibatasi pada file relatif di dalam repository. Tidak ada npx/download.
+  const r = spawnSync(process.execPath, [
+    '--experimental-transform-types',
+    `--import=${resolver}`,
+    join(di, f),
+  ], {
     stdio: 'inherit',
     cwd: akar,
   })
