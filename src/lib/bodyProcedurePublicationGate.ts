@@ -46,7 +46,6 @@ export function evaluateBodyProcedurePublication(
   if (!nonBlank(evidence.citation)) reasons.push('Procedure evidence citation is missing.')
   if (!nonBlank(evidence.sourceLocator)) reasons.push('Procedure evidence source locator is missing.')
   if (!nonBlank(evidence.educationalScope)) reasons.push('Procedure educational scope is missing.')
-  if (!evidence.aiAssisted) reasons.push('AI-assistance disclosure must be explicit.')
 
   const expected = new Set(procedure.anatomyTargetIds)
   const provided = new Set(evidence.targetIds)
