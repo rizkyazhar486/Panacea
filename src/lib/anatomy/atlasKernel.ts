@@ -50,7 +50,7 @@ export type AtlasRelationKind =
 export type AtlasLodTier = 'macro' | 'standard' | 'detail' | 'micro'
 
 export interface AtlasSourceBinding {
-  /** Ordered, reviewed lookup hints. First entries must be the most specific. */
+  /** Ordered curated lookup hints. Deterministic curation is not qualified academic review. */
   nodeHints: readonly string[]
   /** Composite nodes deliberately resolve every component hint. */
   mode: 'specific-fallback' | 'composite'
@@ -195,7 +195,7 @@ export function chooseAtlasLod(node: AtlasNode, projectedPixels: number, budget:
     && lod.maxTriangles <= budget.triangleBudget
     && lod.maxTextureMegabytes <= budget.textureBudgetMegabytes,
   )
-  return candidates.at(-1) ?? lodsFor(node)[0]
+  return candidates[candidates.length - 1] ?? lodsFor(node)[0]
 }
 
 function resolveNodeSource(node: AtlasNode, bundles: readonly AnatomySourceNodeBundle[]) {
@@ -243,7 +243,7 @@ export function buildAtlasRenderPlan(
 
     const sourceMatches = resolveNodeSource(node, bundles)
     if (node.geometryStatus === 'shipped' && sourceMatches.length === 0) {
-      skipped.push({ nodeId: node.id, reason: 'No reviewed source-node match in the active/indexed anatomy bundles.' })
+      skipped.push({ nodeId: node.id, reason: 'No source-node match in the active/indexed anatomy bundles.' })
       continue
     }
 
