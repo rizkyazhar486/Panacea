@@ -2,13 +2,13 @@ import { useEffect, useRef, useState } from 'react'
 import * as THREE from 'three'
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
-import { folderModel, type OrganModel } from '../lib/organModels'
+import { modelAssetPath, type OrganModel } from '../lib/organModels'
 import { anatomyCoverageForOrgan, anatomyScopeForOrgan } from '../lib/organAnatomyRequirements'
 
-// Penampil satu organ dari dekat. Model BodyParts3D membawa mesh anatomi
-// bernama dan karena itu boleh di-ray-pick tepat. Model AI tetap hanya memakai
-// hotspot yang dikurasi; jangan pernah menyulap satu mesh AI menjadi anatomi
-// sub-struktur yang tidak benar-benar ada di sumbernya.
+// Penampil satu organ dari dekat. Reference geometry dari BodyParts3D,
+// Z-Anatomy, atau HuBMAP HRA membawa mesh bernama dan boleh di-ray-pick tepat.
+// Model AI tetap marker-only; jangan pernah menyulap satu permukaan generatif
+// menjadi sub-struktur yang tidak benar-benar ada pada sumbernya.
 
 interface Props {
   organ: OrganModel
@@ -136,7 +136,7 @@ export function OrganModel3D({ organ, selected, onSelect, onPartsLoaded }: Props
 
     const loader = new GLTFLoader()
     loader.load(
-      `${import.meta.env.BASE_URL}${folderModel(organ)}/${organ.id}.glb`,
+      `${import.meta.env.BASE_URL}${modelAssetPath(organ)}`,
       (gltf) => {
         group = gltf.scene
 

@@ -77,6 +77,7 @@ export function modelAssetPath(m: OrganModel): string {
 }
 
 import { ORGAN_ATLAS } from './organAtlas.gen'
+import { REFERENCE_ATLAS_MODELS } from './referenceOrganModels'
 
 export const ORGAN_MODELS: OrganModel[] = [
   {
@@ -211,12 +212,13 @@ export const ORGAN_MODELS: OrganModel[] = [
 ]
 
 /**
- * Model organ untuk satu sasaran. Potongan BodyParts3D DIDAHULUKAN atas model
- * bangkitan AI: keduanya sama-sama menampilkan organ dari dekat, tapi hanya
- * yang pertama merupakan geometri manusia rujukan, dan tiap bagiannya bernama.
+ * Resolve the strongest available geometry without hiding provenance.
+ * 1) organ-specific BodyParts3D close-ups; 2) existing Z-Anatomy/HRA reference
+ * atlases; 3) legacy AI shape approximation only when no reference exists.
  */
 export function modelForFocus(focusKey: string): OrganModel | undefined {
   return ORGAN_ATLAS.find((m) => m.focusKey === focusKey)
+    ?? REFERENCE_ATLAS_MODELS.find((m) => m.focusKey === focusKey)
     ?? ORGAN_MODELS.find((m) => m.focusKey === focusKey)
 }
 
