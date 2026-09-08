@@ -11,7 +11,7 @@
 
 import { writeFileSync, mkdirSync } from 'node:fs'
 import { join } from 'node:path'
-import { bacaAtlas, ambilBagian, pusat, tulisGlb, HAK_CIPTA } from './atlasGlb.mjs'
+import { bacaAtlas, ambilBagian, tulisGlb, HAK_CIPTA } from './atlasGlb.mjs'
 
 const WARNA = ['#ee7c6a', '#f2a33b', '#6393d8', '#d89bc4', '#7fa88a', '#c69a5e', '#7294b9', '#b86858']
 
@@ -95,9 +95,6 @@ const BATAS = {
 
 const { atlas, potongan } = bacaAtlas(SUMBER)
 
-// Sebutan yang tampil di titik penanda. Nama BodyParts3D memakai bahasa
-// Inggris; sisi kiri/kanan dipertahankan karena itulah yang dilihat pembaca.
-
 function sejajarkan(dipilih) {
   // Pusatkan pada titik asal dan skalakan ke tinggi 2 satuan, sama seperti
   // model organ yang sudah ada agar kamera Body3D tidak perlu diubah.
@@ -109,6 +106,43 @@ function sejajarkan(dipilih) {
   const c = [0, 1, 2].map((a) => (min[a] + max[a]) / 2)
   for (const d of dipilih) for (let i = 0; i < d.pos.length; i += 3)
     for (let a = 0; a < 3; a++) d.pos[i + a] = (d.pos[i + a] - c[a]) * s
+}
+
+/**
+ * BodyParts3D may split one semantic structure into several geometry fragments
+ * with the same anatomical name. Those are multiple meshes, not multiple
+ * anatomical structures. Aggregate them before computing counts/hotspots so
+ * “56 meshes of jejunum/ileum” cannot be presented as 56 distinct structures.
+ */
+function semanticParts(data, sourceParts) {
+  const byName = new Map()
+  for (let i = 0; i < data.length; i++) {
+    const d = data[i]
+    let item = byName.get(d.nama)
+    if (!item) {
+      item = {
+        nama: d.nama,
+        warna: WARNA[byName.size % WARNA.length],
+        tri: 0,
+        vertexCount: 0,
+        sum: [0, 0, 0],
+      }
+      byName.set(d.nama, item)
+    }
+    item.tri += sourceParts[i].indexCount / 3
+    for (let p = 0; p < d.pos.length; p += 3) {
+      item.sum[0] += d.pos[p]
+      item.sum[1] += d.pos[p + 1]
+      item.sum[2] += d.pos[p + 2]
+      item.vertexCount++
+    }
+  }
+  return [...byName.values()].map((item) => ({
+    ...item,
+    position: item.vertexCount
+      ? item.sum.map((value) => Number((value / item.vertexCount).toFixed(4)))
+      : [0, 0, 0],
+  }))
 }
 
 mkdirSync(KELUAR, { recursive: true })
@@ -140,47 +174,49 @@ const ringkas = []
 const modelTs = []
 for (const [kunci, pola] of Object.entries(ORGAN)) {
   const saring = BATAS[kunci] ?? (() => true)
-  // Satu bagian bisa cocok dengan lebih dari satu pola; ambil sekali saja.
+  // Satu source object bisa cocok dengan lebih dari satu pola; ambil sekali
+  // berdasarkan source id. Nama yang sama boleh muncul pada beberapa object,
+  // karena itu adalah fragmen geometri yang sah dan tetap disimpan di GLB.
   const terlihat = new Set()
   const cocok = atlas.parts.filter((p) => {
     const n = p.name.toLowerCase()
-    if (!pola.some((r) => r.test(n)) || !saring(n) || terlihat.has(p.id)) return false
+    if (!pola.some((rx) => rx.test(n)) || !saring(n) || terlihat.has(p.id)) return false
     terlihat.add(p.id)
     return true
   })
   if (!cocok.length) { console.warn(`lewat ${kunci}: tidak ada bagian cocok`); continue }
   const data = cocok.map((p) => ambilBagian(potongan, p))
   sejajarkan(data)
-  // Tiap mesh diberi warnanya sendiri. Dengan satu warna untuk semuanya, organ
-  // bermesh banyak seperti mata terbaca sebagai gumpalan tunggal — sklera,
-  // kornea, iris, dan saraf optik tidak bisa dibedakan, padahal justru itu
-  // yang ingin dipelajari. Warnanya sama dengan warna titik penandanya.
+
+  const semantic = semanticParts(data, cocok)
+  const warnaByName = new Map(semantic.map((part) => [part.nama, part.warna]))
+
+  // Fragmen yang memiliki nama anatomi sama diberi warna sama, sehingga satu
+  // konsep tidak tampak seolah beberapa struktur berbeda hanya karena atlas
+  // menyimpannya sebagai beberapa source meshes.
   const bytes = tulisGlb(
     join(KELUAR, `${kunci}.glb`),
-    data.map((d, i) => ({ ...d, warna: WARNA[i % WARNA.length] })),
+    data.map((d) => ({ ...d, warna: warnaByName.get(d.nama) ?? WARNA[0] })),
     HAK_CIPTA,
   )
-  // Titik penanda diambil dari bagian TERBESAR: pada organ dengan puluhan
-  // mesh, menandai semuanya membuat layar penuh label yang saling tumpuk.
-  // Warnanya diambil dari urutan mesh di dalam berkas, bukan dari urutan
-  // titik: dengan begitu titik penanda berwarna sama persis dengan struktur
-  // yang ia namai, bukan sekadar berbeda satu sama lain.
-  const besar = data
-    .map((d, i) => ({ d, tri: cocok[i].indexCount / 3, warna: WARNA[i % WARNA.length] }))
-    .sort((a, b) => b.tri - a.tri)
-    .slice(0, 8)
+
+  // Hotspot juga satu per istilah anatomi unik. Posisinya adalah centroid
+  // berbobot vertex dari seluruh fragmen dengan nama itu, bukan salah satu
+  // fragmen arbitrer; ID React/DOM dengan demikian selalu unik.
+  const besar = [...semantic].sort((a, b) => b.tri - a.tri).slice(0, 8)
   modelTs.push({
     kunci,
-    bagian: cocok.length,
-    hotspots: besar.map(({ d, warna }) => ({
-      id: d.nama.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, ''),
-      ta: d.nama,
-      position: pusat(d),
-      color: warna,
+    bagian: semantic.length,
+    mesh: cocok.length,
+    hotspots: besar.map((part) => ({
+      id: part.nama.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, ''),
+      ta: part.nama,
+      position: part.position,
+      color: part.warna,
     })),
   })
   const tri = cocok.reduce((s, p) => s + p.indexCount / 3, 0)
-  ringkas.push({ kunci, bagian: cocok.length, tri, kb: Math.round(bytes / 1024) })
+  ringkas.push({ kunci, bagian: semantic.length, mesh: cocok.length, tri, kb: Math.round(bytes / 1024) })
 }
 console.table(ringkas)
 
@@ -200,7 +236,7 @@ export const ORGAN_ATLAS: OrganModel[] = ${JSON.stringify(
     id: m.kunci, focusKey: m.kunci,
     label: SEBUTAN[m.kunci][0], scientificName: SEBUTAN[m.kunci][1],
     accent: m.hotspots[0]?.color ?? '#ee7c6a', illustrated: false,
-    sumber: 'bodyparts3d', jumlahBagian: m.bagian, hotspots: m.hotspots,
+    sumber: 'bodyparts3d', jumlahBagian: m.bagian, jumlahMesh: m.mesh, hotspots: m.hotspots,
   })),
   null, 2,
 )}
