@@ -19,6 +19,7 @@
     "uji:rxclass": "tsx uji/rxclass.uji.ts",
     "uji:mygene": "tsx uji/mygene.uji.ts",
     "uji:commons": "tsx uji/commons.uji.ts",
+    "uji:lingkungan": "tsx uji/lingkungan.uji.ts",
     "uji:icd": "tsx uji/icd.uji.ts",
     "uji:drug-info": "tsx uji/drugInfo.uji.ts",
     "uji:anatomy-ontology": "tsx uji/anatomyOntology.uji.ts",
