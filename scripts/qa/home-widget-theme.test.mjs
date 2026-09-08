@@ -5,8 +5,10 @@ import { readFileSync } from 'node:fs'
 const read = (path) => readFileSync(new URL(`../../${path}`, import.meta.url), 'utf8')
 
 const tumpukan = read('src/components/Tumpukan.tsx')
+const semangat = read('src/components/UbinSemangat.tsx')
 const scopedGuard = read('src/styles/widget-dark-surface-v29.css')
 const emergencyGuard = read('public/home-widget-dark-v31.css')
+const comfortGuard = read('src/styles/home-dark-comfort-v34.css')
 const index = read('index.html')
 
 test('Living Instrument mounts the active source widget, not only the filtered index', () => {
@@ -17,18 +19,50 @@ test('Living Instrument mounts the active source widget, not only the filtered i
 
 test('Dark mode guards every nested widget card and loading surface', () => {
   for (const css of [scopedGuard, emergencyGuard]) {
-    assert.match(css, /\.dark \.panacea-home \.widget-instrument-slide-v5 \.kaca/)
     assert.match(css, /\.widget-instrument-loading-v29/)
+    assert.match(css, /Loading widget…/)
+    assert.match(css, /background:#0a0f16!important/)
+    assert.match(css, /color:#dbe7ef!important/)
+    assert.match(css, /\.widget-instrument-slide-v5 \.kaca/)
     assert.match(css, /background:#0b1119!important/)
     assert.match(css, /background-image:none!important/)
     assert.match(css, /color:#f8fafc!important/)
   }
 })
 
+test('Active Suspense fallback cannot retain a giant previous widget canvas', () => {
+  for (const css of [scopedGuard, emergencyGuard]) {
+    assert.match(css, /aria-hidden='false'/)
+    assert.match(css, /height:184px!important/)
+    assert.match(css, /max-height:184px!important/)
+  }
+})
+
 test('Final-authority Dark Home guard loads after the general Home contrast layer', () => {
   const contrast = index.indexOf('/home-contrast-v27.css')
-  const darkGuard = index.indexOf('/home-widget-dark-v31.css')
+  const darkGuard = index.indexOf('/home-widget-dark-v31.css?v=20260909-1')
   assert.ok(contrast >= 0, 'Home contrast layer must remain registered')
   assert.ok(darkGuard > contrast, 'Dark widget guard must load after the general contrast layer')
-  assert.match(index, /MAINTENANCE_VERSION = '20260908-v31'/)
+  assert.match(index, /MAINTENANCE_VERSION = '20260909-v33'/)
+})
+
+test('Home v34 removes decorative outline leakage without recoloring semantic data', () => {
+  assert.match(semangat, /import '\.\.\/styles\/home-dark-comfort-v34\.css'/)
+  assert.match(comfortGuard, /--pmd-calm-surface:rgba\(9,14,22,\.82\)/)
+  assert.match(comfortGuard, /--pmd-calm-border:rgba\(255,255,255,\.085\)/)
+  assert.match(comfortGuard, /\.panacea-home \.kaca\{/)
+  assert.match(comfortGuard, /border:1px solid var\(--pmd-calm-border\)!important/)
+  assert.match(comfortGuard, /\.panacea-home \.kaca::before/)
+  assert.match(comfortGuard, /content:none!important/)
+  assert.doesNotMatch(comfortGuard, /svg\s*[,{]/, 'v34 must not override chart/reference SVG semantics')
+})
+
+test('Global widget controls stay stable while per-widget identity remains available', () => {
+  assert.match(comfortGuard, /\.widget-instrument-edit-v5/)
+  assert.match(comfortGuard, /background:rgba\(0,191,99,\.085\)!important/)
+  assert.match(comfortGuard, /color:#53dfa0!important/)
+  assert.match(comfortGuard, /@media\(max-width:430px\)/)
+  assert.match(comfortGuard, /grid-template-columns:minmax\(0,1fr\)!important/)
+  assert.match(comfortGuard, /\.widget-instrument-title-v5/)
+  assert.match(comfortGuard, /white-space:normal!important/)
 })
