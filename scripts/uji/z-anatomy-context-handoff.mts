@@ -47,4 +47,4 @@ publishAnatomyContextHandoff(kneeContext, 'surgery')
 assert.equal(consumeAnatomyContextHandoff('surgery')?.structureId, 'knee-complex')
 assert.equal(consumeAnatomyContextHandoff('surgery'), null, 'surgical handoff must be one-shot')
 
-console.log('Z-Anatomy handoff uses explicit reviewed mappings; source-node names never infer surgery or biomechanics destinations.')
+console.log('Z-Anatomy handoff uses explicit curated mappings; source-node names never infer surgery or biomechanics destinations, and curation does not imply qualified human review.')
