@@ -372,7 +372,9 @@ export function fmtDurasi(sec: number): string {
 }
 
 export function fmtPace(sec: number): string {
-  const m = Math.floor(sec / 60)
-  const s = Math.round(sec % 60)
+  if (!Number.isFinite(sec) || sec < 0) return '—'
+  const totalDetik = Math.round(sec)
+  const m = Math.floor(totalDetik / 60)
+  const s = totalDetik % 60
   return `${m}:${String(s).padStart(2, '0')}`
 }
