@@ -10,9 +10,9 @@ const reviewed: BodyProcedureEvidenceRecord = {
   procedureId: appendectomy.id,
   targetIds: [...appendectomy.anatomyTargetIds],
   sourceId: 'peer-reviewed-surgical-education-source',
-  sourceVersion: 'versioned-record',
+  sourceVersion: 'doi:10.0000/panacea.fixture.2026.1',
   citation: 'Version-pinned surgical education citation fixture',
-  sourceLocator: 'verified-source-record',
+  sourceLocator: 'article:methods/anatomy-scope',
   educationalScope: 'Generic anatomy-oriented teaching only; not patient-specific operative guidance.',
   aiAssisted: true,
   containsPatientSpecificTrajectory: false,
@@ -32,6 +32,25 @@ const reviewed: BodyProcedureEvidenceRecord = {
 assert.equal(evaluateBodyProcedurePublication(appendectomy, BODY_PROJECTION_TARGETS, reviewed).publishable, true)
 assert.equal(evaluateBodyProcedurePublication(appendectomy, BODY_PROJECTION_TARGETS, { ...reviewed, aiAssisted: false }).publishable, true, 'explicit false must remain a valid AI-assistance disclosure')
 
+const missingRuntimeDisclosure = evaluateBodyProcedurePublication(appendectomy, BODY_PROJECTION_TARGETS, {
+  ...reviewed,
+  aiAssisted: undefined as unknown as boolean,
+})
+assert.equal(missingRuntimeDisclosure.publishable, false)
+assert.ok(missingRuntimeDisclosure.reasons.some((reason) => reason.includes('explicit boolean')))
+
+for (const sourceVersion of ['latest', 'main', 'HEAD', 'current', 'versioned-record']) {
+  const floating = evaluateBodyProcedurePublication(appendectomy, BODY_PROJECTION_TARGETS, { ...reviewed, sourceVersion })
+  assert.equal(floating.publishable, false, `floating procedure source revision ${sourceVersion} must fail closed`)
+  assert.ok(floating.reasons.some((reason) => reason.includes('immutable')))
+}
+
+for (const sourceLocator of ['verified-source-record', 'repository-verified-source-record', 'source-record', 'placeholder']) {
+  const placeholder = evaluateBodyProcedurePublication(appendectomy, BODY_PROJECTION_TARGETS, { ...reviewed, sourceLocator })
+  assert.equal(placeholder.publishable, false, `placeholder procedure source locator ${sourceLocator} must fail closed`)
+  assert.ok(placeholder.reasons.some((reason) => reason.includes('specific source location')))
+}
+
 const unreviewed = evaluateBodyProcedurePublication(appendectomy, BODY_PROJECTION_TARGETS, {
   ...reviewed,
   reviewerName: ' ',
@@ -42,6 +61,12 @@ const unreviewed = evaluateBodyProcedurePublication(appendectomy, BODY_PROJECTIO
 assert.equal(unreviewed.publishable, false)
 assert.ok(unreviewed.reasons.some((reason) => reason.includes('reviewer identity')))
 assert.ok(unreviewed.reasons.some((reason) => reason.includes('credentials')))
+
+for (const reviewedAt of ['2026-02-30', '2026-13-01', '2026-00-10']) {
+  const impossibleDate = evaluateBodyProcedurePublication(appendectomy, BODY_PROJECTION_TARGETS, { ...reviewed, reviewedAt })
+  assert.equal(impossibleDate.publishable, false, `impossible review date ${reviewedAt} must fail closed`)
+  assert.ok(impossibleDate.reasons.some((reason) => reason.includes('real ISO calendar date')))
+}
 
 for (const field of [
   'containsPatientSpecificTrajectory',
@@ -65,4 +90,4 @@ const wrongProcedure = evaluateBodyProcedurePublication(appendectomy, BODY_PROJE
 assert.equal(wrongProcedure.publishable, false)
 assert.ok(wrongProcedure.reasons.some((reason) => reason.includes('normalized procedure target')))
 
-console.log('Body procedure publication gate: provenance, normalized targets, explicit AI disclosure, qualified review, and forbidden operative-detail boundaries verified.')
+console.log('Body procedure publication gate: immutable provenance, normalized targets, explicit AI disclosure, qualified review, and forbidden operative-detail boundaries verified.')
