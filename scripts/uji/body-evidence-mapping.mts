@@ -28,8 +28,12 @@ const generic: BodyEvidenceMappingRecord = {
 assert.equal(validateBodyEvidenceMapping(cardiovascular, generic).publishable, true)
 assert.equal(validateBodyEvidenceMapping(cardiovascular, { ...generic, aiAssisted: false }).publishable, true)
 
-const normalizedVariant = validateBodyEvidenceMapping(cardiovascular, { ...generic, mappedAnatomyTerms: ['coronary artery'] })
+const normalizedVariant = validateBodyEvidenceMapping(cardiovascular, { ...generic, mappedAnatomyTerms: ['coronary-artery'] })
 assert.equal(normalizedVariant.publishable, true)
+
+const substringCollision = validateBodyEvidenceMapping(cardiovascular, { ...generic, mappedAnatomyTerms: ['heartburn'] })
+assert.equal(substringCollision.publishable, false)
+assert.ok(substringCollision.reasons.some((reason) => reason.includes('resolve conservatively')))
 
 const unrelatedAnatomy = validateBodyEvidenceMapping(cardiovascular, { ...generic, mappedAnatomyTerms: ['kidney'] })
 assert.equal(unrelatedAnatomy.publishable, false)
@@ -105,4 +109,4 @@ assert.ok(impossibleCalendarReview.reasons.some((reason) => reason.includes('rea
 const unsupportedKind = validateBodyEvidenceMapping(cardiovascular, { ...generic, kind: 'lesion', targetId: cardiovascular.id })
 assert.equal(unsupportedKind.publishable, true)
 
-console.log('Body evidence mapping: immutable provenance, anatomy-term normalization, generic-vs-patient localization, explicit AI disclosure, and academic-review guards verified.')
+console.log('Body evidence mapping: immutable provenance, anatomy-term token boundaries, generic-vs-patient localization, explicit AI disclosure, and academic-review guards verified.')
