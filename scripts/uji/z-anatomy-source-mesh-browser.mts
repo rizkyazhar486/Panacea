@@ -52,6 +52,14 @@ assert.doesNotMatch(browser, /injury risk/i)
 
 assert.match(lab, /import ZAnatomySourceMeshBrowser from '\.\/ZAnatomySourceMeshBrowser'/)
 assert.match(lab, /<ZAnatomySourceMeshBrowser onHighlight=\{onHighlight\} onFocusRegion=\{onFocusRegion\} onEnableLayer=\{onEnableLayer\} \/>/)
-assert.match(lab, /<ZAnatomyAtlasWorkbench onHighlight=\{onHighlight\} onFocusRegion=\{onFocusRegion\} onEnableLayer=\{onEnableLayer\} \/>/)
+
+// Keep the workbench integration guard semantic rather than formatting-sensitive.
+// The workbench may gain additional explicit callbacks, but these shared viewer
+// callbacks must remain wired to the exact same source-geometry controls.
+const workbenchMount = lab.match(/<ZAnatomyAtlasWorkbench[\s\S]*?\/>/)?.[0] ?? ''
+assert.ok(workbenchMount, 'Z-Anatomy workbench should remain mounted beside the source mesh browser')
+assert.match(workbenchMount, /onHighlight=\{onHighlight\}/)
+assert.match(workbenchMount, /onFocusRegion=\{onFocusRegion\}/)
+assert.match(workbenchMount, /onEnableLayer=\{onEnableLayer\}/)
 
 console.log('Z-Anatomy source mesh browser stays bounded, provenance-aware, exact-node routed, explicit-graph constrained, module-compatible, and mounted beside the curated workbench.')
