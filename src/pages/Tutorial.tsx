@@ -34,6 +34,16 @@ const BELAJAR_AWAM: Langkah[] = [
   { ke: '/clinical-calculators', ikon: '🧮', judul: 'Work out one risk', isi: 'Heart risk, kidney function. Fill the fields and the result arrives with its interpretation.', lama: '1 min' },
 ]
 
+const BODY_EXPLORER: Langkah[] = [
+  {
+    ke: '/body-explorer',
+    ikon: '🫀',
+    judul: 'Explore the body in 3D',
+    isi: 'Start in Anatomy view. Tap a structure, or open Organs, Muscles, or Find structure. Use the advanced labs only when you need them — the same 3D body remains your anchor.',
+    lama: '1 min',
+  },
+]
+
 /** Arti warna cabang di peta penyakit — sama di seluruh 623 catatan. */
 const WARNA: [string, string, string][] = [
   ['bg-neutral-700', 'APA', 'a short definition'],
@@ -81,11 +91,12 @@ export default function Tutorial() {
     <div className="space-y-5 pb-4">
       <header>
         <h1 className="text-[20px] font-black text-ink dark:text-white">How to Use</h1>
-        <p className="text-[13px] text-neutral-500">Six steps, under 10 minutes. Tap to go straight there.</p>
+        <p className="text-[13px] text-neutral-500">A short map of the app. Tap a step to go straight there.</p>
       </header>
 
       <Bagian judul="① Set up first" langkah={MULAI} dari={1} />
       <Bagian judul={awam ? '② Start looking things up' : '② Start studying'} langkah={awam ? BELAJAR_AWAM : BELAJAR} dari={4} />
+      <Bagian judul="③ Explore the body visually" langkah={BODY_EXPLORER} dari={7} />
 
       <section>
         <h2 className="mb-2 text-[11px] font-black uppercase tracking-wide text-neutral-500">What the colours mean on the condition map</h2>
