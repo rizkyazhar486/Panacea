@@ -177,7 +177,11 @@ try {
   await vessels.click()
   await progressiveLoading.waitFor({ state: 'visible', timeout: 5_000 })
   await canvas.scrollIntoViewIfNeeded()
-  const progressiveOverlay = progressiveLoading.locator('xpath=ancestor::*[@role="status"][1]')
+  // Resolve the live region directly. Chaining an ancestor XPath from a text
+  // locator can lose the element once React updates the text node during
+  // progress; filtering the stable status container is deterministic.
+  const progressiveOverlay = page.locator('[role="status"]').filter({ hasText: 'Adding anatomy layer…' }).first()
+  await progressiveOverlay.waitFor({ state: 'visible', timeout: 5_000 })
   const progressiveClass = await progressiveOverlay.getAttribute('class')
   metrics.progressiveLoadingCompact = Boolean(
     progressiveClass?.includes('top-2') && !progressiveClass?.includes('inset-0'),
