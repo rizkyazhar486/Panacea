@@ -51,10 +51,13 @@ export interface BodyAtlasStreamingPlan {
 const MiB = 1024 * 1024
 
 /**
- * Exact checked-in GLB inventory on the branch where the high-end atlas engine
- * was introduced. These are Panacea's existing licensed local assets; the
- * mandatory external thebuggeddev references remain design references only and
- * are deliberately absent from this runtime manifest.
+ * Exact checked-in GLB byte inventory for the current high-end atlas runtime.
+ * Git blob SHAs establish local byte identity only. They do not by themselves
+ * establish upstream source identity, asset-level license evidence,
+ * transformation lineage, or qualified anatomical review. Those publication
+ * requirements are enforced by the dedicated Body provenance/review gates.
+ * Mandatory thebuggeddev references remain design references only and are
+ * deliberately absent from this runtime manifest.
  */
 export const BODY_ATLAS_ASSET_MANIFEST: readonly BodyAtlasAssetRecord[] = [
   { layer: 'surface', file: 'surface.glb', path: 'public/anatomy/surface.glb', bytes: 998_480, gitBlobSha: '07be399e9d1a6aacbe3f07a94159178494a07d4f' },
