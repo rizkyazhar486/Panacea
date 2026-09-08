@@ -64,9 +64,19 @@ assert.match(captureSource, /if \(!file\) return originalLoad\.call/, 'non-anato
 assert.match(captureSource, /gltf\.parser\.json\.nodes/, 'registry must read original GLTF JSON node names')
 assert.match(captureSource, /publishAnatomySourceNodes\(file, names\)/)
 assert.match(qualitySource, /installBody3dSourceNodeCapture\(\)/, 'Body3D generation controller must activate source-node capture')
-assert.match(workbenchSource, /useSyncExternalStore/)
-assert.match(workbenchSource, /Runtime source-node matches/)
-assert.match(workbenchSource, /naming-resolution result—not evidence that the anatomical structure is absent/)
+
+// Guard the runtime-resolution behavior rather than presentation copy. The
+// workbench must subscribe to the registry, use the effective snapshot, scope
+// resolution to the structure's expected GLB, resolve reviewed hints against
+// that scoped runtime data, and distinguish runtime provenance explicitly.
+assert.match(workbenchSource, /useSyncExternalStore\(/, 'workbench must subscribe reactively to runtime source-node updates')
+assert.match(workbenchSource, /subscribeAnatomySourceNodes/, 'workbench must subscribe through the anatomy source-node registry')
+assert.match(workbenchSource, /getEffectiveAnatomySourceNodeSnapshot/, 'workbench must read the effective runtime-aware source-node snapshot')
+assert.match(workbenchSource, /sourceBundles\.filter\(\(bundle\) => bundle\.file === expectedFile\)/, 'runtime name resolution must stay scoped to the expected anatomy GLB')
+assert.match(workbenchSource, /resolveAnatomySourceNodes\(/, 'reviewed node hints must resolve through the registry helper')
+assert.match(workbenchSource, /exactNamesFor\(structure/, 'structure inspection must derive exact source names before highlighting')
+assert.match(workbenchSource, /anatomySourceNodeOrigin\(bundle\.file\) === 'runtime'/, 'workbench must preserve explicit runtime provenance accounting')
+assert.match(workbenchSource, /onHighlight\?\.\(exactNames\)/, 'exact resolved names must drive shared-viewer highlighting')
 assert.doesNotMatch(workbenchSource, /coverage\s*%/i, 'runtime name matching must not be presented as anatomical coverage')
 
 console.log('Z-Anatomy runtime registry retains exact source names and resolves reviewed hints conservatively.')
