@@ -129,6 +129,10 @@ export function resolveBridgeTopic(query: string): BridgeTopic | null {
   return BRIDGE_TOPICS.find((topic) => topic.title.toLowerCase() === q || topic.id === q || topic.aliases.some((alias) => alias.includes(q) || q.includes(alias))) ?? null
 }
 
+function canonicalStageLabel(label: string) {
+  return label.split(' · ', 1)[0]
+}
+
 export function bridgeSummary(topic: BridgeTopic) {
-  return [topic.title, topic.oneLiner, ...topic.stages.map((item) => `${item.label}: ${item.explanation}`)].join('\n\n')
+  return [topic.title, topic.oneLiner, ...topic.stages.map((item) => `${canonicalStageLabel(item.label)}: ${item.explanation}`)].join('\n\n')
 }
