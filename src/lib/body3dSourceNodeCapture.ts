@@ -3,7 +3,7 @@ import { publishAnatomySourceNodes } from './anatomySourceNodeRegistry'
 
 let installed = false
 
-function anatomyFileFromUrl(url: string) {
+export function anatomyFileFromUrl(url: string) {
   const match = url.match(/(?:^|\/)anatomy\/([^/?#]+\.glb)(?:[?#]|$)/i)
   return match?.[1] ?? null
 }
