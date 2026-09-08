@@ -242,27 +242,25 @@ try {
     throw new Error('Selecting the Knee profile did not update the shared Body3D frame')
   }
 
-  // Use the native prototype setter so React's controlled-input value tracker
-  // sees a real value transition. Then emit the same bubbling events a range
-  // control produces. The smoke still requires React-rendered labels/dial to
-  // match exactly, so a DOM-only mutation can never satisfy this gate.
+  // Drive the controlled range through real browser keyboard interaction.
+  // Home establishes the exact range minimum, then ArrowRight advances by the
+  // declared step. Each keypress travels through React's normal onChange path,
+  // while the label and dial below still prove the rendered state reached the
+  // exact non-extreme target rather than accepting a DOM-only mutation.
   await inspector.scrollIntoViewIfNeeded()
   const slider = inspector.locator('input[type="range"]').first()
   const sliderState = await slider.evaluate((node) => ({
     min: Number(node.min),
     max: Number(node.max),
+    step: Number(node.step) || 1,
     neutral: Number(node.value),
   }))
-  const targetAngle = Math.round(
-    sliderState.neutral + (sliderState.max - sliderState.neutral) * 0.65,
-  )
-  await slider.evaluate((node, value) => {
-    const setter = Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, 'value')?.set
-    if (!setter) throw new Error('Native HTMLInputElement value setter is unavailable')
-    setter.call(node, String(value))
-    node.dispatchEvent(new Event('input', { bubbles: true }))
-    node.dispatchEvent(new Event('change', { bubbles: true }))
-  }, targetAngle)
+  const rawTarget = sliderState.neutral + (sliderState.max - sliderState.neutral) * 0.65
+  const targetAngle = sliderState.min + Math.round((rawTarget - sliderState.min) / sliderState.step) * sliderState.step
+  await slider.focus()
+  await slider.press('Home')
+  const stepCount = Math.round((targetAngle - sliderState.min) / sliderState.step)
+  for (let i = 0; i < stepCount; i++) await slider.press('ArrowRight')
 
   const renderedAngleLabel = inspector.getByText(`Flexion / extension · ${targetAngle.toFixed(0)}°`, { exact: true })
   await renderedAngleLabel.waitFor({ state: 'visible', timeout: 5_000 })
@@ -273,7 +271,7 @@ try {
     throw new Error(`Whole-body ROM slider did not move meaningfully from neutral: saw ${observedAngle}°`)
   }
   if (observedAngle !== targetAngle) {
-    throw new Error(`Whole-body ROM slider native event expected ${targetAngle}°: saw ${observedAngle}°`)
+    throw new Error(`Whole-body ROM slider keyboard interaction expected ${targetAngle}°: saw ${observedAngle}°`)
   }
 
   const dialMotionLabel = inspector.getByText(`Flexion ${targetAngle.toFixed(0)}°`, { exact: true })
