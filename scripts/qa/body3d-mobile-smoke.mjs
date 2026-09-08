@@ -45,7 +45,7 @@ const page = await context.newPage()
 // Keep one normally-large optional layer in-flight long enough to prove that
 // progressive loading does not dim or cover anatomy that is already usable.
 await page.route('**/anatomy/cardio' + 'vascular.glb', async (route) => {
-  await new Promise((resolve) => setTimeout(resolve, 1_200))
+  await new Promise((resolve) => setTimeout(resolve, 4_000))
   await route.continue()
 })
 const pageErrors = []
@@ -176,13 +176,11 @@ try {
   const vessels = page.getByRole('button', { name: 'Vessels', exact: true }).first()
   await vessels.click()
   await progressiveLoading.waitFor({ state: 'visible', timeout: 5_000 })
-  await canvas.scrollIntoViewIfNeeded()
-  // Resolve the live region directly. Chaining an ancestor XPath from a text
-  // locator can lose the element once React updates the text node during
-  // progress; filtering the stable status container is deterministic.
-  const progressiveOverlay = page.locator('[role="status"]').filter({ hasText: 'Adding anatomy layer…' }).first()
-  await progressiveOverlay.waitFor({ state: 'visible', timeout: 5_000 })
-  const progressiveClass = await progressiveOverlay.getAttribute('class')
+  // Read the status container from the exact text node that is already visible.
+  // A second live locator can legitimately race the completion of a fast GLB.
+  const progressiveClass = await progressiveLoading.evaluate((node) =>
+    node.closest('[role="status"]')?.getAttribute('class') ?? '',
+  )
   metrics.progressiveLoadingCompact = Boolean(
     progressiveClass?.includes('top-2') && !progressiveClass?.includes('inset-0'),
   )
