@@ -1,11 +1,18 @@
-import { useState } from 'react'
+import { lazy, Suspense, useEffect, useState } from 'react'
 import { URUTAN, WILAYAH, KEDALAMAN, type UrutanLapisan } from '../../lib/dissection'
+import { CAESAREAN_LAYER_SEQUENCE } from '../../lib/surgeryLayerSequences'
 import { SURGICAL_SPATIAL_SCENARIOS } from '../../lib/surgicalSpatialTeaching'
+import type { SurgerySharedView } from './SurgerySimulatorLab'
+
+const SurgerySimulatorLab = lazy(() => import('./SurgerySimulatorLab'))
 
 export interface SurgicalLabProps {
   onKedalaman?: (kedalaman: number) => void
   onSorot?: (nama: string[]) => void
+  onSharedView?: (view: SurgerySharedView) => void
 }
+
+const SURGICAL_SEQUENCES: UrutanLapisan[] = [CAESAREAN_LAYER_SEQUENCE, ...URUTAN]
 
 export function kedalamanUntukLangkah(langkah: number, total: number): number {
   if (total <= 1) return 0
@@ -13,13 +20,26 @@ export function kedalamanUntukLangkah(langkah: number, total: number): number {
   return Math.round(bagian * KEDALAMAN.visceral)
 }
 
-export function SurgicalLab({ onKedalaman, onSorot }: SurgicalLabProps) {
+export function SurgicalLab({ onKedalaman, onSorot, onSharedView }: SurgicalLabProps) {
   const [kunci, setKunci] = useState<string | null>(null)
   const [langkah, setLangkah] = useState(0)
   const [spatialId, setSpatialId] = useState(SURGICAL_SPATIAL_SCENARIOS[0].id)
-  const dipilih: UrutanLapisan | undefined = URUTAN.find((u) => u.kunci === kunci)
+  const [simulatorReady, setSimulatorReady] = useState(false)
+  const dipilih: UrutanLapisan | undefined = SURGICAL_SEQUENCES.find((u) => u.kunci === kunci)
   const lapis = dipilih?.lapis[Math.min(langkah, dipilih.lapis.length - 1)]
   const spatial = SURGICAL_SPATIAL_SCENARIOS.find((item) => item.id === spatialId) ?? SURGICAL_SPATIAL_SCENARIOS[0]
+
+  // Keep the tab click cheap. SurgerySimulatorLab creates the atlas/WebGL
+  // workspace and can be expensive to mount on a mobile GPU. Mounting it in
+  // the same event turn made the parent "Surgical layers" tab click itself
+  // block long enough for browser automation (and potentially a real phone)
+  // to appear frozen. Commit the lightweight SurgicalLab shell first, then
+  // start the simulator on the next animation frame. The scenario selector
+  // inside the simulator remains synchronous once the workspace is mounted.
+  useEffect(() => {
+    const frame = requestAnimationFrame(() => setSimulatorReady(true))
+    return () => cancelAnimationFrame(frame)
+  }, [])
 
   function pilih(u: UrutanLapisan) {
     setKunci(u.kunci)
@@ -36,6 +56,16 @@ export function SurgicalLab({ onKedalaman, onSorot }: SurgicalLabProps) {
 
   return (
     <div className="space-y-4">
+      {simulatorReady ? (
+        <Suspense fallback={<p className="rounded-xl bg-neutral-100/60 px-3 py-2 text-[11px] text-neutral-500 dark:bg-white/5">Loading surgical simulator…</p>}>
+          <SurgerySimulatorLab onKedalaman={onKedalaman} onSorot={onSorot} onSharedView={onSharedView} />
+        </Suspense>
+      ) : (
+        <p data-surgery-workspace-state="opening" className="rounded-xl bg-neutral-100/60 px-3 py-2 text-[11px] text-neutral-500 dark:bg-white/5">
+          Opening surgical workspace…
+        </p>
+      )}
+
       <div className="overflow-hidden rounded-2xl border border-neutral-200 bg-neutral-950 text-white dark:border-white/10">
         <div className="border-b border-white/10 bg-gradient-to-br from-brand/15 via-transparent to-blue-500/10 p-4">
           <div className="text-[10px] font-black uppercase tracking-[0.18em] text-brand">Spatial surgical anatomy</div>
@@ -103,12 +133,12 @@ export function SurgicalLab({ onKedalaman, onSorot }: SurgicalLabProps) {
       <div className="border-t border-neutral-200 pt-3 dark:border-white/10">
         <div className="text-[10px] font-black uppercase tracking-[0.16em] text-neutral-400">Layer sequence</div>
         <p className="mt-1 text-[11px] leading-snug text-neutral-500">
-          Layer-by-layer approaches in the order a scalpel meets them. Stepping through moves the shared dissection depth; it does not simulate a real operation.
+          Layer-by-layer anatomy in the order encountered by depth. Stepping through moves the shared dissection depth; it does not simulate a real operation or encode an operative technique.
         </p>
       </div>
 
       <div className="flex flex-wrap gap-1.5">
-        {URUTAN.map((u) => (
+        {SURGICAL_SEQUENCES.map((u) => (
           <button
             key={u.kunci}
             onClick={() => (kunci === u.kunci ? setKunci(null) : pilih(u))}
@@ -124,7 +154,7 @@ export function SurgicalLab({ onKedalaman, onSorot }: SurgicalLabProps) {
           <div className="rounded-xl border border-neutral-100 p-3 dark:border-white/10">
             <div className="text-sm font-black text-ink dark:text-white">{dipilih.judul}</div>
             <div className="text-[11px] text-neutral-500">{WILAYAH.find((w) => w.kunci === dipilih.wilayah)?.label ?? dipilih.wilayah}</div>
-            <p className="mt-1.5 text-[12px] leading-snug text-neutral-600 dark:text-neutral-400"><b>Landmark.</b> {dipilih.patokan}</p>
+            <p className="mt-1.5 text-[12px] leading-snug text-neutral-600 dark:text-neutral-400"><b>Anatomical context.</b> {dipilih.patokan}</p>
           </div>
 
           <div className="flex items-center gap-2">
