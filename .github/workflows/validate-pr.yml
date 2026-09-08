@@ -2,9 +2,7 @@ name: Validate pull requests
 
 on:
   pull_request:
-    branches:
-      - main
-      - stabilization/unfinished-debt-safe-20260908
+    branches: [main]
   workflow_dispatch:
 
 permissions:
