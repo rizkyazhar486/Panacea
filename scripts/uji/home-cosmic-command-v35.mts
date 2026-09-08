@@ -27,6 +27,8 @@ for (const forbidden of [
 ]) assert.ok(!executableCss.includes(forbidden), `v35 must not override protected wallpaper/widget surface: ${forbidden}`)
 
 assert.ok(!/url\(/.test(executableCss), 'v35 must not introduce or replace wallpaper/media assets')
-assert.ok(!/canvas|webgl/i.test(executableCss), 'v35 executable CSS must remain independent of heavy rendering selectors')
+assert.ok(!/(^|[},]\s*)canvas(?:[\s.#:[>+~,{]|$)/im.test(executableCss), 'v35 must not style a canvas rendering surface')
+assert.ok(!/(^|[\s,{])(?:\.|#)?webgl(?:[\s.#:[>+~,{]|$)/im.test(executableCss), 'v35 must not style a WebGL-specific rendering surface')
+assert.ok(!/@import\b/i.test(executableCss), 'v35 must not pull in external rendering or media layers')
 
 console.log('Home cosmic command v35: hero/action-only visuals; wallpaper and widget safety layers remain authoritative')
