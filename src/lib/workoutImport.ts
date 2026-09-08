@@ -340,14 +340,43 @@ export interface WeeklySummary {
 }
 
 export function summarise(workouts: ImportedWorkout[], hrMax: number): WeeklySummary {
-  const totalDetik = workouts.reduce((a, w) => a + w.durasi, 0)
-  const totalKm = workouts.reduce((a, w) => a + (w.jarakKm ?? 0), 0)
-  const totalKcal = workouts.reduce((a, w) => a + (w.kcal ?? 0), 0)
+  const nonNegatif = (v: unknown): number =>
+    typeof v === 'number' && Number.isFinite(v) && v >= 0 ? v : 0
+  const positif = (v: unknown): number =>
+    typeof v === 'number' && Number.isFinite(v) && v > 0 ? v : 0
 
+  let totalDetik = 0
+  let totalKm = 0
+  let totalKcal = 0
+  let durasiBerjarak = 0
+  let jarakBerpace = 0
   let mudahDetik = 0
   let berzonaDetik = 0
+  const hrMaxAman = Number.isFinite(hrMax) && hrMax > 0 ? hrMax : 0
+
   for (const w of workouts) {
-    const slices = zoneBreakdown(w.hr, hrMax)
+    const durasi = nonNegatif(w?.durasi)
+    const jarak = positif(w?.jarakKm)
+    const kcal = nonNegatif(w?.kcal)
+
+    totalDetik += durasi
+    totalKm += jarak
+    totalKcal += kcal
+
+    // Pace agregat hanya memakai sesi yang memiliki pasangan jarak + durasi
+    // valid. Sesi strength/non-distance tidak boleh memperlambat pace mingguan.
+    if (durasi > 0 && jarak > 0) {
+      durasiBerjarak += durasi
+      jarakBerpace += jarak
+    }
+
+    const hrAman = Array.isArray(w?.hr)
+      ? w.hr
+          .filter((p): p is HrPoint => Boolean(p) && Number.isFinite(p.t) && p.t >= 0 && Number.isFinite(p.bpm) && p.bpm > 0)
+          .slice()
+          .sort((a, b) => a.t - b.t)
+      : []
+    const slices = zoneBreakdown(hrAman, hrMaxAman)
     for (const s of slices) {
       const d = s.menit * 60
       berzonaDetik += d
@@ -360,7 +389,9 @@ export function summarise(workouts: ImportedWorkout[], hrMax: number): WeeklySum
     totalMenit: Math.round(totalDetik / 60),
     totalKm: +totalKm.toFixed(2),
     totalKcal: Math.round(totalKcal),
-    rerataPaceSec: totalKm > 0 ? Math.round(totalDetik / totalKm) : undefined,
+    rerataPaceSec: jarakBerpace > 0 && durasiBerjarak > 0
+      ? Math.round(durasiBerjarak / jarakBerpace)
+      : undefined,
     pctMudah: berzonaDetik > 0 ? Math.round((mudahDetik / berzonaDetik) * 100) : undefined,
   }
 }
