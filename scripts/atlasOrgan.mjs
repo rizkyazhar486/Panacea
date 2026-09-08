@@ -19,7 +19,57 @@ const SUMBER = process.argv[2] ?? '/home/user/ashemag/human-atlas'
 const KELUAR = new URL('../public/organs-atlas/', import.meta.url).pathname
 
 // Nama bagian dicocokkan dengan regex agar sisi kiri/kanan ikut terbawa.
+// Pola baru di bawah berasal dari scripts/atlasDiscover.mjs yang membaca tepat
+// 2.234 nama sumber BodyParts3D; pola dibuat konservatif supaya ventrikel otak,
+// arteri suprarenal, atau struktur bernama mirip tidak terseret ke organ salah.
 const ORGAN = {
+  heart: [
+    /^cavity of (left|right) atrium$/,
+    /^cavity of (left|right) ventricle$/,
+    /^wall of (left|right) atrium$/,
+    /^wall of ventricle$/,
+    /papillary muscle of (left|right) ventricle$/,
+    /cusp of aortic valve$/,
+    /cusp of pulmonary valve$/,
+    /^pulmonary trunk$/,
+    /^(superior|inferior) vena cava$/,
+  ],
+  kidneys: [
+    /^(left|right) kidney$/,
+    / renal artery$/,
+    / renal vein$/,
+    /^(left|right) ureter$/,
+  ],
+  'small-intestine': [
+    /^duodenum$/,
+    /part of jejunum$/,
+    /part of ileum$/,
+    /^ileocecal junction$/,
+  ],
+  'large-intestine': [
+    /^(ascending|transverse|descending) colon$/,
+    /^rectum$/,
+  ],
+  pancreas: [
+    /^pancreas$/,
+    /^parenchyma of pancreas$/,
+    /^pancreatic duct$/,
+    /^pancreatic duct tree$/,
+    /pancreatic artery$/,
+    /pancreaticoduodenal (artery|vein)$/,
+  ],
+  brain: [
+    /gyrus$/,
+    /^cerebellum$/,
+    /^corpus callosum$/,
+    /^hypothalamus$/,
+    /amygdala$/,
+    /hippocampus$/,
+    /thalamus$/,
+    /^medulla oblongata$/,
+    /^midbrain$/,
+    /^pons$/,
+  ],
   eye: [/^(left|right) (cornea|iris|lens|sclera|choroid|vitreous body|corona ciliaris)$/,
         /^optic part of (left|right) retina$/, /^anterior chamber of (left|right) eyeball$/,
         /^(left|right) optic nerve$/, /^suspensory ligament of (left|right) lens$/],
@@ -45,7 +95,6 @@ const BATAS = {
 
 const { atlas, potongan } = bacaAtlas(SUMBER)
 
-
 // Sebutan yang tampil di titik penanda. Nama BodyParts3D memakai bahasa
 // Inggris; sisi kiri/kanan dipertahankan karena itulah yang dilihat pembaca.
 
@@ -62,11 +111,16 @@ function sejajarkan(dipilih) {
     for (let a = 0; a < 3; a++) d.pos[i + a] = (d.pos[i + a] - c[a]) * s
 }
 
-
 mkdirSync(KELUAR, { recursive: true })
 // Sebutan di layar ditulis bahasa Inggris (bahasa dasar aplikasi) dengan
 // nama Latin Terminologia Anatomica-nya, yang sama di semua bahasa.
 const SEBUTAN = {
+  heart: ['Heart', 'Cor'],
+  kidneys: ['Kidneys & renal vessels', 'Renes'],
+  'small-intestine': ['Small intestine', 'Intestinum tenue'],
+  'large-intestine': ['Large intestine', 'Intestinum crassum'],
+  pancreas: ['Pancreas', 'Pancreas'],
+  brain: ['Brain', 'Encephalon'],
   eye: ['Eye', 'Oculus'],
   'optic-pathway': ['Optic pathway', 'Via optica'],
   spleen: ['Spleen', 'Splen'],
