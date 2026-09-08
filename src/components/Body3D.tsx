@@ -802,6 +802,10 @@ export function Body3D({
   }, [highlighted, focusKeywords, loadingLayers, renderMode])
 
   const isLoading = loadingLayers.size > 0
+  // Initial anatomy load may cover the empty viewer, but once at least one
+  // real layer is already rendered, later layer downloads stay compact so the
+  // existing anatomy remains visible and usable on slow/mobile connections.
+  const hasLoadedLayer = ANATOMY_LAYERS.some((def) => Boolean(groupsRef.current[def.key]))
 
   return (
     <div className="relative -mx-5 -mt-5 mb-3 h-[68vh] max-h-[820px] min-h-[480px] overflow-hidden rounded-t-2xl bg-gradient-to-b from-neutral-900 to-neutral-950">
@@ -812,9 +816,25 @@ export function Body3D({
         </div>
       )}
       {!fatal && isLoading && (
-        <div className="pointer-events-none absolute inset-0 flex items-center justify-center bg-black/40">
-          <div className="w-56 rounded-xl bg-black/70 px-3 py-2.5 text-center">
-            <span className="text-xs font-semibold text-white">Loading anatomy…</span>
+        <div
+          role="status"
+          aria-live="polite"
+          className={
+            hasLoadedLayer
+              ? 'pointer-events-none absolute left-2 right-2 top-2 z-10 flex justify-center'
+              : 'pointer-events-none absolute inset-0 flex items-center justify-center bg-black/40'
+          }
+        >
+          <div
+            className={
+              hasLoadedLayer
+                ? 'w-56 rounded-xl border border-white/10 bg-black/80 px-3 py-2.5 text-center shadow-lg backdrop-blur-sm'
+                : 'w-56 rounded-xl bg-black/70 px-3 py-2.5 text-center'
+            }
+          >
+            <span className="text-xs font-semibold text-white">
+              {hasLoadedLayer ? 'Adding anatomy layer…' : 'Loading anatomy…'}
+            </span>
             {[...loadingLayers].map((k) => {
               const def = ANATOMY_LAYERS.find((l) => l.key === k)
               const pct = Math.round((progress[k] ?? 0) * 100)
