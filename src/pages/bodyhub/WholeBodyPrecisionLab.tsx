@@ -88,7 +88,7 @@ function MovementDiagram({ chain }: { chain: string[] }) {
 }
 
 export function WholeBodyPrecisionLab({ onHighlight, onFocusRegion, onEnableLayer, onSetUnfold, onSetDissectionDepth, onOpenSurgical, onOpenMovement }: Props) {
-  const [mode, setMode] = useState<Mode>('holistic')
+  const [mode, setMode] = useState<Mode>('z-anatomy')
   const [regionKey, setRegionKey] = useState<AtlasRegionKey>('thorax')
   const [specialtyId, setSpecialtyId] = useState(SPECIALTY_ATLAS_MODULES[0].id)
   const [movementId, setMovementId] = useState(MOVEMENT_PRIMITIVES[0].id)
