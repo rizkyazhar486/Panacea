@@ -58,6 +58,7 @@ export function atlasGeometryEntitlement(node: AnatomyAtlasNode): AtlasGeometryE
   if (fullyReviewed) return 'verified-anatomy'
 
   if (node.sourceBindings.some((binding) => binding.meshMode === 'conceptual-overlay')) return 'conceptual-only'
+  if (node.scale === 'micro') return 'conceptual-only'
   if (node.sourceBindings.length) return 'source-candidate'
   return 'metadata-only'
 }
