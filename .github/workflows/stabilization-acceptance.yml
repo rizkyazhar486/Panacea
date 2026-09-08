@@ -63,6 +63,12 @@ jobs:
           BODY3D_QA_METRICS: artifacts/body3d-mobile-metrics.json
         run: node scripts/qa/body3d-mobile-smoke.mjs
 
+      - name: Body Exposure rendered WebGL visual artifact
+        env:
+          BODY3D_QA_URL: http://127.0.0.1:4173/#/body-explorer
+          BODY3D_QA_CANVAS_ARTIFACT: artifacts/body3d-mobile-canvas.png
+        run: node scripts/qa/body3d-canvas-artifact.mjs
+
       - name: Surgical simulator mobile 390x844 smoke
         env:
           SURGERY_QA_URL: http://127.0.0.1:4173/#/body-explorer
