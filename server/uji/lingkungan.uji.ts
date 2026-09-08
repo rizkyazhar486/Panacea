@@ -61,6 +61,7 @@ await denganFetchPalsu(async (input, init) => {
   ok('nilai nutrisi negatif ditolak', hasil[0]?.lemak100 === undefined, String(hasil[0]?.lemak100))
   ok('angka string non-negatif tetap dinormalisasi', hasil[0]?.serat100 === 2.3, String(hasil[0]?.serat100))
   ok('identitas sumber dipertahankan', hasil[0]?.sumber === 'Open Food Facts')
+  ok('produk dengan barcode valid membawa URL sumber spesifik', hasil[0]?.sourceUrl === 'https://world.openfoodfacts.org/product/8991234567890')
 })
 
 let panjangQuery = 0
@@ -104,6 +105,15 @@ await denganFetchPalsu(async () => {
 }, async () => {
   const hasil = await cariPangan('   ')
   ok('query kosong selesai tanpa network request', hasil.length === 0 && panggilanKosong === 0, String(panggilanKosong))
+})
+
+let panggilanBarcodeTidakValid = 0
+await denganFetchPalsu(async () => {
+  panggilanBarcodeTidakValid++
+  throw new Error('fetch tidak boleh dipanggil untuk barcode tidak valid')
+}, async () => {
+  const hasil = await cariPangan('', '123/../abc')
+  ok('barcode non-numerik gagal tertutup sebelum network request', hasil.length === 0 && panggilanBarcodeTidakValid === 0, String(panggilanBarcodeTidakValid))
 })
 
 await denganFetchPalsu(async () => new Response(null, { status: 503 }), async () => {
