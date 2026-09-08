@@ -13,9 +13,9 @@ const generic: BodyEvidenceMappingRecord = {
   localizationMode: 'generic-reference',
   sourceKind: 'peer-reviewed',
   sourceId: 'example-peer-reviewed-source',
-  sourceVersion: 'versioned-record',
+  sourceVersion: 'fixture-revision-2026-09-08',
   citation: 'Version-pinned source citation placeholder for validator fixture',
-  sourceLocator: 'repository-verified-source-record',
+  sourceLocator: 'fixture://peer-reviewed-source/section-1',
   evidenceSummary: 'Generic reference localization fixture with no patient-specific claim.',
   mappedAnatomyTerms: ['heart'],
   locationInferredFromFreeText: false,
@@ -24,6 +24,21 @@ const generic: BodyEvidenceMappingRecord = {
 }
 
 assert.equal(validateBodyEvidenceMapping(cardiovascular, generic).publishable, true)
+assert.equal(validateBodyEvidenceMapping(cardiovascular, { ...generic, aiAssisted: false }).publishable, true)
+
+const missingRuntimeDisclosure = validateBodyEvidenceMapping(cardiovascular, { ...generic, aiAssisted: undefined as unknown as boolean })
+assert.equal(missingRuntimeDisclosure.publishable, false)
+assert.ok(missingRuntimeDisclosure.reasons.some((reason) => reason.includes('explicit boolean')))
+
+for (const sourceVersion of ['latest', 'main', 'HEAD', 'versioned-record']) {
+  const floating = validateBodyEvidenceMapping(cardiovascular, { ...generic, sourceVersion })
+  assert.equal(floating.publishable, false)
+  assert.ok(floating.reasons.some((reason) => reason.includes('explicit and immutable')))
+}
+
+const placeholderLocator = validateBodyEvidenceMapping(cardiovascular, { ...generic, sourceLocator: 'repository-verified-source-record' })
+assert.equal(placeholderLocator.publishable, false)
+assert.ok(placeholderLocator.reasons.some((reason) => reason.includes('specific source location')))
 
 const inferred = validateBodyEvidenceMapping(cardiovascular, { ...generic, locationInferredFromFreeText: true })
 assert.equal(inferred.publishable, false)
@@ -48,10 +63,6 @@ const missingCitation = validateBodyEvidenceMapping(cardiovascular, { ...generic
 assert.equal(missingCitation.publishable, false)
 assert.ok(missingCitation.reasons.includes('Evidence citation is missing.'))
 
-const noAiDisclosure = validateBodyEvidenceMapping(cardiovascular, { ...generic, aiAssisted: false })
-assert.equal(noAiDisclosure.publishable, false)
-assert.ok(noAiDisclosure.reasons.some((reason) => reason.includes('AI-assistance disclosure')))
-
 const fakeReview = validateBodyEvidenceMapping(cardiovascular, {
   ...generic,
   academicReview: { status: 'recorded', reviewerName: ' ', reviewerCredentials: ' ', reviewedAt: 'today', scope: ' ' },
@@ -59,9 +70,22 @@ const fakeReview = validateBodyEvidenceMapping(cardiovascular, {
 assert.equal(fakeReview.publishable, false)
 assert.ok(fakeReview.reasons.some((reason) => reason.includes('reviewer identity')))
 assert.ok(fakeReview.reasons.some((reason) => reason.includes('reviewer credentials')))
-assert.ok(fakeReview.reasons.some((reason) => reason.includes('ISO review date')))
+assert.ok(fakeReview.reasons.some((reason) => reason.includes('real ISO review date')))
+
+const impossibleCalendarReview = validateBodyEvidenceMapping(cardiovascular, {
+  ...generic,
+  academicReview: {
+    status: 'recorded',
+    reviewerName: 'Qualified reviewer fixture',
+    reviewerCredentials: 'Credential fixture',
+    reviewedAt: '2026-02-31',
+    scope: 'Validator fixture only.',
+  },
+})
+assert.equal(impossibleCalendarReview.publishable, false)
+assert.ok(impossibleCalendarReview.reasons.some((reason) => reason.includes('real ISO review date')))
 
 const unsupportedKind = validateBodyEvidenceMapping(cardiovascular, { ...generic, kind: 'lesion', targetId: cardiovascular.id })
 assert.equal(unsupportedKind.publishable, true)
 
-console.log('Body evidence mapping: provenance, generic-vs-patient localization, AI disclosure, and academic-review guards verified.')
+console.log('Body evidence mapping: immutable provenance, generic-vs-patient localization, explicit AI disclosure, and academic-review guards verified.')
