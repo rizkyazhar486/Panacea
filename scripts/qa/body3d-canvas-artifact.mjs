@@ -49,7 +49,11 @@ try {
 
   for (const label of [/Get Started/i, /Maybe later/i]) {
     const button = page.getByRole('button', { name: label }).first()
-    if (await button.isVisible().catch(() => false)) await button.click()
+    if (await button.isVisible().catch(() => false)) {
+      await button.click({ timeout: 3_000 }).catch(async () => {
+        await button.evaluate((node) => node instanceof HTMLElement && node.click())
+      })
+    }
   }
 
   const canvas = page.locator('div.h-full.w-full.touch-none > canvas').first()
@@ -61,23 +65,77 @@ try {
   if (await fatal.isVisible().catch(() => false)) throw new Error(await fatal.innerText())
   if (pageErrors.length) throw new Error(`Browser page errors: ${pageErrors.join(' | ')}`)
 
-  // Avoid browser-level compositor capture APIs here. On SwiftShader/WebGL those
-  // compositor calls can hang even while the canvas and interaction are healthy.
-  // Copy the actual rendered WebGL canvas into a 2D canvas instead, validate that
-  // sampled pixels contain real visual variation, then persist that PNG.
-  const capture = await canvas.evaluate((node) => {
+  // Avoid browser-level compositor capture APIs. Three.js normally renders with
+  // preserveDrawingBuffer=false, so copying the canvas after composition can see
+  // a discarded backbuffer even while the on-screen WebGL view is healthy.
+  // Trigger a real OrbitControls interaction, then read the default framebuffer
+  // in the next animation frame, before the compositor can discard it.
+  const capture = await canvas.evaluate(async (node) => {
     const width = node.width
     const height = node.height
     if (width < 300 || height < 480) throw new Error(`Unexpected backing canvas ${width}x${height}`)
+
+    const gl = node.getContext('webgl2') || node.getContext('webgl')
+    if (!gl || gl.isContextLost()) throw new Error('Body3D WebGL context unavailable during visual capture')
+
+    const rect = node.getBoundingClientRect()
+    const x = rect.left + rect.width * 0.5
+    const y = rect.top + rect.height * 0.45
+    const pointerId = 77
+    node.dispatchEvent(new PointerEvent('pointerdown', {
+      bubbles: true,
+      cancelable: true,
+      pointerId,
+      pointerType: 'mouse',
+      clientX: x,
+      clientY: y,
+      button: 0,
+      buttons: 1,
+    }))
+    node.dispatchEvent(new PointerEvent('pointermove', {
+      bubbles: true,
+      cancelable: true,
+      pointerId,
+      pointerType: 'mouse',
+      clientX: x + Math.min(24, rect.width * 0.08),
+      clientY: y + 8,
+      button: 0,
+      buttons: 1,
+    }))
+    node.dispatchEvent(new PointerEvent('pointerup', {
+      bubbles: true,
+      cancelable: true,
+      pointerId,
+      pointerType: 'mouse',
+      clientX: x + Math.min(24, rect.width * 0.08),
+      clientY: y + 8,
+      button: 0,
+      buttons: 0,
+    }))
+
+    const pixels = await new Promise((resolve) => {
+      requestAnimationFrame(() => {
+        const rgba = new Uint8Array(width * height * 4)
+        gl.readPixels(0, 0, width, height, gl.RGBA, gl.UNSIGNED_BYTE, rgba)
+        resolve(rgba)
+      })
+    })
 
     const copy = document.createElement('canvas')
     copy.width = width
     copy.height = height
     const ctx = copy.getContext('2d', { willReadFrequently: true })
-    if (!ctx) throw new Error('2D capture context unavailable')
-    ctx.drawImage(node, 0, 0)
+    if (!ctx) throw new Error('2D artifact context unavailable')
 
-    const pixels = ctx.getImageData(0, 0, width, height).data
+    // WebGL framebuffer rows are bottom-up; ImageData is top-down.
+    const image = ctx.createImageData(width, height)
+    const rowBytes = width * 4
+    for (let srcY = 0; srcY < height; srcY += 1) {
+      const dstY = height - 1 - srcY
+      image.data.set(pixels.subarray(srcY * rowBytes, (srcY + 1) * rowBytes), dstY * rowBytes)
+    }
+    ctx.putImageData(image, 0, 0)
+
     const stride = Math.max(4, Math.floor((width * height) / 4096) * 4)
     let visibleSamples = 0
     let minLuma = 255
@@ -112,7 +170,7 @@ try {
   console.log(JSON.stringify({
     ok: true,
     artifact: outputPath,
-    captureScope: 'rendered-webgl-canvas',
+    captureScope: 'rendered-webgl-framebuffer',
     viewport: { width: 390, height: 844 },
     canvas: { width: capture.width, height: capture.height },
     visibleSamples: capture.visibleSamples,
