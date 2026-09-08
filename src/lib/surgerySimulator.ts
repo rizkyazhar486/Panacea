@@ -1,4 +1,6 @@
-export type SurgeryAtlasId = 'obgin' | 'cardio'
+import { LAP_APPENDIX_SCENARIO } from './surgerySimulatorAppendectomy'
+
+export type SurgeryAtlasId = 'obgin' | 'cardio' | 'gastro'
 export type SurgeryStepMode = 'surface' | 'deep-anatomy' | 'imaging' | 'verification'
 
 export interface SurgeryImagingCue {
@@ -54,6 +56,7 @@ export interface SurgerySimulationScenario {
  * the UI reports that gap rather than fabricating geometry.
  */
 export const SURGERY_SIMULATION_SCENARIOS: SurgerySimulationScenario[] = [
+  LAP_APPENDIX_SCENARIO,
   {
     id: 'caesarean-anatomy',
     label: 'Caesarean section — layered pelvic anatomy',

@@ -66,6 +66,9 @@ const metrics = {
   transseptalAxialSharedBody3d: false,
   transseptalSlicePos: null,
   iceLongAxisVisible: false,
+  lapAppyLoaded: false,
+  lapAppyVariationVisible: false,
+  academicGateVisible: false,
   webgl: false,
   renderDpr: null,
   sharedBodyWebgl: false,
@@ -175,6 +178,23 @@ try {
   await simulator.getByText('ICE guidance', { exact: true }).waitFor({ state: 'visible', timeout: 10_000 })
   await simulator.getByText('orientation, not diagnosis', { exact: true }).waitFor({ state: 'visible', timeout: 10_000 })
   metrics.iceLongAxisVisible = true
+
+  await simulator.getByRole('button', { name: 'DIYAI Lap Appy', exact: true }).click()
+  await simulator.getByText('DIYAI · Laparoscopic appendectomy anatomy simulation', { exact: true }).waitFor({ state: 'visible', timeout: 20_000 })
+  await atlasCanvas.waitFor({ state: 'visible', timeout: 60_000 })
+  await page.waitForTimeout(700)
+  if (await loadFailure.isVisible().catch(() => false)) throw new Error(`DIYAI Lap Appy atlas failure: ${await loadFailure.innerText()}`)
+  metrics.lapAppyLoaded = true
+
+  const variationStep = simulator.getByText('Position variation check', { exact: true }).first()
+  await variationStep.scrollIntoViewIfNeeded()
+  await variationStep.click()
+  await simulator.getByText(/retrocecal, pelvic, retro-ileal, pre-ileal/i).waitFor({ state: 'visible', timeout: 10_000 })
+  metrics.lapAppyVariationVisible = true
+
+  await simulator.getByText('Human review pending', { exact: true }).waitFor({ state: 'visible', timeout: 10_000 })
+  await simulator.getByText(/not academically reviewed/i).waitFor({ state: 'visible', timeout: 10_000 })
+  metrics.academicGateVisible = true
 
   await atlasCanvas.scrollIntoViewIfNeeded()
   const canvasMetrics = await atlasCanvas.evaluate((node) => {

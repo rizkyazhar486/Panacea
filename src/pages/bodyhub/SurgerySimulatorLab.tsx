@@ -226,8 +226,8 @@ export function SurgerySimulatorLab({ onKedalaman, onSorot, onSharedView }: Prop
       <div className="border-b border-white/10 bg-gradient-to-br from-cyan-400/10 via-transparent to-brand/10 p-4">
         <div className="flex flex-wrap items-start justify-between gap-3">
           <div>
-            <div className="text-[9px] font-black uppercase tracking-[0.22em] text-cyan-300">Panacea Surgical Simulation</div>
-            <h3 className="mt-1 text-lg font-black">Verified anatomy first. Procedure logic second.</h3>
+            <div className="text-[9px] font-black uppercase tracking-[0.22em] text-cyan-300">Panacea Surgical Simulation · Do It Yourself with AI #DIYAI</div>
+            <h3 className="mt-1 text-lg font-black">Source-grounded anatomy first. Human review status visible.</h3>
             <p className="mt-1 max-w-3xl text-[10px] leading-relaxed text-neutral-400">
               One reference atlas at a time, exact named source meshes where available, explicit gaps where they are not. No patient-specific target coordinates, fake “safe zones”, or invented anatomy.
             </p>
@@ -236,7 +236,13 @@ export function SurgerySimulatorLab({ onKedalaman, onSorot, onSharedView }: Prop
             <span>Patient data</span><b className="text-neutral-300">None</b>
             <span>Geometry</span><b className="text-neutral-300">Reference atlas</b>
             <span>Use</span><b className="text-neutral-300">Education</b>
+            <span>AI content</span><b className="text-neutral-300">AI-assisted · disclosed</b>
+            <span>Academic review</span><b className="text-amber-300">Human review pending</b>
           </div>
+        </div>
+
+        <div className="mt-2 rounded-xl border border-amber-300/15 bg-amber-300/[0.04] px-3 py-2 text-[9px] leading-relaxed text-amber-100/70">
+          Academic gate: source citations and named geometry do not equal human academic review. Until a qualified anatomy/surgical reviewer is recorded with credentials, date and scope, this simulator remains explicitly <b className="text-amber-200">not academically reviewed</b>.
         </div>
 
         <div className="mt-3 flex flex-wrap gap-1.5">

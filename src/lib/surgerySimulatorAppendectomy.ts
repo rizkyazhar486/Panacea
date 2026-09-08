@@ -128,7 +128,7 @@ export const LAP_APPENDIX_SCENARIO: SurgerySimulationScenario = {
   evidenceBoundary:
     'Source-grounded, AI-assisted educational simulation. Human academic review is currently pending. This is not an operative manual, credentialing tool, autonomous surgical advisor or substitute for supervised surgical training.',
   sources: [
-    'BodyParts3D 4.0 / DBCLS, CC BY 4.0; Mitsuhashi et al. Database (Oxford) 2009; doi:10.1093/database/bap012 / atlas packaging provenance recorded in public/atlas/CREDITS.txt',
+    'BodyParts3D 4.0 / DBCLS, CC BY 4.0; Mitsuhashi et al. (2009), doi:10.1093/nar/gkn613; atlas packaging provenance recorded in public/atlas/CREDITS.txt',
     'Sakellariadis A, et al. Anatomical Variations of the Vermiform Appendix. Acta Med Acad. 2024;53(3):335-342. PMID:39720866. Systematic review.',
     'Barlow A, et al. The vermiform appendix: a review. Clin Anat. 2013;26(7):833-842. PMID:23716128.',
     'Sumi SA, et al. Variations in the Position of Vermiform Appendix in Bangladeshi People. Mymensingh Med J. 2019;28(1):54-59. PMID:30755551. Used only for the taeniae/base landmark statement, not for universal position frequencies.',
