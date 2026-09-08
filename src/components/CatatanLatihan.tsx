@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { kunciTanggal } from '../lib/ramalan'
 import { getWorkouts } from '../lib/workoutStore'
 import { catatLatihanTangan, sesiTangan } from '../lib/latihanManual'
@@ -35,6 +35,18 @@ export function CatatanLatihan() {
   const [jarak, setJarak] = useState('')
   const [pesan, setPesan] = useState('')
   const [versi, setVersi] = useState(0)
+
+  useEffect(() => {
+    const segarkan = () => setVersi((v) => v + 1)
+    window.addEventListener('panacea:health-updated', segarkan)
+    window.addEventListener('storage', segarkan)
+    window.addEventListener('focus', segarkan)
+    return () => {
+      window.removeEventListener('panacea:health-updated', segarkan)
+      window.removeEventListener('storage', segarkan)
+      window.removeEventListener('focus', segarkan)
+    }
+  }, [])
 
   const tanggalAcuan = new Date()
   tanggalAcuan.setHours(12, 0, 0, 0)
@@ -260,7 +272,7 @@ export function CatatanLatihan() {
       sesiBerdurasi28: blok28.reduce((total, x) => total + x.sesiBerdurasi, 0),
     }
     // versi ikut menjadi kebergantungan supaya daftarnya dibaca ulang setelah
-    // satu sesi disimpan — tanpa itu ringkasannya tertinggal satu langkah.
+    // satu sesi disimpan/import — tanpa itu ringkasannya tertinggal satu langkah.
   }, [versi, tanggal, untukKemarin])
 
   const bolehSimpan = menit.trim() !== '' && rpe !== null
@@ -277,7 +289,6 @@ export function CatatanLatihan() {
     if (!hasil) { setPesan('Lama sesi belum masuk akal — isi dalam menit.'); return }
     setPesan(`Saved for ${tanggal}.`)
     setNama(''); setMenit(''); setRpe(null); setJarak('')
-    setVersi((v) => v + 1)
   }
 
   return (
