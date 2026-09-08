@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict'
 import { existsSync, readFileSync, statSync } from 'node:fs'
-import { REFERENCE_ATLAS_MODELS } from '../../src/lib/referenceOrganModels'
+import { REFERENCE_ATLAS_MODELS, REGIONAL_REFERENCE_ATLAS_MODELS } from '../../src/lib/referenceOrganModels'
 import { ATLAS_MODULE_INFO } from '../../src/lib/systemAtlas.gen'
 
 const organModelsSrc = readFileSync(new URL('../../src/lib/organModels.ts', import.meta.url), 'utf8')
@@ -40,11 +40,38 @@ assert.equal(
   'the middle/inner-ear atlas must not be mislabeled as verified external-ear anatomy',
 )
 
-assert.match(organModelsSrc, /import \{ REFERENCE_ATLAS_MODELS \} from '\.\/referenceOrganModels'/, 'organ resolver must import the multi-source reference atlas mappings')
+const regionalExpected = [
+  { focusKey: 'heart', module: 'jantung-ruang', asset: 'atlas/jantung-ruang.glb', structures: 14 },
+  { focusKey: 'liver', module: 'bilier', asset: 'atlas/bilier.glb', structures: 40 },
+  { focusKey: 'pancreas', module: 'bilier', asset: 'atlas/bilier.glb', structures: 40 },
+  { focusKey: 'gallbladder', module: 'bilier', asset: 'atlas/bilier.glb', structures: 40 },
+  { focusKey: 'prostate', module: 'prostat', asset: 'atlas/prostat.glb', structures: 26 },
+  { focusKey: 'bladder', module: 'prostat', asset: 'atlas/prostat.glb', structures: 26 },
+] as const
+
+for (const item of regionalExpected) {
+  const model = REGIONAL_REFERENCE_ATLAS_MODELS.find((m) => m.focusKey === item.focusKey)
+  assert.ok(model, `${item.focusKey} must expose a regional reference relationship view`)
+  assert.equal(model.assetPath, item.asset, `${item.focusKey} regional view must reuse the shipped atlas binary`)
+  assert.equal(model.sumber, 'hra', `${item.focusKey} regional relationship provenance must be HRA`)
+  assert.equal(model.jumlahBagian, item.structures, `${item.focusKey} regional semantic count must match the generated atlas`)
+  assert.equal(ATLAS_MODULE_INFO[item.module]?.structures, item.structures, `${item.module} generator metadata must agree with regional routing`)
+}
+
+assert.match(
+  organModelsSrc,
+  /import \{ REFERENCE_ATLAS_MODELS, REGIONAL_REFERENCE_ATLAS_MODELS \} from '\.\/referenceOrganModels'/,
+  'organ resolver must import primary and regional multi-source reference atlas mappings',
+)
 assert.match(
   organModelsSrc,
   /ORGAN_ATLAS\.find[\s\S]*REFERENCE_ATLAS_MODELS\.find[\s\S]*ORGAN_MODELS\.find/,
   'reference geometry must win over legacy AI close-ups while preserving BodyParts3D organ-specific priority',
+)
+assert.match(
+  organModelsSrc,
+  /regionalModelForFocus[\s\S]*REGIONAL_REFERENCE_ATLAS_MODELS\.find/,
+  'regional reference anatomy must be addressable without replacing the primary close-up',
 )
 assert.match(viewerSrc, /modelAssetPath\(organ\)/, 'viewer must load explicit atlas asset paths instead of duplicating binaries')
 assert.doesNotMatch(
@@ -54,4 +81,4 @@ assert.doesNotMatch(
 )
 assert.match(viewerSrc, /organ\.sumber && organ\.sumber !== 'ai'/, 'all non-AI routed atlases must retain exact named-mesh interaction')
 
-console.log('Reference organ routing: lungs, thyroid, ear, spinal cord and breast reuse verified existing atlas GLBs with explicit source provenance; ear subfocus routes share context without inventing geometry.')
+console.log('Reference organ routing: primary reference atlases and optional HRA regional relationship views reuse shipped GLBs with explicit provenance; AI remains fallback only.')
