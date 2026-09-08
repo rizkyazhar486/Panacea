@@ -1,4 +1,5 @@
 import assert from 'node:assert/strict'
+import { readFile } from 'node:fs/promises'
 import {
   BRIDGE_EXPLAINABILITY_BOUNDARY,
   BRIDGE_EXPLAINABILITY_INTERPRETATION,
@@ -34,4 +35,13 @@ for (const topic of BRIDGE_TOPICS) {
   assert.equal(trace.boundary, 'not-evidence-verification-or-clinical-reasoning')
 }
 
-console.log('Knowledge Bridge explainability trace makes inputs, software transformations, uncertainty and non-clinical boundaries explicit for every curated topic.')
+const ui = await readFile(new URL('../../src/components/KnowledgeBridgeWorkbench.tsx', import.meta.url), 'utf8')
+assert.match(ui, /aria-label="Explanation depth"/)
+assert.match(ui, /Educational · not patient-specific/)
+assert.match(ui, /without hiding the reasoning path/)
+assert.match(ui, /verify uncertain claims in Medical Library/)
+assert.match(ui, /Open the original source before treating a claim as verified/)
+assert.match(ui, /Check uncertainty, differential diagnosis, patient context, contraindications and source currency/)
+assert.match(ui, /Save the uncertainty, not only the answer/)
+
+console.log('Knowledge Bridge explainability makes inputs, transformations, uncertainty, source-verification limits and non-patient-specific boundaries explicit and deterministically guarded.')
