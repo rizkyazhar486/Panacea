@@ -5,8 +5,19 @@ const url = process.env.BODY3D_QA_URL || 'http://127.0.0.1:4173/#/body-explorer'
 const screenshotPath = process.env.BODY3D_QA_SCREENSHOT || 'artifacts/body3d-mobile-390x844.png'
 const motionScreenshotPath = process.env.BODY3D_QA_MOTION_SCREENSHOT || 'artifacts/body3d-mobile-motion-390x844.png'
 const metricsPath = process.env.BODY3D_QA_METRICS || 'artifacts/body3d-mobile-metrics.json'
+const operationTimeoutMs = Number(process.env.BODY3D_QA_OPERATION_TIMEOUT_MS || 20_000)
 
 await mkdir('artifacts', { recursive: true })
+
+function withTimeout(promise, label, timeoutMs = operationTimeoutMs) {
+  let timer
+  return Promise.race([
+    promise,
+    new Promise((_, reject) => {
+      timer = setTimeout(() => reject(new Error(`${label} timed out after ${timeoutMs}ms`)), timeoutMs)
+    }),
+  ]).finally(() => clearTimeout(timer))
+}
 
 const browser = await chromium.launch({
   headless: true,
@@ -43,6 +54,7 @@ await context.addInitScript(() => {
 })
 
 const page = await context.newPage()
+page.setDefaultTimeout(20_000)
 const pageErrors = []
 page.on('pageerror', (error) => pageErrors.push(error.message))
 
@@ -69,10 +81,10 @@ async function capturePng(clip = null) {
         scale: 1,
       }
     }
-    const shot = await cdp.send('Page.captureScreenshot', options)
+    const shot = await withTimeout(cdp.send('Page.captureScreenshot', options), 'Body3D compositor screenshot')
     return Buffer.from(shot.data, 'base64')
   } finally {
-    await cdp.detach()
+    await withTimeout(cdp.detach(), 'Body3D CDP detach', 5_000).catch(() => undefined)
   }
 }
 
@@ -291,6 +303,6 @@ try {
     screenshotError,
     metrics,
   }, null, 2)}\n`)
-  await context.close()
-  await browser.close()
+  await withTimeout(context.close(), 'Body3D browser context close', 10_000).catch(() => undefined)
+  await withTimeout(browser.close(), 'Body3D browser close', 10_000).catch(() => undefined)
 }
