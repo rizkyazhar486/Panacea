@@ -1,5 +1,41 @@
 import type { AnatomyRelation, AnatomyRelationType, AnatomyStructure, AtlasValidationIssue, AtlasValidationReport } from './types'
 
+export type AnatomyGraphEdgeType = AnatomyRelationType | 'parent' | 'child'
+
+export interface AnatomyGraphPathEdge {
+  from: string
+  to: string
+  type: AnatomyGraphEdgeType
+  weight: number
+  note?: string
+}
+
+export interface AnatomyGraphPath {
+  nodeIds: readonly string[]
+  edges: readonly AnatomyGraphPathEdge[]
+  totalWeight: number
+}
+
+export interface AnatomyPathOptions {
+  allowedTypes?: readonly AnatomyGraphEdgeType[]
+  maxWeight?: number
+  maxHops?: number
+}
+
+const RELATION_WEIGHT: Record<AnatomyRelationType, number> = {
+  'part-of': 0.6,
+  'contains': 0.6,
+  'branches-to': 0.7,
+  'drains-to': 0.7,
+  'communicates-with': 0.8,
+  'courses-through': 0.9,
+  'supplies': 1,
+  'innervates': 1,
+  'articulates-with': 1,
+  'attached-to': 1.1,
+  'adjacent-to': 1.5,
+}
+
 export class AnatomyGraph {
   readonly structures: readonly AnatomyStructure[]
   readonly relations: readonly AnatomyRelation[]
@@ -76,6 +112,93 @@ export class AnatomyGraph {
       if (!allowed || allowed.has(relation.type)) ids.add(relation.to)
     }
     return [...ids].sort().map((targetId) => this.get(targetId)).filter((value): value is AnatomyStructure => Boolean(value))
+  }
+
+  private pathEdgesFrom(id: string): readonly AnatomyGraphPathEdge[] {
+    const edges: AnatomyGraphPathEdge[] = []
+    const node = this.get(id)
+    if (node?.parentId && this.byId.has(node.parentId)) {
+      edges.push({ from: id, to: node.parentId, type: 'parent', weight: 0.5 })
+    }
+    for (const childId of this.children.get(id) ?? []) {
+      edges.push({ from: id, to: childId, type: 'child', weight: 0.5 })
+    }
+    for (const relation of this.relationIndex.get(id) ?? []) {
+      edges.push({
+        from: relation.from,
+        to: relation.to,
+        type: relation.type,
+        weight: RELATION_WEIGHT[relation.type],
+        note: relation.note,
+      })
+    }
+    return edges.sort((a, b) => a.weight - b.weight || a.to.localeCompare(b.to) || a.type.localeCompare(b.type))
+  }
+
+  /**
+   * Dijkstra traversal over explicit atlas hierarchy + typed relations.
+   * The graph never invents missing anatomy; if no recorded path exists this
+   * returns null rather than falling back to substring or spatial guessing.
+   */
+  tracePath(fromId: string, toId: string, options: AnatomyPathOptions = {}): AnatomyGraphPath | null {
+    if (!this.byId.has(fromId) || !this.byId.has(toId)) return null
+    if (fromId === toId) return { nodeIds: [fromId], edges: [], totalWeight: 0 }
+
+    const allowed = options.allowedTypes?.length ? new Set(options.allowedTypes) : null
+    const maxWeight = options.maxWeight ?? Number.POSITIVE_INFINITY
+    const maxHops = Math.max(1, options.maxHops ?? 128)
+    const distances = new Map<string, number>([[fromId, 0]])
+    const hops = new Map<string, number>([[fromId, 0]])
+    const previous = new Map<string, AnatomyGraphPathEdge>()
+    const unvisited = new Set(this.byId.keys())
+
+    while (unvisited.size) {
+      let current: string | undefined
+      let bestDistance = Number.POSITIVE_INFINITY
+      for (const candidate of unvisited) {
+        const distance = distances.get(candidate) ?? Number.POSITIVE_INFINITY
+        if (distance < bestDistance || (distance === bestDistance && current !== undefined && candidate < current)) {
+          current = candidate
+          bestDistance = distance
+        }
+      }
+      if (!current || !Number.isFinite(bestDistance) || bestDistance > maxWeight) break
+      unvisited.delete(current)
+      if (current === toId) break
+
+      const currentHops = hops.get(current) ?? 0
+      if (currentHops >= maxHops) continue
+      for (const edge of this.pathEdgesFrom(current)) {
+        if (allowed && !allowed.has(edge.type)) continue
+        if (!unvisited.has(edge.to)) continue
+        const nextDistance = bestDistance + edge.weight
+        const nextHops = currentHops + 1
+        if (nextDistance > maxWeight || nextHops > maxHops) continue
+        const existingDistance = distances.get(edge.to) ?? Number.POSITIVE_INFINITY
+        const existingHops = hops.get(edge.to) ?? Number.POSITIVE_INFINITY
+        if (nextDistance < existingDistance || (nextDistance === existingDistance && nextHops < existingHops)) {
+          distances.set(edge.to, nextDistance)
+          hops.set(edge.to, nextHops)
+          previous.set(edge.to, edge)
+        }
+      }
+    }
+
+    if (!previous.has(toId)) return null
+    const reversed: AnatomyGraphPathEdge[] = []
+    let cursor = toId
+    while (cursor !== fromId) {
+      const edge = previous.get(cursor)
+      if (!edge) return null
+      reversed.push(edge)
+      cursor = edge.from
+    }
+    const edges = reversed.reverse()
+    return {
+      nodeIds: [fromId, ...edges.map((edge) => edge.to)],
+      edges,
+      totalWeight: edges.reduce((sum, edge) => sum + edge.weight, 0),
+    }
   }
 
   validate(): AtlasValidationReport {
