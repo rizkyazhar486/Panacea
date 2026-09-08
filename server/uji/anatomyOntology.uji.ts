@@ -44,8 +44,10 @@ try {
 
     if (url.includes('/conditions/v3/search')) {
       // `cond-123` represents CTSS conditions key_id. It is intentionally not
-      // a Disease Ontology CURIE and must never be promoted to DOID.
-      return jsonResponse([1, ['cond-123'], null, ['diabetes mellitus']])
+      // a Disease Ontology CURIE and must never be promoted to DOID. The label
+      // differs from the OLS fixture so the normal label-deduplication path
+      // does not hide the provenance assertion this test is intended to make.
+      return jsonResponse([1, ['cond-123'], null, ['type 2 diabetes']])
     }
 
     if (url.includes('/hpo/v3/search')) {
