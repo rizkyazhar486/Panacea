@@ -1,7 +1,15 @@
 {
   "version": 1,
-  "updatedAt": "2026-09-08T08:15:00.000Z",
+  "updatedAt": "2026-09-08T13:37:00.000Z",
   "items": {
+    "ff-health-profile-snapshot": {
+      "status": "done",
+      "commit": "a6ba83a6fa6163e6b6491cc34d2ad6c598bbcbed",
+      "paths": ["src/pages/HealthProfile.tsx", "data/feature-factory/surfaces.json", "scripts/uji/feature-factory-health-profile-snapshot.mts"],
+      "note": "Matured the existing /health-data Health Profile as the Feature Factory snapshot capability rather than duplicating UI. Deterministic QA requires the dedicated reachable surface, recorded demographics/cardio-recovery/sleep-activity/body-composition sections, visible source identity and save timestamp, explicit loading/offline states, and empty zero-valued metrics/history rather than fabricated observations. No production health calculation, threshold, API, storage schema, dependency or biomedical interpretation was changed.",
+      "academicReview": {"status":"not-applicable-no-material-claim","sourceBasis":[],"aiUse":"ai-assisted","note":"This batch verifies existing user-entered/measured-data presentation and software fallback/provenance behavior only. It adds no biomedical threshold, diagnosis, treatment recommendation, causal claim, population norm or patient-specific inference.","humanReview":{"status":"not-recorded","reviewer":null,"credentials":null,"reviewedAt":null}},
+      "updatedAt": "2026-09-08T13:37:00.000Z"
+    },
     "ff-medical-education-accessibility": {
       "status": "done",
       "commit": "1e01e9b32c38014fa2b419f697881c80f32c11bf",
