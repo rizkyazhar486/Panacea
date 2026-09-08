@@ -46,6 +46,23 @@ let failure = null
 let screenshotCaptured = false
 let metrics = null
 
+async function capturePng() {
+  // Playwright's page.screenshot can stall while a continuously rendered WebGL
+  // surface is composited. Capture the already-visible viewport directly from
+  // Chromium's compositor instead, matching the stable Body3D mobile smoke.
+  const cdp = await context.newCDPSession(page)
+  try {
+    const shot = await cdp.send('Page.captureScreenshot', {
+      format: 'png',
+      fromSurface: true,
+      captureBeyondViewport: false,
+    })
+    return Buffer.from(shot.data, 'base64')
+  } finally {
+    await cdp.detach()
+  }
+}
+
 async function dismissIfVisible(locator, timeout = 5_000) {
   if (!(await locator.isVisible().catch(() => false))) return false
   await locator.click()
@@ -136,7 +153,7 @@ try {
 
   await organCanvas.evaluate((node) => node.scrollIntoView({ block: 'center', inline: 'center' }))
   await page.waitForTimeout(100)
-  await page.screenshot({ path: screenshotPath, fullPage: false })
+  await writeFile(screenshotPath, await capturePng())
   screenshotCaptured = true
 
   // A generated Tripo model is intentionally not treated as a set of verified
