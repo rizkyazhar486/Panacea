@@ -57,6 +57,8 @@ jobs:
         run: npm run uji:commons
       - name: Test anatomy ontology adapter
         run: npm run uji:anatomy-ontology
+      - name: Test HRA reference-organ adapter
+        run: npm run uji:hra-reference
       - name: Test ICD terminology adapter
         run: npm run uji:icd
       - name: Test canonical drug label orchestration
