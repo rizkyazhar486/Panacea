@@ -10,7 +10,6 @@ permissions:
 
 jobs:
   patch:
-    if: ${{ !contains(github.event.head_commit.message, '[qa-scroll-fixed]') }}
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
@@ -23,6 +22,10 @@ jobs:
           from pathlib import Path
           p = Path('scripts/qa/body3d-mobile-smoke.mjs')
           s = p.read_text()
+          marker = "Re-center the viewer before testing its center"
+          if marker in s:
+              print('QA viewport correction already present')
+              raise SystemExit(0)
           old = """  metrics.progressiveLoadingCompact = Boolean(
     progressiveClass?.includes('top-2') && !progressiveClass?.includes('inset-0'),
   )
@@ -53,8 +56,12 @@ jobs:
           PY
           node --check scripts/qa/body3d-mobile-smoke.mjs
           git diff --check
-      - name: Commit correction
+      - name: Commit correction if changed
         run: |
+          if git diff --quiet -- scripts/qa/body3d-mobile-smoke.mjs; then
+            echo "No source change needed"
+            exit 0
+          fi
           git config user.name "Panacea Stabilization Bot"
           git config user.email "actions@users.noreply.github.com"
           git add scripts/qa/body3d-mobile-smoke.mjs
