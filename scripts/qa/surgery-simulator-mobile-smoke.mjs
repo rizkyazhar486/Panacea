@@ -51,36 +51,95 @@ async function waitForInputValue(locator, expected, tolerance = 0.005, timeout =
   }
   throw new Error(`Timed out waiting for input value ${expected}`)
 }
-async function tapScrolled(locator, container) {
-  // Position the control with native scrolling, then prove that its visible
-  // centre is the browser hit target before sending a real pointer click.
-  // This avoids Playwright locator.click()'s animation-stability loop without
-  // using force:true or DOM .click(). The strict post-action assertions below
-  // still require the shared Body3D render mode / slice state to change.
-  await container.evaluate((node) => node.scrollIntoView({ block: 'center', inline: 'nearest' }))
-  await locator.evaluate((node) => node.scrollIntoView({ block: 'center', inline: 'nearest' }))
-  await page.waitForTimeout(120)
-  const hit = await locator.evaluate((node) => {
-    const rect = node.getBoundingClientRect()
-    const x = rect.left + rect.width / 2
-    const y = rect.top + rect.height / 2
-    const target = document.elementFromPoint(x, y)
-    return {
-      x,
-      y,
-      width: rect.width,
-      height: rect.height,
-      visible: rect.width > 0 && rect.height > 0 && x >= 0 && x <= innerWidth && y >= 0 && y <= innerHeight,
-      enabled: !(node instanceof HTMLButtonElement) || !node.disabled,
-      hitTarget: target === node || node.contains(target),
-      hitTag: target?.tagName ?? null,
-      hitText: target?.textContent?.trim().slice(0, 80) ?? null,
+async function tapScrolled(locator) {
+  // Mobile Body Explorer can contain nested scrolling surfaces. Centre the
+  // preset inside each real scrollable ancestor first, then centre the page
+  // scroller. We still require elementFromPoint to prove a real hit target and
+  // use a normal pointer click — never force:true and never DOM .click().
+  let lastHit = null
+  for (let attempt = 0; attempt < 4; attempt += 1) {
+    await locator.evaluate((node) => {
+      const scrollables = []
+      let parent = node.parentElement
+      while (parent) {
+        const style = getComputedStyle(parent)
+        const canScrollY = /(auto|scroll|overlay)/.test(style.overflowY) && parent.scrollHeight > parent.clientHeight + 1
+        if (canScrollY) scrollables.push(parent)
+        parent = parent.parentElement
+      }
+
+      for (const scroller of scrollables) {
+        const nodeRect = node.getBoundingClientRect()
+        const scrollerRect = scroller.getBoundingClientRect()
+        const desiredCenter = scrollerRect.top + scroller.clientHeight / 2
+        const nodeCenter = nodeRect.top + nodeRect.height / 2
+        scroller.scrollTop += nodeCenter - desiredCenter
+      }
+
+      const rect = node.getBoundingClientRect()
+      const rootScroller = document.scrollingElement
+      if (rootScroller) {
+        const visualTop = window.visualViewport?.offsetTop ?? 0
+        const visualHeight = window.visualViewport?.height ?? window.innerHeight
+        const desiredCenter = visualTop + visualHeight / 2
+        const nodeCenter = rect.top + rect.height / 2
+        rootScroller.scrollTop += nodeCenter - desiredCenter
+      }
+    })
+    await page.waitForTimeout(120)
+
+    lastHit = await locator.evaluate((node) => {
+      const rect = node.getBoundingClientRect()
+      const visualTop = window.visualViewport?.offsetTop ?? 0
+      const visualLeft = window.visualViewport?.offsetLeft ?? 0
+      const visualWidth = window.visualViewport?.width ?? window.innerWidth
+      const visualHeight = window.visualViewport?.height ?? window.innerHeight
+      const x = rect.left + rect.width / 2
+      const y = rect.top + rect.height / 2
+      const target = document.elementFromPoint(x, y)
+      const ancestors = []
+      let parent = node.parentElement
+      while (parent) {
+        const style = getComputedStyle(parent)
+        if (parent.scrollHeight > parent.clientHeight + 1 || /(auto|scroll|overlay)/.test(style.overflowY)) {
+          ancestors.push({
+            tag: parent.tagName,
+            className: parent.className?.toString?.().slice(0, 120) ?? '',
+            overflowY: style.overflowY,
+            scrollTop: parent.scrollTop,
+            clientHeight: parent.clientHeight,
+            scrollHeight: parent.scrollHeight,
+          })
+        }
+        parent = parent.parentElement
+      }
+      return {
+        x,
+        y,
+        width: rect.width,
+        height: rect.height,
+        visualTop,
+        visualLeft,
+        visualWidth,
+        visualHeight,
+        innerWidth: window.innerWidth,
+        innerHeight: window.innerHeight,
+        pageScrollY: window.scrollY,
+        visible: rect.width > 0 && rect.height > 0 && x >= visualLeft && x <= visualLeft + visualWidth && y >= visualTop && y <= visualTop + visualHeight,
+        enabled: !(node instanceof HTMLButtonElement) || !node.disabled,
+        hitTarget: target === node || node.contains(target),
+        hitTag: target?.tagName ?? null,
+        hitText: target?.textContent?.trim().slice(0, 80) ?? null,
+        ancestors,
+      }
+    })
+
+    if (lastHit.visible && lastHit.enabled && lastHit.hitTarget) {
+      await page.mouse.click(lastHit.x, lastHit.y, { delay: 20 })
+      return
     }
-  })
-  if (!hit.visible || !hit.enabled || !hit.hitTarget) {
-    throw new Error(`Preset is not a valid browser hit target: ${JSON.stringify(hit)}`)
   }
-  await page.mouse.click(hit.x, hit.y, { delay: 20 })
+  throw new Error(`Preset is not a valid browser hit target after nested scrolling: ${JSON.stringify(lastHit)}`)
 }
 
 const metrics = {
@@ -153,24 +212,24 @@ try {
   const sagittalPreset = correlation.getByRole('button', { name: 'Sagittal CT', exact: true })
   const explodedPreset = correlation.getByRole('button', { name: 'Exploded 3D', exact: true })
 
-  await tapScrolled(axialPreset, correlation)
+  await tapScrolled(axialPreset)
   await waitForClass(page.getByRole('button', { name: 'CT', exact: true }).first(), 'bg-white')
   await waitForClass(page.getByRole('button', { name: 'Axial', exact: true }).first(), 'bg-brand')
   const sliceLevel = page.getByRole('slider', { name: 'Slice level', exact: true })
   metrics.caesareanSlicePos = await waitForInputValue(sliceLevel, 0.52)
   metrics.axialSharedBody3d = true
 
-  await tapScrolled(coronalPreset, correlation)
+  await tapScrolled(coronalPreset)
   await waitForClass(page.getByRole('button', { name: 'Coronal', exact: true }).first(), 'bg-brand')
   await waitForInputValue(sliceLevel, 0.5)
   metrics.coronalSharedBody3d = true
 
-  await tapScrolled(sagittalPreset, correlation)
+  await tapScrolled(sagittalPreset)
   await waitForClass(page.getByRole('button', { name: 'Sagittal', exact: true }).first(), 'bg-brand')
   await waitForInputValue(sliceLevel, 0.5)
   metrics.sagittalSharedBody3d = true
 
-  await tapScrolled(explodedPreset, correlation)
+  await tapScrolled(explodedPreset)
   await waitForClass(page.getByRole('button', { name: 'Anatomy', exact: true }).first(), 'bg-white')
   metrics.explodedSharedBody3d = true
 
@@ -194,7 +253,7 @@ try {
 
   const transseptalCorrelation = simulator.locator('[data-surgery-correlation="shared-body3d"]')
   const transseptalAxial = transseptalCorrelation.getByRole('button', { name: 'Axial CT', exact: true })
-  await tapScrolled(transseptalAxial, transseptalCorrelation)
+  await tapScrolled(transseptalAxial)
   await waitForClass(page.getByRole('button', { name: 'CT', exact: true }).first(), 'bg-white')
   await waitForClass(page.getByRole('button', { name: 'Axial', exact: true }).first(), 'bg-brand')
   metrics.transseptalSlicePos = await waitForInputValue(page.getByRole('slider', { name: 'Slice level', exact: true }), 0.72)
