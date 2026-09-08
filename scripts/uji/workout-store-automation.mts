@@ -4,7 +4,11 @@ import { clearWorkouts, getWorkouts, mergeWorkouts } from '../../src/lib/workout
 import type { ImportedWorkout } from '../../src/lib/workoutImport.ts'
 
 const memory = new Map<string, string>()
-let broadcasts = 0
+const broadcasts = new Map<string, number>()
+
+function countBroadcast(type: string): void {
+  broadcasts.set(type, (broadcasts.get(type) ?? 0) + 1)
+}
 
 Object.defineProperty(globalThis, 'localStorage', {
   configurable: true,
@@ -18,7 +22,7 @@ Object.defineProperty(globalThis, 'localStorage', {
 Object.defineProperty(globalThis, 'window', {
   configurable: true,
   value: {
-    dispatchEvent: () => { broadcasts += 1; return true },
+    dispatchEvent: (event: Event) => { countBroadcast(event.type); return true },
   },
 })
 
@@ -62,11 +66,13 @@ const incoming: ImportedWorkout = {
   pemulihan: [],
 }
 assert.equal(mergeWorkouts([incoming]), 1)
-assert.equal(broadcasts, 1, 'workout merge must broadcast a same-tab health update')
+assert.equal(broadcasts.get('panacea:data-updated') ?? 0, 1, 'workout merge must broadcast exactly one structured same-tab data update')
+assert.equal(broadcasts.get('panacea:health-updated') ?? 0, 1, 'workout merge must broadcast exactly one legacy same-tab health update')
 assert.ok(JSON.parse(memory.get('pmd_workouts_v1') ?? '[]').some((w: { id?: string }) => w.id === 'new-session'))
 
 clearWorkouts()
-assert.equal(broadcasts, 2, 'clearing training data must broadcast a refresh')
+assert.equal(broadcasts.get('panacea:data-updated') ?? 0, 2, 'clearing training data must broadcast exactly one additional structured refresh')
+assert.equal(broadcasts.get('panacea:health-updated') ?? 0, 2, 'clearing training data must broadcast exactly one additional legacy refresh')
 assert.deepEqual(getWorkouts(), [])
 
 const component = readFileSync('src/components/CatatanLatihan.tsx', 'utf8')
