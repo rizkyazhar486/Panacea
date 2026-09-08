@@ -1,0 +1,78 @@
+name: Body Exposure Reference Patch
+
+on:
+  push:
+    branches:
+      - feat/body-exposure-organ-detail-20260908
+    paths:
+      - 'scripts/stabilization/apply-organ-reference-viewer-fix.mjs'
+      - '.github/workflows/body-exposure-reference-patch.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: body-exposure-reference-patch
+  cancel-in-progress: false
+
+jobs:
+  patch-and-validate:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: feat/body-exposure-organ-detail-20260908
+          fetch-depth: 1
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Fetch BodyParts3D packaging
+        run: git clone --depth 1 https://github.com/ashemag/human-atlas.git /tmp/human-atlas
+
+      - name: Regenerate semantic organ atlas
+        run: node scripts/atlasOrgan.mjs /tmp/human-atlas
+
+      - name: Apply guarded reference viewer patch
+        run: node scripts/stabilization/apply-organ-reference-viewer-fix.mjs
+
+      - name: Validate diff
+        run: |
+          git diff --check
+          grep -q '"jumlahBagian": 21' src/lib/organAtlas.gen.ts
+          grep -q '"jumlahMesh": 22' src/lib/organAtlas.gen.ts
+          grep -q '"jumlahBagian": 45' src/lib/organAtlas.gen.ts
+          grep -q '"jumlahMesh": 51' src/lib/organAtlas.gen.ts
+          grep -q '22 named structures from 26 source meshes' scripts/qa/organ-detail-mobile-smoke.mjs
+          grep -q '45 named structures from 51 source meshes' scripts/qa/organ-detail-mobile-smoke.mjs
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: TypeScript
+        run: npx tsc --noEmit
+
+      - name: Production build
+        run: npm run build
+
+      - name: Deterministic tests
+        run: npm run uji
+
+      - name: Commit validated reference anatomy changes
+        run: |
+          git config user.name 'Panacea Anatomy QA'
+          git config user.email 'actions@users.noreply.github.com'
+          git add \
+            public/organs-atlas \
+            src/lib/organAtlas.gen.ts \
+            src/components/OrganModel3D.tsx \
+            scripts/qa/organ-detail-mobile-smoke.mjs
+          if git diff --cached --quiet; then
+            echo 'No validated changes to commit.'
+            exit 0
+          fi
+          git commit -m 'fix(body): unify semantic anatomy across mesh fragments'
+          git push origin HEAD:feat/body-exposure-organ-detail-20260908
