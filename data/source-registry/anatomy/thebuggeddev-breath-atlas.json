@@ -1,0 +1,44 @@
+{
+  "id": "thebuggeddev_breath_atlas_reference",
+  "name": "thebuggeddev Anatomy / Breath Atlas",
+  "category": "anatomy",
+  "kind": ["viewer", "model-repository"],
+  "homepage": "https://breath-atlas.thebuggeddev.chatgpt.site/",
+  "repository": "https://github.com/thebuggeddev/anatomy",
+  "features": ["external-design-reference", "respiratory-atlas-reference"],
+  "formats": ["web-viewer-reference"],
+  "usage": {
+    "runtime": false,
+    "buildTime": false,
+    "networkRequired": false,
+    "notes": "Mandatory external product/design reference only. Panacea must not hot-link, embed, clone, build from, or ingest this project's code/assets/meshes/text while its license remains unverified. Implement useful interaction ideas independently on the existing shared Body3D renderer."
+  },
+  "license": {
+    "status": "CHECK_REQUIRED",
+    "identifier": null,
+    "commercialUse": "UNKNOWN",
+    "attributionRequired": null,
+    "shareAlike": null,
+    "scope": "GitHub repository metadata reviewed on 2026-09-09 did not expose a repository license. No permission to copy source code, meshes, textures, hotspot coordinates, or text is inferred from public availability.",
+    "verificationUrl": null,
+    "verifiedAt": null,
+    "notes": "Treat license verification as a hard blocker for asset/code ingestion. The Panacea integration stores only the reference URLs, exact reviewed revision, and independently implemented product-pattern notes."
+  },
+  "validation": {
+    "level": "REFERENCE",
+    "clinicalDecisionUse": "NO",
+    "notes": "This external project is not an authoritative anatomy or clinical evidence source for Panacea. Respiratory anatomy and physiology remain governed by Panacea's existing source registry, asset provenance, evidence mapping, and academic-review gates."
+  },
+  "provenance": {
+    "authority": "thebuggeddev external reference project; reviewed repository revision 8c0e6f321a47f895ae58ce098028b92774733ee9",
+    "sourceIdentityRequired": true,
+    "versionPinRequired": true,
+    "notes": "The reviewed product patterns include lazy 3D loading, isolate/layers/cross-section controls, structure callouts and labelling-quiz interaction. Panacea reimplements patterns independently; it does not treat this project as verified anatomy geometry or evidence."
+  },
+  "adapter": {
+    "status": "NOT_APPLICABLE",
+    "normalizedTarget": "ExternalDesignReference",
+    "module": null,
+    "notes": "No runtime or build-time adapter is permitted unless license and asset-level provenance are separately verified in the future."
+  }
+}
