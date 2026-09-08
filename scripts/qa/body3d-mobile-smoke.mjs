@@ -46,6 +46,10 @@ await context.addInitScript(() => {
     dob: '1990-01-01',
   }
   localStorage.setItem('panaceamed.session.v1', JSON.stringify({ account, loginAt: Date.now() }))
+  // This smoke validates Body3D, not global first-run overlays. Seed only the
+  // presentation flags; do not fabricate a completed health assessment.
+  localStorage.setItem('panacea_onboarded_v1', '1')
+  localStorage.setItem('panacea_assessment_prompt_v1', '1')
 })
 
 const page = await context.newPage()
@@ -64,13 +68,6 @@ page.on('pageerror', (error) => pageErrors.push(error.message))
 let metrics = null
 let failure = null
 let canvas = null
-
-async function dismissIfVisible(locator, timeout = 5_000) {
-  if (!(await locator.isVisible().catch(() => false))) return false
-  await locator.click()
-  await locator.waitFor({ state: 'hidden', timeout }).catch(() => undefined)
-  return true
-}
 
 async function canvasHealth(locator) {
   return withTimeout(locator.evaluate((node) => {
@@ -103,9 +100,6 @@ async function assertNoFatal(label) {
 try {
   const response = await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 45_000 })
   if (response && !response.ok()) throw new Error(`Body Explorer returned HTTP ${response.status()}`)
-
-  await dismissIfVisible(page.getByRole('button', { name: /Get Started/i }).first())
-  await dismissIfVisible(page.getByRole('button', { name: /Maybe later/i }).first())
 
   const reminderText = page.getByText(/TODAY.?S REMINDER/i).first()
   if (await reminderText.isVisible().catch(() => false)) {
@@ -199,9 +193,6 @@ try {
     throw new Error(`Additional layer loading blocks or covers the Body3D viewer center: ${JSON.stringify(metrics.progressiveLoadingGeometry)}`)
   }
 
-  // Prove the already-usable viewer remains interactive while an optional layer
-  // is still loading. This is stronger than relying on elementFromPoint alone,
-  // which can report legitimate nested viewer overlays rather than the canvas.
   const progressiveBox = await canvas.boundingBox()
   if (!progressiveBox) throw new Error('Body3D canvas has no bounding box during progressive loading')
   const progressiveX = progressiveBox.x + progressiveBox.width * 0.5
@@ -223,9 +214,6 @@ try {
   await assertNoFatal('Progressive layer interaction triggered a Body3D fatal state')
   await progressiveLoading.waitFor({ state: 'hidden', timeout: 120_000 })
 
-  // Runtime interaction proof: perform a real orbit gesture, then require the
-  // same WebGL canvas/context to remain healthy and unobstructed. The source
-  // invariant test separately guarantees OrbitControls change -> requestRender.
   const box = await canvas.boundingBox()
   if (!box) throw new Error('Body3D canvas has no measurable bounding box')
   const x = box.x + box.width * 0.5
