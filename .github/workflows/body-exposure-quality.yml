@@ -1,0 +1,38 @@
+name: Body Exposure Quality
+
+on:
+  push:
+    branches:
+      - feat/body-exposure-organ-detail-20260908
+  pull_request:
+    paths:
+      - 'src/components/Body3D.tsx'
+      - 'src/components/OrganModel3D.tsx'
+      - 'src/lib/organ*.ts'
+      - 'src/pages/BodyExplorer.tsx'
+      - 'src/pages/bodyhub/**'
+      - 'scripts/uji/**'
+      - 'scripts/qa/**'
+      - 'public/organs-atlas/**'
+      - '.github/workflows/body-exposure-quality.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  frontend:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - run: npm ci
+      - name: TypeScript
+        run: npx tsc --noEmit
+      - name: Production build
+        run: npm run build
+      - name: Deterministic tests
+        run: npm run uji
