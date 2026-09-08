@@ -99,22 +99,24 @@ try {
   metrics.progressiveGeometry = await progressive.evaluate((node) => {
     const status = node.closest('[role="status"]')
     const canvas = document.querySelector('div.h-full.w-full.touch-none > canvas')
-    if (!status || !canvas) return { statusFound: Boolean(status), canvasFound: Boolean(canvas), coversCenter: true, pointerEvents: null }
+    if (!status || !canvas) return { statusFound: Boolean(status), canvasFound: Boolean(canvas), coversCenter: true, pointerEvents: null, centerHitCanvas: false }
     const sr = status.getBoundingClientRect()
     const cr = canvas.getBoundingClientRect()
     const centerX = cr.left + cr.width / 2
     const centerY = cr.top + cr.height / 2
     const coversCenter = centerX >= sr.left && centerX <= sr.right && centerY >= sr.top && centerY <= sr.bottom
+    const hit = document.elementFromPoint(centerX, centerY)
     return {
       statusFound: true,
       canvasFound: true,
       coversCenter,
       pointerEvents: getComputedStyle(status).pointerEvents,
+      centerHitCanvas: hit === canvas,
       canvasCenter: [centerX, centerY],
       statusRect: [sr.left, sr.top, sr.right, sr.bottom],
     }
   })
-  metrics.progressiveCenterClear = !metrics.progressiveGeometry.coversCenter && metrics.progressiveGeometry.pointerEvents === 'none'
+  metrics.progressiveCenterClear = !metrics.progressiveGeometry.coversCenter && metrics.progressiveGeometry.centerHitCanvas
   if (!metrics.progressiveCompact || !metrics.progressiveCenterClear) throw new Error(`progressive loading blocks or covers viewer: ${JSON.stringify(metrics.progressiveGeometry)}`)
   await progressive.waitFor({ state: 'hidden', timeout: 120_000 })
 
