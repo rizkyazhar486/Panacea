@@ -106,6 +106,35 @@ test('rejects category and directory mismatch', async () => {
   assert.match(result.stderr, /must match registry directory/)
 })
 
+test('requires web provenance links to use http or https', async () => {
+  const cases = [
+    {
+      filename: 'unsafe-homepage.json',
+      field: 'homepage',
+      entry: { ...baseEntry, homepage: 'javascript:alert(1)' },
+    },
+    {
+      filename: 'unsafe-repository.json',
+      field: 'repository',
+      entry: { ...baseEntry, repository: 'data:text/plain,not-a-repository' },
+    },
+    {
+      filename: 'unsafe-license-url.json',
+      field: 'license.verificationUrl',
+      entry: {
+        ...baseEntry,
+        license: { ...baseEntry.license, verificationUrl: 'file:///tmp/license.txt' },
+      },
+    },
+  ]
+
+  for (const fixture of cases) {
+    const result = await runFixture([{ filename: fixture.filename, entry: fixture.entry }])
+    assert.notEqual(result.status, 0)
+    assert.match(result.stderr, new RegExp(`${fixture.field.replace('.', '\\.')} must use an http or https URL`))
+  }
+})
+
 test('rejects ACTIVE adapter without a module', async () => {
   const result = await runFixture([
     {
