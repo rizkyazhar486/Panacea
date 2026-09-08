@@ -74,4 +74,19 @@ assert.doesNotMatch(
   'Macro anatomy must stay on evidence-bearing GLB geometry, never primitive stand-ins.',
 )
 
+assert.match(
+  source,
+  /const hasLoadedLayer = ANATOMY_LAYERS\.some/,
+  'Body3D must distinguish initial loading from progressive layer loading.',
+)
+assert.ok(
+  source.includes('Adding anatomy layer…') && source.includes("left-2 right-2 top-2 z-10 flex justify-center"),
+  'Additional anatomy layers must use a compact non-blocking progress surface.',
+)
+assert.match(
+  source,
+  /role="status"[\s\S]*aria-live="polite"/,
+  'Anatomy loading progress must remain announced to assistive technology.',
+)
+
 console.log('Body3D stability invariants verified.')
