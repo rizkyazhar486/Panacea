@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-09-08T06:22:00.000Z",
+  "updatedAt": "2026-09-08T06:26:00.000Z",
   "items": {
     "ff-medical-education-accessibility": {
       "status": "done",
@@ -14,13 +14,13 @@
     },
     "ff-medical-education-baseline": {
       "status": "done",
-      "commit": "84b3eed0e6389f5f46a9102fd9eb939ad11815ff",
+      "commit": "89082214188fe8e4c1ba6e36123dcf251069d515",
       "paths": [
         "src/lib/knowledgeBridgeStudyBaseline.ts",
         "scripts/uji/knowledge-bridge-study-baseline.mts"
       ],
       "note": "Adds a pure, descriptive study self-rating baseline engine for Knowledge Bridge: explicit 1-5 user input only, minimum 3 observations, latest 12 points retained, median/IQR reference with timestamps, unit and user-self-rating source identity, and no patient/physiologic inference, storage, API, polling or dependency. Deterministic tests cover invalid inputs, topic isolation, baseline readiness, comparison semantics and bounded retention.",
-      "updatedAt": "2026-09-08T06:22:00.000Z"
+      "updatedAt": "2026-09-08T06:26:00.000Z"
     },
     "ff-medical-education-checklist": {
       "status": "done",
