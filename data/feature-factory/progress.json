@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-09-08T07:56:00.000Z",
+  "updatedAt": "2026-09-08T08:15:00.000Z",
   "items": {
     "ff-medical-education-accessibility": {
       "status": "done",
@@ -73,6 +73,14 @@
       "note": "Matured the existing plain-language Knowledge Bridge presentation as the Medical Education patient-view capability without duplicating or rewriting medical facts: plain, student and clinical depths reuse the same curated topic one-liner and seven stage objects; the shared glossary provides understandable labels; the UI remains explicitly educational and not patient-specific; and Medical Library/original-source verification boundaries remain visible.",
       "academicReview": {"status":"not-applicable-no-material-claim","sourceBasis":[],"aiUse":"ai-assisted","note":"This candidate adds deterministic presentation guards only. It does not create new medical facts, diagnostic thresholds, patient-specific inference or treatment recommendations, and it explicitly prevents the plain-language presentation from being interpreted as a personalized clinical view.","humanReview":{"status":"not-recorded","reviewer":null,"credentials":null,"reviewedAt":null}},
       "updatedAt": "2026-09-08T07:56:00.000Z"
+    },
+    "ff-medical-education-report": {
+      "status": "done",
+      "commit": "22eb79005830748f39a7a78019be1100f2db7891",
+      "paths": ["src/lib/knowledgeBridgeMap.ts", "src/components/KnowledgeBridgeWorkbench.tsx", "scripts/uji/knowledge-bridge-report.mts"],
+      "note": "Matured the existing Knowledge Bridge copy-summary path as a bounded structured-report capability: it reuses the canonical curated topic identity, one-line context and fixed seven stage objects in deterministic order, normalizes glossary-enhanced display labels back to canonical stage names, performs no hidden synthesis or network call, and retains explicit educational/not-patient-specific plus original-source-verification boundaries.",
+      "academicReview": {"status":"not-applicable-no-material-claim","sourceBasis":[],"aiUse":"ai-assisted","note":"This batch adds deterministic report-contract guards only and introduces no new biomedical, diagnostic, treatment or patient-specific factual claim. Existing curated medical teaching text is exported without reinterpretation and remains subject to its separate source/academic review obligations.","humanReview":{"status":"not-recorded","reviewer":null,"credentials":null,"reviewedAt":null}},
+      "updatedAt": "2026-09-08T08:15:00.000Z"
     }
   }
 }
