@@ -1,0 +1,121 @@
+name: Body Exposure Anatomy Completion
+
+on:
+  push:
+    branches:
+      - feat/body-exposure-organ-detail-20260908
+    paths:
+      - 'scripts/stabilization/apply-body-exposure-anatomy-completion.mjs'
+      - 'scripts/uji/organ-reference-provenance.mts'
+      - '.github/workflows/body-exposure-anatomy-completion.yml'
+      - 'src/lib/referenceOrganModels.ts'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: body-exposure-anatomy-completion
+  cancel-in-progress: false
+
+jobs:
+  complete-and-validate:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: feat/body-exposure-organ-detail-20260908
+          fetch-depth: 1
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Apply guarded completion patch
+        run: node scripts/stabilization/apply-body-exposure-anatomy-completion.mjs
+
+      - name: Validate patch and reference assets
+        run: |
+          git diff --check
+          grep -q 'regionalModelForFocus' src/lib/organModels.ts
+          grep -q 'Regional relationships' src/pages/bodyhub/OrganDossier.tsx
+          grep -q "model.sumber === 'z-anatomy' || model.sumber === 'hra'" src/pages/bodyhub/OrganDossier.tsx
+          grep -q 'HuBMAP Human Reference Atlas · male reference object' src/lib/referenceOrganModels.ts
+          test -s public/atlas/paru.glb
+          test -s public/atlas/tiroid.glb
+          test -s public/atlas/telinga.glb
+          test -s public/atlas/medula-spinalis.glb
+          test -s public/atlas/payudara.glb
+          test -s public/atlas/jantung-ruang.glb
+          test -s public/atlas/bilier.glb
+          test -s public/atlas/prostat.glb
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: TypeScript
+        run: npx tsc --noEmit
+
+      - name: Production build
+        run: npm run build
+
+      - name: Deterministic tests
+        run: npm run uji
+
+      - name: Install Playwright Chromium
+        run: |
+          npm install --no-save --no-package-lock @playwright/test@1.55.0
+          npx playwright install --with-deps chromium
+
+      - name: Start production preview
+        run: |
+          nohup npm run preview -- --host 127.0.0.1 --port 4173 > /tmp/panacea-body-completion-preview.log 2>&1 &
+          echo $! > /tmp/panacea-body-completion-preview.pid
+          for attempt in $(seq 1 45); do
+            if curl -fsS http://127.0.0.1:4173/ >/dev/null; then
+              exit 0
+            fi
+            sleep 1
+          done
+          cat /tmp/panacea-body-completion-preview.log
+          exit 1
+
+      - name: 390x844 functional reference anatomy smoke
+        run: node scripts/qa/organ-detail-mobile-smoke.mjs
+        env:
+          ORGAN_QA_URL: http://127.0.0.1:4173/#/body-explorer
+          ORGAN_QA_SCREENSHOT: artifacts/body-exposure-reference-completion-390x844.png
+          ORGAN_QA_METRICS: artifacts/body-exposure-reference-completion-metrics.json
+
+      - name: Upload visual evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: body-exposure-reference-completion
+          path: artifacts/body-exposure-reference-completion-*
+          if-no-files-found: warn
+          retention-days: 7
+
+      - name: Stop preview
+        if: always()
+        run: |
+          if [ -f /tmp/panacea-body-completion-preview.pid ]; then
+            kill "$(cat /tmp/panacea-body-completion-preview.pid)" 2>/dev/null || true
+          fi
+
+      - name: Commit only fully validated anatomy completion
+        run: |
+          git config user.name 'Panacea Anatomy QA'
+          git config user.email 'actions@users.noreply.github.com'
+          git add \
+            src/lib/organModels.ts \
+            src/pages/bodyhub/OrganDossier.tsx \
+            scripts/qa/organ-detail-mobile-smoke.mjs
+          if git diff --cached --quiet; then
+            echo 'No validated completion changes to commit.'
+            exit 0
+          fi
+          git commit -m 'feat(body): add truthful regional reference anatomy'
+          git push origin HEAD:feat/body-exposure-organ-detail-20260908
