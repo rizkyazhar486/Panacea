@@ -1,0 +1,52 @@
+{
+  "id": "thebuggeddev_breath_atlas",
+  "name": "Breath Atlas",
+  "category": "rendering",
+  "kind": ["viewer"],
+  "homepage": "https://breath-atlas.thebuggeddev.chatgpt.site/",
+  "repository": null,
+  "features": ["body-explorer", "scientific-3d", "breath-atlas-interaction-reference"],
+  "formats": ["web", "interactive-atlas-reference"],
+  "usage": {
+    "runtime": false,
+    "buildTime": false,
+    "networkRequired": true,
+    "notes": "Mandatory visual and interaction reference for the Body Exposure roadmap. It may inform independently implemented navigation, spatial storytelling, progressive disclosure, and atlas interaction quality. The remote site is not embedded and is not used as a data feed, model source, physiology source, or runtime dependency."
+  },
+  "license": {
+    "status": "CHECK_REQUIRED",
+    "identifier": null,
+    "commercialUse": "UNKNOWN",
+    "attributionRequired": null,
+    "shareAlike": null,
+    "scope": "No Panacea runtime, build-time, media, model, code, or content reuse is authorized by this registry record. Reuse requires a separately verified license for the exact material.",
+    "verificationUrl": null,
+    "verifiedAt": null,
+    "notes": "Treat the site as a user-mandated visual/interaction reference only until ownership and licensing of any desired material are independently verified."
+  },
+  "validation": {
+    "level": "REFERENCE",
+    "clinicalDecisionUse": "NO",
+    "notes": "Breath Atlas is not treated as scientific evidence. Panacea must not derive respiratory physiology, anatomy labels, diagnostic meaning, treatment guidance, patient-specific interpretation, or procedural claims from this reference without separate authoritative evidence and review."
+  },
+  "provenance": {
+    "authority": "Breath Atlas site supplied as a Panacea design reference",
+    "sourceIdentityRequired": true,
+    "versionPinRequired": true,
+    "notes": "If a future Panacea interaction materially derives from a captured version of the site, preserve an immutable implementation note or capture reference where legally permitted; scientific provenance remains separate."
+  },
+  "adapter": {
+    "status": "NOT_APPLICABLE",
+    "normalizedTarget": "PanaceaBodyReferenceContract",
+    "module": null,
+    "notes": "Reference-only. No iframe, remote script, data adapter, model import, or content synchronization is authorized by this record."
+  },
+  "trust": {
+    "authority": 1,
+    "evidenceQuality": 0,
+    "recency": 4,
+    "licenseClarity": 0,
+    "reproducibility": 1,
+    "notes": "Suitability is limited to visual/interaction inspiration. Biomedical evidence quality is deliberately zero and no scientific authority is inferred."
+  }
+}
