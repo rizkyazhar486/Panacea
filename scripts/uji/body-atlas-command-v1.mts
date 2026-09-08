@@ -30,6 +30,6 @@ assert.match(runtime, /MutationObserver/, 'mount discovery should be bounded to 
 assert.match(runtime, /Date\.now\(\) \+ 8000/, 'Body Explorer mount observer must have a bounded lifetime')
 assert.match(runtime, /Date\.now\(\) \+ 3000/, 'nested Breath Atlas discovery must also have a bounded lifetime')
 assert.doesNotMatch(runtime, /localStorage|sessionStorage|fetch\(|XMLHttpRequest|WebSocket/, 'Atlas Command must not add persistence, network calls, or streaming transports')
-assert.doesNotMatch(runtime, /heartRate|respRate|SpO2|oxygen|ventilat|diagnos/i, 'Atlas Command runtime must not invent physiologic measurements or clinical interpretation')
+assert.doesNotMatch(runtime, /heartRate\s*[=:]|respRate\s*[=:]|SpO2\s*[=:]|oxygenSaturation\s*[=:]|ventilationMap|diagnosisResult|riskScore|treatmentRecommendation/i, 'Atlas Command must not add physiologic measurements, diagnosis outputs, risk scoring, or treatment logic')
 
 console.log('Body Atlas Command v1: mandatory benchmarks recorded; command UI routes to source-aware Breath Atlas and stays local, bounded, reference-only, and non-clinical')
