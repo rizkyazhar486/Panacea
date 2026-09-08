@@ -143,8 +143,8 @@ async function searchOntology(
 type CtssResponse = [number, unknown[], unknown, unknown[]]
 
 type CtssTableConfig =
-  | { table: 'conditions'; ontology: 'nlm-conditions'; identifierSystem: 'NLM_CONDITIONS_KEY'; displayField: 'primary_name' }
-  | { table: 'hpo'; ontology: 'hp'; identifierSystem: 'HP'; displayField: 'name' }
+  | { table: 'conditions'; ontology: 'nlm-conditions'; identifierSystem: 'NLM_CONDITIONS_KEY'; codeField: 'key_id'; displayField: 'primary_name' }
+  | { table: 'hpo'; ontology: 'hp'; identifierSystem: 'HP'; codeField: 'id'; displayField: 'name' }
 
 function ctssDisplayLabel(value: unknown): string {
   if (Array.isArray(value)) return String(value[0] ?? '').trim()
@@ -158,8 +158,8 @@ async function searchCtss(
 ): Promise<OntologyTerm[]> {
   const q = normalizeQuery(query)
   if (!q) return []
-  const { table, ontology, identifierSystem, displayField } = config
-  const url = `${CTSS_BASE}/${table}/v3/search?terms=${encodeURIComponent(q)}&maxList=4&df=${displayField}`
+  const { table, ontology, identifierSystem, codeField, displayField } = config
+  const url = `${CTSS_BASE}/${table}/v3/search?terms=${encodeURIComponent(q)}&maxList=4&cf=${codeField}&df=${displayField}`
   const res = await fetchImpl(url, { signal: AbortSignal.timeout(8000) })
   if (!res.ok) throw new Error(`CTSS ${table} search failed: ${res.status}`)
   const data = (await res.json()) as CtssResponse
@@ -199,12 +199,14 @@ export async function anatomyOntologyLookup(
         table: 'conditions',
         ontology: 'nlm-conditions',
         identifierSystem: 'NLM_CONDITIONS_KEY',
+        codeField: 'key_id',
         displayField: 'primary_name',
       }, fetchImpl).catch(() => [] as OntologyTerm[]),
       searchCtss(t, {
         table: 'hpo',
         ontology: 'hp',
         identifierSystem: 'HP',
+        codeField: 'id',
         displayField: 'name',
       }, fetchImpl).catch(() => [] as OntologyTerm[]),
     ]),
