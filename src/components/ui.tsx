@@ -24,7 +24,6 @@ export function Card({
 function BodyExplorerStartHere() {
   return (
     <details
-      open
       data-testid="body-explorer-start-here"
       className="mt-3 overflow-hidden rounded-2xl border border-brand/20 bg-brand/[.045] shadow-[0_8px_28px_rgba(15,100,70,.06)] dark:border-brand/25 dark:bg-brand/[.08]"
     >
