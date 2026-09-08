@@ -1,0 +1,104 @@
+name: Body3D Progressive Loading Patch
+
+on:
+  push:
+    branches:
+      - fix/body3d-progressive-loading-20260908
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    if: ${{ !contains(github.event.head_commit.message, '[body3d-progressive-applied]') }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: fix/body3d-progressive-loading-20260908
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Apply guarded progressive-loading patch
+        run: |
+          node <<'NODE'
+          const fs = require('node:fs')
+
+          function replaceExactlyOnce(source, oldText, newText, label) {
+            const first = source.indexOf(oldText)
+            if (first < 0) throw new Error(`${label}: expected source block not found`)
+            if (source.indexOf(oldText, first + oldText.length) >= 0) throw new Error(`${label}: source block is not unique`)
+            return source.slice(0, first) + newText + source.slice(first + oldText.length)
+          }
+
+          const bodyPath = 'src/components/Body3D.tsx'
+          let body = fs.readFileSync(bodyPath, 'utf8')
+          body = replaceExactlyOnce(
+            body,
+            `  const isLoading = loadingLayers.size > 0\n\n  return (`,
+            `  const isLoading = loadingLayers.size > 0\n  // Initial anatomy load may cover the empty viewer, but once at least one\n  // real layer is already rendered, later layer downloads stay compact so the\n  // existing anatomy remains visible and usable on slow/mobile connections.\n  const hasLoadedLayer = ANATOMY_LAYERS.some((def) => Boolean(groupsRef.current[def.key]))\n\n  return (`,
+            'Body3D loaded-layer state',
+          )
+          body = replaceExactlyOnce(
+            body,
+            `      {!fatal && isLoading && (\n        <div className="pointer-events-none absolute inset-0 flex items-center justify-center bg-black/40">\n          <div className="w-56 rounded-xl bg-black/70 px-3 py-2.5 text-center">\n            <span className="text-xs font-semibold text-white">Loading anatomy…</span>`,
+            `      {!fatal && isLoading && (\n        <div\n          role="status"\n          aria-live="polite"\n          className={\n            hasLoadedLayer\n              ? 'pointer-events-none absolute left-2 right-2 top-2 z-10 flex justify-center'\n              : 'pointer-events-none absolute inset-0 flex items-center justify-center bg-black/40'\n          }\n        >\n          <div\n            className={\n              hasLoadedLayer\n                ? 'w-56 rounded-xl border border-white/10 bg-black/80 px-3 py-2.5 text-center shadow-lg backdrop-blur-sm'\n                : 'w-56 rounded-xl bg-black/70 px-3 py-2.5 text-center'\n            }\n          >\n            <span className="text-xs font-semibold text-white">\n              {hasLoadedLayer ? 'Adding anatomy layer…' : 'Loading anatomy…'}\n            </span>`,
+            'Body3D loading presentation',
+          )
+          fs.writeFileSync(bodyPath, body)
+
+          const stabilityPath = 'scripts/uji/body3dStability.mts'
+          let stability = fs.readFileSync(stabilityPath, 'utf8')
+          stability = replaceExactlyOnce(
+            stability,
+            `assert.doesNotMatch(\n  source,\n  /new THREE\\.(?:SphereGeometry|CapsuleGeometry|LatheGeometry)/,\n  'Macro anatomy must stay on evidence-bearing GLB geometry, never primitive stand-ins.',\n)\n\nconsole.log('Body3D stability invariants verified.')`,
+            `assert.doesNotMatch(\n  source,\n  /new THREE\\.(?:SphereGeometry|CapsuleGeometry|LatheGeometry)/,\n  'Macro anatomy must stay on evidence-bearing GLB geometry, never primitive stand-ins.',\n)\n\nassert.match(\n  source,\n  /const hasLoadedLayer = ANATOMY_LAYERS\\.some/,\n  'Body3D must distinguish initial loading from progressive layer loading.',\n)\nassert.ok(\n  source.includes('Adding anatomy layer…') && source.includes("left-2 right-2 top-2 z-10 flex justify-center"),\n  'Additional anatomy layers must use a compact non-blocking progress surface.',\n)\nassert.match(\n  source,\n  /role="status"[\\s\\S]*aria-live="polite"/,\n  'Anatomy loading progress must remain announced to assistive technology.',\n)\n\nconsole.log('Body3D stability invariants verified.')`,
+            'Body3D stability regression',
+          )
+          fs.writeFileSync(stabilityPath, stability)
+
+          const qaPath = 'scripts/qa/body3d-mobile-smoke.mjs'
+          let qa = fs.readFileSync(qaPath, 'utf8')
+          qa = replaceExactlyOnce(
+            qa,
+            `const page = await context.newPage()\nconst pageErrors = []`,
+            `const page = await context.newPage()\n// Keep one normally-large optional layer in-flight long enough to prove that\n// progressive loading does not dim or cover anatomy that is already usable.\nawait page.route('**/anatomy/cardio' + 'vascular.glb', async (route) => {\n  await new Promise((resolve) => setTimeout(resolve, 1_200))\n  await route.continue()\n})\nconst pageErrors = []`,
+            'Body3D QA delayed optional layer',
+          )
+          qa = replaceExactlyOnce(
+            qa,
+            `  await page.waitForTimeout(1_500)\n  await page.getByText('Loading anatomy…').waitFor({ state: 'hidden', timeout: 120_000 })`,
+            `  await page.waitForTimeout(1_500)\n  const initialLoading = page.getByText('Loading anatomy…').first()\n  const progressiveLoading = page.getByText('Adding anatomy layer…').first()\n  await initialLoading.waitFor({ state: 'hidden', timeout: 120_000 })\n  await progressiveLoading.waitFor({ state: 'hidden', timeout: 120_000 })`,
+            'Body3D QA initial settle',
+          )
+          qa = replaceExactlyOnce(
+            qa,
+            `  if (metrics.documentScrollWidth > metrics.viewport.width + 2) {\n    throw new Error(\`Page overflows horizontally: \${metrics.documentScrollWidth}px > \${metrics.viewport.width}px\`)\n  }\n\n  // Exercise OrbitControls and prove the compositor surface actually changes.`,
+            `  if (metrics.documentScrollWidth > metrics.viewport.width + 2) {\n    throw new Error(\`Page overflows horizontally: \${metrics.documentScrollWidth}px > \${metrics.viewport.width}px\`)\n  }\n\n  // Turn on a normally-large optional layer while keeping the already-rendered\n  // anatomy usable. The delayed request above makes this state deterministic.\n  const vessels = page.getByRole('button', { name: 'Vessels', exact: true }).first()\n  await vessels.click()\n  await progressiveLoading.waitFor({ state: 'visible', timeout: 5_000 })\n  await canvas.scrollIntoViewIfNeeded()\n  const progressiveOverlay = progressiveLoading.locator('xpath=ancestor::*[@role="status"][1]')\n  const progressiveClass = await progressiveOverlay.getAttribute('class')\n  metrics.progressiveLoadingCompact = Boolean(\n    progressiveClass?.includes('top-2') && !progressiveClass?.includes('inset-0'),\n  )\n  metrics.progressiveLoadingCenterUnobstructed = await canvas.evaluate((node) => {\n    const rect = node.getBoundingClientRect()\n    return document.elementFromPoint(rect.left + rect.width / 2, rect.top + rect.height / 2) === node\n  })\n  if (!metrics.progressiveLoadingCompact) {\n    throw new Error(\`Additional layer loading is not compact: \${progressiveClass ?? 'no class'}\`)\n  }\n  if (!metrics.progressiveLoadingCenterUnobstructed) {\n    throw new Error('Additional layer loading obstructed the Body3D canvas center')\n  }\n  await progressiveLoading.waitFor({ state: 'hidden', timeout: 120_000 })\n\n  // Exercise OrbitControls and prove the compositor surface actually changes.`,
+            'Body3D QA progressive loading assertion',
+          )
+          fs.writeFileSync(qaPath, qa)
+          NODE
+
+      - name: TypeScript and deterministic tests
+        run: |
+          npx tsc --noEmit
+          npm run uji
+
+      - name: Commit patch
+        run: |
+          git config user.name "Panacea Stabilization Bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add src/components/Body3D.tsx scripts/uji/body3dStability.mts scripts/qa/body3d-mobile-smoke.mjs
+          git diff --cached --check
+          git commit -m "fix(body): keep progressive layer loading unobtrusive [body3d-progressive-applied]"
+          git push origin HEAD:fix/body3d-progressive-loading-20260908
