@@ -6,6 +6,7 @@ const lapAppy = readFileSync('src/lib/surgerySimulatorAppendectomy.ts', 'utf8')
 const ui = readFileSync('src/pages/bodyhub/SurgerySimulatorLab.tsx', 'utf8')
 const shell = readFileSync('src/pages/bodyhub/SurgicalLab.tsx', 'utf8')
 const bodyExplorer = readFileSync('src/pages/BodyExplorer.tsx', 'utf8')
+const mandatoryReferenceRegistry = JSON.parse(readFileSync('data/source-registry/anatomy/thebuggeddev-anatomy.json', 'utf8'))
 
 assert.match(data, /id: 'caesarean-anatomy'/, 'Caesarean scenario is required')
 assert.match(data, /atlasFile: 'atlas\/obgin\.glb'/, 'Caesarean must use the female pelvis reference atlas')
@@ -37,6 +38,19 @@ assert.match(lapAppy, /AI-assisted educational draft/, 'AI generation must be di
 assert.match(lapAppy, /not an operative manual, credentialing tool, autonomous surgical advisor or substitute for supervised surgical training/, 'Lap Appy must remain an anatomy/cognitive trainer rather than an operative recipe')
 assert.match(lapAppy, /No appendiceal-base division line, stapler trajectory, ligature position or “safe margin” is generated from the atlas/, 'Lap Appy must not infer a procedural safe margin from reference geometry')
 assert.doesNotMatch(lapAppy, /trocar.{0,30}(?:mm|cm)|insufflat.{0,30}mmHg|stapler.{0,30}(?:mm|load)|energy.{0,20}(?:watt|\bW\b)|force.{0,20}\bN\b/i, 'DIYAI Lap Appy must not encode operative device settings or force')
+
+// User-required interactive references are pinned visibly in the default DIYAI
+// scenario while remaining fail-closed for code/asset reuse until licensing and
+// provenance are explicitly cleared.
+assert.match(lapAppy, /https:\/\/github\.com\/thebuggeddev\/anatomy/, 'thebuggeddev/anatomy must remain a mandatory interactive reference')
+assert.match(lapAppy, /https:\/\/breath-atlas\.thebuggeddev\.chatgpt\.site\//, 'Breath Atlas must remain a mandatory interactive reference')
+assert.match(lapAppy, /no code or assets are vendored until an explicit upstream license and asset provenance are verified/, 'Unlicensed upstream implementation must stay external-only')
+assert.equal(mandatoryReferenceRegistry.id, 'thebuggeddev_anatomy', 'Mandatory anatomy reference registry id must stay stable')
+assert.equal(mandatoryReferenceRegistry.license.status, 'CHECK_REQUIRED', 'Unverified upstream license must fail closed')
+assert.equal(mandatoryReferenceRegistry.license.commercialUse, 'UNKNOWN', 'Commercial reuse must not be inferred')
+assert.equal(mandatoryReferenceRegistry.usage.runtime, false, 'External reference must not become a silent runtime dependency')
+assert.equal(mandatoryReferenceRegistry.adapter.status, 'EXTERNAL_REFERENCE_ONLY', 'Adapter must remain reference-only until licensing is cleared')
+assert.equal(mandatoryReferenceRegistry.relatedSurfaces.length, 2, 'Repository and Breath Atlas surface must both remain registered')
 
 assert.match(ui, /data-surgery-simulator="anatomy-grounded"/, 'Simulator root marker is required')
 assert.match(ui, /<AtlasViewer3D/, 'Simulator must use the verified atlas viewer')
@@ -70,4 +84,4 @@ assert.match(bodyExplorer, /setSlicePlane\(view\.slicePlane\)/, 'Surgery must dr
 assert.match(bodyExplorer, /setSlicePos\(view\.slicePos\)/, 'Surgery must drive the shared Body3D slice position')
 assert.match(bodyExplorer, /setUnfold\(view\.unfold\)/, 'Surgery must drive the shared Body3D exploded view')
 
-console.log('✓ Surgery simulator scenarios, provenance, academic gates, geometry boundaries, cross-section bridge, and integration verified')
+console.log('✓ Surgery simulator scenarios, provenance, mandatory references, academic gates, geometry boundaries, cross-section bridge, and integration verified')
