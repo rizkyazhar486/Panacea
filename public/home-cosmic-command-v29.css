@@ -1,7 +1,7 @@
 /* Panacea Home Cosmic Command v29
    Meaningful visual refresh for Home without replacing Claude-authored React logic.
-   Goals: space + aurora + orbit + illumination identity, stronger information hierarchy,
-   explicit Light/Dark contrast, and zero new runtime dependencies or heavy GPU loops. */
+   Space + aurora + orbit + illumination identity, stronger information hierarchy,
+   explicit Light/Dark contrast, and progressive motion only on capable devices. */
 
 .panacea-home{
   --space-black:#02040a;
@@ -18,11 +18,9 @@
   --aurora-gold:#ffb347;
 }
 
-/* 4K vector wallpaper remains the single page backdrop, but becomes visually
-   meaningful. No fixed attachment and no duplicated wallpaper layer. */
-.dark .panacea-home{
-  background:#02040a!important;
-}
+/* ONE continuous 4K vector wallpaper. No fixed attachment and no duplicate page
+   wallpaper. Light theme keeps a brighter lab-like interpretation. */
+.dark .panacea-home{background:#02040a!important}
 .dark .panacea-home-backdrop{
   opacity:1!important;
   background-image:
@@ -36,8 +34,7 @@
     url('/panacea-home-cosmos-4k.svg')!important;
 }
 
-/* HERO = the command deck. Black space body with broad aurora light, not thin
-   decorative lines. Existing orbit component is preserved and emphasized. */
+/* HERO = command deck. Broad aurora light, not thin decorative strokes. */
 .panacea-home .home-odyssey-hero{
   border:0!important;
   background:
@@ -66,33 +63,37 @@
     radial-gradient(ellipse at 82% 58%,rgba(139,92,246,.14) 0 9%,transparent 36%),
     radial-gradient(ellipse at 58% 78%,rgba(255,77,87,.11) 0 8%,transparent 33%);
   opacity:.94;
+  transform:translate3d(0,0,0) scale(1.02);
+  will-change:auto;
 }
 
-/* Orbit is an identity motif, not a random line. Keep it soft enough not to
-   compete with metrics. */
+/* Motion is progressive enhancement: normal devices get a very slow aurora
+   drift; pmd-low-memory, iOS, Save-Data and reduced-motion remain static. */
+@keyframes pmd-aurora-drift-v29{
+  0%,100%{transform:translate3d(0,0,0) scale(1.02);opacity:.90}
+  50%{transform:translate3d(-1.2%,1.2%,0) scale(1.045);opacity:1}
+}
+html:not(.pmd-low-memory) .panacea-home .home-odyssey-hero::before{
+  animation:pmd-aurora-drift-v29 18s ease-in-out infinite;
+  will-change:transform,opacity;
+}
+
+/* Orbit is a deliberate identity motif. */
 .panacea-home .home-orbit-core{opacity:.92!important;filter:saturate(1.1)}
 .dark .panacea-home .home-orbit-core{opacity:.78!important}
 .panacea-home .home-orbit-core::before{border-color:rgba(49,130,255,.34)!important;box-shadow:0 0 56px rgba(49,130,255,.10)!important}
 .panacea-home .home-orbit-core::after{border-color:rgba(255,77,87,.28)!important;box-shadow:0 0 50px rgba(237,63,135,.10)!important}
 
-/* Hero copy and CTAs become more like a premium command interface. */
-.dark .panacea-home .home-odyssey-kicker{
-  background:rgba(7,16,29,.72)!important;
-  color:#d8e6f7!important;
-}
+/* Premium command copy/actions. */
+.dark .panacea-home .home-odyssey-kicker{background:rgba(7,16,29,.72)!important;color:#d8e6f7!important}
 .dark .panacea-home .home-odyssey-copy{color:#c4cfdf!important}
 .dark .panacea-home .home-primary-action{
   background:linear-gradient(105deg,#007aee 0%,#4f46e5 36%,#b832d8 65%,#ff4d57 84%,#ff9a3d 100%)!important;
   box-shadow:0 14px 34px rgba(79,70,229,.24),0 0 24px rgba(237,63,135,.12)!important;
 }
-.dark .panacea-home .home-secondary-action{
-  background:rgba(7,13,24,.82)!important;
-  color:#edf5ff!important;
-  border:0!important;
-}
+.dark .panacea-home .home-secondary-action{background:rgba(7,13,24,.82)!important;color:#edf5ff!important;border:0!important}
 
-/* CURRENT SIGNALS = illuminated instrument chips. Different signals retain
-   their semantic text tones, but all surfaces belong to the same command deck. */
+/* CURRENT SIGNALS = illuminated instrument chips. */
 .dark .panacea-home .home-signal-card{
   background:
     radial-gradient(circle at 82% 18%,rgba(49,130,255,.11),transparent 38%),
@@ -102,14 +103,9 @@
 }
 .panacea-home .home-signal-card{border:0!important}
 
-/* High-utility actions become a superhero-spectrum tool deck. The colors are
-   illumination only; the existing labels/routes/icons remain untouched. */
-.panacea-home .home-action-card{
-  position:relative;
-  overflow:hidden;
-  border:0!important;
-  isolation:isolate;
-}
+/* High-utility actions become a superhero-spectrum tool deck. Existing routes,
+   labels, icons and utility are untouched; color is illumination only. */
+.panacea-home .home-action-card{position:relative;overflow:hidden;border:0!important;isolation:isolate}
 .dark .panacea-home .home-action-card{
   background:linear-gradient(145deg,rgba(8,14,25,.96),rgba(3,7,14,.95))!important;
   box-shadow:0 14px 32px rgba(0,0,0,.22)!important;
@@ -141,20 +137,16 @@
 .dark .panacea-home .home-action-card>span:nth-child(2)>span:first-child{color:#f7fbff!important}
 .dark .panacea-home .home-action-card>span:nth-child(2)>span:nth-child(2){color:#aebbd0!important}
 
-/* Section headings read like destinations in one continuous journey rather
-   than unrelated cards. */
+/* Section hierarchy becomes one continuous mission rather than unrelated cards. */
 .dark .panacea-home #daily-tools-title,
 .dark .panacea-home #my-dashboard-title,
 .dark .panacea-home .home-details-summary>div>div:nth-child(2){color:#f8fbff!important}
 .dark .panacea-home .home-command-panel>div:first-child>div:first-child>div:first-child,
-.dark .panacea-home .home-details-summary>div>div:first-child{
-  color:#91a5bf!important;
-}
-.panacea-home #daily-tools-title,
-.panacea-home #my-dashboard-title{font-weight:900!important}
+.dark .panacea-home .home-details-summary>div>div:first-child{color:#91a5bf!important}
+.panacea-home #daily-tools-title,.panacea-home #my-dashboard-title{font-weight:900!important}
 
-/* LIVING INSTRUMENT = black illuminated stage. This also fixes the blank/grey
-   rectangle failure mode seen when a widget wrapper supplies a light surface. */
+/* LIVING INSTRUMENT = black illuminated stage. This explicitly fixes the large
+   light-grey rectangle failure mode seen in Dark Mode. */
 .dark .panacea-home .widget-instrument-v5{color-scheme:dark;color:#f8fbff}
 .dark .panacea-home .widget-instrument-shell-v5{
   background:
@@ -164,15 +156,8 @@
   box-shadow:0 20px 52px rgba(0,0,0,.26)!important;
 }
 .dark .panacea-home .widget-instrument-scroll-v5,
-.dark .panacea-home .widget-instrument-slide-v5{
-  background:transparent!important;
-  color:#f8fbff!important;
-}
-/* Direct widget wrappers must never become a light-grey slab in Dark Mode. */
-.dark .panacea-home .widget-instrument-slide-v5>:is(div,section,article){
-  background-color:transparent!important;
-  color:#f8fbff;
-}
+.dark .panacea-home .widget-instrument-slide-v5{background:transparent!important;color:#f8fbff!important}
+.dark .panacea-home .widget-instrument-slide-v5>:is(section,article){background-color:transparent!important;color:#f8fbff}
 .dark .panacea-home .widget-instrument-slide-v5 :is(.kaca,[class*='bg-neutral-1'],[class*='bg-neutral-2'],[class*='bg-gray-1'],[class*='bg-gray-2'],[class*='bg-slate-1'],[class*='bg-slate-2'],[class*='bg-zinc-1'],[class*='bg-zinc-2']){
   background-color:rgba(7,12,21,.92)!important;
   color:#f8fbff!important;
@@ -189,27 +174,47 @@
 .dark .panacea-home .widget-instrument-state-v5,
 .dark .panacea-home .widget-instrument-label-v5{color:#aebbd0!important}
 .dark .panacea-home .widget-instrument-count-v5,
-.dark .panacea-home .widget-instrument-nav-v5{
-  background:rgba(7,13,24,.88)!important;
-  color:#dfe9f5!important;
+.dark .panacea-home .widget-instrument-nav-v5{background:rgba(7,13,24,.88)!important;color:#dfe9f5!important}
+
+/* Suspense/loading: never show a blank grey slab while a lazy widget chunk is
+   arriving. This is informational only; it adds no timer, fetch or loop. */
+.panacea-home .widget-instrument-loading-v29{
+  min-height:120px;
+  height:100%;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:10px;
+  padding:18px;
+  border-radius:22px;
+  background:rgba(246,249,252,.84);
+  color:#526071;
+  font:800 12px/1.3 Inter,system-ui,sans-serif;
+}
+.dark .panacea-home .widget-instrument-loading-v29{
+  background:
+    radial-gradient(circle at 48% 42%,color-mix(in srgb,var(--wa) 10%,transparent),transparent 36%),
+    linear-gradient(145deg,rgba(8,14,24,.94),rgba(3,7,13,.96))!important;
+  color:#b9c6d8!important;
+}
+.panacea-home .widget-instrument-loading-orb-v29{
+  width:9px;
+  height:9px;
+  flex:0 0 auto;
+  border-radius:999px;
+  background:var(--wa,#00bf63);
+  box-shadow:0 0 14px color-mix(in srgb,var(--wa,#00bf63) 55%,transparent);
 }
 
-/* Empty/loading states are intentional and dark, never a giant grey block. */
+/* Empty states are intentional and theme-safe. */
 .dark .panacea-home .home-loading-card,
-.dark .panacea-home .instrument-empty-v5{
-  background:rgba(7,12,20,.78)!important;
-  color:#aebbd0!important;
-}
-.dark .panacea-home .home-loading-card>div{
-  background:rgba(255,255,255,.08)!important;
-}
+.dark .panacea-home .instrument-empty-v5{background:rgba(7,12,20,.78)!important;color:#aebbd0!important}
+.dark .panacea-home .home-loading-card>div{background:rgba(255,255,255,.08)!important}
 
-/* Reference-range cards and body rows remain clinical, but match the spatial
-   scene. Data bars/thresholds themselves are not recolored. */
+/* Clinical/reference rows keep meaningful data colors but inherit readable
+   neutral text and borders. */
 .dark .panacea-home .widget-instrument-slide-v5 [class*='border-neutral'],
-.dark .panacea-home .widget-instrument-slide-v5 [class*='border-white']{
-  border-color:rgba(255,255,255,.10)!important;
-}
+.dark .panacea-home .widget-instrument-slide-v5 [class*='border-white']{border-color:rgba(255,255,255,.10)!important}
 .dark .panacea-home .widget-instrument-slide-v5 .text-neutral-500{color:#aebbd0!important}
 .dark .panacea-home .widget-instrument-slide-v5 .text-neutral-400{color:#93a2b8!important}
 .dark .panacea-home .widget-instrument-slide-v5 .text-neutral-600{color:#c2ccda!important}
@@ -220,19 +225,12 @@
   color:color-mix(in srgb,var(--wa) 82%,white)!important;
 }
 .dark .panacea-home .home-pill-button,
-.dark .panacea-home .home-summary-plus{
-  background:rgba(8,14,25,.88)!important;
-  color:#dfe9f5!important;
-}
+.dark .panacea-home .home-summary-plus{background:rgba(8,14,25,.88)!important;color:#dfe9f5!important}
 .dark .panacea-home .home-text-link{color:#6ff0b3!important}
 
-/* Light theme keeps the same hierarchy but uses bright 'space lab' surfaces
-   instead of forcing the black treatment. */
-.panacea-home:not(.dark *) .widget-instrument-shell-v5{
-  box-shadow:0 16px 42px rgba(31,52,89,.09)!important;
-}
+/* Light theme uses the same visual hierarchy as a bright space-lab surface. */
+html:not(.dark) .panacea-home .widget-instrument-shell-v5{box-shadow:0 16px 42px rgba(31,52,89,.09)!important}
 
-/* Phone ergonomics: richer visual identity without extra compositing. */
 @media(max-width:430px){
   .panacea-home .home-odyssey-hero{min-height:360px!important}
   .panacea-home .home-orbit-core{right:-104px!important;top:104px!important;opacity:.52!important}
@@ -241,8 +239,8 @@
   .panacea-home .widget-instrument-slide-v5{padding:14px!important}
 }
 
-/* Performance discipline. Aurora/orbit visual language is static on constrained
-   devices; no blur/filter/backdrop loop is introduced here. */
+/* Performance discipline. Rich visual identity stays static on constrained
+   devices and all shadows/backdrop work can fall away without losing utility. */
 html.pmd-low-memory .panacea-home .home-odyssey-hero,
 html.pmd-low-memory .panacea-home .home-action-card,
 html.pmd-low-memory .panacea-home .home-signal-card,
@@ -252,7 +250,9 @@ html.pmd-low-memory .panacea-home .widget-instrument-shell-v5{
   -webkit-backdrop-filter:none!important;
   backdrop-filter:none!important;
 }
-html.pmd-low-memory .panacea-home .home-orbit-core .satellite{animation:none!important}
+html.pmd-low-memory .panacea-home .home-odyssey-hero::before,
+html.pmd-low-memory .panacea-home .home-orbit-core .satellite{animation:none!important;will-change:auto!important}
 @media(prefers-reduced-motion:reduce){
-  .panacea-home .home-orbit-core .satellite{animation:none!important}
+  .panacea-home .home-odyssey-hero::before,
+  .panacea-home .home-orbit-core .satellite{animation:none!important;will-change:auto!important}
 }
