@@ -39,7 +39,12 @@ export function hasVerifiedProfessionalRole(
  * Derive the role visible to protected request handlers. The account can keep
  * its requested professional role for onboarding/profile display, while
  * backend privileges remain unavailable until the owner-approved verification
- * flag exists. A stored `owner` role is never authoritative by itself.
+ * flag exists.
+ *
+ * Owner authority is derived from configured email, not from the mutable role
+ * column. Conversely, legacy `owner`/`admin` values on any other account fail
+ * closed so an account that exploited an older client-driven role bug does not
+ * retain privilege after this fix.
  *
  * `allowOnboardingRole` is only for the professional-application submission
  * route so an unverified doctor/verifier can state which role is being reviewed.
@@ -50,9 +55,9 @@ export function effectiveRoleForRequest(
   ownerEmail: string,
   allowOnboardingRole = false,
 ): Role {
-  if (isConfiguredOwner(user, ownerEmail)) return user.role
+  if (isConfiguredOwner(user, ownerEmail)) return 'owner'
   if (allowOnboardingRole && ['dokter', 'kontributor', 'verifikator'].includes(user.role)) return user.role
-  if (user.role === 'owner') return 'pasien'
+  if (user.role === 'owner' || user.role === 'admin') return 'pasien'
   if (user.role === 'dokter' && settings?.strStatus !== 'verified') return 'pasien'
   if (user.role === 'verifikator' && settings?.strStatus !== 'verified') return 'pasien'
   return user.role
@@ -80,6 +85,5 @@ export function canSendTargetNotification(
   ownerEmail: string,
 ): boolean {
   return isConfiguredOwner(user, ownerEmail)
-    || user.role === 'admin'
     || hasVerifiedProfessionalRole(user, settings, 'verifikator')
 }
