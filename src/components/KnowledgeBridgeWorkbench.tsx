@@ -160,6 +160,23 @@ export function KnowledgeBridgeWorkbench() {
           <button type="button" onClick={copySummary} aria-live="polite" className={`mt-3 w-full rounded-2xl bg-cyan-600 px-3 py-2.5 text-[10px] font-black text-white ${FOCUS_RING}`}>{copied ? 'Copied ✓' : 'Copy bridge summary'}</button>
         </div>
       </div>
+
+      <div className="mt-3 rounded-[22px] border border-amber-200 bg-amber-50/70 p-3 dark:border-amber-400/20 dark:bg-amber-400/[.06]">
+        <div className="flex flex-wrap items-start justify-between gap-2">
+          <div>
+            <div className="text-[9px] font-black uppercase tracking-[.13em] text-amber-800 dark:text-amber-200">Study verification checklist · not clinical clearance</div>
+            <p className="mt-1 max-w-3xl text-[10px] leading-relaxed text-amber-950/75 dark:text-amber-100/75">Use these gates before carrying a bridge claim into notes, teaching, or discussion. They document what still needs verification; they do not certify a patient-specific decision.</p>
+          </div>
+          <Link to={`/med-study?bagian=evidence&cari=${encodeURIComponent(query.trim() || topic.title)}`} className={`shrink-0 rounded-full border border-amber-300 bg-white px-3 py-1.5 text-[9px] font-black text-amber-900 dark:border-amber-400/20 dark:bg-white/10 dark:text-amber-100 ${FOCUS_RING}`}>Open sources →</Link>
+        </div>
+        <ol aria-label="Study verification checklist" className="mt-3 grid gap-2 text-[10px] leading-relaxed text-neutral-700 dark:text-neutral-200 sm:grid-cols-2">
+          <li data-check-id="source" className="rounded-2xl border border-amber-200/80 bg-white/80 p-3 dark:border-amber-400/15 dark:bg-black/15"><b>1 · Source.</b> Open the original source and preserve its identifier, date and provenance before treating a claim as verified.</li>
+          <li data-check-id="population" className="rounded-2xl border border-amber-200/80 bg-white/80 p-3 dark:border-amber-400/15 dark:bg-black/15"><b>2 · Context.</b> Compare population, setting, definitions and units with the question you are studying.</li>
+          <li data-check-id="uncertainty" className="rounded-2xl border border-amber-200/80 bg-white/80 p-3 dark:border-amber-400/15 dark:bg-black/15"><b>3 · Uncertainty.</b> Record uncertainty and plausible alternatives instead of forcing one causal explanation.</li>
+          <li data-check-id="management" className="rounded-2xl border border-amber-200/80 bg-white/80 p-3 dark:border-amber-400/15 dark:bg-black/15"><b>4 · Management claims.</b> If management is involved, check contraindications, harms and source currency before reuse.</li>
+          <li data-check-id="clinical-boundary" className="rounded-2xl border border-amber-200/80 bg-white/80 p-3 dark:border-amber-400/15 dark:bg-black/15 sm:col-span-2"><b>5 · Boundary.</b> A completed study checklist never authorizes a patient-specific diagnosis or treatment decision.</li>
+        </ol>
+      </div>
     </section>
   )
 }
