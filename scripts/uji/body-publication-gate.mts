@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict'
-import { BODY_PROJECTION_TARGETS } from '../../src/lib/bodyProjectionContract.ts'
+import { BODY_PROJECTION_TARGETS, type BodyProjectionTarget } from '../../src/lib/bodyProjectionContract.ts'
 import { evaluateBodyPublication } from '../../src/lib/bodyPublicationGate.ts'
 import type { BodyAssetProvenanceRecord } from '../../src/lib/bodyAssetProvenance.ts'
 import type { BodyEvidenceMappingRecord } from '../../src/lib/bodyEvidenceMapping.ts'
@@ -9,10 +9,11 @@ const thermoreceptor = BODY_PROJECTION_TARGETS.find((target) => target.id === 't
 assert.ok(cardiovascular)
 assert.ok(thermoreceptor)
 
+const reviewedCardiovascular: BodyProjectionTarget = { ...cardiovascular, academicReview: 'recorded' }
 const sourceSha = 'a'.repeat(64)
 const derivedSha = 'b'.repeat(64)
 const asset: BodyAssetProvenanceRecord = {
-  targetId: cardiovascular.id,
+  targetId: reviewedCardiovascular.id,
   sourceId: 'z_anatomy',
   assetId: 'z-anatomy/example-heart',
   sourceRevision: '1234567890abcdef1234567890abcdef12345678',
@@ -34,15 +35,24 @@ const asset: BodyAssetProvenanceRecord = {
   }],
   geometryStatus: 'verified-native',
   evidenceStatus: 'source-checked',
-  academicReview: 'pending',
+  academicReview: 'recorded',
+  reviewerName: 'Qualified reviewer fixture',
+  reviewerCredentials: 'Recorded professional credentials fixture',
+  reviewerDate: '2026-09-08',
+  reviewerScope: 'Fixture-only heart asset identity, anatomy mapping, transformations, and educational scope',
 }
 
-const anatomy = evaluateBodyPublication({ mode: 'verified-anatomy', kind: 'anatomy', target: cardiovascular, asset })
+const anatomy = evaluateBodyPublication({ mode: 'verified-anatomy', kind: 'anatomy', target: reviewedCardiovascular, asset })
 assert.equal(anatomy.publishable, true)
 assert.equal(anatomy.renderAsVerifiedAnatomy, true)
 assert.equal(anatomy.displayAsReferenceOnly, false)
 
-const noAsset = evaluateBodyPublication({ mode: 'verified-anatomy', kind: 'anatomy', target: cardiovascular })
+const pendingAnatomy = evaluateBodyPublication({ mode: 'verified-anatomy', kind: 'anatomy', target: cardiovascular, asset: { ...asset, targetId: cardiovascular.id } })
+assert.equal(pendingAnatomy.publishable, false)
+assert.equal(pendingAnatomy.renderAsVerifiedAnatomy, false)
+assert.ok(pendingAnatomy.reasons.some((reason) => reason.includes('Target academic review is still pending')))
+
+const noAsset = evaluateBodyPublication({ mode: 'verified-anatomy', kind: 'anatomy', target: reviewedCardiovascular })
 assert.equal(noAsset.publishable, false)
 assert.equal(noAsset.renderAsVerifiedAnatomy, false)
 
@@ -68,7 +78,18 @@ assert.equal(overlay.publishable, true)
 assert.equal(overlay.renderAsVerifiedAnatomy, false)
 assert.equal(overlay.displayAsReferenceOnly, true)
 
-const overlayOnVerifiedAsset = evaluateBodyPublication({ mode: 'evidence-overlay', kind: 'physiology', target: cardiovascular, asset, evidence: [evidence] })
+const reviewedEvidence: BodyEvidenceMappingRecord = {
+  ...evidence,
+  targetId: reviewedCardiovascular.id,
+  academicReview: {
+    status: 'recorded',
+    reviewerName: 'Qualified reviewer fixture',
+    reviewerCredentials: 'Recorded professional credentials fixture',
+    reviewedAt: '2026-09-08',
+    scope: 'Fixture-only cardiovascular physiology evidence localization',
+  },
+}
+const overlayOnVerifiedAsset = evaluateBodyPublication({ mode: 'evidence-overlay', kind: 'physiology', target: reviewedCardiovascular, asset, evidence: [reviewedEvidence] })
 assert.equal(overlayOnVerifiedAsset.publishable, true)
 assert.equal(overlayOnVerifiedAsset.displayAsReferenceOnly, false)
 assert.equal(overlayOnVerifiedAsset.renderAsVerifiedAnatomy, false)
@@ -86,4 +107,4 @@ assert.equal(conceptualAnatomy.publishable, false)
 assert.equal(conceptualAnatomy.renderAsVerifiedAnatomy, false)
 assert.ok(conceptualAnatomy.reasons.some((reason) => reason.includes('Reference-only')))
 
-console.log('Body publication gate: verified anatomy, reference overlays, procedure fail-closed, and conceptual geometry boundaries verified.')
+console.log('Body publication gate: reviewed verified anatomy, pending-review fail-closed, reference overlays, procedure fail-closed, and conceptual geometry boundaries verified.')
