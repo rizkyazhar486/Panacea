@@ -21,6 +21,7 @@
     "periksa": "node scripts/periksaTeks.mjs",
     "periksa:semua": "node scripts/periksaTeks.mjs --semua",
     "uji": "node scripts/uji/jalankan.mjs",
+    "uji:anatomy-atlas": "node --experimental-transform-types --import=./scripts/uji/typescript-resolver.mjs scripts/uji/anatomy-atlas-compiler.mts",
     "cakupan": "node scripts/cakupanSkdi.mjs"
   },
   "dependencies": {
