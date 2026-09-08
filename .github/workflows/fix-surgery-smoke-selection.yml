@@ -1,0 +1,44 @@
+name: Fix surgery smoke scenario selection
+
+on:
+  push:
+    branches: [feat/surgery-simulator-anatomy-20260908]
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: feat/surgery-simulator-anatomy-20260908
+      - name: Patch smoke to select Caesarean explicitly
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          path = Path('scripts/qa/surgery-simulator-mobile-smoke.mjs')
+          text = path.read_text()
+          old = "  await page.getByText('Caesarean section — layered pelvic anatomy', { exact: true }).waitFor({ state: 'visible', timeout: 20_000 })"
+          new = "  const caesareanScenario = simulator.getByRole('button', { name: 'Caesarean', exact: true })\n  await caesareanScenario.scrollIntoViewIfNeeded()\n  await caesareanScenario.click()\n  await simulator.getByText('Caesarean section — layered pelvic anatomy', { exact: true }).waitFor({ state: 'visible', timeout: 20_000 })"
+          if text.count(old) != 1:
+              raise SystemExit(f'expected exactly one Caesarean default assumption, found {text.count(old)}')
+          path.write_text(text.replace(old, new))
+          PY
+      - name: Verify patch and remove staging helper
+        shell: bash
+        run: |
+          node --check scripts/qa/surgery-simulator-mobile-smoke.mjs
+          grep -F "getByRole('button', { name: 'Caesarean', exact: true })" scripts/qa/surgery-simulator-mobile-smoke.mjs
+          git rm .github/workflows/fix-surgery-smoke-selection.yml
+          git diff --check
+      - name: Commit product test fix only
+        shell: bash
+        run: |
+          git config user.name panacea-surgery-bot
+          git config user.email actions@users.noreply.github.com
+          git add scripts/qa/surgery-simulator-mobile-smoke.mjs
+          git commit -m "test(surgery): select scenarios explicitly in mobile smoke"
+          git push origin HEAD:feat/surgery-simulator-anatomy-20260908
