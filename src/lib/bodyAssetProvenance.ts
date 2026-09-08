@@ -99,6 +99,12 @@ export function validateBodyAssetProvenance(
       if (!SHA256_RE.test(step.inputSha256) || !SHA256_RE.test(step.outputSha256)) {
         reasons.push(`Transformation step ${index + 1} must pin input and output SHA-256 checksums.`)
       }
+      if (index > 0) {
+        const previous = record.transformations[index - 1]
+        if (previous.outputSha256.toLowerCase() !== step.inputSha256.toLowerCase()) {
+          reasons.push(`Transformation lineage is discontinuous between steps ${index} and ${index + 1}.`)
+        }
+      }
     }
 
     const first = record.transformations[0]

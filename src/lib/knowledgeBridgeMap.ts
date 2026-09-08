@@ -123,10 +123,32 @@ export const BRIDGE_TOPICS: BridgeTopic[] = [
 
 export const BRIDGE_STAGE_ORDER: BridgeStageKey[] = ['anatomy', 'physiology', 'pathology', 'signals', 'diagnostics', 'management', 'evidence']
 
+function normalizeBridgeSearchText(value: string) {
+  return value
+    .trim()
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, ' ')
+    .replace(/\s+/g, ' ')
+}
+
+function containsWholePhrase(value: string, phrase: string) {
+  return ` ${value} `.includes(` ${phrase} `)
+}
+
 export function resolveBridgeTopic(query: string): BridgeTopic | null {
-  const q = query.trim().toLowerCase()
+  const q = normalizeBridgeSearchText(query)
   if (!q) return null
-  return BRIDGE_TOPICS.find((topic) => topic.title.toLowerCase() === q || topic.id === q || topic.aliases.some((alias) => alias.includes(q) || q.includes(alias))) ?? null
+
+  return BRIDGE_TOPICS.find((topic) => {
+    const title = normalizeBridgeSearchText(topic.title)
+    const id = normalizeBridgeSearchText(topic.id)
+    if (q === title || q === id) return true
+
+    return topic.aliases.some((rawAlias) => {
+      const alias = normalizeBridgeSearchText(rawAlias)
+      return alias === q || containsWholePhrase(alias, q) || containsWholePhrase(q, alias)
+    })
+  }) ?? null
 }
 
 function canonicalStageLabel(label: string) {
