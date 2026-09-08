@@ -38,6 +38,11 @@ export function sebaranIntensitas(sesi: ImportedWorkout[], hrMax: number): Sebar
     if (!Array.isArray(w.hr) || !w.hr.length) continue
     let titikSesi = 0
     for (const p of w.hr) {
+      // Data impor normal sudah dibersihkan oleh workoutImport, tetapi sesi yang
+      // dipulihkan dari cache/runtime JSON tidak mendapat perlindungan TypeScript.
+      // Titik rusak tidak boleh diam-diam masuk zona keras karena perbandingan
+      // dengan NaN selalu false, dan juga tidak boleh membantu memenuhi ambang
+      // minimum 30 menit data yang benar-benar terekam.
       if (!p || !Number.isFinite(p.t) || p.t < 0 || !Number.isFinite(p.bpm) || p.bpm <= 0) continue
       const pct = p.bpm / hrMax
       m[pct < 0.8 ? 0 : pct < 0.87 ? 1 : 2] += 1
@@ -46,10 +51,24 @@ export function sebaranIntensitas(sesi: ImportedWorkout[], hrMax: number): Sebar
     }
     if (titikSesi > 0) dipakai += 1
   }
+  // Deret impor bercatat per menit; di bawah 30 menit terekam, persentasenya
+  // lebih menggambarkan sesi mana yang kebetulan memakai jam tangan.
   if (titik < 30) return null
   const persen = m.map((x) => (x / titik) * 100) as [number, number, number]
   return { menit: m, persen, totalMenit: titik, sesi: dipakai }
 }
+
+// ── 2. Hanyutan denyut ─────────────────────────────────────────────────────
+//
+// SENGAJA DISEBUT HANYUTAN DENYUT, BUKAN DECOUPLING. Decoupling (Pa:HR) adalah
+// perbandingan pace-per-denyut paruh pertama terhadap paruh kedua, dan itu
+// menuntut pace PER TITIK. Yang tersimpan di sini hanya deret denyut beserta
+// jarak dan durasi total, sehingga pace per paruh tidak diketahui.
+//
+// Maka yang dihitung hanyalah kenaikan denyut rata-rata dari paruh pertama ke
+// paruh kedua. Ia hanya berarti bila lajunya memang dijaga tetap — dan itu
+// tidak dapat diperiksa dari data yang ada. Karena itu ia disajikan sebagai
+// pengamatan, bukan sebagai penilaian dasar aerobik.
 
 export interface Hanyutan {
   tanggal: string
@@ -68,6 +87,9 @@ export function hanyutanDenyut(sesi: ImportedWorkout[], minMenit = 45): Hanyutan
     const hrValid = w.hr.filter((p) =>
       Boolean(p) && Number.isFinite(p.t) && p.t >= 0 && Number.isFinite(p.bpm) && p.bpm > 0,
     )
+    // Runtime/cache JSON can bypass TypeScript. Invalid samples must not poison
+    // either half's mean or help a session satisfy the minimum recorded-data
+    // threshold used as evidence for drift.
     if (hrValid.length < minMenit) continue
     const tengah = Math.floor(hrValid.length / 2)
     const rata = (a: { bpm: number }[]) => a.reduce((s, p) => s + p.bpm, 0) / a.length
@@ -86,14 +108,19 @@ export function hanyutanDenyut(sesi: ImportedWorkout[], minMenit = 45): Hanyutan
   return out.sort((a, b) => (a.tanggal < b.tanggal ? 1 : -1)).slice(0, 6)
 }
 
+// ── 3. Volume mingguan ─────────────────────────────────────────────────────
+
 export interface Volume {
   minggu: { mulai: string; km: number; menit: number }[]
   rataKm: number
+  /** Kemiringan regresi kuadrat terkecil, km per minggu. */
   trenKmPerMinggu: number
 }
 
 export function volumeMingguan(sesi: ImportedWorkout[], jumlahMinggu = 8, sekarang = Date.now()): Volume | null {
   if (!sesi.length) return null
+  // Minggu dihitung mundur dari hari ini, bukan dari kalender Senin-Minggu:
+  // yang ditanya adalah "tujuh hari terakhir", dan bukan "sejak Senin".
   const minggu: { mulai: string; km: number; menit: number }[] = []
   for (let i = jumlahMinggu - 1; i >= 0; i--) {
     const akhir = sekarang - i * 7 * HARI
@@ -122,6 +149,14 @@ export function volumeMingguan(sesi: ImportedWorkout[], jumlahMinggu = 8, sekara
   return { minggu, rataKm: rataY, trenKmPerMinggu: bawah === 0 ? 0 : atas / bawah }
 }
 
+// ── 4. Perkiraan waktu lomba ───────────────────────────────────────────────
+//
+// Riegel (1981), Runner's World — T2 = T1 x (D2/D1)^1,06. Eksponen 1,06 berasal
+// dari pencocokan terhadap rekor dunia dan cenderung TERLALU OPTIMIS untuk
+// jarak yang jauh lebih panjang daripada yang pernah ditempuh: memperkirakan
+// maraton dari 5 km biasanya meleset beberapa menit, dan meleset ke arah yang
+// membuat orang berangkat terlalu cepat.
+
 export const RIEGEL_EKSPONEN = 1.06
 
 export interface Perkiraan {
@@ -146,10 +181,19 @@ export function perkiraanRiegel(dariKm: number, dariDetik: number): Perkiraan | 
       km: t.km,
       label: t.label,
       detik: dariDetik * Math.pow(t.km / dariKm, RIEGEL_EKSPONEN),
+      // Ditandai bila jaraknya lebih dari dua kali lipat yang pernah ditempuh.
       jauh: t.km > dariKm * 2,
     })),
   }
 }
+
+// ACWR TIDAK DIHITUNG DI BERKAS INI. Ia sudah ada sebagai lajuBeban() di
+// analisisPro.ts, lengkap dengan penanganan riwayat pendek dan keterangan
+// bahwa rentang 0,8-1,3 masih diperdebatkan. Menulis ulang perhitungan yang
+// sama di dua tempat adalah cara paling pasti membuat dua angka berbeda muncul
+// untuk data yang sama - itu sudah pernah terjadi di proyek ini.
+
+// ── 6. Sebaran intensitas per minggu ───────────────────────────────────────
 
 export interface MingguSebaran {
   mulai: string
