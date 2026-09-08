@@ -37,9 +37,6 @@ const context = await browser.newContext({
   hasTouch: true,
 })
 
-// Shell intentionally sends anonymous visitors to the public welcome page.
-// Seed the same remembered-session format used by StoreProvider so this smoke
-// exercises the authenticated Body Explorer without weakening the auth guard.
 await context.addInitScript(() => {
   const account = {
     email: 'body3d-qa@localhost.test',
@@ -88,6 +85,33 @@ async function capturePng(clip = null) {
   }
 }
 
+async function captureFrameSignature(canvas) {
+  return withTimeout(canvas.evaluate((node) => {
+    const c = node
+    const gl = c.getContext('webgl2') || c.getContext('webgl')
+    if (!gl) throw new Error('Body3D renderer canvas did not expose its WebGL context')
+
+    const width = gl.drawingBufferWidth
+    const height = gl.drawingBufferHeight
+    if (!width || !height) throw new Error('Body3D WebGL drawing buffer is empty')
+
+    const points = [
+      [0.25, 0.25], [0.5, 0.25], [0.75, 0.25],
+      [0.25, 0.5], [0.5, 0.5], [0.75, 0.5],
+      [0.25, 0.75], [0.5, 0.75], [0.75, 0.75],
+    ]
+    const bytes = new Uint8Array(points.length * 4)
+    points.forEach(([nx, ny], index) => {
+      const pixel = new Uint8Array(4)
+      const x = Math.max(0, Math.min(width - 1, Math.round((width - 1) * nx)))
+      const y = Math.max(0, Math.min(height - 1, Math.round((height - 1) * ny)))
+      gl.readPixels(x, y, 1, 1, gl.RGBA, gl.UNSIGNED_BYTE, pixel)
+      bytes.set(pixel, index * 4)
+    })
+    return Array.from(bytes).join(',')
+  }), 'Body3D framebuffer signature', 5_000)
+}
+
 async function captureViewport() {
   await writeFile(screenshotPath, await capturePng())
   screenshotCaptured = true
@@ -109,15 +133,9 @@ try {
   const response = await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 45_000 })
   if (response && !response.ok()) throw new Error(`Body Explorer returned HTTP ${response.status()}`)
 
-  // Dismiss normal, user-facing first-run surfaces only through their own UI.
-  // This keeps the test representative: no CSS hiding and no production state
-  // mutation beyond the disposable login session above.
   await dismissIfVisible(page.getByRole('button', { name: /Get Started/i }).first())
   await dismissIfVisible(page.getByRole('button', { name: /Maybe later/i }).first())
 
-  // The daily reminder is dismissible and can float over the top of the viewer.
-  // Close it only if the reminder is actually present. Prefer a button inside
-  // the reminder container rather than clicking arbitrary × buttons elsewhere.
   const reminderText = page.getByText(/TODAY.?S REMINDER/i).first()
   if (await reminderText.isVisible().catch(() => false)) {
     const reminder = reminderText.locator('xpath=ancestor::*[.//button][1]')
@@ -125,14 +143,10 @@ try {
     if (await close.isVisible().catch(() => false)) await close.click()
   }
 
-  // Do not use the first canvas on the page: other visual components may own
-  // canvases too. Body3D mounts its renderer directly inside this unique
-  // touch-none viewer container.
   const canvas = page.locator('div.h-full.w-full.touch-none > canvas').first()
   await canvas.waitFor({ state: 'visible', timeout: 45_000 })
   await canvas.scrollIntoViewIfNeeded()
 
-  // Give Skeleton + Muscles time to enter loading, then require them to settle.
   await page.waitForTimeout(1_500)
   await page.getByText('Loading anatomy…').waitFor({ state: 'hidden', timeout: 120_000 })
 
@@ -181,12 +195,9 @@ try {
     throw new Error(`Page overflows horizontally: ${metrics.documentScrollWidth}px > ${metrics.viewport.width}px`)
   }
 
-  // Exercise OrbitControls and prove the compositor surface actually changes.
-  // This verifies the demand-render path, rather than merely dispatching a drag
-  // that could be swallowed by an overlay or render no new frame.
   const box = await canvas.boundingBox()
   if (!box) throw new Error('Body3D canvas has no measurable bounding box')
-  const beforeOrbit = await capturePng(box)
+  const beforeOrbit = await captureFrameSignature(canvas)
   const x = box.x + box.width * 0.5
   const y = box.y + box.height * 0.45
   await page.mouse.move(x, y)
@@ -194,20 +205,13 @@ try {
   await page.mouse.move(x + Math.min(48, box.width * 0.15), y + 18, { steps: 6 })
   await page.mouse.up()
   await page.waitForTimeout(300)
-  const afterOrbit = await capturePng(box)
-  metrics.orbitChangedFrame = !beforeOrbit.equals(afterOrbit)
-  if (!metrics.orbitChangedFrame) throw new Error('Orbit drag did not produce a new Body3D compositor frame')
+  const afterOrbit = await captureFrameSignature(canvas)
+  metrics.orbitChangedFrame = beforeOrbit !== afterOrbit
+  if (!metrics.orbitChangedFrame) throw new Error('Orbit drag did not produce a new Body3D framebuffer sample')
 
-  // Preserve the canonical Body3D screenshot before navigating deeper into the
-  // precision lab. The second screenshot below captures the motion inspector.
   await captureViewport()
   if (!screenshotCaptured) throw new Error('Body3D mobile visual evidence was not captured')
 
-  // Feature-level regression: open the exact UI path a user follows to reach
-  // whole-body biomechanics, select a real joint profile, change the educational
-  // ROM control, then push that selection back into the shared evidence-bearing
-  // Body3D viewer. The slider itself must remain a readout control; it never
-  // deforms anatomy or claims patient-specific tissue force.
   const precisionTab = page.getByRole('button', { name: 'Whole-body precision', exact: true })
   await precisionTab.click()
   await page.getByText('Panacea · Whole-body precision atlas', { exact: true }).waitFor({ state: 'visible', timeout: 20_000 })
@@ -220,25 +224,21 @@ try {
 
   await canvas.scrollIntoViewIfNeeded()
   await page.waitForTimeout(250)
-  const beforeJointBox = await canvas.boundingBox()
-  if (!beforeJointBox) throw new Error('Body3D canvas became unavailable before joint selection')
-  const beforeJointSelection = await capturePng(beforeJointBox)
+  const beforeJointSelection = await captureFrameSignature(canvas)
 
   const kneeButton = inspector.getByRole('button', { name: 'Knee', exact: true })
   await kneeButton.click()
   await page.waitForTimeout(350)
   await canvas.scrollIntoViewIfNeeded()
   await page.waitForTimeout(350)
-  const afterJointBox = await canvas.boundingBox()
-  if (!afterJointBox) throw new Error('Body3D canvas became unavailable after joint selection')
-  const afterJointSelection = await capturePng(afterJointBox)
+  const afterJointSelection = await captureFrameSignature(canvas)
   metrics.wholeBodyMotion = {
     precisionOpened: true,
     kneeSelected: true,
-    jointSelectionChangedFrame: !beforeJointSelection.equals(afterJointSelection),
+    jointSelectionChangedFrame: beforeJointSelection !== afterJointSelection,
   }
   if (!metrics.wholeBodyMotion.jointSelectionChangedFrame) {
-    throw new Error('Selecting the Knee profile did not update the shared Body3D frame')
+    throw new Error('Selecting the Knee profile did not update the shared Body3D framebuffer sample')
   }
 
   await inspector.scrollIntoViewIfNeeded()
