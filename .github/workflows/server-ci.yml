@@ -67,6 +67,8 @@ jobs:
         run: npm run uji:satusehat
       - name: Test health webhook ingestion
         run: npm run uji:health-webhook
+      - name: Test Open Food Facts adapter
+        run: npm run uji:open-food-facts
       - name: Runtime smoke-test genomics control plane
         env:
           JWT_SECRET: ci-only-panacea-genomics-secret
