@@ -40,6 +40,31 @@ export function setDemo(patch: Partial<Demo>): Demo {
   return next
 }
 
+/**
+ * Merge ONLY values that truly exist into the persisted profile.
+ *
+ * This is intentionally different from setDemo(): getDemo() contains neutral
+ * calculator defaults. Using it during device sync would persist age 30,
+ * weight 70 and height 170 as if the user/device had actually supplied them.
+ */
+export function mergeDemoStored(patch: Partial<Demo>, source = 'profile-sync'): Partial<Demo> {
+  const clean: Partial<Demo> = {}
+  for (const [key, value] of Object.entries(patch) as [keyof Demo, Demo[keyof Demo]][]) {
+    if (key === 'sex') {
+      if (value === 'M' || value === 'F') clean.sex = value
+      continue
+    }
+    if (typeof value === 'number' && Number.isFinite(value) && value > 0) {
+      ;(clean as Record<string, unknown>)[key] = value
+    }
+  }
+  if (!Object.keys(clean).length) return getDemoTersimpan()
+  const next = { ...getDemoTersimpan(), ...clean }
+  try { localStorage.setItem(KEY, JSON.stringify(next)) } catch { /* ignore */ }
+  broadcastHealthUpdate(['profile'], source)
+  return next
+}
+
 // ── Health Profile bridge ────────────────────────────────────────────────────
 // The central Health Profile (/health-data) is the source of truth for
 // biometrics. These helpers let calculators know when a value was prefilled
@@ -64,7 +89,7 @@ export function pushBiometrics(patch: { vo2max?: number; restingHr?: number; hrv
   const clean = Object.fromEntries(Object.entries(patch).filter(([, v]) => typeof v === 'number' && v > 0))
   if (!Object.keys(clean).length) return
   try { localStorage.setItem(HP_KEY, JSON.stringify({ ...getHealthCache(), ...clean })) } catch { /* ignore */ }
-  setDemo(clean as Partial<Demo>)
+  mergeDemoStored(clean as Partial<Demo>, 'biometric-edit')
 }
 
 /**
