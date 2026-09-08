@@ -51,6 +51,12 @@ async function waitForInputValue(locator, expected, tolerance = 0.005, timeout =
   }
   throw new Error(`Timed out waiting for input value ${expected}`)
 }
+async function clickScrolled(locator, container) {
+  await container.scrollIntoViewIfNeeded()
+  await locator.scrollIntoViewIfNeeded()
+  await page.waitForTimeout(120)
+  await locator.click({ timeout: 15_000 })
+}
 
 const metrics = {
   viewport: null,
@@ -122,28 +128,33 @@ try {
   // Prove the surgery presets mutate the SHARED Body3D state above, rather than
   // only toggling local simulator UI. Existing Body Explorer controls are used
   // as the observable state contract: CT/plane active classes, slice slider,
-  // and the shared Unfold slider.
+  // and the shared Unfold slider. On 390x844, scroll each preset into the
+  // viewport explicitly before clicking; do not force the click.
   const correlation = simulator.locator('[data-surgery-correlation="shared-body3d"]')
   await correlation.waitFor({ state: 'visible', timeout: 10_000 })
+  const axialPreset = correlation.getByRole('button', { name: 'Axial CT', exact: true })
+  const coronalPreset = correlation.getByRole('button', { name: 'Coronal CT', exact: true })
+  const sagittalPreset = correlation.getByRole('button', { name: 'Sagittal CT', exact: true })
+  const explodedPreset = correlation.getByRole('button', { name: 'Exploded 3D', exact: true })
 
-  await correlation.getByRole('button', { name: 'Axial CT', exact: true }).click()
+  await clickScrolled(axialPreset, correlation)
   await waitForClass(page.getByRole('button', { name: 'CT', exact: true }).first(), 'bg-white')
   await waitForClass(page.getByRole('button', { name: 'Axial', exact: true }).first(), 'bg-brand')
   const sliceLevel = page.getByRole('slider', { name: 'Slice level', exact: true })
   metrics.caesareanSlicePos = await waitForInputValue(sliceLevel, 0.52)
   metrics.axialSharedBody3d = true
 
-  await correlation.getByRole('button', { name: 'Coronal CT', exact: true }).click()
+  await clickScrolled(coronalPreset, correlation)
   await waitForClass(page.getByRole('button', { name: 'Coronal', exact: true }).first(), 'bg-brand')
   await waitForInputValue(sliceLevel, 0.5)
   metrics.coronalSharedBody3d = true
 
-  await correlation.getByRole('button', { name: 'Sagittal CT', exact: true }).click()
+  await clickScrolled(sagittalPreset, correlation)
   await waitForClass(page.getByRole('button', { name: 'Sagittal', exact: true }).first(), 'bg-brand')
   await waitForInputValue(sliceLevel, 0.5)
   metrics.sagittalSharedBody3d = true
 
-  await correlation.getByRole('button', { name: 'Exploded 3D', exact: true }).click()
+  await clickScrolled(explodedPreset, correlation)
   await waitForClass(page.getByRole('button', { name: 'Anatomy', exact: true }).first(), 'bg-white')
   metrics.explodedSharedBody3d = true
 
@@ -170,12 +181,9 @@ try {
 
   const transseptalCorrelation = simulator.locator('[data-surgery-correlation="shared-body3d"]')
   const transseptalAxial = transseptalCorrelation.getByRole('button', { name: 'Axial CT', exact: true })
-  // On a 390x844 viewport the correlation controls sit below the atlas after a
-  // scenario swap. Navigate to the control as a touch user would before the
-  // click; all shared-state assertions below remain unchanged.
-  await transseptalCorrelation.scrollIntoViewIfNeeded()
-  await transseptalAxial.scrollIntoViewIfNeeded()
-  await transseptalAxial.click()
+  // Scenario swaps can move the correlation controls below the fold. Reuse the
+  // same explicit mobile scroll path before the real click.
+  await clickScrolled(transseptalAxial, transseptalCorrelation)
   await waitForClass(page.getByRole('button', { name: 'CT', exact: true }).first(), 'bg-white')
   await waitForClass(page.getByRole('button', { name: 'Axial', exact: true }).first(), 'bg-brand')
   metrics.transseptalSlicePos = await waitForInputValue(page.getByRole('slider', { name: 'Slice level', exact: true }), 0.72)
