@@ -30,6 +30,7 @@
     "uji:product-atc": "tsx uji/productAtcCrosswalk.uji.ts",
     "uji:health-webhook-repro": "tsx uji/healthWebhookRepro.uji.ts",
     "uji:health-webhook": "tsx uji/healthWebhook.uji.ts && tsx uji/healthWebhookRepro.uji.ts",
+    "uji:lingkungan": "tsx uji/lingkungan.uji.ts",
     "uji:open-food-facts": "tsx uji/lingkungan.uji.ts",
     "uji:open-meteo": "tsx uji/openMeteo.uji.ts",
     "uji:connect-privacy": "tsx uji/connectPrivacy.uji.ts",
@@ -37,7 +38,7 @@
   },
   "dependencies": {
     "cookie-parser": "^1.4.7",
-    "cors": "^2.8.5",
+    "cors": "^2.8.17",
     "dotenv": "^16.4.5",
     "express": "^4.21.0",
     "express-rate-limit": "^8.6.0",
