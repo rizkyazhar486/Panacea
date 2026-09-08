@@ -291,7 +291,14 @@ export function Tumpukan({ judul, anak, aksi }: { judul?: string; anak: WidgetIt
               aria-hidden={aktifItem?.i !== i}
             >
               {i < siap ? (
-                <Suspense fallback={<div className="min-h-[120px]" aria-hidden />}>
+                <Suspense
+                  fallback={
+                    <div className="widget-instrument-loading-v29" role="status" aria-live="polite">
+                      <span className="widget-instrument-loading-orb-v29" aria-hidden />
+                      <span>Preparing {metaFor(a.kunci).name}…</span>
+                    </div>
+                  }
+                >
                   {a.isi}
                 </Suspense>
               ) : null}
