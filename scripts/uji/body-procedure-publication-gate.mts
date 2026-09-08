@@ -3,7 +3,9 @@ import { BODY_PROJECTION_TARGETS, PROCEDURE_PROJECTION_TARGETS } from '../../src
 import { evaluateBodyProcedurePublication, type BodyProcedureEvidenceRecord } from '../../src/lib/bodyProcedurePublicationGate.ts'
 
 const appendectomy = PROCEDURE_PROJECTION_TARGETS.find((procedure) => procedure.id === 'appendectomy')
+const digestive = BODY_PROJECTION_TARGETS.find((target) => target.id === 'digestive-core')
 assert.ok(appendectomy)
+assert.ok(digestive)
 
 const reviewed: BodyProcedureEvidenceRecord = {
   id: 'appendectomy-education-evidence',
@@ -86,8 +88,35 @@ const wrongCoverage = evaluateBodyProcedurePublication(appendectomy, BODY_PROJEC
 assert.equal(wrongCoverage.publishable, false)
 assert.ok(wrongCoverage.reasons.some((reason) => reason.includes('target coverage')))
 
+const duplicateEvidenceTargets = evaluateBodyProcedurePublication(appendectomy, BODY_PROJECTION_TARGETS, {
+  ...reviewed,
+  targetIds: [...reviewed.targetIds, reviewed.targetIds[0]],
+})
+assert.equal(duplicateEvidenceTargets.publishable, false)
+assert.ok(duplicateEvidenceTargets.reasons.some((reason) => reason.includes('duplicate target ids')))
+
+const duplicateContract = { ...appendectomy, anatomyTargetIds: [...appendectomy.anatomyTargetIds, appendectomy.anatomyTargetIds[0]] }
+const duplicateContractEvidence = { ...reviewed, targetIds: [...duplicateContract.anatomyTargetIds] }
+const duplicateContractDecision = evaluateBodyProcedurePublication(duplicateContract, BODY_PROJECTION_TARGETS, duplicateContractEvidence)
+assert.equal(duplicateContractDecision.publishable, false)
+assert.ok(duplicateContractDecision.reasons.some((reason) => reason.includes('duplicate anatomy target ids')))
+
+const nonProcedureDigestive = { ...digestive, kinds: digestive.kinds.filter((kind) => kind !== 'procedure') }
+const targetWithoutProcedurePermission = evaluateBodyProcedurePublication(
+  appendectomy,
+  BODY_PROJECTION_TARGETS.map((target) => target.id === digestive.id ? nonProcedureDigestive : target),
+  reviewed,
+)
+assert.equal(targetWithoutProcedurePermission.publishable, false)
+assert.ok(targetWithoutProcedurePermission.reasons.some((reason) => reason.includes('does not permit procedure projection')))
+
+const crossSystemOnlyProcedure = { ...appendectomy, system: 'cardiovascular' as const }
+const crossSystemOnly = evaluateBodyProcedurePublication(crossSystemOnlyProcedure, BODY_PROJECTION_TARGETS, reviewed)
+assert.equal(crossSystemOnly.publishable, false)
+assert.ok(crossSystemOnly.reasons.some((reason) => reason.includes('procedure system')))
+
 const wrongProcedure = evaluateBodyProcedurePublication(appendectomy, BODY_PROJECTION_TARGETS, { ...reviewed, procedureId: 'cholecystectomy' })
 assert.equal(wrongProcedure.publishable, false)
 assert.ok(wrongProcedure.reasons.some((reason) => reason.includes('normalized procedure target')))
 
-console.log('Body procedure publication gate: immutable provenance, normalized targets, explicit AI disclosure, qualified review, and forbidden operative-detail boundaries verified.')
+console.log('Body procedure publication gate: immutable provenance, target-contract integrity, explicit AI disclosure, qualified review, and forbidden operative-detail boundaries verified.')
