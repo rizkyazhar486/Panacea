@@ -5,6 +5,7 @@ import { WHOLE_BODY_CORE_STRUCTURES } from './catalog'
 import { AnatomyGraph } from './graph'
 import { RESPIRATORY_RELATIONS, RESPIRATORY_STRUCTURES } from './respiratoryAtlas'
 import { AnatomyResolver } from './resolver'
+import { buildMeasuredAtlasLoadPlan, compileAtlasSources } from './sourceCompiler'
 import type { AnatomyAssetRecord, AnatomyRelation, AnatomyResolveContext, AnatomyStructure, AtlasLoadContext, AtlasValidationIssue, AtlasValidationReport } from './types'
 
 export const WHOLE_BODY_STRUCTURES: readonly AnatomyStructure[] = [
@@ -40,6 +41,29 @@ export class WholeBodyAtlasEngine {
   descendants(id: string) { return this.graph.descendants(id) }
   neighbors(id: string, types?: Parameters<AnatomyGraph['neighbors']>[1]) { return this.graph.neighbors(id, types) }
   buildLoadPlan(context: AtlasLoadContext) { return buildAtlasLoadPlan(this.assets, context) }
+
+  /**
+   * Compile semantic structures and logical asset groups against the exact
+   * named nodes indexed from the shipped GLB bundles. The result is suitable
+   * for QA, performance planning, and renderer scheduling; it is not a medical
+   * probability or patient-specific localization surface.
+   */
+  compileSources() {
+    return compileAtlasSources(this.structures, this.assets)
+  }
+
+  sourceCoverageFor(structureId: string) {
+    return this.compileSources().structures.find((entry) => entry.structure.id === structureId) ?? null
+  }
+
+  /**
+   * Variant of the logical load planner that substitutes measured/indexed
+   * triangle cost when source geometry can be resolved. Clinical focus only
+   * changes graphics priority and never anatomy identity.
+   */
+  buildMeasuredLoadPlan(context: AtlasLoadContext) {
+    return buildMeasuredAtlasLoadPlan(this.compileSources(), context)
+  }
 
   assetsFor(structureIds: readonly string[]) {
     const requested = new Set(structureIds)
