@@ -27,7 +27,7 @@ export type BodyHighEndCapability =
   | 'adaptive-lod'
   | 'triangle-budget-residency'
   | 'layer-streaming-budget'
-  | 'cryptographic-local-asset-provenance'
+  | 'cryptographic-local-asset-identity'
   | 'respiratory-compartment-atlas'
   | 'airway-generation-index'
   | 'explicit-coverage-gaps'
@@ -37,20 +37,22 @@ export type BodyHighEndCapability =
 export interface BodyHighEndAtlasContract {
   id: 'panacea-whole-body-high-end-v1'
   benchmarkReferenceIds: readonly ['thebuggeddev_anatomy', 'thebuggeddev_breath_atlas']
-  runtimeAssetPolicy: 'local-reviewed-assets-only'
+  runtimeAssetPolicy: 'local-assets-reference-until-provenance-reviewed'
   renderLayerCount: 7
   respiratoryCompartmentCount: 7
   capabilities: readonly BodyHighEndCapability[]
   mandatoryInteractions: typeof BODY_REFERENCE_INTERACTION_REQUIREMENTS
   externalAssetImportAllowed: false
   patientSpecificBreathingModel: false
+  verifiedBiomedicalAssetPublicationAllowed: false
+  assetLevelProvenanceComplete: false
   highFidelityCaptureLongEdgePx: 5120
 }
 
 export const BODY_HIGH_END_ATLAS_CONTRACT: BodyHighEndAtlasContract = {
   id: 'panacea-whole-body-high-end-v1',
   benchmarkReferenceIds: ['thebuggeddev_anatomy', 'thebuggeddev_breath_atlas'],
-  runtimeAssetPolicy: 'local-reviewed-assets-only',
+  runtimeAssetPolicy: 'local-assets-reference-until-provenance-reviewed',
   renderLayerCount: 7,
   respiratoryCompartmentCount: 7,
   capabilities: [
@@ -61,7 +63,7 @@ export const BODY_HIGH_END_ATLAS_CONTRACT: BodyHighEndAtlasContract = {
     'adaptive-lod',
     'triangle-budget-residency',
     'layer-streaming-budget',
-    'cryptographic-local-asset-provenance',
+    'cryptographic-local-asset-identity',
     'respiratory-compartment-atlas',
     'airway-generation-index',
     'explicit-coverage-gaps',
@@ -71,9 +73,20 @@ export const BODY_HIGH_END_ATLAS_CONTRACT: BodyHighEndAtlasContract = {
   mandatoryInteractions: BODY_REFERENCE_INTERACTION_REQUIREMENTS,
   externalAssetImportAllowed: false,
   patientSpecificBreathingModel: false,
+  verifiedBiomedicalAssetPublicationAllowed: false,
+  assetLevelProvenanceComplete: false,
   highFidelityCaptureLongEdgePx: 5120,
 }
 
+/**
+ * Technical high-end atlas readiness is deliberately distinct from biomedical
+ * publication readiness. A Git blob SHA proves the checked-in bytes are
+ * addressable and stable inside this repository; it does not prove upstream
+ * source identity, asset-level licensing, transformation lineage, or qualified
+ * anatomical review. Until those records exist for every runtime atlas asset,
+ * the atlas may operate as an explicitly reference/teaching experience but the
+ * contract must not claim verified biomedical asset provenance.
+ */
 export function validateBodyHighEndAtlasContract() {
   const reasons: string[] = []
   const mandatoryReferences = validateBodyMandatoryReferenceSources()
@@ -95,13 +108,15 @@ export function validateBodyHighEndAtlasContract() {
 
   if (BODY_HIGH_END_ATLAS_CONTRACT.externalAssetImportAllowed) reasons.push('High-end atlas contract must not enable external benchmark asset import.')
   if (BODY_HIGH_END_ATLAS_CONTRACT.patientSpecificBreathingModel) reasons.push('Generic Breath Atlas visualization must not masquerade as a patient-specific breathing model.')
+  if (BODY_HIGH_END_ATLAS_CONTRACT.assetLevelProvenanceComplete) reasons.push('Asset-level provenance must remain pending until exact source/revision/license/transformation records exist for every runtime atlas asset.')
+  if (BODY_HIGH_END_ATLAS_CONTRACT.verifiedBiomedicalAssetPublicationAllowed) reasons.push('Verified biomedical atlas publication must remain blocked while asset-level provenance and qualified review are incomplete.')
   if (BODY_HIGH_END_ATLAS_CONTRACT.highFidelityCaptureLongEdgePx !== BODY_HIGH_FIDELITY_REFERENCE_TIER.longEdgePx) {
     reasons.push('High-end capture tier must stay aligned with the mandatory 5K reference contract.')
   }
 
   const layerCount = Object.keys(BODY_ATLAS_LAYER_FILES).length
   if (layerCount !== BODY_HIGH_END_ATLAS_CONTRACT.renderLayerCount) reasons.push(`Expected ${BODY_HIGH_END_ATLAS_CONTRACT.renderLayerCount} whole-body render layers; found ${layerCount}.`)
-  if (BODY_ATLAS_ASSET_MANIFEST.length !== layerCount) reasons.push('Every whole-body render layer must have one provenance-pinned local asset.')
+  if (BODY_ATLAS_ASSET_MANIFEST.length !== layerCount) reasons.push('Every whole-body render layer must have one local asset identity record.')
   if (BODY_ATLAS_GRAPH.stats.nodeCount <= 0) reasons.push('Whole-body source graph must contain actual named source meshes.')
   if (BODY_RESPIRATORY_ATLAS.compartments.length !== BODY_HIGH_END_ATLAS_CONTRACT.respiratoryCompartmentCount) reasons.push('Respiratory compartment contract is incomplete.')
 
@@ -116,7 +131,7 @@ export function validateBodyHighEndAtlasContract() {
     'stable-source-node-identity',
     'fail-closed-search',
     'adaptive-lod',
-    'cryptographic-local-asset-provenance',
+    'cryptographic-local-asset-identity',
     'respiratory-compartment-atlas',
     'explicit-coverage-gaps',
     '5k-reference-capture',

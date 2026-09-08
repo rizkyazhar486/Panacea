@@ -34,8 +34,24 @@ assert.match(browser, /not evidence that an anatomical structure is absent/i)
 assert.doesNotMatch(browser, /iframe/i)
 assert.doesNotMatch(browser, /fetch\s*\(/i)
 
+// Structural peer visualization must use only explicit graph edges and exact
+// source-file/source-name identity. It must not turn the engineering graph into
+// an unsupported anatomical-neighborhood claim.
+assert.match(browser, /import \{ BODY_ATLAS_GRAPH \} from '\.\.\/\.\.\/lib\/bodyAtlasGraph'/)
+assert.match(browser, /node\.sourceFile === selectedResult\.file && node\.sourceName === selectedResult\.name/)
+assert.match(browser, /for \(const edge of BODY_ATLAS_GRAPH\.edges\)/)
+assert.match(browser, /edge\.source === selectedGraphNode\.id/)
+assert.match(browser, /edge\.target === selectedGraphNode\.id/)
+assert.match(browser, /edge\.kind/)
+assert.match(browser, /Structural peers/)
+assert.match(browser, /contralateral/)
+assert.match(browser, /same structure/)
+assert.match(browser, /They are not anatomical adjacency, innervation, vascular territory, surgical safety, or biomechanical coupling\./)
+assert.doesNotMatch(browser, /safe surgical path/i)
+assert.doesNotMatch(browser, /injury risk/i)
+
 assert.match(lab, /import ZAnatomySourceMeshBrowser from '\.\/ZAnatomySourceMeshBrowser'/)
 assert.match(lab, /<ZAnatomySourceMeshBrowser onHighlight=\{onHighlight\} onFocusRegion=\{onFocusRegion\} onEnableLayer=\{onEnableLayer\} \/>/)
 assert.match(lab, /<ZAnatomyAtlasWorkbench onHighlight=\{onHighlight\} onFocusRegion=\{onFocusRegion\} onEnableLayer=\{onEnableLayer\} \/>/)
 
-console.log('Z-Anatomy source mesh browser stays bounded, provenance-aware, exact-node routed, module-compatible, and mounted beside the curated workbench.')
+console.log('Z-Anatomy source mesh browser stays bounded, provenance-aware, exact-node routed, explicit-graph constrained, module-compatible, and mounted beside the curated workbench.')
