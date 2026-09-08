@@ -140,14 +140,21 @@ async function searchOntology(
     }))
 }
 
-// CTSS mengembalikan bentuk larik-tetap yang sama di semua tabelnya:
-// [jumlahTotal, kodeArray, dataTambahan|null, tampilanArray]. Diparse defensif
-// karena bentuk response eksternal tetap harus dianggap untrusted input.
-type CtssResponse = [number, string[], unknown, string[]]
+// CTSS mengembalikan bentuk larik-tetap:
+// [jumlahTotal, kodeArray, dataTambahan|null, tampilanArray]. Tiap elemen pada
+// tampilanArray secara resmi merupakan array dari field display yang diminta.
+// Parser tetap menerima scalar sebagai fallback defensif bila format upstream
+// berubah, tetapi tidak mengasumsikan string[] flat.
+type CtssResponse = [number, unknown[], unknown, unknown[]]
 
 type CtssTableConfig =
   | { table: 'conditions'; ontology: 'nlm-conditions'; identifierSystem: 'NLM_CONDITIONS_KEY'; displayField: 'primary_name' }
   | { table: 'hpo'; ontology: 'hp'; identifierSystem: 'HP'; displayField: 'name' }
+
+function ctssDisplayLabel(value: unknown): string {
+  if (Array.isArray(value)) return String(value[0] ?? '').trim()
+  return String(value ?? '').trim()
+}
 
 async function searchCtss(
   query: string,
@@ -164,7 +171,7 @@ async function searchCtss(
   const display = Array.isArray(data[3]) ? data[3] : []
   const out: OntologyTerm[] = []
   for (let i = 0; i < Math.min(codes.length, display.length); i++) {
-    const label = String(display[i] ?? '').trim()
+    const label = ctssDisplayLabel(display[i])
     const code = String(codes[i] ?? '').trim()
     if (!label) continue
     out.push({
