@@ -193,9 +193,6 @@ try {
     throw new Error(`Additional layer loading blocks or covers the Body3D viewer center: ${JSON.stringify(metrics.progressiveLoadingGeometry)}`)
   }
 
-  // Prove the already-usable viewer remains interactive while an optional layer
-  // is still loading. This is stronger than relying on elementFromPoint alone,
-  // which can report legitimate nested viewer overlays rather than the canvas.
   const progressiveBox = await canvas.boundingBox()
   if (!progressiveBox) throw new Error('Body3D canvas has no bounding box during progressive loading')
   const progressiveX = progressiveBox.x + progressiveBox.width * 0.5
@@ -217,9 +214,6 @@ try {
   await assertNoFatal('Progressive layer interaction triggered a Body3D fatal state')
   await progressiveLoading.waitFor({ state: 'hidden', timeout: 120_000 })
 
-  // Runtime interaction proof: perform a real orbit gesture, then require the
-  // same WebGL canvas/context to remain healthy and unobstructed. The source
-  // invariant test separately guarantees OrbitControls change -> requestRender.
   const box = await canvas.boundingBox()
   if (!box) throw new Error('Body3D canvas has no measurable bounding box')
   const x = box.x + box.width * 0.5

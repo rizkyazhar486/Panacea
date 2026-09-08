@@ -55,7 +55,7 @@ const evidence: BodyEvidenceMappingRecord = {
   sourceId: 'versioned-source',
   sourceVersion: '2026-record',
   citation: 'Version-pinned citation fixture',
-  sourceLocator: 'verified-source-record',
+  sourceLocator: 'test-fixture://body-publication-gate/cv-physiology-reference#heart',
   evidenceSummary: 'Generic physiology reference fixture without patient-specific inference.',
   mappedAnatomyTerms: ['heart'],
   locationInferredFromFreeText: false,
