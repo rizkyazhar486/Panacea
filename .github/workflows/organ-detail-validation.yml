@@ -1,0 +1,27 @@
+name: Organ Detail Validation
+
+on:
+  push:
+    branches:
+      - feat/body-exposure-organ-detail-20260908
+
+permissions:
+  contents: read
+
+jobs:
+  frontend:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - run: npm ci
+      - name: TypeScript
+        run: npx tsc --noEmit
+      - name: Production build
+        run: npm run build
+      - name: Deterministic tests
+        run: npm run uji
