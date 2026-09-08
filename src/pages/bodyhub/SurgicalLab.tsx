@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { URUTAN, WILAYAH, KEDALAMAN, type UrutanLapisan } from '../../lib/dissection'
 import { SURGICAL_SPATIAL_SCENARIOS } from '../../lib/surgicalSpatialTeaching'
+import SurgerySimulatorLab from './SurgerySimulatorLab'
 
 export interface SurgicalLabProps {
   onKedalaman?: (kedalaman: number) => void
@@ -36,6 +37,8 @@ export function SurgicalLab({ onKedalaman, onSorot }: SurgicalLabProps) {
 
   return (
     <div className="space-y-4">
+      <SurgerySimulatorLab onKedalaman={onKedalaman} onSorot={onSorot} />
+
       <div className="overflow-hidden rounded-2xl border border-neutral-200 bg-neutral-950 text-white dark:border-white/10">
         <div className="border-b border-white/10 bg-gradient-to-br from-brand/15 via-transparent to-blue-500/10 p-4">
           <div className="text-[10px] font-black uppercase tracking-[0.18em] text-brand">Spatial surgical anatomy</div>
