@@ -366,8 +366,10 @@ export function summarise(workouts: ImportedWorkout[], hrMax: number): WeeklySum
 }
 
 export function fmtDurasi(sec: number): string {
-  const h = Math.floor(sec / 3600)
-  const m = Math.round((sec % 3600) / 60)
+  if (!Number.isFinite(sec) || sec < 0) return '—'
+  const totalMenit = Math.round(sec / 60)
+  const h = Math.floor(totalMenit / 60)
+  const m = totalMenit % 60
   return h > 0 ? `${h}j ${m}m` : `${m} menit`
 }
 
