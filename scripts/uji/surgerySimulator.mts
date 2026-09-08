@@ -49,8 +49,9 @@ assert.equal(mandatoryReferenceRegistry.id, 'thebuggeddev_anatomy', 'Mandatory a
 assert.equal(mandatoryReferenceRegistry.license.status, 'CHECK_REQUIRED', 'Unverified upstream license must fail closed')
 assert.equal(mandatoryReferenceRegistry.license.commercialUse, 'UNKNOWN', 'Commercial reuse must not be inferred')
 assert.equal(mandatoryReferenceRegistry.usage.runtime, false, 'External reference must not become a silent runtime dependency')
-assert.equal(mandatoryReferenceRegistry.adapter.status, 'EXTERNAL_REFERENCE_ONLY', 'Adapter must remain reference-only until licensing is cleared')
-assert.equal(mandatoryReferenceRegistry.relatedSurfaces.length, 2, 'Repository and Breath Atlas surface must both remain registered')
+assert.equal(mandatoryReferenceRegistry.adapter.status, 'NOT_APPLICABLE', 'External reference must not acquire a runtime adapter before licensing/provenance clearance')
+assert.equal(mandatoryReferenceRegistry.repository, 'https://github.com/thebuggeddev/anatomy', 'Mandatory anatomy repository must stay registered')
+assert.equal(mandatoryReferenceRegistry.homepage, 'https://breath-atlas.thebuggeddev.chatgpt.site/', 'Breath Atlas surface must stay registered')
 
 assert.match(ui, /data-surgery-simulator="anatomy-grounded"/, 'Simulator root marker is required')
 assert.match(ui, /<AtlasViewer3D/, 'Simulator must use the verified atlas viewer')
