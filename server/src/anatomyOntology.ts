@@ -5,18 +5,19 @@
 //   - Human Disease Ontology (DOID) — pemetaan penyakit.
 //   - Human Phenotype Ontology (HP) — pemetaan gejala/fenotipe.
 //
-// DUA sumber, bukan satu — tidak bisa diuji langsung dari sandbox ini
-// (jaringan dibatasi), jadi alih-alih menebak satu sumber "yang benar" dan
-// berisiko keduanya diam-diam kosong, permintaannya dijalankan ke keduanya
-// SEKALIGUS dan hasilnya digabung:
+// DUA sumber, bukan satu:
 //   1. EBI OLS4 (Ontology Lookup Service) — layanan publik EMBL-EBI.
 //   2. NLM Clinical Table Search Service (CTSS) — layanan publik US National
-//      Library of Medicine, dipakai luas di sistem kesehatan AS, mengindeks
-//      tabel "conditions" (penyakit, dari MedlinePlus) dan "hpo" (fenotipe).
-// Kalau salah satu gagal atau kosong, sumber yang lain tetap mengisi
-// hasilnya — tidak lagi bergantung pada satu API saja.
+//      Library of Medicine, mengindeks tabel "conditions" dan "hpo".
+//
+// Penting: identifier tabel CTSS "conditions" adalah key internal NLM, BUKAN
+// DOID. Karena itu provenance dan identifier system dibawa eksplisit di tiap
+// term supaya aplikasi tidak pernah menyajikan identifier NLM sebagai Disease
+// Ontology ID.
 const OLS4_BASE = 'https://www.ebi.ac.uk/ols4/api/search'
 const CTSS_BASE = 'https://clinicaltables.nlm.nih.gov/api'
+
+type FetchLike = typeof fetch
 
 /**
  * Merapikan definisi ontologi untuk dibaca manusia.
@@ -85,10 +86,17 @@ export function urutkanRelevansi(terms: OntologyTerm[], kueri: string[]): Ontolo
     .map((x) => x.t)
 }
 
+export type OntologyName = 'doid' | 'hp' | 'uberon' | 'fma' | 'nlm-conditions'
+export type OntologySource = 'ebi-ols4' | 'nlm-ctss'
+export type OntologyIdentifierSystem = 'DOID' | 'HP' | 'UBERON' | 'FMA' | 'NLM_CONDITIONS_KEY'
+type OlsOntologyName = Exclude<OntologyName, 'nlm-conditions'>
+
 export interface OntologyTerm {
-  id: string // CURIE, mis. "DOID:9351" atau "HP:0001945"
+  id: string // CURIE bila tersedia; CTSS conditions memakai key internal NLM.
   label: string
-  ontology: 'doid' | 'hp' | 'uberon' | 'fma'
+  ontology: OntologyName
+  source: OntologySource
+  identifierSystem: OntologyIdentifierSystem
   description: string
   iri: string
 }
@@ -101,9 +109,21 @@ interface Ols4Doc {
   iri?: string
 }
 
-async function searchOntology(query: string, ontology: OntologyTerm['ontology'], rows = 5): Promise<OntologyTerm[]> {
+function identifierSystemForOls(ontology: OlsOntologyName): OntologyIdentifierSystem {
+  if (ontology === 'doid') return 'DOID'
+  if (ontology === 'hp') return 'HP'
+  if (ontology === 'uberon') return 'UBERON'
+  return 'FMA'
+}
+
+async function searchOntology(
+  query: string,
+  ontology: OlsOntologyName,
+  rows = 5,
+  fetchImpl: FetchLike = fetch,
+): Promise<OntologyTerm[]> {
   const url = `${OLS4_BASE}?q=${encodeURIComponent(query)}&ontology=${ontology}&rows=${rows}&exact=false`
-  const res = await fetch(url, { signal: AbortSignal.timeout(8000) })
+  const res = await fetchImpl(url, { signal: AbortSignal.timeout(8000) })
   if (!res.ok) throw new Error(`OLS4 ${ontology} search failed: ${res.status}`)
   const data = (await res.json()) as { response?: { docs?: Ols4Doc[] } }
   const docs = data.response?.docs ?? []
@@ -113,21 +133,37 @@ async function searchOntology(query: string, ontology: OntologyTerm['ontology'],
       id: d.obo_id as string,
       label: d.label as string,
       ontology,
+      source: 'ebi-ols4',
+      identifierSystem: identifierSystemForOls(ontology),
       description: rapikanDefinisi(d.description?.[0] ?? ''),
       iri: d.iri ?? '',
     }))
 }
 
-// CTSS mengembalikan bentuk larik-tetap yang sama di semua tabelnya:
-// [jumlahTotal, kodeArray, dataTambahan|null, tampilanArray]. Ditulis defensif
-// (Array.isArray di tiap langkah) karena bentuk persisnya tidak bisa
-// diverifikasi langsung dari sandbox ini — lebih baik kembali kosong daripada
-// melempar galat kalau satu field tidak seperti dugaan.
-type CtssResponse = [number, string[], unknown, string[]]
+// CTSS mengembalikan bentuk larik-tetap:
+// [jumlahTotal, kodeArray, dataTambahan|null, tampilanArray]. Tiap elemen pada
+// tampilanArray secara resmi merupakan array dari field display yang diminta.
+// Parser tetap menerima scalar sebagai fallback defensif bila format upstream
+// berubah, tetapi tidak mengasumsikan string[] flat.
+type CtssResponse = [number, unknown[], unknown, unknown[]]
 
-async function searchCtss(query: string, table: 'conditions' | 'hpo', ontology: 'doid' | 'hp', displayField: string): Promise<OntologyTerm[]> {
+type CtssTableConfig =
+  | { table: 'conditions'; ontology: 'nlm-conditions'; identifierSystem: 'NLM_CONDITIONS_KEY'; displayField: 'primary_name' }
+  | { table: 'hpo'; ontology: 'hp'; identifierSystem: 'HP'; displayField: 'name' }
+
+function ctssDisplayLabel(value: unknown): string {
+  if (Array.isArray(value)) return String(value[0] ?? '').trim()
+  return String(value ?? '').trim()
+}
+
+async function searchCtss(
+  query: string,
+  config: CtssTableConfig,
+  fetchImpl: FetchLike = fetch,
+): Promise<OntologyTerm[]> {
+  const { table, ontology, identifierSystem, displayField } = config
   const url = `${CTSS_BASE}/${table}/v3/search?terms=${encodeURIComponent(query)}&maxList=4&df=${displayField}`
-  const res = await fetch(url, { signal: AbortSignal.timeout(8000) })
+  const res = await fetchImpl(url, { signal: AbortSignal.timeout(8000) })
   if (!res.ok) throw new Error(`CTSS ${table} search failed: ${res.status}`)
   const data = (await res.json()) as CtssResponse
   if (!Array.isArray(data)) return []
@@ -135,13 +171,15 @@ async function searchCtss(query: string, table: 'conditions' | 'hpo', ontology: 
   const display = Array.isArray(data[3]) ? data[3] : []
   const out: OntologyTerm[] = []
   for (let i = 0; i < Math.min(codes.length, display.length); i++) {
-    const label = String(display[i] ?? '').trim()
+    const label = ctssDisplayLabel(display[i])
     const code = String(codes[i] ?? '').trim()
     if (!label) continue
     out.push({
       id: code || `NLM:${table}:${i}`,
       label,
       ontology,
+      source: 'nlm-ctss',
+      identifierSystem,
       description: '',
       iri: '',
     })
@@ -150,28 +188,40 @@ async function searchCtss(query: string, table: 'conditions' | 'hpo', ontology: 
 }
 
 /**
- * Mengambil istilah penyakit (DOID) DAN gejala (HP) sekaligus untuk satu atau
- * lebih kata kunci — dipanggil per region tubuh yang diklik (lihat
- * bodyRegions.ts di sisi klien untuk daftar kata kuncinya). Menjalankan EBI
- * OLS4 dan NLM CTSS SEKALIGUS untuk tiap kata kunci dan menggabung hasilnya,
- * bukan memilih satu lalu jatuh ke yang lain — supaya satu sumber yang
- * lambat/kosong tidak berarti hasilnya kosong sama sekali.
+ * Mengambil istilah penyakit DAN gejala sekaligus untuk satu atau lebih kata
+ * kunci — dipanggil per region tubuh yang diklik. EBI OLS4 dan NLM CTSS
+ * dijalankan sekaligus supaya satu sumber yang lambat/kosong tidak membuat
+ * seluruh grounding hilang. CTSS conditions tetap masuk bucket diseases,
+ * tetapi namespace identifier-nya tidak pernah dipalsukan sebagai DOID.
  */
-export async function anatomyOntologyLookup(terms: string[]): Promise<{ diseases: OntologyTerm[]; phenotypes: OntologyTerm[] }> {
+export async function anatomyOntologyLookup(
+  terms: string[],
+  fetchImpl: FetchLike = fetch,
+): Promise<{ diseases: OntologyTerm[]; phenotypes: OntologyTerm[] }> {
   const unik = [...new Set(terms.map((t) => t.trim()).filter(Boolean))].slice(0, 4)
   const hasil = await Promise.all(
     unik.flatMap((t) => [
-      searchOntology(t, 'doid', 4).catch(() => [] as OntologyTerm[]),
-      searchOntology(t, 'hp', 4).catch(() => [] as OntologyTerm[]),
-      searchCtss(t, 'conditions', 'doid', 'primary_name').catch(() => [] as OntologyTerm[]),
-      searchCtss(t, 'hpo', 'hp', 'name').catch(() => [] as OntologyTerm[]),
+      searchOntology(t, 'doid', 4, fetchImpl).catch(() => [] as OntologyTerm[]),
+      searchOntology(t, 'hp', 4, fetchImpl).catch(() => [] as OntologyTerm[]),
+      searchCtss(t, {
+        table: 'conditions',
+        ontology: 'nlm-conditions',
+        identifierSystem: 'NLM_CONDITIONS_KEY',
+        displayField: 'primary_name',
+      }, fetchImpl).catch(() => [] as OntologyTerm[]),
+      searchCtss(t, {
+        table: 'hpo',
+        ontology: 'hp',
+        identifierSystem: 'HP',
+        displayField: 'name',
+      }, fetchImpl).catch(() => [] as OntologyTerm[]),
     ]),
   )
   const diseases: OntologyTerm[] = []
   const phenotypes: OntologyTerm[] = []
   for (let i = 0; i < hasil.length; i++) {
-    // Urutan tiap 4: [doid-OLS4, hp-OLS4, doid-CTSS, hp-CTSS] — indeks genap
-    // masuk diseases, ganjil masuk phenotypes.
+    // Urutan tiap 4: [doid-OLS4, hp-OLS4, conditions-CTSS, hp-CTSS] — indeks
+    // genap masuk diseases, ganjil masuk phenotypes.
     const bucket = i % 2 === 0 ? diseases : phenotypes
     for (const term of hasil[i]) {
       if (!bucket.some((x) => x.label.toLowerCase() === term.label.toLowerCase())) bucket.push(term)
@@ -191,22 +241,21 @@ export async function anatomyOntologyLookup(terms: string[]): Promise<{ diseases
  * yang juga dilayani OLS4 tanpa API key:
  *
  *   - UBERON — ontologi anatomi lintas spesies.
- *   - FMA (Foundational Model of Anatomy) — ontologi anatomi manusia paling
- *     rinci yang tersedia bebas.
+ *   - FMA (Foundational Model of Anatomy) — ontologi anatomi manusia rinci.
  *
- * Ini menutup dua celah yang memang TIDAK ADA geometrinya di model 3D
- * Z-Anatomy/BodyParts3D (sudah diperiksa sampai tingkat koleksi, bukan
- * diasumsikan): organ reproduksi wanita (uterus, ovarium, tuba uterina,
- * serviks, vagina) dan struktur mikroskopik kulit (epidermis, dermis, folikel
- * rambut, kelenjar sebasea/keringat). Untuk keduanya, aplikasi kini punya
- * istilah anatomi nyata berikut definisinya, meski bentuk 3D-nya belum ada.
+ * Ini menyediakan semantic grounding untuk struktur yang belum tentu memiliki
+ * geometri 3D lokal. Metadata istilah tidak boleh dianggap sebagai bukti bahwa
+ * mesh yang sesuai sudah tersedia atau tervalidasi.
  */
-export async function anatomyStructureLookup(terms: string[]): Promise<OntologyTerm[]> {
+export async function anatomyStructureLookup(
+  terms: string[],
+  fetchImpl: FetchLike = fetch,
+): Promise<OntologyTerm[]> {
   const unik = [...new Set(terms.map((t) => t.trim()).filter(Boolean))].slice(0, 4)
   const hasil = await Promise.all(
     unik.flatMap((t) => [
-      searchOntology(t, 'uberon', 4).catch(() => [] as OntologyTerm[]),
-      searchOntology(t, 'fma', 4).catch(() => [] as OntologyTerm[]),
+      searchOntology(t, 'uberon', 4, fetchImpl).catch(() => [] as OntologyTerm[]),
+      searchOntology(t, 'fma', 4, fetchImpl).catch(() => [] as OntologyTerm[]),
     ]),
   )
   const out: OntologyTerm[] = []
