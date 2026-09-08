@@ -26,9 +26,6 @@ const context = await browser.newContext({
   hasTouch: true,
 })
 
-// Shell intentionally sends anonymous visitors to the public welcome page.
-// Seed the same remembered-session format used by StoreProvider so this smoke
-// exercises the authenticated Body Explorer without weakening the auth guard.
 await context.addInitScript(() => {
   const account = {
     email: 'body3d-qa@localhost.test',
@@ -43,8 +40,6 @@ await context.addInitScript(() => {
 })
 
 const page = await context.newPage()
-// Keep one normally-large optional layer in-flight long enough to prove that
-// progressive loading does not dim or cover anatomy that is already usable.
 await page.route('**/anatomy/cardio' + 'vascular.glb', async (route) => {
   await new Promise((resolve) => setTimeout(resolve, 4_000))
   await route.continue()
@@ -103,15 +98,9 @@ try {
   const response = await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 45_000 })
   if (response && !response.ok()) throw new Error(`Body Explorer returned HTTP ${response.status()}`)
 
-  // Dismiss normal, user-facing first-run surfaces only through their own UI.
-  // This keeps the test representative: no CSS hiding and no production state
-  // mutation beyond the disposable login session above.
   await dismissIfVisible(page.getByRole('button', { name: /Get Started/i }).first())
   await dismissIfVisible(page.getByRole('button', { name: /Maybe later/i }).first())
 
-  // The daily reminder is dismissible and can float over the top of the viewer.
-  // Close it only if the reminder is actually present. Prefer a button inside
-  // the reminder container rather than clicking arbitrary × buttons elsewhere.
   const reminderText = page.getByText(/TODAY.?S REMINDER/i).first()
   if (await reminderText.isVisible().catch(() => false)) {
     const reminder = reminderText.locator('xpath=ancestor::*[.//button][1]')
@@ -119,15 +108,11 @@ try {
     if (await close.isVisible().catch(() => false)) await close.click()
   }
 
-  // Do not use the first canvas on the page: other visual components may own
-  // canvases too. Body3D mounts its renderer directly inside this unique
-  // touch-none viewer container.
   const viewer = page.locator('div.h-full.w-full.touch-none').first()
   const canvas = viewer.locator('> canvas').first()
   await canvas.waitFor({ state: 'visible', timeout: 45_000 })
   await canvas.scrollIntoViewIfNeeded()
 
-  // Give Skeleton + Muscles time to enter loading, then require them to settle.
   await page.waitForTimeout(1_500)
   const initialLoading = page.getByText('Loading anatomy…').first()
   const progressiveLoading = page.getByText('Adding anatomy layer…').first()
@@ -179,8 +164,6 @@ try {
     throw new Error(`Page overflows horizontally: ${metrics.documentScrollWidth}px > ${metrics.viewport.width}px`)
   }
 
-  // Turn on a normally-large optional layer while keeping the already-rendered
-  // anatomy usable. The delayed request above makes this state deterministic.
   const vessels = page.getByRole('button', { name: 'Vessels', exact: true }).first()
   await vessels.click()
   await progressiveLoading.waitFor({ state: 'visible', timeout: 5_000 })
@@ -192,10 +175,6 @@ try {
   )
   await canvas.scrollIntoViewIfNeeded()
   await page.waitForTimeout(100)
-  // The WebGL renderer canvas is mounted directly inside the touch-none viewer.
-  // Browsers may report either the canvas or that direct viewer wrapper as the
-  // hit target. Both mean the 3D surface is unobstructed; a loading card/overlay
-  // is a sibling and therefore remains a hard failure here.
   metrics.progressiveLoadingCenterUnobstructed = await canvas.evaluate((node) => {
     const rect = node.getBoundingClientRect()
     const x = rect.left + rect.width / 2
@@ -213,9 +192,6 @@ try {
   }
   await progressiveLoading.waitFor({ state: 'hidden', timeout: 120_000 })
 
-  // Exercise OrbitControls and prove the compositor surface actually changes.
-  // This verifies the demand-render path, rather than merely dispatching a drag
-  // that could be swallowed by an overlay or render no new frame.
   const box = await canvas.boundingBox()
   if (!box) throw new Error('Body3D canvas has no measurable bounding box')
   const beforeOrbit = await capturePng(box)
@@ -230,16 +206,9 @@ try {
   metrics.orbitChangedFrame = !beforeOrbit.equals(afterOrbit)
   if (!metrics.orbitChangedFrame) throw new Error('Orbit drag did not produce a new Body3D compositor frame')
 
-  // Preserve the canonical Body3D screenshot before navigating deeper into the
-  // precision lab. The second screenshot below captures the motion inspector.
   await captureViewport()
   if (!screenshotCaptured) throw new Error('Body3D mobile visual evidence was not captured')
 
-  // Feature-level regression: open the exact UI path a user follows to reach
-  // whole-body biomechanics, select a real joint profile, change the educational
-  // ROM control, then push that selection back into the shared evidence-bearing
-  // Body3D viewer. The slider itself must remain a readout control; it never
-  // deforms anatomy or claims patient-specific tissue force.
   const precisionTab = page.getByRole('button', { name: 'Whole-body precision', exact: true })
   await precisionTab.click()
   await page.getByText('Panacea · Whole-body precision atlas', { exact: true }).waitFor({ state: 'visible', timeout: 20_000 })
@@ -273,9 +242,10 @@ try {
     throw new Error('Selecting the Knee profile did not update the shared Body3D frame')
   }
 
-  // Playwright's range-aware fill path emits the native input sequence that a
-  // controlled React range expects. DOM value alone is never accepted: the
-  // visible React label and dial below must render the exact requested angle.
+  // Use the native prototype setter so React's controlled-input value tracker
+  // sees a real value transition. Then emit the same bubbling events a range
+  // control produces. The smoke still requires React-rendered labels/dial to
+  // match exactly, so a DOM-only mutation can never satisfy this gate.
   await inspector.scrollIntoViewIfNeeded()
   const slider = inspector.locator('input[type="range"]').first()
   const sliderState = await slider.evaluate((node) => ({
@@ -286,7 +256,14 @@ try {
   const targetAngle = Math.round(
     sliderState.neutral + (sliderState.max - sliderState.neutral) * 0.65,
   )
-  await slider.fill(String(targetAngle))
+  await slider.evaluate((node, value) => {
+    const setter = Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, 'value')?.set
+    if (!setter) throw new Error('Native HTMLInputElement value setter is unavailable')
+    setter.call(node, String(value))
+    node.dispatchEvent(new Event('input', { bubbles: true }))
+    node.dispatchEvent(new Event('change', { bubbles: true }))
+  }, targetAngle)
+
   const renderedAngleLabel = inspector.getByText(`Flexion / extension · ${targetAngle.toFixed(0)}°`, { exact: true })
   await renderedAngleLabel.waitFor({ state: 'visible', timeout: 5_000 })
   const observedAngle = Number(await slider.inputValue())
@@ -296,7 +273,7 @@ try {
     throw new Error(`Whole-body ROM slider did not move meaningfully from neutral: saw ${observedAngle}°`)
   }
   if (observedAngle !== targetAngle) {
-    throw new Error(`Whole-body ROM slider range fill expected ${targetAngle}°: saw ${observedAngle}°`)
+    throw new Error(`Whole-body ROM slider native event expected ${targetAngle}°: saw ${observedAngle}°`)
   }
 
   const dialMotionLabel = inspector.getByText(`Flexion ${targetAngle.toFixed(0)}°`, { exact: true })
