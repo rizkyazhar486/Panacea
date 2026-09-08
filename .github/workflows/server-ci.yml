@@ -89,6 +89,8 @@ jobs:
         run: npm run uji:markets
       - name: Test sports scoreboard adapter
         run: npm run uji:sports
+      - name: Test auth privilege boundaries
+        run: npm run uji:auth-access
       - name: Runtime smoke-test genomics control plane
         env:
           JWT_SECRET: ci-only-panacea-genomics-secret
