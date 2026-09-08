@@ -76,27 +76,32 @@ export function buildAnatomyContextHandoff(
   }
 }
 
-let pendingSurgicalHandoff: AnatomyContextHandoff | null = null
+const pendingHandoff: Record<AnatomyContextDestination, AnatomyContextHandoff | null> = {
+  surgery: null,
+  biomechanics: null,
+}
 
 /**
- * Ephemeral same-session bridge from the Z-Anatomy workbench to SurgicalLab.
- * Nothing is persisted to storage and nothing is interpreted as patient data.
+ * Ephemeral same-session bridge from the Z-Anatomy workbench to the mapped
+ * teaching destination. Nothing is persisted to storage and nothing is
+ * interpreted as patient data. Surgery and biomechanics keep isolated slots so
+ * opening one module cannot consume or overwrite the other module's context.
  */
 export function publishAnatomyContextHandoff(
   context: AnatomyContextHandoff,
   destination: AnatomyContextDestination,
 ) {
-  if (destination === 'surgery') pendingSurgicalHandoff = context
+  pendingHandoff[destination] = context
 }
 
-/** Consume once so a later manual visit to SurgicalLab is not silently pinned. */
+/** Consume once so a later manual visit is not silently pinned to stale context. */
 export function consumeAnatomyContextHandoff(destination: AnatomyContextDestination) {
-  if (destination !== 'surgery') return null
-  const context = pendingSurgicalHandoff
-  pendingSurgicalHandoff = null
+  const context = pendingHandoff[destination]
+  pendingHandoff[destination] = null
   return context
 }
 
 export function clearAnatomyContextHandoff() {
-  pendingSurgicalHandoff = null
+  pendingHandoff.surgery = null
+  pendingHandoff.biomechanics = null
 }
