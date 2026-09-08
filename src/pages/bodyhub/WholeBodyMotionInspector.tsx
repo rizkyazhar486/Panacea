@@ -94,8 +94,8 @@ export function WholeBodyMotionInspector({ onHighlight, onFocusRegion, onEnableL
         <div className="flex flex-wrap items-start justify-between gap-3">
           <div>
             <div className="text-[10px] font-black uppercase tracking-[0.2em] text-brand">Whole-body motion inspector</div>
-            <h4 className="mt-1 text-lg font-black">Joint → axis → coupled motion → contributing structures</h4>
-            <p className="mt-1 max-w-3xl text-[10px] leading-relaxed text-neutral-400">Reference-style joint inspection scaled across the body. The control highlights evidence-bearing source meshes; it does not warp anatomy into a fake single-axis hinge or fabricate patient-specific force.</p>
+            <h4 className="mt-1 text-lg font-black">Joint → axis → motion → contributing structures</h4>
+            <p className="mt-1 max-w-3xl text-[10px] leading-relaxed text-neutral-400">Reference-style joint inspection scaled across the body. Coupled kinematics appear below when the selected motion has an evidence-grounded secondary motion; the control does not warp anatomy into a fake single-axis hinge or fabricate patient-specific force.</p>
           </div>
           <SourceBadge joint={joint} />
         </div>
