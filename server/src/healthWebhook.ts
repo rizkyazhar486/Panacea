@@ -163,9 +163,9 @@ export function parseHealthWebhookPayload(body: unknown): HealthWebhookResult {
     let nilai: number | undefined
     if (def.jumlahkan) {
       // Sum only the newest VALID phone-local calendar day. A malformed date
-      // must never win lexicographic comparison (for example "zzzz...") and
-      // silently replace a real day's total. If the producer sends no valid
-      // timestamp at all, preserve the historical fallback and sum all values.
+      // must never win lexicographic comparison and replace a real day's total.
+      // If there is no valid timestamp at all, hariTerbaru stays empty and the
+      // documented historical fallback below sums every finite sample.
       let hariTerbaru = ''
       for (const s of m.data) {
         const d = typeof s?.date === 'string' ? tanggalDiOffset(s.date) : null

@@ -5,14 +5,11 @@ import {
   tanggalDiOffset,
 } from '../src/healthWebhook'
 
-// Regression lock for phone-local dates and malformed timestamps.
-// A malformed date must never outrank a valid local calendar day simply
-// because its text sorts later lexicographically.
 assert.equal(tanggalDiOffset('2026-09-08 00:30:00 +0700'), '2026-09-08')
 assert.equal(tanggalDiOffset('2026-09-08T23:45:00.123-0500'), '2026-09-08')
 assert.equal(tanggalDiOffset('not-a-date'), null)
 
-const payload = {
+const mixedPayload = {
   data: {
     metrics: [
       {
@@ -29,18 +26,40 @@ const payload = {
   },
 }
 
-const parsed = parseHealthWebhookPayload(payload)
+const parsedMixed = parseHealthWebhookPayload(mixedPayload)
 assert.equal(
-  parsed.steps,
+  parsedMixed.steps,
   3000,
   'cumulative metrics must use only samples from the newest valid phone-local day',
 )
 assert.equal(
-  newestSampleDate(payload),
+  newestSampleDate(mixedPayload),
   '2026-09-08',
   'malformed timestamps must be ignored for newest-date selection',
 )
 
+const malformedOnlyPayload = {
+  data: {
+    metrics: [
+      {
+        name: 'step_count',
+        units: 'count',
+        data: [
+          { qty: 120, date: 'bad-date-a' },
+          { qty: 80, date: 'bad-date-b' },
+          { qty: 50 },
+        ],
+      },
+    ],
+  },
+}
+
+assert.equal(
+  parseHealthWebhookPayload(malformedOnlyPayload).steps,
+  250,
+  'when no valid timestamp exists, cumulative metrics preserve the documented sum-all fallback',
+)
+assert.equal(newestSampleDate(malformedOnlyPayload), null)
 assert.deepEqual(parseHealthWebhookPayload(null), {})
 
 console.log('Health webhook malformed-date regression checks passed.')

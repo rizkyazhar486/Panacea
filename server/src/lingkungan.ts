@@ -203,7 +203,7 @@ export async function cariPangan(q: string, kode?: string, fetchImpl: FetchLike 
       ? `https://world.openfoodfacts.org/api/v2/product/${encodeURIComponent(normalizedCode)}.json?fields=code,product_name,product_name_id,brands,nutriments`
       : `https://world.openfoodfacts.org/cgi/search.pl?search_terms=${encodeURIComponent(normalizedQuery)}&search_simple=1&action=process&json=1&page_size=8&fields=code,product_name,product_name_id,brands,nutriments`
     const r = await fetchImpl(url, {
-      headers: { 'User-Agent': 'Panaceamed/1.0 (https://panaceamed.id; nutrition-reference)' },
+      headers: { 'User-Agent': 'Panaceamed/1.0 (kontak lewat aplikasi)' },
       signal: AbortSignal.timeout(UPSTREAM_TIMEOUT_MS),
     })
     if (!r.ok) return []

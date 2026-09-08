@@ -42,7 +42,6 @@ function ajuan(emailTag: string, telepon = '081234567890') {
   }
 }
 
-// Consent must be complete before sensitive verification data or phone binding is stored.
 resetConnect()
 const tanpaPersetujuan = ajukanVerifikasi('consent@example.test', {
   ...ajuan('consent'),
@@ -53,7 +52,6 @@ assert.equal(isiConnect().akun['consent@example.test']?.data, undefined)
 assert.equal(isiConnect().akun['consent@example.test']?.teleponSidik, undefined)
 assert.deepEqual(persetujuanAktif('consent@example.test'), [])
 
-// Equivalent Indonesian phone spellings must hash to the same account identity.
 resetConnect()
 assert.deepEqual(ikatTelepon('phone-a@example.test', '081234567890'), { ok: true })
 assert.deepEqual(
@@ -65,7 +63,6 @@ assert.equal(phoneAccount.teleponAkhir, '7890')
 assert.match(phoneAccount.teleponSidik ?? '', /^[a-f0-9]{64}$/)
 assert.doesNotMatch(JSON.stringify(phoneAccount), /081234567890|6281234567890/)
 
-// Social identity normalization must close trivial duplicate-account variants.
 assert.equal(kunciSosial('https://instagram.com/Budi/'), 'instagram|budi')
 assert.equal(kunciSosial('https://www.instagram.com/budi?hl=id'), 'instagram|budi')
 assert.equal(kunciSosial('https://m.facebook.com/profile.php?id=12345#about'), 'facebook|12345')
@@ -73,7 +70,6 @@ assert.equal(kunciSosial('https://linkedin.com/in/Dr-Rizky/'), 'linkedin|in/dr-r
 assert.equal(kunciSosial('https://instagram.com.evil.example/budi'), null)
 assert.equal(kunciSosial('javascript:alert(1)'), null)
 
-// Successful verification stores only the phone fingerprint/last four and versioned consent records.
 resetConnect()
 const form = ajuan('verified')
 assert.deepEqual(ajukanVerifikasi('verified@example.test', form), { ok: true })
@@ -85,13 +81,11 @@ assert.equal(Object.prototype.hasOwnProperty.call(waiting.data ?? {}, 'persetuju
 assert.deepEqual(new Set(persetujuanAktif('verified@example.test')), new Set(TUJUAN_WAJIB))
 assert.ok(waiting.persetujuan.every((record) => record.versiPemberitahuan === VERSI_PEMBERITAHUAN))
 
-// A manual review decision ends the selfie-retention purpose.
 assert.deepEqual(putuskanVerifikasi('verified@example.test', true), { ok: true })
 const approved = isiConnect().akun['verified@example.test']
 assert.equal(approved.status, 'terverifikasi')
 assert.equal(approved.data?.selfieUrl, '')
 
-// Public profile is a strict projection and must not expose specific/private verification fields.
 const publicProfile = profilPublik('verified@example.test')
 assert.ok(publicProfile)
 assert.deepEqual(
@@ -103,7 +97,6 @@ for (const forbidden of ['preferensi', 'tanggalLahir', 'tempatLahir', 'telepon',
   assert.equal(publicJson.includes(forbidden), false, `public profile leaked ${forbidden}`)
 }
 
-// Withdrawal revokes all active purposes and removes verification data + phone binding.
 assert.deepEqual(tarikPersetujuan('verified@example.test'), { ok: true })
 const withdrawn = isiConnect().akun['verified@example.test']
 assert.equal(withdrawn.status, 'belum')
@@ -115,7 +108,6 @@ assert.ok(withdrawn.persetujuan.length >= TUJUAN_WAJIB.length)
 assert.ok(withdrawn.persetujuan.every((record) => typeof record.dicabutPada === 'string'))
 assert.equal(ringkasanSaya('verified@example.test').teleponTerdaftar, false)
 
-// Blocking is account-level and symmetric for visibility, while unblocking restores visibility.
 resetConnect()
 assert.deepEqual(blokir('alice@example.test', 'bob@example.test'), { ok: true })
 assert.equal(terblokir('alice@example.test', 'bob@example.test'), true)
@@ -124,7 +116,6 @@ assert.deepEqual(blokir('alice@example.test', 'alice@example.test'), { ok: false
 assert.deepEqual(bukaBlokir('alice@example.test', 'bob@example.test'), { ok: true })
 assert.equal(terblokir('alice@example.test', 'bob@example.test'), false)
 
-// User-controlled search radius must stay inside the documented safety bounds.
 assert.equal(setelRadius('radius@example.test', -100), 1)
 assert.equal(setelRadius('radius@example.test', 9999), 500)
 assert.equal(setelRadius('radius@example.test', 42.4), 42)

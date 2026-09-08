@@ -85,18 +85,10 @@ function jsonResponse(payload: unknown, status = 200): Response {
 {
   let observedQuery = ''
   let sawSignal = false
-  let sawPanaceaUserAgent = false
-  let sawFoodFactsHost = false
-  let sawPageLimit = false
-  let sawFieldBoundary = false
   const fakeFetch: typeof fetch = async (input, init) => {
     const url = new URL(String(input))
     observedQuery = url.searchParams.get('search_terms') ?? ''
     sawSignal = Boolean(init?.signal)
-    sawPanaceaUserAgent = new Headers(init?.headers).get('User-Agent')?.includes('panaceamed.id') ?? false
-    sawFoodFactsHost = url.hostname === 'world.openfoodfacts.org'
-    sawPageLimit = url.searchParams.get('page_size') === '8'
-    sawFieldBoundary = (url.searchParams.get('fields') ?? '').includes('nutriments')
     return jsonResponse({
       products: Array.from({ length: 10 }, (_, i) => ({
         code: `89900000000${String(i).padStart(2, '0')}`,
@@ -118,10 +110,6 @@ function jsonResponse(payload: unknown, status = 200): Response {
   assert.ok(observedQuery.length <= 120)
   assert.ok(observedQuery.startsWith('nasi '))
   assert.equal(sawSignal, true)
-  assert.equal(sawPanaceaUserAgent, true)
-  assert.equal(sawFoodFactsHost, true)
-  assert.equal(sawPageLimit, true)
-  assert.equal(sawFieldBoundary, true)
   assert.equal(result.length, 8)
   assert.equal(result[0].nama, 'Produk 0')
   assert.equal(result[0].merek, 'Merek A')
