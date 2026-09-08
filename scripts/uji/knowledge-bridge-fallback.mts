@@ -29,7 +29,8 @@ assert.match(workbench, /try \{ localStorage\.setItem\(NOTE_KEY, JSON\.stringify
 
 // Persisted evidence is bounded/sanitized by the dedicated handoff module rather
 // than being trusted directly from storage.
-assert.match(handoff, /BRIDGE_EVIDENCE_MAX\s*=\s*8/, 'Evidence fallback storage must remain bounded to eight pointers.')
+assert.match(handoff, /const MAX_ITEMS\s*=\s*8/, 'Evidence fallback storage must remain bounded to eight pointers.')
+assert.match(handoff, /parsed\.filter\(isBridgeEvidenceRef\)\.slice\(0, MAX_ITEMS\)/, 'Persisted evidence must be validated and bounded before use.')
 assert.match(handoff, /catch \{\s*return \[\]\s*\}/, 'Malformed evidence persistence must fail closed to an empty shelf.')
 
 // Truth boundary: absence of a live/selected source cannot silently become proof.
