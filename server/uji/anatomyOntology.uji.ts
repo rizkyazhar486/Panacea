@@ -81,6 +81,7 @@ try {
   assert.equal(nlmCondition.ontology, 'nlm-condition')
   assert.equal(nlmCondition.idSystem, 'NLM_CONDITION_KEY')
   assert.equal(nlmCondition.source, 'nlm-ctss')
+  assert.equal(nlmCondition.iri, '', 'NLM condition key must not invent an ontology IRI')
   assert.doesNotMatch(nlmCondition.id, /^DOID:/i)
   assert.match(nlmCondition.sourceUrl, /clinicaltables\.nlm\.nih\.gov\/api\/conditions/)
 
@@ -89,6 +90,7 @@ try {
   assert.equal(hpo.id, 'HP:0002088')
   assert.equal(hpo.ontology, 'hp')
   assert.equal(hpo.idSystem, 'HP')
+  assert.match(hpo.sourceUrl, /clinicaltables\.nlm\.nih\.gov\/api\/hpo/)
   assert.equal(result.phenotypes.some((term) => term.id === 'not-an-hpo-id'), false,
     'Malformed upstream HPO identifiers must be dropped instead of mislabeled as HP')
 
