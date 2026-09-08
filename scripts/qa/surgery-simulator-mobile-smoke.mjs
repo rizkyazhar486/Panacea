@@ -51,6 +51,13 @@ try {
   await dismissIfVisible(page.getByRole('button', { name: /Get Started/i }).first())
   await dismissIfVisible(page.getByRole('button', { name: /Maybe later/i }).first())
 
+  const reminderText = page.getByText(/TODAY.?S REMINDER/i).first()
+  if (await reminderText.isVisible().catch(() => false)) {
+    const reminder = reminderText.locator('xpath=ancestor::*[.//button][1]')
+    const close = reminder.locator('button').last()
+    if (await close.isVisible().catch(() => false)) await close.click()
+  }
+
   const surgeryTab = page.getByRole('button', { name: 'Surgical layers', exact: true })
   await surgeryTab.click()
   const simulator = page.locator('[data-surgery-simulator="anatomy-grounded"]')
@@ -65,7 +72,11 @@ try {
   if (await loadFailure.isVisible().catch(() => false)) throw new Error(`Caesarean atlas failure: ${await loadFailure.innerText()}`)
   metrics.caesareanLoaded = true
 
-  await simulator.getByRole('button', { name: 'Bladder–uterus relationship', exact: true }).click()
+  // Step buttons include a secondary mode label in their accessible name, so
+  // exercise the exact visible step title rather than assuming a shorter ARIA name.
+  const bladderStep = simulator.getByText('Bladder–uterus relationship', { exact: true }).first()
+  await bladderStep.scrollIntoViewIfNeeded()
+  await bladderStep.click()
   await simulator.getByText('Bladder–uterus relationship', { exact: true }).last().waitFor({ state: 'visible', timeout: 10_000 })
   await simulator.getByText(/urinary bladder/i).first().waitFor({ state: 'visible', timeout: 10_000 })
   metrics.bladderUterusStep = true
@@ -77,7 +88,9 @@ try {
   if (await loadFailure.isVisible().catch(() => false)) throw new Error(`Transseptal atlas failure: ${await loadFailure.innerText()}`)
   metrics.transseptalLoaded = true
 
-  await simulator.getByRole('button', { name: 'ICE long-axis orientation', exact: true }).click()
+  const iceLongAxisStep = simulator.getByText('ICE long-axis orientation', { exact: true }).first()
+  await iceLongAxisStep.scrollIntoViewIfNeeded()
+  await iceLongAxisStep.click()
   await simulator.getByText('ICE guidance', { exact: true }).waitFor({ state: 'visible', timeout: 10_000 })
   await simulator.getByText('orientation, not diagnosis', { exact: true }).waitFor({ state: 'visible', timeout: 10_000 })
   metrics.iceLongAxisVisible = true
