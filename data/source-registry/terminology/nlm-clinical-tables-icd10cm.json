@@ -1,0 +1,44 @@
+{
+  "id": "nlm_clinical_tables_icd10cm",
+  "name": "NLM Clinical Tables Search Service — ICD-10-CM",
+  "category": "terminology",
+  "kind": ["api", "terminology-server"],
+  "homepage": "https://clinicaltables.nlm.nih.gov/apidoc/icd10cm/v3/doc.html",
+  "repository": null,
+  "features": ["diagnosis-coding-fallback", "disease-directory", "terminology-search"],
+  "formats": ["json", "http-rest"],
+  "usage": {
+    "runtime": true,
+    "buildTime": false,
+    "networkRequired": true,
+    "notes": "Panacea uses the NLM Clinical Tables ICD-10-CM v3 endpoint only as an explicit fallback when the configured WHO ICD-11 path is unavailable or returns no usable result. The backend adapter bounds the query and requested result count; the UI must preserve the `icd10cm` source marker."
+  },
+  "license": {
+    "status": "CHECK_REQUIRED",
+    "identifier": null,
+    "commercialUse": "CONDITIONAL",
+    "attributionRequired": null,
+    "shareAlike": null,
+    "scope": "NLM documents the Clinical Tables Search Service as open to the general public, free of charge and provided as-is, while also stating that individual datasets may carry their own terms of use. This entry therefore does not infer one blanket copyright or commercial-use permission from the service host alone.",
+    "verificationUrl": "https://clinicaltables.nlm.nih.gov/faq.html",
+    "verifiedAt": "2026-09-08",
+    "notes": "Before redistributing or building derivative terminology products, verify the exact ICD-10-CM dataset/source terms in effect for the intended use. Do not use NLM/NIH names to imply endorsement."
+  },
+  "validation": {
+    "level": "REFERENCE",
+    "clinicalDecisionUse": "CONTEXT_ONLY",
+    "notes": "ICD-10-CM is a coding classification reference, not evidence that a diagnosis is correct for an individual patient. Panacea exposes this source only as a clearly labeled fallback and must not present an ICD-10-CM result as ICD-11."
+  },
+  "provenance": {
+    "authority": "U.S. National Library of Medicine Clinical Tables Search Service serving ICD-10-CM",
+    "sourceIdentityRequired": true,
+    "versionPinRequired": false,
+    "notes": "Persist the source marker `icd10cm`, code, title and retrieval context. The current Clinical Tables v3 URL identifies the API contract but does not pin a specific ICD-10-CM data release in Panacea, so this source has weaker reproducibility than the explicitly pinned WHO ICD-11 path. Add release identity if the service exposes a stable dataset-version field suitable for storage."
+  },
+  "adapter": {
+    "status": "ACTIVE",
+    "normalizedTarget": "IcdEntry",
+    "module": "server/src/icd11.ts",
+    "notes": "Implemented fallback: bounded/sanitized diagnosis term -> NLM Clinical Tables ICD-10-CM v3 -> defensive parsing of display rows -> IcdEntry with `sumber: icd10cm`. The same module owns WHO ICD-11 and NLM fallback routing so source identity remains explicit at the normalization boundary."
+  }
+}
