@@ -31,6 +31,27 @@ export interface BodyProcedurePublicationDecision {
 
 const nonBlank = (value: string | undefined) => Boolean(value?.trim())
 const ISO_DATE_RE = /^\d{4}-\d{2}-\d{2}(?:T\d{2}:\d{2}(?::\d{2}(?:\.\d{3})?)?Z)?$/
+const FLOATING_VERSION_RE = /^(?:latest|main|master|head|current|versioned-record)$/i
+const PLACEHOLDER_LOCATOR_RE = /^(?:verified-source-record|repository-verified-source-record|source-record|placeholder)$/i
+
+function isPinnedSourceVersion(value: string | undefined) {
+  if (!nonBlank(value)) return false
+  return !FLOATING_VERSION_RE.test(value!.trim())
+}
+
+function isSpecificSourceLocator(value: string | undefined) {
+  if (!nonBlank(value)) return false
+  return !PLACEHOLDER_LOCATOR_RE.test(value!.trim())
+}
+
+function isValidIsoDate(value: string | undefined) {
+  if (!nonBlank(value) || !ISO_DATE_RE.test(value!.trim())) return false
+  const normalized = value!.trim()
+  const parsed = new Date(normalized.length === 10 ? `${normalized}T00:00:00Z` : normalized)
+  if (Number.isNaN(parsed.getTime())) return false
+  const [year, month, day] = normalized.slice(0, 10).split('-').map(Number)
+  return parsed.getUTCFullYear() === year && parsed.getUTCMonth() + 1 === month && parsed.getUTCDate() === day
+}
 
 export function evaluateBodyProcedurePublication(
   procedure: ProcedureProjectionTarget,
@@ -42,10 +63,11 @@ export function evaluateBodyProcedurePublication(
   if (evidence.procedureId !== procedure.id) reasons.push('Procedure evidence does not match the normalized procedure target.')
   if (!nonBlank(evidence.id)) reasons.push('Procedure evidence id is missing.')
   if (!nonBlank(evidence.sourceId)) reasons.push('Procedure evidence source identity is missing.')
-  if (!nonBlank(evidence.sourceVersion)) reasons.push('Procedure evidence version/revision is missing.')
+  if (!isPinnedSourceVersion(evidence.sourceVersion)) reasons.push('Procedure evidence version/revision must be immutable and explicitly pinned.')
   if (!nonBlank(evidence.citation)) reasons.push('Procedure evidence citation is missing.')
-  if (!nonBlank(evidence.sourceLocator)) reasons.push('Procedure evidence source locator is missing.')
+  if (!isSpecificSourceLocator(evidence.sourceLocator)) reasons.push('Procedure evidence source locator must identify a specific source location.')
   if (!nonBlank(evidence.educationalScope)) reasons.push('Procedure educational scope is missing.')
+  if (typeof evidence.aiAssisted !== 'boolean') reasons.push('AI-assistance disclosure must be an explicit boolean.')
 
   const expected = new Set(procedure.anatomyTargetIds)
   const provided = new Set(evidence.targetIds)
@@ -74,7 +96,7 @@ export function evaluateBodyProcedurePublication(
   if (!nonBlank(evidence.reviewerName)) reasons.push('Qualified reviewer identity is required.')
   if (!nonBlank(evidence.reviewerCredentials)) reasons.push('Qualified reviewer credentials are required.')
   if (!nonBlank(evidence.reviewScope)) reasons.push('Qualified review scope is required.')
-  if (!nonBlank(evidence.reviewedAt) || !ISO_DATE_RE.test(evidence.reviewedAt!.trim())) reasons.push('Qualified review requires an ISO date/timestamp.')
+  if (!isValidIsoDate(evidence.reviewedAt)) reasons.push('Qualified review requires a real ISO calendar date/timestamp.')
 
   if (procedure.reviewRequired !== true) reasons.push('Procedure contract must remain review-required.')
   if (procedure.productionReady) reasons.push('Procedure target must not self-declare production readiness before this gate passes.')
