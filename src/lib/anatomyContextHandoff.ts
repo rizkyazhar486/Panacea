@@ -1,0 +1,97 @@
+import type {
+  AtlasLayerKey,
+  AtlasRegionKey,
+  AtlasStructureTarget,
+  GeometryProvenance,
+} from './wholeBodyAtlasBlueprint'
+
+export type AnatomyContextDestination = 'surgery' | 'biomechanics'
+
+export interface AnatomyContextHandoff {
+  structureId: string
+  structureLabel: string
+  region: AtlasRegionKey
+  layer: AtlasLayerKey
+  provenance: GeometryProvenance
+  nodeHints: readonly string[]
+  resolvedNodeNames: readonly string[]
+  surgicalScenarioId?: string
+  movementJointId?: string
+}
+
+interface ReviewedHandoffRoute {
+  surgicalScenarioId?: string
+  movementJointId?: string
+}
+
+/**
+ * Explicit reviewed cross-module mappings only.
+ *
+ * Do not infer a surgery or biomechanics destination from fuzzy node-name
+ * similarity. A named source mesh proves only that geometry exists; it does not
+ * prove that a procedure or joint model applies to that structure.
+ */
+const REVIEWED_HANDOFF_BY_STRUCTURE: Readonly<Record<string, ReviewedHandoffRoute>> = {
+  'heart-great-vessels': { surgicalScenarioId: 'transseptal-anatomy' },
+  hepatobiliary: { surgicalScenarioId: 'hepatocystic-triangle-spatial' },
+  'hand-tendons': { surgicalScenarioId: 'carpal-tunnel-spatial' },
+  'knee-complex': {
+    surgicalScenarioId: 'knee-medial-parapatellar-spatial',
+    movementJointId: 'knee',
+  },
+  'shoulder-complex': { movementJointId: 'shoulder' },
+  'rotator-cuff': { movementJointId: 'shoulder' },
+  'hip-complex': { movementJointId: 'hip' },
+  paraspinals: { movementJointId: 'thoracolumbar-spine' },
+}
+
+function uniqueNonBlank(values: readonly string[]) {
+  return [...new Set(values.map((value) => value.trim()).filter(Boolean))]
+}
+
+export function buildAnatomyContextHandoff(
+  region: AtlasRegionKey,
+  structure: AtlasStructureTarget,
+  resolvedNodeNames: readonly string[] = [],
+): AnatomyContextHandoff {
+  const route = structure.provenance === 'not-represented'
+    ? undefined
+    : REVIEWED_HANDOFF_BY_STRUCTURE[structure.id]
+
+  return {
+    structureId: structure.id,
+    structureLabel: structure.label,
+    region,
+    layer: structure.layer,
+    provenance: structure.provenance,
+    nodeHints: uniqueNonBlank(structure.nodeHints),
+    resolvedNodeNames: uniqueNonBlank(resolvedNodeNames),
+    surgicalScenarioId: route?.surgicalScenarioId,
+    movementJointId: route?.movementJointId,
+  }
+}
+
+let pendingSurgicalHandoff: AnatomyContextHandoff | null = null
+
+/**
+ * Ephemeral same-session bridge from the Z-Anatomy workbench to SurgicalLab.
+ * Nothing is persisted to storage and nothing is interpreted as patient data.
+ */
+export function publishAnatomyContextHandoff(
+  context: AnatomyContextHandoff,
+  destination: AnatomyContextDestination,
+) {
+  if (destination === 'surgery') pendingSurgicalHandoff = context
+}
+
+/** Consume once so a later manual visit to SurgicalLab is not silently pinned. */
+export function consumeAnatomyContextHandoff(destination: AnatomyContextDestination) {
+  if (destination !== 'surgery') return null
+  const context = pendingSurgicalHandoff
+  pendingSurgicalHandoff = null
+  return context
+}
+
+export function clearAnatomyContextHandoff() {
+  pendingSurgicalHandoff = null
+}
