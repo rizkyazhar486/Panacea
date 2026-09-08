@@ -1,4 +1,4 @@
-import { searchAnatomyImages } from '../src/anatomyImages.ts'
+import { pathologyImageLookup, searchAnatomyImages, xrayImageLookup } from '../src/anatomyImages.ts'
 
 let lulus = 0, gagal = 0
 function ok(nama: string, syarat: boolean, ket = '') {
@@ -114,6 +114,30 @@ await denganFetchPalsu(async () => {
 }, async () => {
   const hasil = await searchAnatomyImages('  <> : " \\ | \u0000  ')
   ok('query kosong setelah sanitasi selesai tanpa network request', hasil.length === 0)
+})
+
+await denganFetchPalsu(async () => new Response(JSON.stringify({
+  query: {
+    pages: [{
+      title: 'File:Pathology department building.jpg',
+      imageinfo: [{
+        url: 'https://upload.wikimedia.org/wikipedia/commons/a/a0/Pathology_department_building.jpg',
+        descriptionurl: 'https://commons.wikimedia.org/wiki/File:Pathology_department_building.jpg',
+        mime: 'image/jpeg',
+        extmetadata: {
+          LicenseShortName: { value: 'CC BY-SA 4.0' },
+          Artist: { value: 'Example author' },
+          ImageDescription: { value: 'University pathology department building.' },
+        },
+      }],
+    }],
+  },
+}), { status: 200, headers: { 'content-type': 'application/json' } }), async () => {
+  const pathology = await pathologyImageLookup('heart')
+  ok('pathology lookup fail-closed saat semua hasil tidak relevan', pathology.length === 0, String(pathology.length))
+
+  const xray = await xrayImageLookup('heart')
+  ok('radiology lookup fail-closed saat semua hasil tidak relevan', xray.length === 0, String(xray.length))
 })
 
 await denganFetchPalsu(async () => new Response(null, { status: 503 }), async () => {
