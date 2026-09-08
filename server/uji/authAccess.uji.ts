@@ -25,8 +25,8 @@ assert.equal(selfServiceRole('admin'), 'pasien')
 assert.equal(selfServiceRole('owner'), 'pasien')
 assert.equal(selfServiceRole('anything-else'), 'pasien')
 
-// Existing server-owned roles are immutable during login; request payload must
-// not upgrade/downgrade them.
+// Existing role data is not overwritten during login; privilege is decided
+// separately by effectiveRoleForRequest so even legacy poisoned roles fail closed.
 const existingDoctor = user('dokter')
 assert.equal(roleForLogin(existingDoctor, 'owner'), 'dokter')
 assert.equal(roleForLogin(existingDoctor, 'pasien'), 'dokter')
@@ -52,14 +52,13 @@ assert.equal(effectiveRoleForRequest(user('verifikator'), { strStatus: 'verified
 assert.equal(effectiveRoleForRequest(user('dokter'), undefined, ownerEmail, true), 'dokter')
 assert.equal(effectiveRoleForRequest(user('verifikator'), undefined, ownerEmail, true), 'verifikator')
 
-// A database role string cannot manufacture owner authority. The configured
-// owner email remains authoritative.
+// A database role string cannot manufacture owner/admin authority. Conversely,
+// the configured owner email regains effective owner authority even if legacy
+// storage says `pasien`, so owner-only routes remain reachable after hardening.
 assert.equal(effectiveRoleForRequest(user('owner', 'attacker@example.test'), undefined, ownerEmail), 'pasien')
+assert.equal(effectiveRoleForRequest(user('admin', 'attacker@example.test'), undefined, ownerEmail), 'pasien')
+assert.equal(effectiveRoleForRequest(user('pasien', ownerEmail), undefined, ownerEmail), 'owner')
 assert.equal(effectiveRoleForRequest(user('owner', ownerEmail), undefined, ownerEmail), 'owner')
-
-// Existing manually provisioned admin remains possible, but admin/owner cannot
-// be created through self-service login because selfServiceRole blocks both.
-assert.equal(effectiveRoleForRequest(user('admin'), undefined, ownerEmail), 'admin')
 
 // Source-level regression guards for the authentication implementation itself.
 const authSource = readFileSync('src/auth.ts', 'utf8')
