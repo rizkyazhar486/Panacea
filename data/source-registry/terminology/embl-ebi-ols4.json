@@ -11,7 +11,7 @@
     "runtime": true,
     "buildTime": false,
     "networkRequired": true,
-    "notes": "Panacea queries the public OLS4 REST API from its evidence adapter for a bounded set of biomedical ontology matches. EMBL-EBI recommends the OLS API and/or upstream OWL files rather than depending on the undocumented internal OLS database representation."
+    "notes": "Panacea queries the public OLS4 REST API through bounded adapters for biomedical ontology matches. The Medical Library adapter uses UBERON, CL and EFO; the Body Explorer server grounding adapter uses DOID, HP, UBERON and FMA. EMBL-EBI recommends the OLS API and/or upstream OWL files rather than depending on the undocumented internal OLS database representation."
   },
   "license": {
     "status": "CHECK_REQUIRED",
@@ -33,13 +33,13 @@
     "authority": "EMBL-EBI Ontology Lookup Service with ontology content supplied by upstream ontology projects",
     "sourceIdentityRequired": true,
     "versionPinRequired": true,
-    "notes": "Preserve ontology prefix/name, term identifier, IRI, ontology/version context when available, query and retrieval timestamp. Any exported or cached ontology content should also retain the upstream ontology licence/rights metadata."
+    "notes": "Preserve ontology prefix/name, term identifier, IRI, ontology/version context when available, query and retrieval timestamp. Body Explorer normalized terms additionally retain the OLS4 source identity and identifier system so a semantic lookup is not mistaken for mesh provenance or patient evidence. Any exported or cached ontology content should also retain the upstream ontology licence/rights metadata."
   },
   "adapter": {
     "status": "ACTIVE",
     "normalizedTarget": "PanaceaOntologyTerm",
     "module": "src/lib/medicalSources.ts",
-    "notes": "Active client-side adapter searches a bounded set of UBERON, CL and EFO results, normalizes OBO/short ID, label, ontology identity, description and IRI, and exposes an OLS search URL. React components do not call OLS directly."
+    "notes": "The Medical Library client adapter in src/lib/medicalSources.ts searches bounded UBERON/CL/EFO results and keeps ontology identity. A second active server adapter in server/src/anatomyOntology.ts grounds Body Explorer disease, phenotype and anatomy terms across DOID/HP/UBERON/FMA, retains source + identifierSystem, bounds query fan-out, degrades independently when one upstream call fails, and has deterministic network-free regression coverage. React components do not call OLS directly."
   },
   "trust": {
     "authority": 5,
