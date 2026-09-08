@@ -189,11 +189,13 @@ function SharedCorrelationPanel({
 
 export function SurgerySimulatorLab({ onKedalaman, onSorot, onSharedView }: Props) {
   const [scenarioId, setScenarioId] = useState(SURGERY_SIMULATION_SCENARIOS[0].id)
+  const [atlasScenarioId, setAtlasScenarioId] = useState(SURGERY_SIMULATION_SCENARIOS[0].id)
   const [stepIndex, setStepIndex] = useState(0)
   const [showAnswer, setShowAnswer] = useState(false)
   const [sharedViewId, setSharedViewId] = useState('source')
 
   const scenario = SURGERY_SIMULATION_SCENARIOS.find((item) => item.id === scenarioId) ?? SURGERY_SIMULATION_SCENARIOS[0]
+  const atlasScenario = SURGERY_SIMULATION_SCENARIOS.find((item) => item.id === atlasScenarioId) ?? SURGERY_SIMULATION_SCENARIOS[0]
   const step = scenario.steps[Math.min(stepIndex, scenario.steps.length - 1)]
   const sourceParts = useMemo(() => sourcePartsFor(scenario), [scenario])
   const partMeta = useMemo<PartMeta[]>(() => sourceParts.map((part) => ({ ...part })), [sourceParts])
@@ -201,18 +203,30 @@ export function SurgerySimulatorLab({ onKedalaman, onSorot, onSharedView }: Prop
   const riskMatches = useMemo(() => matchesKeywords(sourceParts, step.atRiskKeywords), [sourceParts, step])
   const missing = useMemo(() => missingKeywords(sourceParts, step.atlasKeywords), [sourceParts, step])
 
+  const atlasStepIndex = atlasScenario.id === scenario.id ? stepIndex : 0
+  const atlasStep = atlasScenario.steps[Math.min(atlasStepIndex, atlasScenario.steps.length - 1)]
+  const atlasSourceParts = useMemo(() => sourcePartsFor(atlasScenario), [atlasScenario])
+  const atlasPartMeta = useMemo<PartMeta[]>(() => atlasSourceParts.map((part) => ({ ...part })), [atlasSourceParts])
+  const atlasTargetMatches = useMemo(() => matchesKeywords(atlasSourceParts, atlasStep.atlasKeywords), [atlasSourceParts, atlasStep])
+  const atlasRiskMatches = useMemo(() => matchesKeywords(atlasSourceParts, atlasStep.atRiskKeywords), [atlasSourceParts, atlasStep])
+
   useEffect(() => {
     setStepIndex(0)
     setShowAnswer(false)
     setSharedViewId('source')
   }, [scenarioId])
 
+  useEffect(() => {
+    if (atlasScenarioId === scenarioId) return
+    // Keep the discrete scenario selection responsive. AtlasViewer3D teardown
+    // can be expensive under software/mobile WebGL, so swap the heavy GLB only
+    // after the selected scenario UI has had one frame to commit and paint.
+    const frame = window.requestAnimationFrame(() => setAtlasScenarioId(scenarioId))
+    return () => window.cancelAnimationFrame(frame)
+  }, [scenarioId, atlasScenarioId])
+
   function chooseScenario(id: string) {
     if (id === scenarioId) return
-    // Scenario identity and teaching text are urgent UI state. AtlasViewer3D
-    // performs GLB teardown/loading in an effect after the commit, so wrapping
-    // this selection in a low-priority transition can make the interface look
-    // stuck under GPU/CPU pressure even though the click was received.
     setScenarioId(id)
   }
 
@@ -283,14 +297,21 @@ export function SurgerySimulatorLab({ onKedalaman, onSorot, onSharedView }: Prop
                 <div>{targetMatches.length} represented in this step</div>
               </div>
             </div>
-            <AtlasViewer3D
-              berkas={scenario.atlasFile}
-              bagian={partMeta}
-              tinggi={390}
-              dipilih={targetMatches[0] ?? null}
-              hilir={targetMatches.slice(1)}
-              lesi={riskMatches.filter((name) => !targetMatches.includes(name))}
-            />
+            <div data-atlas-scenario={atlasScenario.id}>
+              <AtlasViewer3D
+                berkas={atlasScenario.atlasFile}
+                bagian={atlasPartMeta}
+                tinggi={390}
+                dipilih={atlasTargetMatches[0] ?? null}
+                hilir={atlasTargetMatches.slice(1)}
+                lesi={atlasRiskMatches.filter((name) => !atlasTargetMatches.includes(name))}
+              />
+            </div>
+            {atlasScenario.id !== scenario.id && (
+              <div role="status" aria-live="polite" className="mt-2 text-center text-[9px] font-semibold text-neutral-500">
+                Opening selected anatomy…
+              </div>
+            )}
           </div>
 
           <SharedCorrelationPanel scenario={scenario} active={sharedViewId} onPick={applySharedView} />
