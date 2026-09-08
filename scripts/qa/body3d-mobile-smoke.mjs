@@ -98,7 +98,11 @@ async function captureMotionViewport() {
 
 async function dismissIfVisible(locator, timeout = 5_000) {
   if (!(await locator.isVisible().catch(() => false))) return false
-  await locator.click()
+  await withTimeout(
+    locator.evaluate((node) => node.click()),
+    'optional onboarding dismissal',
+    timeout,
+  )
   await locator.waitFor({ state: 'hidden', timeout }).catch(() => undefined)
   return true
 }
