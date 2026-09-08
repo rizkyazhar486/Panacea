@@ -16,7 +16,23 @@ export type BridgeTopic = {
   stages: BridgeStage[]
 }
 
-const stage = (key: BridgeStageKey, label: string, question: string, explanation: string, route?: string): BridgeStage => ({ key, label, question, explanation, route })
+export const BRIDGE_STAGE_GLOSSARY: Record<BridgeStageKey, string> = {
+  anatomy: 'body structures',
+  physiology: 'normal function',
+  pathology: 'disease mechanism',
+  signals: 'observable clues',
+  diagnostics: 'tests & interpretation',
+  management: 'care options',
+  evidence: 'source verification',
+}
+
+const stage = (key: BridgeStageKey, label: string, question: string, explanation: string, route?: string): BridgeStage => ({
+  key,
+  label: `${label} · ${BRIDGE_STAGE_GLOSSARY[key]}`,
+  question,
+  explanation,
+  route,
+})
 
 export const BRIDGE_TOPICS: BridgeTopic[] = [
   {
@@ -113,6 +129,10 @@ export function resolveBridgeTopic(query: string): BridgeTopic | null {
   return BRIDGE_TOPICS.find((topic) => topic.title.toLowerCase() === q || topic.id === q || topic.aliases.some((alias) => alias.includes(q) || q.includes(alias))) ?? null
 }
 
+function canonicalStageLabel(label: string) {
+  return label.split(' · ', 1)[0]
+}
+
 export function bridgeSummary(topic: BridgeTopic) {
-  return [topic.title, topic.oneLiner, ...topic.stages.map((item) => `${item.label}: ${item.explanation}`)].join('\n\n')
+  return [topic.title, topic.oneLiner, ...topic.stages.map((item) => `${canonicalStageLabel(item.label)}: ${item.explanation}`)].join('\n\n')
 }
