@@ -1,7 +1,24 @@
 {
   "version": 1,
-  "updatedAt": "2026-09-08T15:10:00.000Z",
+  "updatedAt": "2026-09-09T01:24:00+07:00",
   "items": {
+    "ff-health-profile-baseline": {
+      "status": "done",
+      "commit": "e94e738391fd65165d952ac7d0ae31d29c525506",
+      "paths": ["src/lib/healthProfileBaseline.ts", "src/lib/healthInsights.ts", "scripts/uji/feature-factory-health-profile-baseline.mts", "src/pages/HealthProfile.tsx"],
+      "note": "Matured the existing /health-data Automatic Insights surface with a bounded personal descriptive baseline derived only from the user's own dated history. The engine requires at least three valid positive observations, uses at most the latest 30 records, reports median plus observed Q1/Q3, pins the NIST p(N+1) percentile interpolation method, and explicitly labels the result as personal-descriptive-history-only rather than a population normal range, diagnosis, risk score, or treatment threshold. No external API, polling, persistence schema, dependency, population norm, patient-specific diagnosis, or treatment recommendation was added.",
+      "academicReview": {
+        "status": "source-checked",
+        "sourceBasis": [
+          "https://www.itl.nist.gov/div898/handbook/prc/section2/prc262.htm",
+          "https://www.nist.gov/programs-projects/nistsematech-engineering-statistics-handbook"
+        ],
+        "aiUse": "ai-assisted",
+        "note": "Statistical percentile terminology and the p(N+1) interpolation convention were checked against the NIST/SEMATECH Engineering Statistics Handbook. The production copy explicitly prevents interpreting these user-history quartiles as a clinical or population reference interval. Existing unrelated Health Insights clinical wording was not modified by this candidate and remains subject to its own separate review obligations.",
+        "humanReview": {"status": "not-recorded", "reviewer": null, "credentials": null, "reviewedAt": null}
+      },
+      "updatedAt": "2026-09-09T01:24:00+07:00"
+    },
     "ff-health-profile-timeline": {
       "status": "done",
       "commit": "a978908e55521c61f6ef213d9483a9c5921fe783",
