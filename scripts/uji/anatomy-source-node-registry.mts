@@ -1,4 +1,5 @@
 import assert from 'node:assert/strict'
+import { readFileSync } from 'node:fs'
 import {
   anatomySourceNameMatchesHint,
   anatomySourceNodeOrigin,
@@ -43,4 +44,20 @@ const restored = getEffectiveAnatomySourceNodeSnapshot().find((bundle) => bundle
 assert.equal(anatomySourceNodeOrigin('skeletal.glb'), 'generated-index')
 assert.ok((restored?.names.length ?? 0) > 2, 'clearing runtime data should restore the generated GLB index')
 
-console.log('Z-Anatomy source-node resolver preserves exact GLB provenance and conservative matching.')
+const body3dSource = readFileSync(new URL('../../src/components/Body3D.tsx', import.meta.url), 'utf8')
+assert.match(
+  body3dSource,
+  /publishAnatomySourceNodes\(def\.file, sourceNodeNames\)/,
+  'Body3D must publish original GLTF node names after a layer is loaded',
+)
+assert.match(
+  body3dSource,
+  /clearAnatomySourceNodes\(def\.file\)/,
+  'Body3D must clear runtime node provenance when a layer is unloaded or the viewer unmounts',
+)
+assert.ok(
+  body3dSource.indexOf('const sourceNodeNames: string[] = []') > body3dSource.indexOf('const clone = group.clone(true)'),
+  'runtime node collection should happen on the loaded clone, not in the render loop',
+)
+
+console.log('Z-Anatomy source-node resolver preserves exact GLB provenance, conservative matching, and runtime renderer publication.')
