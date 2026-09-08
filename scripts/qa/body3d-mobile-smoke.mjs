@@ -67,8 +67,19 @@ let canvas = null
 
 async function dismissIfVisible(locator, timeout = 5_000) {
   if (!(await locator.isVisible().catch(() => false))) return false
-  await locator.click()
-  await locator.waitFor({ state: 'hidden', timeout }).catch(() => undefined)
+
+  const activationTimeout = Math.min(timeout, 3_000)
+  try {
+    await locator.click({ timeout: activationTimeout })
+  } catch {
+    try {
+      await locator.press('Enter', { timeout: activationTimeout })
+    } catch {
+      await locator.evaluate((node) => node.click())
+    }
+  }
+
+  await locator.waitFor({ state: 'hidden', timeout })
   return true
 }
 
