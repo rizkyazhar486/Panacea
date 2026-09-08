@@ -8,9 +8,18 @@ import {
   type SurgerySimulationStep,
 } from '../../lib/surgerySimulator'
 
+export interface SurgerySharedView {
+  renderMode: 'anatomy' | 'ct'
+  slicePlane: 'none' | 'axial' | 'coronal' | 'sagittal'
+  slicePos: number
+  unfold: number
+  label: string
+}
+
 interface Props {
   onKedalaman?: (depth: number) => void
   onSorot?: (names: string[]) => void
+  onSharedView?: (view: SurgerySharedView) => void
 }
 
 type SourcePart = { name: string; kind: string; group?: string }
@@ -132,10 +141,57 @@ function ImagingPanel({ step, scenario }: { step: SurgerySimulationStep; scenari
   )
 }
 
-export function SurgerySimulatorLab({ onKedalaman, onSorot }: Props) {
+function SharedCorrelationPanel({
+  scenario,
+  active,
+  onPick,
+}: {
+  scenario: SurgerySimulationScenario
+  active: string
+  onPick: (id: string, view: SurgerySharedView) => void
+}) {
+  const regionLevel = scenario.id === 'caesarean-anatomy' ? 0.52 : 0.72
+  const views: Array<{ id: string; view: SurgerySharedView }> = [
+    { id: 'source', view: { renderMode: 'anatomy', slicePlane: 'none', slicePos: regionLevel, unfold: 0, label: 'Source 3D' } },
+    { id: 'axial', view: { renderMode: 'ct', slicePlane: 'axial', slicePos: regionLevel, unfold: 0, label: 'Axial CT' } },
+    { id: 'coronal', view: { renderMode: 'ct', slicePlane: 'coronal', slicePos: 0.5, unfold: 0, label: 'Coronal CT' } },
+    { id: 'sagittal', view: { renderMode: 'ct', slicePlane: 'sagittal', slicePos: 0.5, unfold: 0, label: 'Sagittal CT' } },
+    { id: 'exploded', view: { renderMode: 'anatomy', slicePlane: 'none', slicePos: regionLevel, unfold: 0.28, label: 'Exploded 3D' } },
+  ]
+
+  return (
+    <div data-surgery-correlation="shared-body3d" className="rounded-xl border border-violet-300/15 bg-violet-300/[0.04] p-3">
+      <div className="text-[9px] font-black uppercase tracking-[0.16em] text-violet-300">3D ↔ cross-section correlation</div>
+      <p className="mt-1 text-[9.5px] leading-relaxed text-neutral-300">
+        Push this procedure context into the shared whole-body viewer above. CT presets clip the same reference geometry so front–back, left–right and slice orientation can be learned together.
+      </p>
+      <div className="mt-2 flex flex-wrap gap-1.5">
+        {views.map(({ id, view }) => (
+          <button
+            key={id}
+            type="button"
+            aria-pressed={active === id}
+            onClick={() => onPick(id, view)}
+            className={`rounded-full border px-2.5 py-1.5 text-[9px] font-bold ${
+              active === id ? 'border-violet-300 bg-violet-300/15 text-violet-100' : 'border-white/10 text-neutral-400'
+            }`}
+          >
+            {view.label}
+          </button>
+        ))}
+      </div>
+      <p className="mt-2 text-[8.5px] leading-relaxed text-neutral-500">
+        Teaching render only — standard tissue-value greyscale and atlas clipping, not patient DICOM, CT segmentation, navigation coordinates or operative planning.
+      </p>
+    </div>
+  )
+}
+
+export function SurgerySimulatorLab({ onKedalaman, onSorot, onSharedView }: Props) {
   const [scenarioId, setScenarioId] = useState(SURGERY_SIMULATION_SCENARIOS[0].id)
   const [stepIndex, setStepIndex] = useState(0)
   const [showAnswer, setShowAnswer] = useState(false)
+  const [sharedViewId, setSharedViewId] = useState('source')
 
   const scenario = SURGERY_SIMULATION_SCENARIOS.find((item) => item.id === scenarioId) ?? SURGERY_SIMULATION_SCENARIOS[0]
   const step = scenario.steps[Math.min(stepIndex, scenario.steps.length - 1)]
@@ -148,6 +204,7 @@ export function SurgerySimulatorLab({ onKedalaman, onSorot }: Props) {
   useEffect(() => {
     setStepIndex(0)
     setShowAnswer(false)
+    setSharedViewId('source')
   }, [scenarioId])
 
   function goStep(index: number) {
@@ -157,6 +214,11 @@ export function SurgerySimulatorLab({ onKedalaman, onSorot }: Props) {
     setShowAnswer(false)
     onKedalaman?.(nextStep.bodyDepth)
     onSorot?.([...nextStep.sharedBodyKeywords, ...nextStep.atRiskText])
+  }
+
+  function applySharedView(id: string, view: SurgerySharedView) {
+    setSharedViewId(id)
+    onSharedView?.(view)
   }
 
   return (
@@ -215,6 +277,8 @@ export function SurgerySimulatorLab({ onKedalaman, onSorot }: Props) {
               lesi={riskMatches.filter((name) => !targetMatches.includes(name))}
             />
           </div>
+
+          <SharedCorrelationPanel scenario={scenario} active={sharedViewId} onPick={applySharedView} />
 
           <div className="rounded-xl border border-white/10 bg-white/[0.02] p-3">
             <div className="flex flex-wrap items-start justify-between gap-2">
