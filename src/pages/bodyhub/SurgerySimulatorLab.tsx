@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useState, useTransition } from 'react'
 import AtlasViewer3D, { type PartMeta } from '../../components/AtlasViewer3D'
 import { CARDIO_PARTS } from '../../lib/cardioAtlas.gen'
 import { partsForModule } from '../../lib/systemAtlas.gen'
@@ -192,6 +192,7 @@ export function SurgerySimulatorLab({ onKedalaman, onSorot, onSharedView }: Prop
   const [stepIndex, setStepIndex] = useState(0)
   const [showAnswer, setShowAnswer] = useState(false)
   const [sharedViewId, setSharedViewId] = useState('source')
+  const [isScenarioPending, startScenarioTransition] = useTransition()
 
   const scenario = SURGERY_SIMULATION_SCENARIOS.find((item) => item.id === scenarioId) ?? SURGERY_SIMULATION_SCENARIOS[0]
   const step = scenario.steps[Math.min(stepIndex, scenario.steps.length - 1)]
@@ -206,6 +207,11 @@ export function SurgerySimulatorLab({ onKedalaman, onSorot, onSharedView }: Prop
     setShowAnswer(false)
     setSharedViewId('source')
   }, [scenarioId])
+
+  function chooseScenario(id: string) {
+    if (id === scenarioId) return
+    startScenarioTransition(() => setScenarioId(id))
+  }
 
   function goStep(index: number) {
     const next = Math.max(0, Math.min(scenario.steps.length - 1, index))
@@ -222,7 +228,7 @@ export function SurgerySimulatorLab({ onKedalaman, onSorot, onSharedView }: Prop
   }
 
   return (
-    <section data-surgery-simulator="anatomy-grounded" className="overflow-hidden rounded-2xl border border-neutral-800 bg-[#071018] text-white shadow-2xl shadow-black/20">
+    <section data-surgery-simulator="anatomy-grounded" aria-busy={isScenarioPending} className="overflow-hidden rounded-2xl border border-neutral-800 bg-[#071018] text-white shadow-2xl shadow-black/20">
       <div className="border-b border-white/10 bg-gradient-to-br from-cyan-400/10 via-transparent to-brand/10 p-4">
         <div className="flex flex-wrap items-start justify-between gap-3">
           <div>
@@ -245,12 +251,13 @@ export function SurgerySimulatorLab({ onKedalaman, onSorot, onSharedView }: Prop
           Academic gate: source citations and named geometry do not equal human academic review. Until a qualified anatomy/surgical reviewer is recorded with credentials, date and scope, this simulator remains explicitly <b className="text-amber-200">not academically reviewed</b>.
         </div>
 
-        <div className="mt-3 flex flex-wrap gap-1.5">
+        <div className="mt-3 flex flex-wrap items-center gap-1.5">
           {SURGERY_SIMULATION_SCENARIOS.map((item) => (
-            <ScenarioChip key={item.id} active={item.id === scenario.id} onClick={() => setScenarioId(item.id)}>
+            <ScenarioChip key={item.id} active={item.id === scenario.id} onClick={() => chooseScenario(item.id)}>
               {item.shortLabel}
             </ScenarioChip>
           ))}
+          {isScenarioPending && <span role="status" className="px-2 text-[8.5px] font-semibold text-cyan-200">Switching reference atlas…</span>}
         </div>
       </div>
 
