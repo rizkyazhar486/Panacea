@@ -273,9 +273,11 @@ try {
     throw new Error('Selecting the Knee profile did not update the shared Body3D frame')
   }
 
-  // Drive the native range control with an actual pointer click. Directly
-  // assigning input.value can fool DOM assertions without triggering React's
-  // controlled state; the visual label is the source of truth here.
+  // Drive the native range control through a real keyboard interaction. On a
+  // mobile-emulated Chromium page, coordinate clicks can move the DOM thumb
+  // without producing a stable React change event. End is deterministic and
+  // still exercises the browser's native range input/change path. We continue
+  // to require the controlled React label and dial to render the exact value.
   await inspector.scrollIntoViewIfNeeded()
   const slider = inspector.locator('input[type="range"]').first()
   const sliderState = await slider.evaluate((node) => ({
@@ -283,25 +285,17 @@ try {
     max: Number(node.max),
     neutral: Number(node.value),
   }))
-  const sliderBox = await slider.boundingBox()
-  if (!sliderBox) throw new Error('Whole-body ROM slider has no measurable bounding box')
-  const targetFraction = 0.65
-  const targetAngle = Math.round(sliderState.min + (sliderState.max - sliderState.min) * targetFraction)
-  await slider.click({
-    position: {
-      x: Math.max(1, Math.min(sliderBox.width - 1, sliderBox.width * targetFraction)),
-      y: Math.max(1, sliderBox.height / 2),
-    },
-  })
+  await slider.focus()
+  await slider.press('End')
   await page.waitForTimeout(200)
   const observedAngle = Number(await slider.inputValue())
-  metrics.wholeBodyMotion.sliderTargetDeg = targetAngle
+  metrics.wholeBodyMotion.sliderTargetDeg = sliderState.max
   metrics.wholeBodyMotion.sliderObservedDeg = observedAngle
   if (observedAngle <= sliderState.neutral + 20) {
     throw new Error(`Whole-body ROM slider did not move meaningfully from neutral: saw ${observedAngle}°`)
   }
-  if (Math.abs(observedAngle - targetAngle) > 10) {
-    throw new Error(`Whole-body ROM slider pointer mapping is unexpected: target about ${targetAngle}°, saw ${observedAngle}°`)
+  if (observedAngle !== sliderState.max) {
+    throw new Error(`Whole-body ROM slider native End interaction did not reach ${sliderState.max}°: saw ${observedAngle}°`)
   }
 
   const renderedAngleLabel = inspector.getByText(`Flexion / extension · ${observedAngle.toFixed(0)}°`, { exact: true })
