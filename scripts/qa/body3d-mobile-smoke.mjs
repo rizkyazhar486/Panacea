@@ -67,7 +67,14 @@ let canvas = null
 
 async function dismissIfVisible(locator, timeout = 5_000) {
   if (!(await locator.isVisible().catch(() => false))) return false
-  await locator.click()
+  try {
+    await locator.click({ timeout: Math.min(timeout, 3_000) })
+  } catch {
+    await withTimeout(locator.evaluate((node) => {
+      if (!(node instanceof HTMLElement)) throw new Error('Optional dismissal target is not interactive')
+      node.click()
+    }), 'Optional onboarding dismissal', Math.min(timeout, 5_000))
+  }
   await locator.waitFor({ state: 'hidden', timeout }).catch(() => undefined)
   return true
 }
