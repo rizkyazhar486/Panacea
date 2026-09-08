@@ -46,17 +46,11 @@ await context.addInitScript(() => {
     dob: '1990-01-01',
   }
   localStorage.setItem('panaceamed.session.v1', JSON.stringify({ account, loginAt: Date.now() }))
-  // This smoke validates Body3D, not global first-run overlays. Seed only the
-  // presentation flags; do not fabricate a completed health assessment.
-  localStorage.setItem('panacea_onboarded_v1', '1')
-  localStorage.setItem('panacea_assessment_prompt_v1', '1')
 })
 
 const page = await context.newPage()
 page.setDefaultTimeout(20_000)
 
-// Keep one optional layer in-flight long enough to prove progressive loading
-// does not cover anatomy that is already usable on a mobile viewport.
 await page.route('**/anatomy/cardio' + 'vascular.glb', async (route) => {
   await new Promise((resolve) => setTimeout(resolve, 4_000))
   await route.continue()
@@ -68,6 +62,13 @@ page.on('pageerror', (error) => pageErrors.push(error.message))
 let metrics = null
 let failure = null
 let canvas = null
+
+async function dismissIfVisible(locator, timeout = 5_000) {
+  if (!(await locator.isVisible().catch(() => false))) return false
+  await locator.click()
+  await locator.waitFor({ state: 'hidden', timeout }).catch(() => undefined)
+  return true
+}
 
 async function canvasHealth(locator) {
   return withTimeout(locator.evaluate((node) => {
@@ -100,6 +101,9 @@ async function assertNoFatal(label) {
 try {
   const response = await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 45_000 })
   if (response && !response.ok()) throw new Error(`Body Explorer returned HTTP ${response.status()}`)
+
+  await dismissIfVisible(page.getByRole('button', { name: /Get Started/i }).first())
+  await dismissIfVisible(page.getByRole('button', { name: /Maybe later/i }).first())
 
   const reminderText = page.getByText(/TODAY.?S REMINDER/i).first()
   if (await reminderText.isVisible().catch(() => false)) {
@@ -252,18 +256,51 @@ try {
   if (kneePressed !== 'true') throw new Error(`Knee joint selection did not become active (aria-pressed=${kneePressed})`)
 
   const slider = inspector.locator('input[type="range"]').first()
-  const sliderBounds = await slider.evaluate((node) => ({ min: Number(node.min), max: Number(node.max) }))
-  const targetAngle = Math.round(sliderBounds.min + (sliderBounds.max - sliderBounds.min) * 0.65)
-  await slider.evaluate((node, value) => {
-    node.value = String(value)
-    node.dispatchEvent(new Event('input', { bubbles: true }))
-    node.dispatchEvent(new Event('change', { bubbles: true }))
-  }, targetAngle)
-  await page.waitForTimeout(100)
+  const sliderState = await slider.evaluate((node) => ({
+    min: Number(node.min),
+    max: Number(node.max),
+    step: Number(node.step) || 1,
+    neutral: Number(node.value),
+  }))
+  const rawTarget = sliderState.neutral + (sliderState.max - sliderState.neutral) * 0.65
+  const targetAngle = sliderState.min + Math.round((rawTarget - sliderState.min) / sliderState.step) * sliderState.step
+
+  await slider.focus()
+  await slider.press('Home')
+  const stepCount = Math.round((targetAngle - sliderState.min) / sliderState.step)
+  for (let i = 0; i < stepCount; i++) await slider.press('ArrowRight')
+
   const observedAngle = Number(await slider.inputValue())
-  if (observedAngle !== targetAngle) {
-    throw new Error(`Whole-body ROM slider did not update: expected ${targetAngle}°, saw ${observedAngle}°`)
+  const motionLabel = slider.locator('xpath=ancestor::label[1]')
+  await motionLabel.waitFor({ state: 'visible', timeout: 5_000 })
+  const visibleMotionLabel = (await motionLabel.innerText()).trim()
+  const renderedMotionHeading = (visibleMotionLabel.split('\n')[0] ?? '').trim()
+  const expectedMotionHeading = `Flexion / extension · ${targetAngle.toFixed(0)}°`
+  metrics.wholeBodyRomDiagnostic = {
+    targetAngle,
+    observedAngle,
+    visibleMotionLabel,
+    renderedMotionHeading,
   }
+  console.log(JSON.stringify({
+    stage: 'whole-body-rom-after-keyboard',
+    targetAngle,
+    observedAngle,
+    visibleMotionLabel,
+    renderedMotionHeading,
+  }))
+  if (observedAngle <= sliderState.neutral + 20) {
+    throw new Error(`Whole-body ROM slider did not move meaningfully from neutral: saw ${observedAngle}°; label=${visibleMotionLabel}`)
+  }
+  if (observedAngle !== targetAngle) {
+    throw new Error(`Whole-body ROM slider keyboard interaction expected ${targetAngle}°: saw ${observedAngle}°; label=${visibleMotionLabel}`)
+  }
+  if (renderedMotionHeading !== expectedMotionHeading) {
+    throw new Error(`Whole-body ROM React label expected ${expectedMotionHeading}: saw ${renderedMotionHeading}`)
+  }
+
+  const dialMotionLabel = inspector.getByText(`Flexion ${targetAngle.toFixed(0)}°`, { exact: true })
+  await dialMotionLabel.waitFor({ state: 'visible', timeout: 5_000 })
 
   const boundary = inspector.getByText(/does not warp anatomy or fabricate patient-specific force/i)
   if (!(await boundary.isVisible().catch(() => false))) {
@@ -280,6 +317,7 @@ try {
     kneeSelected: kneePressed === 'true',
     sliderTargetDeg: targetAngle,
     sliderObservedDeg: observedAngle,
+    reactStateRendered: renderedMotionHeading === expectedMotionHeading,
     scientificBoundaryVisible: true,
     applyToShared3dClicked: true,
     contextStable: postShared3dHealth.webgl && !postShared3dHealth.contextLost,
