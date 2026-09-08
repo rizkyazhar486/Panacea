@@ -49,6 +49,8 @@ jobs:
         run: npm run uji:openfda
       - name: Test RxNorm adapter
         run: npm run uji:rxnorm
+      - name: Test RxClass adapter
+        run: npm run uji:rxclass
       - name: Test MyGene adapter
         run: npm run uji:mygene
       - name: Test Wikimedia Commons image adapter
