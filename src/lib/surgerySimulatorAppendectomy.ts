@@ -132,5 +132,7 @@ export const LAP_APPENDIX_SCENARIO: SurgerySimulationScenario = {
     'Sakellariadis A, et al. Anatomical Variations of the Vermiform Appendix. Acta Med Acad. 2024;53(3):335-342. PMID:39720866. Systematic review.',
     'Barlow A, et al. The vermiform appendix: a review. Clin Anat. 2013;26(7):833-842. PMID:23716128.',
     'Sumi SA, et al. Variations in the Position of Vermiform Appendix in Bangladeshi People. Mymensingh Med J. 2019;28(1):54-59. PMID:30755551. Used only for the taeniae/base landmark statement, not for universal position frequencies.',
+    'MANDATORY INTERACTIVE REFERENCE · thebuggeddev/anatomy — https://github.com/thebuggeddev/anatomy — external reference only; no code or assets are vendored until an explicit upstream license and asset provenance are verified.',
+    'MANDATORY INTERACTIVE REFERENCE · Breath Atlas — https://breath-atlas.thebuggeddev.chatgpt.site/ — external interaction/physiology reference only pending explicit license, provenance, and qualified academic review.',
   ],
 }
