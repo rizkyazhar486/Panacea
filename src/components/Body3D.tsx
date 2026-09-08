@@ -11,6 +11,7 @@ import {
   body3dPixelRatio,
   body3dSliceCoordinate,
 } from '../lib/body3dQuality'
+import { clearAnatomySourceNodes, publishAnatomySourceNodes } from '../lib/anatomySourceNodeRegistry'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Model 3D anatomi NYATA — bukan bentuk geometris buatan sendiri (bola/kapsul/
@@ -498,6 +499,7 @@ export function Body3D({
       for (const group of Object.values(groupsRef.current)) {
         if (group) disposeLayerMaterials(group)
       }
+      for (const def of ANATOMY_LAYERS) clearAnatomySourceNodes(def.file)
       groupsRef.current = {}
 
       lingkungan.dispose()
@@ -547,10 +549,17 @@ export function Body3D({
 
             const clone = group.clone(true)
             cloneLayerMaterials(clone)
+            const sourceNodeNames: string[] = []
             clone.traverse((obj) => {
               const name = obj.userData.originalName as string | undefined
-              if (name && name.startsWith('HOW TO')) obj.visible = false
+              if (!name) return
+              if (name.startsWith('HOW TO')) {
+                obj.visible = false
+                return
+              }
+              sourceNodeNames.push(name)
             })
+            publishAnatomySourceNodes(def.file, sourceNodeNames)
             groupsRef.current[def.key] = clone
             scene.add(clone)
             setFailedLayers((s) => { const n = new Set(s); n.delete(def.key); return n })
@@ -608,6 +617,7 @@ export function Body3D({
         loadGenerationRef.current.invalidate(def.key)
         setLoadingLayers((s) => { const n = new Set(s); n.delete(def.key); return n })
         setFailedLayers((s) => { const n = new Set(s); n.delete(def.key); return n })
+        clearAnatomySourceNodes(def.file)
         if (!have) continue
 
         for (const [mesh, entry] of highlightedMeshesRef.current) {
