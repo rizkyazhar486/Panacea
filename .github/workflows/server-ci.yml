@@ -53,6 +53,8 @@ jobs:
         run: npm run uji:mygene
       - name: Test Wikimedia Commons image adapter
         run: npm run uji:commons
+      - name: Test ICD terminology adapter
+        run: npm run uji:icd
       - name: Runtime smoke-test genomics control plane
         env:
           JWT_SECRET: ci-only-panacea-genomics-secret
