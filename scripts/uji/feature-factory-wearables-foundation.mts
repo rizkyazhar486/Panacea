@@ -51,6 +51,22 @@ assert.match(healthImport, /Supports Apple Health[\s\S]*WHOOP[\s\S]*Garmin Conne
 assert.match(page, /Server not active — data is stored locally on this device/, 'wearable surface must remain useful without live backend sync')
 assert.match(page, /Saved on this device, but syncing to the server failed \(offline\)/, 'wearable sync failure must preserve local state')
 
+// Portable export: only actual current state/history is serialized and an empty
+// history never becomes fabricated rows.
+assert.match(page, /function exportJson\(\)[\s\S]*JSON\.stringify\(p, null, 2\)/, 'wearable JSON export must serialize actual Health Profile state')
+assert.match(page, /function exportCsv\(\)[\s\S]*const rows = p\.history \?\? \[\]/, 'wearable CSV export must serialize actual recorded history')
+assert.match(page, /No history to export yet — save your data first\./, 'wearable history export must fail closed when no records exist')
+
+// Timeline/trend/chart: wearable observations reuse the same bounded recorded
+// history without prediction, synthetic interpolation or empty-series seeding.
+assert.match(page, /return \[\.\.\.prev, snap\]\.slice\(-90\)/, 'wearable longitudinal history must remain bounded')
+assert.match(page, /function TrendChart\(\{ history \}/, 'wearable observations must remain visible on the shared trend surface')
+assert.match(page, /if \(history\.length < 2\)/, 'wearable trend surface must expose an insufficient-data state')
+assert.match(page, /ResponsiveContainer width="100%" height="100%"/, 'wearable chart must remain responsive')
+assert.match(page, /<Tooltip /, 'wearable chart must expose recorded point details')
+assert.match(page, /const data = history\.map/, 'wearable trend points must be derived from recorded history only')
+assert.match(page, /const active = series\.filter\(\(s\) => data\.some/, 'wearable chart must not fabricate empty series')
+
 // Privacy + data quality + onboarding + performance are product behavior, not
 // clinical claims. Keep them explicit and bounded.
 assert.match(page, /Screenshots are different:[\s\S]*image is sent to the server to be read/, 'wearable screenshot processing must disclose network transfer')
@@ -59,7 +75,6 @@ assert.match(page, /The OLD link stops working immediately/, 'credential rotatio
 assert.match(page, /title="Diagnostik Sinkronisasi"/, 'wearable data-quality diagnostics must be reachable')
 assert.match(page, /const MAX_ROWS = 60/, 'wearable diagnostic rendering must be bounded')
 assert.match(page, /to="\/health-data\/tutorial"/, 'wearable setup onboarding must be reachable from the canonical surface')
-assert.match(page, /return \[\.\.\.prev, snap\]\.slice\(-90\)/, 'wearable history must remain bounded')
 assert.doesNotMatch(page, /setInterval\(/, 'wearable surface must not add repeated polling')
 
-console.log('Feature Factory wearables foundation: canonical surface, adapter boundary, snapshot/provenance, import, offline/fallback, privacy, diagnostics, onboarding and performance are regression-guarded.')
+console.log('Feature Factory wearables foundation: canonical surface, adapter boundary, snapshot/provenance, import/export, offline/fallback, recorded timeline/trend/chart, privacy, diagnostics, onboarding, performance and QA are regression-guarded.')
