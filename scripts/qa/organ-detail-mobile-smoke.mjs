@@ -92,7 +92,7 @@ try {
   const organCanvas = page.locator('canvas[data-organ-model3d="eye"]').first()
   await organCanvas.waitFor({ state: 'visible', timeout: 45_000 })
   await page.getByText('Named reference anatomy', { exact: true }).waitFor({ state: 'visible', timeout: 45_000 })
-  await page.getByText(/26 source meshes in this close-up/i).waitFor({ state: 'visible', timeout: 10_000 })
+  await page.getByText(/22 named structures from 26 source meshes/i).waitFor({ state: 'visible', timeout: 10_000 })
 
   await organCanvas.evaluate((node) => node.scrollIntoView({ block: 'center', inline: 'center' }))
   await page.waitForTimeout(150)
@@ -128,14 +128,14 @@ try {
 
   const namedTitle = page.getByText('Named reference anatomy', { exact: true })
   const namedCard = namedTitle.locator('xpath=ancestor::div[contains(@class,"rounded-xl")][1]')
-  const showAll = namedCard.getByRole('button', { name: 'Show all 26', exact: true })
+  const showAll = namedCard.getByRole('button', { name: 'Show all 22', exact: true })
   await showAll.click()
   await namedCard.getByRole('button', { name: 'Show less', exact: true }).waitFor({ state: 'visible', timeout: 5_000 })
 
   const allNamedButtons = namedCard.locator('div.mt-2 button')
   const namedButtonCount = await allNamedButtons.count()
   metrics.eyeNamedButtonCount = namedButtonCount
-  if (namedButtonCount !== 26) throw new Error(`Expected 26 eye source-mesh buttons after Show all, found ${namedButtonCount}`)
+  if (namedButtonCount !== 22) throw new Error(`Expected 22 unique eye anatomy controls after Show all, found ${namedButtonCount}`)
 
   // Select a part beyond the initial 12 to prove the complete source inventory
   // is interactive, not merely displayed as metadata.
@@ -156,17 +156,17 @@ try {
   await writeFile(screenshotPath, await capturePng())
   screenshotCaptured = true
 
-  // A generated Tripo model is intentionally not treated as a set of verified
-  // internal anatomical meshes. Switching to Brain must remove the reference
-  // inventory rather than fabricate labels from its single generated surface.
+  // Brain has now been promoted from a Tripo approximation to BodyParts3D
+  // reference anatomy. Assert that the promotion is real and exposes its
+  // semantic inventory rather than silently falling back to the old AI model.
   await page.getByRole('button', { name: 'Organs', exact: true }).first().click()
   await page.getByRole('button', { name: 'Brain', exact: true }).first().click()
   await page.locator('canvas[data-organ-model3d="brain"]').first().waitFor({ state: 'visible', timeout: 45_000 })
-  await page.getByText(/AI-generated model \(Tripo\)/i).waitFor({ state: 'visible', timeout: 10_000 })
-  metrics.aiModelShowsReferenceMeshInventory = await page.getByText('Named reference anatomy', { exact: true }).isVisible().catch(() => false)
-  if (metrics.aiModelShowsReferenceMeshInventory) {
-    throw new Error('AI-generated brain close-up incorrectly exposes a verified reference-mesh inventory')
-  }
+  await page.getByText('Named reference anatomy', { exact: true }).waitFor({ state: 'visible', timeout: 45_000 })
+  await page.getByText(/45 named structures from 51 source meshes/i).waitFor({ state: 'visible', timeout: 10_000 })
+  metrics.brainReferenceInventoryVisible = true
+  metrics.brainStillShowsTripo = await page.getByText(/AI-generated model \(Tripo\)/i).isVisible().catch(() => false)
+  if (metrics.brainStillShowsTripo) throw new Error('Brain still reports the obsolete Tripo source after reference promotion')
 
   if (pageErrors.length) throw new Error(`Browser page errors: ${pageErrors.join(' | ')}`)
   console.log(JSON.stringify({ ok: true, screenshotCaptured, ...metrics }))

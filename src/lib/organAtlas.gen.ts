@@ -15,7 +15,8 @@ export const ORGAN_ATLAS: OrganModel[] = [
     "accent": "#f2a33b",
     "illustrated": false,
     "sumber": "bodyparts3d",
-    "jumlahBagian": 22,
+    "jumlahBagian": 21,
+    "jumlahMesh": 22,
     "hotspots": [
       {
         "id": "wall-of-ventricle",
@@ -104,30 +105,51 @@ export const ORGAN_ATLAS: OrganModel[] = [
     "focusKey": "kidneys",
     "label": "Kidneys & renal vessels",
     "scientificName": "Renes",
-    "accent": "#c69a5e",
+    "accent": "#7fa88a",
     "illustrated": false,
     "sumber": "bodyparts3d",
-    "jumlahBagian": 40,
+    "jumlahBagian": 22,
+    "jumlahMesh": 40,
     "hotspots": [
       {
-        "id": "right-renal-vein",
-        "ta": "Right renal vein",
+        "id": "anterior-division-of-left-renal-artery",
+        "ta": "Anterior division of left renal artery",
         "position": [
-          -0.3224,
-          0.4971,
-          -0.0285
+          0.4678,
+          0.6106,
+          -0.0381
         ],
-        "color": "#c69a5e"
+        "color": "#7fa88a"
+      },
+      {
+        "id": "anterior-division-of-right-renal-artery",
+        "ta": "Anterior division of right renal artery",
+        "position": [
+          -0.3084,
+          0.5158,
+          0.0123
+        ],
+        "color": "#f2a33b"
       },
       {
         "id": "left-renal-vein",
         "ta": "Left renal vein",
         "position": [
-          0.4938,
-          0.612,
-          -0.0935
+          0.4499,
+          0.6089,
+          -0.061
         ],
-        "color": "#ee7c6a"
+        "color": "#b86858"
+      },
+      {
+        "id": "right-renal-vein",
+        "ta": "Right renal vein",
+        "position": [
+          -0.3061,
+          0.4998,
+          -0.0198
+        ],
+        "color": "#7fa88a"
       },
       {
         "id": "left-kidney",
@@ -137,7 +159,7 @@ export const ORGAN_ATLAS: OrganModel[] = [
           0.6136,
           -0.0733
         ],
-        "color": "#6393d8"
+        "color": "#f2a33b"
       },
       {
         "id": "right-kidney",
@@ -147,27 +169,17 @@ export const ORGAN_ATLAS: OrganModel[] = [
           0.4902,
           0.0027
         ],
-        "color": "#7fa88a"
+        "color": "#d89bc4"
       },
       {
-        "id": "anterior-division-of-left-renal-artery",
-        "ta": "Anterior division of left renal artery",
+        "id": "posterior-division-of-right-renal-artery",
+        "ta": "Posterior division of right renal artery",
         "position": [
-          0.5313,
-          0.5955,
-          -0.082
+          -0.3495,
+          0.5045,
+          -0.0558
         ],
-        "color": "#ee7c6a"
-      },
-      {
-        "id": "anterior-division-of-right-renal-artery",
-        "ta": "Anterior division of right renal artery",
-        "position": [
-          -0.3573,
-          0.5032,
-          -0.0223
-        ],
-        "color": "#b86858"
+        "color": "#6393d8"
       },
       {
         "id": "right-ureter",
@@ -177,17 +189,7 @@ export const ORGAN_ATLAS: OrganModel[] = [
           0.1279,
           -0.0204
         ],
-        "color": "#d89bc4"
-      },
-      {
-        "id": "left-ureter",
-        "ta": "Left ureter",
-        "position": [
-          0.4213,
-          0.266,
-          -0.0597
-        ],
-        "color": "#f2a33b"
+        "color": "#6393d8"
       }
     ]
   },
@@ -196,11 +198,62 @@ export const ORGAN_ATLAS: OrganModel[] = [
     "focusKey": "small-intestine",
     "label": "Small intestine",
     "scientificName": "Intestinum tenue",
-    "accent": "#ee7c6a",
+    "accent": "#b86858",
     "illustrated": false,
     "sumber": "bodyparts3d",
-    "jumlahBagian": 56,
+    "jumlahBagian": 8,
+    "jumlahMesh": 56,
     "hotspots": [
+      {
+        "id": "distal-part-of-jejunum",
+        "ta": "Distal part of jejunum",
+        "position": [
+          -0.2595,
+          0.1882,
+          0.1339
+        ],
+        "color": "#b86858"
+      },
+      {
+        "id": "proximal-part-of-ileum",
+        "ta": "Proximal part of ileum",
+        "position": [
+          -0.0343,
+          -0.2267,
+          0.0833
+        ],
+        "color": "#f2a33b"
+      },
+      {
+        "id": "distal-part-of-ileum",
+        "ta": "Distal part of ileum",
+        "position": [
+          -0.189,
+          -0.7338,
+          -0.0528
+        ],
+        "color": "#d89bc4"
+      },
+      {
+        "id": "middle-part-of-ileum",
+        "ta": "Middle part of ileum",
+        "position": [
+          -0.0827,
+          -0.5223,
+          0.0683
+        ],
+        "color": "#6393d8"
+      },
+      {
+        "id": "proximal-part-of-jejunum",
+        "ta": "Proximal part of jejunum",
+        "position": [
+          0.3018,
+          0.3312,
+          0.0868
+        ],
+        "color": "#c69a5e"
+      },
       {
         "id": "duodenum",
         "ta": "Duodenum",
@@ -212,74 +265,24 @@ export const ORGAN_ATLAS: OrganModel[] = [
         "color": "#ee7c6a"
       },
       {
-        "id": "distal-part-of-jejunum",
-        "ta": "Distal part of jejunum",
+        "id": "middle-part-of-jejunum",
+        "ta": "Middle part of jejunum",
         "position": [
-          -0.5258,
-          0.225,
-          0.004
+          0.4358,
+          -0.008,
+          0.0609
         ],
-        "color": "#ee7c6a"
+        "color": "#7294b9"
       },
       {
-        "id": "distal-part-of-jejunum",
-        "ta": "Distal part of jejunum",
+        "id": "ileocecal-junction",
+        "ta": "Ileocecal junction",
         "position": [
-          -0.2122,
-          0.3554,
-          0.1657
+          -0.5742,
+          -0.3262,
+          -0.1516
         ],
-        "color": "#d89bc4"
-      },
-      {
-        "id": "proximal-part-of-ileum",
-        "ta": "Proximal part of ileum",
-        "position": [
-          -0.5044,
-          -0.0553,
-          -0.0091
-        ],
-        "color": "#f2a33b"
-      },
-      {
-        "id": "proximal-part-of-jejunum",
-        "ta": "Proximal part of jejunum",
-        "position": [
-          0.3644,
-          0.3228,
-          0.0805
-        ],
-        "color": "#6393d8"
-      },
-      {
-        "id": "middle-part-of-ileum",
-        "ta": "Middle part of ileum",
-        "position": [
-          -0.354,
-          -0.4255,
-          0.0705
-        ],
-        "color": "#b86858"
-      },
-      {
-        "id": "proximal-part-of-jejunum",
-        "ta": "Proximal part of jejunum",
-        "position": [
-          0.1543,
-          0.1585,
-          0.1591
-        ],
-        "color": "#c69a5e"
-      },
-      {
-        "id": "proximal-part-of-ileum",
-        "ta": "Proximal part of ileum",
-        "position": [
-          0.4275,
-          -0.3171,
-          0.0641
-        ],
-        "color": "#ee7c6a"
+        "color": "#7fa88a"
       }
     ]
   },
@@ -292,6 +295,7 @@ export const ORGAN_ATLAS: OrganModel[] = [
     "illustrated": false,
     "sumber": "bodyparts3d",
     "jumlahBagian": 4,
+    "jumlahMesh": 4,
     "hotspots": [
       {
         "id": "descending-colon",
@@ -343,7 +347,8 @@ export const ORGAN_ATLAS: OrganModel[] = [
     "accent": "#ee7c6a",
     "illustrated": false,
     "sumber": "bodyparts3d",
-    "jumlahBagian": 16,
+    "jumlahBagian": 14,
+    "jumlahMesh": 16,
     "hotspots": [
       {
         "id": "pancreas",
@@ -389,9 +394,9 @@ export const ORGAN_ATLAS: OrganModel[] = [
         "id": "pancreaticoduodenal-vein",
         "ta": "Pancreaticoduodenal vein",
         "position": [
-          -0.6002,
-          -0.243,
-          0.2185
+          -0.5254,
+          -0.1356,
+          0.1179
         ],
         "color": "#d89bc4"
       },
@@ -432,11 +437,22 @@ export const ORGAN_ATLAS: OrganModel[] = [
     "focusKey": "brain",
     "label": "Brain",
     "scientificName": "Encephalon",
-    "accent": "#7294b9",
+    "accent": "#6393d8",
     "illustrated": false,
     "sumber": "bodyparts3d",
-    "jumlahBagian": 51,
+    "jumlahBagian": 45,
+    "jumlahMesh": 51,
     "hotspots": [
+      {
+        "id": "cerebellum",
+        "ta": "Cerebellum",
+        "position": [
+          -0.0008,
+          -0.4202,
+          -0.4597
+        ],
+        "color": "#6393d8"
+      },
       {
         "id": "corpus-callosum",
         "ta": "Corpus callosum",
@@ -448,24 +464,14 @@ export const ORGAN_ATLAS: OrganModel[] = [
         "color": "#7294b9"
       },
       {
-        "id": "cerebellum",
-        "ta": "Cerebellum",
+        "id": "pons",
+        "ta": "Pons",
         "position": [
-          -0.1847,
-          -0.4203,
-          -0.4585
+          -0.0016,
+          -0.3643,
+          -0.0564
         ],
-        "color": "#f2a33b"
-      },
-      {
-        "id": "cerebellum",
-        "ta": "Cerebellum",
-        "position": [
-          0.1869,
-          -0.4201,
-          -0.4608
-        ],
-        "color": "#6393d8"
+        "color": "#ee7c6a"
       },
       {
         "id": "right-superior-frontal-gyrus",
@@ -475,7 +481,7 @@ export const ORGAN_ATLAS: OrganModel[] = [
           0.5919,
           0.3575
         ],
-        "color": "#7fa88a"
+        "color": "#7294b9"
       },
       {
         "id": "left-superior-frontal-gyrus",
@@ -485,7 +491,17 @@ export const ORGAN_ATLAS: OrganModel[] = [
           0.598,
           0.3456
         ],
-        "color": "#d89bc4"
+        "color": "#c69a5e"
+      },
+      {
+        "id": "orbital-gyrus",
+        "ta": "Orbital gyrus",
+        "position": [
+          -0.0035,
+          -0.0001,
+          0.5514
+        ],
+        "color": "#7fa88a"
       },
       {
         "id": "right-precentral-gyrus",
@@ -495,7 +511,7 @@ export const ORGAN_ATLAS: OrganModel[] = [
           0.5664,
           -0.1447
         ],
-        "color": "#f2a33b"
+        "color": "#ee7c6a"
       },
       {
         "id": "left-precentral-gyrus",
@@ -505,17 +521,7 @@ export const ORGAN_ATLAS: OrganModel[] = [
           0.5683,
           -0.1416
         ],
-        "color": "#ee7c6a"
-      },
-      {
-        "id": "pons",
-        "ta": "Pons",
-        "position": [
-          -0.0818,
-          -0.3645,
-          -0.0503
-        ],
-        "color": "#c69a5e"
+        "color": "#b86858"
       }
     ]
   },
@@ -524,10 +530,11 @@ export const ORGAN_ATLAS: OrganModel[] = [
     "focusKey": "eye",
     "label": "Eye",
     "scientificName": "Oculus",
-    "accent": "#b86858",
+    "accent": "#c69a5e",
     "illustrated": false,
     "sumber": "bodyparts3d",
-    "jumlahBagian": 26,
+    "jumlahBagian": 22,
+    "jumlahMesh": 26,
     "hotspots": [
       {
         "id": "right-corona-ciliaris",
@@ -537,7 +544,7 @@ export const ORGAN_ATLAS: OrganModel[] = [
           -0.1476,
           0.6044
         ],
-        "color": "#b86858"
+        "color": "#c69a5e"
       },
       {
         "id": "left-corona-ciliaris",
@@ -547,7 +554,7 @@ export const ORGAN_ATLAS: OrganModel[] = [
           -0.1408,
           0.6038
         ],
-        "color": "#d89bc4"
+        "color": "#6393d8"
       },
       {
         "id": "left-sclera",
@@ -557,7 +564,7 @@ export const ORGAN_ATLAS: OrganModel[] = [
           -0.1328,
           0.4404
         ],
-        "color": "#f2a33b"
+        "color": "#ee7c6a"
       },
       {
         "id": "right-sclera",
@@ -567,27 +574,27 @@ export const ORGAN_ATLAS: OrganModel[] = [
           -0.1334,
           0.448
         ],
-        "color": "#c69a5e"
-      },
-      {
-        "id": "left-choroid",
-        "ta": "Left choroid",
-        "position": [
-          0.7,
-          -0.1349,
-          0.4242
-        ],
-        "color": "#f2a33b"
+        "color": "#d89bc4"
       },
       {
         "id": "right-choroid",
         "ta": "Right choroid",
         "position": [
-          -0.6915,
-          -0.1302,
-          0.4395
+          -0.6958,
+          -0.1299,
+          0.4762
         ],
-        "color": "#7294b9"
+        "color": "#7fa88a"
+      },
+      {
+        "id": "left-choroid",
+        "ta": "Left choroid",
+        "position": [
+          0.7022,
+          -0.1358,
+          0.465
+        ],
+        "color": "#f2a33b"
       },
       {
         "id": "optic-part-of-left-retina",
@@ -597,7 +604,7 @@ export const ORGAN_ATLAS: OrganModel[] = [
           -0.1298,
           0.3808
         ],
-        "color": "#ee7c6a"
+        "color": "#b86858"
       },
       {
         "id": "optic-part-of-right-retina",
@@ -607,7 +614,7 @@ export const ORGAN_ATLAS: OrganModel[] = [
           -0.128,
           0.381
         ],
-        "color": "#7fa88a"
+        "color": "#6393d8"
       }
     ]
   },
@@ -619,7 +626,8 @@ export const ORGAN_ATLAS: OrganModel[] = [
     "accent": "#f2a33b",
     "illustrated": false,
     "sumber": "bodyparts3d",
-    "jumlahBagian": 10,
+    "jumlahBagian": 7,
+    "jumlahMesh": 10,
     "hotspots": [
       {
         "id": "optic-part-of-left-retina",
@@ -642,6 +650,16 @@ export const ORGAN_ATLAS: OrganModel[] = [
         "color": "#d89bc4"
       },
       {
+        "id": "optic-chiasm",
+        "ta": "Optic chiasm",
+        "position": [
+          0.0011,
+          0.3211,
+          -0.1975
+        ],
+        "color": "#7fa88a"
+      },
+      {
         "id": "left-optic-tract",
         "ta": "Left optic tract",
         "position": [
@@ -649,7 +667,7 @@ export const ORGAN_ATLAS: OrganModel[] = [
           0.3266,
           -0.6311
         ],
-        "color": "#7294b9"
+        "color": "#c69a5e"
       },
       {
         "id": "right-optic-tract",
@@ -659,47 +677,27 @@ export const ORGAN_ATLAS: OrganModel[] = [
           0.3271,
           -0.6278
         ],
-        "color": "#f2a33b"
-      },
-      {
-        "id": "optic-chiasm",
-        "ta": "Optic chiasm",
-        "position": [
-          0.0893,
-          0.3216,
-          -0.1987
-        ],
-        "color": "#7fa88a"
-      },
-      {
-        "id": "optic-chiasm",
-        "ta": "Optic chiasm",
-        "position": [
-          -0.0893,
-          0.3207,
-          -0.1963
-        ],
-        "color": "#b86858"
+        "color": "#7294b9"
       },
       {
         "id": "right-optic-nerve",
         "ta": "Right optic nerve",
         "position": [
-          -0.3457,
-          0.1052,
-          0.2255
+          -0.3058,
+          0.1219,
+          0.1597
         ],
-        "color": "#ee7c6a"
+        "color": "#6393d8"
       },
       {
         "id": "left-optic-nerve",
         "ta": "Left optic nerve",
         "position": [
-          0.3465,
-          0.1046,
-          0.224
+          0.3346,
+          0.1026,
+          0.1947
         ],
-        "color": "#c69a5e"
+        "color": "#ee7c6a"
       }
     ]
   },
@@ -712,6 +710,7 @@ export const ORGAN_ATLAS: OrganModel[] = [
     "illustrated": false,
     "sumber": "bodyparts3d",
     "jumlahBagian": 1,
+    "jumlahMesh": 1,
     "hotspots": [
       {
         "id": "spleen",
@@ -734,6 +733,7 @@ export const ORGAN_ATLAS: OrganModel[] = [
     "illustrated": false,
     "sumber": "bodyparts3d",
     "jumlahBagian": 1,
+    "jumlahMesh": 1,
     "hotspots": [
       {
         "id": "stomach",
@@ -756,6 +756,7 @@ export const ORGAN_ATLAS: OrganModel[] = [
     "illustrated": false,
     "sumber": "bodyparts3d",
     "jumlahBagian": 2,
+    "jumlahMesh": 2,
     "hotspots": [
       {
         "id": "gallbladder",
@@ -788,6 +789,7 @@ export const ORGAN_ATLAS: OrganModel[] = [
     "illustrated": false,
     "sumber": "bodyparts3d",
     "jumlahBagian": 4,
+    "jumlahMesh": 4,
     "hotspots": [
       {
         "id": "right-ureter",
@@ -840,6 +842,7 @@ export const ORGAN_ATLAS: OrganModel[] = [
     "illustrated": false,
     "sumber": "bodyparts3d",
     "jumlahBagian": 5,
+    "jumlahMesh": 5,
     "hotspots": [
       {
         "id": "left-deferent-duct",
@@ -902,6 +905,7 @@ export const ORGAN_ATLAS: OrganModel[] = [
     "illustrated": false,
     "sumber": "bodyparts3d",
     "jumlahBagian": 4,
+    "jumlahMesh": 4,
     "hotspots": [
       {
         "id": "left-epididymis",
@@ -954,6 +958,7 @@ export const ORGAN_ATLAS: OrganModel[] = [
     "illustrated": false,
     "sumber": "bodyparts3d",
     "jumlahBagian": 2,
+    "jumlahMesh": 2,
     "hotspots": [
       {
         "id": "left-adrenal-gland",
@@ -986,6 +991,7 @@ export const ORGAN_ATLAS: OrganModel[] = [
     "illustrated": false,
     "sumber": "bodyparts3d",
     "jumlahBagian": 2,
+    "jumlahMesh": 2,
     "hotspots": [
       {
         "id": "pituitary-gland",
@@ -1014,30 +1020,41 @@ export const ORGAN_ATLAS: OrganModel[] = [
     "focusKey": "larynx",
     "label": "Larynx",
     "scientificName": "Larynx",
-    "accent": "#c69a5e",
+    "accent": "#6393d8",
     "illustrated": false,
     "sumber": "bodyparts3d",
-    "jumlahBagian": 25,
+    "jumlahBagian": 22,
+    "jumlahMesh": 25,
     "hotspots": [
       {
         "id": "right-thyro-arytenoid",
         "ta": "Right thyro-arytenoid",
         "position": [
-          -0.217,
-          0.1955,
-          -0.0664
+          -0.2094,
+          0.0419,
+          -0.0893
         ],
-        "color": "#c69a5e"
+        "color": "#6393d8"
       },
       {
         "id": "left-thyro-arytenoid",
         "ta": "Left thyro-arytenoid",
         "position": [
-          0.2169,
-          0.1967,
-          -0.0748
+          0.2097,
+          0.0369,
+          -0.0982
         ],
-        "color": "#6393d8"
+        "color": "#ee7c6a"
+      },
+      {
+        "id": "cricoid-cartilage",
+        "ta": "Cricoid cartilage",
+        "position": [
+          0.0025,
+          -0.7326,
+          -0.2273
+        ],
+        "color": "#ee7c6a"
       },
       {
         "id": "left-aryepiglotticus",
@@ -1047,7 +1064,7 @@ export const ORGAN_ATLAS: OrganModel[] = [
           0.5042,
           -0.0698
         ],
-        "color": "#7fa88a"
+        "color": "#d89bc4"
       },
       {
         "id": "oblique-part-of-left-cricothyroid",
@@ -1057,7 +1074,7 @@ export const ORGAN_ATLAS: OrganModel[] = [
           -0.717,
           -0.2303
         ],
-        "color": "#b86858"
+        "color": "#7294b9"
       },
       {
         "id": "oblique-part-of-right-cricothyroid",
@@ -1067,7 +1084,7 @@ export const ORGAN_ATLAS: OrganModel[] = [
           -0.7129,
           -0.2321
         ],
-        "color": "#6393d8"
+        "color": "#ee7c6a"
       },
       {
         "id": "straight-part-of-left-cricothyroid",
@@ -1077,7 +1094,7 @@ export const ORGAN_ATLAS: OrganModel[] = [
           -0.7059,
           0.0729
         ],
-        "color": "#ee7c6a"
+        "color": "#b86858"
       },
       {
         "id": "right-aryepiglotticus",
@@ -1087,17 +1104,7 @@ export const ORGAN_ATLAS: OrganModel[] = [
           0.4889,
           -0.0744
         ],
-        "color": "#7294b9"
-      },
-      {
-        "id": "thyroid-cartilage",
-        "ta": "Thyroid cartilage",
-        "position": [
-          0.0022,
-          -0.1488,
-          -0.1927
-        ],
-        "color": "#ee7c6a"
+        "color": "#7fa88a"
       }
     ]
   },
@@ -1110,6 +1117,7 @@ export const ORGAN_ATLAS: OrganModel[] = [
     "illustrated": false,
     "sumber": "bodyparts3d",
     "jumlahBagian": 8,
+    "jumlahMesh": 8,
     "hotspots": [
       {
         "id": "vomer",
@@ -1202,6 +1210,7 @@ export const ORGAN_ATLAS: OrganModel[] = [
     "illustrated": false,
     "sumber": "bodyparts3d",
     "jumlahBagian": 14,
+    "jumlahMesh": 14,
     "hotspots": [
       {
         "id": "left-palatopharyngeus",

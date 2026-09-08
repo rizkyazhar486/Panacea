@@ -102,7 +102,7 @@ export function OrganModel3D({ organ, selected, onSelect, onPartsLoaded }: Props
     let group: THREE.Group | null = null
     const namedMeshes: THREE.Mesh[] = []
     const originalEmissive = new Map<THREE.Mesh, THREE.Color>()
-    let highlighted: THREE.Mesh | null = null
+    const highlighted = new Set<THREE.Mesh>()
     const ray = new THREE.Raycaster()
     const pointer = new THREE.Vector2()
 
@@ -112,24 +112,26 @@ export function OrganModel3D({ organ, selected, onSelect, onPartsLoaded }: Props
     }
 
     const restoreHighlight = () => {
-      if (!highlighted) return
-      const material = highlighted.material as THREE.MeshStandardMaterial
-      const original = originalEmissive.get(highlighted)
-      if (original) material.emissive.copy(original)
-      highlighted = null
+      for (const mesh of highlighted) {
+        const material = mesh.material as THREE.MeshStandardMaterial
+        const original = originalEmissive.get(mesh)
+        if (original) material.emissive.copy(original)
+      }
+      highlighted.clear()
     }
 
     const applyHighlight = (value?: string | null) => {
       restoreHighlight()
       const wanted = selectionName(value).toLowerCase()
       if (!wanted) return
-      const hit = namedMeshes.find(
+      const hits = namedMeshes.filter(
         (mesh) => String(mesh.userData.panaceaDisplayName ?? displayMeshName(mesh.name)).toLowerCase() === wanted,
       )
-      if (!hit) return
-      const material = hit.material as THREE.MeshStandardMaterial
-      material.emissive.set(organ.accent).multiplyScalar(0.35)
-      highlighted = hit
+      for (const hit of hits) {
+        const material = hit.material as THREE.MeshStandardMaterial
+        material.emissive.set(organ.accent).multiplyScalar(0.35)
+        highlighted.add(hit)
+      }
     }
 
     const loader = new GLTFLoader()
@@ -138,11 +140,10 @@ export function OrganModel3D({ organ, selected, onSelect, onPartsLoaded }: Props
       (gltf) => {
         group = gltf.scene
 
-        // Reference organ GLBs contain individually named BodyParts3D meshes.
-        // Expose all of those names rather than only the eight largest hotspot
-        // shortcuts. AI close-ups remain marker-only because one generated mesh
-        // does not provide evidence for internal anatomical boundaries.
-        if (organ.sumber === 'bodyparts3d') {
+        // Reference organ GLBs contain individually named anatomy meshes.
+        // Expose semantic names from BodyParts3D, Z-Anatomy, or HRA. AI close-ups
+        // remain marker-only because a generated surface is not boundary evidence.
+        if (organ.sumber && organ.sumber !== 'ai') {
           const names: string[] = []
           group.traverse((object) => {
             if (!(object as THREE.Mesh).isMesh) return
@@ -222,7 +223,7 @@ export function OrganModel3D({ organ, selected, onSelect, onPartsLoaded }: Props
     renderer.domElement.addEventListener('pointerdown', stopAuto)
 
     const pickNamedMesh = (ev: PointerEvent) => {
-      if (organ.sumber !== 'bodyparts3d' || !namedMeshes.length) return
+      if (!organ.sumber || organ.sumber === 'ai' || !namedMeshes.length) return
       const rect = renderer.domElement.getBoundingClientRect()
       if (rect.width < 2 || rect.height < 2) return
       pointer.x = ((ev.clientX - rect.left) / rect.width) * 2 - 1
@@ -368,20 +369,21 @@ export function OrganModel3D({ organ, selected, onSelect, onPartsLoaded }: Props
           <p className="pointer-events-none absolute bottom-1.5 left-0 right-0 px-3 text-center text-[10px] text-neutral-500">
             {pickedMesh
               ? pickedMesh
-              : organ.sumber === 'bodyparts3d'
+              : organ.sumber && organ.sumber !== 'ai'
                 ? 'Drag to rotate · tap any named reference structure'
                 : 'Drag to rotate · tap a verified marker'}
           </p>
         )}
       </div>
 
-      {organ.sumber === 'bodyparts3d' && partNames.length > 0 && (
+      {organ.sumber && organ.sumber !== 'ai' && partNames.length > 0 && (
         <div className="rounded-xl border border-neutral-200 p-2.5 dark:border-white/10">
           <div className="flex items-center justify-between gap-2">
             <div>
               <div className="text-[11px] font-bold text-ink dark:text-white">Named reference anatomy</div>
               <p className="text-[10px] text-neutral-400">
-                {partNames.length} source meshes in this close-up · BodyParts3D 4.0
+                {partNames.length} named structures from {organ.jumlahMesh ?? partNames.length} source meshes ·{' '}
+                {organ.sourceLabel ?? (organ.sumber === 'bodyparts3d' ? 'BodyParts3D 4.0' : organ.sumber)}
               </p>
             </div>
             {partNames.length > 12 && (
@@ -431,7 +433,7 @@ export function OrganModel3D({ organ, selected, onSelect, onPartsLoaded }: Props
               </p>
             </div>
             <span className="shrink-0 rounded-full border border-neutral-200 px-2 py-1 text-[9.5px] font-bold text-neutral-500 dark:border-white/10">
-              {organ.sumber === 'bodyparts3d' ? 'REFERENCE 3D' : 'SHAPE ONLY'}
+              {organ.sumber && organ.sumber !== 'ai' ? 'REFERENCE 3D' : 'SHAPE ONLY'}
             </span>
           </div>
           <div className="mt-2 max-h-48 space-y-1 overflow-y-auto pr-0.5">
