@@ -8,6 +8,7 @@ assert.ok(digestive)
 assert.ok(thermoreceptor)
 
 const sourceSha = 'a'.repeat(64)
+const intermediateSha = 'c'.repeat(64)
 const derivedSha = 'b'.repeat(64)
 
 const complete: BodyAssetProvenanceRecord = {
@@ -23,15 +24,25 @@ const complete: BodyAssetProvenanceRecord = {
   licenseScope: 'asset',
   licenseEvidence: 'Verified source-side asset/license record',
   attribution: 'Source asset attribution preserved for the derived reference mesh',
-  transformationHistory: ['Deterministic build-time conversion to GLB'],
-  transformations: [{
-    operation: 'build-time conversion',
-    tool: 'deterministic converter',
-    toolVersion: 'recorded-version',
-    inputSha256: sourceSha,
-    outputSha256: derivedSha,
-    parameters: 'No fabricated geometry; source coordinates preserved',
-  }],
+  transformationHistory: ['Deterministic source normalization', 'Deterministic build-time conversion to GLB'],
+  transformations: [
+    {
+      operation: 'source normalization',
+      tool: 'deterministic normalizer',
+      toolVersion: 'recorded-version',
+      inputSha256: sourceSha,
+      outputSha256: intermediateSha,
+      parameters: 'No fabricated geometry; source topology preserved',
+    },
+    {
+      operation: 'build-time conversion',
+      tool: 'deterministic converter',
+      toolVersion: 'recorded-version',
+      inputSha256: intermediateSha,
+      outputSha256: derivedSha,
+      parameters: 'No fabricated geometry; source coordinates preserved',
+    },
+  ],
   geometryStatus: 'verified-native',
   evidenceStatus: 'source-checked',
   academicReview: 'pending',
@@ -72,12 +83,19 @@ const missingLicenseEvidence = validateBodyAssetProvenance(reviewedDigestive, { 
 assert.equal(missingLicenseEvidence.validForVerifiedRender, false)
 assert.ok(missingLicenseEvidence.reasons.includes('Asset-specific license evidence is missing.'))
 
-const brokenLineage = validateBodyAssetProvenance(reviewedDigestive, {
+const brokenEnd = validateBodyAssetProvenance(reviewedDigestive, {
   ...reviewedComplete,
-  transformations: [{ ...reviewedComplete.transformations[0], outputSha256: 'c'.repeat(64) }],
+  transformations: [reviewedComplete.transformations[0], { ...reviewedComplete.transformations[1], outputSha256: 'd'.repeat(64) }],
 })
-assert.equal(brokenLineage.validForVerifiedRender, false)
-assert.ok(brokenLineage.reasons.some((reason) => reason.includes('does not end')))
+assert.equal(brokenEnd.validForVerifiedRender, false)
+assert.ok(brokenEnd.reasons.some((reason) => reason.includes('does not end')))
+
+const discontinuousLineage = validateBodyAssetProvenance(reviewedDigestive, {
+  ...reviewedComplete,
+  transformations: [reviewedComplete.transformations[0], { ...reviewedComplete.transformations[1], inputSha256: 'e'.repeat(64) }],
+})
+assert.equal(discontinuousLineage.validForVerifiedRender, false)
+assert.ok(discontinuousLineage.reasons.some((reason) => reason.includes('discontinuous between steps 1 and 2')))
 
 const traversingPath = validateBodyAssetProvenance(reviewedDigestive, { ...reviewedComplete, runtimeAssetPath: '../outside.glb' })
 assert.equal(traversingPath.validForVerifiedRender, false)
@@ -91,4 +109,4 @@ const conceptual = validateBodyAssetProvenance(thermoreceptor, {
 assert.equal(conceptual.validForVerifiedRender, false)
 assert.ok(conceptual.reasons.some((reason) => reason.includes('Reference-only')))
 
-console.log('Body asset provenance: immutable revision, checksums, local runtime, asset-level license, lineage, recorded-review, and reference-only guards verified.')
+console.log('Body asset provenance: immutable revision, checksums, local runtime, asset license scope, continuous lineage, recorded-review, and reference-only guards verified.')
