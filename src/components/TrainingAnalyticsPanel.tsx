@@ -20,11 +20,12 @@ export function TrainingAnalyticsPanel({ untukKemarin, versi }: Props) {
     anchor.setHours(12, 0, 0, 0)
     if (untukKemarin) anchor.setDate(anchor.getDate() - 1)
     return buildTrainingAnalytics(getWorkouts(), anchor)
-    // versi memaksa pembacaan ulang localStorage setelah manual save.
+    // versi memaksa pembacaan ulang localStorage setelah manual save/import.
   }, [untukKemarin, versi])
 
-  const { minggu, total28, blok28, paceAktivitas } = analytics
+  const { minggu, total28, blok28, paceAktivitas, hrrAktivitas } = analytics
   const maxKm = Math.max(1, ...blok28.map((b) => b.km))
+
   const pacePoints = paceAktivitas?.titik ?? []
   const paceValues = pacePoints.map((p) => p.paceSec)
   const paceMin = paceValues.length ? Math.min(...paceValues) : 0
@@ -34,6 +35,17 @@ export function TrainingAnalyticsPanel({ untukKemarin, versi }: Props) {
     const x = pacePoints.length <= 1 ? 50 : 4 + (i / (pacePoints.length - 1)) * 92
     // Pace lebih kecil = lebih cepat. Visual dibuat lebih tinggi untuk nilai yang lebih cepat.
     const y = 34 - ((paceMax - p.paceSec) / paceRange) * 28
+    return { ...p, x, y }
+  })
+
+  const hrrPoints = hrrAktivitas?.titik ?? []
+  const hrrValues = hrrPoints.map((p) => p.hrr1)
+  const hrrMin = hrrValues.length ? Math.min(...hrrValues) : 0
+  const hrrMax = hrrValues.length ? Math.max(...hrrValues) : 0
+  const hrrRange = Math.max(1, hrrMax - hrrMin)
+  const hrrLinePoints = hrrPoints.map((p, i) => {
+    const x = hrrPoints.length <= 1 ? 50 : 4 + (i / (hrrPoints.length - 1)) * 92
+    const y = 34 - ((p.hrr1 - hrrMin) / hrrRange) * 28
     return { ...p, x, y }
   })
 
@@ -161,14 +173,7 @@ export function TrainingAnalyticsPanel({ untukKemarin, versi }: Props) {
           </div>
           <div className="mt-3 overflow-hidden rounded-xl bg-sky-50/60 p-2 dark:bg-sky-400/[0.04]">
             <svg viewBox="0 0 100 40" className="h-24 w-full text-sky-600 dark:text-sky-300" role="img" aria-label={`Pace series from ${fmtPace(pacePoints[0].paceSec)} to ${fmtPace(pacePoints[pacePoints.length - 1].paceSec)} minutes per kilometre`}>
-              <polyline
-                points={linePoints.map((p) => `${p.x},${p.y}`).join(' ')}
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="1.8"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
+              <polyline points={linePoints.map((p) => `${p.x},${p.y}`).join(' ')} fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
               {linePoints.map((p) => <circle key={p.id} cx={p.x} cy={p.y} r="1.8" fill="currentColor" />)}
             </svg>
             <div className="mt-1 grid gap-1" style={{ gridTemplateColumns: `repeat(${linePoints.length}, minmax(0, 1fr))` }}>
@@ -182,6 +187,38 @@ export function TrainingAnalyticsPanel({ untukKemarin, versi }: Props) {
           </div>
           <p className="mt-2 text-[9px] leading-relaxed text-neutral-500 dark:text-neutral-400">
             Lower min/km is plotted higher so faster recorded pace is visually upward. Only the exact normalized activity name is grouped; route, terrain, weather, duration, and session purpose can still differ, so this is a descriptive trend rather than a performance grade.
+          </p>
+        </div>
+      )}
+
+      {hrrAktivitas && hrrLinePoints.length >= 2 && (
+        <div className="mt-3 rounded-2xl border border-indigo-100/80 p-3 dark:border-indigo-400/15" aria-label={`Recorded one-minute heart-rate recovery observations for ${hrrAktivitas.nama}`}>
+          <div className="flex items-end justify-between gap-3">
+            <div className="min-w-0">
+              <div className="t-mikro font-bold uppercase tracking-wide text-neutral-500">Same-activity HRR1</div>
+              <div className="mt-0.5 truncate text-sm font-black text-ink dark:text-white">{hrrAktivitas.nama}</div>
+            </div>
+            <div className="text-right">
+              <div className="text-lg font-black tabular-nums text-indigo-700 dark:text-indigo-300">{hrrLinePoints.length}</div>
+              <div className="t-mikro text-neutral-500">validated observations</div>
+            </div>
+          </div>
+          <div className="mt-3 overflow-hidden rounded-xl bg-indigo-50/60 p-2 dark:bg-indigo-400/[0.04]">
+            <svg viewBox="0 0 100 40" className="h-24 w-full text-indigo-600 dark:text-indigo-300" role="img" aria-label={`Recorded one-minute heart-rate recovery values from ${hrrPoints[0].hrr1} to ${hrrPoints[hrrPoints.length - 1].hrr1} beats per minute`}>
+              <polyline points={hrrLinePoints.map((p) => `${p.x},${p.y}`).join(' ')} fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+              {hrrLinePoints.map((p) => <circle key={p.id} cx={p.x} cy={p.y} r="1.8" fill="currentColor" />)}
+            </svg>
+            <div className="mt-1 grid gap-1" style={{ gridTemplateColumns: `repeat(${hrrLinePoints.length}, minmax(0, 1fr))` }}>
+              {hrrLinePoints.map((p) => (
+                <div key={p.id} className="min-w-0 text-center">
+                  <div className="truncate text-[8px] font-bold text-neutral-500">{p.label}</div>
+                  <div className="truncate text-[8px] font-black tabular-nums text-ink dark:text-white">−{p.hrr1} bpm</div>
+                </div>
+              ))}
+            </div>
+          </div>
+          <p className="mt-2 text-[9px] leading-relaxed text-neutral-500 dark:text-neutral-400">
+            Only sessions with an actual recovery sample around 45–75 seconds are included. Posture and active versus passive cool-down can materially change HRR1, so these are recorded observations—not a fitness grade, diagnosis, or recovery score.
           </p>
         </div>
       )}
