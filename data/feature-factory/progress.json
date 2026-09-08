@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-09-08T07:20:00.000Z",
+  "updatedAt": "2026-09-08T07:42:00.000Z",
   "items": {
     "ff-medical-education-accessibility": {
       "status": "done",
@@ -57,6 +57,14 @@
       "note": "Matured the existing Knowledge Bridge explainability surface with a bounded deterministic system trace: it states how a user query resolves to a curated topic, the fixed stage ordering, that curated text is not transformed into scores/probabilities/diagnoses/treatment decisions or patient-specific inference, and explicit uncertainty/source-verification boundaries. Deterministic guards also verify that the production UI retains explanation-depth controls, educational/not-patient-specific labeling, source verification prompts and uncertainty discipline.",
       "academicReview": {"status":"not-applicable-no-material-claim","sourceBasis":[],"aiUse":"ai-assisted","note":"This candidate explains software input resolution, presentation transformations, uncertainty and verification boundaries. It does not introduce a new disease-specific factual, quantitative, causal, diagnostic or treatment claim; existing medical teaching text remains subject to its separate source/academic review obligations.","humanReview":{"status":"not-recorded","reviewer":null,"credentials":null,"reviewedAt":null}},
       "updatedAt": "2026-09-08T07:20:00.000Z"
+    },
+    "ff-medical-education-fallback": {
+      "status": "done",
+      "commit": "d7746fe873b8224c8bcff7f7839f94bc50442de9",
+      "paths": ["src/components/KnowledgeBridgeWorkbench.tsx", "src/lib/knowledgeBridgeHandoff.ts", "src/lib/knowledgeBridgeMap.ts", "scripts/uji/knowledge-bridge-fallback.mts"],
+      "note": "Verified and hardened the existing Knowledge Bridge graceful fallback without duplicating UI: the core curated map remains local-first with no direct network path; blank search fails closed; unmatched queries explicitly disclose that no curated causal map exists and preserve the exact query in a Medical Library evidence handoff; malformed/unavailable note and evidence storage falls back to empty state; evidence remains validated and bounded to eight source pointers; and fallback content retains educational/not-patient-specific plus original-source-verification boundaries.",
+      "academicReview": {"status":"not-applicable-no-material-claim","sourceBasis":[],"aiUse":"ai-assisted","note":"This candidate adds deterministic fallback guards and documents existing fail-closed behavior. It introduces no new medical factual, quantitative, causal, diagnostic or treatment claim and does not reclassify existing teaching text as verified.","humanReview":{"status":"not-recorded","reviewer":null,"credentials":null,"reviewedAt":null}},
+      "updatedAt": "2026-09-08T07:42:00.000Z"
     }
   }
 }
