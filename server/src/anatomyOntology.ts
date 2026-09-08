@@ -149,22 +149,23 @@ async function searchOntology(query: string, ontology: OlsOntology, rows = 5): P
 
 // CTSS mengembalikan bentuk larik-tetap:
 // [jumlahTotal, kodeArray, dataTambahan|null, tampilanArray].
-// Untuk `conditions`, kodeArray berisi key_id internal NLM; untuk `hpo`, kode
-// yang diminta adalah HPO id. Keduanya tidak boleh diperlakukan sebagai sistem
-// identifier yang sama.
+// Untuk `conditions`, kodeArray diminta eksplisit dari field key_id internal
+// NLM; untuk `hpo`, kodeArray diminta eksplisit dari field id dan harus berupa
+// CURIE HP:. Keduanya tidak boleh diperlakukan sebagai sistem identifier sama.
 type CtssResponse = [number, string[], unknown, string[]]
 
 interface CtssSearchSpec {
   table: 'conditions' | 'hpo'
   ontology: 'nlm-condition' | 'hp'
   idSystem: 'NLM_CONDITION_KEY' | 'HP'
+  codeField: 'key_id' | 'id'
   displayField: string
 }
 
 async function searchCtss(query: string, spec: CtssSearchSpec): Promise<OntologyTerm[]> {
   const q = normalizeQuery(query)
   if (!q) return []
-  const url = `${CTSS_BASE}/${spec.table}/v3/search?terms=${encodeURIComponent(q)}&maxList=4&df=${encodeURIComponent(spec.displayField)}`
+  const url = `${CTSS_BASE}/${spec.table}/v3/search?terms=${encodeURIComponent(q)}&maxList=4&cf=${encodeURIComponent(spec.codeField)}&df=${encodeURIComponent(spec.displayField)}`
   const res = await fetch(url, { signal: AbortSignal.timeout(8000) })
   if (!res.ok) throw new Error(`CTSS ${spec.table} search failed: ${res.status}`)
   const data = (await res.json()) as CtssResponse
@@ -209,12 +210,14 @@ export async function anatomyOntologyLookup(terms: string[]): Promise<{ diseases
         table: 'conditions',
         ontology: 'nlm-condition',
         idSystem: 'NLM_CONDITION_KEY',
+        codeField: 'key_id',
         displayField: 'primary_name',
       }).catch(() => [] as OntologyTerm[]),
       searchCtss(t, {
         table: 'hpo',
         ontology: 'hp',
         idSystem: 'HP',
+        codeField: 'id',
         displayField: 'name',
       }).catch(() => [] as OntologyTerm[]),
     ]),
