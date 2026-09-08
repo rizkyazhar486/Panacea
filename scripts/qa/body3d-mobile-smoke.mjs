@@ -97,28 +97,60 @@ async function assertNoFatal(label) {
 
 async function clickNativeHitTarget(locator, label) {
   await locator.waitFor({ state: 'visible', timeout: 10_000 })
-  await locator.evaluate((node) => node.scrollIntoView({ block: 'center', inline: 'center', behavior: 'auto' }))
-  await page.waitForTimeout(150)
-  const hit = await locator.evaluate((node) => {
-    const rect = node.getBoundingClientRect()
-    const x = rect.left + rect.width / 2
-    const y = rect.top + rect.height / 2
-    const target = document.elementFromPoint(x, y)
-    return {
-      x,
-      y,
-      width: rect.width,
-      height: rect.height,
-      inViewport: rect.width > 0 && rect.height > 0 && x >= 0 && x <= window.innerWidth && y >= 0 && y <= window.innerHeight,
-      ownsHitTarget: target === node || node.contains(target),
-      hitTag: target?.tagName ?? null,
-      hitText: target?.textContent?.trim().slice(0, 80) ?? null,
+  let lastHit = null
+
+  for (let attempt = 0; attempt < 8; attempt += 1) {
+    const hit = await locator.evaluate((node) => {
+      const rect = node.getBoundingClientRect()
+      const x = rect.left + rect.width / 2
+      const y = rect.top + rect.height / 2
+      const visualLeft = window.visualViewport?.offsetLeft ?? 0
+      const visualTop = window.visualViewport?.offsetTop ?? 0
+      const visualWidth = window.visualViewport?.width ?? window.innerWidth
+      const visualHeight = window.visualViewport?.height ?? window.innerHeight
+      const target = document.elementFromPoint(x, y)
+      return {
+        x,
+        y,
+        width: rect.width,
+        height: rect.height,
+        visualLeft,
+        visualTop,
+        visualWidth,
+        visualHeight,
+        inViewport: rect.width > 0
+          && rect.height > 0
+          && x >= visualLeft
+          && x <= visualLeft + visualWidth
+          && y >= visualTop
+          && y <= visualTop + visualHeight,
+        ownsHitTarget: target === node || node.contains(target),
+        hitTag: target?.tagName ?? null,
+        hitText: target?.textContent?.trim().slice(0, 80) ?? null,
+        pageScrollY: window.scrollY,
+      }
+    })
+    lastHit = hit
+
+    if (hit.inViewport && hit.ownsHitTarget) {
+      await page.mouse.click(hit.x, hit.y, { delay: 20 })
+      return
     }
-  })
-  if (!hit.inViewport || !hit.ownsHitTarget) {
-    throw new Error(`${label} is not a real browser hit target: ${JSON.stringify(hit)}`)
+
+    await locator.evaluate((node) => {
+      node.scrollIntoView({ block: 'center', inline: 'center', behavior: 'auto' })
+      const rect = node.getBoundingClientRect()
+      const visualTop = window.visualViewport?.offsetTop ?? 0
+      const visualHeight = window.visualViewport?.height ?? window.innerHeight
+      const centerY = rect.top + rect.height / 2
+      const desiredY = visualTop + visualHeight / 2
+      const deltaY = centerY - desiredY
+      if (Math.abs(deltaY) > 2) window.scrollBy({ top: deltaY, behavior: 'auto' })
+    })
+    await page.waitForTimeout(180)
   }
-  await page.mouse.click(hit.x, hit.y, { delay: 20 })
+
+  throw new Error(`${label} is not a real browser hit target after bounded native scrolling: ${JSON.stringify(lastHit)}`)
 }
 
 try {
