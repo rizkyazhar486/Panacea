@@ -11,7 +11,7 @@
     "runtime": true,
     "buildTime": false,
     "networkRequired": true,
-    "notes": "Panacea queries the public OLS4 REST API through two bounded adapter paths: `src/lib/medicalSources.ts` for Medical Library ontology search (UBERON, CL, EFO) and `server/src/anatomyOntology.ts` for Body Explorer semantic grounding (DOID, HP, UBERON, FMA). EMBL-EBI recommends the OLS API and/or upstream OWL files rather than depending on the undocumented internal OLS database representation."
+    "notes": "Panacea uses a canonical server adapter for Body Explorer semantic grounding (DOID, HP, UBERON, FMA). Medical Library also has a bounded client retrieval path for UBERON/CL/EFO; that secondary path is documented in adapter notes but is not encoded as a second adapter.module because the registry contract requires one concrete repository file per ACTIVE adapter entry."
   },
   "license": {
     "status": "CHECK_REQUIRED",
@@ -38,8 +38,8 @@
   "adapter": {
     "status": "ACTIVE",
     "normalizedTarget": "OntologyResult | OntologyTerm",
-    "module": "src/lib/medicalSources.ts + server/src/anatomyOntology.ts",
-    "notes": "The client adapter normalizes bounded UBERON/CL/EFO search results for Medical Library. The server adapter normalizes bounded DOID/HP/UBERON/FMA results for Body Explorer and preserves source, identifier system, source URL and IRI. UI code consumes normalized results rather than constructing raw OLS requests itself."
+    "module": "server/src/anatomyOntology.ts",
+    "notes": "The canonical ACTIVE registry module is the server adapter, which normalizes bounded DOID/HP/UBERON/FMA results for Body Explorer and preserves source, identifier system, source URL and IRI. `src/lib/medicalSources.ts` currently contains a separate bounded Medical Library retrieval path for UBERON/CL/EFO; it remains a secondary path to consolidate later rather than being encoded as an invalid composite module path."
   },
   "trust": {
     "authority": 5,
