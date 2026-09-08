@@ -6,6 +6,7 @@ import {
   clearAllAnatomySourceNodes,
   getEffectiveAnatomySourceNodeSnapshot,
   publishAnatomySourceNodes,
+  resolveAllAnatomySourceNodes,
   resolveAnatomySourceNodes,
 } from '../../src/lib/anatomySourceNodeRegistry.ts'
 
@@ -33,7 +34,17 @@ assert.ok(femurMatches.length > 0)
 assert.ok(femurMatches.flatMap((match) => match.names).includes('Femur.l'))
 assert.ok(femurMatches.flatMap((match) => match.names).includes('Femur.r'))
 
-const grouped = resolveAnatomySourceNodes(
+const specificFirst = resolveAnatomySourceNodes(
+  ['carotid', 'artery'],
+  [{ file: 'cardiovascular.glb', names: ['Common carotid artery.l', 'Femoral artery.r'] }],
+)
+assert.deepEqual(
+  specificFirst.flatMap((match) => match.names),
+  ['Common carotid artery.l'],
+  'specificity-fallback resolution must stop after the first reviewed hint that yields a match',
+)
+
+const grouped = resolveAllAnatomySourceNodes(
   ['heart', 'aorta', 'vena cava'],
   [{
     file: 'cardiovascular.glb',
@@ -52,7 +63,7 @@ assert.deepEqual(
   'multi-structure atlas targets must not stop resolving after the first successful hint',
 )
 
-const deduplicated = resolveAnatomySourceNodes(
+const deduplicated = resolveAllAnatomySourceNodes(
   ['aorta', 'aorta'],
   [{ file: 'cardiovascular.glb', names: ['Aorta'] }],
 )
@@ -87,4 +98,4 @@ assert.ok(
   'runtime node collection should happen on the loaded clone, not in the render loop',
 )
 
-console.log('Z-Anatomy source-node resolver preserves exact GLB provenance, resolves every reviewed component conservatively, and publishes runtime renderer nodes.')
+console.log('Z-Anatomy source-node resolver preserves specific-first fallbacks, composite multi-hint resolution, exact GLB provenance, and runtime renderer publication.')
