@@ -46,6 +46,15 @@ async function waitForClass(locator, token, timeout = 10_000) {
   }
   throw new Error(`Timed out waiting for class token "${token}" on ${await locator.innerText().catch(() => 'locator')}`)
 }
+async function waitForAttribute(locator, name, expected, timeout = 10_000) {
+  const deadline = Date.now() + timeout
+  while (Date.now() < deadline) {
+    const value = await locator.getAttribute(name).catch(() => null)
+    if (value === expected) return value
+    await page.waitForTimeout(80)
+  }
+  throw new Error(`Timed out waiting for ${name}="${expected}" on ${await locator.innerText().catch(() => 'locator')}`)
+}
 async function waitForInputValue(locator, expected, tolerance = 0.005, timeout = 10_000) {
   const deadline = Date.now() + timeout
   while (Date.now() < deadline) {
@@ -124,6 +133,15 @@ async function scrollNative(locator) {
   await locator.evaluate((node) => node.scrollIntoView({ block: 'center', inline: 'nearest', behavior: 'auto' }))
   await page.waitForTimeout(140)
 }
+async function tapProcedureStep(scope, label) {
+  // Target the actual StepList button, not its text span. A text-span pointer
+  // can be a valid hit target yet still be replaced during responsive reflow
+  // before React processes the click. aria-current is the stable state contract.
+  const button = scope.locator('button').filter({ hasText: label }).first()
+  await tapScrolled(button)
+  await waitForAttribute(button, 'aria-current', 'step')
+  return button
+}
 
 const metrics = {
   viewport: null,
@@ -182,9 +200,7 @@ try {
   if (await loadFailure.isVisible().catch(() => false)) throw new Error(`Caesarean atlas failure: ${await loadFailure.innerText()}`)
   metrics.caesareanLoaded = true
 
-  const bladderStep = simulator.getByText('Bladder–uterus relationship', { exact: true }).first()
-  await tapScrolled(bladderStep)
-  await simulator.getByText('Bladder–uterus relationship', { exact: true }).last().waitFor({ state: 'visible', timeout: 10_000 })
+  await tapProcedureStep(simulator, 'Bladder–uterus relationship')
   await simulator.getByText(/urinary bladder/i).first().waitFor({ state: 'visible', timeout: 10_000 })
   metrics.bladderUterusStep = true
 
@@ -245,8 +261,7 @@ try {
   metrics.transseptalSlicePos = await waitForInputValue(page.getByRole('slider', { name: 'Slice level', exact: true }), 0.72)
   metrics.transseptalAxialSharedBody3d = true
 
-  const iceLongAxisStep = simulator.getByText('ICE long-axis orientation', { exact: true }).first()
-  await tapScrolled(iceLongAxisStep)
+  await tapProcedureStep(simulator, 'ICE long-axis orientation')
   await simulator.getByText('ICE guidance', { exact: true }).waitFor({ state: 'visible', timeout: 10_000 })
   await simulator.getByText('orientation, not diagnosis', { exact: true }).waitFor({ state: 'visible', timeout: 10_000 })
   metrics.iceLongAxisVisible = true
@@ -259,8 +274,7 @@ try {
   if (await loadFailure.isVisible().catch(() => false)) throw new Error(`DIYAI Lap Appy atlas failure: ${await loadFailure.innerText()}`)
   metrics.lapAppyLoaded = true
 
-  const variationStep = simulator.getByText('Position variation check', { exact: true }).first()
-  await tapScrolled(variationStep)
+  await tapProcedureStep(simulator, 'Position variation check')
   await simulator.getByText(/retrocecal, pelvic, retro-ileal, pre-ileal/i).waitFor({ state: 'visible', timeout: 10_000 })
   metrics.lapAppyVariationVisible = true
 
