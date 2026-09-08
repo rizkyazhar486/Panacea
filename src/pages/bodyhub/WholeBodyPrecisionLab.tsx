@@ -151,7 +151,13 @@ export function WholeBodyPrecisionLab({ onHighlight, onFocusRegion, onEnableLaye
 
       {mode === 'z-anatomy' && (
         <div className="space-y-3">
-          <ZAnatomyAtlasWorkbench onHighlight={onHighlight} onFocusRegion={onFocusRegion} onEnableLayer={onEnableLayer} />
+          <ZAnatomyAtlasWorkbench
+            onHighlight={onHighlight}
+            onFocusRegion={onFocusRegion}
+            onEnableLayer={onEnableLayer}
+            onOpenSurgical={onOpenSurgical}
+            onOpenBiomechanics={() => setMode('movement')}
+          />
           <ZAnatomySourceMeshBrowser onHighlight={onHighlight} onFocusRegion={onFocusRegion} onEnableLayer={onEnableLayer} />
         </div>
       )}
