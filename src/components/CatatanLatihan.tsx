@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react'
 import { kunciTanggal } from '../lib/ramalan'
 import { getWorkouts } from '../lib/workoutStore'
 import { catatLatihanTangan, sesiTangan } from '../lib/latihanManual'
+import { TrainingAnalyticsPanel } from './TrainingAnalyticsPanel'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Catatan latihan dengan tangan — bentuknya sengaja SAMA dengan catatan harian.
@@ -26,8 +27,6 @@ const BERAT = [
   { nilai: 10, label: 'All out' },
 ] as const
 
-const HARI = 86400_000
-
 export function CatatanLatihan() {
   const [untukKemarin, setUntukKemarin] = useState(false)
   const [nama, setNama] = useState('')
@@ -37,7 +36,10 @@ export function CatatanLatihan() {
   const [pesan, setPesan] = useState('')
   const [versi, setVersi] = useState(0)
 
-  const tanggal = kunciTanggal(new Date(Date.now() - (untukKemarin ? HARI : 0)))
+  const tanggalAcuan = new Date()
+  tanggalAcuan.setHours(12, 0, 0, 0)
+  if (untukKemarin) tanggalAcuan.setDate(tanggalAcuan.getDate() - 1)
+  const tanggal = kunciTanggal(tanggalAcuan)
 
   const ringkas = useMemo(() => {
     const w = getWorkouts()
@@ -170,9 +172,7 @@ export function CatatanLatihan() {
           })
       : []
 
-    const acuan = new Date()
-    acuan.setHours(12, 0, 0, 0)
-    acuan.setDate(acuan.getDate() - (untukKemarin ? 1 : 0))
+    const acuan = new Date(tanggalAcuan)
 
     const tren = Array.from({ length: 7 }, (_, i) => {
       const d = new Date(acuan)
@@ -558,6 +558,8 @@ export function CatatanLatihan() {
           </p>
         </div>
       )}
+
+      <TrainingAnalyticsPanel untukKemarin={untukKemarin} versi={versi} />
 
       <div className="mt-3 rounded-2xl border border-neutral-100 p-3 dark:border-white/10" aria-label="Training minutes over the last 7 days">
         <div className="flex items-end justify-between gap-3">
