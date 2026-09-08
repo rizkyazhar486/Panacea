@@ -2,6 +2,7 @@ import assert from 'node:assert/strict'
 import { readFileSync } from 'node:fs'
 
 const breathSource = readFileSync(new URL('../../src/pages/bodyhub/BreathAtlasLab.tsx', import.meta.url), 'utf8')
+const quantitativeSource = readFileSync(new URL('../../src/pages/bodyhub/RespiratoryQuantitativePanel.tsx', import.meta.url), 'utf8')
 const precisionSource = readFileSync(new URL('../../src/pages/bodyhub/WholeBodyPrecisionLab.tsx', import.meta.url), 'utf8')
 const registry = JSON.parse(readFileSync(new URL('../../data/source-registry/anatomy/thebuggeddev-anatomy-breath-atlas.json', import.meta.url), 'utf8'))
 
@@ -30,6 +31,17 @@ assert.match(breathSource, /not represented at whole-body mesh scale/i)
 assert.match(breathSource, /source body mesh is not deformed to fake breathing/i)
 assert.match(breathSource, /no patient-specific ventilation map/i)
 
+assert.match(breathSource, /import RespiratoryQuantitativePanel from '\.\/RespiratoryQuantitativePanel'/)
+assert.match(breathSource, /<RespiratoryQuantitativePanel \/>/, 'Quantitative mechanics must remain inside the canonical Breath Atlas experience.')
+assert.match(quantitativeSource, /calculateRespiratoryMetrics/)
+assert.match(quantitativeSource, /Four respiratory cycle phase markers/i)
+assert.match(quantitativeSource, /V̇E = RR × VT/)
+assert.match(quantitativeSource, /V̇A = RR × \(VT − VD\)/)
+assert.match(quantitativeSource, /Measured ≠ modeled/)
+assert.match(quantitativeSource, /No compliance, airway resistance, gas exchange, FEV₁\/FVC, ventilator setting, respiratory work, V\/Q distribution or disease severity is inferred/i)
+assert.doesNotMatch(quantitativeSource, /fetch\s*\(/, 'Quantitative teaching must remain deterministic and network-independent.')
+assert.doesNotMatch(quantitativeSource, /three|Canvas|useFrame|useGLTF/, 'Quantitative teaching must not introduce a second 3D renderer or mesh animation path.')
+
 assert.match(precisionSource, /import BreathAtlasLab from '\.\/BreathAtlasLab'/)
 assert.match(precisionSource, /'breath-atlas'/)
 assert.match(precisionSource, /\['breath-atlas', 'Breath atlas'\]/)
@@ -46,4 +58,4 @@ assert.equal(registry.license.commercialUse, 'UNKNOWN')
 assert.equal(registry.adapter.status, 'NOT_APPLICABLE')
 assert.equal(registry.validation.clinicalDecisionUse, 'NO')
 
-console.log('Breath Atlas remains source-aware, physiologically bounded, independently implemented, and license-gated.')
+console.log('Breath Atlas remains source-aware, quantitatively bounded, independently implemented, and license-gated.')
