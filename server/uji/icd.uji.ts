@@ -42,7 +42,7 @@ await denganFetchPalsu(async (input, init) => {
   ok('fallback memakai endpoint NLM Clinical Tables HTTPS', url.origin === 'https://clinicaltables.nlm.nih.gov')
   ok('fallback memakai dataset ICD-10-CM v3', url.pathname === '/api/icd10cm/v3/search', url.pathname)
   ok('query dibatasi 160 karakter', terms.length === 160, String(terms.length))
-  ok('operator query berisiko dibersihkan', !/[<>\\\":|]/.test(terms), terms)
+  ok('operator query berisiko dibersihkan', !/[<>\\":|]/.test(terms), terms)
   ok('limit besar dibatasi 50', url.searchParams.get('maxList') === '50', url.searchParams.get('maxList') ?? '')
   ok('request fallback mempunyai AbortSignal timeout', init?.signal instanceof AbortSignal)
 
