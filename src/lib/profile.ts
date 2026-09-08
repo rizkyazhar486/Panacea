@@ -2,6 +2,8 @@
 // height used across the fitness calculators so users enter it ONCE and pages
 // stop shipping any one person's numbers as defaults. Stored locally per device.
 
+import { publishDataUpdate, type DataDomain } from './dataSync'
+
 export interface Demo {
   age: number; sex: 'M' | 'F'; weightKg: number; heightCm: number
   // Optional biometrics mirrored from the Health Profile so calculators prefill.
@@ -24,16 +26,17 @@ export function getDemoTersimpan(): Partial<Demo> {
 }
 
 // Broadcast that health/demographic data changed so any mounted page can
-// re-sync immediately (not just on window focus). Pages listen for
-// 'panacea:health-updated' alongside their focus handler.
-export function broadcastHealthUpdate(): void {
-  try { window.dispatchEvent(new Event('panacea:health-updated')) } catch { /* ignore */ }
+// re-sync immediately (not just on window focus). The legacy event is emitted
+// inside publishDataUpdate, so existing consumers keep working while newer
+// pages can subscribe to typed domains and cross-tab BroadcastChannel updates.
+export function broadcastHealthUpdate(domains: DataDomain[] = ['health'], source = 'health'): void {
+  publishDataUpdate(domains, source)
 }
 
 export function setDemo(patch: Partial<Demo>): Demo {
   const next = { ...getDemo(), ...patch }
   try { localStorage.setItem(KEY, JSON.stringify(next)) } catch { /* ignore */ }
-  broadcastHealthUpdate()
+  broadcastHealthUpdate(['profile'], 'profile')
   return next
 }
 
@@ -80,5 +83,5 @@ export function mergeHealthCache(patch: Record<string, unknown>): void {
   }
   if (!Object.keys(clean).length) return
   try { localStorage.setItem(HP_KEY, JSON.stringify({ ...getHealthCache(), ...clean })) } catch { /* kuota */ }
-  broadcastHealthUpdate()
+  broadcastHealthUpdate(['health', 'profile'], 'health-cache')
 }
