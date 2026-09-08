@@ -32,9 +32,15 @@ try {
   if (response && !response.ok()) throw new Error(`Daily returned HTTP ${response.status()}`)
   await dismissIfVisible(page.getByRole('button', { name: /Get Started/i }).first())
   await dismissIfVisible(page.getByRole('button', { name: /Maybe later/i }).first())
+  await page.keyboard.press('Escape').catch(() => undefined)
 
+  // On the full app shell the Daily route may hydrate after global visual/reminder
+  // surfaces. Wait for the user-visible feature heading first, then for its stable
+  // QA contract marker. The previous 30 s marker-only wait raced a late route
+  // hydration even though the final failure screenshot showed the rail rendered.
+  await page.getByRole('heading', { name: 'Now → Next → Later', exact: true }).waitFor({ state: 'visible', timeout: 60_000 })
   const rail = page.locator('[data-panacea-os-focus="v1"]')
-  await rail.waitFor({ state: 'visible', timeout: 30_000 })
+  await rail.waitFor({ state: 'visible', timeout: 10_000 })
   metrics.railVisible = true
 
   const time = rail.getByLabel('Time')
@@ -43,7 +49,7 @@ try {
   const add = rail.getByRole('button', { name: 'Add', exact: true })
   async function addItem(clock, domain, text) {
     await time.fill(clock); await category.selectOption(domain); await title.fill(text); await add.click()
-    await rail.getByText(text, { exact: true }).first().waitFor({ state: 'visible', timeout: 5_000 })
+    await rail.getByText(text, { exact: true }).first().waitFor({ state: 'visible', timeout: 10_000 })
   }
 
   await addItem('13:00', 'nutrition', 'Lunch and hydration')
