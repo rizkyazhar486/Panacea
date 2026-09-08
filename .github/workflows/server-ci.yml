@@ -65,6 +65,8 @@ jobs:
         run: npm run uji:drug-info
       - name: Test SATUSEHAT FHIR boundary
         run: npm run uji:satusehat
+      - name: Test health webhook ingestion
+        run: npm run uji:health-webhook
       - name: Runtime smoke-test genomics control plane
         env:
           JWT_SECRET: ci-only-panacea-genomics-secret
