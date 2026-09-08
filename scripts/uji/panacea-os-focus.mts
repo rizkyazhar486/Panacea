@@ -33,7 +33,11 @@ ok('10:30 at 09:20 remains scheduled', focus[1]?.timing === 'scheduled' && focus
 ok('valid clock parses to minutes', parseClockMinutes('23:59') === 1439)
 ok('invalid clock is rejected', parseClockMinutes('24:00') === null && parseClockMinutes('9:00') === null)
 ok('storage key is date scoped and versioned', panaceaOsStorageKey(date) === `panacea.os.day.v1:${date}`)
-ok('life-domain categories cover requested OS dimensions', ['work', 'study', 'health', 'training', 'family', 'social', 'finance', 'spiritual', 'recovery'].every((x) => PANACEA_OS_CATEGORIES.includes(x as never)))
+ok(
+  'life-domain categories cover work meetings meals prayer leisure and wellbeing',
+  ['work', 'study', 'appointment', 'health', 'training', 'nutrition', 'family', 'social', 'finance', 'spiritual', 'recovery', 'leisure', 'admin']
+    .every((x) => PANACEA_OS_CATEGORIES.includes(x as never)),
+)
 
 const parsed = readPanaceaOsItems(JSON.stringify([
   items[0],
