@@ -59,12 +59,41 @@ page.setDefaultTimeout(20_000)
 const pageErrors = []
 page.on('pageerror', (error) => pageErrors.push(error.message))
 
+async function placeCanvasOnscreen(canvas) {
+  await canvas.scrollIntoViewIfNeeded()
+  await page.waitForTimeout(250)
+  const geometry = await canvas.evaluate((node) => {
+    const rect = node.getBoundingClientRect()
+    return {
+      left: rect.left,
+      top: rect.top,
+      right: rect.right,
+      bottom: rect.bottom,
+      width: rect.width,
+      height: rect.height,
+      viewportWidth: window.innerWidth,
+      viewportHeight: window.innerHeight,
+      centerX: rect.left + rect.width / 2,
+      centerY: rect.top + rect.height / 2,
+    }
+  })
+  const centerInside =
+    geometry.centerX >= 0 && geometry.centerX <= geometry.viewportWidth &&
+    geometry.centerY >= 0 && geometry.centerY <= geometry.viewportHeight
+  if (!centerInside) {
+    throw new Error(`Body3D canvas center outside viewport during visual capture: ${JSON.stringify(geometry)}`)
+  }
+  return geometry
+}
+
 try {
   const response = await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 45_000 })
   if (response && !response.ok()) throw new Error(`Body Explorer returned HTTP ${response.status()}`)
 
   const canvas = page.locator('div.h-full.w-full.touch-none > canvas').first()
   await canvas.waitFor({ state: 'visible', timeout: 45_000 })
+  await placeCanvasOnscreen(canvas)
+
   await page.getByText('Loading anatomy…').first().waitFor({ state: 'hidden', timeout: timeoutMs })
   await page.getByText('Adding anatomy layer…').first().waitFor({ state: 'hidden', timeout: timeoutMs })
 
@@ -72,10 +101,32 @@ try {
   if (await fatal.isVisible().catch(() => false)) throw new Error(await fatal.innerText())
   if (pageErrors.length) throw new Error(`Browser page errors: ${pageErrors.join(' | ')}`)
 
+  // Body3D deliberately pauses demand-rendering while offscreen. Bring the
+  // actual production canvas back into the viewport before asking the visual
+  // gate for evidence, then orbit it once so the captured buffer must contain
+  // a fresh compositor frame rather than a preserved background-only frame.
+  const captureGeometry = await placeCanvasOnscreen(canvas)
+  const box = await canvas.boundingBox()
+  if (!box) throw new Error('Body3D canvas has no onscreen bounding box during visual capture')
+  const x = box.x + box.width * 0.5
+  const y = box.y + box.height * 0.45
+  await page.mouse.move(x, y)
+  await page.mouse.down()
+  await page.mouse.move(x + Math.min(36, box.width * 0.1), y + 14, { steps: 5 })
+  await page.mouse.up()
+  await page.waitForTimeout(500)
+
   const capture = await canvas.evaluate((node) => {
     const width = node.width
     const height = node.height
     if (width < 300 || height < 480) throw new Error(`Unexpected backing canvas ${width}x${height}`)
+
+    const rect = node.getBoundingClientRect()
+    const centerX = rect.left + rect.width / 2
+    const centerY = rect.top + rect.height / 2
+    if (centerX < 0 || centerX > window.innerWidth || centerY < 0 || centerY > window.innerHeight) {
+      throw new Error(`Body3D canvas center outside viewport at copy time: ${JSON.stringify({ centerX, centerY, viewportWidth: window.innerWidth, viewportHeight: window.innerHeight })}`)
+    }
 
     const gl = node.getContext('webgl2') || node.getContext('webgl')
     if (!gl || gl.isContextLost()) throw new Error('Body3D WebGL context unavailable during visual capture')
@@ -93,30 +144,74 @@ try {
 
     const pixels = ctx.getImageData(0, 0, width, height).data
     const stride = Math.max(4, Math.floor((width * height) / 4096) * 4)
+    const lumas = []
     let visibleSamples = 0
+    let brightSamples = 0
     let minLuma = 255
     let maxLuma = 0
+    let sumLuma = 0
+    let sumLumaSquared = 0
     for (let i = 0; i < pixels.length; i += stride) {
       const alpha = pixels[i + 3]
       if (alpha < 8) continue
       const luma = Math.round((pixels[i] * 299 + pixels[i + 1] * 587 + pixels[i + 2] * 114) / 1000)
       visibleSamples += 1
+      if (luma >= 40) brightSamples += 1
       minLuma = Math.min(minLuma, luma)
       maxLuma = Math.max(maxLuma, luma)
+      sumLuma += luma
+      sumLumaSquared += luma * luma
+      lumas.push(luma)
     }
+    lumas.sort((a, b) => a - b)
+    const percentile = (fraction) => lumas.length
+      ? lumas[Math.min(lumas.length - 1, Math.floor((lumas.length - 1) * fraction))]
+      : 0
+    const meanLuma = visibleSamples ? sumLuma / visibleSamples : 0
+    const variance = visibleSamples ? Math.max(0, sumLumaSquared / visibleSamples - meanLuma * meanLuma) : 0
 
     return {
       width,
       height,
       preserveDrawingBuffer: true,
       visibleSamples,
+      brightSamples,
+      brightFraction: visibleSamples ? brightSamples / visibleSamples : 0,
+      minLuma,
+      maxLuma,
+      meanLuma,
+      lumaStdDev: Math.sqrt(variance),
+      p95Luma: percentile(0.95),
+      p99Luma: percentile(0.99),
       lumaSpread: maxLuma - minLuma,
       dataUrl: copy.toDataURL('image/png'),
     }
   })
 
-  if (capture.visibleSamples < 100 || capture.lumaSpread < 8) {
-    throw new Error(`Body3D visual artifact looks blank/flat: ${JSON.stringify({ visibleSamples: capture.visibleSamples, lumaSpread: capture.lumaSpread })}`)
+  // The viewer background is intentionally dark. A background-only gradient can
+  // have thousands of opaque pixels and a small luma spread, so those conditions
+  // alone are not proof that anatomy rendered. Require a meaningful bright-tail
+  // population plus contrast. These thresholds are deliberately far below the
+  // cream/red default skeleton+muscle materials while rejecting the observed
+  // false-positive background frame (p99≈25, max≈25, zero samples >=40).
+  if (
+    capture.visibleSamples < 100 ||
+    capture.lumaSpread < 32 ||
+    capture.maxLuma < 48 ||
+    capture.p99Luma < 40 ||
+    capture.brightFraction < 0.01
+  ) {
+    throw new Error(`Body3D visual artifact lacks a rendered anatomy signal: ${JSON.stringify({
+      visibleSamples: capture.visibleSamples,
+      brightSamples: capture.brightSamples,
+      brightFraction: capture.brightFraction,
+      minLuma: capture.minLuma,
+      maxLuma: capture.maxLuma,
+      p95Luma: capture.p95Luma,
+      p99Luma: capture.p99Luma,
+      lumaSpread: capture.lumaSpread,
+      lumaStdDev: capture.lumaStdDev,
+    })}`)
   }
   if (!capture.dataUrl.startsWith('data:image/png;base64,')) throw new Error('Body3D visual artifact is not a PNG data URL')
 
@@ -127,11 +222,20 @@ try {
   console.log(JSON.stringify({
     ok: true,
     artifact: outputPath,
-    captureScope: 'rendered-webgl-canvas-preserved-in-qa-only-context',
+    captureScope: 'onscreen-rendered-webgl-canvas-preserved-in-qa-only-context',
     viewport: { width: 390, height: 844 },
+    captureGeometry,
     canvas: { width: capture.width, height: capture.height },
     preserveDrawingBuffer: capture.preserveDrawingBuffer,
     visibleSamples: capture.visibleSamples,
+    brightSamples: capture.brightSamples,
+    brightFraction: capture.brightFraction,
+    minLuma: capture.minLuma,
+    maxLuma: capture.maxLuma,
+    meanLuma: capture.meanLuma,
+    lumaStdDev: capture.lumaStdDev,
+    p95Luma: capture.p95Luma,
+    p99Luma: capture.p99Luma,
     lumaSpread: capture.lumaSpread,
     bytes: png.length,
   }))
