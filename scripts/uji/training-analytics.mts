@@ -32,6 +32,7 @@ const data: ImportedWorkout[] = [
     rpe: 5,
     hr: [{ t: 0, bpm: 120 }, { t: 60, bpm: 140 }],
     pemulihan: [{ t: 60, bpm: 100 }],
+    hrr1: 40,
   }),
   workout({
     id: 'strength',
@@ -49,6 +50,8 @@ const data: ImportedWorkout[] = [
     paceSec: 360,
     kcal: 250,
     hr: [{ t: 0, bpm: 125 }],
+    hrr1: 99,
+    pemulihan: [{ t: 120, bpm: 80 }],
   }),
   workout({
     id: 'run-fast',
@@ -59,6 +62,8 @@ const data: ImportedWorkout[] = [
     paceSec: 300,
     kcal: 100,
     rpe: 7,
+    hrr1: 35,
+    pemulihan: [{ t: 58, bpm: 105 }],
   }),
   workout({
     id: 'outside-window',
@@ -88,7 +93,7 @@ assert.equal(result.minggu.sesiDurasi, 4)
 assert.equal(result.minggu.sesiJarak, 3)
 assert.equal(result.minggu.sesiHr, 2)
 assert.equal(result.minggu.sesiRpe, 3)
-assert.equal(result.minggu.sesiRecovery, 1)
+assert.equal(result.minggu.sesiRecovery, 3)
 
 assert.equal(result.total28.sesi, 5)
 assert.equal(result.total28.menit, 205)
@@ -102,9 +107,15 @@ assert.equal(result.paceAktivitas?.nama, 'Run')
 assert.deepEqual(result.paceAktivitas?.titik.map((p) => p.id), ['run-old-window', 'run-10k', 'run-5k', 'run-fast'])
 assert.deepEqual(result.paceAktivitas?.titik.map((p) => p.paceSec), [360, 360, 360, 300])
 
+assert.equal(result.hrrAktivitas?.nama, 'Run')
+assert.deepEqual(result.hrrAktivitas?.titik.map((p) => p.id), ['run-10k', 'run-fast'])
+assert.deepEqual(result.hrrAktivitas?.titik.map((p) => p.hrr1), [40, 35])
+assert.ok(!result.hrrAktivitas?.titik.some((p) => p.id === 'run-5k'), 'cached HRR1 without a 45–75s recovery sample must be excluded')
+
 const invalidAnchor = buildTrainingAnalytics(data, new Date('invalid'))
 assert.equal(invalidAnchor.minggu.sesi, 0)
 assert.deepEqual(invalidAnchor.blok28, [])
 assert.equal(invalidAnchor.paceAktivitas, null)
+assert.equal(invalidAnchor.hrrAktivitas, null)
 
-console.log('Training analytics derives 7/28-day charts only from valid recorded fields and exact activity names.')
+console.log('Training analytics derives 7/28-day charts and HRR1 trends only from valid recorded fields and exact activity names.')
