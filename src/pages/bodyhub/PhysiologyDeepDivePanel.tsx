@@ -5,6 +5,7 @@ import {
   type PhysiologyDeepDive,
   type PhysiologyDomain,
 } from '../../lib/physiologyDeepDives'
+import { BreathAtlasPanel } from './BreathAtlasPanel'
 
 interface Props {
   onFocus: (topic: PhysiologyDeepDive) => void
@@ -92,6 +93,8 @@ export function PhysiologyDeepDivePanel({ onFocus }: Props) {
           </p>
         </div>
       </div>
+
+      <BreathAtlasPanel onFocus={onFocus} />
 
       <div className="-mx-1 flex gap-1.5 overflow-x-auto px-1 pb-1" aria-label="Physiology domains">
         {PHYSIOLOGY_DOMAINS.map((item) => (
