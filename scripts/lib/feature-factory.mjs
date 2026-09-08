@@ -42,16 +42,33 @@ async function collectSourceFiles(directory) {
 
 export async function loadSourceRegistry() {
   const map = new Map()
+  const canonicalIds = new Set()
+
   for (const filePath of await collectSourceFiles(SOURCE_ROOT)) {
     const source = await readJson(filePath)
     if (!source?.id) continue
-    if (map.has(source.id)) {
+    if (canonicalIds.has(source.id)) {
       throw new Error(`Duplicate source id ${JSON.stringify(source.id)}`)
     }
-    map.set(source.id, {
+    canonicalIds.add(source.id)
+
+    const registryKey = path.basename(filePath, '.json')
+    const enriched = {
       ...source,
+      registryKey,
       registryPath: path.relative(ROOT, filePath).replaceAll(path.sep, '/'),
-    })
+    }
+
+    // Domain roadmaps use stable file keys (for example `healthkit`), while
+    // Source Registry records keep authoritative canonical ids (for example
+    // `apple_healthkit`). Resolve both without mutating the source records.
+    for (const key of new Set([source.id, registryKey])) {
+      const existing = map.get(key)
+      if (existing && existing.id !== source.id) {
+        throw new Error(`Source alias collision ${JSON.stringify(key)} between ${existing.id} and ${source.id}`)
+      }
+      map.set(key, enriched)
+    }
   }
   return map
 }
@@ -97,10 +114,13 @@ export function calculatePriority({ impact, reach, complexity, performance, risk
   return Math.max(0, Math.min(100, Math.round((100 * benefit) / denominator)))
 }
 
+function isOperationalSource(source) {
+  return source.adapter?.status === 'ACTIVE' || source.license?.status === 'VERIFIED'
+}
+
 function sourceReadinessScore(sourceEntries) {
   if (sourceEntries.length === 0) return 0
-  const verified = sourceEntries.filter((source) => source.license?.status === 'VERIFIED').length
-  return verified / sourceEntries.length
+  return sourceEntries.filter(isOperationalSource).length / sourceEntries.length
 }
 
 function candidateBlockers(risk, performance, sourceEntries, missingSourceIds) {
@@ -108,10 +128,10 @@ function candidateBlockers(risk, performance, sourceEntries, missingSourceIds) {
   if (missingSourceIds.length > 0) {
     blockers.push(`missing-source:${missingSourceIds.join(',')}`)
   }
-  const unverified = sourceEntries
-    .filter((source) => source.license?.status !== 'VERIFIED')
+  const sourceReview = sourceEntries
+    .filter((source) => !isOperationalSource(source))
     .map((source) => source.id)
-  if (unverified.length > 0) blockers.push(`license-review:${unverified.join(',')}`)
+  if (sourceReview.length > 0) blockers.push(`source-review:${sourceReview.join(',')}`)
   if (risk === 'high') blockers.push('manual-scientific-review')
   if (risk === 'clinical') blockers.push('manual-clinical-validation')
   if (performance >= 5) blockers.push('heavy-asset-performance-review')
@@ -147,6 +167,7 @@ export async function generateFeatureCandidates() {
         else missingSourceIds.push(sourceId)
       }
 
+      const operationalSources = sourceEntries.filter(isOperationalSource)
       const impact = Math.round((domain.impact + capability.impact) / 2)
       const reach = Math.round((domain.reach + capability.reach) / 2)
       const complexity = Math.round((domain.complexity + capability.complexity) / 2)
@@ -168,6 +189,7 @@ export async function generateFeatureCandidates() {
         mode: capability.mode,
         risk: domain.risk,
         sourceIds: [...(domain.sources ?? [])],
+        operationalSourceIds: operationalSources.map((source) => source.registryKey),
         sourceReadiness: Number(sourceReadiness.toFixed(3)),
         metrics: {
           impact,
@@ -187,7 +209,7 @@ export async function generateFeatureCandidates() {
         autoEligible:
           RISK_ORDER[domain.risk] <= RISK_ORDER.medium &&
           missingSourceIds.length === 0 &&
-          blockers.every((blocker) => !blocker.startsWith('license-review:')) &&
+          operationalSources.length > 0 &&
           performance < 5,
         status: progressEntry.status,
         implementation: {
@@ -229,6 +251,9 @@ export function assertFeatureFactory({ target, candidates, sourceRegistry, progr
     }
     if ((candidate.risk === 'high' || candidate.risk === 'clinical') && candidate.autoEligible) {
       errors.push(`${candidate.id}: high/clinical risk cannot be autoEligible`)
+    }
+    if (candidate.autoEligible && candidate.operationalSourceIds.length === 0) {
+      errors.push(`${candidate.id}: autoEligible candidate has no operational source`)
     }
   }
 
