@@ -14,9 +14,11 @@ const context = await browser.newContext({ viewport: { width: 390, height: 844 }
 await context.addInitScript(() => {
   const account = { email: 'surgery-qa@localhost.test', name: 'Surgery QA', role: 'pasien', isSubscriber: false, loggedAt: new Date().toISOString(), sex: 'P', dob: '1990-01-01' }
   localStorage.setItem('panaceamed.session.v1', JSON.stringify({ account, loginAt: Date.now() }))
-  const style = document.createElement('style')
-  style.textContent = 'html, body { overflow-anchor: none !important; scroll-behavior: auto !important; }'
-  document.documentElement.appendChild(style)
+  window.addEventListener('DOMContentLoaded', () => {
+    const style = document.createElement('style')
+    style.textContent = 'html, body { overflow-anchor: none !important; scroll-behavior: auto !important; }'
+    document.documentElement?.appendChild(style)
+  }, { once: true })
 })
 
 const page = await context.newPage()
@@ -55,60 +57,65 @@ async function waitForInputValue(locator, expected, tolerance = 0.005, timeout =
   throw new Error(`Timed out waiting for input value ${expected}`)
 }
 async function tapScrolled(locator) {
-  // CI renders the atlas asynchronously, so scroll anchoring can move the page
-  // after an ordinary scrollIntoView. Compute the target's absolute document
-  // position on each attempt and scroll the root explicitly. A real viewport
-  // hit target is still required before a normal pointer click.
-  let lastHit = null
-  for (let attempt = 0; attempt < 6; attempt += 1) {
-    await locator.evaluate((node) => {
-      const visualTop = window.visualViewport?.offsetTop ?? 0
-      const visualHeight = window.visualViewport?.height ?? window.innerHeight
-      const rect = node.getBoundingClientRect()
-      const absoluteCenter = window.scrollY + rect.top + rect.height / 2
-      const viewportCenter = visualTop + visualHeight / 2
-      const maxScroll = Math.max(0, document.documentElement.scrollHeight - window.innerHeight)
-      const targetScrollY = Math.max(0, Math.min(maxScroll, absoluteCenter - viewportCenter))
-      window.scrollTo({ top: targetScrollY, left: 0, behavior: 'auto' })
-    })
-    await page.waitForTimeout(180)
-
-    lastHit = await locator.evaluate((node) => {
-      const rect = node.getBoundingClientRect()
+  // There can be more than one matching preset while responsive/transitioning
+  // UI is mounted. Always prefer a candidate that is genuinely inside the
+  // visual viewport and owns its browser hit target. If none is hittable yet,
+  // native scrollIntoView on the nearest candidate scrolls every ancestor
+  // scroller (not only the document) before the next bounded attempt.
+  let lastCandidates = []
+  for (let attempt = 0; attempt < 8; attempt += 1) {
+    const candidates = await locator.evaluateAll((nodes) => {
       const visualTop = window.visualViewport?.offsetTop ?? 0
       const visualLeft = window.visualViewport?.offsetLeft ?? 0
       const visualWidth = window.visualViewport?.width ?? window.innerWidth
       const visualHeight = window.visualViewport?.height ?? window.innerHeight
-      const x = rect.left + rect.width / 2
-      const y = rect.top + rect.height / 2
-      const target = document.elementFromPoint(x, y)
-      return {
-        x,
-        y,
-        width: rect.width,
-        height: rect.height,
-        visualTop,
-        visualLeft,
-        visualWidth,
-        visualHeight,
-        innerWidth: window.innerWidth,
-        innerHeight: window.innerHeight,
-        pageScrollY: window.scrollY,
-        documentScrollHeight: document.documentElement.scrollHeight,
-        visible: rect.width > 0 && rect.height > 0 && x >= visualLeft && x <= visualLeft + visualWidth && y >= visualTop && y <= visualTop + visualHeight,
-        enabled: !(node instanceof HTMLButtonElement) || !node.disabled,
-        hitTarget: target === node || node.contains(target),
-        hitTag: target?.tagName ?? null,
-        hitText: target?.textContent?.trim().slice(0, 80) ?? null,
-      }
+      const viewportCenterX = visualLeft + visualWidth / 2
+      const viewportCenterY = visualTop + visualHeight / 2
+      return nodes.map((node, index) => {
+        const rect = node.getBoundingClientRect()
+        const x = rect.left + rect.width / 2
+        const y = rect.top + rect.height / 2
+        const target = document.elementFromPoint(x, y)
+        const visible = rect.width > 0 && rect.height > 0
+          && x >= visualLeft && x <= visualLeft + visualWidth
+          && y >= visualTop && y <= visualTop + visualHeight
+        const enabled = !(node instanceof HTMLButtonElement) || !node.disabled
+        const hitTarget = target === node || node.contains(target)
+        return {
+          index,
+          x,
+          y,
+          width: rect.width,
+          height: rect.height,
+          visible,
+          enabled,
+          hitTarget,
+          distance: Math.hypot(x - viewportCenterX, y - viewportCenterY),
+          hitTag: target?.tagName ?? null,
+          hitText: target?.textContent?.trim().slice(0, 80) ?? null,
+          pageScrollY: window.scrollY,
+        }
+      })
     })
+    lastCandidates = candidates
 
-    if (lastHit.visible && lastHit.enabled && lastHit.hitTarget) {
-      await page.mouse.click(lastHit.x, lastHit.y, { delay: 20 })
+    const hittable = candidates.find((candidate) => candidate.visible && candidate.enabled && candidate.hitTarget)
+    if (hittable) {
+      await page.mouse.click(hittable.x, hittable.y, { delay: 20 })
       return
     }
+
+    const nearest = candidates
+      .filter((candidate) => candidate.enabled && candidate.width > 0 && candidate.height > 0)
+      .sort((a, b) => a.distance - b.distance)[0]
+    if (!nearest) break
+
+    await locator.nth(nearest.index).evaluate((node) => {
+      node.scrollIntoView({ block: 'center', inline: 'center', behavior: 'auto' })
+    })
+    await page.waitForTimeout(220)
   }
-  throw new Error(`Preset is not a valid browser hit target after absolute document scrolling: ${JSON.stringify(lastHit)}`)
+  throw new Error(`Preset is not a valid browser hit target after nested native scrolling: ${JSON.stringify(lastCandidates)}`)
 }
 
 const metrics = {
