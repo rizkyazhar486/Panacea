@@ -55,6 +55,8 @@ jobs:
         run: npm run uji:commons
       - name: Test ICD terminology adapter
         run: npm run uji:icd
+      - name: Test anatomy ontology provenance
+        run: npm run uji:ontology
       - name: Test canonical drug label orchestration
         run: npm run uji:drug-info
       - name: Runtime smoke-test genomics control plane
