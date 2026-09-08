@@ -27,9 +27,14 @@ function BodyExplorerStartHere() {
       data-testid="body-explorer-start-here"
       className="mt-3 overflow-hidden rounded-2xl border border-brand/20 bg-brand/[.045] shadow-[0_8px_28px_rgba(15,100,70,.06)] dark:border-brand/25 dark:bg-brand/[.08]"
     >
-      <summary className="flex min-h-[44px] cursor-pointer list-none items-center justify-between gap-3 px-4 py-2.5 text-sm font-black text-ink marker:hidden dark:text-white">
-        <span>Start here · 60-second guide</span>
-        <span aria-hidden className="rounded-full border border-brand/25 px-2 py-0.5 text-[10px] font-black uppercase tracking-wide text-brand">
+      <summary className="flex min-h-[44px] cursor-pointer list-none items-center justify-between gap-3 px-4 py-2.5 text-ink marker:hidden dark:text-white">
+        <span className="min-w-0">
+          <span className="block text-sm font-black">Start here · 60-second guide</span>
+          <span className="block truncate text-[10.5px] font-semibold text-neutral-500 dark:text-neutral-400">
+            Tap structure · drag to rotate · pinch/scroll to zoom
+          </span>
+        </span>
+        <span aria-hidden className="shrink-0 rounded-full border border-brand/25 px-2 py-0.5 text-[10px] font-black uppercase tracking-wide text-brand">
           Help
         </span>
       </summary>
