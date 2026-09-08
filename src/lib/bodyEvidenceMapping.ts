@@ -61,6 +61,20 @@ function isValidIsoDate(value: string | undefined) {
   return parsed.getUTCFullYear() === year && parsed.getUTCMonth() + 1 === month && parsed.getUTCDate() === day
 }
 
+function normalizeAnatomyTerm(value: string) {
+  return value.trim().toLowerCase().replace(/[^a-z0-9]+/g, ' ').replace(/\s+/g, ' ')
+}
+
+function anatomyTermMatchesTarget(target: BodyProjectionTarget, term: string) {
+  const normalizedTerm = normalizeAnatomyTerm(term)
+  if (!normalizedTerm) return false
+  return target.anatomyHints.some((hint) => {
+    const normalizedHint = normalizeAnatomyTerm(hint)
+    if (normalizedHint.length < 4) return normalizedTerm === normalizedHint
+    return normalizedTerm === normalizedHint || normalizedTerm.includes(normalizedHint) || normalizedHint.includes(normalizedTerm)
+  })
+}
+
 export function validateBodyEvidenceMapping(
   target: BodyProjectionTarget,
   record: BodyEvidenceMappingRecord,
@@ -75,7 +89,11 @@ export function validateBodyEvidenceMapping(
   if (!nonBlank(record.citation)) reasons.push('Evidence citation is missing.')
   if (!isSpecificSourceLocator(record.sourceLocator)) reasons.push('Evidence source locator must identify a specific source location.')
   if (!nonBlank(record.evidenceSummary)) reasons.push('Bounded evidence summary is missing.')
-  if (!record.mappedAnatomyTerms.length || record.mappedAnatomyTerms.some((term) => !nonBlank(term))) reasons.push('At least one explicit mapped anatomy term is required.')
+  if (!record.mappedAnatomyTerms.length || record.mappedAnatomyTerms.some((term) => !nonBlank(term))) {
+    reasons.push('At least one explicit mapped anatomy term is required.')
+  } else if (record.mappedAnatomyTerms.some((term) => !anatomyTermMatchesTarget(target, term))) {
+    reasons.push('Every mapped anatomy term must resolve conservatively to the requested projection target anatomy hints.')
+  }
   if (typeof record.aiAssisted !== 'boolean') reasons.push('AI-assistance disclosure must be an explicit boolean.')
   if (record.locationInferredFromFreeText) reasons.push('Patient lesion/location inference from free text is forbidden.')
 
