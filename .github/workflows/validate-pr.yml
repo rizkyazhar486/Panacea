@@ -4,7 +4,6 @@ on:
   pull_request:
     branches:
       - main
-      - stabilization/unfinished-debt-safe-20260908
   workflow_dispatch:
 
 permissions:
