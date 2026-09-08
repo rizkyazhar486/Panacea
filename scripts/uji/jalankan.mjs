@@ -25,11 +25,11 @@ const berkas = readdirSync(di).filter((f) => f.endsWith('.mts')).sort()
 let gagal = 0
 for (const f of berkas) {
   console.log(`\n─── ${f} ${'─'.repeat(Math.max(0, 60 - f.length))}`)
-  // CI mem-pin Node 24. Jalankan TypeScript dengan runtime yang sudah tersedia,
-  // bukan `npx` yang dapat mengunduh paket saat regression gate sedang berjalan.
-  // transform-types menjaga kompatibilitas syntax TypeScript yang membutuhkan
-  // transformasi sambil tetap menghilangkan dependency jaringan dari runner.
-  const r = spawnSync(process.execPath, ['--experimental-transform-types', join(di, f)], {
+  // `tsx` dipin sebagai devDependency dan sudah dipasang oleh `npm ci`.
+  // Menjalankannya melalui Node --import mempertahankan resolver TypeScript
+  // repo (extensionless imports / source .ts behind .js specifiers) tanpa
+  // `npx` dan tanpa mengunduh paket ketika regression gate sedang berjalan.
+  const r = spawnSync(process.execPath, ['--import=tsx', join(di, f)], {
     stdio: 'inherit',
     cwd: akar,
   })
