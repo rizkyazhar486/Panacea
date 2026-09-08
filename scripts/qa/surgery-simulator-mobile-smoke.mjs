@@ -57,11 +57,11 @@ async function waitForInputValue(locator, expected, tolerance = 0.005, timeout =
   throw new Error(`Timed out waiting for input value ${expected}`)
 }
 async function tapScrolled(locator) {
-  // There can be more than one matching target while responsive/transitioning
-  // UI is mounted. Prefer a candidate that is genuinely inside the visual
-  // viewport and owns its browser hit target. If none is hittable yet, native
-  // scrollIntoView on the nearest candidate scrolls every ancestor scroller
-  // before the next bounded attempt. No force:true or DOM .click() is used.
+  // Responsive/transitioning UI can leave more than one matching target mounted.
+  // Prefer a candidate that is genuinely inside the visual viewport and owns its
+  // browser hit target. If none is hittable yet, native scrollIntoView on the
+  // nearest candidate scrolls ancestor scrollers before the next bounded attempt.
+  // No force:true or DOM .click() is used.
   let lastCandidates = []
   for (let attempt = 0; attempt < 8; attempt += 1) {
     const candidates = await locator.evaluateAll((nodes) => {
@@ -121,7 +121,6 @@ async function scrollNative(locator) {
   // Playwright scrollIntoViewIfNeeded waits for layout stability. The surgical
   // atlas and shared Body3D are continuously rendered, so that actionability
   // condition can remain false even when the target is already visible.
-  // Native scrolling is deterministic and does not bypass subsequent assertions.
   await locator.evaluate((node) => node.scrollIntoView({ block: 'center', inline: 'nearest', behavior: 'auto' }))
   await page.waitForTimeout(140)
 }
@@ -168,12 +167,13 @@ try {
   await sharedBodyCanvas.waitFor({ state: 'visible', timeout: 120_000 })
 
   const surgeryTab = page.getByRole('button', { name: 'Surgical layers', exact: true })
-  await surgeryTab.click()
+  await tapScrolled(surgeryTab)
   let simulator = page.locator('[data-surgery-simulator="anatomy-grounded"]')
   await simulator.waitFor({ state: 'visible', timeout: 30_000 })
   await scrollNative(simulator)
 
-  await simulator.getByRole('button', { name: 'Caesarean', exact: true }).click()
+  const caesareanScenario = simulator.getByRole('button', { name: 'Caesarean', exact: true })
+  await tapScrolled(caesareanScenario)
   await simulator.getByText('Caesarean section — layered pelvic anatomy', { exact: true }).waitFor({ state: 'visible', timeout: 20_000 })
   let atlasCanvas = simulator.locator('canvas[data-atlas-viewer3d="true"]').first()
   await atlasCanvas.waitFor({ state: 'visible', timeout: 60_000 })
@@ -216,18 +216,21 @@ try {
   await waitForClass(page.getByRole('button', { name: 'Anatomy', exact: true }).first(), 'bg-white')
   metrics.explodedSharedBody3d = true
 
-  await page.getByRole('button', { name: 'Layers', exact: true }).click()
+  const layersButton = page.getByRole('button', { name: 'Layers', exact: true })
+  await tapScrolled(layersButton)
   const unfoldSlider = page.getByRole('slider', { name: 'Unfold', exact: true })
   metrics.explodedUnfold = await waitForInputValue(unfoldSlider, 0.28)
 
-  await page.getByRole('button', { name: 'Surgical layers', exact: true }).click()
+  const reopenSurgeryTab = page.getByRole('button', { name: 'Surgical layers', exact: true })
+  await tapScrolled(reopenSurgeryTab)
   simulator = page.locator('[data-surgery-simulator="anatomy-grounded"]')
   await simulator.waitFor({ state: 'visible', timeout: 30_000 })
   atlasCanvas = simulator.locator('canvas[data-atlas-viewer3d="true"]').first()
   await atlasCanvas.waitFor({ state: 'visible', timeout: 60_000 })
   loadFailure = simulator.getByText(/Could not load this anatomical model|could not start 3D graphics|dropped the 3D context/i).first()
 
-  await simulator.getByRole('button', { name: 'Transseptal + ICE', exact: true }).click()
+  const transseptalScenario = simulator.getByRole('button', { name: 'Transseptal + ICE', exact: true })
+  await tapScrolled(transseptalScenario)
   await simulator.getByText('Transseptal puncture — 3D anatomy + ICE orientation', { exact: true }).waitFor({ state: 'visible', timeout: 20_000 })
   await atlasCanvas.waitFor({ state: 'visible', timeout: 60_000 })
   await page.waitForTimeout(700)
@@ -248,7 +251,8 @@ try {
   await simulator.getByText('orientation, not diagnosis', { exact: true }).waitFor({ state: 'visible', timeout: 10_000 })
   metrics.iceLongAxisVisible = true
 
-  await simulator.getByRole('button', { name: 'DIYAI Lap Appy', exact: true }).click()
+  const lapAppyScenario = simulator.getByRole('button', { name: 'DIYAI Lap Appy', exact: true })
+  await tapScrolled(lapAppyScenario)
   await simulator.getByText('DIYAI · Laparoscopic appendectomy anatomy simulation', { exact: true }).waitFor({ state: 'visible', timeout: 20_000 })
   await atlasCanvas.waitFor({ state: 'visible', timeout: 60_000 })
   await page.waitForTimeout(700)
