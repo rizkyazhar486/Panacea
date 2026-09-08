@@ -91,9 +91,10 @@ jobs:
             kill "$(cat /tmp/panacea-vite-preview.pid)" 2>/dev/null || true
           fi
 
-  # Server acceptance is independent of the browser/WebGL runner. Running it in
-  # parallel preserves the exact same gate while removing it from the frontend
-  # critical path and surfaces backend failures earlier.
+  # Server acceptance is independent of the browser/WebGL runner. Some backend
+  # regression tests intentionally import shared root React/TSX modules, so this
+  # runner installs both lockfile graphs before executing the exact same server
+  # typecheck/build/test suite. The jobs remain independent and can run in parallel.
   server-acceptance:
     runs-on: ubuntu-latest
     timeout-minutes: 20
@@ -106,7 +107,12 @@ jobs:
         with:
           node-version: 24
           cache: npm
-          cache-dependency-path: server/package-lock.json
+          cache-dependency-path: |
+            package-lock.json
+            server/package-lock.json
+
+      - name: Install shared root dependencies
+        run: npm ci
 
       - name: Install server dependencies
         working-directory: server
