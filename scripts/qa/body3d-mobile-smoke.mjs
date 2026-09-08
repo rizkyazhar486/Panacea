@@ -209,7 +209,7 @@ try {
 
   const box = await canvas.boundingBox()
   if (!box) throw new Error('Body3D canvas has no measurable bounding box')
-  const beforeOrbit = await capturePng(box)
+  const beforeOrbit = await capturePng()
   const x = box.x + box.width * 0.5
   const y = box.y + box.height * 0.45
   await page.mouse.move(x, y)
@@ -217,7 +217,7 @@ try {
   await page.mouse.move(x + Math.min(48, box.width * 0.15), y + 18, { steps: 6 })
   await page.mouse.up()
   await page.waitForTimeout(300)
-  const afterOrbit = await capturePng(box)
+  const afterOrbit = await capturePng()
   metrics.orbitChangedFrame = !beforeOrbit.equals(afterOrbit)
   if (!metrics.orbitChangedFrame) throw new Error('Orbit drag did not produce a new Body3D compositor frame')
 
@@ -238,7 +238,7 @@ try {
   await page.waitForTimeout(250)
   const beforeJointBox = await canvas.boundingBox()
   if (!beforeJointBox) throw new Error('Body3D canvas became unavailable before joint selection')
-  const beforeJointSelection = await capturePng(beforeJointBox)
+  const beforeJointSelection = await capturePng()
 
   const kneeButton = inspector.getByRole('button', { name: 'Knee', exact: true })
   await kneeButton.click()
@@ -247,7 +247,7 @@ try {
   await page.waitForTimeout(350)
   const afterJointBox = await canvas.boundingBox()
   if (!afterJointBox) throw new Error('Body3D canvas became unavailable after joint selection')
-  const afterJointSelection = await capturePng(afterJointBox)
+  const afterJointSelection = await capturePng()
   metrics.wholeBodyMotion = {
     precisionOpened: true,
     kneeSelected: true,
