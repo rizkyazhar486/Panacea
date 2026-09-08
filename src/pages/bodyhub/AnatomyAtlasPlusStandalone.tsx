@@ -9,20 +9,30 @@ import {
   type SlicePlane,
 } from '../../components/Body3D'
 import AnatomyAtlasPlus from './AnatomyAtlasPlus'
+import BreathAtlasLab from './BreathAtlasLab'
 import type { AtlasPlusEntry } from './anatomyAtlasPlusData'
+
+type StudyMode = 'atlas-plus' | 'breath-atlas'
 
 const DEFAULT_LAYERS = new Set<AnatomyLayer['key']>(['visceral'])
 
 export function AnatomyAtlasPlusStandalone() {
+  const [studyMode, setStudyMode] = useState<StudyMode>('atlas-plus')
   const [layers, setLayers] = useState<Set<AnatomyLayer['key']>>(() => new Set(DEFAULT_LAYERS))
+  const [highlighted, setHighlighted] = useState<string[]>([])
   const [focusKeywords, setFocusKeywords] = useState<string[] | null>(['lung', 'pulmon'])
   const [renderMode, setRenderMode] = useState<RenderMode>('anatomy')
   const [slicePlane, setSlicePlane] = useState<SlicePlane>('none')
   const [slicePos, setSlicePos] = useState(0.5)
   const [pickedLabel, setPickedLabel] = useState('Lungs')
 
+  function enableLayer(layer: AnatomyLayer['key']) {
+    setLayers((current) => (current.has(layer) ? current : new Set(current).add(layer)))
+  }
+
   function focus(entry: AtlasPlusEntry) {
-    setLayers((current) => new Set(current).add(entry.layer))
+    enableLayer(entry.layer)
+    setHighlighted([])
     setFocusKeywords(entry.keywords)
     setRenderMode('anatomy')
     setSlicePlane('none')
@@ -31,6 +41,7 @@ export function AnatomyAtlasPlusStandalone() {
 
   function isolate(entry: AtlasPlusEntry) {
     setLayers(new Set([entry.layer]))
+    setHighlighted([])
     setFocusKeywords(entry.keywords)
     setRenderMode('anatomy')
     setSlicePlane('none')
@@ -45,6 +56,7 @@ export function AnatomyAtlasPlusStandalone() {
       nextKeywords.push(...entry.keywords)
     }
     setLayers(nextLayers)
+    setHighlighted([])
     setFocusKeywords(Array.from(new Set(nextKeywords)))
     setRenderMode('anatomy')
     setSlicePlane('none')
@@ -53,11 +65,23 @@ export function AnatomyAtlasPlusStandalone() {
 
   function crossSection(entry: AtlasPlusEntry) {
     setLayers(new Set([entry.layer]))
+    setHighlighted([])
     setFocusKeywords(entry.keywords)
     setRenderMode('ct')
     setSlicePlane('axial')
     setSlicePos(0.5)
     setPickedLabel(`${entry.label} · CT teaching section`)
+  }
+
+  function handleBreathHighlight(names: string[]) {
+    setHighlighted(names)
+    if (names.length) setPickedLabel('Breath Atlas · exact source nodes')
+  }
+
+  function handleBreathFocus(hints: string[]) {
+    setFocusKeywords(hints.length ? hints : null)
+    setRenderMode('anatomy')
+    setSlicePlane('none')
   }
 
   const ctWindow = CT_WINDOWS.find((window) => window.key === (focusKeywords?.some((keyword) => /lung|bronch|alveol|pulmon/.test(keyword)) ? 'lung' : 'soft')) ?? CT_WINDOWS[0]
@@ -69,17 +93,42 @@ export function AnatomyAtlasPlusStandalone() {
           <div>
             <div className="text-sm font-black text-ink dark:text-white">Atlas+ study viewport</div>
             <p className="mt-0.5 text-[10.5px] leading-relaxed text-neutral-500">
-              A dedicated, lazy-loaded Body3D viewport for focus, isolate, compare and cross-section study. It reuses the same source meshes and cache as Body Explorer.
+              One lazy-loaded Body3D viewport powers curated Atlas+ study and the source-aware Breath Atlas. Both reuse the same Panacea-controlled source meshes and runtime cache.
             </p>
           </div>
           <span className="rounded-full border border-brand/30 px-2.5 py-1 text-[10px] font-black text-brand">{pickedLabel}</span>
         </div>
       </div>
 
+      <div className="grid grid-cols-2 gap-1 rounded-xl bg-neutral-100 p-1 dark:bg-white/5">
+        {([
+          ['atlas-plus', 'Atlas+'],
+          ['breath-atlas', 'Breath Atlas'],
+        ] as const).map(([key, label]) => (
+          <button
+            key={key}
+            type="button"
+            aria-pressed={studyMode === key}
+            onClick={() => {
+              setStudyMode(key)
+              setRenderMode('anatomy')
+              setSlicePlane('none')
+              if (key === 'breath-atlas') {
+                enableLayer('visceral')
+                setPickedLabel('Breath Atlas')
+              }
+            }}
+            className={`min-h-[36px] rounded-lg text-[11px] font-black ${studyMode === key ? 'bg-white text-ink shadow-sm dark:bg-white/10 dark:text-white' : 'text-neutral-500'}`}
+          >
+            {label}
+          </button>
+        ))}
+      </div>
+
       <div className="overflow-hidden rounded-2xl border border-neutral-200 bg-neutral-950 p-1 dark:border-white/10">
         <Body3D
           layers={layers}
-          highlighted={[]}
+          highlighted={highlighted}
           focusKeywords={focusKeywords}
           renderMode={renderMode}
           ctWindow={ctWindow}
@@ -88,7 +137,10 @@ export function AnatomyAtlasPlusStandalone() {
           motion={MOTION_OFF}
           unfold={0}
           dissect={0}
-          onPick={(_rawName, label) => setPickedLabel(label)}
+          onPick={(rawName, label) => {
+            setHighlighted([rawName])
+            setPickedLabel(label)
+          }}
         />
       </div>
 
@@ -133,13 +185,20 @@ export function AnatomyAtlasPlusStandalone() {
         ))}
       </div>
 
-      <AnatomyAtlasPlus
-        onFocusEntry={focus}
-        onIsolateEntry={isolate}
-        onCompareEntries={compare}
-        onCrossSection={crossSection}
-        onOpenPhysiology={() => document.getElementById('physiology-system-list')?.scrollIntoView({ block: 'start', behavior: 'smooth' })}
-      />
+      {studyMode === 'atlas-plus' ? (
+        <AnatomyAtlasPlus
+          onFocusEntry={focus}
+          onIsolateEntry={isolate}
+          onCompareEntries={compare}
+          onCrossSection={crossSection}
+        />
+      ) : (
+        <BreathAtlasLab
+          onHighlight={handleBreathHighlight}
+          onFocusRegion={handleBreathFocus}
+          onEnableLayer={(layer) => enableLayer(layer)}
+        />
+      )}
     </div>
   )
 }
