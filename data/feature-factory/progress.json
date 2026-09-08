@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-09-08T05:09:00.000Z",
+  "updatedAt": "2026-09-08T05:18:00.000Z",
   "items": {
     "ff-medical-education-accessibility": {
       "status": "done",
@@ -24,13 +24,13 @@
     },
     "ff-medical-education-glossary": {
       "status": "done",
-      "commit": "8c9b83c7165102a3305f77cd32caaf58ad4552cc",
+      "commit": "3d939d731e2719dae1ab1b20afc500374b32e283",
       "paths": [
         "src/lib/knowledgeBridgeMap.ts",
         "scripts/uji/knowledge-bridge-glossary.mts"
       ],
-      "note": "Knowledge Bridge now expands each of its seven causal-stage labels with a concise plain-language definition at point of use. The glossary is a fixed seven-entry map reused by every curated topic, adding no dependency, network call, polling, storage, large asset, or patient-specific inference.",
-      "updatedAt": "2026-09-08T05:09:00.000Z"
+      "note": "Knowledge Bridge expands each of its seven causal-stage labels with a concise plain-language definition at point of use while bridgeSummary preserves the canonical stage labels used by existing exports/tests. The glossary is a fixed seven-entry map reused by every curated topic, adding no dependency, network call, polling, storage, large asset, or patient-specific inference.",
+      "updatedAt": "2026-09-08T05:18:00.000Z"
     }
   }
 }
