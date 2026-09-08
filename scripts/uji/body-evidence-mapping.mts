@@ -2,6 +2,7 @@ import assert from 'node:assert/strict'
 import { BODY_PROJECTION_TARGETS } from '../../src/lib/bodyProjectionContract.ts'
 import { validateBodyEvidenceMapping, type BodyEvidenceMappingRecord } from '../../src/lib/bodyEvidenceMapping.ts'
 
+// Exact-head acceptance guard: this suite is intentionally deterministic and content-free.
 const cardiovascular = BODY_PROJECTION_TARGETS.find((target) => target.id === 'cardiovascular-core')
 assert.ok(cardiovascular)
 
