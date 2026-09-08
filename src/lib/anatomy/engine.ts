@@ -3,6 +3,7 @@ import { WHOLE_BODY_ASSET_MANIFEST, buildAtlasLoadPlan, validateAssetManifest } 
 import { resolveProjectionTargetToAtlas } from './bodyProjectionBridge'
 import { WHOLE_BODY_CORE_STRUCTURES } from './catalog'
 import { AnatomyGraph } from './graph'
+import { equationsForStructure, traceMultiscalePath, validateMultiscaleAtlas } from './multiscale'
 import { RESPIRATORY_RELATIONS, RESPIRATORY_STRUCTURES } from './respiratoryAtlas'
 import { AnatomyResolver } from './resolver'
 import { buildMeasuredAtlasLoadPlan, compileAtlasSources } from './sourceCompiler'
@@ -65,6 +66,18 @@ export class WholeBodyAtlasEngine {
     return buildMeasuredAtlasLoadPlan(this.compileSources(), context)
   }
 
+  traceScale(fromId: string, toId: string) {
+    return traceMultiscalePath(fromId, toId)
+  }
+
+  physiologyFor(structureId: string) {
+    return equationsForStructure(structureId)
+  }
+
+  validateMultiscale() {
+    return validateMultiscaleAtlas(this.structures)
+  }
+
   assetsFor(structureIds: readonly string[]) {
     const requested = new Set(structureIds)
     return this.assets.filter((record) => record.structureIds.some((id) => requested.has(id)))
@@ -83,6 +96,11 @@ export class WholeBodyAtlasEngine {
     const issues: AtlasValidationIssue[] = [
       ...this.graph.validate().issues,
       ...validateAssetManifest(this.assets).issues,
+      ...this.validateMultiscale().map((issue) => ({
+        code: `multiscale-${issue.code}`,
+        message: issue.message,
+        structureId: issue.nodeId,
+      })),
     ]
     const structureIds = new Set(this.structures.map((structure) => structure.id))
     for (const asset of this.assets) {
