@@ -50,6 +50,13 @@ await context.addInitScript(() => {
   // presentation flags; do not fabricate a completed health assessment.
   localStorage.setItem('panacea_onboarded_v1', '1')
   localStorage.setItem('panacea_assessment_prompt_v1', '1')
+
+  // Browser QA must not depend on Playwright waiting for scroll-animation
+  // stability while the progressive 3D layout is still settling. This is
+  // test-only presentation control; production scrolling remains untouched.
+  const style = document.createElement('style')
+  style.textContent = 'html, body { overflow-anchor: none !important; scroll-behavior: auto !important; }'
+  document.documentElement.appendChild(style)
 })
 
 const page = await context.newPage()
@@ -97,6 +104,62 @@ async function assertNoFatal(label) {
   }
 }
 
+async function placeCanvasInVisualViewport(locator) {
+  let lastGeometry = null
+  for (let attempt = 0; attempt < 6; attempt += 1) {
+    await locator.evaluate((node) => {
+      // DOM scrolling returns immediately and avoids Playwright's actionability
+      // wait for a continuously settling WebGL/progressive-layout surface.
+      node.scrollIntoView({ block: 'center', inline: 'nearest', behavior: 'auto' })
+
+      const rect = node.getBoundingClientRect()
+      const visualTop = window.visualViewport?.offsetTop ?? 0
+      const visualHeight = window.visualViewport?.height ?? window.innerHeight
+      const absoluteCenter = window.scrollY + rect.top + rect.height / 2
+      const viewportCenter = visualTop + visualHeight / 2
+      const maxScroll = Math.max(0, document.documentElement.scrollHeight - window.innerHeight)
+      const targetScrollY = Math.max(0, Math.min(maxScroll, absoluteCenter - viewportCenter))
+      window.scrollTo({ top: targetScrollY, left: 0, behavior: 'auto' })
+    })
+    await page.waitForTimeout(140)
+
+    lastGeometry = await locator.evaluate((node) => {
+      const rect = node.getBoundingClientRect()
+      const visualTop = window.visualViewport?.offsetTop ?? 0
+      const visualLeft = window.visualViewport?.offsetLeft ?? 0
+      const visualWidth = window.visualViewport?.width ?? window.innerWidth
+      const visualHeight = window.visualViewport?.height ?? window.innerHeight
+      const centerX = rect.left + rect.width / 2
+      const centerY = rect.top + rect.height / 2
+      const visibleWidth = Math.max(0, Math.min(rect.right, visualLeft + visualWidth) - Math.max(rect.left, visualLeft))
+      const visibleHeight = Math.max(0, Math.min(rect.bottom, visualTop + visualHeight) - Math.max(rect.top, visualTop))
+      return {
+        rect: [rect.left, rect.top, rect.right, rect.bottom],
+        center: [centerX, centerY],
+        visualViewport: [visualLeft, visualTop, visualWidth, visualHeight],
+        visibleWidth,
+        visibleHeight,
+        centerVisible:
+          centerX >= visualLeft && centerX <= visualLeft + visualWidth &&
+          centerY >= visualTop && centerY <= visualTop + visualHeight,
+        pageScrollY: window.scrollY,
+      }
+    })
+
+    // The canvas can legitimately be a few pixels taller than the 844px
+    // viewport. Require its usable centre plus substantial visible area rather
+    // than requiring the entire canvas to fit on screen.
+    if (
+      lastGeometry.centerVisible &&
+      lastGeometry.visibleWidth >= Math.min(300, lastGeometry.rect[2] - lastGeometry.rect[0]) &&
+      lastGeometry.visibleHeight >= 480
+    ) {
+      return lastGeometry
+    }
+  }
+  throw new Error(`Body3D canvas could not be positioned in the visual viewport: ${JSON.stringify(lastGeometry)}`)
+}
+
 try {
   const response = await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 45_000 })
   if (response && !response.ok()) throw new Error(`Body Explorer returned HTTP ${response.status()}`)
@@ -111,7 +174,7 @@ try {
   const viewer = page.locator('div.h-full.w-full.touch-none').first()
   canvas = viewer.locator('> canvas').first()
   await canvas.waitFor({ state: 'visible', timeout: 45_000 })
-  await canvas.scrollIntoViewIfNeeded()
+  const initialCanvasGeometry = await placeCanvasInVisualViewport(canvas)
 
   const initialLoading = page.getByText('Loading anatomy…').first()
   const progressiveLoading = page.getByText('Adding anatomy layer…').first()
@@ -140,6 +203,7 @@ try {
   metrics = {
     viewport,
     canvas: health,
+    initialCanvasGeometry,
     canvasCenterUnobstructed: centerUnobstructed,
     route: await page.evaluate(() => window.location.hash),
   }
