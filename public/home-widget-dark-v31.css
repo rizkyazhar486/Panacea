@@ -1,24 +1,8 @@
-/* Panacea Home widget dark-surface guard v31
-   Hardens the Living Instrument against light/gray surface leakage in Dark Mode.
-   Presentation only: no data, calculations, timers, routes or health logic. */
+/* Panacea Home widget Dark Mode emergency guard v31.
+   Loaded from index.html after all prior Home layers so stale glass gradients or
+   loading surfaces cannot turn the Living Instrument light gray on Dark Mode.
+   Presentation only: no health data, calculations, routes, stores or timers. */
 
-.widget-instrument-loading-v29{
-  min-height:120px;
-  border-radius:20px;
-  background:rgba(148,163,184,.055);
-}
-
-.dark .panacea-home .widget-instrument-loading-v29{
-  background:#0b1119!important;
-  background-image:none!important;
-  border:1px solid rgba(255,255,255,.06)!important;
-  box-shadow:none!important;
-  filter:none!important;
-  -webkit-backdrop-filter:none!important;
-  backdrop-filter:none!important;
-}
-
-/* Keep the carousel canvas itself dark. */
 .dark .panacea-home .widget-instrument-shell-v5{
   background:#070b11!important;
   background-image:linear-gradient(155deg,#0d121a 0%,#070b11 100%)!important;
@@ -33,15 +17,25 @@
   color:#f8fafc!important;
 }
 
-/* IMPORTANT: widget families do not all use the same wrapper depth. Previous
-   guards only handled direct-child .kaca cards, leaving deeper cards able to
-   inherit the old light glass gradient. Cover every .kaca inside a slide. */
+/* Suspense must never appear as a large gray card. */
+.dark .panacea-home .widget-instrument-loading-v29{
+  background:#0b1119!important;
+  background-image:none!important;
+  border:1px solid rgba(255,255,255,.06)!important;
+  box-shadow:none!important;
+  filter:none!important;
+  -webkit-backdrop-filter:none!important;
+  backdrop-filter:none!important;
+}
+
+/* Catch every actual glass card at ANY nesting depth. v30 only covered two
+   direct-child shapes; some widget families wrap their .kaca one level deeper. */
 .dark .panacea-home .widget-instrument-slide-v5 .kaca{
   background:#0b1119!important;
   background-image:none!important;
   background-color:#0b1119!important;
   color:#f8fafc!important;
-  border:1px solid rgba(255,255,255,.08)!important;
+  border-color:rgba(255,255,255,.08)!important;
   box-shadow:none!important;
   filter:none!important;
   -webkit-backdrop-filter:none!important;
@@ -54,26 +48,28 @@
   display:none!important;
 }
 
-.dark .panacea-home .widget-instrument-slide-v5 .kaca :is(h1,h2,h3,strong,.font-black):not([class*='text-']){
-  color:#f8fafc!important;
-}
-.dark .panacea-home .widget-instrument-slide-v5 .kaca :is(p,.t-mikro,.t-kecil):not([class*='text-']){
-  color:#cbd5e1!important;
-}
-
-/* Explicit utility-color repairs for common widget text. Semantic chart/status
-   colours are intentionally left intact. */
+/* Neutral utility text is common across older widgets. Repair text only; keep
+   semantic chart/status colours intact. */
 .dark .panacea-home .widget-instrument-slide-v5 :is(.text-neutral-950,.text-neutral-900,.text-neutral-800,.text-neutral-700,.text-ink){
   color:#f8fafc!important;
 }
 .dark .panacea-home .widget-instrument-slide-v5 .text-neutral-600{color:#dde6ef!important}
 .dark .panacea-home .widget-instrument-slide-v5 :is(.text-neutral-500,.text-neutral-400){color:#b8c3cf!important}
 
+/* Head/footer controls must remain dark too, so no gray island surrounds a
+   corrected widget card. */
 .dark .panacea-home :is(.widget-instrument-count-v5,.widget-instrument-nav-v5){
   background:rgba(255,255,255,.05)!important;
   background-image:none!important;
   border-color:rgba(255,255,255,.09)!important;
   color:#d7e0e8!important;
+}
+
+html.pmd-low-memory.dark .panacea-home :is(.widget-instrument-shell-v5,.widget-instrument-loading-v29,.widget-instrument-slide-v5 .kaca){
+  box-shadow:none!important;
+  filter:none!important;
+  -webkit-backdrop-filter:none!important;
+  backdrop-filter:none!important;
 }
 
 @media (prefers-contrast:more){
@@ -83,11 +79,4 @@
     outline:1px solid rgba(255,255,255,.18);
     outline-offset:-1px;
   }
-}
-
-html.pmd-low-memory.dark .panacea-home :is(.widget-instrument-shell-v5,.widget-instrument-loading-v29,.widget-instrument-slide-v5 .kaca){
-  box-shadow:none!important;
-  filter:none!important;
-  -webkit-backdrop-filter:none!important;
-  backdrop-filter:none!important;
 }
