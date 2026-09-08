@@ -94,6 +94,11 @@ try {
 
   await page.getByRole('button', { name: 'Vessels', exact: true }).first().click()
   await progressive.waitFor({ state: 'visible', timeout: 5_000 })
+  // Clicking a layer control may scroll that control into view. Re-center the
+  // actual viewer before testing banner geometry or orbit interaction so the
+  // smoke test never sends pointer input to off-screen coordinates.
+  await canvas.scrollIntoViewIfNeeded()
+  await page.waitForTimeout(100)
   const cls = await progressive.evaluate((n) => n.closest('[role="status"]')?.getAttribute('class') || '')
   metrics.progressiveCompact = cls.includes('top-2') && !cls.includes('inset-0')
   metrics.progressiveGeometry = await progressive.evaluate((node) => {
@@ -120,6 +125,8 @@ try {
   if (!metrics.progressiveCompact || !metrics.progressiveCenterClear) throw new Error(`progressive loading blocks or covers viewer: ${JSON.stringify(metrics.progressiveGeometry)}`)
   await progressive.waitFor({ state: 'hidden', timeout: 120_000 })
 
+  await canvas.scrollIntoViewIfNeeded()
+  await page.waitForTimeout(100)
   const box = await canvas.boundingBox()
   if (!box) throw new Error('canvas has no bounding box')
   const beforeOrbit = await snap(), x = box.x + box.width * .5, y = box.y + box.height * .45
