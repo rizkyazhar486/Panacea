@@ -6,6 +6,7 @@ on:
       - feat/body-exposure-organ-detail-20260908
     paths:
       - 'scripts/stabilization/apply-organ-reference-viewer-fix.mjs'
+      - 'scripts/uji/organ-model-exact-picking.mts'
       - '.github/workflows/body-exposure-reference-patch.yml'
   workflow_dispatch:
 
