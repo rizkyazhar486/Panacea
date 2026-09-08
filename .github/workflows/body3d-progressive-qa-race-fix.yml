@@ -1,0 +1,55 @@
+name: Body3D Progressive QA Race Fix
+
+on:
+  push:
+    branches:
+      - fix/body3d-progressive-loading-20260908
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    if: ${{ !contains(github.event.head_commit.message, '[progressive-qa-race-fixed]') }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: fix/body3d-progressive-loading-20260908
+
+      - name: Apply exact QA race fix
+        run: |
+          node <<'NODE'
+          const fs = require('node:fs')
+          const path = 'scripts/qa/body3d-mobile-smoke.mjs'
+          let s = fs.readFileSync(path, 'utf8')
+          function once(oldText, newText, label) {
+            const at = s.indexOf(oldText)
+            if (at < 0) throw new Error(`${label}: expected text not found`)
+            if (s.indexOf(oldText, at + oldText.length) >= 0) throw new Error(`${label}: text not unique`)
+            s = s.slice(0, at) + newText + s.slice(at + oldText.length)
+          }
+          once(
+            `  await new Promise((resolve) => setTimeout(resolve, 1_200))`,
+            `  await new Promise((resolve) => setTimeout(resolve, 4_000))`,
+            'QA artificial layer delay',
+          )
+          once(
+            `  await vessels.click()\n  await progressiveLoading.waitFor({ state: 'visible', timeout: 5_000 })\n  await canvas.scrollIntoViewIfNeeded()\n  // Resolve the live region directly. Chaining an ancestor XPath from a text\n  // locator can lose the element once React updates the text node during\n  // progress; filtering the stable status container is deterministic.\n  const progressiveOverlay = page.locator('[role="status"]').filter({ hasText: 'Adding anatomy layer…' }).first()\n  await progressiveOverlay.waitFor({ state: 'visible', timeout: 5_000 })\n  const progressiveClass = await progressiveOverlay.getAttribute('class')`,
+            `  await vessels.click()\n  await progressiveLoading.waitFor({ state: 'visible', timeout: 5_000 })\n  // Read the status container from the exact text node that is already visible.\n  // A second live locator can legitimately race the completion of a fast GLB.\n  const progressiveClass = await progressiveLoading.evaluate((node) =>\n    node.closest('[role="status"]')?.getAttribute('class') ?? '',\n  )`,
+            'progressive status class capture',
+          )
+          fs.writeFileSync(path, s)
+          NODE
+          node --check scripts/qa/body3d-mobile-smoke.mjs
+          git diff --check
+
+      - name: Commit corrected QA timing
+        run: |
+          git config user.name "Panacea Stabilization Bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add scripts/qa/body3d-mobile-smoke.mjs
+          git commit -m "test(body): remove progressive loading QA race [progressive-qa-race-fixed]"
+          git push origin HEAD:fix/body3d-progressive-loading-20260908
