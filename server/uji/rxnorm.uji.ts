@@ -1,4 +1,4 @@
-import { findRelatedDrugs } from '../src/rxnorm.ts'
+import { findRelatedDrugs, normalizeDrugName } from '../src/rxnorm.ts'
 
 let lulus = 0, gagal = 0
 function ok(nama: string, syarat: boolean, ket = '') {
@@ -122,11 +122,52 @@ await denganFetchPalsu(async () => {
   ok('failure related-concepts tidak disamarkan', pesan === 'rxnorm_related_502', pesan)
 })
 
+let normalizeCalls = 0
+await denganFetchPalsu(async (input, init) => {
+  normalizeCalls++
+  const url = new URL(String(input))
+  ok(`normalization request ${normalizeCalls} mempunyai timeout`, init?.signal instanceof AbortSignal)
+  if (normalizeCalls === 1) {
+    ok('approximate term query dibersihkan', url.pathname.endsWith('/approximateTerm.json') && url.searchParams.get('term') === 'Glucophge XR')
+    ok('approximate candidate dibatasi', url.searchParams.get('maxEntries') === '5')
+    return new Response(JSON.stringify({ approximateGroup: { candidate: [{ rxcui: '../bad' }, { rxcui: '860975' }] } }), { status: 200 })
+  }
+  ok('hanya RxCUI numerik dipakai untuk property lookup', url.pathname.endsWith('/rxcui/860975/property.json'), url.pathname)
+  ok('property RxNorm Name diminta', url.searchParams.get('propName') === 'RxNorm Name')
+  return new Response(JSON.stringify({ propConceptGroup: { propConcept: [{ propValue: '  metformin   hydrochloride  ' }] } }), { status: 200 })
+}, async () => {
+  const nama = await normalizeDrugName('  Glucophge<> XR  ')
+  ok('canonical RxNorm name dinormalisasi', nama === 'metformin hydrochloride', nama ?? '')
+  ok('normalization membutuhkan dua request', normalizeCalls === 2, String(normalizeCalls))
+})
+
+let malformedNormalizeCalls = 0
+await denganFetchPalsu(async () => {
+  malformedNormalizeCalls++
+  return new Response(JSON.stringify({ approximateGroup: { candidate: [{ rxcui: 'ABC123' }] } }), { status: 200 })
+}, async () => {
+  const nama = await normalizeDrugName('bad candidate')
+  ok('malformed approximate RxCUI tidak diteruskan', malformedNormalizeCalls === 1, String(malformedNormalizeCalls))
+  ok('malformed approximate RxCUI menghasilkan null', nama === null)
+})
+
+await denganFetchPalsu(async () => new Response(null, { status: 503 }), async () => {
+  let pesan = ''
+  try {
+    await normalizeDrugName('glucophage')
+  } catch (error) {
+    pesan = error instanceof Error ? error.message : String(error)
+  }
+  ok('failure approximate-term tidak disamarkan', pesan === 'rxnorm_approximate_503', pesan)
+})
+
 await denganFetchPalsu(async () => {
   throw new Error('fetch tidak boleh dipanggil untuk query kosong')
 }, async () => {
   const hasil = await findRelatedDrugs('  < > \u0001 \u0002  ')
-  ok('query kosong setelah sanitasi selesai tanpa network request', hasil.length === 0)
+  const nama = await normalizeDrugName('  < > \u0001 \u0002  ')
+  ok('query kosong related lookup selesai tanpa network request', hasil.length === 0)
+  ok('query kosong normalization selesai tanpa network request', nama === null)
 })
 
 console.log(`\nRxNorm adapter: ${lulus} lulus, ${gagal} gagal`)
