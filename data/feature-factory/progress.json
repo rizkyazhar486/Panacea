@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-09-08T06:40:00.000Z",
+  "updatedAt": "2026-09-08T06:55:00.000Z",
   "items": {
     "ff-medical-education-accessibility": {
       "status": "done",
@@ -21,6 +21,16 @@
       ],
       "note": "Added a pure descriptive learning baseline for explicit 1–5 user self-ratings: requires at least three valid observations, retains only the latest 12 per non-empty topic, preserves timestamp/unit/user-self-rating provenance, exposes median and IQR-style reference bounds, and remains explicitly descriptive-learning-only. Invalid scores, timestamps and blank topic identities fail closed. No UI import, dependency, network, polling, storage, asset, patient data, diagnosis or treatment inference was added.",
       "updatedAt": "2026-09-08T06:40:00.000Z"
+    },
+    "ff-medical-education-calculator": {
+      "status": "done",
+      "commit": "8ca58cb953de1e1c27a47f2dc31e1f86e486ecda",
+      "paths": [
+        "src/lib/knowledgeBridgeStudyCalculator.ts",
+        "scripts/uji/knowledge-bridge-study-calculator.mts"
+      ],
+      "note": "Added a pure educational self-rating calculator with visible formulas for mean and normalized percent, strict integer 1–5 validation, a maximum of 20 ratings per calculation, non-empty topic identity, and descriptive-learning-only provenance. Invalid input fails closed as a whole instead of silently dropping values. No UI import, dependency, API, polling, storage, asset, patient data, diagnosis, treatment or risk inference was added.",
+      "updatedAt": "2026-09-08T06:55:00.000Z"
     },
     "ff-medical-education-checklist": {
       "status": "done",
