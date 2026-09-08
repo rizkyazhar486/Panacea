@@ -80,14 +80,22 @@ export interface Hanyutan {
 }
 
 export function hanyutanDenyut(sesi: ImportedWorkout[], minMenit = 45): Hanyutan[] {
+  if (!Number.isFinite(minMenit) || minMenit < 2) return []
   const out: Hanyutan[] = []
   for (const w of sesi) {
-    if (!w.hr || w.hr.length < minMenit) continue
-    const tengah = Math.floor(w.hr.length / 2)
+    if (!Array.isArray(w.hr) || !w.hr.length) continue
+    const hrValid = w.hr.filter((p) =>
+      Boolean(p) && Number.isFinite(p.t) && p.t >= 0 && Number.isFinite(p.bpm) && p.bpm > 0,
+    )
+    // Runtime/cache JSON can bypass TypeScript. Invalid samples must not poison
+    // either half's mean or help a session satisfy the minimum recorded-data
+    // threshold used as evidence for drift.
+    if (hrValid.length < minMenit) continue
+    const tengah = Math.floor(hrValid.length / 2)
     const rata = (a: { bpm: number }[]) => a.reduce((s, p) => s + p.bpm, 0) / a.length
-    const awal = rata(w.hr.slice(0, tengah))
-    const akhir = rata(w.hr.slice(tengah))
-    if (!(awal > 0)) continue
+    const awal = rata(hrValid.slice(0, tengah))
+    const akhir = rata(hrValid.slice(tengah))
+    if (!(awal > 0) || !Number.isFinite(awal) || !Number.isFinite(akhir)) continue
     out.push({
       tanggal: w.mulai.slice(0, 10),
       nama: w.nama,
