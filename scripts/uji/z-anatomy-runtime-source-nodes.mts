@@ -43,10 +43,20 @@ assert.equal(anatomySourceNameMatchesHint('Hippocampus', 'hip'), false, 'token m
 assert.equal(anatomySourceNameMatchesHint('Common carotid artery.l', 'carotid'), true)
 
 const carotid = resolveAnatomySourceNodes(['carotid', 'artery'], snapshot)
-assert.equal(carotid.length, 1)
-assert.equal(carotid[0].file, 'cardiovascular.glb')
-assert.deepEqual(carotid[0].names, ['Common carotid artery.l'])
-assert.equal(carotid[0].hint, 'carotid', 'the first specific reviewed hint must win before broad fallbacks')
+assert.equal(carotid.length, 2, 'each reviewed hint may contribute additional exact source nodes')
+assert.deepEqual(
+  carotid.map((entry) => ({ file: entry.file, hint: entry.hint, names: entry.names })),
+  [
+    { file: 'cardiovascular.glb', hint: 'carotid', names: ['Common carotid artery.l'] },
+    { file: 'cardiovascular.glb', hint: 'artery', names: ['Femoral artery.r'] },
+  ],
+  'specific carotid geometry should resolve first, then the broader artery hint may add only unseen exact nodes',
+)
+assert.equal(
+  new Set(carotid.flatMap((entry) => entry.names)).size,
+  carotid.flatMap((entry) => entry.names).length,
+  'overlapping reviewed hints must never emit the same source node twice',
+)
 
 const hip = resolveAnatomySourceNodes(['hip'], snapshot)
 assert.deepEqual(hip.flatMap((entry) => entry.names), ['Hip_Joint'])
@@ -72,4 +82,4 @@ assert.match(workbenchSource, /onHighlight\?\.\(exactNames\)/, 'reviewed structu
 assert.match(workbenchSource, /naming-resolution result—not evidence that the anatomical structure is absent/)
 assert.doesNotMatch(workbenchSource, /coverage\s*%/i, 'source-name matching must not be presented as anatomical coverage')
 
-console.log('Z-Anatomy runtime registry and indexed fallback retain exact source names and resolve reviewed hints conservatively.')
+console.log('Z-Anatomy runtime registry and indexed fallback retain exact source names, resolve every reviewed hint conservatively, and deduplicate overlapping matches.')
