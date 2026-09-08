@@ -160,6 +160,67 @@ async function placeCanvasInVisualViewport(locator) {
   throw new Error(`Body3D canvas could not be positioned in the visual viewport: ${JSON.stringify(lastGeometry)}`)
 }
 
+async function tapStable(locator, label) {
+  // Do not use locator.click({ force: true }) or node.click(): both would hide
+  // real hit-target/overlay regressions. We native-scroll the actual target,
+  // prove it is inside the visual viewport, enabled and owns elementFromPoint,
+  // then deliver a normal browser pointer click at its centre.
+  let lastCandidates = []
+  for (let attempt = 0; attempt < 8; attempt += 1) {
+    const candidates = await locator.evaluateAll((nodes) => {
+      const visualTop = window.visualViewport?.offsetTop ?? 0
+      const visualLeft = window.visualViewport?.offsetLeft ?? 0
+      const visualWidth = window.visualViewport?.width ?? window.innerWidth
+      const visualHeight = window.visualViewport?.height ?? window.innerHeight
+      const viewportCenterX = visualLeft + visualWidth / 2
+      const viewportCenterY = visualTop + visualHeight / 2
+      return nodes.map((node, index) => {
+        const rect = node.getBoundingClientRect()
+        const x = rect.left + rect.width / 2
+        const y = rect.top + rect.height / 2
+        const target = document.elementFromPoint(x, y)
+        const visible = rect.width > 0 && rect.height > 0
+          && x >= visualLeft && x <= visualLeft + visualWidth
+          && y >= visualTop && y <= visualTop + visualHeight
+        const enabled = !(node instanceof HTMLButtonElement) || !node.disabled
+        const hitTarget = target === node || node.contains(target)
+        return {
+          index,
+          x,
+          y,
+          width: rect.width,
+          height: rect.height,
+          visible,
+          enabled,
+          hitTarget,
+          distance: Math.hypot(x - viewportCenterX, y - viewportCenterY),
+          hitTag: target?.tagName ?? null,
+          hitText: target?.textContent?.trim().slice(0, 80) ?? null,
+          pageScrollY: window.scrollY,
+        }
+      })
+    })
+    lastCandidates = candidates
+
+    const hittable = candidates.find((candidate) => candidate.visible && candidate.enabled && candidate.hitTarget)
+    if (hittable) {
+      await page.mouse.click(hittable.x, hittable.y, { delay: 20 })
+      return hittable
+    }
+
+    const nearest = candidates
+      .filter((candidate) => candidate.enabled && candidate.width > 0 && candidate.height > 0)
+      .sort((a, b) => a.distance - b.distance)[0]
+    if (!nearest) break
+
+    await locator.nth(nearest.index).evaluate((node) => {
+      node.scrollIntoView({ block: 'center', inline: 'center', behavior: 'auto' })
+    })
+    await page.waitForTimeout(220)
+  }
+  throw new Error(`${label} is not a valid browser hit target after native scrolling: ${JSON.stringify(lastCandidates)}`)
+}
+
 try {
   const response = await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 45_000 })
   if (response && !response.ok()) throw new Error(`Body Explorer returned HTTP ${response.status()}`)
@@ -168,7 +229,7 @@ try {
   if (await reminderText.isVisible().catch(() => false)) {
     const reminder = reminderText.locator('xpath=ancestor::*[.//button][1]')
     const close = reminder.locator('button').last()
-    if (await close.isVisible().catch(() => false)) await close.click()
+    if (await close.isVisible().catch(() => false)) await tapStable(close, 'Reminder close button')
   }
 
   const viewer = page.locator('div.h-full.w-full.touch-none').first()
@@ -226,7 +287,7 @@ try {
   }
 
   const vessels = page.getByRole('button', { name: 'Vessels', exact: true }).first()
-  await vessels.click()
+  metrics.vesselsPointer = await tapStable(vessels, 'Vessels layer button')
   await progressiveLoading.waitFor({ state: 'visible', timeout: 5_000 })
   const progressiveClass = await progressiveLoading.evaluate((node) =>
     node.closest('[role="status"]')?.getAttribute('class') ?? '',
@@ -300,17 +361,17 @@ try {
   await assertNoFatal('Orbit interaction triggered a Body3D fatal state')
 
   const precisionTab = page.getByRole('button', { name: 'Whole-body precision', exact: true })
-  await precisionTab.click()
+  await tapStable(precisionTab, 'Whole-body precision tab')
   await page.getByText('Panacea · Whole-body precision atlas', { exact: true }).waitFor({ state: 'visible', timeout: 20_000 })
 
   const movementTab = page.getByRole('button', { name: 'Movement biomechanics', exact: true })
-  await movementTab.click()
+  await tapStable(movementTab, 'Movement biomechanics tab')
   const inspectorTitle = page.getByText('Whole-body motion inspector', { exact: true })
   await inspectorTitle.waitFor({ state: 'visible', timeout: 20_000 })
   const inspector = inspectorTitle.locator('xpath=ancestor::div[contains(@class,"rounded-3xl")][1]')
 
   const kneeButton = inspector.getByRole('button', { name: 'Knee', exact: true })
-  await kneeButton.click()
+  await tapStable(kneeButton, 'Knee motion selector')
   await page.waitForTimeout(250)
   const kneePressed = await kneeButton.getAttribute('aria-pressed')
   if (kneePressed !== 'true') throw new Error(`Knee joint selection did not become active (aria-pressed=${kneePressed})`)
@@ -334,7 +395,8 @@ try {
     throw new Error('Whole-body motion inspector scientific boundary is not visible')
   }
 
-  await inspector.getByRole('button', { name: /Inspect this motion in shared 3D/i }).click()
+  const applyShared3d = inspector.getByRole('button', { name: /Inspect this motion in shared 3D/i })
+  await tapStable(applyShared3d, 'Inspect this motion in shared 3D button')
   await page.waitForTimeout(300)
   const postShared3dHealth = await canvasHealth(canvas)
   await assertNoFatal('Shared 3D motion inspection triggered a Body3D fatal state')
