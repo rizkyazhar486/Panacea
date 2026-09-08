@@ -9,6 +9,7 @@ assert.match(browser, /getEffectiveAnatomySourceNodeSnapshot/)
 assert.match(browser, /resolveAllAnatomySourceNodes\(\[normalizedQuery\], sourceBundles, 12\)/)
 assert.match(browser, /const MAX_RESULTS = 36/)
 assert.match(browser, /\.slice\(0, MAX_RESULTS\)/)
+assert.match(browser, /export default ZAnatomySourceMeshBrowser/)
 
 for (const [file, layer] of [
   ['surface.glb', 'surface'],
@@ -37,4 +38,4 @@ assert.match(lab, /import ZAnatomySourceMeshBrowser from '\.\/ZAnatomySourceMesh
 assert.match(lab, /<ZAnatomySourceMeshBrowser onHighlight=\{onHighlight\} onFocusRegion=\{onFocusRegion\} onEnableLayer=\{onEnableLayer\} \/>/)
 assert.match(lab, /<ZAnatomyAtlasWorkbench onHighlight=\{onHighlight\} onFocusRegion=\{onFocusRegion\} onEnableLayer=\{onEnableLayer\} \/>/)
 
-console.log('Z-Anatomy source mesh browser stays bounded, provenance-aware, exact-node routed, and mounted beside the curated workbench.')
+console.log('Z-Anatomy source mesh browser stays bounded, provenance-aware, exact-node routed, module-compatible, and mounted beside the curated workbench.')
