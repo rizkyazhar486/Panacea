@@ -1,0 +1,49 @@
+{
+  "id": "who_atc_ddd",
+  "name": "WHO ATC/DDD Index",
+  "category": "drug",
+  "kind": ["dataset", "standard"],
+  "homepage": "https://atcddd.fhi.no/",
+  "repository": null,
+  "features": [
+    "drug-taxonomy",
+    "drug-utilization-reference",
+    "body-explorer-pharmacology",
+    "drug-product-crosswalk"
+  ],
+  "formats": ["html-search", "xlsx", "xml"],
+  "usage": {
+    "runtime": false,
+    "buildTime": false,
+    "networkRequired": false,
+    "notes": "Panacea currently keeps only an ATC/DDD source boundary and validation helpers in server/src/atcDdd.ts. It does not scrape the public searchable index, download the registered bulk catalogue, or redistribute WHO ATC/DDD data at runtime. Future ingestion must be explicitly licensed and version-pinned before enabling runtime or build-time use."
+  },
+  "license": {
+    "status": "VERIFIED",
+    "identifier": "WHO Collaborating Centre copyright/disclaimer",
+    "commercialUse": "NOT_ALLOWED",
+    "attributionRequired": true,
+    "shareAlike": false,
+    "scope": "The WHO Collaborating Centre for Drug Statistics Methodology states that use of all or parts of its material requires reference to the Centre, copying and distribution for commercial purposes is not allowed, and changing or manipulating the material is not allowed. This registry status therefore blocks copying or redistributing the ATC/DDD material in a commercial Panacea dataset unless separate permission or licence is obtained.",
+    "verificationUrl": "https://atcddd.fhi.no/copyright_disclaimer/",
+    "verifiedAt": "2026-09-08",
+    "notes": "The searchable 2026 index is publicly accessible, while the complete electronic ATC index with DDDs is distributed as Excel or XML through a registered ordering portal. Public accessibility must not be interpreted as permission to copy the catalogue into Panacea. Referencing a source identifier in a verified crosswalk remains distinct from redistributing the underlying index and still requires appropriate citation and legal review for the intended use."
+  },
+  "validation": {
+    "level": "REFERENCE",
+    "clinicalDecisionUse": "NO",
+    "notes": "ATC classifies medicinal substances and DDD is a technical unit for drug-utilisation measurement. A DDD is not an individual patient dose, prescribing recommendation, treatment indication, product catalogue, national formulary status, or evidence that a medicine is appropriate for a patient."
+  },
+  "provenance": {
+    "authority": "WHO Collaborating Centre for Drug Statistics Methodology, Norwegian Institute of Public Health",
+    "sourceIdentityRequired": true,
+    "versionPinRequired": true,
+    "notes": "Pin the annual ATC/DDD edition for every imported or referenced classification result. Current source boundary is pinned to ATC/DDD Index 2026 and uses the Centre's suggested citation. Temporary decisions intended for the 2027 index must not silently overwrite the 2026 reference set."
+  },
+  "adapter": {
+    "status": "PROTOTYPE",
+    "normalizedTarget": "AtcDddEntry",
+    "module": "server/src/atcDdd.ts",
+    "notes": "The current module defines the normalized entry shape, 2026 provenance constant, ATC-code plausibility validation, query normalization and fail-closed product crosswalk construction. No external ATC/DDD dataset adapter is active yet; free-text drug names must never be converted to ATC codes heuristically."
+  }
+}
