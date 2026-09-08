@@ -131,3 +131,5 @@ export function ZAnatomySourceMeshBrowser({ onHighlight, onFocusRegion, onEnable
     </details>
   )
 }
+
+export default ZAnatomySourceMeshBrowser
