@@ -231,16 +231,32 @@ const ZONA: { zona: 1 | 2 | 3 | 4 | 5; nama: string; dariPct: number; hinggaPct:
  * mirip, padahal tuntutan pemulihannya berbeda jauh.
  */
 export function zoneBreakdown(hr: HrPoint[], hrMax: number): ZoneSlice[] {
-  if (!hr.length || !(hrMax > 0)) return []
-  // Tiap sampel mewakili jarak waktu ke sampel berikutnya.
-  const durasiSampel: number[] = hr.map((p, i) =>
-    i < hr.length - 1 ? Math.max(0, hr[i + 1].t - p.t) : (hr.length > 1 ? hr[hr.length - 1].t - hr[hr.length - 2].t : 60),
+  if (!Array.isArray(hr) || !Number.isFinite(hrMax) || hrMax <= 0) return []
+
+  // Runtime JSON/local cache tidak mendapat perlindungan TypeScript. Bersihkan
+  // titik satu per satu dan urutkan salinan supaya pemanggil tidak termutasi.
+  const aman = hr
+    .filter((p): p is HrPoint => Boolean(p) && Number.isFinite(p.t) && p.t >= 0 && Number.isFinite(p.bpm) && p.bpm > 0)
+    .slice()
+    .sort((a, b) => a.t - b.t)
+  if (!aman.length) return []
+
+  // Tiap sampel mewakili jarak waktu ke sampel berikutnya. Untuk sampel
+  // terakhir pertahankan semantik lama: gunakan interval sebelumnya, atau
+  // 60 detik bila hanya ada satu titik.
+  const durasiSampel: number[] = aman.map((p, i) =>
+    i < aman.length - 1
+      ? Math.max(0, aman[i + 1].t - p.t)
+      : aman.length > 1
+        ? Math.max(0, aman[aman.length - 1].t - aman[aman.length - 2].t)
+        : 60,
   )
-  const totalDetik = durasiSampel.reduce((a, b) => a + b, 0) || 1
+  const totalDetik = durasiSampel.reduce((a, b) => a + b, 0)
+  if (!(totalDetik > 0) || !Number.isFinite(totalDetik)) return []
 
   return ZONA.map((z) => {
     let detik = 0
-    hr.forEach((p, i) => {
+    aman.forEach((p, i) => {
       const pct = (p.bpm / hrMax) * 100
       if (pct >= z.dariPct && pct < z.hinggaPct) detik += durasiSampel[i]
     })
