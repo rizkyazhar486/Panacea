@@ -60,9 +60,8 @@ jobs:
       - name: Body Exposure mobile 390x844 smoke
         env:
           BODY3D_QA_URL: http://127.0.0.1:4173/#/body-explorer
-          BODY3D_QA_SCREENSHOT: artifacts/body3d-mobile-390x844.png
           BODY3D_QA_METRICS: artifacts/body3d-mobile-metrics.json
-        run: node scripts/qa/body3d-mobile-smoke.mjs
+        run: node scripts/qa/body3d-mobile-smoke-telemetry.mjs
 
       - name: Upload Body Exposure mobile QA artifact
         if: always()
