@@ -1,6 +1,7 @@
 export * from './types'
 export * from './catalog'
 export * from './respiratoryAtlas'
+export * from './cardiovascularAtlas'
 export * from './graph'
 export * from './resolver'
 export * from './assets'
