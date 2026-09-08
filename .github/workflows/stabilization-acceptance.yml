@@ -3,6 +3,7 @@ name: Stabilization Acceptance
 on:
   push:
     branches:
+      - main
       - stabilization/integrate-body3d-20260908
   pull_request:
     branches:
@@ -11,6 +12,10 @@ on:
 
 permissions:
   contents: read
+
+concurrency:
+  group: stabilization-acceptance-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   full-acceptance:

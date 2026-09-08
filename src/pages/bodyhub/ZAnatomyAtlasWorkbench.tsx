@@ -9,7 +9,7 @@ import {
 import {
   anatomySourceNodeOrigin,
   getEffectiveAnatomySourceNodeSnapshot,
-  resolveAnatomySourceNodes,
+  resolveAllAnatomySourceNodes,
   subscribeAnatomySourceNodes,
 } from '../../lib/anatomySourceNodeRegistry'
 
@@ -99,7 +99,7 @@ export function ZAnatomyAtlasWorkbench({ onHighlight, onFocusRegion, onEnableLay
   function matchesFor(structure: AtlasStructureTarget) {
     if (structure.provenance === 'not-represented') return []
     const expectedFile = SOURCE_FILE_BY_LAYER[structure.layer]
-    return resolveAnatomySourceNodes(
+    return resolveAllAnatomySourceNodes(
       structure.nodeHints,
       sourceBundles.filter((bundle) => bundle.file === expectedFile),
     )
