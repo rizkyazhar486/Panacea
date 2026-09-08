@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-09-08T06:28:00.000Z",
+  "updatedAt": "2026-09-08T06:36:00.000Z",
   "items": {
     "ff-medical-education-accessibility": {
       "status": "done",
@@ -42,6 +42,16 @@
       ],
       "note": "Matured the existing Knowledge Bridge evidence panel instead of duplicating UI: the evidence shelf is bounded to eight source pointers, sanitizes persisted entries, deduplicates by stable key, preserves source/year/identifier/query/original URL, supports deterministic remove/clear, and explicitly states that a selected source pointer is not a verified claim until the original source is opened. No new API, dependency, polling, large asset, or patient-specific inference was added.",
       "updatedAt": "2026-09-08T06:28:00.000Z"
+    },
+    "ff-medical-education-baseline": {
+      "status": "done",
+      "commit": "584f80afb3f23515eba9104a6fe0a1945d284b59",
+      "paths": [
+        "src/lib/knowledgeBridgeStudyBaseline.ts",
+        "scripts/uji/knowledge-bridge-study-baseline.mts"
+      ],
+      "note": "Adds a pure bounded descriptive study baseline for explicit learner self-ratings only: 1–5 integer inputs, minimum three valid observations, latest twelve retained per topic, median plus nearest-rank IQR reference, explicit timestamp/unit/source identity, invalid input rejection, and a descriptive-learning-only interpretation boundary. It does not infer physiology, diagnosis, treatment or patient risk and adds no API, dependency, polling, storage, timer or large asset.",
+      "updatedAt": "2026-09-08T06:36:00.000Z"
     }
   }
 }
