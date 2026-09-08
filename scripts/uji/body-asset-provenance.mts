@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict'
-import { BODY_PROJECTION_TARGETS } from '../../src/lib/bodyProjectionContract.ts'
+import { BODY_PROJECTION_TARGETS, type BodyProjectionTarget } from '../../src/lib/bodyProjectionContract.ts'
 import { validateBodyAssetProvenance, type BodyAssetProvenanceRecord } from '../../src/lib/bodyAssetProvenance.ts'
 
 const digestive = BODY_PROJECTION_TARGETS.find((target) => target.id === 'digestive-core')
@@ -7,11 +7,12 @@ const thermoreceptor = BODY_PROJECTION_TARGETS.find((target) => target.id === 't
 assert.ok(digestive)
 assert.ok(thermoreceptor)
 
+const reviewedDigestive: BodyProjectionTarget = { ...digestive, academicReview: 'recorded' }
 const sourceSha = 'a'.repeat(64)
 const derivedSha = 'b'.repeat(64)
 
 const complete: BodyAssetProvenanceRecord = {
-  targetId: digestive.id,
+  targetId: reviewedDigestive.id,
   sourceId: 'z_anatomy',
   assetId: 'z-anatomy/example-object',
   sourceRevision: '1234567890abcdef1234567890abcdef12345678',
@@ -34,39 +35,47 @@ const complete: BodyAssetProvenanceRecord = {
   }],
   geometryStatus: 'verified-native',
   evidenceStatus: 'source-checked',
-  academicReview: 'pending',
+  academicReview: 'recorded',
+  reviewerName: 'Qualified reviewer fixture',
+  reviewerCredentials: 'Recorded professional credentials fixture',
+  reviewerDate: '2026-09-08',
+  reviewerScope: 'Fixture-only asset identity, anatomy mapping, transformations, and educational scope',
 }
 
-assert.equal(validateBodyAssetProvenance(digestive, complete).validForVerifiedRender, true)
+assert.equal(validateBodyAssetProvenance(reviewedDigestive, complete).validForVerifiedRender, true)
 
-const floating = validateBodyAssetProvenance(digestive, { ...complete, sourceRevision: 'main' })
+const pendingTarget = validateBodyAssetProvenance(digestive, { ...complete, targetId: digestive.id })
+assert.equal(pendingTarget.validForVerifiedRender, false)
+assert.ok(pendingTarget.reasons.some((reason) => reason.includes('Target academic review is still pending')))
+
+const floating = validateBodyAssetProvenance(reviewedDigestive, { ...complete, sourceRevision: 'main' })
 assert.equal(floating.validForVerifiedRender, false)
 assert.ok(floating.reasons.some((reason) => reason.includes('floating')))
 
-const shortGitRevision = validateBodyAssetProvenance(digestive, { ...complete, sourceRevision: 'abc123' })
+const shortGitRevision = validateBodyAssetProvenance(reviewedDigestive, { ...complete, sourceRevision: 'abc123' })
 assert.equal(shortGitRevision.validForVerifiedRender, false)
 assert.ok(shortGitRevision.reasons.some((reason) => reason.includes('40-character commit SHA')))
 
-const remoteRuntime = validateBodyAssetProvenance(digestive, { ...complete, runtimeAssetPath: 'https://example.test/anatomy.glb' })
+const remoteRuntime = validateBodyAssetProvenance(reviewedDigestive, { ...complete, runtimeAssetPath: 'https://example.test/anatomy.glb' })
 assert.equal(remoteRuntime.validForVerifiedRender, false)
 assert.ok(remoteRuntime.reasons.some((reason) => reason.includes('remote runtime embeds')))
 
-const badSourceChecksum = validateBodyAssetProvenance(digestive, { ...complete, sourceAssetSha256: 'not-a-sha256' })
+const badSourceChecksum = validateBodyAssetProvenance(reviewedDigestive, { ...complete, sourceAssetSha256: 'not-a-sha256' })
 assert.equal(badSourceChecksum.validForVerifiedRender, false)
 assert.ok(badSourceChecksum.reasons.some((reason) => reason.includes('Source asset SHA-256')))
 
-const missingLicenseEvidence = validateBodyAssetProvenance(digestive, { ...complete, licenseEvidence: ' ' })
+const missingLicenseEvidence = validateBodyAssetProvenance(reviewedDigestive, { ...complete, licenseEvidence: ' ' })
 assert.equal(missingLicenseEvidence.validForVerifiedRender, false)
 assert.ok(missingLicenseEvidence.reasons.includes('Asset-specific license evidence is missing.'))
 
-const brokenLineage = validateBodyAssetProvenance(digestive, {
+const brokenLineage = validateBodyAssetProvenance(reviewedDigestive, {
   ...complete,
   transformations: [{ ...complete.transformations[0], outputSha256: 'c'.repeat(64) }],
 })
 assert.equal(brokenLineage.validForVerifiedRender, false)
 assert.ok(brokenLineage.reasons.some((reason) => reason.includes('does not end')))
 
-const traversingPath = validateBodyAssetProvenance(digestive, { ...complete, runtimeAssetPath: '../outside.glb' })
+const traversingPath = validateBodyAssetProvenance(reviewedDigestive, { ...complete, runtimeAssetPath: '../outside.glb' })
 assert.equal(traversingPath.validForVerifiedRender, false)
 assert.ok(traversingPath.reasons.some((reason) => reason.includes('traverse')))
 
@@ -78,4 +87,4 @@ const conceptual = validateBodyAssetProvenance(thermoreceptor, {
 assert.equal(conceptual.validForVerifiedRender, false)
 assert.ok(conceptual.reasons.some((reason) => reason.includes('Reference-only')))
 
-console.log('Body asset provenance: immutable revision, checksums, local runtime, license scope, lineage, and reference-only guards verified.')
+console.log('Body asset provenance: immutable revision, checksums, local runtime, license scope, lineage, academic review, and reference-only guards verified.')
