@@ -57,11 +57,11 @@ async function waitForInputValue(locator, expected, tolerance = 0.005, timeout =
   throw new Error(`Timed out waiting for input value ${expected}`)
 }
 async function tapScrolled(locator) {
-  // There can be more than one matching preset while responsive/transitioning
-  // UI is mounted. Always prefer a candidate that is genuinely inside the
-  // visual viewport and owns its browser hit target. If none is hittable yet,
-  // native scrollIntoView on the nearest candidate scrolls every ancestor
-  // scroller (not only the document) before the next bounded attempt.
+  // There can be more than one matching target while responsive/transitioning
+  // UI is mounted. Prefer a candidate that is genuinely inside the visual
+  // viewport and owns its browser hit target. If none is hittable yet, native
+  // scrollIntoView on the nearest candidate scrolls every ancestor scroller
+  // before the next bounded attempt. No force:true or DOM .click() is used.
   let lastCandidates = []
   for (let attempt = 0; attempt < 8; attempt += 1) {
     const candidates = await locator.evaluateAll((nodes) => {
@@ -115,7 +115,15 @@ async function tapScrolled(locator) {
     })
     await page.waitForTimeout(220)
   }
-  throw new Error(`Preset is not a valid browser hit target after nested native scrolling: ${JSON.stringify(lastCandidates)}`)
+  throw new Error(`Target is not a valid browser hit target after nested native scrolling: ${JSON.stringify(lastCandidates)}`)
+}
+async function scrollNative(locator) {
+  // Playwright scrollIntoViewIfNeeded waits for layout stability. The surgical
+  // atlas and shared Body3D are continuously rendered, so that actionability
+  // condition can remain false even when the target is already visible.
+  // Native scrolling is deterministic and does not bypass subsequent assertions.
+  await locator.evaluate((node) => node.scrollIntoView({ block: 'center', inline: 'nearest', behavior: 'auto' }))
+  await page.waitForTimeout(140)
 }
 
 const metrics = {
@@ -163,7 +171,7 @@ try {
   await surgeryTab.click()
   let simulator = page.locator('[data-surgery-simulator="anatomy-grounded"]')
   await simulator.waitFor({ state: 'visible', timeout: 30_000 })
-  await simulator.scrollIntoViewIfNeeded()
+  await scrollNative(simulator)
 
   await simulator.getByRole('button', { name: 'Caesarean', exact: true }).click()
   await simulator.getByText('Caesarean section — layered pelvic anatomy', { exact: true }).waitFor({ state: 'visible', timeout: 20_000 })
@@ -175,8 +183,7 @@ try {
   metrics.caesareanLoaded = true
 
   const bladderStep = simulator.getByText('Bladder–uterus relationship', { exact: true }).first()
-  await bladderStep.scrollIntoViewIfNeeded()
-  await bladderStep.click()
+  await tapScrolled(bladderStep)
   await simulator.getByText('Bladder–uterus relationship', { exact: true }).last().waitFor({ state: 'visible', timeout: 10_000 })
   await simulator.getByText(/urinary bladder/i).first().waitFor({ state: 'visible', timeout: 10_000 })
   metrics.bladderUterusStep = true
@@ -236,8 +243,7 @@ try {
   metrics.transseptalAxialSharedBody3d = true
 
   const iceLongAxisStep = simulator.getByText('ICE long-axis orientation', { exact: true }).first()
-  await iceLongAxisStep.scrollIntoViewIfNeeded()
-  await iceLongAxisStep.click()
+  await tapScrolled(iceLongAxisStep)
   await simulator.getByText('ICE guidance', { exact: true }).waitFor({ state: 'visible', timeout: 10_000 })
   await simulator.getByText('orientation, not diagnosis', { exact: true }).waitFor({ state: 'visible', timeout: 10_000 })
   metrics.iceLongAxisVisible = true
@@ -250,8 +256,7 @@ try {
   metrics.lapAppyLoaded = true
 
   const variationStep = simulator.getByText('Position variation check', { exact: true }).first()
-  await variationStep.scrollIntoViewIfNeeded()
-  await variationStep.click()
+  await tapScrolled(variationStep)
   await simulator.getByText(/retrocecal, pelvic, retro-ileal, pre-ileal/i).waitFor({ state: 'visible', timeout: 10_000 })
   metrics.lapAppyVariationVisible = true
 
@@ -259,7 +264,7 @@ try {
   await simulator.getByText(/not academically reviewed/i).waitFor({ state: 'visible', timeout: 10_000 })
   metrics.academicGateVisible = true
 
-  await atlasCanvas.scrollIntoViewIfNeeded()
+  await scrollNative(atlasCanvas)
   const canvasMetrics = await atlasCanvas.evaluate((node) => {
     const gl = node.getContext('webgl2') || node.getContext('webgl')
     return { webgl: Boolean(gl), clientWidth: node.clientWidth, backingWidth: node.width }
@@ -285,7 +290,7 @@ try {
   if (metrics.overflow > 2) throw new Error(`Surgical simulator overflows mobile viewport by ${metrics.overflow}px`)
   if (pageErrors.length) throw new Error(`Browser page errors: ${pageErrors.join(' | ')}`)
 
-  await simulator.scrollIntoViewIfNeeded()
+  await scrollNative(simulator)
   await captureViewport()
   await writeFile(metricsPath, JSON.stringify(metrics, null, 2))
   console.log(JSON.stringify(metrics, null, 2))
