@@ -61,6 +61,8 @@ jobs:
         run: npm run uji:icd
       - name: Test canonical drug label orchestration
         run: npm run uji:drug-info
+      - name: Test SATUSEHAT FHIR boundary
+        run: npm run uji:satusehat
       - name: Runtime smoke-test genomics control plane
         env:
           JWT_SECRET: ci-only-panacea-genomics-secret
