@@ -23,6 +23,18 @@ test('every generated source reference resolves through the source registry', ()
   }
 })
 
+test('source registry resolves stable filename keys without replacing canonical provenance ids', () => {
+  const healthkitAlias = factory.sourceRegistry.get('healthkit')
+  const healthkitCanonical = factory.sourceRegistry.get('apple_healthkit')
+
+  assert.ok(healthkitAlias, 'healthkit filename alias must resolve')
+  assert.ok(healthkitCanonical, 'apple_healthkit canonical id must resolve')
+  assert.equal(healthkitAlias, healthkitCanonical)
+  assert.equal(healthkitAlias.id, 'apple_healthkit')
+  assert.equal(healthkitAlias.registryKey, 'healthkit')
+  assert.equal(healthkitAlias.registryPath, 'data/source-registry/wearable/healthkit.json')
+})
+
 test('high-risk and clinical candidates can never auto-promote', () => {
   for (const candidate of factory.candidates) {
     if (candidate.risk === 'high' || candidate.risk === 'clinical') {
