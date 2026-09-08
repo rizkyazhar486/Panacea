@@ -46,6 +46,10 @@ await context.addInitScript(() => {
     dob: '1990-01-01',
   }
   localStorage.setItem('panaceamed.session.v1', JSON.stringify({ account, loginAt: Date.now() }))
+  // This smoke validates Body3D, not global first-run overlays. Seed only the
+  // presentation flags; do not fabricate a completed health assessment.
+  localStorage.setItem('panacea_onboarded_v1', '1')
+  localStorage.setItem('panacea_assessment_prompt_v1', '1')
 })
 
 const page = await context.newPage()
@@ -64,13 +68,6 @@ page.on('pageerror', (error) => pageErrors.push(error.message))
 let metrics = null
 let failure = null
 let canvas = null
-
-async function dismissIfVisible(locator, timeout = 5_000) {
-  if (!(await locator.isVisible().catch(() => false))) return false
-  await locator.click()
-  await locator.waitFor({ state: 'hidden', timeout }).catch(() => undefined)
-  return true
-}
 
 async function canvasHealth(locator) {
   return withTimeout(locator.evaluate((node) => {
@@ -103,9 +100,6 @@ async function assertNoFatal(label) {
 try {
   const response = await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 45_000 })
   if (response && !response.ok()) throw new Error(`Body Explorer returned HTTP ${response.status()}`)
-
-  await dismissIfVisible(page.getByRole('button', { name: /Get Started/i }).first())
-  await dismissIfVisible(page.getByRole('button', { name: /Maybe later/i }).first())
 
   const reminderText = page.getByText(/TODAY.?S REMINDER/i).first()
   if (await reminderText.isVisible().catch(() => false)) {
