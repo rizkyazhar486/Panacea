@@ -3,14 +3,13 @@ import { HalamanTab, type TabDef } from '../components/HalamanTab'
 import { IconLeaf } from '../components/icons'
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Gizi — delapan halaman yang semuanya menjawab satu pertanyaan yang sama:
+// Gizi — sembilan halaman yang semuanya menjawab satu pertanyaan yang sama:
 // apa yang masuk ke tubuh hari ini, dan apa akibatnya.
 //
-// Sebelumnya kedelapannya berdiri sebagai rute sendiri-sendiri, padahal orang
-// tidak memikirkannya terpisah: makanan, cairan, kopi, alkohol, dan suplemen
-// adalah satu keputusan yang diambil pada hari yang sama. Memisahkannya
-// menjadi delapan alamat memaksa orang mengingat delapan tempat untuk satu
-// urusan.
+// Sebelumnya kedelapan halaman konten berdiri sebagai rute sendiri-sendiri,
+// padahal orang tidak memikirkannya terpisah: makanan, cairan, kopi, alkohol,
+// dan suplemen adalah satu keputusan yang diambil pada hari yang sama. Tab Data
+// menambahkan kontrol portabilitas jurnal tanpa menyalin ulang angka gizi.
 //
 // Isinya TIDAK ditulis ulang — sama seperti penggabungan skor klinis, latihan,
 // dan pemulihan. Yang digabung adalah tempatnya, bukan isinya, karena menyalin
@@ -27,10 +26,12 @@ const HydrationCalculator = lazy(() => import('./HydrationCalculator').then((m) 
 const CaffeineCalculator = lazy(() => import('./CaffeineCalculator').then((m) => ({ default: m.CaffeineCalculator })))
 const AlcoholCalculator = lazy(() => import('./AlcoholCalculator').then((m) => ({ default: m.AlcoholCalculator })))
 const CarbonDiet = lazy(() => import('./CarbonDiet').then((m) => ({ default: m.CarbonDiet })))
+const NutritionDataControls = lazy(() => import('./NutritionDataControls').then((m) => ({ default: m.NutritionDataControls })))
 
 // Urutannya mengikuti besarnya pengaruh terhadap tubuh, bukan abjad: makanan
 // dan makro lebih dulu, lalu cairan, lalu zat yang ditambahkan sendiri, lalu
-// dampaknya di luar tubuh.
+// dampaknya di luar tubuh. Kontrol data ditaruh terakhir karena ia mengelola
+// jurnal yang dibuat oleh tab Food, bukan menambah interpretasi gizi baru.
 const TABS: TabDef[] = [
   { id: 'makan', label: 'Food', emoji: '🍽️', komponen: Nutrition,
     ringkas: 'What you ate, its energy and composition, and how it lands' },
@@ -48,6 +49,8 @@ const TABS: TabDef[] = [
     ringkas: 'Units, clearance time, and the effect on sleep and recovery' },
   { id: 'jejak', label: 'Footprint', emoji: '🌱', komponen: CarbonDiet,
     ringkas: 'The environmental cost of what is on the plate' },
+  { id: 'data', label: 'Data', emoji: '💾', komponen: NutritionDataControls,
+    ringkas: 'Local journal import/export, validation and recovery controls' },
 ]
 
 export function PusatGizi() {
