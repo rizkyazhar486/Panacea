@@ -51,14 +51,52 @@ const withoutReviewer = evaluateProjectionReadiness(reviewedTarget, { ...complet
 assert.equal(withoutReviewer.renderAsVerifiedAnatomy, false)
 assert.ok(withoutReviewer.reasons.some((reason) => reason.startsWith('Reviewer ')))
 
+const humanReviewedWithoutRecord = evaluateProjectionReadiness(digestive, {
+  ...complete,
+  evidenceStatus: 'human-reviewed',
+  academicReview: 'pending',
+})
+assert.equal(humanReviewedWithoutRecord.renderAsVerifiedAnatomy, false)
+assert.ok(humanReviewedWithoutRecord.reasons.some((reason) => reason.includes('requires a recorded academic review')))
+
+const humanReviewedWithoutReviewer = evaluateProjectionReadiness(digestive, {
+  ...complete,
+  evidenceStatus: 'human-reviewed',
+  academicReview: 'recorded',
+})
+assert.equal(humanReviewedWithoutReviewer.renderAsVerifiedAnatomy, false)
+assert.ok(humanReviewedWithoutReviewer.reasons.some((reason) => reason.includes('Reviewer identity')))
+
+const impossibleReviewDate = evaluateProjectionReadiness(reviewedTarget, {
+  ...complete,
+  academicReview: 'recorded',
+  reviewerName: 'Qualified reviewer fixture',
+  reviewerCredentials: 'Recorded professional credentials fixture',
+  reviewerDate: '2026-02-31',
+  reviewerScope: 'Asset identity, anatomy mapping, transformations, and educational scope',
+})
+assert.equal(impossibleReviewDate.renderAsVerifiedAnatomy, false)
+assert.ok(impossibleReviewDate.reasons.some((reason) => reason.includes('date is missing or invalid')))
+
 const withReviewer = evaluateProjectionReadiness(reviewedTarget, {
   ...complete,
   academicReview: 'recorded',
-  reviewerName: 'Qualified reviewer',
-  reviewerCredentials: 'Recorded professional credentials',
+  reviewerName: 'Qualified reviewer fixture',
+  reviewerCredentials: 'Recorded professional credentials fixture',
   reviewerDate: '2026-09-08',
   reviewerScope: 'Asset identity, anatomy mapping, transformations, and educational scope',
 })
 assert.equal(withReviewer.renderAsVerifiedAnatomy, true)
 
-console.log('Body projection readiness fail-closed provenance and review gate verified.')
+const humanReviewed = evaluateProjectionReadiness(digestive, {
+  ...complete,
+  evidenceStatus: 'human-reviewed',
+  academicReview: 'recorded',
+  reviewerName: 'Qualified reviewer fixture',
+  reviewerCredentials: 'Recorded professional credentials fixture',
+  reviewerDate: '2026-09-08',
+  reviewerScope: 'Asset identity, anatomy mapping, transformations, and educational scope',
+})
+assert.equal(humanReviewed.renderAsVerifiedAnatomy, true)
+
+console.log('Body projection readiness fail-closed provenance and human-review integrity gate verified.')
