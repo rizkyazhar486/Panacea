@@ -33,13 +33,12 @@ const LAYER_ACCENT: Record<AtlasLayerKey, string> = {
   lymphoid: 'border-violet-400/25 bg-violet-500/[0.06] text-violet-200',
 }
 
-const SOURCE_BUNDLES = [
-  { file: 'skeleton.glb', role: 'Full skeletal reference', note: 'Primary skeletal source bundle.' },
-  { file: 'skeletal-light.glb', role: 'Reduced skeletal reference', note: 'Lower-memory skeletal variant.' },
-  { file: 'muscular-visible.glb', role: 'Surface muscle reference', note: 'Visible muscle layer for whole-body orientation.' },
-  { file: 'muscular.glb', role: 'Broader muscular reference', note: 'Expanded muscular source bundle.' },
-  { file: 'clinical.glb', role: 'General clinical reference', note: 'Skeletal + vascular/general reference bundle.' },
-  { file: 'heart.glb', role: 'Heart reference', note: 'Organ-specific heart source bundle.' },
+const CREDITED_Z_ANATOMY_BUNDLES = [
+  { file: 'skeletal.glb', role: 'Skeletal reference', note: 'System-separated skeletal derivative named in the current anatomy credits.' },
+  { file: 'muscular.glb', role: 'Muscular reference', note: 'System-separated muscular derivative named in the current anatomy credits.' },
+  { file: 'cardiovascular.glb', role: 'Cardiovascular reference', note: 'System-separated cardiovascular derivative named in the current anatomy credits.' },
+  { file: 'nervous.glb', role: 'Nervous reference', note: 'System-separated nervous derivative named in the current anatomy credits.' },
+  { file: 'visceral.glb', role: 'Visceral reference', note: 'System-separated visceral derivative named in the current anatomy credits.' },
 ] as const
 
 const PROVENANCE_TEXT: Record<GeometryProvenance, string> = {
@@ -103,7 +102,7 @@ export function ZAnatomyAtlasWorkbench({ onHighlight, onFocusRegion, onEnableLay
           <div className="bg-[radial-gradient(circle_at_20%_0%,rgba(0,191,99,0.18),transparent_42%),radial-gradient(circle_at_90%_20%,rgba(59,130,246,0.15),transparent_38%)] p-5">
             <div className="text-[9px] font-black uppercase tracking-[0.22em] text-brand">Z-Anatomy source geometry · shared Panacea 3D viewer</div>
             <h4 className="mt-2 max-w-2xl text-2xl font-black tracking-tight">Explore source anatomy as layers, regions and named structures—not as a decorative body model.</h4>
-            <p className="mt-2 max-w-2xl text-[11px] leading-relaxed text-neutral-400">This workbench controls the existing Body Exposure viewer. It reuses the shipped open-licensed Z-Anatomy / BodyParts3D-derived GLB bundles, then routes structure selection into the same highlighting and camera-focus system used by biomechanics and surgery.</p>
+            <p className="mt-2 max-w-2xl text-[11px] leading-relaxed text-neutral-400">This workbench controls the existing Body Exposure viewer. It reuses the Z-Anatomy / BodyParts3D-derived source geometry explicitly credited in Panacea, then routes structure selection into the same highlighting and camera-focus system used by biomechanics and surgery.</p>
             <div className="mt-4 flex flex-wrap gap-2">
               <span className="rounded-full border border-brand/30 bg-brand/10 px-3 py-1 text-[9px] font-black text-brand">Z-Anatomy</span>
               <span className="rounded-full border border-blue-400/25 bg-blue-500/10 px-3 py-1 text-[9px] font-black text-blue-200">BodyParts3D lineage</span>
@@ -188,11 +187,11 @@ export function ZAnatomyAtlasWorkbench({ onHighlight, onFocusRegion, onEnableLay
 
       <section className="rounded-2xl border border-neutral-200 p-4 dark:border-white/10">
         <div className="flex flex-wrap items-end justify-between gap-2">
-          <div><div className="text-[9px] font-black uppercase tracking-[0.16em] text-neutral-400">Shipped source bundles</div><div className="mt-1 text-sm font-black text-ink dark:text-white">Actual GLB assets already packaged with Panacea</div></div>
+          <div><div className="text-[9px] font-black uppercase tracking-[0.16em] text-neutral-400">Credited Z-Anatomy derivative bundles</div><div className="mt-1 text-sm font-black text-ink dark:text-white">GLB files explicitly named by the current anatomy attribution</div></div>
           <div className="text-[9px] font-bold text-neutral-500">No second renderer · no remote embed</div>
         </div>
         <div className="mt-3 grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
-          {SOURCE_BUNDLES.map((asset) => (
+          {CREDITED_Z_ANATOMY_BUNDLES.map((asset) => (
             <div key={asset.file} className="rounded-xl border border-neutral-200 p-3 dark:border-white/10">
               <div className="font-mono text-[9px] font-black text-brand">/anatomy/{asset.file}</div>
               <div className="mt-1 text-[10px] font-black text-ink dark:text-white">{asset.role}</div>
@@ -200,7 +199,7 @@ export function ZAnatomyAtlasWorkbench({ onHighlight, onFocusRegion, onEnableLay
             </div>
           ))}
         </div>
-        <p className="mt-3 text-[9px] leading-relaxed text-neutral-500">Attribution is preserved in <span className="font-mono">public/anatomy/CREDITS.txt</span>: Z-Anatomy source, BodyParts3D upstream lineage, and CC BY-SA 4.0 derivative licensing.</p>
+        <p className="mt-3 text-[9px] leading-relaxed text-neutral-500">Attribution is preserved in <span className="font-mono">public/anatomy/CREDITS.txt</span>: Z-Anatomy source, BodyParts3D upstream lineage, and CC BY-SA 4.0 derivative licensing. Other viewer layers are not assigned new provenance here unless their attribution is explicitly documented.</p>
       </section>
     </div>
   )
