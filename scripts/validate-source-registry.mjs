@@ -42,6 +42,15 @@ const isValidUri = (value) => {
   }
 };
 
+const isValidWebUrl = (value) => {
+  try {
+    const url = new URL(value);
+    return url.protocol === 'https:' || url.protocol === 'http:';
+  } catch {
+    return false;
+  }
+};
+
 function validate(value, schema, location = '$') {
   const errors = [];
 
@@ -206,6 +215,23 @@ function validateActiveAdapterModule(modulePath, relativeRegistryPath) {
   return errors;
 }
 
+function validateWebProvenanceUrls(value, relativeRegistryPath) {
+  const errors = [];
+  const candidates = [
+    ['homepage', value.homepage],
+    ['repository', value.repository],
+    ['license.verificationUrl', value.license?.verificationUrl],
+  ];
+
+  for (const [field, candidate] of candidates) {
+    if (typeof candidate === 'string' && !isValidWebUrl(candidate)) {
+      errors.push(`${relativeRegistryPath}: ${field} must use an http or https URL`);
+    }
+  }
+
+  return errors;
+}
+
 function validateSemanticIntegrity(value, filePath, seenIds) {
   const errors = [];
   const relative = path.relative(process.cwd(), filePath);
@@ -227,7 +253,12 @@ function validateSemanticIntegrity(value, filePath, seenIds) {
     );
   }
 
+  errors.push(...validateWebProvenanceUrls(value, relative));
+
   if (value.adapter?.status === 'ACTIVE') {
+    if (value.provenance?.sourceIdentityRequired !== true) {
+      errors.push(`${relative}: ACTIVE adapter requires provenance.sourceIdentityRequired true`);
+    }
     if (!value.adapter?.module) {
       errors.push(`${relative}: ACTIVE adapter must declare a non-null adapter.module`);
     } else {

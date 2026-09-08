@@ -62,6 +62,8 @@ const specialtyCredits = readFileSync('public/atlas/CREDITS.txt', 'utf8')
 assert.match(precisionLab, /WholeBodyMotionInspector/, 'Movement biomechanics tab must mount the whole-body motion inspector.')
 assert.match(inspector, /Joint → axis → motion → contributing structures/, 'Inspector must preserve the joint-to-structure interaction model.')
 assert.match(inspector, /does not warp anatomy or fabricate patient-specific force/i, 'Inspector must disclose its scientific boundary in the UI.')
+assert.match(inspector, /onInput=\{\(event\) => updateAngleFromRange\(event\.currentTarget\.value\)\}/, 'ROM range must synchronize native input events with controlled React state.')
+assert.match(inspector, /onChange=\{\(event\) => updateAngleFromRange\(event\.currentTarget\.value\)\}/, 'ROM range must retain the React change-event fallback.')
 assert.doesNotMatch(inspector, /(?:ligament|tendon|muscle)\s+(?:strain|force)\s*[=:]\s*\{?\s*angleDeg/i, 'Slider position must never be presented as computed tissue force/strain.')
 
 assert.match(anatomyCredits, /Z-Anatomy/i, 'Primary whole-body GLBs must preserve Z-Anatomy attribution.')

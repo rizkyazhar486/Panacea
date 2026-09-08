@@ -63,6 +63,14 @@ jobs:
         run: npm run uji:icd
       - name: Test canonical drug label orchestration
         run: npm run uji:drug-info
+      - name: Test body biomedical fail-closed coverage
+        run: npm run uji:body-biomedical
+      - name: Test WHO ATC/DDD provenance boundary
+        run: npm run uji:atc-ddd
+      - name: Test canonical product registry
+        run: npm run uji:product-registry
+      - name: Test product-to-ATC verified crosswalk
+        run: npm run uji:product-atc
       - name: Test SATUSEHAT FHIR boundary
         run: npm run uji:satusehat
       - name: Test health webhook ingestion
