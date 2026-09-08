@@ -50,6 +50,13 @@ await context.addInitScript(() => {
   // presentation flags; do not fabricate a completed health assessment.
   localStorage.setItem('panacea_onboarded_v1', '1')
   localStorage.setItem('panacea_assessment_prompt_v1', '1')
+
+  // Browser QA must not depend on Playwright waiting for scroll-animation
+  // stability while the progressive 3D layout is still settling. This is
+  // test-only presentation control; production scrolling remains untouched.
+  const style = document.createElement('style')
+  style.textContent = 'html, body { overflow-anchor: none !important; scroll-behavior: auto !important; }'
+  document.documentElement.appendChild(style)
 })
 
 const page = await context.newPage()
@@ -95,6 +102,123 @@ async function assertNoFatal(label) {
   }
 }
 
+async function placeCanvasInVisualViewport(locator) {
+  let lastGeometry = null
+  for (let attempt = 0; attempt < 6; attempt += 1) {
+    await locator.evaluate((node) => {
+      // DOM scrolling returns immediately and avoids Playwright's actionability
+      // wait for a continuously settling WebGL/progressive-layout surface.
+      node.scrollIntoView({ block: 'center', inline: 'nearest', behavior: 'auto' })
+
+      const rect = node.getBoundingClientRect()
+      const visualTop = window.visualViewport?.offsetTop ?? 0
+      const visualHeight = window.visualViewport?.height ?? window.innerHeight
+      const absoluteCenter = window.scrollY + rect.top + rect.height / 2
+      const viewportCenter = visualTop + visualHeight / 2
+      const maxScroll = Math.max(0, document.documentElement.scrollHeight - window.innerHeight)
+      const targetScrollY = Math.max(0, Math.min(maxScroll, absoluteCenter - viewportCenter))
+      window.scrollTo({ top: targetScrollY, left: 0, behavior: 'auto' })
+    })
+    await page.waitForTimeout(140)
+
+    lastGeometry = await locator.evaluate((node) => {
+      const rect = node.getBoundingClientRect()
+      const visualTop = window.visualViewport?.offsetTop ?? 0
+      const visualLeft = window.visualViewport?.offsetLeft ?? 0
+      const visualWidth = window.visualViewport?.width ?? window.innerWidth
+      const visualHeight = window.visualViewport?.height ?? window.innerHeight
+      const centerX = rect.left + rect.width / 2
+      const centerY = rect.top + rect.height / 2
+      const visibleWidth = Math.max(0, Math.min(rect.right, visualLeft + visualWidth) - Math.max(rect.left, visualLeft))
+      const visibleHeight = Math.max(0, Math.min(rect.bottom, visualTop + visualHeight) - Math.max(rect.top, visualTop))
+      return {
+        rect: [rect.left, rect.top, rect.right, rect.bottom],
+        center: [centerX, centerY],
+        visualViewport: [visualLeft, visualTop, visualWidth, visualHeight],
+        visibleWidth,
+        visibleHeight,
+        centerVisible:
+          centerX >= visualLeft && centerX <= visualLeft + visualWidth &&
+          centerY >= visualTop && centerY <= visualTop + visualHeight,
+        pageScrollY: window.scrollY,
+      }
+    })
+
+    // The canvas can legitimately be a few pixels taller than the 844px
+    // viewport. Require its usable centre plus substantial visible area rather
+    // than requiring the entire canvas to fit on screen.
+    if (
+      lastGeometry.centerVisible &&
+      lastGeometry.visibleWidth >= Math.min(300, lastGeometry.rect[2] - lastGeometry.rect[0]) &&
+      lastGeometry.visibleHeight >= 480
+    ) {
+      return lastGeometry
+    }
+  }
+  throw new Error(`Body3D canvas could not be positioned in the visual viewport: ${JSON.stringify(lastGeometry)}`)
+}
+
+async function tapStable(locator, label) {
+  // Do not use locator.click({ force: true }) or node.click(): both would hide
+  // real hit-target/overlay regressions. We native-scroll the actual target,
+  // prove it is inside the visual viewport, enabled and owns elementFromPoint,
+  // then deliver a normal browser pointer click at its centre.
+  let lastCandidates = []
+  for (let attempt = 0; attempt < 8; attempt += 1) {
+    const candidates = await locator.evaluateAll((nodes) => {
+      const visualTop = window.visualViewport?.offsetTop ?? 0
+      const visualLeft = window.visualViewport?.offsetLeft ?? 0
+      const visualWidth = window.visualViewport?.width ?? window.innerWidth
+      const visualHeight = window.visualViewport?.height ?? window.innerHeight
+      const viewportCenterX = visualLeft + visualWidth / 2
+      const viewportCenterY = visualTop + visualHeight / 2
+      return nodes.map((node, index) => {
+        const rect = node.getBoundingClientRect()
+        const x = rect.left + rect.width / 2
+        const y = rect.top + rect.height / 2
+        const target = document.elementFromPoint(x, y)
+        const visible = rect.width > 0 && rect.height > 0
+          && x >= visualLeft && x <= visualLeft + visualWidth
+          && y >= visualTop && y <= visualTop + visualHeight
+        const enabled = !(node instanceof HTMLButtonElement) || !node.disabled
+        const hitTarget = target === node || node.contains(target)
+        return {
+          index,
+          x,
+          y,
+          width: rect.width,
+          height: rect.height,
+          visible,
+          enabled,
+          hitTarget,
+          distance: Math.hypot(x - viewportCenterX, y - viewportCenterY),
+          hitTag: target?.tagName ?? null,
+          hitText: target?.textContent?.trim().slice(0, 80) ?? null,
+          pageScrollY: window.scrollY,
+        }
+      })
+    })
+    lastCandidates = candidates
+
+    const hittable = candidates.find((candidate) => candidate.visible && candidate.enabled && candidate.hitTarget)
+    if (hittable) {
+      await page.mouse.click(hittable.x, hittable.y, { delay: 20 })
+      return hittable
+    }
+
+    const nearest = candidates
+      .filter((candidate) => candidate.enabled && candidate.width > 0 && candidate.height > 0)
+      .sort((a, b) => a.distance - b.distance)[0]
+    if (!nearest) break
+
+    await locator.nth(nearest.index).evaluate((node) => {
+      node.scrollIntoView({ block: 'center', inline: 'center', behavior: 'auto' })
+    })
+    await page.waitForTimeout(220)
+  }
+  throw new Error(`${label} is not a valid browser hit target after native scrolling: ${JSON.stringify(lastCandidates)}`)
+}
+
 try {
   const response = await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 45_000 })
   if (response && !response.ok()) throw new Error(`Body Explorer returned HTTP ${response.status()}`)
@@ -103,13 +227,13 @@ try {
   if (await reminderText.isVisible().catch(() => false)) {
     const reminder = reminderText.locator('xpath=ancestor::*[.//button][1]')
     const close = reminder.locator('button').last()
-    if (await close.isVisible().catch(() => false)) await close.click()
+    if (await close.isVisible().catch(() => false)) await tapStable(close, 'Reminder close button')
   }
 
   const viewer = page.locator('div.h-full.w-full.touch-none').first()
   canvas = viewer.locator('> canvas').first()
   await canvas.waitFor({ state: 'visible', timeout: 45_000 })
-  await canvas.scrollIntoViewIfNeeded()
+  const initialCanvasGeometry = await placeCanvasInVisualViewport(canvas)
 
   const initialLoading = page.getByText('Loading anatomy…').first()
   const progressiveLoading = page.getByText('Adding anatomy layer…').first()
@@ -138,6 +262,7 @@ try {
   metrics = {
     viewport,
     canvas: health,
+    initialCanvasGeometry,
     canvasCenterUnobstructed: centerUnobstructed,
     route: await page.evaluate(() => window.location.hash),
   }
@@ -160,7 +285,7 @@ try {
   }
 
   const vessels = page.getByRole('button', { name: 'Vessels', exact: true }).first()
-  await vessels.click()
+  metrics.vesselsPointer = await tapStable(vessels, 'Vessels layer button')
   await progressiveLoading.waitFor({ state: 'visible', timeout: 5_000 })
   const progressiveClass = await progressiveLoading.evaluate((node) =>
     node.closest('[role="status"]')?.getAttribute('class') ?? '',
@@ -234,17 +359,17 @@ try {
   await assertNoFatal('Orbit interaction triggered a Body3D fatal state')
 
   const precisionTab = page.getByRole('button', { name: 'Whole-body precision', exact: true })
-  await precisionTab.click()
+  await tapStable(precisionTab, 'Whole-body precision tab')
   await page.getByText('Panacea · Whole-body precision atlas', { exact: true }).waitFor({ state: 'visible', timeout: 20_000 })
 
   const movementTab = page.getByRole('button', { name: 'Movement biomechanics', exact: true })
-  await movementTab.click()
+  await tapStable(movementTab, 'Movement biomechanics tab')
   const inspectorTitle = page.getByText('Whole-body motion inspector', { exact: true })
   await inspectorTitle.waitFor({ state: 'visible', timeout: 20_000 })
   const inspector = inspectorTitle.locator('xpath=ancestor::div[contains(@class,"rounded-3xl")][1]')
 
   const kneeButton = inspector.getByRole('button', { name: 'Knee', exact: true })
-  await kneeButton.click()
+  await tapStable(kneeButton, 'Knee motion selector')
   await page.waitForTimeout(250)
   const kneePressed = await kneeButton.getAttribute('aria-pressed')
   if (kneePressed !== 'true') throw new Error(`Knee joint selection did not become active (aria-pressed=${kneePressed})`)
@@ -301,7 +426,8 @@ try {
     throw new Error('Whole-body motion inspector scientific boundary is not visible')
   }
 
-  await inspector.getByRole('button', { name: /Inspect this motion in shared 3D/i }).click()
+  const applyShared3d = inspector.getByRole('button', { name: /Inspect this motion in shared 3D/i })
+  await tapStable(applyShared3d, 'Inspect this motion in shared 3D button')
   await page.waitForTimeout(300)
   const postShared3dHealth = await canvasHealth(canvas)
   await assertNoFatal('Shared 3D motion inspection triggered a Body3D fatal state')
