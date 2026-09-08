@@ -43,7 +43,7 @@ viewer = replaceAllCounted(
   viewer,
   "organ.sumber === 'bodyparts3d'",
   "organ.sumber && organ.sumber !== 'ai'",
-  2,
+  3,
   'reference JSX gates',
 )
 viewer = replaceOne(
