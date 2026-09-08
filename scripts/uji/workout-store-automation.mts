@@ -4,7 +4,7 @@ import { clearWorkouts, getWorkouts, mergeWorkouts } from '../../src/lib/workout
 import type { ImportedWorkout } from '../../src/lib/workoutImport.ts'
 
 const memory = new Map<string, string>()
-let broadcasts = 0
+const broadcastTypes: string[] = []
 
 Object.defineProperty(globalThis, 'localStorage', {
   configurable: true,
@@ -15,10 +15,15 @@ Object.defineProperty(globalThis, 'localStorage', {
   },
 })
 
+Object.defineProperty(globalThis, 'BroadcastChannel', {
+  configurable: true,
+  value: undefined,
+})
+
 Object.defineProperty(globalThis, 'window', {
   configurable: true,
   value: {
-    dispatchEvent: () => { broadcasts += 1; return true },
+    dispatchEvent: (event: Event) => { broadcastTypes.push(event.type); return true },
   },
 })
 
@@ -62,11 +67,13 @@ const incoming: ImportedWorkout = {
   pemulihan: [],
 }
 assert.equal(mergeWorkouts([incoming]), 1)
-assert.equal(broadcasts, 1, 'workout merge must broadcast a same-tab health update')
+assert.equal(broadcastTypes.filter((type) => type === 'panacea:health-updated').length, 1, 'workout merge must preserve one same-tab legacy health update')
+assert.equal(broadcastTypes.filter((type) => type === 'panacea:data-updated').length, 1, 'workout merge must also publish one structured data update')
 assert.ok(JSON.parse(memory.get('pmd_workouts_v1') ?? '[]').some((w: { id?: string }) => w.id === 'new-session'))
 
 clearWorkouts()
-assert.equal(broadcasts, 2, 'clearing training data must broadcast a refresh')
+assert.equal(broadcastTypes.filter((type) => type === 'panacea:health-updated').length, 2, 'clearing training data must broadcast one additional legacy refresh')
+assert.equal(broadcastTypes.filter((type) => type === 'panacea:data-updated').length, 2, 'clearing training data must broadcast one additional structured refresh')
 assert.deepEqual(getWorkouts(), [])
 
 const component = readFileSync('src/components/CatatanLatihan.tsx', 'utf8')
@@ -76,4 +83,4 @@ for (const eventName of ['panacea:health-updated', 'storage', 'focus']) {
 }
 assert.match(component, /<TrainingAnalyticsPanel untukKemarin=\{untukKemarin\} versi=\{versi\} \/>/)
 
-console.log('Workout cache provenance and event-driven Training refresh automation are verified.')
+console.log('Workout cache provenance and legacy + structured Training refresh events are verified.')
