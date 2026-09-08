@@ -4,7 +4,9 @@ import { validateBodyEvidenceMapping, type BodyEvidenceMappingRecord } from '../
 
 // Exact-head acceptance guard: this suite is intentionally deterministic and content-free.
 const cardiovascular = BODY_PROJECTION_TARGETS.find((target) => target.id === 'cardiovascular-core')
+const pulmonary = BODY_PROJECTION_TARGETS.find((target) => target.id === 'pulmonary-core')
 assert.ok(cardiovascular)
+assert.ok(pulmonary)
 
 const generic: BodyEvidenceMappingRecord = {
   id: 'cv-physiology-reference-example',
@@ -25,6 +27,29 @@ const generic: BodyEvidenceMappingRecord = {
 
 assert.equal(validateBodyEvidenceMapping(cardiovascular, generic).publishable, true)
 assert.equal(validateBodyEvidenceMapping(cardiovascular, { ...generic, aiAssisted: false }).publishable, true)
+
+const normalizedVariant = validateBodyEvidenceMapping(cardiovascular, { ...generic, mappedAnatomyTerms: ['coronary-artery'] })
+assert.equal(normalizedVariant.publishable, true)
+
+const genericFragment = validateBodyEvidenceMapping(cardiovascular, { ...generic, mappedAnatomyTerms: ['artery'] })
+assert.equal(genericFragment.publishable, false)
+assert.ok(genericFragment.reasons.some((reason) => reason.includes('resolve conservatively')))
+
+const substringCollision = validateBodyEvidenceMapping(cardiovascular, { ...generic, mappedAnatomyTerms: ['heartburn'] })
+assert.equal(substringCollision.publishable, false)
+assert.ok(substringCollision.reasons.some((reason) => reason.includes('resolve conservatively')))
+
+const unrelatedAnatomy = validateBodyEvidenceMapping(cardiovascular, { ...generic, mappedAnatomyTerms: ['kidney'] })
+assert.equal(unrelatedAnatomy.publishable, false)
+assert.ok(unrelatedAnatomy.reasons.some((reason) => reason.includes('resolve conservatively')))
+
+const crossSystemAnatomy = validateBodyEvidenceMapping(pulmonary, {
+  ...generic,
+  targetId: pulmonary.id,
+  mappedAnatomyTerms: ['heart'],
+})
+assert.equal(crossSystemAnatomy.publishable, false)
+assert.ok(crossSystemAnatomy.reasons.some((reason) => reason.includes('resolve conservatively')))
 
 const missingRuntimeDisclosure = validateBodyEvidenceMapping(cardiovascular, { ...generic, aiAssisted: undefined as unknown as boolean })
 assert.equal(missingRuntimeDisclosure.publishable, false)
@@ -88,4 +113,4 @@ assert.ok(impossibleCalendarReview.reasons.some((reason) => reason.includes('rea
 const unsupportedKind = validateBodyEvidenceMapping(cardiovascular, { ...generic, kind: 'lesion', targetId: cardiovascular.id })
 assert.equal(unsupportedKind.publishable, true)
 
-console.log('Body evidence mapping: immutable provenance, generic-vs-patient localization, explicit AI disclosure, and academic-review guards verified.')
+console.log('Body evidence mapping: immutable provenance, fail-closed anatomy-term token boundaries, generic-vs-patient localization, explicit AI disclosure, and academic-review guards verified.')
