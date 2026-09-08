@@ -143,25 +143,60 @@ export function normalizeAnatomySourceName(value: string) {
     .replace(/\s+/g, ' ')
 }
 
-/**
- * Match lookup hints as complete token sequences rather than raw substrings.
- * This prevents short anatomy terms such as "hip" from matching unrelated
- * source names such as "hippocampus".
- */
-export function anatomySourceNameMatchesHint(sourceName: string, hint: string) {
-  const source = normalizeAnatomySourceName(sourceName)
-  const target = normalizeAnatomySourceName(hint)
-  if (!source || !target) return false
-  return ` ${source} `.includes(` ${target} `)
+function tokenMatches(sourceToken: string, hintToken: string) {
+  // Very short terms must be exact tokens: "hip" must never resolve
+  // "hippocampus". Longer reviewed stems such as "bronch" and "glute" may
+  // safely resolve source tokens such as "bronchus" and "gluteus".
+  return sourceToken === hintToken || (hintToken.length >= 5 && sourceToken.startsWith(hintToken))
 }
 
 /**
- * Resolve source GLTF names conservatively. `nodeHints` are ordered by the
- * reviewed atlas catalogue; the first hint that produces a match wins. This
- * avoids broad fallback hints (for example "artery") drowning out a specific
- * one (for example "carotid"). A match is only a name correspondence, not
- * proof that a mesh is complete, clinically validated, currently loaded, or
- * patient-specific.
+ * Match a reviewed lookup hint against a contiguous source-name token sequence.
+ * Short tokens stay exact, while stems of five or more characters may match the
+ * beginning of a source token. This keeps "hip" away from "hippocampus" while
+ * allowing catalogue stems such as "bronch" -> "bronchus".
+ */
+export function anatomySourceNameMatchesHint(sourceName: string, hint: string) {
+  const sourceTokens = normalizeAnatomySourceName(sourceName).split(' ').filter(Boolean)
+  const hintTokens = normalizeAnatomySourceName(hint).split(' ').filter(Boolean)
+  if (!sourceTokens.length || !hintTokens.length || hintTokens.length > sourceTokens.length) return false
+
+  for (let start = 0; start <= sourceTokens.length - hintTokens.length; start += 1) {
+    let matches = true
+    for (let offset = 0; offset < hintTokens.length; offset += 1) {
+      if (!tokenMatches(sourceTokens[start + offset], hintTokens[offset])) {
+        matches = false
+        break
+      }
+    }
+    if (matches) return true
+  }
+  return false
+}
+
+function matchesForHint(
+  hint: string,
+  sourceBundles: readonly AnatomySourceNodeBundle[],
+  maxNamesPerBundle: number,
+  seenByFile?: Map<string, Set<string>>,
+) {
+  return sourceBundles
+    .map((bundle) => {
+      const seen = seenByFile?.get(bundle.file) ?? new Set<string>()
+      if (seenByFile && !seenByFile.has(bundle.file)) seenByFile.set(bundle.file, seen)
+      const names = bundle.names
+        .filter((name) => !seen.has(name) && anatomySourceNameMatchesHint(name, hint))
+        .slice(0, maxNamesPerBundle)
+      if (seenByFile) for (const name of names) seen.add(name)
+      return { file: bundle.file, hint, names }
+    })
+    .filter((entry) => entry.names.length > 0)
+}
+
+/**
+ * Resolve ordered hints as specificity fallbacks. The first hint that yields a
+ * source-node match wins. Use this for queries such as ["carotid", "artery"]
+ * where a broad fallback must not drown out a reviewed specific target.
  */
 export function resolveAnatomySourceNodes(
   nodeHints: readonly string[],
@@ -169,15 +204,28 @@ export function resolveAnatomySourceNodes(
   maxNamesPerBundle = 8,
 ): AnatomySourceNodeMatch[] {
   for (const hint of nodeHints) {
-    const matches = sourceBundles
-      .map((bundle) => ({
-        file: bundle.file,
-        hint,
-        names: bundle.names.filter((name) => anatomySourceNameMatchesHint(name, hint)).slice(0, maxNamesPerBundle),
-      }))
-      .filter((entry) => entry.names.length > 0)
-
+    const matches = matchesForHint(hint, sourceBundles, maxNamesPerBundle)
     if (matches.length) return matches
   }
   return []
+}
+
+/**
+ * Resolve every reviewed component hint for composite atlas targets such as
+ * "Heart & great vessels" or "Knee complex". Each component may contribute a
+ * bounded set of exact source nodes, while duplicates across overlapping hints
+ * are suppressed. This is deliberately separate from specificity-fallback
+ * resolution so generic search behavior remains fail-closed.
+ */
+export function resolveAllAnatomySourceNodes(
+  nodeHints: readonly string[],
+  sourceBundles: readonly AnatomySourceNodeBundle[],
+  maxNamesPerBundle = 8,
+): AnatomySourceNodeMatch[] {
+  const resolved: AnatomySourceNodeMatch[] = []
+  const seenByFile = new Map<string, Set<string>>()
+  for (const hint of nodeHints) {
+    resolved.push(...matchesForHint(hint, sourceBundles, maxNamesPerBundle, seenByFile))
+  }
+  return resolved
 }

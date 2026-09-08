@@ -25,11 +25,38 @@ assert.equal(anatomySourceNodeOrigin('skeletal.glb'), 'generated-index')
 assert.equal(anatomySourceNameMatchesHint('Femur.r', 'femur'), true)
 assert.equal(anatomySourceNameMatchesHint('Hip joint', 'hip'), true)
 assert.equal(anatomySourceNameMatchesHint('Hippocampus.r', 'hip'), false, 'short anatomy hints must not match unrelated longer words')
+assert.equal(anatomySourceNameMatchesHint('Main bronchus.l', 'bronch'), true, 'reviewed stems of five or more characters may resolve source tokens')
+assert.equal(anatomySourceNameMatchesHint('Gluteus medius muscle.r', 'glute'), true, 'long catalogue stems should resolve their full anatomical source token')
 
 const femurMatches = resolveAnatomySourceNodes(['femur'], [skeletal], 32)
 assert.ok(femurMatches.length > 0)
 assert.ok(femurMatches.flatMap((match) => match.names).includes('Femur.l'))
 assert.ok(femurMatches.flatMap((match) => match.names).includes('Femur.r'))
+
+const grouped = resolveAnatomySourceNodes(
+  ['heart', 'aorta', 'vena cava'],
+  [{
+    file: 'cardiovascular.glb',
+    names: ['Heart', 'Aorta', 'Superior vena cava', 'Hippocampus.r'],
+  }],
+  8,
+)
+assert.deepEqual(
+  grouped.map((match) => match.hint),
+  ['heart', 'aorta', 'vena cava'],
+  'each reviewed component hint should be allowed to contribute exact source nodes',
+)
+assert.deepEqual(
+  grouped.flatMap((match) => match.names),
+  ['Heart', 'Aorta', 'Superior vena cava'],
+  'multi-structure atlas targets must not stop resolving after the first successful hint',
+)
+
+const deduplicated = resolveAnatomySourceNodes(
+  ['aorta', 'aorta'],
+  [{ file: 'cardiovascular.glb', names: ['Aorta'] }],
+)
+assert.equal(deduplicated.flatMap((match) => match.names).length, 1, 'the same source node must not be emitted twice across overlapping hints')
 
 publishAnatomySourceNodes('skeletal.glb', ['Femur.r', 'Femur.l', 'Femur.r'])
 const withRuntime = getEffectiveAnatomySourceNodeSnapshot()
@@ -60,4 +87,4 @@ assert.ok(
   'runtime node collection should happen on the loaded clone, not in the render loop',
 )
 
-console.log('Z-Anatomy source-node resolver preserves exact GLB provenance, conservative matching, and runtime renderer publication.')
+console.log('Z-Anatomy source-node resolver preserves exact GLB provenance, resolves every reviewed component conservatively, and publishes runtime renderer nodes.')
