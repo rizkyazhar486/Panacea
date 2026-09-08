@@ -43,6 +43,12 @@ await context.addInitScript(() => {
 })
 
 const page = await context.newPage()
+// Keep one normally-large optional layer in-flight long enough to prove that
+// progressive loading does not dim or cover anatomy that is already usable.
+await page.route('**/anatomy/cardio' + 'vascular.glb', async (route) => {
+  await new Promise((resolve) => setTimeout(resolve, 4_000))
+  await route.continue()
+})
 const pageErrors = []
 page.on('pageerror', (error) => pageErrors.push(error.message))
 
@@ -116,13 +122,17 @@ try {
   // Do not use the first canvas on the page: other visual components may own
   // canvases too. Body3D mounts its renderer directly inside this unique
   // touch-none viewer container.
-  const canvas = page.locator('div.h-full.w-full.touch-none > canvas').first()
+  const viewer = page.locator('div.h-full.w-full.touch-none').first()
+  const canvas = viewer.locator('> canvas').first()
   await canvas.waitFor({ state: 'visible', timeout: 45_000 })
   await canvas.scrollIntoViewIfNeeded()
 
   // Give Skeleton + Muscles time to enter loading, then require them to settle.
   await page.waitForTimeout(1_500)
-  await page.getByText('Loading anatomy…').waitFor({ state: 'hidden', timeout: 120_000 })
+  const initialLoading = page.getByText('Loading anatomy…').first()
+  const progressiveLoading = page.getByText('Adding anatomy layer…').first()
+  await initialLoading.waitFor({ state: 'hidden', timeout: 120_000 })
+  await progressiveLoading.waitFor({ state: 'hidden', timeout: 120_000 })
 
   const fatal = page.getByText(/This device could not start 3D graphics|The browser dropped the 3D context/i)
   if (await fatal.count()) throw new Error(`Body3D fatal fallback is visible: ${await fatal.first().innerText()}`)
@@ -168,6 +178,40 @@ try {
   if (metrics.documentScrollWidth > metrics.viewport.width + 2) {
     throw new Error(`Page overflows horizontally: ${metrics.documentScrollWidth}px > ${metrics.viewport.width}px`)
   }
+
+  // Turn on a normally-large optional layer while keeping the already-rendered
+  // anatomy usable. The delayed request above makes this state deterministic.
+  const vessels = page.getByRole('button', { name: 'Vessels', exact: true }).first()
+  await vessels.click()
+  await progressiveLoading.waitFor({ state: 'visible', timeout: 5_000 })
+  const progressiveClass = await progressiveLoading.evaluate((node) =>
+    node.closest('[role="status"]')?.getAttribute('class') ?? '',
+  )
+  metrics.progressiveLoadingCompact = Boolean(
+    progressiveClass.includes('top-2') && !progressiveClass.includes('inset-0'),
+  )
+  await canvas.scrollIntoViewIfNeeded()
+  await page.waitForTimeout(100)
+  // The WebGL renderer canvas is mounted directly inside the touch-none viewer.
+  // Browsers may report either the canvas or that direct viewer wrapper as the
+  // hit target. Both mean the 3D surface is unobstructed; a loading card/overlay
+  // is a sibling and therefore remains a hard failure here.
+  metrics.progressiveLoadingCenterUnobstructed = await canvas.evaluate((node) => {
+    const rect = node.getBoundingClientRect()
+    const x = rect.left + rect.width / 2
+    const y = rect.top + rect.height / 2
+    if (x < 0 || x > window.innerWidth || y < 0 || y > window.innerHeight) return false
+    const hit = document.elementFromPoint(x, y)
+    const viewerNode = node.parentElement
+    return Boolean(hit && viewerNode && (hit === node || hit === viewerNode || viewerNode.contains(hit)))
+  })
+  if (!metrics.progressiveLoadingCompact) {
+    throw new Error(`Additional layer loading is not compact: ${progressiveClass || 'no class'}`)
+  }
+  if (!metrics.progressiveLoadingCenterUnobstructed) {
+    throw new Error('Additional layer loading obstructed the Body3D viewer center')
+  }
+  await progressiveLoading.waitFor({ state: 'hidden', timeout: 120_000 })
 
   // Exercise OrbitControls and prove the compositor surface actually changes.
   // This verifies the demand-render path, rather than merely dispatching a drag
