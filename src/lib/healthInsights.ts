@@ -3,6 +3,8 @@
 // (no PNC credits, no API latency) and is fully explainable. Compares recent
 // snapshots against slightly older ones to catch meaningful trend shifts.
 
+import { buildPersonalBaseline, type HealthBaselineMetric } from './healthProfileBaseline'
+
 export interface HistorySnapshot {
   date: string
   vo2max?: number; restingHr?: number; hrvMs?: number; recoveryPct?: number; sleepH?: number
@@ -20,9 +22,26 @@ function avg(nums: number[]): number | null {
   return v.length ? v.reduce((a, b) => a + b, 0) / v.length : null
 }
 
-// Split history into "recent" (last `n`) vs "prior" (the `n` before that) for
-// a simple before/after trend comparison — enough signal without overfitting
-// to single noisy days.
+const BASELINE_META: Array<{ metric: HealthBaselineMetric; label: string; unit: string }> = [
+  { metric: 'restingHr', label: 'Resting HR', unit: 'bpm' },
+  { metric: 'hrvMs', label: 'HRV', unit: 'ms' },
+  { metric: 'sleepH', label: 'Sleep', unit: 'h' },
+]
+
+function baselineInsights(history: HistorySnapshot[]): Insight[] {
+  return BASELINE_META.flatMap(({ metric, label, unit }) => {
+    const baseline = buildPersonalBaseline(history, metric)
+    if (!baseline) return []
+    return [{
+      id: `personal-baseline-${metric}`,
+      tone: 'neutral' as const,
+      icon: '🎯',
+      title: `Personal baseline · ${label}`,
+      body: `${baseline.count} recorded days: median ${baseline.median.toFixed(1)} ${unit}; observed middle 50% ${baseline.q1.toFixed(1)}–${baseline.q3.toFixed(1)} ${unit}. Descriptive of your own saved history only — not a population normal range, diagnosis, or treatment threshold.`,
+    }]
+  })
+}
+
 function splitWindows<T extends HistorySnapshot>(history: T[], n = 3): { recent: T[]; prior: T[] } {
   const sorted = [...history].sort((a, b) => a.date.localeCompare(b.date))
   return { recent: sorted.slice(-n), prior: sorted.slice(-2 * n, -n) }
@@ -37,6 +56,8 @@ export function generateInsights(history: HistorySnapshot[]): Insight[] {
     }]
   }
 
+  out.push(...baselineInsights(history))
+
   const { recent, prior } = splitWindows(history, 3)
   const recentHrv = avg(recent.map((s) => s.hrvMs ?? 0))
   const priorHrv = avg(prior.map((s) => s.hrvMs ?? 0))
@@ -46,7 +67,6 @@ export function generateInsights(history: HistorySnapshot[]): Insight[] {
   const recentVo2 = avg(recent.map((s) => s.vo2max ?? 0))
   const priorVo2 = avg(prior.map((s) => s.vo2max ?? 0))
 
-  // HRV trend — the primary autoregulation signal.
   if (recentHrv != null && priorHrv != null && priorHrv > 0) {
     const delta = ((recentHrv - priorHrv) / priorHrv) * 100
     if (delta <= -10) {
@@ -64,7 +84,6 @@ export function generateInsights(history: HistorySnapshot[]): Insight[] {
     }
   }
 
-  // Resting HR creeping up is an early flag (fatigue, incoming illness, overreaching).
   if (recentRhr != null && priorRhr != null && priorRhr > 0) {
     const deltaBpm = recentRhr - priorRhr
     if (deltaBpm >= 4) {
@@ -76,7 +95,6 @@ export function generateInsights(history: HistorySnapshot[]): Insight[] {
     }
   }
 
-  // Sleep debt.
   if (recentSleep != null && recentSleep < 6.5) {
     out.push({
       id: 'sleep-low', tone: 'critical', icon: '😴',
@@ -85,7 +103,6 @@ export function generateInsights(history: HistorySnapshot[]): Insight[] {
     })
   }
 
-  // VO2max progress — reinforce the behavior that's working.
   if (recentVo2 != null && priorVo2 != null && priorVo2 > 0) {
     const delta = recentVo2 - priorVo2
     if (delta >= 1) {
