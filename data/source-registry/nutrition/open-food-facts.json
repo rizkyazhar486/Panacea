@@ -1,0 +1,48 @@
+{
+  "id": "open_food_facts",
+  "name": "Open Food Facts",
+  "category": "nutrition",
+  "kind": ["api", "dataset"],
+  "homepage": "https://world.openfoodfacts.org/",
+  "repository": "https://github.com/openfoodfacts/openfoodfacts-server",
+  "features": [
+    "food-product-search",
+    "barcode-nutrition-lookup",
+    "nutrition-reference-per-100g"
+  ],
+  "formats": ["json"],
+  "usage": {
+    "runtime": true,
+    "buildTime": false,
+    "networkRequired": true,
+    "notes": "Panacea calls Open Food Facts through server/src/lingkungan.ts and normalizes only selected product identity and per-100g nutrient fields. React components must not call the upstream API directly. The adapter intentionally does not invent serving-size conversions because package serving definitions are heterogeneous and user-entered data quality varies."
+  },
+  "license": {
+    "status": "VERIFIED",
+    "identifier": "ODbL 1.0 (database)",
+    "commercialUse": "ALLOWED",
+    "attributionRequired": true,
+    "shareAlike": true,
+    "scope": "Open Food Facts database data are made available under the Open Database License. Commercial reuse is allowed subject to attribution and the ODbL share-alike/database obligations. This registry entry covers database fields consumed by the current adapter; product images, packaging artwork and other individual content can have separate rights and are not licensed by this entry.",
+    "verificationUrl": "https://world.openfoodfacts.org/terms-of-use",
+    "verifiedAt": "2026-09-08",
+    "notes": "If Panacea creates or publicly distributes a derivative database by combining Open Food Facts data with other databases, review the ODbL share-alike requirements before release. Preserve Open Food Facts attribution. The current adapter does not import product images."
+  },
+  "validation": {
+    "level": "REFERENCE",
+    "clinicalDecisionUse": "CONTEXT_ONLY",
+    "notes": "Open Food Facts is crowdsourced product data and can be incomplete, stale or incorrect. Nutrient values are reference inputs, not laboratory measurements or a validated clinical nutrition prescription. Panacea should preserve product identity and missing-data semantics and must not fabricate absent nutrient fields."
+  },
+  "provenance": {
+    "authority": "Open Food Facts community-maintained open food-products database",
+    "sourceIdentityRequired": true,
+    "versionPinRequired": false,
+    "notes": "Every normalized product should retain the source identity and product code when available. Because records are continuously edited by contributors, reproducible research or regulatory use requires a dated export/snapshot rather than assuming the live API is immutable."
+  },
+  "adapter": {
+    "status": "ACTIVE",
+    "normalizedTarget": "Pangan",
+    "module": "server/src/lingkungan.ts",
+    "notes": "The backend adapter uses a custom User-Agent, caches results for 24 hours, selects a bounded field set, normalizes finite non-negative nutrient values per 100 g, drops products without a usable energy value, and returns an empty result on upstream failure rather than fabricated nutrition data. API rate limits and upstream availability remain operational dependencies."
+  }
+}
