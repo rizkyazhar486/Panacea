@@ -8,6 +8,7 @@ import {
   type RespiratoryInputs,
   type RespiratoryPhaseId,
 } from '../../lib/respiratoryAtlas'
+import { RESPIRATORY_TEACHING_REFERENCES } from '../../lib/respiratoryReferences'
 
 function Metric({ label, value, equation }: { label: string; value: string; equation: string }) {
   return (
@@ -124,6 +125,18 @@ export function RespiratoryQuantitativePanel() {
             <p className="mt-1 text-[9px] leading-relaxed text-amber-100/80">{RESPIRATORY_MODEL_BOUNDARY}</p>
             <p className="mt-2 text-[8.5px] leading-relaxed text-neutral-400">No compliance, airway resistance, gas exchange, FEV₁/FVC, ventilator setting, respiratory work, V/Q distribution or disease severity is inferred from these controls.</p>
           </div>
+        </div>
+      </div>
+
+      <div className="border-t border-white/10 p-4">
+        <div className="text-[8px] font-black uppercase tracking-[0.16em] text-neutral-500">Physiology references · verify at source</div>
+        <div className="mt-2 grid gap-2 md:grid-cols-3">
+          {RESPIRATORY_TEACHING_REFERENCES.map((reference) => (
+            <a key={reference.href} href={reference.href} target="_blank" rel="noreferrer" className="rounded-xl border border-white/10 bg-white/[0.03] p-3 transition hover:border-cyan-300/30">
+              <div className="text-[9px] font-black text-cyan-200">{reference.label} ↗</div>
+              <p className="mt-1 text-[8.5px] leading-relaxed text-neutral-400">{reference.supports}</p>
+            </a>
+          ))}
         </div>
       </div>
     </section>
