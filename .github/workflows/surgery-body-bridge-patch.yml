@@ -1,0 +1,47 @@
+name: Surgery Body Bridge Patch
+
+on:
+  push:
+    branches:
+      - feat/surgery-simulator-anatomy-20260908
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  patch-and-validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: feat/surgery-simulator-anatomy-20260908
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Apply guarded bridge patch
+        run: node scripts/stabilization/apply-surgery-body-bridge.mjs
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: TypeScript
+        run: npx tsc --noEmit
+
+      - name: Deterministic tests
+        run: npm run uji
+
+      - name: Commit validated product source only
+        run: |
+          rm -f scripts/stabilization/apply-surgery-body-bridge.mjs
+          rm -f .github/workflows/surgery-body-bridge-patch.yml
+          git add -A
+          git config user.name "panacea-stabilization-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git commit -m "feat(body): connect surgery to shared 3D imaging"
+          git push origin HEAD:feat/surgery-simulator-anatomy-20260908
