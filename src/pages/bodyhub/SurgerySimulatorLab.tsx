@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState, useTransition } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import AtlasViewer3D, { type PartMeta } from '../../components/AtlasViewer3D'
 import { CARDIO_PARTS } from '../../lib/cardioAtlas.gen'
 import { partsForModule } from '../../lib/systemAtlas.gen'
@@ -192,7 +192,6 @@ export function SurgerySimulatorLab({ onKedalaman, onSorot, onSharedView }: Prop
   const [stepIndex, setStepIndex] = useState(0)
   const [showAnswer, setShowAnswer] = useState(false)
   const [sharedViewId, setSharedViewId] = useState('source')
-  const [isScenarioPending, startScenarioTransition] = useTransition()
 
   const scenario = SURGERY_SIMULATION_SCENARIOS.find((item) => item.id === scenarioId) ?? SURGERY_SIMULATION_SCENARIOS[0]
   const step = scenario.steps[Math.min(stepIndex, scenario.steps.length - 1)]
@@ -210,7 +209,11 @@ export function SurgerySimulatorLab({ onKedalaman, onSorot, onSharedView }: Prop
 
   function chooseScenario(id: string) {
     if (id === scenarioId) return
-    startScenarioTransition(() => setScenarioId(id))
+    // Scenario identity and teaching text are urgent UI state. AtlasViewer3D
+    // performs GLB teardown/loading in an effect after the commit, so wrapping
+    // this selection in a low-priority transition can make the interface look
+    // stuck under GPU/CPU pressure even though the click was received.
+    setScenarioId(id)
   }
 
   function goStep(index: number) {
@@ -228,7 +231,7 @@ export function SurgerySimulatorLab({ onKedalaman, onSorot, onSharedView }: Prop
   }
 
   return (
-    <section data-surgery-simulator="anatomy-grounded" aria-busy={isScenarioPending} className="overflow-hidden rounded-2xl border border-neutral-800 bg-[#071018] text-white shadow-2xl shadow-black/20">
+    <section data-surgery-simulator="anatomy-grounded" className="overflow-hidden rounded-2xl border border-neutral-800 bg-[#071018] text-white shadow-2xl shadow-black/20">
       <div className="border-b border-white/10 bg-gradient-to-br from-cyan-400/10 via-transparent to-brand/10 p-4">
         <div className="flex flex-wrap items-start justify-between gap-3">
           <div>
@@ -257,7 +260,6 @@ export function SurgerySimulatorLab({ onKedalaman, onSorot, onSharedView }: Prop
               {item.shortLabel}
             </ScenarioChip>
           ))}
-          {isScenarioPending && <span role="status" className="px-2 text-[8.5px] font-semibold text-cyan-200">Switching reference atlas…</span>}
         </div>
       </div>
 
