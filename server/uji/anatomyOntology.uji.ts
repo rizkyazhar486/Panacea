@@ -16,6 +16,7 @@ function jsonResponse(payload: unknown): Response {
 
 // Regression fixture: OLS kosong sehingga penyakit/fenotipe datang dari NLM
 // CTSS. Conditions memakai key internal NLM, sedangkan HPO memakai HP CURIE.
+// Display mengikuti bentuk resmi CTSS: satu array field-display per result.
 // Uji ini sengaja tanpa network agar provenance tidak bergantung kondisi API.
 {
   const urls: string[] = []
@@ -27,10 +28,10 @@ function jsonResponse(payload: unknown): Response {
       return jsonResponse({ response: { docs: [] } })
     }
     if (url.includes('/conditions/v3/search')) {
-      return jsonResponse([1, ['C0000001'], null, ['Back pain']])
+      return jsonResponse([1, ['C0000001'], null, [['Back pain']]])
     }
     if (url.includes('/hpo/v3/search')) {
-      return jsonResponse([1, ['HP:0003418'], null, ['Back pain']])
+      return jsonResponse([1, ['HP:0003418'], null, [['Back pain']]])
     }
     return new Response('not found', { status: 404 })
   }
@@ -45,6 +46,7 @@ function jsonResponse(payload: unknown): Response {
   ok('key kondisi NLM membawa identifier system eksplisit',
     disease?.identifierSystem === 'NLM_CONDITIONS_KEY', disease?.identifierSystem)
   ok('key kondisi NLM dipertahankan apa adanya', disease?.id === 'C0000001', disease?.id)
+  ok('display-array CTSS dinormalisasi menjadi label tunggal', disease?.label === 'Back pain', disease?.label)
 
   ok('HPO CTSS tetap berada di bucket phenotype', result.phenotypes.length === 1)
   ok('HPO CTSS tetap memakai namespace HP', phenotype?.ontology === 'hp', phenotype?.ontology)
