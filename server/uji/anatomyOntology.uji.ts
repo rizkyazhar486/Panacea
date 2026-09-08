@@ -54,6 +54,14 @@ function jsonResponse(payload: unknown): Response {
   ok('HPO malformed tidak dipalsukan sebagai HP', !result.phenotypes.some((term) => term.id === 'not-an-hpo-id'))
   ok('provenance URL HPO dipertahankan', phenotype?.sourceUrl.includes('/hpo/v3/search') === true, phenotype?.sourceUrl)
   ok('lookup tetap membatasi satu kueri ke empat sumber', urls.length === 4, String(urls.length))
+
+  const conditionUrl = urls.map((url) => new URL(url)).find((url) => url.pathname.includes('/conditions/v3/search'))
+  ok('conditions meminta code field key_id secara eksplisit', conditionUrl?.searchParams.get('cf') === 'key_id', conditionUrl?.search)
+  ok('conditions meminta display field primary_name', conditionUrl?.searchParams.get('df') === 'primary_name', conditionUrl?.search)
+
+  const hpoUrl = urls.map((url) => new URL(url)).find((url) => url.pathname.includes('/hpo/v3/search'))
+  ok('HPO meminta code field id secara eksplisit', hpoUrl?.searchParams.get('cf') === 'id', hpoUrl?.search)
+  ok('HPO meminta display field name', hpoUrl?.searchParams.get('df') === 'name', hpoUrl?.search)
 }
 
 // OLS anatomy terms juga harus membawa provenance yang dapat dibedakan dari
