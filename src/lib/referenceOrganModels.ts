@@ -11,7 +11,8 @@ import type { OrganModel } from './organModels'
 
 const Z_ANATOMY_LABEL = 'Z-Anatomy · derived from BodyParts3D'
 const Z_ANATOMY_LICENSE = 'CC BY-SA 4.0'
-const HRA_LABEL = 'HuBMAP Human Reference Atlas · female reference object'
+const HRA_FEMALE_LABEL = 'HuBMAP Human Reference Atlas · female reference object'
+const HRA_MALE_LABEL = 'HuBMAP Human Reference Atlas · male reference object'
 const HRA_LICENSE = 'CC BY 4.0'
 
 function zReference(
@@ -48,6 +49,7 @@ function hraReference(
   assetPath: string,
   structures: number,
   accent: string,
+  sex: 'female' | 'male' = 'female',
 ): OrganModel {
   return {
     id,
@@ -60,7 +62,7 @@ function hraReference(
     sumber: 'hra',
     jumlahBagian: structures,
     jumlahMesh: structures,
-    sourceLabel: HRA_LABEL,
+    sourceLabel: sex === 'male' ? HRA_MALE_LABEL : HRA_FEMALE_LABEL,
     sourceLicense: HRA_LICENSE,
     assetPath,
   }
@@ -69,6 +71,11 @@ function hraReference(
 const EAR_ASSET = 'atlas/telinga.glb'
 const EAR_STRUCTURES = 21
 
+/**
+ * Strongest single-organ/reference close-up when a BodyParts3D organ cut is not
+ * already available. These models may replace the old AI surface in the organ
+ * dossier because their named meshes carry explicit source provenance.
+ */
 export const REFERENCE_ATLAS_MODELS: OrganModel[] = [
   zReference(
     'lungs-reference',
@@ -145,5 +152,69 @@ export const REFERENCE_ATLAS_MODELS: OrganModel[] = [
     'atlas/payudara.glb',
     16,
     '#c58f9a',
+  ),
+]
+
+/**
+ * Optional regional views. They never replace a more detailed primary organ
+ * close-up. Their purpose is functional: expose clinically important spatial
+ * relationships while keeping source, license and reference-object sex clear.
+ */
+export const REGIONAL_REFERENCE_ATLAS_MODELS: OrganModel[] = [
+  hraReference(
+    'heart-regional-reference',
+    'heart',
+    'Heart chambers & valves',
+    'Cor — camerae et valvae',
+    'atlas/jantung-ruang.glb',
+    14,
+    '#c0504d',
+  ),
+  hraReference(
+    'liver-biliary-regional-reference',
+    'liver',
+    'Biliary tree & pancreatic ducts',
+    'Hepar et arbor biliaris — regional context',
+    'atlas/bilier.glb',
+    40,
+    '#9b5a4a',
+  ),
+  hraReference(
+    'pancreas-biliary-regional-reference',
+    'pancreas',
+    'Biliary tree & pancreatic ducts',
+    'Pancreas et ductus pancreatici — regional context',
+    'atlas/bilier.glb',
+    40,
+    '#d9a441',
+  ),
+  hraReference(
+    'gallbladder-biliary-regional-reference',
+    'gallbladder',
+    'Biliary tree & pancreatic ducts',
+    'Vesica biliaris et arbor biliaris — regional context',
+    'atlas/bilier.glb',
+    40,
+    '#9b5a4a',
+  ),
+  hraReference(
+    'prostate-pelvis-regional-reference',
+    'prostate',
+    'Prostate zones & bladder',
+    'Prostata et vesica urinaria — regional context',
+    'atlas/prostat.glb',
+    26,
+    '#c58f9a',
+    'male',
+  ),
+  hraReference(
+    'bladder-prostate-regional-reference',
+    'bladder',
+    'Prostate zones & bladder',
+    'Vesica urinaria et prostata — regional context',
+    'atlas/prostat.glb',
+    26,
+    '#b08fbf',
+    'male',
   ),
 ]
