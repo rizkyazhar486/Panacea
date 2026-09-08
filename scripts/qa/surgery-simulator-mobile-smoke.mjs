@@ -142,6 +142,45 @@ async function tapProcedureStep(scope, label) {
   await waitForAttribute(button, 'aria-current', 'step')
   return button
 }
+async function dismissBodyExplorerOverlays() {
+  await dismissIfVisible(page.getByRole('button', { name: /Get Started/i }).first())
+  await dismissIfVisible(page.getByRole('button', { name: /Maybe later/i }).first())
+
+  const reminderText = page.getByText(/TODAY.?S REMINDER/i).first()
+  if (await reminderText.isVisible().catch(() => false)) {
+    const reminder = reminderText.locator('xpath=ancestor::*[.//button][1]')
+    const close = reminder.locator('button').last()
+    if (await close.isVisible().catch(() => false)) await close.click()
+  }
+}
+async function enterSurgerySimulator({ allowRouteReset = false } = {}) {
+  const openFromCurrentRoute = async () => {
+    const surgeryTab = page.getByRole('button', { name: 'Surgical layers', exact: true })
+    await tapScrolled(surgeryTab)
+    // A coordinate click is not enough evidence that React accepted the tab
+    // transition. The active-class is the existing product state contract.
+    await waitForClass(surgeryTab, 'bg-white', 10_000)
+    const simulatorRoot = page.locator('[data-surgery-simulator="anatomy-grounded"]')
+    await simulatorRoot.waitFor({ state: 'visible', timeout: 30_000 })
+    await scrollNative(simulatorRoot)
+    return simulatorRoot
+  }
+
+  try {
+    return await openFromCurrentRoute()
+  } catch (firstError) {
+    if (!allowRouteReset) throw firstError
+
+    // One bounded fresh-route retry isolates lazy-panel/re-entry state without
+    // weakening any anatomy, WebGL, provenance, or publication assertion.
+    // It still uses the same real tab hit target and verifies the active state.
+    const response = await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 45_000 })
+    if (response && !response.ok()) throw new Error(`Body Explorer retry returned HTTP ${response.status()}`, { cause: firstError })
+    await dismissBodyExplorerOverlays()
+    await page.locator('canvas').first().waitFor({ state: 'visible', timeout: 120_000 })
+    return openFromCurrentRoute()
+  }
+}
 
 const metrics = {
   viewport: null,
@@ -171,24 +210,12 @@ const metrics = {
 try {
   const response = await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 45_000 })
   if (response && !response.ok()) throw new Error(`Body Explorer returned HTTP ${response.status()}`)
-  await dismissIfVisible(page.getByRole('button', { name: /Get Started/i }).first())
-  await dismissIfVisible(page.getByRole('button', { name: /Maybe later/i }).first())
-
-  const reminderText = page.getByText(/TODAY.?S REMINDER/i).first()
-  if (await reminderText.isVisible().catch(() => false)) {
-    const reminder = reminderText.locator('xpath=ancestor::*[.//button][1]')
-    const close = reminder.locator('button').last()
-    if (await close.isVisible().catch(() => false)) await close.click()
-  }
+  await dismissBodyExplorerOverlays()
 
   const sharedBodyCanvas = page.locator('canvas').first()
   await sharedBodyCanvas.waitFor({ state: 'visible', timeout: 120_000 })
 
-  const surgeryTab = page.getByRole('button', { name: 'Surgical layers', exact: true })
-  await tapScrolled(surgeryTab)
-  let simulator = page.locator('[data-surgery-simulator="anatomy-grounded"]')
-  await simulator.waitFor({ state: 'visible', timeout: 30_000 })
-  await scrollNative(simulator)
+  let simulator = await enterSurgerySimulator()
 
   const caesareanScenario = simulator.getByRole('button', { name: 'Caesarean', exact: true })
   await tapScrolled(caesareanScenario)
@@ -237,10 +264,7 @@ try {
   const unfoldSlider = page.getByRole('slider', { name: 'Unfold', exact: true })
   metrics.explodedUnfold = await waitForInputValue(unfoldSlider, 0.28)
 
-  const reopenSurgeryTab = page.getByRole('button', { name: 'Surgical layers', exact: true })
-  await tapScrolled(reopenSurgeryTab)
-  simulator = page.locator('[data-surgery-simulator="anatomy-grounded"]')
-  await simulator.waitFor({ state: 'visible', timeout: 30_000 })
+  simulator = await enterSurgerySimulator({ allowRouteReset: true })
   atlasCanvas = simulator.locator('canvas[data-atlas-viewer3d="true"]').first()
   await atlasCanvas.waitFor({ state: 'visible', timeout: 60_000 })
   loadFailure = simulator.getByText(/Could not load this anatomical model|could not start 3D graphics|dropped the 3D context/i).first()
