@@ -3,6 +3,8 @@
 // (no PNC credits, no API latency) and is fully explainable. Compares recent
 // snapshots against slightly older ones to catch meaningful trend shifts.
 
+import { buildPersonalBaseline, type HealthBaselineMetric } from './healthProfileBaseline'
+
 export interface HistorySnapshot {
   date: string
   vo2max?: number; restingHr?: number; hrvMs?: number; recoveryPct?: number; sleepH?: number
@@ -18,6 +20,26 @@ export interface Insight {
 function avg(nums: number[]): number | null {
   const v = nums.filter((n) => typeof n === 'number' && n > 0)
   return v.length ? v.reduce((a, b) => a + b, 0) / v.length : null
+}
+
+const BASELINE_META: Array<{ metric: HealthBaselineMetric; label: string; unit: string }> = [
+  { metric: 'restingHr', label: 'Resting HR', unit: 'bpm' },
+  { metric: 'hrvMs', label: 'HRV', unit: 'ms' },
+  { metric: 'sleepH', label: 'Sleep', unit: 'h' },
+]
+
+function baselineInsights(history: HistorySnapshot[]): Insight[] {
+  return BASELINE_META.flatMap(({ metric, label, unit }) => {
+    const baseline = buildPersonalBaseline(history, metric)
+    if (!baseline) return []
+    return [{
+      id: `personal-baseline-${metric}`,
+      tone: 'neutral' as const,
+      icon: '🎯',
+      title: `Personal baseline · ${label}`,
+      body: `${baseline.count} recorded days: median ${baseline.median.toFixed(1)} ${unit}; observed middle 50% ${baseline.q1.toFixed(1)}–${baseline.q3.toFixed(1)} ${unit}. Descriptive of your own saved history only — not a population normal range, diagnosis, or treatment threshold.`,
+    }]
+  })
 }
 
 // Split history into "recent" (last `n`) vs "prior" (the `n` before that) for
@@ -36,6 +58,8 @@ export function generateInsights(history: HistorySnapshot[]): Insight[] {
       body: 'Save your Health Data at least a few times (ideally every morning) so Panaceamed can detect trends and give automatic recommendations.',
     }]
   }
+
+  out.push(...baselineInsights(history))
 
   const { recent, prior } = splitWindows(history, 3)
   const recentHrv = avg(recent.map((s) => s.hrvMs ?? 0))
