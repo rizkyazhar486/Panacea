@@ -109,7 +109,12 @@ try {
   const viewer = page.locator('div.h-full.w-full.touch-none').first()
   canvas = viewer.locator('> canvas').first()
   await canvas.waitFor({ state: 'visible', timeout: 45_000 })
-  await canvas.scrollIntoViewIfNeeded()
+  // Do not use Playwright scrollIntoViewIfNeeded here: an actively rendering
+  // WebGL canvas can remain visually unstable and keep Playwright's actionability
+  // check waiting even though the canvas is already visible. Native scrolling is
+  // deterministic; the strict center hit-test below still proves real visibility.
+  await canvas.evaluate((node) => node.scrollIntoView({ block: 'center', inline: 'nearest', behavior: 'auto' }))
+  await page.waitForTimeout(150)
 
   const initialLoading = page.getByText('Loading anatomy…').first()
   const progressiveLoading = page.getByText('Adding anatomy layer…').first()
