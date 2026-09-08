@@ -6,6 +6,7 @@ import {
   resolveAllAnatomySourceNodes,
   subscribeAnatomySourceNodes,
 } from '../../lib/anatomySourceNodeRegistry'
+import { BODY_ATLAS_GRAPH } from '../../lib/bodyAtlasGraph'
 import type { AtlasLayerKey } from '../../lib/wholeBodyAtlasBlueprint'
 
 interface Props {
@@ -35,6 +36,7 @@ type Result = {
 
 export function ZAnatomySourceMeshBrowser({ onHighlight, onFocusRegion, onEnableLayer }: Props) {
   const [query, setQuery] = useState('')
+  const [selectedResult, setSelectedResult] = useState<Result | null>(null)
   const sourceBundles = useSyncExternalStore(
     subscribeAnatomySourceNodes,
     getEffectiveAnatomySourceNodeSnapshot,
@@ -56,10 +58,47 @@ export function ZAnatomySourceMeshBrowser({ onHighlight, onFocusRegion, onEnable
       .slice(0, MAX_RESULTS)
   }, [normalizedQuery, sourceBundles])
 
+  const selectedGraphNode = useMemo(() => {
+    if (!selectedResult) return null
+    return BODY_ATLAS_GRAPH.nodes.find((node) =>
+      node.sourceFile === selectedResult.file && node.sourceName === selectedResult.name,
+    ) ?? null
+  }, [selectedResult])
+
+  const structuralPeers = useMemo(() => {
+    if (!selectedGraphNode) return []
+    const peers = new Map<string, { kind: 'contralateral' | 'same-structure'; file: string; name: string; layer?: AtlasLayerKey }>()
+    for (const edge of BODY_ATLAS_GRAPH.edges) {
+      const peerId = edge.source === selectedGraphNode.id
+        ? edge.target
+        : edge.target === selectedGraphNode.id
+          ? edge.source
+          : null
+      if (!peerId) continue
+      const node = BODY_ATLAS_GRAPH.nodeById.get(peerId)
+      if (!node) continue
+      peers.set(`${edge.kind}:${node.id}`, {
+        kind: edge.kind,
+        file: node.sourceFile,
+        name: node.sourceName,
+        layer: LAYER_BY_FILE[node.sourceFile],
+      })
+    }
+    return [...peers.values()].sort((a, b) => a.kind.localeCompare(b.kind) || a.name.localeCompare(b.name))
+  }, [selectedGraphNode])
+
   function inspect(result: Result) {
+    setSelectedResult(result)
     if (result.layer) onEnableLayer?.(result.layer)
     onHighlight?.([result.name])
     onFocusRegion?.([result.name])
+  }
+
+  function inspectPeer(peer: { file: string; name: string; layer?: AtlasLayerKey }) {
+    setSelectedResult({ file: peer.file, name: peer.name, layer: peer.layer })
+    if (peer.layer) onEnableLayer?.(peer.layer)
+    onHighlight?.([peer.name])
+    onFocusRegion?.([peer.name])
   }
 
   return (
@@ -108,8 +147,9 @@ export function ZAnatomySourceMeshBrowser({ onHighlight, onFocusRegion, onEnable
               <div className="mt-2 grid gap-2 sm:grid-cols-2 xl:grid-cols-3">
                 {results.map((result) => {
                   const origin = anatomySourceNodeOrigin(result.file)
+                  const selected = selectedResult?.file === result.file && selectedResult?.name === result.name
                   return (
-                    <button key={`${result.file}:${result.name}`} type="button" onClick={() => inspect(result)} className="min-h-14 rounded-xl border border-neutral-200 bg-white p-2.5 text-left transition hover:-translate-y-0.5 hover:border-brand/40 dark:border-white/10 dark:bg-neutral-950">
+                    <button key={`${result.file}:${result.name}`} type="button" aria-pressed={selected} onClick={() => inspect(result)} className={`min-h-14 rounded-xl border bg-white p-2.5 text-left transition hover:-translate-y-0.5 dark:bg-neutral-950 ${selected ? 'border-brand ring-1 ring-brand/20' : 'border-neutral-200 hover:border-brand/40 dark:border-white/10'}`}>
                       <div className="break-words font-mono text-[10px] font-bold text-ink dark:text-white">{result.name}</div>
                       <div className="mt-1 flex flex-wrap gap-1.5 text-[8px] font-bold text-neutral-400">
                         <span>{result.file}</span>
@@ -125,6 +165,43 @@ export function ZAnatomySourceMeshBrowser({ onHighlight, onFocusRegion, onEnable
                 No conservative source-name match. Short terms match exact tokens; reviewed stems of five or more characters may match token prefixes. This result is not evidence that an anatomical structure is absent.
               </div>
             )}
+          </div>
+        )}
+
+        {selectedResult && (
+          <div className="mt-4 rounded-2xl border border-neutral-200 bg-white p-3 dark:border-white/10 dark:bg-neutral-950">
+            <div className="flex flex-wrap items-start justify-between gap-2">
+              <div>
+                <div className="text-[9px] font-black uppercase tracking-[0.16em] text-brand">Explicit atlas graph</div>
+                <div className="mt-0.5 text-sm font-black text-ink dark:text-white">Structural peers</div>
+                <div className="mt-1 break-words font-mono text-[9px] text-neutral-500">{selectedResult.name}</div>
+              </div>
+              <div className="rounded-full border border-neutral-200 px-2 py-1 text-[8px] font-bold text-neutral-500 dark:border-white/10">
+                {structuralPeers.length} explicit link{structuralPeers.length === 1 ? '' : 's'}
+              </div>
+            </div>
+
+            {structuralPeers.length ? (
+              <div className="mt-3 grid gap-2 sm:grid-cols-2">
+                {structuralPeers.map((peer) => (
+                  <button key={`${peer.kind}:${peer.file}:${peer.name}`} type="button" onClick={() => inspectPeer(peer)} className="min-h-12 rounded-xl border border-neutral-200 p-2.5 text-left transition hover:border-brand/40 dark:border-white/10">
+                    <div className="flex items-center justify-between gap-2">
+                      <span className="break-words font-mono text-[9px] font-bold text-ink dark:text-white">{peer.name}</span>
+                      <span className="shrink-0 rounded-full bg-neutral-100 px-2 py-0.5 text-[8px] font-black text-neutral-500 dark:bg-white/10">{peer.kind === 'contralateral' ? 'contralateral' : 'same structure'}</span>
+                    </div>
+                    <div className="mt-1 text-[8px] font-bold text-neutral-400">{peer.file}{peer.layer ? ` · ${peer.layer}` : ''}</div>
+                  </button>
+                ))}
+              </div>
+            ) : (
+              <div className="mt-3 rounded-xl border border-dashed border-neutral-200 p-3 text-[10px] leading-relaxed text-neutral-500 dark:border-white/10">
+                No explicit contralateral or same-structure peer is recorded for this exact source node.
+              </div>
+            )}
+
+            <p className="mt-3 text-[9px] leading-relaxed text-neutral-500">
+              These links mean only contralateral pairing or repeated instances of the same named structure in the generated atlas graph. They are not anatomical adjacency, innervation, vascular territory, surgical safety, or biomechanical coupling.
+            </p>
           </div>
         )}
       </div>
