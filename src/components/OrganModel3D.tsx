@@ -14,13 +14,15 @@ interface Props {
   /** Hotspot id atau exact named mesh yang sedang dipilih. */
   selected?: string | null
   onSelect?: (hotspotIdOrMeshName: string | null) => void
+  /** Reports only names that really exist as distinct meshes in the loaded GLB. */
+  onPartsLoaded?: (names: string[]) => void
 }
 
 function displayMeshName(name: string): string {
   return name.replace(/_/g, ' ').replace(/\s+/g, ' ').trim()
 }
 
-export function OrganModel3D({ organ, selected, onSelect }: Props) {
+export function OrganModel3D({ organ, selected, onSelect, onPartsLoaded }: Props) {
   const containerRef = useRef<HTMLDivElement>(null)
   const [loading, setLoading] = useState(true)
   const [pct, setPct] = useState(0)
@@ -35,6 +37,8 @@ export function OrganModel3D({ organ, selected, onSelect }: Props) {
   const [layar, setLayar] = useState<Record<string, { x: number; y: number; depan: boolean }>>({})
   const onSelectRef = useRef(onSelect)
   onSelectRef.current = onSelect
+  const onPartsLoadedRef = useRef(onPartsLoaded)
+  onPartsLoadedRef.current = onPartsLoaded
   const selectedRef = useRef(selected)
   selectedRef.current = selected
 
@@ -48,6 +52,7 @@ export function OrganModel3D({ organ, selected, onSelect }: Props) {
     setPickedMesh(null)
     setPartNames([])
     setShowAllParts(false)
+    onPartsLoadedRef.current?.([])
 
     const scene = new THREE.Scene()
     const camera = new THREE.PerspectiveCamera(38, 1, 0.01, 100)
@@ -153,7 +158,9 @@ export function OrganModel3D({ organ, selected, onSelect }: Props) {
             originalEmissive.set(mesh, material.emissive.clone())
             names.push(exactName)
           })
-          setPartNames([...new Set(names)].sort((a, b) => a.localeCompare(b)))
+          const uniqueNames = [...new Set(names)].sort((a, b) => a.localeCompare(b))
+          setPartNames(uniqueNames)
+          onPartsLoadedRef.current?.(uniqueNames)
         }
 
         // Model dinormalkan ke ukuran & titik pusat yang sama, karena berkas
@@ -173,7 +180,11 @@ export function OrganModel3D({ organ, selected, onSelect }: Props) {
         setLoading(false)
       },
       (ev) => { if (ev.total > 0) setPct(ev.loaded / ev.total) },
-      () => { setFatal('Could not load this organ model.'); setLoading(false) },
+      () => {
+        onPartsLoadedRef.current?.([])
+        setFatal('Could not load this organ model.')
+        setLoading(false)
+      },
     )
 
     let inViewport = true
