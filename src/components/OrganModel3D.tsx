@@ -3,6 +3,7 @@ import * as THREE from 'three'
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
 import { folderModel, type OrganModel } from '../lib/organModels'
+import { anatomyCoverageForOrgan, anatomyScopeForOrgan } from '../lib/organAnatomyRequirements'
 
 // Penampil satu organ dari dekat. Model BodyParts3D membawa mesh anatomi
 // bernama dan karena itu boleh di-ray-pick tepat. Model AI tetap hanya memakai
@@ -319,6 +320,9 @@ export function OrganModel3D({ organ, selected, onSelect, onPartsLoaded }: Props
 
   const visibleParts = showAllParts ? partNames : partNames.slice(0, 12)
   const selectedName = selected ? (organ.hotspots.find((h) => h.id === selected)?.ta ?? selected) : ''
+  const anatomyScope = organ.focusKey ? anatomyScopeForOrgan(organ.focusKey) : undefined
+  const anatomyCoverage = organ.focusKey ? anatomyCoverageForOrgan(organ.focusKey, partNames) : undefined
+  const matchedRequirementIds = new Set(anatomyCoverage?.matched.map((item) => item.id) ?? [])
 
   return (
     <div className="space-y-2">
@@ -410,6 +414,49 @@ export function OrganModel3D({ organ, selected, onSelect, onPartsLoaded }: Props
           <p className="mt-2 text-[9.5px] leading-relaxed text-neutral-400">
             These labels come from the named meshes stored in the reference GLB. Missing microscopic or segmental
             structures are not fabricated.
+          </p>
+        </div>
+      )}
+
+      {anatomyScope && anatomyCoverage && (
+        <div
+          data-anatomy-completeness={organ.focusKey ?? organ.id}
+          className="rounded-xl border border-neutral-200 p-2.5 dark:border-white/10"
+        >
+          <div className="flex items-start justify-between gap-2">
+            <div className="min-w-0">
+              <div className="text-[11px] font-bold text-ink dark:text-white">Anatomical completeness gate</div>
+              <p className="mt-0.5 text-[10px] leading-relaxed text-neutral-400">
+                {anatomyCoverage.matched.length}/{anatomyCoverage.total} required macro structures are individually represented by exact named 3D source meshes.
+              </p>
+            </div>
+            <span className="shrink-0 rounded-full border border-neutral-200 px-2 py-1 text-[9.5px] font-bold text-neutral-500 dark:border-white/10">
+              {organ.sumber === 'bodyparts3d' ? 'REFERENCE 3D' : 'SHAPE ONLY'}
+            </span>
+          </div>
+          <div className="mt-2 max-h-48 space-y-1 overflow-y-auto pr-0.5">
+            {anatomyScope.requirements.map((requirement) => {
+              const exact = matchedRequirementIds.has(requirement.id)
+              return (
+                <div
+                  key={requirement.id}
+                  className="flex items-center justify-between gap-2 rounded-lg bg-neutral-50 px-2 py-1.5 dark:bg-white/5"
+                >
+                  <span className="min-w-0 text-[10.5px] font-semibold text-neutral-700 dark:text-neutral-200">
+                    {requirement.label}
+                  </span>
+                  <span className={
+                    'shrink-0 rounded-full px-1.5 py-0.5 text-[9px] font-bold ' +
+                    (exact ? 'bg-brand/10 text-brand' : 'bg-neutral-200/70 text-neutral-500 dark:bg-white/10')
+                  }>
+                    {exact ? 'Exact 3D' : 'Source gap'}
+                  </span>
+                </div>
+              )
+            })}
+          </div>
+          <p className="mt-2 text-[9.5px] leading-relaxed text-neutral-400">
+            “Source gap” means this close-up does not contain that structure as its own named geometry; it does not mean the structure is absent from the human body. Panacea does not generate a fake mesh to fill the gap. Scope terminology follows standard gross anatomy / FIPAT Terminologia Anatomica concepts; BodyParts3D reference objects map to FMA concepts.
           </p>
         </div>
       )}
