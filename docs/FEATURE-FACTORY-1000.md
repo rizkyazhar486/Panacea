@@ -15,7 +15,9 @@ A candidate is a tracked implementation unit, not a promise that every combinati
 
 ## Source-first architecture
 
-Every domain references existing Source Registry IDs. The factory resolves those IDs from `data/source-registry` before ranking work. External APIs, datasets, models and repositories continue to follow the Source Registry flow:
+Every domain references existing Source Registry records. The roadmap may use the registry filename as a stable alias (for example `healthkit`), while the record retains its authoritative canonical ID (for example `apple_healthkit`). The factory resolves both forms without mutating the registry.
+
+External APIs, datasets, models and repositories continue to follow the Source Registry flow:
 
 `source -> license/provenance gate -> adapter -> normalized Panacea schema -> engine -> UI`
 
@@ -23,16 +25,16 @@ Do not bypass that path by calling third-party medical APIs directly from a Reac
 
 ## Automatic promotion policy
 
-Automatic eligibility is deliberately conservative.
+Automatic eligibility is deliberately conservative. Source lists are candidate sources, not permission to use every listed source.
 
 A candidate can be `autoEligible` only when:
 
 1. domain risk is no higher than `medium`;
-2. every referenced Source Registry entry exists;
-3. every referenced source has a verified license gate for the intended registry contract;
+2. every referenced Source Registry record resolves;
+3. at least one referenced source is currently operational for bounded use because it already has an `ACTIVE` Panacea adapter or a `VERIFIED` license gate;
 4. the candidate is not classified as the heaviest performance tier.
 
-`high` candidates require scientific review. `clinical` candidates require explicit clinical validation. Very heavy visualization/asset work requires performance review. These gates must never be weakened merely to make CI pass.
+Only the operational source subset may be used by an automatic implementation. Other listed sources remain explicitly tagged `source-review` until their registry gate is resolved. `high` candidates require scientific review. `clinical` candidates require explicit clinical validation. Very heavy visualization/asset work requires performance review. These gates must never be weakened merely to make CI pass.
 
 ## Priority formula
 
@@ -55,7 +57,7 @@ denominator = 1
 priority = clamp(0, 100, round(100 × benefit / denominator))
 ```
 
-This is an engineering prioritization score, not a clinical confidence score.
+`sourceReadiness` is the fraction of candidate sources that already have an active adapter or verified license gate. This is an engineering prioritization score, not a clinical confidence score.
 
 ## Runtime stability rules
 
