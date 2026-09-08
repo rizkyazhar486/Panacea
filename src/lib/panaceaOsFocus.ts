@@ -50,6 +50,10 @@ function compareItems(a: PanaceaOsItem, b: PanaceaOsItem): number {
   return a.createdAt.localeCompare(b.createdAt) || a.id.localeCompare(b.id)
 }
 
+export function sortPanaceaOsItems(items: PanaceaOsItem[]): PanaceaOsItem[] {
+  return items.slice().sort(compareItems)
+}
+
 export function classifyTiming(item: PanaceaOsItem, nowMinutes: number): Omit<PanaceaOsFocusSlot, 'slot' | 'item'> {
   const scheduled = parseClockMinutes(item.time)
   if (scheduled === null) return { timing: 'open' }
@@ -68,7 +72,7 @@ export function classifyTiming(item: PanaceaOsItem, nowMinutes: number): Omit<Pa
  * stated clock time, then creation order, and exposes the first three.
  */
 export function resolvePanaceaOsFocus(items: PanaceaOsItem[], nowMinutes: number): PanaceaOsFocusSlot[] {
-  const pending = items.filter((item) => !item.completedAt).slice().sort(compareItems)
+  const pending = sortPanaceaOsItems(items.filter((item) => !item.completedAt))
   return pending.slice(0, 3).map((item, index) => ({
     slot: SLOT_NAMES[index],
     item,
@@ -100,7 +104,7 @@ export function readPanaceaOsItems(raw: string | null, date: string): PanaceaOsI
   try {
     const parsed: unknown = JSON.parse(raw)
     if (!Array.isArray(parsed)) return []
-    return parsed.filter(isPanaceaOsItem).filter((item) => item.date === date).sort(compareItems)
+    return sortPanaceaOsItems(parsed.filter(isPanaceaOsItem).filter((item) => item.date === date))
   } catch {
     return []
   }
