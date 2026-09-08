@@ -10,6 +10,7 @@ import {
 } from '../../lib/wholeBodyAtlasBlueprint'
 import { calculateExternalLoad } from '../../lib/biomechanicsModel'
 import BreathAtlasLab from './BreathAtlasLab'
+import HolisticHealthcareAtlas from './HolisticHealthcareAtlas'
 import WholeBodyMotionInspector from './WholeBodyMotionInspector'
 import ZAnatomyAtlasWorkbench from './ZAnatomyAtlasWorkbench'
 
@@ -23,7 +24,7 @@ interface Props {
   onOpenMovement?: () => void
 }
 
-type Mode = 'z-anatomy' | 'breath-atlas' | 'unfolded' | 'specialty' | 'movement'
+type Mode = 'holistic' | 'z-anatomy' | 'breath-atlas' | 'unfolded' | 'specialty' | 'movement'
 
 const PROVENANCE_LABEL: Record<GeometryProvenance, string> = {
   'native-geometry': 'Native geometry',
@@ -87,7 +88,7 @@ function MovementDiagram({ chain }: { chain: string[] }) {
 }
 
 export function WholeBodyPrecisionLab({ onHighlight, onFocusRegion, onEnableLayer, onSetUnfold, onSetDissectionDepth, onOpenSurgical, onOpenMovement }: Props) {
-  const [mode, setMode] = useState<Mode>('z-anatomy')
+  const [mode, setMode] = useState<Mode>('holistic')
   const [regionKey, setRegionKey] = useState<AtlasRegionKey>('thorax')
   const [specialtyId, setSpecialtyId] = useState(SPECIALTY_ATLAS_MODULES[0].id)
   const [movementId, setMovementId] = useState(MOVEMENT_PRIMITIVES[0].id)
@@ -133,8 +134,8 @@ export function WholeBodyPrecisionLab({ onHighlight, onFocusRegion, onEnableLaye
     <div className="space-y-4">
       <div className="overflow-hidden rounded-3xl border border-neutral-200 bg-gradient-to-br from-neutral-950 via-neutral-900 to-black p-4 text-white dark:border-white/10">
         <div className="text-[10px] font-bold uppercase tracking-[0.2em] text-brand">Panacea · Whole-body precision atlas</div>
-        <h3 className="mt-1 text-xl font-black">Explode the body. Inspect every layer. Connect anatomy to surgery and movement.</h3>
-        <p className="mt-2 max-w-3xl text-[11px] leading-relaxed text-neutral-400">Use one shared anatomy viewer to move from whole-body orientation into represented regions, layers, surgical teaching and movement biomechanics while preserving geometry provenance.</p>
+        <h3 className="mt-1 text-xl font-black">One body. Anatomy, breathing, physiology, measurement, movement and care context.</h3>
+        <p className="mt-2 max-w-3xl text-[11px] leading-relaxed text-neutral-400">Use one shared anatomy viewer to move from whole-body orientation into represented regions, respiratory teaching, layers, surgical education and movement biomechanics while preserving evidence and geometry provenance.</p>
         <div className="mt-3 grid gap-2 md:grid-cols-3">
           <div className="rounded-xl border border-white/10 bg-white/5 p-3"><div className="text-[9px] font-bold uppercase tracking-wide text-brand">Visual target</div><p className="mt-1 text-[10px] leading-relaxed text-neutral-300">{ATLAS_REFERENCE_MODEL.visualTarget}</p></div>
           <div className="rounded-xl border border-white/10 bg-white/5 p-3"><div className="text-[9px] font-bold uppercase tracking-wide text-brand">Interaction target</div><p className="mt-1 text-[10px] leading-relaxed text-neutral-300">{ATLAS_REFERENCE_MODEL.interactionTarget}</p></div>
@@ -142,11 +143,21 @@ export function WholeBodyPrecisionLab({ onHighlight, onFocusRegion, onEnableLaye
         </div>
       </div>
 
-      <div className="grid grid-cols-2 gap-1 rounded-xl bg-neutral-100 p-1 dark:bg-white/5 md:grid-cols-5">
-        {([['z-anatomy', 'Z-Anatomy atlas'], ['breath-atlas', 'Breath atlas'], ['unfolded', 'Unfolded body'], ['specialty', 'Specialty atlas'], ['movement', 'Movement biomechanics']] as const).map(([key, label]) => (
+      <div className="grid grid-cols-2 gap-1 rounded-xl bg-neutral-100 p-1 dark:bg-white/5 md:grid-cols-6">
+        {([['holistic', 'Holistic healthcare'], ['z-anatomy', 'Z-Anatomy atlas'], ['breath-atlas', 'Breath atlas'], ['unfolded', 'Unfolded body'], ['specialty', 'Specialty atlas'], ['movement', 'Movement biomechanics']] as const).map(([key, label]) => (
           <button key={key} type="button" aria-pressed={mode === key} onClick={() => setMode(key)} className={`rounded-lg px-2 py-2 text-[11px] font-bold transition ${mode === key ? 'bg-white text-ink shadow-sm dark:bg-white/10 dark:text-white' : 'text-neutral-500'}`}>{label}</button>
         ))}
       </div>
+
+      {mode === 'holistic' && (
+        <HolisticHealthcareAtlas
+          onHighlight={onHighlight}
+          onFocusRegion={onFocusRegion}
+          onEnableLayer={onEnableLayer}
+          onOpenZAnatomy={() => setMode('z-anatomy')}
+          onOpenBreathAtlas={() => setMode('breath-atlas')}
+        />
+      )}
 
       {mode === 'z-anatomy' && (
         <ZAnatomyAtlasWorkbench onHighlight={onHighlight} onFocusRegion={onFocusRegion} onEnableLayer={onEnableLayer} />
