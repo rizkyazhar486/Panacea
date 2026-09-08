@@ -5,7 +5,9 @@ export interface DrugAnatomyCrosswalk {
   drugId: string
   desiredEffectOrganKeys: string[]
   adverseEffectOrganKeys: string[]
-  status: 'verified-curated' | 'unmapped'
+  status: 'curated-reference' | 'unmapped'
+  evidenceStatus: 'reference-only' | 'unmapped'
+  publishableAsEvidence: false
   provenance: string
 }
 
@@ -18,8 +20,13 @@ function validKeys(keys: string[]): string[] {
 
 /**
  * Resolve anatomy only from the repository's curated pharmacology table.
+ *
+ * This crosswalk is a navigation/reference aid, not publication evidence.
  * Free text, label mechanism text, diagnosis names, and AI output are never
- * converted into anatomy targets here. Unknown IDs fail closed as `unmapped`.
+ * converted into anatomy targets here. A drug/adverse-effect overlay can only
+ * become evidence-publishable through the separate BodyEvidenceMapping gate
+ * with pinned source identity/version/locator and the required review metadata.
+ * Unknown IDs fail closed as `unmapped`.
  */
 export function anatomyForCuratedDrugId(rawId: string): DrugAnatomyCrosswalk {
   const id = rawId.trim().toLocaleLowerCase('en-US')
@@ -30,7 +37,9 @@ export function anatomyForCuratedDrugId(rawId: string): DrugAnatomyCrosswalk {
       desiredEffectOrganKeys: [],
       adverseEffectOrganKeys: [],
       status: 'unmapped',
-      provenance: 'No curated Panacea drug-target anatomy mapping is recorded for this drug ID.',
+      evidenceStatus: 'unmapped',
+      publishableAsEvidence: false,
+      provenance: 'No curated Panacea drug-target anatomy reference is recorded for this drug ID.',
     }
   }
 
@@ -42,7 +51,9 @@ export function anatomyForCuratedDrugId(rawId: string): DrugAnatomyCrosswalk {
       desiredEffectOrganKeys: [],
       adverseEffectOrganKeys: [],
       status: 'unmapped',
-      provenance: 'Curated mapping references an anatomy focus key that is not available in the current Z-Anatomy focus registry.',
+      evidenceStatus: 'unmapped',
+      publishableAsEvidence: false,
+      provenance: 'Curated reference mapping contains an anatomy focus key that is not available in the current Z-Anatomy focus registry.',
     }
   }
 
@@ -50,7 +61,9 @@ export function anatomyForCuratedDrugId(rawId: string): DrugAnatomyCrosswalk {
     drugId: id,
     desiredEffectOrganKeys: desired,
     adverseEffectOrganKeys: adverse,
-    status: 'verified-curated',
-    provenance: 'Panacea DRUG_TARGETS → ORGAN_FOCUS curated crosswalk; anatomy focus keys resolve to the repository Z-Anatomy layer/keyword registry.',
+    status: 'curated-reference',
+    evidenceStatus: 'reference-only',
+    publishableAsEvidence: false,
+    provenance: 'Panacea DRUG_TARGETS → ORGAN_FOCUS internal curated reference only; this is not source/version/citation-bearing evidence and must not be presented as verified drug localization.',
   }
 }
