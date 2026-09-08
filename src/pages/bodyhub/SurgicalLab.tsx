@@ -86,7 +86,7 @@ export function SurgicalLab({ onKedalaman, onSorot }: SurgicalLabProps) {
           <div className="text-[10px] font-black uppercase tracking-[0.18em] text-brand">Spatial surgical anatomy</div>
           <h4 className="mt-1 text-lg font-black">Landmark → neighbor → structure at risk</h4>
           <p className="mt-1 max-w-3xl text-[10px] leading-relaxed text-neutral-400">
-            Procedure-specific spatial relationships grounded to named anatomy. Only exact whole-body mesh names can be highlighted; missing or specialty-only anatomy stays text/reference-only instead of being fabricated.
+            Procedure-specific spatial relationships grounded to named anatomy. Only exact whole-body mesh names can be highlighted; missing anatomy stays text-only instead of being fabricated, and specialty-only anatomy remains in its own validated reference frame.
           </p>
         </div>
 
