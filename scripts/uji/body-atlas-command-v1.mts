@@ -3,6 +3,7 @@ import { readFileSync } from 'node:fs'
 
 const runtime = readFileSync('public/body-atlas-command-v1.js', 'utf8')
 const benchmark = readFileSync('docs/body-atlas-command-benchmarks-20260909.md', 'utf8')
+const index = readFileSync('index.html', 'utf8')
 
 for (const required of [
   'https://github.com/thebuggeddev/anatomy',
@@ -21,6 +22,7 @@ for (const command of [
   'Study',
 ]) assert.ok(runtime.includes(command), `Atlas Command entry missing: ${command}`)
 
+assert.match(index, /body-atlas-command-v1\.js\?v=20260909-1/, 'Atlas Command runtime must be registered in the application shell')
 assert.match(runtime, /activatePanel\('Physiology'\)/, 'Breath Atlas must hand off to the existing physiology-reference workspace')
 assert.match(runtime, /does not measure a patient, infer disease, or deform source anatomy/, 'Breath Atlas must keep the explicit reference-only boundary')
 assert.match(runtime, /not AGI, diagnosis, or autonomous clinical decision-making/, 'command-center branding must not misrepresent capability')
