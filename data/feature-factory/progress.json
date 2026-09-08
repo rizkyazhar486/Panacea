@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-09-08T06:28:00.000Z",
+  "updatedAt": "2026-09-08T06:40:00.000Z",
   "items": {
     "ff-medical-education-accessibility": {
       "status": "done",
@@ -11,6 +11,16 @@
       ],
       "note": "Knowledge Bridge now exposes explicit keyboard/screen-reader semantics: named search input, explanation-depth radio group, topic selection state, live status, causal-stage list semantics, and visible focus rings. No dependency or external API path was added.",
       "updatedAt": "2026-09-08T02:23:00.000Z"
+    },
+    "ff-medical-education-baseline": {
+      "status": "done",
+      "commit": "49845b6dc02b692899eefad187717f645303d1a7",
+      "paths": [
+        "src/lib/knowledgeBridgeStudyBaseline.ts",
+        "scripts/uji/knowledge-bridge-study-baseline.mts"
+      ],
+      "note": "Added a pure descriptive learning baseline for explicit 1–5 user self-ratings: requires at least three valid observations, retains only the latest 12 per non-empty topic, preserves timestamp/unit/user-self-rating provenance, exposes median and IQR-style reference bounds, and remains explicitly descriptive-learning-only. Invalid scores, timestamps and blank topic identities fail closed. No UI import, dependency, network, polling, storage, asset, patient data, diagnosis or treatment inference was added.",
+      "updatedAt": "2026-09-08T06:40:00.000Z"
     },
     "ff-medical-education-checklist": {
       "status": "done",
