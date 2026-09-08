@@ -95,90 +95,6 @@ async function assertNoFatal(label) {
   }
 }
 
-async function clickNativeHitTarget(locator, label) {
-  await locator.waitFor({ state: 'visible', timeout: 10_000 })
-  let lastHit = null
-
-  for (let attempt = 0; attempt < 8; attempt += 1) {
-    const hit = await locator.evaluate((node) => {
-      const rect = node.getBoundingClientRect()
-      const x = rect.left + rect.width / 2
-      const y = rect.top + rect.height / 2
-      const visualLeft = window.visualViewport?.offsetLeft ?? 0
-      const visualTop = window.visualViewport?.offsetTop ?? 0
-      const visualWidth = window.visualViewport?.width ?? window.innerWidth
-      const visualHeight = window.visualViewport?.height ?? window.innerHeight
-      const target = document.elementFromPoint(x, y)
-      return {
-        x,
-        y,
-        width: rect.width,
-        height: rect.height,
-        visualLeft,
-        visualTop,
-        visualWidth,
-        visualHeight,
-        inViewport: rect.width > 0
-          && rect.height > 0
-          && x >= visualLeft
-          && x <= visualLeft + visualWidth
-          && y >= visualTop
-          && y <= visualTop + visualHeight,
-        ownsHitTarget: target === node || node.contains(target),
-        hitTag: target?.tagName ?? null,
-        hitText: target?.textContent?.trim().slice(0, 80) ?? null,
-        pageScrollY: window.scrollY,
-      }
-    })
-    lastHit = hit
-
-    if (hit.inViewport && hit.ownsHitTarget) {
-      await page.mouse.click(hit.x, hit.y, { delay: 20 })
-      return
-    }
-
-    await locator.evaluate((node) => {
-      const visualTop = window.visualViewport?.offsetTop ?? 0
-      const visualHeight = window.visualViewport?.height ?? window.innerHeight
-      const desiredViewportY = visualTop + visualHeight / 2
-
-      // A mobile Body Explorer panel can be nested inside one or more independently
-      // scrolling containers. Window-only scrolling can therefore reach its maximum
-      // while the real button remains below the visual viewport. Centre the target in
-      // every scroll-capable ancestor, nearest first, without bypassing hit testing.
-      let ancestor = node.parentElement
-      while (ancestor && ancestor !== document.body && ancestor !== document.documentElement) {
-        const maxScrollTop = Math.max(0, ancestor.scrollHeight - ancestor.clientHeight)
-        if (maxScrollTop > 1) {
-          const nodeRect = node.getBoundingClientRect()
-          const ancestorRect = ancestor.getBoundingClientRect()
-          const targetCenter = nodeRect.top + nodeRect.height / 2
-          const ancestorCenter = ancestorRect.top + ancestorRect.height / 2
-          const delta = targetCenter - ancestorCenter
-          if (Math.abs(delta) > 2) {
-            ancestor.scrollTop = Math.max(0, Math.min(maxScrollTop, ancestor.scrollTop + delta))
-          }
-        }
-        ancestor = ancestor.parentElement
-      }
-
-      node.scrollIntoView({ block: 'center', inline: 'center', behavior: 'auto' })
-      const rect = node.getBoundingClientRect()
-      const centerY = rect.top + rect.height / 2
-      const deltaY = centerY - desiredViewportY
-      if (Math.abs(deltaY) > 2) {
-        const scrollingElement = document.scrollingElement || document.documentElement
-        const maxDocumentScroll = Math.max(0, scrollingElement.scrollHeight - window.innerHeight)
-        const targetY = Math.max(0, Math.min(maxDocumentScroll, window.scrollY + deltaY))
-        window.scrollTo({ top: targetY, left: 0, behavior: 'auto' })
-      }
-    })
-    await page.waitForTimeout(180)
-  }
-
-  throw new Error(`${label} is not a real browser hit target after bounded nested scrolling: ${JSON.stringify(lastHit)}`)
-}
-
 try {
   const response = await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 45_000 })
   if (response && !response.ok()) throw new Error(`Body Explorer returned HTTP ${response.status()}`)
@@ -193,12 +109,7 @@ try {
   const viewer = page.locator('div.h-full.w-full.touch-none').first()
   canvas = viewer.locator('> canvas').first()
   await canvas.waitFor({ state: 'visible', timeout: 45_000 })
-  // Do not use Playwright scrollIntoViewIfNeeded here: an actively rendering
-  // WebGL canvas can remain visually unstable and keep Playwright's actionability
-  // check waiting even though the canvas is already visible. Native scrolling is
-  // deterministic; the strict center hit-test below still proves real visibility.
-  await canvas.evaluate((node) => node.scrollIntoView({ block: 'center', inline: 'nearest', behavior: 'auto' }))
-  await page.waitForTimeout(150)
+  await canvas.scrollIntoViewIfNeeded()
 
   const initialLoading = page.getByText('Loading anatomy…').first()
   const progressiveLoading = page.getByText('Adding anatomy layer…').first()
@@ -249,7 +160,7 @@ try {
   }
 
   const vessels = page.getByRole('button', { name: 'Vessels', exact: true }).first()
-  await clickNativeHitTarget(vessels, 'Vessels')
+  await vessels.click()
   await progressiveLoading.waitFor({ state: 'visible', timeout: 5_000 })
   const progressiveClass = await progressiveLoading.evaluate((node) =>
     node.closest('[role="status"]')?.getAttribute('class') ?? '',
@@ -390,8 +301,7 @@ try {
     throw new Error('Whole-body motion inspector scientific boundary is not visible')
   }
 
-  const shared3dButton = inspector.getByRole('button', { name: /Inspect this motion in shared 3D/i })
-  await clickNativeHitTarget(shared3dButton, 'Inspect this motion in shared 3D')
+  await inspector.getByRole('button', { name: /Inspect this motion in shared 3D/i }).click()
   await page.waitForTimeout(300)
   const postShared3dHealth = await canvasHealth(canvas)
   await assertNoFatal('Shared 3D motion inspection triggered a Body3D fatal state')
