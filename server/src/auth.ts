@@ -2,9 +2,9 @@ import type { Request, Response, NextFunction } from 'express'
 import jwt from 'jsonwebtoken'
 import { OAuth2Client } from 'google-auth-library'
 import { config, features } from './config.js'
-import { upsertUser, getUser, getUserByEmail, type Role, type User } from './store.js'
+import { upsertUser, getUser, getUserByEmail, getSettings, type Role, type User } from './store.js'
 import { sendWelcome } from './email.js'
-import { roleForLogin } from './accessControl.js'
+import { effectiveRoleForRequest, roleForLogin } from './accessControl.js'
 
 const googleClient = new OAuth2Client(config.googleClientId)
 const COOKIE = 'pmd_session'
@@ -49,7 +49,20 @@ export function currentUser(req: Request): User | undefined {
 export function requireAuth(req: Request, res: Response, next: NextFunction) {
   const u = currentUser(req)
   if (!u) return res.status(401).json({ error: 'unauthorized' })
-  ;(req as Request & { user: User }).user = u
+
+  // Professional role selection is onboarding intent until owner approval.
+  // All protected handlers see a downgraded effective role until the server-
+  // owned verification flag is present. The application-submission route is
+  // the sole exception so the requested doctor/verifier role can be reviewed.
+  const allowOnboardingRole = req.method === 'POST' && req.path === '/api/applications'
+  const effectiveRole = effectiveRoleForRequest(
+    u,
+    getSettings(u.id),
+    config.ownerEmail,
+    allowOnboardingRole,
+  )
+  const effectiveUser = effectiveRole === u.role ? u : { ...u, role: effectiveRole }
+  ;(req as Request & { user: User }).user = effectiveUser
   next()
 }
 
