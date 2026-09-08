@@ -57,6 +57,22 @@ function batasiHasil(limit: number): number {
   return Math.min(Math.max(Math.trunc(limit), 1), MAX_RESULTS)
 }
 
+/**
+ * Menerima hanya dua bentuk identifier WHO yang tidak ambigu:
+ * - entity id numerik murni; atau
+ * - URL resmi Foundation entity `https://id.who.int/icd/entity/<digits>`.
+ *
+ * Jangan "membersihkan" string campuran dengan membuang karakter non-angka:
+ * `abc123def` tidak boleh diam-diam berubah menjadi entity 123 karena itu bisa
+ * membuka entitas WHO yang berbeda dari yang sebenarnya dimaksud pemanggil.
+ */
+export function normalisasiIcdEntityId(value: string): string | null {
+  const input = value.trim()
+  if (/^\d+$/.test(input)) return input
+  const cocok = input.match(/^https:\/\/id\.who\.int\/icd\/entity\/(\d+)\/?$/)
+  return cocok?.[1] ?? null
+}
+
 // Token WHO berlaku ~1 jam. Disimpan di memori dan diperbarui lebih awal
 // (60 detik sebelum kedaluwarsa) supaya tidak ada permintaan yang jatuh tepat
 // di detik pergantian.
@@ -199,7 +215,7 @@ interface WhoEntity {
 export async function rincianIcd11(entityId: string): Promise<IcdEntry | null> {
   const token = await whoToken()
   if (!token) return null
-  const id = entityId.replace(/^https?:\/\/id\.who\.int\/icd\/entity\//, '').replace(/[^0-9]/g, '')
+  const id = normalisasiIcdEntityId(entityId)
   if (!id) return null
   const res = await fetch(`${ICD_BASE}/${ICD_RELEASE}/mms/${id}`, {
     headers: whoHeaders(token),
