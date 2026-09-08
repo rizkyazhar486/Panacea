@@ -52,20 +52,35 @@ async function waitForInputValue(locator, expected, tolerance = 0.005, timeout =
   throw new Error(`Timed out waiting for input value ${expected}`)
 }
 async function tapScrolled(locator, container) {
-  // This suite emulates a touch phone. Use native positioning followed by an
-  // actual touchscreen tap so a harmless continuing layout animation cannot
-  // trap Playwright in locator.click()'s "stable" polling. This is not a
-  // forced DOM click: the browser receives a real touch input at the control's
-  // current visible bounds, and the state assertions below still prove that
-  // the intended shared Body3D control changed.
+  // Position the control with native scrolling, then prove that its visible
+  // centre is the browser hit target before sending a real pointer click.
+  // This avoids Playwright locator.click()'s animation-stability loop without
+  // using force:true or DOM .click(). The strict post-action assertions below
+  // still require the shared Body3D render mode / slice state to change.
   await container.evaluate((node) => node.scrollIntoView({ block: 'center', inline: 'nearest' }))
   await locator.evaluate((node) => node.scrollIntoView({ block: 'center', inline: 'nearest' }))
   await page.waitForTimeout(120)
-  const box = await locator.boundingBox()
-  if (!box || box.width <= 0 || box.height <= 0) {
-    throw new Error(`Unable to resolve tappable bounds for ${await locator.innerText().catch(() => 'control')}`)
+  const hit = await locator.evaluate((node) => {
+    const rect = node.getBoundingClientRect()
+    const x = rect.left + rect.width / 2
+    const y = rect.top + rect.height / 2
+    const target = document.elementFromPoint(x, y)
+    return {
+      x,
+      y,
+      width: rect.width,
+      height: rect.height,
+      visible: rect.width > 0 && rect.height > 0 && x >= 0 && x <= innerWidth && y >= 0 && y <= innerHeight,
+      enabled: !(node instanceof HTMLButtonElement) || !node.disabled,
+      hitTarget: target === node || node.contains(target),
+      hitTag: target?.tagName ?? null,
+      hitText: target?.textContent?.trim().slice(0, 80) ?? null,
+    }
+  })
+  if (!hit.visible || !hit.enabled || !hit.hitTarget) {
+    throw new Error(`Preset is not a valid browser hit target: ${JSON.stringify(hit)}`)
   }
-  await page.touchscreen.tap(box.x + box.width / 2, box.y + box.height / 2)
+  await page.mouse.click(hit.x, hit.y, { delay: 20 })
 }
 
 const metrics = {
