@@ -8,6 +8,518 @@ import type { OrganModel } from './organModels'
 
 export const ORGAN_ATLAS: OrganModel[] = [
   {
+    "id": "heart",
+    "focusKey": "heart",
+    "label": "Heart",
+    "scientificName": "Cor",
+    "accent": "#f2a33b",
+    "illustrated": false,
+    "sumber": "bodyparts3d",
+    "jumlahBagian": 22,
+    "hotspots": [
+      {
+        "id": "wall-of-ventricle",
+        "ta": "Wall of ventricle",
+        "position": [
+          0.0703,
+          0.5573,
+          0.0591
+        ],
+        "color": "#f2a33b"
+      },
+      {
+        "id": "wall-of-left-atrium",
+        "ta": "Wall of left atrium",
+        "position": [
+          0.0016,
+          0.6074,
+          -0.1449
+        ],
+        "color": "#ee7c6a"
+      },
+      {
+        "id": "wall-of-right-atrium",
+        "ta": "Wall of right atrium",
+        "position": [
+          -0.201,
+          0.5495,
+          -0.0021
+        ],
+        "color": "#f2a33b"
+      },
+      {
+        "id": "cavity-of-right-ventricle",
+        "ta": "Cavity of right ventricle",
+        "position": [
+          -0.0129,
+          0.5316,
+          0.1201
+        ],
+        "color": "#7fa88a"
+      },
+      {
+        "id": "cavity-of-left-ventricle",
+        "ta": "Cavity of left ventricle",
+        "position": [
+          0.0783,
+          0.5081,
+          -0.0237
+        ],
+        "color": "#d89bc4"
+      },
+      {
+        "id": "right-anterior-cusp-of-pulmonary-valve",
+        "ta": "Right anterior cusp of pulmonary valve",
+        "position": [
+          -0.0219,
+          0.7047,
+          0.1182
+        ],
+        "color": "#c69a5e"
+      },
+      {
+        "id": "cavity-of-right-atrium",
+        "ta": "Cavity of right atrium",
+        "position": [
+          -0.2017,
+          0.5704,
+          -0.0186
+        ],
+        "color": "#c69a5e"
+      },
+      {
+        "id": "left-anterior-cusp-of-pulmonary-valve",
+        "ta": "Left anterior cusp of pulmonary valve",
+        "position": [
+          0.0606,
+          0.682,
+          0.1473
+        ],
+        "color": "#ee7c6a"
+      }
+    ]
+  },
+  {
+    "id": "kidneys",
+    "focusKey": "kidneys",
+    "label": "Kidneys & renal vessels",
+    "scientificName": "Renes",
+    "accent": "#c69a5e",
+    "illustrated": false,
+    "sumber": "bodyparts3d",
+    "jumlahBagian": 40,
+    "hotspots": [
+      {
+        "id": "right-renal-vein",
+        "ta": "Right renal vein",
+        "position": [
+          -0.3224,
+          0.4971,
+          -0.0285
+        ],
+        "color": "#c69a5e"
+      },
+      {
+        "id": "left-renal-vein",
+        "ta": "Left renal vein",
+        "position": [
+          0.4938,
+          0.612,
+          -0.0935
+        ],
+        "color": "#ee7c6a"
+      },
+      {
+        "id": "left-kidney",
+        "ta": "Left kidney",
+        "position": [
+          0.4783,
+          0.6136,
+          -0.0733
+        ],
+        "color": "#6393d8"
+      },
+      {
+        "id": "right-kidney",
+        "ta": "Right kidney",
+        "position": [
+          -0.3246,
+          0.4902,
+          0.0027
+        ],
+        "color": "#7fa88a"
+      },
+      {
+        "id": "anterior-division-of-left-renal-artery",
+        "ta": "Anterior division of left renal artery",
+        "position": [
+          0.5313,
+          0.5955,
+          -0.082
+        ],
+        "color": "#ee7c6a"
+      },
+      {
+        "id": "anterior-division-of-right-renal-artery",
+        "ta": "Anterior division of right renal artery",
+        "position": [
+          -0.3573,
+          0.5032,
+          -0.0223
+        ],
+        "color": "#b86858"
+      },
+      {
+        "id": "right-ureter",
+        "ta": "Right ureter",
+        "position": [
+          -0.2598,
+          0.1279,
+          -0.0204
+        ],
+        "color": "#d89bc4"
+      },
+      {
+        "id": "left-ureter",
+        "ta": "Left ureter",
+        "position": [
+          0.4213,
+          0.266,
+          -0.0597
+        ],
+        "color": "#f2a33b"
+      }
+    ]
+  },
+  {
+    "id": "small-intestine",
+    "focusKey": "small-intestine",
+    "label": "Small intestine",
+    "scientificName": "Intestinum tenue",
+    "accent": "#ee7c6a",
+    "illustrated": false,
+    "sumber": "bodyparts3d",
+    "jumlahBagian": 56,
+    "hotspots": [
+      {
+        "id": "duodenum",
+        "ta": "Duodenum",
+        "position": [
+          -0.2277,
+          0.6454,
+          -0.0939
+        ],
+        "color": "#ee7c6a"
+      },
+      {
+        "id": "distal-part-of-jejunum",
+        "ta": "Distal part of jejunum",
+        "position": [
+          -0.5258,
+          0.225,
+          0.004
+        ],
+        "color": "#ee7c6a"
+      },
+      {
+        "id": "distal-part-of-jejunum",
+        "ta": "Distal part of jejunum",
+        "position": [
+          -0.2122,
+          0.3554,
+          0.1657
+        ],
+        "color": "#d89bc4"
+      },
+      {
+        "id": "proximal-part-of-ileum",
+        "ta": "Proximal part of ileum",
+        "position": [
+          -0.5044,
+          -0.0553,
+          -0.0091
+        ],
+        "color": "#f2a33b"
+      },
+      {
+        "id": "proximal-part-of-jejunum",
+        "ta": "Proximal part of jejunum",
+        "position": [
+          0.3644,
+          0.3228,
+          0.0805
+        ],
+        "color": "#6393d8"
+      },
+      {
+        "id": "middle-part-of-ileum",
+        "ta": "Middle part of ileum",
+        "position": [
+          -0.354,
+          -0.4255,
+          0.0705
+        ],
+        "color": "#b86858"
+      },
+      {
+        "id": "proximal-part-of-jejunum",
+        "ta": "Proximal part of jejunum",
+        "position": [
+          0.1543,
+          0.1585,
+          0.1591
+        ],
+        "color": "#c69a5e"
+      },
+      {
+        "id": "proximal-part-of-ileum",
+        "ta": "Proximal part of ileum",
+        "position": [
+          0.4275,
+          -0.3171,
+          0.0641
+        ],
+        "color": "#ee7c6a"
+      }
+    ]
+  },
+  {
+    "id": "large-intestine",
+    "focusKey": "large-intestine",
+    "label": "Large intestine",
+    "scientificName": "Intestinum crassum",
+    "accent": "#f2a33b",
+    "illustrated": false,
+    "sumber": "bodyparts3d",
+    "jumlahBagian": 4,
+    "hotspots": [
+      {
+        "id": "descending-colon",
+        "ta": "Descending colon",
+        "position": [
+          0.5023,
+          0.1157,
+          0.0183
+        ],
+        "color": "#f2a33b"
+      },
+      {
+        "id": "transverse-colon",
+        "ta": "Transverse colon",
+        "position": [
+          0.0779,
+          0.7488,
+          0.353
+        ],
+        "color": "#d89bc4"
+      },
+      {
+        "id": "ascending-colon",
+        "ta": "Ascending colon",
+        "position": [
+          -0.5732,
+          0.3179,
+          0.0756
+        ],
+        "color": "#ee7c6a"
+      },
+      {
+        "id": "rectum",
+        "ta": "Rectum",
+        "position": [
+          0.0385,
+          -0.6028,
+          -0.4175
+        ],
+        "color": "#6393d8"
+      }
+    ]
+  },
+  {
+    "id": "pancreas",
+    "focusKey": "pancreas",
+    "label": "Pancreas",
+    "scientificName": "Pancreas",
+    "accent": "#ee7c6a",
+    "illustrated": false,
+    "sumber": "bodyparts3d",
+    "jumlahBagian": 16,
+    "hotspots": [
+      {
+        "id": "pancreas",
+        "ta": "Pancreas",
+        "position": [
+          -0.044,
+          0.003,
+          0.0288
+        ],
+        "color": "#ee7c6a"
+      },
+      {
+        "id": "parenchyma-of-pancreas",
+        "ta": "Parenchyma of pancreas",
+        "position": [
+          -0.0363,
+          0.0106,
+          0.0251
+        ],
+        "color": "#6393d8"
+      },
+      {
+        "id": "pancreatic-duct-tree",
+        "ta": "Pancreatic duct tree",
+        "position": [
+          -0.1085,
+          0.0027,
+          0.0466
+        ],
+        "color": "#d89bc4"
+      },
+      {
+        "id": "pancreatic-duct",
+        "ta": "Pancreatic duct",
+        "position": [
+          -0.1534,
+          -0.0053,
+          0.0731
+        ],
+        "color": "#f2a33b"
+      },
+      {
+        "id": "pancreaticoduodenal-vein",
+        "ta": "Pancreaticoduodenal vein",
+        "position": [
+          -0.6002,
+          -0.243,
+          0.2185
+        ],
+        "color": "#d89bc4"
+      },
+      {
+        "id": "dorsal-pancreatic-artery",
+        "ta": "Dorsal pancreatic artery",
+        "position": [
+          -0.0178,
+          0.2275,
+          0.0878
+        ],
+        "color": "#b86858"
+      },
+      {
+        "id": "anterior-superior-pancreaticoduodenal-artery",
+        "ta": "Anterior superior pancreaticoduodenal artery",
+        "position": [
+          -0.6076,
+          0.0305,
+          0.1963
+        ],
+        "color": "#c69a5e"
+      },
+      {
+        "id": "caudal-pancreatic-artery",
+        "ta": "Caudal pancreatic artery",
+        "position": [
+          0.6752,
+          0.3503,
+          -0.3616
+        ],
+        "color": "#7294b9"
+      }
+    ]
+  },
+  {
+    "id": "brain",
+    "focusKey": "brain",
+    "label": "Brain",
+    "scientificName": "Encephalon",
+    "accent": "#7294b9",
+    "illustrated": false,
+    "sumber": "bodyparts3d",
+    "jumlahBagian": 51,
+    "hotspots": [
+      {
+        "id": "corpus-callosum",
+        "ta": "Corpus callosum",
+        "position": [
+          0.005,
+          0.2211,
+          0.0478
+        ],
+        "color": "#7294b9"
+      },
+      {
+        "id": "cerebellum",
+        "ta": "Cerebellum",
+        "position": [
+          -0.1847,
+          -0.4203,
+          -0.4585
+        ],
+        "color": "#f2a33b"
+      },
+      {
+        "id": "cerebellum",
+        "ta": "Cerebellum",
+        "position": [
+          0.1869,
+          -0.4201,
+          -0.4608
+        ],
+        "color": "#6393d8"
+      },
+      {
+        "id": "right-superior-frontal-gyrus",
+        "ta": "Right superior frontal gyrus",
+        "position": [
+          -0.1507,
+          0.5919,
+          0.3575
+        ],
+        "color": "#7fa88a"
+      },
+      {
+        "id": "left-superior-frontal-gyrus",
+        "ta": "Left superior frontal gyrus",
+        "position": [
+          0.1528,
+          0.598,
+          0.3456
+        ],
+        "color": "#d89bc4"
+      },
+      {
+        "id": "right-precentral-gyrus",
+        "ta": "Right precentral gyrus",
+        "position": [
+          -0.3812,
+          0.5664,
+          -0.1447
+        ],
+        "color": "#f2a33b"
+      },
+      {
+        "id": "left-precentral-gyrus",
+        "ta": "Left precentral gyrus",
+        "position": [
+          0.3868,
+          0.5683,
+          -0.1416
+        ],
+        "color": "#ee7c6a"
+      },
+      {
+        "id": "pons",
+        "ta": "Pons",
+        "position": [
+          -0.0818,
+          -0.3645,
+          -0.0503
+        ],
+        "color": "#c69a5e"
+      }
+    ]
+  },
+  {
     "id": "eye",
     "focusKey": "eye",
     "label": "Eye",
