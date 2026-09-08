@@ -3,7 +3,7 @@ const whoClientSecretAsli = process.env.WHO_ICD_CLIENT_SECRET
 process.env.WHO_ICD_CLIENT_ID = ''
 process.env.WHO_ICD_CLIENT_SECRET = ''
 
-const { cariDiagnosis, icd11Configured, icd11Release } = await import('../src/icd11.ts')
+const { cariDiagnosis, icd11Configured, icd11Release, normalisasiIcdEntityId } = await import('../src/icd11.ts')
 
 if (whoClientIdAsli === undefined) delete process.env.WHO_ICD_CLIENT_ID
 else process.env.WHO_ICD_CLIENT_ID = whoClientIdAsli
@@ -18,6 +18,13 @@ function ok(nama: string, syarat: boolean, ket = '') {
 
 ok('fixture memaksa jalur WHO tidak terkonfigurasi', icd11Configured === false)
 ok('release ICD-11 dipin ke 2026-01', icd11Release === '2026-01', icd11Release)
+ok('entity id numerik murni diterima', normalisasiIcdEntityId(' 123456789 ') === '123456789')
+ok('URL Foundation resmi diterima', normalisasiIcdEntityId('https://id.who.int/icd/entity/123456789') === '123456789')
+ok('slash akhir URL resmi diterima', normalisasiIcdEntityId('https://id.who.int/icd/entity/123456789/') === '123456789')
+ok('http ditolak agar provenance URL tidak diturunkan', normalisasiIcdEntityId('http://id.who.int/icd/entity/123456789') === null)
+ok('host mirip WHO ditolak', normalisasiIcdEntityId('https://id.who.int.evil.example/icd/entity/123456789') === null)
+ok('identifier campuran tidak disulap menjadi angka', normalisasiIcdEntityId('abc123456789def') === null)
+ok('URL release MMS bukan Foundation entity id', normalisasiIcdEntityId('https://id.who.int/icd/release/11/2026-01/mms/123456789') === null)
 
 const fetchAsli = globalThis.fetch
 async function denganFetchPalsu(fn: typeof fetch, run: () => Promise<void>) {
@@ -35,7 +42,7 @@ await denganFetchPalsu(async (input, init) => {
   ok('fallback memakai endpoint NLM Clinical Tables HTTPS', url.origin === 'https://clinicaltables.nlm.nih.gov')
   ok('fallback memakai dataset ICD-10-CM v3', url.pathname === '/api/icd10cm/v3/search', url.pathname)
   ok('query dibatasi 160 karakter', terms.length === 160, String(terms.length))
-  ok('operator query berisiko dibersihkan', !/[<>\\":|]/.test(terms), terms)
+  ok('operator query berisiko dibersihkan', !/[<>\\\":|]/.test(terms), terms)
   ok('limit besar dibatasi 50', url.searchParams.get('maxList') === '50', url.searchParams.get('maxList') ?? '')
   ok('request fallback mempunyai AbortSignal timeout', init?.signal instanceof AbortSignal)
 
