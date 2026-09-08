@@ -6,6 +6,7 @@ const screenshotPath = process.env.BODY3D_QA_SCREENSHOT || 'artifacts/body3d-mob
 const motionScreenshotPath = process.env.BODY3D_QA_MOTION_SCREENSHOT || 'artifacts/body3d-mobile-motion-390x844.png'
 const metricsPath = process.env.BODY3D_QA_METRICS || 'artifacts/body3d-mobile-metrics.json'
 const operationTimeoutMs = Number(process.env.BODY3D_QA_OPERATION_TIMEOUT_MS || 20_000)
+const screenshotTimeoutMs = Number(process.env.BODY3D_QA_SCREENSHOT_TIMEOUT_MS || 45_000)
 
 await mkdir('artifacts', { recursive: true })
 
@@ -78,7 +79,7 @@ async function capturePng(clip = null) {
         scale: 1,
       }
     }
-    const shot = await withTimeout(cdp.send('Page.captureScreenshot', options), 'Body3D compositor screenshot')
+    const shot = await withTimeout(cdp.send('Page.captureScreenshot', options), 'Body3D compositor screenshot', screenshotTimeoutMs)
     return Buffer.from(shot.data, 'base64')
   } finally {
     await withTimeout(cdp.detach(), 'Body3D CDP detach', 5_000).catch(() => undefined)
@@ -277,7 +278,7 @@ try {
 
   await inspector.scrollIntoViewIfNeeded()
   await captureMotionViewport()
-  if (!motionScreenshotCaptured) throw new Error('Whole-body motion inspector mobile visual evidence was not captured')
+  if (!motionScreenshotCaptured) throw new Error('Body3D mobile visual evidence was not captured')
 
   if (pageErrors.length) throw new Error(`Browser page errors: ${pageErrors.join(' | ')}`)
 
