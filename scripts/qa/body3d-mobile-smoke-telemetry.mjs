@@ -96,11 +96,26 @@ try {
   await progressive.waitFor({ state: 'visible', timeout: 5_000 })
   const cls = await progressive.evaluate((n) => n.closest('[role="status"]')?.getAttribute('class') || '')
   metrics.progressiveCompact = cls.includes('top-2') && !cls.includes('inset-0')
-  metrics.progressiveCenterClear = await canvas.evaluate((node) => {
-    const r = node.getBoundingClientRect(), hit = document.elementFromPoint(r.left + r.width / 2, r.top + r.height / 2), p = node.parentElement
-    return Boolean(hit && p && (hit === node || hit === p || p.contains(hit)))
+  metrics.progressiveGeometry = await progressive.evaluate((node) => {
+    const status = node.closest('[role="status"]')
+    const canvas = document.querySelector('div.h-full.w-full.touch-none > canvas')
+    if (!status || !canvas) return { statusFound: Boolean(status), canvasFound: Boolean(canvas), coversCenter: true, pointerEvents: null }
+    const sr = status.getBoundingClientRect()
+    const cr = canvas.getBoundingClientRect()
+    const centerX = cr.left + cr.width / 2
+    const centerY = cr.top + cr.height / 2
+    const coversCenter = centerX >= sr.left && centerX <= sr.right && centerY >= sr.top && centerY <= sr.bottom
+    return {
+      statusFound: true,
+      canvasFound: true,
+      coversCenter,
+      pointerEvents: getComputedStyle(status).pointerEvents,
+      canvasCenter: [centerX, centerY],
+      statusRect: [sr.left, sr.top, sr.right, sr.bottom],
+    }
   })
-  if (!metrics.progressiveCompact || !metrics.progressiveCenterClear) throw new Error('progressive loading blocks or covers viewer')
+  metrics.progressiveCenterClear = !metrics.progressiveGeometry.coversCenter && metrics.progressiveGeometry.pointerEvents === 'none'
+  if (!metrics.progressiveCompact || !metrics.progressiveCenterClear) throw new Error(`progressive loading blocks or covers viewer: ${JSON.stringify(metrics.progressiveGeometry)}`)
   await progressive.waitFor({ state: 'hidden', timeout: 120_000 })
 
   const box = await canvas.boundingBox()
