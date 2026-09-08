@@ -1,0 +1,44 @@
+{
+  "id": "thebuggeddev_anatomy_breath_atlas",
+  "name": "thebuggeddev Anatomy / Breath Atlas",
+  "category": "anatomy",
+  "kind": ["viewer", "tooling"],
+  "homepage": "https://breath-atlas.thebuggeddev.chatgpt.site/",
+  "repository": "https://github.com/thebuggeddev/anatomy",
+  "features": [],
+  "formats": ["web-viewer", "threejs-reference"],
+  "usage": {
+    "runtime": false,
+    "buildTime": false,
+    "networkRequired": false,
+    "notes": "Interaction and information-architecture reference only. Panacea does not embed, fetch, copy or redistribute this source's code or assets; the Breath Atlas experience is independently implemented against Panacea-controlled anatomy geometry and source-node registry."
+  },
+  "license": {
+    "status": "CHECK_REQUIRED",
+    "identifier": null,
+    "commercialUse": "UNKNOWN",
+    "attributionRequired": null,
+    "shareAlike": null,
+    "scope": "Repository source-code and asset licensing is not sufficiently explicit for Panacea redistribution or derivative use.",
+    "verificationUrl": "https://github.com/thebuggeddev/anatomy/issues/1",
+    "verifiedAt": "2026-09-09",
+    "notes": "A public repository issue requests licensing clarification. Do not copy source code, artwork or 3D model assets into Panacea unless rights are separately verified."
+  },
+  "validation": {
+    "level": "EDUCATIONAL",
+    "clinicalDecisionUse": "NO",
+    "notes": "Use interaction and information-architecture patterns only. Respiratory anatomy and biomechanics displayed by Panacea remain independently reviewed and mapped to Panacea source geometry."
+  },
+  "provenance": {
+    "authority": "thebuggeddev public Anatomy viewer and Breath Atlas demonstration",
+    "sourceIdentityRequired": true,
+    "versionPinRequired": true,
+    "notes": "Record repository/site identity and access date when used as a design reference. Do not convert reference status into anatomical evidence."
+  },
+  "adapter": {
+    "status": "NOT_APPLICABLE",
+    "normalizedTarget": "PanaceaBodyExposureInteractionReference",
+    "module": null,
+    "notes": "No runtime adapter and no external network dependency; the Panacea implementation is independent."
+  }
+}
