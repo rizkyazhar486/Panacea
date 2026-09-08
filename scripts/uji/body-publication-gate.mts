@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict'
-import { BODY_PROJECTION_TARGETS } from '../../src/lib/bodyProjectionContract.ts'
+import { BODY_PROJECTION_TARGETS, type BodyProjectionTarget } from '../../src/lib/bodyProjectionContract.ts'
 import { evaluateBodyPublication } from '../../src/lib/bodyPublicationGate.ts'
 import type { BodyAssetProvenanceRecord } from '../../src/lib/bodyAssetProvenance.ts'
 import type { BodyEvidenceMappingRecord } from '../../src/lib/bodyEvidenceMapping.ts'
@@ -37,7 +37,21 @@ const asset: BodyAssetProvenanceRecord = {
   academicReview: 'pending',
 }
 
-const anatomy = evaluateBodyPublication({ mode: 'verified-anatomy', kind: 'anatomy', target: cardiovascular, asset })
+const pendingAnatomy = evaluateBodyPublication({ mode: 'verified-anatomy', kind: 'anatomy', target: cardiovascular, asset })
+assert.equal(pendingAnatomy.publishable, false)
+assert.equal(pendingAnatomy.renderAsVerifiedAnatomy, false)
+assert.ok(pendingAnatomy.reasons.some((reason) => reason.includes('academic review')))
+
+const reviewedCardiovascular: BodyProjectionTarget = { ...cardiovascular, academicReview: 'recorded' }
+const reviewedAsset: BodyAssetProvenanceRecord = {
+  ...asset,
+  academicReview: 'recorded',
+  reviewerName: 'Qualified reviewer fixture',
+  reviewerCredentials: 'Credential fixture',
+  reviewerDate: '2026-09-08',
+  reviewerScope: 'Validator fixture only.',
+}
+const anatomy = evaluateBodyPublication({ mode: 'verified-anatomy', kind: 'anatomy', target: reviewedCardiovascular, asset: reviewedAsset })
 assert.equal(anatomy.publishable, true)
 assert.equal(anatomy.renderAsVerifiedAnatomy, true)
 assert.equal(anatomy.displayAsReferenceOnly, false)
@@ -68,10 +82,10 @@ assert.equal(overlay.publishable, true)
 assert.equal(overlay.renderAsVerifiedAnatomy, false)
 assert.equal(overlay.displayAsReferenceOnly, true)
 
-const overlayOnVerifiedAsset = evaluateBodyPublication({ mode: 'evidence-overlay', kind: 'physiology', target: cardiovascular, asset, evidence: [evidence] })
-assert.equal(overlayOnVerifiedAsset.publishable, true)
-assert.equal(overlayOnVerifiedAsset.displayAsReferenceOnly, false)
-assert.equal(overlayOnVerifiedAsset.renderAsVerifiedAnatomy, false)
+const overlayOnPendingAsset = evaluateBodyPublication({ mode: 'evidence-overlay', kind: 'physiology', target: cardiovascular, asset, evidence: [evidence] })
+assert.equal(overlayOnPendingAsset.publishable, true)
+assert.equal(overlayOnPendingAsset.displayAsReferenceOnly, true)
+assert.equal(overlayOnPendingAsset.renderAsVerifiedAnatomy, false)
 
 const wrongKind = evaluateBodyPublication({ mode: 'evidence-overlay', kind: 'lesion', target: cardiovascular, evidence: [evidence] })
 assert.equal(wrongKind.publishable, false)
@@ -81,9 +95,9 @@ const procedure = evaluateBodyPublication({ mode: 'evidence-overlay', kind: 'pro
 assert.equal(procedure.publishable, false)
 assert.ok(procedure.reasons.some((reason) => reason.includes('dedicated procedure evidence')))
 
-const conceptualAnatomy = evaluateBodyPublication({ mode: 'verified-anatomy', kind: 'anatomy', target: thermoreceptor, asset: { ...asset, targetId: thermoreceptor.id, sourceId: 'hubmap_hra' } })
+const conceptualAnatomy = evaluateBodyPublication({ mode: 'verified-anatomy', kind: 'anatomy', target: thermoreceptor, asset: { ...reviewedAsset, targetId: thermoreceptor.id, sourceId: 'hubmap_hra' } })
 assert.equal(conceptualAnatomy.publishable, false)
 assert.equal(conceptualAnatomy.renderAsVerifiedAnatomy, false)
 assert.ok(conceptualAnatomy.reasons.some((reason) => reason.includes('Reference-only')))
 
-console.log('Body publication gate: verified anatomy, reference overlays, procedure fail-closed, and conceptual geometry boundaries verified.')
+console.log('Body publication gate: recorded-review verified anatomy, reference overlays, procedure fail-closed, and conceptual geometry boundaries verified.')
