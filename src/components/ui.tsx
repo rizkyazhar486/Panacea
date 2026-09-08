@@ -21,6 +21,53 @@ export function Card({
   )
 }
 
+function BodyExplorerStartHere() {
+  return (
+    <details
+      open
+      data-testid="body-explorer-start-here"
+      className="mt-3 overflow-hidden rounded-2xl border border-brand/20 bg-brand/[.045] shadow-[0_8px_28px_rgba(15,100,70,.06)] dark:border-brand/25 dark:bg-brand/[.08]"
+    >
+      <summary className="flex min-h-[44px] cursor-pointer list-none items-center justify-between gap-3 px-4 py-2.5 text-sm font-black text-ink marker:hidden dark:text-white">
+        <span>Start here · 60-second guide</span>
+        <span aria-hidden className="rounded-full border border-brand/25 px-2 py-0.5 text-[10px] font-black uppercase tracking-wide text-brand">
+          Help
+        </span>
+      </summary>
+      <div className="border-t border-brand/15 px-4 py-3">
+        <ol className="grid gap-2 sm:grid-cols-3">
+          <li className="rounded-xl bg-white/75 p-3 dark:bg-white/[.055]">
+            <div className="text-[10px] font-black uppercase tracking-[.14em] text-brand">1 · Explore</div>
+            <p className="mt-1 text-xs leading-relaxed text-neutral-700 dark:text-neutral-200">
+              Tap a structure on the 3D body, or start with <strong>Organs</strong>, <strong>Muscles</strong>, or <strong>Find structure</strong>.
+            </p>
+          </li>
+          <li className="rounded-xl bg-white/75 p-3 dark:bg-white/[.055]">
+            <div className="text-[10px] font-black uppercase tracking-[.14em] text-brand">2 · Inspect</div>
+            <p className="mt-1 text-xs leading-relaxed text-neutral-700 dark:text-neutral-200">
+              Keep <strong>Anatomy</strong> as the default view. Switch to CT, MRI, or another view only when you need that perspective.
+            </p>
+          </li>
+          <li className="rounded-xl bg-white/75 p-3 dark:bg-white/[.055]">
+            <div className="text-[10px] font-black uppercase tracking-[.14em] text-brand">3 · Go deeper</div>
+            <p className="mt-1 text-xs leading-relaxed text-neutral-700 dark:text-neutral-200">
+              Open <strong>Physiology</strong>, <strong>Drugs</strong>, <strong>Diseases</strong>, or advanced labs after you have selected what you want to study.
+            </p>
+          </li>
+        </ol>
+        <div className="mt-2 flex flex-wrap gap-1.5 text-[10.5px] font-bold text-neutral-500 dark:text-neutral-300">
+          <span className="rounded-full bg-white/80 px-2.5 py-1 dark:bg-white/[.06]">Explore: Layers · Muscles · Organs · Find</span>
+          <span className="rounded-full bg-white/80 px-2.5 py-1 dark:bg-white/[.06]">Learn: Physiology · Drugs · Diseases · Study</span>
+          <span className="rounded-full bg-white/80 px-2.5 py-1 dark:bg-white/[.06]">Advanced: Cardio · Specialty · Molecular · Genomics · Cell · Surgical</span>
+        </div>
+        <p className="mt-2 text-[10.5px] leading-relaxed text-neutral-500 dark:text-neutral-400">
+          You do not need to use every tab. The same 3D body stays your anchor while the tools around it change.
+        </p>
+      </div>
+    </details>
+  )
+}
+
 export function SectionTitle({
   icon,
   title,
@@ -33,27 +80,31 @@ export function SectionTitle({
   right?: ReactNode
 }) {
   const w = rupaRute()
+  const showBodyExplorerGuide = title === 'Body Explorer'
   return (
-    <div className="mb-5 flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
-      <div className="flex min-w-0 items-start gap-3.5">
-        {icon && (
-          <span className={`grid h-11 w-11 shrink-0 place-items-center rounded-2xl shadow-[inset_0_1px_rgba(255,255,255,.7),0_8px_24px_rgba(20,40,50,.08)] ${w.bg} ${w.teks}`}>
-            {icon}
-          </span>
-        )}
-        <div className="min-w-0 pt-0.5">
-          <h2 className="flex items-start gap-2.5 text-[clamp(1.2rem,2.3vw,1.65rem)] font-black leading-[1.08] tracking-[-.025em] text-ink dark:text-white">
-            <span aria-hidden className={`mt-1 h-5 w-1.5 shrink-0 rounded-full ${w.garis}`} />
-            <span>{title}</span>
-          </h2>
-          {subtitle && (
-            <Prosa kelas="mt-1.5 max-w-3xl text-[13px] leading-relaxed text-neutral-600 dark:text-neutral-300">
-              {subtitle}
-            </Prosa>
+    <div className="mb-5">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+        <div className="flex min-w-0 items-start gap-3.5">
+          {icon && (
+            <span className={`grid h-11 w-11 shrink-0 place-items-center rounded-2xl shadow-[inset_0_1px_rgba(255,255,255,.7),0_8px_24px_rgba(20,40,50,.08)] ${w.bg} ${w.teks}`}>
+              {icon}
+            </span>
           )}
+          <div className="min-w-0 pt-0.5">
+            <h2 className="flex items-start gap-2.5 text-[clamp(1.2rem,2.3vw,1.65rem)] font-black leading-[1.08] tracking-[-.025em] text-ink dark:text-white">
+              <span aria-hidden className={`mt-1 h-5 w-1.5 shrink-0 rounded-full ${w.garis}`} />
+              <span>{title}</span>
+            </h2>
+            {subtitle && (
+              <Prosa kelas="mt-1.5 max-w-3xl text-[13px] leading-relaxed text-neutral-600 dark:text-neutral-300">
+                {subtitle}
+              </Prosa>
+            )}
+          </div>
         </div>
+        {right && <div className="no-scrollbar flex max-w-full shrink-0 items-center gap-2 overflow-x-auto sm:justify-end">{right}</div>}
       </div>
-      {right && <div className="no-scrollbar flex max-w-full shrink-0 items-center gap-2 overflow-x-auto sm:justify-end">{right}</div>}
+      {showBodyExplorerGuide && <BodyExplorerStartHere />}
     </div>
   )
 }
