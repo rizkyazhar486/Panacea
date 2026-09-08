@@ -32,15 +32,44 @@ async function captureViewport() {
     await cdp.detach()
   }
 }
+async function waitForClass(locator, token, timeout = 10_000) {
+  const deadline = Date.now() + timeout
+  while (Date.now() < deadline) {
+    const className = await locator.getAttribute('class').catch(() => '')
+    if ((className || '').includes(token)) return className
+    await page.waitForTimeout(80)
+  }
+  throw new Error(`Timed out waiting for class token "${token}" on ${await locator.innerText().catch(() => 'locator')}`)
+}
+async function waitForInputValue(locator, expected, tolerance = 0.005, timeout = 10_000) {
+  const deadline = Date.now() + timeout
+  while (Date.now() < deadline) {
+    const raw = await locator.inputValue().catch(() => '')
+    const value = Number(raw)
+    if (Number.isFinite(value) && Math.abs(value - expected) <= tolerance) return value
+    await page.waitForTimeout(80)
+  }
+  throw new Error(`Timed out waiting for input value ${expected}`)
+}
 
 const metrics = {
   viewport: null,
   caesareanLoaded: false,
   bladderUterusStep: false,
+  axialSharedBody3d: false,
+  coronalSharedBody3d: false,
+  sagittalSharedBody3d: false,
+  explodedSharedBody3d: false,
+  caesareanSlicePos: null,
+  explodedUnfold: null,
   transseptalLoaded: false,
+  transseptalAxialSharedBody3d: false,
+  transseptalSlicePos: null,
   iceLongAxisVisible: false,
   webgl: false,
   renderDpr: null,
+  sharedBodyWebgl: false,
+  sharedBodyRenderDpr: null,
   overflow: null,
   pageErrors,
 }
@@ -58,17 +87,20 @@ try {
     if (await close.isVisible().catch(() => false)) await close.click()
   }
 
+  const sharedBodyCanvas = page.locator('canvas').first()
+  await sharedBodyCanvas.waitFor({ state: 'visible', timeout: 120_000 })
+
   const surgeryTab = page.getByRole('button', { name: 'Surgical layers', exact: true })
   await surgeryTab.click()
-  const simulator = page.locator('[data-surgery-simulator="anatomy-grounded"]')
+  let simulator = page.locator('[data-surgery-simulator="anatomy-grounded"]')
   await simulator.waitFor({ state: 'visible', timeout: 30_000 })
   await simulator.scrollIntoViewIfNeeded()
 
   await page.getByText('Caesarean section — layered pelvic anatomy', { exact: true }).waitFor({ state: 'visible', timeout: 20_000 })
-  const atlasCanvas = simulator.locator('canvas[data-atlas-viewer3d="true"]').first()
+  let atlasCanvas = simulator.locator('canvas[data-atlas-viewer3d="true"]').first()
   await atlasCanvas.waitFor({ state: 'visible', timeout: 60_000 })
   await simulator.getByText(/Loading anatomy/i).waitFor({ state: 'hidden', timeout: 120_000 }).catch(() => undefined)
-  const loadFailure = simulator.getByText(/Could not load this anatomical model|could not start 3D graphics|dropped the 3D context/i).first()
+  let loadFailure = simulator.getByText(/Could not load this anatomical model|could not start 3D graphics|dropped the 3D context/i).first()
   if (await loadFailure.isVisible().catch(() => false)) throw new Error(`Caesarean atlas failure: ${await loadFailure.innerText()}`)
   metrics.caesareanLoaded = true
 
@@ -81,12 +113,61 @@ try {
   await simulator.getByText(/urinary bladder/i).first().waitFor({ state: 'visible', timeout: 10_000 })
   metrics.bladderUterusStep = true
 
+  // Prove the surgery presets mutate the SHARED Body3D state above, rather than
+  // only toggling local simulator UI. Existing Body Explorer controls are used
+  // as the observable state contract: CT/plane active classes, slice slider,
+  // and the shared Unfold slider.
+  const correlation = simulator.locator('[data-surgery-correlation="shared-body3d"]')
+  await correlation.waitFor({ state: 'visible', timeout: 10_000 })
+
+  await correlation.getByRole('button', { name: 'Axial CT', exact: true }).click()
+  await waitForClass(page.getByRole('button', { name: 'CT', exact: true }).first(), 'bg-white')
+  await waitForClass(page.getByRole('button', { name: 'Axial', exact: true }).first(), 'bg-brand')
+  const sliceLevel = page.getByRole('slider', { name: 'Slice level', exact: true })
+  metrics.caesareanSlicePos = await waitForInputValue(sliceLevel, 0.52)
+  metrics.axialSharedBody3d = true
+
+  await correlation.getByRole('button', { name: 'Coronal CT', exact: true }).click()
+  await waitForClass(page.getByRole('button', { name: 'Coronal', exact: true }).first(), 'bg-brand')
+  await waitForInputValue(sliceLevel, 0.5)
+  metrics.coronalSharedBody3d = true
+
+  await correlation.getByRole('button', { name: 'Sagittal CT', exact: true }).click()
+  await waitForClass(page.getByRole('button', { name: 'Sagittal', exact: true }).first(), 'bg-brand')
+  await waitForInputValue(sliceLevel, 0.5)
+  metrics.sagittalSharedBody3d = true
+
+  await correlation.getByRole('button', { name: 'Exploded 3D', exact: true }).click()
+  await waitForClass(page.getByRole('button', { name: 'Anatomy', exact: true }).first(), 'bg-white')
+  metrics.explodedSharedBody3d = true
+
+  // The Unfold control lives in the Layers tab. Switching panels must not reset
+  // the shared Body3D state set by the surgical preset.
+  await page.getByRole('button', { name: 'Layers', exact: true }).click()
+  const unfoldSlider = page.getByRole('slider', { name: 'Unfold', exact: true })
+  metrics.explodedUnfold = await waitForInputValue(unfoldSlider, 0.28)
+
+  // Return to surgery; the component may remount, so resolve fresh locators.
+  await page.getByRole('button', { name: 'Surgical layers', exact: true }).click()
+  simulator = page.locator('[data-surgery-simulator="anatomy-grounded"]')
+  await simulator.waitFor({ state: 'visible', timeout: 30_000 })
+  atlasCanvas = simulator.locator('canvas[data-atlas-viewer3d="true"]').first()
+  await atlasCanvas.waitFor({ state: 'visible', timeout: 60_000 })
+  loadFailure = simulator.getByText(/Could not load this anatomical model|could not start 3D graphics|dropped the 3D context/i).first()
+
   await simulator.getByRole('button', { name: 'Transseptal + ICE', exact: true }).click()
   await simulator.getByText('Transseptal puncture — 3D anatomy + ICE orientation', { exact: true }).waitFor({ state: 'visible', timeout: 20_000 })
   await atlasCanvas.waitFor({ state: 'visible', timeout: 60_000 })
   await page.waitForTimeout(700)
   if (await loadFailure.isVisible().catch(() => false)) throw new Error(`Transseptal atlas failure: ${await loadFailure.innerText()}`)
   metrics.transseptalLoaded = true
+
+  const transseptalCorrelation = simulator.locator('[data-surgery-correlation="shared-body3d"]')
+  await transseptalCorrelation.getByRole('button', { name: 'Axial CT', exact: true }).click()
+  await waitForClass(page.getByRole('button', { name: 'CT', exact: true }).first(), 'bg-white')
+  await waitForClass(page.getByRole('button', { name: 'Axial', exact: true }).first(), 'bg-brand')
+  metrics.transseptalSlicePos = await waitForInputValue(page.getByRole('slider', { name: 'Slice level', exact: true }), 0.72)
+  metrics.transseptalAxialSharedBody3d = true
 
   const iceLongAxisStep = simulator.getByText('ICE long-axis orientation', { exact: true }).first()
   await iceLongAxisStep.scrollIntoViewIfNeeded()
@@ -102,12 +183,22 @@ try {
   })
   metrics.webgl = canvasMetrics.webgl
   metrics.renderDpr = canvasMetrics.backingWidth / Math.max(1, canvasMetrics.clientWidth)
+
+  const sharedCanvasMetrics = await sharedBodyCanvas.evaluate((node) => {
+    const gl = node.getContext('webgl2') || node.getContext('webgl')
+    return { webgl: Boolean(gl), clientWidth: node.clientWidth, backingWidth: node.width }
+  })
+  metrics.sharedBodyWebgl = sharedCanvasMetrics.webgl
+  metrics.sharedBodyRenderDpr = sharedCanvasMetrics.backingWidth / Math.max(1, sharedCanvasMetrics.clientWidth)
+
   metrics.viewport = await page.evaluate(() => ({ width: innerWidth, height: innerHeight, dpr: devicePixelRatio }))
   metrics.overflow = await page.evaluate(() => document.documentElement.scrollWidth - innerWidth)
 
   if (!metrics.webgl) throw new Error('Surgical atlas canvas has no WebGL context')
+  if (!metrics.sharedBodyWebgl) throw new Error('Shared Body3D canvas has no WebGL context')
   if (metrics.viewport.width !== 390 || metrics.viewport.height !== 844) throw new Error(`Unexpected viewport ${metrics.viewport.width}x${metrics.viewport.height}`)
   if (metrics.renderDpr < 1 || metrics.renderDpr > 1.51) throw new Error(`Unsafe surgical atlas mobile DPR ${metrics.renderDpr.toFixed(3)}`)
+  if (metrics.sharedBodyRenderDpr < 1 || metrics.sharedBodyRenderDpr > 1.51) throw new Error(`Unsafe shared Body3D mobile DPR ${metrics.sharedBodyRenderDpr.toFixed(3)}`)
   if (metrics.overflow > 2) throw new Error(`Surgical simulator overflows mobile viewport by ${metrics.overflow}px`)
   if (pageErrors.length) throw new Error(`Browser page errors: ${pageErrors.join(' | ')}`)
 
