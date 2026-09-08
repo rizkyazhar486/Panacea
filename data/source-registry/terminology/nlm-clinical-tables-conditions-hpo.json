@@ -1,0 +1,52 @@
+{
+  "id": "nlm_clinical_tables_conditions_hpo",
+  "name": "NLM Clinical Tables Search Service — Conditions + Human Phenotype Ontology",
+  "category": "terminology",
+  "kind": ["api", "terminology-server"],
+  "homepage": "https://clinicaltables.nlm.nih.gov/",
+  "repository": null,
+  "features": ["body-explorer", "anatomy-ontology", "disease-grounding", "phenotype-grounding", "knowledge-bridge"],
+  "formats": ["json", "http-rest"],
+  "usage": {
+    "runtime": true,
+    "buildTime": false,
+    "networkRequired": true,
+    "notes": "Panacea uses the NLM Clinical Tables `conditions` and `hpo` v3 endpoints only through `server/src/anatomyOntology.ts` as bounded semantic grounding sources alongside EMBL-EBI OLS4. The conditions table returns an NLM-internal `key_id`, not a Disease Ontology CURIE; the HPO table returns `HP:...` identifiers. These identifier systems must remain distinct in normalized records and UI provenance."
+  },
+  "license": {
+    "status": "CHECK_REQUIRED",
+    "identifier": null,
+    "commercialUse": "CONDITIONAL",
+    "attributionRequired": null,
+    "shareAlike": null,
+    "scope": "NLM states that the Clinical Tables Search Service is open to the general public, free of charge and provided as-is, while individual datasets may carry their own source-specific terms. This entry therefore does not infer one blanket licence for the Conditions or HPO datasets from the service host alone.",
+    "verificationUrl": "https://clinicaltables.nlm.nih.gov/faq.html",
+    "verifiedAt": "2026-09-08",
+    "notes": "Preserve dataset/source attribution and verify dataset-specific rights before redistributing terminology content or building derivative terminology products. Do not use NLM, NIH or contributor names to imply endorsement."
+  },
+  "validation": {
+    "level": "REFERENCE",
+    "clinicalDecisionUse": "CONTEXT_ONLY",
+    "notes": "Matches from Conditions or HPO are semantic reference results, not evidence that a disease or phenotype applies to an individual patient. An NLM Conditions key must never be relabeled as a DOID. An HPO term supports phenotype normalization only when its `HP:...` identifier is preserved and valid."
+  },
+  "provenance": {
+    "authority": "U.S. National Library of Medicine Clinical Tables Search Service; Conditions and Human Phenotype Ontology source datasets",
+    "sourceIdentityRequired": true,
+    "versionPinRequired": false,
+    "notes": "Persist the endpoint/table identity, source marker `nlm-ctss`, identifier system (`NLM_CONDITIONS_KEY` or `HP`), identifier, label, query context and retrieval timestamp. NLM currently exposes dataset-version information on the Clinical Tables site (for example HPO data version 2026-06-23), but the Panacea runtime adapter does not yet ingest a machine-readable dataset version, so reproducibility is intentionally marked weaker until version capture is implemented."
+  },
+  "adapter": {
+    "status": "ACTIVE",
+    "normalizedTarget": "OntologyTerm",
+    "module": "server/src/anatomyOntology.ts",
+    "notes": "Implemented server adapter normalizes Conditions results to `ontology: nlm-conditions`, `identifierSystem: NLM_CONDITIONS_KEY`, and HPO results to `ontology: hp`, `identifierSystem: HP`; it bounds queries, validates HP CURIEs, preserves source URLs, and merges these results with OLS4 without converting NLM keys into DOID identifiers."
+  },
+  "trust": {
+    "authority": 5,
+    "evidenceQuality": 3,
+    "recency": 4,
+    "licenseClarity": 2,
+    "reproducibility": 3,
+    "notes": "High authority as an NLM access service, but content rights and evidence meaning remain dataset-specific. Reproducibility is reduced because the current runtime adapter records endpoint provenance but not a machine-readable dataset release identifier."
+  }
+}

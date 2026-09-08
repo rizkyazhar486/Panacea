@@ -1,5 +1,5 @@
-/* Panacea Home widget dark-surface guard v29
-   Prevent light placeholder/surface flashes inside the Living Instrument in dark mode.
+/* Panacea Home widget dark-surface guard v30
+   Hardens the Living Instrument against light/gray surface leakage in Dark Mode.
    Presentation only: no data, calculations, timers, routes or health logic. */
 
 .widget-instrument-loading-v29{
@@ -8,31 +8,93 @@
   background:rgba(148,163,184,.055);
 }
 
-.dark .widget-instrument-loading-v29{
-  background:rgba(255,255,255,.025);
+.dark .panacea-home .widget-instrument-loading-v29{
+  background:#0b1119!important;
+  background-image:none!important;
+  border:1px solid rgba(255,255,255,.06)!important;
+  box-shadow:none!important;
 }
 
-.dark .home-command-panel:has(.widget-instrument-v5)
-.widget-instrument-slide-v5 section>.kaca{
-  background-color:rgba(8,12,18,.96)!important;
+/* Keep the carousel canvas itself dark. This catches any stale global surface
+   rule before it can flash a light panel while a widget mounts. */
+.dark .panacea-home .widget-instrument-shell-v5{
+  background:linear-gradient(155deg,#0d121a 0%,#070b11 100%)!important;
+  background-color:#070b11!important;
+  border-color:rgba(255,255,255,.10)!important;
   color:#f8fafc!important;
 }
 
-.dark .home-command-panel:has(.widget-instrument-v5)
-.widget-instrument-slide-v5 section>.kaca :is(h1,h2,h3,strong,.font-black):not([class*='text-']){
+.dark .panacea-home .widget-instrument-scroll-v5,
+.dark .panacea-home .widget-instrument-slide-v5{
+  background:transparent!important;
+  background-image:none!important;
   color:#f8fafc!important;
 }
 
-.dark .home-command-panel:has(.widget-instrument-v5)
-.widget-instrument-slide-v5 section>.kaca :is(p,.t-mikro,.t-kecil):not([class*='text-']){
+/* The old global .kaca system uses background gradients. Overriding only
+   background-color leaves that background-image alive, which is what caused
+   the large light-gray card visible in Dark Mode. Replace the whole shorthand. */
+.dark .panacea-home .widget-instrument-slide-v5 > section > .kaca,
+.dark .panacea-home .widget-instrument-slide-v5 > .kaca{
+  background:#0b1119!important;
+  background-image:none!important;
+  background-color:#0b1119!important;
+  color:#f8fafc!important;
+  border:1px solid rgba(255,255,255,.08)!important;
+  box-shadow:none!important;
+  filter:none!important;
+  -webkit-backdrop-filter:none!important;
+  backdrop-filter:none!important;
+}
+
+/* Decorative pseudo layers from the global glass card must never cover widget
+   content or re-introduce bright gradients inside the Home carousel. */
+.dark .panacea-home .widget-instrument-slide-v5 > section > .kaca::before,
+.dark .panacea-home .widget-instrument-slide-v5 > section > .kaca::after,
+.dark .panacea-home .widget-instrument-slide-v5 > .kaca::before,
+.dark .panacea-home .widget-instrument-slide-v5 > .kaca::after{
+  content:none!important;
+  display:none!important;
+}
+
+.dark .panacea-home .widget-instrument-slide-v5 > section > .kaca :is(h1,h2,h3,strong,.font-black):not([class*='text-']),
+.dark .panacea-home .widget-instrument-slide-v5 > .kaca :is(h1,h2,h3,strong,.font-black):not([class*='text-']){
+  color:#f8fafc!important;
+}
+
+.dark .panacea-home .widget-instrument-slide-v5 > section > .kaca :is(p,.t-mikro,.t-kecil):not([class*='text-']),
+.dark .panacea-home .widget-instrument-slide-v5 > .kaca :is(p,.t-mikro,.t-kecil):not([class*='text-']){
   color:#cbd5e1!important;
 }
 
+/* Explicit utility-color repairs for common widget text. These are intentionally
+   scoped to the Living Instrument so clinical/chart colors are not flattened. */
+.dark .panacea-home .widget-instrument-slide-v5 :is(.text-neutral-900,.text-neutral-800,.text-neutral-700){
+  color:#f8fafc!important;
+}
+.dark .panacea-home .widget-instrument-slide-v5 .text-neutral-600{
+  color:#dbe4ee!important;
+}
+.dark .panacea-home .widget-instrument-slide-v5 :is(.text-neutral-500,.text-neutral-400){
+  color:#b8c3cf!important;
+}
+
 @media (prefers-contrast:more){
-  .dark .home-command-panel:has(.widget-instrument-v5)
-  .widget-instrument-slide-v5 section>.kaca{
-    background-color:#090d13!important;
-    outline:1px solid rgba(255,255,255,.16);
+  .dark .panacea-home .widget-instrument-shell-v5,
+  .dark .panacea-home .widget-instrument-slide-v5 > section > .kaca,
+  .dark .panacea-home .widget-instrument-slide-v5 > .kaca{
+    background:#070b10!important;
+    background-image:none!important;
+    outline:1px solid rgba(255,255,255,.18);
     outline-offset:-1px;
   }
+}
+
+html.pmd-low-memory.dark .panacea-home .widget-instrument-shell-v5,
+html.pmd-low-memory.dark .panacea-home .widget-instrument-slide-v5 > section > .kaca,
+html.pmd-low-memory.dark .panacea-home .widget-instrument-slide-v5 > .kaca{
+  box-shadow:none!important;
+  filter:none!important;
+  -webkit-backdrop-filter:none!important;
+  backdrop-filter:none!important;
 }

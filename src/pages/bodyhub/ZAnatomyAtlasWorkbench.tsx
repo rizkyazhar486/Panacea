@@ -1,0 +1,208 @@
+import { useMemo, useState } from 'react'
+import {
+  WHOLE_BODY_REGIONS,
+  type AtlasLayerKey,
+  type AtlasRegionKey,
+  type AtlasStructureTarget,
+  type GeometryProvenance,
+} from '../../lib/wholeBodyAtlasBlueprint'
+
+interface Props {
+  onHighlight?: (nodeHints: string[]) => void
+  onFocusRegion?: (nodeHints: string[]) => void
+  onEnableLayer?: (layer: AtlasLayerKey) => void
+}
+
+const LAYER_LABEL: Record<AtlasLayerKey, string> = {
+  surface: 'Surface',
+  skeletal: 'Skeletal',
+  muscular: 'Muscular',
+  cardiovascular: 'Cardiovascular',
+  nervous: 'Nervous',
+  visceral: 'Viscera',
+  lymphoid: 'Lymphoid',
+}
+
+const LAYER_ACCENT: Record<AtlasLayerKey, string> = {
+  surface: 'border-rose-300/30 bg-rose-400/[0.06] text-rose-200',
+  skeletal: 'border-amber-100/25 bg-amber-50/[0.06] text-amber-100',
+  muscular: 'border-red-400/25 bg-red-500/[0.07] text-red-200',
+  cardiovascular: 'border-blue-400/25 bg-blue-500/[0.07] text-blue-200',
+  nervous: 'border-yellow-300/25 bg-yellow-400/[0.06] text-yellow-100',
+  visceral: 'border-emerald-400/25 bg-emerald-500/[0.06] text-emerald-200',
+  lymphoid: 'border-violet-400/25 bg-violet-500/[0.06] text-violet-200',
+}
+
+const CREDITED_Z_ANATOMY_BUNDLES = [
+  { file: 'skeletal.glb', role: 'Skeletal reference', note: 'System-separated skeletal derivative named in the current anatomy credits.' },
+  { file: 'muscular.glb', role: 'Muscular reference', note: 'System-separated muscular derivative named in the current anatomy credits.' },
+  { file: 'cardiovascular.glb', role: 'Cardiovascular reference', note: 'System-separated cardiovascular derivative named in the current anatomy credits.' },
+  { file: 'nervous.glb', role: 'Nervous reference', note: 'System-separated nervous derivative named in the current anatomy credits.' },
+  { file: 'visceral.glb', role: 'Visceral reference', note: 'System-separated visceral derivative named in the current anatomy credits.' },
+] as const
+
+const PROVENANCE_TEXT: Record<GeometryProvenance, string> = {
+  'native-geometry': 'Native source geometry',
+  'adjacent-geometry': 'Adjacent / partial geometry',
+  'not-represented': 'Not directly represented',
+}
+
+function structureKey(region: AtlasRegionKey, structure: AtlasStructureTarget) {
+  return `${region}:${structure.id}`
+}
+
+export function ZAnatomyAtlasWorkbench({ onHighlight, onFocusRegion, onEnableLayer }: Props) {
+  const entries = useMemo(() => WHOLE_BODY_REGIONS.flatMap((region) =>
+    region.structures.map((structure) => ({ region, structure, key: structureKey(region.key, structure) }))), [])
+  const [query, setQuery] = useState('')
+  const [regionKey, setRegionKey] = useState<AtlasRegionKey>('thorax')
+  const [selectedKey, setSelectedKey] = useState(() => structureKey('thorax', WHOLE_BODY_REGIONS.find((r) => r.key === 'thorax')?.structures[0] ?? WHOLE_BODY_REGIONS[0].structures[0]))
+
+  const selected = entries.find((entry) => entry.key === selectedKey) ?? entries[0]
+  const normalizedQuery = query.trim().toLocaleLowerCase()
+  const filtered = entries.filter(({ region, structure }) => {
+    if (region.key !== regionKey) return false
+    if (!normalizedQuery) return true
+    return [structure.label, structure.layer, structure.level, structure.clinicalWhy, ...structure.nodeHints]
+      .join(' ')
+      .toLocaleLowerCase()
+      .includes(normalizedQuery)
+  })
+
+  const layerCounts = useMemo(() => {
+    const counts = new Map<AtlasLayerKey, number>()
+    for (const { structure } of entries) counts.set(structure.layer, (counts.get(structure.layer) ?? 0) + 1)
+    return counts
+  }, [entries])
+
+  function inspect(region: AtlasRegionKey, structure: AtlasStructureTarget, focus = true) {
+    setRegionKey(region)
+    setSelectedKey(structureKey(region, structure))
+    onEnableLayer?.(structure.layer)
+    onHighlight?.(structure.nodeHints)
+    if (focus) onFocusRegion?.(structure.nodeHints)
+  }
+
+  function inspectRegion(key: AtlasRegionKey) {
+    const region = WHOLE_BODY_REGIONS.find((item) => item.key === key)
+    if (!region) return
+    setRegionKey(key)
+    const first = region.structures[0]
+    if (first) setSelectedKey(structureKey(key, first))
+    const hints = [...new Set(region.structures.flatMap((structure) => structure.nodeHints))]
+    for (const layer of new Set(region.structures.map((structure) => structure.layer))) onEnableLayer?.(layer)
+    onHighlight?.(hints)
+    onFocusRegion?.(hints)
+  }
+
+  return (
+    <div className="space-y-4">
+      <section className="overflow-hidden rounded-3xl border border-white/10 bg-neutral-950 text-white">
+        <div className="grid gap-0 lg:grid-cols-[1.25fr_0.75fr]">
+          <div className="bg-[radial-gradient(circle_at_20%_0%,rgba(0,191,99,0.18),transparent_42%),radial-gradient(circle_at_90%_20%,rgba(59,130,246,0.15),transparent_38%)] p-5">
+            <div className="text-[9px] font-black uppercase tracking-[0.22em] text-brand">Z-Anatomy source geometry · shared Panacea 3D viewer</div>
+            <h4 className="mt-2 max-w-2xl text-2xl font-black tracking-tight">Explore source anatomy as layers, regions and named structures—not as a decorative body model.</h4>
+            <p className="mt-2 max-w-2xl text-[11px] leading-relaxed text-neutral-400">This workbench controls the existing Body Exposure viewer. It reuses the Z-Anatomy / BodyParts3D-derived source geometry explicitly credited in Panacea, then routes structure selection into the same highlighting and camera-focus system used by biomechanics and surgery.</p>
+            <div className="mt-4 flex flex-wrap gap-2">
+              <span className="rounded-full border border-brand/30 bg-brand/10 px-3 py-1 text-[9px] font-black text-brand">Z-Anatomy</span>
+              <span className="rounded-full border border-blue-400/25 bg-blue-500/10 px-3 py-1 text-[9px] font-black text-blue-200">BodyParts3D lineage</span>
+              <span className="rounded-full border border-white/10 bg-white/5 px-3 py-1 text-[9px] font-black text-neutral-300">CC BY-SA 4.0 derivative bundle</span>
+            </div>
+          </div>
+          <div className="border-t border-white/10 bg-black/30 p-4 lg:border-l lg:border-t-0">
+            <div className="text-[9px] font-black uppercase tracking-[0.18em] text-neutral-500">Scientific boundary</div>
+            <p className="mt-2 text-[10px] leading-relaxed text-neutral-300">Atlas geometry is a generic educational reference, not patient-specific anatomy. Missing structures are not synthesized. Adjacent or partial geometry remains explicitly labelled instead of being promoted to native anatomy.</p>
+            <div className="mt-3 rounded-xl border border-amber-400/20 bg-amber-400/[0.05] p-3 text-[9px] leading-relaxed text-amber-100">Selection changes visibility/highlighting and camera focus only. It does not imply surgical clearance, pathology, force, tissue strain, or a patient-specific safe corridor.</div>
+          </div>
+        </div>
+      </section>
+
+      <section className="grid gap-3 xl:grid-cols-[0.72fr_1.28fr]">
+        <div className="space-y-3">
+          <div className="rounded-2xl border border-neutral-200 bg-white p-3 dark:border-white/10 dark:bg-white/[0.02]">
+            <div className="text-[9px] font-black uppercase tracking-[0.16em] text-neutral-400">Anatomy systems</div>
+            <div className="mt-2 grid grid-cols-2 gap-2">
+              {(Object.keys(LAYER_LABEL) as AtlasLayerKey[]).map((layer) => (
+                <button key={layer} type="button" onClick={() => onEnableLayer?.(layer)} className={`min-h-12 rounded-xl border p-2 text-left transition hover:-translate-y-0.5 ${LAYER_ACCENT[layer]}`}>
+                  <div className="text-[10px] font-black">{LAYER_LABEL[layer]}</div>
+                  <div className="mt-1 text-[8px] opacity-70">{layerCounts.get(layer) ?? 0} catalogue targets</div>
+                </button>
+              ))}
+            </div>
+            <p className="mt-2 text-[9px] leading-relaxed text-neutral-500">Counts describe Panacea catalogue targets, not the number of meshes inside a GLB.</p>
+          </div>
+
+          <div className="rounded-2xl border border-neutral-200 p-3 dark:border-white/10">
+            <div className="text-[9px] font-black uppercase tracking-[0.16em] text-neutral-400">Body region</div>
+            <div className="mt-2 grid grid-cols-2 gap-1.5">
+              {WHOLE_BODY_REGIONS.map((region) => (
+                <button key={region.key} type="button" aria-pressed={regionKey === region.key} onClick={() => inspectRegion(region.key)} className={`min-h-11 rounded-xl border px-2 py-2 text-left text-[9px] font-black transition ${regionKey === region.key ? 'border-brand bg-brand text-white' : 'border-neutral-200 text-neutral-500 dark:border-white/10 dark:text-neutral-400'}`}>{region.label}</button>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        <div className="space-y-3">
+          <div className="rounded-2xl border border-neutral-200 p-3 dark:border-white/10">
+            <label className="block text-[9px] font-black uppercase tracking-[0.16em] text-neutral-400" htmlFor="z-anatomy-structure-search">Structure finder</label>
+            <input id="z-anatomy-structure-search" value={query} onChange={(event) => setQuery(event.target.value)} placeholder={`Search ${WHOLE_BODY_REGIONS.find((r) => r.key === regionKey)?.label ?? 'region'} structures…`} className="mt-2 min-h-11 w-full rounded-xl border border-neutral-200 bg-transparent px-3 text-xs text-ink outline-none transition focus:border-brand dark:border-white/10 dark:text-white" />
+            <div className="mt-3 grid gap-2 md:grid-cols-2">
+              {filtered.map(({ region, structure, key }) => (
+                <button key={key} type="button" onClick={() => inspect(region.key, structure, false)} className={`rounded-xl border p-3 text-left transition ${selected?.key === key ? 'border-brand bg-brand/[0.05]' : 'border-neutral-200 hover:border-brand/40 dark:border-white/10'}`}>
+                  <div className="flex items-start justify-between gap-2">
+                    <span className="text-xs font-black text-ink dark:text-white">{structure.label}</span>
+                    <span className="rounded-full border border-neutral-200 px-2 py-0.5 text-[8px] font-bold text-neutral-500 dark:border-white/10">{LAYER_LABEL[structure.layer]}</span>
+                  </div>
+                  <div className="mt-1 text-[8px] font-bold uppercase tracking-wide text-neutral-400">{PROVENANCE_TEXT[structure.provenance]} · {structure.level}</div>
+                </button>
+              ))}
+            </div>
+            {!filtered.length && <div className="mt-3 rounded-xl border border-dashed border-neutral-200 p-4 text-center text-[10px] text-neutral-500 dark:border-white/10">No represented catalogue target matches this search in the selected region.</div>}
+          </div>
+
+          {selected && (
+            <div className="overflow-hidden rounded-2xl border border-neutral-200 dark:border-white/10">
+              <div className="grid gap-0 md:grid-cols-[1fr_0.8fr]">
+                <div className="p-4">
+                  <div className="text-[9px] font-black uppercase tracking-[0.16em] text-brand">Selected structure</div>
+                  <h5 className="mt-1 text-lg font-black text-ink dark:text-white">{selected.structure.label}</h5>
+                  <div className="mt-2 flex flex-wrap gap-1.5">
+                    <span className="rounded-full border border-neutral-200 px-2 py-1 text-[8px] font-black text-neutral-500 dark:border-white/10">{selected.region.label}</span>
+                    <span className="rounded-full border border-neutral-200 px-2 py-1 text-[8px] font-black text-neutral-500 dark:border-white/10">{LAYER_LABEL[selected.structure.layer]}</span>
+                    <span className="rounded-full border border-neutral-200 px-2 py-1 text-[8px] font-black text-neutral-500 dark:border-white/10">{PROVENANCE_TEXT[selected.structure.provenance]}</span>
+                  </div>
+                  <p className="mt-3 text-[10px] leading-relaxed text-neutral-500">{selected.structure.clinicalWhy}</p>
+                  <button type="button" onClick={() => inspect(selected.region.key, selected.structure, true)} className="mt-3 min-h-11 rounded-full bg-brand px-4 text-[10px] font-black text-white shadow-lg shadow-brand/20">Inspect in shared 3D →</button>
+                </div>
+                <div className="border-t border-neutral-200 bg-neutral-50 p-4 dark:border-white/10 dark:bg-white/[0.02] md:border-l md:border-t-0">
+                  <div className="text-[9px] font-black uppercase tracking-[0.16em] text-neutral-400">Geometry lookup hints</div>
+                  <div className="mt-2 flex flex-wrap gap-1.5">{selected.structure.nodeHints.map((hint) => <span key={hint} className="rounded-lg border border-neutral-200 bg-white px-2 py-1 font-mono text-[8px] text-neutral-500 dark:border-white/10 dark:bg-neutral-950">{hint}</span>)}</div>
+                  <p className="mt-3 text-[9px] leading-relaxed text-neutral-500">These are source-node lookup hints used to locate evidence-bearing geometry in the shared atlas. They are not additional anatomical claims.</p>
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+      </section>
+
+      <section className="rounded-2xl border border-neutral-200 p-4 dark:border-white/10">
+        <div className="flex flex-wrap items-end justify-between gap-2">
+          <div><div className="text-[9px] font-black uppercase tracking-[0.16em] text-neutral-400">Credited Z-Anatomy derivative bundles</div><div className="mt-1 text-sm font-black text-ink dark:text-white">GLB files explicitly named by the current anatomy attribution</div></div>
+          <div className="text-[9px] font-bold text-neutral-500">No second renderer · no remote embed</div>
+        </div>
+        <div className="mt-3 grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
+          {CREDITED_Z_ANATOMY_BUNDLES.map((asset) => (
+            <div key={asset.file} className="rounded-xl border border-neutral-200 p-3 dark:border-white/10">
+              <div className="font-mono text-[9px] font-black text-brand">/anatomy/{asset.file}</div>
+              <div className="mt-1 text-[10px] font-black text-ink dark:text-white">{asset.role}</div>
+              <div className="mt-1 text-[9px] leading-relaxed text-neutral-500">{asset.note}</div>
+            </div>
+          ))}
+        </div>
+        <p className="mt-3 text-[9px] leading-relaxed text-neutral-500">Attribution is preserved in <span className="font-mono">public/anatomy/CREDITS.txt</span>: Z-Anatomy source, BodyParts3D upstream lineage, and CC BY-SA 4.0 derivative licensing. Other viewer layers are not assigned new provenance here unless their attribution is explicitly documented.</p>
+      </section>
+    </div>
+  )
+}
+
+export default ZAnatomyAtlasWorkbench
