@@ -16,8 +16,6 @@ function jsonResponse(payload: unknown): Response {
 
 // Regression fixture: OLS kosong sehingga penyakit/fenotipe datang dari NLM
 // CTSS. Conditions memakai key internal NLM, sedangkan HPO memakai HP CURIE.
-// Display mengikuti bentuk resmi CTSS: satu array field-display per result.
-// Uji ini sengaja tanpa network agar provenance tidak bergantung kondisi API.
 {
   const urls: string[] = []
   const fakeFetch: typeof fetch = async (input) => {
@@ -31,7 +29,7 @@ function jsonResponse(payload: unknown): Response {
       return jsonResponse([1, ['C0000001'], null, [['Back pain']]])
     }
     if (url.includes('/hpo/v3/search')) {
-      return jsonResponse([1, ['HP:0003418'], null, [['Back pain']]])
+      return jsonResponse([2, ['HP:0003418', 'not-an-hpo-id'], null, [['Back pain'], ['Invalid phenotype']]])
     }
     return new Response('not found', { status: 404 })
   }
@@ -47,11 +45,14 @@ function jsonResponse(payload: unknown): Response {
     disease?.identifierSystem === 'NLM_CONDITIONS_KEY', disease?.identifierSystem)
   ok('key kondisi NLM dipertahankan apa adanya', disease?.id === 'C0000001', disease?.id)
   ok('display-array CTSS dinormalisasi menjadi label tunggal', disease?.label === 'Back pain', disease?.label)
+  ok('provenance URL conditions dipertahankan', disease?.sourceUrl.includes('/conditions/v3/search') === true, disease?.sourceUrl)
 
   ok('HPO CTSS tetap berada di bucket phenotype', result.phenotypes.length === 1)
   ok('HPO CTSS tetap memakai namespace HP', phenotype?.ontology === 'hp', phenotype?.ontology)
   ok('HPO CTSS membawa identifier system HP', phenotype?.identifierSystem === 'HP', phenotype?.identifierSystem)
   ok('HPO CTSS mempertahankan CURIE HP', phenotype?.id === 'HP:0003418', phenotype?.id)
+  ok('HPO malformed tidak dipalsukan sebagai HP', !result.phenotypes.some((term) => term.id === 'not-an-hpo-id'))
+  ok('provenance URL HPO dipertahankan', phenotype?.sourceUrl.includes('/hpo/v3/search') === true, phenotype?.sourceUrl)
   ok('lookup tetap membatasi satu kueri ke empat sumber', urls.length === 4, String(urls.length))
 }
 
@@ -84,6 +85,20 @@ function jsonResponse(payload: unknown): Response {
   ok('OLS anatomy term membawa source OLS4', term?.source === 'ebi-ols4', term?.source)
   ok('UBERON membawa identifier system UBERON', term?.identifierSystem === 'UBERON', term?.identifierSystem)
   ok('UBERON CURIE dipertahankan', term?.id === 'UBERON:0000948', term?.id)
+  ok('OLS source URL dipertahankan', term?.sourceUrl.includes('www.ebi.ac.uk/ols4/api/search') === true, term?.sourceUrl)
+}
+
+// Query panjang tidak boleh diteruskan mentah ke upstream. Ini menjaga request
+// bounded dan mencegah cache/log upstream diisi payload arbitrer sangat panjang.
+{
+  const queryLengths: number[] = []
+  const fakeFetch: typeof fetch = async (input) => {
+    const url = new URL(String(input))
+    queryLengths.push((url.searchParams.get('q') ?? '').length)
+    return jsonResponse({ response: { docs: [] } })
+  }
+  await anatomyStructureLookup([`lung ${'x'.repeat(500)}`], fakeFetch)
+  ok('query OLS dibatasi sebelum upstream', queryLengths.length === 2 && queryLengths.every((n) => n <= 160), queryLengths.join(','))
 }
 
 console.log(`\n${lulus} lulus, ${gagal} gagal`)
