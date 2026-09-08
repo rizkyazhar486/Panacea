@@ -56,7 +56,7 @@ export interface BodyAtlasCrossSectionResult {
 
 export interface BodyAtlasNeighborhoodResult {
   center: BodyAtlasSpatialBinding
-  neighbors: readonly Array<BodyAtlasSpatialBinding & { distance: number }>
+  neighbors: ReadonlyArray<BodyAtlasSpatialBinding & { distance: number }>
 }
 
 export interface BodyAtlasCameraFrame {
