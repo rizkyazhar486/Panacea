@@ -58,7 +58,9 @@ const captureSource = readFileSync(new URL('../../src/lib/body3dSourceNodeCaptur
 const qualitySource = readFileSync(new URL('../../src/lib/body3dQuality.ts', import.meta.url), 'utf8')
 const workbenchSource = readFileSync(new URL('../../src/pages/bodyhub/ZAnatomyAtlasWorkbench.tsx', import.meta.url), 'utf8')
 
-assert.match(captureSource, /anatomy\\\/\(\[\^\/?#\]\+\\\.glb\)/, 'capture hook must remain scoped to anatomy GLB URLs')
+assert.match(captureSource, /function anatomyFileFromUrl\(url: string\)/, 'capture hook must keep a dedicated URL scope guard')
+assert.match(captureSource, /anatomy\\\/.*\\\.glb/, 'capture hook must remain scoped to anatomy GLB URLs')
+assert.match(captureSource, /if \(!file\) return originalLoad\.call/, 'non-anatomy GLTF loads must pass through unchanged')
 assert.match(captureSource, /gltf\.parser\.json\.nodes/, 'registry must read original GLTF JSON node names')
 assert.match(captureSource, /publishAnatomySourceNodes\(file, names\)/)
 assert.match(qualitySource, /installBody3dSourceNodeCapture\(\)/, 'Body3D generation controller must activate source-node capture')
