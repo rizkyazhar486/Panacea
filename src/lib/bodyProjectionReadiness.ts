@@ -26,15 +26,25 @@ export interface ProjectionReadinessResult {
 }
 
 const nonBlank = (value: string | undefined) => Boolean(value?.trim())
+const ISO_DATE_RE = /^\d{4}-\d{2}-\d{2}(?:T\d{2}:\d{2}(?::\d{2}(?:\.\d{3})?)?Z)?$/
+
+function isValidIsoDate(value: string | undefined) {
+  if (!nonBlank(value) || !ISO_DATE_RE.test(value!.trim())) return false
+  const normalized = value!.trim()
+  const parsed = new Date(normalized.length === 10 ? `${normalized}T00:00:00Z` : normalized)
+  if (Number.isNaN(parsed.getTime())) return false
+  const [year, month, day] = normalized.slice(0, 10).split('-').map(Number)
+  return parsed.getUTCFullYear() === year && parsed.getUTCMonth() + 1 === month && parsed.getUTCDate() === day
+}
 
 /**
- * Fail-closed readiness gate for Body3D projection assets.
+ * Fail-closed readiness gate for verified Body3D anatomy.
  *
- * A roadmap target can only render as verified reference anatomy when an
- * asset-level record pins source identity/revision/license/attribution,
- * preserves transformation history, and satisfies the target's evidence and
- * academic-review contract. Repository-level licensing or a matching label is
- * intentionally insufficient.
+ * Verified anatomy requires BOTH an academically reviewed target contract and
+ * an academically reviewed exact asset provenance record. Source checking,
+ * repository-level licensing, an internal label, or an AI-generated review
+ * claim are never sufficient. Human-review metadata must identify the reviewer,
+ * credentials, review date and scope. Reference-only concepts remain reference-only.
  */
 export function evaluateProjectionReadiness(
   target: BodyProjectionTarget,
@@ -70,18 +80,23 @@ export function evaluateProjectionReadiness(
   if (!['verified-native', 'verified-adjacent'].includes(provenance.geometryStatus)) reasons.push('Geometry is not verified.')
   if (!['source-checked', 'human-reviewed'].includes(provenance.evidenceStatus)) reasons.push('Evidence has not been source-checked.')
 
-  if (target.academicReview === 'recorded') {
-    if (provenance.academicReview !== 'recorded') reasons.push('Required academic review has not been recorded.')
+  if (target.academicReview !== 'recorded') reasons.push('Target academic review has not been recorded.')
+  if (provenance.academicReview !== 'recorded') reasons.push('Asset academic review has not been recorded.')
+  if (provenance.evidenceStatus === 'human-reviewed' && provenance.academicReview !== 'recorded') {
+    reasons.push('Human-reviewed evidence status requires a recorded academic review.')
+  }
+
+  if (provenance.academicReview === 'recorded') {
     if (!nonBlank(provenance.reviewerName)) reasons.push('Reviewer identity is missing.')
     if (!nonBlank(provenance.reviewerCredentials)) reasons.push('Reviewer credentials are missing.')
-    if (!nonBlank(provenance.reviewerDate)) reasons.push('Reviewer date is missing.')
+    if (!isValidIsoDate(provenance.reviewerDate)) reasons.push('Reviewer date is missing or invalid.')
     if (!nonBlank(provenance.reviewerScope)) reasons.push('Reviewer scope is missing.')
   }
 
   if (target.patientSpecificAllowed) reasons.push('Reference Body3D projection contract must not silently enable patient-specific geometry.')
 
   return reasons.length
-    ? { readiness: 'verification-required', renderAsVerifiedAnatomy: false, reasons }
+    ? { readiness: 'verification-required', renderAsVerifiedAnatomy: false, reasons: [...new Set(reasons)] }
     : { readiness: 'verified-reference', renderAsVerifiedAnatomy: true, reasons: [] }
 }
 
