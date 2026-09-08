@@ -85,5 +85,32 @@ await denganFetchPalsu(async () => new Response(JSON.stringify({}), {
   ok('payload kosong tidak dianggap observasi valid', hasil.error === 'tidak_terjawab')
 })
 
+const partialFetch: typeof fetch = async (input) => {
+  const url = new URL(String(input))
+  if (url.hostname === 'air-quality-api.open-meteo.com') throw new Error('air upstream down')
+  return new Response(JSON.stringify({
+    current: { uv_index: 4, temperature_2m: 26, apparent_temperature: 28, relative_humidity_2m: 80 },
+    daily: { uv_index_max: [6], sunrise: ['2026-09-08T05:40'], sunset: ['2026-09-08T17:45'] },
+  }), { status: 200, headers: { 'content-type': 'application/json' } })
+}
+const partial = await lingkunganKota('Bandung', partialFetch)
+ok('kegagalan satu upstream tidak membuang observasi valid dari upstream lain', partial.error === undefined && partial.aqi === undefined && partial.uv === 4 && partial.suhuC === 26)
+
+const boundedFetch: typeof fetch = async (input) => {
+  const url = new URL(String(input))
+  if (url.hostname === 'air-quality-api.open-meteo.com') {
+    return new Response(JSON.stringify({ current: { european_aqi: 2001, pm2_5: -1, pm10: 22 } }), {
+      status: 200,
+      headers: { 'content-type': 'application/json' },
+    })
+  }
+  return new Response(JSON.stringify({
+    current: { uv_index: 99, temperature_2m: 25, apparent_temperature: 250, relative_humidity_2m: 150 },
+    daily: { uv_index_max: [-3], sunrise: ['2026-09-08T05:40'], sunset: ['2026-09-08T17:45'] },
+  }), { status: 200, headers: { 'content-type': 'application/json' } })
+}
+const bounded = await lingkunganKota('Jakarta', boundedFetch)
+ok('nilai upstream di luar batas plausibilitas ditolak tanpa mengarang pengganti', bounded.aqi === undefined && bounded.pm25 === undefined && bounded.pm10 === 22 && bounded.uv === undefined && bounded.suhuC === 25 && bounded.terasaC === undefined && bounded.lembapPct === undefined)
+
 console.log(`\nOpen-Meteo adapter: ${lulus} lulus, ${gagal} gagal`)
 if (gagal > 0) process.exitCode = 1
