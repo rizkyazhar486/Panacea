@@ -5,6 +5,7 @@ import {
   panaceaOsStorageKey,
   readPanaceaOsItems,
   resolvePanaceaOsFocus,
+  sortPanaceaOsItems,
   type PanaceaOsCategory,
   type PanaceaOsItem,
 } from '../lib/panaceaOsFocus'
@@ -73,9 +74,10 @@ export function PanaceaOsFocusRail({ date }: { date: string }) {
   const completed = items.filter((item) => item.completedAt).length
 
   function persist(next: PanaceaOsItem[]) {
-    setItems(next)
+    const ordered = sortPanaceaOsItems(next)
+    setItems(ordered)
     try {
-      localStorage.setItem(panaceaOsStorageKey(date), JSON.stringify(next))
+      localStorage.setItem(panaceaOsStorageKey(date), JSON.stringify(ordered))
     } catch {
       // The OS rail still works in-memory when storage is unavailable/private.
     }
