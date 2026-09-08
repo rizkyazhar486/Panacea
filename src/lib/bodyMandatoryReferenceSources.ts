@@ -23,14 +23,17 @@ export interface BodyHighFidelityReferenceTier {
   note: string
 }
 
-/**
- * Mandatory external references for the Body Exposure maturation roadmap.
- *
- * These records intentionally do NOT grant permission to ship third-party
- * assets and do NOT promote a visual reference into anatomical truth.
- * Runtime geometry still has to pass the existing asset-level provenance,
- * licensing and qualified academic-review gates before verified rendering.
- */
+export const BODY_REFERENCE_INTERACTION_REQUIREMENTS = [
+  'rotate',
+  'zoom',
+  'isolate',
+  'cross-section',
+  'layers',
+  'compare',
+  'hotspot-selection',
+  'label-quiz',
+] as const
+
 export const BODY_MANDATORY_REFERENCE_SOURCES: readonly BodyMandatoryReferenceSource[] = [
   {
     id: 'thebuggeddev_anatomy',
@@ -58,11 +61,6 @@ export const BODY_MANDATORY_REFERENCE_SOURCES: readonly BodyMandatoryReferenceSo
   },
 ] as const
 
-/**
- * "5K" is a Panacea reference-render/capture target, not a claim that every
- * upstream mesh or texture natively contains 5K detail. Interactive runtime
- * quality remains adaptive so mobile and lower-memory devices stay usable.
- */
 export const BODY_HIGH_FIDELITY_REFERENCE_TIER: BodyHighFidelityReferenceTier = {
   id: '5k-reference',
   longEdgePx: 5120,
@@ -73,24 +71,22 @@ export const BODY_HIGH_FIDELITY_REFERENCE_TIER: BodyHighFidelityReferenceTier = 
 
 export function validateBodyMandatoryReferenceSources() {
   const reasons: string[] = []
-  const expectedIds = new Set<BodyMandatoryReferenceSource['id']>([
-    'thebuggeddev_anatomy',
-    'thebuggeddev_breath_atlas',
+  const expectedIds = new Set<BodyMandatoryReferenceSource['id']>(['thebuggeddev_anatomy', 'thebuggeddev_breath_atlas'])
+  const requiredInteractions = new Set([
+    'rotate', 'zoom', 'isolate', 'cross-section', 'layers', 'compare', 'hotspot-selection', 'label-quiz',
   ])
 
   for (const source of BODY_MANDATORY_REFERENCE_SOURCES) {
     expectedIds.delete(source.id)
     if (!source.url.startsWith('https://')) reasons.push(`${source.id}: source URL must use HTTPS.`)
     if (!source.requiredForDesignReview) reasons.push(`${source.id}: reference must remain mandatory for design review.`)
-    if (source.licenseStatus !== 'verified' && source.runtimeAssetImportAllowed) {
-      reasons.push(`${source.id}: runtime asset import must remain blocked while licensing is pending.`)
-    }
-    if (source.licenseStatus !== 'verified' && source.verifiedAnatomyAllowed) {
-      reasons.push(`${source.id}: pending-license reference must not be promoted to verified anatomy.`)
-    }
+    if (source.licenseStatus !== 'verified' && source.runtimeAssetImportAllowed) reasons.push(`${source.id}: runtime asset import must remain blocked while licensing is pending.`)
+    if (source.licenseStatus !== 'verified' && source.verifiedAnatomyAllowed) reasons.push(`${source.id}: pending-license reference must not be promoted to verified anatomy.`)
   }
 
+  for (const interaction of BODY_REFERENCE_INTERACTION_REQUIREMENTS) requiredInteractions.delete(interaction)
   if (expectedIds.size) reasons.push(`Missing mandatory Body references: ${[...expectedIds].join(', ')}.`)
+  if (requiredInteractions.size) reasons.push(`Missing mandatory Body interactions: ${[...requiredInteractions].join(', ')}.`)
   if (BODY_HIGH_FIDELITY_REFERENCE_TIER.longEdgePx !== 5120) reasons.push('5K reference tier must remain exactly 5120px on the long edge.')
   if (BODY_HIGH_FIDELITY_REFERENCE_TIER.runtimePolicy !== 'adaptive') reasons.push('5K reference target must not force 5K runtime rendering on every device.')
 
