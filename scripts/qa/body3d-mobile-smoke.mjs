@@ -229,26 +229,42 @@ try {
     throw new Error('Selecting the Knee profile did not update the shared Body3D frame')
   }
 
+  // Drive the native range control with an actual pointer click. Directly
+  // assigning input.value can fool DOM assertions without triggering React's
+  // controlled state; the visual label is the source of truth here.
   await inspector.scrollIntoViewIfNeeded()
   const slider = inspector.locator('input[type="range"]').first()
-  const sliderBounds = await slider.evaluate((node) => ({
+  const sliderState = await slider.evaluate((node) => ({
     min: Number(node.min),
     max: Number(node.max),
-    value: Number(node.value),
+    neutral: Number(node.value),
   }))
-  const targetAngle = Math.round(sliderBounds.min + (sliderBounds.max - sliderBounds.min) * 0.65)
-  await slider.evaluate((node, value) => {
-    node.value = String(value)
-    node.dispatchEvent(new Event('input', { bubbles: true }))
-    node.dispatchEvent(new Event('change', { bubbles: true }))
-  }, targetAngle)
-  await page.waitForTimeout(100)
+  const sliderBox = await slider.boundingBox()
+  if (!sliderBox) throw new Error('Whole-body ROM slider has no measurable bounding box')
+  const targetFraction = 0.65
+  const targetAngle = Math.round(sliderState.min + (sliderState.max - sliderState.min) * targetFraction)
+  await slider.click({
+    position: {
+      x: Math.max(1, Math.min(sliderBox.width - 1, sliderBox.width * targetFraction)),
+      y: Math.max(1, sliderBox.height / 2),
+    },
+  })
+  await page.waitForTimeout(200)
   const observedAngle = Number(await slider.inputValue())
   metrics.wholeBodyMotion.sliderTargetDeg = targetAngle
   metrics.wholeBodyMotion.sliderObservedDeg = observedAngle
-  if (observedAngle !== targetAngle) {
-    throw new Error(`Whole-body ROM slider did not update: expected ${targetAngle}°, saw ${observedAngle}°`)
+  if (observedAngle <= sliderState.neutral + 20) {
+    throw new Error(`Whole-body ROM slider did not move meaningfully from neutral: saw ${observedAngle}°`)
   }
+  if (Math.abs(observedAngle - targetAngle) > 10) {
+    throw new Error(`Whole-body ROM slider pointer mapping is unexpected: target about ${targetAngle}°, saw ${observedAngle}°`)
+  }
+
+  const renderedAngleLabel = inspector.getByText(`Flexion / extension · ${observedAngle.toFixed(0)}°`, { exact: true })
+  await renderedAngleLabel.waitFor({ state: 'visible', timeout: 5_000 })
+  const dialMotionLabel = inspector.getByText(`Flexion ${observedAngle.toFixed(0)}°`, { exact: true })
+  await dialMotionLabel.waitFor({ state: 'visible', timeout: 5_000 })
+  metrics.wholeBodyMotion.reactStateRendered = true
 
   const boundary = inspector.getByText(/does not warp anatomy or fabricate patient-specific force/i)
   if (!(await boundary.isVisible().catch(() => false))) {
