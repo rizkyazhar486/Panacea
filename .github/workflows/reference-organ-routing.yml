@@ -1,0 +1,71 @@
+name: Reference Organ Routing
+
+on:
+  push:
+    branches:
+      - feat/body-exposure-organ-detail-20260908
+    paths:
+      - 'src/lib/referenceOrganModels.ts'
+      - 'scripts/uji/reference-organ-routing.mts'
+      - 'scripts/stabilization/apply-reference-atlas-routing.mjs'
+      - '.github/workflows/reference-organ-routing.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: reference-organ-routing
+  cancel-in-progress: false
+
+jobs:
+  patch-and-validate:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: feat/body-exposure-organ-detail-20260908
+          fetch-depth: 1
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Apply guarded routing patch
+        run: node scripts/stabilization/apply-reference-atlas-routing.mjs
+
+      - name: Validate routing diff and assets
+        run: |
+          git diff --check
+          test -s public/atlas/paru.glb
+          test -s public/atlas/tiroid.glb
+          test -s public/atlas/telinga.glb
+          test -s public/atlas/medula-spinalis.glb
+          test -s public/atlas/payudara.glb
+          grep -q "REFERENCE_ATLAS_MODELS.find" src/lib/organModels.ts
+          grep -q "modelAssetPath(organ)" src/components/OrganModel3D.tsx
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: TypeScript
+        run: npx tsc --noEmit
+
+      - name: Production build
+        run: npm run build
+
+      - name: Deterministic tests
+        run: npm run uji
+
+      - name: Commit only validated routing changes
+        run: |
+          git config user.name 'Panacea Anatomy QA'
+          git config user.email 'actions@users.noreply.github.com'
+          git add src/lib/organModels.ts src/components/OrganModel3D.tsx
+          if git diff --cached --quiet; then
+            echo 'No validated routing changes to commit.'
+            exit 0
+          fi
+          git commit -m 'feat(body): route organ close-ups to verified reference atlases'
+          git push origin HEAD:feat/body-exposure-organ-detail-20260908
