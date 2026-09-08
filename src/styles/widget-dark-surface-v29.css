@@ -1,0 +1,38 @@
+/* Panacea Home widget dark-surface guard v29
+   Prevent light placeholder/surface flashes inside the Living Instrument in dark mode.
+   Presentation only: no data, calculations, timers, routes or health logic. */
+
+.widget-instrument-loading-v29{
+  min-height:120px;
+  border-radius:20px;
+  background:rgba(148,163,184,.055);
+}
+
+.dark .widget-instrument-loading-v29{
+  background:rgba(255,255,255,.025);
+}
+
+.dark .home-command-panel:has(.widget-instrument-v5)
+.widget-instrument-slide-v5 section>.kaca{
+  background-color:rgba(8,12,18,.96)!important;
+  color:#f8fafc!important;
+}
+
+.dark .home-command-panel:has(.widget-instrument-v5)
+.widget-instrument-slide-v5 section>.kaca :is(h1,h2,h3,strong,.font-black):not([class*='text-']){
+  color:#f8fafc!important;
+}
+
+.dark .home-command-panel:has(.widget-instrument-v5)
+.widget-instrument-slide-v5 section>.kaca :is(p,.t-mikro,.t-kecil):not([class*='text-']){
+  color:#cbd5e1!important;
+}
+
+@media (prefers-contrast:more){
+  .dark .home-command-panel:has(.widget-instrument-v5)
+  .widget-instrument-slide-v5 section>.kaca{
+    background-color:#090d13!important;
+    outline:1px solid rgba(255,255,255,.16);
+    outline-offset:-1px;
+  }
+}

@@ -1,6 +1,7 @@
 import { Suspense, useEffect, useRef, useState, type CSSProperties, type ReactNode } from 'react'
 import '../styles/widget-living-instrument-v5.css'
 import '../styles/widget-concepts-v8.css'
+import '../styles/widget-dark-surface-v29.css'
 
 type WidgetItem = { kunci: string; isi: ReactNode }
 type InstrumentMeta = {
@@ -113,9 +114,6 @@ export function Tumpukan({ judul, anak, aksi }: { judul?: string; anak: WidgetIt
   const halaman = useRef<(HTMLDivElement | null)[]>([])
   const digeser = useRef(false)
   const hemat = typeof document !== 'undefined' && document.documentElement.classList.contains('pmd-low-memory')
-  // One look-ahead is enough to keep a swipe responsive. Mounting two or three
-  // future widgets at once needlessly starts their timers, observers and data
-  // work before the user has approached them.
   const preload = 1
   const [aktif, setAktif] = useState(0)
   const [tinggi, setTinggi] = useState<number | undefined>(undefined)
@@ -125,15 +123,6 @@ export function Tumpukan({ judul, anak, aksi }: { judul?: string; anak: WidgetIt
   useEffect(() => {
     setSiap((s) => Math.max(s, Math.min(anak.length, preload)))
   }, [anak.length, preload])
-
-  // Do not progressively mount every selected widget in the background.
-  // Only the active slide and one look-ahead are allowed to become live. This
-  // keeps timers, observers, calculations and network hooks dormant until the
-  // user actually approaches that widget.
-  useEffect(() => {
-    const lookAhead = 1
-    setSiap((s) => Math.max(s, Math.min(anak.length, aktif + lookAhead + 1)))
-  }, [aktif, anak.length])
 
   useEffect(() => {
     const periksa = () => {
@@ -161,9 +150,16 @@ export function Tumpukan({ judul, anak, aksi }: { judul?: string; anak: WidgetIt
   const TINGGI_MAKS = hemat ? 390 : 440
   const aktifItem = tampil[Math.min(aktif, Math.max(0, tampil.length - 1))]
 
-  // Measure only the active widget. The old implementation measured every
-  // mounted slide and used the tallest one for the whole carousel, which both
-  // forced repeated layout work and left large empty areas under short widgets.
+  // `aktif` is the index inside the filtered visible list, while `siap` is a
+  // prefix count in the original `anak` array. When earlier widgets return
+  // null, these indexes diverge. Mount by the active widget's ORIGINAL index so
+  // the header can never point at an unmounted/blank slide (e.g. 11/17 Zone 2).
+  useEffect(() => {
+    const lookAhead = 1
+    const originalIndex = aktifItem?.i ?? aktif
+    setSiap((s) => Math.max(s, Math.min(anak.length, originalIndex + lookAhead + 1)))
+  }, [aktif, aktifItem?.i, anak.length])
+
   useEffect(() => {
     const index = aktifItem?.i
     if (index == null || index >= siap) return
@@ -291,7 +287,7 @@ export function Tumpukan({ judul, anak, aksi }: { judul?: string; anak: WidgetIt
               aria-hidden={aktifItem?.i !== i}
             >
               {i < siap ? (
-                <Suspense fallback={<div className="min-h-[120px]" aria-hidden />}>
+                <Suspense fallback={<div className="widget-instrument-loading-v29" aria-hidden />}>
                   {a.isi}
                 </Suspense>
               ) : null}
