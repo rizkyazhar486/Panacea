@@ -46,7 +46,7 @@ export const icd11Release = ICD_RELEASE
 
 function bersihkanKueri(value: string): string {
   return value
-    .replace(/[\u0000-\u001f\u007f<>\\":|]/g, ' ')
+    .replace(/[\u0000-\u001f\u007f<>\\\":|]/g, ' ')
     .replace(/\s+/g, ' ')
     .trim()
     .slice(0, MAX_QUERY_LENGTH)
@@ -55,6 +55,22 @@ function bersihkanKueri(value: string): string {
 function batasiHasil(limit: number): number {
   if (!Number.isFinite(limit)) return 20
   return Math.min(Math.max(Math.trunc(limit), 1), MAX_RESULTS)
+}
+
+/**
+ * Menerima hanya dua bentuk identifier WHO yang tidak ambigu:
+ * - entity id numerik murni; atau
+ * - URL resmi Foundation entity `https://id.who.int/icd/entity/<digits>`.
+ *
+ * Jangan "membersihkan" string campuran dengan membuang karakter non-angka:
+ * `abc123def` tidak boleh diam-diam berubah menjadi entity 123 karena itu bisa
+ * membuka entitas WHO yang berbeda dari yang sebenarnya dimaksud pemanggil.
+ */
+export function normalisasiIcdEntityId(value: string): string | null {
+  const input = value.trim()
+  if (/^\d+$/.test(input)) return input
+  const cocok = input.match(/^https:\/\/id\.who\.int\/icd\/entity\/(\d+)\/?$/)
+  return cocok?.[1] ?? null
 }
 
 // Token WHO berlaku ~1 jam. Disimpan di memori dan diperbarui lebih awal
@@ -122,8 +138,6 @@ async function cariIcd11(q: string, limit: number): Promise<IcdEntry[]> {
   const data = (await res.json()) as WhoSearchResp
   const out: IcdEntry[] = []
   for (const e of data.destinationEntities ?? []) {
-    // Entitas tanpa kode adalah simpul pengelompokan, bukan diagnosis yang
-    // bisa dikodekan — tidak berguna di daftar hasil.
     if (typeof e.theCode !== 'string' || !e.theCode.trim()) continue
     if (typeof e.title !== 'string' || !e.title.trim()) continue
     out.push({
@@ -199,7 +213,7 @@ interface WhoEntity {
 export async function rincianIcd11(entityId: string): Promise<IcdEntry | null> {
   const token = await whoToken()
   if (!token) return null
-  const id = entityId.replace(/^https?:\/\/id\.who\.int\/icd\/entity\//, '').replace(/[^0-9]/g, '')
+  const id = normalisasiIcdEntityId(entityId)
   if (!id) return null
   const res = await fetch(`${ICD_BASE}/${ICD_RELEASE}/mms/${id}`, {
     headers: whoHeaders(token),
