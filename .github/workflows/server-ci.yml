@@ -57,6 +57,8 @@ jobs:
         run: npm run uji:icd
       - name: Test canonical drug label orchestration
         run: npm run uji:drug-info
+      - name: Test anatomy ontology provenance adapter
+        run: npm run uji:ontology
       - name: Runtime smoke-test genomics control plane
         env:
           JWT_SECRET: ci-only-panacea-genomics-secret
