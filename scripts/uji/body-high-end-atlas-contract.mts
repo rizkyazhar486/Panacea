@@ -17,6 +17,9 @@ assert.deepEqual([...BODY_HIGH_END_ATLAS_CONTRACT.benchmarkReferenceIds], [
 ])
 assert.equal(BODY_HIGH_END_ATLAS_CONTRACT.externalAssetImportAllowed, false)
 assert.equal(BODY_HIGH_END_ATLAS_CONTRACT.patientSpecificBreathingModel, false)
+assert.equal(BODY_HIGH_END_ATLAS_CONTRACT.verifiedBiomedicalAssetPublicationAllowed, false)
+assert.equal(BODY_HIGH_END_ATLAS_CONTRACT.assetLevelProvenanceComplete, false)
+assert.equal(BODY_HIGH_END_ATLAS_CONTRACT.runtimeAssetPolicy, 'local-assets-reference-until-provenance-reviewed')
 assert.equal(BODY_HIGH_END_ATLAS_CONTRACT.highFidelityCaptureLongEdgePx, 5120)
 assert.equal(BODY_HIGH_END_ATLAS_CONTRACT.renderLayerCount, 7)
 assert.equal(BODY_HIGH_END_ATLAS_CONTRACT.respiratoryCompartmentCount, 7)
@@ -34,7 +37,11 @@ assert.equal(BODY_ATLAS_ASSET_MANIFEST.length, 7)
 assert.equal(BODY_RESPIRATORY_ATLAS.compartments.length, 7)
 assert.ok(BODY_HIGH_END_ATLAS_CONTRACT.capabilities.includes('whole-body-source-graph'))
 assert.ok(BODY_HIGH_END_ATLAS_CONTRACT.capabilities.includes('respiratory-compartment-atlas'))
-assert.ok(BODY_HIGH_END_ATLAS_CONTRACT.capabilities.includes('cryptographic-local-asset-provenance'))
+assert.ok(BODY_HIGH_END_ATLAS_CONTRACT.capabilities.includes('cryptographic-local-asset-identity'))
+assert.equal(
+  BODY_HIGH_END_ATLAS_CONTRACT.capabilities.some((capability) => capability === ('cryptographic-local-asset-provenance' as never)),
+  false,
+)
 assert.ok(BODY_HIGH_END_ATLAS_CONTRACT.capabilities.includes('explicit-coverage-gaps'))
 
-console.log(`High-end atlas contract: ${BODY_ATLAS_GRAPH.nodes.length} local source meshes + ${BODY_RESPIRATORY_ATLAS.nodes.length} respiratory-classified meshes; mandatory thebuggeddev anatomy/Breath Atlas benchmarks retained with fail-closed runtime licensing.`)
+console.log(`High-end atlas contract: ${BODY_ATLAS_GRAPH.nodes.length} local source meshes + ${BODY_RESPIRATORY_ATLAS.nodes.length} respiratory-classified meshes; cryptographic local identity is preserved while verified biomedical provenance remains explicitly blocked pending asset-level source/license/transformation records and qualified review.`)
