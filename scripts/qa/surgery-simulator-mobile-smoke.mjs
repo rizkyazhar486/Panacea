@@ -14,6 +14,9 @@ const context = await browser.newContext({ viewport: { width: 390, height: 844 }
 await context.addInitScript(() => {
   const account = { email: 'surgery-qa@localhost.test', name: 'Surgery QA', role: 'pasien', isSubscriber: false, loggedAt: new Date().toISOString(), sex: 'P', dob: '1990-01-01' }
   localStorage.setItem('panaceamed.session.v1', JSON.stringify({ account, loginAt: Date.now() }))
+  const style = document.createElement('style')
+  style.textContent = 'html, body { overflow-anchor: none !important; scroll-behavior: auto !important; }'
+  document.documentElement.appendChild(style)
 })
 
 const page = await context.newPage()
@@ -52,41 +55,23 @@ async function waitForInputValue(locator, expected, tolerance = 0.005, timeout =
   throw new Error(`Timed out waiting for input value ${expected}`)
 }
 async function tapScrolled(locator) {
-  // Mobile Body Explorer can contain nested scrolling surfaces. Centre the
-  // preset inside each real scrollable ancestor first, then centre the page
-  // scroller. We still require elementFromPoint to prove a real hit target and
-  // use a normal pointer click — never force:true and never DOM .click().
+  // CI renders the atlas asynchronously, so scroll anchoring can move the page
+  // after an ordinary scrollIntoView. Compute the target's absolute document
+  // position on each attempt and scroll the root explicitly. A real viewport
+  // hit target is still required before a normal pointer click.
   let lastHit = null
-  for (let attempt = 0; attempt < 4; attempt += 1) {
+  for (let attempt = 0; attempt < 6; attempt += 1) {
     await locator.evaluate((node) => {
-      const scrollables = []
-      let parent = node.parentElement
-      while (parent) {
-        const style = getComputedStyle(parent)
-        const canScrollY = /(auto|scroll|overlay)/.test(style.overflowY) && parent.scrollHeight > parent.clientHeight + 1
-        if (canScrollY) scrollables.push(parent)
-        parent = parent.parentElement
-      }
-
-      for (const scroller of scrollables) {
-        const nodeRect = node.getBoundingClientRect()
-        const scrollerRect = scroller.getBoundingClientRect()
-        const desiredCenter = scrollerRect.top + scroller.clientHeight / 2
-        const nodeCenter = nodeRect.top + nodeRect.height / 2
-        scroller.scrollTop += nodeCenter - desiredCenter
-      }
-
+      const visualTop = window.visualViewport?.offsetTop ?? 0
+      const visualHeight = window.visualViewport?.height ?? window.innerHeight
       const rect = node.getBoundingClientRect()
-      const rootScroller = document.scrollingElement
-      if (rootScroller) {
-        const visualTop = window.visualViewport?.offsetTop ?? 0
-        const visualHeight = window.visualViewport?.height ?? window.innerHeight
-        const desiredCenter = visualTop + visualHeight / 2
-        const nodeCenter = rect.top + rect.height / 2
-        rootScroller.scrollTop += nodeCenter - desiredCenter
-      }
+      const absoluteCenter = window.scrollY + rect.top + rect.height / 2
+      const viewportCenter = visualTop + visualHeight / 2
+      const maxScroll = Math.max(0, document.documentElement.scrollHeight - window.innerHeight)
+      const targetScrollY = Math.max(0, Math.min(maxScroll, absoluteCenter - viewportCenter))
+      window.scrollTo({ top: targetScrollY, left: 0, behavior: 'auto' })
     })
-    await page.waitForTimeout(120)
+    await page.waitForTimeout(180)
 
     lastHit = await locator.evaluate((node) => {
       const rect = node.getBoundingClientRect()
@@ -97,22 +82,6 @@ async function tapScrolled(locator) {
       const x = rect.left + rect.width / 2
       const y = rect.top + rect.height / 2
       const target = document.elementFromPoint(x, y)
-      const ancestors = []
-      let parent = node.parentElement
-      while (parent) {
-        const style = getComputedStyle(parent)
-        if (parent.scrollHeight > parent.clientHeight + 1 || /(auto|scroll|overlay)/.test(style.overflowY)) {
-          ancestors.push({
-            tag: parent.tagName,
-            className: parent.className?.toString?.().slice(0, 120) ?? '',
-            overflowY: style.overflowY,
-            scrollTop: parent.scrollTop,
-            clientHeight: parent.clientHeight,
-            scrollHeight: parent.scrollHeight,
-          })
-        }
-        parent = parent.parentElement
-      }
       return {
         x,
         y,
@@ -125,12 +94,12 @@ async function tapScrolled(locator) {
         innerWidth: window.innerWidth,
         innerHeight: window.innerHeight,
         pageScrollY: window.scrollY,
+        documentScrollHeight: document.documentElement.scrollHeight,
         visible: rect.width > 0 && rect.height > 0 && x >= visualLeft && x <= visualLeft + visualWidth && y >= visualTop && y <= visualTop + visualHeight,
         enabled: !(node instanceof HTMLButtonElement) || !node.disabled,
         hitTarget: target === node || node.contains(target),
         hitTag: target?.tagName ?? null,
         hitText: target?.textContent?.trim().slice(0, 80) ?? null,
-        ancestors,
       }
     })
 
@@ -139,7 +108,7 @@ async function tapScrolled(locator) {
       return
     }
   }
-  throw new Error(`Preset is not a valid browser hit target after nested scrolling: ${JSON.stringify(lastHit)}`)
+  throw new Error(`Preset is not a valid browser hit target after absolute document scrolling: ${JSON.stringify(lastHit)}`)
 }
 
 const metrics = {
