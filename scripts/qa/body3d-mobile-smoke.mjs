@@ -256,16 +256,18 @@ try {
   const sliderState = await slider.evaluate((node) => ({
     min: Number(node.min),
     max: Number(node.max),
+    step: Number(node.step) || 1,
     neutral: Number(node.value),
   }))
-  const targetAngle = Math.round(
-    sliderState.neutral + (sliderState.max - sliderState.neutral) * 0.65,
-  )
-  await slider.evaluate((node, value) => {
-    node.value = String(value)
-    node.dispatchEvent(new Event('input', { bubbles: true }))
-    node.dispatchEvent(new Event('change', { bubbles: true }))
-  }, targetAngle)
+  const rawTarget = sliderState.neutral + (sliderState.max - sliderState.neutral) * 0.65
+  const targetAngle = sliderState.min + Math.round((rawTarget - sliderState.min) / sliderState.step) * sliderState.step
+
+  // Use real browser keyboard interaction so React's controlled input receives
+  // the same change path as a user instead of a DOM-only value mutation.
+  await slider.focus()
+  await slider.press('Home')
+  const stepCount = Math.round((targetAngle - sliderState.min) / sliderState.step)
+  for (let i = 0; i < stepCount; i++) await slider.press('ArrowRight')
 
   const renderedAngleLabel = inspector.getByText(`Flexion / extension · ${targetAngle.toFixed(0)}°`, { exact: true })
   await renderedAngleLabel.waitFor({ state: 'visible', timeout: 5_000 })
@@ -276,7 +278,7 @@ try {
     throw new Error(`Whole-body ROM slider did not move meaningfully from neutral: saw ${observedAngle}°`)
   }
   if (observedAngle !== targetAngle) {
-    throw new Error(`Whole-body ROM slider event interaction expected ${targetAngle}°: saw ${observedAngle}°`)
+    throw new Error(`Whole-body ROM slider keyboard interaction expected ${targetAngle}°: saw ${observedAngle}°`)
   }
 
   const dialMotionLabel = inspector.getByText(`Flexion ${targetAngle.toFixed(0)}°`, { exact: true })
@@ -299,7 +301,7 @@ try {
 
   await inspector.scrollIntoViewIfNeeded()
   await captureMotionViewport()
-  if (!motionScreenshotCaptured) throw new Error('Whole-body motion inspector mobile visual evidence was not captured')
+  if (!motionScreenshotCaptured) throw new Error('Body3D motion inspector mobile visual evidence was not captured')
 
   if (pageErrors.length) throw new Error(`Browser page errors: ${pageErrors.join(' | ')}`)
 
