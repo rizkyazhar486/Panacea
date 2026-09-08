@@ -39,8 +39,8 @@ assert.doesNotMatch(atlas, /\.glb["'`]/i, 'Holistic hub must not import external
 
 assert.match(precision, /import HolisticHealthcareAtlas from '\.\/HolisticHealthcareAtlas'/, 'Whole-body precision lab must mount the holistic hub.')
 assert.match(precision, /type Mode = 'holistic' \| 'z-anatomy' \| 'breath-atlas' \| 'unfolded' \| 'specialty' \| 'movement'/, 'Holistic mode must be additive and preserve every existing precision mode.')
-assert.match(precision, /useState<Mode>\('holistic'\)/, 'Holistic healthcare must be the default precision experience.')
-assert.match(precision, /\['holistic', 'Holistic healthcare'\]/, 'Holistic healthcare needs an explicit tab.')
+assert.match(precision, /useState<Mode>\('z-anatomy'\)/, 'Z-Anatomy must remain the default precision experience while holistic healthcare stays additive.')
+assert.match(precision, /\[\['holistic', 'Holistic healthcare'\], \['z-anatomy', 'Z-Anatomy atlas'\]/, 'Holistic healthcare must remain the first navigation tab while preserving the Z-Anatomy runtime default.')
 assert.match(precision, /\['z-anatomy', 'Z-Anatomy atlas'\]/, 'Z-Anatomy must remain directly reachable.')
 assert.match(precision, /\['breath-atlas', 'Breath atlas'\]/, 'Breath Atlas must remain directly reachable.')
 assert.match(precision, /onOpenZAnatomy=\{\(\) => setMode\('z-anatomy'\)\}/, 'Holistic hub must hand off to the existing anatomy atlas without a second renderer.')
