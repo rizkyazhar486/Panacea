@@ -18,6 +18,10 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  # Keep the expensive browser/WebGL acceptance on one runner so the production
+  # build is reused by both Body smoke checks. `npm run build` already executes
+  # the repository validators plus `tsc -b`, so a separate `tsc --noEmit` here
+  # only repeated the same frontend type gate on every PR.
   full-acceptance:
     runs-on: ubuntu-latest
     timeout-minutes: 40
@@ -34,10 +38,7 @@ jobs:
       - name: Install frontend dependencies
         run: npm ci
 
-      - name: Frontend TypeScript
-        run: npx tsc --noEmit
-
-      - name: Frontend production build
+      - name: Frontend production build and TypeScript
         run: npm run build
 
       - name: Frontend tests
@@ -89,6 +90,23 @@ jobs:
           if [ -f /tmp/panacea-vite-preview.pid ]; then
             kill "$(cat /tmp/panacea-vite-preview.pid)" 2>/dev/null || true
           fi
+
+  # Server acceptance is independent of the browser/WebGL runner. Running it in
+  # parallel preserves the exact same gate while removing it from the frontend
+  # critical path and surfaces backend failures earlier.
+  server-acceptance:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: server/package-lock.json
 
       - name: Install server dependencies
         working-directory: server
