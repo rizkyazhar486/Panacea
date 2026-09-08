@@ -35,6 +35,29 @@ export function hasVerifiedProfessionalRole(
   return user.role === role && settings?.strStatus === 'verified'
 }
 
+/**
+ * Derive the role visible to protected request handlers. The account can keep
+ * its requested professional role for onboarding/profile display, while
+ * backend privileges remain unavailable until the owner-approved verification
+ * flag exists. A stored `owner` role is never authoritative by itself.
+ *
+ * `allowOnboardingRole` is only for the professional-application submission
+ * route so an unverified doctor/verifier can state which role is being reviewed.
+ */
+export function effectiveRoleForRequest(
+  user: Pick<User, 'email' | 'role'>,
+  settings: AccessSettings,
+  ownerEmail: string,
+  allowOnboardingRole = false,
+): Role {
+  if (isConfiguredOwner(user, ownerEmail)) return user.role
+  if (allowOnboardingRole && ['dokter', 'kontributor', 'verifikator'].includes(user.role)) return user.role
+  if (user.role === 'owner') return 'pasien'
+  if (user.role === 'dokter' && settings?.strStatus !== 'verified') return 'pasien'
+  if (user.role === 'verifikator' && settings?.strStatus !== 'verified') return 'pasien'
+  return user.role
+}
+
 export function canReviewSecondOpinions(
   user: Pick<User, 'email' | 'role'>,
   settings: AccessSettings,
