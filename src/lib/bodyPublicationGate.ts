@@ -13,65 +13,96 @@ export interface BodyPublicationRequest {
 }
 
 export interface BodyPublicationDecision {
+  /** Strict biomedical publication readiness. */
   publishable: boolean
+  /** Provenance-valid evidence may remain visible as explicitly reference-only while review is pending. */
+  referenceDisplayAllowed: boolean
   renderAsVerifiedAnatomy: boolean
   displayAsReferenceOnly: boolean
   reasons: string[]
 }
 
+const REVIEW_ONLY_EVIDENCE_REASON = 'Target requires recorded academic review metadata for publication.'
+
 /**
  * Unified fail-closed publication decision for Body Exposure / shared Body3D.
  *
  * Formula:
- * verified anatomy = target contract AND strict asset provenance;
- * evidence overlay = target contract AND at least one valid provenance-bearing
- * mapping. An overlay can be publishable as reference-only without promoting
- * the underlying geometry to verified anatomy. Procedures deliberately remain
- * outside this gate until a procedure-specific evidence/review contract exists.
+ * verified anatomy = target contract AND strict asset provenance AND recorded review;
+ * reference evidence display = provenance-valid mapping AND safe target contract;
+ * biomedical publication = reference evidence display AND recorded target + mapping review.
+ *
+ * Review-pending evidence may remain visible only as an explicitly reference-only
+ * teaching overlay. It must never be described as publication-ready, and verified
+ * underlying geometry must not launder an unreviewed overlay into a verified claim.
+ * Procedures remain delegated to the dedicated procedure publication gate.
  */
 export function evaluateBodyPublication(request: BodyPublicationRequest): BodyPublicationDecision {
   const { target, kind } = request
   const reasons: string[] = []
+  const referenceReasons: string[] = []
 
-  if (!target.kinds.includes(kind)) reasons.push(`Projection target does not permit publication kind "${kind}".`)
+  const addSharedReason = (reason: string) => {
+    reasons.push(reason)
+    referenceReasons.push(reason)
+  }
+
+  if (!target.kinds.includes(kind)) addSharedReason(`Projection target does not permit publication kind "${kind}".`)
   if (target.geometryStatus === 'blocked' || target.evidenceStatus === 'unsupported') {
-    reasons.push('Projection target contract blocks publication.')
+    addSharedReason('Projection target contract blocks publication.')
   }
 
   if (kind === 'procedure') {
-    reasons.push('Procedure publication requires a dedicated procedure evidence and qualified-review gate.')
+    addSharedReason('Procedure publication requires a dedicated procedure evidence and qualified-review gate.')
   }
 
   const assetValidation = request.asset ? validateBodyAssetProvenance(target, request.asset) : null
   const assetVerified = Boolean(assetValidation?.validForVerifiedRender)
 
   if (request.mode === 'verified-anatomy') {
-    if (kind !== 'anatomy') reasons.push('Verified-anatomy mode is restricted to anatomy projections.')
-    if (!request.asset) reasons.push('Verified anatomy requires an exact asset-level provenance record.')
-    if (assetValidation && !assetValidation.validForVerifiedRender) reasons.push(...assetValidation.reasons)
+    if (kind !== 'anatomy') addSharedReason('Verified-anatomy mode is restricted to anatomy projections.')
+    if (!request.asset) addSharedReason('Verified anatomy requires an exact asset-level provenance record.')
+    if (assetValidation && !assetValidation.validForVerifiedRender) {
+      for (const reason of assetValidation.reasons) addSharedReason(reason)
+    }
   }
 
   if (request.mode === 'evidence-overlay') {
     if (kind === 'anatomy' || kind === 'procedure') {
-      reasons.push('Evidence-overlay mode only accepts lesion, drug-target, adverse-effect, or physiology mappings.')
+      addSharedReason('Evidence-overlay mode only accepts lesion, drug-target, adverse-effect, or physiology mappings.')
     }
 
     const evidence = request.evidence ?? []
-    if (evidence.length === 0) reasons.push('Evidence overlay requires at least one provenance-bearing mapping.')
+    if (evidence.length === 0) addSharedReason('Evidence overlay requires at least one provenance-bearing mapping.')
 
     for (const [index, record] of evidence.entries()) {
-      if (record.kind !== kind) reasons.push(`Evidence mapping ${index + 1} kind does not match publication kind.`)
+      if (record.kind !== kind) addSharedReason(`Evidence mapping ${index + 1} kind does not match publication kind.`)
       const validation = validateBodyEvidenceMapping(target, record)
-      if (!validation.publishable) reasons.push(...validation.reasons.map((reason) => `Evidence mapping ${index + 1}: ${reason}`))
+      for (const reason of validation.reasons) {
+        const mapped = `Evidence mapping ${index + 1}: ${reason}`
+        reasons.push(mapped)
+        if (reason !== REVIEW_ONLY_EVIDENCE_REASON) referenceReasons.push(mapped)
+      }
+    }
+
+    if (target.academicReview !== 'recorded') {
+      reasons.push('Target academic review must be recorded before biomedical publication.')
+    }
+    for (const [index, record] of evidence.entries()) {
+      if (record.academicReview.status !== 'recorded') {
+        reasons.push(`Evidence mapping ${index + 1}: academic review must be recorded before biomedical publication.`)
+      }
     }
   }
 
+  const referenceDisplayAllowed = request.mode === 'evidence-overlay' && referenceReasons.length === 0
   const publishable = reasons.length === 0
   const renderAsVerifiedAnatomy = publishable && request.mode === 'verified-anatomy' && assetVerified
-  const displayAsReferenceOnly = publishable && request.mode === 'evidence-overlay' && !assetVerified
+  const displayAsReferenceOnly = referenceDisplayAllowed && (!publishable || !assetVerified)
 
   return {
     publishable,
+    referenceDisplayAllowed,
     renderAsVerifiedAnatomy,
     displayAsReferenceOnly,
     reasons: [...new Set(reasons)],
