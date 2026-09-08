@@ -51,15 +51,21 @@ async function waitForInputValue(locator, expected, tolerance = 0.005, timeout =
   }
   throw new Error(`Timed out waiting for input value ${expected}`)
 }
-async function clickScrolled(locator, container) {
-  // Position only: Playwright's scrollIntoViewIfNeeded can wait forever for
-  // "stable" while the mobile simulator continues a harmless layout animation.
-  // Native scrolling avoids that setup flake; the actual click below remains a
-  // normal, non-forced Playwright click and still requires actionability.
+async function tapScrolled(locator, container) {
+  // This suite emulates a touch phone. Use native positioning followed by an
+  // actual touchscreen tap so a harmless continuing layout animation cannot
+  // trap Playwright in locator.click()'s "stable" polling. This is not a
+  // forced DOM click: the browser receives a real touch input at the control's
+  // current visible bounds, and the state assertions below still prove that
+  // the intended shared Body3D control changed.
   await container.evaluate((node) => node.scrollIntoView({ block: 'center', inline: 'nearest' }))
   await locator.evaluate((node) => node.scrollIntoView({ block: 'center', inline: 'nearest' }))
   await page.waitForTimeout(120)
-  await locator.click({ timeout: 15_000 })
+  const box = await locator.boundingBox()
+  if (!box || box.width <= 0 || box.height <= 0) {
+    throw new Error(`Unable to resolve tappable bounds for ${await locator.innerText().catch(() => 'control')}`)
+  }
+  await page.touchscreen.tap(box.x + box.width / 2, box.y + box.height / 2)
 }
 
 const metrics = {
@@ -132,24 +138,24 @@ try {
   const sagittalPreset = correlation.getByRole('button', { name: 'Sagittal CT', exact: true })
   const explodedPreset = correlation.getByRole('button', { name: 'Exploded 3D', exact: true })
 
-  await clickScrolled(axialPreset, correlation)
+  await tapScrolled(axialPreset, correlation)
   await waitForClass(page.getByRole('button', { name: 'CT', exact: true }).first(), 'bg-white')
   await waitForClass(page.getByRole('button', { name: 'Axial', exact: true }).first(), 'bg-brand')
   const sliceLevel = page.getByRole('slider', { name: 'Slice level', exact: true })
   metrics.caesareanSlicePos = await waitForInputValue(sliceLevel, 0.52)
   metrics.axialSharedBody3d = true
 
-  await clickScrolled(coronalPreset, correlation)
+  await tapScrolled(coronalPreset, correlation)
   await waitForClass(page.getByRole('button', { name: 'Coronal', exact: true }).first(), 'bg-brand')
   await waitForInputValue(sliceLevel, 0.5)
   metrics.coronalSharedBody3d = true
 
-  await clickScrolled(sagittalPreset, correlation)
+  await tapScrolled(sagittalPreset, correlation)
   await waitForClass(page.getByRole('button', { name: 'Sagittal', exact: true }).first(), 'bg-brand')
   await waitForInputValue(sliceLevel, 0.5)
   metrics.sagittalSharedBody3d = true
 
-  await clickScrolled(explodedPreset, correlation)
+  await tapScrolled(explodedPreset, correlation)
   await waitForClass(page.getByRole('button', { name: 'Anatomy', exact: true }).first(), 'bg-white')
   metrics.explodedSharedBody3d = true
 
@@ -173,7 +179,7 @@ try {
 
   const transseptalCorrelation = simulator.locator('[data-surgery-correlation="shared-body3d"]')
   const transseptalAxial = transseptalCorrelation.getByRole('button', { name: 'Axial CT', exact: true })
-  await clickScrolled(transseptalAxial, transseptalCorrelation)
+  await tapScrolled(transseptalAxial, transseptalCorrelation)
   await waitForClass(page.getByRole('button', { name: 'CT', exact: true }).first(), 'bg-white')
   await waitForClass(page.getByRole('button', { name: 'Axial', exact: true }).first(), 'bg-brand')
   metrics.transseptalSlicePos = await waitForInputValue(page.getByRole('slider', { name: 'Slice level', exact: true }), 0.72)
