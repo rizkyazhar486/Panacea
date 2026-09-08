@@ -10,6 +10,7 @@ import {
 } from '../../lib/wholeBodyAtlasBlueprint'
 import { calculateExternalLoad } from '../../lib/biomechanicsModel'
 import WholeBodyMotionInspector from './WholeBodyMotionInspector'
+import ZAnatomyAtlasWorkbench from './ZAnatomyAtlasWorkbench'
 
 interface Props {
   onHighlight?: (nodeHints: string[]) => void
@@ -21,7 +22,7 @@ interface Props {
   onOpenMovement?: () => void
 }
 
-type Mode = 'unfolded' | 'specialty' | 'movement'
+type Mode = 'z-anatomy' | 'unfolded' | 'specialty' | 'movement'
 
 const PROVENANCE_LABEL: Record<GeometryProvenance, string> = {
   'native-geometry': 'Native geometry',
@@ -85,7 +86,7 @@ function MovementDiagram({ chain }: { chain: string[] }) {
 }
 
 export function WholeBodyPrecisionLab({ onHighlight, onFocusRegion, onEnableLayer, onSetUnfold, onSetDissectionDepth, onOpenSurgical, onOpenMovement }: Props) {
-  const [mode, setMode] = useState<Mode>('unfolded')
+  const [mode, setMode] = useState<Mode>('z-anatomy')
   const [regionKey, setRegionKey] = useState<AtlasRegionKey>('thorax')
   const [specialtyId, setSpecialtyId] = useState(SPECIALTY_ATLAS_MODULES[0].id)
   const [movementId, setMovementId] = useState(MOVEMENT_PRIMITIVES[0].id)
@@ -140,11 +141,15 @@ export function WholeBodyPrecisionLab({ onHighlight, onFocusRegion, onEnableLaye
         </div>
       </div>
 
-      <div className="grid grid-cols-3 gap-1 rounded-xl bg-neutral-100 p-1 dark:bg-white/5">
-        {([['unfolded', 'Unfolded body'], ['specialty', 'Specialty atlas'], ['movement', 'Movement biomechanics']] as const).map(([key, label]) => (
+      <div className="grid grid-cols-2 gap-1 rounded-xl bg-neutral-100 p-1 dark:bg-white/5 md:grid-cols-4">
+        {([['z-anatomy', 'Z-Anatomy atlas'], ['unfolded', 'Unfolded body'], ['specialty', 'Specialty atlas'], ['movement', 'Movement biomechanics']] as const).map(([key, label]) => (
           <button key={key} type="button" aria-pressed={mode === key} onClick={() => setMode(key)} className={`rounded-lg px-2 py-2 text-[11px] font-bold transition ${mode === key ? 'bg-white text-ink shadow-sm dark:bg-white/10 dark:text-white' : 'text-neutral-500'}`}>{label}</button>
         ))}
       </div>
+
+      {mode === 'z-anatomy' && (
+        <ZAnatomyAtlasWorkbench onHighlight={onHighlight} onFocusRegion={onFocusRegion} onEnableLayer={onEnableLayer} />
+      )}
 
       {mode === 'unfolded' && (
         <div className="space-y-4">
