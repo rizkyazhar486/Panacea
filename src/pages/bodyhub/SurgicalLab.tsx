@@ -1,8 +1,10 @@
-import { useState } from 'react'
+import { lazy, Suspense, useEffect, useState } from 'react'
 import { URUTAN, WILAYAH, KEDALAMAN, type UrutanLapisan } from '../../lib/dissection'
 import { CAESAREAN_LAYER_SEQUENCE } from '../../lib/surgeryLayerSequences'
 import { SURGICAL_SPATIAL_SCENARIOS } from '../../lib/surgicalSpatialTeaching'
-import SurgerySimulatorLab, { type SurgerySharedView } from './SurgerySimulatorLab'
+import type { SurgerySharedView } from './SurgerySimulatorLab'
+
+const SurgerySimulatorLab = lazy(() => import('./SurgerySimulatorLab'))
 
 export interface SurgicalLabProps {
   onKedalaman?: (kedalaman: number) => void
@@ -22,9 +24,22 @@ export function SurgicalLab({ onKedalaman, onSorot, onSharedView }: SurgicalLabP
   const [kunci, setKunci] = useState<string | null>(null)
   const [langkah, setLangkah] = useState(0)
   const [spatialId, setSpatialId] = useState(SURGICAL_SPATIAL_SCENARIOS[0].id)
+  const [simulatorReady, setSimulatorReady] = useState(false)
   const dipilih: UrutanLapisan | undefined = SURGICAL_SEQUENCES.find((u) => u.kunci === kunci)
   const lapis = dipilih?.lapis[Math.min(langkah, dipilih.lapis.length - 1)]
   const spatial = SURGICAL_SPATIAL_SCENARIOS.find((item) => item.id === spatialId) ?? SURGICAL_SPATIAL_SCENARIOS[0]
+
+  // Keep the tab click cheap. SurgerySimulatorLab creates the atlas/WebGL
+  // workspace and can be expensive to mount on a mobile GPU. Mounting it in
+  // the same event turn made the parent "Surgical layers" tab click itself
+  // block long enough for browser automation (and potentially a real phone)
+  // to appear frozen. Commit the lightweight SurgicalLab shell first, then
+  // start the simulator on the next animation frame. The scenario selector
+  // inside the simulator remains synchronous once the workspace is mounted.
+  useEffect(() => {
+    const frame = requestAnimationFrame(() => setSimulatorReady(true))
+    return () => cancelAnimationFrame(frame)
+  }, [])
 
   function pilih(u: UrutanLapisan) {
     setKunci(u.kunci)
@@ -41,7 +56,15 @@ export function SurgicalLab({ onKedalaman, onSorot, onSharedView }: SurgicalLabP
 
   return (
     <div className="space-y-4">
-      <SurgerySimulatorLab onKedalaman={onKedalaman} onSorot={onSorot} onSharedView={onSharedView} />
+      {simulatorReady ? (
+        <Suspense fallback={<p className="rounded-xl bg-neutral-100/60 px-3 py-2 text-[11px] text-neutral-500 dark:bg-white/5">Loading surgical simulator…</p>}>
+          <SurgerySimulatorLab onKedalaman={onKedalaman} onSorot={onSorot} onSharedView={onSharedView} />
+        </Suspense>
+      ) : (
+        <p data-surgery-workspace-state="opening" className="rounded-xl bg-neutral-100/60 px-3 py-2 text-[11px] text-neutral-500 dark:bg-white/5">
+          Opening surgical workspace…
+        </p>
+      )}
 
       <div className="overflow-hidden rounded-2xl border border-neutral-200 bg-neutral-950 text-white dark:border-white/10">
         <div className="border-b border-white/10 bg-gradient-to-br from-brand/15 via-transparent to-blue-500/10 p-4">
