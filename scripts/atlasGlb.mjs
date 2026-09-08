@@ -127,7 +127,10 @@ export function tulisGlb(berkas, bagian, catatanHakCipta) {
     const aNor = accs.push({ bufferView: tambah(nor, 34962), componentType: 5126, count: nor.length / 3, type: 'VEC3' }) - 1
     const aIdx = accs.push({ bufferView: tambah(idx, 34963), componentType: 5125, count: idx.length, type: 'SCALAR' }) - 1
     meshes.push({ name: nama, primitives: [{ attributes: { POSITION: aPos, NORMAL: aNor }, indices: aIdx, material: bahan.length }] })
-    nodes.push({ name: nama, mesh: meshes.length - 1 })
+    // `name` may be sanitized by GLTFLoader for animation/property binding.
+    // Preserve the exact source anatomy term in extras so medical labels never
+    // depend on reversing that sanitizer.
+    nodes.push({ name: nama, mesh: meshes.length - 1, extras: { panaceaAnatomyName: nama } })
     const w = HEX(warna ?? '#c98a80')
     bahan.push({ name: nama, pbrMetallicRoughness: { baseColorFactor: [...w, 1], metallicFactor: 0.05, roughnessFactor: 0.72 }, doubleSided: true })
   }
