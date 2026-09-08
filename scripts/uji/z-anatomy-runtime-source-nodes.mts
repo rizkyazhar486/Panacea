@@ -8,6 +8,7 @@ import {
   resolveAnatomySourceNodes,
   subscribeAnatomySourceNodes,
 } from '../../src/lib/anatomySourceNodeRegistry.ts'
+import { anatomyFileFromUrl } from '../../src/lib/body3dSourceNodeCapture.ts'
 
 clearAllAnatomySourceNodes()
 let notifications = 0
@@ -54,11 +55,20 @@ assert.deepEqual(hip.flatMap((entry) => entry.names), ['Hip_Joint'])
 unsubscribe()
 clearAllAnatomySourceNodes()
 
+// Test URL scope behavior directly rather than matching the source-code regex
+// text. The runtime contract is that only actual /anatomy/*.glb requests may
+// publish source nodes; similarly named paths must remain ignored.
+assert.equal(anatomyFileFromUrl('/anatomy/skeletal.glb'), 'skeletal.glb')
+assert.equal(anatomyFileFromUrl('/anatomy/cardiovascular.glb?rev=abc#mesh'), 'cardiovascular.glb')
+assert.equal(anatomyFileFromUrl('https://panaceamed.id/assets/anatomy/nervous.glb?v=1'), 'nervous.glb')
+assert.equal(anatomyFileFromUrl('/atlas/skeletal.glb'), null)
+assert.equal(anatomyFileFromUrl('/not-anatomy/skeletal.glb'), null)
+assert.equal(anatomyFileFromUrl('/anatomy/skeletal.gltf'), null)
+
 const captureSource = readFileSync(new URL('../../src/lib/body3dSourceNodeCapture.ts', import.meta.url), 'utf8')
 const qualitySource = readFileSync(new URL('../../src/lib/body3dQuality.ts', import.meta.url), 'utf8')
 const workbenchSource = readFileSync(new URL('../../src/pages/bodyhub/ZAnatomyAtlasWorkbench.tsx', import.meta.url), 'utf8')
 
-assert.match(captureSource, /anatomy\\\/\(\[\^\/?#\]\+\\\.glb\)/, 'capture hook must remain scoped to anatomy GLB URLs')
 assert.match(captureSource, /gltf\.parser\.json\.nodes/, 'registry must read original GLTF JSON node names')
 assert.match(captureSource, /publishAnatomySourceNodes\(file, names\)/)
 assert.match(qualitySource, /installBody3dSourceNodeCapture\(\)/, 'Body3D generation controller must activate source-node capture')
