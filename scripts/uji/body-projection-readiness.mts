@@ -26,9 +26,11 @@ const complete: ProjectionAssetProvenance = {
   academicReview: 'pending',
 }
 
-const ready = evaluateProjectionReadiness(digestive, complete)
-assert.equal(ready.readiness, 'verified-reference')
-assert.equal(ready.renderAsVerifiedAnatomy, true)
+const pendingReview = evaluateProjectionReadiness(digestive, complete)
+assert.equal(pendingReview.readiness, 'verification-required')
+assert.equal(pendingReview.renderAsVerifiedAnatomy, false)
+assert.ok(pendingReview.reasons.includes('Verified anatomy requires recorded target academic review.'))
+assert.ok(pendingReview.reasons.includes('Verified anatomy requires recorded asset academic review.'))
 
 const missingLicense = evaluateProjectionReadiness(digestive, { ...complete, license: ' ' })
 assert.equal(missingLicense.renderAsVerifiedAnatomy, false)
@@ -51,14 +53,26 @@ const withoutReviewer = evaluateProjectionReadiness(reviewedTarget, { ...complet
 assert.equal(withoutReviewer.renderAsVerifiedAnatomy, false)
 assert.ok(withoutReviewer.reasons.some((reason) => reason.startsWith('Reviewer ')))
 
+const reviewedAssetOnPendingTarget = evaluateProjectionReadiness(digestive, {
+  ...complete,
+  academicReview: 'recorded',
+  reviewerName: 'Qualified reviewer fixture',
+  reviewerCredentials: 'Credential fixture',
+  reviewerDate: '2026-09-08',
+  reviewerScope: 'Validator fixture only',
+})
+assert.equal(reviewedAssetOnPendingTarget.renderAsVerifiedAnatomy, false)
+assert.ok(reviewedAssetOnPendingTarget.reasons.includes('Verified anatomy requires recorded target academic review.'))
+
 const withReviewer = evaluateProjectionReadiness(reviewedTarget, {
   ...complete,
   academicReview: 'recorded',
-  reviewerName: 'Qualified reviewer',
-  reviewerCredentials: 'Recorded professional credentials',
+  reviewerName: 'Qualified reviewer fixture',
+  reviewerCredentials: 'Credential fixture',
   reviewerDate: '2026-09-08',
-  reviewerScope: 'Asset identity, anatomy mapping, transformations, and educational scope',
+  reviewerScope: 'Asset identity, anatomy mapping, transformations, and educational scope fixture',
 })
+assert.equal(withReviewer.readiness, 'verified-reference')
 assert.equal(withReviewer.renderAsVerifiedAnatomy, true)
 
-console.log('Body projection readiness fail-closed provenance and review gate verified.')
+console.log('Body projection readiness: pending review stays unverified; recorded target + asset review metadata is required for verified anatomy.')
