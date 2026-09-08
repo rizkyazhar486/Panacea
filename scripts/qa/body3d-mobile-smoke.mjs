@@ -174,16 +174,53 @@ try {
     node.closest('[role="status"]')?.getAttribute('class') ?? '',
   )
   metrics.progressiveLoadingCompact = progressiveClass.includes('top-2') && !progressiveClass.includes('inset-0')
-  metrics.progressiveLoadingCenterUnobstructed = await canvas.evaluate((node) => {
-    const rect = node.getBoundingClientRect()
-    const x = rect.left + rect.width / 2
-    const y = rect.top + rect.height / 2
-    const hit = document.elementFromPoint(x, y)
-    const viewerNode = node.parentElement
-    return Boolean(hit && viewerNode && (hit === node || hit === viewerNode || viewerNode.contains(hit)))
+  metrics.progressiveLoadingGeometry = await progressiveLoading.evaluate((node) => {
+    const status = node.closest('[role="status"]')
+    const canvas = document.querySelector('div.h-full.w-full.touch-none > canvas')
+    if (!status || !canvas) {
+      return { statusFound: Boolean(status), canvasFound: Boolean(canvas), coversCenter: true, pointerEvents: null }
+    }
+    const sr = status.getBoundingClientRect()
+    const cr = canvas.getBoundingClientRect()
+    const centerX = cr.left + cr.width / 2
+    const centerY = cr.top + cr.height / 2
+    return {
+      statusFound: true,
+      canvasFound: true,
+      coversCenter: centerX >= sr.left && centerX <= sr.right && centerY >= sr.top && centerY <= sr.bottom,
+      pointerEvents: getComputedStyle(status).pointerEvents,
+      canvasCenter: [centerX, centerY],
+      statusRect: [sr.left, sr.top, sr.right, sr.bottom],
+    }
   })
+  metrics.progressiveLoadingCenterUnobstructed = !metrics.progressiveLoadingGeometry.coversCenter && metrics.progressiveLoadingGeometry.pointerEvents === 'none'
   if (!metrics.progressiveLoadingCompact) throw new Error(`Additional layer loading is not compact: ${progressiveClass || 'no class'}`)
-  if (!metrics.progressiveLoadingCenterUnobstructed) throw new Error('Additional layer loading obstructed the Body3D viewer center')
+  if (!metrics.progressiveLoadingCenterUnobstructed) {
+    throw new Error(`Additional layer loading blocks or covers the Body3D viewer center: ${JSON.stringify(metrics.progressiveLoadingGeometry)}`)
+  }
+
+  // Prove the already-usable viewer remains interactive while an optional layer
+  // is still loading. This is stronger than relying on elementFromPoint alone,
+  // which can report legitimate nested viewer overlays rather than the canvas.
+  const progressiveBox = await canvas.boundingBox()
+  if (!progressiveBox) throw new Error('Body3D canvas has no bounding box during progressive loading')
+  const progressiveX = progressiveBox.x + progressiveBox.width * 0.5
+  const progressiveY = progressiveBox.y + progressiveBox.height * 0.45
+  await page.mouse.move(progressiveX, progressiveY)
+  await page.mouse.down()
+  await page.mouse.move(progressiveX + Math.min(32, progressiveBox.width * 0.1), progressiveY + 12, { steps: 4 })
+  await page.mouse.up()
+  await page.waitForTimeout(250)
+  const progressiveHealth = await canvasHealth(canvas)
+  metrics.progressiveInteraction = {
+    attempted: true,
+    contextStable: progressiveHealth.webgl && !progressiveHealth.contextLost,
+    canvasVisible: await canvas.isVisible(),
+  }
+  if (!metrics.progressiveInteraction.contextStable || !metrics.progressiveInteraction.canvasVisible) {
+    throw new Error('Progressive layer loading prevented stable Body3D interaction')
+  }
+  await assertNoFatal('Progressive layer interaction triggered a Body3D fatal state')
   await progressiveLoading.waitFor({ state: 'hidden', timeout: 120_000 })
 
   // Runtime interaction proof: perform a real orbit gesture, then require the
