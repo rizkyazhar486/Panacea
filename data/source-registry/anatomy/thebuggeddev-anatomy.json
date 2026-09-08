@@ -1,0 +1,52 @@
+{
+  "id": "thebuggeddev_anatomy",
+  "name": "thebuggeddev Anatomy",
+  "category": "anatomy",
+  "kind": ["model-repository", "viewer", "tooling"],
+  "homepage": "https://github.com/thebuggeddev/anatomy",
+  "repository": "https://github.com/thebuggeddev/anatomy",
+  "features": ["body-exposure-reference", "threejs-anatomy-viewer", "glb-draco-pipeline-reference"],
+  "formats": ["glb", "threejs", "draco"],
+  "usage": {
+    "runtime": false,
+    "buildTime": false,
+    "networkRequired": false,
+    "notes": "Mandatory design/architecture reference for Panacea Body Exposure. Do not copy code, models, textures, labels, or other assets into Panacea until the exact upstream license and asset-level provenance are verified. Reimplement patterns independently where useful."
+  },
+  "license": {
+    "status": "UNKNOWN",
+    "identifier": null,
+    "commercialUse": "UNKNOWN",
+    "attributionRequired": null,
+    "shareAlike": null,
+    "scope": "No root LICENSE file was visible during the 2026-09-09 review. Repository visibility alone is not permission to reuse code or assets.",
+    "verificationUrl": "https://github.com/thebuggeddev/anatomy",
+    "verifiedAt": null,
+    "notes": "Fail closed: reference architecture/UX only until license text and model-level rights are verified and version-pinned."
+  },
+  "validation": {
+    "level": "REFERENCE",
+    "clinicalDecisionUse": "NO",
+    "notes": "Useful as a software/visualization reference only. It is not an authoritative anatomy source and does not establish medical accuracy, qualified review, diagnostic validity, or patient-specific anatomy."
+  },
+  "provenance": {
+    "authority": "thebuggeddev public GitHub repository",
+    "sourceIdentityRequired": true,
+    "versionPinRequired": true,
+    "notes": "Any future adoption must pin an exact upstream commit and separately record provenance/license for every imported or derived asset."
+  },
+  "adapter": {
+    "status": "PLANNED",
+    "normalizedTarget": "PanaceaBodyReferenceArchitecture",
+    "module": null,
+    "notes": "Reference targets include Three.js scene organization, GLB/Draco loading strategy, interaction patterns, progressive asset delivery, and multilingual atlas UX. No direct runtime dependency is authorized by this registry entry."
+  },
+  "trust": {
+    "authority": 1,
+    "evidenceQuality": 1,
+    "recency": 4,
+    "licenseClarity": 0,
+    "reproducibility": 3,
+    "notes": "Trust scores describe suitability as a software reference, not anatomical truth."
+  }
+}
