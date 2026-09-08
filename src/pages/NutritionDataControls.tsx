@@ -1,9 +1,12 @@
 import { useMemo, useState, type ChangeEvent } from 'react'
 import { useStore } from '../lib/store'
 import {
+  MAX_NUTRITION_FILTER_RESULTS,
   MAX_NUTRITION_IMPORT_BYTES,
   MAX_NUTRITION_IMPORT_ENTRIES,
   buildNutritionJournalTimeline,
+  compareLatestNutritionJournalDays,
+  filterNutritionJournalEntries,
   latestNutritionJournalSnapshot,
   parseNutritionJournalJson,
   sanitizeNutritionJournal,
@@ -27,12 +30,19 @@ function recordedEnergyPolyline(values: number[], width = 320, height = 96) {
   }).join(' ')
 }
 
+function signed(value: number, unit = '') {
+  const rounded = Math.round(value)
+  return `${rounded > 0 ? '+' : ''}${rounded}${unit}`
+}
+
 export function NutritionDataControls() {
   const { state, addFood } = useStore()
   const [status, setStatus] = useState<StatusMessage>({
     kind: 'idle',
     text: 'Local journal controls are ready. No file is uploaded to Panacea.',
   })
+  const [query, setQuery] = useState('')
+  const [dateFilter, setDateFilter] = useState('')
 
   const journal = useMemo(
     () => sanitizeNutritionJournal(state.foods, 1_000),
@@ -40,7 +50,16 @@ export function NutritionDataControls() {
   )
   const timeline = useMemo(() => buildNutritionJournalTimeline(state.foods, 7), [state.foods])
   const latest = useMemo(() => latestNutritionJournalSnapshot(state.foods), [state.foods])
+  const comparison = useMemo(() => compareLatestNutritionJournalDays(state.foods), [state.foods])
   const energyPoints = useMemo(() => recordedEnergyPolyline(timeline.map((day) => day.kcal)), [timeline])
+  const dateOptions = useMemo(
+    () => [...new Set(journal.entries.map((entry) => entry.date))].sort((a, b) => b.localeCompare(a)).slice(0, 30),
+    [journal.entries],
+  )
+  const filteredEntries = useMemo(
+    () => filterNutritionJournalEntries(journal.entries, query, dateFilter),
+    [journal.entries, query, dateFilter],
+  )
 
   function exportJournal() {
     const exported = serializeNutritionJournal(state.foods)
@@ -92,6 +111,12 @@ export function NutritionDataControls() {
         <p className="mt-2 max-w-3xl text-xs leading-relaxed text-neutral-500 dark:text-neutral-400">
           Export or restore recorded food entries as a versioned JSON file. Import validation checks structure, dates, finite values, duplicate IDs and bounded record count. It does not verify that a food database or nutrient value is scientifically correct.
         </p>
+
+        <ol className="mt-4 grid gap-2 text-[11px] sm:grid-cols-3" aria-label="Nutrition data controls quick start">
+          <li className="rounded-2xl border border-neutral-200 p-3 dark:border-white/10"><b>1 · Export</b><div className="mt-1 text-neutral-500">Download a local copy before moving or restoring records.</div></li>
+          <li className="rounded-2xl border border-neutral-200 p-3 dark:border-white/10"><b>2 · Import</b><div className="mt-1 text-neutral-500">Choose the Panacea JSON file yourself; unsupported data fails closed.</div></li>
+          <li className="rounded-2xl border border-neutral-200 p-3 dark:border-white/10"><b>3 · Review</b><div className="mt-1 text-neutral-500">Check imported/skipped counts and the recorded-only timeline before relying on it.</div></li>
+        </ol>
 
         <div className="mt-4 grid gap-3 sm:grid-cols-3">
           <div className="rounded-2xl border border-neutral-200 p-3 dark:border-white/10">
@@ -177,15 +202,68 @@ export function NutritionDataControls() {
                 </div>
               </div>
             </div>
+
+            <div className="mt-4 rounded-2xl border border-neutral-200 p-3 dark:border-white/10">
+              <div className="text-[9px] font-black uppercase tracking-wide text-neutral-400">Latest vs previous recorded day</div>
+              {!comparison ? (
+                <p className="mt-2 text-[11px] text-neutral-500">A second recorded date is required before a descriptive comparison is shown.</p>
+              ) : (
+                <div className="mt-2 grid gap-2 sm:grid-cols-6" aria-label={`Recorded comparison ${comparison.previous.date} to ${comparison.latest.date}`}>
+                  <div className="rounded-xl bg-neutral-50 p-2 text-[10px] dark:bg-white/[0.03]"><b>Dates</b><div>{comparison.previous.date}<br />→ {comparison.latest.date}</div></div>
+                  <div className="rounded-xl bg-neutral-50 p-2 text-[10px] dark:bg-white/[0.03]"><b>Entries Δ</b><div>{signed(comparison.delta.entries)}</div></div>
+                  <div className="rounded-xl bg-neutral-50 p-2 text-[10px] dark:bg-white/[0.03]"><b>kcal Δ</b><div>{signed(comparison.delta.kcal)}</div></div>
+                  <div className="rounded-xl bg-neutral-50 p-2 text-[10px] dark:bg-white/[0.03]"><b>Carbs Δ</b><div>{signed(comparison.delta.carbs, ' g')}</div></div>
+                  <div className="rounded-xl bg-neutral-50 p-2 text-[10px] dark:bg-white/[0.03]"><b>Protein Δ</b><div>{signed(comparison.delta.protein, ' g')}</div></div>
+                  <div className="rounded-xl bg-neutral-50 p-2 text-[10px] dark:bg-white/[0.03]"><b>Fat Δ</b><div>{signed(comparison.delta.fat, ' g')}</div></div>
+                </div>
+              )}
+              <p className="mt-2 text-[10px] text-neutral-400">Difference in recorded totals only; no target, adequacy or health interpretation is inferred.</p>
+            </div>
           </>
         )}
       </section>
 
-      <section className="grid gap-3 md:grid-cols-2">
+      <section className="rounded-3xl border border-neutral-200 bg-white p-5 dark:border-white/10 dark:bg-white/[0.02]">
+        <div className="text-[9px] font-black uppercase tracking-[0.16em] text-neutral-400">Find recorded entries</div>
+        <div className="mt-3 grid gap-2 sm:grid-cols-[1fr_220px]">
+          <div>
+            <label htmlFor="nutrition-journal-search" className="text-[10px] font-bold text-neutral-500">Food name or recorded date</label>
+            <input id="nutrition-journal-search" type="search" value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search your recorded journal…" className="mt-1 min-h-11 w-full rounded-xl border border-neutral-200 bg-transparent px-3 text-sm outline-none focus:border-brand dark:border-white/10" />
+          </div>
+          <div>
+            <label htmlFor="nutrition-journal-date" className="text-[10px] font-bold text-neutral-500">Date filter</label>
+            <select id="nutrition-journal-date" value={dateFilter} onChange={(event) => setDateFilter(event.target.value)} className="mt-1 min-h-11 w-full rounded-xl border border-neutral-200 bg-transparent px-3 text-sm outline-none focus:border-brand dark:border-white/10">
+              <option value="">All recorded dates</option>
+              {dateOptions.map((date) => <option key={date} value={date}>{date}</option>)}
+            </select>
+          </div>
+        </div>
+        <div className="mt-3 text-[10px] text-neutral-400">Showing up to {MAX_NUTRITION_FILTER_RESULTS} validated local records; search never queries a remote service.</div>
+        {!filteredEntries.length ? (
+          <div className="mt-3 rounded-xl border border-dashed border-neutral-200 p-4 text-center text-[11px] text-neutral-500 dark:border-white/10">No validated recorded entry matches this filter.</div>
+        ) : (
+          <div className="mt-3 max-h-72 space-y-1.5 overflow-y-auto" aria-label="Filtered nutrition journal records">
+            {filteredEntries.map((entry) => (
+              <div key={entry.id} className="grid grid-cols-[1fr_auto] gap-3 rounded-xl bg-neutral-50 px-3 py-2 text-[10px] dark:bg-white/[0.03]">
+                <div><b className="text-ink dark:text-white">{entry.name}</b><span className="ml-2 text-neutral-400">{entry.date} · {entry.grams} g</span></div>
+                <div className="text-right text-neutral-500">{entry.kcal} kcal · C {entry.carbs} g · P {entry.protein} g · F {entry.fat} g</div>
+              </div>
+            ))}
+          </div>
+        )}
+      </section>
+
+      <section className="grid gap-3 md:grid-cols-3">
         <div className="rounded-2xl border border-neutral-200 p-4 dark:border-white/10">
           <div className="text-[9px] font-black uppercase tracking-[0.16em] text-neutral-400">Offline + bounded import</div>
           <p className="mt-2 text-[11px] leading-relaxed text-neutral-500 dark:text-neutral-400">
             Reading and writing happens in your browser. One import is limited to {MAX_NUTRITION_IMPORT_ENTRIES} records and 1 MB; unsupported schema versions, malformed JSON and invalid records fail closed.
+          </p>
+        </div>
+        <div className="rounded-2xl border border-blue-300/40 bg-blue-50/60 p-4 dark:border-blue-300/20 dark:bg-blue-400/[0.05]">
+          <div className="text-[9px] font-black uppercase tracking-[0.16em] text-blue-700 dark:text-blue-200">Privacy boundary</div>
+          <p className="mt-2 text-[11px] leading-relaxed text-blue-800 dark:text-blue-100">
+            Structured journal import/export stays on-device in this control. Exported JSON can contain personal nutrition records, so you choose where to store or share the downloaded file. There is no automatic upload or background sync from this tab.
           </p>
         </div>
         <div className="rounded-2xl border border-amber-300/40 bg-amber-50/60 p-4 dark:border-amber-300/20 dark:bg-amber-400/[0.05]">

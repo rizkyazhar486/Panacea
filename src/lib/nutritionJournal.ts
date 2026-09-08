@@ -6,6 +6,7 @@ export const MAX_NUTRITION_IMPORT_BYTES = 1_000_000
 export const MAX_NUTRITION_IMPORT_ENTRIES = 200
 export const MAX_NUTRITION_EXPORT_ENTRIES = 1_000
 export const MAX_NUTRITION_TIMELINE_DAYS = 30
+export const MAX_NUTRITION_FILTER_RESULTS = 50
 
 export interface NutritionJournalEnvelope {
   schema: typeof NUTRITION_JOURNAL_SCHEMA
@@ -26,6 +27,12 @@ export interface NutritionJournalDaySummary {
   carbs: number
   protein: number
   fat: number
+}
+
+export interface NutritionJournalDayComparison {
+  previous: NutritionJournalDaySummary
+  latest: NutritionJournalDaySummary
+  delta: Pick<NutritionJournalDaySummary, 'entries' | 'grams' | 'kcal' | 'carbs' | 'protein' | 'fat'>
 }
 
 function isRecord(value: unknown): value is Record<string, unknown> {
@@ -136,6 +143,43 @@ export function buildNutritionJournalTimeline(
 export function latestNutritionJournalSnapshot(entries: readonly FoodEntry[]) {
   const timeline = buildNutritionJournalTimeline(entries, 1)
   return timeline[0] ?? null
+}
+
+export function compareLatestNutritionJournalDays(entries: readonly FoodEntry[]): NutritionJournalDayComparison | null {
+  const timeline = buildNutritionJournalTimeline(entries, 2)
+  if (timeline.length < 2) return null
+  const [previous, latest] = timeline
+  return {
+    previous,
+    latest,
+    delta: {
+      entries: latest.entries - previous.entries,
+      grams: latest.grams - previous.grams,
+      kcal: latest.kcal - previous.kcal,
+      carbs: latest.carbs - previous.carbs,
+      protein: latest.protein - previous.protein,
+      fat: latest.fat - previous.fat,
+    },
+  }
+}
+
+export function filterNutritionJournalEntries(
+  entries: readonly FoodEntry[],
+  query = '',
+  date = '',
+  limit = MAX_NUTRITION_FILTER_RESULTS,
+) {
+  const normalizedQuery = query.trim().toLocaleLowerCase()
+  const normalizedDate = date.trim()
+  const boundedLimit = Math.min(MAX_NUTRITION_FILTER_RESULTS, Math.max(0, Math.floor(limit)))
+  if (!boundedLimit) return []
+  return sanitizeNutritionJournal(entries, MAX_NUTRITION_EXPORT_ENTRIES).entries
+    .filter((entry) => !normalizedDate || entry.date === normalizedDate)
+    .filter((entry) => !normalizedQuery
+      || entry.name.toLocaleLowerCase().includes(normalizedQuery)
+      || entry.date.includes(normalizedQuery))
+    .sort((a, b) => b.date.localeCompare(a.date) || a.name.localeCompare(b.name))
+    .slice(0, boundedLimit)
 }
 
 export function parseNutritionJournalJson(text: string): NutritionJournalSanitizeResult {
