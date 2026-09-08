@@ -5,6 +5,7 @@ export const NUTRITION_JOURNAL_VERSION = 1 as const
 export const MAX_NUTRITION_IMPORT_BYTES = 1_000_000
 export const MAX_NUTRITION_IMPORT_ENTRIES = 200
 export const MAX_NUTRITION_EXPORT_ENTRIES = 1_000
+export const MAX_NUTRITION_TIMELINE_DAYS = 30
 
 export interface NutritionJournalEnvelope {
   schema: typeof NUTRITION_JOURNAL_SCHEMA
@@ -15,6 +16,16 @@ export interface NutritionJournalEnvelope {
 export interface NutritionJournalSanitizeResult {
   entries: FoodEntry[]
   rejected: number
+}
+
+export interface NutritionJournalDaySummary {
+  date: string
+  entries: number
+  grams: number
+  kcal: number
+  carbs: number
+  protein: number
+  fat: number
 }
 
 function isRecord(value: unknown): value is Record<string, unknown> {
@@ -86,6 +97,45 @@ export function sanitizeNutritionJournal(
   }
 
   return { entries, rejected }
+}
+
+export function buildNutritionJournalTimeline(
+  entries: readonly FoodEntry[],
+  maxDays = 7,
+): NutritionJournalDaySummary[] {
+  const boundedDays = Math.min(MAX_NUTRITION_TIMELINE_DAYS, Math.max(0, Math.floor(maxDays)))
+  if (!boundedDays) return []
+  const sanitized = sanitizeNutritionJournal(entries, MAX_NUTRITION_EXPORT_ENTRIES).entries
+  const byDate = new Map<string, NutritionJournalDaySummary>()
+
+  for (const entry of sanitized) {
+    const current = byDate.get(entry.date) ?? {
+      date: entry.date,
+      entries: 0,
+      grams: 0,
+      kcal: 0,
+      carbs: 0,
+      protein: 0,
+      fat: 0,
+    }
+    current.entries += 1
+    current.grams += entry.grams
+    current.kcal += entry.kcal
+    current.carbs += entry.carbs
+    current.protein += entry.protein
+    current.fat += entry.fat
+    byDate.set(entry.date, current)
+  }
+
+  const latest = [...byDate.values()]
+    .sort((a, b) => b.date.localeCompare(a.date))
+    .slice(0, boundedDays)
+  return latest.reverse()
+}
+
+export function latestNutritionJournalSnapshot(entries: readonly FoodEntry[]) {
+  const timeline = buildNutritionJournalTimeline(entries, 1)
+  return timeline[0] ?? null
 }
 
 export function parseNutritionJournalJson(text: string): NutritionJournalSanitizeResult {

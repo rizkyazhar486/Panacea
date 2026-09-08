@@ -5,6 +5,8 @@ import {
   MAX_NUTRITION_IMPORT_ENTRIES,
   NUTRITION_JOURNAL_SCHEMA,
   NUTRITION_JOURNAL_VERSION,
+  buildNutritionJournalTimeline,
+  latestNutritionJournalSnapshot,
   parseNutritionJournalJson,
   sanitizeNutritionFoodEntry,
   sanitizeNutritionJournal,
@@ -59,11 +61,29 @@ assert.throws(
   /larger than the 1 MB import limit/,
 )
 
+const timeline = buildNutritionJournalTimeline([
+  valid,
+  { ...valid, id: 'meal-2', date: '2026-09-07', kcal: 300, carbs: 40, protein: 20, fat: 8 },
+  { ...valid, id: 'meal-3', date: '2026-09-09', kcal: 180, carbs: 10, protein: 12, fat: 6, grams: 100 },
+  { ...valid, id: 'meal-4', date: '2026-09-08', kcal: 350, carbs: 35, protein: 25, fat: 10 },
+], 7)
+assert.deepEqual(timeline.map((day) => day.date), ['2026-09-07', '2026-09-08', '2026-09-09'])
+assert.equal(timeline[2].entries, 2)
+assert.equal(timeline[2].kcal, 600)
+assert.equal(timeline[2].grams, 350)
+assert.equal(timeline.some((day) => day.date === '2026-09-06'), false, 'missing dates must not be fabricated as zero-valued chart points')
+assert.deepEqual(latestNutritionJournalSnapshot([valid, { ...valid, id: 'older', date: '2026-09-01' }])?.date, '2026-09-09')
+assert.deepEqual(buildNutritionJournalTimeline([valid], 0), [])
+
 const controlsSource = readFileSync(new URL('../../src/pages/NutritionDataControls.tsx', import.meta.url), 'utf8')
 assert.match(controlsSource, /No file is uploaded to Panacea/)
 assert.match(controlsSource, /file\.size > MAX_NUTRITION_IMPORT_BYTES/)
 assert.match(controlsSource, /existingIds\.has\(entry\.id\)/)
 assert.match(controlsSource, /aria-live="polite"/)
+assert.match(controlsSource, /No valid nutrition journal records yet/)
+assert.match(controlsSource, /No missing day is inserted as zero/)
+assert.match(controlsSource, /Descriptive journal totals only/)
+assert.match(controlsSource, /role="img"/)
 assert.match(controlsSource, /do not synthesize, correct or clinically interpret/i)
 assert.doesNotMatch(controlsSource, /\bfetch\s*\(/, 'nutrition journal controls must remain local and offline-capable')
 assert.doesNotMatch(controlsSource, /axios|XMLHttpRequest|WebSocket/, 'nutrition data controls must not acquire a hidden network path')
@@ -73,4 +93,4 @@ assert.match(hubSource, /NutritionDataControls/)
 assert.match(hubSource, /id: 'data'/)
 assert.match(hubSource, /Local journal import\/export, validation and recovery controls/)
 
-console.log('Nutrition journal import/export is bounded, schema-versioned, local-only, fail-closed, deduplicated and free of fabricated nutritional interpretation.')
+console.log('Nutrition journal data controls are bounded, local-only, fail-closed and expose recorded-only snapshot/timeline/trend/chart views without fabricated days or clinical interpretation.')
