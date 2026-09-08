@@ -299,9 +299,21 @@ try {
     throw new Error(`Whole-body motion inspector overflows horizontally: ${metrics.wholeBodyMotion.documentScrollWidth}px > ${metrics.viewport.width}px`)
   }
 
+  // The initial evidence already proves the live 3D compositor. For the second
+  // evidence image, temporarily hide only the WebGL canvas so Chromium does not
+  // block on a second software-GPU readback while we capture the motion UI.
   await inspector.scrollIntoViewIfNeeded()
-  await captureMotionViewport()
+  const previousCanvasVisibility = await canvas.evaluate((node) => node.style.visibility)
+  try {
+    await canvas.evaluate((node) => { node.style.visibility = 'hidden' })
+    await page.waitForTimeout(50)
+    await captureMotionViewport()
+  } finally {
+    await canvas.evaluate((node, visibility) => { node.style.visibility = visibility }, previousCanvasVisibility)
+  }
   if (!motionScreenshotCaptured) throw new Error('Body3D motion inspector mobile visual evidence was not captured')
+  await assertCanvasHealthy(canvas, 'Post motion visual evidence')
+  metrics.wholeBodyMotion.motionEvidenceCapturedWithoutWebglReadback = true
 
   if (pageErrors.length) throw new Error(`Browser page errors: ${pageErrors.join(' | ')}`)
 
