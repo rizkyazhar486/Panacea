@@ -31,6 +31,8 @@ export interface OrganHotspot {
   color: string
 }
 
+export type OrganGeometrySource = 'ai' | 'bodyparts3d' | 'z-anatomy' | 'hra'
+
 export interface OrganModel {
   /** id di repo sumber, sekaligus nama berkas .glb dan folder gambarnya. */
   id: string
@@ -44,18 +46,22 @@ export interface OrganModel {
   /** Punya ilustrasi /organs/<id>/*.webp (organ, location, microscopic, compare). */
   illustrated: boolean
   /**
-   * Dari mana geometrinya datang. 'ai' = model bangkitan Tripo di /organs/;
-   * 'bodyparts3d' = potongan anatomi rujukan nyata di /organs-atlas/, dibangun
-   * oleh scripts/atlasOrgan.mjs. Bedanya dinyatakan di layar, bukan disamarkan.
+   * Asal geometri. AI = pendekatan bentuk. Tiga nilai lain adalah reference
+   * geometry dan disimpan sebagai close-up provenance-aware di /organs-atlas/.
    */
-  sumber?: 'ai' | 'bodyparts3d'
-  /** Jumlah mesh bernama di dalam berkas — hanya untuk model bodyparts3d. */
+  sumber?: OrganGeometrySource
+  /** Jumlah ISTILAH anatomi unik yang benar-benar bernama di reference GLB. */
   jumlahBagian?: number
+  /** Jumlah mesh geometri mentah; beberapa mesh boleh mewakili istilah yang sama. */
+  jumlahMesh?: number
+  /** Label sumber/lisensi opsional untuk reference atlas non-BodyParts3D. */
+  sourceLabel?: string
+  sourceLicense?: string
 }
 
 /** Folder publik tempat berkas .glb organ ini berada. */
 export function folderModel(m: OrganModel): string {
-  return m.sumber === 'bodyparts3d' ? 'organs-atlas' : 'organs'
+  return m.sumber && m.sumber !== 'ai' ? 'organs-atlas' : 'organs'
 }
 
 import { ORGAN_ATLAS } from './organAtlas.gen'
@@ -193,9 +199,9 @@ export const ORGAN_MODELS: OrganModel[] = [
 ]
 
 /**
- * Model organ untuk satu sasaran. Potongan BodyParts3D DIDAHULUKAN atas model
- * bangkitan AI: keduanya sama-sama menampilkan organ dari dekat, tapi hanya
- * yang pertama merupakan geometri manusia rujukan, dan tiap bagiannya bernama.
+ * Model organ untuk satu sasaran. Potongan reference atlas DIDAHULUKAN atas
+ * model bangkitan AI. Geometry rujukan bisa berasal dari BodyParts3D,
+ * Z-Anatomy, atau HuBMAP HRA; semuanya tetap membawa provenance eksplisit.
  */
 export function modelForFocus(focusKey: string): OrganModel | undefined {
   return ORGAN_ATLAS.find((m) => m.focusKey === focusKey)
