@@ -7,6 +7,7 @@ const motionScreenshotPath = process.env.BODY3D_QA_MOTION_SCREENSHOT || 'artifac
 const metricsPath = process.env.BODY3D_QA_METRICS || 'artifacts/body3d-mobile-metrics.json'
 const operationTimeoutMs = Number(process.env.BODY3D_QA_OPERATION_TIMEOUT_MS || 20_000)
 const screenshotTimeoutMs = Number(process.env.BODY3D_QA_SCREENSHOT_TIMEOUT_MS || 45_000)
+const frameSignatureTimeoutMs = Number(process.env.BODY3D_QA_FRAME_SIGNATURE_TIMEOUT_MS || 20_000)
 
 await mkdir('artifacts', { recursive: true })
 
@@ -110,7 +111,7 @@ async function captureFrameSignature(canvas) {
       bytes.set(pixel, index * 4)
     })
     return Array.from(bytes).join(',')
-  }), 'Body3D framebuffer signature', 5_000)
+  }), 'Body3D framebuffer signature', frameSignatureTimeoutMs)
 }
 
 async function captureViewport() {
