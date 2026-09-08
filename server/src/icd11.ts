@@ -46,7 +46,7 @@ export const icd11Release = ICD_RELEASE
 
 function bersihkanKueri(value: string): string {
   return value
-    .replace(/[\u0000-\u001f\u007f<>\\\":|]/g, ' ')
+    .replace(/[\u0000-\u001f\u007f<>\\":|]/g, ' ')
     .replace(/\s+/g, ' ')
     .trim()
     .slice(0, MAX_QUERY_LENGTH)
@@ -138,6 +138,8 @@ async function cariIcd11(q: string, limit: number): Promise<IcdEntry[]> {
   const data = (await res.json()) as WhoSearchResp
   const out: IcdEntry[] = []
   for (const e of data.destinationEntities ?? []) {
+    // Entitas tanpa kode adalah simpul pengelompokan, bukan diagnosis yang
+    // bisa dikodekan — tidak berguna di daftar hasil.
     if (typeof e.theCode !== 'string' || !e.theCode.trim()) continue
     if (typeof e.title !== 'string' || !e.title.trim()) continue
     out.push({
