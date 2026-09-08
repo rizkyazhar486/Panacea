@@ -130,11 +130,32 @@ test('accepts ACTIVE adapter whose repository-relative module is a real file', a
   assert.equal(result.status, 0, result.stderr)
 })
 
+test('accepts ACTIVE adapter with multiple real repository-relative modules', async () => {
+  const result = await runFixture([
+    {
+      filename: 'active-multiple-modules.json',
+      entry: activeEntry(['scripts/validate-source-registry.mjs', 'scripts/qa/source-registry-validator.test.mjs']),
+    },
+  ])
+  assert.equal(result.status, 0, result.stderr)
+})
+
 test('rejects ACTIVE adapter whose module file does not exist', async () => {
   const result = await runFixture([
     {
       filename: 'active-missing-module.json',
       entry: activeEntry('server/src/definitely-not-a-panacea-adapter.ts'),
+    },
+  ])
+  assert.notEqual(result.status, 0)
+  assert.match(result.stderr, /ACTIVE adapter\.module does not exist/)
+})
+
+test('rejects ACTIVE adapter module array when any module is missing', async () => {
+  const result = await runFixture([
+    {
+      filename: 'active-partially-missing-modules.json',
+      entry: activeEntry(['scripts/validate-source-registry.mjs', 'server/src/definitely-not-a-panacea-adapter.ts']),
     },
   ])
   assert.notEqual(result.status, 0)

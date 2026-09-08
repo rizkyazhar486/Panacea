@@ -158,6 +158,14 @@ async function parseJson(filePath) {
 
 function validateActiveAdapterModule(modulePath, relativeRegistryPath) {
   const errors = [];
+
+  if (Array.isArray(modulePath)) {
+    for (const pathEntry of modulePath) {
+      errors.push(...validateActiveAdapterModule(pathEntry, relativeRegistryPath));
+    }
+    return errors;
+  }
+
   if (typeof modulePath !== 'string' || !modulePath.trim()) return errors;
 
   if (path.isAbsolute(modulePath)) {
