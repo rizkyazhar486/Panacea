@@ -3,6 +3,7 @@ import {
   parseClockMinutes,
   readPanaceaOsItems,
   resolvePanaceaOsFocus,
+  sortPanaceaOsItems,
   panaceaOsStorageKey,
   type PanaceaOsItem,
 } from '../../src/lib/panaceaOsFocus.ts'
@@ -38,6 +39,10 @@ ok(
   ['work', 'study', 'appointment', 'health', 'training', 'nutrition', 'family', 'social', 'finance', 'spiritual', 'recovery', 'leisure', 'admin']
     .every((x) => PANACEA_OS_CATEGORIES.includes(x as never)),
 )
+
+const ordered = sortPanaceaOsItems(items)
+ok('agenda normalization is chronological with untimed items last', ordered.map((item) => item.id).join(',') === 'done,work,study,finance,untimed')
+ok('agenda sorting does not mutate caller array', items[0]?.id === 'untimed')
 
 const parsed = readPanaceaOsItems(JSON.stringify([
   items[0],
