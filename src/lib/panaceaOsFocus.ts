@@ -1,13 +1,16 @@
 export const PANACEA_OS_CATEGORIES = [
   'work',
   'study',
+  'appointment',
   'health',
   'training',
+  'nutrition',
   'family',
   'social',
   'finance',
   'spiritual',
   'recovery',
+  'leisure',
   'admin',
 ] as const
 
