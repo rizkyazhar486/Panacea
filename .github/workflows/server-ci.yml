@@ -51,6 +51,8 @@ jobs:
         run: npm run uji:rxnorm
       - name: Test MyGene adapter
         run: npm run uji:mygene
+      - name: Test Wikimedia Commons image adapter
+        run: npm run uji:commons
       - name: Runtime smoke-test genomics control plane
         env:
           JWT_SECRET: ci-only-panacea-genomics-secret
