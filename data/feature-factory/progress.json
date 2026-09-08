@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-09-08T03:16:00.000Z",
+  "updatedAt": "2026-09-08T05:09:00.000Z",
   "items": {
     "ff-medical-education-accessibility": {
       "status": "done",
@@ -21,6 +21,16 @@
       ],
       "note": "Knowledge Bridge adds a static provenance-aware study verification checklist covering source identity/date, population/context/units, uncertainty, management-claim safeguards, and an explicit non-clinical-clearance boundary. No new API, dependency, polling, storage, or patient-specific inference was added.",
       "updatedAt": "2026-09-08T03:16:00.000Z"
+    },
+    "ff-medical-education-glossary": {
+      "status": "done",
+      "commit": "8c9b83c7165102a3305f77cd32caaf58ad4552cc",
+      "paths": [
+        "src/lib/knowledgeBridgeMap.ts",
+        "scripts/uji/knowledge-bridge-glossary.mts"
+      ],
+      "note": "Knowledge Bridge now expands each of its seven causal-stage labels with a concise plain-language definition at point of use. The glossary is a fixed seven-entry map reused by every curated topic, adding no dependency, network call, polling, storage, large asset, or patient-specific inference.",
+      "updatedAt": "2026-09-08T05:09:00.000Z"
     }
   }
 }
