@@ -21,6 +21,25 @@
     return true
   }
 
+  function activateNestedPanel(parentLabel, childLabel) {
+    if (!activatePanel(parentLabel)) return false
+    const until = Date.now() + 3000
+    const clickChild = () => {
+      const child = findButton(childLabel)
+      if (!child) return false
+      child.click()
+      child.scrollIntoView({ block: 'nearest', inline: 'nearest' })
+      return true
+    }
+    if (clickChild()) return true
+    const nestedObserver = new MutationObserver(() => {
+      if (clickChild() || Date.now() > until) nestedObserver.disconnect()
+    })
+    nestedObserver.observe(document.documentElement, { childList: true, subtree: true })
+    window.setTimeout(() => nestedObserver.disconnect(), 3100)
+    return true
+  }
+
   function addStyles() {
     if (document.getElementById(STYLE_ID)) return
     const style = document.createElement('style')
@@ -77,7 +96,7 @@
         <button type="button" class="atlas-close" aria-label="Close Atlas Command">×</button>
       </div>
       <div class="atlas-grid"></div>
-      <div class="breath-note"><strong>Breath Atlas reference.</strong> Opens the existing physiology-reference workspace. It does not measure a patient, infer disease, or deform source anatomy.</div>
+      <div class="breath-note"><strong>Breath Atlas reference.</strong> Opens Whole-body precision → Breath atlas, using Panacea's existing source-aware respiratory workspace. It does not measure a patient, infer disease, or deform source anatomy.</div>
       <div class="atlas-foot">Command-center interaction only — not AGI, diagnosis, or autonomous clinical decision-making. Panacea's existing source/provenance and safety gates remain authoritative.</div>
     `
 
@@ -86,7 +105,7 @@
       makeCommand('Explore anatomy', 'systems + source geometry', () => activatePanel('Layers')),
       makeCommand('Find structure', 'named source-node index', () => activatePanel('Find structure')),
       makeCommand('Whole-body precision', 'unfold + depth workspace', () => activatePanel('Whole-body precision')),
-      makeCommand('Breath Atlas', 'reference-only physiology', () => activatePanel('Physiology')),
+      makeCommand('Breath Atlas', 'source-aware respiratory atlas', () => activateNestedPanel('Whole-body precision', 'Breath atlas')),
       makeCommand('Organs', 'focus existing organ atlas', () => activatePanel('Organs')),
       makeCommand('Study', 'existing education workspace', () => activatePanel('Study')),
     )
