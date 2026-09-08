@@ -115,13 +115,15 @@ function sampleBpm(s: Record<string, unknown>): number | undefined {
 }
 
 function series(raw: unknown, t0: number): HrPoint[] {
-  if (!Array.isArray(raw)) return []
+  if (!Array.isArray(raw) || !Number.isFinite(t0)) return []
   const out: HrPoint[] = []
   for (const s of raw as Record<string, unknown>[]) {
     const bpm = sampleBpm(s)
     const t = parseHaeDate(s?.date)
-    if (bpm == null || bpm <= 0) continue
-    out.push({ t: Number.isNaN(t) ? out.length * 60 : Math.round((t - t0) / 1000), bpm: Math.round(bpm) })
+    if (bpm == null || bpm <= 0 || Number.isNaN(t)) continue
+    const relatif = Math.round((t - t0) / 1000)
+    if (!Number.isFinite(relatif) || relatif < 0) continue
+    out.push({ t: relatif, bpm: Math.round(bpm) })
   }
   return out.sort((a, b) => a.t - b.t)
 }
@@ -129,7 +131,7 @@ function series(raw: unknown, t0: number): HrPoint[] {
 /** Energi datang dalam kJ pada sebagian besar ekspor; jadikan kkal. */
 function toKcal(v: unknown, units?: unknown): number | undefined {
   const n = qty(v)
-  if (n == null) return undefined
+  if (n == null || n < 0) return undefined
   const u = typeof units === 'string' ? units.toLowerCase() : ''
   const uu = u || (v && typeof v === 'object' ? String((v as { units?: unknown }).units ?? '').toLowerCase() : '')
   return Math.round(uu.startsWith('kj') ? n / 4.184 : n)
@@ -150,15 +152,24 @@ export function parseWorkouts(text: string): ImportedWorkout[] {
     const t1 = parseHaeDate(w?.end)
     if (Number.isNaN(t0)) continue
 
+    const akhirValid = !Number.isNaN(t1) && t1 >= t0
     const hr = series(w?.heartRateData, t0)
-    const pemulihan = series(w?.heartRateRecovery, Number.isNaN(t1) ? t0 : t1)
+    // Recovery hanya punya makna relatif terhadap akhir sesi yang benar-benar
+    // terekam. Tanpa end timestamp valid, jangan mengarang anchor recovery.
+    const pemulihan = akhirValid ? series(w?.heartRateRecovery, t1) : []
 
-    const durasi = typeof w?.duration === 'number' && w.duration > 0
-      ? w.duration
-      : Number.isNaN(t1) ? 0 : (t1 - t0) / 1000
+    const durasiTerekam = qty(w?.duration)
+    const durasiTurunan = akhirValid ? (t1 - t0) / 1000 : 0
+    const durasi = durasiTerekam != null && durasiTerekam > 0
+      ? durasiTerekam
+      : durasiTurunan > 0 ? durasiTurunan : 0
 
-    const jarakKm = qty(w?.distance) ?? qty(w?.walkingAndRunningDistance)
-    const kecepatanKmh = qty(w?.speed) ?? (jarakKm && durasi > 0 ? (jarakKm / (durasi / 3600)) : undefined)
+    const jarakMentah = qty(w?.distance) ?? qty(w?.walkingAndRunningDistance)
+    const jarakKm = jarakMentah != null && jarakMentah > 0 ? jarakMentah : undefined
+    const speedMentah = qty(w?.speed)
+    const kecepatanKmh = speedMentah != null && speedMentah > 0
+      ? speedMentah
+      : jarakKm && durasi > 0 ? (jarakKm / (durasi / 3600)) : undefined
 
     // HRR1 hanya bermakna bila ekspor benar-benar merekam sampel dekat menit
     // pertama. Pilih titik 45-75 detik yang paling dekat ke 60 detik; jangan
@@ -180,23 +191,32 @@ export function parseWorkouts(text: string): ImportedWorkout[] {
       }
     }
 
+    const avgHrMentah = qty(w?.avgHeartRate)
+    const maxHrMentah = qty(w?.maxHeartRate)
+    const cadenceMentah = qty(w?.stepCadence)
+    const stepCountMentah = qty(w?.stepCount)
+    const langkah = Array.isArray(w?.stepCount)
+      ? Math.round((w.stepCount as Record<string, unknown>[]).reduce((a, s) => {
+          const n = qty(s?.qty)
+          return a + (n != null && n >= 0 ? n : 0)
+        }, 0))
+      : stepCountMentah != null && stepCountMentah >= 0 ? Math.round(stepCountMentah) : undefined
+
     out.push({
-      id: typeof w?.id === 'string' ? w.id : `${w?.name ?? 'workout'}-${t0}`,
-      nama: typeof w?.name === 'string' ? w.name : 'Latihan',
+      id: typeof w?.id === 'string' && w.id.trim() ? w.id : `${w?.name ?? 'workout'}-${t0}`,
+      nama: typeof w?.name === 'string' && w.name.trim() ? w.name : 'Latihan',
       mulai: new Date(t0).toISOString(),
-      selesai: Number.isNaN(t1) ? new Date(t0 + durasi * 1000).toISOString() : new Date(t1).toISOString(),
+      selesai: akhirValid ? new Date(t1).toISOString() : new Date(t0 + durasi * 1000).toISOString(),
       durasi: Math.round(durasi),
       jarakKm: jarakKm != null ? +jarakKm.toFixed(2) : undefined,
       kcal: toKcal(w?.activeEnergyBurned) ?? toKcal(w?.totalEnergy),
-      avgHr: qty(w?.avgHeartRate) != null ? Math.round(qty(w?.avgHeartRate)!) : undefined,
-      maxHr: qty(w?.maxHeartRate) != null ? Math.round(qty(w?.maxHeartRate)!) : undefined,
+      avgHr: avgHrMentah != null && avgHrMentah > 0 ? Math.round(avgHrMentah) : undefined,
+      maxHr: maxHrMentah != null && maxHrMentah > 0 ? Math.round(maxHrMentah) : undefined,
       minHr: hr.length ? Math.min(...hr.map((p) => p.bpm)) : undefined,
       kecepatanKmh: kecepatanKmh != null ? +kecepatanKmh.toFixed(2) : undefined,
       paceSec: kecepatanKmh && kecepatanKmh > 0 ? Math.round(3600 / kecepatanKmh) : undefined,
-      kadens: qty(w?.stepCadence) != null ? Math.round(qty(w?.stepCadence)!) : undefined,
-      langkah: Array.isArray(w?.stepCount)
-        ? Math.round((w.stepCount as Record<string, unknown>[]).reduce((a, s) => a + (qty(s?.qty) ?? 0), 0))
-        : qty(w?.stepCount) != null ? Math.round(qty(w?.stepCount)!) : undefined,
+      kadens: cadenceMentah != null && cadenceMentah > 0 ? Math.round(cadenceMentah) : undefined,
+      langkah,
       diDalamRuangan: typeof w?.isIndoor === 'boolean' ? w.isIndoor : undefined,
       hr,
       pemulihan,
