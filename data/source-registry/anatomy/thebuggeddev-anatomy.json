@@ -2,9 +2,10 @@
   "id": "thebuggeddev_anatomy",
   "name": "thebuggeddev Anatomy / Breath Atlas",
   "category": "anatomy",
-  "kind": ["reference-ui", "threejs-application", "external-site"],
+  "kind": ["viewer", "tooling"],
   "homepage": "https://breath-atlas.thebuggeddev.chatgpt.site/",
   "repository": "https://github.com/thebuggeddev/anatomy",
+  "features": ["body-exposure", "surgical-simulator", "respiratory-physiology"],
   "formats": ["typescript", "threejs", "external-web"],
   "usage": {
     "runtime": false,
@@ -32,24 +33,12 @@
     "authority": "thebuggeddev public GitHub repository and hosted Breath Atlas experience",
     "sourceIdentityRequired": true,
     "versionPinRequired": true,
-    "notes": "If future licensing allows import, pin exact upstream commit, record every imported asset origin, transformation history, anatomical mapping, reviewer, and final attribution text."
+    "notes": "If future licensing allows import, pin the exact upstream commit and record every imported asset origin, transformation history, anatomical mapping, reviewer, and final attribution text. The repository URL and hosted Breath Atlas URL remain preserved separately as repository/homepage fields."
   },
   "adapter": {
-    "status": "EXTERNAL_REFERENCE_ONLY",
+    "status": "NOT_APPLICABLE",
     "normalizedTarget": "PanaceaAnatomyInteractionReference",
-    "module": "src/lib/surgerySimulatorAppendectomy.ts",
-    "notes": "Current integration is intentionally link/reference only. Recreate useful interaction patterns independently inside Panacea rather than copying unlicensed implementation or assets."
-  },
-  "relatedSurfaces": [
-    {
-      "label": "thebuggeddev/anatomy",
-      "url": "https://github.com/thebuggeddev/anatomy",
-      "role": "interactive 3D anatomy implementation benchmark"
-    },
-    {
-      "label": "Breath Atlas",
-      "url": "https://breath-atlas.thebuggeddev.chatgpt.site/",
-      "role": "interactive physiology / respiratory visualization benchmark"
-    }
-  ]
+    "module": null,
+    "notes": "Current integration is intentionally external-reference-only, so no runtime adapter exists. Recreate useful interaction patterns independently inside Panacea rather than copying unlicensed implementation or assets."
+  }
 }
