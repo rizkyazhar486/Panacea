@@ -52,6 +52,9 @@ assert.doesNotMatch(browser, /injury risk/i)
 
 assert.match(lab, /import ZAnatomySourceMeshBrowser from '\.\/ZAnatomySourceMeshBrowser'/)
 assert.match(lab, /<ZAnatomySourceMeshBrowser onHighlight=\{onHighlight\} onFocusRegion=\{onFocusRegion\} onEnableLayer=\{onEnableLayer\} \/>/)
-assert.match(lab, /<ZAnatomyAtlasWorkbench onHighlight=\{onHighlight\} onFocusRegion=\{onFocusRegion\} onEnableLayer=\{onEnableLayer\} \/>/)
+assert.match(
+  lab,
+  /<ZAnatomyAtlasWorkbench\s+onHighlight=\{onHighlight\}\s+onFocusRegion=\{onFocusRegion\}\s+onEnableLayer=\{onEnableLayer\}\s+onOpenSurgical=\{onOpenSurgical\}\s+onOpenBiomechanics=\{\(\) => setMode\('movement'\)\}\s+\/>/,
+)
 
-console.log('Z-Anatomy source mesh browser stays bounded, provenance-aware, exact-node routed, explicit-graph constrained, module-compatible, and mounted beside the curated workbench.')
+console.log('Z-Anatomy source mesh browser stays bounded, provenance-aware, exact-node routed, explicit-graph constrained, module-compatible, and mounted beside the curated workbench with its explicit surgery and biomechanics handoffs.')
