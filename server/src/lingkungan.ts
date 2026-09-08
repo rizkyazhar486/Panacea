@@ -125,6 +125,18 @@ export interface Pangan {
 
 const singgahPangan = new Map<string, { at: number; data: Pangan[] }>()
 const PANGAN_SINGGAH_MS = 24 * 60 * 60_000
+const PANGAN_QUERY_MAX = 120
+const PANGAN_KODE_MAX = 64
+const PANGAN_TIMEOUT_MS = 8_000
+const PANGAN_USER_AGENT = 'Panaceamed/1.0 (https://panaceamed.id; nutrition-reference)'
+
+function normPanganQuery(q: string): string {
+  return String(q ?? '').trim().replace(/\s+/g, ' ').slice(0, PANGAN_QUERY_MAX)
+}
+
+function normPanganKode(kode?: string): string {
+  return String(kode ?? '').trim().replace(/\s+/g, '').slice(0, PANGAN_KODE_MAX)
+}
 
 function keAngka(v: unknown): number | undefined {
   const n = Number(v)
@@ -150,18 +162,25 @@ function keProduk(p: Record<string, any>): Pangan | null {
 }
 
 export async function cariPangan(q: string, kode?: string): Promise<Pangan[]> {
-  const kunci = kode ? `k:${kode}` : `q:${q.toLowerCase()}`
+  const query = normPanganQuery(q)
+  const kodeAman = normPanganKode(kode)
+  if (!kodeAman && !query) return []
+
+  const kunci = kodeAman ? `k:${kodeAman}` : `q:${query.toLowerCase()}`
   const hit = singgahPangan.get(kunci)
   if (hit && Date.now() - hit.at < PANGAN_SINGGAH_MS) return hit.data
 
   try {
-    const url = kode
-      ? `https://world.openfoodfacts.org/api/v2/product/${encodeURIComponent(kode)}.json?fields=code,product_name,product_name_id,brands,nutriments`
-      : `https://world.openfoodfacts.org/cgi/search.pl?search_terms=${encodeURIComponent(q)}&search_simple=1&action=process&json=1&page_size=8&fields=code,product_name,product_name_id,brands,nutriments`
-    const r = await fetch(url, { headers: { 'User-Agent': 'Panaceamed/1.0 (kontak lewat aplikasi)' } })
+    const url = kodeAman
+      ? `https://world.openfoodfacts.org/api/v2/product/${encodeURIComponent(kodeAman)}.json?fields=code,product_name,product_name_id,brands,nutriments`
+      : `https://world.openfoodfacts.org/cgi/search.pl?search_terms=${encodeURIComponent(query)}&search_simple=1&action=process&json=1&page_size=8&fields=code,product_name,product_name_id,brands,nutriments`
+    const r = await fetch(url, {
+      headers: { 'User-Agent': PANGAN_USER_AGENT },
+      signal: AbortSignal.timeout(PANGAN_TIMEOUT_MS),
+    })
     if (!r.ok) return []
     const j = (await r.json()) as { product?: Record<string, any>; products?: Record<string, any>[] }
-    const daftar = (kode ? [j.product ?? {}] : (j.products ?? []))
+    const daftar = (kodeAman ? [j.product ?? {}] : (j.products ?? []))
       .map(keProduk)
       .filter((p): p is Pangan => p !== null && p.kkal100 != null)
       .slice(0, 8)
