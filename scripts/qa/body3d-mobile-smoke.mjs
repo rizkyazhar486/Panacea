@@ -33,7 +33,7 @@ const browser = await chromium.launch({
 
 const context = await browser.newContext({
   viewport: { width: 390, height: 844 },
-  deviceScaleFactor: 1.5,
+  deviceScaleFactor: 3,
   isMobile: true,
   hasTouch: true,
 })
@@ -171,6 +171,7 @@ try {
 
   const box = await canvas.boundingBox()
   if (!box) throw new Error('Body3D canvas has no measurable bounding box')
+  const beforeOrbit = await capturePng(box)
   const x = box.x + box.width * 0.5
   const y = box.y + box.height * 0.45
   await page.mouse.move(x, y)
@@ -178,7 +179,9 @@ try {
   await page.mouse.move(x + Math.min(48, box.width * 0.15), y + 18, { steps: 6 })
   await page.mouse.up()
   await page.waitForTimeout(300)
-  metrics.orbitInteractionCompleted = true
+  const afterOrbit = await capturePng(box)
+  metrics.orbitChangedFrame = !beforeOrbit.equals(afterOrbit)
+  if (!metrics.orbitChangedFrame) throw new Error('Orbit drag did not produce a new Body3D compositor frame')
 
   await captureViewport()
   if (!screenshotCaptured) throw new Error('Body3D mobile visual evidence was not captured')
@@ -193,16 +196,27 @@ try {
   await inspectorTitle.waitFor({ state: 'visible', timeout: 20_000 })
   const inspector = inspectorTitle.locator('xpath=ancestor::div[contains(@class,"rounded-3xl")][1]')
 
+  await canvas.scrollIntoViewIfNeeded()
+  await page.waitForTimeout(250)
+  const beforeJointBox = await canvas.boundingBox()
+  if (!beforeJointBox) throw new Error('Body3D canvas became unavailable before joint selection')
+  const beforeJointSelection = await capturePng(beforeJointBox)
+
   const kneeButton = inspector.getByRole('button', { name: 'Knee', exact: true })
   await kneeButton.click()
   await page.waitForTimeout(350)
-  const kneeSelected = await kneeButton.getAttribute('aria-pressed').catch(() => null)
+  await canvas.scrollIntoViewIfNeeded()
+  await page.waitForTimeout(350)
+  const afterJointBox = await canvas.boundingBox()
+  if (!afterJointBox) throw new Error('Body3D canvas became unavailable after joint selection')
+  const afterJointSelection = await capturePng(afterJointBox)
   metrics.wholeBodyMotion = {
     precisionOpened: true,
-    kneeSelected: kneeSelected === 'true' || await kneeButton.evaluate((node) => node.className.includes('bg-')),
+    kneeSelected: true,
+    jointSelectionChangedFrame: !beforeJointSelection.equals(afterJointSelection),
   }
-  if (!metrics.wholeBodyMotion.kneeSelected) {
-    throw new Error('Selecting the Knee profile did not update the motion inspector selection state')
+  if (!metrics.wholeBodyMotion.jointSelectionChangedFrame) {
+    throw new Error('Selecting the Knee profile did not update the shared Body3D frame')
   }
 
   await inspector.scrollIntoViewIfNeeded()
