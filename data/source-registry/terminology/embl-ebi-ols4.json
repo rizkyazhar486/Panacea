@@ -38,8 +38,8 @@
   "adapter": {
     "status": "ACTIVE",
     "normalizedTarget": "OntologyResult | OntologyTerm",
-    "module": "src/lib/medicalSources.ts + server/src/anatomyOntology.ts",
-    "notes": "The client adapter normalizes bounded UBERON/CL/EFO search results for Medical Library. The server adapter normalizes bounded DOID/HP/UBERON/FMA results for Body Explorer and preserves source, identifier system, source URL and IRI. UI code consumes normalized results rather than constructing raw OLS requests itself."
+    "module": "src/lib/medicalSources.ts",
+    "notes": "The registry validator requires one concrete module path here, so the Medical Library adapter is the canonical module pointer. OLS4 is also consumed through the bounded server adapter at `server/src/anatomyOntology.ts`, which normalizes DOID/HP/UBERON/FMA results for Body Explorer and preserves source, identifier system, source URL and IRI. UI code consumes normalized results rather than constructing raw OLS requests itself."
   },
   "trust": {
     "authority": 5,
