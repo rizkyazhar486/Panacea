@@ -228,6 +228,9 @@ function validateSemanticIntegrity(value, filePath, seenIds) {
   }
 
   if (value.adapter?.status === 'ACTIVE') {
+    if (value.provenance?.sourceIdentityRequired !== true) {
+      errors.push(`${relative}: ACTIVE adapter requires provenance.sourceIdentityRequired true`);
+    }
     if (!value.adapter?.module) {
       errors.push(`${relative}: ACTIVE adapter must declare a non-null adapter.module`);
     } else {
