@@ -263,6 +263,9 @@ export function parseHrNotifications(text: string): HrNotification[] {
 
   const out: HrNotification[] = []
   for (const n of raw as Record<string, unknown>[]) {
+    const mulaiTs = parseHaeDate(n?.start)
+    if (Number.isNaN(mulaiTs)) continue
+
     const kind = typeof n?.heartNotification === 'string' ? n.heartNotification.toLowerCase() : ''
     const jenis: HrNotification['jenis'] =
       kind.includes('high') ? 'tinggi'
@@ -275,12 +278,15 @@ export function parseHrNotifications(text: string): HrNotification[] {
 
     const samples = Array.isArray(n?.heartRateData) ? (n.heartRateData as Record<string, unknown>[]) : []
     const bpms = samples.map((s) => sampleBpm(s)).filter((v): v is number => v != null && v > 0)
+    const ambang = typeof n?.threshold === 'number' && Number.isFinite(n.threshold) && n.threshold > 0
+      ? n.threshold
+      : undefined
 
     out.push({
       jenis,
       label,
-      mulai: (() => { const t = parseHaeDate(n?.start); return Number.isNaN(t) ? '' : new Date(t).toISOString() })(),
-      ambang: typeof n?.threshold === 'number' ? n.threshold : undefined,
+      mulai: new Date(mulaiTs).toISOString(),
+      ambang,
       puncakBpm: bpms.length ? Math.max(...bpms) : undefined,
       sampel: bpms.length,
     })
