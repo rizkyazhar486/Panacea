@@ -95,6 +95,32 @@ async function assertNoFatal(label) {
   }
 }
 
+async function clickNativeHitTarget(locator, label) {
+  await locator.waitFor({ state: 'visible', timeout: 10_000 })
+  await locator.evaluate((node) => node.scrollIntoView({ block: 'center', inline: 'center', behavior: 'auto' }))
+  await page.waitForTimeout(150)
+  const hit = await locator.evaluate((node) => {
+    const rect = node.getBoundingClientRect()
+    const x = rect.left + rect.width / 2
+    const y = rect.top + rect.height / 2
+    const target = document.elementFromPoint(x, y)
+    return {
+      x,
+      y,
+      width: rect.width,
+      height: rect.height,
+      inViewport: rect.width > 0 && rect.height > 0 && x >= 0 && x <= window.innerWidth && y >= 0 && y <= window.innerHeight,
+      ownsHitTarget: target === node || node.contains(target),
+      hitTag: target?.tagName ?? null,
+      hitText: target?.textContent?.trim().slice(0, 80) ?? null,
+    }
+  })
+  if (!hit.inViewport || !hit.ownsHitTarget) {
+    throw new Error(`${label} is not a real browser hit target: ${JSON.stringify(hit)}`)
+  }
+  await page.mouse.click(hit.x, hit.y, { delay: 20 })
+}
+
 try {
   const response = await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 45_000 })
   if (response && !response.ok()) throw new Error(`Body Explorer returned HTTP ${response.status()}`)
@@ -306,7 +332,8 @@ try {
     throw new Error('Whole-body motion inspector scientific boundary is not visible')
   }
 
-  await inspector.getByRole('button', { name: /Inspect this motion in shared 3D/i }).click()
+  const shared3dButton = inspector.getByRole('button', { name: /Inspect this motion in shared 3D/i })
+  await clickNativeHitTarget(shared3dButton, 'Inspect this motion in shared 3D')
   await page.waitForTimeout(300)
   const postShared3dHealth = await canvasHealth(canvas)
   await assertNoFatal('Shared 3D motion inspection triggered a Body3D fatal state')
