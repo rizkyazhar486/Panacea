@@ -1,5 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
-import type { AnatomyLayer } from '../../components/Body3D'
+import { useMemo, useState } from 'react'
 import {
   ATLAS_PLUS_ENTRIES,
   ATLAS_PLUS_REVIEW,
@@ -9,74 +8,14 @@ import {
   type AtlasPlusEntry,
 } from './anatomyAtlasPlusData'
 
-type AtlasMode = 'explore' | 'compare' | 'quiz' | 'breath'
-type BreathView = 'mechanics' | 'airway' | 'alveolus'
-type BreathPhaseKey = 'inspiration' | 'end-inspiration' | 'expiration'
+type AtlasMode = 'explore' | 'compare' | 'quiz'
 
 interface Props {
   onFocusEntry: (entry: AtlasPlusEntry) => void
   onIsolateEntry: (entry: AtlasPlusEntry) => void
   onCompareEntries: (entries: AtlasPlusEntry[]) => void
   onCrossSection: (entry: AtlasPlusEntry) => void
-  onOpenPhysiology: () => void
 }
-
-const BREATH_PHASES: Array<{
-  key: BreathPhaseKey
-  label: string
-  diaphragm: string
-  ribCage: string
-  airflow: string
-  pressure: string
-  summary: string
-}> = [
-  {
-    key: 'inspiration',
-    label: 'Inspiration',
-    diaphragm: 'Contracts and descends',
-    ribCage: 'Thoracic dimensions increase',
-    airflow: 'Air moves toward the alveoli',
-    pressure: 'Alveolar pressure becomes slightly lower than atmospheric pressure',
-    summary: 'Expansion of the thoracic cavity increases lung volume through pleural coupling, creating the pressure gradient that draws air inward.',
-  },
-  {
-    key: 'end-inspiration',
-    label: 'End inspiration',
-    diaphragm: 'Remains shortened briefly',
-    ribCage: 'Thoracic volume is near its cycle maximum',
-    airflow: 'Net flow approaches zero at the phase transition',
-    pressure: 'Alveolar and atmospheric pressures approach equilibrium',
-    summary: 'At the transition between inspiration and expiration, airflow falls toward zero even though lung volume remains elevated.',
-  },
-  {
-    key: 'expiration',
-    label: 'Expiration',
-    diaphragm: 'Relaxes and rises',
-    ribCage: 'Thoracic dimensions return toward resting position',
-    airflow: 'Air moves toward the mouth and nose',
-    pressure: 'Elastic recoil creates the outward pressure gradient in quiet breathing',
-    summary: 'Quiet expiration is driven mainly by elastic recoil as inspiratory muscles relax; forced expiration recruits additional muscles.',
-  },
-]
-
-const AIRWAY_PATH = [
-  'Nose / mouth',
-  'Pharynx',
-  'Larynx',
-  'Trachea',
-  'Main bronchi',
-  'Bronchioles',
-  'Respiratory bronchioles',
-  'Alveolar ducts',
-  'Alveoli',
-]
-
-const MICRO_EXCHANGE = [
-  { title: 'Ventilation', text: 'Fresh gas reaches the distal airspaces through the conducting and respiratory airways.' },
-  { title: 'Diffusion', text: 'Oxygen and carbon dioxide cross the thin alveolar-capillary interface down partial-pressure gradients.' },
-  { title: 'Perfusion', text: 'Pulmonary capillary blood brings carbon dioxide to the exchange surface and carries oxygen away.' },
-  { title: 'Surfactant', text: 'Type II alveolar cells produce surfactant, reducing surface tension at the air-liquid interface.' },
-]
 
 function initialAtlasId(): string {
   if (typeof window === 'undefined') return 'pan-anat-lungs'
@@ -191,125 +130,6 @@ function EntryDetail({
   )
 }
 
-function BreathMechanicsFigure({ phase }: { phase: BreathPhaseKey }) {
-  const inspiration = phase === 'inspiration'
-  const expiration = phase === 'expiration'
-  const lungScale = inspiration ? 1.06 : expiration ? 0.96 : 1.03
-  const diaphragmY = inspiration ? 22 : expiration ? 4 : 16
-  const arrow = expiration ? '↑ outward flow' : inspiration ? '↓ inward flow' : '↔ transition'
-
-  return (
-    <div className="overflow-hidden rounded-2xl border border-sky-200/60 bg-gradient-to-b from-sky-50 to-white p-3 dark:border-sky-300/10 dark:from-sky-300/5 dark:to-transparent">
-      <svg viewBox="0 0 320 245" role="img" aria-label={`Breathing mechanics schematic: ${phase}`} className="mx-auto h-auto w-full max-w-[360px]">
-        <path d="M88 30 Q160 3 232 30 L252 170 Q160 208 68 170 Z" fill="none" stroke="currentColor" strokeOpacity="0.18" strokeWidth="6" />
-        <g transform={`translate(160 112) scale(${lungScale}) translate(-160 -112)`}>
-          <path d="M151 52 C115 42 88 67 85 112 C82 154 103 178 145 174 C154 142 155 94 151 52 Z" fill="rgba(56,189,248,0.30)" stroke="rgba(14,116,144,0.75)" strokeWidth="2" />
-          <path d="M169 52 C205 42 232 67 235 112 C238 154 217 178 175 174 C166 142 165 94 169 52 Z" fill="rgba(56,189,248,0.30)" stroke="rgba(14,116,144,0.75)" strokeWidth="2" />
-        </g>
-        <path d="M160 18 L160 64 M160 64 L137 82 M160 64 L183 82" fill="none" stroke="rgba(34,197,94,0.9)" strokeWidth="7" strokeLinecap="round" />
-        <path d={`M78 ${186 + diaphragmY} Q160 ${160 + diaphragmY} 242 ${186 + diaphragmY}`} fill="none" stroke="rgba(239,68,68,0.85)" strokeWidth="7" strokeLinecap="round" />
-        <text x="160" y="230" textAnchor="middle" fontSize="12" fill="currentColor" opacity="0.65">diaphragm</text>
-        <text x="160" y="42" textAnchor="middle" fontSize="12" fill="currentColor" opacity="0.65">{arrow}</text>
-      </svg>
-      <p className="text-center text-[10px] leading-relaxed text-neutral-500">Mechanics schematic only. The source Body3D anatomy is not deformed or presented as a patient-specific simulation.</p>
-    </div>
-  )
-}
-
-function BreathAtlas({ onFocusLungs, onFocusDiaphragm, onOpenPhysiology }: { onFocusLungs: () => void; onFocusDiaphragm: () => void; onOpenPhysiology: () => void }) {
-  const [view, setView] = useState<BreathView>('mechanics')
-  const [phaseIndex, setPhaseIndex] = useState(0)
-  const [playing, setPlaying] = useState(false)
-  const phase = BREATH_PHASES[phaseIndex]
-
-  useEffect(() => {
-    if (!playing) return
-    const reduceMotion = typeof window !== 'undefined' && window.matchMedia?.('(prefers-reduced-motion: reduce)').matches
-    if (reduceMotion) return
-    const timer = window.setInterval(() => setPhaseIndex((index) => (index + 1) % BREATH_PHASES.length), 1600)
-    return () => window.clearInterval(timer)
-  }, [playing])
-
-  return (
-    <div className="space-y-3">
-      <div className="rounded-2xl border border-sky-200/60 bg-sky-50/50 p-3 dark:border-sky-300/10 dark:bg-sky-300/5">
-        <div className="text-sm font-black text-ink dark:text-white">Breath Atlas · anatomy → mechanics → gas exchange</div>
-        <p className="mt-1 text-[11px] leading-relaxed text-neutral-500">
-          Follow one breath from upper airway to alveolar-capillary exchange while keeping the real Body3D atlas dimensionally stable.
-        </p>
-        <div className="mt-2 flex flex-wrap gap-1.5">
-          <button type="button" onClick={onFocusLungs} className="min-h-[32px] rounded-full bg-brand px-3 text-[10.5px] font-black text-white">Focus lungs in 3D</button>
-          <button type="button" onClick={onFocusDiaphragm} className="min-h-[32px] rounded-full border border-brand px-3 text-[10.5px] font-black text-brand">Focus diaphragm</button>
-          <button type="button" onClick={onOpenPhysiology} className="min-h-[32px] rounded-full border border-neutral-200 px-3 text-[10.5px] font-black text-neutral-600 dark:border-white/10 dark:text-neutral-300">Open full physiology</button>
-        </div>
-      </div>
-
-      <div className="grid grid-cols-3 gap-1 rounded-xl bg-neutral-100 p-1 dark:bg-white/5">
-        {([
-          ['mechanics', 'Mechanics'],
-          ['airway', 'Airway path'],
-          ['alveolus', 'Alveolus'],
-        ] as const).map(([key, label]) => (
-          <button key={key} type="button" onClick={() => setView(key)} className={`min-h-[34px] rounded-lg text-[10.5px] font-bold ${view === key ? 'bg-white shadow-sm dark:bg-white/10' : 'text-neutral-500'}`}>{label}</button>
-        ))}
-      </div>
-
-      {view === 'mechanics' && (
-        <div className="space-y-3">
-          <BreathMechanicsFigure phase={phase.key} />
-          <div className="flex flex-wrap items-center gap-1.5">
-            {BREATH_PHASES.map((item, index) => (
-              <button key={item.key} type="button" onClick={() => { setPlaying(false); setPhaseIndex(index) }} className={`min-h-[32px] rounded-full border px-2.5 text-[10.5px] font-bold ${phase.key === item.key ? 'border-brand bg-brand text-white' : 'border-neutral-200 text-neutral-500 dark:border-white/10'}`}>{item.label}</button>
-            ))}
-            <button type="button" onClick={() => setPlaying((value) => !value)} aria-pressed={playing} className="min-h-[32px] rounded-full border border-sky-300 px-2.5 text-[10.5px] font-black text-sky-700 dark:text-sky-300">{playing ? 'Pause cycle' : 'Play cycle'}</button>
-          </div>
-          <div className="grid gap-2 sm:grid-cols-2">
-            {[
-              ['Diaphragm', phase.diaphragm],
-              ['Rib cage / thorax', phase.ribCage],
-              ['Airflow', phase.airflow],
-              ['Pressure relationship', phase.pressure],
-            ].map(([label, value]) => (
-              <div key={label} className="rounded-xl bg-neutral-50 p-2.5 dark:bg-white/[0.03]">
-                <div className="text-[9.5px] font-black uppercase tracking-wide text-neutral-400">{label}</div>
-                <div className="mt-1 text-[11px] leading-relaxed text-neutral-600 dark:text-neutral-300">{value}</div>
-              </div>
-            ))}
-          </div>
-          <p className="text-xs leading-relaxed text-neutral-600 dark:text-neutral-300">{phase.summary}</p>
-        </div>
-      )}
-
-      {view === 'airway' && (
-        <div className="space-y-2">
-          <div className="flex flex-wrap items-center gap-1">
-            {AIRWAY_PATH.map((segment, index) => (
-              <span key={segment} className="contents">
-                <span className="rounded-full border border-sky-200 bg-sky-50 px-2.5 py-1 text-[10.5px] font-bold text-sky-800 dark:border-sky-300/10 dark:bg-sky-300/5 dark:text-sky-300">{segment}</span>
-                {index < AIRWAY_PATH.length - 1 && <span className="text-neutral-300">→</span>}
-              </span>
-            ))}
-          </div>
-          <p className="text-[11px] leading-relaxed text-neutral-500">
-            The conducting zone conditions and transports gas; the respiratory zone begins where airway walls participate directly in gas exchange.
-          </p>
-        </div>
-      )}
-
-      {view === 'alveolus' && (
-        <div className="grid gap-2 sm:grid-cols-2">
-          {MICRO_EXCHANGE.map((item) => (
-            <div key={item.title} className="rounded-xl border border-neutral-200 p-2.5 dark:border-white/10">
-              <div className="text-[11px] font-black text-ink dark:text-white">{item.title}</div>
-              <p className="mt-1 text-[10.5px] leading-relaxed text-neutral-500">{item.text}</p>
-            </div>
-          ))}
-        </div>
-      )}
-    </div>
-  )
-}
-
 function QuizMode({ onFocus }: { onFocus: (entry: AtlasPlusEntry) => void }) {
   const [index, setIndex] = useState(0)
   const [answer, setAnswer] = useState<string | null>(null)
@@ -366,7 +186,7 @@ function QuizMode({ onFocus }: { onFocus: (entry: AtlasPlusEntry) => void }) {
   )
 }
 
-export function AnatomyAtlasPlus({ onFocusEntry, onIsolateEntry, onCompareEntries, onCrossSection, onOpenPhysiology }: Props) {
+export function AnatomyAtlasPlus({ onFocusEntry, onIsolateEntry, onCompareEntries, onCrossSection }: Props) {
   const [mode, setMode] = useState<AtlasMode>('explore')
   const [query, setQuery] = useState('')
   const [selectedId, setSelectedId] = useState(initialAtlasId)
@@ -396,9 +216,6 @@ export function AnatomyAtlasPlus({ onFocusEntry, onIsolateEntry, onCompareEntrie
     }
   }
 
-  const lungs = atlasPlusById('pan-anat-lungs')!
-  const diaphragm = atlasPlusById('pan-anat-diaphragm')!
-
   return (
     <div data-anatomy-atlas-plus="reference-only" className="space-y-3">
       <SourceBoundary />
@@ -408,7 +225,6 @@ export function AnatomyAtlasPlus({ onFocusEntry, onIsolateEntry, onCompareEntrie
           ['explore', 'Explore'],
           ['compare', 'Compare'],
           ['quiz', 'Quiz'],
-          ['breath', 'Breath Atlas'],
         ] as const).map(([key, label]) => (
           <button key={key} type="button" onClick={() => setMode(key)} className={`min-h-[34px] shrink-0 rounded-lg px-3 text-[10.5px] font-black ${mode === key ? 'bg-white shadow-sm dark:bg-white/10' : 'text-neutral-500'}`}>{label}</button>
         ))}
@@ -443,14 +259,18 @@ export function AnatomyAtlasPlus({ onFocusEntry, onIsolateEntry, onCompareEntrie
       {mode === 'compare' && (
         <div className="space-y-3">
           <div className="grid grid-cols-2 gap-2">
-            {[['A', compareA, setCompareA], ['B', compareB, setCompareB]].map(([slot, value, setter]) => (
-              <label key={String(slot)} className="text-[10px] font-black uppercase tracking-wide text-neutral-500">
-                Structure {String(slot)}
-                <select value={String(value)} onChange={(event) => (setter as (value: string) => void)(event.target.value)} className="mt-1 h-10 w-full rounded-xl border border-neutral-200 bg-white px-2 text-xs font-bold normal-case tracking-normal dark:border-white/10 dark:bg-neutral-900">
-                  {ATLAS_PLUS_ENTRIES.map((entry) => <option key={entry.id} value={entry.id}>{entry.label}</option>)}
-                </select>
-              </label>
-            ))}
+            <label className="text-[10px] font-black uppercase tracking-wide text-neutral-500">
+              Structure A
+              <select value={compareA} onChange={(event) => setCompareA(event.target.value)} className="mt-1 h-10 w-full rounded-xl border border-neutral-200 bg-white px-2 text-xs font-bold normal-case tracking-normal dark:border-white/10 dark:bg-neutral-900">
+                {ATLAS_PLUS_ENTRIES.map((entry) => <option key={entry.id} value={entry.id}>{entry.label}</option>)}
+              </select>
+            </label>
+            <label className="text-[10px] font-black uppercase tracking-wide text-neutral-500">
+              Structure B
+              <select value={compareB} onChange={(event) => setCompareB(event.target.value)} className="mt-1 h-10 w-full rounded-xl border border-neutral-200 bg-white px-2 text-xs font-bold normal-case tracking-normal dark:border-white/10 dark:bg-neutral-900">
+                {ATLAS_PLUS_ENTRIES.map((entry) => <option key={entry.id} value={entry.id}>{entry.label}</option>)}
+              </select>
+            </label>
           </div>
           <button type="button" onClick={() => onCompareEntries([left, right])} className="min-h-[34px] rounded-full bg-brand px-3 text-[10.5px] font-black text-white">Show both in Body3D</button>
           <div className="grid gap-2 sm:grid-cols-2">
@@ -467,14 +287,6 @@ export function AnatomyAtlasPlus({ onFocusEntry, onIsolateEntry, onCompareEntrie
       )}
 
       {mode === 'quiz' && <QuizMode onFocus={onFocusEntry} />}
-
-      {mode === 'breath' && (
-        <BreathAtlas
-          onFocusLungs={() => onFocusEntry(lungs)}
-          onFocusDiaphragm={() => onFocusEntry(diaphragm)}
-          onOpenPhysiology={onOpenPhysiology}
-        />
-      )}
 
       <div className="rounded-xl bg-neutral-50 p-2.5 text-[10px] leading-relaxed text-neutral-500 dark:bg-white/[0.03]">
         Contract: review={ATLAS_PLUS_REVIEW.humanReview} · patient-specific={String(ATLAS_PLUS_REVIEW.patientSpecific)} · clinical-decision-use={String(ATLAS_PLUS_REVIEW.clinicalDecisionUse)}.
