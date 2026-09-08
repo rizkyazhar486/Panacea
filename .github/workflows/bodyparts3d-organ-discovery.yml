@@ -1,0 +1,29 @@
+name: BodyParts3D Organ Discovery
+
+on:
+  push:
+    branches:
+      - feat/body-exposure-organ-detail-20260908
+    paths:
+      - scripts/atlasDiscover.mjs
+      - .github/workflows/bodyparts3d-organ-discovery.yml
+
+permissions:
+  contents: read
+
+jobs:
+  discover:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - name: Fetch reference atlas
+        run: git clone --depth 1 https://github.com/ashemag/human-atlas.git /tmp/human-atlas
+      - name: Enumerate exact organ candidates
+        run: node scripts/atlasDiscover.mjs /tmp/human-atlas artifacts/atlas-organ-candidates.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: bodyparts3d-organ-candidates
+          path: artifacts/atlas-organ-candidates.json
+          if-no-files-found: error
+          retention-days: 7
