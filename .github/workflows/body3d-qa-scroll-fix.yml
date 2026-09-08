@@ -1,0 +1,62 @@
+name: Body3D QA Scroll Fix
+
+on:
+  push:
+    branches:
+      - fix/body3d-progressive-rebased-20260908
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    if: ${{ !contains(github.event.head_commit.message, '[qa-scroll-fixed]') }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: fix/body3d-progressive-rebased-20260908
+      - name: Patch exact QA block
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          p = Path('scripts/qa/body3d-mobile-smoke.mjs')
+          s = p.read_text()
+          old = """  metrics.progressiveLoadingCompact = Boolean(
+    progressiveClass?.includes('top-2') && !progressiveClass?.includes('inset-0'),
+  )
+  metrics.progressiveLoadingCenterUnobstructed = await canvas.evaluate((node) => {
+    const rect = node.getBoundingClientRect()
+    return document.elementFromPoint(rect.left + rect.width / 2, rect.top + rect.height / 2) === node
+  })
+"""
+          new = """  metrics.progressiveLoadingCompact = Boolean(
+    progressiveClass?.includes('top-2') && !progressiveClass?.includes('inset-0'),
+  )
+  // Clicking the layer control legitimately scrolls that control into view.
+  // Re-center the viewer before testing its center; otherwise elementFromPoint
+  // can probe a coordinate outside the viewport and misreport it as an overlay.
+  await canvas.evaluate((node) => node.scrollIntoView({ block: 'center', inline: 'center' }))
+  await page.waitForTimeout(100)
+  metrics.progressiveLoadingCenterUnobstructed = await canvas.evaluate((node) => {
+    const rect = node.getBoundingClientRect()
+    const x = rect.left + rect.width / 2
+    const y = rect.top + rect.height / 2
+    if (x < 0 || x > window.innerWidth || y < 0 || y > window.innerHeight) return false
+    return document.elementFromPoint(x, y) === node
+  })
+"""
+          if s.count(old) != 1:
+              raise SystemExit(f'expected one QA obstruction block, found {s.count(old)}')
+          p.write_text(s.replace(old, new))
+          PY
+          node --check scripts/qa/body3d-mobile-smoke.mjs
+          git diff --check
+      - name: Commit correction
+        run: |
+          git config user.name "Panacea Stabilization Bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add scripts/qa/body3d-mobile-smoke.mjs
+          git commit -m "test(body): measure progressive obstruction in the viewer viewport [qa-scroll-fixed]"
+          git push origin HEAD:fix/body3d-progressive-rebased-20260908
