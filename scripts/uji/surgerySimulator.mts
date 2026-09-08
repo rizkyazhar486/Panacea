@@ -4,6 +4,7 @@ import { readFileSync } from 'node:fs'
 const data = readFileSync('src/lib/surgerySimulator.ts', 'utf8')
 const ui = readFileSync('src/pages/bodyhub/SurgerySimulatorLab.tsx', 'utf8')
 const shell = readFileSync('src/pages/bodyhub/SurgicalLab.tsx', 'utf8')
+const bodyExplorer = readFileSync('src/pages/BodyExplorer.tsx', 'utf8')
 
 assert.match(data, /id: 'caesarean-anatomy'/, 'Caesarean scenario is required')
 assert.match(data, /atlasFile: 'atlas\/obgin\.glb'/, 'Caesarean must use the female pelvis reference atlas')
@@ -31,6 +32,21 @@ assert.match(ui, /Open-source Cardiac Atlas Lab reference prototype/, 'Reference
 assert.doesNotMatch(ui, /SphereGeometry|BoxGeometry|CapsuleGeometry|CylinderGeometry/, 'Surgery UI must not fabricate anatomy primitives')
 assert.doesNotMatch(ui, /Math\.random/, 'Surgical simulator must remain deterministic')
 
-assert.match(shell, /SurgerySimulatorLab/, 'Surgical simulator must remain wired into Body Exposure')
+// Cross-sectional correlation must drive the SAME evidence-bearing whole-body viewer,
+// not a disconnected decorative canvas.
+assert.match(ui, /data-surgery-correlation="shared-body3d"/, 'Shared 3D/cross-section correlation panel is required')
+for (const label of ['Source 3D', 'Axial CT', 'Coronal CT', 'Sagittal CT', 'Exploded 3D']) {
+  assert.match(ui, new RegExp(label.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')), `${label} preset must remain available`)
+}
+assert.match(ui, /not patient DICOM, CT segmentation, navigation coordinates or operative planning/, 'Cross-section teaching boundary must remain explicit')
+assert.match(ui, /onSharedView\?\.\(view\)/, 'Simulator must emit shared-view state')
 
-console.log('✓ Surgery simulator scenarios, provenance, geometry boundaries, and integration verified')
+assert.match(shell, /SurgerySimulatorLab/, 'Surgical simulator must remain wired into Body Exposure')
+assert.match(shell, /onSharedView=\{onSharedView\}/, 'Surgical shell must forward shared-view state to Body Exposure')
+assert.match(bodyExplorer, /onSharedView=\{\(view\) => \{/, 'Body Exposure must receive surgery shared-view state')
+assert.match(bodyExplorer, /setRenderMode\(view\.renderMode\)/, 'Surgery must drive the shared Body3D render mode')
+assert.match(bodyExplorer, /setSlicePlane\(view\.slicePlane\)/, 'Surgery must drive the shared Body3D slice plane')
+assert.match(bodyExplorer, /setSlicePos\(view\.slicePos\)/, 'Surgery must drive the shared Body3D slice position')
+assert.match(bodyExplorer, /setUnfold\(view\.unfold\)/, 'Surgery must drive the shared Body3D exploded view')
+
+console.log('✓ Surgery simulator scenarios, provenance, geometry boundaries, cross-section bridge, and integration verified')
