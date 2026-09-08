@@ -273,11 +273,9 @@ try {
     throw new Error('Selecting the Knee profile did not update the shared Body3D frame')
   }
 
-  // Drive the native range control through a real keyboard interaction. On a
-  // mobile-emulated Chromium page, coordinate clicks can move the DOM thumb
-  // without producing a stable React change event. End is deterministic and
-  // still exercises the browser's native range input/change path. We continue
-  // to require the controlled React label and dial to render the exact value.
+  // Playwright's range-aware fill path emits the native input sequence that a
+  // controlled React range expects. DOM value alone is never accepted: the
+  // visible React label and dial below must render the exact requested angle.
   await inspector.scrollIntoViewIfNeeded()
   const slider = inspector.locator('input[type="range"]').first()
   const sliderState = await slider.evaluate((node) => ({
@@ -285,22 +283,23 @@ try {
     max: Number(node.max),
     neutral: Number(node.value),
   }))
-  await slider.focus()
-  await slider.press('End')
-  await page.waitForTimeout(200)
+  const targetAngle = Math.round(
+    sliderState.neutral + (sliderState.max - sliderState.neutral) * 0.65,
+  )
+  await slider.fill(String(targetAngle))
+  const renderedAngleLabel = inspector.getByText(`Flexion / extension · ${targetAngle.toFixed(0)}°`, { exact: true })
+  await renderedAngleLabel.waitFor({ state: 'visible', timeout: 5_000 })
   const observedAngle = Number(await slider.inputValue())
-  metrics.wholeBodyMotion.sliderTargetDeg = sliderState.max
+  metrics.wholeBodyMotion.sliderTargetDeg = targetAngle
   metrics.wholeBodyMotion.sliderObservedDeg = observedAngle
   if (observedAngle <= sliderState.neutral + 20) {
     throw new Error(`Whole-body ROM slider did not move meaningfully from neutral: saw ${observedAngle}°`)
   }
-  if (observedAngle !== sliderState.max) {
-    throw new Error(`Whole-body ROM slider native End interaction did not reach ${sliderState.max}°: saw ${observedAngle}°`)
+  if (observedAngle !== targetAngle) {
+    throw new Error(`Whole-body ROM slider range fill expected ${targetAngle}°: saw ${observedAngle}°`)
   }
 
-  const renderedAngleLabel = inspector.getByText(`Flexion / extension · ${observedAngle.toFixed(0)}°`, { exact: true })
-  await renderedAngleLabel.waitFor({ state: 'visible', timeout: 5_000 })
-  const dialMotionLabel = inspector.getByText(`Flexion ${observedAngle.toFixed(0)}°`, { exact: true })
+  const dialMotionLabel = inspector.getByText(`Flexion ${targetAngle.toFixed(0)}°`, { exact: true })
   await dialMotionLabel.waitFor({ state: 'visible', timeout: 5_000 })
   metrics.wholeBodyMotion.reactStateRendered = true
 
