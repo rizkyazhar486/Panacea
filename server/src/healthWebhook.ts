@@ -162,17 +162,19 @@ export function parseHealthWebhookPayload(body: unknown): HealthWebhookResult {
 
     let nilai: number | undefined
     if (def.jumlahkan) {
-      // Jumlahkan hanya sampel dari hari terbaru yang ada di payload, agar
-      // ekspor "Last 7 Days" tidak menumpuk tujuh hari menjadi satu angka.
+      // Sum only the newest VALID phone-local calendar day. A malformed date
+      // must never win lexicographic comparison and replace a real day's total.
+      // If there is no valid timestamp at all, hariTerbaru stays empty and the
+      // documented historical fallback below sums every finite sample.
       let hariTerbaru = ''
       for (const s of m.data) {
-        const d = typeof s?.date === 'string' ? s.date.trim().slice(0, 10) : ''
+        const d = typeof s?.date === 'string' ? tanggalDiOffset(s.date) : null
         if (d && d > hariTerbaru) hariTerbaru = d
       }
       let total = 0
       let ada = false
       for (const s of m.data) {
-        const d = typeof s?.date === 'string' ? s.date.trim().slice(0, 10) : ''
+        const d = typeof s?.date === 'string' ? tanggalDiOffset(s.date) : null
         if (hariTerbaru && d !== hariTerbaru) continue
         const v = anyValue(s)
         if (typeof v === 'number' && Number.isFinite(v)) { total += v; ada = true }
