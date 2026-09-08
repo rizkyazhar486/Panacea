@@ -12,13 +12,16 @@ import {
 const CATEGORY_LABELS: Record<PanaceaOsCategory, string> = {
   work: 'Work',
   study: 'Study',
+  appointment: 'Appointment',
   health: 'Health',
   training: 'Training',
+  nutrition: 'Meal / Nutrition',
   family: 'Family',
   social: 'Social',
   finance: 'Finance',
   spiritual: 'Spiritual',
   recovery: 'Recovery',
+  leisure: 'Leisure',
   admin: 'Admin',
 }
 
