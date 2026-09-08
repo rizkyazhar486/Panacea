@@ -52,8 +52,12 @@ async function waitForInputValue(locator, expected, tolerance = 0.005, timeout =
   throw new Error(`Timed out waiting for input value ${expected}`)
 }
 async function clickScrolled(locator, container) {
-  await container.scrollIntoViewIfNeeded()
-  await locator.scrollIntoViewIfNeeded()
+  // Position only: Playwright's scrollIntoViewIfNeeded can wait forever for
+  // "stable" while the mobile simulator continues a harmless layout animation.
+  // Native scrolling avoids that setup flake; the actual click below remains a
+  // normal, non-forced Playwright click and still requires actionability.
+  await container.evaluate((node) => node.scrollIntoView({ block: 'center', inline: 'nearest' }))
+  await locator.evaluate((node) => node.scrollIntoView({ block: 'center', inline: 'nearest' }))
   await page.waitForTimeout(120)
   await locator.click({ timeout: 15_000 })
 }
@@ -105,8 +109,6 @@ try {
   await simulator.waitFor({ state: 'visible', timeout: 30_000 })
   await simulator.scrollIntoViewIfNeeded()
 
-  // Scenario order is product UX, not a test contract. Select Caesarean
-  // explicitly so adding a new default scenario cannot invalidate this smoke.
   await simulator.getByRole('button', { name: 'Caesarean', exact: true }).click()
   await simulator.getByText('Caesarean section — layered pelvic anatomy', { exact: true }).waitFor({ state: 'visible', timeout: 20_000 })
   let atlasCanvas = simulator.locator('canvas[data-atlas-viewer3d="true"]').first()
@@ -116,8 +118,6 @@ try {
   if (await loadFailure.isVisible().catch(() => false)) throw new Error(`Caesarean atlas failure: ${await loadFailure.innerText()}`)
   metrics.caesareanLoaded = true
 
-  // Step buttons include a secondary mode label in their accessible name, so
-  // exercise the exact visible step title rather than assuming a shorter ARIA name.
   const bladderStep = simulator.getByText('Bladder–uterus relationship', { exact: true }).first()
   await bladderStep.scrollIntoViewIfNeeded()
   await bladderStep.click()
@@ -125,11 +125,6 @@ try {
   await simulator.getByText(/urinary bladder/i).first().waitFor({ state: 'visible', timeout: 10_000 })
   metrics.bladderUterusStep = true
 
-  // Prove the surgery presets mutate the SHARED Body3D state above, rather than
-  // only toggling local simulator UI. Existing Body Explorer controls are used
-  // as the observable state contract: CT/plane active classes, slice slider,
-  // and the shared Unfold slider. On 390x844, scroll each preset into the
-  // viewport explicitly before clicking; do not force the click.
   const correlation = simulator.locator('[data-surgery-correlation="shared-body3d"]')
   await correlation.waitFor({ state: 'visible', timeout: 10_000 })
   const axialPreset = correlation.getByRole('button', { name: 'Axial CT', exact: true })
@@ -158,13 +153,10 @@ try {
   await waitForClass(page.getByRole('button', { name: 'Anatomy', exact: true }).first(), 'bg-white')
   metrics.explodedSharedBody3d = true
 
-  // The Unfold control lives in the Layers tab. Switching panels must not reset
-  // the shared Body3D state set by the surgical preset.
   await page.getByRole('button', { name: 'Layers', exact: true }).click()
   const unfoldSlider = page.getByRole('slider', { name: 'Unfold', exact: true })
   metrics.explodedUnfold = await waitForInputValue(unfoldSlider, 0.28)
 
-  // Return to surgery; the component may remount, so resolve fresh locators.
   await page.getByRole('button', { name: 'Surgical layers', exact: true }).click()
   simulator = page.locator('[data-surgery-simulator="anatomy-grounded"]')
   await simulator.waitFor({ state: 'visible', timeout: 30_000 })
@@ -181,8 +173,6 @@ try {
 
   const transseptalCorrelation = simulator.locator('[data-surgery-correlation="shared-body3d"]')
   const transseptalAxial = transseptalCorrelation.getByRole('button', { name: 'Axial CT', exact: true })
-  // Scenario swaps can move the correlation controls below the fold. Reuse the
-  // same explicit mobile scroll path before the real click.
   await clickScrolled(transseptalAxial, transseptalCorrelation)
   await waitForClass(page.getByRole('button', { name: 'CT', exact: true }).first(), 'bg-white')
   await waitForClass(page.getByRole('button', { name: 'Axial', exact: true }).first(), 'bg-brand')
