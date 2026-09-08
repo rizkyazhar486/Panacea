@@ -25,6 +25,10 @@ jobs:
           node-version: 20
           cache: npm
       - run: npm ci
+      # Regression suite is intentionally offline/no-browser. Run it before
+      # producing a deployable artifact so parser/cache/analytics regressions
+      # cannot silently reach GitHub Pages.
+      - run: npm run uji
       # Set repo variable VITE_API_URL (Settings → Secrets and variables →
       # Actions → Variables) to your deployed backend URL to enable live mode.
       - run: npm run build
