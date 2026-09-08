@@ -34,6 +34,8 @@ assert.match(lapAppy, /retrocecal, pelvic, retro-ileal, pre-ileal/, 'Lap Appy mu
 assert.match(lapAppy, /three taeniae coli converge at the appendiceal base/, 'Evidence-grounded appendiceal base landmark is required')
 assert.match(lapAppy, /Human academic review is currently pending/, 'Human academic review status must remain explicit')
 assert.match(lapAppy, /AI-assisted educational draft/, 'AI generation must be disclosed')
+assert.match(lapAppy, /not an operative manual, credentialing tool, autonomous surgical advisor or substitute for supervised surgical training/, 'Lap Appy must remain an anatomy/cognitive trainer rather than an operative recipe')
+assert.match(lapAppy, /No appendiceal-base division line, stapler trajectory, ligature position or “safe margin” is generated from the atlas/, 'Lap Appy must not infer a procedural safe margin from reference geometry')
 assert.doesNotMatch(lapAppy, /trocar.{0,30}(?:mm|cm)|insufflat.{0,30}mmHg|stapler.{0,30}(?:mm|load)|energy.{0,20}(?:watt|\bW\b)|force.{0,20}\bN\b/i, 'DIYAI Lap Appy must not encode operative device settings or force')
 
 assert.match(ui, /data-surgery-simulator="anatomy-grounded"/, 'Simulator root marker is required')
@@ -68,4 +70,4 @@ assert.match(bodyExplorer, /setSlicePlane\(view\.slicePlane\)/, 'Surgery must dr
 assert.match(bodyExplorer, /setSlicePos\(view\.slicePos\)/, 'Surgery must drive the shared Body3D slice position')
 assert.match(bodyExplorer, /setUnfold\(view\.unfold\)/, 'Surgery must drive the shared Body3D exploded view')
 
-console.log('✓ Surgery simulator scenarios, provenance, geometry boundaries, cross-section bridge, and integration verified')
+console.log('✓ Surgery simulator scenarios, provenance, academic gates, geometry boundaries, cross-section bridge, and integration verified')
