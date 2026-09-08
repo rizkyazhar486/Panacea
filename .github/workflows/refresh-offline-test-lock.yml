@@ -1,0 +1,36 @@
+name: Refresh offline test lock
+
+on:
+  push:
+    branches:
+      - fix/offline-test-runner-node24-v2-20260908
+    paths:
+      - .github/workflows/refresh-offline-test-lock.yml
+
+permissions:
+  contents: write
+
+jobs:
+  refresh-lock:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: fix/offline-test-runner-node24-v2-20260908
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - name: Generate lockfile with pinned local tsx
+        run: npm install --package-lock-only --save-dev --save-exact tsx@4.23.13
+      - name: Commit generated package metadata
+        run: |
+          if git diff --quiet -- package.json package-lock.json; then
+            echo "No package metadata changes generated"
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add package.json package-lock.json
+          git commit -m "build(test): pin local tsx resolver"
+          git push origin HEAD:fix/offline-test-runner-node24-v2-20260908
