@@ -6,7 +6,8 @@ const source = await readFile(new URL('../../src/lib/anatomyContextHandoff.ts', 
 assert.match(source, /CURATED_HANDOFF_BY_STRUCTURE/)
 assert.doesNotMatch(source, /REVIEWED_HANDOFF_BY_STRUCTURE/)
 assert.match(source, /does NOT\s+mean qualified human academic review/i)
-assert.match(source, /reviewer\s+identity, credentials, date and scope/i)
+assert.match(source, /human-reviewed elsewhere when reviewer/i)
+assert.match(source, /identity, credentials, date and scope/i)
 assert.doesNotMatch(source, /Explicit reviewed cross-module mappings/i)
 
 console.log('Anatomy context handoff review boundary verified: deterministic curated routing does not masquerade as qualified human review.')
