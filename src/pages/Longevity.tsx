@@ -9,6 +9,7 @@ import { useVitals } from '../lib/useVitals'
 import { ShareStatCard } from '../components/ShareStatCard'
 import { PanelKebugaranIlmiah } from '../components/PanelKebugaranIlmiah'
 import { bahanOtomatis } from '../lib/bugarOtomatis'
+import { LongevityRecordedSnapshot } from '../components/LongevityRecordedSnapshot'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Pusat Longevity — the layer wearables DON'T have. Apple Watch & WHOOP score
@@ -269,6 +270,8 @@ export function Longevity() {
 
   return (
     <div className="mx-auto max-w-2xl space-y-5 pb-24">
+      <LongevityRecordedSnapshot vitals={vitals} />
+
       {/* Hero */}
       {score != null && bAge != null && (
         <div className="flex justify-end">
