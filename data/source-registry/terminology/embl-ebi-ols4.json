@@ -5,13 +5,13 @@
   "kind": ["api", "ontology", "terminology-server"],
   "homepage": "https://www.ebi.ac.uk/ols4/",
   "repository": "https://github.com/EBISPOT/ols4",
-  "features": ["medical-library", "anatomy-ontology", "cell-ontology", "phenotype-ontology", "knowledge-bridge", "semantic-search"],
+  "features": ["medical-library", "body-explorer", "anatomy-ontology", "disease-grounding", "cell-ontology", "phenotype-ontology", "knowledge-bridge", "semantic-search"],
   "formats": ["json", "http-rest", "owl", "rdf"],
   "usage": {
     "runtime": true,
     "buildTime": false,
     "networkRequired": true,
-    "notes": "Panacea queries the public OLS4 REST API from its evidence adapter for a bounded set of biomedical ontology matches. EMBL-EBI recommends the OLS API and/or upstream OWL files rather than depending on the undocumented internal OLS database representation."
+    "notes": "Panacea queries the public OLS4 REST API through two bounded adapter paths: `src/lib/medicalSources.ts` for Medical Library ontology search (UBERON, CL, EFO) and `server/src/anatomyOntology.ts` for Body Explorer semantic grounding (DOID, HP, UBERON, FMA). EMBL-EBI recommends the OLS API and/or upstream OWL files rather than depending on the undocumented internal OLS database representation."
   },
   "license": {
     "status": "CHECK_REQUIRED",
@@ -37,9 +37,9 @@
   },
   "adapter": {
     "status": "ACTIVE",
-    "normalizedTarget": "PanaceaOntologyTerm",
-    "module": "src/lib/medicalSources.ts",
-    "notes": "Active client-side adapter searches a bounded set of UBERON, CL and EFO results, normalizes OBO/short ID, label, ontology identity, description and IRI, and exposes an OLS search URL. React components do not call OLS directly."
+    "normalizedTarget": "OntologyResult | OntologyTerm",
+    "module": "src/lib/medicalSources.ts + server/src/anatomyOntology.ts",
+    "notes": "The client adapter normalizes bounded UBERON/CL/EFO search results for Medical Library. The server adapter normalizes bounded DOID/HP/UBERON/FMA results for Body Explorer and preserves source, identifier system, source URL and IRI. UI code consumes normalized results rather than constructing raw OLS requests itself."
   },
   "trust": {
     "authority": 5,
