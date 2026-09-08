@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict'
 import {
   calculateStudyRatingSummary,
+  STUDY_CALCULATOR_BOUNDARY,
   STUDY_CALCULATOR_INTERPRETATION,
   STUDY_CALCULATOR_MAX_RATINGS,
   STUDY_CALCULATOR_SOURCE,
@@ -13,26 +14,29 @@ assert.deepEqual(ready, {
   count: 5,
   sum: 15,
   mean: 3,
-  normalizedPercent: 60,
+  percentOfScaleMaximum: 60,
   min: 1,
   max: 5,
   sourceIdentity: STUDY_CALCULATOR_SOURCE,
   interpretation: STUDY_CALCULATOR_INTERPRETATION,
+  boundary: STUDY_CALCULATOR_BOUNDARY,
   formulas: {
     mean: 'sum(scores) / count',
-    normalizedPercent: '100 * sum(scores) / (5 * count)',
+    percentOfScaleMaximum: '100 * sum(scores) / (5 * count)',
   },
   error: null,
 })
 
 const rounding = calculateStudyRatingSummary('asthma', [1, 1, 2])
 assert.equal(rounding.mean, 1.33)
-assert.equal(rounding.normalizedPercent, 26.7)
+assert.equal(rounding.percentOfScaleMaximum, 26.7)
+assert.equal(rounding.boundary, 'not-mastery-competence-or-clinical-score')
+assert.equal(rounding.interpretation, 'personal-descriptive-self-rating-only')
 
 const blankTopic = calculateStudyRatingSummary('   ', [3])
 assert.equal(blankTopic.status, 'invalid-input')
 assert.equal(blankTopic.mean, null)
-assert.equal(blankTopic.normalizedPercent, null)
+assert.equal(blankTopic.percentOfScaleMaximum, null)
 
 const noRatings = calculateStudyRatingSummary('asthma', [])
 assert.equal(noRatings.status, 'invalid-input')
@@ -52,9 +56,9 @@ assert.equal(bounded.status, 'invalid-input')
 assert.match(bounded.error ?? '', /At most 20/)
 
 const edge = calculateStudyRatingSummary('asthma', [5])
-assert.equal(edge.normalizedPercent, 100)
+assert.equal(edge.percentOfScaleMaximum, 100)
 assert.equal(edge.mean, 5)
 assert.equal(edge.min, 5)
 assert.equal(edge.max, 5)
 
-console.log('Knowledge Bridge study calculator uses explicit formulas, strict 1–5 input validation, bounded batches, and descriptive-learning-only output.')
+console.log('Knowledge Bridge study calculator uses transparent arithmetic, strict bounded input, and explicitly never presents a self-rating percentage as mastery, competence, or a clinical score.')
