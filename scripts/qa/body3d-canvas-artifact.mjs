@@ -61,7 +61,7 @@ try {
   if (await fatal.isVisible().catch(() => false)) throw new Error(await fatal.innerText())
   if (pageErrors.length) throw new Error(`Browser page errors: ${pageErrors.join(' | ')}`)
 
-  // Do not use page.screenshot()/CDP capture here. On SwiftShader/WebGL those
+  // Avoid browser-level compositor capture APIs here. On SwiftShader/WebGL those
   // compositor calls can hang even while the canvas and interaction are healthy.
   // Copy the actual rendered WebGL canvas into a 2D canvas instead, validate that
   // sampled pixels contain real visual variation, then persist that PNG.
