@@ -9,6 +9,7 @@ import {
   type GeometryProvenance,
 } from '../../lib/wholeBodyAtlasBlueprint'
 import { calculateExternalLoad } from '../../lib/biomechanicsModel'
+import WholeBodyMotionInspector from './WholeBodyMotionInspector'
 
 interface Props {
   onHighlight?: (nodeHints: string[]) => void
@@ -209,9 +210,14 @@ export function WholeBodyPrecisionLab({ onHighlight, onFocusRegion, onEnableLaye
       )}
 
       {mode === 'movement' && (
-        <div className="space-y-3">
-          <div className="flex flex-wrap gap-1.5">
-            {MOVEMENT_PRIMITIVES.map((item) => <button key={item.id} type="button" onClick={() => setMovementId(item.id)} className={`rounded-full border px-3 py-1.5 text-[10px] font-bold ${movement.id === item.id ? 'border-brand bg-brand text-white' : 'border-neutral-200 text-neutral-500 dark:border-white/10'}`}>{item.label}</button>)}
+        <div className="space-y-4">
+          <WholeBodyMotionInspector onHighlight={onHighlight} onFocusRegion={onFocusRegion} onEnableLayer={onEnableLayer} />
+
+          <div className="rounded-2xl border border-neutral-200 p-3 dark:border-white/10">
+            <div className="mb-2 text-[9px] font-black uppercase tracking-[0.16em] text-neutral-400">Whole-body movement chains</div>
+            <div className="flex flex-wrap gap-1.5">
+              {MOVEMENT_PRIMITIVES.map((item) => <button key={item.id} type="button" onClick={() => setMovementId(item.id)} className={`rounded-full border px-3 py-1.5 text-[10px] font-bold ${movement.id === item.id ? 'border-brand bg-brand text-white' : 'border-neutral-200 text-neutral-500 dark:border-white/10'}`}>{item.label}</button>)}
+            </div>
           </div>
           <MovementDiagram chain={movement.chain} />
           <div className="grid gap-2 md:grid-cols-2">
