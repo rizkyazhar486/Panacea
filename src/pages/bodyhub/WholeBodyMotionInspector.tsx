@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react'
 import type { AtlasLayerKey } from '../../lib/wholeBodyAtlasBlueprint'
+import { consumeAnatomyContextHandoff } from '../../lib/anatomyContextHandoff'
 import { coupledKinematicsFor } from '../../lib/biomechanicsCoupling'
 import {
   WHOLE_BODY_BIOMECHANICS_DISCLOSURE,
@@ -41,9 +42,11 @@ function AxisDial({ progress, label }: { progress: number; label: string }) {
 
 export function WholeBodyMotionInspector({ onHighlight, onFocusRegion, onEnableLayer }: Props) {
   const firstJoint = WHOLE_BODY_JOINT_PROFILES[0]
-  const [jointId, setJointId] = useState(firstJoint.id)
-  const [motionId, setMotionId] = useState(firstJoint.motions[0].id)
-  const [angleDeg, setAngleDeg] = useState(firstJoint.motions[0].neutralDeg)
+  const [incomingHandoff] = useState(() => consumeAnatomyContextHandoff('biomechanics'))
+  const initialJoint = WHOLE_BODY_JOINT_PROFILES.find((item) => item.id === incomingHandoff?.movementJointId) ?? firstJoint
+  const [jointId, setJointId] = useState(initialJoint.id)
+  const [motionId, setMotionId] = useState(initialJoint.motions[0].id)
+  const [angleDeg, setAngleDeg] = useState(initialJoint.motions[0].neutralDeg)
 
   const joint = WHOLE_BODY_JOINT_PROFILES.find((item) => item.id === jointId) ?? firstJoint
   const motion = joint.motions.find((item) => item.id === motionId) ?? joint.motions[0]
@@ -105,6 +108,14 @@ export function WholeBodyMotionInspector({ onHighlight, onFocusRegion, onEnableL
           </div>
           <SourceBadge joint={joint} />
         </div>
+        {incomingHandoff?.movementJointId && (
+          <div className="mt-3 rounded-xl border border-blue-400/20 bg-blue-400/[0.06] p-3">
+            <div className="text-[8px] font-black uppercase tracking-[0.16em] text-blue-300">From Z-Anatomy · curated biomechanics route</div>
+            <div className="mt-1 text-xs font-black text-white">{incomingHandoff.structureLabel} → {incomingHandoff.movementJointId}</div>
+            <p className="mt-1 text-[9px] leading-relaxed text-neutral-400">This one-shot context selects a repository-curated joint model. Source-mesh availability does not itself prove biomechanics applicability, qualified human review, or patient-specific mechanics.</p>
+            {incomingHandoff.resolvedNodeNames.length > 0 && <p className="mt-1 font-mono text-[8px] text-neutral-500">Source nodes: {incomingHandoff.resolvedNodeNames.slice(0, 6).join(' · ')}</p>}
+          </div>
+        )}
       </div>
 
       <div className="grid gap-0 xl:grid-cols-[0.82fr_1.18fr]">

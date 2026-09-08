@@ -41,10 +41,29 @@ assert.equal(bowelContext.surgicalScenarioId, undefined)
 assert.equal(bowelContext.movementJointId, undefined)
 assert.equal(bowelContext.resolvedNodeNames[0], 'Ileum', 'source-node names must not create a route by fuzzy inference')
 
+const notRepresentedKnee = buildAnatomyContextHandoff(
+  knee.region.key,
+  { ...knee.structure, provenance: 'not-represented' },
+  ['Femur.R'],
+)
+assert.equal(notRepresentedKnee.surgicalScenarioId, undefined, 'not-represented geometry must fail closed for surgery')
+assert.equal(notRepresentedKnee.movementJointId, undefined, 'not-represented geometry must fail closed for biomechanics')
+
 clearAnatomyContextHandoff()
 assert.equal(consumeAnatomyContextHandoff('surgery'), null)
+assert.equal(consumeAnatomyContextHandoff('biomechanics'), null)
+
 publishAnatomyContextHandoff(kneeContext, 'surgery')
+publishAnatomyContextHandoff(cuffContext, 'biomechanics')
 assert.equal(consumeAnatomyContextHandoff('surgery')?.structureId, 'knee-complex')
 assert.equal(consumeAnatomyContextHandoff('surgery'), null, 'surgical handoff must be one-shot')
+assert.equal(consumeAnatomyContextHandoff('biomechanics')?.structureId, 'rotator-cuff', 'biomechanics context must remain isolated from surgery consumption')
+assert.equal(consumeAnatomyContextHandoff('biomechanics'), null, 'biomechanics handoff must be one-shot')
 
-console.log('Z-Anatomy handoff uses explicit curated mappings; source-node names never infer surgery or biomechanics destinations, and curation does not imply qualified human review.')
+publishAnatomyContextHandoff(kneeContext, 'surgery')
+publishAnatomyContextHandoff(kneeContext, 'biomechanics')
+clearAnatomyContextHandoff()
+assert.equal(consumeAnatomyContextHandoff('surgery'), null, 'clear must remove surgery context')
+assert.equal(consumeAnatomyContextHandoff('biomechanics'), null, 'clear must remove biomechanics context')
+
+console.log('Z-Anatomy handoff uses explicit curated mappings; surgery and biomechanics are isolated one-shot contexts, source-node names never infer destinations, and curation does not imply qualified human review.')

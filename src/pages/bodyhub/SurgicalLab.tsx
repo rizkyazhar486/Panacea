@@ -1,5 +1,6 @@
 import { lazy, Suspense, useEffect, useState } from 'react'
 import { URUTAN, WILAYAH, KEDALAMAN, type UrutanLapisan } from '../../lib/dissection'
+import { consumeAnatomyContextHandoff } from '../../lib/anatomyContextHandoff'
 import { CAESAREAN_LAYER_SEQUENCE } from '../../lib/surgeryLayerSequences'
 import { SURGICAL_SPATIAL_SCENARIOS } from '../../lib/surgicalSpatialTeaching'
 import type { SurgerySharedView } from './SurgerySimulatorLab'
@@ -21,9 +22,11 @@ export function kedalamanUntukLangkah(langkah: number, total: number): number {
 }
 
 export function SurgicalLab({ onKedalaman, onSorot, onSharedView }: SurgicalLabProps) {
+  const [incomingHandoff] = useState(() => consumeAnatomyContextHandoff('surgery'))
+  const initialSpatial = SURGICAL_SPATIAL_SCENARIOS.find((item) => item.id === incomingHandoff?.surgicalScenarioId) ?? SURGICAL_SPATIAL_SCENARIOS[0]
   const [kunci, setKunci] = useState<string | null>(null)
   const [langkah, setLangkah] = useState(0)
-  const [spatialId, setSpatialId] = useState(SURGICAL_SPATIAL_SCENARIOS[0].id)
+  const [spatialId, setSpatialId] = useState(initialSpatial.id)
   const [simulatorReady, setSimulatorReady] = useState(false)
   const dipilih: UrutanLapisan | undefined = SURGICAL_SEQUENCES.find((u) => u.kunci === kunci)
   const lapis = dipilih?.lapis[Math.min(langkah, dipilih.lapis.length - 1)]
@@ -54,6 +57,14 @@ export function SurgicalLab({ onKedalaman, onSorot, onSharedView }: SurgicalLabP
     onKedalaman?.(kedalamanUntukLangkah(n, dipilih.lapis.length))
   }
 
+  function highlightIncomingContext() {
+    if (!incomingHandoff) return
+    const names = incomingHandoff.resolvedNodeNames.length > 0
+      ? [...incomingHandoff.resolvedNodeNames]
+      : [...incomingHandoff.nodeHints]
+    onSorot?.(names)
+  }
+
   return (
     <div className="space-y-4">
       {simulatorReady ? (
@@ -73,6 +84,14 @@ export function SurgicalLab({ onKedalaman, onSorot, onSharedView }: SurgicalLabP
           <p className="mt-1 max-w-3xl text-[10px] leading-relaxed text-neutral-400">
             Procedure-specific spatial relationships grounded to named anatomy. Existing source meshes are highlighted; missing anatomy stays text-only instead of being fabricated.
           </p>
+          {incomingHandoff?.surgicalScenarioId && (
+            <div className="mt-3 rounded-xl border border-red-400/20 bg-red-400/[0.05] p-3">
+              <div className="text-[8px] font-black uppercase tracking-[0.16em] text-red-300">From Z-Anatomy · curated surgical route</div>
+              <div className="mt-1 text-xs font-black text-white">{incomingHandoff.structureLabel} → {initialSpatial.label}</div>
+              <p className="mt-1 text-[9px] leading-relaxed text-neutral-400">This one-shot context opens a repository-curated teaching scenario. It does not infer a procedure from mesh names, establish qualified human review, or define a patient-specific safe corridor.</p>
+              <button type="button" onClick={highlightIncomingContext} className="mt-2 min-h-10 rounded-full border border-red-300 px-3 text-[9px] font-black text-red-200 transition hover:bg-red-500 hover:text-white">Highlight source context in 3D →</button>
+            </div>
+          )}
         </div>
 
         <div className="p-3">

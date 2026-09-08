@@ -12,11 +12,18 @@ import {
   resolveAllAnatomySourceNodes,
   subscribeAnatomySourceNodes,
 } from '../../lib/anatomySourceNodeRegistry'
+import {
+  buildAnatomyContextHandoff,
+  publishAnatomyContextHandoff,
+  type AnatomyContextDestination,
+} from '../../lib/anatomyContextHandoff'
 
 interface Props {
   onHighlight?: (nodeHints: string[]) => void
   onFocusRegion?: (nodeHints: string[]) => void
   onEnableLayer?: (layer: AtlasLayerKey) => void
+  onOpenSurgical?: () => void
+  onOpenBiomechanics?: () => void
 }
 
 const LAYER_LABEL: Record<AtlasLayerKey, string> = {
@@ -67,7 +74,7 @@ function structureKey(region: AtlasRegionKey, structure: AtlasStructureTarget) {
   return `${region}:${structure.id}`
 }
 
-export function ZAnatomyAtlasWorkbench({ onHighlight, onFocusRegion, onEnableLayer }: Props) {
+export function ZAnatomyAtlasWorkbench({ onHighlight, onFocusRegion, onEnableLayer, onOpenSurgical, onOpenBiomechanics }: Props) {
   const entries = useMemo(() => WHOLE_BODY_REGIONS.flatMap((region) =>
     region.structures.map((structure) => ({ region, structure, key: structureKey(region.key, structure) }))), [])
   const [query, setQuery] = useState('')
@@ -110,6 +117,10 @@ export function ZAnatomyAtlasWorkbench({ onHighlight, onFocusRegion, onEnableLay
   }
 
   const sourceMatches = selected ? matchesFor(selected.structure) : []
+  const selectedExactNames = selected ? exactNamesFor(selected.structure) : []
+  const selectedHandoff = selected
+    ? buildAnatomyContextHandoff(selected.region.key, selected.structure, selectedExactNames)
+    : null
   const sourceNameCount = sourceBundles.reduce((total, bundle) => total + bundle.names.length, 0)
   const runtimeBundleCount = sourceBundles.filter((bundle) => anatomySourceNodeOrigin(bundle.file) === 'runtime').length
 
@@ -140,6 +151,15 @@ export function ZAnatomyAtlasWorkbench({ onHighlight, onFocusRegion, onEnableLay
     // highlighting and use reviewed hints only for camera framing.
     onHighlight?.([])
     onFocusRegion?.(hints)
+  }
+
+  function openMappedContext(destination: AnatomyContextDestination) {
+    if (!selected || !selectedHandoff) return
+    if (destination === 'surgery' && !selectedHandoff.surgicalScenarioId) return
+    if (destination === 'biomechanics' && !selectedHandoff.movementJointId) return
+    publishAnatomyContextHandoff(selectedHandoff, destination)
+    if (destination === 'surgery') onOpenSurgical?.()
+    else onOpenBiomechanics?.()
   }
 
   return (
@@ -220,6 +240,20 @@ export function ZAnatomyAtlasWorkbench({ onHighlight, onFocusRegion, onEnableLay
                   </div>
                   <p className="mt-3 text-[10px] leading-relaxed text-neutral-500">{selected.structure.clinicalWhy}</p>
                   <button type="button" onClick={() => inspect(selected.region.key, selected.structure, true)} className="mt-3 min-h-11 rounded-full bg-brand px-4 text-[10px] font-black text-white shadow-lg shadow-brand/20">Inspect in shared 3D →</button>
+                  {selectedHandoff && (selectedHandoff.surgicalScenarioId || selectedHandoff.movementJointId) && (
+                    <div className="mt-3 rounded-xl border border-neutral-200 bg-neutral-50 p-3 dark:border-white/10 dark:bg-white/[0.02]">
+                      <div className="text-[8px] font-black uppercase tracking-[0.15em] text-neutral-400">Curated teaching handoff</div>
+                      <div className="mt-2 flex flex-wrap gap-2">
+                        {selectedHandoff.surgicalScenarioId && (
+                          <button type="button" onClick={() => openMappedContext('surgery')} className="min-h-10 rounded-full border border-red-300 px-3 text-[9px] font-black text-red-600 transition hover:bg-red-500 hover:text-white dark:border-red-500/30 dark:text-red-300">Open mapped surgical anatomy →</button>
+                        )}
+                        {selectedHandoff.movementJointId && (
+                          <button type="button" onClick={() => openMappedContext('biomechanics')} className="min-h-10 rounded-full border border-blue-300 px-3 text-[9px] font-black text-blue-600 transition hover:bg-blue-500 hover:text-white dark:border-blue-500/30 dark:text-blue-300">Continue in biomechanics →</button>
+                        )}
+                      </div>
+                      <p className="mt-2 text-[8.5px] leading-relaxed text-neutral-500">Routes are explicit repository mappings. They are not inferred from mesh-name similarity, do not establish qualified human review, and do not turn generic atlas geometry into a patient-specific procedural model.</p>
+                    </div>
+                  )}
                 </div>
                 <div className="border-t border-neutral-200 bg-neutral-50 p-4 dark:border-white/10 dark:bg-white/[0.02] md:border-l md:border-t-0">
                   <div className="text-[9px] font-black uppercase tracking-[0.16em] text-neutral-400">Geometry lookup hints</div>
