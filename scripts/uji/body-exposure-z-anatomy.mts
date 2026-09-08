@@ -1,19 +1,21 @@
 import assert from 'node:assert/strict'
-import { readFileSync } from 'node:fs'
+import { existsSync, readFileSync } from 'node:fs'
 
 const workbench = readFileSync('src/pages/bodyhub/ZAnatomyAtlasWorkbench.tsx', 'utf8')
 const precisionLab = readFileSync('src/pages/bodyhub/WholeBodyPrecisionLab.tsx', 'utf8')
 const credits = readFileSync('public/anatomy/CREDITS.txt', 'utf8')
 
-for (const asset of [
-  'skeleton.glb',
-  'skeletal-light.glb',
-  'muscular-visible.glb',
+const creditedAssets = [
+  'skeletal.glb',
   'muscular.glb',
-  'clinical.glb',
-  'heart.glb',
-]) {
-  assert.match(workbench, new RegExp(asset.replace('.', '\\.')), `Z-Anatomy workbench must disclose shipped source bundle ${asset}.`)
+  'cardiovascular.glb',
+  'nervous.glb',
+  'visceral.glb',
+]
+
+for (const asset of creditedAssets) {
+  assert.ok(existsSync(`public/anatomy/${asset}`), `Credited Z-Anatomy bundle must exist on disk: ${asset}.`)
+  assert.match(workbench, new RegExp(asset.replace('.', '\\.')), `Z-Anatomy workbench must disclose credited source bundle ${asset}.`)
   assert.match(credits, new RegExp(asset.replace('.', '\\.')), `Anatomy credits must retain ${asset}.`)
 }
 
@@ -22,7 +24,8 @@ assert.match(workbench, /BodyParts3D lineage/i, 'Workbench must disclose BodyPar
 assert.match(workbench, /CC BY-SA 4\.0 derivative bundle/i, 'Workbench must expose share-alike derivative licensing.')
 assert.match(credits, /Z-Anatomy/i, 'Repository credits must retain Z-Anatomy attribution.')
 assert.match(credits, /BodyParts3D/i, 'Repository credits must retain BodyParts3D attribution.')
-assert.match(credits, /Creative Commons Attribution-ShareAlike 4\.0 \(CC BY-SA 4\.0\)/i, 'Repository credits must retain CC BY-SA 4.0 licensing.')
+assert.match(credits, /Creative Commons Attribution-ShareAlike 4\.0 International \(CC BY-SA 4\.0\)/i, 'Repository credits must retain CC BY-SA 4.0 licensing.')
+assert.match(workbench, /Other viewer layers are not assigned new provenance here unless their attribution is explicitly documented/i, 'Workbench must not over-claim provenance for additional viewer layers.')
 
 assert.match(workbench, /onEnableLayer\?\./, 'Workbench must control the shared anatomy layer system.')
 assert.match(workbench, /onHighlight\?\./, 'Workbench must route selected structures into the shared viewer highlighter.')
@@ -42,4 +45,4 @@ assert.match(precisionLab, /mode === 'unfolded'/, 'Existing unfolded anatomy mod
 assert.match(precisionLab, /mode === 'specialty'/, 'Existing specialty atlas mode must be preserved.')
 assert.match(precisionLab, /mode === 'movement'/, 'Existing biomechanics mode must be preserved.')
 
-console.log('Body Exposure Z-Anatomy workbench preserves real source bundles, provenance, shared-viewer interaction, and scientific boundaries.')
+console.log('Body Exposure Z-Anatomy workbench preserves credited source bundles, provenance, shared-viewer interaction, and scientific boundaries.')
