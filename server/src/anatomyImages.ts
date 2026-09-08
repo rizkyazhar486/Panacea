@@ -8,35 +8,32 @@
 // TIDAK ADA di data Z-Anatomy/BodyParts3D. Yang juga belum ada: gambar
 // patologi per organ. Ketiganya butuh sumber gambar nyata berlisensi bebas.
 //
-// Commons memenuhi keempat syaratnya sekaligus:
-//   1. Tanpa API key.
-//   2. Semua berkasnya domain publik atau CC — legal dipakai selama
-//      atribusinya ditampilkan (karena itu license/artist ikut dikembalikan
-//      di tiap hasil, bukan opsional).
-//   3. Memuat set ilustrasi kedokteran bermutu (a.l. buku teks Anatomy &
-//      Physiology CNX/OpenStax CC BY, koleksi Wellcome, foto patologi CDC PHIL).
-//   4. Bisa dijangkau dari server ini, sementara hampir semua host gambar lain
-//      diblokir oleh kebijakan jaringan.
+// Commons memenuhi kebutuhan discovery gambar medis tanpa API key dan setiap
+// hasil punya halaman berkas tempat creator, sumber, serta lisensi spesifik
+// berkas dicatat. Panacea TIDAK menganggap Commons memiliki satu blanket
+// license: syarat atribusi/share-alike/public-domain dibaca per berkas dan
+// sourcePage selalu dipertahankan agar pengguna bisa memverifikasinya.
 //
-// Tidak bisa diuji langsung dari sandbox tempat kode ini ditulis (jaringannya
-// dibatasi), jadi parsingnya ditulis defensif: tiap field diperiksa dulu, dan
-// hasil yang bentuknya tidak sesuai dibuang, bukan melempar galat.
+// Parsing ditulis defensif: query dibatasi, URL media harus berasal dari host
+// upload Wikimedia, halaman sumber harus Commons, dan hasil tanpa metadata
+// lisensi dibuang daripada menebak status hak ciptanya.
 const COMMONS_API = 'https://commons.wikimedia.org/w/api.php'
 
-// Wikimedia mewajibkan User-Agent yang bisa dihubungi di tiap permintaan
-// otomatis; permintaan tanpa itu boleh saja ditolak oleh mereka.
+// Wikimedia meminta User-Agent deskriptif dengan jalur kontak untuk request
+// otomatis. Website Panacea menjadi contact point dari adapter server ini.
 const USER_AGENT = 'Panaceamed/1.0 (https://panaceamed.id; health education app)'
+const MAX_QUERY_LENGTH = 160
 
 export interface AnatomyImage {
   title: string
   /** URL gambar ukuran tampil (bukan berkas asli yang bisa puluhan MB). */
   url: string
-  /** Halaman deskripsi di Commons — tujuan tautan atribusi. */
+  /** Halaman deskripsi di Commons — tujuan tautan atribusi dan verifikasi. */
   sourcePage: string
   /** Mis. "CC BY-SA 4.0", "Public domain". WAJIB ditampilkan. */
   license: string
   licenseUrl: string
-  /** Pembuat karya. WAJIB ditampilkan untuk lisensi CC BY/BY-SA. */
+  /** Pembuat karya; bila metadata kosong, verifikasi di sourcePage. */
   artist: string
   description: string
 }
@@ -65,15 +62,71 @@ function teksPolos(html: string): string {
     .trim()
 }
 
+/** Query pengguna diperlakukan sebagai istilah, bukan tempat menyisipkan
+ * sintaks pencarian MediaWiki. Tanda yang paling mudah mengubah operator
+ * pencarian dibuang dan panjangnya dibatasi sebelum request dibuat. */
+function bersihkanPencarian(value: string): string {
+  return value
+    .replace(/[\u0000-\u001f\u007f<>\\":|]/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim()
+    .slice(0, MAX_QUERY_LENGTH)
+}
+
+function halamanBerkasCommons(title: string): string {
+  const slug = title.trim().replace(/\s+/g, '_')
+  return `https://commons.wikimedia.org/wiki/${encodeURIComponent(slug)}`
+}
+
+/** descriptionurl berasal dari upstream, tetapi tetap divalidasi agar field
+ * provenance tidak pernah berubah menjadi tautan host arbitrer. */
+function halamanSumberCommons(descriptionUrl: string | undefined, title: string): string {
+  const raw = teksPolos(descriptionUrl ?? '')
+  if (raw) {
+    try {
+      const url = new URL(raw)
+      if (url.protocol === 'https:' && url.hostname === 'commons.wikimedia.org') return url.toString()
+    } catch {
+      // Gunakan canonical file page di bawah bila metadata URL rusak.
+    }
+  }
+  return halamanBerkasCommons(title)
+}
+
+function tautanWeb(value: string | undefined): string {
+  const raw = teksPolos(value ?? '')
+  if (!raw) return ''
+  try {
+    const url = new URL(raw)
+    return url.protocol === 'https:' || url.protocol === 'http:' ? url.toString() : ''
+  } catch {
+    return ''
+  }
+}
+
+function tautanGambarCommons(value: string | undefined): string {
+  if (!value) return ''
+  try {
+    const url = new URL(value)
+    if (url.protocol !== 'https:' || url.hostname !== 'upload.wikimedia.org') return ''
+    return url.toString()
+  } catch {
+    return ''
+  }
+}
+
 const MIME_DITERIMA = new Set(['image/jpeg', 'image/png', 'image/svg+xml', 'image/webp'])
 
 export async function searchAnatomyImages(query: string, limit = 8): Promise<AnatomyImage[]> {
+  const q = bersihkanPencarian(query)
+  if (!q) return []
+
   const params = new URLSearchParams({
     action: 'query',
     format: 'json',
     formatversion: '2',
     generator: 'search',
-    gsrsearch: query,
+    gsrsearch: q,
     gsrnamespace: '6', // hanya namespace File
     gsrlimit: String(Math.min(Math.max(limit, 1), 20)),
     prop: 'imageinfo',
@@ -90,24 +143,30 @@ export async function searchAnatomyImages(query: string, limit = 8): Promise<Ana
 
   const out: AnatomyImage[] = []
   for (const page of pages) {
+    const pageTitle = teksPolos(page.title ?? '')
+    if (!pageTitle) continue
+
     const info = Array.isArray(page.imageinfo) ? page.imageinfo[0] : undefined
     if (!info) continue
     if (info.mime && !MIME_DITERIMA.has(info.mime)) continue
-    const url = info.thumburl || info.url
+
+    const url = tautanGambarCommons(info.thumburl) || tautanGambarCommons(info.url)
     if (!url) continue
+
     const meta = info.extmetadata ?? {}
     const license = teksPolos(meta.LicenseShortName?.value ?? meta.License?.value ?? '')
     // Tanpa lisensi yang diketahui, berkasnya tidak ditampilkan sama sekali —
     // lebih baik hasilnya lebih sedikit daripada memakai gambar yang status
     // hak ciptanya tidak jelas.
     if (!license) continue
+
     out.push({
-      title: teksPolos(page.title ?? '').replace(/^File:/, ''),
+      title: pageTitle.replace(/^File:/, ''),
       url,
-      sourcePage: info.descriptionurl ?? '',
+      sourcePage: halamanSumberCommons(info.descriptionurl, pageTitle),
       license,
-      licenseUrl: teksPolos(meta.LicenseUrl?.value ?? ''),
-      artist: teksPolos(meta.Artist?.value ?? '') || 'Unknown',
+      licenseUrl: tautanWeb(meta.LicenseUrl?.value),
+      artist: teksPolos(meta.Artist?.value ?? '') || 'Lihat halaman sumber',
       description: teksPolos(meta.ImageDescription?.value ?? '').slice(0, 300),
     })
   }
@@ -188,7 +247,7 @@ async function cariGabungan(
   varian: (q: string) => string[],
   saring?: (judul: string, q: string) => boolean,
 ): Promise<AnatomyImage[]> {
-  const q = term.trim()
+  const q = bersihkanPencarian(term)
   if (!q) return []
   const hasil = await Promise.all(
     varian(q).map((v) => searchAnatomyImages(v, 8).catch(() => [] as AnatomyImage[])),
@@ -251,10 +310,10 @@ export async function mriImageLookup(structure: string): Promise<AnatomyImage[]>
  * gambar garis, dan bentuk tubuh nyata dalam sebuah gerakan justru yang perlu
  * dilihat: sudut siku, posisi tulang belikat, kedalaman pinggul.
  *
- * Commons memuat banyak foto dan animasi peragaan latihan berlisensi bebas
- * (a.l. koleksi Everkinetic yang CC BY-SA). Penyaringnya ketat: judulnya harus
- * menyebut latihannya DAN satu kata yang menandakan peragaan, supaya "row"
- * tidak mengembalikan foto perahu dan "press" tidak mengembalikan mesin cetak.
+ * Commons memuat banyak foto dan animasi peragaan latihan berlisensi bebas.
+ * Penyaringnya ketat: judulnya harus menyebut latihannya DAN satu kata yang
+ * menandakan peragaan, supaya "row" tidak mengembalikan foto perahu dan
+ * "press" tidak mengembalikan mesin cetak. Lisensi tetap dicek per berkas.
  */
 export async function exerciseImageLookup(exercise: string): Promise<AnatomyImage[]> {
   return cariGabungan(
