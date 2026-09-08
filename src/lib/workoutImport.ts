@@ -160,17 +160,22 @@ export function parseWorkouts(text: string): ImportedWorkout[] {
     const jarakKm = qty(w?.distance) ?? qty(w?.walkingAndRunningDistance)
     const kecepatanKmh = qty(w?.speed) ?? (jarakKm && durasi > 0 ? (jarakKm / (durasi / 3600)) : undefined)
 
-    // Penurunan satu menit pertama sesudah sesi berakhir — dihitung dari deret
-    // nyata, bukan dari angka ringkas yang tidak jelas diambil kapan.
+    // HRR1 hanya bermakna bila ekspor benar-benar merekam sampel dekat menit
+    // pertama. Pilih titik 45-75 detik yang paling dekat ke 60 detik; jangan
+    // mengganti titik yang hilang dengan sampel 10 detik atau beberapa menit
+    // kemudian karena itu akan memberi label "1-minute" pada waktu yang salah.
     let hrr1: number | undefined
     const last = <T,>(a: T[]): T | undefined => (a.length ? a[a.length - 1] : undefined)
     const akhir = last(hr)?.bpm
     if (akhir != null && pemulihan.length) {
-      const dalam60 = pemulihan.filter((p) => p.t <= 60)
-      const titik = last(dalam60.length ? dalam60 : pemulihan)
+      const sekitarMenit = pemulihan
+        .filter((p) => p.t >= 45 && p.t <= 75)
+        .sort((a, b) => Math.abs(a.t - 60) - Math.abs(b.t - 60))
+      const titik = sekitarMenit[0]
       if (titik) {
-        const puncakPemulihan = pemulihan[0]?.bpm ?? akhir
-        const d = Math.max(akhir, puncakPemulihan) - titik.bpm
+        const puncakAwal = pemulihan.find((p) => p.t >= 0 && p.t <= 15)?.bpm
+        const dasar = Math.max(akhir, puncakAwal ?? akhir)
+        const d = dasar - titik.bpm
         if (d > 0) hrr1 = Math.round(d)
       }
     }
