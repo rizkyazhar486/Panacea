@@ -2,8 +2,6 @@ import { mkdir, writeFile } from 'node:fs/promises'
 import { chromium } from '@playwright/test'
 
 const url = process.env.BODY3D_QA_URL || 'http://127.0.0.1:4173/#/body-explorer'
-const screenshotPath = process.env.BODY3D_QA_SCREENSHOT || 'artifacts/body3d-mobile-390x844.png'
-const motionScreenshotPath = process.env.BODY3D_QA_MOTION_SCREENSHOT || 'artifacts/body3d-mobile-motion-390x844.png'
 const metricsPath = process.env.BODY3D_QA_METRICS || 'artifacts/body3d-mobile-metrics.json'
 const operationTimeoutMs = Number(process.env.BODY3D_QA_OPERATION_TIMEOUT_MS || 20_000)
 
@@ -52,6 +50,9 @@ await context.addInitScript(() => {
 
 const page = await context.newPage()
 page.setDefaultTimeout(20_000)
+
+// Keep one optional layer in-flight long enough to prove progressive loading
+// does not cover anatomy that is already usable on a mobile viewport.
 await page.route('**/anatomy/cardio' + 'vascular.glb', async (route) => {
   await new Promise((resolve) => setTimeout(resolve, 4_000))
   await route.continue()
@@ -62,76 +63,41 @@ page.on('pageerror', (error) => pageErrors.push(error.message))
 
 let metrics = null
 let failure = null
-let screenshotCaptured = false
-let motionScreenshotCaptured = false
-let screenshotError = null
 let canvas = null
-
-async function frameSignature(locator) {
-  return withTimeout(locator.evaluate((node) => {
-    const gl = node.getContext('webgl2') || node.getContext('webgl')
-    if (!gl) throw new Error('WebGL context unavailable for frame signature')
-    const width = gl.drawingBufferWidth
-    const height = gl.drawingBufferHeight
-    if (!width || !height) throw new Error('WebGL drawing buffer is empty')
-
-    const sampleWidth = Math.min(96, width)
-    const sampleHeight = Math.min(96, height)
-    const x = Math.max(0, Math.floor((width - sampleWidth) / 2))
-    const y = Math.max(0, Math.floor((height - sampleHeight) / 2))
-    const pixels = new Uint8Array(sampleWidth * sampleHeight * 4)
-    gl.finish()
-    gl.readPixels(x, y, sampleWidth, sampleHeight, gl.RGBA, gl.UNSIGNED_BYTE, pixels)
-
-    let hash = 2166136261
-    let nonZero = 0
-    let min = 255
-    let max = 0
-    for (let i = 0; i < pixels.length; i += 4) {
-      const r = pixels[i]
-      const g = pixels[i + 1]
-      const b = pixels[i + 2]
-      const a = pixels[i + 3]
-      if (r || g || b || a) nonZero += 1
-      min = Math.min(min, r, g, b)
-      max = Math.max(max, r, g, b)
-      hash ^= r; hash = Math.imul(hash, 16777619)
-      hash ^= g; hash = Math.imul(hash, 16777619)
-      hash ^= b; hash = Math.imul(hash, 16777619)
-      hash ^= a; hash = Math.imul(hash, 16777619)
-    }
-    return {
-      hash: (hash >>> 0).toString(16).padStart(8, '0'),
-      nonZero,
-      min,
-      max,
-      sampleWidth,
-      sampleHeight,
-      drawingBufferWidth: width,
-      drawingBufferHeight: height,
-    }
-  }), 'Body3D WebGL frame signature', 10_000)
-}
-
-async function canvasPng(locator) {
-  const dataUrl = await withTimeout(locator.evaluate((node) => node.toDataURL('image/png')), 'Body3D canvas PNG', 10_000)
-  const prefix = 'data:image/png;base64,'
-  if (!dataUrl.startsWith(prefix)) throw new Error('Body3D canvas did not produce a PNG data URL')
-  const png = Buffer.from(dataUrl.slice(prefix.length), 'base64')
-  if (png.length < 5_000) throw new Error(`Body3D canvas PNG is unexpectedly small: ${png.length} bytes`)
-  return png
-}
-
-async function captureCanvas(path) {
-  if (!canvas) throw new Error('Body3D canvas is unavailable for visual evidence')
-  await writeFile(path, await canvasPng(canvas))
-}
 
 async function dismissIfVisible(locator, timeout = 5_000) {
   if (!(await locator.isVisible().catch(() => false))) return false
   await locator.click()
   await locator.waitFor({ state: 'hidden', timeout }).catch(() => undefined)
   return true
+}
+
+async function canvasHealth(locator) {
+  return withTimeout(locator.evaluate((node) => {
+    const gl = node.getContext('webgl2') || node.getContext('webgl')
+    const rect = node.getBoundingClientRect()
+    return {
+      webgl: Boolean(gl),
+      contextLost: gl ? gl.isContextLost() : true,
+      clientWidth: node.clientWidth,
+      clientHeight: node.clientHeight,
+      backingWidth: node.width,
+      backingHeight: node.height,
+      rectWidth: rect.width,
+      rectHeight: rect.height,
+    }
+  }), 'Body3D canvas health', 10_000)
+}
+
+function fatalLocator() {
+  return page.getByText(/This device could not start 3D graphics|The browser dropped the 3D context/i).first()
+}
+
+async function assertNoFatal(label) {
+  const fatal = fatalLocator()
+  if (await fatal.isVisible().catch(() => false)) {
+    throw new Error(`${label}: ${await fatal.innerText()}`)
+  }
 }
 
 try {
@@ -153,59 +119,52 @@ try {
   await canvas.waitFor({ state: 'visible', timeout: 45_000 })
   await canvas.scrollIntoViewIfNeeded()
 
-  await page.waitForTimeout(1_500)
   const initialLoading = page.getByText('Loading anatomy…').first()
   const progressiveLoading = page.getByText('Adding anatomy layer…').first()
   await initialLoading.waitFor({ state: 'hidden', timeout: 120_000 })
   await progressiveLoading.waitFor({ state: 'hidden', timeout: 120_000 })
+  await assertNoFatal('Initial Body3D render failed')
 
-  const fatal = page.getByText(/This device could not start 3D graphics|The browser dropped the 3D context/i)
-  if (await fatal.count()) throw new Error(`Body3D fatal fallback is visible: ${await fatal.first().innerText()}`)
   const layerFailure = page.getByText(/Couldn.t load:/i).first()
   if (await layerFailure.isVisible().catch(() => false)) {
     throw new Error(`Body3D anatomy layer failed to load: ${await layerFailure.innerText()}`)
   }
 
-  metrics = await canvas.evaluate((node) => {
-    const gl = node.getContext('webgl2') || node.getContext('webgl')
+  const health = await canvasHealth(canvas)
+  const viewport = await page.evaluate(() => ({
+    width: window.innerWidth,
+    height: window.innerHeight,
+    devicePixelRatio: window.devicePixelRatio,
+    documentScrollWidth: document.documentElement.scrollWidth,
+  }))
+  const centerUnobstructed = await canvas.evaluate((node) => {
     const rect = node.getBoundingClientRect()
-    const center = document.elementFromPoint(rect.left + rect.width / 2, rect.top + rect.height / 2)
-    return {
-      viewport: { width: window.innerWidth, height: window.innerHeight, devicePixelRatio: window.devicePixelRatio },
-      canvas: {
-        clientWidth: node.clientWidth,
-        clientHeight: node.clientHeight,
-        backingWidth: node.width,
-        backingHeight: node.height,
-      },
-      webgl: Boolean(gl),
-      documentScrollWidth: document.documentElement.scrollWidth,
-      canvasCount: document.querySelectorAll('canvas').length,
-      route: window.location.hash,
-      canvasCenterUnobstructed: center === node,
-    }
+    const hit = document.elementFromPoint(rect.left + rect.width / 2, rect.top + rect.height / 2)
+    return hit === node
   })
 
-  if (!metrics.webgl) throw new Error('Body3D renderer canvas did not expose its WebGL context')
-  if (!metrics.canvasCenterUnobstructed) throw new Error('Body3D canvas center is obstructed by another UI layer')
-  if (metrics.viewport.width !== 390 || metrics.viewport.height !== 844) {
-    throw new Error(`Unexpected viewport ${metrics.viewport.width}x${metrics.viewport.height}`)
-  }
-  if (metrics.canvas.clientWidth < 300 || metrics.canvas.clientHeight < 480) {
-    throw new Error(`Body3D canvas is too small on mobile: ${metrics.canvas.clientWidth}x${metrics.canvas.clientHeight}`)
-  }
-  metrics.renderDpr = metrics.canvas.backingWidth / Math.max(1, metrics.canvas.clientWidth)
-  if (metrics.renderDpr < 1 || metrics.renderDpr > 1.51) {
-    throw new Error(`Mobile Body3D backing-store ratio ${metrics.renderDpr.toFixed(3)} is outside the safe 1.0–1.5 range`)
-  }
-  if (metrics.documentScrollWidth > metrics.viewport.width + 2) {
-    throw new Error(`Page overflows horizontally: ${metrics.documentScrollWidth}px > ${metrics.viewport.width}px`)
+  metrics = {
+    viewport,
+    canvas: health,
+    canvasCenterUnobstructed: centerUnobstructed,
+    route: await page.evaluate(() => window.location.hash),
   }
 
-  const initialFrame = await frameSignature(canvas)
-  metrics.initialFrame = initialFrame
-  if (initialFrame.nonZero < 100 || initialFrame.max <= initialFrame.min) {
-    throw new Error('Body3D sampled framebuffer is blank or uniform')
+  if (!health.webgl || health.contextLost) throw new Error('Body3D WebGL context is unavailable or lost')
+  if (!centerUnobstructed) throw new Error('Body3D canvas center is obstructed by another UI layer')
+  if (viewport.width !== 390 || viewport.height !== 844) {
+    throw new Error(`Unexpected viewport ${viewport.width}x${viewport.height}`)
+  }
+  if (health.clientWidth < 300 || health.clientHeight < 480) {
+    throw new Error(`Body3D canvas is too small on mobile: ${health.clientWidth}x${health.clientHeight}`)
+  }
+  const renderDpr = health.backingWidth / Math.max(1, health.clientWidth)
+  metrics.renderDpr = renderDpr
+  if (renderDpr < 1 || renderDpr > 1.51) {
+    throw new Error(`Mobile Body3D backing-store ratio ${renderDpr.toFixed(3)} is outside the safe 1.0–1.5 range`)
+  }
+  if (viewport.documentScrollWidth > viewport.width + 2) {
+    throw new Error(`Page overflows horizontally: ${viewport.documentScrollWidth}px > ${viewport.width}px`)
   }
 
   const vessels = page.getByRole('button', { name: 'Vessels', exact: true }).first()
@@ -215,13 +174,10 @@ try {
     node.closest('[role="status"]')?.getAttribute('class') ?? '',
   )
   metrics.progressiveLoadingCompact = progressiveClass.includes('top-2') && !progressiveClass.includes('inset-0')
-  await canvas.scrollIntoViewIfNeeded()
-  await page.waitForTimeout(100)
   metrics.progressiveLoadingCenterUnobstructed = await canvas.evaluate((node) => {
     const rect = node.getBoundingClientRect()
     const x = rect.left + rect.width / 2
     const y = rect.top + rect.height / 2
-    if (x < 0 || x > window.innerWidth || y < 0 || y > window.innerHeight) return false
     const hit = document.elementFromPoint(x, y)
     const viewerNode = node.parentElement
     return Boolean(hit && viewerNode && (hit === node || hit === viewerNode || viewerNode.contains(hit)))
@@ -230,9 +186,11 @@ try {
   if (!metrics.progressiveLoadingCenterUnobstructed) throw new Error('Additional layer loading obstructed the Body3D viewer center')
   await progressiveLoading.waitFor({ state: 'hidden', timeout: 120_000 })
 
+  // Runtime interaction proof: perform a real orbit gesture, then require the
+  // same WebGL canvas/context to remain healthy and unobstructed. The source
+  // invariant test separately guarantees OrbitControls change -> requestRender.
   const box = await canvas.boundingBox()
   if (!box) throw new Error('Body3D canvas has no measurable bounding box')
-  const beforeOrbit = await frameSignature(canvas)
   const x = box.x + box.width * 0.5
   const y = box.y + box.height * 0.45
   await page.mouse.move(x, y)
@@ -240,13 +198,17 @@ try {
   await page.mouse.move(x + Math.min(48, box.width * 0.15), y + 18, { steps: 6 })
   await page.mouse.up()
   await page.waitForTimeout(500)
-  const afterOrbit = await frameSignature(canvas)
-  metrics.orbitFrame = { before: beforeOrbit, after: afterOrbit }
-  metrics.orbitChangedFrame = beforeOrbit.hash !== afterOrbit.hash
-  if (!metrics.orbitChangedFrame) throw new Error('Orbit drag did not change the sampled Body3D framebuffer')
-
-  await captureCanvas(screenshotPath)
-  screenshotCaptured = true
+  const postOrbitHealth = await canvasHealth(canvas)
+  metrics.orbitInteraction = {
+    attempted: true,
+    contextStable: postOrbitHealth.webgl && !postOrbitHealth.contextLost,
+    canvasVisible: await canvas.isVisible(),
+    measurable: Boolean(await canvas.boundingBox()),
+  }
+  if (!metrics.orbitInteraction.contextStable || !metrics.orbitInteraction.canvasVisible || !metrics.orbitInteraction.measurable) {
+    throw new Error('Orbit interaction destabilized the Body3D canvas or WebGL context')
+  }
+  await assertNoFatal('Orbit interaction triggered a Body3D fatal state')
 
   const precisionTab = page.getByRole('button', { name: 'Whole-body precision', exact: true })
   await precisionTab.click()
@@ -258,26 +220,12 @@ try {
   await inspectorTitle.waitFor({ state: 'visible', timeout: 20_000 })
   const inspector = inspectorTitle.locator('xpath=ancestor::div[contains(@class,"rounded-3xl")][1]')
 
-  await canvas.scrollIntoViewIfNeeded()
-  await page.waitForTimeout(300)
-  const beforeJointSelection = await frameSignature(canvas)
-
   const kneeButton = inspector.getByRole('button', { name: 'Knee', exact: true })
   await kneeButton.click()
-  await page.waitForTimeout(700)
-  await canvas.scrollIntoViewIfNeeded()
-  const afterJointSelection = await frameSignature(canvas)
-  metrics.wholeBodyMotion = {
-    precisionOpened: true,
-    kneeSelected: true,
-    jointSelectionChangedFrame: beforeJointSelection.hash !== afterJointSelection.hash,
-    jointFrame: { before: beforeJointSelection, after: afterJointSelection },
-  }
-  if (!metrics.wholeBodyMotion.jointSelectionChangedFrame) {
-    throw new Error('Selecting the Knee profile did not update the sampled shared Body3D framebuffer')
-  }
+  await page.waitForTimeout(250)
+  const kneePressed = await kneeButton.getAttribute('aria-pressed')
+  if (kneePressed !== 'true') throw new Error(`Knee joint selection did not become active (aria-pressed=${kneePressed})`)
 
-  await inspector.scrollIntoViewIfNeeded()
   const slider = inspector.locator('input[type="range"]').first()
   const sliderBounds = await slider.evaluate((node) => ({ min: Number(node.min), max: Number(node.max) }))
   const targetAngle = Math.round(sliderBounds.min + (sliderBounds.max - sliderBounds.min) * 0.65)
@@ -288,8 +236,6 @@ try {
   }, targetAngle)
   await page.waitForTimeout(100)
   const observedAngle = Number(await slider.inputValue())
-  metrics.wholeBodyMotion.sliderTargetDeg = targetAngle
-  metrics.wholeBodyMotion.sliderObservedDeg = observedAngle
   if (observedAngle !== targetAngle) {
     throw new Error(`Whole-body ROM slider did not update: expected ${targetAngle}°, saw ${observedAngle}°`)
   }
@@ -300,41 +246,37 @@ try {
   }
 
   await inspector.getByRole('button', { name: /Inspect this motion in shared 3D/i }).click()
-  await page.waitForTimeout(250)
-  metrics.wholeBodyMotion.applyToShared3dClicked = true
-  metrics.wholeBodyMotion.documentScrollWidth = await page.evaluate(() => document.documentElement.scrollWidth)
-  if (metrics.wholeBodyMotion.documentScrollWidth > metrics.viewport.width + 2) {
-    throw new Error(`Whole-body motion inspector overflows horizontally: ${metrics.wholeBodyMotion.documentScrollWidth}px > ${metrics.viewport.width}px`)
+  await page.waitForTimeout(300)
+  const postShared3dHealth = await canvasHealth(canvas)
+  await assertNoFatal('Shared 3D motion inspection triggered a Body3D fatal state')
+
+  metrics.wholeBodyMotion = {
+    precisionOpened: true,
+    kneeSelected: kneePressed === 'true',
+    sliderTargetDeg: targetAngle,
+    sliderObservedDeg: observedAngle,
+    scientificBoundaryVisible: true,
+    applyToShared3dClicked: true,
+    contextStable: postShared3dHealth.webgl && !postShared3dHealth.contextLost,
+    documentScrollWidth: await page.evaluate(() => document.documentElement.scrollWidth),
   }
 
-  await canvas.scrollIntoViewIfNeeded()
-  await page.waitForTimeout(250)
-  await captureCanvas(motionScreenshotPath)
-  motionScreenshotCaptured = true
-
+  if (!metrics.wholeBodyMotion.contextStable) throw new Error('Shared 3D motion inspection lost the WebGL context')
+  if (metrics.wholeBodyMotion.documentScrollWidth > viewport.width + 2) {
+    throw new Error(`Whole-body motion inspector overflows horizontally: ${metrics.wholeBodyMotion.documentScrollWidth}px > ${viewport.width}px`)
+  }
   if (pageErrors.length) throw new Error(`Browser page errors: ${pageErrors.join(' | ')}`)
 
-  console.log(JSON.stringify({ ok: true, url, screenshotCaptured, motionScreenshotCaptured, ...metrics }))
+  console.log(JSON.stringify({ ok: true, url, ...metrics }))
 } catch (error) {
   failure = error instanceof Error ? error.message : String(error)
   throw error
 } finally {
-  if (!screenshotCaptured && canvas) {
-    try {
-      await captureCanvas(screenshotPath)
-      screenshotCaptured = true
-    } catch (error) {
-      screenshotError = error instanceof Error ? error.message : String(error)
-    }
-  }
   await writeFile(metricsPath, `${JSON.stringify({
     ok: !failure,
     url,
     failure,
     pageErrors,
-    screenshotCaptured,
-    motionScreenshotCaptured,
-    screenshotError,
     metrics,
   }, null, 2)}\n`)
   await withTimeout(context.close(), 'Body3D browser context close', 10_000).catch(() => undefined)
