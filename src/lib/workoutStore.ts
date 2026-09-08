@@ -106,25 +106,34 @@ function normalisasiWorkout(w: unknown): ImportedWorkout | null {
   if (!w || typeof w !== 'object') return null
   const x = w as Record<string, unknown>
   if (typeof x.id !== 'string' || !x.id.trim()) return null
-  if (typeof x.mulai !== 'string' || Number.isNaN(Date.parse(x.mulai))) return null
+  if (typeof x.mulai !== 'string' || !x.mulai.trim()) return null
+  const mulaiTs = Date.parse(x.mulai)
+  if (Number.isNaN(mulaiTs)) return null
 
   const durasi = angkaHingga(x.durasi)
+  const selesaiTs = typeof x.selesai === 'string' ? Date.parse(x.selesai) : NaN
+  const selesai = !Number.isNaN(selesaiTs) && selesaiTs >= mulaiTs && typeof x.selesai === 'string'
+    ? x.selesai
+    : x.mulai
+  const hr = (Array.isArray(x.hr) ? x.hr : [])
+    .map(titikHr)
+    .filter((p): p is HrPoint => p !== null)
+    .sort((a, b) => a.t - b.t)
+  const pemulihan = (Array.isArray(x.pemulihan) ? x.pemulihan : [])
+    .map(titikHr)
+    .filter((p): p is HrPoint => p !== null)
+    .sort((a, b) => a.t - b.t)
+
   const hasil: ImportedWorkout = {
     id: x.id,
     nama: typeof x.nama === 'string' ? x.nama : '',
     mulai: x.mulai,
-    // Fallback ini hanya menjaga bentuk data; durasi tidak dihitung ulang dari
-    // waktu selesai sehingga kita tidak menciptakan lama sesi palsu.
-    selesai: typeof x.selesai === 'string' ? x.selesai : x.mulai,
+    // Waktu selesai invalid dinetralkan ke waktu mulai. Durasi tetap berasal
+    // dari field durasi sendiri; kita tidak mengarang durasi dari timestamp.
+    selesai,
     durasi: durasi !== undefined && durasi >= 0 ? durasi : 0,
-    hr: (Array.isArray(x.hr) ? x.hr : [])
-      .map(titikHr)
-      .filter((p): p is HrPoint => p !== null)
-      .sort((a, b) => a.t - b.t),
-    pemulihan: (Array.isArray(x.pemulihan) ? x.pemulihan : [])
-      .map(titikHr)
-      .filter((p): p is HrPoint => p !== null)
-      .sort((a, b) => a.t - b.t),
+    hr,
+    pemulihan,
   }
 
   const jarakKm = angkaPositif(x.jarakKm)
@@ -149,7 +158,10 @@ function normalisasiWorkout(w: unknown): ImportedWorkout | null {
   if (kadens !== undefined) hasil.kadens = kadens
   if (langkah !== undefined && langkah >= 0) hasil.langkah = langkah
   if (typeof x.diDalamRuangan === 'boolean') hasil.diDalamRuangan = x.diDalamRuangan
-  if (hrr1 !== undefined) hasil.hrr1 = hrr1
+  // HRR1 hanya dipertahankan jika cache juga menyimpan bukti waktu sekitar
+  // menit pertama. Ini membersihkan nilai lama yang dibuat dengan fallback
+  // recovery yang sudah tidak digunakan importer baru.
+  if (hrr1 !== undefined && pemulihan.some((p) => p.t >= 45 && p.t <= 75)) hasil.hrr1 = hrr1
   if (rpe !== undefined && rpe >= 1 && rpe <= 10) hasil.rpe = rpe
 
   return hasil
