@@ -6,7 +6,7 @@ import { SISTEM_FISIOLOGI } from '../../lib/physiology'
 import { ORGAN_FOCUS } from '../../lib/organFocus'
 import type { AnatomyLayer } from '../../components/Body3D'
 import OrganClinicalPanel from './OrganClinicalPanel'
-import { modelForFocus, modelIlustrasi, ILUSTRASI } from '../../lib/organModels'
+import { modelForFocus, regionalModelForFocus, modelIlustrasi, ILUSTRASI } from '../../lib/organModels'
 import OrganModel3D from '../../components/OrganModel3D'
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -136,14 +136,20 @@ export function OrganDossier({ organKey, organLabel, onLocate }: Props) {
     (['ossicles', 'nasal-septum'].includes(organKey) && f.key === 'skeletal'),
   )
   const term = organLabel
-  // Model organ tunggal beresolusi tinggi, kalau organ ini punya. Terpisah
-  // dari figur tubuh utuh dan asalnya berbeda — lihat organModels.ts.
-  const model = modelForFocus(organKey)
+  // Primary detail and optional regional context are separate on purpose:
+  // the richer regional atlas must not silently replace a more detailed organ cut.
+  const primaryModel = modelForFocus(organKey)
+  const regionalModel = regionalModelForFocus(organKey)
   // Ilustrasi selalu datang dari berkas /organs/<id>/, yang hanya dimiliki
-  // model bangkitan AI. Saat organ ini memakai potongan BodyParts3D untuk 3D-nya,
-  // ilustrasinya tetap dicari terpisah supaya tidak ikut hilang.
+  // model bangkitan AI. Reference geometry and legacy illustrations stay separate.
   const ilustrasi = modelIlustrasi(organKey)
+  const [anatomyView, setAnatomyView] = useState<'primary' | 'regional'>('primary')
   const [hotspot, setHotspot] = useState<string | null>(null)
+  useEffect(() => {
+    setAnatomyView('primary')
+    setHotspot(null)
+  }, [organKey])
+  const model = anatomyView === 'regional' && regionalModel ? regionalModel : primaryModel
 
   return (
     <div className="space-y-2">
@@ -170,6 +176,22 @@ export function OrganDossier({ organKey, organLabel, onLocate }: Props) {
       <Bagian judul="1 · Anatomy" sub="What it is, and where it sits" terbukaAwal>
         {model && (
           <>
+            {regionalModel && (
+              <div aria-label="Anatomy view" className="grid grid-cols-2 gap-1 rounded-xl bg-neutral-100 p-1 dark:bg-white/5">
+                <button
+                  onClick={() => { setAnatomyView('primary'); setHotspot(null) }}
+                  className={`min-h-[34px] rounded-lg px-2 text-[11px] font-bold transition ${anatomyView === 'primary' ? 'bg-white text-ink shadow-sm dark:bg-white/15 dark:text-white' : 'text-neutral-500'}`}
+                >
+                  Organ detail
+                </button>
+                <button
+                  onClick={() => { setAnatomyView('regional'); setHotspot(null) }}
+                  className={`min-h-[34px] rounded-lg px-2 text-[11px] font-bold transition ${anatomyView === 'regional' ? 'bg-white text-ink shadow-sm dark:bg-white/15 dark:text-white' : 'text-neutral-500'}`}
+                >
+                  Regional relationships
+                </button>
+              </div>
+            )}
             <OrganModel3D organ={model} selected={hotspot} onSelect={setHotspot} />
             <div className="flex flex-wrap items-center gap-1.5">
               <span className="text-[11px] font-bold text-neutral-500">{model.scientificName}</span>
@@ -191,15 +213,20 @@ export function OrganDossier({ organKey, organLabel, onLocate }: Props) {
             <p className="text-[10px] leading-relaxed text-neutral-400">
               {model.sumber === 'bodyparts3d' ? (
                 <>
-                  Detailed organ view — {model.jumlahBagian === 1 ? 'one named structure' : `${model.jumlahBagian} individually named structures`} cut from BodyParts3D 4.0
-                  (Database Center for Life Science, CC BY 4.0), the same reference anatomy as the full-body figure
-                  above. Real human reference geometry, not an artistic impression.
+                  Reference anatomy — {model.jumlahBagian === 1 ? 'one named structure' : `${model.jumlahBagian} named structures`} from BodyParts3D 4.0
+                  (Database Center for Life Science, CC BY 4.0). Named source geometry supports exact structure selection.
+                  This is educational reference anatomy, not patient-specific imaging.
+                </>
+              ) : model.sumber === 'z-anatomy' || model.sumber === 'hra' ? (
+                <>
+                  Reference anatomy — {model.jumlahBagian === 1 ? 'one named structure' : `${model.jumlahBagian} named structures`} from {model.sourceLabel ?? model.sumber}
+                  {model.sourceLicense ? ` (${model.sourceLicense})` : ''}. Named source geometry supports exact structure selection.
+                  This is a reference atlas, not patient-specific imaging.
                 </>
               ) : (
                 <>
-                  Detailed organ view — an AI-generated model (Tripo), used with the owner’s permission. It is a shape
-                  approximation for recognising form and position, not verified anatomy. The full-body figure above uses
-                  BodyParts3D, which is derived from real human data.
+                  Shape approximation — an AI-generated model (Tripo), used with the owner’s permission. It is suitable
+                  for recognising broad form and position only; it is not verified sub-structure anatomy and is not patient-specific.
                 </>
               )}
             </p>

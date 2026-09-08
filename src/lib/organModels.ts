@@ -77,7 +77,7 @@ export function modelAssetPath(m: OrganModel): string {
 }
 
 import { ORGAN_ATLAS } from './organAtlas.gen'
-import { REFERENCE_ATLAS_MODELS } from './referenceOrganModels'
+import { REFERENCE_ATLAS_MODELS, REGIONAL_REFERENCE_ATLAS_MODELS } from './referenceOrganModels'
 
 export const ORGAN_MODELS: OrganModel[] = [
   {
@@ -220,6 +220,11 @@ export function modelForFocus(focusKey: string): OrganModel | undefined {
   return ORGAN_ATLAS.find((m) => m.focusKey === focusKey)
     ?? REFERENCE_ATLAS_MODELS.find((m) => m.focusKey === focusKey)
     ?? ORGAN_MODELS.find((m) => m.focusKey === focusKey)
+}
+
+/** Optional regional anatomy that complements, rather than replaces, the primary close-up. */
+export function regionalModelForFocus(focusKey: string): OrganModel | undefined {
+  return REGIONAL_REFERENCE_ATLAS_MODELS.find((m) => m.focusKey === focusKey)
 }
 
 /** Model bangkitan AI saja — dipakai untuk mencari ilustrasi /organs/<id>/. */

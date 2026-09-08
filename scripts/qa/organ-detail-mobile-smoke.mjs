@@ -168,6 +168,36 @@ try {
   metrics.brainStillShowsTripo = await page.getByText(/AI-generated model \(Tripo\)/i).isVisible().catch(() => false)
   if (metrics.brainStillShowsTripo) throw new Error('Brain still reports the obsolete Tripo source after reference promotion')
 
+  // Z-Anatomy promotion: lungs must load named reference geometry and must not
+  // inherit the legacy Tripo provenance text.
+  await page.getByRole('button', { name: 'Organs', exact: true }).first().click()
+  await page.getByRole('button', { name: 'Lungs', exact: true }).first().click()
+  await page.locator('canvas[data-organ-model3d="lungs-reference"]').first().waitFor({ state: 'visible', timeout: 45_000 })
+  await page.getByText(/13 named structures from 13 source meshes/i).first().waitFor({ state: 'visible', timeout: 10_000 })
+  await page.getByText(/Z-Anatomy · derived from BodyParts3D/i).first().waitFor({ state: 'visible', timeout: 10_000 })
+  metrics.lungsReferenceProvenanceVisible = true
+
+  // HRA promotion: breast must expose the reference-object sex and licensing
+  // rather than being presented as a generic or patient-specific body.
+  await page.getByRole('button', { name: 'Organs', exact: true }).first().click()
+  await page.getByRole('button', { name: 'Breast', exact: true }).first().click()
+  await page.locator('canvas[data-organ-model3d="breast-reference"]').first().waitFor({ state: 'visible', timeout: 45_000 })
+  await page.getByText(/16 named structures from 16 source meshes/i).first().waitFor({ state: 'visible', timeout: 10_000 })
+  await page.getByText(/HuBMAP Human Reference Atlas · female reference object/i).first().waitFor({ state: 'visible', timeout: 10_000 })
+  metrics.breastReferenceProvenanceVisible = true
+
+  // Functional regional context: Heart keeps its primary BodyParts3D close-up
+  // but can deliberately switch to the HRA chambers/valves relationship view.
+  await page.getByRole('button', { name: 'Organs', exact: true }).first().click()
+  await page.getByRole('button', { name: 'Heart', exact: true }).first().click()
+  const regionalButton = page.getByRole('button', { name: 'Regional relationships', exact: true })
+  await regionalButton.waitFor({ state: 'visible', timeout: 10_000 })
+  await regionalButton.click()
+  await page.locator('canvas[data-organ-model3d="heart-regional-reference"]').first().waitFor({ state: 'visible', timeout: 45_000 })
+  await page.getByText(/14 named structures from 14 source meshes/i).first().waitFor({ state: 'visible', timeout: 10_000 })
+  await page.getByText(/HuBMAP Human Reference Atlas · female reference object/i).first().waitFor({ state: 'visible', timeout: 10_000 })
+  metrics.heartRegionalRelationshipsUsable = true
+
   if (pageErrors.length) throw new Error(`Browser page errors: ${pageErrors.join(' | ')}`)
   console.log(JSON.stringify({ ok: true, screenshotCaptured, ...metrics }))
 } catch (error) {
