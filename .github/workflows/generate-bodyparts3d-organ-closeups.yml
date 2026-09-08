@@ -1,0 +1,54 @@
+name: Generate BodyParts3D Organ Close-ups
+
+on:
+  push:
+    branches:
+      - feat/body-exposure-organ-detail-20260908
+    paths:
+      - scripts/atlasOrgan.mjs
+      - scripts/atlasGlb.mjs
+      - .github/workflows/generate-bodyparts3d-organ-closeups.yml
+
+permissions:
+  contents: write
+
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: feat/body-exposure-organ-detail-20260908
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - name: Fetch BodyParts3D packaging
+        run: git clone --depth 1 https://github.com/ashemag/human-atlas.git /tmp/human-atlas
+      - name: Generate close-ups
+        run: node scripts/atlasOrgan.mjs /tmp/human-atlas
+      - name: Require new verified organ assets
+        run: |
+          for organ in heart kidneys small-intestine large-intestine pancreas brain eye; do
+            test -s "public/organs-atlas/${organ}.glb"
+            grep -q "\"focusKey\": \"${organ}\"" src/lib/organAtlas.gen.ts
+          done
+          git diff --check
+      - name: Validate generated application
+        run: |
+          npm ci
+          npx tsc --noEmit
+          npm run build
+          npm run uji
+      - name: Commit generated reference assets
+        run: |
+          if git diff --quiet -- public/organs-atlas src/lib/organAtlas.gen.ts; then
+            echo "Generated reference assets already match the extractor"
+            exit 0
+          fi
+          git config user.name "Panacea Anatomy Generator"
+          git config user.email "actions@users.noreply.github.com"
+          git add public/organs-atlas src/lib/organAtlas.gen.ts
+          git commit -m "feat(body): add verified BodyParts3D organ close-ups"
+          git push origin HEAD:feat/body-exposure-organ-detail-20260908
