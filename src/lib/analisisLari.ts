@@ -30,18 +30,26 @@ export interface Sebaran {
 }
 
 export function sebaranIntensitas(sesi: ImportedWorkout[], hrMax: number): Sebaran | null {
-  if (!(hrMax > 0)) return null
+  if (!Number.isFinite(hrMax) || !(hrMax > 0)) return null
   const m: [number, number, number] = [0, 0, 0]
   let titik = 0
   let dipakai = 0
   for (const w of sesi) {
-    if (!w.hr?.length) continue
-    dipakai += 1
+    if (!Array.isArray(w.hr) || !w.hr.length) continue
+    let titikSesi = 0
     for (const p of w.hr) {
+      // Data impor normal sudah dibersihkan oleh workoutImport, tetapi sesi yang
+      // dipulihkan dari cache/runtime JSON tidak mendapat perlindungan TypeScript.
+      // Titik rusak tidak boleh diam-diam masuk zona keras karena perbandingan
+      // dengan NaN selalu false, dan juga tidak boleh membantu memenuhi ambang
+      // minimum 30 menit data yang benar-benar terekam.
+      if (!p || !Number.isFinite(p.t) || p.t < 0 || !Number.isFinite(p.bpm) || p.bpm <= 0) continue
       const pct = p.bpm / hrMax
       m[pct < 0.8 ? 0 : pct < 0.87 ? 1 : 2] += 1
       titik += 1
+      titikSesi += 1
     }
+    if (titikSesi > 0) dipakai += 1
   }
   // Deret impor bercatat per menit; di bawah 30 menit terekam, persentasenya
   // lebih menggambarkan sesi mana yang kebetulan memakai jam tangan.
