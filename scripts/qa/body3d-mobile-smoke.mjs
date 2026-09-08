@@ -138,19 +138,45 @@ async function clickNativeHitTarget(locator, label) {
     }
 
     await locator.evaluate((node) => {
-      node.scrollIntoView({ block: 'center', inline: 'center', behavior: 'auto' })
-      const rect = node.getBoundingClientRect()
       const visualTop = window.visualViewport?.offsetTop ?? 0
       const visualHeight = window.visualViewport?.height ?? window.innerHeight
+      const desiredViewportY = visualTop + visualHeight / 2
+
+      // A mobile Body Explorer panel can be nested inside one or more independently
+      // scrolling containers. Window-only scrolling can therefore reach its maximum
+      // while the real button remains below the visual viewport. Centre the target in
+      // every scroll-capable ancestor, nearest first, without bypassing hit testing.
+      let ancestor = node.parentElement
+      while (ancestor && ancestor !== document.body && ancestor !== document.documentElement) {
+        const maxScrollTop = Math.max(0, ancestor.scrollHeight - ancestor.clientHeight)
+        if (maxScrollTop > 1) {
+          const nodeRect = node.getBoundingClientRect()
+          const ancestorRect = ancestor.getBoundingClientRect()
+          const targetCenter = nodeRect.top + nodeRect.height / 2
+          const ancestorCenter = ancestorRect.top + ancestorRect.height / 2
+          const delta = targetCenter - ancestorCenter
+          if (Math.abs(delta) > 2) {
+            ancestor.scrollTop = Math.max(0, Math.min(maxScrollTop, ancestor.scrollTop + delta))
+          }
+        }
+        ancestor = ancestor.parentElement
+      }
+
+      node.scrollIntoView({ block: 'center', inline: 'center', behavior: 'auto' })
+      const rect = node.getBoundingClientRect()
       const centerY = rect.top + rect.height / 2
-      const desiredY = visualTop + visualHeight / 2
-      const deltaY = centerY - desiredY
-      if (Math.abs(deltaY) > 2) window.scrollBy({ top: deltaY, behavior: 'auto' })
+      const deltaY = centerY - desiredViewportY
+      if (Math.abs(deltaY) > 2) {
+        const scrollingElement = document.scrollingElement || document.documentElement
+        const maxDocumentScroll = Math.max(0, scrollingElement.scrollHeight - window.innerHeight)
+        const targetY = Math.max(0, Math.min(maxDocumentScroll, window.scrollY + deltaY))
+        window.scrollTo({ top: targetY, left: 0, behavior: 'auto' })
+      }
     })
     await page.waitForTimeout(180)
   }
 
-  throw new Error(`${label} is not a real browser hit target after bounded native scrolling: ${JSON.stringify(lastHit)}`)
+  throw new Error(`${label} is not a real browser hit target after bounded nested scrolling: ${JSON.stringify(lastHit)}`)
 }
 
 try {
