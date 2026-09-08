@@ -2,6 +2,8 @@ export const STUDY_BASELINE_MAX_POINTS = 12
 export const STUDY_BASELINE_MIN_POINTS = 3
 export const STUDY_BASELINE_UNIT = 'self-rated confidence / 5'
 export const STUDY_BASELINE_SOURCE = 'user-self-rating'
+export const STUDY_BASELINE_METHOD = 'median + nearest-rank observed quartiles'
+export const STUDY_BASELINE_INTERPRETATION = 'personal-descriptive-self-rating-only'
 
 export type StudyBaselinePoint = Readonly<{
   topicId: string
@@ -15,22 +17,28 @@ export type StudyBaseline = Readonly<{
   status: 'insufficient' | 'ready'
   count: number
   median: number | null
-  referenceLow: number | null
-  referenceHigh: number | null
+  observedQ1: number | null
+  observedQ3: number | null
   unit: typeof STUDY_BASELINE_UNIT
   sourceIdentity: typeof STUDY_BASELINE_SOURCE
+  method: typeof STUDY_BASELINE_METHOD
   firstRecordedAt: string | null
   lastRecordedAt: string | null
   points: readonly StudyBaselinePoint[]
-  interpretation: 'descriptive-learning-only'
+  interpretation: typeof STUDY_BASELINE_INTERPRETATION
 }>
 
 export type StudyBaselineComparison = Readonly<{
   score: number
   deltaFromMedian: number | null
-  position: 'insufficient-baseline' | 'below-reference' | 'within-reference' | 'above-reference'
+  position:
+    | 'insufficient-baseline'
+    | 'below-observed-quartile-band'
+    | 'within-observed-quartile-band'
+    | 'above-observed-quartile-band'
   unit: typeof STUDY_BASELINE_UNIT
-  interpretation: 'descriptive-learning-only'
+  method: typeof STUDY_BASELINE_METHOD
+  interpretation: typeof STUDY_BASELINE_INTERPRETATION
 }>
 
 function validTimestamp(value: string): boolean {
@@ -55,6 +63,9 @@ function median(values: readonly number[]): number {
     : sorted[middle]
 }
 
+// This is intentionally a transparent summary of the user's observed points,
+// not a population reference interval. Percentile conventions differ; Panacea
+// pins this simple nearest-rank method so the output stays deterministic.
 function nearestRank(values: readonly number[], percentile: number): number {
   const sorted = [...values].sort((a, b) => a - b)
   const rank = Math.max(1, Math.ceil(percentile * sorted.length))
@@ -79,10 +90,11 @@ export function buildStudyBaseline(
     count,
     unit: STUDY_BASELINE_UNIT,
     sourceIdentity: STUDY_BASELINE_SOURCE,
+    method: STUDY_BASELINE_METHOD,
     firstRecordedAt: points[0]?.recordedAt ?? null,
     lastRecordedAt: count > 0 ? points[count - 1].recordedAt : null,
     points,
-    interpretation: 'descriptive-learning-only',
+    interpretation: STUDY_BASELINE_INTERPRETATION,
   } as const
 
   if (count < STUDY_BASELINE_MIN_POINTS) {
@@ -90,8 +102,8 @@ export function buildStudyBaseline(
       ...common,
       status: 'insufficient',
       median: null,
-      referenceLow: null,
-      referenceHigh: null,
+      observedQ1: null,
+      observedQ3: null,
     }
   }
 
@@ -100,8 +112,8 @@ export function buildStudyBaseline(
     ...common,
     status: 'ready',
     median: median(scores),
-    referenceLow: nearestRank(scores, 0.25),
-    referenceHigh: nearestRank(scores, 0.75),
+    observedQ1: nearestRank(scores, 0.25),
+    observedQ3: nearestRank(scores, 0.75),
   }
 }
 
@@ -116,27 +128,29 @@ export function compareStudyScore(
   if (
     baseline.status !== 'ready' ||
     baseline.median === null ||
-    baseline.referenceLow === null ||
-    baseline.referenceHigh === null
+    baseline.observedQ1 === null ||
+    baseline.observedQ3 === null
   ) {
     return {
       score,
       deltaFromMedian: null,
       position: 'insufficient-baseline',
       unit: STUDY_BASELINE_UNIT,
-      interpretation: 'descriptive-learning-only',
+      method: STUDY_BASELINE_METHOD,
+      interpretation: STUDY_BASELINE_INTERPRETATION,
     }
   }
 
   return {
     score,
     deltaFromMedian: score - baseline.median,
-    position: score < baseline.referenceLow
-      ? 'below-reference'
-      : score > baseline.referenceHigh
-        ? 'above-reference'
-        : 'within-reference',
+    position: score < baseline.observedQ1
+      ? 'below-observed-quartile-band'
+      : score > baseline.observedQ3
+        ? 'above-observed-quartile-band'
+        : 'within-observed-quartile-band',
     unit: STUDY_BASELINE_UNIT,
-    interpretation: 'descriptive-learning-only',
+    method: STUDY_BASELINE_METHOD,
+    interpretation: STUDY_BASELINE_INTERPRETATION,
   }
 }
