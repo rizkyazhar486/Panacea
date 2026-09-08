@@ -42,6 +42,12 @@ await context.addInitScript(() => {
 })
 
 const page = await context.newPage()
+// Keep one normally-large optional layer in-flight long enough to prove that
+// progressive loading does not dim or cover anatomy that is already usable.
+await page.route('**/anatomy/cardio' + 'vascular.glb', async (route) => {
+  await new Promise((resolve) => setTimeout(resolve, 1_200))
+  await route.continue()
+})
 const pageErrors = []
 page.on('pageerror', (error) => pageErrors.push(error.message))
 
@@ -115,7 +121,10 @@ try {
 
   // Give Skeleton + Muscles time to enter loading, then require them to settle.
   await page.waitForTimeout(1_500)
-  await page.getByText('Loading anatomy…').waitFor({ state: 'hidden', timeout: 120_000 })
+  const initialLoading = page.getByText('Loading anatomy…').first()
+  const progressiveLoading = page.getByText('Adding anatomy layer…').first()
+  await initialLoading.waitFor({ state: 'hidden', timeout: 120_000 })
+  await progressiveLoading.waitFor({ state: 'hidden', timeout: 120_000 })
 
   const fatal = page.getByText(/This device could not start 3D graphics|The browser dropped the 3D context/i)
   if (await fatal.count()) throw new Error(`Body3D fatal fallback is visible: ${await fatal.first().innerText()}`)
@@ -161,6 +170,29 @@ try {
   if (metrics.documentScrollWidth > metrics.viewport.width + 2) {
     throw new Error(`Page overflows horizontally: ${metrics.documentScrollWidth}px > ${metrics.viewport.width}px`)
   }
+
+  // Turn on a normally-large optional layer while keeping the already-rendered
+  // anatomy usable. The delayed request above makes this state deterministic.
+  const vessels = page.getByRole('button', { name: 'Vessels', exact: true }).first()
+  await vessels.click()
+  await progressiveLoading.waitFor({ state: 'visible', timeout: 5_000 })
+  await canvas.scrollIntoViewIfNeeded()
+  const progressiveOverlay = progressiveLoading.locator('xpath=ancestor::*[@role="status"][1]')
+  const progressiveClass = await progressiveOverlay.getAttribute('class')
+  metrics.progressiveLoadingCompact = Boolean(
+    progressiveClass?.includes('top-2') && !progressiveClass?.includes('inset-0'),
+  )
+  metrics.progressiveLoadingCenterUnobstructed = await canvas.evaluate((node) => {
+    const rect = node.getBoundingClientRect()
+    return document.elementFromPoint(rect.left + rect.width / 2, rect.top + rect.height / 2) === node
+  })
+  if (!metrics.progressiveLoadingCompact) {
+    throw new Error(`Additional layer loading is not compact: ${progressiveClass ?? 'no class'}`)
+  }
+  if (!metrics.progressiveLoadingCenterUnobstructed) {
+    throw new Error('Additional layer loading obstructed the Body3D canvas center')
+  }
+  await progressiveLoading.waitFor({ state: 'hidden', timeout: 120_000 })
 
   // Exercise OrbitControls and prove the compositor surface actually changes.
   // This verifies the demand-render path, rather than merely dispatching a drag
