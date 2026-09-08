@@ -169,7 +169,13 @@ try {
   metrics.transseptalLoaded = true
 
   const transseptalCorrelation = simulator.locator('[data-surgery-correlation="shared-body3d"]')
-  await transseptalCorrelation.getByRole('button', { name: 'Axial CT', exact: true }).click()
+  const transseptalAxial = transseptalCorrelation.getByRole('button', { name: 'Axial CT', exact: true })
+  // On a 390x844 viewport the correlation controls sit below the atlas after a
+  // scenario swap. Navigate to the control as a touch user would before the
+  // click; all shared-state assertions below remain unchanged.
+  await transseptalCorrelation.scrollIntoViewIfNeeded()
+  await transseptalAxial.scrollIntoViewIfNeeded()
+  await transseptalAxial.click()
   await waitForClass(page.getByRole('button', { name: 'CT', exact: true }).first(), 'bg-white')
   await waitForClass(page.getByRole('button', { name: 'Axial', exact: true }).first(), 'bg-brand')
   metrics.transseptalSlicePos = await waitForInputValue(page.getByRole('slider', { name: 'Slice level', exact: true }), 0.72)
