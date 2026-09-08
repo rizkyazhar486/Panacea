@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { KESENANGAN, WARNA, tawaranHariIni, hariIniSelesai, tandai } from '../lib/semangat'
 import { Cincin, Gelembung } from './Rupa'
+import '../styles/home-dark-comfort-v34.css'
 
 // Optional daily prompts at the start of Home. The art stays expressive, but
 // the copy remains literal: completion is not a health score or a judgement.
