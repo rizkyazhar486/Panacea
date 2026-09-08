@@ -1,7 +1,10 @@
 import assert from 'node:assert/strict'
 import { readFileSync } from 'node:fs'
+import { BREATH_ATLAS_ACADEMIC_EVIDENCE, breathAtlasHumanReviewRecorded } from '../../src/lib/breathAtlasAcademicEvidence.ts'
 
-const breathSource = readFileSync(new URL('../../src/pages/bodyhub/BreathAtlasLab.tsx', import.meta.url), 'utf8')
+const breathSource = readFileSync(new URL('../../src/pages/bodyhub/BreathAtlasCoreLab.tsx', import.meta.url), 'utf8')
+const wrapperSource = readFileSync(new URL('../../src/pages/bodyhub/BreathAtlasLab.tsx', import.meta.url), 'utf8')
+const evidencePanelSource = readFileSync(new URL('../../src/pages/bodyhub/BreathAtlasEvidencePanel.tsx', import.meta.url), 'utf8')
 const precisionSource = readFileSync(new URL('../../src/pages/bodyhub/WholeBodyPrecisionLab.tsx', import.meta.url), 'utf8')
 const registry = JSON.parse(readFileSync(new URL('../../data/source-registry/anatomy/thebuggeddev-anatomy-breath-atlas.json', import.meta.url), 'utf8'))
 
@@ -30,6 +33,30 @@ assert.match(breathSource, /not represented at whole-body mesh scale/i)
 assert.match(breathSource, /source body mesh is not deformed to fake breathing/i)
 assert.match(breathSource, /no patient-specific ventilation map/i)
 
+assert.match(wrapperSource, /BreathAtlasCoreLab/)
+assert.match(wrapperSource, /BreathAtlasEvidencePanel/)
+assert.match(wrapperSource, /<BreathAtlasCoreLab \{\.\.\.props\} \/>/)
+assert.match(wrapperSource, /<BreathAtlasEvidencePanel \/>/)
+assert.match(evidencePanelSource, /Academic Accuracy Gate · respiratory claims/)
+assert.match(evidencePanelSource, /human academic review not recorded/i)
+assert.match(evidencePanelSource, /AI-assisted · disclosed/)
+
+assert.equal(BREATH_ATLAS_ACADEMIC_EVIDENCE.status, 'source-checked')
+assert.equal(BREATH_ATLAS_ACADEMIC_EVIDENCE.humanReview.status, 'not-recorded')
+assert.equal(breathAtlasHumanReviewRecorded(), false)
+assert.deepEqual(
+  BREATH_ATLAS_ACADEMIC_EVIDENCE.sources.map((source) => source.id),
+  ['pmid-23733642', 'pmid-37816345', 'pmid-37571742'],
+)
+assert.deepEqual(
+  BREATH_ATLAS_ACADEMIC_EVIDENCE.sources.map((source) => source.doi),
+  ['10.1002/cphy.c100009', '10.1055/s-0043-1770060', '10.3390/s23156960'],
+)
+for (const source of BREATH_ATLAS_ACADEMIC_EVIDENCE.sources) {
+  assert.match(source.pubmedUrl, /^https:\/\/pubmed\.ncbi\.nlm\.nih\.gov\/\d+\/$/)
+  assert.ok(source.supports.length > 0)
+}
+
 assert.match(precisionSource, /import BreathAtlasLab from '\.\/BreathAtlasLab'/)
 assert.match(precisionSource, /'breath-atlas'/)
 assert.match(precisionSource, /\['breath-atlas', 'Breath atlas'\]/)
@@ -46,4 +73,4 @@ assert.equal(registry.license.commercialUse, 'UNKNOWN')
 assert.equal(registry.adapter.status, 'NOT_APPLICABLE')
 assert.equal(registry.validation.clinicalDecisionUse, 'NO')
 
-console.log('Breath Atlas remains source-aware, physiologically bounded, independently implemented, and license-gated.')
+console.log('Breath Atlas remains source-aware, physiologically bounded, independently implemented, license-gated, and visibly source-checked without fabricating human academic review.')
