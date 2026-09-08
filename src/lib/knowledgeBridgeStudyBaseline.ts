@@ -77,10 +77,10 @@ export function buildStudyBaseline(
     unit: STUDY_BASELINE_UNIT,
     sourceIdentity: STUDY_BASELINE_SOURCE,
     firstRecordedAt: points[0]?.recordedAt ?? null,
-    lastRecordedAt: points.at(-1)?.recordedAt ?? null,
+    lastRecordedAt: count > 0 ? points[count - 1].recordedAt : null,
     points,
-    interpretation: 'descriptive-learning-only' as const,
-  }
+    interpretation: 'descriptive-learning-only',
+  } as const
 
   if (count < STUDY_BASELINE_MIN_POINTS) {
     return {
