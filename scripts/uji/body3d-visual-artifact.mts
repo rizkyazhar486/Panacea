@@ -7,8 +7,9 @@ const executableCapture = capture
   .replace(/\/\*[\s\S]*?\*\//g, '')
   .replace(/^\s*\/\/.*$/gm, '')
 
-assert.match(capture, /rendered WebGL canvas|rendered-webgl-canvas/i, 'capture must describe its actual WebGL-canvas scope')
-assert.match(capture, /drawImage\(node, 0, 0\)/, 'capture must copy the rendered canvas without a compositor screenshot')
+assert.match(capture, /rendered WebGL canvas|rendered-webgl-(?:canvas|framebuffer)/i, 'capture must describe its actual rendered WebGL scope')
+assert.match(executableCapture, /gl\.readPixels\(/, 'capture must read actual rendered WebGL framebuffer pixels without a compositor screenshot')
+assert.match(capture, /requestAnimationFrame/, 'capture must sample the newly requested render frame before the backbuffer is discarded')
 assert.match(capture, /visibleSamples < 100/, 'capture must fail closed for visually empty output')
 assert.match(capture, /lumaSpread < 8/, 'capture must fail closed for flat output')
 assert.match(capture, /png\.length < 10_000/, 'capture must reject implausibly small PNG output')
