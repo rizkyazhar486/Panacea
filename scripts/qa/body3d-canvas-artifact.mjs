@@ -25,6 +25,20 @@ const context = await browser.newContext({
   hasTouch: true,
 })
 
+// This browser exists only to persist a visual QA artifact. The separate
+// behavioral smoke uses the production/default WebGL context. Preserve the
+// drawing buffer here so Chromium/SwiftShader does not discard a healthy
+// rendered frame before the artifact copier can read it.
+await context.addInitScript(() => {
+  const nativeGetContext = HTMLCanvasElement.prototype.getContext
+  HTMLCanvasElement.prototype.getContext = function getContext(type, attributes) {
+    if (type === 'webgl' || type === 'webgl2' || type === 'experimental-webgl') {
+      return nativeGetContext.call(this, type, { ...(attributes || {}), preserveDrawingBuffer: true })
+    }
+    return nativeGetContext.call(this, type, attributes)
+  }
+})
+
 await context.addInitScript(() => {
   const account = {
     email: 'body3d-qa@localhost.test',
@@ -65,77 +79,29 @@ try {
   if (await fatal.isVisible().catch(() => false)) throw new Error(await fatal.innerText())
   if (pageErrors.length) throw new Error(`Browser page errors: ${pageErrors.join(' | ')}`)
 
-  // Avoid browser-level compositor capture APIs. Three.js normally renders with
-  // preserveDrawingBuffer=false, so copying the canvas after composition can see
-  // a discarded backbuffer even while the on-screen WebGL view is healthy.
-  // Trigger a real OrbitControls interaction, then read the default framebuffer
-  // in the next animation frame, before the compositor can discard it.
-  const capture = await canvas.evaluate(async (node) => {
+  // Avoid browser-level compositor capture APIs. This QA-only context preserves
+  // its drawing buffer, allowing a direct copy of the actual rendered WebGL
+  // canvas while the production/default context remains tested separately.
+  const capture = await canvas.evaluate((node) => {
     const width = node.width
     const height = node.height
     if (width < 300 || height < 480) throw new Error(`Unexpected backing canvas ${width}x${height}`)
 
     const gl = node.getContext('webgl2') || node.getContext('webgl')
     if (!gl || gl.isContextLost()) throw new Error('Body3D WebGL context unavailable during visual capture')
-
-    const rect = node.getBoundingClientRect()
-    const x = rect.left + rect.width * 0.5
-    const y = rect.top + rect.height * 0.45
-    const pointerId = 77
-    node.dispatchEvent(new PointerEvent('pointerdown', {
-      bubbles: true,
-      cancelable: true,
-      pointerId,
-      pointerType: 'mouse',
-      clientX: x,
-      clientY: y,
-      button: 0,
-      buttons: 1,
-    }))
-    node.dispatchEvent(new PointerEvent('pointermove', {
-      bubbles: true,
-      cancelable: true,
-      pointerId,
-      pointerType: 'mouse',
-      clientX: x + Math.min(24, rect.width * 0.08),
-      clientY: y + 8,
-      button: 0,
-      buttons: 1,
-    }))
-    node.dispatchEvent(new PointerEvent('pointerup', {
-      bubbles: true,
-      cancelable: true,
-      pointerId,
-      pointerType: 'mouse',
-      clientX: x + Math.min(24, rect.width * 0.08),
-      clientY: y + 8,
-      button: 0,
-      buttons: 0,
-    }))
-
-    const pixels = await new Promise((resolve) => {
-      requestAnimationFrame(() => {
-        const rgba = new Uint8Array(width * height * 4)
-        gl.readPixels(0, 0, width, height, gl.RGBA, gl.UNSIGNED_BYTE, rgba)
-        resolve(rgba)
-      })
-    })
+    const contextAttributes = gl.getContextAttributes()
+    if (!contextAttributes?.preserveDrawingBuffer) {
+      throw new Error('Visual QA WebGL context did not preserve its rendered buffer')
+    }
 
     const copy = document.createElement('canvas')
     copy.width = width
     copy.height = height
     const ctx = copy.getContext('2d', { willReadFrequently: true })
     if (!ctx) throw new Error('2D artifact context unavailable')
+    ctx.drawImage(node, 0, 0)
 
-    // WebGL framebuffer rows are bottom-up; ImageData is top-down.
-    const image = ctx.createImageData(width, height)
-    const rowBytes = width * 4
-    for (let srcY = 0; srcY < height; srcY += 1) {
-      const dstY = height - 1 - srcY
-      image.data.set(pixels.subarray(srcY * rowBytes, (srcY + 1) * rowBytes), dstY * rowBytes)
-    }
-    ctx.putImageData(image, 0, 0)
-
+    const pixels = ctx.getImageData(0, 0, width, height).data
     const stride = Math.max(4, Math.floor((width * height) / 4096) * 4)
     let visibleSamples = 0
     let minLuma = 255
@@ -152,6 +118,7 @@ try {
     return {
       width,
       height,
+      preserveDrawingBuffer: true,
       visibleSamples,
       lumaSpread: maxLuma - minLuma,
       dataUrl: copy.toDataURL('image/png'),
@@ -170,9 +137,10 @@ try {
   console.log(JSON.stringify({
     ok: true,
     artifact: outputPath,
-    captureScope: 'rendered-webgl-framebuffer',
+    captureScope: 'rendered-webgl-canvas-preserved-in-qa-only-context',
     viewport: { width: 390, height: 844 },
     canvas: { width: capture.width, height: capture.height },
+    preserveDrawingBuffer: capture.preserveDrawingBuffer,
     visibleSamples: capture.visibleSamples,
     lumaSpread: capture.lumaSpread,
     bytes: png.length,
