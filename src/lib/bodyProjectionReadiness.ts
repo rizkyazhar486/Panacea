@@ -26,6 +26,16 @@ export interface ProjectionReadinessResult {
 }
 
 const nonBlank = (value: string | undefined) => Boolean(value?.trim())
+const ISO_DATE_RE = /^\d{4}-\d{2}-\d{2}(?:T\d{2}:\d{2}(?::\d{2}(?:\.\d{3})?)?Z)?$/
+
+function isValidIsoDate(value: string | undefined) {
+  if (!nonBlank(value) || !ISO_DATE_RE.test(value!.trim())) return false
+  const normalized = value!.trim()
+  const parsed = new Date(normalized.length === 10 ? `${normalized}T00:00:00Z` : normalized)
+  if (Number.isNaN(parsed.getTime())) return false
+  const [year, month, day] = normalized.slice(0, 10).split('-').map(Number)
+  return parsed.getUTCFullYear() === year && parsed.getUTCMonth() + 1 === month && parsed.getUTCDate() === day
+}
 
 /**
  * Fail-closed readiness gate for Body3D projection assets.
@@ -70,18 +80,25 @@ export function evaluateProjectionReadiness(
   if (!['verified-native', 'verified-adjacent'].includes(provenance.geometryStatus)) reasons.push('Geometry is not verified.')
   if (!['source-checked', 'human-reviewed'].includes(provenance.evidenceStatus)) reasons.push('Evidence has not been source-checked.')
 
-  if (target.academicReview === 'recorded') {
+  const claimsHumanReview = provenance.evidenceStatus === 'human-reviewed' || provenance.academicReview === 'recorded'
+  const reviewRequired = target.academicReview === 'recorded' || claimsHumanReview
+
+  if (provenance.evidenceStatus === 'human-reviewed' && provenance.academicReview !== 'recorded') {
+    reasons.push('Human-reviewed evidence status requires a recorded academic review.')
+  }
+
+  if (reviewRequired) {
     if (provenance.academicReview !== 'recorded') reasons.push('Required academic review has not been recorded.')
     if (!nonBlank(provenance.reviewerName)) reasons.push('Reviewer identity is missing.')
     if (!nonBlank(provenance.reviewerCredentials)) reasons.push('Reviewer credentials are missing.')
-    if (!nonBlank(provenance.reviewerDate)) reasons.push('Reviewer date is missing.')
+    if (!isValidIsoDate(provenance.reviewerDate)) reasons.push('Reviewer date is missing or invalid.')
     if (!nonBlank(provenance.reviewerScope)) reasons.push('Reviewer scope is missing.')
   }
 
   if (target.patientSpecificAllowed) reasons.push('Reference Body3D projection contract must not silently enable patient-specific geometry.')
 
   return reasons.length
-    ? { readiness: 'verification-required', renderAsVerifiedAnatomy: false, reasons }
+    ? { readiness: 'verification-required', renderAsVerifiedAnatomy: false, reasons: [...new Set(reasons)] }
     : { readiness: 'verified-reference', renderAsVerifiedAnatomy: true, reasons: [] }
 }
 
