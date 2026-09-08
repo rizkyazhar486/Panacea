@@ -71,14 +71,33 @@ export function evaluateBodyProcedurePublication(
 
   const expected = new Set(procedure.anatomyTargetIds)
   const provided = new Set(evidence.targetIds)
+  if (expected.size !== procedure.anatomyTargetIds.length) {
+    reasons.push('Procedure contract contains duplicate anatomy target ids.')
+  }
+  if (provided.size !== evidence.targetIds.length) {
+    reasons.push('Procedure evidence target coverage must not contain duplicate target ids.')
+  }
   if (expected.size !== provided.size || [...expected].some((id) => !provided.has(id))) {
     reasons.push('Procedure evidence target coverage does not match the normalized anatomy targets.')
   }
 
+  let sameSystemTargetFound = false
   for (const targetId of procedure.anatomyTargetIds) {
     const target = targets.find((candidate) => candidate.id === targetId)
-    if (!target) reasons.push(`Required anatomy target "${targetId}" is missing from the projection contract.`)
-    else if (target.geometryStatus === 'blocked' || target.evidenceStatus === 'unsupported') reasons.push(`Required anatomy target "${targetId}" is not publishable.`)
+    if (!target) {
+      reasons.push(`Required anatomy target "${targetId}" is missing from the projection contract.`)
+      continue
+    }
+    if (target.system === procedure.system) sameSystemTargetFound = true
+    if (!target.kinds.includes('procedure')) {
+      reasons.push(`Required anatomy target "${targetId}" does not permit procedure projection.`)
+    }
+    if (target.geometryStatus === 'blocked' || target.evidenceStatus === 'unsupported') {
+      reasons.push(`Required anatomy target "${targetId}" is not publishable.`)
+    }
+  }
+  if (!sameSystemTargetFound) {
+    reasons.push('Procedure contract must include at least one anatomy target from the procedure system.')
   }
 
   const forbidden = [
