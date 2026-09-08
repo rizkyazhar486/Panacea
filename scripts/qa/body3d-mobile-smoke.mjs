@@ -51,8 +51,6 @@ await context.addInitScript(() => {
 const page = await context.newPage()
 page.setDefaultTimeout(20_000)
 
-// Keep one optional layer in-flight long enough to prove progressive loading
-// does not cover anatomy that is already usable on a mobile viewport.
 await page.route('**/anatomy/cardio' + 'vascular.glb', async (route) => {
   await new Promise((resolve) => setTimeout(resolve, 4_000))
   await route.continue()
@@ -273,17 +271,23 @@ try {
   for (let i = 0; i < stepCount; i++) await slider.press('ArrowRight')
 
   const observedAngle = Number(await slider.inputValue())
-  const visibleMotionLabel = (await slider.locator('xpath=ancestor::label[1]').innerText()).trim()
+  const motionLabel = slider.locator('xpath=ancestor::label[1]')
+  await motionLabel.waitFor({ state: 'visible', timeout: 5_000 })
+  const visibleMotionLabel = (await motionLabel.innerText()).trim()
+  const renderedMotionHeading = (visibleMotionLabel.split('\n')[0] ?? '').trim()
+  const expectedMotionHeading = `Flexion / extension · ${targetAngle.toFixed(0)}°`
   metrics.wholeBodyRomDiagnostic = {
     targetAngle,
     observedAngle,
     visibleMotionLabel,
+    renderedMotionHeading,
   }
   console.log(JSON.stringify({
     stage: 'whole-body-rom-after-keyboard',
     targetAngle,
     observedAngle,
     visibleMotionLabel,
+    renderedMotionHeading,
   }))
   if (observedAngle <= sliderState.neutral + 20) {
     throw new Error(`Whole-body ROM slider did not move meaningfully from neutral: saw ${observedAngle}°; label=${visibleMotionLabel}`)
@@ -291,9 +295,10 @@ try {
   if (observedAngle !== targetAngle) {
     throw new Error(`Whole-body ROM slider keyboard interaction expected ${targetAngle}°: saw ${observedAngle}°; label=${visibleMotionLabel}`)
   }
+  if (renderedMotionHeading !== expectedMotionHeading) {
+    throw new Error(`Whole-body ROM React label expected ${expectedMotionHeading}: saw ${renderedMotionHeading}`)
+  }
 
-  const renderedAngleLabel = inspector.getByText(`Flexion / extension · ${targetAngle.toFixed(0)}°`, { exact: true })
-  await renderedAngleLabel.waitFor({ state: 'visible', timeout: 5_000 })
   const dialMotionLabel = inspector.getByText(`Flexion ${targetAngle.toFixed(0)}°`, { exact: true })
   await dialMotionLabel.waitFor({ state: 'visible', timeout: 5_000 })
 
@@ -312,7 +317,7 @@ try {
     kneeSelected: kneePressed === 'true',
     sliderTargetDeg: targetAngle,
     sliderObservedDeg: observedAngle,
-    reactStateRendered: true,
+    reactStateRendered: renderedMotionHeading === expectedMotionHeading,
     scientificBoundaryVisible: true,
     applyToShared3dClicked: true,
     contextStable: postShared3dHealth.webgl && !postShared3dHealth.contextLost,
