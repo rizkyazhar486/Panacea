@@ -2,6 +2,7 @@ import { BODY_PROJECTION_TARGETS, type BodyProjectionTarget } from '../bodyProje
 import { WHOLE_BODY_ASSET_MANIFEST, buildAtlasLoadPlan, validateAssetManifest } from './assets'
 import { resolveProjectionTargetToAtlas } from './bodyProjectionBridge'
 import { WHOLE_BODY_CORE_STRUCTURES } from './catalog'
+import { CARDIOVASCULAR_DEEP_RELATIONS, CARDIOVASCULAR_DEEP_STRUCTURES } from './cardiovascularAtlas'
 import { AnatomyGraph } from './graph'
 import { equationsForStructure, traceMultiscalePath, validateMultiscaleAtlas } from './multiscale'
 import { RESPIRATORY_RELATIONS, RESPIRATORY_STRUCTURES } from './respiratoryAtlas'
@@ -12,10 +13,12 @@ import type { AnatomyAssetRecord, AnatomyRelation, AnatomyResolveContext, Anatom
 export const WHOLE_BODY_STRUCTURES: readonly AnatomyStructure[] = [
   ...WHOLE_BODY_CORE_STRUCTURES,
   ...RESPIRATORY_STRUCTURES,
+  ...CARDIOVASCULAR_DEEP_STRUCTURES,
 ]
 
 export const WHOLE_BODY_RELATIONS: readonly AnatomyRelation[] = [
   ...RESPIRATORY_RELATIONS,
+  ...CARDIOVASCULAR_DEEP_RELATIONS,
 ]
 
 export class WholeBodyAtlasEngine {
