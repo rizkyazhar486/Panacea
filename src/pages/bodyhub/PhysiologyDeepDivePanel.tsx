@@ -5,7 +5,6 @@ import {
   type PhysiologyDeepDive,
   type PhysiologyDomain,
 } from '../../lib/physiologyDeepDives'
-import RespiratoryAtlasPanel from './RespiratoryAtlasPanel'
 
 interface Props {
   onFocus: (topic: PhysiologyDeepDive) => void
@@ -163,10 +162,6 @@ export function PhysiologyDeepDivePanel({ onFocus }: Props) {
               <FormulaBlock topic={selected} />
             </div>
           </div>
-
-          {selected.id === 'spirometry' && (
-            <RespiratoryAtlasPanel onFocus3D={() => onFocus(selected)} />
-          )}
 
           <div className="grid gap-2 md:grid-cols-[minmax(0,1fr)_auto]">
             <div className="rounded-xl border border-amber-200 bg-amber-50/70 p-3 dark:border-amber-500/20 dark:bg-amber-500/10">
