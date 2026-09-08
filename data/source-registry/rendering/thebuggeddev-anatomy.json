@@ -1,0 +1,52 @@
+{
+  "id": "thebuggeddev_anatomy",
+  "name": "thebuggeddev/anatomy",
+  "category": "rendering",
+  "kind": ["viewer", "tooling"],
+  "homepage": "https://github.com/thebuggeddev/anatomy",
+  "repository": "https://github.com/thebuggeddev/anatomy",
+  "features": ["body-explorer", "scientific-3d", "anatomy-interaction-reference"],
+  "formats": ["web", "three-dimensional-interaction"],
+  "usage": {
+    "runtime": false,
+    "buildTime": false,
+    "networkRequired": true,
+    "notes": "Mandatory Body Exposure design/interaction reference only. Panacea may independently reimplement interaction patterns such as searchable organ/structure libraries, model prefetch, rotate/zoom, isolate, cross-section/layer controls, compare workflows, hotspots, labeling practice, microscopic context cards, and authoring probes. Do not copy, bundle, import, or redistribute repository code, models, textures, or other assets unless the exact material and license scope are separately verified and recorded."
+  },
+  "license": {
+    "status": "CHECK_REQUIRED",
+    "identifier": null,
+    "commercialUse": "UNKNOWN",
+    "attributionRequired": null,
+    "shareAlike": null,
+    "scope": "No Panacea runtime or build-time use is authorized by this registry record. Any future source-code or asset reuse requires a separately verified license for the exact revision and material.",
+    "verificationUrl": null,
+    "verifiedAt": null,
+    "notes": "No clear repository-root license was established during this reference audit. Treat architecture and UX patterns as inspiration only until licensing is independently verified."
+  },
+  "validation": {
+    "level": "REFERENCE",
+    "clinicalDecisionUse": "NO",
+    "notes": "This project is not an anatomical, physiological, diagnostic, procedural, or clinical authority for Panacea. Any biomedical statement, structure identity, geometry, label, or educational claim adopted by Panacea must pass Panacea source provenance and academic-review gates independently."
+  },
+  "provenance": {
+    "authority": "thebuggeddev/anatomy project",
+    "sourceIdentityRequired": true,
+    "versionPinRequired": true,
+    "notes": "If a future implementation derives materially from a specific repository behavior, record the exact immutable revision and the independently implemented Panacea behavior. This registry entry alone is not evidence of scientific correctness or permission to reuse content."
+  },
+  "adapter": {
+    "status": "NOT_APPLICABLE",
+    "normalizedTarget": "PanaceaBodyReferenceContract",
+    "module": null,
+    "notes": "Reference-only. No runtime adapter, package dependency, remote embed, model loader, or asset import is permitted by this record."
+  },
+  "trust": {
+    "authority": 1,
+    "evidenceQuality": 0,
+    "recency": 4,
+    "licenseClarity": 0,
+    "reproducibility": 3,
+    "notes": "Scores describe suitability as a UX/rendering inspiration source only. Evidence quality is deliberately zero because this entry is not biomedical evidence."
+  }
+}
