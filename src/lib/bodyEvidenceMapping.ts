@@ -39,6 +39,27 @@ export interface BodyEvidenceMappingValidation {
 
 const nonBlank = (value: string | undefined) => Boolean(value?.trim())
 const ISO_DATE_RE = /^\d{4}-\d{2}-\d{2}(?:T\d{2}:\d{2}(?::\d{2}(?:\.\d{3})?)?Z)?$/
+const FLOATING_VERSION_RE = /^(?:latest|main|master|head|current|versioned-record)$/i
+const PLACEHOLDER_LOCATOR_RE = /^(?:verified-source-record|repository-verified-source-record|source-record|placeholder)$/i
+
+function isPinnedSourceVersion(value: string | undefined) {
+  if (!nonBlank(value)) return false
+  return !FLOATING_VERSION_RE.test(value!.trim())
+}
+
+function isSpecificSourceLocator(value: string | undefined) {
+  if (!nonBlank(value)) return false
+  return !PLACEHOLDER_LOCATOR_RE.test(value!.trim())
+}
+
+function isValidIsoDate(value: string | undefined) {
+  if (!nonBlank(value) || !ISO_DATE_RE.test(value!.trim())) return false
+  const normalized = value!.trim()
+  const parsed = new Date(normalized.length === 10 ? `${normalized}T00:00:00Z` : normalized)
+  if (Number.isNaN(parsed.getTime())) return false
+  const [year, month, day] = normalized.slice(0, 10).split('-').map(Number)
+  return parsed.getUTCFullYear() === year && parsed.getUTCMonth() + 1 === month && parsed.getUTCDate() === day
+}
 
 export function validateBodyEvidenceMapping(
   target: BodyProjectionTarget,
@@ -50,12 +71,12 @@ export function validateBodyEvidenceMapping(
   if (!target.kinds.includes(record.kind)) reasons.push(`Projection target does not permit evidence kind "${record.kind}".`)
   if (!nonBlank(record.id)) reasons.push('Evidence mapping id is missing.')
   if (!nonBlank(record.sourceId)) reasons.push('Evidence source identity is missing.')
-  if (!nonBlank(record.sourceVersion)) reasons.push('Evidence source version/revision is missing.')
+  if (!isPinnedSourceVersion(record.sourceVersion)) reasons.push('Evidence source version/revision must be explicit and immutable.')
   if (!nonBlank(record.citation)) reasons.push('Evidence citation is missing.')
-  if (!nonBlank(record.sourceLocator)) reasons.push('Evidence source locator is missing.')
+  if (!isSpecificSourceLocator(record.sourceLocator)) reasons.push('Evidence source locator must identify a specific source location.')
   if (!nonBlank(record.evidenceSummary)) reasons.push('Bounded evidence summary is missing.')
   if (!record.mappedAnatomyTerms.length || record.mappedAnatomyTerms.some((term) => !nonBlank(term))) reasons.push('At least one explicit mapped anatomy term is required.')
-  if (!record.aiAssisted) reasons.push('AI-assistance disclosure must be explicit for AI-generated or AI-transformed mapping content.')
+  if (typeof record.aiAssisted !== 'boolean') reasons.push('AI-assistance disclosure must be an explicit boolean.')
   if (record.locationInferredFromFreeText) reasons.push('Patient lesion/location inference from free text is forbidden.')
 
   if (record.localizationMode === 'generic-reference') {
@@ -78,7 +99,7 @@ export function validateBodyEvidenceMapping(
     if (!nonBlank(record.academicReview.reviewerName)) reasons.push('Recorded academic review requires reviewer identity.')
     if (!nonBlank(record.academicReview.reviewerCredentials)) reasons.push('Recorded academic review requires reviewer credentials.')
     if (!nonBlank(record.academicReview.scope)) reasons.push('Recorded academic review requires review scope.')
-    if (!nonBlank(record.academicReview.reviewedAt) || !ISO_DATE_RE.test(record.academicReview.reviewedAt!.trim())) reasons.push('Recorded academic review requires an ISO review date/timestamp.')
+    if (!isValidIsoDate(record.academicReview.reviewedAt)) reasons.push('Recorded academic review requires a real ISO review date/timestamp.')
   }
 
   if (target.academicReview === 'recorded' && record.academicReview.status !== 'recorded') reasons.push('Target requires recorded academic review metadata for publication.')
