@@ -22,6 +22,7 @@ import { kotaDariTeks } from './kota.js'
 // ─────────────────────────────────────────────────────────────────────────────
 
 const SINGGAH_MS = 60 * 60_000
+const LINGKUNGAN_TIMEOUT_MS = 8_000
 
 export interface Lingkungan {
   kota: string
@@ -55,8 +56,12 @@ export async function lingkunganKota(namaKota: string): Promise<Lingkungan> {
   const dasar = { kota: kota.nama, sumber: 'Open-Meteo' }
   try {
     const [udara, uv] = await Promise.all([
-      fetch(`https://air-quality-api.open-meteo.com/v1/air-quality?latitude=${kota.lat}&longitude=${kota.lon}&current=european_aqi,pm2_5,pm10&timezone=auto`),
-      fetch(`https://api.open-meteo.com/v1/forecast?latitude=${kota.lat}&longitude=${kota.lon}&current=uv_index,temperature_2m,apparent_temperature,relative_humidity_2m&daily=uv_index_max,sunrise,sunset&timezone=auto&forecast_days=1`),
+      fetch(`https://air-quality-api.open-meteo.com/v1/air-quality?latitude=${kota.lat}&longitude=${kota.lon}&current=european_aqi,pm2_5,pm10&timezone=auto`, {
+        signal: AbortSignal.timeout(LINGKUNGAN_TIMEOUT_MS),
+      }),
+      fetch(`https://api.open-meteo.com/v1/forecast?latitude=${kota.lat}&longitude=${kota.lon}&current=uv_index,temperature_2m,apparent_temperature,relative_humidity_2m&daily=uv_index_max,sunrise,sunset&timezone=auto&forecast_days=1`, {
+        signal: AbortSignal.timeout(LINGKUNGAN_TIMEOUT_MS),
+      }),
     ])
 
     const hasil: Lingkungan = { ...dasar }
