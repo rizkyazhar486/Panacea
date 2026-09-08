@@ -1,0 +1,186 @@
+/* Panacea Welcome revival v28
+   Additive presentation layer for the existing Claude/Higgsfield Landing.tsx.
+   It does not remove product sections or replace React logic. The goal is to
+   make the original cinematic/history/news experience readable, professional,
+   brand-coherent and inexpensive on phones. */
+
+html.pmd-welcome-active #root > div{
+  --pw-bg:#f7f9fc;
+  --pw-fg:#101828;
+  --pw-muted:#475467;
+  --pw-surface:rgba(255,255,255,.86);
+  --pw-line:rgba(15,23,42,.08);
+  min-height:100vh;
+  background:var(--pw-bg)!important;
+  color:var(--pw-fg);
+  overflow-x:hidden;
+}
+html.dark.pmd-welcome-active #root > div{
+  --pw-bg:#050912;
+  --pw-fg:#f8fafc;
+  --pw-muted:#cbd5e1;
+  --pw-surface:rgba(8,14,24,.88);
+  --pw-line:rgba(255,255,255,.10);
+}
+
+/* Public navigation: quiet, readable and consistent in both themes. */
+html.pmd-welcome-active #root > div > header{
+  border-color:var(--pw-line)!important;
+  background:rgba(255,255,255,.88)!important;
+  color:var(--pw-fg)!important;
+  -webkit-backdrop-filter:saturate(1.1) blur(14px);
+  backdrop-filter:saturate(1.1) blur(14px);
+}
+html.dark.pmd-welcome-active #root > div > header{
+  background:rgba(5,9,18,.90)!important;
+}
+html.pmd-welcome-active #root > div > header :is(a,button){min-height:44px}
+html.dark.pmd-welcome-active #root > div > header :is(.text-neutral-600,.text-neutral-500){color:#cbd5e1!important}
+
+/* Higgsfield hero: the film remains clearly visible, but text always sits on a
+   deterministic contrast field. The three soft color fields are Panacea's
+   green/red/blue identity, not an extra page wallpaper. */
+html.pmd-welcome-active .pmd-welcome-hero{
+  min-height:clamp(620px,78vh,840px);
+  display:flex;
+  align-items:center;
+  background:#eaf3ef;
+}
+html.dark.pmd-welcome-active .pmd-welcome-hero{background:#04110c}
+html.pmd-welcome-active .pmd-welcome-hero video{
+  opacity:.90!important;
+  filter:saturate(1.05) contrast(1.03)!important;
+  transform:translateZ(0);
+}
+html.pmd-welcome-active .pmd-welcome-hero .hero-video-scrim{
+  background:
+    radial-gradient(circle at 16% 20%,rgba(0,191,99,.13),transparent 28%),
+    radial-gradient(circle at 88% 24%,rgba(37,99,235,.09),transparent 25%),
+    radial-gradient(circle at 18% 88%,rgba(220,38,38,.055),transparent 22%),
+    linear-gradient(180deg,rgba(250,252,251,.52) 0%,rgba(250,252,251,.67) 58%,rgba(247,249,252,.96) 100%)!important;
+}
+html.dark.pmd-welcome-active .pmd-welcome-hero .hero-video-scrim{
+  background:
+    radial-gradient(circle at 16% 20%,rgba(0,191,99,.14),transparent 28%),
+    radial-gradient(circle at 88% 24%,rgba(37,99,235,.10),transparent 25%),
+    radial-gradient(circle at 18% 88%,rgba(220,38,38,.065),transparent 22%),
+    linear-gradient(180deg,rgba(3,8,15,.48) 0%,rgba(3,8,15,.64) 58%,rgba(5,9,18,.96) 100%)!important;
+}
+html.pmd-welcome-active .pmd-welcome-hero h1{
+  max-width:15ch;
+  margin-inline:auto;
+  text-wrap:balance;
+  color:#101828!important;
+  text-shadow:0 1px 0 rgba(255,255,255,.38);
+}
+html.dark.pmd-welcome-active .pmd-welcome-hero h1{
+  color:#f8fafc!important;
+  text-shadow:0 2px 24px rgba(0,0,0,.38);
+}
+html.pmd-welcome-active .pmd-welcome-hero p{color:#344054!important;line-height:1.62}
+html.dark.pmd-welcome-active .pmd-welcome-hero p{color:#d0d5dd!important}
+html.pmd-welcome-active .pmd-welcome-hero .liquid-glass{
+  border-color:rgba(0,122,75,.14)!important;
+  background:rgba(255,255,255,.72)!important;
+  box-shadow:none!important;
+}
+html.dark.pmd-welcome-active .pmd-welcome-hero .liquid-glass{
+  border-color:rgba(110,231,183,.16)!important;
+  background:rgba(5,12,20,.70)!important;
+}
+
+/* The video itself is the hero art. Avoid piling GPU-heavy glow objects on top
+   of it on touch/low-memory devices. */
+html.pmd-low-memory.pmd-welcome-active .pmd-welcome-hero .orb,
+html.pmd-low-memory.pmd-welcome-active .pmd-welcome-hero canvas{
+  display:none!important;
+}
+html.pmd-low-memory.pmd-welcome-active .pmd-welcome-hero video{
+  filter:none!important;
+  transform:none!important;
+}
+
+/* Featured films read like editorial cinema, not two unrelated demo cards. */
+html.pmd-welcome-active .pmd-welcome-film-grid{
+  background:linear-gradient(180deg,transparent,rgba(0,191,99,.035),transparent);
+}
+html.pmd-welcome-active .pmd-welcome-film-grid video{
+  display:block;
+  background:#06120c;
+}
+html.pmd-welcome-active .pmd-welcome-film-grid [class*='shadow-2xl']{
+  border:1px solid var(--pw-line);
+  box-shadow:0 22px 60px -38px rgba(2,44,28,.42)!important;
+}
+html.dark.pmd-welcome-active .pmd-welcome-film-grid [class*='shadow-2xl']{
+  box-shadow:0 22px 60px -38px rgba(0,0,0,.92)!important;
+}
+
+/* Capability rail: retain Claude's content, but make motion optional and keep
+   the strip useful as a swipeable taxonomy on phones. */
+html.pmd-welcome-active .pmd-welcome-capability-rail{
+  border-color:var(--pw-line)!important;
+  background:rgba(255,255,255,.62)!important;
+  -webkit-backdrop-filter:none!important;
+  backdrop-filter:none!important;
+}
+html.dark.pmd-welcome-active .pmd-welcome-capability-rail{background:rgba(8,14,24,.74)!important}
+html.pmd-welcome-active .pmd-welcome-capability-rail #panacea-track{animation-duration:70s!important}
+html.dark.pmd-welcome-active .pmd-welcome-capability-rail #panacea-track span{color:#cbd5e1!important}
+
+/* Content rhythm: improve section scanning without hiding any of Claude's
+   feature, role, pricing, news, history, regenerative or robotics content. */
+html.pmd-welcome-active #root > div > section{scroll-margin-top:78px}
+html.pmd-welcome-active #root > div > section :is(h2,h3){text-wrap:balance}
+html.pmd-welcome-active #root > div > section :is(p,li){text-wrap:pretty}
+html.dark.pmd-welcome-active #root > div > section .text-ink{color:#f8fafc!important}
+html.dark.pmd-welcome-active #root > div > section :is(.text-neutral-600,.text-neutral-700){color:#cbd5e1!important}
+html.dark.pmd-welcome-active #root > div > section :is(.text-neutral-500,.text-neutral-400){color:#94a3b8!important}
+html.dark.pmd-welcome-active #root > div > section .bg-white{background:#0b111c!important}
+html.dark.pmd-welcome-active #root > div > section .bg-neutral-50{background:#101827!important}
+html.dark.pmd-welcome-active #root > div > section .border-black\/5{border-color:rgba(255,255,255,.10)!important}
+
+/* News is intentionally a dark editorial block; keep it visually separate
+   from marketing cards and preserve source/recency information. */
+html.pmd-welcome-active #news{
+  border:1px solid rgba(0,191,99,.10);
+  box-shadow:0 30px 80px -55px rgba(0,91,57,.55);
+}
+
+/* History is the brand's intellectual spine. Give it a calm reading width and
+   remove gratuitous blur/shadow work on phones while preserving every era. */
+html.pmd-welcome-active .pmd-welcome-history [class*='shadow-2xl']{
+  box-shadow:0 20px 52px -38px rgba(0,80,48,.42)!important;
+}
+html.pmd-low-memory.pmd-welcome-active .pmd-welcome-history .orb{display:none!important}
+html.pmd-low-memory.pmd-welcome-active .pmd-welcome-history [class*='shadow']{box-shadow:none!important}
+
+/* Footer/header are part of the same public product, not a second theme. */
+html.pmd-welcome-active #root > div > footer{
+  border-color:var(--pw-line)!important;
+  background:var(--pw-surface)!important;
+}
+html.dark.pmd-welcome-active #root > div > footer .text-neutral-500{color:#94a3b8!important}
+
+/* Mobile: reduce visual competition and preserve comfortable touch/reading. */
+@media(max-width:640px){
+  html.pmd-welcome-active .pmd-welcome-hero{min-height:680px;padding-top:72px!important;padding-bottom:72px!important}
+  html.pmd-welcome-active .pmd-welcome-hero h1{font-size:clamp(38px,11vw,52px)!important;line-height:1.02!important}
+  html.pmd-welcome-active .pmd-welcome-hero p{font-size:15px!important}
+  html.pmd-welcome-active .pmd-welcome-capability-rail{overflow-x:auto!important;overscroll-behavior-inline:contain}
+  html.pmd-welcome-active .pmd-welcome-capability-rail #panacea-track{animation:none!important;transform:none!important;padding-inline:18px}
+  html.pmd-welcome-active .pmd-welcome-capability-rail #panacea-track>div:not(:first-child){display:none}
+  html.pmd-welcome-active #root > div > section{padding-left:max(18px,env(safe-area-inset-left))!important;padding-right:max(18px,env(safe-area-inset-right))!important}
+}
+
+@media(prefers-reduced-motion:reduce){
+  html.pmd-welcome-active .pmd-welcome-capability-rail #panacea-track{animation:none!important;transform:none!important}
+  html.pmd-welcome-active .pmd-welcome-hero video{filter:none!important}
+}
+
+@media(prefers-contrast:more){
+  html.pmd-welcome-active #root > div{--pw-line:rgba(15,23,42,.22)}
+  html.dark.pmd-welcome-active #root > div{--pw-line:rgba(255,255,255,.26)}
+  html.pmd-welcome-active .pmd-welcome-hero .hero-video-scrim{background:rgba(255,255,255,.84)!important}
+  html.dark.pmd-welcome-active .pmd-welcome-hero .hero-video-scrim{background:rgba(3,8,15,.82)!important}
+}
