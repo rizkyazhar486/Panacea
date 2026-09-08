@@ -14,8 +14,10 @@ interface Props {
   onFocus: (topic: PhysiologyDeepDive) => void
 }
 
+type BreathAtlasStationId = (typeof BREATH_ATLAS_STATIONS)[number]['id']
+
 export function BreathAtlasPanel({ onFocus }: Props) {
-  const [stationId, setStationId] = useState(BREATH_ATLAS_STATIONS[0].id)
+  const [stationId, setStationId] = useState<BreathAtlasStationId>(BREATH_ATLAS_STATIONS[0].id)
   const station = BREATH_ATLAS_STATIONS.find((item) => item.id === stationId) ?? BREATH_ATLAS_STATIONS[0]
 
   return (
