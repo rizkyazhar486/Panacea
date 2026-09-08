@@ -7,8 +7,8 @@ import {
   type GeometryProvenance,
 } from '../../lib/wholeBodyAtlasBlueprint'
 import {
-  EMPTY_ANATOMY_SOURCE_NODE_SNAPSHOT,
-  getAnatomySourceNodeSnapshot,
+  anatomySourceNodeOrigin,
+  getEffectiveAnatomySourceNodeSnapshot,
   resolveAnatomySourceNodes,
   subscribeAnatomySourceNodes,
 } from '../../lib/anatomySourceNodeRegistry'
@@ -39,6 +39,16 @@ const LAYER_ACCENT: Record<AtlasLayerKey, string> = {
   lymphoid: 'border-violet-400/25 bg-violet-500/[0.06] text-violet-200',
 }
 
+const SOURCE_FILE_BY_LAYER: Record<AtlasLayerKey, string> = {
+  surface: 'surface.glb',
+  skeletal: 'skeletal.glb',
+  muscular: 'muscular.glb',
+  cardiovascular: 'cardiovascular.glb',
+  nervous: 'nervous.glb',
+  visceral: 'visceral.glb',
+  lymphoid: 'lymphoid.glb',
+}
+
 const CREDITED_Z_ANATOMY_BUNDLES = [
   { file: 'skeletal.glb', role: 'Skeletal reference', note: 'System-separated skeletal derivative named in the current anatomy credits.' },
   { file: 'muscular.glb', role: 'Muscular reference', note: 'System-separated muscular derivative named in the current anatomy credits.' },
@@ -65,8 +75,8 @@ export function ZAnatomyAtlasWorkbench({ onHighlight, onFocusRegion, onEnableLay
   const [selectedKey, setSelectedKey] = useState(() => structureKey('thorax', WHOLE_BODY_REGIONS.find((r) => r.key === 'thorax')?.structures[0] ?? WHOLE_BODY_REGIONS[0].structures[0]))
   const sourceBundles = useSyncExternalStore(
     subscribeAnatomySourceNodes,
-    getAnatomySourceNodeSnapshot,
-    () => EMPTY_ANATOMY_SOURCE_NODE_SNAPSHOT,
+    getEffectiveAnatomySourceNodeSnapshot,
+    getEffectiveAnatomySourceNodeSnapshot,
   )
 
   const selected = entries.find((entry) => entry.key === selectedKey) ?? entries[0]
@@ -86,18 +96,36 @@ export function ZAnatomyAtlasWorkbench({ onHighlight, onFocusRegion, onEnableLay
     return counts
   }, [entries])
 
-  const sourceMatches = useMemo(
-    () => selected ? resolveAnatomySourceNodes(selected.structure.nodeHints, sourceBundles) : [],
-    [selected, sourceBundles],
-  )
-  const loadedSourceNames = sourceBundles.reduce((total, bundle) => total + bundle.names.length, 0)
+  function matchesFor(structure: AtlasStructureTarget) {
+    if (structure.provenance === 'not-represented') return []
+    const expectedFile = SOURCE_FILE_BY_LAYER[structure.layer]
+    return resolveAnatomySourceNodes(
+      structure.nodeHints,
+      sourceBundles.filter((bundle) => bundle.file === expectedFile),
+    )
+  }
+
+  function exactNamesFor(structure: AtlasStructureTarget) {
+    return [...new Set(matchesFor(structure).flatMap((match) => match.names))]
+  }
+
+  const sourceMatches = selected ? matchesFor(selected.structure) : []
+  const sourceNameCount = sourceBundles.reduce((total, bundle) => total + bundle.names.length, 0)
+  const runtimeBundleCount = sourceBundles.filter((bundle) => anatomySourceNodeOrigin(bundle.file) === 'runtime').length
 
   function inspect(region: AtlasRegionKey, structure: AtlasStructureTarget, focus = true) {
     setRegionKey(region)
     setSelectedKey(structureKey(region, structure))
     onEnableLayer?.(structure.layer)
-    onHighlight?.(structure.nodeHints)
-    if (focus) onFocusRegion?.(structure.nodeHints)
+    const exactNames = exactNamesFor(structure)
+    onHighlight?.(exactNames)
+    if (focus) onFocusRegion?.(exactNames.length ? exactNames : structure.nodeHints)
+  }
+
+  function inspectExact(structure: AtlasStructureTarget, name: string) {
+    onEnableLayer?.(structure.layer)
+    onHighlight?.([name])
+    onFocusRegion?.([name])
   }
 
   function inspectRegion(key: AtlasRegionKey) {
@@ -108,7 +136,9 @@ export function ZAnatomyAtlasWorkbench({ onHighlight, onFocusRegion, onEnableLay
     if (first) setSelectedKey(structureKey(key, first))
     const hints = [...new Set(region.structures.flatMap((structure) => structure.nodeHints))]
     for (const layer of new Set(region.structures.map((structure) => structure.layer))) onEnableLayer?.(layer)
-    onHighlight?.(hints)
+    // A region is broader than one evidence-bearing mesh. Clear exact structure
+    // highlighting and use reviewed hints only for camera framing.
+    onHighlight?.([])
     onFocusRegion?.(hints)
   }
 
@@ -198,30 +228,28 @@ export function ZAnatomyAtlasWorkbench({ onHighlight, onFocusRegion, onEnableLay
 
                   <div className="mt-4 border-t border-neutral-200 pt-3 dark:border-white/10">
                     <div className="flex items-center justify-between gap-2">
-                      <div className="text-[9px] font-black uppercase tracking-[0.16em] text-neutral-400">Runtime source-node matches</div>
-                      <span className="text-[8px] font-bold text-neutral-400">{sourceBundles.length} loaded bundles · {loadedSourceNames} names</span>
+                      <div className="text-[9px] font-black uppercase tracking-[0.16em] text-neutral-400">Source-node matches</div>
+                      <span className="text-[8px] font-bold text-neutral-400">{runtimeBundleCount ? `${runtimeBundleCount} runtime bundles` : 'GLB index fallback'} · {sourceNameCount} names</span>
                     </div>
-                    {!sourceBundles.length ? (
-                      <p className="mt-2 text-[9px] leading-relaxed text-neutral-500">Source names appear after the shared 3D viewer finishes loading an enabled anatomy layer.</p>
-                    ) : sourceMatches.length ? (
+                    {sourceMatches.length ? (
                       <div className="mt-2 space-y-2">
                         {sourceMatches.map((match) => (
                           <div key={`${match.file}:${match.hint}`} className="rounded-xl border border-brand/20 bg-brand/[0.04] p-2.5">
                             <div className="flex flex-wrap items-center justify-between gap-1.5">
                               <span className="font-mono text-[8px] font-black text-brand">{match.file}</span>
-                              <span className="text-[8px] text-neutral-400">matched hint: {match.hint}</span>
+                              <span className="text-[8px] text-neutral-400">{anatomySourceNodeOrigin(match.file) === 'runtime' ? 'loaded runtime' : 'generated GLB index'} · hint: {match.hint}</span>
                             </div>
                             <div className="mt-2 flex flex-wrap gap-1.5">
                               {match.names.map((name) => (
-                                <span key={`${match.file}:${name}`} className="rounded-lg border border-neutral-200 bg-white px-2 py-1 font-mono text-[8px] text-neutral-600 dark:border-white/10 dark:bg-neutral-950 dark:text-neutral-300">{name}</span>
+                                <button key={`${match.file}:${name}`} type="button" onClick={() => inspectExact(selected.structure, name)} className="rounded-lg border border-neutral-200 bg-white px-2 py-1 font-mono text-[8px] text-neutral-600 transition hover:border-brand hover:text-brand dark:border-white/10 dark:bg-neutral-950 dark:text-neutral-300">{name}</button>
                               ))}
                             </div>
                           </div>
                         ))}
-                        <p className="text-[8.5px] leading-relaxed text-neutral-500">These are exact original GLTF node names matched by the reviewed lookup hints. A name match does not prove that a mesh is complete, clinically validated, or patient-specific.</p>
+                        <p className="text-[8.5px] leading-relaxed text-neutral-500">Exact names come from the loaded runtime bundle when available; otherwise they come from <span className="font-mono">bodyIndex.gen.ts</span>, generated from shipped GLB metadata. An indexed match proves a named source mesh exists in the bundle, not that its layer is currently loaded or that the mesh is complete, clinically validated, or patient-specific.</p>
                       </div>
                     ) : (
-                      <p className="mt-2 rounded-xl border border-dashed border-neutral-200 p-2.5 text-[9px] leading-relaxed text-neutral-500 dark:border-white/10">No direct source-node name match was found in the loaded layers. This is a naming-resolution result—not evidence that the anatomical structure is absent.</p>
+                      <p className="mt-2 rounded-xl border border-dashed border-neutral-200 p-2.5 text-[9px] leading-relaxed text-neutral-500 dark:border-white/10">No direct source-node name match was found for this reviewed target. This is a naming-resolution result—not evidence that the anatomical structure is absent. No substitute geometry is highlighted.</p>
                     )}
                   </div>
                 </div>
