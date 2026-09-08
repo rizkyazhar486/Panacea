@@ -1,7 +1,8 @@
 import type { AnatomyLaterality, AnatomyRelation, AnatomyStructure } from './types'
 
-const r = (id: string, label: string, parentId: string, options: Partial<Pick<AnatomyStructure, 'synonyms' | 'laterality' | 'tags'>> = {}): AnatomyStructure => ({
-  id, label, parentId, system: 'respiratory', regions: ['thorax'], synonyms: options.synonyms ?? [],
+type RespiratoryOptions = Partial<Pick<AnatomyStructure, 'synonyms' | 'laterality' | 'tags' | 'regions'>>
+const r = (id: string, label: string, parentId: string, options: RespiratoryOptions = {}): AnatomyStructure => ({
+  id, label, parentId, system: 'respiratory', regions: options.regions ?? ['thorax'], synonyms: options.synonyms ?? [],
   laterality: options.laterality ?? 'midline', tags: options.tags ?? [], assetGroupId: 'respiratory-deep-atlas', reviewStatus: 'reference',
 })
 
@@ -41,14 +42,14 @@ const bronchopulmonarySegments = segmentSpecs.map((spec) => r(`${spec.code}-segm
 }))
 
 export const RESPIRATORY_STRUCTURES: readonly AnatomyStructure[] = [
-  r('respiratory-system', 'Respiratory system', 'body', { synonyms: ['respiratory tract'], tags: ['system-root'] }),
-  r('nasal-cavity', 'Nasal cavity', 'respiratory-system', { synonyms: ['nasal passages'], tags: ['upper-airway'] }),
-  r('nasopharynx', 'Nasopharynx', 'respiratory-system', { tags: ['upper-airway'] }),
-  r('oropharynx', 'Oropharynx', 'respiratory-system', { tags: ['upper-airway'] }),
-  r('laryngopharynx', 'Laryngopharynx', 'respiratory-system', { synonyms: ['hypopharynx'], tags: ['upper-airway'] }),
-  r('larynx', 'Larynx', 'respiratory-system', { synonyms: ['voice box'], tags: ['upper-airway'] }),
-  r('epiglottis', 'Epiglottis', 'larynx', { tags: ['upper-airway'] }),
-  r('trachea', 'Trachea', 'larynx', { synonyms: ['windpipe'], tags: ['airway'] }),
+  r('respiratory-system', 'Respiratory system', 'body', { regions: ['head','neck','thorax'], synonyms: ['respiratory tract'], tags: ['system-root'] }),
+  r('nasal-cavity', 'Nasal cavity', 'respiratory-system', { regions: ['head'], synonyms: ['nasal passages'], tags: ['upper-airway'] }),
+  r('nasopharynx', 'Nasopharynx', 'respiratory-system', { regions: ['head'], tags: ['upper-airway'] }),
+  r('oropharynx', 'Oropharynx', 'respiratory-system', { regions: ['head','neck'], tags: ['upper-airway'] }),
+  r('laryngopharynx', 'Laryngopharynx', 'respiratory-system', { regions: ['neck'], synonyms: ['hypopharynx'], tags: ['upper-airway'] }),
+  r('larynx', 'Larynx', 'respiratory-system', { regions: ['neck'], synonyms: ['voice box'], tags: ['upper-airway'] }),
+  r('epiglottis', 'Epiglottis', 'larynx', { regions: ['neck'], tags: ['upper-airway'] }),
+  r('trachea', 'Trachea', 'larynx', { regions: ['neck','thorax'], synonyms: ['windpipe'], tags: ['airway'] }),
   r('carina', 'Carina of trachea', 'trachea', { synonyms: ['tracheal carina'], tags: ['airway','bifurcation'] }),
   r('right-main-bronchus', 'Right main bronchus', 'carina', { laterality: 'right', synonyms: ['right mainstem bronchus'], tags: ['airway'] }),
   r('left-main-bronchus', 'Left main bronchus', 'carina', { laterality: 'left', synonyms: ['left mainstem bronchus'], tags: ['airway'] }),
@@ -74,9 +75,10 @@ export const RESPIRATORY_STRUCTURES: readonly AnatomyStructure[] = [
   r('right-horizontal-fissure', 'Right horizontal fissure', 'right-lung', { laterality: 'right', tags: ['fissure'] }),
   r('right-oblique-fissure', 'Right oblique fissure', 'right-lung', { laterality: 'right', tags: ['fissure'] }),
   r('left-oblique-fissure', 'Left oblique fissure', 'left-lung', { laterality: 'left', tags: ['fissure'] }),
-  r('visceral-pleura', 'Visceral pleura', 'respiratory-system', { synonyms: ['pulmonary pleura'], tags: ['pleura'] }),
-  r('parietal-pleura', 'Parietal pleura', 'respiratory-system', { tags: ['pleura'] }),
-  r('pleural-cavity', 'Pleural cavity', 'respiratory-system', { tags: ['pleura','space'] }),
+  r('pleura', 'Pleura', 'respiratory-system', { tags: ['pleura'] }),
+  r('visceral-pleura', 'Visceral pleura', 'pleura', { synonyms: ['pulmonary pleura'], tags: ['pleura'] }),
+  r('parietal-pleura', 'Parietal pleura', 'pleura', { tags: ['pleura'] }),
+  r('pleural-cavity', 'Pleural cavity', 'pleura', { tags: ['pleura','space'] }),
   r('diaphragm', 'Diaphragm', 'respiratory-system', { synonyms: ['thoracic diaphragm'], tags: ['respiratory-muscle'] }),
 ]
 
