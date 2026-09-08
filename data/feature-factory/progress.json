@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-09-08T15:10:00.000Z",
+  "updatedAt": "2026-09-08T18:27:00.000Z",
   "items": {
     "ff-health-profile-timeline": {
       "status": "done",
@@ -97,6 +97,14 @@
       "note": "Matured the existing Knowledge Bridge copy-summary path as a bounded structured-report capability: it reuses the canonical curated topic identity, one-line context and fixed seven stage objects in deterministic order, normalizes glossary-enhanced display labels back to canonical stage names, performs no hidden synthesis or network call, and retains explicit educational/not-patient-specific plus original-source-verification boundaries.",
       "academicReview": {"status":"not-applicable-no-material-claim","sourceBasis":[],"aiUse":"ai-assisted","note":"This batch adds deterministic report-contract guards only and introduces no new biomedical, diagnostic, treatment or patient-specific factual claim. Existing curated medical teaching text is exported without reinterpretation and remains subject to its separate source/academic review obligations.","humanReview":{"status":"not-recorded","reviewer":null,"credentials":null,"reviewedAt":null}},
       "updatedAt": "2026-09-08T08:15:00.000Z"
+    },
+    "ff-medical-education-search": {
+      "status": "done",
+      "commit": "72a71865a92671a577c364ab39f64829b6701912",
+      "paths": ["src/lib/knowledgeBridgeMap.ts", "scripts/uji/knowledge-bridge-search.mts"],
+      "note": "Matured the existing local Knowledge Bridge search instead of adding duplicate UI: topic resolution now normalizes punctuation/whitespace and matches only complete tokens or phrases across curated aliases, preserving useful searches such as blood-pressure and heart attack while rejecting substring fragments that could select an unrelated map. Search remains local-first with no network call, dependency, polling, storage, medical-content rewrite, or patient-specific inference.",
+      "academicReview": {"status":"not-applicable-no-material-claim","sourceBasis":[],"aiUse":"ai-assisted","note":"Search matching semantics only; this batch adds no biomedical factual, quantitative, diagnostic, treatment, causal, population-norm, or patient-specific claim.","humanReview":{"status":"not-recorded","reviewer":null,"credentials":null,"reviewedAt":null}},
+      "updatedAt": "2026-09-08T18:27:00.000Z"
     }
   }
 }
