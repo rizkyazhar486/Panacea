@@ -94,6 +94,18 @@ try {
   assert.equal(result.phenotypes.some((term) => term.id === 'not-an-hpo-id'), false,
     'Malformed upstream HPO identifiers must be dropped instead of mislabeled as HP')
 
+  const conditionRequest = seenUrls.map((url) => new URL(url))
+    .find((url) => url.hostname === 'clinicaltables.nlm.nih.gov' && url.pathname.includes('/conditions/'))
+  assert.ok(conditionRequest, 'NLM Conditions request should be issued')
+  assert.equal(conditionRequest.searchParams.get('cf'), 'key_id', 'Conditions must explicitly request NLM key_id')
+  assert.equal(conditionRequest.searchParams.get('df'), 'primary_name')
+
+  const hpoRequest = seenUrls.map((url) => new URL(url))
+    .find((url) => url.hostname === 'clinicaltables.nlm.nih.gov' && url.pathname.includes('/hpo/'))
+  assert.ok(hpoRequest, 'NLM HPO request should be issued')
+  assert.equal(hpoRequest.searchParams.get('cf'), 'id', 'HPO must explicitly request the HP identifier field')
+  assert.equal(hpoRequest.searchParams.get('df'), 'name')
+
   const longQuery = `lung ${'x'.repeat(300)}`
   await anatomyStructureLookup([longQuery])
   const structureUrls = seenUrls
