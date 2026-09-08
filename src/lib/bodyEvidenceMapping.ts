@@ -65,13 +65,19 @@ function normalizeAnatomyTerm(value: string) {
   return value.trim().toLowerCase().replace(/[^a-z0-9]+/g, ' ').replace(/\s+/g, ' ')
 }
 
+function containsWholeAnatomyPhrase(value: string, phrase: string) {
+  return ` ${value} `.includes(` ${phrase} `)
+}
+
 function anatomyTermMatchesTarget(target: BodyProjectionTarget, term: string) {
   const normalizedTerm = normalizeAnatomyTerm(term)
   if (!normalizedTerm) return false
   return target.anatomyHints.some((hint) => {
     const normalizedHint = normalizeAnatomyTerm(hint)
-    if (normalizedHint.length < 4) return normalizedTerm === normalizedHint
-    return normalizedTerm === normalizedHint || normalizedTerm.includes(normalizedHint) || normalizedHint.includes(normalizedTerm)
+    if (!normalizedHint) return false
+    return normalizedTerm === normalizedHint
+      || containsWholeAnatomyPhrase(normalizedTerm, normalizedHint)
+      || containsWholeAnatomyPhrase(normalizedHint, normalizedTerm)
   })
 }
 
