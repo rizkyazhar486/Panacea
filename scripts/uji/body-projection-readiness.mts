@@ -53,6 +53,17 @@ const withoutReviewer = evaluateProjectionReadiness(reviewedTarget, { ...complet
 assert.equal(withoutReviewer.renderAsVerifiedAnatomy, false)
 assert.ok(withoutReviewer.reasons.some((reason) => reason.startsWith('Reviewer ')))
 
+const impossibleReviewDate = evaluateProjectionReadiness(reviewedTarget, {
+  ...complete,
+  academicReview: 'recorded',
+  reviewerName: 'Qualified reviewer fixture',
+  reviewerCredentials: 'Recorded professional credentials fixture',
+  reviewerDate: '2026-02-31',
+  reviewerScope: 'Validator fixture only.',
+})
+assert.equal(impossibleReviewDate.renderAsVerifiedAnatomy, false)
+assert.ok(impossibleReviewDate.reasons.includes('Reviewer date is missing or invalid.'))
+
 const withReviewer = evaluateProjectionReadiness(reviewedTarget, {
   ...complete,
   academicReview: 'recorded',
@@ -64,4 +75,15 @@ const withReviewer = evaluateProjectionReadiness(reviewedTarget, {
 assert.equal(withReviewer.readiness, 'verified-reference')
 assert.equal(withReviewer.renderAsVerifiedAnatomy, true)
 
-console.log('Body projection readiness: pending review stays unverified; recorded target + asset review metadata is required for verified anatomy.')
+const humanReviewed = evaluateProjectionReadiness(reviewedTarget, {
+  ...complete,
+  evidenceStatus: 'human-reviewed',
+  academicReview: 'recorded',
+  reviewerName: 'Qualified reviewer fixture',
+  reviewerCredentials: 'Recorded professional credentials fixture',
+  reviewerDate: '2026-09-08',
+  reviewerScope: 'Validator fixture only.',
+})
+assert.equal(humanReviewed.renderAsVerifiedAnatomy, true)
+
+console.log('Body projection readiness: verified anatomy requires recorded target + asset review metadata with a valid calendar date.')
