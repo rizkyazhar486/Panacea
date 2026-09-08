@@ -40,8 +40,9 @@ const nonBlank = (value: string | undefined) => Boolean(value?.trim())
  * This deliberately sits above the general projection readiness contract:
  * verified rendering requires an immutable source revision, source + derived
  * checksums, asset-scoped licensing evidence, a repository-local runtime asset,
- * and deterministic transformation lineage. No biomedical geometry is created
- * or inferred here.
+ * and deterministic transformation lineage with an explicitly versioned tool
+ * for every transformation step. No biomedical geometry is created or inferred
+ * here.
  */
 export function validateBodyAssetProvenance(
   target: BodyProjectionTarget,
@@ -93,8 +94,8 @@ export function validateBodyAssetProvenance(
     reasons.push('Structured transformation lineage is missing.')
   } else {
     for (const [index, step] of record.transformations.entries()) {
-      if (!nonBlank(step.operation) || !nonBlank(step.tool)) {
-        reasons.push(`Transformation step ${index + 1} is missing operation or tool identity.`)
+      if (!nonBlank(step.operation) || !nonBlank(step.tool) || !nonBlank(step.toolVersion)) {
+        reasons.push(`Transformation step ${index + 1} is missing operation, tool identity, or tool version.`)
       }
       if (!SHA256_RE.test(step.inputSha256) || !SHA256_RE.test(step.outputSha256)) {
         reasons.push(`Transformation step ${index + 1} must pin input and output SHA-256 checksums.`)

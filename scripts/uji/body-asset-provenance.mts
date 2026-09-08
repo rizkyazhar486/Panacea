@@ -83,6 +83,13 @@ const missingLicenseEvidence = validateBodyAssetProvenance(reviewedDigestive, { 
 assert.equal(missingLicenseEvidence.validForVerifiedRender, false)
 assert.ok(missingLicenseEvidence.reasons.includes('Asset-specific license evidence is missing.'))
 
+const missingToolVersion = validateBodyAssetProvenance(reviewedDigestive, {
+  ...reviewedComplete,
+  transformations: [reviewedComplete.transformations[0], { ...reviewedComplete.transformations[1], toolVersion: ' ' }],
+})
+assert.equal(missingToolVersion.validForVerifiedRender, false)
+assert.ok(missingToolVersion.reasons.some((reason) => reason.includes('tool version')))
+
 const brokenEnd = validateBodyAssetProvenance(reviewedDigestive, {
   ...reviewedComplete,
   transformations: [reviewedComplete.transformations[0], { ...reviewedComplete.transformations[1], outputSha256: 'd'.repeat(64) }],
@@ -109,4 +116,4 @@ const conceptual = validateBodyAssetProvenance(thermoreceptor, {
 assert.equal(conceptual.validForVerifiedRender, false)
 assert.ok(conceptual.reasons.some((reason) => reason.includes('Reference-only')))
 
-console.log('Body asset provenance: immutable revision, checksums, local runtime, asset license scope, continuous lineage, recorded-review, and reference-only guards verified.')
+console.log('Body asset provenance: immutable revision, checksums, local runtime, asset license scope, versioned transformation tools, continuous lineage, recorded-review, and reference-only guards verified.')
