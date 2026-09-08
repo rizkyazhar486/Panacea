@@ -130,6 +130,20 @@ test('accepts ACTIVE adapter whose repository-relative module is a real file', a
   assert.equal(result.status, 0, result.stderr)
 })
 
+test('rejects ACTIVE adapter without source identity provenance', async () => {
+  const result = await runFixture([
+    {
+      filename: 'active-without-source-identity.json',
+      entry: {
+        ...activeEntry('scripts/validate-source-registry.mjs'),
+        provenance: { ...baseEntry.provenance, sourceIdentityRequired: false },
+      },
+    },
+  ])
+  assert.notEqual(result.status, 0)
+  assert.match(result.stderr, /ACTIVE adapter requires provenance\.sourceIdentityRequired true/)
+})
+
 test('rejects ACTIVE adapter whose module file does not exist', async () => {
   const result = await runFixture([
     {
