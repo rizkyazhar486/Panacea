@@ -2,7 +2,7 @@
   "id": "health_auto_export",
   "name": "Health Auto Export by HealthyApps",
   "category": "wearable",
-  "kind": ["service"],
+  "kind": ["api"],
   "homepage": "https://www.healthyapps.dev/apps/health-auto-export/",
   "repository": null,
   "features": ["apple-health", "user-controlled-export", "health-metrics", "workouts", "heart-rate-series", "sleep-stages", "rest-api-export", "json-import", "permissioned-health-sync"],
