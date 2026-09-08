@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-09-08T05:18:00.000Z",
+  "updatedAt": "2026-09-08T06:32:00.000Z",
   "items": {
     "ff-medical-education-accessibility": {
       "status": "done",
@@ -31,6 +31,17 @@
       ],
       "note": "Knowledge Bridge expands each of its seven causal-stage labels with a concise plain-language definition at point of use while bridgeSummary preserves the canonical stage labels used by existing exports/tests. The glossary is a fixed seven-entry map reused by every curated topic, adding no dependency, network call, polling, storage, large asset, or patient-specific inference.",
       "updatedAt": "2026-09-08T05:18:00.000Z"
+    },
+    "ff-medical-education-evidence": {
+      "status": "done",
+      "commit": "9cf769e57e273f87144c5098ba7a332966d7a606",
+      "paths": [
+        "src/lib/knowledgeBridgeHandoff.ts",
+        "src/components/KnowledgeBridgeWorkbench.tsx",
+        "scripts/uji/knowledge-bridge-evidence.mts"
+      ],
+      "note": "Matured the existing Knowledge Bridge evidence panel instead of duplicating UI: the evidence shelf is bounded to eight source pointers, sanitizes persisted entries, deduplicates by stable key, preserves source/year/identifier/query/original URL, supports deterministic remove/clear, and explicitly states that a selected source pointer is not a verified claim until the original source is opened. No new API, dependency, polling, large asset, or patient-specific inference was added.",
+      "updatedAt": "2026-09-08T06:32:00.000Z"
     }
   }
 }
