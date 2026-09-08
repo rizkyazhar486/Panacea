@@ -6,6 +6,7 @@ import {
   subscribeAnatomySourceNodes,
 } from '../../lib/anatomySourceNodeRegistry'
 import type { AtlasLayerKey, GeometryProvenance } from '../../lib/wholeBodyAtlasBlueprint'
+import RespiratoryQuantitativePanel from './RespiratoryQuantitativePanel'
 
 interface Props {
   onHighlight?: (nodeHints: string[]) => void
@@ -353,6 +354,8 @@ export function BreathAtlasLab({ onHighlight, onFocusRegion, onEnableLayer }: Pr
           </div>
         </div>
       </section>
+
+      <RespiratoryQuantitativePanel />
 
       <section className="grid gap-3 md:grid-cols-3">
         <div className="rounded-2xl border border-neutral-200 p-4 dark:border-white/10">
