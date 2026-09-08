@@ -1,0 +1,52 @@
+{
+  "id": "thebuggeddev_breath_atlas",
+  "name": "thebuggeddev Breath Atlas",
+  "category": "physiology",
+  "kind": ["viewer"],
+  "homepage": "https://breath-atlas.thebuggeddev.chatgpt.site/",
+  "repository": null,
+  "features": ["respiratory-atlas-reference", "breathing-visualization-reference", "body-exposure-respiratory-ux"],
+  "formats": ["web-viewer"],
+  "usage": {
+    "runtime": false,
+    "buildTime": false,
+    "networkRequired": false,
+    "notes": "Mandatory UX/visualization reference for Panacea respiratory and Body Exposure work. Do not embed, scrape, copy, iframe, or treat site content as a physiological evidence source. Reimplement interaction concepts independently after provenance and scientific claims are separately verified."
+  },
+  "license": {
+    "status": "UNKNOWN",
+    "identifier": null,
+    "commercialUse": "UNKNOWN",
+    "attributionRequired": null,
+    "shareAlike": null,
+    "scope": "No reusable source or license record was verified during the 2026-09-09 review.",
+    "verificationUrl": "https://breath-atlas.thebuggeddev.chatgpt.site/",
+    "verifiedAt": null,
+    "notes": "Fail closed for copying or runtime dependency until source ownership, license scope, and asset provenance are verified."
+  },
+  "validation": {
+    "level": "REFERENCE",
+    "clinicalDecisionUse": "NO",
+    "notes": "Treat as presentation/interaction inspiration only. Respiratory anatomy, mechanics, gas exchange, pressures, volumes, thresholds, pathology, and treatment claims require separate authoritative evidence and the Panacea Academic Accuracy Gate."
+  },
+  "provenance": {
+    "authority": "thebuggeddev hosted Breath Atlas reference site",
+    "sourceIdentityRequired": true,
+    "versionPinRequired": true,
+    "notes": "If an upstream repository or version identifier becomes available, pin it before any implementation derived from source code or assets."
+  },
+  "adapter": {
+    "status": "PLANNED",
+    "normalizedTarget": "PanaceaRespiratoryAtlasReference",
+    "module": null,
+    "notes": "Reference targets include spatial respiratory storytelling, synchronized anatomy/physiology explanation, breathing-phase visualization, and compact interactive atlas UX. Any production implementation must use Panacea-controlled assets and independently verified physiology sources."
+  },
+  "trust": {
+    "authority": 1,
+    "evidenceQuality": 1,
+    "recency": 4,
+    "licenseClarity": 0,
+    "reproducibility": 1,
+    "notes": "Trust scores reflect use as a visual/UX reference, not medical evidence."
+  }
+}
