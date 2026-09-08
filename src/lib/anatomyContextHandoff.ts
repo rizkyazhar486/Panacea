@@ -19,19 +19,24 @@ export interface AnatomyContextHandoff {
   movementJointId?: string
 }
 
-interface ReviewedHandoffRoute {
+interface CuratedHandoffRoute {
   surgicalScenarioId?: string
   movementJointId?: string
 }
 
 /**
- * Explicit reviewed cross-module mappings only.
+ * Explicit curated cross-module mappings only.
+ *
+ * "Curated" here means deterministic repository configuration. It does NOT
+ * mean qualified human academic review. A mapping may only be described as
+ * human-reviewed elsewhere when reviewer identity, credentials, date and scope
+ * are recorded through the repository's academic-review gates.
  *
  * Do not infer a surgery or biomechanics destination from fuzzy node-name
  * similarity. A named source mesh proves only that geometry exists; it does not
  * prove that a procedure or joint model applies to that structure.
  */
-const REVIEWED_HANDOFF_BY_STRUCTURE: Readonly<Record<string, ReviewedHandoffRoute>> = {
+const CURATED_HANDOFF_BY_STRUCTURE: Readonly<Record<string, CuratedHandoffRoute>> = {
   'heart-great-vessels': { surgicalScenarioId: 'transseptal-anatomy' },
   hepatobiliary: { surgicalScenarioId: 'hepatocystic-triangle-spatial' },
   'hand-tendons': { surgicalScenarioId: 'carpal-tunnel-spatial' },
@@ -56,7 +61,7 @@ export function buildAnatomyContextHandoff(
 ): AnatomyContextHandoff {
   const route = structure.provenance === 'not-represented'
     ? undefined
-    : REVIEWED_HANDOFF_BY_STRUCTURE[structure.id]
+    : CURATED_HANDOFF_BY_STRUCTURE[structure.id]
 
   return {
     structureId: structure.id,
