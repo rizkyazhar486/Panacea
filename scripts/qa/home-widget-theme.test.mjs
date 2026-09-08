@@ -17,18 +17,29 @@ test('Living Instrument mounts the active source widget, not only the filtered i
 
 test('Dark mode guards every nested widget card and loading surface', () => {
   for (const css of [scopedGuard, emergencyGuard]) {
-    assert.match(css, /\.dark \.panacea-home \.widget-instrument-slide-v5 \.kaca/)
     assert.match(css, /\.widget-instrument-loading-v29/)
+    assert.match(css, /Loading widget…/)
+    assert.match(css, /background:#0a0f16!important/)
+    assert.match(css, /color:#dbe7ef!important/)
+    assert.match(css, /\.widget-instrument-slide-v5 \.kaca/)
     assert.match(css, /background:#0b1119!important/)
     assert.match(css, /background-image:none!important/)
     assert.match(css, /color:#f8fafc!important/)
   }
 })
 
+test('Active Suspense fallback cannot retain a giant previous widget canvas', () => {
+  for (const css of [scopedGuard, emergencyGuard]) {
+    assert.match(css, /aria-hidden='false'/)
+    assert.match(css, /height:184px!important/)
+    assert.match(css, /max-height:184px!important/)
+  }
+})
+
 test('Final-authority Dark Home guard loads after the general Home contrast layer', () => {
   const contrast = index.indexOf('/home-contrast-v27.css')
-  const darkGuard = index.indexOf('/home-widget-dark-v31.css')
+  const darkGuard = index.indexOf('/home-widget-dark-v31.css?v=20260909-1')
   assert.ok(contrast >= 0, 'Home contrast layer must remain registered')
   assert.ok(darkGuard > contrast, 'Dark widget guard must load after the general contrast layer')
-  assert.match(index, /MAINTENANCE_VERSION = '20260908-v31'/)
+  assert.match(index, /MAINTENANCE_VERSION = '20260909-v33'/)
 })
