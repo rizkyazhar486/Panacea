@@ -12,6 +12,7 @@ import { calculateExternalLoad } from '../../lib/biomechanicsModel'
 import BreathAtlasLab from './BreathAtlasLab'
 import WholeBodyMotionInspector from './WholeBodyMotionInspector'
 import ZAnatomyAtlasWorkbench from './ZAnatomyAtlasWorkbench'
+import ZAnatomySourceMeshBrowser from './ZAnatomySourceMeshBrowser'
 
 interface Props {
   onHighlight?: (nodeHints: string[]) => void
@@ -149,7 +150,16 @@ export function WholeBodyPrecisionLab({ onHighlight, onFocusRegion, onEnableLaye
       </div>
 
       {mode === 'z-anatomy' && (
-        <ZAnatomyAtlasWorkbench onHighlight={onHighlight} onFocusRegion={onFocusRegion} onEnableLayer={onEnableLayer} />
+        <div className="space-y-3">
+          <ZAnatomyAtlasWorkbench
+            onHighlight={onHighlight}
+            onFocusRegion={onFocusRegion}
+            onEnableLayer={onEnableLayer}
+            onOpenSurgical={onOpenSurgical}
+            onOpenBiomechanics={() => setMode('movement')}
+          />
+          <ZAnatomySourceMeshBrowser onHighlight={onHighlight} onFocusRegion={onFocusRegion} onEnableLayer={onEnableLayer} />
+        </div>
       )}
 
       {mode === 'breath-atlas' && (

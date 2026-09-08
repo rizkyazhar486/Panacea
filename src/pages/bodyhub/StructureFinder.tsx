@@ -27,6 +27,20 @@ const LAPISAN: Array<{ k: StrukturTubuh['l']; label: string }> = [
   { k: 'surface', label: 'Surface' },
 ]
 
+const MAX_COMPARE = 3
+
+type CompareItem =
+  | { key: string; family: 'whole-body'; label: string; whole: StrukturTubuh }
+  | { key: string; family: 'specialty'; label: string; atlas: StrukturAtlasCari }
+
+function wholeCompareKey(s: StrukturTubuh) {
+  return `whole:${s.l}:${s.n}`
+}
+
+function atlasCompareKey(s: StrukturAtlasCari) {
+  return `atlas:${s.module}:${s.name}`
+}
+
 export interface StructureFinderProps {
   /** Menyorot struktur pada model tubuh, memakai nama persis di dalam berkas. */
   onSorot: (nama: string[]) => void
@@ -39,6 +53,7 @@ export function StructureFinder({ onSorot, onLapisan }: StructureFinderProps) {
   const [saring, setSaring] = useState<SaringTubuh>({})
   const [dipilih, setDipilih] = useState<StrukturTubuh | null>(null)
   const [atlasDipilih, setAtlasDipilih] = useState<StrukturAtlasCari | null>(null)
+  const [dibandingkan, setDibandingkan] = useState<CompareItem[]>([])
 
   const cakupan = useMemo(() => cakupanTubuh(), [])
   const cakupanAtlas = useMemo(() => cakupanStrukturAtlas(), [])
@@ -66,8 +81,42 @@ export function StructureFinder({ onSorot, onLapisan }: StructureFinderProps) {
     onSorot([])
   }
 
+  function toggleBandingWhole(s: StrukturTubuh) {
+    const key = wholeCompareKey(s)
+    setDibandingkan((prev) => {
+      if (prev.some((item) => item.key === key)) return prev.filter((item) => item.key !== key)
+      if (prev.length >= MAX_COMPARE) return prev
+      return [...prev, { key, family: 'whole-body', label: namaTampil(s), whole: s }]
+    })
+  }
+
+  function toggleBandingAtlas(s: StrukturAtlasCari) {
+    const key = atlasCompareKey(s)
+    setDibandingkan((prev) => {
+      if (prev.some((item) => item.key === key)) return prev.filter((item) => item.key !== key)
+      if (prev.length >= MAX_COMPARE) return prev
+      return [...prev, { key, family: 'specialty', label: s.name, atlas: s }]
+    })
+  }
+
+  function hapusBanding(key: string) {
+    setDibandingkan((prev) => prev.filter((item) => item.key !== key))
+  }
+
+  function sorotPerbandinganWholeBody() {
+    const wholeNodes: string[] = []
+    for (const item of dibandingkan) {
+      if (item.family !== 'whole-body') continue
+      onLapisan(item.whole.l)
+      wholeNodes.push(...pasangan(item.whole))
+    }
+    onSorot([...new Set(wholeNodes)])
+  }
+
   const adaKueri = kueri.trim().length >= 2
   const totalHasil = hasil.length + hasilAtlas.length
+  const wholeCompareCount = dibandingkan.filter((item) => item.family === 'whole-body').length
+  const comparePenuh = dibandingkan.length >= MAX_COMPARE
 
   return (
     <div className="space-y-3">
@@ -118,6 +167,79 @@ export function StructureFinder({ onSorot, onLapisan }: StructureFinderProps) {
         they live in separate atlas files with their own anatomy boundaries.
       </p>
 
+      <div className="rounded-xl border border-neutral-200 bg-neutral-50/70 p-3 dark:border-white/10 dark:bg-white/[0.03]">
+        <div className="flex flex-wrap items-start justify-between gap-2">
+          <div>
+            <div className="text-[10px] font-black uppercase tracking-wide text-brand">Compare tray · {dibandingkan.length}/{MAX_COMPARE}</div>
+            <p className="mt-0.5 text-[10px] leading-snug text-neutral-500">
+              Compare up to three named meshes side by side. Whole-body entries can be highlighted together; specialty
+              entries stay in their own atlas and are never redirected to a substitute body mesh.
+            </p>
+          </div>
+          <div className="flex flex-wrap gap-1.5">
+            <button
+              type="button"
+              onClick={sorotPerbandinganWholeBody}
+              disabled={wholeCompareCount === 0}
+              className="rounded-full border border-brand px-2.5 py-1 text-[10px] font-bold text-brand disabled:cursor-not-allowed disabled:opacity-40"
+            >
+              Highlight whole-body set
+            </button>
+            <button
+              type="button"
+              onClick={() => setDibandingkan([])}
+              disabled={dibandingkan.length === 0}
+              className="rounded-full border border-neutral-200 px-2.5 py-1 text-[10px] font-bold text-neutral-500 disabled:cursor-not-allowed disabled:opacity-40 dark:border-white/10"
+            >
+              Clear
+            </button>
+          </div>
+        </div>
+
+        {dibandingkan.length === 0 ? (
+          <p className="mt-2 text-[10px] text-neutral-400">Add a result below to start a bounded anatomy comparison.</p>
+        ) : (
+          <div className="mt-2 grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
+            {dibandingkan.map((item) => (
+              <div key={item.key} className="rounded-lg border border-neutral-200 bg-white p-2.5 dark:border-white/10 dark:bg-white/5">
+                <div className="flex items-start justify-between gap-2">
+                  <div className="min-w-0">
+                    <div className="truncate text-[11px] font-black text-ink dark:text-white">{item.label}</div>
+                    {item.family === 'whole-body' ? (
+                      <div className="mt-0.5 text-[10px] leading-snug text-neutral-500">
+                        Whole-body · {LAPISAN.find((l) => l.k === item.whole.l)?.label} ·{' '}
+                        {WILAYAH.find((w) => w.kunci === item.whole.w)?.label ?? item.whole.w}<br />
+                        {pasangan(item.whole).length} exact mesh name{pasangan(item.whole).length === 1 ? '' : 's'} · {item.whole.t.toLocaleString()} triangles
+                      </div>
+                    ) : (
+                      <div className="mt-0.5 text-[10px] leading-snug text-neutral-500">
+                        Specialty atlas · {item.atlas.moduleLabel} · {item.atlas.kind}
+                        {item.atlas.region ? ` · ${item.atlas.region}` : ''}<br />
+                        Separate specialty geometry; no whole-body substitute.
+                      </div>
+                    )}
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => hapusBanding(item.key)}
+                    aria-label={`Remove ${item.label} from compare tray`}
+                    className="shrink-0 rounded-full border border-neutral-200 px-2 py-0.5 text-[10px] font-bold text-neutral-500 dark:border-white/10"
+                  >
+                    Remove
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {comparePenuh && (
+          <p className="mt-2 text-[10px] font-semibold text-neutral-500">
+            Compare tray is capped at three structures to keep the anatomy workspace responsive.
+          </p>
+        )}
+      </div>
+
       {dipilih && (
         <div className="rounded-xl border border-brand/30 bg-brand/[0.04] p-3">
           <div className="text-sm font-black text-ink dark:text-ink">{namaTampil(dipilih)}</div>
@@ -163,48 +285,84 @@ export function StructureFinder({ onSorot, onLapisan }: StructureFinderProps) {
         {hasil.length > 0 && (
           <div className="space-y-1">
             <div className="px-1 text-[10px] font-bold uppercase tracking-wide text-neutral-400">Whole-body</div>
-            {hasil.map(({ struktur }) => (
-              <button
-                key={`${struktur.l}-${struktur.n}`}
-                onClick={() => pilih(struktur)}
-                className={`flex w-full items-baseline justify-between gap-2 rounded-lg px-2.5 py-1.5 text-left active:scale-[0.99] ${
-                  dipilih?.n === struktur.n && dipilih?.l === struktur.l
-                    ? 'bg-brand text-white'
-                    : 'bg-neutral-100/60 dark:bg-white/5'
-                }`}
-              >
-                <span className="min-w-0 truncate text-[12px] font-semibold">{namaTampil(struktur)}</span>
-                <span className={`shrink-0 text-[10px] font-bold ${dipilih?.n === struktur.n ? 'text-white/70' : 'text-neutral-500'}`}>
-                  {LAPISAN.find((l) => l.k === struktur.l)?.label}
-                </span>
-              </button>
-            ))}
+            {hasil.map(({ struktur }) => {
+              const compareKey = wholeCompareKey(struktur)
+              const inCompare = dibandingkan.some((item) => item.key === compareKey)
+              return (
+                <div key={`${struktur.l}-${struktur.n}`} className="flex items-stretch gap-1.5">
+                  <button
+                    onClick={() => pilih(struktur)}
+                    className={`flex min-w-0 flex-1 items-baseline justify-between gap-2 rounded-lg px-2.5 py-1.5 text-left active:scale-[0.99] ${
+                      dipilih?.n === struktur.n && dipilih?.l === struktur.l
+                        ? 'bg-brand text-white'
+                        : 'bg-neutral-100/60 dark:bg-white/5'
+                    }`}
+                  >
+                    <span className="min-w-0 truncate text-[12px] font-semibold">{namaTampil(struktur)}</span>
+                    <span className={`shrink-0 text-[10px] font-bold ${dipilih?.n === struktur.n ? 'text-white/70' : 'text-neutral-500'}`}>
+                      {LAPISAN.find((l) => l.k === struktur.l)?.label}
+                    </span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => toggleBandingWhole(struktur)}
+                    aria-pressed={inCompare}
+                    disabled={!inCompare && comparePenuh}
+                    className={`shrink-0 rounded-lg border px-2 py-1 text-[10px] font-bold ${
+                      inCompare
+                        ? 'border-brand bg-brand/10 text-brand'
+                        : 'border-neutral-200 text-neutral-500 dark:border-white/10'
+                    } disabled:cursor-not-allowed disabled:opacity-35`}
+                  >
+                    {inCompare ? 'Added' : 'Compare'}
+                  </button>
+                </div>
+              )
+            })}
           </div>
         )}
 
         {hasilAtlas.length > 0 && (
           <div className="space-y-1">
             <div className="px-1 text-[10px] font-bold uppercase tracking-wide text-neutral-400">Specialty atlases</div>
-            {hasilAtlas.map((struktur) => (
-              <button
-                key={`${struktur.module}-${struktur.name}`}
-                onClick={() => pilihAtlas(struktur)}
-                className={`flex w-full items-baseline justify-between gap-2 rounded-lg px-2.5 py-1.5 text-left active:scale-[0.99] ${
-                  atlasDipilih?.module === struktur.module && atlasDipilih?.name === struktur.name
-                    ? 'bg-brand text-white'
-                    : 'bg-neutral-100/60 dark:bg-white/5'
-                }`}
-              >
-                <span className="min-w-0 truncate text-[12px] font-semibold">{struktur.name}</span>
-                <span className={`shrink-0 text-[10px] font-bold ${
-                  atlasDipilih?.module === struktur.module && atlasDipilih?.name === struktur.name
-                    ? 'text-white/70'
-                    : 'text-neutral-500'
-                }`}>
-                  {struktur.moduleLabel}
-                </span>
-              </button>
-            ))}
+            {hasilAtlas.map((struktur) => {
+              const compareKey = atlasCompareKey(struktur)
+              const inCompare = dibandingkan.some((item) => item.key === compareKey)
+              return (
+                <div key={`${struktur.module}-${struktur.name}`} className="flex items-stretch gap-1.5">
+                  <button
+                    onClick={() => pilihAtlas(struktur)}
+                    className={`flex min-w-0 flex-1 items-baseline justify-between gap-2 rounded-lg px-2.5 py-1.5 text-left active:scale-[0.99] ${
+                      atlasDipilih?.module === struktur.module && atlasDipilih?.name === struktur.name
+                        ? 'bg-brand text-white'
+                        : 'bg-neutral-100/60 dark:bg-white/5'
+                    }`}
+                  >
+                    <span className="min-w-0 truncate text-[12px] font-semibold">{struktur.name}</span>
+                    <span className={`shrink-0 text-[10px] font-bold ${
+                      atlasDipilih?.module === struktur.module && atlasDipilih?.name === struktur.name
+                        ? 'text-white/70'
+                        : 'text-neutral-500'
+                    }`}>
+                      {struktur.moduleLabel}
+                    </span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => toggleBandingAtlas(struktur)}
+                    aria-pressed={inCompare}
+                    disabled={!inCompare && comparePenuh}
+                    className={`shrink-0 rounded-lg border px-2 py-1 text-[10px] font-bold ${
+                      inCompare
+                        ? 'border-brand bg-brand/10 text-brand'
+                        : 'border-neutral-200 text-neutral-500 dark:border-white/10'
+                    } disabled:cursor-not-allowed disabled:opacity-35`}
+                  >
+                    {inCompare ? 'Added' : 'Compare'}
+                  </button>
+                </div>
+              )
+            })}
           </div>
         )}
 
