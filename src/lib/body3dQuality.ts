@@ -1,5 +1,8 @@
-// Guard runtime Body Exposure yang sengaja murni/deterministik supaya perilaku
-// kritis dapat diuji tanpa membutuhkan WebGL atau peramban.
+import { installBody3dSourceNodeCapture } from './body3dSourceNodeCapture'
+
+// Guard runtime Body Exposure. Perhitungan kualitas di bawah tetap murni dan
+// deterministik; constructor generation token hanya memasang satu hook loader
+// untuk mencatat nama node sumber ketika viewer Body3D benar-benar dibuat.
 
 export const BODY3D_DESKTOP_MAX_DPR = 2
 export const BODY3D_MOBILE_MAX_DPR = 1.5
@@ -37,6 +40,10 @@ export function body3dPixelRatio(
  */
 export class Body3dLayerLoadGeneration {
   private generations = new Map<string, number>()
+
+  constructor() {
+    installBody3dSourceNodeCapture()
+  }
 
   begin(key: string): number {
     const next = (this.generations.get(key) ?? 0) + 1
