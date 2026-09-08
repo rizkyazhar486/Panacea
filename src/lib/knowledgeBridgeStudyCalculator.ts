@@ -2,7 +2,8 @@ export const STUDY_CALCULATOR_MAX_RATINGS = 20
 export const STUDY_CALCULATOR_MIN_SCORE = 1
 export const STUDY_CALCULATOR_MAX_SCORE = 5
 export const STUDY_CALCULATOR_SOURCE = 'user-self-rating' as const
-export const STUDY_CALCULATOR_INTERPRETATION = 'descriptive-learning-only' as const
+export const STUDY_CALCULATOR_INTERPRETATION = 'personal-descriptive-self-rating-only' as const
+export const STUDY_CALCULATOR_BOUNDARY = 'not-mastery-competence-or-clinical-score' as const
 
 export type StudyRatingCalculation = Readonly<{
   topicId: string
@@ -10,21 +11,22 @@ export type StudyRatingCalculation = Readonly<{
   count: number
   sum: number | null
   mean: number | null
-  normalizedPercent: number | null
+  percentOfScaleMaximum: number | null
   min: number | null
   max: number | null
   sourceIdentity: typeof STUDY_CALCULATOR_SOURCE
   interpretation: typeof STUDY_CALCULATOR_INTERPRETATION
+  boundary: typeof STUDY_CALCULATOR_BOUNDARY
   formulas: Readonly<{
     mean: 'sum(scores) / count'
-    normalizedPercent: '100 * sum(scores) / (5 * count)'
+    percentOfScaleMaximum: '100 * sum(scores) / (5 * count)'
   }>
   error: string | null
 }>
 
 const FORMULAS = Object.freeze({
   mean: 'sum(scores) / count',
-  normalizedPercent: '100 * sum(scores) / (5 * count)',
+  percentOfScaleMaximum: '100 * sum(scores) / (5 * count)',
 } as const)
 
 function invalid(topicId: string, error: string): StudyRatingCalculation {
@@ -34,11 +36,12 @@ function invalid(topicId: string, error: string): StudyRatingCalculation {
     count: 0,
     sum: null,
     mean: null,
-    normalizedPercent: null,
+    percentOfScaleMaximum: null,
     min: null,
     max: null,
     sourceIdentity: STUDY_CALCULATOR_SOURCE,
     interpretation: STUDY_CALCULATOR_INTERPRETATION,
+    boundary: STUDY_CALCULATOR_BOUNDARY,
     formulas: FORMULAS,
     error,
   }
@@ -72,7 +75,7 @@ export function calculateStudyRatingSummary(
   const sum = ratings.reduce((total, score) => total + score, 0)
   const count = ratings.length
   const mean = round(sum / count, 2)
-  const normalizedPercent = round((100 * sum) / (STUDY_CALCULATOR_MAX_SCORE * count), 1)
+  const percentOfScaleMaximum = round((100 * sum) / (STUDY_CALCULATOR_MAX_SCORE * count), 1)
 
   return {
     topicId: cleanTopicId,
@@ -80,11 +83,12 @@ export function calculateStudyRatingSummary(
     count,
     sum,
     mean,
-    normalizedPercent,
+    percentOfScaleMaximum,
     min: Math.min(...ratings),
     max: Math.max(...ratings),
     sourceIdentity: STUDY_CALCULATOR_SOURCE,
     interpretation: STUDY_CALCULATOR_INTERPRETATION,
+    boundary: STUDY_CALCULATOR_BOUNDARY,
     formulas: FORMULAS,
     error: null,
   }
