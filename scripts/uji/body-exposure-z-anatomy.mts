@@ -38,11 +38,13 @@ assert.match(workbench, /does not imply surgical clearance, pathology, force, ti
 assert.match(workbench, /No second renderer · no remote embed/i, 'Workbench must remain attached to the existing demand-render anatomy viewer.')
 
 assert.match(precisionLab, /import ZAnatomyAtlasWorkbench from '\.\/ZAnatomyAtlasWorkbench'/, 'Whole-body precision lab must mount the Z-Anatomy workbench.')
-assert.match(precisionLab, /type Mode = 'z-anatomy' \| 'unfolded' \| 'specialty' \| 'movement'/, 'Existing precision-atlas modes must remain available alongside Z-Anatomy.')
-assert.match(precisionLab, /useState<Mode>\('z-anatomy'\)/, 'Z-Anatomy must be the first visible precision-atlas experience.')
-assert.match(precisionLab, /\['z-anatomy', 'Z-Anatomy atlas'\]/, 'Z-Anatomy must have an explicit navigation tab.')
+assert.match(precisionLab, /type Mode = 'holistic' \| 'z-anatomy' \| 'unfolded' \| 'specialty' \| 'movement'/, 'Holistic mode and every existing precision-atlas mode must remain available alongside Z-Anatomy.')
+assert.match(precisionLab, /useState<Mode>\('holistic'\)/, 'Holistic healthcare must be the first visible precision-atlas experience.')
+assert.match(precisionLab, /\['holistic', 'Holistic healthcare'\]/, 'Holistic healthcare must have an explicit navigation tab.')
+assert.match(precisionLab, /\['z-anatomy', 'Z-Anatomy atlas'\]/, 'Z-Anatomy must retain an explicit navigation tab.')
+assert.match(precisionLab, /mode === 'z-anatomy'/, 'Existing Z-Anatomy workbench must remain directly reachable.')
 assert.match(precisionLab, /mode === 'unfolded'/, 'Existing unfolded anatomy mode must be preserved.')
 assert.match(precisionLab, /mode === 'specialty'/, 'Existing specialty atlas mode must be preserved.')
 assert.match(precisionLab, /mode === 'movement'/, 'Existing biomechanics mode must be preserved.')
 
-console.log('Body Exposure Z-Anatomy workbench preserves credited source bundles, provenance, shared-viewer interaction, and scientific boundaries.')
+console.log('Body Exposure Z-Anatomy workbench preserves credited source bundles, provenance, shared-viewer interaction, holistic integration, and scientific boundaries.')
