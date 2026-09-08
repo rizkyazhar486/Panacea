@@ -9,12 +9,16 @@
 // DIMUAT SAAT DIBUTUHKAN. Berkas penyakit, tatalaksana, dan rekap OSCE besar;
 // menyertakannya ke bundel awal akan memperlambat pembukaan aplikasi bagi
 // semua orang demi satu halaman. Indeksnya dibangun pada ketikan pertama, lalu
-// disimpan di memori.
+// disimpan di memori. Katalog widget Home sendiri sudah eager di shell/home,
+// jadi mesin cari mengimpor WIDGETS secara statis agar Vite tidak membuat
+// pseudo-split dynamic import yang sebenarnya tidak bisa dipisahkan.
 //
 // PERINGKAT SEDERHANA, DAN ITU DISENGAJA. Cocok di awal kata lebih tinggi
 // daripada cocok di tengah; nama lebih tinggi daripada keterangan. Pembobotan
 // yang lebih rumit membuat urutannya tidak dapat diterka pemakainya, dan
 // urutan yang tidak dapat diterka membuat orang berhenti memercayai hasil.
+
+import { WIDGETS } from './homeWidgets'
 
 export type JenisHasil = 'fitur' | 'penyakit' | 'obat' | 'stasiun' | 'kalkulator'
 
@@ -77,8 +81,7 @@ const PADANAN: Record<string, string> = {
 }
 
 async function bangun(): Promise<Butir[]> {
-  const [fitur, penjelasan, penyakit, obat, osce] = await Promise.all([
-    import('./homeWidgets'),
+  const [penjelasan, penyakit, obat, osce] = await Promise.all([
     import('./penjelasanFitur'),
     import('./skdiDiseaseNotes'),
     import('./skdiTherapyReference'),
@@ -89,7 +92,7 @@ async function bangun(): Promise<Butir[]> {
   const out: Butir[] = []
 
   // 1. Fitur — dari katalog widget (lengkap dengan ringkasannya).
-  for (const w of fitur.WIDGETS) {
+  for (const w of WIDGETS) {
     const rute = w.ke.split('?')[0]
     const hitung = !BUKAN_HITUNG.has(rute) && PENANDA_HITUNG.test(`${w.label} ${w.ke}`)
     out.push({
