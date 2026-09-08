@@ -512,6 +512,14 @@ export function BodyExplorer() {
         title="Body Explorer"
         subtitle="A real 3D anatomy model — tap any bone, muscle, vessel, nerve, or organ"
       />
+      <div className="flex justify-end">
+        <Link
+          to="/brain-explorer"
+          className="rounded-full border border-brand/40 bg-brand/5 px-3 py-1.5 text-xs font-bold text-brand transition hover:bg-brand/10"
+        >
+          Open dedicated 3D Brain Explorer →
+        </Link>
+      </div>
       <Card>
         <Body3D
           layers={layers}

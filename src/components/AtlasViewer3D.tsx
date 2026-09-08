@@ -269,10 +269,11 @@ export function AtlasViewer3D({
       const denyut = 0.55 + 0.45 * Math.sin(detik * 6.0)
       const setJalur = new Set((J?.urutan ?? []).map((n) => n.toLowerCase()))
 
-      const kunciBaru = `${[...setLesi].sort().join('|')}::${[...setHilir].sort().join('|')}::${W ?? ''}::${J?.id ?? ''}`
+      const kunciBaru = `${[...setLesi].sort().join('|')}::${[...setHilir].sort().join('|')}::${W ?? ''}::${J?.id ?? ''}::${D ?? ''}`
       if (meshes.length && kunciBaru !== kunciBingkai) {
         kunciBingkai = kunciBaru
-        if (adaSorot) bingkaiKe((m) => setLesi.has(m.name.toLowerCase()) || setHilir.has(m.name.toLowerCase()), 2.1)
+        if (D) bingkaiKe((m) => m.name.toLowerCase() === D.toLowerCase(), 1.55)
+        else if (adaSorot) bingkaiKe((m) => setLesi.has(m.name.toLowerCase()) || setHilir.has(m.name.toLowerCase()), 2.1)
         else if (W || J) {
           const perhatian = new Set([...setJalur])
           bingkaiKe((m) => (W ? wilayahMesh.get(m) === W : false) || perhatian.has(m.name.toLowerCase()), 1.9)

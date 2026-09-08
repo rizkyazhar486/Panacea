@@ -26,6 +26,7 @@ const PusatGizi = lazy(() => import('./pages/PusatGizi').then((m) => ({ default:
 const ClinicalScores = lazy(() => import('./pages/ClinicalScores').then((m) => ({ default: m.ClinicalScores })))
 const Translator = lazy(() => import('./pages/Translator').then((m) => ({ default: m.Translator })))
 const BodyExplorer = lazy(() => import('./pages/BodyExplorer').then((m) => ({ default: m.BodyExplorer })))
+const BrainExplorer = lazy(() => import('./pages/BrainExplorer').then((m) => ({ default: m.BrainExplorer })))
 const Radiology = lazy(() => import('./pages/Radiology').then((m) => ({ default: m.Radiology })))
 // Dua halaman ini sudah rampung dan sudah punya ujinya, tetapi tidak pernah
 // dipasang ke rute mana pun sehingga tidak ada satu pun jalan menuju ke sana.
@@ -373,6 +374,7 @@ createRoot(document.getElementById('root')!).render(
               <Route path="/trials" element={<Navigate to="/rujukan?t=uji" replace />} />
               <Route path="/nutrition" element={<Navigate to="/gizi?t=makan" replace />} />
               <Route path="/body-explorer" element={<BodyExplorer />} />
+              <Route path="/brain-explorer" element={<BrainExplorer />} />
               <Route path="/radiology" element={<Radiology />} />
               <Route path="/frontier-health" element={<FrontierHealthOS />} />
               <Route path="/knowledge-bridge" element={<KnowledgeBridge />} />
