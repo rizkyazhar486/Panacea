@@ -41,7 +41,8 @@ export async function emailOtpStart(req: Request, res: Response) {
     return res.status(429).json({ error: 'too_soon' })
   }
 
-  // node:crypto avoids predictable Math.random()-based authentication codes.
+  // node:crypto provides a cryptographically secure OTP source instead of a
+  // predictable non-cryptographic pseudo-random generator.
   const code = String(randomInt(100000, 1_000_000))
   emailLastStart.set(email, now)
   emailCodes.set(email, { code, expires: now + OTP_TTL_MS, tries: 0 })
