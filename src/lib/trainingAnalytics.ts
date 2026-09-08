@@ -31,6 +31,12 @@ export interface SameActivityPacePoint {
   paceSec: number
 }
 
+export interface SameActivityHrrPoint {
+  id: string
+  label: string
+  hrr1: number
+}
+
 export interface TrainingAnalytics {
   minggu: TrainingWeekSummary
   blok28: TrainingBlock28[]
@@ -47,6 +53,10 @@ export interface TrainingAnalytics {
   paceAktivitas: {
     nama: string
     titik: SameActivityPacePoint[]
+  } | null
+  hrrAktivitas: {
+    nama: string
+    titik: SameActivityHrrPoint[]
   } | null
 }
 
@@ -81,6 +91,20 @@ function adaRecovery(w: ImportedWorkout): boolean {
 }
 
 /**
+ * HRR1 lama dari cache tidak dipercaya sendirian. Nilai hanya layak masuk tren
+ * bila sesi juga masih memiliki sampel recovery yang benar-benar berada pada
+ * jendela sekitar satu menit yang dipakai importer (45–75 detik).
+ */
+function hrr1Tervalidasi(w: ImportedWorkout): number | null {
+  const hrr1 = angkaPositif(w.hrr1)
+  if (!(hrr1 > 0) || !Array.isArray(w.pemulihan)) return null
+  const punyaSampelMenit = w.pemulihan.some(
+    (p) => Boolean(p) && Number.isFinite(p.t) && p.t >= 45 && p.t <= 75 && Number.isFinite(p.bpm) && p.bpm > 0,
+  )
+  return punyaSampelMenit ? Math.round(hrr1) : null
+}
+
+/**
  * Menyusun analytics deskriptif dari sesi yang sudah terekam.
  *
  * Tidak ada target, readiness score, injury prediction, atau klasifikasi
@@ -94,6 +118,7 @@ export function buildTrainingAnalytics(workouts: ImportedWorkout[], anchorInput:
       blok28: [],
       total28: { sesi: 0, menit: 0, km: 0, sesiDurasi: 0, sesiJarak: 0, sesiHr: 0, sesiRpe: 0, sesiRecovery: 0 },
       paceAktivitas: null,
+      hrrAktivitas: null,
     }
   }
   anchor.setHours(12, 0, 0, 0)
@@ -215,5 +240,26 @@ export function buildTrainingAnalytics(workouts: ImportedWorkout[], anchorInput:
     if (titik.length >= 2) paceAktivitas = { nama, titik }
   }
 
-  return { minggu, blok28, total28, paceAktivitas }
+  const hrrRows = valid
+    .map((x) => ({ ...x, hrr1: hrr1Tervalidasi(x.w) }))
+    .filter((x): x is typeof x & { hrr1: number } => x.hrr1 !== null && Boolean(namaAktivitas(x.w.nama)))
+    .sort((a, b) => b.date.getTime() - a.date.getTime())
+  const latestHrr = hrrRows[0]
+  let hrrAktivitas: TrainingAnalytics['hrrAktivitas'] = null
+  if (latestHrr) {
+    const nama = namaAktivitas(latestHrr.w.nama)
+    const key = nama.toLocaleLowerCase()
+    const titik = hrrRows
+      .filter(({ w }) => namaAktivitas(w.nama).toLocaleLowerCase() === key)
+      .slice(0, 6)
+      .reverse()
+      .map(({ w, date, hrr1 }) => ({
+        id: w.id,
+        label: date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
+        hrr1,
+      }))
+    if (titik.length >= 2) hrrAktivitas = { nama, titik }
+  }
+
+  return { minggu, blok28, total28, paceAktivitas, hrrAktivitas }
 }
