@@ -1,0 +1,52 @@
+{
+  "id": "health_auto_export",
+  "name": "Health Auto Export by HealthyApps",
+  "category": "wearable",
+  "kind": ["api"],
+  "homepage": "https://www.healthyapps.dev/apps/health-auto-export/",
+  "repository": null,
+  "features": ["apple-health", "user-controlled-export", "health-metrics", "workouts", "heart-rate-series", "sleep-stages", "rest-api-export", "json-import", "permissioned-health-sync"],
+  "formats": ["health-auto-export-json-v2", "json", "https-rest"],
+  "usage": {
+    "runtime": true,
+    "buildTime": false,
+    "networkRequired": true,
+    "notes": "Panacea receives user-configured Health Auto Export REST/JSON payloads through the server integration and normalizes supported records with server/src/healthWebhook.ts. Health Auto Export is a transport/export bridge over Apple Health data, not an independent physiological measurement source and not direct browser access to HealthKit. Manual file parsing can be offline, but continuous automation requires the user-configured network destination."
+  },
+  "license": {
+    "status": "CHECK_REQUIRED",
+    "identifier": null,
+    "commercialUse": "CONDITIONAL",
+    "attributionRequired": null,
+    "shareAlike": null,
+    "scope": "Use of the proprietary Health Auto Export app, its export formats/documentation, and user-directed automations. The public privacy policy documents device-local processing and user-selected export destinations but does not establish one blanket open licence for the app, documentation, Apple Health records, or all upstream device/app data.",
+    "verificationUrl": "https://www.healthyapps.dev/health-auto-export/privacy-policy/",
+    "verifiedAt": "2026-09-09",
+    "notes": "Re-check current HealthyApps Terms of Use and Apple Health/HealthKit obligations before shipping or marketing a production integration. Do not infer redistribution or secondary-use rights from the fact that a user can export data. Third-party source/device data retains its own applicable rights and consent constraints."
+  },
+  "validation": {
+    "level": "REFERENCE",
+    "clinicalDecisionUse": "NO",
+    "notes": "Health Auto Export transports records held in Apple Health; it does not validate sensor accuracy, medical significance, device certification, or clinical correctness. Panacea must preserve missingness, units, timestamps and source context and must not turn exported wellness data into diagnosis or treatment claims."
+  },
+  "provenance": {
+    "authority": "HealthyApps export format and user-selected Apple Health records",
+    "sourceIdentityRequired": true,
+    "versionPinRequired": true,
+    "notes": "Preserve export format version, metric/workout type, declared unit, sample timestamps with original timezone offset, Apple Health source/device metadata when present, user-controlled import/receipt time, and Panacea parser version. For summarized exports preserve that values may be Min/Avg/Max windows rather than raw samples. Never replace the originating Apple Health/device source with 'HealthyApps' merely because Health Auto Export transported the record."
+  },
+  "adapter": {
+    "status": "ACTIVE",
+    "normalizedTarget": "PanaceaHealthObservation",
+    "module": "server/src/healthWebhook.ts",
+    "notes": "The active parser normalizes supported metrics, unit variants, phone-local calendar dates, heart-rate series and sleep sessions. It keeps malformed or unsupported values from being silently invented. Live webhook endpoints must remain authenticated/rate-limited at the server boundary and raw health payloads must not be exposed through browser logs, URLs or public storage."
+  },
+  "trust": {
+    "authority": 3,
+    "evidenceQuality": 1,
+    "recency": 5,
+    "licenseClarity": 2,
+    "reproducibility": 4,
+    "notes": "Useful documented transport format with deterministic parsing, but not a scientific evidence authority. Evidence quality is intentionally low because measurement quality belongs to the originating HealthKit source/device. Licence clarity remains conservative because app/docs and transported third-party health data do not share one blanket open licence."
+  }
+}
