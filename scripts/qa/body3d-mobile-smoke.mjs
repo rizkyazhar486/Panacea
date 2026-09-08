@@ -51,8 +51,6 @@ await context.addInitScript(() => {
 const page = await context.newPage()
 page.setDefaultTimeout(20_000)
 
-// Keep one optional layer in-flight long enough to prove progressive loading
-// does not cover anatomy that is already usable on a mobile viewport.
 await page.route('**/anatomy/cardio' + 'vascular.glb', async (route) => {
   await new Promise((resolve) => setTimeout(resolve, 4_000))
   await route.continue()
@@ -199,9 +197,6 @@ try {
     throw new Error(`Additional layer loading blocks or covers the Body3D viewer center: ${JSON.stringify(metrics.progressiveLoadingGeometry)}`)
   }
 
-  // Prove the already-usable viewer remains interactive while an optional layer
-  // is still loading. This is stronger than relying on elementFromPoint alone,
-  // which can report legitimate nested viewer overlays rather than the canvas.
   const progressiveBox = await canvas.boundingBox()
   if (!progressiveBox) throw new Error('Body3D canvas has no bounding box during progressive loading')
   const progressiveX = progressiveBox.x + progressiveBox.width * 0.5
@@ -223,9 +218,6 @@ try {
   await assertNoFatal('Progressive layer interaction triggered a Body3D fatal state')
   await progressiveLoading.waitFor({ state: 'hidden', timeout: 120_000 })
 
-  // Runtime interaction proof: perform a real orbit gesture, then require the
-  // same WebGL canvas/context to remain healthy and unobstructed. The source
-  // invariant test separately guarantees OrbitControls change -> requestRender.
   const box = await canvas.boundingBox()
   if (!box) throw new Error('Body3D canvas has no measurable bounding box')
   const x = box.x + box.width * 0.5
@@ -264,18 +256,51 @@ try {
   if (kneePressed !== 'true') throw new Error(`Knee joint selection did not become active (aria-pressed=${kneePressed})`)
 
   const slider = inspector.locator('input[type="range"]').first()
-  const sliderBounds = await slider.evaluate((node) => ({ min: Number(node.min), max: Number(node.max) }))
-  const targetAngle = Math.round(sliderBounds.min + (sliderBounds.max - sliderBounds.min) * 0.65)
-  await slider.evaluate((node, value) => {
-    node.value = String(value)
-    node.dispatchEvent(new Event('input', { bubbles: true }))
-    node.dispatchEvent(new Event('change', { bubbles: true }))
-  }, targetAngle)
-  await page.waitForTimeout(100)
+  const sliderState = await slider.evaluate((node) => ({
+    min: Number(node.min),
+    max: Number(node.max),
+    step: Number(node.step) || 1,
+    neutral: Number(node.value),
+  }))
+  const rawTarget = sliderState.neutral + (sliderState.max - sliderState.neutral) * 0.65
+  const targetAngle = sliderState.min + Math.round((rawTarget - sliderState.min) / sliderState.step) * sliderState.step
+
+  await slider.focus()
+  await slider.press('Home')
+  const stepCount = Math.round((targetAngle - sliderState.min) / sliderState.step)
+  for (let i = 0; i < stepCount; i++) await slider.press('ArrowRight')
+
   const observedAngle = Number(await slider.inputValue())
-  if (observedAngle !== targetAngle) {
-    throw new Error(`Whole-body ROM slider did not update: expected ${targetAngle}°, saw ${observedAngle}°`)
+  const motionLabel = slider.locator('xpath=ancestor::label[1]')
+  await motionLabel.waitFor({ state: 'visible', timeout: 5_000 })
+  const visibleMotionLabel = (await motionLabel.innerText()).trim()
+  const renderedMotionHeading = (visibleMotionLabel.split('\n')[0] ?? '').trim()
+  const expectedMotionHeading = `Flexion / extension · ${targetAngle.toFixed(0)}°`
+  metrics.wholeBodyRomDiagnostic = {
+    targetAngle,
+    observedAngle,
+    visibleMotionLabel,
+    renderedMotionHeading,
   }
+  console.log(JSON.stringify({
+    stage: 'whole-body-rom-after-keyboard',
+    targetAngle,
+    observedAngle,
+    visibleMotionLabel,
+    renderedMotionHeading,
+  }))
+  if (observedAngle <= sliderState.neutral + 20) {
+    throw new Error(`Whole-body ROM slider did not move meaningfully from neutral: saw ${observedAngle}°; label=${visibleMotionLabel}`)
+  }
+  if (observedAngle !== targetAngle) {
+    throw new Error(`Whole-body ROM slider keyboard interaction expected ${targetAngle}°: saw ${observedAngle}°; label=${visibleMotionLabel}`)
+  }
+  if (renderedMotionHeading !== expectedMotionHeading) {
+    throw new Error(`Whole-body ROM React label expected ${expectedMotionHeading}: saw ${renderedMotionHeading}`)
+  }
+
+  const dialMotionLabel = inspector.getByText(`Flexion ${targetAngle.toFixed(0)}°`, { exact: true })
+  await dialMotionLabel.waitFor({ state: 'visible', timeout: 5_000 })
 
   const boundary = inspector.getByText(/does not warp anatomy or fabricate patient-specific force/i)
   if (!(await boundary.isVisible().catch(() => false))) {
@@ -292,6 +317,7 @@ try {
     kneeSelected: kneePressed === 'true',
     sliderTargetDeg: targetAngle,
     sliderObservedDeg: observedAngle,
+    reactStateRendered: renderedMotionHeading === expectedMotionHeading,
     scientificBoundaryVisible: true,
     applyToShared3dClicked: true,
     contextStable: postShared3dHealth.webgl && !postShared3dHealth.contextLost,
