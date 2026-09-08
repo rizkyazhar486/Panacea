@@ -237,11 +237,10 @@ function sebut(judul: string, q: string): boolean {
 /** Menjalankan beberapa varian kata kunci sekaligus lalu menggabung hasilnya
  *  tanpa duplikat — satu varian yang kosong tidak mengosongkan hasilnya.
  *
- *  `saring` membuang hasil yang lolos mesin cari tapi jelas bukan yang dicari.
- *  Kalau penyaringan menyisakan NOL sedangkan hasil mentahnya ada, hasil
- *  mentah dikembalikan: daftar yang kurang tepat masih lebih berguna daripada
- *  layar kosong, dan tiap gambar tetap membawa judul serta sumbernya sendiri
- *  supaya pembaca bisa menilai. */
+ *  `saring` adalah boundary relevansi ilmiah. Jika upstream mengembalikan
+ *  hasil tetapi tidak ada satu pun yang lolos filter, adapter harus fail-closed
+ *  dan mengembalikan array kosong. Lebih baik UI menampilkan empty state yang
+ *  jujur daripada gambar berlisensi baik tetapi secara medis tidak relevan. */
 async function cariGabungan(
   term: string,
   varian: (q: string) => string[],
@@ -260,7 +259,7 @@ async function cariGabungan(
   }
   if (!saring) return gabung.slice(0, 8)
   const tersaring = gabung.filter((img) => saring(`${img.title} ${img.description}`, q))
-  return (tersaring.length ? tersaring : gabung).slice(0, 8)
+  return tersaring.slice(0, 8)
 }
 
 /**
