@@ -93,8 +93,8 @@ export function validateBodyAssetProvenance(
     reasons.push('Structured transformation lineage is missing.')
   } else {
     for (const [index, step] of record.transformations.entries()) {
-      if (!nonBlank(step.operation) || !nonBlank(step.tool)) {
-        reasons.push(`Transformation step ${index + 1} is missing operation or tool identity.`)
+      if (!nonBlank(step.operation) || !nonBlank(step.tool) || !nonBlank(step.toolVersion)) {
+        reasons.push(`Transformation step ${index + 1} is missing operation, tool identity, or tool version.`)
       }
       if (!SHA256_RE.test(step.inputSha256) || !SHA256_RE.test(step.outputSha256)) {
         reasons.push(`Transformation step ${index + 1} must pin input and output SHA-256 checksums.`)
