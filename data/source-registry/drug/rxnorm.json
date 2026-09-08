@@ -5,13 +5,13 @@
   "kind": ["api", "terminology-server"],
   "homepage": "https://lhncbc.nlm.nih.gov/RxNav/",
   "repository": null,
-  "features": ["drug-normalization", "medication-identity", "rxcui", "prescribable-content", "medication-reconciliation", "fhir-medication"],
+  "features": ["drug-normalization", "canonical-drug-name", "approximate-term-normalization", "medication-identity", "rxcui", "prescribable-content", "medication-reconciliation", "fhir-medication"],
   "formats": ["json", "xml", "http-rest"],
   "usage": {
     "runtime": true,
     "buildTime": false,
     "networkRequired": true,
-    "notes": "Use RxNorm as Panacea's U.S. medication identity/normalization source. The online NLM APIs are free but limited to 20 requests/second/IP; NLM recommends caching responses for 12-24 hours. High-volume deployments should evaluate RxNav-in-a-Box rather than hammering the public endpoint."
+    "notes": "Use RxNorm as Panacea's U.S. medication identity/normalization source through the canonical server adapter. The adapter supports exact name->RxCUI resolution, related SCD/SBD concepts, and approximate-term->canonical-name normalization for orchestration fallbacks. The online NLM APIs are free but limited to 20 requests/second/IP; NLM recommends caching responses for 12-24 hours."
   },
   "license": {
     "status": "VERIFIED",
@@ -27,19 +27,19 @@
   "validation": {
     "level": "REFERENCE",
     "clinicalDecisionUse": "CONTEXT_ONLY",
-    "notes": "RxNorm normalizes medication identity and relationships; a successful RXCUI match does not validate dose, indication, contraindication, interaction, prescribing appropriateness or patient-specific treatment. RxNav drug-drug interaction features were discontinued on January 2, 2024, so Panacea must not present RxNorm/RxNav as a current DDI engine."
+    "notes": "RxNorm normalizes medication identity and relationships; an exact or approximate RXCUI/canonical-name match does not validate dose, indication, contraindication, interaction, prescribing appropriateness or patient-specific treatment. RxNav drug-drug interaction features were discontinued on January 2, 2024, so Panacea must not present RxNorm/RxNav as a current DDI engine."
   },
   "provenance": {
     "authority": "U.S. National Library of Medicine (NLM)",
     "sourceIdentityRequired": true,
     "versionPinRequired": true,
-    "notes": "Persist RXCUI, concept status, term type (TTY) where used, source vocabulary when relevant, and the RxNorm release/API version observed during normalization. Preserve the original medication string so users can audit how a source name became a normalized RxNorm concept."
+    "notes": "Persist RXCUI, canonical RxNorm name, concept status, term type (TTY) where used, source vocabulary when relevant, and the RxNorm release/API version observed during normalization. Preserve the original medication string so users can audit exact or approximate normalization from source text to RxNorm concept."
   },
   "adapter": {
     "status": "ACTIVE",
     "normalizedTarget": "PanaceaMedicationConcept",
     "module": "server/src/rxnorm.ts",
-    "notes": "Production adapter resolves normalized medication text to a numeric RXCUI, retrieves SCD/SBD related concepts, rejects malformed upstream identifiers, applies bounded requests and timeouts, and returns a de-duplicated related-drug list. It is a medication identity/normalization adapter only; it does not perform drug-drug interaction checking or prescribing recommendations."
+    "notes": "Canonical production adapter sanitizes/bounds medication text, resolves exact names to numeric RXCUI for SCD/SBD related concepts, and separately supports approximateTerm->numeric RXCUI->RxNorm Name canonical normalization. It rejects malformed upstream identifiers, applies timeouts and does not perform drug-drug interaction checking or prescribing recommendations. Higher-level drugInfo orchestration reuses this normalization path rather than issuing duplicate RxNav requests."
   },
   "trust": {
     "authority": 5,
