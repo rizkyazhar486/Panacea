@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react'
 import type { AtlasLayerKey } from '../../lib/wholeBodyAtlasBlueprint'
+import { coupledKinematicsFor } from '../../lib/biomechanicsCoupling'
 import {
   WHOLE_BODY_BIOMECHANICS_DISCLOSURE,
   WHOLE_BODY_JOINT_PROFILES,
@@ -49,6 +50,7 @@ export function WholeBodyMotionInspector({ onHighlight, onFocusRegion, onEnableL
   const excursion = normalizedJointExcursion(motion, angleDeg)
   const excursionState = classifyJointExcursion(motion, angleDeg)
   const positionLabel = signedMotionLabel(motion, angleDeg)
+  const coupled = coupledKinematicsFor(motion.id)
 
   const groupedJoints = useMemo(() => {
     const groups = new Map<string, WholeBodyJointProfile[]>()
@@ -82,7 +84,7 @@ export function WholeBodyMotionInspector({ onHighlight, onFocusRegion, onEnableL
   function applyToViewer() {
     onEnableLayer?.('skeletal')
     onEnableLayer?.('muscular')
-    onHighlight?.([...new Set([...joint.nodeHints, ...motion.structureHints])])
+    onHighlight?.([...new Set([...joint.nodeHints, ...motion.structureHints, ...(coupled?.structures ?? [])])])
     onFocusRegion?.(joint.nodeHints)
   }
 
@@ -92,8 +94,8 @@ export function WholeBodyMotionInspector({ onHighlight, onFocusRegion, onEnableL
         <div className="flex flex-wrap items-start justify-between gap-3">
           <div>
             <div className="text-[10px] font-black uppercase tracking-[0.2em] text-brand">Whole-body motion inspector</div>
-            <h4 className="mt-1 text-lg font-black">Joint → axis → motion → contributing structures</h4>
-            <p className="mt-1 max-w-3xl text-[10px] leading-relaxed text-neutral-400">Reference-style joint inspection scaled across the body. The control drives educational readouts and highlights evidence-bearing source meshes; it does not warp anatomy or fabricate patient-specific force.</p>
+            <h4 className="mt-1 text-lg font-black">Joint → axis → coupled motion → contributing structures</h4>
+            <p className="mt-1 max-w-3xl text-[10px] leading-relaxed text-neutral-400">Reference-style joint inspection scaled across the body. The control highlights evidence-bearing source meshes; it does not warp anatomy into a fake single-axis hinge or fabricate patient-specific force.</p>
           </div>
           <SourceBadge joint={joint} />
         </div>
@@ -108,13 +110,7 @@ export function WholeBodyMotionInspector({ onHighlight, onFocusRegion, onEnableL
                 <div className="mb-1 text-[8px] font-black uppercase tracking-[0.14em] text-neutral-600">{region.replace('-', ' ')}</div>
                 <div className="grid grid-cols-2 gap-1.5">
                   {joints.map((item) => (
-                    <button
-                      key={item.id}
-                      type="button"
-                      aria-pressed={joint.id === item.id}
-                      onClick={() => inspectJoint(item)}
-                      className={`min-h-11 rounded-xl border px-2 py-2 text-left text-[10px] font-black transition ${joint.id === item.id ? 'border-brand bg-brand/15 text-white' : 'border-white/10 bg-white/[0.03] text-neutral-400 hover:border-brand/40 hover:text-white'}`}
-                    >
+                    <button key={item.id} type="button" aria-pressed={joint.id === item.id} onClick={() => inspectJoint(item)} className={`min-h-11 rounded-xl border px-2 py-2 text-left text-[10px] font-black transition ${joint.id === item.id ? 'border-brand bg-brand/15 text-white' : 'border-white/10 bg-white/[0.03] text-neutral-400 hover:border-brand/40 hover:text-white'}`}>
                       {item.label}
                     </button>
                   ))}
@@ -144,15 +140,7 @@ export function WholeBodyMotionInspector({ onHighlight, onFocusRegion, onEnableL
 
               <label className="block rounded-xl border border-white/10 bg-white/[0.03] p-3 text-[11px] font-black">
                 {motion.label} · {angleDeg.toFixed(0)}°
-                <input
-                  type="range"
-                  min={motion.minDeg}
-                  max={motion.maxDeg}
-                  step={1}
-                  value={angleDeg}
-                  onChange={(event) => setAngleDeg(Number(event.target.value))}
-                  className="mt-3 w-full accent-[var(--brand,#00bf63)]"
-                />
+                <input type="range" min={motion.minDeg} max={motion.maxDeg} step={1} value={angleDeg} onChange={(event) => setAngleDeg(Number(event.target.value))} className="mt-3 w-full accent-[var(--brand,#00bf63)]" />
                 <div className="mt-1 flex justify-between text-[8px] font-bold text-neutral-600"><span>{motion.minDeg}°</span><span>neutral {motion.neutralDeg}°</span><span>{motion.maxDeg}°</span></div>
               </label>
 
@@ -161,6 +149,21 @@ export function WholeBodyMotionInspector({ onHighlight, onFocusRegion, onEnableL
               <button type="button" onClick={applyToViewer} className="min-h-11 rounded-full border border-brand px-4 text-[11px] font-black text-brand transition hover:bg-brand hover:text-white">Inspect this motion in shared 3D →</button>
             </div>
           </div>
+
+          {coupled && (
+            <div className="rounded-2xl border border-cyan-400/20 bg-cyan-400/[0.04] p-3">
+              <div className="text-[9px] font-black uppercase tracking-[0.16em] text-cyan-300">Coupled kinematics</div>
+              <div className="mt-1 text-sm font-black text-white">{coupled.title}</div>
+              <div className="mt-3 grid gap-2 md:grid-cols-2">
+                <div className="rounded-xl border border-white/10 bg-black/20 p-3"><div className="text-[8px] font-black uppercase tracking-wide text-neutral-500">Primary motion</div><p className="mt-1 text-[10px] leading-relaxed text-neutral-300">{coupled.primaryMotion}</p></div>
+                <div className="rounded-xl border border-white/10 bg-black/20 p-3"><div className="text-[8px] font-black uppercase tracking-wide text-neutral-500">Coupled motion</div><p className="mt-1 text-[10px] leading-relaxed text-neutral-300">{coupled.coupledMotion}</p></div>
+              </div>
+              <div className="mt-2 text-[9px] font-black uppercase tracking-wide text-cyan-300">Structures carrying the relationship</div>
+              <p className="mt-1 text-[10px] leading-relaxed text-neutral-300">{coupled.structures.join(' · ')}</p>
+              <p className="mt-2 text-[10px] leading-relaxed text-neutral-400">{coupled.interpretation}</p>
+              <p className="mt-2 text-[9px] leading-relaxed text-neutral-600">Evidence note: {coupled.source}</p>
+            </div>
+          )}
 
           <div className="grid gap-2 md:grid-cols-3">
             <div className="rounded-xl border border-brand/20 bg-brand/[0.06] p-3"><div className="text-[9px] font-black uppercase tracking-wide text-brand">Primary driver context</div><p className="mt-1 text-[10px] leading-relaxed text-neutral-300">{motion.drivers.join(' · ')}</p></div>
