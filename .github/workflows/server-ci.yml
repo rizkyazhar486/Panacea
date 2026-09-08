@@ -53,6 +53,8 @@ jobs:
         run: npm run uji:mygene
       - name: Test Wikimedia Commons image adapter
         run: npm run uji:commons
+      - name: Test anatomy ontology provenance
+        run: npm run uji:ontology
       - name: Test ICD terminology adapter
         run: npm run uji:icd
       - name: Test canonical drug label orchestration
