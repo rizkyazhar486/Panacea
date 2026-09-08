@@ -1,7 +1,15 @@
 {
   "version": 1,
-  "updatedAt": "2026-09-08T18:50:00.000Z",
+  "updatedAt": "2026-09-08T18:55:00.000Z",
   "items": {
+    "ff-health-profile-chart": {
+      "status": "done",
+      "commit": "18c46f4fa0361b0769a0069488fc1793a87e4444",
+      "paths": ["src/pages/HealthProfile.tsx", "scripts/uji/feature-factory-health-profile-ux-safety.mts"],
+      "note": "Matured the existing Health Profile responsive trend chart as the Feature Factory chart capability. It uses recorded bounded history only, requires at least two saves, renders only series that actually contain values, exposes a tooltip and responsive container, and does not extrapolate or fabricate missing points.",
+      "academicReview": {"status":"not-applicable-no-material-claim","sourceBasis":[],"aiUse":"ai-assisted","note":"Recorded-data visualization behavior only; no biomedical threshold, diagnosis, prognosis, causal claim or treatment recommendation is introduced.","humanReview":{"status":"not-recorded","reviewer":null,"credentials":null,"reviewedAt":null}},
+      "updatedAt": "2026-09-08T18:55:00.000Z"
+    },
     "ff-health-profile-data-quality": {
       "status": "done",
       "commit": "2104246d227e62c51c51f268bf183b746154bc9a",
@@ -41,6 +49,30 @@
       "note": "Matured the existing offline-safe Health Profile path: core profile entry, load and save remain usable from localStorage when the backend is absent or sync fails, while the UI explicitly distinguishes local-only persistence from server synchronization. No repeated polling or fabricated offline data is introduced.",
       "academicReview": {"status":"not-applicable-no-material-claim","sourceBasis":[],"aiUse":"ai-assisted","note":"Offline persistence behavior only; no biomedical or clinical claim is added.","humanReview":{"status":"not-recorded","reviewer":null,"credentials":null,"reviewedAt":null}},
       "updatedAt": "2026-09-08T18:50:00.000Z"
+    },
+    "ff-health-profile-onboarding": {
+      "status": "done",
+      "commit": "18c46f4fa0361b0769a0069488fc1793a87e4444",
+      "paths": ["src/pages/HealthProfile.tsx", "scripts/uji/feature-factory-health-profile-ux-safety.mts"],
+      "note": "Matured the existing progressive Health Profile onboarding: import/export paths are explained at point of use, Apple Watch versus Garmin/WHOOP paths are distinguished, imported values require review before Save, and a dedicated bounded 8-step Health Data tutorial remains directly reachable without blocking manual entry.",
+      "academicReview": {"status":"not-applicable-no-material-claim","sourceBasis":[],"aiUse":"ai-assisted","note":"Product onboarding and workflow disclosure only; no biomedical or clinical claim is introduced.","humanReview":{"status":"not-recorded","reviewer":null,"credentials":null,"reviewedAt":null}},
+      "updatedAt": "2026-09-08T18:55:00.000Z"
+    },
+    "ff-health-profile-performance": {
+      "status": "done",
+      "commit": "18c46f4fa0361b0769a0069488fc1793a87e4444",
+      "paths": ["src/main.tsx", "src/pages/HealthProfile.tsx", "scripts/uji/feature-factory-health-profile-ux-safety.mts"],
+      "note": "Matured the existing Health Profile performance budget: the route stays React.lazy loaded, imports are capped at 60 MB, longitudinal history is capped at 90 saves, diagnostic rows at 60, large pasted payload text remains uncontrolled to avoid rerender churn, and no repeated polling loop is introduced.",
+      "academicReview": {"status":"not-applicable-no-material-claim","sourceBasis":[],"aiUse":"ai-assisted","note":"Frontend performance constraints only; no biomedical content or interpretation is added.","humanReview":{"status":"not-recorded","reviewer":null,"credentials":null,"reviewedAt":null}},
+      "updatedAt": "2026-09-08T18:55:00.000Z"
+    },
+    "ff-health-profile-privacy": {
+      "status": "done",
+      "commit": "18c46f4fa0361b0769a0069488fc1793a87e4444",
+      "paths": ["src/pages/HealthProfile.tsx", "scripts/uji/feature-factory-health-profile-ux-safety.mts"],
+      "note": "Matured existing Health Profile privacy controls: structured XML/CSV/JSON imports explicitly stay on-device, screenshot OCR is clearly disclosed as a server-processing exception with crop-before-upload minimization guidance, private webhook-link scope is visible, and user-confirmed token rotation revokes a leaked prior link immediately.",
+      "academicReview": {"status":"not-applicable-no-material-claim","sourceBasis":[],"aiUse":"ai-assisted","note":"Privacy and data-flow controls only; no medical factual or clinical claim is introduced.","humanReview":{"status":"not-recorded","reviewer":null,"credentials":null,"reviewedAt":null}},
+      "updatedAt": "2026-09-08T18:55:00.000Z"
     },
     "ff-health-profile-provenance": {
       "status": "done",
