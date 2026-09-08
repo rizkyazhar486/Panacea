@@ -81,6 +81,10 @@ export function WholeBodyMotionInspector({ onHighlight, onFocusRegion, onEnableL
     onHighlight?.([...new Set([...joint.nodeHints, ...next.structureHints])])
   }
 
+  function setMotionAngle(value: string) {
+    setAngleDeg(Number(value))
+  }
+
   function applyToViewer() {
     onEnableLayer?.('skeletal')
     onEnableLayer?.('muscular')
@@ -140,7 +144,16 @@ export function WholeBodyMotionInspector({ onHighlight, onFocusRegion, onEnableL
 
               <label className="block rounded-xl border border-white/10 bg-white/[0.03] p-3 text-[11px] font-black">
                 {motion.label} · {angleDeg.toFixed(0)}°
-                <input type="range" min={motion.minDeg} max={motion.maxDeg} step={1} value={angleDeg} onChange={(event) => setAngleDeg(Number(event.target.value))} className="mt-3 w-full accent-[var(--brand,#00bf63)]" />
+                <input
+                  type="range"
+                  min={motion.minDeg}
+                  max={motion.maxDeg}
+                  step={1}
+                  value={angleDeg}
+                  onInput={(event) => setMotionAngle(event.currentTarget.value)}
+                  onChange={(event) => setMotionAngle(event.currentTarget.value)}
+                  className="mt-3 w-full accent-[var(--brand,#00bf63)]"
+                />
                 <div className="mt-1 flex justify-between text-[8px] font-bold text-neutral-600"><span>{motion.minDeg}°</span><span>neutral {motion.neutralDeg}°</span><span>{motion.maxDeg}°</span></div>
               </label>
 

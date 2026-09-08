@@ -53,6 +53,10 @@ await context.addInitScript(() => {
 
 const page = await context.newPage()
 page.setDefaultTimeout(20_000)
+await page.route('**/anatomy/cardio' + 'vascular.glb', async (route) => {
+  await new Promise((resolve) => setTimeout(resolve, 4_000))
+  await route.continue()
+})
 const pageErrors = []
 page.on('pageerror', (error) => pageErrors.push(error.message))
 
@@ -117,12 +121,16 @@ try {
     if (await close.isVisible().catch(() => false)) await close.click()
   }
 
-  const canvas = page.locator('div.h-full.w-full.touch-none > canvas').first()
+  const viewer = page.locator('div.h-full.w-full.touch-none').first()
+  const canvas = viewer.locator('> canvas').first()
   await canvas.waitFor({ state: 'visible', timeout: 45_000 })
   await canvas.scrollIntoViewIfNeeded()
 
   await page.waitForTimeout(1_500)
-  await page.getByText('Loading anatomy…').waitFor({ state: 'hidden', timeout: 120_000 })
+  const initialLoading = page.getByText('Loading anatomy…').first()
+  const progressiveLoading = page.getByText('Adding anatomy layer…').first()
+  await initialLoading.waitFor({ state: 'hidden', timeout: 120_000 })
+  await progressiveLoading.waitFor({ state: 'hidden', timeout: 120_000 })
 
   const fatal = page.getByText(/This device could not start 3D graphics|The browser dropped the 3D context/i)
   if (await fatal.count()) throw new Error(`Body3D fatal fallback is visible: ${await fatal.first().innerText()}`)
@@ -168,6 +176,34 @@ try {
   if (metrics.documentScrollWidth > metrics.viewport.width + 2) {
     throw new Error(`Page overflows horizontally: ${metrics.documentScrollWidth}px > ${metrics.viewport.width}px`)
   }
+
+  const vessels = page.getByRole('button', { name: 'Vessels', exact: true }).first()
+  await vessels.click()
+  await progressiveLoading.waitFor({ state: 'visible', timeout: 5_000 })
+  const progressiveClass = await progressiveLoading.evaluate((node) =>
+    node.closest('[role="status"]')?.getAttribute('class') ?? '',
+  )
+  metrics.progressiveLoadingCompact = Boolean(
+    progressiveClass.includes('top-2') && !progressiveClass.includes('inset-0'),
+  )
+  await canvas.scrollIntoViewIfNeeded()
+  await page.waitForTimeout(100)
+  metrics.progressiveLoadingCenterUnobstructed = await canvas.evaluate((node) => {
+    const rect = node.getBoundingClientRect()
+    const x = rect.left + rect.width / 2
+    const y = rect.top + rect.height / 2
+    if (x < 0 || x > window.innerWidth || y < 0 || y > window.innerHeight) return false
+    const hit = document.elementFromPoint(x, y)
+    const viewerNode = node.parentElement
+    return Boolean(hit && viewerNode && (hit === node || hit === viewerNode || viewerNode.contains(hit)))
+  })
+  if (!metrics.progressiveLoadingCompact) {
+    throw new Error(`Additional layer loading is not compact: ${progressiveClass || 'no class'}`)
+  }
+  if (!metrics.progressiveLoadingCenterUnobstructed) {
+    throw new Error('Additional layer loading obstructed the Body3D viewer center')
+  }
+  await progressiveLoading.waitFor({ state: 'hidden', timeout: 120_000 })
 
   const box = await canvas.boundingBox()
   if (!box) throw new Error('Body3D canvas has no measurable bounding box')
@@ -221,24 +257,35 @@ try {
 
   await inspector.scrollIntoViewIfNeeded()
   const slider = inspector.locator('input[type="range"]').first()
-  const sliderBounds = await slider.evaluate((node) => ({
+  const sliderState = await slider.evaluate((node) => ({
     min: Number(node.min),
     max: Number(node.max),
-    value: Number(node.value),
+    neutral: Number(node.value),
   }))
-  const targetAngle = Math.round(sliderBounds.min + (sliderBounds.max - sliderBounds.min) * 0.65)
+  const targetAngle = Math.round(
+    sliderState.neutral + (sliderState.max - sliderState.neutral) * 0.65,
+  )
   await slider.evaluate((node, value) => {
     node.value = String(value)
     node.dispatchEvent(new Event('input', { bubbles: true }))
     node.dispatchEvent(new Event('change', { bubbles: true }))
   }, targetAngle)
-  await page.waitForTimeout(100)
+
+  const renderedAngleLabel = inspector.getByText(`Flexion / extension · ${targetAngle.toFixed(0)}°`, { exact: true })
+  await renderedAngleLabel.waitFor({ state: 'visible', timeout: 5_000 })
   const observedAngle = Number(await slider.inputValue())
   metrics.wholeBodyMotion.sliderTargetDeg = targetAngle
   metrics.wholeBodyMotion.sliderObservedDeg = observedAngle
-  if (observedAngle !== targetAngle) {
-    throw new Error(`Whole-body ROM slider did not update: expected ${targetAngle}°, saw ${observedAngle}°`)
+  if (observedAngle <= sliderState.neutral + 20) {
+    throw new Error(`Whole-body ROM slider did not move meaningfully from neutral: saw ${observedAngle}°`)
   }
+  if (observedAngle !== targetAngle) {
+    throw new Error(`Whole-body ROM slider event interaction expected ${targetAngle}°: saw ${observedAngle}°`)
+  }
+
+  const dialMotionLabel = inspector.getByText(`Flexion ${targetAngle.toFixed(0)}°`, { exact: true })
+  await dialMotionLabel.waitFor({ state: 'visible', timeout: 5_000 })
+  metrics.wholeBodyMotion.reactStateRendered = true
 
   const boundary = inspector.getByText(/does not warp anatomy or fabricate patient-specific force/i)
   if (!(await boundary.isVisible().catch(() => false))) {
@@ -255,7 +302,7 @@ try {
 
   await inspector.scrollIntoViewIfNeeded()
   await captureMotionViewport()
-  if (!motionScreenshotCaptured) throw new Error('Body3D motion inspector mobile visual evidence was not captured')
+  if (!motionScreenshotCaptured) throw new Error('Whole-body motion inspector mobile visual evidence was not captured')
 
   if (pageErrors.length) throw new Error(`Browser page errors: ${pageErrors.join(' | ')}`)
 
