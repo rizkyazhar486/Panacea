@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-09-08T07:42:00.000Z",
+  "updatedAt": "2026-09-08T07:56:00.000Z",
   "items": {
     "ff-medical-education-accessibility": {
       "status": "done",
@@ -65,6 +65,14 @@
       "note": "Verified and hardened the existing Knowledge Bridge graceful fallback without duplicating UI: the core curated map remains local-first with no direct network path; blank search fails closed; unmatched queries explicitly disclose that no curated causal map exists and preserve the exact query in a Medical Library evidence handoff; malformed/unavailable note and evidence storage falls back to empty state; evidence remains validated and bounded to eight source pointers; and fallback content retains educational/not-patient-specific plus original-source-verification boundaries.",
       "academicReview": {"status":"not-applicable-no-material-claim","sourceBasis":[],"aiUse":"ai-assisted","note":"This candidate adds deterministic fallback guards and documents existing fail-closed behavior. It introduces no new medical factual, quantitative, causal, diagnostic or treatment claim and does not reclassify existing teaching text as verified.","humanReview":{"status":"not-recorded","reviewer":null,"credentials":null,"reviewedAt":null}},
       "updatedAt": "2026-09-08T07:42:00.000Z"
+    },
+    "ff-medical-education-patient-view": {
+      "status": "done",
+      "commit": "0fc181fd04401f9df59a2ffbc0d86c104cffda44",
+      "paths": ["src/components/KnowledgeBridgeWorkbench.tsx", "src/lib/knowledgeBridgeMap.ts", "scripts/uji/knowledge-bridge-patient-view.mts"],
+      "note": "Matured the existing plain-language Knowledge Bridge presentation as the Medical Education patient-view capability without duplicating or rewriting medical facts: plain, student and clinical depths reuse the same curated topic one-liner and seven stage objects; the shared glossary provides understandable labels; the UI remains explicitly educational and not patient-specific; and Medical Library/original-source verification boundaries remain visible.",
+      "academicReview": {"status":"not-applicable-no-material-claim","sourceBasis":[],"aiUse":"ai-assisted","note":"This candidate adds deterministic presentation guards only. It does not create new medical facts, diagnostic thresholds, patient-specific inference or treatment recommendations, and it explicitly prevents the plain-language presentation from being interpreted as a personalized clinical view.","humanReview":{"status":"not-recorded","reviewer":null,"credentials":null,"reviewedAt":null}},
+      "updatedAt": "2026-09-08T07:56:00.000Z"
     }
   }
 }
