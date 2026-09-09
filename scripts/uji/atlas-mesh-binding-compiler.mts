@@ -141,6 +141,21 @@ assert.equal(kneeBinding.status, 'bound')
 assert.deepEqual(new Set(kneeBinding.selectedMeshNodeIds), new Set(['mesh:patella:left', 'mesh:tibia:left']))
 assert.deepEqual(kneeBinding.unresolvedHints, [])
 
+const thresholdMiss = compileAtlasNodeMeshBinding(leftKneeComposite, syntheticGraph, { minScore: 2_000 })
+assert.equal(
+  thresholdMiss.status,
+  'unresolved',
+  'candidates below minScore are unresolved, not ambiguous when no structural competition exists',
+)
+assert.deepEqual(thresholdMiss.selectedMeshNodeIds, [])
+assert.deepEqual(new Set(thresholdMiss.unresolvedHints), new Set(['patella', 'tibia']))
+
+const cappedComposite = compileAtlasNodeMeshBinding(leftKneeComposite, syntheticGraph, { maxSelectedMeshes: 1 })
+assert.equal(cappedComposite.status, 'partial', 'selection capacity must not silently promote a truncated composite to bound')
+assert.equal(cappedComposite.selectedMeshNodeIds.length, 1)
+assert.ok(cappedComposite.unresolvedHints.includes('tibia'))
+assert.ok(cappedComposite.reasons.some((reason) => reason.includes('maxSelectedMeshes=1')))
+
 const referenceOnly = atlasNode({
   id: 'test:reference-only-carotid',
   label: 'Reference-only carotid metadata',
@@ -196,4 +211,4 @@ assert.equal(collisions.length, 1)
 assert.equal(collisions[0].meshNodeId, 'mesh:carotid:left')
 assert.deepEqual(collisions[0].atlasNodeIds, ['test:left-carotid', 'test:left-carotid-duplicate'])
 
-console.log('Atlas mesh binding compiler: specificity fallback, laterality/region/file boundaries, composite binding, ambiguity fail-closed behavior, metadata-only gate, and collision audit verified.')
+console.log('Atlas mesh binding compiler: specificity fallback, laterality/region/file boundaries, composite binding, threshold semantics, selection-cap partial state, ambiguity fail-closed behavior, metadata-only gate, and collision audit verified.')
