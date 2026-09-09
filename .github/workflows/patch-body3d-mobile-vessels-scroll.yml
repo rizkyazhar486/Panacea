@@ -1,0 +1,44 @@
+name: Patch Body3D mobile layer-control scroll
+
+on:
+  push:
+    branches: [feat/surgery-simulator-main-refresh-20260909-2230]
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: feat/surgery-simulator-main-refresh-20260909-2230
+      - name: Patch Vessels interaction to verify a real tappable viewport position
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          path = Path('scripts/qa/body3d-mobile-smoke.mjs')
+          text = path.read_text()
+          old = """  const vessels = page.getByRole('button', { name: 'Vessels', exact: true }).first()\n  await vessels.click()\n"""
+          new = """  const vessels = page.getByRole('button', { name: 'Vessels', exact: true }).first()\n  await vessels.waitFor({ state: 'visible', timeout: 10_000 })\n  // The viewer was deliberately centered above for unobstructed-canvas checks.\n  // Move to the Layers control the way a mobile user would, then prove the\n  // button is genuinely tappable before clicking it. Do not force-click: a\n  // clipped or covered control must still fail this acceptance gate.\n  await vessels.evaluate((node) => node.scrollIntoView({ block: 'center', inline: 'nearest', behavior: 'auto' }))\n  await page.waitForTimeout(150)\n  const vesselsGeometry = await vessels.evaluate((node) => {\n    const rect = node.getBoundingClientRect()\n    const centerX = rect.left + rect.width / 2\n    const centerY = rect.top + rect.height / 2\n    const hit = document.elementFromPoint(centerX, centerY)\n    return {\n      rect: [rect.left, rect.top, rect.right, rect.bottom],\n      center: [centerX, centerY],\n      inViewport: rect.left >= 0 && rect.top >= 0 && rect.right <= innerWidth && rect.bottom <= innerHeight,\n      centerHitIsControl: Boolean(hit && (hit === node || node.contains(hit))),\n      hitTag: hit?.tagName ?? null,\n      hitText: hit?.textContent?.trim().slice(0, 80) ?? null,\n      scrollY,\n    }\n  })\n  metrics.vesselsControlGeometry = vesselsGeometry\n  if (!vesselsGeometry.inViewport || !vesselsGeometry.centerHitIsControl) {\n    throw new Error(`Vessels layer control is not genuinely tappable on mobile: ${JSON.stringify(vesselsGeometry)}`)\n  }\n  await vessels.click()\n"""
+          if text.count(old) != 1:
+              raise SystemExit(f'expected one Vessels click block, found {text.count(old)}')
+          path.write_text(text.replace(old, new))
+          PY
+      - name: Verify patch and remove staging workflow
+        shell: bash
+        run: |
+          node --check scripts/qa/body3d-mobile-smoke.mjs
+          grep -F "Vessels layer control is not genuinely tappable on mobile" scripts/qa/body3d-mobile-smoke.mjs
+          git rm .github/workflows/patch-body3d-mobile-vessels-scroll.yml
+          git diff --check
+      - name: Commit smoke correction only
+        shell: bash
+        run: |
+          git config user.name panacea-body-qa-bot
+          git config user.email actions@users.noreply.github.com
+          git add scripts/qa/body3d-mobile-smoke.mjs
+          git commit -m "test(body): verify layer controls after explicit mobile scroll"
+          git push origin HEAD:feat/surgery-simulator-main-refresh-20260909-2230
