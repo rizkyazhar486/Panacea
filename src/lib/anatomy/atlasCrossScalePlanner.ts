@@ -8,10 +8,11 @@ import {
   type BioScaleManifest,
   type BioScaleRelation,
 } from './bioScaleAtlas'
+import { buildAtlasScaleCorridorEdges } from './atlasScaleCorridors'
 
 export type CrossScaleNamespace = 'atlas' | 'bio'
 export type CrossScaleValue = AtlasScale | BioScale
-export type CrossScaleEdgeKind = AtlasGraphEdge['kind'] | 'bio-parent' | 'bio-child' | 'bio-relation' | 'atlas-to-cell' | 'cell-to-atlas'
+export type CrossScaleEdgeKind = AtlasGraphEdge['kind'] | 'scale-corridor' | 'bio-parent' | 'bio-child' | 'bio-relation' | 'atlas-to-cell' | 'cell-to-atlas'
 
 export interface CrossScaleStep {
   namespace: CrossScaleNamespace
@@ -55,10 +56,6 @@ const ATLAS_SCALE_ORDER: readonly AtlasScale[] = ['organism', 'region', 'organ',
 const key = (namespace: CrossScaleNamespace, id: string) => `${namespace}::${id}`
 const atlasKey = (id: string) => key('atlas', id)
 const bioKey = (id: string) => key('bio', id)
-
-function atlasScaleRank(scale: AtlasScale) {
-  return ATLAS_SCALE_ORDER.indexOf(scale)
-}
 
 function combinedScaleRank(scale: CrossScaleValue) {
   const atlasRank = ATLAS_SCALE_ORDER.indexOf(scale as AtlasScale)
@@ -105,6 +102,19 @@ export function buildCrossScaleAdjacency(atlas: AtlasManifest, bio: BioScaleMani
         note: edge.note,
       })
     }
+  }
+
+  // Navigation corridors are an explicit semantic-zoom overlay. They do not
+  // replace canonical parenthood; they simply offer a lower-cost progressive
+  // route than a broad -> microstructure jump when strict drill-down is active.
+  for (const edge of buildAtlasScaleCorridorEdges(atlas)) {
+    addEdge(adjacency, {
+      fromKey: atlasKey(edge.fromId),
+      toKey: atlasKey(edge.toId),
+      kind: 'scale-corridor',
+      weight: edge.weight,
+      note: edge.corridorId,
+    })
   }
 
   for (const node of bio.nodes) {
