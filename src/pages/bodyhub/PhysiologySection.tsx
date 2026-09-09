@@ -1,11 +1,15 @@
 import { useState } from 'react'
-import { SISTEM_FISIOLOGI, type SistemFisiologi } from '../../lib/physiology'
+import {
+  PHYSIOLOGY_EVIDENCE_BOUNDARY,
+  PHYSIOLOGY_REFERENCE_SOURCES,
+  SISTEM_FISIOLOGI,
+  type SistemFisiologi,
+} from '../../lib/physiology'
 import type { AnatomyLayer } from '../../components/Body3D'
 import { PhysiologyDeepDivePanel } from './PhysiologyDeepDivePanel'
 
-// Fisiologi — apa yang tubuh KERJAKAN. Tiap sistem membawa nilai istirahat DAN
-// nilai saat olahraga bersebelahan, karena di situlah halaman ini bertemu
-// halaman Workout: beban yang dicatat di sana punya penjelasan faal di sini.
+// Fisiologi — mekanisme dan reference envelopes. Angka di sini tidak menjadi
+// personal physiology hanya karena ditampilkan berdampingan dengan Workout.
 
 interface Props {
   onPickSystem: (layer: AnatomyLayer['key'] | undefined, searchTerms: string[], label: string) => void
@@ -13,10 +17,10 @@ interface Props {
 
 function Baris({ n }: { n: SistemFisiologi['angka'][number] }) {
   return (
-    <div className="flex items-baseline justify-between gap-2 border-b border-neutral-100 py-1 last:border-0 dark:border-white/5">
-      <span className="min-w-0 flex-1 text-[11px] text-neutral-500">{n.label}</span>
-      <span className="shrink-0 text-[11px] font-bold text-ink dark:text-white">{n.rest}</span>
-      {n.exercise && <span className="shrink-0 text-[11px] font-bold text-brand">{n.exercise}</span>}
+    <div className="grid grid-cols-[minmax(0,1fr)_minmax(90px,auto)] gap-x-2 gap-y-0.5 border-b border-neutral-100 py-1.5 last:border-0 sm:grid-cols-[minmax(0,1fr)_minmax(110px,auto)_minmax(130px,auto)] dark:border-white/5">
+      <span className="min-w-0 text-[11px] text-neutral-500">{n.label}</span>
+      <span className="text-right text-[11px] font-bold text-ink dark:text-white">{n.rest}</span>
+      {n.exercise && <span className="col-span-2 text-[10px] font-semibold leading-relaxed text-brand sm:col-span-1 sm:text-right">{n.exercise}</span>}
     </div>
   )
 }
@@ -26,15 +30,18 @@ export function PhysiologySection({ onPickSystem }: Props) {
 
   return (
     <div className="space-y-3">
-      <p className="text-[11px] leading-relaxed text-neutral-400">
-        Anatomy is what the body is made of; physiology is what it does. Each system below shows its resting values
-        and — in green — what changes under exercise, which is the same load the Workout tab measures.
-      </p>
+      <div className="rounded-xl border border-brand/20 bg-brand/[0.04] p-3 dark:bg-brand/[0.08]">
+        <div className="text-[10px] font-black uppercase tracking-wide text-brand">Reference physiology · not a live body measurement</div>
+        <p className="mt-1 text-[11px] leading-relaxed text-neutral-500">{PHYSIOLOGY_EVIDENCE_BOUNDARY}</p>
+      </div>
+
       {SISTEM_FISIOLOGI.map((s) => {
         const terbuka = open === s.key
         return (
           <div key={s.key} className="rounded-xl border border-neutral-200 dark:border-white/10">
             <button
+              type="button"
+              aria-expanded={terbuka}
               onClick={() => {
                 setOpen(terbuka ? null : s.key)
                 if (!terbuka) onPickSystem(s.layer3d, s.searchTerms, s.label)
@@ -65,33 +72,40 @@ export function PhysiologySection({ onPickSystem }: Props) {
                   <p className="mt-0.5 text-xs leading-relaxed text-neutral-600 dark:text-neutral-300">{s.regulasi}</p>
                 </div>
                 <div>
-                  <div className="flex items-baseline justify-between gap-2">
-                    <span className="t-mikro font-bold uppercase tracking-wide text-neutral-500">Rest</span>
-                    <span className="t-mikro font-bold uppercase tracking-wide text-brand">Exercise</span>
+                  <div className="grid grid-cols-2 gap-2 text-[9px] font-black uppercase tracking-wide text-neutral-500 sm:grid-cols-[minmax(0,1fr)_minmax(110px,auto)_minmax(130px,auto)]">
+                    <span>Variable</span>
+                    <span className="text-right">Reference rest</span>
+                    <span className="col-span-2 text-right text-brand sm:col-span-1">Typical exercise response</span>
                   </div>
-                  <div className="mt-0.5">
-                    {s.angka.map((n) => <Baris key={n.label} n={n} />)}
-                  </div>
+                  <div className="mt-0.5">{s.angka.map((n) => <Baris key={n.label} n={n} />)}</div>
                 </div>
                 <div className="rounded-lg bg-brand/5 p-2.5 dark:bg-brand/10">
                   <div className="t-mikro font-bold uppercase tracking-wide text-brand">Under exercise</div>
                   <p className="mt-0.5 text-xs leading-relaxed text-ink dark:text-white">{s.saatOlahraga}</p>
                 </div>
+                {s.evidenceNote && (
+                  <div className="rounded-lg border border-amber-200 bg-amber-50/70 p-2.5 text-[10px] leading-relaxed text-amber-900 dark:border-amber-500/20 dark:bg-amber-500/10 dark:text-amber-200">
+                    <span className="font-black">Interpretation boundary. </span>{s.evidenceNote}
+                  </div>
+                )}
               </div>
             )}
           </div>
         )
       })}
 
-      <PhysiologyDeepDivePanel
-        onFocus={(topic) => onPickSystem(topic.layer3d, topic.searchTerms, topic.label)}
-      />
+      <PhysiologyDeepDivePanel onFocus={(topic) => onPickSystem(topic.layer3d, topic.searchTerms, topic.label)} />
 
-      <p className="text-[10.5px] leading-relaxed text-neutral-400">
-        Reference ranges are standard adult values from general physiology teaching, not diagnostic thresholds and
-        not targets for any individual. Deep-dive formulas are transparent teaching relationships and require measured
-        inputs plus clinical context before they can be used for patient interpretation.
-      </p>
+      <details className="rounded-xl border border-neutral-200 dark:border-white/10">
+        <summary className="cursor-pointer list-none px-3 py-2 text-[10px] font-bold text-neutral-500">Physiology reference basis</summary>
+        <div className="border-t border-neutral-100 p-3 text-[10px] leading-relaxed text-neutral-500 dark:border-white/5">
+          <p>Educational synthesis cross-checked against standard human and exercise physiology references:</p>
+          <ul className="mt-1 list-disc space-y-0.5 pl-4">
+            {PHYSIOLOGY_REFERENCE_SOURCES.map((source) => <li key={source}>{source}</li>)}
+          </ul>
+          <p className="mt-2">Reference envelopes are intentionally approximate. Individual interpretation requires measured data, measurement method, population context and—when clinically relevant—professional assessment.</p>
+        </div>
+      </details>
     </div>
   )
 }

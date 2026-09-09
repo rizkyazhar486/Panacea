@@ -24,6 +24,8 @@ const COMMONS_API = 'https://commons.wikimedia.org/w/api.php'
 const USER_AGENT = 'Panaceamed/1.0 (https://panaceamed.id; health education app)'
 const MAX_QUERY_LENGTH = 160
 
+type FetchLike = typeof fetch
+
 export interface AnatomyImage {
   title: string
   /** URL gambar ukuran tampil (bukan berkas asli yang bisa puluhan MB). */
@@ -117,7 +119,11 @@ function tautanGambarCommons(value: string | undefined): string {
 
 const MIME_DITERIMA = new Set(['image/jpeg', 'image/png', 'image/svg+xml', 'image/webp'])
 
-export async function searchAnatomyImages(query: string, limit = 8): Promise<AnatomyImage[]> {
+export async function searchAnatomyImages(
+  query: string,
+  limit = 8,
+  fetchImpl: FetchLike = fetch,
+): Promise<AnatomyImage[]> {
   const q = bersihkanPencarian(query)
   if (!q) return []
 
@@ -133,7 +139,7 @@ export async function searchAnatomyImages(query: string, limit = 8): Promise<Ana
     iiprop: 'url|extmetadata|mime',
     iiurlwidth: '1024',
   })
-  const res = await fetch(`${COMMONS_API}?${params.toString()}`, {
+  const res = await fetchImpl(`${COMMONS_API}?${params.toString()}`, {
     headers: { 'User-Agent': USER_AGENT, Accept: 'application/json' },
     signal: AbortSignal.timeout(9000),
   })
@@ -179,15 +185,21 @@ export async function searchAnatomyImages(query: string, limit = 8): Promise<Ana
  * seperti "vagina" di Commons juga mengembalikan foto non-klinis, sedangkan
  * yang dibutuhkan halaman ini adalah gambar anatomi/ilustrasi medis.
  */
-export async function anatomyImageLookup(structure: string): Promise<AnatomyImage[]> {
-  return cariGabungan(structure, (q) => [`${q} anatomy diagram`, `${q} anatomy`], sebut)
+export async function anatomyImageLookup(
+  structure: string,
+  fetchImpl: FetchLike = fetch,
+): Promise<AnatomyImage[]> {
+  return cariGabungan(structure, (q) => [`${q} anatomy diagram`, `${q} anatomy`], sebut, fetchImpl)
 }
 
 /**
  * Gambar PATOLOGI untuk satu organ — kata kuncinya diarahkan ke penyakitnya
  * ("pathology", "histopathology"), bukan anatomi normalnya.
  */
-export async function pathologyImageLookup(organ: string): Promise<AnatomyImage[]> {
+export async function pathologyImageLookup(
+  organ: string,
+  fetchImpl: FetchLike = fetch,
+): Promise<AnatomyImage[]> {
   return cariGabungan(
     organ,
     (q) => [`${q} histopathology`, `${q} pathology gross specimen`, `${q} pathology micrograph`],
@@ -196,6 +208,7 @@ export async function pathologyImageLookup(organ: string): Promise<AnatomyImage[
     // banyak gambar tampak salah. Judul berkasnya harus benar-benar
     // menyebut organnya DAN satu kata yang menandakan sediaan.
     (judul, q) => sebut(judul, q) && /histopath|patholog|carcinoma|tumou?r|lesion|specimen|biopsy|infarct|necros/i.test(judul),
+    fetchImpl,
   )
 }
 
@@ -208,11 +221,15 @@ export async function pathologyImageLookup(organ: string): Promise<AnatomyImage[
  * adalah mikrograf sediaan berpewarnaan. Karena itu kata kuncinya diarahkan ke
  * "histology"/"micrograph"/"H&E stain", bukan ke diagram anatomi.
  */
-export async function histologyImageLookup(tissue: string): Promise<AnatomyImage[]> {
+export async function histologyImageLookup(
+  tissue: string,
+  fetchImpl: FetchLike = fetch,
+): Promise<AnatomyImage[]> {
   return cariGabungan(
     tissue,
     (q) => [`${q} histology`, `${q} histology micrograph`, `${q} H&E stain`],
     (judul, q) => sebut(judul, q) && /histolog|micrograph|stain|H&E|section|slide|microscop/i.test(judul),
+    fetchImpl,
   )
 }
 
@@ -245,11 +262,12 @@ async function cariGabungan(
   term: string,
   varian: (q: string) => string[],
   saring?: (judul: string, q: string) => boolean,
+  fetchImpl: FetchLike = fetch,
 ): Promise<AnatomyImage[]> {
   const q = bersihkanPencarian(term)
   if (!q) return []
   const hasil = await Promise.all(
-    varian(q).map((v) => searchAnatomyImages(v, 8).catch(() => [] as AnatomyImage[])),
+    varian(q).map((v) => searchAnatomyImages(v, 8, fetchImpl).catch(() => [] as AnatomyImage[])),
   )
   const gabung: AnatomyImage[] = []
   for (const daftar of hasil) {
@@ -277,27 +295,39 @@ async function cariGabungan(
  * ketiganya berbeda jauh — tulang paling jelas di rontgen/CT, jaringan lunak
  * dan saraf justru paling jelas di MRI — jadi tabnya pun dipisah di layar.
  */
-export async function xrayImageLookup(structure: string): Promise<AnatomyImage[]> {
+export async function xrayImageLookup(
+  structure: string,
+  fetchImpl: FetchLike = fetch,
+): Promise<AnatomyImage[]> {
   return cariGabungan(
     structure,
     (q) => [`${q} radiograph`, `${q} x-ray`, `${q} plain film radiography`],
     (judul, q) => sebut(judul, q) && /radiograph|x-?ray|röntgen|roentgen/i.test(judul),
+    fetchImpl,
   )
 }
 
-export async function ctImageLookup(structure: string): Promise<AnatomyImage[]> {
+export async function ctImageLookup(
+  structure: string,
+  fetchImpl: FetchLike = fetch,
+): Promise<AnatomyImage[]> {
   return cariGabungan(
     structure,
     (q) => [`${q} CT scan`, `${q} computed tomography`, `${q} CT axial`],
     (judul, q) => sebut(judul, q) && /\bCT\b|computed tomograph|tomodensito/i.test(judul),
+    fetchImpl,
   )
 }
 
-export async function mriImageLookup(structure: string): Promise<AnatomyImage[]> {
+export async function mriImageLookup(
+  structure: string,
+  fetchImpl: FetchLike = fetch,
+): Promise<AnatomyImage[]> {
   return cariGabungan(
     structure,
     (q) => [`${q} MRI`, `${q} magnetic resonance imaging`, `${q} MRI sagittal`],
     (judul, q) => sebut(judul, q) && /\bMRI\b|magnetic resonance/i.test(judul),
+    fetchImpl,
   )
 }
 
@@ -314,12 +344,16 @@ export async function mriImageLookup(structure: string): Promise<AnatomyImage[]>
  * menandakan peragaan, supaya "row" tidak mengembalikan foto perahu dan
  * "press" tidak mengembalikan mesin cetak. Lisensi tetap dicek per berkas.
  */
-export async function exerciseImageLookup(exercise: string): Promise<AnatomyImage[]> {
+export async function exerciseImageLookup(
+  exercise: string,
+  fetchImpl: FetchLike = fetch,
+): Promise<AnatomyImage[]> {
   return cariGabungan(
     exercise,
     (q) => [`${q} exercise`, `${q} weight training`, `${q} fitness demonstration`],
     (judul, q) =>
       sebut(judul, q) &&
       /exercise|workout|training|fitness|gym|calisthenic|barbell|dumbbell|bodyweight|muscle/i.test(judul),
+    fetchImpl,
   )
 }

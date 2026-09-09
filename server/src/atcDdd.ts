@@ -47,7 +47,10 @@ export interface AtcProductCrosswalk {
   provenance?: string
 }
 
-const ATC_CODE = /^[A-V](?:\d{2}(?:[A-Z]{1,2}(?:\d{2})?)?)?$/
+// Official ATC hierarchy: 14 first-level groups, then 2 digits, 1 letter,
+// 1 letter, and finally 2 digits for the chemical-substance level.
+const ATC_MAIN_GROUP = '[ABCDGHJLMNPRSV]'
+const ATC_CODE = new RegExp(`^(?:${ATC_MAIN_GROUP}|${ATC_MAIN_GROUP}\\d{2}|${ATC_MAIN_GROUP}\\d{2}[A-Z]|${ATC_MAIN_GROUP}\\d{2}[A-Z]{2}|${ATC_MAIN_GROUP}\\d{2}[A-Z]{2}\\d{2})$`)
 
 export function isPlausibleAtcCode(value: string): boolean {
   return ATC_CODE.test(value.trim().toUpperCase())
@@ -73,20 +76,23 @@ export function verifiedAtcProductCrosswalk(input: {
   atcCode: string
   provenance: string
 }): AtcProductCrosswalk {
+  const productSource = input.productSource.trim()
+  const productId = input.productId.trim()
+  const ingredientName = input.ingredientName.trim()
   const atcCode = input.atcCode.trim().toUpperCase()
   const provenance = input.provenance.trim()
-  if (!isPlausibleAtcCode(atcCode) || !provenance) {
+  if (!productSource || !productId || !ingredientName || !isPlausibleAtcCode(atcCode) || !provenance) {
     return {
-      productSource: input.productSource.trim(),
-      productId: input.productId.trim(),
-      ingredientName: input.ingredientName.trim(),
+      productSource,
+      productId,
+      ingredientName,
       status: 'unmapped',
     }
   }
   return {
-    productSource: input.productSource.trim(),
-    productId: input.productId.trim(),
-    ingredientName: input.ingredientName.trim(),
+    productSource,
+    productId,
+    ingredientName,
     atcCode,
     status: 'verified',
     provenance,

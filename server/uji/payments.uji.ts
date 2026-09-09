@@ -1,5 +1,6 @@
 import assert from 'node:assert/strict'
-import { evaluatePaymentNotification, orderStatus, visibleOrderStatus } from '../src/payments'
+import crypto from 'node:crypto'
+import { evaluatePaymentNotification, orderStatus, verifyPaymentSignature, visibleOrderStatus } from '../src/payments'
 
 const ownOrder = { userId: 'user-a', status: 'pending' as const }
 const paidOrder = { userId: 'user-a', status: 'paid' as const }
@@ -20,6 +21,23 @@ const res = {
 orderStatus({ headers: {}, cookies: {}, params: { orderId: 'PMD-unknown' } } as any, res as any)
 assert.equal(statusCode, 401)
 assert.deepEqual(responseBody, { error: 'unauthorized' })
+
+const serverKey = 'test-midtrans-server-key'
+const signedBody = {
+  order_id: 'PMD-test-1',
+  status_code: '200',
+  gross_amount: '10000.00',
+  signature_key: crypto
+    .createHash('sha512')
+    .update('PMD-test-1' + '200' + '10000.00' + serverKey)
+    .digest('hex'),
+}
+assert.equal(verifyPaymentSignature(signedBody, serverKey), true)
+assert.equal(verifyPaymentSignature({ ...signedBody, signature_key: signedBody.signature_key.toUpperCase() }, serverKey), true)
+assert.equal(verifyPaymentSignature({ ...signedBody, gross_amount: '9999.00' }, serverKey), false)
+assert.equal(verifyPaymentSignature({ ...signedBody, signature_key: signedBody.signature_key.slice(2) }, serverKey), false)
+assert.equal(verifyPaymentSignature({ ...signedBody, signature_key: 'z'.repeat(128) }, serverKey), false)
+assert.equal(verifyPaymentSignature({ ...signedBody, signature_key: '' }, serverKey), false)
 
 const pending = { amountIdr: 10000, status: 'pending' as const }
 const paid = { amountIdr: 10000, status: 'paid' as const }
@@ -125,4 +143,4 @@ assert.deepEqual(
   { action: 'ignore' },
 )
 
-console.log('Payment ownership, amount, fraud, idempotence, and out-of-order webhook boundaries verified.')
+console.log('Payment ownership, constant-time signature, amount, fraud, idempotence, and out-of-order webhook boundaries verified.')

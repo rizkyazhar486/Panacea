@@ -1,4 +1,4 @@
-import { useMemo, useState, useSyncExternalStore } from 'react'
+import { useEffect, useMemo, useState, useSyncExternalStore } from 'react'
 import {
   WHOLE_BODY_REGIONS,
   type AtlasLayerKey,
@@ -8,9 +8,12 @@ import {
 } from '../../lib/wholeBodyAtlasBlueprint'
 import {
   anatomySourceNodeOrigin,
+  findReviewedAtlasTargetsForSourceSelection,
+  getAnatomySourceSelectionSnapshot,
   getEffectiveAnatomySourceNodeSnapshot,
   resolveAllAnatomySourceNodes,
   subscribeAnatomySourceNodes,
+  subscribeAnatomySourceSelection,
 } from '../../lib/anatomySourceNodeRegistry'
 import {
   buildAnatomyContextHandoff,
@@ -106,6 +109,26 @@ export function ZAnatomyAtlasWorkbench({ onHighlight, onFocusRegion, onEnableLay
     getEffectiveAnatomySourceNodeSnapshot,
     getEffectiveAnatomySourceNodeSnapshot,
   )
+  const viewerSelection = useSyncExternalStore(
+    subscribeAnatomySourceSelection,
+    getAnatomySourceSelectionSnapshot,
+    getAnatomySourceSelectionSnapshot,
+  )
+  const viewerTargets = useMemo(
+    () => findReviewedAtlasTargetsForSourceSelection(viewerSelection),
+    [viewerSelection.name, viewerSelection.file, viewerSelection.revision],
+  )
+  const viewerResolved = viewerTargets.length === 1 ? viewerTargets[0] : null
+
+  // A viewer tap may change the reviewed atlas target only when correspondence
+  // is unique. Ambiguous source meshes remain highlighted in the viewer without
+  // silently choosing between clinically different teaching contexts.
+  useEffect(() => {
+    if (!viewerResolved) return
+    setRegionKey(viewerResolved.region)
+    setSelectedKey(viewerResolved.key)
+    setQuery('')
+  }, [viewerResolved, viewerSelection.revision])
 
   const selected = entries.find((entry) => entry.key === selectedKey) ?? entries[0]
   const normalizedQuery = query.trim().toLocaleLowerCase()
@@ -225,6 +248,32 @@ export function ZAnatomyAtlasWorkbench({ onHighlight, onFocusRegion, onEnableLay
         onFocusRegion={onFocusRegion}
         onEnableLayer={onEnableLayer}
       />
+
+      {viewerSelection.name && (
+        <section aria-live="polite" className="rounded-2xl border border-brand/20 bg-brand/[0.035] p-3">
+          <div className="flex flex-wrap items-start justify-between gap-2">
+            <div className="min-w-0">
+              <div className="text-[8px] font-black uppercase tracking-[0.16em] text-brand">Viewer → reviewed atlas sync</div>
+              <div className="mt-1 break-words font-mono text-[10px] font-black text-ink dark:text-white">{viewerSelection.name}</div>
+              <div className="mt-1 font-mono text-[8px] text-neutral-400">{viewerSelection.file ?? 'source layer not resolved'}</div>
+            </div>
+            {viewerResolved ? (
+              <span className="rounded-full border border-brand/30 bg-brand/10 px-2.5 py-1 text-[8px] font-black text-brand">Unique reviewed mapping</span>
+            ) : viewerTargets.length > 1 ? (
+              <span className="rounded-full border border-amber-300/30 bg-amber-400/10 px-2.5 py-1 text-[8px] font-black text-amber-700 dark:text-amber-200">Ambiguous · {viewerTargets.length} targets</span>
+            ) : (
+              <span className="rounded-full border border-neutral-300 px-2.5 py-1 text-[8px] font-black text-neutral-500 dark:border-white/15">Exact source node only</span>
+            )}
+          </div>
+          {viewerResolved ? (
+            <p className="mt-2 text-[9px] leading-relaxed text-neutral-500">This exact GLB node maps uniquely to <span className="font-bold text-ink dark:text-white">{viewerResolved.label}</span>. The Workbench region and selected teaching target have been synchronized automatically; the source mesh itself remains the evidence-bearing geometry.</p>
+          ) : viewerTargets.length > 1 ? (
+            <p className="mt-2 text-[9px] leading-relaxed text-neutral-500">The exact mesh name overlaps multiple reviewed teaching targets ({viewerTargets.map((target) => target.label).join(', ')}). Panacea keeps the viewer highlight but does not guess which clinical context you intended.</p>
+          ) : (
+            <p className="mt-2 text-[9px] leading-relaxed text-neutral-500">The source node is real and remains selected in the 3D viewer, but no unique reviewed catalogue target is claimed from its name. This is a mapping limitation, not evidence that the anatomy is absent.</p>
+          )}
+        </section>
+      )}
 
       <section className="grid gap-3 xl:grid-cols-[0.72fr_1.28fr]">
         <div className="space-y-3">
