@@ -81,13 +81,21 @@ export function LongevityRecordedSnapshot({ vitals }: { vitals: Vitals }) {
         </p>
       </div>
 
-      <section className="mt-3 rounded-2xl border border-neutral-200 p-3 dark:border-white/10" aria-labelledby="longevity-recorded-checklist-title">
+      <section
+        className="mt-3 rounded-2xl border border-neutral-200 p-3 dark:border-white/10"
+        aria-labelledby="longevity-recorded-checklist-title"
+        aria-label="Longevity recorded-input safety checklist"
+      >
         <div id="longevity-recorded-checklist-title" className="text-[10px] font-black uppercase tracking-[0.16em] text-neutral-500">
           Recorded-input safety checklist
         </div>
         <div className="mt-2 space-y-2">
           {checklist.map((item) => (
-            <div key={item.id} className="grid grid-cols-[auto_1fr] gap-2 rounded-xl bg-neutral-50 p-2.5 dark:bg-white/[0.03]">
+            <div
+              key={item.id}
+              data-check-id={item.id}
+              className="grid grid-cols-[auto_1fr] gap-2 rounded-xl bg-neutral-50 p-2.5 dark:bg-white/[0.03]"
+            >
               <span className={`mt-0.5 inline-flex h-5 min-w-5 items-center justify-center rounded-full text-[10px] font-black ${item.ok ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-500/15 dark:text-emerald-300' : 'bg-amber-100 text-amber-700 dark:bg-amber-500/15 dark:text-amber-300'}`} aria-hidden="true">
                 {item.ok ? '✓' : '!'}
               </span>
