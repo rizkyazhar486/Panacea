@@ -31,6 +31,14 @@ function clampRows(rows: number): number {
   return Math.max(1, Math.min(MAX_OLS_ROWS, Math.trunc(rows)))
 }
 
+/**
+ * Merapikan definisi ontologi untuk dibaca manusia.
+ *
+ * Definisi DOID ditulis untuk mesin dan memuat nama relasi apa adanya:
+ * "The disease has_symptom fever, has_symptom malaise, has_symptom back pain."
+ * Itu tampil di layar sebagai teks rusak. Relasinya diubah jadi bahasa biasa
+ * dan pengulangannya diringkas, tanpa membuang satu pun isinya.
+ */
 export function rapikanDefinisi(teks: string): string {
   if (!teks) return ''
   let t = teks
