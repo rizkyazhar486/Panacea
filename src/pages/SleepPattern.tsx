@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import { Card, SectionTitle } from '../components/ui'
 import { IconHeart, IconActivity, IconTimer } from '../components/icons'
 import { api, backendEnabled, type SleepNight } from '../lib/api'
+import { buildSleepRecordedChecklist, summarizeSleepRecordedChecklist } from '../lib/sleepRecordedChecklist'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Sleep Pattern — per tahapan, per malam.
@@ -117,6 +118,9 @@ export function SleepPattern() {
     }
   }, [urut])
 
+  const checklist = useMemo(() => buildSleepRecordedChecklist(urut), [urut])
+  const checklistSummary = useMemo(() => summarizeSleepRecordedChecklist(checklist), [checklist])
+
   if (!backendEnabled) {
     return (
       <div className="space-y-4">
@@ -202,6 +206,30 @@ export function SleepPattern() {
                   : `Your bedtime moves about ${ringkas!.keteraturanMenit} minutes from night to night. A shift that size gives the body a moving time cue. If shift work makes a fixed bedtime impossible, the thing that helps most is fixing your WAKE TIME and getting bright light straight after — wake time is far easier to control than the moment you fall asleep.`}
               </p>
             )}
+          </Card>
+
+          <Card>
+            <SectionTitle
+              title="Recorded sleep data checklist"
+              subtitle={`${checklistSummary.ready}/${checklistSummary.total} integrity checks ready`}
+            />
+            <p className="mt-2 text-sm leading-relaxed text-neutral-500">
+              Checks the stored record layer only: history bounds, timestamps, source identity, and supplied hour values.
+              It does not clinically validate wearable sleep staging or the interpretation text elsewhere on this page.
+            </p>
+            <ul className="mt-3 space-y-2" aria-label="Recorded sleep data integrity checks">
+              {checklist.map((item) => (
+                <li key={item.id} className="rounded-lg border border-white/10 bg-white/[0.03] p-3">
+                  <div className="flex flex-wrap items-center justify-between gap-2">
+                    <span className="text-sm font-semibold text-ink">{item.title}</span>
+                    <span className={`text-[10px] font-bold uppercase tracking-wider ${item.status === 'ready' ? 'text-emerald-300' : 'text-amber-200'}`}>
+                      {item.status === 'ready' ? 'Ready' : 'Attention'}
+                    </span>
+                  </div>
+                  <p className="mt-1 text-xs leading-relaxed text-neutral-500">{item.detail}</p>
+                </li>
+              ))}
+            </ul>
           </Card>
 
           <Card>
