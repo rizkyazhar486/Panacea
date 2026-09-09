@@ -9,6 +9,7 @@ import {
   type GeometryProvenance,
 } from '../../lib/wholeBodyAtlasBlueprint'
 import { calculateExternalLoad } from '../../lib/biomechanicsModel'
+import BodyMultisystemScaleNavigator from './BodyMultisystemScaleNavigator'
 import BreathAtlasLab from './BreathAtlasLab'
 import WholeBodyMotionInspector from './WholeBodyMotionInspector'
 import ZAnatomyAtlasWorkbench from './ZAnatomyAtlasWorkbench'
@@ -143,6 +144,8 @@ export function WholeBodyPrecisionLab({ onHighlight, onFocusRegion, onEnableLaye
           <div className="rounded-xl border border-white/10 bg-white/5 p-3"><div className="text-[9px] font-bold uppercase tracking-wide text-brand">Truth rule</div><p className="mt-1 text-[10px] leading-relaxed text-neutral-300">{ATLAS_REFERENCE_MODEL.truthRule}</p></div>
         </div>
       </div>
+
+      <BodyMultisystemScaleNavigator />
 
       <div className="grid grid-cols-2 gap-1 rounded-xl bg-neutral-100 p-1 dark:bg-white/5 md:grid-cols-5">
         {([['z-anatomy', 'Z-Anatomy atlas'], ['breath-atlas', 'Breath atlas'], ['unfolded', 'Unfolded body'], ['specialty', 'Specialty atlas'], ['movement', 'Movement biomechanics']] as const).map(([key, label]) => (
