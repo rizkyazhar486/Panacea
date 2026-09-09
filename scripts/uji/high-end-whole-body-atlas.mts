@@ -153,5 +153,10 @@ assert.deepEqual(validateHighEndAtlasFrame(frameInput), [])
 const readiness = highEndAtlasEngineeringReadiness()
 assert.equal(readiness.academicReviewRequired, true)
 assert.ok(readiness.nodeCount >= BRONCHOPULMONARY_SEGMENT_RUNTIME.length)
+assert.deepEqual(
+  readiness.blockingEngineeringIssues.filter((issue) => issue.startsWith('manifest:invalid-academic-review:')),
+  [],
+  'High-end engineering readiness must surface canonical academic-review claim defects instead of bypassing them.',
+)
 
-console.log('High-end whole-body atlas: adaptive streaming, residency hysteresis, multiscale navigation, respiratory segment routing, and review boundaries verified.')
+console.log('High-end whole-body atlas: adaptive streaming, residency hysteresis, multiscale navigation, respiratory segment routing, canonical manifest validity, and review boundaries verified.')
