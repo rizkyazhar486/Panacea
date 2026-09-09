@@ -104,10 +104,65 @@ export function confirmPayment(req: Request, res: Response) {
   res.json({ ok: true, status: 'paid' })
 }
 
-// Real Midtrans webhook (HTTP notification). Verifies signature, credits wallet.
+type PaymentNotificationOrder = Pick<Order, 'amountIdr' | 'status'>
+export type PaymentNotificationDecision =
+  | { action: 'fulfill' }
+  | { action: 'fail' }
+  | { action: 'ignore' }
+  | { action: 'reject'; status: 400 | 409; error: 'invalid_status_code' | 'amount_mismatch' | 'fraud_not_accepted' }
+
+/**
+ * Pure webhook-state gate. Signature verification happens separately in the
+ * HTTP handler; this function checks whether an authenticated notification is
+ * actually safe to fulfill against the order Panacea created.
+ *
+ * Midtrans documents successful delivery as transaction_status settlement (or
+ * capture for card), status_code 200, and fraud_status=accept when the field is
+ * present. We additionally require the signed gross_amount to match the local
+ * order amount, and never downgrade an already-paid order when delayed failure
+ * notifications arrive out of order.
+ */
+export function evaluatePaymentNotification(
+  body: Record<string, string>,
+  order: PaymentNotificationOrder,
+): PaymentNotificationDecision {
+  const transactionStatus = String(body.transaction_status ?? '').trim().toLowerCase()
+  const success = transactionStatus === 'settlement' || transactionStatus === 'capture'
+
+  if (success) {
+    if (String(body.status_code ?? '').trim() !== '200') {
+      return { action: 'reject', status: 409, error: 'invalid_status_code' }
+    }
+
+    const grossAmount = Number(body.gross_amount)
+    if (!Number.isFinite(grossAmount) || Math.abs(grossAmount - order.amountIdr) > 0.005) {
+      return { action: 'reject', status: 409, error: 'amount_mismatch' }
+    }
+
+    const fraudStatus = String(body.fraud_status ?? '').trim().toLowerCase()
+    if (fraudStatus && fraudStatus !== 'accept') {
+      return { action: 'reject', status: 409, error: 'fraud_not_accepted' }
+    }
+
+    if (order.status === 'paid') return { action: 'ignore' }
+    return { action: 'fulfill' }
+  }
+
+  if (['deny', 'cancel', 'expire'].includes(transactionStatus)) {
+    // Midtrans notes notifications can arrive out of order. A delayed failure
+    // event must never roll a fulfilled order back to failed.
+    if (order.status === 'paid') return { action: 'ignore' }
+    return { action: 'fail' }
+  }
+
+  return { action: 'ignore' }
+}
+
+// Real Midtrans webhook (HTTP notification). Verifies signature and only then
+// applies a state transition that is safe for the matching local order.
 export function paymentWebhook(req: Request, res: Response) {
   const body = req.body as Record<string, string>
-  const { order_id, status_code, gross_amount, signature_key, transaction_status } = body
+  const { order_id, status_code, gross_amount, signature_key } = body
   if (!order_id) return res.status(400).json({ error: 'bad_request' })
   const expected = crypto
     .createHash('sha512')
@@ -118,12 +173,14 @@ export function paymentWebhook(req: Request, res: Response) {
   const order = getOrder(order_id)
   if (!order) return res.status(404).json({ error: 'order_not_found' })
 
-  if (transaction_status === 'settlement' || transaction_status === 'capture') {
-    if (order.status !== 'paid') {
-      setOrderStatus(order.id, 'paid')
-      fulfillOrder(order)
-    }
-  } else if (['deny', 'cancel', 'expire'].includes(transaction_status)) {
+  const decision = evaluatePaymentNotification(body, order)
+  if (decision.action === 'reject') {
+    return res.status(decision.status).json({ error: decision.error })
+  }
+  if (decision.action === 'fulfill') {
+    setOrderStatus(order.id, 'paid')
+    fulfillOrder(order)
+  } else if (decision.action === 'fail') {
     setOrderStatus(order.id, 'failed')
   }
   res.json({ ok: true })
