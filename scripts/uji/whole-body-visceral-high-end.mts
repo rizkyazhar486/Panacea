@@ -58,11 +58,13 @@ for (const side of ['right', 'left'] as const) {
   ]) assert.equal(urine.nodeIds.includes(checkpoint), true, `Urinary path must include ${checkpoint}.`)
 }
 
-const rightLymph = requirePath('lymph:right-inguinal-nodes', 'cv:right-venous-angle', ['drains'])
-assert.equal(rightLymph.nodeIds.includes('lymph:cisterna-chyli'), true)
-assert.equal(rightLymph.nodeIds.includes('lymph:thoracic-duct'), false, 'Right lower-limb lymph reaches the left venous angle through thoracic duct, not right venous angle.')
-
-// Correct central anatomy: lower-body lymph drains through cisterna chyli and thoracic duct to the LEFT venous angle.
+// Lower-body lymph must NOT be routed to the right lymphatic duct. Both lower limbs
+// drain centrally through lumbar trunks/cisterna chyli/thoracic duct to the LEFT venous angle.
+assert.equal(
+  traceAtlasPath(manifest, 'lymph:right-inguinal-nodes', 'cv:right-venous-angle', ['drains']),
+  null,
+  'Right lower-limb lymph must not be incorrectly routed to the right venous angle.',
+)
 const rightLowerBodyToLeftAngle = requirePath('lymph:right-inguinal-nodes', 'cv:left-venous-angle', ['drains'])
 assert.equal(rightLowerBodyToLeftAngle.nodeIds.includes('lymph:cisterna-chyli'), true)
 assert.equal(rightLowerBodyToLeftAngle.nodeIds.includes('lymph:thoracic-duct'), true)
