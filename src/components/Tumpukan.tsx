@@ -2,6 +2,7 @@ import { Suspense, useEffect, useRef, useState, type CSSProperties, type ReactNo
 import '../styles/widget-living-instrument-v5.css'
 import '../styles/widget-concepts-v8.css'
 import '../styles/widget-dark-surface-v29.css'
+import '../styles/home-widget-loading-copy-v37.css'
 
 type WidgetItem = { kunci: string; isi: ReactNode }
 type InstrumentMeta = {
@@ -287,7 +288,13 @@ export function Tumpukan({ judul, anak, aksi }: { judul?: string; anak: WidgetIt
               aria-hidden={aktifItem?.i !== i}
             >
               {i < siap ? (
-                <Suspense fallback={<div className="widget-instrument-loading-v29" aria-hidden />}>
+                <Suspense
+                  fallback={(
+                    <div className="widget-instrument-loading-v29" role="status" aria-live="polite" aria-busy="true">
+                      <span className="widget-instrument-loading-copy-v37">Loading widget…</span>
+                    </div>
+                  )}
+                >
                   {a.isi}
                 </Suspense>
               ) : null}
