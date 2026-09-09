@@ -1,5 +1,4 @@
-import type { AtlasRegionKey } from '../wholeBodyAtlasBlueprint'
-import type { HighEndAtlasSystemKey } from './highEndAtlasOntology'
+import type { AtlasRegionId, AtlasSystemId } from './atlasKernel'
 
 export interface AtlasLodCost {
   triangles: number
@@ -15,9 +14,9 @@ export interface AtlasLodOption extends AtlasLodCost {
 
 export interface AtlasRenderCandidate {
   structureId: string
-  system: HighEndAtlasSystemKey
-  region: AtlasRegionKey | 'whole-body'
-  clinicalImportance: number
+  system: AtlasSystemId
+  region: AtlasRegionId
+  educationalImportance: number
   projectedCoverage: number
   required: boolean
   lods: readonly AtlasLodOption[]
@@ -27,8 +26,8 @@ export interface AtlasRenderBudget extends AtlasLodCost {}
 
 export interface AtlasFocusContext {
   structureIds: ReadonlySet<string>
-  systems: ReadonlySet<HighEndAtlasSystemKey>
-  regions: ReadonlySet<AtlasRegionKey>
+  systems: ReadonlySet<AtlasSystemId>
+  regions: ReadonlySet<AtlasRegionId>
 }
 
 export interface PlannedAtlasAsset {
@@ -85,19 +84,19 @@ function validLods(candidate: AtlasRenderCandidate) {
 }
 
 /**
- * Priority formula:
+ * Educational graphics priority, never a clinical probability:
  *
- * P = (F × R × C × S) / max(K, 1)
+ * P = (F × R × E × S) / max(K, 1)
  *
- * F = explicit focus/system focus weight
+ * F = explicit structure/system focus weight
  * R = region focus weight
- * C = bounded clinical importance multiplier
+ * E = bounded educational-importance multiplier
  * S = projected screen contribution multiplier
  * K = normalized cost of the candidate's cheapest valid LOD
  *
- * Cost is used only for ordering optional structures. Required structures are
- * first reserved at their cheapest LOD and are never silently dropped to make
- * an apparently successful plan.
+ * Required structures are first reserved at their cheapest valid LOD. If their
+ * combined minimum cannot fit, planning fails closed with `budget-blocked`
+ * instead of silently exceeding device budgets or omitting the selected target.
  */
 export function atlasPriorityScore(candidate: AtlasRenderCandidate, focus: AtlasFocusContext) {
   const lods = validLods(candidate)
@@ -108,10 +107,10 @@ export function atlasPriorityScore(candidate: AtlasRenderCandidate, focus: Atlas
     : focus.systems.has(candidate.system)
       ? 2.25
       : 1
-  const regionWeight = candidate.region !== 'whole-body' && focus.regions.has(candidate.region) ? 1.75 : 1
-  const clinicalWeight = 1 + clamp01(candidate.clinicalImportance)
+  const regionWeight = focus.regions.has(candidate.region) ? 1.75 : 1
+  const educationalWeight = 1 + clamp01(candidate.educationalImportance)
   const screenWeight = 0.25 + 1.75 * clamp01(candidate.projectedCoverage)
-  return (focusWeight * regionWeight * clinicalWeight * screenWeight) / normalizedCost(cheapest)
+  return (focusWeight * regionWeight * educationalWeight * screenWeight) / normalizedCost(cheapest)
 }
 
 function cheapestLod(candidate: AtlasRenderCandidate) {
@@ -155,8 +154,6 @@ export function planHighEndAtlasLods(
   let usage = zeroUsage()
   const unresolvedRequired: string[] = []
 
-  // Phase 1: reserve the cheapest representation of every hard-required node.
-  // If any required minimum cannot fit, fail closed rather than hiding it.
   for (const { candidate, priority } of ordered.filter(({ candidate }) => candidate.required)) {
     const lod = cheapestLod(candidate)
     if (!lod || !fits(usage, lod, positiveBudget)) {
@@ -177,7 +174,6 @@ export function planHighEndAtlasLods(
     }
   }
 
-  // Phase 2: admit optional nodes at their cheapest LOD by deterministic value.
   for (const { candidate, priority } of ordered.filter(({ candidate }) => !candidate.required)) {
     const lod = cheapestLod(candidate)
     if (!lod || !fits(usage, lod, positiveBudget)) continue
@@ -185,9 +181,6 @@ export function planHighEndAtlasLods(
     usage = addCost(usage, lod)
   }
 
-  // Phase 3: spend remaining budget on the highest marginal quality gain per
-  // incremental normalized cost. One step at a time prevents a large organ from
-  // consuming all headroom before smaller high-value structures can upgrade.
   while (true) {
     const upgradeCandidates = [...selected.values()]
       .map((planned) => {
@@ -200,7 +193,7 @@ export function planHighEndAtlasLods(
         if (!fits(usage, delta, positiveBudget)) return null
         const qualityGain = upgrade.quality - planned.lod.quality
         const marginalValue = (qualityGain * Math.max(planned.priority, EPSILON)) / normalizedCost(delta)
-        return { candidate, planned, upgrade, delta, marginalValue }
+        return { planned, upgrade, delta, marginalValue }
       })
       .filter((entry): entry is NonNullable<typeof entry> => Boolean(entry))
       .sort((a, b) => b.marginalValue - a.marginalValue
