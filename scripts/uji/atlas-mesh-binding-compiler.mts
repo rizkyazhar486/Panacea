@@ -110,6 +110,24 @@ assert.ok(leftCarotidBinding.candidates[0].reasons.includes('explicit-file-allow
 assert.ok(leftCarotidBinding.candidates[0].reasons.includes('laterality-boundary'))
 assert.ok(leftCarotidBinding.candidates[0].reasons.includes('region-boundary'))
 
+const fallbackThresholdNode = atlasNode({
+  id: 'test:left-carotid-threshold-fallback',
+  label: 'Left common carotid artery',
+  system: 'cardiovascular',
+  regions: ['neck'],
+  laterality: 'left',
+  hints: ['artery', 'common carotid artery'],
+  files: ['cardiovascular.glb'],
+})
+const fallbackThresholdBinding = compileAtlasNodeMeshBinding(fallbackThresholdNode, syntheticGraph, { minScore: 1_400 })
+assert.equal(
+  fallbackThresholdBinding.status,
+  'bound',
+  'a below-threshold earlier hint must not prevent a later reviewed hint from resolving the same node',
+)
+assert.deepEqual(fallbackThresholdBinding.matchedHints, ['common carotid artery'])
+assert.deepEqual(fallbackThresholdBinding.selectedMeshNodeIds, ['mesh:carotid:left'])
+
 const broadArtery = atlasNode({
   id: 'test:broad-artery',
   label: 'Artery',
@@ -211,4 +229,4 @@ assert.equal(collisions.length, 1)
 assert.equal(collisions[0].meshNodeId, 'mesh:carotid:left')
 assert.deepEqual(collisions[0].atlasNodeIds, ['test:left-carotid', 'test:left-carotid-duplicate'])
 
-console.log('Atlas mesh binding compiler: specificity fallback, laterality/region/file boundaries, composite binding, threshold semantics, selection-cap partial state, ambiguity fail-closed behavior, metadata-only gate, and collision audit verified.')
+console.log('Atlas mesh binding compiler: specificity fallback, exhaustive reviewed hints, laterality/region/file boundaries, composite binding, threshold semantics, selection-cap partial state, ambiguity fail-closed behavior, metadata-only gate, and collision audit verified.')
