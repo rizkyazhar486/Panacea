@@ -57,10 +57,8 @@ jobs:
         run: npm run uji:mygene
       - name: Test Wikimedia Commons image adapter
         run: npm run uji:commons
-      - name: Test environment and food adapters
+      - name: Test environment and Open Food Facts adapters
         run: npm run uji:lingkungan
-      - name: Test Open Food Facts adapter
-        run: npm run uji:open-food-facts
       - name: Test Open-Meteo adapter
         run: npm run uji:open-meteo
       - name: Test anatomy ontology adapter
@@ -83,10 +81,8 @@ jobs:
         run: npm run uji:product-atc
       - name: Test SATUSEHAT FHIR boundary
         run: npm run uji:satusehat
-      - name: Test health webhook ingestion
+      - name: Test health webhook ingestion and malformed-date regression
         run: npm run uji:health-webhook
-      - name: Test health webhook malformed-date regression
-        run: npm run uji:health-webhook-repro
       - name: Test Connect privacy boundaries
         run: npm run uji:connect-privacy
       - name: Test market data adapter
