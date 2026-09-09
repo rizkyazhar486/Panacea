@@ -1,11 +1,39 @@
-import { useState } from 'react'
+import { useState, useSyncExternalStore } from 'react'
 import { URUTAN, WILAYAH, KEDALAMAN, type UrutanLapisan } from '../../lib/dissection'
 import { consumeAnatomyContextHandoff } from '../../lib/anatomyContextHandoff'
-import { SURGICAL_SPATIAL_SCENARIOS } from '../../lib/surgicalSpatialTeaching'
+import {
+  filterAnatomySourceBundlesForAtlasRegion,
+  getEffectiveAnatomySourceNodeSnapshot,
+  resolveAllAnatomySourceNodes,
+  subscribeAnatomySourceNodes,
+} from '../../lib/anatomySourceNodeRegistry'
+import {
+  SURGICAL_SPATIAL_SCENARIOS,
+  type SurgicalSpatialCheckpoint,
+  type SurgicalSpatialRegion,
+} from '../../lib/surgicalSpatialTeaching'
+import type { AtlasLayerKey, AtlasRegionKey } from '../../lib/wholeBodyAtlasBlueprint'
 
 export interface SurgicalLabProps {
   onKedalaman?: (kedalaman: number) => void
   onSorot?: (nama: string[]) => void
+}
+
+const SOURCE_FILE_BY_LAYER: Record<AtlasLayerKey, string> = {
+  surface: 'surface.glb',
+  skeletal: 'skeletal.glb',
+  muscular: 'muscular.glb',
+  cardiovascular: 'cardiovascular.glb',
+  nervous: 'nervous.glb',
+  visceral: 'visceral.glb',
+  lymphoid: 'lymphoid.glb',
+}
+
+const ATLAS_REGION_BY_SURGICAL_REGION: Record<SurgicalSpatialRegion, AtlasRegionKey> = {
+  cardiac: 'thorax',
+  abdomen: 'abdomen',
+  hand: 'upper-limb',
+  knee: 'lower-limb',
 }
 
 export function kedalamanUntukLangkah(langkah: number, total: number): number {
@@ -20,9 +48,28 @@ export function SurgicalLab({ onKedalaman, onSorot }: SurgicalLabProps) {
   const [kunci, setKunci] = useState<string | null>(null)
   const [langkah, setLangkah] = useState(0)
   const [spatialId, setSpatialId] = useState(initialSpatial.id)
+  const sourceBundles = useSyncExternalStore(
+    subscribeAnatomySourceNodes,
+    getEffectiveAnatomySourceNodeSnapshot,
+    getEffectiveAnatomySourceNodeSnapshot,
+  )
   const dipilih: UrutanLapisan | undefined = URUTAN.find((u) => u.kunci === kunci)
   const lapis = dipilih?.lapis[Math.min(langkah, dipilih.lapis.length - 1)]
   const spatial = SURGICAL_SPATIAL_SCENARIOS.find((item) => item.id === spatialId) ?? SURGICAL_SPATIAL_SCENARIOS[0]
+  const incomingExactNames = incomingHandoff ? [...incomingHandoff.resolvedNodeNames] : []
+
+  function exactCheckpointNames(region: SurgicalSpatialRegion, checkpoint: SurgicalSpatialCheckpoint) {
+    const allowedFiles = new Set(checkpoint.layerHints.map((layer) => SOURCE_FILE_BY_LAYER[layer]))
+    const layerBundles = sourceBundles.filter((bundle) => allowedFiles.has(bundle.file))
+    const regionalBundles = filterAnatomySourceBundlesForAtlasRegion(
+      layerBundles,
+      ATLAS_REGION_BY_SURGICAL_REGION[region],
+    )
+    return [...new Set(
+      resolveAllAnatomySourceNodes(checkpoint.nodeHints, regionalBundles)
+        .flatMap((match) => match.names),
+    )]
+  }
 
   function pilih(u: UrutanLapisan) {
     setKunci(u.kunci)
@@ -38,11 +85,7 @@ export function SurgicalLab({ onKedalaman, onSorot }: SurgicalLabProps) {
   }
 
   function highlightIncomingContext() {
-    if (!incomingHandoff) return
-    const names = incomingHandoff.resolvedNodeNames.length > 0
-      ? [...incomingHandoff.resolvedNodeNames]
-      : [...incomingHandoff.nodeHints]
-    onSorot?.(names)
+    onSorot?.(incomingExactNames)
   }
 
   return (
@@ -59,7 +102,7 @@ export function SurgicalLab({ onKedalaman, onSorot }: SurgicalLabProps) {
               <div className="text-[8px] font-black uppercase tracking-[0.16em] text-red-300">From Z-Anatomy · curated surgical route</div>
               <div className="mt-1 text-xs font-black text-white">{incomingHandoff.structureLabel} → {initialSpatial.label}</div>
               <p className="mt-1 text-[9px] leading-relaxed text-neutral-400">This one-shot context opens a repository-curated teaching scenario. It does not infer a procedure from mesh names, establish qualified human review, or define a patient-specific safe corridor.</p>
-              <button type="button" onClick={highlightIncomingContext} className="mt-2 min-h-10 rounded-full border border-red-300 px-3 text-[9px] font-black text-red-200 transition hover:bg-red-500 hover:text-white">Highlight source context in 3D →</button>
+              <button type="button" disabled={!incomingExactNames.length} onClick={highlightIncomingContext} className="mt-2 min-h-10 rounded-full border border-red-300 px-3 text-[9px] font-black text-red-200 transition hover:bg-red-500 hover:text-white disabled:cursor-not-allowed disabled:opacity-50">{incomingExactNames.length ? `Highlight ${incomingExactNames.length} exact source nodes →` : 'No exact source-node match to highlight'}</button>
             </div>
           )}
         </div>
@@ -87,28 +130,34 @@ export function SurgicalLab({ onKedalaman, onSorot }: SurgicalLabProps) {
           </div>
 
           <div className="mt-3 grid gap-2 lg:grid-cols-2">
-            {spatial.checkpoints.map((checkpoint) => (
-              <button
-                key={checkpoint.id}
-                type="button"
-                onClick={() => onSorot?.([...checkpoint.nodeHints, ...checkpoint.structuresAtRisk])}
-                className="rounded-xl border border-white/10 bg-white/[0.02] p-3 text-left transition hover:border-brand/40"
-              >
-                <div className="text-xs font-black text-white">{checkpoint.label}</div>
-                <p className="mt-1 text-[10px] leading-relaxed text-neutral-300">{checkpoint.anatomy}</p>
-                <div className="mt-2 text-[9px] font-black uppercase tracking-wide text-blue-300">Relationships</div>
-                <ul className="mt-1 space-y-0.5 text-[10px] leading-relaxed text-neutral-400">
-                  {checkpoint.relationships.map((relationship) => <li key={relationship}>• {relationship}</li>)}
-                </ul>
-                {checkpoint.structuresAtRisk.length > 0 && (
-                  <div className="mt-2 rounded-lg border border-red-400/20 bg-red-400/[0.05] p-2">
-                    <div className="text-[9px] font-black uppercase tracking-wide text-red-300">Adjacent / at-risk structures</div>
-                    <div className="mt-1 text-[10px] leading-relaxed text-neutral-300">{checkpoint.structuresAtRisk.join(' · ')}</div>
+            {spatial.checkpoints.map((checkpoint) => {
+              const exactNames = exactCheckpointNames(spatial.region, checkpoint)
+              return (
+                <button
+                  key={checkpoint.id}
+                  type="button"
+                  onClick={() => onSorot?.(exactNames)}
+                  className="rounded-xl border border-white/10 bg-white/[0.02] p-3 text-left transition hover:border-brand/40"
+                >
+                  <div className="flex items-start justify-between gap-2">
+                    <div className="text-xs font-black text-white">{checkpoint.label}</div>
+                    <span className={`shrink-0 rounded-full border px-2 py-0.5 text-[8px] font-black ${exactNames.length ? 'border-brand/30 bg-brand/10 text-brand' : 'border-amber-400/20 bg-amber-400/[0.05] text-amber-200'}`}>{exactNames.length ? `${exactNames.length} exact nodes` : 'text-only gap'}</span>
                   </div>
-                )}
-                <div className="mt-2 text-[9px] font-bold text-brand">Highlight represented anatomy in 3D →</div>
-              </button>
-            ))}
+                  <p className="mt-1 text-[10px] leading-relaxed text-neutral-300">{checkpoint.anatomy}</p>
+                  <div className="mt-2 text-[9px] font-black uppercase tracking-wide text-blue-300">Relationships</div>
+                  <ul className="mt-1 space-y-0.5 text-[10px] leading-relaxed text-neutral-400">
+                    {checkpoint.relationships.map((relationship) => <li key={relationship}>• {relationship}</li>)}
+                  </ul>
+                  {checkpoint.structuresAtRisk.length > 0 && (
+                    <div className="mt-2 rounded-lg border border-red-400/20 bg-red-400/[0.05] p-2">
+                      <div className="text-[9px] font-black uppercase tracking-wide text-red-300">Adjacent / at-risk structures</div>
+                      <div className="mt-1 text-[10px] leading-relaxed text-neutral-300">{checkpoint.structuresAtRisk.join(' · ')}</div>
+                    </div>
+                  )}
+                  <div className={`mt-2 text-[9px] font-bold ${exactNames.length ? 'text-brand' : 'text-amber-300'}`}>{exactNames.length ? 'Highlight exact represented anatomy in 3D →' : 'No exact regional source mesh · keep this checkpoint text-only'}</div>
+                </button>
+              )
+            })}
           </div>
 
           <div className="mt-3 rounded-xl border border-amber-400/20 bg-amber-400/[0.05] p-3 text-[9px] leading-relaxed text-neutral-400">

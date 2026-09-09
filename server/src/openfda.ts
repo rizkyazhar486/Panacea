@@ -7,6 +7,8 @@ const BASE = 'https://api.fda.gov/drug/label.json'
 const KEY = process.env.OPENFDA_KEY || ''
 const TIMEOUT_MS = 8000
 const MAX_QUERY_LENGTH = 160
+// SPL set_id is UUID-shaped; malformed upstream identity must fail closed.
+const SPL_SET_ID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
 
 export interface DrugInfo {
   brand: string
@@ -18,9 +20,9 @@ export interface DrugInfo {
   dosage: string
   adverse: string
   manufacturer: string
-  /** Stable source identity when openFDA supplies a SPL set_id or record id. */
+  /** Stable source identity when openFDA supplies a valid SPL set_id or record id. */
   labelId?: string
-  /** Exact openFDA source query for the SPL set_id; never contains an API key. */
+  /** Exact openFDA source query for a valid SPL set_id; never contains an API key. */
   sourceUrl?: string
 }
 
@@ -42,14 +44,20 @@ const clip = (s: string, n = 1200) => (s.length > n ? s.slice(0, n).trimEnd() + 
 
 function cleanQuery(value: string): string {
   return value
-    .replace(/[<>\\":]/g, ' ')
+    .replace(/[<>\\\":]/g, ' ')
     .replace(/\s+/g, ' ')
     .trim()
     .slice(0, MAX_QUERY_LENGTH)
 }
 
+function normalizeSplSetId(value: string | undefined): string | undefined {
+  const clean = value?.trim()
+  if (!clean || !SPL_SET_ID.test(clean)) return undefined
+  return clean.toLowerCase()
+}
+
 function sourceUrlForSetId(setId: string | undefined): string | undefined {
-  const clean = setId?.trim()
+  const clean = normalizeSplSetId(setId)
   if (!clean) return undefined
   const params = new URLSearchParams({ search: `set_id:"${clean}"`, limit: '1' })
   return `${BASE}?${params.toString()}`
@@ -84,7 +92,7 @@ export async function lookupDrug(name: string): Promise<DrugInfo | null> {
   }
   if (!r) return null
 
-  const setId = r.set_id?.trim() || undefined
+  const setId = normalizeSplSetId(r.set_id)
   const recordId = r.id?.trim() || undefined
 
   return {
