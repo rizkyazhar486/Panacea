@@ -38,7 +38,7 @@ export interface WidgetDef {
 }
 
 export const WIDGETS: WidgetDef[] = [
-  { id: 'semangat', label: 'Three Small Things', ringkas: 'Something good you can do right now — it takes minutes', ke: '/all-features', emoji: '✨', kategori: 'Mind & Habits', bawaan: true },
+  { id: 'semangat', label: 'Three Small Things', ringkas: 'Something good you can do right now — it takes minutes', ke: '/semua-fitur', emoji: '✨', kategori: 'Mind & Habits', bawaan: true },
   { id: 'lifeStory', label: 'Your Story', ringkas: 'Health is one thread in a whole life — log the moments that shape yours', ke: '/my-story', emoji: '📖', kategori: 'Mind & Habits' },
   { id: 'medStudy', label: 'Med Study Hub', ringkas: 'Question bank, OSCE technique, and exam plans', ke: '/med-study', emoji: '📚', kategori: 'Clinical & Learning' },
   { id: 'tatalaksana', label: 'SKDI Therapy', ringkas: 'Find drugs and doses by disease', ke: '/med-study?bagian=therapy', emoji: '💊', kategori: 'Clinical & Learning' },
@@ -139,7 +139,7 @@ export const WIDGETS: WidgetDef[] = [
   { id: 'nadiPanjang', label: 'Resting HR, 30 Days', ringkas: 'Against your own usual band', ke: '/tubuh', emoji: '❤️', kategori: 'Body & Data' },
   { id: 'tidur14', label: 'Sleep, 14 Nights', ringkas: 'Median, and the nights that fell short', ke: '/pola-tidur', emoji: '🌙', kategori: 'Sleep & Recovery' },
   { id: 'muatanPekan', label: 'Training Minutes per Week', ringkas: 'The last eight weeks', ke: '/latihan', emoji: '📈', kategori: 'Training', bawaan: true },
-  { id: 'kaloriBanding', label: 'Logged Today', ringkas: 'Food and training you\'ve recorded', ke: '/nutrisi', emoji: '🍽️', kategori: 'Nutrition' },
+  { id: 'kaloriBanding', label: 'Logged Today', ringkas: 'Food and training you\'ve recorded', ke: '/nutrition', emoji: '🍽️', kategori: 'Nutrition' },
   { id: 'tdee', label: 'Daily Energy', ringkas: 'BMR, TDEE, calorie target and macros', ke: '/macro-lab', emoji: '🔥', kategori: 'Nutrition', bawaan: true },
   { id: 'aturanAngka', label: 'How Your Numbers Work', ringkas: 'What each number reads, what moves it, and what to do', ke: '/how-numbers-work', emoji: '🎯', kategori: 'Body & Data' },
   { id: 'kalistenik', label: 'Calisthenics Ladder', ringkas: 'Beginner to advanced — 109 movements, 4 phases', ke: '/calisthenics', emoji: '🤸', kategori: 'Training' },
