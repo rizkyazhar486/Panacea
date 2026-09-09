@@ -69,6 +69,8 @@ jobs:
         run: npm run uji:icd
       - name: Test canonical drug label orchestration
         run: npm run uji:drug-info
+      - name: Test payment webhook safety boundary
+        run: npm run uji:payments
       - name: Test body biomedical fail-closed coverage
         run: npm run uji:body-biomedical
       - name: Test WHO ATC/DDD provenance boundary
