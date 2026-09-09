@@ -53,4 +53,17 @@ assert.deepEqual(invalidTransfer.loadNow, ['required']);
 assert.deepEqual(invalidTransfer.prefetchNext, []);
 assert.ok(invalidTransfer.deferred.includes('unknown-size'));
 
+for (const invalidOverride of [Number.NaN, Number.POSITIVE_INFINITY, Number.NEGATIVE_INFINITY]) {
+  const invalidConcurrency = planBodyProgressivePrefetch(candidates, {
+    network: 'normal',
+    memory: 'high',
+    viewportWidth: 1440,
+    maxConcurrentOverride: invalidOverride,
+  });
+  assert.equal(invalidConcurrency.maxConcurrent, 0);
+  assert.deepEqual(invalidConcurrency.loadNow, []);
+  assert.deepEqual(invalidConcurrency.prefetchNext, []);
+  assert.ok(invalidConcurrency.deferred.includes('visceral-selected'));
+}
+
 console.log('body-progressive-prefetch-policy: bounded deterministic loading policy verified');
