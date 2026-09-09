@@ -7,6 +7,7 @@ import { awal, awalBulat } from '../lib/nilaiAwal'
 import { useVitals } from '../lib/useVitals'
 import { mergeVitals } from '../lib/healthVitals'
 import { mergeHealthCache } from '../lib/profile'
+import { buildRecoveryRecordedChecklist } from '../lib/recoveryRecordedChecklist'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Recovery & Strain — WHOOP-style daily loop, offline:
@@ -171,6 +172,21 @@ export function Readiness() {
   const strain = strainOf(today.workouts)
   const [lo, hi] = rec != null ? strainTarget(rec) : [8, 13]
   const tone = rec != null ? recTone(rec) : { color: '#a3a3a3', label: 'Fill in your morning check-in first' }
+  const recordedChecklist = useMemo(() => buildRecoveryRecordedChecklist(
+    { hrv: today.hrv, rhr: today.rhr, sleepH: today.sleepH },
+    {
+      hrvMs: typeof vitals.hrvMs === 'number' ? vitals.hrvMs : undefined,
+      restingHr: typeof vitals.restingHr === 'number' ? vitals.restingHr : undefined,
+      sleepH: typeof vitals.sleepH === 'number' ? vitals.sleepH : undefined,
+      source: typeof vitals.source === 'string' ? vitals.source : undefined,
+      measuredAt: typeof vitals.measuredAt === 'string' ? vitals.measuredAt : undefined,
+      syncedAt: typeof vitals.syncedAt === 'string' ? vitals.syncedAt : undefined,
+    },
+  ), [
+    today.hrv, today.rhr, today.sleepH,
+    vitals.hrvMs, vitals.restingHr, vitals.sleepH,
+    vitals.source, vitals.measuredAt, vitals.syncedAt,
+  ])
 
   // Week bars.
   const week = useMemo(() => Array.from({ length: 7 }, (_, i) => {
@@ -326,6 +342,40 @@ export function Readiness() {
             <div className="text-[10px] text-neutral-500">{debt > 2 ? 'sleep earlier tonight' : 'under control'}</div>
           </div>
         </div>
+      </Card>
+
+      <Card className="!p-5">
+        <SectionTitle
+          icon={<span className="text-lg">✓</span>}
+          title="Recorded-data safety check"
+          subtitle="Completeness, provenance, units and scientific boundary"
+        />
+        <div className="mt-2 space-y-2">
+          {recordedChecklist.map((item) => {
+            const statusLabel = item.status === 'pass' ? 'PASS' : item.status === 'attention' ? 'REVIEW' : 'WAITING'
+            const statusClass = item.status === 'pass'
+              ? 'bg-emerald-50 text-emerald-700'
+              : item.status === 'attention'
+                ? 'bg-amber-50 text-amber-700'
+                : 'bg-neutral-100 text-neutral-600'
+            return (
+              <div key={item.id} className="rounded-xl border border-neutral-100 p-3">
+                <div className="flex items-start justify-between gap-3">
+                  <div>
+                    <div className="text-xs font-bold">{item.label}</div>
+                    <p className="mt-1 text-[11px] leading-relaxed text-neutral-600">{item.detail}</p>
+                  </div>
+                  <span className={`shrink-0 rounded-full px-2 py-1 text-[9px] font-black tracking-wide ${statusClass}`}>
+                    {statusLabel}
+                  </span>
+                </div>
+              </div>
+            )
+          })}
+        </div>
+        <p className="mt-2 text-[10px] text-neutral-500">
+          Software/provenance check only. It is not clinical clearance and does not validate the readiness formula.
+        </p>
       </Card>
 
       {/* Log workout -> strain */}
