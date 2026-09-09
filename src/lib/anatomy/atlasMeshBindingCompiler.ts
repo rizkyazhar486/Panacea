@@ -239,6 +239,8 @@ function selectSpecificFallback(
   graph: BodyAtlasGraph,
   options: Required<AtlasMeshBindingCompilerOptions>,
 ): AtlasMeshBindingResult {
+  const rejectedCandidates: AtlasMeshBindingCandidate[] = []
+
   for (let hintIndex = 0; hintIndex < node.source.nodeHints.length; hintIndex += 1) {
     const hint = node.source.nodeHints[hintIndex]
     const ranked = rankCandidates(scopedMeshes
@@ -250,15 +252,8 @@ function selectSpecificFallback(
 
     const eligible = ranked.filter((candidate) => candidate.score >= options.minScore)
     if (!eligible.length) {
-      return {
-        atlasNodeId: node.id,
-        status: 'unresolved',
-        selectedMeshNodeIds: [],
-        candidates: ranked,
-        matchedHints: [],
-        unresolvedHints: [hint],
-        reasons: [`Best candidate did not meet minScore=${options.minScore}.`],
-      }
+      rejectedCandidates.push(...ranked)
+      continue
     }
 
     const { sameIdentity, ambiguous } = classifyCompetition(eligible, graph, options.ambiguityMargin)
@@ -293,10 +288,12 @@ function selectSpecificFallback(
     atlasNodeId: node.id,
     status: 'unresolved',
     selectedMeshNodeIds: [],
-    candidates: [],
+    candidates: rankCandidates(rejectedCandidates),
     matchedHints: [],
     unresolvedHints: [...node.source.nodeHints],
-    reasons: ['No reviewed source hint resolved inside the explicit file/region/laterality boundaries.'],
+    reasons: rejectedCandidates.length
+      ? [`No reviewed source hint met minScore=${options.minScore}; later hints were still evaluated before failing closed.`]
+      : ['No reviewed source hint resolved inside the explicit file/region/laterality boundaries.'],
   }
 }
 
