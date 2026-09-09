@@ -46,6 +46,15 @@ jobs:
 
       - name: Install mobile browser smoke runner
         run: |
+          # Playwright needs Ubuntu runtime libraries for its bundled Chromium,
+          # not the runner image's unrelated Google Chrome APT repository.
+          # Disable that external source only for this ephemeral CI runner so a
+          # temporarily inconsistent Chrome index cannot block all browser gates.
+          for source in /etc/apt/sources.list.d/google-chrome.list /etc/apt/sources.list.d/google-chrome.sources; do
+            if [ -f "$source" ]; then
+              sudo mv "$source" "${source}.disabled"
+            fi
+          done
           npm install --no-save --no-package-lock @playwright/test@1.55.0
           npx playwright install --with-deps chromium
 
