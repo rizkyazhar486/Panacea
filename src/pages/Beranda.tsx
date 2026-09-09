@@ -111,8 +111,19 @@ export default function Beranda() {
 
   useEffect(() => {
     const update = () => setRefresh((x) => x + 1)
+    const onVisibility = () => {
+      if (document.visibilityState === 'visible') update()
+    }
     window.addEventListener('panacea:health-updated', update)
-    return () => window.removeEventListener('panacea:health-updated', update)
+    window.addEventListener('storage', update)
+    window.addEventListener('focus', update)
+    document.addEventListener('visibilitychange', onVisibility)
+    return () => {
+      window.removeEventListener('panacea:health-updated', update)
+      window.removeEventListener('storage', update)
+      window.removeEventListener('focus', update)
+      document.removeEventListener('visibilitychange', onVisibility)
+    }
   }, [])
 
   const vitals = useMemo(() => getVitals(), [refresh])
