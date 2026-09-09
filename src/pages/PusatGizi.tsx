@@ -3,23 +3,18 @@ import { HalamanTab, type TabDef } from '../components/HalamanTab'
 import { IconLeaf } from '../components/icons'
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Gizi — sembilan halaman yang semuanya menjawab satu pertanyaan yang sama:
+// Gizi — sepuluh halaman yang semuanya menjawab satu pertanyaan yang sama:
 // apa yang masuk ke tubuh hari ini, dan apa akibatnya.
 //
-// Sebelumnya kedelapan halaman konten berdiri sebagai rute sendiri-sendiri,
-// padahal orang tidak memikirkannya terpisah: makanan, cairan, kopi, alkohol,
-// dan suplemen adalah satu keputusan yang diambil pada hari yang sama. Tab Data
-// menambahkan kontrol portabilitas jurnal tanpa menyalin ulang angka gizi.
-//
-// Isinya TIDAK ditulis ulang — sama seperti penggabungan skor klinis, latihan,
-// dan pemulihan. Yang digabung adalah tempatnya, bukan isinya, karena menyalin
-// ulang angka gizi berarti berisiko salah menyalin satu takaran tanpa ada yang
-// menyadarinya. Tiap komponen tetap dimuat lazy, jadi hanya tab yang dibuka
-// yang diunduh.
+// Halaman-halaman ini tetap satu hub supaya makanan, cairan, kopi, alkohol,
+// suplemen, pemeriksaan kualitas input, dan kontrol portabilitas jurnal tidak
+// tersebar ke banyak alamat. Isinya tidak disalin ulang: tiap komponen tetap
+// lazy-loaded sehingga hanya tab yang dibuka yang diunduh.
 // ─────────────────────────────────────────────────────────────────────────────
 
 const Nutrition = lazy(() => import('./Nutrition').then((m) => ({ default: m.Nutrition })))
 const MacroLabGizi = lazy(() => import('./MacroLabGizi').then((m) => ({ default: m.MacroLabGizi })))
+const NutritionChecklist = lazy(() => import('./NutritionChecklist').then((m) => ({ default: m.NutritionChecklist })))
 const NutritionToolkit = lazy(() => import('./NutritionToolkit').then((m) => ({ default: m.NutritionToolkit })))
 const DietarySupplements = lazy(() => import('./DietarySupplements').then((m) => ({ default: m.DietarySupplements })))
 const HydrationCalculator = lazy(() => import('./HydrationCalculator').then((m) => ({ default: m.HydrationCalculator })))
@@ -28,15 +23,17 @@ const AlcoholCalculator = lazy(() => import('./AlcoholCalculator').then((m) => (
 const CarbonDiet = lazy(() => import('./CarbonDiet').then((m) => ({ default: m.CarbonDiet })))
 const NutritionDataControls = lazy(() => import('./NutritionDataControls').then((m) => ({ default: m.NutritionDataControls })))
 
-// Urutannya mengikuti besarnya pengaruh terhadap tubuh, bukan abjad: makanan
-// dan makro lebih dulu, lalu cairan, lalu zat yang ditambahkan sendiri, lalu
-// dampaknya di luar tubuh. Kontrol data ditaruh terakhir karena ia mengelola
-// jurnal yang dibuat oleh tab Food, bukan menambah interpretasi gizi baru.
+// Urutannya mengikuti penggunaan: catat makanan dan makro, verifikasi kualitas
+// input, lalu gunakan toolkit/cairan/zat tambahan. Kontrol data tetap terakhir
+// karena ia mengelola jurnal yang dibuat oleh tab Food, bukan menginterpretasi
+// data gizi secara klinis.
 const TABS: TabDef[] = [
   { id: 'makan', label: 'Food', emoji: '🍽️', komponen: Nutrition,
     ringkas: 'What you ate, its energy and composition, and how it lands' },
   { id: 'makro', label: 'Macros', emoji: '📊', komponen: MacroLabGizi,
     ringkas: 'Protein, carbohydrate and fat targets, and why each one is set there' },
+  { id: 'checklist', label: 'Checklist', emoji: '✅', komponen: NutritionChecklist,
+    ringkas: 'Verify recorded inputs, units, provenance and interpretation boundaries before reuse' },
   { id: 'alat', label: 'Toolkit', emoji: '🧰', komponen: NutritionToolkit,
     ringkas: 'Practical tools — portions, labels, swaps, planning' },
   { id: 'suplemen', label: 'Supplements', emoji: '💊', komponen: DietarySupplements,
