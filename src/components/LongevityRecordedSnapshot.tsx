@@ -23,10 +23,10 @@ export function LongevityRecordedSnapshot({ vitals }: { vitals: Vitals }) {
     },
     {
       id: 'units',
-      label: 'Units preserved',
-      ok: metrics.length > 0 && metrics.every((metric) => metric.unit.trim().length > 0),
+      label: 'Units / dimensionless identity preserved',
+      ok: metrics.length > 0 && metrics.every((metric) => metric.unit.trim().length > 0 || metric.key === 'waistHipRatio'),
       detail: metrics.length > 0
-        ? 'Every rendered recorded metric keeps an explicit unit.'
+        ? 'Every rendered metric keeps its explicit unit, while waist-to-hip ratio remains explicitly dimensionless.'
         : 'No recorded metric is present, so no unit claim is synthesized.',
     },
     {
