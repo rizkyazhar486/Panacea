@@ -93,6 +93,7 @@ export async function googleLogin(req: Request, res: Response) {
 
 export function devLogin(req: Request, res: Response) {
   if (!devLoginEnabled) return res.status(404).json({ error: 'dev_login_disabled' })
+
   const { email, name, role } = req.body as { email?: string; name?: string; role?: Role }
   const normalizedEmail = String(email || '').trim().toLowerCase()
   if (!normalizedEmail) return res.status(400).json({ error: 'missing_email' })
