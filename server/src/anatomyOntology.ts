@@ -20,6 +20,7 @@ const MAX_QUERY_LENGTH = 160
 const MAX_OLS_ROWS = 10
 
 type FetchLike = typeof fetch
+type Clock = () => Date
 
 function normalizeQuery(query: string): string {
   return query.replace(/\s+/g, ' ').trim().slice(0, MAX_QUERY_LENGTH)
@@ -92,7 +93,9 @@ export interface OntologyTerm {
   ontology: OntologyName
   source: OntologySource
   identifierSystem: OntologyIdentifierSystem
+  sourceDataset: string
   sourceUrl: string
+  retrievedAt: string
   description: string
   iri: string
 }
@@ -116,6 +119,7 @@ async function searchOntology(
   query: string,
   ontology: OlsOntologyName,
   rows = 5,
+  retrievedAt: string,
   fetchImpl: FetchLike = fetch,
 ): Promise<OntologyTerm[]> {
   const q = normalizeQuery(query)
@@ -134,7 +138,9 @@ async function searchOntology(
       ontology,
       source: 'ebi-ols4',
       identifierSystem: identifierSystemForOls(ontology),
+      sourceDataset: `ols4:${ontology}`,
       sourceUrl: url,
+      retrievedAt,
       description: rapikanDefinisi(d.description?.[0] ?? ''),
       iri: typeof d.iri === 'string' ? d.iri.trim() : '',
     }))
@@ -154,6 +160,7 @@ function ctssDisplayLabel(value: unknown): string {
 async function searchCtss(
   query: string,
   config: CtssTableConfig,
+  retrievedAt: string,
   fetchImpl: FetchLike = fetch,
 ): Promise<OntologyTerm[]> {
   const q = normalizeQuery(query)
@@ -178,7 +185,9 @@ async function searchCtss(
       ontology,
       source: 'nlm-ctss',
       identifierSystem,
+      sourceDataset: `nlm-clinical-tables:${table}`,
       sourceUrl: url,
+      retrievedAt,
       description: '',
       iri: '',
     })
@@ -189,26 +198,28 @@ async function searchCtss(
 export async function anatomyOntologyLookup(
   terms: string[],
   fetchImpl: FetchLike = fetch,
+  clock: Clock = () => new Date(),
 ): Promise<{ diseases: OntologyTerm[]; phenotypes: OntologyTerm[] }> {
   const unik = [...new Set(terms.map(normalizeQuery).filter(Boolean))].slice(0, 4)
+  const retrievedAt = clock().toISOString()
   const hasil = await Promise.all(
     unik.flatMap((t) => [
-      searchOntology(t, 'doid', 4, fetchImpl).catch(() => [] as OntologyTerm[]),
-      searchOntology(t, 'hp', 4, fetchImpl).catch(() => [] as OntologyTerm[]),
+      searchOntology(t, 'doid', 4, retrievedAt, fetchImpl).catch(() => [] as OntologyTerm[]),
+      searchOntology(t, 'hp', 4, retrievedAt, fetchImpl).catch(() => [] as OntologyTerm[]),
       searchCtss(t, {
         table: 'conditions',
         ontology: 'nlm-conditions',
         identifierSystem: 'NLM_CONDITIONS_KEY',
         codeField: 'key_id',
         displayField: 'primary_name',
-      }, fetchImpl).catch(() => [] as OntologyTerm[]),
+      }, retrievedAt, fetchImpl).catch(() => [] as OntologyTerm[]),
       searchCtss(t, {
         table: 'hpo',
         ontology: 'hp',
         identifierSystem: 'HP',
         codeField: 'id',
         displayField: 'name',
-      }, fetchImpl).catch(() => [] as OntologyTerm[]),
+      }, retrievedAt, fetchImpl).catch(() => [] as OntologyTerm[]),
     ]),
   )
   const diseases: OntologyTerm[] = []
@@ -230,12 +241,14 @@ export async function anatomyOntologyLookup(
 export async function anatomyStructureLookup(
   terms: string[],
   fetchImpl: FetchLike = fetch,
+  clock: Clock = () => new Date(),
 ): Promise<OntologyTerm[]> {
   const unik = [...new Set(terms.map(normalizeQuery).filter(Boolean))].slice(0, 4)
+  const retrievedAt = clock().toISOString()
   const hasil = await Promise.all(
     unik.flatMap((t) => [
-      searchOntology(t, 'uberon', 4, fetchImpl).catch(() => [] as OntologyTerm[]),
-      searchOntology(t, 'fma', 4, fetchImpl).catch(() => [] as OntologyTerm[]),
+      searchOntology(t, 'uberon', 4, retrievedAt, fetchImpl).catch(() => [] as OntologyTerm[]),
+      searchOntology(t, 'fma', 4, retrievedAt, fetchImpl).catch(() => [] as OntologyTerm[]),
     ]),
   )
   const out: OntologyTerm[] = []
