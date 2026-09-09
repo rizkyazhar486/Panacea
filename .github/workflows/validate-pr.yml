@@ -1,9 +1,12 @@
-name: Validate pull requests
+name: Validate changes
 
 on:
   pull_request:
     branches:
       - main
+  push:
+    branches:
+      - 'panacea-maturity/**'
   workflow_dispatch:
 
 permissions:

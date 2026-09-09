@@ -2,7 +2,9 @@ name: Render backend CI
 
 on:
   push:
-    branches: [main]
+    branches:
+      - main
+      - 'panacea-maturity/**'
     paths:
       - 'server/**'
       - '.github/workflows/server-ci.yml'
