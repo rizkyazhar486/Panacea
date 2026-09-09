@@ -1,5 +1,5 @@
 import { INDEKS_TUBUH, type StrukturTubuh } from './bodyIndex.gen'
-import { WHOLE_BODY_REGIONS, type AtlasRegionKey } from './wholeBodyAtlasBlueprint'
+import { WHOLE_BODY_REGIONS, type AtlasLayerKey, type AtlasRegionKey } from './wholeBodyAtlasBlueprint'
 
 export interface AnatomySourceNodeBundle {
   file: string
@@ -12,11 +12,26 @@ export interface AnatomySourceNodeMatch {
   names: readonly string[]
 }
 
+export interface AnatomySourceSelection {
+  name: string
+  file: string | null
+  revision: number
+}
+
+export interface ReviewedAtlasSourceTarget {
+  key: string
+  region: AtlasRegionKey
+  structureId: string
+  label: string
+  layer: AtlasLayerKey
+}
+
 export type AnatomySourceNodeOrigin = 'runtime' | 'generated-index'
 
 type Listener = () => void
 
 const listeners = new Set<Listener>()
+const selectionListeners = new Set<Listener>()
 const bundles = new Map<string, readonly string[]>()
 
 const FILE_BY_LAYER: Record<StrukturTubuh['l'], string> = {
@@ -84,6 +99,7 @@ export const INDEXED_ANATOMY_SOURCE_NODE_SNAPSHOT = buildIndexedSnapshot()
 
 let snapshot: readonly AnatomySourceNodeBundle[] = []
 let effectiveSnapshot: readonly AnatomySourceNodeBundle[] = INDEXED_ANATOMY_SOURCE_NODE_SNAPSHOT
+let sourceSelection: AnatomySourceSelection = { name: '', file: null, revision: 0 }
 
 function rebuildSnapshot() {
   snapshot = [...bundles.entries()]
@@ -104,6 +120,10 @@ function rebuildSnapshot() {
 function notify() {
   rebuildSnapshot()
   for (const listener of listeners) listener()
+}
+
+function notifySelection() {
+  for (const listener of selectionListeners) listener()
 }
 
 function sameNames(a: readonly string[] | undefined, b: readonly string[]) {
@@ -162,6 +182,37 @@ export function anatomySourceNodeOrigin(file: string): AnatomySourceNodeOrigin {
 
 export const EMPTY_ANATOMY_SOURCE_NODE_SNAPSHOT: readonly AnatomySourceNodeBundle[] = []
 
+/**
+ * Publish one exact source node picked by the shared 3D viewer. This tiny
+ * external store lets lazily-mounted atlas panels recover the latest viewer
+ * selection without coupling the renderer to one specific UI tab.
+ */
+export function publishAnatomySourceSelection(name: string, file?: string | null) {
+  const normalizedName = name.trim()
+  if (!normalizedName) return
+  sourceSelection = {
+    name: normalizedName,
+    file: file?.trim() || null,
+    revision: sourceSelection.revision + 1,
+  }
+  notifySelection()
+}
+
+export function clearAnatomySourceSelection() {
+  if (!sourceSelection.name && !sourceSelection.file) return
+  sourceSelection = { name: '', file: null, revision: sourceSelection.revision + 1 }
+  notifySelection()
+}
+
+export function subscribeAnatomySourceSelection(listener: Listener) {
+  selectionListeners.add(listener)
+  return () => selectionListeners.delete(listener)
+}
+
+export function getAnatomySourceSelectionSnapshot() {
+  return sourceSelection
+}
+
 export function normalizeAnatomySourceName(value: string) {
   return value
     .normalize('NFKD')
@@ -200,6 +251,43 @@ export function anatomySourceNameMatchesHint(sourceName: string, hint: string) {
     if (matches) return true
   }
   return false
+}
+
+/**
+ * Find reviewed catalogue targets that genuinely correspond to one exact source
+ * mesh name. The source file, when known, constrains the layer first. No fuzzy
+ * ranking is used: ambiguity remains ambiguity instead of forcing a mesh into a
+ * clinically different teaching target (for example femur -> hip vs knee).
+ */
+export function findReviewedAtlasTargetsForSourceSelection(
+  selection: Pick<AnatomySourceSelection, 'name' | 'file'>,
+): ReviewedAtlasSourceTarget[] {
+  const sourceName = selection.name.trim()
+  if (!sourceName) return []
+
+  const matches: ReviewedAtlasSourceTarget[] = []
+  for (const region of WHOLE_BODY_REGIONS) {
+    for (const structure of region.structures) {
+      if (structure.provenance === 'not-represented') continue
+      if (selection.file && FILE_BY_LAYER[structure.layer] !== selection.file) continue
+      if (!structure.nodeHints.some((hint) => anatomySourceNameMatchesHint(sourceName, hint))) continue
+      matches.push({
+        key: `${region.key}:${structure.id}`,
+        region: region.key,
+        structureId: structure.id,
+        label: structure.label,
+        layer: structure.layer,
+      })
+    }
+  }
+  return matches
+}
+
+export function resolveReviewedAtlasTargetForSourceSelection(
+  selection: Pick<AnatomySourceSelection, 'name' | 'file'>,
+): ReviewedAtlasSourceTarget | null {
+  const matches = findReviewedAtlasTargetsForSourceSelection(selection)
+  return matches.length === 1 ? matches[0] : null
 }
 
 /**
