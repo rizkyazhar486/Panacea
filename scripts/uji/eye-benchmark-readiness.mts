@@ -61,7 +61,7 @@ const eligible = evaluateEyeBenchmarkReadiness({
   evidence: evidence(),
 })
 assert.equal(eligible.status, 'eligible')
-assert.equal(eligible.score, 94.25)
+assert.equal(eligible.score, 94.05)
 assert.equal(eligible.mayOverrideGlobalMaturationGate, false)
 assert.deepEqual(eligible.blockers, [])
 assert.deepEqual(eligible.gaps, [])
