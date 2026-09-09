@@ -10,6 +10,7 @@ const MAX_QUERY_LENGTH = 160
 const MAX_NORMALIZED_NAME_LENGTH = 240
 
 export interface RelatedDrug { name: string; tty: string }
+export interface NormalizedDrugIdentity { rxcui: string; name: string }
 
 interface RxcuiResp { idGroup?: { rxnormId?: string[] } }
 interface ApproximateResp {
@@ -43,10 +44,15 @@ function firstNumericRxcui(ids: Array<string | undefined>): string | undefined {
   return ids.find((id): id is string => typeof id === 'string' && /^\d+$/.test(id))
 }
 
-/** Resolve misspellings/local brand-like terms to the canonical RxNorm name.
+/**
+ * Resolve misspellings/local brand-like terms to a canonical RxNorm concept.
+ * RxCUI is preserved with the normalized name so downstream provenance joins
+ * do not silently degrade to free-text identity matching.
+ *
  * This is terminology normalization only; it is not a drug-interaction or
- * therapeutic-equivalence decision. */
-export async function normalizeDrugName(name: string): Promise<string | null> {
+ * therapeutic-equivalence decision.
+ */
+export async function normalizeDrugIdentity(name: string): Promise<NormalizedDrugIdentity | null> {
   const q = cleanQuery(name)
   if (!q) return null
 
@@ -66,7 +72,14 @@ export async function normalizeDrugName(name: string): Promise<string | null> {
   const propertyJson = (await propertyRes.json()) as PropertyResp
   const rawName = propertyJson.propConceptGroup?.propConcept?.find((prop) => typeof prop.propValue === 'string' && prop.propValue.trim())?.propValue
   if (!rawName) return null
-  return rawName.replace(/\s+/g, ' ').trim().slice(0, MAX_NORMALIZED_NAME_LENGTH)
+  const normalizedName = rawName.replace(/\s+/g, ' ').trim().slice(0, MAX_NORMALIZED_NAME_LENGTH)
+  if (!normalizedName) return null
+  return { rxcui, name: normalizedName }
+}
+
+/** Backward-compatible name-only normalization wrapper. */
+export async function normalizeDrugName(name: string): Promise<string | null> {
+  return (await normalizeDrugIdentity(name))?.name ?? null
 }
 
 export async function findRelatedDrugs(name: string): Promise<RelatedDrug[]> {
