@@ -4,6 +4,7 @@ import { readFileSync } from 'node:fs'
 const home = readFileSync('src/pages/Beranda.tsx', 'utf8')
 const routes = readFileSync('src/main.tsx', 'utf8')
 const deferred = readFileSync('src/components/dashboard/DeferredHomeSections.tsx', 'utf8')
+const mobileStability = readFileSync('src/styles/home-mobile-stability.css', 'utf8')
 
 const quickActions = [...home.matchAll(/\{ to: '([^']+)', emoji: '[^']+', label: '([^']+)'/g)]
 assert.ok(quickActions.length >= 10, 'Home must keep a broad high-utility action set')
@@ -31,7 +32,11 @@ assert.match(home, /removeEventListener\('storage', update\)/, 'Home must clean 
 assert.match(home, /removeEventListener\('focus', update\)/, 'Home must clean up focus listeners')
 assert.match(home, /IntersectionObserver/, 'Heavy Home sections must remain viewport-deferred')
 assert.match(home, /LazyPerformanceVisualizationDeck/, 'Performance visualization must remain code-split')
+assert.match(home, /home-mobile-stability\.css/, 'Home must actually load its touch/reduced-motion stability stylesheet')
+assert.match(mobileStability, /@media \(hover: none\) and \(pointer: coarse\)/, 'Touch devices must retain their compositor reduction boundary')
+assert.match(mobileStability, /backdrop-filter: none !important/, 'Touch Home must disable stacked backdrop filters')
+assert.match(mobileStability, /prefers-reduced-motion: reduce/, 'Home must respect reduced-motion preferences')
 assert.match(deferred, /Load 3D preview/, '3D anatomy preview must remain explicit opt-in')
 assert.doesNotMatch(deferred, /setActivated\(true\).*useEffect/s, '3D preview must not auto-activate from an effect')
 
-console.log('Home command center integrity: routes resolve, live signals retain provenance/freshness boundaries, cross-tab/resume refresh stays wired, heavy sections stay deferred, and 3D remains opt-in.')
+console.log('Home command center integrity: routes resolve, live signals retain provenance/freshness boundaries, cross-tab/resume refresh stays wired, mobile stability is active, heavy sections stay deferred, and 3D remains opt-in.')
