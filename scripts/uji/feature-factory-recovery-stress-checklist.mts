@@ -2,7 +2,11 @@ import assert from 'node:assert/strict'
 import { readFileSync } from 'node:fs'
 import { buildRecoveryRecordedChecklist } from '../../src/lib/recoveryRecordedChecklist'
 
+const expectedChecklistIds = ['completeness', 'source', 'timestamp', 'units', 'scientific-boundary']
+
 const empty = buildRecoveryRecordedChecklist({}, {})
+assert.deepEqual(empty.map((item) => item.id), expectedChecklistIds)
+assert.equal(new Set(empty.map((item) => item.id)).size, expectedChecklistIds.length)
 assert.deepEqual(
   empty.map((item) => item.status),
   ['waiting', 'waiting', 'waiting', 'waiting', 'pass'],
@@ -19,6 +23,7 @@ const traced = buildRecoveryRecordedChecklist(
     measuredAt: '2026-09-09T05:00:00.000Z',
   },
 )
+assert.deepEqual(traced.map((item) => item.id), expectedChecklistIds)
 assert.ok(traced.every((item) => item.status === 'pass'))
 assert.match(traced.find((item) => item.id === 'source')?.detail ?? '', /Oura/)
 assert.match(traced.find((item) => item.id === 'units')?.detail ?? '', /HRV in ms[\s\S]*bpm[\s\S]*hours/)
