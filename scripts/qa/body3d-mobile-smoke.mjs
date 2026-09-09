@@ -161,16 +161,23 @@ try {
 
   const vessels = page.getByRole('button', { name: 'Vessels', exact: true }).first()
   // The layer controls live below the tall 3D viewer on a 390x844 screen.
-  // Bring the real user control into the visual viewport before interacting;
-  // do not bypass the UI with DOM clicks or state injection, because this
-  // smoke is meant to prove the mobile control can actually be reached.
-  await vessels.evaluate((node) => node.scrollIntoView({ block: 'center', inline: 'center', behavior: 'auto' }))
-  await page.waitForTimeout(100)
+  // The app deliberately enables smooth page scrolling, so scrollIntoView is
+  // asynchronous even with behavior:auto. Wait for the real control to finish
+  // entering the viewport instead of racing that animation with a fixed delay.
+  await vessels.evaluate((node) => node.scrollIntoView({ block: 'center', inline: 'center', behavior: 'smooth' }))
+  await withTimeout((async () => {
+    while (true) {
+      const box = await vessels.boundingBox()
+      if (box && box.x >= 0 && box.y >= 0 && box.x + box.width <= viewport.width && box.y + box.height <= viewport.height) return
+      await page.waitForTimeout(50)
+    }
+  })(), 'Vessels layer control smooth-scroll into mobile viewport', 5_000)
   const vesselsBox = await vessels.boundingBox()
   if (!vesselsBox || vesselsBox.x < 0 || vesselsBox.y < 0 || vesselsBox.x + vesselsBox.width > viewport.width || vesselsBox.y + vesselsBox.height > viewport.height) {
     throw new Error(`Vessels layer control could not be brought into the mobile viewport: ${JSON.stringify(vesselsBox)}`)
   }
   metrics.vesselsControlInViewport = true
+  metrics.vesselsControlBox = vesselsBox
   await vessels.click()
   await progressiveLoading.waitFor({ state: 'visible', timeout: 5_000 })
   const progressiveClass = await progressiveLoading.evaluate((node) =>
