@@ -188,8 +188,14 @@ export function buildMeasuredAtlasRenderPlan(
   }
 }
 
-export function measuredCoverageBySystem(compiled: CompiledAtlas): Readonly<Record<AtlasSystemId, { nodes: number; triangles: number }>> {
-  const systems = {} as Record<AtlasSystemId, { nodes: number; triangles: number }>
+/**
+ * Sparse by design: a system absent from the compiled manifest is absent from
+ * the result rather than being falsely advertised as measured zero coverage.
+ */
+export function measuredCoverageBySystem(
+  compiled: CompiledAtlas,
+): Readonly<Partial<Record<AtlasSystemId, { nodes: number; triangles: number }>>> {
+  const systems: Partial<Record<AtlasSystemId, { nodes: number; triangles: number }>> = {}
   for (const entry of compiled.nodes) {
     const current = systems[entry.node.system] ?? { nodes: 0, triangles: 0 }
     current.nodes += 1
