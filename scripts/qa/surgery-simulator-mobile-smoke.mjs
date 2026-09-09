@@ -26,7 +26,14 @@ const pageErrors = []
 page.on('pageerror', (error) => pageErrors.push(error.message))
 
 async function dismissIfVisible(locator) {
-  if (await locator.isVisible().catch(() => false)) await locator.click()
+  if (!(await locator.isVisible().catch(() => false))) return false
+  // Optional onboarding/reminder overlays can be visually ready while
+  // Playwright's locator.click() still waits indefinitely on actionability.
+  // Reuse the same bounded real browser hit-target path as the simulator
+  // controls: no force:true and no DOM .click().
+  await tapScrolled(locator)
+  await page.waitForTimeout(180)
+  return true
 }
 async function captureViewport() {
   const cdp = await context.newCDPSession(page)
@@ -150,7 +157,7 @@ async function dismissBodyExplorerOverlays() {
   if (await reminderText.isVisible().catch(() => false)) {
     const reminder = reminderText.locator('xpath=ancestor::*[.//button][1]')
     const close = reminder.locator('button').last()
-    if (await close.isVisible().catch(() => false)) await close.click()
+    await dismissIfVisible(close)
   }
 }
 async function enterSurgerySimulator({ allowRouteReset = false } = {}) {
