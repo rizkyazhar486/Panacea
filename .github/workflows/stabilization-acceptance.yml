@@ -18,6 +18,10 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  # Keep the expensive browser/WebGL acceptance on one runner so the production
+  # build is reused by Body and surgery smoke checks. `npm run build` already
+  # executes repository validators plus `tsc -b`, so a separate frontend
+  # `tsc --noEmit` would only repeat the same type gate on every PR.
   full-acceptance:
     runs-on: ubuntu-latest
     timeout-minutes: 40
@@ -34,10 +38,7 @@ jobs:
       - name: Install frontend dependencies
         run: npm ci
 
-      - name: Frontend TypeScript
-        run: npx tsc --noEmit
-
-      - name: Frontend production build
+      - name: Frontend production build and TypeScript
         run: npm run build
 
       - name: Frontend tests
@@ -98,6 +99,29 @@ jobs:
           if [ -f /tmp/panacea-vite-preview.pid ]; then
             kill "$(cat /tmp/panacea-vite-preview.pid)" 2>/dev/null || true
           fi
+
+  # Server acceptance is independent of the browser/WebGL runner. Some backend
+  # regression tests intentionally import shared root React/TSX modules, so this
+  # runner installs both lockfile graphs before executing the same server
+  # typecheck/build/test suite. GitHub can run both acceptance jobs in parallel.
+  server-acceptance:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: |
+            package-lock.json
+            server/package-lock.json
+
+      - name: Install shared root dependencies
+        run: npm ci
 
       - name: Install server dependencies
         working-directory: server
