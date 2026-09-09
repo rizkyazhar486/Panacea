@@ -7,7 +7,7 @@ import {
 } from '../../src/lib/anatomy/eyeCellOrganelleWave4.ts'
 
 assert.deepEqual(validateEyeCellOrganelleWave4(), [])
-assert.ok(EYE_CELL_ORGANELLE_WAVE4.length >= 20, 'Eye Wave 4 must be a substantive cellular/organelle reference layer.')
+assert.ok(EYE_CELL_ORGANELLE_WAVE4.length >= 31, 'Eye Wave 4 must be a substantive canonical cellular/organelle reference layer.')
 
 const byId = new Map(EYE_CELL_ORGANELLE_WAVE4.map((item) => [item.id, item]))
 for (const id of EYE_WAVE4_REQUIRED_IDS) assert.ok(byId.has(id), `missing required Wave 4 node: ${id}`)
@@ -26,14 +26,28 @@ assert.equal(byId.get('rod-basal-body')?.parentId, 'rod-connecting-cilium')
 assert.equal(byId.get('cone-basal-body')?.parentId, 'cone-connecting-cilium')
 assert.equal(byId.get('rod-inner-segment-mitochondria')?.parentId, 'rod-inner-segment-ellipsoid')
 assert.equal(byId.get('cone-inner-segment-mitochondria')?.parentId, 'cone-inner-segment-ellipsoid')
+assert.equal(byId.get('rod-inner-segment-ribosomes')?.parentId, 'rod-inner-segment')
+assert.equal(byId.get('cone-inner-segment-ribosomes')?.parentId, 'cone-inner-segment')
+assert.equal(byId.get('rod-transport-vesicles')?.parentId, 'rod-inner-segment')
+assert.equal(byId.get('cone-transport-vesicles')?.parentId, 'cone-inner-segment')
+assert.equal(byId.get('rod-nucleus')?.parentId, 'rod-photoreceptors')
+assert.equal(byId.get('cone-nucleus')?.parentId, 'cone-photoreceptors')
 assert.equal(byId.get('rod-outer-segment-discs')?.parentId, 'rod-outer-segment')
 assert.equal(byId.get('cone-outer-segment-discs')?.parentId, 'cone-outer-segment')
+assert.equal(byId.get('rod-synaptic-vesicles')?.parentId, 'rod-spherule')
+assert.equal(byId.get('cone-synaptic-vesicles')?.parentId, 'cone-pedicle')
+assert.equal(byId.get('rod-synaptic-ribbon')?.parentId, 'rod-spherule')
+assert.equal(byId.get('cone-synaptic-ribbon')?.parentId, 'cone-pedicle')
+assert.equal(byId.get('rod-synaptic-ribbon')?.kind, 'synaptic-specialization')
+assert.equal(byId.get('cone-synaptic-ribbon')?.kind, 'synaptic-specialization')
 assert.equal(byId.get('rpe-melanosomes')?.parentId, 'retinal-pigment-epithelium')
 assert.equal(byId.get('rpe-phagosomes')?.parentId, 'retinal-pigment-epithelium')
+assert.equal(byId.get('rpe-phagolysosomal-compartment')?.parentId, 'rpe-phagosomes')
 assert.equal(byId.get('rpe-lysosomes')?.parentId, 'retinal-pigment-epithelium')
 
 assert.match(byId.get('rod-outer-segment-discs')?.notes ?? '', /not individually reconstructed measured discs/)
 assert.match(byId.get('cone-outer-segment-discs')?.notes ?? '', /do not reuse rod disc topology/)
+assert.match(byId.get('rpe-phagolysosomal-compartment')?.notes ?? '', /do not infer count, position, kinetics, or disease state/)
 
 for (const forbiddenClaim of [
   'dimensions',
@@ -41,6 +55,8 @@ for (const forbiddenClaim of [
   'copy numbers',
   'concentrations',
   'microscopy coordinates',
+  'membrane kinetics',
+  'molecular interactions',
   'disease state',
   'patient-specific morphology',
   'synthetic cellular geometry',
@@ -57,4 +73,8 @@ const invalidGeometry = EYE_CELL_ORGANELLE_WAVE4.map((item) => ({ ...item })) as
 invalidGeometry[0] = { ...invalidGeometry[0], geometryStatus: 'source-geometry-required' }
 assert.ok(validateEyeCellOrganelleWave4(invalidGeometry).includes(`geometry:${invalidGeometry[0].id}`))
 
-console.log(`eye-cell-organelle-wave4: ok (${EYE_CELL_ORGANELLE_WAVE4.length} cellular references; no synthetic cell geometry)`)
+const duplicateId = EYE_CELL_ORGANELLE_WAVE4.map((item) => ({ ...item })) as any[]
+duplicateId.push({ ...duplicateId[0] })
+assert.ok(validateEyeCellOrganelleWave4(duplicateId).includes(`duplicate:${duplicateId[0].id}`))
+
+console.log(`eye-cell-organelle-wave4: ok (${EYE_CELL_ORGANELLE_WAVE4.length} canonical cellular references; no duplicate Wave 4 model)`)
