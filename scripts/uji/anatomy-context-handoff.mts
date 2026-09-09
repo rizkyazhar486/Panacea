@@ -64,11 +64,15 @@ const shoulderContext = buildAnatomyContextHandoff(shoulder.region, shoulder.str
 assert.equal(shoulderContext.surgicalScenarioId, undefined)
 assert.equal(shoulderContext.movementJointId, 'shoulder')
 
-const missingGeometry = WHOLE_BODY_REGIONS
-  .flatMap((region) => region.structures.map((structure) => ({ region: region.key, structure })))
-  .find(({ structure }) => structure.provenance === 'not-represented')
-assert.ok(missingGeometry, 'fixture must include at least one explicitly not-represented structure')
-const missingContext = buildAnatomyContextHandoff(missingGeometry.region, missingGeometry.structure)
+// Exercise the provenance guard directly rather than depending on the current
+// catalogue containing a not-represented fixture. Even a structure ID that has
+// a curated route must fail closed when its geometry provenance says it is not
+// represented.
+const notRepresentedKnee: AtlasStructureTarget = {
+  ...knee.structure,
+  provenance: 'not-represented',
+}
+const missingContext = buildAnatomyContextHandoff(knee.region, notRepresentedKnee)
 assert.equal(missingContext.surgicalScenarioId, undefined)
 assert.equal(missingContext.movementJointId, undefined)
 
