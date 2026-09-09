@@ -4,6 +4,11 @@ export interface NutritionDataExplainabilityStep {
   detail: string
 }
 
+export interface NutritionPlainLanguageItem {
+  id: 'recorded-only' | 'numbers-as-recorded' | 'missing-stays-missing' | 'decision-boundary'
+  text: string
+}
+
 export const NUTRITION_DATA_EXPLAINABILITY_STEPS: readonly NutritionDataExplainabilityStep[] = [
   {
     id: 'recorded-input',
@@ -24,5 +29,24 @@ export const NUTRITION_DATA_EXPLAINABILITY_STEPS: readonly NutritionDataExplaina
     id: 'recorded-output',
     title: '4 · Recorded output',
     detail: 'The UI presents recorded dates, counts, kcal and gram values with explicit boundaries. These outputs are descriptive journal views, not calorie or macro requirements, adequacy judgments, diagnoses, treatment rules or dietary recommendations.',
+  },
+] as const
+
+export const NUTRITION_PLAIN_LANGUAGE_GUIDE: readonly NutritionPlainLanguageItem[] = [
+  {
+    id: 'recorded-only',
+    text: 'This page shows only food entries you recorded or chose to import. It does not make up a meal or a missing day.',
+  },
+  {
+    id: 'numbers-as-recorded',
+    text: 'Calories and grams are shown as recorded. This view does not turn those numbers into a health grade or a daily eating goal.',
+  },
+  {
+    id: 'missing-stays-missing',
+    text: 'If a day or value is missing, it stays missing instead of being silently changed to zero.',
+  },
+  {
+    id: 'decision-boundary',
+    text: 'Use the original food source and appropriate clinical guidance for health decisions; this recorded-data view does not diagnose or prescribe.',
   },
 ] as const
