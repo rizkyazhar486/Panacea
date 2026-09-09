@@ -1,4 +1,7 @@
-import { useMemo, useState } from 'react'
+import { lazy, Suspense, useId, useMemo, useState } from 'react'
+import { FeatureErrorBoundary } from '../../components/FeatureErrorBoundary'
+
+const OcularOpticsLesson = lazy(() => import('../../components/digital-twin/Ocular4DAtlas').then((module) => ({ default: module.OcularOpticsLesson })))
 import AtlasViewer3D, { type PartMeta } from '../../components/AtlasViewer3D'
 import { ATLAS_MODULE_INFO, partsForModule } from '../../lib/systemAtlas.gen'
 import {
@@ -138,6 +141,8 @@ function Daftar({ judul, isi }: { judul: string; isi: string[] }) {
 }
 
 export function SpecialtyLab({ onBukaOrgan, onBukaCardio, onBukaObat }: Props) {
+  const eyeOpticsId = useId()
+  const [showEyeOptics, setShowEyeOptics] = useState(false)
   const [modul, setModul] = useState<string>('respirasi')
   const [kelompok, setKelompok] = useState<string>('Chest')
   const [cari, setCari] = useState('')
@@ -168,6 +173,7 @@ export function SpecialtyLab({ onBukaOrgan, onBukaCardio, onBukaObat }: Props) {
   const cakupan = useMemo(() => cakupanAtlas(), [])
 
   function bukaHasil(h: HasilCari) {
+    setShowEyeOptics(false)
     setCari('')
     if (h.jenis === 'obat') { onBukaObat?.(h.id); return }
     if (h.module === 'cardio') { onBukaCardio?.(h.jenis === 'kondisi' ? h.id : ''); return }
@@ -179,6 +185,7 @@ export function SpecialtyLab({ onBukaOrgan, onBukaCardio, onBukaObat }: Props) {
   }
 
   function pilihModul(id: string) {
+    setShowEyeOptics(false)
     setModul(id)
     setKondisiId(null)
     setStruktur(null)
@@ -250,6 +257,25 @@ export function SpecialtyLab({ onBukaOrgan, onBukaCardio, onBukaObat }: Props) {
           <Chip key={m} aktif={modul === m} onClick={() => pilihModul(m)}>{ATLAS_MODULE_INFO[m].label}</Chip>
         ))}
       </div>
+
+      {modul === 'mata' && (
+        <div>
+          <button type="button" aria-expanded={showEyeOptics} aria-controls={eyeOpticsId}
+            onClick={() => setShowEyeOptics((value) => !value)}
+            className="min-h-[44px] rounded-xl border border-sky-300 px-4 py-2 text-sm font-semibold text-sky-800 dark:border-sky-300/30 dark:text-sky-200">
+            {showEyeOptics ? 'Close optics lesson' : 'Explore pupil & accommodation'}
+          </button>
+          <div id={eyeOpticsId}>
+            {showEyeOptics && (
+              <FeatureErrorBoundary featureName="Eye optics" onBack={() => setShowEyeOptics(false)}>
+                <Suspense fallback={<p role="status" className="p-3 text-sm text-neutral-500">Loading eye optics…</p>}>
+                  <OcularOpticsLesson />
+                </Suspense>
+              </FeatureErrorBoundary>
+            )}
+          </div>
+        </div>
+      )}
 
       <AtlasViewer3D
         berkas={`atlas/${modul}.glb`}
