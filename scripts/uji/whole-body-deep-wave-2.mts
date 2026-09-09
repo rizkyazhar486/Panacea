@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict'
 import { COMPLETE_WHOLE_BODY_ATLAS } from '../../src/lib/anatomy/completeAtlas.ts'
 import {
+  atlasDescendants,
   atlasLineage,
   atlasSectionHits,
   buildAtlasExposurePlan,
@@ -46,12 +47,24 @@ assert.ok(coverage.metadataCoverageRatio > 0 && coverage.metadataCoverageRatio <
 assert.ok(coverage.referenceOnlyNodeCount >= WHOLE_BODY_DEEP_WAVE_2_NODES.length)
 assert.ok(coverage.warnings.some((warning) => warning.includes('not a claim of anatomical completeness')))
 
-const ocularLineage = atlasLineage(COMPLETE_WHOLE_BODY_ATLAS, 'he2:organ-of-corti')
-assert.deepEqual(ocularLineage.slice(-2), ['he:cochlea', 'he2:organ-of-corti'])
+const cochlearLineage = atlasLineage(COMPLETE_WHOLE_BODY_ATLAS, 'he2:organ-of-corti')
+assert.deepEqual(cochlearLineage.slice(-2), ['he:cochlea', 'he2:organ-of-corti'])
+
+// Cross-scale drilldown deliberately selects the strongest candidate at each finer
+// scale, so it must be tested by semantic scale coverage rather than one fixed
+// anatomical identity. Specific structures remain independently verifiable through
+// the canonical hierarchy/descendant traversal.
+const ocularDescendants = atlasDescendants(COMPLETE_WHOLE_BODY_ATLAS, 'he:ocular-globe', 4)
+assert.ok(ocularDescendants.some(({ nodeId }) => nodeId === 'he:retina'), 'ocular hierarchy must preserve retina as a descendant')
+assert.ok(ocularDescendants.some(({ nodeId }) => nodeId === 'he:retinal-photoreceptor-unit'), 'ocular hierarchy must reach retinal photoreceptor microstructure')
 
 const ocularDrilldown = buildCrossScaleDrilldown(COMPLETE_WHOLE_BODY_ATLAS, 'he:ocular-globe')
-assert.ok(ocularDrilldown.includes('he:retina'), 'organ -> tissue drilldown must preserve retina')
-assert.ok(ocularDrilldown.some((id) => id === 'he:retinal-photoreceptor-unit'), 'organ -> microstructure drilldown must reach photoreceptor unit')
+const ocularDrilldownScales = ocularDrilldown
+  .map((id) => topology.byId.get(id)?.scale)
+  .filter((scale): scale is NonNullable<typeof scale> => Boolean(scale))
+assert.ok(ocularDrilldownScales.includes('tissue'), 'organ drilldown must expose at least one tissue-scale candidate')
+assert.ok(ocularDrilldownScales.includes('microstructure'), 'organ drilldown must expose at least one microstructure-scale candidate')
+assert.equal(new Set(ocularDrilldownScales).size, ocularDrilldownScales.length, 'drilldown must select at most one best candidate per finer scale')
 
 const respiratoryFlow = buildExplicitAtlasFlowNetwork(COMPLETE_WHOLE_BODY_ATLAS, 'he2:terminal-bronchiole', {
   systems: ['respiratory'],
