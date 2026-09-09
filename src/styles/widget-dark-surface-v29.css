@@ -1,6 +1,8 @@
-/* Panacea Home widget dark-surface guard v33
+/* Panacea Home widget dark-surface guard v37
    Scoped companion to the public final-authority guard. Keeps Living Instrument
-   loading and card surfaces readable without changing widget data or logic. */
+   loading and card surfaces readable without changing widget data or logic.
+   v37 additionally guards Safari/PWA theme-restoration and empty-active-slide
+   races so Dark Mode can never expose a blank light-gray canvas. */
 
 .widget-instrument-loading-v29{
   min-height:132px;
@@ -131,9 +133,85 @@ html.dark .panacea-home .widget-instrument-slide-v5[aria-hidden='false'] > div:e
   box-shadow:none!important;
 }
 
+/* If the slide itself is briefly empty before its lazy child mounts, show an
+   intentional compact state. This closes the exact large blank slab seen on
+   iOS when the header advances before the content chunk paints. */
+.panacea-home .widget-instrument-slide-v5[aria-hidden='false']:empty{
+  min-height:132px!important;
+  display:grid!important;
+  place-items:center!important;
+  border-radius:20px!important;
+  background:#f8fafc!important;
+  background-image:none!important;
+  border:1px solid rgba(15,23,42,.07)!important;
+  color:#52606d!important;
+}
+.panacea-home .widget-instrument-slide-v5[aria-hidden='false']:empty::before{
+  content:'Loading widget…';
+  display:block;
+  padding:14px 18px;
+  font:700 13px/1.35 Inter,system-ui,-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+  letter-spacing:.01em;
+  color:inherit;
+}
+html.dark .panacea-home .widget-instrument-slide-v5[aria-hidden='false']:empty,
+.dark .panacea-home .widget-instrument-slide-v5[aria-hidden='false']:empty{
+  background:#0a0f16!important;
+  border-color:rgba(255,255,255,.07)!important;
+  color:#dbe7ef!important;
+}
+
+/* applyTheme writes both .dark and inline color-scheme. Honour color-scheme as
+   a second source of truth so restored Safari/PWA frames cannot flash Light
+   surfaces while Dark Mode is already resolved. */
+html[style*='color-scheme: dark'] .panacea-home .widget-instrument-loading-v29,
+html[style*='color-scheme: dark'] .panacea-home .widget-instrument-slide-v5[aria-hidden='false']:empty{
+  background:#0a0f16!important;
+  background-image:none!important;
+  border-color:rgba(255,255,255,.07)!important;
+  color:#dbe7ef!important;
+}
+html[style*='color-scheme: dark'] .panacea-home .widget-instrument-shell-v5{
+  background:#070b11!important;
+  background-image:linear-gradient(155deg,#0d121a 0%,#070b11 100%)!important;
+  border-color:rgba(255,255,255,.10)!important;
+  color:#f8fafc!important;
+}
+html[style*='color-scheme: dark'] .panacea-home .widget-instrument-slide-v5 .kaca{
+  background:#0b1119!important;
+  background-image:none!important;
+  border-color:rgba(255,255,255,.08)!important;
+  color:#f8fafc!important;
+}
+
+/* Before saved appearance is applied, respect a dark OS unless JavaScript has
+   explicitly resolved Light Mode. This removes the first-paint gray flash. */
+@media (prefers-color-scheme:dark){
+  html:not([style*='color-scheme: light']) .panacea-home .widget-instrument-loading-v29,
+  html:not([style*='color-scheme: light']) .panacea-home .widget-instrument-slide-v5[aria-hidden='false']:empty{
+    background:#0a0f16!important;
+    background-image:none!important;
+    border-color:rgba(255,255,255,.07)!important;
+    color:#dbe7ef!important;
+  }
+  html:not([style*='color-scheme: light']) .panacea-home .widget-instrument-shell-v5{
+    background:#070b11!important;
+    background-image:linear-gradient(155deg,#0d121a 0%,#070b11 100%)!important;
+    border-color:rgba(255,255,255,.10)!important;
+    color:#f8fafc!important;
+  }
+  html:not([style*='color-scheme: light']) .panacea-home .widget-instrument-slide-v5 .kaca{
+    background:#0b1119!important;
+    background-image:none!important;
+    border-color:rgba(255,255,255,.08)!important;
+    color:#f8fafc!important;
+  }
+}
+
 @supports selector(.a:has(.b)){
   .panacea-home .widget-instrument-scroll-v5:has(> .widget-instrument-slide-v5[aria-hidden='false'] > .widget-instrument-loading-v29),
-  .panacea-home .widget-instrument-scroll-v5:has(> .widget-instrument-slide-v5[aria-hidden='false'] > div:empty){
+  .panacea-home .widget-instrument-scroll-v5:has(> .widget-instrument-slide-v5[aria-hidden='false'] > div:empty),
+  .panacea-home .widget-instrument-scroll-v5:has(> .widget-instrument-slide-v5[aria-hidden='false']:empty){
     height:184px!important;
     min-height:184px!important;
     max-height:184px!important;
