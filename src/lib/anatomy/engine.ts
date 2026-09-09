@@ -6,6 +6,7 @@ import { CARDIOVASCULAR_DEEP_RELATIONS, CARDIOVASCULAR_DEEP_STRUCTURES } from '.
 import { CIRCULATION_TOPOLOGY_RELATIONS } from './circulationTopology'
 import { AnatomyGraph } from './graph'
 import { equationsForStructure, traceMultiscalePath, validateMultiscaleAtlas } from './multiscale'
+import { NEUROVASCULAR_RELATIONS, NEUROVASCULAR_STRUCTURES } from './neurovascularAtlas'
 import { RESPIRATORY_RELATIONS, RESPIRATORY_STRUCTURES } from './respiratoryAtlas'
 import { AnatomyResolver } from './resolver'
 import { buildMeasuredAtlasLoadPlan, compileAtlasSources } from './sourceCompiler'
@@ -15,12 +16,14 @@ export const WHOLE_BODY_STRUCTURES: readonly AnatomyStructure[] = [
   ...WHOLE_BODY_CORE_STRUCTURES,
   ...RESPIRATORY_STRUCTURES,
   ...CARDIOVASCULAR_DEEP_STRUCTURES,
+  ...NEUROVASCULAR_STRUCTURES,
 ]
 
 export const WHOLE_BODY_RELATIONS: readonly AnatomyRelation[] = [
   ...RESPIRATORY_RELATIONS,
   ...CARDIOVASCULAR_DEEP_RELATIONS,
   ...CIRCULATION_TOPOLOGY_RELATIONS,
+  ...NEUROVASCULAR_RELATIONS,
 ]
 
 export class WholeBodyAtlasEngine {
