@@ -31,14 +31,6 @@ function clampRows(rows: number): number {
   return Math.max(1, Math.min(MAX_OLS_ROWS, Math.trunc(rows)))
 }
 
-/**
- * Merapikan definisi ontologi untuk dibaca manusia.
- *
- * Definisi DOID ditulis untuk mesin dan memuat nama relasi apa adanya:
- * "The disease has_symptom fever, has_symptom malaise, has_symptom back pain."
- * Itu tampil di layar sebagai teks rusak. Relasinya diubah jadi bahasa biasa
- * dan pengulangannya diringkas, tanpa membuang satu pun isinya.
- */
 export function rapikanDefinisi(teks: string): string {
   if (!teks) return ''
   let t = teks
@@ -115,6 +107,14 @@ function identifierSystemForOls(ontology: OlsOntologyName): OntologyIdentifierSy
   return 'FMA'
 }
 
+function hasExpectedOlsCurie(ontology: OlsOntologyName, value: string): boolean {
+  const id = value.trim()
+  if (ontology === 'doid') return /^DOID:\d+$/i.test(id)
+  if (ontology === 'hp') return /^HP:\d+$/i.test(id)
+  if (ontology === 'uberon') return /^UBERON:\d+$/i.test(id)
+  return /^FMA:\d+$/i.test(id)
+}
+
 async function searchOntology(
   query: string,
   ontology: OlsOntologyName,
@@ -131,7 +131,7 @@ async function searchOntology(
   const data = (await res.json()) as { response?: { docs?: Ols4Doc[] } }
   const docs = Array.isArray(data.response?.docs) ? data.response?.docs ?? [] : []
   return docs
-    .filter((d) => typeof d.obo_id === 'string' && d.obo_id.trim() && typeof d.label === 'string' && d.label.trim())
+    .filter((d) => typeof d.obo_id === 'string' && hasExpectedOlsCurie(ontology, d.obo_id) && typeof d.label === 'string' && d.label.trim())
     .map((d) => ({
       id: (d.obo_id as string).trim(),
       label: (d.label as string).trim(),
