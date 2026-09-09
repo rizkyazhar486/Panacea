@@ -18,10 +18,6 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  # Keep the expensive browser/WebGL acceptance on one runner so the production
-  # build is reused by both Body smoke checks. `npm run build` already executes
-  # repository validators plus `tsc -b`, so a separate frontend `tsc --noEmit`
-  # only repeated the same type gate on every PR.
   full-acceptance:
     runs-on: ubuntu-latest
     timeout-minutes: 40
@@ -75,12 +71,28 @@ jobs:
           BODY3D_QA_CANVAS_ARTIFACT: artifacts/body3d-mobile-canvas.png
         run: node scripts/qa/body3d-canvas-artifact.mjs
 
+      - name: Panacea OS Daily mobile 390x844 smoke
+        env:
+          PANACEA_OS_QA_URL: http://127.0.0.1:4173/#/harian
+          PANACEA_OS_QA_SCREENSHOT: artifacts/panacea-os-mobile-390x844.png
+          PANACEA_OS_QA_METRICS: artifacts/panacea-os-mobile-metrics.json
+        run: node scripts/qa/panacea-os-mobile-smoke.mjs
+
       - name: Upload Body Exposure mobile QA artifact
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: body3d-mobile-qa
           path: artifacts/body3d-mobile-*
+          if-no-files-found: warn
+          retention-days: 7
+
+      - name: Upload Panacea OS mobile QA artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: panacea-os-mobile-qa
+          path: artifacts/panacea-os-mobile-*
           if-no-files-found: warn
           retention-days: 7
 
@@ -91,10 +103,6 @@ jobs:
             kill "$(cat /tmp/panacea-vite-preview.pid)" 2>/dev/null || true
           fi
 
-  # Server acceptance is independent of the browser/WebGL runner. Some backend
-  # regression tests intentionally import shared root React/TSX modules, so this
-  # runner installs both lockfile graphs before executing the same server
-  # typecheck/build/test suite. GitHub can run both acceptance jobs in parallel.
   server-acceptance:
     runs-on: ubuntu-latest
     timeout-minutes: 20
