@@ -301,7 +301,12 @@ try {
     throw new Error('Whole-body motion inspector scientific boundary is not visible')
   }
 
-  await inspector.getByRole('button', { name: /Inspect this motion in shared 3D/i }).click()
+  const shared3dButton = inspector.getByRole('button', { name: /Inspect \d+ exact source nodes in shared 3D/i })
+  await shared3dButton.waitFor({ state: 'visible', timeout: 5_000 })
+  if (!(await shared3dButton.isEnabled())) {
+    throw new Error('Whole-body motion inspector shared 3D action is disabled despite represented source geometry')
+  }
+  await shared3dButton.click()
   await page.waitForTimeout(300)
   const postShared3dHealth = await canvasHealth(canvas)
   await assertNoFatal('Shared 3D motion inspection triggered a Body3D fatal state')
