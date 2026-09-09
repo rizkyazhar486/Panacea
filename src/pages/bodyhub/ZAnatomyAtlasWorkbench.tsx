@@ -17,6 +17,7 @@ import {
   publishAnatomyContextHandoff,
   type AnatomyContextDestination,
 } from '../../lib/anatomyContextHandoff'
+import ZAnatomySpatialSourceMap from './ZAnatomySpatialSourceMap'
 
 interface Props {
   onHighlight?: (nodeHints: string[]) => void
@@ -218,6 +219,12 @@ export function ZAnatomyAtlasWorkbench({ onHighlight, onFocusRegion, onEnableLay
           </div>
         </div>
       </section>
+
+      <ZAnatomySpatialSourceMap
+        onHighlight={onHighlight}
+        onFocusRegion={onFocusRegion}
+        onEnableLayer={onEnableLayer}
+      />
 
       <section className="grid gap-3 xl:grid-cols-[0.72fr_1.28fr]">
         <div className="space-y-3">
