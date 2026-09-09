@@ -159,8 +159,48 @@ try {
     throw new Error(`Page overflows horizontally: ${viewport.documentScrollWidth}px > ${viewport.width}px`)
   }
 
-  const vessels = page.getByRole('button', { name: 'Vessels', exact: true }).first()
-  await vessels.click()
+  // Exercise the real viewer-adjacent mobile path instead of reaching the
+  // distant Layers rail directly. Native instant scrolling avoids Playwright's
+  // element-stability wait during the animated Body panel, but activation still
+  // uses ordinary Playwright clicks and remains fail-closed on viewport reachability.
+  const exerciseRefs = page.getByRole('button', { name: 'Exercise refs', exact: true }).first()
+  await exerciseRefs.waitFor({ state: 'visible', timeout: 5_000 })
+  await exerciseRefs.evaluate((node) => node.scrollIntoView({ block: 'center', inline: 'nearest', behavior: 'auto' }))
+  await page.waitForTimeout(100)
+  const exerciseRefsBox = await exerciseRefs.boundingBox()
+  if (!exerciseRefsBox) throw new Error('Exercise refs control has no measurable bounding box on mobile')
+  const exerciseRefsInViewport =
+    exerciseRefsBox.x >= 0 &&
+    exerciseRefsBox.y >= 0 &&
+    exerciseRefsBox.x + exerciseRefsBox.width <= viewport.width &&
+    exerciseRefsBox.y + exerciseRefsBox.height <= viewport.height
+  if (!exerciseRefsInViewport) {
+    throw new Error(`Exercise refs control cannot be brought into the 390x844 viewport: ${JSON.stringify(exerciseRefsBox)}`)
+  }
+  await exerciseRefs.click()
+
+  const enableVessels = page.getByRole('button', { name: /Turn on Vessels & Organs to inspect the system/i }).first()
+  await enableVessels.waitFor({ state: 'visible', timeout: 5_000 })
+  await enableVessels.evaluate((node) => node.scrollIntoView({ block: 'center', inline: 'nearest', behavior: 'auto' }))
+  await page.waitForTimeout(100)
+  const enableVesselsBox = await enableVessels.boundingBox()
+  if (!enableVesselsBox) throw new Error('Vessels & Organs shortcut has no measurable bounding box on mobile')
+  const enableVesselsInViewport =
+    enableVesselsBox.x >= 0 &&
+    enableVesselsBox.y >= 0 &&
+    enableVesselsBox.x + enableVesselsBox.width <= viewport.width &&
+    enableVesselsBox.y + enableVesselsBox.height <= viewport.height
+  metrics.progressiveLayerControl = {
+    path: 'Exercise refs -> Turn on Vessels & Organs',
+    exerciseRefsBox,
+    box: enableVesselsBox,
+    inViewport: exerciseRefsInViewport && enableVesselsInViewport,
+  }
+  if (!enableVesselsInViewport) {
+    throw new Error(`Vessels & Organs shortcut cannot be brought into the 390x844 viewport: ${JSON.stringify(enableVesselsBox)}`)
+  }
+  await enableVessels.click()
+
   await progressiveLoading.waitFor({ state: 'visible', timeout: 5_000 })
   const progressiveClass = await progressiveLoading.evaluate((node) =>
     node.closest('[role="status"]')?.getAttribute('class') ?? '',
