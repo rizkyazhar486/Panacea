@@ -126,6 +126,7 @@ export function DrugSection({ onHighlightSites }: Props) {
             value={q}
             onChange={(e) => setQ(e.target.value)}
             onKeyDown={(e) => { if (e.key === 'Enter' && q.trim()) pilih(q.trim()) }}
+            aria-label="Search drug, vaccine or serum"
             placeholder="Search a drug, vaccine or serum…"
             className="h-11 w-full rounded-xl border border-neutral-200 bg-white px-3 text-sm text-ink outline-none focus:border-brand dark:border-white/10 dark:bg-white/5 dark:text-white"
           />
@@ -133,7 +134,7 @@ export function DrugSection({ onHighlightSites }: Props) {
             <ul className="absolute z-20 mt-1 max-h-56 w-full overflow-y-auto rounded-xl border border-neutral-200 bg-white shadow-lg dark:border-white/10 dark:bg-neutral-900">
               {suggestions.map((s) => (
                 <li key={s.rxcui}>
-                  <button onClick={() => pilih(s.nama)} className="w-full px-3 py-2 text-left text-sm text-ink hover:bg-neutral-50 dark:text-white dark:hover:bg-white/5">
+                  <button type="button" onClick={() => pilih(s.nama)} className="w-full px-3 py-2 text-left text-sm text-ink hover:bg-neutral-50 dark:text-white dark:hover:bg-white/5">
                     {s.nama}
                   </button>
                 </li>
@@ -148,8 +149,8 @@ export function DrugSection({ onHighlightSites }: Props) {
         </p>
       </div>
 
-      {loading && <p className="text-sm text-neutral-500">Looking up pharmacology and the official label…</p>}
-      {error && <p className="text-sm text-neutral-500">{error}</p>}
+      {loading && <p role="status" className="text-sm text-neutral-500">Looking up pharmacology and the official label…</p>}
+      {error && <p role="alert" className="text-sm text-neutral-500">{error}</p>}
 
       {(action.length > 0 || adverse.length > 0) && (
         <div className="space-y-2">
