@@ -81,6 +81,7 @@ export const EYE_CELL_ORGANELLE_WAVE4: readonly EyeCellOrganelleNode[] = [
   C('rpe-melanosomes', 'RPE melanosomes', 'rpe', 'organelle', 'retinal-pigment-epithelium', 'PMID:32648890'),
   C('rpe-mitochondria', 'RPE mitochondria', 'rpe', 'organelle', 'retinal-pigment-epithelium', 'PMID:32648890'),
   C('rpe-phagosomes', 'RPE photoreceptor-outer-segment phagosomes', 'rpe', 'organelle', 'retinal-pigment-epithelium', 'PMID:25074813'),
+  C('rpe-phagosome-lysosomal-degradation-stage', 'RPE phagosome lysosomal-degradation stage', 'rpe', 'cell-compartment', 'rpe-phagosomes', 'PMID:16524426', 'Conceptual reference stage only: the cited review supports phagosome transport into the RPE cell body and lysosomal degradation of its contents. Do not present this as a measured phagolysosome geometry, infer compartment count or position, transport/degradation kinetics, molecular interactions, or disease state.'),
   C('rpe-lysosomes', 'RPE lysosomes', 'rpe', 'organelle', 'retinal-pigment-epithelium', 'PMID:8419462'),
 ] as const
 
@@ -107,11 +108,12 @@ export const EYE_WAVE4_REQUIRED_IDS = [
   'rpe-basal-infoldings',
   'rpe-melanosomes',
   'rpe-phagosomes',
+  'rpe-phagosome-lysosomal-degradation-stage',
   'rpe-lysosomes',
 ] as const
 
 export const EYE_WAVE4_SCIENTIFIC_BOUNDARY =
-  'Cellular reference only. Do not fabricate dimensions, organelle counts, copy numbers, concentrations, microscopy coordinates, vesicle or ribbon counts, transport or release kinetics, synaptic strength, disease state, patient-specific morphology, synthetic cellular geometry, or molecular-function inference from visual motion.'
+  'Cellular reference only. Do not fabricate dimensions, organelle counts, copy numbers, concentrations, microscopy coordinates, vesicle or ribbon counts, transport, degradation or release kinetics, synaptic strength, molecular interactions, disease state, patient-specific morphology, synthetic cellular geometry, or molecular-function inference from visual motion.'
 
 const evidencePattern = /^(NCBI:NBK\d+|PMID:\d+)$/
 
