@@ -160,6 +160,17 @@ try {
   }
 
   const vessels = page.getByRole('button', { name: 'Vessels', exact: true }).first()
+  // The layer controls live below the tall 3D viewer on a 390x844 screen.
+  // Bring the real user control into the visual viewport before interacting;
+  // do not bypass the UI with DOM clicks or state injection, because this
+  // smoke is meant to prove the mobile control can actually be reached.
+  await vessels.evaluate((node) => node.scrollIntoView({ block: 'center', inline: 'center', behavior: 'auto' }))
+  await page.waitForTimeout(100)
+  const vesselsBox = await vessels.boundingBox()
+  if (!vesselsBox || vesselsBox.x < 0 || vesselsBox.y < 0 || vesselsBox.x + vesselsBox.width > viewport.width || vesselsBox.y + vesselsBox.height > viewport.height) {
+    throw new Error(`Vessels layer control could not be brought into the mobile viewport: ${JSON.stringify(vesselsBox)}`)
+  }
+  metrics.vesselsControlInViewport = true
   await vessels.click()
   await progressiveLoading.waitFor({ state: 'visible', timeout: 5_000 })
   const progressiveClass = await progressiveLoading.evaluate((node) =>
