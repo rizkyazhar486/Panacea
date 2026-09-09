@@ -12,6 +12,8 @@ const MAX_REFERENCE_ORGANS = 256
 const MAX_ANNOTATIONS = 64
 const MAX_TEXT_LENGTH = 512
 
+type FetchLike = typeof fetch
+
 export interface HraReferenceOrgan {
   id: string
   entityId: string | null
@@ -88,8 +90,10 @@ function normalizeReferenceOrgan(value: unknown): HraReferenceOrgan | null {
   }
 }
 
-export async function fetchHraReferenceOrgans(): Promise<HraReferenceOrgan[]> {
-  const response = await fetch(HRA_REFERENCE_ORGANS_URL, {
+export async function fetchHraReferenceOrgans(
+  fetchImpl: FetchLike = fetch,
+): Promise<HraReferenceOrgan[]> {
+  const response = await fetchImpl(HRA_REFERENCE_ORGANS_URL, {
     headers: { Accept: 'application/json' },
     signal: AbortSignal.timeout(TIMEOUT_MS),
   })
