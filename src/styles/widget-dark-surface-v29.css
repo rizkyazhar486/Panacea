@@ -109,8 +109,31 @@ html.dark .panacea-home :is(.widget-instrument-count-v5,.widget-instrument-nav-v
   color:#d7e0e8!important;
 }
 
+/* Repair only the active slide's OUTER neutral fallback. Nested semantic bars,
+   charts and reference ranges keep their own colors. */
+html.dark .panacea-home .widget-instrument-slide-v5[aria-hidden='false'] > :is(.bg-neutral-50,.bg-neutral-100,.bg-neutral-200,.bg-gray-50,.bg-gray-100,.bg-gray-200,.bg-slate-50,.bg-slate-100,.bg-slate-200),
+.dark .panacea-home .widget-instrument-slide-v5[aria-hidden='false'] > :is(.bg-neutral-50,.bg-neutral-100,.bg-neutral-200,.bg-gray-50,.bg-gray-100,.bg-gray-200,.bg-slate-50,.bg-slate-100,.bg-slate-200){
+  background:#111925!important;
+  background-image:none!important;
+  color:#f8fafc!important;
+  color-scheme:dark;
+}
+
+/* Keep a legacy/empty direct-child fallback compact and visibly dark. */
+html.dark .panacea-home .widget-instrument-slide-v5[aria-hidden='false'] > div:empty,
+.dark .panacea-home .widget-instrument-slide-v5[aria-hidden='false'] > div:empty{
+  min-height:132px!important;
+  max-height:184px!important;
+  background:#0b1119!important;
+  background-image:none!important;
+  border:1px solid rgba(255,255,255,.08)!important;
+  border-radius:20px!important;
+  box-shadow:none!important;
+}
+
 @supports selector(.a:has(.b)){
-  .panacea-home .widget-instrument-scroll-v5:has(> .widget-instrument-slide-v5[aria-hidden='false'] > .widget-instrument-loading-v29){
+  .panacea-home .widget-instrument-scroll-v5:has(> .widget-instrument-slide-v5[aria-hidden='false'] > .widget-instrument-loading-v29),
+  .panacea-home .widget-instrument-scroll-v5:has(> .widget-instrument-slide-v5[aria-hidden='false'] > div:empty){
     height:184px!important;
     min-height:184px!important;
     max-height:184px!important;
