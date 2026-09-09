@@ -29,14 +29,6 @@ export interface EyeAssetProductionGate {
   visualQaReviewed: boolean;
 }
 
-/**
- * Build-time/runtime-neutral description of one source node that has already
- * passed through the Panacea source/asset ingestion boundary.
- *
- * This module deliberately does not discover, download, rename or fuzzy-match
- * anatomy. A node can become exact only when the caller supplies the exact
- * source node ID and the node is explicitly mapped to the requested target ID.
- */
 export interface EyeSourceNodeRecord {
   nodeId: string;
   canonicalTargetId: string;
@@ -50,10 +42,6 @@ export interface EyeSourceGeometryReadinessInput {
   targetTrust: BodyTargetTrustRecord;
   requestedSourceNodeId: string | null;
   sourceNodes: readonly EyeSourceNodeRecord[];
-  /**
-   * Review candidates may be surfaced to a human, but they are never promoted
-   * to exact geometry by this evaluator.
-   */
   candidateSourceNodeIds?: readonly string[];
 }
 
@@ -75,15 +63,20 @@ const nonBlank = (value: string | null | undefined): value is string =>
 const identitiesMatch = (
   left: BodySourceIdentity | null,
   right: BodySourceIdentity | null,
-): boolean =>
-  hasCompleteBodySourceIdentity(left) &&
-  hasCompleteBodySourceIdentity(right) &&
-  left.sourceId === right.sourceId &&
-  left.assetId === right.assetId &&
-  left.revision === right.revision &&
-  left.licenseId === right.licenseId &&
-  left.attribution === right.attribution &&
-  left.transformationHistoryId === right.transformationHistoryId;
+): boolean => {
+  if (!left || !right) return false;
+  if (!hasCompleteBodySourceIdentity(left) || !hasCompleteBodySourceIdentity(right)) {
+    return false;
+  }
+  return (
+    left.sourceId === right.sourceId &&
+    left.assetId === right.assetId &&
+    left.revision === right.revision &&
+    left.licenseId === right.licenseId &&
+    left.attribution === right.attribution &&
+    left.transformationHistoryId === right.transformationHistoryId
+  );
+};
 
 const allProductionGatesPass = (gate: EyeAssetProductionGate): boolean =>
   gate.provenanceComplete &&
@@ -96,23 +89,6 @@ const allProductionGatesPass = (gate: EyeAssetProductionGate): boolean =>
 const uniqueNonBlank = (values: readonly string[] | undefined): string[] =>
   [...new Set((values ?? []).filter(nonBlank))];
 
-/**
- * Fail-closed eye/orbit source-geometry readiness.
- *
- * VerifiedEyeRender =
- *   ExactSourceNode
- *   AND AssetProvenanceComplete
- *   AND LicenseCleared
- *   AND StableIdMapped
- *   AND ArtifactVerified
- *   AND PerformanceReviewed
- *   AND VisualQaReviewed
- *   AND TargetTrustVerified
- *   AND SourceIdentityMatchesTargetTrust
- *
- * Candidate/fuzzy matches are review hints only. They can never satisfy
- * ExactSourceNode and therefore can never unlock verified rendering.
- */
 export function evaluateEyeSourceGeometryReadiness(
   input: EyeSourceGeometryReadinessInput,
 ): EyeSourceGeometryReadinessDecision {
