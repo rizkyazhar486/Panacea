@@ -47,6 +47,16 @@ jobs:
       - name: Install mobile browser smoke runner
         run: |
           npm install --no-save --no-package-lock @playwright/test@1.55.0
+          # GitHub-hosted Ubuntu images ship an external Google Chrome apt
+          # source. Playwright downloads its own pinned Chromium, so that source
+          # is unrelated to this gate and must not be allowed to break apt when
+          # Google's repository metadata is briefly inconsistent.
+          for source in /etc/apt/sources.list.d/*; do
+            [ -f "$source" ] || continue
+            if grep -q 'dl.google.com/linux/chrome' "$source"; then
+              sudo rm -f "$source"
+            fi
+          done
           npx playwright install --with-deps chromium
 
       - name: Start frontend preview
