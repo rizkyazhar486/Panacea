@@ -95,6 +95,8 @@ jobs:
         run: npm run uji:auth-access
       - name: Test medical translation safety shield
         run: npm run uji:translate
+      - name: Test payment ownership and webhook boundaries
+        run: npm run uji:payments
       - name: Runtime smoke-test genomics control plane
         env:
           JWT_SECRET: ci-only-panacea-genomics-secret
