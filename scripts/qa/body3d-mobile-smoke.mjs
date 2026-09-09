@@ -95,6 +95,21 @@ async function assertNoFatal(label) {
   }
 }
 
+async function activateVesselsButton(locator) {
+  await locator.waitFor({ state: 'visible', timeout: 20_000 })
+  await locator.evaluate((node) => node.scrollIntoView({ block: 'center', inline: 'nearest', behavior: 'auto' }))
+  await page.waitForTimeout(150)
+  await locator.focus()
+  const state = await locator.evaluate((node) => ({
+    disabled: node instanceof HTMLButtonElement ? node.disabled : true,
+    focused: document.activeElement === node,
+    ariaDisabled: node.getAttribute('aria-disabled'),
+  }))
+  if (state.disabled || state.ariaDisabled === 'true') throw new Error('Vessels layer control is disabled')
+  if (!state.focused) throw new Error('Vessels layer control could not receive browser focus')
+  await page.keyboard.press('Enter')
+}
+
 try {
   const response = await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 45_000 })
   if (response && !response.ok()) throw new Error(`Body Explorer returned HTTP ${response.status()}`)
@@ -160,7 +175,7 @@ try {
   }
 
   const vessels = page.getByRole('button', { name: 'Vessels', exact: true }).first()
-  await vessels.click()
+  await activateVesselsButton(vessels)
   await progressiveLoading.waitFor({ state: 'visible', timeout: 5_000 })
   const progressiveClass = await progressiveLoading.evaluate((node) =>
     node.closest('[role="status"]')?.getAttribute('class') ?? '',
