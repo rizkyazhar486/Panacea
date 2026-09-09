@@ -8,6 +8,11 @@ import {
   type AtlasWorldIntent,
 } from './atlasWorldFrameCompiler'
 import {
+  solveAtlasDissection,
+  validateAtlasDissectionPlan,
+  type AtlasDissectionIntent,
+} from './atlasDissectionSolver'
+import {
   buildRespiratoryMotionField,
   validateRespiratoryMotionField,
   type RespiratoryMotionChannel,
@@ -28,6 +33,7 @@ export const ULTIMATE_WHOLE_BODY_CAPABILITIES = {
     'physiology-capable educational mode',
     'fail-closed surgery-reference mode',
     'organ-to-tissue-to-microstructure drill-down',
+    'semantic peel/isolate/ghost relationship dissection solver',
   ] as const,
   rendering: [
     'adaptive LOD',
@@ -36,6 +42,7 @@ export const ULTIMATE_WHOLE_BODY_CAPABILITIES = {
     'source-bundle de-duplication',
     'transparent context passes',
     'relationship highlight passes',
+    'protected-node dissection visibility decisions',
   ] as const,
   respiratory: [
     'segment-level bronchoscopic reference route',
@@ -53,6 +60,7 @@ export const ULTIMATE_WHOLE_BODY_CAPABILITIES = {
 
 export interface UltimateWholeBodyFrameInput extends Omit<AtlasWorldFrameInput, 'manifest'> {
   intent: AtlasWorldIntent
+  dissection?: AtlasDissectionIntent
   respiratoryMotion?: {
     cycleFraction: number
     selectedSegmentNodeId?: string
@@ -65,6 +73,9 @@ export function planUltimateWholeBodyFrame(input: UltimateWholeBodyFrameInput) {
     ...input,
     manifest: COMPLETE_WHOLE_BODY_ATLAS,
   })
+  const dissection = input.dissection
+    ? solveAtlasDissection(COMPLETE_WHOLE_BODY_ATLAS, input.dissection)
+    : undefined
   const motion = input.respiratoryMotion
     ? buildRespiratoryMotionField(input.respiratoryMotion)
     : undefined
@@ -76,6 +87,7 @@ export function planUltimateWholeBodyFrame(input: UltimateWholeBodyFrameInput) {
       nodeCount: COMPLETE_WHOLE_BODY_ATLAS.nodes.length,
     },
     world,
+    dissection,
     respiratoryMotion: motion,
     capabilities: ULTIMATE_WHOLE_BODY_CAPABILITIES,
   }
@@ -108,6 +120,7 @@ export function ultimateWholeBodyEngineeringReadiness() {
 
 export function validateUltimateWholeBodyFrame(frame: ReturnType<typeof planUltimateWholeBodyFrame>): string[] {
   const issues = validateAtlasWorldFrame(frame.world)
+  if (frame.dissection) issues.push(...validateAtlasDissectionPlan(frame.dissection))
   if (frame.respiratoryMotion) issues.push(...validateRespiratoryMotionField(frame.respiratoryMotion))
   if (frame.atlas.nodeCount !== COMPLETE_WHOLE_BODY_ATLAS.nodes.length) issues.push('Ultimate atlas node count drifted from canonical manifest.')
   if (frame.capabilities.clinicalBoundary.patientSpecificGeometry !== false) issues.push('Ultimate atlas must never self-enable patient-specific geometry.')
