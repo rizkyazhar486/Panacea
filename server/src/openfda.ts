@@ -7,8 +7,8 @@ const BASE = 'https://api.fda.gov/drug/label.json'
 const KEY = process.env.OPENFDA_KEY || ''
 const TIMEOUT_MS = 8000
 const MAX_QUERY_LENGTH = 160
-// SPL set_id is UUID-shaped; malformed upstream identity must fail closed.
-const SPL_SET_ID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
+// openFDA documents both id and set_id as GUIDs; malformed upstream identity must fail closed.
+const OPENFDA_GUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
 
 export interface DrugInfo {
   brand: string
@@ -20,7 +20,7 @@ export interface DrugInfo {
   dosage: string
   adverse: string
   manufacturer: string
-  /** Stable source identity when openFDA supplies a valid SPL set_id or record id. */
+  /** Stable source identity when openFDA supplies a valid SPL set_id or revision record id. */
   labelId?: string
   /** Exact openFDA source query for a valid SPL set_id; never contains an API key. */
   sourceUrl?: string
@@ -50,16 +50,16 @@ function cleanQuery(value: string): string {
     .slice(0, MAX_QUERY_LENGTH)
 }
 
-function normalizeSplSetId(value: string | undefined): string | undefined {
+function normalizeOpenFdaGuid(value: string | undefined): string | undefined {
   const clean = value?.trim()
-  if (!clean || !SPL_SET_ID.test(clean)) return undefined
+  if (!clean || !OPENFDA_GUID.test(clean)) return undefined
   return clean.toLowerCase()
 }
 
 function sourceUrlForSetId(setId: string | undefined): string | undefined {
-  const clean = normalizeSplSetId(setId)
+  const clean = normalizeOpenFdaGuid(setId)
   if (!clean) return undefined
-  const params = new URLSearchParams({ search: `set_id:"${clean}"`, limit: '1' })
+  const params = new URLSearchParams({ search: `set_id:\"${clean}\"`, limit: '1' })
   return `${BASE}?${params.toString()}`
 }
 
@@ -81,8 +81,8 @@ export async function lookupDrug(name: string): Promise<DrugInfo | null> {
   if (!q) return null
 
   const searches = [
-    `openfda.brand_name:"${q}"`,
-    `openfda.generic_name:"${q}"`,
+    `openfda.brand_name:\"${q}\"`,
+    `openfda.generic_name:\"${q}\"`,
   ]
 
   let r: FdaResult | null = null
@@ -92,8 +92,8 @@ export async function lookupDrug(name: string): Promise<DrugInfo | null> {
   }
   if (!r) return null
 
-  const setId = normalizeSplSetId(r.set_id)
-  const recordId = r.id?.trim() || undefined
+  const setId = normalizeOpenFdaGuid(r.set_id)
+  const recordId = normalizeOpenFdaGuid(r.id)
 
   return {
     brand: first(r.openfda?.brand_name) || q,
