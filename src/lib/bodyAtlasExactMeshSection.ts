@@ -60,7 +60,7 @@ function sourceOriginalName(object: THREE.Object3D) {
   return typeof object.userData.originalName === 'string' ? object.userData.originalName.trim() : ''
 }
 
-function findExactSourceObject(root: THREE.Object3D, sourceName: string) {
+function findExactSourceObject(root: THREE.Object3D, sourceName: string): THREE.Object3D | null {
   let match: THREE.Object3D | null = null
   root.traverse((object) => {
     if (!match && sourceOriginalName(object) === sourceName) match = object
