@@ -1,4 +1,5 @@
 import assert from 'node:assert/strict'
+import fs from 'node:fs'
 import { INDEKS_TUBUH } from '../../src/lib/bodySearch.ts'
 import { KEDALAMAN } from '../../src/lib/dissection.ts'
 import {
@@ -33,15 +34,20 @@ assert.ok(INDEKS_TUBUH.length >= 2_500, 'whole-body source index should retain t
 for (const structure of INDEKS_TUBUH) {
   const precision = layerPrecisionForStructure(structure)
   assert.equal(precision.source, 'whole-body-geometry-index')
+  assert.equal(precision.identityPrecision, 'exact-source-mesh')
   assert.equal(precision.layer.layer, structure.l)
   assert.equal(precision.layer.sourceFile, expectedFiles[structure.l])
   assert.equal(precision.layer.depthStage, KEDALAMAN[structure.l])
   assert.equal(precision.coordinateSpace, 'normalized-whole-body-model')
   assert.equal(precision.physicallyCalibrated, false)
   assert.equal(precision.physicalUnit, null)
+  assert.match(precision.calibrationNote, /normalized model-space/i)
+  assert.match(precision.regionNote, /navigation hints, not curated anatomical-region assertions/i)
   assert.ok(precision.exactMeshNames.includes(structure.n), `${structure.n} must remain part of its exact source set`)
   assert.ok(precision.members.length >= 1, `${structure.n} must resolve to indexed mesh metadata`)
   assert.ok(precision.members.every((member) => INDEKS_TUBUH.some((candidate) => candidate.n === member.exactMeshName && candidate.l === structure.l)))
+  assert.ok(precision.members.every((member) => member.lateralityMethod === 'source-name-suffix'))
+  assert.ok(precision.members.every((member) => member.regionMethod === 'normalized-coordinate-heuristic'))
   assert.ok(precision.members.every((member) => Number.isFinite(member.normalizedHeight) && member.normalizedHeight >= 0 && member.normalizedHeight <= 1))
   assert.ok(precision.members.every((member) => Number.isFinite(member.normalizedRadialDistance) && member.normalizedRadialDistance >= 0))
   assert.equal(precision.totalTriangles, precision.members.reduce((sum, member) => sum + member.triangles, 0))
@@ -50,4 +56,9 @@ for (const structure of INDEKS_TUBUH) {
 
 assert.equal(layerPrecisionByExactName('__not_a_real_mesh__'), null, 'unknown names must fail closed rather than substitute another structure')
 
-console.log(`Layer precision contract verified across ${INDEKS_TUBUH.length} exact whole-body meshes and all ${LAYER_PRECISION_LAYERS.length} source layers.`)
+const generator = fs.readFileSync('scripts/indeksTubuh.mjs', 'utf8')
+assert.match(generator, /function wilayahDari\(yNorm, radial\)/)
+assert.match(generator, /if \(radial > 0\.16 && yNorm >= 0\.6 && yNorm <= 0\.85\) return 'bahu-lengan'/)
+assert.match(generator, /if \(radial > 0\.2 && yNorm >= 0\.4 && yNorm < 0\.62\) return 'tangan'/)
+
+console.log(`Layer precision contract verified across ${INDEKS_TUBUH.length} exact whole-body meshes and all ${LAYER_PRECISION_LAYERS.length} source layers, with heuristic region provenance kept explicit.`)
