@@ -21,6 +21,7 @@ import { IconLeaf } from '../components/icons'
 
 const Nutrition = lazy(() => import('./Nutrition').then((m) => ({ default: m.Nutrition })))
 const MacroLabGizi = lazy(() => import('./MacroLabGizi').then((m) => ({ default: m.MacroLabGizi })))
+const NutritionChecklist = lazy(() => import('./NutritionChecklist').then((m) => ({ default: m.NutritionChecklist })))
 const NutritionToolkit = lazy(() => import('./NutritionToolkit').then((m) => ({ default: m.NutritionToolkit })))
 const DietarySupplements = lazy(() => import('./DietarySupplements').then((m) => ({ default: m.DietarySupplements })))
 const HydrationCalculator = lazy(() => import('./HydrationCalculator').then((m) => ({ default: m.HydrationCalculator })))
@@ -36,6 +37,8 @@ const TABS: TabDef[] = [
     ringkas: 'What you ate, its energy and composition, and how it lands' },
   { id: 'makro', label: 'Macros', emoji: '📊', komponen: MacroLabGizi,
     ringkas: 'Protein, carbohydrate and fat targets, and why each one is set there' },
+  { id: 'checklist', label: 'Checklist', emoji: '✅', komponen: NutritionChecklist,
+    ringkas: 'Verify recorded inputs, units, provenance and interpretation boundaries before reuse' },
   { id: 'alat', label: 'Toolkit', emoji: '🧰', komponen: NutritionToolkit,
     ringkas: 'Practical tools — portions, labels, swaps, planning' },
   { id: 'suplemen', label: 'Supplements', emoji: '💊', komponen: DietarySupplements,
