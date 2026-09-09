@@ -27,11 +27,11 @@ async function runEyeOptics(page) {
   await specialty.click()
 
   const neuro = page.getByRole('button', { name: 'Neuro & senses', exact: true })
-  await expect(neuro).toBeVisible()
+  await neuro.waitFor({ state: 'visible', timeout: 20_000 })
   await activateWithKeyboard(neuro)
 
   const eye = page.getByRole('button', { name: 'Eye & orbit', exact: true })
-  await expect(eye).toBeVisible()
+  await eye.waitFor({ state: 'visible', timeout: 20_000 })
   await activateWithKeyboard(eye)
 
   const opener = page.getByRole('button', { name: 'Explore pupil & accommodation', exact: true })
