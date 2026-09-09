@@ -1,5 +1,4 @@
 import type { AtlasManifest, AtlasNode } from './atlasKernel'
-import { HIGHER_END_WHOLE_BODY_NODES } from './higherEndWholeBodyAtlas'
 import { RESPIRATORY_ATLAS_NODES } from './respiratoryAtlas'
 import { WHOLE_BODY_ATLAS_BASE_NODES } from './wholeBodyAtlas'
 
@@ -28,23 +27,16 @@ export function deriveCanonicalAtlasHierarchy(nodes: readonly AtlasNode[]): read
 /**
  * Canonical high-complexity atlas manifest used by advanced viewers.
  *
- * Three independently reviewable layers are composed here:
- * - shipped/indexed whole-body baseline;
- * - respiratory airway/lobe/segment deep dive;
- * - higher-end whole-body reference expansion for compartments, vascular and
- *   neural networks, lymphatics, fascial spaces, and organ→microstructure
- *   scale bridges.
- *
- * Reference-only expansion nodes deliberately remain non-shipped until a
- * reviewed geometry/source binding is admitted. Hierarchy children are rebuilt
- * after composition so cross-module topology stays deterministic.
+ * The base whole-body scaffold and the respiratory deep-dive are composed only
+ * here so each source file remains independently reviewable. Hierarchy children
+ * are rebuilt after composition, making cross-module parents deterministic and
+ * preventing stale authoring hints from changing the runtime topology.
  */
 export const COMPLETE_WHOLE_BODY_ATLAS: AtlasManifest = {
   id: 'panacea-complete-whole-body-atlas',
-  revision: '2026-09-09-r3-higher-end',
+  revision: '2026-09-09-r2',
   nodes: deriveCanonicalAtlasHierarchy([
     ...WHOLE_BODY_ATLAS_BASE_NODES,
     ...RESPIRATORY_ATLAS_NODES,
-    ...HIGHER_END_WHOLE_BODY_NODES,
   ]),
 }
