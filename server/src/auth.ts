@@ -8,6 +8,12 @@ import { effectiveRoleForRequest, roleForLogin } from './accessControl.js'
 
 const googleClient = new OAuth2Client(config.googleClientId)
 const COOKIE = 'pmd_session'
+const SESSION_COOKIE_ATTRIBUTES = {
+  httpOnly: true,
+  secure: config.cookieSecure,
+  sameSite: config.cookieSecure ? 'none' : 'lax',
+  path: '/',
+} as const
 
 function issueToken(userId: string): string {
   return jwt.sign({ uid: userId }, config.jwtSecret, { expiresIn: '7d' })
@@ -16,16 +22,14 @@ function issueToken(userId: string): string {
 export function setSession(res: Response, userId: string): string {
   const token = issueToken(userId)
   res.cookie(COOKIE, token, {
-    httpOnly: true,
-    secure: config.cookieSecure,
-    sameSite: config.cookieSecure ? 'none' : 'lax',
+    ...SESSION_COOKIE_ATTRIBUTES,
     maxAge: 7 * 24 * 3600 * 1000,
   })
   return token
 }
 
 export function clearSession(res: Response) {
-  res.clearCookie(COOKIE)
+  res.clearCookie(COOKIE, SESSION_COOKIE_ATTRIBUTES)
 }
 
 export function currentUser(req: Request): User | undefined {
