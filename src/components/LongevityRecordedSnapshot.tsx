@@ -4,44 +4,12 @@ import {
   buildLongevityRecordedSnapshot,
   longevitySnapshotProvenance,
 } from '../lib/longevityRecordedSnapshot'
+import { buildLongevityRecordedChecklist } from '../lib/longevityRecordedChecklist'
 
 export function LongevityRecordedSnapshot({ vitals }: { vitals: Vitals }) {
   const metrics = buildLongevityRecordedSnapshot(vitals)
   const provenance = longevitySnapshotProvenance(vitals)
-  const checklist = [
-    {
-      id: 'source',
-      label: 'Source identity',
-      ok: Boolean(provenance.source),
-      detail: provenance.source ?? 'No shared-vitals source is recorded yet.',
-    },
-    {
-      id: 'timestamp',
-      label: 'Measurement timestamp',
-      ok: Boolean(provenance.timestamp),
-      detail: provenance.timestamp ?? 'No shared-vitals timestamp is recorded yet.',
-    },
-    {
-      id: 'units',
-      label: 'Units / dimensionless identity preserved',
-      ok: metrics.length > 0 && metrics.every((metric) => metric.unit.trim().length > 0 || metric.key === 'waistHipRatio'),
-      detail: metrics.length > 0
-        ? 'Every rendered metric keeps its explicit unit, while waist-to-hip ratio remains explicitly dimensionless.'
-        : 'No recorded metric is present, so no unit claim is synthesized.',
-    },
-    {
-      id: 'empty-state',
-      label: 'No fabricated defaults',
-      ok: true,
-      detail: 'The recorded snapshot stays empty when shared measurements are unavailable.',
-    },
-    {
-      id: 'scientific-boundary',
-      label: 'Scientific boundary',
-      ok: true,
-      detail: 'This checklist does not validate the page’s legacy score, biological-age estimate, targets, projections, diagnosis, prognosis or treatment guidance.',
-    },
-  ] as const
+  const checklist = buildLongevityRecordedChecklist(metrics, provenance)
 
   return (
     <Card className="!p-5">
