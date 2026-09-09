@@ -106,9 +106,10 @@ const incompleteSource = compileBodyTargetPresentation({
     sourceIdentity: { ...verifiedTarget.sourceIdentity!, revision: '   ' },
   },
 });
-assert.equal(incompleteSource.mode, 'hidden');
+assert.equal(incompleteSource.mode, 'reference');
 assert.equal(incompleteSource.sourceIdentityStatus, 'incomplete');
 assert.equal(incompleteSource.verifiedAnatomyLabelAllowed, false);
+assert.ok(incompleteSource.blockers.includes('target:verified-anatomy-not-eligible'));
 assert.ok(incompleteSource.mandatoryDisclosures.some((line) => line.includes('Source identity: incomplete')));
 
 const notRepresented = compileBodyTargetPresentation({
