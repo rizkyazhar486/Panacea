@@ -217,10 +217,18 @@ export function WholeBodyMotionInspector({ onHighlight, onFocusRegion, onEnableL
               <div className={`rounded-xl border p-2 text-[9px] leading-relaxed ${exactSourceNames.length ? 'border-brand/20 bg-brand/[0.05] text-neutral-300' : 'border-amber-400/20 bg-amber-400/[0.05] text-amber-200'}`}>
                 <span className="font-black">Geometry correspondence. </span>
                 {exactSourceNames.length
-                  ? `${exactSourceNames.length} exact skeletal/muscular source nodes match this reviewed joint + motion context.`
+                  ? `${exactSourceNames.length} exact skeletal/muscular source nodes match this curated joint + motion context.`
                   : 'No exact regional skeletal/muscular source-node match. The biomechanics description remains educational text and is not projected onto substitute geometry.'}
               </div>
-              <button type="button" disabled={!exactSourceNames.length} onClick={applyToViewer} className="min-h-11 rounded-full border border-brand px-4 text-[11px] font-black text-brand transition hover:bg-brand hover:text-white disabled:cursor-not-allowed disabled:border-white/10 disabled:text-neutral-600">{exactSourceNames.length ? `Inspect ${exactSourceNames.length} exact source nodes in shared 3D →` : 'No exact represented geometry to inspect'}</button>
+              <button
+                type="button"
+                aria-label={exactSourceNames.length ? 'Inspect this motion in shared 3D' : 'No exact represented geometry to inspect'}
+                disabled={!exactSourceNames.length}
+                onClick={applyToViewer}
+                className="min-h-11 rounded-full border border-brand px-4 text-[11px] font-black text-brand transition hover:bg-brand hover:text-white disabled:cursor-not-allowed disabled:border-white/10 disabled:text-neutral-600"
+              >
+                {exactSourceNames.length ? `Inspect ${exactSourceNames.length} exact source nodes in shared 3D →` : 'No exact represented geometry to inspect'}
+              </button>
             </div>
           </div>
 
