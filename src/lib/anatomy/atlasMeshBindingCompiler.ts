@@ -100,10 +100,6 @@ function optionsWithDefaults(options: AtlasMeshBindingCompilerOptions): Required
   }
 }
 
-function normalizedSet(values: readonly string[]) {
-  return new Set(values.map(normalizeAtlasTerm).filter(Boolean))
-}
-
 function nodeSearchTerms(node: AtlasNode) {
   return stableUnique([node.label, ...(node.synonyms ?? []), ...node.source.nodeHints])
     .map(normalizeAtlasTerm)
@@ -132,9 +128,15 @@ function scopeMeshNodes(
   })
 }
 
-function scoreCandidate(node: AtlasNode, mesh: BodyAtlasNode, hint: string, hintIndex: number): AtlasMeshBindingCandidate | null {
+function scoreCandidate(
+  node: AtlasNode,
+  mesh: BodyAtlasNode,
+  hint: string,
+  hintIndex: number,
+): AtlasMeshBindingCandidate | null {
   const normalizedHint = normalizeAtlasTerm(hint)
   if (!normalizedHint) return null
+
   const sourceMatches = anatomySourceNameMatchesHint(mesh.sourceName, hint)
   const baseMatches = anatomySourceNameMatchesHint(mesh.baseName, hint)
   if (!sourceMatches && !baseMatches) return null
@@ -158,8 +160,6 @@ function scoreCandidate(node: AtlasNode, mesh: BodyAtlasNode, hint: string, hint
     reasons.push('reviewed-contiguous-base-hint')
   }
 
-  // Ordered hints encode reviewer specificity. Earlier hints receive a bounded
-  // bonus but can never rescue a non-match.
   score += Math.max(0, 120 - hintIndex * 20)
   reasons.push(`specificity-rank:${hintIndex}`)
 
@@ -215,14 +215,30 @@ function sameStructuralIdentity(a: BodyAtlasNode | undefined, b: BodyAtlasNode |
   return a.layer === b.layer && a.normalizedBaseName === b.normalizedBaseName
 }
 
+function classifyCompetition(
+  eligible: readonly AtlasMeshBindingCandidate[],
+  graph: BodyAtlasGraph,
+  ambiguityMargin: number,
+) {
+  const lookup = meshById(graph)
+  const top = eligible[0]
+  const topMesh = top ? lookup.get(top.meshNodeId) : undefined
+  const sameIdentity = top
+    ? eligible.filter((candidate) => sameStructuralIdentity(topMesh, lookup.get(candidate.meshNodeId)))
+    : []
+  const competing = top
+    ? eligible.find((candidate) => !sameStructuralIdentity(topMesh, lookup.get(candidate.meshNodeId)))
+    : undefined
+  const ambiguous = Boolean(top && competing && top.score - competing.score < ambiguityMargin)
+  return { sameIdentity, competing, ambiguous }
+}
+
 function selectSpecificFallback(
   node: AtlasNode,
   scopedMeshes: readonly BodyAtlasNode[],
   graph: BodyAtlasGraph,
   options: Required<AtlasMeshBindingCompilerOptions>,
 ): AtlasMeshBindingResult {
-  const lookup = meshById(graph)
-
   for (let hintIndex = 0; hintIndex < node.source.nodeHints.length; hintIndex += 1) {
     const hint = node.source.nodeHints[hintIndex]
     const ranked = rankCandidates(scopedMeshes
@@ -231,6 +247,7 @@ function selectSpecificFallback(
       .slice(0, options.maxCandidatesPerHint)
 
     if (!ranked.length) continue
+
     const eligible = ranked.filter((candidate) => candidate.score >= options.minScore)
     if (!eligible.length) {
       return {
@@ -244,11 +261,8 @@ function selectSpecificFallback(
       }
     }
 
-    const top = eligible[0]
-    const topMesh = lookup.get(top.meshNodeId)
-    const sameIdentity = eligible.filter((candidate) => sameStructuralIdentity(topMesh, lookup.get(candidate.meshNodeId)))
-    const competing = eligible.find((candidate) => !sameStructuralIdentity(topMesh, lookup.get(candidate.meshNodeId)))
-    if (competing && top.score - competing.score < options.ambiguityMargin) {
+    const { sameIdentity, ambiguous } = classifyCompetition(eligible, graph, options.ambiguityMargin)
+    if (ambiguous) {
       return {
         atlasNodeId: node.id,
         status: 'ambiguous',
@@ -261,15 +275,16 @@ function selectSpecificFallback(
     }
 
     const selected = sameIdentity.slice(0, options.maxSelectedMeshes)
+    const truncated = selected.length < sameIdentity.length
     return {
       atlasNodeId: node.id,
-      status: 'bound',
+      status: truncated ? 'partial' : 'bound',
       selectedMeshNodeIds: selected.map((candidate) => candidate.meshNodeId),
       candidates: eligible,
       matchedHints: [hint],
       unresolvedHints: [],
-      reasons: selected.length < sameIdentity.length
-        ? [`Selection bounded to maxSelectedMeshes=${options.maxSelectedMeshes}.`]
+      reasons: truncated
+        ? [`One structural identity resolved, but selection was bounded to maxSelectedMeshes=${options.maxSelectedMeshes}.`]
         : ['Specific-fallback binding resolved one structural identity without competing ambiguity.'],
     }
   }
@@ -291,15 +306,23 @@ function selectComposite(
   graph: BodyAtlasGraph,
   options: Required<AtlasMeshBindingCompilerOptions>,
 ): AtlasMeshBindingResult {
-  const lookup = meshById(graph)
   const allCandidates: AtlasMeshBindingCandidate[] = []
   const selectedIds: string[] = []
   const matchedHints: string[] = []
   const unresolvedHints: string[] = []
+  const ambiguousHints: string[] = []
   const reasons: string[] = []
 
   for (let hintIndex = 0; hintIndex < node.source.nodeHints.length; hintIndex += 1) {
     const hint = node.source.nodeHints[hintIndex]
+
+    if (selectedIds.length >= options.maxSelectedMeshes) {
+      const remaining = node.source.nodeHints.slice(hintIndex)
+      unresolvedHints.push(...remaining)
+      reasons.push(`Composite selection reached maxSelectedMeshes=${options.maxSelectedMeshes}; remaining components were not silently promoted.`)
+      break
+    }
+
     const ranked = rankCandidates(scopedMeshes
       .map((mesh) => scoreCandidate(node, mesh, hint, hintIndex))
       .filter((candidate): candidate is AtlasMeshBindingCandidate => Boolean(candidate)))
@@ -312,11 +335,9 @@ function selectComposite(
       continue
     }
 
-    const top = eligible[0]
-    const topMesh = lookup.get(top.meshNodeId)
-    const sameIdentity = eligible.filter((candidate) => sameStructuralIdentity(topMesh, lookup.get(candidate.meshNodeId)))
-    const competing = eligible.find((candidate) => !sameStructuralIdentity(topMesh, lookup.get(candidate.meshNodeId)))
-    if (competing && top.score - competing.score < options.ambiguityMargin) {
+    const { sameIdentity, ambiguous } = classifyCompetition(eligible, graph, options.ambiguityMargin)
+    if (ambiguous) {
+      ambiguousHints.push(hint)
       unresolvedHints.push(hint)
       reasons.push(`Composite component "${hint}" remained ambiguous.`)
       continue
@@ -330,21 +351,27 @@ function selectComposite(
   }
 
   const status: AtlasMeshBindingStatus = selectedIds.length === 0
-    ? (allCandidates.length ? 'ambiguous' : 'unresolved')
+    ? (ambiguousHints.length ? 'ambiguous' : 'unresolved')
     : unresolvedHints.length
       ? 'partial'
       : 'bound'
 
+  const defaultReason = status === 'bound'
+    ? 'Every composite component resolved through explicit reviewed hints.'
+    : status === 'ambiguous'
+      ? 'No composite component could be selected because at least one reviewed hint had competing structural identities.'
+      : status === 'unresolved'
+        ? `No composite component met the configured binding threshold minScore=${options.minScore}.`
+        : 'Composite binding is partial because one or more reviewed components remained unresolved, ambiguous, or exceeded the selection cap.'
+
   return {
     atlasNodeId: node.id,
     status,
-    selectedMeshNodeIds: selectedIds.slice(0, options.maxSelectedMeshes),
+    selectedMeshNodeIds: selectedIds,
     candidates: rankCandidates(allCandidates),
     matchedHints: stableUnique(matchedHints),
     unresolvedHints: stableUnique(unresolvedHints),
-    reasons: reasons.length ? reasons : [status === 'bound'
-      ? 'Every composite component resolved through explicit reviewed hints.'
-      : 'Composite binding is fail-closed for unresolved or ambiguous components.'],
+    reasons: reasons.length ? reasons : [defaultReason],
   }
 }
 
