@@ -8,6 +8,14 @@ import type {
   AtlasSystemId,
 } from './atlasKernel'
 
+export interface AtlasGraphEdge {
+  from: string
+  to: string
+  kind: AtlasRelationKind | 'hierarchy'
+  weight: number
+  reversed?: boolean
+}
+
 export interface AtlasRuntimeIndex {
   manifest: AtlasManifest
   byId: ReadonlyMap<string, AtlasNode>
@@ -17,14 +25,6 @@ export interface AtlasRuntimeIndex {
   normalizedTerms: ReadonlyMap<string, readonly string[]>
   depthById: ReadonlyMap<string, number>
   graph: ReadonlyMap<string, readonly AtlasGraphEdge[]>
-}
-
-export interface AtlasGraphEdge {
-  from: string
-  to: string
-  kind: AtlasRelationKind | 'hierarchy'
-  weight: number
-  reversed?: boolean
 }
 
 export interface AtlasSearchFilters {
@@ -93,18 +93,21 @@ export interface AtlasCoverageCell {
   surgicalLandmarks: number
 }
 
+export interface AtlasSystemCoverageSummary {
+  total: number
+  shipped: number
+  partial: number
+  referenceOnly: number
+  planned: number
+  representedRegions: number
+  representedScales: number
+}
+
 export interface AtlasCoverageMatrix {
   cells: readonly AtlasCoverageCell[]
   emptyCells: readonly AtlasCoverageCell[]
-  bySystem: Readonly<Record<AtlasSystemId, {
-    total: number
-    shipped: number
-    partial: number
-    referenceOnly: number
-    planned: number
-    representedRegions: number
-    representedScales: number
-  }>>
+  /** Partial because callers may deliberately request only a subset of systems. */
+  bySystem: Readonly<Partial<Record<AtlasSystemId, AtlasSystemCoverageSummary>>>
 }
 
 export interface AtlasPrefetchRequest {
@@ -129,39 +132,31 @@ export interface AtlasScaleRoute {
 }
 
 const SCALE_ORDER: readonly AtlasScale[] = ['organism', 'region', 'organ', 'suborgan', 'tissue', 'microstructure']
+const HIERARCHY_WEIGHT = 0.6
 
 const RELATION_WEIGHTS: Readonly<Record<AtlasRelationKind, number>> = {
-  'contains': 0.75,
+  contains: 0.75,
   'part-of': 0.75,
   'continuous-with': 0.9,
   'articulates-with': 1,
   'passes-through': 1.05,
-  'supplies': 1.15,
-  'drains': 1.15,
-  'innervates': 1.2,
+  supplies: 1.15,
+  drains: 1.15,
+  innervates: 1.2,
   'moves-with': 1.25,
   'projects-to': 1.3,
   'adjacent-to': 1.8,
 }
 
-const HIERARCHY_WEIGHT = 0.6
+const normalize = (value: string) => value
+  .normalize('NFKD')
+  .toLowerCase()
+  .replace(/[^a-z0-9]+/g, ' ')
+  .trim()
+  .replace(/\s+/g, ' ')
 
-function normalize(value: string) {
-  return value
-    .normalize('NFKD')
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, ' ')
-    .trim()
-    .replace(/\s+/g, ' ')
-}
-
-function tokens(value: string) {
-  return normalize(value).split(' ').filter(Boolean)
-}
-
-function stableUnique<T>(values: readonly T[]) {
-  return [...new Set(values)]
-}
+const tokens = (value: string) => normalize(value).split(' ').filter(Boolean)
+const stableUnique = <T>(values: readonly T[]) => [...new Set(values)]
 
 function pushMap<K, V>(map: Map<K, V[]>, key: K, value: V) {
   const bucket = map.get(key) ?? []
@@ -195,7 +190,7 @@ function hierarchyDepth(nodeId: string, byId: ReadonlyMap<string, AtlasNode>) {
 
 function addGraphEdge(graph: Map<string, AtlasGraphEdge[]>, edge: AtlasGraphEdge) {
   const bucket = graph.get(edge.from) ?? []
-  const duplicate = bucket.some((existing) => existing.to === edge.to && existing.kind === edge.kind && existing.reversed === edge.reversed)
+  const duplicate = bucket.some((item) => item.to === edge.to && item.kind === edge.kind && item.reversed === edge.reversed)
   if (!duplicate) bucket.push(edge)
   graph.set(edge.from, bucket)
 }
@@ -250,20 +245,11 @@ function termScore(term: string, query: string, queryTokens: readonly string[]) 
   const termTokens = tokens(term)
   const overlap = queryTokens.filter((token) => termTokens.includes(token)).length
   if (!overlap) return 0
-  const coverage = overlap / Math.max(queryTokens.length, 1)
-  return overlap * 12 + coverage * 24
+  return overlap * 12 + (overlap / Math.max(queryTokens.length, 1)) * 24
 }
 
-/**
- * Deterministic local search over the canonical manifest. No network, no model,
- * no fuzzy medical inference: the result is bounded by reviewed labels,
- * synonyms, ids, and source hints already present in the atlas contract.
- */
-export function searchAtlasRuntime(
-  index: AtlasRuntimeIndex,
-  queryRaw: string,
-  filters: AtlasSearchFilters = {},
-): readonly AtlasSearchHit[] {
+/** Deterministic local search; no fuzzy medical inference or network call. */
+export function searchAtlasRuntime(index: AtlasRuntimeIndex, queryRaw: string, filters: AtlasSearchFilters = {}): readonly AtlasSearchHit[] {
   const query = normalize(queryRaw)
   if (!query) return []
   const queryTokens = tokens(query)
@@ -271,8 +257,7 @@ export function searchAtlasRuntime(
 
   for (const node of index.manifest.nodes) {
     if (!matchesFilters(node, filters)) continue
-    const terms = index.normalizedTerms.get(node.id) ?? []
-    const rankedTerms = terms
+    const rankedTerms = (index.normalizedTerms.get(node.id) ?? [])
       .map((term) => ({ term, score: termScore(term, query, queryTokens) }))
       .filter((item) => item.score > 0)
       .sort((a, b) => b.score - a.score || a.term.localeCompare(b.term))
@@ -281,10 +266,9 @@ export function searchAtlasRuntime(
     const exactLabelBoost = normalize(node.label) === query ? 80 : 0
     const exactIdBoost = normalize(node.id.replace(/[:_-]+/g, ' ')) === query ? 90 : 0
     const specificityBoost = Math.min(index.depthById.get(node.id) ?? 0, 5) * 2
-    const priorityBoost = node.educationalPriority * 10
     hits.push({
       node,
-      score: rankedTerms[0].score + exactLabelBoost + exactIdBoost + specificityBoost + priorityBoost,
+      score: rankedTerms[0].score + exactLabelBoost + exactIdBoost + specificityBoost + node.educationalPriority * 10,
       matchedTerms: rankedTerms.slice(0, 4).map((item) => item.term),
     })
   }
@@ -301,13 +285,8 @@ function allowedEdge(edge: AtlasGraphEdge, options: AtlasPathOptions) {
   return true
 }
 
-/** Weighted shortest path across hierarchy + explicit anatomical relations. */
-export function findAtlasPath(
-  index: AtlasRuntimeIndex,
-  fromNodeId: string,
-  toNodeId: string,
-  options: AtlasPathOptions = {},
-): AtlasPathResult | null {
+/** Weighted shortest path across canonical hierarchy plus explicit anatomical relations. */
+export function findAtlasPath(index: AtlasRuntimeIndex, fromNodeId: string, toNodeId: string, options: AtlasPathOptions = {}): AtlasPathResult | null {
   if (!index.byId.has(fromNodeId) || !index.byId.has(toNodeId)) return null
   if (fromNodeId === toNodeId) {
     const node = index.byId.get(fromNodeId)!
@@ -317,13 +296,13 @@ export function findAtlasPath(
   const maxVisited = Math.max(1, options.maxVisited ?? 10_000)
   const distances = new Map<string, number>([[fromNodeId, 0]])
   const previous = new Map<string, { nodeId: string; edge: AtlasGraphEdge }>()
-  const unvisited = new Set<string>([fromNodeId])
-  let visitedCount = 0
+  const frontier = new Set<string>([fromNodeId])
+  let visited = 0
 
-  while (unvisited.size && visitedCount < maxVisited) {
+  while (frontier.size && visited < maxVisited) {
     let current: string | undefined
     let currentDistance = Number.POSITIVE_INFINITY
-    for (const nodeId of unvisited) {
+    for (const nodeId of frontier) {
       const distance = distances.get(nodeId) ?? Number.POSITIVE_INFINITY
       if (distance < currentDistance || (distance === currentDistance && nodeId < (current ?? '\uffff'))) {
         current = nodeId
@@ -331,17 +310,17 @@ export function findAtlasPath(
       }
     }
     if (!current) break
-    unvisited.delete(current)
-    visitedCount += 1
+    frontier.delete(current)
+    visited += 1
     if (current === toNodeId) break
 
     for (const edge of index.graph.get(current) ?? []) {
       if (!allowedEdge(edge, options)) continue
-      const nextDistance = currentDistance + edge.weight
-      if (nextDistance >= (distances.get(edge.to) ?? Number.POSITIVE_INFINITY)) continue
-      distances.set(edge.to, nextDistance)
+      const candidateDistance = currentDistance + edge.weight
+      if (candidateDistance >= (distances.get(edge.to) ?? Number.POSITIVE_INFINITY)) continue
+      distances.set(edge.to, candidateDistance)
       previous.set(edge.to, { nodeId: current, edge })
-      unvisited.add(edge.to)
+      frontier.add(edge.to)
     }
   }
 
@@ -360,7 +339,7 @@ export function findAtlasPath(
   edges.reverse()
   return {
     nodeIds,
-    nodes: nodeIds.map((nodeId) => index.byId.get(nodeId)!).filter(Boolean),
+    nodes: nodeIds.map((nodeId) => index.byId.get(nodeId)).filter((node): node is AtlasNode => node !== undefined),
     edges,
     totalWeight: distances.get(toNodeId) ?? Number.POSITIVE_INFINITY,
   }
@@ -374,13 +353,10 @@ function planeAxis(plane: AtlasSectionPlane): 0 | 1 | 2 {
 
 /**
  * Sphere-plane intersection over normalized educational anchors.
- * areaProxy = π(r² - d²), where d is distance from anchor center to plane.
+ * areaProxy = π(r² - d²), where d is distance from anchor center to the plane.
  * This is a graphics ranking heuristic only, not a morphometric measurement.
  */
-export function atlasCrossSectionCandidates(
-  index: AtlasRuntimeIndex,
-  request: AtlasCrossSectionRequest,
-): readonly AtlasCrossSectionHit[] {
+export function atlasCrossSectionCandidates(index: AtlasRuntimeIndex, request: AtlasCrossSectionRequest): readonly AtlasCrossSectionHit[] {
   const axis = planeAxis(request.plane)
   const halfThickness = Math.max(request.thickness ?? 0, 0) / 2
   const hits: AtlasCrossSectionHit[] = []
@@ -413,25 +389,10 @@ export function atlasCrossSectionCandidates(
 }
 
 function emptyCoverageCell(system: AtlasSystemId, region: AtlasRegionId, scale: AtlasScale): AtlasCoverageCell {
-  return {
-    system,
-    region,
-    scale,
-    total: 0,
-    shipped: 0,
-    partial: 0,
-    referenceOnly: 0,
-    planned: 0,
-    academicReviewed: 0,
-    physiologyCapable: 0,
-    surgicalLandmarks: 0,
-  }
+  return { system, region, scale, total: 0, shipped: 0, partial: 0, referenceOnly: 0, planned: 0, academicReviewed: 0, physiologyCapable: 0, surgicalLandmarks: 0 }
 }
 
-/**
- * Completeness lattice: system × region × scale. This intentionally exposes
- * holes instead of hiding them behind an aggregate percentage.
- */
+/** Completeness lattice system × region × scale; holes remain explicit. */
 export function buildAtlasCoverageMatrix(
   index: AtlasRuntimeIndex,
   systems: readonly AtlasSystemId[] = stableUnique(index.manifest.nodes.map((node) => node.system)).sort(),
@@ -439,15 +400,10 @@ export function buildAtlasCoverageMatrix(
   scales: readonly AtlasScale[] = SCALE_ORDER,
 ): AtlasCoverageMatrix {
   const cells: AtlasCoverageCell[] = []
-
   for (const system of systems) {
     for (const region of regions) {
       for (const scale of scales) {
-        const matching = index.manifest.nodes.filter((node) =>
-          node.system === system
-          && node.regions.includes(region)
-          && node.scale === scale,
-        )
+        const matching = index.manifest.nodes.filter((node) => node.system === system && node.regions.includes(region) && node.scale === scale)
         cells.push({
           ...emptyCoverageCell(system, region, scale),
           total: matching.length,
@@ -463,9 +419,10 @@ export function buildAtlasCoverageMatrix(
     }
   }
 
-  const bySystem = Object.fromEntries(systems.map((system) => {
+  const bySystem: Partial<Record<AtlasSystemId, AtlasSystemCoverageSummary>> = {}
+  for (const system of systems) {
     const nodes = index.manifest.nodes.filter((node) => node.system === system)
-    return [system, {
+    bySystem[system] = {
       total: nodes.length,
       shipped: nodes.filter((node) => node.geometryStatus === 'shipped').length,
       partial: nodes.filter((node) => node.geometryStatus === 'partial').length,
@@ -473,8 +430,8 @@ export function buildAtlasCoverageMatrix(
       planned: nodes.filter((node) => node.geometryStatus === 'planned').length,
       representedRegions: new Set(nodes.flatMap((node) => node.regions)).size,
       representedScales: new Set(nodes.map((node) => node.scale)).size,
-    }]
-  })) as AtlasCoverageMatrix['bySystem']
+    }
+  }
 
   return { cells, emptyCells: cells.filter((cell) => cell.total === 0), bySystem }
 }
@@ -496,17 +453,15 @@ function graphDepths(index: AtlasRuntimeIndex, startNodeId: string, maxDepth: nu
   return depth
 }
 
-/** Asset-file prefetch order derived from graph proximity, not guesswork. */
-export function buildAtlasPrefetchPlan(
-  index: AtlasRuntimeIndex,
-  request: AtlasPrefetchRequest,
-): readonly AtlasPrefetchCandidate[] {
+/** Asset-file prefetch order is derived from graph proximity rather than guesses. */
+export function buildAtlasPrefetchPlan(index: AtlasRuntimeIndex, request: AtlasPrefetchRequest): readonly AtlasPrefetchCandidate[] {
   if (!index.byId.has(request.selectedNodeId)) return []
   const depths = graphDepths(index, request.selectedNodeId, Math.max(0, request.maxGraphDepth ?? 2), request.relationKinds)
   const byFile = new Map<string, { nodeIds: string[]; minimumGraphDepth: number; priority: number }>()
 
   for (const [nodeId, graphDepth] of depths) {
-    const node = index.byId.get(nodeId)!
+    const node = index.byId.get(nodeId)
+    if (!node) continue
     if (!request.includeReferenceOnly && (node.geometryStatus === 'reference-only' || node.geometryStatus === 'planned')) continue
     for (const file of node.source.files ?? []) {
       const existing = byFile.get(file) ?? { nodeIds: [], minimumGraphDepth: graphDepth, priority: 0 }
@@ -518,21 +473,12 @@ export function buildAtlasPrefetchPlan(
   }
 
   return [...byFile.entries()]
-    .map(([file, value]) => ({
-      file,
-      nodeIds: stableUnique(value.nodeIds).sort(),
-      minimumGraphDepth: value.minimumGraphDepth,
-      priority: value.priority,
-    }))
+    .map(([file, value]) => ({ file, nodeIds: stableUnique(value.nodeIds).sort(), minimumGraphDepth: value.minimumGraphDepth, priority: value.priority }))
     .sort((a, b) => b.priority - a.priority || a.minimumGraphDepth - b.minimumGraphDepth || a.file.localeCompare(b.file))
     .slice(0, request.maxFiles ?? 8)
 }
 
-/**
- * Descend through canonical children choosing the next deeper scale with the
- * highest educational priority. Useful for deterministic organ→tissue→micro
- * navigation without an AI model deciding anatomy identity.
- */
+/** Deterministic canonical organ→tissue→microstructure descent. */
 export function buildAtlasScaleRoute(index: AtlasRuntimeIndex, startNodeId: string): AtlasScaleRoute | null {
   const startNode = index.byId.get(startNodeId)
   if (!startNode) return null
@@ -544,12 +490,12 @@ export function buildAtlasScaleRoute(index: AtlasRuntimeIndex, startNodeId: stri
     const currentScaleIndex = SCALE_ORDER.indexOf(current.scale)
     const children = (current.children ?? [])
       .map((nodeId) => index.byId.get(nodeId))
-      .filter((node): node is AtlasNode => Boolean(node) && !seen.has(node.id))
+      .filter((node): node is AtlasNode => node !== undefined && !seen.has(node.id))
       .filter((node) => SCALE_ORDER.indexOf(node.scale) > currentScaleIndex)
       .sort((a, b) => {
-        const scaleDeltaA = SCALE_ORDER.indexOf(a.scale) - currentScaleIndex
-        const scaleDeltaB = SCALE_ORDER.indexOf(b.scale) - currentScaleIndex
-        return scaleDeltaA - scaleDeltaB || b.educationalPriority - a.educationalPriority || a.id.localeCompare(b.id)
+        const deltaA = SCALE_ORDER.indexOf(a.scale) - currentScaleIndex
+        const deltaB = SCALE_ORDER.indexOf(b.scale) - currentScaleIndex
+        return deltaA - deltaB || b.educationalPriority - a.educationalPriority || a.id.localeCompare(b.id)
       })
     const next = children[0]
     if (!next) break
@@ -558,11 +504,7 @@ export function buildAtlasScaleRoute(index: AtlasRuntimeIndex, startNodeId: stri
     current = next
   }
 
-  return {
-    startNode,
-    route,
-    representedScales: stableUnique(route.map((node) => node.scale)),
-  }
+  return { startNode, route, representedScales: stableUnique(route.map((node) => node.scale)) }
 }
 
 export const ATLAS_SCALE_ORDER = SCALE_ORDER
