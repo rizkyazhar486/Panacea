@@ -63,10 +63,13 @@ export function DrugSection({ onHighlightSites }: Props) {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
 
+  // Jumlah total zat aktif diambil sekali supaya layar bisa menyebut angka
+  // yang SEBENARNYA ada di RxNorm, bukan angka yang dijanjikan.
   useEffect(() => {
     api.drugIngredients('').then((r) => setTotal(r.total)).catch(() => setTotal(null))
   }, [])
 
+  // Saran nama diambil dari daftar RxNorm sambil mengetik.
   useEffect(() => {
     const term = q.trim()
     if (term.length < 2) { setSuggestions([]); return }
@@ -83,6 +86,9 @@ export function DrugSection({ onHighlightSites }: Props) {
     setError('')
     setProfile(null)
     setLabel(null)
+    // Profil kelas dan teks label diambil bersamaan: keduanya berdiri sendiri,
+    // dan obat yang punya kelas tapi tanpa label AS (atau sebaliknya) tetap
+    // harus menampilkan bagian yang ada.
     const [p, l] = await Promise.all([
       api.drugPharmacology(name).catch(() => null),
       api.drugInfo(name).catch(() => null),
@@ -102,10 +108,13 @@ export function DrugSection({ onHighlightSites }: Props) {
     atcCodes,
   )
 
+  // Setiap kali situsnya berubah, model 3D diminta menyorot dan menyalakan
+  // lapisan yang perlu — inilah "tunjukkan di mana obat ini bekerja".
   useEffect(() => {
     const semua = [...action, ...adverse]
     if (!semua.length) return
     onHighlightSites(keywordsOf(semua), layersOf(semua))
+    // onHighlightSites stabil dari induknya; kata kunci saja yang menentukan.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [profile])
 
@@ -174,6 +183,8 @@ export function DrugSection({ onHighlightSites }: Props) {
       {label && (
         <div className="space-y-2">
           <div className="t-mikro font-bold uppercase tracking-wide text-neutral-500">From the official FDA label</div>
+          {/* Dosis, cara pakai dan waktu pakai HANYA dari label. Tidak ada
+              satu angka pun di sini yang berasal dari kode aplikasi. */}
           {label.dosage && (
             <div className="rounded-xl bg-neutral-50 p-2.5 dark:bg-white/5">
               <div className="t-mikro font-bold uppercase tracking-wide text-neutral-500">Dose &amp; how to use</div>
