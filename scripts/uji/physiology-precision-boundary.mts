@@ -6,6 +6,8 @@ import {
   SISTEM_FISIOLOGI,
 } from '../../src/lib/physiology.ts'
 
+// Keep this boundary on the latest PR merge-ref so browser/WebGL acceptance
+// exercises the current stabilization workflow as well as physiology content.
 assert.ok(SISTEM_FISIOLOGI.length >= 11, 'Physiology coverage must retain all major system cards.')
 assert.ok(PHYSIOLOGY_REFERENCE_SOURCES.length >= 3, 'Physiology must expose a reference basis.')
 assert.match(PHYSIOLOGY_EVIDENCE_BOUNDARY, /population-level/i)
