@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Card, SectionTitle } from '../components/ui'
 import { IconChartUp } from '../components/icons'
+import { PanaceaOsFocusRail } from '../components/PanaceaOsFocusRail'
 import { useStore } from '../lib/store'
 import { ambilRiwayat } from '../lib/riwayatVitals'
 import { getWorkouts } from '../lib/workoutStore'
@@ -11,7 +12,7 @@ import { fmtDurasi, fmtPace } from '../lib/workoutImport'
 //
 // APA YANG DIPISAHKAN DI SINI. Sebuah hari punya dua macam isi: yang TERUKUR
 // (masuk sendiri dari perangkat) dan yang DIRASAKAN (hanya Anda yang tahu).
-// Keduanya sengaja dipisah menjadi dua blok dengan judul yang menyebutkan
+// Keduanya sengaja dipisahkan menjadi dua blok dengan judul yang menyebutkan
 // asalnya, karena begitu keduanya dicampur dalam satu kisi, nilai yang
 // dilaporkan sendiri mulai terbaca seolah ikut diukur alat.
 //
@@ -155,6 +156,8 @@ export function Harian() {
           )
         })}
       </div>
+
+      {geser === 0 && <PanaceaOsFocusRail date={tgl} />}
 
       <Card className="!p-3">
         <span className="text-[10px] font-black uppercase tracking-wide text-neutral-500">Measured — arrives automatically from your device</span>
