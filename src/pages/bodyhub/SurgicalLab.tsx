@@ -1,5 +1,6 @@
 import { useState, useSyncExternalStore } from 'react'
 import { URUTAN, WILAYAH, KEDALAMAN, type UrutanLapisan } from '../../lib/dissection'
+import { resolveSurgicalRisks, wholeBodyRiskNodes, type SurgicalRiskCoverage } from '../../lib/surgicalGeometry'
 import { consumeAnatomyContextHandoff } from '../../lib/anatomyContextHandoff'
 import {
   filterAnatomySourceBundlesForAtlasRegion,
@@ -42,6 +43,37 @@ export function kedalamanUntukLangkah(langkah: number, total: number): number {
   return Math.round(bagian * KEDALAMAN.visceral)
 }
 
+const STATUS_LABEL: Record<SurgicalRiskCoverage['status'], string> = {
+  'whole-body': 'Whole-body mesh',
+  'specialty-atlas': 'Specialty atlas',
+  'reference-only': 'Reference only',
+}
+
+function RiskRow({ risk }: { risk: SurgicalRiskCoverage }) {
+  const cls = risk.status === 'whole-body'
+    ? 'border-brand/30 bg-brand/10 text-brand'
+    : risk.status === 'specialty-atlas'
+      ? 'border-blue-300 bg-blue-50 text-blue-700 dark:border-blue-500/30 dark:bg-blue-500/10 dark:text-blue-300'
+      : 'border-amber-300 bg-amber-50 text-amber-800 dark:border-amber-500/30 dark:bg-amber-500/10 dark:text-amber-300'
+
+  return (
+    <li className="rounded-lg border border-rose-200/60 bg-white/60 p-2 dark:border-rose-500/20 dark:bg-black/10">
+      <div className="flex flex-wrap items-start justify-between gap-1.5">
+        <span className="text-[11px] font-semibold leading-snug text-rose-700 dark:text-rose-300">{risk.label}</span>
+        <span className={`rounded-full border px-2 py-0.5 text-[9px] font-black ${cls}`}>{STATUS_LABEL[risk.status]}</span>
+      </div>
+      {risk.status === 'specialty-atlas' && (
+        <p className="mt-1 text-[9px] leading-snug text-neutral-500">
+          Exact-name reference: {[...new Set(risk.specialtyMatches.map((match) => match.moduleLabel))].join(' · ')}. Kept in its own validated reference frame; not overlaid by a guessed transform.
+        </p>
+      )}
+      {risk.status === 'reference-only' && (
+        <p className="mt-1 text-[9px] leading-snug text-neutral-500">No exact geometry-name match in the current whole-body or specialty indexes.</p>
+      )}
+    </li>
+  )
+}
+
 export function SurgicalLab({ onKedalaman, onSorot }: SurgicalLabProps) {
   const [incomingHandoff] = useState(() => consumeAnatomyContextHandoff('surgery'))
   const initialSpatial = SURGICAL_SPATIAL_SCENARIOS.find((item) => item.id === incomingHandoff?.surgicalScenarioId) ?? SURGICAL_SPATIAL_SCENARIOS[0]
@@ -55,6 +87,8 @@ export function SurgicalLab({ onKedalaman, onSorot }: SurgicalLabProps) {
   )
   const dipilih: UrutanLapisan | undefined = URUTAN.find((u) => u.kunci === kunci)
   const lapis = dipilih?.lapis[Math.min(langkah, dipilih.lapis.length - 1)]
+  const risiko = resolveSurgicalRisks(lapis?.bahaya ?? [])
+  const nodeWholeBody = wholeBodyRiskNodes(lapis?.bahaya ?? [])
   const spatial = SURGICAL_SPATIAL_SCENARIOS.find((item) => item.id === spatialId) ?? SURGICAL_SPATIAL_SCENARIOS[0]
   const incomingExactNames = incomingHandoff ? [...incomingHandoff.resolvedNodeNames] : []
 
@@ -171,7 +205,7 @@ export function SurgicalLab({ onKedalaman, onSorot }: SurgicalLabProps) {
       <div className="border-t border-neutral-200 pt-3 dark:border-white/10">
         <div className="text-[10px] font-black uppercase tracking-[0.16em] text-neutral-400">Layer sequence</div>
         <p className="mt-1 text-[11px] leading-snug text-neutral-500">
-          Layer-by-layer approaches in the order a scalpel meets them. Stepping through moves the shared dissection depth; it does not simulate a real operation.
+          Layer-by-layer anatomical approaches in outside-to-inside order. The shared dissection depth is only an approximate system-layer correspondence; it does not reconstruct an operative plane, instrument path, patient variation, or a real operation.
         </p>
       </div>
 
@@ -179,8 +213,9 @@ export function SurgicalLab({ onKedalaman, onSorot }: SurgicalLabProps) {
         {URUTAN.map((u) => (
           <button
             key={u.kunci}
+            type="button"
             onClick={() => (kunci === u.kunci ? setKunci(null) : pilih(u))}
-            className={`rounded-full px-2.5 py-1 text-[11px] font-bold active:scale-95 ${kunci === u.kunci ? 'bg-brand text-white' : 'border border-neutral-200 text-neutral-600 dark:border-white/10 dark:text-neutral-400'}`}
+            className={`min-h-11 rounded-full px-3 py-1.5 text-[11px] font-bold active:scale-95 ${kunci === u.kunci ? 'bg-brand text-white' : 'border border-neutral-200 text-neutral-600 dark:border-white/10 dark:text-neutral-400'}`}
           >
             {u.judul.split(/[—(:]/)[0].trim()}
           </button>
@@ -192,19 +227,24 @@ export function SurgicalLab({ onKedalaman, onSorot }: SurgicalLabProps) {
           <div className="rounded-xl border border-neutral-100 p-3 dark:border-white/10">
             <div className="text-sm font-black text-ink dark:text-white">{dipilih.judul}</div>
             <div className="text-[11px] text-neutral-500">{WILAYAH.find((w) => w.kunci === dipilih.wilayah)?.label ?? dipilih.wilayah}</div>
-            <p className="mt-1.5 text-[12px] leading-snug text-neutral-600 dark:text-neutral-400"><b>Landmark.</b> {dipilih.patokan}</p>
+            <p className="mt-1.5 text-[12px] leading-snug text-neutral-600 dark:text-neutral-400"><b>Anatomical landmark reference.</b> {dipilih.patokan}</p>
           </div>
 
           <div className="flex items-center gap-2">
-            <button onClick={() => keLangkah(Math.max(0, langkah - 1))} disabled={langkah === 0} className="shrink-0 rounded-full border border-brand/30 bg-brand-50 px-3 py-1.5 text-[11px] font-bold text-brand-dark disabled:opacity-40 active:scale-95">← Back</button>
+            <button type="button" onClick={() => keLangkah(Math.max(0, langkah - 1))} disabled={langkah === 0} className="min-h-11 shrink-0 rounded-full border border-brand/30 bg-brand-50 px-3 py-1.5 text-[11px] font-bold text-brand-dark disabled:opacity-40 active:scale-95">← Back</button>
             <div className="flex-1 text-center text-[11px] font-bold text-neutral-500">Layer {langkah + 1} of {dipilih.lapis.length}</div>
-            <button onClick={() => keLangkah(Math.min(dipilih.lapis.length - 1, langkah + 1))} disabled={langkah === dipilih.lapis.length - 1} className="shrink-0 rounded-full border border-brand/30 bg-brand-50 px-3 py-1.5 text-[11px] font-bold text-brand-dark disabled:opacity-40 active:scale-95">Deeper →</button>
+            <button type="button" onClick={() => keLangkah(Math.min(dipilih.lapis.length - 1, langkah + 1))} disabled={langkah === dipilih.lapis.length - 1} className="min-h-11 shrink-0 rounded-full border border-brand/30 bg-brand-50 px-3 py-1.5 text-[11px] font-bold text-brand-dark disabled:opacity-40 active:scale-95">Deeper →</button>
           </div>
 
           <ol className="space-y-1">
             {dipilih.lapis.map((l, i) => (
-              <li key={l.nama}>
-                <button onClick={() => keLangkah(i)} className={`w-full rounded-lg px-2.5 py-1.5 text-left text-[11px] font-semibold active:scale-[0.99] ${i === langkah ? 'bg-brand text-white' : i < langkah ? 'bg-neutral-100 text-neutral-400 line-through dark:bg-white/5' : 'bg-neutral-100/60 text-neutral-600 dark:bg-white/5 dark:text-neutral-400'}`}>
+              <li key={`${l.nama}-${i}`}>
+                <button
+                  type="button"
+                  onClick={() => keLangkah(i)}
+                  aria-current={i === langkah ? 'step' : undefined}
+                  className={`min-h-11 w-full rounded-lg px-2.5 py-2 text-left text-[11px] font-semibold active:scale-[0.99] ${i === langkah ? 'bg-brand text-white' : i < langkah ? 'bg-neutral-100 text-neutral-400 dark:bg-white/5' : 'bg-neutral-100/60 text-neutral-600 dark:bg-white/5 dark:text-neutral-400'}`}
+                >
                   {i + 1}. {l.nama}
                 </button>
               </li>
@@ -212,17 +252,25 @@ export function SurgicalLab({ onKedalaman, onSorot }: SurgicalLabProps) {
           </ol>
 
           <div className="rounded-xl border border-brand/30 bg-brand/[0.04] p-3">
-            <div className="text-[10px] font-bold uppercase tracking-wide text-brand">Now at</div>
+            <div className="text-[10px] font-bold uppercase tracking-wide text-brand">Current anatomical layer</div>
             <div className="mt-0.5 text-sm font-black text-ink dark:text-white">{lapis.nama}</div>
             <p className="mt-1 text-[12px] leading-snug text-neutral-600 dark:text-neutral-400">{lapis.catatan}</p>
-            {lapis.bahaya && lapis.bahaya.length > 0 && (
+            {risiko.length > 0 && (
               <div className="mt-2 rounded-lg bg-rose-500/10 p-2.5">
-                <div className="text-[10px] font-bold uppercase tracking-wide text-rose-700 dark:text-rose-300">At risk in this layer</div>
-                <ul className="mt-0.5 space-y-0.5">
-                  {lapis.bahaya.map((b) => <li key={b} className="text-[11px] font-semibold leading-snug text-rose-700 dark:text-rose-300">● {b}</li>)}
-                </ul>
-                <button onClick={() => onSorot?.(lapis.bahaya ?? [])} className="mt-1.5 rounded-full border border-rose-300 px-2.5 py-1 text-[10px] font-bold text-rose-700 active:scale-95 dark:border-rose-500/40 dark:text-rose-300">Try to find these on the model</button>
-                <p className="mt-1 text-[10px] leading-snug text-rose-700/80 dark:text-rose-300/80">Only structures the whole-body model actually carries will light up; nothing is invented to fill a missing mesh.</p>
+                <div className="text-[10px] font-bold uppercase tracking-wide text-rose-700 dark:text-rose-300">Structures at risk · geometry coverage</div>
+                <ul className="mt-1 space-y-1">{risiko.map((risk) => <RiskRow key={risk.label} risk={risk} />)}</ul>
+                {nodeWholeBody.length > 0 && (
+                  <button
+                    type="button"
+                    onClick={() => onSorot?.(nodeWholeBody)}
+                    className="mt-2 min-h-11 rounded-full border border-rose-300 px-3 py-1 text-[10px] font-bold text-rose-700 active:scale-95 dark:border-rose-500/40 dark:text-rose-300"
+                  >
+                    Highlight {nodeWholeBody.length} verified whole-body mesh{nodeWholeBody.length === 1 ? '' : 'es'} →
+                  </button>
+                )}
+                <p className="mt-1 text-[10px] leading-snug text-rose-700/80 dark:text-rose-300/80">
+                  Highlighting is exact-name only. Specialty/reference-only structures are never substituted with a similar whole-body mesh.
+                </p>
               </div>
             )}
           </div>
