@@ -27,8 +27,14 @@ await context.addInitScript(() => {
   localStorage.setItem('panaceamed.session.v1', JSON.stringify({ account, loginAt: Date.now() }))
   localStorage.setItem('panacea_onboarded_v1', '1')
   localStorage.setItem('panacea_assessment_prompt_v1', '1')
-  localStorage.removeItem('pmd_vitals_v1')
-  localStorage.removeItem('pmd_workouts_v1')
+  // Clear only before the first navigation. addInitScript runs again on reload,
+  // so a permanent removeItem here would erase the recorded-vitals fixture we
+  // intentionally write later in this smoke.
+  if (!sessionStorage.getItem('home-qa-initialized')) {
+    localStorage.removeItem('pmd_vitals_v1')
+    localStorage.removeItem('pmd_workouts_v1')
+    sessionStorage.setItem('home-qa-initialized', '1')
+  }
 })
 
 const page = await context.newPage()
