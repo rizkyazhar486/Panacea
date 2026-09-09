@@ -106,4 +106,20 @@ assert.ok(
   'runtime node collection should happen on the loaded clone, not in the render loop',
 )
 
-console.log('Z-Anatomy source-node resolver preserves exact GLB provenance, keeps specificity fallbacks fail-closed, resolves every reviewed composite component conservatively, and publishes runtime renderer nodes.')
+const workbenchSource = readFileSync(new URL('../../src/pages/bodyhub/ZAnatomyAtlasWorkbench.tsx', import.meta.url), 'utf8')
+assert.match(workbenchSource, /Geometry verification/, 'selected atlas target should expose a visible geometry-verification state')
+assert.match(workbenchSource, /Runtime geometry loaded/, 'workbench must distinguish live runtime GLB geometry')
+assert.match(workbenchSource, /Indexed source available/, 'workbench must distinguish indexed source names from mounted geometry')
+assert.match(workbenchSource, /No direct source geometry/, 'workbench must preserve explicit missing-geometry state')
+assert.match(workbenchSource, /Load layer & verify geometry/, 'indexed targets should invite loading the source layer before runtime verification')
+assert.match(workbenchSource, /Inspect loaded source geometry/, 'runtime targets should identify that source geometry is already mounted')
+assert.match(workbenchSource, /no substitute mesh/, 'not-represented targets must not imply synthetic fallback geometry')
+assert.match(workbenchSource, /aria-live="polite"/, 'geometry-verification state should announce the indexed-to-runtime transition accessibly')
+
+const meshBrowserSource = readFileSync(new URL('../../src/pages/bodyhub/ZAnatomySourceMeshBrowser.tsx', import.meta.url), 'utf8')
+assert.match(meshBrowserSource, /useSyncExternalStore/, 'source mesh browser must react to runtime source-node publication')
+assert.match(meshBrowserSource, /anatomySourceNodeOrigin/, 'source mesh browser must identify runtime versus generated-index provenance')
+assert.match(meshBrowserSource, /loaded runtime/, 'source mesh browser must label live source nodes without calling them generated metadata')
+assert.match(meshBrowserSource, /generated GLB index/, 'unloaded bundles must retain an explicit generated-index fallback label')
+
+console.log('Z-Anatomy source-node resolver preserves exact GLB provenance, keeps specificity fallbacks fail-closed, resolves reviewed composite components conservatively, publishes runtime renderer nodes, and keeps runtime-versus-indexed geometry state explicit in the atlas UX.')
