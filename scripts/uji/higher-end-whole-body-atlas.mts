@@ -114,11 +114,11 @@ assert.deepEqual(ocularScaleRoute?.representedScales, ['suborgan', 'tissue', 'mi
 const coverage = buildAtlasCoverageMatrix(index)
 for (const system of expectedSystems) {
   const summary = coverage.bySystem[system as keyof typeof coverage.bySystem]
-  assert.ok(summary?.total > 0, `${system} must be represented in the complete atlas.`)
+  assert.ok((summary?.total ?? 0) > 0, `${system} must be represented in the complete atlas.`)
 }
-assert.ok(coverage.bySystem.nervous.representedRegions >= 5)
-assert.ok(coverage.bySystem.digestive.representedScales >= 3)
-assert.ok(coverage.bySystem.sensory.representedScales >= 3)
+assert.ok((coverage.bySystem.nervous?.representedRegions ?? 0) >= 5)
+assert.ok((coverage.bySystem.digestive?.representedScales ?? 0) >= 3)
+assert.ok((coverage.bySystem.sensory?.representedScales ?? 0) >= 3)
 assert.ok(coverage.emptyCells.length > 0, 'Completeness matrix must expose remaining holes rather than pretending total anatomical completeness.')
 
 const lungPrefetch = buildAtlasPrefetchPlan(index, {
