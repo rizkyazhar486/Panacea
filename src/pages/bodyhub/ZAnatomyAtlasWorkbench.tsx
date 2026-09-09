@@ -70,6 +70,26 @@ const PROVENANCE_TEXT: Record<GeometryProvenance, string> = {
   'not-represented': 'Not directly represented',
 }
 
+type GeometryVerificationState = 'runtime' | 'indexed' | 'not-represented'
+
+const GEOMETRY_VERIFICATION: Record<GeometryVerificationState, { label: string; detail: string; tone: string }> = {
+  runtime: {
+    label: 'Runtime geometry loaded',
+    detail: 'This source layer is mounted in the shared WebGL scene. Resolved names below come from the live GLB nodes currently available to selection and highlighting.',
+    tone: 'border-brand/25 bg-brand/[0.06] text-brand',
+  },
+  indexed: {
+    label: 'Indexed source available',
+    detail: 'The shipped GLB metadata contains source-node names for this layer, but the layer is not mounted yet. Load it to verify selection against runtime node names.',
+    tone: 'border-blue-300/30 bg-blue-500/[0.05] text-blue-600 dark:text-blue-300',
+  },
+  'not-represented': {
+    label: 'No direct source geometry',
+    detail: 'This reviewed teaching target is intentionally marked as not directly represented. Panacea keeps that absence explicit instead of synthesizing a substitute mesh.',
+    tone: 'border-amber-300/30 bg-amber-500/[0.05] text-amber-700 dark:text-amber-200',
+  },
+}
+
 function structureKey(region: AtlasRegionKey, structure: AtlasStructureTarget) {
   return `${region}:${structure.id}`
 }
@@ -123,6 +143,21 @@ export function ZAnatomyAtlasWorkbench({ onHighlight, onFocusRegion, onEnableLay
     : null
   const sourceNameCount = sourceBundles.reduce((total, bundle) => total + bundle.names.length, 0)
   const runtimeBundleCount = sourceBundles.filter((bundle) => anatomySourceNodeOrigin(bundle.file) === 'runtime').length
+  const selectedSourceFile = selected ? SOURCE_FILE_BY_LAYER[selected.structure.layer] : ''
+  const selectedSourceBundle = selectedSourceFile
+    ? sourceBundles.find((bundle) => bundle.file === selectedSourceFile)
+    : undefined
+  const selectedGeometryState: GeometryVerificationState = selected?.structure.provenance === 'not-represented'
+    ? 'not-represented'
+    : selectedSourceFile && anatomySourceNodeOrigin(selectedSourceFile) === 'runtime'
+      ? 'runtime'
+      : 'indexed'
+  const selectedGeometryVerification = GEOMETRY_VERIFICATION[selectedGeometryState]
+  const inspectLabel = selectedGeometryState === 'runtime'
+    ? 'Inspect loaded source geometry →'
+    : selectedGeometryState === 'indexed'
+      ? 'Load layer & verify geometry →'
+      : 'Frame reviewed region →'
 
   function inspect(region: AtlasRegionKey, structure: AtlasStructureTarget, focus = true) {
     setRegionKey(region)
@@ -239,7 +274,18 @@ export function ZAnatomyAtlasWorkbench({ onHighlight, onFocusRegion, onEnableLay
                     <span className="rounded-full border border-neutral-200 px-2 py-1 text-[8px] font-black text-neutral-500 dark:border-white/10">{PROVENANCE_TEXT[selected.structure.provenance]}</span>
                   </div>
                   <p className="mt-3 text-[10px] leading-relaxed text-neutral-500">{selected.structure.clinicalWhy}</p>
-                  <button type="button" onClick={() => inspect(selected.region.key, selected.structure, true)} className="mt-3 min-h-11 rounded-full bg-brand px-4 text-[10px] font-black text-white shadow-lg shadow-brand/20">Inspect in shared 3D →</button>
+                  <div aria-live="polite" className={`mt-3 rounded-xl border p-3 ${selectedGeometryVerification.tone}`}>
+                    <div className="text-[8px] font-black uppercase tracking-[0.15em] opacity-70">Geometry verification</div>
+                    <div className="mt-1 text-[11px] font-black">{selectedGeometryVerification.label}</div>
+                    <p className="mt-1 text-[9px] leading-relaxed opacity-80">{selectedGeometryVerification.detail}</p>
+                    {selectedGeometryState !== 'not-represented' && (
+                      <div className="mt-2 font-mono text-[8px] opacity-75">{selectedSourceFile} · {(selectedSourceBundle?.names.length ?? 0).toLocaleString()} {selectedGeometryState === 'runtime' ? 'runtime' : 'indexed'} source-node names</div>
+                    )}
+                    {selectedGeometryState === 'not-represented' && (
+                      <div className="mt-2 text-[8px] font-bold opacity-75">Reviewed catalogue target · no substitute mesh</div>
+                    )}
+                  </div>
+                  <button type="button" onClick={() => inspect(selected.region.key, selected.structure, true)} className="mt-3 min-h-11 rounded-full bg-brand px-4 text-[10px] font-black text-white shadow-lg shadow-brand/20">{inspectLabel}</button>
                   {selectedHandoff && (selectedHandoff.surgicalScenarioId || selectedHandoff.movementJointId) && (
                     <div className="mt-3 rounded-xl border border-neutral-200 bg-neutral-50 p-3 dark:border-white/10 dark:bg-white/[0.02]">
                       <div className="text-[8px] font-black uppercase tracking-[0.15em] text-neutral-400">Curated teaching handoff</div>
