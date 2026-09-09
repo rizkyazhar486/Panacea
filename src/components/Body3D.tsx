@@ -16,12 +16,7 @@ import {
   publishAnatomySourceNodes,
   publishAnatomySourceSelection,
 } from '../lib/anatomySourceNodeRegistry'
-import {
-  clearBodyAtlasRuntimeRoot,
-  clearBodyAtlasRuntimeRoots,
-  createBodyAtlasRuntimeRootOwner,
-  publishBodyAtlasRuntimeRoot,
-} from '../lib/bodyAtlasRuntimeRoots'
+import { createBodyAtlasRuntimeRootLifecycle } from '../lib/bodyAtlasRuntimeRootLifecycle'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Model 3D anatomi NYATA — bukan bentuk geometris buatan sendiri (bola/kapsul/
@@ -303,7 +298,7 @@ export function Body3D({
   const layersRef = useRef(layers)
   layersRef.current = layers
   const loadGenerationRef = useRef(new Body3dLayerLoadGeneration())
-  const [runtimeRootOwner] = useState(() => createBodyAtlasRuntimeRootOwner('Body3D'))
+  const [runtimeRootLifecycle] = useState(() => createBodyAtlasRuntimeRootLifecycle('Body3D'))
   const sceneRef = useRef<THREE.Scene | null>(null)
   const cameraRef = useRef<THREE.PerspectiveCamera | null>(null)
   const homeFramingRef = useRef<{ position: THREE.Vector3; target: THREE.Vector3; minDistance: number; maxDistance: number } | null>(null)
@@ -513,7 +508,7 @@ export function Body3D({
         if (active !== entry.baseMaterial) active.dispose()
       }
       highlightedMeshesRef.current.clear()
-      clearBodyAtlasRuntimeRoots(runtimeRootOwner)
+      runtimeRootLifecycle.dispose()
       for (const group of Object.values(groupsRef.current)) {
         if (group) disposeLayerMaterials(group)
       }
@@ -579,7 +574,7 @@ export function Body3D({
             })
             publishAnatomySourceNodes(def.file, sourceNodeNames)
             groupsRef.current[def.key] = clone
-            publishBodyAtlasRuntimeRoot(runtimeRootOwner, def.file, clone)
+            runtimeRootLifecycle.publish(def.file, clone)
             scene.add(clone)
             setFailedLayers((s) => { const n = new Set(s); n.delete(def.key); return n })
             setProgress((p) => ({ ...p, [def.key]: 1 }))
@@ -637,7 +632,7 @@ export function Body3D({
         setLoadingLayers((s) => { const n = new Set(s); n.delete(def.key); return n })
         setFailedLayers((s) => { const n = new Set(s); n.delete(def.key); return n })
         clearAnatomySourceNodes(def.file)
-        clearBodyAtlasRuntimeRoot(runtimeRootOwner, def.file)
+        runtimeRootLifecycle.clear(def.file)
         if (!have) continue
 
         for (const [mesh, entry] of highlightedMeshesRef.current) {
