@@ -1,6 +1,13 @@
-import { useMemo, useState } from 'react'
+import { useMemo, useState, useSyncExternalStore } from 'react'
 import type { AtlasLayerKey } from '../../lib/wholeBodyAtlasBlueprint'
 import { consumeAnatomyContextHandoff } from '../../lib/anatomyContextHandoff'
+import {
+  filterAnatomySourceBundlesForAtlasRegion,
+  getEffectiveAnatomySourceNodeSnapshot,
+  resolveAllAnatomySourceNodes,
+  subscribeAnatomySourceNodes,
+  type AnatomySourceNodeBundle,
+} from '../../lib/anatomySourceNodeRegistry'
 import { coupledKinematicsFor } from '../../lib/biomechanicsCoupling'
 import {
   WHOLE_BODY_BIOMECHANICS_DISCLOSURE,
@@ -8,6 +15,7 @@ import {
   classifyJointExcursion,
   normalizedJointExcursion,
   signedMotionLabel,
+  type JointMotionProfile,
   type WholeBodyJointProfile,
 } from '../../lib/wholeBodyBiomechanics'
 
@@ -15,6 +23,23 @@ interface Props {
   onHighlight?: (nodeHints: string[]) => void
   onFocusRegion?: (nodeHints: string[]) => void
   onEnableLayer?: (layer: AtlasLayerKey) => void
+}
+
+const BIOMECHANICS_SOURCE_FILES = new Set(['skeletal.glb', 'muscular.glb'])
+
+function exactBiomechanicsSourceNames(
+  joint: WholeBodyJointProfile,
+  motion: JointMotionProfile,
+  coupledStructures: readonly string[],
+  sourceBundles: readonly AnatomySourceNodeBundle[],
+) {
+  const biomechanicsBundles = sourceBundles.filter((bundle) => BIOMECHANICS_SOURCE_FILES.has(bundle.file))
+  const regionalBundles = filterAnatomySourceBundlesForAtlasRegion(biomechanicsBundles, joint.region)
+  const hints = [...joint.nodeHints, ...motion.structureHints, ...coupledStructures]
+  return [...new Set(
+    resolveAllAnatomySourceNodes(hints, regionalBundles)
+      .flatMap((match) => match.names),
+  )]
 }
 
 function SourceBadge({ joint }: { joint: WholeBodyJointProfile }) {
@@ -47,6 +72,11 @@ export function WholeBodyMotionInspector({ onHighlight, onFocusRegion, onEnableL
   const [jointId, setJointId] = useState(initialJoint.id)
   const [motionId, setMotionId] = useState(initialJoint.motions[0].id)
   const [angleDeg, setAngleDeg] = useState(initialJoint.motions[0].neutralDeg)
+  const sourceBundles = useSyncExternalStore(
+    subscribeAnatomySourceNodes,
+    getEffectiveAnatomySourceNodeSnapshot,
+    getEffectiveAnatomySourceNodeSnapshot,
+  )
 
   const joint = WHOLE_BODY_JOINT_PROFILES.find((item) => item.id === jointId) ?? firstJoint
   const motion = joint.motions.find((item) => item.id === motionId) ?? joint.motions[0]
@@ -54,6 +84,10 @@ export function WholeBodyMotionInspector({ onHighlight, onFocusRegion, onEnableL
   const excursionState = classifyJointExcursion(motion, angleDeg)
   const positionLabel = signedMotionLabel(motion, angleDeg)
   const coupled = coupledKinematicsFor(motion.id)
+  const exactSourceNames = useMemo(
+    () => exactBiomechanicsSourceNames(joint, motion, coupled?.structures ?? [], sourceBundles),
+    [joint, motion, coupled, sourceBundles],
+  )
 
   const groupedJoints = useMemo(() => {
     const groups = new Map<string, WholeBodyJointProfile[]>()
@@ -65,23 +99,31 @@ export function WholeBodyMotionInspector({ onHighlight, onFocusRegion, onEnableL
     return [...groups.entries()]
   }, [])
 
+  function representedNames(nextJoint: WholeBodyJointProfile, nextMotion: JointMotionProfile) {
+    const nextCoupled = coupledKinematicsFor(nextMotion.id)
+    return exactBiomechanicsSourceNames(nextJoint, nextMotion, nextCoupled?.structures ?? [], sourceBundles)
+  }
+
   function inspectJoint(next: WholeBodyJointProfile) {
     const firstMotion = next.motions[0]
+    const exactNames = representedNames(next, firstMotion)
     setJointId(next.id)
     setMotionId(firstMotion.id)
     setAngleDeg(firstMotion.neutralDeg)
     onEnableLayer?.('skeletal')
     onEnableLayer?.('muscular')
-    onHighlight?.([...new Set([...next.nodeHints, ...firstMotion.structureHints])])
-    onFocusRegion?.(next.nodeHints)
+    onHighlight?.(exactNames)
+    if (exactNames.length) onFocusRegion?.(exactNames)
   }
 
   function inspectMotion(nextMotionId: string) {
     const next = joint.motions.find((item) => item.id === nextMotionId)
     if (!next) return
+    const exactNames = representedNames(joint, next)
     setMotionId(next.id)
     setAngleDeg(next.neutralDeg)
-    onHighlight?.([...new Set([...joint.nodeHints, ...next.structureHints])])
+    onHighlight?.(exactNames)
+    if (exactNames.length) onFocusRegion?.(exactNames)
   }
 
   function updateAngleFromRange(value: string) {
@@ -93,8 +135,8 @@ export function WholeBodyMotionInspector({ onHighlight, onFocusRegion, onEnableL
   function applyToViewer() {
     onEnableLayer?.('skeletal')
     onEnableLayer?.('muscular')
-    onHighlight?.([...new Set([...joint.nodeHints, ...motion.structureHints, ...(coupled?.structures ?? [])])])
-    onFocusRegion?.(joint.nodeHints)
+    onHighlight?.(exactSourceNames)
+    if (exactSourceNames.length) onFocusRegion?.(exactSourceNames)
   }
 
   return (
@@ -172,7 +214,13 @@ export function WholeBodyMotionInspector({ onHighlight, onFocusRegion, onEnableL
 
               <div className="h-2 overflow-hidden rounded-full bg-white/5"><div className="h-full bg-brand transition-[width] duration-150" style={{ width: `${Math.max(2, excursion * 100)}%` }} /></div>
               <p className="text-[10px] leading-relaxed text-neutral-400">{motion.teachingNote}</p>
-              <button type="button" onClick={applyToViewer} className="min-h-11 rounded-full border border-brand px-4 text-[11px] font-black text-brand transition hover:bg-brand hover:text-white">Inspect this motion in shared 3D →</button>
+              <div className={`rounded-xl border p-2 text-[9px] leading-relaxed ${exactSourceNames.length ? 'border-brand/20 bg-brand/[0.05] text-neutral-300' : 'border-amber-400/20 bg-amber-400/[0.05] text-amber-200'}`}>
+                <span className="font-black">Geometry correspondence. </span>
+                {exactSourceNames.length
+                  ? `${exactSourceNames.length} exact skeletal/muscular source nodes match this reviewed joint + motion context.`
+                  : 'No exact regional skeletal/muscular source-node match. The biomechanics description remains educational text and is not projected onto substitute geometry.'}
+              </div>
+              <button type="button" disabled={!exactSourceNames.length} onClick={applyToViewer} className="min-h-11 rounded-full border border-brand px-4 text-[11px] font-black text-brand transition hover:bg-brand hover:text-white disabled:cursor-not-allowed disabled:border-white/10 disabled:text-neutral-600">{exactSourceNames.length ? `Inspect ${exactSourceNames.length} exact source nodes in shared 3D →` : 'No exact represented geometry to inspect'}</button>
             </div>
           </div>
 
