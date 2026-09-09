@@ -74,12 +74,28 @@ jobs:
           BODY3D_QA_CANVAS_ARTIFACT: artifacts/body3d-mobile-canvas.png
         run: node scripts/qa/body3d-canvas-artifact.mjs
 
+      - name: Panacea OS Daily mobile 390x844 smoke
+        env:
+          PANACEA_OS_QA_URL: http://127.0.0.1:4173/#/harian
+          PANACEA_OS_QA_SCREENSHOT: artifacts/panacea-os-mobile-390x844.png
+          PANACEA_OS_QA_METRICS: artifacts/panacea-os-mobile-metrics.json
+        run: node scripts/qa/panacea-os-mobile-smoke.mjs
+
       - name: Upload Body Exposure mobile QA artifact
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: body3d-mobile-qa
           path: artifacts/body3d-mobile-*
+          if-no-files-found: warn
+          retention-days: 7
+
+      - name: Upload Panacea OS mobile QA artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: panacea-os-mobile-qa
+          path: artifacts/panacea-os-mobile-*
           if-no-files-found: warn
           retention-days: 7
 
