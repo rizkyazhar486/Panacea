@@ -1,0 +1,52 @@
+{
+  "id": "panacea-eye-visible-wave1-evidence",
+  "revision": "2026-09-09-r2",
+  "scope": "gross-visible ocular anatomy only",
+  "clinicalDecisionUse": "NO",
+  "academicReviewStatus": "PENDING_QUALIFIED_REVIEW",
+  "geometryRule": "No structure may be promoted to verified/shipped geometry without exact source identity, immutable revision, license/attribution, transformation history, and qualified anatomical review.",
+  "sources": [
+    {
+      "id": "NCBI:NBK482428",
+      "title": "Anatomy, Head and Neck, Eye",
+      "url": "https://www.ncbi.nlm.nih.gov/books/NBK482428/",
+      "use": "gross globe, orbit, extraocular and neuroanatomy reference",
+      "assetReuse": "NO_AUTOMATIC_REUSE"
+    },
+    {
+      "id": "NCBI:NBK11120",
+      "title": "Anatomy of the Eye - Neuroscience",
+      "url": "https://www.ncbi.nlm.nih.gov/books/NBK11120/",
+      "use": "globe compartments, uvea, aqueous/lens/vitreous relationships",
+      "assetReuse": "NO_AUTOMATIC_REUSE"
+    },
+    {
+      "id": "NCBI:NBK53329",
+      "title": "The Ocular Circulation - Anatomy",
+      "url": "https://www.ncbi.nlm.nih.gov/books/NBK53329/",
+      "use": "ocular arterial/venous anatomy and anterior segment drainage landmarks",
+      "assetReuse": "NO_AUTOMATIC_REUSE"
+    },
+    {
+      "id": "NEI:EYE-PARTS-2025",
+      "title": "About the Eye / Parts of the Eye",
+      "url": "https://www.nei.nih.gov/eye-health-information/healthy-vision/nei-for-kids/about-eye",
+      "use": "public-facing terminology cross-check",
+      "assetReuse": "NO_AUTOMATIC_REUSE"
+    },
+    {
+      "id": "NEI:HOW-EYES-WORK-2022",
+      "title": "How the Eyes Work",
+      "url": "https://www.nei.nih.gov/learn-about-eye-health/healthy-vision/how-eyes-work",
+      "use": "gross optical-path educational cross-check",
+      "assetReuse": "NO_AUTOMATIC_REUSE"
+    }
+  ],
+  "boundaries": [
+    "Evidence anchors validate terminology and relationships; they do not license copying figures, images, or meshes.",
+    "Reference-only structures are metadata/education targets, not claims of available 3D source geometry.",
+    "Pupil and visual axis are conceptual/aperture entities and must never be fabricated as tissue meshes.",
+    "No patient-specific geometry, diagnosis, treatment recommendation, surgical coordinate, or procedural guidance is produced by this dataset.",
+    "Histology, cell biology, organelles, pathways, proteins, genes and DNA are deliberately deferred until gross-visible Wave 1 passes acceptance."
+  ]
+}
