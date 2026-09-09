@@ -1,14 +1,15 @@
 import { lookupDrugLabel, type DrugLabelInfo } from './drugInfo.js'
-import { findRelatedDrugs, normalizeDrugName, type RelatedDrug } from './rxnorm.js'
+import { findRelatedDrugs, normalizeDrugIdentity, type RelatedDrug } from './rxnorm.js'
 
 /**
  * Product-registry federation boundary for Body Exposure.
  *
  * This layer normalizes a user-entered medicinal product name against RxNorm,
- * surfaces bounded SCD/SBD related products, and attaches the canonical
- * Structured Product Label when openFDA can resolve one. It deliberately does
- * not treat a brand name as an ATC concept and does not infer an ATC code from
- * free text. ATC linkage remains a separate provenance-gated crosswalk.
+ * preserves the canonical RxCUI identity, surfaces bounded SCD/SBD related
+ * products, and attaches the canonical Structured Product Label when openFDA
+ * can resolve one. It deliberately does not treat a brand name as an ATC
+ * concept and does not infer an ATC code from free text. ATC linkage remains a
+ * separate provenance-gated crosswalk.
  */
 
 export interface ProductRegistrySource {
@@ -19,6 +20,8 @@ export interface ProductRegistrySource {
 export interface ProductRegistryRecord {
   query: string
   normalizedName: string | null
+  /** Canonical numeric RxCUI paired with normalizedName when RxNorm resolves it. */
+  normalizedRxcui: string | null
   relatedProducts: RelatedDrug[]
   label: DrugLabelInfo | null
   sources: ProductRegistrySource[]
@@ -43,6 +46,7 @@ export async function resolveProductRegistry(rawQuery: string): Promise<ProductR
     return {
       query: '',
       normalizedName: null,
+      normalizedRxcui: null,
       relatedProducts: [],
       label: null,
       sources: [],
@@ -52,12 +56,16 @@ export async function resolveProductRegistry(rawQuery: string): Promise<ProductR
   }
 
   let normalizedName: string | null = null
+  let normalizedRxcui: string | null = null
   let relatedProducts: RelatedDrug[] = []
 
   try {
-    normalizedName = await normalizeDrugName(query)
+    const identity = await normalizeDrugIdentity(query)
+    normalizedName = identity?.name ?? null
+    normalizedRxcui = identity?.rxcui ?? null
   } catch {
     normalizedName = null
+    normalizedRxcui = null
   }
 
   try {
@@ -79,6 +87,7 @@ export async function resolveProductRegistry(rawQuery: string): Promise<ProductR
   return {
     query,
     normalizedName,
+    normalizedRxcui,
     relatedProducts,
     label,
     sources,
