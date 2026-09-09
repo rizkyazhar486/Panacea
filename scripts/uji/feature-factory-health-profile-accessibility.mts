@@ -27,5 +27,7 @@ assert.match(page, /ariaLabel=\{label\}/,
   'Numeric health fields must retain their explicit accessible names.')
 assert.doesNotMatch(page, /onKeyDown|tabIndex=\{-1\}/,
   'Native button/input keyboard semantics must not be replaced with a custom keyboard trap.')
+assert.doesNotMatch(page, /role="application"/,
+  'Health Profile must not override standard browser and assistive-technology interaction semantics.')
 
 console.log('Health Profile accessibility guards preserve named source state, live async status, alert semantics, visible keyboard focus, field names and non-interpretive chart accessibility.')
