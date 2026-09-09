@@ -1,7 +1,7 @@
 import { EYE_HISTOLOGY_WAVE3 } from './eyeHistologyWave3'
 
 export type EyeWave4Domain = 'photoreceptor' | 'rpe'
-export type EyeWave4Kind = 'cell-compartment' | 'organelle' | 'membrane-specialization' | 'cytoskeletal-structure'
+export type EyeWave4Kind = 'cell-compartment' | 'organelle' | 'membrane-specialization' | 'cytoskeletal-structure' | 'synaptic-specialization'
 
 export interface EyeCellOrganelleNode {
   id: string
@@ -59,13 +59,24 @@ export const EYE_CELL_ORGANELLE_WAVE4: readonly EyeCellOrganelleNode[] = [
   C('cone-inner-segment-mitochondria', 'Cone inner-segment mitochondria', 'photoreceptor', 'organelle', 'cone-inner-segment-ellipsoid', 'NCBI:NBK11522'),
   C('photoreceptor-golgi-apparatus', 'Photoreceptor Golgi apparatus', 'photoreceptor', 'organelle', 'photoreceptor-layer', 'PMID:19582864'),
   C('photoreceptor-endoplasmic-reticulum', 'Photoreceptor endoplasmic reticulum', 'photoreceptor', 'organelle', 'photoreceptor-layer', 'NCBI:NBK52768'),
+  C('rod-inner-segment-ribosomes', 'Rod inner-segment ribosomes', 'photoreceptor', 'organelle', 'rod-inner-segment', 'NCBI:NBK11522'),
+  C('cone-inner-segment-ribosomes', 'Cone inner-segment ribosomes', 'photoreceptor', 'organelle', 'cone-inner-segment', 'NCBI:NBK11522'),
+  C('rod-transport-vesicles', 'Rod inner-segment cytoplasmic transport vesicles', 'photoreceptor', 'organelle', 'rod-inner-segment', 'NCBI:NBK11522'),
+  C('cone-transport-vesicles', 'Cone inner-segment cytoplasmic transport vesicles', 'photoreceptor', 'organelle', 'cone-inner-segment', 'NCBI:NBK11522'),
+  C('rod-nucleus', 'Rod photoreceptor nucleus', 'photoreceptor', 'organelle', 'rod-photoreceptors', 'NCBI:NBK11522'),
+  C('cone-nucleus', 'Cone photoreceptor nucleus', 'photoreceptor', 'organelle', 'cone-photoreceptors', 'NCBI:NBK11522'),
   C('rod-outer-segment-discs', 'Rod outer-segment discs', 'photoreceptor', 'membrane-specialization', 'rod-outer-segment', 'NCBI:NBK11522', 'Rod discs are represented as membrane specializations, not individually reconstructed measured discs.'),
   C('cone-outer-segment-discs', 'Cone outer-segment membrane discs / lamellae', 'photoreceptor', 'membrane-specialization', 'cone-outer-segment', 'NCBI:NBK52768', 'Cone outer-segment lamellae remain membrane-continuous in the cited reference; do not reuse rod disc topology.'),
+  C('rod-synaptic-vesicles', 'Rod spherule synaptic vesicles', 'photoreceptor', 'organelle', 'rod-spherule', 'NCBI:NBK11522'),
+  C('cone-synaptic-vesicles', 'Cone pedicle synaptic vesicles', 'photoreceptor', 'organelle', 'cone-pedicle', 'NCBI:NBK11522'),
+  C('rod-synaptic-ribbon', 'Rod photoreceptor synaptic ribbon', 'photoreceptor', 'synaptic-specialization', 'rod-spherule', 'NCBI:NBK6214'),
+  C('cone-synaptic-ribbon', 'Cone photoreceptor synaptic ribbon', 'photoreceptor', 'synaptic-specialization', 'cone-pedicle', 'NCBI:NBK6214'),
   C('rpe-apical-microvilli', 'RPE apical microvilli / processes', 'rpe', 'membrane-specialization', 'retinal-pigment-epithelium', 'NCBI:NBK54392'),
   C('rpe-basal-infoldings', 'RPE basal membrane infoldings', 'rpe', 'membrane-specialization', 'retinal-pigment-epithelium', 'PMID:32648890'),
   C('rpe-melanosomes', 'RPE melanosomes', 'rpe', 'organelle', 'retinal-pigment-epithelium', 'PMID:32648890'),
   C('rpe-mitochondria', 'RPE mitochondria', 'rpe', 'organelle', 'retinal-pigment-epithelium', 'PMID:32648890'),
   C('rpe-phagosomes', 'RPE photoreceptor-outer-segment phagosomes', 'rpe', 'organelle', 'retinal-pigment-epithelium', 'PMID:25074813'),
+  C('rpe-phagolysosomal-compartment', 'RPE phagolysosomal degradation compartment', 'rpe', 'cell-compartment', 'rpe-phagosomes', 'PMID:16524426', 'Conceptual degradation compartment only; do not infer count, position, kinetics, or disease state.'),
   C('rpe-lysosomes', 'RPE lysosomes', 'rpe', 'organelle', 'retinal-pigment-epithelium', 'PMID:8419462'),
 ] as const
 
@@ -76,17 +87,28 @@ export const EYE_WAVE4_REQUIRED_IDS = [
   'cone-basal-body',
   'rod-inner-segment-mitochondria',
   'cone-inner-segment-mitochondria',
+  'rod-inner-segment-ribosomes',
+  'cone-inner-segment-ribosomes',
+  'rod-transport-vesicles',
+  'cone-transport-vesicles',
+  'rod-nucleus',
+  'cone-nucleus',
   'rod-outer-segment-discs',
   'cone-outer-segment-discs',
+  'rod-synaptic-vesicles',
+  'cone-synaptic-vesicles',
+  'rod-synaptic-ribbon',
+  'cone-synaptic-ribbon',
   'rpe-apical-microvilli',
   'rpe-basal-infoldings',
   'rpe-melanosomes',
   'rpe-phagosomes',
+  'rpe-phagolysosomal-compartment',
   'rpe-lysosomes',
 ] as const
 
 export const EYE_WAVE4_SCIENTIFIC_BOUNDARY =
-  'Cellular reference only. Do not fabricate dimensions, organelle counts, copy numbers, concentrations, microscopy coordinates, disease state, patient-specific morphology, synthetic cellular geometry, or molecular-function inference from visual motion.'
+  'Cellular reference only. Do not fabricate dimensions, organelle counts, copy numbers, concentrations, microscopy coordinates, membrane kinetics, molecular interactions, disease state, patient-specific morphology, synthetic cellular geometry, or molecular-function inference from visual motion.'
 
 const evidencePattern = /^(NCBI:NBK\d+|PMID:\d+)$/
 
