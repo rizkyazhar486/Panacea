@@ -159,8 +159,36 @@ try {
     throw new Error(`Page overflows horizontally: ${viewport.documentScrollWidth}px > ${viewport.width}px`)
   }
 
-  const vessels = page.getByRole('button', { name: 'Vessels', exact: true }).first()
-  await vessels.click()
+  // Exercise the real mobile-reachable product path for progressively adding
+  // the delayed cardiovascular layer. The direct Layers chip lives much
+  // farther down the long Body Explorer panel; the physiology shortcut is
+  // intentionally adjacent to the viewer and is the safer interaction target
+  // for this viewport smoke. No force-clicking: the shortcut must be fully
+  // inside 390x844 before the normal click proceeds.
+  const exerciseRefs = page.getByRole('button', { name: 'Exercise refs', exact: true }).first()
+  await exerciseRefs.scrollIntoViewIfNeeded()
+  await exerciseRefs.click()
+
+  const enableVessels = page.getByRole('button', { name: /Turn on Vessels & Organs to inspect the system/i }).first()
+  await enableVessels.waitFor({ state: 'visible', timeout: 5_000 })
+  await enableVessels.evaluate((node) => node.scrollIntoView({ block: 'center', inline: 'nearest', behavior: 'auto' }))
+  await page.waitForTimeout(100)
+  const enableVesselsBox = await enableVessels.boundingBox()
+  if (!enableVesselsBox) throw new Error('Vessels & Organs shortcut has no measurable bounding box on mobile')
+  const enableVesselsInViewport =
+    enableVesselsBox.x >= 0 &&
+    enableVesselsBox.y >= 0 &&
+    enableVesselsBox.x + enableVesselsBox.width <= viewport.width &&
+    enableVesselsBox.y + enableVesselsBox.height <= viewport.height
+  metrics.progressiveLayerControl = {
+    path: 'Exercise refs -> Turn on Vessels & Organs',
+    box: enableVesselsBox,
+    inViewport: enableVesselsInViewport,
+  }
+  if (!enableVesselsInViewport) {
+    throw new Error(`Vessels & Organs shortcut cannot be brought into the 390x844 viewport: ${JSON.stringify(enableVesselsBox)}`)
+  }
+  await enableVessels.click()
   await progressiveLoading.waitFor({ state: 'visible', timeout: 5_000 })
   const progressiveClass = await progressiveLoading.evaluate((node) =>
     node.closest('[role="status"]')?.getAttribute('class') ?? '',
