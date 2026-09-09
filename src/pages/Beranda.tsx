@@ -7,8 +7,10 @@ import { pratinjauBeranda } from '../lib/pratinjauBeranda'
 import { getVitals, vitalsAge } from '../lib/healthVitals'
 import { getWorkouts } from '../lib/workoutStore'
 import { ageFromDob } from '../lib/anthro'
+import { emptyHomeDailyState, homeDailyStateSignature, PANACEA_STATE_STORAGE_KEY, parseHomeDailyState, type HomeDailyState } from '../lib/homeCrossTabDailyState'
 import '../styles/home-odyssey.css'
 import '../styles/home-utility-polish.css'
+import '../styles/home-mobile-stability.css'
 
 const LazyPapanWidget = lazy(() => import('../components/PapanWidget').then((m) => ({ default: m.PapanWidget })))
 const LazyKisiFitur = lazy(() => import('../components/KisiFitur').then((m) => ({ default: m.KisiFitur })))
@@ -105,27 +107,56 @@ function DeferredHomeBlock({
 export default function Beranda() {
   const { account, state } = useStore()
   const [refresh, setRefresh] = useState(0)
+  const [externalDailyState, setExternalDailyState] = useState<HomeDailyState | null>(null)
   const [logsOpen, setLogsOpen] = useState(false)
   const [exploreOpen, setExploreOpen] = useState(false)
   const lowMemory = typeof document !== 'undefined' && document.documentElement.classList.contains('pmd-low-memory')
 
+  const localDailyState = useMemo<HomeDailyState>(() => ({
+    foods: state.foods ?? [],
+    sleepLogs: state.sleepLogs ?? [],
+    wellness: state.wellness ?? {},
+  }), [state.foods, state.sleepLogs, state.wellness])
+  const localDailySignature = useMemo(() => homeDailyStateSignature(localDailyState), [localDailyState])
+  const localDailySignatureRef = useRef(localDailySignature)
+
+  useEffect(() => {
+    if (localDailySignatureRef.current === localDailySignature) return
+    localDailySignatureRef.current = localDailySignature
+    setExternalDailyState(null)
+  }, [localDailySignature])
+
   useEffect(() => {
     const update = () => setRefresh((x) => x + 1)
+    const onStorage = (event: StorageEvent) => {
+      update()
+      if (event.key !== PANACEA_STATE_STORAGE_KEY) return
+      if (event.newValue === null) {
+        setExternalDailyState(emptyHomeDailyState())
+        return
+      }
+      const next = parseHomeDailyState(event.newValue)
+      if (next) setExternalDailyState(next)
+    }
     const onVisibility = () => {
       if (document.visibilityState === 'visible') update()
     }
     window.addEventListener('panacea:health-updated', update)
-    window.addEventListener('storage', update)
+    window.addEventListener('storage', onStorage)
     window.addEventListener('focus', update)
     document.addEventListener('visibilitychange', onVisibility)
     return () => {
       window.removeEventListener('panacea:health-updated', update)
-      window.removeEventListener('storage', update)
+      window.removeEventListener('storage', onStorage)
       window.removeEventListener('focus', update)
       document.removeEventListener('visibilitychange', onVisibility)
     }
   }, [])
 
+  const dailyState = externalDailyState ?? localDailyState
+  const dailyFoods = dailyState.foods ?? []
+  const dailySleepLogs = dailyState.sleepLogs ?? []
+  const dailyWellness = dailyState.wellness ?? {}
   const vitals = useMemo(() => getVitals(), [refresh])
   const workouts = useMemo(() => getWorkouts(), [refresh])
   const name = account?.name?.trim().split(/\s+/)[0] || ''
@@ -139,24 +170,24 @@ export default function Beranda() {
 
   const tanggalCatatan = useMemo(() => {
     const dates = new Set<string>()
-    for (const sleep of state.sleepLogs ?? []) if (sleep?.date) dates.add(sleep.date)
-    for (const date of Object.keys(state.wellness ?? {})) dates.add(date)
+    for (const sleep of dailySleepLogs) if (sleep?.date) dates.add(sleep.date)
+    for (const date of Object.keys(dailyWellness)) dates.add(date)
     return [...dates]
-  }, [state.sleepLogs, state.wellness])
+  }, [dailySleepLogs, dailyWellness])
 
   const pratinjau = useMemo(
     () => pratinjauBeranda({
-      foods: state.foods ?? [],
-      sleepLogs: state.sleepLogs ?? [],
+      foods: dailyFoods,
+      sleepLogs: dailySleepLogs,
       umur: account?.dob ? ageFromDob(account.dob) : undefined,
     }),
-    [state.foods, state.sleepLogs, account?.dob, refresh],
+    [dailyFoods, dailySleepLogs, account?.dob, refresh],
   )
 
   const signals = useMemo<Signal[]>(() => {
     const out: Signal[] = []
-    const sharedMeta = vitalsMeta || 'Recorded shared vitals'
-    const lastSleep = [...(state.sleepLogs ?? [])]
+    const sharedMeta = vitalsMeta || 'Source/time unavailable'
+    const lastSleep = [...dailySleepLogs]
       .filter((x) => typeof x?.hours === 'number' && x.hours > 0)
       .sort((a, b) => (a.date < b.date ? 1 : -1))[0]
 
@@ -181,7 +212,7 @@ export default function Beranda() {
       out.push({ label: 'Sessions', value: workouts.length.toString(), unit: 'recorded', meta: 'Local workout history', tone: 'text-violet-700 dark:text-violet-300', to: '/latihan' })
     }
     return out
-  }, [vitals, workouts, state.sleepLogs, vitalsMeta])
+  }, [vitals, workouts, dailySleepLogs, vitalsMeta])
 
   return (
     <main className="panacea-home mx-auto w-full max-w-4xl space-y-5 pb-24">
