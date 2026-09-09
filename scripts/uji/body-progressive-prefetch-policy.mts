@@ -53,6 +53,14 @@ assert.deepEqual(invalidTransfer.loadNow, ['required']);
 assert.deepEqual(invalidTransfer.prefetchNext, []);
 assert.ok(invalidTransfer.deferred.includes('unknown-size'));
 
+const invalidRequiredTransfer = planBodyProgressivePrefetch([
+  { assetId: 'unknown-required', estimatedTransferMb: Number.NaN, intent: 'required-now', selected: true, adjacentToSelection: false, alreadyResident: false },
+  { assetId: 'known-next', estimatedTransferMb: 1, intent: 'likely-next', selected: false, adjacentToSelection: true, alreadyResident: false },
+], { network: 'normal', memory: 'standard', viewportWidth: 390 });
+assert.deepEqual(invalidRequiredTransfer.loadNow, []);
+assert.deepEqual(invalidRequiredTransfer.prefetchNext, ['known-next']);
+assert.ok(invalidRequiredTransfer.deferred.includes('unknown-required'));
+
 for (const invalidOverride of [Number.NaN, Number.POSITIVE_INFINITY, Number.NEGATIVE_INFINITY]) {
   const invalidConcurrency = planBodyProgressivePrefetch(candidates, {
     network: 'normal',
