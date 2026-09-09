@@ -37,7 +37,7 @@ await denganFetchPalsu(async (input, init) => {
   return new Response(JSON.stringify({
     results: [{
       id: 'record-id-fallback',
-      set_id: '12345678-abcd-4321-9876-abcdef123456',
+      set_id: '12345678-ABCD-4321-9876-ABCDEF123456',
       openfda: {
         brand_name: ['Example Brand'],
         generic_name: ['metformin hydrochloride'],
@@ -57,9 +57,9 @@ await denganFetchPalsu(async (input, init) => {
   ok('manufacturer dipertahankan', hasil?.manufacturer === 'Example Manufacturer')
   ok('purpose dipertahankan', hasil?.purpose === 'Antihyperglycemic')
   ok('mechanism of action dipertahankan dari label', hasil?.mechanism === 'Decreases hepatic glucose production and improves insulin sensitivity.', hasil?.mechanism)
-  ok('SPL set_id diprioritaskan sebagai source identity', hasil?.labelId === '12345678-abcd-4321-9876-abcdef123456', hasil?.labelId)
+  ok('SPL set_id valid dinormalisasi sebagai source identity', hasil?.labelId === '12345678-abcd-4321-9876-abcdef123456', hasil?.labelId)
   const sourceUrl = hasil?.sourceUrl ? new URL(hasil.sourceUrl) : null
-  ok('source URL menunjuk exact set_id', sourceUrl?.searchParams.get('search') === 'set_id:"12345678-abcd-4321-9876-abcdef123456"')
+  ok('source URL menunjuk exact canonical set_id', sourceUrl?.searchParams.get('search') === 'set_id:"12345678-abcd-4321-9876-abcdef123456"')
   ok('source URL tidak pernah membawa API key', sourceUrl?.searchParams.has('api_key') === false)
   ok('brand→generic membutuhkan tepat dua request', panggilan === 2, String(panggilan))
 })
@@ -71,6 +71,18 @@ await denganFetchPalsu(async () => new Response(JSON.stringify({
   ok('record id menjadi fallback identity bila set_id tidak tersedia', hasil?.labelId === 'record-only-id')
   ok('source URL tidak dibuat tanpa set_id yang stabil', hasil?.sourceUrl === undefined)
   ok('mechanism kosong tetap string kosong tanpa fabrikasi', hasil?.mechanism === '')
+})
+
+await denganFetchPalsu(async () => new Response(JSON.stringify({
+  results: [{
+    id: 'record-safe-fallback',
+    set_id: 'not-a-canonical-spl-id\" OR openfda.brand_name:*',
+    openfda: { brand_name: ['Malformed Set ID'] },
+  }],
+}), { status: 200, headers: { 'content-type': 'application/json' } }), async () => {
+  const hasil = await lookupDrug('malformed set id')
+  ok('set_id malformed tidak dipromosikan menjadi stable identity', hasil?.labelId === 'record-safe-fallback', hasil?.labelId)
+  ok('set_id malformed tidak boleh menghasilkan provenance URL', hasil?.sourceUrl === undefined, hasil?.sourceUrl)
 })
 
 await denganFetchPalsu(async (input) => {
