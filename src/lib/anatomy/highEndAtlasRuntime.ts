@@ -23,6 +23,13 @@ import { WHOLE_BODY_BIOSCALE_ATLAS, WHOLE_BODY_BIOSCALE_SYSTEMS } from './wholeB
 import { planCrossScaleRoute, validateCrossScaleRoute } from './atlasCrossScalePlanner'
 import { compileVirtualSpecimenJourney, validateVirtualSpecimenJourney } from './atlasVirtualSpecimenCompiler'
 import { validateAtlasScaleCorridors } from './atlasScaleCorridors'
+import {
+  compileFunctionalTopologyScene,
+  functionalPathwayById,
+  functionalTopologySystemCoverage,
+  validateFunctionalTopologyManifest,
+} from './atlasFunctionalTopology'
+import { WHOLE_BODY_FUNCTIONAL_TOPOLOGY } from './wholeBodyFunctionalTopology'
 
 export const HIGH_END_ATLAS_SYSTEMS: readonly AtlasSystemId[] = [
   'surface',
@@ -61,7 +68,7 @@ export const HIGH_END_ATLAS_BENCHMARK_REFERENCES = [
 ] as const
 
 export const HIGH_END_ATLAS_CAPABILITIES = {
-  architecture: 'whole-body-multiscale-streaming-knowledge-graph-with-bioscale-bridge',
+  architecture: 'whole-body-multiscale-streaming-functional-knowledge-graph-with-bioscale-bridge',
   systems: HIGH_END_ATLAS_SYSTEMS,
   atlasScales: ['organism', 'region', 'organ', 'suborgan', 'tissue', 'microstructure'] as const,
   bioScales: ['cellular', 'subcellular', 'molecular'] as const,
@@ -80,11 +87,15 @@ export const HIGH_END_ATLAS_CAPABILITIES = {
     'explicit atlas-to-cell semantic bridges',
     'authored scale corridors for progressive semantic zoom',
     'virtual specimen scene-stage compilation across geometry/microscopy/molecular domains',
+    'branching qualitative functional topology for airflow/perfusion/neural/lymph/renal/GI/endocrine/sensory pathways',
+    'graph-hop propagation waves with no fabricated physiological timing or magnitude',
+    'functional topology atlas pinning and bioscale reference compilation',
     'fail-closed bioscale provenance and review boundaries',
     'academic-review boundary preservation',
   ] as const,
   patientSpecificGeometry: false,
   patientSpecificBioscaleInference: false,
+  quantitativePhysiologyInference: false,
   academicReviewRequired: true,
   benchmarks: HIGH_END_ATLAS_BENCHMARK_REFERENCES,
 } as const
@@ -104,6 +115,10 @@ export interface HighEndAtlasFrameInput {
     targetBioNodeId: string
     strictDrillDown?: boolean
     preserveAnatomicalContext?: boolean
+  }
+  functional?: {
+    pathwayId: string
+    maxHops?: number
   }
 }
 
@@ -148,17 +163,27 @@ export function planHighEndAtlasFrame(input: HighEndAtlasFrameInput) {
       })
     : undefined
 
+  const functionalPathway = input.functional?.pathwayId
+    ? functionalPathwayById(WHOLE_BODY_FUNCTIONAL_TOPOLOGY, input.functional.pathwayId)
+    : undefined
+  const functionalTopology = functionalPathway
+    ? compileFunctionalTopologyScene(manifest, WHOLE_BODY_BIOSCALE_ATLAS, functionalPathway, { maxHops: input.functional?.maxHops })
+    : undefined
+
   return {
     manifestId: manifest.id,
     manifestRevision: manifest.revision,
     bioscaleManifestId: WHOLE_BODY_BIOSCALE_ATLAS.id,
     bioscaleManifestRevision: WHOLE_BODY_BIOSCALE_ATLAS.revision,
+    functionalTopologyManifestId: WHOLE_BODY_FUNCTIONAL_TOPOLOGY.id,
+    functionalTopologyManifestRevision: WHOLE_BODY_FUNCTIONAL_TOPOLOGY.revision,
     selectedNodeId: selected?.id,
     focusStack,
     streaming,
     respiratory,
     crossScale,
     virtualSpecimen,
+    functionalTopology,
   }
 }
 
@@ -174,8 +199,11 @@ export function highEndAtlasEngineeringReadiness() {
   const respiratoryIssues = validateRespiratoryHighEndRuntime(manifest)
   const bioscaleIssues = validateBioScaleManifest(manifest, WHOLE_BODY_BIOSCALE_ATLAS)
   const corridorIssues = validateAtlasScaleCorridors(manifest)
+  const functionalIssues = validateFunctionalTopologyManifest(manifest, WHOLE_BODY_BIOSCALE_ATLAS, WHOLE_BODY_FUNCTIONAL_TOPOLOGY)
   const bioscale = bioScaleCoverage(WHOLE_BODY_BIOSCALE_ATLAS)
   const bioscaleMissingSystems = HIGH_END_ATLAS_SYSTEMS.filter((system) => !WHOLE_BODY_BIOSCALE_SYSTEMS.includes(system))
+  const functionalSystems = functionalTopologySystemCoverage(WHOLE_BODY_FUNCTIONAL_TOPOLOGY)
+  const functionalMissingSystems = HIGH_END_ATLAS_SYSTEMS.filter((system) => !functionalSystems.includes(system))
 
   return {
     manifestId: manifest.id,
@@ -188,12 +216,17 @@ export function highEndAtlasEngineeringReadiness() {
     bioscaleNodeCount: WHOLE_BODY_BIOSCALE_ATLAS.nodes.length,
     bioscaleCoverage: bioscale,
     bioscaleMissingSystems,
+    functionalTopologyManifestId: WHOLE_BODY_FUNCTIONAL_TOPOLOGY.id,
+    functionalPathwayCount: WHOLE_BODY_FUNCTIONAL_TOPOLOGY.pathways.length,
+    functionalSystems,
+    functionalMissingSystems,
     blockingEngineeringIssues: [
       ...manifestIssues.map((issue) => `manifest:${issue.code}:${issue.nodeId ?? 'manifest'}:${issue.message}`),
       ...multiscaleIssues,
       ...respiratoryIssues,
       ...bioscaleIssues.map((issue) => `bioscale:${issue.code}:${issue.nodeId ?? 'manifest'}:${issue.message}`),
       ...corridorIssues.map((issue) => `corridor:${issue}`),
+      ...functionalIssues.map((issue) => `functional:${issue.code}:${issue.pathwayId ?? 'manifest'}:${issue.edgeId ?? '-'}:${issue.message}`),
     ],
     academicReviewRequired: true as const,
   }
@@ -220,5 +253,8 @@ export function validateHighEndAtlasFrame(input: HighEndAtlasFrameInput): string
     }
   }
   if (frame.virtualSpecimen) issues.push(...validateVirtualSpecimenJourney(frame.virtualSpecimen))
+  if (input.functional?.pathwayId && !frame.functionalTopology) {
+    issues.push(`Functional topology pathway is absent: ${input.functional.pathwayId}`)
+  }
   return [...new Set(issues)]
 }
