@@ -17,6 +17,8 @@ for (const [, path, label] of quickActions) {
 
 assert.match(home, /vitalsAge\(vitals\)/, 'Home signals must expose recorded-data freshness when provenance exists')
 assert.match(home, /vitals\.source/, 'Home signals must retain source identity when available')
+assert.match(home, /Source\/time unavailable/, 'Home must fail closed when shared-vitals provenance is unavailable')
+assert.doesNotMatch(home, /Recorded shared vitals/, 'Home must not imply provenance completeness when source and timestamp are absent')
 assert.doesNotMatch(home, /unit: 'today'/, 'Home must not call a shared snapshot “today” without metric-level date evidence')
 assert.match(home, /Recorded recovery inputs/, 'Readiness quick action must avoid an unvalidated train-vs-recover instruction')
 assert.match(home, /Recorded hydration data/, 'Hydration quick action must avoid presenting an unreviewed target as a Home claim')
