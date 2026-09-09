@@ -56,6 +56,7 @@ function signedBody(overrides: Record<string, string> = {}) {
   assert.equal(verifyMidtransSignature({ ...body, gross_amount: '999.00' }, TEST_SERVER_KEY), false)
   assert.equal(verifyMidtransSignature({ ...body, signature_key: 'deadbeef' }, TEST_SERVER_KEY), false)
   assert.equal(verifyMidtransSignature({ ...body, status_code: '' }, TEST_SERVER_KEY), false)
+  assert.equal(verifyMidtransSignature(body, ''), false)
 }
 
 // Signed success notifications must still match the server-created order and
@@ -65,6 +66,10 @@ function signedBody(overrides: Record<string, string> = {}) {
   assert.deepEqual(paymentNotificationGate(signedBody(), order), { kind: 'accept' })
   assert.deepEqual(
     paymentNotificationGate(signedBody({ gross_amount: '999.00' }), order),
+    { kind: 'reject', reason: 'amount_mismatch' },
+  )
+  assert.deepEqual(
+    paymentNotificationGate(signedBody({ gross_amount: '' }), order),
     { kind: 'reject', reason: 'amount_mismatch' },
   )
   assert.deepEqual(
@@ -99,6 +104,18 @@ function signedBody(overrides: Record<string, string> = {}) {
   statusCode = 200
   responseBody = undefined
   paymentWebhook({ body: { order_id: 'PMD-test-order' } } as any, res as any)
+  assert.equal(statusCode, 400)
+  assert.deepEqual(responseBody, { error: 'bad_request' })
+
+  statusCode = 200
+  responseBody = undefined
+  paymentWebhook({ body: null } as any, res as any)
+  assert.equal(statusCode, 400)
+  assert.deepEqual(responseBody, { error: 'bad_request' })
+
+  statusCode = 200
+  responseBody = undefined
+  paymentWebhook({ body: 'not-an-object' } as any, res as any)
   assert.equal(statusCode, 400)
   assert.deepEqual(responseBody, { error: 'bad_request' })
 
