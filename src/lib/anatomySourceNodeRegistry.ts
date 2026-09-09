@@ -35,7 +35,11 @@ const BODY_INDEX_REGIONS_BY_ATLAS: Readonly<Record<AtlasRegionKey, readonly stri
   abdomen: ['abdomen'],
   'pelvis-perineum': ['pelvis'],
   'upper-limb': ['bahu-lengan', 'tangan'],
-  'lower-limb': ['paha', 'tungkai'],
+  // The hip is a lower-limb joint, but the acetabular/pelvic side of that joint
+  // is indexed in the pelvic bucket. Retain pelvis here so exact hip resolution
+  // can include both sides of the articulation while name hints still decide
+  // which represented structures are actually selected.
+  'lower-limb': ['pelvis', 'paha', 'tungkai'],
   // The axial spine spans several longitudinal body-index regions. Deliberately
   // exclude limb buckets so a generic vertebral/nerve hint cannot jump into an
   // appendicular mesh merely because the source name happens to overlap.
