@@ -12,7 +12,9 @@ export interface LayerPrecisionMember {
   exactMeshName: string
   baseName: string
   laterality: StrukturTubuh['s']
-  region: string
+  lateralityMethod: 'source-name-suffix'
+  derivedRegion: string
+  regionMethod: 'normalized-coordinate-heuristic'
   normalizedHeight: number
   normalizedRadialDistance: number
   triangles: number
@@ -20,6 +22,7 @@ export interface LayerPrecisionMember {
 
 export interface LayerPrecisionRecord {
   source: 'whole-body-geometry-index'
+  identityPrecision: 'exact-source-mesh'
   layer: LayerPrecisionDefinition
   exactMeshNames: readonly string[]
   members: readonly LayerPrecisionMember[]
@@ -28,6 +31,7 @@ export interface LayerPrecisionRecord {
   physicallyCalibrated: false
   physicalUnit: null
   calibrationNote: string
+  regionNote: string
 }
 
 const SOURCE_FILE_BY_LAYER: Record<StrukturTubuh['l'], string> = {
@@ -75,7 +79,9 @@ function memberFromIndex(structure: StrukturTubuh): LayerPrecisionMember {
     exactMeshName: structure.n,
     baseName: structure.b,
     laterality: structure.s,
-    region: structure.w,
+    lateralityMethod: 'source-name-suffix',
+    derivedRegion: structure.w,
+    regionMethod: 'normalized-coordinate-heuristic',
     normalizedHeight: structure.y,
     normalizedRadialDistance: structure.r,
     triangles: structure.t,
@@ -90,6 +96,10 @@ function memberFromIndex(structure: StrukturTubuh): LayerPrecisionMember {
  * transform, so this contract deliberately exposes no centimetre, millimetre,
  * inch, or other physical-distance value. A future calibrated asset may add a
  * separate physical transform only after its scale and provenance are verified.
+ *
+ * The generated body's `w` region value is intentionally exposed only as a
+ * derived region: indeksTubuh.mjs assigns it from normalized Y/radial thresholds,
+ * not from a curated anatomical-region ontology.
  */
 export function layerPrecisionForStructure(structure: StrukturTubuh): LayerPrecisionRecord {
   const exactMeshNames = [...new Set(pasangan(structure))]
@@ -100,6 +110,7 @@ export function layerPrecisionForStructure(structure: StrukturTubuh): LayerPreci
 
   return {
     source: 'whole-body-geometry-index',
+    identityPrecision: 'exact-source-mesh',
     layer: layerPrecisionDefinition(structure.l),
     exactMeshNames,
     members,
@@ -108,6 +119,7 @@ export function layerPrecisionForStructure(structure: StrukturTubuh): LayerPreci
     physicallyCalibrated: false,
     physicalUnit: null,
     calibrationNote: 'Coordinates are normalized model-space metadata, not patient distance. No cm/mm/inch conversion is valid without a verified physical scale transform.',
+    regionNote: 'Derived region labels come from normalized coordinate thresholds in indeksTubuh.mjs; they are navigation hints, not curated anatomical-region assertions.',
   }
 }
 
