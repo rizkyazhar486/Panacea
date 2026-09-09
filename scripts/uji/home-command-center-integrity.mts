@@ -42,7 +42,7 @@ assert.doesNotMatch(home, /unit: 'today'/, 'Home must not call a shared snapshot
 assert.match(home, /aria-live=\"polite\"/, 'Live Home signal rail must announce refreshes accessibly')
 assert.match(home, /role=\"status\"[\s\S]*aria-live=\"polite\"[\s\S]*aria-busy=\"true\"/, 'Deferred Home loading cards must expose a polite busy status')
 assert.match(home, /className=\"sr-only\">Loading \{label\}<\/span>/, 'Deferred loading status must include readable assistive text')
-assert.match(home, /<div aria-hidden=\"true\">[\s\S]*home-loading-card/, 'Home loading skeleton visuals must stay out of the accessibility tree')
+assert.match(home, /aria-busy=\"true\"[\s\S]*<div aria-hidden=\"true\">/, 'Home loading skeleton visuals must stay out of the accessibility tree')
 assert.match(home, /signals\.slice\(0, 5\)/, 'Home signal rail must stay bounded')
 assert.match(home, /IntersectionObserver/, 'Heavy Home sections must remain viewport-deferred')
 assert.match(home, /LazyPerformanceVisualizationDeck/, 'Performance visualization must remain code-split')
