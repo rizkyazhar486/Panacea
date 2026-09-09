@@ -46,7 +46,7 @@
     "evidenceQuality": 4,
     "recency": 5,
     "licenseClarity": 2,
-    "reproducibility": 4,
-    "notes": "High authority as an EMBL-EBI ontology access layer, while scientific scope and rights depend on each upstream ontology. Licence clarity is intentionally conservative because OLS aggregates heterogeneous ontology licences."
+    "reproducibility": 3,
+    "notes": "High authority as an EMBL-EBI ontology access layer. Runtime now preserves dataset context and retrieval time, but it does not yet persist an upstream ontology release/version pin, so reproducibility remains intentionally conservative. Scientific scope and rights also depend on each upstream ontology."
   }
 }
