@@ -60,7 +60,8 @@ try {
     await rail.getByText('6.5', { exact: true }).waitFor({ state: 'visible' })
     await peer.evaluate(() => localStorage.removeItem('panaceamed.state.v3'))
     await page.getByText(/Add your first health or daily entry/i).first().waitFor({ state: 'visible' })
-    assert(await page.getByText(/^Sleep$/).count() === 0, 'Cross-tab removal must clear the external Home daily snapshot')
+    assert(await page.locator('[aria-label="Recorded health signals"]').count() === 0, 'Cross-tab removal must remove the external recorded-signal rail')
+    assert(await page.getByText('6.5', { exact: true }).count() === 0, 'Cross-tab removal must remove the external sleep value without confusing the persistent Sleep quick action')
   } finally {
     await peer.close()
   }
@@ -87,7 +88,7 @@ try {
   assert((await viewportHealth()).scrollWidth <= 392, 'Recorded signal rail must not overflow the page horizontally')
   await page.screenshot({ path: screenshotPath, fullPage: true })
   if (pageErrors.length) throw new Error(`Home page errors: ${pageErrors.join(' | ')}`)
-  console.log('Home mobile 390x844 smoke: empty state is honest, real cross-tab daily state adoption works without reload, touch compositor guard is active, 3D remains opt-in, provenance survives reload, and no horizontal overflow was detected.')
+  console.log('Home mobile 390x844 smoke: empty state is honest, real cross-tab daily state adoption/removal works without reload, touch compositor guard is active, 3D remains opt-in, provenance survives reload, and no horizontal overflow was detected.')
 } finally {
   await browser.close()
 }
