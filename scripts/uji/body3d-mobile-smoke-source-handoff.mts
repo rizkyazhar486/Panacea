@@ -5,7 +5,7 @@ const smoke = readFileSync(new URL('../qa/body3d-mobile-smoke.mjs', import.meta.
 const inspector = readFileSync(new URL('../../src/pages/bodyhub/WholeBodyMotionInspector.tsx', import.meta.url), 'utf8')
 
 assert.match(inspector, /Inspect \$\{exactSourceNames\.length\} exact source nodes in shared 3D/)
-assert.match(inspector, /disabled=!\{exactSourceNames\.length\}/)
+assert.match(inspector, /disabled\s*=\s*\{\s*!exactSourceNames\.length\s*\}/)
 assert.doesNotMatch(smoke, /Inspect this motion in shared 3D/)
 assert.match(smoke, /Inspect \\d\+ exact source nodes in shared 3D/)
 assert.match(smoke, /exactSourceCount/)
