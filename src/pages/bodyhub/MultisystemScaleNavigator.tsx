@@ -33,9 +33,14 @@ export default function MultisystemScaleNavigator() {
   const domains = useMemo(() => listBodyMultisystemDomains(scale), [scale])
   const boundary = getBodyMultisystemReferenceBoundary()
   const views = listBodyMultisystemScaleViews()
+  const selectedIndex = views.findIndex((view) => view.scale === scale) + 1
 
   return (
-    <section data-body-multisystem-scale-navigator="v1" className="rounded-2xl border border-neutral-200 bg-white/80 p-3 dark:border-white/10 dark:bg-white/5">
+    <section
+      data-body-multisystem-scale-navigator="v1"
+      data-selected-scale={selected.scale}
+      className="rounded-2xl border border-neutral-200 bg-white/80 p-3 dark:border-white/10 dark:bg-white/5"
+    >
       <div className="flex flex-wrap items-start justify-between gap-2">
         <div>
           <div className="text-[9px] font-black uppercase tracking-[0.18em] text-brand">Body → RNA → brain → longevity</div>
@@ -43,6 +48,18 @@ export default function MultisystemScaleNavigator() {
           <p className="mt-1 max-w-2xl text-[10px] leading-relaxed text-neutral-500">Move across biological scales while changing representation when 3D gross anatomy is no longer scientifically appropriate.</p>
         </div>
         <div className="rounded-full border border-neutral-200 px-2 py-1 text-[9px] font-bold text-neutral-500 dark:border-white/10">{views.length} scales</div>
+      </div>
+
+      <div
+        role="status"
+        aria-live="polite"
+        aria-atomic="true"
+        data-body-multisystem-scale-selection="v1"
+        className="mt-2 flex flex-wrap items-center gap-1.5 text-[9px] font-bold text-neutral-500"
+      >
+        <span className="rounded-full border border-brand/30 bg-brand/5 px-2 py-1 text-brand">Scale {selectedIndex}/{views.length}</span>
+        <span className="rounded-full border border-neutral-200 px-2 py-1 dark:border-white/10">{selected.label}</span>
+        <span className="rounded-full border border-neutral-200 px-2 py-1 dark:border-white/10">{domains.length} domains</span>
       </div>
 
       <div className="mt-3 space-y-2">
