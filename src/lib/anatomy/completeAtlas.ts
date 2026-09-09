@@ -58,6 +58,6 @@ const COMPOSED_STRUCTURAL_NODES = applyAtlasRelationPatches(
 
 export const COMPLETE_WHOLE_BODY_ATLAS: AtlasManifest = {
   id: 'panacea-complete-whole-body-atlas',
-  revision: '2026-09-10-r4-higher-end-foundation-structural',
+  revision: '2026-09-10-r4-higher-end-foundation-structural-foundation',
   nodes: deriveCanonicalAtlasHierarchy(COMPOSED_STRUCTURAL_NODES),
 }
