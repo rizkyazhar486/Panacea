@@ -109,18 +109,18 @@ type PaymentNotificationGate =
   | { kind: 'ignore'; reason: 'status_not_success' | 'fraud_not_accepted' }
   | { kind: 'reject'; reason: 'amount_mismatch' | 'currency_mismatch' }
 
-function cleanBodyField(body: Record<string, string>, key: string): string {
-  const value = body[key]
+function cleanBodyField(body: Record<string, unknown> | null | undefined, key: string): string {
+  const value = body?.[key]
   return typeof value === 'string' ? value.trim() : ''
 }
 
 /** Verify the Midtrans SHA-512 notification signature without leaking timing by early character comparison. */
-export function verifyMidtransSignature(body: Record<string, string>, serverKey = config.midtrans.serverKey): boolean {
+export function verifyMidtransSignature(body: Record<string, unknown>, serverKey = config.midtrans.serverKey): boolean {
   const orderId = cleanBodyField(body, 'order_id')
   const statusCode = cleanBodyField(body, 'status_code')
   const grossAmount = cleanBodyField(body, 'gross_amount')
   const signature = cleanBodyField(body, 'signature_key').toLowerCase()
-  if (!orderId || !statusCode || !grossAmount || !signature) return false
+  if (!orderId || !statusCode || !grossAmount || !signature || !serverKey) return false
 
   const expected = crypto
     .createHash('sha512')
@@ -139,10 +139,11 @@ export function verifyMidtransSignature(body: Record<string, string>, serverKey 
  * but must not grant value; amount/currency conflicts fail closed.
  */
 export function paymentNotificationGate(
-  body: Record<string, string>,
+  body: Record<string, unknown>,
   order: Pick<Order, 'amountIdr'>,
 ): PaymentNotificationGate {
-  const notifiedAmount = Number(cleanBodyField(body, 'gross_amount'))
+  const grossAmount = cleanBodyField(body, 'gross_amount')
+  const notifiedAmount = grossAmount ? Number(grossAmount) : Number.NaN
   if (!Number.isFinite(notifiedAmount) || Math.abs(notifiedAmount - order.amountIdr) > 0.001) {
     return { kind: 'reject', reason: 'amount_mismatch' }
   }
@@ -182,7 +183,8 @@ export function nextPaymentOrderStatus(
 
 // Real Midtrans webhook (HTTP notification). Verifies authenticity and server-side order invariants before granting value.
 export function paymentWebhook(req: Request, res: Response) {
-  const body = req.body as Record<string, string>
+  const rawBody = req.body
+  const body: Record<string, unknown> = rawBody && typeof rawBody === 'object' ? rawBody as Record<string, unknown> : {}
   const orderId = cleanBodyField(body, 'order_id')
   const transactionStatus = cleanBodyField(body, 'transaction_status')
   if (!orderId || !transactionStatus || !cleanBodyField(body, 'status_code') || !cleanBodyField(body, 'gross_amount') || !cleanBodyField(body, 'signature_key')) {
