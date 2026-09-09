@@ -11,7 +11,11 @@ import {
   body3dPixelRatio,
   body3dSliceCoordinate,
 } from '../lib/body3dQuality'
-import { clearAnatomySourceNodes, publishAnatomySourceNodes } from '../lib/anatomySourceNodeRegistry'
+import {
+  clearAnatomySourceNodes,
+  publishAnatomySourceNodes,
+  publishAnatomySourceSelection,
+} from '../lib/anatomySourceNodeRegistry'
 import {
   clearBodyAtlasRuntimeRoot,
   clearBodyAtlasRuntimeRoots,
@@ -444,10 +448,16 @@ export function Body3D({
       const targets = Object.values(groupsRef.current).filter((g): g is THREE.Group => !!g)
       const hits = raycaster.intersectObjects(targets, true)
       if (hits.length === 0) return
-      let obj: THREE.Object3D | null = hits[0].object
+      const hitObject = hits[0].object
+      let obj: THREE.Object3D | null = hitObject
       while (obj && !obj.userData.originalName) obj = obj.parent
       if (obj) {
         const rawName = obj.userData.originalName as string
+        const sourceLayer = ANATOMY_LAYERS.find((def) => {
+          const group = groupsRef.current[def.key]
+          return Boolean(group && isDescendantOf(hitObject, group))
+        })
+        publishAnatomySourceSelection(rawName, sourceLayer?.file)
         onPickRef.current(rawName, humanizeStructureName(rawName))
       }
     }
