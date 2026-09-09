@@ -3,7 +3,8 @@ import crypto from 'node:crypto'
 // midtrans-client is CommonJS
 import midtransClient from 'midtrans-client'
 import { config, features } from './config.js'
-import { credit, createOrder, getOrder, setOrderStatus, getUser, saveSettings, isEarlyAdopter, EARLY_ADOPTER_DISCOUNT, CLINICAL_CALC_PRICE_IDR, uid, type User } from './store.js'
+import { currentUser } from './auth.js'
+import { credit, createOrder, getOrder, setOrderStatus, getUser, saveSettings, isEarlyAdopter, EARLY_ADOPTER_DISCOUNT, CLINICAL_CALC_PRICE_IDR, uid, type Order, type User } from './store.js'
 import { notify } from './push.js'
 import { sendReceipt } from './email.js'
 
@@ -128,8 +129,15 @@ export function paymentWebhook(req: Request, res: Response) {
   res.json({ ok: true })
 }
 
+export function visibleOrderStatus(order: Pick<Order, 'userId' | 'status'> | undefined, requesterUserId: string): Order['status'] | undefined {
+  if (!order || order.userId !== requesterUserId) return undefined
+  return order.status
+}
+
 export function orderStatus(req: Request, res: Response) {
-  const order = getOrder(req.params.orderId)
-  if (!order) return res.status(404).json({ error: 'order_not_found' })
-  res.json({ status: order.status })
+  const user = currentUser(req)
+  if (!user) return res.status(401).json({ error: 'unauthorized' })
+  const status = visibleOrderStatus(getOrder(req.params.orderId), user.id)
+  if (!status) return res.status(404).json({ error: 'order_not_found' })
+  res.json({ status })
 }
