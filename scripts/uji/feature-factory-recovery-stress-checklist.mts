@@ -23,6 +23,7 @@ const traced = buildRecoveryRecordedChecklist(
     measuredAt: '2026-09-09T05:00:00.000Z',
   },
 )
+assert.equal(traced.length, expectedChecklistIds.length)
 assert.deepEqual(traced.map((item) => item.id), expectedChecklistIds)
 assert.ok(traced.every((item) => item.status === 'pass'))
 assert.match(traced.find((item) => item.id === 'source')?.detail ?? '', /Oura/)
