@@ -48,6 +48,8 @@ function labelKondisi(id: string): { label: string; where: string } | null {
 function Chip({ aktif, onClick, children }: { aktif: boolean; onClick: () => void; children: React.ReactNode }) {
   return (
     <button
+      type="button"
+      aria-pressed={aktif}
       onClick={onClick}
       className={`min-h-[32px] shrink-0 rounded-full border px-3 text-[11.5px] font-bold transition ${
         aktif ? 'border-brand bg-brand text-white'
