@@ -1,0 +1,83 @@
+/* Panacea Home dark fallback hotfix v37
+   Final cache-busting authority for the Living Instrument stage. Presentation
+   only: no widget data, calculations, routes, stores or loading semantics. */
+
+html.dark .panacea-home .widget-instrument-shell-v5,
+.dark .panacea-home .widget-instrument-shell-v5,
+html.dark .panacea-home .widget-instrument-scroll-v5,
+.dark .panacea-home .widget-instrument-scroll-v5{
+  background:#070b11!important;
+  background-image:none!important;
+  color:#f8fafc!important;
+  border-color:rgba(255,255,255,.10)!important;
+  color-scheme:dark;
+}
+
+html.dark .panacea-home .widget-instrument-slide-v5,
+.dark .panacea-home .widget-instrument-slide-v5{
+  background:transparent!important;
+  background-image:none!important;
+  color:#f8fafc!important;
+}
+
+html.dark .panacea-home .widget-instrument-loading-v29,
+.dark .panacea-home .widget-instrument-loading-v29{
+  min-height:132px!important;
+  display:grid!important;
+  place-items:center!important;
+  border-radius:20px!important;
+  background:#0b1119!important;
+  background-image:none!important;
+  border:1px solid rgba(255,255,255,.09)!important;
+  color:#dbe7ef!important;
+  box-shadow:none!important;
+  filter:none!important;
+  -webkit-backdrop-filter:none!important;
+  backdrop-filter:none!important;
+}
+html.dark .panacea-home .widget-instrument-loading-v29::before,
+.dark .panacea-home .widget-instrument-loading-v29::before{
+  content:'Loading widget…'!important;
+  color:#dbe7ef!important;
+}
+
+/* Legacy/cached lazy fallbacks sometimes arrive as a plain neutral utility
+   block rather than the named loading class. Repair only the OUTER direct child
+   of the active slide so semantic bars/charts/reference ranges keep their data
+   colours. */
+html.dark .panacea-home .widget-instrument-slide-v5[aria-hidden='false'] > :is(.bg-neutral-50,.bg-neutral-100,.bg-neutral-200,.bg-gray-50,.bg-gray-100,.bg-gray-200,.bg-slate-50,.bg-slate-100,.bg-slate-200),
+.dark .panacea-home .widget-instrument-slide-v5[aria-hidden='false'] > :is(.bg-neutral-50,.bg-neutral-100,.bg-neutral-200,.bg-gray-50,.bg-gray-100,.bg-gray-200,.bg-slate-50,.bg-slate-100,.bg-slate-200){
+  background:#111925!important;
+  background-image:none!important;
+  color:#f8fafc!important;
+}
+
+/* If an older bundle renders an empty direct-child fallback with an inline
+   light background, never allow it to become a feature-sized grey slab. This
+   selector only applies to an empty direct child of the active slide. */
+html.dark .panacea-home .widget-instrument-slide-v5[aria-hidden='false'] > div:empty,
+.dark .panacea-home .widget-instrument-slide-v5[aria-hidden='false'] > div:empty{
+  min-height:132px!important;
+  max-height:184px!important;
+  background:#0b1119!important;
+  background-image:none!important;
+  border:1px solid rgba(255,255,255,.08)!important;
+  border-radius:20px!important;
+  box-shadow:none!important;
+}
+
+@supports selector(.a:has(.b)){
+  .panacea-home .widget-instrument-scroll-v5:has(> .widget-instrument-slide-v5[aria-hidden='false'] > .widget-instrument-loading-v29),
+  .panacea-home .widget-instrument-scroll-v5:has(> .widget-instrument-slide-v5[aria-hidden='false'] > div:empty){
+    height:184px!important;
+    min-height:184px!important;
+    max-height:184px!important;
+  }
+}
+
+html.pmd-low-memory.dark .panacea-home :is(.widget-instrument-shell-v5,.widget-instrument-loading-v29){
+  box-shadow:none!important;
+  filter:none!important;
+  -webkit-backdrop-filter:none!important;
+  backdrop-filter:none!important;
+}
