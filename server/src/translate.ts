@@ -17,7 +17,8 @@
 //
 //   1. PERISAI DETERMINISTIK. Sebelum teks dikirim ke model, semua yang tidak
 //      boleh berubah — angka berikut satuannya, dosis, kode ICD/ATC/LOINC,
-//      istilah Terminologia Anatomica, URL, dan nama zat aktif — DICABUT dan
+//      istilah Terminologia Anatomica, URL, nama zat aktif, serta identifier
+//      pasien/kontak yang dapat dikenali secara deterministik — DICABUT dan
 //      diganti penanda ⟦0⟧, ⟦1⟧, dan seterusnya. Model tidak pernah melihatnya,
 //      jadi tidak mungkin mengubahnya. Sesudah terjemahan kembali, penandanya
 //      diisi ulang persis seperti semula, dan kalau ada satu penanda saja yang
@@ -81,6 +82,14 @@ export const REGISTER: Array<{ key: Register; label: string; arahan: string }> =
 // tertangkap utuh sebagai satu satuan dan tidak tercabik jadi "5" dan "mg".
 const POLA_LINDUNG: Array<{ nama: string; re: RegExp }> = [
   { nama: 'url', re: /https?:\/\/[^\s<>"']+/g },
+  // PII yang bisa dikenali TANPA menebak nama orang. Identitas berlabel dan
+  // detail kontak dicabut utuh agar provider model tidak menerima nilainya,
+  // namun dipulihkan byte-for-byte setelah terjemahan. Jangan perluas menjadi
+  // deteksi nama heuristik: false positive pada istilah klinis justru berbahaya.
+  { nama: 'email', re: /\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,63}\b/gi },
+  { nama: 'telepon-internasional', re: /(?<!\w)\+\d{1,3}(?:[\s().-]?\d){7,14}(?!\d)/g },
+  { nama: 'telepon-berlabel', re: /\b(?:tel(?:epon|ephone)?|phone|mobile|hp|wa|whatsapp)\s*[:#-]?\s*(?:\+?\d[\d\s().-]{6,20}\d)/gi },
+  { nama: 'id-pasien', re: /\b(?:NIK|MRN|patient\s*(?:id|identifier)|ID\s*pasien|No\.?\s*(?:RM|rekam\s*medis)|RM)\s*[:#-]?\s*[A-Z0-9][A-Z0-9./-]{3,31}\b/gi },
   // Tekanan darah HARUS lebih dulu daripada pola nilai bersatuan. Kalau tidak,
   // "150/95 mmHg" tercabik: bagian "95 mmHg" tertangkap duluan sebagai nilai
   // dan menyisakan "150/" telanjang di teks yang dikirim ke model — yang
@@ -173,7 +182,7 @@ function bangunSystem(dari: string, ke: string, register: Register): string {
     `- REGISTER: ${reg.arahan}`,
     '',
     'ABSOLUTE RULES',
-    '- Placeholders that look like ⟦0⟧, ⟦1⟧ are protected content: numbers, doses, codes and fixed terms. Reproduce every placeholder EXACTLY, unchanged, in the natural position the target language requires. Never translate, renumber, merge, drop or add one.',
+    '- Placeholders that look like ⟦0⟧, ⟦1⟧ are protected content: identifiers, contact details, numbers, doses, codes and fixed terms. Reproduce every placeholder EXACTLY, unchanged, in the natural position the target language requires. Never translate, renumber, merge, drop or add one.',
     '- Never change a number, a unit, a dose, or a laterality (left/right). If the source is ambiguous, keep the ambiguity — do not resolve it.',
     '- Preserve negation and hedging exactly. "No evidence of X" must not become "X is absent"; "may cause" must not become "causes".',
     '- Keep the original paragraph and line structure, including lists.',
@@ -226,9 +235,10 @@ export async function terjemahkan(
   const { hasil, hilang } = bukaPerisai(terjemahan, perisai.peta)
   if (hilang.length) {
     // Inilah gerbang keselamatannya. Penanda yang hilang berarti model
-    // menghapus atau mengubah sesuatu yang dilindungi — dosis, kode, atau
-    // nama obat. Terjemahan seperti itu TIDAK diterbitkan, karena kesalahannya
-    // justru tidak kelihatan oleh pembaca yang tidak menguasai bahasa asalnya.
+    // menghapus atau mengubah sesuatu yang dilindungi — dosis, kode, identifier,
+    // detail kontak, atau nama obat. Terjemahan seperti itu TIDAK diterbitkan,
+    // karena kesalahannya justru tidak kelihatan oleh pembaca yang tidak
+    // menguasai bahasa asalnya.
     throw new Error(`perisai_hilang:${hilang.slice(0, 5).join(', ')}`)
   }
 
