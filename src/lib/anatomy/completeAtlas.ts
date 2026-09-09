@@ -41,7 +41,7 @@ export function deriveCanonicalAtlasHierarchy(nodes: readonly AtlasNode[]): read
  */
 export const COMPLETE_WHOLE_BODY_ATLAS: AtlasManifest = {
   id: 'panacea-complete-whole-body-atlas',
-  revision: '2026-09-10-r4-whole-body-deep-wave-2',
+  revision: '2026-09-10-r4-higher-end-foundation-whole-body-deep-wave-2',
   nodes: deriveCanonicalAtlasHierarchy([
     ...WHOLE_BODY_ATLAS_BASE_NODES,
     ...RESPIRATORY_ATLAS_NODES,
