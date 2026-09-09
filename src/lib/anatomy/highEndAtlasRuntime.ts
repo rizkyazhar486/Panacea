@@ -1,5 +1,5 @@
 import type { AtlasRenderRequest, AtlasSystemId } from './atlasKernel'
-import { atlasNodeById } from './atlasKernel'
+import { atlasNodeById, validateAtlasManifest } from './atlasKernel'
 import { COMPLETE_WHOLE_BODY_ATLAS } from './completeAtlas'
 import {
   buildAtlasCoverageReport,
@@ -98,12 +98,15 @@ export function planHighEndAtlasFrame(input: HighEndAtlasFrameInput) {
 }
 
 /**
- * Engineering readiness only. This deliberately separates runtime capability
- * from academic/anatomical publication approval.
+ * Engineering readiness only. Canonical manifest validity is included so an
+ * invalid academic-review claim cannot be hidden by otherwise healthy runtime
+ * checks. A clean result still does not constitute academic publication
+ * approval or qualified human review.
  */
 export function highEndAtlasEngineeringReadiness() {
   const manifest = COMPLETE_WHOLE_BODY_ATLAS
   const coverage = buildAtlasCoverageReport(manifest)
+  const manifestIssues = validateAtlasManifest(manifest)
   const multiscaleIssues = validateMultiscaleAtlas(manifest)
   const respiratoryIssues = validateRespiratoryHighEndRuntime(manifest)
 
@@ -114,7 +117,11 @@ export function highEndAtlasEngineeringReadiness() {
     systemsRepresented: HIGH_END_ATLAS_SYSTEMS.filter((system) => coverage.systemCoverage[system] > 0),
     scaleCoverage: coverage.scaleCoverage,
     missingSystemRegionPairs: coverage.missingSystemRegionPairs,
-    blockingEngineeringIssues: [...multiscaleIssues, ...respiratoryIssues],
+    blockingEngineeringIssues: [
+      ...manifestIssues.map((issue) => `manifest:${issue.code}:${issue.nodeId ?? 'manifest'}:${issue.message}`),
+      ...multiscaleIssues,
+      ...respiratoryIssues,
+    ],
     academicReviewRequired: true as const,
   }
 }
