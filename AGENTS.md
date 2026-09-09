@@ -30,11 +30,13 @@ For each candidate:
 5. Push a consolidated branch update; avoid repeated tiny pushes that continually
    cancel and restart CI.
 6. Open/update one PR.
-7. Require exact-head **Validate pull requests** plus complete **Stabilization
-   Acceptance** before merge.
+7. Require **Validate pull requests** plus complete **Stabilization Acceptance**
+   for the current PR head and its current base-generated speculative merge
+   revision before merge.
 8. Immediately before merge, re-resolve latest `main`, mergeability and changed-file
-   overlap. If overlap or workflow ancestry is uncertain, refresh from latest main
-   and rerun gates; never force merge.
+   overlap. If the PR head changed, the tested merge revision is stale, overlap or
+   workflow ancestry is uncertain, refresh from latest main and rerun gates; never
+   force merge.
 9. Merge through the PR only. Verify `main` and available deployment/smoke evidence.
 10. Continue to the next non-overlapping candidate without waiting for a manual
     “lanjut” instruction when operating under an authorized automation.
@@ -54,8 +56,9 @@ use, or safely parallelize independent gates.
   runner time and cancels useful evidence.
 - Do not create placeholder/TEMP commits on `main` to trigger or test CI.
 - Do not bypass or edit tests solely to make a failing candidate green.
-- CI green on an old head is stale evidence if the PR head changes. If `main`
-  changes materially or overlaps the PR, revalidate against current main.
+- CI green is stale evidence if the PR head changes or if a material base change
+  causes GitHub to regenerate a different speculative merge revision. Revalidate
+  the current head against the current base-generated merge result.
 
 ## Failure protocol
 

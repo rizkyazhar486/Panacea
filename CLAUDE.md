@@ -73,14 +73,18 @@ For every production change:
 1. Push the short-lived branch and open/update exactly one PR.
 2. Run targeted checks first as useful.
 3. Require **Validate pull requests** and the complete **Stabilization Acceptance**
-   workflow to pass for the exact current PR head. Full acceptance remains the
-   authority for frontend build/tests, Body/WebGL smoke, and server gates.
+   workflow to pass for the current PR head and the current base-generated
+   speculative merge revision. Full acceptance remains the authority for frontend
+   build/tests, Body/WebGL smoke, and server gates.
 4. Immediately before merge, resolve latest `main`, confirm mergeability, inspect
-   changed-file overlap, and confirm the tested head has not changed.
-5. If `main` moved into overlapping files, CI/workflow files, or creates uncertain
-   ancestry, refresh/rebuild from latest `main` and rerun gates. Never force merge.
-6. Merge through the PR only after the exact-head gates are green and the final
-   race check is clean. Automatic merge is acceptable under those conditions.
+   changed-file overlap, and confirm neither the PR head nor the tested merge
+   revision has gone stale.
+5. If `main` moves materially, changes overlapping/CI files, or causes GitHub to
+   generate a different merge revision, refresh/rebuild from latest `main` and
+   rerun gates. Never force merge.
+6. Merge through the PR only after the current-head/current-merge-result gates are
+   green and the final race check is clean. Automatic merge is acceptable under
+   those conditions.
 7. After merge, verify the merge is present on `main` and inspect available
    deployment/smoke evidence.
 8. Close stale or superseded duplicate PRs so agents do not keep working the same
@@ -104,4 +108,5 @@ force/device setting, diagnosis or treatment from generic atlas/simulation data.
 
 Read and follow `AGENTS.md` as the cross-agent operating policy. If this file and
 `AGENTS.md` conflict on Git/CI coordination, follow the safer rule: short-lived
-branch → PR → exact-head gates → final latest-main audit → merge.
+branch → PR → current-head/current-merge-result gates → final latest-main audit →
+merge.
