@@ -33,13 +33,13 @@
     "authority": "U.S. National Library of Medicine Clinical Tables Search Service; Conditions and Human Phenotype Ontology source datasets",
     "sourceIdentityRequired": true,
     "versionPinRequired": false,
-    "notes": "Persist the endpoint/table identity, source marker `nlm-ctss`, identifier system (`NLM_CONDITIONS_KEY` or `HP`), identifier, label, query context and retrieval timestamp. NLM currently exposes dataset-version information on the Clinical Tables site (for example HPO data version 2026-06-23), but the Panacea runtime adapter does not yet ingest a machine-readable dataset version, so reproducibility is intentionally marked weaker until version capture is implemented."
+    "notes": "The runtime adapter now persists endpoint/table identity through `sourceDataset` (`nlm-clinical-tables:conditions` or `nlm-clinical-tables:hpo`), source marker `nlm-ctss`, identifier system (`NLM_CONDITIONS_KEY` or `HP`), identifier, label, source URL and one `retrievedAt` timestamp shared across each lookup. NLM exposes dataset-version information on the Clinical Tables site, but the Panacea runtime adapter still does not ingest a machine-readable dataset release identifier; reproducibility therefore remains intentionally below a version-pinned source."
   },
   "adapter": {
     "status": "ACTIVE",
     "normalizedTarget": "OntologyTerm",
     "module": "server/src/anatomyOntology.ts",
-    "notes": "Implemented server adapter normalizes Conditions results to `ontology: nlm-conditions`, `identifierSystem: NLM_CONDITIONS_KEY`, and HPO results to `ontology: hp`, `identifierSystem: HP`; it bounds queries, validates HP CURIEs, preserves source URLs, and merges these results with OLS4 without converting NLM keys into DOID identifiers."
+    "notes": "Implemented server adapter normalizes Conditions results to `ontology: nlm-conditions`, `identifierSystem: NLM_CONDITIONS_KEY`, and HPO results to `ontology: hp`, `identifierSystem: HP`; it bounds queries, validates HP CURIEs, preserves `sourceDataset`, source URLs and retrieval timestamps, and merges these results with OLS4 without converting NLM keys into DOID identifiers."
   },
   "trust": {
     "authority": 5,
@@ -47,6 +47,6 @@
     "recency": 4,
     "licenseClarity": 2,
     "reproducibility": 3,
-    "notes": "High authority as an NLM access service, but content rights and evidence meaning remain dataset-specific. Reproducibility is reduced because the current runtime adapter records endpoint provenance but not a machine-readable dataset release identifier."
+    "notes": "High authority as an NLM access service, but content rights and evidence meaning remain dataset-specific. Reproducibility remains reduced because the runtime captures source dataset and retrieval time but not a machine-readable dataset release identifier."
   }
 }
