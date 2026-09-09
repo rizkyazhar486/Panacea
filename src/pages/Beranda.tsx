@@ -226,12 +226,12 @@ export default function Beranda() {
                 <Link
                   key={s.label}
                   to={s.to}
-                  className="home-signal-card min-h-[110px] w-[144px] shrink-0 snap-start rounded-[20px] p-3 transition active:scale-[.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
+                  className="home-signal-card min-h-[116px] w-[148px] shrink-0 snap-start rounded-[20px] p-3 transition active:scale-[.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
                 >
-                  <div className="text-[9px] font-black uppercase tracking-[.13em] text-neutral-500 dark:text-neutral-400">{s.label}</div>
-                  <div className={`mt-3 text-[27px] font-black leading-none tracking-[-.045em] tabular-nums ${s.tone}`}>{s.value}</div>
-                  {s.unit && <div className="mt-1.5 truncate text-[9px] font-semibold text-neutral-500 dark:text-neutral-400">{s.unit}</div>}
-                  {s.meta && <div className="mt-1 truncate text-[8px] font-medium text-neutral-400 dark:text-neutral-500" title={s.meta}>{s.meta}</div>}
+                  <div className="text-[11px] font-black uppercase tracking-[.11em] text-neutral-600 dark:text-neutral-300">{s.label}</div>
+                  <div className={`mt-2.5 text-[27px] font-black leading-none tracking-[-.045em] tabular-nums ${s.tone}`}>{s.value}</div>
+                  {s.unit && <div className="mt-1.5 truncate text-[10.5px] font-bold text-neutral-600 dark:text-neutral-300">{s.unit}</div>}
+                  {s.meta && <div className="mt-1 truncate text-[10px] font-semibold text-neutral-600 dark:text-neutral-300" title={s.meta}>{s.meta}</div>}
                 </Link>
               ))}
             </div>
@@ -246,20 +246,20 @@ export default function Beranda() {
       <section className="home-command-panel" aria-labelledby="daily-tools-title">
         <div className="mb-3 flex items-end justify-between gap-3">
           <div>
-            <div className="text-[9px] font-black uppercase tracking-[.16em] text-neutral-500 dark:text-neutral-400">High utility</div>
+            <div className="text-[11px] font-black uppercase tracking-[.14em] text-neutral-600 dark:text-neutral-300">High utility</div>
             <h2 id="daily-tools-title" className="mt-0.5 text-[17px] font-black tracking-tight text-neutral-950 dark:text-white">What do you need now?</h2>
           </div>
           <Link to="/semua-fitur" className="home-text-link">All features ›</Link>
         </div>
         <div className="home-action-grid">
           {AKSI_UTAMA.map((item) => (
-            <Link key={item.to} to={item.to} className="home-action-card">
+            <Link key={item.to} to={item.to} className="home-action-card min-h-[78px]">
               <span className={`home-action-icon bg-gradient-to-br ${item.accent}`} aria-hidden>{item.emoji}</span>
               <span className="min-w-0">
-                <span className="block text-[11px] font-black text-neutral-900 dark:text-white">{item.label}</span>
-                <span className="mt-0.5 block truncate text-[9px] font-semibold text-neutral-500 dark:text-neutral-400">{item.note}</span>
+                <span className="block text-[13px] font-black leading-tight text-neutral-950 dark:text-white">{item.label}</span>
+                <span className="mt-1 block text-[11px] font-semibold leading-snug text-neutral-600 dark:text-neutral-300">{item.note}</span>
               </span>
-              <span className="ml-auto text-neutral-300 dark:text-neutral-600" aria-hidden>›</span>
+              <span className="ml-auto text-neutral-400 dark:text-neutral-500" aria-hidden>›</span>
             </Link>
           ))}
         </div>
@@ -268,9 +268,9 @@ export default function Beranda() {
       <section className="home-command-panel" aria-labelledby="my-dashboard-title">
         <div className="mb-3 flex items-center justify-between gap-3">
           <div>
-            <div className="text-[9px] font-black uppercase tracking-[.16em] text-neutral-500 dark:text-neutral-400">Live widgets</div>
+            <div className="text-[11px] font-black uppercase tracking-[.14em] text-neutral-600 dark:text-neutral-300">Live widgets</div>
             <h2 id="my-dashboard-title" className="mt-0.5 text-[17px] font-black tracking-tight text-neutral-950 dark:text-white">My dashboard</h2>
-            <p className="mt-1 text-[10px] font-semibold text-neutral-500 dark:text-neutral-400">Your selected metrics, trends, timers and reminders stay visible here.</p>
+            <p className="mt-1 text-[12px] font-semibold leading-relaxed text-neutral-600 dark:text-neutral-300">Your selected metrics, trends, timers and reminders stay visible here.</p>
           </div>
           <Link to="/atur-fitur" className="home-pill-button">Customize</Link>
         </div>
@@ -308,7 +308,7 @@ export default function Beranda() {
       >
         <summary className="home-details-summary">
           <div>
-            <div className="text-[9px] font-black uppercase tracking-[.16em] text-neutral-500 dark:text-neutral-400">Fast input</div>
+            <div className="text-[11px] font-black uppercase tracking-[.14em] text-neutral-600 dark:text-neutral-300">Fast input</div>
             <div className="mt-0.5 text-[15px] font-black text-neutral-950 dark:text-white">Log today or a workout</div>
           </div>
           <span className="home-summary-plus">＋</span>
@@ -339,11 +339,11 @@ export default function Beranda() {
       >
         <summary className="home-details-summary">
           <div>
-            <div className="text-[9px] font-black uppercase tracking-[.16em] text-neutral-500 dark:text-neutral-400">Explore</div>
+            <div className="text-[11px] font-black uppercase tracking-[.14em] text-neutral-600 dark:text-neutral-300">Explore</div>
             <div className="mt-0.5 text-[15px] font-black text-neutral-950 dark:text-white">Learning & Panacea universe</div>
-            <div className="mt-1 text-[9px] font-semibold text-neutral-500 dark:text-neutral-400">Loaded only when you want it.</div>
+            <div className="mt-1 text-[11px] font-semibold leading-relaxed text-neutral-600 dark:text-neutral-300">Loaded only when you want it.</div>
           </div>
-          <span className="text-xl text-neutral-400 transition group-open:rotate-90" aria-hidden>›</span>
+          <span className="text-xl text-neutral-500 transition group-open:rotate-90 dark:text-neutral-400" aria-hidden>›</span>
         </summary>
         {exploreOpen && (
           <div className="mt-4 space-y-5 border-t border-neutral-200/70 pt-4 dark:border-white/10">
