@@ -155,7 +155,7 @@ export default function Beranda() {
 
   const signals = useMemo<Signal[]>(() => {
     const out: Signal[] = []
-    const sharedMeta = vitalsMeta || 'Recorded shared vitals'
+    const sharedMeta = vitalsMeta || 'Source/time unavailable'
     const lastSleep = [...(state.sleepLogs ?? [])]
       .filter((x) => typeof x?.hours === 'number' && x.hours > 0)
       .sort((a, b) => (a.date < b.date ? 1 : -1))[0]
