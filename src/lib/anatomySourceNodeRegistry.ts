@@ -1,4 +1,5 @@
 import { INDEKS_TUBUH, type StrukturTubuh } from './bodyIndex.gen'
+import { WHOLE_BODY_REGIONS, type AtlasRegionKey } from './wholeBodyAtlasBlueprint'
 
 export interface AnatomySourceNodeBundle {
   file: string
@@ -27,6 +28,29 @@ const FILE_BY_LAYER: Record<StrukturTubuh['l'], string> = {
   visceral: 'visceral.glb',
   lymphoid: 'lymphoid.glb',
 }
+
+const BODY_INDEX_REGIONS_BY_ATLAS: Readonly<Record<AtlasRegionKey, readonly string[]>> = {
+  'head-neck': ['kepala', 'leher'],
+  thorax: ['toraks'],
+  abdomen: ['abdomen'],
+  'pelvis-perineum': ['pelvis'],
+  'upper-limb': ['bahu-lengan', 'tangan'],
+  'lower-limb': ['paha', 'tungkai'],
+  // The axial spine spans several longitudinal body-index regions. Deliberately
+  // exclude limb buckets so a generic vertebral/nerve hint cannot jump into an
+  // appendicular mesh merely because the source name happens to overlap.
+  'spine-back': ['leher', 'toraks', 'abdomen', 'pelvis'],
+}
+
+const BODY_INDEX_REGIONS_BY_SOURCE_NAME = (() => {
+  const out = new Map<string, Set<string>>()
+  for (const structure of INDEKS_TUBUH) {
+    const regions = out.get(structure.n) ?? new Set<string>()
+    regions.add(structure.w)
+    out.set(structure.n, regions)
+  }
+  return out
+})()
 
 function buildIndexedSnapshot(): readonly AnatomySourceNodeBundle[] {
   const grouped = new Map<string, string[]>()
@@ -174,6 +198,61 @@ export function anatomySourceNameMatchesHint(sourceName: string, hint: string) {
   return false
 }
 
+/**
+ * Restrict exact GLB source names to the body-index regions represented by one
+ * reviewed atlas region. Runtime names that cannot be tied back to the shipped
+ * generated metadata are excluded here rather than guessed into a region.
+ */
+export function filterAnatomySourceBundlesForAtlasRegion(
+  sourceBundles: readonly AnatomySourceNodeBundle[],
+  region: AtlasRegionKey,
+): AnatomySourceNodeBundle[] {
+  const allowedRegions = new Set(BODY_INDEX_REGIONS_BY_ATLAS[region])
+  return sourceBundles
+    .map((bundle) => ({
+      file: bundle.file,
+      names: bundle.names.filter((name) => {
+        const sourceRegions = BODY_INDEX_REGIONS_BY_SOURCE_NAME.get(name)
+        return Boolean(sourceRegions && [...sourceRegions].some((sourceRegion) => allowedRegions.has(sourceRegion)))
+      }),
+    }))
+    .filter((bundle) => bundle.names.length > 0)
+}
+
+function sameReviewedHints(a: readonly string[], b: readonly string[]) {
+  return a.length === b.length && a.every((hint, index) => hint === b[index])
+}
+
+function reviewedAtlasRegionsForHints(nodeHints: readonly string[]) {
+  return WHOLE_BODY_REGIONS
+    .filter((region) => region.structures.some((structure) => sameReviewedHints(structure.nodeHints, nodeHints)))
+    .map((region) => region.key)
+}
+
+function regionScopeReviewedBundles(
+  nodeHints: readonly string[],
+  sourceBundles: readonly AnatomySourceNodeBundle[],
+) {
+  const regions = reviewedAtlasRegionsForHints(nodeHints)
+  if (!regions.length) return sourceBundles
+
+  const namesByFile = new Map<string, Set<string>>()
+  for (const region of regions) {
+    for (const bundle of filterAnatomySourceBundlesForAtlasRegion(sourceBundles, region)) {
+      const names = namesByFile.get(bundle.file) ?? new Set<string>()
+      for (const name of bundle.names) names.add(name)
+      namesByFile.set(bundle.file, names)
+    }
+  }
+
+  return sourceBundles
+    .map((bundle) => ({
+      file: bundle.file,
+      names: [...(namesByFile.get(bundle.file) ?? [])],
+    }))
+    .filter((bundle) => bundle.names.length > 0)
+}
+
 function matchesForHint(
   hint: string,
   sourceBundles: readonly AnatomySourceNodeBundle[],
@@ -214,8 +293,10 @@ export function resolveAnatomySourceNodes(
  * Resolve every reviewed component hint for composite atlas targets such as
  * "Heart & great vessels" or "Knee complex". Each component may contribute a
  * bounded set of exact source nodes, while duplicates across overlapping hints
- * are suppressed. This is deliberately separate from specificity-fallback
- * resolution so generic search behavior remains fail-closed.
+ * are suppressed. When the complete hint list exactly belongs to a reviewed
+ * WHOLE_BODY_REGIONS target, candidates are additionally constrained to that
+ * target's body region before name matching. Generic callers with arbitrary
+ * hints keep the existing source-bundle behavior.
  */
 export function resolveAllAnatomySourceNodes(
   nodeHints: readonly string[],
@@ -224,8 +305,9 @@ export function resolveAllAnatomySourceNodes(
 ): AnatomySourceNodeMatch[] {
   const resolved: AnatomySourceNodeMatch[] = []
   const seenByFile = new Map<string, Set<string>>()
+  const scopedBundles = regionScopeReviewedBundles(nodeHints, sourceBundles)
   for (const hint of nodeHints) {
-    resolved.push(...matchesForHint(hint, sourceBundles, maxNamesPerBundle, seenByFile))
+    resolved.push(...matchesForHint(hint, scopedBundles, maxNamesPerBundle, seenByFile))
   }
   return resolved
 }
