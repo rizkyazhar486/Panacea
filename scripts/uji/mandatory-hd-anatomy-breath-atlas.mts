@@ -1,4 +1,5 @@
 import assert from 'node:assert/strict'
+import { readFileSync } from 'node:fs'
 import { BODY_PROJECTION_TARGETS } from '../../src/lib/bodyProjectionContract.ts'
 import { evaluateProjectionReadiness } from '../../src/lib/bodyProjectionReadiness.ts'
 import {
@@ -30,6 +31,20 @@ for (const reference of MANDATORY_ANATOMY_REFERENCES) {
   assert.equal(reference.licenseStatus, 'unverified')
   assert.equal(reference.directCopyAllowed, false, `${reference.id} must not become a blanket copy source without verified licensing.`)
 }
+
+const breathAtlasUi = readFileSync(new URL('../../src/pages/bodyhub/BreathAtlasLab.tsx', import.meta.url), 'utf8')
+for (const reference of MANDATORY_ANATOMY_REFERENCES) {
+  assert.ok(
+    breathAtlasUi.includes(reference.url),
+    `BreathAtlasLab must retain the mandatory visible reference ${reference.url}`,
+  )
+}
+assert.match(breathAtlasUi, /independently implemented Panacea teaching layer/i)
+assert.match(breathAtlasUi, /does not embed or copy third-party viewer code or assets/i)
+assert.match(breathAtlasUi, /Scientific boundary/i)
+assert.match(breathAtlasUi, /not deformed to fake breathing/i)
+assert.match(breathAtlasUi, /no patient-specific ventilation map/i)
+assert.match(breathAtlasUi, /Microscopic alveolar geometry is disclosed as unavailable/i)
 
 const mobile = selectHdAnatomyRenderProfile({ viewportWidth: 390, devicePixelRatio: 3 })
 assert.equal(mobile.id, 'mobile-safe')
@@ -141,4 +156,4 @@ for (const overlay of RESPIRATORY_OVERLAY_POLICIES) {
   assert.equal(overlay.requiresExplicitSourceForQuantification, true)
 }
 
-console.log('Mandatory HD Anatomy + Breath Atlas capability, provenance, LOD, and physiology boundaries verified.')
+console.log('Mandatory HD Anatomy + Breath Atlas capability, UI references, provenance, LOD, and physiology boundaries verified.')
