@@ -160,6 +160,25 @@ try {
   }
 
   const vessels = page.getByRole('button', { name: 'Vessels', exact: true }).first()
+  await vessels.evaluate((node) => node.scrollIntoView({ block: 'center', inline: 'nearest', behavior: 'auto' }))
+  await page.waitForTimeout(100)
+  const vesselsBox = await vessels.boundingBox()
+  metrics.vesselsControlReachability = {
+    found: true,
+    box: vesselsBox,
+    viewportWidth: viewport.width,
+    viewportHeight: viewport.height,
+  }
+  if (!vesselsBox) throw new Error('Vessels layer control has no measurable bounding box on mobile')
+  const vesselsInViewport =
+    vesselsBox.x >= 0 &&
+    vesselsBox.y >= 0 &&
+    vesselsBox.x + vesselsBox.width <= viewport.width &&
+    vesselsBox.y + vesselsBox.height <= viewport.height
+  metrics.vesselsControlReachability.inViewport = vesselsInViewport
+  if (!vesselsInViewport) {
+    throw new Error(`Vessels layer control cannot be brought into the 390x844 viewport: ${JSON.stringify(vesselsBox)}`)
+  }
   await vessels.click()
   await progressiveLoading.waitFor({ state: 'visible', timeout: 5_000 })
   const progressiveClass = await progressiveLoading.evaluate((node) =>
