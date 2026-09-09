@@ -10,8 +10,10 @@ const RXNAV = 'https://rxnav.nlm.nih.gov/REST'
 const MAX_DRUG_QUERY_LENGTH = 160
 const MAX_CLASS_RESULTS = 100
 const MAX_SEARCH_RESULTS = 100
+const UMUR_CACHE_VERSI = 12 * 60 * 60 * 1000
 
 type FetchLike = typeof fetch
+type VersionedRelaSource = 'MEDRT' | 'ATC'
 
 function normalizeDrugQuery(value: string): string {
   return value.replace(/\s+/g, ' ').trim().slice(0, MAX_DRUG_QUERY_LENGTH)
@@ -47,6 +49,13 @@ export interface ProfilFarmakologi {
   atc: KelasObat[]
   /** Relasi `may_treat` dari MED-RT; konteks referensi, bukan indikasi pasien. */
   indikasi: KelasObat[]
+  /**
+   * Versi relation-source yang dilaporkan RxClass untuk sumber yang memang
+   * mempunyai version identifier. DailyMed sengaja tidak diberi versi palsu:
+   * NLM mendokumentasikan class-member DailyMed sebagai rolling update tanpa
+   * version number yang diasosiasikan.
+   */
+  versiSumber: Partial<Record<VersionedRelaSource, string>>
 }
 
 interface RxClassResp {
@@ -57,6 +66,35 @@ interface RxClassResp {
       rela?: string
       relaSource?: string
     }>
+  }
+}
+
+let cacheVersiSumber: Partial<Record<VersionedRelaSource, { nilai: string; waktu: number }>> = {}
+
+async function versiRelaSource(
+  source: VersionedRelaSource,
+  fetchImpl: FetchLike,
+): Promise<string> {
+  const useRuntimeCache = fetchImpl === fetch
+  const cached = cacheVersiSumber[source]
+  if (useRuntimeCache && cached && Date.now() - cached.waktu < UMUR_CACHE_VERSI) return cached.nilai
+
+  try {
+    const res = await fetchImpl(`${RXNAV}/rxclass/version/${source}.json`, {
+      headers: { Accept: 'application/json' },
+      signal: AbortSignal.timeout(6000),
+    })
+    if (!res.ok) return ''
+    const data = (await res.json()) as { relaSourceVersion?: unknown }
+    const nilai = typeof data.relaSourceVersion === 'string'
+      ? data.relaSourceVersion.replace(/\s+/g, ' ').trim().slice(0, 80)
+      : ''
+    if (useRuntimeCache && nilai) cacheVersiSumber[source] = { nilai, waktu: Date.now() }
+    return nilai
+  } catch {
+    // Versi adalah provenance tambahan. Kegagalan endpoint versi tidak boleh
+    // menghapus relation slices yang sudah valid; absence tetap eksplisit.
+    return ''
   }
 }
 
@@ -116,12 +154,14 @@ export async function profilFarmakologi(
   const q = normalizeDrugQuery(name)
   if (!q) return null
   const aman = (p: Promise<KelasObat[]>) => p.catch(() => [] as KelasObat[])
-  const [mekanisme, efekFisiologis, kelasFarmakologi, atc, indikasi] = await Promise.all([
+  const [mekanisme, efekFisiologis, kelasFarmakologi, atc, indikasi, versiMedrt, versiAtc] = await Promise.all([
     aman(kelasMenurut(q, 'MEDRT', 'has_MoA', fetchImpl)),
     aman(kelasMenurut(q, 'MEDRT', 'has_PE', fetchImpl)),
     aman(kelasMenurut(q, 'DAILYMED', 'has_EPC', fetchImpl)),
     aman(kelasMenurut(q, 'ATC', undefined, fetchImpl)),
     aman(kelasMenurut(q, 'MEDRT', 'may_treat', fetchImpl)),
+    versiRelaSource('MEDRT', fetchImpl),
+    versiRelaSource('ATC', fetchImpl),
   ])
   const adaIsi = mekanisme.length || efekFisiologis.length || kelasFarmakologi.length || atc.length || indikasi.length
   if (!adaIsi) return null
@@ -143,7 +183,11 @@ export async function profilFarmakologi(
     // RXCUI hanya pelengkap; source-class profile yang sudah valid tetap berguna.
   }
 
-  return { nama: q, rxcui, mekanisme, efekFisiologis, kelasFarmakologi, atc, indikasi }
+  const versiSumber: ProfilFarmakologi['versiSumber'] = {}
+  if (versiMedrt) versiSumber.MEDRT = versiMedrt
+  if (versiAtc) versiSumber.ATC = versiAtc
+
+  return { nama: q, rxcui, mekanisme, efekFisiologis, kelasFarmakologi, atc, indikasi, versiSumber }
 }
 
 export interface ZatAktif { rxcui: string; nama: string }
