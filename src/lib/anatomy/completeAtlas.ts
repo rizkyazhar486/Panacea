@@ -2,17 +2,20 @@ import type { AtlasManifest, AtlasNode } from './atlasKernel'
 import { ADVANCED_RESPIRATORY_ATLAS_NODES } from './advancedRespiratoryAtlas'
 import { CARDIOPULMONARY_BRIDGE_NODES, CARDIOPULMONARY_RELATION_PATCHES } from './cardiopulmonaryBridge'
 import { DEEP_CARDIOVASCULAR_ATLAS_NODES } from './deepCardiovascularAtlas'
+import { DEEP_LYMPHATIC_RELATION_PATCHES, DEEP_LYMPHATIC_TOPOLOGY_NODES } from './deepLymphaticTopology'
 import { DEEP_NEUROVASCULAR_ATLAS_NODES } from './deepNeurovascularAtlas'
+import { DEEP_VISCERAL_ATLAS_NODES } from './deepVisceralAtlas'
 import { applyAtlasRelationPatches, HIGH_END_ATLAS_RELATION_PATCHES } from './highEndTopology'
 import { RESPIRATORY_ATLAS_NODES } from './respiratoryAtlas'
+import { VISCERAL_RELATION_PATCHES } from './visceralTopology'
+import { VISCERAL_VASCULAR_ATLAS_NODES } from './visceralVascularAtlas'
 import { WHOLE_BODY_ATLAS_BASE_NODES } from './wholeBodyAtlas'
 
 /**
  * Build hierarchy solely from parentId. Raw `children` arrays are deliberately
  * treated as non-canonical authoring hints because multi-module atlas sources
- * can otherwise create impossible dual parents (for example lung-lobe organ
- * containment versus airway continuity). Airway/vessel/nerve continuity must
- * be represented with explicit relation edges instead.
+ * can otherwise create impossible dual parents. Airway/vessel/duct/lymphatic
+ * continuity is represented with explicit relation edges instead.
  */
 export function deriveCanonicalAtlasHierarchy(nodes: readonly AtlasNode[]): readonly AtlasNode[] {
   const childrenByParent = new Map<string, string[]>()
@@ -50,12 +53,20 @@ const COMPOSED_HIGH_END_NODES = applyAtlasRelationPatches(
     ...DEEP_CARDIOVASCULAR_ATLAS_NODES,
     ...DEEP_NEUROVASCULAR_ATLAS_NODES,
     ...CARDIOPULMONARY_BRIDGE_NODES,
+    ...DEEP_VISCERAL_ATLAS_NODES,
+    ...VISCERAL_VASCULAR_ATLAS_NODES,
+    ...DEEP_LYMPHATIC_TOPOLOGY_NODES,
   ],
-  [...HIGH_END_ATLAS_RELATION_PATCHES, ...CARDIOPULMONARY_RELATION_PATCHES],
+  [
+    ...HIGH_END_ATLAS_RELATION_PATCHES,
+    ...CARDIOPULMONARY_RELATION_PATCHES,
+    ...VISCERAL_RELATION_PATCHES,
+    ...DEEP_LYMPHATIC_RELATION_PATCHES,
+  ],
 )
 
 export const COMPLETE_WHOLE_BODY_ATLAS: AtlasManifest = {
   id: 'panacea-complete-whole-body-atlas',
-  revision: '2026-09-09-r3-high-end',
+  revision: '2026-09-09-r4-visceral-high-end',
   nodes: deriveCanonicalAtlasHierarchy(COMPOSED_HIGH_END_NODES),
 }
