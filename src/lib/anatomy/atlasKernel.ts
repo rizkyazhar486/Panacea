@@ -1,5 +1,6 @@
 import type { AnatomySourceNodeBundle, AnatomySourceNodeMatch } from '../anatomySourceNodeRegistry'
 import { resolveAllAnatomySourceNodes, resolveAnatomySourceNodes } from '../anatomySourceNodeRegistry'
+import { validateAtlasAcademicReviewEvidence } from './atlasAcademicReviewGate'
 
 export type AtlasSystemId =
   | 'surface'
@@ -50,7 +51,7 @@ export type AtlasRelationKind =
 export type AtlasLodTier = 'macro' | 'standard' | 'detail' | 'micro'
 
 export interface AtlasSourceBinding {
-  /** Ordered, reviewed lookup hints. First entries must be the most specific. */
+  /** Ordered, curated source-node lookup hints. First entries must be the most specific. */
   nodeHints: readonly string[]
   /** Composite nodes deliberately resolve every component hint. */
   mode: 'specific-fallback' | 'composite'
@@ -164,6 +165,7 @@ export interface AtlasValidationIssue {
     | 'relation-target-missing'
     | 'invalid-priority'
     | 'invalid-provenance'
+    | 'invalid-academic-review'
     | 'invalid-lod'
     | 'non-reciprocal-hierarchy'
     | 'cycle'
@@ -243,7 +245,7 @@ export function buildAtlasRenderPlan(
 
     const sourceMatches = resolveNodeSource(node, bundles)
     if (node.geometryStatus === 'shipped' && sourceMatches.length === 0) {
-      skipped.push({ nodeId: node.id, reason: 'No reviewed source-node match in the active/indexed anatomy bundles.' })
+      skipped.push({ nodeId: node.id, reason: 'No source-node match in the active/indexed anatomy bundles.' })
       continue
     }
 
@@ -336,6 +338,10 @@ export function validateAtlasManifest(manifest: AtlasManifest): AtlasValidationI
     }
     if (!node.provenance.sourceId.trim() || !isPinnedRevision(node.provenance.sourceRevision) || !node.provenance.license.trim() || !node.provenance.sourceLocator.trim()) {
       issues.push({ nodeId: node.id, code: 'invalid-provenance', message: 'Atlas provenance requires source id, immutable revision, license, and source locator.' })
+    }
+    const academicReview = validateAtlasAcademicReviewEvidence(node.provenance)
+    for (const reason of academicReview.reasons) {
+      issues.push({ nodeId: node.id, code: 'invalid-academic-review', message: reason })
     }
     for (const lod of lodsFor(node)) {
       if (lod.maxTriangles <= 0 || lod.maxTextureMegabytes <= 0 || lod.maxNodeCount <= 0 || lod.minProjectedPixels < 0) {
