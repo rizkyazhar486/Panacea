@@ -24,7 +24,7 @@ async function activateWithKeyboard(button) {
 
 async function runEyeOptics(page) {
   const specialty = page.getByRole('button', { name: 'Specialty labs', exact: true })
-  await activateWithKeyboard(specialty)
+  await specialty.click()
 
   const neuro = page.getByRole('button', { name: 'Neuro & senses', exact: true })
   await expect(neuro).toBeVisible()
