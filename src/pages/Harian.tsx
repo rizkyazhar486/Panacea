@@ -12,7 +12,7 @@ import { fmtDurasi, fmtPace } from '../lib/workoutImport'
 //
 // APA YANG DIPISAHKAN DI SINI. Sebuah hari punya dua macam isi: yang TERUKUR
 // (masuk sendiri dari perangkat) dan yang DIRASAKAN (hanya Anda yang tahu).
-// Keduanya sengaja dipisahkan menjadi dua blok dengan judul yang menyebutkan
+// Keduanya sengaja dipisah menjadi dua blok dengan judul yang menyebutkan
 // asalnya, karena begitu keduanya dicampur dalam satu kisi, nilai yang
 // dilaporkan sendiri mulai terbaca seolah ikut diukur alat.
 //
