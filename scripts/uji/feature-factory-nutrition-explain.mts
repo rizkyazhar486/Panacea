@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict'
 import { readFileSync } from 'node:fs'
-import { NUTRITION_DATA_EXPLAINABILITY_STEPS } from '../../src/components/NutritionDataExplainabilityCard.tsx'
+import { NUTRITION_DATA_EXPLAINABILITY_STEPS } from '../../src/lib/nutritionDataExplainability.ts'
 
 assert.equal(NUTRITION_DATA_EXPLAINABILITY_STEPS.length, 4)
 assert.deepEqual(
