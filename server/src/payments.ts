@@ -158,17 +158,30 @@ export function evaluatePaymentNotification(
   return { action: 'ignore' }
 }
 
+/**
+ * Verify Midtrans' documented SHA-512 notification signature without a
+ * data-dependent string comparison. Invalid/malformed signatures fail closed
+ * before timingSafeEqual, which requires equal-length buffers.
+ */
+export function verifyPaymentSignature(body: Record<string, string>, serverKey: string): boolean {
+  const provided = String(body.signature_key ?? '').trim()
+  if (!/^[0-9a-f]{128}$/i.test(provided)) return false
+
+  const expected = crypto
+    .createHash('sha512')
+    .update(String(body.order_id ?? '') + String(body.status_code ?? '') + String(body.gross_amount ?? '') + serverKey)
+    .digest()
+  const received = Buffer.from(provided, 'hex')
+  return received.length === expected.length && crypto.timingSafeEqual(received, expected)
+}
+
 // Real Midtrans webhook (HTTP notification). Verifies signature and only then
 // applies a state transition that is safe for the matching local order.
 export function paymentWebhook(req: Request, res: Response) {
   const body = req.body as Record<string, string>
-  const { order_id, status_code, gross_amount, signature_key } = body
+  const { order_id } = body
   if (!order_id) return res.status(400).json({ error: 'bad_request' })
-  const expected = crypto
-    .createHash('sha512')
-    .update(order_id + status_code + gross_amount + config.midtrans.serverKey)
-    .digest('hex')
-  if (signature_key !== expected) return res.status(403).json({ error: 'bad_signature' })
+  if (!verifyPaymentSignature(body, config.midtrans.serverKey)) return res.status(403).json({ error: 'bad_signature' })
 
   const order = getOrder(order_id)
   if (!order) return res.status(404).json({ error: 'order_not_found' })

@@ -1,288 +1,282 @@
 import type { AnatomyLayer } from '../components/Body3D'
 
-// ─────────────────────────────────────────────────────────────────────────────
-// FISIOLOGI — apa yang tubuh KERJAKAN, bukan terbuat dari apa.
-//
-// Anatomi menjawab "ini apa dan letaknya di mana"; fisiologi menjawab "ini
-// bekerja bagaimana, seberapa cepat, dikendalikan apa, dan berubah bagaimana
-// saat tubuh dibebani". Bagian itu memang belum pernah ada di aplikasi ini.
-//
-// KENAPA TIAP SISTEM MEMBAWA "SAAT OLAHRAGA". Olahraga adalah uji beban faal
-// yang paling gampang diamati sendiri: denyut naik, napas dalam, aliran darah
-// pindah dari usus ke otot, suhu naik, keringat keluar. Menaruh respons itu
-// tepat di sebelah nilai istirahatnya membuat halaman Workout dan halaman
-// Body Explorer membicarakan tubuh yang SAMA — beban di satu layar punya
-// penjelasan faal di layar lainnya.
-//
-// ANGKA. Yang ditulis di sini adalah kisaran rujukan dewasa sehat yang lazim
-// dan disepakati luas (curah jantung, laju filtrasi glomerulus, volume tidal,
-// dan seterusnya), bukan ambang diagnostik dan bukan sasaran pribadi
-// siapa pun. Nilai yang tidak dapat dipastikan tidak ditulis.
-// ─────────────────────────────────────────────────────────────────────────────
+// FISIOLOGI — apa yang tubuh kerjakan. Semua angka di sini adalah rujukan
+// pendidikan populasi, bukan nilai personal, target latihan, atau ambang
+// diagnosis. Respons latihan bergantung pada usia, ukuran tubuh, jenis kelamin,
+// kebugaran, posisi, lingkungan, protokol dan metode pengukuran.
 
 export interface NilaiFaal {
   label: string
-  /** Nilai istirahat pada dewasa sehat. */
+  /** Nilai/kisaran rujukan saat istirahat; bukan "nilai normal" universal. */
   rest: string
-  /** Nilai atau arah perubahannya saat olahraga berat. */
+  /** Arah atau kisaran respons latihan yang lazim; bukan prediksi individual. */
   exercise?: string
 }
 
 export interface SistemFisiologi {
-  /** Sama dengan key di ORGAN_SYSTEMS (anatomyHierarchy.ts) supaya keduanya
-   *  bisa disandingkan tanpa tabel penerjemah. */
   key: string
   label: string
-  /** Satu kalimat: fungsi utamanya. */
   fungsi: string
-  /** Proses faal utamanya, ditulis sebagai langkah yang bisa diikuti. */
   proses: string[]
-  /** Lingkar umpan balik yang mengendalikannya. */
   regulasi: string
   angka: NilaiFaal[]
-  /** Apa yang terjadi saat olahraga — penghubung ke halaman Workout. */
   saatOlahraga: string
   layer3d?: AnatomyLayer['key']
-  /** Untuk mengambil istilah ontologi & gambar, seperti entri anatomi. */
   searchTerms: string[]
+  /** Batas interpretasi khusus sistem yang harus tetap terlihat di UI. */
+  evidenceNote?: string
 }
+
+export const PHYSIOLOGY_REFERENCE_SOURCES = [
+  'Guyton & Hall Textbook of Medical Physiology',
+  'Boron & Boulpaep Medical Physiology',
+  'ACSM Guidelines for Exercise Testing and Prescription',
+] as const
+
+export const PHYSIOLOGY_EVIDENCE_BOUNDARY =
+  'Reference physiology describes population-level mechanisms and approximate teaching ranges. It does not infer a user’s physiology, fitness, disease, internal force, oxygen delivery, hydration state or clinical risk without measured inputs and an appropriate validated method.'
 
 export const SISTEM_FISIOLOGI: SistemFisiologi[] = [
   {
     key: 'cardiovascular',
     label: 'Cardiovascular physiology',
-    fungsi: 'Moves oxygen, fuel, hormones and heat to every cell, and carries carbon dioxide and waste away.',
+    fungsi: 'Moves oxygen, fuel, hormones and heat through the circulation and carries carbon dioxide and metabolic products away from tissues.',
     proses: [
-      'The sinoatrial node fires spontaneously, setting the heart rate without any nerve input.',
-      'The impulse spreads through the atria, pauses at the AV node, then runs down the bundle of His and Purkinje fibres so the ventricles contract from the apex upward.',
-      'Stroke volume depends on preload (how full the ventricle is), afterload (the pressure it must push against), and contractility.',
-      'Cardiac output = heart rate × stroke volume. Blood pressure = cardiac output × systemic vascular resistance.',
+      'Pacemaker cells in the sinoatrial node depolarise spontaneously; autonomic and hormonal inputs continuously modulate the resulting heart rate.',
+      'Atrial activation reaches the AV node and His–Purkinje system, coordinating ventricular activation rather than making the chambers contract as a single point source.',
+      'Stroke volume reflects preload, afterload, contractility, ventricular compliance and heart–vascular interaction.',
+      'Cardiac output = heart rate × stroke volume. Mean arterial pressure is often approximated as cardiac output × systemic vascular resistance, while pulsatile pressure also depends on arterial properties.',
     ],
-    regulasi: 'Baroreceptors in the carotid sinus and aortic arch sense pressure and adjust sympathetic and vagal tone within seconds. The kidney adjusts blood volume over hours to days through the renin–angiotensin–aldosterone system.',
+    regulasi: 'Arterial baroreflexes rapidly alter sympathetic and parasympathetic activity. Renal, hormonal and vascular mechanisms regulate volume and pressure over longer timescales.',
     angka: [
-      { label: 'Heart rate', rest: '60–100 beats/min', exercise: 'Up to roughly 220 − age at maximum' },
-      { label: 'Stroke volume', rest: '~70 mL', exercise: 'Rises to ~100–120 mL, then plateaus' },
-      { label: 'Cardiac output', rest: '~5 L/min', exercise: '20–25 L/min in a trained adult' },
-      { label: 'Ejection fraction', rest: '55–70%' },
-      { label: 'Blood pressure', rest: '~120/80 mmHg', exercise: 'Systolic rises; diastolic stays flat or falls slightly' },
+      { label: 'Heart rate', rest: 'Common adult reference: 60–100 beats/min', exercise: 'Rises with workload; 220 − age is only a rough population heuristic for HRmax' },
+      { label: 'Stroke volume', rest: 'Often ~60–100 mL/beat', exercise: 'Usually rises; the magnitude and whether it plateaus vary with posture, intensity and training' },
+      { label: 'Cardiac output', rest: 'Often ~4–8 L/min', exercise: 'Can rise several-fold; peak values vary widely with body size and endurance training' },
+      { label: 'Ejection fraction', rest: 'Common reference ~55–70%' },
+      { label: 'Blood pressure', rest: 'Interpret from measured SBP/DBP, not one universal value', exercise: 'During dynamic exercise systolic pressure usually rises; diastolic response is smaller and protocol-dependent' },
     ],
-    saatOlahraga: 'Cardiac output can quintuple. Sympathetic drive raises rate and contractility while arterioles in working muscle dilate and those in the gut and kidney constrict, redirecting blood to where it is needed. Endurance training enlarges the left ventricle, so stroke volume rises and resting heart rate falls — that is why a fit person\'s resting pulse is low.',
+    saatOlahraga: 'Sympathetic activation, vagal withdrawal, increased venous return and local metabolic vasodilation raise oxygen delivery to working muscle. Endurance training can produce physiological cardiac remodelling and a lower resting heart rate, but the degree varies and a low pulse is not by itself proof of fitness.',
     layer3d: 'cardiovascular',
     searchTerms: ['cardiovascular physiology', 'heart disease'],
+    evidenceNote: 'Peak heart rate and cardiac output are measured variables. Age formulas and generic exercise values are approximations, not substitutes for testing.',
   },
   {
     key: 'respiratory',
     label: 'Respiratory physiology',
-    fungsi: 'Brings oxygen into the blood and clears carbon dioxide, and in doing so sets the body\'s acid–base balance.',
+    fungsi: 'Ventilates the lungs, exchanges oxygen and carbon dioxide, and contributes to acid–base regulation.',
     proses: [
-      'The diaphragm contracts and flattens, dropping intrapleural pressure and drawing air in. Quiet exhalation is passive elastic recoil.',
-      'Gas crosses the alveolar–capillary membrane by simple diffusion down its partial-pressure gradient.',
-      'Oxygen is carried almost entirely bound to haemoglobin; the sigmoid dissociation curve is what lets tissues unload it steeply at low PO₂.',
-      'Most carbon dioxide travels as bicarbonate after carbonic anhydrase converts it inside red cells.',
+      'Diaphragm and inspiratory-muscle contraction lowers pleural pressure and expands the lungs; quiet expiration is largely passive elastic recoil.',
+      'Gas transfer across the alveolar–capillary membrane depends on partial-pressure gradients, surface area, diffusion properties and ventilation–perfusion matching.',
+      'Most oxygen is carried bound to haemoglobin; the oxyhaemoglobin dissociation curve links saturation to oxygen partial pressure and tissue unloading.',
+      'Most carbon dioxide is transported as bicarbonate after rapid interconversion catalysed by carbonic anhydrase in red cells.',
     ],
-    regulasi: 'Central chemoreceptors in the medulla respond to CO₂ (via CSF pH) and drive most of normal breathing. Peripheral chemoreceptors in the carotid and aortic bodies respond to low oxygen and only take over when PaO₂ falls below roughly 60 mmHg.',
+    regulasi: 'Central chemoreceptors are strongly influenced by CO₂ through CSF pH. Peripheral carotid and aortic-body chemoreceptors respond to arterial hypoxaemia as well as acid–base/CO₂ signals; the hypoxic ventilatory stimulus becomes especially strong as PaO₂ falls to roughly the 60 mmHg range and below.',
     angka: [
-      { label: 'Respiratory rate', rest: '12–20 breaths/min', exercise: '40–60 breaths/min' },
-      { label: 'Tidal volume', rest: '~500 mL', exercise: 'Up to ~3 L' },
-      { label: 'Minute ventilation', rest: '~6 L/min', exercise: '100–150 L/min' },
-      { label: 'Arterial oxygen saturation', rest: '95–100%', exercise: 'Stays near resting values in healthy lungs' },
-      { label: 'VO₂ max', rest: '—', exercise: '~35–45 mL/kg/min untrained; 60–85 in elite endurance athletes' },
+      { label: 'Respiratory rate', rest: 'Common adult reference: ~12–20 breaths/min', exercise: 'Rises with workload; peak rate is highly individual' },
+      { label: 'Tidal volume', rest: 'Often ~0.5 L at quiet rest', exercise: 'Usually rises before breathing frequency contributes more strongly at high ventilation' },
+      { label: 'Minute ventilation', rest: 'Often ~5–8 L/min', exercise: 'Can exceed 100 L/min in strenuous exercise and much more in highly trained athletes' },
+      { label: 'Arterial oxygen saturation', rest: 'Often ~95–100% at sea level', exercise: 'Usually maintained in healthy people, but may fall in some athletes, lung disease or altitude' },
+      { label: 'VO₂max', rest: '—', exercise: 'A measured maximal oxygen-uptake phenotype; values depend strongly on age, sex, body size and training' },
     ],
-    saatOlahraga: 'Ventilation rises almost immediately — before blood gases have even changed — driven by signals from the motor cortex and moving joints. Beyond the ventilatory threshold, lactate buffering produces extra CO₂ and breathing climbs out of proportion to oxygen use. Healthy lungs are rarely the limit on exercise; the heart and muscle usually are.',
+    saatOlahraga: 'Ventilation rises rapidly from central command and afferent feedback, then tracks metabolic CO₂ production and acid–base demands. Above ventilatory thresholds it rises disproportionately. Pulmonary reserve is large in many healthy people, but exercise-induced arterial desaturation, airway disease, altitude and elite workloads can make respiratory factors relevant.',
     layer3d: 'visceral',
     searchTerms: ['respiratory physiology', 'lung disease'],
+    evidenceNote: 'Ventilation and VO₂max require direct measurement if used to characterize an individual; the displayed values are not a fitness classification.',
   },
   {
     key: 'muscular',
     label: 'Muscle physiology',
-    fungsi: 'Converts chemical energy into force and movement, and generates most of the body\'s heat.',
+    fungsi: 'Converts chemical energy into force, movement and heat through excitation–contraction coupling and cross-bridge cycling.',
     proses: [
-      'A motor neuron releases acetylcholine at the neuromuscular junction, depolarising the muscle fibre.',
-      'The action potential travels down T-tubules and triggers calcium release from the sarcoplasmic reticulum.',
-      'Calcium binds troponin, moving tropomyosin off the actin binding sites; myosin heads then cycle — the sliding filament mechanism.',
-      'Force is graded two ways: recruiting more motor units (smallest first — the size principle), and firing them faster.',
+      'A motor neuron releases acetylcholine at the neuromuscular junction, initiating a muscle-fibre action potential.',
+      'The action potential travels along sarcolemma and T-tubules and triggers calcium release from the sarcoplasmic reticulum.',
+      'Calcium binding to troponin shifts tropomyosin and permits actin–myosin cross-bridge cycling.',
+      'Force is regulated by motor-unit recruitment, firing rate, muscle length/velocity, architecture and neural coordination.',
     ],
-    regulasi: 'Muscle spindles sense stretch and drive the reflex contraction; Golgi tendon organs sense tension and inhibit it, protecting against overload.',
+    regulasi: 'Muscle spindles, Golgi tendon organs, joint/cutaneous afferents and descending commands interact in task-dependent spinal and supraspinal control. Golgi tendon organs are not a simple emergency switch that always inhibits a muscle at high tension.',
     angka: [
-      { label: 'Skeletal muscle mass', rest: '~40% of body mass' },
-      { label: 'Blood flow to muscle', rest: '~1 L/min (~20% of output)', exercise: 'Up to 20 L/min (~85%)' },
-      { label: 'ATP from phosphocreatine', rest: '—', exercise: 'Powers the first ~10 seconds of maximal effort' },
-      { label: 'Anaerobic glycolysis', rest: '—', exercise: 'Dominant from ~10 seconds to ~2 minutes' },
-      { label: 'Oxidative phosphorylation', rest: 'Dominant at rest', exercise: 'Dominant beyond ~2 minutes' },
+      { label: 'Skeletal muscle fraction', rest: 'Often ~30–45% of body mass; highly individual' },
+      { label: 'Muscle blood flow', rest: 'Low relative to exercise', exercise: 'Can receive most of the increased cardiac output during heavy dynamic exercise' },
+      { label: 'Phosphagen contribution', rest: '—', exercise: 'Very high during the first seconds of maximal work, while all energy systems remain active' },
+      { label: 'Glycolytic contribution', rest: '—', exercise: 'Becomes prominent during intense short-duration work; no fixed 10 s–2 min switch' },
+      { label: 'Oxidative contribution', rest: 'Dominant for resting ATP demand', exercise: 'Contribution rises rapidly and dominates sustained submaximal work; kinetics depend on intensity and training' },
     ],
-    saatOlahraga: 'Three energy systems hand over in sequence rather than switching: phosphocreatine for the first seconds, glycolysis for the first couple of minutes, then oxidative metabolism. Type I fibres are slow, fatigue-resistant and aerobic; type II are fast, powerful and fatigue quickly. Strength training grows fibre cross-section (hypertrophy) and, early on, improves recruitment before any size change is visible.',
+    saatOlahraga: 'Phosphagen, glycolytic and oxidative pathways contribute simultaneously; their relative contributions shift continuously with intensity and duration. Fibre phenotypes span a continuum rather than two perfectly discrete classes. Early strength gains are often strongly neural, while repeated loading can later increase muscle cross-sectional area.',
     layer3d: 'muscular',
     searchTerms: ['muscle physiology', 'myopathy'],
+    evidenceNote: 'The viewer names likely contributors but does not infer recruitment, activation, fibre type, tendon force or muscle force from a visual slider.',
   },
   {
     key: 'urinary',
     label: 'Renal physiology',
-    fungsi: 'Filters the blood to control fluid volume, electrolytes, acid–base balance and blood pressure, and excretes waste.',
+    fungsi: 'Regulates extracellular fluid, electrolytes, acid–base balance and waste excretion while contributing to blood-pressure and endocrine control.',
     proses: [
-      'The glomerulus filters plasma under pressure — a passive sieve that holds back cells and large proteins.',
-      'The proximal tubule reabsorbs roughly two-thirds of filtered sodium and water, plus essentially all glucose and amino acids.',
-      'The loop of Henle builds the medullary concentration gradient that makes concentrated urine possible.',
-      'The distal tubule and collecting duct do the fine adjustment under aldosterone and antidiuretic hormone.',
+      'Glomerular filtration moves water and small solutes into Bowman space while normally retaining cells and most large proteins.',
+      'The proximal tubule reabsorbs most filtered sodium and water and normally reclaims nearly all filtered glucose and amino acids below transport limits.',
+      'Countercurrent mechanisms in the loop of Henle help build the medullary osmotic gradient.',
+      'Distal nephron and collecting-duct transport provide regulated fine control under hormones including aldosterone and vasopressin.',
     ],
-    regulasi: 'Falling renal perfusion releases renin, generating angiotensin II (vasoconstriction) and aldosterone (sodium retention). Rising plasma osmolality releases ADH from the posterior pituitary, so the collecting duct reabsorbs water.',
+    regulasi: 'Renal autoregulation, sympathetic tone, the renin–angiotensin–aldosterone system, natriuretic peptides and vasopressin interact to regulate perfusion, sodium and water balance.',
     angka: [
-      { label: 'Renal blood flow', rest: '~1.1 L/min (~20% of output)', exercise: 'Falls sharply as blood is redirected to muscle' },
-      { label: 'Glomerular filtration rate', rest: '~90–120 mL/min/1.73 m²' },
-      { label: 'Filtrate produced', rest: '~180 L/day' },
-      { label: 'Urine output', rest: '~1–2 L/day', exercise: 'Falls; ADH rises with fluid loss' },
+      { label: 'Renal blood flow', rest: 'Often ~1.0–1.2 L/min in a healthy adult', exercise: 'Usually decreases as intensity rises, with wide protocol-dependent variation' },
+      { label: 'Estimated/measured GFR', rest: 'Interpret by method, age and clinical context; ~90–120 mL/min/1.73 m² is a teaching range for many young adults' },
+      { label: 'Daily filtrate', rest: 'Order of magnitude ~180 L/day before tubular reabsorption' },
+      { label: 'Urine volume', rest: 'Often roughly 1–2 L/day but strongly intake- and environment-dependent', exercise: 'May fall during prolonged exercise as renal perfusion and water-conservation signals change' },
     ],
-    saatOlahraga: 'Renal blood flow drops as circulation is diverted to muscle and skin. Sweat loss raises plasma osmolality, ADH rises, and urine becomes scant and concentrated — which is why dark urine after training is a dehydration signal, not a kidney problem in itself.',
+    saatOlahraga: 'Renal blood flow generally falls with increasing exercise intensity, while sweating and fluid intake alter osmolality and vasopressin. Urine colour alone is nonspecific: dark urine can reflect concentration but also blood, myoglobin, medications or other causes, so it must not be used here as proof of dehydration or reassurance about kidney status.',
     layer3d: 'visceral',
     searchTerms: ['renal physiology', 'kidney disease'],
+    evidenceNote: 'Hydration and renal function require measured context; urine colour is not a diagnostic sensor in this model.',
   },
   {
     key: 'digestive',
     label: 'Digestive physiology',
-    fungsi: 'Breaks food into absorbable molecules, takes them up, and disposes of what is left.',
+    fungsi: 'Processes food, coordinates secretion and motility, absorbs nutrients and water, and supports host–microbiome metabolism.',
     proses: [
-      'Chewing and salivary amylase begin starch digestion; swallowing is a coordinated reflex once initiated.',
-      'The stomach secretes acid and pepsinogen, kills most swallowed microbes, and releases chyme into the duodenum in controlled amounts.',
-      'Pancreatic enzymes and bile finish digestion in the small intestine, where almost all absorption happens across the villi.',
-      'The colon reclaims water and electrolytes; its bacteria ferment residual fibre into short-chain fatty acids.',
+      'Oral processing and salivary enzymes begin digestion before coordinated swallowing transfers a bolus to the oesophagus.',
+      'The stomach mixes food with acid and enzymes and meters chyme into the duodenum.',
+      'Pancreatic enzymes, bile and brush-border processes support digestion and absorption across the small-intestinal mucosa.',
+      'The colon absorbs water and electrolytes while microbial fermentation produces metabolites including short-chain fatty acids.',
     ],
-    regulasi: 'The enteric nervous system runs the gut largely on its own. Gastrin drives acid secretion, secretin and cholecystokinin coordinate pancreatic enzymes and bile, and incretins (GLP-1, GIP) link a meal to insulin release before glucose even rises.',
+    regulasi: 'Enteric neural circuits interact with autonomic input and gut hormones including gastrin, secretin, cholecystokinin, GLP-1 and GIP; control is distributed rather than a single linear reflex.',
     angka: [
-      { label: 'Splanchnic blood flow', rest: '~1.4 L/min (~25% of output)', exercise: 'Falls to as little as ~20% of its resting value' },
-      { label: 'Gastric pH', rest: '1.5–3.5' },
-      { label: 'Gastric emptying', rest: '~2–4 hours for a mixed meal' },
-      { label: 'Small bowel transit', rest: '~3–5 hours' },
+      { label: 'Splanchnic blood flow', rest: 'A substantial fraction of resting cardiac output', exercise: 'Usually falls as intensity rises, especially with heat/dehydration' },
+      { label: 'Gastric pH', rest: 'Often strongly acidic between meals; varies with meals, drugs and disease' },
+      { label: 'Gastric emptying', rest: 'Highly meal-dependent; mixed meals often require hours' },
+      { label: 'Small-bowel transit', rest: 'Measured transit varies widely among people and methods' },
     ],
-    saatOlahraga: 'Blood is shunted away from the gut, which is the direct cause of exercise-related nausea, cramping and "runner\'s gut". It is also why a large meal shortly before hard training performs badly: digestion and working muscle are competing for the same circulation.',
+    saatOlahraga: 'Exercise-related gastrointestinal symptoms are multifactorial. Reduced splanchnic perfusion can contribute, but mechanical motion, heat, dehydration, intensity, anxiety and pre-exercise food/fluid composition also matter; the model must not assign a single direct cause.',
     layer3d: 'visceral',
     searchTerms: ['digestive physiology', 'gastrointestinal disease'],
   },
   {
     key: 'endocrine',
     label: 'Endocrine physiology',
-    fungsi: 'Uses hormones in the bloodstream to coordinate metabolism, growth, stress response, reproduction and fluid balance over minutes to years.',
+    fungsi: 'Uses hormone signals to coordinate metabolism, growth, stress responses, reproduction and fluid balance across multiple timescales.',
     proses: [
-      'The hypothalamus signals the pituitary, which signals a target gland — thyroid, adrenal cortex, or gonad.',
-      'The target gland\'s hormone feeds back to suppress both the hypothalamus and pituitary, holding the axis steady.',
-      'Insulin and glucagon from the pancreatic islets hold blood glucose within a narrow range regardless of meals or fasting.',
-      'Catecholamines from the adrenal medulla act in seconds; thyroid hormone acts over weeks.',
+      'Hypothalamic signals regulate pituitary output, which in turn regulates multiple peripheral endocrine glands.',
+      'Many endocrine axes use negative feedback, but feedback strength and pulsatility change across time and physiological states.',
+      'Pancreatic insulin and glucagon are major regulators of glucose flux, interacting with autonomic and other hormonal signals.',
+      'Hormones act over different timescales: catecholamine effects can be rapid while genomic hormone effects may evolve over hours to days.',
     ],
-    regulasi: 'Almost every axis is a negative feedback loop. The exceptions are instructive: the LH surge before ovulation is genuine positive feedback, and so is oxytocin during labour.',
+    regulasi: 'Negative feedback is common, while specific physiological states use positive feedback—for example sustained pre-ovulatory oestradiol can generate the LH surge.',
     angka: [
-      { label: 'Fasting glucose', rest: '70–99 mg/dL', exercise: 'Held steady; glucagon and catecholamines rise to match uptake' },
-      { label: 'Cortisol', rest: 'Peaks early morning, lowest around midnight', exercise: 'Rises with intensity and duration' },
-      { label: 'Growth hormone', rest: 'Pulsatile, largest pulse in deep sleep', exercise: 'Rises sharply with high-intensity work' },
-      { label: 'TSH', rest: '0.4–4.0 mIU/L' },
+      { label: 'Fasting plasma glucose', rest: 'Common laboratory reference ~70–99 mg/dL', exercise: 'May fall, remain stable or transiently rise depending on intensity, duration, nutrition and metabolic state' },
+      { label: 'Cortisol', rest: 'Circadian and pulsatile', exercise: 'Response depends on intensity, duration, time of day and training state' },
+      { label: 'Growth hormone', rest: 'Pulsatile, with sleep-related secretion', exercise: 'Often rises during sufficiently intense/prolonged exercise, with large individual variation' },
+      { label: 'TSH', rest: 'Laboratory reference ranges are assay- and population-specific' },
     ],
-    saatOlahraga: 'Insulin falls while glucagon, catecholamines, cortisol and growth hormone rise — together mobilising glucose and fatty acids. Muscle contraction itself moves GLUT4 transporters to the membrane without any insulin at all, which is why exercise lowers blood glucose even in insulin resistance.',
+    saatOlahraga: 'Muscle contraction stimulates insulin-independent GLUT4 translocation and can improve insulin sensitivity after exercise. Counter-regulatory hormones rise with sufficiently intense/prolonged work, so blood glucose is not guaranteed to fall during every session and may transiently rise during high-intensity exercise.',
     layer3d: 'visceral',
     searchTerms: ['endocrine physiology', 'endocrine system disease'],
   },
   {
     key: 'nervous-system',
     label: 'Neurophysiology',
-    fungsi: 'Senses, decides and commands — in milliseconds — and stores what happened.',
+    fungsi: 'Senses, integrates and controls activity over millisecond-to-long-term timescales.',
     proses: [
-      'The resting membrane potential (~−70 mV) is held by the Na⁺/K⁺-ATPase and potassium leak channels.',
-      'A stimulus past threshold opens voltage-gated sodium channels and an all-or-nothing action potential fires.',
-      'Myelin forces the impulse to jump node to node (saltatory conduction), multiplying speed without thickening the axon.',
-      'At the synapse, calcium entry releases neurotransmitter; the postsynaptic cell sums excitation and inhibition to decide whether to fire.',
+      'Resting membrane potential reflects ionic gradients, selective membrane permeability and electrogenic transport including the Na⁺/K⁺-ATPase.',
+      'When membrane depolarisation reaches threshold, voltage-gated channels generate a regenerative action potential.',
+      'Myelin enables saltatory conduction between nodes of Ranvier and substantially increases conduction velocity.',
+      'At synapses, transmitter release and postsynaptic integration alter the probability and timing of downstream firing.',
     ],
-    regulasi: 'The autonomic nervous system runs the background: sympathetic for exertion and threat, parasympathetic for digestion and recovery. Most organs receive both and the balance, not either alone, sets the state.',
+    regulasi: 'Autonomic, somatic and central networks interact continuously. Sympathetic and parasympathetic descriptions are useful summaries, but organ control is not a two-position switch.',
     angka: [
-      { label: 'Resting membrane potential', rest: '~−70 mV' },
-      { label: 'Myelinated nerve conduction', rest: '~50–120 m/s' },
-      { label: 'Unmyelinated conduction', rest: '~0.5–2 m/s' },
-      { label: 'Cerebral blood flow', rest: '~750 mL/min (~15% of output)', exercise: 'Tightly autoregulated — held nearly constant' },
+      { label: 'Neuronal resting potential', rest: 'Often around −70 mV; varies by cell type' },
+      { label: 'Myelinated conduction velocity', rest: 'Can span tens to >100 m/s depending on fibre diameter/type' },
+      { label: 'Unmyelinated conduction velocity', rest: 'Typically much slower than large myelinated fibres' },
+      { label: 'Cerebral blood flow', rest: 'Often ~700–800 mL/min globally in adults', exercise: 'Can rise during moderate exercise and change again at high intensity as arterial CO₂ and autoregulation shift' },
     ],
-    saatOlahraga: 'Sympathetic outflow rises and vagal tone withdraws; the vagal withdrawal is what makes heart rate climb in the very first seconds. Central command from the motor cortex raises heart rate and ventilation before any feedback from muscle arrives. Cerebral flow is defended almost unchanged — the brain does not give up its supply.',
+    saatOlahraga: 'Central command and autonomic adjustments begin rapidly with movement. Cerebral perfusion is regulated but not perfectly fixed: moderate exercise may increase flow, while hyperventilation-induced hypocapnia at very high intensity can reduce it. A generic viewer cannot infer regional neural activation or perfusion.',
     layer3d: 'nervous',
     searchTerms: ['nervous system physiology', 'neurological disease'],
   },
   {
     key: 'integumentary',
     label: 'Thermoregulation & skin physiology',
-    fungsi: 'Keeps core temperature near 37 °C, forms the barrier against water loss and infection, and makes vitamin D.',
+    fungsi: 'Maintains thermal balance, provides a barrier against water loss/pathogens and participates in vitamin-D synthesis.',
     proses: [
-      'The hypothalamic preoptic area compares core temperature against its set point.',
-      'When too hot: skin arterioles dilate to dump heat, and eccrine sweat glands secrete for evaporative cooling.',
-      'When too cold: skin vessels constrict, shivering starts, and heat is conserved centrally.',
-      'Evaporation is the only mechanism that still works once ambient temperature exceeds skin temperature.',
+      'Central and peripheral thermal signals are integrated in hypothalamic and distributed neural circuits.',
+      'Heat stress increases skin blood flow and eccrine sweating, supporting dry and evaporative heat loss.',
+      'Cold exposure reduces skin blood flow and can trigger shivering and behavioural heat-conservation responses.',
+      'When ambient temperature exceeds skin temperature, evaporation becomes the principal avenue for net heat loss.',
     ],
-    regulasi: 'A hypothalamic negative feedback loop with skin and core thermoreceptors as its sensors. Fever is not a failure of that loop — it is the set point being raised deliberately by pyrogens.',
+    regulasi: 'Thermoregulation uses feedback from core and skin temperatures with behavioural and autonomic effectors. Fever shifts regulated temperature upward through pyrogen-mediated signalling rather than simply disabling temperature control.',
     angka: [
-      { label: 'Core temperature', rest: '36.5–37.5 °C', exercise: 'Rises to 38–40 °C in hard or prolonged effort' },
-      { label: 'Skin blood flow', rest: '~0.3 L/min', exercise: 'Up to ~8 L/min in heat' },
-      { label: 'Sweat rate', rest: 'Negligible', exercise: '~1–2 L/hour; up to ~3 L/hour when heat-acclimatised' },
+      { label: 'Core temperature', rest: 'Often ~36.5–37.5 °C, depending on site/time/method', exercise: 'Usually rises with sustained work; magnitude depends on workload and heat balance' },
+      { label: 'Skin blood flow', rest: 'Low-to-moderate and highly environment-dependent', exercise: 'Can rise several-fold during heat stress' },
+      { label: 'Sweat rate', rest: 'Low in thermoneutral rest', exercise: 'Can exceed 1 L/hour; large variation with climate, body size and acclimation' },
     ],
-    saatOlahraga: 'Working muscle produces far more heat than force, so cooling becomes the limiting problem in endurance work. Skin and muscle then compete for the same cardiac output, which is why performance falls in the heat. Acclimatisation over 10–14 days makes sweat start earlier, flow faster and carry less salt.',
+    saatOlahraga: 'Only part of metabolic energy becomes external mechanical work; much is released as heat. During prolonged exercise, cardiovascular demand for both active muscle and skin can contribute to performance decline in heat. Heat acclimation changes sweating and circulatory responses over repeated exposures, with individual variability.',
     layer3d: 'surface',
     searchTerms: ['thermoregulation', 'skin physiology'],
   },
   {
     key: 'lymphatic',
     label: 'Immune & lymphatic physiology',
-    fungsi: 'Returns filtered fluid to the blood, absorbs dietary fat, and mounts the defence against infection.',
+    fungsi: 'Returns interstitial fluid to the circulation, transports absorbed dietary lipid and supports immune-cell trafficking.',
     proses: [
-      'Capillaries leak more fluid than they reabsorb; lymphatics collect the surplus and return it via the thoracic duct.',
-      'Lymph passes through nodes where antigen-presenting cells meet lymphocytes.',
-      'Innate immunity responds within minutes without prior exposure; adaptive immunity takes days but remembers.',
-      'B cells make antibody; cytotoxic T cells kill infected cells; helper T cells direct both.',
+      'Net capillary filtration creates interstitial fluid that is taken up by initial lymphatics and returned to the venous circulation.',
+      'Lymph nodes organise encounters among antigen, antigen-presenting cells and lymphocytes.',
+      'Innate and adaptive immune responses operate on overlapping timescales with different recognition and memory mechanisms.',
+      'B cells can differentiate into antibody-producing plasma cells; T-cell subsets perform cytotoxic, helper and regulatory functions.',
     ],
-    regulasi: 'Lymph has no pump. It moves by skeletal muscle contraction, arterial pulsation and breathing — which is why immobility causes swelling and movement relieves it.',
+    regulasi: 'Lymph flow has no single central pump. Intrinsic contraction of collecting lymphatic vessels combines with skeletal-muscle movement, respiration, arterial pulsation and pressure gradients.',
     angka: [
-      { label: 'Lymph returned', rest: '~2–3 L/day' },
-      { label: 'Lymph nodes', rest: '~500–600 in an adult' },
-      { label: 'Neutrophils', rest: '~40–70% of white cells', exercise: 'Rise sharply during and just after exertion' },
+      { label: 'Daily lymph return', rest: 'Order of magnitude: a few litres/day; variable by tissue and state' },
+      { label: 'Lymph nodes', rest: 'Hundreds in an adult; exact counts vary anatomically' },
+      { label: 'Circulating neutrophils', rest: 'Laboratory differential is population- and lab-dependent', exercise: 'Acute exercise commonly redistributes leukocyte populations' },
     ],
-    saatOlahraga: 'Muscle contraction is the lymphatic pump, so movement itself drives immune traffic. Moderate regular training improves immune surveillance; very heavy prolonged work is followed by a transient dip in some immune measures, which is part of why recovery and sleep are not optional in hard training blocks.',
+    saatOlahraga: 'Acute exercise causes dynamic leukocyte mobilisation and redistribution rather than a simple on/off change in immunity. Regular activity is associated with many immune-health benefits, while responses to prolonged intense exercise depend on training load, recovery, energy availability, sleep, infection exposure and other factors.',
     layer3d: 'lymphoid',
     searchTerms: ['immune system physiology', 'lymphatic system disease'],
   },
   {
     key: 'skeletal',
     label: 'Bone physiology',
-    fungsi: 'Supports and levers the body, protects organs, stores calcium and phosphate, and makes blood cells.',
+    fungsi: 'Provides support and leverage, protects organs, houses marrow and participates in mineral homeostasis.',
     proses: [
-      'Osteoclasts resorb bone and osteoblasts lay it down — remodelling continues lifelong.',
-      'Bone deposits along lines of mechanical stress (Wolff\'s law), so loading shapes the skeleton.',
-      'Red marrow produces red cells, white cells and platelets.',
-      'Parathyroid hormone raises serum calcium; calcitonin and vitamin D adjust the balance from the other side.',
+      'Osteoclast-mediated resorption and osteoblast-mediated formation are coupled during remodelling.',
+      'Bone adapts to its mechanical environment through mechanosensitive modelling and remodelling rather than simply depositing material along one line of stress.',
+      'Haematopoietic marrow produces blood-cell lineages.',
+      'Parathyroid hormone and vitamin-D physiology are central to calcium/phosphate homeostasis; calcitonin has a more limited role in routine adult calcium regulation.',
     ],
-    regulasi: 'Serum calcium is held in a very narrow range by parathyroid hormone, vitamin D and calcitonin acting on bone, gut and kidney together. Bone is the body\'s calcium reserve, and it will be spent to defend serum calcium.',
+    regulasi: 'Calcium and phosphate homeostasis integrates parathyroid hormone, vitamin D, kidney, intestine and bone. Bone mineral is an important reservoir, but regulation is dynamic and affected by renal, endocrine, nutritional and mechanical factors.',
     angka: [
-      { label: 'Bones in an adult', rest: '206' },
-      { label: 'Serum calcium', rest: '8.5–10.5 mg/dL' },
-      { label: 'Skeleton remodelled', rest: '~10% per year' },
-      { label: 'Peak bone mass', rest: 'Reached around age 25–30' },
+      { label: 'Bones in a typical adult skeleton', rest: 'Common teaching count: 206; anatomical variants occur' },
+      { label: 'Serum calcium', rest: 'Interpret with laboratory method, albumin/ionized calcium and clinical context' },
+      { label: 'Bone remodelling', rest: 'Continuous and site-dependent; no single annual percentage describes every bone' },
+      { label: 'Peak bone mass', rest: 'Usually accrued by early adulthood; timing varies by site and individual' },
     ],
-    saatOlahraga: 'Impact and resistance loading are the strongest stimuli for bone formation there are — stronger than calcium intake alone. Weight-bearing training in youth raises peak bone mass, and continued loading slows later loss. Swimming and cycling, being unloaded, do not carry the same benefit.',
+    saatOlahraga: 'Progressive resistance and impact/weight-bearing loading can be osteogenic when appropriately dosed. Activities with low skeletal impact such as swimming or cycling may provide less direct osteogenic stimulus at some sites, but they still have substantial cardiovascular, muscular and other health benefits.',
     layer3d: 'skeletal',
     searchTerms: ['bone physiology', 'osteoporosis'],
   },
   {
     key: 'reproductive',
     label: 'Reproductive physiology',
-    fungsi: 'Produces gametes and sex hormones, and in females runs the cycle that supports pregnancy.',
+    fungsi: 'Coordinates gametogenesis, sex-steroid production and, in people with ovaries/uterus, cyclical reproductive physiology and pregnancy support.',
     proses: [
-      'GnRH from the hypothalamus is released in pulses, driving FSH and LH from the anterior pituitary.',
-      'In the ovary, FSH matures a follicle; rising oestrogen eventually flips to positive feedback and triggers the LH surge and ovulation.',
-      'The corpus luteum secretes progesterone; if there is no pregnancy it involutes and the endometrium sheds.',
-      'In the testis, FSH supports Sertoli cells and spermatogenesis while LH drives testosterone from Leydig cells.',
+      'Pulsatile hypothalamic GnRH drives pituitary gonadotropin secretion.',
+      'Ovarian follicular development and steroid feedback shape FSH/LH dynamics; sustained pre-ovulatory oestradiol can trigger positive feedback and the LH surge.',
+      'After ovulation the corpus luteum produces progesterone; without pregnancy, luteal regression contributes to endometrial shedding.',
+      'In testes, LH stimulates Leydig-cell testosterone production while FSH and intratesticular androgen signalling support Sertoli-cell function and spermatogenesis.',
     ],
-    regulasi: 'A hypothalamic–pituitary–gonadal axis on negative feedback, with one deliberate exception: the mid-cycle oestrogen-driven LH surge is positive feedback, and it is what makes ovulation possible.',
+    regulasi: 'The hypothalamic–pituitary–gonadal axis uses pulsatile signalling and mostly negative feedback, with state-dependent exceptions including the pre-ovulatory positive-feedback response.',
     angka: [
-      { label: 'Menstrual cycle', rest: '~21–35 days; luteal phase ~14 days' },
-      { label: 'Spermatogenesis', rest: '~64–72 days start to finish' },
-      { label: 'Basal body temperature', rest: 'Rises ~0.3–0.5 °C after ovulation' },
+      { label: 'Menstrual-cycle length', rest: 'Common adult range ~21–35 days; cycle phases vary among and within individuals' },
+      { label: 'Spermatogenesis', rest: 'Takes on the order of ~2 months plus epididymal transit; estimates vary by method' },
+      { label: 'Basal body temperature', rest: 'May rise by a few tenths of a degree after ovulation; not a precise ovulation timestamp' },
     ],
-    saatOlahraga: 'Very high training loads combined with low energy availability suppress GnRH pulses. In women this causes functional hypothalamic amenorrhoea, and with it bone loss; in men, low testosterone. This is Relative Energy Deficiency in Sport (RED-S), and the fix is eating enough, not training less hard.',
+    saatOlahraga: 'Low energy availability can disrupt reproductive and other physiological systems in athletes of any sex and is central to RED-S. Evaluation and management are individualized and may involve nutrition, training-load adjustment and medical assessment; the appropriate response is not reducible to a single instruction such as “eat more” or “train less”.',
     layer3d: 'visceral',
     searchTerms: ['reproductive physiology', 'reproductive system disease'],
+    evidenceNote: 'Cycle, gonadal and RED-S interpretation requires individual history and measurements; this atlas provides mechanisms, not diagnosis.',
   },
 ]
 
 /** Fisiologi yang berpasangan dengan satu kelompok otot latihan — dipakai
- *  halaman Workout untuk menjelaskan apa yang sedang terjadi di tubuh. */
+ * halaman Workout untuk menjelaskan apa yang sedang terjadi di tubuh. */
 export const FISIOLOGI_LATIHAN = ['muscular', 'cardiovascular', 'respiratory', 'endocrine', 'integumentary', 'skeletal'] as const
 
 export function fisiologiUntuk(key: string): SistemFisiologi | undefined {

@@ -1,4 +1,4 @@
-import { Suspense, useEffect, useRef, useState, type CSSProperties, type ReactNode } from 'react'
+import { Suspense, useEffect, useLayoutEffect, useRef, useState, type CSSProperties, type ReactNode } from 'react'
 import '../styles/widget-living-instrument-v5.css'
 import '../styles/widget-concepts-v8.css'
 import '../styles/widget-dark-surface-v29.css'
@@ -149,6 +149,13 @@ export function Tumpukan({ judul, anak, aksi }: { judul?: string; anak: WidgetIt
   const TINGGI_MIN = 184
   const TINGGI_MAKS = hemat ? 390 : 440
   const aktifItem = tampil[Math.min(aktif, Math.max(0, tampil.length - 1))]
+
+  // Reset before paint whenever the visible source widget changes. This is the
+  // browser-independent counterpart to the :has() CSS guard: older WebViews
+  // must never inherit a tall previous widget while the new slide mounts.
+  useLayoutEffect(() => {
+    setTinggi(TINGGI_MIN)
+  }, [aktifItem?.i])
 
   // `aktif` is the index inside the filtered visible list, while `siap` is a
   // prefix count in the original `anak` array. When earlier widgets return
