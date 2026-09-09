@@ -1,4 +1,5 @@
 import { useMemo, useState, type ChangeEvent } from 'react'
+import { NutritionPersonalBaselineCard } from '../components/NutritionPersonalBaselineCard'
 import { useStore } from '../lib/store'
 import {
   MAX_NUTRITION_FILTER_RESULTS,
@@ -238,6 +239,8 @@ export function NutritionDataControls() {
           </>
         )}
       </section>
+
+      <NutritionPersonalBaselineCard entries={state.foods} />
 
       <section className="rounded-3xl border border-neutral-200 bg-white p-5 dark:border-white/10 dark:bg-white/[0.02]">
         <div className="text-[9px] font-black uppercase tracking-[0.16em] text-neutral-400">Find recorded entries</div>
