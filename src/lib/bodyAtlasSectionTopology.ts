@@ -19,6 +19,8 @@ export interface BodyAtlasSectionTopologyResult {
   components: readonly BodyAtlasSectionTopologyComponent[]
   droppedDegenerateSegmentIndices: readonly number[]
   sourceSectionTruncated: boolean
+  topologyTruncated: boolean
+  inputSegmentsConsidered: number
   semantics: 'source-segment-topology-only-no-gap-closing-no-smoothing'
 }
 
@@ -33,8 +35,18 @@ interface EdgeRecord {
   b: number
 }
 
+interface EndpointSpatialHash {
+  cellSize: number
+  buckets: Map<string, number[]>
+}
+
 function finiteOr(value: number | undefined, fallback: number) {
   return Number.isFinite(value) ? Number(value) : fallback
+}
+
+function boundedInteger(value: number | undefined, fallback: number, min: number, max: number) {
+  const candidate = Math.trunc(finiteOr(value, fallback))
+  return Math.max(min, Math.min(candidate, max))
 }
 
 function squaredDistance(a: AnatomySpatialVec3, b: AnatomySpatialVec3) {
@@ -48,16 +60,45 @@ function sourceKey(segment: BodyAtlasExactSectionSegment) {
   return `${segment.sourceFile}\0${segment.sourceName}`
 }
 
+function cellCoordinate(value: number, cellSize: number) {
+  return Math.floor(value / cellSize)
+}
+
+function cellKey(x: number, y: number, z: number) {
+  return `${x},${y},${z}`
+}
+
 function clusterEndpoint(
   point: AnatomySpatialVec3,
   clusters: EndpointCluster[],
+  spatialHash: EndpointSpatialHash,
   epsilonSquared: number,
 ) {
-  for (let index = 0; index < clusters.length; index += 1) {
-    if (squaredDistance(point, clusters[index].representative) <= epsilonSquared) return index
+  const x = cellCoordinate(point[0], spatialHash.cellSize)
+  const y = cellCoordinate(point[1], spatialHash.cellSize)
+  const z = cellCoordinate(point[2], spatialHash.cellSize)
+
+  // Any endpoint within epsilon must live in this cell or one of the 26
+  // neighboring cells. Search only those buckets instead of every cluster.
+  for (let dx = -1; dx <= 1; dx += 1) {
+    for (let dy = -1; dy <= 1; dy += 1) {
+      for (let dz = -1; dz <= 1; dz += 1) {
+        const candidates = spatialHash.buckets.get(cellKey(x + dx, y + dy, z + dz))
+        if (!candidates) continue
+        for (const clusterIndex of candidates) {
+          if (squaredDistance(point, clusters[clusterIndex].representative) <= epsilonSquared) return clusterIndex
+        }
+      }
+    }
   }
+
+  const clusterIndex = clusters.length
   clusters.push({ representative: point, edgeIndices: [] })
-  return clusters.length - 1
+  const key = cellKey(x, y, z)
+  const bucket = spatialHash.buckets.get(key) ?? []
+  bucket.push(clusterIndex)
+  spatialHash.buckets.set(key, bucket)
+  return clusterIndex
 }
 
 function classifyComponent(
@@ -65,7 +106,8 @@ function classifyComponent(
   edgeIndices: readonly number[],
   clusters: readonly EndpointCluster[],
 ): Pick<BodyAtlasSectionTopologyComponent, 'topology' | 'degreeOneCount' | 'maxDegree'> {
-  const degrees = nodeIndices.map((nodeIndex) => clusters[nodeIndex].edgeIndices.filter((edgeIndex) => edgeIndices.includes(edgeIndex)).length)
+  const edgeSet = new Set(edgeIndices)
+  const degrees = nodeIndices.map((nodeIndex) => clusters[nodeIndex].edgeIndices.filter((edgeIndex) => edgeSet.has(edgeIndex)).length)
   const degreeOneCount = degrees.filter((degree) => degree === 1).length
   const maxDegree = degrees.length ? Math.max(...degrees) : 0
   const allDegreeTwo = degrees.length > 0 && degrees.every((degree) => degree === 2)
@@ -82,24 +124,33 @@ function classifyComponent(
  * Classify connectivity of exact source-triangle section segments without
  * altering their geometry.
  *
- * Endpoint clustering is used only to decide graph connectivity. This function
- * never snaps or averages points, never inserts a missing edge, never closes a
- * gap, never smooths a curve, and never emits a filled/assembled contour.
+ * Endpoint clustering is used only to decide graph connectivity. A spatial hash
+ * bounds neighborhood lookup to adjacent epsilon-sized cells; a hard segment
+ * budget prevents unbounded work. This function never snaps or averages points,
+ * never inserts a missing edge, never closes a gap, never smooths a curve, and
+ * never emits a filled/assembled contour.
+ *
  * `closed-loop` therefore means only that the supplied raw segment graph is
  * topologically closed within epsilon. It is not an academic/anatomical review
- * status and `publishableContour` intentionally remains false.
+ * status and `publishableContour` intentionally remains false. If either the
+ * upstream exact section or this topology pass is truncated, the component is
+ * explicitly marked incomplete.
  */
 export function classifyBodyAtlasSectionTopology(
   segments: readonly BodyAtlasExactSectionSegment[],
-  options: { endpointEpsilon?: number; sourceSectionTruncated?: boolean } = {},
+  options: { endpointEpsilon?: number; sourceSectionTruncated?: boolean; maxSegments?: number } = {},
 ): BodyAtlasSectionTopologyResult {
   const epsilon = Math.max(1e-9, Math.min(Math.abs(finiteOr(options.endpointEpsilon, 1e-6)), 1e-2))
   const epsilonSquared = epsilon * epsilon
   const sourceSectionTruncated = Boolean(options.sourceSectionTruncated)
+  const maxSegments = boundedInteger(options.maxSegments, 25_000, 1, 100_000)
+  const inputSegmentsConsidered = Math.min(segments.length, maxSegments)
+  const topologyTruncated = segments.length > maxSegments
+  const completeSourceSection = !sourceSectionTruncated && !topologyTruncated
   const droppedDegenerateSegmentIndices: number[] = []
   const grouped = new Map<string, number[]>()
 
-  for (let segmentIndex = 0; segmentIndex < segments.length; segmentIndex += 1) {
+  for (let segmentIndex = 0; segmentIndex < inputSegmentsConsidered; segmentIndex += 1) {
     const segment = segments[segmentIndex]
     const key = sourceKey(segment)
     const indices = grouped.get(key) ?? []
@@ -112,12 +163,13 @@ export function classifyBodyAtlasSectionTopology(
   for (const segmentIndices of grouped.values()) {
     const firstSegment = segments[segmentIndices[0]]
     const clusters: EndpointCluster[] = []
+    const spatialHash: EndpointSpatialHash = { cellSize: epsilon, buckets: new Map() }
     const edges: EdgeRecord[] = []
 
     for (const segmentIndex of segmentIndices) {
       const segment = segments[segmentIndex]
-      const a = clusterEndpoint(segment.start, clusters, epsilonSquared)
-      const b = clusterEndpoint(segment.end, clusters, epsilonSquared)
+      const a = clusterEndpoint(segment.start, clusters, spatialHash, epsilonSquared)
+      const b = clusterEndpoint(segment.end, clusters, spatialHash, epsilonSquared)
       if (a === b) {
         droppedDegenerateSegmentIndices.push(segmentIndex)
         continue
@@ -162,7 +214,7 @@ export function classifyBodyAtlasSectionTopology(
         endpointClusterCount: componentNodes.size,
         degreeOneCount: classification.degreeOneCount,
         maxDegree: classification.maxDegree,
-        completeSourceSection: !sourceSectionTruncated,
+        completeSourceSection,
         publishableContour: false,
       })
     }
@@ -174,6 +226,8 @@ export function classifyBodyAtlasSectionTopology(
       || a.segmentIndices[0] - b.segmentIndices[0]),
     droppedDegenerateSegmentIndices: droppedDegenerateSegmentIndices.sort((a, b) => a - b),
     sourceSectionTruncated,
+    topologyTruncated,
+    inputSegmentsConsidered,
     semantics: 'source-segment-topology-only-no-gap-closing-no-smoothing',
   }
 }
