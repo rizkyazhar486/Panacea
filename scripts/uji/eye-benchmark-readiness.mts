@@ -6,6 +6,8 @@ import {
   type EyeBenchmarkEvidence,
 } from '../../src/lib/anatomy/eyeBenchmarkReadiness.ts'
 
+// Synthetic unit-test fixture only. This MUST NOT be copied into production
+// provenance and does not represent a real human academic review.
 const reviewedProvenance = {
   sourceId: 'test-source',
   sourceRevision: 'rev-2026-09-09',
@@ -13,6 +15,14 @@ const reviewedProvenance = {
   sourceLocator: 'test://eye-organ',
   reviewStatus: 'academic-reviewed' as const,
   reviewerScope: 'Synthetic test fixture only',
+  qualifiedAcademicReview: {
+    reviewerName: 'TEST FIXTURE — NOT A REAL REVIEWER',
+    reviewerCredentials: 'TEST FIXTURE — NOT REAL CREDENTIALS',
+    reviewDate: '2026-09-09',
+    reviewScope: 'Unit-test behavior only; no anatomical content reviewed.',
+    disposition: 'approved' as const,
+    limitations: 'Synthetic fixture. Never valid as production academic-review evidence.',
+  },
 }
 
 function eyeNode(overrides: Partial<AtlasNode> = {}): AtlasNode {
