@@ -1,11 +1,13 @@
+import { NutritionEvidenceLineageCard } from '../components/NutritionEvidenceLineageCard'
 import { NutritionJournalCalculatorCard } from '../components/NutritionJournalCalculatorCard'
 import { useStore } from '../lib/store'
 import { NutritionDataControls } from './NutritionDataControls'
 
 /**
  * One lazy Nutrition Data tab, composed from bounded local-first controls.
- * The calculator remains recorded-journal arithmetic only and does not add a
- * second route, background sync, or dietary recommendation engine.
+ * Evidence lineage is registry-backed and static; the calculator remains
+ * recorded-journal arithmetic only. Neither adds a second route, background
+ * sync, direct upstream request, or dietary recommendation engine.
  */
 export function NutritionDataWorkbench() {
   const { state } = useStore()
@@ -13,6 +15,7 @@ export function NutritionDataWorkbench() {
   return (
     <div className="space-y-4">
       <NutritionDataControls />
+      <NutritionEvidenceLineageCard />
       <NutritionJournalCalculatorCard entries={state.foods} />
     </div>
   )
