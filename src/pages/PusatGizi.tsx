@@ -21,7 +21,7 @@ const HydrationCalculator = lazy(() => import('./HydrationCalculator').then((m) 
 const CaffeineCalculator = lazy(() => import('./CaffeineCalculator').then((m) => ({ default: m.CaffeineCalculator })))
 const AlcoholCalculator = lazy(() => import('./AlcoholCalculator').then((m) => ({ default: m.AlcoholCalculator })))
 const CarbonDiet = lazy(() => import('./CarbonDiet').then((m) => ({ default: m.CarbonDiet })))
-const NutritionDataControls = lazy(() => import('./NutritionDataControls').then((m) => ({ default: m.NutritionDataControls })))
+const NutritionDataWorkbench = lazy(() => import('./NutritionDataWorkbench').then((m) => ({ default: m.NutritionDataWorkbench })))
 
 // Urutannya mengikuti penggunaan: catat makanan dan makro, verifikasi kualitas
 // input, lalu gunakan toolkit/cairan/zat tambahan. Kontrol data tetap terakhir
@@ -46,8 +46,8 @@ const TABS: TabDef[] = [
     ringkas: 'Units, clearance time, and the effect on sleep and recovery' },
   { id: 'jejak', label: 'Footprint', emoji: '🌱', komponen: CarbonDiet,
     ringkas: 'The environmental cost of what is on the plate' },
-  { id: 'data', label: 'Data', emoji: '💾', komponen: NutritionDataControls,
-    ringkas: 'Local journal import/export, validation and recovery controls' },
+  { id: 'data', label: 'Data', emoji: '💾', komponen: NutritionDataWorkbench,
+    ringkas: 'Local journal controls, recorded-history summaries, and transparent arithmetic' },
 ]
 
 export function PusatGizi() {
