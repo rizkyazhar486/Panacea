@@ -46,7 +46,21 @@ jobs:
 
       - name: Install mobile browser smoke runner
         run: |
+          set -euo pipefail
           npm install --no-save --no-package-lock @playwright/test@1.55.0
+
+          # Playwright's Ubuntu dependency installation does not require the
+          # preconfigured Google Chrome apt repository. Keep that unrelated
+          # third-party mirror out of this ephemeral runner's apt transaction so
+          # a transient Chrome Packages hash mismatch cannot block Body/WebGL QA.
+          for source in /etc/apt/sources.list.d/*; do
+            [ -f "$source" ] || continue
+            if grep -q 'dl.google.com/linux/chrome' "$source"; then
+              echo "Disabling unrelated Chrome apt source for Playwright: $source"
+              sudo mv "$source" "$source.disabled"
+            fi
+          done
+
           npx playwright install --with-deps chromium
 
       - name: Start frontend preview
