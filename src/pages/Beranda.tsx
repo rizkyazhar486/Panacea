@@ -4,7 +4,7 @@ import { useStore } from '../lib/store'
 import { DeferredBodyExposureWidget, DeferredHomeFeatureUniverse, DeferredPanaceaLearningRail } from '../components/dashboard/DeferredHomeSections'
 import { HomeSectionBoundary } from '../components/HomeSectionBoundary'
 import { pratinjauBeranda } from '../lib/pratinjauBeranda'
-import { getVitals, vitalsAge } from '../lib/healthVitals'
+import { getVitals } from '../lib/healthVitals'
 import { getWorkouts } from '../lib/workoutStore'
 import { ageFromDob } from '../lib/anthro'
 import '../styles/home-odyssey.css'
@@ -26,27 +26,20 @@ type QuickAction = {
 
 const AKSI_UTAMA: QuickAction[] = [
   { to: '/latihan', emoji: '🏃', label: 'Training', note: 'Start session · history · zones', accent: 'from-emerald-400 to-cyan-500' },
-  { to: '/readiness', emoji: '🔆', label: 'Readiness', note: 'Recorded recovery inputs', accent: 'from-amber-400 to-orange-500' },
+  { to: '/readiness', emoji: '🔆', label: 'Readiness', note: 'Train hard or recover?', accent: 'from-amber-400 to-orange-500' },
   { to: '/recovery', emoji: '🌙', label: 'Recovery', note: 'Sleep · recovery tools', accent: 'from-indigo-500 to-violet-600' },
   { to: '/tubuh', emoji: '❤️', label: 'Body', note: 'Vitals · trends · health data', accent: 'from-rose-500 to-red-600' },
-  { to: '/pola-tidur', emoji: '😴', label: 'Sleep', note: 'Duration · stages · history', accent: 'from-blue-500 to-indigo-600' },
-  { to: '/hydration', emoji: '💧', label: 'Hydration', note: 'Recorded hydration data', accent: 'from-sky-400 to-blue-500' },
+  { to: '/pola-tidur', emoji: '😴', label: 'Sleep', note: 'Duration · stages · debt', accent: 'from-blue-500 to-indigo-600' },
+  { to: '/hydration', emoji: '💧', label: 'Hydration', note: 'Daily fluid target', accent: 'from-sky-400 to-blue-500' },
   { to: '/nutrition', emoji: '🥗', label: 'Nutrition', note: 'Food · macros · intake', accent: 'from-lime-400 to-emerald-500' },
   { to: '/med-reminders', emoji: '💊', label: 'Medication', note: 'Dose reminders', accent: 'from-fuchsia-500 to-pink-600' },
-  { to: '/planning', emoji: '🗓️', label: 'Plan', note: 'Turn goals into actions', accent: 'from-cyan-500 to-blue-600' },
+  { to: '/planning', emoji: '🗓️', label: 'Plan', note: 'Turn goals into today', accent: 'from-cyan-500 to-blue-600' },
   { to: '/emergency', emoji: '🆘', label: 'Emergency', note: 'Emergency health card', accent: 'from-red-500 to-orange-500' },
   { to: '/body-explorer', emoji: '🫀', label: '3D Body', note: 'Explore anatomy visually', accent: 'from-violet-500 to-blue-600' },
   { to: '/chatbot', emoji: '✨', label: 'Ask Panacea', note: 'Ask from your context', accent: 'from-orange-400 to-fuchsia-600' },
 ]
 
-type Signal = {
-  label: string
-  value: string
-  unit?: string
-  meta?: string
-  tone: string
-  to: string
-}
+type Signal = { label: string; value: string; unit?: string; tone: string; to: string }
 
 function HomeLoadingCard({ label, tall = false }: { label: string; tall?: boolean }) {
   return (
@@ -111,31 +104,13 @@ export default function Beranda() {
 
   useEffect(() => {
     const update = () => setRefresh((x) => x + 1)
-    const onVisibility = () => {
-      if (document.visibilityState === 'visible') update()
-    }
     window.addEventListener('panacea:health-updated', update)
-    window.addEventListener('storage', update)
-    window.addEventListener('focus', update)
-    document.addEventListener('visibilitychange', onVisibility)
-    return () => {
-      window.removeEventListener('panacea:health-updated', update)
-      window.removeEventListener('storage', update)
-      window.removeEventListener('focus', update)
-      document.removeEventListener('visibilitychange', onVisibility)
-    }
+    return () => window.removeEventListener('panacea:health-updated', update)
   }, [])
 
   const vitals = useMemo(() => getVitals(), [refresh])
   const workouts = useMemo(() => getWorkouts(), [refresh])
   const name = account?.name?.trim().split(/\s+/)[0] || ''
-  const vitalsFreshness = useMemo(() => vitalsAge(vitals), [vitals])
-  const vitalsMeta = useMemo(
-    () => [typeof vitals.source === 'string' ? vitals.source.trim() : '', vitalsFreshness ?? '']
-      .filter(Boolean)
-      .join(' · '),
-    [vitals.source, vitalsFreshness],
-  )
 
   const tanggalCatatan = useMemo(() => {
     const dates = new Set<string>()
@@ -155,33 +130,32 @@ export default function Beranda() {
 
   const signals = useMemo<Signal[]>(() => {
     const out: Signal[] = []
-    const sharedMeta = vitalsMeta || 'Recorded shared vitals'
     const lastSleep = [...(state.sleepLogs ?? [])]
       .filter((x) => typeof x?.hours === 'number' && x.hours > 0)
       .sort((a, b) => (a.date < b.date ? 1 : -1))[0]
 
     if (typeof vitals.steps === 'number' && vitals.steps > 0) {
-      out.push({ label: 'Steps', value: Math.round(vitals.steps).toLocaleString(), unit: 'steps', meta: sharedMeta, tone: 'text-emerald-700 dark:text-emerald-300', to: '/tubuh?t=gerak' })
+      out.push({ label: 'Steps', value: Math.round(vitals.steps).toLocaleString(), unit: 'today', tone: 'text-emerald-700 dark:text-emerald-300', to: '/tubuh?t=gerak' })
     }
     if (lastSleep) {
-      out.push({ label: 'Sleep', value: (Math.round(lastSleep.hours * 10) / 10).toString(), unit: 'hours', meta: lastSleep.date ? `Recorded ${lastSleep.date}` : 'Recorded sleep log', tone: 'text-indigo-700 dark:text-indigo-300', to: '/tubuh?t=tidur' })
+      out.push({ label: 'Sleep', value: (Math.round(lastSleep.hours * 10) / 10).toString(), unit: 'hours', tone: 'text-indigo-700 dark:text-indigo-300', to: '/tubuh?t=tidur' })
     } else if (typeof vitals.sleepH === 'number' && vitals.sleepH > 0) {
-      out.push({ label: 'Sleep', value: (Math.round(vitals.sleepH * 10) / 10).toString(), unit: 'hours', meta: sharedMeta, tone: 'text-indigo-700 dark:text-indigo-300', to: '/tubuh?t=tidur' })
+      out.push({ label: 'Sleep', value: (Math.round(vitals.sleepH * 10) / 10).toString(), unit: 'hours', tone: 'text-indigo-700 dark:text-indigo-300', to: '/tubuh?t=tidur' })
     }
     if (typeof vitals.restingHr === 'number' && vitals.restingHr > 0) {
-      out.push({ label: 'Resting HR', value: Math.round(vitals.restingHr).toString(), unit: 'bpm', meta: sharedMeta, tone: 'text-rose-700 dark:text-rose-300', to: '/tubuh?t=jantung' })
+      out.push({ label: 'Resting HR', value: Math.round(vitals.restingHr).toString(), unit: 'bpm', tone: 'text-rose-700 dark:text-rose-300', to: '/tubuh?t=jantung' })
     }
     if (typeof vitals.vo2max === 'number' && vitals.vo2max > 0) {
-      out.push({ label: 'VO₂max', value: (Math.round(vitals.vo2max * 10) / 10).toString(), unit: 'mL/kg/min', meta: sharedMeta, tone: 'text-sky-700 dark:text-sky-300', to: '/latihan?t=lab' })
+      out.push({ label: 'VO₂max', value: (Math.round(vitals.vo2max * 10) / 10).toString(), unit: 'mL/kg/min', tone: 'text-sky-700 dark:text-sky-300', to: '/latihan?t=lab' })
     }
     if (typeof vitals.weightKg === 'number' && vitals.weightKg > 0) {
-      out.push({ label: 'Weight', value: vitals.weightKg.toString(), unit: 'kg', meta: sharedMeta, tone: 'text-neutral-900 dark:text-white', to: '/body' })
+      out.push({ label: 'Weight', value: vitals.weightKg.toString(), unit: 'kg', tone: 'text-neutral-900 dark:text-white', to: '/body' })
     }
     if (workouts.length > 0) {
-      out.push({ label: 'Sessions', value: workouts.length.toString(), unit: 'recorded', meta: 'Local workout history', tone: 'text-violet-700 dark:text-violet-300', to: '/latihan' })
+      out.push({ label: 'Sessions', value: workouts.length.toString(), unit: 'recorded', tone: 'text-violet-700 dark:text-violet-300', to: '/latihan' })
     }
     return out
-  }, [vitals, workouts, state.sleepLogs, vitalsMeta])
+  }, [vitals, workouts, state.sleepLogs])
 
   return (
     <main className="panacea-home mx-auto w-full max-w-4xl space-y-5 pb-24">
@@ -211,27 +185,26 @@ export default function Beranda() {
             {name ? `Hi, ${name}. ` : ''}Your <span className="energy-word">daily command center.</span>
           </h1>
           <p className="home-odyssey-copy">
-            Useful actions, recorded health signals and your own widgets — dense enough to work every day, light enough to stay smooth.
+            Useful actions, live health signals and your own widgets — dense enough to work every day, light enough to stay smooth.
           </p>
 
           <div className="home-odyssey-actions">
             <Link to="/latihan" className="home-primary-action">Start training <span aria-hidden>→</span></Link>
             <button type="button" onClick={() => setLogsOpen(true)} className="home-secondary-action">Quick log <span aria-hidden>＋</span></button>
-            <Link to="/readiness" className="home-secondary-action">Review readiness <span aria-hidden>↗</span></Link>
+            <Link to="/readiness" className="home-secondary-action">Check readiness <span aria-hidden>↗</span></Link>
           </div>
 
           {signals.length > 0 ? (
-            <div className="home-signal-rail no-scrollbar -mx-1 mt-4 flex snap-x gap-2.5 overflow-x-auto px-1 pb-1" aria-label="Recorded health signals" aria-live="polite">
+            <div className="home-signal-rail no-scrollbar -mx-1 mt-4 flex snap-x gap-2.5 overflow-x-auto px-1 pb-1" aria-label="Current health signals">
               {signals.slice(0, 5).map((s) => (
                 <Link
                   key={s.label}
                   to={s.to}
-                  className="home-signal-card min-h-[110px] w-[144px] shrink-0 snap-start rounded-[20px] p-3 transition active:scale-[.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
+                  className="home-signal-card min-h-[98px] w-[134px] shrink-0 snap-start rounded-[20px] p-3 transition active:scale-[.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
                 >
                   <div className="text-[9px] font-black uppercase tracking-[.13em] text-neutral-500 dark:text-neutral-400">{s.label}</div>
                   <div className={`mt-3 text-[27px] font-black leading-none tracking-[-.045em] tabular-nums ${s.tone}`}>{s.value}</div>
                   {s.unit && <div className="mt-1.5 truncate text-[9px] font-semibold text-neutral-500 dark:text-neutral-400">{s.unit}</div>}
-                  {s.meta && <div className="mt-1 truncate text-[8px] font-medium text-neutral-400 dark:text-neutral-500" title={s.meta}>{s.meta}</div>}
                 </Link>
               ))}
             </div>
