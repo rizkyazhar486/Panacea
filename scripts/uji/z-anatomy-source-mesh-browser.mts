@@ -51,17 +51,27 @@ assert.doesNotMatch(browser, /safe surgical path/i)
 assert.doesNotMatch(browser, /injury risk/i)
 
 assert.match(lab, /import ZAnatomySourceMeshBrowser from '\.\/ZAnatomySourceMeshBrowser'/)
-assert.match(lab, /<ZAnatomySourceMeshBrowser\b/)
-assert.match(lab, /<ZAnatomyAtlasWorkbench\b/)
 
-// Keep the original shared-viewer wiring, while allowing additive callbacks
-// such as curated surgery/biomechanics navigation on the workbench.
+const sourceBrowserTag = lab.match(/<ZAnatomySourceMeshBrowser\b[\s\S]*?\/>/)?.[0]
+assert.ok(sourceBrowserTag, 'WholeBodyPrecisionLab must mount ZAnatomySourceMeshBrowser')
 for (const callback of [
   'onHighlight={onHighlight}',
   'onFocusRegion={onFocusRegion}',
   'onEnableLayer={onEnableLayer}',
 ]) {
-  assert.ok(lab.includes(callback), `WholeBodyPrecisionLab must preserve ${callback}`)
+  assert.ok(sourceBrowserTag.includes(callback), `ZAnatomySourceMeshBrowser must preserve ${callback}`)
 }
 
-console.log('Z-Anatomy source mesh browser stays bounded, provenance-aware, exact-node routed, explicit-graph constrained, module-compatible, and mounted beside the curated workbench with additive callbacks allowed.')
+const workbenchTag = lab.match(/<ZAnatomyAtlasWorkbench\b[\s\S]*?\/>/)?.[0]
+assert.ok(workbenchTag, 'WholeBodyPrecisionLab must mount ZAnatomyAtlasWorkbench')
+for (const callback of [
+  'onHighlight={onHighlight}',
+  'onFocusRegion={onFocusRegion}',
+  'onEnableLayer={onEnableLayer}',
+  'onOpenSurgical={onOpenSurgical}',
+  "onOpenBiomechanics={() => setMode('movement')}",
+]) {
+  assert.ok(workbenchTag.includes(callback), `ZAnatomyAtlasWorkbench must preserve ${callback}`)
+}
+
+console.log('Z-Anatomy source mesh browser stays bounded, provenance-aware, exact-node routed, explicit-graph constrained, module-compatible, and mounted beside the curated workbench with component-bound surgery and biomechanics handoffs.')
