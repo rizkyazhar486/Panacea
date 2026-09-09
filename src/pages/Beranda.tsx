@@ -9,6 +9,7 @@ import { getWorkouts } from '../lib/workoutStore'
 import { ageFromDob } from '../lib/anthro'
 import '../styles/home-odyssey.css'
 import '../styles/home-utility-polish.css'
+import '../styles/home-mobile-stability.css'
 
 const LazyPapanWidget = lazy(() => import('../components/PapanWidget').then((m) => ({ default: m.PapanWidget })))
 const LazyKisiFitur = lazy(() => import('../components/KisiFitur').then((m) => ({ default: m.KisiFitur })))
