@@ -32,6 +32,16 @@ const pendingBridge: MultiscaleBridge = {
       inferredFromFreeText: false, destination: 'cell-lab',
     },
     {
+      id: 'fixture-organelle', label: 'Fixture organelle', scale: 'organelle', representation: 'subcellular-reference',
+      evidence: [evidence], academicReview: { status: 'pending' }, patientSpecific: false,
+      inferredFromFreeText: false, destination: 'cell-lab',
+    },
+    {
+      id: 'fixture-molecule', label: 'Fixture molecule', scale: 'molecule', representation: 'molecular-structure',
+      evidence: [evidence], academicReview: { status: 'pending' }, patientSpecific: false,
+      inferredFromFreeText: false, destination: 'molecular-lab',
+    },
+    {
       id: 'fixture-protein', label: 'Fixture protein', scale: 'protein', representation: 'molecular-structure',
       evidence: [evidence], academicReview: { status: 'pending' }, patientSpecific: false,
       inferredFromFreeText: false, destination: 'molecular-lab',
@@ -50,29 +60,35 @@ const pendingBridge: MultiscaleBridge = {
   edges: [
     { from: 'fixture-organ', to: 'fixture-tissue', relation: 'contains', evidence: [evidence], academicReview: { status: 'pending' }, inferredFromFreeText: false },
     { from: 'fixture-tissue', to: 'fixture-cell', relation: 'has-cell-type', evidence: [evidence], academicReview: { status: 'pending' }, inferredFromFreeText: false },
-    { from: 'fixture-cell', to: 'fixture-protein', relation: 'expresses-protein', evidence: [evidence], academicReview: { status: 'pending' }, inferredFromFreeText: false },
+    { from: 'fixture-cell', to: 'fixture-organelle', relation: 'has-compartment', evidence: [evidence], academicReview: { status: 'pending' }, inferredFromFreeText: false },
+    { from: 'fixture-organelle', to: 'fixture-molecule', relation: 'contains-molecule', evidence: [evidence], academicReview: { status: 'pending' }, inferredFromFreeText: false },
+    { from: 'fixture-cell', to: 'fixture-protein', relation: 'reference-link', evidence: [evidence], academicReview: { status: 'pending' }, inferredFromFreeText: false },
     { from: 'fixture-protein', to: 'fixture-pathway', relation: 'participates-in-pathway', evidence: [evidence], academicReview: { status: 'pending' }, inferredFromFreeText: false },
-    { from: 'fixture-pathway', to: 'fixture-gene', relation: 'reference-link', evidence: [evidence], academicReview: { status: 'pending' }, inferredFromFreeText: false },
+    { from: 'fixture-protein', to: 'fixture-gene', relation: 'encoded-by-gene', evidence: [evidence], academicReview: { status: 'pending' }, inferredFromFreeText: false },
   ],
 }
 
 const pending = validateMultiscaleBridge(pendingBridge)
-assert.equal(pending.valid, true)
+assert.equal(pending.valid, true, pending.reasons.join(' | '))
 assert.equal(pending.publicationReady, false, 'structurally valid pending-review reference graphs must not be called publication-ready')
 
-const gross = pendingBridge.nodes[0]
-const molecular = pendingBridge.nodes[3]
+const gross = pendingBridge.nodes.find((node) => node.id === 'fixture-organ')!
+const protein = pendingBridge.nodes.find((node) => node.id === 'fixture-protein')!
 assert.equal(canRenderInGrossBody3D(gross), true)
-assert.equal(canRenderInGrossBody3D(molecular), false, 'protein/molecular structures must never masquerade as gross Body3D anatomy')
+assert.equal(canRenderInGrossBody3D(protein), false, 'protein/molecular structures must never masquerade as gross Body3D anatomy')
 assert.equal(nextScale('organ'), 'tissue')
+assert.equal(nextScale('cell'), 'organelle')
+assert.equal(nextScale('organelle'), 'molecule')
 assert.equal(nextScale('gene'), null)
 
 const badMolecularGeometry = structuredClone(pendingBridge)
-badMolecularGeometry.nodes[3].representation = 'gross-geometry'
+const badProtein = badMolecularGeometry.nodes.find((node) => node.id === 'fixture-protein')!
+badProtein.representation = 'gross-geometry'
 assert.match(validateMultiscaleBridge(badMolecularGeometry).reasons.join(' '), /cannot use gross-geometry representation at protein scale/i)
 
 const badVersion = structuredClone(pendingBridge)
-badVersion.nodes[3].evidence[0].sourceVersion = 'latest'
+const versionedProtein = badVersion.nodes.find((node) => node.id === 'fixture-protein')!
+versionedProtein.evidence[0].sourceVersion = 'latest'
 assert.match(validateMultiscaleBridge(badVersion).reasons.join(' '), /immutable, non-placeholder source version/i)
 
 const missingEdgeEvidence = structuredClone(pendingBridge)
@@ -94,11 +110,11 @@ const review = {
 reviewed.nodes.forEach((node) => { node.academicReview = review })
 reviewed.edges.forEach((edge) => { edge.academicReview = review })
 const reviewedResult = validateMultiscaleBridge(reviewed)
-assert.equal(reviewedResult.valid, true)
+assert.equal(reviewedResult.valid, true, reviewedResult.reasons.join(' | '))
 assert.equal(reviewedResult.publicationReady, true)
 
 const malformedReview = structuredClone(reviewed)
 malformedReview.nodes[0].academicReview = { ...review, reviewedAt: 'not-a-date' }
 assert.match(validateMultiscaleBridge(malformedReview).reasons.join(' '), /real ISO review date/i)
 
-console.log('Body multiscale molecular bridge is fail-closed across anatomy → tissue → cell → molecular → pathway → gene reference navigation.')
+console.log('Body multiscale molecular bridge is fail-closed across organ → tissue → cell → organelle → molecule/protein → pathway/gene reference navigation.')
