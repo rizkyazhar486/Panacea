@@ -37,14 +37,17 @@ test('Active Suspense fallback cannot retain a giant previous widget canvas', ()
     assert.match(css, /height:184px!important/)
     assert.match(css, /max-height:184px!important/)
   }
+  assert.match(tumpukan, /useLayoutEffect/)
+  assert.match(tumpukan, /setTinggi\(TINGGI_MIN\)/)
+  assert.match(tumpukan, /\[aktifItem\?\.i\]/)
 })
 
 test('Final-authority Dark Home guard loads after the general Home contrast layer', () => {
   const contrast = index.indexOf('/home-contrast-v27.css')
-  const darkGuard = index.indexOf('/home-widget-dark-v31.css?v=20260909-1')
+  const darkGuard = index.indexOf('/home-widget-dark-v31.css?v=20260909-2')
   assert.ok(contrast >= 0, 'Home contrast layer must remain registered')
   assert.ok(darkGuard > contrast, 'Dark widget guard must load after the general contrast layer')
-  assert.match(index, /MAINTENANCE_VERSION = '20260909-v33'/)
+  assert.match(index, /MAINTENANCE_VERSION = '20260909-v37'/)
 })
 
 test('Home v34 removes decorative outline leakage without recoloring semantic data', () => {
