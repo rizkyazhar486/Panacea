@@ -14,6 +14,9 @@ function jsonResponse(payload: unknown): Response {
   })
 }
 
+const fixedRetrievedAt = '2026-09-09T12:34:56.000Z'
+const fixedClock = () => new Date(fixedRetrievedAt)
+
 // Regression fixture: OLS kosong sehingga penyakit/fenotipe datang dari NLM
 // CTSS. Conditions memakai key internal NLM, sedangkan HPO memakai HP CURIE.
 {
@@ -34,7 +37,7 @@ function jsonResponse(payload: unknown): Response {
     return new Response('not found', { status: 404 })
   }
 
-  const result = await anatomyOntologyLookup(['back pain'], fakeFetch)
+  const result = await anatomyOntologyLookup(['back pain'], fakeFetch, fixedClock)
   const disease = result.diseases[0]
   const phenotype = result.phenotypes[0]
 
@@ -45,6 +48,9 @@ function jsonResponse(payload: unknown): Response {
     disease?.identifierSystem === 'NLM_CONDITIONS_KEY', disease?.identifierSystem)
   ok('key kondisi NLM dipertahankan apa adanya', disease?.id === 'C0000001', disease?.id)
   ok('display-array CTSS dinormalisasi menjadi label tunggal', disease?.label === 'Back pain', disease?.label)
+  ok('dataset conditions dipertahankan eksplisit',
+    disease?.sourceDataset === 'nlm-clinical-tables:conditions', disease?.sourceDataset)
+  ok('retrieval timestamp conditions deterministik', disease?.retrievedAt === fixedRetrievedAt, disease?.retrievedAt)
   ok('provenance URL conditions dipertahankan', disease?.sourceUrl.includes('/conditions/v3/search') === true, disease?.sourceUrl)
 
   ok('HPO CTSS tetap berada di bucket phenotype', result.phenotypes.length === 1)
@@ -52,6 +58,9 @@ function jsonResponse(payload: unknown): Response {
   ok('HPO CTSS membawa identifier system HP', phenotype?.identifierSystem === 'HP', phenotype?.identifierSystem)
   ok('HPO CTSS mempertahankan CURIE HP', phenotype?.id === 'HP:0003418', phenotype?.id)
   ok('HPO malformed tidak dipalsukan sebagai HP', !result.phenotypes.some((term) => term.id === 'not-an-hpo-id'))
+  ok('dataset HPO dipertahankan eksplisit',
+    phenotype?.sourceDataset === 'nlm-clinical-tables:hpo', phenotype?.sourceDataset)
+  ok('retrieval timestamp HPO sama dalam satu lookup', phenotype?.retrievedAt === fixedRetrievedAt, phenotype?.retrievedAt)
   ok('provenance URL HPO dipertahankan', phenotype?.sourceUrl.includes('/hpo/v3/search') === true, phenotype?.sourceUrl)
   ok('lookup tetap membatasi satu kueri ke empat sumber', urls.length === 4, String(urls.length))
 
@@ -87,12 +96,14 @@ function jsonResponse(payload: unknown): Response {
     return new Response('not found', { status: 404 })
   }
 
-  const result = await anatomyStructureLookup(['heart'], fakeFetch)
+  const result = await anatomyStructureLookup(['heart'], fakeFetch, fixedClock)
   const term = result[0]
   ok('OLS anatomy term ditemukan', result.length === 1)
   ok('OLS anatomy term membawa source OLS4', term?.source === 'ebi-ols4', term?.source)
   ok('UBERON membawa identifier system UBERON', term?.identifierSystem === 'UBERON', term?.identifierSystem)
   ok('UBERON CURIE dipertahankan', term?.id === 'UBERON:0000948', term?.id)
+  ok('OLS dataset context dipertahankan', term?.sourceDataset === 'ols4:uberon', term?.sourceDataset)
+  ok('OLS retrieval timestamp dipertahankan', term?.retrievedAt === fixedRetrievedAt, term?.retrievedAt)
   ok('OLS source URL dipertahankan', term?.sourceUrl.includes('www.ebi.ac.uk/ols4/api/search') === true, term?.sourceUrl)
 }
 
@@ -105,7 +116,7 @@ function jsonResponse(payload: unknown): Response {
     queryLengths.push((url.searchParams.get('q') ?? '').length)
     return jsonResponse({ response: { docs: [] } })
   }
-  await anatomyStructureLookup([`lung ${'x'.repeat(500)}`], fakeFetch)
+  await anatomyStructureLookup([`lung ${'x'.repeat(500)}`], fakeFetch, fixedClock)
   ok('query OLS dibatasi sebelum upstream', queryLengths.length === 2 && queryLengths.every((n) => n <= 160), queryLengths.join(','))
 }
 
