@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict'
 import crypto from 'node:crypto'
-import { evaluatePaymentNotification, orderStatus, verifyPaymentSignature, visibleOrderStatus } from '../src/payments'
+import { evaluatePaymentNotification, normalizeTopUpPnc, orderStatus, verifyPaymentSignature, visibleOrderStatus } from '../src/payments'
 
 const ownOrder = { userId: 'user-a', status: 'pending' as const }
 const paidOrder = { userId: 'user-a', status: 'paid' as const }
@@ -10,6 +10,17 @@ assert.equal(visibleOrderStatus(ownOrder, 'user-a'), 'pending')
 assert.equal(visibleOrderStatus(paidOrder, 'user-a'), 'paid')
 assert.equal(visibleOrderStatus(foreignOrder, 'user-a'), undefined)
 assert.equal(visibleOrderStatus(undefined, 'user-a'), undefined)
+
+assert.equal(normalizeTopUpPnc(1, 1000), 1)
+assert.equal(normalizeTopUpPnc(12.9, 1000), 12)
+assert.equal(normalizeTopUpPnc('25', 1000), 25)
+assert.equal(normalizeTopUpPnc(0, 1000), undefined)
+assert.equal(normalizeTopUpPnc(-1, 1000), undefined)
+assert.equal(normalizeTopUpPnc(Number.POSITIVE_INFINITY, 1000), undefined)
+assert.equal(normalizeTopUpPnc(Number.NaN, 1000), undefined)
+assert.equal(normalizeTopUpPnc(Number.MAX_SAFE_INTEGER, 1000), undefined)
+assert.equal(normalizeTopUpPnc(100, 0), undefined)
+assert.equal(normalizeTopUpPnc(100, Number.POSITIVE_INFINITY), undefined)
 
 let statusCode = 200
 let responseBody: unknown
@@ -143,4 +154,4 @@ assert.deepEqual(
   { action: 'ignore' },
 )
 
-console.log('Payment ownership, constant-time signature, amount, fraud, idempotence, and out-of-order webhook boundaries verified.')
+console.log('Payment ownership, amount normalization, constant-time signature, amount, fraud, idempotence, and out-of-order webhook boundaries verified.')
