@@ -1,0 +1,44 @@
+{
+  "id": "thebuggeddev_anatomy",
+  "name": "thebuggeddev Anatomy / Breath Atlas",
+  "category": "anatomy",
+  "kind": ["viewer", "tooling"],
+  "homepage": "https://breath-atlas.thebuggeddev.chatgpt.site/",
+  "repository": "https://github.com/thebuggeddev/anatomy",
+  "features": ["body-exposure", "surgical-simulator", "respiratory-physiology"],
+  "formats": ["typescript", "threejs", "external-web"],
+  "usage": {
+    "runtime": false,
+    "buildTime": false,
+    "networkRequired": true,
+    "notes": "Mandatory interactive reference for Body Exposure / surgical education UX. Link and benchmark only. Do not vendor upstream code, textures, meshes, screenshots, or other assets until explicit licensing and asset-level provenance are verified."
+  },
+  "license": {
+    "status": "CHECK_REQUIRED",
+    "identifier": null,
+    "commercialUse": "UNKNOWN",
+    "attributionRequired": null,
+    "shareAlike": null,
+    "scope": "GitHub repository metadata currently exposes no repository license. The hosted Breath Atlas surface also has no license record verified by Panacea. Treat both as external references only until explicit permission/license terms are documented.",
+    "verificationUrl": "https://github.com/thebuggeddev/anatomy",
+    "verifiedAt": "2026-09-09",
+    "notes": "Public availability is not equivalent to permission to copy or redistribute. Production ingestion remains blocked until license and asset provenance are resolved."
+  },
+  "validation": {
+    "level": "REFERENCE",
+    "clinicalDecisionUse": "NO",
+    "notes": "Use as an interaction and visualization benchmark only. It is not accepted as anatomical authority, patient-specific evidence, operative guidance, or academic validation."
+  },
+  "provenance": {
+    "authority": "thebuggeddev public GitHub repository and hosted Breath Atlas experience",
+    "sourceIdentityRequired": true,
+    "versionPinRequired": true,
+    "notes": "If future licensing allows import, pin the exact upstream commit and record every imported asset origin, transformation history, anatomical mapping, reviewer, and final attribution text. The repository URL and hosted Breath Atlas URL remain preserved separately as repository/homepage fields."
+  },
+  "adapter": {
+    "status": "NOT_APPLICABLE",
+    "normalizedTarget": "PanaceaAnatomyInteractionReference",
+    "module": null,
+    "notes": "Current integration is intentionally external-reference-only, so no runtime adapter exists. Recreate useful interaction patterns independently inside Panacea rather than copying unlicensed implementation or assets."
+  }
+}
