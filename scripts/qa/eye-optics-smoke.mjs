@@ -15,16 +15,30 @@ export async function verifyEyeOptics(page) {
   }
 }
 
+async function activateWithKeyboard(button) {
+  await button.scrollIntoViewIfNeeded()
+  await button.focus()
+  await expect(button).toBeFocused()
+  await button.press('Enter')
+}
+
 async function runEyeOptics(page) {
-  await page.getByRole('button', { name: 'Specialty labs', exact: true }).click()
-  await page.getByRole('button', { name: 'Neuro & senses', exact: true }).click()
-  await page.getByRole('button', { name: 'Eye & orbit', exact: true }).click()
+  const specialty = page.getByRole('button', { name: 'Specialty labs', exact: true })
+  await activateWithKeyboard(specialty)
+
+  const neuro = page.getByRole('button', { name: 'Neuro & senses', exact: true })
+  await expect(neuro).toBeVisible()
+  await activateWithKeyboard(neuro)
+
+  const eye = page.getByRole('button', { name: 'Eye & orbit', exact: true })
+  await expect(eye).toBeVisible()
+  await activateWithKeyboard(eye)
 
   const opener = page.getByRole('button', { name: 'Explore pupil & accommodation', exact: true })
   const svg = page.locator('svg[aria-label="Educational ocular optics schematic"]')
   await expect(opener).toHaveAttribute('aria-expanded', 'false')
   await expect(svg).toHaveCount(0)
-  await opener.click()
+  await activateWithKeyboard(opener)
   await expect(svg).toBeVisible()
   await expect(page.getByRole('button', { name: 'Close optics lesson', exact: true })).toHaveAttribute('aria-expanded', 'true')
 
@@ -55,7 +69,7 @@ async function runEyeOptics(page) {
   const nearRx = Number(await lens.getAttribute('rx'))
 
   const phase = page.getByRole('button', { name: /03.*Accommodation/ })
-  await phase.click()
+  await activateWithKeyboard(phase)
   await expect(phase).toHaveAttribute('aria-pressed', 'true')
   const lesson = svg.locator('xpath=ancestor::section[1]')
   await expect(lesson).toContainText('Phase 3/7')
@@ -65,12 +79,13 @@ async function runEyeOptics(page) {
   await svg.scrollIntoViewIfNeeded()
   await page.screenshot({ path: 'artifacts/body3d-mobile-eye-optics.png', timeout: 10_000 })
 
-  await page.getByRole('button', { name: 'Close optics lesson', exact: true }).click()
+  const close = page.getByRole('button', { name: 'Close optics lesson', exact: true })
+  await activateWithKeyboard(close)
   await expect(svg).toHaveCount(0)
-  await opener.click()
+  await activateWithKeyboard(opener)
   await expect(distance).toHaveValue('6')
   await expect(pupil).toHaveValue('4')
-  await page.getByRole('button', { name: 'Close optics lesson', exact: true }).click()
+  await activateWithKeyboard(page.getByRole('button', { name: 'Close optics lesson', exact: true }))
 
   return { reachable: true, keyboardControls: true, closeAndReopen: true, smallGap, largeGap, farRx, nearRx, width }
 }
