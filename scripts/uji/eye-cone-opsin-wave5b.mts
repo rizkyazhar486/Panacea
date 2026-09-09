@@ -42,6 +42,21 @@ for (const edge of EYE_CONE_OPSIN_WAVE5B_EDGES) {
   assert.equal(edge.publicationReady, false)
   assert.equal(edge.evidence.retrievedOn, '2026-09-09')
 }
+
+const blockedCrossDatabaseNodeIds = new Set(
+  EYE_CONE_OPSIN_WAVE5B_NODES
+    .filter((node) => node.crossDatabaseStatus === 'blocked-pending-exact-stable-id')
+    .map((node) => node.id),
+)
+assert.ok(blockedCrossDatabaseNodeIds.has('opn1mw-gene'))
+for (const edge of EYE_CONE_OPSIN_WAVE5B_EDGES) {
+  assert.equal(
+    blockedCrossDatabaseNodeIds.has(edge.from) || blockedCrossDatabaseNodeIds.has(edge.to),
+    false,
+    `Blocked cross-database node must not participate in an edge: ${edge.id}`,
+  )
+}
+
 assert.match(EYE_CONE_OPSIN_WAVE5B_BOUNDARY, /Do not infer spectral maxima/)
 assert.match(EYE_CONE_OPSIN_WAVE5B_BOUNDARY, /pathogenicity/)
 assert.match(EYE_CONE_OPSIN_WAVE5B_BOUNDARY, /patient expression/)
