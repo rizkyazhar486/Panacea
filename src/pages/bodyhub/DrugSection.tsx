@@ -63,13 +63,10 @@ export function DrugSection({ onHighlightSites }: Props) {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
 
-  // Jumlah total zat aktif diambil sekali supaya layar bisa menyebut angka
-  // yang SEBENARNYA ada di RxNorm, bukan angka yang dijanjikan.
   useEffect(() => {
     api.drugIngredients('').then((r) => setTotal(r.total)).catch(() => setTotal(null))
   }, [])
 
-  // Saran nama diambil dari daftar RxNorm sambil mengetik.
   useEffect(() => {
     const term = q.trim()
     if (term.length < 2) { setSuggestions([]); return }
@@ -86,9 +83,6 @@ export function DrugSection({ onHighlightSites }: Props) {
     setError('')
     setProfile(null)
     setLabel(null)
-    // Profil kelas dan teks label diambil bersamaan: keduanya berdiri sendiri,
-    // dan obat yang punya kelas tapi tanpa label AS (atau sebaliknya) tetap
-    // harus menampilkan bagian yang ada.
     const [p, l] = await Promise.all([
       api.drugPharmacology(name).catch(() => null),
       api.drugInfo(name).catch(() => null),
@@ -108,13 +102,10 @@ export function DrugSection({ onHighlightSites }: Props) {
     atcCodes,
   )
 
-  // Setiap kali situsnya berubah, model 3D diminta menyorot dan menyalakan
-  // lapisan yang perlu — inilah "tunjukkan di mana obat ini bekerja".
   useEffect(() => {
     const semua = [...action, ...adverse]
     if (!semua.length) return
     onHighlightSites(keywordsOf(semua), layersOf(semua))
-    // onHighlightSites stabil dari induknya; kata kunci saja yang menentukan.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [profile])
 
@@ -126,6 +117,7 @@ export function DrugSection({ onHighlightSites }: Props) {
             value={q}
             onChange={(e) => setQ(e.target.value)}
             onKeyDown={(e) => { if (e.key === 'Enter' && q.trim()) pilih(q.trim()) }}
+            aria-label="Search drug, vaccine or serum"
             placeholder="Search a drug, vaccine or serum…"
             className="h-11 w-full rounded-xl border border-neutral-200 bg-white px-3 text-sm text-ink outline-none focus:border-brand dark:border-white/10 dark:bg-white/5 dark:text-white"
           />
@@ -133,7 +125,7 @@ export function DrugSection({ onHighlightSites }: Props) {
             <ul className="absolute z-20 mt-1 max-h-56 w-full overflow-y-auto rounded-xl border border-neutral-200 bg-white shadow-lg dark:border-white/10 dark:bg-neutral-900">
               {suggestions.map((s) => (
                 <li key={s.rxcui}>
-                  <button onClick={() => pilih(s.nama)} className="w-full px-3 py-2 text-left text-sm text-ink hover:bg-neutral-50 dark:text-white dark:hover:bg-white/5">
+                  <button type="button" onClick={() => pilih(s.nama)} className="w-full px-3 py-2 text-left text-sm text-ink hover:bg-neutral-50 dark:text-white dark:hover:bg-white/5">
                     {s.nama}
                   </button>
                 </li>
@@ -148,8 +140,8 @@ export function DrugSection({ onHighlightSites }: Props) {
         </p>
       </div>
 
-      {loading && <p className="text-sm text-neutral-500">Looking up pharmacology and the official label…</p>}
-      {error && <p className="text-sm text-neutral-500">{error}</p>}
+      {loading && <p role="status" className="text-sm text-neutral-500">Looking up pharmacology and the official label…</p>}
+      {error && <p role="alert" className="text-sm text-neutral-500">{error}</p>}
 
       {(action.length > 0 || adverse.length > 0) && (
         <div className="space-y-2">
@@ -182,8 +174,6 @@ export function DrugSection({ onHighlightSites }: Props) {
       {label && (
         <div className="space-y-2">
           <div className="t-mikro font-bold uppercase tracking-wide text-neutral-500">From the official FDA label</div>
-          {/* Dosis, cara pakai dan waktu pakai HANYA dari label. Tidak ada
-              satu angka pun di sini yang berasal dari kode aplikasi. */}
           {label.dosage && (
             <div className="rounded-xl bg-neutral-50 p-2.5 dark:bg-white/5">
               <div className="t-mikro font-bold uppercase tracking-wide text-neutral-500">Dose &amp; how to use</div>
