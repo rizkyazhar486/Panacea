@@ -49,7 +49,7 @@ export default function MultisystemScaleNavigator() {
         {SCALE_GROUPS.map((group) => (
           <div key={group.label}>
             <div className="mb-1 text-[8px] font-black uppercase tracking-[0.16em] text-neutral-400">{group.label}</div>
-            <div className="flex flex-wrap gap-1.5">
+            <div role="group" aria-label={`${group.label} biological scales`} className="flex flex-wrap gap-1.5">
               {group.scales.map((item) => {
                 const view = getBodyMultisystemScaleView(item)
                 const active = item === scale
