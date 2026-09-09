@@ -1,0 +1,60 @@
+{
+  "id": "panacea-eye-visible-wave1-evidence",
+  "revision": "2026-09-09-r4",
+  "scope": "gross-visible ocular anatomy only",
+  "clinicalDecisionUse": "NO",
+  "academicReviewStatus": "PENDING_QUALIFIED_REVIEW",
+  "aiAssisted": true,
+  "geometryRule": "No target may be promoted to verified anatomy without exact asset identity, immutable revision, license, attribution, transformation history and qualified review.",
+  "sources": [
+    {
+      "id": "NCBI:NBK482428",
+      "title": "Anatomy, Head and Neck, Eye",
+      "url": "https://www.ncbi.nlm.nih.gov/books/NBK482428/",
+      "use": "gross globe, accessory structures and eye anatomy",
+      "assetReuse": "NO_AUTOMATIC_REUSE"
+    },
+    {
+      "id": "NCBI:NBK531490",
+      "title": "Anatomy, Head and Neck, Orbit Bones",
+      "url": "https://www.ncbi.nlm.nih.gov/books/NBK531490/",
+      "use": "bony orbit, optic canal and orbital relationships",
+      "assetReuse": "NO_AUTOMATIC_REUSE"
+    },
+    {
+      "id": "NCBI:NBK539843",
+      "title": "Anatomy, Head and Neck, Orbit",
+      "url": "https://www.ncbi.nlm.nih.gov/books/NBK539843/",
+      "use": "orbital soft tissue, extraocular muscles and cranial nerve relationships",
+      "assetReuse": "NO_AUTOMATIC_REUSE"
+    },
+    {
+      "id": "NCBI:NBK542332",
+      "title": "Anatomy, Head and Neck: Retina",
+      "url": "https://www.ncbi.nlm.nih.gov/books/NBK542332/",
+      "use": "retina and posterior ocular relationships",
+      "assetReuse": "NO_AUTOMATIC_REUSE"
+    },
+    {
+      "id": "NEI:ABOUT-EYE-2025",
+      "title": "About the Eye",
+      "url": "https://www.nei.nih.gov/eye-health-information/healthy-vision/nei-for-kids/about-eye",
+      "use": "gross terminology cross-check for cornea, iris, pupil, lens, retina, macula, fovea and optic nerve",
+      "assetReuse": "NO_AUTOMATIC_REUSE"
+    },
+    {
+      "id": "NEI:HOW-TEARS-WORK-2025",
+      "title": "How Tears Work",
+      "url": "https://www.nei.nih.gov/eye-health-information/healthy-vision/how-eyes-work/how-tears-work",
+      "use": "tear film, lacrimal production and drainage overview",
+      "assetReuse": "NO_AUTOMATIC_REUSE"
+    }
+  ],
+  "boundaries": [
+    "These sources support terminology and anatomical relationships; they do not license copying figures, images, textures or meshes.",
+    "Reference-only targets are educational metadata, not claims of available 3D geometry.",
+    "Pupil, visual axis and other spaces/openings are not fabricated as tissue meshes.",
+    "No patient-specific geometry, diagnosis, treatment recommendation, surgical coordinate or autonomous decision is produced.",
+    "Histology, cellular anatomy, molecular pathways and physiology are deferred to later evidence-gated waves."
+  ]
+}
