@@ -1,0 +1,139 @@
+/* Panacea Home readability guard v36
+   Final-authority Home-only accessibility layer.
+   Presentation only: no health calculations, routes, storage, chart semantics,
+   clinical meaning, loading behavior, or animation logic is changed. */
+
+.panacea-home{
+  --pmd-v36-text:#111827;
+  --pmd-v36-secondary:#374151;
+  --pmd-v36-muted:#4b5563;
+  --pmd-v36-subtle:#64748b;
+  --pmd-v36-panel:#f8fafc;
+  --pmd-v36-card:#ffffff;
+  --pmd-v36-border:rgba(15,23,42,.15);
+  --pmd-v36-border-strong:rgba(15,23,42,.22);
+}
+
+.dark .panacea-home{
+  --pmd-v36-text:#f8fafc;
+  --pmd-v36-secondary:#e2e8f0;
+  --pmd-v36-muted:#cbd5e1;
+  --pmd-v36-subtle:#b6c2d0;
+  --pmd-v36-panel:#08101a;
+  --pmd-v36-card:#111925;
+  --pmd-v36-border:rgba(255,255,255,.14);
+  --pmd-v36-border-strong:rgba(255,255,255,.22);
+}
+
+/* Neutral utility text is descriptive UI copy, not a semantic health colour.
+   These overrides intentionally leave emerald/rose/amber/blue/etc. data tones
+   untouched. */
+.panacea-home :is(.text-neutral-950,.text-neutral-900,.text-neutral-800,.text-neutral-700,.text-ink){
+  color:var(--pmd-v36-text)!important;
+}
+.panacea-home :is(.text-neutral-600,.text-gray-600,.text-slate-600,.text-zinc-600){
+  color:var(--pmd-v36-secondary)!important;
+}
+.panacea-home :is(.text-neutral-500,.text-neutral-400,.text-gray-500,.text-gray-400,.text-slate-500,.text-slate-400,.text-zinc-500,.text-zinc-400){
+  color:var(--pmd-v36-muted)!important;
+}
+.panacea-home :is(.text-neutral-300,.text-gray-300,.text-slate-300,.text-zinc-300){
+  color:var(--pmd-v36-subtle)!important;
+}
+
+/* Restore visible depth between page -> panel -> widget. Previous translucent
+   dark surfaces could be only a few luminance points apart. */
+.panacea-home .home-command-panel,
+.panacea-home .home-loading-card{
+  background:var(--pmd-v36-panel)!important;
+  border:1px solid var(--pmd-v36-border)!important;
+}
+
+.panacea-home :is(.home-action-card,.home-signal-card){
+  background:var(--pmd-v36-card)!important;
+  border:1px solid var(--pmd-v36-border)!important;
+}
+
+.dark .panacea-home .home-action-card,
+.dark .panacea-home .home-signal-card{
+  background:
+    radial-gradient(circle at 84% 16%,rgba(49,130,255,.10),transparent 38%),
+    var(--pmd-v36-card)!important;
+  border-color:var(--pmd-v36-border)!important;
+}
+
+.panacea-home .home-command-panel .kaca,
+.panacea-home .widget-instrument-slide-v5 .kaca{
+  background:var(--pmd-v36-card)!important;
+  border:1px solid var(--pmd-v36-border)!important;
+}
+
+.dark .panacea-home .widget-instrument-shell-v5{
+  background:#070b11!important;
+  border-color:var(--pmd-v36-border)!important;
+}
+.dark .panacea-home .widget-instrument-slide-v5 .kaca{
+  background:var(--pmd-v36-card)!important;
+  border-color:var(--pmd-v36-border)!important;
+}
+
+/* Small Home labels were technically present but visually fragile on phones.
+   Increase only reading-critical labels; layout dimensions remain unchanged. */
+.panacea-home .home-action-card>span:nth-child(2)>span:first-child{
+  color:var(--pmd-v36-text)!important;
+  font-size:12px!important;
+  line-height:1.25!important;
+}
+.panacea-home .home-action-card>span:nth-child(2)>span:nth-child(2){
+  color:var(--pmd-v36-muted)!important;
+  font-size:10.5px!important;
+  line-height:1.35!important;
+}
+.panacea-home .home-signal-card [class*='text-[9px]']{
+  color:var(--pmd-v36-muted)!important;
+  font-size:10.5px!important;
+  line-height:1.3!important;
+}
+.panacea-home .home-command-panel .t-mikro{
+  color:var(--pmd-v36-muted);
+}
+
+/* Inputs and placeholders remain explicit against either Home theme. */
+.panacea-home :is(input,select,textarea):not([type='range']):not([type='checkbox']):not([type='radio']){
+  color:var(--pmd-v36-text)!important;
+  background:var(--pmd-v36-card)!important;
+  border-color:var(--pmd-v36-border-strong)!important;
+}
+.panacea-home :is(input,textarea)::placeholder{
+  color:var(--pmd-v36-subtle)!important;
+  opacity:1!important;
+}
+
+/* Keyboard and switch-control users should never have to infer focus from a
+   tiny colour change. */
+.panacea-home :is(a,button,input,select,textarea,summary):focus-visible{
+  outline:3px solid #00bf63!important;
+  outline-offset:2px!important;
+}
+
+@media (prefers-contrast:more){
+  .panacea-home{
+    --pmd-v36-muted:#334155;
+    --pmd-v36-subtle:#475569;
+    --pmd-v36-border:rgba(15,23,42,.28);
+  }
+  .dark .panacea-home{
+    --pmd-v36-muted:#e2e8f0;
+    --pmd-v36-subtle:#cbd5e1;
+    --pmd-v36-border:rgba(255,255,255,.30);
+  }
+}
+
+@media (forced-colors:active){
+  .panacea-home :is(.home-command-panel,.home-action-card,.home-signal-card,.home-loading-card,.kaca){
+    forced-color-adjust:auto;
+    background:Canvas!important;
+    color:CanvasText!important;
+    border:1px solid CanvasText!important;
+  }
+}
