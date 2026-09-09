@@ -13,6 +13,7 @@ import BreathAtlasLab from './BreathAtlasLab'
 import WholeBodyMotionInspector from './WholeBodyMotionInspector'
 import ZAnatomyAtlasWorkbench from './ZAnatomyAtlasWorkbench'
 import ZAnatomySourceMeshBrowser from './ZAnatomySourceMeshBrowser'
+import ZAnatomySystemExplorer from './ZAnatomySystemExplorer'
 
 interface Props {
   onHighlight?: (nodeHints: string[]) => void
@@ -158,6 +159,7 @@ export function WholeBodyPrecisionLab({ onHighlight, onFocusRegion, onEnableLaye
             onOpenSurgical={onOpenSurgical}
             onOpenBiomechanics={() => setMode('movement')}
           />
+          <ZAnatomySystemExplorer onHighlight={onHighlight} onFocusRegion={onFocusRegion} onEnableLayer={onEnableLayer} />
           <ZAnatomySourceMeshBrowser onHighlight={onHighlight} onFocusRegion={onFocusRegion} onEnableLayer={onEnableLayer} />
         </div>
       )}
