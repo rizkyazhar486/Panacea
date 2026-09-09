@@ -118,7 +118,9 @@ export function planBodyProgressivePrefetch(
       a.estimatedTransferMb - b.estimatedTransferMb ||
       a.assetId.localeCompare(b.assetId));
 
-  const required = pending.filter((candidate) => candidate.selected || candidate.intent === 'required-now');
+  const required = pending.filter((candidate) =>
+    Number.isFinite(candidate.estimatedTransferMb) &&
+    (candidate.selected || candidate.intent === 'required-now'));
   const loadNow = required.slice(0, maxConcurrent).map((candidate) => candidate.assetId);
   const requiredOverflow = new Set(required.slice(maxConcurrent).map((candidate) => candidate.assetId));
 
