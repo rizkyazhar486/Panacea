@@ -54,7 +54,7 @@ assert.equal(referenceGeometry.displayAllowed, true);
 assert.equal(referenceGeometry.geometryHighlightAllowed, true);
 assert.equal(referenceGeometry.verifiedAnatomyLabelAllowed, false);
 
-const thermoreceptorConcept = evaluateBodyHotspotLearningTrust({
+const thermoreceptorRecord: BodyHotspotLearningRecord = {
   hotspotId: 'fixture:thermoreception',
   label: 'Thermoreception concept',
   mode: 'learn',
@@ -70,14 +70,16 @@ const thermoreceptorConcept = evaluateBodyHotspotLearningTrust({
   exactSourceNodeNames: [],
   conceptualOverlayId: 'fixture:thermoreception-overlay',
   evidenceMappingId: 'fixture:thermoreception-evidence-map',
-});
+};
+
+const thermoreceptorConcept = evaluateBodyHotspotLearningTrust(thermoreceptorRecord);
 assert.equal(thermoreceptorConcept.displayAllowed, true);
 assert.equal(thermoreceptorConcept.geometryHighlightAllowed, false);
 assert.equal(thermoreceptorConcept.conceptualOverlayAllowed, true);
 assert.equal(thermoreceptorConcept.verifiedAnatomyLabelAllowed, false);
 
 const fakeConceptGeometry = evaluateBodyHotspotLearningTrust({
-  ...thermoreceptorConcept,
+  ...thermoreceptorRecord,
   hotspotId: 'fixture:fake-concept-geometry',
   exactSourceNodeNames: ['Invented_Thermoreceptor_Organ'],
 });
@@ -85,10 +87,10 @@ assert.equal(fakeConceptGeometry.displayAllowed, false);
 assert.ok(fakeConceptGeometry.blockers.includes('conceptual-overlay:source-geometry-prohibited'));
 
 const unprovenConcept = evaluateBodyHotspotLearningTrust({
-  ...thermoreceptorConcept,
+  ...thermoreceptorRecord,
   hotspotId: 'fixture:unproven-concept',
   targetTrust: {
-    ...thermoreceptorConcept.targetTrust,
+    ...thermoreceptorRecord.targetTrust,
     evidenceStatus: 'verification-required',
   },
 });
