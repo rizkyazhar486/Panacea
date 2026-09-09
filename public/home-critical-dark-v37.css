@@ -1,0 +1,49 @@
+/* Panacea Home critical dark fallback v37
+   Loaded from <head> before React widget chunks. This prevents a light/gray
+   loading flash on Dark Home while lazy widget code is still resolving.
+   Presentation only; no widget data, chart semantics or health logic changed. */
+
+html.dark .panacea-home .widget-instrument-shell-v5,
+.dark .panacea-home .widget-instrument-shell-v5{
+  background:#070b11!important;
+  background-image:none!important;
+  color:#f8fafc!important;
+}
+
+html.dark .panacea-home .widget-instrument-loading-v29,
+.dark .panacea-home .widget-instrument-loading-v29{
+  min-height:132px!important;
+  display:grid!important;
+  place-items:center!important;
+  border-radius:20px!important;
+  background:#0a0f16!important;
+  background-image:none!important;
+  border:1px solid rgba(255,255,255,.08)!important;
+  color:#dbe7ef!important;
+  box-shadow:none!important;
+  filter:none!important;
+  -webkit-backdrop-filter:none!important;
+  backdrop-filter:none!important;
+  color-scheme:dark;
+}
+
+html.dark .panacea-home .widget-instrument-loading-v29::before,
+.dark .panacea-home .widget-instrument-loading-v29::before{
+  content:'Loading widget…';
+  color:inherit!important;
+  font:700 13px/1.35 Inter,system-ui,-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+}
+
+html.dark .panacea-home .widget-instrument-slide-v5,
+.dark .panacea-home .widget-instrument-slide-v5{
+  background:transparent!important;
+  color:#f8fafc!important;
+}
+
+@supports selector(.a:has(.b)){
+  .panacea-home .widget-instrument-scroll-v5:has(> .widget-instrument-slide-v5[aria-hidden='false'] > .widget-instrument-loading-v29){
+    height:184px!important;
+    min-height:184px!important;
+    max-height:184px!important;
+  }
+}
