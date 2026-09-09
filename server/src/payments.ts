@@ -104,26 +104,104 @@ export function confirmPayment(req: Request, res: Response) {
   res.json({ ok: true, status: 'paid' })
 }
 
-// Real Midtrans webhook (HTTP notification). Verifies signature, credits wallet.
-export function paymentWebhook(req: Request, res: Response) {
-  const body = req.body as Record<string, string>
-  const { order_id, status_code, gross_amount, signature_key, transaction_status } = body
-  if (!order_id) return res.status(400).json({ error: 'bad_request' })
+type PaymentNotificationGate =
+  | { kind: 'accept' }
+  | { kind: 'ignore'; reason: 'status_not_success' | 'fraud_not_accepted' }
+  | { kind: 'reject'; reason: 'amount_mismatch' | 'currency_mismatch' }
+
+function cleanBodyField(body: Record<string, string>, key: string): string {
+  const value = body[key]
+  return typeof value === 'string' ? value.trim() : ''
+}
+
+/** Verify the Midtrans SHA-512 notification signature without leaking timing by early character comparison. */
+export function verifyMidtransSignature(body: Record<string, string>, serverKey = config.midtrans.serverKey): boolean {
+  const orderId = cleanBodyField(body, 'order_id')
+  const statusCode = cleanBodyField(body, 'status_code')
+  const grossAmount = cleanBodyField(body, 'gross_amount')
+  const signature = cleanBodyField(body, 'signature_key').toLowerCase()
+  if (!orderId || !statusCode || !grossAmount || !signature) return false
+
   const expected = crypto
     .createHash('sha512')
-    .update(order_id + status_code + gross_amount + config.midtrans.serverKey)
+    .update(orderId + statusCode + grossAmount + serverKey)
     .digest('hex')
-  if (signature_key !== expected) return res.status(403).json({ error: 'bad_signature' })
+  const actualBytes = Buffer.from(signature, 'utf8')
+  const expectedBytes = Buffer.from(expected, 'utf8')
+  return actualBytes.length === expectedBytes.length && crypto.timingSafeEqual(actualBytes, expectedBytes)
+}
 
-  const order = getOrder(order_id)
+/**
+ * Cross-check a signed notification against the server-created order before any
+ * state transition. Midtrans documents `gross_amount` as the transaction total,
+ * successful notifications with status_code 200, and fraud_status=accept when
+ * that field exists. A non-accepted fraud/status notification is acknowledged
+ * but must not grant value; amount/currency conflicts fail closed.
+ */
+export function paymentNotificationGate(
+  body: Record<string, string>,
+  order: Pick<Order, 'amountIdr'>,
+): PaymentNotificationGate {
+  const notifiedAmount = Number(cleanBodyField(body, 'gross_amount'))
+  if (!Number.isFinite(notifiedAmount) || Math.abs(notifiedAmount - order.amountIdr) > 0.001) {
+    return { kind: 'reject', reason: 'amount_mismatch' }
+  }
+
+  const currency = cleanBodyField(body, 'currency').toUpperCase()
+  if (currency && currency !== 'IDR') return { kind: 'reject', reason: 'currency_mismatch' }
+
+  const transactionStatus = cleanBodyField(body, 'transaction_status').toLowerCase()
+  if (transactionStatus === 'settlement' || transactionStatus === 'capture') {
+    if (cleanBodyField(body, 'status_code') !== '200') {
+      return { kind: 'ignore', reason: 'status_not_success' }
+    }
+    const fraudStatus = cleanBodyField(body, 'fraud_status').toLowerCase()
+    if (fraudStatus && fraudStatus !== 'accept') {
+      return { kind: 'ignore', reason: 'fraud_not_accepted' }
+    }
+  }
+
+  return { kind: 'accept' }
+}
+
+/** Monotonic/idempotent order transition: a paid order is never downgraded by a late failure notification. */
+export function nextPaymentOrderStatus(
+  current: Order['status'],
+  transactionStatus: string,
+  successAccepted = true,
+): Order['status'] | undefined {
+  const status = transactionStatus.trim().toLowerCase()
+  if (status === 'settlement' || status === 'capture') {
+    return successAccepted && current !== 'paid' ? 'paid' : undefined
+  }
+  if (['deny', 'cancel', 'expire'].includes(status)) {
+    return current !== 'paid' && current !== 'failed' ? 'failed' : undefined
+  }
+  return undefined
+}
+
+// Real Midtrans webhook (HTTP notification). Verifies authenticity and server-side order invariants before granting value.
+export function paymentWebhook(req: Request, res: Response) {
+  const body = req.body as Record<string, string>
+  const orderId = cleanBodyField(body, 'order_id')
+  const transactionStatus = cleanBodyField(body, 'transaction_status')
+  if (!orderId || !transactionStatus || !cleanBodyField(body, 'status_code') || !cleanBodyField(body, 'gross_amount') || !cleanBodyField(body, 'signature_key')) {
+    return res.status(400).json({ error: 'bad_request' })
+  }
+  if (!verifyMidtransSignature(body)) return res.status(403).json({ error: 'bad_signature' })
+
+  const order = getOrder(orderId)
   if (!order) return res.status(404).json({ error: 'order_not_found' })
 
-  if (transaction_status === 'settlement' || transaction_status === 'capture') {
-    if (order.status !== 'paid') {
-      setOrderStatus(order.id, 'paid')
-      fulfillOrder(order)
-    }
-  } else if (['deny', 'cancel', 'expire'].includes(transaction_status)) {
+  const gate = paymentNotificationGate(body, order)
+  if (gate.kind === 'reject') return res.status(409).json({ error: gate.reason })
+  if (gate.kind === 'ignore') return res.json({ ok: true, ignored: gate.reason })
+
+  const nextStatus = nextPaymentOrderStatus(order.status, transactionStatus, true)
+  if (nextStatus === 'paid') {
+    setOrderStatus(order.id, 'paid')
+    fulfillOrder(order)
+  } else if (nextStatus === 'failed') {
     setOrderStatus(order.id, 'failed')
   }
   res.json({ ok: true })
