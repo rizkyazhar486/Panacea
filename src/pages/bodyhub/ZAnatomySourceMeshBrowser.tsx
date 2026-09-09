@@ -25,6 +25,16 @@ const LAYER_BY_FILE: Record<string, AtlasLayerKey> = {
   'lymphoid.glb': 'lymphoid',
 }
 
+const LAYER_LABEL: Record<AtlasLayerKey, string> = {
+  surface: 'Surface',
+  skeletal: 'Skeleton',
+  muscular: 'Muscles',
+  cardiovascular: 'Cardiovascular',
+  nervous: 'Nervous',
+  visceral: 'Viscera',
+  lymphoid: 'Lymphoid',
+}
+
 const QUICK_QUERIES = ['femur', 'aorta', 'median nerve', 'rectus femoris'] as const
 const MAX_RESULTS = 36
 
@@ -46,6 +56,7 @@ export function ZAnatomySourceMeshBrowser({ onHighlight, onFocusRegion, onEnable
   const normalizedQuery = normalizeAnatomySourceName(query)
   const sourceNameCount = sourceBundles.reduce((total, bundle) => total + bundle.names.length, 0)
   const runtimeBundleCount = sourceBundles.filter((bundle) => anatomySourceNodeOrigin(bundle.file) === 'runtime').length
+  const maxBundleNames = Math.max(1, ...sourceBundles.map((bundle) => bundle.names.length))
 
   const results = useMemo<Result[]>(() => {
     if (!normalizedQuery) return []
@@ -118,6 +129,53 @@ export function ZAnatomySourceMeshBrowser({ onHighlight, onFocusRegion, onEnable
         <p className="text-[10px] leading-relaxed text-neutral-500">
           Search the original named meshes shipped with the anatomy GLBs. This is a source-name inventory, not anatomy coverage. A generated-index match proves a named mesh exists in a shipped GLB; runtime means that same bundle is currently mounted in the shared viewer.
         </p>
+
+        <div className="mt-3 rounded-2xl border border-neutral-200 bg-white p-3 dark:border-white/10 dark:bg-neutral-950">
+          <div className="flex flex-wrap items-end justify-between gap-2">
+            <div>
+              <div className="text-[9px] font-black uppercase tracking-[0.16em] text-brand">Source bundle composition</div>
+              <div className="mt-0.5 text-sm font-black text-ink dark:text-white">Named geometry inventory</div>
+            </div>
+            <div className="text-[8px] font-bold text-neutral-400">bar length = relative named-node count</div>
+          </div>
+          <div className="mt-3 grid gap-2 sm:grid-cols-2 xl:grid-cols-3">
+            {sourceBundles.map((bundle) => {
+              const layer = LAYER_BY_FILE[bundle.file]
+              const origin = anatomySourceNodeOrigin(bundle.file)
+              const width = `${Math.max(4, Math.round((bundle.names.length / maxBundleNames) * 100))}%`
+              return (
+                <button
+                  key={bundle.file}
+                  type="button"
+                  onClick={() => { if (layer) onEnableLayer?.(layer) }}
+                  disabled={!layer}
+                  className="min-h-20 rounded-xl border border-neutral-200 p-2.5 text-left transition hover:border-brand/40 disabled:cursor-default dark:border-white/10"
+                  aria-label={`${bundle.file}: ${bundle.names.length} named source nodes`}
+                >
+                  <div className="flex items-start justify-between gap-2">
+                    <div>
+                      <div className="text-[10px] font-black text-ink dark:text-white">{layer ? LAYER_LABEL[layer] : bundle.file}</div>
+                      <div className="mt-0.5 font-mono text-[8px] text-neutral-400">{bundle.file}</div>
+                    </div>
+                    <div className="text-right">
+                      <div className="text-sm font-black text-ink dark:text-white">{bundle.names.length.toLocaleString()}</div>
+                      <div className="text-[8px] text-neutral-400">named nodes</div>
+                    </div>
+                  </div>
+                  <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-neutral-100 dark:bg-white/10">
+                    <div className="h-full rounded-full bg-brand" style={{ width }} />
+                  </div>
+                  <div className={`mt-1.5 text-[8px] font-black ${origin === 'runtime' ? 'text-brand' : 'text-blue-500'}`}>
+                    {origin === 'runtime' ? 'loaded runtime' : 'generated GLB index'}
+                  </div>
+                </button>
+              )
+            })}
+          </div>
+          <p className="mt-2 text-[9px] leading-relaxed text-neutral-500">
+            Node counts compare the source-name inventories of shipped bundles only. They are not anatomical completeness, tissue volume, clinical importance, segmentation quality, or a percentage of the human body.
+          </p>
+        </div>
 
         <label className="mt-3 block text-[9px] font-black uppercase tracking-[0.16em] text-neutral-400" htmlFor="z-anatomy-source-mesh-search">Original GLTF node name</label>
         <input

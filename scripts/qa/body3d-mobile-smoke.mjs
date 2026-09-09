@@ -301,7 +301,25 @@ try {
     throw new Error('Whole-body motion inspector scientific boundary is not visible')
   }
 
-  await inspector.getByRole('button', { name: /Inspect this motion in shared 3D/i }).click()
+  const exactSourceButton = inspector.getByRole('button', { name: /Inspect \d+ exact source nodes in shared 3D/i }).first()
+  const textOnlyButton = inspector.getByRole('button', { name: 'No exact represented geometry to inspect', exact: true }).first()
+  if (!(await exactSourceButton.isVisible().catch(() => false))) {
+    const textOnly = await textOnlyButton.isVisible().catch(() => false)
+    throw new Error(textOnly
+      ? 'Knee biomechanics did not resolve an exact regional skeletal/muscular source-node match for shared 3D inspection'
+      : 'Exact-source shared 3D motion control is missing')
+  }
+  if (!(await exactSourceButton.isEnabled())) {
+    throw new Error('Exact-source shared 3D motion control is unexpectedly disabled')
+  }
+  const exactSourceButtonText = (await exactSourceButton.innerText()).trim()
+  const exactSourceMatch = exactSourceButtonText.match(/Inspect (\d+) exact source nodes in shared 3D/i)
+  const exactSourceCount = Number(exactSourceMatch?.[1] ?? 0)
+  if (!Number.isInteger(exactSourceCount) || exactSourceCount <= 0) {
+    throw new Error(`Exact-source shared 3D motion control reported invalid source-node count: ${exactSourceButtonText}`)
+  }
+
+  await exactSourceButton.click()
   await page.waitForTimeout(300)
   const postShared3dHealth = await canvasHealth(canvas)
   await assertNoFatal('Shared 3D motion inspection triggered a Body3D fatal state')
@@ -313,6 +331,7 @@ try {
     sliderObservedDeg: observedAngle,
     reactStateRendered: renderedMotionHeading === expectedMotionHeading,
     scientificBoundaryVisible: true,
+    exactSourceCount,
     applyToShared3dClicked: true,
     contextStable: postShared3dHealth.webgl && !postShared3dHealth.contextLost,
     documentScrollWidth: await page.evaluate(() => document.documentElement.scrollWidth),
