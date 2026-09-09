@@ -115,7 +115,7 @@ export const EYE_WAVE2_REQUIRED_IDS = [
   'suprachoroid', 'haller-layer', 'sattler-layer', 'choriocapillaris', 'bruch-membrane',
   'lens-capsule', 'lens-anterior-epithelium', 'lens-cortex', 'lens-nucleus', 'lens-fibers',
   'trabecular-meshwork', 'uveal-trabecular-meshwork', 'corneoscleral-trabecular-meshwork',
-  'juxtacanalicular-tissue', 'schlemm-canal',
+  'juxtacanalicular-tissue', 'schlemm-canal', 'collector-channels', 'aqueous-veins',
 ] as const
 
 export const EYE_WAVE2_SCIENTIFIC_BOUNDARY =
