@@ -9,6 +9,7 @@ const semangat = read('src/components/UbinSemangat.tsx')
 const scopedGuard = read('src/styles/widget-dark-surface-v29.css')
 const emergencyGuard = read('public/home-widget-dark-v31.css')
 const comfortGuard = read('src/styles/home-dark-comfort-v34.css')
+const activeGuard = read('src/styles/home-widget-active-v35.css')
 const index = read('index.html')
 
 test('Living Instrument mounts the active source widget, not only the filtered index', () => {
@@ -65,4 +66,22 @@ test('Global widget controls stay stable while per-widget identity remains avail
   assert.match(comfortGuard, /grid-template-columns:minmax\(0,1fr\)!important/)
   assert.match(comfortGuard, /\.widget-instrument-title-v5/)
   assert.match(comfortGuard, /white-space:normal!important/)
+})
+
+test('Home v35 keeps transient active slides compact and theme-safe', () => {
+  assert.match(comfortGuard, /@import '\.\/home-widget-active-v35\.css'/)
+  assert.match(activeGuard, /aria-hidden='false'\]:empty/)
+  assert.match(activeGuard, /widget-instrument-loading-v29/)
+  assert.match(activeGuard, /height:184px!important/)
+  assert.match(activeGuard, /max-height:184px!important/)
+  assert.match(activeGuard, /background:#090f17!important/)
+  assert.doesNotMatch(activeGuard, /svg\s*[,{]/, 'v35 must not override semantic chart/reference SVG data')
+})
+
+test('Home v35 separates mobile widget identity from global controls', () => {
+  assert.match(activeGuard, /@media\(max-width:430px\)/)
+  assert.match(activeGuard, /justify-content:space-between!important/)
+  assert.match(activeGuard, /max-width:min\(68vw,240px\)!important/)
+  assert.match(activeGuard, /widget-instrument-label-v5/)
+  assert.match(activeGuard, /font-size:11px!important/)
 })
