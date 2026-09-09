@@ -21,6 +21,8 @@ import type { RespiratoryCyclePhase } from './respiratoryAtlasContract'
 import { bioScaleCoverage, bioScaleNodeById, validateBioScaleManifest } from './bioScaleAtlas'
 import { WHOLE_BODY_BIOSCALE_ATLAS, WHOLE_BODY_BIOSCALE_SYSTEMS } from './wholeBodyBioScaleAtlas'
 import { planCrossScaleRoute, validateCrossScaleRoute } from './atlasCrossScalePlanner'
+import { compileVirtualSpecimenJourney, validateVirtualSpecimenJourney } from './atlasVirtualSpecimenCompiler'
+import { validateAtlasScaleCorridors } from './atlasScaleCorridors'
 
 export const HIGH_END_ATLAS_SYSTEMS: readonly AtlasSystemId[] = [
   'surface',
@@ -76,6 +78,8 @@ export const HIGH_END_ATLAS_CAPABILITIES = {
     'qualitative respiratory cycle overlays',
     'whole-body to cellular/subcellular/molecular route solving',
     'explicit atlas-to-cell semantic bridges',
+    'authored scale corridors for progressive semantic zoom',
+    'virtual specimen scene-stage compilation across geometry/microscopy/molecular domains',
     'fail-closed bioscale provenance and review boundaries',
     'academic-review boundary preservation',
   ] as const,
@@ -99,6 +103,7 @@ export interface HighEndAtlasFrameInput {
     fromAtlasNodeId?: string
     targetBioNodeId: string
     strictDrillDown?: boolean
+    preserveAnatomicalContext?: boolean
   }
 }
 
@@ -134,6 +139,15 @@ export function planHighEndAtlasFrame(input: HighEndAtlasFrameInput) {
       )
     : undefined
 
+  const virtualSpecimen = crossScale
+    ? compileVirtualSpecimenJourney(manifest, WHOLE_BODY_BIOSCALE_ATLAS, crossScale, {
+        viewportWidth: input.budget.viewportWidth,
+        viewportHeight: input.budget.viewportHeight,
+        devicePixelRatio: input.budget.devicePixelRatio,
+        preserveAnatomicalContext: input.crossScale?.preserveAnatomicalContext ?? true,
+      })
+    : undefined
+
   return {
     manifestId: manifest.id,
     manifestRevision: manifest.revision,
@@ -144,6 +158,7 @@ export function planHighEndAtlasFrame(input: HighEndAtlasFrameInput) {
     streaming,
     respiratory,
     crossScale,
+    virtualSpecimen,
   }
 }
 
@@ -158,6 +173,7 @@ export function highEndAtlasEngineeringReadiness() {
   const multiscaleIssues = validateMultiscaleAtlas(manifest)
   const respiratoryIssues = validateRespiratoryHighEndRuntime(manifest)
   const bioscaleIssues = validateBioScaleManifest(manifest, WHOLE_BODY_BIOSCALE_ATLAS)
+  const corridorIssues = validateAtlasScaleCorridors(manifest)
   const bioscale = bioScaleCoverage(WHOLE_BODY_BIOSCALE_ATLAS)
   const bioscaleMissingSystems = HIGH_END_ATLAS_SYSTEMS.filter((system) => !WHOLE_BODY_BIOSCALE_SYSTEMS.includes(system))
 
@@ -177,6 +193,7 @@ export function highEndAtlasEngineeringReadiness() {
       ...multiscaleIssues,
       ...respiratoryIssues,
       ...bioscaleIssues.map((issue) => `bioscale:${issue.code}:${issue.nodeId ?? 'manifest'}:${issue.message}`),
+      ...corridorIssues.map((issue) => `corridor:${issue}`),
     ],
     academicReviewRequired: true as const,
   }
@@ -202,5 +219,6 @@ export function validateHighEndAtlasFrame(input: HighEndAtlasFrameInput): string
       issues.push(...validateCrossScaleRoute(frame.crossScale, input.crossScale.strictDrillDown ?? true))
     }
   }
+  if (frame.virtualSpecimen) issues.push(...validateVirtualSpecimenJourney(frame.virtualSpecimen))
   return [...new Set(issues)]
 }
