@@ -3,6 +3,8 @@ import { useStore } from '../lib/store'
 import {
   MAX_NUTRITION_IMPORT_BYTES,
   MAX_NUTRITION_IMPORT_ENTRIES,
+  buildNutritionJournalTimeline,
+  latestNutritionJournalSnapshot,
   parseNutritionJournalJson,
   sanitizeNutritionJournal,
   serializeNutritionJournal,
@@ -11,6 +13,18 @@ import {
 interface StatusMessage {
   kind: 'idle' | 'success' | 'error'
   text: string
+}
+
+function recordedEnergyPolyline(values: number[], width = 320, height = 96) {
+  if (!values.length) return ''
+  const min = Math.min(...values)
+  const max = Math.max(...values)
+  const span = max - min
+  return values.map((value, index) => {
+    const x = values.length === 1 ? width / 2 : (index / (values.length - 1)) * width
+    const y = span === 0 ? height / 2 : height - ((value - min) / span) * (height - 16) - 8
+    return `${x.toFixed(1)},${y.toFixed(1)}`
+  }).join(' ')
 }
 
 export function NutritionDataControls() {
@@ -24,6 +38,9 @@ export function NutritionDataControls() {
     () => sanitizeNutritionJournal(state.foods, 1_000),
     [state.foods],
   )
+  const timeline = useMemo(() => buildNutritionJournalTimeline(state.foods, 7), [state.foods])
+  const latest = useMemo(() => latestNutritionJournalSnapshot(state.foods), [state.foods])
+  const energyPoints = useMemo(() => recordedEnergyPolyline(timeline.map((day) => day.kcal)), [timeline])
 
   function exportJournal() {
     const exported = serializeNutritionJournal(state.foods)
@@ -114,6 +131,54 @@ export function NutritionDataControls() {
         >
           {status.text}
         </div>
+      </section>
+
+      <section className="rounded-3xl border border-neutral-200 bg-white p-5 dark:border-white/10 dark:bg-white/[0.02]">
+        <div className="text-[9px] font-black uppercase tracking-[0.16em] text-neutral-400">Recorded-only snapshot + timeline</div>
+        {!latest ? (
+          <div className="mt-3 rounded-2xl border border-dashed border-neutral-300 p-5 text-center text-xs text-neutral-500 dark:border-white/10 dark:text-neutral-400">
+            No valid nutrition journal records yet. This panel stays empty instead of generating a sample day.
+          </div>
+        ) : (
+          <>
+            <div className="mt-3 grid gap-3 sm:grid-cols-4">
+              <div className="rounded-2xl border border-neutral-200 p-3 dark:border-white/10"><div className="text-[9px] font-black uppercase text-neutral-400">Latest date</div><div className="mt-1 text-sm font-black text-ink dark:text-white">{latest.date}</div></div>
+              <div className="rounded-2xl border border-neutral-200 p-3 dark:border-white/10"><div className="text-[9px] font-black uppercase text-neutral-400">Entries</div><div className="mt-1 text-lg font-black text-ink dark:text-white">{latest.entries}</div></div>
+              <div className="rounded-2xl border border-neutral-200 p-3 dark:border-white/10"><div className="text-[9px] font-black uppercase text-neutral-400">Recorded kcal</div><div className="mt-1 text-lg font-black text-ink dark:text-white">{Math.round(latest.kcal)}</div></div>
+              <div className="rounded-2xl border border-neutral-200 p-3 dark:border-white/10"><div className="text-[9px] font-black uppercase text-neutral-400">Recorded mass</div><div className="mt-1 text-lg font-black text-ink dark:text-white">{Math.round(latest.grams)} g</div></div>
+            </div>
+
+            <div className="mt-4 grid gap-4 lg:grid-cols-[0.9fr_1.1fr]">
+              <div className="rounded-2xl border border-neutral-200 p-3 dark:border-white/10">
+                <div className="text-[9px] font-black uppercase tracking-wide text-neutral-400">Recorded energy trend · latest {timeline.length} logged day{timeline.length === 1 ? '' : 's'}</div>
+                {timeline.length < 2 ? (
+                  <p className="mt-4 text-[11px] leading-relaxed text-neutral-500">At least two recorded dates are required for a trend line. No missing day is inserted as zero.</p>
+                ) : (
+                  <svg viewBox="0 0 320 96" role="img" aria-label={`Recorded energy totals across ${timeline.length} logged days`} className="mt-3 h-28 w-full overflow-visible text-brand">
+                    <polyline points={energyPoints} fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
+                    {energyPoints.split(' ').map((point) => {
+                      const [cx, cy] = point.split(',')
+                      return <circle key={point} cx={cx} cy={cy} r="3.5" fill="currentColor" />
+                    })}
+                  </svg>
+                )}
+                <p className="mt-2 text-[10px] leading-relaxed text-neutral-400">Descriptive journal totals only. The line is not a calorie target, energy-balance estimate or recommendation.</p>
+              </div>
+
+              <div className="rounded-2xl border border-neutral-200 p-3 dark:border-white/10">
+                <div className="text-[9px] font-black uppercase tracking-wide text-neutral-400">Latest recorded dates</div>
+                <div className="mt-2 space-y-2">
+                  {[...timeline].reverse().map((day) => (
+                    <div key={day.date} className="grid grid-cols-[1fr_auto] gap-3 rounded-xl bg-neutral-50 px-3 py-2 text-[10px] dark:bg-white/[0.03]">
+                      <div><span className="font-black text-ink dark:text-white">{day.date}</span><span className="ml-2 text-neutral-400">{day.entries} entr{day.entries === 1 ? 'y' : 'ies'}</span></div>
+                      <div className="text-right text-neutral-500">{Math.round(day.kcal)} kcal · C {Math.round(day.carbs)} g · P {Math.round(day.protein)} g · F {Math.round(day.fat)} g</div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </>
+        )}
       </section>
 
       <section className="grid gap-3 md:grid-cols-2">
