@@ -12,6 +12,7 @@ import {
   sanitizeNutritionJournal,
   serializeNutritionJournal,
 } from '../lib/nutritionJournal'
+import { summarizeNutritionEnergyTrend } from '../lib/nutritionTrend'
 
 interface StatusMessage {
   kind: 'idle' | 'success' | 'error'
@@ -51,6 +52,7 @@ export function NutritionDataControls() {
   const timeline = useMemo(() => buildNutritionJournalTimeline(state.foods, 7), [state.foods])
   const latest = useMemo(() => latestNutritionJournalSnapshot(state.foods), [state.foods])
   const comparison = useMemo(() => compareLatestNutritionJournalDays(state.foods), [state.foods])
+  const energyTrend = useMemo(() => summarizeNutritionEnergyTrend(state.foods), [state.foods])
   const energyPoints = useMemo(() => recordedEnergyPolyline(timeline.map((day) => day.kcal)), [timeline])
   const dateOptions = useMemo(
     () => [...new Set(journal.entries.map((entry) => entry.date))].sort((a, b) => b.localeCompare(a)).slice(0, 30),
@@ -187,7 +189,21 @@ export function NutritionDataControls() {
                     })}
                   </svg>
                 )}
-                <p className="mt-2 text-[10px] leading-relaxed text-neutral-400">Descriptive journal totals only. The line is not a calorie target, energy-balance estimate or recommendation.</p>
+                {energyTrend ? (
+                  <div
+                    className="mt-3 rounded-xl bg-neutral-50 px-3 py-2 text-[10px] leading-relaxed text-neutral-600 dark:bg-white/[0.03] dark:text-neutral-300"
+                    aria-label={`Recorded energy trend summary from ${energyTrend.firstDate} to ${energyTrend.latestDate}`}
+                  >
+                    <b className="text-ink dark:text-white">
+                      {energyTrend.direction === 'higher' ? 'Higher recorded total' : energyTrend.direction === 'lower' ? 'Lower recorded total' : 'No net change in recorded total'}
+                    </b>
+                    <div className="mt-1">
+                      {signed(energyTrend.deltaKcal, ' kcal')} from first to latest retained day · {signed(energyTrend.kcalPerCalendarDay, ' kcal/day')} calendar-day slope across {energyTrend.elapsedCalendarDays} day{energyTrend.elapsedCalendarDays === 1 ? '' : 's'}.
+                    </div>
+                    <div className="mt-1 text-neutral-400">Based on {energyTrend.observedDays} recorded day{energyTrend.observedDays === 1 ? '' : 's'}; missing dates are not inserted as zero.</div>
+                  </div>
+                ) : null}
+                <p className="mt-2 text-[10px] leading-relaxed text-neutral-400">Descriptive journal totals only. The line and slope are not a calorie target, energy-balance estimate, adequacy judgment or recommendation.</p>
               </div>
 
               <div className="rounded-2xl border border-neutral-200 p-3 dark:border-white/10">
