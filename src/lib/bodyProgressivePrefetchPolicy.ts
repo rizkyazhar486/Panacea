@@ -90,6 +90,12 @@ function defaultsFor(context: BodyPrefetchContext): {
   };
 }
 
+const resolveMaxConcurrent = (override: number | undefined, fallback: number): number => {
+  if (override === undefined) return fallback;
+  if (!Number.isFinite(override)) return 0;
+  return Math.max(0, Math.min(6, Math.floor(override)));
+};
+
 /**
  * Deterministic planner only. It returns IDs; callers own loading, cancellation,
  * retries and cache policy. The planner never starts polling or network work.
@@ -99,9 +105,7 @@ export function planBodyProgressivePrefetch(
   context: BodyPrefetchContext,
 ): BodyPrefetchPlan {
   const defaults = defaultsFor(context);
-  const maxConcurrent = context.maxConcurrentOverride === undefined
-    ? defaults.maxConcurrent
-    : Math.max(0, Math.min(6, Math.floor(context.maxConcurrentOverride)));
+  const maxConcurrent = resolveMaxConcurrent(context.maxConcurrentOverride, defaults.maxConcurrent);
 
   const pending = candidates
     .filter((candidate) => !candidate.alreadyResident)
