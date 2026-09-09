@@ -14,14 +14,22 @@ function jsonResponse(payload: unknown, status = 200): Response {
   })
 }
 
-// Pharmacology profile: preserve relation source, bound input, reject malformed
-// concepts/RXCUIs and survive one source failing without fabricating a result.
+// Pharmacology profile: preserve relation source + relation-source version,
+// bound input, reject malformed concepts/RXCUIs and survive one source failing
+// without fabricating a result.
 {
   const urls: string[] = []
   const longName = `aspirin ${'x'.repeat(500)}`
   const fakeFetch: typeof fetch = async (input) => {
     const url = new URL(String(input))
     urls.push(url.toString())
+
+    if (url.pathname.endsWith('/rxclass/version/MEDRT.json')) {
+      return jsonResponse({ relaSourceVersion: ' 2026.08.31 ' })
+    }
+    if (url.pathname.endsWith('/rxclass/version/ATC.json')) {
+      return jsonResponse({ relaSourceVersion: '2026_03_01' })
+    }
 
     if (url.pathname.endsWith('/rxclass/class/byDrugName.json')) {
       const source = url.searchParams.get('relaSource') ?? ''
@@ -89,11 +97,58 @@ function jsonResponse(payload: unknown, status = 200): Response {
     profile?.indikasi[0]?.relasi === 'may_treat' && profile?.indikasi[0]?.sumber === 'MEDRT',
     JSON.stringify(profile?.indikasi[0]))
 
+  ok('versi MED-RT dipertahankan sebagai provenance profil',
+    profile?.versiSumber.MEDRT === '2026.08.31', JSON.stringify(profile?.versiSumber))
+  ok('versi ATC dipertahankan sebagai provenance profil',
+    profile?.versiSumber.ATC === '2026_03_01', JSON.stringify(profile?.versiSumber))
+
   const classUrls = urls.map((raw) => new URL(raw)).filter((url) => url.pathname.includes('/rxclass/class/byDrugName.json'))
   ok('profil meminta tepat lima relation slices', classUrls.length === 5, String(classUrls.length))
   ok('drugName dibatasi sebelum semua request RxClass',
     classUrls.every((url) => (url.searchParams.get('drugName') ?? '').length <= 160),
     classUrls.map((url) => (url.searchParams.get('drugName') ?? '').length).join(','))
+
+  const versionUrls = urls.map((raw) => new URL(raw)).filter((url) => url.pathname.includes('/rxclass/version/'))
+  ok('hanya source yang punya version identifier yang diminta',
+    versionUrls.length === 2
+      && versionUrls.some((url) => url.pathname.endsWith('/MEDRT.json'))
+      && versionUrls.some((url) => url.pathname.endsWith('/ATC.json')),
+    versionUrls.map((url) => url.pathname).join(','))
+  ok('DailyMed tidak diberi version endpoint palsu',
+    !versionUrls.some((url) => url.pathname.includes('DAILYMED')),
+    versionUrls.map((url) => url.pathname).join(','))
+}
+
+// Version lookup failure must not erase otherwise valid relations. Reproducible
+// metadata is best-effort because upstream can temporarily fail; absence stays
+// explicit rather than being replaced with a guessed version.
+{
+  const fakeFetch: typeof fetch = async (input) => {
+    const url = new URL(String(input))
+    if (url.pathname.includes('/rxclass/version/')) return jsonResponse({ error: 'down' }, 503)
+    if (url.pathname.endsWith('/rxclass/class/byDrugName.json')) {
+      const source = url.searchParams.get('relaSource') ?? ''
+      if (source === 'MEDRT' && url.searchParams.get('relas') === 'has_MoA') {
+        return jsonResponse({
+          rxclassDrugInfoList: {
+            rxclassDrugInfo: [{
+              rxclassMinConceptItem: { classId: 'N0002', className: 'Reference mechanism', classType: 'MOA' },
+              rela: 'has_MoA',
+              relaSource: 'MEDRT',
+            }],
+          },
+        })
+      }
+      return jsonResponse({ rxclassDrugInfoList: { rxclassDrugInfo: [] } })
+    }
+    if (url.pathname.endsWith('/rxcui.json')) return jsonResponse({ idGroup: { rxnormId: ['1191'] } })
+    return new Response('not found', { status: 404 })
+  }
+
+  const profile = await profilFarmakologi('aspirin', fakeFetch)
+  ok('relation tetap tersedia saat endpoint versi gagal', profile?.mekanisme.length === 1)
+  ok('versi upstream yang gagal tetap kosong, tidak ditebak',
+    Object.keys(profile?.versiSumber ?? {}).length === 0, JSON.stringify(profile?.versiSumber))
 }
 
 // Ingredient list: accept only real-looking RXCUI identity, normalize whitespace,
