@@ -35,7 +35,7 @@ export default function MultisystemScaleNavigator() {
   const views = listBodyMultisystemScaleViews()
 
   return (
-    <section data-body-multisystem-scale-navigator="v1" className="rounded-2xl border border-neutral-200 bg-white/80 p-3 dark:border-white/10 dark:bg-white/5">
+    <section data-body-multisystem-scale-navigator="v1" data-selected-scale={selected.scale} className="rounded-2xl border border-neutral-200 bg-white/80 p-3 dark:border-white/10 dark:bg-white/5">
       <div className="flex flex-wrap items-start justify-between gap-2">
         <div>
           <div className="text-[9px] font-black uppercase tracking-[0.18em] text-brand">Body → RNA → brain → longevity</div>
