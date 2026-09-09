@@ -2,6 +2,7 @@ import { evaluateHdAnatomyAsset, type HdAnatomyLod } from './hdAnatomyContract'
 import type { AnatomyStreamingPlan, AnatomyStreamingPlanEntry } from '../anatomyStreamingPlanner'
 import {
   anatomyAssetCacheKey,
+  isImmutableAnatomyRevision,
   type AnatomyAssetManifestEntry,
   type AnatomyAssetPublicationTier,
 } from './assetManifest'
@@ -33,6 +34,7 @@ export function numericLodToHdLod(level: number): HdAnatomyLod {
 const LOD_RANK: Record<HdAnatomyLod, number> = { overview: 0, organ: 1, detail: 2 }
 
 function eligibleForTier(entry: AnatomyAssetManifestEntry, tier: AnatomyAssetPublicationTier) {
+  if (!isImmutableAnatomyRevision(entry.immutableRevision)) return false
   const gate = evaluateHdAnatomyAsset(entry)
   return tier === 'verified' ? gate.usableForVerifiedRendering : gate.usableForReferenceRendering
 }
@@ -50,15 +52,13 @@ function selectAsset(
       const aDistance = Math.abs(LOD_RANK[a.lod] - requestedRank)
       const bDistance = Math.abs(LOD_RANK[b.lod] - requestedRank)
       if (aDistance !== bDistance) return aDistance - bDistance
-      // Prefer a lower LOD over an unexpectedly more expensive higher LOD when
-      // both are equally distant from the requested tier.
       if (LOD_RANK[a.lod] !== LOD_RANK[b.lod]) return LOD_RANK[a.lod] - LOD_RANK[b.lod]
       return a.assetId.localeCompare(b.assetId)
     })
   return candidates[0]
 }
 
-function renderAction(streaming: AnatomyStreamingPlanEntry, asset: AnatomyAssetManifestEntry): AnatomyAssetLoadPlanEntry['action'] {
+function renderAction(streaming: AnatomyStreamingPlanEntry): AnatomyAssetLoadPlanEntry['action'] {
   if (streaming.action === 'preload') return 'preload'
   if (streaming.action === 'keep') return 'keep'
   if (streaming.action === 'upgrade' || streaming.action === 'downgrade') return 'replace'
@@ -67,7 +67,8 @@ function renderAction(streaming: AnatomyStreamingPlanEntry, asset: AnatomyAssetM
 
 /**
  * Convert geometry-level streaming intent into immutable asset requests.
- * Assets that fail the requested HD publication tier are never silently used.
+ * Assets that fail the requested HD publication tier or immutable-revision
+ * invariant are never silently used.
  */
 export function planAnatomyAssetLoads(
   streamingPlan: AnatomyStreamingPlan,
@@ -105,7 +106,7 @@ export function planAnatomyAssetLoads(
       continue
     }
 
-    const action = renderAction(streaming, asset)
+    const action = renderAction(streaming)
     totalGpuBytes += asset.estimatedGpuBytes
     totalDrawCalls += asset.estimatedDrawCalls
     entries.push({
