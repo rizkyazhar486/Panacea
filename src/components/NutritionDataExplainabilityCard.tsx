@@ -1,4 +1,7 @@
-import { NUTRITION_DATA_EXPLAINABILITY_STEPS } from '../lib/nutritionDataExplainability'
+import {
+  NUTRITION_DATA_EXPLAINABILITY_STEPS,
+  NUTRITION_PLAIN_LANGUAGE_GUIDE,
+} from '../lib/nutritionDataExplainability'
 
 /**
  * Explain the existing Nutrition Data software pipeline without creating a
@@ -15,6 +18,15 @@ export function NutritionDataExplainabilityCard() {
       <p className="mt-2 max-w-3xl text-[11px] leading-relaxed text-neutral-500 dark:text-neutral-400">
         This trace explains the software path used by the existing Nutrition Data tab. It is deliberately separate from scientific validation of a nutrient source and from clinical interpretation.
       </p>
+
+      <details className="mt-4 rounded-2xl border border-emerald-300/40 bg-emerald-50/50 p-3 dark:border-emerald-300/20 dark:bg-emerald-400/[0.04]">
+        <summary className="cursor-pointer text-[10px] font-black text-emerald-800 dark:text-emerald-100">In simple words</summary>
+        <ul className="mt-2 space-y-1.5 text-[10px] leading-relaxed text-emerald-800 dark:text-emerald-100" aria-label="Plain-language nutrition data guide">
+          {NUTRITION_PLAIN_LANGUAGE_GUIDE.map((item) => (
+            <li key={item.id}>• {item.text}</li>
+          ))}
+        </ul>
+      </details>
 
       <ol className="mt-4 grid gap-2 md:grid-cols-2" aria-label="Nutrition data processing steps">
         {NUTRITION_DATA_EXPLAINABILITY_STEPS.map((step) => (
