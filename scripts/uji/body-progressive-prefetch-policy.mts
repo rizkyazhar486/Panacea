@@ -1,0 +1,56 @@
+import assert from 'node:assert/strict';
+import {
+  planBodyProgressivePrefetch,
+  type BodyAssetCandidate,
+} from '../../src/lib/bodyProgressivePrefetchPolicy.ts';
+
+const candidates: BodyAssetCandidate[] = [
+  { assetId: 'visceral-selected', estimatedTransferMb: 3, intent: 'required-now', selected: true, adjacentToSelection: false, alreadyResident: false },
+  { assetId: 'cardiovascular-adjacent', estimatedTransferMb: 2, intent: 'likely-next', selected: false, adjacentToSelection: true, alreadyResident: false },
+  { assetId: 'skeletal-likely', estimatedTransferMb: 4, intent: 'likely-next', selected: false, adjacentToSelection: false, alreadyResident: false },
+  { assetId: 'muscular-idle', estimatedTransferMb: 5, intent: 'idle-opportunistic', selected: false, adjacentToSelection: false, alreadyResident: false },
+  { assetId: 'resident-surface', estimatedTransferMb: 6, intent: 'required-now', selected: false, adjacentToSelection: false, alreadyResident: true },
+];
+
+const mobile = planBodyProgressivePrefetch(candidates, { network: 'normal', memory: 'standard', viewportWidth: 390 });
+assert.deepEqual(mobile.loadNow, ['visceral-selected']);
+assert.deepEqual(mobile.prefetchNext, ['cardiovascular-adjacent']);
+assert.ok(mobile.deferred.includes('skeletal-likely'));
+assert.ok(!mobile.loadNow.includes('resident-surface'));
+assert.equal(mobile.maxConcurrent, 2);
+assert.equal(mobile.transferBudgetMb, 5);
+
+const saveData = planBodyProgressivePrefetch(candidates, { network: 'save-data', memory: 'standard', viewportWidth: 390 });
+assert.deepEqual(saveData.loadNow, ['visceral-selected']);
+assert.deepEqual(saveData.prefetchNext, []);
+assert.equal(saveData.maxConcurrent, 1);
+assert.equal(saveData.transferBudgetMb, 0);
+assert.equal(saveData.reason, 'save-data');
+
+const offline = planBodyProgressivePrefetch(candidates, { network: 'offline', memory: 'low', viewportWidth: 390 });
+assert.deepEqual(offline.loadNow, []);
+assert.deepEqual(offline.prefetchNext, []);
+assert.equal(offline.maxConcurrent, 0);
+assert.equal(offline.reason, 'offline');
+
+const lowMemory = planBodyProgressivePrefetch(candidates, { network: 'normal', memory: 'low', viewportWidth: 1024 });
+assert.deepEqual(lowMemory.loadNow, ['visceral-selected']);
+assert.deepEqual(lowMemory.prefetchNext, []);
+assert.equal(lowMemory.maxConcurrent, 1);
+assert.equal(lowMemory.reason, 'low-memory');
+
+const deterministicA = planBodyProgressivePrefetch(candidates, { network: 'normal', memory: 'high', viewportWidth: 1440 });
+const deterministicB = planBodyProgressivePrefetch([...candidates].reverse(), { network: 'normal', memory: 'high', viewportWidth: 1440 });
+assert.deepEqual(deterministicA, deterministicB);
+assert.ok(deterministicA.maxConcurrent <= 4);
+assert.ok(deterministicA.transferBudgetMb <= 24);
+
+const invalidTransfer = planBodyProgressivePrefetch([
+  { assetId: 'required', estimatedTransferMb: 1, intent: 'required-now', selected: true, adjacentToSelection: false, alreadyResident: false },
+  { assetId: 'unknown-size', estimatedTransferMb: Number.NaN, intent: 'likely-next', selected: false, adjacentToSelection: true, alreadyResident: false },
+], { network: 'normal', memory: 'high', viewportWidth: 1440 });
+assert.deepEqual(invalidTransfer.loadNow, ['required']);
+assert.deepEqual(invalidTransfer.prefetchNext, []);
+assert.ok(invalidTransfer.deferred.includes('unknown-size'));
+
+console.log('body-progressive-prefetch-policy: bounded deterministic loading policy verified');
