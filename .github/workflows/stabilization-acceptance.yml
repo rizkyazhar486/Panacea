@@ -47,6 +47,16 @@ jobs:
       - name: Install mobile browser smoke runner
         run: |
           npm install --no-save --no-package-lock @playwright/test@1.55.0
+          # GitHub's Ubuntu runner can include the unrelated Google Chrome apt
+          # source. A transient checksum mismatch there must not block Playwright
+          # Chromium's own system-dependency installation.
+          for source in /etc/apt/sources.list.d/*.list /etc/apt/sources.list.d/*.sources; do
+            [ -f "$source" ] || continue
+            if grep -q 'dl.google.com/linux/chrome-stable' "$source"; then
+              echo "Disabling unrelated Google Chrome apt source: $source"
+              sudo mv "$source" "$source.panacea-disabled"
+            fi
+          done
           npx playwright install --with-deps chromium
 
       - name: Start frontend preview
