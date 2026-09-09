@@ -139,10 +139,10 @@ export function MultiscaleScaleRail({ bridge, initialNodeId, onOpenDestination }
             )}
           </div>
 
-          {active.destination && (
+          {active.destination && onOpenDestination && (
             <button
               type="button"
-              onClick={() => onOpenDestination?.(active)}
+              onClick={() => onOpenDestination(active)}
               className="mt-3 min-h-11 rounded-full border border-brand px-3 text-[10px] font-black text-brand transition hover:bg-brand hover:text-white"
             >
               Open {active.destination.replaceAll('-', ' ')} →
