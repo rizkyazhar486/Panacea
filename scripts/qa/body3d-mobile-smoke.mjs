@@ -301,7 +301,19 @@ try {
     throw new Error('Whole-body motion inspector scientific boundary is not visible')
   }
 
-  await inspector.getByRole('button', { name: /Inspect this motion in shared 3D/i }).click()
+  const shared3dButton = inspector.getByRole('button', {
+    name: /Inspect \d+ exact source nodes in shared 3D/i,
+  })
+  await shared3dButton.waitFor({ state: 'visible', timeout: 5_000 })
+  if (await shared3dButton.isDisabled()) {
+    throw new Error('Whole-body motion inspector exact-source handoff is disabled despite represented geometry')
+  }
+  const shared3dButtonText = (await shared3dButton.innerText()).trim()
+  const exactSourceCount = Number(shared3dButtonText.match(/Inspect\s+(\d+)\s+exact source nodes/i)?.[1] ?? 0)
+  if (!Number.isInteger(exactSourceCount) || exactSourceCount <= 0) {
+    throw new Error(`Whole-body motion inspector did not expose a positive exact-source count: ${shared3dButtonText}`)
+  }
+  await shared3dButton.click()
   await page.waitForTimeout(300)
   const postShared3dHealth = await canvasHealth(canvas)
   await assertNoFatal('Shared 3D motion inspection triggered a Body3D fatal state')
@@ -313,6 +325,7 @@ try {
     sliderObservedDeg: observedAngle,
     reactStateRendered: renderedMotionHeading === expectedMotionHeading,
     scientificBoundaryVisible: true,
+    exactSourceNodeCount: exactSourceCount,
     applyToShared3dClicked: true,
     contextStable: postShared3dHealth.webgl && !postShared3dHealth.contextLost,
     documentScrollWidth: await page.evaluate(() => document.documentElement.scrollWidth),
