@@ -263,7 +263,7 @@ export function HealthProfile() {
     </Field>
   )
 
-  if (loading) return <div className="mx-auto max-w-2xl py-16 text-center text-sm text-neutral-500">Loading health data…</div>
+  if (loading) return <div role="status" aria-live="polite" className="mx-auto max-w-2xl py-16 text-center text-sm text-neutral-500">Loading health data…</div>
 
   return (
     <div className="mx-auto max-w-2xl space-y-5 pb-24">
@@ -272,11 +272,11 @@ export function HealthProfile() {
           subtitle={backendEnabled ? 'Saved on the server per account — follows you across all devices' : 'Saved on this device (server not active)'} />
         <Prosa kelas="mt-1 text-[11px] leading-relaxed text-neutral-500">Apple Watch syncs directly; Garmin and WHOOP are imported from a file you export and upload; everything else can be filled in by hand. Whatever you enter here flows straight into every fitness and longevity calculator in the app.</Prosa>
         <div className="mt-3">
-          <div className="text-xs font-semibold uppercase tracking-wide text-neutral-500">Data Source</div>
-          <div className="mt-1.5 flex flex-wrap gap-1.5">
+          <div id="health-data-source-label" className="text-xs font-semibold uppercase tracking-wide text-neutral-500">Data Source</div>
+          <div role="group" aria-labelledby="health-data-source-label" className="mt-1.5 flex flex-wrap gap-1.5">
             {SOURCES.map((s) => (
-              <button key={s} onClick={() => u({ source: s })}
-                className={'rounded-full px-3 py-1.5 text-[11px] font-bold transition ' + (p.source === s ? 'bg-brand text-white' : 'bg-neutral-100 text-neutral-500')}>
+              <button key={s} type="button" aria-pressed={p.source === s} onClick={() => u({ source: s })}
+                className={'rounded-full px-3 py-1.5 text-[11px] font-bold transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/40 focus-visible:ring-offset-2 ' + (p.source === s ? 'bg-brand text-white' : 'bg-neutral-100 text-neutral-500')}>
                 {s}
               </button>
             ))}
@@ -306,9 +306,9 @@ export function HealthProfile() {
         <div className="mt-3 flex flex-wrap items-center gap-2">
           <input ref={fileRef} type="file" accept=".xml,.csv,.json,.jpg,.jpeg,.png,.webp,text/xml,text/csv,application/json,image/*" className="hidden" onChange={(e) => onImport(e.target.files?.[0])} />
           <Button onClick={() => fileRef.current?.click()} className="!px-4">Choose export file…</Button>
-          <button onClick={exportJson} className="rounded-xl bg-neutral-100 px-4 py-2 text-xs font-bold text-neutral-600 transition hover:bg-neutral-200">Download JSON</button>
-          <button onClick={exportCsv} className="rounded-xl bg-neutral-100 px-4 py-2 text-xs font-bold text-neutral-600 transition hover:bg-neutral-200">Download history CSV</button>
-          {note && <span className="w-full text-[11px] font-semibold text-brand-dark">{note}</span>}
+          <button type="button" onClick={exportJson} className="rounded-xl bg-neutral-100 px-4 py-2 text-xs font-bold text-neutral-600 transition hover:bg-neutral-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/40 focus-visible:ring-offset-2">Download JSON</button>
+          <button type="button" onClick={exportCsv} className="rounded-xl bg-neutral-100 px-4 py-2 text-xs font-bold text-neutral-600 transition hover:bg-neutral-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/40 focus-visible:ring-offset-2">Download history CSV</button>
+          {note && <span role="status" aria-live="polite" className="w-full text-[11px] font-semibold text-brand-dark">{note}</span>}
         </div>
       </Card>
 
@@ -369,8 +369,10 @@ export function HealthProfile() {
       <div className="sticky bottom-4 z-10">
         <Card className="!p-3 flex items-center justify-between gap-3 shadow-lg">
           <div className="min-w-0 text-[11px] text-neutral-500">
-            {savedAt ? <span className="flex items-center gap-1 font-semibold text-brand-dark"><IconCheck size={13} /> Saved {new Date(savedAt).toLocaleString('en-US', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}</span> : 'Not saved yet'}
-            {err && <span className="mt-0.5 block text-amber-600">{err}</span>}
+            <span role="status" aria-live="polite">
+              {savedAt ? <span className="flex items-center gap-1 font-semibold text-brand-dark"><IconCheck size={13} /> Saved {new Date(savedAt).toLocaleString('en-US', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}</span> : 'Not saved yet'}
+            </span>
+            {err && <span role="alert" className="mt-0.5 block text-amber-600">{err}</span>}
           </div>
           <Button onClick={save} disabled={saving} className="shrink-0">{saving ? 'Saving…' : 'Save'}</Button>
         </Card>
@@ -478,7 +480,11 @@ function TrendChart({ history }: { history: Snapshot[] }) {
   return (
     <Card className="!p-5">
       <SectionTitle icon={<IconActivity size={20} />} title="Trends" subtitle={`${history.length} records saved`} />
-      <div className="mt-3 h-56">
+      <div
+        role="img"
+        aria-label={`Recorded health trend chart with ${history.length} saved records${active.length ? ` showing ${active.map((s) => s.name).join(', ')}` : ' and no recorded series to display'}.`}
+        className="mt-3 h-56"
+      >
         <ResponsiveContainer width="100%" height="100%">
           <LineChart data={data} margin={{ top: 5, right: 8, left: -18, bottom: 0 }}>
             <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
@@ -494,7 +500,7 @@ function TrendChart({ history }: { history: Snapshot[] }) {
       <div className="mt-2 flex flex-wrap justify-center gap-3">
         {active.map((s) => (
           <span key={s.key} className="flex items-center gap-1 text-[10px] font-semibold text-neutral-500">
-            <span className="h-2 w-2 rounded-full" style={{ background: s.color }} />{s.name}
+            <span aria-hidden="true" className="h-2 w-2 rounded-full" style={{ background: s.color }} />{s.name}
           </span>
         ))}
       </div>
