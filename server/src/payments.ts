@@ -53,11 +53,30 @@ function channels(method: string): string[] {
   return ['credit_card'] // Visa / Mastercard
 }
 
+/**
+ * Preserve the existing integer-floor behavior for ordinary numeric top-ups,
+ * but fail closed before persistence when coercion produces a non-finite value
+ * or when the PNC/IDR multiplication would leave JavaScript's safe-integer
+ * range. Fixed-price purchases bypass this helper because their IDR amount is
+ * server-owned.
+ */
+export function normalizeTopUpPnc(value: unknown, tokenToIdr: number): number | undefined {
+  const numeric = Number(value)
+  if (!Number.isFinite(numeric) || numeric < 1) return undefined
+  const pnc = Math.floor(numeric)
+  if (!Number.isSafeInteger(pnc)) return undefined
+  if (!Number.isFinite(tokenToIdr) || tokenToIdr <= 0) return undefined
+  if (!Number.isSafeInteger(pnc * tokenToIdr)) return undefined
+  return pnc
+}
+
 export async function createPayment(req: Request, res: Response) {
   const user = (req as Request & { user: User }).user
   const { amountPnc, method, purpose } = req.body as { amountPnc?: number; method?: string; purpose?: string }
   const isFixed = !!purpose && purpose in FIXED_PRICE
-  const pnc = isFixed ? 0 : Math.max(1, Math.floor(Number(amountPnc) || 0))
+  const normalizedPnc = isFixed ? 0 : normalizeTopUpPnc(amountPnc, config.tokenToIdr)
+  if (normalizedPnc === undefined) return res.status(400).json({ error: 'invalid_amount' })
+  const pnc = normalizedPnc
   const baseIdr = isFixed ? FIXED_PRICE[purpose!] : pnc * config.tokenToIdr
   // Early-adopter promo: first 25 emails get 75% off everything (PNC still full).
   const early = isEarlyAdopter(user.id)
