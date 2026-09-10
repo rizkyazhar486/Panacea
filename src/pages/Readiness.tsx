@@ -270,7 +270,16 @@ export function Readiness() {
           <div className="w-24"><Field label="Minutes"><input className={inputClass} type="number" min={1} value={wMin} onChange={(event) => setWMin(Number(event.target.value))} /></Field></div>
           <div className="flex-1">
             <Field label={`Session RPE ${wRpe}/10`}>
-              <input type="range" min={1} max={10} value={wRpe} onChange={(event) => setWRpe(Number(event.target.value))} className="w-full" />
+              <input
+                type="range"
+                min={1}
+                max={10}
+                value={wRpe}
+                aria-label="Session RPE"
+                aria-valuetext={`${wRpe} of 10`}
+                onChange={(event) => setWRpe(Number(event.target.value))}
+                className="w-full"
+              />
             </Field>
           </div>
           <button
