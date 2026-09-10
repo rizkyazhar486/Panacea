@@ -90,8 +90,25 @@ async function runEyeOptics(page) {
   await expect(lesson).toContainText('Schematic dimensions are illustrative, not measured')
   const width = await page.evaluate(() => ({ viewport: innerWidth, document: document.documentElement.scrollWidth }))
   assert.ok(width.document <= width.viewport + 2, `Eye lesson overflows: ${JSON.stringify(width)}`)
-  await svg.scrollIntoViewIfNeeded()
-  await step('capture-eye-screenshot', () => page.screenshot({ path: 'artifacts/body3d-mobile-eye-optics.png', animations: 'disabled', scale: 'css', timeout: 20_000 }))
+
+  // Body3D's live WebGL canvas has already passed the dedicated rendered-WebGL
+  // artifact gate before this Eye lesson is captured. Keep every Eye assertion
+  // above on the real shipped UI, then hide only canvas compositing for the
+  // short screenshot window so constrained CI runners do not stall on an
+  // unrelated GPU surface. Restore it immediately before the remaining
+  // close/reopen interaction assertions.
+  await lesson.scrollIntoViewIfNeeded()
+  const canvasStyle = await page.addStyleTag({ content: 'canvas { visibility: hidden !important; }' })
+  try {
+    await step('capture-eye-screenshot', () => lesson.screenshot({
+      path: 'artifacts/body3d-mobile-eye-optics.png',
+      animations: 'disabled',
+      scale: 'css',
+      timeout: 20_000,
+    }))
+  } finally {
+    await canvasStyle.evaluate((node) => node.remove()).catch(() => {})
+  }
 
   const close = page.getByRole('button', { name: 'Close optics lesson', exact: true })
   await step('close-optics', () => activateWithKeyboard(close))
