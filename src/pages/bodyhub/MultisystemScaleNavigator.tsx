@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { lazy, Suspense, useMemo, useState } from 'react'
 import {
   getBodyMultisystemReferenceBoundary,
   getBodyMultisystemScaleView,
@@ -6,6 +6,8 @@ import {
   listBodyMultisystemScaleViews,
 } from '../../lib/bodyMultisystemScaleAdapter'
 import type { KnowledgeScale } from '../../lib/multisystemKnowledgeGraph'
+
+const Ocular4DAtlas = lazy(() => import('../../components/digital-twin/Ocular4DAtlas'))
 
 const SCALE_GROUPS: readonly { label: string; scales: readonly KnowledgeScale[] }[] = [
   { label: 'Body', scales: ['whole-body', 'system', 'organ'] },
@@ -29,6 +31,7 @@ const REPRESENTATION_LABEL = {
 
 export default function MultisystemScaleNavigator() {
   const [scale, setScale] = useState<KnowledgeScale>('whole-body')
+  const [eyeOpen, setEyeOpen] = useState(false)
   const selected = getBodyMultisystemScaleView(scale)
   const domains = useMemo(() => listBodyMultisystemDomains(scale), [scale])
   const boundary = getBodyMultisystemReferenceBoundary()
@@ -44,6 +47,32 @@ export default function MultisystemScaleNavigator() {
         </div>
         <div className="rounded-full border border-neutral-200 px-2 py-1 text-[9px] font-bold text-neutral-500 dark:border-white/10">{views.length} scales</div>
       </div>
+
+      <div className="mt-3 rounded-2xl border border-sky-200 bg-sky-50/70 p-3 dark:border-sky-300/20 dark:bg-sky-300/[.06]">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <div className="text-[9px] font-black uppercase tracking-[0.16em] text-sky-700 dark:text-sky-300">Current organ benchmark</div>
+            <div className="mt-1 text-sm font-black text-neutral-950 dark:text-white">Eye 4D Gold Standard</div>
+            <p className="mt-1 max-w-2xl text-[10px] leading-relaxed text-neutral-600 dark:text-neutral-300">Open the ocular atlas directly inside Body Exposure to inspect the globe, optical media, retina, visual pathway and mapped source anatomy without leaving the whole-body learning flow.</p>
+          </div>
+          <button
+            type="button"
+            aria-expanded={eyeOpen}
+            onClick={() => setEyeOpen((value) => !value)}
+            className="min-h-11 shrink-0 rounded-xl border border-sky-300 bg-white px-4 text-[10px] font-black text-sky-800 shadow-sm transition hover:bg-sky-100 dark:border-sky-300/30 dark:bg-white/5 dark:text-sky-200 dark:hover:bg-white/10"
+          >
+            {eyeOpen ? 'Close Eye 4D' : 'Open Eye 4D'}
+          </button>
+        </div>
+      </div>
+
+      {eyeOpen && (
+        <div className="mt-3 overflow-hidden rounded-2xl border border-sky-200 bg-white p-2 dark:border-sky-300/20 dark:bg-[#080c10] sm:p-3">
+          <Suspense fallback={<div role="status" className="flex min-h-40 items-center justify-center text-xs font-bold text-neutral-500">Loading Eye 4D atlas…</div>}>
+            <Ocular4DAtlas />
+          </Suspense>
+        </div>
+      )}
 
       <div className="mt-3 space-y-2">
         {SCALE_GROUPS.map((group) => (
