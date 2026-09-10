@@ -6,11 +6,17 @@ export interface DicomSliceItem {
   citra: Citra
 }
 
+export type DicomGroupIdentity = 'dicom-series-uid' | 'fallback-signature'
+
 export interface DicomDisplayGroup {
   id: string
   label: string
   modality: string
   description?: string
+  studyInstanceUid?: string
+  seriesInstanceUid?: string
+  frameOfReferenceUid?: string
+  identity: DicomGroupIdentity
   rows: number
   columns: number
   slices: DicomSliceItem[]
@@ -28,10 +34,7 @@ function spacingKey(citra: Citra): string {
   return `${spacing[0].toFixed(4)}x${spacing[1].toFixed(4)}`
 }
 
-function displaySignature(citra: Citra): string {
-  // This is deliberately NOT called a SeriesInstanceUID. Older Panacea DICOM
-  // metadata does not yet expose that UID, so this only separates obviously
-  // different user-loaded acquisitions for safer display.
+function fallbackDisplaySignature(citra: Citra): string {
   return [
     clean(citra.modalitas).toUpperCase() || 'OT',
     clean(citra.deskripsiSeri).toLowerCase() || 'unnamed',
@@ -39,6 +42,15 @@ function displaySignature(citra: Citra): string {
     spacingKey(citra),
     citra.bingkai === 1 ? 'single-frame' : `frames-${citra.bingkai}`,
   ].join('|')
+}
+
+function groupKey(citra: Citra): { key: string; identity: DicomGroupIdentity } {
+  const seriesUid = clean(citra.seriesInstanceUid)
+  if (seriesUid) {
+    const studyUid = clean(citra.studyInstanceUid) || 'study-unspecified'
+    return { key: `uid:${studyUid}|${seriesUid}`, identity: 'dicom-series-uid' }
+  }
+  return { key: `fallback:${fallbackDisplaySignature(citra)}`, identity: 'fallback-signature' }
 }
 
 function stableId(signature: string): string {
@@ -51,25 +63,29 @@ function stableId(signature: string): string {
 }
 
 export function kelompokkanDicomUntukTampilan(items: readonly DicomSliceItem[]): DicomDisplayGroup[] {
-  const map = new Map<string, DicomSliceItem[]>()
+  const map = new Map<string, { identity: DicomGroupIdentity; slices: DicomSliceItem[] }>()
   for (const item of items) {
-    const key = displaySignature(item.citra)
-    const existing = map.get(key)
-    if (existing) existing.push(item)
-    else map.set(key, [item])
+    const grouping = groupKey(item.citra)
+    const existing = map.get(grouping.key)
+    if (existing) existing.slices.push(item)
+    else map.set(grouping.key, { identity: grouping.identity, slices: [item] })
   }
 
   return [...map.entries()]
-    .map(([signature, slices], index) => {
-      const ordered = urutkanSeri(slices)
+    .map(([signature, entry], index) => {
+      const ordered = urutkanSeri(entry.slices)
       const first = ordered[0].citra
       const mpr = buatVolumeMpr(ordered.map((item) => item.citra))
       const description = clean(first.deskripsiSeri) || undefined
       return {
-        id: stableId(`${signature}|${index}`),
+        id: stableId(signature),
         label: description || `${first.modalitas || 'OT'} acquisition ${index + 1}`,
         modality: first.modalitas || 'OT',
         description,
+        studyInstanceUid: first.studyInstanceUid,
+        seriesInstanceUid: first.seriesInstanceUid,
+        frameOfReferenceUid: first.frameOfReferenceUid,
+        identity: entry.identity,
         rows: first.baris,
         columns: first.kolom,
         slices: ordered,
@@ -84,4 +100,4 @@ export function kelompokkanDicomUntukTampilan(items: readonly DicomSliceItem[]):
 }
 
 export const BATAS_KELOMPOK_DICOM =
-  'Loaded images are separated into display groups using modality, description, matrix, spacing and frame count. This is a safety convenience, not proof of DICOM SeriesInstanceUID identity; Panacea still validates a stack before linked orthogonal viewing.'
+  'When SeriesInstanceUID is present, Panacea groups slices by exact DICOM series identity. Files without that UID use a conservative modality/description/matrix/spacing/frame fallback and are still validated before linked orthogonal viewing.'
