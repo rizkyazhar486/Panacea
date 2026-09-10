@@ -96,56 +96,22 @@ async function runEyeOptics(page) {
   // which also includes the live WebGL canvas and can exceed Playwright's
   // screenshot timeout on constrained CI runners. All interaction, geometry,
   // overflow, and content assertions above remain unchanged.
-  const lessonMarkup = await lesson.evaluate((element) => {
-    const clone = element.cloneNode(true)
-    const originals = [element, ...element.querySelectorAll('input')]
-    const clones = [clone, ...clone.querySelectorAll('input')]
-    originals.forEach((source, index) => {
-      if (source instanceof HTMLInputElement) clones[index].setAttribute('value', source.value)
-    })
-    return clone.outerHTML
-  })
-  const captureCss = `
-    * { box-sizing: border-box; }
-    body { margin: 0; background: #05090d; color: #e5eef5; font: 12px/1.45 Arial, sans-serif; }
-    section { width: 390px; padding: 16px; border: 1px solid #334155; border-radius: 24px; background: #080c10; }
-    section > div:first-child { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 12px; }
-    h3 { margin: 4px 0; font-size: 18px; }
-    p { margin: 4px 0; color: #b8c5d1; }
-    svg { display: block; width: 100%; height: auto; margin: 14px 0; }
-    button, article { border: 1px solid #475569; border-radius: 14px; background: #111827; color: #e5eef5; padding: 10px; }
-    button { margin: 4px 4px 4px 0; text-align: left; }
-    article { margin-top: 10px; }
-    label { display: flex; justify-content: space-between; margin-top: 10px; font-weight: 700; }
-    input[type="range"] { width: 100%; }
-    a { color: #a5b4fc; }
-  `
-  const capturePage = await page.context().newPage()
+  const captureBox = await lesson.boundingBox()
+  assert.ok(captureBox && captureBox.width > 0 && captureBox.height > 0, 'Eye lesson needs a visible capture box')
+  const cdp = await page.context().newCDPSession(page)
   try {
-    await capturePage.setViewportSize({ width: 390, height: 844 })
-    await capturePage.setContent(`<!doctype html><html><head><meta name="viewport" content="width=device-width,initial-scale=1"><style>${captureCss}</style></head><body>${lessonMarkup}</body></html>`)
-    const captureLesson = capturePage.locator('section').first()
-    await expect(captureLesson).toBeVisible()
-    const captureBox = await captureLesson.boundingBox()
-    assert.ok(captureBox && captureBox.width > 0 && captureBox.height > 0, 'Eye lesson needs a visible capture box')
-    await capturePage.evaluate(() => document.fonts.ready)
-    const cdp = await capturePage.context().newCDPSession(capturePage)
-    try {
-      const screenshot = await step('capture-eye-screenshot', () => Promise.race([
-        cdp.send('Page.captureScreenshot', {
-          format: 'png',
-          fromSurface: true,
-          captureBeyondViewport: true,
-          clip: { x: captureBox.x, y: captureBox.y, width: captureBox.width, height: captureBox.height, scale: 1 },
-        }),
-        new Promise((_, reject) => setTimeout(() => reject(new Error('Eye optics screenshot exceeded 20 seconds')), 20_000)),
-      ]))
-      await writeFile('artifacts/body3d-mobile-eye-optics.png', Buffer.from(screenshot.data, 'base64'))
-    } finally {
-      await cdp.detach()
-    }
+    const screenshot = await step('capture-eye-screenshot', () => Promise.race([
+      cdp.send('Page.captureScreenshot', {
+        format: 'png',
+        fromSurface: true,
+        captureBeyondViewport: true,
+        clip: { x: captureBox.x, y: captureBox.y, width: captureBox.width, height: captureBox.height, scale: 1 },
+      }),
+      new Promise((_, reject) => setTimeout(() => reject(new Error('Eye optics screenshot exceeded 20 seconds')), 20_000)),
+    ]))
+    await writeFile('artifacts/body3d-mobile-eye-optics.png', Buffer.from(screenshot.data, 'base64'))
   } finally {
-    await capturePage.close()
+    await cdp.detach()
   }
 
   const close = page.getByRole('button', { name: 'Close optics lesson', exact: true })
