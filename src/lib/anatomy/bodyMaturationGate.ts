@@ -1,4 +1,6 @@
 import type { AtlasManifest, AtlasNode, AtlasSystemId } from './atlasKernel'
+import { INDEXED_ANATOMY_SOURCE_NODE_SNAPSHOT } from '../anatomySourceNodeRegistry'
+import { buildSystemMaturityAdmissionReport } from './systemMaturityAdmission'
 
 export const BODY_MATURATION_ORDER = [
   'whole-body',
@@ -51,6 +53,7 @@ export type BodyMaturationBlockerCode =
   | 'duplicate-root'
   | 'wrong-scale'
   | 'geometry-not-shipped'
+  | 'source-admission-failed'
   | 'schema-not-authoritative'
   | 'upstream-incomplete'
 
@@ -82,6 +85,12 @@ function rootNodes(manifest: AtlasManifest, id: string): readonly AtlasNode[] {
 
 function auditSystemStage(manifest: AtlasManifest): BodyMaturationBlocker[] {
   const blockers: BodyMaturationBlocker[] = []
+  const admissionBySystem = new Map(
+    buildSystemMaturityAdmissionReport(manifest, INDEXED_ANATOMY_SOURCE_NODE_SNAPSHOT)
+      .admissions
+      .map((entry) => [entry.system, entry] as const),
+  )
+
   for (const system of REQUIRED_WHOLE_BODY_SYSTEMS) {
     const id = `system:${system}`
     const matches = rootNodes(manifest, id)
@@ -100,6 +109,19 @@ function auditSystemStage(manifest: AtlasManifest): BodyMaturationBlocker[] {
     }
     if (node.geometryStatus !== 'shipped') {
       blockers.push({ stage: 'system', code: 'geometry-not-shipped', requirement: node.geometryStatus, nodeId: node.id, message: `${node.label} is ${node.geometryStatus}; whole-body system coverage is not complete.` })
+      continue
+    }
+
+    const admission = admissionBySystem.get(system)
+    if (!admission?.admitted) {
+      const status = admission?.status ?? 'missing-admission'
+      blockers.push({
+        stage: 'system',
+        code: 'source-admission-failed',
+        requirement: status,
+        nodeId: node.id,
+        message: `${node.label} cannot complete whole-body system coverage until same-frame source admission succeeds (${status}).`,
+      })
     }
   }
   return blockers
