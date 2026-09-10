@@ -1,4 +1,4 @@
-import type { Citra } from './dicom'
+import { koordinatIrisPasien, type Citra } from './dicom'
 
 export type BidangMpr = 'source' | 'cross-row' | 'cross-column'
 
@@ -13,6 +13,9 @@ export interface VolumeMpr {
   minimum: number
   maksimum: number
   terbalik: boolean
+  seriesInstanceUid?: string
+  frameOfReferenceUid?: string
+  orientasiPasien?: Citra['orientasiPasien']
 }
 
 export interface IrisanMpr {
@@ -44,11 +47,43 @@ function deskripsiNormal(value?: string): string | undefined {
   return text || undefined
 }
 
+function normalDariOrientasi(orientation?: Citra['orientasiPasien']): [number, number, number] | undefined {
+  if (!orientation) return undefined
+  const [rx, ry, rz, cx, cy, cz] = orientation
+  const nx = ry * cz - rz * cy
+  const ny = rz * cx - rx * cz
+  const nz = rx * cy - ry * cx
+  const length = Math.hypot(nx, ny, nz)
+  if (!Number.isFinite(length) || length < 1e-6) return undefined
+  return [nx / length, ny / length, nz / length]
+}
+
+function arahSama(a?: Citra['orientasiPasien'], b?: Citra['orientasiPasien']): boolean {
+  if (!a || !b) return false
+  const rowDot = a[0] * b[0] + a[1] * b[1] + a[2] * b[2]
+  const colDot = a[3] * b[3] + a[4] * b[4] + a[5] * b[5]
+  return rowDot > 0.999 && colDot > 0.999
+}
+
+function nilaiIdentitas(items: readonly Citra[], key: 'seriesInstanceUid' | 'frameOfReferenceUid'): {
+  value?: string
+  partial: boolean
+  mixed: boolean
+} {
+  const values = items.map((item) => item[key]?.trim()).filter((value): value is string => Boolean(value))
+  const unique = new Set(values)
+  return {
+    value: unique.size === 1 ? values[0] : undefined,
+    partial: values.length > 0 && values.length !== items.length,
+    mixed: unique.size > 1,
+  }
+}
+
 /**
  * Builds a strictly local 3-D voxel stack from already-decoded DICOM slices.
  * It never invents missing slices, interpolates anatomy, or claims diagnostic MPR.
- * Incomplete identity metadata is handled conservatively: obvious mixed-series or
- * irregular stacks are rejected instead of being rendered as one continuous volume.
+ * Identity, orientation and spacing conflicts fail closed rather than creating a
+ * visually plausible but spatially false volume.
  */
 export function buatVolumeMpr(citra: readonly Citra[]): HasilVolumeMpr {
   if (citra.length < 3) return { ok: false, alasan: 'Load at least 3 slices from one compatible series for orthogonal views.' }
@@ -56,9 +91,34 @@ export function buatVolumeMpr(citra: readonly Citra[]): HasilVolumeMpr {
   const pertama = citra[0]
   if (pertama.bingkai !== 1) return { ok: false, alasan: 'Orthogonal views currently require single-frame DICOM slices.' }
 
-  const deskripsi = new Set(citra.map((item) => deskripsiNormal(item.deskripsiSeri)).filter((value): value is string => Boolean(value)))
-  if (deskripsi.size > 1) {
-    return { ok: false, alasan: 'More than one series description is present. Select a single MRI/CT series before creating linked orthogonal views.' }
+  const seriesIdentity = nilaiIdentitas(citra, 'seriesInstanceUid')
+  if (seriesIdentity.partial) {
+    return { ok: false, alasan: 'Only some slices contain a SeriesInstanceUID. Panacea will not guess whether they belong to one acquisition.' }
+  }
+  if (seriesIdentity.mixed) {
+    return { ok: false, alasan: 'More than one DICOM SeriesInstanceUID is present. Select a single series for linked orthogonal views.' }
+  }
+
+  const frameIdentity = nilaiIdentitas(citra, 'frameOfReferenceUid')
+  if (frameIdentity.partial) {
+    return { ok: false, alasan: 'Only some slices contain a FrameOfReferenceUID. Spatial continuity is not assumed.' }
+  }
+  if (frameIdentity.mixed) {
+    return { ok: false, alasan: 'Slices use different DICOM frames of reference and are not combined into one volume.' }
+  }
+
+  // Description is a fallback separation aid only when exact SeriesInstanceUID
+  // is absent. Exact DICOM series identity takes precedence when present.
+  if (!seriesIdentity.value) {
+    const descriptions = new Set(citra.map((item) => deskripsiNormal(item.deskripsiSeri)).filter((value): value is string => Boolean(value)))
+    if (descriptions.size > 1) {
+      return { ok: false, alasan: 'More than one series description is present. Select a single MRI/CT acquisition before creating linked orthogonal views.' }
+    }
+  }
+
+  const orientationCount = citra.filter((item) => item.orientasiPasien).length
+  if (orientationCount > 0 && orientationCount !== citra.length) {
+    return { ok: false, alasan: 'Only some slices contain Image Orientation (Patient). Panacea will not guess the missing spatial orientation.' }
   }
 
   for (const item of citra) {
@@ -74,6 +134,9 @@ export function buatVolumeMpr(citra: readonly Citra[]): HasilVolumeMpr {
     if (item.terbalik !== pertama.terbalik) {
       return { ok: false, alasan: 'Slices use different grayscale photometric interpretation and are not combined.' }
     }
+    if (orientationCount === citra.length && !arahSama(pertama.orientasiPasien, item.orientasiPasien)) {
+      return { ok: false, alasan: 'Slice orientation changes inside the selected stack. A straight orthogonal reformat would be spatially misleading.' }
+    }
 
     const a = pertama.jarakPiksel
     const b = item.jarakPiksel
@@ -82,31 +145,40 @@ export function buatVolumeMpr(citra: readonly Citra[]): HasilVolumeMpr {
     }
   }
 
-  const posisiSemua = citra.map((item) => item.posisiZ)
-  const posisi = posisiSemua.filter((value): value is number => value != null && Number.isFinite(value))
-  const jarakPosisi: number[] = []
+  const coordinatesAlongNormal = citra.map((item) => koordinatIrisPasien(item))
+  const allNormalCoordinates = coordinatesAlongNormal.every((value): value is number => value != null && Number.isFinite(value))
+  const fallbackZ = citra.map((item) => item.posisiZ)
+  const anyFallbackZ = fallbackZ.some((value) => value != null && Number.isFinite(value))
+  const allFallbackZ = fallbackZ.every((value): value is number => value != null && Number.isFinite(value))
 
-  if (posisi.length > 0 && posisi.length !== citra.length) {
+  if (!allNormalCoordinates && anyFallbackZ && !allFallbackZ) {
     return { ok: false, alasan: 'Only some slices contain patient-position coordinates. Panacea will not guess the missing slice positions.' }
   }
 
-  if (posisi.length === citra.length) {
-    for (let i = 1; i < posisi.length; i++) {
-      const delta = Math.abs(posisi[i] - posisi[i - 1])
-      if (delta <= 1e-4) return { ok: false, alasan: 'Two or more slices share the same recorded position, so the stack is not treated as a continuous volume.' }
-      jarakPosisi.push(delta)
+  const spatialCoordinates = allNormalCoordinates
+    ? coordinatesAlongNormal as number[]
+    : allFallbackZ
+      ? fallbackZ as number[]
+      : []
+  const spatialDistances: number[] = []
+
+  if (spatialCoordinates.length === citra.length) {
+    for (let i = 1; i < spatialCoordinates.length; i++) {
+      const delta = Math.abs(spatialCoordinates[i] - spatialCoordinates[i - 1])
+      if (delta <= 1e-4) return { ok: false, alasan: 'Two or more slices share the same recorded spatial position, so the stack is not treated as a continuous volume.' }
+      spatialDistances.push(delta)
     }
 
-    const typical = median(jarakPosisi)
+    const typical = median(spatialDistances)
     if (typical != null) {
       const tolerance = Math.max(0.15, typical * 0.12)
-      if (jarakPosisi.some((delta) => Math.abs(delta - typical) > tolerance)) {
+      if (spatialDistances.some((delta) => Math.abs(delta - typical) > tolerance)) {
         return { ok: false, alasan: 'Slice spacing is irregular. Orthogonal reconstruction is withheld instead of stretching or inventing anatomy.' }
       }
     }
   }
 
-  const jarakIrisMm = median(jarakPosisi)
+  const jarakIrisMm = median(spatialDistances)
     ?? median(citra.map((item) => item.tebalIrisMm ?? Number.NaN))
     ?? 1
   const jarakBarisMm = median(citra.map((item) => item.jarakPiksel?.[0] ?? Number.NaN)) ?? 1
@@ -135,6 +207,9 @@ export function buatVolumeMpr(citra: readonly Citra[]): HasilVolumeMpr {
       minimum,
       maksimum,
       terbalik: pertama.terbalik,
+      seriesInstanceUid: seriesIdentity.value,
+      frameOfReferenceUid: frameIdentity.value,
+      orientasiPasien: orientationCount === citra.length ? pertama.orientasiPasien : undefined,
     },
   }
 }
@@ -212,19 +287,42 @@ export function jendelakanMpr(
   return keluar
 }
 
-export function labelBidangMpr(deskripsiSeri?: string): Record<BidangMpr, string> {
+function labelsFromOrientation(orientation: Citra['orientasiPasien']): Record<BidangMpr, string> | undefined {
+  const normal = normalDariOrientasi(orientation)
+  if (!normal) return undefined
+  const [x, y, z] = normal.map(Math.abs)
+  // Only use a canonical anatomical name when the plane is close enough to a
+  // principal patient axis. Oblique acquisitions stay explicitly labelled oblique.
+  const dominant = Math.max(x, y, z)
+  if (dominant < 0.9) return {
+    source: 'Oblique source plane',
+    'cross-row': 'Orthogonal A',
+    'cross-column': 'Orthogonal B',
+  }
+  if (z === dominant) return { source: 'Axial', 'cross-row': 'Coronal-like', 'cross-column': 'Sagittal-like' }
+  if (y === dominant) return { source: 'Coronal', 'cross-row': 'Axial-like', 'cross-column': 'Sagittal-like' }
+  return { source: 'Sagittal', 'cross-row': 'Axial-like', 'cross-column': 'Coronal-like' }
+}
+
+export function labelBidangMpr(
+  deskripsiSeri?: string,
+  orientasiPasien?: Citra['orientasiPasien'],
+): Record<BidangMpr, string> {
+  const byOrientation = labelsFromOrientation(orientasiPasien)
+  if (byOrientation) return byOrientation
+
   const text = (deskripsiSeri ?? '').toLowerCase()
   if (/\b(ax|axial|trans|transverse)\b/.test(text)) {
-    return { source: 'Axial', 'cross-row': 'Coronal', 'cross-column': 'Sagittal' }
+    return { source: 'Axial', 'cross-row': 'Coronal-like', 'cross-column': 'Sagittal-like' }
   }
   if (/\b(cor|coronal)\b/.test(text)) {
-    return { source: 'Coronal', 'cross-row': 'Axial', 'cross-column': 'Sagittal' }
+    return { source: 'Coronal', 'cross-row': 'Axial-like', 'cross-column': 'Sagittal-like' }
   }
   if (/\b(sag|sagittal)\b/.test(text)) {
-    return { source: 'Sagittal', 'cross-row': 'Axial', 'cross-column': 'Coronal' }
+    return { source: 'Sagittal', 'cross-row': 'Axial-like', 'cross-column': 'Coronal-like' }
   }
   return { source: 'Source plane', 'cross-row': 'Orthogonal A', 'cross-column': 'Orthogonal B' }
 }
 
 export const BATAS_MPR =
-  'Orthogonal views are local voxel reformats of one compatible loaded series. Panacea rejects obvious mixed or irregular stacks, never invents missing anatomy or findings, and only uses anatomical plane names when the source series explicitly identifies its plane.'
+  'Orthogonal views are local voxel reformats of one compatible loaded series. Panacea validates available SeriesInstanceUID, frame of reference, orientation and spacing, never invents missing anatomy or findings, and marks simple row/column reconstructions as “-like” rather than implying a diagnostic reformat.'
