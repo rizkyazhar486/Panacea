@@ -1,5 +1,4 @@
 import assert from 'node:assert/strict'
-import { writeFile } from 'node:fs/promises'
 import { expect } from '@playwright/test'
 
 // Reuse the authenticated mobile Body smoke browser and production build.
@@ -92,26 +91,65 @@ async function runEyeOptics(page) {
   const width = await page.evaluate(() => ({ viewport: innerWidth, document: document.documentElement.scrollWidth }))
   assert.ok(width.document <= width.viewport + 2, `Eye lesson overflows: ${JSON.stringify(width)}`)
   await lesson.scrollIntoViewIfNeeded()
-  // Capture only the verified Eye lesson instead of compositing the entire page,
-  // which also includes the live WebGL canvas and can exceed Playwright's
-  // screenshot timeout on constrained CI runners. All interaction, geometry,
-  // overflow, and content assertions above remain unchanged.
-  const captureBox = await lesson.boundingBox()
-  assert.ok(captureBox && captureBox.width > 0 && captureBox.height > 0, 'Eye lesson needs a visible capture box')
-  const cdp = await page.context().newCDPSession(page)
+
+  // Verify the real shipped lesson first, then move only artifact transport onto
+  // a static page with no WebGL context. This avoids asking SwiftShader to
+  // composite the live Body3D canvas while preserving the exact verified DOM
+  // state and computed presentation of the Eye lesson for the visual artifact.
+  const lessonSnapshot = await lesson.evaluate((element) => {
+    const clone = element.cloneNode(true)
+    const originals = [element, ...element.querySelectorAll('*')]
+    const copies = [clone, ...clone.querySelectorAll('*')]
+
+    originals.forEach((source, index) => {
+      const copy = copies[index]
+      if (!(source instanceof Element) || !(copy instanceof Element)) return
+      const computed = getComputedStyle(source)
+      for (const property of computed) {
+        copy.style.setProperty(property, computed.getPropertyValue(property), computed.getPropertyPriority(property))
+      }
+      if (source instanceof HTMLInputElement && copy instanceof HTMLInputElement) {
+        copy.value = source.value
+        copy.setAttribute('value', source.value)
+      }
+    })
+
+    const rect = element.getBoundingClientRect()
+    return {
+      markup: clone.outerHTML,
+      width: rect.width,
+      height: rect.height,
+    }
+  })
+  assert.ok(lessonSnapshot.width > 0 && lessonSnapshot.height > 0, 'Eye lesson needs a visible capture box')
+
+  const capturePage = await page.context().newPage()
   try {
-    const screenshot = await step('capture-eye-screenshot', () => Promise.race([
-      cdp.send('Page.captureScreenshot', {
-        format: 'png',
-        fromSurface: true,
-        captureBeyondViewport: true,
-        clip: { x: captureBox.x, y: captureBox.y, width: captureBox.width, height: captureBox.height, scale: 1 },
-      }),
-      new Promise((_, reject) => setTimeout(() => reject(new Error('Eye optics screenshot exceeded 20 seconds')), 20_000)),
-    ]))
-    await writeFile('artifacts/body3d-mobile-eye-optics.png', Buffer.from(screenshot.data, 'base64'))
+    await capturePage.setViewportSize({
+      width: 390,
+      height: Math.max(844, Math.ceil(lessonSnapshot.height) + 32),
+    })
+    await capturePage.setContent(
+      `<!doctype html><html><head><meta name="viewport" content="width=device-width,initial-scale=1"></head><body style="margin:0;background:#05090d">${lessonSnapshot.markup}</body></html>`,
+      { waitUntil: 'domcontentloaded' },
+    )
+    const captureLesson = capturePage.locator('section').first()
+    await expect(captureLesson).toBeVisible()
+    await expect(captureLesson).toContainText('Phase 3/7')
+    await expect(captureLesson).toContainText('Schematic dimensions are illustrative, not measured')
+    await step('capture-eye-screenshot', () => captureLesson.screenshot({
+      path: 'artifacts/body3d-mobile-eye-optics.png',
+      animations: 'disabled',
+      scale: 'css',
+      timeout: 20_000,
+    }))
   } finally {
-    await cdp.detach()
+    // Cleanup is best-effort so a broken renderer process cannot hold the
+    // acceptance job after the bounded visual gate has already decided.
+    await Promise.race([
+      capturePage.close().catch(() => undefined),
+      new Promise((resolve) => setTimeout(resolve, 2_000)),
+    ])
   }
 
   const close = page.getByRole('button', { name: 'Close optics lesson', exact: true })
