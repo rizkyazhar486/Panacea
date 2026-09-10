@@ -1,4 +1,5 @@
 import assert from 'node:assert/strict'
+import { writeFile } from 'node:fs/promises'
 import { expect } from '@playwright/test'
 
 // Reuse the authenticated mobile Body smoke browser and production build.
@@ -125,7 +126,22 @@ async function runEyeOptics(page) {
     await expect(captureLesson).toBeVisible()
     const captureBox = await captureLesson.boundingBox()
     assert.ok(captureBox && captureBox.width > 0 && captureBox.height > 0, 'Eye lesson needs a visible capture box')
-    await step('capture-eye-screenshot', () => capturePage.screenshot({ path: 'artifacts/body3d-mobile-eye-optics.png', clip: captureBox, animations: 'disabled', scale: 'css', timeout: 20_000 }))
+    await capturePage.evaluate(() => document.fonts.ready)
+    const cdp = await capturePage.context().newCDPSession(capturePage)
+    try {
+      const screenshot = await step('capture-eye-screenshot', () => Promise.race([
+        cdp.send('Page.captureScreenshot', {
+          format: 'png',
+          fromSurface: true,
+          captureBeyondViewport: true,
+          clip: { x: captureBox.x, y: captureBox.y, width: captureBox.width, height: captureBox.height, scale: 1 },
+        }),
+        new Promise((_, reject) => setTimeout(() => reject(new Error('Eye optics screenshot exceeded 20 seconds')), 20_000)),
+      ]))
+      await writeFile('artifacts/body3d-mobile-eye-optics.png', Buffer.from(screenshot.data, 'base64'))
+    } finally {
+      await cdp.detach()
+    }
   } finally {
     await capturePage.close()
   }
