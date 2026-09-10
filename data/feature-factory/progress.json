@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-09-10T06:18:00.000Z",
+  "updatedAt": "2026-09-10T10:13:00.000Z",
   "items": {
     "ff-recovery-stress-checklist": {
       "status": "done",
@@ -9,6 +9,14 @@
       "note": "Records the already-promoted Recovery/Stress checklist capability from PR #1150. The implementation derives checklist state only from valid recorded HRV, resting-heart-rate, sleep, context-journal and workout observations; missing observations remain missing; workout load is the transparent recorded-data product session RPE × recorded minutes; no synthetic readiness/stress score, proprietary provider score, forecast, diagnosis or training prescription is introduced.",
       "academicReview": {"status":"not-applicable-no-material-claim","sourceBasis":[],"aiUse":"ai-assisted","note":"This ledger entry records an already-promoted descriptive recorded-data software capability. It does not add a biomedical threshold, diagnostic interpretation, treatment recommendation, population norm, provider-derived score or patient-specific inference. Provider-derived WHOOP/Oura/Garmin scores remain outside this local checklist unless separately admitted through reviewed provenance-bearing adapters.","humanReview":{"status":"not-recorded","reviewer":null,"credentials":null,"reviewedAt":null}},
       "updatedAt": "2026-09-10T06:18:00.000Z"
+    },
+    "ff-recovery-stress-snapshot": {
+      "status": "done",
+      "commit": "40a30ba7e318dac57eaaf167b62db3f914e677c5",
+      "paths": ["src/pages/Readiness.tsx", "scripts/uji/feature-factory-recovery-stress-snapshot.mts"],
+      "note": "Records the promoted Recovery/Stress snapshot maturity guard from PR #1162. The existing /readiness surface remains a bounded recorded-data snapshot for HRV (ms), resting HR (bpm), sleep hours, source/timestamps, missing-as-missing behavior, arithmetic means only after at least three prior observations, and transparent recorded load as session RPE × recorded minutes. No synthetic readiness score, provider-score reproduction, diagnosis, forecast or training prescription is introduced.",
+      "academicReview": {"status":"not-applicable-no-material-claim","sourceBasis":[],"aiUse":"ai-assisted","note":"This ledger entry records deterministic software/provenance safeguards around an already-existing recorded-data presentation. It adds no biomedical threshold, population norm, diagnostic interpretation, treatment recommendation, provider-derived score or patient-specific inference.","humanReview":{"status":"not-recorded","reviewer":null,"credentials":null,"reviewedAt":null}},
+      "updatedAt": "2026-09-10T10:13:00.000Z"
     },
     "ff-health-profile-export": {
       "status": "done",
