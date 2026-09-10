@@ -95,17 +95,25 @@ async function runEyeOptics(page) {
   // which also includes the live WebGL canvas and can exceed Playwright's
   // screenshot timeout on constrained CI runners. All interaction, geometry,
   // overflow, and content assertions above remain unchanged.
-  const lessonMarkup = await lesson.evaluate((element) => element.outerHTML)
-  const stylesheetMarkup = await page.locator('link[rel="stylesheet"], style').evaluateAll((nodes) => nodes.map((node) => {
-    if (node.tagName !== 'LINK') return node.outerHTML
-    const clone = node.cloneNode()
-    clone.href = node.href
+  const lessonMarkup = await lesson.evaluate((element) => {
+    const clone = element.cloneNode(true)
+    const originals = [element, ...element.querySelectorAll('*')]
+    const clones = [clone, ...clone.querySelectorAll('*')]
+    originals.forEach((source, index) => {
+      const target = clones[index]
+      const computed = getComputedStyle(source)
+      for (const property of computed) target.style.setProperty(property, computed.getPropertyValue(property), computed.getPropertyPriority(property))
+      if (source instanceof HTMLInputElement) {
+        target.setAttribute('value', source.value)
+        if (source.checked) target.setAttribute('checked', '')
+      }
+    })
     return clone.outerHTML
-  }).join(''))
+  })
   const capturePage = await page.context().newPage()
   try {
     await capturePage.setViewportSize({ width: 390, height: 844 })
-    await capturePage.setContent(`<!doctype html><html><head><meta name="viewport" content="width=device-width,initial-scale=1">${stylesheetMarkup}</head><body>${lessonMarkup}</body></html>`, { waitUntil: 'load' })
+    await capturePage.setContent(`<!doctype html><html><head><meta name="viewport" content="width=device-width,initial-scale=1"></head><body style="margin:0">${lessonMarkup}</body></html>`, { waitUntil: 'load' })
     await capturePage.evaluate(() => document.fonts.ready)
     const captureLesson = capturePage.locator('section').first()
     await expect(captureLesson).toBeVisible()
