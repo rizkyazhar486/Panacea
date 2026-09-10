@@ -1,0 +1,14 @@
+interface:
+  display_name: Astra Foreman
+  short_description: Direct coding workers and verify completed work
+  default_prompt: Use $astra-foreman to take this engineering task from evidence through
+    implementation, verification, and required closeout.
+  icon_small: assets/icon.svg
+  icon_large: assets/icon.svg
+policy:
+  products:
+  - chatgpt
+  - codex
+  - api
+  - atlas
+  allow_implicit_invocation: true
