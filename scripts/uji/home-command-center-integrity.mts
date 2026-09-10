@@ -50,9 +50,10 @@ assert.match(home, /home-mobile-stability\.css/, 'Home must load its touch/reduc
 assert.match(mobileStability, /@media \(hover: none\) and \(pointer: coarse\)/, 'Touch devices must retain the compositor reduction boundary')
 assert.match(mobileStability, /backdrop-filter: none !important/, 'Touch Home must disable stacked backdrop filters')
 assert.match(mobileStability, /\.home-icon-button[\s\S]*width: 44px !important;[\s\S]*height: 44px !important;/, 'Primary icon controls must keep a 44x44 touch floor')
-assert.match(mobileStability, /\.home-primary-action,[\s\S]*\.home-secondary-action,[\s\S]*min-height: 44px !important;/, 'Hero actions must keep a 44px touch-height floor')
+assert.match(mobileStability, /\.home-primary-action:focus-visible,[\s\S]*\.home-secondary-action:focus-visible[\s\S]*outline: 3px solid/, 'Hero CTA controls must retain a visible keyboard focus ring')
+assert.match(mobileStability, /\.home-primary-action,[\s\S]*\.home-secondary-action,[\s\S]*\.home-pill-button,[\s\S]*\.home-text-link,[\s\S]*\.home-details-summary[\s\S]*min-height: 44px !important;/, 'Primary Home touch controls and text links must keep a 44px touch-height floor')
 assert.match(mobileStability, /prefers-reduced-motion: reduce/, 'Home must respect reduced-motion preferences')
 assert.match(deferred, /Load 3D preview/, '3D anatomy preview must remain explicit opt-in')
 assert.doesNotMatch(deferred, /setActivated\(true\).*useEffect/s, '3D preview must not auto-activate from an effect')
 
-console.log('Home command center integrity: routes resolve, cross-tab daily state is narrow/fail-closed, provenance is honest, loading states are announced accessibly, primary touch targets keep a 44px floor, mobile stability is active, heavy sections stay deferred, and 3D remains opt-in.')
+console.log('Home command center integrity: routes resolve, cross-tab daily state is narrow/fail-closed, provenance is honest, loading states are announced accessibly, keyboard focus remains visible, touch targets keep a 44px floor, mobile stability is active, heavy sections stay deferred, and 3D remains opt-in.')
