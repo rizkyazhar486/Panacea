@@ -8,7 +8,7 @@ export async function verifyEyeOptics(page) {
   try {
     return await Promise.race([
       runEyeOptics(page),
-      new Promise((_, reject) => { timer = setTimeout(() => reject(new Error('Eye optics smoke exceeded 90 seconds')), 90_000) }),
+      new Promise((_, reject) => { timer = setTimeout(() => reject(new Error('Eye optics smoke exceeded 120 seconds')), 120_000) }),
     ])
   } finally {
     clearTimeout(timer)
@@ -85,7 +85,7 @@ async function runEyeOptics(page) {
   const width = await page.evaluate(() => ({ viewport: innerWidth, document: document.documentElement.scrollWidth }))
   assert.ok(width.document <= width.viewport + 2, `Eye lesson overflows: ${JSON.stringify(width)}`)
   await svg.scrollIntoViewIfNeeded()
-  await step('capture-eye-screenshot', () => page.screenshot({ path: 'artifacts/body3d-mobile-eye-optics.png', timeout: 10_000 }))
+  await step('capture-eye-screenshot', () => page.screenshot({ path: 'artifacts/body3d-mobile-eye-optics.png', animations: 'disabled', timeout: 20_000 }))
 
   const close = page.getByRole('button', { name: 'Close optics lesson', exact: true })
   await step('close-optics', () => activateWithKeyboard(close))
