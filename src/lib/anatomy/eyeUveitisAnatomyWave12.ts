@@ -14,7 +14,7 @@ export interface EyeUveitisAnatomyRecord {
   id: string
   label: string
   context: EyeUveitisAnatomicalContext
-  primaryInflammationSite: string
+  primaryInflammationSites: readonly string[]
   anatomicalTargets: readonly string[]
   displayOrder: number
   evidence: readonly EyeUveitisEvidence[]
@@ -47,7 +47,7 @@ export const EYE_UVEITIS_ANATOMY_WAVE12: readonly EyeUveitisAnatomyRecord[] = [
     id: 'uveitis-anterior-anatomical-context',
     label: 'Anterior uveitis is anatomically centered in the anterior chamber, with iris and ciliary-body context',
     context: 'anterior',
-    primaryInflammationSite: 'anterior-chamber',
+    primaryInflammationSites: ['anterior-chamber'],
     anatomicalTargets: ['anterior-chamber', 'iris', 'ciliary-body'],
     displayOrder: 1,
     evidence: [
@@ -68,7 +68,7 @@ export const EYE_UVEITIS_ANATOMY_WAVE12: readonly EyeUveitisAnatomyRecord[] = [
     id: 'uveitis-intermediate-anatomical-context',
     label: 'Intermediate uveitis is anatomically centered in the vitreous, with pars-plana context',
     context: 'intermediate',
-    primaryInflammationSite: 'vitreous-body',
+    primaryInflammationSites: ['vitreous-body'],
     anatomicalTargets: ['vitreous-body', 'pars-plana'],
     displayOrder: 2,
     evidence: [
@@ -89,7 +89,7 @@ export const EYE_UVEITIS_ANATOMY_WAVE12: readonly EyeUveitisAnatomyRecord[] = [
     id: 'uveitis-posterior-anatomical-context',
     label: 'Posterior uveitis is anatomically centered in the retina or choroid',
     context: 'posterior',
-    primaryInflammationSite: 'retina',
+    primaryInflammationSites: ['retina', 'choroid'],
     anatomicalTargets: ['retina', 'choroid'],
     displayOrder: 3,
     evidence: [
@@ -121,10 +121,10 @@ const ALLOWED_TARGETS = new Set([
   'choroid',
 ])
 
-const EXPECTED_PRIMARY_SITE: Readonly<Record<EyeUveitisAnatomicalContext, string>> = {
-  anterior: 'anterior-chamber',
-  intermediate: 'vitreous-body',
-  posterior: 'retina',
+const EXPECTED_PRIMARY_SITES: Readonly<Record<EyeUveitisAnatomicalContext, readonly string[]>> = {
+  anterior: ['anterior-chamber'],
+  intermediate: ['vitreous-body'],
+  posterior: ['retina', 'choroid'],
 }
 
 export function validateEyeUveitisAnatomyWave12(
@@ -143,9 +143,10 @@ export function validateEyeUveitisAnatomyWave12(
     if (!record.anatomicalTargets.length || record.anatomicalTargets.some((target) => !ALLOWED_TARGETS.has(target))) {
       errors.push(`target:${record.id}`)
     }
+    const expectedSites = EXPECTED_PRIMARY_SITES[record.context]
     if (
-      record.primaryInflammationSite !== EXPECTED_PRIMARY_SITE[record.context] ||
-      !record.anatomicalTargets.includes(record.primaryInflammationSite)
+      record.primaryInflammationSites.join(',') !== expectedSites.join(',') ||
+      record.primaryInflammationSites.some((site) => !record.anatomicalTargets.includes(site))
     ) errors.push(`primary-site:${record.id}`)
     if (!record.evidence.length || record.evidence.some((item) => !/^PMID:\d+$/.test(item.locator))) {
       errors.push(`evidence:${record.id}`)
