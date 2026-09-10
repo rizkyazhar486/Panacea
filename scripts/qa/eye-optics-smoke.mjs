@@ -92,10 +92,10 @@ async function runEyeOptics(page) {
   const width = await page.evaluate(() => ({ viewport: innerWidth, document: document.documentElement.scrollWidth }))
   assert.ok(width.document <= width.viewport + 2, `Eye lesson overflows: ${JSON.stringify(width)}`)
   await lesson.scrollIntoViewIfNeeded()
-  // Capture only the verified Eye lesson instead of compositing the entire page,
-  // which also includes the live WebGL canvas and can exceed Playwright's
-  // screenshot timeout on constrained CI runners. All interaction, geometry,
-  // overflow, and content assertions above remain unchanged.
+  // Capture only the verified Eye lesson instead of compositing the entire page.
+  // The capture command itself is bounded; cleanup is deliberately non-blocking
+  // so a wedged Chromium/SwiftShader CDP session cannot hold Stabilization open
+  // after the visual gate has already timed out and failed closed.
   const captureBox = await lesson.boundingBox()
   assert.ok(captureBox && captureBox.width > 0 && captureBox.height > 0, 'Eye lesson needs a visible capture box')
   const cdp = await page.context().newCDPSession(page)
@@ -111,7 +111,7 @@ async function runEyeOptics(page) {
     ]))
     await writeFile('artifacts/body3d-mobile-eye-optics.png', Buffer.from(screenshot.data, 'base64'))
   } finally {
-    await cdp.detach()
+    void cdp.detach().catch(() => undefined)
   }
 
   const close = page.getByRole('button', { name: 'Close optics lesson', exact: true })
