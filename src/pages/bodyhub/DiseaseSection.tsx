@@ -34,7 +34,7 @@ export function DiseaseSection({ onPickDiagnosis }: Props) {
 
   return (
     <div className="space-y-2.5">
-      <form onSubmit={(e) => { e.preventDefault(); cari() }} className="flex gap-2">
+      <form aria-busy={loading} onSubmit={(e) => { e.preventDefault(); cari() }} className="flex gap-2">
         <input
           value={q}
           onChange={(e) => setQ(e.target.value)}
