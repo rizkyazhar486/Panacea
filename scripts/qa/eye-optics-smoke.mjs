@@ -95,25 +95,25 @@ async function runEyeOptics(page) {
   // which also includes the live WebGL canvas and can exceed Playwright's
   // screenshot timeout on constrained CI runners. All interaction, geometry,
   // overflow, and content assertions above remain unchanged.
-  const lessonMarkup = await lesson.evaluate((element) => {
-    const clone = element.cloneNode(true)
-    const originals = [element, ...element.querySelectorAll('*')]
-    const clones = [clone, ...clone.querySelectorAll('*')]
-    originals.forEach((source, index) => {
-      const target = clones[index]
-      const computed = getComputedStyle(source)
-      for (const property of computed) target.style.setProperty(property, computed.getPropertyValue(property), computed.getPropertyPriority(property))
-      if (source instanceof HTMLInputElement) {
-        target.setAttribute('value', source.value)
-        if (source.checked) target.setAttribute('checked', '')
-      }
-    })
-    return clone.outerHTML
-  })
+  const snapshot = await lesson.evaluate((element) => ({
+    markup: element.outerHTML,
+    inputValues: [...element.querySelectorAll('input')].map((input) => input.value),
+    htmlClass: document.documentElement.className,
+    bodyClass: document.body.className,
+  }))
+  const stylesheetText = await page.evaluate(() => [...document.styleSheets].flatMap((sheet) => {
+    try {
+      return [...sheet.cssRules].map((rule) => rule.cssText)
+    } catch {
+      return []
+    }
+  }).join('\n'))
   const capturePage = await page.context().newPage()
   try {
     await capturePage.setViewportSize({ width: 390, height: 844 })
-    await capturePage.setContent(`<!doctype html><html><head><meta name="viewport" content="width=device-width,initial-scale=1"></head><body style="margin:0">${lessonMarkup}</body></html>`, { waitUntil: 'load' })
+    await capturePage.setContent(`<!doctype html><html class="${snapshot.htmlClass}"><head><meta name="viewport" content="width=device-width,initial-scale=1"></head><body class="${snapshot.bodyClass}" style="margin:0">${snapshot.markup}</body></html>`)
+    await capturePage.addStyleTag({ content: stylesheetText })
+    await capturePage.locator('input').evaluateAll((inputs, values) => inputs.forEach((input, index) => { input.value = values[index] ?? input.value }), snapshot.inputValues)
     await capturePage.evaluate(() => document.fonts.ready)
     const captureLesson = capturePage.locator('section').first()
     await expect(captureLesson).toBeVisible()
