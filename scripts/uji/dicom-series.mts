@@ -31,10 +31,11 @@ const input = [
 ]
 
 const groups = kelompokkanDicomUntukTampilan(input)
-assert.equal(groups.length, 2, 'obviously different MRI descriptions should not be mixed')
+assert.equal(groups.length, 2, 'obviously different MRI descriptions should not be mixed when UID is unavailable')
 
 const pd = groups.find((group) => group.label === 'Axial PD FS')
 assert.ok(pd)
+assert.equal(pd.identity, 'fallback-signature')
 assert.equal(pd.slices.length, 3)
 assert.deepEqual(pd.slices.map((item) => item.citra.posisiZ), [0, 3, 6])
 assert.equal(pd.linkedPlanesAvailable, true)
@@ -43,6 +44,29 @@ const t1 = groups.find((group) => group.label === 'Sagittal T1')
 assert.ok(t1)
 assert.equal(t1.slices.length, 3)
 assert.equal(t1.linkedPlanesAvailable, true)
+
+const exactUid = kelompokkanDicomUntukTampilan([
+  { nama: 'uid-a.dcm', citra: citra(0, 'Display label A', { studyInstanceUid: '1.2.10', seriesInstanceUid: '1.2.10.1' }) },
+  { nama: 'uid-b.dcm', citra: citra(1, 'Display label B', { studyInstanceUid: '1.2.10', seriesInstanceUid: '1.2.10.1' }) },
+  { nama: 'uid-c.dcm', citra: citra(2, 'Display label C', { studyInstanceUid: '1.2.10', seriesInstanceUid: '1.2.10.1' }) },
+])
+assert.equal(exactUid.length, 1, 'matching SeriesInstanceUID must outrank description wording')
+assert.equal(exactUid[0].identity, 'dicom-series-uid')
+assert.equal(exactUid[0].seriesInstanceUid, '1.2.10.1')
+assert.equal(exactUid[0].studyInstanceUid, '1.2.10')
+assert.equal(exactUid[0].linkedPlanesAvailable, true)
+
+const differentUid = kelompokkanDicomUntukTampilan([
+  { nama: 'uid-a.dcm', citra: citra(0, 'Same label', { studyInstanceUid: '1.2.10', seriesInstanceUid: '1.2.10.1' }) },
+  { nama: 'uid-b.dcm', citra: citra(1, 'Same label', { studyInstanceUid: '1.2.10', seriesInstanceUid: '1.2.10.2' }) },
+])
+assert.equal(differentUid.length, 2, 'different SeriesInstanceUID values must remain separate even when descriptions match')
+
+const sameSeriesDifferentStudy = kelompokkanDicomUntukTampilan([
+  { nama: 'study-a.dcm', citra: citra(0, 'Same label', { studyInstanceUid: '1.2.20', seriesInstanceUid: '1.2.shared' }) },
+  { nama: 'study-b.dcm', citra: citra(1, 'Same label', { studyInstanceUid: '1.2.21', seriesInstanceUid: '1.2.shared' }) },
+])
+assert.equal(sameSeriesDifferentStudy.length, 2, 'study boundary must remain explicit')
 
 const matrixMismatch = kelompokkanDicomUntukTampilan([
   { nama: 'a.dcm', citra: citra(0, 'Axial PD FS') },
@@ -56,4 +80,4 @@ const modalityMismatch = kelompokkanDicomUntukTampilan([
 ])
 assert.equal(modalityMismatch.length, 2, 'different modalities must never share a display group')
 
-console.log('dicom-series: obvious acquisitions stay separated and each group is independently validated')
+console.log('dicom-series: exact UID groups are preferred; fallback grouping stays conservative')
