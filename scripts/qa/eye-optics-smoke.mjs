@@ -31,6 +31,12 @@ async function activateWithKeyboard(button) {
 }
 
 async function runEyeOptics(page) {
+  const dismissReminder = page.getByRole('button', { name: 'Dismiss', exact: true })
+  if (await dismissReminder.isVisible().catch(() => false)) {
+    await step('dismiss-reminder', () => dismissReminder.click())
+    await expect(dismissReminder).toHaveCount(0)
+  }
+
   const specialty = page.getByRole('button', { name: 'Specialty labs', exact: true })
   await step('open-specialty', () => specialty.click())
 
