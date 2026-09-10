@@ -15,6 +15,14 @@ export async function verifyEyeOptics(page) {
   }
 }
 
+async function step(name, action) {
+  const startedAt = Date.now()
+  console.log(`eye-optics:start:${name}`)
+  const result = await action()
+  console.log(`eye-optics:done:${name}:${Date.now() - startedAt}ms`)
+  return result
+}
+
 async function activateWithKeyboard(button) {
   await button.scrollIntoViewIfNeeded()
   await button.focus()
@@ -24,22 +32,22 @@ async function activateWithKeyboard(button) {
 
 async function runEyeOptics(page) {
   const specialty = page.getByRole('button', { name: 'Specialty labs', exact: true })
-  await specialty.click()
+  await step('open-specialty', () => specialty.click())
 
   const neuro = page.getByRole('button', { name: 'Neuro & senses', exact: true })
-  await neuro.waitFor({ state: 'visible', timeout: 20_000 })
-  await activateWithKeyboard(neuro)
+  await step('wait-neuro', () => neuro.waitFor({ state: 'visible', timeout: 20_000 }))
+  await step('activate-neuro', () => activateWithKeyboard(neuro))
 
   const eye = page.getByRole('button', { name: 'Eye & orbit', exact: true })
-  await eye.waitFor({ state: 'visible', timeout: 20_000 })
-  await activateWithKeyboard(eye)
+  await step('wait-eye', () => eye.waitFor({ state: 'visible', timeout: 20_000 }))
+  await step('activate-eye', () => activateWithKeyboard(eye))
 
   const opener = page.getByRole('button', { name: 'Explore pupil & accommodation', exact: true })
   const svg = page.locator('svg[aria-label="Educational ocular optics schematic"]')
   await expect(opener).toHaveAttribute('aria-expanded', 'false')
   await expect(svg).toHaveCount(0)
-  await activateWithKeyboard(opener)
-  await expect(svg).toBeVisible()
+  await step('open-optics', () => activateWithKeyboard(opener))
+  await step('wait-optics-svg', () => expect(svg).toBeVisible())
   await expect(page.getByRole('button', { name: 'Close optics lesson', exact: true })).toHaveAttribute('aria-expanded', 'true')
 
   const pupil = page.getByRole('slider', { name: /Pupil aperture/ })
@@ -69,7 +77,7 @@ async function runEyeOptics(page) {
   const nearRx = Number(await lens.getAttribute('rx'))
 
   const phase = page.getByRole('button', { name: /03.*Accommodation/ })
-  await activateWithKeyboard(phase)
+  await step('activate-accommodation-phase', () => activateWithKeyboard(phase))
   await expect(phase).toHaveAttribute('aria-pressed', 'true')
   const lesson = svg.locator('xpath=ancestor::section[1]')
   await expect(lesson).toContainText('Phase 3/7')
@@ -77,15 +85,15 @@ async function runEyeOptics(page) {
   const width = await page.evaluate(() => ({ viewport: innerWidth, document: document.documentElement.scrollWidth }))
   assert.ok(width.document <= width.viewport + 2, `Eye lesson overflows: ${JSON.stringify(width)}`)
   await svg.scrollIntoViewIfNeeded()
-  await page.screenshot({ path: 'artifacts/body3d-mobile-eye-optics.png', timeout: 10_000 })
+  await step('capture-eye-screenshot', () => page.screenshot({ path: 'artifacts/body3d-mobile-eye-optics.png', timeout: 10_000 }))
 
   const close = page.getByRole('button', { name: 'Close optics lesson', exact: true })
-  await activateWithKeyboard(close)
+  await step('close-optics', () => activateWithKeyboard(close))
   await expect(svg).toHaveCount(0)
-  await activateWithKeyboard(opener)
+  await step('reopen-optics', () => activateWithKeyboard(opener))
   await expect(distance).toHaveValue('6')
   await expect(pupil).toHaveValue('4')
-  await activateWithKeyboard(page.getByRole('button', { name: 'Close optics lesson', exact: true }))
+  await step('final-close-optics', () => activateWithKeyboard(page.getByRole('button', { name: 'Close optics lesson', exact: true })))
 
   return { reachable: true, keyboardControls: true, closeAndReopen: true, smallGap, largeGap, farRx, nearRx, width }
 }
