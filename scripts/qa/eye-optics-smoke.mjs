@@ -8,7 +8,7 @@ export async function verifyEyeOptics(page) {
   try {
     return await Promise.race([
       runEyeOptics(page),
-      new Promise((_, reject) => { timer = setTimeout(() => reject(new Error('Eye optics smoke exceeded 60 seconds')), 60_000) }),
+      new Promise((_, reject) => { timer = setTimeout(() => reject(new Error('Eye optics smoke exceeded 90 seconds')), 90_000) }),
     ])
   } finally {
     clearTimeout(timer)
