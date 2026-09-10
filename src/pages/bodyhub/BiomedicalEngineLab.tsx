@@ -74,7 +74,7 @@ export function BiomedicalEngineLab() {
         <div className="space-y-3">
           <div className="grid gap-2 md:grid-cols-2 xl:grid-cols-3">
             {BIOMEDICAL_TRACKS.map((item) => (
-              <button key={item.id} type="button" onClick={() => setSelected(item.id)} className={`rounded-2xl border p-3 text-left transition ${selected === item.id ? 'border-brand bg-brand/[0.05]' : 'border-neutral-200 dark:border-white/10'}`}>
+              <button key={item.id} type="button" aria-pressed={selected === item.id} onClick={() => setSelected(item.id)} className={`rounded-2xl border p-3 text-left transition ${selected === item.id ? 'border-brand bg-brand/[0.05]' : 'border-neutral-200 dark:border-white/10'}`}>
                 <div className="flex items-center justify-between gap-2"><span className="text-[9px] font-black tracking-[0.12em] text-brand">{DOMAIN_ICON[item.id]}</span><Pill>{item.evidenceLevel}</Pill></div>
                 <div className="mt-1 text-sm font-black text-ink dark:text-white">{item.label}</div>
                 <p className="mt-1 text-[11px] leading-relaxed text-neutral-500">{item.mission}</p>
