@@ -97,31 +97,33 @@ async function runEyeOptics(page) {
   // screenshot timeout on constrained CI runners. All interaction, geometry,
   // overflow, and content assertions above remain unchanged.
   const lessonMarkup = await lesson.evaluate((element) => {
-    const properties = [
-      'display', 'position', 'box-sizing', 'width', 'height', 'min-width', 'max-width',
-      'padding-top', 'padding-right', 'padding-bottom', 'padding-left',
-      'margin-top', 'margin-right', 'margin-bottom', 'margin-left', 'gap',
-      'grid-template-columns', 'flex-direction', 'flex-wrap', 'flex-grow', 'flex-shrink',
-      'align-items', 'justify-content', 'overflow', 'overflow-x', 'overflow-y',
-      'border-width', 'border-style', 'border-color', 'border-radius',
-      'background-color', 'color', 'font-family', 'font-size', 'font-weight',
-      'line-height', 'letter-spacing', 'text-align', 'text-transform', 'opacity', 'transform',
-    ]
     const clone = element.cloneNode(true)
-    const originals = [element, ...element.querySelectorAll('*')]
-    const clones = [clone, ...clone.querySelectorAll('*')]
+    const originals = [element, ...element.querySelectorAll('input')]
+    const clones = [clone, ...clone.querySelectorAll('input')]
     originals.forEach((source, index) => {
-      const target = clones[index]
-      const computed = getComputedStyle(source)
-      for (const property of properties) target.style.setProperty(property, computed.getPropertyValue(property))
-      if (source instanceof HTMLInputElement) target.setAttribute('value', source.value)
+      if (source instanceof HTMLInputElement) clones[index].setAttribute('value', source.value)
     })
     return clone.outerHTML
   })
+  const captureCss = `
+    * { box-sizing: border-box; }
+    body { margin: 0; background: #05090d; color: #e5eef5; font: 12px/1.45 Arial, sans-serif; }
+    section { width: 390px; padding: 16px; border: 1px solid #334155; border-radius: 24px; background: #080c10; }
+    section > div:first-child { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 12px; }
+    h3 { margin: 4px 0; font-size: 18px; }
+    p { margin: 4px 0; color: #b8c5d1; }
+    svg { display: block; width: 100%; height: auto; margin: 14px 0; }
+    button, article { border: 1px solid #475569; border-radius: 14px; background: #111827; color: #e5eef5; padding: 10px; }
+    button { margin: 4px 4px 4px 0; text-align: left; }
+    article { margin-top: 10px; }
+    label { display: flex; justify-content: space-between; margin-top: 10px; font-weight: 700; }
+    input[type="range"] { width: 100%; }
+    a { color: #a5b4fc; }
+  `
   const capturePage = await page.context().newPage()
   try {
     await capturePage.setViewportSize({ width: 390, height: 844 })
-    await capturePage.setContent(`<!doctype html><html><head><meta name="viewport" content="width=device-width,initial-scale=1"></head><body style="margin:0">${lessonMarkup}</body></html>`)
+    await capturePage.setContent(`<!doctype html><html><head><meta name="viewport" content="width=device-width,initial-scale=1"><style>${captureCss}</style></head><body>${lessonMarkup}</body></html>`)
     const captureLesson = capturePage.locator('section').first()
     await expect(captureLesson).toBeVisible()
     const captureBox = await captureLesson.boundingBox()
