@@ -90,8 +90,12 @@ async function runEyeOptics(page) {
   await expect(lesson).toContainText('Schematic dimensions are illustrative, not measured')
   const width = await page.evaluate(() => ({ viewport: innerWidth, document: document.documentElement.scrollWidth }))
   assert.ok(width.document <= width.viewport + 2, `Eye lesson overflows: ${JSON.stringify(width)}`)
-  await svg.scrollIntoViewIfNeeded()
-  await step('capture-eye-screenshot', () => page.screenshot({ path: 'artifacts/body3d-mobile-eye-optics.png', animations: 'disabled', scale: 'css', timeout: 20_000 }))
+  await lesson.scrollIntoViewIfNeeded()
+  // Capture only the verified Eye lesson instead of compositing the entire page,
+  // which also includes the live WebGL canvas and can exceed Playwright's
+  // screenshot timeout on constrained CI runners. All interaction, geometry,
+  // overflow, and content assertions above remain unchanged.
+  await step('capture-eye-screenshot', () => lesson.screenshot({ path: 'artifacts/body3d-mobile-eye-optics.png', animations: 'disabled', scale: 'css', timeout: 20_000 }))
 
   const close = page.getByRole('button', { name: 'Close optics lesson', exact: true })
   await step('close-optics', () => activateWithKeyboard(close))
