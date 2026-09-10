@@ -39,7 +39,35 @@ const mixedDescription = buatVolumeMpr([
   slice(1, { deskripsiSeri: 'Sagittal T1' }),
   slice(2),
 ])
-assert.equal(mixedDescription.ok, false, 'obvious mixed series must fail closed')
+assert.equal(mixedDescription.ok, false, 'obvious mixed series without exact UID must fail closed')
+
+const exactSeriesAllowsDescriptionVariation = buatVolumeMpr([
+  slice(0, { seriesInstanceUid: '1.2.3', deskripsiSeri: 'Axial PD FS' }),
+  slice(1, { seriesInstanceUid: '1.2.3', deskripsiSeri: 'AX PD FS' }),
+  slice(2, { seriesInstanceUid: '1.2.3', deskripsiSeri: 'Axial PD FS' }),
+])
+assert.equal(exactSeriesAllowsDescriptionVariation.ok, true, 'exact SeriesInstanceUID should outrank display-description variation')
+
+const mixedSeriesUid = buatVolumeMpr([
+  slice(0, { seriesInstanceUid: '1.2.3' }),
+  slice(1, { seriesInstanceUid: '1.2.4' }),
+  slice(2, { seriesInstanceUid: '1.2.3' }),
+])
+assert.equal(mixedSeriesUid.ok, false, 'different SeriesInstanceUID values must never form one volume')
+
+const partialSeriesUid = buatVolumeMpr([
+  slice(0, { seriesInstanceUid: '1.2.3' }),
+  slice(1),
+  slice(2, { seriesInstanceUid: '1.2.3' }),
+])
+assert.equal(partialSeriesUid.ok, false, 'partial SeriesInstanceUID metadata must fail closed')
+
+const mixedFrame = buatVolumeMpr([
+  slice(0, { frameOfReferenceUid: '9.1' }),
+  slice(1, { frameOfReferenceUid: '9.2' }),
+  slice(2, { frameOfReferenceUid: '9.1' }),
+])
+assert.equal(mixedFrame.ok, false, 'different frames of reference must not be combined')
 
 const partialPosition = buatVolumeMpr([slice(0), slice(1, { posisiZ: undefined }), slice(2)])
 assert.equal(partialPosition.ok, false, 'partial spatial coordinates must not be guessed')
@@ -49,6 +77,22 @@ assert.equal(irregular.ok, false, 'irregular spacing must not be stretched into 
 
 const spacingMismatch = buatVolumeMpr([slice(0), slice(1, { jarakPiksel: [2, 1.5] }), slice(2)])
 assert.equal(spacingMismatch.ok, false, 'material pixel-spacing changes must fail closed')
+
+const axialOrientation: Citra['orientasiPasien'] = [1, 0, 0, 0, 1, 0]
+const orientedResult = buatVolumeMpr([
+  slice(0, { posisiPasien: [0, 0, 0], orientasiPasien: axialOrientation }),
+  slice(1, { posisiPasien: [0, 0, 5], orientasiPasien: axialOrientation }),
+  slice(2, { posisiPasien: [0, 0, 10], orientasiPasien: axialOrientation }),
+])
+assert.equal(orientedResult.ok, true, 'consistent patient position/orientation should define slice spacing')
+if (orientedResult.ok) assert.equal(orientedResult.volume.jarakIrisMm, 5)
+
+const changedOrientation = buatVolumeMpr([
+  slice(0, { posisiPasien: [0, 0, 0], orientasiPasien: axialOrientation }),
+  slice(1, { posisiPasien: [0, 0, 5], orientasiPasien: [0, 1, 0, 1, 0, 0] }),
+  slice(2, { posisiPasien: [0, 0, 10], orientasiPasien: axialOrientation }),
+])
+assert.equal(changedOrientation.ok, false, 'orientation changes must not be flattened into a straight MPR')
 
 const result = buatVolumeMpr([slice(0), slice(1), slice(2)])
 assert.equal(result.ok, true, 'compatible series must create a local volume')
@@ -85,8 +129,13 @@ assert.equal(inverted[1], 0)
 
 assert.deepEqual(labelBidangMpr('Axial PD FS'), {
   source: 'Axial',
-  'cross-row': 'Coronal',
-  'cross-column': 'Sagittal',
+  'cross-row': 'Coronal-like',
+  'cross-column': 'Sagittal-like',
+})
+assert.deepEqual(labelBidangMpr('anything', axialOrientation), {
+  source: 'Axial',
+  'cross-row': 'Coronal-like',
+  'cross-column': 'Sagittal-like',
 })
 assert.deepEqual(labelBidangMpr('unknown localizer'), {
   source: 'Source plane',
@@ -94,4 +143,4 @@ assert.deepEqual(labelBidangMpr('unknown localizer'), {
   'cross-column': 'Orthogonal B',
 })
 
-console.log('dicom-mpr: compatible stacks reconstruct; mixed/irregular data fail closed')
+console.log('dicom-mpr: compatible stacks reconstruct; identity/orientation/spacing conflicts fail closed')
