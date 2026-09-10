@@ -1,4 +1,5 @@
 import assert from 'node:assert/strict'
+import { writeFile } from 'node:fs/promises'
 import { expect } from '@playwright/test'
 
 // Reuse the authenticated mobile Body smoke browser and production build.
@@ -90,8 +91,28 @@ async function runEyeOptics(page) {
   await expect(lesson).toContainText('Schematic dimensions are illustrative, not measured')
   const width = await page.evaluate(() => ({ viewport: innerWidth, document: document.documentElement.scrollWidth }))
   assert.ok(width.document <= width.viewport + 2, `Eye lesson overflows: ${JSON.stringify(width)}`)
-  await svg.scrollIntoViewIfNeeded()
-  await step('capture-eye-screenshot', () => page.screenshot({ path: 'artifacts/body3d-mobile-eye-optics.png', animations: 'disabled', scale: 'css', timeout: 20_000 }))
+  await lesson.scrollIntoViewIfNeeded()
+  // Capture only the verified Eye lesson instead of compositing the entire page,
+  // which also includes the live WebGL canvas and can exceed Playwright's
+  // screenshot timeout on constrained CI runners. All interaction, geometry,
+  // overflow, and content assertions above remain unchanged.
+  const captureBox = await lesson.boundingBox()
+  assert.ok(captureBox && captureBox.width > 0 && captureBox.height > 0, 'Eye lesson needs a visible capture box')
+  const cdp = await page.context().newCDPSession(page)
+  try {
+    const screenshot = await step('capture-eye-screenshot', () => Promise.race([
+      cdp.send('Page.captureScreenshot', {
+        format: 'png',
+        fromSurface: true,
+        captureBeyondViewport: true,
+        clip: { x: captureBox.x, y: captureBox.y, width: captureBox.width, height: captureBox.height, scale: 1 },
+      }),
+      new Promise((_, reject) => setTimeout(() => reject(new Error('Eye optics screenshot exceeded 20 seconds')), 20_000)),
+    ]))
+    await writeFile('artifacts/body3d-mobile-eye-optics.png', Buffer.from(screenshot.data, 'base64'))
+  } finally {
+    await cdp.detach()
+  }
 
   const close = page.getByRole('button', { name: 'Close optics lesson', exact: true })
   await step('close-optics', () => activateWithKeyboard(close))
