@@ -55,6 +55,37 @@ export function resolveHrMax(prefs: Record<string, any>, observedMax = 0): numbe
 /** Minimum gap between two zone alerts, so a 5-minute sync cannot spam. */
 const ZONE_COOLDOWN_MS = 20 * 60_000
 
+export interface AlertDeliveryCommitResult {
+  delivered: boolean
+  stateCommitted: boolean
+}
+
+/**
+ * Notification state must describe what actually happened.
+ *
+ * A cooldown/once-per-day stamp written before delivery can suppress every
+ * retry when notification persistence fails. Deliver first, then commit the
+ * stamp. A commit failure after successful delivery is reported separately so
+ * callers do not claim the anti-duplicate state was persisted when it was not.
+ */
+export async function deliverThenCommitAlertState(
+  deliver: () => Promise<unknown>,
+  commitState: () => void,
+): Promise<AlertDeliveryCommitResult> {
+  try {
+    await deliver()
+  } catch {
+    return { delivered: false, stateCommitted: false }
+  }
+
+  try {
+    commitState()
+    return { delivered: true, stateCommitted: true }
+  } catch {
+    return { delivered: true, stateCommitted: false }
+  }
+}
+
 export interface ZoneAlertResult {
   sent: boolean
   reason: string
@@ -98,14 +129,18 @@ export async function checkHrZoneAlert(
   const last = Number(prefs.hrZoneLastAlertAt) || 0
   if (Date.now() - last < ZONE_COOLDOWN_MS) return { sent: false, reason: 'cooldown', zone: z.zone, bpm: newest.bpm }
 
-  saveSettings(userId, { hrZoneLastAlertAt: Date.now() })
-  await notify(userId, {
-    title: `❤️ Zone ${z.zone} — ${z.name} · ${newest.bpm} bpm`,
-    body: `${z.meaning} Read ${menitLalu(newest.t)}; data reaches us a few minutes after it is recorded.`,
-    url: './#/log-detak-jantung',
-    tag: 'hr-zone',
-  }, 'notifHrZone').catch(() => {})
+  const result = await deliverThenCommitAlertState(
+    () => notify(userId, {
+      title: `❤️ Zone ${z.zone} — ${z.name} · ${newest.bpm} bpm`,
+      body: `${z.meaning} Read ${menitLalu(newest.t)}; data reaches us a few minutes after it is recorded.`,
+      url: './#/log-detak-jantung',
+      tag: 'hr-zone',
+    }, 'notifHrZone'),
+    () => saveSettings(userId, { hrZoneLastAlertAt: Date.now() }),
+  )
 
+  if (!result.delivered) return { sent: false, reason: 'delivery-failed', zone: z.zone, bpm: newest.bpm }
+  if (!result.stateCommitted) return { sent: true, reason: 'sent-state-uncommitted', zone: z.zone, bpm: newest.bpm }
   return { sent: true, reason: 'sent', zone: z.zone, bpm: newest.bpm }
 }
 
@@ -186,17 +221,21 @@ export async function checkBedtimeReminder(userId: string, email: string): Promi
   const localDate = new Date(Date.now() + (Number(prefs.tzOffsetMin) || 0) * 60_000).toISOString().slice(0, 10)
   if (prefs.sleepLastFiredOn === localDate) return { sent: false, reason: 'already-today' }
 
-  saveSettings(userId, { sleepLastFiredOn: localDate })
   const jam = `${String(Math.floor(target / 60)).padStart(2, '0')}.${String(target % 60).padStart(2, '0')}`
-  await notify(userId, {
-    title: '🌙 Time to wind down',
-    body: lead > 0
-      ? `Your sleep target is ${jam} — ${lead} minutes from now. What matters most is not how long you sleep, but going to bed at the same hour every night.`
-      : `Your sleep target is ${jam}. What matters most is not how long you sleep, but going to bed at the same hour every night.`,
-    url: './#/pola-tidur',
-    tag: 'bedtime',
-  }, 'notifSleepTime').catch(() => {})
+  const result = await deliverThenCommitAlertState(
+    () => notify(userId, {
+      title: '🌙 Time to wind down',
+      body: lead > 0
+        ? `Your sleep target is ${jam} — ${lead} minutes from now. What matters most is not how long you sleep, but going to bed at the same hour every night.`
+        : `Your sleep target is ${jam}. What matters most is not how long you sleep, but going to bed at the same hour every night.`,
+      url: './#/pola-tidur',
+      tag: 'bedtime',
+    }, 'notifSleepTime'),
+    () => saveSettings(userId, { sleepLastFiredOn: localDate }),
+  )
 
+  if (!result.delivered) return { sent: false, reason: 'delivery-failed' }
+  if (!result.stateCommitted) return { sent: true, reason: 'sent-state-uncommitted' }
   return { sent: true, reason: 'sent' }
 }
 
@@ -234,14 +273,18 @@ export async function checkWorkoutReminder(userId: string): Promise<LatihanCheck
   const localDate = lokal.toISOString().slice(0, 10)
   if (prefs.latihanLastFiredOn === localDate) return { sent: false, reason: 'already-today' }
 
-  saveSettings(userId, { latihanLastFiredOn: localDate })
   const jam = `${String(Math.floor(target / 60)).padStart(2, '0')}.${String(target % 60).padStart(2, '0')}`
-  await notify(userId, {
-    title: '🏃 Waktunya latihan',
-    body: `Jadwal latihan Anda pukul ${jam}. Sesi pendek yang benar-benar dikerjakan lebih berarti daripada sesi panjang yang ditunda.`,
-    url: './#/latihan',
-    tag: 'latihan-harian',
-  }, 'notifLatihan').catch(() => {})
+  const result = await deliverThenCommitAlertState(
+    () => notify(userId, {
+      title: '🏃 Waktunya latihan',
+      body: `Jadwal latihan Anda pukul ${jam}. Sesi pendek yang benar-benar dikerjakan lebih berarti daripada sesi panjang yang ditunda.`,
+      url: './#/latihan',
+      tag: 'latihan-harian',
+    }, 'notifLatihan'),
+    () => saveSettings(userId, { latihanLastFiredOn: localDate }),
+  )
 
+  if (!result.delivered) return { sent: false, reason: 'delivery-failed' }
+  if (!result.stateCommitted) return { sent: true, reason: 'sent-state-uncommitted' }
   return { sent: true, reason: 'sent' }
 }
