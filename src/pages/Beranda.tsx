@@ -54,11 +54,15 @@ function HomeLoadingCard({ label, tall = false }: { label: string; tall?: boolea
   return (
     <div
       className={`home-loading-card ${tall ? 'min-h-[180px]' : 'min-h-[82px]'}`}
-      aria-label={`${label} loading`}
+      role="status"
+      aria-live="polite"
       aria-busy="true"
     >
-      <div className="h-2.5 w-24 rounded-full bg-neutral-200/80 dark:bg-white/10" />
-      <div className="mt-3 h-4 w-52 max-w-[68%] rounded-full bg-neutral-100 dark:bg-white/[.06]" />
+      <span className="sr-only">Loading {label}</span>
+      <div aria-hidden="true">
+        <div className="h-2.5 w-24 rounded-full bg-neutral-200/80 dark:bg-white/10" />
+        <div className="mt-3 h-4 w-52 max-w-[68%] rounded-full bg-neutral-100 dark:bg-white/[.06]" />
+      </div>
     </div>
   )
 }
