@@ -44,7 +44,7 @@ assert.deepEqual(malformed.map((day) => day.date), ['2026-09-01', '2026-09-03'],
 
 const many = Array.from({ length: MAX_NUTRITION_TIMELINE_DAYS + 5 }, (_, index) => ({
   id: `bounded-${index}`,
-  date: `2026-08-${String(index + 1).padStart(2, '0')}`,
+  date: new Date(Date.UTC(2026, 7, 1 + index)).toISOString().slice(0, 10),
   name: `Recorded ${index}`,
   kcal: 100 + index,
   ...base,
@@ -54,8 +54,8 @@ assert.equal(bounded.length, MAX_NUTRITION_TIMELINE_DAYS, 'Timeline must retain 
 assert.equal(bounded[0]?.date, '2026-08-06')
 assert.equal(bounded.at(-1)?.date, '2026-09-04')
 
-const latestTwo = buildNutritionJournalTimeline(recorded, 1)
-assert.deepEqual(latestTwo.map((day) => day.date), ['2026-09-03'], 'A smaller requested window must keep the latest recorded date.')
+const latestOne = buildNutritionJournalTimeline(recorded, 1)
+assert.deepEqual(latestOne.map((day) => day.date), ['2026-09-03'], 'A smaller requested window must keep the latest recorded date.')
 
 const page = readFileSync(new URL('../../src/pages/NutritionDataControls.tsx', import.meta.url), 'utf8')
 assert.match(page, /buildNutritionJournalTimeline\(state\.foods, 7\)/)
