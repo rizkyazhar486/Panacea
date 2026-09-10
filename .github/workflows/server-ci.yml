@@ -83,6 +83,8 @@ jobs:
         run: npm run uji:satusehat
       - name: Test health webhook ingestion and malformed-date regression
         run: npm run uji:health-webhook
+      - name: Test health alert delivery-state semantics
+        run: npm run uji:health-alerts
       - name: Test Connect privacy boundaries
         run: npm run uji:connect-privacy
       - name: Test market data adapter
