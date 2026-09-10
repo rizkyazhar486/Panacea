@@ -9,11 +9,11 @@ assert.deepEqual(validateEyeUveitisAnatomyWave12(), [])
 assert.equal(EYE_UVEITIS_ANATOMY_WAVE12.length, 3)
 
 const byContext = new Map(EYE_UVEITIS_ANATOMY_WAVE12.map((record) => [record.context, record]))
-assert.equal(byContext.get('anterior')?.primaryInflammationSite, 'anterior-chamber')
+assert.deepEqual(byContext.get('anterior')?.primaryInflammationSites, ['anterior-chamber'])
 assert.deepEqual(byContext.get('anterior')?.anatomicalTargets, ['anterior-chamber', 'iris', 'ciliary-body'])
-assert.equal(byContext.get('intermediate')?.primaryInflammationSite, 'vitreous-body')
+assert.deepEqual(byContext.get('intermediate')?.primaryInflammationSites, ['vitreous-body'])
 assert.deepEqual(byContext.get('intermediate')?.anatomicalTargets, ['vitreous-body', 'pars-plana'])
-assert.equal(byContext.get('posterior')?.primaryInflammationSite, 'retina')
+assert.deepEqual(byContext.get('posterior')?.primaryInflammationSites, ['retina', 'choroid'])
 assert.deepEqual(byContext.get('posterior')?.anatomicalTargets, ['retina', 'choroid'])
 
 for (const record of EYE_UVEITIS_ANATOMY_WAVE12) {
@@ -46,8 +46,11 @@ assert.ok(
     .includes('target:uveitis-posterior-anatomical-context'),
 )
 
-const invalidPrimarySite = EYE_UVEITIS_ANATOMY_WAVE12.map((record) => ({ ...record }))
-Object.assign(invalidPrimarySite[1]!, { primaryInflammationSite: 'pars-plana' })
+const invalidPrimarySite = EYE_UVEITIS_ANATOMY_WAVE12.map((record) => ({
+  ...record,
+  primaryInflammationSites: [...record.primaryInflammationSites],
+}))
+invalidPrimarySite[1]!.primaryInflammationSites = ['pars-plana']
 assert.ok(
   validateEyeUveitisAnatomyWave12(invalidPrimarySite as typeof EYE_UVEITIS_ANATOMY_WAVE12)
     .includes('primary-site:uveitis-intermediate-anatomical-context'),
