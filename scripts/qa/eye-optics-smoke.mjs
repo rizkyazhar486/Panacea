@@ -30,6 +30,32 @@ async function activateWithKeyboard(button) {
   await button.press('Enter')
 }
 
+async function captureEyeLesson(page, lesson) {
+  const canvases = page.locator('canvas')
+  await canvases.evaluateAll((nodes) => {
+    for (const node of nodes) {
+      node.dataset.panaceaQaPreviousVisibility = node.style.visibility
+      node.style.visibility = 'hidden'
+    }
+  })
+
+  try {
+    await lesson.screenshot({
+      path: 'artifacts/body3d-mobile-eye-optics.png',
+      animations: 'disabled',
+      scale: 'css',
+      timeout: 20_000,
+    })
+  } finally {
+    await canvases.evaluateAll((nodes) => {
+      for (const node of nodes) {
+        node.style.visibility = node.dataset.panaceaQaPreviousVisibility ?? ''
+        delete node.dataset.panaceaQaPreviousVisibility
+      }
+    }).catch(() => {})
+  }
+}
+
 async function runEyeOptics(page) {
   const dismissReminder = page.getByRole('button', { name: 'Dismiss', exact: true })
   if (await dismissReminder.isVisible().catch(() => false)) {
@@ -91,7 +117,7 @@ async function runEyeOptics(page) {
   const width = await page.evaluate(() => ({ viewport: innerWidth, document: document.documentElement.scrollWidth }))
   assert.ok(width.document <= width.viewport + 2, `Eye lesson overflows: ${JSON.stringify(width)}`)
   await svg.scrollIntoViewIfNeeded()
-  await step('capture-eye-screenshot', () => page.screenshot({ path: 'artifacts/body3d-mobile-eye-optics.png', animations: 'disabled', scale: 'css', timeout: 20_000 }))
+  await step('capture-eye-screenshot', () => captureEyeLesson(page, lesson))
 
   const close = page.getByRole('button', { name: 'Close optics lesson', exact: true })
   await step('close-optics', () => activateWithKeyboard(close))
