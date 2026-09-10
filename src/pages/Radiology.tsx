@@ -3,7 +3,7 @@ import type { PointerEvent as ReactPointerEvent } from 'react'
 import { Card, SectionTitle } from '../components/ui'
 import { IconSearch, IconActivity } from '../components/icons'
 import {
-  bacaDicom, jendelaAwal, urutkanSeri, nilaiDi, tafsirHu,
+  bacaDicom, jendelaAwal, nilaiDi, tafsirHu,
   JENDELA_CT, type Citra,
 } from '../lib/dicom'
 import {
@@ -14,8 +14,14 @@ import {
   labelBidangMpr,
   type IrisanMpr,
 } from '../lib/dicomMpr'
+import {
+  BATAS_KELOMPOK_DICOM,
+  kelompokkanDicomUntukTampilan,
+  type DicomDisplayGroup,
+  type DicomSliceItem,
+} from '../lib/dicomSeries'
 
-interface Irisan { nama: string; citra: Citra }
+type Irisan = DicomSliceItem
 
 interface PlaneProps {
   title: string
@@ -82,7 +88,7 @@ function PlaneViewer({
         </div>
       </div>
       <div className="relative flex min-h-[220px] items-center justify-center overflow-hidden bg-black p-2 sm:min-h-[280px]">
-        <div className="relative max-h-full max-w-full" style={{ aspectRatio: String(safeAspect) }}>
+        <div className="relative w-full max-w-full" style={{ aspectRatio: String(safeAspect) }}>
           <canvas
             ref={canvasRef}
             onPointerDown={(event) => {
@@ -90,7 +96,7 @@ function PlaneViewer({
               pick(event)
             }}
             onPointerMove={(event) => { if (event.buttons === 1) pick(event) }}
-            className="block h-full max-h-[560px] w-full max-w-full cursor-crosshair select-none object-contain"
+            className="block h-full max-h-[560px] w-full cursor-crosshair select-none object-contain"
             style={{ imageRendering: 'pixelated', touchAction: 'none', aspectRatio: String(safeAspect) }}
             aria-label={`${title} DICOM plane`}
           />
@@ -156,9 +162,61 @@ function MiniSlice({ citra, pusat, lebar, aktif, onClick, label }: {
   )
 }
 
+function SequenceStrip({ groups, activeId, onSelect }: {
+  groups: readonly DicomDisplayGroup[]
+  activeId: string
+  onSelect: (group: DicomDisplayGroup) => void
+}) {
+  if (!groups.length) return null
+
+  return (
+    <Card className="!p-4">
+      <div className="flex items-center justify-between gap-3">
+        <div>
+          <div className="text-xs font-black text-ink dark:text-white">Sequences / acquisitions</div>
+          <div className="mt-0.5 text-[10px] text-neutral-500">Panacea separates obviously different loaded acquisitions before reconstruction.</div>
+        </div>
+        <div className="rounded-full bg-neutral-100 px-2.5 py-1 text-[10px] font-black text-neutral-500 dark:bg-white/10 dark:text-white/50">
+          {groups.length}
+        </div>
+      </div>
+      <div className="mt-3 flex gap-2 overflow-x-auto pb-1">
+        {groups.map((group) => {
+          const active = group.id === activeId
+          return (
+            <button
+              key={group.id}
+              type="button"
+              onClick={() => onSelect(group)}
+              className={`min-w-[150px] shrink-0 rounded-2xl border p-3 text-left transition ${
+                active
+                  ? 'border-brand bg-brand-50 shadow-sm dark:bg-brand/10'
+                  : 'border-neutral-100 bg-white hover:border-neutral-200 dark:border-white/10 dark:bg-white/5'
+              }`}
+            >
+              <div className="flex items-center justify-between gap-2">
+                <span className={`text-[9px] font-black uppercase tracking-wide ${active ? 'text-brand-dark dark:text-brand' : 'text-neutral-400'}`}>
+                  {group.modality}
+                </span>
+                <span className={`h-2 w-2 rounded-full ${group.linkedPlanesAvailable ? 'bg-emerald-500' : 'bg-amber-400'}`} />
+              </div>
+              <div className="mt-1 truncate text-xs font-black text-ink dark:text-white">{group.label}</div>
+              <div className="mt-1 text-[10px] text-neutral-500">{group.slices.length} slice{group.slices.length === 1 ? '' : 's'} · {group.columns}×{group.rows}</div>
+              <div className={`mt-2 text-[9px] font-bold ${group.linkedPlanesAvailable ? 'text-emerald-600 dark:text-emerald-300' : 'text-amber-600 dark:text-amber-300'}`}>
+                {group.linkedPlanesAvailable ? '3-plane navigation available' : 'Source view only'}
+              </div>
+            </button>
+          )
+        })}
+      </div>
+    </Card>
+  )
+}
+
 export function Radiology() {
-  const [irisan, setIrisan] = useState<Irisan[]>([])
+  const [loaded, setLoaded] = useState<Irisan[]>([])
   const [ditolak, setDitolak] = useState<Array<{ nama: string; alasan: string }>>([])
+  const [activeGroupId, setActiveGroupId] = useState('')
   const [indeks, setIndeks] = useState(0)
   const [bingkai, setBingkai] = useState(0)
   const [pusat, setPusat] = useState(40)
@@ -168,10 +226,34 @@ export function Radiology() {
   const [crosshair, setCrosshair] = useState(true)
   const [catatan, setCatatan] = useState('')
 
+  const groups = useMemo(() => kelompokkanDicomUntukTampilan(loaded), [loaded])
+  const activeGroup = useMemo(
+    () => groups.find((group) => group.id === activeGroupId) ?? groups[0],
+    [groups, activeGroupId],
+  )
+  const irisan = activeGroup?.slices ?? []
   const kini = irisan[Math.min(indeks, Math.max(0, irisan.length - 1))]?.citra
   const hasilMpr = useMemo(() => buatVolumeMpr(irisan.map((item) => item.citra)), [irisan])
   const volume = hasilMpr.ok ? hasilMpr.volume : null
   const labelBidang = useMemo(() => labelBidangMpr(kini?.deskripsiSeri), [kini?.deskripsiSeri])
+
+  const resetViewFor = useCallback((slices: readonly Irisan[]) => {
+    if (!slices.length) {
+      setIndeks(0)
+      setBingkai(0)
+      setCursor({ x: 0, y: 0 })
+      return
+    }
+    const middle = Math.max(0, Math.floor(slices.length / 2))
+    const image = slices[middle]?.citra ?? slices[0].citra
+    const window = jendelaAwal(image)
+    setIndeks(middle)
+    setBingkai(0)
+    setPusat(window.pusat)
+    setLebar(window.lebar)
+    setCursor({ x: Math.floor(image.kolom / 2), y: Math.floor(image.baris / 2) })
+    setCatatan('')
+  }, [])
 
   const muat = useCallback(async (berkas: FileList | null) => {
     if (!berkas || !berkas.length) return
@@ -189,23 +271,18 @@ export function Radiology() {
       }
     }
 
-    const urut = urutkanSeri(baik)
-    const tengah = Math.max(0, Math.floor(urut.length / 2))
-    setIrisan(urut)
+    const nextGroups = kelompokkanDicomUntukTampilan(baik)
+    setLoaded(baik)
     setDitolak(buruk)
-    setIndeks(tengah)
-    setBingkai(0)
-    setCatatan('')
-
-    if (urut.length) {
-      const first = urut[tengah]?.citra ?? urut[0].citra
-      const window = jendelaAwal(first)
-      setPusat(window.pusat)
-      setLebar(window.lebar)
-      setCursor({ x: Math.floor(first.kolom / 2), y: Math.floor(first.baris / 2) })
-    }
+    setActiveGroupId(nextGroups[0]?.id ?? '')
+    resetViewFor(nextGroups[0]?.slices ?? [])
     setMemuat(false)
-  }, [])
+  }, [resetViewFor])
+
+  const pilihKelompok = useCallback((group: DicomDisplayGroup) => {
+    setActiveGroupId(group.id)
+    resetViewFor(group.slices)
+  }, [resetViewFor])
 
   useEffect(() => {
     if (!kini) return
@@ -263,9 +340,9 @@ export function Radiology() {
         <SectionTitle
           icon={<IconSearch size={20} />}
           title="MRI / CT workspace"
-          subtitle="Load your own uncompressed DICOM series. Pixel data stays in this browser and is never uploaded."
+          subtitle="Load your own uncompressed DICOM study. Pixel data stays in this browser and is never uploaded."
         />
-        <label className="mt-3 block cursor-pointer rounded-2xl border-2 border-dashed border-brand/40 bg-brand-50/40 px-4 py-5 text-center active:scale-[0.995]">
+        <label className="mt-3 block cursor-pointer rounded-2xl border-2 border-dashed border-brand/40 bg-brand-50/40 px-4 py-5 text-center active:scale-[0.995] dark:bg-brand/5">
           <input
             type="file"
             multiple
@@ -274,9 +351,9 @@ export function Radiology() {
             onChange={(event) => void muat(event.target.files)}
           />
           <div className="text-2xl">🩻</div>
-          <div className="mt-1 text-sm font-black text-brand-dark">{memuat ? 'Reading locally…' : 'Open a DICOM series'}</div>
+          <div className="mt-1 text-sm font-black text-brand-dark dark:text-brand">{memuat ? 'Reading locally…' : 'Open DICOM files'}</div>
           <div className="mt-1 text-[11px] leading-snug text-neutral-500">
-            Select the slices from one series together. Uncompressed CT, MR, CR and DX are supported by the local reader.
+            You can select several acquisitions together. Panacea separates obvious sequences before building linked views.
           </div>
         </label>
 
@@ -294,12 +371,14 @@ export function Radiology() {
         )}
       </Card>
 
+      <SequenceStrip groups={groups} activeId={activeGroup?.id ?? ''} onSelect={pilihKelompok} />
+
       {kini && sourcePlane && (
         <section className="overflow-hidden rounded-[28px] border border-slate-700/60 bg-[#081017] text-white shadow-2xl shadow-black/20">
           <header className="flex flex-wrap items-center justify-between gap-3 border-b border-white/10 px-4 py-3 sm:px-5">
             <div className="min-w-0">
               <div className="flex flex-wrap items-center gap-2">
-                <h2 className="truncate text-sm font-black sm:text-base">{kini.deskripsiSeri || 'Loaded DICOM study'}</h2>
+                <h2 className="truncate text-sm font-black sm:text-base">{activeGroup?.label || kini.deskripsiSeri || 'Loaded DICOM study'}</h2>
                 <span className="rounded-full border border-emerald-400/30 bg-emerald-400/10 px-2 py-0.5 text-[9px] font-black uppercase tracking-wide text-emerald-200">
                   local only
                 </span>
@@ -310,7 +389,7 @@ export function Radiology() {
                 )}
               </div>
               <div className="mt-0.5 text-[10px] text-white/45">
-                {kini.modalitas} · {irisan.length} slice{irisan.length === 1 ? '' : 's'} · no cloud upload
+                {kini.modalitas} · {irisan.length} slice{irisan.length === 1 ? '' : 's'} · acquisition {Math.max(1, groups.indexOf(activeGroup!) + 1)}/{groups.length}
               </div>
             </div>
             <div className="flex flex-wrap gap-2">
@@ -319,7 +398,7 @@ export function Radiology() {
                 onClick={() => setCrosshair((value) => !value)}
                 className={`rounded-xl border px-3 py-2 text-[10px] font-black ${crosshair ? 'border-cyan-300/40 bg-cyan-400/15 text-cyan-100' : 'border-white/10 bg-white/5 text-white/60'}`}
               >
-                Crosshair {crosshair ? 'on' : 'off'}
+                Point guide {crosshair ? 'on' : 'off'}
               </button>
               <a
                 href="#/body-explorer"
@@ -350,7 +429,7 @@ export function Radiology() {
                 {crossRow && (
                   <PlaneViewer
                     title={labelBidang['cross-row']}
-                    subtitle="Reformatted from loaded voxel stack"
+                    subtitle="Reformatted from this loaded acquisition"
                     plane={crossRow}
                     pusat={pusat}
                     lebar={lebar}
@@ -368,7 +447,7 @@ export function Radiology() {
                 {crossColumn && (
                   <PlaneViewer
                     title={labelBidang['cross-column']}
-                    subtitle="Reformatted from loaded voxel stack"
+                    subtitle="Reformatted from this loaded acquisition"
                     plane={crossColumn}
                     pusat={pusat}
                     lebar={lebar}
@@ -407,7 +486,7 @@ export function Radiology() {
                       value={cursor.x}
                       onChange={(event) => setCursor((old) => ({ ...old, x: Number(event.target.value) }))}
                       className="mt-2 w-full accent-cyan-400"
-                      aria-label="Horizontal crosshair position"
+                      aria-label="Horizontal point position"
                     />
                   </label>
                   <label className="text-[10px] font-bold text-white/55">
@@ -419,7 +498,7 @@ export function Radiology() {
                       value={cursor.y}
                       onChange={(event) => setCursor((old) => ({ ...old, y: Number(event.target.value) }))}
                       className="mt-2 w-full accent-amber-300"
-                      aria-label="Vertical crosshair position"
+                      aria-label="Vertical point position"
                     />
                   </label>
                 </div>
@@ -566,6 +645,7 @@ export function Radiology() {
 
           <footer className="border-t border-white/10 px-4 py-3 text-[9px] leading-relaxed text-white/35 sm:px-5">
             {volume ? BATAS_MPR : (hasilMpr.ok ? BATAS_MPR : hasilMpr.alasan)} {' '}
+            {groups.length > 1 ? BATAS_KELOMPOK_DICOM : ''} {' '}
             This remains an educational viewer, not a reporting workstation, automated detector, or regulated medical device.
           </footer>
         </section>
@@ -576,7 +656,7 @@ export function Radiology() {
           <div className="text-4xl">🧭</div>
           <h3 className="mt-3 text-base font-black text-ink dark:text-white">Three-plane workspace is ready for your study</h3>
           <p className="mx-auto mt-2 max-w-xl text-xs leading-relaxed text-neutral-500">
-            Load one compatible DICOM stack to navigate the source plane and two linked orthogonal reformats with a shared crosshair, slice strip, local notes and CT/MR-safe display controls.
+            Load compatible DICOM files to browse separate acquisitions, navigate the source plane and linked orthogonal reformats with one shared point, use a slice strip, local notes and CT/MR-safe display controls.
           </p>
         </div>
       )}
