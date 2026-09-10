@@ -92,7 +92,76 @@ async function runEyeOptics(page) {
   const width = await page.evaluate(() => ({ viewport: innerWidth, document: document.documentElement.scrollWidth }))
   assert.ok(width.document <= width.viewport + 2, `Eye lesson overflows: ${JSON.stringify(width)}`)
   await lesson.scrollIntoViewIfNeeded()
-  await step('capture-eye-screenshot', () => lesson.screenshot({ path: 'artifacts/body3d-mobile-eye-optics.png', animations: 'disabled', timeout: 20_000 }))
+
+  // Exercise and verify the real shipped lesson first. Artifact transport then
+  // uses a static DOM snapshot with copied computed styles so SwiftShader never
+  // has to composite the live Body3D WebGL canvas. Crucially, use page-level
+  // screenshot + clip: locator.screenshot waits for element stability and can
+  // deadlock on a visually static clone that still has animated computed style.
+  const lessonSnapshot = await lesson.evaluate((element) => {
+    const clone = element.cloneNode(true)
+    const originals = [element, ...element.querySelectorAll('*')]
+    const copies = [clone, ...clone.querySelectorAll('*')]
+
+    originals.forEach((source, index) => {
+      const copy = copies[index]
+      if (!(source instanceof Element) || !(copy instanceof Element)) return
+      const computed = getComputedStyle(source)
+      for (const property of computed) {
+        copy.style.setProperty(property, computed.getPropertyValue(property), computed.getPropertyPriority(property))
+      }
+      if (source instanceof HTMLInputElement && copy instanceof HTMLInputElement) {
+        copy.value = source.value
+        copy.setAttribute('value', source.value)
+      }
+    })
+
+    const rect = element.getBoundingClientRect()
+    return {
+      markup: clone.outerHTML,
+      width: rect.width,
+      height: rect.height,
+    }
+  })
+  assert.ok(lessonSnapshot.width > 0 && lessonSnapshot.height > 0, 'Eye lesson needs a visible capture box')
+
+  const capturePage = await page.context().newPage()
+  try {
+    await capturePage.setViewportSize({
+      width: 390,
+      height: Math.max(844, Math.ceil(lessonSnapshot.height) + 32),
+    })
+    await capturePage.setContent(
+      `<!doctype html><html><head><meta name="viewport" content="width=device-width,initial-scale=1"><style>*,*::before,*::after{animation:none!important;transition:none!important;caret-color:transparent!important}</style></head><body style="margin:0;background:#05090d">${lessonSnapshot.markup}</body></html>`,
+      { waitUntil: 'domcontentloaded' },
+    )
+    const captureLesson = capturePage.locator('section').first()
+    await expect(captureLesson).toBeVisible()
+    await expect(captureLesson).toContainText('Phase 3/7')
+    await expect(captureLesson).toContainText('Schematic dimensions are illustrative, not measured')
+    const captureBox = await captureLesson.boundingBox()
+    assert(captureBox && captureBox.width > 0 && captureBox.height > 0, 'Static Eye lesson needs a visible capture box')
+    await step('capture-eye-screenshot', () => capturePage.screenshot({
+      path: 'artifacts/body3d-mobile-eye-optics.png',
+      clip: {
+        x: Math.max(0, captureBox.x),
+        y: Math.max(0, captureBox.y),
+        width: captureBox.width,
+        height: captureBox.height,
+      },
+      animations: 'disabled',
+      caret: 'hide',
+      scale: 'css',
+      timeout: 20_000,
+    }))
+  } finally {
+    // Cleanup is best-effort so a broken renderer process cannot hold the
+    // acceptance job after the bounded visual gate has already decided.
+    await Promise.race([
+      capturePage.close().catch(() => undefined),
+      new Promise((resolve) => setTimeout(resolve, 2_000)),
+    ])
+  }
 
   const close = page.getByRole('button', { name: 'Close optics lesson', exact: true })
   await step('close-optics', () => activateWithKeyboard(close))
