@@ -95,13 +95,23 @@ async function runEyeOptics(page) {
   // which also includes the live WebGL canvas and can exceed Playwright's
   // screenshot timeout on constrained CI runners. All interaction, geometry,
   // overflow, and content assertions above remain unchanged.
-  const lessonBox = await lesson.boundingBox()
-  assert.ok(lessonBox && lessonBox.width > 0 && lessonBox.height > 0, 'Eye lesson needs a visible capture box')
-  const canvasSuppression = await page.addStyleTag({ content: 'canvas { visibility: hidden !important; }' })
+  const lessonMarkup = await lesson.evaluate((element) => element.outerHTML)
+  const stylesheetMarkup = await page.locator('link[rel="stylesheet"], style').evaluateAll((nodes) => nodes.map((node) => {
+    if (node.tagName !== 'LINK') return node.outerHTML
+    const clone = node.cloneNode()
+    clone.href = node.href
+    return clone.outerHTML
+  }).join(''))
+  const capturePage = await page.context().newPage()
   try {
-    await step('capture-eye-screenshot', () => page.screenshot({ path: 'artifacts/body3d-mobile-eye-optics.png', clip: lessonBox, animations: 'disabled', scale: 'css', timeout: 20_000 }))
+    await capturePage.setViewportSize({ width: 390, height: 844 })
+    await capturePage.setContent(`<!doctype html><html><head><meta name="viewport" content="width=device-width,initial-scale=1">${stylesheetMarkup}</head><body>${lessonMarkup}</body></html>`, { waitUntil: 'load' })
+    await capturePage.evaluate(() => document.fonts.ready)
+    const captureLesson = capturePage.locator('section').first()
+    await expect(captureLesson).toBeVisible()
+    await step('capture-eye-screenshot', () => captureLesson.screenshot({ path: 'artifacts/body3d-mobile-eye-optics.png', animations: 'disabled', scale: 'css', timeout: 20_000 }))
   } finally {
-    await canvasSuppression.evaluate((style) => style.remove()).catch(() => {})
+    await capturePage.close()
   }
 
   const close = page.getByRole('button', { name: 'Close optics lesson', exact: true })
