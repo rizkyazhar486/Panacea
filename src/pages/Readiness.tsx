@@ -7,6 +7,7 @@ import { awal, awalBulat } from '../lib/nilaiAwal'
 import { useVitals } from '../lib/useVitals'
 import { mergeVitals } from '../lib/healthVitals'
 import { mergeHealthCache } from '../lib/profile'
+import { buildRecoveryRecordedChecklist } from '../lib/recoveryRecordedChecklist'
 
 interface Workout { rpe: number; min: number }
 interface DayLog {
@@ -127,6 +128,17 @@ export function Readiness() {
   const hrvBaseline = useMemo(() => averagePrevious(store, 'hrv'), [store])
   const rhrBaseline = useMemo(() => averagePrevious(store, 'rhr'), [store])
   const sleepBaseline = useMemo(() => averagePrevious(store, 'sleepH'), [store])
+  const checklist = useMemo(() => buildRecoveryRecordedChecklist(
+    { hrv: today.hrv, rhr: today.rhr, sleepH: today.sleepH },
+    {
+      hrvMs: typeof vitals.hrvMs === 'number' ? vitals.hrvMs : undefined,
+      restingHr: typeof vitals.restingHr === 'number' ? vitals.restingHr : undefined,
+      sleepH: typeof vitals.sleepH === 'number' ? vitals.sleepH : undefined,
+      source: typeof vitals.source === 'string' ? vitals.source : undefined,
+      measuredAt: typeof vitals.measuredAt === 'string' ? vitals.measuredAt : undefined,
+      syncedAt: typeof vitals.syncedAt === 'string' ? vitals.syncedAt : undefined,
+    },
+  ), [today.hrv, today.rhr, today.sleepH, vitals])
   const week = useMemo(() => Array.from({ length: 7 }, (_, i) => {
     const date = dayKey(6 - i)
     const day = store[date]
@@ -214,6 +226,21 @@ export function Readiness() {
               </button>
             ))}
           </div>
+        </div>
+      </Card>
+
+      <Card className="!p-5">
+        <SectionTitle icon={<span className="text-lg">✓</span>} title="Recorded-data safety check" subtitle="Completeness, provenance, units and scientific boundary — not clinical clearance" />
+        <div className="mt-3 space-y-2" aria-label="Recovery recorded-data safety checklist">
+          {checklist.map((item) => (
+            <div key={item.id} className="rounded-xl border border-neutral-200 bg-neutral-50 p-3 text-xs dark:border-neutral-700 dark:bg-neutral-900">
+              <div className="flex items-center justify-between gap-3">
+                <span className="font-bold">{item.label}</span>
+                <span className="uppercase tracking-wide text-neutral-500">{item.status}</span>
+              </div>
+              <p className="mt-1 leading-relaxed text-neutral-600 dark:text-neutral-300">{item.detail}</p>
+            </div>
+          ))}
         </div>
       </Card>
 
