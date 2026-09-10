@@ -95,29 +95,37 @@ async function runEyeOptics(page) {
   // which also includes the live WebGL canvas and can exceed Playwright's
   // screenshot timeout on constrained CI runners. All interaction, geometry,
   // overflow, and content assertions above remain unchanged.
-  const snapshot = await lesson.evaluate((element) => ({
-    markup: element.outerHTML,
-    inputValues: [...element.querySelectorAll('input')].map((input) => input.value),
-    htmlClass: document.documentElement.className,
-    bodyClass: document.body.className,
-  }))
-  const stylesheetText = await page.evaluate(() => [...document.styleSheets].flatMap((sheet) => {
-    try {
-      return [...sheet.cssRules].map((rule) => rule.cssText)
-    } catch {
-      return []
-    }
-  }).join('\n'))
+  const lessonMarkup = await lesson.evaluate((element) => {
+    const properties = [
+      'display', 'position', 'box-sizing', 'width', 'height', 'min-width', 'max-width',
+      'padding-top', 'padding-right', 'padding-bottom', 'padding-left',
+      'margin-top', 'margin-right', 'margin-bottom', 'margin-left', 'gap',
+      'grid-template-columns', 'flex-direction', 'flex-wrap', 'flex-grow', 'flex-shrink',
+      'align-items', 'justify-content', 'overflow', 'overflow-x', 'overflow-y',
+      'border-width', 'border-style', 'border-color', 'border-radius',
+      'background-color', 'color', 'font-family', 'font-size', 'font-weight',
+      'line-height', 'letter-spacing', 'text-align', 'text-transform', 'opacity', 'transform',
+    ]
+    const clone = element.cloneNode(true)
+    const originals = [element, ...element.querySelectorAll('*')]
+    const clones = [clone, ...clone.querySelectorAll('*')]
+    originals.forEach((source, index) => {
+      const target = clones[index]
+      const computed = getComputedStyle(source)
+      for (const property of properties) target.style.setProperty(property, computed.getPropertyValue(property))
+      if (source instanceof HTMLInputElement) target.setAttribute('value', source.value)
+    })
+    return clone.outerHTML
+  })
   const capturePage = await page.context().newPage()
   try {
     await capturePage.setViewportSize({ width: 390, height: 844 })
-    await capturePage.setContent(`<!doctype html><html class="${snapshot.htmlClass}"><head><meta name="viewport" content="width=device-width,initial-scale=1"></head><body class="${snapshot.bodyClass}" style="margin:0">${snapshot.markup}</body></html>`)
-    await capturePage.addStyleTag({ content: stylesheetText })
-    await capturePage.locator('input').evaluateAll((inputs, values) => inputs.forEach((input, index) => { input.value = values[index] ?? input.value }), snapshot.inputValues)
-    await capturePage.evaluate(() => document.fonts.ready)
+    await capturePage.setContent(`<!doctype html><html><head><meta name="viewport" content="width=device-width,initial-scale=1"></head><body style="margin:0">${lessonMarkup}</body></html>`)
     const captureLesson = capturePage.locator('section').first()
     await expect(captureLesson).toBeVisible()
-    await step('capture-eye-screenshot', () => captureLesson.screenshot({ path: 'artifacts/body3d-mobile-eye-optics.png', animations: 'disabled', scale: 'css', timeout: 20_000 }))
+    const captureBox = await captureLesson.boundingBox()
+    assert.ok(captureBox && captureBox.width > 0 && captureBox.height > 0, 'Eye lesson needs a visible capture box')
+    await step('capture-eye-screenshot', () => capturePage.screenshot({ path: 'artifacts/body3d-mobile-eye-optics.png', clip: captureBox, animations: 'disabled', scale: 'css', timeout: 20_000 }))
   } finally {
     await capturePage.close()
   }
