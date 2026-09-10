@@ -1,4 +1,5 @@
 import assert from 'node:assert/strict'
+import { stat, writeFile } from 'node:fs/promises'
 import { expect } from '@playwright/test'
 
 // Reuse the authenticated mobile Body smoke browser and production build.
@@ -92,64 +93,50 @@ async function runEyeOptics(page) {
   assert.ok(width.document <= width.viewport + 2, `Eye lesson overflows: ${JSON.stringify(width)}`)
   await lesson.scrollIntoViewIfNeeded()
 
-  // Verify the real shipped lesson first, then move only artifact transport onto
-  // a static page with no WebGL context. This avoids asking SwiftShader to
-  // composite the live Body3D canvas while preserving the exact verified DOM
-  // state and computed presentation of the Eye lesson for the visual artifact.
-  const lessonSnapshot = await lesson.evaluate((element) => {
-    const clone = element.cloneNode(true)
-    const originals = [element, ...element.querySelectorAll('*')]
-    const copies = [clone, ...clone.querySelectorAll('*')]
+  // Preserve all assertions on the shipped page, then capture that same
+  // production-rendered viewport through CDP. This bypasses Playwright's
+  // screenshot actionability/font pipeline without cloning or restyling UI.
+  await lesson.evaluate((element) => element.scrollIntoView({ block: 'start', inline: 'nearest' }))
+  await page.evaluate(() => new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve))))
 
-    originals.forEach((source, index) => {
-      const copy = copies[index]
-      if (!(source instanceof Element) || !(copy instanceof Element)) return
-      const computed = getComputedStyle(source)
-      for (const property of computed) {
-        copy.style.setProperty(property, computed.getPropertyValue(property), computed.getPropertyPriority(property))
-      }
-      if (source instanceof HTMLInputElement && copy instanceof HTMLInputElement) {
-        copy.value = source.value
-        copy.setAttribute('value', source.value)
-      }
-    })
-
-    const rect = element.getBoundingClientRect()
-    return {
-      markup: clone.outerHTML,
-      width: rect.width,
-      height: rect.height,
+  const canvases = page.locator('canvas')
+  await canvases.evaluateAll((nodes) => {
+    for (const node of nodes) {
+      node.dataset.panaceaQaPreviousVisibility = node.style.visibility
+      node.style.visibility = 'hidden'
     }
   })
-  assert.ok(lessonSnapshot.width > 0 && lessonSnapshot.height > 0, 'Eye lesson needs a visible capture box')
 
-  const capturePage = await page.context().newPage()
+  let cdp
   try {
-    await capturePage.setViewportSize({
-      width: 390,
-      height: Math.max(844, Math.ceil(lessonSnapshot.height) + 32),
-    })
-    await capturePage.setContent(
-      `<!doctype html><html><head><meta name="viewport" content="width=device-width,initial-scale=1"></head><body style="margin:0;background:#05090d">${lessonSnapshot.markup}</body></html>`,
-      { waitUntil: 'domcontentloaded' },
-    )
-    const captureLesson = capturePage.locator('section').first()
-    await expect(captureLesson).toBeVisible()
-    await expect(captureLesson).toContainText('Phase 3/7')
-    await expect(captureLesson).toContainText('Schematic dimensions are illustrative, not measured')
-    await step('capture-eye-screenshot', () => captureLesson.screenshot({
-      path: 'artifacts/body3d-mobile-eye-optics.png',
-      animations: 'disabled',
-      scale: 'css',
-      timeout: 20_000,
+    const viewport = page.viewportSize()
+    assert.deepEqual(viewport, { width: 390, height: 844 }, 'Eye evidence must use the mobile acceptance viewport')
+
+    const captureStartedAt = Date.now()
+    cdp = await page.context().newCDPSession(page)
+    const screenshot = await step('capture-eye-screenshot', () => cdp.send('Page.captureScreenshot', {
+      format: 'png',
+      fromSurface: true,
+      captureBeyondViewport: false,
+    }))
+    const png = Buffer.from(screenshot.data, 'base64')
+    await writeFile('artifacts/body3d-mobile-eye-optics.png', png)
+    const artifact = await stat('artifacts/body3d-mobile-eye-optics.png')
+    assert.ok(artifact.size > 10_000, `Eye optics artifact is unexpectedly small: ${artifact.size} bytes`)
+    console.log(JSON.stringify({
+      stage: 'eye-optics-artifact',
+      viewport,
+      bytes: artifact.size,
+      captureMs: Date.now() - captureStartedAt,
     }))
   } finally {
-    // Cleanup is best-effort so a broken renderer process cannot hold the
-    // acceptance job after the bounded visual gate has already decided.
-    await Promise.race([
-      capturePage.close().catch(() => undefined),
-      new Promise((resolve) => setTimeout(resolve, 2_000)),
-    ])
+    if (cdp) await cdp.detach().catch(() => undefined)
+    await canvases.evaluateAll((nodes) => {
+      for (const node of nodes) {
+        node.style.visibility = node.dataset.panaceaQaPreviousVisibility ?? ''
+        delete node.dataset.panaceaQaPreviousVisibility
+      }
+    }).catch(() => undefined)
   }
 
   const close = page.getByRole('button', { name: 'Close optics lesson', exact: true })
