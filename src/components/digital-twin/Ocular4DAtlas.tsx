@@ -102,7 +102,7 @@ function OpticsSchematic({ pupilMm, distanceM }: { pupilMm: number; distanceM: n
         <linearGradient id="eye-lens" x1="0" x2="1"><stop offset="0" stopColor="#dbf8ff" stopOpacity=".5"/><stop offset=".5" stopColor="#fff" stopOpacity=".8"/><stop offset="1" stopColor="#8ddcff" stopOpacity=".45"/></linearGradient>
       </defs>
       <rect width="760" height="270" rx="28" fill="#05090d" />
-      <text x="24" y="30" fill="#8ba2b5" fontSize="11" fontWeight="700">OPTICAL SCHEMATIC · EDUCATIONAL, NOT PATIENT BIOMETRY</text>
+      <text x="24" y="30" fill="#8ba2b5" fontSize="15" fontWeight="800">OPTICAL SCHEMATIC · EDUCATIONAL, NOT PATIENT BIOMETRY</text>
       <ellipse cx="495" cy="140" rx="205" ry="108" fill="url(#eye-globe)" stroke="#9db8c8" strokeOpacity=".35" strokeWidth="2" />
       <path d="M318 62 Q274 140 318 218" fill="none" stroke="#9fe8ff" strokeWidth="8" strokeOpacity=".82" />
       <line x1="365" y1="82" x2="365" y2={140 - pupilHalf} stroke="#5e7890" strokeWidth="12" strokeLinecap="butt" />
@@ -113,11 +113,12 @@ function OpticsSchematic({ pupilMm, distanceM }: { pupilMm: number; distanceM: n
       <path d={`M34 82 L318 106 L365 ${140 - pupilHalf * .38} L405 119 L673 140`} fill="none" stroke="#ffe08a" strokeWidth="2.2" opacity=".9" />
       <path d={`M34 198 L318 174 L365 ${140 + pupilHalf * .38} L405 161 L673 140`} fill="none" stroke="#ffe08a" strokeWidth="2.2" opacity=".9" />
       <path d="M34 140 L673 140" fill="none" stroke="#75cfff" strokeWidth="1.4" strokeDasharray="7 7" opacity=".65" />
-      <text x="293" y="246" fill="#a9bdcc" fontSize="10">cornea</text>
-      <text x="346" y="246" fill="#a9bdcc" fontSize="10">pupil</text>
-      <text x="392" y="246" fill="#a9bdcc" fontSize="10">lens</text>
-      <text x="654" y="246" fill="#a9bdcc" fontSize="10">retina</text>
-      <text x="24" y="55" fill="#d6e6f0" fontSize="12" fontWeight="800">Target {distanceM.toFixed(distanceM < 1 ? 2 : 1)} m · pupil {pupilMm.toFixed(1)} mm · accommodation demand ≈ {accommodationD.toFixed(2)} D</text>
+      <text x="293" y="246" fill="#d6e6f0" fontSize="18" fontWeight="700">cornea</text>
+      <text x="346" y="246" fill="#d6e6f0" fontSize="18" fontWeight="700">pupil</text>
+      <text x="392" y="246" fill="#d6e6f0" fontSize="18" fontWeight="700">lens</text>
+      <text x="654" y="246" fill="#d6e6f0" fontSize="18" fontWeight="700">retina</text>
+      <text x="24" y="55" fill="#d6e6f0" fontSize="17" fontWeight="800">Target {distanceM.toFixed(distanceM < 1 ? 2 : 1)} m · pupil {pupilMm.toFixed(1)} mm</text>
+      <text x="24" y="75" fill="#d6e6f0" fontSize="17" fontWeight="800">Accommodation demand ≈ {accommodationD.toFixed(2)} D</text>
     </svg>
   )
 }
