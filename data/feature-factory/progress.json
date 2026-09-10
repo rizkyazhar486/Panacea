@@ -1,7 +1,15 @@
 {
   "version": 1,
-  "updatedAt": "2026-09-09T22:14:00.000Z",
+  "updatedAt": "2026-09-10T06:18:00.000Z",
   "items": {
+    "ff-recovery-stress-checklist": {
+      "status": "done",
+      "commit": "c78a28dbe670ae84fa2e77090086a2b7b5ea469f",
+      "paths": ["src/lib/recoveryRecordedChecklist.ts", "src/pages/Readiness.tsx", "scripts/uji/feature-factory-recovery-stress-checklist.mts"],
+      "note": "Records the already-promoted Recovery/Stress checklist capability from PR #1150. The implementation derives checklist state only from valid recorded HRV, resting-heart-rate, sleep, context-journal and workout observations; missing observations remain missing; workout load is the transparent recorded-data product session RPE × recorded minutes; no synthetic readiness/stress score, proprietary provider score, forecast, diagnosis or training prescription is introduced.",
+      "academicReview": {"status":"not-applicable-no-material-claim","sourceBasis":[],"aiUse":"ai-assisted","note":"This ledger entry records an already-promoted descriptive recorded-data software capability. It does not add a biomedical threshold, diagnostic interpretation, treatment recommendation, population norm, provider-derived score or patient-specific inference. Provider-derived WHOOP/Oura/Garmin scores remain outside this local checklist unless separately admitted through reviewed provenance-bearing adapters.","humanReview":{"status":"not-recorded","reviewer":null,"credentials":null,"reviewedAt":null}},
+      "updatedAt": "2026-09-10T06:18:00.000Z"
+    },
     "ff-health-profile-export": {
       "status": "done",
       "commit": "15575240d61a8d5d9f9708f742dd983fe9f54747",
