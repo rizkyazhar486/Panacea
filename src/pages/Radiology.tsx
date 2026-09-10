@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import type { PointerEvent as ReactPointerEvent } from 'react'
 import { Card, SectionTitle } from '../components/ui'
 import { IconSearch, IconActivity } from '../components/icons'
+import { DicomCrossplanes3D } from '../components/DicomCrossplanes3D'
 import {
   bacaDicom, jendelaAwal, nilaiDi, tafsirHu,
   JENDELA_CT, type Citra,
@@ -462,6 +463,19 @@ export function Radiology() {
                   />
                 )}
               </div>
+
+              {volume && (
+                <div className="mt-3">
+                  <DicomCrossplanes3D
+                    volume={volume}
+                    cursor={cursor}
+                    slice={indeks}
+                    pusat={pusat}
+                    lebar={lebar}
+                    terbalik={kini.terbalik}
+                  />
+                </div>
+              )}
 
               <div className="mt-3 rounded-2xl border border-white/10 bg-white/[0.035] p-3">
                 <div className="grid gap-3 md:grid-cols-3">
