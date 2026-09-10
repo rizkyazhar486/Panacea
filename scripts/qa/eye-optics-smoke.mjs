@@ -95,9 +95,11 @@ async function runEyeOptics(page) {
   // which also includes the live WebGL canvas and can exceed Playwright's
   // screenshot timeout on constrained CI runners. All interaction, geometry,
   // overflow, and content assertions above remain unchanged.
+  const lessonBox = await lesson.boundingBox()
+  assert.ok(lessonBox && lessonBox.width > 0 && lessonBox.height > 0, 'Eye lesson needs a visible capture box')
   const canvasSuppression = await page.addStyleTag({ content: 'canvas { visibility: hidden !important; }' })
   try {
-    await step('capture-eye-screenshot', () => lesson.screenshot({ path: 'artifacts/body3d-mobile-eye-optics.png', animations: 'disabled', scale: 'css', timeout: 20_000 }))
+    await step('capture-eye-screenshot', () => page.screenshot({ path: 'artifacts/body3d-mobile-eye-optics.png', clip: lessonBox, animations: 'disabled', scale: 'css', timeout: 20_000 }))
   } finally {
     await canvasSuppression.evaluate((style) => style.remove()).catch(() => {})
   }
