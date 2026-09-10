@@ -111,7 +111,7 @@ export function Readiness() {
   const updateToday = (patch: Partial<DayLog>) => {
     setStore((current) => ({
       ...current,
-      [tk]: { behaviors: [], workouts: [], ...current[tk], ...patch },
+      [tk]: { ...(current[tk] ?? { behaviors: [], workouts: [] }), ...patch },
     }))
   }
 
