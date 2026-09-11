@@ -143,6 +143,7 @@ export function KolomPelatih({
               subtitle={terakhir ? new Date(terakhir.mulai).toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long' }) : ''} />
             <ShareCardButton targetRef={debriefRef} fileName={`panaceamed-${db.judul.replace(/\s+/g, '-').toLowerCase()}.png`} title={db.judul} />
           </div>
+          <KesegaranData jedaMs={jedaMs} />
           <div className="mt-2 flex flex-wrap items-center gap-2">
             <span className="rounded-full px-2.5 py-1 text-[11px] font-black"
               style={{ background: `${db.klasifikasi.warna}22`, color: db.klasifikasi.warna }}>
@@ -267,6 +268,43 @@ function kapan(iso: string): string {
  * Penghitungnya hidup: `useJam` di komponen induk membuatnya berdetak, jadi
  * menit yang berjalan terlihat dan tidak ada yang mengira tampilannya beku.
  */
+/**
+ * Kesegaran data, bukan kesegaran latihan.
+ *
+ * Kartu ini menampilkan tanggal sesi terakhir dan berhenti di situ. Dari layar,
+ * "Tuesday 8 September" tidak bisa dibedakan dari dua keadaan yang sangat
+ * berbeda: seseorang memang belum berlatih sejak Selasa, atau ia sudah berlatih
+ * tetapi datanya belum sampai. Keduanya terlihat persis sama.
+ *
+ * Yang kedua benar-benar terjadi dan memakan waktu pemakainya: ia berlari,
+ * membuka Panacea, melihat tanggal lama, dan menyangka aplikasinya rusak.
+ * Sesi latihan hanya masuk lewat otomatisasi Workouts di Health Auto Export
+ * atau impor berkas; kalau otomatisasi itu tidak ada, tidak ada yang pernah
+ * berangkat — bukan gagal di tengah jalan.
+ *
+ * Karena itu pita ini hanya muncul ketika jedanya sudah cukup panjang untuk
+ * meragukan, dan ia tidak menuduh siapa pun: ia menyebut apa yang diketahui
+ * ("ini yang terbaru yang diterima") lalu menunjukkan tempat memeriksanya.
+ * Ambangnya dua hari supaya hari istirahat yang biasa tidak memicunya.
+ */
+const AMBANG_BASI_MS = 48 * 3600_000
+
+function KesegaranData({ jedaMs }: { jedaMs: number | null }) {
+  if (jedaMs === null || jedaMs < AMBANG_BASI_MS) return null
+  const hari = Math.floor(jedaMs / 86400_000)
+  return (
+    <div className="mt-2 rounded-2xl border border-amber-400/20 bg-amber-400/[0.07] px-3 py-2">
+      <p className="text-[11px] leading-relaxed text-amber-200/90">
+        This is the most recent session Panacea has <strong>received</strong> — {hari} days ago. If you have trained
+        since, the data has not arrived yet.
+      </p>
+      <Link to="/health-data" className="mt-1 inline-block text-[11px] font-black text-amber-300 underline underline-offset-2">
+        Check sync or import sessions →
+      </Link>
+    </div>
+  )
+}
+
 function SejakTerakhir({ jedaMs, nama, mulai, kelelahanKini, proyeksi }: {
   jedaMs: number
   nama?: string
