@@ -4,8 +4,10 @@ import {
   BODY_MATURATION_ORDER,
   REQUIRED_MACRO_REGIONS,
   REQUIRED_WHOLE_BODY_SYSTEMS,
+  auditOrganStage,
   buildBodyMaturationReport,
 } from '../../src/lib/anatomy/bodyMaturationGate.ts'
+import { REQUIRED_MACRO_ORGANS } from '../../src/lib/anatomy/organCoverageGate.ts'
 import { INDEXED_ANATOMY_SOURCE_NODE_SNAPSHOT } from '../../src/lib/anatomySourceNodeRegistry.ts'
 
 assert.deepEqual(BODY_MATURATION_ORDER, [
@@ -106,6 +108,56 @@ for (const stage of sourceBlocked.stages.slice(2)) {
   assert.equal(stage.authoringAllowed, false)
 }
 
+const syntheticOrganReady = {
+  id: 'synthetic-organ-maturation',
+  revision: 'test',
+  nodes: REQUIRED_MACRO_ORGANS.map((entry) => ({
+    id: entry.acceptedNodeIds[0],
+    label: entry.label,
+    system: entry.system,
+    regions: ['whole-body'],
+    laterality: 'not-applicable',
+    scale: 'organ',
+    source: { mode: 'specific-fallback', nodeHints: [entry.label] },
+    geometryStatus: 'shipped',
+    educationalPriority: 1,
+    provenance: {
+      sourceId: 'test',
+      sourceRevision: 'test',
+      license: 'test',
+      sourceLocator: 'test',
+      reviewStatus: 'academic-review-required',
+      reviewerScope: 'test',
+    },
+  })),
+} as const
+
+assert.deepEqual(auditOrganStage(syntheticOrganReady as never), [])
+
+const firstOrgan = REQUIRED_MACRO_ORGANS[0]
+assert.ok(firstOrgan)
+const syntheticOrganPartial = {
+  ...syntheticOrganReady,
+  nodes: syntheticOrganReady.nodes.map((node, index) =>
+    index === 0 ? { ...node, geometryStatus: 'partial' as const } : node,
+  ),
+}
+const partialOrganBlockers = auditOrganStage(syntheticOrganPartial as never)
+assert.equal(partialOrganBlockers.length, 1)
+assert.equal(partialOrganBlockers[0]?.stage, 'organ')
+assert.equal(partialOrganBlockers[0]?.code, 'organ-coverage-incomplete')
+assert.equal(partialOrganBlockers[0]?.requirement, `${firstOrgan.id}:partial`)
+assert.equal(partialOrganBlockers[0]?.nodeId, firstOrgan.acceptedNodeIds[0])
+
+const syntheticOrganMissing = {
+  ...syntheticOrganReady,
+  nodes: syntheticOrganReady.nodes.slice(1),
+}
+const missingOrganBlockers = auditOrganStage(syntheticOrganMissing as never)
+assert.equal(missingOrganBlockers.length, 1)
+assert.equal(missingOrganBlockers[0]?.requirement, `${firstOrgan.id}:missing`)
+assert.equal(missingOrganBlockers[0]?.nodeId, undefined)
+
 console.log(JSON.stringify({
   activeStage: report.activeStage,
   currentSystemBlockers: system.blockers.map((blocker) => ({
@@ -119,4 +171,9 @@ console.log(JSON.stringify({
   sourceAdmissionGuard: sourceBlockedSystem.blockers
     .filter((blocker) => blocker.code === 'source-admission-failed')
     .map((blocker) => ({ nodeId: blocker.nodeId, requirement: blocker.requirement })),
+  organCoverageGuard: {
+    allShippedBlockers: auditOrganStage(syntheticOrganReady as never).length,
+    partial: partialOrganBlockers.map((blocker) => blocker.requirement),
+    missing: missingOrganBlockers.map((blocker) => blocker.requirement),
+  },
 }, null, 2))
