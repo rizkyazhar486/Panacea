@@ -24,7 +24,7 @@ function normalizeName(value: string): string {
 
 function sourceHintsFor(nodeId: string): readonly string[] {
   const node = RESPIRATORY_ATLAS_NODES.find((candidate) => candidate.id === nodeId)
-  if (!node?.source || !node.source.files.includes('visceral.glb')) return []
+  if (!node?.source?.files?.includes('visceral.glb')) return []
   return node.source.nodeHints
 }
 
@@ -110,7 +110,7 @@ export function RespiratoryFlow3D({ phase, height = 340 }: Props) {
 
     const respiratoryHints = new Set(
       RESPIRATORY_ATLAS_NODES
-        .filter((node) => node.source?.files.includes('visceral.glb'))
+        .filter((node) => node.source?.files?.includes('visceral.glb'))
         .flatMap((node) => node.source?.nodeHints ?? [])
         .filter(Boolean)
         .map(normalizeName),
