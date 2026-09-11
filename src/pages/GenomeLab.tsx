@@ -368,6 +368,24 @@ export function GenomeLab() {
           <p className="mt-2 inline-block rounded-full bg-amber-400/15 px-2.5 py-1 text-[10px] font-black uppercase tracking-[0.12em] text-amber-800 dark:text-amber-300">
             highest evidence: {senyawa.bukti.replace(/-/g, ' ')}
           </p>
+          {senyawa.rujukan.length > 0 ? (
+            <div className="mt-2 space-y-1.5">
+              {senyawa.rujukan.map((r) => (
+                <div key={r.pmid ?? r.nct} className="rounded-xl border border-neutral-200 p-2.5 dark:border-white/10">
+                  <a href={r.pmid ? `https://pubmed.ncbi.nlm.nih.gov/${r.pmid}/` : `https://clinicaltrials.gov/study/${r.nct}`}
+                    target="_blank" rel="noreferrer"
+                    className="text-[11.5px] font-bold text-brand-dark underline underline-offset-2 dark:text-brand">
+                    {r.pmid ? `PMID ${r.pmid}` : r.nct} · {r.judul}
+                  </a>
+                  <p className="mt-1 text-[11px] leading-relaxed text-neutral-600 dark:text-neutral-400">{r.temuan}</p>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <p className="mt-2 text-[11px] font-semibold text-neutral-500">
+              No source checked for this entry yet — treat the note above as unverified.
+            </p>
+          )}
         </div>
 
         {senyawa.ec50Mikromolar !== null && senyawa.koefisienHill !== null ? (

@@ -137,6 +137,24 @@ export function langkahBeban(
  * bukti perpanjangan umur pada manusia; beberapa punya bukti kuat pada hewan,
  * dan jarak antara keduanya adalah inti seluruh bidang ini.
  */
+/**
+ * Satu rujukan yang BENAR-BENAR diperiksa, bukan diingat.
+ *
+ * Setiap entri di bawah dicari di PubMed atau ClinicalTrials.gov sewaktu
+ * berkas ini ditulis, dan `temuan` mencatat apa yang sumbernya benar-benar
+ * tunjukkan -- bukan apa yang enak dikutip. Satu klaim gugur karena
+ * pemeriksaan ini; lihat catatan metformin.
+ */
+export interface Rujukan {
+  /** PubMed ID, bila sumbernya makalah. */
+  pmid?: string
+  /** Identitas ClinicalTrials.gov, bila sumbernya uji terdaftar. */
+  nct?: string
+  judul: string
+  /** Apa yang sumber itu tunjukkan, dinyatakan sebatas yang ditunjukkan. */
+  temuan: string
+}
+
 export interface SenyawaGero {
   id: string
   nama: string
@@ -155,6 +173,8 @@ export interface SenyawaGero {
   koefisienHill: number | null
   /** Apa yang benar-benar ditunjukkan, dan pada spesies apa. */
   catatan: string
+  /** Sumber yang diperiksa. Kosong berarti belum diperiksa, dan itu ditulis. */
+  rujukan: Rujukan[]
 }
 
 export const SENYAWA_GERO: SenyawaGero[] = [
@@ -168,6 +188,12 @@ export const SENYAWA_GERO: SenyawaGero[] = [
     koefisienHill: 1,
     catatan: 'Memperpanjang umur pada mencit bahkan ketika dimulai di usia tua. '
       + 'Bukti umur pada manusia tidak ada. Imunosupresi adalah efek kelasnya, bukan efek samping langka.',
+    rujukan: [{
+      pmid: '19587680',
+      judul: 'Rapamycin fed late in life extends lifespan in genetically heterogeneous mice (Nature, 2009)',
+      temuan: 'Umur diperpanjang pada MENCIT walaupun pemberian dimulai pada usia 600 hari. '
+        + 'Tidak menunjukkan apa pun tentang umur manusia.',
+    }],
   },
   {
     id: 'metformin',
@@ -177,9 +203,25 @@ export const SENYAWA_GERO: SenyawaGero[] = [
     bukti: 'clinical-research',
     ec50Mikromolar: null,
     koefisienHill: null,
-    catatan: 'Obat diabetes yang mapan. Efek geroprotektifnya pada manusia non-diabetes sedang diuji '
-      + '(TAME) dan belum terjawab. Tidak ada satu EC50 in vitro yang konsisten antar-sistem, jadi '
-      + 'tidak ada angka yang dicantumkan.',
+    catatan: 'Obat diabetes yang mapan. Klaim awal berkas ini menyebut TAME sebagai uji yang '
+      + '"sedang berjalan"; pencarian di ClinicalTrials.gov tidak menemukan uji TAME yang terdaftar, '
+      + 'dan yang benar-benar terbit adalah rancangan serta kerangka biomarkernya. Jadi efek '
+      + 'geroprotektif pada manusia non-diabetes belum diuji dalam uji terdaftar, bukan sekadar '
+      + '"belum terjawab". Tidak ada satu EC50 in vitro yang konsisten antar-sistem.',
+    rujukan: [
+      {
+        pmid: '30151729',
+        judul: 'A framework for selection of blood-based biomarkers for geroscience-guided clinical trials: report from the TAME Biomarkers Workgroup (GeroScience, 2018)',
+        temuan: 'Menetapkan biomarker dan rancangan yang DIUSULKAN untuk TAME. Sebuah rancangan, '
+          + 'bukan hasil, dan bukan bukti bahwa ujinya berjalan.',
+      },
+      {
+        pmid: '30746605',
+        judul: 'Taming expectations of metformin as a treatment to extend healthspan (GeroScience, 2019)',
+        temuan: 'Tinjauan yang justru memperingatkan bahwa harapan terhadap metformin melampaui '
+          + 'buktinya, termasuk kemungkinan tumpulnya adaptasi latihan.',
+      },
+    ],
   },
   {
     id: 'dasatinib-quercetin',
@@ -192,6 +234,12 @@ export const SENYAWA_GERO: SenyawaGero[] = [
     catatan: 'Kombinasi senolitik kanonis. Membersihkan sel senesen pada hewan dan pada uji manusia '
       + 'berskala sangat kecil dengan titik akhir jaringan, bukan titik akhir umur. Kombinasi dipakai '
       + 'justru karena tipe sel senesen yang berbeda bergantung pada jalur bertahan yang berbeda.',
+    rujukan: [{
+      pmid: '34699859',
+      judul: 'Strategies for late phase preclinical and early clinical trials of senolytics (Mech Ageing Dev, 2021)',
+      temuan: 'Menempatkan senolitik pada tahap praklinis akhir dan uji klinis AWAL. '
+        + 'Titik akhirnya jaringan dan kelayakan, bukan umur.',
+    }],
   },
   {
     id: 'spermidine',
@@ -203,6 +251,7 @@ export const SENYAWA_GERO: SenyawaGero[] = [
     koefisienHill: null,
     catatan: 'Memperpanjang umur pada beberapa organisme model. Data manusia bersifat observasional '
       + 'dan tidak bisa memisahkan senyawa dari pola makan yang mengandungnya.',
+    rujukan: [],
   },
   {
     id: 'nmn-nr',
@@ -214,6 +263,7 @@ export const SENYAWA_GERO: SenyawaGero[] = [
     koefisienHill: null,
     catatan: 'Menaikkan NAD+ darah pada manusia secara terukur. Bahwa kenaikan itu menghasilkan '
       + 'manfaat klinis belum ditunjukkan; menaikkan biomarker bukan hasil.',
+    rujukan: [],
   },
 ]
 

@@ -149,3 +149,42 @@ assert.ok(senyawaUntukCiri('cellular-senescence').length > 0, 'Senolitik harus t
 assert.equal(senyawaUntukCiri('tidak-ada-ciri-ini').length, 0)
 
 console.log('Farmakodinamik: identitas Hill eksak, invers, C80/C20 = 16^(1/n), CI Loewe = 1 untuk senyawa dengan dirinya sendiri, Euler konvergen orde satu terhadap penyelesaian analitik, dan katalog yang tidak mengarang EC50.')
+
+// ── 7. Rujukan harus benar-benar bisa ditelusuri ────────────────────────────
+//
+// Kutipan yang tidak bisa dibuka sama saja dengan tidak ada kutipan, dan lebih
+// buruk: ia memberi kesan diperiksa padahal tidak. Jadi identitasnya diuji
+// bentuknya, dan isinya diuji apakah menyatakan BATAS temuan, bukan sekadar
+// mengangguk.
+for (const s of SENYAWA_GERO) {
+  for (const r of s.rujukan) {
+    assert.ok(r.pmid || r.nct, `${s.id}: rujukan tanpa identitas tidak bisa ditelusuri.`)
+    if (r.pmid) assert.match(r.pmid, /^\d{6,9}$/, `${s.id}: PMID tidak berbentuk PMID: ${r.pmid}`)
+    if (r.nct) assert.match(r.nct, /^NCT\d{8}$/, `${s.id}: NCT tidak berbentuk NCT: ${r.nct}`)
+    assert.ok(r.judul.length > 25, `${s.id}: judul rujukan terlalu pendek untuk dikenali.`)
+    assert.ok(r.temuan.length > 40,
+      `${s.id}: rujukan harus mencatat apa yang benar-benar ditunjukkan, bukan hanya dikutip.`)
+  }
+}
+
+// Senyawa dengan bukti klinis atau praklinis yang DIKLAIM harus membawa
+// setidaknya satu sumber, atau menyatakan sendiri bahwa belum diperiksa.
+{
+  const tanpaSumber = SENYAWA_GERO.filter((s) => s.rujukan.length === 0)
+  assert.ok(tanpaSumber.length > 0,
+    'Kalau setiap senyawa tiba-tiba punya rujukan, kemungkinan besar sebagiannya dikarang.')
+  assert.ok(SENYAWA_GERO.some((s) => s.rujukan.length > 0), 'Setidaknya sebagian harus diperiksa.')
+}
+
+// Pemeriksaan yang MENGGUGURKAN klaim harus tetap tercatat, bukan dihapus
+// diam-diam. Klaim TAME adalah contohnya.
+{
+  const metformin = SENYAWA_GERO.find((s) => s.id === 'metformin')
+  assert.ok(metformin, 'metformin harus ada.')
+  assert.match(metformin.catatan, /tidak menemukan uji TAME yang terdaftar/,
+    'Koreksi terhadap klaim yang gugur harus terlihat di katalog, bukan hilang.')
+  assert.ok(metformin.rujukan.some((r) => /Taming expectations/i.test(r.judul)),
+    'Sumber yang membantah harapan berlebih harus ikut dikutip, bukan hanya yang mendukung.')
+}
+
+console.log('Rujukan: identitas berbentuk sah, temuan dinyatakan sebatas yang ditunjukkan, dan klaim yang gugur saat diperiksa tetap tercatat.')
