@@ -26,6 +26,148 @@ function Angka({ label, nilai, satuan, normal, buruk }: {
   )
 }
 
+function batasVisual(n: number, min: number, max: number) {
+  return Math.max(min, Math.min(max, n))
+}
+
+/**
+ * Gambar hubungan antarsistem, bukan atlas anatomi. Bentuk organ sengaja
+ * disederhanakan; yang berubah hanyalah cue visual dari output yang memang
+ * dihitung bodySim. Ketebalan garis tidak boleh dibaca sebagai diameter
+ * pembuluh atau pengukuran pasien.
+ */
+function SystemCouplingDiagram({ out }: { out: ReturnType<typeof simulate> }) {
+  const pulmonaryWidth = 2 + batasVisual(out.cardiacOutput / 8, 0, 1) * 3
+  const renalWidth = 2 + batasVisual(out.renalPerfusion / 1600, 0, 1) * 3
+  const oxygenOpacity = 0.5 + batasVisual(out.sao2 / 100, 0, 1) * 0.5
+
+  return (
+    <figure className="rounded-2xl border border-neutral-200 bg-neutral-50/70 p-3 dark:border-white/10 dark:bg-white/[0.035]">
+      <div className="mb-1 flex items-center justify-between gap-2">
+        <div>
+          <div className="text-[10px] font-black uppercase tracking-[0.14em] text-neutral-500">Live system coupling</div>
+          <div className="mt-0.5 text-[11px] font-bold text-ink dark:text-white">Heart ↔ lungs · heart ↔ kidneys</div>
+        </div>
+        <span className="rounded-full border border-neutral-200 px-2 py-1 text-[8px] font-black uppercase tracking-wide text-neutral-500 dark:border-white/10">schematic</span>
+      </div>
+
+      <svg
+        viewBox="0 0 360 230"
+        className="w-full"
+        role="img"
+        aria-labelledby="sim-coupling-title sim-coupling-desc"
+      >
+        <title id="sim-coupling-title">Live heart, lung, and kidney coupling schematic</title>
+        <desc id="sim-coupling-desc">
+          The current simulator computes cardiac output {out.cardiacOutput.toFixed(1)} litres per minute,
+          oxygen saturation {out.sao2.toFixed(0)} percent, and glomerular filtration {out.gfr.toFixed(0)} millilitres per minute.
+          Organ shapes and line thickness are educational cues rather than anatomical scale.
+        </desc>
+        <defs>
+          <marker id="sim-arrow-cyan" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse">
+            <path d="M 0 0 L 10 5 L 0 10 z" fill="#38bdf8" />
+          </marker>
+          <marker id="sim-arrow-green" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse">
+            <path d="M 0 0 L 10 5 L 0 10 z" fill="#00BF63" />
+          </marker>
+          <marker id="sim-arrow-purple" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse">
+            <path d="M 0 0 L 10 5 L 0 10 z" fill="#a855f7" />
+          </marker>
+        </defs>
+
+        {/* Pulmonary loop: heart to lungs, then oxygenated return. */}
+        <path
+          d="M158 122 C122 112 118 92 138 80"
+          fill="none"
+          stroke="#38bdf8"
+          strokeWidth={pulmonaryWidth}
+          strokeLinecap="round"
+          markerEnd="url(#sim-arrow-cyan)"
+        />
+        <path
+          d="M222 80 C242 94 236 112 202 122"
+          fill="none"
+          stroke="#00BF63"
+          strokeOpacity={oxygenOpacity}
+          strokeWidth={pulmonaryWidth}
+          strokeLinecap="round"
+          markerEnd="url(#sim-arrow-green)"
+        />
+
+        {/* Renal perfusion loop: systemic output to kidneys and venous return. */}
+        <path
+          d="M166 145 C145 160 130 177 123 191"
+          fill="none"
+          stroke="#a855f7"
+          strokeWidth={renalWidth}
+          strokeLinecap="round"
+          markerEnd="url(#sim-arrow-purple)"
+        />
+        <path
+          d="M194 145 C215 160 230 177 237 191"
+          fill="none"
+          stroke="#a855f7"
+          strokeWidth={renalWidth}
+          strokeLinecap="round"
+          markerEnd="url(#sim-arrow-purple)"
+        />
+        <path
+          d="M142 198 C160 181 169 164 175 148"
+          fill="none"
+          stroke="#00BF63"
+          strokeOpacity="0.65"
+          strokeWidth="2"
+          strokeLinecap="round"
+          markerEnd="url(#sim-arrow-green)"
+        />
+        <path
+          d="M218 198 C200 181 191 164 185 148"
+          fill="none"
+          stroke="#00BF63"
+          strokeOpacity="0.65"
+          strokeWidth="2"
+          strokeLinecap="round"
+          markerEnd="url(#sim-arrow-green)"
+        />
+
+        {/* Airway and lungs. */}
+        <path d="M180 20 L180 46 M180 46 L154 58 M180 46 L206 58" fill="none" stroke="currentColor" strokeOpacity="0.35" strokeWidth="4" strokeLinecap="round" />
+        <ellipse cx="145" cy="66" rx="34" ry="41" fill="rgba(56,189,248,0.12)" stroke="#38bdf8" strokeWidth="2" />
+        <ellipse cx="215" cy="66" rx="34" ry="41" fill="rgba(56,189,248,0.12)" stroke="#38bdf8" strokeWidth="2" />
+        <text x="180" y="56" textAnchor="middle" className="fill-current text-[9px] font-black">LUNGS</text>
+        <text x="180" y="70" textAnchor="middle" className="fill-current text-[8.5px] font-bold" opacity="0.76">SaO₂ {out.sao2.toFixed(0)}%</text>
+        <text x="180" y="82" textAnchor="middle" className="fill-current text-[8.5px] font-bold" opacity="0.62">PaCO₂ {out.paco2.toFixed(0)} mmHg</text>
+
+        {/* Unified heart node: this is coupling, not chamber anatomy. */}
+        <path
+          d="M180 151 C171 141 145 126 145 108 C145 94 156 86 168 86 C175 86 180 90 180 96 C180 90 185 86 192 86 C204 86 215 94 215 108 C215 126 189 141 180 151 Z"
+          fill="rgba(255,90,31,0.14)"
+          stroke="#FF5A1F"
+          strokeWidth="2.2"
+        />
+        <text x="180" y="113" textAnchor="middle" className="fill-current text-[9px] font-black">HEART</text>
+        <text x="180" y="126" textAnchor="middle" className="fill-current text-[8.5px] font-bold" opacity="0.76">CO {out.cardiacOutput.toFixed(1)} L/min</text>
+        <text x="180" y="138" textAnchor="middle" className="fill-current text-[8.5px] font-bold" opacity="0.62">MAP {out.map.toFixed(0)} mmHg</text>
+
+        {/* Kidneys as paired schematic beans. */}
+        <path d="M95 188 C80 177 78 153 95 146 C108 141 121 150 119 164 C117 180 108 194 95 188 Z" fill="rgba(168,85,247,0.12)" stroke="#a855f7" strokeWidth="2" />
+        <path d="M265 188 C280 177 282 153 265 146 C252 141 239 150 241 164 C243 180 252 194 265 188 Z" fill="rgba(168,85,247,0.12)" stroke="#a855f7" strokeWidth="2" />
+        <text x="180" y="177" textAnchor="middle" className="fill-current text-[9px] font-black">KIDNEYS</text>
+        <text x="180" y="190" textAnchor="middle" className="fill-current text-[8.5px] font-bold" opacity="0.76">GFR {out.gfr.toFixed(0)} mL/min</text>
+        <text x="180" y="202" textAnchor="middle" className="fill-current text-[8.5px] font-bold" opacity="0.62">urine {out.urineOutput.toFixed(0)} mL/h</text>
+
+        <text x="68" y="105" className="fill-current text-[7.5px] font-black uppercase" opacity="0.48">pulmonary loop</text>
+        <text x="248" y="164" className="fill-current text-[7.5px] font-black uppercase" opacity="0.48">renal perfusion</text>
+        <text x="180" y="222" textAnchor="middle" className="fill-current text-[8px] font-bold" opacity="0.54">O₂ delivery {out.do2.toFixed(0)} mL/min · lactate {out.lactate.toFixed(1)} mmol/L</text>
+      </svg>
+
+      <figcaption className="mt-1 text-[10px] leading-relaxed text-neutral-500">
+        Educational coupling map, not anatomical scale. Organ shapes are schematic and the changing line thickness is only a normalized cue from the current computed model output; it is not vessel calibre, imaging, or a patient measurement.
+      </figcaption>
+    </figure>
+  )
+}
+
 export function SimulatorSection({ onVitals }: Props) {
   const [input, setInput] = useState<SimInput>({ ...NORMAL })
   const [skenarioAktif, setSkenarioAktif] = useState('normal')
@@ -88,6 +230,8 @@ export function SimulatorSection({ onVitals }: Props) {
           </p>
         </div>
       )}
+
+      <SystemCouplingDiagram out={out} />
 
       <div>
         <div className="t-mikro font-bold uppercase tracking-wide text-neutral-500">Circulation</div>
