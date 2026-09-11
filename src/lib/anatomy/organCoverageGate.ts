@@ -1,6 +1,6 @@
-import type { AtlasManifest, AtlasSystemId } from './atlasKernel'
+import type { AtlasManifest, AtlasNode, AtlasSystemId } from './atlasKernel'
 
-export type OrganCoverageStatus = 'shipped' | 'partial' | 'reference-only' | 'missing'
+export type OrganCoverageStatus = 'shipped' | 'partial' | 'reference-only' | 'wrong-scale' | 'missing'
 
 export interface RequiredOrganCoverage {
   id: string
@@ -12,6 +12,7 @@ export interface RequiredOrganCoverage {
 export interface OrganCoverageEntry extends RequiredOrganCoverage {
   status: OrganCoverageStatus
   matchedNodeId?: string
+  matchedNodeScale?: AtlasNode['scale']
 }
 
 export interface OrganCoverageReport {
@@ -19,6 +20,7 @@ export interface OrganCoverageReport {
   shipped: number
   partial: number
   referenceOnly: number
+  wrongScale: number
   missing: number
   entries: readonly OrganCoverageEntry[]
 }
@@ -30,7 +32,9 @@ export interface OrganCoverageReport {
  * listed node is anatomically reviewed or patient-specific. A requirement is
  * complete only when at least one accepted canonical atlas node exists at organ
  * scale and its geometry is shipped. Smaller-scale or reference-only nodes never
- * satisfy an organ requirement.
+ * satisfy an organ requirement. If an accepted canonical ID exists only at the
+ * wrong scale, the ledger surfaces `wrong-scale` instead of misreporting it as
+ * anatomically absent.
  */
 export const REQUIRED_MACRO_ORGANS: readonly RequiredOrganCoverage[] = [
   { id: 'skin', label: 'Skin', system: 'surface', acceptedNodeIds: ['surface:skin'] },
@@ -99,20 +103,28 @@ function classifyGeometry(status: string | undefined): OrganCoverageStatus {
 export function buildOrganCoverageReport(manifest: AtlasManifest): OrganCoverageReport {
   const nodesById = new Map(manifest.nodes.map((node) => [node.id, node]))
   const entries: OrganCoverageEntry[] = REQUIRED_MACRO_ORGANS.map((requirement) => {
-    const matched = requirement.acceptedNodeIds
+    const candidates = requirement.acceptedNodeIds
       .map((id) => nodesById.get(id))
-      .find((node) => node?.scale === 'organ')
+      .filter((node): node is AtlasNode => Boolean(node))
+    const matched = candidates.find((node) => node.scale === 'organ')
+    const wrongScale = matched ? undefined : candidates[0]
 
     return {
       ...requirement,
-      matchedNodeId: matched?.id,
-      status: matched ? classifyGeometry(matched.geometryStatus) : 'missing',
+      matchedNodeId: matched?.id ?? wrongScale?.id,
+      matchedNodeScale: matched?.scale ?? wrongScale?.scale,
+      status: matched
+        ? classifyGeometry(matched.geometryStatus)
+        : wrongScale
+          ? 'wrong-scale'
+          : 'missing',
     }
   })
 
   const shipped = entries.filter((entry) => entry.status === 'shipped').length
   const partial = entries.filter((entry) => entry.status === 'partial').length
   const referenceOnly = entries.filter((entry) => entry.status === 'reference-only').length
+  const wrongScale = entries.filter((entry) => entry.status === 'wrong-scale').length
   const missing = entries.filter((entry) => entry.status === 'missing').length
 
   return {
@@ -120,6 +132,7 @@ export function buildOrganCoverageReport(manifest: AtlasManifest): OrganCoverage
     shipped,
     partial,
     referenceOnly,
+    wrongScale,
     missing,
     entries,
   }
