@@ -32,12 +32,12 @@ const systemRoots: readonly AtlasNode[] = [
   ['articular', 'Articular system', ['skeletal'], ['whole-body'], ['joint', 'cartilage', 'ligament']],
   ['muscular', 'Muscular system', ['muscular'], ['whole-body'], ['muscle']],
   ['cardiovascular', 'Cardiovascular system', ['cardiovascular'], ['whole-body'], ['heart', 'artery', 'vein']],
-  ['lymphatic', 'Lymphatic system', ['lymphoid'], ['whole-body'], ['lymph node', 'lymphatic']],
+  ['lymphatic', 'Lymphatic system', ['lymphoid'], ['whole-body'], ['nodes', 'Spleen', 'thymus']],
   ['nervous', 'Nervous system', ['nervous'], ['whole-body'], ['brain', 'spinal cord', 'nerve']],
   ['respiratory', 'Respiratory system', ['visceral'], ['head', 'neck', 'thorax'], ['trachea', 'bronch', 'lung']],
   ['digestive', 'Digestive system', ['visceral'], ['head', 'neck', 'thorax', 'abdomen', 'pelvis'], ['esophagus', 'stomach', 'intestine', 'liver']],
   ['urinary', 'Urinary system', ['visceral'], ['abdomen', 'pelvis'], ['kidney', 'ureter', 'urinary bladder']],
-  ['endocrine', 'Endocrine system', ['visceral'], ['head', 'neck', 'thorax', 'abdomen', 'pelvis'], ['pituitary', 'thyroid', 'adrenal', 'pancreas']],
+  ['endocrine', 'Endocrine system', ['visceral'], ['head', 'neck', 'thorax', 'abdomen', 'pelvis'], ['hypophysis', 'thyroid', 'suprarenal', 'pancreas']],
   ['reproductive', 'Reproductive system', ['visceral'], ['pelvis'], ['prostate', 'testis', 'uterus', 'ovary']],
   ['sensory', 'Special sensory organs', ['nervous', 'visceral'], ['head'], ['eye', 'cochlea', 'vestibular']],
   ['fascial', 'Fascial and connective planes', ['surface', 'muscular'], ['whole-body'], ['fascia', 'aponeurosis']],
@@ -86,9 +86,94 @@ const majorNodes: readonly AtlasNode[] = [
   node({ id: 'urinary:ureters', label: 'Ureters', system: 'urinary', regions: ['abdomen', 'pelvis'], laterality: 'paired', scale: 'organ', parentId: 'urinary:kidneys', children: ['urinary:bladder'], source: { mode: 'specific-fallback', files: ['visceral.glb'], nodeHints: ['ureter'] }, geometryStatus: 'shipped', educationalPriority: 0.8, physiologyCapable: true }),
   node({ id: 'urinary:bladder', label: 'Urinary bladder', system: 'urinary', regions: ['pelvis'], laterality: 'midline', scale: 'organ', parentId: 'urinary:ureters', source: { mode: 'specific-fallback', files: ['visceral.glb'], nodeHints: ['urinary bladder', 'bladder'] }, geometryStatus: 'shipped', educationalPriority: 0.85, physiologyCapable: true, surgicalLandmark: true }),
 
-  node({ id: 'endo:pituitary', label: 'Pituitary gland', system: 'endocrine', regions: ['head'], laterality: 'midline', scale: 'organ', parentId: 'system:endocrine', source: { mode: 'specific-fallback', files: ['visceral.glb'], nodeHints: ['pituitary'] }, geometryStatus: 'shipped', educationalPriority: 0.85, physiologyCapable: true }),
+  node({ id: 'endo:pituitary', label: 'Pituitary gland', system: 'endocrine', regions: ['head'], laterality: 'midline', scale: 'organ', parentId: 'system:endocrine', source: { mode: 'specific-fallback', files: ['visceral.glb'], nodeHints: ['Adenohypophysis', 'Neurohypophysis', 'hypophysis'] }, synonyms: ['Hypophysis'], geometryStatus: 'shipped', educationalPriority: 0.85, physiologyCapable: true }),
   node({ id: 'endo:thyroid', label: 'Thyroid gland', system: 'endocrine', regions: ['neck'], laterality: 'bilateral', scale: 'organ', parentId: 'system:endocrine', source: { mode: 'specific-fallback', files: ['visceral.glb'], nodeHints: ['thyroid gland', 'thyroid'] }, geometryStatus: 'shipped', educationalPriority: 0.9, physiologyCapable: true, surgicalLandmark: true }),
   node({ id: 'endo:adrenals', label: 'Adrenal glands', system: 'endocrine', regions: ['abdomen'], laterality: 'paired', scale: 'organ', parentId: 'system:endocrine', source: { mode: 'specific-fallback', files: ['visceral.glb'], nodeHints: ['suprarenal gland', 'adrenal gland'] }, geometryStatus: 'shipped', educationalPriority: 0.85, physiologyCapable: true }),
+
+  // ── Organ yang geometrinya SUDAH dikirim tetapi belum pernah dideklarasikan ──
+  //
+  // Gerbang cakupan melaporkan 24 dari 44 organ makro sebagai "missing". Sebagian
+  // besar ternyata bukan tidak ada: bundel GLB-nya sudah ikut dikirim, hanya
+  // simpul atlasnya yang tidak pernah ditulis. Jadi yang hilang adalah
+  // deklarasinya, bukan meshnya.
+  //
+  // Setiap nodeHints di bawah dibaca LANGSUNG dari chunk JSON berkas GLB-nya,
+  // bukan ditebak dari nama Latin yang sepertinya benar. Ejaannya mengikuti
+  // berkasnya apa adanya -- "Oesophagus", bukan "Esophagus" -- karena pencarian
+  // simpul mencocokkan teks, dan ejaan yang salah menghasilkan organ yang
+  // dideklarasikan tetapi tidak pernah tampil.
+  //
+  // Yang TIDAK ditambahkan di sini, karena tidak ditemukan di berkas mana pun:
+  // kulit, pembuluh limfa (duktus torasikus), sendi sinovial utama, bidang
+  // fasia, dan organ reproduksi perempuan. Itu tetap kekurangan yang nyata dan
+  // dibiarkan merah, bukan diisi supaya angkanya bagus.
+
+  node({ id: 'lymph:spleen', label: 'Spleen', system: 'lymphatic', regions: ['abdomen'], laterality: 'left', scale: 'organ', parentId: 'system:lymphatic', source: { mode: 'specific-fallback', files: ['lymphoid.glb'], nodeHints: ['Spleen'] }, geometryStatus: 'shipped', educationalPriority: 0.9, physiologyCapable: true, surgicalLandmark: true }),
+  node({ id: 'lymph:thymus', label: 'Thymus', system: 'lymphatic', regions: ['thorax'], laterality: 'bilateral', scale: 'organ', parentId: 'system:lymphatic', source: { mode: 'composite', files: ['lymphoid.glb'], nodeHints: ['Left lobe of thymus', 'Right lobe of thymus'] }, geometryStatus: 'shipped', educationalPriority: 0.75, physiologyCapable: true }),
+  // Jaringan kelenjar getah bening: bundelnya memuat sekitar 150 kelompok
+  // bernama. Yang didaftarkan di sini adalah kelompok regional utama, cukup
+  // untuk membuat simpulnya nyata tanpa menyalin seluruh daftar.
+  node({ id: 'lymph:nodes', label: 'Lymph node network', system: 'lymphatic', regions: ['whole-body'], laterality: 'bilateral', scale: 'organ', parentId: 'system:lymphatic', source: { mode: 'composite', files: ['lymphoid.glb'], nodeHints: ['Central axillary nodes', 'Apical axillary nodes', 'Superficial lateral cervical nodes', 'Submandibular nodes', 'Coeliac nodes', 'Lateral aortic nodes', 'Superomedial superficial inguinal nodes', 'Deep popliteal nodes', 'Superior tracheobronchial nodes', 'Parasternal nodes'] }, geometryStatus: 'shipped', educationalPriority: 0.8, physiologyCapable: true }),
+
+  node({ id: 'gi:esophagus', label: 'Esophagus', system: 'digestive', regions: ['neck', 'thorax'], laterality: 'midline', scale: 'organ', parentId: 'system:digestive', source: { mode: 'specific-fallback', files: ['visceral.glb'], nodeHints: ['Oesophagus'] }, synonyms: ['Oesophagus'], geometryStatus: 'shipped', educationalPriority: 0.85, physiologyCapable: true, surgicalLandmark: true }),
+  node({ id: 'gi:gallbladder', label: 'Gallbladder', system: 'digestive', regions: ['abdomen'], laterality: 'right', scale: 'organ', parentId: 'gi:liver', source: { mode: 'composite', files: ['visceral.glb'], nodeHints: ['Gallbladder', 'Body of gallbladder', 'Fundus of gallbladder', 'Neck of gallbladder', 'Bile duct'] }, geometryStatus: 'shipped', educationalPriority: 0.85, physiologyCapable: true, surgicalLandmark: true }),
+  node({ id: 'gi:salivary-glands', label: 'Major salivary glands', system: 'digestive', regions: ['head', 'neck'], laterality: 'paired', scale: 'organ', parentId: 'system:digestive', source: { mode: 'composite', files: ['visceral.glb'], nodeHints: ['Parotid gland', 'Submandibular gland', 'Sublingual gland'] }, geometryStatus: 'shipped', educationalPriority: 0.75, physiologyCapable: true, surgicalLandmark: true }),
+  // Sengaja 'partial': berkasnya memuat lidah, palatum molle, dan uvula, tetapi
+  // rongga mulut yang utuh juga menuntut gigi dan palatum durum, yang tidak ada
+  // di sini. Menyebutnya 'shipped' akan menjanjikan lebih daripada yang tampil.
+  node({ id: 'gi:oral-cavity', label: 'Oral cavity', system: 'digestive', regions: ['head'], laterality: 'midline', scale: 'organ', parentId: 'system:digestive', source: { mode: 'composite', files: ['visceral.glb'], nodeHints: ['Tongue', 'Soft palate', 'Uvula of palate'] }, geometryStatus: 'partial', educationalPriority: 0.8, physiologyCapable: true }),
+
+  node({ id: 'urinary:urethra', label: 'Urethra', system: 'urinary', regions: ['pelvis'], laterality: 'midline', scale: 'organ', parentId: 'urinary:bladder', source: { mode: 'specific-fallback', files: ['visceral.glb'], nodeHints: ['Urethra'] }, geometryStatus: 'shipped', educationalPriority: 0.7, physiologyCapable: true }),
+
+  node({ id: 'endo:pineal', label: 'Pineal gland', system: 'endocrine', regions: ['head'], laterality: 'midline', scale: 'organ', parentId: 'system:endocrine', source: { mode: 'specific-fallback', files: ['visceral.glb'], nodeHints: ['Pineal gland'] }, geometryStatus: 'shipped', educationalPriority: 0.7, physiologyCapable: true }),
+  node({ id: 'endo:parathyroids', label: 'Parathyroid glands', system: 'endocrine', regions: ['neck'], laterality: 'paired', scale: 'organ', parentId: 'endo:thyroid', source: { mode: 'composite', files: ['visceral.glb'], nodeHints: ['Superior parathyroid gland', 'Inferior parathyroid gland'] }, geometryStatus: 'shipped', educationalPriority: 0.75, physiologyCapable: true, surgicalLandmark: true }),
+  // Hipotalamus ada di bundel SARAF, bukan viseral. Mengikat berkas yang keliru
+  // memberi simpul yang dideklarasikan tetapi tidak pernah tampil.
+  node({ id: 'endo:hypothalamus', label: 'Hypothalamus', system: 'endocrine', regions: ['head'], laterality: 'midline', scale: 'organ', parentId: 'system:endocrine', source: { mode: 'specific-fallback', files: ['nervous.glb'], nodeHints: ['Hypothalamus'] }, geometryStatus: 'shipped', educationalPriority: 0.85, physiologyCapable: true }),
+
+  // ── Gelombang kedua: organ besar yang geometrinya juga sudah ada ────────────
+  //
+  // Sama seperti gelombang pertama, setiap petunjuk dibaca dari chunk JSON
+  // berkas GLB-nya. Yang berbeda: beberapa di antaranya jujur 'partial', dan
+  // alasannya ditulis di tempat masing-masing. 'Partial' di sini berarti ada
+  // yang tampil tetapi tidak cukup untuk menyebut organnya utuh.
+
+  node({ id: 'msk:appendicular-skeleton', label: 'Appendicular skeleton', system: 'skeletal', regions: ['upper-limb', 'lower-limb'], laterality: 'paired', scale: 'organ', parentId: 'system:skeletal', source: { mode: 'composite', files: ['skeletal.glb'], nodeHints: ['Humerus', 'Radius', 'Ulna', 'Femur', 'Tibia', 'Fibula', 'Scapula', 'Clavicle'] }, geometryStatus: 'shipped', educationalPriority: 0.9, surgicalLandmark: true }),
+
+  node({ id: 'msk:skeletal-muscle-set', label: 'Skeletal muscle organ set', system: 'muscular', regions: ['whole-body'], laterality: 'bilateral', scale: 'organ', parentId: 'system:muscular', source: { mode: 'composite', files: ['muscular.glb'], nodeHints: ['Rectus abdominis muscle', 'Descending part of trapezius muscle', 'Long head of biceps brachii', 'Gluteus maximus'] }, geometryStatus: 'shipped', educationalPriority: 0.9, physiologyCapable: true }),
+
+  node({ id: 'cv:systemic-venous-tree', label: 'Systemic venous tree', system: 'cardiovascular', regions: ['whole-body'], laterality: 'bilateral', scale: 'organ', parentId: 'system:cardiovascular', source: { mode: 'composite', files: ['cardiovascular.glb'], nodeHints: ['Superior vena cava', 'Inferior vena cava', 'Femoral vein', 'Internal jugular vein'] }, geometryStatus: 'shipped', educationalPriority: 0.85, physiologyCapable: true, surgicalLandmark: true }),
+
+  node({ id: 'neuro:peripheral-nerves', label: 'Peripheral nerve network', system: 'nervous', regions: ['whole-body'], laterality: 'bilateral', scale: 'organ', parentId: 'system:nervous', source: { mode: 'composite', files: ['nervous.glb'], nodeHints: ['Sciatic nerve', 'Ulnar nerve', 'Median nerve', 'Femoral nerve'] }, geometryStatus: 'shipped', educationalPriority: 0.9, physiologyCapable: true, surgicalLandmark: true }),
+
+  node({ id: 'repro:male-organs', label: 'Male reproductive organ set', system: 'reproductive', regions: ['pelvis'], laterality: 'midline', scale: 'organ', parentId: 'system:reproductive', source: { mode: 'composite', files: ['visceral.glb'], nodeHints: ['Prostate', 'Ductus deferens', 'Epididymis', 'Corpus cavernosum of penis', 'Glans penis'] }, geometryStatus: 'shipped', educationalPriority: 0.75, physiologyCapable: true, surgicalLandmark: true }),
+
+  // 'Partial': tulang pendengaran lengkap, tetapi koklea dan labirin sebagai
+  // organ tidak ada di berkas mana pun. Nukleus koklearis di bundel saraf
+  // adalah batang otak, bukan telinga, dan sengaja tidak dipakai di sini.
+  node({ id: 'sensory:ears', label: 'Auditory ossicles', system: 'sensory', regions: ['head'], laterality: 'paired', scale: 'organ', parentId: 'system:sensory', source: { mode: 'composite', files: ['skeletal.glb'], nodeHints: ['Malleus', 'Incus', 'Stapes'] }, geometryStatus: 'partial', educationalPriority: 0.8, physiologyCapable: true }),
+
+  // Mata: bola mata lengkap dengan isinya, ditambah aparatus lakrimal.
+  //
+  // Simpul ini sempat 'partial' dengan empat petunjuk saja. Pemicu untuk
+  // memeriksanya lagi datang dari luar: sebuah atlas kepala pihak ketiga
+  // (bubblik525/head, CC BY-SA 4.0) menampilkan kornea, iris, lensa dan badan
+  // vitreus sebagai objek tersendiri. Ternyata seluruhnya SUDAH ada di
+  // nervous.glb milik kita -- keduanya diturunkan dari berkas Z-Anatomy yang
+  // sama -- dan yang kurang bukan geometrinya melainkan deklarasinya.
+  //
+  // Jadi tidak ada yang diimpor. Yang berubah hanya daftar petunjuknya, dan
+  // isinya dibaca dari berkas kita sendiri.
+  //
+  // Ruang nama 'sensory:' dipertahankan supaya tidak bertabrakan dengan
+  // pekerjaan mata multiskala yang berjalan di ruang nama 'eye:'.
+  node({ id: 'sensory:eyes', label: 'Eyes', system: 'sensory', regions: ['head'], laterality: 'paired', scale: 'organ', parentId: 'system:sensory', source: { mode: 'composite', files: ['nervous.glb'], nodeHints: ['Sclera', 'Cornea', 'Iris', 'Lens', 'Vitreous body', 'Ciliary body-curve', 'Anterior chamber of eyeball', 'Posterior segment of eyeball', 'Suspensory ligament of eyeball', 'Optic nerve (II)'] }, geometryStatus: 'shipped', educationalPriority: 0.95, physiologyCapable: true, surgicalLandmark: true }),
+
+  // Aparatus lakrimal berdiri sendiri: ia melayani mata tetapi bukan bagian
+  // bola matanya, dan menggabungkannya ke dalam 'Eyes' akan menyembunyikan
+  // jalur air mata yang justru punya arti klinis sendiri.
+  node({ id: 'sensory:lacrimal-apparatus', label: 'Lacrimal apparatus', system: 'sensory', regions: ['head'], laterality: 'paired', scale: 'organ', parentId: 'sensory:eyes', source: { mode: 'composite', files: ['nervous.glb'], nodeHints: ['Lacrimal gland', 'Lacrimal canaliculus', 'Lacrimal sac', 'Nasolacrimal duct'] }, geometryStatus: 'shipped', educationalPriority: 0.8, physiologyCapable: true, surgicalLandmark: true }),
+
 
   node({ id: 'msk:spine', label: 'Vertebral column', system: 'skeletal', regions: ['neck', 'thorax', 'abdomen', 'back', 'pelvis'], laterality: 'midline', scale: 'organ', parentId: 'system:skeletal', source: { mode: 'composite', files: ['skeletal.glb'], nodeHints: ['cervical vertebra', 'thoracic vertebra', 'lumbar vertebra', 'sacrum'] }, geometryStatus: 'shipped', educationalPriority: 0.95, surgicalLandmark: true }),
   node({ id: 'msk:shoulder-complex', label: 'Shoulder complex', system: 'articular', regions: ['upper-limb'], laterality: 'paired', scale: 'organ', parentId: 'system:articular', source: { mode: 'composite', files: ['skeletal.glb', 'muscular.glb'], nodeHints: ['scapula', 'clavicle', 'humerus', 'deltoid', 'supraspinatus', 'infraspinatus'] }, geometryStatus: 'partial', educationalPriority: 0.9, physiologyCapable: true, surgicalLandmark: true }),
