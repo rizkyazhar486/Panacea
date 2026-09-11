@@ -2851,3 +2851,69 @@ h1 {
 
 /* Batu tulis-500 di atas kartu hampir putih: 4,44 dari 4,5. */
 :root:not(.dark) .text-slate-500 { color: #57626f; }
+
+/* ── Kartu pelatih (halaman Training) ─────────────────────────────────────
+
+   Kartu ini semula ditulis hanya untuk permukaan gelap: nol varian tema, jadi
+   warna seperti slate-300 dipakai apa adanya di kedua mode. Di mode terang itu
+   berarti abu-abu muda di atas putih. Terukur pada bundel produksi di 390x844:
+   tujuh dari empat belas simpul teks berada di 1.45:1 -- badan kartunya
+   praktis tidak terbaca.
+
+   Kenapa token, bukan varian `dark:` Tailwind: repositori ini mengganti tema
+   dengan KELAS `.dark` pada <html>, sementara Tailwind v4 tanpa
+   @custom-variant memetakan `dark:` ke @media (prefers-color-scheme). Keduanya
+   tidak nyambung -- diuji: `text-slate-700 dark:text-slate-300` tetap
+   memberikan slate-700 ketika kelas .dark aktif. Menambahkan custom-variant itu
+   akan mengubah perilaku SETIAP utilitas `dark:` di seluruh aplikasi sekaligus,
+   jadi kartu ini memakai token yang dikendalikan kelas, sejalan dengan ratusan
+   aturan `.dark` yang sudah ada di berkas ini.
+
+   Nilai mode gelap sama persis dengan warna yang dipakai sebelumnya, sehingga
+   tampilan gelap tidak berubah sedikit pun. */
+:root {
+  --pelatih-teks-0: #1e293b;
+  --pelatih-teks-1: #334155;
+  --pelatih-teks-2: #475569;
+  --pelatih-teks-3: #64748b;
+  --pelatih-amber-1: #92400e;
+  --pelatih-amber-2: #92400e;
+  --pelatih-amber-3: #b45309;
+  --pelatih-hijau: #047857;
+  --pelatih-alas-1: rgba(15, 23, 42, 0.04);
+  --pelatih-alas-2: rgba(15, 23, 42, 0.03);
+  --pelatih-garis: rgba(15, 23, 42, 0.10);
+}
+.dark {
+  --pelatih-teks-0: #e2e8f0;
+  --pelatih-teks-1: #cbd5e1;
+  --pelatih-teks-2: #94a3b8;
+  --pelatih-teks-3: #64748b;
+  --pelatih-amber-1: #fde68a;
+  --pelatih-amber-2: #fcd34d;
+  --pelatih-amber-3: #fbbf24;
+  --pelatih-hijau: #34d399;
+  --pelatih-alas-1: rgba(255, 255, 255, 0.05);
+  --pelatih-alas-2: rgba(255, 255, 255, 0.02);
+  --pelatih-garis: rgba(255, 255, 255, 0.10);
+}
+
+/* Lencana klasifikasi sesi pada kartu pelatih.
+
+   Warnanya berasal dari data (jenis sesi), bukan dari palet tema, sehingga
+   tidak bisa memakai varian tema sama sekali. Dipakai apa adanya di mode
+   terang, jingga sesi interval hanya mencapai 2.39:1 terhadap tepungnya --
+   di bawah ambang AA. Maka ia digelapkan untuk mode terang dan dibiarkan
+   penuh di mode gelap, tempat ia memang sudah terbaca. */
+.pita-klasifikasi {
+  color: color-mix(in oklab, var(--pmd-nada) 62%, #000);
+  background: color-mix(in oklab, var(--pmd-nada) 14%, transparent);
+}
+.dark .pita-klasifikasi {
+  /* Warna penuh hanya mencapai 3.96:1 di atas tepung gelapnya -- terukur, dan
+     hurufnya 11px tebal, terlalu kecil untuk ambang teks besar. Dicerahkan
+     sedikit ke arah putih, bukan diganti, supaya jenis sesi tetap dikenali
+     dari warnanya. */
+  color: color-mix(in oklab, var(--pmd-nada) 74%, #fff);
+  background: color-mix(in oklab, var(--pmd-nada) 13%, transparent);
+}
