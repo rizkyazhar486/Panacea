@@ -1,6 +1,10 @@
 import type { AtlasManifest, AtlasNode, AtlasSystemId } from './atlasKernel'
 import { INDEXED_ANATOMY_SOURCE_NODE_SNAPSHOT } from '../anatomySourceNodeRegistry'
 import { buildSystemMaturityAdmissionReport } from './systemMaturityAdmission'
+import {
+  evaluateMacroDomainClosure,
+  type MacroTargetPublicationRecord,
+} from './macroSystemClosureGate'
 
 export const BODY_MATURATION_ORDER = [
   'whole-body',
@@ -54,6 +58,7 @@ export type BodyMaturationBlockerCode =
   | 'wrong-scale'
   | 'geometry-not-shipped'
   | 'source-admission-failed'
+  | 'macro-closure-failed'
   | 'schema-not-authoritative'
   | 'upstream-incomplete'
 
@@ -79,11 +84,23 @@ export interface BodyMaturationReport {
   mayAdvancePastActiveStage: false
 }
 
+export interface BodyMaturationEvidence {
+  /**
+   * Asset-level publication records are optional input and fail closed when absent.
+   * Supplying records does not itself establish truth: macroSystemClosureGate still
+   * requires complete provenance fields, source candidates and approved review.
+   */
+  macroPublicationRecords?: readonly MacroTargetPublicationRecord[]
+}
+
 function rootNodes(manifest: AtlasManifest, id: string): readonly AtlasNode[] {
   return manifest.nodes.filter((node) => node.id === id)
 }
 
-function auditSystemStage(manifest: AtlasManifest): BodyMaturationBlocker[] {
+function auditSystemStage(
+  manifest: AtlasManifest,
+  evidence: BodyMaturationEvidence,
+): BodyMaturationBlocker[] {
   const blockers: BodyMaturationBlocker[] = []
   const admissionBySystem = new Map(
     buildSystemMaturityAdmissionReport(manifest, INDEXED_ANATOMY_SOURCE_NODE_SNAPSHOT)
@@ -122,6 +139,20 @@ function auditSystemStage(manifest: AtlasManifest): BodyMaturationBlocker[] {
         nodeId: node.id,
         message: `${node.label} cannot complete whole-body system coverage until same-frame source admission succeeds (${status}).`,
       })
+      continue
+    }
+
+    if (system === 'articular' || system === 'fascial') {
+      const closure = evaluateMacroDomainClosure(system, evidence.macroPublicationRecords ?? [])
+      if (!closure.mayPromoteSystemRootToShipped) {
+        blockers.push({
+          stage: 'system',
+          code: 'macro-closure-failed',
+          requirement: closure.status,
+          nodeId: node.id,
+          message: `${node.label} cannot complete whole-body system coverage until every required ${system} macro target passes asset-level provenance and qualified-review closure (${closure.status}).`,
+        })
+      }
     }
   }
   return blockers
@@ -179,13 +210,10 @@ function unsupportedSchema(stage: BodyMaturationStageId): BodyMaturationStage {
   }
 }
 
-/**
- * Enforces the project's required maturation direction:
- * whole body -> systems -> regions -> organs -> smaller scales -> molecular -> DNA.
- * Existing smaller-scale content may remain viewable, but it cannot be used as evidence
- * that the project is ready to advance while a larger upstream stage is incomplete.
- */
-export function buildBodyMaturationReport(manifest: AtlasManifest): BodyMaturationReport {
+export function buildBodyMaturationReport(
+  manifest: AtlasManifest,
+  evidence: BodyMaturationEvidence = {},
+): BodyMaturationReport {
   const wholeBody: BodyMaturationStage = {
     id: 'whole-body',
     status: 'complete',
@@ -193,7 +221,7 @@ export function buildBodyMaturationReport(manifest: AtlasManifest): BodyMaturati
     blockers: [],
   }
 
-  const systemBlockers = auditSystemStage(manifest)
+  const systemBlockers = auditSystemStage(manifest, evidence)
   const system: BodyMaturationStage = {
     id: 'system',
     status: systemBlockers.length ? 'incomplete' : 'complete',
