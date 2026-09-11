@@ -112,3 +112,128 @@ export const RUJUKAN_HEMODINAMIK = {
   saturasiVena: 0.75,
   tekananParsialVena: 40,
 } as const
+
+// ── Lingkar tekanan-volume ─────────────────────────────────────────────────
+//
+// Panel pertama modul ini hanya menampilkan deretan angka. Angka saja tidak
+// memperlihatkan BENTUK siklus jantung, padahal bentuk itulah yang membuat
+// perbedaan preload, afterload dan kontraktilitas bisa dikenali sekilas -- dan
+// ketiganya menggeser lingkarnya dengan cara yang sama sekali berbeda.
+//
+// Model elastans berubah-waktu (Suga-Sagawa): bilik diperlakukan sebagai pegas
+// yang kekakuannya naik-turun sepanjang siklus.
+//
+//   P(V, t) = e(t) * Ees * (V - V0) + (1 - e(t)) * Ped(V)
+//
+// e(t) berayun 0..1. Pada e = 1 bilik berada di garis akhir-sistolik ESPVR;
+// pada e = 0 ia mengikuti kurva pengisian pasif EDPVR. Ini penyederhanaan yang
+// sudah mapan, bukan karangan: ESPVR yang lurus dan EDPVR yang eksponensial
+// adalah bentuk yang dipakai di literatur hemodinamika.
+
+export interface ParameterBilik {
+  /** Elastans akhir-sistolik, mmHg/mL. Ukuran kontraktilitas. */
+  ees: number
+  /** Volume tanpa tekanan, mL. */
+  v0: number
+  /** Kekakuan pengisian pasif, mmHg. */
+  kekakuanPasif: number
+  /** Tetapan eksponensial EDPVR, per mL. */
+  eksponenPasif: number
+  /** Tekanan arteri yang harus dilampaui katup untuk membuka, mmHg. */
+  afterload: number
+  /** Volume akhir-diastolik yang dicapai pengisian, mL. */
+  volumeAkhirDiastol: number
+}
+
+export const BILIK_RUJUKAN: ParameterBilik = {
+  ees: 2.3,
+  v0: 15,
+  // Dipilih supaya tekanan akhir-diastolik mendarat sekitar 10 mmHg pada EDV
+  // 120 mL. Nilai pertama (2,6 dan 0,028) memberi 46,6 mmHg -- itu gagal
+  // jantung berat yang ditampilkan sebagai normal, dan tidak ada yang
+  // mencurigakan pada dua angka itu sampai keluarannya dihitung.
+  kekakuanPasif: 0.45,
+  eksponenPasif: 0.03,
+  afterload: 90,
+  volumeAkhirDiastol: 120,
+}
+
+/** Tekanan pengisian pasif pada volume tertentu. */
+export function tekananPasif(volume: number, p: ParameterBilik): number {
+  const dv = Math.max(0, volume - p.v0)
+  return p.kekakuanPasif * (Math.exp(p.eksponenPasif * dv) - 1)
+}
+
+/** Tekanan akhir-sistolik yang bisa dihasilkan bilik pada volume tertentu. */
+export function tekananAkhirSistolik(volume: number, p: ParameterBilik): number {
+  return Math.max(0, p.ees * (volume - p.v0))
+}
+
+/**
+ * Volume akhir-sistolik: tempat garis ESPVR memotong afterload.
+ *
+ * Bilik mengeluarkan darah sampai tekanan yang MASIH bisa dihasilkannya turun
+ * ke tekanan arteri. Dari situ katup menutup. Jadi ESV bukan angka yang
+ * dipilih melainkan titik potong -- dan itulah sebabnya menaikkan afterload
+ * menaikkan ESV tanpa ada yang mengubah kontraktilitas.
+ */
+export function volumeAkhirSistolik(p: ParameterBilik): number {
+  if (!(p.ees > 0)) return p.volumeAkhirDiastol
+  const v = p.v0 + p.afterload / p.ees
+  // Tidak bisa mengeluarkan lebih banyak daripada yang ada, dan tidak bisa
+  // mengeluarkan volume negatif.
+  return Math.min(p.volumeAkhirDiastol, Math.max(p.v0, v))
+}
+
+export interface TitikLingkar { volume: number; tekanan: number }
+
+/**
+ * Empat fase siklus sebagai lintasan tertutup.
+ *
+ * Pengisian sepanjang EDPVR, kontraksi isovolumik tegak, ejeksi pada afterload,
+ * relaksasi isovolumik tegak. Lingkarnya tertutup karena memang harus: bilik
+ * kembali ke tempat ia mulai.
+ */
+export function lingkarTekananVolume(p: ParameterBilik, langkahPerFase = 24): TitikLingkar[] {
+  const esv = volumeAkhirSistolik(p)
+  const edv = Math.max(esv, p.volumeAkhirDiastol)
+  const titik: TitikLingkar[] = []
+
+  // 1. Pengisian: dari ESV ke EDV mengikuti kurva pasif.
+  for (let i = 0; i <= langkahPerFase; i++) {
+    const v = esv + ((edv - esv) * i) / langkahPerFase
+    titik.push({ volume: v, tekanan: tekananPasif(v, p) })
+  }
+  // 2. Kontraksi isovolumik: volume tetap, tekanan naik sampai katup membuka.
+  const pEd = tekananPasif(edv, p)
+  for (let i = 1; i <= langkahPerFase; i++) {
+    titik.push({ volume: edv, tekanan: pEd + ((p.afterload - pEd) * i) / langkahPerFase })
+  }
+  // 3. Ejeksi: volume turun pada tekanan arteri.
+  for (let i = 1; i <= langkahPerFase; i++) {
+    titik.push({ volume: edv - ((edv - esv) * i) / langkahPerFase, tekanan: p.afterload })
+  }
+  // 4. Relaksasi isovolumik: kembali turun ke tekanan pengisian di ESV.
+  const pEs = tekananPasif(esv, p)
+  for (let i = 1; i <= langkahPerFase; i++) {
+    titik.push({ volume: esv, tekanan: p.afterload - ((p.afterload - pEs) * i) / langkahPerFase })
+  }
+  return titik
+}
+
+/**
+ * Kerja sekuncup = luas lingkar, mmHg*mL.
+ *
+ * Dihitung dengan rumus tali sepatu, sehingga ia benar-benar LUAS lintasan
+ * yang digambar, bukan perkiraan persegi panjang SV x tekanan. Kalau lingkar
+ * dan angka berpisah, uji akan menangkapnya.
+ */
+export function kerjaSekuncup(lingkar: readonly TitikLingkar[]): number {
+  let dua = 0
+  for (let i = 0; i < lingkar.length; i++) {
+    const a = lingkar[i]
+    const b = lingkar[(i + 1) % lingkar.length]
+    dua += a.volume * b.tekanan - b.volume * a.tekanan
+  }
+  return Math.abs(dua) / 2
+}

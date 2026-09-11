@@ -3,6 +3,7 @@ import {
   kandunganOksigen, isiSekuncup, curahJantung, fraksiEjeksi,
   hantaranOksigen, konsumsiOksigenFick, curahJantungFick, rasioEkstraksiOksigen,
   HUFNER, KELARUTAN_PLASMA, RUJUKAN_HEMODINAMIK as R,
+  BILIK_RUJUKAN, volumeAkhirSistolik, lingkarTekananVolume, kerjaSekuncup, tekananPasif,
 } from '../../src/lib/hemodinamik.ts'
 
 const dekat = (a: number, b: number, tol = 1e-9) => Math.abs(a - b) <= tol
@@ -94,3 +95,91 @@ assert.ok(Number.isNaN(kandunganOksigen(-1, 0.98, 100)))
 assert.ok(Number.isNaN(curahJantungFick(250, 20, 20)))
 
 console.log('Hemodinamik: rantai rujukan mendarat pada CaO2 20 mL/dL, DO2 ~1000 dan VO2 ~250 dengan ekstraksi 24%; Fick bolak-balik kembali tepat, dan kedua jalur ekstraksi sepakat.')
+
+// ── 7. Lingkar tekanan-volume ──────────────────────────────────────────────
+//
+// Lingkar ini adalah gambar, dan gambar yang salah tetap terlihat meyakinkan.
+// Karena itu yang diuji bukan bentuknya melainkan angka-angka yang harus
+// dihasilkannya.
+{
+  const p = BILIK_RUJUKAN
+  const esv = volumeAkhirSistolik(p)
+  const sv = p.volumeAkhirDiastol - esv
+
+  assert.ok(esv > 35 && esv < 70, `ESV rujukan di luar kisaran dewasa: ${esv.toFixed(1)}`)
+  assert.ok(sv > 55 && sv < 90, `Isi sekuncup dari lingkar di luar kisaran: ${sv.toFixed(1)}`)
+  assert.ok(sv / p.volumeAkhirDiastol > 0.5, 'Fraksi ejeksi dari lingkar harus di atas 50%.')
+
+  // Tekanan akhir-diastolik adalah pemeriksaan yang menangkap kekakuan pasif
+  // yang keliru. Nilai pertama memberi 46,6 mmHg -- gagal jantung berat yang
+  // ditampilkan sebagai normal.
+  const pEd = tekananPasif(p.volumeAkhirDiastol, p)
+  assert.ok(pEd > 4 && pEd < 16, `Tekanan akhir-diastolik di luar kisaran normal: ${pEd.toFixed(1)} mmHg`)
+}
+
+// Lingkarnya harus benar-benar tertutup: bilik kembali ke tempat ia mulai.
+{
+  const l = lingkarTekananVolume(BILIK_RUJUKAN)
+  const awal = l[0], akhir = l[l.length - 1]
+  assert.ok(dekat(awal.volume, akhir.volume, 1e-9), 'Lingkar harus kembali ke volume semula.')
+  assert.ok(Math.abs(awal.tekanan - akhir.tekanan) < 1e-9, 'Lingkar harus kembali ke tekanan semula.')
+}
+
+// Lebar lingkar HARUS sama dengan isi sekuncup. Kalau gambar dan angka
+// berpisah, panelnya berbohong dengan cara yang paling sulit dilihat.
+{
+  const p = BILIK_RUJUKAN
+  const l = lingkarTekananVolume(p)
+  const volume = l.map((t) => t.volume)
+  const lebar = Math.max(...volume) - Math.min(...volume)
+  assert.ok(dekat(lebar, p.volumeAkhirDiastol - volumeAkhirSistolik(p), 1e-9),
+    `Lebar lingkar ${lebar} tidak sama dengan isi sekuncup.`)
+}
+
+// Kerja sekuncup harus positif dan masuk akal, dan harus berada DI ATAS
+// perkiraan persegi panjang SV x afterload hanya bila lingkarnya memang
+// mengandung fase isovolumik.
+{
+  const kerja = kerjaSekuncup(lingkarTekananVolume(BILIK_RUJUKAN))
+  assert.ok(kerja > 3000 && kerja < 9000, `Kerja sekuncup di luar kisaran: ${kerja.toFixed(0)}`)
+}
+
+// ── 8. Tiga tuas menggeser lingkar dengan cara yang BERBEDA ────────────────
+//
+// Inilah seluruh alasan lingkar ini digambar. Kalau ketiganya menggeser
+// bentuknya dengan cara yang sama, gambarnya tidak mengajarkan apa pun.
+{
+  const p = BILIK_RUJUKAN
+  const dasarEsv = volumeAkhirSistolik(p)
+  const dasarSv = p.volumeAkhirDiastol - dasarEsv
+
+  // Afterload naik: ESV naik, isi sekuncup turun. Kontraktilitas tidak diubah.
+  const afterloadTinggi = { ...p, afterload: 140 }
+  const esvAfterload = volumeAkhirSistolik(afterloadTinggi)
+  assert.ok(esvAfterload > dasarEsv, 'Afterload naik harus menaikkan ESV.')
+  assert.ok(p.volumeAkhirDiastol - esvAfterload < dasarSv, 'Afterload naik harus menurunkan isi sekuncup.')
+
+  // Kontraktilitas naik: ESV TURUN, isi sekuncup naik -- arah berlawanan.
+  const kontraktilTinggi = { ...p, ees: 4 }
+  const esvKontraktil = volumeAkhirSistolik(kontraktilTinggi)
+  assert.ok(esvKontraktil < dasarEsv, 'Kontraktilitas naik harus menurunkan ESV.')
+  assert.ok(p.volumeAkhirDiastol - esvKontraktil > dasarSv, 'Kontraktilitas naik harus menaikkan isi sekuncup.')
+
+  // Preload naik: ESV TIDAK berubah sama sekali, tetapi isi sekuncup naik.
+  // Inilah Frank-Starling, dan ia jatuh sendiri dari geometri: titik potong
+  // ESPVR dengan afterload tidak bergerak ketika hanya EDV yang digeser.
+  const preloadTinggi = { ...p, volumeAkhirDiastol: 150 }
+  assert.ok(dekat(volumeAkhirSistolik(preloadTinggi), dasarEsv, 1e-9),
+    'Preload tidak boleh menggeser ESV.')
+  assert.ok(150 - volumeAkhirSistolik(preloadTinggi) > dasarSv,
+    'Preload naik harus menaikkan isi sekuncup.')
+}
+
+// Bilik tidak bisa mengeluarkan lebih banyak daripada isinya.
+{
+  const mustahil = volumeAkhirSistolik({ ...BILIK_RUJUKAN, afterload: 400 })
+  assert.ok(mustahil <= BILIK_RUJUKAN.volumeAkhirDiastol, 'ESV tidak boleh melebihi EDV.')
+  assert.ok(BILIK_RUJUKAN.volumeAkhirDiastol - mustahil >= 0, 'Isi sekuncup tidak boleh negatif.')
+}
+
+console.log('Lingkar P-V: tertutup, lebarnya sama dengan isi sekuncup, tekanan akhir-diastolik 10 mmHg, dan afterload/kontraktilitas/preload menggesernya ke tiga arah yang berbeda.')
