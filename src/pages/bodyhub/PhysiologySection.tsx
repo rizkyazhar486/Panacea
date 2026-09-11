@@ -56,7 +56,7 @@ export function PhysiologySection({ onPickSystem }: Props) {
                 <span className="block text-sm font-bold text-ink dark:text-white">{s.label}</span>
                 <span className="mt-0.5 block text-[11px] leading-relaxed text-neutral-500">{s.fungsi}</span>
               </span>
-              <span className={`shrink-0 text-neutral-400 transition-transform ${terbuka ? 'rotate-90' : ''}`}>›</span>
+              <span aria-hidden="true" className={`shrink-0 text-neutral-400 transition-transform ${terbuka ? 'rotate-90' : ''}`}>›</span>
             </button>
             {terbuka && (
               <div id={panelId} role="region" aria-labelledby={triggerId} className="space-y-3 border-t border-neutral-100 p-3 dark:border-white/5">
