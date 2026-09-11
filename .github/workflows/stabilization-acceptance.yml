@@ -85,6 +85,11 @@ jobs:
           BODY3D_QA_CANVAS_ARTIFACT: artifacts/body3d-mobile-canvas.png
         run: node scripts/qa/body3d-canvas-artifact.mjs
 
+      - name: Segmental ventilation 3D 390x844 smoke
+        env:
+          VENT3D_QA_URL: http://127.0.0.1:4173/#/body-explorer
+        run: npm run qa:ventilasi-3d
+
       - name: Panacea OS Daily mobile 390x844 smoke
         env:
           PANACEA_OS_QA_URL: http://127.0.0.1:4173/#/harian
