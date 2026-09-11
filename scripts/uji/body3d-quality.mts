@@ -6,6 +6,10 @@ import {
   Body3dLayerLoadGeneration,
   body3dDissectionMaterialState,
   body3dPixelRatio,
+  body3dRefinePixelRatio,
+  body3dNextRefineCeiling,
+  BODY3D_REFINE_MAX_RENDER_PIXELS,
+  BODY3D_REFINE_FRAME_BUDGET_MS,
   body3dSliceCoordinate,
 } from '../../src/lib/body3dQuality.ts'
 
@@ -53,3 +57,52 @@ assert.equal(body3dSliceCoordinate(bounds, 'coronal', 0.25), -1.5)
 assert.equal(body3dSliceCoordinate(bounds, 'sagittal', 1.5), 2)
 
 console.log('Body3D quality/lifecycle guards verified.')
+
+// ── Penghalusan bertahap ────────────────────────────────────────────────────
+//
+// Cap interaktif 1.5x melindungi fill-rate saat tubuh diputar, tetapi ikut
+// berlaku pada frame diam -- dan frame diam itulah yang dibaca. Pada telepon
+// ber-DPR 3 itu berarti setengah resolusi linear.
+
+// Telepon: frame diam naik sampai DPR perangkat, karena kanvasnya kecil.
+// 390x574 pada 3x hanya 2.0 MP, jauh di bawah anggaran frame diam.
+assert.equal(body3dRefinePixelRatio(390, 574, 3, 1.5, 3), 3)
+
+// Penghalusan tidak boleh pernah menurunkan kualitas.
+assert.ok(body3dRefinePixelRatio(390, 574, 3, 1.5, 1) >= 1.5,
+  'Rasio halus tidak boleh di bawah rasio interaktif.')
+assert.equal(body3dRefinePixelRatio(3840, 2160, 2, 2, 3), 2,
+  'Kanvas 4K sudah di anggaran; tidak ada tambahan yang dipaksakan.')
+
+// Kanvas desktop besar tetap dibatasi anggaran piksel frame diam. Rasio
+// interaktifnya diturunkan dari kebijakan yang sama, bukan dikarang: pada
+// 2560x1440 anggaran interaktif sendiri sudah menahan di sekitar 1.19x, jadi
+// memberi angka 2 sebagai masukan akan menguji keadaan yang tidak pernah ada.
+const interaktifBesar = body3dPixelRatio(2560, 1440, 3, false)
+const besar = body3dRefinePixelRatio(2560, 1440, 3, interaktifBesar, 3)
+assert.ok(besar > interaktifBesar, 'Frame diam harus lebih tajam daripada frame interaktif.')
+assert.ok(besar * besar * 2560 * 1440 <= BODY3D_REFINE_MAX_RENDER_PIXELS + 1,
+  `Frame diam melampaui anggaran pikselnya: ${besar}`)
+
+// Lantai "tidak pernah lebih buruk" menang atas anggaran ketika keduanya
+// berbenturan: menghaluskan yang justru memperburuk gambar tidak masuk akal.
+assert.equal(body3dRefinePixelRatio(2560, 1440, 3, 2, 3), 2,
+  'Rasio interaktif yang sudah tinggi dipertahankan apa adanya.')
+
+// Nilai rusak tidak boleh meledak.
+assert.ok(Number.isFinite(body3dRefinePixelRatio(0, 0, NaN, NaN, NaN)))
+
+// Langit-langit menyesuaikan dari pengukuran, bukan dari tebakan perangkat.
+assert.equal(body3dNextRefineCeiling(3, BODY3D_REFINE_FRAME_BUDGET_MS + 1, 1.5, 3), 2.5,
+  'Frame yang melewati anggaran harus menurunkan langit-langit.')
+// Naik selangkah demi selangkah, bukan melompat ke DPR perangkat: lompatan
+// itulah yang membuat satu frame 3x menahan utas utama sebelum ada bukti
+// perangkatnya sanggup.
+assert.equal(body3dNextRefineCeiling(2, 10, 1.5, 3), 2.5,
+  'Perangkat yang lapang naik satu langkah, bukan langsung ke atas.')
+assert.equal(body3dNextRefineCeiling(2.5, 10, 1.5, 3), 3, 'Langkah berikutnya mencapai DPR perangkat.')
+assert.equal(body3dNextRefineCeiling(3, 10, 1.5, 3), 3, 'Tidak pernah melewati DPR perangkat.')
+assert.equal(body3dNextRefineCeiling(1.5, 9_999, 1.5, 3), 1.5,
+  'Tidak pernah turun di bawah rasio interaktif.')
+
+console.log('Body3D refine: frame diam mencapai resolusi perangkat, tetap di dalam anggaran, dan menyesuaikan diri dari waktu frame terukur.')

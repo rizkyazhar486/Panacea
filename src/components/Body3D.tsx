@@ -9,6 +9,10 @@ import {
   Body3dLayerLoadGeneration,
   body3dDissectionMaterialState,
   body3dPixelRatio,
+  body3dRefinePixelRatio,
+  body3dNextRefineCeiling,
+  BODY3D_REFINE_DELAY_MS,
+  BODY3D_REFINE_FIRST_STEP,
   body3dSliceCoordinate,
 } from '../lib/body3dQuality'
 import {
@@ -388,13 +392,87 @@ export function Body3D({
     // mengirim event "change" saat drag/zoom; perubahan React lain memanggil
     // requestRenderRef. Ini mempertahankan detail tinggi tanpa membakar GPU
     // hanya untuk menggambar frame identik berulang kali.
+    // Penghalusan bertahap. Selama tubuh digerakkan, frame digambar pada rasio
+    // interaktif yang hemat. Begitu kamera berhenti, SATU frame digambar ulang
+    // pada resolusi penuh perangkat.
+    //
+    // Ini bukan sekadar menaikkan cap: cap interaktif 1.5x ada karena alasan
+    // yang benar, yaitu tekanan fill-rate saat memutar. Yang salah adalah cap
+    // itu ikut berlaku pada frame diam -- padahal justru frame diam yang
+    // ditatap dan dibaca. Pada telepon ber-DPR 3, itu setengah resolusi linear.
+    //
+    // Biayanya satu frame, bukan aliran frame, karena viewer ini memang tidak
+    // menggambar ulang gambar yang sama berulang kali.
+    let rasioInteraktif = renderer.getPixelRatio()
+    // Mulai satu langkah di atas rasio interaktif, bukan langsung di DPR
+    // perangkat: langkah pertama harus murah pada perangkat mana pun.
+    //
+    // Diisi di resize(), bukan di sini: pada titik ini renderer masih memakai
+    // rasio bawaannya (1x) dan menyemai dari situ membuat langit-langitnya
+    // berhenti di 1.5 -- sama dengan rasio interaktif, sehingga penghalusan
+    // tidak pernah berjalan sama sekali. Terukur: buffer tetap 534 pada layar
+    // 3x, tiga kali berturut-turut.
+    let atapHalus = 0
+    let sudahHalus = false
+    let jamHalus: ReturnType<typeof setTimeout> | undefined
+
+    const pakaiRasio = (rasio: number) => {
+      const w = container.clientWidth
+      const h = container.clientHeight
+      if (w < 2 || h < 2) return
+      if (Math.abs(renderer.getPixelRatio() - rasio) < 0.001) return
+      renderer.setPixelRatio(rasio)
+      renderer.setSize(w, h)
+    }
+
+    const batalkanHalus = () => {
+      if (jamHalus !== undefined) { clearTimeout(jamHalus); jamHalus = undefined }
+    }
+
+    const jadwalkanHalus = () => {
+      batalkanHalus()
+      if (sudahHalus || !inViewport || !documentVisible) return
+      jamHalus = setTimeout(() => {
+        jamHalus = undefined
+        if (!inViewport || !documentVisible || sudahHalus) return
+        const w = container.clientWidth
+        const h = container.clientHeight
+        if (w < 2 || h < 2) return
+        const halus = body3dRefinePixelRatio(w, h, window.devicePixelRatio || 1, rasioInteraktif, atapHalus)
+        if (halus <= rasioInteraktif + 0.001) { sudahHalus = true; return }
+        // Digambar di dalam rAF seperti frame lain, bukan langsung di dalam
+        // timer: frame mahal yang dijalankan di luar penjadwalan peramban
+        // menahan utas utama tepat ketika pengguna menyentuh kontrol lain.
+        requestAnimationFrame(() => {
+          if (!inViewport || !documentVisible) return
+          pakaiRasio(halus)
+          const mulai = performance.now()
+          controls.update()
+          renderer.render(scene, camera)
+          // Waktu frame diukur pada perangkat yang sedang dipakai; tidak ada
+          // daftar perangkat dan tidak ada tebakan dari jumlah inti.
+          const lama = performance.now() - mulai
+          atapHalus = body3dNextRefineCeiling(atapHalus, lama, rasioInteraktif, window.devicePixelRatio || 1)
+          // Masih ada ruang naik dan frame barusan murah: jadwalkan langkah
+          // berikutnya, sehingga ketajaman penuh dicapai bertahap.
+          sudahHalus = atapHalus <= halus + 0.001
+          if (!sudahHalus) jadwalkanHalus()
+        })
+      }, BODY3D_REFINE_DELAY_MS)
+    }
+
     function requestRender() {
+      // Gerakan baru membatalkan frame halus dan mengembalikan rasio hemat.
+      sudahHalus = false
+      batalkanHalus()
+      pakaiRasio(rasioInteraktif)
       if (raf !== 0 || !inViewport || !documentVisible) return
       raf = requestAnimationFrame(() => {
         raf = 0
         if (!inViewport || !documentVisible) return
         controls.update()
         renderer.render(scene, camera)
+        jadwalkanHalus()
       })
     }
 
@@ -402,6 +480,7 @@ export function Body3D({
       if (raf === 0) return
       cancelAnimationFrame(raf)
       raf = 0
+      batalkanHalus()
     }
 
     requestRenderRef.current = requestRender
@@ -413,6 +492,9 @@ export function Body3D({
       if (w < 2 || h < 2) return
       const smallViewport = window.matchMedia('(max-width: 640px)').matches
       const pixelRatio = body3dPixelRatio(w, h, window.devicePixelRatio || 1, smallViewport)
+      rasioInteraktif = pixelRatio
+      atapHalus = Math.max(atapHalus, pixelRatio + BODY3D_REFINE_FIRST_STEP)
+      sudahHalus = false
       if (Math.abs(renderer.getPixelRatio() - pixelRatio) > 0.001) renderer.setPixelRatio(pixelRatio)
       renderer.setSize(w, h)
       camera.aspect = w / h
