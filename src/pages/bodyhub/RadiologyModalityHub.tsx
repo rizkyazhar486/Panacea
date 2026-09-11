@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useMemo, useState, type KeyboardEvent } from 'react'
 
 type RadiologyModality = 'mri' | 'mra' | 'ct' | 'pet' | 'mammography'
 
@@ -67,6 +67,22 @@ export default function RadiologyModalityHub() {
     [modality],
   )
 
+  function handleTabKeyDown(event: KeyboardEvent<HTMLButtonElement>, currentIndex: number) {
+    let nextIndex: number | null = null
+    if (event.key === 'ArrowRight') nextIndex = (currentIndex + 1) % MODALITIES.length
+    else if (event.key === 'ArrowLeft') nextIndex = (currentIndex - 1 + MODALITIES.length) % MODALITIES.length
+    else if (event.key === 'Home') nextIndex = 0
+    else if (event.key === 'End') nextIndex = MODALITIES.length - 1
+    if (nextIndex === null) return
+
+    const next = MODALITIES[nextIndex]
+    if (!next) return
+    event.preventDefault()
+    setModality(next.id)
+    const tabs = event.currentTarget.parentElement?.querySelectorAll<HTMLButtonElement>('[role="tab"]')
+    tabs?.[nextIndex]?.focus()
+  }
+
   return (
     <section className="rounded-2xl border border-cyan-200 bg-cyan-50/60 p-3 dark:border-cyan-300/20 dark:bg-cyan-300/[.045]" aria-label="Radiology modality hub">
       <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
@@ -79,7 +95,7 @@ export default function RadiologyModalityHub() {
       </div>
 
       <div role="tablist" aria-label="Radiology modalities" className="no-scrollbar mt-3 flex gap-1.5 overflow-x-auto pb-1">
-        {MODALITIES.map((item) => (
+        {MODALITIES.map((item, index) => (
           <button
             key={item.id}
             id={`radiology-tab-${item.id}`}
@@ -87,7 +103,9 @@ export default function RadiologyModalityHub() {
             role="tab"
             aria-selected={modality === item.id}
             aria-controls="radiology-modality-panel"
+            tabIndex={modality === item.id ? 0 : -1}
             onClick={() => setModality(item.id)}
+            onKeyDown={(event) => handleTabKeyDown(event, index)}
             className={`min-h-11 shrink-0 rounded-xl border px-3 text-[10px] font-black transition ${modality === item.id ? 'border-cyan-600 bg-cyan-600 text-white shadow-sm' : 'border-neutral-200 bg-white text-neutral-600 hover:border-cyan-300 dark:border-white/10 dark:bg-white/[.035] dark:text-neutral-300'}`}
           >
             {item.shortLabel}
@@ -99,6 +117,7 @@ export default function RadiologyModalityHub() {
         id="radiology-modality-panel"
         role="tabpanel"
         aria-labelledby={`radiology-tab-${selected.id}`}
+        tabIndex={0}
         className="mt-3 rounded-2xl border border-neutral-200 bg-white p-3 dark:border-white/10 dark:bg-[#080c10]"
       >
         <div className="flex flex-wrap items-start justify-between gap-2">
