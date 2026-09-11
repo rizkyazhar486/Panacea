@@ -23,7 +23,7 @@ for (const [label, pola] of larangan) {
 
 assert.match(
   sumber,
-  /ocular-optics-schematic-title/,
+  /svg\[aria-label=\\"Educational ocular optics schematic\\"\]/,
   'Eye artifact QA must remain anchored to the shipped ocular optics lesson',
 )
 
