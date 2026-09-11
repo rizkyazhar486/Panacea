@@ -122,6 +122,7 @@ const nav: Nav[] = [
   { to: '/body-explorer', label: 'Body Explorer', icon: IconActivity, roles: ['pasien', 'dokter', 'owner'], group: 'Your Body' },
   { to: '/radiology', label: 'Radiology Viewer', icon: IconSearch, roles: ['pasien', 'dokter', 'owner'], group: 'Your Body' },
   { to: '/electrophysiology', label: 'Arrhythmia Lab', icon: IconHeart, roles: ['pasien', 'dokter', 'owner'], group: 'Your Body' },
+  { to: '/genome-lab', label: 'Genome Lab', icon: IconActivity, roles: ['pasien', 'dokter', 'owner'], group: 'Your Body' },
   { to: '/knowledge-bridge', label: 'Knowledge Bridge', icon: IconBook, roles: ['pasien', 'dokter', 'owner'], group: 'Learn & Look Up' },
   { to: '/frontier-health', label: 'Frontier Health OS', icon: IconSparkle, roles: ['dokter', 'owner'], group: 'Learn & Look Up' },
   { to: '/health-data', label: 'Health Data', icon: IconHeart, roles: ['pasien', 'dokter', 'owner'], group: 'Your Body' },
