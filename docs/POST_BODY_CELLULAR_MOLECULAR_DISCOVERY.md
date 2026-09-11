@@ -19,7 +19,7 @@ The goal is to move beyond a static induced-pluripotent-stem-cell-style visualiz
 
 ### 1. A "virtual cell" cannot be reduced to transcriptome prediction
 
-Current virtual-cell research is converging on a hybrid direction: learned models are useful for pattern recognition, but causal and mechanistic validity still requires explicit biological models. Nature Biotechnology summarized the field in 2026 by emphasizing that progress toward a true virtual cell depends on combining AI pattern finding with mechanistic causal rigor. Contemporary whole-cell work spans reaction networks, gene expression, spatial structure and molecular dynamics rather than a single omics layer.
+Current virtual-cell research is converging on a hybrid direction: learned models are useful for pattern recognition, but causal and mechanistic validity still requires explicit biological models. Contemporary whole-cell work spans reaction networks, gene expression, spatial structure and molecular dynamics rather than a single omics layer.
 
 Panacea therefore uses four model classes:
 
@@ -58,6 +58,21 @@ Recent reviews of partial reprogramming report rejuvenation signals in experimen
 
 Panacea must therefore model rejuvenation as a multidimensional state-space problem across the hallmarks and cell/tissue context. It must not equate epigenetic age reversal with organismal immortality, cancer safety, restored organ function or proven human lifespan extension.
 
+#### Current translational snapshot — 2026-09-11
+
+ClinicalTrials.gov now lists **NCT07290244**, a recruiting, first-in-human **Phase 1** study of ER-100 OSK epigenetic therapy in open-angle glaucoma and non-arteritic anterior ischemic optic neuropathy. The registry describes an estimated enrollment of 18 participants, a primary emphasis on safety/tolerability, no posted results, and long-term follow-up through five years.
+
+This materially changes the maturity label from "preclinical only" to **very-early clinical/translational for a narrow ocular indication**. It does **not** establish:
+
+- clinical efficacy;
+- systemic rejuvenation;
+- reversal of organismal aging;
+- cancer prevention;
+- lifespan extension;
+- general safety of partial reprogramming across tissues.
+
+The registry search for the exact phrase "Partial Epigenetic Reprogramming" returned this single interventional trial in the 2026-09-11 snapshot. Registry facts are sponsor-submitted and must be refreshed before any current-status display. They are not equivalent to peer-reviewed efficacy evidence.
+
 ### 4. Cancer is a dynamic system, not a single mutation lookup
 
 The Hallmarks of Cancer framework was expanded to emphasize phenotypic plasticity, non-mutational epigenetic reprogramming, microbiome context and senescent cells in the tumor microenvironment (PMID 35022204).
@@ -88,11 +103,11 @@ Initial source graph:
 
 - **NCBI PubChem** — chemical identity, structures, annotations, BioAssays and bioactivities. PubChem exposes PUG-REST and bulk downloads; assay provenance remains tied to the submitting source.
 - **EMBL-EBI ChEMBL** — curated bioactive molecules, targets, assays and medicinal-chemistry measurements via REST services.
-- **BindingDB** — measured protein-small-molecule binding affinities and target relationships; its current web service exposes measured IC50/Ki/Kd-linked records.
+- **BindingDB** — measured protein-small-molecule binding affinities and target relationships; its web services expose measured affinity-linked records.
 
 ### Target, pathway and disease evidence
 
-- **Open Targets Platform** — target-disease evidence, genetics, drugs, tractability and clinical context. The current Platform exposes GraphQL and downloadable datasets and is versioned by release.
+- **Open Targets Platform** — target-disease evidence, genetics, drugs, tractability and clinical context. The Platform exposes GraphQL and downloadable datasets and is versioned by release.
 - **Reactome** — expert-curated molecular reactions and pathways with cross-references to major biological resources.
 
 ### Cancer functional and genomic evidence
@@ -103,7 +118,7 @@ Initial source graph:
 ### Cell-state and healthy-reference evidence
 
 - **CZ CELLxGENE** — standardized single-cell datasets and Census access. Current documentation explicitly warns that aggregated normalized expression is not fully batch corrected; Panacea must preserve dataset identity and audit batch effects.
-- **NIH GTEx** — adult tissue expression, eQTL and baseline regulatory context. Current GTEx V11 uses updated gene annotation; release identity must be pinned.
+- **NIH GTEx** — adult tissue expression, eQTL and baseline regulatory context. Release identity must be pinned.
 
 ### Protein identity and structure
 
@@ -138,7 +153,7 @@ Learned models may represent high-dimensional cell state, perturbation response,
 
 The preferred long-term architecture combines mechanistic constraints with learned representations/surrogates. Learned components may accelerate inference or fill empirically supported latent structure, while mechanistic layers preserve causal/physical interpretation where possible.
 
-This is the closest scientifically defensible analogue to using advanced AI on difficult physics: mathematical sophistication is useful only when the governing assumptions and validation are equally rigorous.
+Mathematical sophistication is useful only when the governing assumptions and validation are equally rigorous.
 
 ## Required validation axes
 
@@ -265,11 +280,15 @@ Biomedical literature:
 - Ahmad U, et al. Can iPSCs Turn Back Time? Prospects and Pitfalls in Age Reversal. 2026. PMID 40735996.
 - Li YY, Tay FR. The epigenetic rejuvenation promise. Ageing Research Reviews. 2026. PMID 41490578.
 
+Clinical registry snapshot:
+
+- ClinicalTrials.gov NCT07290244 — ER-100 OSK epigenetic therapy, Phase 1, recruiting, first-in-human, estimated n=18, no posted results as of 2026-09-11.
+
 Current official resources reviewed:
 
 - NCBI PubChem PUG-REST / BioAssay documentation
 - Open Targets Platform API and release documentation
-- Broad DepMap Portal 26Q1
+- Broad DepMap Portal
 - NCI GDC API and controlled-access documentation
 - CZ CELLxGENE documentation and Census/normalization caveats
 - Reactome Content Service
@@ -278,4 +297,4 @@ Current official resources reviewed:
 - UniProt REST API
 - RCSB PDB public APIs
 - AlphaFold Protein Structure Database
-- GTEx Portal and V11 downloads
+- GTEx Portal and current downloads
