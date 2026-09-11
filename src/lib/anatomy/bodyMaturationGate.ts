@@ -1,6 +1,7 @@
 import type { AtlasManifest, AtlasNode, AtlasSystemId } from './atlasKernel'
 import { INDEXED_ANATOMY_SOURCE_NODE_SNAPSHOT } from '../anatomySourceNodeRegistry'
 import { buildSystemMaturityAdmissionReport } from './systemMaturityAdmission'
+import { buildOrganCoverageReport } from './organCoverageGate'
 import {
   evaluateMacroDomainClosure,
   type MacroTargetPublicationRecord,
@@ -59,6 +60,7 @@ export type BodyMaturationBlockerCode =
   | 'geometry-not-shipped'
   | 'source-admission-failed'
   | 'macro-closure-failed'
+  | 'organ-coverage-incomplete'
   | 'schema-not-authoritative'
   | 'upstream-incomplete'
 
@@ -183,6 +185,18 @@ function auditRegionStage(manifest: AtlasManifest): BodyMaturationBlocker[] {
   return blockers
 }
 
+export function auditOrganStage(manifest: AtlasManifest): BodyMaturationBlocker[] {
+  return buildOrganCoverageReport(manifest).entries
+    .filter((entry) => entry.status !== 'shipped')
+    .map((entry) => ({
+      stage: 'organ' as const,
+      code: 'organ-coverage-incomplete' as const,
+      requirement: `${entry.id}:${entry.status}`,
+      nodeId: entry.matchedNodeId,
+      message: `${entry.label} organ coverage is ${entry.status}; organ-scale maturation requires an accepted canonical organ node with shipped geometry.`,
+    }))
+}
+
 function locked(stage: BodyMaturationStageId, upstream: BodyMaturationStageId): BodyMaturationStage {
   return {
     id: stage,
@@ -257,10 +271,28 @@ export function buildBodyMaturationReport(
     return { activeStage: 'region', stages, wholeBodyComplete: false, mayAdvancePastActiveStage: false }
   }
 
-  const deeper = BODY_MATURATION_ORDER.slice(3).map(unsupportedSchema)
+  const organBlockers = auditOrganStage(manifest)
+  const organ: BodyMaturationStage = {
+    id: 'organ',
+    status: organBlockers.length ? 'incomplete' : 'complete',
+    authoringAllowed: true,
+    blockers: organBlockers,
+  }
+
+  if (organ.status !== 'complete') {
+    const stages: BodyMaturationStage[] = [wholeBody, system, region, organ]
+    let upstream: BodyMaturationStageId = 'organ'
+    for (const stage of BODY_MATURATION_ORDER.slice(4)) {
+      stages.push(locked(stage, upstream))
+      upstream = stage
+    }
+    return { activeStage: 'organ', stages, wholeBodyComplete: true, mayAdvancePastActiveStage: false }
+  }
+
+  const deeper = BODY_MATURATION_ORDER.slice(4).map(unsupportedSchema)
   return {
-    activeStage: 'organ',
-    stages: [wholeBody, system, region, ...deeper],
+    activeStage: 'suborgan',
+    stages: [wholeBody, system, region, organ, ...deeper],
     wholeBodyComplete: true,
     mayAdvancePastActiveStage: false,
   }
