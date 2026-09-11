@@ -11,6 +11,7 @@ import {
   EYE_ORBIT_ADNEXA_WAVE13_BOUNDARY,
   type EyeOrbitAdnexaDomain,
 } from '../../lib/anatomy/eyeOrbitAdnexaWave13'
+import RadiologyModalityHub from './RadiologyModalityHub'
 
 const Ocular4DAtlas = lazy(() => import('../../components/digital-twin/Ocular4DAtlas'))
 
@@ -122,6 +123,10 @@ export default function MultisystemScaleNavigator() {
           </section>
         </div>
       )}
+
+      <div className="mt-3">
+        <RadiologyModalityHub />
+      </div>
 
       <div className="mt-3 space-y-2">
         {SCALE_GROUPS.map((group) => (
