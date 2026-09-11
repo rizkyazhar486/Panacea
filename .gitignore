@@ -20,3 +20,14 @@ skills-lock.json
 # TypeScript incremental build cache
 tsconfig.tsbuildinfo
 *.tsbuildinfo
+
+# Keluaran QA peramban (tangkapan layar 390x844, artefak WebGL, berkas metrik).
+#
+# Dihasilkan ulang setiap kali smoke dijalankan, baik di CI maupun di mesin
+# pengembang, dan tidak satu pun pernah dilacak. Tanpa baris ini, setiap agen
+# yang menjalankan smoke meninggalkan berkas tak terlacak di pohon kerjanya dan
+# cepat atau lambat ada yang meng-commit ratusan PNG biner ke dalam riwayat.
+#
+# Unggahan CI tidak terpengaruh: actions/upload-artifact membaca pohon kerja,
+# bukan indeks git.
+artifacts/
