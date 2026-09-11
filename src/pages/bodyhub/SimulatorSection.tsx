@@ -65,6 +65,8 @@ export function SimulatorSection({ onVitals }: Props) {
           {SKENARIO.map((s) => (
             <button
               key={s.key}
+              type="button"
+              aria-pressed={skenarioAktif === s.key}
               onClick={() => pakaiSkenario(s.key)}
               className={`min-h-[32px] rounded-full border px-2.5 text-[11px] font-bold transition ${
                 skenarioAktif === s.key
@@ -133,13 +135,16 @@ export function SimulatorSection({ onVitals }: Props) {
 
       <div>
         <button
+          type="button"
+          aria-expanded={bukaKendali}
+          aria-controls="body-simulator-controls"
           onClick={() => setBukaKendali(!bukaKendali)}
           className="w-full rounded-xl border border-neutral-200 px-3 py-2 text-left text-xs font-bold text-ink dark:border-white/10 dark:text-white"
         >
           {bukaKendali ? 'Hide controls' : 'Change any variable yourself'} ›
         </button>
         {bukaKendali && (
-          <div className="mt-2 space-y-2">
+          <div id="body-simulator-controls" className="mt-2 space-y-2">
             {(['cv', 'paru', 'ginjal'] as const).map((sis) => (
               <div key={sis}>
                 <div className="t-mikro font-bold uppercase tracking-wide text-neutral-500">
@@ -166,6 +171,7 @@ export function SimulatorSection({ onVitals }: Props) {
               </div>
             ))}
             <button
+              type="button"
               onClick={() => pakaiSkenario('normal')}
               className="rounded-full border border-neutral-200 px-2.5 py-1 text-[11px] font-bold text-neutral-500 dark:border-white/10"
             >
