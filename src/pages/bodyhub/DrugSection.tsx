@@ -151,6 +151,7 @@ export function DrugSection({ onHighlightSites }: Props) {
 
       {loading && <p role="status" className="text-sm text-neutral-500">Looking up pharmacology and the official label…</p>}
       {error && <p role="alert" className="text-sm text-neutral-500">{error}</p>}
+      {!loading && !error && (profile || label) && <p role="status" className="sr-only">Drug information loaded.</p>}
 
       {(action.length > 0 || adverse.length > 0) && (
         <div className="space-y-2">
