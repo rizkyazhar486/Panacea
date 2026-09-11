@@ -80,6 +80,7 @@ export default function MultisystemScaleNavigator() {
           <button
             type="button"
             aria-expanded={eyeOpen}
+            aria-controls={eyeOpen ? 'body-eye-4d-panel' : undefined}
             onClick={() => setEyeOpen((value) => !value)}
             className="min-h-11 shrink-0 rounded-xl border border-sky-300 bg-white px-4 text-[10px] font-black text-sky-800 shadow-sm transition hover:bg-sky-100 dark:border-sky-300/30 dark:bg-white/5 dark:text-sky-200 dark:hover:bg-white/10"
           >
@@ -89,7 +90,7 @@ export default function MultisystemScaleNavigator() {
       </div>
 
       {eyeOpen && (
-        <div className="mt-3 space-y-3">
+        <div id="body-eye-4d-panel" role="region" aria-label="Eye 4D benchmark" className="mt-3 space-y-3">
           <div className="overflow-hidden rounded-2xl border border-sky-200 bg-white p-2 dark:border-sky-300/20 dark:bg-[#080c10] sm:p-3">
             <Suspense fallback={<div role="status" className="flex min-h-40 items-center justify-center text-xs font-bold text-neutral-500">Loading Eye 4D atlas…</div>}>
               <Ocular4DAtlas />
