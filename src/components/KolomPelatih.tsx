@@ -67,16 +67,16 @@ export function KolomPelatih({
       <Card>
         <div className="flex items-start justify-between gap-3">
           <div className="min-w-0">
-            <div className="text-[10px] font-black uppercase tracking-wide text-slate-500">Coach · next</div>
+            <div className="text-[10px] font-black uppercase tracking-wide text-[color:var(--pelatih-teks-3)]">Coach · next</div>
             <div className="mt-0.5 text-[15px] font-black" style={{ color: saran.warna }}>{saran.judul}</div>
-            <p className="mt-1 line-clamp-2 text-[12px] leading-relaxed text-slate-400">{saran.isi}</p>
+            <p className="mt-1 line-clamp-2 text-[12px] leading-relaxed text-[color:var(--pelatih-teks-2)]">{saran.isi}</p>
           </div>
           {status && (
             <div className="shrink-0 text-right">
               <div className="text-xl font-black tabular-nums" style={{ color: status.baca.warna }}>
                 {Math.round(status.kesegaran)}
               </div>
-              <div className="text-[10px] uppercase tracking-wide text-slate-500">Freshness</div>
+              <div className="text-[10px] uppercase tracking-wide text-[color:var(--pelatih-teks-3)]">Freshness</div>
             </div>
           )}
         </div>
@@ -105,10 +105,10 @@ export function KolomPelatih({
         <div className="mt-3 rounded-2xl p-4" style={{ background: `${saran.warna}14`, border: `1px solid ${saran.warna}33` }}>
           <div className="flex flex-wrap items-baseline justify-between gap-2">
             <span className="text-lg font-black" style={{ color: saran.warna }}>{saran.judul}</span>
-            <span className="rounded-full bg-black/20 px-2.5 py-0.5 text-[11px] font-bold text-slate-300">{saran.kapan}</span>
+            <span className="rounded-full bg-black/20 px-2.5 py-0.5 text-[11px] font-bold text-[color:var(--pelatih-teks-1)]">{saran.kapan}</span>
           </div>
-          <p className="mt-2 text-sm leading-relaxed text-slate-300">{saran.isi}</p>
-          <p className="mt-2 text-[11px] leading-relaxed text-slate-500">Basis: {saran.dasar}</p>
+          <p className="mt-2 text-sm leading-relaxed text-[color:var(--pelatih-teks-1)]">{saran.isi}</p>
+          <p className="mt-2 text-[11px] leading-relaxed text-[color:var(--pelatih-teks-3)]">Basis: {saran.dasar}</p>
         </div>
 
         {status && (
@@ -129,7 +129,7 @@ export function KolomPelatih({
           <SejakTerakhir jedaMs={jedaMs} nama={terakhir?.nama} mulai={terakhir?.mulai}
             kelelahanKini={status ? Math.round(status.kelelahan) : null} proyeksi={proyeksi} />
         )}
-        {status && <p className="mt-2 text-[12px] leading-relaxed text-slate-400">
+        {status && <p className="mt-2 text-[12px] leading-relaxed text-[color:var(--pelatih-teks-2)]">
           <b style={{ color: status.baca.warna }}>{status.baca.judul}.</b> {status.baca.arti}
         </p>}
       </Card>
@@ -145,27 +145,32 @@ export function KolomPelatih({
           </div>
           <KesegaranData jedaMs={jedaMs} />
           <div className="mt-2 flex flex-wrap items-center gap-2">
-            <span className="rounded-full px-2.5 py-1 text-[11px] font-black"
-              style={{ background: `${db.klasifikasi.warna}22`, color: db.klasifikasi.warna }}>
+            {/* Warna klasifikasi datang dari data, bukan dari palet tema, jadi
+                ia tidak bisa diberi varian `dark:`. Di atas tepung terang,
+                jingga penuh hanya mencapai 2.39:1 -- terukur. Warnanya
+                karena itu dititipkan sebagai custom property dan digelapkan
+                untuk mode terang di CSS. */}
+            <span className="pita-klasifikasi rounded-full px-2.5 py-1 text-[11px] font-black"
+              style={{ ['--pmd-nada' as string]: db.klasifikasi.warna }}>
               {db.klasifikasi.label}
             </span>
             {db.klasifikasi.yakin !== 'tinggi' && (
-              <span className="rounded-full bg-white/5 px-2.5 py-1 text-[10px] font-bold text-slate-500">
+              <span className="rounded-full bg-[var(--pelatih-alas-1)] px-2.5 py-1 text-[10px] font-bold text-[color:var(--pelatih-teks-3)]">
                 confidence {db.klasifikasi.yakin}
               </span>
             )}
           </div>
-          <p className="mt-2 text-sm leading-relaxed text-slate-300">{db.ringkas}</p>
+          <p className="mt-2 text-sm leading-relaxed text-[color:var(--pelatih-teks-1)]">{db.ringkas}</p>
           <div className="mt-3 space-y-1.5">
             {db.poin.map((p, i) => (
-              <div key={i} className="flex items-start gap-2 rounded-xl bg-white/5 px-3 py-2">
+              <div key={i} className="flex items-start gap-2 rounded-xl bg-[var(--pelatih-alas-1)] px-3 py-2">
                 <span className="shrink-0 text-sm">{p.ikon}</span>
-                <span className="text-[12px] leading-relaxed text-slate-300">{p.teks}</span>
+                <span className="text-[12px] leading-relaxed text-[color:var(--pelatih-teks-1)]">{p.teks}</span>
               </div>
             ))}
           </div>
           {db.banding && (
-            <p className="mt-3 rounded-xl border border-white/10 bg-white/[0.02] p-3 text-[12px] leading-relaxed text-slate-400">
+            <p className="mt-3 rounded-xl border border-[var(--pelatih-garis)] bg-[var(--pelatih-alas-2)] p-3 text-[12px] leading-relaxed text-[color:var(--pelatih-teks-2)]">
               {db.banding}
             </p>
           )}
@@ -180,21 +185,21 @@ export function KolomPelatih({
         <div className="mt-3 space-y-1.5">
           {jadwal.map((h) => (
             <div key={h.tanggal}
-              className={`flex items-start gap-3 rounded-xl px-3 py-2 ${h.sudah ? 'bg-emerald-500/10' : 'bg-white/5'}`}>
+              className={`flex items-start gap-3 rounded-xl px-3 py-2 ${h.sudah ? 'bg-emerald-500/10' : 'bg-[var(--pelatih-alas-1)]'}`}>
               <div className="w-12 shrink-0">
-                <div className="text-[11px] font-black text-slate-300">{h.hari.slice(0, 3)}</div>
-                <div className="text-[10px] text-slate-500">{h.tanggal.slice(8)}/{h.tanggal.slice(5, 7)}</div>
+                <div className="text-[11px] font-black text-[color:var(--pelatih-teks-1)]">{h.hari.slice(0, 3)}</div>
+                <div className="text-[10px] text-[color:var(--pelatih-teks-3)]">{h.tanggal.slice(8)}/{h.tanggal.slice(5, 7)}</div>
               </div>
               <div className="min-w-0 flex-1">
                 <div className="text-[13px] font-bold" style={{ color: h.warna }}>
-                  {h.label}{h.sudah && <span className="ml-1.5 text-[10px] font-bold text-emerald-400">✓ session logged</span>}
+                  {h.label}{h.sudah && <span className="ml-1.5 text-[10px] font-bold text-[color:var(--pelatih-hijau)]">✓ session logged</span>}
                 </div>
-                <div className="text-[11px] leading-snug text-slate-500">{h.isi}</div>
+                <div className="text-[11px] leading-snug text-[color:var(--pelatih-teks-3)]">{h.isi}</div>
               </div>
             </div>
           ))}
         </div>
-        <p className="mt-2 text-[11px] leading-relaxed text-slate-500">
+        <p className="mt-2 text-[11px] leading-relaxed text-[color:var(--pelatih-teks-3)]">
           This is an example of a balanced week, not an order. Move sessions to fit your days — what
           matters is the ratio: mostly easy, a little hard.
         </p>
@@ -205,10 +210,10 @@ export function KolomPelatih({
         <div className="flex items-start gap-3">
           <span className="text-xl">{dk.nada === 'baik' ? '👏' : dk.nada === 'hati-hati' ? '⚠️' : '🫱'}</span>
           <div>
-            <div className={`text-sm font-black ${dk.nada === 'baik' ? 'text-emerald-400' : dk.nada === 'hati-hati' ? 'text-amber-400' : 'text-slate-300'}`}>
+            <div className={`text-sm font-black ${dk.nada === 'baik' ? 'text-[color:var(--pelatih-hijau)]' : dk.nada === 'hati-hati' ? 'text-[color:var(--pelatih-amber-3)]' : 'text-[color:var(--pelatih-teks-1)]'}`}>
               {dk.judul}
             </div>
-            <p className="mt-1 text-[12px] leading-relaxed text-slate-400">{dk.isi}</p>
+            <p className="mt-1 text-[12px] leading-relaxed text-[color:var(--pelatih-teks-2)]">{dk.isi}</p>
           </div>
         </div>
       </Card>
@@ -218,9 +223,9 @@ export function KolomPelatih({
 
 function Angka({ label, nilai, warna }: { label: string; nilai: number; warna: string }) {
   return (
-    <div className="rounded-xl bg-white/5 p-2.5 text-center">
+    <div className="rounded-xl bg-[var(--pelatih-alas-1)] p-2.5 text-center">
       <div className="text-lg font-black tabular-nums" style={{ color: warna }}>{nilai}</div>
-      <div className="text-[10px] uppercase tracking-wide text-slate-500">{label}</div>
+      <div className="text-[10px] uppercase tracking-wide text-[color:var(--pelatih-teks-3)]">{label}</div>
     </div>
   )
 }
@@ -298,7 +303,7 @@ function KesegaranData({ jedaMs }: { jedaMs: number | null }) {
         This is the most recent session Panacea has <strong>received</strong> — {hari} days ago. If you have trained
         since, the data has not arrived yet.
       </p>
-      <Link to="/health-data" className="mt-1 inline-block text-[11px] font-black text-amber-300 underline underline-offset-2">
+      <Link to="/health-data" className="mt-1 inline-block text-[11px] font-black text-[color:var(--pelatih-amber-2)] underline underline-offset-2">
         Check sync or import sessions →
       </Link>
     </div>
@@ -314,28 +319,28 @@ function SejakTerakhir({ jedaMs, nama, mulai, kelelahanKini, proyeksi }: {
 }) {
   const baru = jedaMs < 86400_000
   return (
-    <div className="mt-3 rounded-2xl bg-white/5 p-3">
+    <div className="mt-3 rounded-2xl bg-[var(--pelatih-alas-1)] p-3">
       <div className="flex flex-wrap items-baseline gap-x-2">
-        <span className="text-[11px] uppercase tracking-wide text-slate-500">⏱ Since last session</span>
-        <span className="text-[15px] font-black tabular-nums text-slate-200">{lamanya(jedaMs)}</span>
+        <span className="text-[11px] uppercase tracking-wide text-[color:var(--pelatih-teks-3)]">⏱ Since last session</span>
+        <span className="text-[15px] font-black tabular-nums text-[color:var(--pelatih-teks-0)]">{lamanya(jedaMs)}</span>
       </div>
       {(nama || mulai) && (
-        <p className="mt-0.5 text-[11px] text-slate-500">
+        <p className="mt-0.5 text-[11px] text-[color:var(--pelatih-teks-3)]">
           {nama}{nama && mulai ? ' · ' : ''}{mulai ? kapan(mulai) : ''}
         </p>
       )}
 
       {kelelahanKini !== null && proyeksi.some((p) => p.kelelahan !== null) && (
         <div className="mt-2">
-          <div className="mb-1 text-[10px] uppercase tracking-wide text-slate-500">Fatigue if you keep resting</div>
+          <div className="mb-1 text-[10px] uppercase tracking-wide text-[color:var(--pelatih-teks-3)]">Fatigue if you keep resting</div>
           <div data-proyeksi className="flex flex-wrap items-center gap-x-1.5 gap-y-1 text-[12px] tabular-nums">
             <span data-kel className="rounded-md bg-red-500/15 px-2 py-0.5 font-black text-red-300">{kelelahanKini}</span>
-            <span className="text-[10px] text-slate-500">kini</span>
+            <span className="text-[10px] text-[color:var(--pelatih-teks-3)]">kini</span>
             {proyeksi.map((p) => p.kelelahan === null ? null : (
               <span key={p.hari} className="flex items-center gap-1.5">
                 <span className="text-slate-600">→</span>
-                <span data-kel className="rounded-md bg-white/5 px-2 py-0.5 font-bold text-slate-300">{p.kelelahan}</span>
-                <span className="text-[10px] text-slate-500">+{p.hari}h</span>
+                <span data-kel className="rounded-md bg-[var(--pelatih-alas-1)] px-2 py-0.5 font-bold text-[color:var(--pelatih-teks-1)]">{p.kelelahan}</span>
+                <span className="text-[10px] text-[color:var(--pelatih-teks-3)]">+{p.hari}h</span>
               </span>
             ))}
           </div>
