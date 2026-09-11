@@ -1,0 +1,56 @@
+{
+  "version": 1,
+  "updatedAt": "2026-09-09",
+  "scope": "Educational multisystem atlas evidence anchors. This file does not establish patient-specific diagnosis, treatment, clinical efficacy, academic human review, or permission to reuse third-party assets.",
+  "mandatoryReferences": [
+    {
+      "id": "thebuggeddev-anatomy",
+      "url": "https://github.com/thebuggeddev/anatomy",
+      "use": "architecture-and-ux-reference-only",
+      "licenseStatus": "unverified-for-reuse-in-panacea",
+      "medicalEvidence": false
+    },
+    {
+      "id": "breath-atlas-thebuggeddev",
+      "url": "https://breath-atlas.thebuggeddev.chatgpt.site/",
+      "use": "respiratory-visual-storytelling-reference-only",
+      "licenseStatus": "unverified-for-reuse-in-panacea",
+      "medicalEvidence": false
+    }
+  ],
+  "scientificAnchors": [
+    {
+      "id": "takahashi-yamanaka-2006-ipsc",
+      "pmid": "16904174",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/16904174/",
+      "year": 2006,
+      "status": "source-checked",
+      "scope": "Foundational experimental iPSC induction by defined factors; not a universal clinical regeneration claim."
+    },
+    {
+      "id": "jun-takahashi-2025-ipsc-cell-replacement",
+      "pmid": "39969437",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/39969437/",
+      "year": 2025,
+      "status": "source-checked",
+      "scope": "Japanese translational iPSC cell-replacement review with Parkinson disease as a major clinical example; efficacy and readiness remain indication-specific."
+    },
+    {
+      "id": "aging-on-chip-2025",
+      "pmid": "40509615",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/40509615/",
+      "year": 2025,
+      "status": "research-frontier",
+      "scope": "Aging/rejuvenation research including organ-on-chip, senescence, single-cell methods and partial reprogramming; not proof of immortality or validated human age reversal."
+    }
+  ],
+  "forbiddenPromotions": [
+    "third-party-ux-reference-to-medical-evidence",
+    "unknown-license-reference-to-runtime-asset",
+    "research-frontier-to-clinically-validated",
+    "gene-or-rna-to-deterministic-thought",
+    "hormone-to-deterministic-personality",
+    "atlas-geometry-to-patient-specific-anatomy",
+    "longevity-research-to-immortality-claim"
+  ]
+}

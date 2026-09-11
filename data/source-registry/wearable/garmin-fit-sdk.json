@@ -1,0 +1,52 @@
+{
+  "id": "garmin_fit_sdk",
+  "name": "Garmin FIT Protocol and SDK",
+  "category": "wearable",
+  "kind": ["standard", "tooling"],
+  "homepage": "https://developer.garmin.com/fit/overview/",
+  "repository": null,
+  "features": ["fit", "activity-files", "workout-files", "course-files", "sensor-data", "developer-data-fields", "activity-import", "activity-export", "garmin", "wearable-sync"],
+  "formats": ["fit", "binary", "fit-protocol-v1", "fit-protocol-v2"],
+  "usage": {
+    "runtime": true,
+    "buildTime": false,
+    "networkRequired": false,
+    "notes": "Use FIT as a versioned interchange/recording format for sport, fitness and health-device data, primarily for deterministic server-side or isolated-worker decoding/encoding of files already obtained through an authorized source such as Garmin Connect Activity API or an explicit user import. Do not add a FIT decoder to the primary browser bundle merely to render dashboards. Decode detailed files on demand, retain the original artifact, and cache normalized results. FIT protocol v2 Developer Data Fields must be preserved rather than silently dropped; older v1-only decoders are not sufficient for files containing those fields."
+  },
+  "license": {
+    "status": "CHECK_REQUIRED",
+    "identifier": "Garmin FIT protocol / SDK license",
+    "commercialUse": "CONDITIONAL",
+    "attributionRequired": null,
+    "shareAlike": null,
+    "scope": "Garmin publishes the FIT protocol and SDK for implementing interoperable FIT encoding/decoding, but Panacea must review the license shipped with the exact SDK/version before vendoring, redistributing, modifying or shipping Garmin SDK source/binaries. Registry inclusion does not grant redistribution rights. Prefer obtaining the SDK through Garmin's official distribution process and keep third-party/open-source parser licensing separate if an alternative implementation is evaluated.",
+    "verificationUrl": "https://developer.garmin.com/fit/get-the-sdk/",
+    "verifiedAt": "2026-09-08",
+    "notes": "Do not copy or vendor Garmin FIT SDK source files into this public repository until the exact SDK license has been reviewed for that version and intended distribution model. Protocol compatibility does not transfer ownership or license rights for Garmin SDK code, device data, third-party Developer Data Fields or imported user files."
+  },
+  "validation": {
+    "level": "REFERENCE",
+    "clinicalDecisionUse": "CONTEXT_ONLY",
+    "notes": "FIT defines transport/storage semantics, not clinical validity. A syntactically valid and CRC-valid FIT file can still contain consumer-device measurements, proprietary derived metrics, missing samples, sensor dropouts or unsupported developer fields. Parsed FIT data may support training and longitudinal context but must not independently drive diagnosis or treatment decisions."
+  },
+  "provenance": {
+    "authority": "Garmin Ltd. / FIT protocol",
+    "sourceIdentityRequired": true,
+    "versionPinRequired": true,
+    "notes": "For every parsed file persist the original source/provider, original filename or provider artifact ID, SHA-256 checksum, file size, FIT protocol version when determinable, FIT Profile/SDK version used by the parser, parser implementation/version, file type, manufacturer/product/device metadata when present, activity timestamps/timezone context, units, developer field definitions, parse warnings/errors and Panacea adapter version. Preserve the immutable original artifact separately from normalized records so parsing can be reproduced after parser/profile upgrades."
+  },
+  "adapter": {
+    "status": "PLANNED",
+    "normalizedTarget": "PanaceaWorkoutObservation",
+    "module": null,
+    "notes": "Planned flow: authorized FIT artifact or explicit user import -> size/type/magic/integrity checks -> SHA-256 fingerprint and deduplication -> isolated deterministic decoder pinned to a reviewed FIT SDK/profile version -> retain standard plus Developer Data Field definitions -> normalize file/session/lap/record/event relationships to PanaceaWorkoutObservation -> persist warnings and source-artifact lineage. Reject corrupt or unsupported structures fail-closed; never invent missing samples or silently coerce unknown units/fields. Re-parsing after SDK/profile upgrades must create a new derived-version record rather than overwriting prior normalized output."
+  },
+  "trust": {
+    "authority": 5,
+    "evidenceQuality": 3,
+    "recency": 5,
+    "licenseClarity": 3,
+    "reproducibility": 5,
+    "notes": "FIT is the authoritative Garmin-defined interchange format for compatible sport/fitness/health-device records and can be highly reproducible when the original file, checksum, profile and parser versions are retained. Evidence quality remains dependent on the originating device, sensor, firmware, algorithm and collection conditions; transport-format validity is not measurement validity."
+  }
+}

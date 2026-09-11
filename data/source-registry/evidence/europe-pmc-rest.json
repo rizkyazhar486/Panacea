@@ -1,0 +1,52 @@
+{
+  "id": "europe-pmc-rest",
+  "name": "Europe PMC REST Web Service",
+  "category": "evidence",
+  "kind": ["api", "dataset"],
+  "homepage": "https://europepmc.org/",
+  "repository": null,
+  "features": ["medical-library", "clinical-evidence", "literature-search", "knowledge-bridge", "publication-provenance"],
+  "formats": ["json", "xml", "dublin-core", "http-rest"],
+  "usage": {
+    "runtime": true,
+    "buildTime": false,
+    "networkRequired": true,
+    "notes": "Panacea uses the official Europe PMC REST web service from its evidence adapter for bounded publication search and metadata retrieval. Do not replace the documented API path with page scraping or bulk crawling of the Europe PMC website."
+  },
+  "license": {
+    "status": "CHECK_REQUIRED",
+    "identifier": null,
+    "commercialUse": "CONDITIONAL",
+    "attributionRequired": true,
+    "shareAlike": null,
+    "scope": "Europe PMC exposes bibliographic metadata and links to publication content, but article/full-text reuse rights remain with the respective authors or publishers. Open-access articles available through Europe PMC services can carry different Creative Commons or similar licences and must be evaluated record by record before reproduction or redistribution.",
+    "verificationUrl": "https://dev.europepmc.org/Copyright",
+    "verifiedAt": "2026-09-08",
+    "notes": "Panacea currently consumes citation-level metadata and abstracts for reference display. Never infer that Europe PMC indexing, free access, or API availability grants a blanket licence to republish article full text, figures or other copyrighted material. Preserve each record's own licence when later adding full-text workflows."
+  },
+  "validation": {
+    "level": "REFERENCE",
+    "clinicalDecisionUse": "CONTEXT_ONLY",
+    "notes": "Europe PMC provides literature provenance and publication metadata. Indexing or citation count does not establish study quality, causal validity, guideline status or patient-specific applicability."
+  },
+  "provenance": {
+    "authority": "Europe PMC / EMBL-EBI and the Europe PMC Funders' Group, in collaboration with NLM",
+    "sourceIdentityRequired": true,
+    "versionPinRequired": false,
+    "notes": "Preserve the Europe PMC source/database identifier, publication identifier (PMID/PMCID or native ID when available), title, query, canonical record URL and retrieval timestamp. Full-text or figure workflows must additionally preserve the record-level licence statement."
+  },
+  "adapter": {
+    "status": "ACTIVE",
+    "normalizedTarget": "panacea.evidence.citation",
+    "module": "src/lib/medicalSources.ts",
+    "notes": "Active client-side adapter uses the official REST search endpoint, requests JSON core metadata with a bounded page size, normalizes source/id/title/authors/journal/year/abstract/citation count, and exposes the canonical Europe PMC article URL. React components do not call Europe PMC directly."
+  },
+  "trust": {
+    "authority": 5,
+    "evidenceQuality": 3,
+    "recency": 5,
+    "licenseClarity": 3,
+    "reproducibility": 5,
+    "notes": "High authority for bibliographic provenance and reproducible retrieval. Evidence quality applies only to the source as a literature index, not to every indexed publication; licence clarity is reduced because publication-content rights vary by record."
+  }
+}

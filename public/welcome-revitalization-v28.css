@@ -1,0 +1,103 @@
+/* Panacea Welcome revitalization v28
+   Presentation-only layer. It preserves the existing Landing structure, Higgsfield
+   history films, MedicalNews, pricing and Claude-authored content while improving
+   contrast, hierarchy and mobile/GPU comfort. */
+
+body:has(.hero-video-scrim){background:#f5f8f6;color:#111827}
+html.dark body:has(.hero-video-scrim){background:#030806;color:#f8fafc}
+body:has(.hero-video-scrim) #root>div{background:transparent!important;color:#111827}
+html.dark body:has(.hero-video-scrim) #root>div{color:#f8fafc}
+
+/* Header: solid-enough contrast without a second heavy glass layer. */
+body:has(.hero-video-scrim) header.sticky{border-bottom:0!important;background:rgba(250,252,251,.91)!important;box-shadow:0 1px 0 rgba(15,23,42,.06);-webkit-backdrop-filter:saturate(130%) blur(12px);backdrop-filter:saturate(130%) blur(12px)}
+html.dark body:has(.hero-video-scrim) header.sticky{background:rgba(4,10,7,.92)!important;box-shadow:0 1px 0 rgba(255,255,255,.08)}
+body:has(.hero-video-scrim) header.sticky :is(a,button){min-height:44px}
+html.dark body:has(.hero-video-scrim) header.sticky a{color:#dce7e1!important}
+
+/* Hero: the original Higgsfield film becomes the visual anchor, not an effect
+   hidden under extra orbs. Copy remains readable in both themes. */
+body:has(.hero-video-scrim) section:has(.hero-video-scrim){min-height:min(860px,88svh);display:flex;align-items:center;background:#eaf2ed;padding-top:clamp(64px,10vw,112px)!important;padding-bottom:clamp(64px,10vw,112px)!important}
+html.dark body:has(.hero-video-scrim) section:has(.hero-video-scrim){background:#03100a}
+body:has(.hero-video-scrim) section:has(.hero-video-scrim) video{opacity:.86;transform:scale(1.01);filter:saturate(.9) contrast(1.03)}
+body:has(.hero-video-scrim) .hero-video-scrim{background:linear-gradient(180deg,rgba(245,249,247,.76) 0%,rgba(245,249,247,.48) 42%,rgba(245,249,247,.92) 100%),radial-gradient(circle at 50% 34%,rgba(0,191,99,.08),transparent 44%)}
+html.dark body:has(.hero-video-scrim) .hero-video-scrim{background:linear-gradient(180deg,rgba(2,8,5,.54) 0%,rgba(2,8,5,.42) 45%,rgba(2,8,5,.88) 100%),radial-gradient(circle at 50% 36%,rgba(0,191,99,.13),transparent 46%)}
+body:has(.hero-video-scrim) section:has(.hero-video-scrim) .orb{display:none!important}
+body:has(.hero-video-scrim) section:has(.hero-video-scrim) h1{max-width:980px;margin-inline:auto;color:#0f172a!important;text-wrap:balance}
+html.dark body:has(.hero-video-scrim) section:has(.hero-video-scrim) h1{color:#f8fafc!important}
+body:has(.hero-video-scrim) section:has(.hero-video-scrim) p{color:#405047!important;line-height:1.62}
+html.dark body:has(.hero-video-scrim) section:has(.hero-video-scrim) p{color:#d2ddd7!important}
+body:has(.hero-video-scrim) section:has(.hero-video-scrim) .liquid-glass{border:0!important;background:rgba(255,255,255,.72)!important;box-shadow:none!important}
+html.dark body:has(.hero-video-scrim) section:has(.hero-video-scrim) .liquid-glass{background:rgba(4,12,8,.72)!important}
+
+/* These counters are marketing constants rather than measured product evidence.
+   Keep them out of the public visual hierarchy until backed by live data. */
+body:has(.hero-video-scrim) section:has(.hero-video-scrim) div.mx-auto.mt-14.grid.max-w-3xl{display:none!important}
+/* Same principle for the absolute trust-claim strip. The conservative clinician
+   support statement immediately above remains visible. */
+body:has(.hero-video-scrim) section:has(.hero-video-scrim) div.mx-auto.mt-8.flex.max-w-3xl.flex-wrap{display:none!important}
+
+/* Existing feature/product sections: one calm surface system and explicit dark
+   contrast. No content is removed here. */
+body:has(.hero-video-scrim) .liquid-glass{border:1px solid rgba(15,23,42,.07)!important;background:rgba(255,255,255,.82)!important;box-shadow:0 16px 44px rgba(15,23,42,.055)!important}
+html.dark body:has(.hero-video-scrim) .liquid-glass{border-color:rgba(255,255,255,.09)!important;background:rgba(8,16,12,.86)!important;box-shadow:0 16px 44px rgba(0,0,0,.18)!important}
+body:has(.hero-video-scrim) .text-ink{color:#111827!important}
+html.dark body:has(.hero-video-scrim) .text-ink{color:#f8fafc!important}
+html.dark body:has(.hero-video-scrim) .text-neutral-700{color:#dbe5df!important}
+html.dark body:has(.hero-video-scrim) .text-neutral-600{color:#c2d0c8!important}
+html.dark body:has(.hero-video-scrim) .text-neutral-500{color:#9fb0a7!important}
+
+/* Featured films: retire the code-demo/Remotion tile from presentation without
+   deleting its asset or Claude's code. The original Higgsfield film gets the
+   complete canvas. */
+body:has(.hero-video-scrim) section:has(video[src*="media/brand-intro.mp4"]) .mx-auto.grid{grid-template-columns:minmax(0,1fr)!important;max-width:960px!important}
+body:has(.hero-video-scrim) section:has(video[src*="media/brand-intro.mp4"]) .reveal:has(video[src*="media/brand-intro.mp4"]){display:none!important}
+body:has(.hero-video-scrim) section:has(video[src*="media/brand-intro.mp4"]) .reveal{max-width:960px;margin-inline:auto;width:100%}
+body:has(.hero-video-scrim) section:has(video[src*="media/brand-intro.mp4"]) video{aspect-ratio:16/8.2;min-height:260px;border-radius:30px}
+body:has(.hero-video-scrim) section:has(video[src*="media/brand-intro.mp4"]) .absolute.bottom-0{color:#fff!important;padding:clamp(20px,4vw,34px)!important}
+body:has(.hero-video-scrim) section:has(video[src*="media/brand-intro.mp4"]) .absolute.bottom-0 p{color:rgba(255,255,255,.82)!important}
+
+/* The hard-coded update list goes stale; MedicalNews directly below remains the
+   public news/innovation surface. Hide only this static list section. */
+body:has(.hero-video-scrim) section.mx-auto.max-w-3xl:has(ul.mt-8){display:none!important}
+
+/* Business/roles section keeps its content but loses the template-like glowing
+   orb and light-only background. */
+body:has(.hero-video-scrim) section.bg-gradient-to-br{background:linear-gradient(180deg,#eef5f0 0%,#f8faf9 100%)!important}
+html.dark body:has(.hero-video-scrim) section.bg-gradient-to-br{background:linear-gradient(180deg,#06110b 0%,#030806 100%)!important}
+body:has(.hero-video-scrim) section.bg-gradient-to-br>.orb{display:none!important}
+
+/* History is core Panacea identity. Preserve all Higgsfield era films but make
+   the cards look archival/scientific rather than emoji-template cards. */
+body:has(.hero-video-scrim) .tumpuk-kartu>div{border:0!important;border-radius:24px!important;background:#fbfdfc!important;box-shadow:0 18px 50px rgba(15,23,42,.09)!important}
+html.dark body:has(.hero-video-scrim) .tumpuk-kartu>div{background:#07110c!important;box-shadow:0 18px 50px rgba(0,0,0,.30)!important}
+body:has(.hero-video-scrim) .tumpuk-kartu h3{color:#111827!important}
+html.dark body:has(.hero-video-scrim) .tumpuk-kartu h3{color:#f8fafc!important}
+body:has(.hero-video-scrim) .tumpuk-kartu p{color:#526158!important}
+html.dark body:has(.hero-video-scrim) .tumpuk-kartu p{color:#c5d2ca!important}
+body:has(.hero-video-scrim) .tumpuk-kartu video{border-radius:16px!important;background:#020805!important}
+body:has(.hero-video-scrim) .tumpuk-kartu span.grid.h-12{filter:saturate(.35);background:rgba(0,191,99,.08)!important}
+
+/* Marquee stays as navigation context, not a loud advertisement. */
+body:has(.hero-video-scrim) #panacea-track{animation-duration:72s!important}
+body:has(.hero-video-scrim) #panacea-track span{font-size:13px!important;font-weight:700!important}
+body:has(.hero-video-scrim) div:has(>#panacea-track){border-block:0!important;background:rgba(0,191,99,.035)!important;-webkit-backdrop-filter:none!important;backdrop-filter:none!important}
+
+/* Mobile: preserve content, reduce compositing and keep every action tappable. */
+@media(max-width:640px){
+  body:has(.hero-video-scrim) section:has(.hero-video-scrim){min-height:760px;padding-inline:18px!important}
+  body:has(.hero-video-scrim) section:has(.hero-video-scrim) h1{font-size:clamp(38px,11vw,52px)!important;line-height:1.02!important}
+  body:has(.hero-video-scrim) section:has(.hero-video-scrim) p{font-size:15px!important}
+  body:has(.hero-video-scrim) .tumpuk-kartu>div{padding:16px!important}
+  body:has(.hero-video-scrim) section:has(video[src*="media/brand-intro.mp4"]) video{min-height:220px;aspect-ratio:4/3}
+}
+
+html.pmd-low-memory body:has(.hero-video-scrim) header.sticky,
+html.pmd-low-memory body:has(.hero-video-scrim) .liquid-glass{-webkit-backdrop-filter:none!important;backdrop-filter:none!important;box-shadow:none!important}
+html.pmd-low-memory body:has(.hero-video-scrim) section:has(.hero-video-scrim) video{display:none!important}
+html.pmd-low-memory body:has(.hero-video-scrim) div[style*="height: 400vh"]{display:none!important}
+html.pmd-low-memory body:has(.hero-video-scrim) #panacea-track{animation:none!important;transform:none!important}
+
+@media(prefers-reduced-motion:reduce){
+  body:has(.hero-video-scrim) #panacea-track{animation:none!important;transform:none!important}
+  body:has(.hero-video-scrim) section:has(.hero-video-scrim) video{display:none!important}
+}

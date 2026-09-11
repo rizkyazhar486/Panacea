@@ -1,0 +1,52 @@
+{
+  "id": "medplum",
+  "name": "Medplum",
+  "category": "clinical-data",
+  "kind": ["api", "library", "framework"],
+  "homepage": "https://www.medplum.com/",
+  "repository": "https://github.com/medplum/medplum",
+  "features": ["fhir-backend", "ehr-integration", "smart-on-fhir", "oauth", "access-control", "clinical-data-gateway", "human-os", "digital-twin"],
+  "formats": ["fhir-r4-json", "graphql", "rest"],
+  "usage": {
+    "runtime": true,
+    "buildTime": false,
+    "networkRequired": true,
+    "notes": "Treat Medplum as an optional FHIR backend/gateway rather than a mandatory Panacea dependency. Hosted Medplum currently exposes a FHIR R4 API. A self-hosted or hosted deployment still requires authenticated network boundaries; Panacea must remain usable for local/reference features when no Medplum connection exists."
+  },
+  "license": {
+    "status": "VERIFIED",
+    "identifier": "Apache-2.0",
+    "commercialUse": "ALLOWED",
+    "attributionRequired": true,
+    "shareAlike": false,
+    "scope": "The medplum/medplum open-source repository is Apache-2.0 licensed. This license covers the software, not hosted-service subscriptions, patient data, third-party terminology content, external integrations or separate commercial agreements.",
+    "verificationUrl": "https://github.com/medplum/medplum",
+    "verifiedAt": "2026-09-08",
+    "notes": "Keep open-source licensing separate from hosted Medplum terms, data-processing agreements, deployment security, and any third-party service or terminology licenses."
+  },
+  "validation": {
+    "level": "REFERENCE",
+    "clinicalDecisionUse": "NO",
+    "notes": "Medplum is clinical-data infrastructure. Successful storage, retrieval or FHIR conformance does not validate the medical correctness of observations, diagnoses, medications, decision support or derived Panacea outputs."
+  },
+  "provenance": {
+    "authority": "Medplum / Orangebot, Inc. and open-source contributors",
+    "sourceIdentityRequired": true,
+    "versionPinRequired": true,
+    "notes": "Preserve source project/server, FHIR R4 resourceType/id/meta.versionId, canonical profiles and audit context. Do not erase the distinction between a resource retrieved from Medplum and a locally derived Panacea representation."
+  },
+  "adapter": {
+    "status": "PLANNED",
+    "normalizedTarget": "PanaceaFHIRGateway",
+    "module": null,
+    "notes": "Planned flow: authenticated FHIR R4 endpoint -> SMART/OAuth and access-policy gate -> version/profile validation -> PanaceaFHIRGateway -> PanaceaHealthResource. Never store client secrets in the browser, public repository or localStorage. Prefer authorization-code/SMART flows for user-facing access and least-privilege scoped service credentials for backend tasks."
+  },
+  "trust": {
+    "authority": 4,
+    "evidenceQuality": 2,
+    "recency": 5,
+    "licenseClarity": 5,
+    "reproducibility": 4,
+    "notes": "Scores describe infrastructure suitability, not biomedical evidence quality. Deployment architecture, access policies and hosted-service configuration materially affect operational trust."
+  }
+}

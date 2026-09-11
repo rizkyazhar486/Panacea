@@ -1,0 +1,157 @@
+name: Stabilization Acceptance
+
+on:
+  push:
+    branches:
+      - main
+      - stabilization/integrate-body3d-20260908
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: stabilization-acceptance-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  # Keep the expensive browser/WebGL acceptance on one runner so the production
+  # build is reused by both Body smoke checks. `npm run build` already executes
+  # repository validators plus `tsc -b`, so a separate frontend `tsc --noEmit`
+  # only repeated the same type gate on every PR.
+  full-acceptance:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Install frontend dependencies
+        run: npm ci
+
+      - name: Frontend production build and TypeScript
+        run: npm run build
+
+      - name: Frontend tests
+        run: npm run uji
+
+      - name: Install mobile browser smoke runner
+        run: |
+          npm install --no-save --no-package-lock @playwright/test@1.55.0
+          # GitHub's Ubuntu runner can include the unrelated Google Chrome apt
+          # source. A transient checksum mismatch there must not block Playwright
+          # Chromium's own system-dependency installation.
+          for source in /etc/apt/sources.list.d/*.list /etc/apt/sources.list.d/*.sources; do
+            [ -f "$source" ] || continue
+            if grep -q 'dl.google.com/linux/chrome-stable' "$source"; then
+              echo "Disabling unrelated Google Chrome apt source: $source"
+              sudo mv "$source" "$source.panacea-disabled"
+            fi
+          done
+          npx playwright install --with-deps chromium
+
+      - name: Start frontend preview
+        run: |
+          nohup npm run preview -- --host 127.0.0.1 --port 4173 > /tmp/panacea-vite-preview.log 2>&1 &
+          echo $! > /tmp/panacea-vite-preview.pid
+          for attempt in $(seq 1 45); do
+            if curl -fsS http://127.0.0.1:4173/ >/dev/null; then
+              exit 0
+            fi
+            sleep 1
+          done
+          cat /tmp/panacea-vite-preview.log
+          exit 1
+
+      - name: Body Exposure mobile 390x844 smoke
+        env:
+          BODY3D_QA_URL: http://127.0.0.1:4173/#/body-explorer
+          BODY3D_QA_SCREENSHOT: artifacts/body3d-mobile-390x844.png
+          BODY3D_QA_METRICS: artifacts/body3d-mobile-metrics.json
+        run: node scripts/qa/body3d-mobile-smoke.mjs
+
+      - name: Body Exposure rendered WebGL visual artifact
+        env:
+          BODY3D_QA_URL: http://127.0.0.1:4173/#/body-explorer
+          BODY3D_QA_CANVAS_ARTIFACT: artifacts/body3d-mobile-canvas.png
+        run: node scripts/qa/body3d-canvas-artifact.mjs
+
+      - name: Panacea OS Daily mobile 390x844 smoke
+        env:
+          PANACEA_OS_QA_URL: http://127.0.0.1:4173/#/harian
+          PANACEA_OS_QA_SCREENSHOT: artifacts/panacea-os-mobile-390x844.png
+          PANACEA_OS_QA_METRICS: artifacts/panacea-os-mobile-metrics.json
+        run: node scripts/qa/panacea-os-mobile-smoke.mjs
+
+      - name: Upload Body Exposure mobile QA artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: body3d-mobile-qa
+          path: artifacts/body3d-mobile-*
+          if-no-files-found: warn
+          retention-days: 7
+
+      - name: Upload Panacea OS mobile QA artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: panacea-os-mobile-qa
+          path: artifacts/panacea-os-mobile-*
+          if-no-files-found: warn
+          retention-days: 7
+
+      - name: Stop frontend preview
+        if: always()
+        run: |
+          if [ -f /tmp/panacea-vite-preview.pid ]; then
+            kill "$(cat /tmp/panacea-vite-preview.pid)" 2>/dev/null || true
+          fi
+
+  # Server acceptance is independent of the browser/WebGL runner. Some backend
+  # regression tests intentionally import shared root React/TSX modules, so this
+  # runner installs both lockfile graphs before executing the same server
+  # typecheck/build/test suite. GitHub can run both acceptance jobs in parallel.
+  server-acceptance:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: |
+            package-lock.json
+            server/package-lock.json
+
+      - name: Install shared root dependencies
+        run: npm ci
+
+      - name: Install server dependencies
+        working-directory: server
+        run: npm ci
+
+      - name: Server TypeScript
+        working-directory: server
+        run: npm run typecheck
+
+      - name: Server build
+        working-directory: server
+        run: npm run build
+
+      - name: Server tests
+        working-directory: server
+        run: npm run uji

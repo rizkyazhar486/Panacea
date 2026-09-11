@@ -3,87 +3,32 @@ import * as THREE from 'three'
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
 import { bangunLintasan, kecepatanAliran, titikPada, type FlowPath, type Vec3 } from '../lib/cardioFlow'
+import { body3dPixelRatio } from '../lib/body3dQuality'
 
-// ─────────────────────────────────────────────────────────────────────────────
-// PENAMPIL ATLAS — satu penampil untuk SELURUH modul spesialisasi.
-//
-// Dipakai oleh ruang kardiovaskular maupun oleh ruang spesialisasi lain
-// (respirasi, gastro, nefrologi, neurologi, THT, mata, ortopedi, urogenital,
-// panggul, imunologi, kulit). Yang berbeda antar modul hanya BERKAS dan
-// DAFTAR STRUKTURNYA; perilakunya sama, dan itu disengaja: orang tidak perlu
-// belajar penampil baru tiap berpindah bidang.
-//
-// Empat aturan yang menentukan bentuknya:
-//
-//   1. TIAP MESH BERNAMA. Menyorot "LAD" atau "Left kidney" cukup dengan
-//      mencocokkan nama, tanpa daftar indeks yang akan basi begitu berkasnya
-//      dibangun ulang.
-//   2. ALIRAN MENGIKUTI GARIS TENGAH STRUKTUR, bukan garis lurus antar organ.
-//      Perhitungannya ada di cardioFlow.ts dan diuji dengan angka — animasi
-//      yang salah arah tetap terlihat indah, jadi ia tidak bisa diperiksa
-//      dengan mata.
-//   3. YANG TIDAK TERLIBAT DIREDUPKAN, tidak disembunyikan. Menghilangkan
-//      struktur lain menghapus konteks letaknya; meredupkan tetap menjawab
-//      "di sebelah mana ini".
-//   4. KAMERA IKUT MENDEKAT ke struktur yang disorot. Pada pohon seluruh tubuh,
-//      LAD atau kelenjar hipofisis hanya beberapa piksel; menyorot tanpa
-//      mendekat terbaca sebagai "tidak terjadi apa-apa".
-// ─────────────────────────────────────────────────────────────────────────────
-
-/** Keterangan satu struktur, sama untuk semua modul. */
 export interface PartMeta {
   name: string
-  /** Jenis jaringan atau golongan — dipakai penyaring dan aturan tampilan. */
   kind: string
-  /** Pengelompokan bebas per modul (wilayah tubuh, sistem, dan sebagainya). */
   group?: string
 }
 
 export interface AtlasViewerProps {
-  /** Berkas GLB, relatif terhadap folder publik. Contoh: 'atlas/neurologi.glb'. */
   berkas: string
-  /** Struktur yang dikenal berkas itu, untuk memulihkan nama dan menyaring. */
   bagian: PartMeta[]
-  /** Struktur yang menjadi LESI — disorot merah dan berdenyut. */
   lesi?: string[]
-  /** Struktur yang kekurangan darah AKIBAT lesi — disorot kuning. */
   hilir?: string[]
-  /** Jalur aliran yang sedang diperagakan. */
   jalur?: FlowPath | null
-  /** Denyut jantung, memengaruhi laju dan bentuk aliran. */
   hr?: number
-  /** Hanya tampilkan kelompok ini. null = semua. */
   wilayah?: string | null
-  /** Tinggi kanvas. Modul dengan struktur ramping perlu ruang lebih. */
   tinggi?: number
   onPilih?: (nama: string | null) => void
   dipilih?: string | null
 }
 
-/**
- * GLTFLoader MENGGANTI nama simpul: spasi menjadi garis bawah dan tanda baca
- * dibuang (THREE.PropertyBinding.sanitizeNodeName). Jadi mesh "Trunk of
- * anterior interventricular branch of left coronary artery" sampai di adegan
- * dengan nama lain, dan pencocokan nama gagal DIAM-DIAM: figur tetap tampil
- * rapi, hanya tidak ada yang pernah menyala. Nama asli dipulihkan lewat peta
- * ini, dan itu pula yang ditampilkan ke pengguna.
- */
+/** Nama ini harus mengikuti sanitizer yang dipakai GLTFLoader/PropertyBinding. */
 function namaBersih(s: string): string {
   return s.replace(/\s/g, '_').replace(/[^\w-]/g, '')
 }
 
-/**
- * Warna sorotan ditulis dalam RUANG LINEAR, sama seperti warna bahan di dalam
- * GLB (lihat scripts/atlasGlb.mjs, yang memangkatkan 2,2 sebelum menulis).
- *
- * Ini bukan kerewelan: memakai `new THREE.Color('#ff7a00')` membuat jingga
- * tampil sebagai HIJAU ZAITUN di layar, karena nilainya diperlakukan sebagai
- * linear lalu dikodekan sekali lagi ke sRGB saat penyajian — saluran hijau
- * naik jauh lebih banyak daripada merah. Terukur: jingga (255,122,0) keluar
- * sebagai (154,145,0). Menyamakan ruang warna dengan berkas modelnya membuat
- * sorotan tampil sebagaimana ditulis, dan tetap benar baik saat manajemen
- * warna three.js menyala maupun mati.
- */
 function warnaLinear(hex: string): THREE.Color {
   const n = (i: number) => Math.pow(parseInt(hex.slice(i, i + 2), 16) / 255, 2.2)
   return new THREE.Color().setRGB(n(1), n(3), n(5))
@@ -93,16 +38,25 @@ const WARNA_LESI = warnaLinear('#ff2d2d')
 const WARNA_HILIR = warnaLinear('#ff7a00')
 const JUMLAH_PARTIKEL = 90
 
-export function AtlasViewer3D({ berkas, bagian, lesi = [], hilir = [], jalur = null, hr = 72, wilayah = null, tinggi = 300, onPilih, dipilih = null }: AtlasViewerProps) {
+export function AtlasViewer3D({
+  berkas,
+  bagian,
+  lesi = [],
+  hilir = [],
+  jalur = null,
+  hr = 72,
+  wilayah = null,
+  tinggi = 300,
+  onPilih,
+  dipilih = null,
+}: AtlasViewerProps) {
   const wadahRef = useRef<HTMLDivElement>(null)
   const [muat, setMuat] = useState(true)
   const [pct, setPct] = useState(0)
   const [gagal, setGagal] = useState('')
   const [sentuh, setSentuh] = useState<string | null>(null)
 
-  // Nilai yang berubah tiap render dibaca lewat ref supaya loop animasi tidak
-  // perlu dibangun ulang — memuat ulang GLB 3,6 MB tiap kali orang mengganti
-  // penyakit akan terasa seperti aplikasi yang macet.
+  // Props dinamis dibaca melalui ref agar mengganti penyakit/flow tidak memuat ulang GLB.
   const propRef = useRef({ lesi, hilir, jalur, hr, wilayah, dipilih })
   propRef.current = { lesi, hilir, jalur, hr, wilayah, dipilih }
   const bagianRef = useRef(bagian)
@@ -124,9 +78,10 @@ export function AtlasViewer3D({ berkas, bagian, lesi = [], hilir = [], jalur = n
       setMuat(false)
       return
     }
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
+
     renderer.setClearColor(0x000000, 0)
     renderer.outputColorSpace = THREE.SRGBColorSpace
+    renderer.domElement.dataset.atlasViewer3d = 'true'
     wadah.appendChild(renderer.domElement)
 
     scene.add(new THREE.AmbientLight(0xffffff, 0.85))
@@ -143,7 +98,12 @@ export function AtlasViewer3D({ berkas, bagian, lesi = [], hilir = [], jalur = n
     camera.position.set(0, 0.15, 3.4)
 
     const ukur = () => {
-      const w = wadah.clientWidth, h = wadah.clientHeight
+      const w = wadah.clientWidth
+      const h = wadah.clientHeight
+      if (w < 2 || h < 2) return
+      const smallViewport = window.matchMedia('(max-width: 640px)').matches
+      const dpr = body3dPixelRatio(w, h, window.devicePixelRatio || 1, smallViewport)
+      if (Math.abs(renderer.getPixelRatio() - dpr) > 0.01) renderer.setPixelRatio(dpr)
       renderer.setSize(w, h)
       camera.aspect = w / h
       camera.updateProjectionMatrix()
@@ -158,12 +118,12 @@ export function AtlasViewer3D({ berkas, bagian, lesi = [], hilir = [], jalur = n
     const jenisMesh = new Map<THREE.Mesh, string>()
     let grup: THREE.Group | null = null
 
-    // ── Partikel aliran ──────────────────────────────────────────────────────
-    // Bola kecil, bukan THREE.Points: titik digambar sebagai persegi sejajar
-    // layar, dan begitu kamera mendekat ke satu pembuluh ia berubah menjadi
-    // kotak-kotak besar yang tidak menyerupai apa pun.
     const geoPartikel = new THREE.SphereGeometry(1, 8, 6)
-    const matPartikel = new THREE.MeshBasicMaterial({ color: warnaLinear('#ff6b6b'), transparent: true, opacity: 0.95 })
+    const matPartikel = new THREE.MeshBasicMaterial({
+      color: warnaLinear('#ff6b6b'),
+      transparent: true,
+      opacity: 0.95,
+    })
     const partikel = new THREE.InstancedMesh(geoPartikel, matPartikel, JUMLAH_PARTIKEL)
     partikel.instanceMatrix.setUsage(THREE.DynamicDrawUsage)
     partikel.frustumCulled = false
@@ -186,57 +146,74 @@ export function AtlasViewer3D({ berkas, bagian, lesi = [], hilir = [], jalur = n
       `${import.meta.env.BASE_URL}${berkas}`,
       (gltf) => {
         grup = gltf.scene
-        const asliPerBersih = new Map(bagianRef.current.map((p) => [namaBersih(p.name), p]))
+
+        // Satu nama sanitized hanya boleh menunjuk ke satu metadata atlas.
+        // Bila generator suatu hari menghasilkan collision, mesh tersebut tidak
+        // diberi nama tebakan dan tidak ikut ray-picking sampai metadata diperbaiki.
+        const asliPerBersih = new Map<string, PartMeta>()
+        const ambigu = new Set<string>()
+        for (const p of bagianRef.current) {
+          const k = namaBersih(p.name)
+          const ada = asliPerBersih.get(k)
+          if (ada && ada.name !== p.name) ambigu.add(k)
+          else asliPerBersih.set(k, p)
+        }
+
         grup.traverse((o) => {
           if (!(o as THREE.Mesh).isMesh) return
           const m = o as THREE.Mesh
-          const bagian = asliPerBersih.get(m.name) ?? asliPerBersih.get(namaBersih(m.name))
-          if (bagian) m.name = bagian.name
-          const bahan = (m.material as THREE.MeshStandardMaterial).clone()
+          const clean = namaBersih(m.name)
+          const part = ambigu.has(clean) ? undefined : (asliPerBersih.get(m.name) ?? asliPerBersih.get(clean))
+          if (part) m.name = part.name
+
+          const bahanAsli = m.material as THREE.Material | THREE.Material[]
+          if (Array.isArray(bahanAsli)) {
+            // Atlas generator saat ini menghasilkan satu material per mesh.
+            // Bila format berubah, jangan menyamarkan ketidakcocokan itu.
+            console.warn(`Multi-material mesh on ${berkas} is not supported for precise atlas highlighting: ${m.name}`)
+            return
+          }
+          const bahan = (bahanAsli as THREE.MeshStandardMaterial).clone()
           bahan.transparent = true
           m.material = bahan
           warnaAsli.set(m, bahan.color.clone())
-          wilayahMesh.set(m, bagian?.group ?? '')
-          // Rongga jantung adalah gumpalan besar dan pejal. Dibiarkan sepekat
-          // pembuluh, ia menutupi koroner yang justru sedang dipelajari.
-          jenisMesh.set(m, bagian?.kind ?? '')
+          wilayahMesh.set(m, part?.group ?? '')
+          jenisMesh.set(m, part?.kind ?? '')
           meshes.push(m)
         })
+
         const takDikenal = meshes.filter((m) => !jenisMesh.get(m)).length
+        if (ambigu.size) console.warn(`${ambigu.size} ambiguous sanitized atlas names in ${berkas}`)
         if (takDikenal) console.warn(`${takDikenal} mesh pada ${berkas} tidak dikenali namanya`)
         scene.add(grup)
         setMuat(false)
       },
-      (ev) => { if (ev.total > 0) setPct(ev.loaded / ev.total) },
-      () => { setGagal('Could not load this anatomical model.'); setMuat(false) },
+      (ev) => {
+        if (ev.total > 0) setPct(ev.loaded / ev.total)
+      },
+      () => {
+        setGagal('Could not load this anatomical model.')
+        setMuat(false)
+      },
     )
 
-    // ── Sentuhan: dari struktur ke penyakit ──────────────────────────────────
     const ray = new THREE.Raycaster()
     const titik = new THREE.Vector2()
     function padaKlik(ev: PointerEvent) {
       if (!grup) return
       const r = renderer.domElement.getBoundingClientRect()
+      if (r.width < 2 || r.height < 2) return
       titik.x = ((ev.clientX - r.left) / r.width) * 2 - 1
       titik.y = -((ev.clientY - r.top) / r.height) * 2 + 1
       ray.setFromCamera(titik, camera)
-      const kena = ray.intersectObjects(meshes.filter((m) => m.visible), false)
+      // Hanya mesh dengan metadata terverifikasi yang boleh menghasilkan label.
+      const kena = ray.intersectObjects(meshes.filter((m) => m.visible && Boolean(jenisMesh.get(m))), false)
       const nama = kena[0]?.object.name ?? null
       setSentuh(nama)
       onPilihRef.current?.(nama)
     }
     renderer.domElement.addEventListener('pointerup', padaKlik)
 
-    const onHilang = (e: Event) => {
-      e.preventDefault()
-      setGagal('The browser dropped the 3D context, usually because memory ran low.')
-    }
-    renderer.domElement.addEventListener('webglcontextlost', onHilang)
-
-    // ── Membingkai ulang kamera ──────────────────────────────────────────────
-    // Pada pohon pembuluh seluruh tubuh, LAD hanya beberapa piksel. Menyorotnya
-    // saja tidak cukup: kamera harus IKUT mendekat, kalau tidak orang melihat
-    // gambar yang sama persis dan menyimpulkan tidak terjadi apa-apa.
     const kotak = new THREE.Box3()
     const pusatTujuan = new THREE.Vector3()
     let jarakTujuan = 3.4
@@ -260,13 +237,28 @@ export function AtlasViewer3D({ berkas, bagian, lesi = [], hilir = [], jalur = n
     }
 
     const jam = new THREE.Clock()
-    let t = 0            // posisi partikel terdepan pada lintasan, 0..1
+    let t = 0
     let raf = 0
     let kunciBingkai = ''
+    let inViewport = true
+    let documentVisible = !document.hidden
     const v = new THREE.Vector3()
 
-    function bingkai() {
+    function stopRendering() {
+      if (!raf) return
+      cancelAnimationFrame(raf)
+      raf = 0
+    }
+
+    function startRendering() {
+      if (raf || !inViewport || !documentVisible) return
       raf = requestAnimationFrame(bingkai)
+    }
+
+    function bingkai() {
+      raf = 0
+      if (!inViewport || !documentVisible) return
+
       const dt = Math.min(jam.getDelta(), 0.1)
       const { lesi: L, hilir: H, jalur: J, hr: HR, wilayah: W, dipilih: D } = propRef.current
       const detik = jam.getElapsedTime()
@@ -274,28 +266,19 @@ export function AtlasViewer3D({ berkas, bagian, lesi = [], hilir = [], jalur = n
       const setLesi = new Set(L.map((s) => s.toLowerCase()))
       const setHilir = new Set(H.map((s) => s.toLowerCase()))
       const adaSorot = setLesi.size > 0 || setHilir.size > 0
-      // Denyut lesi: 2 Hz, cukup untuk menarik mata tanpa menjadi kedipan.
       const denyut = 0.55 + 0.45 * Math.sin(detik * 6.0)
-
-      // Struktur yang dilalui aliran TIDAK PERNAH disaring keluar oleh
-      // penyaring wilayah. Tanpa aturan ini, memilih "Heart" saat mengikuti
-      // sirkulasi paru menyembunyikan arteri pulmonalisnya sendiri, dan
-      // partikel tampak melayang di udara kosong.
       const setJalur = new Set((J?.urutan ?? []).map((n) => n.toLowerCase()))
 
-      // Bingkai ulang hanya saat yang disorot atau yang disaring berubah —
-      // bukan tiap bingkai, supaya pengguna tetap bisa memutar dan memperbesar
-      // sendiri tanpa kamera menariknya kembali.
       const kunciBaru = `${[...setLesi].sort().join('|')}::${[...setHilir].sort().join('|')}::${W ?? ''}::${J?.id ?? ''}`
       if (meshes.length && kunciBaru !== kunciBingkai) {
         kunciBingkai = kunciBaru
         if (adaSorot) bingkaiKe((m) => setLesi.has(m.name.toLowerCase()) || setHilir.has(m.name.toLowerCase()), 2.1)
         else if (W || J) {
-          // Tanpa lesi, yang dibingkai adalah apa yang sedang dilihat: wilayah
-          // yang dipilih beserta jalur yang sedang diikuti.
           const perhatian = new Set([...setJalur])
           bingkaiKe((m) => (W ? wilayahMesh.get(m) === W : false) || perhatian.has(m.name.toLowerCase()), 1.9)
-        } else bingkaiKe(() => true, 1.45)
+        } else {
+          bingkaiKe(() => true, 1.45)
+        }
       }
 
       for (const m of meshes) {
@@ -304,11 +287,10 @@ export function AtlasViewer3D({ berkas, bagian, lesi = [], hilir = [], jalur = n
         const cocokWilayah = !W || wilayahMesh.get(m) === W || setJalur.has(nama)
         m.visible = cocokWilayah
         if (!cocokWilayah) continue
+
         const asli = warnaAsli.get(m)!
         if (setLesi.has(nama)) {
           bahan.color.copy(WARNA_LESI)
-          // Pantulan dimatikan pada struktur yang disorot: kilau putih dari
-          // lampu menipiskan warnanya, dan warna itulah keterangannya.
           bahan.metalness = 0
           bahan.roughness = 1
           bahan.emissive.copy(WARNA_LESI).multiplyScalar(denyut * 0.7)
@@ -318,27 +300,14 @@ export function AtlasViewer3D({ berkas, bagian, lesi = [], hilir = [], jalur = n
           bahan.metalness = 0
           bahan.roughness = 1
           bahan.emissive.copy(WARNA_HILIR).multiplyScalar(0.6)
-          // Sengaja PEKAT, termasuk untuk ruang jantung: struktur setengah
-          // tembus yang tertumpuk di atas struktur lain menghasilkan warna
-          // campuran — jingga di atas rongga yang teredam terbaca hijau zaitun,
-          // dan warna yang salah adalah keterangan yang salah.
           bahan.opacity = 1
         } else {
           bahan.color.copy(asli)
           bahan.emissive.setRGB(0, 0, 0)
-          // Diredupkan, bukan disembunyikan: letak lesi hanya berarti kalau
-          // tetangganya masih terlihat.
           const rongga = jenisMesh.get(m) === 'chamber'
           bahan.opacity = adaSorot ? (rongga ? 0.10 : 0.16) : (rongga ? 0.34 : 0.92)
         }
-        // Struktur setengah tembus tidak boleh menulis kedalaman: kalau ia
-        // menulis, ia menutupi partikel darah yang berada DI DALAMNYA — aliran
-        // di dalam ruang jantung jadi menghilang justru saat ruangnya dilihat.
         bahan.depthWrite = bahan.opacity >= 0.99
-        // Yang disorot digambar TERAKHIR. Semua bahan di sini tembus pandang,
-        // jadi urutannya menentukan warna akhir: struktur teredam yang digambar
-        // di atas sorotan akan menodainya — jingga di balik lapisan teredam
-        // terbaca hijau zaitun, terukur (211,121,0) menjadi (155,145,0).
         m.renderOrder = setLesi.has(nama) || setHilir.has(nama) ? 2 : 0
 
         if (D && nama === D.toLowerCase()) {
@@ -347,7 +316,6 @@ export function AtlasViewer3D({ berkas, bagian, lesi = [], hilir = [], jalur = n
         }
       }
 
-      // ── Aliran ─────────────────────────────────────────────────────────────
       if (J && J.id !== idJalur) {
         idJalur = J.id
         lintasan = bangunLintasan(J.urutan)
@@ -363,17 +331,15 @@ export function AtlasViewer3D({ berkas, bagian, lesi = [], hilir = [], jalur = n
           J.oxygen === 'oxygenated' ? '#ff5a5a' : J.oxygen === 'portal' ? '#a389e8' : '#5aa2ff',
         ))
       }
-      if (!J) { idJalur = ''; garis.visible = false; partikel.visible = false }
+      if (!J) {
+        idJalur = ''
+        garis.visible = false
+        partikel.visible = false
+      }
 
       if (J && lintasan.length >= 2) {
         partikel.visible = true
-        // Laju dasar dipilih supaya satu putaran penuh memakan ~6 detik pada
-        // 72/menit: cukup lambat untuk diikuti mata, cukup cepat untuk terbaca
-        // sebagai aliran.
         t = (t + dt * (1 / 6) * kecepatanAliran(detik, HR, J.pulsatile)) % 1
-        // Ukuran partikel mengikuti jarak kamera: pada tampilan seluruh tubuh
-        // ia harus cukup besar untuk terlihat, saat mendekat ke satu pembuluh ia
-        // tidak boleh lebih besar daripada pembuluhnya sendiri.
         const jarakKamera = camera.position.distanceTo(controls.target)
         const jari = Math.min(0.02, Math.max(0.004, jarakKamera * 0.008))
         for (let i = 0; i < JUMLAH_PARTIKEL; i++) {
@@ -386,8 +352,6 @@ export function AtlasViewer3D({ berkas, bagian, lesi = [], hilir = [], jalur = n
         partikel.instanceMatrix.needsUpdate = true
       }
 
-      // Gerak kamera dihaluskan, bukan meloncat: loncatan menghapus rasa
-      // "ini bagian dari tubuh yang tadi" dan orang kehilangan letaknya.
       if (adaTujuan) {
         controls.target.lerp(pusatTujuan, 1 - Math.pow(0.001, dt))
         v.copy(camera.position).sub(controls.target)
@@ -399,26 +363,64 @@ export function AtlasViewer3D({ berkas, bagian, lesi = [], hilir = [], jalur = n
 
       controls.update()
       renderer.render(scene, camera)
+      raf = requestAnimationFrame(bingkai)
     }
-    bingkai()
+
+    const onHilang = (e: Event) => {
+      e.preventDefault()
+      stopRendering()
+      setGagal('The browser dropped the 3D context, usually because memory ran low.')
+    }
+    const onPulih = () => {
+      setGagal('')
+      ukur()
+      startRendering()
+    }
+    renderer.domElement.addEventListener('webglcontextlost', onHilang)
+    renderer.domElement.addEventListener('webglcontextrestored', onPulih)
+
+    const io = new IntersectionObserver(
+      ([entry]) => {
+        inViewport = Boolean(entry?.isIntersecting)
+        if (inViewport) startRendering()
+        else stopRendering()
+      },
+      { rootMargin: '128px' },
+    )
+    io.observe(wadah)
+
+    const onVisibility = () => {
+      documentVisible = !document.hidden
+      if (documentVisible) startRendering()
+      else stopRendering()
+    }
+    document.addEventListener('visibilitychange', onVisibility)
+
+    startRendering()
 
     return () => {
-      cancelAnimationFrame(raf)
+      stopRendering()
+      io.disconnect()
       ro.disconnect()
+      document.removeEventListener('visibilitychange', onVisibility)
       renderer.domElement.removeEventListener('pointerup', padaKlik)
       renderer.domElement.removeEventListener('webglcontextlost', onHilang)
+      renderer.domElement.removeEventListener('webglcontextrestored', onPulih)
       controls.dispose()
+
       scene.traverse((o) => {
         const m = o as THREE.Mesh
-        if (m.isMesh) {
-          m.geometry.dispose()
-          const b = m.material as THREE.Material | THREE.Material[]
-          Array.isArray(b) ? b.forEach((x) => x.dispose()) : b.dispose()
-        }
+        if (!m.isMesh) return
+        m.geometry.dispose()
+        const b = m.material as THREE.Material | THREE.Material[]
+        if (Array.isArray(b)) b.forEach((x) => x.dispose())
+        else b.dispose()
       })
-      geoPartikel.dispose()
-      matPartikel.dispose()
+      garis.geometry.dispose()
+      ;(garis.material as THREE.Material).dispose()
+      renderer.renderLists.dispose()
       renderer.dispose()
+      renderer.forceContextLoss()
       if (renderer.domElement.parentNode) renderer.domElement.parentNode.removeChild(renderer.domElement)
     }
   }, [berkas])
@@ -440,7 +442,7 @@ export function AtlasViewer3D({ berkas, bagian, lesi = [], hilir = [], jalur = n
       )}
       {!muat && !gagal && (
         <p className="px-3 pb-2 text-center text-[10.5px] text-neutral-400">
-          {sentuh ? sentuh : 'Drag to rotate · tap any structure to see what goes wrong there'}
+          {sentuh ? sentuh : 'Drag to rotate · tap any verified structure to identify it'}
         </p>
       )}
     </div>

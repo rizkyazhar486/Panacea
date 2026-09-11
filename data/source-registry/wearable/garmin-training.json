@@ -1,0 +1,52 @@
+{
+  "id": "garmin_connect_training_api",
+  "name": "Garmin Connect Training API",
+  "category": "wearable",
+  "kind": ["api"],
+  "homepage": "https://developer.garmin.com/gc-developer-program/training-api/",
+  "repository": null,
+  "features": ["garmin", "workout-export", "training-plan-export", "structured-workout", "calendar", "device-sync", "coaching"],
+  "formats": ["json", "http-rest", "oauth2"],
+  "usage": {
+    "runtime": true,
+    "buildTime": false,
+    "networkRequired": true,
+    "notes": "Use the Garmin Connect Training API only as an explicit outbound channel for publishing structured workouts or training plans from Panacea to a consenting user's Garmin Connect account for synchronization to compatible Garmin devices. This is a write-capable integration and must remain separate from Garmin Health/Activity ingestion. Do not silently publish, replace or reschedule workouts in the background. Every outbound publish should be initiated or explicitly approved by the user after reviewing the workout identity, date, targets and important assumptions. Keep credentials and OAuth tokens server-side."
+  },
+  "license": {
+    "status": "CHECK_REQUIRED",
+    "identifier": "Garmin Connect Developer Program terms and API Brand Guidelines",
+    "commercialUse": "CONDITIONAL",
+    "attributionRequired": true,
+    "shareAlike": null,
+    "scope": "Garmin Connect Training API access is contractual and available through the business-focused Garmin Connect Developer Program. User consent, Garmin approval and compliance with the applicable agreement and brand requirements are required. The public program FAQ currently states no general licensing or maintenance fees for Garmin Connect Developer Program access, but production, commercial, redistribution, branding and other rights remain governed by Garmin's applicable agreement and may change.",
+    "verificationUrl": "https://developer.garmin.com/gc-developer-program/training-api/",
+    "verifiedAt": "2026-09-08",
+    "notes": "Re-check Garmin Connect Developer Program terms, approval status, quotas, branding and any workout/training-specific restrictions before production. Registry inclusion is not permission to publish on behalf of users. Do not imply Garmin authored, medically approved or endorsed a Panacea-generated workout or plan."
+  },
+  "validation": {
+    "level": "REFERENCE",
+    "clinicalDecisionUse": "REQUIRES_SEPARATE_VALIDATION",
+    "notes": "The API transports training content; it does not validate whether the workout is appropriate for a particular person. Panacea must independently validate workout generation logic, contraindication handling, units, intensity targets, progression rules and device compatibility. A successful Garmin API response means the workout was accepted for synchronization, not that the prescription is safe, effective, completed or clinically appropriate."
+  },
+  "provenance": {
+    "authority": "Garmin Ltd. / Garmin Connect",
+    "sourceIdentityRequired": true,
+    "versionPinRequired": true,
+    "notes": "For every outbound publish retain Garmin API family/version or contract revision, Panacea plan/workout ID and immutable version, user-approved snapshot/hash, intended schedule/date, workout steps and units, origin of each target or estimate, approval timestamp, Garmin provider object ID returned by the API, request/result timestamps and Panacea adapter version. If a plan is later edited, create a new version and require a new explicit publish/replace action rather than mutating the already-approved snapshot invisibly."
+  },
+  "adapter": {
+    "status": "PLANNED",
+    "normalizedTarget": "PanaceaTrainingPlanExport",
+    "module": null,
+    "notes": "Planned flow: create/version Panacea workout or training plan -> deterministic safety and unit validation -> present exact outbound snapshot to user -> explicit user approval -> server-side OAuth 2.0 publish to Garmin Connect Training API -> persist Garmin object ID/result -> show synchronization state without assuming device download or workout completion. No autonomous background publish, silent replacement or schedule mutation. Idempotency keys/local publish records should prevent duplicate workouts after retries. Failure or uncertain response must remain unresolved until reconciled rather than being displayed as successfully synced."
+  },
+  "trust": {
+    "authority": 5,
+    "evidenceQuality": 1,
+    "recency": 5,
+    "licenseClarity": 3,
+    "reproducibility": 4,
+    "notes": "High authority for transport/synchronization behavior between third-party platforms, Garmin Connect and compatible Garmin devices. It is not an evidence source for the safety or effectiveness of a workout prescription, so evidence quality for clinical/training recommendations is intentionally low. Reproducibility depends on preserving the exact approved outbound plan version and API result."
+  }
+}

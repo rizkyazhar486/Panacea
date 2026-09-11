@@ -1,0 +1,77 @@
+/* Panacea Home contrast guard v27
+   Final accessibility/readability guard for Home only. No product logic,
+   calculations, SVG data colors, chart strokes or loading behavior changed. */
+
+.panacea-home{
+  --pmd-home-fg:#111827;
+  --pmd-home-muted:#4b5563;
+  --pmd-home-subtle:#64748b;
+  --pmd-home-control:#ffffff;
+  --pmd-home-control-border:rgba(15,23,42,.12);
+  color-scheme:light;
+}
+.dark .panacea-home{
+  --pmd-home-fg:#f8fafc;
+  --pmd-home-muted:#cbd5e1;
+  --pmd-home-subtle:#94a3b8;
+  --pmd-home-control:#0b111c;
+  --pmd-home-control-border:rgba(255,255,255,.14);
+  color-scheme:dark;
+}
+
+/* Known non-semantic text must always contrast with its Home surface. Explicit
+   data colors (HR, VO2max, status tones, SVG strokes/fills) are left alone. */
+.panacea-home .widget-instrument-title-v5,
+.panacea-home .home-details-summary,
+.panacea-home .home-action-card>span:nth-child(2)>span:first-child{
+  color:var(--pmd-home-fg)!important;
+}
+.panacea-home .widget-instrument-state-v5,
+.panacea-home .widget-instrument-label-v5,
+.panacea-home .home-action-card>span:nth-child(2)>span:nth-child(2),
+.panacea-home .widget-instrument-slide-v5 .t-mikro:not([class*='text-']),
+.panacea-home .widget-instrument-slide-v5 .t-kecil:not([class*='text-']){
+  color:var(--pmd-home-muted)!important;
+}
+
+/* Native controls were the remaining place where OS/theme defaults could make
+   text and surface converge. Keep them explicit in both themes. */
+.panacea-home :is(input,select,textarea):not([type='range']):not([type='checkbox']):not([type='radio']){
+  color:var(--pmd-home-fg)!important;
+  background-color:var(--pmd-home-control)!important;
+  border-color:var(--pmd-home-control-border)!important;
+  caret-color:#00bf63;
+}
+.panacea-home :is(input,textarea)::placeholder{color:var(--pmd-home-subtle)!important;opacity:1}
+.panacea-home select option{color:var(--pmd-home-fg);background:var(--pmd-home-control)}
+.panacea-home :is(button,input,select,textarea)[disabled]{opacity:.55}
+
+/* Long labels should wrap inside their own surface instead of colliding with
+   arrows, counters or neighboring widgets on narrow phones. */
+.panacea-home .home-action-card>span:nth-child(2),
+.panacea-home .home-details-summary>div,
+.panacea-home .widget-instrument-copy-v5{min-width:0}
+.panacea-home .home-action-card>span:nth-child(2)>span,
+.panacea-home .home-details-summary>div>div,
+.panacea-home .widget-instrument-slide-v5 p{overflow-wrap:anywhere}
+
+/* Ensure status labels remain visible if a browser/user requests more contrast. */
+@media (prefers-contrast:more){
+  .panacea-home{--pmd-home-muted:#334155;--pmd-home-control-border:rgba(15,23,42,.24)}
+  .dark .panacea-home{--pmd-home-muted:#e2e8f0;--pmd-home-control-border:rgba(255,255,255,.28)}
+  .panacea-home :is(.home-action-card,.home-signal-card,.widget-instrument-slide-v5 section>.kaca,.widget-instrument-slide-v5>.kaca){
+    outline:1px solid var(--pmd-home-control-border);
+    outline-offset:-1px;
+  }
+}
+
+/* Forced-colors keeps Windows/high-contrast users on system colors instead of
+   preserving translucent brand surfaces that could hide text. */
+@media (forced-colors:active){
+  .panacea-home :is(.home-action-card,.home-signal-card,.home-loading-card,.widget-instrument-slide-v5 section>.kaca,.widget-instrument-slide-v5>.kaca){
+    forced-color-adjust:auto;
+    background:Canvas!important;
+    color:CanvasText!important;
+    border:1px solid CanvasText!important;
+  }
+}

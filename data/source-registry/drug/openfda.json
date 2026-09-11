@@ -1,0 +1,52 @@
+{
+  "id": "openfda",
+  "name": "openFDA Drug Label API",
+  "category": "drug",
+  "kind": ["api", "dataset"],
+  "homepage": "https://open.fda.gov/apis/drug/label/",
+  "repository": null,
+  "features": ["drug-label", "medication-information", "drug-mechanism", "drug-safety-reference", "clinical-evidence", "medication-provenance"],
+  "formats": ["json", "http-rest"],
+  "usage": {
+    "runtime": true,
+    "buildTime": false,
+    "networkRequired": true,
+    "notes": "Panacea accesses the openFDA drug-label endpoint only through its canonical server adapter. The optional OPENFDA_KEY remains server-side. Runtime requests are bounded, time-limited and normalized before reaching orchestration/UI layers; consumer modules should not construct openFDA requests directly."
+  },
+  "license": {
+    "status": "VERIFIED",
+    "identifier": "CC0-1.0 / U.S. public-domain policy with documented exceptions",
+    "commercialUse": "CONDITIONAL",
+    "attributionRequired": false,
+    "shareAlike": false,
+    "scope": "openFDA states that its content, data, documentation, code and related materials are generally public domain and released under CC0 1.0 unless otherwise noted. Individual records or fields can contain third-party material that is not covered by CC0 and must retain any explicit warning or separate rights restriction.",
+    "verificationUrl": "https://open.fda.gov/terms/",
+    "verifiedAt": "2026-09-08",
+    "notes": "FDA requests attribution even though it is not generally required. Panacea must not imply FDA endorsement. Any record or field carrying a third-party-rights warning overrides the general CC0 assumption for that material."
+  },
+  "validation": {
+    "level": "REFERENCE",
+    "clinicalDecisionUse": "CONTEXT_ONLY",
+    "notes": "openFDA explicitly warns that its data should not be relied on for medical-care decisions and that not all data is validated for clinical or production use. Panacea may present official label content, including mechanism-of-action text when the label supplies it, as reference context rather than patient-specific prescribing advice."
+  },
+  "provenance": {
+    "authority": "U.S. Food and Drug Administration (FDA)",
+    "sourceIdentityRequired": true,
+    "versionPinRequired": false,
+    "notes": "Preserve the SPL set_id when available, otherwise the openFDA record id, together with the exact key-free source URL when a stable set_id exists, the medication query and retrieval timestamp. A drug name alone is not sufficient provenance because multiple labels can exist for the same ingredient or brand."
+  },
+  "adapter": {
+    "status": "ACTIVE",
+    "normalizedTarget": "PanaceaDrugLabelReference",
+    "module": "server/src/openfda.ts",
+    "notes": "Canonical production adapter performs bounded brand-name lookup with generic-name fallback, uses upstream timeouts, returns selected structured-product-label fields including mechanism_of_action when present, and preserves set_id/record identity plus a key-free source URL when available. Higher-level drugInfo orchestration reuses this adapter rather than issuing duplicate openFDA requests."
+  },
+  "trust": {
+    "authority": 5,
+    "evidenceQuality": 3,
+    "recency": 5,
+    "licenseClarity": 4,
+    "reproducibility": 5,
+    "notes": "High authority for the provenance of FDA-published label records. The evidence-quality dimension is intentionally lower because openFDA itself warns that API data is not a substitute for validated clinical decision support; license clarity is reduced by explicitly documented third-party exceptions."
+  }
+}

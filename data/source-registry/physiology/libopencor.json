@@ -1,0 +1,52 @@
+{
+  "id": "libopencor",
+  "name": "libOpenCOR",
+  "category": "physiology",
+  "kind": ["library"],
+  "homepage": "https://opencor.ws/libopencor/",
+  "repository": "https://github.com/opencor/libopencor",
+  "features": ["cellml-simulation-engine", "physiology-simulation", "ode-simulation", "model-analysis", "model-validation", "reproducible-time-series"],
+  "formats": ["cellml", "simulation-results"],
+  "usage": {
+    "runtime": false,
+    "buildTime": true,
+    "networkRequired": false,
+    "notes": "Treat libOpenCOR as a candidate isolated simulation backend/build-time engine, not a browser dependency. Do not ship native binaries in the main Vite bundle. Evaluate worker/service/native or future WebAssembly isolation only after numerical regression, crash containment and supported-CellML-feature tests pass."
+  },
+  "license": {
+    "status": "VERIFIED",
+    "identifier": "Apache-2.0",
+    "commercialUse": "ALLOWED",
+    "attributionRequired": true,
+    "shareAlike": false,
+    "scope": "The official opencor/libopencor repository is licensed under Apache License 2.0. This license covers libOpenCOR software, not CellML models, model publications, PMR assets, simulation inputs or other scientific datasets processed by the engine.",
+    "verificationUrl": "https://github.com/opencor/libopencor",
+    "verifiedAt": "2026-09-08",
+    "notes": "Preserve Apache-2.0 license/NOTICE requirements when redistributing the library or derivatives. Model/source licenses remain independent and must travel with simulation provenance."
+  },
+  "validation": {
+    "level": "RESEARCH",
+    "clinicalDecisionUse": "NO",
+    "notes": "A successful numerical run does not prove biological or clinical validity. Current upstream limitations require explicit caution: issue #541 remains open because libOpenCOR currently expects flattened CellML files rather than supporting CellML imports, and issue #568 documents a segmentation-fault scenario when instantiating a simulation on a 2026 build. Panacea must not activate this engine for production or patient-facing inference until a pinned version passes a representative regression and robustness corpus."
+  },
+  "provenance": {
+    "authority": "OpenCOR / IUPS Physiome modelling ecosystem",
+    "sourceIdentityRequired": true,
+    "versionPinRequired": true,
+    "notes": "Pin exact libOpenCOR build/version and platform. At verification, main reports VERSION.txt = 1.20260803.0. Persist engine version, operating environment, model checksum, model/source revision, flattening/transformation steps, solver/algorithm, parameters, initial conditions, tolerances, time grid, output variables and units for every simulation result."
+  },
+  "adapter": {
+    "status": "PLANNED",
+    "normalizedTarget": "PanaceaPhysiologySimulationEngine",
+    "module": null,
+    "notes": "Planned gated flow: validated PanaceaPhysiologyModelDefinition -> flatten/import-resolution step when required -> isolated pinned libOpenCOR execution -> deterministic regression check -> normalized time-series + diagnostics -> PanaceaPhysiologySimulationResult. Run untrusted or newly acquired models out of the UI process. Fail closed on parser/simulation errors; never substitute an animation when the simulation fails. Activation requires a regression corpus with expected values/tolerances and explicit handling of upstream issue #541/imports and crash-class failures such as #568."
+  },
+  "trust": {
+    "authority": 4,
+    "evidenceQuality": 1,
+    "recency": 5,
+    "licenseClarity": 5,
+    "reproducibility": 3,
+    "notes": "Active specialist simulation library with permissive licensing. Evidence quality is intentionally low because it is an execution engine, not evidence. Reproducibility remains conservative until Panacea pins a version and validates model/solver outputs and crash behavior across its supported corpus."
+  }
+}

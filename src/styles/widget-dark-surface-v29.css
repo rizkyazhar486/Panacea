@@ -1,0 +1,236 @@
+/* Panacea Home widget dark-surface guard v37
+   Scoped companion to the public final-authority guard. Keeps Living Instrument
+   loading and card surfaces readable without changing widget data or logic.
+   v37 additionally guards Safari/PWA theme-restoration and empty-active-slide
+   races so Dark Mode can never expose a blank light-gray canvas. */
+
+.widget-instrument-loading-v29{
+  min-height:132px;
+  display:grid;
+  place-items:center;
+  border-radius:20px;
+  background:rgba(248,250,252,.92);
+  background-image:none;
+  border:1px solid rgba(15,23,42,.07);
+  color:#52606d;
+  box-shadow:none;
+  filter:none;
+  -webkit-backdrop-filter:none;
+  backdrop-filter:none;
+}
+.widget-instrument-loading-v29::before{
+  content:'Loading widget…';
+  display:block;
+  padding:14px 18px;
+  font:700 13px/1.35 Inter,system-ui,-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+  letter-spacing:.01em;
+  color:inherit;
+}
+
+html.dark .panacea-home .widget-instrument-loading-v29,
+.dark .panacea-home .widget-instrument-loading-v29{
+  background:#0a0f16!important;
+  background-image:none!important;
+  border-color:rgba(255,255,255,.07)!important;
+  color:#dbe7ef!important;
+  color-scheme:dark;
+}
+
+html.dark .panacea-home .widget-instrument-shell-v5,
+.dark .panacea-home .widget-instrument-shell-v5{
+  background:#070b11!important;
+  background-image:linear-gradient(155deg,#0d121a 0%,#070b11 100%)!important;
+  background-color:#070b11!important;
+  border-color:rgba(255,255,255,.10)!important;
+  color:#f8fafc!important;
+  color-scheme:dark;
+}
+
+html.dark .panacea-home .widget-instrument-scroll-v5,
+html.dark .panacea-home .widget-instrument-slide-v5,
+.dark .panacea-home .widget-instrument-scroll-v5,
+.dark .panacea-home .widget-instrument-slide-v5{
+  background:transparent!important;
+  background-image:none!important;
+  color:#f8fafc!important;
+}
+
+html.dark .panacea-home .widget-instrument-shell-v5::before,
+html.dark .panacea-home .widget-instrument-shell-v5::after,
+.dark .panacea-home .widget-instrument-shell-v5::before,
+.dark .panacea-home .widget-instrument-shell-v5::after{
+  content:none!important;
+  display:none!important;
+}
+
+html.dark .panacea-home .widget-instrument-slide-v5 .kaca,
+.dark .panacea-home .widget-instrument-slide-v5 .kaca{
+  background:#0b1119!important;
+  background-image:none!important;
+  background-color:#0b1119!important;
+  color:#f8fafc!important;
+  border:1px solid rgba(255,255,255,.08)!important;
+  box-shadow:none!important;
+  filter:none!important;
+  -webkit-backdrop-filter:none!important;
+  backdrop-filter:none!important;
+  color-scheme:dark;
+}
+
+html.dark .panacea-home .widget-instrument-slide-v5 .kaca::before,
+html.dark .panacea-home .widget-instrument-slide-v5 .kaca::after,
+.dark .panacea-home .widget-instrument-slide-v5 .kaca::before,
+.dark .panacea-home .widget-instrument-slide-v5 .kaca::after{
+  content:none!important;
+  display:none!important;
+}
+
+html.dark .panacea-home .widget-instrument-slide-v5 .kaca :is(h1,h2,h3,strong,.font-black):not([class*='text-']),
+.dark .panacea-home .widget-instrument-slide-v5 .kaca :is(h1,h2,h3,strong,.font-black):not([class*='text-']){
+  color:#f8fafc!important;
+}
+html.dark .panacea-home .widget-instrument-slide-v5 .kaca :is(p,.t-mikro,.t-kecil):not([class*='text-']),
+.dark .panacea-home .widget-instrument-slide-v5 .kaca :is(p,.t-mikro,.t-kecil):not([class*='text-']){
+  color:#cbd5e1!important;
+}
+
+html.dark .panacea-home .widget-instrument-slide-v5 :is(.text-neutral-950,.text-neutral-900,.text-neutral-800,.text-neutral-700,.text-ink),
+.dark .panacea-home .widget-instrument-slide-v5 :is(.text-neutral-950,.text-neutral-900,.text-neutral-800,.text-neutral-700,.text-ink){
+  color:#f8fafc!important;
+}
+html.dark .panacea-home .widget-instrument-slide-v5 .text-neutral-600,
+.dark .panacea-home .widget-instrument-slide-v5 .text-neutral-600{color:#dde6ef!important}
+html.dark .panacea-home .widget-instrument-slide-v5 :is(.text-neutral-500,.text-neutral-400),
+.dark .panacea-home .widget-instrument-slide-v5 :is(.text-neutral-500,.text-neutral-400){color:#b8c3cf!important}
+
+html.dark .panacea-home :is(.widget-instrument-count-v5,.widget-instrument-nav-v5),
+.dark .panacea-home :is(.widget-instrument-count-v5,.widget-instrument-nav-v5){
+  background:rgba(255,255,255,.05)!important;
+  background-image:none!important;
+  border-color:rgba(255,255,255,.09)!important;
+  color:#d7e0e8!important;
+}
+
+/* Repair only the active slide's OUTER neutral fallback. Nested semantic bars,
+   charts and reference ranges keep their own colors. */
+html.dark .panacea-home .widget-instrument-slide-v5[aria-hidden='false'] > :is(.bg-neutral-50,.bg-neutral-100,.bg-neutral-200,.bg-gray-50,.bg-gray-100,.bg-gray-200,.bg-slate-50,.bg-slate-100,.bg-slate-200),
+.dark .panacea-home .widget-instrument-slide-v5[aria-hidden='false'] > :is(.bg-neutral-50,.bg-neutral-100,.bg-neutral-200,.bg-gray-50,.bg-gray-100,.bg-gray-200,.bg-slate-50,.bg-slate-100,.bg-slate-200){
+  background:#111925!important;
+  background-image:none!important;
+  color:#f8fafc!important;
+  color-scheme:dark;
+}
+
+/* Keep a legacy/empty direct-child fallback compact and visibly dark. */
+html.dark .panacea-home .widget-instrument-slide-v5[aria-hidden='false'] > div:empty,
+.dark .panacea-home .widget-instrument-slide-v5[aria-hidden='false'] > div:empty{
+  min-height:132px!important;
+  max-height:184px!important;
+  background:#0b1119!important;
+  background-image:none!important;
+  border:1px solid rgba(255,255,255,.08)!important;
+  border-radius:20px!important;
+  box-shadow:none!important;
+}
+
+/* If the slide itself is briefly empty before its lazy child mounts, show an
+   intentional compact state. This closes the exact large blank slab seen on
+   iOS when the header advances before the content chunk paints. */
+.panacea-home .widget-instrument-slide-v5[aria-hidden='false']:empty{
+  min-height:132px!important;
+  display:grid!important;
+  place-items:center!important;
+  border-radius:20px!important;
+  background:#f8fafc!important;
+  background-image:none!important;
+  border:1px solid rgba(15,23,42,.07)!important;
+  color:#52606d!important;
+}
+.panacea-home .widget-instrument-slide-v5[aria-hidden='false']:empty::before{
+  content:'Loading widget…';
+  display:block;
+  padding:14px 18px;
+  font:700 13px/1.35 Inter,system-ui,-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+  letter-spacing:.01em;
+  color:inherit;
+}
+html.dark .panacea-home .widget-instrument-slide-v5[aria-hidden='false']:empty,
+.dark .panacea-home .widget-instrument-slide-v5[aria-hidden='false']:empty{
+  background:#0a0f16!important;
+  border-color:rgba(255,255,255,.07)!important;
+  color:#dbe7ef!important;
+}
+
+/* applyTheme writes both .dark and inline color-scheme. Honour color-scheme as
+   a second source of truth so restored Safari/PWA frames cannot flash Light
+   surfaces while Dark Mode is already resolved. */
+html[style*='color-scheme: dark'] .panacea-home .widget-instrument-loading-v29,
+html[style*='color-scheme: dark'] .panacea-home .widget-instrument-slide-v5[aria-hidden='false']:empty{
+  background:#0a0f16!important;
+  background-image:none!important;
+  border-color:rgba(255,255,255,.07)!important;
+  color:#dbe7ef!important;
+}
+html[style*='color-scheme: dark'] .panacea-home .widget-instrument-shell-v5{
+  background:#070b11!important;
+  background-image:linear-gradient(155deg,#0d121a 0%,#070b11 100%)!important;
+  border-color:rgba(255,255,255,.10)!important;
+  color:#f8fafc!important;
+}
+html[style*='color-scheme: dark'] .panacea-home .widget-instrument-slide-v5 .kaca{
+  background:#0b1119!important;
+  background-image:none!important;
+  border-color:rgba(255,255,255,.08)!important;
+  color:#f8fafc!important;
+}
+
+/* Before saved appearance is applied, respect a dark OS unless JavaScript has
+   explicitly resolved Light Mode. This removes the first-paint gray flash. */
+@media (prefers-color-scheme:dark){
+  html:not([style*='color-scheme: light']) .panacea-home .widget-instrument-loading-v29,
+  html:not([style*='color-scheme: light']) .panacea-home .widget-instrument-slide-v5[aria-hidden='false']:empty{
+    background:#0a0f16!important;
+    background-image:none!important;
+    border-color:rgba(255,255,255,.07)!important;
+    color:#dbe7ef!important;
+  }
+  html:not([style*='color-scheme: light']) .panacea-home .widget-instrument-shell-v5{
+    background:#070b11!important;
+    background-image:linear-gradient(155deg,#0d121a 0%,#070b11 100%)!important;
+    border-color:rgba(255,255,255,.10)!important;
+    color:#f8fafc!important;
+  }
+  html:not([style*='color-scheme: light']) .panacea-home .widget-instrument-slide-v5 .kaca{
+    background:#0b1119!important;
+    background-image:none!important;
+    border-color:rgba(255,255,255,.08)!important;
+    color:#f8fafc!important;
+  }
+}
+
+@supports selector(.a:has(.b)){
+  .panacea-home .widget-instrument-scroll-v5:has(> .widget-instrument-slide-v5[aria-hidden='false'] > .widget-instrument-loading-v29),
+  .panacea-home .widget-instrument-scroll-v5:has(> .widget-instrument-slide-v5[aria-hidden='false'] > div:empty),
+  .panacea-home .widget-instrument-scroll-v5:has(> .widget-instrument-slide-v5[aria-hidden='false']:empty){
+    height:184px!important;
+    min-height:184px!important;
+    max-height:184px!important;
+  }
+}
+
+@media (prefers-contrast:more){
+  html.dark .panacea-home :is(.widget-instrument-shell-v5,.widget-instrument-loading-v29,.widget-instrument-slide-v5 .kaca),
+  .dark .panacea-home :is(.widget-instrument-shell-v5,.widget-instrument-loading-v29,.widget-instrument-slide-v5 .kaca){
+    background:#05080d!important;
+    background-image:none!important;
+    outline:1px solid rgba(255,255,255,.18);
+    outline-offset:-1px;
+  }
+}
+
+html.pmd-low-memory.dark .panacea-home :is(.widget-instrument-shell-v5,.widget-instrument-loading-v29,.widget-instrument-slide-v5 .kaca){
+  box-shadow:none!important;
+  filter:none!important;
+  -webkit-backdrop-filter:none!important;
+  backdrop-filter:none!important;
+}

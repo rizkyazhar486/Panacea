@@ -5,18 +5,31 @@
 //   - Human Disease Ontology (DOID) — pemetaan penyakit.
 //   - Human Phenotype Ontology (HP) — pemetaan gejala/fenotipe.
 //
-// DUA sumber, bukan satu — tidak bisa diuji langsung dari sandbox ini
-// (jaringan dibatasi), jadi alih-alih menebak satu sumber "yang benar" dan
-// berisiko keduanya diam-diam kosong, permintaannya dijalankan ke keduanya
-// SEKALIGUS dan hasilnya digabung:
+// DUA sumber, bukan satu:
 //   1. EBI OLS4 (Ontology Lookup Service) — layanan publik EMBL-EBI.
 //   2. NLM Clinical Table Search Service (CTSS) — layanan publik US National
-//      Library of Medicine, dipakai luas di sistem kesehatan AS, mengindeks
-//      tabel "conditions" (penyakit, dari MedlinePlus) dan "hpo" (fenotipe).
-// Kalau salah satu gagal atau kosong, sumber yang lain tetap mengisi
-// hasilnya — tidak lagi bergantung pada satu API saja.
+//      Library of Medicine, mengindeks tabel "conditions" dan "hpo".
+//
+// Penting: identifier tabel CTSS "conditions" adalah key internal NLM, BUKAN
+// DOID. Karena itu provenance dan identifier system dibawa eksplisit di tiap
+// term supaya aplikasi tidak pernah menyajikan identifier NLM sebagai Disease
+// Ontology ID.
 const OLS4_BASE = 'https://www.ebi.ac.uk/ols4/api/search'
 const CTSS_BASE = 'https://clinicaltables.nlm.nih.gov/api'
+const MAX_QUERY_LENGTH = 160
+const MAX_OLS_ROWS = 10
+
+type FetchLike = typeof fetch
+type Clock = () => Date
+
+function normalizeQuery(query: string): string {
+  return query.replace(/\s+/g, ' ').trim().slice(0, MAX_QUERY_LENGTH)
+}
+
+function clampRows(rows: number): number {
+  if (!Number.isFinite(rows)) return 5
+  return Math.max(1, Math.min(MAX_OLS_ROWS, Math.trunc(rows)))
+}
 
 /**
  * Merapikan definisi ontologi untuk dibaca manusia.
@@ -37,7 +50,6 @@ export function rapikanDefinisi(teks: string): string {
     .replace(/\bhas_?_?part\b/g, 'includes')
     .replace(/\bderives_from\b/g, 'derived from')
     .replace(/_/g, ' ')
-  // "symptom: fever, symptom: malaise, symptom: back pain" -> satu daftar.
   t = t.replace(/symptom:\s*/g, (function () {
     let pertama = true
     return () => (pertama ? ((pertama = false), 'symptoms include ') : '')
@@ -45,21 +57,8 @@ export function rapikanDefinisi(teks: string): string {
   return t.replace(/\s+/g, ' ').trim()
 }
 
-/**
- * Mengurutkan hasil menurut relevansi terhadap yang dicari.
- *
- * Tanpa ini, mencari "back pain" mengembalikan demam Lassa dan brucellosis —
- * keduanya memang MENYEBUT nyeri punggung di antara daftar gejalanya, jadi
- * mesin cari menganggapnya cocok. Yang dicari pengguna adalah penyakit yang
- * MEMANG TENTANG bagian itu, bukan penyakit apa saja yang kebetulan
- * menyinggungnya.
- *
- * Aturannya sederhana dan bisa diperiksa: cocok pada LABEL jauh lebih berarti
- * daripada cocok pada definisi, dan cocok seluruh frasa lebih berarti daripada
- * cocok satu kata.
- */
 export function urutkanRelevansi(terms: OntologyTerm[], kueri: string[]): OntologyTerm[] {
-  const frasa = kueri.map((k) => k.toLowerCase().trim()).filter(Boolean)
+  const frasa = kueri.map((k) => normalizeQuery(k).toLowerCase()).filter(Boolean)
   const kata = [...new Set(frasa.flatMap((f) => f.split(/\s+/)).filter((w) => w.length >= 4))]
   const skor = (t: OntologyTerm): number => {
     const label = t.label.toLowerCase()
@@ -78,17 +77,25 @@ export function urutkanRelevansi(terms: OntologyTerm[], kueri: string[]): Ontolo
   }
   return terms
     .map((t) => ({ t, n: skor(t) }))
-    // Skor nol berarti tidak ada satu pun kata pencarian yang muncul di label
-    // MAUPUN definisinya — hasil seperti itu tidak menjelaskan apa pun.
     .filter((x) => x.n > 0)
     .sort((a, b) => b.n - a.n)
     .map((x) => x.t)
 }
 
+export type OntologyName = 'doid' | 'hp' | 'uberon' | 'fma' | 'nlm-conditions'
+export type OntologySource = 'ebi-ols4' | 'nlm-ctss'
+export type OntologyIdentifierSystem = 'DOID' | 'HP' | 'UBERON' | 'FMA' | 'NLM_CONDITIONS_KEY'
+type OlsOntologyName = Exclude<OntologyName, 'nlm-conditions'>
+
 export interface OntologyTerm {
-  id: string // CURIE, mis. "DOID:9351" atau "HP:0001945"
+  id: string
   label: string
-  ontology: 'doid' | 'hp' | 'uberon' | 'fma'
+  ontology: OntologyName
+  source: OntologySource
+  identifierSystem: OntologyIdentifierSystem
+  sourceDataset: string
+  sourceUrl: string
+  retrievedAt: string
   description: string
   iri: string
 }
@@ -101,33 +108,66 @@ interface Ols4Doc {
   iri?: string
 }
 
-async function searchOntology(query: string, ontology: OntologyTerm['ontology'], rows = 5): Promise<OntologyTerm[]> {
-  const url = `${OLS4_BASE}?q=${encodeURIComponent(query)}&ontology=${ontology}&rows=${rows}&exact=false`
-  const res = await fetch(url, { signal: AbortSignal.timeout(8000) })
+function identifierSystemForOls(ontology: OlsOntologyName): OntologyIdentifierSystem {
+  if (ontology === 'doid') return 'DOID'
+  if (ontology === 'hp') return 'HP'
+  if (ontology === 'uberon') return 'UBERON'
+  return 'FMA'
+}
+
+async function searchOntology(
+  query: string,
+  ontology: OlsOntologyName,
+  rows = 5,
+  retrievedAt: string,
+  fetchImpl: FetchLike = fetch,
+): Promise<OntologyTerm[]> {
+  const q = normalizeQuery(query)
+  if (!q) return []
+  const rowCount = clampRows(rows)
+  const url = `${OLS4_BASE}?q=${encodeURIComponent(q)}&ontology=${ontology}&rows=${rowCount}&exact=false`
+  const res = await fetchImpl(url, { signal: AbortSignal.timeout(8000) })
   if (!res.ok) throw new Error(`OLS4 ${ontology} search failed: ${res.status}`)
   const data = (await res.json()) as { response?: { docs?: Ols4Doc[] } }
-  const docs = data.response?.docs ?? []
+  const docs = Array.isArray(data.response?.docs) ? data.response?.docs ?? [] : []
   return docs
-    .filter((d) => d.obo_id && d.label)
+    .filter((d) => typeof d.obo_id === 'string' && d.obo_id.trim() && typeof d.label === 'string' && d.label.trim())
     .map((d) => ({
-      id: d.obo_id as string,
-      label: d.label as string,
+      id: (d.obo_id as string).trim(),
+      label: (d.label as string).trim(),
       ontology,
+      source: 'ebi-ols4',
+      identifierSystem: identifierSystemForOls(ontology),
+      sourceDataset: `ols4:${ontology}`,
+      sourceUrl: url,
+      retrievedAt,
       description: rapikanDefinisi(d.description?.[0] ?? ''),
-      iri: d.iri ?? '',
+      iri: typeof d.iri === 'string' ? d.iri.trim() : '',
     }))
 }
 
-// CTSS mengembalikan bentuk larik-tetap yang sama di semua tabelnya:
-// [jumlahTotal, kodeArray, dataTambahan|null, tampilanArray]. Ditulis defensif
-// (Array.isArray di tiap langkah) karena bentuk persisnya tidak bisa
-// diverifikasi langsung dari sandbox ini — lebih baik kembali kosong daripada
-// melempar galat kalau satu field tidak seperti dugaan.
-type CtssResponse = [number, string[], unknown, string[]]
+type CtssResponse = [number, unknown[], unknown, unknown[]]
 
-async function searchCtss(query: string, table: 'conditions' | 'hpo', ontology: 'doid' | 'hp', displayField: string): Promise<OntologyTerm[]> {
-  const url = `${CTSS_BASE}/${table}/v3/search?terms=${encodeURIComponent(query)}&maxList=4&df=${displayField}`
-  const res = await fetch(url, { signal: AbortSignal.timeout(8000) })
+type CtssTableConfig =
+  | { table: 'conditions'; ontology: 'nlm-conditions'; identifierSystem: 'NLM_CONDITIONS_KEY'; codeField: 'key_id'; displayField: 'primary_name' }
+  | { table: 'hpo'; ontology: 'hp'; identifierSystem: 'HP'; codeField: 'id'; displayField: 'name' }
+
+function ctssDisplayLabel(value: unknown): string {
+  if (Array.isArray(value)) return String(value[0] ?? '').trim()
+  return String(value ?? '').trim()
+}
+
+async function searchCtss(
+  query: string,
+  config: CtssTableConfig,
+  retrievedAt: string,
+  fetchImpl: FetchLike = fetch,
+): Promise<OntologyTerm[]> {
+  const q = normalizeQuery(query)
+  if (!q) return []
+  const { table, ontology, identifierSystem, codeField, displayField } = config
+  const url = `${CTSS_BASE}/${table}/v3/search?terms=${encodeURIComponent(q)}&maxList=4&cf=${codeField}&df=${displayField}`
+  const res = await fetchImpl(url, { signal: AbortSignal.timeout(8000) })
   if (!res.ok) throw new Error(`CTSS ${table} search failed: ${res.status}`)
   const data = (await res.json()) as CtssResponse
   if (!Array.isArray(data)) return []
@@ -135,13 +175,19 @@ async function searchCtss(query: string, table: 'conditions' | 'hpo', ontology: 
   const display = Array.isArray(data[3]) ? data[3] : []
   const out: OntologyTerm[] = []
   for (let i = 0; i < Math.min(codes.length, display.length); i++) {
-    const label = String(display[i] ?? '').trim()
+    const label = ctssDisplayLabel(display[i])
     const code = String(codes[i] ?? '').trim()
-    if (!label) continue
+    if (!label || !code) continue
+    if (identifierSystem === 'HP' && !/^HP:\d+$/i.test(code)) continue
     out.push({
-      id: code || `NLM:${table}:${i}`,
+      id: code,
       label,
       ontology,
+      source: 'nlm-ctss',
+      identifierSystem,
+      sourceDataset: `nlm-clinical-tables:${table}`,
+      sourceUrl: url,
+      retrievedAt,
       description: '',
       iri: '',
     })
@@ -149,70 +195,66 @@ async function searchCtss(query: string, table: 'conditions' | 'hpo', ontology: 
   return out
 }
 
-/**
- * Mengambil istilah penyakit (DOID) DAN gejala (HP) sekaligus untuk satu atau
- * lebih kata kunci — dipanggil per region tubuh yang diklik (lihat
- * bodyRegions.ts di sisi klien untuk daftar kata kuncinya). Menjalankan EBI
- * OLS4 dan NLM CTSS SEKALIGUS untuk tiap kata kunci dan menggabung hasilnya,
- * bukan memilih satu lalu jatuh ke yang lain — supaya satu sumber yang
- * lambat/kosong tidak berarti hasilnya kosong sama sekali.
- */
-export async function anatomyOntologyLookup(terms: string[]): Promise<{ diseases: OntologyTerm[]; phenotypes: OntologyTerm[] }> {
-  const unik = [...new Set(terms.map((t) => t.trim()).filter(Boolean))].slice(0, 4)
+export async function anatomyOntologyLookup(
+  terms: string[],
+  fetchImpl: FetchLike = fetch,
+  clock: Clock = () => new Date(),
+): Promise<{ diseases: OntologyTerm[]; phenotypes: OntologyTerm[] }> {
+  const unik = [...new Set(terms.map(normalizeQuery).filter(Boolean))].slice(0, 4)
+  const retrievedAt = clock().toISOString()
   const hasil = await Promise.all(
     unik.flatMap((t) => [
-      searchOntology(t, 'doid', 4).catch(() => [] as OntologyTerm[]),
-      searchOntology(t, 'hp', 4).catch(() => [] as OntologyTerm[]),
-      searchCtss(t, 'conditions', 'doid', 'primary_name').catch(() => [] as OntologyTerm[]),
-      searchCtss(t, 'hpo', 'hp', 'name').catch(() => [] as OntologyTerm[]),
+      searchOntology(t, 'doid', 4, retrievedAt, fetchImpl).catch(() => [] as OntologyTerm[]),
+      searchOntology(t, 'hp', 4, retrievedAt, fetchImpl).catch(() => [] as OntologyTerm[]),
+      searchCtss(t, {
+        table: 'conditions',
+        ontology: 'nlm-conditions',
+        identifierSystem: 'NLM_CONDITIONS_KEY',
+        codeField: 'key_id',
+        displayField: 'primary_name',
+      }, retrievedAt, fetchImpl).catch(() => [] as OntologyTerm[]),
+      searchCtss(t, {
+        table: 'hpo',
+        ontology: 'hp',
+        identifierSystem: 'HP',
+        codeField: 'id',
+        displayField: 'name',
+      }, retrievedAt, fetchImpl).catch(() => [] as OntologyTerm[]),
     ]),
   )
   const diseases: OntologyTerm[] = []
   const phenotypes: OntologyTerm[] = []
   for (let i = 0; i < hasil.length; i++) {
-    // Urutan tiap 4: [doid-OLS4, hp-OLS4, doid-CTSS, hp-CTSS] — indeks genap
-    // masuk diseases, ganjil masuk phenotypes.
     const bucket = i % 2 === 0 ? diseases : phenotypes
     for (const term of hasil[i]) {
-      if (!bucket.some((x) => x.label.toLowerCase() === term.label.toLowerCase())) bucket.push(term)
+      if (!bucket.some((x) => x.source === term.source && x.identifierSystem === term.identifierSystem && x.id === term.id)) {
+        bucket.push(term)
+      }
     }
   }
-  // Diurutkan menurut relevansi terhadap yang dicari SEBELUM dipotong, supaya
-  // delapan yang tampil adalah delapan yang paling berkaitan — bukan delapan
-  // pertama yang kebetulan dikembalikan mesin cari.
   return {
     diseases: urutkanRelevansi(diseases, terms).slice(0, 8),
     phenotypes: urutkanRelevansi(phenotypes, terms).slice(0, 8),
   }
 }
 
-/**
- * Istilah STRUKTUR ANATOMI (bukan penyakit/gejala) dari dua ontologi anatomi
- * yang juga dilayani OLS4 tanpa API key:
- *
- *   - UBERON — ontologi anatomi lintas spesies.
- *   - FMA (Foundational Model of Anatomy) — ontologi anatomi manusia paling
- *     rinci yang tersedia bebas.
- *
- * Ini menutup dua celah yang memang TIDAK ADA geometrinya di model 3D
- * Z-Anatomy/BodyParts3D (sudah diperiksa sampai tingkat koleksi, bukan
- * diasumsikan): organ reproduksi wanita (uterus, ovarium, tuba uterina,
- * serviks, vagina) dan struktur mikroskopik kulit (epidermis, dermis, folikel
- * rambut, kelenjar sebasea/keringat). Untuk keduanya, aplikasi kini punya
- * istilah anatomi nyata berikut definisinya, meski bentuk 3D-nya belum ada.
- */
-export async function anatomyStructureLookup(terms: string[]): Promise<OntologyTerm[]> {
-  const unik = [...new Set(terms.map((t) => t.trim()).filter(Boolean))].slice(0, 4)
+export async function anatomyStructureLookup(
+  terms: string[],
+  fetchImpl: FetchLike = fetch,
+  clock: Clock = () => new Date(),
+): Promise<OntologyTerm[]> {
+  const unik = [...new Set(terms.map(normalizeQuery).filter(Boolean))].slice(0, 4)
+  const retrievedAt = clock().toISOString()
   const hasil = await Promise.all(
     unik.flatMap((t) => [
-      searchOntology(t, 'uberon', 4).catch(() => [] as OntologyTerm[]),
-      searchOntology(t, 'fma', 4).catch(() => [] as OntologyTerm[]),
+      searchOntology(t, 'uberon', 4, retrievedAt, fetchImpl).catch(() => [] as OntologyTerm[]),
+      searchOntology(t, 'fma', 4, retrievedAt, fetchImpl).catch(() => [] as OntologyTerm[]),
     ]),
   )
   const out: OntologyTerm[] = []
   for (const daftar of hasil) {
     for (const term of daftar) {
-      if (!out.some((x) => x.label.toLowerCase() === term.label.toLowerCase())) out.push(term)
+      if (!out.some((x) => x.source === term.source && x.identifierSystem === term.identifierSystem && x.id === term.id)) out.push(term)
     }
   }
   return out.slice(0, 10)

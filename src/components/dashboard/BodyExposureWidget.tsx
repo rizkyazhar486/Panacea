@@ -2,7 +2,6 @@ import { useEffect, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
 import * as THREE from 'three'
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'
-import { MeshoptDecoder } from 'three/examples/jsm/libs/meshopt_decoder.module.js'
 import { RoomEnvironment } from 'three/examples/jsm/environments/RoomEnvironment.js'
 
 type Props = {
@@ -12,54 +11,130 @@ type Props = {
   showCta?: boolean
 }
 
-const loader = new GLTFLoader()
-loader.setMeshoptDecoder(MeshoptDecoder)
-let cached: Promise<THREE.Group> | null = null
+const HRA_BASE = 'https://raw.githubusercontent.com/hubmapconsortium/ccf-releases/main/v1.2/models/'
+const HRA_MODELS = [
+  { file: 'VH_M_Skin.glb', kind: 'skin' as const },
+  { file: 'VH_M_Heart.glb', kind: 'organ' as const },
+  { file: 'VH_M_Lung.glb', kind: 'organ' as const },
+  { file: 'VH_M_Blood_Vasculature.glb', kind: 'organ' as const },
+]
 
-function loadSurface() {
-  if (!cached) {
-    cached = new Promise((resolve, reject) => {
-      loader.load(
-        `${import.meta.env.BASE_URL}anatomy/surface.glb`,
-        (gltf) => resolve(gltf.scene),
-        undefined,
-        reject,
-      )
-    })
-  }
-  return cached
+const loader = new GLTFLoader()
+const modelCache = new Map<string, Promise<THREE.Group>>()
+
+function loadModel(file: string) {
+  const existing = modelCache.get(file)
+  if (existing) return existing
+  const promise = new Promise<THREE.Group>((resolve, reject) => {
+    loader.load(`${HRA_BASE}${file}`, (gltf) => resolve(gltf.scene), undefined, reject)
+  })
+  modelCache.set(file, promise)
+  return promise
 }
+
+function cloneModel(base: THREE.Group, kind: 'skin' | 'organ') {
+  const model = base.clone(true)
+  model.traverse((object) => {
+    if (!(object instanceof THREE.Mesh) || !object.material) return
+    object.material = Array.isArray(object.material)
+      ? object.material.map((material) => material.clone())
+      : object.material.clone()
+    const materials = Array.isArray(object.material) ? object.material : [object.material]
+    for (const material of materials) {
+      if (material instanceof THREE.MeshStandardMaterial || material instanceof THREE.MeshPhysicalMaterial) {
+        material.envMapIntensity = 0.72
+        material.roughness = Math.max(material.roughness ?? 0.45, 0.32)
+        material.metalness = Math.min(material.metalness ?? 0, 0.04)
+      }
+      if (kind === 'skin') {
+        material.transparent = true
+        material.opacity = 0.2
+        material.depthWrite = false
+        material.side = THREE.DoubleSide
+      }
+    }
+  })
+  return model
+}
+
+function disposeClonedMaterials(root: THREE.Object3D) {
+  root.traverse((object) => {
+    if (!(object instanceof THREE.Mesh) || !object.material) return
+    const materials = Array.isArray(object.material) ? object.material : [object.material]
+    materials.forEach((material) => material.dispose())
+  })
+}
+
+const VIEW_SHORTCUTS = [
+  { label: 'Front', angle: 0 },
+  { label: 'Side', angle: Math.PI / 2 },
+  { label: 'Back', angle: Math.PI },
+] as const
+
+const EXPLORE = [
+  { to: '/body-explorer?mode=realistic-atlas', label: 'Anatomy' },
+  { to: '/body-explorer?mode=digital-twin', label: 'Body → Cell' },
+  { to: '/body-explorer?mode=cell-genome', label: 'Cell → DNA' },
+  { to: '/body-explorer?mode=surgery', label: 'Surgery' },
+] as const
 
 export function BodyExposureWidget({ className = '', hero = false, interactive = true, showCta = true }: Props) {
   const mountRef = useRef<HTMLDivElement>(null)
+  const rotationRef = useRef(0)
+  const zoomRef = useRef(1)
+  const dragRef = useRef({ active: false, startX: 0, startRotation: 0 })
   const [status, setStatus] = useState<'loading' | 'ready' | 'error'>('loading')
+  const [zoomLabel, setZoomLabel] = useState(100)
+
+  function showView(angle: number) {
+    if (!interactive) return
+    rotationRef.current = angle
+  }
+
+  function setZoom(next: number) {
+    if (!interactive) return
+    const value = Math.min(1.38, Math.max(0.74, next))
+    zoomRef.current = value
+    setZoomLabel(Math.round(100 / value))
+  }
+
+  function fitView() {
+    rotationRef.current = 0
+    setZoom(1)
+  }
 
   useEffect(() => {
     const mount = mountRef.current
     if (!mount) return
 
     const scene = new THREE.Scene()
-    const camera = new THREE.PerspectiveCamera(hero ? 30 : 28, 1, 0.01, 100)
+    const camera = new THREE.PerspectiveCamera(hero ? 28 : 29, 1, 0.001, 10000)
     const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, powerPreference: 'high-performance' })
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, hero ? 2 : 1.5))
+    const isPhone = window.matchMedia('(max-width: 767px)').matches
+    const pixelRatioCap = isPhone ? 1.2 : hero ? 1.5 : 1.35
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, pixelRatioCap))
     renderer.outputColorSpace = THREE.SRGBColorSpace
     renderer.toneMapping = THREE.ACESFilmicToneMapping
-    renderer.toneMappingExposure = 1.05
+    renderer.toneMappingExposure = 1.0
     renderer.setClearColor(0x000000, 0)
     mount.appendChild(renderer.domElement)
 
     const pmrem = new THREE.PMREMGenerator(renderer)
-    const environment = pmrem.fromScene(new RoomEnvironment(), 0.04).texture
+    const room = new RoomEnvironment()
+    const environment = pmrem.fromScene(room, 0.04).texture
+    room.dispose()
     scene.environment = environment
 
-    const key = new THREE.DirectionalLight(0xffe6b0, 3.1)
-    key.position.set(2.4, 4.5, 4)
+    const hemi = new THREE.HemisphereLight(0xf4f7fa, 0x11161b, 1.55)
+    scene.add(hemi)
+    const key = new THREE.DirectionalLight(0xffffff, 2.5)
+    key.position.set(3, 5, 5)
     scene.add(key)
-    const fill = new THREE.DirectionalLight(0x7ef0ff, 1.8)
-    fill.position.set(-3, 1, 2)
+    const fill = new THREE.DirectionalLight(0xbcd8f2, 1.0)
+    fill.position.set(-4, 1.5, 3)
     scene.add(fill)
-    const rim = new THREE.DirectionalLight(0x5cff9b, 2.1)
-    rim.position.set(0, 2, -4)
+    const rim = new THREE.DirectionalLight(0xffdfd0, 0.9)
+    rim.position.set(2, 4, -5)
     scene.add(rim)
 
     const pivot = new THREE.Group()
@@ -67,12 +142,14 @@ export function BodyExposureWidget({ className = '', hero = false, interactive =
     let disposed = false
     let visible = true
     let raf = 0
+    let baseCameraZ = 2
+    let targetY = 0
 
     const resize = () => {
-      const w = Math.max(1, mount.clientWidth)
-      const h = Math.max(1, mount.clientHeight)
-      renderer.setSize(w, h, false)
-      camera.aspect = w / h
+      const width = Math.max(1, mount.clientWidth)
+      const height = Math.max(1, mount.clientHeight)
+      renderer.setSize(width, height, false)
+      camera.aspect = width / height
       camera.updateProjectionMatrix()
     }
     resize()
@@ -82,57 +159,85 @@ export function BodyExposureWidget({ className = '', hero = false, interactive =
     const observer = new IntersectionObserver(([entry]) => { visible = entry.isIntersecting }, { threshold: 0.05 })
     observer.observe(mount)
 
-    loadSurface().then((base) => {
+    void loadModel('VH_M_Skin.glb').then(async (base) => {
       if (disposed) return
-      const model = base.clone(true)
-      model.traverse((obj) => {
-        if (!(obj instanceof THREE.Mesh)) return
-        obj.material = new THREE.MeshPhysicalMaterial({
-          color: 0xb87568,
-          roughness: 0.43,
-          metalness: 0,
-          clearcoat: 0.18,
-          clearcoatRoughness: 0.42,
-          sheen: 0.3,
-          sheenColor: new THREE.Color(0xffd8c6),
-          transmission: 0.025,
-          thickness: 0.35,
-          transparent: true,
-          opacity: hero ? 0.94 : 0.91,
-          side: THREE.DoubleSide,
-        })
-      })
-      const box = new THREE.Box3().setFromObject(model)
+      const skin = cloneModel(base, 'skin')
+      const box = new THREE.Box3().setFromObject(skin)
       const center = box.getCenter(new THREE.Vector3())
       const size = box.getSize(new THREE.Vector3())
-      model.position.sub(center)
-      pivot.add(model)
+      pivot.position.set(-center.x, -center.y, -center.z)
+      pivot.add(skin)
+
       const height = Math.max(size.y, 0.1)
-      camera.position.set(0, height * 0.05, height * (hero ? 1.18 : 1.28))
-      camera.lookAt(0, height * 0.02, 0)
-      camera.near = Math.max(height / 100, 0.01)
-      camera.far = height * 10
+      baseCameraZ = height * (hero ? 1.05 : 1.18)
+      targetY = 0
+      camera.position.set(0, height * 0.015, baseCameraZ)
+      camera.lookAt(0, targetY, 0)
+      camera.near = Math.max(height / 1000, 0.001)
+      camera.far = height * 20
       camera.updateProjectionMatrix()
+
+      // The reference body is usable as soon as skin geometry is ready.
+      // Stream organs sequentially afterward instead of parsing several GLBs at
+      // once; this avoids short GPU/RAM spikes that are especially costly in
+      // iOS WebKit while preserving the same HRA source geometry.
       setStatus('ready')
+      const internals = HRA_MODELS.filter((item) => item.kind === 'organ')
+      for (const item of internals) {
+        if (disposed) return
+        try {
+          const organBase = await loadModel(item.file)
+          if (disposed) return
+          pivot.add(cloneModel(organBase, 'organ'))
+        } catch {
+          // Keep the already loaded reference body usable if one optional
+          // internal structure is temporarily unavailable.
+        }
+      }
     }).catch(() => { if (!disposed) setStatus('error') })
 
-    const pointer = { x: 0, y: 0 }
-    const onPointerMove = (event: PointerEvent) => {
+    const onPointerDown = (event: PointerEvent) => {
       if (!interactive) return
-      const rect = mount.getBoundingClientRect()
-      pointer.x = ((event.clientX - rect.left) / Math.max(rect.width, 1) - 0.5) * 2
-      pointer.y = ((event.clientY - rect.top) / Math.max(rect.height, 1) - 0.5) * 2
+      dragRef.current = { active: true, startX: event.clientX, startRotation: rotationRef.current }
+      mount.setPointerCapture?.(event.pointerId)
     }
+    const onPointerMove = (event: PointerEvent) => {
+      if (!interactive || !dragRef.current.active) return
+      rotationRef.current = dragRef.current.startRotation + (event.clientX - dragRef.current.startX) * 0.012
+    }
+    const onPointerUp = (event: PointerEvent) => {
+      if (!interactive) return
+      dragRef.current.active = false
+      if (mount.hasPointerCapture?.(event.pointerId)) mount.releasePointerCapture?.(event.pointerId)
+    }
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (!interactive) return
+      if (event.key === 'ArrowLeft' || event.key === 'ArrowRight') {
+        event.preventDefault()
+        rotationRef.current += event.key === 'ArrowLeft' ? -Math.PI / 8 : Math.PI / 8
+      } else if (event.key === '+' || event.key === '=') {
+        event.preventDefault()
+        setZoom(zoomRef.current - 0.1)
+      } else if (event.key === '-') {
+        event.preventDefault()
+        setZoom(zoomRef.current + 0.1)
+      } else if (event.key === '0' || event.key.toLowerCase() === 'f') {
+        event.preventDefault()
+        fitView()
+      }
+    }
+    mount.addEventListener('pointerdown', onPointerDown)
     mount.addEventListener('pointermove', onPointerMove)
+    mount.addEventListener('pointerup', onPointerUp)
+    mount.addEventListener('pointercancel', onPointerUp)
+    mount.addEventListener('keydown', onKeyDown)
 
-    const clock = new THREE.Clock()
     const animate = () => {
-      const t = clock.getElapsedTime()
       if (visible) {
-        const targetY = t * 0.11 + pointer.x * 0.12
-        pivot.rotation.y += (targetY - pivot.rotation.y) * 0.025
-        pivot.rotation.x += ((pointer.y * 0.035) - pivot.rotation.x) * 0.025
-        pivot.position.y = Math.sin(t * 0.9) * 0.008
+        pivot.rotation.y += (rotationRef.current - pivot.rotation.y) * 0.11
+        const desiredZ = baseCameraZ * zoomRef.current
+        camera.position.z += (desiredZ - camera.position.z) * 0.11
+        camera.lookAt(0, targetY, 0)
         renderer.render(scene, camera)
       }
       raf = requestAnimationFrame(animate)
@@ -144,35 +249,54 @@ export function BodyExposureWidget({ className = '', hero = false, interactive =
       cancelAnimationFrame(raf)
       ro.disconnect()
       observer.disconnect()
+      mount.removeEventListener('pointerdown', onPointerDown)
       mount.removeEventListener('pointermove', onPointerMove)
+      mount.removeEventListener('pointerup', onPointerUp)
+      mount.removeEventListener('pointercancel', onPointerUp)
+      mount.removeEventListener('keydown', onKeyDown)
+      disposeClonedMaterials(pivot)
       environment.dispose()
       pmrem.dispose()
+      renderer.renderLists.dispose()
       renderer.dispose()
+      renderer.forceContextLoss()
       if (renderer.domElement.parentElement === mount) mount.removeChild(renderer.domElement)
     }
   }, [hero, interactive])
 
   return (
-    <div className={`panacea-body-widget relative overflow-hidden ${className}`}>
-      <div className="pointer-events-none absolute inset-0 panacea-orbit-field" aria-hidden />
-      <div ref={mountRef} className={`relative z-10 w-full ${hero ? 'h-[clamp(360px,62vh,720px)]' : 'h-[250px]'}`} aria-label="Interactive reference human anatomy preview" />
-      <div className="pointer-events-none absolute inset-x-4 top-4 z-20 flex items-center justify-between gap-2">
-        <span className="panacea-kicker">Reference anatomy · 3D</span>
-        <span className="rounded-full border border-white/15 bg-black/20 px-2.5 py-1 text-[10px] font-bold text-white/70 backdrop-blur-xl">
-          {status === 'ready' ? 'Live model' : status === 'error' ? 'Preview unavailable' : 'Loading atlas…'}
-        </span>
+    <section className={`relative overflow-hidden rounded-[28px] border border-white/10 bg-[#080b0e] shadow-[0_22px_60px_rgba(4,10,14,.28)] ${className}`}>
+      <div ref={mountRef} className={`relative z-10 w-full select-none outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-cyan-300/70 ${interactive ? 'cursor-grab touch-none active:cursor-grabbing' : ''} ${hero ? 'h-[clamp(430px,68vh,760px)]' : 'h-[320px]'}`} aria-label="HuBMAP Human Reference Atlas body preview. Drag to rotate and use the view controls." role={interactive ? 'application' : 'img'} tabIndex={interactive ? 0 : -1} />
+
+      <div className="pointer-events-none absolute inset-x-4 top-4 z-20 flex items-start justify-between gap-3">
+        <div className="max-w-[72%]">
+          <span className="inline-flex rounded-full border border-white/12 bg-black/45 px-2.5 py-1 text-[9px] font-medium uppercase tracking-[.12em] text-cyan-200 backdrop-blur-xl">HuBMAP Human Reference Atlas</span>
+          <h2 className="mt-2 text-[17px] font-semibold tracking-[-.02em] text-white sm:text-xl">Reference human anatomy</h2>
+          <p className="mt-1 max-w-md text-[10px] font-normal leading-relaxed text-white/60">Visible Human reference skin, heart, lungs and blood vasculature. Source geometry is loaded from the HRA release rather than generated as decorative anatomy.</p>
+        </div>
+        <span className="shrink-0 rounded-full border border-white/12 bg-black/45 px-2.5 py-1 text-[9px] font-medium text-white/70 backdrop-blur-xl">{status === 'ready' ? 'HRA ready' : status === 'error' ? 'Source unavailable' : 'Loading HRA…'}</span>
       </div>
-      {!hero && (
-        <div className="pointer-events-none absolute bottom-4 left-4 right-4 z-20">
-          <div className="text-sm font-black text-white">Your body, from whole-person to molecular scale</div>
-          <div className="mt-1 text-[11px] leading-relaxed text-white/65">Rotate the reference model here, then open the full Digital Twin for anatomy, radiology and 4D physiology.</div>
+
+      {interactive && status === 'ready' && (
+        <div className="absolute inset-x-3 bottom-3 z-30 flex justify-center" aria-label="3D body controls">
+          <div className="flex flex-wrap justify-center gap-1 rounded-full border border-white/10 bg-black/55 p-1.5 backdrop-blur-xl">
+            {VIEW_SHORTCUTS.map((item) => <button key={item.label} type="button" onClick={() => showView(item.angle)} className="rounded-full px-3 py-2 text-[9px] font-semibold text-white/75 transition hover:bg-white/10 hover:text-white active:scale-95">{item.label}</button>)}
+            <span className="mx-0.5 h-7 w-px self-center bg-white/10" aria-hidden />
+            <button type="button" onClick={() => setZoom(zoomRef.current + 0.1)} className="grid h-8 w-8 place-items-center rounded-full text-sm font-semibold text-white/75 hover:bg-white/10" aria-label="Zoom out">−</button>
+            <button type="button" onClick={fitView} className="rounded-full px-2.5 py-2 text-[9px] font-semibold text-white/65 hover:bg-white/10">Fit</button>
+            <button type="button" onClick={() => setZoom(zoomRef.current - 0.1)} className="grid h-8 w-8 place-items-center rounded-full text-sm font-semibold text-white/75 hover:bg-white/10" aria-label="Zoom in">＋</button>
+            <span className="self-center px-1 text-[9px] font-medium tabular-nums text-white/40">{zoomLabel}%</span>
+          </div>
         </div>
       )}
-      {showCta && (
-        <Link to="/body-explorer" className="liquid-orbit-button pointer-events-auto absolute bottom-4 right-4 z-30 hidden sm:inline-flex">
-          Open 4D atlas <span aria-hidden>→</span>
-        </Link>
-      )}
-    </div>
+
+      {status === 'error' && <div className="absolute inset-x-4 bottom-4 z-30 rounded-2xl border border-rose-300/20 bg-black/65 p-3 text-[10px] font-medium text-rose-100 backdrop-blur-xl">The external HRA model could not be loaded. Open the full atlas to retry or inspect the live source references.</div>}
+
+      {hero && <div className="absolute bottom-16 left-3 right-3 z-30 hidden gap-2 sm:flex">{EXPLORE.map((item) => <Link key={item.to} to={item.to} className="flex min-w-0 flex-1 items-center justify-between rounded-2xl border border-white/10 bg-black/45 px-3 py-2.5 text-[9px] font-semibold text-white/75 backdrop-blur-xl transition hover:bg-white/10 hover:text-white"><span className="truncate">{item.label}</span><span>→</span></Link>)}</div>}
+
+      {showCta && !hero && <Link to="/body-explorer?mode=realistic-atlas" className="absolute bottom-[62px] right-4 z-30 hidden rounded-full border border-white/10 bg-white px-3.5 py-2 text-[9px] font-semibold text-neutral-950 shadow-sm sm:inline-flex">Open HRA anatomy →</Link>}
+
+      <a href="https://humanatlas.io/3d-reference-library" target="_blank" rel="noreferrer" className="absolute bottom-[66px] left-4 z-30 text-[8px] font-medium uppercase tracking-[.1em] text-white/35 hover:text-white/70">Source: HuBMAP HRA · CC BY 4.0 ↗</a>
+    </section>
   )
 }

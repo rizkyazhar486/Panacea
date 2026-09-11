@@ -1,0 +1,52 @@
+{
+  "id": "cornerstone3d",
+  "name": "Cornerstone3D",
+  "category": "imaging",
+  "kind": ["library", "framework", "viewer"],
+  "homepage": "https://www.cornerstonejs.org/",
+  "repository": "https://github.com/cornerstonejs/cornerstone3D",
+  "features": [267, 271, 273, 274, 275, 276, "dicom-viewer", "medical-imaging", "segmentation-viewer"],
+  "formats": ["dicom", "dicomweb", "dicom-seg", "nifti", "volume", "surface"],
+  "usage": {
+    "runtime": true,
+    "buildTime": false,
+    "networkRequired": false,
+    "notes": "Cornerstone3D is a browser medical-imaging framework. Local DICOM can be supported without a network; DICOMweb and remote studies require authenticated network access. Patient imaging must remain separated from public reference anatomy and must never be uploaded to third-party services implicitly."
+  },
+  "license": {
+    "status": "VERIFIED",
+    "identifier": "MIT",
+    "commercialUse": "ALLOWED",
+    "attributionRequired": true,
+    "shareAlike": false,
+    "scope": "The Cornerstone3D software repository is MIT licensed. This software license does not grant rights to DICOM studies, patient data, annotations, segmentations, trained models, or third-party codecs/datasets used with it.",
+    "verificationUrl": "https://github.com/cornerstonejs/cornerstone3D/blob/main/LICENSE",
+    "verifiedAt": "2026-09-08",
+    "notes": "Retain the MIT copyright and permission notice. Track imaging data provenance, access permissions, de-identification status, and any third-party codec/model licenses separately."
+  },
+  "validation": {
+    "level": "REFERENCE",
+    "clinicalDecisionUse": "REQUIRES_SEPARATE_VALIDATION",
+    "notes": "Cornerstone3D provides rendering, interaction and segmentation-viewing capabilities; use of the framework does not by itself make Panacea a validated diagnostic medical device. Measurement, segmentation, reconstruction and decision-support workflows require separate verification and clinical validation for their intended use."
+  },
+  "provenance": {
+    "authority": "Cornerstone.js / Open Health Imaging Foundation",
+    "sourceIdentityRequired": true,
+    "versionPinRequired": true,
+    "notes": "Pin package versions and preserve Study/Series/SOP Instance UIDs or equivalent normalized identifiers when handling DICOM. Derived segmentations and surfaces must point back to the source study and transformation history."
+  },
+  "adapter": {
+    "status": "PLANNED",
+    "normalizedTarget": "PanaceaImagingStudy",
+    "module": null,
+    "notes": "Planned flow: local DICOM or authenticated DICOMweb -> privacy/provenance gate -> Cornerstone loader -> normalized PanaceaImagingStudy -> stack/volume viewport -> optional segmentation/surface export. Keep imaging access behind an adapter rather than calling loaders directly from feature components."
+  },
+  "trust": {
+    "authority": 5,
+    "evidenceQuality": 2,
+    "recency": 5,
+    "licenseClarity": 5,
+    "reproducibility": 5,
+    "notes": "Scores describe suitability as an imaging framework. EvidenceQuality is intentionally low because Cornerstone3D is infrastructure, not biomedical evidence."
+  }
+}

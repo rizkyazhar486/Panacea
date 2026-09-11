@@ -1,0 +1,52 @@
+{
+  "id": "garmin_connect_activity_api",
+  "name": "Garmin Connect Activity API",
+  "category": "wearable",
+  "kind": ["api"],
+  "homepage": "https://developer.garmin.com/gc-developer-program/activity-api/",
+  "repository": null,
+  "features": ["garmin", "activity", "running", "cycling", "swimming", "yoga", "strength-training", "activity-details", "fit", "gpx", "tcx", "laps", "sessions", "sensor-data", "wearable-sync"],
+  "formats": ["json", "http-rest", "oauth2", "fit", "gpx", "tcx"],
+  "usage": {
+    "runtime": true,
+    "buildTime": false,
+    "networkRequired": true,
+    "notes": "Use the Garmin Connect Activity API for detailed recorded fitness activities uploaded from supported Garmin wearables or cycling computers to Garmin Connect. Keep this source separate from the Garmin Health API for all-day health summaries and from Garmin Health SDKs for direct/real-time device access. Subscribe only to activity feeds required by enabled features and use Garmin's push or ping/pull architecture. Detailed FIT/GPX/TCX files should be fetched and parsed on demand or server-side rather than bundled into the browser or downloaded for every dashboard view."
+  },
+  "license": {
+    "status": "CHECK_REQUIRED",
+    "identifier": "Garmin Connect Developer Program terms and API Brand Guidelines",
+    "commercialUse": "CONDITIONAL",
+    "attributionRequired": true,
+    "shareAlike": null,
+    "scope": "Garmin Connect Activity API access is contractual and subject to user consent, business/program approval, the applicable Garmin developer agreement and Garmin API Brand Guidelines. The Garmin Connect Developer Program FAQ states the program is for business use and currently has no general licensing or maintenance fee, but API-specific or commercial conditions may still apply under the governing agreement. Confirm production, redistribution, retention, sublicense and commercial rights with Garmin before release.",
+    "verificationUrl": "https://developer.garmin.com/gc-developer-program/activity-api/",
+    "verifiedAt": "2026-09-08",
+    "notes": "Registry inclusion is not contractual permission. Re-check program terms and Garmin API Brand Guidelines before production. Preserve Garmin attribution in UI, reports, exports, APIs/webhooks and derived analytics influenced by Garmin device-sourced data. Do not imply Garmin endorsement of Panacea, user coaching recommendations or analyses."
+  },
+  "validation": {
+    "level": "REFERENCE",
+    "clinicalDecisionUse": "CONTEXT_ONLY",
+    "notes": "Recorded Garmin activities can provide useful longitudinal training context but remain consumer-device observations whose accuracy depends on device, sensor, placement, environmental conditions, user behavior, firmware and algorithms. Derived fields such as training or performance metrics must remain distinguishable from raw/provider-recorded observations. Activity files and parsed outputs are not clinical diagnoses and must not independently drive medical treatment decisions."
+  },
+  "provenance": {
+    "authority": "Garmin Ltd. / Garmin Connect",
+    "sourceIdentityRequired": true,
+    "versionPinRequired": true,
+    "notes": "Persist API family/version or contract revision, Garmin activity/provider ID, activity type, device model when supplied, file type and original file identity/hash when a FIT/GPX/TCX artifact is fetched, manufacturer/product identity present in FIT metadata where available, start/end/timestamps and timezone context, units, sessions/laps/events relationships, retrieval timestamp, parser version and Panacea adapter version. Never discard raw-file lineage after parsing. Garmin attribution must remain visible as 'Garmin [device model]' where required; if model is unavailable, identify Garmin as source."
+  },
+  "adapter": {
+    "status": "PLANNED",
+    "normalizedTarget": "PanaceaWorkoutObservation",
+    "module": null,
+    "notes": "Planned flow: Garmin Connect user authorization/consent -> server-side OAuth 2.0/token handling -> Activity API push or ping/pull ingestion -> store lightweight activity metadata -> retrieve detailed FIT/GPX/TCX only when needed -> deterministic parsing with versioned parser -> normalize sessions/laps/records to PanaceaWorkoutObservation while retaining source file/provider IDs and Garmin attribution metadata. Deduplicate repeated deliveries and make raw-file parsing idempotent. Handle revocation, deletion, delayed device sync and partial files explicitly; fail closed on corrupt/unsupported file structures rather than inventing samples."
+  },
+  "trust": {
+    "authority": 5,
+    "evidenceQuality": 3,
+    "recency": 5,
+    "licenseClarity": 3,
+    "reproducibility": 4,
+    "notes": "High-authority source for Garmin-recorded activity artifacts. Reproducibility is stronger when original FIT/GPX/TCX files and parser versions are retained, while evidence quality remains below clinical-grade measurement because consumer sensors and provider algorithms can vary by device and context. Commercial/data rights remain conditional on current Garmin program terms."
+  }
+}

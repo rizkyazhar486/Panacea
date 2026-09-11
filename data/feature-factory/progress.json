@@ -1,0 +1,118 @@
+{
+  "version": 1,
+  "updatedAt": "2026-09-10T06:18:00.000Z",
+  "items": {
+    "ff-recovery-stress-checklist": {
+      "status": "done",
+      "commit": "c78a28dbe670ae84fa2e77090086a2b7b5ea469f",
+      "paths": ["src/lib/recoveryRecordedChecklist.ts", "src/pages/Readiness.tsx", "scripts/uji/feature-factory-recovery-stress-checklist.mts"],
+      "note": "Records the already-promoted Recovery/Stress checklist capability from PR #1150. The implementation derives checklist state only from valid recorded HRV, resting-heart-rate, sleep, context-journal and workout observations; missing observations remain missing; workout load is the transparent recorded-data product session RPE × recorded minutes; no synthetic readiness/stress score, proprietary provider score, forecast, diagnosis or training prescription is introduced.",
+      "academicReview": {"status":"not-applicable-no-material-claim","sourceBasis":[],"aiUse":"ai-assisted","note":"This ledger entry records an already-promoted descriptive recorded-data software capability. It does not add a biomedical threshold, diagnostic interpretation, treatment recommendation, population norm, provider-derived score or patient-specific inference. Provider-derived WHOOP/Oura/Garmin scores remain outside this local checklist unless separately admitted through reviewed provenance-bearing adapters.","humanReview":{"status":"not-recorded","reviewer":null,"credentials":null,"reviewedAt":null}},
+      "updatedAt": "2026-09-10T06:18:00.000Z"
+    },
+    "ff-health-profile-export": {
+      "status": "done",
+      "commit": "15575240d61a8d5d9f9708f742dd983fe9f54747",
+      "paths": ["src/pages/HealthProfile.tsx", "data/feature-factory/surfaces.json", "scripts/uji/feature-factory-health-profile-export.mts"],
+      "note": "Reconciled the already-promoted Health Profile export capability after PR #1140. The production surface remains /health-data; JSON export serializes the recorded snapshot, CSV export uses persisted history only, empty history fails closed, missing values remain missing, filenames are date-stamped, and exports are explicit user-triggered local downloads without hidden network calls, synthesis, scores, estimates or predictions.",
+      "academicReview": {"status":"not-applicable-no-material-claim","sourceBasis":[],"aiUse":"ai-assisted","note":"This candidate records software export/provenance behavior already promoted on main. It adds no biomedical threshold, diagnosis, treatment recommendation, causal claim, population norm, derived score or patient-specific inference.","humanReview":{"status":"not-recorded","reviewer":null,"credentials":null,"reviewedAt":null}},
+      "updatedAt": "2026-09-09T22:14:00.000Z"
+    },
+    "ff-health-profile-timeline": {
+      "status": "done",
+      "commit": "a978908e55521c61f6ef213d9483a9c5921fe783",
+      "paths": ["src/pages/HealthProfile.tsx", "data/feature-factory/surfaces.json", "scripts/uji/feature-factory-health-profile-timeline.mts"],
+      "note": "Matured the existing /health-data dated history and Trends surface as the Feature Factory timeline capability rather than duplicating UI. Deterministic QA requires explicit date-stamped records, same-day replacement, a bounded latest-90-record history, a meaningful <2-record empty state, visible saved-record count, and user-controlled CSV history export with no hidden synthesis or seeded observations. No production health formula, threshold, API, persistence schema, dependency, biomedical interpretation or patient-specific inference was changed.",
+      "academicReview": {"status":"not-applicable-no-material-claim","sourceBasis":[],"aiUse":"ai-assisted","note":"This batch verifies software timeline persistence/presentation boundaries for user-entered or measured records only. It adds no biomedical threshold, diagnostic interpretation, treatment recommendation, causal claim, population norm or patient-specific inference.","humanReview":{"status":"not-recorded","reviewer":null,"credentials":null,"reviewedAt":null}},
+      "updatedAt": "2026-09-08T15:10:00.000Z"
+    },
+    "ff-health-profile-snapshot": {
+      "status": "done",
+      "commit": "a6ba83a6fa6163e6b6491cc34d2ad6c598bbcbed",
+      "paths": ["src/pages/HealthProfile.tsx", "data/feature-factory/surfaces.json", "scripts/uji/feature-factory-health-profile-snapshot.mts"],
+      "note": "Matured the existing /health-data Health Profile as the Feature Factory snapshot capability rather than duplicating UI. Deterministic QA requires the dedicated reachable surface, recorded demographics/cardio-recovery/sleep-activity/body-composition sections, visible source identity and save timestamp, explicit loading/offline states, and empty zero-valued metrics/history rather than fabricated observations. No production health calculation, threshold, API, storage schema, dependency or biomedical interpretation was changed.",
+      "academicReview": {"status":"not-applicable-no-material-claim","sourceBasis":[],"aiUse":"ai-assisted","note":"This batch verifies existing user-entered/measured-data presentation and software fallback/provenance behavior only. It adds no biomedical threshold, diagnosis, treatment recommendation, causal claim, population norm or patient-specific inference.","humanReview":{"status":"not-recorded","reviewer":null,"credentials":null,"reviewedAt":null}},
+      "updatedAt": "2026-09-08T13:37:00.000Z"
+    },
+    "ff-medical-education-accessibility": {
+      "status": "done",
+      "commit": "1e01e9b32c38014fa2b419f697881c80f32c11bf",
+      "paths": ["src/components/KnowledgeBridgeWorkbench.tsx", "scripts/uji/knowledge-bridge-accessibility.mts"],
+      "note": "Knowledge Bridge now exposes explicit keyboard/screen-reader semantics: named search input, explanation-depth radio group, topic selection state, live status, causal-stage list semantics, and visible focus rings. No dependency or external API path was added.",
+      "academicReview": {"status":"not-applicable-no-material-claim","sourceBasis":[],"aiUse":"ai-assisted","note":"Accessibility semantics only; this candidate adds no medical factual, quantitative, causal, diagnostic or treatment claim.","humanReview":{"status":"not-recorded","reviewer":null,"credentials":null,"reviewedAt":null}},
+      "updatedAt": "2026-09-08T02:23:00.000Z"
+    },
+    "ff-medical-education-baseline": {
+      "status": "done",
+      "commit": "49845b6dc02b692899eefad187717f645303d1a7",
+      "paths": ["src/lib/knowledgeBridgeStudyBaseline.ts", "scripts/uji/knowledge-bridge-study-baseline.mts"],
+      "note": "Added a pure descriptive learning baseline for explicit 1–5 user self-ratings: requires at least three valid observations, retains only the latest 12 per non-empty topic, preserves timestamp/unit/user-self-rating provenance, exposes median plus observed Q1/Q3 using a pinned nearest-rank method, and remains explicitly personal-descriptive-self-rating-only. Invalid scores, timestamps and blank topic identities fail closed. The quartile band is not a population or clinical reference interval.",
+      "academicReview": {"status":"source-checked","sourceBasis":["https://itl.nist.gov/div898/handbook/prc/section2/prc262.htm","https://www.itl.nist.gov/div898/handbook/eda/section3/boxplot.htm"],"aiUse":"ai-assisted","note":"Statistical terminology was checked against NIST percentile/quartile definitions. Panacea explicitly pins its deterministic nearest-rank convention and does not present the observed self-rating quartiles as a normative, physiological or clinical reference interval.","humanReview":{"status":"not-recorded","reviewer":null,"credentials":null,"reviewedAt":null}},
+      "updatedAt": "2026-09-08T06:55:00.000Z"
+    },
+    "ff-medical-education-calculator": {
+      "status": "done",
+      "commit": "c33b286efb4e58526f8fb35919024fa5d657e031",
+      "paths": ["src/lib/knowledgeBridgeStudyCalculator.ts", "scripts/uji/knowledge-bridge-study-calculator.mts"],
+      "note": "Added a bounded pure calculator for explicit 1–5 learner self-ratings. It returns count, sum, arithmetic mean, percent of the 5-point scale maximum, minimum and maximum; exposes exact formulas; rejects blank topics, non-integer/out-of-range scores and more than 20 inputs as a whole; and explicitly labels outputs personal-descriptive-self-rating-only and not a mastery, competence or clinical score.",
+      "academicReview": {"status":"not-applicable-no-material-claim","sourceBasis":[],"aiUse":"ai-assisted","note":"The candidate introduces a software-defined arithmetic summary of user-entered ratings, not a biomedical, diagnostic, treatment, competency or validated psychometric claim. Formula definitions are explicit in code and deterministic tests; no external clinical interpretation is attached.","humanReview":{"status":"not-recorded","reviewer":null,"credentials":null,"reviewedAt":null}},
+      "updatedAt": "2026-09-08T07:08:00.000Z"
+    },
+    "ff-medical-education-checklist": {
+      "status": "done",
+      "commit": "0f53753ea983b471d24f585c56c0da12b9b0d3cd",
+      "paths": ["src/components/KnowledgeBridgeWorkbench.tsx", "scripts/uji/knowledge-bridge-checklist.mts"],
+      "note": "Knowledge Bridge adds a static provenance-aware study verification checklist covering source identity/date, population/context/units, uncertainty, management-claim safeguards, and an explicit non-clinical-clearance boundary. No new API, dependency, polling, storage, or patient-specific inference was added.",
+      "academicReview": {"status":"not-applicable-no-material-claim","sourceBasis":[],"aiUse":"ai-assisted","note":"This candidate adds a process checklist for verifying claims; it does not itself introduce a medical threshold, diagnosis, treatment recommendation or patient-specific claim.","humanReview":{"status":"not-recorded","reviewer":null,"credentials":null,"reviewedAt":null}},
+      "updatedAt": "2026-09-08T03:16:00.000Z"
+    },
+    "ff-medical-education-glossary": {
+      "status": "done",
+      "commit": "3d939d731e2719dae1ab1b20afc500374b32e283",
+      "paths": ["src/lib/knowledgeBridgeMap.ts", "scripts/uji/knowledge-bridge-glossary.mts"],
+      "note": "Knowledge Bridge expands each of its seven causal-stage labels with a concise plain-language definition at point of use while bridgeSummary preserves the canonical stage labels used by existing exports/tests. The glossary is a fixed seven-entry map reused by every curated topic, adding no dependency, network call, polling, storage, large asset, or patient-specific inference.",
+      "academicReview": {"status":"not-applicable-no-material-claim","sourceBasis":[],"aiUse":"ai-assisted","note":"The candidate only clarifies interface stage categories such as structure, normal function and source verification; it adds no disease-specific threshold, causal estimate, diagnosis or treatment claim.","humanReview":{"status":"not-recorded","reviewer":null,"credentials":null,"reviewedAt":null}},
+      "updatedAt": "2026-09-08T05:18:00.000Z"
+    },
+    "ff-medical-education-evidence": {
+      "status": "done",
+      "commit": "e4845638fab7b76e3f691a9a0915d42acd750db6",
+      "paths": ["src/lib/knowledgeBridgeHandoff.ts", "src/components/KnowledgeBridgeWorkbench.tsx", "scripts/uji/knowledge-bridge-evidence.mts"],
+      "note": "Matured the existing Knowledge Bridge evidence panel instead of duplicating UI: the evidence shelf is bounded to eight source pointers, sanitizes persisted entries, deduplicates by stable key, preserves source/year/identifier/query/original URL, supports deterministic remove/clear, and explicitly states that a selected source pointer is not a verified claim until the original source is opened. No new API, dependency, polling, large asset, or patient-specific inference was added.",
+      "academicReview": {"status":"not-applicable-no-material-claim","sourceBasis":[],"aiUse":"ai-assisted","note":"This candidate changes evidence-pointer handling and provenance UX, not the truth value of any medical claim. It explicitly prevents a selected citation from being presented as verified merely because it was selected.","humanReview":{"status":"not-recorded","reviewer":null,"credentials":null,"reviewedAt":null}},
+      "updatedAt": "2026-09-08T06:28:00.000Z"
+    },
+    "ff-medical-education-explain": {
+      "status": "done",
+      "commit": "ebf59c5350ed29badfdd282559a22d21aaaacf58",
+      "paths": ["src/lib/knowledgeBridgeExplainability.ts", "src/components/KnowledgeBridgeWorkbench.tsx", "scripts/uji/knowledge-bridge-explainability.mts"],
+      "note": "Matured the existing Knowledge Bridge explainability surface with a bounded deterministic system trace: it states how a user query resolves to a curated topic, the fixed stage ordering, that curated text is not transformed into scores/probabilities/diagnoses/treatment decisions or patient-specific inference, and explicit uncertainty/source-verification boundaries. Deterministic guards also verify that the production UI retains explanation-depth controls, educational/not-patient-specific labeling, source verification prompts and uncertainty discipline.",
+      "academicReview": {"status":"not-applicable-no-material-claim","sourceBasis":[],"aiUse":"ai-assisted","note":"This candidate explains software input resolution, presentation transformations, uncertainty and verification boundaries. It does not introduce a new disease-specific factual, quantitative, causal, diagnostic or treatment claim; existing medical teaching text remains subject to its separate source/academic review obligations.","humanReview":{"status":"not-recorded","reviewer":null,"credentials":null,"reviewedAt":null}},
+      "updatedAt": "2026-09-08T07:20:00.000Z"
+    },
+    "ff-medical-education-fallback": {
+      "status": "done",
+      "commit": "d7746fe873b8224c8bcff7f7839f94bc50442de9",
+      "paths": ["src/components/KnowledgeBridgeWorkbench.tsx", "src/lib/knowledgeBridgeHandoff.ts", "src/lib/knowledgeBridgeMap.ts", "scripts/uji/knowledge-bridge-fallback.mts"],
+      "note": "Verified and hardened the existing Knowledge Bridge graceful fallback without duplicating UI: the core curated map remains local-first with no direct network path; blank search fails closed; unmatched queries explicitly disclose that no curated causal map exists and preserve the exact query in a Medical Library evidence handoff; malformed/unavailable note and evidence storage falls back to empty state; evidence remains validated and bounded to eight source pointers; and fallback content retains educational/not-patient-specific plus original-source-verification boundaries.",
+      "academicReview": {"status":"not-applicable-no-material-claim","sourceBasis":[],"aiUse":"ai-assisted","note":"This candidate adds deterministic fallback guards and documents existing fail-closed behavior. It introduces no new medical factual, quantitative, causal, diagnostic or treatment claim and does not reclassify existing teaching text as verified.","humanReview":{"status":"not-recorded","reviewer":null,"credentials":null,"reviewedAt":null}},
+      "updatedAt": "2026-09-08T07:42:00.000Z"
+    },
+    "ff-medical-education-patient-view": {
+      "status": "done",
+      "commit": "0fc181fd04401f9df59a2ffbc0d86c104cffda44",
+      "paths": ["src/components/KnowledgeBridgeWorkbench.tsx", "src/lib/knowledgeBridgeMap.ts", "scripts/uji/knowledge-bridge-patient-view.mts"],
+      "note": "Matured the existing plain-language Knowledge Bridge presentation as the Medical Education patient-view capability without duplicating or rewriting medical facts: plain, student and clinical depths reuse the same curated topic one-liner and seven stage objects; the shared glossary provides understandable labels; the UI remains explicitly educational and not patient-specific; and Medical Library/original-source verification boundaries remain visible.",
+      "academicReview": {"status":"not-applicable-no-material-claim","sourceBasis":[],"aiUse":"ai-assisted","note":"This candidate adds deterministic presentation guards only. It does not create new medical facts, diagnostic thresholds, patient-specific inference or treatment recommendations, and it explicitly prevents the plain-language presentation from being interpreted as a personalized clinical view.","humanReview":{"status":"not-recorded","reviewer":null,"credentials":null,"reviewedAt":null}},
+      "updatedAt": "2026-09-08T07:56:00.000Z"
+    },
+    "ff-medical-education-report": {
+      "status": "done",
+      "commit": "22eb79005830748f39a7a78019be1100f2db7891",
+      "paths": ["src/lib/knowledgeBridgeMap.ts", "src/components/KnowledgeBridgeWorkbench.tsx", "scripts/uji/knowledge-bridge-report.mts"],
+      "note": "Matured the existing Knowledge Bridge copy-summary path as a bounded structured-report capability: it reuses the canonical curated topic identity, one-line context and fixed seven stage objects in deterministic order, normalizes glossary-enhanced display labels back to canonical stage names, performs no hidden synthesis or network call, and retains explicit educational/not-patient-specific plus original-source-verification boundaries.",
+      "academicReview": {"status":"not-applicable-no-material-claim","sourceBasis":[],"aiUse":"ai-assisted","note":"This batch adds deterministic report-contract guards only and introduces no new biomedical, diagnostic, treatment or patient-specific factual claim. Existing curated medical teaching text is exported without reinterpretation and remains subject to its separate source/academic review obligations.","humanReview":{"status":"not-recorded","reviewer":null,"credentials":null,"reviewedAt":null}},
+      "updatedAt": "2026-09-08T08:15:00.000Z"
+    }
+  }
+}

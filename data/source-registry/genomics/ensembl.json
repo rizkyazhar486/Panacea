@@ -1,0 +1,52 @@
+{
+  "id": "ensembl_rest_api",
+  "name": "Ensembl REST API",
+  "category": "genomics",
+  "kind": ["api", "dataset"],
+  "homepage": "https://rest.ensembl.org/",
+  "repository": null,
+  "features": ["gene-lookup", "transcripts", "genomic-coordinates", "reference-sequence", "variants", "variant-consequences", "vep", "stable-identifiers", "cross-references", "comparative-genomics", "genomic-education"],
+  "formats": ["json", "xml", "http-rest"],
+  "usage": {
+    "runtime": true,
+    "buildTime": true,
+    "networkRequired": true,
+    "notes": "Use Ensembl as a versioned genomic reference and annotation source, not as a patient diagnosis engine. Prefer targeted runtime lookups for genes/variants and reproducible build-time snapshots for curated educational content. Cache by Ensembl release, species, assembly and stable identifier where appropriate. Never mix coordinates from different assemblies or releases without an explicit transformation step and retained provenance."
+  },
+  "license": {
+    "status": "CHECK_REQUIRED",
+    "identifier": "Ensembl / EMBL-EBI data terms; Ensembl software Apache-2.0",
+    "commercialUse": "CONDITIONAL",
+    "attributionRequired": true,
+    "shareAlike": false,
+    "scope": "Ensembl states that project-generated data are available without restriction and project code is Apache-2.0, while some included data/software can be subject to third-party constraints. Panacea must therefore retain source-level provenance and review the terms of external annotations returned through Ensembl rather than applying one blanket license to every field.",
+    "verificationUrl": "https://www.ensembl.org/info/about/legal/index.html",
+    "verifiedAt": "2026-09-08",
+    "notes": "Do not imply Ensembl endorsement. Preserve reasonable source attribution and keep licensing for imported third-party variation, phenotype, ontology or cross-reference data attached to the originating source when known."
+  },
+  "validation": {
+    "level": "REFERENCE",
+    "clinicalDecisionUse": "CONTEXT_ONLY",
+    "notes": "Ensembl provides authoritative reference genome annotation and computational consequence annotation, but a consequence prediction is not equivalent to clinical pathogenicity. VEP consequence terms, population annotations and genomic coordinates may support education/research workflows only unless separately validated in a clinical genetics pipeline."
+  },
+  "provenance": {
+    "authority": "Ensembl / EMBL-EBI",
+    "sourceIdentityRequired": true,
+    "versionPinRequired": true,
+    "notes": "Persist Ensembl REST/API version when available, Ensembl data release, species, assembly name/version, stable gene/transcript/protein/variation IDs including version suffixes where supplied, query endpoint/parameters, reference allele and coordinates, retrieved consequence terms, external source identifiers, retrieval timestamp and Panacea adapter version. Coordinate liftover or transcript remapping must create a derived record that preserves both source and destination assemblies."
+  },
+  "adapter": {
+    "status": "PLANNED",
+    "normalizedTarget": "PanaceaGenomicReference",
+    "module": null,
+    "notes": "Planned flow: normalized gene/variant request -> explicit species and assembly context -> Ensembl REST adapter -> validate stable IDs/coordinates/alleles -> normalize genes, transcripts, sequences and predicted consequences to PanaceaGenomicReference -> retain Ensembl release plus external-source provenance. VEP outputs must remain labeled predicted/computational; do not convert consequence severity into pathogenic/benign labels. Handle retired/mapped stable IDs explicitly and fail closed on ambiguous assembly or allele representation."
+  },
+  "trust": {
+    "authority": 5,
+    "evidenceQuality": 4,
+    "recency": 5,
+    "licenseClarity": 4,
+    "reproducibility": 5,
+    "notes": "High-authority and highly reproducible reference annotation when release, assembly and identifiers are pinned. Evidence quality is strong for reference annotation but clinical interpretation requires separate evidence sources; mixed third-party annotations require source-specific licensing and provenance."
+  }
+}

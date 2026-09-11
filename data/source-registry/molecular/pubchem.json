@@ -1,0 +1,52 @@
+{
+  "id": "pubchem",
+  "name": "PubChem / PUG REST",
+  "category": "molecular",
+  "kind": ["api", "dataset"],
+  "homepage": "https://pubchem.ncbi.nlm.nih.gov/",
+  "repository": null,
+  "features": ["chemical-compounds", "substances", "bioassays", "2d-structures", "3d-conformers", "smiles", "inchi", "inchikey", "synonyms", "chemical-properties", "similarity-search", "substructure-search", "gene-protein-pathway-links", "pug-rest"],
+  "formats": ["json", "xml", "sdf", "csv", "png", "asnt", "http-rest"],
+  "usage": {
+    "runtime": true,
+    "buildTime": true,
+    "networkRequired": true,
+    "notes": "Use PubChem for chemical structure, compound/substance identifiers, properties, bioassays and source-linked molecular annotations. PUG REST asks clients not to exceed 5 requests/second. Interactive requests should be cached/deduplicated and bulk work should prefer PubChem download mechanisms rather than high-volume API loops."
+  },
+  "license": {
+    "status": "CHECK_REQUIRED",
+    "identifier": "Mixed / contributor-specific; PubChem-generated data unrestricted",
+    "commercialUse": "CONDITIONAL",
+    "attributionRequired": null,
+    "shareAlike": null,
+    "scope": "PubChem states that PubChem-generated information and participant-provided information are made available without cost and without restriction through the archive, while also warning that some contributed information may be copyrighted. PubChem aggregates data from many contributors whose current source-specific licenses can differ, including restrictions on commercial use or derivative redistribution. Panacea must therefore retain contributor-level provenance and evaluate the applicable source license for any reused annotation/content beyond PubChem-generated normalized structure data.",
+    "verificationUrl": "https://pubchem.ncbi.nlm.nih.gov/docs/downloads",
+    "verifiedAt": "2026-09-08",
+    "notes": "Do not treat the entire PubChem corpus as if it had one universal license. Before redistributing source annotations, images, vendor records or third-party classifications, inspect the PubChem source record and applicable contributor license. Preserve source URLs and attribution where required."
+  },
+  "validation": {
+    "level": "REFERENCE",
+    "clinicalDecisionUse": "CONTEXT_ONLY",
+    "notes": "PubChem chemical identifiers, structures, computed properties and assay records support molecular research/education. A CID/SID/AID, synonym match, predicted conformer or bioassay result is not equivalent to a clinically validated drug identity, approved indication, dose, interaction conclusion or patient-specific treatment recommendation. RxNorm remains the medication-normalization source and DailyMed remains the U.S. SPL label source."
+  },
+  "provenance": {
+    "authority": "U.S. National Library of Medicine (NLM) PubChem plus identified data contributors",
+    "sourceIdentityRequired": true,
+    "versionPinRequired": true,
+    "notes": "Persist PubChem CID/SID/AID as applicable, record creation/modification dates when used, canonical/isomeric structure identifiers, contributor/source name and source URL for annotations, and retrieval date/API route. Keep PubChem-generated normalized compound data distinct from contributor-provided claims. Preserve the original query/input used to resolve a chemical entity."
+  },
+  "adapter": {
+    "status": "PLANNED",
+    "normalizedTarget": "PanaceaChemicalEntity",
+    "module": null,
+    "notes": "Planned flow: chemical name/SMILES/InChI/InChIKey/CID -> exact PUG REST lookup -> optional identity/similarity/substructure search with explicit method and threshold -> PanaceaChemicalEntity retaining original input + CID/SID links + canonical identifiers + molecular properties + source provenance. Enforce <=5 requests/second with cache/deduplication and resilient handling of 503/throttling. Never silently convert a PubChem synonym match into an RxNorm medication identity. Bioassay and pathway annotations must retain contributor/source evidence and licensing metadata."
+  },
+  "trust": {
+    "authority": 5,
+    "evidenceQuality": 4,
+    "recency": 5,
+    "licenseClarity": 3,
+    "reproducibility": 5,
+    "notes": "High-authority NLM molecular archive with strong stable identifiers and programmatic access. Evidence quality varies by record/source and experimental context. License clarity is intentionally reduced because PubChem integrates many third-party contributors with heterogeneous terms."
+  }
+}

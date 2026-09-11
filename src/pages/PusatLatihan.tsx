@@ -1,4 +1,4 @@
-import { lazy, useMemo } from 'react'
+import { lazy, useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { HalamanTab, type TabDef } from '../components/HalamanTab'
 import { NADA, type Angka } from '../components/PanelAngka'
@@ -10,6 +10,7 @@ import { auditKebugaran, auditKelelahan, auditKesegaran, bacaanJujur, type Bahan
 import { IconRun } from '../components/icons'
 import { getWorkouts } from '../lib/workoutStore'
 import { getVitals } from '../lib/healthVitals'
+import { getDemoTersimpan } from '../lib/profile'
 import { statusSingkat } from '../lib/pelatih'
 import { upayaRelatif } from '../lib/analisisPro'
 import { hrMaxFromAge } from '../lib/workoutImport'
@@ -18,11 +19,12 @@ import { hrMaxFromAge } from '../lib/workoutImport'
 // 1) what should I do today, 2) what does the data say, 3) what physiology
 // explains it, 4) what exercise / plan should I choose.
 const WorkoutHistory = lazy(() => import('./WorkoutHistory').then((m) => ({ default: m.WorkoutHistory })))
+const GpsTracker = lazy(() => import('../components/GpsTracker').then((m) => ({ default: m.GpsTracker })))
 const AthleteScience = lazy(() => import('./AthleteScience').then((m) => ({ default: m.AthleteScience })))
 const AnalisisPro = lazy(() => import('./AnalisisPro').then((m) => ({ default: m.AnalisisPro })))
 const TrainingPhysiology = lazy(() => import('./TrainingPhysiology').then((m) => ({ default: m.TrainingPhysiology })))
 const EnduranceTools = lazy(() => import('./EnduranceTools').then((m) => ({ default: m.EnduranceTools })))
-const Workout = lazy(() => import('./Workout').then((m) => ({ default: m.Workout })))
+const Workout = lazy(() => import('./WorkoutSafe').then((m) => ({ default: m.WorkoutSafe })))
 const LatihanBeban = lazy(() => import('./LatihanBeban').then((m) => ({ default: m.LatihanBeban })))
 const Kalistenik = lazy(() => import('./Kalistenik').then((m) => ({ default: m.Kalistenik })))
 const CrossFit = lazy(() => import('./CrossFit').then((m) => ({ default: m.CrossFit })))
@@ -43,6 +45,8 @@ const Rekomposisi = lazy(() => import('./Rekomposisi').then((m) => ({ default: m
 const TABS: TabDef[] = [
   { id: 'pelatih', label: 'Today', emoji: '🎯', komponen: WorkoutHistory,
     ringkas: 'Decision first: next session, recovery context, recent history and targets' },
+  { id: 'gps', label: 'GPS', emoji: '📍', komponen: GpsTracker,
+    ringkas: 'Live device GPS with fix quality control, auto-pause, moving pace, kilometre splits and privacy-first sharing' },
   { id: 'athlete-science', label: 'Athlete Science', emoji: '🧬', komponen: AthleteScience,
     ringkas: 'VO₂, HRV, load and recovery with assumptions, confidence and physiological context' },
   { id: 'analisis', label: 'Analysis', emoji: '📈', komponen: AnalisisPro,
@@ -87,68 +91,115 @@ const TABS: TabDef[] = [
     ringkas: 'Fat loss and muscle gain with explicit assumptions' },
 ]
 
+type Sex = 'M' | 'F'
+
+function angkaPositif(value: unknown): value is number {
+  return typeof value === 'number' && Number.isFinite(value) && value > 0
+}
+
+function sexValid(value: unknown): value is Sex {
+  return value === 'M' || value === 'F'
+}
+
+function umurValid(value: unknown): value is number {
+  return typeof value === 'number' && Number.isFinite(value) && value >= 10 && value <= 100
+}
+
 export function PusatLatihan() {
-  const angka = useMemo<Angka[]>(() => {
-    const w = getWorkouts()
-    if (!w.length) return []
-    const v = getVitals()
-    const teramati = w.reduce((a, x) => Math.max(a, x.maxHr ?? 0), 0)
-    const sex = (v.sex === 'F' ? 'F' : 'M') as 'M' | 'F'
-    const k = {
-      hrMax: Math.max(teramati, hrMaxFromAge(30, sex)),
-      hrRest: typeof v.restingHr === 'number' && v.restingHr > 0 ? v.restingHr : 60,
-      sex,
+  // workoutStore dan healthVitals sudah menyiarkan event ini setelah data lokal
+  // berubah. Tanpa subscription, useMemo([]) membuat Training Lab membeku pada
+  // snapshot saat mount dan angka tetap lama setelah import/sync sampai reload.
+  const [dataRevision, setDataRevision] = useState(0)
+  useEffect(() => {
+    const refresh = () => setDataRevision((value) => value + 1)
+    window.addEventListener('panacea:health-updated', refresh)
+    window.addEventListener('storage', refresh)
+    window.addEventListener('focus', refresh)
+    return () => {
+      window.removeEventListener('panacea:health-updated', refresh)
+      window.removeEventListener('storage', refresh)
+      window.removeEventListener('focus', refresh)
     }
-    const st = statusSingkat(w, k)
-    if (!st) return []
+  }, [])
+
+  const snapshot = useMemo(() => {
+    const workouts = getWorkouts()
+    if (!workouts.length) {
+      return { workouts, k: null, status: null, missing: [] as string[], hrMaxSource: '' }
+    }
+
+    const vitals = getVitals()
+    const demo = getDemoTersimpan()
+    const observedMax = workouts.reduce((highest, workout) => Math.max(highest, workout.maxHr ?? 0), 0)
+    const sex = sexValid(vitals.sex) ? vitals.sex : sexValid(demo.sex) ? demo.sex : null
+    const age = umurValid(demo.age) ? demo.age : null
+    const predictedMax = sex && age != null ? hrMaxFromAge(age, sex) : 0
+    const hrMax = Math.max(observedMax, predictedMax)
+    const hrRest = angkaPositif(vitals.restingHr)
+      ? vitals.restingHr
+      : angkaPositif(demo.restingHr) ? demo.restingHr : 0
+
+    const missing: string[] = []
+    if (!sex) missing.push('sex in Health Profile')
+    if (!(hrMax > 0)) missing.push('measured peak HR or saved age')
+    if (!(hrRest > 0)) missing.push('resting heart rate')
+
+    if (missing.length || !sex) {
+      return { workouts, k: null, status: null, missing, hrMaxSource: '' }
+    }
+
+    const k = { hrMax, hrRest, sex }
+    const status = statusSingkat(workouts, k)
+    const hrMaxSource = observedMax >= predictedMax && observedMax > 0
+      ? 'highest observed workout HR'
+      : age != null ? `age estimate (${age} y)` : 'observed workout HR'
+    return { workouts, k, status, missing, hrMaxSource }
+  }, [dataRevision])
+
+  const angka = useMemo<Angka[]>(() => {
+    const { workouts, k, status } = snapshot
+    if (!workouts.length || !k || !status) return []
     const deret = Array.from({ length: 14 }, (_, i) => {
-      const x = statusSingkat(w, k, Date.now() - (13 - i) * 86400_000)
+      const x = statusSingkat(workouts, k, Date.now() - (13 - i) * 86400_000)
       return x ? x.kesegaran : 0
     })
     return [
-      { label: 'Freshness', nilai: String(Math.round(st.kesegaran)),
-        nada: st.kesegaran >= -10 ? NADA.baik : NADA.perhatian, deret },
-      { label: 'Fitness trend', nilai: String(Math.round(st.kebugaran)), nada: NADA.biru },
-      { label: 'Fatigue load', nilai: String(Math.round(st.kelelahan)), nada: NADA.jantung },
-      { label: 'Sessions', nilai: String(w.length), satuan: 'recorded', nada: NADA.netral },
+      { label: 'Freshness', nilai: String(Math.round(status.kesegaran)),
+        nada: status.kesegaran >= -10 ? NADA.baik : NADA.perhatian, deret },
+      { label: 'Fitness trend', nilai: String(Math.round(status.kebugaran)), nada: NADA.biru },
+      { label: 'Fatigue load', nilai: String(Math.round(status.kelelahan)), nada: NADA.jantung },
+      { label: 'Sessions', nilai: String(workouts.length), satuan: 'recorded', nada: NADA.netral },
     ]
-  }, [])
+  }, [snapshot])
 
   const audit = useMemo(() => {
-    const w = getWorkouts()
-    if (!w.length) return null
-    const v = getVitals()
-    const teramati = w.reduce((a, x) => Math.max(a, x.maxHr ?? 0), 0)
-    const sex = (v.sex === 'F' ? 'F' : 'M') as 'M' | 'F'
-    const hrMax = Math.max(teramati, hrMaxFromAge(30, sex))
-    const hrIstirahat = typeof v.restingHr === 'number' && v.restingHr > 0 ? v.restingHr : 60
-    const st = statusSingkat(w, { hrMax, hrRest: hrIstirahat, sex })
-    if (!st) return null
+    const { workouts, k, status } = snapshot
+    if (!workouts.length || !k || !status) return null
 
-    const waktu = w.map((x) => Date.parse(x.mulai)).filter((t) => !Number.isNaN(t))
+    const waktu = workouts.map((x) => Date.parse(x.mulai)).filter((t) => !Number.isNaN(t))
     const rentangHari = waktu.length
       ? Math.max(1, Math.round((Date.now() - Math.min(...waktu)) / 86400_000))
       : 0
     const hariIni = new Date().toDateString()
-    const upayaHariIni = w
+    const upayaHariIni = workouts
       .filter((x) => new Date(Date.parse(x.mulai)).toDateString() === hariIni)
-      .reduce((a, x) => a + upayaRelatif(x, { hrMax, hrRest: hrIstirahat, sex }).skor, 0)
+      .reduce((a, x) => a + upayaRelatif(x, k).skor, 0)
 
     return {
       bahan: {
-        kebugaran: st.kebugaran,
-        kelelahan: st.kelelahan,
-        kesegaran: st.kesegaran,
-        jumlahSesi: w.length,
+        kebugaran: status.kebugaran,
+        kelelahan: status.kelelahan,
+        kesegaran: status.kesegaran,
+        jumlahSesi: workouts.length,
         rentangHari,
-        hrMax,
-        hrIstirahat,
+        hrMax: k.hrMax,
+        hrIstirahat: k.hrRest,
         upayaHariIni,
       } satisfies BahanAudit,
-      riwayat: w,
-      k: { hrMax, hrRest: hrIstirahat, sex },
+      riwayat: workouts,
+      k,
     }
-  }, [])
+  }, [snapshot])
 
   return (
     <HalamanTab
@@ -160,6 +211,11 @@ export function PusatLatihan() {
         <div className="space-y-3">
           <FightHero tag="Human Performance" title="Training Lab" motto="Measure. Interpret. Adapt." />
           <MetalStatPanel angka={angka} />
+          {snapshot.workouts.length > 0 && !snapshot.k && snapshot.missing.length > 0 && (
+            <p className="rounded-2xl border border-amber-400/25 bg-amber-500/10 p-3 text-[12px] leading-relaxed text-amber-800 dark:text-amber-200">
+              Training-load model paused rather than inventing profile values. Add {snapshot.missing.join(', ')}; your recorded sessions remain available below.
+            </p>
+          )}
           <div className="grid gap-2 sm:grid-cols-3">
             <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-3">
               <div className="text-[10px] font-black uppercase tracking-[0.16em] text-neutral-500">1 · Decision</div>
@@ -183,7 +239,7 @@ export function PusatLatihan() {
             <section className="space-y-3">
               <h2 className="text-[13px] font-black text-ink dark:text-white">Model audit & uncertainty</h2>
               <p className="rounded-2xl border border-white/10 bg-white/[0.03] p-3 text-[12px] leading-relaxed text-neutral-500">
-                Fitness, fatigue and freshness are model outputs, not direct biological measurements. Interpret trends within the same athlete and verify them against symptoms, sleep, session RPE and actual performance.
+                Fitness, fatigue and freshness are model outputs, not direct biological measurements. HRmax input: {audit.k.hrMax} bpm ({snapshot.hrMaxSource}); resting HR: {audit.k.hrRest} bpm. Interpret trends within the same athlete and verify them against symptoms, sleep, session RPE and actual performance.
               </p>
               {bacaanJujur(audit.bahan) && (
                 <p className="rounded-2xl border-l-4 border-amber-400 bg-amber-50/70 p-3 text-[12px] leading-relaxed text-amber-900 dark:bg-amber-500/10 dark:text-amber-200">

@@ -1,0 +1,52 @@
+{
+  "id": "who_icd11",
+  "name": "WHO ICD-11",
+  "category": "terminology",
+  "kind": ["api", "standard", "terminology-server"],
+  "homepage": "https://icd.who.int/",
+  "repository": null,
+  "features": ["diagnosis-coding", "clinical-intelligence", "disease-directory", "epidemiology", "healthcare-infrastructure", "fhir-terminology"],
+  "formats": ["json", "json-ld", "http-rest", "fhir-prerelease"],
+  "usage": {
+    "runtime": true,
+    "buildTime": false,
+    "networkRequired": true,
+    "notes": "Panacea uses the official WHO ICD API v2 from the backend when WHO OAuth2 client credentials are configured. The active adapter pins ICD-11 MMS release 2026-01 so classification content does not change silently. Credentials stay server-side and are never embedded in browser code."
+  },
+  "license": {
+    "status": "VERIFIED",
+    "identifier": "CC-BY-ND-3.0-IGO",
+    "commercialUse": "CONDITIONAL",
+    "attributionRequired": true,
+    "shareAlike": false,
+    "scope": "WHO licenses the digital ICD-11 classification under CC BY-ND 3.0 IGO for commercial and non-commercial use when appropriately cited and not adapted. The license has specific conditions: Panacea must preserve ICD codes/URIs and must not publish an altered classification as ICD-11. Mappings or crosswalks between ICD-11 and other classifications or terminologies are not automatically covered by this license and may require a separate written agreement with WHO.",
+    "verificationUrl": "https://icd.who.int/en/docs/icd11-license.pdf",
+    "verifiedAt": "2026-09-08",
+    "notes": "Do not modify WHO classification content in place. Panacea-specific annotations must be clearly separate from WHO-authored fields. Do not assume permission for generated ICD↔SNOMED or other crosswalk products without checking WHO mapping terms."
+  },
+  "validation": {
+    "level": "REFERENCE",
+    "clinicalDecisionUse": "CONTEXT_ONLY",
+    "notes": "ICD-11 is an authoritative classification/coding standard. A valid code does not by itself prove a patient diagnosis or treatment recommendation; diagnostic reasoning and clinical application require independent clinical evidence and validation."
+  },
+  "provenance": {
+    "authority": "World Health Organization (WHO)",
+    "sourceIdentityRequired": true,
+    "versionPinRequired": true,
+    "notes": "Record API major version, ICD release id, language, Foundation URI and/or MMS linearization URI/code. Do not collapse Foundation entities and MMS codes into one identifier because they represent different layers of ICD-11. The active adapter explicitly pins 2026-01, which WHO currently lists as the latest MMS release."
+  },
+  "adapter": {
+    "status": "ACTIVE",
+    "normalizedTarget": "IcdEntry",
+    "module": "server/src/icd11.ts",
+    "notes": "Implemented flow: backend OAuth2 client-credentials -> WHO ICD API v2 -> pinned 2026-01 MMS search/entity response -> IcdEntry with source marker `icd11`, code/title and WHO URI when available. If WHO credentials are absent, or WHO search fails to return usable results, the same module can fall back to the separately registered NLM ICD-10-CM source; fallback results always carry `sumber: icd10cm` and must never be presented as ICD-11. WHO FHIR support remains outside this adapter's primary production path."
+  },
+  "trust": {
+    "authority": 5,
+    "evidenceQuality": 4,
+    "recency": 5,
+    "licenseClarity": 4,
+    "reproducibility": 5,
+    "notes": "High authority as a WHO classification standard. EvidenceQuality reflects classification authority, not proof that a code is clinically correct for an individual patient. LicenseClarity is reduced because no-derivatives and mapping/crosswalk rules require use-case-specific care."
+  }
+}

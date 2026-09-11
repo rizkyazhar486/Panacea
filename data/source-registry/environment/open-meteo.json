@@ -1,0 +1,49 @@
+{
+  "id": "open_meteo",
+  "name": "Open-Meteo Weather & Air Quality APIs",
+  "category": "environment",
+  "kind": ["api", "dataset"],
+  "homepage": "https://open-meteo.com/",
+  "repository": "https://github.com/open-meteo/open-meteo",
+  "features": [
+    "environment-air-quality",
+    "environment-uv-weather",
+    "outdoor-training-context",
+    "circadian-sunrise-sunset"
+  ],
+  "formats": ["json"],
+  "usage": {
+    "runtime": true,
+    "buildTime": false,
+    "networkRequired": true,
+    "notes": "Panacea currently calls the public Open-Meteo air-quality and forecast endpoints through server/src/lingkungan.ts using a selected city centre rather than a user's precise home/GPS coordinates. React components must not call Open-Meteo directly. The public free endpoint is appropriate for non-commercial evaluation only; a commercial Panacea deployment must use an Open-Meteo commercial API plan/customer endpoint or another contractually compatible source before treating this integration as production-commercial-safe."
+  },
+  "license": {
+    "status": "VERIFIED",
+    "identifier": "CC BY 4.0 data; service tier terms apply",
+    "commercialUse": "CONDITIONAL",
+    "attributionRequired": true,
+    "shareAlike": false,
+    "scope": "Open-Meteo states that API data are provided under CC BY 4.0 with attribution. Service access is a separate boundary: the free API is restricted to non-commercial use, while commercial use requires an applicable paid API subscription/customer endpoint. Upstream weather and air-quality products can carry additional source-specific acknowledgement requirements.",
+    "verificationUrl": "https://open-meteo.com/en/terms",
+    "verifiedAt": "2026-09-08",
+    "notes": "Do not equate the CC BY 4.0 data licence with permission to use the free service tier commercially. Keep visible Open-Meteo attribution wherever its data are displayed, and preserve any upstream attribution required for specific datasets used by the selected API product."
+  },
+  "validation": {
+    "level": "REFERENCE",
+    "clinicalDecisionUse": "CONTEXT_ONLY",
+    "notes": "AQI, particulate matter, UV, temperature, apparent temperature, humidity and sunrise/sunset are environmental context. They are not patient-specific measurements, diagnostic evidence, emergency alerts or a substitute for local public-health authorities. The adapter intentionally returns an error/empty state rather than fabricated fallback values when upstream data are unavailable."
+  },
+  "provenance": {
+    "authority": "OpenMeteo GmbH API aggregating open meteorological and air-quality data from named upstream providers",
+    "sourceIdentityRequired": true,
+    "versionPinRequired": false,
+    "notes": "Runtime displays must retain Open-Meteo as the source. Because upstream models/providers can vary by product and location, downstream scientific claims should not imply a fixed measurement station, model or spatial resolution unless that metadata is explicitly captured."
+  },
+  "adapter": {
+    "status": "ACTIVE",
+    "normalizedTarget": "Lingkungan",
+    "module": "server/src/lingkungan.ts",
+    "notes": "The current backend adapter requests city-centre environmental context, caches successful results for one hour and fails closed when no useful upstream values are returned. A future commercial deployment must configure a contractually compatible endpoint rather than silently continuing to use the free non-commercial service tier."
+  }
+}

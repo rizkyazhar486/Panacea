@@ -115,13 +115,15 @@ function sampleBpm(s: Record<string, unknown>): number | undefined {
 }
 
 function series(raw: unknown, t0: number): HrPoint[] {
-  if (!Array.isArray(raw)) return []
+  if (!Array.isArray(raw) || !Number.isFinite(t0)) return []
   const out: HrPoint[] = []
   for (const s of raw as Record<string, unknown>[]) {
     const bpm = sampleBpm(s)
     const t = parseHaeDate(s?.date)
-    if (bpm == null || bpm <= 0) continue
-    out.push({ t: Number.isNaN(t) ? out.length * 60 : Math.round((t - t0) / 1000), bpm: Math.round(bpm) })
+    if (bpm == null || bpm <= 0 || Number.isNaN(t)) continue
+    const relatif = Math.round((t - t0) / 1000)
+    if (!Number.isFinite(relatif) || relatif < 0) continue
+    out.push({ t: relatif, bpm: Math.round(bpm) })
   }
   return out.sort((a, b) => a.t - b.t)
 }
@@ -129,7 +131,7 @@ function series(raw: unknown, t0: number): HrPoint[] {
 /** Energi datang dalam kJ pada sebagian besar ekspor; jadikan kkal. */
 function toKcal(v: unknown, units?: unknown): number | undefined {
   const n = qty(v)
-  if (n == null) return undefined
+  if (n == null || n < 0) return undefined
   const u = typeof units === 'string' ? units.toLowerCase() : ''
   const uu = u || (v && typeof v === 'object' ? String((v as { units?: unknown }).units ?? '').toLowerCase() : '')
   return Math.round(uu.startsWith('kj') ? n / 4.184 : n)
@@ -150,48 +152,71 @@ export function parseWorkouts(text: string): ImportedWorkout[] {
     const t1 = parseHaeDate(w?.end)
     if (Number.isNaN(t0)) continue
 
+    const akhirValid = !Number.isNaN(t1) && t1 >= t0
     const hr = series(w?.heartRateData, t0)
-    const pemulihan = series(w?.heartRateRecovery, Number.isNaN(t1) ? t0 : t1)
+    // Recovery hanya punya makna relatif terhadap akhir sesi yang benar-benar
+    // terekam. Tanpa end timestamp valid, jangan mengarang anchor recovery.
+    const pemulihan = akhirValid ? series(w?.heartRateRecovery, t1) : []
 
-    const durasi = typeof w?.duration === 'number' && w.duration > 0
-      ? w.duration
-      : Number.isNaN(t1) ? 0 : (t1 - t0) / 1000
+    const durasiTerekam = qty(w?.duration)
+    const durasiTurunan = akhirValid ? (t1 - t0) / 1000 : 0
+    const durasi = durasiTerekam != null && durasiTerekam > 0
+      ? durasiTerekam
+      : durasiTurunan > 0 ? durasiTurunan : 0
 
-    const jarakKm = qty(w?.distance) ?? qty(w?.walkingAndRunningDistance)
-    const kecepatanKmh = qty(w?.speed) ?? (jarakKm && durasi > 0 ? (jarakKm / (durasi / 3600)) : undefined)
+    const jarakMentah = qty(w?.distance) ?? qty(w?.walkingAndRunningDistance)
+    const jarakKm = jarakMentah != null && jarakMentah > 0 ? jarakMentah : undefined
+    const speedMentah = qty(w?.speed)
+    const kecepatanKmh = speedMentah != null && speedMentah > 0
+      ? speedMentah
+      : jarakKm && durasi > 0 ? (jarakKm / (durasi / 3600)) : undefined
 
-    // Penurunan satu menit pertama sesudah sesi berakhir — dihitung dari deret
-    // nyata, bukan dari angka ringkas yang tidak jelas diambil kapan.
+    // HRR1 hanya bermakna bila ekspor benar-benar merekam sampel dekat menit
+    // pertama. Pilih titik 45-75 detik yang paling dekat ke 60 detik; jangan
+    // mengganti titik yang hilang dengan sampel 10 detik atau beberapa menit
+    // kemudian karena itu akan memberi label "1-minute" pada waktu yang salah.
     let hrr1: number | undefined
     const last = <T,>(a: T[]): T | undefined => (a.length ? a[a.length - 1] : undefined)
     const akhir = last(hr)?.bpm
     if (akhir != null && pemulihan.length) {
-      const dalam60 = pemulihan.filter((p) => p.t <= 60)
-      const titik = last(dalam60.length ? dalam60 : pemulihan)
+      const sekitarMenit = pemulihan
+        .filter((p) => p.t >= 45 && p.t <= 75)
+        .sort((a, b) => Math.abs(a.t - 60) - Math.abs(b.t - 60))
+      const titik = sekitarMenit[0]
       if (titik) {
-        const puncakPemulihan = pemulihan[0]?.bpm ?? akhir
-        const d = Math.max(akhir, puncakPemulihan) - titik.bpm
+        const puncakAwal = pemulihan.find((p) => p.t >= 0 && p.t <= 15)?.bpm
+        const dasar = Math.max(akhir, puncakAwal ?? akhir)
+        const d = dasar - titik.bpm
         if (d > 0) hrr1 = Math.round(d)
       }
     }
 
+    const avgHrMentah = qty(w?.avgHeartRate)
+    const maxHrMentah = qty(w?.maxHeartRate)
+    const cadenceMentah = qty(w?.stepCadence)
+    const stepCountMentah = qty(w?.stepCount)
+    const langkah = Array.isArray(w?.stepCount)
+      ? Math.round((w.stepCount as Record<string, unknown>[]).reduce((a, s) => {
+          const n = qty(s?.qty)
+          return a + (n != null && n >= 0 ? n : 0)
+        }, 0))
+      : stepCountMentah != null && stepCountMentah >= 0 ? Math.round(stepCountMentah) : undefined
+
     out.push({
-      id: typeof w?.id === 'string' ? w.id : `${w?.name ?? 'workout'}-${t0}`,
-      nama: typeof w?.name === 'string' ? w.name : 'Latihan',
+      id: typeof w?.id === 'string' && w.id.trim() ? w.id : `${w?.name ?? 'workout'}-${t0}`,
+      nama: typeof w?.name === 'string' && w.name.trim() ? w.name : 'Latihan',
       mulai: new Date(t0).toISOString(),
-      selesai: Number.isNaN(t1) ? new Date(t0 + durasi * 1000).toISOString() : new Date(t1).toISOString(),
+      selesai: akhirValid ? new Date(t1).toISOString() : new Date(t0 + durasi * 1000).toISOString(),
       durasi: Math.round(durasi),
       jarakKm: jarakKm != null ? +jarakKm.toFixed(2) : undefined,
       kcal: toKcal(w?.activeEnergyBurned) ?? toKcal(w?.totalEnergy),
-      avgHr: qty(w?.avgHeartRate) != null ? Math.round(qty(w?.avgHeartRate)!) : undefined,
-      maxHr: qty(w?.maxHeartRate) != null ? Math.round(qty(w?.maxHeartRate)!) : undefined,
+      avgHr: avgHrMentah != null && avgHrMentah > 0 ? Math.round(avgHrMentah) : undefined,
+      maxHr: maxHrMentah != null && maxHrMentah > 0 ? Math.round(maxHrMentah) : undefined,
       minHr: hr.length ? Math.min(...hr.map((p) => p.bpm)) : undefined,
       kecepatanKmh: kecepatanKmh != null ? +kecepatanKmh.toFixed(2) : undefined,
       paceSec: kecepatanKmh && kecepatanKmh > 0 ? Math.round(3600 / kecepatanKmh) : undefined,
-      kadens: qty(w?.stepCadence) != null ? Math.round(qty(w?.stepCadence)!) : undefined,
-      langkah: Array.isArray(w?.stepCount)
-        ? Math.round((w.stepCount as Record<string, unknown>[]).reduce((a, s) => a + (qty(s?.qty) ?? 0), 0))
-        : qty(w?.stepCount) != null ? Math.round(qty(w?.stepCount)!) : undefined,
+      kadens: cadenceMentah != null && cadenceMentah > 0 ? Math.round(cadenceMentah) : undefined,
+      langkah,
       diDalamRuangan: typeof w?.isIndoor === 'boolean' ? w.isIndoor : undefined,
       hr,
       pemulihan,
@@ -226,16 +251,32 @@ const ZONA: { zona: 1 | 2 | 3 | 4 | 5; nama: string; dariPct: number; hinggaPct:
  * mirip, padahal tuntutan pemulihannya berbeda jauh.
  */
 export function zoneBreakdown(hr: HrPoint[], hrMax: number): ZoneSlice[] {
-  if (!hr.length || !(hrMax > 0)) return []
-  // Tiap sampel mewakili jarak waktu ke sampel berikutnya.
-  const durasiSampel: number[] = hr.map((p, i) =>
-    i < hr.length - 1 ? Math.max(0, hr[i + 1].t - p.t) : (hr.length > 1 ? hr[hr.length - 1].t - hr[hr.length - 2].t : 60),
+  if (!Array.isArray(hr) || !Number.isFinite(hrMax) || hrMax <= 0) return []
+
+  // Runtime JSON/local cache tidak mendapat perlindungan TypeScript. Bersihkan
+  // titik satu per satu dan urutkan salinan supaya pemanggil tidak termutasi.
+  const aman = hr
+    .filter((p): p is HrPoint => Boolean(p) && Number.isFinite(p.t) && p.t >= 0 && Number.isFinite(p.bpm) && p.bpm > 0)
+    .slice()
+    .sort((a, b) => a.t - b.t)
+  if (!aman.length) return []
+
+  // Tiap sampel mewakili jarak waktu ke sampel berikutnya. Untuk sampel
+  // terakhir pertahankan semantik lama: gunakan interval sebelumnya, atau
+  // 60 detik bila hanya ada satu titik.
+  const durasiSampel: number[] = aman.map((p, i) =>
+    i < aman.length - 1
+      ? Math.max(0, aman[i + 1].t - p.t)
+      : aman.length > 1
+        ? Math.max(0, aman[aman.length - 1].t - aman[aman.length - 2].t)
+        : 60,
   )
-  const totalDetik = durasiSampel.reduce((a, b) => a + b, 0) || 1
+  const totalDetik = durasiSampel.reduce((a, b) => a + b, 0)
+  if (!(totalDetik > 0) || !Number.isFinite(totalDetik)) return []
 
   return ZONA.map((z) => {
     let detik = 0
-    hr.forEach((p, i) => {
+    aman.forEach((p, i) => {
       const pct = (p.bpm / hrMax) * 100
       if (pct >= z.dariPct && pct < z.hinggaPct) detik += durasiSampel[i]
     })
@@ -263,6 +304,9 @@ export function parseHrNotifications(text: string): HrNotification[] {
 
   const out: HrNotification[] = []
   for (const n of raw as Record<string, unknown>[]) {
+    const mulaiTs = parseHaeDate(n?.start)
+    if (Number.isNaN(mulaiTs)) continue
+
     const kind = typeof n?.heartNotification === 'string' ? n.heartNotification.toLowerCase() : ''
     const jenis: HrNotification['jenis'] =
       kind.includes('high') ? 'tinggi'
@@ -275,12 +319,15 @@ export function parseHrNotifications(text: string): HrNotification[] {
 
     const samples = Array.isArray(n?.heartRateData) ? (n.heartRateData as Record<string, unknown>[]) : []
     const bpms = samples.map((s) => sampleBpm(s)).filter((v): v is number => v != null && v > 0)
+    const ambang = typeof n?.threshold === 'number' && Number.isFinite(n.threshold) && n.threshold > 0
+      ? n.threshold
+      : undefined
 
     out.push({
       jenis,
       label,
-      mulai: (() => { const t = parseHaeDate(n?.start); return Number.isNaN(t) ? '' : new Date(t).toISOString() })(),
-      ambang: typeof n?.threshold === 'number' ? n.threshold : undefined,
+      mulai: new Date(mulaiTs).toISOString(),
+      ambang,
       puncakBpm: bpms.length ? Math.max(...bpms) : undefined,
       sampel: bpms.length,
     })
@@ -329,14 +376,43 @@ export interface WeeklySummary {
 }
 
 export function summarise(workouts: ImportedWorkout[], hrMax: number): WeeklySummary {
-  const totalDetik = workouts.reduce((a, w) => a + w.durasi, 0)
-  const totalKm = workouts.reduce((a, w) => a + (w.jarakKm ?? 0), 0)
-  const totalKcal = workouts.reduce((a, w) => a + (w.kcal ?? 0), 0)
+  const nonNegatif = (v: unknown): number =>
+    typeof v === 'number' && Number.isFinite(v) && v >= 0 ? v : 0
+  const positif = (v: unknown): number =>
+    typeof v === 'number' && Number.isFinite(v) && v > 0 ? v : 0
 
+  let totalDetik = 0
+  let totalKm = 0
+  let totalKcal = 0
+  let durasiBerjarak = 0
+  let jarakBerpace = 0
   let mudahDetik = 0
   let berzonaDetik = 0
+  const hrMaxAman = Number.isFinite(hrMax) && hrMax > 0 ? hrMax : 0
+
   for (const w of workouts) {
-    const slices = zoneBreakdown(w.hr, hrMax)
+    const durasi = nonNegatif(w?.durasi)
+    const jarak = positif(w?.jarakKm)
+    const kcal = nonNegatif(w?.kcal)
+
+    totalDetik += durasi
+    totalKm += jarak
+    totalKcal += kcal
+
+    // Pace agregat hanya memakai sesi yang memiliki pasangan jarak + durasi
+    // valid. Sesi strength/non-distance tidak boleh memperlambat pace mingguan.
+    if (durasi > 0 && jarak > 0) {
+      durasiBerjarak += durasi
+      jarakBerpace += jarak
+    }
+
+    const hrAman = Array.isArray(w?.hr)
+      ? w.hr
+          .filter((p): p is HrPoint => Boolean(p) && Number.isFinite(p.t) && p.t >= 0 && Number.isFinite(p.bpm) && p.bpm > 0)
+          .slice()
+          .sort((a, b) => a.t - b.t)
+      : []
+    const slices = zoneBreakdown(hrAman, hrMaxAman)
     for (const s of slices) {
       const d = s.menit * 60
       berzonaDetik += d
@@ -349,19 +425,25 @@ export function summarise(workouts: ImportedWorkout[], hrMax: number): WeeklySum
     totalMenit: Math.round(totalDetik / 60),
     totalKm: +totalKm.toFixed(2),
     totalKcal: Math.round(totalKcal),
-    rerataPaceSec: totalKm > 0 ? Math.round(totalDetik / totalKm) : undefined,
+    rerataPaceSec: jarakBerpace > 0 && durasiBerjarak > 0
+      ? Math.round(durasiBerjarak / jarakBerpace)
+      : undefined,
     pctMudah: berzonaDetik > 0 ? Math.round((mudahDetik / berzonaDetik) * 100) : undefined,
   }
 }
 
 export function fmtDurasi(sec: number): string {
-  const h = Math.floor(sec / 3600)
-  const m = Math.round((sec % 3600) / 60)
+  if (!Number.isFinite(sec) || sec < 0) return '—'
+  const totalMenit = Math.round(sec / 60)
+  const h = Math.floor(totalMenit / 60)
+  const m = totalMenit % 60
   return h > 0 ? `${h}j ${m}m` : `${m} menit`
 }
 
 export function fmtPace(sec: number): string {
-  const m = Math.floor(sec / 60)
-  const s = Math.round(sec % 60)
+  if (!Number.isFinite(sec) || sec < 0) return '—'
+  const totalDetik = Math.round(sec)
+  const m = Math.floor(totalDetik / 60)
+  const s = totalDetik % 60
   return `${m}:${String(s).padStart(2, '0')}`
 }

@@ -2,20 +2,16 @@ import { useEffect, useRef, useState } from 'react'
 import * as THREE from 'three'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
 import { tempatkan, cuplikan, RADIUS_SEL, RADIUS_INTI, type Penempatan } from '../lib/cellLayout'
+import { body3dPixelRatio } from '../lib/body3dQuality'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // SEL DALAM TIGA DIMENSI.
 //
-// Yang perlu dikatakan terus terang: ini MODEL, bukan pindaian. Tidak ada
-// berkas mesh sel berlisensi terbuka yang bisa dipakai, jadi bentuknya dibangun
-// dari geometri dasar — dan justru karena itu satu-satunya hal yang membuatnya
-// jujur adalah ANGKANYA. Diameter tiap organel diambil dari ukuran nyata dalam
-// mikrometer, perbandingannya terhadap sel dipertahankan, letaknya dihitung
-// agar tidak menembus inti maupun menonjol keluar membran, dan jumlah yang
-// digambar disebut apa adanya sebagai cuplikan.
-//
-// Sel dipotong terbuka, bukan digambar utuh. Bola utuh hanya memperlihatkan
-// membran, dan seluruh isi yang menjadi pokok bahasan tersembunyi di baliknya.
+// Ini adalah rekonstruksi edukasi berbasis SKALA REFERENSI, bukan segmentasi
+// mikroskopi atau mesh pasien. Primitive dipakai untuk menjelaskan kompartemen
+// dan perbandingan ukuran; karena itu bentuk primitive tidak boleh dibaca
+// sebagai ultrastruktur yang presisi. Angka di cellBio.ts sendiri dinyatakan
+// sebagai perkiraan diameter/panjang tipikal dalam mikrometer.
 // ─────────────────────────────────────────────────────────────────────────────
 
 export interface Cell3DProps {
@@ -45,7 +41,7 @@ function warnaLinear(hex: string): THREE.Color {
   return new THREE.Color().setRGB(n(1), n(3), n(5))
 }
 
-/** Jumlah yang benar-benar digambar — dibatasi oleh apa yang bisa dirender. */
+/** Jumlah referensi yang disampel; bukan jumlah universal untuk setiap tipe sel. */
 export const GAMBAR = {
   mitokondria: { asli: 1500, maks: 60 },
   lisosom: { asli: 300, maks: 26 },
@@ -55,6 +51,7 @@ export const GAMBAR = {
 
 export function Cell3D({ disorot, tinggi = 340, onPilih }: Cell3DProps) {
   const wadahRef = useRef<HTMLDivElement>(null)
+  const requestRenderRef = useRef<(() => void) | null>(null)
   const [gagal, setGagal] = useState('')
   const disorotRef = useRef(disorot)
   disorotRef.current = disorot
@@ -62,8 +59,13 @@ export function Cell3D({ disorot, tinggi = 340, onPilih }: Cell3DProps) {
   onPilihRef.current = onPilih
 
   useEffect(() => {
+    requestRenderRef.current?.()
+  }, [disorot])
+
+  useEffect(() => {
     const wadah = wadahRef.current
     if (!wadah) return
+
     const scene = new THREE.Scene()
     const camera = new THREE.PerspectiveCamera(42, 1, 0.1, 500)
     let renderer: THREE.WebGLRenderer
@@ -73,10 +75,11 @@ export function Cell3D({ disorot, tinggi = 340, onPilih }: Cell3DProps) {
       setGagal('This device could not start 3D graphics (WebGL).')
       return
     }
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
+
     renderer.setClearColor(0x000000, 0)
     renderer.outputColorSpace = THREE.SRGBColorSpace
     renderer.localClippingEnabled = true
+    renderer.domElement.dataset.cellViewer3d = 'true'
     wadah.appendChild(renderer.domElement)
 
     scene.add(new THREE.AmbientLight(0xffffff, 0.85))
@@ -89,23 +92,54 @@ export function Cell3D({ disorot, tinggi = 340, onPilih }: Cell3DProps) {
 
     const controls = new OrbitControls(camera, renderer.domElement)
     controls.enablePan = false
-    controls.enableDamping = true
+    // Tidak ada animasi biologis pada rekonstruksi ini. Damping dimatikan agar
+    // viewer bisa benar-benar render-on-demand, bukan membutuhkan loop 60 fps.
+    controls.enableDamping = false
     controls.minDistance = 14
     controls.maxDistance = 60
 
+    let raf = 0
+    let inViewport = true
+    let documentVisible = !document.hidden
+
+    function stopRendering() {
+      if (!raf) return
+      cancelAnimationFrame(raf)
+      raf = 0
+    }
+
+    function renderFrame() {
+      raf = 0
+      if (!inViewport || !documentVisible) return
+      terapkanSorot()
+      controls.update()
+      renderer.render(scene, camera)
+    }
+
+    function requestRender() {
+      if (raf || !inViewport || !documentVisible) return
+      raf = requestAnimationFrame(renderFrame)
+    }
+    requestRenderRef.current = requestRender
+    controls.addEventListener('change', requestRender)
+
     const ukur = () => {
-      const w = wadah.clientWidth, h = wadah.clientHeight
-      if (!w || !h) return
+      const w = wadah.clientWidth
+      const h = wadah.clientHeight
+      if (w < 2 || h < 2) return
+      const smallViewport = window.matchMedia('(max-width: 640px)').matches
+      const dpr = body3dPixelRatio(w, h, window.devicePixelRatio || 1, smallViewport)
+      if (Math.abs(renderer.getPixelRatio() - dpr) > 0.01) renderer.setPixelRatio(dpr)
       renderer.setSize(w, h)
       camera.aspect = w / h
       camera.updateProjectionMatrix()
+      requestRender()
     }
     ukur()
     const ro = new ResizeObserver(ukur)
     ro.observe(wadah)
 
-    // Bidang potong: separuh sel dibuang supaya isinya terlihat. Sel utuh
-    // hanya memperlihatkan membran, dan seluruh pokok bahasan ada di dalamnya.
+    // Bidang potong: separuh sel dibuang supaya kompartemen internal terlihat.
     const potong = new THREE.Plane(new THREE.Vector3(0, 0, -1), 1.5)
     const grup = new THREE.Group()
     scene.add(grup)
@@ -120,10 +154,12 @@ export function Cell3D({ disorot, tinggi = 340, onPilih }: Cell3DProps) {
     const bahan = (k: string, opsi: Partial<THREE.MeshStandardMaterialParameters> = {}) =>
       new THREE.MeshStandardMaterial({
         color: warnaLinear(WARNA[k] ?? '#999999'),
-        roughness: 0.55, metalness: 0.05, clippingPlanes: [potong], ...opsi,
+        roughness: 0.55,
+        metalness: 0.05,
+        clippingPlanes: [potong],
+        ...opsi,
       })
 
-    // Membran plasma — tembus pandang, dipotong separuh.
     const membran = new THREE.Mesh(
       new THREE.SphereGeometry(RADIUS_SEL, 64, 48),
       bahan('membran', { transparent: true, opacity: 0.16, side: THREE.DoubleSide, depthWrite: false }),
@@ -131,8 +167,10 @@ export function Cell3D({ disorot, tinggi = 340, onPilih }: Cell3DProps) {
     catat('membran', membran)
     grup.add(membran)
 
-    // Inti dan anak inti.
-    const inti = new THREE.Mesh(new THREE.SphereGeometry(RADIUS_INTI, 48, 32), bahan('nukleus', { transparent: true, opacity: 0.85 }))
+    const inti = new THREE.Mesh(
+      new THREE.SphereGeometry(RADIUS_INTI, 48, 32),
+      bahan('nukleus', { transparent: true, opacity: 0.85 }),
+    )
     catat('nukleus', inti)
     grup.add(inti)
     const anakInti = new THREE.Mesh(new THREE.SphereGeometry(0.75, 24, 16), bahan('nukleolus'))
@@ -140,9 +178,8 @@ export function Cell3D({ disorot, tinggi = 340, onPilih }: Cell3DProps) {
     catat('nukleolus', anakInti)
     grup.add(anakInti)
 
-    // Retikulum endoplasma: lembaran terlipat yang MENEMPEL pada selubung inti,
-    // karena memang bersinambungan dengannya — RE yang mengambang bebas adalah
-    // kesalahan yang sering digambar.
+    // ER/Golgi di sini adalah representasi topologis: ia menunjukkan hubungan
+    // kompartemen, bukan meniru ultrastruktur mikroskopi secara literal.
     for (let i = 0; i < 7; i++) {
       const r = RADIUS_INTI + 0.55 + i * 0.42
       const lembar = new THREE.Mesh(
@@ -154,7 +191,6 @@ export function Cell3D({ disorot, tinggi = 340, onPilih }: Cell3DProps) {
       grup.add(lembar)
     }
 
-    // Golgi: tumpukan cakram melengkung, satu sisi cis dan satu sisi trans.
     const golgi = new THREE.Group()
     for (let i = 0; i < 5; i++) {
       const c = new THREE.Mesh(
@@ -171,12 +207,15 @@ export function Cell3D({ disorot, tinggi = 340, onPilih }: Cell3DProps) {
     golgi.traverse((o) => { o.userData.organel = 'golgi' })
     grup.add(golgi)
 
-    // Sitoskeleton: berkas lurus dari dekat inti ke membran.
     for (let i = 0; i < 14; i++) {
       const sudut = (i / 14) * Math.PI * 2
       const miring = (i % 5) * 0.3 - 0.6
       const a = new THREE.Vector3(Math.cos(sudut) * RADIUS_INTI, miring, Math.sin(sudut) * RADIUS_INTI)
-      const b2 = new THREE.Vector3(Math.cos(sudut) * (RADIUS_SEL - 0.3), miring * 2.2, Math.sin(sudut) * (RADIUS_SEL - 0.3))
+      const b2 = new THREE.Vector3(
+        Math.cos(sudut) * (RADIUS_SEL - 0.3),
+        miring * 2.2,
+        Math.sin(sudut) * (RADIUS_SEL - 0.3),
+      )
       const arah = b2.clone().sub(a)
       const batang = new THREE.Mesh(
         new THREE.CylinderGeometry(0.045, 0.045, arah.length(), 6),
@@ -188,7 +227,6 @@ export function Cell3D({ disorot, tinggi = 340, onPilih }: Cell3DProps) {
       grup.add(batang)
     }
 
-    // Organel bertaburan: letaknya dihitung sekali, deterministik.
     const letak = tempatkan([
       { kunci: 'mitokondria', jumlah: GAMBAR.mitokondria.maks, diameterUm: 1 },
       { kunci: 'lisosom', jumlah: GAMBAR.lisosom.maks, diameterUm: 0.5 },
@@ -197,8 +235,6 @@ export function Cell3D({ disorot, tinggi = 340, onPilih }: Cell3DProps) {
     ])
 
     const geometri: Record<string, THREE.BufferGeometry> = {
-      // Mitokondria memanjang, bukan bulat — bentuk itulah yang membuatnya
-      // bisa memanjang, membelah dan menyatu di dalam sel hidup.
       mitokondria: new THREE.CapsuleGeometry(0.28, 0.75, 6, 12),
       lisosom: new THREE.SphereGeometry(0.25, 16, 12),
       peroksisom: new THREE.SphereGeometry(0.25, 16, 12),
@@ -210,7 +246,6 @@ export function Cell3D({ disorot, tinggi = 340, onPilih }: Cell3DProps) {
       d.push(p)
       perKunci.set(p.kunci, d)
     }
-    const instans = new Map<string, THREE.InstancedMesh>()
     for (const [k, daftar] of perKunci) {
       const im = new THREE.InstancedMesh(geometri[k], bahan(k), daftar.length)
       const m = new THREE.Matrix4()
@@ -224,7 +259,6 @@ export function Cell3D({ disorot, tinggi = 340, onPilih }: Cell3DProps) {
       })
       im.instanceMatrix.needsUpdate = true
       im.userData.organel = k
-      instans.set(k, im)
       catat(k, im)
       grup.add(im)
     }
@@ -233,8 +267,6 @@ export function Cell3D({ disorot, tinggi = 340, onPilih }: Cell3DProps) {
     controls.target.set(0, 0, 0)
     controls.update()
 
-    // Menyorot satu organel: yang lain diredupkan, bukan disembunyikan —
-    // organel tanpa tetangganya kehilangan skala, dan skala adalah pokoknya.
     function terapkanSorot() {
       const s = disorotRef.current
       for (const [k, daftar] of perOrganel) {
@@ -248,26 +280,22 @@ export function Cell3D({ disorot, tinggi = 340, onPilih }: Cell3DProps) {
             b.opacity = redup ? Math.min(dasar, 0.12) : dasar
             b.transparent = b.opacity < 0.999
             b.depthWrite = b.opacity >= 0.999
-            b.emissive = new THREE.Color(s === k ? 0x1b5e3a : 0x000000)
+            b.emissive.setHex(s === k ? 0x1b5e3a : 0x000000)
             b.emissiveIntensity = s === k ? 0.55 : 0
-            b.needsUpdate = true
           })
         }
       }
     }
-    terapkanSorot()
 
     const ray = new THREE.Raycaster()
     const titik = new THREE.Vector2()
     function klik(ev: PointerEvent) {
       const kotak = renderer.domElement.getBoundingClientRect()
+      if (kotak.width < 2 || kotak.height < 2) return
       titik.x = ((ev.clientX - kotak.left) / kotak.width) * 2 - 1
       titik.y = -((ev.clientY - kotak.top) / kotak.height) * 2 + 1
       ray.setFromCamera(titik, camera)
       const kena = ray.intersectObjects(grup.children, true)
-      // Membran diabaikan sebagai sasaran klik: ia menyelubungi segalanya,
-      // sehingga setiap klik akan mengenainya lebih dulu dan tidak ada organel
-      // di dalamnya yang pernah bisa dipilih.
       const pertama = kena.find((k) => {
         let o: THREE.Object3D | null = k.object
         while (o && !o.userData.organel) o = o.parent
@@ -279,34 +307,79 @@ export function Cell3D({ disorot, tinggi = 340, onPilih }: Cell3DProps) {
     }
     renderer.domElement.addEventListener('pointerdown', klik)
 
-    let hidup = true
-    let bingkai = 0
-    const putar = () => {
-      if (!hidup) return
-      bingkai = requestAnimationFrame(putar)
-      terapkanSorot()
-      controls.update()
-      renderer.render(scene, camera)
+    const onHilang = (e: Event) => {
+      e.preventDefault()
+      stopRendering()
+      setGagal('The browser dropped the 3D context, usually because memory ran low.')
     }
-    putar()
+    const onPulih = () => {
+      setGagal('')
+      ukur()
+      requestRender()
+    }
+    renderer.domElement.addEventListener('webglcontextlost', onHilang)
+    renderer.domElement.addEventListener('webglcontextrestored', onPulih)
+
+    const io = new IntersectionObserver(
+      ([entry]) => {
+        inViewport = Boolean(entry?.isIntersecting)
+        if (inViewport) requestRender()
+        else stopRendering()
+      },
+      { rootMargin: '128px' },
+    )
+    io.observe(wadah)
+
+    const onVisibility = () => {
+      documentVisible = !document.hidden
+      if (documentVisible) requestRender()
+      else stopRendering()
+    }
+    document.addEventListener('visibilitychange', onVisibility)
+
+    requestRender()
 
     return () => {
-      hidup = false
-      cancelAnimationFrame(bingkai)
-      renderer.domElement.removeEventListener('pointerdown', klik)
+      requestRenderRef.current = null
+      stopRendering()
+      io.disconnect()
       ro.disconnect()
+      document.removeEventListener('visibilitychange', onVisibility)
+      renderer.domElement.removeEventListener('pointerdown', klik)
+      renderer.domElement.removeEventListener('webglcontextlost', onHilang)
+      renderer.domElement.removeEventListener('webglcontextrestored', onPulih)
+      controls.removeEventListener('change', requestRender)
       controls.dispose()
-      for (const g of Object.values(geometri)) g.dispose()
-      for (const im of instans.values()) im.dispose()
+
+      const geometries = new Set<THREE.BufferGeometry>()
+      const materials = new Set<THREE.Material>()
+      scene.traverse((o) => {
+        const mesh = o as THREE.Mesh
+        if (!mesh.isMesh) return
+        geometries.add(mesh.geometry)
+        const m = mesh.material as THREE.Material | THREE.Material[]
+        if (Array.isArray(m)) m.forEach((x) => materials.add(x))
+        else materials.add(m)
+      })
+      geometries.forEach((g) => g.dispose())
+      materials.forEach((m) => m.dispose())
+      renderer.renderLists.dispose()
       renderer.dispose()
-      wadah.removeChild(renderer.domElement)
+      renderer.forceContextLoss()
+      if (renderer.domElement.parentNode) renderer.domElement.parentNode.removeChild(renderer.domElement)
     }
   }, [])
 
-  if (gagal) {
-    return <div className="rounded-xl bg-neutral-100/60 p-4 text-center text-[12px] text-neutral-500 dark:bg-white/5">{gagal}</div>
-  }
-  return <div ref={wadahRef} style={{ height: tinggi }} className="w-full touch-none rounded-xl bg-neutral-950/90" />
+  return (
+    <div className="relative overflow-hidden rounded-xl bg-neutral-950/90">
+      <div ref={wadahRef} style={{ height: tinggi }} className="w-full touch-none" />
+      {gagal && (
+        <div className="absolute inset-0 flex items-center justify-center bg-neutral-950/90 p-4">
+          <p className="text-center text-[12px] text-neutral-300">{gagal}</p>
+        </div>
+      )}
+    </div>
+  )
 }
 
 export function keteranganCuplikan(): string[] {

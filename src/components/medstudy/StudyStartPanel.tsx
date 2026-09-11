@@ -2,9 +2,10 @@ import { LearningModeSwitch } from '../LearningModeSwitch'
 import { ENRICHMENT_LIBRARY } from '../../data/enrichmentLibrary'
 import { getLearningMode, learningModeProfile } from '../../lib/learningMode'
 
-export type StudyStartSection = 'practice' | 'osce' | 'case-bank' | 'procedures' | 'therapy' | 'diseases' | 'mnemonik' | 'usmle'
+export type StudyStartSection = 'evidence' | 'practice' | 'osce' | 'case-bank' | 'procedures' | 'therapy' | 'diseases' | 'mnemonik' | 'usmle'
 
 const PATHS: { section: StudyStartSection; icon: string; title: string; body: string }[] = [
+  { section: 'evidence', icon: '🔎', title: 'Search live evidence', body: 'Europe PMC, anatomy ontology, registered trials and FDA drug labels.' },
   { section: 'diseases', icon: '🧬', title: 'Understand a disease', body: 'Etiology → mechanism → pathology → symptoms → diagnosis → treatment.' },
   { section: 'therapy', icon: '💊', title: 'Learn drugs & therapy', body: 'Start with why a treatment works, then indications, risks and practical use.' },
   { section: 'practice', icon: '🧠', title: 'Practice questions', body: 'Use active recall and explanations instead of rereading notes.' },
@@ -29,16 +30,16 @@ export function StudyStartPanel({ onSelect, current }: { onSelect: (section: Stu
         <div className="flex flex-wrap items-end justify-between gap-3">
           <div>
             <div className="panacea-kicker !text-neutral-500 dark:!text-white/50">Start by intention</div>
-            <h2 className="mt-1 text-lg font-black tracking-tight text-neutral-900 dark:text-white">What are you trying to understand?</h2>
+            <h2 className="mt-1 text-lg font-black tracking-tight text-neutral-900 dark:text-white">What are you trying to do?</h2>
             <p className="mt-1 max-w-2xl text-xs leading-relaxed text-neutral-500 dark:text-white/50">Current depth: <b>{profile.label}</b>. {profile.description}</p>
           </div>
         </div>
-        <div className="mt-4 grid grid-cols-2 gap-2 md:grid-cols-4">
+        <div className="mt-4 grid grid-cols-2 gap-2 md:grid-cols-3">
           {PATHS.map((path) => (
-            <button key={path.section} onClick={() => onSelect(path.section)} className={`rounded-2xl border p-3 text-left transition hover:-translate-y-0.5 ${current === path.section ? 'border-[#d8bb70]/35 bg-[#d8bb70]/10' : 'border-black/[.055] bg-white/45 hover:bg-white/75 dark:border-white/10 dark:bg-white/[.035] dark:hover:bg-white/[.065]'}`}>
+            <button key={path.section} onClick={() => onSelect(path.section)} className={`rounded-2xl border p-3 text-left transition hover:-translate-y-0.5 ${current === path.section ? 'border-neutral-950 bg-neutral-950 text-white dark:border-white dark:bg-white dark:text-neutral-950' : 'border-black/[.055] bg-white/55 hover:bg-white dark:border-white/10 dark:bg-white/[.035] dark:hover:bg-white/[.065]'}`}>
               <span className="text-xl">{path.icon}</span>
-              <span className="mt-2 block text-xs font-black text-neutral-900 dark:text-white">{path.title}</span>
-              <span className="mt-1 block text-[10px] leading-relaxed text-neutral-500 dark:text-white/45">{path.body}</span>
+              <span className="mt-2 block text-xs font-black">{path.title}</span>
+              <span className={`mt-1 block text-[10px] leading-relaxed ${current === path.section ? 'opacity-60' : 'text-neutral-500 dark:text-white/45'}`}>{path.body}</span>
             </button>
           ))}
         </div>

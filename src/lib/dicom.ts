@@ -38,7 +38,16 @@ export interface Citra {
   jarakPiksel?: [number, number]
   tebalIrisMm?: number
   nomorIris?: number
-  /** Posisi irisan pada sumbu pasien — dipakai mengurutkan satu seri. */
+  /** Keempat UID ini dipertahankan apa adanya untuk identitas dan batas registrasi. */
+  sopInstanceUid?: string
+  studyInstanceUid?: string
+  seriesInstanceUid?: string
+  frameOfReferenceUid?: string
+  /** Image Position (Patient), mm dalam sistem koordinat pasien DICOM. */
+  posisiPasien?: [number, number, number]
+  /** Image Orientation (Patient): direction cosine baris lalu kolom. */
+  orientasiPasien?: [number, number, number, number, number, number]
+  /** Kompatibilitas dengan kode lama; diturunkan dari posisiPasien[2]. */
   posisiZ?: number
   deskripsiSeri?: string
 }
@@ -68,11 +77,16 @@ const tagDari = (grup: number, elemen: number) => (grup << 16) | elemen
 const T = {
   sintaksTransfer: tagDari(0x0002, 0x0010),
   panjangMetaGrup: tagDari(0x0002, 0x0000),
+  sopInstanceUid: tagDari(0x0008, 0x0018),
   modalitas: tagDari(0x0008, 0x0060),
   deskripsiSeri: tagDari(0x0008, 0x103e),
   tebalIris: tagDari(0x0018, 0x0050),
+  studyInstanceUid: tagDari(0x0020, 0x000d),
+  seriesInstanceUid: tagDari(0x0020, 0x000e),
   nomorIris: tagDari(0x0020, 0x0013),
   posisiPasien: tagDari(0x0020, 0x0032),
+  orientasiPasien: tagDari(0x0020, 0x0037),
+  frameOfReferenceUid: tagDari(0x0020, 0x0052),
   baris: tagDari(0x0028, 0x0010),
   kolom: tagDari(0x0028, 0x0011),
   jumlahBingkai: tagDari(0x0028, 0x0008),
@@ -106,7 +120,9 @@ const VR_IMPLISIT: Record<number, string> = {
   [tagDari(0x0028, 0x1050)]: 'DS', [tagDari(0x0028, 0x1051)]: 'DS',
   [tagDari(0x0028, 0x1052)]: 'DS', [tagDari(0x0028, 0x1053)]: 'DS',
   [tagDari(0x0028, 0x0030)]: 'DS', [tagDari(0x0018, 0x0050)]: 'DS',
-  [tagDari(0x0020, 0x0032)]: 'DS',
+  [tagDari(0x0020, 0x0032)]: 'DS', [tagDari(0x0020, 0x0037)]: 'DS',
+  [tagDari(0x0008, 0x0018)]: 'UI', [tagDari(0x0020, 0x000d)]: 'UI',
+  [tagDari(0x0020, 0x000e)]: 'UI', [tagDari(0x0020, 0x0052)]: 'UI',
   [tagDari(0x0008, 0x0060)]: 'CS', [tagDari(0x0028, 0x0004)]: 'CS',
   [tagDari(0x0008, 0x103e)]: 'LO',
   [tagDari(0x7fe0, 0x0010)]: 'OW',
@@ -199,6 +215,14 @@ function angka(dv: DataView, u?: Unsur): number | undefined {
   return Number.isFinite(x) ? x : undefined
 }
 
+function angkaJamak(dv: DataView, u: Unsur | undefined, minimum: number): number[] | undefined {
+  const t = teks(dv, u)
+  if (!t) return undefined
+  const values = t.split('\\').map((part) => Number.parseFloat(part.trim()))
+  if (values.length < minimum || values.some((value) => !Number.isFinite(value))) return undefined
+  return values
+}
+
 export function bacaDicom(buffer: ArrayBuffer): Hasil<Citra> {
   if (buffer.byteLength < 140) return { ok: false, alasan: 'File is too small to be a DICOM image' }
   const dv = new DataView(buffer)
@@ -274,8 +298,13 @@ export function bacaDicom(buffer: ArrayBuffer): Hasil<Citra> {
     if (v > maksimum) maksimum = v
   }
 
-  const jarak = teks(dv, ds.get(T.jarakPiksel))?.split('\\').map(Number)
-  const posisi = teks(dv, ds.get(T.posisiPasien))?.split('\\').map(Number)
+  const jarak = angkaJamak(dv, ds.get(T.jarakPiksel), 2)
+  const posisi = angkaJamak(dv, ds.get(T.posisiPasien), 3)
+  const orientasi = angkaJamak(dv, ds.get(T.orientasiPasien), 6)
+  const posisiPasien: Citra['posisiPasien'] = posisi ? [posisi[0], posisi[1], posisi[2]] : undefined
+  const orientasiPasien: Citra['orientasiPasien'] = orientasi
+    ? [orientasi[0], orientasi[1], orientasi[2], orientasi[3], orientasi[4], orientasi[5]]
+    : undefined
 
   return {
     ok: true,
@@ -286,10 +315,16 @@ export function bacaDicom(buffer: ArrayBuffer): Hasil<Citra> {
       pusatBawaan: angka(dv, ds.get(T.pusatJendela)),
       lebarBawaan: angka(dv, ds.get(T.lebarJendela)),
       terbalik: (teks(dv, ds.get(T.fotometrik)) ?? 'MONOCHROME2') === 'MONOCHROME1',
-      jarakPiksel: jarak && jarak.length >= 2 && jarak.every(Number.isFinite) ? [jarak[0], jarak[1]] : undefined,
+      jarakPiksel: jarak ? [jarak[0], jarak[1]] : undefined,
       tebalIrisMm: angka(dv, ds.get(T.tebalIris)),
       nomorIris: angka(dv, ds.get(T.nomorIris)),
-      posisiZ: posisi && posisi.length >= 3 && Number.isFinite(posisi[2]) ? posisi[2] : undefined,
+      sopInstanceUid: teks(dv, ds.get(T.sopInstanceUid)),
+      studyInstanceUid: teks(dv, ds.get(T.studyInstanceUid)),
+      seriesInstanceUid: teks(dv, ds.get(T.seriesInstanceUid)),
+      frameOfReferenceUid: teks(dv, ds.get(T.frameOfReferenceUid)),
+      posisiPasien,
+      orientasiPasien,
+      posisiZ: posisiPasien?.[2],
       deskripsiSeri: teks(dv, ds.get(T.deskripsiSeri)),
     },
   }
@@ -331,7 +366,7 @@ export function terapkanJendela(
   const n = citra.baris * citra.kolom
   const mulai = Math.min(Math.max(0, bingkai), citra.bingkai - 1) * n
   const keluar = new Uint8ClampedArray(n)
-  const l = Math.max(1, lebar)
+  const l = Math.max(1.000001, lebar)
   const bawah = pusat - 0.5 - (l - 1) / 2
   const atas = pusat - 0.5 + (l - 1) / 2
   for (let i = 0; i < n; i++) {
@@ -354,9 +389,38 @@ export function jendelaAwal(citra: Citra): { pusat: number; lebar: number } {
   return { pusat: citra.minimum + lebar / 2, lebar }
 }
 
-/** Satu seri diurutkan menurut posisi pada sumbu pasien, bukan nama berkas. */
+function normalIris(citra: Citra): [number, number, number] | undefined {
+  const o = citra.orientasiPasien
+  if (!o) return undefined
+  const [rx, ry, rz, cx, cy, cz] = o
+  const nx = ry * cz - rz * cy
+  const ny = rz * cx - rx * cz
+  const nz = rx * cy - ry * cx
+  const length = Math.hypot(nx, ny, nz)
+  if (!Number.isFinite(length) || length < 1e-6) return undefined
+  return [nx / length, ny / length, nz / length]
+}
+
+/** Koordinat irisan sepanjang normal bidang DICOM, bila orientasi+posisi lengkap. */
+export function koordinatIrisPasien(citra: Citra): number | undefined {
+  const p = citra.posisiPasien
+  const n = normalIris(citra)
+  if (!p || !n) return undefined
+  const coordinate = p[0] * n[0] + p[1] * n[1] + p[2] * n[2]
+  return Number.isFinite(coordinate) ? coordinate : undefined
+}
+
+/** Satu seri diurutkan menurut normal bidang pasien; Z lama hanya fallback. */
 export function urutkanSeri<T extends { citra: Citra }>(irisan: T[]): T[] {
   return [...irisan].sort((a, b) => {
+    const ca = koordinatIrisPasien(a.citra)
+    const cb = koordinatIrisPasien(b.citra)
+    const na = normalIris(a.citra)
+    const nb = normalIris(b.citra)
+    if (ca != null && cb != null && na && nb) {
+      const arahSama = na[0] * nb[0] + na[1] * nb[1] + na[2] * nb[2]
+      if (arahSama > 0.995 && ca !== cb) return ca - cb
+    }
     const za = a.citra.posisiZ, zb = b.citra.posisiZ
     if (za != null && zb != null && za !== zb) return za - zb
     return (a.citra.nomorIris ?? 0) - (b.citra.nomorIris ?? 0)

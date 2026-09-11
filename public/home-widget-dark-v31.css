@@ -1,0 +1,141 @@
+/* Panacea Home widget Dark Mode guard v33.
+   Final-authority visual safety layer for Home Living Instruments.
+   Goal: never show a large blank/light-gray panel in Dark Mode, keep loading
+   states readable, and preserve all health data, chart semantics and logic. */
+
+/* A Suspense fallback must look intentional in BOTH themes instead of becoming
+   an empty slab. Keep it compact so the previous tall widget cannot leave a
+   giant blank canvas while the next chunk resolves. */
+.panacea-home .widget-instrument-loading-v29{
+  min-height:132px!important;
+  display:grid!important;
+  place-items:center!important;
+  border-radius:20px!important;
+  background:rgba(248,250,252,.92)!important;
+  background-image:none!important;
+  border:1px solid rgba(15,23,42,.07)!important;
+  color:#52606d!important;
+  box-shadow:none!important;
+  filter:none!important;
+  -webkit-backdrop-filter:none!important;
+  backdrop-filter:none!important;
+}
+.panacea-home .widget-instrument-loading-v29::before{
+  content:'Loading widget…';
+  display:block;
+  padding:14px 18px;
+  font:700 13px/1.35 Inter,system-ui,-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+  letter-spacing:.01em;
+  color:inherit;
+}
+
+html.dark .panacea-home .widget-instrument-loading-v29,
+.dark .panacea-home .widget-instrument-loading-v29{
+  background:#0a0f16!important;
+  background-image:none!important;
+  border-color:rgba(255,255,255,.07)!important;
+  color:#dbe7ef!important;
+  color-scheme:dark;
+}
+
+/* Keep the whole carousel canvas in the Panacea charcoal family. The explicit
+   html.dark form is intentional: it wins even when older cached component CSS
+   used a competing .dark descendant selector. */
+html.dark .panacea-home .widget-instrument-shell-v5,
+.dark .panacea-home .widget-instrument-shell-v5{
+  background:#070b11!important;
+  background-image:linear-gradient(155deg,#0d121a 0%,#070b11 100%)!important;
+  background-color:#070b11!important;
+  border-color:rgba(255,255,255,.10)!important;
+  color:#f8fafc!important;
+  color-scheme:dark;
+}
+
+html.dark .panacea-home .widget-instrument-scroll-v5,
+html.dark .panacea-home .widget-instrument-slide-v5,
+.dark .panacea-home .widget-instrument-scroll-v5,
+.dark .panacea-home .widget-instrument-slide-v5{
+  background:transparent!important;
+  background-image:none!important;
+  color:#f8fafc!important;
+}
+
+/* Decorative shell lines/glows are not data and were a source of visual noise. */
+html.dark .panacea-home .widget-instrument-shell-v5::before,
+html.dark .panacea-home .widget-instrument-shell-v5::after,
+.dark .panacea-home .widget-instrument-shell-v5::before,
+.dark .panacea-home .widget-instrument-shell-v5::after{
+  content:none!important;
+  display:none!important;
+}
+
+/* Catch every actual glass card at ANY nesting depth. */
+html.dark .panacea-home .widget-instrument-slide-v5 .kaca,
+.dark .panacea-home .widget-instrument-slide-v5 .kaca{
+  background:#0b1119!important;
+  background-image:none!important;
+  background-color:#0b1119!important;
+  color:#f8fafc!important;
+  border:1px solid rgba(255,255,255,.08)!important;
+  box-shadow:none!important;
+  filter:none!important;
+  -webkit-backdrop-filter:none!important;
+  backdrop-filter:none!important;
+  color-scheme:dark;
+}
+
+html.dark .panacea-home .widget-instrument-slide-v5 .kaca::before,
+html.dark .panacea-home .widget-instrument-slide-v5 .kaca::after,
+.dark .panacea-home .widget-instrument-slide-v5 .kaca::before,
+.dark .panacea-home .widget-instrument-slide-v5 .kaca::after{
+  content:none!important;
+  display:none!important;
+}
+
+/* Neutral utility text is common across older widgets. Repair neutral text only;
+   semantic chart/status colours remain untouched. */
+html.dark .panacea-home .widget-instrument-slide-v5 :is(.text-neutral-950,.text-neutral-900,.text-neutral-800,.text-neutral-700,.text-ink),
+.dark .panacea-home .widget-instrument-slide-v5 :is(.text-neutral-950,.text-neutral-900,.text-neutral-800,.text-neutral-700,.text-ink){
+  color:#f8fafc!important;
+}
+html.dark .panacea-home .widget-instrument-slide-v5 .text-neutral-600,
+.dark .panacea-home .widget-instrument-slide-v5 .text-neutral-600{color:#dde6ef!important}
+html.dark .panacea-home .widget-instrument-slide-v5 :is(.text-neutral-500,.text-neutral-400),
+.dark .panacea-home .widget-instrument-slide-v5 :is(.text-neutral-500,.text-neutral-400){color:#b8c3cf!important}
+
+html.dark .panacea-home :is(.widget-instrument-count-v5,.widget-instrument-nav-v5),
+.dark .panacea-home :is(.widget-instrument-count-v5,.widget-instrument-nav-v5){
+  background:rgba(255,255,255,.05)!important;
+  background-image:none!important;
+  border-color:rgba(255,255,255,.09)!important;
+  color:#d7e0e8!important;
+}
+
+/* When the ACTIVE slide is the Suspense fallback, collapse the retained stage
+   height to the compact baseline rather than showing the previous widget's tall
+   empty canvas. Modern Safari/iOS supports :has(); older browsers simply keep
+   the normal ResizeObserver behavior. */
+@supports selector(.a:has(.b)){
+  .panacea-home .widget-instrument-scroll-v5:has(> .widget-instrument-slide-v5[aria-hidden='false'] > .widget-instrument-loading-v29){
+    height:184px!important;
+    min-height:184px!important;
+    max-height:184px!important;
+  }
+}
+
+html.pmd-low-memory.dark .panacea-home :is(.widget-instrument-shell-v5,.widget-instrument-loading-v29,.widget-instrument-slide-v5 .kaca){
+  box-shadow:none!important;
+  filter:none!important;
+  -webkit-backdrop-filter:none!important;
+  backdrop-filter:none!important;
+}
+
+@media (prefers-contrast:more){
+  html.dark .panacea-home :is(.widget-instrument-shell-v5,.widget-instrument-loading-v29,.widget-instrument-slide-v5 .kaca),
+  .dark .panacea-home :is(.widget-instrument-shell-v5,.widget-instrument-loading-v29,.widget-instrument-slide-v5 .kaca){
+    background:#05080d!important;
+    background-image:none!important;
+    outline:1px solid rgba(255,255,255,.18);
+    outline-offset:-1px;
+  }
+}

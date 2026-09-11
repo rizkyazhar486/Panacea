@@ -30,6 +30,13 @@ const ZONE_COLOR: Record<RunType, string> = {
   interval: 'bg-rose-500/10 border-rose-500/30 text-rose-300',
 }
 
+const ZONE_BAR: Record<RunType, string> = {
+  easy: 'bg-emerald-500',
+  long: 'bg-sky-500',
+  tempo: 'bg-amber-500',
+  interval: 'bg-rose-500',
+}
+
 export function BaseTraining() {
   const [tab, setTab] = useState<Tab>('lari')
 
@@ -101,6 +108,26 @@ function RunTab() {
   }, [mode, racePace, dist, mins])
 
   const result = useMemo(() => (derived == null ? null : trainingPaces(derived)), [derived])
+  const spectrum = useMemo(() => {
+    if (!result) return null
+    const ranges = RUN_ZONES.map((zone) => {
+      const [a, b] = result.zones[zone.key]
+      return { zone, fast: Math.min(a, b), slow: Math.max(a, b) }
+    })
+    const fastest = Math.min(result.race, ...ranges.map((row) => row.fast))
+    const slowest = Math.max(result.race, ...ranges.map((row) => row.slow))
+    const span = Math.max(1, slowest - fastest)
+    return {
+      fastest,
+      slowest,
+      racePosition: ((result.race - fastest) / span) * 100,
+      rows: ranges.map((row) => ({
+        ...row,
+        left: ((row.fast - fastest) / span) * 100,
+        width: ((row.slow - row.fast) / span) * 100,
+      })),
+    }
+  }, [result])
 
   return (
     <div className="space-y-4">
@@ -163,6 +190,50 @@ function RunTab() {
                 )
               })}
             </div>
+
+            {spectrum && (
+              <div className="mt-4 rounded-xl border border-neutral-200/70 bg-neutral-50/70 p-3 dark:border-white/10 dark:bg-white/[0.03]">
+                <div className="flex items-center justify-between gap-3 text-[11px]">
+                  <span className="font-bold uppercase tracking-wide text-ink dark:text-white">Pace spectrum</span>
+                  <span className="text-neutral-500">One scale for all zones</span>
+                </div>
+                <div className="mt-2 flex justify-between gap-3 text-[10px] text-neutral-500">
+                  <span>Faster · {fmtPace(spectrum.fastest)}/km</span>
+                  <span>{fmtPace(spectrum.slowest)}/km · Slower</span>
+                </div>
+                <div className="mt-3 space-y-2.5">
+                  {spectrum.rows.map((row) => (
+                    <div key={row.zone.key} className="grid grid-cols-[62px_minmax(0,1fr)_92px] items-center gap-2">
+                      <span className="truncate text-[11px] font-semibold text-neutral-600 dark:text-neutral-300">
+                        {row.zone.name.replace(' Run', '')}
+                      </span>
+                      <div
+                        className="relative h-2.5 overflow-hidden rounded-full bg-neutral-200/80 dark:bg-white/10"
+                        role="img"
+                        aria-label={`${row.zone.name}: ${fmtPace(row.fast)} to ${fmtPace(row.slow)} per kilometre`}
+                      >
+                        <span
+                          aria-hidden
+                          className="absolute inset-y-0 w-px bg-neutral-500/60 dark:bg-white/50"
+                          style={{ left: `${spectrum.racePosition}%` }}
+                        />
+                        <span
+                          aria-hidden
+                          className={`absolute inset-y-0 rounded-full ${ZONE_BAR[row.zone.key]}`}
+                          style={{ left: `${row.left}%`, width: `${row.width}%` }}
+                        />
+                      </div>
+                      <span className="text-right text-[10px] font-semibold tabular-nums text-neutral-500">
+                        {fmtPace(row.fast)}–{fmtPace(row.slow)}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+                <p className="mt-3 text-[10px] leading-relaxed text-neutral-500">
+                  Bars use seconds per kilometre on one linear pace axis. The thin marker is your reference race pace, not a training target.
+                </p>
+              </div>
+            )}
 
             <Prosa kelas="text-xs text-slate-500 mt-3">Estimates follow the VDOT framework (Jack Daniels' Running Formula), interpolated between table rows. These are a starting point, not a fixed rule — adjust for how you feel and for the weather.</Prosa>
           </>

@@ -49,6 +49,8 @@ export function CellLab() {
         {TABS.map((t) => (
           <button
             key={t.id}
+            type="button"
+            aria-pressed={tab === t.id}
             onClick={() => { setTab(t.id); setTahapAktif(0) }}
             className={`shrink-0 rounded-full px-3 py-1.5 text-[11px] font-bold active:scale-95 ${
               tab === t.id ? 'bg-brand text-white' : 'border border-brand/30 bg-brand-50 text-brand-dark'
@@ -64,13 +66,16 @@ export function CellLab() {
           <Cell3D disorot={organel} onPilih={setOrganel} tinggi={320} />
           <p className="text-[11px] leading-snug text-neutral-500">
             The cell is cut open — a whole sphere would show only the membrane. Tap an organelle to isolate it.
-            Sizes are the real ones in micrometres, held to scale against a 20 µm cell.
+            Reference-scale dimensions are typical estimates in micrometres, normalized against a 20 µm teaching cell;
+            real dimensions vary by cell type, state and measurement method.
           </p>
 
           <div className="flex flex-wrap gap-1.5">
             {ORGANEL.map((o) => (
               <button
                 key={o.kunci}
+                type="button"
+                aria-pressed={organel === o.kunci}
                 onClick={() => setOrganel(organel === o.kunci ? null : o.kunci)}
                 className={`rounded-full px-2.5 py-1 text-[11px] font-bold active:scale-95 ${
                   organel === o.kunci ? 'bg-brand text-white' : 'border border-neutral-200 text-neutral-600 dark:border-white/10 dark:text-neutral-400'
@@ -86,7 +91,7 @@ export function CellLab() {
               <div className="flex items-baseline justify-between gap-2">
                 <div className="text-sm font-black text-ink dark:text-ink">{dipilih.nama}</div>
                 <div className="shrink-0 text-[11px] font-bold text-neutral-500">
-                  {dipilih.ukuranUm} µm · {dipilih.membran === 0 ? 'no membrane' : `${dipilih.membran} membrane${dipilih.membran > 1 ? 's' : ''}`}
+                  ≈{dipilih.ukuranUm} µm reference scale · {dipilih.membran === 0 ? 'no membrane' : `${dipilih.membran} membrane${dipilih.membran > 1 ? 's' : ''}`}
                 </div>
               </div>
               <p className="mt-1 text-[12px] leading-snug text-neutral-600 dark:text-neutral-400">{dipilih.fungsi}</p>
@@ -94,12 +99,14 @@ export function CellLab() {
                 {dipilih.klinis}
               </p>
               {dipilih.jumlah > 0 && (
-                <p className="mt-1.5 text-[10px] text-neutral-500">About {dipilih.jumlah.toLocaleString()} per typical cell.</p>
+                <p className="mt-1.5 text-[10px] text-neutral-500">
+                  Reference count: about {dipilih.jumlah.toLocaleString()} per typical cell; actual abundance varies by cell type and state.
+                </p>
               )}
             </div>
           )}
 
-          {/* Jumlah yang digambar jauh lebih sedikit daripada jumlah nyata.
+          {/* Jumlah yang digambar jauh lebih sedikit daripada jumlah rujukan.
               Mengatakannya lebih berguna daripada membiarkan pembelajar
               menghitung mitokondria di layar. */}
           <div className="rounded-xl bg-neutral-100/60 p-3 dark:bg-white/5">
@@ -110,8 +117,9 @@ export function CellLab() {
               ))}
             </ul>
             <p className="mt-1.5 text-[11px] leading-snug text-neutral-500">
-              This is a model built from real dimensions, not a scan. No openly licensed cell mesh exists,
-              so what makes it honest is the numbers: diameters, counts and compartments, all stated.
+              This view is a scale-constrained educational reconstruction, not a microscopy-derived segmentation or patient scan.
+              It uses stated reference dimensions, counts and compartments; the primitive shapes are not ultrastructural evidence.
+              Real microscopy-derived 3D datasets exist, but they are not bundled into this viewer under the current verified asset and licensing pipeline.
             </p>
           </div>
         </>
@@ -211,6 +219,8 @@ export function CellLab() {
             {(['malat-aspartat', 'gliserol-fosfat'] as Antarjemput[]).map((a) => (
               <button
                 key={a}
+                type="button"
+                aria-pressed={antarjemput === a}
                 onClick={() => setAntarjemput(a)}
                 className={`flex-1 rounded-xl px-3 py-2 text-[11px] font-bold active:scale-95 ${
                   antarjemput === a ? 'bg-brand text-white' : 'border border-brand/30 bg-brand-50 text-brand-dark'

@@ -9,8 +9,10 @@
 // didaftarkan satu kali oleh pemilik aplikasi.
 //
 // Karena kredensialnya bisa saja belum dipasang, ada jalur kedua yang selalu
-// hidup: NLM Clinical Tables (ICD-10-CM, tanpa kunci, domain publik). Itu
-// BUKAN ICD-11 dan tidak boleh disebut ICD-11 — jadi tiap hasil membawa
+// hidup: NLM Clinical Tables (ICD-10-CM, tanpa kunci). Layanan NLM gratis/as-is,
+// tetapi hak/ketentuan data tetap harus dinilai per dataset; jangan menganggap
+// semua dataset Clinical Tables otomatis memiliki satu blanket license.
+// Itu BUKAN ICD-11 dan tidak boleh disebut ICD-11 — jadi tiap hasil membawa
 // penanda `sumber` sendiri, dan layarnya menampilkan penanda itu apa adanya.
 // Lebih baik pengguna tahu ia sedang melihat ICD-10 daripada mengira sudah
 // melihat ICD-11.
@@ -24,6 +26,8 @@ const ICD_BASE = 'https://id.who.int/icd/release/11'
 // berikutnya. Naikkan hanya setelah release baru diverifikasi terhadap API WHO.
 const ICD_RELEASE = '2026-01'
 const CLINICAL_TABLES = 'https://clinicaltables.nlm.nih.gov/api/icd10cm/v3/search'
+const MAX_QUERY_LENGTH = 160
+const MAX_RESULTS = 50
 
 export interface IcdEntry {
   code: string
@@ -39,6 +43,35 @@ export interface IcdEntry {
 
 export const icd11Configured = Boolean(config.whoIcd.clientId && config.whoIcd.clientSecret)
 export const icd11Release = ICD_RELEASE
+
+function bersihkanKueri(value: string): string {
+  return value
+    .replace(/[\u0000-\u001f\u007f<>\\":|]/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim()
+    .slice(0, MAX_QUERY_LENGTH)
+}
+
+function batasiHasil(limit: number): number {
+  if (!Number.isFinite(limit)) return 20
+  return Math.min(Math.max(Math.trunc(limit), 1), MAX_RESULTS)
+}
+
+/**
+ * Menerima hanya dua bentuk identifier WHO yang tidak ambigu:
+ * - entity id numerik murni; atau
+ * - URL resmi Foundation entity `https://id.who.int/icd/entity/<digits>`.
+ *
+ * Jangan "membersihkan" string campuran dengan membuang karakter non-angka:
+ * `abc123def` tidak boleh diam-diam berubah menjadi entity 123 karena itu bisa
+ * membuka entitas WHO yang berbeda dari yang sebenarnya dimaksud pemanggil.
+ */
+export function normalisasiIcdEntityId(value: string): string | null {
+  const input = value.trim()
+  if (/^\d+$/.test(input)) return input
+  const cocok = input.match(/^https:\/\/id\.who\.int\/icd\/entity\/(\d+)\/?$/)
+  return cocok?.[1] ?? null
+}
 
 // Token WHO berlaku ~1 jam. Disimpan di memori dan diperbarui lebih awal
 // (60 detik sebelum kedaluwarsa) supaya tidak ada permintaan yang jatuh tepat
@@ -107,12 +140,13 @@ async function cariIcd11(q: string, limit: number): Promise<IcdEntry[]> {
   for (const e of data.destinationEntities ?? []) {
     // Entitas tanpa kode adalah simpul pengelompokan, bukan diagnosis yang
     // bisa dikodekan — tidak berguna di daftar hasil.
-    if (!e.theCode || !e.title) continue
+    if (typeof e.theCode !== 'string' || !e.theCode.trim()) continue
+    if (typeof e.title !== 'string' || !e.title.trim()) continue
     out.push({
-      code: e.theCode,
+      code: e.theCode.trim(),
       title: bersih(e.title),
-      chapter: e.chapter ? bersih(e.chapter) : undefined,
-      uri: e.id,
+      chapter: typeof e.chapter === 'string' && e.chapter.trim() ? bersih(e.chapter) : undefined,
+      uri: typeof e.id === 'string' && e.id.trim() ? e.id : undefined,
       sumber: 'icd11',
     })
     if (out.length >= limit) break
@@ -122,7 +156,15 @@ async function cariIcd11(q: string, limit: number): Promise<IcdEntry[]> {
 
 interface ClinicalTablesResp extends Array<unknown> {
   0: number
-  3: Array<[string, string]>
+  3: unknown[]
+}
+
+function isClinicalTableRow(value: unknown): value is [string, string] {
+  return Array.isArray(value)
+    && typeof value[0] === 'string'
+    && Boolean(value[0].trim())
+    && typeof value[1] === 'string'
+    && Boolean(value[1].trim())
 }
 
 async function cariIcd10cm(q: string, limit: number): Promise<IcdEntry[]> {
@@ -132,8 +174,12 @@ async function cariIcd10cm(q: string, limit: number): Promise<IcdEntry[]> {
   const data = (await res.json()) as ClinicalTablesResp
   const rows = Array.isArray(data[3]) ? data[3] : []
   return rows
-    .filter((r) => Array.isArray(r) && r.length >= 2)
-    .map(([code, name]) => ({ code, title: name, sumber: 'icd10cm' as const }))
+    .filter(isClinicalTableRow)
+    .map(([code, name]) => ({
+      code: code.trim(),
+      title: name.trim(),
+      sumber: 'icd10cm' as const,
+    }))
 }
 
 /**
@@ -143,17 +189,18 @@ async function cariIcd10cm(q: string, limit: number): Promise<IcdEntry[]> {
  * daripada layar kosong. Sumber tidak pernah disamarkan.
  */
 export async function cariDiagnosis(q: string, limit = 20): Promise<IcdEntry[]> {
-  const kueri = q.trim()
+  const kueri = bersihkanKueri(q)
   if (!kueri) return []
+  const batas = batasiHasil(limit)
   if (icd11Configured) {
     try {
-      const hasil = await cariIcd11(kueri, limit)
+      const hasil = await cariIcd11(kueri, batas)
       if (hasil.length) return hasil
     } catch {
       // jatuh ke jalur cadangan di bawah
     }
   }
-  return cariIcd10cm(kueri, limit)
+  return cariIcd10cm(kueri, batas)
 }
 
 interface WhoEntity {
@@ -168,7 +215,7 @@ interface WhoEntity {
 export async function rincianIcd11(entityId: string): Promise<IcdEntry | null> {
   const token = await whoToken()
   if (!token) return null
-  const id = entityId.replace(/^https?:\/\/id\.who\.int\/icd\/entity\//, '').replace(/[^0-9]/g, '')
+  const id = normalisasiIcdEntityId(entityId)
   if (!id) return null
   const res = await fetch(`${ICD_BASE}/${ICD_RELEASE}/mms/${id}`, {
     headers: whoHeaders(token),

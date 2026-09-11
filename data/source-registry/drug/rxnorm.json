@@ -1,0 +1,52 @@
+{
+  "id": "rxnorm",
+  "name": "RxNorm / RxNorm API",
+  "category": "drug",
+  "kind": ["api", "terminology-server"],
+  "homepage": "https://lhncbc.nlm.nih.gov/RxNav/",
+  "repository": null,
+  "features": ["drug-normalization", "canonical-drug-name", "approximate-term-normalization", "medication-identity", "rxcui", "prescribable-content", "medication-reconciliation", "fhir-medication"],
+  "formats": ["json", "xml", "http-rest"],
+  "usage": {
+    "runtime": true,
+    "buildTime": false,
+    "networkRequired": true,
+    "notes": "Use RxNorm as Panacea's U.S. medication identity/normalization source through the canonical server adapter. The adapter supports exact name->RxCUI resolution, related SCD/SBD concepts, and approximate-term->canonical-name normalization for orchestration fallbacks. The online NLM APIs are free but limited to 20 requests/second/IP; NLM recommends caching responses for 12-24 hours."
+  },
+  "license": {
+    "status": "VERIFIED",
+    "identifier": "NLM non-proprietary RxNorm content; API Terms of Service",
+    "commercialUse": "ALLOWED",
+    "attributionRequired": true,
+    "shareAlike": false,
+    "scope": "NLM states that RxNorm API and Prescribable RxNorm content are non-proprietary and, with one exception, no license is needed. The proprietary-information function can expose restricted source-vocabulary content and requires a valid UMLS license/API authorization for those sources. RxClass can include separately licensed SNOMED CT content and is outside the unrestricted RxNorm-only scope.",
+    "verificationUrl": "https://lhncbc.nlm.nih.gov/RxNav/TermsofService.html",
+    "verifiedAt": "2026-09-08",
+    "notes": "Include the NLM-requested attribution/disclaimer in Panacea documentation or acknowledgements. Do not use NLM name/logo as product endorsement. Keep unrestricted RXNORM content separate from proprietary UMLS/SNOMED/source-vocabulary data."
+  },
+  "validation": {
+    "level": "REFERENCE",
+    "clinicalDecisionUse": "CONTEXT_ONLY",
+    "notes": "RxNorm normalizes medication identity and relationships; an exact or approximate RXCUI/canonical-name match does not validate dose, indication, contraindication, interaction, prescribing appropriateness or patient-specific treatment. RxNav drug-drug interaction features were discontinued on January 2, 2024, so Panacea must not present RxNorm/RxNav as a current DDI engine."
+  },
+  "provenance": {
+    "authority": "U.S. National Library of Medicine (NLM)",
+    "sourceIdentityRequired": true,
+    "versionPinRequired": true,
+    "notes": "Persist RXCUI, canonical RxNorm name, concept status, term type (TTY) where used, source vocabulary when relevant, and the RxNorm release/API version observed during normalization. Preserve the original medication string so users can audit exact or approximate normalization from source text to RxNorm concept."
+  },
+  "adapter": {
+    "status": "ACTIVE",
+    "normalizedTarget": "PanaceaMedicationConcept",
+    "module": "server/src/rxnorm.ts",
+    "notes": "Canonical production adapter sanitizes/bounds medication text, resolves exact names to numeric RXCUI for SCD/SBD related concepts, and separately supports approximateTerm->numeric RXCUI->RxNorm Name canonical normalization. It rejects malformed upstream identifiers, applies timeouts and does not perform drug-drug interaction checking or prescribing recommendations. Higher-level drugInfo orchestration reuses this normalization path rather than issuing duplicate RxNav requests."
+  },
+  "trust": {
+    "authority": 5,
+    "evidenceQuality": 4,
+    "recency": 5,
+    "licenseClarity": 4,
+    "reproducibility": 5,
+    "notes": "High authority for U.S. medication terminology/normalization. License clarity is reduced because proprietary UMLS source vocabularies and RxClass/SNOMED have separate conditions outside unrestricted RxNorm content."
+  }
+}

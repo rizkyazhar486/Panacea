@@ -1,0 +1,52 @@
+{
+  "id": "itk_wasm",
+  "name": "ITK-Wasm",
+  "category": "imaging",
+  "kind": ["library", "framework", "tooling"],
+  "homepage": "https://wasm.itk.org/",
+  "repository": "https://github.com/InsightSoftwareConsortium/ITK-Wasm",
+  "features": [274, 275, 276, "image-processing", "spatial-analysis", "mesh-processing", "transform-io", "dicom-processing"],
+  "formats": ["image", "mesh", "point-set", "transform", "dicom", "nifti", "wasm", "wasi"],
+  "usage": {
+    "runtime": true,
+    "buildTime": false,
+    "networkRequired": false,
+    "notes": "ITK-Wasm can execute high-performance spatial processing in the browser, Node.js, Python and WASI environments. For Panacea web use, prefer worker-based asynchronous processing so large image operations do not block the React main thread. Local processing must remain possible without implicitly uploading patient data."
+  },
+  "license": {
+    "status": "VERIFIED",
+    "identifier": "Apache-2.0",
+    "commercialUse": "ALLOWED",
+    "attributionRequired": true,
+    "shareAlike": false,
+    "scope": "The ITK-Wasm repository is distributed under the Apache License 2.0. This software license does not grant rights to patient images, test datasets, third-party codecs, algorithms, models or content passed through a pipeline; those require independent provenance and license review.",
+    "verificationUrl": "https://github.com/InsightSoftwareConsortium/ITK-Wasm/blob/main/LICENSE",
+    "verifiedAt": "2026-09-08",
+    "notes": "Preserve applicable copyright, license and NOTICE obligations. Review third-party packages used by any selected ITK-Wasm pipeline independently before production integration."
+  },
+  "validation": {
+    "level": "REFERENCE",
+    "clinicalDecisionUse": "REQUIRES_SEPARATE_VALIDATION",
+    "notes": "A deterministic image-processing algorithm can be technically reproducible without being clinically validated for diagnosis. Panacea must validate each processing pipeline, parameters and derived measurement for its intended medical use."
+  },
+  "provenance": {
+    "authority": "InsightSoftwareConsortium / NumFOCUS ITK ecosystem",
+    "sourceIdentityRequired": true,
+    "versionPinRequired": true,
+    "notes": "ITK-Wasm is currently in a 1.0.0 beta release series, so do not integrate an unpinned moving target. When activated, record the exact package/pipeline version, input artifact identity, voxel spacing, direction/orientation, coordinate system, parameters and output checksum for every derived artifact."
+  },
+  "adapter": {
+    "status": "PLANNED",
+    "normalizedTarget": "PanaceaImagingTransform",
+    "module": null,
+    "notes": "Planned flow: PanaceaImagingStudy or PanaceaScientificVolume -> validated processing request -> worker-backed ITK-Wasm pipeline -> PanaceaImagingTransform with input IDs, algorithm/version, parameters, coordinate metadata and output checksum -> Cornerstone3D/vtk.js visualization. Processing results must never overwrite the immutable source study."
+  },
+  "trust": {
+    "authority": 5,
+    "evidenceQuality": 3,
+    "recency": 5,
+    "licenseClarity": 5,
+    "reproducibility": 5,
+    "notes": "Scores describe engineering suitability for reproducible spatial processing. Clinical evidence quality still depends on the specific algorithm and intended use."
+  }
+}

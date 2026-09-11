@@ -7,6 +7,7 @@ import type { ImportedWorkout } from '../lib/workoutImport'
 import type { Konteks } from '../lib/trainingPhysiology'
 import { debrief, saranBerikutnya, jadwalPekan, dukungan, statusSingkat } from '../lib/pelatih'
 import { useJam } from '../lib/useJam'
+import { TrainingSessionCockpit } from './TrainingSessionCockpit'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Kolom Pelatih — bagian yang berbicara, bukan yang menampilkan angka.
@@ -88,6 +89,15 @@ export function KolomPelatih({
 
   return (
     <>
+      {terakhir && (
+        <TrainingSessionCockpit
+          workout={terakhir}
+          nextTitle={saran.judul}
+          nextWhen={saran.kapan}
+          nextColor={saran.warna}
+        />
+      )}
+
       {/* 1. Apa berikutnya */}
       <Card>
         <SectionTitle icon={<IconRun />} title="Next session"

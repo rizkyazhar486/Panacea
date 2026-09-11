@@ -1,9 +1,10 @@
 // React binding for the shared vitals store.
 //
-// `useVitals()` re-reads whenever any page merges new device data (the
-// 'panacea:health-updated' broadcast), when another tab writes to localStorage,
-// and on window focus — so a value synced on one page appears on every other
-// page without a reload.
+// `useVitals()` re-reads whenever the central data bus reports a local or
+// cross-tab update, and on window focus as a last-known-good fallback. The bus
+// keeps the legacy health event compatible while adding structured domains and
+// BroadcastChannel propagation, so one component no longer needs to recreate
+// three subtly different listeners itself.
 //
 // `useVitalField` is the piece that makes pages actually autofill: it seeds a
 // normal input's state from the device value, keeps following the device while
@@ -11,22 +12,23 @@
 // Without that last rule, a background sync would yank a field out from under
 // someone mid-entry.
 
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { getVitals, mergeVitals, type Vitals } from './healthVitals'
 import { mergeHealthCache } from './profile'
+import { subscribeDataUpdates } from './dataSync'
 
 export function useVitals(): Vitals {
   const [v, setV] = useState<Vitals>(() => (typeof window === 'undefined' ? {} : getVitals()))
 
   useEffect(() => {
     const sync = () => setV(getVitals())
-    window.addEventListener('panacea:health-updated', sync)
+    const unsubscribe = subscribeDataUpdates(() => sync())
+    // Focus remains a cheap fallback for browsers where BroadcastChannel or
+    // storage delivery is restricted. It performs no network request here.
     window.addEventListener('focus', sync)
-    window.addEventListener('storage', sync)
     return () => {
-      window.removeEventListener('panacea:health-updated', sync)
+      unsubscribe()
       window.removeEventListener('focus', sync)
-      window.removeEventListener('storage', sync)
     }
   }, [])
 

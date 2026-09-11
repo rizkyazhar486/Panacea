@@ -1,0 +1,67 @@
+name: Validate changes
+
+on:
+  pull_request:
+    branches:
+      - main
+  push:
+    branches:
+      - 'panacea-maturity/**'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: validate-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - name: Typecheck and production build
+        run: npm run build
+      - name: Deterministic offline tests
+        run: npm run uji
+
+  server-validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: |
+            package-lock.json
+            server/package-lock.json
+
+      - name: Install shared root dependencies
+        run: npm ci
+
+      - name: Install server dependencies
+        working-directory: server
+        run: npm ci
+
+      - name: Server TypeScript
+        working-directory: server
+        run: npm run typecheck
+
+      - name: Server build
+        working-directory: server
+        run: npm run build
+
+      - name: Full deterministic server tests
+        working-directory: server
+        run: npm run uji

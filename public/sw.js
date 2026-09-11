@@ -1,24 +1,26 @@
-// Minimal, conservative service worker — enables installability + basic offline.
-// Strategy: navigations are network-first (so deploys are picked up immediately,
-// with an offline fallback to the cached shell); same-origin static assets are
-// cache-first (they're content-hashed, so safe). API & cross-origin requests
-// (backend, Cloudinary, Google, fonts) are never cached.
-const CACHE = 'panaceamed-v7'
-const SHELL = ['./', './index.html', './manifest.webmanifest', './logo-mark.png']
+// Panaceamed stability-first service worker.
+// Release: ios-webkit-stability-v18
+//
+// Important: this worker intentionally does NOT intercept fetch requests.
+// iOS WebKit can keep an older installed service worker alive across deploys;
+// combining that with SPA/chunk changes can create stale-response loops and,
+// under memory pressure, terminate the WebContent process with Safari's
+// "A problem repeatedly occurred" screen. Network requests therefore pass
+// directly to the browser/CDN. Push + notification routing remain supported.
+const CACHE_PREFIX = 'panaceamed-'
 
-self.addEventListener('install', (event) => {
-  event.waitUntil(caches.open(CACHE).then((c) => c.addAll(SHELL)).catch(() => {}))
+self.addEventListener('install', () => {
   self.skipWaiting()
 })
 
 self.addEventListener('activate', (event) => {
   event.waitUntil(
-    caches.keys().then((keys) => Promise.all(keys.filter((k) => k !== CACHE).map((k) => caches.delete(k)))),
+    caches.keys()
+      .then((keys) => Promise.all(keys.filter((key) => key.startsWith(CACHE_PREFIX)).map((key) => caches.delete(key))))
+      .then(() => self.clients.claim()),
   )
-  self.clients.claim()
 })
 
-// ── Web Push ────────────────────────────────────────────────────────────
 self.addEventListener('push', (event) => {
   let data = { title: 'Panaceamed.id', body: 'Anda punya pembaruan baru.', url: './' }
   try {
@@ -26,6 +28,7 @@ self.addEventListener('push', (event) => {
   } catch {
     /* keep defaults */
   }
+
   event.waitUntil(
     self.registration.showNotification(data.title, {
       body: data.body,
@@ -37,79 +40,28 @@ self.addEventListener('push', (event) => {
   )
 })
 
-// KETUKAN PADA NOTIFIKASI HARUS SAMPAI KE HALAMANNYA.
-//
-// Dua cacat diperbaiki di sini sekaligus, dan keduanya menghasilkan gejala yang
-// sama bagi pemakainya — notifikasi ditekan, lalu mendarat di tempat yang salah:
-//
-//   1. Jendela yang SUDAH terbuka hanya difokuskan, alamat tujuannya diabaikan
-//      sama sekali. Yang terlihat: notifikasi gol ditekan, aplikasi terbuka
-//      pada halaman apa pun yang terakhir dibuka — kadang halaman yang sudah
-//      tidak ada lagi, sehingga yang muncul justru layar 404.
-//   2. Alamat relatif ('./#/skor') diserahkan mentah ke openWindow. Alamat
-//      relatif diselesaikan terhadap letak berkas pekerja ini, dan itu tidak
-//      selalu sama dengan akar aplikasi — pada pemasangan ke Layar Utama iOS
-//      hasilnya dapat meleset satu tingkat, dan yang meleset satu tingkat pada
-//      HashRouter berarti rute yang tidak dikenali.
-//
-// Sekarang alamatnya diselesaikan terhadap SCOPE pendaftaran — akar aplikasi
-// yang sebenarnya — dan jendela yang sudah terbuka DIARAHKAN ke sana sebelum
-// difokuskan.
 self.addEventListener('notificationclick', (event) => {
   event.notification.close()
-  const mentah = (event.notification.data && event.notification.data.url) || './'
-  let tujuan
+  const raw = (event.notification.data && event.notification.data.url) || './'
+  let destination
   try {
-    tujuan = new URL(mentah, self.registration.scope).href
-  } catch (e) {
-    tujuan = self.registration.scope
+    destination = new URL(raw, self.registration.scope).href
+  } catch {
+    destination = self.registration.scope
   }
+
   event.waitUntil(
     self.clients.matchAll({ type: 'window', includeUncontrolled: true }).then((clients) => {
-      for (const c of clients) {
-        // navigate() tidak ada pada sebagian peramban; bila tidak ada, jendela
-        // tetap difokuskan supaya ketukannya tidak berakhir tanpa apa pun.
-        if ('navigate' in c) {
-          return c.navigate(tujuan).then((k) => (k && 'focus' in k ? k.focus() : c.focus())).catch(() => c.focus())
+      for (const client of clients) {
+        if ('navigate' in client) {
+          return client
+            .navigate(destination)
+            .then((next) => (next && 'focus' in next ? next.focus() : client.focus()))
+            .catch(() => client.focus())
         }
-        if ('focus' in c) return c.focus()
+        if ('focus' in client) return client.focus()
       }
-      if (self.clients.openWindow) return self.clients.openWindow(tujuan)
+      if (self.clients.openWindow) return self.clients.openWindow(destination)
     }),
-  )
-})
-
-self.addEventListener('fetch', (event) => {
-  const req = event.request
-  if (req.method !== 'GET') return
-  const url = new URL(req.url)
-  if (url.origin !== self.location.origin) return // skip backend, Cloudinary, fonts, etc.
-  if (url.pathname.includes('/api/')) return
-
-  if (req.mode === 'navigate') {
-    event.respondWith(
-      fetch(req)
-        .then((res) => {
-          const copy = res.clone()
-          caches.open(CACHE).then((c) => c.put('./index.html', copy)).catch(() => {})
-          return res
-        })
-        .catch(() => caches.match('./index.html').then((r) => r || caches.match('./'))),
-    )
-    return
-  }
-
-  event.respondWith(
-    caches.match(req).then(
-      (cached) =>
-        cached ||
-        fetch(req).then((res) => {
-          if (res.ok && res.type === 'basic') {
-            const copy = res.clone()
-            caches.open(CACHE).then((c) => c.put(req, copy)).catch(() => {})
-          }
-          return res
-        }),
-    ),
   )
 })

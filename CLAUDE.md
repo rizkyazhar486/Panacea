@@ -41,10 +41,67 @@ so it lives here instead.
 `===` are **data**, not interface. Translating them empties saved layouts and
 silently kills filters with no visible error. Translate the label; leave the key.
 
-## Shipping
+## Multi-agent coordination — mandatory
 
-- Push to **both** `main` and `claude/continue-previous-task-un3s83`.
-- Run `npx tsc --noEmit`, `npm run build`, and `cd server && npm run uji` before
-  pushing.
-- Verify user-visible changes in a real browser at 390x844, not only by reading
-  the diff.
+This repository is edited concurrently by ChatGPT/Codex, Claude Code, Replit and
+other automation. **GitHub `main` is the source of truth, but agents must not push
+directly to `main`.** Direct writes make other PRs stale, cancel useful CI, and
+create hard-to-audit races.
+
+Before editing:
+1. Resolve the latest `main` SHA.
+2. Inspect recent commits and open PRs touching the intended files/area.
+3. If another active PR owns overlapping paths, do not duplicate it. Pick another
+   safe task or coordinate explicitly.
+4. Create a short-lived branch from the latest safe `main`.
+
+During implementation:
+- Keep one coherent, reversible batch per PR.
+- Do not create `TEMP`, placeholder, dummy, or knowingly broken commits on `main`.
+- Prefer targeted tests while iterating; diagnose failures before pushing another
+  commit so CI is not repeatedly cancelled and restarted.
+- Do not weaken validators, biomedical gates, browser smoke, security checks, or
+  tests merely to obtain green CI.
+- Do not force-push shared branches or overwrite another agent's work.
+
+## Shipping — PR only
+
+**Never push directly to `main`, and never "push to both main and a Claude branch".**
+The previous dual-push rule is retired because it caused moving-main races.
+
+For every production change:
+1. Push the short-lived branch and open/update exactly one PR.
+2. Run targeted checks first as useful.
+3. Require **Validate pull requests** and the complete **Stabilization Acceptance**
+   workflow to pass for the exact current PR head. Full acceptance remains the
+   authority for frontend build/tests, Body/WebGL smoke, and server gates.
+4. Immediately before merge, resolve latest `main`, confirm mergeability, inspect
+   changed-file overlap, and confirm the tested head has not changed.
+5. If `main` moved into overlapping files, CI/workflow files, or creates uncertain
+   ancestry, refresh/rebuild from latest `main` and rerun gates. Never force merge.
+6. Merge through the PR only after the exact-head gates are green and the final
+   race check is clean. Automatic merge is acceptable under those conditions.
+7. After merge, verify the merge is present on `main` and inspect available
+   deployment/smoke evidence.
+8. Close stale or superseded duplicate PRs so agents do not keep working the same
+   candidate twice.
+
+For user-visible changes, verify the affected surface in a real browser at
+**390x844** when the repository's browser tooling supports it. For Body/3D work,
+preserve the existing WebGL smoke and rendered-artifact checks.
+
+## Biomedical / clinical publication boundary
+
+Software CI is not academic or clinical validation. For anatomy, physiology,
+pathology, pharmacology, genomics, surgery, diagnosis/treatment, or other medical
+content, preserve provenance, evidence/version boundaries, uncertainty, AI
+assistance disclosure, and the repository Academic Accuracy Gate. Never claim
+human review unless a real qualified reviewer, credentials, date and scope are
+recorded. Never infer patient-specific anatomy, lesion location, procedure target,
+force/device setting, diagnosis or treatment from generic atlas/simulation data.
+
+## Shared policy
+
+Read and follow `AGENTS.md` as the cross-agent operating policy. If this file and
+`AGENTS.md` conflict on Git/CI coordination, follow the safer rule: short-lived
+branch → PR → exact-head gates → final latest-main audit → merge.

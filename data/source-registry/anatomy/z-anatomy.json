@@ -1,0 +1,44 @@
+{
+  "id": "z_anatomy",
+  "name": "Z-Anatomy",
+  "category": "anatomy",
+  "kind": ["dataset", "mesh", "tooling"],
+  "homepage": "https://www.z-anatomy.com/",
+  "repository": "https://github.com/Z-Anatomy/Models-of-human-anatomy",
+  "features": [751, 752, 753, 754, 755, 756, 757, 758, 759, 760, 761],
+  "formats": ["blend", "mesh", "derived-glb", "derived-gltf"],
+  "usage": {
+    "runtime": false,
+    "buildTime": true,
+    "networkRequired": false,
+    "notes": "Treat Z-Anatomy as an asset-acquisition/build-time source. Runtime delivery should use Panacea-controlled optimized derivatives with their own asset manifest and preserved attribution/license metadata."
+  },
+  "license": {
+    "status": "VERIFIED",
+    "identifier": "CC-BY-SA-4.0 with asset-level exceptions",
+    "commercialUse": "CONDITIONAL",
+    "attributionRequired": true,
+    "shareAlike": true,
+    "scope": "The Z-Anatomy repository states that its shared code/content is CC BY-SA 4.0, while its license/attribution file also identifies incorporated or referenced models under licenses including CC BY-NC-SA 4.0 and CC BY-NC 4.0. Therefore every imported anatomical asset must carry its own provenance and license decision before commercial use.",
+    "verificationUrl": "https://github.com/Z-Anatomy/Models-of-human-anatomy/blob/master/License.txt",
+    "verifiedAt": "2026-09-08",
+    "notes": "Never infer commercial permission from the repository-level license alone. Block production ingestion when the selected asset has no explicit asset-level license/provenance record."
+  },
+  "validation": {
+    "level": "EDUCATIONAL",
+    "clinicalDecisionUse": "NO",
+    "notes": "Use as anatomical visualization/reference material. Do not present geometry alone as patient-specific anatomy, diagnostic evidence, or validated procedural guidance."
+  },
+  "provenance": {
+    "authority": "Z-Anatomy project with documented upstream model attributions including BodyParts3D and other contributors",
+    "sourceIdentityRequired": true,
+    "versionPinRequired": true,
+    "notes": "Record upstream creator/source, exact asset identifier, source revision, transformation history and attribution text for every derived Panacea mesh."
+  },
+  "adapter": {
+    "status": "PLANNED",
+    "normalizedTarget": "PanaceaAnatomyAssetManifest",
+    "module": null,
+    "notes": "Planned pipeline: source asset -> license/provenance gate -> mesh cleanup -> stable anatomical ID mapping -> LOD/compression -> GLB/glTF -> Panacea anatomy renderer."
+  }
+}

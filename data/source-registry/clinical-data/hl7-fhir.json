@@ -1,0 +1,52 @@
+{
+  "id": "hl7_fhir",
+  "name": "HL7 FHIR",
+  "category": "clinical-data",
+  "kind": ["standard"],
+  "homepage": "https://hl7.org/fhir/",
+  "repository": null,
+  "features": ["human-os", "digital-twin", "clinical-intelligence", "healthcare-infrastructure", "interoperability", "patient", "observation", "condition", "medication", "diagnostic-report", "imaging-study", "procedure", "care-plan", "encounter"],
+  "formats": ["json", "xml", "rdf"],
+  "usage": {
+    "runtime": true,
+    "buildTime": true,
+    "networkRequired": false,
+    "notes": "FHIR is Panacea's interoperability contract, not a mandatory hosted service. Resource definitions and profiles can be used locally; network access is required only when exchanging resources with a FHIR server. Every integration must declare its FHIR version, profiles and implementation guides explicitly."
+  },
+  "license": {
+    "status": "VERIFIED",
+    "identifier": "CC0-1.0",
+    "commercialUse": "ALLOWED",
+    "attributionRequired": false,
+    "shareAlike": false,
+    "scope": "HL7 dedicates the FHIR specification materials to the public domain under CC0 1.0. FHIR and HL7 trademarks remain protected, and third-party intellectual property referenced by FHIR, including terminologies such as SNOMED CT and standards such as DICOM, is not licensed by the FHIR CC0 grant.",
+    "verificationUrl": "https://hl7.org/fhir/license.html",
+    "verifiedAt": "2026-09-08",
+    "notes": "Use the HL7 FHIR trademark according to HL7 guidance and never infer permission to redistribute third-party terminology content merely because a FHIR resource references it."
+  },
+  "validation": {
+    "level": "REFERENCE",
+    "clinicalDecisionUse": "CONTEXT_ONLY",
+    "notes": "FHIR standardizes representation and exchange of healthcare data; it does not establish that a resource's clinical content, measurement, coding, diagnosis or recommendation is correct. Profiles, validation rules and intended clinical use require separate verification."
+  },
+  "provenance": {
+    "authority": "Health Level Seven International (HL7)",
+    "sourceIdentityRequired": true,
+    "versionPinRequired": true,
+    "notes": "The current published specification is FHIR R5 v5.0.0, while many production ecosystems and Medplum currently expose FHIR R4. Panacea must preserve fhirVersion, canonical profile URLs, resource id/meta.versionId and source server identity. Never silently coerce R4/R4B/R5 resources across versions."
+  },
+  "adapter": {
+    "status": "PLANNED",
+    "normalizedTarget": "PanaceaHealthResource",
+    "module": null,
+    "notes": "Planned flow: versioned FHIR JSON/XML -> conformance/profile validation -> Panacea FHIR adapter -> PanaceaHealthResource preserving original resourceType/id/meta/canonical profile/source -> domain engines and UI. Keep original FHIR payload or immutable source reference available for round-trip provenance."
+  },
+  "trust": {
+    "authority": 5,
+    "evidenceQuality": 2,
+    "recency": 4,
+    "licenseClarity": 5,
+    "reproducibility": 5,
+    "notes": "FHIR has high authority as an interoperability standard, but it is not itself a biomedical evidence source; EvidenceQuality therefore intentionally does not score it as clinical evidence."
+  }
+}

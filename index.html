@@ -6,6 +6,22 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
     <meta name="theme-color" content="#00BF63" />
     <link rel="manifest" href="./manifest.webmanifest" />
+    <link rel="stylesheet" href="/home-widget-v3.css?v=20260907-3" />
+    <link rel="stylesheet" href="/home-widget-hd-v9.css?v=20260908-1" />
+    <link rel="stylesheet" href="/home-widget-hd-v10.css?v=20260908-1" />
+    <link rel="stylesheet" href="/home-widget-clean-v11.css?v=20260908-1" />
+    <link rel="stylesheet" href="/home-performance-v12.css?v=20260908-1" />
+    <link rel="stylesheet" href="/home-theme-v18.css?v=20260908-2" />
+    <link rel="stylesheet" href="/shell-theme-v18.css?v=20260908-2" />
+    <link rel="stylesheet" href="/shell-performance-v20.css?v=20260908-1" />
+    <link rel="stylesheet" href="/home-visual-v25.css?v=20260908-1" />
+    <link rel="stylesheet" href="/home-comfort-v26.css?v=20260908-1" />
+    <link rel="stylesheet" href="/home-contrast-v27.css?v=20260908-1" />
+    <link rel="stylesheet" href="/home-widget-dark-v31.css?v=20260909-1" />
+    <link rel="stylesheet" href="/home-cosmic-command-v35.css?v=20260909-2" />
+    <link rel="stylesheet" href="/welcome-revitalization-v28.css?v=20260908-1" />
+    <link rel="stylesheet" href="/home-readability-v36.css?v=20260909-1" />
+    <script defer src="/welcome-runtime-v28.js?v=20260908-1"></script>
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="default" />
     <meta name="apple-mobile-web-app-title" content="Panaceamed" />
@@ -14,7 +30,6 @@
       name="description"
       content="Panaceamed.id — AI-Klinik Praktis untuk Akses Kesehatan. AI anamnesis, AI-EMR, longevity & faskes darurat, diverifikasi klinisi berlisensi."
     />
-    <!-- Open Graph / social sharing -->
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content="Panaceamed.id" />
     <meta property="og:title" content="Panaceamed.id — Longevity Medical-AI" />
@@ -27,22 +42,120 @@
     <meta name="twitter:image" content="./logo-mark.png" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <!-- Critical Home typography only. Keep the first paint small and predictable. -->
     <link
-      href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@600;700&family=Instrument+Serif:ital@0;1&family=Barlow:wght@300;400;500;600&family=Unbounded:wght@700;800;900&family=Oxanium:wght@600;700;800&family=Gugi&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@600;700&display=swap"
       rel="stylesheet"
     />
+    <!-- Specialty display faces are decorative. JavaScript schedules them only
+         after load + idle time on normal devices so they cannot compete with
+         React, Home widgets, or health data during startup. -->
+    <noscript>
+      <link
+        href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Barlow:wght@300;400;500;600&family=Unbounded:wght@700;800;900&family=Oxanium:wght@600;700;800&family=Gugi&display=swap"
+        rel="stylesheet"
+      />
+    </noscript>
     <title>Panaceamed.id — Longevity Medical-AI</title>
+    <style>
+      @keyframes pmd-splash-pulse{0%,100%{transform:scale(1);opacity:1}50%{transform:scale(1.06);opacity:.9}}
+      html.pmd-low-memory .orb{animation:none!important}
+      html.pmd-low-memory #pmd-splash img{animation:none!important;box-shadow:none!important}
+      html:has(a[aria-current="page"][href$="/body-explorer"]){scroll-behavior:auto}
+      @media (prefers-reduced-motion:reduce){*,*::before,*::after{scroll-behavior:auto!important;animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important}}
+    </style>
+    <script>
+      (() => {
+        const ua = navigator.userAgent || ''
+        const isIOS = /iPhone|iPad|iPod/i.test(ua) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1)
+        const saveData = Boolean(navigator.connection && navigator.connection.saveData)
+        const reducedMotion = Boolean(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches)
+        const lowMemory = isIOS || saveData || reducedMotion
+
+        window.__PANACEA_LOW_MEMORY__ = lowMemory
+        if (lowMemory) document.documentElement.classList.add('pmd-low-memory')
+      })()
+    </script>
+    <script>
+      (() => {
+        if (window.__PANACEA_LOW_MEMORY__) return
+
+        const loadSpecialtyFonts = () => {
+          if (document.getElementById('pmd-specialty-fonts')) return
+          const link = document.createElement('link')
+          link.id = 'pmd-specialty-fonts'
+          link.rel = 'stylesheet'
+          link.href = 'https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Barlow:wght@300;400;500;600&family=Unbounded:wght@700;800;900&family=Oxanium:wght@600;700;800&family=Gugi&display=swap'
+          document.head.appendChild(link)
+        }
+
+        const schedule = () => {
+          if ('requestIdleCallback' in window) {
+            window.requestIdleCallback(loadSpecialtyFonts, { timeout: 10000 })
+          } else {
+            window.setTimeout(loadSpecialtyFonts, 6000)
+          }
+        }
+
+        if (document.readyState === 'complete') schedule()
+        else window.addEventListener('load', schedule, { once: true })
+      })()
+    </script>
   </head>
   <body>
     <div id="root"></div>
-    <!-- Splash screen — pure inline HTML/CSS so it paints before any JS loads
-         (the actual first visual, not a fake one bolted on after mount).
-         Removed by main.tsx once the app has mounted, with a floor so it
-         never flashes imperceptibly on a fast connection. -->
-    <div id="pmd-splash" style="position:fixed;inset:0;z-index:9999;display:flex;align-items:center;justify-content:center;background:linear-gradient(160deg,#00BF63,#0B7A4B);transition:opacity .45s ease;">
+    <div id="pmd-splash" style="position:fixed;inset:0;z-index:9999;display:flex;align-items:center;justify-content:center;background:linear-gradient(160deg,#00BF63,#0B7A4B);transition:opacity .35s ease;">
       <img src="./logo-mark.png" alt="" width="72" height="72" style="border-radius:20px;animation:pmd-splash-pulse 1.3s ease-in-out infinite;box-shadow:0 12px 32px rgba(0,0,0,0.25);" />
     </div>
-    <style>@keyframes pmd-splash-pulse{0%,100%{transform:scale(1);opacity:1}50%{transform:scale(1.08);opacity:.88}}</style>
+
+    <script>
+      (() => {
+        const CACHE_PREFIX = 'panaceamed-'
+        const MAINTENANCE_VERSION = '20260909-v33'
+        const MAINTENANCE_KEY = 'pmd-cache-maintenance-version'
+        const rootReady = () => {
+          const root = document.getElementById('root')
+          return Boolean(root && root.childElementCount > 0)
+        }
+
+        const maintain = async () => {
+          try {
+            if ('caches' in window) {
+              const keys = await caches.keys()
+              for (const key of keys) {
+                if (key.startsWith(CACHE_PREFIX) && !key.includes('stability')) {
+                  await caches.delete(key)
+                }
+              }
+            }
+            if (navigator.onLine && 'serviceWorker' in navigator) {
+              const registrations = await navigator.serviceWorker.getRegistrations()
+              for (const registration of registrations) {
+                await registration.update().catch(() => undefined)
+              }
+            }
+            try { localStorage.setItem(MAINTENANCE_KEY, MAINTENANCE_VERSION) } catch {}
+          } catch {}
+        }
+
+        let alreadyMaintained = false
+        try { alreadyMaintained = localStorage.getItem(MAINTENANCE_KEY) === MAINTENANCE_VERSION } catch {}
+        if (!alreadyMaintained) {
+          if ('requestIdleCallback' in window) {
+            window.requestIdleCallback(() => { void maintain() }, { timeout: 15000 })
+          } else {
+            window.setTimeout(() => { void maintain() }, 12000)
+          }
+        }
+
+        window.setTimeout(() => {
+          if (rootReady()) return
+          const splash = document.getElementById('pmd-splash')
+          if (!splash) return
+          splash.innerHTML = '<div style="max-width:330px;padding:24px;text-align:center;font-family:system-ui;color:white"><img src="./logo-mark.png" alt="" width="64" height="64" style="border-radius:18px;box-shadow:0 10px 28px rgba(0,0,0,.22)"/><div style="margin-top:16px;font-size:20px;font-weight:800">Panacea gagal memulai</div><div style="margin-top:7px;font-size:13px;line-height:1.5;opacity:.86">Tidak ada reload otomatis. Coba muat ulang satu kali.</div><button type="button" onclick="location.reload()" style="margin-top:16px;border:0;border-radius:14px;padding:12px 18px;font:700 14px system-ui;color:#06351f;background:#fff;box-shadow:0 8px 28px rgba(0,0,0,.2)">Muat ulang Panacea</button></div>'
+        }, 12000)
+      })()
+    </script>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>

@@ -1,0 +1,582 @@
+.home-command-panel,
+.home-loading-card {
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  border-radius: 24px;
+  background: rgba(255, 255, 255, 0.82);
+  box-shadow: 0 14px 34px rgba(15, 23, 42, 0.06);
+}
+
+.home-command-panel {
+  padding: 16px;
+}
+
+.dark .home-command-panel,
+.dark .home-loading-card {
+  border-color: rgba(255, 255, 255, 0.09);
+  background: rgba(9, 12, 20, 0.76);
+  box-shadow: 0 14px 36px rgba(0, 0, 0, 0.22);
+}
+
+.home-icon-button {
+  display: grid;
+  width: 42px;
+  height: 42px;
+  place-items: center;
+  border: 1px solid rgba(15, 23, 42, 0.1);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.82);
+  color: #182235;
+  font-size: 18px;
+  font-weight: 800;
+  box-shadow: 0 6px 18px rgba(15, 23, 42, 0.08);
+}
+
+.home-icon-button-strong {
+  border-color: transparent;
+  background: #111827;
+  color: white;
+}
+
+.dark .home-icon-button {
+  border-color: rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.08);
+  color: white;
+}
+
+.dark .home-icon-button-strong {
+  background: white;
+  color: #111827;
+}
+
+.home-action-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.home-action-card {
+  display: flex;
+  min-height: 70px;
+  align-items: center;
+  gap: 10px;
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  border-radius: 18px;
+  background: rgba(248, 250, 252, 0.82);
+  padding: 10px;
+  transition: transform 140ms ease, border-color 140ms ease, background 140ms ease;
+}
+
+.home-action-card:hover {
+  border-color: rgba(37, 99, 235, 0.22);
+  background: rgba(255, 255, 255, 0.96);
+}
+
+.home-action-card:active {
+  transform: scale(0.985);
+}
+
+.home-action-card:focus-visible,
+.home-icon-button:focus-visible,
+.home-pill-button:focus-visible,
+.home-text-link:focus-visible,
+.home-details-summary:focus-visible {
+  outline: 3px solid rgba(59, 130, 246, 0.42);
+  outline-offset: 2px;
+}
+
+.dark .home-action-card {
+  border-color: rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.045);
+}
+
+.dark .home-action-card:hover {
+  border-color: rgba(125, 211, 252, 0.2);
+  background: rgba(255, 255, 255, 0.07);
+}
+
+.home-action-icon {
+  display: grid;
+  width: 40px;
+  height: 40px;
+  flex: 0 0 auto;
+  place-items: center;
+  border-radius: 14px;
+  color: white;
+  font-size: 20px;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.28), 0 8px 20px rgba(15, 23, 42, 0.1);
+}
+
+.home-text-link {
+  min-height: 38px;
+  display: inline-flex;
+  align-items: center;
+  color: #047857;
+  font-size: 10px;
+  font-weight: 900;
+}
+
+.dark .home-text-link {
+  color: #6ee7b7;
+}
+
+.home-pill-button {
+  min-height: 40px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  border-radius: 999px;
+  background: #f3f4f6;
+  padding: 0 13px;
+  color: #374151;
+  font-size: 10px;
+  font-weight: 900;
+}
+
+.dark .home-pill-button {
+  border-color: rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.08);
+  color: #e5e7eb;
+}
+
+.home-details-summary {
+  display: flex;
+  min-height: 54px;
+  cursor: pointer;
+  list-style: none;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.home-details-summary::-webkit-details-marker {
+  display: none;
+}
+
+.home-summary-plus {
+  display: grid;
+  width: 38px;
+  height: 38px;
+  flex: 0 0 auto;
+  place-items: center;
+  border-radius: 999px;
+  background: #f3f4f6;
+  color: #4b5563;
+  font-size: 18px;
+  transition: transform 160ms ease;
+}
+
+.group[open] .home-summary-plus {
+  transform: rotate(45deg);
+}
+
+.dark .home-summary-plus {
+  background: rgba(255, 255, 255, 0.08);
+  color: #f3f4f6;
+}
+
+/* Home widgets remain visible; this only cleans their frame consistency. */
+.home-command-panel .kaca {
+  border: 1px solid rgba(15, 23, 42, 0.08) !important;
+  border-radius: 20px !important;
+  background: rgba(255, 255, 255, 0.88) !important;
+  box-shadow: 0 8px 22px rgba(15, 23, 42, 0.055) !important;
+}
+
+.dark .home-command-panel .kaca {
+  border-color: rgba(255, 255, 255, 0.08) !important;
+  background: rgba(255, 255, 255, 0.045) !important;
+  box-shadow: 0 8px 22px rgba(0, 0, 0, 0.18) !important;
+}
+
+.home-command-panel a,
+.home-command-panel button,
+.home-command-panel summary {
+  -webkit-tap-highlight-color: transparent;
+}
+
+@media (min-width: 720px) {
+  .home-action-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (pointer: coarse) {
+  .home-action-card,
+  .home-icon-button,
+  .home-pill-button,
+  .home-details-summary {
+    min-height: 44px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .home-action-card,
+  .home-summary-plus {
+    transition: none;
+  }
+}
+
+/* ──────────────────────────────────────────────────────────────────────────
+   PANACEA WIDGET SYSTEM 2.0
+   A visual-system layer only. It deliberately does not change calculations,
+   storage, API calls, routing or the component lifecycle. The goal is to make
+   the many existing widgets feel like one coherent native dashboard while
+   keeping the browser work cheap: static borders, no animated glass, no new
+   images, no new JS observers and no additional network requests.
+   ────────────────────────────────────────────────────────────────────────── */
+
+/* The widget board should read as a dashboard inside the Home surface rather
+   than another card nested inside a card. */
+.home-command-panel:has(.geser-halaman) {
+  padding: clamp(12px, 3vw, 16px);
+  border-color: rgba(15, 23, 42, 0.075);
+}
+
+.dark .home-command-panel:has(.geser-halaman) {
+  border-color: rgba(255, 255, 255, 0.085);
+  background: rgba(6, 9, 15, 0.82);
+}
+
+/* Typography hierarchy. Current widgets use the shared t-* tokens; tuning
+   them here improves every widget at once without touching its data code. */
+.home-command-panel .t-mikro {
+  font-size: 10.5px !important;
+  line-height: 1.35 !important;
+  letter-spacing: 0.015em;
+}
+
+.home-command-panel .t-kecil {
+  font-size: 12.5px !important;
+  line-height: 1.4 !important;
+}
+
+.home-command-panel .t-sedang {
+  font-size: 15px !important;
+  line-height: 1.2 !important;
+}
+
+.home-command-panel .t-angka {
+  font-size: clamp(25px, 7.2vw, 32px) !important;
+  line-height: .98 !important;
+  letter-spacing: -0.035em;
+}
+
+.home-command-panel .t-angka-panjang {
+  font-size: clamp(21px, 6vw, 27px) !important;
+  line-height: 1 !important;
+  letter-spacing: -0.03em;
+}
+
+/* One compact rhythm for the whole board. This fixes cards whose headings,
+   body copy and controls previously used unrelated spacing. */
+.home-command-panel .gap-fluid {
+  gap: 10px !important;
+}
+
+.home-command-panel > div,
+.home-command-panel > section,
+.home-command-panel .geser-halaman + *,
+.home-command-panel .geser-halaman ~ * {
+  scroll-margin-top: 84px;
+}
+
+/* Wide-carousel header: keep Summary / Manage / progress on a single readable
+   line without the giant letter spacing visible in the screenshots. */
+.home-command-panel .geser-halaman {
+  margin-top: 1px;
+  max-height: 244px;
+  border-radius: 22px;
+  overscroll-behavior-inline: contain;
+}
+
+.home-command-panel .geser-halaman > div {
+  min-width: 100%;
+  height: 100%;
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior-y: contain;
+  scrollbar-width: none;
+  padding: 1px;
+}
+
+.home-command-panel .geser-halaman > div::-webkit-scrollbar {
+  display: none;
+}
+
+/* Wide widget pages get one predictable inner surface. Short widgets fill the
+   same stage without forcing the overall Home page to jump on every swipe. */
+.home-command-panel .geser-halaman > div > section,
+.home-command-panel .geser-halaman > div > a {
+  min-height: calc(100% - 2px);
+  min-width: 0;
+}
+
+.home-command-panel .geser-halaman .kaca {
+  min-height: 100%;
+  border-radius: 22px !important;
+  border-color: rgba(15, 23, 42, 0.09) !important;
+  background: rgba(250, 252, 252, 0.92) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, .72),
+    0 8px 24px rgba(15, 23, 42, 0.045) !important;
+}
+
+.dark .home-command-panel .geser-halaman .kaca {
+  border-color: rgba(255, 255, 255, 0.11) !important;
+  background: rgba(15, 18, 25, 0.94) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, .055),
+    0 10px 26px rgba(0, 0, 0, 0.2) !important;
+}
+
+/* Kill expensive decorative animation/pseudo-glow inside the widget board.
+   Brand colours remain in the actual metrics, rings, charts and status dots. */
+.home-command-panel .kaca,
+.home-command-panel .kaca::before,
+.home-command-panel .kaca::after {
+  animation: none !important;
+}
+
+.home-command-panel .kaca::before,
+.home-command-panel .kaca::after {
+  transition: none !important;
+}
+
+/* Section headers become a consistent mini navigation bar. */
+.home-command-panel section > .mb-2,
+.home-command-panel section > .mb-1,
+.home-command-panel section > .mb-3 {
+  min-height: 38px;
+  margin-bottom: 8px !important;
+  align-items: center;
+}
+
+.home-command-panel section > .mb-2 h2,
+.home-command-panel section > .mb-1 h2,
+.home-command-panel section > .mb-3 h2 {
+  font-size: 11.5px !important;
+  line-height: 1.15 !important;
+  font-weight: 900 !important;
+  letter-spacing: .105em !important;
+}
+
+.home-command-panel section > .mb-2 a,
+.home-command-panel section > .mb-2 button,
+.home-command-panel section > .mb-3 a,
+.home-command-panel section > .mb-3 button {
+  min-height: 38px;
+  border-radius: 12px;
+  padding-inline: 9px;
+  font-size: 11px !important;
+  line-height: 1;
+}
+
+/* Metric text and explanatory copy: numerals lead, explanations support. */
+.home-command-panel .kaca p {
+  max-width: 66ch;
+  font-size: 11.5px;
+  line-height: 1.46;
+}
+
+.home-command-panel .kaca [class*='text-[26px]'],
+.home-command-panel .kaca [class*='text-[27px]'] {
+  line-height: .98;
+  letter-spacing: -.035em;
+}
+
+.home-command-panel .tabular-nums {
+  font-variant-numeric: tabular-nums;
+}
+
+/* Buttons and chips become touch-safe but no longer oversized. */
+.home-command-panel .kaca button,
+.home-command-panel .kaca a[href] {
+  -webkit-tap-highlight-color: transparent;
+}
+
+.home-command-panel .kaca button {
+  min-height: 42px;
+}
+
+.home-command-panel .kaca button:focus-visible,
+.home-command-panel .kaca a[href]:focus-visible,
+.home-command-panel .geser-halaman button:focus-visible {
+  outline: 2px solid rgba(0, 191, 99, .78);
+  outline-offset: 2px;
+}
+
+/* Five-option controls such as Daily Energy should not become five giant
+   blocks. Equal sizing + smaller copy keeps them usable on iPhone widths. */
+.home-command-panel .kaca .grid-cols-5 > button {
+  min-width: 0;
+  min-height: 42px;
+  padding: 6px 3px !important;
+  border-radius: 12px !important;
+  font-size: 10.5px !important;
+  line-height: 1.15 !important;
+  overflow-wrap: normal;
+}
+
+/* Media/logo treatment: team crests and small identity marks stay crisp and
+   proportional instead of determining the card height. */
+.home-command-panel .geser-halaman img {
+  width: auto;
+  height: auto;
+  max-width: 64px;
+  max-height: 64px;
+  object-fit: contain;
+}
+
+.home-command-panel .geser-halaman img[alt*='logo' i],
+.home-command-panel .geser-halaman img[alt*='team' i],
+.home-command-panel .geser-halaman img[alt*='club' i] {
+  max-width: 56px;
+  max-height: 56px;
+}
+
+/* Arabic/scripture content gets a dedicated reading scale. The previous large
+   desktop-like size caused the verse to dominate a compact dashboard card. */
+.home-command-panel [lang='ar'],
+.home-command-panel [dir='rtl'] {
+  font-size: clamp(20px, 5.8vw, 29px) !important;
+  line-height: 1.75 !important;
+  letter-spacing: 0 !important;
+  overflow-wrap: normal;
+  word-break: normal;
+}
+
+/* Charts/progress bars should be visible without shouting. */
+.home-command-panel svg,
+.home-command-panel canvas {
+  max-width: 100%;
+}
+
+.home-command-panel [role='progressbar'],
+.home-command-panel .kaca > span.h-2\.5,
+.home-command-panel .kaca > span.h-2,
+.home-command-panel .kaca > span.h-1\.5 {
+  overflow: hidden;
+}
+
+/* Compact empty states. A feature with no data should invite one action, not
+   occupy the same visual weight as a fully populated metric card. */
+.home-command-panel .border-dashed {
+  min-height: 72px !important;
+  border-radius: 18px !important;
+  background: rgba(148, 163, 184, .035);
+}
+
+.dark .home-command-panel .border-dashed {
+  background: rgba(255, 255, 255, .022);
+}
+
+/* Body-detail lists: line up the labels and numbers like a native Health list. */
+.home-command-panel .kaca.overflow-hidden > a {
+  min-height: 50px;
+  padding-block: 8px;
+}
+
+.home-command-panel .kaca.overflow-hidden > a + a {
+  border-top-color: rgba(148, 163, 184, .13) !important;
+}
+
+/* Summary page dots/progress: easier to understand, cheaper to render. */
+.home-command-panel .geser-halaman + div,
+.home-command-panel [aria-label^='Widget'] {
+  touch-action: manipulation;
+}
+
+.home-command-panel button[aria-label^='Widget'] {
+  min-height: 20px !important;
+  min-width: 20px;
+  padding: 7px;
+  background-clip: content-box;
+}
+
+/* Mobile is the primary target for this board. Remove nested blur and avoid
+   compositing every card onto its own GPU layer. */
+@media (max-width: 640px) {
+  .home-command-panel:has(.geser-halaman) {
+    padding: 12px;
+    border-radius: 22px;
+  }
+
+  .home-command-panel .geser-halaman {
+    max-height: 232px;
+    border-radius: 20px;
+  }
+
+  .home-command-panel .geser-halaman .kaca,
+  .home-command-panel .kaca {
+    -webkit-backdrop-filter: none !important;
+    backdrop-filter: none !important;
+  }
+
+  .home-command-panel .geser-halaman .kaca {
+    border-radius: 20px !important;
+  }
+
+  .home-command-panel .t-mikro {
+    font-size: 10px !important;
+  }
+
+  .home-command-panel .t-kecil {
+    font-size: 12px !important;
+  }
+
+  .home-command-panel .kaca p {
+    font-size: 11.25px;
+    line-height: 1.42;
+  }
+
+  .home-command-panel .geser-halaman img {
+    max-width: 56px;
+    max-height: 56px;
+  }
+
+  /* Prevent long action labels like Mark all read from colliding with titles. */
+  .home-command-panel section > .mb-2,
+  .home-command-panel section > .mb-3 {
+    gap: 6px !important;
+  }
+
+  .home-command-panel section > .mb-2 > :last-child,
+  .home-command-panel section > .mb-3 > :last-child {
+    flex-shrink: 0;
+  }
+}
+
+@media (max-width: 380px) {
+  .home-command-panel .geser-halaman {
+    max-height: 224px;
+  }
+
+  .home-command-panel .kaca .grid-cols-5 > button {
+    font-size: 9.5px !important;
+    padding-inline: 2px !important;
+  }
+
+  .home-command-panel [lang='ar'],
+  .home-command-panel [dir='rtl'] {
+    font-size: clamp(18px, 5.4vw, 24px) !important;
+  }
+}
+
+@media (pointer: coarse) {
+  .home-command-panel button,
+  .home-command-panel a[href] {
+    touch-action: manipulation;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .home-command-panel *,
+  .home-command-panel *::before,
+  .home-command-panel *::after {
+    scroll-behavior: auto !important;
+    animation-duration: .01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: .01ms !important;
+  }
+}

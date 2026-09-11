@@ -1,0 +1,52 @@
+{
+  "id": "embl-ebi-ols4",
+  "name": "EMBL-EBI Ontology Lookup Service (OLS4)",
+  "category": "terminology",
+  "kind": ["api", "ontology", "terminology-server"],
+  "homepage": "https://www.ebi.ac.uk/ols4/",
+  "repository": "https://github.com/EBISPOT/ols4",
+  "features": ["medical-library", "body-explorer", "anatomy-ontology", "disease-grounding", "cell-ontology", "phenotype-ontology", "knowledge-bridge", "semantic-search"],
+  "formats": ["json", "http-rest", "owl", "rdf"],
+  "usage": {
+    "runtime": true,
+    "buildTime": false,
+    "networkRequired": true,
+    "notes": "Panacea queries the public OLS4 REST API through two bounded adapter paths: `src/lib/medicalSources.ts` for Medical Library ontology search (UBERON, CL, EFO) and `server/src/anatomyOntology.ts` for Body Explorer semantic grounding (DOID, HP, UBERON, FMA). EMBL-EBI recommends the OLS API and/or upstream OWL files rather than depending on the undocumented internal OLS database representation."
+  },
+  "license": {
+    "status": "CHECK_REQUIRED",
+    "identifier": "OLS4 software: Apache-2.0; indexed ontology content: varies by ontology",
+    "commercialUse": "CONDITIONAL",
+    "attributionRequired": true,
+    "shareAlike": null,
+    "scope": "The OLS4 software repository is Apache-2.0, but OLS is an aggregation and lookup service for ontologies owned and licensed by their respective projects. EMBL-EBI states that it does not add restrictions beyond those imposed by data owners. Individual ontology records can therefore carry licences such as Apache-2.0, CC BY, CC BY-SA or other terms.",
+    "verificationUrl": "https://www.ebi.ac.uk/about/terms-of-use/",
+    "verifiedAt": "2026-09-08",
+    "notes": "Do not treat the Apache-2.0 licence of the OLS4 software as a licence for every ontology returned through the service. Before redistributing ontology content, preserve and evaluate the upstream ontology's own licence and attribution requirements."
+  },
+  "validation": {
+    "level": "REFERENCE",
+    "clinicalDecisionUse": "CONTEXT_ONLY",
+    "notes": "OLS provides semantic identifiers and ontology metadata. A matching ontology term supports normalization and navigation but does not independently validate a diagnosis, phenotype assignment, anatomical claim or patient-specific clinical conclusion."
+  },
+  "provenance": {
+    "authority": "EMBL-EBI Ontology Lookup Service with ontology content supplied by upstream ontology projects",
+    "sourceIdentityRequired": true,
+    "versionPinRequired": true,
+    "notes": "Preserve ontology prefix/name, term identifier, IRI, ontology/version context when available, query and retrieval timestamp. Any exported or cached ontology content should also retain the upstream ontology licence/rights metadata."
+  },
+  "adapter": {
+    "status": "ACTIVE",
+    "normalizedTarget": "OntologyResult | OntologyTerm",
+    "module": "src/lib/medicalSources.ts",
+    "notes": "The registry validator requires one concrete module path here, so the Medical Library adapter is the canonical module pointer. OLS4 is also consumed through the bounded server adapter at `server/src/anatomyOntology.ts`, which normalizes DOID/HP/UBERON/FMA results for Body Explorer and preserves source, identifier system, source URL and IRI. UI code consumes normalized results rather than constructing raw OLS requests itself."
+  },
+  "trust": {
+    "authority": 5,
+    "evidenceQuality": 4,
+    "recency": 5,
+    "licenseClarity": 2,
+    "reproducibility": 4,
+    "notes": "High authority as an EMBL-EBI ontology access layer, while scientific scope and rights depend on each upstream ontology. Licence clarity is intentionally conservative because OLS aggregates heterogeneous ontology licences."
+  }
+}

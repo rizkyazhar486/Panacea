@@ -1,0 +1,52 @@
+{
+  "id": "rxclass",
+  "name": "NLM RxClass API",
+  "category": "drug",
+  "kind": ["api", "terminology-server"],
+  "homepage": "https://lhncbc.nlm.nih.gov/RxNav/APIs/RxClassAPIs.html",
+  "repository": null,
+  "features": ["drug-bank", "pharmacology-profile", "mechanism-context", "physiologic-effect-context", "drug-classification", "knowledge-bridge"],
+  "formats": ["json", "http-rest"],
+  "usage": {
+    "runtime": true,
+    "buildTime": false,
+    "networkRequired": true,
+    "notes": "Panacea queries RxClass only from the server adapter. The adapter requests bounded relation slices for MED-RT mechanism/physiologic-effect/may_treat relations, DailyMed established pharmacologic classes and ATC classes, while preserving `relaSource` on every normalized class. It also captures the RxClass relation-source version for MEDRT and ATC when NLM exposes one. DailyMed is intentionally not assigned a fabricated version because NLM documents that its RxClass class-member data is a rolling update without an associated version number. RxNorm ingredient identity remains a separate normalization concern even though the same NLM RxNav service domain is used."
+  },
+  "license": {
+    "status": "CHECK_REQUIRED",
+    "identifier": "RxClass API access: no API licence required; relation-source rights/terms vary",
+    "commercialUse": "CONDITIONAL",
+    "attributionRequired": true,
+    "shareAlike": null,
+    "scope": "NLM states that no licence is needed to use the RxClass API and requests NLM acknowledgement for applications using its data. RxClass aggregates drug-class relations from multiple relation sources; this registry entry therefore does not infer one blanket licence or redistribution permission for MED-RT, DailyMed, ATC or other source-vocabulary content returned by RxClass.",
+    "verificationUrl": "https://lhncbc.nlm.nih.gov/RxNav/APIs/RxClassAPIs.html",
+    "verifiedAt": "2026-09-09",
+    "notes": "Preserve relation-source identity and verify the terms of the contributing vocabulary before redistributing source-specific class content. Do not use NLM/NIH names or logos to imply endorsement."
+  },
+  "validation": {
+    "level": "REFERENCE",
+    "clinicalDecisionUse": "CONTEXT_ONLY",
+    "notes": "RxClass relations are terminology/pharmacology context. `has_MoA`, `has_PE`, `has_EPC`, ATC membership or `may_treat` relations must not be converted into a patient-specific indication, treatment recommendation, probability of benefit, contraindication decision or interaction claim without separate validated clinical evidence and decision logic."
+  },
+  "provenance": {
+    "authority": "U.S. National Library of Medicine RxClass service with source-specific drug-class relations",
+    "sourceIdentityRequired": true,
+    "versionPinRequired": false,
+    "notes": "Persist relation source, class identifier, class type, relation, drug query identity and retrieval timestamp. The active Panacea adapter now captures `relaSourceVersion` for MEDRT and ATC through the official RxClass version endpoint and keeps version absence explicit if that endpoint fails. NLM documents DailyMed class-member data in RxClass as a rolling update with no associated version number, so `versionPinRequired` remains false for the aggregate profile rather than pretending every relation source can be pinned."
+  },
+  "adapter": {
+    "status": "ACTIVE",
+    "normalizedTarget": "ProfilFarmakologi",
+    "module": "server/src/rxclass.ts",
+    "notes": "Active server adapter bounds drug queries and class outputs, preserves `relaSource`, captures MEDRT/ATC `relaSourceVersion` metadata with a bounded timeout and runtime cache, rejects malformed class identities and RXCUIs, tolerates partial relation-source/version failure without fabricating missing classes or versions, normalizes RxNorm IN/PIN ingredients, and keeps the full ingredient list behind a 12-hour runtime cache. Regression coverage verifies version preservation and explicitly verifies that DailyMed is not assigned a fake version endpoint."
+  },
+  "trust": {
+    "authority": 5,
+    "evidenceQuality": 3,
+    "recency": 4,
+    "licenseClarity": 2,
+    "reproducibility": 4,
+    "notes": "High authority as an NLM access service, but scientific meaning and rights vary by relation source. Reproducibility improves because MEDRT and ATC source versions are captured when available; it remains below maximum because DailyMed relations are rolling updates without a version number and third-party source terms still vary."
+  }
+}

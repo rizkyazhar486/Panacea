@@ -1,0 +1,49 @@
+/* Panacea mobile shell performance v20
+   Performance-only overrides for low-memory/touch devices.
+   No routing, data, media, widget, health, or interaction logic changes. */
+
+/* The global Shell renders several full-screen blurred decorative orbs behind
+   every page. Stopping their animation is not enough on iOS: the large blur
+   layers still consume GPU memory and compositing bandwidth. Home already owns
+   its static v18 cosmic wallpaper, so low-memory devices can omit these generic
+   shell ornaments without losing information or navigation. */
+html.pmd-low-memory .orb {
+  display: none !important;
+  animation: none !important;
+  filter: none !important;
+  box-shadow: none !important;
+  transform: none !important;
+}
+
+/* On touch devices, keep navigation surfaces readable but avoid live
+   backdrop-filter compositing while the page scrolls underneath them. */
+@media (hover: none) and (pointer: coarse) {
+  header.kaca,
+  .drawer-in,
+  [data-pintasan].kaca {
+    -webkit-backdrop-filter: none !important;
+    backdrop-filter: none !important;
+  }
+}
+
+html.pmd-low-memory header.kaca,
+html.pmd-low-memory .drawer-in,
+html.pmd-low-memory [data-pintasan].kaca {
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
+  filter: none !important;
+}
+
+/* Keep interactions immediate and predictable on constrained devices. */
+html.pmd-low-memory header.kaca,
+html.pmd-low-memory .drawer-in {
+  transition-property: none !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  header.kaca,
+  .drawer-in,
+  [data-pintasan].kaca {
+    transition-duration: .001ms !important;
+  }
+}

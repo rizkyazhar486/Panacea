@@ -1,0 +1,61 @@
+/* Panacea Home performance v12
+   Rendering containment only. No data, calculation, API, routing or widget logic. */
+
+/* Let the browser skip paint/layout work for Home sections that are still far
+   outside the viewport while preserving a stable intrinsic block size. */
+.panacea-home > .home-command-panel,
+.panacea-home > details.home-command-panel {
+  content-visibility: auto;
+  contain-intrinsic-size: auto 260px;
+}
+
+/* Keep widget layout invalidation inside the instrument instead of forcing
+   the rest of Home to reflow when a chart, timer or late data point changes. */
+.widget-instrument-shell-v5 {
+  contain: layout paint;
+}
+
+.widget-instrument-slide-v5 {
+  contain: layout paint;
+}
+
+/* Loading placeholders must be cheap. They intentionally have no shimmer,
+   animation, blur or large shadow. */
+.home-loading-card {
+  animation: none !important;
+  transition: none !important;
+}
+
+/* iOS / save-data / reduced-motion already enters pmd-low-memory before React
+   mounts. Strip decorative GPU work there but keep every control functional. */
+html.pmd-low-memory .home-command-panel,
+html.pmd-low-memory .home-loading-card,
+html.pmd-low-memory .widget-instrument-shell-v5,
+html.pmd-low-memory .widget-instrument-slide-v5,
+html.pmd-low-memory .kaca {
+  box-shadow: none !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+html.pmd-low-memory .home-action-card,
+html.pmd-low-memory .home-icon-button,
+html.pmd-low-memory .home-pill-button,
+html.pmd-low-memory .widget-instrument-nav-v5,
+html.pmd-low-memory .widget-instrument-line-fill-v5 {
+  transition: none !important;
+}
+
+/* Avoid accidental expensive filter stacks on charts and rings in low-memory
+   mode. Color and stroke remain intact; only decorative glow is removed. */
+html.pmd-low-memory .widget-instrument-v5 svg,
+html.pmd-low-memory .widget-instrument-v5 canvas {
+  filter: none !important;
+}
+
+@supports (content-visibility: auto) {
+  .panacea-home > section:not(.home-odyssey-hero),
+  .panacea-home > details {
+    contain-intrinsic-size: auto 220px;
+  }
+}

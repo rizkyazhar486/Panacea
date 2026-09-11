@@ -1,0 +1,30 @@
+import assert from 'node:assert/strict'
+import { readFile } from 'node:fs/promises'
+
+const source = await readFile(new URL('../../src/pages/bodyhub/MultisystemScaleNavigator.tsx', import.meta.url), 'utf8')
+
+assert.match(source, /data-body-multisystem-scale-navigator="v1"/)
+assert.match(source, /Body → RNA → brain → longevity/)
+assert.match(source, /whole-body/)
+assert.match(source, /rna/)
+assert.match(source, /dna-epigenome/)
+assert.match(source, /neural-circuit/)
+assert.match(source, /endocrine-signal/)
+assert.match(source, /cognition-behavior/)
+assert.match(source, /development-regeneration/)
+assert.match(source, /aging-longevity/)
+assert.match(source, /Geometry \{selected\.geometryRequired \? 'required' : 'not required'\}/)
+assert.match(source, /Evidence \{selected\.evidenceBoundary\}/)
+assert.match(source, /patient anatomy/i)
+assert.match(source, /measured RNA\/genomic data/i)
+assert.match(source, /diagnosis/i)
+assert.match(source, /treatment/i)
+assert.match(source, /personality inference/i)
+assert.match(source, /immortality claim/i)
+assert.match(source, /boundary\.externalUxReferences/)
+assert.match(source, /boundary\.scientificEvidence/)
+assert.doesNotMatch(source, /fetch\s*\(/)
+assert.doesNotMatch(source, /new THREE\./)
+assert.doesNotMatch(source, /GLTFLoader/)
+
+console.log('Body multisystem scale navigator: compact 15-scale UI preserves representation and evidence boundaries without network or duplicate renderer.')

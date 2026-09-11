@@ -1,0 +1,52 @@
+{
+  "id": "rcsb-pdb",
+  "name": "RCSB Protein Data Bank (PDB)",
+  "category": "molecular",
+  "kind": ["api", "dataset"],
+  "homepage": "https://www.rcsb.org/",
+  "repository": null,
+  "features": ["experimental-3d-structures", "protein-structures", "nucleic-acid-structures", "ligands", "assemblies", "polymer-entities", "chemical-components", "sequence-search", "structure-similarity-search", "graphql-data-api", "rest-data-api"],
+  "formats": ["json", "pdbx/mmcif", "cif", "fasta"],
+  "usage": {
+    "runtime": true,
+    "buildTime": true,
+    "networkRequired": true,
+    "notes": "Use RCSB PDB for experimentally determined macromolecular structure data and related core archive metadata. Prefer the current RCSB Data API (REST/GraphQL) and Search API v2 for programmatic access. Large structure assets should be fetched on demand or synchronized server-side rather than bundled into the main web application."
+  },
+  "license": {
+    "status": "VERIFIED",
+    "identifier": "CC0-1.0",
+    "commercialUse": "ALLOWED",
+    "attributionRequired": false,
+    "shareAlike": false,
+    "scope": "The wwPDB policy places data files contained in the PDB archive under CC0 1.0 Universal. RCSB states that data provided by its programmatic APIs are available under the same license unless they originate from an integrated external resource, in which case the external provider's licensing restrictions still apply.",
+    "verificationUrl": "https://www.rcsb.org/pages/usage-policy",
+    "verifiedAt": "2026-09-08",
+    "notes": "Although CC0 does not require attribution, RCSB/wwPDB encourage citation of the original structure authors and PDB identifiers. Panacea should preserve structure citations. Do not assume that RCSB educational articles, Molecule of the Month illustrations, screenshots or integrated third-party annotations share the PDB core archive's CC0 terms."
+  },
+  "validation": {
+    "level": "REFERENCE",
+    "clinicalDecisionUse": "CONTEXT_ONLY",
+    "notes": "A deposited molecular structure is scientific structural evidence, not a patient-specific diagnosis or treatment recommendation. Resolution, experimental method, model quality, biological assembly assumptions, ligand identity and structural limitations must remain visible when a structure is used for teaching, visualization or research interpretation."
+  },
+  "provenance": {
+    "authority": "Worldwide Protein Data Bank (wwPDB) archive via RCSB Protein Data Bank",
+    "sourceIdentityRequired": true,
+    "versionPinRequired": true,
+    "notes": "Persist PDB ID, DOI/citation when available, deposition/revision metadata, experimental method, resolution or model-quality fields where relevant, assembly/entity identifiers and the source/API retrieval date. For external annotations or computed structure models exposed through RCSB, keep the originating database/source identity and license separate from PDB core archive provenance."
+  },
+  "adapter": {
+    "status": "PLANNED",
+    "normalizedTarget": "PanaceaMolecularStructure",
+    "module": null,
+    "notes": "Planned flow: search by gene/protein/sequence/structure -> select explicit PDB entry/entity/assembly -> retrieve core Data API metadata plus structure coordinates -> PanaceaMolecularStructure retaining PDB ID + entity/assembly IDs + experimental metadata + citations + source version/retrieval timestamp. Structure rendering should be lazy-loaded into a molecular viewer layer and never injected into the global bundle. Do not silently mix experimentally determined PDB structures with predicted/computed models; label structure origin and evidence class explicitly."
+  },
+  "trust": {
+    "authority": 5,
+    "evidenceQuality": 5,
+    "recency": 5,
+    "licenseClarity": 5,
+    "reproducibility": 5,
+    "notes": "Very high authority for experimentally determined macromolecular structure archive data, with strong identifiers, citations and versioning. Scientific interpretation still depends on experiment/model quality and biological context."
+  }
+}

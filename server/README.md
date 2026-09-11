@@ -1,17 +1,16 @@
 # Panaceamed.id — Backend
 
-Real **Google OAuth login** + **Midtrans payments** (QRIS / Virtual Account / Card)
-for Panaceamed.id, with a **mock fallback** so it runs with zero configuration.
+Panaceamed.id uses this Node/Express service as its **backend on Render**. It handles real Google OAuth, payments, realtime communication, notifications, evidence APIs, and now the genomics compute control plane.
 
-- No credentials set → mock mode (dev-login + simulated payments).
-- Credentials set → live Google verification + live Midtrans transactions + webhook.
+- No optional credentials set → the relevant integration reports unavailable/mock state rather than pretending to be live.
+- Credentials set → the corresponding integration can operate against its real upstream service.
 
 ## Run
 
 ```bash
 cd server
 npm install
-cp .env.example .env      # fill in keys to go live (optional)
+cp .env.example .env
 npm run dev               # http://localhost:8787
 ```
 
@@ -23,16 +22,48 @@ echo "VITE_API_URL=http://localhost:8787" > .env.local
 npm run dev
 ```
 
-The login screen will show a green "Backend aktif" indicator. Sign in (real Google
-button appears when `GOOGLE_CLIENT_ID` is set), then open **Billing & Token** — the
-"Dompet Real (Backend)" card processes payments through the server.
+The production deployment uses the same API contract through the Render backend URL configured as `VITE_API_URL`.
+
+## Render genomics control plane
+
+The public Render backend is the **control plane** for heavy genomics jobs. It deliberately does not proxy multi-gigabyte FASTQ/BAM/POD5 payloads through Express and does not execute arbitrary shell commands from browser input.
+
+A user first stages an input object in an allowed object location (`https://`, `s3://`, or `gs://`). The authenticated backend can then create one of these job kinds:
+
+- `ont-basecalling` — raw Oxford Nanopore signal → upstream Dorado/basecalling worker.
+- `pharmcat` — prepared PGx input → upstream PharmCAT pipeline.
+- `sv-calling` — staged sequencing/alignment evidence → configured structural-variant worker.
+
+Configure the worker on Render with:
+
+```bash
+GENOMICS_WORKER_URL=https://your-private-or-authenticated-worker.example
+GENOMICS_WORKER_TOKEN=server-only-secret
+GENOMICS_WORKER_PROVIDER=render-worker
+GENOMICS_WORKER_TIMEOUT_MS=30000
+```
+
+The worker contract is intentionally small:
+
+```text
+POST /jobs
+GET  /jobs/:id
+POST /jobs/:id/cancel
+```
+
+If `GENOMICS_WORKER_URL` is empty or unreachable, Panacea returns an explicit unavailable/error response. It does **not** fabricate a queued or completed genomics job.
+
+### Security boundary
+
+Job submission/status/cancel requires an authenticated Panacea session. The Render backend forwards an opaque internal user id, not the user's email. The worker job id is never exposed directly to the browser; Panacea wraps it in a user-bound HMAC-signed `jobHandle`, so another account cannot use someone else's handle. Worker credentials remain server-only.
 
 ## Going live
 
 | Feature | What to set | Where to get it |
 | --- | --- | --- |
-| Google login | `GOOGLE_CLIENT_ID` (+ add your frontend origin to Authorized JS origins) | https://console.cloud.google.com/apis/credentials |
-| Payments | `MIDTRANS_SERVER_KEY`, `MIDTRANS_CLIENT_KEY` | https://dashboard.sandbox.midtrans.com/settings/config_info |
+| Google login | `GOOGLE_CLIENT_ID` (+ add your frontend origin to Authorized JS origins) | Google Cloud Console |
+| Payments | `MIDTRANS_SERVER_KEY`, `MIDTRANS_CLIENT_KEY` | Midtrans Dashboard |
+| Genomics compute | `GENOMICS_WORKER_URL`, optional `GENOMICS_WORKER_TOKEN` | Your configured Render/private compute worker |
 
 Set the Midtrans **Payment Notification URL** to `https://YOUR_BACKEND/api/payments/webhook`.
 
@@ -40,18 +71,37 @@ Set the Midtrans **Payment Notification URL** to `https://YOUR_BACKEND/api/payme
 
 | Method | Path | Purpose |
 | --- | --- | --- |
-| GET | `/api/health` | Capability discovery (which features are live) |
-| POST | `/api/auth/google` | Verify Google ID token → session cookie |
-| POST | `/api/auth/dev-login` | Mock login (always available) |
+| GET | `/api/health` | Backend capability discovery |
+| POST | `/api/auth/google` | Verify Google ID token → session cookie/token |
+| POST | `/api/auth/dev-login` | Development login |
 | GET | `/api/auth/me` | Current session user |
 | POST | `/api/auth/logout` | Clear session |
 | GET | `/api/wallet` | Balance + transactions (PNC) |
 | POST | `/api/wallet/withdraw` | Withdraw PNC to bank |
 | POST | `/api/payments/create` | Create a Midtrans (or mock) order |
-| POST | `/api/payments/confirm` | Mock-only: simulate a paid callback |
+| POST | `/api/payments/confirm` | Mock-only payment confirmation |
 | POST | `/api/payments/webhook` | Midtrans notification (verifies signature) |
 | GET | `/api/payments/status/:orderId` | Order status |
+| GET | `/api/genomics/compute/capabilities` | Render genomics control-plane capability/status |
+| POST | `/api/genomics/compute/jobs` | Submit authenticated staged genomics job |
+| GET | `/api/genomics/compute/jobs/:jobHandle` | Read authenticated job status/result metadata |
+| POST | `/api/genomics/compute/jobs/:jobHandle/cancel` | Cancel authenticated job |
 
-> Persistence uses a local `data.json` file for the demo — swap for a real
-> database (Postgres/SQLite) before production. AI support, not a replacement for
-> a licensed clinician; verify doses against a current formulary.
+## Genomics request example
+
+```json
+{
+  "kind": "ont-basecalling",
+  "input": {
+    "uri": "s3://panacea-staging/run-001/input.pod5",
+    "sha256": "<64-hex-sha256>",
+    "sizeBytes": 123456789,
+    "format": "pod5"
+  },
+  "parameters": {
+    "model": "<current-compatible-ONT-model>"
+  }
+}
+```
+
+The backend validates only orchestration metadata. Scientific correctness still belongs to the configured upstream caller/annotator and its validated input requirements; Panacea must preserve provenance and must not convert job completion into an automatic diagnosis or treatment recommendation.

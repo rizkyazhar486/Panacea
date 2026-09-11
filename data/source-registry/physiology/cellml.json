@@ -1,0 +1,52 @@
+{
+  "id": "cellml",
+  "name": "CellML 2.0",
+  "category": "physiology",
+  "kind": ["standard"],
+  "homepage": "https://www.cellml.org/specifications/cellml_2.0/",
+  "repository": null,
+  "features": ["physiology-model-encoding", "mathematical-model-exchange", "cellular-models", "electrophysiology-models", "circulation-models", "metabolism-models", "endocrine-models", "reproducible-simulation"],
+  "formats": ["cellml", "xml", "mathml", "application/cellml+xml"],
+  "usage": {
+    "runtime": true,
+    "buildTime": true,
+    "networkRequired": false,
+    "notes": "CellML is an interchange/encoding standard, not a network service. Panacea may ingest locally supplied or separately acquired CellML models and normalize them for simulation. Do not bundle a large model repository into the primary client; acquire models through explicit source adapters and cache only validated/versioned models needed by a feature."
+  },
+  "license": {
+    "status": "VERIFIED",
+    "identifier": "CellML official Terms of Use",
+    "commercialUse": "ALLOWED",
+    "attributionRequired": true,
+    "shareAlike": false,
+    "scope": "The official CellML terms allow individuals to freely use, publish and redistribute the CellML format/documentation; write and sell applications that create, load or write CellML-valid XML files; distribute or sell their own CellML-valid XML files; and transmit verbatim copies of the CellML format/documentation. Applications and files using the standard should reference the CellML specifications. These terms cover the CellML format/specification, not the copyright or license of every model encoded in CellML.",
+    "verificationUrl": "https://www.cellml.org/about/terms",
+    "verifiedAt": "2026-09-08",
+    "notes": "Every imported model still needs its own model-level license/citation manifest. Do not infer that a .cellml file is commercially reusable merely because the CellML standard itself permits commercial implementations."
+  },
+  "validation": {
+    "level": "REFERENCE",
+    "clinicalDecisionUse": "NO",
+    "notes": "CellML 2.0 defines a valid model encoding, not whether a biological model is scientifically correct, calibrated for a population, validated against experiments, suitable for a patient or approved for clinical decisions. Syntax validity, numerical reproducibility and biological/clinical validity are separate gates."
+  },
+  "provenance": {
+    "authority": "CellML Working Group / Auckland Bioengineering Institute / IUPS Physiome Project",
+    "sourceIdentityRequired": true,
+    "versionPinRequired": true,
+    "notes": "Record CellML specification version, model source/exposure, model authors, original publication/citation, model revision/commit or exposure identifier, acquisition timestamp and model license. Preserve component/variable names, units and semantic identifiers needed to audit transformations."
+  },
+  "adapter": {
+    "status": "PLANNED",
+    "normalizedTarget": "PanaceaPhysiologyModelDefinition",
+    "module": null,
+    "notes": "Planned flow: provenance-cleared CellML model -> standards-compliant parser/validator -> normalized equations, variables, units, components and metadata -> PanaceaPhysiologyModelDefinition -> explicit simulation engine -> time-series outputs -> visualization. Persist solver name/version, parameters, initial conditions, time span, tolerances and output units with every simulation result. Never label interpolation or a hand-authored animation as model output."
+  },
+  "trust": {
+    "authority": 5,
+    "evidenceQuality": 1,
+    "recency": 4,
+    "licenseClarity": 5,
+    "reproducibility": 5,
+    "notes": "High-authority modelling standard with strong reproducibility value. Evidence quality is intentionally low because a file format/specification is not biological evidence; each encoded model requires separate scientific validation."
+  }
+}

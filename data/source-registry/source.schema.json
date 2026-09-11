@@ -1,0 +1,182 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://panaceamed.id/schemas/source-registry.schema.json",
+  "title": "Panacea Source Registry Entry",
+  "description": "Contract for external scientific, medical, imaging, anatomical, molecular, terminology, wearable and visualization sources used by Panacea. A registry entry documents provenance and suitability; it is not permission to use an asset unless the recorded license scope has been verified for that asset/version.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "id",
+    "name",
+    "category",
+    "kind",
+    "homepage",
+    "features",
+    "usage",
+    "license",
+    "validation",
+    "provenance",
+    "adapter"
+  ],
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^[a-z0-9][a-z0-9_-]*$"
+    },
+    "name": {
+      "type": "string",
+      "minLength": 1
+    },
+    "category": {
+      "type": "string",
+      "enum": [
+        "anatomy",
+        "imaging",
+        "rendering",
+        "physiology",
+        "molecular",
+        "pathway",
+        "genomics",
+        "biomechanics",
+        "signals",
+        "clinical-data",
+        "terminology",
+        "drug",
+        "evidence",
+        "wearable",
+        "nutrition",
+        "environment",
+        "population"
+      ]
+    },
+    "kind": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "enum": [
+          "api",
+          "dataset",
+          "mesh",
+          "ontology",
+          "library",
+          "framework",
+          "standard",
+          "model-repository",
+          "terminology-server",
+          "viewer",
+          "tooling"
+        ]
+      }
+    },
+    "homepage": {
+      "type": "string",
+      "format": "uri"
+    },
+    "repository": {
+      "type": ["string", "null"],
+      "format": "uri"
+    },
+    "features": {
+      "type": "array",
+      "items": {
+        "oneOf": [
+          { "type": "integer", "minimum": 1 },
+          { "type": "string", "minLength": 1 }
+        ]
+      }
+    },
+    "formats": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": { "type": "string" }
+    },
+    "usage": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["runtime", "buildTime", "networkRequired"],
+      "properties": {
+        "runtime": { "type": "boolean" },
+        "buildTime": { "type": "boolean" },
+        "networkRequired": { "type": "boolean" },
+        "notes": { "type": "string" }
+      }
+    },
+    "license": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status", "commercialUse", "attributionRequired"],
+      "properties": {
+        "status": {
+          "type": "string",
+          "enum": ["VERIFIED", "CHECK_REQUIRED", "UNKNOWN"]
+        },
+        "identifier": { "type": ["string", "null"] },
+        "commercialUse": {
+          "type": "string",
+          "enum": ["ALLOWED", "CONDITIONAL", "NOT_ALLOWED", "UNKNOWN"]
+        },
+        "attributionRequired": { "type": ["boolean", "null"] },
+        "shareAlike": { "type": ["boolean", "null"] },
+        "scope": { "type": "string" },
+        "verificationUrl": { "type": ["string", "null"], "format": "uri" },
+        "verifiedAt": { "type": ["string", "null"], "format": "date" },
+        "notes": { "type": "string" }
+      }
+    },
+    "validation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["level", "clinicalDecisionUse"],
+      "properties": {
+        "level": {
+          "type": "string",
+          "enum": ["EDUCATIONAL", "RESEARCH", "REFERENCE", "REGULATORY", "CLINICAL_SUPPORT"]
+        },
+        "clinicalDecisionUse": {
+          "type": "string",
+          "enum": ["NO", "CONTEXT_ONLY", "REQUIRES_SEPARATE_VALIDATION"]
+        },
+        "notes": { "type": "string" }
+      }
+    },
+    "provenance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["authority", "sourceIdentityRequired", "versionPinRequired"],
+      "properties": {
+        "authority": { "type": "string" },
+        "sourceIdentityRequired": { "type": "boolean" },
+        "versionPinRequired": { "type": "boolean" },
+        "notes": { "type": "string" }
+      }
+    },
+    "adapter": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status", "normalizedTarget"],
+      "properties": {
+        "status": {
+          "type": "string",
+          "enum": ["PLANNED", "PROTOTYPE", "ACTIVE", "DEPRECATED", "NOT_APPLICABLE"]
+        },
+        "normalizedTarget": { "type": "string", "minLength": 1 },
+        "module": { "type": ["string", "null"] },
+        "notes": { "type": "string" }
+      }
+    },
+    "trust": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "authority": { "type": "integer", "minimum": 0, "maximum": 5 },
+        "evidenceQuality": { "type": "integer", "minimum": 0, "maximum": 5 },
+        "recency": { "type": "integer", "minimum": 0, "maximum": 5 },
+        "licenseClarity": { "type": "integer", "minimum": 0, "maximum": 5 },
+        "reproducibility": { "type": "integer", "minimum": 0, "maximum": 5 },
+        "notes": { "type": "string" }
+      }
+    }
+  }
+}

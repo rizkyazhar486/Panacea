@@ -8,35 +8,34 @@
 // TIDAK ADA di data Z-Anatomy/BodyParts3D. Yang juga belum ada: gambar
 // patologi per organ. Ketiganya butuh sumber gambar nyata berlisensi bebas.
 //
-// Commons memenuhi keempat syaratnya sekaligus:
-//   1. Tanpa API key.
-//   2. Semua berkasnya domain publik atau CC — legal dipakai selama
-//      atribusinya ditampilkan (karena itu license/artist ikut dikembalikan
-//      di tiap hasil, bukan opsional).
-//   3. Memuat set ilustrasi kedokteran bermutu (a.l. buku teks Anatomy &
-//      Physiology CNX/OpenStax CC BY, koleksi Wellcome, foto patologi CDC PHIL).
-//   4. Bisa dijangkau dari server ini, sementara hampir semua host gambar lain
-//      diblokir oleh kebijakan jaringan.
+// Commons memenuhi kebutuhan discovery gambar medis tanpa API key dan setiap
+// hasil punya halaman berkas tempat creator, sumber, serta lisensi spesifik
+// berkas dicatat. Panacea TIDAK menganggap Commons memiliki satu blanket
+// license: syarat atribusi/share-alike/public-domain dibaca per berkas dan
+// sourcePage selalu dipertahankan agar pengguna bisa memverifikasinya.
 //
-// Tidak bisa diuji langsung dari sandbox tempat kode ini ditulis (jaringannya
-// dibatasi), jadi parsingnya ditulis defensif: tiap field diperiksa dulu, dan
-// hasil yang bentuknya tidak sesuai dibuang, bukan melempar galat.
+// Parsing ditulis defensif: query dibatasi, URL media harus berasal dari host
+// upload Wikimedia, halaman sumber harus Commons, dan hasil tanpa metadata
+// lisensi dibuang daripada menebak status hak ciptanya.
 const COMMONS_API = 'https://commons.wikimedia.org/w/api.php'
 
-// Wikimedia mewajibkan User-Agent yang bisa dihubungi di tiap permintaan
-// otomatis; permintaan tanpa itu boleh saja ditolak oleh mereka.
+// Wikimedia meminta User-Agent deskriptif dengan jalur kontak untuk request
+// otomatis. Website Panacea menjadi contact point dari adapter server ini.
 const USER_AGENT = 'Panaceamed/1.0 (https://panaceamed.id; health education app)'
+const MAX_QUERY_LENGTH = 160
+
+type FetchLike = typeof fetch
 
 export interface AnatomyImage {
   title: string
   /** URL gambar ukuran tampil (bukan berkas asli yang bisa puluhan MB). */
   url: string
-  /** Halaman deskripsi di Commons — tujuan tautan atribusi. */
+  /** Halaman deskripsi di Commons — tujuan tautan atribusi dan verifikasi. */
   sourcePage: string
   /** Mis. "CC BY-SA 4.0", "Public domain". WAJIB ditampilkan. */
   license: string
   licenseUrl: string
-  /** Pembuat karya. WAJIB ditampilkan untuk lisensi CC BY/BY-SA. */
+  /** Pembuat karya; bila metadata kosong, verifikasi di sourcePage. */
   artist: string
   description: string
 }
@@ -65,22 +64,82 @@ function teksPolos(html: string): string {
     .trim()
 }
 
+/** Query pengguna diperlakukan sebagai istilah, bukan tempat menyisipkan
+ * sintaks pencarian MediaWiki. Tanda yang paling mudah mengubah operator
+ * pencarian dibuang dan panjangnya dibatasi sebelum request dibuat. */
+function bersihkanPencarian(value: string): string {
+  return value
+    .replace(/[\u0000-\u001f\u007f<>\\":|]/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim()
+    .slice(0, MAX_QUERY_LENGTH)
+}
+
+function halamanBerkasCommons(title: string): string {
+  const slug = title.trim().replace(/\s+/g, '_')
+  return `https://commons.wikimedia.org/wiki/${encodeURIComponent(slug)}`
+}
+
+/** descriptionurl berasal dari upstream, tetapi tetap divalidasi agar field
+ * provenance tidak pernah berubah menjadi tautan host arbitrer. */
+function halamanSumberCommons(descriptionUrl: string | undefined, title: string): string {
+  const raw = teksPolos(descriptionUrl ?? '')
+  if (raw) {
+    try {
+      const url = new URL(raw)
+      if (url.protocol === 'https:' && url.hostname === 'commons.wikimedia.org') return url.toString()
+    } catch {
+      // Gunakan canonical file page di bawah bila metadata URL rusak.
+    }
+  }
+  return halamanBerkasCommons(title)
+}
+
+function tautanWeb(value: string | undefined): string {
+  const raw = teksPolos(value ?? '')
+  if (!raw) return ''
+  try {
+    const url = new URL(raw)
+    return url.protocol === 'https:' || url.protocol === 'http:' ? url.toString() : ''
+  } catch {
+    return ''
+  }
+}
+
+function tautanGambarCommons(value: string | undefined): string {
+  if (!value) return ''
+  try {
+    const url = new URL(value)
+    if (url.protocol !== 'https:' || url.hostname !== 'upload.wikimedia.org') return ''
+    return url.toString()
+  } catch {
+    return ''
+  }
+}
+
 const MIME_DITERIMA = new Set(['image/jpeg', 'image/png', 'image/svg+xml', 'image/webp'])
 
-export async function searchAnatomyImages(query: string, limit = 8): Promise<AnatomyImage[]> {
+export async function searchAnatomyImages(
+  query: string,
+  limit = 8,
+  fetchImpl: FetchLike = fetch,
+): Promise<AnatomyImage[]> {
+  const q = bersihkanPencarian(query)
+  if (!q) return []
+
   const params = new URLSearchParams({
     action: 'query',
     format: 'json',
     formatversion: '2',
     generator: 'search',
-    gsrsearch: query,
+    gsrsearch: q,
     gsrnamespace: '6', // hanya namespace File
     gsrlimit: String(Math.min(Math.max(limit, 1), 20)),
     prop: 'imageinfo',
     iiprop: 'url|extmetadata|mime',
     iiurlwidth: '1024',
   })
-  const res = await fetch(`${COMMONS_API}?${params.toString()}`, {
+  const res = await fetchImpl(`${COMMONS_API}?${params.toString()}`, {
     headers: { 'User-Agent': USER_AGENT, Accept: 'application/json' },
     signal: AbortSignal.timeout(9000),
   })
@@ -90,24 +149,30 @@ export async function searchAnatomyImages(query: string, limit = 8): Promise<Ana
 
   const out: AnatomyImage[] = []
   for (const page of pages) {
+    const pageTitle = teksPolos(page.title ?? '')
+    if (!pageTitle) continue
+
     const info = Array.isArray(page.imageinfo) ? page.imageinfo[0] : undefined
     if (!info) continue
     if (info.mime && !MIME_DITERIMA.has(info.mime)) continue
-    const url = info.thumburl || info.url
+
+    const url = tautanGambarCommons(info.thumburl) || tautanGambarCommons(info.url)
     if (!url) continue
+
     const meta = info.extmetadata ?? {}
     const license = teksPolos(meta.LicenseShortName?.value ?? meta.License?.value ?? '')
     // Tanpa lisensi yang diketahui, berkasnya tidak ditampilkan sama sekali —
     // lebih baik hasilnya lebih sedikit daripada memakai gambar yang status
     // hak ciptanya tidak jelas.
     if (!license) continue
+
     out.push({
-      title: teksPolos(page.title ?? '').replace(/^File:/, ''),
+      title: pageTitle.replace(/^File:/, ''),
       url,
-      sourcePage: info.descriptionurl ?? '',
+      sourcePage: halamanSumberCommons(info.descriptionurl, pageTitle),
       license,
-      licenseUrl: teksPolos(meta.LicenseUrl?.value ?? ''),
-      artist: teksPolos(meta.Artist?.value ?? '') || 'Unknown',
+      licenseUrl: tautanWeb(meta.LicenseUrl?.value),
+      artist: teksPolos(meta.Artist?.value ?? '') || 'Lihat halaman sumber',
       description: teksPolos(meta.ImageDescription?.value ?? '').slice(0, 300),
     })
   }
@@ -120,15 +185,21 @@ export async function searchAnatomyImages(query: string, limit = 8): Promise<Ana
  * seperti "vagina" di Commons juga mengembalikan foto non-klinis, sedangkan
  * yang dibutuhkan halaman ini adalah gambar anatomi/ilustrasi medis.
  */
-export async function anatomyImageLookup(structure: string): Promise<AnatomyImage[]> {
-  return cariGabungan(structure, (q) => [`${q} anatomy diagram`, `${q} anatomy`], sebut)
+export async function anatomyImageLookup(
+  structure: string,
+  fetchImpl: FetchLike = fetch,
+): Promise<AnatomyImage[]> {
+  return cariGabungan(structure, (q) => [`${q} anatomy diagram`, `${q} anatomy`], sebut, fetchImpl)
 }
 
 /**
  * Gambar PATOLOGI untuk satu organ — kata kuncinya diarahkan ke penyakitnya
  * ("pathology", "histopathology"), bukan anatomi normalnya.
  */
-export async function pathologyImageLookup(organ: string): Promise<AnatomyImage[]> {
+export async function pathologyImageLookup(
+  organ: string,
+  fetchImpl: FetchLike = fetch,
+): Promise<AnatomyImage[]> {
   return cariGabungan(
     organ,
     (q) => [`${q} histopathology`, `${q} pathology gross specimen`, `${q} pathology micrograph`],
@@ -137,6 +208,7 @@ export async function pathologyImageLookup(organ: string): Promise<AnatomyImage[
     // banyak gambar tampak salah. Judul berkasnya harus benar-benar
     // menyebut organnya DAN satu kata yang menandakan sediaan.
     (judul, q) => sebut(judul, q) && /histopath|patholog|carcinoma|tumou?r|lesion|specimen|biopsy|infarct|necros/i.test(judul),
+    fetchImpl,
   )
 }
 
@@ -149,11 +221,15 @@ export async function pathologyImageLookup(organ: string): Promise<AnatomyImage[
  * adalah mikrograf sediaan berpewarnaan. Karena itu kata kuncinya diarahkan ke
  * "histology"/"micrograph"/"H&E stain", bukan ke diagram anatomi.
  */
-export async function histologyImageLookup(tissue: string): Promise<AnatomyImage[]> {
+export async function histologyImageLookup(
+  tissue: string,
+  fetchImpl: FetchLike = fetch,
+): Promise<AnatomyImage[]> {
   return cariGabungan(
     tissue,
     (q) => [`${q} histology`, `${q} histology micrograph`, `${q} H&E stain`],
     (judul, q) => sebut(judul, q) && /histolog|micrograph|stain|H&E|section|slide|microscop/i.test(judul),
+    fetchImpl,
   )
 }
 
@@ -178,20 +254,20 @@ function sebut(judul: string, q: string): boolean {
 /** Menjalankan beberapa varian kata kunci sekaligus lalu menggabung hasilnya
  *  tanpa duplikat — satu varian yang kosong tidak mengosongkan hasilnya.
  *
- *  `saring` membuang hasil yang lolos mesin cari tapi jelas bukan yang dicari.
- *  Kalau penyaringan menyisakan NOL sedangkan hasil mentahnya ada, hasil
- *  mentah dikembalikan: daftar yang kurang tepat masih lebih berguna daripada
- *  layar kosong, dan tiap gambar tetap membawa judul serta sumbernya sendiri
- *  supaya pembaca bisa menilai. */
+ *  `saring` adalah boundary relevansi ilmiah. Jika upstream mengembalikan
+ *  hasil tetapi tidak ada satu pun yang lolos filter, adapter harus fail-closed
+ *  dan mengembalikan array kosong. Lebih baik UI menampilkan empty state yang
+ *  jujur daripada gambar berlisensi baik tetapi secara medis tidak relevan. */
 async function cariGabungan(
   term: string,
   varian: (q: string) => string[],
   saring?: (judul: string, q: string) => boolean,
+  fetchImpl: FetchLike = fetch,
 ): Promise<AnatomyImage[]> {
-  const q = term.trim()
+  const q = bersihkanPencarian(term)
   if (!q) return []
   const hasil = await Promise.all(
-    varian(q).map((v) => searchAnatomyImages(v, 8).catch(() => [] as AnatomyImage[])),
+    varian(q).map((v) => searchAnatomyImages(v, 8, fetchImpl).catch(() => [] as AnatomyImage[])),
   )
   const gabung: AnatomyImage[] = []
   for (const daftar of hasil) {
@@ -201,7 +277,7 @@ async function cariGabungan(
   }
   if (!saring) return gabung.slice(0, 8)
   const tersaring = gabung.filter((img) => saring(`${img.title} ${img.description}`, q))
-  return (tersaring.length ? tersaring : gabung).slice(0, 8)
+  return tersaring.slice(0, 8)
 }
 
 /**
@@ -219,27 +295,39 @@ async function cariGabungan(
  * ketiganya berbeda jauh — tulang paling jelas di rontgen/CT, jaringan lunak
  * dan saraf justru paling jelas di MRI — jadi tabnya pun dipisah di layar.
  */
-export async function xrayImageLookup(structure: string): Promise<AnatomyImage[]> {
+export async function xrayImageLookup(
+  structure: string,
+  fetchImpl: FetchLike = fetch,
+): Promise<AnatomyImage[]> {
   return cariGabungan(
     structure,
     (q) => [`${q} radiograph`, `${q} x-ray`, `${q} plain film radiography`],
     (judul, q) => sebut(judul, q) && /radiograph|x-?ray|röntgen|roentgen/i.test(judul),
+    fetchImpl,
   )
 }
 
-export async function ctImageLookup(structure: string): Promise<AnatomyImage[]> {
+export async function ctImageLookup(
+  structure: string,
+  fetchImpl: FetchLike = fetch,
+): Promise<AnatomyImage[]> {
   return cariGabungan(
     structure,
     (q) => [`${q} CT scan`, `${q} computed tomography`, `${q} CT axial`],
     (judul, q) => sebut(judul, q) && /\bCT\b|computed tomograph|tomodensito/i.test(judul),
+    fetchImpl,
   )
 }
 
-export async function mriImageLookup(structure: string): Promise<AnatomyImage[]> {
+export async function mriImageLookup(
+  structure: string,
+  fetchImpl: FetchLike = fetch,
+): Promise<AnatomyImage[]> {
   return cariGabungan(
     structure,
     (q) => [`${q} MRI`, `${q} magnetic resonance imaging`, `${q} MRI sagittal`],
     (judul, q) => sebut(judul, q) && /\bMRI\b|magnetic resonance/i.test(judul),
+    fetchImpl,
   )
 }
 
@@ -251,17 +339,21 @@ export async function mriImageLookup(structure: string): Promise<AnatomyImage[]>
  * gambar garis, dan bentuk tubuh nyata dalam sebuah gerakan justru yang perlu
  * dilihat: sudut siku, posisi tulang belikat, kedalaman pinggul.
  *
- * Commons memuat banyak foto dan animasi peragaan latihan berlisensi bebas
- * (a.l. koleksi Everkinetic yang CC BY-SA). Penyaringnya ketat: judulnya harus
- * menyebut latihannya DAN satu kata yang menandakan peragaan, supaya "row"
- * tidak mengembalikan foto perahu dan "press" tidak mengembalikan mesin cetak.
+ * Commons memuat banyak foto dan animasi peragaan latihan berlisensi bebas.
+ * Penyaringnya ketat: judulnya harus menyebut latihannya DAN satu kata yang
+ * menandakan peragaan, supaya "row" tidak mengembalikan foto perahu dan
+ * "press" tidak mengembalikan mesin cetak. Lisensi tetap dicek per berkas.
  */
-export async function exerciseImageLookup(exercise: string): Promise<AnatomyImage[]> {
+export async function exerciseImageLookup(
+  exercise: string,
+  fetchImpl: FetchLike = fetch,
+): Promise<AnatomyImage[]> {
   return cariGabungan(
     exercise,
     (q) => [`${q} exercise`, `${q} weight training`, `${q} fitness demonstration`],
     (judul, q) =>
       sebut(judul, q) &&
       /exercise|workout|training|fitness|gym|calisthenic|barbell|dumbbell|bodyweight|muscle/i.test(judul),
+    fetchImpl,
   )
 }

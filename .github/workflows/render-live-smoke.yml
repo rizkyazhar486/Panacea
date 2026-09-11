@@ -1,0 +1,83 @@
+name: Render live genomics smoke
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'server/**'
+      - '.github/workflows/render-live-smoke.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: render-live-genomics-smoke
+  cancel-in-progress: true
+
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Wait for Render deployment and verify genomics API
+        env:
+          SERVER_URL: ${{ vars.SERVER_URL }}
+          SERVER_URL_SECRET: ${{ secrets.SERVER_URL }}
+          VITE_API_URL: ${{ vars.VITE_API_URL }}
+          VITE_API_URL_SECRET: ${{ secrets.VITE_API_URL }}
+          EXPECTED_SHA: ${{ github.sha }}
+        run: |
+          set -euo pipefail
+          base="${SERVER_URL:-${SERVER_URL_SECRET:-${VITE_API_URL:-$VITE_API_URL_SECRET}}}"
+          if [ -z "$base" ]; then
+            echo 'VITE_API_URL/SERVER_URL is not configured.' >&2
+            exit 1
+          fi
+          endpoint="${base%/}/api/genomics/compute/capabilities"
+          echo "Waiting for live Render endpoint: $endpoint"
+
+          ok=''
+          for attempt in $(seq 1 45); do
+            code=$(curl -sS --max-time 90 -o /tmp/capabilities.json -w '%{http_code}' "$endpoint" || true)
+            if [ "$code" = '200' ]; then
+              if EXPECTED_SHA="$EXPECTED_SHA" node - <<'NODE'
+          const fs = require('node:fs')
+          const body = JSON.parse(fs.readFileSync('/tmp/capabilities.json', 'utf8'))
+          const expected = process.env.EXPECTED_SHA || ''
+          if (body.backend !== 'render-control-plane') process.exit(2)
+          for (const kind of ['ont-basecalling', 'pharmcat', 'sv-calling']) {
+            if (!body.jobKinds?.includes(kind)) process.exit(3)
+          }
+          const revision = body.runtime?.revision || ''
+          if (revision && expected && revision !== expected) process.exit(4)
+          console.log(JSON.stringify({
+            backend: body.backend,
+            configured: body.configured,
+            provider: body.provider,
+            runtime: body.runtime,
+            jobKinds: body.jobKinds,
+          }))
+          NODE
+              then
+                ok='yes'
+                break
+              fi
+            fi
+            echo "Attempt $attempt: HTTP ${code:-000}; Render may still be deploying."
+            sleep 10
+          done
+
+          if [ "$ok" != 'yes' ]; then
+            echo 'Live Render genomics capability check did not converge.' >&2
+            cat /tmp/capabilities.json 2>/dev/null || true
+            exit 1
+          fi
+
+          unauth_code=$(curl -sS --max-time 30 -o /tmp/unauth.json -w '%{http_code}' \
+            -H 'Content-Type: application/json' \
+            -d '{"kind":"ont-basecalling","input":{"uri":"https://example.test/input.pod5"}}' \
+            "${base%/}/api/genomics/compute/jobs")
+          test "$unauth_code" = '401'
+          grep -q '"unauthorized"' /tmp/unauth.json
+          echo 'Live Render genomics control plane passed capability + auth-boundary smoke tests.'

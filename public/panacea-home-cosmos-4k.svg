@@ -1,0 +1,70 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 3840 2160" preserveAspectRatio="xMidYMid slice">
+  <defs>
+    <linearGradient id="base" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#030812"/>
+      <stop offset="0.28" stop-color="#07152a"/>
+      <stop offset="0.55" stop-color="#07101f"/>
+      <stop offset="0.76" stop-color="#120b20"/>
+      <stop offset="1" stop-color="#030812"/>
+    </linearGradient>
+    <radialGradient id="green" cx="0.08" cy="0.12" r="0.58">
+      <stop offset="0" stop-color="#00bf63" stop-opacity="0.26"/>
+      <stop offset="0.45" stop-color="#00bf63" stop-opacity="0.08"/>
+      <stop offset="1" stop-color="#00bf63" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="blue" cx="0.78" cy="0.18" r="0.62">
+      <stop offset="0" stop-color="#1688ff" stop-opacity="0.24"/>
+      <stop offset="0.48" stop-color="#3348ff" stop-opacity="0.09"/>
+      <stop offset="1" stop-color="#3348ff" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="red" cx="0.88" cy="0.72" r="0.55">
+      <stop offset="0" stop-color="#ff345d" stop-opacity="0.22"/>
+      <stop offset="0.50" stop-color="#b82b64" stop-opacity="0.08"/>
+      <stop offset="1" stop-color="#b82b64" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="auroraA" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#00bf63" stop-opacity="0"/>
+      <stop offset="0.22" stop-color="#00d98b" stop-opacity="0.22"/>
+      <stop offset="0.50" stop-color="#18a7ff" stop-opacity="0.24"/>
+      <stop offset="0.76" stop-color="#7060ff" stop-opacity="0.19"/>
+      <stop offset="1" stop-color="#7060ff" stop-opacity="0"/>
+    </linearGradient>
+    <linearGradient id="auroraB" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#176dff" stop-opacity="0"/>
+      <stop offset="0.27" stop-color="#268eff" stop-opacity="0.18"/>
+      <stop offset="0.62" stop-color="#bb3dff" stop-opacity="0.15"/>
+      <stop offset="0.84" stop-color="#ff465f" stop-opacity="0.20"/>
+      <stop offset="1" stop-color="#ff465f" stop-opacity="0"/>
+    </linearGradient>
+    <pattern id="stars" width="360" height="320" patternUnits="userSpaceOnUse">
+      <circle cx="28" cy="44" r="2.2" fill="#ffffff" opacity="0.52"/>
+      <circle cx="142" cy="94" r="1.4" fill="#a6ddff" opacity="0.56"/>
+      <circle cx="300" cy="38" r="1.2" fill="#b7ffd9" opacity="0.54"/>
+      <circle cx="80" cy="244" r="1.1" fill="#ffffff" opacity="0.40"/>
+      <circle cx="260" cy="232" r="1.8" fill="#ffffff" opacity="0.42"/>
+      <circle cx="338" cy="184" r="0.9" fill="#ffd5bd" opacity="0.52"/>
+      <path d="M202 164h14M209 157v14" stroke="#ffffff" stroke-width="1" opacity="0.26"/>
+    </pattern>
+    <linearGradient id="edgeFade" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#000" stop-opacity="0"/>
+      <stop offset="0.10" stop-color="#fff" stop-opacity="1"/>
+      <stop offset="0.90" stop-color="#fff" stop-opacity="1"/>
+      <stop offset="1" stop-color="#000" stop-opacity="0"/>
+    </linearGradient>
+    <mask id="fadeY"><rect width="3840" height="2160" fill="url(#edgeFade)"/></mask>
+  </defs>
+
+  <rect width="3840" height="2160" fill="url(#base)"/>
+  <rect width="3840" height="2160" fill="url(#stars)" opacity="0.86"/>
+  <g mask="url(#fadeY)">
+    <ellipse cx="410" cy="360" rx="1420" ry="920" fill="url(#green)"/>
+    <ellipse cx="3040" cy="420" rx="1500" ry="980" fill="url(#blue)"/>
+    <ellipse cx="3320" cy="1640" rx="1380" ry="980" fill="url(#red)"/>
+    <path d="M-420 810 C420 350 1120 820 1760 560 C2400 300 2870 220 4320 690" fill="none" stroke="url(#auroraA)" stroke-width="220" opacity="0.56"/>
+    <path d="M-480 1550 C520 1160 1170 1680 1960 1390 C2700 1120 3230 1050 4280 1410" fill="none" stroke="url(#auroraB)" stroke-width="185" opacity="0.52"/>
+    <path d="M-380 820 C460 370 1130 830 1770 575 C2410 320 2880 245 4240 695" fill="none" stroke="url(#auroraA)" stroke-width="5" opacity="0.72"/>
+    <path d="M-420 1560 C520 1180 1180 1690 1970 1410 C2720 1140 3240 1070 4250 1420" fill="none" stroke="url(#auroraB)" stroke-width="4" opacity="0.64"/>
+  </g>
+  <rect y="0" width="3840" height="110" fill="#030812" opacity="0.42"/>
+  <rect y="2050" width="3840" height="110" fill="#030812" opacity="0.42"/>
+</svg>

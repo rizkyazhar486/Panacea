@@ -1,0 +1,52 @@
+{
+  "id": "cbioportal_public_api",
+  "name": "cBioPortal Public API",
+  "category": "genomics",
+  "kind": ["api", "dataset"],
+  "homepage": "https://www.cbioportal.org/api/",
+  "repository": "https://github.com/cBioPortal/cbioportal",
+  "features": ["cancer-genomics", "somatic-mutations", "copy-number", "molecular-profiles", "clinical-attributes", "cancer-studies", "oncoprint-data", "tumor-evolution-education", "precision-oncology-research"],
+  "formats": ["json", "http-rest", "openapi"],
+  "usage": {
+    "runtime": true,
+    "buildTime": true,
+    "networkRequired": true,
+    "notes": "Use the cBioPortal public REST API for targeted oncology-genomics research/education queries and versioned snapshots for reproducible curated content. Do not embed or fork the full cBioPortal application merely to access public study data. Query only the studies, molecular profiles, genes and samples required by a feature; cache normalized results with study/source provenance and avoid bulk-loading large cohorts into the browser."
+  },
+  "license": {
+    "status": "CHECK_REQUIRED",
+    "identifier": "cBioPortal software AGPL-3.0; study/external-data terms vary by source",
+    "commercialUse": "CONDITIONAL",
+    "attributionRequired": true,
+    "shareAlike": null,
+    "scope": "The cBioPortal software repository is AGPL-3.0, but Panacea's planned use is API/data consumption rather than incorporating portal server code. Study datasets and external annotations can originate from TCGA, CPTAC, TARGET, institutional studies and services with their own terms. External resources such as OncoKB can require separate licensing for some clinical/therapeutic content. Review source-study and external-annotation terms before commercial redistribution or production use.",
+    "verificationUrl": "https://docs.cbioportal.org/web-api-and-clients/",
+    "verifiedAt": "2026-09-08",
+    "notes": "Do not infer that public API accessibility grants one blanket commercial license across every study or annotation. Preserve study attribution and source-specific licenses. If Panacea ever modifies or self-hosts cBioPortal software, perform a separate AGPL-3.0 compliance review rather than relying on this API-consumption entry."
+  },
+  "validation": {
+    "level": "RESEARCH",
+    "clinicalDecisionUse": "CONTEXT_ONLY",
+    "notes": "cBioPortal is a high-value cancer-genomics research resource, not a standalone prescribing or diagnostic engine. Molecular alterations can be cohort observations and may use heterogeneous assays, pipelines and sample selection. Therapeutic interpretation from external services must retain its own evidence level/license and must not be inferred solely from alteration frequency or visualization."
+  },
+  "provenance": {
+    "authority": "cBioPortal project and source study providers",
+    "sourceIdentityRequired": true,
+    "versionPinRequired": true,
+    "notes": "Persist cBioPortal instance/base URL and API contract/version, study ID and study metadata, sample/patient IDs as returned by the source, molecular profile ID, gene identifier, alteration type, assay/profile metadata when available, reference genome/coordinate context where relevant, source-study attribution, external annotation provider identity, retrieval timestamp and Panacea adapter version. Never merge similarly named studies or profiles without stable IDs."
+  },
+  "adapter": {
+    "status": "PLANNED",
+    "normalizedTarget": "PanaceaCancerGenomicObservation",
+    "module": null,
+    "notes": "Planned flow: explicit cancer study/profile/gene query -> cBioPortal REST API adapter -> validate study/sample/profile identifiers -> normalize molecular and clinical observations to PanaceaCancerGenomicObservation -> retain cohort/study/assay and external-annotation provenance -> render research/educational summaries. Keep cohort alteration data separate from a patient's permissioned genomic record. Do not convert alteration presence/frequency into treatment recommendations without an independently validated precision-oncology evidence layer."
+  },
+  "trust": {
+    "authority": 5,
+    "evidenceQuality": 4,
+    "recency": 5,
+    "licenseClarity": 3,
+    "reproducibility": 4,
+    "notes": "High-authority platform for curated cancer-genomics cohorts and reproducible API access when study/profile IDs are pinned. Evidence and licensing vary by contributing study, assay and external annotation source, so provenance must remain granular and study-specific."
+  }
+}

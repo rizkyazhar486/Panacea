@@ -1,0 +1,52 @@
+{
+  "id": "gtex_portal",
+  "name": "GTEx Portal",
+  "category": "genomics",
+  "kind": ["api", "dataset"],
+  "homepage": "https://gtexportal.org/",
+  "repository": null,
+  "features": ["tissue-expression", "gene-expression", "transcript-expression", "eqtl", "sqtl", "tissue-comparison", "single-cell-reference", "non-diseased-tissue-context", "molecular-digital-twin-research"],
+  "formats": ["json", "http-rest", "gct", "parquet", "tsv"],
+  "usage": {
+    "runtime": true,
+    "buildTime": true,
+    "networkRequired": true,
+    "notes": "Use GTEx open-access data as a population reference for tissue-specific gene expression/regulation and targeted educational queries. Prefer release-pinned summary data or targeted API calls instead of sending large expression matrices to the browser. Protected raw sequence data and full donor metadata are a separate controlled-access class and must never be fetched by the public web application. GTEx tissue distributions are cohort reference context, not an individual's normal range or diagnosis."
+  },
+  "license": {
+    "status": "CHECK_REQUIRED",
+    "identifier": "GTEx Portal acknowledgement/publication policy plus NIH genomic-data access terms",
+    "commercialUse": "CONDITIONAL",
+    "attributionRequired": true,
+    "shareAlike": null,
+    "scope": "The GTEx Portal provides open-access summary/derived datasets and states that GTEx data, visualizations and tools can be used with acknowledgement. Raw sequence data and full donor metadata are protected access and governed by NIH/dbGaP controlled-access requirements. Panacea must verify the exact release/file terms and any third-party annotation licenses before commercial redistribution or bundling.",
+    "verificationUrl": "https://gtexportal.org/home/downloads/adult-gtex/overview",
+    "verifiedAt": "2026-09-08",
+    "notes": "Preserve GTEx acknowledgement, release and dbGaP accession where applicable. Open access does not authorize re-identification attempts or relaxation of privacy obligations. Controlled-access data use must follow the approved Data Use Certification, consent limitations and current NIH security requirements."
+  },
+  "validation": {
+    "level": "RESEARCH",
+    "clinicalDecisionUse": "CONTEXT_ONLY",
+    "notes": "GTEx is a high-value research reference from non-diseased tissue samples, but donor composition, post-mortem collection, tissue heterogeneity, processing pipelines and cohort size affect distributions. Expression/QTL results must not be presented as patient-specific expression, disease status, treatment response or a universal normal interval."
+  },
+  "provenance": {
+    "authority": "NIH GTEx Consortium / GTEx Portal",
+    "sourceIdentityRequired": true,
+    "versionPinRequired": true,
+    "notes": "Persist GTEx project (Adult/dGTEx/NHP-dGTEx where applicable), analysis release, dbGaP accession/version when supplied, tissue ontology/name, GENCODE/annotation release, gene/transcript stable ID and version, expression unit/normalization method, QTL type and variant/gene identifiers, sample-count/summary context, source file or API endpoint, retrieval date and Panacea adapter version. Never combine V8/V10/V11 values or different annotation releases without explicit harmonization and provenance."
+  },
+  "adapter": {
+    "status": "PLANNED",
+    "normalizedTarget": "PanaceaTissueExpressionReference",
+    "module": null,
+    "notes": "Planned open-data flow: gene/tissue/reference query -> explicit GTEx analysis release -> targeted Portal/API or approved open-access snapshot -> validate gene/transcript IDs, tissue and units -> normalize population summaries/QTLs to PanaceaTissueExpressionReference -> retain release, sample context and acknowledgement. Protected-access flow is intentionally excluded from the public web adapter and would require a separately approved research environment. Do not translate cohort percentiles into individual abnormal/normal labels."
+  },
+  "trust": {
+    "authority": 5,
+    "evidenceQuality": 4,
+    "recency": 5,
+    "licenseClarity": 3,
+    "reproducibility": 5,
+    "notes": "Highly authoritative tissue-expression/QTL reference with reproducible release-pinned datasets. Clinical applicability is limited by cohort and tissue context, while rights/privacy requirements differ between open summary data and protected individual-level genomic data."
+  }
+}

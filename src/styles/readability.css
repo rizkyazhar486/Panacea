@@ -1,0 +1,254 @@
+/* Panacea readability + mobile surface guardrails.
+   This stylesheet is imported by src/components/ui.tsx, which Shell imports,
+   so these rules apply to the authenticated app without requiring every page
+   to remember its own mobile/contrast fixes.
+
+   Principles:
+   - one continuous viewport background (no background-attachment: fixed seams
+     on iOS Safari),
+   - readable ink on glass/card surfaces,
+   - touch-safe controls and focus states,
+   - no horizontal page drift,
+   - dialogs fit inside phone safe areas,
+   - long clinical/business strings wrap instead of breaking layout. */
+
+/* ── Continuous app canvas ──────────────────────────────────────────────── */
+html {
+  min-height: 100%;
+  background: #fcfcfd;
+  scroll-padding-top: max(72px, env(safe-area-inset-top));
+}
+
+body {
+  position: relative;
+  isolation: isolate;
+  min-height: 100vh;
+  min-height: 100dvh;
+  overflow-x: clip;
+  background: transparent !important;
+}
+
+/* A fixed pseudo-layer is more reliable on iOS Safari than putting `fixed`
+   on a multi-gradient body background. It stays continuous while the document
+   grows, so long pages do not reveal seams/bands during scroll. */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background:
+    radial-gradient(70% 52% at 8% -10%, rgba(255, 122, 46, 0.075) 0%, rgba(255, 122, 46, 0) 66%),
+    radial-gradient(68% 55% at 102% 6%, rgba(0, 151, 255, 0.07) 0%, rgba(0, 151, 255, 0) 66%),
+    radial-gradient(54% 48% at 52% 108%, rgba(0, 191, 99, 0.055) 0%, rgba(0, 191, 99, 0) 68%),
+    linear-gradient(180deg, #fdfdfe 0%, #f8faf9 55%, #fbfbfd 100%);
+  background-repeat: no-repeat;
+  background-size: cover;
+  transform: translateZ(0);
+  will-change: transform;
+}
+
+.dark body::before {
+  background:
+    radial-gradient(70% 54% at 8% -10%, rgba(255, 190, 46, 0.14) 0%, rgba(255, 190, 46, 0) 64%),
+    radial-gradient(66% 54% at 102% 4%, rgba(0, 163, 255, 0.13) 0%, rgba(0, 163, 255, 0) 64%),
+    radial-gradient(58% 50% at 54% 108%, rgba(143, 70, 255, 0.10) 0%, rgba(143, 70, 255, 0) 66%),
+    linear-gradient(180deg, #050606 0%, #080b09 52%, #050606 100%);
+}
+
+#root {
+  position: relative;
+  min-width: 0;
+  min-height: 100vh;
+  min-height: 100dvh;
+}
+
+@supports (-webkit-touch-callout: none) {
+  /* Stable large viewport prevents the wallpaper from resizing into a visible
+     horizontal band when Safari's address bar collapses/expands. */
+  body::before { min-height: 100lvh; }
+}
+
+/* ── Surface readability ────────────────────────────────────────────────── */
+.kaca .text-neutral-400,
+.liquid-glass .text-neutral-400,
+.panacea-readable-card .text-neutral-400 {
+  color: #66746d;
+}
+
+.kaca .text-neutral-500,
+.liquid-glass .text-neutral-500,
+.panacea-readable-card .text-neutral-500 {
+  color: #52615a;
+}
+
+.kaca .text-neutral-600,
+.liquid-glass .text-neutral-600,
+.panacea-readable-card .text-neutral-600 {
+  color: #3f4d46;
+}
+
+/* White and near-white cards occur outside `.kaca` too. These values are
+   deliberately darker than Tailwind's decorative neutrals because many of
+   these labels carry health/business meaning. */
+.bg-white .text-neutral-400,
+.bg-neutral-50 .text-neutral-400 { color: #66746d; }
+.bg-white .text-neutral-500,
+.bg-neutral-50 .text-neutral-500 { color: #52615a; }
+.bg-white .text-neutral-600,
+.bg-neutral-50 .text-neutral-600 { color: #3f4d46; }
+
+.kaca p,
+.liquid-glass p,
+.panacea-readable-card p {
+  text-wrap: pretty;
+}
+
+.dark .kaca .text-neutral-400,
+.dark .liquid-glass .text-neutral-400,
+.dark .panacea-readable-card .text-neutral-400,
+.dark .bg-white .text-neutral-400,
+.dark .bg-neutral-50 .text-neutral-400 {
+  color: #aeb9b4 !important;
+}
+
+.dark .kaca .text-neutral-500,
+.dark .liquid-glass .text-neutral-500,
+.dark .panacea-readable-card .text-neutral-500,
+.dark .bg-white .text-neutral-500,
+.dark .bg-neutral-50 .text-neutral-500 {
+  color: #bac5c0 !important;
+}
+
+.dark .kaca .text-neutral-600,
+.dark .liquid-glass .text-neutral-600,
+.dark .panacea-readable-card .text-neutral-600,
+.dark .bg-white .text-neutral-600,
+.dark .bg-neutral-50 .text-neutral-600 {
+  color: #c8d2ce !important;
+}
+
+/* Utility for feature/product cards that must stay readable regardless of the
+   ambient glass/background treatment around them. */
+.panacea-readable-card {
+  min-width: 0;
+  background: rgba(255, 255, 255, 0.965);
+  color: #0c1410;
+  border-color: rgba(15, 23, 42, 0.10);
+  box-shadow: 0 16px 48px rgba(20, 40, 50, 0.065);
+}
+
+.dark .panacea-readable-card {
+  background: rgba(17, 19, 21, 0.97);
+  color: #f4f7f5;
+  border-color: rgba(255, 255, 255, 0.12);
+}
+
+/* Long copy needs a comfortable measure even when its parent card can grow. */
+.panacea-reading-copy {
+  max-width: 72ch;
+  line-height: 1.65;
+}
+
+/* ── Layout resilience ──────────────────────────────────────────────────── */
+main,
+section,
+article,
+aside,
+nav,
+header,
+footer,
+.kaca,
+.liquid-glass,
+.panacea-readable-card {
+  min-width: 0;
+}
+
+h1, h2, h3, h4, p, li, dd, dt, label, button, a, span {
+  overflow-wrap: anywhere;
+}
+
+pre,
+code,
+table {
+  max-width: 100%;
+}
+
+pre {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+img,
+video,
+canvas,
+svg {
+  max-width: 100%;
+}
+
+/* Prevent nested horizontal scrollers from dragging the whole document on
+   phones. Components that intentionally scroll horizontally keep doing so. */
+.no-scrollbar,
+.overflow-x-auto {
+  overscroll-behavior-x: contain;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* ── Inputs and touch targets ───────────────────────────────────────────── */
+button,
+a[href],
+input,
+select,
+textarea,
+[role='button'] {
+  touch-action: manipulation;
+}
+
+button:focus-visible,
+a[href]:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible,
+[role='button']:focus-visible {
+  outline: 2px solid rgba(0, 191, 99, 0.72);
+  outline-offset: 2px;
+}
+
+@media (max-width: 640px) {
+  /* iOS zooms forms with sub-16px text. A zooming page makes menus and cards
+     appear to jump out of alignment after typing. */
+  input,
+  select,
+  textarea {
+    font-size: 16px !important;
+  }
+
+  /* Keep dense cards comfortable without rewriting every page component. */
+  .kaca {
+    border-radius: 22px;
+  }
+
+  [role='dialog'] {
+    max-width: calc(100vw - 16px) !important;
+    max-height: calc(100dvh - env(safe-area-inset-top) - env(safe-area-inset-bottom) - 16px) !important;
+  }
+}
+
+/* Safe-area padding for fixed controls that opt into these helpers. */
+.panacea-safe-bottom {
+  padding-bottom: max(12px, env(safe-area-inset-bottom));
+}
+
+.panacea-safe-top {
+  padding-top: max(12px, env(safe-area-inset-top));
+}
+
+/* Motion should communicate state, not make the whole interface shimmer. */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

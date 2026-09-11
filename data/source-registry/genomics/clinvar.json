@@ -1,0 +1,52 @@
+{
+  "id": "ncbi_clinvar",
+  "name": "NCBI ClinVar",
+  "category": "genomics",
+  "kind": ["api", "dataset"],
+  "homepage": "https://www.ncbi.nlm.nih.gov/clinvar/",
+  "repository": null,
+  "features": ["variant-assertions", "clinical-significance", "review-status", "conflicting-interpretations", "gene-disease-context", "drug-response", "variant-history", "genomic-education", "precision-medicine-research"],
+  "formats": ["xml", "json", "vcf", "tsv", "http-rest", "e-utilities"],
+  "usage": {
+    "runtime": true,
+    "buildTime": true,
+    "networkRequired": true,
+    "notes": "Use ClinVar as a source of submitted variant-condition assertions and their review/evidence metadata, not as an automated diagnosis or treatment rule. Prefer accession-targeted runtime retrieval through NCBI E-utilities and versioned weekly/monthly snapshots for reproducible educational or research indexes. Keep ClinVar assertions separate from Ensembl computational consequence predictions and from patient-specific sequencing results."
+  },
+  "license": {
+    "status": "VERIFIED",
+    "identifier": "NCBI ClinVar public data use policy",
+    "commercialUse": "ALLOWED",
+    "attributionRequired": true,
+    "shareAlike": false,
+    "scope": "ClinVar states that its public data are freely available for use and unrestricted distribution. ClinVar asks users who distribute or copy the data to provide attribution to ClinVar as the source. Third-party publications, linked databases and external resources referenced by ClinVar retain their own copyright/licensing terms and are not relicensed by this registry entry.",
+    "verificationUrl": "https://www.ncbi.nlm.nih.gov/clinvar/docs/maintenance_use/",
+    "verifiedAt": "2026-09-08",
+    "notes": "Attribute ClinVar when data are displayed, redistributed or materially incorporated into Panacea outputs. Preserve submitter identity and accession provenance; do not imply that NCBI/NIH independently validated each submitted classification or endorses Panacea interpretations."
+  },
+  "validation": {
+    "level": "CLINICAL_SUPPORT",
+    "clinicalDecisionUse": "REQUIRES_SEPARATE_VALIDATION",
+    "notes": "ClinVar is clinically important reference evidence but explicitly warns against direct diagnostic or medical decision use without review by a genetics professional. NIH does not independently verify all submitted information. Conflicting classifications, review status, assertion criteria, submitter expertise and assertion dates must remain visible; Panacea must not collapse disagreement into a single fabricated certainty score."
+  },
+  "provenance": {
+    "authority": "NCBI / NIH ClinVar",
+    "sourceIdentityRequired": true,
+    "versionPinRequired": true,
+    "notes": "Persist VCV/RCV/SCV accessions and versions where available, Variation ID, HGVS expressions, reference assembly and coordinates, submitted condition identifiers/names, clinical-significance assertion, review status/stars, submitter, assertion/evaluation dates, collection method, citation/evidence links, conflict state, retrieval/release date and Panacea adapter version. Do not overwrite historical assertions when newer submissions or aggregate classifications appear."
+  },
+  "adapter": {
+    "status": "PLANNED",
+    "normalizedTarget": "PanaceaVariantAssertion",
+    "module": null,
+    "notes": "Planned flow: normalized variant/accession request -> explicit assembly/allele context -> NCBI E-utilities or versioned ClinVar snapshot -> retain VCV/RCV/SCV hierarchy and submitter-level assertions -> normalize each assertion to PanaceaVariantAssertion -> expose aggregate interpretation only alongside review status, dates and conflicts. Never map an Ensembl/VEP consequence term directly to ClinVar pathogenicity. Patient sequencing observations must remain in a separate permissioned patient-data domain and only link to ClinVar by normalized variant identity after allele/assembly verification."
+  },
+  "trust": {
+    "authority": 5,
+    "evidenceQuality": 4,
+    "recency": 5,
+    "licenseClarity": 5,
+    "reproducibility": 5,
+    "notes": "High-authority public archive with strong accession/version provenance and frequent releases. Evidence quality varies across submissions and review levels, so expert-panel or practice-guideline assertions should remain distinguishable from single-submitter assertions and conflicts must be preserved rather than averaged away."
+  }
+}

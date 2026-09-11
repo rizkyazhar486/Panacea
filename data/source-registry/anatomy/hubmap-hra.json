@@ -1,0 +1,44 @@
+{
+  "id": "hubmap_hra",
+  "name": "HuBMAP Human Reference Atlas (HRA)",
+  "category": "anatomy",
+  "kind": ["api", "dataset", "mesh", "ontology"],
+  "homepage": "https://humanatlas.io/",
+  "repository": "https://github.com/hubmapconsortium/hra-kg",
+  "features": [51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 751, 752, 753, 754, 755, 756, 757, 758, 759, 760, 761],
+  "formats": ["jsonld", "ttl", "csv", "glb"],
+  "usage": {
+    "runtime": false,
+    "buildTime": true,
+    "networkRequired": true,
+    "notes": "A bounded read-only prototype adapter now exists for the official HRA reference-organ endpoint, but it is intentionally not wired to a public Panacea runtime route or UI yet. Continue using versioned build-time snapshots for stable graph/asset work until caching, version pinning and product integration are designed. The prototype normalizes semantic reference-organ identity only and does not download or expose HRA meshes."
+  },
+  "license": {
+    "status": "VERIFIED",
+    "identifier": "MIT (code) + CC-BY-4.0 (HRA-KG data)",
+    "commercialUse": "ALLOWED",
+    "attributionRequired": true,
+    "shareAlike": false,
+    "scope": "The HuBMAP HRA-KG repository states that its code is MIT licensed and its data is CC BY 4.0. This registry entry covers that HRA-KG scope. Any third-party upstream source or separately hosted 3D asset must retain its own provenance/license record and must not inherit this permission automatically.",
+    "verificationUrl": "https://github.com/hubmapconsortium/hra-kg",
+    "verifiedAt": "2026-09-08",
+    "notes": "Preserve HRA attribution and version identity. Treat separately sourced reference objects as separate assets when their own entry/license metadata exists."
+  },
+  "validation": {
+    "level": "REFERENCE",
+    "clinicalDecisionUse": "CONTEXT_ONLY",
+    "notes": "Use HRA to organize reference anatomy, spatial relationships, anatomical structures, cell types and biomarkers. It is a reference atlas, not a patient-specific diagnostic model and not sufficient by itself for clinical decisions."
+  },
+  "provenance": {
+    "authority": "HuBMAP Consortium Human Reference Atlas",
+    "sourceIdentityRequired": true,
+    "versionPinRequired": true,
+    "notes": "Persist HRA release/version, digital object identifier, source ontology/atlas identifiers and transformation history. Preserve semantic IDs across mesh optimization so visual geometry remains linked to the reference graph. The current prototype preserves the upstream HRA spatial-entity ID plus entity/annotation/reference-organ IRIs without inventing ontology mappings."
+  },
+  "adapter": {
+    "status": "PROTOTYPE",
+    "normalizedTarget": "HraReferenceOrgan",
+    "module": "server/src/hraReference.ts",
+    "notes": "Read-only prototype for `https://apps.humanatlas.io/hra-api/v1/reference-organs`. It enforces a fixed upstream endpoint, timeout, bounded rows/annotations, record-type and ID validation, deduplication, explicit source provenance and fail-closed malformed-payload handling. It is covered by `server/uji/hraReference.uji.ts` and backend CI. No UI route, patient-specific inference or mesh ingestion is enabled by this status."
+  }
+}

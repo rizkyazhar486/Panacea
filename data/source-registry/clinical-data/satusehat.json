@@ -1,0 +1,52 @@
+{
+  "id": "satusehat",
+  "name": "SATUSEHAT Platform API",
+  "category": "clinical-data",
+  "kind": ["api"],
+  "homepage": "https://satusehat.kemkes.go.id/platform/docs/id/",
+  "repository": null,
+  "features": ["human-os", "clinical-intelligence", "healthcare-infrastructure", "interoperability", "fhir", "patient", "encounter", "condition", "observation", "national-health-exchange"],
+  "formats": ["fhir-r4-json", "oauth2"],
+  "usage": {
+    "runtime": true,
+    "buildTime": false,
+    "networkRequired": true,
+    "notes": "SATUSEHAT is a live national interoperability service. Panacea uses server-side OAuth client-credentials and the official FHIR R4 endpoints; browser code must never receive the client secret. Without configured credentials the current adapter only builds a local preview Bundle and performs no SATUSEHAT network I/O."
+  },
+  "license": {
+    "status": "CHECK_REQUIRED",
+    "identifier": null,
+    "commercialUse": "CONDITIONAL",
+    "attributionRequired": null,
+    "shareAlike": null,
+    "scope": "Official SATUSEHAT Platform API access, documentation and exchanged healthcare data. Public documentation confirms access requirements and credential handling but does not establish one blanket open-content or commercial redistribution licence for all API data/resources.",
+    "verificationUrl": "https://satusehat.kemkes.go.id/platform/docs/id/api-code/",
+    "verifiedAt": "2026-09-09",
+    "notes": "Production credentials are issued to verified interoperability partners and must remain confidential. Do not infer permission to redistribute patient, terminology or other third-party content merely because it is exchanged through SATUSEHAT. Re-check current partner, privacy, retention and data-use obligations before production activation."
+  },
+  "validation": {
+    "level": "REGULATORY",
+    "clinicalDecisionUse": "REQUIRES_SEPARATE_VALIDATION",
+    "notes": "SATUSEHAT provides a regulated interoperability pathway, not independent validation that Panacea-generated clinical content is correct. FHIR conformance, IHS/NIK identity reconciliation, organization/practitioner/location identifiers, terminology binding and workflow-specific certification remain separate requirements before real clinical submission."
+  },
+  "provenance": {
+    "authority": "Kementerian Kesehatan Republik Indonesia — SATUSEHAT Platform",
+    "sourceIdentityRequired": true,
+    "versionPinRequired": true,
+    "notes": "Preserve SATUSEHAT environment (sandbox or production), FHIR R4 endpoint generation, returned resource id/meta/version where available, Organization/IHS identities and the local source record used to construct each outbound Bundle. Never treat a local preview Bundle as proof that SATUSEHAT accepted or validated it."
+  },
+  "adapter": {
+    "status": "ACTIVE",
+    "normalizedTarget": "PanaceaHealthResource",
+    "module": "server/src/satusehat.ts",
+    "notes": "Current adapter centralizes OAuth token handling, server-side secret isolation, path validation, bounded network timeouts and deterministic FHIR Bundle construction. Production activation must remain fail-closed until SATUSEHAT credentials and required national identity mappings are configured and verified."
+  },
+  "trust": {
+    "authority": 5,
+    "evidenceQuality": 2,
+    "recency": 5,
+    "licenseClarity": 2,
+    "reproducibility": 4,
+    "notes": "High authority as Indonesia's national health interoperability platform. The service is not itself biomedical evidence, and licence/data-use scope is deliberately scored conservatively until production partner terms are reviewed for the exact Panacea use case."
+  }
+}

@@ -1,56 +1,61 @@
-// Bank data obat — RxNorm & RxClass (NLM/NIH), gratis, tanpa kunci API.
+// Bank data obat berbasis RxNorm + RxClass (NLM/NIH).
 //
-// TENTANG DRUGBANK, karena itu yang diminta secara khusus.
-//
-// DrugBank TIDAK bisa dipakai di aplikasi ini. Bukan soal teknis:
-//   - Basis data lengkapnya berlisensi komersial berbayar, bukan API terbuka.
-//   - Berkas "DrugBank Open Data" yang gratis berlisensi CC BY-NC 4.0 —
-//     NC = non-commercial. Aplikasi ini berjualan (lihat server/src/payments.ts,
-//     Midtrans, isSubscriber), jadi ia komersial, dan mencantumkan sumber TIDAK
-//     menyembuhkan larangan NC. Atribusi memenuhi syarat CC BY dan CC BY-SA;
-//     ia tidak memberi izin yang memang tidak diberikan.
-//   - NLM sendiri MENUTUP API interaksi obat RxNav pada Januari 2024 justru
-//     karena perjanjian datanya dengan DrugBank berakhir (lihat catatan di
-//     server/src/rxnorm.ts).
-//
-// Yang dipakai sebagai gantinya adalah sumber pemerintah AS yang berstatus
-// domain publik dan boleh dipakai komersial tanpa syarat:
-//   - RxNorm (NLM) — daftar zat aktif & produk. Inilah jawaban nyata untuk
-//     "17.000 obat": `daftarSemuaZatAktif()` menarik SELURUH konsep zat aktif
-//     RxNorm dalam satu permintaan, jumlahnya belasan ribu, bukan hasil
-//     ketikan tangan.
-//   - RxClass (NLM) — kelas obat dari MED-RT & DailyMed: MEKANISME KERJA,
-//     EFEK FISIOLOGIS, kelas farmakologi, kelompok ATC, serta penyakit yang
-//     "may_treat"/"may_prevent". Inilah yang membuat "obat ini bekerja di
-//     mana" bisa dijawab dari data, bukan dari ingatan.
-//   - openFDA / DailyMed — teks label resmi (dosis, cara pakai, peringatan);
-//     sudah dipakai di server/src/drugInfo.ts.
+// RxClass API dapat dipakai tanpa lisensi API, tetapi relasi kelas yang
+// dikembalikan berasal dari beberapa source vocabulary (mis. MED-RT,
+// DailyMed, ATC). Karena itu Panacea mempertahankan `relaSource` pada setiap
+// hasil dan TIDAK menganggap seluruh class relation mempunyai satu blanket
+// licence/provenance. RxNorm/RxClass dipakai untuk normalisasi dan konteks
+// farmakologi; hasilnya bukan rekomendasi terapi pasien.
 const RXNAV = 'https://rxnav.nlm.nih.gov/REST'
+const MAX_DRUG_QUERY_LENGTH = 160
+const MAX_CLASS_RESULTS = 100
+const MAX_SEARCH_RESULTS = 100
+const UMUR_CACHE_VERSI = 12 * 60 * 60 * 1000
+
+type FetchLike = typeof fetch
+type VersionedRelaSource = 'MEDRT' | 'ATC'
+
+function normalizeDrugQuery(value: string): string {
+  return value.replace(/\s+/g, ' ').trim().slice(0, MAX_DRUG_QUERY_LENGTH)
+}
+
+function clampSearchLimit(value: number): number {
+  if (!Number.isFinite(value)) return 40
+  return Math.max(1, Math.min(MAX_SEARCH_RESULTS, Math.trunc(value)))
+}
 
 export interface KelasObat {
-  /** Pengenal kelas di sumbernya (mis. "N0000175565"). Data, bukan teks layar. */
+  /** Pengenal kelas di namespace sumbernya (mis. MED-RT/ATC). */
   id: string
   nama: string
   /** MOA | PE | EPC | ATC1-4 | DISEASE, apa adanya dari RxClass. */
   jenis: string
-  /** has_MoA | has_PE | has_EPC | may_treat | may_prevent | ... */
+  /** has_MoA | has_PE | has_EPC | may_treat | ... */
   relasi: string
+  /** Source vocabulary relation dari RxClass (mis. MEDRT, DAILYMED, ATC). */
   sumber: string
 }
 
 export interface ProfilFarmakologi {
   nama: string
   rxcui: string
-  /** Bagaimana ia bekerja pada tingkat molekul (MED-RT has_MoA). */
+  /** Relasi mechanism-of-action yang dikembalikan MED-RT/RxClass. */
   mekanisme: KelasObat[]
-  /** Apa yang ia lakukan pada faal tubuh (MED-RT has_PE). */
+  /** Relasi physiologic-effect yang dikembalikan MED-RT/RxClass. */
   efekFisiologis: KelasObat[]
-  /** Kelas farmakologi mapan menurut FDA (DailyMed has_EPC). */
+  /** Established pharmacologic class dari DailyMed/RxClass bila tersedia. */
   kelasFarmakologi: KelasObat[]
-  /** Kelompok ATC WHO — huruf pertamanya adalah kelompok ANATOMI. */
+  /** Kelas ATC yang dikembalikan RxClass bila tersedia. */
   atc: KelasObat[]
-  /** Penyakit yang lazim diobati/dicegah (MED-RT). */
+  /** Relasi `may_treat` dari MED-RT; konteks referensi, bukan indikasi pasien. */
   indikasi: KelasObat[]
+  /**
+   * Versi relation-source yang dilaporkan RxClass untuk sumber yang memang
+   * mempunyai version identifier. DailyMed sengaja tidak diberi versi palsu:
+   * NLM mendokumentasikan class-member DailyMed sebagai rolling update tanpa
+   * version number yang diasosiasikan.
+   */
+  versiSumber: Partial<Record<VersionedRelaSource, string>>
 }
 
 interface RxClassResp {
@@ -64,116 +69,185 @@ interface RxClassResp {
   }
 }
 
-async function kelasMenurut(drugName: string, relaSource: string, relas?: string): Promise<KelasObat[]> {
-  const params = new URLSearchParams({ drugName, relaSource })
+let cacheVersiSumber: Partial<Record<VersionedRelaSource, { nilai: string; waktu: number }>> = {}
+
+async function versiRelaSource(
+  source: VersionedRelaSource,
+  fetchImpl: FetchLike,
+): Promise<string> {
+  const useRuntimeCache = fetchImpl === fetch
+  const cached = cacheVersiSumber[source]
+  if (useRuntimeCache && cached && Date.now() - cached.waktu < UMUR_CACHE_VERSI) return cached.nilai
+
+  try {
+    const res = await fetchImpl(`${RXNAV}/rxclass/version/${source}.json`, {
+      headers: { Accept: 'application/json' },
+      signal: AbortSignal.timeout(6000),
+    })
+    if (!res.ok) return ''
+    const data = (await res.json()) as { relaSourceVersion?: unknown }
+    const nilai = typeof data.relaSourceVersion === 'string'
+      ? data.relaSourceVersion.replace(/\s+/g, ' ').trim().slice(0, 80)
+      : ''
+    if (useRuntimeCache && nilai) cacheVersiSumber[source] = { nilai, waktu: Date.now() }
+    return nilai
+  } catch {
+    // Versi adalah provenance tambahan. Kegagalan endpoint versi tidak boleh
+    // menghapus relation slices yang sudah valid; absence tetap eksplisit.
+    return ''
+  }
+}
+
+async function kelasMenurut(
+  drugName: string,
+  relaSource: string,
+  relas: string | undefined,
+  fetchImpl: FetchLike,
+): Promise<KelasObat[]> {
+  const q = normalizeDrugQuery(drugName)
+  if (!q) return []
+  const params = new URLSearchParams({ drugName: q, relaSource })
   if (relas) params.set('relas', relas)
-  const res = await fetch(`${RXNAV}/rxclass/class/byDrugName.json?${params.toString()}`, {
+  const res = await fetchImpl(`${RXNAV}/rxclass/class/byDrugName.json?${params.toString()}`, {
     headers: { Accept: 'application/json' },
     signal: AbortSignal.timeout(9000),
   })
   if (!res.ok) return []
   const data = (await res.json()) as RxClassResp
+  const items = Array.isArray(data.rxclassDrugInfoList?.rxclassDrugInfo)
+    ? data.rxclassDrugInfoList?.rxclassDrugInfo ?? []
+    : []
   const out: KelasObat[] = []
-  for (const item of data.rxclassDrugInfoList?.rxclassDrugInfo ?? []) {
+  const seen = new Set<string>()
+  for (const item of items) {
     const c = item.rxclassMinConceptItem
-    if (!c?.className || !c.classId) continue
-    if (out.some((x) => x.id === c.classId)) continue
+    const id = typeof c?.classId === 'string' ? c.classId.trim() : ''
+    const nama = typeof c?.className === 'string' ? c.className.trim() : ''
+    if (!id || !nama) continue
+    const sumber = typeof item.relaSource === 'string' && item.relaSource.trim()
+      ? item.relaSource.trim()
+      : relaSource
+    const key = `${sumber}|${id}`
+    if (seen.has(key)) continue
+    seen.add(key)
     out.push({
-      id: c.classId,
-      nama: c.className,
-      jenis: c.classType ?? '',
-      relasi: item.rela ?? '',
-      sumber: item.relaSource ?? relaSource,
+      id,
+      nama,
+      jenis: typeof c?.classType === 'string' ? c.classType.trim() : '',
+      relasi: typeof item.rela === 'string' ? item.rela.trim() : '',
+      sumber,
     })
+    if (out.length >= MAX_CLASS_RESULTS) break
   }
   return out
 }
 
 /**
- * Profil farmakologi satu obat: bagaimana ia bekerja, apa efeknya pada faal
- * tubuh, golongannya, dan untuk penyakit apa. Lima permintaan dijalankan
- * bersamaan; satu yang gagal tidak mengosongkan yang lain, karena profil
- * separuh masih berguna sedangkan galat total tidak.
+ * Profil farmakologi satu obat dari source relations RxClass. Satu source yang
+ * gagal tidak menghapus source lain, tetapi hasil parsial tetap membawa
+ * `sumber` sehingga UI/engine tidak mengubahnya menjadi satu klaim homogen.
  */
-export async function profilFarmakologi(name: string): Promise<ProfilFarmakologi | null> {
-  const q = name.trim()
+export async function profilFarmakologi(
+  name: string,
+  fetchImpl: FetchLike = fetch,
+): Promise<ProfilFarmakologi | null> {
+  const q = normalizeDrugQuery(name)
   if (!q) return null
   const aman = (p: Promise<KelasObat[]>) => p.catch(() => [] as KelasObat[])
-  const [mekanisme, efekFisiologis, kelasFarmakologi, atc, indikasi] = await Promise.all([
-    aman(kelasMenurut(q, 'MEDRT', 'has_MoA')),
-    aman(kelasMenurut(q, 'MEDRT', 'has_PE')),
-    aman(kelasMenurut(q, 'DAILYMED', 'has_EPC')),
-    aman(kelasMenurut(q, 'ATC')),
-    aman(kelasMenurut(q, 'MEDRT', 'may_treat')),
+  const [mekanisme, efekFisiologis, kelasFarmakologi, atc, indikasi, versiMedrt, versiAtc] = await Promise.all([
+    aman(kelasMenurut(q, 'MEDRT', 'has_MoA', fetchImpl)),
+    aman(kelasMenurut(q, 'MEDRT', 'has_PE', fetchImpl)),
+    aman(kelasMenurut(q, 'DAILYMED', 'has_EPC', fetchImpl)),
+    aman(kelasMenurut(q, 'ATC', undefined, fetchImpl)),
+    aman(kelasMenurut(q, 'MEDRT', 'may_treat', fetchImpl)),
+    versiRelaSource('MEDRT', fetchImpl),
+    versiRelaSource('ATC', fetchImpl),
   ])
   const adaIsi = mekanisme.length || efekFisiologis.length || kelasFarmakologi.length || atc.length || indikasi.length
   if (!adaIsi) return null
 
   let rxcui = ''
   try {
-    const res = await fetch(`${RXNAV}/rxcui.json?name=${encodeURIComponent(q)}&search=1`, {
+    const params = new URLSearchParams({ name: q, search: '1' })
+    const res = await fetchImpl(`${RXNAV}/rxcui.json?${params.toString()}`, {
+      headers: { Accept: 'application/json' },
       signal: AbortSignal.timeout(6000),
     })
     if (res.ok) {
-      const d = (await res.json()) as { idGroup?: { rxnormId?: string[] } }
-      rxcui = d.idGroup?.rxnormId?.[0] ?? ''
+      const d = (await res.json()) as { idGroup?: { rxnormId?: unknown } }
+      const ids = Array.isArray(d.idGroup?.rxnormId) ? d.idGroup?.rxnormId : []
+      const first = ids.find((id): id is string => typeof id === 'string' && /^\d+$/.test(id))
+      rxcui = first ?? ''
     }
-  } catch { /* rxcui hanya pelengkap */ }
+  } catch {
+    // RXCUI hanya pelengkap; source-class profile yang sudah valid tetap berguna.
+  }
 
-  return { nama: q, rxcui, mekanisme, efekFisiologis, kelasFarmakologi, atc, indikasi }
+  const versiSumber: ProfilFarmakologi['versiSumber'] = {}
+  if (versiMedrt) versiSumber.MEDRT = versiMedrt
+  if (versiAtc) versiSumber.ATC = versiAtc
+
+  return { nama: q, rxcui, mekanisme, efekFisiologis, kelasFarmakologi, atc, indikasi, versiSumber }
 }
 
 export interface ZatAktif { rxcui: string; nama: string }
 
-// Daftar lengkapnya besar (belasan ribu entri) dan praktis tidak berubah dari
-// jam ke jam, jadi disimpan di memori proses. Tanpa ini tiap pembukaan halaman
-// menarik ulang berkas beberapa megabyte dari NLM tanpa alasan.
+// Daftar ingredient cukup besar dan tidak perlu diambil ulang setiap render.
+// Cache hanya dipakai untuk fetch runtime asli; injected test fetch tidak boleh
+// mencemari cache proses produksi.
 let cacheZat: { data: ZatAktif[]; waktu: number } | null = null
 const UMUR_CACHE = 12 * 60 * 60 * 1000
 
 /**
- * SELURUH zat aktif yang dikenal RxNorm. Inilah bank data obatnya — jumlahnya
- * belasan ribu dan datang dari NLM, bukan dari daftar yang ditulis tangan.
- *
- * tty=IN adalah "ingredient" (zat aktif tunggal); PIN adalah "precise
- * ingredient" (bentuk garam/ester spesifik, mis. "metoprolol tartrate" di
- * samping "metoprolol"). Keduanya diambil karena resep nyata memakai
- * kedua-duanya.
+ * Konsep RxNorm dengan TTY IN/PIN. Ini adalah vocabulary identity/reference,
+ * bukan daftar obat yang otomatis tepat untuk satu negara, formularium, atau
+ * pasien tertentu.
  */
-export async function daftarSemuaZatAktif(): Promise<ZatAktif[]> {
-  if (cacheZat && Date.now() - cacheZat.waktu < UMUR_CACHE) return cacheZat.data
-  const res = await fetch(`${RXNAV}/allconcepts.json?tty=IN+PIN`, {
+export async function daftarSemuaZatAktif(fetchImpl: FetchLike = fetch): Promise<ZatAktif[]> {
+  const useRuntimeCache = fetchImpl === fetch
+  if (useRuntimeCache && cacheZat && Date.now() - cacheZat.waktu < UMUR_CACHE) return cacheZat.data
+
+  const res = await fetchImpl(`${RXNAV}/allconcepts.json?tty=IN+PIN`, {
     headers: { Accept: 'application/json' },
     signal: AbortSignal.timeout(30000),
   })
   if (!res.ok) throw new Error(`rxnorm_allconcepts_${res.status}`)
-  const data = (await res.json()) as { minConceptGroup?: { minConcept?: Array<{ rxcui?: string; name?: string }> } }
+  const data = (await res.json()) as { minConceptGroup?: { minConcept?: unknown } }
+  const concepts = Array.isArray(data.minConceptGroup?.minConcept) ? data.minConceptGroup?.minConcept : []
   const daftar: ZatAktif[] = []
   const terlihat = new Set<string>()
-  for (const c of data.minConceptGroup?.minConcept ?? []) {
-    if (!c.rxcui || !c.name) continue
-    const kunci = c.name.toLowerCase()
+  for (const raw of concepts) {
+    if (!raw || typeof raw !== 'object') continue
+    const c = raw as { rxcui?: unknown; name?: unknown }
+    const rxcui = typeof c.rxcui === 'string' ? c.rxcui.trim() : ''
+    const nama = typeof c.name === 'string' ? c.name.replace(/\s+/g, ' ').trim() : ''
+    if (!/^\d+$/.test(rxcui) || !nama) continue
+    const kunci = nama.toLowerCase()
     if (terlihat.has(kunci)) continue
     terlihat.add(kunci)
-    daftar.push({ rxcui: c.rxcui, nama: c.name })
+    daftar.push({ rxcui, nama })
   }
   daftar.sort((a, b) => a.nama.localeCompare(b.nama))
-  cacheZat = { data: daftar, waktu: Date.now() }
+  if (useRuntimeCache) cacheZat = { data: daftar, waktu: Date.now() }
   return daftar
 }
 
-/** Pencarian di dalam daftar lengkap itu — dipakai kotak cari di layar. */
-export async function cariZatAktif(q: string, limit = 40): Promise<ZatAktif[]> {
-  const kueri = q.trim().toLowerCase()
-  const semua = await daftarSemuaZatAktif()
-  if (!kueri) return semua.slice(0, limit)
+/** Pencarian lokal di daftar ingredient RxNorm yang sudah dinormalisasi. */
+export async function cariZatAktif(
+  q: string,
+  limit = 40,
+  fetchImpl: FetchLike = fetch,
+): Promise<ZatAktif[]> {
+  const kueri = normalizeDrugQuery(q).toLowerCase()
+  const batas = clampSearchLimit(limit)
+  const semua = await daftarSemuaZatAktif(fetchImpl)
+  if (!kueri) return semua.slice(0, batas)
   const mulai: ZatAktif[] = []
   const mengandung: ZatAktif[] = []
   for (const z of semua) {
     const n = z.nama.toLowerCase()
     if (n.startsWith(kueri)) mulai.push(z)
     else if (n.includes(kueri)) mengandung.push(z)
-    if (mulai.length >= limit) break
   }
-  return [...mulai, ...mengandung].slice(0, limit)
+  return [...mulai, ...mengandung].slice(0, batas)
 }

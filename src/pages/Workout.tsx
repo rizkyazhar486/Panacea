@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react'
-import { hariIni } from '../lib/tanggal'
+import { hariIni, hariLalu } from '../lib/tanggal'
 import { Card, SectionTitle, Button, Badge, inputClass } from '../components/ui'
 import { FotoLatihanKecil } from '../components/FotoLatihan'
 import { IconActivity, IconFlame, IconRun, IconCheck, IconPlus } from '../components/icons'
@@ -161,6 +161,7 @@ export function Workout() {
   const [sets, setSets] = useState(3); const [reps, setReps] = useState(12); const [weight, setWeight] = useState(0)
   const [toasts, setToasts] = useState<Achievement[]>([])
   const [badgeCount, setBadgeCount] = useState(unlockedCount)
+  const validLogInput = Number.isInteger(sets) && sets > 0 && Number.isInteger(reps) && reps > 0 && Number.isFinite(weight) && weight >= 0
 
   const filtered = useMemo(() => EX.filter((e) =>
     (muscle === 'All' || e.muscle === muscle) &&
@@ -169,6 +170,7 @@ export function Workout() {
   ), [muscle, modality, type])
 
   function logExercise(exId: string) {
+    if (!validLogInput) return
     const entry: LogEntry = { id: `${Date.now()}`, exId, date: hariIni(), sets, reps, weight }
     const next = [entry, ...log]
     setLog(next); saveLog(next)
@@ -184,8 +186,93 @@ export function Workout() {
 
   const todayStr = hariIni()
   const todayLog = log.filter((l) => l.date === todayStr)
-  const weekLog = log.filter((l) => Date.now() - new Date(l.date).getTime() <= 7 * 86400000)
-  const weeklyVolume = weekLog.reduce((a, l) => a + l.sets * l.reps * (l.weight || 1), 0)
+  const weekLog = useMemo(() => {
+    const last7Days = new Set(Array.from({ length: 7 }, (_, offset) => hariLalu(offset)))
+    return log.filter((l) => last7Days.has(l.date))
+  }, [log, todayStr])
+  const todaySets = todayLog.reduce((total, l) => total + (Number.isFinite(l.sets) && l.sets > 0 ? l.sets : 0), 0)
+  const weeklySets = weekLog.reduce((total, l) => total + (Number.isFinite(l.sets) && l.sets > 0 ? l.sets : 0), 0)
+  const weeklyLoadedVolume = weekLog.reduce((total, l) => {
+    const safeSets = Number.isFinite(l.sets) && l.sets > 0 ? l.sets : 0
+    const safeReps = Number.isFinite(l.reps) && l.reps > 0 ? l.reps : 0
+    const safeWeight = Number.isFinite(l.weight) && l.weight > 0 ? l.weight : 0
+    return total + safeSets * safeReps * safeWeight
+  }, 0)
+  const weeklyMuscleSets = useMemo(() => {
+    const totals = new Map<Muscle, number>()
+    for (const entry of weekLog) {
+      const safeSets = Number.isFinite(entry.sets) && entry.sets > 0 ? entry.sets : 0
+      if (safeSets === 0) continue
+      const exercise = EX.find((candidate) => candidate.id === entry.exId)
+      if (!exercise) continue
+      totals.set(exercise.muscle, (totals.get(exercise.muscle) ?? 0) + safeSets)
+    }
+    const total = [...totals.values()].reduce((sum, muscleSets) => sum + muscleSets, 0)
+    return MUSCLES
+      .map((muscleName) => {
+        const muscleSets = totals.get(muscleName) ?? 0
+        return { muscle: muscleName, sets: muscleSets, pct: total > 0 ? (muscleSets / total) * 100 : 0 }
+      })
+      .filter((item) => item.sets > 0)
+      .sort((a, b) => b.sets - a.sets)
+  }, [weekLog])
+  const progress28 = useMemo(() => {
+    const offsetByDate = new Map<string, number>()
+    for (let offset = 0; offset < 28; offset += 1) offsetByDate.set(hariLalu(offset), offset)
+
+    const buckets = [
+      { label: '0–6d', sets: 0, loadedVolume: 0, days: new Set<string>() },
+      { label: '7–13d', sets: 0, loadedVolume: 0, days: new Set<string>() },
+      { label: '14–20d', sets: 0, loadedVolume: 0, days: new Set<string>() },
+      { label: '21–27d', sets: 0, loadedVolume: 0, days: new Set<string>() },
+    ]
+
+    for (const entry of log) {
+      const offset = offsetByDate.get(entry.date)
+      if (offset === undefined) continue
+      const safeSets = Number.isFinite(entry.sets) && entry.sets > 0 ? entry.sets : 0
+      const safeReps = Number.isFinite(entry.reps) && entry.reps > 0 ? entry.reps : 0
+      const safeWeight = Number.isFinite(entry.weight) && entry.weight > 0 ? entry.weight : 0
+      if (safeSets === 0) continue
+      const bucket = buckets[Math.floor(offset / 7)]
+      bucket.sets += safeSets
+      bucket.loadedVolume += safeSets * safeReps * safeWeight
+      bucket.days.add(entry.date)
+    }
+
+    const rows = [...buckets].reverse().map((bucket) => ({
+      label: bucket.label,
+      sets: bucket.sets,
+      loadedVolume: bucket.loadedVolume,
+      activeDays: bucket.days.size,
+    }))
+
+    return {
+      rows,
+      maxSets: Math.max(1, ...rows.map((row) => row.sets)),
+      totalSets: rows.reduce((sum, row) => sum + row.sets, 0),
+      activeDays: rows.reduce((sum, row) => sum + row.activeDays, 0),
+    }
+  }, [log, todayStr])
+  const consistency28 = useMemo(() => {
+    const setsByDate = new Map<string, number>()
+    for (const entry of log) {
+      const safeSets = Number.isFinite(entry.sets) && entry.sets > 0 ? entry.sets : 0
+      if (safeSets === 0) continue
+      setsByDate.set(entry.date, (setsByDate.get(entry.date) ?? 0) + safeSets)
+    }
+
+    const days = Array.from({ length: 28 }, (_, index) => {
+      const date = hariLalu(27 - index)
+      return { date, sets: setsByDate.get(date) ?? 0 }
+    })
+
+    return {
+      days,
+      activeDays: days.filter((day) => day.sets > 0).length,
+      maxSets: Math.max(1, ...days.map((day) => day.sets)),
+    }
+  }, [log, todayStr])
 
   return (
     <div className="mx-auto max-w-2xl space-y-5 pb-24">
@@ -197,7 +284,7 @@ export function Workout() {
         right={
           <div className="flex flex-col items-end gap-1">
             {badgeCount > 0 && <span className="metal-tag metal-gold">🏆 {badgeCount} unlocked</span>}
-            {todayLog.length > 0 && <span className="text-[11px] font-bold uppercase tracking-[0.2em] text-white/50">{todayLog.length} sets logged today</span>}
+            {todaySets > 0 && <span className="text-[11px] font-bold uppercase tracking-[0.2em] text-white/50">{todaySets} sets logged today</span>}
           </div>
         }
       />
@@ -236,19 +323,109 @@ export function Workout() {
             gold/silver/bronze, bukan menambah data. */}
         <div className="metal-forge mt-4 grid grid-cols-3 gap-2 rounded-2xl p-3">
           <div className="relative text-center">
-            <div className="metal-emboss-gold text-xl font-black">{todayLog.length}</div>
+            <div className="metal-emboss-gold text-xl font-black">{todaySets}</div>
             <div className="mt-0.5 text-[10px] font-bold uppercase tracking-wide text-white/50">Sets Today</div>
           </div>
           <div className="relative text-center">
-            <div className="metal-emboss text-xl font-black">{weekLog.length}</div>
-            <div className="mt-0.5 text-[10px] font-bold uppercase tracking-wide text-white/50">Sessions This Week</div>
+            <div className="metal-emboss text-xl font-black">{weeklySets}</div>
+            <div className="mt-0.5 text-[10px] font-bold uppercase tracking-wide text-white/50">Sets This Week</div>
           </div>
           <div className="relative text-center">
-            <div className="metal-emboss text-xl font-black">{weeklyVolume.toLocaleString('en-US')}</div>
-            <div className="mt-0.5 text-[10px] font-bold uppercase tracking-wide text-white/50">Weekly Volume</div>
+            <div className="metal-emboss text-xl font-black">{weeklyLoadedVolume.toLocaleString('en-US', { maximumFractionDigits: 1 })}</div>
+            <div className="mt-0.5 text-[10px] font-bold uppercase tracking-wide text-white/50">External Load kg·reps</div>
           </div>
         </div>
       </Card>
+
+      {weeklyMuscleSets.length > 0 && (
+        <Card className="!p-5">
+          <SectionTitle icon={<IconActivity size={18} />} title="Weekly Muscle Distribution" subtitle="Working sets logged during the last 7 days" />
+          <div className="mt-4 space-y-3">
+            {weeklyMuscleSets.map((item) => (
+              <div key={item.muscle}>
+                <div className="mb-1.5 flex items-center justify-between gap-3 text-xs">
+                  <span className={`font-bold ${OTOT[item.muscle].teks}`}>{OTOT[item.muscle].emoji} {item.muscle}</span>
+                  <span className="shrink-0 tabular-nums text-neutral-500">{item.sets} sets · {item.pct.toFixed(0)}%</span>
+                </div>
+                <div className="h-2 overflow-hidden rounded-full bg-neutral-100 dark:bg-white/10" role="img" aria-label={`${item.muscle}: ${item.sets} sets, ${item.pct.toFixed(0)} percent of weekly sets`}>
+                  <div className={`h-full rounded-full ${OTOT[item.muscle].garis}`} style={{ width: `${item.pct}%` }} />
+                </div>
+              </div>
+            ))}
+          </div>
+          <p className="mt-3 text-[11px] leading-relaxed text-neutral-500">
+            Set distribution is descriptive, not a prescription. Use it to spot repeated emphasis or neglected areas; appropriate weekly set targets depend on training goal, exercise selection, intensity, and recovery.
+          </p>
+        </Card>
+      )}
+
+      {progress28.totalSets > 0 && (
+        <Card className="!p-5">
+          <SectionTitle icon={<IconRun size={18} />} title="28-Day Volume Trend" subtitle="Four consecutive 7-day blocks using your local calendar" />
+          <div className="mt-3 flex flex-wrap gap-2 text-[11px]">
+            <span className="rounded-full bg-brand-50 px-2.5 py-1 font-bold text-brand-dark">{progress28.totalSets} sets / 28d</span>
+            <span className="rounded-full bg-neutral-100 px-2.5 py-1 font-bold text-neutral-600 dark:bg-white/10 dark:text-neutral-300">{progress28.activeDays} training days</span>
+          </div>
+          <div className="mt-4 space-y-3">
+            {progress28.rows.map((row) => (
+              <div key={row.label} className="rounded-xl border border-neutral-100 p-3 dark:border-white/10">
+                <div className="flex items-center justify-between gap-3 text-xs">
+                  <span className="font-bold text-ink dark:text-white">{row.label}</span>
+                  <span className="shrink-0 tabular-nums font-semibold text-neutral-600 dark:text-neutral-300">{row.sets} sets</span>
+                </div>
+                <div className="mt-2 h-2 overflow-hidden rounded-full bg-neutral-100 dark:bg-white/10" role="img" aria-label={`${row.label}: ${row.sets} logged sets across ${row.activeDays} training days`}>
+                  <div
+                    className="h-full rounded-full bg-brand"
+                    style={{ width: `${row.sets > 0 ? Math.max(4, (row.sets / progress28.maxSets) * 100) : 0}%` }}
+                  />
+                </div>
+                <div className="mt-1.5 flex flex-wrap items-center justify-between gap-x-3 gap-y-1 text-[10px] text-neutral-500">
+                  <span>{row.activeDays} training {row.activeDays === 1 ? 'day' : 'days'}</span>
+                  <span className="tabular-nums">{row.loadedVolume > 0 ? `${row.loadedVolume.toLocaleString('en-US', { maximumFractionDigits: 1 })} kg·reps external` : 'No external kg logged'}</span>
+                </div>
+              </div>
+            ))}
+          </div>
+          <p className="mt-3 text-[11px] leading-relaxed text-neutral-500">
+            Set volume includes bodyweight and loaded exercise logs. External volume load is Σ(sets × reps × entered kg), so bodyweight work is not assigned an invented kilogram value.
+          </p>
+        </Card>
+      )}
+
+      {consistency28.activeDays > 0 && (
+        <Card className="!p-5">
+          <SectionTitle icon={<IconActivity size={18} />} title="28-Day Training Consistency" subtitle="Daily logged-set activity across the same local-calendar window" />
+          <div className="mt-3 flex items-center justify-between gap-3 text-[11px]">
+            <span className="rounded-full bg-brand-50 px-2.5 py-1 font-bold text-brand-dark">{consistency28.activeDays} active training days</span>
+            <span className="font-semibold text-neutral-500">Oldest → Today</span>
+          </div>
+          <div className="mt-4 grid grid-cols-7 gap-2" role="img" aria-label={`Training activity in the last 28 days: ${consistency28.activeDays} active days`}>
+            {consistency28.days.map((day) => {
+              const ratio = day.sets / consistency28.maxSets
+              const intensity = day.sets === 0
+                ? 'bg-neutral-100 text-neutral-400 dark:bg-white/10 dark:text-neutral-500'
+                : ratio >= 0.67
+                  ? 'bg-brand text-white'
+                  : ratio >= 0.34
+                    ? 'bg-brand-100 text-brand-dark'
+                    : 'bg-brand-50 text-brand-dark'
+              return (
+                <div
+                  key={day.date}
+                  className={`grid aspect-square min-w-0 place-items-center rounded-lg text-[9px] font-bold tabular-nums ${intensity}`}
+                  title={`${day.date}: ${day.sets} logged ${day.sets === 1 ? 'set' : 'sets'}`}
+                  aria-label={`${day.date}: ${day.sets} logged ${day.sets === 1 ? 'set' : 'sets'}`}
+                >
+                  {day.date.slice(8)}
+                </div>
+              )
+            })}
+          </div>
+          <p className="mt-3 text-[11px] leading-relaxed text-neutral-500">
+            Cell intensity is relative to your highest daily set count inside this 28-day window. A blank day means no valid sets were logged, not necessarily a missed workout or poor recovery.
+          </p>
+        </Card>
+      )}
 
       <div className="space-y-2.5">
         {filtered.map((e) => (
@@ -302,10 +479,10 @@ export function Workout() {
                 </div>
 
                 <div className="flex flex-wrap items-end gap-2 rounded-xl border border-neutral-100 p-3">
-                  <label className="text-xs">Sets<input className={inputClass + ' mt-1 w-16'} type="number" value={sets} onChange={(ev) => setSets(+ev.target.value)} /></label>
-                  <label className="text-xs">Reps<input className={inputClass + ' mt-1 w-16'} type="number" value={reps} onChange={(ev) => setReps(+ev.target.value)} /></label>
-                  <label className="text-xs">Load (kg)<input className={inputClass + ' mt-1 w-20'} type="number" value={weight} onChange={(ev) => setWeight(+ev.target.value)} /></label>
-                  <Button onClick={() => logExercise(e.id)} className="h-9"><IconPlus size={14} /> Log</Button>
+                  <label className="text-xs">Sets<input className={inputClass + ' mt-1 w-16'} type="number" min={1} step={1} value={sets} onChange={(ev) => setSets(+ev.target.value)} /></label>
+                  <label className="text-xs">Reps<input className={inputClass + ' mt-1 w-16'} type="number" min={1} step={1} value={reps} onChange={(ev) => setReps(+ev.target.value)} /></label>
+                  <label className="text-xs">Load (kg)<input className={inputClass + ' mt-1 w-20'} type="number" min={0} step="any" value={weight} onChange={(ev) => setWeight(+ev.target.value)} /></label>
+                  <Button disabled={!validLogInput} onClick={() => logExercise(e.id)} className="h-9"><IconPlus size={14} /> Log</Button>
                 </div>
               </div>
             )}

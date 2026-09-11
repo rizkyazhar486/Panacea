@@ -1,0 +1,52 @@
+{
+  "id": "garmin_health_companion_sdk",
+  "name": "Garmin Health Companion SDK",
+  "category": "wearable",
+  "kind": ["framework"],
+  "homepage": "https://developer.garmin.com/health-sdk/overview/",
+  "repository": null,
+  "features": ["garmin", "direct-device", "real-time-streaming", "ble", "heart-rate", "enhanced-beat-to-beat-intervals", "accelerometer", "pulse-ox", "respiration", "stress", "body-battery", "steps", "calories", "device-battery", "episodic-sampling"],
+  "formats": ["android-sdk", "ios-sdk", "bluetooth-low-energy"],
+  "usage": {
+    "runtime": true,
+    "buildTime": true,
+    "networkRequired": false,
+    "notes": "Enterprise-only native mobile SDK for direct Bluetooth Low Energy communication with supported Garmin wearables. The Companion SDK is compatible with the Garmin Connect experience and is intended for real-time/episodic sensor access; all-day historical metrics should remain a separate Garmin Health API concern. Panacea's current Vite web client cannot directly host this Android/iOS SDK, so any implementation must live behind an explicit native-mobile bridge or companion application and must fail closed when that bridge is unavailable. Do not emulate direct-device support in the browser or label cloud data as a live device stream."
+  },
+  "license": {
+    "status": "CHECK_REQUIRED",
+    "identifier": "Garmin Health SDK commercial agreement",
+    "commercialUse": "CONDITIONAL",
+    "attributionRequired": null,
+    "shareAlike": null,
+    "scope": "Garmin states that Health SDK evaluation is free for approved enterprise partners, while commercial use requires a license fee or minimum device order quantity commitment. Access is reviewed by Garmin Health and the SDK/program materials are not an open-source data source. Production use must follow the executed Garmin Health agreement, supported-device requirements, branding/privacy obligations and any distribution restrictions supplied with the SDK.",
+    "verificationUrl": "https://developer.garmin.com/health-sdk/questions-answers/",
+    "verifiedAt": "2026-09-08",
+    "notes": "Do not place Garmin SDK binaries, credentials, confidential documentation or other non-redistributable program materials in the public Panacea repository. Re-check the executed commercial agreement and current Garmin branding requirements before production or distribution."
+  },
+  "validation": {
+    "level": "REFERENCE",
+    "clinicalDecisionUse": "REQUIRES_SEPARATE_VALIDATION",
+    "notes": "Real-time wearable streams can be useful for wellness, training, research and monitoring context, but device/sensor output is not automatically a diagnostic measurement or treatment directive. Panacea must preserve raw/provider-reported measurements separately from any derived interpretation, show signal-quality or missing-data state where available, and independently validate any clinical-decision feature for its intended population and use case."
+  },
+  "provenance": {
+    "authority": "Garmin Ltd. / Garmin Health",
+    "sourceIdentityRequired": true,
+    "versionPinRequired": true,
+    "notes": "Persist Garmin Health SDK family and version, platform version, supported device model and firmware when available, stream/metric type, unit, sampling cadence or event timing, source timestamp and local receipt timestamp, connection/session identity, quality/status flags and Panacea native-bridge version. Treat the unique device identifier as sensitive metadata: retain or pseudonymize it only when necessary for safe device association and never expose it casually to analytics, logs or UI. Never merge Companion live samples with Health API summaries without retaining their distinct source paths."
+  },
+  "adapter": {
+    "status": "PLANNED",
+    "normalizedTarget": "PanaceaWearableObservation",
+    "module": null,
+    "notes": "Planned flow: approved Garmin Health Companion SDK inside a native Android/iOS layer -> explicit pairing/consent -> BLE session -> requested real-time stream only -> native validation and timestamp/unit normalization -> privacy-minimized bridge message -> PanaceaWearableObservation. The web app must consume only normalized bridge messages and must not receive SDK secrets or confidential program material. Subscribe only while a feature actually needs live data, stop streams on disconnect/background/consent withdrawal, bound sampling and buffering, discard stale packets, preserve reconnect boundaries, and never fabricate continuity across gaps. Historical/all-day synchronization remains the Garmin Health API path rather than being reconstructed from episodic Companion streams."
+  },
+  "trust": {
+    "authority": 5,
+    "evidenceQuality": 2,
+    "recency": 5,
+    "licenseClarity": 3,
+    "reproducibility": 3,
+    "notes": "High-authority first-party interface for supported Garmin device streams. Evidence quality is conservative because consumer-wearable sensor outputs and provider-derived metrics are not equivalent to independently validated clinical measurements; supported fields, device models and algorithms can vary by SDK/device/firmware version."
+  }
+}

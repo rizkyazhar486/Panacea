@@ -4,8 +4,24 @@ import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'
 import { MeshoptDecoder } from 'three/examples/jsm/libs/meshopt_decoder.module.js'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
 import { RoomEnvironment } from 'three/examples/jsm/environments/RoomEnvironment.js'
-import { SEBAR_PERISTALTIK } from '../lib/motionWave'
 import { keburaman, geserBuka, KEDALAMAN, type KunciLapisan } from '../lib/dissection'
+import {
+  Body3dLayerLoadGeneration,
+  body3dDissectionMaterialState,
+  body3dPixelRatio,
+  body3dSliceCoordinate,
+} from '../lib/body3dQuality'
+import {
+  clearAnatomySourceNodes,
+  publishAnatomySourceNodes,
+  publishAnatomySourceSelection,
+} from '../lib/anatomySourceNodeRegistry'
+import {
+  clearBodyAtlasRuntimeRoot,
+  clearBodyAtlasRuntimeRoots,
+  createBodyAtlasRuntimeRootOwner,
+  publishBodyAtlasRuntimeRoot,
+} from '../lib/bodyAtlasRuntimeRoots'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Model 3D anatomi NYATA — bukan bentuk geometris buatan sendiri (bola/kapsul/
@@ -80,9 +96,8 @@ function loadLayer(file: string, onProgress?: (pct: number) => void): Promise<TH
           restoreOriginalNames(gltf)
           resolve(gltf.scene)
         },
-        // Berkasnya besar (cardiovascular.glb saja 12 MB). Tanpa laporan
-        // kemajuan, unduhan lambat di jaringan seluler TIDAK BISA DIBEDAKAN
-        // dari kerusakan: keduanya sama-sama kotak hitam yang diam.
+        // Berkasnya besar. Tanpa laporan kemajuan, unduhan lambat di jaringan
+        // seluler tidak bisa dibedakan dari viewer yang rusak.
         (ev) => { if (ev.total > 0 && onProgress) onProgress(ev.loaded / ev.total) },
         (err) => reject(err instanceof Error ? err : new Error(String(err))),
       )
@@ -94,55 +109,21 @@ function loadLayer(file: string, onProgress?: (pct: number) => void): Promise<TH
 
 const HIGHLIGHT = new THREE.Color(0x00bf63)
 
-function batasSatu(x: number) { return Math.max(0, Math.min(1, x)) }
-
 function isDescendantOf(obj: THREE.Object3D, ancestor: THREE.Object3D): boolean {
   let p: THREE.Object3D | null = obj
-  while (p) { if (p === ancestor) return true; p = p.parent }
+  while (p) {
+    if (p === ancestor) return true
+    p = p.parent
+  }
   return false
 }
 
 // ─── Mode tampilan radiologi ────────────────────────────────────────────────
-//
-// KENAPA VERSI PERTAMA TIDAK BENAR, dan apa yang diperbaiki.
-//
-// Versi pertama sekadar mewarnai permukaan model dengan abu-abu pilihan lalu
-// menyebutnya CT dan MRI. Hasilnya tampak "seperti radiologi" tapi tidak dapat
-// dipakai: CT dan MRI TIDAK PERNAH dilihat sebagai permukaan tiga dimensi
-// berwarna abu — keduanya dibaca sebagai POTONGAN LINTANG, irisan demi irisan.
-// Menampilkan cangkang 3D abu-abu mengajarkan bentuk yang salah tentang
-// bagaimana modalitas itu sebenarnya dipakai.
-//
-// Dua perbaikan, keduanya mengubah isinya, bukan gayanya:
-//
-//   1. NILAI KEABUANNYA SEKARANG BERASAL DARI ANGKA FISIS, bukan selera.
-//      Untuk CT dipakai UNIT HOUNSFIELD nyata tiap jaringan (udara -1000,
-//      lemak -100, air 0, otot +40, darah +45, tulang spongiosa +300, tulang
-//      kortikal +1000) lalu dipetakan lewat WINDOWING — window width & level
-//      yang sama seperti di konsol CT sungguhan. Karena itu ada pilihan
-//      window: soft tissue (W400/L40), lung (W1500/L-600), bone (W2000/L400).
-//      Mengubah window mengubah gambarnya persis seperti di stasiun kerja
-//      radiologi, dan itulah keterampilan yang sebenarnya dilatih.
-//      Untuk MRI dipakai INTENSITAS SINYAL relatif pada T1 dan T2 — dan
-//      keduanya dipisah, karena "MRI" tanpa menyebut pembobotan tidak berarti
-//      apa-apa: cairan gelap di T1 dan terang di T2, dan itu justru inti
-//      pembacaannya.
-//
-//   2. ADA BIDANG POTONG. Mode CT dan MRI memotong model dengan bidang
-//      aksial/koronal/sagital yang bisa digeser, memakai clipping plane —
-//      sehingga yang dilihat adalah PENAMPANG pada ketinggian tertentu, cara
-//      citra itu benar-benar dibaca.
-//
-// Yang tetap tidak berubah dan tetap dikatakan di layar: ini RENDER dari data
-// mesh, bukan hasil pindai. Nilainya benar secara relatif dan diambil dari
-// tabel baku, tetapi ia tidak mengukur pasien mana pun. Citra modalitas asli
-// tetap disediakan lewat tab gambar.
+// CT/MRI di sini adalah render pendidikan dari mesh anatomi, bukan data pindai
+// pasien. Windowing dan sifat jaringan dibuat fisik/relatif agar interaksi
+// mengajarkan konsep radiologi tanpa menyamarkannya sebagai citra klinis asli.
 export type RenderMode = 'anatomy' | 'xray' | 'ct' | 'mriT1' | 'mriT2'
-
-/** Bidang potong untuk CT/MRI — cara citra lintang sungguhan dibaca. */
 export type SlicePlane = 'none' | 'axial' | 'coronal' | 'sagittal'
-
-/** Window CT: lebar & titik tengah dalam unit Hounsfield, seperti di konsol. */
 export interface CtWindow { key: string; label: string; width: number; level: number }
 
 export const CT_WINDOWS: CtWindow[] = [
@@ -160,24 +141,11 @@ export const RENDER_MODES: Array<{ key: RenderMode; label: string; hint: string 
 ]
 
 type LayerKey = AnatomyLayer['key']
-
-// Sifat fisis tiap lapisan jaringan. Angkanya nilai baku yang lazim dikutip
-// di radiologi, bukan hasil pengukuran aplikasi ini.
-//
-//   hu : unit Hounsfield rata-rata (CT). Udara -1000, air 0 menurut definisi.
-//   t1 : intensitas sinyal relatif pada MRI T1 (0 = void, 1 = paling terang).
-//   t2 : intensitas sinyal relatif pada MRI T2.
-//   mu : atenuasi relatif untuk rontgen — seberapa banyak berkas diserap.
 interface SifatJaringan { hu: number; t1: number; t2: number; mu: number }
 
 const JARINGAN: Record<LayerKey, SifatJaringan> = {
-  // Tulang kortikal paling padat, jadi paling putih di CT — sekaligus nyaris
-  // tanpa sinyal di MRI. Dua fakta yang tampak bertentangan sampai orang tahu
-  // MRI membaca proton air bergerak, bukan kepadatan.
   skeletal: { hu: 800, t1: 0.12, t2: 0.08, mu: 1.0 },
   muscular: { hu: 45, t1: 0.42, t2: 0.35, mu: 0.28 },
-  // Kulit & lemak subkutan: HU negatif, dan lemak TERANG di T1 — itulah yang
-  // menjadikan lemak patokan pertama saat membaca T1.
   surface: { hu: -60, t1: 0.85, t2: 0.55, mu: 0.16 },
   cardiovascular: { hu: 50, t1: 0.38, t2: 0.30, mu: 0.30 },
   nervous: { hu: 35, t1: 0.55, t2: 0.62, mu: 0.24 },
@@ -185,15 +153,7 @@ const JARINGAN: Record<LayerKey, SifatJaringan> = {
   lymphoid: { hu: 40, t1: 0.40, t2: 0.68, mu: 0.26 },
 }
 
-/**
- * Windowing CT — persis operasi yang dikerjakan konsol CT.
- *
- * Nilai di bawah (level − width/2) menjadi hitam, di atas (level + width/2)
- * menjadi putih, di antaranya linear. Inilah sebabnya SATU pindaian yang sama
- * bisa memperlihatkan paru ATAU tulang tergantung window-nya: datanya tidak
- * berubah, rentang yang ditampilkan yang berubah. Keterampilan itu yang
- * dilatih di sini, bukan sekadar "gambarnya abu-abu".
- */
+/** Windowing CT dalam unit Hounsfield. */
 function windowHu(hu: number, w: CtWindow): number {
   const bawah = w.level - w.width / 2
   const atas = w.level + w.width / 2
@@ -210,11 +170,10 @@ const MODE_BACKGROUND: Record<RenderMode, number> = {
   mriT2: 0x000000,
 }
 
-// Material dibuat sekali per (lapisan x modalitas x window) lalu dipakai
-// bersama — puluhan ribu mesh tidak boleh punya salinan masing-masing.
-// Sorotan hijau tetap presisi karena efek sorot mengkloning dulu.
+// Material radiologi dibagi per layer/mode untuk menahan draw-state/memory.
+// Plane clipping-nya stabil dan diperbarui in-place, sehingga cache tidak
+// menyimpan posisi slice lama.
 const radiologyMaterialCache = new Map<string, THREE.MeshStandardMaterial>()
-
 function radiologyMaterial(
   layer: LayerKey,
   mode: Exclude<RenderMode, 'anatomy'>,
@@ -225,20 +184,12 @@ function radiologyMaterial(
   let mat = radiologyMaterialCache.get(cacheKey)
   if (!mat) {
     const j = JARINGAN[layer]
-    // Keabuannya DIHITUNG dari sifat jaringan, tidak dipilih dengan mata.
     let abu: number
     let opacity = 1
-    if (mode === 'ct') {
-      abu = windowHu(j.hu, win)
-    } else if (mode === 'mriT1') {
-      abu = j.t1
-    } else if (mode === 'mriT2') {
-      abu = j.t2
-    } else {
-      // Rontgen: yang menentukan bukan keabuan permukaan melainkan seberapa
-      // banyak berkas diserap, jadi atenuasi dipakai sebagai OPASITAS pada
-      // penggambaran additive. Tumpukan jaringan otomatis menjadi lebih
-      // terang, persis seperti berkas yang menembus lebih banyak materi.
+    if (mode === 'ct') abu = windowHu(j.hu, win)
+    else if (mode === 'mriT1') abu = j.t1
+    else if (mode === 'mriT2') abu = j.t2
+    else {
       abu = 1
       opacity = Math.min(j.mu * 0.9, 0.95)
     }
@@ -251,119 +202,44 @@ function radiologyMaterial(
       opacity,
       blending: mode === 'xray' ? THREE.AdditiveBlending : THREE.NormalBlending,
       depthWrite: mode !== 'xray',
-      // Bidang potong membuat permukaan dalam ikut terlihat, jadi kedua sisi
-      // wajah harus digambar — kalau tidak, penampangnya tampak berlubang.
       side: mode === 'xray' || clip ? THREE.DoubleSide : THREE.FrontSide,
       clippingPlanes: clip ? [clip] : null,
     })
+    mat.userData.body3dBaseOpacity = opacity
     radiologyMaterialCache.set(cacheKey, mat)
   }
   return mat
 }
 
-// ─── Gerak fisiologis ───────────────────────────────────────────────────────
-//
-// Model ini TIDAK punya rangka animasi (armature), jadi ia tidak bisa berjalan
-// atau mengangkat beban — itu butuh bone weighting, pekerjaan tersendiri.
-// Yang BISA dilakukan, dan yang sebenarnya paling menjelaskan faal, adalah
-// menggerakkan struktur pada tempatnya menurut irama sungguhannya:
-//
-//   - Jantung berdenyut pada laju denyut yang dipilih (istirahat vs latihan),
-//     dengan sistol yang cepat dan diastol yang lebih lambat — bukan sinus
-//     simetris, karena pengisian memang memakan waktu lebih lama daripada
-//     pengosongan.
-//   - Paru & diafragma mengembang pada laju napas yang dipilih.
-//   - Otot yang sedang ditargetkan berkontraksi pada tempo latihan, dengan
-//     fase eksentrik yang lebih lambat daripada konsentrik — sebagaimana
-//     angkatan yang dilakukan dengan benar.
-//
-// Amplitudonya kecil dan sengaja: ini menandai IRAMA dan mana yang bergerak,
-// bukan mensimulasikan perubahan volume yang sebenarnya.
+// MotionState tetap menjadi kontrak UI/physiology. Source anatomy is
+// evidence-bearing geometry: mesh jantung, paru, pembuluh, usus, dan otot tidak
+// di-scale untuk menyimulasikan faal. Animasi deformasi baru boleh kembali jika
+// tersedia rig/morph target yang memang dibuat dan divalidasi untuk struktur itu.
 export interface MotionState {
-  /** Denyut jantung per menit. 0 mematikan gerak jantung. */
   heartRate: number
-  /** Napas per menit. 0 mematikan gerak paru. */
   respRate: number
-  /** Repetisi per menit untuk otot yang disorot. 0 mematikan. */
   contractionRate: number
-  /**
-   * Gelombang peristaltik saluran cerna, per menit. 0 mematikan.
-   *
-   * Ini gerak yang paling sering keliru dibayangkan orang: usus tidak
-   * meremas seluruhnya bersamaan, melainkan MENJALARKAN gelombang dari
-   * lambung ke arah anus. Karena itu tiap ruas diberi selisih fase menurut
-   * letaknya di sepanjang saluran — selisih fase itulah peristaltiknya, dan
-   * meremas serempak justru menggambarkan hal yang salah.
-   */
   peristalsisRate?: number
 }
 
 export const MOTION_OFF: MotionState = { heartRate: 0, respRate: 0, contractionRate: 0, peristalsisRate: 0 }
-// Peristaltik istirahat ~3/menit di lambung dan ~8-12/menit di usus halus;
-// dipakai satu nilai madya karena modelnya tidak memisahkan keduanya.
 export const MOTION_REST: MotionState = { heartRate: 70, respRate: 14, contractionRate: 0, peristalsisRate: 8 }
-// Saat olahraga aliran darah dialihkan dari usus ke otot dan motilitasnya
-// TURUN — itulah sebab kram dan mual saat berlari sesudah makan. Angkanya
-// sengaja lebih kecil daripada saat istirahat, bukan lebih besar.
 export const MOTION_EXERCISE: MotionState = { heartRate: 160, respRate: 40, contractionRate: 30, peristalsisRate: 3 }
-
-const KATA_JANTUNG = ['atrium', 'ventricle', 'heart', 'papillary muscle']
-const KATA_PARU = [' lung', 'lung ', 'bronch', 'alveol', 'diaphragm']
-// Saluran cerna, dari lambung sampai rektum. Ureter ikut karena ia juga
-// mendorong isinya dengan gelombang, bukan mengalirkannya pasif.
-const KATA_CERNA = ['stomach', 'duodenum', 'jejunum', 'ileum', 'colon', 'caecum', 'cecum', 'sigmoid', 'rectum', 'ureter']
-// Arteri besar. Denyutnya MENYUSUL denyut jantung, tidak serentak dengannya.
-const KATA_ARTERI = ['artery', 'arteria', 'aorta', 'trunk']
-
-function cocokSalahSatu(nama: string, kata: string[]): boolean {
-  const n = nama.toLowerCase()
-  return kata.some((k) => n.includes(k))
-}
 
 interface Props {
   layers: Set<AnatomyLayer['key']>
-  /** Node names (exact, e.g. "Rectus femoris muscle.l") to highlight in green — 0, 1 or many at once. */
   highlighted: string[]
-  /**
-   * Substring keywords (case-insensitive) matched against every structure's
-   * real name — for organs split into many named parts (lungs, liver
-   * segments, brain gyri) where listing every exact name isn't practical.
-   * When set, matching structures are highlighted AND the camera zooms to
-   * frame just that organ; clearing it restores the whole-body framing.
-   */
   focusKeywords: string[] | null
-  /** Imaging look applied to the model: true colour, or X-ray / CT / MRI. */
   renderMode: RenderMode
-  /** CT window (width/level in Hounsfield units). Ignored outside CT. */
   ctWindow: CtWindow
-  /** Cross-sectional cut — how CT and MRI are actually read. */
   slicePlane: SlicePlane
-  /** Slice position, 0..1 across the body along that axis. */
   slicePos: number
-  /** Physiological motion — heartbeat, breathing, muscle contraction. */
   motion: MotionState
-  /**
-   * Membuka tubuh: tiap struktur bergeser RADIAL menjauhi sumbu tubuh sejauh
-   * ini (dalam satuan dunia). Nol berarti tubuh utuh.
-   */
   unfold: number
-  /**
-   * Kedalaman diseksi 0..6 — sejauh mana lapisan luar dipudarkan supaya yang
-   * di bawahnya terlihat. Bukan penghapusan: lapisan luar tetap disisakan
-   * samar sebagai orientasi.
-   */
   dissect: number
-  /** Fires with the raw node name and a human-readable label when the user taps a structure. */
   onPick: (rawName: string, label: string) => void
 }
 
-/**
- * Latar bergradasi vertikal sebagai tekstur.
- *
- * Dibangkitkan di kanvas 2D dan bukan diambil dari berkas gambar, supaya tidak
- * ada unduhan tambahan pada halaman yang geometrinya saja sudah puluhan
- * megabita.
- */
 function latarGradasi(atas: number, bawah: number): THREE.Texture {
   const k = document.createElement('canvas')
   k.width = 2
@@ -380,47 +256,74 @@ function latarGradasi(atas: number, bawah: number): THREE.Texture {
   return t
 }
 
-export function Body3D({ layers, highlighted, focusKeywords, renderMode, ctWindow, slicePlane, slicePos, motion, unfold, dissect, onPick }: Props) {
+function cloneLayerMaterials(root: THREE.Group) {
+  // Object3D.clone(true) tetap berbagi material dengan modelCache. Dissection
+  // mengubah opacity/depthWrite, jadi setiap viewer perlu material lokal tanpa
+  // menduplikasi material yang sama ratusan kali di satu layer.
+  const lokal = new Map<THREE.Material, THREE.Material>()
+  root.traverse((obj) => {
+    if (!(obj instanceof THREE.Mesh)) return
+    const sumber = Array.isArray(obj.material) ? obj.material : [obj.material]
+    const salinan = sumber.map((material) => {
+      const existing = lokal.get(material)
+      if (existing) return existing
+      const copy = material.clone()
+      copy.userData = { ...material.userData, body3dBaseOpacity: material.opacity }
+      lokal.set(material, copy)
+      return copy
+    })
+    obj.material = Array.isArray(obj.material) ? salinan : salinan[0]
+    obj.userData.baseMaterial = obj.material
+  })
+  root.userData.body3dOwnedMaterials = [...lokal.values()]
+}
+
+function disposeLayerMaterials(root: THREE.Group) {
+  const owned = root.userData.body3dOwnedMaterials as THREE.Material[] | undefined
+  if (!owned) return
+  for (const material of owned) material.dispose()
+  root.userData.body3dOwnedMaterials = []
+}
+
+export function Body3D({
+  layers,
+  highlighted,
+  focusKeywords,
+  renderMode,
+  ctWindow,
+  slicePlane,
+  slicePos,
+  motion: _motion,
+  unfold,
+  dissect,
+  onPick,
+}: Props) {
   const containerRef = useRef<HTMLDivElement>(null)
   const groupsRef = useRef<Partial<Record<AnatomyLayer['key'], THREE.Group>>>({})
+  const layersRef = useRef(layers)
+  layersRef.current = layers
+  const loadGenerationRef = useRef(new Body3dLayerLoadGeneration())
+  const [runtimeRootOwner] = useState(() => createBodyAtlasRuntimeRootOwner('Body3D'))
   const sceneRef = useRef<THREE.Scene | null>(null)
   const cameraRef = useRef<THREE.PerspectiveCamera | null>(null)
   const homeFramingRef = useRef<{ position: THREE.Vector3; target: THREE.Vector3; minDistance: number; maxDistance: number } | null>(null)
   const controlsRef = useRef<OrbitControls | null>(null)
   const rendererRef = useRef<THREE.WebGLRenderer | null>(null)
   const lightsRef = useRef<{ ambient: THREE.AmbientLight; key: THREE.DirectionalLight; fill: THREE.DirectionalLight; tepi: THREE.DirectionalLight } | null>(null)
-  const clipRef = useRef<THREE.Plane | null>(null)
+  const clipRef = useRef<THREE.Plane>(new THREE.Plane())
   const latarRef = useRef<THREE.Texture | null>(null)
   const bodyBoxRef = useRef<THREE.Box3 | null>(null)
-  // Gerak dibaca dari ref di dalam loop render, bukan lewat dependency effect:
-  // mengubah laju denyut tidak boleh membangun ulang scene.
-  const motionRef = useRef(motion)
-  motionRef.current = motion
-  // Struktur yang ikut bergerak, dikumpulkan sekali tiap lapisan dimuat —
-  // menelusuri ribuan node tiap frame akan menghabiskan anggaran frame.
-  const animatedRef = useRef<{
-    heart: THREE.Object3D[]
-    lungs: THREE.Object3D[]
-    /** Ruas saluran cerna beserta fase relatifnya (0..1) menurut letaknya. */
-    gut: Array<{ obj: THREE.Object3D; fase: number }>
-    /** Arteri beserta jeda denyutnya dari jantung, dalam detik. */
-    artery: Array<{ obj: THREE.Object3D; jeda: number }>
-  }>({ heart: [], lungs: [], gut: [], artery: [] })
+  const requestRenderRef = useRef<() => void>(() => undefined)
   const hasFitRef = useRef(false)
-  const highlightedMeshesRef = useRef<Map<THREE.Mesh, { original: THREE.Color; matchedName: string }>>(new Map())
+  const highlightedMeshesRef = useRef<Map<THREE.Mesh, { baseMaterial: THREE.Material; matchedName: string }>>(new Map())
   const onPickRef = useRef(onPick)
   onPickRef.current = onPick
   const [loadingLayers, setLoadingLayers] = useState<Set<string>>(new Set())
   const [failedLayers, setFailedLayers] = useState<Set<string>>(new Set())
-  // Kemajuan unduhan per lapisan, 0..1.
+  const [retryNonce, setRetryNonce] = useState(0)
   const [progress, setProgress] = useState<Record<string, number>>({})
-  // Kegagalan yang membuat viewer TIDAK BISA menampilkan apa pun. Sebelumnya
-  // keadaan ini berakhir sebagai kotak hitam diam tanpa satu pun keterangan —
-  // pengguna melihat layar kosong dan tidak punya cara tahu apa yang salah.
   const [fatal, setFatal] = useState<string>('')
 
-  // Inisialisasi Three.js sekali saja (renderer/kamera/kontrol bertahan
-  // selama komponen hidup; hanya lapisan model yang berubah-ubah).
   useEffect(() => {
     const container = containerRef.current
     if (!container) return
@@ -433,69 +336,29 @@ export function Body3D({ layers, highlighted, focusKeywords, renderMode, ctWindo
     let renderer: THREE.WebGLRenderer
     try {
       renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false })
-    } catch (e) {
-      // Peramban tanpa WebGL, atau GPU yang menolak membuat konteks karena
-      // tekanan memori — lazim di ponsel kelas menengah. Dulu ini melempar
-      // dan seluruh efek berhenti diam-diam.
-      setFatal(
-        'This device could not start 3D graphics (WebGL). Try closing other tabs and reloading, or open the page on another browser.',
-      )
+    } catch {
+      setFatal('This device could not start 3D graphics (WebGL). Try closing other tabs and reloading, or open the page on another browser.')
       return
     }
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
     renderer.setClearColor(0x0a0a0f, 1)
     renderer.outputColorSpace = THREE.SRGBColorSpace
-    // ACES DIGANTI, dan alasannya terukur. ACES memiringkan merah jenuh ke
-    // arah oranye saat luminansnya naik: begitu pencahayaan diperbaiki, rona
-    // rata-rata piksel otot bergeser dari 8,5° (merah) ke 17,9° (oranye), dan
-    // otot berhenti terlihat seperti otot. Khronos PBR Neutral dirancang justru
-    // untuk mempertahankan warna dasar bahan pada pencahayaan terang, sehingga
-    // bentuknya bertambah tanpa warnanya ikut berubah.
     renderer.toneMapping = THREE.NeutralToneMapping
-    // Nilainya disetel dengan pengukuran, bukan perasaan. Figur lama:
-    // luminans tubuh 31/255, nol piksel terpotong — gelap karena kurang
-    // cahaya, bukan karena batas atas. Pada 1,25 dengan Neutral hasilnya
-    // berbalik terlalu jauh: 102/255 dengan 3,75% piksel terbakar, dan sorotan
-    // yang terbakar pada merah ikut menariknya ke oranye lagi. Pada 0,95 ia
-    // berayun balik terlalu gelap (35/255, hampir sama dengan sebelum
-    // diperbaiki).
-    //
-    // Nilai akhirnya 1,1, dipilih atas nama WARNA dan bukan terang. Diukur:
-    // 1,2 memberi luminans 40,4 dengan rona merah 14,1°, sedangkan 1,1 memberi
-    // 36,3 dengan rona 9,8°. Empat titik terang tidak sebanding dengan otot
-    // yang mulai terbaca oranye — pada atlas anatomi, warna jaringan adalah
-    // informasi, bukan selera.
     renderer.toneMappingExposure = 1.1
-    // Clipping lokal per-material harus dinyalakan eksplisit; tanpa ini
-    // clippingPlanes pada material diabaikan diam-diam.
     renderer.localClippingEnabled = true
     container.appendChild(renderer.domElement)
     rendererRef.current = renderer
 
-    // ── Pencahayaan berbasis lingkungan ──────────────────────────────────
-    //
-    // Inilah perbedaan terbesar antara render yang terlihat seperti atlas
-    // anatomi dan render yang terlihat seperti mainan plastik. MeshStandardMaterial
-    // menghitung pantulan spekular dari LINGKUNGANNYA; tanpa peta lingkungan,
-    // suku spekularnya nyaris nol, sehingga otot sekalipun berpermukaan
-    // melengkung tampak rata seperti kertas berwarna. Cahaya terarah saja tidak
-    // bisa menggantikannya — ia hanya menambah terang, bukan menambah bentuk.
-    //
-    // RoomEnvironment dipakai karena ia dibangkitkan secara prosedural: tidak
-    // ada berkas HDR yang perlu diunduh, jadi tidak ada tambahan muatan
-    // jaringan pada halaman yang sudah mengunduh puluhan megabita geometri.
+    // Procedural environment memberi bentuk PBR tanpa download HDR tambahan.
+    // RoomEnvironment sendiri hanya dibutuhkan saat PMREM dibangun; geometri
+    // sementaranya langsung dilepas setelah render target terbentuk.
     const pmrem = new THREE.PMREMGenerator(renderer)
-    const lingkungan = pmrem.fromScene(new RoomEnvironment(), 0.04)
+    const ruang = new RoomEnvironment()
+    const lingkungan = pmrem.fromScene(ruang, 0.04)
+    ruang.dispose()
     scene.environment = lingkungan.texture
-    // Intensitasnya ditahan: lingkungan penuh membuat merah otot pudar menjadi
-    // merah muda, dan warna jaringan di sini mengikuti konvensi atlas, bukan
-    // selera. Yang diambil dari lingkungan adalah BENTUKNYA, bukan warnanya.
     scene.environmentIntensity = 0.4
     pmrem.dispose()
 
-    // Latar bergradasi, bukan warna rata. Siluet tubuh yang gelap di atas
-    // latar yang sama gelapnya kehilangan tepinya sama sekali — bahu dan
-    // lengan menyatu dengan kekosongan di belakangnya.
     latarRef.current = latarGradasi(0x141922, 0x05070b)
     scene.background = latarRef.current
 
@@ -507,9 +370,6 @@ export function Body3D({ layers, highlighted, focusKeywords, renderMode, ctWindo
     const fill = new THREE.DirectionalLight(0xffffff, 0.25)
     fill.position.set(-3, 1, -2)
     scene.add(fill)
-    // Cahaya tepi dari belakang. Tugasnya bukan menerangi melainkan MEMISAHKAN:
-    // ia menggarisi bahu, lengan dan betis sehingga tubuh berdiri di depan
-    // latar alih-alih tenggelam ke dalamnya.
     const tepi = new THREE.DirectionalLight(0xdce8ff, 0.55)
     tepi.position.set(-1.5, 2.5, -4)
     scene.add(tepi)
@@ -525,19 +385,49 @@ export function Body3D({ layers, highlighted, focusKeywords, renderMode, ctWindo
     controlsRef.current = controls
     hasFitRef.current = false
 
+    let raf = 0
+    let inViewport = true
+    let documentVisible = !document.hidden
+
+    // Tidak ada loop 60-fps saat tubuh diam. OrbitControls tanpa damping
+    // mengirim event "change" saat drag/zoom; perubahan React lain memanggil
+    // requestRenderRef. Ini mempertahankan detail tinggi tanpa membakar GPU
+    // hanya untuk menggambar frame identik berulang kali.
+    function requestRender() {
+      if (raf !== 0 || !inViewport || !documentVisible) return
+      raf = requestAnimationFrame(() => {
+        raf = 0
+        if (!inViewport || !documentVisible) return
+        controls.update()
+        renderer.render(scene, camera)
+      })
+    }
+
+    function stopRendering() {
+      if (raf === 0) return
+      cancelAnimationFrame(raf)
+      raf = 0
+    }
+
+    requestRenderRef.current = requestRender
+    controls.addEventListener('change', requestRender)
+
     const resize = () => {
       const w = container.clientWidth
       const h = container.clientHeight
+      if (w < 2 || h < 2) return
+      const smallViewport = window.matchMedia('(max-width: 640px)').matches
+      const pixelRatio = body3dPixelRatio(w, h, window.devicePixelRatio || 1, smallViewport)
+      if (Math.abs(renderer.getPixelRatio() - pixelRatio) > 0.001) renderer.setPixelRatio(pixelRatio)
       renderer.setSize(w, h)
       camera.aspect = w / h
       camera.updateProjectionMatrix()
+      requestRender()
     }
     resize()
     const ro = new ResizeObserver(resize)
     ro.observe(container)
 
-    // Raycast pada tap/klik (bukan drag-rotate) untuk mengidentifikasi satu
-    // struktur spesifik yang disentuh pengguna.
     const raycaster = new THREE.Raycaster()
     const pointer = new THREE.Vector2()
     let downPos: { x: number; y: number } | null = null
@@ -552,146 +442,106 @@ export function Body3D({ layers, highlighted, focusKeywords, renderMode, ctWindo
       if (!downPos) return
       const moved = Math.hypot(e.clientX - downPos.x, e.clientY - downPos.y)
       downPos = null
-      if (moved > 6) return // drag-to-rotate, not a tap
+      if (moved > 6) return
       toPointer(e)
       raycaster.setFromCamera(pointer, camera)
       const targets = Object.values(groupsRef.current).filter((g): g is THREE.Group => !!g)
       const hits = raycaster.intersectObjects(targets, true)
       if (hits.length === 0) return
-      let obj: THREE.Object3D | null = hits[0].object
+      const hitObject = hits[0].object
+      let obj: THREE.Object3D | null = hitObject
       while (obj && !obj.userData.originalName) obj = obj.parent
       if (obj) {
         const rawName = obj.userData.originalName as string
+        const sourceLayer = ANATOMY_LAYERS.find((def) => {
+          const group = groupsRef.current[def.key]
+          return Boolean(group && isDescendantOf(hitObject, group))
+        })
+        publishAnatomySourceSelection(rawName, sourceLayer?.file)
         onPickRef.current(rawName, humanizeStructureName(rawName))
       }
     }
     renderer.domElement.addEventListener('pointerdown', onPointerDown)
     renderer.domElement.addEventListener('pointerup', onPointerUp)
 
-    // Konteks WebGL bisa DICABUT peramban saat memori menipis — sangat lazim
-    // di ponsel dengan model sebesar ini. Kalau tidak ditangani, gambarnya
-    // membeku lalu menghitam tanpa keterangan apa pun.
     const onContextLost = (e: Event) => {
       e.preventDefault()
+      stopRendering()
       setFatal('The browser dropped the 3D context, usually because memory ran low. Turn off some layers and reload.')
     }
-    renderer.domElement.addEventListener('webglcontextlost', onContextLost)
-
-    let raf = 0
-    const jam = new THREE.Clock()
-    function animate() {
-      const t = jam.getElapsedTime()
-      const m = motionRef.current
-
-      // Denyut jantung. Siklusnya SENGAJA tidak simetris: sistol menempati
-      // kira-kira sepertiga awal siklus dan berlangsung cepat, sisanya
-      // diastol yang mengisi lebih lambat — itu bentuk siklus jantung yang
-      // sebenarnya, dan sinus biasa akan menggambarkannya keliru.
-      if (m.heartRate > 0 && animatedRef.current.heart.length) {
-        const fase = (t * m.heartRate / 60) % 1
-        const kontraksi = fase < 0.33
-          ? Math.sin((fase / 0.33) * Math.PI)          // sistol: cepat
-          : -0.15 * Math.sin(((fase - 0.33) / 0.67) * Math.PI) // diastol: mengisi
-        const k = 1 - kontraksi * 0.07
-        for (const o of animatedRef.current.heart) {
-          const dasar = o.userData.baseScale as THREE.Vector3 | undefined
-          if (dasar) o.scale.set(dasar.x * k, dasar.y * k, dasar.z * k)
-        }
-      }
-
-      // Napas. Inspirasi aktif dan lebih pendek, ekspirasi pasif dan lebih
-      // panjang — perbandingan I:E kira-kira 1:2 saat istirahat.
-      if (m.respRate > 0 && animatedRef.current.lungs.length) {
-        const fase = (t * m.respRate / 60) % 1
-        const kembang = fase < 0.4
-          ? Math.sin((fase / 0.4) * (Math.PI / 2))
-          : Math.cos(((fase - 0.4) / 0.6) * (Math.PI / 2))
-        const k = 1 + kembang * 0.05
-        for (const o of animatedRef.current.lungs) {
-          const dasar = o.userData.baseScale as THREE.Vector3 | undefined
-          if (dasar) o.scale.set(dasar.x * k, dasar.y * k, dasar.z * k)
-        }
-      }
-
-      // Peristaltik: SATU gelombang yang menjalar, bukan seluruh usus meremas
-      // bersamaan. Tiap ruas memakai fase yang sama tapi digeser menurut
-      // letaknya di sepanjang saluran, sehingga yang terlihat adalah
-      // gelombang berjalan dari lambung ke arah rektum — yang memang itulah
-      // peristaltik. Meremas serempak akan menggambarkan hal yang keliru.
-      if ((m.peristalsisRate ?? 0) > 0 && animatedRef.current.gut.length) {
-        const laju = (m.peristalsisRate ?? 0) / 60
-        for (const g of animatedRef.current.gut) {
-          const dasar = g.obj.userData.baseScale as THREE.Vector3 | undefined
-          if (!dasar) continue
-          // Gelombangnya sempit: hanya sebagian kecil saluran yang sedang
-          // meremas pada satu saat, sisanya melebar menerima isinya.
-          const fase = ((t * laju) - g.fase * SEBAR_PERISTALTIK) % 1
-          const remas = fase > 0 && fase < 0.25 ? Math.sin((fase / 0.25) * Math.PI) : 0
-          const k = 1 - remas * 0.12
-          g.obj.scale.set(dasar.x * k, dasar.y * k, dasar.z * k)
-        }
-      }
-
-      // Denyut arteri MENYUSUL denyut jantung, tidak serentak dengannya.
-      // Gelombang nadi merambat sekitar 5 m/detik, jadi arteri di tungkai
-      // berdenyut puluhan milidetik sesudah aorta. Jeda itu dihitung dari
-      // jarak sebenarnya tiap pembuluh ke jantung.
-      if (m.heartRate > 0 && animatedRef.current.artery.length) {
-        const periode = 60 / m.heartRate
-        for (const a of animatedRef.current.artery) {
-          const dasar = a.obj.userData.baseScale as THREE.Vector3 | undefined
-          if (!dasar) continue
-          const fase = (((t - a.jeda) % periode) + periode) % periode / periode
-          // Naik cepat, turun perlahan — bentuk gelombang nadi, bukan sinus.
-          const nadi = fase < 0.2 ? Math.sin((fase / 0.2) * Math.PI) : 0
-          const k = 1 + nadi * 0.035
-          a.obj.scale.set(dasar.x * k, dasar.y * k, dasar.z * k)
-        }
-      }
-
-      // Otot yang sedang disorot berkontraksi pada tempo latihan. Fase
-      // konsentrik cepat, eksentrik dua kali lebih lambat — tempo angkatan
-      // yang dianjurkan, bukan getaran hias.
-      if (m.contractionRate > 0) {
-        const fase = (t * m.contractionRate / 60) % 1
-        const kontraksi = fase < 0.33
-          ? Math.sin((fase / 0.33) * (Math.PI / 2))
-          : Math.cos(((fase - 0.33) / 0.67) * (Math.PI / 2))
-        const k = 1 + kontraksi * 0.06
-        for (const [mesh] of highlightedMeshesRef.current) {
-          const dasar = mesh.userData.baseScale as THREE.Vector3 | undefined
-          if (dasar) mesh.scale.set(dasar.x * k, dasar.y * k, dasar.z * k)
-        }
-      }
-
-      controls.update()
-      renderer.render(scene, camera)
-      raf = requestAnimationFrame(animate)
+    const onContextRestored = () => {
+      setFatal('')
+      requestRender()
     }
-    animate()
+    renderer.domElement.addEventListener('webglcontextlost', onContextLost)
+    renderer.domElement.addEventListener('webglcontextrestored', onContextRestored)
+
+    // Heavy WebGL work juga tidak dijadwalkan ketika viewer keluar layar.
+    const visibilityObserver = new IntersectionObserver(
+      ([entry]) => {
+        inViewport = entry?.isIntersecting ?? true
+        if (inViewport && documentVisible) requestRender()
+        else stopRendering()
+      },
+      { rootMargin: '128px 0px', threshold: 0.01 },
+    )
+    visibilityObserver.observe(container)
+
+    const onVisibilityChange = () => {
+      documentVisible = !document.hidden
+      if (documentVisible && inViewport) requestRender()
+      else stopRendering()
+    }
+    document.addEventListener('visibilitychange', onVisibilityChange)
+    requestRender()
 
     return () => {
-      cancelAnimationFrame(raf)
+      requestRenderRef.current = () => undefined
+      stopRendering()
+      controls.removeEventListener('change', requestRender)
+      visibilityObserver.disconnect()
+      document.removeEventListener('visibilitychange', onVisibilityChange)
       ro.disconnect()
       renderer.domElement.removeEventListener('pointerdown', onPointerDown)
       renderer.domElement.removeEventListener('pointerup', onPointerUp)
       renderer.domElement.removeEventListener('webglcontextlost', onContextLost)
+      renderer.domElement.removeEventListener('webglcontextrestored', onContextRestored)
       controls.dispose()
-      // Peta lingkungan dan tekstur latar dibuat di GPU dan tidak ikut
-      // dibersihkan oleh renderer.dispose(); tanpa ini, membuka-tutup halaman
-      // ini berulang kali meninggalkan tumpukan tekstur yang tidak pernah
-      // dilepas — kebocoran yang baru terasa setelah beberapa kali navigasi,
-      // dan pada ponsel berakhir sebagai konteks WebGL yang ditolak.
+
+      for (const [mesh, entry] of highlightedMeshesRef.current) {
+        const active = mesh.material as THREE.Material
+        if (active !== entry.baseMaterial) active.dispose()
+      }
+      highlightedMeshesRef.current.clear()
+      clearBodyAtlasRuntimeRoots(runtimeRootOwner)
+      for (const group of Object.values(groupsRef.current)) {
+        if (group) disposeLayerMaterials(group)
+      }
+      for (const def of ANATOMY_LAYERS) clearAnatomySourceNodes(def.file)
+      groupsRef.current = {}
+
       lingkungan.dispose()
       latarRef.current?.dispose()
       latarRef.current = null
+      scene.environment = null
+      scene.background = null
+      renderer.renderLists.dispose()
       renderer.dispose()
-      container.removeChild(renderer.domElement)
+      renderer.forceContextLoss()
+      if (renderer.domElement.parentElement === container) container.removeChild(renderer.domElement)
+      rendererRef.current = null
+      controlsRef.current = null
+      cameraRef.current = null
       sceneRef.current = null
+      bodyBoxRef.current = null
+      homeFramingRef.current = null
+      lightsRef.current = null
+      hasFitRef.current = false
     }
   }, [])
 
-  // Muat/lepas lapisan sesuai toggle yang dipilih pengguna.
+  // Muat/lepas layer dengan generation token. Promise lama tidak boleh memasang
+  // mesh jika pengguna sudah mematikan layer atau request baru sudah dimulai.
   useEffect(() => {
     const scene = sceneRef.current
     if (!scene) return
@@ -700,59 +550,42 @@ export function Body3D({ layers, highlighted, focusKeywords, renderMode, ctWindo
       const want = layers.has(def.key)
       const have = groupsRef.current[def.key]
       if (want && !have) {
+        const generation = loadGenerationRef.current.begin(def.key)
+        setFailedLayers((s) => { const n = new Set(s); n.delete(def.key); return n })
+        setProgress((p) => ({ ...p, [def.key]: 0 }))
         setLoadingLayers((s) => new Set(s).add(def.key))
-        loadLayer(def.file, (pct) => setProgress((p) => ({ ...p, [def.key]: pct })))
+        loadLayer(def.file, (pct) => {
+          if (!loadGenerationRef.current.isCurrent(def.key, generation)) return
+          setProgress((p) => ({ ...p, [def.key]: pct }))
+        })
           .then((group) => {
+            if (
+              sceneRef.current !== scene
+              || !layersRef.current.has(def.key)
+              || !loadGenerationRef.current.isCurrent(def.key, generation)
+            ) return
+
             const clone = group.clone(true)
-            // Material anatomi asli disimpan di tiap mesh SEBELUM mode
-            // radiologi sempat menggantinya, supaya kembali ke "Anatomy"
-            // selalu memulihkan warna yang benar dan bukan salinan abu-abu.
-            clone.traverse((child) => {
-              if (child instanceof THREE.Mesh) child.userData.baseMaterial = child.material
-              // Z-Anatomy menitipkan satu objek teks petunjuk ("HOW TO ...")
-              // di tiap koleksi. Itu bukan struktur anatomi: ia bisa ikut
-              // terkena raycast, dan pada mode rontgen yang additive ia malah
-              // menyala terang di antara tungkai. Disembunyikan di semua mode.
-              const name = child.userData.originalName as string | undefined
-              if (name && name.startsWith('HOW TO')) child.visible = false
-            })
-            // Nama itu menempel di node induknya, bukan di mesh anaknya, jadi
-            // node bernama itu sendiri juga perlu dipadamkan.
+            cloneLayerMaterials(clone)
+            const sourceNodeNames: string[] = []
             clone.traverse((obj) => {
               const name = obj.userData.originalName as string | undefined
-              if (name && name.startsWith('HOW TO')) obj.visible = false
-            })
-            groupsRef.current[def.key] = clone
-            // Struktur yang ikut berdenyut/bernapas dikumpulkan sekarang, dan
-            // skala awalnya disimpan supaya animasinya selalu kembali ke
-            // ukuran asli, bukan mengecil sedikit demi sedikit tiap siklus.
-            clone.traverse((obj) => {
-              const nama = obj.userData.originalName as string | undefined
-              if (!nama) return
-              if (cocokSalahSatu(nama, KATA_JANTUNG)) {
-                obj.userData.baseScale = obj.scale.clone()
-                animatedRef.current.heart.push(obj)
-              } else if (cocokSalahSatu(nama, KATA_PARU)) {
-                obj.userData.baseScale = obj.scale.clone()
-                animatedRef.current.lungs.push(obj)
-              } else if (cocokSalahSatu(nama, KATA_CERNA)) {
-                obj.userData.baseScale = obj.scale.clone()
-                // Fase ditentukan KETINGGIAN ruas itu di tubuh. Saluran cerna
-                // berjalan dari atas (lambung) ke bawah (rektum), jadi tinggi
-                // adalah pendekatan yang layak untuk urutan sepanjang saluran
-                // tanpa perlu tahu topologi ususnya. Nilainya diisi setelah
-                // kotak batas tubuh diketahui, di bawah.
-                animatedRef.current.gut.push({ obj, fase: 0 })
-              } else if (cocokSalahSatu(nama, KATA_ARTERI)) {
-                obj.userData.baseScale = obj.scale.clone()
-                animatedRef.current.artery.push({ obj, jeda: 0 })
+              if (!name) return
+              if (name.startsWith('HOW TO')) {
+                obj.visible = false
+                return
               }
+              sourceNodeNames.push(name)
             })
+            publishAnatomySourceNodes(def.file, sourceNodeNames)
+            groupsRef.current[def.key] = clone
+            publishBodyAtlasRuntimeRoot(runtimeRootOwner, def.file, clone)
             scene.add(clone)
-            setLoadingLayers((s) => { const n = new Set(s); n.delete(def.key); return n })
-            // Bingkai kamera sekali saja berdasar bounding box lapisan
-            // pertama yang termuat (semua lapisan berbagi ruang koordinat
-            // tubuh yang sama), supaya tampilan tidak melompat tiap toggle.
+            setFailedLayers((s) => { const n = new Set(s); n.delete(def.key); return n })
+            setProgress((p) => ({ ...p, [def.key]: 1 }))
+
+            // Bingkai kamera sekali saja berdasarkan layer pertama. Semua
+            // layer Z-Anatomy berbagi koordinat tubuh yang sama.
             const camera = cameraRef.current
             const controls = controlsRef.current
             if (!hasFitRef.current && camera && controls) {
@@ -762,11 +595,6 @@ export function Body3D({ layers, highlighted, focusKeywords, renderMode, ctWindo
                 const size = box.getSize(new THREE.Vector3())
                 const height = Math.max(size.y, 0.1)
                 const dist = height * 1.7
-                // Sudut tiga-perempat, bukan tepat dari depan. Pandangan
-                // simetris dari depan meratakan kedalaman: bahu, dada dan
-                // panggul jatuh pada satu bidang sehingga figurnya terbaca
-                // sebagai diagram. Sedikit menyamping mengembalikan volumenya
-                // tanpa mengorbankan orientasi kiri-kanan.
                 camera.position.set(
                   center.x + dist * 0.26,
                   center.y + height * 0.06,
@@ -781,28 +609,6 @@ export function Body3D({ layers, highlighted, focusKeywords, renderMode, ctWindo
                 controls.update()
                 hasFitRef.current = true
                 bodyBoxRef.current = box.clone()
-
-                // Fase peristaltik dan jeda denyut arteri dihitung SEKALI di
-                // sini, saat ukuran tubuh sudah diketahui — bukan tiap frame.
-                const pusat = new THREE.Vector3()
-                const kotak = new THREE.Box3()
-                const tinggiTubuh = Math.max(size.y, 0.1)
-                for (const g of animatedRef.current.gut) {
-                  kotak.setFromObject(g.obj).getCenter(pusat)
-                  // 0 di ujung atas saluran, 1 di ujung bawah.
-                  g.fase = batasSatu((box.max.y - pusat.y) / tinggiTubuh)
-                }
-                // Jeda denyut = jarak dari jantung dibagi kecepatan rambat
-                // gelombang nadi. Pada aorta ia sekitar 5 m/detik, jadi denyut
-                // di pergelangan kaki tiba puluhan milidetik SESUDAH di dada.
-                // Itulah sebabnya nadi diraba, bukan dilihat serentak.
-                const jantung = new THREE.Vector3(center.x, center.y + tinggiTubuh * 0.18, center.z)
-                const PWV = 5
-                const skalaMeter = 1.7 / tinggiTubuh
-                for (const a of animatedRef.current.artery) {
-                  kotak.setFromObject(a.obj).getCenter(pusat)
-                  a.jeda = (pusat.distanceTo(jantung) * skalaMeter) / PWV
-                }
                 homeFramingRef.current = {
                   position: camera.position.clone(),
                   target: center.clone(),
@@ -811,64 +617,66 @@ export function Body3D({ layers, highlighted, focusKeywords, renderMode, ctWindo
                 }
               }
             }
+            requestRenderRef.current()
           })
           .catch(() => {
-            setLoadingLayers((s) => { const n = new Set(s); n.delete(def.key); return n })
-            setFailedLayers((s) => new Set(s).add(def.key))
-            // Berkas yang gagal dibuang dari cache supaya percobaan berikutnya
-            // benar-benar mengunduh lagi, bukan memakai ulang promise yang
-            // sudah gagal selamanya.
+            if (
+              loadGenerationRef.current.isCurrent(def.key, generation)
+              && layersRef.current.has(def.key)
+            ) {
+              setFailedLayers((s) => new Set(s).add(def.key))
+            }
             modelCache.delete(def.file)
           })
-      } else if (!want && have) {
+          .finally(() => {
+            if (!loadGenerationRef.current.isCurrent(def.key, generation)) return
+            setLoadingLayers((s) => { const n = new Set(s); n.delete(def.key); return n })
+          })
+      } else if (!want) {
+        loadGenerationRef.current.invalidate(def.key)
+        setLoadingLayers((s) => { const n = new Set(s); n.delete(def.key); return n })
+        setFailedLayers((s) => { const n = new Set(s); n.delete(def.key); return n })
+        clearAnatomySourceNodes(def.file)
+        clearBodyAtlasRuntimeRoot(runtimeRootOwner, def.file)
+        if (!have) continue
+
+        for (const [mesh, entry] of highlightedMeshesRef.current) {
+          if (!isDescendantOf(mesh, have)) continue
+          const active = mesh.material as THREE.Material
+          if (active !== entry.baseMaterial) active.dispose()
+          highlightedMeshesRef.current.delete(mesh)
+        }
+
         scene.remove(have)
         delete groupsRef.current[def.key]
-        // Daftar animasi menyimpan referensi ke objek lapisan ini; kalau tidak
-        // dibuang, ia tetap dianimasikan setelah lepas dari scene dan
-        // menahan memorinya.
-        const masih = (o: THREE.Object3D) => o.parent !== null && !isDescendantOf(o, have)
-        animatedRef.current.heart = animatedRef.current.heart.filter(masih)
-        animatedRef.current.gut = animatedRef.current.gut.filter((g) => masih(g.obj))
-        animatedRef.current.artery = animatedRef.current.artery.filter((a) => masih(a.obj))
-        animatedRef.current.lungs = animatedRef.current.lungs.filter(masih)
+        disposeLayerMaterials(have)
+        requestRenderRef.current()
       }
     }
-  }, [layers])
+  }, [layers, retryNonce])
 
-  // Terapkan modalitas pencitraan ke seluruh mesh yang sedang tampil.
-  //
-  // Sorotan hijau dibersihkan lebih dulu: materialnya memang sedang diganti,
-  // jadi catatan "warna emissive sebelumnya" milik material lama tidak lagi
-  // menunjuk ke apa pun yang terpasang. Efek sorot di bawah ikut bergantung
-  // pada renderMode, jadi sorotannya langsung dipasang ulang di atas material
-  // yang baru.
+  // Terapkan modalitas radiologi. Plane yang sama diperbarui in-place supaya
+  // cache material selalu membaca posisi slice slider terbaru.
   useEffect(() => {
-    // Bidang potong dibangun dulu, karena material di bawah memerlukannya.
-    // Normal & jarak dihitung dari kotak batas tubuh yang sebenarnya, bukan
-    // dari angka tetap — supaya posisi 0..1 berarti "dari ujung ke ujung
-    // tubuh", bukan "dari titik nol dunia".
     const box = bodyBoxRef.current
-    if (slicePlane === 'none' || renderMode === 'anatomy' || renderMode === 'xray' || !box) {
-      clipRef.current = null
-    } else {
-      const min = box.min
-      const max = box.max
-      // Aksial memotong mendatar (sumbu Y), koronal depan-belakang (Z),
-      // sagital kiri-kanan (X) — konvensi radiologi baku.
+    let clip: THREE.Plane | null = null
+    if (slicePlane !== 'none' && renderMode !== 'anatomy' && renderMode !== 'xray' && box) {
       const normal =
         slicePlane === 'axial' ? new THREE.Vector3(0, -1, 0)
         : slicePlane === 'coronal' ? new THREE.Vector3(0, 0, -1)
         : new THREE.Vector3(-1, 0, 0)
-      const lo = slicePlane === 'axial' ? min.y : slicePlane === 'coronal' ? min.z : min.x
-      const hi = slicePlane === 'axial' ? max.y : slicePlane === 'coronal' ? max.z : max.x
-      const at = lo + (hi - lo) * Math.max(0, Math.min(1, slicePos))
-      // Plane didefinisikan sebagai normal·x + constant > 0 = sisi yang
-      // DIPERTAHANKAN. Karena ketiga normal menunjuk ke arah negatif sumbunya,
-      // syarat itu menjadi (koordinat < at) untuk ketiganya — jadi constant
-      // sama dengan posisi potongnya, tanpa kasus khusus per bidang.
-      clipRef.current = new THREE.Plane(normal, at)
+      clip = clipRef.current
+      clip.set(normal, body3dSliceCoordinate(box, slicePlane, slicePos))
+    }
+
+    // Render mode mengganti material seluruh mesh; clone highlight lama harus
+    // dilepas dulu supaya tidak menjadi orphan GPU resource.
+    for (const [mesh, entry] of highlightedMeshesRef.current) {
+      const active = mesh.material as THREE.Material
+      if (active !== entry.baseMaterial) active.dispose()
     }
     highlightedMeshesRef.current.clear()
+
     for (const def of ANATOMY_LAYERS) {
       const group = groupsRef.current[def.key]
       if (!group) continue
@@ -876,14 +684,12 @@ export function Body3D({ layers, highlighted, focusKeywords, renderMode, ctWindo
         if (!(child instanceof THREE.Mesh)) return
         child.material =
           renderMode === 'anatomy'
-            ? (child.userData.baseMaterial as THREE.Material)
-            : radiologyMaterial(def.key, renderMode, ctWindow, clipRef.current)
+            ? (child.userData.baseMaterial as THREE.Material | THREE.Material[])
+            : radiologyMaterial(def.key, renderMode, ctWindow, clip)
       })
     }
+
     rendererRef.current?.setClearColor(MODE_BACKGROUND[renderMode], 1)
-    // Rontgen butuh cahaya lebih rata: bayangan terarah membuat tumpukan
-    // jaringan terbaca sebagai bentuk padat bercahaya, bukan sebagai bayangan
-    // yang saling menembus.
     const lights = lightsRef.current
     if (lights) {
       const flat = renderMode === 'xray'
@@ -892,28 +698,17 @@ export function Body3D({ layers, highlighted, focusKeywords, renderMode, ctWindo
       lights.fill.intensity = flat ? 0.1 : 0.25
       lights.tepi.intensity = flat ? 0 : 0.55
     }
-    // Pencahayaan lingkungan dan latar bergradasi HANYA untuk mode anatomi.
-    // CT dan MRI dibaca sebagai keabuan yang nilainya berarti; menambahkan
-    // pantulan spekular ke atasnya akan membuat piksel terang yang tidak
-    // mewakili jaringan apa pun — persis kesalahan yang membuat gambar medis
-    // palsu terlihat meyakinkan.
     const sc = sceneRef.current
     if (sc) {
       const anatomi = renderMode === 'anatomy'
       sc.environmentIntensity = anatomi ? 0.4 : 0
       sc.background = anatomi ? latarRef.current : null
     }
+    requestRenderRef.current()
   }, [renderMode, ctWindow, slicePlane, slicePos, loadingLayers])
 
-  // ── Membuka tubuh dan kedalaman diseksi ───────────────────────────────────
-  //
-  // Dua hal dikerjakan di satu tempat karena keduanya menyentuh mesh yang
-  // sama: pergeseran radial ("unfold") dan keburaman per lapisan.
-  //
-  // Posisi asli tiap node disimpan sekali di userData sebelum digeser. Tanpa
-  // itu, menggeser dari posisi yang sudah tergeser akan menumpuk kesalahan
-  // dan tubuh perlahan terbang berantakan — kesalahan yang tidak melempar
-  // galat apa pun, hanya membuat anatominya salah.
+  // Membuka tubuh dan kedalaman diseksi. Opacity X-ray tidak boleh ditimpa:
+  // dissection mengalikan opacity dasar modalitas dan menjaga depthWrite=false.
   useEffect(() => {
     const kotak = bodyBoxRef.current
     if (!kotak) return
@@ -928,9 +723,6 @@ export function Body3D({ layers, highlighted, focusKeywords, renderMode, ctWindo
       const dalam = KEDALAMAN[kunci]
 
       group.traverse((obj) => {
-        // Node bernama adalah satuan anatomi; itulah yang digeser, bukan tiap
-        // primitif di bawahnya — menggeser primitif akan mencabik satu organ
-        // menjadi kepingan yang tidak berarti apa-apa.
         const nama = obj.userData.originalName as string | undefined
         if (nama && !obj.userData.posisiAsli) {
           obj.userData.posisiAsli = obj.position.clone()
@@ -943,39 +735,38 @@ export function Body3D({ layers, highlighted, focusKeywords, renderMode, ctWindo
           const g = geserBuka(
             { x: pd.x, y: pd.y, z: pd.z },
             { x: pusat.x, y: pusat.y, z: pusat.z },
-            unfold, dalam,
+            unfold,
+            dalam,
           )
           obj.position.set(asal.x + g.x, asal.y + g.y, asal.z + g.z)
         }
 
         if (obj instanceof THREE.Mesh) {
-          const bahan = obj.material as THREE.Material | THREE.Material[]
-          const daftar = Array.isArray(bahan) ? bahan : [bahan]
+          const entry = highlightedMeshesRef.current.get(obj)
+          const active = Array.isArray(obj.material) ? obj.material : [obj.material]
+          const daftar = entry && entry.baseMaterial !== obj.material
+            ? [...active, entry.baseMaterial]
+            : active
           for (const b of daftar) {
             if (!b) continue
-            b.transparent = buram < 0.999
-            b.opacity = buram
-            // Struktur separuh tembus yang tetap menulis kedalaman akan
-            // menutupi apa pun di belakangnya — persis lapisan yang sedang
-            // dibuka supaya terlihat.
-            b.depthWrite = buram >= 0.999
+            const baseOpacity =
+              typeof b.userData.body3dBaseOpacity === 'number'
+                ? b.userData.body3dBaseOpacity as number
+                : b.opacity
+            const state = body3dDissectionMaterialState(renderMode, baseOpacity, buram)
+            b.transparent = state.transparent
+            b.opacity = state.opacity
+            b.depthWrite = state.depthWrite
             b.needsUpdate = true
           }
         }
       })
     }
+    requestRenderRef.current()
   }, [unfold, dissect, layers, loadingLayers, renderMode])
 
-  // Sorot (hijau) struktur yang sedang dipilih/ditarget, pulihkan warna
-  // struktur yang sebelumnya disorot tapi sudah tidak lagi ada di daftar.
-  //
-  // Satu node bernama (mis. "Long head of biceps brachii.l") bisa berupa
-  // Mesh langsung (mesh 1 primitif) ATAU Group berisi beberapa Mesh anak
-  // tak-bernama (mesh multi-primitif) -- jadi pencocokan nama dilakukan di
-  // level node manapun, lalu semua Mesh di BAWAHNYA (termasuk dirinya
-  // sendiri) yang disorot. Nama node yang cocok disimpan bersama tiap mesh
-  // supaya proses "lepas sorotan" tidak bergantung pada mesh.name (yang bisa
-  // saja kosong untuk anak dari node multi-primitif).
+  // Sorot struktur pilihan dengan material clone lokal. Saat sorotan dilepas,
+  // material dasar dipasang kembali dan clone langsung didispose.
   useEffect(() => {
     const exact = new Set(highlighted)
     const keywords = (focusKeywords ?? []).map((k) => k.toLowerCase())
@@ -984,13 +775,9 @@ export function Body3D({ layers, highlighted, focusKeywords, renderMode, ctWindo
 
     for (const [mesh, entry] of current) {
       if (!matches(entry.matchedName)) {
-        const mat = mesh.material as THREE.MeshStandardMaterial
-        mat.emissive.copy(entry.original)
-        mat.emissiveIntensity = 0
-        // Sorotan lepas -> ukurannya dikembalikan, kalau tidak otot yang
-        // sempat berkontraksi akan tertinggal membesar selamanya.
-        const dasar = mesh.userData.baseScale as THREE.Vector3 | undefined
-        if (dasar) mesh.scale.copy(dasar)
+        const active = mesh.material as THREE.Material
+        mesh.material = entry.baseMaterial
+        if (active !== entry.baseMaterial) active.dispose()
         current.delete(mesh)
       }
     }
@@ -1007,81 +794,77 @@ export function Body3D({ layers, highlighted, focusKeywords, renderMode, ctWindo
           if (current.has(child)) return
           const shared = child.material as THREE.MeshStandardMaterial
           if (!shared || !('emissive' in shared)) return
-          // Materialnya BERBAGI satu instance dengan ratusan mesh lain
-          // yang warnanya sama (mis. "Flat_Internal rotator" dipakai 232
-          // otot) -- kalau emissive-nya diubah langsung, semua yang
-          // berbagi material itu ikut menyala hijau, bukan cuma struktur
-          // yang disentuh/ditarget. Kloning dulu supaya sorotan benar-benar
-          // presisi.
           const mat = shared.clone()
           child.material = mat
-          // Skala dasar disimpan supaya animasi kontraksi punya titik pulang.
-          if (!child.userData.baseScale) child.userData.baseScale = child.scale.clone()
-          current.set(child, { original: mat.emissive.clone(), matchedName: originalName })
+          current.set(child, { baseMaterial: shared, matchedName: originalName })
           mat.emissive = HIGHLIGHT.clone()
           mat.emissiveIntensity = 0.55
         })
       })
     }
 
-    // Zoom kamera ke organ yang ditarget, atau kembali ke bingkai seluruh
-    // tubuh kalau target organnya dibersihkan.
     const camera = cameraRef.current
     const controls = controlsRef.current
-    if (!camera || !controls) return
-    if (focusBox && !focusBox.isEmpty()) {
-      const center = focusBox.getCenter(new THREE.Vector3())
-      const size = focusBox.getSize(new THREE.Vector3())
-      const radius = Math.max(size.length() * 0.5, 0.03)
-      // Banyak organ target (jantung, paru, ginjal, hati) ada DI DALAM
-      // rongga tubuh, di balik tulang rusuk/otot yang masih terlihat. Jarak
-      // kamera dihitung dari ukuran organ itu sendiri saja akan menaruh
-      // kamera di tengah dinding dada -- dikalikan lebih besar supaya kamera
-      // tetap di luar jaringan yang menutupinya, bukan menembusnya.
-      const dist = Math.max(radius * 8, 0.35)
-      let dir = camera.position.clone().sub(controls.target)
-      if (dir.lengthSq() < 1e-8) dir = new THREE.Vector3(0, 0.15, 1)
-      dir.normalize()
-      camera.position.copy(center.clone().add(dir.multiplyScalar(dist)))
-      controls.target.copy(center)
-      controls.minDistance = dist * 0.3
-      controls.maxDistance = dist * 8
-      controls.update()
-    } else if (!focusKeywords && homeFramingRef.current) {
-      const home = homeFramingRef.current
-      camera.position.copy(home.position)
-      controls.target.copy(home.target)
-      controls.minDistance = home.minDistance
-      controls.maxDistance = home.maxDistance
-      controls.update()
+    if (camera && controls) {
+      if (focusBox && !focusBox.isEmpty()) {
+        const center = focusBox.getCenter(new THREE.Vector3())
+        const size = focusBox.getSize(new THREE.Vector3())
+        const radius = Math.max(size.length() * 0.5, 0.03)
+        const dist = Math.max(radius * 8, 0.35)
+        let dir = camera.position.clone().sub(controls.target)
+        if (dir.lengthSq() < 1e-8) dir = new THREE.Vector3(0, 0.15, 1)
+        dir.normalize()
+        camera.position.copy(center.clone().add(dir.multiplyScalar(dist)))
+        controls.target.copy(center)
+        controls.minDistance = dist * 0.3
+        controls.maxDistance = dist * 8
+        controls.update()
+      } else if (!focusKeywords && homeFramingRef.current) {
+        const home = homeFramingRef.current
+        camera.position.copy(home.position)
+        controls.target.copy(home.target)
+        controls.minDistance = home.minDistance
+        controls.maxDistance = home.maxDistance
+        controls.update()
+      }
     }
+    requestRenderRef.current()
   }, [highlighted, focusKeywords, loadingLayers, renderMode])
 
   const isLoading = loadingLayers.size > 0
+  // Initial anatomy load may cover the empty viewer, but once at least one
+  // real layer is already rendered, later layer downloads stay compact so the
+  // existing anatomy remains visible and usable on slow/mobile connections.
+  const hasLoadedLayer = ANATOMY_LAYERS.some((def) => Boolean(groupsRef.current[def.key]))
 
   return (
-    // Viewer memenuhi lebar kartu dan menempel ke tepi atasnya. Sebelumnya
-    // ia terkurung padding kartu, sehingga di layar 390 px lebar gambarnya
-    // hanya 316 px — hampir seperlima lebar layar terbuang menjadi bingkai
-    // kosong, pada satu-satunya elemen halaman yang memang untuk dilihat.
     <div className="relative -mx-5 -mt-5 mb-3 h-[68vh] max-h-[820px] min-h-[480px] overflow-hidden rounded-t-2xl bg-gradient-to-b from-neutral-900 to-neutral-950">
       <div ref={containerRef} className="h-full w-full touch-none" />
-      {/* Kegagalan yang membuat viewer tidak bisa menampilkan apa pun. Ini
-          menggantikan kotak hitam diam: layar kosong tanpa keterangan membuat
-          orang mengira aplikasinya rusak seluruhnya, padahal penyebabnya
-          biasanya memori atau jaringan dan bisa mereka atasi sendiri. */}
       {fatal && (
         <div className="absolute inset-0 flex items-center justify-center p-5">
           <p className="text-center text-xs leading-relaxed text-neutral-300">{fatal}</p>
         </div>
       )}
       {!fatal && isLoading && (
-        <div className="pointer-events-none absolute inset-0 flex items-center justify-center bg-black/40">
-          <div className="w-56 rounded-xl bg-black/70 px-3 py-2.5 text-center">
-            <span className="text-xs font-semibold text-white">Loading anatomy…</span>
-            {/* Persentase nyata, bukan pemintal. Lapisan pembuluh darah saja
-                12 MB — di jaringan seluler itu puluhan detik, dan tanpa angka
-                yang bergerak orang menyimpulkan aplikasinya menggantung. */}
+        <div
+          role="status"
+          aria-live="polite"
+          className={
+            hasLoadedLayer
+              ? 'pointer-events-none absolute left-2 right-2 top-2 z-10 flex justify-center'
+              : 'pointer-events-none absolute inset-0 flex items-center justify-center bg-black/40'
+          }
+        >
+          <div
+            className={
+              hasLoadedLayer
+                ? 'w-56 rounded-xl border border-white/10 bg-black/80 px-3 py-2.5 text-center shadow-lg backdrop-blur-sm'
+                : 'w-56 rounded-xl bg-black/70 px-3 py-2.5 text-center'
+            }
+          >
+            <span className="text-xs font-semibold text-white">
+              {hasLoadedLayer ? 'Adding anatomy layer…' : 'Loading anatomy…'}
+            </span>
             {[...loadingLayers].map((k) => {
               const def = ANATOMY_LAYERS.find((l) => l.key === k)
               const pct = Math.round((progress[k] ?? 0) * 100)
@@ -1100,13 +883,24 @@ export function Body3D({ layers, highlighted, focusKeywords, renderMode, ctWindo
         </div>
       )}
       {failedLayers.size > 0 && (
-        <div className="absolute bottom-2 left-2 right-2 rounded-lg bg-red-950/85 px-2.5 py-1.5 text-[11px] text-red-200">
-          Couldn’t load: {[...failedLayers].map((k) => ANATOMY_LAYERS.find((l) => l.key === k)?.label ?? k).join(', ')} —
-          check the connection and toggle the layer off and on to retry.
+        <div
+          className="absolute bottom-2 left-2 right-2 flex items-center justify-between gap-2 rounded-lg bg-red-950/90 px-2.5 py-2 text-[11px] text-red-200"
+          role="status"
+          aria-live="polite"
+        >
+          <span className="min-w-0 leading-relaxed">
+            Couldn’t load: {[...failedLayers].map((k) => ANATOMY_LAYERS.find((l) => l.key === k)?.label ?? k).join(', ')}.
+          </span>
+          <button
+            type="button"
+            onClick={() => setRetryNonce((n) => n + 1)}
+            disabled={isLoading}
+            className="min-h-[34px] shrink-0 rounded-full border border-red-300/40 bg-red-100/10 px-3 font-bold text-red-100 transition hover:bg-red-100/20 disabled:cursor-wait disabled:opacity-50"
+          >
+            {isLoading ? 'Retrying…' : 'Retry'}
+          </button>
         </div>
       )}
-      {/* Tidak error, tidak memuat, tapi juga tidak ada yang tampil: keadaan
-          inilah yang dulu jadi kotak hitam misterius. */}
       {!fatal && !isLoading && failedLayers.size === 0 && layers.size === 0 && (
         <div className="pointer-events-none absolute inset-0 flex items-center justify-center p-5">
           <p className="text-center text-xs text-neutral-400">

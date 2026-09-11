@@ -1,60 +1,35 @@
 // ─────────────────────────────────────────────────────────────────────────────
-// Hal-hal kecil yang membuat hari terasa lebih baik — dan yang memang benar.
+// Optional daily wellbeing prompts.
 //
-// ARAH APLIKASI INI BERUBAH DI SINI, dan alasannya perlu ditulis supaya tidak
-// hilang lagi.
+// Home should not force every visit into a clinical frame. Panacea can still
+// feel energetic, humane and visually expressive without inventing outcomes or
+// judging the user's day. These prompts are intentionally small and optional.
 //
-// Beranda sebelumnya dipimpin oleh grafik denyut, tekanan darah, pengingat
-// obat, dan kartu darurat. Semuanya berguna, semuanya benar, dan gabungannya
-// membuat siapa pun yang membukanya merasa seperti PASIEN — bukan seperti
-// orang yang sedang menjalani harinya. Aplikasi yang setiap pagi menyapa
-// dengan angka penyakit tidak membuat orang lebih sehat; ia membuat orang
-// lebih cemas, dan orang yang cemas menutup aplikasinya.
-//
-// Materi klinisnya TIDAK dihapus — ia tetap lengkap dan tetap dicari oleh yang
-// membutuhkannya. Yang berubah hanya apa yang muncul lebih dahulu.
-//
-// APA YANG DIPILIH MASUK KE SINI, DAN SYARATNYA:
-//
-//   1. BISA DILAKUKAN SEKARANG, dalam hitungan menit, tanpa alat dan tanpa
-//      persiapan. Saran yang butuh persiapan adalah saran yang ditunda.
-//   2. TERASA ENAK SAAT DILAKUKAN, bukan hanya baik menurut teori. Perilaku
-//      yang tidak memberi imbalan apa pun tidak diulang, betapa pun benarnya.
-//   3. BENAR-BENAR ADA DASARNYA. Ini tetap aplikasi kesehatan; nada boleh
-//      ringan, isinya tidak boleh dikarang. Tiap butir membawa satu kalimat
-//      tentang apa yang sebenarnya diketahui, ditulis tanpa membesar-besarkan.
-//
-// YANG SENGAJA TIDAK ADA — dan ini yang membuatnya bukan sekadar aplikasi
-// kebiasaan biasa:
-//
-//   · Tidak ada rangkaian yang bisa PUTUS. Tidak ada "kamu kehilangan 12 hari".
-//     Rasa bersalah adalah mesin yang paling sering menghentikan orang, dan
-//     memasangnya ke dalam perangkat lunak berarti membuat hari buruk terasa
-//     lebih mahal daripada seharusnya.
-//   · Tidak ada imbalan acak, tidak ada peti kejutan, tidak ada apa pun yang
-//     dirancang supaya dibuka berulang kali tanpa alasan. Membuat orang
-//     kecanduan aplikasi kesehatan adalah menukar satu masalah dengan masalah
-//     lain, dan itu sudah ditolak di aplikasi ini sebelumnya.
-//   · Tidak ada target harian yang ditetapkan aplikasi. Yang muncul adalah
-//     tawaran, bukan tugas.
-//
-// Yang ADA hanyalah: satu hal kecil, dilakukan, lalu dirayakan sebentar. Itu
-// saja sudah cukup, dan hari yang tidak ada satu pun tetap hari yang baik.
+// RULES FOR THIS LIST:
+//   1. The action must be low-friction and possible in a few minutes.
+//   2. The wording must describe the action honestly, not promise a result.
+//   3. Health-related explanations must be cautious and proportional to the
+//      evidence. Association is not causation; an average study effect is not a
+//      guarantee for one person.
+//   4. Completion is never a health score, diagnosis, treatment result or moral
+//      judgement. The user can ignore every prompt without “failing” anything.
+//   5. No variable rewards or mechanics designed to keep the user reopening the
+//      app without a useful reason.
 // ─────────────────────────────────────────────────────────────────────────────
 
 export interface Kesenangan {
   id: string
   judul: string
-  /** Ajakannya, ditulis seperti orang berbicara. */
+  /** Short, concrete instruction. */
   ajakan: string
-  /** Berapa lama sebenarnya. Jujur — dilebihkan sekali saja dan tidak dipercaya lagi. */
+  /** Approximate time needed for the action. */
   menit: number
   emoji: string
-  /** Warna kartunya. Beranda yang satu warna terasa seperti borang. */
+  /** Visual identity only; color does not imply healthy/unhealthy. */
   warna: 'kuning' | 'jingga' | 'merah' | 'ungu' | 'biru' | 'hijau' | 'toska' | 'merahmuda'
-  /** Apa yang benar-benar diketahui. Satu kalimat, tanpa dibesar-besarkan. */
+  /** Evidence-aware explanation without a guaranteed outcome. */
   kenapa: string
-  /** Ke mana kalau ingin lebih jauh. Boleh kosong. */
+  /** Optional route for a fuller tool or explanation. */
   ke?: string
 }
 
@@ -71,79 +46,79 @@ export const WARNA: Record<Kesenangan['warna'], { bg: string; teks: string; peka
 
 export const KESENANGAN: Kesenangan[] = [
   {
-    id: 'cahaya', judul: 'Get some daylight', ajakan: 'Step outside and let the light hit your eyes.',
+    id: 'cahaya', judul: 'Get some daylight', ajakan: 'Step outside for a few minutes if conditions are safe.',
     menit: 5, emoji: '🌤️', warna: 'kuning',
-    kenapa: 'Morning light is the strongest signal your body clock has. It is the single change that moves sleep — and therefore mood — the most reliably.',
+    kenapa: 'Light exposure is an important cue for circadian timing. The effect depends on timing, intensity, duration and the individual.',
     ke: '/light-exposure',
   },
   {
-    id: 'napas', judul: 'Breathe out longer', ajakan: 'Two short breaths in, one long breath out. A few rounds.',
+    id: 'napas', judul: 'Try slow breathing', ajakan: 'Breathe comfortably and make the exhale a little longer for a few rounds.',
     menit: 2, emoji: '🫧', warna: 'biru',
-    kenapa: 'A longer exhale than inhale shifts you toward the calming branch of the nervous system. The effect is real, immediate, and short-lived — which is fine, because you can do it again.',
+    kenapa: 'Slow breathing can reduce perceived arousal or stress for some people. Stop if it causes dizziness or discomfort.',
     ke: '/breathwork',
   },
   {
-    id: 'gerak', judul: 'Move, any way you like', ajakan: 'Five minutes. Walk, dance, stairs — it does not have to be exercise.',
+    id: 'gerak', judul: 'Move for a few minutes', ajakan: 'Walk, dance, take the stairs, or choose another comfortable movement.',
     menit: 5, emoji: '💃', warna: 'jingga',
-    kenapa: 'Even brief movement lifts mood within minutes, and the effect does not depend on the session being long or hard enough to count as training.',
+    kenapa: 'A short movement break adds physical activity and interrupts prolonged sitting. It does not need to count as a training session.',
     ke: '/workout',
   },
   {
-    id: 'kabari', judul: 'Message someone you like', ajakan: 'One person. No reason needed.',
+    id: 'kabari', judul: 'Message someone', ajakan: 'Send a short message to someone you want to stay connected with.',
     menit: 2, emoji: '💌', warna: 'merahmuda',
-    kenapa: 'Of everything studied in long-life research, the strength of close relationships is among the most consistent predictors — ahead of most things people usually worry about.',
+    kenapa: 'Social connection is associated with health and wellbeing in population research. This prompt is simply one low-effort way to maintain contact.',
   },
   {
-    id: 'air', judul: 'Drink a glass of water', ajakan: 'Right now, before you scroll on.',
+    id: 'air', judul: 'Have some water', ajakan: 'Drink according to thirst and your usual fluid needs.',
     menit: 1, emoji: '💧', warna: 'toska',
-    kenapa: 'Mild dehydration shows up as tiredness and poor concentration long before it shows up as thirst.',
+    kenapa: 'Fluid needs vary with body size, activity, climate, diet and medical conditions. People with prescribed fluid restriction should follow their care plan.',
     ke: '/hydration',
   },
   {
-    id: 'regang', judul: 'Unfold yourself', ajakan: 'Stand up. Reach up. Roll the shoulders back.',
+    id: 'regang', judul: 'Stand and move', ajakan: 'Stand up, change position, and move your shoulders or legs comfortably.',
     menit: 2, emoji: '🙆', warna: 'ungu',
-    kenapa: 'Breaking up long sitting matters more for health than any single stretch does — the benefit is in standing up, not in the technique.',
+    kenapa: 'Changing position breaks up prolonged sitting. No single stretch is presented here as a treatment or injury-prevention guarantee.',
     ke: '/stretching',
   },
   {
-    id: 'syukur', judul: 'Name one good thing', ajakan: 'Something from today. Small counts. Small is usually better.',
+    id: 'syukur', judul: 'Write one positive note', ajakan: 'Record one thing from today that you appreciated or want to remember.',
     menit: 1, emoji: '✨', warna: 'kuning',
-    kenapa: 'Deliberately noticing one good thing has modest but repeatable effects on mood in trials. It is not magic and it does not need to be.',
+    kenapa: 'Brief positive-reflection exercises have shown small average wellbeing effects in some studies. They are optional prompts, not a treatment for low mood.',
     ke: '/logs',
   },
   {
-    id: 'musik', judul: 'Play a song you love', ajakan: 'The one that always works. You know the one.',
+    id: 'musik', judul: 'Play music you enjoy', ajakan: 'Choose one song because you want to hear it, not because the app says you should.',
     menit: 4, emoji: '🎧', warna: 'ungu',
-    kenapa: 'Music you personally love reliably triggers reward pathways — this is one of the few pleasures that shows up clearly on a brain scan.',
+    kenapa: 'Music can be used for enjoyment or relaxation, but responses differ between people and situations.',
   },
   {
-    id: 'matahari', judul: 'Walk after you eat', ajakan: 'Ten minutes, any pace, after your next meal.',
+    id: 'matahari', judul: 'Walk after a meal', ajakan: 'If appropriate for you, take an easy walk after your next meal.',
     menit: 10, emoji: '🚶', warna: 'hijau',
-    kenapa: 'A short walk after eating blunts the rise in blood sugar noticeably — one of the highest-return ten minutes in the day.',
+    kenapa: 'Light post-meal activity can reduce the average postprandial glucose rise in studies. Individual response and suitability vary.',
     ke: '/workout',
   },
   {
-    id: 'layar', judul: 'Look away from the screen', ajakan: 'Twenty seconds looking at something far away.',
+    id: 'layar', judul: 'Change your focus distance', ajakan: 'Look away from the screen at something farther away for a short break.',
     menit: 1, emoji: '👀', warna: 'biru',
-    kenapa: 'Eye strain from close work eases when the focus distance changes. It costs twenty seconds.',
+    kenapa: 'Changing focus distance and taking breaks can reduce visual discomfort during prolonged near work for some people.',
     ke: '/screen-time',
   },
   {
-    id: 'tawa', judul: 'Find something funny', ajakan: 'One clip, one memory, one friend who always does it.',
+    id: 'tawa', judul: 'Take a short recreation break', ajakan: 'Choose something you find funny or enjoyable for a few minutes.',
     menit: 3, emoji: '😄', warna: 'jingga',
-    kenapa: 'Laughing lowers subjective stress and briefly raises pain tolerance. That is a small effect, and it is also a genuinely nice three minutes.',
+    kenapa: 'This is a recreation prompt, not a medical intervention. The purpose is simply to make room for a brief enjoyable activity.',
   },
   {
-    id: 'rapikan', judul: 'Clear one small surface', ajakan: 'One table. One shelf. Not the whole room.',
+    id: 'rapikan', judul: 'Finish one small task', ajakan: 'Pick one clearly bounded task that can be completed in a few minutes.',
     menit: 5, emoji: '🧹', warna: 'toska',
-    kenapa: 'Finishing something visible and bounded gives a sense of control that generalises — which is why the trick is choosing something small enough to actually finish.',
+    kenapa: 'A small bounded task can provide structure for the next few minutes. No health or productivity outcome is implied.',
   },
 ]
 
 const KUNCI = 'pmd_semangat_v1'
 
 interface Simpanan {
-  /** tanggal ISO → id yang sudah dilakukan hari itu. */
+  /** Local date → ids completed on that date. */
   [tanggal: string]: string[]
 }
 
@@ -175,26 +150,20 @@ export function tandai(id: string): string[] {
   if (kini.has(id)) kini.delete(id)
   else kini.add(id)
   s[t] = [...kini]
-  // Simpan 60 hari terakhir saja. Lebih dari itu tidak dilihat siapa pun dan
-  // hanya membebani penyimpanan.
+  // Keep only recent history because this widget does not use older entries.
   const kunci = Object.keys(s).sort().slice(-60)
   const ramping: Simpanan = {}
   for (const k of kunci) ramping[k] = s[k]
-  try { localStorage.setItem(KUNCI, JSON.stringify(ramping)) } catch { /* penuh */ }
+  try { localStorage.setItem(KUNCI, JSON.stringify(ramping)) } catch { /* storage unavailable/full */ }
   return s[t]
 }
 
 /**
- * Tiga tawaran untuk hari ini.
+ * Three deterministic optional prompts for the current day.
  *
- * DIPILIH MENURUT TANGGAL, BUKAN ACAK TIAP BUKA. Yang berganti tiap gulir
- * menjadi hiasan, dan lebih buruk: ia menjadi mesin yang membuat orang membuka
- * aplikasi berulang kali untuk melihat apa yang muncul. Itu persis yang tidak
- * ingin dibangun di sini. Ditentukan tanggal, ia sama sepanjang hari, dan besok
- * berganti dengan sendirinya.
- *
- * Jam ikut dipertimbangkan sedikit: "jalan sesudah makan" dan "cahaya pagi"
- * tidak masuk akal ditawarkan tengah malam.
+ * The selection changes by date rather than on every app open so it does not
+ * become a variable-reward loop. Time of day only removes prompts that would be
+ * poorly timed, such as daylight late at night.
  */
 export function tawaranHariIni(sekarang = new Date()): Kesenangan[] {
   const jam = sekarang.getHours()
@@ -210,6 +179,5 @@ export function tawaranHariIni(sekarang = new Date()): Kesenangan[] {
   for (let i = 0; i < 3 && i < layak.length; i++) {
     keluar.push(layak[(((hari * 3 + i) % layak.length) + layak.length) % layak.length])
   }
-  // Jaga-jaga bila rumusnya menghasilkan yang sama dua kali pada daftar pendek.
   return keluar.filter((k, i) => keluar.findIndex((x) => x.id === k.id) === i)
 }

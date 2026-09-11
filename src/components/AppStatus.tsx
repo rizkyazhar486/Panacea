@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import type { AutoSyncStatus } from '../lib/autoIsi'
+import { SmartNotificationOrchestrator } from './SmartNotificationOrchestrator'
 
 // Small ambient status layer: offline state, service-worker updates, and a
 // non-blocking automation-sync notice. The sync notice appears only after an
@@ -56,6 +57,8 @@ export function AppStatus() {
 
   return (
     <>
+      <SmartNotificationOrchestrator />
+
       {offline && (
         <div className="fixed inset-x-0 top-0 z-[60] flex items-center justify-center gap-2 bg-ink px-4 py-1.5 text-center text-xs font-semibold text-white">
           <span className="h-2 w-2 rounded-full bg-amber-400" /> You are offline — last saved data stays available.

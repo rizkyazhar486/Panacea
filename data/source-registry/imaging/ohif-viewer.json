@@ -1,0 +1,52 @@
+{
+  "id": "ohif_viewer",
+  "name": "OHIF Viewer",
+  "category": "imaging",
+  "kind": ["framework", "viewer", "tooling"],
+  "homepage": "https://ohif.org/",
+  "repository": "https://github.com/OHIF/Viewers",
+  "features": [267, 271, 273, 274, 275, 276, "dicomweb", "mpr", "mip", "segmentation", "volume-rendering", "4d-imaging", "slide-microscopy", "ecg-waveform"],
+  "formats": ["dicom", "dicomweb", "dicom-sr", "dicom-seg", "rt-struct", "pdf", "video", "wsi", "waveform"],
+  "usage": {
+    "runtime": false,
+    "buildTime": false,
+    "networkRequired": true,
+    "notes": "Treat OHIF primarily as an architecture and workflow reference for Panacea rather than bundling the full viewer into the main application by default. OHIF uses Cornerstone3D for decoding, rendering and annotation and supports DICOMweb-oriented workflows. A future dedicated imaging route may integrate selected OHIF concepts or modules only after bundle-size, authentication, PHI isolation and mobile-performance review."
+  },
+  "license": {
+    "status": "VERIFIED",
+    "identifier": "MIT",
+    "commercialUse": "ALLOWED",
+    "attributionRequired": true,
+    "shareAlike": false,
+    "scope": "The OHIF Viewer software repository is MIT licensed. This software license does not grant rights to patient studies, image archives, annotations, segmentations, third-party extensions, codecs, datasets, or models loaded by a deployment.",
+    "verificationUrl": "https://github.com/OHIF/Viewers/blob/master/LICENSE",
+    "verifiedAt": "2026-09-08",
+    "notes": "Retain the OHIF MIT notice. Audit licenses and terms for every optional extension, archive, codec and dataset independently."
+  },
+  "validation": {
+    "level": "REFERENCE",
+    "clinicalDecisionUse": "REQUIRES_SEPARATE_VALIDATION",
+    "notes": "OHIF is a mature imaging platform and has been used as a basis for production and regulated applications, but using OHIF does not make Panacea itself a validated diagnostic device. Intended-use validation, measurement verification, cybersecurity and clinical workflow validation remain Panacea responsibilities."
+  },
+  "provenance": {
+    "authority": "Open Health Imaging Foundation",
+    "sourceIdentityRequired": true,
+    "versionPinRequired": true,
+    "notes": "Pin the OHIF release/docs version used as an implementation reference. Preserve DICOM source identifiers and transformation provenance independently from viewer state."
+  },
+  "adapter": {
+    "status": "PLANNED",
+    "normalizedTarget": "PanaceaImagingWorkspace",
+    "module": null,
+    "notes": "Preferred near-term use is architecture reference: DICOMweb data source -> Panacea imaging adapter -> Cornerstone3D rendering -> task-specific Panacea UI. Avoid copying the full OHIF application shell into Panacea until a dedicated imaging product boundary and performance budget are justified."
+  },
+  "trust": {
+    "authority": 5,
+    "evidenceQuality": 2,
+    "recency": 5,
+    "licenseClarity": 5,
+    "reproducibility": 5,
+    "notes": "Scores describe engineering/reference suitability. EvidenceQuality remains low because OHIF is software infrastructure rather than biomedical evidence."
+  }
+}

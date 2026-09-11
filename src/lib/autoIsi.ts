@@ -1,6 +1,6 @@
 import { api, backendEnabled } from './api'
 import { mergeVitals } from './healthVitals'
-import { getDemoTersimpan, setDemo, mergeHealthCache } from './profile'
+import { getDemoTersimpan, mergeDemoStored, mergeHealthCache, type Demo } from './profile'
 import { nilaiWajar, saringProfil, KE_DEMO } from './autoIsiFilter'
 import { parseWorkouts, parseHrNotifications } from './workoutImport'
 import { mergeWorkouts, mergeHrNotifications } from './workoutStore'
@@ -24,6 +24,8 @@ import { mergeWorkouts, mergeHrNotifications } from './workoutStore'
 //      saat backend lambat/kosong, lalu disegarkan ketika data benar-benar ada.
 //   5. EVENTUAL CONSISTENCY — saat app kembali fokus/online dan secara periodik
 //      selama terbuka, sinkronisasi dijalankan ulang.
+//   6. NEWER DATA WINS — snapshot server yang lebih tua tidak boleh menimpa
+//      perubahan lokal yang memiliki timestamp lebih baru.
 // ─────────────────────────────────────────────────────────────────────────────
 
 export interface AutoSyncStatus {
@@ -40,10 +42,12 @@ const STATUS_KEY = 'pmd_auto_sync_status_v2'
 const HEALTH_PROFILE_CACHE_KEY = 'pmd_health_profile'
 const PERIODIC_MS = 5 * 60 * 1000
 const REQUEST_TIMEOUT_MS = 10_000
+const MIN_TRIGGER_GAP_MS = 60_000
 
 let sudahJalan = false
 let pemantauTerpasang = false
 let sedangJalan: Promise<number> | null = null
+let lastTriggeredAt = 0
 
 function bacaStatus(): AutoSyncStatus {
   const fallback: AutoSyncStatus = {
@@ -118,21 +122,31 @@ async function tarikProfilDenganRetry(): Promise<Record<string, unknown>> {
   throw lastError
 }
 
+function cacheProfilLokal(): Record<string, unknown> {
+  try { return JSON.parse(localStorage.getItem(HEALTH_PROFILE_CACHE_KEY) || '{}') as Record<string, unknown> } catch { return {} }
+}
+
+function timestampProfil(profil: Record<string, unknown>): number | null {
+  const stamp = String(profil.lastDeviceSyncAt ?? profil.updatedAt ?? '')
+  const time = Date.parse(stamp)
+  return Number.isNaN(time) ? null : time
+}
+
 /**
- * HealthProfile mempunyai cache lokalnya sendiri. Sinkronisasi otomatis lama
- * hanya menulis ke healthVitals, sehingga halaman /health-data dapat kembali
- * kosong saat server sedang gagal walaupun dashboard masih punya angka lama.
- * Simpan hanya snapshot server yang bermakna, dan jangan menimpa cache lokal
- * yang memiliki timestamp lebih baru.
+ * Bila kedua sisi punya provenance waktu yang valid, snapshot lama tidak boleh
+ * menggeser snapshot baru. Tanpa guard ini, focus sync dapat mengembalikan form,
+ * vitals, dan kalkulator ke angka server yang lebih tua setelah edit lokal.
  */
+function profilRemoteLebihLama(profil: Record<string, unknown>): boolean {
+  const remoteTime = timestampProfil(profil)
+  const localTime = timestampProfil(cacheProfilLokal())
+  return remoteTime !== null && localTime !== null && remoteTime < localTime
+}
+
+/** Simpan snapshot server yang sudah lolos pemeriksaan newer-wins. */
 function simpanSnapshotProfilLokal(profil: Record<string, unknown>) {
   try {
-    const current = JSON.parse(localStorage.getItem(HEALTH_PROFILE_CACHE_KEY) || '{}') as Record<string, unknown>
-    const remoteStamp = String(profil.lastDeviceSyncAt ?? profil.updatedAt ?? '')
-    const localStamp = String(current.lastDeviceSyncAt ?? current.updatedAt ?? '')
-    const remoteTime = Date.parse(remoteStamp)
-    const localTime = Date.parse(localStamp)
-    if (!Number.isNaN(remoteTime) && !Number.isNaN(localTime) && remoteTime < localTime) return
+    const current = cacheProfilLokal()
     localStorage.setItem(HEALTH_PROFILE_CACHE_KEY, JSON.stringify({ ...current, ...profil }))
   } catch { /* cache optional; never block sync */ }
 }
@@ -140,7 +154,7 @@ function simpanSnapshotProfilLokal(profil: Record<string, unknown>) {
 function terapkanProfil(profil: Record<string, unknown>): number {
   const bersih = saringProfil(profil)
   const jumlah = Object.keys(bersih).length
-  if (!jumlah) return 0
+  if (!jumlah || profilRemoteLebihLama(profil)) return 0
 
   const sumber = typeof profil.deviceSyncSource === 'string' ? profil.deviceSyncSource : 'Perangkat'
   const kapan = typeof profil.lastDeviceSyncAt === 'string' ? profil.lastDeviceSyncAt : undefined
@@ -148,17 +162,26 @@ function terapkanProfil(profil: Record<string, unknown>): number {
   // mergeVitals tidak menerima nol/undefined sehingga profil parsial tidak dapat
   // menghapus last-known-good values yang sudah tersimpan di browser.
   mergeVitals({ ...bersih, source: sumber, measuredAt: kapan })
-  mergeHealthCache(bersih)
+  // Kirim profil utuh: mergeHealthCache sendiri hanya menerima angka finite
+  // positif/string, sehingga provenance seperti source/updatedAt ikut sinkron
+  // tetapi history/array tidak disalin lewat jalur ini.
+  mergeHealthCache(profil)
   simpanSnapshotProfilLokal(profil)
 
   const demo = getDemoTersimpan() as Record<string, unknown>
-  const tambahan: Record<string, number> = {}
+  const tambahan: Partial<Demo> = {}
   for (const k of KE_DEMO) {
     const v = (bersih as Record<string, unknown>)[k]
     const lama = demo[k]
-    if (nilaiWajar(k, v) && !(typeof lama === 'number' && lama > 0)) tambahan[k] = v as number
+    if (nilaiWajar(k, v) && !(typeof lama === 'number' && lama > 0)) {
+      ;(tambahan as Record<string, unknown>)[k] = v
+    }
   }
-  if (Object.keys(tambahan).length) setDemo(tambahan)
+  if ((profil.sex === 'M' || profil.sex === 'F') && demo.sex !== 'M' && demo.sex !== 'F') tambahan.sex = profil.sex
+  // Jangan gunakan setDemo() di jalur perangkat: setDemo membaca neutral
+  // defaults dari getDemo(), sehingga usia/berat/tinggi default dapat tersimpan
+  // seolah benar-benar berasal dari perangkat.
+  if (Object.keys(tambahan).length) mergeDemoStored(tambahan, 'auto-device-sync')
 
   return jumlah
 }
@@ -221,6 +244,8 @@ function pasangPemantau() {
       if (document.visibilityState === 'visible') segarkan()
     })
   }
+  // Lima menit cukup sering untuk wearable/webhook tetapi tetap ringan. Timer
+  // hanya bekerja ketika aplikasi terlihat; focus/online menangani saat kembali.
   window.setInterval(() => {
     if (typeof document === 'undefined' || document.visibilityState === 'visible') segarkan()
   }, PERIODIC_MS)
@@ -237,10 +262,14 @@ export async function autoIsiDariPerangkat(paksa = false): Promise<number> {
   if (!backendEnabled) return 0
   pasangPemantau()
 
-  // Jangan membuat beberapa request identik saat focus + online + interval
-  // kebetulan berimpit.
+  // Jangan membuat beberapa request identik saat focus + online + visibility
+  // kebetulan berimpit. Setelah satu sync sukses, trigger paksa yang berdekatan
+  // satu menit dianggap kejadian UI yang sama, bukan alasan memukul backend lagi.
   if (sedangJalan) return sedangJalan
+  const nowMs = Date.now()
   if (sudahJalan && !paksa) return 0
+  if (sudahJalan && paksa && nowMs - lastTriggeredAt < MIN_TRIGGER_GAP_MS) return 0
+  lastTriggeredAt = nowMs
 
   sedangJalan = (async () => {
     const attemptAt = new Date().toISOString()
@@ -259,9 +288,6 @@ export async function autoIsiDariPerangkat(paksa = false): Promise<number> {
       const profil = await tarikProfilDenganRetry()
       jumlah = terapkanProfil(profil)
       profileMeaningful = jumlah > 0
-      // Hanya data bermakna yang menutup initial-sync gate. Respons HTTP 200
-      // dengan {} tidak lagi membuat seluruh sesi berhenti mencoba.
-      if (profileMeaningful) sudahJalan = true
     } catch (e) {
       errors.push(`profile: ${String((e as Error)?.message ?? 'unavailable')}`)
     }
@@ -270,6 +296,10 @@ export async function autoIsiDariPerangkat(paksa = false): Promise<number> {
     errors.push(...sekunder.errors)
 
     const adaData = profileMeaningful || sekunder.workoutsPulled > 0 || sekunder.notificationsPulled > 0
+    // Workouts-only / notification-only accounts are valid too. Previously only
+    // a non-empty profile closed the initial gate, causing repeated initial pulls.
+    if (adaData) sudahJalan = true
+
     const now = new Date().toISOString()
     tulisStatus({
       state: errors.length ? (adaData ? 'partial' : 'offline') : 'ok',

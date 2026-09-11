@@ -1,0 +1,99 @@
+/* Panacea Home active-widget stability v35
+   Presentation-only guard for the transient state between carousel navigation
+   and a lazy widget becoming available. It never recolors charts, thresholds,
+   status marks, health values or semantic SVG data. */
+
+/* An active source slide can exist for one render before its lazy child mounts.
+   Never let that transient empty slide inherit the previous widget's tall canvas. */
+@supports selector(.a:has(.b)) {
+  .panacea-home .widget-instrument-scroll-v5:has(> .widget-instrument-slide-v5[aria-hidden='false']:empty),
+  .panacea-home .widget-instrument-scroll-v5:has(> .widget-instrument-slide-v5[aria-hidden='false'] > .widget-instrument-loading-v29) {
+    height:184px!important;
+    min-height:184px!important;
+    max-height:184px!important;
+  }
+}
+
+.panacea-home .widget-instrument-slide-v5[aria-hidden='false']:empty {
+  min-height:0!important;
+  background:transparent!important;
+  background-image:none!important;
+  box-shadow:none!important;
+}
+
+/* Loading is a compact state, not a blank content card. */
+.panacea-home .widget-instrument-loading-v29 {
+  min-height:120px!important;
+  margin:0!important;
+  border-radius:18px!important;
+  box-shadow:none!important;
+  filter:none!important;
+  -webkit-backdrop-filter:none!important;
+  backdrop-filter:none!important;
+}
+html.dark .panacea-home .widget-instrument-loading-v29,
+.dark .panacea-home .widget-instrument-loading-v29 {
+  background:#090f17!important;
+  background-image:none!important;
+  border-color:rgba(255,255,255,.075)!important;
+  color:#dbe7ef!important;
+}
+
+/* Keep the instrument body visually tied to its dark shell during transitions. */
+html.dark .panacea-home .widget-instrument-shell-v5,
+.dark .panacea-home .widget-instrument-shell-v5 {
+  background-color:#070b11!important;
+}
+html.dark .panacea-home .widget-instrument-scroll-v5,
+.dark .panacea-home .widget-instrument-scroll-v5 {
+  background:transparent!important;
+  background-image:none!important;
+}
+
+/* Mobile controls: one readable identity row, then count at the left and the
+   management action at the right. This prevents a wide CTA from compressing
+   the widget title while keeping both controls immediately discoverable. */
+@media(max-width:430px) {
+  .panacea-home .widget-instrument-tools-v5 {
+    display:flex!important;
+    width:100%!important;
+    align-items:center!important;
+    justify-content:space-between!important;
+    gap:10px!important;
+  }
+  .panacea-home .widget-instrument-count-v5 {
+    flex:0 0 auto!important;
+    min-width:54px!important;
+  }
+  .panacea-home .widget-instrument-edit-v5 {
+    flex:0 1 auto!important;
+    max-width:min(68vw,240px)!important;
+    margin-left:auto!important;
+  }
+  .panacea-home .widget-instrument-edit-v5 > span:last-child {
+    min-width:0!important;
+    overflow:hidden!important;
+    text-overflow:ellipsis!important;
+  }
+  .panacea-home .widget-instrument-label-v5 {
+    min-width:0!important;
+    max-width:62vw!important;
+    overflow:hidden!important;
+    text-overflow:ellipsis!important;
+    white-space:nowrap!important;
+    font-size:11px!important;
+    line-height:1.25!important;
+  }
+}
+
+/* iPhone/Save-Data receives the same information with zero extra compositing. */
+html.pmd-low-memory .panacea-home :is(.widget-instrument-loading-v29,.widget-instrument-shell-v5,.widget-instrument-scroll-v5) {
+  box-shadow:none!important;
+  filter:none!important;
+  -webkit-backdrop-filter:none!important;
+  backdrop-filter:none!important;
+}
+
+@media(prefers-reduced-motion:reduce) {
+  .panacea-home .widget-instrument-scroll-v5 { scroll-behavior:auto!important; }
+}

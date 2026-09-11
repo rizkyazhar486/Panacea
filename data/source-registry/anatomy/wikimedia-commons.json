@@ -1,0 +1,51 @@
+{
+  "id": "wikimedia_commons",
+  "name": "Wikimedia Commons",
+  "category": "anatomy",
+  "kind": ["api", "dataset"],
+  "homepage": "https://commons.wikimedia.org/",
+  "repository": null,
+  "features": [
+    "body-explorer-reference-images",
+    "anatomy-reference-images",
+    "histology-reference-images",
+    "pathology-reference-images",
+    "radiology-reference-images",
+    "exercise-reference-images"
+  ],
+  "formats": ["jpeg", "png", "svg", "webp"],
+  "usage": {
+    "runtime": true,
+    "buildTime": false,
+    "networkRequired": true,
+    "notes": "Panacea queries the Wikimedia Commons MediaWiki API through the backend adapter. Runtime results are normalized to AnatomyImage records and retain a Commons file description page plus per-file license metadata. React components must not call the Commons API directly."
+  },
+  "license": {
+    "status": "CHECK_REQUIRED",
+    "identifier": "Per-file license",
+    "commercialUse": "CONDITIONAL",
+    "attributionRequired": null,
+    "shareAlike": null,
+    "scope": "Wikimedia Commons does not provide one blanket media license for every file. Each selected image or media file carries its own license or public-domain status on the file description page, with potentially different attribution, license-link, share-alike and non-copyright requirements.",
+    "verificationUrl": "https://commons.wikimedia.org/wiki/Commons:Reusing_content_outside_Wikimedia",
+    "verifiedAt": "2026-09-08",
+    "notes": "Do not infer permission from the Commons host alone. Preserve the file source page, creator/artist metadata, license short name and license URL when available. Any reuse beyond the current reference display must re-check the exact file terms and applicable non-copyright restrictions."
+  },
+  "validation": {
+    "level": "REFERENCE",
+    "clinicalDecisionUse": "NO",
+    "notes": "Commons is used as a provenance-preserving visual reference source. Search relevance, uploader metadata and educational usefulness are heterogeneous; an image must not be treated as patient-specific diagnostic evidence, calibrated modality data or validated procedural guidance."
+  },
+  "provenance": {
+    "authority": "Wikimedia Commons file repository with per-file creator, source and licensing metadata",
+    "sourceIdentityRequired": true,
+    "versionPinRequired": false,
+    "notes": "Every normalized image must retain its Commons file title and canonical sourcePage. License and artist fields are evidence copied from current extmetadata, while the file description page remains the verification source if metadata is incomplete or changes over time."
+  },
+  "adapter": {
+    "status": "ACTIVE",
+    "normalizedTarget": "AnatomyImage",
+    "module": "server/src/anatomyImages.ts",
+    "notes": "Backend adapter bounds and sanitizes search terms, restricts file namespace and accepted image MIME types, accepts media only from upload.wikimedia.org, requires per-file license metadata, preserves or reconstructs a canonical Commons source page, and uses a descriptive User-Agent plus request timeout."
+  }
+}

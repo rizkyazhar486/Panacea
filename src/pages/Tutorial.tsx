@@ -1,18 +1,6 @@
 import { Link } from 'react-router-dom'
 import { useTujuan, modeAwam } from '../lib/tujuan'
 
-/**
- * Panduan pemakaian: peta, bukan buku manual.
- *
- * Ditulis dengan bentuk yang sama dengan catatan penyakit — simpul, panah,
- * kotak — karena itu bentuk yang sudah dipakai di seluruh aplikasi ini, dan
- * panduan yang berbentuk lain justru menambah satu hal baru untuk dipelajari.
- *
- * Isinya dibatasi pada apa yang benar-benar perlu diketahui untuk mulai: ke
- * mana pergi, apa yang didapat, dan berapa lama. Sisanya sudah dijelaskan di
- * halamannya masing-masing.
- */
-
 type Langkah = { ke?: string; ikon: string; judul: string; isi: string; lama: string }
 
 const MULAI: Langkah[] = [
@@ -27,14 +15,22 @@ const BELAJAR: Langkah[] = [
   { ke: '/clinical-calculators', ikon: '🧮', judul: 'Compute one score', isi: 'SOFA, Wells, Child-Pugh. Fill the fields and the result arrives with its interpretation.', lama: '1 min' },
 ]
 
-/** Langkah yang sama tanpa istilah ujian. Halaman tujuannya persis sama. */
 const BELAJAR_AWAM: Langkah[] = [
   { ke: '/med-study', ikon: '🧠', judul: 'Look up one condition', isi: 'A map appears: Sebab → Tampak → Pastikan → Periksa → Obat → Bahaya. Tap a branch for the full content.', lama: '2 min' },
   { ke: '/med-study', ikon: '🩺', judul: 'See how to give first aid', isi: 'Rescue breathing, cardiac arrest, splinting a fracture — each stage is a branch.', lama: '2 min' },
   { ke: '/clinical-calculators', ikon: '🧮', judul: 'Work out one risk', isi: 'Heart risk, kidney function. Fill the fields and the result arrives with its interpretation.', lama: '1 min' },
 ]
 
-/** Arti warna cabang di peta penyakit — sama di seluruh 623 catatan. */
+const BODY_EXPLORER: Langkah[] = [
+  {
+    ke: '/body-explorer',
+    ikon: '🫀',
+    judul: 'Explore the body in 3D',
+    isi: 'Start in Anatomy view. Tap a structure, or open Organs, Muscles, or Find structure. Use the advanced labs only when you need them — the same 3D body remains your anchor.',
+    lama: '1 min',
+  },
+]
+
 const WARNA: [string, string, string][] = [
   ['bg-neutral-700', 'APA', 'a short definition'],
   ['bg-rose-500', 'SEBAB', 'aetiology and risk factors'],
@@ -74,18 +70,17 @@ function Bagian({ judul, langkah, dari }: { judul: string; langkah: Langkah[]; d
 }
 
 export default function Tutorial() {
-  // Panduan memakai bahasa pembacanya sendiri; kalau tidak, langkah pertama
-  // pemakai awam justru menjadi menebak arti singkatan di dalam panduannya.
   const awam = modeAwam(useTujuan())
   return (
     <div className="space-y-5 pb-4">
       <header>
         <h1 className="text-[20px] font-black text-ink dark:text-white">How to Use</h1>
-        <p className="text-[13px] text-neutral-500">Six steps, under 10 minutes. Tap to go straight there.</p>
+        <p className="text-[13px] text-neutral-500">A short map of the app. Tap a step to go straight there.</p>
       </header>
 
       <Bagian judul="① Set up first" langkah={MULAI} dari={1} />
       <Bagian judul={awam ? '② Start looking things up' : '② Start studying'} langkah={awam ? BELAJAR_AWAM : BELAJAR} dari={4} />
+      <Bagian judul="③ Explore the body visually" langkah={BODY_EXPLORER} dari={7} />
 
       <section>
         <h2 className="mb-2 text-[11px] font-black uppercase tracking-wide text-neutral-500">What the colours mean on the condition map</h2>

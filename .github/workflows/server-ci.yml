@@ -1,0 +1,135 @@
+name: Render backend CI
+
+on:
+  push:
+    branches:
+      - main
+      - 'panacea-maturity/**'
+    paths:
+      - 'server/**'
+      - '.github/workflows/server-ci.yml'
+  pull_request:
+    paths:
+      - 'server/**'
+      - '.github/workflows/server-ci.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: render-backend-ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  typecheck:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    defaults:
+      run:
+        working-directory: server
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: server/package-lock.json
+      - name: Install dependencies
+        run: npm ci
+      - name: Typecheck backend
+        run: npm run typecheck
+      - name: Build backend
+        run: npm run build
+      - name: Test ClinicalTrials adapter
+        run: npm run uji:trials
+      - name: Test PubMed adapter
+        run: npm run uji:pubmed
+      - name: Test openFDA adapter
+        run: npm run uji:openfda
+      - name: Test RxNorm adapter
+        run: npm run uji:rxnorm
+      - name: Test RxClass adapter
+        run: npm run uji:rxclass
+      - name: Test MyGene adapter
+        run: npm run uji:mygene
+      - name: Test Wikimedia Commons image adapter
+        run: npm run uji:commons
+      - name: Test environment and Open Food Facts adapters
+        run: npm run uji:lingkungan
+      - name: Test Open-Meteo adapter
+        run: npm run uji:open-meteo
+      - name: Test anatomy ontology adapter
+        run: npm run uji:anatomy-ontology
+      - name: Test HRA reference-organ adapter
+        run: npm run uji:hra-reference
+      - name: Test ICD terminology adapter
+        run: npm run uji:icd
+      - name: Test canonical drug label orchestration
+        run: npm run uji:drug-info
+      - name: Test payment webhook safety boundary
+        run: npm run uji:payments
+      - name: Test body biomedical fail-closed coverage
+        run: npm run uji:body-biomedical
+      - name: Test WHO ATC/DDD provenance boundary
+        run: npm run uji:atc-ddd
+      - name: Test canonical product registry
+        run: npm run uji:product-registry
+      - name: Test product-to-ATC verified crosswalk
+        run: npm run uji:product-atc
+      - name: Test SATUSEHAT FHIR boundary
+        run: npm run uji:satusehat
+      - name: Test health webhook ingestion and malformed-date regression
+        run: npm run uji:health-webhook
+      - name: Test Connect privacy boundaries
+        run: npm run uji:connect-privacy
+      - name: Test market data adapter
+        run: npm run uji:markets
+      - name: Test sports scoreboard adapter
+        run: npm run uji:sports
+      - name: Test auth privilege boundaries
+        run: npm run uji:auth-access
+      - name: Test medical translation safety shield
+        run: npm run uji:translate
+      - name: Runtime smoke-test genomics control plane
+        env:
+          JWT_SECRET: ci-only-panacea-genomics-secret
+          PORT: '8799'
+          CORS_ORIGINS: http://localhost:5173
+        run: |
+          set -euo pipefail
+          node dist/index.js >/tmp/panacea-backend.log 2>&1 &
+          SERVER_PID=$!
+          trap 'kill "$SERVER_PID" 2>/dev/null || true' EXIT
+
+          for attempt in $(seq 1 30); do
+            if curl -fsS http://127.0.0.1:8799/api/genomics/compute/capabilities >/tmp/genomics-capabilities.json; then
+              break
+            fi
+            sleep 1
+          done
+
+          if [ ! -s /tmp/genomics-capabilities.json ]; then
+            cat /tmp/panacea-backend.log
+            echo 'Genomics capabilities endpoint did not become ready.' >&2
+            exit 1
+          fi
+
+          node -e '
+            const fs = require("node:fs");
+            const body = JSON.parse(fs.readFileSync("/tmp/genomics-capabilities.json", "utf8"));
+            if (body.backend !== "render-control-plane") throw new Error(`Unexpected backend: ${body.backend}`);
+            if (body.configured !== false) throw new Error("CI must report genomics worker as unconfigured without secrets");
+            for (const kind of ["ont-basecalling", "pharmcat", "sv-calling"]) {
+              if (!body.jobKinds?.includes(kind)) throw new Error(`Missing genomics job kind: ${kind}`);
+            }
+          '
+
+          HTTP_CODE=$(curl -sS -o /tmp/genomics-unauth.json -w '%{http_code}' \
+            -H 'Content-Type: application/json' \
+            -d '{"kind":"ont-basecalling","input":{"uri":"https://example.test/input.pod5"}}' \
+            http://127.0.0.1:8799/api/genomics/compute/jobs)
+          test "$HTTP_CODE" = '401'
+          grep -q '"unauthorized"' /tmp/genomics-unauth.json

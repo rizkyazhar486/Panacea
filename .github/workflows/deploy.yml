@@ -22,9 +22,17 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: 20
+          # The offline test runner uses Node's TypeScript transform support
+          # (`--experimental-transform-types`). Node 20 rejects that flag and
+          # makes every .mts test fail before its code starts, so CI must use a
+          # runtime that actually supports the repository's test contract.
+          node-version: 24
           cache: npm
       - run: npm ci
+      # Regression suite is intentionally offline/no-browser. Run it before
+      # producing a deployable artifact so parser/cache/analytics regressions
+      # cannot silently reach GitHub Pages.
+      - run: npm run uji
       # Set repo variable VITE_API_URL (Settings → Secrets and variables →
       # Actions → Variables) to your deployed backend URL to enable live mode.
       - run: npm run build

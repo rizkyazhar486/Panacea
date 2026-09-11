@@ -1,0 +1,124 @@
+@import './home-widget-active-v35.css';
+
+/* Panacea Home dark comfort v34
+   Final visual comfort layer after the v33 loading hotfix.
+   Presentation only: no health values, thresholds, chart/status colors,
+   widget logic, routing, persistence or loading behavior are changed. */
+
+.panacea-home{
+  --pmd-calm-surface:rgba(255,255,255,.78);
+  --pmd-calm-border:rgba(15,23,42,.075);
+  --pmd-calm-fg:#111827;
+  --pmd-calm-muted:#52606d;
+}
+html.dark .panacea-home,
+.dark .panacea-home{
+  --pmd-calm-surface:rgba(9,14,22,.82);
+  --pmd-calm-border:rgba(255,255,255,.085);
+  --pmd-calm-fg:#f8fafc;
+  --pmd-calm-muted:#b8c4cf;
+}
+
+/* Generic Home glass must not inherit gold/yellow or other decorative outlines.
+   Semantic colors inside charts, reference zones, status marks and progress
+   graphics are intentionally not targeted. */
+.panacea-home .kaca{
+  background:var(--pmd-calm-surface)!important;
+  background-image:none!important;
+  border:1px solid var(--pmd-calm-border)!important;
+  color:var(--pmd-calm-fg)!important;
+  box-shadow:none!important;
+  -webkit-backdrop-filter:none!important;
+  backdrop-filter:none!important;
+}
+.panacea-home .kaca::before,
+.panacea-home .kaca::after{
+  content:none!important;
+  display:none!important;
+  border:0!important;
+  background:none!important;
+  box-shadow:none!important;
+}
+
+/* The Living Instrument keeps its purpose-specific icon/accent, but global
+   controls such as Manage widgets should not turn blue/purple/orange whenever
+   the active widget changes. Keep those controls Panacea-green and neutral. */
+.panacea-home .widget-instrument-edit-v5{
+  border:1px solid rgba(0,191,99,.24)!important;
+  background:rgba(0,191,99,.085)!important;
+  background-image:none!important;
+  color:#079855!important;
+  box-shadow:none!important;
+}
+html.dark .panacea-home .widget-instrument-edit-v5,
+.dark .panacea-home .widget-instrument-edit-v5{
+  border-color:rgba(37,211,124,.24)!important;
+  background:rgba(0,191,99,.09)!important;
+  color:#53dfa0!important;
+}
+.panacea-home .widget-instrument-count-v5,
+.panacea-home .widget-instrument-nav-v5{
+  background:rgba(148,163,184,.08)!important;
+  background-image:none!important;
+  border:1px solid var(--pmd-calm-border)!important;
+  box-shadow:none!important;
+}
+html.dark .panacea-home .widget-instrument-count-v5,
+html.dark .panacea-home .widget-instrument-nav-v5,
+.dark .panacea-home .widget-instrument-count-v5,
+.dark .panacea-home .widget-instrument-nav-v5{
+  color:#dbe5ee!important;
+}
+
+/* Reference/body sections should read as measurement panels, not framed
+   posters. Their internal separators and reference markers remain untouched. */
+.panacea-home .kaca > :is(div,a)+:is(div,a){
+  border-color:rgba(148,163,184,.12);
+}
+html.dark .panacea-home .kaca > :is(div,a)+:is(div,a),
+.dark .panacea-home .kaca > :is(div,a)+:is(div,a){
+  border-color:rgba(255,255,255,.075);
+}
+
+/* Mobile: give identity and controls their own breathing room instead of
+   squeezing title, counter and Manage widgets into one dense row. */
+@media(max-width:430px){
+  .panacea-home .widget-instrument-head-v5{
+    grid-template-columns:minmax(0,1fr)!important;
+    align-items:start!important;
+    gap:10px!important;
+  }
+  .panacea-home .widget-instrument-tools-v5{
+    width:100%!important;
+    justify-content:flex-end!important;
+    gap:8px!important;
+  }
+  .panacea-home .widget-instrument-edit-v5,
+  .panacea-home .widget-instrument-count-v5{
+    min-height:42px!important;
+    height:42px!important;
+  }
+  .panacea-home .widget-instrument-edit-v5 button{
+    min-height:42px!important;
+  }
+  .panacea-home .widget-instrument-title-v5{
+    white-space:normal!important;
+    overflow:visible!important;
+    text-overflow:clip!important;
+    text-wrap:balance;
+  }
+}
+
+/* Low-memory devices get exactly the same hierarchy with no compositing cost. */
+html.pmd-low-memory .panacea-home .kaca,
+html.pmd-low-memory .panacea-home :is(.widget-instrument-edit-v5,.widget-instrument-count-v5,.widget-instrument-nav-v5){
+  box-shadow:none!important;
+  filter:none!important;
+  -webkit-backdrop-filter:none!important;
+  backdrop-filter:none!important;
+}
+
+@media(prefers-contrast:more){
+  .panacea-home{--pmd-calm-border:rgba(15,23,42,.22)}
+  html.dark .panacea-home,.dark .panacea-home{--pmd-calm-border:rgba(255,255,255,.22)}
+}

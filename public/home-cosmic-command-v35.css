@@ -1,0 +1,176 @@
+/* Panacea Home Cosmic Command v35
+   Safe fresh-main salvage from the older v30 concept.
+
+   Scope is intentionally presentation-only and deliberately excludes:
+   - page/backdrop replacement (home-visual-v25 remains authoritative)
+   - Living Instrument/widget surface overrides (home-widget-dark-v31/v33 remains authoritative)
+   - loading/fallback semantics
+   - health meaning, routes, stores, timers, observers, canvas or WebGL
+*/
+
+.panacea-home {
+  --command-green: #00bf63;
+  --command-cyan: #21d4fd;
+  --command-blue: #3182ff;
+  --command-violet: #8b5cf6;
+  --command-magenta: #ed3f87;
+  --command-red: #ff4d57;
+  --command-gold: #ffb347;
+}
+
+/* Command-deck lighting. Keep the existing wallpaper and content structure. */
+.panacea-home .home-odyssey-hero {
+  border: 0 !important;
+  background:
+    radial-gradient(70% 95% at 95% 8%, rgba(49, 130, 255, .22), transparent 64%),
+    radial-gradient(64% 82% at 72% 92%, rgba(237, 63, 135, .16), transparent 70%),
+    radial-gradient(56% 74% at 12% 12%, rgba(0, 191, 99, .13), transparent 66%),
+    linear-gradient(145deg, rgba(250, 253, 255, .94), rgba(239, 245, 250, .82) 48%, rgba(248, 242, 249, .86)) !important;
+  box-shadow: 0 24px 70px rgba(25, 46, 92, .14) !important;
+}
+
+.dark .panacea-home .home-odyssey-hero {
+  background:
+    radial-gradient(78% 100% at 92% 10%, rgba(49, 130, 255, .22), transparent 63%),
+    radial-gradient(68% 88% at 70% 95%, rgba(237, 63, 135, .19), transparent 68%),
+    radial-gradient(54% 78% at 8% 10%, rgba(0, 191, 99, .16), transparent 66%),
+    linear-gradient(145deg, rgba(3, 7, 14, .98), rgba(7, 11, 22, .96) 52%, rgba(11, 5, 17, .96)) !important;
+  box-shadow: 0 30px 90px rgba(0, 0, 0, .42), 0 0 72px rgba(49, 130, 255, .08) !important;
+}
+
+.panacea-home .home-odyssey-hero::before {
+  content: '' !important;
+  display: block !important;
+  position: absolute;
+  inset: -18% -12%;
+  pointer-events: none;
+  background:
+    radial-gradient(ellipse at 66% 34%, rgba(33, 212, 253, .15) 0 8%, transparent 34%),
+    radial-gradient(ellipse at 82% 58%, rgba(139, 92, 246, .14) 0 9%, transparent 36%),
+    radial-gradient(ellipse at 58% 78%, rgba(255, 77, 87, .11) 0 8%, transparent 33%);
+  opacity: .94;
+  transform: translate3d(0, 0, 0) scale(1.02);
+  will-change: auto;
+}
+
+@keyframes pmd-command-aurora-v35 {
+  0%, 100% { transform: translate3d(0, 0, 0) scale(1.02); opacity: .90; }
+  50% { transform: translate3d(-1.2%, 1.2%, 0) scale(1.045); opacity: 1; }
+}
+
+html:not(.pmd-low-memory) .panacea-home .home-odyssey-hero::before {
+  animation: pmd-command-aurora-v35 18s ease-in-out infinite;
+  will-change: transform, opacity;
+}
+
+/* Orbit remains a decorative identity motif, never a status signal. */
+.panacea-home .home-orbit-core { opacity: .92 !important; filter: saturate(1.1); }
+.dark .panacea-home .home-orbit-core { opacity: .78 !important; }
+.panacea-home .home-orbit-core::before {
+  border-color: rgba(49, 130, 255, .34) !important;
+  box-shadow: 0 0 56px rgba(49, 130, 255, .10) !important;
+}
+.panacea-home .home-orbit-core::after {
+  border-color: rgba(255, 77, 87, .28) !important;
+  box-shadow: 0 0 50px rgba(237, 63, 135, .10) !important;
+}
+
+/* Existing actions keep their labels, routes and semantics. */
+.dark .panacea-home .home-odyssey-kicker {
+  background: rgba(7, 16, 29, .72) !important;
+  color: #d8e6f7 !important;
+}
+.dark .panacea-home .home-odyssey-copy { color: #c4cfdf !important; }
+.dark .panacea-home .home-primary-action {
+  background: linear-gradient(105deg, #007aee 0%, #4f46e5 36%, #b832d8 65%, #ff4d57 84%, #ff9a3d 100%) !important;
+  box-shadow: 0 14px 34px rgba(79, 70, 229, .24), 0 0 24px rgba(237, 63, 135, .12) !important;
+}
+.dark .panacea-home .home-secondary-action {
+  background: rgba(7, 13, 24, .82) !important;
+  color: #edf5ff !important;
+  border: 0 !important;
+}
+
+/* Health signal content is untouched; only its card illumination changes. */
+.panacea-home .home-signal-card { border: 0 !important; }
+.dark .panacea-home .home-signal-card {
+  background:
+    radial-gradient(circle at 82% 18%, rgba(49, 130, 255, .11), transparent 38%),
+    linear-gradient(155deg, rgba(8, 14, 25, .96), rgba(3, 7, 14, .94)) !important;
+  color: #f8fbff !important;
+  box-shadow: 0 18px 42px rgba(0, 0, 0, .26) !important;
+}
+
+/* Utility deck: color is decorative, never a health judgement. */
+.panacea-home .home-action-card {
+  position: relative;
+  overflow: hidden;
+  border: 0 !important;
+  isolation: isolate;
+}
+.dark .panacea-home .home-action-card {
+  background: linear-gradient(145deg, rgba(8, 14, 25, .96), rgba(3, 7, 14, .95)) !important;
+  box-shadow: 0 14px 32px rgba(0, 0, 0, .22) !important;
+}
+.panacea-home .home-action-card::before {
+  content: '';
+  position: absolute;
+  z-index: -1;
+  width: 120px;
+  height: 120px;
+  right: -52px;
+  top: -62px;
+  border-radius: 999px;
+  background: radial-gradient(circle, var(--tool-glow, rgba(49, 130, 255, .20)), transparent 68%);
+  pointer-events: none;
+}
+.panacea-home .home-action-card:nth-child(1) { --tool-glow: rgba(0, 191, 99, .30); }
+.panacea-home .home-action-card:nth-child(2) { --tool-glow: rgba(255, 179, 71, .32); }
+.panacea-home .home-action-card:nth-child(3) { --tool-glow: rgba(139, 92, 246, .32); }
+.panacea-home .home-action-card:nth-child(4) { --tool-glow: rgba(255, 77, 87, .30); }
+.panacea-home .home-action-card:nth-child(5) { --tool-glow: rgba(49, 130, 255, .30); }
+.panacea-home .home-action-card:nth-child(6) { --tool-glow: rgba(33, 212, 253, .30); }
+.panacea-home .home-action-card:nth-child(7) { --tool-glow: rgba(0, 217, 139, .28); }
+.panacea-home .home-action-card:nth-child(8) { --tool-glow: rgba(237, 63, 135, .30); }
+.panacea-home .home-action-card:nth-child(9) { --tool-glow: rgba(42, 164, 255, .30); }
+.panacea-home .home-action-card:nth-child(10) { --tool-glow: rgba(255, 91, 65, .30); }
+.panacea-home .home-action-card:nth-child(11) { --tool-glow: rgba(114, 82, 255, .34); }
+.panacea-home .home-action-card:nth-child(12) { --tool-glow: rgba(255, 140, 53, .32); }
+.dark .panacea-home .home-action-card > span:nth-child(2) > span:first-child { color: #f7fbff !important; }
+.dark .panacea-home .home-action-card > span:nth-child(2) > span:nth-child(2) { color: #aebbd0 !important; }
+
+.dark .panacea-home #daily-tools-title,
+.dark .panacea-home #my-dashboard-title,
+.dark .panacea-home .home-details-summary > div > div:nth-child(2) { color: #f8fbff !important; }
+.dark .panacea-home .home-command-panel > div:first-child > div:first-child > div:first-child,
+.dark .panacea-home .home-details-summary > div > div:first-child { color: #91a5bf !important; }
+.panacea-home #daily-tools-title,
+.panacea-home #my-dashboard-title { font-weight: 900 !important; }
+
+@media (max-width: 430px) {
+  .panacea-home .home-odyssey-hero { min-height: 360px !important; }
+  .panacea-home .home-orbit-core { right: -104px !important; top: 104px !important; opacity: .52 !important; }
+  .dark .panacea-home .home-action-card { min-height: 82px !important; }
+}
+
+html.pmd-low-memory .panacea-home .home-odyssey-hero,
+html.pmd-low-memory .panacea-home .home-action-card,
+html.pmd-low-memory .panacea-home .home-signal-card {
+  box-shadow: none !important;
+  filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
+}
+html.pmd-low-memory .panacea-home .home-odyssey-hero::before,
+html.pmd-low-memory .panacea-home .home-orbit-core .satellite {
+  animation: none !important;
+  will-change: auto !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .panacea-home .home-odyssey-hero::before,
+  .panacea-home .home-orbit-core .satellite {
+    animation: none !important;
+    will-change: auto !important;
+  }
+}

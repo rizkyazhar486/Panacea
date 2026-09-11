@@ -30,18 +30,26 @@ export interface Sebaran {
 }
 
 export function sebaranIntensitas(sesi: ImportedWorkout[], hrMax: number): Sebaran | null {
-  if (!(hrMax > 0)) return null
+  if (!Number.isFinite(hrMax) || !(hrMax > 0)) return null
   const m: [number, number, number] = [0, 0, 0]
   let titik = 0
   let dipakai = 0
   for (const w of sesi) {
-    if (!w.hr?.length) continue
-    dipakai += 1
+    if (!Array.isArray(w.hr) || !w.hr.length) continue
+    let titikSesi = 0
     for (const p of w.hr) {
+      // Data impor normal sudah dibersihkan oleh workoutImport, tetapi sesi yang
+      // dipulihkan dari cache/runtime JSON tidak mendapat perlindungan TypeScript.
+      // Titik rusak tidak boleh diam-diam masuk zona keras karena perbandingan
+      // dengan NaN selalu false, dan juga tidak boleh membantu memenuhi ambang
+      // minimum 30 menit data yang benar-benar terekam.
+      if (!p || !Number.isFinite(p.t) || p.t < 0 || !Number.isFinite(p.bpm) || p.bpm <= 0) continue
       const pct = p.bpm / hrMax
       m[pct < 0.8 ? 0 : pct < 0.87 ? 1 : 2] += 1
       titik += 1
+      titikSesi += 1
     }
+    if (titikSesi > 0) dipakai += 1
   }
   // Deret impor bercatat per menit; di bawah 30 menit terekam, persentasenya
   // lebih menggambarkan sesi mana yang kebetulan memakai jam tangan.
@@ -72,14 +80,22 @@ export interface Hanyutan {
 }
 
 export function hanyutanDenyut(sesi: ImportedWorkout[], minMenit = 45): Hanyutan[] {
+  if (!Number.isFinite(minMenit) || minMenit < 2) return []
   const out: Hanyutan[] = []
   for (const w of sesi) {
-    if (!w.hr || w.hr.length < minMenit) continue
-    const tengah = Math.floor(w.hr.length / 2)
+    if (!Array.isArray(w.hr) || !w.hr.length) continue
+    const hrValid = w.hr.filter((p) =>
+      Boolean(p) && Number.isFinite(p.t) && p.t >= 0 && Number.isFinite(p.bpm) && p.bpm > 0,
+    )
+    // Runtime/cache JSON can bypass TypeScript. Invalid samples must not poison
+    // either half's mean or help a session satisfy the minimum recorded-data
+    // threshold used as evidence for drift.
+    if (hrValid.length < minMenit) continue
+    const tengah = Math.floor(hrValid.length / 2)
     const rata = (a: { bpm: number }[]) => a.reduce((s, p) => s + p.bpm, 0) / a.length
-    const awal = rata(w.hr.slice(0, tengah))
-    const akhir = rata(w.hr.slice(tengah))
-    if (!(awal > 0)) continue
+    const awal = rata(hrValid.slice(0, tengah))
+    const akhir = rata(hrValid.slice(tengah))
+    if (!(awal > 0) || !Number.isFinite(awal) || !Number.isFinite(akhir)) continue
     out.push({
       tanggal: w.mulai.slice(0, 10),
       nama: w.nama,

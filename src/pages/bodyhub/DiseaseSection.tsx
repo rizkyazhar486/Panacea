@@ -34,10 +34,11 @@ export function DiseaseSection({ onPickDiagnosis }: Props) {
 
   return (
     <div className="space-y-2.5">
-      <form onSubmit={(e) => { e.preventDefault(); cari() }} className="flex gap-2">
+      <form aria-busy={loading} onSubmit={(e) => { e.preventDefault(); cari() }} className="flex gap-2">
         <input
           value={q}
           onChange={(e) => setQ(e.target.value)}
+          aria-label="Search diagnosis or classification code"
           placeholder="Search a diagnosis or code…"
           className="h-11 min-w-0 flex-1 rounded-xl border border-neutral-200 bg-white px-3 text-sm text-ink outline-none focus:border-brand dark:border-white/10 dark:bg-white/5 dark:text-white"
         />
@@ -51,7 +52,7 @@ export function DiseaseSection({ onPickDiagnosis }: Props) {
       </form>
 
       {sudahCari && !loading && results.length === 0 && (
-        <p className="text-sm text-neutral-500">No matching diagnosis found.</p>
+        <p role="status" className="text-sm text-neutral-500">No matching diagnosis found.</p>
       )}
 
       {results.length > 0 && (
@@ -72,6 +73,7 @@ export function DiseaseSection({ onPickDiagnosis }: Props) {
             {results.map((r) => (
               <li key={`${r.sumber}-${r.code}-${r.title}`}>
                 <button
+                  type="button"
                   onClick={() => onPickDiagnosis(r.title)}
                   className="w-full rounded-xl bg-neutral-50 p-2.5 text-left dark:bg-white/5"
                 >

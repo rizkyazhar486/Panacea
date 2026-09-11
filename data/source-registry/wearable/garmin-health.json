@@ -1,0 +1,52 @@
+{
+  "id": "garmin_connect_health_api",
+  "name": "Garmin Connect Health API",
+  "category": "wearable",
+  "kind": ["api"],
+  "homepage": "https://developer.garmin.com/gc-developer-program/health-api/",
+  "repository": null,
+  "features": ["garmin", "steps", "intensity-minutes", "sleep", "calories", "heart-rate", "stress", "pulse-ox", "body-battery", "body-composition", "respiration", "blood-pressure", "all-day-health", "wearable-sync"],
+  "formats": ["json", "http-rest", "oauth2"],
+  "usage": {
+    "runtime": true,
+    "buildTime": false,
+    "networkRequired": true,
+    "notes": "Use the Garmin Connect Health API as a cloud-to-cloud source for all-day health summaries uploaded by supported Garmin devices to Garmin Connect. Do not confuse it with the Garmin Activity API for detailed activity/FIT data or the Garmin Health SDK for direct/real-time device access. Request only the feeds required by enabled Panacea features and prefer Garmin's push or ping/pull synchronization patterns over independent polling by individual widgets. Keep credentials and token exchange server-side; never embed secrets or long-lived tokens in the Vite bundle or browser storage."
+  },
+  "license": {
+    "status": "CHECK_REQUIRED",
+    "identifier": "Garmin Connect Developer Program terms and API Brand Guidelines",
+    "commercialUse": "CONDITIONAL",
+    "attributionRequired": true,
+    "shareAlike": null,
+    "scope": "Garmin Connect Developer Program access is contractual rather than open-data licensed and requires user consent, developer/program approval and compliance with applicable Garmin terms. The public Health API page states that commercial use requires a license fee payment; final commercial rights, fees, redistribution permissions, retention rules and sublicensing obligations must be confirmed under the agreement applicable to Panacea before production. Garmin device-sourced data must retain Garmin attribution in accordance with current API Brand Guidelines.",
+    "verificationUrl": "https://developer.garmin.com/gc-developer-program/health-api/",
+    "verifiedAt": "2026-09-08",
+    "notes": "Re-check Garmin Connect Developer Program terms, production approval, licensing/fees, privacy/security requirements and brand guidelines before release. Registry approval is not contractual permission. Do not imply Garmin endorsement of Panacea, third-party data, clinical interpretations or derived models."
+  },
+  "validation": {
+    "level": "REFERENCE",
+    "clinicalDecisionUse": "CONTEXT_ONLY",
+    "notes": "Garmin Health API provides device/provider-recorded measurements and provider-derived wellness metrics. Preserve the distinction between measurements such as heart rate or steps and Garmin-derived values such as Body Battery or stress-related metrics. These values can provide longitudinal context but are not diagnoses, direct causal physiology measurements or treatment recommendations. Device availability, algorithms, sampling conditions and firmware can affect values; missing data must remain missing rather than being fabricated or silently imputed."
+  },
+  "provenance": {
+    "authority": "Garmin Ltd. / Garmin Connect",
+    "sourceIdentityRequired": true,
+    "versionPinRequired": true,
+    "notes": "Persist Garmin API family/version or contract revision, feed/summary type, Garmin user/provider object identifiers when permitted, source timestamps and timezone/offset data, units, device model when supplied, retrieval timestamp and Panacea adapter version. Preserve whether a normalized value is a providerMeasurement or providerDerivedMetric. Garmin API Brand Guidelines require visible 'Garmin [device model]' attribution on primary and secondary displays using Garmin device-sourced data; if device model is unavailable, identify Garmin as the source. Attribution must also survive exports, reports, screenshots, APIs/webhooks and materially derived analytics or AI outputs influenced by Garmin device-sourced data."
+  },
+  "adapter": {
+    "status": "PLANNED",
+    "normalizedTarget": "PanaceaWearableObservation",
+    "module": null,
+    "notes": "Planned flow: Garmin Connect user authorization/consent -> server-side credential/token handling -> subscribe only to needed Health API feeds -> push or ping/pull ingestion -> deduplicate by provider identity/timestamp -> source-aware normalization -> PanaceaWearableObservation. Propagate Garmin attribution metadata with every normalized record so UI, exports and downstream derived analytics can comply without reconstructing source identity later. Handle revocation, retries, duplicate deliveries, delayed sync and data deletion explicitly. Detailed activities/FIT files and direct real-time device streaming belong in separate Garmin Activity API and Garmin Health SDK adapters, not this module."
+  },
+  "trust": {
+    "authority": 5,
+    "evidenceQuality": 2,
+    "recency": 5,
+    "licenseClarity": 3,
+    "reproducibility": 3,
+    "notes": "High-authority source for Garmin Connect health records originating from supported Garmin devices. Evidence quality and reproducibility are conservative because consumer wearable measurements and proprietary wellness algorithms are not interchangeable with validated clinical measurements and may vary by device, firmware, acquisition context and algorithm version. Commercial/data rights remain conditional on current Garmin program terms."
+  }
+}

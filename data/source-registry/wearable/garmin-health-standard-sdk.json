@@ -1,0 +1,52 @@
+{
+  "id": "garmin_health_standard_sdk",
+  "name": "Garmin Health Standard SDK",
+  "category": "wearable",
+  "kind": ["framework"],
+  "homepage": "https://developer.garmin.com/health-sdk/overview/",
+  "repository": null,
+  "features": ["garmin", "direct-device", "device-control", "all-day-metrics", "real-time-streaming", "custom-data-logging", "ble", "heart-rate", "enhanced-beat-to-beat-intervals", "accelerometer", "gyroscope", "actigraphy", "pulse-ox", "respiration", "stress", "body-battery", "sleep", "health-snapshot", "fitness-activity-details", "single-app-experience"],
+  "formats": ["android-sdk", "ios-sdk", "bluetooth-low-energy"],
+  "usage": {
+    "runtime": true,
+    "buildTime": true,
+    "networkRequired": false,
+    "notes": "Enterprise-only native Android/iOS SDK for direct Garmin wearable integration. Garmin describes the Standard SDK as a single-app path that can access health/fitness data directly, configure supported device features and operate without Garmin Connect or Garmin servers. This is therefore not interchangeable with Garmin Health API or Companion SDK data. Panacea's Vite web client cannot host the SDK directly; implementation requires an approved native application/bridge. Never claim Standard-SDK device control from the browser and never silently fall back to cloud data while labeling it as direct-device data."
+  },
+  "license": {
+    "status": "CHECK_REQUIRED",
+    "identifier": "Garmin Health SDK commercial agreement",
+    "commercialUse": "CONDITIONAL",
+    "attributionRequired": null,
+    "shareAlike": null,
+    "scope": "Garmin Health SDK access is available to approved enterprise partners. Evaluation is free, while commercial use requires a license fee or minimum device order quantity commitment according to Garmin's current public FAQ. SDK binaries, documentation, supported-device rights, branding, distribution, privacy and device-provisioning obligations are governed by Garmin's commercial agreement rather than an open-source license.",
+    "verificationUrl": "https://developer.garmin.com/health-sdk/questions-answers/",
+    "verifiedAt": "2026-09-08",
+    "notes": "Do not commit Garmin SDK binaries, confidential program material, license files, credentials or private documentation to Panacea's public repository. Re-check the executed Garmin Health agreement, supported-device matrix and branding/privacy obligations before any production or clinical deployment."
+  },
+  "validation": {
+    "level": "REFERENCE",
+    "clinicalDecisionUse": "REQUIRES_SEPARATE_VALIDATION",
+    "notes": "Direct access and device control do not make Garmin wearable measurements diagnostic. Any clinical-support use must validate the specific device model, firmware, metric, sampling configuration, intended population and workflow independently. Panacea must distinguish raw/provider-reported measurements, provider-derived metrics and Panacea-derived interpretations, preserve missing/quality states, and avoid inferring uninterrupted measurement across disconnects or configuration changes."
+  },
+  "provenance": {
+    "authority": "Garmin Ltd. / Garmin Health",
+    "sourceIdentityRequired": true,
+    "versionPinRequired": true,
+    "notes": "Persist Garmin Health Standard SDK version, native platform version, device model and firmware when available, device configuration profile/version, enabled logging/stream settings, metric/stream type, unit, sampling cadence, source timestamp and receipt timestamp, connection/session boundary, quality/status flags and Panacea native-bridge version. Configuration is part of measurement provenance: when a logging interval, enabled sensor or device feature changes, record the change boundary instead of treating measurements before and after as identical. Treat stable device identifiers as sensitive and pseudonymize where feasible."
+  },
+  "adapter": {
+    "status": "PLANNED",
+    "normalizedTarget": "PanaceaWearableObservation",
+    "module": null,
+    "notes": "Planned data flow: approved Standard SDK inside a native Android/iOS layer -> explicit enrollment/pairing and consent -> versioned device configuration -> direct BLE logged/live data -> native validation -> source-aware normalization -> privacy-minimized bridge message -> PanaceaWearableObservation. Device-control writes must use a separate auditable command path with an immutable requested configuration, actor, reason, target device, prior configuration, user/admin approval when applicable, provider response and effective timestamp. Generic AI/chat output must never directly execute device-control commands. Require explicit deterministic authorization after any AI suggestion, use idempotent command identifiers, verify post-command device state when supported, and fail closed on ambiguous device identity, unsupported firmware, lost connection or stale approval."
+  },
+  "trust": {
+    "authority": 5,
+    "evidenceQuality": 2,
+    "recency": 5,
+    "licenseClarity": 3,
+    "reproducibility": 3,
+    "notes": "High-authority first-party interface for supported Garmin wearables. Evidence quality remains conservative because consumer-wearable measurements and provider algorithms are not automatically clinical-grade, while reproducibility depends on device model, firmware, SDK version and active logging configuration."
+  }
+}

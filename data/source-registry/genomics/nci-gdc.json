@@ -1,0 +1,52 @@
+{
+  "id": "nci_genomic_data_commons",
+  "name": "NCI Genomic Data Commons",
+  "category": "genomics",
+  "kind": ["api", "dataset"],
+  "homepage": "https://gdc.cancer.gov/",
+  "repository": null,
+  "features": ["cancer-genomics", "harmonized-genomics", "projects", "cases", "biospecimens", "somatic-variants", "rna-seq", "clinical-metadata", "genomic-files", "research-cohorts"],
+  "formats": ["json", "http-rest", "vcf", "maf", "bam", "tsv", "manifest"],
+  "usage": {
+    "runtime": true,
+    "buildTime": true,
+    "networkRequired": true,
+    "notes": "Use GDC open metadata/data for targeted cancer-genomics research and reproducible curated snapshots. Treat controlled-access files as a separate protected data class requiring explicit dbGaP/eRA authorization and purpose-limited handling. Do not bulk-fetch genomic files into the browser. Large files should be handled by authorized server-side workflows or approved research pipelines; the web UI should receive only the minimum normalized metadata/results needed for the current feature."
+  },
+  "license": {
+    "status": "CHECK_REQUIRED",
+    "identifier": "NIH/NCI GDC data access policies and source-program terms",
+    "commercialUse": "CONDITIONAL",
+    "attributionRequired": true,
+    "shareAlike": null,
+    "scope": "GDC contains both open-access and controlled-access data. Controlled access is determined by participant consent and program data-access policies and requires appropriate dbGaP authorization/eRA authentication. Study/program-specific publication, redistribution and acknowledgement requirements can also apply. Review the exact project/file access class and governing policy before commercial or production reuse.",
+    "verificationUrl": "https://gdc.cancer.gov/access-data/data-access-processes-and-tools",
+    "verifiedAt": "2026-09-08",
+    "notes": "Access permission is not a content license and must not be broadened by Panacea. Preserve program/project attribution and any source-study acknowledgements. Do not redistribute controlled data or derived information beyond the user's approved research purpose and authorization."
+  },
+  "validation": {
+    "level": "RESEARCH",
+    "clinicalDecisionUse": "CONTEXT_ONLY",
+    "notes": "GDC provides harmonized and curated cancer research data but is not a direct patient-care diagnostic service. Cohort data, genomic pipelines and clinical metadata may be valuable for research/education, yet individual treatment decisions require separately validated clinical assays, pathology context and clinical evidence."
+  },
+  "provenance": {
+    "authority": "National Cancer Institute / Genomic Data Commons",
+    "sourceIdentityRequired": true,
+    "versionPinRequired": true,
+    "notes": "Persist GDC API/status version, project/program IDs, entity UUIDs, case/sample/aliquot identifiers as supplied by GDC, data category/type, experimental strategy, workflow/pipeline metadata, reference genome/assembly where relevant, file UUID/name/format/size/checksum, open-versus-controlled access class, release/retrieval date and Panacea adapter version. Derived analyses must retain the exact source file/entity UUIDs and processing versions."
+  },
+  "adapter": {
+    "status": "PLANNED",
+    "normalizedTarget": "PanaceaCancerGenomicDataset",
+    "module": null,
+    "notes": "Planned flow for open data: explicit project/cohort query -> GDC API metadata search -> validate UUIDs/access class -> retrieve only required open records/files -> normalize metadata and research observations to PanaceaCancerGenomicDataset. Controlled-data flow must be implemented separately behind server-side authorization, encrypted storage, audit logging and purpose checks; never place GDC authentication tokens in browser code, localStorage, URLs or logs. Token-bearing requests must fail closed on authorization mismatch or expired access."
+  },
+  "trust": {
+    "authority": 5,
+    "evidenceQuality": 5,
+    "recency": 5,
+    "licenseClarity": 3,
+    "reproducibility": 5,
+    "notes": "Highly authoritative NCI cancer-genomics resource with stable UUIDs, documented harmonization pipelines and strong reproducibility when source files/workflows are pinned. Access/redistribution rights vary by project and open-versus-controlled status, so rights cannot be represented by one permissive blanket license."
+  }
+}

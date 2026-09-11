@@ -2,6 +2,8 @@
 // height used across the fitness calculators so users enter it ONCE and pages
 // stop shipping any one person's numbers as defaults. Stored locally per device.
 
+import { publishDataUpdate, type DataDomain } from './dataSync'
+
 export interface Demo {
   age: number; sex: 'M' | 'F'; weightKg: number; heightCm: number
   // Optional biometrics mirrored from the Health Profile so calculators prefill.
@@ -24,16 +26,42 @@ export function getDemoTersimpan(): Partial<Demo> {
 }
 
 // Broadcast that health/demographic data changed so any mounted page can
-// re-sync immediately (not just on window focus). Pages listen for
-// 'panacea:health-updated' alongside their focus handler.
-export function broadcastHealthUpdate(): void {
-  try { window.dispatchEvent(new Event('panacea:health-updated')) } catch { /* ignore */ }
+// re-sync immediately (not just on window focus). The legacy event is emitted
+// inside publishDataUpdate, so existing consumers keep working while newer
+// pages can subscribe to typed domains and cross-tab BroadcastChannel updates.
+export function broadcastHealthUpdate(domains: DataDomain[] = ['health'], source = 'health'): void {
+  publishDataUpdate(domains, source)
 }
 
 export function setDemo(patch: Partial<Demo>): Demo {
   const next = { ...getDemo(), ...patch }
   try { localStorage.setItem(KEY, JSON.stringify(next)) } catch { /* ignore */ }
-  broadcastHealthUpdate()
+  broadcastHealthUpdate(['profile'], 'profile')
+  return next
+}
+
+/**
+ * Merge ONLY values that truly exist into the persisted profile.
+ *
+ * This is intentionally different from setDemo(): getDemo() contains neutral
+ * calculator defaults. Using it during device sync would persist age 30,
+ * weight 70 and height 170 as if the user/device had actually supplied them.
+ */
+export function mergeDemoStored(patch: Partial<Demo>, source = 'profile-sync'): Partial<Demo> {
+  const clean: Partial<Demo> = {}
+  for (const [key, value] of Object.entries(patch) as [keyof Demo, Demo[keyof Demo]][]) {
+    if (key === 'sex') {
+      if (value === 'M' || value === 'F') clean.sex = value
+      continue
+    }
+    if (typeof value === 'number' && Number.isFinite(value) && value > 0) {
+      ;(clean as Record<string, unknown>)[key] = value
+    }
+  }
+  if (!Object.keys(clean).length) return getDemoTersimpan()
+  const next = { ...getDemoTersimpan(), ...clean }
+  try { localStorage.setItem(KEY, JSON.stringify(next)) } catch { /* ignore */ }
+  broadcastHealthUpdate(['profile'], source)
   return next
 }
 
@@ -61,7 +89,7 @@ export function pushBiometrics(patch: { vo2max?: number; restingHr?: number; hrv
   const clean = Object.fromEntries(Object.entries(patch).filter(([, v]) => typeof v === 'number' && v > 0))
   if (!Object.keys(clean).length) return
   try { localStorage.setItem(HP_KEY, JSON.stringify({ ...getHealthCache(), ...clean })) } catch { /* ignore */ }
-  setDemo(clean as Partial<Demo>)
+  mergeDemoStored(clean as Partial<Demo>, 'biometric-edit')
 }
 
 /**
@@ -80,5 +108,5 @@ export function mergeHealthCache(patch: Record<string, unknown>): void {
   }
   if (!Object.keys(clean).length) return
   try { localStorage.setItem(HP_KEY, JSON.stringify({ ...getHealthCache(), ...clean })) } catch { /* kuota */ }
-  broadcastHealthUpdate()
+  broadcastHealthUpdate(['health', 'profile'], 'health-cache')
 }

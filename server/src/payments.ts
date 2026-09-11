@@ -3,7 +3,8 @@ import crypto from 'node:crypto'
 // midtrans-client is CommonJS
 import midtransClient from 'midtrans-client'
 import { config, features } from './config.js'
-import { credit, createOrder, getOrder, setOrderStatus, getUser, saveSettings, isEarlyAdopter, EARLY_ADOPTER_DISCOUNT, CLINICAL_CALC_PRICE_IDR, uid, type User } from './store.js'
+import { currentUser } from './auth.js'
+import { credit, createOrder, getOrder, setOrderStatus, getUser, saveSettings, isEarlyAdopter, EARLY_ADOPTER_DISCOUNT, CLINICAL_CALC_PRICE_IDR, uid, type Order, type User } from './store.js'
 import { notify } from './push.js'
 import { sendReceipt } from './email.js'
 
@@ -52,11 +53,30 @@ function channels(method: string): string[] {
   return ['credit_card'] // Visa / Mastercard
 }
 
+/**
+ * Preserve the existing integer-floor behavior for ordinary numeric top-ups,
+ * but fail closed before persistence when coercion produces a non-finite value
+ * or when the PNC/IDR multiplication would leave JavaScript's safe-integer
+ * range. Fixed-price purchases bypass this helper because their IDR amount is
+ * server-owned.
+ */
+export function normalizeTopUpPnc(value: unknown, tokenToIdr: number): number | undefined {
+  const numeric = Number(value)
+  if (!Number.isFinite(numeric) || numeric < 1) return undefined
+  const pnc = Math.floor(numeric)
+  if (!Number.isSafeInteger(pnc)) return undefined
+  if (!Number.isFinite(tokenToIdr) || tokenToIdr <= 0) return undefined
+  if (!Number.isSafeInteger(pnc * tokenToIdr)) return undefined
+  return pnc
+}
+
 export async function createPayment(req: Request, res: Response) {
   const user = (req as Request & { user: User }).user
   const { amountPnc, method, purpose } = req.body as { amountPnc?: number; method?: string; purpose?: string }
   const isFixed = !!purpose && purpose in FIXED_PRICE
-  const pnc = isFixed ? 0 : Math.max(1, Math.floor(Number(amountPnc) || 0))
+  const normalizedPnc = isFixed ? 0 : normalizeTopUpPnc(amountPnc, config.tokenToIdr)
+  if (normalizedPnc === undefined) return res.status(400).json({ error: 'invalid_amount' })
+  const pnc = normalizedPnc
   const baseIdr = isFixed ? FIXED_PRICE[purpose!] : pnc * config.tokenToIdr
   // Early-adopter promo: first 25 emails get 75% off everything (PNC still full).
   const early = isEarlyAdopter(user.id)
@@ -103,33 +123,110 @@ export function confirmPayment(req: Request, res: Response) {
   res.json({ ok: true, status: 'paid' })
 }
 
-// Real Midtrans webhook (HTTP notification). Verifies signature, credits wallet.
-export function paymentWebhook(req: Request, res: Response) {
-  const body = req.body as Record<string, string>
-  const { order_id, status_code, gross_amount, signature_key, transaction_status } = body
-  if (!order_id) return res.status(400).json({ error: 'bad_request' })
+type PaymentNotificationOrder = Pick<Order, 'amountIdr' | 'status'>
+export type PaymentNotificationDecision =
+  | { action: 'fulfill' }
+  | { action: 'fail' }
+  | { action: 'ignore' }
+  | { action: 'reject'; status: 400 | 409; error: 'invalid_status_code' | 'amount_mismatch' | 'fraud_not_accepted' }
+
+/**
+ * Pure webhook-state gate. Signature verification happens separately in the
+ * HTTP handler; this function checks whether an authenticated notification is
+ * actually safe to fulfill against the order Panacea created.
+ *
+ * Midtrans documents successful delivery as transaction_status settlement (or
+ * capture for card), status_code 200, and fraud_status=accept when the field is
+ * present. We additionally require the signed gross_amount to match the local
+ * order amount, and never downgrade an already-paid order when delayed failure
+ * notifications arrive out of order.
+ */
+export function evaluatePaymentNotification(
+  body: Record<string, string>,
+  order: PaymentNotificationOrder,
+): PaymentNotificationDecision {
+  const transactionStatus = String(body.transaction_status ?? '').trim().toLowerCase()
+  const success = transactionStatus === 'settlement' || transactionStatus === 'capture'
+
+  if (success) {
+    if (String(body.status_code ?? '').trim() !== '200') {
+      return { action: 'reject', status: 409, error: 'invalid_status_code' }
+    }
+
+    const grossAmount = Number(body.gross_amount)
+    if (!Number.isFinite(grossAmount) || Math.abs(grossAmount - order.amountIdr) > 0.005) {
+      return { action: 'reject', status: 409, error: 'amount_mismatch' }
+    }
+
+    const fraudStatus = String(body.fraud_status ?? '').trim().toLowerCase()
+    if (fraudStatus && fraudStatus !== 'accept') {
+      return { action: 'reject', status: 409, error: 'fraud_not_accepted' }
+    }
+
+    if (order.status === 'paid') return { action: 'ignore' }
+    return { action: 'fulfill' }
+  }
+
+  if (['deny', 'cancel', 'expire'].includes(transactionStatus)) {
+    // Midtrans notes notifications can arrive out of order. A delayed failure
+    // event must never roll a fulfilled order back to failed.
+    if (order.status === 'paid') return { action: 'ignore' }
+    return { action: 'fail' }
+  }
+
+  return { action: 'ignore' }
+}
+
+/**
+ * Verify Midtrans' documented SHA-512 notification signature without a
+ * data-dependent string comparison. Invalid/malformed signatures fail closed
+ * before timingSafeEqual, which requires equal-length buffers.
+ */
+export function verifyPaymentSignature(body: Record<string, string>, serverKey: string): boolean {
+  const provided = String(body.signature_key ?? '').trim()
+  if (!/^[0-9a-f]{128}$/i.test(provided)) return false
+
   const expected = crypto
     .createHash('sha512')
-    .update(order_id + status_code + gross_amount + config.midtrans.serverKey)
-    .digest('hex')
-  if (signature_key !== expected) return res.status(403).json({ error: 'bad_signature' })
+    .update(String(body.order_id ?? '') + String(body.status_code ?? '') + String(body.gross_amount ?? '') + serverKey)
+    .digest()
+  const received = Buffer.from(provided, 'hex')
+  return received.length === expected.length && crypto.timingSafeEqual(received, expected)
+}
+
+// Real Midtrans webhook (HTTP notification). Verifies signature and only then
+// applies a state transition that is safe for the matching local order.
+export function paymentWebhook(req: Request, res: Response) {
+  const body = req.body as Record<string, string>
+  const { order_id } = body
+  if (!order_id) return res.status(400).json({ error: 'bad_request' })
+  if (!verifyPaymentSignature(body, config.midtrans.serverKey)) return res.status(403).json({ error: 'bad_signature' })
 
   const order = getOrder(order_id)
   if (!order) return res.status(404).json({ error: 'order_not_found' })
 
-  if (transaction_status === 'settlement' || transaction_status === 'capture') {
-    if (order.status !== 'paid') {
-      setOrderStatus(order.id, 'paid')
-      fulfillOrder(order)
-    }
-  } else if (['deny', 'cancel', 'expire'].includes(transaction_status)) {
+  const decision = evaluatePaymentNotification(body, order)
+  if (decision.action === 'reject') {
+    return res.status(decision.status).json({ error: decision.error })
+  }
+  if (decision.action === 'fulfill') {
+    setOrderStatus(order.id, 'paid')
+    fulfillOrder(order)
+  } else if (decision.action === 'fail') {
     setOrderStatus(order.id, 'failed')
   }
   res.json({ ok: true })
 }
 
+export function visibleOrderStatus(order: Pick<Order, 'userId' | 'status'> | undefined, requesterUserId: string): Order['status'] | undefined {
+  if (!order || order.userId !== requesterUserId) return undefined
+  return order.status
+}
+
 export function orderStatus(req: Request, res: Response) {
-  const order = getOrder(req.params.orderId)
-  if (!order) return res.status(404).json({ error: 'order_not_found' })
-  res.json({ status: order.status })
+  const user = currentUser(req)
+  if (!user) return res.status(401).json({ error: 'unauthorized' })
+  const status = visibleOrderStatus(getOrder(req.params.orderId), user.id)
+  if (!status) return res.status(404).json({ error: 'order_not_found' })
+  res.json({ status })
 }

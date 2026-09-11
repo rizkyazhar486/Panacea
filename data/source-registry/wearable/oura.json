@@ -1,0 +1,52 @@
+{
+  "id": "oura_api_v2",
+  "name": "Oura API V2",
+  "category": "wearable",
+  "kind": ["api"],
+  "homepage": "https://cloud.ouraring.com/v2/docs",
+  "repository": null,
+  "features": ["oura", "sleep", "readiness", "activity", "heart-rate", "workout", "session", "spo2", "stress", "resilience", "cardiovascular-age", "wearable-sync"],
+  "formats": ["json", "http-rest", "oauth2"],
+  "usage": {
+    "runtime": true,
+    "buildTime": false,
+    "networkRequired": true,
+    "notes": "Use Oura API V2 only through a server-side OAuth/API adapter for deterministic Panacea application features. V2 is the current Oura API integration point; V1 is sunset. Do not expose client secrets or long-lived credentials in the Vite bundle or browser storage. Oura API-derived User Data/Oura Data must not be routed into an AI model, AI platform, prompt, embedding pipeline, evaluation set or training/fine-tuning workflow. The agreement effective 2026-06-08 prohibits API data from being used as AI input and prohibits training, fine-tuning, evaluation and persistent model representations. If a future Panacea feature legitimately needs Oura data in an LLM context, evaluate Oura's MCP Server path separately under the current agreement, user consent and legal review; do not repurpose the REST API path for AI use."
+  },
+  "license": {
+    "status": "CHECK_REQUIRED",
+    "identifier": "Oura API and MCP Agreement",
+    "commercialUse": "CONDITIONAL",
+    "attributionRequired": true,
+    "shareAlike": null,
+    "scope": "Oura API and MCP access is contractual rather than open-data licensed. The agreement effective 2026-06-08 defines authorized purposes, user-consent obligations, confidentiality/security duties, AI restrictions, redistribution limits, anti-aggregation restrictions, branding requirements and restrictions on charging users for access to Oura API/MCP/Oura Platform functionality. Panacea must not sell, redistribute or expose Oura User Data/Oura Data as a data product and must keep independent Panacea functionality legally and technically separable from access to Oura-provided functionality.",
+    "verificationUrl": "https://cloud.ouraring.com/legal/api-agreement",
+    "verifiedAt": "2026-09-08",
+    "notes": "Re-check the current agreement, privacy policy, branding guidelines, application approval requirements, retention/deletion duties and any product-specific restrictions before production. Agreement terms may change and take precedence over this registry summary. Do not use API-derived Oura data for AI/LLM input; where Oura permits LLM use for a non-aggregator, it is through the MCP Server path and remains separately governed."
+  },
+  "validation": {
+    "level": "REFERENCE",
+    "clinicalDecisionUse": "CONTEXT_ONLY",
+    "notes": "Oura exposes wearable measurements plus proprietary/provider-derived scores and insights. Panacea must preserve the distinction between direct/provider-reported observations and Oura-derived scores such as Readiness, Sleep or Activity-related scores. Do not present an Oura score as a diagnosis, causal physiological measurement or clinically validated treatment recommendation without independent evidence. Missing or delayed provider output must remain missing/delayed rather than being imputed as a score."
+  },
+  "provenance": {
+    "authority": "Ouraring, Inc.",
+    "sourceIdentityRequired": true,
+    "versionPinRequired": true,
+    "notes": "Persist API family/version, endpoint/object type, provider object ID, source timestamps and timezone information, units, contributors/data-origin fields when supplied, retrieval timestamp and Panacea adapter version. Mark normalized values as providerMeasurement or providerDerivedScore. Preserve Oura's object boundaries instead of flattening sleep/readiness/activity/workout records into one synthetic certainty score."
+  },
+  "adapter": {
+    "status": "PLANNED",
+    "normalizedTarget": "PanaceaWearableObservation",
+    "module": null,
+    "notes": "Planned REST flow: server-side OAuth 2.0 authorization-code exchange with CSRF state -> encrypted token storage -> least-privilege scopes -> incremental API V2 synchronization -> deterministic/source-aware normalization -> PanaceaWearableObservation. API-derived Oura User Data/Oura Data is explicitly excluded from Panacea AI/LLM/prompt/embedding/evaluation/training paths. Training, fine-tuning, evaluation datasets and persistent AI representations are not allowed. If an AI-assisted Oura feature is later proposed, implement it as a separate reviewed MCP integration rather than forwarding REST API payloads to an AI model. Enforce consent, retention/deletion, revocation and data-minimization rules; never log secrets or sensitive payloads. Fail closed when integration classification or permitted purpose is uncertain."
+  },
+  "trust": {
+    "authority": 5,
+    "evidenceQuality": 2,
+    "recency": 5,
+    "licenseClarity": 3,
+    "reproducibility": 3,
+    "notes": "High-authority source for Oura's own wearable records and scores. Evidence quality and reproducibility are conservative because device algorithms and proprietary scores are not equivalent to primary clinical measurements and may evolve. Data rights and AI/commercial use are tightly governed by current contractual terms and user consent."
+  }
+}
