@@ -17,6 +17,7 @@ import { Link } from 'react-router-dom'
 // Bagian berat dimuat saat dibuka saja — pengguna yang cuma memutar model 3D
 // tidak perlu ikut mengunduh tabel fisiologi dan pencarian obat.
 const HemodinamikPanel = lazy(() => import('./bodyhub/HemodinamikPanel').then((m) => ({ default: m.HemodinamikPanel })))
+const NefronPanel = lazy(() => import('./bodyhub/NefronPanel').then((m) => ({ default: m.NefronPanel })))
 const VentilasiSegmenPanel = lazy(() => import('./bodyhub/VentilasiSegmenPanel').then((m) => ({ default: m.VentilasiSegmenPanel })))
 const LokalisasiLesiPanel = lazy(() => import('./bodyhub/LokalisasiLesiPanel').then((m) => ({ default: m.LokalisasiLesiPanel })))
 const PhysiologySection = lazy(() => import('./bodyhub/PhysiologySection'))
@@ -90,7 +91,7 @@ function Chip({
 // sama-sama menyorot struktur pada figur yang itu-itu juga. Itulah maksud
 // "satu simulasi tubuh yang utuh" — bukan enam halaman yang saling menyebut,
 // melainkan satu tubuh yang ditanyai dari enam sudut.
-type PanelTab = 'hemodinamik' | 'ventilasi' | 'lokalisasi' | 'layers' | 'muscles' | 'workout-sim' | 'organs' | 'physiology' | 'simulator' | 'cardio' | 'spesialisasi' | 'molekul' | 'genomik' | 'sel' | 'bedah' | 'cari' | 'presisi' | 'mesin' | 'drugs' | 'diseases' | 'reference'
+type PanelTab = 'hemodinamik' | 'nefron' | 'ventilasi' | 'lokalisasi' | 'layers' | 'muscles' | 'workout-sim' | 'organs' | 'physiology' | 'simulator' | 'cardio' | 'spesialisasi' | 'molekul' | 'genomik' | 'sel' | 'bedah' | 'cari' | 'presisi' | 'mesin' | 'drugs' | 'diseases' | 'reference'
 
 const PANEL_TABS: Array<{ key: PanelTab; label: string }> = [
   { key: 'layers', label: 'Layers' },
@@ -102,6 +103,7 @@ const PANEL_TABS: Array<{ key: PanelTab; label: string }> = [
   { key: 'lokalisasi', label: 'Localise a lesion' },
   { key: 'ventilasi', label: 'Segmental ventilation' },
   { key: 'hemodinamik', label: 'Oxygen delivery' },
+  { key: 'nefron', label: 'Glomerular filtration' },
   { key: 'cardio', label: 'Cardio lab' },
   { key: 'spesialisasi', label: 'Specialty labs' },
   { key: 'molekul', label: 'Molecules' },
@@ -874,6 +876,12 @@ export function BodyExplorer() {
             {panelTab === 'hemodinamik' && (
               <Suspense fallback={<p className="text-sm text-neutral-500">Loading oxygen delivery…</p>}>
                 <HemodinamikPanel />
+              </Suspense>
+            )}
+
+            {panelTab === 'nefron' && (
+              <Suspense fallback={<p className="text-sm text-neutral-500">Loading glomerular filtration…</p>}>
+                <NefronPanel />
               </Suspense>
             )}
             {panelTab === 'ventilasi' && (
