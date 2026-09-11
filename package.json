@@ -21,11 +21,12 @@
     "periksa": "node scripts/periksaTeks.mjs",
     "periksa:semua": "node scripts/periksaTeks.mjs --semua",
     "uji": "node scripts/uji/jalankan.mjs",
+    "qa:share-card": "node scripts/qa/share-card-export-smoke.mjs",
     "cakupan": "node scripts/cakupanSkdi.mjs"
   },
   "dependencies": {
     "framer-motion": "^13.2.0",
-    "html2canvas": "^1.4.1",
+    "html2canvas-pro": "^2.4.2",
     "leaflet": "^1.9.4",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
