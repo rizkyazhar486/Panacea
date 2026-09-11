@@ -19,9 +19,9 @@ concurrency:
 
 jobs:
   # Keep the expensive browser/WebGL acceptance on one runner so the production
-  # build is reused by both Body smoke checks. `npm run build` already executes
-  # repository validators plus `tsc -b`, so a separate frontend `tsc --noEmit`
-  # only repeated the same type gate on every PR.
+  # build is reused by Home, Body and Panacea OS smoke checks. `npm run build`
+  # already executes repository validators plus `tsc -b`, so a separate frontend
+  # `tsc --noEmit` only repeated the same type gate on every PR.
   full-acceptance:
     runs-on: ubuntu-latest
     timeout-minutes: 40
@@ -72,6 +72,13 @@ jobs:
           cat /tmp/panacea-vite-preview.log
           exit 1
 
+      - name: Home Dark mobile 390x844 smoke
+        env:
+          HOME_DARK_QA_URL: http://127.0.0.1:4173/#/
+          HOME_DARK_QA_SCREENSHOT: artifacts/home-dark-mobile-390x844.png
+          HOME_DARK_QA_METRICS: artifacts/home-dark-mobile-metrics.json
+        run: node scripts/qa/home-dark-mobile-smoke.mjs
+
       - name: Body Exposure mobile 390x844 smoke
         env:
           BODY3D_QA_URL: http://127.0.0.1:4173/#/body-explorer
@@ -91,6 +98,15 @@ jobs:
           PANACEA_OS_QA_SCREENSHOT: artifacts/panacea-os-mobile-390x844.png
           PANACEA_OS_QA_METRICS: artifacts/panacea-os-mobile-metrics.json
         run: node scripts/qa/panacea-os-mobile-smoke.mjs
+
+      - name: Upload Home Dark mobile QA artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: home-dark-mobile-qa
+          path: artifacts/home-dark-mobile-*
+          if-no-files-found: warn
+          retention-days: 7
 
       - name: Upload Body Exposure mobile QA artifact
         if: always()
