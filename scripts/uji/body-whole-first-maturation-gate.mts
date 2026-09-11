@@ -42,10 +42,6 @@ for (const stage of report.stages.slice(2)) {
   assert.ok(stage.blockers.some((blocker) => blocker.code === 'upstream-incomplete'))
 }
 
-// Synthetic gate-transition fixture only: give every system root one exact name
-// from its already-declared same-frame source bundle. This proves the region
-// stage can still open when engineering source admission truly succeeds; these
-// synthetic assignments are not anatomical/publication evidence.
 const syntheticSystemReady = structuredClone(COMPLETE_WHOLE_BODY_ATLAS)
 const requiredSystemRootIds = new Set(REQUIRED_WHOLE_BODY_SYSTEMS.map((id) => `system:${id}`))
 for (const node of syntheticSystemReady.nodes) {
@@ -68,17 +64,22 @@ for (const node of syntheticSystemReady.nodes) {
   })
 }
 
-const afterSystems = buildBodyMaturationReport(syntheticSystemReady)
-assert.equal(afterSystems.activeStage, 'region')
-const region = afterSystems.stages.find((stage) => stage.id === 'region')
-assert.ok(region)
-assert.equal(region.status, 'incomplete')
-assert.ok(region.blockers.some((blocker) => blocker.requirement === 'region:hand' && blocker.code === 'missing-root'))
-assert.ok(region.blockers.some((blocker) => blocker.requirement === 'region:foot' && blocker.code === 'missing-root'))
+const afterGenericAdmission = buildBodyMaturationReport(syntheticSystemReady)
+assert.equal(afterGenericAdmission.activeStage, 'system')
+assert.equal(afterGenericAdmission.wholeBodyComplete, false)
+const afterGenericSystem = afterGenericAdmission.stages.find((stage) => stage.id === 'system')
+assert.ok(afterGenericSystem)
+assert.ok(afterGenericSystem.blockers.some((blocker) =>
+  blocker.nodeId === 'system:articular' && blocker.code === 'macro-closure-failed',
+))
+assert.ok(afterGenericSystem.blockers.some((blocker) =>
+  blocker.nodeId === 'system:fascial' && blocker.code === 'macro-closure-failed',
+))
+for (const stage of afterGenericAdmission.stages.slice(2)) {
+  assert.equal(stage.status, 'locked')
+  assert.equal(stage.authoringAllowed, false)
+}
 
-// `geometryStatus = shipped` is metadata, not source admission. Break one exact
-// source hint while leaving every system marked shipped: maturation must fail
-// closed at system rather than leapfrog into region/organ work.
 const metadataOnly = structuredClone(syntheticSystemReady)
 const surfaceRoot = metadataOnly.nodes.find((node) => node.id === 'system:surface')
 assert.ok(surfaceRoot)
@@ -112,12 +113,10 @@ console.log(JSON.stringify({
     nodeId: blocker.nodeId,
     requirement: blocker.requirement,
   })),
+  macroClosureGuard: afterGenericSystem.blockers
+    .filter((blocker) => blocker.code === 'macro-closure-failed')
+    .map((blocker) => ({ nodeId: blocker.nodeId, requirement: blocker.requirement })),
   sourceAdmissionGuard: sourceBlockedSystem.blockers
     .filter((blocker) => blocker.code === 'source-admission-failed')
     .map((blocker) => ({ nodeId: blocker.nodeId, requirement: blocker.requirement })),
-  nextMacroRegionBlockers: region.blockers.map((blocker) => ({
-    code: blocker.code,
-    nodeId: blocker.nodeId,
-    requirement: blocker.requirement,
-  })),
 }, null, 2))
