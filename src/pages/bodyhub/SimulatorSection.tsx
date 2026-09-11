@@ -33,13 +33,25 @@ function batasVisual(n: number, min: number, max: number) {
 /**
  * Gambar hubungan antarsistem, bukan atlas anatomi. Bentuk organ sengaja
  * disederhanakan; yang berubah hanyalah cue visual dari output yang memang
- * dihitung bodySim. Ketebalan garis tidak boleh dibaca sebagai diameter
- * pembuluh atau pengukuran pasien.
+ * dihitung bodySim. Ketebalan garis dan kecepatan partikel tidak boleh dibaca
+ * sebagai diameter pembuluh atau waktu transit darah yang sebenarnya.
  */
-function SystemCouplingDiagram({ out }: { out: ReturnType<typeof simulate> }) {
-  const pulmonaryWidth = 2 + batasVisual(out.cardiacOutput / 8, 0, 1) * 3
-  const renalWidth = 2 + batasVisual(out.renalPerfusion / 1600, 0, 1) * 3
+function SystemCouplingDiagram({ out, heartRate, motion, onToggleMotion }: {
+  out: ReturnType<typeof simulate>
+  heartRate: number
+  motion: boolean
+  onToggleMotion: () => void
+}) {
+  const pulmonaryNorm = batasVisual(out.cardiacOutput / 8, 0, 1)
+  const renalNorm = batasVisual(out.renalPerfusion / 1600, 0, 1)
+  const pulmonaryWidth = 2 + pulmonaryNorm * 3
+  const renalWidth = 2 + renalNorm * 3
   const oxygenOpacity = 0.5 + batasVisual(out.sao2 / 100, 0, 1) * 0.5
+  // Durasi hanya cue ternormalisasi agar perubahan output terlihat. Ini bukan
+  // estimasi waktu transit darah. Denyut halo mengikuti HR input simulator.
+  const pulmonaryDuration = (2.8 - pulmonaryNorm * 1.4).toFixed(2)
+  const renalDuration = (3.2 - renalNorm * 1.4).toFixed(2)
+  const beatDuration = Math.max(0.32, 60 / Math.max(heartRate, 1)).toFixed(2)
 
   return (
     <figure className="rounded-2xl border border-neutral-200 bg-neutral-50/70 p-3 dark:border-white/10 dark:bg-white/[0.035]">
@@ -48,7 +60,17 @@ function SystemCouplingDiagram({ out }: { out: ReturnType<typeof simulate> }) {
           <div className="text-[10px] font-black uppercase tracking-[0.14em] text-neutral-500">Live system coupling</div>
           <div className="mt-0.5 text-[11px] font-bold text-ink dark:text-white">Heart ↔ lungs · heart ↔ kidneys</div>
         </div>
-        <span className="rounded-full border border-neutral-200 px-2 py-1 text-[8px] font-black uppercase tracking-wide text-neutral-500 dark:border-white/10">schematic</span>
+        <div className="flex shrink-0 items-center gap-1.5">
+          <span className="rounded-full border border-neutral-200 px-2 py-1 text-[8px] font-black uppercase tracking-wide text-neutral-500 dark:border-white/10">schematic</span>
+          <button
+            type="button"
+            aria-pressed={motion}
+            onClick={onToggleMotion}
+            className="min-h-[30px] rounded-full border border-neutral-200 px-2.5 text-[9px] font-black text-ink dark:border-white/10 dark:text-white"
+          >
+            {motion ? 'Pause flow' : 'Run flow'}
+          </button>
+        </div>
       </div>
 
       <svg
@@ -61,7 +83,7 @@ function SystemCouplingDiagram({ out }: { out: ReturnType<typeof simulate> }) {
         <desc id="sim-coupling-desc">
           The current simulator computes cardiac output {out.cardiacOutput.toFixed(1)} litres per minute,
           oxygen saturation {out.sao2.toFixed(0)} percent, and glomerular filtration {out.gfr.toFixed(0)} millilitres per minute.
-          Organ shapes and line thickness are educational cues rather than anatomical scale.
+          Organ shapes, line thickness, and moving particles are educational cues rather than anatomical scale or measured blood transit.
         </desc>
         <defs>
           <marker id="sim-arrow-cyan" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse">
@@ -93,6 +115,16 @@ function SystemCouplingDiagram({ out }: { out: ReturnType<typeof simulate> }) {
           strokeLinecap="round"
           markerEnd="url(#sim-arrow-green)"
         />
+        {motion && (
+          <g aria-hidden="true" className="motion-reduce:hidden">
+            <circle r="3.2" fill="#38bdf8">
+              <animateMotion path="M158 122 C122 112 118 92 138 80" dur={`${pulmonaryDuration}s`} repeatCount="indefinite" />
+            </circle>
+            <circle r="3.2" fill="#00BF63" opacity={oxygenOpacity}>
+              <animateMotion path="M222 80 C242 94 236 112 202 122" dur={`${pulmonaryDuration}s`} repeatCount="indefinite" />
+            </circle>
+          </g>
+        )}
 
         {/* Renal perfusion loop: systemic output to kidneys and venous return. */}
         <path
@@ -129,6 +161,22 @@ function SystemCouplingDiagram({ out }: { out: ReturnType<typeof simulate> }) {
           strokeLinecap="round"
           markerEnd="url(#sim-arrow-green)"
         />
+        {motion && (
+          <g aria-hidden="true" className="motion-reduce:hidden">
+            <circle r="3" fill="#a855f7">
+              <animateMotion path="M166 145 C145 160 130 177 123 191" dur={`${renalDuration}s`} repeatCount="indefinite" />
+            </circle>
+            <circle r="3" fill="#a855f7">
+              <animateMotion path="M194 145 C215 160 230 177 237 191" dur={`${renalDuration}s`} repeatCount="indefinite" />
+            </circle>
+            <circle r="2.7" fill="#00BF63" opacity="0.7">
+              <animateMotion path="M142 198 C160 181 169 164 175 148" dur={`${renalDuration}s`} repeatCount="indefinite" />
+            </circle>
+            <circle r="2.7" fill="#00BF63" opacity="0.7">
+              <animateMotion path="M218 198 C200 181 191 164 185 148" dur={`${renalDuration}s`} repeatCount="indefinite" />
+            </circle>
+          </g>
+        )}
 
         {/* Airway and lungs. */}
         <path d="M180 20 L180 46 M180 46 L154 58 M180 46 L206 58" fill="none" stroke="currentColor" strokeOpacity="0.35" strokeWidth="4" strokeLinecap="round" />
@@ -139,6 +187,11 @@ function SystemCouplingDiagram({ out }: { out: ReturnType<typeof simulate> }) {
         <text x="180" y="82" textAnchor="middle" className="fill-current text-[8.5px] font-bold" opacity="0.62">PaCO₂ {out.paco2.toFixed(0)} mmHg</text>
 
         {/* Unified heart node: this is coupling, not chamber anatomy. */}
+        {motion && (
+          <circle cx="180" cy="119" r="38" fill="none" stroke="#FF5A1F" strokeWidth="2" aria-hidden="true" className="motion-reduce:hidden">
+            <animate attributeName="opacity" values="0.08;0.34;0.08" dur={`${beatDuration}s`} repeatCount="indefinite" />
+          </circle>
+        )}
         <path
           d="M180 151 C171 141 145 126 145 108 C145 94 156 86 168 86 C175 86 180 90 180 96 C180 90 185 86 192 86 C204 86 215 94 215 108 C215 126 189 141 180 151 Z"
           fill="rgba(255,90,31,0.14)"
@@ -162,7 +215,7 @@ function SystemCouplingDiagram({ out }: { out: ReturnType<typeof simulate> }) {
       </svg>
 
       <figcaption className="mt-1 text-[10px] leading-relaxed text-neutral-500">
-        Educational coupling map, not anatomical scale. Organ shapes are schematic and the changing line thickness is only a normalized cue from the current computed model output; it is not vessel calibre, imaging, or a patient measurement.
+        Educational coupling map, not anatomical scale. Organ shapes are schematic; line thickness and particle speed are normalized teaching cues, not vessel calibre or blood transit time. The halo cadence follows the selected simulator heart rate and is not a measured heartbeat. Motion is suppressed when reduced-motion is requested.
       </figcaption>
     </figure>
   )
@@ -172,6 +225,7 @@ export function SimulatorSection({ onVitals }: Props) {
   const [input, setInput] = useState<SimInput>({ ...NORMAL })
   const [skenarioAktif, setSkenarioAktif] = useState('normal')
   const [bukaKendali, setBukaKendali] = useState(false)
+  const [gerakVisual, setGerakVisual] = useState(true)
   const out = simulate(input)
 
   function pakaiSkenario(key: string) {
@@ -231,7 +285,12 @@ export function SimulatorSection({ onVitals }: Props) {
         </div>
       )}
 
-      <SystemCouplingDiagram out={out} />
+      <SystemCouplingDiagram
+        out={out}
+        heartRate={input.heartRate}
+        motion={gerakVisual}
+        onToggleMotion={() => setGerakVisual((x) => !x)}
+      />
 
       <div>
         <div className="t-mikro font-bold uppercase tracking-wide text-neutral-500">Circulation</div>
