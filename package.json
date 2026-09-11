@@ -22,6 +22,7 @@
     "periksa:semua": "node scripts/periksaTeks.mjs --semua",
     "uji": "node scripts/uji/jalankan.mjs",
     "qa:share-card": "node scripts/qa/share-card-export-smoke.mjs",
+    "qa:lesi-3d": "node scripts/qa/lesi-neuro-3d-smoke.mjs",
     "cakupan": "node scripts/cakupanSkdi.mjs"
   },
   "dependencies": {

@@ -1,5 +1,8 @@
-import { useMemo, useState } from 'react'
+import { lazy, Suspense, useMemo, useState } from 'react'
 import { Prosa } from '../../components/Prosa'
+
+// 3D dimuat hanya saat panel ini dibuka; ia membawa three.js dan nervous.glb.
+const LesiNeuro3D = lazy(() => import('./LesiNeuro3D').then((m) => ({ default: m.LesiNeuro3D })))
 import {
   lokalisasi, tempatTerbaik, NAMA_TINGKAT, TINGKAT_SARAF_KRANIAL, DI_LUAR_MODEL,
   type Temuan, type TemuanSarafKranial, type Modalitas, type Sisi, type Wilayah,
@@ -129,6 +132,10 @@ export function LokalisasiLesiPanel() {
           never looks at a patient.
         </Prosa>
       </div>
+
+      <Suspense fallback={<div className="h-[280px] w-full rounded-2xl bg-[var(--pelatih-alas-1,rgba(15,23,42,0.04))]" />}>
+        <LesiNeuro3D tingkat={terbaik?.tingkat ?? null} sisi={terbaik?.sisi ?? null} />
+      </Suspense>
 
       {/* Tutorial: kasus yang benar-benar menjalankan alatnya. */}
       <div className="rounded-2xl border border-brand/25 bg-brand/[0.05] p-3">
