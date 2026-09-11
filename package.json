@@ -21,6 +21,7 @@
     "periksa": "node scripts/periksaTeks.mjs",
     "periksa:semua": "node scripts/periksaTeks.mjs --semua",
     "uji": "node scripts/uji/jalankan.mjs",
+    "qa:share-card": "node scripts/qa/share-card-export-smoke.mjs",
     "cakupan": "node scripts/cakupanSkdi.mjs"
   },
   "dependencies": {

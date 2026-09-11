@@ -49,3 +49,56 @@ assert.match(source, /Sharing failed — tap to try again/,
 assert.match(source, /stampWatermark/, 'Watermark hanya untuk gambar yang diekspor.')
 
 console.log('Share card capture: pustaka warna-modern terpasang, catch kosong tertutup, kegagalan terlihat dan bisa diulang.')
+
+// ── 5. Gambar ekspor harus memakai huruf aplikasi, bukan serif bawaan ───────
+//
+// html2canvas-pro menyalin simpul kartu ke dokumen lain. Huruf aplikasi
+// dipasang di `body { font-family: var(--font-sans) }`, sehingga klonnya
+// kehilangan pewarisan itu dan peramban jatuh ke serif bawaan. Terlihat
+// langsung pada gambar yang dibagikan pengguna: kartu Inter di layar keluar
+// bergaya Times. Tumpukan huruf karena itu harus ditulis literal -- var() CSS
+// pun tinggal di :root yang tidak ikut tersalin.
+assert.match(source, /onclone:/, 'Klon penangkapan harus diberi gaya, bukan diserahkan ke bawaan peramban.')
+assert.match(source, /'Inter'/, 'Huruf badan harus disebut literal di dalam gaya ekspor.')
+assert.match(source, /'Oxanium'/, 'Judul ekspor memakai huruf hero aplikasi.')
+assert.match(source, /'JetBrains Mono'/, 'Angka ekspor memakai huruf lebar-tetap supaya kolom metrik lurus.')
+// Diperiksa pada blok gayanya, bukan pada seluruh berkas: kalimat penjelas di
+// atas menyebut `var(--font-sans)` sebagai kutipan, dan pemeriksaan sekasar itu
+// tidak bisa membedakan prosa dari CSS.
+const blokGaya = source.slice(source.indexOf('const GAYA_EKSPOR'), source.indexOf('export function ShareCardButton'))
+assert.doesNotMatch(blokGaya, /font-family:\s*var\(/,
+  'var() CSS tidak tersedia di dokumen klon; tumpukan huruf harus literal.')
+assert.match(blokGaya, /font-family: \$\{SANS\} !important/,
+  'Badan kartu ekspor harus dipaksa ke tumpukan huruf aplikasi.')
+assert.match(blokGaya, /font-family: \$\{HERO\} !important/, 'Judul ekspor memakai huruf hero.')
+assert.match(blokGaya, /font-family: \$\{ANGKA\} !important/, 'Metrik ekspor memakai huruf lebar-tetap.')
+assert.match(source, /document\.fonts\?\.ready/,
+  'Potret harus menunggu huruf web termuat, kalau tidak klon dirender dengan huruf pengganti.')
+
+// ── 6. Tombol share tidak boleh ikut tercetak di dalam gambarnya sendiri ────
+//
+// Simpul yang dipotret membungkus tombolnya, jadi cip share muncul di tengah
+// kartu yang dibagikan. Ia dibuang dari klon, bukan disembunyikan di layar.
+assert.match(source, /data-share-hide/, 'Tombol share harus ditandai supaya bisa dibuang dari klon.')
+assert.match(source, /\[data-share-hide\]'\)\.forEach\(\(el\) => el\.remove\(\)\)/,
+  'Elemen bertanda harus dibuang dari klon sebelum potret diambil.')
+
+// ── 7. Watermark harus punya ruangnya sendiri ───────────────────────────────
+//
+// Stempel digambar di sudut kanan bawah kanvas. Tanpa pita khusus ia jatuh di
+// atas baris teks terakhir -- terlihat pada laporan pengguna, "Panaceamed.id"
+// menimpa kata "finishing".
+assert.match(source, /PITA_WATERMARK/, 'Pita watermark harus dipesan secara eksplisit.')
+assert.match(source, /padding-bottom: \$\{PITA_WATERMARK\}px/,
+  'Pita itu harus benar-benar dipakai sebagai ruang bawah kartu ekspor.')
+
+// ── 8. Kulit ekspor tidak boleh memaksakan warna latar ──────────────────────
+//
+// Versi pertama kulit ini memasang gradien gelap. Diuji di peramban, kartu
+// keluar hitam-di-atas-hitam: halaman sedang bermode terang, warna teksnya
+// tetap gelap, dan hanya latarnya yang diganti. Latar adalah milik kartu; yang
+// boleh diatur di sini hanya huruf, aksen, dan pita watermark.
+assert.doesNotMatch(blokGaya, /\.pmd-share-export \{[^}]*background:/,
+  'Latar kartu ekspor harus tetap milik kartunya sendiri.')
+
+console.log('Share card export: huruf aplikasi terpakai, tombol tidak ikut tercetak, watermark punya pita sendiri.')
