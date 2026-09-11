@@ -24,6 +24,15 @@ const synthetic = {
       }]
     }
     if (index === 1) return []
+    if (index === 2) {
+      return [{
+        id: entry.acceptedNodeIds[0], label: entry.label, system: entry.system,
+        regions: ['whole-body'], laterality: 'not-applicable', scale: 'suborgan',
+        source: { mode: 'specific-fallback', nodeHints: [entry.label] },
+        geometryStatus: 'shipped', educationalPriority: 1,
+        provenance: { sourceId: 'test', sourceRevision: 'test', license: 'test', sourceLocator: 'test', reviewStatus: 'academic-review-required', reviewerScope: 'test' },
+      }]
+    }
     return [{
       id: entry.acceptedNodeIds[0], label: entry.label, system: entry.system,
       regions: ['whole-body'], laterality: 'not-applicable', scale: 'organ',
@@ -35,12 +44,19 @@ const synthetic = {
 } as const
 
 const report = buildOrganCoverageReport(synthetic as never)
-assert.equal(report.complete, false, 'partial or missing organ coverage must fail closed')
+assert.equal(report.complete, false, 'partial, wrong-scale or missing organ coverage must fail closed')
 assert.equal(report.partial, 1, 'partial geometry must remain visible as a blocker')
 assert.equal(report.missing, 1, 'missing canonical organ must remain visible as a blocker')
+assert.equal(report.wrongScale, 1, 'known canonical IDs at the wrong biological scale must not be misreported as missing')
 assert.equal(report.referenceOnly, 0)
-assert.equal(report.shipped, REQUIRED_MACRO_ORGANS.length - 2)
+assert.equal(report.shipped, REQUIRED_MACRO_ORGANS.length - 3)
 assert.equal(report.entries.length, REQUIRED_MACRO_ORGANS.length)
+
+const wrongScaleEntry = report.entries[2]
+assert.ok(wrongScaleEntry)
+assert.equal(wrongScaleEntry.status, 'wrong-scale')
+assert.equal(wrongScaleEntry.matchedNodeId, REQUIRED_MACRO_ORGANS[2]?.acceptedNodeIds[0])
+assert.equal(wrongScaleEntry.matchedNodeScale, 'suborgan')
 
 const allShipped = {
   ...synthetic,
@@ -57,6 +73,8 @@ const complete = buildOrganCoverageReport(allShipped as never)
 assert.equal(complete.complete, true, 'only all-shipped organ coverage may pass')
 assert.equal(complete.shipped, REQUIRED_MACRO_ORGANS.length)
 assert.equal(complete.partial, 0)
+assert.equal(complete.referenceOnly, 0)
+assert.equal(complete.wrongScale, 0)
 assert.equal(complete.missing, 0)
 
-console.log(`body-organ-coverage-gate: ok (${REQUIRED_MACRO_ORGANS.length} required macro-organ entries)`)
+console.log(`body-organ-coverage-gate: ok (${REQUIRED_MACRO_ORGANS.length} required macro-organ entries; wrong-scale identities fail closed separately from missing anatomy)`)
