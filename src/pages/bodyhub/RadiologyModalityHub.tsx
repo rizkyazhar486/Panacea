@@ -82,9 +82,11 @@ export default function RadiologyModalityHub() {
         {MODALITIES.map((item) => (
           <button
             key={item.id}
+            id={`radiology-tab-${item.id}`}
             type="button"
             role="tab"
             aria-selected={modality === item.id}
+            aria-controls="radiology-modality-panel"
             onClick={() => setModality(item.id)}
             className={`min-h-11 shrink-0 rounded-xl border px-3 text-[10px] font-black transition ${modality === item.id ? 'border-cyan-600 bg-cyan-600 text-white shadow-sm' : 'border-neutral-200 bg-white text-neutral-600 hover:border-cyan-300 dark:border-white/10 dark:bg-white/[.035] dark:text-neutral-300'}`}
           >
@@ -93,7 +95,12 @@ export default function RadiologyModalityHub() {
         ))}
       </div>
 
-      <div role="tabpanel" className="mt-3 rounded-2xl border border-neutral-200 bg-white p-3 dark:border-white/10 dark:bg-[#080c10]">
+      <div
+        id="radiology-modality-panel"
+        role="tabpanel"
+        aria-labelledby={`radiology-tab-${selected.id}`}
+        className="mt-3 rounded-2xl border border-neutral-200 bg-white p-3 dark:border-white/10 dark:bg-[#080c10]"
+      >
         <div className="flex flex-wrap items-start justify-between gap-2">
           <div className="max-w-3xl">
             <div className="text-[9px] font-black uppercase tracking-wide text-cyan-700 dark:text-cyan-300">{selected.label}</div>
