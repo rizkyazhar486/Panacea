@@ -8,7 +8,14 @@ export async function verifyEyeOptics(page) {
   try {
     return await Promise.race([
       runEyeOptics(page),
-      new Promise((_, reject) => { timer = setTimeout(() => reject(new Error('Eye optics smoke exceeded 120 seconds')), 120_000) }),
+      // Penjaga ini mencegah gantung selamanya, bukan menagih kecepatan.
+      // Di runner yang terbebani, seluruh rangkaian yang SEHAT memakan sekitar
+      // 120 detik: activate-neuro 15,8 dtk, activate-eye 16,1 dtk, tangkapan
+      // layar 32,8 dtk, close-optics 11,3 dtk — semuanya lulus, lalu penjaga
+      // 120 detik memutusnya tepat di garis akhir. Anggaran yang pas-pasan
+      // begitu mengubah penjaga anti-gantung menjadi sumber merah yang tetap.
+      // Dinaikkan supaya ia kembali hanya menangkap gantung yang sebenarnya.
+      new Promise((_, reject) => { timer = setTimeout(() => reject(new Error('Eye optics smoke exceeded 300 seconds')), 300_000) }),
     ])
   } finally {
     clearTimeout(timer)
@@ -129,6 +136,13 @@ async function runEyeOptics(page) {
     path: 'artifacts/body3d-mobile-eye-optics.png',
     clip: { x: kotakDua.x, y: kotakDua.y, width: kotakDua.width, height: kotakDua.height },
     animations: 'disabled',
+    // scale 'css' dan bukan 'device'. Artefak ini dipakai untuk menilai
+    // keterbacaan label pada 390 px, jadi 356x1032 piksel CSS justru yang
+    // dilihat pemakai — memperbesarnya tiga kali tidak menambah satu pun
+    // keputusan yang bisa diambil darinya, hanya menambah piksel. Terukur pada
+    // CPU tercekik 6x: 17,8 detik / 263.712 byte pada 'device', turun menjadi
+    // 11,0 detik / 64.556 byte pada 'css'.
+    scale: 'css',
     // Kestabilan sudah ditagih di atas sebagai assertion, jadi batas waktu ini
     // tidak lagi menjaga apa pun selain penyandian PNG itu sendiri: potongan
     // 356x1032 pada deviceScaleFactor 3. Diukur di CPU yang dicekik 4x, 6x dan
