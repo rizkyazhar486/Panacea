@@ -78,6 +78,16 @@ export interface TemuanSarafKranial {
 
 const lawan = (s: Sisi): Sisi => (s === 'kiri' ? 'kanan' : 'kiri')
 
+// Pengenal internal memakai bahasa Indonesia; kalimat alasan dibaca pengguna
+// dan karena itu harus bahasa Inggris. Keduanya dipisah di sini, bukan dengan
+// menerjemahkan pengenalnya -- pengenal adalah data, bukan teks antarmuka.
+const KATA_SISI: Record<Sisi, string> = { kiri: 'left', kanan: 'right' }
+const KATA_MODALITAS: Record<Modalitas, string> = {
+  'motorik': 'weakness',
+  'nyeri-suhu': 'pain and temperature loss',
+  'getar-posisi': 'vibration and position loss',
+}
+
 /**
  * Tingkat tempat nukleus setiap saraf kranial berada.
  *
@@ -177,16 +187,22 @@ export function lokalisasi(
           const diBatang = tingkat === 'midbrain' || tingkat === 'pons' || tingkat === 'medula'
           if (!diBatang) {
             tidakCocok++
-            alasan.push(`face ${t.modalitas} on the ${t.sisi} is not explained outside the brainstem`)
+            alasan.push(
+              `facial ${KATA_MODALITAS[t.modalitas]} on the ${KATA_SISI[t.sisi]} is not explained outside the brainstem`,
+            )
             continue
           }
           // Nukleus saraf kranial bersifat ipsilateral.
           if (t.sisi === sisi) {
             cocok++
-            alasan.push(`face ${t.modalitas} ipsilateral to a ${NAMA_TINGKAT[tingkat]} lesion`)
+            alasan.push(
+              `facial ${KATA_MODALITAS[t.modalitas]} is ipsilateral to a ${NAMA_TINGKAT[tingkat]} lesion`,
+            )
           } else {
             tidakCocok++
-            alasan.push(`face ${t.modalitas} on the ${t.sisi} would be ipsilateral, not contralateral`)
+            alasan.push(
+              `facial ${KATA_MODALITAS[t.modalitas]} on the ${KATA_SISI[t.sisi]} would be ipsilateral, not contralateral`,
+            )
           }
           continue
         }
@@ -195,12 +211,14 @@ export function lokalisasi(
         if (diramalkan === t.sisi) {
           cocok++
           alasan.push(
-            `${t.modalitas} on the ${t.sisi} body follows from a ${sisi} ${NAMA_TINGKAT[tingkat]} lesion`,
+            `${KATA_MODALITAS[t.modalitas]} on the ${KATA_SISI[t.sisi]} body follows from a `
+            + `${KATA_SISI[sisi]} ${NAMA_TINGKAT[tingkat]} lesion`,
           )
         } else {
           tidakCocok++
           alasan.push(
-            `${t.modalitas} would appear on the ${diramalkan} body, not the ${t.sisi}`,
+            `${KATA_MODALITAS[t.modalitas]} would appear on the ${KATA_SISI[diramalkan]} body, `
+            + `not the ${KATA_SISI[t.sisi]}`,
           )
         }
       }
@@ -217,7 +235,7 @@ export function lokalisasi(
         } else {
           tidakCocok++
           alasan.push(
-            `CN ${sk.saraf} points to the ${NAMA_TINGKAT[tingkatNukleus]} on the ${sk.sisi}`,
+            `CN ${sk.saraf} points to the ${NAMA_TINGKAT[tingkatNukleus]} on the ${KATA_SISI[sk.sisi]}`,
           )
         }
       }

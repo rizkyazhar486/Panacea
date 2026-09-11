@@ -140,3 +140,32 @@ assert.ok(DI_LUAR_MODEL.some((s) => /patient|imaging/i.test(s)),
   'Harus dinyatakan bahwa ini tidak bekerja pada pasien atau pencitraan.')
 
 console.log('Lokalisasi lesi: hemiseksi korda, sindrom medula lateral, dan sindrom midbrain/pons semuanya jatuh sendiri dari aturan penyilangan; pola bilateral ditolak alih-alih dipaksakan.')
+
+// ── 8. Kalimat alasan harus berbahasa Inggris ───────────────────────────────
+//
+// Pengenal internal berbahasa Indonesia ('motorik', 'kiri', 'kanan') dan itu
+// benar: pengenal adalah data. Tetapi kalimat alasan dibaca pengguna, dan
+// versi pertama membocorkan pengenalnya apa adanya -- terlihat di peramban
+// sebagai "motorik on the kanan body follows from a kiri Pons lesion".
+{
+  const h = lokalisasi(
+    [
+      { modalitas: 'motorik', sisi: 'kanan', wilayah: 'badan' },
+      { modalitas: 'nyeri-suhu', sisi: 'kiri', wilayah: 'wajah' },
+      { modalitas: 'getar-posisi', sisi: 'kanan', wilayah: 'badan' },
+    ],
+    [{ saraf: 7, sisi: 'kiri' }],
+  )
+  const semua = h.kandidat.flatMap((k) => k.alasan)
+  assert.ok(semua.length > 10, 'Harus ada banyak kalimat untuk diperiksa.')
+  for (const kalimat of semua) {
+    for (const bocor of ['motorik', 'nyeri-suhu', 'getar-posisi', ' kiri', ' kanan']) {
+      assert.ok(!kalimat.includes(bocor),
+        `Pengenal internal bocor ke kalimat antarmuka: "${kalimat}"`)
+    }
+  }
+  assert.ok(semua.some((k) => /weakness/.test(k)), 'Modalitas harus muncul sebagai kata Inggris.')
+  assert.ok(semua.some((k) => /\bleft\b|\bright\b/.test(k)), 'Sisi harus muncul sebagai kata Inggris.')
+}
+
+console.log('Alasan: seluruh kalimat berbahasa Inggris, pengenal internal tidak bocor ke antarmuka.')
