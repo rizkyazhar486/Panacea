@@ -205,6 +205,28 @@ export const RESEARCH_FRONTIER_REPROGRAMMING_RISKS = [
   'unknown-long-term-safety',
 ] as const
 
+/**
+ * Dated registry snapshot, not a permanent efficacy statement.
+ * Refresh before presenting current translational status.
+ */
+export const REPROGRAMMING_TRANSLATIONAL_SNAPSHOT = {
+  asOf: '2026-09-11',
+  source: 'ClinicalTrials.gov',
+  nctId: 'NCT07290244',
+  intervention: 'ER-100 OSK epigenetic therapy',
+  indicationScope: 'open-angle glaucoma and non-arteritic anterior ischemic optic neuropathy',
+  phase: 'Phase 1',
+  status: 'recruiting',
+  estimatedEnrollment: 18,
+  firstInHuman: true,
+  primaryPurpose: 'safety-and-tolerability',
+  postedResults: false,
+  efficacyEstablished: false,
+  systemicRejuvenationEstablished: false,
+  lifespanExtensionEstablished: false,
+  evidenceTier: 'clinical-translational' satisfies ResearchEvidenceTier,
+} as const
+
 export const AGING_HALLMARKS_2023 = [
   'genomic-instability',
   'telomere-attrition',
