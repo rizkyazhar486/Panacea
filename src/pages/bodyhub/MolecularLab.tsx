@@ -106,6 +106,7 @@ export function MolecularLab({ onBukaOrgan, awal = null }: Props) {
           {mol?.name} · {mol?.formula}
         </span>
         <button
+          type="button"
           onClick={() => setTanpaH(!tanpaH)}
           className="min-h-[32px] rounded-full border border-neutral-200 px-3 text-[11px] font-bold text-neutral-600 dark:border-white/10 dark:text-neutral-300"
         >
@@ -149,6 +150,7 @@ export function MolecularLab({ onBukaOrgan, awal = null }: Props) {
             {obat.sites.map((s) => (
               <button
                 key={s}
+                type="button"
                 onClick={() => onBukaOrgan?.(s)}
                 className="rounded-full border border-brand/40 bg-brand/10 px-2 py-1 text-[10.5px] font-bold text-brand"
               >
@@ -165,6 +167,7 @@ export function MolecularLab({ onBukaOrgan, awal = null }: Props) {
               {obat.efekSamping.map((s) => (
                 <button
                   key={s}
+                  type="button"
                   onClick={() => onBukaOrgan?.(s)}
                   className="rounded-full border border-amber-400/40 bg-amber-400/10 px-2 py-1 text-[10.5px] font-semibold text-amber-700 dark:text-amber-300"
                 >
