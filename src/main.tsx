@@ -32,6 +32,7 @@ const Radiology = lazy(() => import('./pages/Radiology').then((m) => ({ default:
 const FrontierHealthOS = lazy(() => import('./pages/FrontierHealthOS').then((m) => ({ default: m.FrontierHealthOS })))
 const KnowledgeBridge = lazy(() => import('./pages/KnowledgeBridge').then((m) => ({ default: m.KnowledgeBridge })))
 const Electrophysiology = lazy(() => import('./pages/Electrophysiology').then((m) => ({ default: m.Electrophysiology })))
+const GenomeLab = lazy(() => import('./pages/GenomeLab').then((m) => ({ default: m.GenomeLab })))
 const Consult = lazy(() => import('./pages/Consult').then((m) => ({ default: m.Consult })))
 const Hospitals = lazy(() => import('./pages/Hospitals').then((m) => ({ default: m.Hospitals })))
 const Pharmacy = lazy(() => import('./pages/Pharmacy').then((m) => ({ default: m.Pharmacy })))
@@ -378,6 +379,7 @@ createRoot(document.getElementById('root')!).render(
               <Route path="/frontier-health" element={<FrontierHealthOS />} />
               <Route path="/knowledge-bridge" element={<KnowledgeBridge />} />
               <Route path="/electrophysiology" element={<Electrophysiology />} />
+              <Route path="/genome-lab" element={<GenomeLab />} />
               <Route path="/translator" element={<Translator />} />
               {/* Dua puluh satu skor klinis yang dulu punya rute sendiri kini
                   digabung ke satu halaman. Rute lamanya SENGAJA dipertahankan
