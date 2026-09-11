@@ -28,22 +28,17 @@ async function namaSimpulGlb(path: string): Promise<string[] | null> {
   return (json.nodes ?? []).map((n) => n.name).filter((n): n is string => Boolean(n))
 }
 
-// Utang yang SUDAH ADA, disebut satu per satu.
+// Tidak ada utang yang tersisa.
 //
-// Seluruhnya milik respiratoryAtlas.ts, yang sedang dikerjakan agen lain, jadi
-// tidak diperbaiki di sini. Berkas itu menamai lobus dan bronkus menurut
-// segmen -- "Anterior basal segment of left lung (SVIII)", "Superior segmental
-// bronchus of left lung (BVI)" -- sementara petunjuknya ditulis sebagai
-// "upper lobe of right lung". Daftar ini membuat utangnya terlihat; ia tidak
-// membuatnya hilang, dan tidak boleh bertambah.
-const UTANG_DIKETAHUI = new Set([
-  'resp:larynx', 'resp:carina',
-  'resp:right-upper-lobe', 'resp:right-lower-lobe',
-  'resp:left-upper-lobe', 'resp:left-lower-lobe',
-  'resp:segment:r-s2', 'resp:segment:r-s3', 'resp:segment:r-s4',
-  'resp:segment:r-s5', 'resp:segment:r-s6',
-  'resp:segment:l-s1-2', 'resp:segment:l-s3', 'resp:segment:l-s6',
-])
+// Daftar ini semula memuat empat belas simpul pernapasan yang tidak menemukan
+// geometrinya. Semuanya ternyata salah nama, bukan tidak punya mesh: berkasnya
+// memakai Terminologia Anatomica ("Superior lobe of right lung", "Anterior
+// segmental bronchus of right lung (BIII)") sementara petunjuknya ditulis
+// dalam bahasa klinis ("upper lobe of right lung", "... of right upper lobe").
+//
+// Sengaja dibiarkan kosong dan tetap diperiksa: begitu ada simpul baru yang
+// tidak resolve, uji ini gagal, dan tidak ada tempat untuk menyembunyikannya.
+const UTANG_DIKETAHUI = new Set<string>([])
 
 const cache = new Map<string, string[] | null>()
 async function isi(berkas: string): Promise<string[] | null> {
