@@ -153,10 +153,27 @@ const majorNodes: readonly AtlasNode[] = [
   // adalah batang otak, bukan telinga, dan sengaja tidak dipakai di sini.
   node({ id: 'sensory:ears', label: 'Auditory ossicles', system: 'sensory', regions: ['head'], laterality: 'paired', scale: 'organ', parentId: 'system:sensory', source: { mode: 'composite', files: ['skeletal.glb'], nodeHints: ['Malleus', 'Incus', 'Stapes'] }, geometryStatus: 'partial', educationalPriority: 0.8, physiologyCapable: true }),
 
-  // 'Partial': ruang dan saraf bola mata ada di bundel SARAF. Simpul ini
-  // sengaja memakai ruang nama 'sensory:' supaya tidak bertabrakan dengan
-  // pekerjaan mata multiskala yang sedang berjalan di ruang nama 'eye:'.
-  node({ id: 'sensory:eyes', label: 'Eyes', system: 'sensory', regions: ['head'], laterality: 'paired', scale: 'organ', parentId: 'system:sensory', source: { mode: 'composite', files: ['nervous.glb'], nodeHints: ['Anterior chamber of eyeball', 'Anterior segment of eyeball', 'Optic nerve (II)', 'Suspensory ligament of eyeball'] }, geometryStatus: 'partial', educationalPriority: 0.95, physiologyCapable: true }),
+  // Mata: bola mata lengkap dengan isinya, ditambah aparatus lakrimal.
+  //
+  // Simpul ini sempat 'partial' dengan empat petunjuk saja. Pemicu untuk
+  // memeriksanya lagi datang dari luar: sebuah atlas kepala pihak ketiga
+  // (bubblik525/head, CC BY-SA 4.0) menampilkan kornea, iris, lensa dan badan
+  // vitreus sebagai objek tersendiri. Ternyata seluruhnya SUDAH ada di
+  // nervous.glb milik kita -- keduanya diturunkan dari berkas Z-Anatomy yang
+  // sama -- dan yang kurang bukan geometrinya melainkan deklarasinya.
+  //
+  // Jadi tidak ada yang diimpor. Yang berubah hanya daftar petunjuknya, dan
+  // isinya dibaca dari berkas kita sendiri.
+  //
+  // Ruang nama 'sensory:' dipertahankan supaya tidak bertabrakan dengan
+  // pekerjaan mata multiskala yang berjalan di ruang nama 'eye:'.
+  node({ id: 'sensory:eyes', label: 'Eyes', system: 'sensory', regions: ['head'], laterality: 'paired', scale: 'organ', parentId: 'system:sensory', source: { mode: 'composite', files: ['nervous.glb'], nodeHints: ['Sclera', 'Cornea', 'Iris', 'Lens', 'Vitreous body', 'Ciliary body-curve', 'Anterior chamber of eyeball', 'Posterior segment of eyeball', 'Suspensory ligament of eyeball', 'Optic nerve (II)'] }, geometryStatus: 'shipped', educationalPriority: 0.95, physiologyCapable: true, surgicalLandmark: true }),
+
+  // Aparatus lakrimal berdiri sendiri: ia melayani mata tetapi bukan bagian
+  // bola matanya, dan menggabungkannya ke dalam 'Eyes' akan menyembunyikan
+  // jalur air mata yang justru punya arti klinis sendiri.
+  node({ id: 'sensory:lacrimal-apparatus', label: 'Lacrimal apparatus', system: 'sensory', regions: ['head'], laterality: 'paired', scale: 'organ', parentId: 'sensory:eyes', source: { mode: 'composite', files: ['nervous.glb'], nodeHints: ['Lacrimal gland', 'Lacrimal canaliculus', 'Lacrimal sac', 'Nasolacrimal duct'] }, geometryStatus: 'shipped', educationalPriority: 0.8, physiologyCapable: true, surgicalLandmark: true }),
+
 
   node({ id: 'msk:spine', label: 'Vertebral column', system: 'skeletal', regions: ['neck', 'thorax', 'abdomen', 'back', 'pelvis'], laterality: 'midline', scale: 'organ', parentId: 'system:skeletal', source: { mode: 'composite', files: ['skeletal.glb'], nodeHints: ['cervical vertebra', 'thoracic vertebra', 'lumbar vertebra', 'sacrum'] }, geometryStatus: 'shipped', educationalPriority: 0.95, surgicalLandmark: true }),
   node({ id: 'msk:shoulder-complex', label: 'Shoulder complex', system: 'articular', regions: ['upper-limb'], laterality: 'paired', scale: 'organ', parentId: 'system:articular', source: { mode: 'composite', files: ['skeletal.glb', 'muscular.glb'], nodeHints: ['scapula', 'clavicle', 'humerus', 'deltoid', 'supraspinatus', 'infraspinatus'] }, geometryStatus: 'partial', educationalPriority: 0.9, physiologyCapable: true, surgicalLandmark: true }),
