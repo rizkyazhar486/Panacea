@@ -318,6 +318,9 @@ export function Body3D({
   const onPickRef = useRef(onPick)
   onPickRef.current = onPick
   const [loadingLayers, setLoadingLayers] = useState<Set<string>>(new Set())
+  // Dibaca dari dalam loop render, yang tidak ikut dirender ulang oleh React.
+  const sedangMemuatRef = useRef(false)
+  sedangMemuatRef.current = loadingLayers.size > 0
   const [failedLayers, setFailedLayers] = useState<Set<string>>(new Set())
   const [retryNonce, setRetryNonce] = useState(0)
   const [progress, setProgress] = useState<Record<string, number>>({})
@@ -435,6 +438,23 @@ export function Body3D({
       jamHalus = setTimeout(() => {
         jamHalus = undefined
         if (!inViewport || !documentVisible || sudahHalus) return
+        // Menunggu peramban benar-benar senggang, bukan sekadar menunggu jam
+        // berdetak. Frame halus yang dimulai tepat saat pengguna menekan
+        // sesuatu akan menahan klik itu sampai selesai -- terlihat di CI
+        // sebagai "performing click action" yang menggantung 20 detik pada
+        // tombol Vessels. requestIdleCallback tidak akan menjalankannya
+        // selagi masih ada pekerjaan mengantre.
+        const senggang: (cb: () => void) => void =
+          typeof (window as unknown as { requestIdleCallback?: unknown }).requestIdleCallback === 'function'
+            ? (cb) => (window as unknown as { requestIdleCallback: (f: () => void, o?: { timeout: number }) => void })
+                .requestIdleCallback(cb, { timeout: 2000 })
+            : (cb) => { window.setTimeout(cb, 0) }
+        senggang(() => {
+        if (!inViewport || !documentVisible || sudahHalus) return
+        // Muatan layer sedang berjalan: geometri dan materialnya masih
+        // berubah, jadi frame halus sekarang bukan hanya mahal tetapi juga
+        // segera basi. Dicoba lagi nanti.
+        if (sedangMemuatRef.current) { jadwalkanHalus(); return }
         const w = container.clientWidth
         const h = container.clientHeight
         if (w < 2 || h < 2) return
@@ -457,6 +477,7 @@ export function Body3D({
           // berikutnya, sehingga ketajaman penuh dicapai bertahap.
           sudahHalus = atapHalus <= halus + 0.001
           if (!sudahHalus) jadwalkanHalus()
+        })
         })
       }, BODY3D_REFINE_DELAY_MS)
     }
