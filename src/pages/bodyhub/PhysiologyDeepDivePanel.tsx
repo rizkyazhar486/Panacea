@@ -93,7 +93,7 @@ export function PhysiologyDeepDivePanel({ onFocus }: Props) {
         </div>
       </div>
 
-      <div className="-mx-1 flex gap-1.5 overflow-x-auto px-1 pb-1" aria-label="Physiology domains">
+      <div role="group" className="-mx-1 flex gap-1.5 overflow-x-auto px-1 pb-1" aria-label="Physiology domains">
         {PHYSIOLOGY_DOMAINS.map((item) => (
           <button
             key={item.key}
@@ -112,7 +112,7 @@ export function PhysiologyDeepDivePanel({ onFocus }: Props) {
       </div>
 
       <div className="grid gap-3 lg:grid-cols-[220px_minmax(0,1fr)]">
-        <div className="max-h-[390px] space-y-1 overflow-y-auto pr-1" aria-label="Physiology topics">
+        <div role="group" className="max-h-[390px] space-y-1 overflow-y-auto pr-1" aria-label="Physiology topics">
           {visible.map((topic) => (
             <button
               key={topic.id}
