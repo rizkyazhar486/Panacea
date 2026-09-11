@@ -144,6 +144,33 @@ export const RESEARCH_FRONTIER_DATA_SOURCES = [
   },
 ] as const
 
+export const CHEMICAL_SPACE_POLICY = {
+  completenessClaimAllowed: false,
+  federationRequired: true,
+  distinguishMeasuredFromPredicted: true,
+  distinguishEnumeratedFromGenerative: true,
+  preserveInactiveAndNegativeEvidence: true,
+  preserveAssayAndSourceContext: true,
+  preserveProtonationAndIonizationContextWhereRelevant: true,
+  diversityMustBeMeasuredAcrossMultipleRepresentations: true,
+  underrepresentedClassesMustRemainVisible: true,
+  underrepresentedExamples: [
+    'metal-containing-compounds',
+    'macrocycles',
+    'natural-products',
+    'mid-sized-peptides',
+    'protein-protein-interaction-modulators',
+    'beyond-rule-of-five-entities',
+  ],
+  coverageStates: [
+    'experimentally-observed',
+    'curated-database-record',
+    'enumerated-make-on-demand',
+    'computed-or-generated-hypothesis',
+    'unmapped-or-unknown',
+  ],
+} as const
+
 export const RESEARCH_FRONTIER_VALIDATION_AXES = [
   'expression-level-agreement',
   'delta-change-recovery',
