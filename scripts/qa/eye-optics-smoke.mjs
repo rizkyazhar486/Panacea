@@ -8,7 +8,14 @@ export async function verifyEyeOptics(page) {
   try {
     return await Promise.race([
       runEyeOptics(page),
-      new Promise((_, reject) => { timer = setTimeout(() => reject(new Error('Eye optics smoke exceeded 120 seconds')), 120_000) }),
+      // Penjaga ini mencegah gantung selamanya, bukan menagih kecepatan.
+      // Di runner yang terbebani, seluruh rangkaian yang SEHAT memakan sekitar
+      // 120 detik: activate-neuro 15,8 dtk, activate-eye 16,1 dtk, tangkapan
+      // layar 32,8 dtk, close-optics 11,3 dtk — semuanya lulus, lalu penjaga
+      // 120 detik memutusnya tepat di garis akhir. Anggaran yang pas-pasan
+      // begitu mengubah penjaga anti-gantung menjadi sumber merah yang tetap.
+      // Dinaikkan supaya ia kembali hanya menangkap gantung yang sebenarnya.
+      new Promise((_, reject) => { timer = setTimeout(() => reject(new Error('Eye optics smoke exceeded 300 seconds')), 300_000) }),
     ])
   } finally {
     clearTimeout(timer)
@@ -92,7 +99,58 @@ async function runEyeOptics(page) {
   const width = await page.evaluate(() => ({ viewport: innerWidth, document: document.documentElement.scrollWidth }))
   assert.ok(width.document <= width.viewport + 2, `Eye lesson overflows: ${JSON.stringify(width)}`)
   await lesson.scrollIntoViewIfNeeded()
-  await step('capture-eye-screenshot', () => lesson.screenshot({ path: 'artifacts/body3d-mobile-eye-optics.png', animations: 'disabled', timeout: 20_000 }))
+
+  // Tangkapan layar ini memakai page.screenshot({ clip }) dan BUKAN
+  // lesson.screenshot(), dengan alasan yang terukur.
+  //
+  // lesson.screenshot() menunggu heuristik "element is stable" milik Playwright:
+  // dua bingkai rAF berturut-turut dengan kotak yang sama. Di runner yang
+  // terbebani, rAF turun ke 3-4 per detik — diukur dengan mencekik CPU 6x, dan
+  // angkanya sama saja pada halaman yang tidak punya kanvas 3D sekalipun
+  // (/latihan 4/detik, /body-explorer 3/detik). Dengan anggaran 20 detik,
+  // heuristik itu kehabisan waktu meskipun elemennya sama sekali tidak bergerak.
+  // Terukur juga: top 72, tinggi 1032, kanvas 534x861, tinggi dokumen 4209 —
+  // semuanya satu nilai selama 40 cuplikan. Jadi yang gagal adalah cara
+  // menunggunya, bukan halamannya.
+  //
+  // Menaikkan batas waktu hanya menunda gejalanya. Sebagai gantinya kestabilan
+  // diperiksa SECARA EKSPLISIT di sini — dua pengukuran kotak yang harus sama —
+  // lalu piksel yang sama persis diambil lewat clip. Ini bukan pelonggaran:
+  // sebelumnya kestabilan hanya diandaikan oleh heuristik yang tertutup, kini
+  // ia menjadi assertion yang bisa gagal dan bisa dibaca.
+  //
+  // Yang TIDAK berubah: ini tetap aplikasi produksi yang hidup, dengan CSS,
+  // WebGL, tata letak dan interaksi aslinya. Tidak ada setContent, tidak ada
+  // newPage, tidak ada markup pengganti.
+  const kotakSatu = await lesson.boundingBox()
+  assert.ok(kotakSatu, 'Eye lesson has no bounding box to capture')
+  await page.waitForTimeout(400)
+  const kotakDua = await lesson.boundingBox()
+  assert.ok(kotakDua, 'Eye lesson lost its bounding box before capture')
+  assert.deepEqual(
+    { x: Math.round(kotakDua.x), y: Math.round(kotakDua.y), w: Math.round(kotakDua.width), h: Math.round(kotakDua.height) },
+    { x: Math.round(kotakSatu.x), y: Math.round(kotakSatu.y), w: Math.round(kotakSatu.width), h: Math.round(kotakSatu.height) },
+    `Eye lesson layout is still moving: ${JSON.stringify(kotakSatu)} -> ${JSON.stringify(kotakDua)}`,
+  )
+  await step('capture-eye-screenshot', () => page.screenshot({
+    path: 'artifacts/body3d-mobile-eye-optics.png',
+    clip: { x: kotakDua.x, y: kotakDua.y, width: kotakDua.width, height: kotakDua.height },
+    animations: 'disabled',
+    // scale 'css' dan bukan 'device'. Artefak ini dipakai untuk menilai
+    // keterbacaan label pada 390 px, jadi 356x1032 piksel CSS justru yang
+    // dilihat pemakai — memperbesarnya tiga kali tidak menambah satu pun
+    // keputusan yang bisa diambil darinya, hanya menambah piksel. Terukur pada
+    // CPU tercekik 6x: 17,8 detik / 263.712 byte pada 'device', turun menjadi
+    // 11,0 detik / 64.556 byte pada 'css'.
+    scale: 'css',
+    // Kestabilan sudah ditagih di atas sebagai assertion, jadi batas waktu ini
+    // tidak lagi menjaga apa pun selain penyandian PNG itu sendiri: potongan
+    // 356x1032 pada deviceScaleFactor 3. Diukur di CPU yang dicekik 4x, 6x dan
+    // 10x, penyandian itu memakan 16,6-17,8 detik. Anggaran 20 detik yang lama
+    // hanya menyisakan dua detik, dan itulah yang menjadikannya gerbang yang
+    // menyala merah terus-menerus tanpa ada yang rusak.
+    timeout: 45_000,
+  }))
 
   const close = page.getByRole('button', { name: 'Close optics lesson', exact: true })
   await step('close-optics', () => activateWithKeyboard(close))

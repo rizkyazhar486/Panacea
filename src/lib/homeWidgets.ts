@@ -39,7 +39,7 @@ export interface WidgetDef {
 
 export const WIDGETS: WidgetDef[] = [
   { id: 'semangat', label: 'Three Small Things', ringkas: 'Something good you can do right now — it takes minutes', ke: '/semua-fitur', emoji: '✨', kategori: 'Mind & Habits', bawaan: true },
-  { id: 'lifeStory', label: 'Your Story', ringkas: 'Health is one thread in a whole life — log the moments that shape yours', ke: '/my-story', emoji: '📖', kategori: 'Mind & Habits' },
+  { id: 'lifeStory', label: 'Your Story', ringkas: 'Health is one thread in a whole life — log the moments that shape yours', ke: '/my-story', emoji: '📖', kategori: 'Mind & Habits', bawaan: true },
   { id: 'medStudy', label: 'Med Study Hub', ringkas: 'Question bank, OSCE technique, and exam plans', ke: '/med-study', emoji: '📚', kategori: 'Clinical & Learning' },
   { id: 'tatalaksana', label: 'SKDI Therapy', ringkas: 'Find drugs and doses by disease', ke: '/med-study?bagian=therapy', emoji: '💊', kategori: 'Clinical & Learning' },
   { id: 'penyakit', label: 'SKDI Disease List', ringkas: 'Full notes for each disease', ke: '/med-study?bagian=diseases', emoji: '📖', kategori: 'Clinical & Learning' },
@@ -99,10 +99,10 @@ export const WIDGETS: WidgetDef[] = [
   { id: 'grafikLatihan', label: '7-Day Training Chart', ringkas: 'Training minutes per day', ke: '/latihan', emoji: '📊', kategori: 'Training', bawaan: true },
   { id: 'grafikTidur', label: '7-Day Sleep Chart', ringkas: 'Hours slept per night', ke: '/pola-tidur', emoji: '🌙', kategori: 'Sleep & Recovery', bawaan: true },
   { id: 'grafikLangkah', label: '7-Day Steps Chart', ringkas: 'Steps per day', ke: '/tubuh', emoji: '👣', kategori: 'Body & Data', bawaan: true },
-  { id: 'grafikGizi', label: '7-Day Nutrition Chart', ringkas: 'Calories logged per day', ke: '/nutrition', emoji: '🍽️', kategori: 'Nutrition' },
+  { id: 'grafikGizi', label: '7-Day Nutrition Chart', ringkas: 'Calories logged per day', ke: '/nutrition', emoji: '🍽️', kategori: 'Nutrition', bawaan: true },
   { id: 'grafikDenyut', label: '14-Day Heart Rate Chart', ringkas: 'Resting heart rate over time', ke: '/tubuh', emoji: '❤️', kategori: 'Body & Data' },
-  { id: 'langkahRingkas', label: 'Steps Today (vs usual)', ringkas: "Today's step count against your own 7-day median", ke: '/tubuh', emoji: '👣', kategori: 'Body & Data' },
-  { id: 'latihanRingkas', label: 'Training, 7 Days (Quick)', ringkas: 'Session count, minutes, distance & pace at a glance', ke: '/riwayat-latihan', emoji: '🏃', kategori: 'Training' },
+  { id: 'langkahRingkas', label: 'Steps Today (vs usual)', ringkas: "Today's step count against your own 7-day median", ke: '/tubuh', emoji: '👣', kategori: 'Body & Data', bawaan: true },
+  { id: 'latihanRingkas', label: 'Training, 7 Days (Quick)', ringkas: 'Session count, minutes, distance & pace at a glance', ke: '/riwayat-latihan', emoji: '🏃', kategori: 'Training', bawaan: true },
   { id: 'tidurRingkas', label: 'Sleep Last Night (Quick)', ringkas: 'Hours slept with a 14-night trend line', ke: '/pola-tidur', emoji: '🌙', kategori: 'Sleep & Recovery' },
   { id: 'denyutRingkas', label: 'Resting Heart Rate (Quick)', ringkas: 'Latest reading with a 14-day trend line', ke: '/log-detak-jantung', emoji: '❤️', kategori: 'Body & Data' },
   { id: 'aerobikRingkas', label: 'Aerobic Capacity (vs age)', ringkas: 'VO2max compared to the median for your age & sex', ke: '/longevity', emoji: '🌱', kategori: 'Body & Data' },
@@ -113,21 +113,21 @@ export const WIDGETS: WidgetDef[] = [
   { id: 'bodyBattery', label: 'Body Battery', ringkas: 'Today\'s energy reserve', ke: '/body-battery', emoji: '🔋', kategori: 'Body & Data' },
   { id: 'detakJantung', label: 'Heart Rate', ringkas: 'Latest samples from your watch', ke: '/log-detak-jantung', emoji: '❤️', kategori: 'Body & Data' },
   { id: 'healthData', label: 'Health Data', ringkas: 'Which metrics your devices actually fill in', ke: '/health-data', emoji: '📲', kategori: 'Body & Data' },
-  { id: 'komposisi', label: 'Body Composition', ringkas: 'Fat, muscle, and body water', ke: '/body', emoji: '⚖️', kategori: 'Body & Data' },
+  { id: 'komposisi', label: 'Body Composition', ringkas: 'Fat, muscle, and body water', ke: '/body', emoji: '⚖️', kategori: 'Body & Data', bawaan: true },
   { id: 'usiaBiologis', label: 'Biological Age', ringkas: 'An estimate of your body\'s age', ke: '/biological-age', emoji: '🕰️', kategori: 'Body & Data' },
   { id: 'organ', label: 'Organ Vitality', ringkas: 'How each organ system is doing', ke: '/organ-vitality', emoji: '🫀', kategori: 'Body & Data' },
   { id: 'labDecoder', label: 'Read Your Lab Report', ringkas: 'Translate laboratory numbers', ke: '/lab-decoder', emoji: '🧾', kategori: 'Body & Data' },
   { id: 'rppg', label: 'Camera Heart Rate', ringkas: 'Measure your pulse through your face', ke: '/rppg-heart-rate', emoji: '📷', kategori: 'Body & Data' },
   { id: 'vokal', label: 'Voice Biomarkers', ringkas: 'Health signals in the voice', ke: '/vocal-biomarkers', emoji: '🎙️', kategori: 'Body & Data' },
   { id: 'tenaga', label: 'Energy Today', ringkas: 'Self-reported, across 14 days', ke: '/harian', emoji: '🔋', kategori: 'Body & Data' },
-  { id: 'hidrasi2', label: 'Fluids Today', ringkas: 'Against your own baseline', ke: '/hydration', emoji: '💧', kategori: 'Nutrition' },
+  { id: 'hidrasi2', label: 'Fluids Today', ringkas: 'Against your own baseline', ke: '/hydration', emoji: '💧', kategori: 'Nutrition', bawaan: true },
   { id: 'cahaya', label: 'Morning Light', ringkas: 'Days in a row', ke: '/harian', emoji: '🌅', kategori: 'Body & Data' },
   { id: 'tangga', label: 'Floors Climbed', ringkas: 'Today\'s stairs vs your usual', ke: '/tubuh', emoji: '🪜', kategori: 'Training' },
   { id: 'vo2tren', label: 'VO₂max', ringkas: 'How your readings have moved', ke: '/longevity', emoji: '🫁', kategori: 'Training' },
   { id: 'suplemen', label: 'Supplements', ringkas: 'Your own list — no recommendations', ke: '/harian', emoji: '💊', kategori: 'Nutrition' },
   { id: 'suhuEkstrem', label: 'Heat & Cold', ringkas: 'Sauna and cold immersion', ke: '/harian', emoji: '🔥', kategori: 'Sleep & Recovery' },
   { id: 'pangan', label: 'Packaged Food Lookup', ringkas: 'Barcode or name, from Open Food Facts', ke: '/nutrition', emoji: '🔎', kategori: 'Nutrition' },
-  { id: 'obatPengingat', label: 'Medication', ringkas: 'Next dose and active reminders', ke: '/med-reminders', emoji: '💊', kategori: 'Services & Emergency' },
+  { id: 'obatPengingat', label: 'Medication', ringkas: 'Next dose and active reminders', ke: '/med-reminders', emoji: '💊', kategori: 'Services & Emergency', bawaan: true },
   { id: 'beban', label: 'Lifting Volume', ringkas: 'Eight weeks and per-lift records', ke: '/latihan-beban', emoji: '🏋️', kategori: 'Training' },
   { id: 'ukurBerkala', label: 'Periodic Measures', ringkas: 'Grip strength and balance', ke: '/tubuh', emoji: '✊', kategori: 'Body & Data' },
   { id: 'skrining', label: 'Screening & Vaccines', ringkas: 'What\'s due, on your own schedule', ke: '/tubuh', emoji: '🗓️', kategori: 'Clinical & Learning' },
@@ -147,15 +147,15 @@ export const WIDGETS: WidgetDef[] = [
   { id: 'papanAtlet', label: 'Athlete Board', ringkas: 'Load, ratio, focus, and when you train', ke: '/athlete-board', emoji: '📈', kategori: 'Training' },
   { id: 'selam', label: 'Dive Log', ringkas: 'Depth, surface interval, and time to fly', ke: '/dive-log', emoji: '🤿', kategori: 'Training' },
   { id: 'ringHarian', label: 'Today in Rings', ringkas: 'Recovery, exertion, steps and sleep at a glance', ke: '/athlete-board', emoji: '⭕', kategori: 'Body & Data', bawaan: true },
-  { id: 'ayatHarian', label: 'Verse of the Day', ringkas: 'One verse, both translations, recitation and commentary', ke: '/scripture', emoji: '📖', kategori: 'Faith & Life' },
+  { id: 'ayatHarian', label: 'Verse of the Day', ringkas: 'One verse, both translations, recitation and commentary', ke: '/scripture', emoji: '📖', kategori: 'Faith & Life', bawaan: true },
   { id: 'kisahNabi', label: 'Stories of the Prophets', ringkas: 'Summaries with the verses that carry them', ke: '/prophet-stories', emoji: '🕋', kategori: 'Faith & Life' },
   { id: 'edukasiAwam', label: 'Health, Explained', ringkas: 'Everyday complaints in plain language', ke: '/health-explained', emoji: '📗', kategori: 'Clinical & Learning' },
   { id: 'hitungHari', label: 'Days Since', ringkas: 'Day counters for habits you are changing', ke: '/harian', emoji: '📅', kategori: 'Body & Data' },
   { id: 'kepatuhan', label: 'Adherence, 14 Days', ringkas: 'Complete days, partial days, and missed', ke: '/harian', emoji: '💊', kategori: 'Body & Data' },
   { id: 'beratTren', label: 'Weight, 90 Days', ringkas: 'The three-month direction, not day-to-day noise', ke: '/tubuh', emoji: '⚖️', kategori: 'Body & Data', bawaan: true },
   { id: 'lab', label: 'Lab Results', ringkas: 'HbA1c, ApoB, eGFR — and how they\'ve moved', ke: '/tubuh', emoji: '🧪', kategori: 'Clinical & Learning' },
-  { id: 'lingkungan', label: 'Air & UV', ringkas: 'AQI and UV index for your city', ke: '/tubuh', emoji: '🌤️', kategori: 'Body & Data' },
-  { id: 'hrv', label: 'Overnight HRV', ringkas: 'Against your 14-day usual', ke: '/tubuh?t=jantung', emoji: '💓', kategori: 'Sleep & Recovery' },
+  { id: 'lingkungan', label: 'Air & UV', ringkas: 'AQI and UV index for your city', ke: '/tubuh', emoji: '🌤️', kategori: 'Body & Data', bawaan: true },
+  { id: 'hrv', label: 'Overnight HRV', ringkas: 'Against your 14-day usual', ke: '/tubuh?t=jantung', emoji: '💓', kategori: 'Sleep & Recovery', bawaan: true },
   { id: 'tahapTidur', label: 'Sleep Stages', ringkas: 'Deep, REM, and core', ke: '/pola-tidur', emoji: '🛌', kategori: 'Sleep & Recovery' },
   { id: 'efisiensiTidur', label: 'Sleep Efficiency', ringkas: 'Sleep ÷ time in bed', ke: '/pola-tidur', emoji: '📊', kategori: 'Sleep & Recovery' },
   { id: 'lajuNapas', label: 'Respiratory Rate', ringkas: 'Breaths per minute overnight', ke: '/tubuh', emoji: '🌬️', kategori: 'Body & Data' },
@@ -163,27 +163,27 @@ export const WIDGETS: WidgetDef[] = [
   { id: 'suhu', label: 'Body Temperature', ringkas: 'Deviation from your usual', ke: '/tubuh', emoji: '🌡️', kategori: 'Body & Data' },
   { id: 'zona2', label: 'Zone 2 This Week', ringkas: 'Minutes at 60–70% of max HR', ke: '/latihan?t=analisis', emoji: '🫀', kategori: 'Training', bawaan: true },
   { id: 'hrr', label: 'Heart Rate Recovery', ringkas: 'How many bpm it drops in one minute', ke: '/latihan?t=analisis', emoji: '📉', kategori: 'Training' },
-  { id: 'utangTidur', label: 'Sleep Debt', ringkas: 'Seven nights against your usual', ke: '/pola-tidur', emoji: '😴', kategori: 'Sleep & Recovery' },
-  { id: 'tekanan', label: 'Blood Pressure', ringkas: 'Systolic and diastolic', ke: '/tubuh', emoji: '🩸', kategori: 'Body & Data' },
+  { id: 'utangTidur', label: 'Sleep Debt', ringkas: 'Seven nights against your usual', ke: '/pola-tidur', emoji: '😴', kategori: 'Sleep & Recovery', bawaan: true },
+  { id: 'tekanan', label: 'Blood Pressure', ringkas: 'Systolic and diastolic', ke: '/tubuh', emoji: '🩸', kategori: 'Body & Data', bawaan: true },
   { id: 'napas', label: '2-Minute Breathing', ringkas: 'A guided breathing pattern', ke: '/harian', emoji: '🌬️', kategori: 'Body & Data', bawaan: true },
   { id: 'duduk', label: 'Sitting', ringkas: 'A stand-up nudge every 30 minutes', ke: '/harian', emoji: '🪑', kategori: 'Body & Data' },
   { id: 'mata', label: 'Eyes 20-20-20', ringkas: 'An eye break every 20 minutes', ke: '/tubuh', emoji: '👁️', kategori: 'Body & Data' },
   { id: 'fokus', label: 'Focus Session', ringkas: 'A countdown for work or screen time', ke: '/harian', emoji: '🎯', kategori: 'Body & Data' },
   { id: 'kopi', label: 'Coffee', ringkas: 'Last coffee and caffeine still on board', ke: '/pola-tidur', emoji: '☕', kategori: 'Nutrition' },
   { id: 'puasa', label: 'Fasting', ringkas: 'Time to Maghrib and your eating window', ke: '/prayer-times', emoji: '🌙', kategori: 'Faith & Life' },
-  { id: 'pewaktu', label: 'Timers', ringkas: 'Naps and AMRAP', ke: '/latihan', emoji: '⏱️', kategori: 'Training' },
+  { id: 'pewaktu', label: 'Timers', ringkas: 'Naps and AMRAP', ke: '/latihan', emoji: '⏱️', kategori: 'Training', bawaan: true },
   { id: 'kabar', label: 'Notifications', ringkas: 'What was actually sent, still readable after the lock screen', ke: '/settings', emoji: '🔔', kategori: 'Services & Emergency' },
-  { id: 'pengingat', label: 'Reminders', ringkas: 'Training, team goals, and the call to prayer', ke: '/settings', emoji: '🔔', kategori: 'Services & Emergency' },
+  { id: 'pengingat', label: 'Reminders', ringkas: 'Training, team goals, and the call to prayer', ke: '/settings', emoji: '🔔', kategori: 'Services & Emergency', bawaan: true },
   { id: 'ringkasanKarya', label: 'Book & Film Summaries', ringkas: 'One paragraph per book and film', ke: '/ringkasan-karya', emoji: '📚', kategori: 'Faith & Life' },
-  { id: 'inspirasi', label: 'Inspiration', ringkas: 'Stories and quotes, changing daily', ke: '/resilience-stories', emoji: '✨', kategori: 'Faith & Life' },
-  { id: 'kartuBelajar', label: 'Study Cards', ringkas: 'Diagnosis → management, answer hidden first', ke: '/med-study?bagian=therapy', emoji: '🗂️', kategori: 'Clinical & Learning' },
-  { id: 'soalHarian', label: 'Question of the Day', ringkas: 'One question, with the reasoning', ke: '/med-study', emoji: '❓', kategori: 'Clinical & Learning' },
+  { id: 'inspirasi', label: 'Inspiration', ringkas: 'Stories and quotes, changing daily', ke: '/resilience-stories', emoji: '✨', kategori: 'Faith & Life', bawaan: true },
+  { id: 'kartuBelajar', label: 'Study Cards', ringkas: 'Diagnosis → management, answer hidden first', ke: '/med-study?bagian=therapy', emoji: '🗂️', kategori: 'Clinical & Learning', bawaan: true },
+  { id: 'soalHarian', label: 'Question of the Day', ringkas: 'One question, with the reasoning', ke: '/med-study', emoji: '❓', kategori: 'Clinical & Learning', bawaan: true },
   { id: 'skorTim', label: 'Your Teams\' Scores', ringkas: 'Matches for the teams you follow', ke: '/sports-scores', emoji: '⚽', kategori: 'Faith & Life' },
   { id: 'tidurLebar', label: 'Sleep, 14 Nights', ringkas: 'Tonight against your usual', ke: '/pola-tidur', emoji: '🌙', kategori: 'Sleep & Recovery' },
   { id: 'giziLebar', label: 'Intake Today', ringkas: 'Calories and macro split', ke: '/nutrition', emoji: '🥗', kategori: 'Nutrition', bawaan: true },
   { id: 'motivasi', label: 'This Week', ringkas: 'Days in a row and training minutes', ke: '/harian', emoji: '🔥', kategori: 'Body & Data', bawaan: true },
-  { id: 'obatCepat', label: 'Drugs & Doses', ringkas: 'Look up a dose straight from the home screen', ke: '/med-study?bagian=therapy', emoji: '💊', kategori: 'Clinical & Learning' },
-  { id: 'kalkulatorCepat', label: 'Quick Maths', ringkas: 'BMI, MAP, BSA, dose per kg', ke: '/clinical-calculators', emoji: '🧮', kategori: 'Clinical & Learning' },
+  { id: 'obatCepat', label: 'Drugs & Doses', ringkas: 'Look up a dose straight from the home screen', ke: '/med-study?bagian=therapy', emoji: '💊', kategori: 'Clinical & Learning', bawaan: true },
+  { id: 'kalkulatorCepat', label: 'Quick Maths', ringkas: 'BMI, MAP, BSA, dose per kg', ke: '/clinical-calculators', emoji: '🧮', kategori: 'Clinical & Learning', bawaan: true },
   { id: 'stasiunSering', label: 'Most Frequent Stations', ringkas: 'OSCE cases by system', ke: '/osce-ukmppd', emoji: '🩺', kategori: 'Clinical & Learning' },
   { id: 'konsistensi', label: 'Consistency', ringkas: 'Days logged over 12 weeks', ke: '/harian', emoji: '🟩', kategori: 'Body & Data', bawaan: true },
   { id: 'longevity', label: 'Longevity', ringkas: 'Evidence-based longevity', ke: '/longevity', emoji: '🌱', kategori: 'Body & Data' },
@@ -374,7 +374,21 @@ export function ambilWidget(): string[] {
     if (!Array.isArray(arr)) return widgetBawaan()
     // Saring id yang sudah tidak ada lagi, agar kartu yang dihapus dari aplikasi
     // tidak meninggalkan slot kosong di beranda seseorang.
-    return arr.filter((id) => typeof id === 'string' && (WIDGET_HIDUP as readonly string[]).includes(id))
+    const hidup = arr.filter((id) => typeof id === 'string' && (WIDGET_HIDUP as readonly string[]).includes(id))
+
+    // Kalau penyaringan itu menghabiskan SELURUH pilihan seseorang, papannya
+    // menjadi kosong dan tidak ada jalan kembali: berkas pilihan tetap ada,
+    // jadi cabang "belum pernah memilih" di atas tidak pernah tercapai lagi.
+    // Itu pernah terjadi ketika daftar WIDGET_HIDUP dipersempit — pemakai yang
+    // dulu memilih kartu-kartu yang kemudian dimatikan membuka beranda dan
+    // mendapati papannya kosong, tanpa pernah menghapus apa pun sendiri.
+    //
+    // Papan kosong tidak pernah menjadi pilihan siapa pun, jadi keadaan itu
+    // dibaca sebagai kehilangan dan bawaannya dikembalikan. Kehilangan
+    // SEBAGIAN tidak diperlakukan begitu: pemakai yang sengaja menyisakan satu
+    // kartu memang berhak menyisakan satu kartu.
+    if (hidup.length === 0) return widgetBawaan()
+    return hidup
   } catch {
     return widgetBawaan()
   }

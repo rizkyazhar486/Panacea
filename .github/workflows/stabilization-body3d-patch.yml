@@ -1,0 +1,62 @@
+name: Stabilization Full Acceptance
+
+on:
+  push:
+    branches:
+      - claude/continue-previous-task-un3s83
+    paths:
+      - 'src/**'
+      - 'scripts/uji/**'
+      - 'server/**'
+      - 'package.json'
+      - 'package-lock.json'
+      - 'tsconfig*.json'
+      - '.github/workflows/stabilization-body3d-patch.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Checkout working branch
+        uses: actions/checkout@v4
+        with:
+          ref: claude/continue-previous-task-un3s83
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install frontend dependencies
+        run: npm ci
+
+      - name: Frontend TypeScript
+        run: npx tsc --noEmit
+
+      - name: Frontend production build
+        run: npm run build
+
+      - name: Frontend tests
+        run: npm run uji
+
+      - name: Install server dependencies
+        working-directory: server
+        run: npm ci
+
+      - name: Server TypeScript
+        working-directory: server
+        run: npm run typecheck
+
+      - name: Server build
+        working-directory: server
+        run: npm run build
+
+      - name: Server tests
+        working-directory: server
+        run: npm run uji
