@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict'
 import {
   AGING_HALLMARKS_2023,
+  REPROGRAMMING_TRANSLATIONAL_SNAPSHOT,
   RESEARCH_FRONTIER_DATA_SOURCES,
   RESEARCH_FRONTIER_EVIDENCE_TIERS,
   RESEARCH_FRONTIER_MODEL_CLASSES,
@@ -127,3 +128,13 @@ assert.ok(RESEARCH_FRONTIER_REPROGRAMMING_RISKS.includes('loss-of-cell-identity'
 assert.equal(AGING_HALLMARKS_2023.length, 12)
 assert.ok(AGING_HALLMARKS_2023.includes('cellular-senescence'))
 assert.ok(AGING_HALLMARKS_2023.includes('chronic-inflammation'))
+
+assert.equal(REPROGRAMMING_TRANSLATIONAL_SNAPSHOT.asOf, '2026-09-11')
+assert.equal(REPROGRAMMING_TRANSLATIONAL_SNAPSHOT.source, 'ClinicalTrials.gov')
+assert.equal(REPROGRAMMING_TRANSLATIONAL_SNAPSHOT.nctId, 'NCT07290244')
+assert.equal(REPROGRAMMING_TRANSLATIONAL_SNAPSHOT.phase, 'Phase 1')
+assert.equal(REPROGRAMMING_TRANSLATIONAL_SNAPSHOT.firstInHuman, true)
+assert.equal(REPROGRAMMING_TRANSLATIONAL_SNAPSHOT.postedResults, false)
+assert.equal(REPROGRAMMING_TRANSLATIONAL_SNAPSHOT.efficacyEstablished, false)
+assert.equal(REPROGRAMMING_TRANSLATIONAL_SNAPSHOT.systemicRejuvenationEstablished, false)
+assert.equal(REPROGRAMMING_TRANSLATIONAL_SNAPSHOT.lifespanExtensionEstablished, false)
