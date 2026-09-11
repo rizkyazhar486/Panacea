@@ -37,11 +37,15 @@ export function PhysiologySection({ onPickSystem }: Props) {
 
       {SISTEM_FISIOLOGI.map((s) => {
         const terbuka = open === s.key
+        const triggerId = `physiology-trigger-${s.key}`
+        const panelId = `physiology-panel-${s.key}`
         return (
           <div key={s.key} className="rounded-xl border border-neutral-200 dark:border-white/10">
             <button
+              id={triggerId}
               type="button"
               aria-expanded={terbuka}
+              aria-controls={terbuka ? panelId : undefined}
               onClick={() => {
                 setOpen(terbuka ? null : s.key)
                 if (!terbuka) onPickSystem(s.layer3d, s.searchTerms, s.label)
@@ -55,7 +59,7 @@ export function PhysiologySection({ onPickSystem }: Props) {
               <span className={`shrink-0 text-neutral-400 transition-transform ${terbuka ? 'rotate-90' : ''}`}>›</span>
             </button>
             {terbuka && (
-              <div className="space-y-3 border-t border-neutral-100 p-3 dark:border-white/5">
+              <div id={panelId} role="region" aria-labelledby={triggerId} className="space-y-3 border-t border-neutral-100 p-3 dark:border-white/5">
                 <div>
                   <div className="t-mikro font-bold uppercase tracking-wide text-neutral-500">How it works</div>
                   <ol className="mt-1 space-y-1">
