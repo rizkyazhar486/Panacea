@@ -64,6 +64,7 @@ export function DiseaseSection({ onPickDiagnosis }: Props) {
 
       {results.length > 0 && (
         <>
+          <p role="status" className="sr-only">{results.length} classification results loaded.</p>
           <div className="flex items-center gap-1.5">
             <span className={`rounded-full px-2 py-0.5 text-[10px] font-bold ${
               icd11 ? 'bg-brand/10 text-brand' : 'bg-amber-100 text-amber-700 dark:bg-amber-500/15 dark:text-amber-400'
