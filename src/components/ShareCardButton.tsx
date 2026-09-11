@@ -1,14 +1,30 @@
 import { useState, type RefObject } from 'react'
-import html2canvas from 'html2canvas'
+import html2canvas from 'html2canvas-pro'
 import { simpanBerkas } from '../lib/unduh'
 import { IconShare2 } from './icons'
 
 // Generic "make this card shareable" button — attach a ref to any card and
 // drop this in a corner. Captures the card as-is (whatever chart, gradient,
-// or text it holds) via html2canvas, stamps a small Panaceamed watermark in
-// the bottom-right corner of the exported image only (never on the live
-// card), then hands the PNG to the same share/download fallback chain used
-// by the GPS activity share card (Web Share sheet → download → open in tab).
+// or text it holds), stamps a small Panaceamed watermark in the bottom-right
+// corner of the exported image only (never on the live card), then hands the
+// PNG to the same share/download fallback chain used by the GPS activity
+// share card (Web Share sheet → download → open in tab).
+//
+// Kenapa html2canvas-pro dan bukan html2canvas: Tailwind v4 menulis warnanya
+// sebagai oklch()/oklab(), dan html2canvas 1.4.1 lebih tua daripada fungsi
+// warna itu. Ia melempar
+//
+//     Attempting to parse an unsupported color function "oklab"
+//
+// pada kartu mana pun yang memakai warna tema — yaitu semuanya. Terukur di
+// peramban sungguhan pada bundel produksi: 186 aturan oklch di satu berkas
+// CSS. Jadi tombol ini tidak pernah bisa bekerja sejak Tailwind v4 dipakai;
+// bukan kadang-kadang gagal, tetapi tidak pernah berhasil.
+//
+// Galatnya dulu ditelan `catch {}` kosong, sehingga tombolnya diam saja:
+// tidak ada berkas, tidak ada pesan, tidak ada yang tercatat. Itu sebabnya
+// laporannya berbunyi "tombol share tidak berfungsi" dan bukan "share gagal".
+// Kegagalan sekarang harus terlihat — lihat `galat` di bawah.
 
 const LOGO = '/logo-mark.png'
 
@@ -75,10 +91,12 @@ export function ShareCardButton({
   className?: string
 }) {
   const [busy, setBusy] = useState(false)
+  const [galat, setGalat] = useState(false)
 
   async function handleShare() {
     if (!targetRef.current || busy) return
     setBusy(true)
+    setGalat(false)
     try {
       const rendered = await html2canvas(targetRef.current, {
         backgroundColor: null,
@@ -88,9 +106,11 @@ export function ShareCardButton({
       const stamped = await stampWatermark(rendered)
       const blob: Blob | null = await new Promise((resolve) => stamped.toBlob((b) => resolve(b), 'image/png'))
       if (blob) await simpanBerkas(blob, fileName, title)
-    } catch {
-      // capture failed silently (e.g. an unsupported CSS filter) — nothing to
-      // recover into, the user can just try again
+    } catch (e) {
+      // Tidak ada jalan pulih otomatis, tetapi diam bukan pilihan: tombol yang
+      // gagal tanpa jejak tidak bisa dibedakan dari tombol yang mati.
+      console.error('[share] capture failed', e)
+      setGalat(true)
     } finally {
       setBusy(false)
     }
@@ -101,11 +121,15 @@ export function ShareCardButton({
       type="button"
       onClick={handleShare}
       disabled={busy}
-      aria-label="Share this card"
-      title="Share this card"
+      aria-label={galat ? 'Sharing failed — tap to try again' : 'Share this card'}
+      title={galat ? 'Sharing failed — tap to try again' : 'Share this card'}
       className={`grid h-8 w-8 shrink-0 place-items-center rounded-full border border-white/15 bg-black/55 text-white backdrop-blur-sm transition hover:bg-black/75 disabled:opacity-50 ${className}`}
     >
-      {busy ? <span className="h-3.5 w-3.5 animate-spin rounded-full border-2 border-white/40 border-t-white" /> : <IconShare2 size={15} />}
+      {busy
+        ? <span className="h-3.5 w-3.5 animate-spin rounded-full border-2 border-white/40 border-t-white" />
+        : galat
+          ? <span aria-hidden className="text-[13px] font-black leading-none text-rose-300">!</span>
+          : <IconShare2 size={15} />}
     </button>
   )
 }
