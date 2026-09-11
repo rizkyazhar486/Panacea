@@ -876,6 +876,9 @@ export function BodyExplorer() {
             {panelTab === 'hemodinamik' && (
               <Suspense fallback={<p className="text-sm text-neutral-500">Loading oxygen delivery…</p>}>
                 <HemodinamikPanel />
+              </Suspense>
+            )}
+
             {panelTab === 'nefron' && (
               <Suspense fallback={<p className="text-sm text-neutral-500">Loading glomerular filtration…</p>}>
                 <NefronPanel />
