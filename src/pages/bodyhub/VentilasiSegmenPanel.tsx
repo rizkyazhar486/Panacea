@@ -1,5 +1,9 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
+import { lazy, Suspense } from 'react'
 import { Prosa } from '../../components/Prosa'
+
+// 3D dimuat hanya saat panel ini dibuka; ia membawa three.js dan visceral.glb.
+const VentilasiBronkus3D = lazy(() => import('./VentilasiBronkus3D').then((m) => ({ default: m.VentilasiBronkus3D })))
 import {
   SEGMEN_VENTILASI, mulaiVentilasi, langkahVentilasi,
   resistensi, tetapanWaktu, jariJariTersumbat,
@@ -79,6 +83,16 @@ export function VentilasiSegmenPanel() {
           imitate breathing; only the physiological state advances.
         </Prosa>
       </div>
+
+      <Suspense fallback={<div className="h-[280px] w-full rounded-2xl bg-[var(--pelatih-alas-1,rgba(15,23,42,0.04))]" />}>
+        <VentilasiBronkus3D penyempitan={penyempitan} />
+      </Suspense>
+      <p className="text-[11px] leading-relaxed text-neutral-500">
+        The coloured tubes are the twenty segmental bronchi as the atlas ships them, filling from
+        empty to full as each segment's own time constant allows. The segment parenchyma is not drawn
+        because this model file does not carry it — inventing that geometry would make the picture
+        claim more than the data holds.
+      </p>
 
       <div className="grid grid-cols-3 gap-2">
         <div className="rounded-2xl bg-[var(--pelatih-alas-1,rgba(15,23,42,0.04))] px-3 py-2">
