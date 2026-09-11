@@ -530,6 +530,20 @@ export interface UkuranJaringan {
 const PITA_PANJANG = 120
 const PITA_TINGGI = 3
 
+/**
+ * Waktu saat u melewati 0,5, diinterpolasi linear di antara dua langkah.
+ *
+ * Jatuh kembali ke waktu langkah bila kedua sampelnya sama, sehingga tidak
+ * pernah membagi nol.
+ */
+function lintasAmbang(t0: number, t1: number, u0: number, u1: number): number {
+  const beda = u1 - u0
+  if (!Number.isFinite(beda) || beda === 0) return t1
+  const pecahan = (0.5 - u0) / beda
+  if (!Number.isFinite(pecahan) || pecahan < 0 || pecahan > 1) return t1
+  return t0 + (t1 - t0) * pecahan
+}
+
 export function ukurPlanar(par: Parameter, dt = DT_BAKU): UkuranJaringan {
   const j = buatJaringan(PITA_PANJANG, PITA_TINGGI, par)
   rangsang(j, 0, 0, 3, PITA_TINGGI, 1)
@@ -537,7 +551,21 @@ export function ukurPlanar(par: Parameter, dt = DT_BAKU): UkuranJaringan {
   const xA = 15, xB = 45
   const iA = 1 * PITA_PANJANG + xA
   const iB = 1 * PITA_PANJANG + xB
+  // Waktu kedatangan diinterpolasi di ANTARA dua langkah, bukan dibulatkan ke
+  // langkah terdekat.
+  //
+  // Kenapa ini penting dan bukan sekadar kerapian: kecepatan konduksi dihitung
+  // dari selisih dua waktu kedatangan. Kalau keduanya dibulatkan ke kelipatan
+  // dt, selisihnya ikut terkuantisasi, dan CV yang keluar berderau mengikuti
+  // ukuran langkah. Terukur pada studi refinement dt = 0,016 sampai 0,0005:
+  // orde konvergensi CV yang teramati keluar sebagai 35,80, -34,39, 1,58, 0,41
+  // -- angka yang tidak berarti apa-apa. Dengan interpolasi linear pada
+  // perlintasan ambang, orde yang sama menjadi 0,98, 0,99, 1,00, 1,00, yaitu
+  // orde pertama persis seperti yang diramalkan untuk Euler maju.
+  //
+  // Jadi yang berderau selama ini adalah PENGUKURANNYA, bukan solvernya.
   let tA = -1, tB = -1
+  let uAsebelum = j.u[iA], uBsebelum = j.u[iB], tSebelum = j.t
   const jejak: number[] = []
   const waktu: number[] = []
 
@@ -552,8 +580,10 @@ export function ukurPlanar(par: Parameter, dt = DT_BAKU): UkuranJaringan {
   for (let n = 0; n < batas; n++) {
     satuLangkah(j, dt)
     const uA = j.u[iA]
-    if (tA < 0 && uA > 0.5) tA = j.t
-    if (tB < 0 && j.u[iB] > 0.5) tB = j.t
+    const uB = j.u[iB]
+    if (tA < 0 && uA > 0.5) tA = lintasAmbang(tSebelum, j.t, uAsebelum, uA)
+    if (tB < 0 && uB > 0.5) tB = lintasAmbang(tSebelum, j.t, uBsebelum, uB)
+    uAsebelum = uA; uBsebelum = uB; tSebelum = j.t
     if (tA >= 0) { jejak.push(uA); waktu.push(j.t); puncakA = Math.max(puncakA, uA) }
     if (!Number.isFinite(uA)) break
     if (tA >= 0 && tB >= 0 && puncakA > 0.5 && uA < 0.02 * puncakA) break
