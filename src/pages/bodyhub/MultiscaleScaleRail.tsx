@@ -76,7 +76,7 @@ export function MultiscaleScaleRail({ bridge, initialNodeId, onOpenDestination }
         </p>
       </div>
 
-      <div className="-mx-1 flex gap-1.5 overflow-x-auto px-1 pb-1" aria-label="Biological scales">
+      <div role="group" className="-mx-1 flex gap-1.5 overflow-x-auto px-1 pb-1" aria-label="Biological scales">
         {SCALE_ORDER.map((scale) => {
           const nodes = bridge.nodes.filter((node) => node.scale === scale)
           const selectable = nodes[0]
