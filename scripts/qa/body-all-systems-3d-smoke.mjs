@@ -58,7 +58,7 @@ try {
 
   const precisionTab = page.getByRole('button', { name: 'Whole-body precision', exact: true })
   await precisionTab.click()
-  await page.getByText('Panacea · Whole-body precision atlas', { exact: true }).waitFor({ state: 'visible', timeout: 30_000 })
+  await page.getByText('Panacea · Whole-body precision atlas', { exact: true }).first().waitFor({ state: 'visible', timeout: 30_000 })
 
   const explorer = page.getByRole('region', { name: 'All body systems source-backed 3D' })
   await explorer.waitFor({ state: 'visible', timeout: 30_000 })
