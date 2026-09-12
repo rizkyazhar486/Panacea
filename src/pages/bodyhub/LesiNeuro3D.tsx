@@ -1,9 +1,8 @@
 import { useEffect, useRef, useState } from 'react'
 import * as THREE from 'three'
-import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
-import { MeshoptDecoder } from 'three/examples/jsm/libs/meshopt_decoder.module.js'
 import { body3dPixelRatio } from '../../lib/body3dQuality'
+import { muatAtlas, namaAtlas } from '../../lib/anatomy/pemuatAtlas'
 import {
   BERKAS_SARAF, MESH_LINTASAN, ikatanUntuk, kunciNama, meshSorot,
 } from '../../lib/anatomy/tingkatLesiMesh'
@@ -100,19 +99,17 @@ export function LesiNeuro3D({ tingkat, sisi, tinggi = 280 }: LesiNeuro3DProps) {
     const dasar = new Map<THREE.MeshStandardMaterial, THREE.Color>()
     let grup: THREE.Group | null = null
 
-    // nervous.glb terkompresi meshopt, sama seperti berkas atlas lainnya.
-    const loader = new GLTFLoader()
-    loader.setMeshoptDecoder(MeshoptDecoder)
-    loader.load(
-      `${import.meta.env.BASE_URL}${BERKAS_SARAF}`,
-      (gltf) => {
-        grup = gltf.scene
+    // Dekoder meshopt, pemulihan nama asli dan penolakan yang terlihat ditangani
+    // `muatAtlas`; lihat komentarnya untuk kegagalan sunyi yang pernah terjadi.
+    muatAtlas(BERKAS_SARAF.replace(/^anatomy\//, ''))
+      .then(({ scene: dimuat, namaAsli }) => {
+        grup = dimuat
         const kotak = new THREE.Box3()
 
         grup.traverse((o) => {
           if (!(o as THREE.Mesh).isMesh) return
           const m = o as THREE.Mesh
-          const k = kunciNama(m.name)
+          const k = kunciNama(namaAtlas(namaAsli, m))
           const lintasan = kunciLintasan.has(k)
           if (!lintasan && !kunciTempat.has(k)) {
             m.visible = false
@@ -151,13 +148,11 @@ export function LesiNeuro3D({ tingkat, sisi, tinggi = 280 }: LesiNeuro3DProps) {
         renderer.domElement.dataset.strukturTampil = String(perKunci.size)
         setMuat(false)
         terapkanRef.current?.(tingkat, sisi)
-      },
-      undefined,
-      () => {
+      })
+      .catch(() => {
         setGagal('Could not load the nervous-system model.')
         setMuat(false)
-      },
-    )
+      })
 
     /**
      * Bingkai kamera pada sekumpulan mesh.

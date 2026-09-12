@@ -54,6 +54,9 @@ async function semuaBerkasSumber(dir: string): Promise<string[]> {
 
   for (const p of berkas) {
     const isi = await readFile(p, 'utf8')
+    // Pemanggil yang lewat `muatAtlas` sudah aman menurut konstruksi: helper
+    // itulah yang memasang dekodernya, dan uji di bawah menjaga helper-nya.
+    if (isi.includes('muatAtlas(')) continue
     if (!isi.includes('new GLTFLoader(')) continue
     // Hanya pemuat yang benar-benar menunjuk berkas atlas yang diatur di sini.
     if (!/anatomy\/|BERKAS_SARAF|BERKAS_PERMUKAAN|BERKAS_BRONKUS/.test(isi)) continue
@@ -61,15 +64,22 @@ async function semuaBerkasSumber(dir: string): Promise<string[]> {
     if (!isi.includes('setMeshoptDecoder')) pelanggar.push(relative(AKAR, p))
   }
 
-  assert.ok(diperiksa >= 3, `Hanya ${diperiksa} pemuat atlas ditemukan; pemindaiannya mungkin rusak`)
+  assert.ok(diperiksa >= 1, `Tidak ada pemuat atlas ditemukan sama sekali; pemindaiannya mungkin rusak`)
   assert.deepEqual(
     pelanggar, [],
     'Pemuat atlas tanpa setMeshoptDecoder. Berkasnya akan ditolak diam-diam dan kanvasnya kosong:\n  ' +
     pelanggar.join('\n  '),
   )
 
+  // Helper bersama adalah satu-satunya jalur yang boleh dipercaya pemanggil
+  // lain, jadi ia sendiri harus benar-benar memasang dekodernya.
+  const helper = await readFile(new URL('../../src/lib/anatomy/pemuatAtlas.ts', import.meta.url), 'utf8')
+  assert.ok(helper.includes('setMeshoptDecoder'), 'pemuatAtlas.ts tidak memasang dekoder meshopt')
+  assert.ok(helper.includes('parser.associations'), 'pemuatAtlas.ts tidak memulihkan nama asli simpul')
+
   console.log(
-    `Pemuat GLB meshopt: ${BERKAS_ATLAS.length} berkas atlas menuntut EXT_meshopt_compression, dan ` +
-    `${diperiksa} pemuat di src/ memasang dekodernya.`,
+    `Pemuat GLB meshopt: ${BERKAS_ATLAS.length} berkas atlas menuntut EXT_meshopt_compression; ` +
+    `${diperiksa} pemuat langsung di src/ memasang dekodernya, dan helper bersama memasangnya ` +
+    'sekaligus memulihkan nama asli simpul.',
   )
 }
