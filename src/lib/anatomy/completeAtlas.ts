@@ -2,6 +2,7 @@ import type { AtlasManifest, AtlasNode } from './atlasKernel'
 import { HIGHER_END_WHOLE_BODY_NODES } from './higherEndWholeBodyAtlas'
 import { RESPIRATORY_ATLAS_NODES } from './respiratoryAtlas'
 import { WHOLE_BODY_ATLAS_BASE_NODES } from './wholeBodyAtlas'
+import { WHOLE_BODY_DEEP_EXPANSION_WAVE_1 } from './wholeBodyDeepExpansionWave1'
 
 /**
  * Build hierarchy solely from parentId. Raw `children` arrays are deliberately
@@ -28,18 +29,20 @@ export function deriveCanonicalAtlasHierarchy(nodes: readonly AtlasNode[]): read
 /**
  * Canonical high-complexity atlas manifest used by advanced viewers.
  *
- * The base whole-body scaffold, respiratory deep-dive and fail-closed higher-end
- * reference identities are composed only here so each source stays independently
- * reviewable. Higher-end nodes are navigation metadata, never verified geometry.
- * Hierarchy children are rebuilt after composition, making cross-module parents
- * deterministic and preventing stale authoring hints from changing runtime topology.
+ * Composition deliberately separates verified-source geometry from reference-only
+ * educational identities. The deep whole-body wave expands system, regional and
+ * microstructure navigation without claiming that Panacea already owns reviewed
+ * geometry for every identity. Hierarchy children are rebuilt after composition,
+ * making cross-module parents deterministic and preventing stale authoring hints
+ * from changing runtime topology.
  */
 export const COMPLETE_WHOLE_BODY_ATLAS: AtlasManifest = {
   id: 'panacea-complete-whole-body-atlas',
-  revision: '2026-09-09-r3-higher-end-foundation',
+  revision: '2026-09-09-r4-deep-world-foundation',
   nodes: deriveCanonicalAtlasHierarchy([
     ...WHOLE_BODY_ATLAS_BASE_NODES,
     ...RESPIRATORY_ATLAS_NODES,
     ...HIGHER_END_WHOLE_BODY_NODES,
+    ...WHOLE_BODY_DEEP_EXPANSION_WAVE_1,
   ]),
 }
