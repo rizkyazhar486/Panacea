@@ -28,6 +28,7 @@
     "qa:limfe-3d": "node scripts/qa/limfe-3d-smoke.mjs",
     "qa:kerangka-3d": "node scripts/qa/kerangka-3d-smoke.mjs",
     "qa:lesi-3d": "node scripts/qa/lesi-neuro-3d-smoke.mjs",
+    "qa:kelenjar-3d": "node scripts/qa/kelenjar-3d-smoke.mjs",
     "cakupan": "node scripts/cakupanSkdi.mjs"
   },
   "dependencies": {

@@ -24,6 +24,7 @@ const KerangkaPanel = lazy(() => import('./bodyhub/KerangkaPanel').then((m) => (
 const ArteriPanel = lazy(() => import('./bodyhub/ArteriPanel').then((m) => ({ default: m.ArteriPanel })))
 const LimfePanel = lazy(() => import('./bodyhub/LimfePanel').then((m) => ({ default: m.LimfePanel })))
 const VentilasiSegmenPanel = lazy(() => import('./bodyhub/VentilasiSegmenPanel').then((m) => ({ default: m.VentilasiSegmenPanel })))
+const KelenjarSaluranPanel = lazy(() => import('./bodyhub/KelenjarSaluranPanel').then((m) => ({ default: m.KelenjarSaluranPanel })))
 const LokalisasiLesiPanel = lazy(() => import('./bodyhub/LokalisasiLesiPanel').then((m) => ({ default: m.LokalisasiLesiPanel })))
 const PhysiologySection = lazy(() => import('./bodyhub/PhysiologySection'))
 const DrugSection = lazy(() => import('./bodyhub/DrugSection'))
@@ -96,7 +97,7 @@ function Chip({
 // sama-sama menyorot struktur pada figur yang itu-itu juga. Itulah maksud
 // "satu simulasi tubuh yang utuh" — bukan enam halaman yang saling menyebut,
 // melainkan satu tubuh yang ditanyai dari enam sudut.
-type PanelTab = 'hemodinamik' | 'nefron' | 'asam-basa' | 'wilayah-abdomen' | 'kerangka' | 'arteri' | 'limfe' | 'ventilasi' | 'lokalisasi' | 'layers' | 'muscles' | 'workout-sim' | 'organs' | 'physiology' | 'simulator' | 'cardio' | 'spesialisasi' | 'molekul' | 'genomik' | 'sel' | 'bedah' | 'cari' | 'presisi' | 'mesin' | 'drugs' | 'diseases' | 'reference'
+type PanelTab = 'hemodinamik' | 'nefron' | 'asam-basa' | 'wilayah-abdomen' | 'kerangka' | 'arteri' | 'limfe' | 'kelenjar-saluran' | 'ventilasi' | 'lokalisasi' | 'layers' | 'muscles' | 'workout-sim' | 'organs' | 'physiology' | 'simulator' | 'cardio' | 'spesialisasi' | 'molekul' | 'genomik' | 'sel' | 'bedah' | 'cari' | 'presisi' | 'mesin' | 'drugs' | 'diseases' | 'reference'
 
 const PANEL_TABS: Array<{ key: PanelTab; label: string }> = [
   { key: 'layers', label: 'Layers' },
@@ -114,6 +115,7 @@ const PANEL_TABS: Array<{ key: PanelTab; label: string }> = [
   { key: 'kerangka', label: 'Skeleton' },
   { key: 'arteri', label: 'Arterial territories' },
   { key: 'limfe', label: 'Lymphoid system' },
+  { key: 'kelenjar-saluran', label: 'Glands & urinary tract' },
   { key: 'cardio', label: 'Cardio lab' },
   { key: 'spesialisasi', label: 'Specialty labs' },
   { key: 'molekul', label: 'Molecules' },
@@ -921,6 +923,12 @@ export function BodyExplorer() {
             {panelTab === 'kerangka' && (
               <Suspense fallback={<p className="text-sm text-neutral-500">Loading the skeleton…</p>}>
                 <KerangkaPanel />
+              </Suspense>
+            )}
+
+            {panelTab === 'kelenjar-saluran' && (
+              <Suspense fallback={<p className="text-sm text-neutral-500">Loading glands and the urinary tract…</p>}>
+                <KelenjarSaluranPanel />
               </Suspense>
             )}
             {panelTab === 'ventilasi' && (
