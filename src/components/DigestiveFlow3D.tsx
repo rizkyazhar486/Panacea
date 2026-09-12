@@ -9,7 +9,7 @@ import {
   resolveAllAnatomySourceNodes,
 } from '../lib/anatomySourceNodeRegistry'
 import { body3dPixelRatio } from '../lib/body3dQuality'
-import { digestiveFlowVisualState, type DigestiveFlowPhase } from '../lib/digestiveFlowVisual'
+import { advanceDigestiveFlowTime, digestiveFlowVisualState, type DigestiveFlowPhase } from '../lib/digestiveFlowVisual'
 
 interface Target {
   id: string
@@ -50,7 +50,10 @@ function centerOf(object: THREE.Object3D | null) {
 export default function DigestiveFlow3D() {
   const containerRef = useRef<HTMLDivElement>(null)
   const phaseRef = useRef<DigestiveFlowPhase>('upper')
+  const playbackRef = useRef({ running: true, resetVersion: 0 })
   const [phase, setPhase] = useState<DigestiveFlowPhase>('upper')
+  const [running, setRunning] = useState(true)
+  const [resetVersion, setResetVersion] = useState(0)
   const [loading, setLoading] = useState(false)
   const [opened, setOpened] = useState(false)
   const [error, setError] = useState('')
@@ -69,6 +72,14 @@ export default function DigestiveFlow3D() {
   useEffect(() => {
     phaseRef.current = phase
   }, [phase])
+
+  useEffect(() => {
+    playbackRef.current.running = running
+  }, [running])
+
+  useEffect(() => {
+    playbackRef.current.resetVersion = resetVersion
+  }, [resetVersion])
 
   useEffect(() => {
     if (!opened) return
@@ -195,16 +206,25 @@ export default function DigestiveFlow3D() {
       if (!disposed) { setError('Could not load the shipped visceral source geometry.'); setLoading(false) }
     })
 
-    const clock = new THREE.Clock()
     const temp = new THREE.Object3D()
     const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    let elapsedSeconds = 0
+    let lastFrameMs: number | null = null
+    let appliedResetVersion = playbackRef.current.resetVersion
     let raf = 0
     let inViewport = true
     let documentVisible = !document.hidden
-    const render = () => {
+    const render = (timeMs: number) => {
       raf = 0
       if (!inViewport || !documentVisible) return
-      const visual = digestiveFlowVisualState(reduced ? 0 : clock.getElapsedTime(), phaseRef.current)
+      if (appliedResetVersion !== playbackRef.current.resetVersion) {
+        elapsedSeconds = 0
+        appliedResetVersion = playbackRef.current.resetVersion
+      }
+      const deltaSeconds = lastFrameMs === null ? 0 : Math.min(0.1, Math.max(0, (timeMs - lastFrameMs) / 1000))
+      lastFrameMs = timeMs
+      elapsedSeconds = advanceDigestiveFlowTime(elapsedSeconds, deltaSeconds, playbackRef.current.running && !reduced)
+      const visual = digestiveFlowVisualState(elapsedSeconds, phaseRef.current)
       for (const [material, materialPhase] of materials) {
         const active = materialPhase === phaseRef.current
         material.emissive.setRGB(active ? visual.organEmphasis : 0, active ? visual.organEmphasis * 0.35 : 0, 0)
@@ -229,7 +249,12 @@ export default function DigestiveFlow3D() {
       renderer.render(scene, camera)
       raf = requestAnimationFrame(render)
     }
-    const start = () => { if (!raf && inViewport && documentVisible) raf = requestAnimationFrame(render) }
+    const start = () => {
+      if (!raf && inViewport && documentVisible) {
+        lastFrameMs = null
+        raf = requestAnimationFrame(render)
+      }
+    }
     const stop = () => { if (raf) cancelAnimationFrame(raf); raf = 0 }
     const io = new IntersectionObserver(([entry]) => { inViewport = Boolean(entry?.isIntersecting); inViewport ? start() : stop() }, { rootMargin: '128px' })
     io.observe(container)
@@ -252,7 +277,7 @@ export default function DigestiveFlow3D() {
         <button type="button" aria-expanded={opened} onClick={() => setOpened((v) => !v)} className="min-h-11 rounded-xl border border-amber-300 bg-white px-4 text-[10px] font-black text-amber-800 dark:bg-white/5 dark:text-amber-200">{opened ? 'Close Digestive 3D' : 'Open Digestive 3D'}</button>
       </div>
       <div className="mt-2 flex flex-wrap gap-1.5 text-[8px] font-black"><span className="rounded-full border border-emerald-300/40 px-2 py-1 text-emerald-700 dark:text-emerald-300">{represented.length} targets resolve</span><span className="rounded-full border border-neutral-300/40 px-2 py-1 text-neutral-500">{unavailable.length} unavailable</span></div>
-      {opened && <div className="mt-3 space-y-2"><div className="flex flex-wrap gap-1.5">{(['upper','small-bowel','colon'] as DigestiveFlowPhase[]).map((p) => <button key={p} type="button" aria-pressed={phase===p} onClick={() => setPhase(p)} className={`min-h-10 rounded-full border px-3 text-[9px] font-black ${phase===p ? 'border-amber-500 bg-amber-500 text-black' : 'border-neutral-200 dark:border-white/10'}`}>{PHASE_LABEL[p]}</button>)}</div><div className="relative overflow-hidden rounded-2xl bg-neutral-950"><div ref={containerRef} className="h-[340px] w-full" aria-hidden="true" />{loading && <div role="status" className="absolute inset-0 flex items-center justify-center text-xs font-bold text-neutral-400">Loading digestive source geometry…</div>}{error && <div role="alert" className="absolute inset-0 flex items-center justify-center p-4 text-center text-xs font-bold text-neutral-400">{error}</div>}<div className="pointer-events-none absolute left-3 top-3 rounded-full border border-white/10 bg-black/60 px-3 py-1 text-[8px] font-black text-amber-200">{PHASE_LABEL[phase]} · {routeCount} source route segments</div></div><p className="text-[9px] leading-relaxed text-neutral-500">Moving particles show educational direction only. Animation period is a display cycle, not measured peristalsis, gastric emptying, intestinal transit, pressure, motility, diagnosis, or patient physiology.</p>{unavailable.length > 0 && <details className="text-[9px] text-neutral-500"><summary className="cursor-pointer font-black">Unavailable source targets ({unavailable.length})</summary><div className="mt-1 flex flex-wrap gap-1">{unavailable.map((target) => <span key={target.id} className="rounded-full border border-neutral-200 px-2 py-1 dark:border-white/10">{target.label}</span>)}</div></details>}</div>}
+      {opened && <div className="mt-3 space-y-2"><div className="flex flex-wrap items-center justify-between gap-2"><div className="flex flex-wrap gap-1.5">{(['upper','small-bowel','colon'] as DigestiveFlowPhase[]).map((p) => <button key={p} type="button" aria-pressed={phase===p} onClick={() => setPhase(p)} className={`min-h-10 rounded-full border px-3 text-[9px] font-black ${phase===p ? 'border-amber-500 bg-amber-500 text-black' : 'border-neutral-200 dark:border-white/10'}`}>{PHASE_LABEL[p]}</button>)}</div><div role="group" aria-label="Digestive flow cue playback" className="flex gap-1.5"><button type="button" aria-pressed={!running} onClick={() => setRunning((value) => !value)} className="min-h-10 rounded-full border border-amber-400 px-3 text-[9px] font-black text-amber-800 dark:text-amber-200">{running ? 'Pause flow cue' : 'Resume flow cue'}</button><button type="button" onClick={() => setResetVersion((value) => value + 1)} className="min-h-10 rounded-full border border-neutral-300 px-3 text-[9px] font-black text-neutral-600 dark:border-white/15 dark:text-neutral-300">Reset cue</button></div></div><div role="status" aria-live="polite" className="sr-only">Digestive flow cue {running ? 'running' : 'paused'} for {PHASE_LABEL[phase]}.</div><div className="relative overflow-hidden rounded-2xl bg-neutral-950"><div ref={containerRef} className="h-[340px] w-full" role="img" aria-label={`Source-backed digestive 3D showing ${PHASE_LABEL[phase]} with the educational flow cue ${running ? 'running' : 'paused'}`} data-digestive-flow-running={running ? 'true' : 'false'} />{loading && <div role="status" className="absolute inset-0 flex items-center justify-center text-xs font-bold text-neutral-400">Loading digestive source geometry…</div>}{error && <div role="alert" className="absolute inset-0 flex items-center justify-center p-4 text-center text-xs font-bold text-neutral-400">{error}</div>}<div className="pointer-events-none absolute left-3 top-3 rounded-full border border-white/10 bg-black/60 px-3 py-1 text-[8px] font-black text-amber-200">{PHASE_LABEL[phase]} · {routeCount} source route segments</div></div><p className="text-[9px] leading-relaxed text-neutral-500">Moving particles show educational direction only. Animation period is a display cycle, not measured peristalsis, gastric emptying, intestinal transit, pressure, motility, diagnosis, or patient physiology.</p>{unavailable.length > 0 && <details className="text-[9px] text-neutral-500"><summary className="cursor-pointer font-black">Unavailable source targets ({unavailable.length})</summary><div className="mt-1 flex flex-wrap gap-1">{unavailable.map((target) => <span key={target.id} className="rounded-full border border-neutral-200 px-2 py-1 dark:border-white/10">{target.label}</span>)}</div></details>}</div>}
     </section>
   )
 }
