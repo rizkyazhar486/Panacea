@@ -8,7 +8,7 @@ import {
 
 assert.equal(
   IMMUNE_MARROW_RENDER_FORMULA,
-  'ImmuneMarrowRenderEligible = ReachableWebGLModule ∧ ExactShippedStructures ∧ PositiveIndexedTriangles ∧ BodyParts3DSourceOnly ∧ MarrowMeshNotFabricated',
+  'ImmuneMarrowRenderEligible = ReachableWebGLModule ∧ ExactShippedStructures ∧ PositiveIndexedTriangles ∧ BodyParts3DSourceOnly ∧ NoSeparateMarrowMesh',
 )
 
 const audit = auditImmuneMarrowSourceAcceptance()
@@ -18,7 +18,12 @@ assert.ok(audit.structures > 0, 'imunologi: no exact shipped structures')
 assert.ok(audit.triangles > 0, 'imunologi: no positive indexed triangles')
 assert.deepEqual(audit.sources, ['bodyparts3d'])
 assert.ok(audit.exactSource, 'imunologi: expected BodyParts3D only')
-assert.equal(audit.marrowMeshFabricated, false)
+assert.deepEqual(
+  audit.explicitMarrowStructures,
+  [],
+  `imunologi: separate marrow-like mesh unexpectedly present: ${audit.explicitMarrowStructures.join(', ')}`,
+)
+assert.equal(audit.separateMarrowMeshPresent, false)
 assert.equal(audit.blockers.length, 0, `imunologi: ${audit.blockers.join(', ')}`)
 assert.ok(audit.renderEligible, 'imunologi: source-backed render gate failed')
 
@@ -38,5 +43,6 @@ console.log('immune marrow source acceptance:', {
   structures: audit.structures,
   triangles: audit.triangles,
   sources: audit.sources,
-  marrowMeshFabricated: audit.marrowMeshFabricated,
+  explicitMarrowStructures: audit.explicitMarrowStructures,
+  separateMarrowMeshPresent: audit.separateMarrowMeshPresent,
 })
