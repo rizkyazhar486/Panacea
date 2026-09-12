@@ -22,6 +22,7 @@
     "periksa:semua": "node scripts/periksaTeks.mjs --semua",
     "uji": "node scripts/uji/jalankan.mjs",
     "qa:share-card": "node scripts/qa/share-card-export-smoke.mjs",
+    "qa:bergerak": "node scripts/qa/panel-bergerak-smoke.mjs",
     "qa:organ-3d": "node scripts/qa/organ-model-3d-smoke.mjs",
     "qa:wilayah-3d": "node scripts/qa/wilayah-abdomen-3d-smoke.mjs",
     "qa:ventilasi-3d": "node scripts/qa/ventilasi-bronkus-3d-smoke.mjs",
