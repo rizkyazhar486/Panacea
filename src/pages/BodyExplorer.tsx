@@ -988,6 +988,12 @@ export function BodyExplorer() {
                 <SurgicalLab
                   onKedalaman={setDissect}
                   onSorot={(nama) => { setActiveWorkout(null); setActiveOrgan(null); setFocusKeywords(null); setHighlighted(nama) }}
+                  onSharedView={(view) => {
+                    setRenderMode(view.renderMode)
+                    setSlicePlane(view.slicePlane)
+                    setSlicePos(view.slicePos)
+                    setUnfold(view.unfold)
+                  }}
                 />
               </Suspense>
             )}
