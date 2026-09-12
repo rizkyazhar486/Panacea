@@ -28,6 +28,7 @@ const LimfePanel = lazy(() => import('./bodyhub/LimfePanel').then((m) => ({ defa
 const VentilasiMembranPanel = lazy(() => import('./bodyhub/VentilasiMembranPanel').then((m) => ({ default: m.VentilasiMembranPanel })))
 const VentilasiSegmenPanel = lazy(() => import('./bodyhub/VentilasiSegmenPanel').then((m) => ({ default: m.VentilasiSegmenPanel })))
 const KelenjarSaluranPanel = lazy(() => import('./bodyhub/KelenjarSaluranPanel').then((m) => ({ default: m.KelenjarSaluranPanel })))
+const TuasSendiPanel = lazy(() => import('./bodyhub/TuasSendiPanel').then((m) => ({ default: m.TuasSendiPanel })))
 const LokalisasiLesiPanel = lazy(() => import('./bodyhub/LokalisasiLesiPanel').then((m) => ({ default: m.LokalisasiLesiPanel })))
 const PhysiologySection = lazy(() => import('./bodyhub/PhysiologySection'))
 const DrugSection = lazy(() => import('./bodyhub/DrugSection'))
@@ -101,13 +102,14 @@ function Chip({
 // sama-sama menyorot struktur pada figur yang itu-itu juga. Itulah maksud
 // "satu simulasi tubuh yang utuh" — bukan enam halaman yang saling menyebut,
 // melainkan satu tubuh yang ditanyai dari enam sudut.
-type PanelTab = 'hemodinamik' | 'nefron' | 'asam-basa' | 'farmakodinamik' | 'dialisis' | 'wilayah-abdomen' | 'kerangka' | 'arteri' | 'limfe' | 'kelenjar-saluran' | 'ventilasi' | 'ventilasi-membran' | 'lokalisasi' | 'layers' | 'muscles' | 'workout-sim' | 'biomekanika' | 'organs' | 'physiology' | 'simulator' | 'cardio' | 'spesialisasi' | 'molekul' | 'genomik' | 'sel' | 'bedah' | 'cari' | 'presisi' | 'mesin' | 'drugs' | 'diseases' | 'reference'
+type PanelTab = 'hemodinamik' | 'nefron' | 'asam-basa' | 'farmakodinamik' | 'dialisis' | 'wilayah-abdomen' | 'kerangka' | 'arteri' | 'limfe' | 'kelenjar-saluran' | 'ventilasi' | 'ventilasi-membran' | 'lokalisasi' | 'tuas-sendi' | 'layers' | 'muscles' | 'workout-sim' | 'biomekanika' | 'organs' | 'physiology' | 'simulator' | 'cardio' | 'spesialisasi' | 'molekul' | 'genomik' | 'sel' | 'bedah' | 'cari' | 'presisi' | 'mesin' | 'drugs' | 'diseases' | 'reference'
 
 const PANEL_TABS: Array<{ key: PanelTab; label: string }> = [
   { key: 'layers', label: 'Layers' },
   { key: 'muscles', label: 'Muscles' },
   { key: 'workout-sim', label: 'Workout' },
   { key: 'biomekanika', label: 'Motion biomechanics' },
+  { key: 'tuas-sendi', label: 'Joint levers' },
   { key: 'organs', label: 'Organs' },
   { key: 'physiology', label: 'Physiology' },
   { key: 'simulator', label: 'Simulator' },
@@ -896,6 +898,12 @@ export function BodyExplorer() {
                     setLayers((prev) => new Set(prev).add('cardiovascular').add('visceral'))
                   }}
                 />
+              </Suspense>
+            )}
+
+            {panelTab === 'tuas-sendi' && (
+              <Suspense fallback={<p className="text-sm text-neutral-500">Loading joint levers…</p>}>
+                <TuasSendiPanel />
               </Suspense>
             )}
 
