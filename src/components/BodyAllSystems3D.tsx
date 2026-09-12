@@ -41,6 +41,7 @@ export default function BodyAllSystems3D() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const [loadedFiles, setLoadedFiles] = useState(0)
+  const [failedFiles, setFailedFiles] = useState<string[]>([])
 
   const systems = useMemo(() => resolveBodySystemSourceWave(), [open])
   const selected = systems.find((system) => system.id === systemId) ?? systems[0]
@@ -57,6 +58,7 @@ export default function BodyAllSystems3D() {
     setLoading(true)
     setError('')
     setLoadedFiles(0)
+    setFailedFiles([])
 
     const scene = new THREE.Scene()
     const camera = new THREE.PerspectiveCamera(36, 1, 0.01, 1000)
@@ -177,7 +179,13 @@ export default function BodyAllSystems3D() {
         if (disposed) return
         completed += 1
         setLoadedFiles(completed)
-        if (completed === filesNeeded.length) setLoading(false)
+        setFailedFiles((current) => current.includes(file) ? current : [...current, file])
+        setError((current) => current || 'One or more shipped anatomy source bundles failed to load. Missing renders remain blocked; no replacement geometry was created.')
+        if (completed === filesNeeded.length) {
+          fitCamera()
+          updateVisibility()
+          setLoading(false)
+        }
       })
     }
 
@@ -240,8 +248,8 @@ export default function BodyAllSystems3D() {
     }
   }, [open])
 
-  const represented = selected.targets.filter((target) => target.available)
-  const unavailable = selected.targets.filter((target) => !target.available)
+  const represented = selected.targets.filter((target) => target.available && !failedFiles.includes(target.file))
+  const unavailable = selected.targets.filter((target) => !target.available || failedFiles.includes(target.file))
 
   return (
     <section className="rounded-2xl border border-emerald-200 bg-emerald-50/50 p-3 dark:border-emerald-300/20 dark:bg-emerald-300/[.04]" aria-label="All body systems source-backed 3D">
@@ -271,18 +279,22 @@ export default function BodyAllSystems3D() {
           <div className="rounded-xl border border-neutral-200 bg-white p-3 dark:border-white/10 dark:bg-white/[.035]">
             <div className="text-[9px] font-black uppercase tracking-wide text-emerald-700 dark:text-emerald-300">{selected.label}</div>
             <div className="mt-1 text-lg font-black text-neutral-950 dark:text-white">{represented.length}/{selected.targets.length} source targets represented</div>
-            <p className="mt-1 text-[9px] leading-relaxed text-neutral-500">Counts reflect source-name resolution only, not anatomical completeness or human academic validation.</p>
+            <p className="mt-1 text-[9px] leading-relaxed text-neutral-500">Counts require source-name resolution and a successfully loaded source bundle; they do not claim anatomical completeness or human academic validation.</p>
           </div>
           <div className="grid gap-1.5 sm:grid-cols-2 md:grid-cols-1 xl:grid-cols-2">
-            {selected.targets.map((target) => (
-              <div key={target.id} className="rounded-xl border border-neutral-200 bg-white p-2.5 dark:border-white/10 dark:bg-white/[.035]">
-                <div className="text-[10px] font-black text-neutral-900 dark:text-white">{target.label}</div>
-                <div className={`mt-1 text-[9px] font-bold ${target.available ? 'text-emerald-700 dark:text-emerald-300' : 'text-amber-700 dark:text-amber-300'}`}>{target.available ? `${target.names.length} exact source node(s)` : 'BLOCKED · source geometry unavailable'}</div>
-                <div className="mt-1 truncate text-[8px] text-neutral-400">{target.file}</div>
-              </div>
-            ))}
+            {selected.targets.map((target) => {
+              const bundleFailed = failedFiles.includes(target.file)
+              const renderedAvailable = target.available && !bundleFailed
+              return (
+                <div key={target.id} className="rounded-xl border border-neutral-200 bg-white p-2.5 dark:border-white/10 dark:bg-white/[.035]">
+                  <div className="text-[10px] font-black text-neutral-900 dark:text-white">{target.label}</div>
+                  <div className={`mt-1 text-[9px] font-bold ${renderedAvailable ? 'text-emerald-700 dark:text-emerald-300' : 'text-amber-700 dark:text-amber-300'}`}>{renderedAvailable ? `${target.names.length} exact source node(s)` : bundleFailed ? 'BLOCKED · source bundle failed to load' : 'BLOCKED · source geometry unavailable'}</div>
+                  <div className="mt-1 truncate text-[8px] text-neutral-400">{target.file}</div>
+                </div>
+              )
+            })}
           </div>
-          {unavailable.length > 0 && <p className="rounded-xl border border-amber-200 bg-amber-50 p-2.5 text-[9px] leading-relaxed text-amber-900 dark:border-amber-300/20 dark:bg-amber-300/[.06] dark:text-amber-200">Missing targets are deliberately not approximated. The next source-ingestion wave must provide compatible licensed geometry before they can render.</p>}
+          {unavailable.length > 0 && <p className="rounded-xl border border-amber-200 bg-amber-50 p-2.5 text-[9px] leading-relaxed text-amber-900 dark:border-amber-300/20 dark:bg-amber-300/[.06] dark:text-amber-200">Missing or failed source targets are deliberately not approximated. Compatible licensed geometry must load successfully before they can be counted as rendered.</p>}
         </div>
       </div>
     </section>
