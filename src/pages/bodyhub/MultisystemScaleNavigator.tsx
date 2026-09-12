@@ -14,6 +14,7 @@ import {
 import RadiologyModalityHub from './RadiologyModalityHub'
 
 const Ocular4DAtlas = lazy(() => import('../../components/digital-twin/Ocular4DAtlas'))
+const BodyAllSystems3D = lazy(() => import('../../components/BodyAllSystems3D'))
 
 const SCALE_GROUPS: readonly { label: string; scales: readonly KnowledgeScale[] }[] = [
   { label: 'Body', scales: ['whole-body', 'system', 'organ'] },
@@ -123,6 +124,12 @@ export default function MultisystemScaleNavigator() {
           </section>
         </div>
       )}
+
+      <div className="mt-3">
+        <Suspense fallback={<div role="status" className="flex min-h-28 items-center justify-center rounded-2xl border border-neutral-200 text-xs font-bold text-neutral-500 dark:border-white/10">Loading all-system Body explorer…</div>}>
+          <BodyAllSystems3D />
+        </Suspense>
+      </div>
 
       <div className="mt-3">
         <RadiologyModalityHub />
