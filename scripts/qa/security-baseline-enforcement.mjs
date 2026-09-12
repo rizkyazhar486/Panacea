@@ -1,9 +1,10 @@
 import assert from 'node:assert/strict'
-import { readFile, readdir } from 'node:fs/promises'
+import { mkdir, readFile, readdir, writeFile } from 'node:fs/promises'
 import { join, relative } from 'node:path'
 
 const root = new URL('../../', import.meta.url).pathname
 const sourceRoots = ['src', 'server/src']
+const reportPath = join(root, 'artifacts/security-baseline-enforcement.json')
 
 async function walk(dir) {
   const out = []
@@ -36,8 +37,6 @@ function isNonInjectionCleanup(rule, line) {
 }
 
 const files = (await Promise.all(sourceRoots.map((dir) => walk(join(root, dir))))).flat()
-assert.ok(files.length > 0, 'security baseline found no application source files')
-
 const findings = []
 for (const file of files) {
   const text = await readFile(file, 'utf8')
@@ -51,39 +50,70 @@ for (const file of files) {
 
 const reviewedDebt = findings.filter((item) => item.file === 'src/pages/Feed.tsx' && item.rule === 'document.write')
 const unreviewed = findings.filter((item) => !(item.file === 'src/pages/Feed.tsx' && item.rule === 'document.write'))
-assert.deepEqual(unreviewed, [], `Unreviewed browser execution/HTML injection sinks:\n${unreviewed.map((item) => `${item.file}:${item.line} ${item.rule}`).join('\n')}`)
-assert.equal(reviewedDebt.length, 1, `Expected exactly one reviewed Feed document.write debt; found ${reviewedDebt.length}`)
 
 const feed = await readFile(join(root, 'src/pages/Feed.tsx'), 'utf8')
-assert.match(feed, /const esc = \(s: string\) => s\.replace\(\/\[<>&\]\//, 'Reviewed Feed print debt must preserve HTML escaping')
-assert.match(feed, /\$\{esc\(new Date\(\)\.toLocaleString\('en-US'\)\)\}/, 'Reviewed Feed print debt must escape generated date text')
-assert.match(feed, /rows\.map\(\(r\) => `<tr><td>\$\{esc\(r\[0\]\)\}<\/td><td>\$\{esc\(r\[1\]\)\}<\/td><\/tr>`\)\.join\(''\)/, 'Reviewed Feed print debt must escape every report row cell')
+const feedChecks = {
+  escapeFunction: feed.includes("const esc = (s: string) => s.replace(/[<>&]/g"),
+  escapedGeneratedDate: feed.includes("${esc(new Date().toLocaleString('en-US'))}"),
+  escapedRows: feed.includes("rows.map((r) => `<tr><td>${esc(r[0])}</td><td>${esc(r[1])}</td></tr>`).join('')"),
+}
 
 const workflow = await readFile(join(root, '.github/workflows/validate-pr.yml'), 'utf8')
-assert.match(workflow, /permissions:\s*\n\s*contents:\s*read\b/)
-assert.doesNotMatch(workflow, /permissions:\s*write-all\b/)
-assert.doesNotMatch(workflow, /contents:\s*write\b/)
+const ciChecks = {
+  contentsRead: /permissions:\s*\n\s*contents:\s*read\b/.test(workflow),
+  writeAllAbsent: !/permissions:\s*write-all\b/.test(workflow),
+  contentsWriteAbsent: !/contents:\s*write\b/.test(workflow),
+}
 
 const pkg = JSON.parse(await readFile(join(root, 'package.json'), 'utf8'))
 const lock = JSON.parse(await readFile(join(root, 'package-lock.json'), 'utf8'))
 const dependencies = Object.entries(pkg.dependencies ?? {})
 const floating = dependencies.filter(([, version]) => ['', '*', 'latest', 'next'].includes(String(version).trim().toLowerCase()))
-assert.deepEqual(floating, [], `Floating production dependency declarations: ${floating.map(([name]) => name).join(', ')}`)
 const lockRootDependencies = lock.packages?.['']?.dependencies ?? {}
-assert.deepEqual(dependencies.filter(([name]) => !(name in lockRootDependencies)).map(([name]) => name), [], 'Production dependency missing from lockfile root')
-assert.deepEqual(
-  dependencies
-    .map(([name]) => ({ name, entry: lock.packages?.[`node_modules/${name}`] }))
-    .filter(({ entry }) => !entry || !entry.version || !entry.resolved || !entry.integrity)
-    .map(({ name }) => name),
-  [],
-  'Production dependency missing resolved version/integrity metadata',
-)
+const missingLockRoot = dependencies.filter(([name]) => !(name in lockRootDependencies)).map(([name]) => name)
+const incompleteResolvedMetadata = dependencies
+  .map(([name]) => ({ name, entry: lock.packages?.[`node_modules/${name}`] }))
+  .filter(({ entry }) => !entry || !entry.version || !entry.resolved || !entry.integrity)
+  .map(({ name }) => name)
+
+const checks = {
+  sourceFilesFound: files.length > 0,
+  zeroUnreviewedSinks: unreviewed.length === 0,
+  oneReviewedFeedDebt: reviewedDebt.length === 1,
+  ...feedChecks,
+  ...ciChecks,
+  zeroFloatingProductionDependencies: floating.length === 0,
+  completeRootLockDeclarations: missingLockRoot.length === 0,
+  completeResolvedLockMetadata: incompleteResolvedMetadata.length === 0,
+}
+
+await mkdir(join(root, 'artifacts'), { recursive: true })
+await writeFile(reportPath, JSON.stringify({
+  generatedAt: new Date().toISOString(),
+  scannedFiles: files.length,
+  findings,
+  reviewedDebt,
+  unreviewed,
+  feedChecks,
+  ciChecks,
+  dependencyChecks: {
+    productionDependencies: dependencies.length,
+    floating: floating.map(([name, version]) => ({ name, version })),
+    missingLockRoot,
+    incompleteResolvedMetadata,
+  },
+  checks,
+  pass: Object.values(checks).every(Boolean),
+}, null, 2))
+
+for (const [name, passed] of Object.entries(checks)) {
+  assert.equal(passed, true, `Security baseline check failed: ${name}`)
+}
 
 console.log('security baseline enforcement:', {
   scannedFiles: files.length,
   unreviewedSinks: unreviewed.length,
   reviewedDebt: reviewedDebt.map((item) => `${item.file}:${item.line} ${item.rule}`),
   productionDependencies: dependencies.length,
-  ciPermissions: 'contents:read',
+  checks,
 })
