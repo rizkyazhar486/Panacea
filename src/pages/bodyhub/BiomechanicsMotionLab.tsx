@@ -55,7 +55,7 @@ export default function BiomechanicsMotionLab() {
           <h3 className="mt-1 text-sm font-black">Original motion ↔ source-backed anatomical atlas</h3>
           <p className="mt-1 max-w-3xl text-[10px] leading-relaxed text-white/55">A side-by-side workspace inspired by the supplied reference: scrub a real exercise video while inspecting the corresponding source-backed muscle atlas. The atlas remains rotatable and the same timeline stays visible on mobile.</p>
         </div>
-        <label className="min-h-10 cursor-pointer rounded-xl border border-emerald-300/30 bg-emerald-300/10 px-3 py-2 text-[10px] font-black text-emerald-200">
+        <label className="min-h-10 cursor-pointer rounded-xl border border-emerald-300/30 bg-emerald-300/10 px-3 py-2 text-[10px] font-black text-emerald-200 focus-within:ring-2 focus-within:ring-emerald-300 focus-within:ring-offset-2 focus-within:ring-offset-[#07110f]">
           Load motion video
           <input className="sr-only" type="file" accept="video/*" onChange={(event) => loadVideo(event.target.files?.[0])} />
         </label>
@@ -101,7 +101,7 @@ export default function BiomechanicsMotionLab() {
 
       <div className="space-y-3 border-t border-white/10 p-3 sm:p-4">
         <div className="grid gap-2 sm:grid-cols-[1fr_auto] sm:items-center">
-          <label className="text-[9px] font-black uppercase tracking-wide text-white/50">Synchronized timeline · {phase}
+          <label className="text-[9px] font-black uppercase tracking-wide text-white/50">Synchronized timeline · <span aria-live="polite">{phase}</span>
             <input aria-label="Motion timeline" type="range" min="0" max="1" step="0.001" value={progress} disabled={!duration} onChange={(event) => seek(Number(event.target.value))} className="mt-2 block w-full accent-emerald-400" />
           </label>
           <div className="text-right font-mono text-[10px] text-white/50">{time.toFixed(2)} / {duration.toFixed(2)} s</div>
