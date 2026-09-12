@@ -1,0 +1,73 @@
+name: Organ 3D Acceptance
+
+on:
+  pull_request:
+    branches:
+      - main
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: organ-3d-acceptance-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  organ-render-proof:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Production build
+        run: npm run build
+
+      - name: Install browser smoke runner
+        run: |
+          npm install --no-save --no-package-lock @playwright/test@1.55.0
+          for source in /etc/apt/sources.list.d/*.list /etc/apt/sources.list.d/*.sources; do
+            [ -f "$source" ] || continue
+            if grep -q 'dl.google.com/linux/chrome-stable' "$source"; then
+              sudo mv "$source" "$source.panacea-disabled"
+            fi
+          done
+          npx playwright install --with-deps chromium
+
+      - name: Start production preview
+        run: |
+          nohup npm run preview -- --host 127.0.0.1 --port 4173 > /tmp/panacea-organ-preview.log 2>&1 &
+          echo $! > /tmp/panacea-organ-preview.pid
+          for attempt in $(seq 1 45); do
+            if curl -fsS http://127.0.0.1:4173/ >/dev/null; then
+              exit 0
+            fi
+            sleep 1
+          done
+          cat /tmp/panacea-organ-preview.log
+          exit 1
+
+      - name: Prove organ GLBs render meshes
+        env:
+          ORGAN3D_QA_URL: http://127.0.0.1:4173/#/body-explorer
+        run: npm run qa:organ-3d
+
+      - name: Stop production preview
+        if: always()
+        run: |
+          if [ -f /tmp/panacea-organ-preview.pid ]; then
+            kill "$(cat /tmp/panacea-organ-preview.pid)" 2>/dev/null || true
+          fi
