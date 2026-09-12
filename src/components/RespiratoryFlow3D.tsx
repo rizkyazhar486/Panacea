@@ -2,6 +2,8 @@ import { useEffect, useRef, useState } from 'react'
 import * as THREE from 'three'
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
+import { MeshoptDecoder } from 'three/examples/jsm/libs/meshopt_decoder.module.js'
+import { IKATAN_BRONKUS } from '../lib/anatomy/bronkusSegmental'
 import { RESPIRATORY_ATLAS_NODES } from '../lib/anatomy/respiratoryAtlas'
 import { body3dPixelRatio } from '../lib/body3dQuality'
 import { respiratoryFlowVisualState, type RespiratoryFlowPhase } from '../lib/respiratoryFlowVisual'
@@ -41,6 +43,20 @@ function centerOf(object: THREE.Object3D | null): THREE.Vector3 | null {
   const box = new THREE.Box3().setFromObject(object)
   if (box.isEmpty()) return null
   return box.getCenter(new THREE.Vector3())
+}
+
+function segmentCenterFor(nodeId: string, byName: Map<string, THREE.Object3D>): THREE.Vector3 | null {
+  const binding = IKATAN_BRONKUS.find((entry) => entry.segmen === nodeId)
+  if (!binding) return null
+
+  const centers = binding.mesh
+    .map((name) => centerOf(byName.get(normalizeName(name)) ?? null))
+    .filter((center): center is THREE.Vector3 => Boolean(center))
+  if (!centers.length) return null
+
+  const average = new THREE.Vector3()
+  for (const center of centers) average.add(center)
+  return average.multiplyScalar(1 / centers.length)
 }
 
 function routeCurve(
@@ -108,13 +124,18 @@ export function RespiratoryFlow3D({ phase, height = 340 }: Props) {
     const resizeObserver = new ResizeObserver(resize)
     resizeObserver.observe(container)
 
-    const respiratoryHints = new Set(
-      RESPIRATORY_ATLAS_NODES
+    // Source hints are useful for organs/lobes, but the segmental-airway hints
+    // deliberately omit atlas suffixes such as `(BI)`. Reuse the exact
+    // source-bound bronchial names already gated by bronkus-segmental-3d.mts
+    // so the viewer cannot silently hide all segmental bronchi.
+    const respiratoryHints = new Set([
+      ...RESPIRATORY_ATLAS_NODES
         .filter((node) => node.source?.files?.includes('visceral.glb'))
         .flatMap((node) => node.source?.nodeHints ?? [])
         .filter(Boolean)
         .map(normalizeName),
-    )
+      ...IKATAN_BRONKUS.flatMap((binding) => binding.mesh).map(normalizeName),
+    ])
 
     const visibleMeshes: THREE.Mesh[] = []
     const lungMaterials: THREE.MeshStandardMaterial[] = []
@@ -125,7 +146,12 @@ export function RespiratoryFlow3D({ phase, height = 340 }: Props) {
     let root: THREE.Group | null = null
     let disposed = false
 
-    new GLTFLoader().load(
+    // visceral.glb is meshopt-compressed. The decoder is mandatory: without
+    // it GLTFLoader rejects the shipped source model and the canvas can remain
+    // present while the anatomy never appears.
+    const loader = new GLTFLoader()
+    loader.setMeshoptDecoder(MeshoptDecoder)
+    loader.load(
       `${import.meta.env.BASE_URL}anatomy/visceral.glb`,
       (gltf) => {
         if (disposed) return
@@ -175,7 +201,11 @@ export function RespiratoryFlow3D({ phase, height = 340 }: Props) {
         routes = RESPIRATORY_ATLAS_NODES
           .filter((node) => node.id.startsWith('resp:segment:'))
           .map((node) => {
-            const segment = centerOf(sourceObjectFor(node.id, byName))
+            // Segment routes end on the exact shipped bronchial meshes from
+            // IKATAN_BRONKUS. The respiratory-atlas hints are prefix-like and
+            // intentionally do not include suffixes such as `(BI)`, so exact
+            // Map lookup against those hints would yield zero routes.
+            const segment = segmentCenterFor(node.id, byName)
             const main = node.laterality === 'right' ? rightMain : leftMain
             return routeCurve(trachea, main, segment)
           })
