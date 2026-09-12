@@ -5,6 +5,7 @@ import {
   SPECIALTY_ORGAN_RENDER_FORMULA,
   SPECIALTY_ORGAN_TARGETS,
   auditSpecialtyOrganBreadth,
+  auditSpecialtyOrganModule,
   renderEligible,
 } from '../../src/lib/anatomy/specialtyOrganBreadthAudit.ts'
 
@@ -16,8 +17,8 @@ assert.equal(
 )
 
 const systems = new Set(audits.map((audit) => audit.system))
-for (const required of ['digestive', 'reproductive', 'lymphatic-immune', 'integumentary-surface']) {
-  assert.ok(systems.has(required as never), `missing canonical breadth system: ${required}`)
+for (const required of ['digestive', 'reproductive', 'lymphatic-immune', 'integumentary-surface'] as const) {
+  assert.ok(systems.has(required), `missing canonical breadth system: ${required}`)
 }
 
 for (const audit of audits) {
@@ -49,8 +50,17 @@ for (const target of SPECIALTY_ORGAN_TARGETS) {
 
 // Fail-closed regression: an absent module must remain blocked rather than borrowing
 // geometry from a neighbouring module.
-const impossible = audits.find((audit) => audit.module === '__not_real__')
-assert.equal(impossible, undefined)
+const impossible = auditSpecialtyOrganModule({
+  system: 'digestive',
+  module: '__not_real__',
+  label: 'Impossible source gap',
+})
+assert.equal(impossible.reachable, false)
+assert.equal(impossible.sourceBacked, false)
+assert.equal(renderEligible(impossible), false)
+assert.ok(impossible.blockers.includes('MODULE_NOT_SHIPPED'))
+assert.ok(impossible.blockers.includes('NO_EXACT_SHIPPED_STRUCTURES'))
+assert.ok(impossible.blockers.includes('SOURCE_IDENTITY_MISSING'))
 
 console.log('specialty organ breadth audit:', audits.map(({ system, module, structures, triangles, sources }) => ({
   system, module, structures, triangles, sources,
