@@ -380,3 +380,21 @@ export const SURGICAL_FOCUS_WITHOUT_GEOMETRY: SurgicalFocusWithoutGeometry[] = [
  * seratus dari hampir tiga ribu simpul tidak memfokuskan apa pun.
  */
 export const BATAS_FOKUS_TERLALU_LUAS = 100
+
+/**
+ * Apakah struktur ini punya geometri yang benar-benar dikirim?
+ *
+ * Dipakai antarmuka untuk BERHENTI menampilkan dua hal yang berbeda secara
+ * identik. Sampai sekarang "Ureter" -- yang meshnya ada dan bisa disorot --
+ * tampil persis seperti "Recurrent laryngeal nerve", yang tidak dikirim sama
+ * sekali. Keduanya keping abu-abu yang sama meyakinkannya, dan pembacanya
+ * tidak punya cara untuk tahu mana yang bisa ditunjuk pada model.
+ *
+ * Daftarnya sudah dijaga dua arah oleh scripts/uji/bedah-struktur-risiko.mts:
+ * struktur yang tidak resolve harus ada di sini, dan yang ada di sini harus
+ * benar-benar tidak resolve. Jadi jawaban fungsi ini tidak bisa menyimpang
+ * dari berkas GLB tanpa menggagalkan gerbang.
+ */
+export function alasanTanpaGeometri(structure: string): string | null {
+  return SURGICAL_STRUCTURES_WITHOUT_GEOMETRY.find((d) => d.structure === structure)?.reason ?? null
+}

@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
+import { KepingStrukturRisiko } from './KepingStrukturRisiko'
 import {
   ALL_SURGICAL_PROCEDURES,
   SURGICAL_SPECIALTIES,
@@ -101,7 +102,7 @@ export function SurgicalProcedureTimeline() {
           <div className="grid gap-3 lg:grid-cols-2">
             <article className="rounded-2xl border border-rose-200 bg-rose-50 p-4 dark:border-rose-300/20 dark:bg-rose-300/[.055]">
               <div className="text-[9px] font-black uppercase tracking-[.14em] text-rose-700 dark:text-rose-200">Structures at risk</div>
-              <div className="mt-3 flex flex-wrap gap-1.5">{phase.structuresAtRisk.length ? phase.structuresAtRisk.map((item) => <span key={item} className="rounded-full border border-rose-200 bg-white px-2.5 py-1.5 text-[9px] font-bold text-rose-800 dark:border-rose-300/20 dark:bg-white/[.04] dark:text-rose-100">{item}</span>) : <span className="text-[10px] text-neutral-500">No specific risk structure listed in this atlas record.</span>}</div>
+              <div className="mt-3 flex flex-wrap gap-1.5">{phase.structuresAtRisk.length ? phase.structuresAtRisk.map((item) => <KepingStrukturRisiko key={item} struktur={item} gaya="rounded-full border border-rose-200 bg-white px-2.5 py-1.5 text-[9px] font-bold text-rose-800 dark:border-rose-300/20 dark:bg-white/[.04] dark:text-rose-100" />) : <span className="text-[10px] text-neutral-500">No specific risk structure listed in this atlas record.</span>}</div>
             </article>
             <article className="rounded-2xl border border-cyan-200 bg-cyan-50 p-4 dark:border-cyan-300/20 dark:bg-cyan-300/[.055]">
               <div className="text-[9px] font-black uppercase tracking-[.14em] text-cyan-700 dark:text-cyan-200">Safety checkpoint</div>
