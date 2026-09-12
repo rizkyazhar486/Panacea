@@ -6,7 +6,7 @@
   "description": "Panaceamed.id — Longevity Medical-AI Co-Physician platform (AI Chatbot + AI-EMR)",
   "scripts": {
     "dev": "vite",
-    "build": "node scripts/gen-note-index.mjs --check && node scripts/validate-source-registry.mjs && node scripts/validate-feature-factory.mjs && node scripts/validate-academic-review.mjs && node --test scripts/qa/source-registry-validator.test.mjs scripts/qa/feature-factory.test.mjs scripts/qa/academic-review-gate.test.mjs scripts/qa/home-widget-theme.test.mjs && tsc -b && vite build",
+    "build": "node scripts/gen-note-index.mjs --check && node scripts/validate-source-registry.mjs && node scripts/validate-feature-factory.mjs && node scripts/validate-academic-review.mjs && node --test scripts/qa/source-registry-validator.test.mjs scripts/qa/feature-factory.test.mjs scripts/qa/academic-review-gate.test.mjs scripts/qa/home-widget-theme.test.mjs scripts/qa/security-baseline.test.mjs && tsc -b && vite build",
     "preview": "vite preview",
     "gen:note-index": "node scripts/gen-note-index.mjs",
     "validate:source-registry": "node scripts/validate-source-registry.mjs",
@@ -15,6 +15,7 @@
     "validate:academic-review": "node scripts/validate-academic-review.mjs",
     "test:feature-factory": "node --test scripts/qa/feature-factory.test.mjs scripts/qa/academic-review-gate.test.mjs",
     "test:home-theme": "node --test scripts/qa/home-widget-theme.test.mjs",
+    "test:security": "node --test scripts/qa/security-baseline.test.mjs",
     "next:features": "node scripts/next-feature-candidates.mjs",
     "feature:status": "node scripts/next-feature-candidates.mjs --json",
     "feature:update": "node scripts/update-feature-progress.mjs",
