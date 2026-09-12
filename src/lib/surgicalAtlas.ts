@@ -205,9 +205,9 @@ export const SURGICAL_PROCEDURES: SurgicalProcedure[] = [
     summary: 'Reconstructive wound-bed and graft-take concept using layered skin/vascular anatomy.',
     learningObjectives: ['Understand donor/recipient tissue layers', 'Visualize vascular dependence of graft take', 'See reconstruction as a timed biological process, not just a static closure'],
     phases: [
-      phase('wound-bed', 'Recipient bed', 'Understand viable tissue and vascular context.', 'A graft brings no blood supply of its own, so the recipient bed is not a surface but a source: whether it can perfuse the graft decides the outcome before anything is placed. Bone or tendon stripped of its covering cannot do that, which is why the composition of the bed is examined rather than its size.', ['skin', 'dermis', 'subcutaneous', 'artery', 'vein'], ['surface', 'cardiovascular', 'muscular'], 3, .14, ['Exposed tendon/bone depending on region', 'Local vessels', 'Nerves'], 'Recipient anatomy and tissue layers are recognized.', ['wound preparation family']),
+      phase('wound-bed', 'Recipient bed', 'Understand viable tissue and vascular context.', 'A graft brings no blood supply of its own, so the recipient bed is not a surface but a source: whether it can perfuse the graft decides the outcome before anything is placed. Bone or tendon stripped of its covering cannot do that, which is why the composition of the bed is examined rather than its size. No integument is shipped as geometry in this atlas, so this phase has nothing to highlight on the model and is text only.', ['skin', 'dermis', 'subcutaneous'], ['surface', 'cardiovascular', 'muscular'], 3, .14, ['Exposed tendon/bone depending on region', 'Local vessels', 'Nerves'], 'Recipient anatomy and tissue layers are recognized.', ['wound preparation family']),
       phase('graft-layer', 'Graft placement concept', 'Visualize a thin skin layer conforming to the recipient surface.', 'A generic graft sheet demonstrates contact and coverage. Harvest thickness and device settings are intentionally absent.', ['skin', 'dermis'], ['surface', 'cardiovascular'], 4, .18, ['Underlying structures', 'Graft edges'], 'Coverage and contact are visually understood.', ['graft handling family', 'fixation/dressing family']),
-      phase('take-timeline', '4D graft-take timeline', 'Show the concept of evolving graft-host vascular integration.', 'Graft take is a sequence and not an event: the graft first survives on diffusion from the bed, then depends on vessels growing into it. Anything that separates graft from bed interrupts that supply, which is the reason contact matters more than coverage. The timeline is generic biology, not a viability prediction for anyone.', ['skin', 'artery', 'vein'], ['surface', 'cardiovascular'], 4, .16, ['Graft tissue', 'Recipient microvasculature'], 'Time-dependent biology is explicitly labelled educational.', ['dressing family']),
+      phase('take-timeline', '4D graft-take timeline', 'Show the concept of evolving graft-host vascular integration.', 'Graft take is a sequence and not an event: the graft first survives on diffusion from the bed, then depends on vessels growing into it. Anything that separates graft from bed interrupts that supply, which is the reason contact matters more than coverage. The timeline is generic biology, not a viability prediction for anyone. Like the recipient bed, it has no shipped geometry to point at.', ['skin'], ['surface', 'cardiovascular'], 4, .16, ['Graft tissue', 'Recipient microvasculature'], 'Time-dependent biology is explicitly labelled educational.', ['dressing family']),
       COMMON_CLOSE,
     ],
     complications: ['Graft loss', 'Infection', 'Hematoma/seroma', 'Contracture/scarring', 'Donor-site morbidity'],
@@ -316,3 +316,67 @@ export const SURGICAL_STRUCTURES_WITHOUT_GEOMETRY: SurgicalStructureWithoutGeome
   { structure: 'Venous sinuses', reason: 'Individual dural sinuses (superior sagittal, transverse, sigmoid, straight) are shipped under their own names; the collective term matches none of them.' },
   { structure: 'Vessels', reason: 'Generic term; matching it would claim grounding over the entire cardiovascular layer.' },
 ]
+
+/**
+ * Kata kunci fokus yang TIDAK bisa menyorot apa pun.
+ *
+ * `focusKeywords` bukan hiasan: Body3D mencocokkannya sebagai SUBSTRING ke nama
+ * simpul asli, lalu memakai yang cocok untuk (a) menyalakan emissive pada mesh
+ * dan (b) membingkai ulang kamera ke kotak gabungannya. Kata kunci yang tidak
+ * cocok dengan apa pun karena itu tidak menyorot apa pun DAN tidak memindahkan
+ * kamera — fasenya tetap terbuka, terlihat normal, dan tidak mengajarkan apa
+ * pun. Tidak ada galat dan tidak ada uji yang gagal.
+ *
+ * Ini kegagalan yang sama seperti `structuresAtRisk`, satu lapis di atasnya:
+ * di sana namanya hanya dibaca manusia, di sini namanya MENGEMUDIKAN penampil.
+ *
+ * Dicatat, bukan ditambal. Menyulap kata kunci supaya cocok dengan mesh
+ * terdekat akan menyorot struktur yang salah — jauh lebih buruk daripada tidak
+ * menyorot apa pun.
+ */
+export interface SurgicalFocusWithoutGeometry {
+  keyword: string
+  reason: string
+}
+
+export const SURGICAL_FOCUS_WITHOUT_GEOMETRY: SurgicalFocusWithoutGeometry[] = [
+  { keyword: 'caecum', reason: 'Not shipped in any layer. The appendectomy orientation phase is built on the appendiceal base; only \'Vermiform appendix\' exists, with no caecal mesh around it.' },
+  { keyword: 'cecum', reason: 'American spelling of the same absent structure; carried so the phase does not silently depend on spelling.' },
+  { keyword: 'ileum', reason: 'Not shipped. The terminal ileum is the landmark the appendiceal base is found from, and the visceral layer ships Jejunum but no ileum.' },
+  { keyword: 'mesoappendix', reason: 'Not shipped. The appendicular artery runs in it, so the mesentery that phase divides has no geometry at all.' },
+  { keyword: 'cystic duct', reason: 'Not shipped. The biliary layer carries \'Bile duct\' only; the cystic duct that defines Calot\'s triangle is absent.' },
+  { keyword: 'common bile', reason: 'Not shipped under that name. \'Bile duct\' exists but nothing distinguishes the common duct, which is the structure the phase exists to avoid.' },
+  { keyword: 'hepatic duct', reason: 'Not shipped. Neither common nor right hepatic duct appears in any layer.' },
+  { keyword: 'cystic artery', reason: 'Not shipped. \'Common hepatic artery\' and \'Proper hepatic artery\' exist; the cystic branch does not.' },
+  { keyword: 'external oblique', reason: 'Not shipped as a named node. The inguinal phases open its aponeurosis, so that step can only ever be text.' },
+  { keyword: 'spermatic', reason: 'Not shipped. The cord is the structure the inguinal repair is built around.' },
+  { keyword: 'round ligament', reason: 'Not shipped. It is the female counterpart of the cord in the same phase.' },
+  { keyword: 'abdominal wall', reason: 'Collective wording rather than a node name; the shipped atlas names individual muscles and fasciae, none of which stands for the wall as a whole.' },
+  { keyword: 'distal femur', reason: 'Not shipped as a region. \'Femur\' exists as one bone with no separately named distal portion, so the arthroplasty resection level cannot be shown.' },
+  { keyword: 'tibial plateau', reason: 'Not shipped as a region, for the same reason as the distal femur.' },
+  { keyword: 'anterior cruciate', reason: 'Not shipped. No cruciate ligament geometry exists in any layer, so the ACL phases have no target at all.' },
+  { keyword: 'posterior cruciate', reason: 'Not shipped. Like the anterior cruciate, no geometry exists for it, so a phase discussing the posterior drawer has nothing to point at.' },
+  { keyword: 'meniscus', reason: 'Not shipped. No meniscal geometry exists, so knee phases that reference it cannot highlight it.' },
+  { keyword: 'flexor tendon', reason: 'Not shipped as named tendon geometry; the muscular layer carries muscle bellies, and the carpal tunnel contents therefore have no mesh.' },
+  { keyword: 'uterus', reason: 'Not shipped. The cesarean phases have no uterine geometry whatsoever — the organ the procedure is performed on is absent.' },
+  { keyword: 'placenta', reason: 'Not shipped, and would not be part of a generic atlas in any case; it is patient- and pregnancy-specific.' },
+  { keyword: 'fetal', reason: 'Not shipped. No fetal anatomy exists in this atlas.' },
+  { keyword: 'recurrent laryngeal', reason: 'Not shipped. This is the structure the entire thyroidectomy safety phase exists to protect, and it has no geometry to point at.' },
+  { keyword: 'skull', reason: 'Not shipped under that name. The skeletal layer names individual cranial bones (Frontal bone, Parietal bone), never the skull as one node.' },
+  { keyword: 'venous sinus', reason: 'Not shipped. The dural sinuses are absent, so the craniotomy phase cannot show what a bur hole must avoid.' },
+  { keyword: 'skin', reason: 'Not shipped. No integument exists in any layer, so no incision phase can show where it is made.' },
+  { keyword: 'dermis', reason: 'Not shipped. No integument of any depth exists in this atlas, so layers of skin cannot be distinguished from one another or shown at all.' },
+  { keyword: 'subcutaneous', reason: 'Not shipped. No subcutaneous layer exists, so the plane every open approach passes through is absent.' },
+]
+
+/**
+ * Kata kunci yang cocok dengan TERLALU BANYAK mesh.
+ *
+ * Batasnya adalah proksi, dan disebut proksi dengan sengaja: yang sebenarnya
+ * merusak adalah kotak pembingkai kamera menjadi sebesar seluruh tubuh,
+ * sehingga "fokus" justru menjauhkan penampil dari struktur yang dimaksud.
+ * Jumlah mesh dapat dihitung dari berkas yang dikirim; kotaknya tidak, tanpa
+ * membaca seluruh data verteks. Satu kata kunci yang menyorot lebih dari
+ * seratus dari hampir tiga ribu simpul tidak memfokuskan apa pun.
+ */
+export const BATAS_FOKUS_TERLALU_LUAS = 100
