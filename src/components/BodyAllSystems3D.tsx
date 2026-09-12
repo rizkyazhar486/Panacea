@@ -100,12 +100,51 @@ export default function BodyAllSystems3D() {
     rim.position.set(-4, 1.5, -3)
     scene.add(rim)
 
+    const mobile = window.matchMedia('(max-width: 640px)').matches
     const controls = new OrbitControls(camera, renderer.domElement)
-    controls.enableDamping = true
+    // Continuous damping needs a permanent RAF loop. That is fine on desktop,
+    // but SwiftShader/mobile can monopolize the main thread enough that an
+    // otherwise visible/enabled system tab cannot acknowledge a real click.
+    // Mobile therefore renders on actual control/source/resize events instead.
+    controls.enableDamping = !mobile
     controls.enablePan = false
 
     const sourceBounds = new THREE.Box3()
     let disposed = false
+    let raf = 0
+    let inViewport = true
+    let documentVisible = !document.hidden
+
+    const renderFrame = () => {
+      if (disposed || !inViewport || !documentVisible) return
+      controls.update()
+      renderer.render(scene, camera)
+    }
+
+    const requestRender = () => {
+      if (disposed || !inViewport || !documentVisible) return
+      if (mobile) {
+        if (raf) return
+        raf = requestAnimationFrame(() => {
+          raf = 0
+          renderFrame()
+        })
+        return
+      }
+      if (!raf) raf = requestAnimationFrame(renderLoop)
+    }
+
+    const renderLoop = () => {
+      raf = 0
+      if (disposed || !inViewport || !documentVisible) return
+      renderFrame()
+      raf = requestAnimationFrame(renderLoop)
+    }
+
+    const stop = () => {
+      if (raf) cancelAnimationFrame(raf)
+      raf = 0
+    }
 
     const resolvedByFile = new Map<string, Set<string>>()
     for (const target of selected.targets) {
@@ -128,6 +167,7 @@ export default function BodyAllSystems3D() {
       controls.target.copy(center)
       camera.position.set(center.x + span * 0.25, center.y + span * 0.08, center.z + span * 2.25)
       camera.lookAt(center)
+      requestRender()
     }
 
     let completed = 0
@@ -135,6 +175,7 @@ export default function BodyAllSystems3D() {
     const finishOne = () => {
       completed += 1
       setLoadedFiles(completed)
+      requestRender()
       if (completed === filesNeeded.length) {
         fitCamera()
         setLoading(false)
@@ -162,6 +203,7 @@ export default function BodyAllSystems3D() {
         if (matched > 0) {
           scene.add(atlasScene)
           setLoadedSourceFiles((current) => current.includes(file) ? current : [...current, file])
+          requestRender()
         } else {
           atlasScene.traverse((object) => {
             const mesh = object as THREE.Mesh
@@ -186,39 +228,32 @@ export default function BodyAllSystems3D() {
       const width = container.clientWidth
       const height = container.clientHeight
       if (width < 2 || height < 2) return
-      const mobile = window.matchMedia('(max-width: 640px)').matches
       renderer.setPixelRatio(body3dPixelRatio(width, height, window.devicePixelRatio || 1, mobile))
       renderer.setSize(width, height)
       camera.aspect = width / height
       camera.updateProjectionMatrix()
+      requestRender()
     }
     resize()
     const ro = new ResizeObserver(resize)
     ro.observe(container)
 
-    let raf = 0
-    let inViewport = true
-    let documentVisible = !document.hidden
-    const render = () => {
-      raf = 0
-      if (!inViewport || !documentVisible) return
-      controls.update()
-      renderer.render(scene, camera)
-      raf = requestAnimationFrame(render)
-    }
-    const start = () => { if (!raf && inViewport && documentVisible) raf = requestAnimationFrame(render) }
-    const stop = () => { if (raf) cancelAnimationFrame(raf); raf = 0 }
+    const onControlChange = () => requestRender()
+    if (mobile) controls.addEventListener('change', onControlChange)
+
     const io = new IntersectionObserver(([entry]) => {
       inViewport = Boolean(entry?.isIntersecting)
-      inViewport ? start() : stop()
+      if (inViewport) requestRender()
+      else stop()
     }, { rootMargin: '128px' })
     io.observe(container)
     const onVisibility = () => {
       documentVisible = !document.hidden
-      documentVisible ? start() : stop()
+      if (documentVisible) requestRender()
+      else stop()
     }
     document.addEventListener('visibilitychange', onVisibility)
-    start()
+    requestRender()
 
     return () => {
       disposed = true
@@ -226,6 +261,7 @@ export default function BodyAllSystems3D() {
       io.disconnect()
       ro.disconnect()
       document.removeEventListener('visibilitychange', onVisibility)
+      if (mobile) controls.removeEventListener('change', onControlChange)
       controls.dispose()
       scene.traverse((object) => {
         const mesh = object as THREE.Mesh
