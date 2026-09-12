@@ -1,15 +1,24 @@
 import assert from 'node:assert/strict'
 import { readFileSync } from 'node:fs'
 
-const breathSource = readFileSync(new URL('../../src/pages/bodyhub/BreathAtlasLab.tsx', import.meta.url), 'utf8')
+const breathEntrySource = readFileSync(new URL('../../src/pages/bodyhub/BreathAtlasLab.tsx', import.meta.url), 'utf8')
+const breathSource = readFileSync(new URL('../../src/pages/bodyhub/BreathAtlasContent.tsx', import.meta.url), 'utf8')
 const precisionSource = readFileSync(new URL('../../src/pages/bodyhub/WholeBodyPrecisionLab.tsx', import.meta.url), 'utf8')
 const registry = JSON.parse(readFileSync(new URL('../../data/source-registry/anatomy/thebuggeddev-anatomy-breath-atlas.json', import.meta.url), 'utf8'))
+
+assert.match(breathEntrySource, /https:\/\/github\.com\/thebuggeddev\/anatomy/)
+assert.match(breathEntrySource, /https:\/\/breath-atlas\.thebuggeddev\.chatgpt\.site\//)
+assert.match(breathEntrySource, /interaction reference only · license check required/)
+assert.doesNotMatch(breathEntrySource, /<iframe/i, 'Breath Atlas entry must not embed a remote third-party viewer')
+assert.doesNotMatch(breathEntrySource, /fetch\s*\(/, 'Breath Atlas entry must not introduce a runtime dependency on the external reference')
+assert.match(breathEntrySource, /lazy\(\(\) => import\('\.\.\/\.\.\/components\/RespiratoryFlow3D'\)\)/, 'Respiratory WebGL must remain lazy-loaded from the Breath Atlas entry')
+assert.match(breathEntrySource, /<BreathAtlasContent \{\.\.\.props\} \/>/, 'The source-aware Breath Atlas content must remain reachable through the 3D entry')
 
 assert.match(breathSource, /https:\/\/github\.com\/thebuggeddev\/anatomy/)
 assert.match(breathSource, /https:\/\/breath-atlas\.thebuggeddev\.chatgpt\.site\//)
 assert.match(breathSource, /interaction reference only · license check required/)
-assert.doesNotMatch(breathSource, /<iframe/i, 'Breath Atlas must not embed a remote third-party viewer')
-assert.doesNotMatch(breathSource, /fetch\s*\(/, 'Breath Atlas must not introduce a runtime dependency on the external reference')
+assert.doesNotMatch(breathSource, /<iframe/i, 'Breath Atlas content must not embed a remote third-party viewer')
+assert.doesNotMatch(breathSource, /fetch\s*\(/, 'Breath Atlas content must not introduce a runtime dependency on the external reference')
 
 assert.match(breathSource, /getEffectiveAnatomySourceNodeSnapshot/)
 assert.match(breathSource, /resolveAllAnatomySourceNodes/)
@@ -46,4 +55,4 @@ assert.equal(registry.license.commercialUse, 'UNKNOWN')
 assert.equal(registry.adapter.status, 'NOT_APPLICABLE')
 assert.equal(registry.validation.clinicalDecisionUse, 'NO')
 
-console.log('Breath Atlas remains source-aware, physiologically bounded, independently implemented, and license-gated.')
+console.log('Breath Atlas remains source-aware, physiologically bounded, independently implemented, license-gated, and reachable through lazy 3D.')
