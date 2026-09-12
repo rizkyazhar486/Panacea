@@ -10,6 +10,7 @@ const scopedGuard = read('src/styles/widget-dark-surface-v29.css')
 const emergencyGuard = read('public/home-widget-dark-v31.css')
 const comfortGuard = read('src/styles/home-dark-comfort-v34.css')
 const activeGuard = read('src/styles/home-widget-active-v35.css')
+const loadingCopyGuard = read('src/styles/home-widget-loading-copy-v37.css')
 const index = read('index.html')
 
 test('Living Instrument mounts the active source widget, not only the filtered index', () => {
@@ -84,4 +85,16 @@ test('Home v35 separates mobile widget identity from global controls', () => {
   assert.match(activeGuard, /max-width:min\(68vw,240px\)!important/)
   assert.match(activeGuard, /widget-instrument-label-v5/)
   assert.match(activeGuard, /font-size:11px!important/)
+})
+
+test('Home v37 renders real accessible loading copy instead of relying on pseudo text', () => {
+  assert.match(tumpukan, /home-widget-loading-copy-v37\.css/)
+  assert.match(tumpukan, /role="status"/)
+  assert.match(tumpukan, /aria-live="polite"/)
+  assert.match(tumpukan, /widget-instrument-loading-copy-v37/)
+  assert.match(tumpukan, /Loading widget…/)
+  assert.match(loadingCopyGuard, /\.widget-instrument-loading-v29::before/)
+  assert.match(loadingCopyGuard, /content:none!important/)
+  assert.match(loadingCopyGuard, /html\.dark \.panacea-home \.widget-instrument-loading-copy-v37/)
+  assert.doesNotMatch(loadingCopyGuard, /svg\s*[,{]/, 'v37 must not override semantic chart/reference SVG data')
 })
