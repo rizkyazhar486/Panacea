@@ -90,22 +90,6 @@ export function WilayahAbdomen3D({ terpilih, onPilih, tinggi = 300 }: WilayahAbd
       `${import.meta.env.BASE_URL}${BERKAS_PERMUKAAN}`,
       (gltf) => {
         grup = gltf.scene
-
-        // Nama ASLI dipulihkan lewat parser.associations, seperti Body3D.
-        //
-        // GLTFLoader membuang titik pemisah, sehingga "Hypochondriac region.l"
-        // dan "...r" tiba di scene dengan nama yang sama. Sisi tidak bisa
-        // dipulihkan dari nama itu -- tetapi berkasnya masih menyimpannya, dan
-        // associations adalah jalan kembali ke sana. Posisi X dipakai hanya
-        // sebagai pemeriksaan silang di bawah, bukan sebagai sumber sisi.
-        const nodesJson = gltf.parser.json.nodes as Array<{ name?: string }> | undefined
-        const namaAsli = new Map<THREE.Object3D, string>()
-        grup.traverse((o) => {
-          const assoc = gltf.parser.associations.get(o) as { nodes?: number } | undefined
-          const idx = assoc?.nodes
-          const nama = idx !== undefined ? nodesJson?.[idx]?.name : undefined
-          if (nama) namaAsli.set(o, nama)
-        })
         // Sisi dibaca dari matriks dunia, jadi matriksnya harus sudah benar --
         // dan harus dibaca SEBELUM adegan digeser ke pusat di bawah.
         grup.updateMatrixWorld(true)
@@ -114,9 +98,10 @@ export function WilayahAbdomen3D({ terpilih, onPilih, tinggi = 300 }: WilayahAbd
         grup.traverse((o) => {
           if (!(o as THREE.Mesh).isMesh) return
           const m = o as THREE.Mesh
-          const asli = namaAsli.get(m) ?? namaAsli.get(m.parent as THREE.Object3D) ?? m.name
+          // Sisi diambil dari POSISI, bukan dari nama: loader membuang ".l" dan
+          // ".r" sehingga kedua sisi tiba dengan nama yang sama.
           const posisi = m.getWorldPosition(new THREE.Vector3())
-          const id = wilayahDariMesh(asli, posisi.x)
+          const id = wilayahDariMesh(m.name, posisi.x)
           if (!id) {
             m.visible = false
             return
