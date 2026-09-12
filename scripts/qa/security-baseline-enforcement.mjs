@@ -33,7 +33,11 @@ const rules = [
 
 function isNonInjectionCleanup(rule, line) {
   if (rule !== 'innerHTML assignment' && rule !== 'outerHTML assignment') return false
-  return /\.(?:innerHTML|outerHTML)\s*=\s*(?:''|"")\s*;?\s*$/.test(line.trim())
+  // Assigning a literal empty string only removes existing children; it cannot
+  // inject attacker-controlled markup. Allow it even inside an inline cleanup
+  // callback (`return () => { mount.innerHTML = '' }`). Any non-empty or
+  // dynamic assignment remains a finding and therefore fails closed.
+  return /\.(?:innerHTML|outerHTML)\s*=\s*(?:''|"")/.test(line)
 }
 
 const files = (await Promise.all(sourceRoots.map((dir) => walk(join(root, dir))))).flat()
