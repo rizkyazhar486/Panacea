@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import * as THREE from 'three'
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'
+import { MeshoptDecoder } from 'three/examples/jsm/libs/meshopt_decoder.module.js'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
 import {
   getEffectiveAnatomySourceNodeSnapshot,
@@ -127,7 +128,12 @@ export default function DigestiveFlow3D() {
     let routes: { phase: DigestiveFlowPhase; curve: THREE.CatmullRomCurve3 }[] = []
     let disposed = false
 
-    new GLTFLoader().load(`${import.meta.env.BASE_URL}anatomy/visceral.glb`, (gltf) => {
+    // visceral.glb dikirim terkompresi meshopt. Tanpa dekodernya GLTFLoader
+    // MENOLAK berkasnya sama sekali, dan penolakan itu tidak muncul di mana
+    // pun: tidak ada galat konsol, tidak ada pengecualian, hanya kanvas kosong.
+    const loader = new GLTFLoader()
+    loader.setMeshoptDecoder(MeshoptDecoder)
+    loader.load(`${import.meta.env.BASE_URL}anatomy/visceral.glb`, (gltf) => {
       if (disposed) return
       gltf.scene.traverse((object) => {
         if (!(object as THREE.Mesh).isMesh) return
