@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import * as THREE from 'three'
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'
+import { MeshoptDecoder } from 'three/examples/jsm/libs/meshopt_decoder.module.js'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
 import { folderModel, type OrganModel } from '../lib/organModels'
 
@@ -73,6 +74,7 @@ export function OrganModel3D({ organ, selected, onSelect }: Props) {
 
     let group: THREE.Group | null = null
     const loader = new GLTFLoader()
+    loader.setMeshoptDecoder(MeshoptDecoder)
     loader.load(
       `${import.meta.env.BASE_URL}${folderModel(organ)}/${organ.id}.glb`,
       (gltf) => {

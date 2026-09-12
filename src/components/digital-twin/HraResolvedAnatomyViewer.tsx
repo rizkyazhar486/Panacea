@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import * as THREE from 'three'
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'
+import { MeshoptDecoder } from 'three/examples/jsm/libs/meshopt_decoder.module.js'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
 import { RoomEnvironment } from 'three/examples/jsm/environments/RoomEnvironment.js'
 import { resolveHraTerms, type HraResolvedRecord } from '../../lib/hraResolver'
@@ -247,6 +248,7 @@ export function HraResolvedAnatomyViewer({ terms, title, description, maxResults
     }
 
     const loader = new GLTFLoader()
+  loader.setMeshoptDecoder(MeshoptDecoder)
     loader.load(
       selectedModelUrl,
       (gltf) => {
