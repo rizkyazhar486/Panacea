@@ -51,6 +51,7 @@ const BiomedicalEngineLab = lazy(() => import('./bodyhub/BiomedicalEngineLab'))
 // Ruang bedah: urutan lapisan yang ditemui pisau, per pendekatan.
 const SurgicalLab = lazy(() => import('./bodyhub/SurgicalLab'))
 const WorkoutSimSection = lazy(() => import('./bodyhub/WorkoutSimSection'))
+const BiomechanicsMotionLab = lazy(() => import('./bodyhub/BiomechanicsMotionLab'))
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Body Explorer — model 3D anatomi NYATA (lihat Body3D.tsx untuk sumber data
@@ -97,12 +98,13 @@ function Chip({
 // sama-sama menyorot struktur pada figur yang itu-itu juga. Itulah maksud
 // "satu simulasi tubuh yang utuh" — bukan enam halaman yang saling menyebut,
 // melainkan satu tubuh yang ditanyai dari enam sudut.
-type PanelTab = 'hemodinamik' | 'nefron' | 'asam-basa' | 'wilayah-abdomen' | 'kerangka' | 'arteri' | 'limfe' | 'kelenjar-saluran' | 'ventilasi' | 'lokalisasi' | 'layers' | 'muscles' | 'workout-sim' | 'organs' | 'physiology' | 'simulator' | 'cardio' | 'spesialisasi' | 'molekul' | 'genomik' | 'sel' | 'bedah' | 'cari' | 'presisi' | 'mesin' | 'drugs' | 'diseases' | 'reference'
+type PanelTab = 'hemodinamik' | 'nefron' | 'asam-basa' | 'wilayah-abdomen' | 'kerangka' | 'arteri' | 'limfe' | 'kelenjar-saluran' | 'ventilasi' | 'lokalisasi' | 'layers' | 'muscles' | 'workout-sim' | 'biomekanika' | 'organs' | 'physiology' | 'simulator' | 'cardio' | 'spesialisasi' | 'molekul' | 'genomik' | 'sel' | 'bedah' | 'cari' | 'presisi' | 'mesin' | 'drugs' | 'diseases' | 'reference'
 
 const PANEL_TABS: Array<{ key: PanelTab; label: string }> = [
   { key: 'layers', label: 'Layers' },
   { key: 'muscles', label: 'Muscles' },
   { key: 'workout-sim', label: 'Workout' },
+  { key: 'biomekanika', label: 'Motion biomechanics' },
   { key: 'organs', label: 'Organs' },
   { key: 'physiology', label: 'Physiology' },
   { key: 'simulator', label: 'Simulator' },
@@ -848,6 +850,12 @@ export function BodyExplorer() {
                   }}
                   onTempo={setRepTempo}
                 />
+              </Suspense>
+            )}
+
+            {panelTab === 'biomekanika' && (
+              <Suspense fallback={<p className="text-sm text-neutral-500">Loading the biomechanics motion lab…</p>}>
+                <BiomechanicsMotionLab />
               </Suspense>
             )}
 
