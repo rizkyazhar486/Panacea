@@ -45,6 +45,35 @@ page.setDefaultTimeout(20_000)
 const pageErrors = []
 page.on('pageerror', (error) => pageErrors.push(error.message))
 
+async function assertRendererHealthy(explorer, canvas, label) {
+  const alert = explorer.getByRole('alert').first()
+  if (await alert.isVisible().catch(() => false)) {
+    throw new Error(`${label} source renderer failed closed: ${await alert.innerText()}`)
+  }
+  if (pageErrors.length) throw new Error(`Browser page errors: ${pageErrors.join(' | ')}`)
+  await canvas.waitFor({ state: 'visible', timeout: 45_000 })
+  await canvas.scrollIntoViewIfNeeded()
+  const health = await canvas.evaluate((node) => {
+    const gl = node.getContext('webgl2') || node.getContext('webgl')
+    const rect = node.getBoundingClientRect()
+    return {
+      webgl: Boolean(gl),
+      contextLost: gl ? gl.isContextLost() : true,
+      clientWidth: node.clientWidth,
+      clientHeight: node.clientHeight,
+      backingWidth: node.width,
+      backingHeight: node.height,
+      rectWidth: rect.width,
+      rectHeight: rect.height,
+    }
+  })
+  if (!health.webgl || health.contextLost) throw new Error(`${label} WebGL context is unavailable or lost`)
+  if (health.clientWidth < 300 || health.clientHeight < 300) {
+    throw new Error(`${label} canvas is too small on mobile: ${health.clientWidth}x${health.clientHeight}`)
+  }
+  return health
+}
+
 try {
   const response = await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 45_000 })
   if (response && !response.ok()) throw new Error(`Body Explorer returned HTTP ${response.status()}`)
@@ -64,41 +93,25 @@ try {
   await explorer.waitFor({ state: 'visible', timeout: 30_000 })
   await explorer.getByRole('button', { name: 'Open all-system 3D', exact: true }).click()
 
+  const loading = explorer.getByText(/Loading source bundles…/i).first()
   const canvas = explorer.locator('canvas[data-body-all-systems3d="true"]').first()
   await canvas.waitFor({ state: 'visible', timeout: 45_000 })
-  await canvas.scrollIntoViewIfNeeded()
-
-  const loading = explorer.getByText(/Loading source bundles…/i).first()
   await loading.waitFor({ state: 'hidden', timeout: 120_000 })
+  const cardiovascularHealth = await assertRendererHealthy(explorer, canvas, 'Cardiovascular')
 
-  const alert = explorer.getByRole('alert').first()
-  if (await alert.isVisible().catch(() => false)) {
-    throw new Error(`All-system source renderer failed closed: ${await alert.innerText()}`)
-  }
-  if (pageErrors.length) throw new Error(`Browser page errors: ${pageErrors.join(' | ')}`)
-
-  const health = await canvas.evaluate((node) => {
-    const gl = node.getContext('webgl2') || node.getContext('webgl')
-    const rect = node.getBoundingClientRect()
-    return {
-      webgl: Boolean(gl),
-      contextLost: gl ? gl.isContextLost() : true,
-      clientWidth: node.clientWidth,
-      clientHeight: node.clientHeight,
-      backingWidth: node.width,
-      backingHeight: node.height,
-      rectWidth: rect.width,
-      rectHeight: rect.height,
-    }
-  })
-  if (!health.webgl || health.contextLost) throw new Error('All-system 3D WebGL context is unavailable or lost')
-  if (health.clientWidth < 300 || health.clientHeight < 300) {
-    throw new Error(`All-system 3D canvas is too small on mobile: ${health.clientWidth}x${health.clientHeight}`)
+  const cardiovascularCoverageText = (await explorer.getByText(/source targets represented/i).first().innerText()).trim()
+  const cardiovascularMatch = cardiovascularCoverageText.match(/(\d+)\/(\d+) source targets represented/i)
+  if (Number(cardiovascularMatch?.[1] ?? 0) <= 0) {
+    throw new Error(`Cardiovascular source bundle loaded without rendered coverage: ${cardiovascularCoverageText}`)
   }
 
   const respiratoryTab = explorer.getByRole('tab', { name: 'Respiratory', exact: true })
   await respiratoryTab.click()
   if ((await respiratoryTab.getAttribute('aria-selected')) !== 'true') throw new Error('Respiratory system tab did not become active')
+
+  await loading.waitFor({ state: 'visible', timeout: 10_000 }).catch(() => undefined)
+  await loading.waitFor({ state: 'hidden', timeout: 120_000 })
+  const respiratoryHealth = await assertRendererHealthy(explorer, canvas, 'Respiratory')
 
   const representedText = (await explorer.getByText(/source targets represented/i).first().innerText()).trim()
   const representedMatch = representedText.match(/(\d+)\/(\d+) source targets represented/i)
@@ -140,13 +153,24 @@ try {
     ok: true,
     route: await page.evaluate(() => window.location.hash),
     viewport,
-    canvas: health,
+    cardiovascularCanvas: cardiovascularHealth,
+    respiratoryCanvas: respiratoryHealth,
     postOrbit,
     respiratoryCoverage: { represented, total, label: representedText },
+    loadingStrategy: 'active-system source bundles only',
     scientificBoundary: 'source-backed educational render; unresolved or failed source geometry stays blocked',
   }
   await writeFile(metricsPath, JSON.stringify(metrics, null, 2))
   console.log(JSON.stringify(metrics))
+} catch (error) {
+  const failure = {
+    ok: false,
+    route: await page.evaluate(() => window.location.hash).catch(() => null),
+    pageErrors,
+    message: error instanceof Error ? error.message : String(error),
+  }
+  await writeFile(metricsPath, JSON.stringify(failure, null, 2)).catch(() => undefined)
+  throw error
 } finally {
   await context.close().catch(() => undefined)
   await browser.close().catch(() => undefined)
