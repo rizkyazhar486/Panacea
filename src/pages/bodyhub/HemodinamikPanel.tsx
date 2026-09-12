@@ -16,6 +16,64 @@ import {
 // yang sama sekali berbeda, dan itu hanya terlihat kalau keduanya dihitung
 // pada rantai yang sama.
 
+/** Batas penggeser, satu sumber untuk panel dan untuk ujinya. */
+export const RENTANG_HEMODINAMIK = {
+  denyut: { min: 35, maks: 180 },
+  volumeAkhirDiastol: { min: 60, maks: 220 },
+  volumeAkhirSistol: { min: 20, maks: 200 },
+  hemoglobin: { min: 4, maks: 20 },
+  saturasiArteri: { min: 60, maks: 100 },
+  afterload: { min: 40, maks: 200 },
+  ees: { min: 0.6, maks: 6 },
+} as const
+
+/** Masukan sebuah kasus terpandu: persis ketujuh penggeser, tidak lebih. */
+export interface MasukanHemodinamik {
+  denyut: number
+  volumeAkhirDiastol: number
+  volumeAkhirSistol: number
+  hemoglobin: number
+  saturasiArteri: number
+  afterload: number
+  ees: number
+}
+
+export interface KasusHemodinamik {
+  judul: string
+  ajakan: string
+  masukan: MasukanHemodinamik
+  pelajaran: string
+}
+
+// Kasus memuat MASUKAN saja. Isi sekuncup, curah jantung, kandungan oksigen,
+// hantaran, konsumsi dan rasio ekstraksi tetap dihitung mesin sepanjang rantai
+// yang sama. Menyimpan jawabannya di sini akan membuat tutorialnya tetap tampak
+// benar sesudah rantainya rusak -- kebalikan dari mengajar.
+export const KASUS_HEMODINAMIK: KasusHemodinamik[] = [
+  {
+    judul: 'Case 1 \u00b7 Anaemia with a normal pump',
+    ajakan: 'Haemoglobin 6 g/dL; rate, volumes and saturation all left at their reference values.',
+    masukan: {
+      denyut: 70, volumeAkhirDiastol: 120, volumeAkhirSistol: 50,
+      hemoglobin: 6, saturasiArteri: 98, afterload: 90, ees: 2.3,
+    },
+    pelajaran: 'Cardiac output, ejection fraction and saturation are all untouched and all normal — and '
+      + 'delivery has still collapsed, because delivery is a product and one term fell. Reading the pump '
+      + 'numbers alone would have called this circulation fine.',
+  },
+  {
+    judul: 'Case 2 \u00b7 Afterload raised against the same heart',
+    ajakan: 'Aortic pressure 170 mmHg with contractility unchanged — watch the loop, not just the numbers.',
+    masukan: {
+      denyut: 70, volumeAkhirDiastol: 120, volumeAkhirSistol: 50,
+      hemoglobin: 15, saturasiArteri: 98, afterload: 170, ees: 2.3,
+    },
+    pelajaran: 'The ventricle now closes higher up the same ESPVR line, so it ejects less from the same '
+      + 'filling: the loop grows taller and narrower and stroke work rises for less output. Raise '
+      + 'contractility instead and the line itself rotates, which is a different change altogether.',
+  },
+]
+
 function Angka2({ nilai, satuan, label }: { nilai: string; satuan?: string; label: string }) {
   return (
     <div className="rounded-xl bg-white/60 px-2.5 py-1.5 dark:bg-white/[0.05]">
@@ -134,6 +192,19 @@ export function HemodinamikPanel() {
   const [afterload, setAfterload] = useState<number>(BILIK_RUJUKAN.afterload)
   const [ees, setEes] = useState<number>(BILIK_RUJUKAN.ees)
   const [berjalan, setBerjalan] = useState(true)
+  const [pelajaran, setPelajaran] = useState<string | null>(null)
+
+  // Kasus hanya MENGISI penggeser; tidak ada hasil rantai yang ikut dipasang.
+  function jalankanKasus(k: KasusHemodinamik) {
+    setHr(k.masukan.denyut)
+    setEdv(k.masukan.volumeAkhirDiastol)
+    setEsv(k.masukan.volumeAkhirSistol)
+    setHb(k.masukan.hemoglobin)
+    setSao2(k.masukan.saturasiArteri)
+    setAfterload(k.masukan.afterload)
+    setEes(k.masukan.ees)
+    setPelajaran(k.pelajaran)
+  }
 
   // Bilik memakai EDV yang sama dengan penggeser di atas, sehingga lingkarnya
   // dan angka-angkanya tidak bisa menceritakan dua hal yang berbeda.
@@ -167,12 +238,31 @@ export function HemodinamikPanel() {
         </Prosa>
       </div>
 
+      {/* Tutorial: kasus yang benar-benar menjalankan alatnya. */}
+      <div className="rounded-2xl border border-brand/25 bg-brand/[0.05] p-3">
+        <p className="text-[10px] font-black uppercase tracking-[0.14em] text-brand">Learn by running one</p>
+        <div className="mt-2 grid gap-1.5">
+          {KASUS_HEMODINAMIK.map((k) => (
+            <button key={k.judul} type="button" onClick={() => jalankanKasus(k)}
+              className="rounded-xl bg-white/75 p-2.5 text-left transition hover:bg-white dark:bg-white/[.055] dark:hover:bg-white/[.09]">
+              <div className="text-[11.5px] font-black text-ink dark:text-white">{k.judul}</div>
+              <div className="mt-0.5 text-[11px] leading-relaxed text-neutral-600 dark:text-neutral-400">{k.ajakan}</div>
+            </button>
+          ))}
+        </div>
+        {pelajaran && (
+          <p className="mt-2 rounded-xl bg-white/80 p-2.5 text-[11.5px] leading-relaxed text-neutral-700 dark:bg-white/[.06] dark:text-neutral-200">
+            {pelajaran}
+          </p>
+        )}
+      </div>
+
       <div className="rounded-2xl bg-[var(--pelatih-alas-1,rgba(15,23,42,0.04))] p-3">
-        <Geser label="Heart rate" nilai={hr} min={35} maks={180} onUbah={setHr} satuan="/min" />
-        <Geser label="End-diastolic volume" nilai={edv} min={60} maks={220} onUbah={setEdv} satuan="mL" />
-        <Geser label="End-systolic volume" nilai={esv} min={20} maks={200} onUbah={setEsv} satuan="mL" />
-        <Geser label="Haemoglobin" nilai={hb} min={4} maks={20} step={0.5} onUbah={setHb} satuan="g/dL" />
-        <Geser label="Arterial saturation" nilai={sao2} min={60} maks={100} onUbah={setSao2} satuan="%" />
+        <Geser label="Heart rate" nilai={hr} min={RENTANG_HEMODINAMIK.denyut.min} maks={RENTANG_HEMODINAMIK.denyut.maks} onUbah={setHr} satuan="/min" />
+        <Geser label="End-diastolic volume" nilai={edv} min={RENTANG_HEMODINAMIK.volumeAkhirDiastol.min} maks={RENTANG_HEMODINAMIK.volumeAkhirDiastol.maks} onUbah={setEdv} satuan="mL" />
+        <Geser label="End-systolic volume" nilai={esv} min={RENTANG_HEMODINAMIK.volumeAkhirSistol.min} maks={RENTANG_HEMODINAMIK.volumeAkhirSistol.maks} onUbah={setEsv} satuan="mL" />
+        <Geser label="Haemoglobin" nilai={hb} min={RENTANG_HEMODINAMIK.hemoglobin.min} maks={RENTANG_HEMODINAMIK.hemoglobin.maks} step={0.5} onUbah={setHb} satuan="g/dL" />
+        <Geser label="Arterial saturation" nilai={sao2} min={RENTANG_HEMODINAMIK.saturasiArteri.min} maks={RENTANG_HEMODINAMIK.saturasiArteri.maks} onUbah={setSao2} satuan="%" />
       </div>
 
       <div className="rounded-2xl bg-[var(--pelatih-alas-1,rgba(15,23,42,0.04))] p-3">
@@ -189,8 +279,8 @@ export function HemodinamikPanel() {
           <Angka2 nilai={(edv - esvLingkar).toFixed(0)} satuan="mL" label="Loop width = SV" />
           <Angka2 nilai={(kerja / 1000).toFixed(1)} satuan="J·10⁻³" label="Stroke work" />
         </div>
-        <Geser label="Afterload (aortic pressure)" nilai={afterload} min={40} maks={200} onUbah={setAfterload} satuan="mmHg" />
-        <Geser label="Contractility (Ees)" nilai={ees} min={0.6} maks={6} step={0.1} onUbah={setEes} satuan="mmHg/mL" />
+        <Geser label="Afterload (aortic pressure)" nilai={afterload} min={RENTANG_HEMODINAMIK.afterload.min} maks={RENTANG_HEMODINAMIK.afterload.maks} onUbah={setAfterload} satuan="mmHg" />
+        <Geser label="Contractility (Ees)" nilai={ees} min={RENTANG_HEMODINAMIK.ees.min} maks={RENTANG_HEMODINAMIK.ees.maks} step={0.1} onUbah={setEes} satuan="mmHg/mL" />
         <Prosa kelas="mt-2 text-[11.5px] leading-relaxed text-neutral-600 dark:text-neutral-400">
           Three levers, three different deformations. Afterload slides the closing point up the orange
           ESPVR line, so the loop gets taller and narrower. Contractility rotates that line, so the same

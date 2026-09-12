@@ -45,6 +45,66 @@ const NAMA: Record<Gangguan, string> = {
   'alkalosis-respiratorik': 'Respiratory alkalosis',
 }
 
+/** Batas penggeser, satu sumber untuk panel dan untuk ujinya. Sebuah kasus
+ *  terpandu yang keluar dari batas ini akan dijepit diam-diam oleh input range
+ *  dan mengajarkan angka yang salah, maka ujinya memeriksa ini. */
+export const RENTANG_ASAM_BASA = {
+  bikarbonat: { min: 4, maks: 44 },
+  paco2: { min: 15, maks: 90 },
+  natrium: { min: 120, maks: 160 },
+  klorida: { min: 80, maks: 125 },
+  albumin: { min: 1, maks: 5 },
+} as const
+
+/** Masukan sebuah kasus terpandu: persis keadaan penggeser, tidak lebih. */
+export interface MasukanAsamBasa {
+  bikarbonat: number
+  paco2: number
+  natrium: number
+  klorida: number
+  albumin: number
+  kronik: boolean
+}
+
+export interface KasusAsamBasa {
+  judul: string
+  ajakan: string
+  masukan: MasukanAsamBasa
+  pelajaran: string
+}
+
+// Kasus ini memuat MASUKAN saja. pH, gangguan utama, rentang Winter, celah
+// anion terkoreksi dan rasio delta tetap dihitung mesin dari masukan itu.
+// Kalau jawabannya ikut disimpan di sini, tutorialnya akan tetap tampak
+// "benar" walaupun mesinnya sudah rusak -- kebalikan dari mengajar.
+export const KASUS_ASAM_BASA: KasusAsamBasa[] = [
+  {
+    judul: 'Case 1 \u00b7 Diabetic ketoacidosis',
+    ajakan: 'Bicarbonate 8, CO\u2082 22, sodium 135, chloride 95, albumin normal.',
+    masukan: { bikarbonat: 8, paco2: 22, natrium: 135, klorida: 95, albumin: 4.0, kronik: false },
+    pelajaran: 'The low CO\u2082 here is not a second disturbance — it is the lung answering the acid. '
+      + 'Check the expected range before calling it one, and read the anion gap to see what the unmeasured '
+      + 'acid is doing.',
+  },
+  {
+    judul: 'Case 2 \u00b7 Long-standing CO\u2082 retention',
+    ajakan: 'Bicarbonate 32 with CO\u2082 60 — then toggle "long-standing rather than acute".',
+    masukan: { bikarbonat: 32, paco2: 60, natrium: 140, klorida: 100, albumin: 4.0, kronik: true },
+    pelajaran: 'The same two numbers change meaning with the clock. Against the acute rule the bicarbonate '
+      + 'looks far too high and invites a second diagnosis; against the chronic rule, where the kidney has '
+      + 'had days to retain base, it is exactly what one disturbance predicts. Untick the box and watch the '
+      + 'verdict flip.',
+  },
+  {
+    judul: 'Case 3 \u00b7 A gap hidden by low albumin',
+    ajakan: 'Bicarbonate 16, CO\u2082 32, sodium 140, chloride 112, albumin only 2.0 g/dL.',
+    masukan: { bikarbonat: 16, paco2: 32, natrium: 140, klorida: 112, albumin: 2.0, kronik: false },
+    pelajaran: 'The measured gap looks unremarkable, so the raw number invites the wrong route entirely. '
+      + 'Albumin is the largest unmeasured anion; correct for it and the gap reappears. This is the case '
+      + 'that is missed by reading one number instead of two.',
+  },
+]
+
 function Davenport({ bikarbonat, paco2, ph }: { bikarbonat: number; paco2: number; ph: number }) {
   const px = Number.isFinite(ph) ? x(Math.min(PH_MAKS, Math.max(PH_MIN, ph))) : null
   const py = y(Math.min(HCO3_MAKS, bikarbonat))
@@ -124,6 +184,18 @@ export function AsamBasaPanel() {
   const [klorida, setKlorida] = useState<number>(104)
   const [albumin, setAlbumin] = useState<number>(4)
   const [kronik, setKronik] = useState<boolean>(false)
+  const [pelajaran, setPelajaran] = useState<string | null>(null)
+
+  // Kasus hanya MENGISI penggeser. Tidak ada satu pun hasil yang ikut dipasang.
+  function jalankanKasus(k: KasusAsamBasa) {
+    setBikarbonat(k.masukan.bikarbonat)
+    setPaco2(k.masukan.paco2)
+    setNatrium(k.masukan.natrium)
+    setKlorida(k.masukan.klorida)
+    setAlbumin(k.masukan.albumin)
+    setKronik(k.masukan.kronik)
+    setPelajaran(k.pelajaran)
+  }
 
   const gas = { bikarbonat, paco2 }
   const elektrolit = { natrium, klorida, bikarbonat, albumin }
@@ -146,11 +218,30 @@ export function AsamBasaPanel() {
         </p>
       </Prosa>
 
+      {/* Tutorial: kasus yang benar-benar menjalankan alatnya. */}
+      <div className="rounded-2xl border border-brand/25 bg-brand/[0.05] p-3">
+        <p className="text-[10px] font-black uppercase tracking-[0.14em] text-brand">Learn by running one</p>
+        <div className="mt-2 grid gap-1.5">
+          {KASUS_ASAM_BASA.map((k) => (
+            <button key={k.judul} type="button" onClick={() => jalankanKasus(k)}
+              className="rounded-xl bg-white/75 p-2.5 text-left transition hover:bg-white dark:bg-white/[.055] dark:hover:bg-white/[.09]">
+              <div className="text-[11.5px] font-black text-ink dark:text-white">{k.judul}</div>
+              <div className="mt-0.5 text-[11px] leading-relaxed text-neutral-600 dark:text-neutral-400">{k.ajakan}</div>
+            </button>
+          ))}
+        </div>
+        {pelajaran && (
+          <p className="mt-2 rounded-xl bg-white/80 p-2.5 text-[11.5px] leading-relaxed text-neutral-700 dark:bg-white/[.06] dark:text-neutral-200">
+            {pelajaran}
+          </p>
+        )}
+      </div>
+
       <Davenport bikarbonat={bikarbonat} paco2={paco2} ph={ph} />
 
       <div>
-        <Geser label="Bicarbonate" nilai={bikarbonat} min={4} maks={44} onUbah={setBikarbonat} satuan="mmol/L" />
-        <Geser label="Arterial CO₂" nilai={paco2} min={15} maks={90} onUbah={setPaco2} satuan="mmHg" />
+        <Geser label="Bicarbonate" nilai={bikarbonat} min={RENTANG_ASAM_BASA.bikarbonat.min} maks={RENTANG_ASAM_BASA.bikarbonat.maks} onUbah={setBikarbonat} satuan="mmol/L" />
+        <Geser label="Arterial CO₂" nilai={paco2} min={RENTANG_ASAM_BASA.paco2.min} maks={RENTANG_ASAM_BASA.paco2.maks} onUbah={setPaco2} satuan="mmHg" />
       </div>
 
       <div className="grid grid-cols-3 gap-2">
@@ -193,9 +284,9 @@ export function AsamBasaPanel() {
 
       <div className="rounded-2xl border border-[var(--pelatih-garis,rgba(15,23,42,0.10))] p-3">
         <div className="text-[11px] font-black uppercase tracking-[0.14em] text-neutral-500">Anion gap</div>
-        <Geser label="Sodium" nilai={natrium} min={120} maks={160} onUbah={setNatrium} satuan="mmol/L" />
-        <Geser label="Chloride" nilai={klorida} min={80} maks={125} onUbah={setKlorida} satuan="mmol/L" />
-        <Geser label="Albumin" nilai={albumin} min={1} maks={5} langkah={0.5} onUbah={setAlbumin} satuan="g/dL" />
+        <Geser label="Sodium" nilai={natrium} min={RENTANG_ASAM_BASA.natrium.min} maks={RENTANG_ASAM_BASA.natrium.maks} onUbah={setNatrium} satuan="mmol/L" />
+        <Geser label="Chloride" nilai={klorida} min={RENTANG_ASAM_BASA.klorida.min} maks={RENTANG_ASAM_BASA.klorida.maks} onUbah={setKlorida} satuan="mmol/L" />
+        <Geser label="Albumin" nilai={albumin} min={RENTANG_ASAM_BASA.albumin.min} maks={RENTANG_ASAM_BASA.albumin.maks} langkah={0.5} onUbah={setAlbumin} satuan="g/dL" />
 
         <div className="mt-3 grid grid-cols-3 gap-2">
           <Angka nilai={ag.toFixed(1)} label="Measured" />

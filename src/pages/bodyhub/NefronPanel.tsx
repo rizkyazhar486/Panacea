@@ -12,6 +12,50 @@ import {
 // bisa dimasukkan dan tidak ada yang bisa keluar salah. Di sini gaya Starling
 // benar-benar digerakkan, dan GFR-nya ikut.
 
+/** Batas penggeser, satu sumber untuk panel dan untuk ujinya. */
+export const RENTANG_NEFRON = {
+  hidrostatikKapiler: { min: 20, maks: 80 },
+  hidrostatikBowman: { min: 5, maks: 45 },
+  onkotikKapiler: { min: 10, maks: 55 },
+} as const
+
+/** Masukan sebuah kasus terpandu: persis ketiga penggeser, tidak lebih. */
+export interface MasukanNefron {
+  hidrostatikKapiler: number
+  hidrostatikBowman: number
+  onkotikKapiler: number
+}
+
+export interface KasusNefron {
+  judul: string
+  ajakan: string
+  masukan: MasukanNefron
+  pelajaran: string
+}
+
+// Kasus memuat MASUKAN saja. Tekanan neto, GFR dan fraksi filtrasi tetap
+// dihitung mesin dari gaya Starling. Menyimpan jawabannya di sini akan membuat
+// tutorialnya tetap tampak benar sesudah mesinnya rusak -- kebalikan mengajar.
+export const KASUS_NEFRON: KasusNefron[] = [
+  {
+    judul: 'Case 1 \u00b7 Hypotension at the glomerulus',
+    ajakan: 'Capillary hydrostatic pressure falls to 40 mmHg; the other two forces are unchanged.',
+    masukan: { hidrostatikKapiler: 40, hidrostatikBowman: 18, onkotikKapiler: 32 },
+    pelajaran: 'Only the driving force moved, and it moved by a third — yet filtration falls much '
+      + 'further than a third, because what is left over is a small difference between large numbers. '
+      + 'That sensitivity is the whole reason the kidney autoregulates, and this model has no '
+      + 'autoregulation to hide it.',
+  },
+  {
+    judul: 'Case 2 \u00b7 Obstructed outflow',
+    ajakan: "Bowman's space pressure rises to 32 mmHg behind a blocked ureter; nothing upstream changes.",
+    masukan: { hidrostatikKapiler: 60, hidrostatikBowman: 32, onkotikKapiler: 32 },
+    pelajaran: 'Nothing about the blood supply changed here. Pressure built up downstream instead, and '
+      + 'it opposes filtration exactly as oncotic pressure does — which is why an obstruction below the '
+      + 'kidney lowers the filtration rate above it. Push it further and the flow stops on screen.',
+  },
+]
+
 function Angka({ nilai, satuan, label, nada }: { nilai: string; satuan?: string; label: string; nada?: string }) {
   return (
     <div className="rounded-2xl bg-[var(--pelatih-alas-1,rgba(15,23,42,0.04))] px-3 py-2">
@@ -140,6 +184,15 @@ export function NefronPanel() {
   const [pGc, setPGc] = useState(RUJUKAN.starling.hidrostatikKapiler)
   const [pBs, setPBs] = useState(RUJUKAN.starling.hidrostatikBowman)
   const [piGc, setPiGc] = useState(RUJUKAN.starling.onkotikKapiler)
+  const [pelajaran, setPelajaran] = useState<string | null>(null)
+
+  // Kasus hanya MENGISI ketiga penggeser; tidak ada hasil yang ikut dipasang.
+  function jalankanKasus(k: KasusNefron) {
+    setPGc(k.masukan.hidrostatikKapiler)
+    setPBs(k.masukan.hidrostatikBowman)
+    setPiGc(k.masukan.onkotikKapiler)
+    setPelajaran(k.pelajaran)
+  }
 
   const starling = useMemo(() => ({
     hidrostatikKapiler: pGc, hidrostatikBowman: pBs, onkotikKapiler: piGc,
@@ -169,6 +222,25 @@ export function NefronPanel() {
           and watch filtration follow. Nothing here is measured from a person, and this does not estimate
           anyone&apos;s kidney function.
         </Prosa>
+      </div>
+
+      {/* Tutorial: kasus yang benar-benar menjalankan alatnya. */}
+      <div className="rounded-2xl border border-brand/25 bg-brand/[0.05] p-3">
+        <p className="text-[10px] font-black uppercase tracking-[0.14em] text-brand">Learn by running one</p>
+        <div className="mt-2 grid gap-1.5">
+          {KASUS_NEFRON.map((k) => (
+            <button key={k.judul} type="button" onClick={() => jalankanKasus(k)}
+              className="rounded-xl bg-white/75 p-2.5 text-left transition hover:bg-white dark:bg-white/[.055] dark:hover:bg-white/[.09]">
+              <div className="text-[11.5px] font-black text-ink dark:text-white">{k.judul}</div>
+              <div className="mt-0.5 text-[11px] leading-relaxed text-neutral-600 dark:text-neutral-400">{k.ajakan}</div>
+            </button>
+          ))}
+        </div>
+        {pelajaran && (
+          <p className="mt-2 rounded-xl bg-white/80 p-2.5 text-[11.5px] leading-relaxed text-neutral-700 dark:bg-white/[.06] dark:text-neutral-200">
+            {pelajaran}
+          </p>
+        )}
       </div>
 
       <div className="rounded-2xl bg-[var(--pelatih-alas-1,rgba(15,23,42,0.04))] p-3">
@@ -201,9 +273,9 @@ export function NefronPanel() {
       )}
 
       <div className="rounded-2xl bg-[var(--pelatih-alas-1,rgba(15,23,42,0.04))] p-3">
-        <Geser label="Glomerular capillary hydrostatic" nilai={pGc} min={20} maks={80} onUbah={setPGc} satuan="mmHg" />
-        <Geser label="Bowman's space hydrostatic" nilai={pBs} min={5} maks={45} onUbah={setPBs} satuan="mmHg" />
-        <Geser label="Capillary oncotic" nilai={piGc} min={10} maks={55} onUbah={setPiGc} satuan="mmHg" />
+        <Geser label="Glomerular capillary hydrostatic" nilai={pGc} min={RENTANG_NEFRON.hidrostatikKapiler.min} maks={RENTANG_NEFRON.hidrostatikKapiler.maks} onUbah={setPGc} satuan="mmHg" />
+        <Geser label="Bowman's space hydrostatic" nilai={pBs} min={RENTANG_NEFRON.hidrostatikBowman.min} maks={RENTANG_NEFRON.hidrostatikBowman.maks} onUbah={setPBs} satuan="mmHg" />
+        <Geser label="Capillary oncotic" nilai={piGc} min={RENTANG_NEFRON.onkotikKapiler.min} maks={RENTANG_NEFRON.onkotikKapiler.maks} onUbah={setPiGc} satuan="mmHg" />
         <p className="mt-2 text-[11px] leading-relaxed text-neutral-500">
           Raising Bowman&apos;s pressure is what an obstructed outflow does. Raising capillary oncotic
           pressure is what happens along the length of the capillary as protein-free filtrate leaves —
