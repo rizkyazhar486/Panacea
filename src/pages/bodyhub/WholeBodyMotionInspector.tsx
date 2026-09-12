@@ -161,7 +161,7 @@ export function WholeBodyMotionInspector({ onHighlight, onFocusRegion, onEnableL
       </div>
 
       <div className="grid gap-0 xl:grid-cols-[0.82fr_1.18fr]">
-        <div className="border-b border-white/10 p-3 xl:border-b-0 xl:border-r">
+        <div className="order-2 border-b border-white/10 p-3 xl:order-1 xl:border-b-0 xl:border-r">
           <div className="mb-2 text-[9px] font-black uppercase tracking-[0.16em] text-neutral-500">Select joint</div>
           <div className="space-y-3">
             {groupedJoints.map(([region, joints]) => (
@@ -179,7 +179,7 @@ export function WholeBodyMotionInspector({ onHighlight, onFocusRegion, onEnableL
           </div>
         </div>
 
-        <div className="space-y-4 p-4">
+        <div className="order-1 space-y-4 p-4 xl:order-2">
           <div className="flex flex-wrap gap-1.5">
             {joint.motions.map((item) => (
               <button key={item.id} type="button" aria-pressed={motion.id === item.id} onClick={() => inspectMotion(item.id)} className={`rounded-full border px-3 py-1.5 text-[10px] font-bold ${motion.id === item.id ? 'border-brand bg-brand text-white' : 'border-white/10 text-neutral-400'}`}>
