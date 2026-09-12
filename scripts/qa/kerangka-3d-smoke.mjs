@@ -9,8 +9,12 @@
 import { readFileSync } from 'node:fs'
 import { chromium } from '@playwright/test'
 
-const url = process.env.KERANGKA3D_QA_URL || 'http://127.0.0.1:4198/#/body-explorer'
-const jalurPeramban = process.env.KERANGKA3D_QA_CHROME || '/opt/pw-browsers/chromium-1194/chrome-linux/chrome'
+const url = process.env.KERANGKA3D_QA_URL || 'http://127.0.0.1:4173/#/body-explorer'
+// Kosong berarti "biar Playwright yang memilih". Jalur tetap ke sebuah versi
+// chromium tertentu hanya ada di mesin pengembang ini; di pelari CI, Playwright
+// memasang peramban miliknya sendiri di tempat lain, dan jalur yang dipaku akan
+// membuat gerbang ini gagal karena berkas tidak ada -- bukan karena panelnya.
+const jalurPeramban = process.env.KERANGKA3D_QA_CHROME || ''
 
 // Jumlah kelompok yang diharapkan dibaca dari katalognya sendiri, supaya
 // menambah kelompok tanpa mengikatnya ke mesh tetap ketahuan di sini.
@@ -29,7 +33,8 @@ function hitungDariSumber() {
 
 const browser = await chromium.launch({
   headless: true,
-  executablePath: jalurPeramban,
+  // Hanya disisipkan bila benar-benar diminta; Playwright memilih sendiri kalau tidak.
+  ...(jalurPeramban ? { executablePath: jalurPeramban } : {}),
   args: ['--use-gl=angle', '--use-angle=swiftshader', '--enable-webgl', '--enable-unsafe-swiftshader', '--ignore-gpu-blocklist'],
 })
 const context = await browser.newContext({
