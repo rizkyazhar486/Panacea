@@ -45,6 +45,9 @@ export function OrganModel3D({ organ, selected, onSelect }: Props) {
     renderer.setClearColor(0x000000, 0)
     renderer.outputColorSpace = THREE.SRGBColorSpace
     renderer.toneMapping = THREE.ACESFilmicToneMapping
+    // Penanda kanvas supaya gerbang browser bisa memeriksa TEPAT panel ini di
+    // halaman yang memuat beberapa kanvas sekaligus.
+    renderer.domElement.dataset.organModel3d = 'true'
     container.appendChild(renderer.domElement)
 
     scene.add(new THREE.AmbientLight(0xffffff, 0.9))
@@ -92,6 +95,12 @@ export function OrganModel3D({ organ, selected, onSelect }: Props) {
         camera.position.set(0, 0.4, 4.6)
         controls.target.set(0, 0, 0)
         controls.update()
+        // Jumlah mesh yang benar-benar masuk ke adegan. Inilah yang membedakan
+        // "berkas terunduh" dari "model tergambar": unduhan berstatus 200 lalu
+        // ditolak pemuat memberi nol di sini, tanpa satu pun galat jaringan.
+        let jumlahMesh = 0
+        group.traverse((o) => { if ((o as THREE.Mesh).isMesh) jumlahMesh += 1 })
+        renderer.domElement.dataset.organMesh = String(jumlahMesh)
         setLoading(false)
       },
       (ev) => { if (ev.total > 0) setPct(ev.loaded / ev.total) },
