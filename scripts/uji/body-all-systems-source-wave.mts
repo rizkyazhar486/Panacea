@@ -49,7 +49,8 @@ for (const coverage of bodySystemSourceCoverage()) {
 }
 
 const component = readFileSync(new URL('../../src/components/BodyAllSystems3D.tsx', import.meta.url), 'utf8')
-assert.match(component, /MeshoptDecoder/)
+assert.match(component, /muatAtlas/)
+assert.match(component, /namaAtlas/)
 assert.match(component, /OrbitControls/)
 assert.match(component, /body3dPixelRatio/)
 assert.match(component, /BLOCKED · source geometry unavailable/)
@@ -61,6 +62,13 @@ assert.match(component, /no replacement geometry/i)
 assert.match(component, /dataset\.bodyAllSystems3d\s*=\s*['"]true['"]/)
 assert.match(component, /IntersectionObserver/)
 assert.match(component, /visibilitychange/)
+
+// Meshopt belongs to the shared trusted atlas loader, not to each renderer.
+// Guard the architectural boundary so this panel cannot bypass the canonical
+// loader or instantiate a second decoder implementation just to satisfy QA.
+const trustedLoader = readFileSync(new URL('../../src/lib/anatomy/pemuatAtlas.ts', import.meta.url), 'utf8')
+assert.match(trustedLoader, /MeshoptDecoder/)
+assert.match(trustedLoader, /GLTFLoader/)
 
 const navigator = readFileSync(new URL('../../src/pages/bodyhub/MultisystemScaleNavigator.tsx', import.meta.url), 'utf8')
 assert.match(navigator, /BodyAllSystems3D/)
