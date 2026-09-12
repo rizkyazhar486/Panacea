@@ -1,4 +1,4 @@
-name: Organ 3D Acceptance
+name: Body 3D Render Acceptance
 
 on:
   pull_request:
@@ -13,13 +13,13 @@ permissions:
   contents: read
 
 concurrency:
-  group: organ-3d-acceptance-${{ github.event.pull_request.number || github.ref }}
+  group: body-3d-acceptance-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
 
 jobs:
-  organ-render-proof:
+  render-proof:
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 45
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -60,10 +60,45 @@ jobs:
           cat /tmp/panacea-organ-preview.log
           exit 1
 
-      - name: Prove organ GLBs render meshes
+      # Kedelapan gerbang dijalankan terhadap SATU build dan SATU preview.
+      #
+      # Sebelumnya hanya qa:organ-3d yang berjalan di CI, sementara tujuh gerbang
+      # lain hanya ada di mesin pengembang -- artinya mereka tidak menjaga main
+      # sama sekali. Panel organ gagal untuk sembilan model justru karena ia
+      # satu-satunya permukaan 3D tanpa gerbang; membiarkan tujuh gerbang tidak
+      # pernah berjalan adalah bentuk lain dari lubang yang sama.
+      #
+      # Dijalankan berurutan, bukan paralel: WebGL di sini memakai SwiftShader,
+      # dan beberapa adegan sekaligus saling berebut CPU sampai salah satunya
+      # habis waktu karena kelambatan, bukan karena cacat.
+      - name: Prove every 3D panel renders
         env:
           ORGAN3D_QA_URL: http://127.0.0.1:4173/#/body-explorer
-        run: npm run qa:organ-3d
+          WILAYAH3D_QA_URL: http://127.0.0.1:4173/#/body-explorer
+          VENT3D_QA_URL: http://127.0.0.1:4173/#/body-explorer
+          ARTERI3D_QA_URL: http://127.0.0.1:4173/#/body-explorer
+          LIMFE3D_QA_URL: http://127.0.0.1:4173/#/body-explorer
+          KERANGKA3D_QA_URL: http://127.0.0.1:4173/#/body-explorer
+          LESI3D_QA_URL: http://127.0.0.1:4173/#/body-explorer
+          KELENJAR3D_QA_URL: http://127.0.0.1:4173/#/body-explorer
+        run: |
+          set -e
+          gagal=""
+          for gerbang in qa:organ-3d qa:wilayah-3d qa:ventilasi-3d qa:arteri-3d \
+                         qa:limfe-3d qa:kerangka-3d qa:lesi-3d qa:kelenjar-3d; do
+            echo "::group::$gerbang"
+            if npm run "$gerbang"; then
+              echo "::endgroup::"
+            else
+              echo "::endgroup::"
+              echo "::error::$gerbang gagal"
+              gagal="$gagal $gerbang"
+            fi
+          done
+          if [ -n "$gagal" ]; then
+            echo "Gerbang 3D yang gagal:$gagal"
+            exit 1
+          fi
 
       - name: Stop production preview
         if: always()

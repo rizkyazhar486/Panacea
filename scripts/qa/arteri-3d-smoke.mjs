@@ -8,7 +8,7 @@
 // yang ikut menyala cocok dengan pohon di dalam berkasnya.
 import { chromium } from '@playwright/test'
 
-const url = process.env.ARTERI3D_QA_URL || 'http://127.0.0.1:4196/#/body-explorer'
+const url = process.env.ARTERI3D_QA_URL || 'http://127.0.0.1:4173/#/body-explorer'
 const jalurPeramban = process.env.ARTERI3D_QA_CHROME || undefined
 
 const browser = await chromium.launch({
