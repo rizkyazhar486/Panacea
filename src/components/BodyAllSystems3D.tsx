@@ -55,16 +55,15 @@ export default function BodyAllSystems3D() {
       return
     }
 
-    // Commit the lightweight disclosure interaction first, then start Three.js
-    // in a separate browser task. On constrained mobile/SwiftShader runners,
-    // constructing a WebGLRenderer in the same interaction turn can keep the
-    // click dispatch busy long enough for automation (and users) to perceive a
-    // frozen button even though the control itself is healthy.
+    // Commit and paint the lightweight disclosure interaction first, then give
+    // the browser a short interaction window before constructing Three.js.
+    // A zero-delay timer can still start SwiftShader/WebGL work before the
+    // pointer/click acknowledgement has returned on constrained mobile runners.
     setOpen(true)
     openTimerRef.current = window.setTimeout(() => {
       openTimerRef.current = null
       setRendererArmed(true)
-    }, 0)
+    }, 120)
   }
 
   useEffect(() => {
