@@ -28,6 +28,11 @@ export function BreathAtlasLab(props: Props) {
           <div>
             <div className="text-[9px] font-black uppercase tracking-[0.18em] text-cyan-300">Respiratory source render</div>
             <div className="mt-1 text-sm font-black">Airflow 3D · shipped visceral geometry</div>
+            <div className="mt-2 flex flex-wrap gap-1.5 text-[8px] font-black">
+              <a href="https://github.com/thebuggeddev/anatomy" target="_blank" rel="noreferrer" className="rounded-full border border-white/15 bg-white/5 px-2.5 py-1 text-neutral-300 transition hover:border-cyan-300/50 hover:text-cyan-200">thebuggeddev/anatomy ↗</a>
+              <a href="https://breath-atlas.thebuggeddev.chatgpt.site/" target="_blank" rel="noreferrer" className="rounded-full border border-cyan-300/20 bg-cyan-300/[0.06] px-2.5 py-1 text-cyan-200 transition hover:bg-cyan-300/10">Breath Atlas reference ↗</a>
+              <span className="rounded-full border border-amber-300/20 bg-amber-300/[0.05] px-2.5 py-1 text-amber-100">interaction reference only · license check required</span>
+            </div>
           </div>
           <button
             type="button"
