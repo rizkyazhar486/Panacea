@@ -94,6 +94,7 @@ export function LokalisasiLesiPanel() {
 
   const hasil = useMemo(() => lokalisasi(temuan, saraf), [temuan, saraf])
   const terbaik = tempatTerbaik(hasil)
+  const adaTemuan = temuan.length > 0 || saraf.length > 0
 
   function alihkan(modalitas: Modalitas, sisi: Sisi, wilayah: Wilayah) {
     setPelajaran(null)
@@ -134,7 +135,16 @@ export function LokalisasiLesiPanel() {
       </div>
 
       <Suspense fallback={<div className="h-[280px] w-full rounded-2xl bg-[var(--pelatih-alas-1,rgba(15,23,42,0.04))]" />}>
-        <LesiNeuro3D tingkat={terbaik?.tingkat ?? null} sisi={terbaik?.sisi ?? null} />
+        {/* Tanpa satu pun temuan, `lokalisasi` masih mengembalikan kandidat:
+            setiap tempat "menjelaskan" nol temuan dengan sama baiknya. Menyorot
+            kandidat pertama dari daftar itu akan menampilkan tempat lesi pada
+            model sebelum ada yang dimasukkan. Dulu ini tidak terlihat karena
+            viewer-nya gagal mengikat mesh bersisi; ia terlihat begitu ikatannya
+            diperbaiki. Jadi yang disorot hanya disebut saat ADA temuan. */}
+        <LesiNeuro3D
+          tingkat={adaTemuan ? terbaik?.tingkat ?? null : null}
+          sisi={adaTemuan ? terbaik?.sisi ?? null : null}
+        />
       </Suspense>
 
       {/* Tutorial: kasus yang benar-benar menjalankan alatnya. */}

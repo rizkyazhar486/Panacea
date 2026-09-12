@@ -1,10 +1,9 @@
 import { useEffect, useRef, useState } from 'react'
 import * as THREE from 'three'
-import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
-import { MeshoptDecoder } from 'three/examples/jsm/libs/meshopt_decoder.module.js'
 import { body3dPixelRatio } from '../../lib/body3dQuality'
 import { BERKAS_BRONKUS, kunciNama, petaMeshKeSegmen } from '../../lib/anatomy/bronkusSegmental'
+import { muatAtlas, namaAtlas } from '../../lib/anatomy/pemuatAtlas'
 import {
   SEGMEN_VENTILASI, mulaiVentilasi, langkahVentilasi, type KeadaanVentilasi,
 } from '../../lib/ventilasiSegmental'
@@ -101,21 +100,18 @@ export function VentilasiBronkus3D({
     let grup: THREE.Group | null = null
     let keadaan: KeadaanVentilasi = mulaiVentilasi(SEGMEN_VENTILASI)
 
-    // visceral.glb dikirim terkompresi meshopt. Tanpa dekodernya GLTFLoader
-    // menolak berkasnya sama sekali -- dan kegagalannya tidak muncul sebagai
-    // pengecualian di konsol, hanya sebagai paru yang tidak pernah berwarna.
-    const loader = new GLTFLoader()
-    loader.setMeshoptDecoder(MeshoptDecoder)
-    loader.load(
-      `${import.meta.env.BASE_URL}${BERKAS_BRONKUS}`,
-      (gltf) => {
-        grup = gltf.scene
+    // Dekoder meshopt, pemulihan nama asli dan penolakan yang terlihat semuanya
+    // ditangani `muatAtlas`; lihat komentarnya untuk kelima kegagalan sunyi
+    // yang pernah terjadi saat setiap pemanggil mengurusnya sendiri.
+    muatAtlas(BERKAS_BRONKUS.replace(/^anatomy\//, ''))
+      .then(({ scene: dimuat, namaAsli }) => {
+        grup = dimuat
         const kotak = new THREE.Box3()
 
         grup.traverse((o) => {
           if (!(o as THREE.Mesh).isMesh) return
           const m = o as THREE.Mesh
-          const idSegmen = peta.get(kunciNama(m.name))
+          const idSegmen = peta.get(kunciNama(namaAtlas(namaAsli, m)))
           if (!idSegmen) {
             // Sisa rongga dada disembunyikan, bukan dihapus: menghapusnya akan
             // membuat berkas yang sama tidak bisa dipakai ulang di tempat lain.
@@ -149,13 +145,11 @@ export function VentilasiBronkus3D({
         scene.add(grup)
         renderer.domElement.dataset.segmenTerikat = String(perSegmen.size)
         setMuat(false)
-      },
-      undefined,
-      () => {
+      })
+      .catch(() => {
         setGagal('Could not load the airway model.')
         setMuat(false)
-      },
-    )
+      })
 
     let raf = 0
     let sebelumnya = performance.now()

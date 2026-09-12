@@ -1,9 +1,8 @@
 import { useEffect, useRef, useState } from 'react'
 import * as THREE from 'three'
-import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
-import { MeshoptDecoder } from 'three/examples/jsm/libs/meshopt_decoder.module.js'
 import { body3dPixelRatio } from '../../lib/body3dQuality'
+import { muatAtlas, namaAtlas } from '../../lib/anatomy/pemuatAtlas'
 import {
   BERKAS_PERMUKAAN, WILAYAH_ABDOMEN, wilayahDariMesh,
 } from '../../lib/anatomy/wilayahAbdomen'
@@ -84,28 +83,13 @@ export function WilayahAbdomen3D({ terpilih, onPilih, tinggi = 300 }: WilayahAbd
     const dapatDipilih: THREE.Mesh[] = []
     let grup: THREE.Group | null = null
 
-    const loader = new GLTFLoader()
-    loader.setMeshoptDecoder(MeshoptDecoder)
-    loader.load(
-      `${import.meta.env.BASE_URL}${BERKAS_PERMUKAAN}`,
-      (gltf) => {
-        grup = gltf.scene
-
-        // Nama ASLI dipulihkan lewat parser.associations, seperti Body3D.
-        //
-        // GLTFLoader membuang titik pemisah, sehingga "Hypochondriac region.l"
-        // dan "...r" tiba di scene dengan nama yang sama. Sisi tidak bisa
-        // dipulihkan dari nama itu -- tetapi berkasnya masih menyimpannya, dan
-        // associations adalah jalan kembali ke sana. Posisi X dipakai hanya
-        // sebagai pemeriksaan silang di bawah, bukan sebagai sumber sisi.
-        const nodesJson = gltf.parser.json.nodes as Array<{ name?: string }> | undefined
-        const namaAsli = new Map<THREE.Object3D, string>()
-        grup.traverse((o) => {
-          const assoc = gltf.parser.associations.get(o) as { nodes?: number } | undefined
-          const idx = assoc?.nodes
-          const nama = idx !== undefined ? nodesJson?.[idx]?.name : undefined
-          if (nama) namaAsli.set(o, nama)
-        })
+    // Nama ASLI dipulihkan oleh `muatAtlas`: GLTFLoader membuang titik pemisah,
+    // sehingga "Hypochondriac region.l" dan "...r" tiba di scene dengan nama
+    // yang sama. Sisi tidak bisa dipulihkan dari nama itu -- tetapi berkasnya
+    // masih menyimpannya. Posisi X hanya cadangan, bukan sumber sisi.
+    muatAtlas(BERKAS_PERMUKAAN.replace(/^anatomy\//, ''))
+      .then(({ scene: dimuat, namaAsli }) => {
+        grup = dimuat
         // Sisi dibaca dari matriks dunia, jadi matriksnya harus sudah benar --
         // dan harus dibaca SEBELUM adegan digeser ke pusat di bawah.
         grup.updateMatrixWorld(true)
@@ -114,7 +98,7 @@ export function WilayahAbdomen3D({ terpilih, onPilih, tinggi = 300 }: WilayahAbd
         grup.traverse((o) => {
           if (!(o as THREE.Mesh).isMesh) return
           const m = o as THREE.Mesh
-          const asli = namaAsli.get(m) ?? namaAsli.get(m.parent as THREE.Object3D) ?? m.name
+          const asli = namaAtlas(namaAsli, m)
           const posisi = m.getWorldPosition(new THREE.Vector3())
           const id = wilayahDariMesh(asli, posisi.x)
           if (!id) {
@@ -154,13 +138,11 @@ export function WilayahAbdomen3D({ terpilih, onPilih, tinggi = 300 }: WilayahAbd
         renderer.domElement.dataset.wilayahTampil = String(bahanPerWilayah.size)
         setMuat(false)
         terapkanRef.current?.(terpilih)
-      },
-      undefined,
-      () => {
+      })
+      .catch(() => {
         setGagal('Could not load the surface model.')
         setMuat(false)
-      },
-    )
+      })
 
     terapkanRef.current = (id) => {
       for (const [wid, daftar] of bahanPerWilayah) {
