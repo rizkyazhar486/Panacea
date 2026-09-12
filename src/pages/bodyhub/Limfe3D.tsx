@@ -1,8 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import * as THREE from 'three'
-import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
-import { MeshoptDecoder } from 'three/examples/jsm/libs/meshopt_decoder.module.js'
+import { muatAtlas, namaAtlas } from '../../lib/anatomy/pemuatAtlas'
 import { body3dPixelRatio } from '../../lib/body3dQuality'
 import { BERKAS_LIMFOID, MESH_BUKAN_ANATOMI, stasiunDariMeshAsli } from '../../lib/anatomy/stasiunLimfe'
 
@@ -100,30 +99,18 @@ export function Limfe3D({ terpilih, onPilih, tinggi = 340 }: Limfe3DProps) {
     let grup: THREE.Group | null = null
     let kotakSeluruh = new THREE.Box3()
 
-    const loader = new GLTFLoader()
-    // Tanpa baris ini berkasnya ditolak mentah-mentah dan tidak ada yang tampil.
-    loader.setMeshoptDecoder(MeshoptDecoder)
-    loader.load(
-      `${import.meta.env.BASE_URL}${BERKAS_LIMFOID}`,
-      (gltf) => {
-        grup = gltf.scene
-
-        // Nama ASLI, satu-satunya identitas yang boleh dipakai mencocokkan.
-        const simpulJson = gltf.parser.json.nodes as Array<{ name?: string }> | undefined
-        const namaAsli = new Map<THREE.Object3D, string>()
-        grup.traverse((o) => {
-          const assoc = gltf.parser.associations.get(o) as { nodes?: number } | undefined
-          const idx = assoc?.nodes
-          const nama = idx !== undefined ? simpulJson?.[idx]?.name : undefined
-          if (nama) namaAsli.set(o, nama)
-        })
+    // muatAtlas memasang dekoder meshopt dan memulihkan nama ASLI -- satu-satunya
+    // identitas yang boleh dipakai mencocokkan -- lewat parser.associations.
+    muatAtlas(BERKAS_LIMFOID)
+      .then(({ scene: adegan, namaAsli }) => {
+        grup = adegan
         grup.updateMatrixWorld(true)
 
         const abai = new Set<string>(MESH_BUKAN_ANATOMI)
         grup.traverse((o) => {
           if (!(o as THREE.Mesh).isMesh) return
           const m = o as THREE.Mesh
-          const asli = namaAsli.get(m) ?? namaAsli.get(m.parent as THREE.Object3D) ?? m.name
+          const asli = namaAtlas(namaAsli, m)
           if (abai.has(asli)) {
             // "HOW TO ..." adalah teks petunjuk berkas sumber, bukan anatomi.
             m.visible = false
@@ -173,13 +160,11 @@ export function Limfe3D({ terpilih, onPilih, tinggi = 340 }: Limfe3DProps) {
         renderer.domElement.dataset.limfeMesh = String(stasiunMesh.size)
         setMuat(false)
         terapkanRef.current?.(terpilih)
-      },
-      undefined,
-      () => {
+      })
+      .catch(() => {
         setGagal('Could not load the lymphoid model.')
         setMuat(false)
-      },
-    )
+      })
 
     // Pembingkaian kamera: tujuan diperbarui, animasi di bawah yang menuju ke sana.
     const tujuanPosisi = new THREE.Vector3()

@@ -115,6 +115,28 @@ async function semuaBerkasSumber(dir: string): Promise<string[]> {
   assert.ok(helper.includes('setMeshoptDecoder'), 'pemuatAtlas.ts tidak memasang dekoder meshopt')
   assert.ok(helper.includes('parser.associations'), 'pemuatAtlas.ts tidak memulihkan nama asli simpul')
 
+  // Tetapan jalur berkas harus berupa NAMA BERKAS TELANJANG.
+  //
+  // muatAtlas memberi awalan `anatomy/` sendiri, jadi tetapan yang sudah
+  // membawa awalan itu menghasilkan `anatomy/anatomy/x.glb` -- 404, kanvas
+  // kosong. Sebelum ini tetapannya tidak seragam: BERKAS_ARTERI telanjang
+  // sedangkan BERKAS_LIMFOID dan BERKAS_KERANGKA membawa awalan, dan tiap
+  // pemanggil harus tahu yang mana. Keseragaman itu dijaga di sini supaya
+  // tidak perlu diingat lagi.
+  {
+    const { BERKAS_ARTERI } = await import('../../src/lib/anatomy/wilayahArteri.ts')
+    const { BERKAS_LIMFOID } = await import('../../src/lib/anatomy/stasiunLimfe.ts')
+    const { BERKAS_KERANGKA } = await import('../../src/lib/anatomy/rangkaKerangka.ts')
+    for (const [nama, nilai] of Object.entries({ BERKAS_ARTERI, BERKAS_LIMFOID, BERKAS_KERANGKA })) {
+      assert.ok(
+        !nilai.includes('/'),
+        `${nama} = "${nilai}" membawa awalan jalur; muatAtlas menambahkan "anatomy/" sendiri, ` +
+        'sehingga awalan ganda menghasilkan 404 dan kanvas kosong tanpa galat.',
+      )
+      assert.ok(nilai.endsWith('.glb'), `${nama} = "${nilai}" bukan nama berkas .glb`)
+    }
+  }
+
   console.log(
     `Pemuat GLB meshopt: ${BERKAS_ATLAS.length} berkas atlas menuntut EXT_meshopt_compression; ` +
     `${menuntut} dari ${glb.length} berkas .glb di public/ menuntutnya, ${diperiksa} pemuat langsung di src/ memasang dekodernya, dan helper bersama memasangnya ` +

@@ -1,8 +1,8 @@
 import { useEffect, useRef, useState } from 'react'
 import * as THREE from 'three'
-import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'
+
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
-import { MeshoptDecoder } from 'three/examples/jsm/libs/meshopt_decoder.module.js'
+import { muatAtlas, namaAtlas } from '../../lib/anatomy/pemuatAtlas'
 import { body3dPixelRatio } from '../../lib/body3dQuality'
 import { ARTERI, BERKAS_ARTERI, arteriDariSimpul, namaSimpulArteri } from '../../lib/anatomy/wilayahArteri'
 
@@ -108,21 +108,14 @@ export function Arteri3D({ terpilih, onPilih, onTerikat, tinggi = 320 }: Arteri3
     let grup: THREE.Group | null = null
     let batal = false
 
-    const loader = new GLTFLoader()
-    loader.setMeshoptDecoder(MeshoptDecoder)
-    loader.load(
-      `${import.meta.env.BASE_URL}anatomy/${BERKAS_ARTERI}`,
-      (gltf) => {
+    // muatAtlas, bukan GLTFLoader sendiri: dekoder meshopt selalu terpasang dan
+    // nama ASLI dipulihkan lewat parser.associations di satu tempat. Kedua hal
+    // itu sebelumnya disalin tangan di tiap panel, dan setiap salinan adalah
+    // kesempatan untuk melupakan salah satunya tanpa galat apa pun.
+    muatAtlas(BERKAS_ARTERI)
+      .then(({ scene: adegan, namaAsli }) => {
         if (batal) return
-        const simpulJson = gltf.parser.json.nodes as Array<{ name?: string }> | undefined
-        const namaAsli = new Map<THREE.Object3D, string>()
-        gltf.scene.traverse((o) => {
-          const assoc = gltf.parser.associations.get(o) as { nodes?: number } | undefined
-          const i = assoc?.nodes
-          const nama = i !== undefined ? simpulJson?.[i]?.name : undefined
-          if (nama) namaAsli.set(o, nama)
-        })
-        grup = gltf.scene
+        grup = adegan
         grup.updateMatrixWorld(true)
         const kotak = new THREE.Box3()
 
@@ -131,7 +124,7 @@ export function Arteri3D({ terpilih, onPilih, onTerikat, tinggi = 320 }: Arteri3
           const m = o as THREE.Mesh
           // Mesh berisi geometri batang itu sendiri tidak bernama di dalam
           // berkas; namanya ada pada simpul pivot induknya.
-          const asli = namaAsli.get(m) ?? namaAsli.get(m.parent as THREE.Object3D) ?? m.name
+          const asli = namaAtlas(namaAsli, m)
           if (BUKAN_ARTERI.test(asli) || !ARTERI_LATAR.test(asli)) {
             m.visible = false
             return
@@ -189,14 +182,12 @@ export function Arteri3D({ terpilih, onPilih, onTerikat, tinggi = 320 }: Arteri3
         setMuat(false)
         onTerikatRef.current?.(meshArteri.size)
         terapkanRef.current?.(terpilih)
-      },
-      undefined,
-      () => {
+      })
+      .catch(() => {
         if (batal) return
         setGagal('Could not load the cardiovascular model.')
         setMuat(false)
-      },
-    )
+      })
 
     terapkanRef.current = (id) => {
       const inti = new Set(id ? meshArteri.get(id) ?? [] : [])
