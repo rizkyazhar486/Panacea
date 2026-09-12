@@ -78,7 +78,18 @@ const segmentNodes: readonly AtlasNode[] = SEGMENTS.map((segment) => resp({
 
 export const RESPIRATORY_ATLAS_NODES: readonly AtlasNode[] = [
   resp({ id: 'resp:upper-airway', label: 'Upper airway', regions: ['head', 'neck'], laterality: 'midline', scale: 'organ', parentId: 'system:respiratory', children: ['resp:nasal-cavity', 'resp:pharynx', 'resp:larynx'], source: { mode: 'composite', files: ['visceral.glb'], nodeHints: ['nasal cavity', 'pharynx', 'larynx'] }, geometryStatus: 'shipped', physiologyCapable: true }),
-  resp({ id: 'resp:nasal-cavity', label: 'Nasal cavity', regions: ['head'], laterality: 'bilateral', scale: 'suborgan', parentId: 'resp:upper-airway', source: { mode: 'specific-fallback', files: ['visceral.glb'], nodeHints: ['nasal cavity', 'nose'] }, geometryStatus: 'partial', physiologyCapable: true }),
+  // Rongga hidung berskala ORGAN, bukan suborgan.
+  //
+  // Kontrak cakupan organ menuntutnya sebagai organ makro, sementara simpul ini
+  // dulu dideklarasikan 'suborgan'. Akibatnya gerbang cakupan -- yang hanya
+  // menerima skala 'organ' -- melaporkannya HILANG, padahal geometrinya
+  // dikirim: "Mucosa of nasal cavity" di visceral.glb, konka inferior, tulang
+  // hidung dan kartilago septum di skeletal.glb.
+  //
+  // Yang diperbaiki adalah klasifikasinya, BUKAN aturannya. Statusnya tetap
+  // 'partial' karena memang hanya mukosanya yang dirujuk dari berkas ini, jadi
+  // perubahan ini tidak menambah satu pun organ ke hitungan 'shipped'.
+  resp({ id: 'resp:nasal-cavity', label: 'Nasal cavity', regions: ['head'], laterality: 'bilateral', scale: 'organ', parentId: 'resp:upper-airway', source: { mode: 'specific-fallback', files: ['visceral.glb'], nodeHints: ['nasal cavity', 'nose'] }, geometryStatus: 'partial', physiologyCapable: true }),
   resp({ id: 'resp:pharynx', label: 'Pharynx', regions: ['head', 'neck'], laterality: 'midline', scale: 'organ', parentId: 'resp:upper-airway', source: { mode: 'specific-fallback', files: ['visceral.glb'], nodeHints: ['pharynx'] }, geometryStatus: 'shipped', physiologyCapable: true }),
   // Bundel viseral memuat epiglotis, tetapi tidak ada satu simpul pun untuk
   // laring sebagai organ utuh; karena itu 'partial', bukan 'shipped'.
