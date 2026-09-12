@@ -21,6 +21,8 @@ const NefronPanel = lazy(() => import('./bodyhub/NefronPanel').then((m) => ({ de
 const AsamBasaPanel = lazy(() => import('./bodyhub/AsamBasaPanel').then((m) => ({ default: m.AsamBasaPanel })))
 const WilayahAbdomenPanel = lazy(() => import('./bodyhub/WilayahAbdomenPanel').then((m) => ({ default: m.WilayahAbdomenPanel })))
 const KerangkaPanel = lazy(() => import('./bodyhub/KerangkaPanel').then((m) => ({ default: m.KerangkaPanel })))
+const ArteriPanel = lazy(() => import('./bodyhub/ArteriPanel').then((m) => ({ default: m.ArteriPanel })))
+const LimfePanel = lazy(() => import('./bodyhub/LimfePanel').then((m) => ({ default: m.LimfePanel })))
 const VentilasiSegmenPanel = lazy(() => import('./bodyhub/VentilasiSegmenPanel').then((m) => ({ default: m.VentilasiSegmenPanel })))
 const LokalisasiLesiPanel = lazy(() => import('./bodyhub/LokalisasiLesiPanel').then((m) => ({ default: m.LokalisasiLesiPanel })))
 const PhysiologySection = lazy(() => import('./bodyhub/PhysiologySection'))
@@ -94,7 +96,7 @@ function Chip({
 // sama-sama menyorot struktur pada figur yang itu-itu juga. Itulah maksud
 // "satu simulasi tubuh yang utuh" — bukan enam halaman yang saling menyebut,
 // melainkan satu tubuh yang ditanyai dari enam sudut.
-type PanelTab = 'hemodinamik' | 'nefron' | 'asam-basa' | 'wilayah-abdomen' | 'kerangka' | 'ventilasi' | 'lokalisasi' | 'layers' | 'muscles' | 'workout-sim' | 'organs' | 'physiology' | 'simulator' | 'cardio' | 'spesialisasi' | 'molekul' | 'genomik' | 'sel' | 'bedah' | 'cari' | 'presisi' | 'mesin' | 'drugs' | 'diseases' | 'reference'
+type PanelTab = 'hemodinamik' | 'nefron' | 'asam-basa' | 'wilayah-abdomen' | 'kerangka' | 'arteri' | 'limfe' | 'ventilasi' | 'lokalisasi' | 'layers' | 'muscles' | 'workout-sim' | 'organs' | 'physiology' | 'simulator' | 'cardio' | 'spesialisasi' | 'molekul' | 'genomik' | 'sel' | 'bedah' | 'cari' | 'presisi' | 'mesin' | 'drugs' | 'diseases' | 'reference'
 
 const PANEL_TABS: Array<{ key: PanelTab; label: string }> = [
   { key: 'layers', label: 'Layers' },
@@ -110,6 +112,8 @@ const PANEL_TABS: Array<{ key: PanelTab; label: string }> = [
   { key: 'asam-basa', label: 'Acid–base' },
   { key: 'wilayah-abdomen', label: 'Abdominal regions' },
   { key: 'kerangka', label: 'Skeleton' },
+  { key: 'arteri', label: 'Arterial territories' },
+  { key: 'limfe', label: 'Lymphoid system' },
   { key: 'cardio', label: 'Cardio lab' },
   { key: 'spesialisasi', label: 'Specialty labs' },
   { key: 'molekul', label: 'Molecules' },
@@ -902,6 +906,18 @@ export function BodyExplorer() {
                 <WilayahAbdomenPanel />
               </Suspense>
             )}
+            {panelTab === 'arteri' && (
+              <Suspense fallback={<p className="text-sm text-neutral-500">Loading arterial supply…</p>}>
+                <ArteriPanel />
+              </Suspense>
+            )}
+
+            {panelTab === 'limfe' && (
+              <Suspense fallback={<p className="text-sm text-neutral-500">Loading lymph nodes…</p>}>
+                <LimfePanel />
+              </Suspense>
+            )}
+
             {panelTab === 'kerangka' && (
               <Suspense fallback={<p className="text-sm text-neutral-500">Loading the skeleton…</p>}>
                 <KerangkaPanel />
