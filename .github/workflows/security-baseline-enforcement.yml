@@ -31,3 +31,12 @@ jobs:
 
       - name: Enforce security baseline
         run: node scripts/qa/security-baseline-enforcement.mjs
+
+      - name: Upload security enforcement report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: security-baseline-enforcement
+          path: artifacts/security-baseline-enforcement.json
+          if-no-files-found: error
+          retention-days: 7
