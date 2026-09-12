@@ -31,3 +31,13 @@ tsconfig.tsbuildinfo
 # Unggahan CI tidak terpengaruh: actions/upload-artifact membaca pohon kerja,
 # bukan indeks git.
 artifacts/
+
+# Worktree terisolasi untuk agen paralel. Dibuat oleh perkakas, bukan isi repo:
+# beberapa agen bekerja serentak di checkout masing-masing supaya indeks git
+# mereka tidak saling menimpa.
+.claude/worktrees/
+
+# Skrip smoke sementara. Pemeriksaan browser sering ditulis sebagai berkas
+# sekali pakai di akar repo; menamainya *.tmp.mjs membuatnya tidak pernah
+# terbawa ke dalam commit kalau seseorang lupa menghapusnya.
+*.tmp.mjs
