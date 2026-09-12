@@ -19,6 +19,7 @@ import { Link } from 'react-router-dom'
 const HemodinamikPanel = lazy(() => import('./bodyhub/HemodinamikPanel').then((m) => ({ default: m.HemodinamikPanel })))
 const NefronPanel = lazy(() => import('./bodyhub/NefronPanel').then((m) => ({ default: m.NefronPanel })))
 const AsamBasaPanel = lazy(() => import('./bodyhub/AsamBasaPanel').then((m) => ({ default: m.AsamBasaPanel })))
+const LimfePanel = lazy(() => import('./bodyhub/LimfePanel').then((m) => ({ default: m.LimfePanel })))
 const WilayahAbdomenPanel = lazy(() => import('./bodyhub/WilayahAbdomenPanel').then((m) => ({ default: m.WilayahAbdomenPanel })))
 const VentilasiSegmenPanel = lazy(() => import('./bodyhub/VentilasiSegmenPanel').then((m) => ({ default: m.VentilasiSegmenPanel })))
 const LokalisasiLesiPanel = lazy(() => import('./bodyhub/LokalisasiLesiPanel').then((m) => ({ default: m.LokalisasiLesiPanel })))
@@ -93,7 +94,7 @@ function Chip({
 // sama-sama menyorot struktur pada figur yang itu-itu juga. Itulah maksud
 // "satu simulasi tubuh yang utuh" — bukan enam halaman yang saling menyebut,
 // melainkan satu tubuh yang ditanyai dari enam sudut.
-type PanelTab = 'hemodinamik' | 'nefron' | 'asam-basa' | 'wilayah-abdomen' | 'ventilasi' | 'lokalisasi' | 'layers' | 'muscles' | 'workout-sim' | 'organs' | 'physiology' | 'simulator' | 'cardio' | 'spesialisasi' | 'molekul' | 'genomik' | 'sel' | 'bedah' | 'cari' | 'presisi' | 'mesin' | 'drugs' | 'diseases' | 'reference'
+type PanelTab = 'hemodinamik' | 'nefron' | 'asam-basa' | 'wilayah-abdomen' | 'limfe' | 'ventilasi' | 'lokalisasi' | 'layers' | 'muscles' | 'workout-sim' | 'organs' | 'physiology' | 'simulator' | 'cardio' | 'spesialisasi' | 'molekul' | 'genomik' | 'sel' | 'bedah' | 'cari' | 'presisi' | 'mesin' | 'drugs' | 'diseases' | 'reference'
 
 const PANEL_TABS: Array<{ key: PanelTab; label: string }> = [
   { key: 'layers', label: 'Layers' },
@@ -108,6 +109,7 @@ const PANEL_TABS: Array<{ key: PanelTab; label: string }> = [
   { key: 'nefron', label: 'Glomerular filtration' },
   { key: 'asam-basa', label: 'Acid–base' },
   { key: 'wilayah-abdomen', label: 'Abdominal regions' },
+  { key: 'limfe', label: 'Lymphoid system' },
   { key: 'cardio', label: 'Cardio lab' },
   { key: 'spesialisasi', label: 'Specialty labs' },
   { key: 'molekul', label: 'Molecules' },
@@ -898,6 +900,11 @@ export function BodyExplorer() {
             {panelTab === 'wilayah-abdomen' && (
               <Suspense fallback={<p className="text-sm text-neutral-500">Loading the abdominal regions…</p>}>
                 <WilayahAbdomenPanel />
+              </Suspense>
+            )}
+            {panelTab === 'limfe' && (
+              <Suspense fallback={<p className="text-sm text-neutral-500">Loading the lymphoid system…</p>}>
+                <LimfePanel />
               </Suspense>
             )}
             {panelTab === 'ventilasi' && (
