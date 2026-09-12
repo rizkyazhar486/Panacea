@@ -162,6 +162,17 @@ for (const w of WILAYAH_ABDOMEN) {
   }
   assert.ok(pasangan >= 6, `Harus menguji keenam wilayah berpasangan, hanya ${pasangan}`)
 
+  // Jalur utama: nama ASLI masih menyebut sisinya, dan harus dipercaya lebih
+  // dulu. Ia diuji dengan X yang SENGAJA dibalik: kalau posisi yang menang,
+  // wilayahnya akan tertukar dan uji ini gagal.
+  for (const w of WILAYAH_ABDOMEN.filter((x) => x.kolom !== 'tengah')) {
+    for (const nama of w.mesh) {
+      const x = simpul.get(nama) ?? 0
+      assert.equal(wilayahDariMesh(nama, x), w.id, `Nama asli "${nama}" tidak menemukan wilayahnya`)
+      assert.equal(wilayahDariMesh(nama, -x), w.id, `Nama asli "${nama}" kalah oleh posisi yang dibalik`)
+    }
+  }
+
   // Menukar tanda X harus menukar wilayahnya. Tanpa ini, sebuah implementasi
   // yang mengabaikan posisi sama sekali akan tetap lolos seluruh uji di atas.
   const kanan = WILAYAH_ABDOMEN.find((w) => w.id === 'hypochondriac-right')
@@ -185,5 +196,5 @@ for (const w of WILAYAH_ABDOMEN) {
 console.log(
   'Wilayah abdomen: sembilan wilayah mengisi kisi tiga-kali-tiga, setiap mesh ada di surface.glb, wilayah ' +
   'garis tengah memakai kedua belahan, wilayah punggung "Lumbar region" terbukti tidak dipakai sebagai perut, ' +
-  'dan tidak ada struktur penanda sisi yang menyeberang; sisi diambil dari koordinat X karena nama kehilangan ".l" dan ".r" di scene.',
+  'dan tidak ada struktur penanda sisi yang menyeberang; sisi diambil dari nama asli yang dipulihkan lewat parser.associations, dengan koordinat X sebagai cadangan.',
 )

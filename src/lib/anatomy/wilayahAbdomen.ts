@@ -151,12 +151,21 @@ export function wilayahUntuk(id: string): WilayahAbdomen | undefined {
  * Wilayah garis tengah ditentukan oleh namanya saja; wilayah berpasangan
  * menuntut posisi, karena namanya sudah kehilangan sisinya.
  */
+export function sisiDariNama(nama: string): 'kanan' | 'kiri' | null {
+  const m = /\.([lr])$/.exec(nama)
+  if (!m) return null
+  return m[1] === 'r' ? 'kanan' : 'kiri'
+}
+
 export function wilayahDariMesh(nama: string, x: number): string | undefined {
   const dasar = kunciDasar(nama)
   const sesuai = WILAYAH_ABDOMEN.filter((w) => w.mesh.some((n) => kunciDasar(n) === dasar))
   if (sesuai.length === 0) return undefined
   if (sesuai.length === 1) return sesuai[0].id
-  const sisi = sisiDariX(x)
+  // Nama ASLI menyebut sisinya, dan itu yang dipercaya lebih dulu. Posisi X
+  // hanya dipakai bila nama yang sampai ke sini sudah kehilangan akhirannya --
+  // yaitu bila pemanggil gagal memulihkan nama asli dari parser.associations.
+  const sisi = sisiDariNama(nama) ?? sisiDariX(x)
   return sesuai.find((w) => w.kolom === sisi)?.id
 }
 
