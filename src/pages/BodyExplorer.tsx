@@ -20,6 +20,7 @@ const HemodinamikPanel = lazy(() => import('./bodyhub/HemodinamikPanel').then((m
 const NefronPanel = lazy(() => import('./bodyhub/NefronPanel').then((m) => ({ default: m.NefronPanel })))
 const AsamBasaPanel = lazy(() => import('./bodyhub/AsamBasaPanel').then((m) => ({ default: m.AsamBasaPanel })))
 const FarmakodinamikPanel = lazy(() => import('./bodyhub/FarmakodinamikPanel').then((m) => ({ default: m.FarmakodinamikPanel })))
+const DialisisPanel = lazy(() => import('./bodyhub/DialisisPanel').then((m) => ({ default: m.DialisisPanel })))
 const WilayahAbdomenPanel = lazy(() => import('./bodyhub/WilayahAbdomenPanel').then((m) => ({ default: m.WilayahAbdomenPanel })))
 const KerangkaPanel = lazy(() => import('./bodyhub/KerangkaPanel').then((m) => ({ default: m.KerangkaPanel })))
 const ArteriPanel = lazy(() => import('./bodyhub/ArteriPanel').then((m) => ({ default: m.ArteriPanel })))
@@ -99,7 +100,7 @@ function Chip({
 // sama-sama menyorot struktur pada figur yang itu-itu juga. Itulah maksud
 // "satu simulasi tubuh yang utuh" — bukan enam halaman yang saling menyebut,
 // melainkan satu tubuh yang ditanyai dari enam sudut.
-type PanelTab = 'hemodinamik' | 'nefron' | 'asam-basa' | 'farmakodinamik' | 'wilayah-abdomen' | 'kerangka' | 'arteri' | 'limfe' | 'kelenjar-saluran' | 'ventilasi' | 'lokalisasi' | 'layers' | 'muscles' | 'workout-sim' | 'biomekanika' | 'organs' | 'physiology' | 'simulator' | 'cardio' | 'spesialisasi' | 'molekul' | 'genomik' | 'sel' | 'bedah' | 'cari' | 'presisi' | 'mesin' | 'drugs' | 'diseases' | 'reference'
+type PanelTab = 'hemodinamik' | 'nefron' | 'asam-basa' | 'farmakodinamik' | 'dialisis' | 'wilayah-abdomen' | 'kerangka' | 'arteri' | 'limfe' | 'kelenjar-saluran' | 'ventilasi' | 'lokalisasi' | 'layers' | 'muscles' | 'workout-sim' | 'biomekanika' | 'organs' | 'physiology' | 'simulator' | 'cardio' | 'spesialisasi' | 'molekul' | 'genomik' | 'sel' | 'bedah' | 'cari' | 'presisi' | 'mesin' | 'drugs' | 'diseases' | 'reference'
 
 const PANEL_TABS: Array<{ key: PanelTab; label: string }> = [
   { key: 'layers', label: 'Layers' },
@@ -115,6 +116,7 @@ const PANEL_TABS: Array<{ key: PanelTab; label: string }> = [
   { key: 'nefron', label: 'Glomerular filtration' },
   { key: 'asam-basa', label: 'Acid–base' },
   { key: 'farmakodinamik', label: 'Dose–response' },
+  { key: 'dialisis', label: 'Dialysis kinetics' },
   { key: 'wilayah-abdomen', label: 'Abdominal regions' },
   { key: 'kerangka', label: 'Skeleton' },
   { key: 'arteri', label: 'Arterial territories' },
@@ -910,6 +912,12 @@ export function BodyExplorer() {
             {panelTab === 'farmakodinamik' && (
               <Suspense fallback={<p className="text-sm text-neutral-500">Loading dose–response…</p>}>
                 <FarmakodinamikPanel />
+              </Suspense>
+            )}
+
+            {panelTab === 'dialisis' && (
+              <Suspense fallback={<p className="text-sm text-neutral-500">Loading dialysis kinetics…</p>}>
+                <DialisisPanel />
               </Suspense>
             )}
 
