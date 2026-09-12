@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import * as THREE from 'three'
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'
+import { MeshoptDecoder } from 'three/examples/jsm/libs/meshopt_decoder.module.js'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
 import { CARDIO_BY_NAME, CARDIO_PARTS } from '../lib/cardioAtlas.gen'
 import { cardiacCycleVisualState } from '../lib/cardiacCycleVisual'
@@ -112,7 +113,11 @@ export function CardiacCycle3D({ hr = 72, tinggi = 300 }: Props) {
     ]
     const tmp = new THREE.Object3D()
 
-    new GLTFLoader().load(
+    // cardio.glb dan seluruh berkas di public/organs terkompresi meshopt.
+    // Tanpa dekodernya GLTFLoader menolak berkasnya dan kanvasnya diam.
+    const loader = new GLTFLoader()
+    loader.setMeshoptDecoder(MeshoptDecoder)
+    loader.load(
       `${import.meta.env.BASE_URL}cardio/cardio.glb`,
       (gltf) => {
         root = gltf.scene
