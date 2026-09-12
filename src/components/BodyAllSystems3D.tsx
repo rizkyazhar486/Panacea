@@ -27,7 +27,9 @@ function materialFor(source: THREE.Material) {
 
 export default function BodyAllSystems3D() {
   const containerRef = useRef<HTMLDivElement>(null)
+  const openTimerRef = useRef<number | null>(null)
   const [open, setOpen] = useState(false)
+  const [rendererArmed, setRendererArmed] = useState(false)
   const [systemId, setSystemId] = useState<BodySystemId>('cardiovascular')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
@@ -38,8 +40,35 @@ export default function BodyAllSystems3D() {
   const systems = useMemo(() => resolveBodySystemSourceWave(), [])
   const selected = systems.find((system) => system.id === systemId) ?? systems[0]
 
+  useEffect(() => () => {
+    if (openTimerRef.current !== null) window.clearTimeout(openTimerRef.current)
+  }, [])
+
+  const toggleOpen = () => {
+    if (openTimerRef.current !== null) {
+      window.clearTimeout(openTimerRef.current)
+      openTimerRef.current = null
+    }
+    if (open) {
+      setRendererArmed(false)
+      setOpen(false)
+      return
+    }
+
+    // Commit the lightweight disclosure interaction first, then start Three.js
+    // in a separate browser task. On constrained mobile/SwiftShader runners,
+    // constructing a WebGLRenderer in the same interaction turn can keep the
+    // click dispatch busy long enough for automation (and users) to perceive a
+    // frozen button even though the control itself is healthy.
+    setOpen(true)
+    openTimerRef.current = window.setTimeout(() => {
+      openTimerRef.current = null
+      setRendererArmed(true)
+    }, 0)
+  }
+
   useEffect(() => {
-    if (!open) return
+    if (!open || !rendererArmed) return
     const container = containerRef.current
     if (!container) return
 
@@ -212,7 +241,7 @@ export default function BodyAllSystems3D() {
       renderer.forceContextLoss()
       renderer.domElement.remove()
     }
-  }, [open, selected])
+  }, [open, rendererArmed, selected])
 
   const represented = selected.targets.filter((target) => target.available && loadedSourceFiles.includes(target.file) && !failedFiles.includes(target.file))
   const unavailable = selected.targets.filter((target) => !target.available || failedFiles.includes(target.file))
@@ -225,7 +254,7 @@ export default function BodyAllSystems3D() {
           <h4 className="mt-1 text-sm font-black text-neutral-950 dark:text-white">All major systems · one source-backed WebGL explorer</h4>
           <p className="mt-1 max-w-3xl text-[10px] leading-relaxed text-neutral-600 dark:text-neutral-300">Only source bundles required by the active system are loaded on mobile. Every target resolves against the shipped GLB source index first; unresolved structures stay unavailable with no replacement geometry, inferred anatomy, patient geometry or academic-review claim.</p>
         </div>
-        <button type="button" aria-expanded={open} onClick={() => setOpen((value) => !value)} className="min-h-11 rounded-xl border border-emerald-300 bg-white px-4 text-[10px] font-black text-emerald-800 dark:bg-white/5 dark:text-emerald-200">{open ? 'Close all-system 3D' : 'Open all-system 3D'}</button>
+        <button type="button" aria-expanded={open} onClick={toggleOpen} className="min-h-11 rounded-xl border border-emerald-300 bg-white px-4 text-[10px] font-black text-emerald-800 dark:bg-white/5 dark:text-emerald-200">{open ? 'Close all-system 3D' : 'Open all-system 3D'}</button>
       </div>
 
       <div className="mt-3 flex gap-1.5 overflow-x-auto pb-1" role="tablist" aria-label="Body systems">
