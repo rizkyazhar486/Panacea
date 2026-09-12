@@ -245,7 +245,7 @@ export default function BodyAllSystems3D() {
           <div className="rounded-xl border border-neutral-200 bg-white p-3 dark:border-white/10 dark:bg-white/[.035]">
             <div className="text-[9px] font-black uppercase tracking-wide text-emerald-700 dark:text-emerald-300">{selected.label}</div>
             <div className="mt-1 text-lg font-black text-neutral-950 dark:text-white">{represented.length}/{selected.targets.length} source targets represented</div>
-            <p className="mt-1 text-[9px] leading-relaxed text-neutral-500">Counts require source-name resolution plus a successfully loaded active-system bundle with matching renderable nodes; they do not claim anatomical completeness or human academic validation.</p>
+            <p className="mt-1 text-[9px] leading-relaxed text-neutral-500">Counts require source-name resolution plus a successfully loaded source bundle for the active system with matching renderable nodes; they do not claim anatomical completeness or human academic validation.</p>
           </div>
           <div className="grid gap-1.5 sm:grid-cols-2 md:grid-cols-1 xl:grid-cols-2">
             {selected.targets.map((target) => {
