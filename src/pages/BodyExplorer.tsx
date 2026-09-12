@@ -101,6 +101,8 @@ function Chip({
 // melainkan satu tubuh yang ditanyai dari enam sudut.
 type PanelTab = 'hemodinamik' | 'nefron' | 'asam-basa' | 'farmakodinamik' | 'wilayah-abdomen' | 'kerangka' | 'arteri' | 'limfe' | 'kelenjar-saluran' | 'ventilasi' | 'lokalisasi' | 'layers' | 'muscles' | 'workout-sim' | 'biomekanika' | 'organs' | 'physiology' | 'simulator' | 'cardio' | 'spesialisasi' | 'molekul' | 'genomik' | 'sel' | 'bedah' | 'cari' | 'presisi' | 'mesin' | 'drugs' | 'diseases' | 'reference'
 
+import { kelompokUntuk, kelompokTerpakai } from '../lib/bodyExplorerTabGroups'
+
 const PANEL_TABS: Array<{ key: PanelTab; label: string }> = [
   { key: 'layers', label: 'Layers' },
   { key: 'muscles', label: 'Muscles' },
@@ -276,7 +278,11 @@ export function BodyExplorer() {
   // NYATA yang ditampilkan di bawah kalau ada struktur yang sedang dipilih —
   // memilih "CT" lalu masih melihat foto anatomi berwarna akan membingungkan.
   const [renderMode, setRenderMode] = useState<RenderMode>('anatomy')
+  const [kelompokPilihan, setKelompokPilihan] = useState<string | null>(null)
   const [panelTab, setPanelTab] = useState<PanelTab>('layers')
+  // Kelompok yang ditampilkan: pilihan pengguna bila ada, kalau tidak kelompok
+  // milik tab yang sedang aktif.
+  const kelompokTampil = kelompokPilihan ?? kelompokUntuk(panelTab)
   // Hasil pencarian atlas bisa menunjuk ke ruang lain. Kedua nilai ini membawa
   // pilihannya menyeberang tab, supaya menekan hasil pencarian benar-benar
   // membuka apa yang ditunjuk dan bukan sekadar berpindah tab kosong.
@@ -757,11 +763,35 @@ export function BodyExplorer() {
               flex-1 membuat halamannya menggulir ke samping, dan itu terukur:
               scrollWidth 427 pada clientWidth 390. Jadi barisnya digulirkan
               sendiri secara mendatar dan tiap tab memakai lebar teksnya. */}
+          {/* Baris kelompok. Kelompok yang ditampilkan mengikuti tab AKTIF selama
+              pengguna belum memilih sendiri, supaya perpindahan tab dari tempat
+              lain -- menekan organ pada model, misalnya -- tetap mendarat di
+              baris yang memperlihatkannya. */}
+          <div role="group" aria-label="Panel groups"
+            className="-mx-1 mb-1 flex gap-1 overflow-x-auto">
+            {kelompokTerpakai(PANEL_TABS.map((t) => t.key)).map((k) => (
+              <button
+                key={k}
+                type="button"
+                onClick={() => setKelompokPilihan(k)}
+                aria-pressed={kelompokTampil === k}
+                className={`min-h-[30px] shrink-0 rounded-full px-3 text-[11px] font-black uppercase tracking-[0.08em] transition ${
+                  kelompokTampil === k
+                    ? 'bg-[#00BF63] text-white'
+                    : 'bg-neutral-100 text-neutral-500 dark:bg-white/5'
+                }`}
+              >
+                {k}
+              </button>
+            ))}
+          </div>
+
           <div className="-mx-1 flex gap-1 overflow-x-auto rounded-xl bg-neutral-100 p-1 dark:bg-white/5">
-            {PANEL_TABS.map((t) => (
+            {PANEL_TABS.filter((t) => kelompokUntuk(t.key) === kelompokTampil).map((t) => (
               <button
                 key={t.key}
                 onClick={() => setPanelTab(t.key)}
+                aria-pressed={panelTab === t.key}
                 className={`min-h-[34px] shrink-0 rounded-lg px-3 text-xs font-bold transition ${
                   panelTab === t.key
                     ? 'bg-white text-ink shadow-sm dark:bg-white/15 dark:text-white'
