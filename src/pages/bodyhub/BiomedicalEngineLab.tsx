@@ -102,7 +102,7 @@ export function BiomedicalEngineLab() {
   const [slicePos, setSlicePos] = useState(0)
   const [unfold, setUnfold] = useState(0)
   const [dissect, setDissect] = useState(0)
-  const [selectedExam, setSelectedExam] = useState(EXAM_LIBRARY[0])
+  const [selectedExam, setSelectedExam] = useState<(typeof EXAM_LIBRARY)[number]>(EXAM_LIBRARY[0])
   const [pickedStructure, setPickedStructure] = useState('')
 
   const track = BIOMEDICAL_TRACKS.find((item) => item.id === selected) ?? BIOMEDICAL_TRACKS[0]
