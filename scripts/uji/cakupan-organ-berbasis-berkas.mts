@@ -49,24 +49,17 @@ const POLA: Record<string, RegExp> = {
 /**
  * Organ yang berstatus 'missing' BUKAN karena geometrinya tidak ada.
  *
- * Rongga hidung dideklarasikan pada skala 'suborgan' di bawah `resp:upper-airway`,
- * sementara gerbang cakupan hanya menerima simpul berskala 'organ'. Geometrinya
- * dikirim -- "Mucosa of nasal cavity" ada di visceral.glb dan konka inferior ada
- * di skeletal.glb -- sehingga melaporkannya sebagai hilang adalah keliru secara
- * faktual, meskipun angkanya keluar dari aturan yang benar.
+ * Daftar ini KOSONG, dan itu hasil kerja, bukan kebetulan. Rongga hidung
+ * sempat masuk ke sini: geometrinya dikirim, tetapi simpulnya dideklarasikan
+ * berskala 'suborgan' sementara gerbang cakupan hanya menerima 'organ', jadi
+ * ia terhitung hilang. Yang diperbaiki adalah klasifikasinya, bukan aturan
+ * skalanya, sehingga catatannya tidak lagi diperlukan.
  *
- * Ini TIDAK diperbaiki dengan melonggarkan gerbangnya. Aturan skala itu yang
- * menjaga simpul kecil tidak dihitung sebagai organ, dan melemahkannya demi
- * angka yang lebih bagus adalah persis yang dilarang. Perbedaannya dicatat di
- * sini supaya keputusan kontraknya terlihat, bukan diam-diam diselesaikan.
- *
- * Setiap catatan di sini WAJIB membuktikan geometrinya memang ada, jadi daftar
- * ini tidak bisa dipakai untuk menyembunyikan organ yang benar-benar hilang.
+ * Kalau daftar ini terisi lagi, setiap catatan WAJIB membuktikan geometrinya
+ * memang ada, supaya ia tidak bisa dipakai menyembunyikan organ yang benar-
+ * benar tidak dikirim.
  */
-const HILANG_KARENA_SKALA: Record<string, RegExp> = {
-  'nasal-cavity': /nasal cavity|inferior nasal concha/i,
-}
-
+const HILANG_KARENA_SKALA: Record<string, RegExp> = {}
 const laporan = buildOrganCoverageReport(COMPLETE_WHOLE_BODY_ATLAS)
 const hilang = laporan.entries.filter((e) => e.status === 'missing')
 
