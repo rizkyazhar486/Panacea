@@ -12,6 +12,12 @@ const PERIOD_SECONDS: Readonly<Record<DigestiveFlowPhase, number>> = {
   colon: 11,
 }
 
+export function advanceDigestiveFlowTime(currentSeconds: number, deltaSeconds: number, running: boolean) {
+  const current = Number.isFinite(currentSeconds) ? Math.max(0, currentSeconds) : 0
+  const delta = Number.isFinite(deltaSeconds) ? Math.max(0, deltaSeconds) : 0
+  return running ? current + delta : current
+}
+
 export function digestiveFlowVisualState(elapsedSeconds: number, phase: DigestiveFlowPhase): DigestiveFlowVisualState {
   const safeElapsed = Number.isFinite(elapsedSeconds) ? Math.max(0, elapsedSeconds) : 0
   const period = PERIOD_SECONDS[phase]
