@@ -106,8 +106,24 @@ try {
   }
 
   const respiratoryTab = explorer.getByRole('tab', { name: 'Respiratory', exact: true })
-  await respiratoryTab.click()
-  if ((await respiratoryTab.getAttribute('aria-selected')) !== 'true') throw new Error('Respiratory system tab did not become active')
+  await respiratoryTab.scrollIntoViewIfNeeded()
+  const respiratoryTabBox = await respiratoryTab.boundingBox()
+  if (!respiratoryTabBox) throw new Error('Respiratory system tab has no measurable bounding box')
+  const respiratoryTabPoint = {
+    x: respiratoryTabBox.x + respiratoryTabBox.width / 2,
+    y: respiratoryTabBox.y + respiratoryTabBox.height / 2,
+  }
+  const respiratoryHitTarget = await page.evaluate(({ x, y }) => {
+    const hit = document.elementFromPoint(x, y)
+    return hit?.closest('[role="tab"]')?.textContent?.trim() ?? null
+  }, respiratoryTabPoint)
+  if (respiratoryHitTarget !== 'Respiratory') {
+    throw new Error(`Respiratory system tab is obstructed by: ${respiratoryHitTarget ?? 'unknown element'}`)
+  }
+  await page.mouse.click(respiratoryTabPoint.x, respiratoryTabPoint.y)
+  await page.waitForFunction(() => Array.from(document.querySelectorAll('[role="tab"]')).some(
+    (tab) => tab.textContent?.trim() === 'Respiratory' && tab.getAttribute('aria-selected') === 'true',
+  ))
 
   await loading.waitFor({ state: 'visible', timeout: 10_000 }).catch(() => undefined)
   await loading.waitFor({ state: 'hidden', timeout: 120_000 })
