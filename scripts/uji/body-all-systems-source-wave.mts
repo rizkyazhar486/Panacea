@@ -54,7 +54,7 @@ assert.match(component, /OrbitControls/)
 assert.match(component, /body3dPixelRatio/)
 assert.match(component, /BLOCKED · source geometry unavailable/)
 assert.match(component, /no replacement geometry/i)
-assert.match(component, /data\.bodyAllSystems3d/)
+assert.match(component, /dataset\.bodyAllSystems3d\s*=\s*['"]true['"]/)
 assert.match(component, /IntersectionObserver/)
 assert.match(component, /visibilitychange/)
 
