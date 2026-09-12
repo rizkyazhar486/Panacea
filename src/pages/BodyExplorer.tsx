@@ -25,6 +25,7 @@ const WilayahAbdomenPanel = lazy(() => import('./bodyhub/WilayahAbdomenPanel').t
 const KerangkaPanel = lazy(() => import('./bodyhub/KerangkaPanel').then((m) => ({ default: m.KerangkaPanel })))
 const ArteriPanel = lazy(() => import('./bodyhub/ArteriPanel').then((m) => ({ default: m.ArteriPanel })))
 const LimfePanel = lazy(() => import('./bodyhub/LimfePanel').then((m) => ({ default: m.LimfePanel })))
+const VentilasiMembranPanel = lazy(() => import('./bodyhub/VentilasiMembranPanel').then((m) => ({ default: m.VentilasiMembranPanel })))
 const VentilasiSegmenPanel = lazy(() => import('./bodyhub/VentilasiSegmenPanel').then((m) => ({ default: m.VentilasiSegmenPanel })))
 const KelenjarSaluranPanel = lazy(() => import('./bodyhub/KelenjarSaluranPanel').then((m) => ({ default: m.KelenjarSaluranPanel })))
 const LokalisasiLesiPanel = lazy(() => import('./bodyhub/LokalisasiLesiPanel').then((m) => ({ default: m.LokalisasiLesiPanel })))
@@ -100,7 +101,7 @@ function Chip({
 // sama-sama menyorot struktur pada figur yang itu-itu juga. Itulah maksud
 // "satu simulasi tubuh yang utuh" — bukan enam halaman yang saling menyebut,
 // melainkan satu tubuh yang ditanyai dari enam sudut.
-type PanelTab = 'hemodinamik' | 'nefron' | 'asam-basa' | 'farmakodinamik' | 'dialisis' | 'wilayah-abdomen' | 'kerangka' | 'arteri' | 'limfe' | 'kelenjar-saluran' | 'ventilasi' | 'lokalisasi' | 'layers' | 'muscles' | 'workout-sim' | 'biomekanika' | 'organs' | 'physiology' | 'simulator' | 'cardio' | 'spesialisasi' | 'molekul' | 'genomik' | 'sel' | 'bedah' | 'cari' | 'presisi' | 'mesin' | 'drugs' | 'diseases' | 'reference'
+type PanelTab = 'hemodinamik' | 'nefron' | 'asam-basa' | 'farmakodinamik' | 'dialisis' | 'wilayah-abdomen' | 'kerangka' | 'arteri' | 'limfe' | 'kelenjar-saluran' | 'ventilasi' | 'ventilasi-membran' | 'lokalisasi' | 'layers' | 'muscles' | 'workout-sim' | 'biomekanika' | 'organs' | 'physiology' | 'simulator' | 'cardio' | 'spesialisasi' | 'molekul' | 'genomik' | 'sel' | 'bedah' | 'cari' | 'presisi' | 'mesin' | 'drugs' | 'diseases' | 'reference'
 
 const PANEL_TABS: Array<{ key: PanelTab; label: string }> = [
   { key: 'layers', label: 'Layers' },
@@ -115,6 +116,7 @@ const PANEL_TABS: Array<{ key: PanelTab; label: string }> = [
   { key: 'hemodinamik', label: 'Oxygen delivery' },
   { key: 'nefron', label: 'Glomerular filtration' },
   { key: 'asam-basa', label: 'Acid–base' },
+  { key: 'ventilasi-membran', label: 'Ventilation & membrane' },
   { key: 'farmakodinamik', label: 'Dose–response' },
   { key: 'dialisis', label: 'Dialysis kinetics' },
   { key: 'wilayah-abdomen', label: 'Abdominal regions' },
@@ -958,6 +960,11 @@ export function BodyExplorer() {
             {panelTab === 'ventilasi' && (
               <Suspense fallback={<p className="text-sm text-neutral-500">Loading segmental ventilation…</p>}>
                 <VentilasiSegmenPanel />
+              </Suspense>
+            )}
+            {panelTab === 'ventilasi-membran' && (
+              <Suspense fallback={<p className="text-sm text-neutral-500">Loading ventilation and membrane…</p>}>
+                <VentilasiMembranPanel />
               </Suspense>
             )}
             {panelTab === 'lokalisasi' && (
