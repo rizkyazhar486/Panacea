@@ -17,7 +17,7 @@ assert.ok(info, 'biliary/pancreatic module must be shipped')
 assert.ok(parts.length >= 8, 'biliary/pancreatic module must expose ductal and organ context breadth')
 assert.ok(parts.every((part) => Number.isFinite(part.triangles) && part.triangles > 0), 'every biliary/pancreatic source structure must carry positive indexed triangles')
 assert.ok(triangles > 0, 'biliary/pancreatic module must contain indexed source geometry')
-assert.deepEqual(sources, ['bodyparts3d'], 'biliary/pancreatic geometry must retain BodyParts3D source identity')
+assert.deepEqual(sources, ['hra-female'], 'biliary/pancreatic geometry must retain HuBMAP Human Reference Atlas female source identity')
 
 assert.ok(names.some((name) => name.includes('hepatic') && name.includes('duct')), 'hepatic duct source geometry must be present')
 assert.ok(names.some((name) => name.includes('cystic') && name.includes('duct')), 'cystic duct source geometry must be present')
