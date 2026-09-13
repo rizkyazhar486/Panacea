@@ -44,7 +44,14 @@ export function DailyQuoteBanner() {
   if (!visible) return null
 
   return (
-    <div className="pointer-events-none fixed inset-x-0 top-4 z-[60] flex justify-center px-4">
+    // Dipasang DI BAWAH bilah atas, bukan di atasnya: menutupi seluruh baris
+    // navigasi dengan pengingat harian membuat menu, pencarian, profil dan
+    // keluar tidak terlihat sekaligus tidak bisa ditekan sampai spanduknya
+    // ditutup. Tingginya dibaca dari bilah yang sebenarnya, bukan ditebak.
+    <div
+      className="pointer-events-none fixed inset-x-0 z-[60] flex justify-center px-4"
+      style={{ top: 'calc(var(--tinggi-bilah-atas, 0px) + 12px)' }}
+    >
       <div
         className="fly-in-drop pointer-events-auto relative w-full max-w-sm overflow-hidden rounded-2xl shadow-2xl"
         style={{

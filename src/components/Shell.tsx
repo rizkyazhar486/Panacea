@@ -393,6 +393,29 @@ export function Shell({ children }: { children: ReactNode }) {
   }, [])
 
   // Satu pendengar untuk seluruh halaman — lihat catatan di lib/kilau.ts.
+  // Tinggi bilah atas, disiarkan supaya lapisan mengambang tidak menimpanya.
+  //
+  // Spanduk kutipan harian dipasang `fixed top-4 z-[60]`, tepat di atas bilah
+  // ini yang hanya z-10. Di layar 390px ia menutupi SELURUH baris navigasi --
+  // menu, tombol kembali, judul halaman, pencarian, notifikasi, profil dan
+  // keluar -- dan karena spanduknya menerima penunjuk, tombol-tombol di
+  // bawahnya juga tidak bisa ditekan sampai spanduknya ditutup. Angka tetap
+  // tidak dipakai di sini: tinggi bilah berubah menurut lebar layar dan isi
+  // judulnya, dan tebakan yang meleset mengembalikan tumpang-tindih yang sama.
+  const bilahAtas = useRef<HTMLElement | null>(null)
+  useEffect(() => {
+    const el = bilahAtas.current
+    if (!el) return
+    const ukur = () => {
+      document.documentElement.style.setProperty('--tinggi-bilah-atas', `${Math.round(el.getBoundingClientRect().height)}px`)
+    }
+    ukur()
+    if (typeof ResizeObserver === 'undefined') return
+    const pengamat = new ResizeObserver(ukur)
+    pengamat.observe(el)
+    return () => pengamat.disconnect()
+  }, [])
+
   useEffect(() => pasangKilau(), [])
   const [sidebarOpen, setSidebarOpen] = useState(true)
   const [closedGroups, setClosedGroups] = useState<Record<string, boolean>>({})
@@ -598,7 +621,7 @@ export function Shell({ children }: { children: ReactNode }) {
       </aside>
 
       <div className="relative z-10 flex min-w-0 flex-1 flex-col">
-        <header className="kaca sticky top-0 z-10 flex items-center justify-between gap-2 rounded-none border-x-0 border-t-0 px-4 py-3 sm:px-5">
+        <header ref={bilahAtas} className="kaca sticky top-0 z-10 flex items-center justify-between gap-2 rounded-none border-x-0 border-t-0 px-4 py-3 sm:px-5">
           <div className="flex min-w-0 items-center gap-2">
             {/* Mobile: buka drawer */}
             <button
