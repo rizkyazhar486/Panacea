@@ -28,11 +28,29 @@ function band(score: number): { label: string; tone: 'brand' | 'low' | 'critical
 }
 
 export function MeldScore() {
-  const [bilirubin, setBilirubin] = useState(2.0)
-  const [inr, setInr] = useState(1.5)
-  const [creatinine, setCreatinine] = useState(1.2)
-  const [sodium, setSodium] = useState(135)
+  // Keempat angka ini hasil laboratorium, dan tidak satu pun punya nilai awal
+  // yang bisa dibela. Halaman ini dahulu terbuka pada bilirubin 2,0 / INR 1,5
+  // / kreatinin 1,2 / Na 135 -- nilai yang terbaca persis seperti hasil lab
+  // seseorang -- lalu mencetak skor MELD-Na, sebuah pita prioritas transplan,
+  // sebuah angka kematian tiga bulan, kalimat siap salin, DAN satu titik pada
+  // grafik tren yang tersimpan di perangkat.
+  //
+  // Lantai rumusnya memperburuk keadaan: Math.max(x, 1.0) mengubah kolom
+  // kosong menjadi 1,0, sehingga halaman kosong menghasilkan MELD 6 --
+  // "Low priority, ~2% 3-month mortality". Kekosongan tampil sebagai kabar
+  // baik yang spesifik.
+  const [bilirubin, setBilirubin] = useState(0)
+  const [inr, setInr] = useState(0)
+  const [creatinine, setCreatinine] = useState(0)
+  const [sodium, setSodium] = useState(0)
   const [dialysis, setDialysis] = useState(false)
+
+  const belum: string[] = []
+  if (!(bilirubin > 0)) belum.push('total bilirubin')
+  if (!(inr > 0)) belum.push('INR')
+  if (!dialysis && !(creatinine > 0)) belum.push('creatinine')
+  if (!(sodium > 0)) belum.push('sodium')
+  const lengkap = belum.length === 0
 
   const bili = Math.max(bilirubin, 1.0)
   const inrB = Math.max(inr, 1.0)
@@ -45,7 +63,7 @@ export function MeldScore() {
   const meldNaRaw = meld > 11 ? meld + 1.32 * (137 - na) - 0.033 * meld * (137 - na) : meld
   const meldNa = Math.min(Math.max(meldNaRaw, 6), 40)
 
-  const bandInfo = band(meldNa)
+  const bandInfo = lengkap ? band(meldNa) : null
 
   return (
     <div className="mx-auto max-w-2xl space-y-5 pb-24">
@@ -77,22 +95,35 @@ export function MeldScore() {
 
       <Card className="!p-5">
         <div className="text-xs font-black uppercase tracking-wide text-neutral-500">MELD-Na Score</div>
-        <div className="mt-2 flex items-center gap-3">
-          <span className="text-3xl font-black text-brand-dark">{meldNa.toFixed(0)}</span>
-          <Badge tone={bandInfo.tone}>{bandInfo.label}</Badge>
-        </div>
-        <p className="mt-2 text-[12px] text-neutral-500">Estimated {bandInfo.mortality} (population-level estimate, not individual prognosis).</p>
-        <p className="mt-2 text-[12px] text-neutral-500">Unadjusted MELD (pre-sodium): {meld.toFixed(0)}</p>
-        <CopyNote text={`MELD-Na ${meldNa.toFixed(0)} (bilirubin ${bilirubin} mg/dL, INR ${inr}, creatinine ${dialysis ? '4.0 [on dialysis]' : creatinine + ' mg/dL'}, Na ${sodium} mEq/L) — ${bandInfo.label.toLowerCase()}, est. ${bandInfo.mortality} [Kamath 2001; Kim 2008; OPTN 2016]`} />
+        {lengkap && bandInfo !== null ? (
+          <>
+            <div className="mt-2 flex items-center gap-3">
+              <span className="text-3xl font-black text-brand-dark">{meldNa.toFixed(0)}</span>
+              <Badge tone={bandInfo.tone}>{bandInfo.label}</Badge>
+            </div>
+            <p className="mt-2 text-[12px] text-neutral-500">Estimated {bandInfo.mortality} (population-level estimate, not individual prognosis).</p>
+            <p className="mt-2 text-[12px] text-neutral-500">Unadjusted MELD (pre-sodium): {meld.toFixed(0)}</p>
+            <CopyNote text={`MELD-Na ${meldNa.toFixed(0)} (bilirubin ${bilirubin} mg/dL, INR ${inr}, creatinine ${dialysis ? '4.0 [on dialysis]' : creatinine + ' mg/dL'}, Na ${sodium} mEq/L) — ${bandInfo.label.toLowerCase()}, est. ${bandInfo.mortality} [Kamath 2001; Kim 2008; OPTN 2016]`} />
+          </>
+        ) : (
+          <p className="mt-2 text-[12.5px] leading-relaxed text-neutral-600 dark:text-neutral-300">
+            No score yet. Still needed: {belum.join(', ')}.
+            {' '}These are laboratory results; none of them has a default. The formula floors each value at 1.0,
+            so an empty page would otherwise score 6 and read as low priority with a specific mortality figure —
+            and record that figure to your trend.
+          </p>
+        )}
       </Card>
 
-      <ScoreTrend
-        storageKey="pmd_meldna_trend_v1"
-        scoreName="MELD-Na"
-        total={Math.round(meldNa)}
-        maxScore={40}
-        detail={`Bili ${bilirubin}, INR ${inr}, Cr ${dialysis ? '4.0 (dialysis)' : creatinine}, Na ${sodium}`}
-      />
+      {lengkap && (
+        <ScoreTrend
+          storageKey="pmd_meldna_trend_v1"
+          scoreName="MELD-Na"
+          total={Math.round(meldNa)}
+          maxScore={40}
+          detail={`Bili ${bilirubin}, INR ${inr}, Cr ${dialysis ? '4.0 (dialysis)' : creatinine}, Na ${sodium}`}
+        />
+      )}
 
       <div className="rounded-2xl border border-neutral-100 bg-white p-4 text-center text-[11px] leading-relaxed text-neutral-500 dark:border-white/10 dark:bg-white/5">
         Kamath, P.S., et al. (2001). <i>Hepatology</i>, 33(2), 464-470. Kim, W.R., et al. (2008). <i>NEJM</i>,
