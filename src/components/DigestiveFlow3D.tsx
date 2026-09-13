@@ -9,6 +9,7 @@ import {
   resolveAllAnatomySourceNodes,
 } from '../lib/anatomySourceNodeRegistry'
 import { body3dPixelRatio } from '../lib/body3dQuality'
+import { disposeOwnedObject3DResources } from '../lib/threeOwnedResourceDisposal'
 import { advanceDigestiveFlowTime, digestiveFlowVisualState, type DigestiveFlowPhase } from '../lib/digestiveFlowVisual'
 
 interface Target {
@@ -87,6 +88,7 @@ export default function DigestiveFlow3D() {
     if (!container) return
     setLoading(true)
     setError('')
+    setRouteCount(0)
 
     const scene = new THREE.Scene()
     const camera = new THREE.PerspectiveCamera(38, 1, 0.01, 1000)
@@ -264,8 +266,7 @@ export default function DigestiveFlow3D() {
 
     return () => {
       disposed = true; stop(); io.disconnect(); ro.disconnect(); document.removeEventListener('visibilitychange', onVisibility); controls.dispose()
-      particleGeo?.dispose(); particleMat?.dispose()
-      scene.traverse((object) => { const mesh = object as THREE.Mesh; if (!mesh.isMesh) return; const material = mesh.material as THREE.Material | THREE.Material[]; if (Array.isArray(material)) material.forEach((m) => m.dispose()); else material.dispose() })
+      disposeOwnedObject3DResources(scene)
       renderer.dispose(); renderer.forceContextLoss(); renderer.domElement.remove()
     }
   }, [opened])
