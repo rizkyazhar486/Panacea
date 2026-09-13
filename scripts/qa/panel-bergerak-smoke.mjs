@@ -30,6 +30,31 @@ await context.addInitScript(() => {
   localStorage.setItem('panaceamed.session.v1', JSON.stringify({ account, loginAt: Date.now() }))
   localStorage.setItem('panacea_onboarded_v1', '1')
   localStorage.setItem('panacea_assessment_prompt_v1', '1')
+
+  // Penghitung bingkai.
+  //
+  // Sebuah panel yang loop-nya mati dan sebuah peramban yang TIDAK PERNAH
+  // menjadwalkan satu bingkai pun terlihat persis sama dari luar: nilainya
+  // tidak berubah. Perbedaannya menentukan segalanya -- yang pertama cacat
+  // pada kode, yang kedua cacat pada mesin yang kebetulan sedang sibuk.
+  // Tanpa penghitung ini gerbang menuduh panel yang sehat, dan tuduhan palsu
+  // dari sebuah gerbang jauh lebih mahal daripada gerbang yang lambat.
+  // Denyut sendiri, BUKAN pembungkus rAF halaman.
+  //
+  // Versi pertama membungkus window.requestAnimationFrame dan menghitung
+  // pemanggilan halaman. Itu mengukur PERMINTAAN, bukan PASOKAN -- dan
+  // memberikan diagnosis yang justru terbalik: begitu loop sebuah panel
+  // benar-benar mati, ia berhenti meminta bingkai, penghitungnya berhenti
+  // tumbuh, dan gerbang menyalahkan mesinnya padahal kodenyalah yang rusak.
+  // Terbukti dengan menyabotase panel nefron: gerbang melaporkan "tidak ada
+  // bingkai" untuk loop yang memang sengaja dimatikan.
+  //
+  // Denyut ini meminta bingkainya sendiri tanpa henti, jadi penghitungnya
+  // tumbuh selama peramban masih menjadwalkan bingkai -- apa pun yang
+  // dilakukan panelnya.
+  window.__bingkai = 0
+  const denyut = () => { window.__bingkai += 1; window.requestAnimationFrame(denyut) }
+  window.requestAnimationFrame(denyut)
 })
 
 const page = await context.newPage()
@@ -92,6 +117,27 @@ const PANEL = [
   },
 ]
 
+/** Berapa bingkai animasi yang sudah benar-benar dijalankan halaman ini. */
+const bingkai = () => page.evaluate(() => window.__bingkai ?? 0)
+
+/**
+ * Pastikan halaman BENAR-BENAR menerima bingkai sebelum menilai panel apa pun.
+ *
+ * Mengembalikan true bila penghitung bertambah dalam jendela yang diberikan.
+ * Halaman yang tidak terlihat, atau mesin yang kehabisan CPU di belakang
+ * delapan adegan SwiftShader, berhenti menjadwalkan bingkai sama sekali; itu
+ * bukan pernyataan apa pun tentang panelnya.
+ */
+async function bingkaiMengalir(batasMs = 6_000) {
+  const awal = await bingkai()
+  const mulai = Date.now()
+  while (Date.now() - mulai < batasMs) {
+    await page.waitForTimeout(250)
+    if ((await bingkai()) > awal) return true
+  }
+  return false
+}
+
 let gagal = null
 try {
   await page.goto(url, { waitUntil: 'networkidle' })
@@ -133,8 +179,31 @@ try {
     }
 
     if (a === b) {
+      // Sebelum menuduh, buktikan dulu alat ukurnya sampai ke bendanya.
+      // Kalau halaman ini tidak menerima bingkai sama sekali, yang terbukti
+      // adalah mesinnya, bukan panelnya -- dan mengatakan "loop-nya mati"
+      // akan menjadi tuduhan palsu yang menghabiskan waktu orang berikutnya.
+      await page.bringToFront()
+      if (!(await bingkaiMengalir())) {
+        throw new Error(
+          `${p.tab}: peramban tidak menjalankan SATU bingkai animasi pun selama pemeriksaan ` +
+          `(penghitung tetap ${await bingkai()}). Ini pernyataan tentang mesin yang menjalankan ` +
+          'gerbang ini, BUKAN tentang panelnya: tidak ada loop mana pun yang bisa maju tanpa bingkai. ' +
+          'Jalankan ulang pada mesin yang tidak kehabisan CPU sebelum menyalahkan kodenya.',
+        )
+      }
+      // Bingkai mengalir sekarang; beri panel satu kesempatan jujur lagi.
+      const mulaiUlang = Date.now()
+      while (b === a && Date.now() - mulaiUlang < batasMs) {
+        await page.waitForTimeout(250)
+        b = await p.ukur()
+      }
+    }
+
+    if (a === b) {
       throw new Error(
-        `${p.tab}: tidak bergerak sama sekali dalam ${batasMs / 1000} detik (${p.catatan}). ` +
+        `${p.tab}: tidak bergerak sama sekali dalam ${(batasMs * 2) / 1000} detik (${p.catatan}), ` +
+        `padahal peramban menjalankan ${await bingkai()} bingkai animasi. ` +
         `Nilai tetap "${String(a).slice(0, 40)}". Panel yang menjanjikan simulasi berjalan ` +
         'sementara loop-nya mati terlihat persis seperti panel yang bekerja.',
       )
@@ -146,8 +215,9 @@ try {
   if (pageErrors.length) throw new Error(`Galat halaman: ${pageErrors.join(' | ')}`)
 
   console.log(
-    `Panel bergerak lulus: ${PANEL.length} panel yang mengaku berjalan benar-benar berubah dalam 2,2 detik, ` +
-    'termasuk satu yang hanya bergerak setelah diganggu, lebar halaman 390px, nol galat halaman.',
+    `Panel bergerak lulus: ${PANEL.length} panel yang mengaku berjalan benar-benar berubah, ` +
+    `termasuk satu yang hanya bergerak setelah diganggu; ${await bingkai()} bingkai animasi ` +
+    'benar-benar dijalankan, lebar halaman 390px, nol galat halaman.',
   )
 } catch (e) {
   gagal = e
