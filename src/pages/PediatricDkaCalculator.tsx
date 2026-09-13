@@ -30,11 +30,33 @@ function holliday(weightKg: number): number {
 }
 
 export function PediatricDkaCalculator() {
-  const [weightKg, setWeightKg] = useState(18)
+  // Halaman ini mengeluarkan DOSIS, bukan sekadar skor.
+  //
+  // Ia dahulu terbuka pada berat 18 kg -- seorang anak berusia sekitar empat
+  // tahun yang tidak ada -- dengan dehidrasi 10% dan kalium 3,5 mEq/L, lalu
+  // langsung mencetak laju infus dalam mL/jam, laju insulin dalam unit/jam
+  // IV, satu pita kalium yang dapat berbunyi "hold insulin", dan sebuah
+  // ringkasan siap salin yang berbentuk lembar kerja DKA yang sudah selesai
+  // diisi. Setiap angka di bawahnya adalah dosis untuk anak khayalan itu.
+  //
+  // Berat, dehidrasi dan kalium karena itu dimulai kosong.
+  //
+  // DUA HAL TIDAK DIUBAH, dan bedanya disengaja. "Tidak syok" adalah
+  // penilaian klinis yang memang dijawab, seperti kotak centang yang tidak
+  // dicentang. Dan 0,05 U/kg/jam bukan pengukuran tentang pasien melainkan
+  // PILIHAN PROTOKOL antara 0,05 dan 0,1 -- sebuah setelan, dengan nilai
+  // awal yang sah.
+  const [weightKg, setWeightKg] = useState(0)
   const [shock, setShock] = useState(false)
-  const [dehydrationPct, setDehydrationPct] = useState(10)
-  const [potassiumMeq, setPotassiumK] = useState(3.5)
+  const [dehydrationPct, setDehydrationPct] = useState(0)
+  const [potassiumMeq, setPotassiumK] = useState(0)
   const [insulinRateUKgHr, setInsulinRate] = useState(0.05)
+
+  const belum: string[] = []
+  if (!(weightKg > 0)) belum.push('weight')
+  if (!(dehydrationPct > 0)) belum.push('dehydration estimate')
+  const bisaCairan = belum.length === 0
+  const adaKalium = potassiumMeq > 0
 
   const bolusMlPerKg = shock ? 20 : 10
   const bolusMl = bolusMlPerKg * weightKg
@@ -49,12 +71,13 @@ export function PediatricDkaCalculator() {
   const insulinRateUHr = insulinRateUKgHr * weightKg
 
   const kBand = useMemo(() => {
+    if (!(potassiumMeq > 0)) return null
     if (potassiumMeq < 3.5) return { label: 'Hypokalemic — hold insulin until K rechecked / replete first', tone: 'critical' as const }
     if (potassiumMeq > 5.5) return { label: 'Hyperkalemic — hold added KCl/KPO4 until urine output confirmed & K falls', tone: 'critical' as const }
     return { label: 'Normokalemic — standard 20 mEq/L KCl + 20 mEq/L KPO4 split', tone: 'brand' as const }
   }, [potassiumMeq])
 
-  const summary = `Pediatric DKA fluids: BB ${weightKg}kg, ${shock ? 'shock' : 'no shock'} → bolus ${bolusMlPerKg}mL/kg = ${bolusMl.toFixed(0)}mL; deficit ${dehydrationPct}% x ${weightKg}kg x 1000 = ${deficitMl.toFixed(0)}mL; maintenance (Holliday-Segar) x2 = ${maintenance48hMl.toFixed(0)}mL; total 48h = ${total48hMl.toFixed(0)}mL − bolus = ${netAfterBolusMl.toFixed(0)}mL → rate ${ratePerHr.toFixed(1)} mL/hr. K: ${kBand.label}. Insulin: ${insulinRateUKgHr} U/kg/hr = ${insulinRateUHr.toFixed(2)} U/hr IV.`
+  const summary = `Pediatric DKA fluids: BB ${weightKg}kg, ${shock ? 'shock' : 'no shock'} → bolus ${bolusMlPerKg}mL/kg = ${bolusMl.toFixed(0)}mL; deficit ${dehydrationPct}% x ${weightKg}kg x 1000 = ${deficitMl.toFixed(0)}mL; maintenance (Holliday-Segar) x2 = ${maintenance48hMl.toFixed(0)}mL; total 48h = ${total48hMl.toFixed(0)}mL − bolus = ${netAfterBolusMl.toFixed(0)}mL → rate ${ratePerHr.toFixed(1)} mL/hr. K: ${kBand ? kBand.label : 'not measured'}. Insulin: ${insulinRateUKgHr} U/kg/hr = ${insulinRateUHr.toFixed(2)} U/hr IV.`
 
   return (
     <div className="mx-auto max-w-2xl space-y-5 pb-24">
@@ -78,35 +101,51 @@ export function PediatricDkaCalculator() {
 
       <Card className="!p-5">
         <div className="text-xs font-black uppercase tracking-wide text-neutral-500">1. Resuscitation</div>
-        <p className="mt-1 text-[13px] text-neutral-600 dark:text-neutral-300">
-          NaCl 0.9% or RL — {shock ? 'shock' : 'no shock / partially corrected'} → <b>{bolusMlPerKg} mL/kg</b> {shock ? 'bolus' : 'over 1-2h'}
-        </p>
-        <div className="mt-1 text-2xl font-black text-brand-dark">{bolusMl.toFixed(0)} mL</div>
+        {bisaCairan ? (
+          <>
+            <p className="mt-1 text-[13px] text-neutral-600 dark:text-neutral-300">
+              NaCl 0.9% or RL — {shock ? 'shock' : 'no shock / partially corrected'} → <b>{bolusMlPerKg} mL/kg</b> {shock ? 'bolus' : 'over 1-2h'}
+            </p>
+            <div className="mt-1 text-2xl font-black text-brand-dark">{bolusMl.toFixed(0)} mL</div>
 
-        <div className="mt-4 text-xs font-black uppercase tracking-wide text-neutral-500">2. Fluid & Electrolytes (48h)</div>
-        <div className="mt-2 space-y-1 text-[13px] text-neutral-600 dark:text-neutral-300">
-          <div className="flex justify-between"><span>Deficit: {dehydrationPct}% x {weightKg}kg x 1000mL</span><b>{deficitMl.toFixed(0)} mL</b></div>
-          <div className="flex justify-between"><span>Maintenance (Holliday-Segar) x 2</span><b>{maintenance48hMl.toFixed(0)} mL</b></div>
-          <div className="flex justify-between border-t border-neutral-100 pt-1 dark:border-white/10"><span>Total: (deficit + maintenance) − bolus</span><b>{netAfterBolusMl.toFixed(0)} mL</b></div>
-        </div>
-        <div className="mt-3 rounded-xl bg-brand/10 px-3 py-2 text-center">
-          <div className="text-[11px] font-bold text-neutral-500">Infusion rate over 48h</div>
-          <div className="text-3xl font-black text-brand-dark">{ratePerHr.toFixed(1)} mL/hr</div>
-        </div>
+            <div className="mt-4 text-xs font-black uppercase tracking-wide text-neutral-500">2. Fluid &amp; Electrolytes (48h)</div>
+            <div className="mt-2 space-y-1 text-[13px] text-neutral-600 dark:text-neutral-300">
+              <div className="flex justify-between"><span>Deficit: {dehydrationPct}% x {weightKg}kg x 1000mL</span><b>{deficitMl.toFixed(0)} mL</b></div>
+              <div className="flex justify-between"><span>Maintenance (Holliday-Segar) x 2</span><b>{maintenance48hMl.toFixed(0)} mL</b></div>
+              <div className="flex justify-between border-t border-neutral-100 pt-1 dark:border-white/10"><span>Total: (deficit + maintenance) − bolus</span><b>{netAfterBolusMl.toFixed(0)} mL</b></div>
+            </div>
+            <div className="mt-3 rounded-xl bg-brand/10 px-3 py-2 text-center">
+              <div className="text-[11px] font-bold text-neutral-500">Infusion rate over 48h</div>
+              <div className="text-3xl font-black text-brand-dark">{ratePerHr.toFixed(1)} mL/hr</div>
+            </div>
+          </>
+        ) : (
+          <p className="mt-1 text-[12.5px] leading-relaxed text-neutral-600 dark:text-neutral-300">
+            No volumes or rates yet. Still needed: {belum.join(' and ')}.
+            {' '}Every figure on this page is a dose. A starting weight of 18 kg is a four-year-old who is not here,
+            and leaving it in place would print millilitres per hour and units per hour for that child instead of yours.
+          </p>
+        )}
 
         <div className="mt-4 text-xs font-black uppercase tracking-wide text-neutral-500">3. Potassium</div>
         <Field label="Measured serum K (mEq/L)">
           <input className={inputClass} type="number" step={0.1} min={0} value={potassiumMeq || ''} onChange={(e) => setPotassiumK(Number(e.target.value) || 0)} />
         </Field>
-        <div className="mt-2"><Badge tone={kBand.tone}>{kBand.label}</Badge></div>
+        <div className="mt-2">
+          {kBand !== null
+            ? <Badge tone={kBand.tone}>{kBand.label}</Badge>
+            : <span className="text-[12.5px] text-neutral-600 dark:text-neutral-300">No potassium bracket until a measured serum K is entered — the bracket decides whether insulin is held.</span>}
+        </div>
 
         <div className="mt-4 text-xs font-black uppercase tracking-wide text-neutral-500">4. Insulin (IV infusion, no bolus)</div>
         <Field label="Insulin rate (U/kg/hr)">
           <input className={inputClass} type="number" step={0.01} min={0.01} max={0.1} value={insulinRateUKgHr || ''} onChange={(e) => setInsulinRate(Number(e.target.value) || 0)} />
         </Field>
-        <div className="mt-1 text-2xl font-black text-brand-dark">{insulinRateUHr.toFixed(2)} U/hr IV</div>
+        {bisaCairan
+          ? <div className="mt-1 text-2xl font-black text-brand-dark">{insulinRateUHr.toFixed(2)} U/hr IV</div>
+          : <div className="mt-1 text-[12.5px] text-neutral-600 dark:text-neutral-300">U/hr cannot be shown without a weight; the rate above is per kilogram.</div>}
 
-        <div className="mt-4"><CopyNote text={summary} /></div>
+        {bisaCairan && adaKalium && <div className="mt-4"><CopyNote text={summary} /></div>}
       </Card>
 
       <div className="rounded-2xl border border-neutral-100 bg-white p-4 text-center text-[11px] leading-relaxed text-neutral-500 dark:border-white/10 dark:bg-white/5">
