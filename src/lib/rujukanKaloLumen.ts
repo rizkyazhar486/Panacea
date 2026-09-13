@@ -66,8 +66,21 @@ export const KALOLUMEN = {
  * baik akan mudah terbaca sebagai halaman yang MENJALANKANNYA. Keduanya sangat
  * berbeda, dan yang kedua tidak benar.
  */
+// KALIMAT PERTAMA DI BAWAH PERNAH SALAH, dan salahnya ke arah yang jarang
+// diperiksa orang: ia MENGECILKAN apa yang ada.
+//
+// Ia berbunyi "Panacea does not read DICOM files" -- ditulis ketika memang
+// begitu keadaannya. Sesudah jembatan ke /radiology dipasang, halaman yang
+// sama memuat dua kalimat yang saling membantah: satu blok mengatakan
+// "Panacea can also read an actual DICOM study" dan menautkan pembacanya ke
+// sana, sebuah blok merah beberapa baris di bawahnya mengatakan Panacea
+// tidak bisa. src/lib/dicom.ts memang memuat pengurai sungguhan, dan
+// Radiology.tsx memanggil bacaDicom() atas berkas yang dipilih pemakai.
+//
+// Pernyataan batas yang terlalu berhati-hati tetap pernyataan yang keliru,
+// dan yang ini sekaligus menyembunyikan fitur yang benar-benar ada.
 export const YANG_BELUM_DIMILIKI_PANACEA: readonly string[] = [
-  'Panacea does not read DICOM files. No CT or MRI study is loaded, decoded or reconstructed anywhere on this page.',
+  'This panel loads no study. The window below is a reference scale computed here — no CT or MRI file is read, decoded or reconstructed on this page. Panacea does read uncompressed DICOM, in the viewer linked above; that is a different screen, and it renders single images and planes, not a reconstructed 3D model.',
   'Panacea does not bundle, call, embed or license KaloLumen, and none of its images or models are reproduced here.',
   'The Hounsfield window below is Panacea computing the published physics itself, on a reference scale — not a scan, and not anyone’s body.',
   'No number here was measured from a patient, and nothing here is a diagnosis or a clinical finding.',
