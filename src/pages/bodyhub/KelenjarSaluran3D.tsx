@@ -210,20 +210,43 @@ export function KelenjarSaluran3D({ terpilih, onPilih, tinggi = 320 }: KelenjarS
     renderer.domElement.addEventListener('pointercancel', batalTunjuk)
 
     let raf = 0
+    let dalamViewport = true
+    let dokumenTerlihat = !document.hidden
     const gambar = () => {
-      raf = requestAnimationFrame(gambar)
+      raf = 0
+      if (!dalamViewport || !dokumenTerlihat) return
       controls.update()
       renderer.render(scene, camera)
+      raf = requestAnimationFrame(gambar)
     }
-    raf = requestAnimationFrame(gambar)
+    const mulaiGambar = () => {
+      if (!raf && dalamViewport && dokumenTerlihat) raf = requestAnimationFrame(gambar)
+    }
+    const berhentiGambar = () => {
+      if (raf) cancelAnimationFrame(raf)
+      raf = 0
+    }
+    const io = new IntersectionObserver(([entry]) => {
+      dalamViewport = Boolean(entry?.isIntersecting)
+      dalamViewport ? mulaiGambar() : berhentiGambar()
+    }, { rootMargin: '128px' })
+    io.observe(wadah)
+    const saatVisibilitasBerubah = () => {
+      dokumenTerlihat = !document.hidden
+      dokumenTerlihat ? mulaiGambar() : berhentiGambar()
+    }
+    document.addEventListener('visibilitychange', saatVisibilitasBerubah)
+    mulaiGambar()
 
     return () => {
       dibatalkan = true
-      cancelAnimationFrame(raf)
+      berhentiGambar()
       terapkanRef.current = null
       renderer.domElement.removeEventListener('pointerdown', mulaiTunjuk)
       renderer.domElement.removeEventListener('pointerup', selesaiTunjuk)
       renderer.domElement.removeEventListener('pointercancel', batalTunjuk)
+      document.removeEventListener('visibilitychange', saatVisibilitasBerubah)
+      io.disconnect()
       ro.disconnect()
       controls.dispose()
       for (const daftar of bahanPerStruktur.values()) for (const bahan of daftar) bahan.dispose()
