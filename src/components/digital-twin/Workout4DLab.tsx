@@ -3,8 +3,8 @@ import { InsideWorkout4D } from './InsideWorkout4D'
 import { WorkoutDNA } from './WorkoutDNA'
 import { HumanReplay } from './HumanReplay'
 import { getWorkouts } from '../../lib/workoutStore'
-import { getDemo } from '../../lib/profile'
-import { hrMaxFromAge } from '../../lib/workoutImport'
+import { getDemo, getDemoTersimpan } from '../../lib/profile'
+import { hrMaxPerkiraan } from '../../lib/workoutImport'
 import { useVitals } from '../../lib/useVitals'
 import { IconActivity, IconRun } from '../icons'
 
@@ -14,7 +14,7 @@ export function Workout4DLab() {
   const workouts = useMemo(() => getWorkouts(), [vitals])
   const hrMax = useMemo(() => {
     const observed = workouts.reduce((max, workout) => Math.max(max, workout.maxHr ?? 0, ...workout.hr.map((point) => point.bpm)), 0)
-    return Math.max(observed, hrMaxFromAge(demo.age || 30, demo.sex))
+    return Math.max(observed, hrMaxPerkiraan(getDemoTersimpan()))
   }, [workouts, demo])
 
   if (!workouts.length) {

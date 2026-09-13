@@ -3,8 +3,8 @@ import { Link } from 'react-router-dom'
 import { getWorkouts } from '../lib/workoutStore'
 import { hitungSesi } from '../lib/trainingPhysiology'
 import { sesiDariWorkout } from '../lib/analisisPro'
-import { hrMaxFromAge } from '../lib/workoutImport'
-import { getDemo } from '../lib/profile'
+import { hrMaxPerkiraan } from '../lib/workoutImport'
+import { getDemo, getDemoTersimpan } from '../lib/profile'
 import { getVitals } from '../lib/healthVitals'
 import { deretMetrik, ambilRiwayat } from '../lib/riwayatVitals'
 import { useStore } from '../lib/store'
@@ -50,7 +50,7 @@ function konteksLatihan() {
   return {
     sesi,
     k: {
-      hrMax: sesi.reduce((a, w) => Math.max(a, w.maxHr ?? 0), 0) || hrMaxFromAge(usia, jk),
+      hrMax: sesi.reduce((a, w) => Math.max(a, w.maxHr ?? 0), 0) || hrMaxPerkiraan(getDemoTersimpan()),
       hrRest: typeof v.restingHr === 'number' && v.restingHr > 0 ? v.restingHr : 60,
       sex: jk,
     },
