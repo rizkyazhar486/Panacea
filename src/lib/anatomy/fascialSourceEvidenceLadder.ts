@@ -141,7 +141,7 @@ export const SUPERFICIAL_FASCIA_EVIDENCE_LADDER: readonly {
 
 export function currentSuperficialFasciaEvidenceTier(): FascialEvidenceTier {
   const satisfied = SUPERFICIAL_FASCIA_EVIDENCE_LADDER.filter((entry) => entry.satisfied)
-  return satisfied.at(-1)?.tier ?? 'layer-manifest'
+  return satisfied[satisfied.length - 1]?.tier ?? 'layer-manifest'
 }
 
 export function superficialFasciaCandidateAdmissionReady(
