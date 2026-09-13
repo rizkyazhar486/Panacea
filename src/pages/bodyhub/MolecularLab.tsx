@@ -1,10 +1,12 @@
-import { useMemo, useState } from 'react'
+import { lazy, Suspense, useMemo, useState } from 'react'
 import Molecule3D from '../../components/Molecule3D'
 import { DRUG_TARGETS, moleculeOf, type DrugTarget } from '../../lib/drugTargets'
 import { semuaObat, dosisSkdi } from '../../lib/obatKatalog'
 import { ORGAN_FOCUS } from '../../lib/organFocus'
 import { CARDIO_CONDITIONS } from '../../lib/cardioPathology'
 import { SYSTEM_CONDITIONS } from '../../lib/specialtyPathology'
+
+const ProteinFoldingDiseaseAtlas3D = lazy(() => import('./ProteinFoldingDiseaseAtlas3D'))
 
 // ─────────────────────────────────────────────────────────────────────────────
 // RUANG MOLEKUL — ujung terkecil dari rantai yang sama.
@@ -65,6 +67,7 @@ export function MolecularLab({ onBukaOrgan, awal = null }: Props) {
   const [kelas, setKelas] = useState<DrugTarget['targetKelas'] | 'all'>('all')
   const [pilih, setPilih] = useState<string>(awal ?? 'aspirin')
   const [tanpaH, setTanpaH] = useState(true)
+  const [proteinAtlasOpen, setProteinAtlasOpen] = useState(false)
 
   const daftar = useMemo(
     () => DRUG_TARGETS.filter((d) => kelas === 'all' || d.targetKelas === kelas),
@@ -84,6 +87,35 @@ export function MolecularLab({ onBukaOrgan, awal = null }: Props) {
           happens, and the disease in the pathology atlas it is used against.
         </p>
       </div>
+
+      <section className="rounded-2xl border border-violet-400/25 bg-violet-500/[0.04] p-3" aria-labelledby="protein-folding-entry-title">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <div className="min-w-0">
+            <div className="t-mikro font-bold uppercase tracking-wide text-violet-500">Protein structure research</div>
+            <h3 id="protein-folding-entry-title" className="text-sm font-black text-ink dark:text-white">Protein folding & disease mechanisms</h3>
+            <p className="mt-1 max-w-3xl text-[11px] leading-relaxed text-neutral-500">
+              Open the interactive folding landscape for cancer, Alzheimer disease, Parkinson disease and schizophrenia research targets. The current geometry is explicitly schematic; atomistic mode remains blocked until verified coordinates are loaded.
+            </p>
+          </div>
+          <button
+            type="button"
+            data-protein-folding-launch="true"
+            aria-expanded={proteinAtlasOpen}
+            aria-controls="protein-folding-atlas-region"
+            onClick={() => setProteinAtlasOpen((open) => !open)}
+            className="min-h-11 shrink-0 rounded-xl border border-violet-400/40 bg-violet-500/10 px-4 text-xs font-bold text-violet-700 dark:text-violet-200"
+          >
+            {proteinAtlasOpen ? 'Close protein folding 3D' : 'Open protein folding 3D'}
+          </button>
+        </div>
+        {proteinAtlasOpen && (
+          <div id="protein-folding-atlas-region" role="region" aria-label="Protein folding 3D research atlas" className="mt-3 min-w-0 overflow-hidden rounded-2xl">
+            <Suspense fallback={<div role="status" className="min-h-[240px] rounded-2xl bg-slate-950 p-4 text-sm text-slate-300">Loading protein folding 3D…</div>}>
+              <ProteinFoldingDiseaseAtlas3D />
+            </Suspense>
+          </div>
+        )}
+      </section>
 
       <div className="-mx-1 flex gap-1.5 overflow-x-auto px-1 pb-1">
         {KELAS.map((k) => (
