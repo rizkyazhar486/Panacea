@@ -60,7 +60,14 @@ jobs:
           cat /tmp/panacea-organ-preview.log
           exit 1
 
-      # Kedelapan gerbang dijalankan terhadap SATU build dan SATU preview.
+      # Kesepuluh gerbang dijalankan terhadap SATU build dan SATU preview.
+      #
+      # qa:bergerak dan qa:kendali ditambahkan belakangan, dan ketiadaan
+      # keduanya adalah PERSIS lubang yang diperingatkan komentar di bawah:
+      # qa:bergerak sudah ada di repositori, lengkap dengan gerbangnya, tetapi
+      # tidak terdaftar di alur kerja mana pun -- jadi ia tidak pernah menjaga
+      # main sejak hari ia digabungkan. qa:kendali menutup selisih antara
+      # "pernah diperiksa dengan tangan sekali" dan "dijaga".
       #
       # Sebelumnya hanya qa:organ-3d yang berjalan di CI, sementara tujuh gerbang
       # lain hanya ada di mesin pengembang -- artinya mereka tidak menjaga main
@@ -81,11 +88,14 @@ jobs:
           KERANGKA3D_QA_URL: http://127.0.0.1:4173/#/body-explorer
           LESI3D_QA_URL: http://127.0.0.1:4173/#/body-explorer
           KELENJAR3D_QA_URL: http://127.0.0.1:4173/#/body-explorer
+          BERGERAK_QA_URL: http://127.0.0.1:4173/#/body-explorer
+          KENDALI_QA_URL: http://127.0.0.1:4173/#/body-explorer
         run: |
           set -e
           gagal=""
           for gerbang in qa:organ-3d qa:wilayah-3d qa:ventilasi-3d qa:arteri-3d \
-                         qa:limfe-3d qa:kerangka-3d qa:lesi-3d qa:kelenjar-3d; do
+                         qa:limfe-3d qa:kerangka-3d qa:lesi-3d qa:kelenjar-3d \
+                         qa:bergerak qa:kendali; do
             echo "::group::$gerbang"
             if npm run "$gerbang"; then
               echo "::endgroup::"
