@@ -62,6 +62,14 @@ jobs:
 
       # Kesepuluh gerbang dijalankan terhadap SATU build dan SATU preview.
       #
+      # qa:bergerak, qa:kendali dan qa:share-card ditambahkan belakangan, dan
+      # ketiadaan mereka adalah PERSIS lubang yang diperingatkan komentar di
+      # bawah. Dua di antaranya sudah ada lengkap di repositori dan tidak
+      # terdaftar di alur kerja mana pun, jadi tidak pernah menjaga main sehari
+      # pun. scripts/uji/gerbang-qa-terdaftar.mts sekarang menolak pengulangan:
+      # setiap skrip qa:* harus benar-benar dijalankan oleh sebuah alur kerja.
+      #
+      # (komentar lama, masih berlaku)
       # qa:bergerak dan qa:kendali ditambahkan belakangan, dan ketiadaan
       # keduanya adalah PERSIS lubang yang diperingatkan komentar di bawah:
       # qa:bergerak sudah ada di repositori, lengkap dengan gerbangnya, tetapi
@@ -91,12 +99,13 @@ jobs:
           BERGERAK_QA_URL: http://127.0.0.1:4173/#/body-explorer
           KENDALI_QA_URL: http://127.0.0.1:4173/#/body-explorer
           BILAH_QA_URL: http://127.0.0.1:4173/#/latihan?t=pelatih
+          SHARE_QA_URL: http://127.0.0.1:4173/#/latihan?t=pelatih
         run: |
           set -e
           gagal=""
           for gerbang in qa:organ-3d qa:wilayah-3d qa:ventilasi-3d qa:arteri-3d \
                          qa:limfe-3d qa:kerangka-3d qa:lesi-3d qa:kelenjar-3d \
-                         qa:bergerak qa:kendali qa:bilah-atas; do
+                         qa:bergerak qa:kendali qa:bilah-atas qa:share-card; do
             echo "::group::$gerbang"
             if npm run "$gerbang"; then
               echo "::endgroup::"
