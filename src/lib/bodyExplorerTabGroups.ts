@@ -75,6 +75,7 @@ export const KELOMPOK_TAB: Readonly<Record<string, string>> = {
   // Rujukan dan alat yang lebih dalam.
   'molekul': 'Reference',
   'genomik': 'Reference',
+  'genom-alfa': 'Reference',
   'presisi': 'Reference',
   'mesin': 'Reference',
   'reference': 'Reference',

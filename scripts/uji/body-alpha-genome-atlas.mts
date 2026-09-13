@@ -38,3 +38,16 @@ if (!ui.includes('min-h-11')) throw new Error('Mobile touch target floor missing
 if (!ui.includes('aria-pressed')) throw new Error('Genome record selection accessibility missing');
 
 console.log('body alpha genome atlas guards: ok');
+
+// Modul wajib yang tidak terpasang di mana pun tetap nol bagi pengguna: seluruh
+// berkasnya lengkap, tesnya hijau, dan tidak ada satu pun layar yang membukanya.
+// Persis itu yang terjadi pada atlas ini sejak menit pertama ia digabungkan.
+const explorer = fs.readFileSync('src/pages/BodyExplorer.tsx', 'utf8');
+if (!explorer.includes("import('./bodyhub/AlphaGenomeAtlas')")) throw new Error('Alpha Genome Atlas is not loaded by Body Explorer');
+if (!explorer.includes("{ key: 'genom-alfa', label: 'Genome atlas' }")) throw new Error('Alpha Genome Atlas has no tab a user can select');
+if (!explorer.includes("panelTab === 'genom-alfa'")) throw new Error('Alpha Genome Atlas tab renders nothing');
+
+const kelompok = fs.readFileSync('src/lib/bodyExplorerTabGroups.ts', 'utf8');
+if (!kelompok.includes("'genom-alfa':")) throw new Error('Alpha Genome Atlas tab is unclassified, so it drifts to the trailing group');
+
+console.log('body alpha genome atlas: mandatory module is reachable from Body Explorer');
