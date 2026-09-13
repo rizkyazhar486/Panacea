@@ -5,24 +5,6 @@ import { muatAtlas, namaAtlas } from '../../lib/anatomy/pemuatAtlas'
 import { body3dPixelRatio } from '../../lib/body3dQuality'
 import { BERKAS_LIMFOID, MESH_BUKAN_ANATOMI, stasiunDariMeshAsli } from '../../lib/anatomy/stasiunLimfe'
 
-// Sistem limfoid sebagai benda yang bisa ditunjuk.
-//
-// EMPAT hal di sini bukan gaya, melainkan syarat supaya gambarnya tidak kosong
-// atau tidak menyala di tempat yang keliru. Masing-masing pernah gagal, dan
-// tidak satu pun melempar galat:
-//
-//   1. setMeshoptDecoder. lymphoid.glb memakai EXT_meshopt_compression;
-//      tanpa dekodernya GLTFLoader MENOLAK berkasnya dan kanvas tinggal kosong.
-//   2. Nama ASLI dipulihkan lewat gltf.parser.associations. Nama scene sudah
-//      kehilangan titik pemisah, sehingga "Occipital nodes.l" dan "...r" tiba
-//      dengan nama yang sama dan akhiran angka yang urutannya tidak dijamin.
-//   3. Bahan DIKLON per objek. Berkas ini memakai ulang satu mesh dan satu
-//      bahan untuk kiri dan kanan sekaligus untuk stasiun yang sama sekali
-//      berbeda; mewarnai bahan bersama akan menyalakan setengah tubuh.
-//   4. Satu nodus limfe seukuran kacang pada tubuh setinggi 1,4 unit tidak
-//      terlihat dari jarak seluruh badan. Kamera karena itu mendekat ke kotak
-//      batas stasiun yang dipilih, dan mundur lagi saat pilihan dilepas.
-
 export interface Limfe3DProps {
   terpilih: string | null
   onPilih: (id: string | null) => void
@@ -59,9 +41,11 @@ export function Limfe3D({ terpilih, onPilih, tinggi = 340 }: Limfe3DProps) {
       setMuat(false)
       return
     }
+
     renderer.setClearColor(0x000000, 0)
     renderer.outputColorSpace = THREE.SRGBColorSpace
     renderer.domElement.dataset.limfe3d = 'true'
+    renderer.domElement.setAttribute('aria-hidden', 'true')
     wadah.appendChild(renderer.domElement)
 
     scene.add(new THREE.AmbientLight(0xffffff, 0.9))
@@ -83,7 +67,7 @@ export function Limfe3D({ terpilih, onPilih, tinggi = 340 }: Limfe3DProps) {
       const kecil = window.matchMedia('(max-width: 640px)').matches
       const dpr = body3dPixelRatio(w, h, window.devicePixelRatio || 1, kecil)
       if (Math.abs(renderer.getPixelRatio() - dpr) > 0.01) renderer.setPixelRatio(dpr)
-      renderer.setSize(w, h)
+      renderer.setSize(w, h, false)
       camera.aspect = w / h
       camera.updateProjectionMatrix()
     }
@@ -96,13 +80,14 @@ export function Limfe3D({ terpilih, onPilih, tinggi = 340 }: Limfe3DProps) {
     const stasiunMesh = new Map<THREE.Mesh, string>()
     const dapatDipilih: THREE.Mesh[] = []
     const bahanLain: THREE.MeshStandardMaterial[] = []
+    const bahanMilikViewport = new Set<THREE.Material>()
     let grup: THREE.Group | null = null
     let kotakSeluruh = new THREE.Box3()
+    let dibuang = false
 
-    // muatAtlas memasang dekoder meshopt dan memulihkan nama ASLI -- satu-satunya
-    // identitas yang boleh dipakai mencocokkan -- lewat parser.associations.
     muatAtlas(BERKAS_LIMFOID)
       .then(({ scene: adegan, namaAsli }) => {
+        if (dibuang) return
         grup = adegan
         grup.updateMatrixWorld(true)
 
@@ -112,13 +97,13 @@ export function Limfe3D({ terpilih, onPilih, tinggi = 340 }: Limfe3DProps) {
           const m = o as THREE.Mesh
           const asli = namaAtlas(namaAsli, m)
           if (abai.has(asli)) {
-            // "HOW TO ..." adalah teks petunjuk berkas sumber, bukan anatomi.
             m.visible = false
             return
           }
           const bahanAsli = m.material
           if (Array.isArray(bahanAsli)) return
           const bahan = (bahanAsli as THREE.MeshStandardMaterial).clone()
+          bahanMilikViewport.add(bahan)
           bahan.transparent = true
           bahan.color = DIAM.clone()
           bahan.emissive = new THREE.Color(0, 0, 0)
@@ -128,8 +113,6 @@ export function Limfe3D({ terpilih, onPilih, tinggi = 340 }: Limfe3DProps) {
           const id = stasiunDariMeshAsli(asli)
           kotakSeluruh.expandByObject(m)
           if (!id) {
-            // Geometri tak bernama di berkas ini tetap digambar sebagai konteks,
-            // tetapi tidak pernah diklaim sebagai stasiun bernama.
             bahanLain.push(bahan)
             return
           }
@@ -147,8 +130,6 @@ export function Limfe3D({ terpilih, onPilih, tinggi = 340 }: Limfe3DProps) {
           const pusat = kotakSeluruh.getCenter(new THREE.Vector3())
           grup.position.sub(pusat)
           grup.updateMatrixWorld(true)
-          // Kotak batas dihitung ulang setelah adegan digeser, supaya
-          // pembingkaian stasiun memakai koordinat yang sama dengan kamera.
           kotakSeluruh = new THREE.Box3().setFromObject(grup)
           for (const [id, kotak] of kotakPerStasiun) {
             kotak.translate(new THREE.Vector3(-pusat.x, -pusat.y, -pusat.z))
@@ -162,11 +143,11 @@ export function Limfe3D({ terpilih, onPilih, tinggi = 340 }: Limfe3DProps) {
         terapkanRef.current?.(terpilih)
       })
       .catch(() => {
+        if (dibuang) return
         setGagal('Could not load the lymphoid model.')
         setMuat(false)
       })
 
-    // Pembingkaian kamera: tujuan diperbarui, animasi di bawah yang menuju ke sana.
     const tujuanPosisi = new THREE.Vector3()
     const tujuanTarget = new THREE.Vector3()
     let punyaTujuan = false
@@ -211,13 +192,14 @@ export function Limfe3D({ terpilih, onPilih, tinggi = 340 }: Limfe3DProps) {
     const titik = new THREE.Vector2()
     let turun: { x: number; y: number } | null = null
     const mulai = (ev: PointerEvent) => { turun = { x: ev.clientX, y: ev.clientY } }
+    const batal = () => { turun = null }
     const selesai = (ev: PointerEvent) => {
-      // Memutar model tidak boleh diperlakukan sebagai memilih.
       if (!turun) return
       const geser = Math.hypot(ev.clientX - turun.x, ev.clientY - turun.y)
       turun = null
       if (geser > 8) return
       const kotakLayar = renderer.domElement.getBoundingClientRect()
+      if (kotakLayar.width < 2 || kotakLayar.height < 2) return
       titik.x = ((ev.clientX - kotakLayar.left) / kotakLayar.width) * 2 - 1
       titik.y = -((ev.clientY - kotakLayar.top) / kotakLayar.height) * 2 + 1
       ray.setFromCamera(titik, camera)
@@ -227,10 +209,17 @@ export function Limfe3D({ terpilih, onPilih, tinggi = 340 }: Limfe3DProps) {
     }
     renderer.domElement.addEventListener('pointerdown', mulai)
     renderer.domElement.addEventListener('pointerup', selesai)
+    renderer.domElement.addEventListener('pointercancel', batal)
+    renderer.domElement.addEventListener('pointerleave', batal)
 
     let raf = 0
+    let diViewport = true
+    let konteksHilang = false
+    const bolehMenggambar = () => !dibuang && !konteksHilang && diViewport && document.visibilityState !== 'hidden'
+
     const gambar = () => {
-      raf = requestAnimationFrame(gambar)
+      raf = 0
+      if (!bolehMenggambar()) return
       if (punyaTujuan) {
         camera.position.lerp(tujuanPosisi, 0.12)
         controls.target.lerp(tujuanTarget, 0.12)
@@ -238,17 +227,55 @@ export function Limfe3D({ terpilih, onPilih, tinggi = 340 }: Limfe3DProps) {
       }
       controls.update()
       renderer.render(scene, camera)
+      raf = requestAnimationFrame(gambar)
     }
-    raf = requestAnimationFrame(gambar)
+    const mulaiGambar = () => {
+      if (!raf && bolehMenggambar()) raf = requestAnimationFrame(gambar)
+    }
+    const berhentiGambar = () => {
+      if (raf) cancelAnimationFrame(raf)
+      raf = 0
+    }
+
+    const io = new IntersectionObserver((entri) => {
+      diViewport = entri[0]?.isIntersecting ?? false
+      if (diViewport) mulaiGambar()
+      else berhentiGambar()
+    }, { rootMargin: '120px' })
+    io.observe(wadah)
+
+    const saatVisibilitas = () => {
+      if (document.visibilityState === 'hidden') berhentiGambar()
+      else mulaiGambar()
+    }
+    document.addEventListener('visibilitychange', saatVisibilitas)
+
+    const saatContextLost = (event: Event) => {
+      event.preventDefault()
+      konteksHilang = true
+      berhentiGambar()
+      setGagal('The 3D graphics context was lost.')
+      setMuat(false)
+    }
+    renderer.domElement.addEventListener('webglcontextlost', saatContextLost)
+    mulaiGambar()
 
     return () => {
-      cancelAnimationFrame(raf)
+      dibuang = true
+      berhentiGambar()
       terapkanRef.current = null
       renderer.domElement.removeEventListener('pointerdown', mulai)
       renderer.domElement.removeEventListener('pointerup', selesai)
+      renderer.domElement.removeEventListener('pointercancel', batal)
+      renderer.domElement.removeEventListener('pointerleave', batal)
+      renderer.domElement.removeEventListener('webglcontextlost', saatContextLost)
+      document.removeEventListener('visibilitychange', saatVisibilitas)
+      io.disconnect()
       ro.disconnect()
       controls.dispose()
       if (grup) scene.remove(grup)
+      for (const bahan of bahanMilikViewport) bahan.dispose()
+      renderer.renderLists.dispose()
       renderer.dispose()
       renderer.domElement.remove()
     }
@@ -260,15 +287,17 @@ export function Limfe3D({ terpilih, onPilih, tinggi = 340 }: Limfe3DProps) {
   }, [terpilih])
 
   return (
-    <div ref={wadahRef} style={{ height: tinggi }}
+    <div ref={wadahRef} style={{ height: tinggi }} role="region"
+      aria-label="Interactive source-backed lymphatic anatomy"
+      aria-busy={muat ? 'true' : undefined}
       className="relative w-full overflow-hidden rounded-2xl bg-[var(--pelatih-alas-1,rgba(15,23,42,0.04))]">
       {muat && !gagal && (
-        <p className="absolute inset-0 grid place-items-center text-[12px] text-neutral-500">
+        <p role="status" aria-live="polite" className="absolute inset-0 grid place-items-center text-[12px] text-neutral-500">
           Loading the lymphoid system…
         </p>
       )}
       {gagal && (
-        <p className="absolute inset-0 grid place-items-center px-6 text-center text-[12px] text-neutral-500">
+        <p role="alert" className="absolute inset-0 grid place-items-center px-6 text-center text-[12px] text-neutral-500">
           {gagal} The list below still names every station and what it drains.
         </p>
       )}
