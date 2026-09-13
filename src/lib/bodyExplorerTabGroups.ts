@@ -51,6 +51,7 @@ export const KELOMPOK_TAB: Readonly<Record<string, string>> = {
   'dialisis': 'Physiology',
   'gas-alveolar': 'Physiology',
   'difusi': 'Physiology',
+  'indera': 'Reference',
   'sel': 'Physiology',
 
   // Sistem anatomi yang bisa ditunjuk pada model.
