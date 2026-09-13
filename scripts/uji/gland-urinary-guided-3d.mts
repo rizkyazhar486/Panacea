@@ -40,5 +40,9 @@ assert.match(viewerSource, /Math\.hypot\(ev\.clientX - awal\.x, ev\.clientY - aw
 assert.match(viewerSource, /removeEventListener\('pointercancel', batalTunjuk\)/)
 assert.match(viewerSource, /bahan\.dispose\(\)/)
 assert.match(viewerSource, /Dragging rotates the atlas without changing the selection/)
+assert.match(viewerSource, /new IntersectionObserver/)
+assert.match(viewerSource, /document\.addEventListener\('visibilitychange', saatVisibilitasBerubah\)/)
+assert.match(viewerSource, /document\.removeEventListener\('visibilitychange', saatVisibilitasBerubah\)/)
+assert.match(viewerSource, /io\.disconnect\(\)/)
 
 console.log('gland / urinary guided 3D navigation: ok')
