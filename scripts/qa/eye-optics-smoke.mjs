@@ -1,5 +1,6 @@
 import assert from 'node:assert/strict'
 import { expect } from '@playwright/test'
+import { eyeScreenshotOptions } from './eye-screenshot-options.mjs'
 
 // Reuse the authenticated mobile Body smoke browser and production build.
 // This exercises the shipped UI, not a stand-alone component fixture.
@@ -132,9 +133,11 @@ async function runEyeOptics(page) {
     { x: Math.round(kotakSatu.x), y: Math.round(kotakSatu.y), w: Math.round(kotakSatu.width), h: Math.round(kotakSatu.height) },
     `Eye lesson layout is still moving: ${JSON.stringify(kotakSatu)} -> ${JSON.stringify(kotakDua)}`,
   )
+  const scroll = await page.evaluate(() => ({ x: window.scrollX, y: window.scrollY }))
   await step('capture-eye-screenshot', () => page.screenshot({
     path: 'artifacts/body3d-mobile-eye-optics.png',
-    clip: { x: kotakDua.x, y: kotakDua.y, width: kotakDua.width, height: kotakDua.height },
+    // Preserve the whole lesson when its height exceeds the mobile viewport.
+    ...eyeScreenshotOptions(kotakDua, scroll),
     animations: 'disabled',
     // scale 'css' dan bukan 'device'. Artefak ini dipakai untuk menilai
     // keterbacaan label pada 390 px, jadi 356x1032 piksel CSS justru yang
