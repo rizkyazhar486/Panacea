@@ -1,0 +1,35 @@
+import fs from 'node:fs';
+
+const model = fs.readFileSync('src/lib/alphaGenomeAtlas.ts', 'utf8');
+const registry = fs.readFileSync('src/lib/bodyExposureMandatoryModules.ts', 'utf8');
+const ui = fs.readFileSync('src/pages/bodyhub/AlphaGenomeAtlas.tsx', 'utf8');
+
+for (const term of [
+  'chromosome', 'locus', 'gene', 'transcript', 'variant', 'protein', 'pathway',
+  'GRCh38 human reference genome', 'MANE Select / Plus Clinical', 'ClinVar', 'gnomAD',
+  'Ensembl', 'RefSeq', 'UniProt', 'GTEx',
+  'patientInferenceAllowed: false', 'syntheticVariantCoordinatesAllowed: false',
+]) {
+  if (!model.includes(term)) throw new Error(`Missing Alpha Genome Atlas model guard: ${term}`);
+}
+
+if (!registry.includes("id: BODY_EXPOSURE_ALPHA_GENOME_REQUIREMENT.id")) throw new Error('Alpha Genome Atlas is not registered as mandatory Body Exposure module');
+if (!registry.includes('required: true')) throw new Error('Mandatory genome requirement lost');
+if (!registry.includes('no fabricated coordinates or patient inference')) throw new Error('Fail-closed genome safety contract missing');
+
+for (const term of [
+  "from 'three'", 'OrbitControls', 'WebGLRenderer', 'ACESFilmicToneMapping',
+  'CapsuleGeometry', 'TubeGeometry', 'TorusKnotGeometry', 'CatmullRomCurve3',
+  'ResizeObserver', 'requestAnimationFrame', 'renderer.dispose()',
+  'Chromosome → locus → gene → transcript → variant → protein → pathway',
+  'missing coordinates or evidence stay missing rather than being synthesized',
+  'Search atlas', 'TP53', 'BRCA1', 'APOE', 'SCN5A', 'CFTR', 'HTT',
+]) {
+  if (!ui.includes(term)) throw new Error(`Missing Alpha Genome Atlas UI guard: ${term}`);
+}
+
+if (!ui.includes('Math.min(window.devicePixelRatio || 1, 2)')) throw new Error('Device pixel ratio is not bounded');
+if (!ui.includes('min-h-11')) throw new Error('Mobile touch target floor missing');
+if (!ui.includes('aria-pressed')) throw new Error('Genome record selection accessibility missing');
+
+console.log('body alpha genome atlas guards: ok');
