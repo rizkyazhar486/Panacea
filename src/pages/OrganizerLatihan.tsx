@@ -1,10 +1,10 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { Card, SectionTitle } from '../components/ui'
 import { IconActivity } from '../components/icons'
 import { getWorkouts } from '../lib/workoutStore'
 import { useVitals } from '../lib/useVitals'
 import {
-  susunPekan, periksaAturan, kadensLariPekanan, BATAS_ORGANIZER,
+  susunPekan, periksaAturan, kadensLariPekanan, sesiLariAwal, BATAS_ORGANIZER,
   type HariRencana, type JenisHari, type PilihanOrganizer,
 } from '../lib/organizerLatihan'
 
@@ -78,8 +78,21 @@ export function OrganizerLatihan() {
   const [pilihan, setPilihan] = useState<PilihanOrganizer>(() => ({
     hariLatihan: 4,
     fokus: 'seimbang',
-    sesiLari: 2,
+    sesiLari: sesiLariAwal(tercatat),
   }))
+
+  // Selama penggesernya belum disentuh, jumlah lari MENGIKUTI yang tercatat.
+  // Sesi bisa tiba belakangan lewat sinkronisasi, jadi nilai awal saja tidak
+  // cukup: tanpa ini halaman tetap merencanakan dua lari untuk orang yang
+  // riwayatnya baru termuat sesudah render pertama.
+  const [disentuh, setDisentuh] = useState(false)
+  useEffect(() => {
+    if (disentuh) return
+    setPilihan((p) => {
+      const awal = sesiLariAwal(tercatat)
+      return p.sesiLari === awal ? p : { ...p, sesiLari: awal }
+    })
+  }, [tercatat, disentuh])
 
   const pekan = useMemo(() => susunPekan(pilihan, tercatat), [pilihan, tercatat])
   const langgar = useMemo(() => periksaAturan(pekan), [pekan])
@@ -124,7 +137,7 @@ export function OrganizerLatihan() {
           <input
             type="range" min={0} max={BATAS_ORGANIZER.LARI_MAKS} step={1}
             value={pilihan.sesiLari}
-            onChange={(e) => setPilihan((p) => ({ ...p, sesiLari: Number(e.target.value) }))}
+            onChange={(e) => { setDisentuh(true); setPilihan((p) => ({ ...p, sesiLari: Number(e.target.value) })) }}
             className="mt-1.5 h-11 w-full accent-brand"
             aria-label="Runs kept per week"
           />
@@ -150,8 +163,12 @@ export function OrganizerLatihan() {
 
         <p className="mt-3 text-[11.5px] leading-relaxed text-neutral-500 dark:text-neutral-400">
           {tercatat === null
-            ? 'No running sessions are stored yet, so the run count is the one you set here and nothing else.'
-            : `Your stored sessions average ${tercatat} runs per week. That figure is read from what was recorded; every other number on this page is a template.`}
+            ? 'No running sessions are stored yet, so the run count starts at a template value of 2 and is whatever you set here — nothing on this page is reading your history.'
+            : disentuh
+              ? `Your stored sessions average ${tercatat} ${tercatat === 1 ? 'run' : 'runs'} per week. The week below now uses the ${pilihan.sesiLari} you chose instead. That average is read from what was recorded; every other number on this page is a template.`
+              : jumlah.lari < pilihan.sesiLari
+                ? `Your stored sessions average ${tercatat} ${tercatat === 1 ? 'run' : 'runs'} per week, and the week below starts from that figure — but only ${jumlah.lari} fit, because ${jumlah.kekuatan} strength days and one full rest day come first. Lower the strength days to make room. The average is read from what was recorded; every other number on this page is a template.`
+                : `Your stored sessions average ${tercatat} ${tercatat === 1 ? 'run' : 'runs'} per week, and the week below is built around that figure — move the slider to override it. The average is read from what was recorded; every other number on this page is a template.`}
         </p>
       </Card>
 
