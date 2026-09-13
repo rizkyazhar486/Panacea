@@ -11,6 +11,7 @@ export default function BiomechanicsMotionLab() {
   const objectUrlRef = useRef<string | null>(null)
   const [videoUrl, setVideoUrl] = useState<string | null>(null)
   const [videoName, setVideoName] = useState('')
+  const [videoError, setVideoError] = useState('')
   const [time, setTime] = useState(0)
   const [duration, setDuration] = useState(0)
   const [groupKey, setGroupKey] = useState('quads')
@@ -36,6 +37,7 @@ export default function BiomechanicsMotionLab() {
     objectUrlRef.current = url
     setVideoUrl(url)
     setVideoName(file.name)
+    setVideoError('')
     setTime(0)
     setDuration(0)
   }
@@ -47,22 +49,36 @@ export default function BiomechanicsMotionLab() {
     setTime(video.currentTime)
   }
 
+  const videoStatus = videoError
+    ? videoError
+    : videoUrl
+      ? duration > 0
+        ? `${videoName || 'Motion video'} ready. Duration ${duration.toFixed(1)} seconds.`
+        : `${videoName || 'Motion video'} loading.`
+      : 'No motion video loaded. The source-backed 3D atlas remains available.'
+
   return (
-    <section data-biomechanics-motion-lab="v1" className="overflow-hidden rounded-2xl border border-emerald-900/30 bg-[#07110f] text-white shadow-sm">
+    <section
+      data-biomechanics-motion-lab="v1"
+      aria-label="Biomechanics motion lab"
+      className="overflow-hidden rounded-2xl border border-emerald-900/30 bg-[#07110f] text-white shadow-sm"
+    >
       <div className="flex flex-wrap items-start justify-between gap-3 border-b border-white/10 px-3 py-3 sm:px-4">
         <div>
           <div className="text-[9px] font-black uppercase tracking-[0.18em] text-emerald-300">Biomechanics motion lab</div>
           <h3 className="mt-1 text-sm font-black">Original motion ↔ source-backed anatomical atlas</h3>
           <p className="mt-1 max-w-3xl text-[10px] leading-relaxed text-white/55">A side-by-side workspace inspired by the supplied reference: scrub a real exercise video while inspecting the corresponding source-backed muscle atlas. The atlas remains rotatable and the same timeline stays visible on mobile.</p>
         </div>
-        <label className="min-h-10 cursor-pointer rounded-xl border border-emerald-300/30 bg-emerald-300/10 px-3 py-2 text-[10px] font-black text-emerald-200">
+        <label className="min-h-11 cursor-pointer rounded-xl border border-emerald-300/30 bg-emerald-300/10 px-3 py-2 text-[10px] font-black text-emerald-200">
           Load motion video
           <input className="sr-only" type="file" accept="video/*" onChange={(event) => loadVideo(event.target.files?.[0])} />
         </label>
       </div>
 
-      <div className="grid min-h-[430px] grid-cols-1 md:grid-cols-2">
-        <div className="relative min-h-[360px] border-b border-white/10 bg-black md:border-b-0 md:border-r">
+      <p className="sr-only" role="status" aria-live="polite">{videoStatus}</p>
+
+      <div className="grid min-h-0 grid-cols-1 md:min-h-[430px] md:grid-cols-2">
+        <div className="relative min-h-[300px] border-b border-white/10 bg-black sm:min-h-[340px] md:min-h-[430px] md:border-b-0 md:border-r">
           <div className="absolute left-3 top-3 z-10 rounded-full bg-black/65 px-2 py-1 text-[10px] font-bold backdrop-blur">Original · {time.toFixed(2)}s</div>
           {videoUrl ? (
             <video
@@ -70,22 +86,43 @@ export default function BiomechanicsMotionLab() {
               src={videoUrl}
               controls
               playsInline
-              className="h-full min-h-[360px] w-full object-contain"
-              onLoadedMetadata={(event) => setDuration(event.currentTarget.duration || 0)}
+              preload="metadata"
+              aria-label={videoName ? `Motion video: ${videoName}` : 'Loaded motion video'}
+              className="h-full min-h-[300px] w-full object-contain sm:min-h-[340px] md:min-h-[430px]"
+              onLoadedMetadata={(event) => {
+                setDuration(event.currentTarget.duration || 0)
+                setVideoError('')
+              }}
               onTimeUpdate={(event) => setTime(event.currentTarget.currentTime)}
+              onError={() => {
+                setDuration(0)
+                setVideoError('The selected video could not be decoded in this browser. The 3D atlas remains available.')
+              }}
             />
           ) : (
-            <div className="flex h-full min-h-[360px] flex-col items-center justify-center px-6 text-center">
-              <div className="text-3xl">＋</div>
+            <div className="flex h-full min-h-[300px] flex-col items-center justify-center px-6 text-center sm:min-h-[340px] md:min-h-[430px]">
+              <div className="text-3xl" aria-hidden="true">＋</div>
               <div className="mt-2 text-xs font-black">Load your exercise clip</div>
               <p className="mt-1 max-w-xs text-[10px] leading-relaxed text-white/45">The video stays local in this browser session. Panacea does not claim pose tracking until a validated pose-estimation pipeline is connected.</p>
             </div>
           )}
-          {videoName && <div className="absolute bottom-12 left-3 max-w-[80%] truncate rounded bg-black/60 px-2 py-1 text-[9px] text-white/60">{videoName}</div>}
+          {videoError && (
+            <div className="absolute inset-x-3 bottom-3 z-10 rounded-xl border border-amber-300/30 bg-black/80 p-2 text-[10px] leading-relaxed text-amber-100" role="alert">
+              {videoError}
+            </div>
+          )}
+          {videoName && !videoError && <div className="absolute bottom-12 left-3 max-w-[80%] truncate rounded bg-black/60 px-2 py-1 text-[9px] text-white/60">{videoName}</div>}
         </div>
 
-        <div className="relative min-h-[430px] bg-[#091613]">
-          <div className="pointer-events-none absolute left-3 top-3 z-10 rounded-full bg-black/55 px-2 py-1 text-[10px] font-bold backdrop-blur">Source atlas · drag to rotate</div>
+        <div
+          className="relative min-h-[390px] bg-[#091613] sm:min-h-[430px]"
+          role="region"
+          aria-label={`Source-backed rotatable muscle atlas. Current target: ${group.label}.`}
+          aria-describedby="biomechanics-atlas-help biomechanics-atlas-state"
+        >
+          <div className="pointer-events-none absolute left-3 top-3 z-10 rounded-full bg-black/55 px-2 py-1 text-[10px] font-bold backdrop-blur">Source atlas · drag or touch to rotate</div>
+          <p id="biomechanics-atlas-help" className="sr-only">Interactive 3D anatomy remains the primary visualization. Drag with a pointer or use touch gestures supported by the atlas viewer to inspect the model.</p>
+          <p id="biomechanics-atlas-state" className="sr-only" role="status" aria-live="polite">{group.label} selected. {group.nodeNames.length} source atlas nodes are requested for highlighting.</p>
           <AtlasViewer3D
             berkas="anatomy/muscular.glb"
             bagian={MUSCLE_PARTS}
@@ -102,16 +139,16 @@ export default function BiomechanicsMotionLab() {
       <div className="space-y-3 border-t border-white/10 p-3 sm:p-4">
         <div className="grid gap-2 sm:grid-cols-[1fr_auto] sm:items-center">
           <label className="text-[9px] font-black uppercase tracking-wide text-white/50">Synchronized timeline · {phase}
-            <input aria-label="Motion timeline" type="range" min="0" max="1" step="0.001" value={progress} disabled={!duration} onChange={(event) => seek(Number(event.target.value))} className="mt-2 block w-full accent-emerald-400" />
+            <input aria-label="Motion timeline" type="range" min="0" max="1" step="0.001" value={progress} disabled={!duration} onChange={(event) => seek(Number(event.target.value))} className="mt-2 block min-h-11 w-full accent-emerald-400" />
           </label>
           <div className="text-right font-mono text-[10px] text-white/50">{time.toFixed(2)} / {duration.toFixed(2)} s</div>
         </div>
 
         <div>
           <div className="mb-1.5 text-[9px] font-black uppercase tracking-wide text-white/45">Muscle / tendon target</div>
-          <div className="flex gap-1.5 overflow-x-auto pb-1">
+          <div className="flex gap-1.5 overflow-x-auto pb-1" role="group" aria-label="Muscle and tendon targets">
             {WORKOUT_MUSCLE_GROUPS.map((item) => (
-              <button key={item.key} type="button" aria-pressed={group.key === item.key} onClick={() => setGroupKey(item.key)} className={`min-h-9 shrink-0 rounded-full border px-3 text-[10px] font-bold ${group.key === item.key ? 'border-emerald-300 bg-emerald-300 text-black' : 'border-white/10 text-white/60'}`}>{item.label}</button>
+              <button key={item.key} type="button" aria-pressed={group.key === item.key} onClick={() => setGroupKey(item.key)} className={`min-h-11 shrink-0 rounded-full border px-3 text-[10px] font-bold ${group.key === item.key ? 'border-emerald-300 bg-emerald-300 text-black' : 'border-white/10 text-white/60'}`}>{item.label}</button>
             ))}
           </div>
         </div>
