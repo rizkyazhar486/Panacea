@@ -19,9 +19,66 @@ function materialFor(source: THREE.Material) {
     standard.depthWrite = false
     standard.emissive.set(0x083c35)
     standard.emissiveIntensity = 0.34
-    return standard
   }
   return cloned
+}
+
+/**
+ * Build a render-owned view without mutating or disposing the source GLTF.
+ *
+ * `muatAtlas` owns the decoded source scene.  System switching used to add that
+ * entire scene to the viewport and synchronously traverse/dispose every mesh on
+ * cleanup.  Large source bundles can make a mobile click spend seconds in React
+ * effect teardown even when only a handful of source nodes are represented.
+ *
+ * Here the source stays immutable. Only exact source-matched Mesh instances are
+ * projected into a small render-owned group. Geometry is deliberately shared
+ * read-only; only cloned materials belong to this viewport and are disposed.
+ */
+function projectMatchedSourceMeshes(
+  atlasScene: THREE.Group,
+  namaAsli: Map<THREE.Object3D, string>,
+  names: ReadonlySet<string>,
+) {
+  const group = new THREE.Group()
+  const bounds = new THREE.Box3()
+  let matched = 0
+
+  atlasScene.updateMatrixWorld(true)
+  atlasScene.traverse((object) => {
+    if (!(object as THREE.Mesh).isMesh) return
+    const source = object as THREE.Mesh
+    const sourceName = namaAtlas(namaAsli, source)
+    if (!names.has(normalizeAnatomySourceName(sourceName))) return
+
+    const raw = Array.isArray(source.material) ? source.material : [source.material]
+    const clonedMaterials = raw.map(materialFor)
+    const projected = new THREE.Mesh(
+      source.geometry,
+      Array.isArray(source.material) ? clonedMaterials : clonedMaterials[0],
+    )
+    projected.name = sourceName
+    projected.matrix.copy(source.matrixWorld)
+    projected.matrixAutoUpdate = false
+    projected.frustumCulled = source.frustumCulled
+    projected.renderOrder = source.renderOrder
+    group.add(projected)
+    bounds.expandByObject(projected)
+    matched += 1
+  })
+
+  return { group, bounds, matched }
+}
+
+function disposeProjectedMaterials(group: THREE.Group) {
+  group.traverse((object) => {
+    const mesh = object as THREE.Mesh
+    if (!mesh.isMesh) return
+    const materials = Array.isArray(mesh.material) ? mesh.material : [mesh.material]
+    materials.forEach((material) => material.dispose())
+    // Geometry belongs to the immutable source scene loaded by muatAtlas.
+    // Never dispose it from a viewport projection.
+  })
 }
 
 export default function BodyAllSystems3D() {
@@ -53,11 +110,6 @@ export default function BodyAllSystems3D() {
       setOpen(false)
       return
     }
-
-    // Commit and paint the lightweight disclosure interaction first, then give
-    // the browser a short interaction window before constructing Three.js.
-    // A zero-delay timer can still start SwiftShader/WebGL work before the
-    // pointer/click acknowledgement has returned on constrained mobile runners.
     setOpen(true)
     openTimerRef.current = window.setTimeout(() => {
       openTimerRef.current = null
@@ -102,14 +154,11 @@ export default function BodyAllSystems3D() {
 
     const mobile = window.matchMedia('(max-width: 640px)').matches
     const controls = new OrbitControls(camera, renderer.domElement)
-    // Continuous damping needs a permanent RAF loop. That is fine on desktop,
-    // but SwiftShader/mobile can monopolize the main thread enough that an
-    // otherwise visible/enabled system tab cannot acknowledge a real click.
-    // Mobile therefore renders on actual control/source/resize events instead.
     controls.enableDamping = !mobile
     controls.enablePan = false
 
     const sourceBounds = new THREE.Box3()
+    const projectedGroups: THREE.Group[] = []
     let disposed = false
     let raf = 0
     let inViewport = true
@@ -120,7 +169,12 @@ export default function BodyAllSystems3D() {
       controls.update()
       renderer.render(scene, camera)
     }
-
+    const renderLoop = () => {
+      raf = 0
+      if (disposed || !inViewport || !documentVisible) return
+      renderFrame()
+      raf = requestAnimationFrame(renderLoop)
+    }
     const requestRender = () => {
       if (disposed || !inViewport || !documentVisible) return
       if (mobile) {
@@ -129,18 +183,10 @@ export default function BodyAllSystems3D() {
           raf = 0
           renderFrame()
         })
-        return
+      } else if (!raf) {
+        raf = requestAnimationFrame(renderLoop)
       }
-      if (!raf) raf = requestAnimationFrame(renderLoop)
     }
-
-    const renderLoop = () => {
-      raf = 0
-      if (disposed || !inViewport || !documentVisible) return
-      renderFrame()
-      raf = requestAnimationFrame(renderLoop)
-    }
-
     const stop = () => {
       if (raf) cancelAnimationFrame(raf)
       raf = 0
@@ -171,7 +217,6 @@ export default function BodyAllSystems3D() {
     }
 
     let completed = 0
-
     const finishOne = () => {
       completed += 1
       setLoadedFiles(completed)
@@ -186,32 +231,14 @@ export default function BodyAllSystems3D() {
       muatAtlas(file).then(({ scene: atlasScene, namaAsli }) => {
         if (disposed) return
         const names = resolvedByFile.get(file) ?? new Set<string>()
-        let matched = 0
-        atlasScene.traverse((object) => {
-          if (!(object as THREE.Mesh).isMesh) return
-          const mesh = object as THREE.Mesh
-          const sourceName = namaAtlas(namaAsli, mesh)
-          const represented = names.has(normalizeAnatomySourceName(sourceName))
-          mesh.visible = represented
-          if (!represented) return
-          matched += 1
-          const raw = Array.isArray(mesh.material) ? mesh.material : [mesh.material]
-          const cloned = raw.map(materialFor)
-          mesh.material = Array.isArray(mesh.material) ? cloned : cloned[0]
-          sourceBounds.expandByObject(mesh)
-        })
-        if (matched > 0) {
-          scene.add(atlasScene)
+        const projection = projectMatchedSourceMeshes(atlasScene, namaAsli, names)
+        if (projection.matched > 0) {
+          projectedGroups.push(projection.group)
+          scene.add(projection.group)
+          sourceBounds.union(projection.bounds)
           setLoadedSourceFiles((current) => current.includes(file) ? current : [...current, file])
           requestRender()
         } else {
-          atlasScene.traverse((object) => {
-            const mesh = object as THREE.Mesh
-            if (!mesh.isMesh) return
-            mesh.geometry.dispose()
-            const materials = Array.isArray(mesh.material) ? mesh.material : [mesh.material]
-            materials.forEach((material) => material.dispose())
-          })
           setFailedFiles((current) => current.includes(file) ? current : [...current, file])
           setError((current) => current || 'A shipped source bundle loaded but none of the resolved source nodes were renderable. Missing renders remain blocked; no replacement geometry was created.')
         }
@@ -263,13 +290,9 @@ export default function BodyAllSystems3D() {
       document.removeEventListener('visibilitychange', onVisibility)
       if (mobile) controls.removeEventListener('change', onControlChange)
       controls.dispose()
-      scene.traverse((object) => {
-        const mesh = object as THREE.Mesh
-        if (!mesh.isMesh) return
-        mesh.geometry.dispose()
-        const materials = Array.isArray(mesh.material) ? mesh.material : [mesh.material]
-        materials.forEach((material) => material.dispose())
-      })
+      // Cleanup is O(rendered meshes), not O(every mesh in every source bundle).
+      // Source geometry stays loader-owned and immutable across system switches.
+      projectedGroups.forEach(disposeProjectedMaterials)
       renderer.dispose()
       renderer.forceContextLoss()
       renderer.domElement.remove()
