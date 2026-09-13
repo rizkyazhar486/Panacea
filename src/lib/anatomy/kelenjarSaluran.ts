@@ -33,8 +33,8 @@
 // diagnosis, dan tidak ada yang disimpulkan tentang tubuh siapa pun. Atlas ini
 // adalah satu tubuh rujukan dewasa; letak dan ukuran organ berbeda antar orang.
 
-export const BERKAS_VISCERAL = 'anatomy/visceral.glb'
-export const BERKAS_NERVOUS = 'anatomy/nervous.glb'
+export const BERKAS_VISCERAL = 'visceral.glb'
+export const BERKAS_NERVOUS = 'nervous.glb'
 
 export type BerkasSumber = typeof BERKAS_VISCERAL | typeof BERKAS_NERVOUS
 
