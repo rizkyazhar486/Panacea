@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { Prosa } from '../components/Prosa'
 import { Card, SectionTitle, Field, inputClass, Badge } from '../components/ui'
 import { IconActivity } from '../components/icons'
-import { getDemo } from '../lib/profile'
+import { getDemoTersimpan } from '../lib/profile'
 import { CopyNote } from '../components/CopyNote'
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -40,18 +40,36 @@ function sbpPts(v: number): number {
 }
 
 export function GlasgowBlatchfordScore() {
-  const [bun, setBun] = useState(15)
-  const [hgb, setHgb] = useState(14)
-  const [sex, setSex] = useState<'M' | 'F'>(() => getDemo().sex || 'M')
-  const [sbp, setSbp] = useState(120)
+  // Ini yang paling tajam di antara semuanya.
+  //
+  // Nilai awalnya -- ureum 15, Hb 14 pada laki-laki, TD sistolik 120 --
+  // ketiganya bernilai NOL poin. Skor nol pada Glasgow-Blatchford bukan
+  // sekadar "rendah": ia ambang yang dipakai sebagian panduan untuk
+  // MEMULANGKAN pasien perdarahan saluran cerna atas tanpa rawat inap dan
+  // tanpa endoskopi. Halaman ini dahulu menampilkan kesimpulan itu, beserta
+  // kalimat siap salin, sebelum seorang pun memasukkan apa pun.
+  //
+  // Kotak centangnya (melena, sinkop, gagal jantung, penyakit hati) tetap
+  // seperti semula: tidak dicentang berarti "tidak ada", dan itu jawaban.
+  // Yang dihapus hanya ketiga pengukurannya.
+  const [bun, setBun] = useState(0)
+  const [hgb, setHgb] = useState(0)
+  const [sex, setSex] = useState<'M' | 'F'>(() => (getDemoTersimpan().sex === 'F' ? 'F' : 'M'))
+  const [sbp, setSbp] = useState(0)
   const [flags, setFlags] = useState<Record<string, boolean>>({})
   const toggle = (key: string) => setFlags((c) => ({ ...c, [key]: !c[key] }))
+
+  const belum: string[] = []
+  if (!(bun > 0)) belum.push('blood urea')
+  if (!(hgb > 0)) belum.push('haemoglobin')
+  if (!(sbp > 0)) belum.push('systolic BP')
+  const lengkap = belum.length === 0
 
   const flagPts: Record<string, number> = { hr: 1, melena: 1, syncope: 2, hepatic: 2, cardiac: 2 }
   const flagScore = Object.entries(flags).reduce((sum, [k, v]) => sum + (v ? flagPts[k] ?? 0 : 0), 0)
 
   const score = bunPts(bun) + hgbPts(hgb, sex) + sbpPts(sbp) + flagScore
-  const lowRisk = score === 0
+  const lowRisk = lengkap && score === 0
 
   return (
     <div className="mx-auto max-w-2xl space-y-5 pb-24">
@@ -105,18 +123,30 @@ export function GlasgowBlatchfordScore() {
 
       <Card className="!p-5">
         <div className="text-xs font-black uppercase tracking-wide text-neutral-500">Glasgow-Blatchford Score</div>
-        <div className="mt-2 flex items-center gap-3">
-          <span className="text-3xl font-black text-brand-dark">{score}</span>
-          <Badge tone={lowRisk ? 'brand' : score <= 5 ? 'low' : 'critical'}>
-            {lowRisk ? 'Very low risk' : score <= 5 ? 'Low-moderate risk' : 'High risk'}
-          </Badge>
-        </div>
-        <p className="mt-2 text-[12px] text-neutral-500">
-          {lowRisk
-            ? 'Score of 0: some guidelines support safe outpatient management without hospital admission.'
-            : 'A score ≥1 generally warrants admission and inpatient endoscopy per most guidelines; higher scores correlate with need for transfusion, endoscopic intervention, or surgery.'}
-        </p>
-        <CopyNote text={`Glasgow-Blatchford ${score} (BUN ${bun}, Hgb ${hgb} ${sex}, SBP ${sbp}) — ${lowRisk ? 'very low risk: outpatient management may be appropriate' : 'admission and inpatient endoscopy warranted'} [Blatchford 2000]`} />
+        {lengkap ? (
+          <>
+            <div className="mt-2 flex items-center gap-3">
+              <span className="text-3xl font-black text-brand-dark">{score}</span>
+              <Badge tone={lowRisk ? 'brand' : score <= 5 ? 'low' : 'critical'}>
+                {lowRisk ? 'Very low risk' : score <= 5 ? 'Low-moderate risk' : 'High risk'}
+              </Badge>
+            </div>
+            <p className="mt-2 text-[12px] text-neutral-500">
+              {lowRisk
+                ? 'Score of 0: some guidelines support safe outpatient management without hospital admission.'
+                : 'A score ≥1 generally warrants admission and inpatient endoscopy per most guidelines; higher scores correlate with need for transfusion, endoscopic intervention, or surgery.'}
+            </p>
+            <CopyNote text={`Glasgow-Blatchford ${score} (BUN ${bun}, Hgb ${hgb} ${sex}, SBP ${sbp}) — ${lowRisk ? 'very low risk: outpatient management may be appropriate' : 'admission and inpatient endoscopy warranted'} [Blatchford 2000]`} />
+          </>
+        ) : (
+          <p className="mt-2 text-[12.5px] leading-relaxed text-neutral-600 dark:text-neutral-300">
+            No score yet. Still needed: {belum.join(', ')}.
+            {' '}A score of zero here is not a mild result — it is the threshold some guidelines use to send a patient
+            with an upper GI bleed home without endoscopy. Blood urea 15, haemoglobin 14 and a systolic of 120 each
+            score zero, so leaving them in place would have shown exactly that conclusion for a patient nobody
+            has worked up.
+          </p>
+        )}
       </Card>
 
       <div className="rounded-2xl border border-neutral-100 bg-white p-4 text-center text-[11px] leading-relaxed text-neutral-500 dark:border-white/10 dark:bg-white/5">
