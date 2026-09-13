@@ -14,6 +14,7 @@ import {
 import RadiologyModalityHub from './RadiologyModalityHub'
 
 const Ocular4DAtlas = lazy(() => import('../../components/digital-twin/Ocular4DAtlas'))
+const LongevityResearchSimulator = lazy(() => import('./LongevityResearchSimulator'))
 
 const SCALE_GROUPS: readonly { label: string; scales: readonly KnowledgeScale[] }[] = [
   { label: 'Body', scales: ['whole-body', 'system', 'organ'] },
@@ -174,6 +175,14 @@ export default function MultisystemScaleNavigator() {
           <p className="mt-2 text-[9px] leading-relaxed text-neutral-500">Selection is educational context only. It never creates patient anatomy, measured RNA/genomic data, diagnosis, treatment, personality inference, or an immortality claim.</p>
         </div>
       </div>
+
+      {selected.scale === 'aging-longevity' && (
+        <div className="mt-3">
+          <Suspense fallback={<div role="status" className="flex min-h-40 items-center justify-center rounded-2xl border border-neutral-200 text-xs font-bold text-neutral-500 dark:border-white/10">Loading longevity research simulator…</div>}>
+            <LongevityResearchSimulator />
+          </Suspense>
+        </div>
+      )}
 
       <details className="mt-3 rounded-xl border border-neutral-200 p-3 dark:border-white/10">
         <summary className="cursor-pointer text-[10px] font-black text-ink dark:text-white">Evidence & mandatory references</summary>
