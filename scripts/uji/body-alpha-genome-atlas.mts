@@ -13,6 +13,11 @@ for (const term of [
   if (!model.includes(term)) throw new Error(`Missing Alpha Genome Atlas model guard: ${term}`);
 }
 
+// Seed biological identities belong to the data/model layer, not as duplicated UI literals.
+for (const symbol of ['TP53', 'BRCA1', 'APOE', 'SCN5A', 'CFTR', 'HTT']) {
+  if (!model.includes(`symbol: '${symbol}'`)) throw new Error(`Missing Alpha Genome Atlas seed record: ${symbol}`);
+}
+
 if (!registry.includes("id: BODY_EXPOSURE_ALPHA_GENOME_REQUIREMENT.id")) throw new Error('Alpha Genome Atlas is not registered as mandatory Body Exposure module');
 if (!registry.includes('required: true')) throw new Error('Mandatory genome requirement lost');
 if (!registry.includes('no fabricated coordinates or patient inference')) throw new Error('Fail-closed genome safety contract missing');
@@ -23,7 +28,7 @@ for (const term of [
   'ResizeObserver', 'requestAnimationFrame', 'renderer.dispose()',
   'Chromosome → locus → gene → transcript → variant → protein → pathway',
   'missing coordinates or evidence stay missing rather than being synthesized',
-  'Search atlas', 'TP53', 'BRCA1', 'APOE', 'SCN5A', 'CFTR', 'HTT',
+  'Search atlas', 'ALPHA_GENOME_SEED_RECORDS', 'selected.symbol', 'filtered.map',
 ]) {
   if (!ui.includes(term)) throw new Error(`Missing Alpha Genome Atlas UI guard: ${term}`);
 }
