@@ -302,18 +302,30 @@ export interface TitikTren {
   nilai: number
 }
 
+/**
+ * Pembandingan terhadap seusia hanya ada bila usianya BENAR-BENAR diketahui.
+ *
+ * Null di sini bukan kelalaian melainkan jawaban: VO2max 42 pada usia 25 dan
+ * pada usia 60 adalah dua hal yang berbeda, jadi tanpa usia yang tersimpan
+ * tidak ada titik tengah yang bisa disebut, tidak ada pita, dan tidak ada
+ * rasio bahaya. Angka VO2max sendiri dan arahnya selama 90 hari tetap sah --
+ * keduanya tidak memerlukan usia siapa pun.
+ */
 export interface KebugaranKardio {
   kini: number
   /** Perubahan terhadap nilai 90 hari lalu, bila ada. */
   delta: number | null
   deret: TitikTren[]
   /** Rentang usia-jenis kelamin: titik tengah dan posisi orang ini. */
-  titikTengah: number
-  pita: string
-  selisihMet: number
+  titikTengah: number | null
+  pita: string | null
+  selisihMet: number | null
   /** Rasio bahaya kematian terhadap orang seusia di titik tengah (Kodama 2009). */
-  hr: number
+  hr: number | null
   perkiraan: boolean
+  /** Usia dan jenis kelamin yang dipakai membandingkan -- atau ketiadaannya. */
+  usiaDipakai: number | null
+  bandingSeusia: boolean
 }
 
 /**
@@ -326,8 +338,8 @@ export interface KebugaranKardio {
  */
 export function kebugaranKardio<J>(
   deretVo2: TitikTren[],
-  usia: number,
-  jk: J,
+  usia: number | null,
+  jk: J | null,
   nilaiKebugaranFn: (vo2: number, usia: number, jk: J) => {
     titikTengah: number; pita: string; selisihMet: number; hrTerhadapTitikTengah: number
   } | null,
@@ -335,18 +347,34 @@ export function kebugaranKardio<J>(
 ): KebugaranKardio | null {
   if (!deretVo2.length) return null
   const kini = deretVo2[deretVo2.length - 1].nilai
-  const nilai = nilaiKebugaranFn(kini, usia, jk)
-  if (!nilai) return null
   const lama = deretVo2.find((d) => Date.parse(`${d.tanggal}T00:00:00`) <= Date.now() - 90 * 86400_000)
-  return {
+  const dasar = {
     kini: Math.round(kini * 10) / 10,
     delta: lama ? Math.round((kini - lama.nilai) * 10) / 10 : null,
     deret: deretVo2,
+    perkiraan,
+  }
+
+  // Usia yang tidak diketahui TIDAK diganti angka bawaan. Mengisi 30 di sini
+  // akan memberi tahu seseorang yang berusia 58 bahwa ia di bawah titik tengah
+  // "seusianya" -- padahal yang dibandingkan adalah orang lain.
+  const usiaSah = typeof usia === 'number' && Number.isFinite(usia) && usia > 0
+  if (!usiaSah || jk === null || jk === undefined) {
+    return { ...dasar, titikTengah: null, pita: null, selisihMet: null, hr: null, usiaDipakai: null, bandingSeusia: false }
+  }
+
+  const nilai = nilaiKebugaranFn(kini, usia as number, jk as J)
+  if (!nilai) {
+    return { ...dasar, titikTengah: null, pita: null, selisihMet: null, hr: null, usiaDipakai: usia as number, bandingSeusia: false }
+  }
+  return {
+    ...dasar,
     titikTengah: Math.round(nilai.titikTengah * 10) / 10,
     pita: nilai.pita,
     selisihMet: Math.round(nilai.selisihMet * 10) / 10,
     hr: Math.round(nilai.hrTerhadapTitikTengah * 100) / 100,
-    perkiraan,
+    usiaDipakai: usia as number,
+    bandingSeusia: true,
   }
 }
 
