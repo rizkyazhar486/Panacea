@@ -76,6 +76,7 @@ export const KELOMPOK_TAB: Readonly<Record<string, string>> = {
   'molekul': 'Reference',
   'genomik': 'Reference',
   'genom-alfa': 'Reference',
+  'vertikal-molekuler': 'Reference',
   'presisi': 'Reference',
   'mesin': 'Reference',
   'reference': 'Reference',
