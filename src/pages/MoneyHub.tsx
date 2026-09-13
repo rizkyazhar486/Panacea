@@ -3,6 +3,7 @@ import { Prosa } from '../components/Prosa'
 import { hariIni } from '../lib/tanggal'
 import { Card, SectionTitle, Badge, Field, inputClass, Button } from '../components/ui'
 import { IconToken } from '../components/icons'
+import { FinanceResearchLab } from './finance/FinanceResearchLab'
 import {
   CATEGORY_LABEL, summarise, emergencyMonths, emergencyVerdict, planDebt, assessRisk,
   project, formatIdr, RISK_LEVEL_LABEL,
@@ -35,7 +36,7 @@ function save(key: string, v: unknown) {
   try { localStorage.setItem(key, JSON.stringify(v)) } catch { /* ignore */ }
 }
 
-type Tab = 'catat' | 'arus' | 'darurat' | 'utang' | 'investasi'
+type Tab = 'catat' | 'arus' | 'darurat' | 'utang' | 'investasi' | 'riset'
 
 export function MoneyHub() {
   const [tab, setTab] = useState<Tab>('catat')
@@ -53,6 +54,7 @@ export function MoneyHub() {
     { id: 'darurat', l: 'Emergency Fund' },
     { id: 'utang', l: 'Debt' },
     { id: 'investasi', l: 'Risk Profile' },
+    { id: 'riset', l: 'Markets Lab' },
   ]
 
   return (
@@ -82,6 +84,7 @@ export function MoneyHub() {
       {tab === 'darurat' && <EmergencyTab summary={summary} />}
       {tab === 'utang' && <DebtTab debts={debts} setDebts={setDebts} />}
       {tab === 'investasi' && <RiskTab />}
+      {tab === 'riset' && <FinanceResearchLab />}
 
       <div className="rounded-2xl border border-neutral-100 bg-white p-4 text-center text-[11px] leading-relaxed text-neutral-500 dark:border-white/10 dark:bg-white/5">
         An educational personal-finance tool. This page does not recommend buying or selling any
