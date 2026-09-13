@@ -293,6 +293,61 @@ export function hrMaxFromAge(age: number, sex: 'M' | 'F'): number {
   return sex === 'M' ? 220 - age : 226 - age
 }
 
+/** Dari mana angka HRmax yang dipakai itu berasal. Kunci, bukan label. */
+export type AsalHrMax = 'terukur' | 'perkiraan-usia' | 'asumsi-usia'
+
+export interface HrMaksimum {
+  nilai: number
+  asal: AsalHrMax
+  /** Usia yang benar-benar dipakai rumus, atau null bila angkanya terukur. */
+  usiaDipakai: number | null
+}
+
+/**
+ * HRmax BESERTA asal-usulnya.
+ *
+ * Angka ini menggerakkan seluruh sebaran zona -- yaitu jawaban atas "seberapa
+ * keras sesi itu sebenarnya". Sampai sekarang layar hanya menulis "HRmax used
+ * N bpm" tanpa menyebut N itu apa, padahal ada tiga kemungkinan yang sangat
+ * berbeda:
+ *
+ *   1. TERUKUR  -- denyut tertinggi yang pernah benar-benar tercatat pada sesi
+ *      milik orang ini. Ini data.
+ *   2. PERKIRAAN dari usia yang ia simpan sendiri. Ini rumus populasi
+ *      (220-usia / 226-usia), bukan pengukuran: sebarannya lebar, meleset
+ *      belasan denyut pada banyak orang.
+ *   3. ASUMSI. Profilnya kosong, jadi getDemo() diam-diam mencampurkan nilai
+ *      bawaan DEMO_DEFAULT -- usia 30, jenis kelamin laki-laki -- dan
+ *      angkanya lahir dari orang yang tidak ada.
+ *
+ * Yang ketiga adalah asumsi yang ditampilkan sebagai data. Fungsi ini tidak
+ * menghapusnya (sebaran zona tetap perlu suatu angka), tetapi menolak
+ * menyembunyikannya: pemanggilnya menerima asalnya dan wajib mengatakannya.
+ */
+export function hrMaksimum(
+  sesi: readonly { maxHr?: number }[],
+  demoTersimpan: { age?: number; sex?: 'M' | 'F' },
+): HrMaksimum {
+  const terukur = sesi.reduce((a, w) => Math.max(a, w.maxHr ?? 0), 0)
+
+  const usiaTersimpan = Number.isFinite(demoTersimpan.age) && (demoTersimpan.age as number) > 0
+    ? (demoTersimpan.age as number)
+    : null
+  const usia = usiaTersimpan ?? 30
+  const jk = demoTersimpan.sex === 'M' || demoTersimpan.sex === 'F' ? demoTersimpan.sex : 'M'
+  const rumus = hrMaxFromAge(usia, jk)
+
+  // Denyut yang PERNAH TERCATAT lebih dapat dipercaya daripada rumus mana pun,
+  // jadi ia menang bila lebih tinggi -- dan ketika ia menang, angkanya memang
+  // terukur, bukan diperkirakan.
+  if (terukur > rumus) return { nilai: terukur, asal: 'terukur', usiaDipakai: null }
+  return {
+    nilai: rumus,
+    asal: usiaTersimpan === null ? 'asumsi-usia' : 'perkiraan-usia',
+    usiaDipakai: usia,
+  }
+}
+
 // ── Peringatan detak jantung ────────────────────────────────────────────────
 
 export function parseHrNotifications(text: string): HrNotification[] {
