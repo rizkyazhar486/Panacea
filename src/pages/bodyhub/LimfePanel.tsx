@@ -7,13 +7,6 @@ import {
 
 const Limfe3D = lazy(() => import('./Limfe3D').then((m) => ({ default: m.Limfe3D })))
 
-// Panel limfe: model DAN daftar, keduanya setara.
-//
-// 3D tidak bisa dipakai dengan papan tombol, dan tidak semua orang bisa
-// menunjuk benda sekecil satu nodus. Daftar di bawah karena itu bukan
-// pelengkap: setiap stasiun bisa dipilih dari sana, dan pilihan dari mana pun
-// menyalakan stasiun yang sama.
-
 export function LimfePanel() {
   const [terpilih, setTerpilih] = useState<string | null>(null)
   const [wilayah, setWilayah] = useState<WilayahLimfe>('head-neck')
@@ -36,7 +29,7 @@ export function LimfePanel() {
         </Prosa>
       </div>
 
-      <Suspense fallback={<div className="h-[340px] w-full rounded-2xl bg-[var(--pelatih-alas-1,rgba(15,23,42,0.04))]" />}>
+      <Suspense fallback={<div role="status" aria-label="Loading lymphatic anatomy" className="h-[340px] w-full rounded-2xl bg-[var(--pelatih-alas-1,rgba(15,23,42,0.04))]" />}>
         <Limfe3D terpilih={terpilih} onPilih={(id) => setTerpilih(id)} />
       </Suspense>
 
@@ -45,13 +38,11 @@ export function LimfePanel() {
         a single node is a few millimetres across on a whole body, and would otherwise be invisible.
       </p>
 
-      {/* Pemilih wilayah, lalu daftar. Setiap stasiun bisa dicapai tanpa
-          menyentuh model sama sekali. */}
       <div role="group" aria-label="Body regions" className="flex flex-wrap gap-1.5">
         {WILAYAH_LIMFE.map((w) => (
           <button key={w.id} type="button" aria-pressed={wilayah === w.id}
             onClick={() => setWilayah(w.id)}
-            className={`rounded-full px-3 py-1.5 text-[11px] font-bold transition ${
+            className={`min-h-11 rounded-full px-3 py-2 text-[11px] font-bold transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#00BF63] focus-visible:ring-offset-2 ${
               wilayah === w.id
                 ? 'bg-[#00BF63] text-white'
                 : 'bg-[var(--pelatih-alas-1,rgba(15,23,42,0.04))] text-ink dark:text-white'
@@ -65,7 +56,7 @@ export function LimfePanel() {
         {daftar.map((s) => (
           <button key={s.id} type="button" aria-pressed={terpilih === s.id}
             onClick={() => pilih(s.id)}
-            className={`rounded-xl px-3 py-2 text-left text-[12px] font-bold leading-tight transition ${
+            className={`min-h-11 rounded-xl px-3 py-2 text-left text-[12px] font-bold leading-tight transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#00BF63] focus-visible:ring-offset-2 ${
               terpilih === s.id
                 ? 'bg-[#00BF63] text-white'
                 : 'bg-[var(--pelatih-alas-1,rgba(15,23,42,0.04))] text-ink dark:text-white'
@@ -98,8 +89,6 @@ export function LimfePanel() {
         )}
       </div>
 
-      {/* Prosa hanya melipat anak berupa string, jadi tiap paragraf dikirim
-          utuh sebagai string -- juga supaya tidak ada <p> di dalam <p>. */}
       <Prosa kelas="text-[11px] leading-relaxed text-neutral-500" baris={2}>
         {'What this atlas does not carry: there are no lymphatic vessels in this model — no thoracic duct, no cisterna chyli, no lymph trunks. Only the nodes and the lymphoid organs were modelled. Nothing here has been mirrored, substituted or drawn in to cover that gap: the connections between stations exist in the text, not in the geometry. Two labelled stations in the source file, "Cubital nodes" and "Inferior deep lateral cervical nodes", carry no geometry of their own, so they are shown through the named nodes that sit inside them.'}
       </Prosa>
@@ -107,7 +96,6 @@ export function LimfePanel() {
       <Prosa kelas="text-[11px] leading-relaxed text-neutral-500" baris={2}>
         {'Limits: these are standard gross-anatomy drainage relationships for orientation — which region of the body drains to which group of nodes in an adult. This is not staging, says nothing about the spread of disease or about prognosis, and concludes nothing about any individual. Lymphatic drainage varies between people and has many alternative routes, and node groups are conventional names for clusters that are inconstant in number and position.'}
       </Prosa>
-
     </div>
   )
 }
