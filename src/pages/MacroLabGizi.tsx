@@ -6,7 +6,7 @@ import { KolomAngka } from '../components/KolomAngka'
 import { IconLeaf } from '../components/icons'
 import { useVitalField } from '../lib/useVitals'
 import { KolomVitalTerikat } from '../components/KolomVital'
-import { getDemo } from '../lib/profile'
+import { getDemo, getDemoTersimpan } from '../lib/profile'
 import { hitungTdee, TUJUAN_GIZI, AKTIVITAS_GIZI, PROTEIN_PER_KG, type TujuanGizi, type TingkatAktivitas } from '../lib/tdee'
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -32,11 +32,25 @@ import { hitungTdee, TUJUAN_GIZI, AKTIVITAS_GIZI, PROTEIN_PER_KG, type TujuanGiz
 
 export function MacroLabGizi() {
   const demo = useMemo(() => getDemo(), [])
+  // Halaman ini adalah kalkulator dengan kolom yang terlihat dan bisa disunting,
+  // jadi nilai awalnya boleh ada. Yang tidak boleh adalah DIAM: tanpa penanda,
+  // 70 kg / 170 cm / 30 tahun dari DEMO_DEFAULT terbaca persis seperti angka
+  // yang tersimpan, dan sasaran kalori di bawahnya terbaca sebagai milik
+  // pembacanya.
+  const tersimpan = useMemo(() => getDemoTersimpan(), [])
   const ikatBerat = useVitalField('weightKg', demo.weightKg || 70)
   const ikatTinggi = useVitalField('heightCm', demo.heightCm || 170)
   const [berat] = ikatBerat
   const [tinggi] = ikatTinggi
   const [umur, setAge] = useState<number | undefined>(demo.age || 30)
+  const [, , beratDariPerangkat] = ikatBerat
+  const [, , tinggiDariPerangkat] = ikatTinggi
+  const bawaan = [
+    !beratDariPerangkat && !(tersimpan.weightKg && tersimpan.weightKg > 0) ? `weight ${berat} kg` : null,
+    !tinggiDariPerangkat && !(tersimpan.heightCm && tersimpan.heightCm > 0) ? `height ${tinggi} cm` : null,
+    !(tersimpan.age && tersimpan.age > 0) ? `age ${umur}` : null,
+    tersimpan.sex !== 'F' && tersimpan.sex !== 'M' ? `sex ${demo.sex === 'F' ? 'female' : 'male'}` : null,
+  ].filter((x): x is string => x !== null)
   const [tujuan, setTujuan] = useState<TujuanGizi>('rawat')
   const [aktivitas, setAktivitas] = useState<TingkatAktivitas>('sedang')
   const [makanPerHari, setMakanPerHari] = useState<number | undefined>(3)
@@ -66,7 +80,7 @@ export function MacroLabGizi() {
       <SectionTitle
         icon={<IconLeaf />}
         title="Macro Lab"
-        subtitle="Macronutrient targets and meal structure, from your own body mass"
+        subtitle="Macronutrient targets and meal structure, from the body mass you enter"
       />
 
       <Card>
@@ -80,6 +94,12 @@ export function MacroLabGizi() {
           Weight and height fill in from your device once synced; press Enter after changing one so it
           is used across the whole app.
         </p>
+        {bawaan.length > 0 && (
+          <p className="mt-2 rounded-xl border border-amber-400/30 bg-amber-400/[.07] p-2 text-[10.5px] leading-relaxed text-amber-700 dark:text-amber-300">
+            Not yours yet: {bawaan.join(', ')}. Those are neutral starting figures, not anything you entered or any
+            device measured — every number below is arithmetic on them until you replace them.
+          </p>
+        )}
 
         <div className="mt-3 text-[11px] font-black uppercase tracking-wide text-neutral-500">Goal</div>
         <div className="mt-2 grid grid-cols-3 gap-1.5">
