@@ -79,10 +79,25 @@ function band(total: number): { label: string; tone: 'brand' | 'low' | 'critical
 }
 
 export function BradenScale() {
-  const [vals, setVals] = useState<Record<string, number>>({ sensory: 4, moisture: 4, activity: 4, mobility: 4, nutrition: 4, friction: 3 })
+  // Keenam subskala ini dahulu terbuka pada nilai TERBAIKNYA masing-masing --
+  // total 23 dari 23, "no risk", dengan kalimat siap salin. Braden dibuat
+  // justru untuk menemukan yang berisiko, dan skor 23 adalah kesimpulan
+  // paling menenangkan yang bisa dihasilkannya.
+  //
+  // Bedanya dengan kotak centang yang dibiarkan kosong: kotak kosong berarti
+  // "kriteria itu tidak ada", sebuah jawaban. Sedangkan "Nutrition:
+  // Excellent" dan "Sensory: No impairment" adalah TEMUAN POSITIF -- enam
+  // penilaian yang dinyatakan tentang seorang pasien sebelum ada yang
+  // menilainya. Karena itu keenamnya kini dimulai kosong.
+  const [vals, setVals] = useState<Record<string, number | null>>(
+    Object.fromEntries(SUBSCALES.map((sub) => [sub.key, null])),
+  )
+
+  const belum = SUBSCALES.filter((sub) => vals[sub.key] == null)
+  const lengkap = belum.length === 0
 
   const total = SUBSCALES.reduce((s, sub) => s + (vals[sub.key] ?? 0), 0)
-  const result = band(total)
+  const result = lengkap ? band(total) : null
 
   return (
     <div className="mx-auto max-w-2xl space-y-5 pb-24">
@@ -94,7 +109,12 @@ export function BradenScale() {
       <Card className="!p-5 space-y-3">
         {SUBSCALES.map((sub) => (
           <Field key={sub.key} label={sub.label}>
-            <select className={inputClass} value={vals[sub.key]} onChange={(e) => setVals((v) => ({ ...v, [sub.key]: Number(e.target.value) }))}>
+            <select
+              className={inputClass}
+              value={vals[sub.key] ?? ''}
+              onChange={(e) => setVals((v) => ({ ...v, [sub.key]: e.target.value === '' ? null : Number(e.target.value) }))}
+            >
+              <option value="">Not assessed</option>
               {sub.options.map((o) => (
                 <option key={o.pts} value={o.pts}>{o.label} ({o.pts})</option>
               ))}
@@ -105,12 +125,23 @@ export function BradenScale() {
 
       <Card className="!p-5">
         <div className="text-xs font-black uppercase tracking-wide text-neutral-500">Total Braden Score</div>
-        <div className="mt-2 flex items-center gap-3">
-          <span className="text-3xl font-black text-brand-dark">{total} / 23</span>
-          <Badge tone={result.tone}>{result.label}</Badge>
-        </div>
-        <p className="mt-2 text-[12px] text-neutral-500">{result.rec}</p>
-        <CopyNote text={`Braden ${total}/23 — ${result.label.toLowerCase()}: ${result.rec} [Bergstrom & Braden 1987]`} />
+        {lengkap && result !== null ? (
+          <>
+            <div className="mt-2 flex items-center gap-3">
+              <span className="text-3xl font-black text-brand-dark">{total} / 23</span>
+              <Badge tone={result.tone}>{result.label}</Badge>
+            </div>
+            <p className="mt-2 text-[12px] text-neutral-500">{result.rec}</p>
+            <CopyNote text={`Braden ${total}/23 — ${result.label.toLowerCase()}: ${result.rec} [Bergstrom & Braden 1987]`} />
+          </>
+        ) : (
+          <p className="mt-2 text-[12.5px] leading-relaxed text-neutral-600 dark:text-neutral-300">
+            Not scored yet. Still to assess: {belum.map((sub) => sub.label.toLowerCase()).join(', ')}.
+            {' '}Each subscale is a positive finding about a patient, not a box that means something by being left
+            alone — starting every one at its best value would total 23 of 23 and read as no risk, which is the most
+            reassuring conclusion this scale can produce.
+          </p>
+        )}
       </Card>
 
       <div className="rounded-2xl border border-neutral-100 bg-white p-4 text-center text-[11px] leading-relaxed text-neutral-500 dark:border-white/10 dark:bg-white/5">
