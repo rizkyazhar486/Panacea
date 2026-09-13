@@ -60,9 +60,24 @@ jobs:
           cat /tmp/panacea-organ-preview.log
           exit 1
 
-      # Every 3D surface runs against one production build/preview. The browser
-      # gates deliberately execute sequentially because SwiftShader becomes
-      # nondeterministic under concurrent heavy WebGL scenes.
+      # Kesepuluh gerbang dijalankan terhadap SATU build dan SATU preview.
+      #
+      # qa:bergerak dan qa:kendali ditambahkan belakangan, dan ketiadaan
+      # keduanya adalah PERSIS lubang yang diperingatkan komentar di bawah:
+      # qa:bergerak sudah ada di repositori, lengkap dengan gerbangnya, tetapi
+      # tidak terdaftar di alur kerja mana pun -- jadi ia tidak pernah menjaga
+      # main sejak hari ia digabungkan. qa:kendali menutup selisih antara
+      # "pernah diperiksa dengan tangan sekali" dan "dijaga".
+      #
+      # Sebelumnya hanya qa:organ-3d yang berjalan di CI, sementara tujuh gerbang
+      # lain hanya ada di mesin pengembang -- artinya mereka tidak menjaga main
+      # sama sekali. Panel organ gagal untuk sembilan model justru karena ia
+      # satu-satunya permukaan 3D tanpa gerbang; membiarkan tujuh gerbang tidak
+      # pernah berjalan adalah bentuk lain dari lubang yang sama.
+      #
+      # Dijalankan berurutan, bukan paralel: WebGL di sini memakai SwiftShader,
+      # dan beberapa adegan sekaligus saling berebut CPU sampai salah satunya
+      # habis waktu karena kelambatan, bukan karena cacat.
       - name: Prove every 3D panel renders
         env:
           ORGAN3D_QA_URL: http://127.0.0.1:4173/#/body-explorer
