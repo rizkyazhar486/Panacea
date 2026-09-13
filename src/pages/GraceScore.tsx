@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { Prosa } from '../components/Prosa'
 import { Card, SectionTitle, Field, inputClass, Badge } from '../components/ui'
 import { IconHeart } from '../components/icons'
-import { getDemo } from '../lib/profile'
+import { getDemoTersimpan } from '../lib/profile'
 import { CopyNote } from '../components/CopyNote'
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -62,19 +62,36 @@ function band(score: number): { label: string; tone: 'brand' | 'low' | 'critical
 }
 
 export function GraceScore() {
-  const [age, setAge] = useState(() => getDemo().age || 60)
-  const [hr, setHr] = useState(75)
-  const [sbp, setSbp] = useState(130)
-  const [creat, setCreat] = useState(1.0)
+  // GRACE menentukan waktu strategi invasif pada sindrom koroner akut.
+  // Halaman ini dahulu terbuka pada usia 60 (atau 30 dari getDemo()), nadi
+  // 75, TD 130 dan kreatinin 1,0 -- empat pengukuran yang tidak pernah
+  // diambil -- lalu mencetak skor, pita risiko, angka kematian di rumah
+  // sakit, dan kalimat siap salin untuk pasien yang tidak ada.
+  //
+  // Killip I, tanpa henti jantung, tanpa deviasi ST dan tanpa penanda adalah
+  // jawaban yang SAH dan bernilai nol; keempatnya tetap seperti semula.
+  // Yang dihapus hanya keempat pengukurannya.
+  const tersimpan = getDemoTersimpan()
+  const [age, setAge] = useState(() => (tersimpan.age && tersimpan.age > 0 ? tersimpan.age : 0))
+  const [hr, setHr] = useState(0)
+  const [sbp, setSbp] = useState(0)
+  const [creat, setCreat] = useState(0)
   const [killip, setKillip] = useState(0)
   const [arrest, setArrest] = useState(false)
   const [stDev, setStDev] = useState(false)
   const [markers, setMarkers] = useState(false)
 
+  const belum: string[] = []
+  if (!(age > 0)) belum.push('age')
+  if (!(hr > 0)) belum.push('heart rate')
+  if (!(sbp > 0)) belum.push('systolic BP')
+  if (!(creat > 0)) belum.push('creatinine')
+  const lengkap = belum.length === 0
+
   const score =
     agePts(age) + hrPts(hr) + sbpPts(sbp) + creatPts(creat) + KILLIP_PTS[killip] +
     (arrest ? 39 : 0) + (stDev ? 28 : 0) + (markers ? 14 : 0)
-  const result = band(score)
+  const result = lengkap ? band(score) : null
 
   return (
     <div className="mx-auto max-w-2xl space-y-5 pb-24">
@@ -121,15 +138,26 @@ export function GraceScore() {
 
       <Card className="!p-5">
         <div className="text-xs font-black uppercase tracking-wide text-neutral-500">GRACE Score</div>
-        <div className="mt-2 flex items-center gap-3">
-          <span className="text-3xl font-black text-brand-dark">{score}</span>
-          <Badge tone={result.tone}>{result.label}</Badge>
-        </div>
-        <p className="mt-2 text-[12px] text-neutral-500">
-          {result.mortality}. Categories: ≤108 low · 109-140 intermediate · {'>'}140 high. In NSTE-ACS,
-          higher GRACE risk supports an earlier invasive strategy per ESC guidance.
-        </p>
-        <CopyNote text={`GRACE ${score} (age ${age}, HR ${hr}, SBP ${sbp}, Cr ${creat}, Killip ${['I', 'II', 'III', 'IV'][killip]}${arrest ? ', cardiac arrest at admission' : ''}${stDev ? ', ST deviation' : ''}${markers ? ', elevated biomarkers' : ''}) — ${result.label.toLowerCase()}, ${result.mortality} [Granger 2003]`} />
+        {lengkap && result !== null ? (
+          <>
+            <div className="mt-2 flex items-center gap-3">
+              <span className="text-3xl font-black text-brand-dark">{score}</span>
+              <Badge tone={result.tone}>{result.label}</Badge>
+            </div>
+            <p className="mt-2 text-[12px] text-neutral-500">
+              {result.mortality}. Categories: ≤108 low · 109-140 intermediate · {'>'}140 high. In NSTE-ACS,
+              higher GRACE risk supports an earlier invasive strategy per ESC guidance.
+            </p>
+            <CopyNote text={`GRACE ${score} (age ${age}, HR ${hr}, SBP ${sbp}, Cr ${creat}, Killip ${['I', 'II', 'III', 'IV'][killip]}${arrest ? ', cardiac arrest at admission' : ''}${stDev ? ', ST deviation' : ''}${markers ? ', elevated biomarkers' : ''}) — ${result.label.toLowerCase()}, ${result.mortality} [Granger 2003]`} />
+          </>
+        ) : (
+          <p className="mt-2 text-[12.5px] leading-relaxed text-neutral-600 dark:text-neutral-300">
+            No score yet. Still needed: {belum.join(', ')}.
+            {' '}Killip I with no arrest, no ST deviation and no raised biomarkers is a real answer worth zero points
+            and stays as it is — but the four measurements are not answers until someone takes them, and this score
+            can move the timing of an invasive strategy.
+          </p>
+        )}
       </Card>
 
       <div className="rounded-2xl border border-neutral-100 bg-white p-4 text-center text-[11px] leading-relaxed text-neutral-500 dark:border-white/10 dark:bg-white/5">
