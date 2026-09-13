@@ -20,6 +20,7 @@ import { hrMaxFromAge } from '../lib/workoutImport'
 // explains it, 4) what exercise / plan should I choose.
 const WorkoutHistory = lazy(() => import('./WorkoutHistory').then((m) => ({ default: m.WorkoutHistory })))
 const OrganizerLatihan = lazy(() => import('./OrganizerLatihan').then((m) => ({ default: m.OrganizerLatihan })))
+const PelatihAsupan = lazy(() => import('./PelatihAsupan').then((m) => ({ default: m.PelatihAsupan })))
 const GpsTracker = lazy(() => import('../components/GpsTracker').then((m) => ({ default: m.GpsTracker })))
 const AthleteScience = lazy(() => import('./AthleteScience').then((m) => ({ default: m.AthleteScience })))
 const AnalisisPro = lazy(() => import('./AnalisisPro').then((m) => ({ default: m.AnalisisPro })))
@@ -48,6 +49,8 @@ const TABS: TabDef[] = [
     ringkas: 'Decision first: next session, recovery context, recent history and targets' },
   { id: 'organizer', label: 'Organizer', emoji: '🗂️', komponen: OrganizerLatihan,
     ringkas: 'Weekly calendar for push, pull, legs and abs, scheduled around the runs already recorded' },
+  { id: 'asupan-pelatih', label: 'Coach intake', emoji: '📝', komponen: PelatihAsupan,
+    ringkas: 'Collects age, height, weight, goal, equipment, injuries and restrictions first, and refuses to print a plan until they are answered' },
   { id: 'gps', label: 'GPS', emoji: '📍', komponen: GpsTracker,
     ringkas: 'Live device GPS with fix quality control, auto-pause, moving pace, kilometre splits and privacy-first sharing' },
   { id: 'athlete-science', label: 'Athlete Science', emoji: '🧬', komponen: AthleteScience,
