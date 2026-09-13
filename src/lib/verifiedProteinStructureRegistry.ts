@@ -1,4 +1,4 @@
-export type ExperimentalStructureMethod = 'X-RAY DIFFRACTION' | 'CRYO-ELECTRON MICROSCOPY' | 'SOLUTION NMR'
+export type ExperimentalStructureMethod = 'X-RAY DIFFRACTION' | 'ELECTRON MICROSCOPY' | 'SOLUTION NMR'
 
 export interface VerifiedProteinStructureRecord {
   id: string
@@ -61,6 +61,44 @@ export const VERIFIED_PROTEIN_STRUCTURES: readonly VerifiedProteinStructureRecor
     clinicalInferenceAllowed: false,
     molecularDynamicsClaimAllowed: false,
     caveat: 'This crystallographic receptor state is not receptor-density imaging, patient physiology, a complete signaling ensemble, or a one-receptor explanation of schizophrenia or antipsychotic response.',
+  },
+  {
+    id: 'snca-wild-type-fibril-type-1-9rb7',
+    pdbId: '9RB7',
+    title: 'Wild-type alpha-synuclein fibril - Type 1',
+    genes: ['SNCA'],
+    proteins: ['Alpha-synuclein fibril'],
+    ligands: [],
+    organism: 'Homo sapiens',
+    method: 'ELECTRON MICROSCOPY',
+    resolutionAngstrom: 3.45,
+    released: '2026-03-11',
+    rcsbUrl: 'https://www.rcsb.org/structure/9RB7',
+    pdbDoi: 'https://doi.org/10.2210/pdb9RB7/pdb',
+    evidenceState: 'experimental-atomic-coordinates',
+    coordinateUse: 'allowed-with-provenance',
+    clinicalInferenceAllowed: false,
+    molecularDynamicsClaimAllowed: false,
+    caveat: 'This entry is one experimentally resolved fibril polymorph. It must not be presented as the soluble monomer, every oligomer, every fibril strain, or a complete Parkinson disease mechanism.',
+  },
+  {
+    id: 'lrrk2-c-terminal-6vno',
+    pdbId: '6VNO',
+    title: 'C-terminal half of Parkinson disease-linked LRRK2',
+    genes: ['LRRK2'],
+    proteins: ['Leucine-rich repeat serine/threonine-protein kinase 2 C-terminal construct'],
+    ligands: [],
+    organism: 'Homo sapiens',
+    method: 'ELECTRON MICROSCOPY',
+    resolutionAngstrom: 3.5,
+    released: '2020-08-26',
+    rcsbUrl: 'https://www.rcsb.org/structure/6VNO',
+    pdbDoi: 'https://doi.org/10.2210/pdb6VNO/pdb',
+    evidenceState: 'experimental-atomic-coordinates',
+    coordinateUse: 'allowed-with-provenance',
+    clinicalInferenceAllowed: false,
+    molecularDynamicsClaimAllowed: false,
+    caveat: 'This is a C-terminal LRRK2 construct, not a complete full-length state atlas. Missing regions, nucleotide state, membrane context and conformational heterogeneity must remain explicit.',
   },
 ] as const
 
