@@ -47,14 +47,23 @@ function classify(score: number): { label: string; tone: 'brand' | 'low' | 'crit
 }
 
 export function ChildPughScore() {
-  const [bilirubin, setBilirubin] = useState(1.5)
-  const [albumin, setAlbumin] = useState(3.2)
-  const [inr, setInr] = useState(1.4)
+  // Tiga nilai lab dimulai kosong. Asites dan ensefalopati TIDAK: keduanya
+  // berskala 1-3 dengan 1 berarti "tidak ada", yaitu jawaban klinis yang sah
+  // bernilai satu poin, bukan kekosongan.
+  const [bilirubin, setBilirubin] = useState(0)
+  const [albumin, setAlbumin] = useState(0)
+  const [inr, setInr] = useState(0)
   const [ascites, setAscites] = useState<Level>(1)
   const [enceph, setEnceph] = useState<Level>(1)
 
+  const belum: string[] = []
+  if (!(bilirubin > 0)) belum.push('total bilirubin')
+  if (!(albumin > 0)) belum.push('albumin')
+  if (!(inr > 0)) belum.push('INR')
+  const lengkap = belum.length === 0
+
   const pts = bilirubinPts(bilirubin) + albuminPts(albumin) + inrPts(inr) + ascites + enceph
-  const cls = classify(pts)
+  const cls = lengkap ? classify(pts) : null
 
   return (
     <div className="mx-auto max-w-2xl space-y-5 pb-24">
@@ -95,14 +104,25 @@ export function ChildPughScore() {
 
       <Card className="!p-5">
         <div className="text-xs font-black uppercase tracking-wide text-neutral-500">Child-Pugh Class</div>
-        <div className="mt-2 flex items-center gap-3">
-          <span className="text-3xl font-black text-brand-dark">{pts} pts</span>
-          <Badge tone={cls.tone}>{cls.label}</Badge>
-        </div>
-        <p className="mt-2 text-[12px] text-neutral-500">Estimated {cls.survival} (population-level estimate, not individual prognosis).</p>
-        <CopyNote text={`Child-Pugh ${pts} points, ${cls.label} (bilirubin ${bilirubin} mg/dL, albumin ${albumin} g/dL, INR ${inr}, ascites ${ascites}pt, encephalopathy ${enceph}pt) — est. ${cls.survival} [Pugh 1973]`} />
+        {lengkap && cls !== null ? (
+          <>
+            <div className="mt-2 flex items-center gap-3">
+              <span className="text-3xl font-black text-brand-dark">{pts} pts</span>
+              <Badge tone={cls.tone}>{cls.label}</Badge>
+            </div>
+            <p className="mt-2 text-[12px] text-neutral-500">Estimated {cls.survival} (population-level estimate, not individual prognosis).</p>
+            <CopyNote text={`Child-Pugh ${pts} points, ${cls.label} (bilirubin ${bilirubin} mg/dL, albumin ${albumin} g/dL, INR ${inr}, ascites ${ascites}pt, encephalopathy ${enceph}pt) — est. ${cls.survival} [Pugh 1973]`} />
+          </>
+        ) : (
+          <p className="mt-2 text-[12.5px] leading-relaxed text-neutral-600 dark:text-neutral-300">
+            No class yet. Still needed: {belum.join(', ')}.
+            {' '}Ascites and encephalopathy are already answered — "none" is a real finding worth one point each —
+            but the three laboratory values are not answers until someone draws them.
+          </p>
+        )}
       </Card>
 
+      {lengkap && (
       <ScoreTrend
         storageKey="pmd_childpugh_trend_v1"
         scoreName="Child-Pugh"
@@ -110,6 +130,7 @@ export function ChildPughScore() {
         maxScore={15}
         detail={`Bili ${bilirubin}, Alb ${albumin}, INR ${inr}, ascites ${ascites}pt, enceph ${enceph}pt`}
       />
+      )}
 
       <div className="rounded-2xl border border-neutral-100 bg-white p-4 text-center text-[11px] leading-relaxed text-neutral-500 dark:border-white/10 dark:bg-white/5">
         Pugh, R.N.H., et al. (1973). Transection of the oesophagus for bleeding oesophageal varices.
