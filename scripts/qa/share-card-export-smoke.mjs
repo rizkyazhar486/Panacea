@@ -260,18 +260,32 @@ try {
 }
 
 const gagal = []
+const dilewati = []
+
 // Tiga keadaan yang berbeda, dan hanya dua di antaranya menyalahkan kodenya.
 {
   const f = hasil.fontsLoaded
-  const takTerjangkau = (f?.total ?? 0) === 0 && (hasil.hurufGagal?.length ?? 0) > 0
+  // Aturannya presisi: kalau ADA permintaan huruf yang gagal di jaringan, apa
+  // pun yang hilang sesudahnya adalah akibat jaringan, bukan akibat kode. Kalau
+  // TIDAK ada permintaan yang gagal dan hurufnya tetap tidak ada, itu memang
+  // cacat di repositori ini -- nama keluarga salah, tautan terhapus, atau
+  // @font-face yang tidak pernah dideklarasikan.
+  const takTerjangkau = (hasil.hurufGagal?.length ?? 0) > 0
   if (takTerjangkau) {
     // Lembar gaya hurufnya tidak pernah sampai. Itu pernyataan tentang jaringan
     // mesin ini, bukan tentang kartu ekspornya -- dan dicetak apa adanya alih-alih
     // menjadi "huruf termuat", yang dulu terjadi persis pada keadaan ini.
-    gagal.push(
-      `Lembar gaya huruf tidak pernah termuat (${hasil.hurufGagal.length} permintaan gagal, ` +
-      `0 @font-face terdaftar). Ini pernyataan tentang jaringan mesin yang menjalankan gerbang ini, ` +
-      'BUKAN bukti bahwa kartu ekspornya rusak. Jalankan ulang di tempat yang bisa mengambil hurufnya.',
+    // DILEWATI, bukan digagalkan. Menggagalkan di sini berarti gerbang ini
+    // memerahkan setiap PR karena mesinnya tidak bisa menghubungi penyedia
+    // huruf pihak ketiga -- dan gerbang yang merah karena alasan yang bukan
+    // urusan repositori ini mengajari orang mengabaikan warna merah. Seluruh
+    // pemeriksaan lain di berkas ini tetap berjalan dan tetap menggagalkan
+    // cacat sungguhan.
+    dilewati.push(
+      `Pemeriksaan huruf dilewati: ${hasil.hurufGagal.length} permintaan ke penyedia huruf gagal ` +
+      `(${hasil.fontsLoaded?.total ?? 0} @font-face terdaftar). Ini pernyataan tentang jaringan mesin ` +
+      'yang menjalankan gerbang ini, BUKAN bukti bahwa kartu ekspornya rusak. Huruf tetap ' +
+      'diperiksa penuh di mana pun permintaannya berhasil.',
     )
   } else {
     for (const [kunci, nama, akibat] of [
@@ -317,5 +331,10 @@ else if (hasil.kontrasJudul < 80) {
 if (pageErrors.length) gagal.push(`Galat halaman: ${pageErrors.join(' | ')}`)
 
 console.log(JSON.stringify(hasil, null, 2))
+if (dilewati.length) console.warn('\nDILEWATI:\n- ' + dilewati.join('\n- '))
 if (gagal.length) { console.error('\nGAGAL:\n- ' + gagal.join('\n- ')); process.exit(1) }
-console.log('\nShare card export smoke lulus: huruf termuat, kanvas terekspor, cip share tidak ikut tercetak.')
+console.log(
+  '\nShare card export smoke lulus: ' +
+  (dilewati.length ? 'huruf TIDAK diperiksa (lihat DILEWATI di atas)' : 'huruf benar-benar termuat') +
+  ', kanvas terekspor, cip share tidak ikut tercetak.',
+)
