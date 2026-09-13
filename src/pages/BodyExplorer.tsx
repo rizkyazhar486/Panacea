@@ -22,6 +22,7 @@ const AsamBasaPanel = lazy(() => import('./bodyhub/AsamBasaPanel').then((m) => (
 const FarmakodinamikPanel = lazy(() => import('./bodyhub/FarmakodinamikPanel').then((m) => ({ default: m.FarmakodinamikPanel })))
 const DialisisPanel = lazy(() => import('./bodyhub/DialisisPanel').then((m) => ({ default: m.DialisisPanel })))
 const GasAlveolarPanel = lazy(() => import('./bodyhub/GasAlveolarPanel').then((m) => ({ default: m.GasAlveolarPanel })))
+const DifusiPanel = lazy(() => import('./bodyhub/DifusiPanel').then((m) => ({ default: m.DifusiPanel })))
 const WilayahAbdomenPanel = lazy(() => import('./bodyhub/WilayahAbdomenPanel').then((m) => ({ default: m.WilayahAbdomenPanel })))
 const KerangkaPanel = lazy(() => import('./bodyhub/KerangkaPanel').then((m) => ({ default: m.KerangkaPanel })))
 const ArteriPanel = lazy(() => import('./bodyhub/ArteriPanel').then((m) => ({ default: m.ArteriPanel })))
@@ -103,7 +104,7 @@ function Chip({
 // sama-sama menyorot struktur pada figur yang itu-itu juga. Itulah maksud
 // "satu simulasi tubuh yang utuh" — bukan enam halaman yang saling menyebut,
 // melainkan satu tubuh yang ditanyai dari enam sudut.
-type PanelTab = 'hemodinamik' | 'nefron' | 'asam-basa' | 'farmakodinamik' | 'dialisis' | 'gas-alveolar' | 'wilayah-abdomen' | 'kerangka' | 'arteri' | 'limfe' | 'kelenjar-saluran' | 'ventilasi' | 'ventilasi-membran' | 'lokalisasi' | 'tuas-sendi' | 'layers' | 'muscles' | 'workout-sim' | 'biomekanika' | 'organs' | 'physiology' | 'simulator' | 'cardio' | 'spesialisasi' | 'molekul' | 'genomik' | 'sel' | 'bedah' | 'cari' | 'presisi' | 'mesin' | 'drugs' | 'diseases' | 'reference'
+type PanelTab = 'hemodinamik' | 'nefron' | 'asam-basa' | 'farmakodinamik' | 'dialisis' | 'gas-alveolar' | 'difusi' | 'wilayah-abdomen' | 'kerangka' | 'arteri' | 'limfe' | 'kelenjar-saluran' | 'ventilasi' | 'ventilasi-membran' | 'lokalisasi' | 'tuas-sendi' | 'layers' | 'muscles' | 'workout-sim' | 'biomekanika' | 'organs' | 'physiology' | 'simulator' | 'cardio' | 'spesialisasi' | 'molekul' | 'genomik' | 'sel' | 'bedah' | 'cari' | 'presisi' | 'mesin' | 'drugs' | 'diseases' | 'reference'
 
 import { kelompokUntuk, kelompokTerpakai, urutkanMenurutKelompok } from '../lib/bodyExplorerTabGroups'
 
@@ -125,6 +126,7 @@ const PANEL_TABS: Array<{ key: PanelTab; label: string }> = [
   { key: 'farmakodinamik', label: 'Dose–response' },
   { key: 'dialisis', label: 'Dialysis kinetics' },
   { key: 'gas-alveolar', label: 'Alveolar gas' },
+  { key: 'difusi', label: 'Diffusion limits' },
   { key: 'wilayah-abdomen', label: 'Abdominal regions' },
   { key: 'kerangka', label: 'Skeleton' },
   { key: 'arteri', label: 'Arterial territories' },
@@ -1004,6 +1006,12 @@ export function BodyExplorer() {
             {panelTab === 'gas-alveolar' && (
               <Suspense fallback={<p className="text-sm text-neutral-500">Loading the alveolar gas equation…</p>}>
                 <GasAlveolarPanel />
+              </Suspense>
+            )}
+
+            {panelTab === 'difusi' && (
+              <Suspense fallback={<p className="text-sm text-neutral-500">Loading diffusion limits…</p>}>
+                <DifusiPanel />
               </Suspense>
             )}
 
