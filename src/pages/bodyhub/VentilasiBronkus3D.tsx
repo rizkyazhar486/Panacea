@@ -69,6 +69,7 @@ export function VentilasiBronkus3D({
     renderer.setClearColor(0x000000, 0)
     renderer.outputColorSpace = THREE.SRGBColorSpace
     renderer.domElement.dataset.ventilasi3d = 'true'
+    renderer.domElement.dataset.animasiAktif = 'false'
     wadah.appendChild(renderer.domElement)
 
     scene.add(new THREE.AmbientLight(0xffffff, 0.9))
@@ -99,12 +100,14 @@ export function VentilasiBronkus3D({
     const perSegmen = new Map<string, THREE.MeshStandardMaterial[]>()
     let grup: THREE.Group | null = null
     let keadaan: KeadaanVentilasi = mulaiVentilasi(SEGMEN_VENTILASI)
+    let dibuang = false
 
     // Dekoder meshopt, pemulihan nama asli dan penolakan yang terlihat semuanya
     // ditangani `muatAtlas`; lihat komentarnya untuk kelima kegagalan sunyi
     // yang pernah terjadi saat setiap pemanggil mengurusnya sendiri.
     muatAtlas(BERKAS_BRONKUS.replace(/^anatomy\//, ''))
       .then(({ scene: dimuat, namaAsli }) => {
+        if (dibuang) return
         grup = dimuat
         const kotak = new THREE.Box3()
 
@@ -118,7 +121,12 @@ export function VentilasiBronkus3D({
             m.visible = false
             return
           }
-          const bahan = (m.material as THREE.MeshStandardMaterial).clone()
+          const sumber = m.material as THREE.Material | THREE.Material[]
+          if (Array.isArray(sumber) || !(sumber as THREE.MeshStandardMaterial).isMeshStandardMaterial) {
+            m.visible = false
+            return
+          }
+          const bahan = (sumber as THREE.MeshStandardMaterial).clone()
           bahan.color = KOSONG.clone()
           bahan.emissive = new THREE.Color(0, 0, 0)
           m.material = bahan
@@ -147,16 +155,21 @@ export function VentilasiBronkus3D({
         setMuat(false)
       })
       .catch(() => {
+        if (dibuang) return
         setGagal('Could not load the airway model.')
         setMuat(false)
       })
 
     let raf = 0
     let sebelumnya = performance.now()
+    let diViewport = true
+    let dokumenTerlihat = !document.hidden
     const warna = new THREE.Color()
 
     const gambar = (sekarang: number) => {
-      raf = requestAnimationFrame(gambar)
+      raf = 0
+      if (dibuang || !diViewport || !dokumenTerlihat) return
+
       const dt = Math.min((sekarang - sebelumnya) / 1000, 0.05)
       sebelumnya = sekarang
 
@@ -185,15 +198,68 @@ export function VentilasiBronkus3D({
         for (const id of perSegmen.keys()) jumlah += keadaan.isi[id] ?? 0
         renderer.domElement.dataset.isiRerata = (jumlah / perSegmen.size).toFixed(3)
       }
+      raf = requestAnimationFrame(gambar)
     }
-    raf = requestAnimationFrame(gambar)
+
+    const mulai = () => {
+      if (dibuang || raf || !diViewport || !dokumenTerlihat) return
+      sebelumnya = performance.now()
+      renderer.domElement.dataset.animasiAktif = 'true'
+      raf = requestAnimationFrame(gambar)
+    }
+    const berhenti = () => {
+      if (raf) cancelAnimationFrame(raf)
+      raf = 0
+      renderer.domElement.dataset.animasiAktif = 'false'
+    }
+
+    const io = new IntersectionObserver(([entry]) => {
+      diViewport = Boolean(entry?.isIntersecting)
+      if (diViewport) mulai()
+      else berhenti()
+    }, { rootMargin: '96px' })
+    io.observe(wadah)
+
+    const saatVisibilitasBerubah = () => {
+      dokumenTerlihat = !document.hidden
+      if (dokumenTerlihat) mulai()
+      else berhenti()
+    }
+    document.addEventListener('visibilitychange', saatVisibilitasBerubah)
+    mulai()
 
     return () => {
-      cancelAnimationFrame(raf)
+      dibuang = true
+      berhenti()
+      io.disconnect()
       ro.disconnect()
+      document.removeEventListener('visibilitychange', saatVisibilitasBerubah)
       controls.dispose()
-      if (grup) scene.remove(grup)
+
+      const geometriSudah = new Set<THREE.BufferGeometry>()
+      const bahanSudah = new Set<THREE.Material>()
+      if (grup) {
+        grup.traverse((o) => {
+          if (!(o as THREE.Mesh).isMesh) return
+          const m = o as THREE.Mesh
+          if (!geometriSudah.has(m.geometry)) {
+            geometriSudah.add(m.geometry)
+            m.geometry.dispose()
+          }
+          const bahan = m.material as THREE.Material | THREE.Material[]
+          for (const item of Array.isArray(bahan) ? bahan : [bahan]) {
+            if (!bahanSudah.has(item)) {
+              bahanSudah.add(item)
+              item.dispose()
+            }
+          }
+        })
+        scene.remove(grup)
+      }
+
+      renderer.renderLists.dispose()
       renderer.dispose()
+      renderer.forceContextLoss()
       renderer.domElement.remove()
     }
   }, [])
