@@ -13,6 +13,8 @@ import {
 } from '../../lib/surgicalLayerRiskGeometry'
 import {
   SURGICAL_SPATIAL_SCENARIOS,
+  alasanRisikoTanpaGeometri,
+  TANDA_RISIKO_TANPA_GEOMETRI,
   type SurgicalSpatialCheckpoint,
   type SurgicalSpatialRegion,
 } from '../../lib/surgicalSpatialTeaching'
@@ -173,7 +175,26 @@ export function SurgicalLab({ onKedalaman, onSorot }: SurgicalLabProps) {
                   {checkpoint.structuresAtRisk.length > 0 && (
                     <div className="mt-2 rounded-lg border border-red-400/20 bg-red-400/[0.05] p-2">
                       <div className="text-[9px] font-black uppercase tracking-wide text-red-300">Adjacent / at-risk structures</div>
-                      <div className="mt-1 text-[10px] leading-relaxed text-neutral-300">{checkpoint.structuresAtRisk.join(' · ')}</div>
+                      {/* Dulu satu teks gabungan, sehingga struktur yang bisa
+                          ditunjuk pada model tampil sama persis dengan yang
+                          tidak dikirim sama sekali. Hanya 4 dari 17 nama di
+                          seluruh checkpoint yang benar-benar resolve. */}
+                      <ul className="mt-1 space-y-0.5 text-[10px] leading-relaxed text-neutral-300">
+                        {checkpoint.structuresAtRisk.map((risiko) => {
+                          const alasan = alasanRisikoTanpaGeometri(risiko)
+                          return (
+                            <li key={risiko} className={alasan ? 'text-neutral-400' : undefined}
+                              {...(alasan ? { [TANDA_RISIKO_TANPA_GEOMETRI]: 'true' } : {})}
+                              title={alasan ? `Named only — not shipped as geometry in this atlas, so it cannot be highlighted on the model. ${alasan}` : undefined}>
+                              • {risiko}
+                              {alasan && <>
+                                <span aria-hidden="true" className="ml-1 font-black">○</span>
+                                <span className="sr-only"> — named only; not shipped as geometry in this atlas.</span>
+                              </>}
+                            </li>
+                          )
+                        })}
+                      </ul>
                     </div>
                   )}
                   <div className={`mt-2 text-[9px] font-bold ${exactNames.length ? 'text-brand' : 'text-amber-300'}`}>{exactNames.length ? 'Highlight exact represented anatomy in 3D →' : 'No exact regional source mesh · keep this checkpoint text-only'}</div>
