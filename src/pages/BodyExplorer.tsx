@@ -49,6 +49,7 @@ const MolecularLab = lazy(() => import('./bodyhub/MolecularLab'))
 // Ruang genomika: varian klinis, alat urutan, perancang CRISPR, dan jalur sinyal.
 const GenomicsLab = lazy(() => import('./bodyhub/GenomicsLab'))
 const AlphaGenomeAtlas = lazy(() => import('./bodyhub/AlphaGenomeAtlas'))
+const VertikalMolekulerPanel = lazy(() => import('./bodyhub/VertikalMolekulerPanel').then((m) => ({ default: m.VertikalMolekulerPanel })))
 // Ruang sel: organel dalam 3D dan biokimia yang berjalan di tiap kompartemen.
 const CellLab = lazy(() => import('./bodyhub/CellLab'))
 // Pencari struktur: 2.587 nama yang benar-benar ada di berkas geometrinya.
@@ -107,7 +108,7 @@ function Chip({
 // sama-sama menyorot struktur pada figur yang itu-itu juga. Itulah maksud
 // "satu simulasi tubuh yang utuh" — bukan enam halaman yang saling menyebut,
 // melainkan satu tubuh yang ditanyai dari enam sudut.
-type PanelTab = 'hemodinamik' | 'nefron' | 'asam-basa' | 'farmakodinamik' | 'dialisis' | 'gas-alveolar' | 'indera' | 'termoregulasi' | 'difusi' | 'wilayah-abdomen' | 'kerangka' | 'arteri' | 'limfe' | 'kelenjar-saluran' | 'ventilasi' | 'ventilasi-membran' | 'lokalisasi' | 'tuas-sendi' | 'layers' | 'muscles' | 'workout-sim' | 'biomekanika' | 'organs' | 'physiology' | 'simulator' | 'cardio' | 'spesialisasi' | 'molekul' | 'genomik' | 'genom-alfa' | 'sel' | 'bedah' | 'cari' | 'presisi' | 'mesin' | 'drugs' | 'diseases' | 'reference'
+type PanelTab = 'hemodinamik' | 'nefron' | 'asam-basa' | 'farmakodinamik' | 'dialisis' | 'gas-alveolar' | 'indera' | 'termoregulasi' | 'difusi' | 'wilayah-abdomen' | 'kerangka' | 'arteri' | 'limfe' | 'kelenjar-saluran' | 'ventilasi' | 'ventilasi-membran' | 'lokalisasi' | 'tuas-sendi' | 'layers' | 'muscles' | 'workout-sim' | 'biomekanika' | 'organs' | 'physiology' | 'simulator' | 'cardio' | 'spesialisasi' | 'molekul' | 'genomik' | 'genom-alfa' | 'vertikal-molekuler' | 'sel' | 'bedah' | 'cari' | 'presisi' | 'mesin' | 'drugs' | 'diseases' | 'reference'
 
 import { kelompokUntuk, kelompokTerpakai, urutkanMenurutKelompok } from '../lib/bodyExplorerTabGroups'
 
@@ -142,6 +143,7 @@ const PANEL_TABS: Array<{ key: PanelTab; label: string }> = [
   { key: 'molekul', label: 'Molecules' },
   { key: 'genomik', label: 'Genomics' },
   { key: 'genom-alfa', label: 'Genome atlas' },
+  { key: 'vertikal-molekuler', label: 'Tissue → gene' },
   { key: 'cari', label: 'Find structure' },
   { key: 'presisi', label: 'Whole-body precision' },
   { key: 'mesin', label: 'Biomedical engine' },
@@ -1116,6 +1118,12 @@ export function BodyExplorer() {
             {panelTab === 'genom-alfa' && (
               <Suspense fallback={<p className="text-sm text-neutral-500">Loading the genome atlas…</p>}>
                 <AlphaGenomeAtlas />
+              </Suspense>
+            )}
+
+            {panelTab === 'vertikal-molekuler' && (
+              <Suspense fallback={<p className="text-sm text-neutral-500">Loading the multiscale vertical…</p>}>
+                <VertikalMolekulerPanel />
               </Suspense>
             )}
 
