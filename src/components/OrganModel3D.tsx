@@ -3,16 +3,24 @@ import * as THREE from 'three'
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'
 import { MeshoptDecoder } from 'three/examples/jsm/libs/meshopt_decoder.module.js'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
+import { body3dPixelRatio } from '../lib/body3dQuality'
 import { folderModel, type OrganModel } from '../lib/organModels'
-
-// Penampil satu organ dari dekat. Lihat src/lib/organModels.ts untuk asal
-// modelnya dan kenapa bagiannya ditandai titik, bukan lewat raycast nama.
 
 interface Props {
   organ: OrganModel
-  /** Hotspot yang sedang dipilih, kalau ada. */
   selected?: string | null
   onSelect?: (hotspotId: string | null) => void
+}
+
+function disposeObject3D(root: THREE.Object3D) {
+  root.traverse((object) => {
+    const mesh = object as THREE.Mesh
+    if (!mesh.isMesh) return
+    mesh.geometry.dispose()
+    const material = mesh.material as THREE.Material | THREE.Material[]
+    if (Array.isArray(material)) material.forEach((entry) => entry.dispose())
+    else material.dispose()
+  })
 }
 
 export function OrganModel3D({ organ, selected, onSelect }: Props) {
@@ -20,10 +28,6 @@ export function OrganModel3D({ organ, selected, onSelect }: Props) {
   const [loading, setLoading] = useState(true)
   const [pct, setPct] = useState(0)
   const [fatal, setFatal] = useState('')
-  // Posisi layar tiap hotspot, dihitung ulang tiap frame. Titiknya digambar
-  // sebagai HTML di atas kanvas, bukan sebagai objek 3D: teksnya jadi tetap
-  // tajam, bisa dibaca pembaca layar, dan sasaran sentuhnya cukup besar di
-  // ponsel tanpa ikut membesar saat model diperbesar.
   const [layar, setLayar] = useState<Record<string, { x: number; y: number; depan: boolean }>>({})
   const onSelectRef = useRef(onSelect)
   onSelectRef.current = onSelect
@@ -46,7 +50,6 @@ export function OrganModel3D({ organ, selected, onSelect }: Props) {
       setLoading(false)
       return
     }
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
     renderer.setClearColor(0x000000, 0)
     renderer.outputColorSpace = THREE.SRGBColorSpace
     renderer.toneMapping = THREE.ACESFilmicToneMapping
@@ -65,13 +68,15 @@ export function OrganModel3D({ organ, selected, onSelect }: Props) {
     const controls = new OrbitControls(camera, renderer.domElement)
     controls.enablePan = false
     controls.enableDamping = true
-    controls.autoRotate = true
+    controls.autoRotate = !window.matchMedia('(prefers-reduced-motion: reduce)').matches
     controls.autoRotateSpeed = 0.7
 
     const resize = () => {
       const w = container.clientWidth
       const h = container.clientHeight
       if (w < 2 || h < 2) return
+      const mobile = window.matchMedia('(max-width: 640px)').matches
+      renderer.setPixelRatio(body3dPixelRatio(w, h, window.devicePixelRatio || 1, mobile))
       renderer.setSize(w, h)
       camera.aspect = w / h
       camera.updateProjectionMatrix()
@@ -87,7 +92,10 @@ export function OrganModel3D({ organ, selected, onSelect }: Props) {
     loader.load(
       `${import.meta.env.BASE_URL}${folderModel(organ)}/${organ.id}.glb`,
       (gltf) => {
-        if (disposed) return
+        if (disposed) {
+          disposeObject3D(gltf.scene)
+          return
+        }
         group = gltf.scene
         const box = new THREE.Box3().setFromObject(group)
         const size = box.getSize(new THREE.Vector3())
@@ -100,11 +108,11 @@ export function OrganModel3D({ organ, selected, onSelect }: Props) {
         controls.target.set(0, 0, 0)
         controls.update()
         let jumlahMesh = 0
-        group.traverse((o) => { if ((o as THREE.Mesh).isMesh) jumlahMesh += 1 })
+        group.traverse((object) => { if ((object as THREE.Mesh).isMesh) jumlahMesh += 1 })
         renderer.domElement.dataset.organMesh = String(jumlahMesh)
         setLoading(false)
       },
-      (ev) => { if (!disposed && ev.total > 0) setPct(ev.loaded / ev.total) },
+      (event) => { if (!disposed && event.total > 0) setPct(event.loaded / event.total) },
       () => {
         if (disposed) return
         setFatal('Could not load this organ model.')
@@ -121,8 +129,8 @@ export function OrganModel3D({ organ, selected, onSelect }: Props) {
       raf = 0
     }
 
-    const onContextLost = (e: Event) => {
-      e.preventDefault()
+    const onContextLost = (event: Event) => {
+      event.preventDefault()
       stop()
       setFatal('The browser dropped the 3D context, usually because memory ran low.')
       setLoading(false)
@@ -132,7 +140,7 @@ export function OrganModel3D({ organ, selected, onSelect }: Props) {
     const stopAuto = () => { controls.autoRotate = false }
     renderer.domElement.addEventListener('pointerdown', stopAuto)
 
-    const v = new THREE.Vector3()
+    const vector = new THREE.Vector3()
     function animate() {
       raf = 0
       if (!inViewport || !documentVisible || disposed) return
@@ -143,13 +151,13 @@ export function OrganModel3D({ organ, selected, onSelect }: Props) {
         const h = container.clientHeight
         const next: Record<string, { x: number; y: number; depan: boolean }> = {}
         for (const spot of organ.hotspots) {
-          v.set(spot.position[0], spot.position[1], spot.position[2])
-          group.localToWorld(v)
-          const jarakKamera = v.distanceTo(camera.position)
-          v.project(camera)
+          vector.set(spot.position[0], spot.position[1], spot.position[2])
+          group.localToWorld(vector)
+          const jarakKamera = vector.distanceTo(camera.position)
+          vector.project(camera)
           next[spot.id] = {
-            x: ((v.x + 1) / 2) * w,
-            y: ((1 - v.y) / 2) * h,
+            x: ((vector.x + 1) / 2) * w,
+            y: ((1 - vector.y) / 2) * h,
             depan: jarakKamera < camera.position.length() + 0.4,
           }
         }
@@ -186,14 +194,7 @@ export function OrganModel3D({ organ, selected, onSelect }: Props) {
       renderer.domElement.removeEventListener('webglcontextlost', onContextLost)
       renderer.domElement.removeEventListener('pointerdown', stopAuto)
       controls.dispose()
-      scene.traverse((object) => {
-        const mesh = object as THREE.Mesh
-        if (!mesh.isMesh) return
-        mesh.geometry.dispose()
-        const material = mesh.material as THREE.Material | THREE.Material[]
-        if (Array.isArray(material)) material.forEach((entry) => entry.dispose())
-        else material.dispose()
-      })
+      disposeObject3D(scene)
       renderer.renderLists.dispose()
       renderer.dispose()
       renderer.forceContextLoss()
