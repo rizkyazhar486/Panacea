@@ -45,35 +45,33 @@ try {
   await launch.click()
   if ((await launch.getAttribute('aria-expanded')) !== 'true') throw new Error('Protein folding atlas did not expose expanded state after launch')
 
-  const canvas = page.locator('canvas[data-protein-folding3d="true"]')
+  const region = page.locator('#protein-folding-atlas-region')
+  await region.waitFor({ state: 'visible' })
+  const canvas = region.locator('canvas[data-protein-folding3d="true"]')
   await canvas.waitFor({ state: 'visible' })
   await page.waitForTimeout(900)
 
-  const render = await canvas.evaluate((node) => {
-    const gl = node.getContext('webgl2') || node.getContext('webgl')
-    if (!gl) return { webgl: false, lost: true, width: 0, height: 0, contrastColors: 0 }
-    const width = gl.drawingBufferWidth
-    const height = gl.drawingBufferHeight
-    const pixels = new Uint8Array(width * height * 4)
-    gl.finish()
-    gl.readPixels(0, 0, width, height, gl.RGBA, gl.UNSIGNED_BYTE, pixels)
-    const colors = new Set()
-    const pixelCount = width * height
-    const stridePixels = Math.max(1, Math.floor(pixelCount / 12000))
-    for (let pixel = 0; pixel < pixelCount; pixel += stridePixels) {
-      const i = pixel * 4
-      if (pixels[i + 3] === 0) continue
-      colors.add(`${pixels[i]},${pixels[i + 1]},${pixels[i + 2]}`)
-      if (colors.size >= 16) break
-    }
-    return {
-      webgl: true,
-      lost: gl.isContextLost(),
-      width,
-      height,
-      contrastColors: colors.size,
-    }
-  })
+  const render = await canvas.evaluate((node) => new Promise((resolve) => {
+    requestAnimationFrame(() => {
+      const gl = node.getContext('webgl2') || node.getContext('webgl')
+      if (!gl) return resolve({ webgl: false, lost: true, width: 0, height: 0, contrastColors: 0 })
+      const width = gl.drawingBufferWidth
+      const height = gl.drawingBufferHeight
+      const pixels = new Uint8Array(width * height * 4)
+      gl.finish()
+      gl.readPixels(0, 0, width, height, gl.RGBA, gl.UNSIGNED_BYTE, pixels)
+      const colors = new Set()
+      const pixelCount = width * height
+      const stridePixels = Math.max(1, Math.floor(pixelCount / 12000))
+      for (let pixel = 0; pixel < pixelCount; pixel += stridePixels) {
+        const i = pixel * 4
+        if (pixels[i + 3] === 0) continue
+        colors.add(`${pixels[i]},${pixels[i + 1]},${pixels[i + 2]}`)
+        if (colors.size >= 16) break
+      }
+      resolve({ webgl: true, lost: gl.isContextLost(), width, height, contrastColors: colors.size })
+    })
+  }))
   if (!render.webgl || render.lost) throw new Error(`Protein folding WebGL unhealthy: ${JSON.stringify(render)}`)
   if (render.width < 300 || render.height < 300) throw new Error(`Protein folding drawing buffer too small: ${render.width}x${render.height}`)
   if (render.contrastColors < 3) throw new Error(`Protein folding canvas lacks visible contrast-bearing render signal: ${JSON.stringify(render)}`)
@@ -81,17 +79,17 @@ try {
   const canvasBox = await canvas.boundingBox()
   if (!canvasBox || canvasBox.width < 280 || canvasBox.height < 300) throw new Error(`Protein folding canvas is not meaningfully visible: ${JSON.stringify(canvasBox)}`)
 
-  await page.getByRole('button', { name: 'Alzheimer', exact: true }).click()
+  await region.getByRole('button', { name: 'Alzheimer', exact: true }).click()
   await page.waitForTimeout(250)
-  const targetSelect = page.getByRole('combobox').last()
+  const targetSelect = region.getByRole('combobox')
   const targetText = await targetSelect.locator('option:checked').textContent()
   if (!targetText || !/(APP|MAPT)/.test(targetText)) throw new Error(`Alzheimer domain did not switch to an Alzheimer research target: ${targetText}`)
 
-  await page.getByRole('button', { name: 'Binding pocket', exact: true }).click()
+  await region.getByRole('button', { name: 'Binding pocket', exact: true }).click()
   await page.waitForTimeout(250)
-  const pocketButton = page.getByRole('button', { name: 'Binding pocket', exact: true })
+  const pocketButton = region.getByRole('button', { name: 'Binding pocket', exact: true })
   if ((await pocketButton.getAttribute('aria-pressed')) !== 'true') throw new Error('Binding-pocket stage did not become active')
-  const bodyText = await page.locator('#protein-folding-atlas-region').innerText()
+  const bodyText = await region.innerText()
   if (!bodyText.includes('Pocket predictions are hypotheses')) throw new Error('Binding-pocket evidence boundary is not visible')
   if (!bodyText.includes('atomistic rendering remains blocked')) throw new Error('Atomistic fail-closed disclosure is not visible')
   if (!bodyText.includes('Research hypothesis engine only')) throw new Error('Research-only boundary is not visible')
