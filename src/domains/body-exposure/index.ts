@@ -20,3 +20,8 @@ export {
 } from './engine/oculomotorLesionEngine'
 
 export { OculomotorLesionLab } from './ui/OculomotorLesionLab'
+
+export {
+  disposeOwnedObject3DResources,
+  type ThreeOwnedResourceDisposalReport,
+} from './adapters/threeOwnedResourceDisposal'
