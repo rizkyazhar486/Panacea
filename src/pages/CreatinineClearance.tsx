@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { Prosa } from '../components/Prosa'
 import { Card, SectionTitle, Field, inputClass, Badge } from '../components/ui'
 import { IconActivity } from '../components/icons'
-import { getDemo } from '../lib/profile'
+import { getDemoTersimpan } from '../lib/profile'
 import { CopyNote } from '../components/CopyNote'
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -34,19 +34,37 @@ function band(crcl: number): { label: string; tone: 'brand' | 'low' | 'critical'
 }
 
 export function CreatinineClearance() {
-  const demo = getDemo()
-  const [age, setAge] = useState(demo.age || 40)
-  const [weightKg, setWeightKg] = useState(demo.weightKg || 70)
-  const [heightCm, setHeightCm] = useState(demo.heightCm || 170)
-  const [sex, setSex] = useState<'M' | 'F'>(demo.sex || 'M')
-  const [scr, setScr] = useState(1.0)
+  // Bacaan TERSIMPAN, bukan getDemo(). getDemo() memadukan DEMO_DEFAULT ke
+  // profil kosong, sehingga halaman ini dahulu terbuka dengan usia 30, berat
+  // 70 kg dan jenis kelamin laki-laki -- lalu, dengan kreatinin awal 1,0,
+  // mencetak "107 mL/min - Normal" beserta kalimat siap salin untuk rekam
+  // medis. Tidak satu pun angka itu berasal dari orang yang membacanya.
+  const demo = getDemoTersimpan()
+  const [age, setAge] = useState(demo.age && demo.age > 0 ? demo.age : 0)
+  const [weightKg, setWeightKg] = useState(demo.weightKg && demo.weightKg > 0 ? demo.weightKg : 0)
+  const [heightCm, setHeightCm] = useState(demo.heightCm && demo.heightCm > 0 ? demo.heightCm : 0)
+  const [sex, setSex] = useState<'M' | 'F'>(demo.sex === 'F' ? 'F' : 'M')
+  // Kreatinin serum TIDAK punya nilai awal yang bisa dibela. Ia hasil
+  // laboratorium; satu-satunya jalan masuknya adalah diketik.
+  const [scr, setScr] = useState(0)
   const [weightBasis, setWeightBasis] = useState<'actual' | 'ideal'>('actual')
 
-  const ibw = idealBodyWeight(heightCm, sex)
+  const ibw = heightCm > 0 ? idealBodyWeight(heightCm, sex) : 0
   const useWeight = weightBasis === 'ideal' ? ibw : weightKg
-  const crcl = scr > 0 ? ((140 - age) * useWeight * (sex === 'F' ? 0.85 : 1)) / (72 * scr) : 0
-  const obese = weightKg > ibw * 1.25
-  const bandInfo = band(crcl)
+  // Kekosongan BUKAN nol. Sebelum ini, mengosongkan kolom kreatinin membuat
+  // crcl menjadi 0, dan band(0) menjawab "Kidney failure -- many drugs
+  // contraindicated": kolom kosong ditampilkan sebagai gagal ginjal berat,
+  // lengkap dengan tombol menyalinnya ke catatan.
+  const bisaHitung = scr > 0 && age > 0 && useWeight > 0
+  const crcl = bisaHitung ? ((140 - age) * useWeight * (sex === 'F' ? 0.85 : 1)) / (72 * scr) : null
+  const obese = weightKg > 0 && ibw > 0 && weightKg > ibw * 1.25
+  const bandInfo = crcl !== null ? band(crcl) : null
+
+  const belum: string[] = []
+  if (!(age > 0)) belum.push('age')
+  if (!(weightKg > 0)) belum.push('weight')
+  if (weightBasis === 'ideal' && !(heightCm > 0)) belum.push('height')
+  if (!(scr > 0)) belum.push('serum creatinine')
 
   return (
     <div className="mx-auto max-w-2xl space-y-5 pb-24">
@@ -89,13 +107,23 @@ export function CreatinineClearance() {
 
       <Card className="!p-5">
         <div className="text-xs font-black uppercase tracking-wide text-neutral-500">Result</div>
-        <div className="mt-2 flex items-center gap-3">
-          <span className="text-3xl font-black text-brand-dark">{crcl.toFixed(0)}</span>
-          <span className="text-sm font-semibold text-neutral-500">mL/min</span>
-          <Badge tone={bandInfo.tone}>{bandInfo.label}</Badge>
-        </div>
-        <p className="mt-2 text-[12px] text-neutral-500">Ideal body weight (reference): {ibw.toFixed(1)} kg</p>
-        <CopyNote text={`CrCl (Cockcroft-Gault) ${crcl.toFixed(0)} mL/min using ${weightBasis} body weight (age ${age}, ${sex === 'M' ? 'male' : 'female'}, ${useWeight.toFixed(0)} kg, SCr ${scr} mg/dL) — ${bandInfo.label.toLowerCase()} [Cockcroft & Gault 1976]`} />
+        {crcl !== null && bandInfo !== null ? (
+          <>
+            <div className="mt-2 flex items-center gap-3">
+              <span className="text-3xl font-black text-brand-dark">{crcl.toFixed(0)}</span>
+              <span className="text-sm font-semibold text-neutral-500">mL/min</span>
+              <Badge tone={bandInfo.tone}>{bandInfo.label}</Badge>
+            </div>
+            {ibw > 0 && <p className="mt-2 text-[12px] text-neutral-500">Ideal body weight (reference): {ibw.toFixed(1)} kg</p>}
+            <CopyNote text={`CrCl (Cockcroft-Gault) ${crcl.toFixed(0)} mL/min using ${weightBasis} body weight (age ${age}, ${sex === 'M' ? 'male' : 'female'}, ${useWeight.toFixed(0)} kg, SCr ${scr} mg/dL) — ${bandInfo.label.toLowerCase()} [Cockcroft & Gault 1976]`} />
+          </>
+        ) : (
+          <p className="mt-2 text-[12.5px] leading-relaxed text-neutral-600 dark:text-neutral-300">
+            No clearance is shown yet. Still needed: {belum.join(', ')}.
+            {' '}Serum creatinine has no default — it is a laboratory result, and an empty field is not a value.
+            {' '}Nothing here is estimated on your behalf, because a number on this page can change a drug dose.
+          </p>
+        )}
       </Card>
 
       <div className="rounded-2xl border border-neutral-100 bg-white p-4 text-center text-[11px] leading-relaxed text-neutral-500 dark:border-white/10 dark:bg-white/5">
