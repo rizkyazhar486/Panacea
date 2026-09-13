@@ -181,7 +181,17 @@ export function KelenjarSaluran3D({ terpilih, onPilih, tinggi = 320 }: KelenjarS
 
     const ray = new THREE.Raycaster()
     const titik = new THREE.Vector2()
-    const klik = (ev: PointerEvent) => {
+    let awalTunjuk: { x: number; y: number } | null = null
+
+    const mulaiTunjuk = (ev: PointerEvent) => {
+      awalTunjuk = { x: ev.clientX, y: ev.clientY }
+    }
+
+    const selesaiTunjuk = (ev: PointerEvent) => {
+      const awal = awalTunjuk
+      awalTunjuk = null
+      if (!awal || Math.hypot(ev.clientX - awal.x, ev.clientY - awal.y) > 6) return
+
       const kotakLayar = renderer.domElement.getBoundingClientRect()
       titik.x = ((ev.clientX - kotakLayar.left) / kotakLayar.width) * 2 - 1
       titik.y = -((ev.clientY - kotakLayar.top) / kotakLayar.height) * 2 + 1
@@ -190,7 +200,14 @@ export function KelenjarSaluran3D({ terpilih, onPilih, tinggi = 320 }: KelenjarS
       const id = kena ? strukturMesh.get(kena.object as THREE.Mesh) ?? null : null
       if (id) onPilihRef.current(id)
     }
-    renderer.domElement.addEventListener('pointerdown', klik)
+
+    const batalTunjuk = () => {
+      awalTunjuk = null
+    }
+
+    renderer.domElement.addEventListener('pointerdown', mulaiTunjuk)
+    renderer.domElement.addEventListener('pointerup', selesaiTunjuk)
+    renderer.domElement.addEventListener('pointercancel', batalTunjuk)
 
     let raf = 0
     const gambar = () => {
@@ -204,9 +221,12 @@ export function KelenjarSaluran3D({ terpilih, onPilih, tinggi = 320 }: KelenjarS
       dibatalkan = true
       cancelAnimationFrame(raf)
       terapkanRef.current = null
-      renderer.domElement.removeEventListener('pointerdown', klik)
+      renderer.domElement.removeEventListener('pointerdown', mulaiTunjuk)
+      renderer.domElement.removeEventListener('pointerup', selesaiTunjuk)
+      renderer.domElement.removeEventListener('pointercancel', batalTunjuk)
       ro.disconnect()
       controls.dispose()
+      for (const daftar of bahanPerStruktur.values()) for (const bahan of daftar) bahan.dispose()
       for (const g of grup) scene.remove(g)
       renderer.dispose()
       renderer.domElement.remove()
@@ -234,7 +254,7 @@ export function KelenjarSaluran3D({ terpilih, onPilih, tinggi = 320 }: KelenjarS
         )}
       </div>
       <p className="mt-2 text-[11px] leading-relaxed text-neutral-500">
-        Tap a structure on the model, or use the list below. The view faces the front of the body, so the
+        Tap a structure on the model, or use the list below. Dragging rotates the atlas without changing the selection. The view faces the front of the body, so the
         person's right is on your left.
       </p>
     </div>
