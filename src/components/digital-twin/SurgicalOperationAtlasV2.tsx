@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
+import { KepingStrukturRisiko } from './KepingStrukturRisiko'
 import { Body3D, CT_WINDOWS, type MotionState } from '../Body3D'
 import { IconActivity, IconBook, IconHeart, IconShield, IconSparkle, IconTimer } from '../icons'
 import {
@@ -281,7 +282,7 @@ export function SurgicalOperationAtlasV2() {
 
               <div className="mt-4 rounded-2xl border border-rose-300/15 bg-rose-300/[.05] p-4">
                 <div className="flex items-center gap-2 text-[9px] font-black uppercase tracking-[.15em] text-rose-200"><IconHeart size={13} /> Structures at risk</div>
-                <div className="mt-2 flex flex-wrap gap-1.5">{current.structuresAtRisk.map((item) => <span key={item} className="rounded-full border border-rose-200/12 bg-black/20 px-2.5 py-1.5 text-[10px] font-bold text-rose-100/75">{item}</span>)}</div>
+                <div className="mt-2 flex flex-wrap gap-1.5">{current.structuresAtRisk.map((item) => <KepingStrukturRisiko key={item} struktur={item} gaya="rounded-full border border-rose-200/12 bg-black/20 px-2.5 py-1.5 text-[10px] font-bold text-rose-100/75" />)}</div>
               </div>
 
               <div className="mt-3 rounded-2xl border border-[#f0d68a]/15 bg-[#f0d68a]/[.055] p-4">
