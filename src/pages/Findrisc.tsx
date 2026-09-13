@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { Prosa } from '../components/Prosa'
 import { Card, SectionTitle, Field, inputClass, Badge } from '../components/ui'
 import { IconActivity } from '../components/icons'
-import { getDemo } from '../lib/profile'
+import { getDemoTersimpan } from '../lib/profile'
 import { CopyNote } from '../components/CopyNote'
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -29,24 +29,40 @@ function band(score: number): { label: string; tone: 'brand' | 'low' | 'critical
 }
 
 export function Findrisc() {
-  const demo = getDemo()
-  const [age, setAge] = useState(demo.age || 45)
+  // Usia 45, IMT 24 dan lingkar pinggang 90 adalah tiga PENGUKURAN, bukan
+  // jawaban -- dan ketiganya dahulu terisi sendiri, sehingga halaman ini
+  // terbuka dengan sebuah persentase risiko diabetes 10 tahun untuk orang
+  // yang belum mengukur apa pun. IMT lebih halus lagi: ia dihitung dari
+  // berat dan tinggi sulih getDemo(), lalu tampil sebagai angka desimal yang
+  // terlihat seperti hasil pengukuran.
+  //
+  // "Cukup bergerak" dan "makan sayur tiap hari" TETAP bernilai awal benar:
+  // keduanya pertanyaan ya/tidak yang jawabannya bernilai nol poin, sama
+  // seperti kotak centang yang tidak dicentang.
+  const demo = getDemoTersimpan()
+  const [age, setAge] = useState(demo.age && demo.age > 0 ? demo.age : 0)
   const [bmi, setBmi] = useState(() => {
     const w = demo.weightKg, h = demo.heightCm
-    return w && h ? +(w / ((h / 100) ** 2)).toFixed(1) : 24
+    return w && w > 0 && h && h > 0 ? +(w / ((h / 100) ** 2)).toFixed(1) : 0
   })
-  const [waist, setWaist] = useState(90)
-  const [sex, setSex] = useState<'M' | 'F'>(demo.sex || 'M')
+  const [waist, setWaist] = useState(0)
+  const [sex, setSex] = useState<'M' | 'F'>(demo.sex === 'F' ? 'F' : 'M')
   const [active, setActive] = useState(true)
   const [veg, setVeg] = useState(true)
   const [bpMed, setBpMed] = useState(false)
   const [highGlucose, setHighGlucose] = useState(false)
   const [family, setFamily] = useState<0 | 3 | 5>(0)
 
+  const belum: string[] = []
+  if (!(age > 0)) belum.push('age')
+  if (!(bmi > 0)) belum.push('BMI')
+  if (!(waist > 0)) belum.push('waist circumference')
+  const lengkap = belum.length === 0
+
   const score =
     agePts(age) + bmiPts(bmi) + waistPts(waist, sex) +
     (active ? 0 : 2) + (veg ? 0 : 1) + (bpMed ? 2 : 0) + (highGlucose ? 5 : 0) + family
-  const result = band(score)
+  const result = lengkap ? band(score) : null
 
   return (
     <div className="mx-auto max-w-2xl space-y-5 pb-24">
@@ -95,6 +111,8 @@ export function Findrisc() {
 
       <Card className="!p-5">
         <div className="text-xs font-black uppercase tracking-wide text-neutral-500">FINDRISC Score</div>
+        {lengkap && result !== null ? (
+          <>
         <div className="mt-2 flex items-center gap-3">
           <span className="text-3xl font-black text-brand-dark">{score} / 26</span>
           <Badge tone={result.tone}>{result.label} risk</Badge>
@@ -104,6 +122,14 @@ export function Findrisc() {
           <Prosa kelas="mt-2 rounded-xl border border-amber-200 bg-amber-50 px-3 py-2 text-xs font-semibold text-amber-800 dark:border-amber-500/30 dark:bg-amber-500/10 dark:text-amber-200">Skor ≥12 layak ditindaklanjuti — tanyakan kepada tenaga medis tentang pemeriksaan glukosa puasa atau HbA1c; pengungkit terbesarnya adalah penurunan berat badan, gerak harian, dan mengurangi karbohidrat olahan (uji Finlandia &amp; DPP menurunkan perkembangan menjadi diabetes sekitar 58% lewat perubahan gaya hidup).</Prosa>
         )}
         <CopyNote text={`FINDRISC ${score}/26 — ${result.label.toLowerCase()} 10-year type-2 diabetes risk (${result.risk}) [Lindström & Tuomilehto 2003]`} />
+          </>
+        ) : (
+          <p className="mt-2 text-[12.5px] leading-relaxed text-neutral-600 dark:text-neutral-300">
+            No score yet. Still needed: {belum.join(', ')}.
+            {' '}The lifestyle questions above are already answered and worth zero points, but age, BMI and waist are
+            measurements — filling them in would produce a ten-year diabetes percentage for a body nobody measured.
+          </p>
+        )}
       </Card>
 
       <div className="rounded-2xl border border-neutral-100 bg-white p-4 text-center text-[11px] leading-relaxed text-neutral-500 dark:border-white/10 dark:bg-white/5">
