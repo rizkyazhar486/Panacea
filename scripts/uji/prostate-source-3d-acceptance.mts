@@ -17,7 +17,7 @@ assert.ok(info, 'prostate module must be shipped')
 assert.ok(parts.length >= 7, 'prostate module must expose zonal and outlet anatomy breadth')
 assert.ok(parts.every((part) => Number.isFinite(part.triangles) && part.triangles > 0), 'every prostate-module structure must carry positive indexed triangles')
 assert.ok(triangles > 0, 'prostate module must contain indexed source geometry')
-assert.deepEqual(sources, ['bodyparts3d'], 'prostate geometry must retain BodyParts3D source identity')
+assert.deepEqual(sources, ['hra-male'], 'prostate geometry must retain HuBMAP Human Reference Atlas male source identity')
 
 for (const required of ['transition', 'central', 'peripheral']) {
   assert.ok(names.some((name) => name.includes(required)), `${required} prostate zone source geometry must be present`)
