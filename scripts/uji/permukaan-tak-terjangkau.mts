@@ -82,7 +82,6 @@ const DIKETAHUI: readonly string[] = [
   'components/digital-twin/AdvancedPhysiologySystems.tsx',
   'components/digital-twin/BodyEvidenceDock.tsx',
   'components/digital-twin/BodyParts3DDeepAtlas.tsx',
-  'components/digital-twin/BodyToCellCinematic.tsx',
   'components/digital-twin/CellGenomeEvidenceLab.tsx',
   'components/digital-twin/CellGenomeExplorer.tsx',
   'components/digital-twin/CinematicSurgicalRehearsal.tsx',

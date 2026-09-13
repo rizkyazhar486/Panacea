@@ -1,9 +1,12 @@
+import { lazy, Suspense, useState } from 'react'
 import { MultiscaleScaleRail } from './MultiscaleScaleRail'
 import {
   PULMONARY_SFTPC_MOLECULAR_VERTICAL,
   PULMONARY_SFTPC_WITHHELD_GAPS,
   validatePulmonarySftpcVertical,
 } from '../../lib/bodyPulmonaryMolecularVertical'
+
+const BodyToCellCinematic = lazy(() => import('../../components/digital-twin/BodyToCellCinematic'))
 
 // Perjalanan satu tubuh dari jaringan sampai gen.
 //
@@ -22,10 +25,40 @@ import {
 
 export function VertikalMolekulerPanel() {
   const periksa = validatePulmonarySftpcVertical()
+  const [cinematicOpen, setCinematicOpen] = useState(false)
 
   return (
     <div className="space-y-4">
       <MultiscaleScaleRail bridge={PULMONARY_SFTPC_MOLECULAR_VERTICAL} />
+
+      <section className="overflow-hidden rounded-2xl border border-cyan-300/20 bg-[#02060b] text-white">
+        <div className="flex flex-col gap-3 p-3.5 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <div className="text-[9px] font-black uppercase tracking-[.16em] text-cyan-300">Structural scale transition</div>
+            <h3 className="mt-1 text-sm font-black">Cell → nucleus → chromatin → DNA → sequencing</h3>
+            <p className="mt-1 max-w-3xl text-[10.5px] leading-relaxed text-white/50">
+              Open the existing Three.js cellular atlas only when you need the structural view. It is an educational reference scene, not literal continuity from this SFTPC tissue node and not patient microscopy or sequencing data.
+            </p>
+          </div>
+          <button
+            type="button"
+            aria-expanded={cinematicOpen}
+            aria-controls="body-cell-dna-cinematic"
+            onClick={() => setCinematicOpen((value) => !value)}
+            className="min-h-11 shrink-0 rounded-xl border border-cyan-300/30 bg-cyan-300/10 px-4 text-[10px] font-black text-cyan-100 transition hover:bg-cyan-300/15"
+          >
+            {cinematicOpen ? 'Close cellular 3D' : 'Open cellular 3D'}
+          </button>
+        </div>
+
+        {cinematicOpen && (
+          <div id="body-cell-dna-cinematic" role="region" aria-label="Cell to DNA cinematic 3D" className="border-t border-white/10 p-2 sm:p-3">
+            <Suspense fallback={<div role="status" className="flex min-h-40 items-center justify-center text-xs font-bold text-white/45">Loading cellular 3D atlas…</div>}>
+              <BodyToCellCinematic />
+            </Suspense>
+          </div>
+        )}
+      </section>
 
       <section
         aria-labelledby="vertikal-ditahan"
