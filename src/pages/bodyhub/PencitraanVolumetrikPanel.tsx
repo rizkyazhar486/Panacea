@@ -5,6 +5,10 @@ import {
   lebarJendela, levelJendela, kelasDalamJendela, cakupanKelas, keabuan,
 } from '../../lib/pencitraanVolumetrik'
 import { KALOLUMEN, YANG_BELUM_DIMILIKI_PANACEA } from '../../lib/rujukanKaloLumen'
+import {
+  BODY_EXPOSURE_VOLUMETRIC_IMAGING_REQUIREMENT,
+  unfinishedVolumetricImagingCapabilities,
+} from '../../lib/bodyVolumetricImagingRequirement'
 
 // Panel teknologi pencitraan volumetrik untuk Body Exposure.
 //
@@ -38,6 +42,8 @@ export function PencitraanVolumetrikPanel() {
 
   const jendela = useMemo(() => ({ bawah: Math.min(bawah, atas - 1), atas: Math.max(atas, bawah + 1) }), [bawah, atas])
   const terlihat = useMemo(() => kelasDalamJendela(jendela), [jendela])
+  const belumSelesai = useMemo(() => unfinishedVolumetricImagingCapabilities(), [])
+  const jumlahSelesai = BODY_EXPOSURE_VOLUMETRIC_IMAGING_REQUIREMENT.capabilities.length - belumSelesai.length
 
   return (
     <div className="space-y-4">
@@ -50,6 +56,86 @@ export function PencitraanVolumetrikPanel() {
           takes one decision that matters more than any other — <strong>which HU range you keep</strong>.
         </p>
       </Prosa>
+
+      <section
+        aria-labelledby="volumetric-obligation-title"
+        className="rounded-2xl border border-emerald-500/30 bg-emerald-500/[.06] p-3.5"
+        data-body-volumetric-obligation="true"
+      >
+        <div className="flex flex-wrap items-start justify-between gap-3">
+          <div className="min-w-0">
+            <div className="text-[10px] font-black uppercase tracking-[.14em] text-emerald-700 dark:text-emerald-300">
+              Mandatory Body Exposure build
+            </div>
+            <h3 id="volumetric-obligation-title" className="mt-1 text-sm font-black text-ink dark:text-white">
+              {BODY_EXPOSURE_VOLUMETRIC_IMAGING_REQUIREMENT.label}
+            </h3>
+            <p className="mt-1 max-w-2xl text-[11.5px] leading-relaxed text-neutral-600 dark:text-neutral-300">
+              This is no longer an optional reference idea. Body Exposure is required to mature this surface into a
+              real CT/MRI reconstruction workspace while keeping every unavailable capability visibly unavailable
+              until its source pipeline and runtime proof exist.
+            </p>
+          </div>
+          <div className="shrink-0 rounded-xl border border-emerald-500/25 bg-white/60 px-3 py-2 text-right dark:bg-white/[.05]">
+            <div className="font-[var(--font-angka)] text-xl font-black tabular-nums text-emerald-700 dark:text-emerald-300">
+              {jumlahSelesai}/{BODY_EXPOSURE_VOLUMETRIC_IMAGING_REQUIREMENT.capabilities.length}
+            </div>
+            <div className="text-[9px] font-black uppercase tracking-[.12em] text-neutral-500">capabilities present</div>
+          </div>
+        </div>
+
+        <div className="mt-3 grid gap-2 sm:grid-cols-2">
+          {BODY_EXPOSURE_VOLUMETRIC_IMAGING_REQUIREMENT.capabilities.map((capability) => {
+            const present = capability.status === 'present'
+            const blocked = capability.status === 'blocked'
+            return (
+              <div
+                key={capability.id}
+                className={`rounded-xl border p-3 ${
+                  present
+                    ? 'border-emerald-500/25 bg-emerald-500/[.06]'
+                    : blocked
+                      ? 'border-amber-500/25 bg-amber-500/[.06]'
+                      : 'border-neutral-200/80 bg-white/50 dark:border-white/10 dark:bg-white/[.025]'
+                }`}
+              >
+                <div className="flex items-start justify-between gap-2">
+                  <span className="text-[11.5px] font-black leading-snug text-ink dark:text-white">{capability.label}</span>
+                  <span className={`shrink-0 rounded-full px-2 py-1 text-[8.5px] font-black uppercase tracking-[.12em] ${
+                    present
+                      ? 'bg-emerald-500/15 text-emerald-700 dark:text-emerald-300'
+                      : blocked
+                        ? 'bg-amber-500/15 text-amber-700 dark:text-amber-300'
+                        : 'bg-neutral-500/10 text-neutral-600 dark:text-neutral-300'
+                  }`}>
+                    {present ? 'present' : blocked ? 'blocked' : 'required'}
+                  </span>
+                </div>
+                <p className="mt-1.5 text-[10.5px] leading-relaxed text-neutral-600 dark:text-neutral-400">
+                  {capability.acceptance}
+                </p>
+              </div>
+            )
+          })}
+        </div>
+
+        <div className="mt-3 rounded-xl border border-neutral-200/70 bg-white/60 p-3 dark:border-white/10 dark:bg-white/[.035]">
+          <div className="text-[9.5px] font-black uppercase tracking-[.14em] text-neutral-500">Required benchmark anatomy</div>
+          <div className="mt-2 flex flex-wrap gap-1.5">
+            {BODY_EXPOSURE_VOLUMETRIC_IMAGING_REQUIREMENT.regionBenchmarks.map((region) => (
+              <span key={region} className="rounded-full border border-neutral-200/80 px-2.5 py-1 text-[10px] font-bold text-neutral-600 dark:border-white/10 dark:text-neutral-300">
+                {region}
+              </span>
+            ))}
+          </div>
+        </div>
+
+        <p className="mt-3 text-[10.5px] leading-relaxed text-neutral-500">
+          Current truth: the quantitative CT-window teaching below is implemented; real DICOM ingestion, linked MPR,
+          patient-volume surface/volume reconstruction, registered vessel extraction and spatial-display output are not.
+          They remain mandatory unfinished work rather than simulated completion.
+        </p>
+      </section>
 
       <div className="rounded-2xl border border-[var(--pelatih-garis,rgba(15,23,42,0.10))] p-3">
         <div className="text-[11px] font-black uppercase tracking-[0.14em] text-neutral-500">
