@@ -56,8 +56,20 @@ if (!explorer.includes("panelTab === 'pencitraan-volumetrik'")) {
   throw new Error('DICOM-to-3D tab renders no panel');
 }
 
-// The currently shipped surface is still an educational foundation; the test
-// must prevent the roadmap from silently claiming a pipeline that does not yet exist.
+// The obligation itself must be visible to the user inside the existing Body Exposure surface.
+for (const marker of [
+  'BODY_EXPOSURE_VOLUMETRIC_IMAGING_REQUIREMENT',
+  'unfinishedVolumetricImagingCapabilities',
+  'data-body-volumetric-obligation="true"',
+  'Mandatory Body Exposure build',
+  'capabilities present',
+  'Required benchmark anatomy',
+  'real DICOM ingestion, linked MPR',
+]) {
+  if (!panel.includes(marker)) throw new Error(`Visible volumetric-imaging obligation missing: ${marker}`);
+}
+
+// Existing teaching features and the honest current limitation remain intact.
 for (const marker of [
   'From a DICOM stack to a 3D body',
   'Lower threshold',
@@ -86,4 +98,4 @@ if (requirement.includes("id: 'linked-mpr',\n      label: 'Linked axial · coron
   throw new Error('Linked MPR must not be marked present before implementation');
 }
 
-console.log('body volumetric imaging obligation: mandatory roadmap is registered, reachable and fail-closed');
+console.log('body volumetric imaging obligation: mandatory roadmap is registered, visible, reachable and fail-closed');
