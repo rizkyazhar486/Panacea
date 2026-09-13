@@ -85,6 +85,13 @@ jobs:
           BODY3D_QA_CANVAS_ARTIFACT: artifacts/body3d-mobile-canvas.png
         run: node scripts/qa/body3d-canvas-artifact.mjs
 
+      - name: Body Exposure all-system source 3D mobile smoke
+        env:
+          BODY_ALL_SYSTEMS_QA_URL: http://127.0.0.1:4173/#/body-explorer
+          BODY_ALL_SYSTEMS_QA_SCREENSHOT: artifacts/body3d-mobile-all-systems.png
+          BODY_ALL_SYSTEMS_QA_METRICS: artifacts/body3d-mobile-all-systems-metrics.json
+        run: node scripts/qa/body-all-systems-3d-smoke.mjs
+
       - name: Panacea OS Daily mobile 390x844 smoke
         env:
           PANACEA_OS_QA_URL: http://127.0.0.1:4173/#/harian
