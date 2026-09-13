@@ -21,6 +21,13 @@ export function KelenjarSaluranPanel() {
   const kemih = jalurKemih()
   const posisiTur = useMemo(() => posisiTurKelenjar(turAktif, terpilih), [turAktif, terpilih])
 
+  const pilihStruktur = (id: string | null) => {
+    setTerpilih(id)
+    if (!id) return
+    const dipilih = strukturUntuk(id)
+    if (dipilih) setTurAktif(dipilih.sistem)
+  }
+
   const pilihLangkahTur = (arah: -1 | 1) => {
     setTerpilih(langkahTurKelenjar(turAktif, terpilih, arah))
   }
@@ -30,7 +37,7 @@ export function KelenjarSaluranPanel() {
       key={id}
       type="button"
       aria-pressed={terpilih === id}
-      onClick={() => setTerpilih(terpilih === id ? null : id)}
+      onClick={() => pilihStruktur(terpilih === id ? null : id)}
       className={`rounded-xl border px-2.5 py-2 text-left text-[12px] font-bold leading-snug transition ${
         terpilih === id
           ? 'border-transparent bg-[#00BF63] text-white'
@@ -53,7 +60,7 @@ export function KelenjarSaluranPanel() {
       </div>
 
       <Suspense fallback={<div className="h-[320px] w-full rounded-2xl bg-[var(--pelatih-alas-1,rgba(15,23,42,0.04))]" />}>
-        <KelenjarSaluran3D terpilih={terpilih} onPilih={setTerpilih} />
+        <KelenjarSaluran3D terpilih={terpilih} onPilih={pilihStruktur} />
       </Suspense>
 
       <div className="rounded-2xl border border-[var(--pelatih-garis,rgba(15,23,42,0.10))] p-3">
