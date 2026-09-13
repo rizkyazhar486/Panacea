@@ -17,7 +17,7 @@ assert.ok(info, 'breast module must be shipped')
 assert.ok(parts.length >= 6, 'breast module must expose glandular, ductal and surface anatomy breadth')
 assert.ok(parts.every((part) => Number.isFinite(part.triangles) && part.triangles > 0), 'every breast-module structure must carry positive indexed triangles')
 assert.ok(triangles > 0, 'breast module must contain indexed source geometry')
-assert.deepEqual(sources, ['bodyparts3d'], 'breast geometry must retain BodyParts3D source identity')
+assert.deepEqual(sources, ['hra-female'], 'breast geometry must retain HuBMAP Human Reference Atlas female source identity')
 
 assert.ok(names.some((name) => name.includes('nipple')), 'nipple source geometry must be present')
 assert.ok(names.some((name) => name.includes('areola')), 'areolar source geometry must be present')
