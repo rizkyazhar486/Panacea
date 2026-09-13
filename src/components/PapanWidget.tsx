@@ -7,8 +7,8 @@ import { widgetPapan, ambilWidget } from '../lib/homeWidgets'
 const WIDGETS = widgetPapan()
 import { lazy, Suspense } from 'react'
 import { getWorkouts } from '../lib/workoutStore'
-import { hrMaxFromAge } from '../lib/workoutImport'
-import { getDemo } from '../lib/profile'
+import { hrMaxPerkiraan } from '../lib/workoutImport'
+import { getDemo, getDemoTersimpan } from '../lib/profile'
 
 // Dimuat malas: berkas grafik beserta analisisnya tidak perlu ikut ke bundel
 // awal bagi pemakai yang tidak menyalakan kartunya.
@@ -362,7 +362,7 @@ function KartuGrafikOlahraga() {
   if (!workouts.length) return null
   const demo = getDemo()
   const teramati = workouts.reduce((a, w) => Math.max(a, w.maxHr ?? 0), 0)
-  const hrMax = Math.max(teramati, hrMaxFromAge(demo.age || 30, demo.sex))
+  const hrMax = Math.max(teramati, hrMaxPerkiraan(getDemoTersimpan()))
   return (
     <section className="rounded-3xl bg-neutral-900 p-4 dark:bg-white/5">
       <Suspense fallback={<div className="h-24" />}>

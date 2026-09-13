@@ -348,6 +348,23 @@ export function hrMaksimum(
   }
 }
 
+/**
+ * HRmax PERKIRAAN dari demografi yang benar-benar disimpan.
+ *
+ * Ada untuk satu alasan: angka 30 itu tadinya tertulis DUA BELAS KALI di
+ * seluruh src, sebagai `demo.age || 30` atau `demo.age > 0 ? demo.age : 30`.
+ * Dua belas salinan sebuah asumsi berarti dua belas tempat yang bisa berubah
+ * sendiri-sendiri, dan tidak satu pun di antaranya menjelaskan bahwa 30 itu
+ * bukan usia siapa pun. Sekarang asumsinya tinggal satu, di sebelah
+ * penjelasannya, dan `hrMaksimum` di atas yang memutuskan namanya.
+ *
+ * Angkanya SAMA PERSIS dengan yang dihasilkan salinan-salinan itu; yang
+ * berubah hanya di mana ia tinggal dan apakah asalnya bisa ditanyakan.
+ */
+export function hrMaxPerkiraan(demoTersimpan: { age?: number; sex?: 'M' | 'F' }): number {
+  return hrMaksimum([], demoTersimpan).nilai
+}
+
 // ── Peringatan detak jantung ────────────────────────────────────────────────
 
 export function parseHrNotifications(text: string): HrNotification[] {

@@ -4,9 +4,9 @@ import { SectionTitle } from '../components/ui'
 import { IconActivity } from '../components/icons'
 import { useJam } from '../lib/useJam'
 import { getWorkouts } from '../lib/workoutStore'
-import { getDemo } from '../lib/profile'
+import { getDemo, getDemoTersimpan } from '../lib/profile'
 import { getVitals } from '../lib/healthVitals'
-import { hrMaxFromAge } from '../lib/workoutImport'
+import { hrMaxPerkiraan } from '../lib/workoutImport'
 import { kebugaranKesegaran } from '../lib/analisisPro'
 import { ringkasBeban, statusLatihan } from '../lib/trainingPhysiology'
 import {
@@ -100,7 +100,7 @@ export function PapanAtlet() {
     const jk: 'M' | 'F' = demo.sex === 'F' ? 'F' : 'M'
     const v = getVitals()
     const k = {
-      hrMax: workouts.reduce((a, w) => Math.max(a, w.maxHr ?? 0), 0) || hrMaxFromAge(usia, jk),
+      hrMax: workouts.reduce((a, w) => Math.max(a, w.maxHr ?? 0), 0) || hrMaxPerkiraan(getDemoTersimpan()),
       hrRest: typeof v.restingHr === 'number' && v.restingHr > 0 ? v.restingHr : 60,
       sex: jk,
     }

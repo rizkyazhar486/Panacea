@@ -6,9 +6,9 @@ import { AreaChart, Area, Line, ComposedChart, XAxis, YAxis, Tooltip, Responsive
 import { Card, SectionTitle } from '../components/ui'
 import { IconChartUp, IconRun, IconTimer, IconActivity } from '../components/icons'
 import { getWorkouts, mergeWorkouts } from '../lib/workoutStore'
-import { parseWorkouts, hrMaxFromAge, fmtDurasi, fmtPace, type ImportedWorkout } from '../lib/workoutImport'
+import { parseWorkouts, hrMaxPerkiraan, fmtDurasi, fmtPace, type ImportedWorkout } from '../lib/workoutImport'
 import { api, backendEnabled } from '../lib/api'
-import { getDemo } from '../lib/profile'
+import { getDemo, getDemoTersimpan } from '../lib/profile'
 import { sebaranIntensitas, sebaranPerMinggu, hanyutanDenyut, volumeMingguan, perkiraanRiegel } from '../lib/analisisLari'
 import { useVitals } from '../lib/useVitals'
 import {
@@ -67,7 +67,7 @@ export function AnalisisPro() {
   const konteks = useMemo(() => {
     const teramati = workouts.reduce((a, w) => Math.max(a, w.maxHr ?? 0), 0)
     return {
-      hrMax: Math.max(teramati, hrMaxFromAge(demo.age || 30, demo.sex)),
+      hrMax: Math.max(teramati, hrMaxPerkiraan(getDemoTersimpan())),
       hrRest: demo.restingHr && demo.restingHr > 0 ? demo.restingHr : 60,
       sex: demo.sex,
     }
