@@ -1,8 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import * as THREE from 'three'
-import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
-import { MeshoptDecoder } from 'three/examples/jsm/libs/meshopt_decoder.module.js'
+import { muatAtlas, namaAtlas, type AtlasDimuat } from '../../lib/anatomy/pemuatAtlas'
 import { body3dPixelRatio } from '../../lib/body3dQuality'
 import { BERKAS_KELENJAR, petaMeshKeStruktur, STRUKTUR_KELENJAR } from '../../lib/anatomy/kelenjarSaluran'
 
@@ -91,43 +90,15 @@ export function KelenjarSaluran3D({ terpilih, onPilih, tinggi = 320 }: KelenjarS
     const kotak = new THREE.Box3()
     let dibatalkan = false
 
-    // Ketujuh GLB atlas ini dimampatkan meshopt. TANPA dekodernya GLTFLoader
-    // MENOLAK berkasnya dan kanvasnya kosong begitu saja, tanpa galat.
-    const loader = new GLTFLoader()
-    loader.setMeshoptDecoder(MeshoptDecoder)
+    // muatAtlas memasang dekoder meshopt (tanpanya berkasnya ditolak dan
+    // kanvasnya kosong tanpa galat) dan memulihkan nama ASLI lewat
+    // parser.associations. Yang kedua bukan kenyamanan: GLTFLoader membuang
+    // titik pemisah, sehingga "Kidney.l" dan "Kidney.r" tiba dengan nama yang
+    // SAMA, dibedakan hanya oleh akhiran angka yang urutannya tidak dijamin
+    // apa pun -- mencocokkan nama scene akan menukar kiri dan kanan tanpa satu
+    // pun galat.
 
-    interface Atlas {
-      scene: THREE.Group
-      parser: {
-        json: { nodes?: Array<{ name?: string }> }
-        associations: Map<THREE.Object3D, unknown>
-      }
-    }
-
-    /**
-     * Nama ASLI tiap objek, dipulihkan lewat parser.associations.
-     *
-     * GLTFLoader menyanitasi nama simpul dan aturannya berbeda antar versi
-     * three: titik pemisah dibuang, sehingga "Kidney.l" dan "Kidney.r" tiba di
-     * scene dengan nama yang SAMA, dibedakan hanya oleh akhiran angka yang
-     * urutannya tidak dijamin apa pun. Mencocokkan nama scene akan menukar kiri
-     * dan kanan tanpa satu pun galat.
-     */
-    const namaAsliDari = (gltf: Atlas) => {
-      const nodesJson = gltf.parser.json.nodes
-      const peta = new Map<THREE.Object3D, string>()
-      gltf.scene.traverse((o) => {
-        const assoc = gltf.parser.associations.get(o) as { nodes?: number } | undefined
-        const idx = assoc?.nodes
-        const nama = idx !== undefined ? nodesJson?.[idx]?.name : undefined
-        if (nama) peta.set(o, nama)
-      })
-      return peta
-    }
-
-    const pasang = (gltf: Atlas) => {
-      const akar = gltf.scene
-      const namaAsli = namaAsliDari(gltf)
+    const pasang = ({ scene: akar, namaAsli }: AtlasDimuat) => {
       akar.traverse((o) => {
         if (!(o as THREE.Mesh).isMesh) return
         const m = o as THREE.Mesh
@@ -136,7 +107,7 @@ export function KelenjarSaluran3D({ terpilih, onPilih, tinggi = 320 }: KelenjarS
         // lobus hipofisis). Karena itu namanya dicari pada objeknya dulu, lalu
         // pada induknya -- dan berhenti pada yang PERTAMA ditemukan, supaya
         // "Pancreatic duct" tidak ikut terbaca sebagai "Pancreas".
-        const nama = namaAsli.get(m) ?? (m.parent ? namaAsli.get(m.parent) : undefined)
+        const nama = namaAtlas(namaAsli, m) || undefined
         const id = nama ? peta.get(nama) : undefined
         if (!id) {
           m.visible = false
@@ -184,16 +155,7 @@ export function KelenjarSaluran3D({ terpilih, onPilih, tinggi = 320 }: KelenjarS
     // Satu berkas gagal harus TERLIHAT, bukan menghasilkan separuh gambar yang
     // tampak benar. Keduanya dimuat berdampingan lalu dipasang dalam urutan
     // TETAP: urutan kedatangan jaringan tidak boleh menentukan isi scene.
-    const muatSatu = (berkas: string) => new Promise<Atlas>((selesai, tolak) => {
-      loader.load(
-        `${import.meta.env.BASE_URL}${berkas}`,
-        (gltf) => selesai(gltf as unknown as Atlas),
-        undefined,
-        (e) => tolak(e instanceof Error ? e : new Error(`Gagal memuat ${berkas}`)),
-      )
-    })
-
-    Promise.all(BERKAS_KELENJAR.map(muatSatu))
+    Promise.all(BERKAS_KELENJAR.map((berkas) => muatAtlas(berkas)))
       .then((hasil) => {
         if (dibatalkan) return
         for (const a of hasil) pasang(a)

@@ -127,7 +127,10 @@ async function semuaBerkasSumber(dir: string): Promise<string[]> {
     const { BERKAS_ARTERI } = await import('../../src/lib/anatomy/wilayahArteri.ts')
     const { BERKAS_LIMFOID } = await import('../../src/lib/anatomy/stasiunLimfe.ts')
     const { BERKAS_KERANGKA } = await import('../../src/lib/anatomy/rangkaKerangka.ts')
-    for (const [nama, nilai] of Object.entries({ BERKAS_ARTERI, BERKAS_LIMFOID, BERKAS_KERANGKA })) {
+    const { BERKAS_VISCERAL, BERKAS_NERVOUS } = await import('../../src/lib/anatomy/kelenjarSaluran.ts')
+    for (const [nama, nilai] of Object.entries({
+      BERKAS_ARTERI, BERKAS_LIMFOID, BERKAS_KERANGKA, BERKAS_VISCERAL, BERKAS_NERVOUS,
+    })) {
       assert.ok(
         !nilai.includes('/'),
         `${nama} = "${nilai}" membawa awalan jalur; muatAtlas menambahkan "anatomy/" sendiri, ` +
