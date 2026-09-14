@@ -4,6 +4,7 @@ import { IconActivity, IconSearch, IconStethoscope } from '../components/icons'
 import { api, type OntologyTerm, type DrugLabelInfo, type AnatomyImage, type ImageKind } from '../lib/api'
 import { explainBodyRegion, explainDrug } from '../lib/ai'
 import { useStore } from '../lib/store'
+import jumlahAtlas from '../data/jumlahAtlas.json'
 import { Body3D, ANATOMY_LAYERS, RENDER_MODES, CT_WINDOWS, MOTION_OFF, MOTION_REST, MOTION_EXERCISE, type AnatomyLayer, type RenderMode, type SlicePlane, type MotionState } from '../components/Body3D'
 import { FeatureErrorBoundary } from '../components/FeatureErrorBoundary'
 import { WORKOUT_MUSCLE_GROUPS } from '../lib/workoutMuscles'
@@ -870,13 +871,27 @@ export function BodyExplorer() {
             <div className="mt-3">
               {panelTab === 'layers' && (
               <>
-                <p className="mb-1.5 text-[11px] text-neutral-400">
-                  Turn body systems on or off. Only what you can see can be tapped.
-                </p>
+                <div className="mb-1.5 flex flex-wrap items-baseline justify-between gap-x-2 gap-y-0.5">
+                  <p className="text-[11px] text-neutral-400">
+                    Turn body systems on or off. Only what you can see can be tapped.
+                  </p>
+                  {/* Jumlah struktur yang SEDANG terlihat, dihitung dari berkas
+                      geometrinya sendiri lewat src/data/jumlahAtlas.json. */}
+                  <p className="text-[11px] font-bold tabular-nums text-neutral-500 dark:text-neutral-400">
+                    {ANATOMY_LAYERS.filter((l) => layers.has(l.key))
+                      .reduce((n, l) => n + (jumlahAtlas.perSistem[l.key] ?? 0), 0)
+                      .toLocaleString()}
+                    {' of '}
+                    {jumlahAtlas.total.toLocaleString()} structures visible
+                  </p>
+                </div>
                 <div className="flex flex-wrap gap-1.5">
                   {ANATOMY_LAYERS.map((l) => (
                     <Chip key={l.key} active={layers.has(l.key)} onClick={() => toggleLayer(l.key)}>
                       {l.label}
+                      <span className={`ml-1.5 tabular-nums ${layers.has(l.key) ? 'text-white/70' : 'text-neutral-400 dark:text-neutral-500'}`}>
+                        {jumlahAtlas.perSistem[l.key] ?? 0}
+                      </span>
                     </Chip>
                   ))}
                 </div>
