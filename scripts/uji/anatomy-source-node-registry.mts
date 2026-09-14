@@ -34,30 +34,48 @@ assert.ok(femurMatches.length > 0)
 assert.ok(femurMatches.flatMap((match) => match.names).includes('Femur.l'))
 assert.ok(femurMatches.flatMap((match) => match.names).includes('Femur.r'))
 
+const cardiovascularBundle = [{
+  file: 'cardiovascular.glb',
+  names: ['Heart', 'Aorta', 'Superior vena cava', 'Hippocampus.r'],
+}]
+
+const specificFirst = resolveAnatomySourceNodes(
+  ['heart', 'aorta', 'vena cava'],
+  cardiovascularBundle,
+  8,
+)
+assert.deepEqual(
+  specificFirst.map((match) => match.hint),
+  ['heart'],
+  'specificity-fallback resolution must stop after the first reviewed hint that matches',
+)
+assert.deepEqual(
+  specificFirst.flatMap((match) => match.names),
+  ['Heart'],
+  'broad fallback hints must not expand a successful specific anatomy query',
+)
+
 const grouped = resolveAllAnatomySourceNodes(
   ['heart', 'aorta', 'vena cava'],
-  [{
-    file: 'cardiovascular.glb',
-    names: ['Heart', 'Aorta', 'Superior vena cava', 'Hippocampus.r'],
-  }],
+  cardiovascularBundle,
   8,
 )
 assert.deepEqual(
   grouped.map((match) => match.hint),
   ['heart', 'aorta', 'vena cava'],
-  'each reviewed component hint should be allowed to contribute exact source nodes',
+  'each reviewed composite component hint should be allowed to contribute exact source nodes',
 )
 assert.deepEqual(
   grouped.flatMap((match) => match.names),
   ['Heart', 'Aorta', 'Superior vena cava'],
-  'multi-structure atlas targets must not stop resolving after the first successful hint',
+  'multi-structure atlas targets must resolve all reviewed components rather than stopping after the first successful hint',
 )
 
 const deduplicated = resolveAllAnatomySourceNodes(
   ['aorta', 'aorta'],
   [{ file: 'cardiovascular.glb', names: ['Aorta'] }],
 )
-assert.equal(deduplicated.flatMap((match) => match.names).length, 1, 'the same source node must not be emitted twice across overlapping hints')
+assert.equal(deduplicated.flatMap((match) => match.names).length, 1, 'the same source node must not be emitted twice across overlapping composite hints')
 
 publishAnatomySourceNodes('skeletal.glb', ['Femur.r', 'Femur.l', 'Femur.r'])
 const withRuntime = getEffectiveAnatomySourceNodeSnapshot()
@@ -104,4 +122,4 @@ assert.match(meshBrowserSource, /anatomySourceNodeOrigin/, 'source mesh browser 
 assert.match(meshBrowserSource, /loaded runtime/, 'source mesh browser must label live source nodes without calling them generated metadata')
 assert.match(meshBrowserSource, /generated GLB index/, 'unloaded bundles must retain an explicit generated-index fallback label')
 
-console.log('Z-Anatomy source-node resolver preserves exact GLB provenance, publishes runtime renderer nodes, and keeps runtime-versus-indexed geometry state explicit in the atlas UX.')
+console.log('Z-Anatomy source-node resolver preserves exact GLB provenance, keeps specificity fallbacks fail-closed, resolves reviewed composite components conservatively, publishes runtime renderer nodes, and keeps runtime-versus-indexed geometry state explicit in the atlas UX.')

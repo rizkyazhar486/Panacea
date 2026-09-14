@@ -1,0 +1,77 @@
+name: Surgery Mobile QA
+
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - 'src/pages/BodyExplorer.tsx'
+      - 'src/components/Body3D.tsx'
+      - 'src/pages/bodyhub/SurgicalLab.tsx'
+      - 'src/pages/bodyhub/SurgerySimulatorLab.tsx'
+      - 'src/lib/surgerySimulator.ts'
+      - 'src/lib/surgeryLayerSequences.ts'
+      - 'scripts/qa/surgery-simulator-mobile-smoke.mjs'
+      - 'scripts/uji/surgerySimulator.mts'
+      - '.github/workflows/surgery-mobile-qa.yml'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: surgery-mobile-qa-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  mobile-browser-qa:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+
+      - name: Install application dependencies
+        run: npm ci
+
+      - name: Install browser QA runtime
+        run: |
+          npm install --no-save --package-lock=false @playwright/test@1.55.0
+          npx playwright install --with-deps chromium
+
+      - name: Build production frontend
+        run: npm run build
+
+      - name: Start production preview
+        run: |
+          npm run preview -- --host 127.0.0.1 --port 4173 > /tmp/panacea-preview.log 2>&1 &
+          echo $! > /tmp/panacea-preview.pid
+          for i in $(seq 1 60); do
+            if curl --fail --silent http://127.0.0.1:4173/ > /dev/null; then
+              exit 0
+            fi
+            sleep 1
+          done
+          cat /tmp/panacea-preview.log
+          exit 1
+
+      - name: Verify surgery and shared Body3D at 390x844
+        run: node scripts/qa/surgery-simulator-mobile-smoke.mjs
+
+      - name: Show preview log on failure
+        if: failure()
+        run: cat /tmp/panacea-preview.log || true
+
+      - name: Upload QA evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: surgery-mobile-qa
+          if-no-files-found: warn
+          retention-days: 14
+          path: |
+            artifacts/surgery-simulator-390x844.png
+            artifacts/surgery-simulator-metrics.json
+            /tmp/panacea-preview.log
