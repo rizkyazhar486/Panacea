@@ -3,6 +3,7 @@ import { useStore } from '../lib/store'
 import { PostCard } from './Feed'
 import { backendEnabled } from '../lib/api'
 import { IconSearch, IconUsers } from '../components/icons'
+import { SourceExperienceShortcuts } from '../components/SourceExperienceShortcuts'
 
 // Search — find people (profiles) and posts. Operates over the posts available
 // locally; with a backend the feed includes other users so search spans them too.
@@ -42,6 +43,8 @@ export function Search() {
           Search covers all users when the server is connected. Without a server, only posts on this device are searched.
         </p>
       )}
+
+      <SourceExperienceShortcuts query={query} />
 
       {/* People */}
       <div className="mb-4">
