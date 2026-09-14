@@ -1,5 +1,5 @@
 3D anatomy assets in this folder (skeletal.glb, muscular.glb, cardiovascular.glb,
-nervous.glb, visceral.glb) are derived from:
+nervous.glb, visceral.glb, lymphoid.glb) are derived from:
 
   Z-Anatomy — The libre 3D atlas of anatomy
   https://github.com/Z-Anatomy/Models-of-human-anatomy
@@ -14,15 +14,20 @@ nervous.glb, visceral.glb) are derived from:
 Authors (Z-Anatomy): Kousaku Okubo (original BodyParts3D model), Gauthier Kervyn
 (design, 3D, anatomy), Marcin Zielinski (Blender add-on), Lluis Vinent (app dev).
 
-What was changed for Panaceamed.id: exported five system-separated GLB files
-(skeletal, muscular, cardiovascular, nervous, visceral) from the original
-Z-Anatomy Blender project, applied Meshopt mesh compression, and replaced the
-original Blender node-based shaders (which depend on Blender-viewport-only
-effects) with flat PBR materials colored per anatomical structure type
-(muscle red, artery red, vein blue, nerve yellow, bone tan, etc.) so the
-models render correctly in a web WebGL viewer (three.js).
+What was changed for Panaceamed.id: exported system-separated GLB files
+(skeletal, muscular, cardiovascular, nervous, visceral, lymphoid) from the
+original Z-Anatomy Blender project, applied Meshopt mesh compression, and
+replaced the original Blender node-based shaders (which depend on
+Blender-viewport-only effects) with flat PBR materials colored per anatomical
+structure type so the models render correctly in a web WebGL viewer (three.js).
+The lymphoid export contains source-model lymph-node and lymphoid-organ geometry;
+Panacea does not add missing lymphatic vessels or ducts to that file.
 
-Per the CC BY-SA 4.0 terms, this derivative work (the five .glb files in this
-folder) is itself licensed under CC BY-SA 4.0 — attribution above must be kept,
-and any redistribution of these specific files must carry the same license.
-This does not extend to the rest of the Panaceamed.id application/codebase.
+Per the CC BY-SA 4.0 terms, these derivative GLB files are themselves licensed
+under CC BY-SA 4.0 — attribution above must be kept, and any redistribution of
+these specific files must carry the same license. This does not extend to the
+rest of the Panaceamed.id application/codebase.
+
+Note: other files that may appear in this folder are not covered by this notice
+unless they are explicitly named above; their provenance/license must be checked
+separately rather than inferred from proximity.
