@@ -3,6 +3,7 @@ import { FeatureErrorBoundary } from '../../components/FeatureErrorBoundary'
 
 const OcularOpticsLesson = lazy(() => import('../../components/digital-twin/Ocular4DAtlas').then((module) => ({ default: module.OcularOpticsLesson })))
 import AtlasViewer3D, { type PartMeta } from '../../components/AtlasViewer3D'
+import { SkinLesionUncertaintyStudio } from './SkinLesionUncertaintyStudio'
 import { ATLAS_MODULE_INFO, partsForModule } from '../../lib/systemAtlas.gen'
 import {
   kondisiUntukModul, kondisiUntukStrukturSistem, strukturKondisiSistem, type SystemCondition,
@@ -285,6 +286,8 @@ export function SpecialtyLab({ onBukaOrgan, onBukaCardio, onBukaObat }: Props) {
         dipilih={struktur}
         onPilih={(n) => { setStruktur(n); if (n) setKondisiId(null) }}
       />
+
+      {modul === 'kulit' && <SkinLesionUncertaintyStudio />}
 
       <p className="text-[10.5px] leading-relaxed text-neutral-400">
         {info?.structures} named structures · {info?.kb} kB · {SUMBER[asal] ?? SUMBER['bodyparts3d']}.{' '}
