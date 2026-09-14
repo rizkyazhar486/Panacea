@@ -70,9 +70,16 @@ assert.ok(/import jumlahAtlas from '\.\.\/data\/jumlahAtlas\.json'/.test(halaman
 // Bukan "ungkapannya ada di suatu tempat": jumlah per sistem dipakai DUA kali
 // di halaman ini — sekali untuk menjumlah yang terlihat, sekali di dalam chip.
 // Memeriksa keberadaannya saja akan lolos ketika angka pada chip-nya dihapus.
-const chip = halaman.match(/<Chip[\s\S]{0,400}?<\/Chip>/)?.[0] ?? ''
+const chip = halaman.match(/<Chip[\s\S]{0,900}?<\/Chip>/)?.[0] ?? ''
 assert.ok(/jumlahAtlas\.perSistem\[l\.key\]/.test(chip),
   'the per-system count was removed from the chip itself, even though the page still totals them elsewhere')
+// Angka pada pil disembunyikan dari pembaca layar (aria-hidden) karena ia
+// bukan bagian dari nama tombol. Kalau begitu, angkanya WAJIB tetap sampai
+// lewat aria-label — kalau tidak, pemakai pembaca layar kehilangan datanya.
+if (/aria-hidden="true"/.test(chip)) {
+  assert.ok(/ariaLabel=\{`\$\{l\.label\}, \$\{\(jumlahAtlas\.perSistem\[l\.key\] \?\? 0\)/.test(chip),
+    'the chip hides its count from assistive tech without putting it back in the accessible name')
+}
 assert.ok(/jumlahAtlas\.total/.test(halaman), 'the total is no longer shown')
 assert.ok(!/2,?187|2\.187/.test(halaman), 'a structure count was hard-coded into the page instead of read from the manifest')
 
