@@ -1,5 +1,7 @@
 import { lazy, Suspense, type ComponentType } from 'react'
 import { useSearchParams } from 'react-router-dom'
+import { PanaceaZoneNav } from '../components/PanaceaZoneNav'
+import { FeatureBoulevard } from '../components/FeatureBoulevard'
 
 const EMR = lazy(() => import('./EMR').then((m) => ({ default: m.EMR })))
 const Chatbot = lazy(() => import('./Chatbot').then((m) => ({ default: m.Chatbot })))
@@ -26,6 +28,7 @@ export function HelpServicesWorkspace() {
   const Active = active.component
   return (
     <div className="mx-auto w-full max-w-[1400px] space-y-4 pb-10">
+      <PanaceaZoneNav />
       <section className="rounded-[30px] border border-white/10 bg-black/20 p-4 shadow-2xl backdrop-blur-xl sm:p-5">
         <div className="text-[10px] font-black uppercase tracking-[.22em] text-brand">Help & Services</div>
         <h1 className="mt-1 text-2xl font-black tracking-tight text-ink dark:text-white sm:text-3xl">Ask, document and reach emergency information in one place</h1>
@@ -40,6 +43,7 @@ export function HelpServicesWorkspace() {
         <div className="mt-3 rounded-2xl border border-white/10 bg-white/[.03] px-3 py-2.5 text-[11px] leading-relaxed text-neutral-500 dark:text-neutral-400"><b className="text-ink dark:text-white">{active.label}:</b> {active.description}</div>
       </section>
       <section role="tabpanel" aria-label={active.label}><Suspense fallback={<Loader />}><Active /></Suspense></section>
+      <FeatureBoulevard zone="services" title="Help & Services feature boulevard" />
     </div>
   )
 }
