@@ -1,13 +1,10 @@
 import { Navigate } from 'react-router-dom'
 import { useStore } from '../lib/store'
-import Beranda from './Beranda'
+import { HomeSocialWorkspace } from './HomeSocialWorkspace'
 
-// Pendaratan menurut peran.
-//
-// Beranda dulu adalah umpan sosial (Feed). Bagi pemakai baru layar pertama
-// sebuah aplikasi kesehatan berbunyi "No posts yet" -- 31 kata, tidak satu pun
-// tentang kesehatannya. Umpan itu tetap ada di /community; yang berubah hanya
-// pintu masuknya, kini berisi pekerjaan yang bisa langsung dikerjakan.
+// Role-aware landing stays intact for contributor/verifier/admin accounts.
+// Patient, doctor and owner accounts now land in one Home workspace that
+// contains logs/stats, social, clubs, finance, markets, scores and reading.
 export function Home() {
   const { account } = useStore()
   if (!account) return null
@@ -19,6 +16,6 @@ export function Home() {
     case 'admin':
       return <Navigate to="/admin" replace />
     default:
-      return <Beranda />
+      return <HomeSocialWorkspace />
   }
 }
