@@ -1,0 +1,59 @@
+{
+  "id": "bioimage_archive_s_biad712",
+  "name": "BioImage Archive S-BIAD712 — multispectral live human iPSC organelle imaging",
+  "category": "imaging",
+  "kind": ["dataset"],
+  "homepage": "https://uk1s3.embassy.ebi.ac.uk/bia-integrator-data/pages/S-BIAD712.html",
+  "features": [
+    "cellular-reference-imaging",
+    "confocal-microscopy",
+    "organelle-imaging",
+    "human-ipsc",
+    "multichannel-z-stack",
+    "time-series",
+    "reference-volume-source"
+  ],
+  "formats": ["czi", "confocal", "z-stack", "multichannel", "time-series"],
+  "usage": {
+    "runtime": false,
+    "buildTime": true,
+    "networkRequired": true,
+    "notes": "Use as an accession-pinned research/reference source for optional derived cellular visualization assets. Do not ship the full 30.3 GiB study in the web bundle. Select individual files explicitly, preserve channel/slice metadata, and generate lightweight derivatives offline. Source files remain immutable and external to the application bundle."
+  },
+  "license": {
+    "status": "VERIFIED",
+    "identifier": "CC-BY-4.0",
+    "commercialUse": "ALLOWED",
+    "attributionRequired": true,
+    "shareAlike": false,
+    "scope": "This verification applies specifically to BioImage Archive accession S-BIAD712, whose official study page states License: CC BY 4.0. It does not grant blanket rights to other BioImage Archive accessions; each accession and any imported/brokered dataset must be checked independently.",
+    "verificationUrl": "https://uk1s3.embassy.ebi.ac.uk/bia-integrator-data/pages/S-BIAD712.html",
+    "verifiedAt": "2026-09-08",
+    "notes": "Any Panacea derivative must provide appropriate attribution, link to CC BY 4.0, identify S-BIAD712 and the exact source filename/image ID, and indicate transformations such as channel selection, cropping, resampling, projection, segmentation or mesh derivation."
+  },
+  "validation": {
+    "level": "RESEARCH",
+    "clinicalDecisionUse": "NO",
+    "notes": "This is biological microscopy of live undifferentiated human induced pluripotent stem cells, not patient imaging and not a diagnostic reference. It may support education and research visualization of cellular compartments, but cannot establish universal organelle morphology, dimensions, abundance or disease state for arbitrary human cells."
+  },
+  "provenance": {
+    "authority": "EMBL-EBI BioImage Archive; study authors Maria Clara Zanellati and Sarah Cohen",
+    "sourceIdentityRequired": true,
+    "versionPinRequired": true,
+    "notes": "Pin accession S-BIAD712 plus exact image ID/filename for every derivative. The study page reports 67 .czi images (30.3 GiB total), Homo sapiens, confocal microscopy, with seven organelle markers targeting nucleus, endoplasmic reticulum, Golgi, mitochondria, peroxisomes, lysosomes and lipid droplets. Record original dimensions, channels, Z/T indices, acquisition metadata when available, transformation parameters and output checksum."
+  },
+  "adapter": {
+    "status": "PLANNED",
+    "normalizedTarget": "PanaceaScientificVolume",
+    "module": null,
+    "notes": "Planned build-time flow: accession/file manifest -> checksum-verified CZI source -> pinned conversion/reader -> selected channels and slices -> lightweight immutable reference volume or derived mesh/preview -> PanaceaScientificVolume metadata containing source accession, image ID, filename, original dimensions, channel mapping, transformations, license and checksums. Never replace the scale-reference Cell3D reconstruction silently; microscopy-derived views must remain visibly identified as source-derived reference data."
+  },
+  "trust": {
+    "authority": 5,
+    "evidenceQuality": 4,
+    "recency": 4,
+    "licenseClarity": 5,
+    "reproducibility": 4,
+    "notes": "High authority and clear accession-level licensing. Reproducibility depends on pinning the exact CZI file and conversion pipeline. Biological generalizability is intentionally limited because the study represents one live hiPSC imaging context rather than all human cell types."
+  }
+}
