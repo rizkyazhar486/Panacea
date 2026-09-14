@@ -3,8 +3,8 @@ import { useSearchParams } from 'react-router-dom'
 import { PanaceaZoneNav } from '../components/PanaceaZoneNav'
 import { FeatureBoulevard } from '../components/FeatureBoulevard'
 
-const Beranda = lazy(() => import('./Beranda').then((m) => ({ default: m.Beranda })))
-const Feed = lazy(() => import('./Feed').then((m) => ({ default: m.Feed })))
+const Beranda = lazy(() => import('./Beranda'))
+const Feed = lazy(() => import('./Feed'))
 const ClubHub = lazy(() => import('./ClubHub').then((m) => ({ default: m.ClubHub })))
 const MoneyHub = lazy(() => import('./MoneyHub').then((m) => ({ default: m.MoneyHub })))
 const Markets = lazy(() => import('./Markets').then((m) => ({ default: m.Markets })))
