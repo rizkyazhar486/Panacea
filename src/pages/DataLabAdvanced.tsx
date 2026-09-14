@@ -2,9 +2,10 @@ import { useEffect, useMemo, useState } from 'react'
 import { Prosa } from '../components/Prosa'
 import { Card, SectionTitle, Field, inputClass, Badge } from '../components/ui'
 import { IconStethoscope } from '../components/icons'
+import { CfpbComplaintRoutingLab } from '../components/finance/CfpbComplaintRoutingLab'
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Data Lab Advanced — seven small real local-data-processing tools in one
+// Data Lab Advanced — local data-processing tools and transparent research workspaces in one
 // page: a blood-panel linear-regression trend forecaster, a glucose-
 // variability calculator (CGM-style), the published PhenoAge biological-age
 // formula, an omega-6:3 ratio calculator, a Shannon Diversity Index on your
@@ -14,7 +15,7 @@ import { IconStethoscope } from '../components/icons'
 // external API, no data ever leaves the browser.
 // ─────────────────────────────────────────────────────────────────────────────
 
-type Tab = 'blood-trend' | 'glucose' | 'phenoage' | 'omega' | 'microbiome' | 'supplements' | 'vault'
+type Tab = 'blood-trend' | 'glucose' | 'phenoage' | 'omega' | 'microbiome' | 'supplements' | 'vault' | 'cfpb'
 
 function linreg(xs: number[], ys: number[]): { slope: number; intercept: number } {
   const n = xs.length
@@ -300,6 +301,7 @@ const TABS: { id: Tab; label: string }[] = [
   { id: 'microbiome', label: 'Microbiome Diversity' },
   { id: 'supplements', label: 'Supplement Curves' },
   { id: 'vault', label: 'Encrypted Vault' },
+  { id: 'cfpb', label: 'CFPB Complaints' },
 ]
 
 export function DataLabAdvanced() {
@@ -307,7 +309,7 @@ export function DataLabAdvanced() {
   return (
     <div className="mx-auto max-w-2xl space-y-5 pb-24">
       <Card className="!p-5">
-        <SectionTitle icon={<IconStethoscope size={20} />} title="Data Lab Advanced" subtitle="Seven genuinely local data tools — nothing leaves your browser" />
+        <SectionTitle icon={<IconStethoscope size={20} />} title="Data Lab Advanced" subtitle="Local health tools and transparent research workspaces" />
         <div className="mt-3 flex flex-wrap gap-2">
           {TABS.map((t) => (
             <button key={t.id} onClick={() => setTab(t.id)} className={`rounded-full px-3 py-1.5 text-[12px] font-bold transition ${tab === t.id ? 'bg-brand text-white' : 'bg-neutral-100 text-neutral-600 dark:bg-white/10 dark:text-neutral-300'}`}>{t.label}</button>
@@ -322,10 +324,12 @@ export function DataLabAdvanced() {
       {tab === 'microbiome' && <MicrobiomeDiversity />}
       {tab === 'supplements' && <SupplementCombiner />}
       {tab === 'vault' && <EncryptedVault />}
+      {tab === 'cfpb' && <CfpbComplaintRoutingLab />}
 
       <div className="rounded-2xl border border-neutral-100 bg-white p-4 text-center text-[11px] leading-relaxed text-neutral-500 dark:border-white/10 dark:bg-white/5">
-        All computation happens locally in your browser — no file, blood value, or note here is ever
-        sent to a server. Educational tools, not diagnostic or medical devices.
+        All computation happens locally in your browser — no imported file, blood value, complaint,
+        or note here is sent to a server. Educational and research tools, not diagnostic, legal,
+        lending, or regulatory decisions.
       </div>
     </div>
   )
