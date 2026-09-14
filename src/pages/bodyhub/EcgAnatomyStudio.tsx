@@ -94,7 +94,7 @@ export function EcgAnatomyStudio({ heartRate, onHeartRateChange }: Props) {
         <div className="text-[9px] font-black uppercase tracking-[0.18em] text-brand">Heart anatomy × 12-lead ECG</div>
         <h3 className="mt-1 text-sm font-black text-ink dark:text-white">Rotate the electrical view across all twelve standard leads</h3>
         <p className="mt-1 text-[10.5px] leading-relaxed text-neutral-500">
-          Every waveform on this screen is generated locally for teaching. No patient ECG is analysed. PTB-XL is a future source-backed compatibility target for record playback and multi-label statement exploration; no PTB-XL records, labels, model weights or performance claims are bundled here.
+          Every waveform on this screen is generated locally for teaching and is not recorded ECG data. It does not classify a patient rhythm. PTB-XL is a future source-backed compatibility target for record playback and multi-label statement exploration; no PTB-XL records, labels, model weights or performance claims are bundled here. HaneenElyamani/ECG-classification remains a capability reference only because repository-level reuse terms have not been verified.
         </p>
       </div>
 
