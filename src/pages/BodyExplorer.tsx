@@ -5,6 +5,7 @@ import { api, type OntologyTerm, type DrugLabelInfo, type AnatomyImage, type Ima
 import { explainBodyRegion, explainDrug } from '../lib/ai'
 import { useStore } from '../lib/store'
 import jumlahAtlas from '../data/jumlahAtlas.json'
+import { CariStrukturCepat } from '../components/CariStrukturCepat'
 import { Body3D, ANATOMY_LAYERS, RENDER_MODES, CT_WINDOWS, MOTION_OFF, MOTION_REST, MOTION_EXERCISE, type AnatomyLayer, type RenderMode, type SlicePlane, type MotionState } from '../components/Body3D'
 import { FeatureErrorBoundary } from '../components/FeatureErrorBoundary'
 import { WORKOUT_MUSCLE_GROUPS } from '../lib/workoutMuscles'
@@ -588,6 +589,24 @@ export function BodyExplorer() {
         subtitle="A real 3D anatomy model — tap any bone, muscle, vessel, nerve, or organ"
       />
       <Card>
+        {/* Kotak cari di ATAS modelnya. Struktur yang dicari orang hampir
+            selalu berada di sistem yang sedang dimatikan -- itu sebabnya ia
+            dicari dan bukan diketuk -- jadi memilih hasil ikut menyalakan
+            sistemnya, kalau tidak layarnya tidak berubah dan strukturnya
+            terbaca sebagai tidak ada. */}
+        <div className="mb-2">
+          <CariStrukturCepat
+            lapisanAktif={layers}
+            onNyalakanLapisan={(kunci) => setLayers((prev) => new Set(prev).add(kunci))}
+            onSorot={(nama, label) => {
+              setActiveWorkout(null)
+              setActiveOrgan(null)
+              setFocusKeywords(null)
+              setHighlighted(nama)
+              lookup(label, [toSearchTerm(nama[0])], undefined, nama[0])
+            }}
+          />
+        </div>
         <Body3D
           layers={layers}
           highlighted={highlighted}
