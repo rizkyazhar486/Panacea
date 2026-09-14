@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { Prosa } from '../components/Prosa'
 import { Card, SectionTitle, Field, inputClass, Badge } from '../components/ui'
 import { IconHeart } from '../components/icons'
-import { getDemo } from '../lib/profile'
+import { getDemoTersimpan } from '../lib/profile'
 import { ScoreTrend } from '../components/ScoreTrend'
 import { CopyNote } from '../components/CopyNote'
 
@@ -28,20 +28,30 @@ function band(qtcMs: number, sex: 'M' | 'F'): { label: string; tone: 'brand' | '
 }
 
 export function QTcCalculator() {
-  const [qtMs, setQtMs] = useState(400)
-  const [hr, setHr] = useState(60)
-  const [sex, setSex] = useState<'M' | 'F'>(() => getDemo().sex || 'M')
+  // QT 400 ms pada nadi 60 bukan nilai netral: ia menghasilkan QTc tepat
+  // 400 ms, yang dijawab "Normal". Halaman ini dahulu terbuka dengan kabar
+  // baik itu -- lengkap dengan kalimat siap salin dan satu titik tren yang
+  // tersimpan -- untuk EKG yang belum pernah diukur siapa pun. Keduanya
+  // bacaan dari rekaman; tidak ada nilai bawaan yang bisa dibela.
+  const [qtMs, setQtMs] = useState(0)
+  const [hr, setHr] = useState(0)
+  const [sex, setSex] = useState<'M' | 'F'>(() => (getDemoTersimpan().sex === 'F' ? 'F' : 'M'))
 
-  const rrSec = 60 / hr
+  const belum: string[] = []
+  if (!(qtMs > 0)) belum.push('QT interval')
+  if (!(hr > 0)) belum.push('heart rate')
+  const lengkap = belum.length === 0
+
+  const rrSec = lengkap ? 60 / hr : 0
   const qtSec = qtMs / 1000
 
-  const bazett = qtSec / Math.sqrt(rrSec) * 1000
-  const fridericia = qtSec / Math.cbrt(rrSec) * 1000
-  const framingham = (qtSec + 0.154 * (1 - rrSec)) * 1000
-  const hodges = qtMs + 1.75 * (hr - 60)
+  const bazett = lengkap ? qtSec / Math.sqrt(rrSec) * 1000 : 0
+  const fridericia = lengkap ? qtSec / Math.cbrt(rrSec) * 1000 : 0
+  const framingham = lengkap ? (qtSec + 0.154 * (1 - rrSec)) * 1000 : 0
+  const hodges = lengkap ? qtMs + 1.75 * (hr - 60) : 0
 
   const primary = bazett // Bazett is the most widely used in routine practice
-  const primaryBand = band(primary, sex)
+  const primaryBand = lengkap ? band(primary, sex) : null
 
   const rows = [
     { name: 'Bazett', value: bazett, note: 'Most widely used; overcorrects at high heart rates' },
@@ -57,10 +67,10 @@ export function QTcCalculator() {
         <Prosa kelas="mt-2 text-[13px] leading-relaxed text-neutral-500">Many drugs (antipsychotics, some antibiotics/antiemetics, methadone, class Ia/III antiarrhythmics) prolong the QT interval and raise the risk of Torsades de Pointes. Enter the measured QT interval and heart rate from an ECG.</Prosa>
         <div className="mt-3 grid grid-cols-3 gap-3">
           <Field label="QT interval (ms)">
-            <input className={inputClass} type="number" min={200} max={700} value={qtMs} onChange={(e) => setQtMs(Number(e.target.value) || 0)} />
+            <input className={inputClass} type="number" min={200} max={700} value={qtMs || ''} onChange={(e) => setQtMs(Number(e.target.value) || 0)} />
           </Field>
           <Field label="Heart rate (bpm)">
-            <input className={inputClass} type="number" min={30} max={200} value={hr} onChange={(e) => setHr(Number(e.target.value) || 1)} />
+            <input className={inputClass} type="number" min={30} max={200} value={hr || ''} onChange={(e) => setHr(Number(e.target.value) || 0)} />
           </Field>
           <Field label="Sex">
             <select className={inputClass} value={sex} onChange={(e) => setSex(e.target.value as 'M' | 'F')}>
@@ -73,26 +83,39 @@ export function QTcCalculator() {
 
       <Card className="!p-5">
         <div className="text-xs font-black uppercase tracking-wide text-neutral-500">Bazett QTc (most commonly used clinically)</div>
-        <div className="mt-2 flex items-center gap-3">
-          <span className="text-3xl font-black text-brand-dark">{primary.toFixed(0)} ms</span>
-          <Badge tone={primaryBand.tone}>{primaryBand.label}</Badge>
-        </div>
-        <p className="mt-2 text-[12px] leading-relaxed text-neutral-500">
-          {primary >= 500
-            ? 'QTc ≥500ms is a high-risk threshold for Torsades de Pointes regardless of sex — review QT-prolonging medications urgently and correct electrolytes (K, Mg, Ca).'
-            : `Normal reference: <430ms (men) / <450ms (women); borderline 430-450 (men)/450-470 (women); prolonged >450ms (men) />470ms (women).`}
-        </p>
-        <CopyNote text={`QTc ${primary.toFixed(0)} ms by Bazett (QT ${qtMs} ms @ HR ${hr}, ${sex === 'M' ? 'male' : 'female'}) — ${primaryBand.label.toLowerCase()}; Fridericia ${fridericia.toFixed(0)}, Framingham ${framingham.toFixed(0)}, Hodges ${hodges.toFixed(0)} ms`} />
+        {lengkap && primaryBand !== null ? (
+          <>
+            <div className="mt-2 flex items-center gap-3">
+              <span className="text-3xl font-black text-brand-dark">{primary.toFixed(0)} ms</span>
+              <Badge tone={primaryBand.tone}>{primaryBand.label}</Badge>
+            </div>
+            <p className="mt-2 text-[12px] leading-relaxed text-neutral-500">
+              {primary >= 500
+                ? 'QTc ≥500ms is a high-risk threshold for Torsades de Pointes regardless of sex — review QT-prolonging medications urgently and correct electrolytes (K, Mg, Ca).'
+                : `Normal reference: <430ms (men) / <450ms (women); borderline 430-450 (men)/450-470 (women); prolonged >450ms (men) />470ms (women).`}
+            </p>
+            <CopyNote text={`QTc ${primary.toFixed(0)} ms by Bazett (QT ${qtMs} ms @ HR ${hr}, ${sex === 'M' ? 'male' : 'female'}) — ${primaryBand.label.toLowerCase()}; Fridericia ${fridericia.toFixed(0)}, Framingham ${framingham.toFixed(0)}, Hodges ${hodges.toFixed(0)} ms`} />
+          </>
+        ) : (
+          <p className="mt-2 text-[12.5px] leading-relaxed text-neutral-600 dark:text-neutral-300">
+            No QTc yet. Still needed: {belum.join(' and ')}.
+            {' '}Both are read off a recording. A QT of 400 ms at 60 bpm is not a neutral placeholder — it corrects to
+            exactly 400 ms and reads as "Normal", so leaving it in would put a reassuring result on an ECG nobody measured.
+          </p>
+        )}
       </Card>
 
-      <ScoreTrend
-        storageKey="pmd_qtc_trend_v1"
-        scoreName="QTc (Bazett, ms)"
-        total={Math.round(primary)}
-        maxScore={700}
-        detail={`QT ${qtMs}ms @ HR ${hr} (${sex}) — Fri ${fridericia.toFixed(0)}, Fra ${framingham.toFixed(0)}, Hod ${hodges.toFixed(0)}`}
-      />
+      {lengkap && (
+        <ScoreTrend
+          storageKey="pmd_qtc_trend_v1"
+          scoreName="QTc (Bazett, ms)"
+          total={Math.round(primary)}
+          maxScore={700}
+          detail={`QT ${qtMs}ms @ HR ${hr} (${sex}) — Fri ${fridericia.toFixed(0)}, Fra ${framingham.toFixed(0)}, Hod ${hodges.toFixed(0)}`}
+        />
+      )}
 
+      {lengkap && (
       <Card className="!p-5">
         <div className="text-xs font-black uppercase tracking-wide text-neutral-500">Compare correction formulas</div>
         <div className="mt-3 space-y-2">
@@ -111,6 +134,7 @@ export function QTcCalculator() {
           preferred over Bazett at tachycardia or bradycardia.
         </p>
       </Card>
+      )}
 
       <div className="rounded-2xl border border-neutral-100 bg-white p-4 text-center text-[11px] leading-relaxed text-neutral-500 dark:border-white/10 dark:bg-white/5">
         Bazett (1920); Fridericia (1920); Sagie et al., Framingham Heart Study (1992); Hodges et al.

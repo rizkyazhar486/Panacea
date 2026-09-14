@@ -4,9 +4,9 @@ import { SectionTitle } from '../components/ui'
 import { IconActivity } from '../components/icons'
 import { useJam } from '../lib/useJam'
 import { getWorkouts } from '../lib/workoutStore'
-import { getDemo } from '../lib/profile'
+import { getDemo, getDemoTersimpan } from '../lib/profile'
 import { getVitals } from '../lib/healthVitals'
-import { hrMaxFromAge } from '../lib/workoutImport'
+import { hrMaxPerkiraan } from '../lib/workoutImport'
 import { kebugaranKesegaran } from '../lib/analisisPro'
 import { ringkasBeban, statusLatihan } from '../lib/trainingPhysiology'
 import {
@@ -96,11 +96,18 @@ export function PapanAtlet() {
     const workouts = getWorkouts()
     if (workouts.length < 3) return null
     const demo = getDemo()
+    // Dua bacaan yang sengaja dibedakan. `usia`/`jk` di bawah dipakai untuk
+    // perkiraan yang tetap masuk akal dengan nilai bawaan; `usiaTersimpan`
+    // dipakai untuk pembandingan terhadap orang seusia, yang TIDAK masuk akal
+    // tanpa usia yang sebenarnya.
+    const tersimpan = getDemoTersimpan()
     const usia = demo.age > 0 ? demo.age : 30
     const jk: 'M' | 'F' = demo.sex === 'F' ? 'F' : 'M'
+    const usiaTersimpan = typeof tersimpan.age === 'number' && tersimpan.age > 0 ? tersimpan.age : null
+    const jkTersimpan: 'P' | 'L' | null = tersimpan.sex === 'F' ? 'P' : tersimpan.sex === 'M' ? 'L' : null
     const v = getVitals()
     const k = {
-      hrMax: workouts.reduce((a, w) => Math.max(a, w.maxHr ?? 0), 0) || hrMaxFromAge(usia, jk),
+      hrMax: workouts.reduce((a, w) => Math.max(a, w.maxHr ?? 0), 0) || hrMaxPerkiraan(getDemoTersimpan()),
       hrRest: typeof v.restingHr === 'number' && v.restingHr > 0 ? v.restingHr : 60,
       sex: jk,
     }
@@ -136,7 +143,7 @@ export function PapanAtlet() {
       pekanan: bebanPekanan(sesi, 12, sekarang),
       pasangan,
       dampak: dampakBeban(pasangan),
-      kardio: kebugaranKardio(deretVo2, usia, jk === 'F' ? 'P' : 'L', nilaiKebugaran, vo2Perkiraan),
+      kardio: kebugaranKardio(deretVo2, usiaTersimpan, jkTersimpan, nilaiKebugaran, vo2Perkiraan),
       hrr: pemulihanDenyut(workouts),
       adaptasi: adaptasi(deretMetrik('hrvMs', 90), deretMetrik('restingHr', 90), 28),
       rekor: rekorPribadi(sesi),
@@ -391,32 +398,53 @@ export function PapanAtlet() {
         <Panel
           judul="Cardio fitness · VO₂max"
           nilai={kardio.kini}
-          satuan={`ml/kg/min · typical for your age ${kardio.titikTengah}`}
-          warna={kardio.selisihMet >= 0.75 ? NEON.hijau : kardio.selisihMet <= -0.75 ? NEON.merah : NEON.jingga}
+          satuan={kardio.bandingSeusia ? `ml/kg/min · typical for your age ${kardio.titikTengah}` : 'ml/kg/min'}
+          warna={
+            !kardio.bandingSeusia || kardio.selisihMet === null ? NEON.biru
+              : kardio.selisihMet >= 0.75 ? NEON.hijau
+                : kardio.selisihMet <= -0.75 ? NEON.merah : NEON.jingga
+          }
           catatan={
             (kardio.perkiraan
               ? 'Estimated from your maximum and resting heart rate, not measured — it can differ from a lab test by over ten percent, and is most useful for watching direction rather than comparing with other people. '
               : '') +
-            `You are ${kardio.pita} the midpoint for your age and sex, by ${Math.abs(kardio.selisihMet).toFixed(1)} MET. Kodama 2009 puts each MET at a hazard ratio of 0.87 for all-cause mortality, which places you near ${kardio.hr.toFixed(2)} relative to that midpoint — a figure that applies to GROUPS, never to one person's future.`
+            (kardio.bandingSeusia
+              ? `You are ${kardio.pita} the midpoint for your age and sex, by ${Math.abs(kardio.selisihMet as number).toFixed(1)} MET. Kodama 2009 puts each MET at a hazard ratio of 0.87 for all-cause mortality, which places you near ${(kardio.hr as number).toFixed(2)} relative to that midpoint — a figure that applies to GROUPS, never to one person's future.`
+              : 'Your age and sex are not stored, so this figure is NOT placed against the norms for people your age. The same VO₂max means something quite different at 25 and at 60, and a comparison against an assumed age would be a comparison against somebody else. The value and its direction below need no age and stand as they are.')
           }
         >
           {/* Posisi terhadap titik tengah seusia, bukan terhadap pita tetap.
               VO2max 42 pada usia 25 dan pada usia 60 adalah dua hal yang sama
-              sekali berbeda. */}
-          <div className="relative mt-3 h-4 overflow-hidden rounded-full bg-neutral-200 dark:bg-white/10">
-            <span className="absolute inset-y-0 w-px bg-neutral-400" style={{ left: '50%' }} />
-            <span
-              className="absolute inset-y-0 w-1 rounded-full"
-              style={{
-                left: `calc(${Math.min(97, Math.max(1, 50 + kardio.selisihMet * 12))}% - 2px)`,
-                background: kardio.selisihMet >= 0 ? NEON.hijau : NEON.merah,
-                boxShadow: `0 0 8px ${kardio.selisihMet >= 0 ? NEON.hijau : NEON.merah}`,
-              }}
-            />
-          </div>
-          <div className="mt-1 flex justify-between text-[9px] font-bold text-neutral-400">
-            <span>−4 MET</span><span>age midpoint</span><span>+4 MET</span>
-          </div>
+              sekali berbeda. Tanpa usia yang tersimpan, batang ini tidak
+              digambar sama sekali: sebuah penanda di tengah skala akan
+              MENYATAKAN sebuah pembandingan yang tidak pernah dilakukan. */}
+          {kardio.bandingSeusia && kardio.selisihMet !== null && (
+            <>
+              <div className="relative mt-3 h-4 overflow-hidden rounded-full bg-neutral-200 dark:bg-white/10">
+                <span className="absolute inset-y-0 w-px bg-neutral-400" style={{ left: '50%' }} />
+                <span
+                  className="absolute inset-y-0 w-1 rounded-full"
+                  style={{
+                    left: `calc(${Math.min(97, Math.max(1, 50 + kardio.selisihMet * 12))}% - 2px)`,
+                    background: kardio.selisihMet >= 0 ? NEON.hijau : NEON.merah,
+                    boxShadow: `0 0 8px ${kardio.selisihMet >= 0 ? NEON.hijau : NEON.merah}`,
+                  }}
+                />
+              </div>
+              <div className="mt-1 flex justify-between text-[9px] font-bold text-neutral-400">
+                <span>−4 MET</span><span>age midpoint</span><span>+4 MET</span>
+              </div>
+            </>
+          )}
+          {!kardio.bandingSeusia && (
+            <Link
+              to="/health-data"
+              className="mt-3 flex min-h-11 items-center justify-between rounded-xl border border-neutral-300/70 px-3 text-[11.5px] font-bold text-neutral-600 dark:border-white/15 dark:text-neutral-300"
+            >
+              <span>Add your age and sex to enable the age comparison</span>
+              <span aria-hidden>›</span>
+            </Link>
+          )}
           {kardio.delta != null && (
             <div className="mt-2 text-[11px] font-bold" style={{ color: kardio.delta >= 0 ? NEON.hijau : NEON.merah }}>
               {kardio.delta >= 0 ? '▲' : '▼'} {Math.abs(kardio.delta)} over 90 days

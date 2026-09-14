@@ -5,8 +5,8 @@ import { Card } from './ui'
 import { Portal } from './Portal'
 import { WIDGETS, ambilWidget, alihkanWidget, simpanWidget, widgetBawaan } from '../lib/homeWidgets'
 import { getWorkouts } from '../lib/workoutStore'
-import { hrMaxFromAge } from '../lib/workoutImport'
-import { getDemo } from '../lib/profile'
+import { hrMaxPerkiraan } from '../lib/workoutImport'
+import { getDemo, getDemoTersimpan } from '../lib/profile'
 import { useVitals } from '../lib/useVitals'
 import { KolomPelatih } from './KolomPelatih'
 import { ArtiKebugaran } from './ArtiKebugaran'
@@ -41,7 +41,7 @@ export function WidgetBeranda() {
   const konteks = useMemo(() => {
     const teramati = workouts.reduce((a, w) => Math.max(a, w.maxHr ?? 0), 0)
     return {
-      hrMax: Math.max(teramati, hrMaxFromAge(demo.age || 30, demo.sex)),
+      hrMax: Math.max(teramati, hrMaxPerkiraan(getDemoTersimpan())),
       hrRest: demo.restingHr && demo.restingHr > 0 ? demo.restingHr : 60,
       sex: demo.sex,
     }

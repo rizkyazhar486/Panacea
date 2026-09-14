@@ -21,7 +21,11 @@ function holliday(weightKg: number): number {
 }
 
 function MaintenanceFluid() {
-  const [weightKg, setWeightKg] = useState(70)
+  // Berat badan tidak punya nilai awal yang bisa dibela di halaman yang
+  // mengeluarkan mL/jam. 70 kg dahulu mencetak laju rumatan lengkap dengan
+  // jatah natrium dan kalium harian, siap disalin.
+  const [weightKg, setWeightKg] = useState(0)
+  const adaBerat = weightKg > 0
   const dailyMl = holliday(weightKg)
   const hourlyMl = dailyMl / 24
   const naMeq = weightKg <= 10 ? 3 * weightKg : weightKg <= 20 ? 30 + 2 * (weightKg - 10) : 50 + (weightKg - 20)
@@ -33,31 +37,47 @@ function MaintenanceFluid() {
       <Field label="Weight (kg)">
         <input className={inputClass} type="number" min={1} step={0.1} value={weightKg || ''} onChange={(e) => setWeightKg(Number(e.target.value) || 0)} />
       </Field>
-      <div className="mt-3 grid grid-cols-2 gap-3">
-        <div className="rounded-xl bg-brand/10 p-3 text-center">
-          <div className="text-[11px] font-bold text-neutral-500">Daily (100-50-20)</div>
-          <div className="text-2xl font-black text-brand-dark">{dailyMl.toFixed(0)} mL</div>
-        </div>
-        <div className="rounded-xl bg-brand/10 p-3 text-center">
-          <div className="text-[11px] font-bold text-neutral-500">Rate (4-2-1)</div>
-          <div className="text-2xl font-black text-brand-dark">{hourlyMl.toFixed(1)} mL/hr</div>
-        </div>
-      </div>
-      <div className="mt-3 flex justify-between text-[13px] text-neutral-600 dark:text-neutral-300">
-        <span>Approx. daily Na allowance</span><b>{naMeq.toFixed(0)} mEq</b>
-      </div>
-      <div className="flex justify-between text-[13px] text-neutral-600 dark:text-neutral-300">
-        <span>Approx. daily K allowance</span><b>{kMeq.toFixed(0)} mEq</b>
-      </div>
-      <div className="mt-3"><CopyNote text={summary} /></div>
+      {adaBerat ? (
+        <>
+          <div className="mt-3 grid grid-cols-2 gap-3">
+            <div className="rounded-xl bg-brand/10 p-3 text-center">
+              <div className="text-[11px] font-bold text-neutral-500">Daily (100-50-20)</div>
+              <div className="text-2xl font-black text-brand-dark">{dailyMl.toFixed(0)} mL</div>
+            </div>
+            <div className="rounded-xl bg-brand/10 p-3 text-center">
+              <div className="text-[11px] font-bold text-neutral-500">Rate (4-2-1)</div>
+              <div className="text-2xl font-black text-brand-dark">{hourlyMl.toFixed(1)} mL/hr</div>
+            </div>
+          </div>
+          <div className="mt-3 flex justify-between text-[13px] text-neutral-600 dark:text-neutral-300">
+            <span>Approx. daily Na allowance</span><b>{naMeq.toFixed(0)} mEq</b>
+          </div>
+          <div className="flex justify-between text-[13px] text-neutral-600 dark:text-neutral-300">
+            <span>Approx. daily K allowance</span><b>{kMeq.toFixed(0)} mEq</b>
+          </div>
+        </>
+      ) : (
+        <p className="mt-3 text-[12.5px] leading-relaxed text-neutral-600 dark:text-neutral-300">
+          Enter a weight. A page that answers in mL/hr has no defensible starting body — 70 kg used to print a
+          full maintenance rate with daily sodium and potassium allowances, ready to copy.
+        </p>
+      )}
+      {adaBerat && <div className="mt-3"><CopyNote text={summary} /></div>}
     </Card>
   )
 }
 
 function FluidResuscitation() {
-  const [weightKg, setWeightKg] = useState(70)
+  // Sama: 70 kg dengan luas luka bakar 20% memberi Parkland 4 x 70 x 20 =
+  // 5600 mL beserta laju per jam, untuk pasien yang tidak ada. Pilihan
+  // skenario TETAP punya nilai awal -- ia memilih rumus mana yang dipakai,
+  // bukan mengukur sesuatu tentang pasien.
+  const [weightKg, setWeightKg] = useState(0)
   const [scenario, setScenario] = useState<'adult-sepsis' | 'peds-shock' | 'burns'>('adult-sepsis')
-  const [tbsaPct, setTbsaPct] = useState(20)
+  const [tbsaPct, setTbsaPct] = useState(0)
+  const adaBerat = weightKg > 0
+  const adaTbsa = scenario !== 'burns' || tbsaPct > 0
+  const bisaHitung = adaBerat && adaTbsa
 
   const result = useMemo(() => {
     if (scenario === 'adult-sepsis') {
@@ -94,12 +114,20 @@ function FluidResuscitation() {
           </Field>
         )}
       </div>
-      <div className="mt-3 rounded-xl bg-brand/10 p-3 text-center">
-        <div className="text-[11px] font-bold text-neutral-500">{result.label}</div>
-        <div className="mt-1 text-2xl font-black text-brand-dark">{result.ml.toFixed(0)} mL</div>
-        {result.extra && <div className="mt-1 text-[12px] text-neutral-600 dark:text-neutral-300">{result.extra}</div>}
-      </div>
-      <div className="mt-3"><CopyNote text={summary} /></div>
+      {bisaHitung ? (
+        <div className="mt-3 rounded-xl bg-brand/10 p-3 text-center">
+          <div className="text-[11px] font-bold text-neutral-500">{result.label}</div>
+          <div className="mt-1 text-2xl font-black text-brand-dark">{result.ml.toFixed(0)} mL</div>
+          {result.extra && <div className="mt-1 text-[12px] text-neutral-600 dark:text-neutral-300">{result.extra}</div>}
+        </div>
+      ) : (
+        <p className="mt-3 text-[12.5px] leading-relaxed text-neutral-600 dark:text-neutral-300">
+          {adaBerat ? 'Enter the burned surface area.' : 'Enter a weight.'}{' '}
+          At 70 kg with 20% TBSA the Parkland formula gave 5600 mL and an hourly rate — a resuscitation volume for
+          a patient nobody had weighed.
+        </p>
+      )}
+      {bisaHitung && <div className="mt-3"><CopyNote text={summary} /></div>}
     </Card>
   )
 }
@@ -108,20 +136,28 @@ type ElecTab = 'corrected-na' | 'na-correction-rate' | 'k-deficit'
 function Electrolytes() {
   const [eTab, setETab] = useState<ElecTab>('corrected-na')
 
-  const [measuredNa, setMeasuredNa] = useState(130)
-  const [glucose, setGlucose] = useState(400)
+  // Ketiga sub-kalkulator di bawah masing-masing terbuka dengan hasilnya
+  // sendiri: natrium terkoreksi dari Na 130 dan glukosa 400; laju koreksi
+  // dari Na 120 menuju 130 pada 70 kg; dan defisit kalium dari K 3,0. Semua
+  // itu nilai laboratorium.
+  const [measuredNa, setMeasuredNa] = useState(0)
+  const [glucose, setGlucose] = useState(0)
+  const adaNaTerkoreksi = measuredNa > 0 && glucose > 0
   const correctedNa = measuredNa + 1.6 * ((glucose - 100) / 100)
 
-  const [currentNa, setCurrentNa] = useState(120)
-  const [targetNa, setTargetNa] = useState(130)
-  const [weightKgR, setWeightKgR] = useState(70)
+  const [currentNa, setCurrentNa] = useState(0)
+  const [targetNa, setTargetNa] = useState(0)
+  const [weightKgR, setWeightKgR] = useState(0)
   const [sexR, setSexR] = useState<'M' | 'F'>('M')
   const tbw = weightKgR * (sexR === 'M' ? 0.6 : 0.5)
   const naChangePerL = (140 - currentNa) / (tbw + 1) // simplified Adrogue-Madias with 1L infusate Na=140 (0.9% saline)
   const litersFor10 = naChangePerL !== 0 ? 10 / naChangePerL : 0
 
-  const [currentK, setCurrentK] = useState(3.0)
-  const [weightKgK, setWeightKgK] = useState(70)
+  const adaLajuNa = currentNa > 0 && weightKgR > 0
+
+  const [currentK, setCurrentK] = useState(0)
+  const [weightKgK, setWeightKgK] = useState(0)
+  const adaDefisitK = currentK > 0 && weightKgK > 0
   const kDeficitLow = (4.0 - currentK) * weightKgK * 0.3 // illustrative deficit range, ~0.2-0.4 mEq/kg per 0.1 drop below 4
   const kDeficitHigh = (4.0 - currentK) * weightKgK * 0.6
 
@@ -144,7 +180,7 @@ function Electrolytes() {
             <div className="text-[11px] font-bold text-neutral-500">Corrected sodium</div>
             <div className="text-2xl font-black text-brand-dark">{correctedNa.toFixed(1)} mEq/L</div>
           </div>
-          <div className="mt-3"><CopyNote text={`Corrected Na = ${measuredNa} + 1.6 x ((${glucose}-100)/100) = ${correctedNa.toFixed(1)} mEq/L [Katz formula]`} /></div>
+          {adaNaTerkoreksi && <div className="mt-3"><CopyNote text={`Corrected Na = ${measuredNa} + 1.6 x ((${glucose}-100)/100) = ${correctedNa.toFixed(1)} mEq/L [Katz formula]`} /></div>}
         </div>
       )}
 
@@ -167,7 +203,7 @@ function Electrolytes() {
             <div className="text-2xl font-black text-brand-dark">{naChangePerL.toFixed(2)} mEq/L</div>
             <div className="mt-1 text-[12px] text-neutral-600 dark:text-neutral-300">≈ {litersFor10.toFixed(2)} L to raise Na by 10 mEq/L — target ≤8-10 mEq/L per 24h</div>
           </div>
-          <div className="mt-3"><CopyNote text={`Estimated Na rise ≈ ${naChangePerL.toFixed(2)} mEq/L per 1L 0.9% saline (TBW ${tbw.toFixed(1)}L). Cap correction at 8-10 mEq/L/24h.`} /></div>
+          {adaLajuNa && <div className="mt-3"><CopyNote text={`Estimated Na rise ≈ ${naChangePerL.toFixed(2)} mEq/L per 1L 0.9% saline (TBW ${tbw.toFixed(1)}L). Cap correction at 8-10 mEq/L/24h.`} /></div>}
         </div>
       )}
 
@@ -182,7 +218,7 @@ function Electrolytes() {
             <div className="text-[11px] font-bold text-neutral-500">Estimated total-body deficit</div>
             <div className="text-2xl font-black text-brand-dark">{Math.max(0, kDeficitLow).toFixed(0)}–{Math.max(0, kDeficitHigh).toFixed(0)} mEq</div>
           </div>
-          <div className="mt-3"><CopyNote text={`Estimated K deficit ${Math.max(0, kDeficitLow).toFixed(0)}-${Math.max(0, kDeficitHigh).toFixed(0)} mEq (K ${currentK}, BB ${weightKgK}kg) — repletion estimate only, recheck levels serially during replacement.`} /></div>
+          {adaDefisitK && <div className="mt-3"><CopyNote text={`Estimated K deficit ${Math.max(0, kDeficitLow).toFixed(0)}-${Math.max(0, kDeficitHigh).toFixed(0)} mEq (K ${currentK}, BB ${weightKgK}kg) — repletion estimate only, recheck levels serially during replacement.`} /></div>}
         </div>
       )}
     </Card>

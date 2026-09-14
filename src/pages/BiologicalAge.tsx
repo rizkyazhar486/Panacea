@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { KolomAngka } from '../components/KolomAngka'
 import { Card, SectionTitle, Field, inputClass, Badge } from '../components/ui'
 import { IconHeart, IconActivity, IconChartUp } from '../components/icons'
-import { getHealthCache, getDemo, pushBiometrics } from '../lib/profile'
+import { getHealthCache, getDemoTersimpan, pushBiometrics } from '../lib/profile'
 import { getVitals } from '../lib/healthVitals'
 import { LongevityPanel } from '../components/LongevityPanel'
 
@@ -43,14 +43,26 @@ function num(obj: Record<string, unknown>, k: string): number | undefined {
   return typeof obj[k] === 'number' && (obj[k] as number) > 0 ? (obj[k] as number) : undefined
 }
 
+// HARUS getDemoTersimpan(), bukan getDemo().
+//
+// getDemo() memadukan DEMO_DEFAULT -- 30 tahun, 70 kg, 170 cm -- ke dalam
+// profil kosong, dan ketiga syarat `> 0` di bawah karenanya SELALU benar.
+// Pada perangkat yang belum pernah diisi apa pun, fungsi bernama
+// syncFromDevices() ini menyalin tiga tetapan lalu melaporkan "Updated from
+// your devices: Age, Weight, Height" -- sebuah kalimat yang menyebutkan asal
+// usul yang tidak pernah ada, untuk angka yang kemudian dipakai menaksir usia
+// biologis orang yang membacanya. Bacaan tersimpan membuat laporannya benar.
 function syncFromDevices(cur: BioData): { next: BioData; changed: string[] } {
   const patch: Partial<BioData> = {}
   const changed: string[] = []
-  const demo = getDemo()
-  if (demo.age > 0 && cur.age === 0) { patch.age = demo.age; changed.push('Age') }
+  const demo = getDemoTersimpan()
+  const usiaTersimpan = typeof demo.age === 'number' && demo.age > 0 ? demo.age : 0
+  const beratTersimpan = typeof demo.weightKg === 'number' && demo.weightKg > 0 ? demo.weightKg : 0
+  const tinggiTersimpan = typeof demo.heightCm === 'number' && demo.heightCm > 0 ? demo.heightCm : 0
+  if (usiaTersimpan > 0 && cur.age === 0) { patch.age = usiaTersimpan; changed.push('Age') }
   if ((demo.sex === 'M' || demo.sex === 'F') && cur.age === 0) patch.sex = demo.sex
-  if (demo.weightKg > 0 && !cur.weightKg) { patch.weightKg = demo.weightKg; changed.push('Weight') }
-  if (demo.heightCm > 0 && !cur.heightCm) { patch.heightCm = demo.heightCm; changed.push('Height') }
+  if (beratTersimpan > 0 && !cur.weightKg) { patch.weightKg = beratTersimpan; changed.push('Weight') }
+  if (tinggiTersimpan > 0 && !cur.heightCm) { patch.heightCm = tinggiTersimpan; changed.push('Height') }
   const hc = getHealthCache() as Record<string, unknown>
   const vo2 = num(hc, 'vo2max'); if (vo2 && vo2 !== cur.vo2) { patch.vo2 = vo2; changed.push('VO₂max') }
   const rhr = num(hc, 'restingHr'); if (rhr && rhr !== cur.rhr) { patch.rhr = rhr; changed.push('Resting HR') }
@@ -81,8 +93,13 @@ function rmr(w: number, h: number, age: number, sex: 'M' | 'F'): number {
 // Metabolic age: find the age at which the average person's RMR equals yours,
 // holding your weight/height/sex constant. Higher RMR → younger metabolic age.
 function metabolicAge(d: BioData): number | null {
-  if (!(d.weightKg > 0 && d.heightCm > 0)) return null
-  const mine = rmr(d.weightKg, d.heightCm, d.age || 30, d.sex)
+  // Tanpa usia, fungsi ini merosot menjadi lelucon yang meyakinkan: ia
+  // menghitung RMR dengan usia sulih 30, lalu MENCARI usia yang RMR-nya sama
+  // -- dan menemukan 30. Angka itu lalu tampil sebagai "metabolic age" milik
+  // orang yang tidak pernah menyebutkan usianya, dengan ketepatan yang justru
+  // berasal dari tebakannya sendiri.
+  if (!(d.weightKg > 0 && d.heightCm > 0 && d.age > 0)) return null
+  const mine = rmr(d.weightKg, d.heightCm, d.age, d.sex)
   // RMR drops ~5 kcal/yr of age in this model; invert to an age.
   // Reference RMR at age 20 for this body, then step forward until it matches.
   let best = 18
@@ -101,7 +118,9 @@ interface Marker { label: string; delta: number; note: string }
 function bioMarkers(d: BioData): Marker[] {
   const M = d.sex === 'M'
   const out: Marker[] = []
-  if (d.vo2 > 0) {
+  // Norma VO2max di bawah bergantung pada usia. Dengan usia 0, Math.max()
+  // menahannya di norma orang berusia 25 -- angka pembanding untuk orang lain.
+  if (d.vo2 > 0 && d.age > 0) {
     const good = (M ? 46 : 40) - Math.max(0, d.age - 25) * 0.35
     const delta = -((d.vo2 - good) * 0.35) // above age-norm → younger
     out.push({ label: 'VO₂max', delta, note: `${d.vo2} vs age-norm ${good.toFixed(0)} — strongest mortality predictor` })
@@ -148,7 +167,11 @@ export function BiologicalAge() {
   function syncNow(silent = false) {
     setD((cur) => {
       const { next, changed } = syncFromDevices(cur)
-      if (!silent) setSyncNote(changed.length ? `Updated from your devices: ${changed.join(', ')}.` : 'Already up to date with your device data.')
+      if (!silent) {
+        setSyncNote(changed.length
+          ? `Filled in from what you have stored: ${changed.join(', ')}.`
+          : 'Nothing to fill in — no stored profile or device reading was found for the fields still empty. They are left blank rather than guessed.')
+      }
       return changed.length ? next : cur
     })
   }

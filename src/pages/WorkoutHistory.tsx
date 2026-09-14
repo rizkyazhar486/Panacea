@@ -7,13 +7,13 @@ import { ShareCardButton } from '../components/ShareCardButton'
 import { IconRun, IconHeart, IconActivity, IconTimer } from '../components/icons'
 import { getWorkouts, getHrNotifications, clearWorkouts, mergeWorkouts, mergeHrNotifications } from '../lib/workoutStore'
 import {
-  zoneBreakdown, hrMaxFromAge, summarise, fmtDurasi, fmtPace, NOTIF_INFO, parseWorkouts, parseHrNotifications,
+  zoneBreakdown, hrMaksimum, summarise, fmtDurasi, fmtPace, NOTIF_INFO, parseWorkouts, parseHrNotifications,
   type ImportedWorkout,
 } from '../lib/workoutImport'
 import { api, backendEnabled } from '../lib/api'
 import { KolomPelatih } from '../components/KolomPelatih'
 import { usahaTerbaik, kemajuanTarget, type Target, type JenisTarget, type PeriodeTarget } from '../lib/analisisPro'
-import { getDemo } from '../lib/profile'
+import { getDemo, getDemoTersimpan } from '../lib/profile'
 import { useVitals } from '../lib/useVitals'
 import { GrafikOlahraga } from '../components/GrafikOlahraga'
 
@@ -59,13 +59,11 @@ export function WorkoutHistory() {
     return () => { hidup = false }
   }, [])
 
-  const hrMax = useMemo(() => {
-    const teramati = workouts.reduce((a, w) => Math.max(a, w.maxHr ?? 0), 0)
-    const perkiraan = hrMaxFromAge(demo.age || 30, demo.sex)
-    // Denyut tertinggi yang PERNAH TERCATAT lebih dapat dipercaya daripada
-    // rumus 220−usia, yang meleset belasan denyut pada banyak orang.
-    return Math.max(teramati, perkiraan)
-  }, [workouts, demo])
+  // Dihitung BESERTA asalnya. Angka ini menggerakkan seluruh sebaran zona,
+  // jadi menampilkannya tanpa menyebut ia terukur, diperkirakan, atau sekadar
+  // diasumsikan dari profil kosong berarti menyodorkan asumsi sebagai data.
+  const hr = useMemo(() => hrMaksimum(workouts, getDemoTersimpan()), [workouts, vitals, tarikan])
+  const hrMax = hr.nilai
 
   const ringkas = useMemo(() => summarise(workouts, hrMax), [workouts, hrMax])
 
@@ -112,7 +110,40 @@ export function WorkoutHistory() {
 
   return (
     <div className="space-y-4">
-      <SectionTitle icon={<IconRun />} title="Training History" subtitle={`${workouts.length} sessions stored · HRmax used ${hrMax} bpm`} />
+      <SectionTitle
+        icon={<IconRun />}
+        title="Training History"
+        subtitle={`${workouts.length} sessions stored · HRmax ${hrMax} bpm ${
+          hr.asal === 'terukur' ? '(measured)' : hr.asal === 'perkiraan-usia' ? '(estimated from age)' : '(assumed)'
+        }`}
+      />
+
+      {/* Zona latihan seluruhnya bergantung pada angka ini, jadi asalnya
+          dinyatakan di tempat ia dipakai -- bukan disembunyikan di profil. */}
+      <Card>
+        <div className="text-[10px] font-black uppercase tracking-[.14em] text-neutral-500">
+          Where this HRmax comes from
+        </div>
+        <p className="mt-1 text-[12px] leading-relaxed text-neutral-600 dark:text-neutral-300">
+          {hr.asal === 'terukur'
+            ? `${hrMax} bpm is the highest heart rate actually recorded in your own sessions. That is a measurement, and it is the most trustworthy basis available here.`
+            : hr.asal === 'perkiraan-usia'
+              ? `${hrMax} bpm is not measured. It is the population formula applied to the age ${hr.usiaDipakai} you saved. That formula scatters by roughly ten beats either way between people of the same age, so treat the zones below as approximate.`
+              : `${hrMax} bpm is an ASSUMPTION, not your data. Your profile has no age saved, so the formula fell back to a 30-year-old man. Every training zone below is built on that stand-in person.`}
+        </p>
+        {hr.asal !== 'terukur' && (
+          <p className="mt-2 text-[12px] leading-relaxed text-neutral-600 dark:text-neutral-300">
+            {hr.asal === 'asumsi-usia' ? (
+              <>
+                Set your age on <Link to="/profil" className="font-semibold text-ink underline dark:text-white">your profile</Link> to
+                replace the stand-in, or record a session that reaches your real maximum — a recorded peak always wins over any formula.
+              </>
+            ) : (
+              <>A recorded session that reaches a higher peak will replace this estimate automatically.</>
+            )}
+          </p>
+        )}
+      </Card>
 
       {/* Kolom pelatih ditaruh paling atas: pertanyaan yang dibawa orang saat
           membuka halaman ini adalah "berikutnya apa", bukan "berapa totalnya". */}

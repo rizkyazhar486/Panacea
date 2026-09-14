@@ -59,17 +59,34 @@ function band(total: number, anyThree: boolean): { label: string; tone: 'brand' 
 }
 
 export function News2Score() {
-  const [rr, setRr] = useState(16)
-  const [spo2, setSpo2] = useState(98)
+  // NEWS2 adalah pemicu eskalasi di samping tempat tidur. Sebelum ini halaman
+  // itu terbuka pada RR 16, SpO2 98, TD 120, nadi 75, sadar penuh dan suhu
+  // 37,0 -- keenam angka yang kebetulan berjumlah NOL -- lalu menampilkan
+  // "Low risk" beserta anjuran "Routine monitoring per ward protocol", dan
+  // menyimpan skor itu sebagai satu titik tren di perangkat. Ketenangan itu
+  // dikarang untuk pasien yang belum diperiksa siapa pun.
+  //
+  // Nadi masih boleh terisi dari cache kesehatan, karena itu memang bacaan
+  // yang benar-benar ada; hanya nilai bawaan 75-nya yang dihapus.
+  const [rr, setRr] = useState(0)
+  const [spo2, setSpo2] = useState(0)
   const [onOxygen, setOnOxygen] = useState(false)
-  const [sbp, setSbp] = useState(120)
+  const [sbp, setSbp] = useState(0)
   const [hr, setHr] = useState(() => {
     const v = getHealthCache().restingHr
-    return typeof v === 'number' && v > 0 ? v : 75
+    return typeof v === 'number' && v > 0 ? v : 0
   })
   const hrFromDevice = hasHealth('restingHr')
   const [alert, setAlert] = useState(true)
-  const [temp, setTemp] = useState(37.0)
+  const [temp, setTemp] = useState(0)
+
+  const belum: string[] = []
+  if (!(rr > 0)) belum.push('respiration rate')
+  if (!(spo2 > 0)) belum.push('SpO₂')
+  if (!(sbp > 0)) belum.push('systolic BP')
+  if (!(hr > 0)) belum.push('pulse')
+  if (!(temp > 0)) belum.push('temperature')
+  const lengkap = belum.length === 0
 
   const rrScore = rrPts(rr)
   const spo2Score = spo2Pts(spo2)
@@ -90,7 +107,7 @@ export function News2Score() {
   ]
   const total = rows.reduce((s, r) => s + r.pts, 0)
   const anyThree = rows.some((r) => r.pts === 3)
-  const result = band(total, anyThree)
+  const result = lengkap ? band(total, anyThree) : null
 
   return (
     <div className="mx-auto max-w-2xl space-y-5 pb-24">
@@ -127,6 +144,7 @@ export function News2Score() {
         </label>
       </Card>
 
+      {lengkap && (
       <Card className="!p-5">
         <div className="text-xs font-black uppercase tracking-wide text-neutral-500">Per-parameter breakdown</div>
         <div className="mt-3 space-y-2">
@@ -138,24 +156,38 @@ export function News2Score() {
           ))}
         </div>
       </Card>
+      )}
 
       <Card className="!p-5">
         <div className="text-xs font-black uppercase tracking-wide text-neutral-500">Total NEWS2 Score</div>
-        <div className="mt-2 flex items-center gap-3">
-          <span className="text-3xl font-black text-brand-dark">{total}</span>
-          <Badge tone={result.tone}>{result.label}</Badge>
-        </div>
-        <p className="mt-2 text-[12px] text-neutral-500">{result.action}</p>
-        <CopyNote text={`NEWS2 ${total} (RR ${rr}, SpO2 ${spo2}%${onOxygen ? ' on supplemental O2' : ' on air'}, SBP ${sbp}, HR ${hr}, ${alert ? 'alert' : 'AVPU<A'}, T ${temp.toFixed(1)}°C) — ${result.label.toLowerCase()}: ${result.action} [RCP 2017]`} />
+        {lengkap && result !== null ? (
+          <>
+            <div className="mt-2 flex items-center gap-3">
+              <span className="text-3xl font-black text-brand-dark">{total}</span>
+              <Badge tone={result.tone}>{result.label}</Badge>
+            </div>
+            <p className="mt-2 text-[12px] text-neutral-500">{result.action}</p>
+            <CopyNote text={`NEWS2 ${total} (RR ${rr}, SpO2 ${spo2}%${onOxygen ? ' on supplemental O2' : ' on air'}, SBP ${sbp}, HR ${hr}, ${alert ? 'alert' : 'AVPU<A'}, T ${temp.toFixed(1)}°C) — ${result.label.toLowerCase()}: ${result.action} [RCP 2017]`} />
+          </>
+        ) : (
+          <p className="mt-2 text-[12.5px] leading-relaxed text-neutral-600 dark:text-neutral-300">
+            No score yet. Still needed: {belum.join(', ')}.
+            {' '}NEWS2 is an escalation trigger, so an unmeasured observation is left blank rather than assumed normal —
+            a full set of normal-looking defaults scores 0 and reads as "low risk, routine monitoring" for a patient
+            nobody has assessed.
+          </p>
+        )}
       </Card>
 
-      <ScoreTrend
-        storageKey="pmd_news2_trend_v1"
-        scoreName="NEWS2"
-        total={total}
-        maxScore={20}
-        detail={`RR ${rr}, SpO₂ ${spo2}%${onOxygen ? ' on O₂' : ''}, SBP ${sbp}, HR ${hr}, ${alert ? 'alert' : 'not alert'}, T ${temp.toFixed(1)}°C`}
-      />
+      {lengkap && (
+        <ScoreTrend
+          storageKey="pmd_news2_trend_v1"
+          scoreName="NEWS2"
+          total={total}
+          maxScore={20}
+          detail={`RR ${rr}, SpO₂ ${spo2}%${onOxygen ? ' on O₂' : ''}, SBP ${sbp}, HR ${hr}, ${alert ? 'alert' : 'not alert'}, T ${temp.toFixed(1)}°C`}
+        />
+      )}
 
       <div className="rounded-2xl border border-neutral-100 bg-white p-4 text-center text-[11px] leading-relaxed text-neutral-500 dark:border-white/10 dark:bg-white/5">
         Royal College of Physicians (2017). National Early Warning Score (NEWS) 2. Decision-support

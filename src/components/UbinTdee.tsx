@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { getDemo } from '../lib/profile'
+import { getDemoTersimpan } from '../lib/profile'
 import { useVitalField } from '../lib/useVitals'
 import {
   hitungTdee,
@@ -40,23 +40,34 @@ function simpanPilihan(p: Pilihan) {
 }
 
 export function UbinTdee() {
-  const demo = useMemo(() => getDemo(), [])
-  const [berat] = useVitalField('weightKg', demo.weightKg || 0)
-  const [tinggi] = useVitalField('heightCm', demo.heightCm || 0)
+  // HARUS getDemoTersimpan(), bukan getDemo().
+  //
+  // getDemo() memadukan DEMO_DEFAULT -- 70 kg, 170 cm, 30 tahun -- ke dalam
+  // profil yang kosong. Dengan itu sebagai nilai cadangan, `lengkap` di bawah
+  // BERNILAI BENAR bagi orang yang belum pernah mengisi apa pun, penjaga ini
+  // tidak pernah bisa menyala, dan ubin ini memasang "kompas energi" lengkap
+  // dengan sasaran kalori dan makro untuk tubuh yang tidak ada. Bacaan yang
+  // tersimpan membuat penjaganya benar-benar menjaga.
+  const tersimpan = useMemo(() => getDemoTersimpan(), [])
+  const [berat] = useVitalField('weightKg', tersimpan.weightKg || 0)
+  const [tinggi] = useVitalField('heightCm', tersimpan.heightCm || 0)
   const [pilihan, setPilihan] = useState<Pilihan>(muatPilihan)
-  const umur = demo.age || 0
-  const lengkap = berat > 0 && tinggi > 0 && umur > 0
+  const umur = tersimpan.age || 0
+  // Jenis kelamin ikut diwajibkan: konstanta Mifflin-St Jeor berbeda 166 kkal
+  // antara keduanya, dan 'M' adalah tebakan seperti angka mana pun.
+  const jenisKelamin = tersimpan.sex === 'F' || tersimpan.sex === 'M' ? tersimpan.sex : null
+  const lengkap = berat > 0 && tinggi > 0 && umur > 0 && jenisKelamin !== null
 
   const h = useMemo(
     () => hitungTdee({
       beratKg: berat,
       tinggiCm: tinggi,
       umur,
-      sex: demo.sex,
+      sex: jenisKelamin ?? undefined,
       tujuan: pilihan.tujuan,
       aktivitas: pilihan.aktivitas,
     }),
-    [berat, tinggi, umur, demo.sex, pilihan],
+    [berat, tinggi, umur, jenisKelamin, pilihan],
   )
 
   function ubah(p: Partial<Pilihan>) {
@@ -72,7 +83,10 @@ export function UbinTdee() {
           <h2 className="t-kecil font-black uppercase tracking-wide text-neutral-500">Metabolic compass</h2>
           <Link to="/profil" className="t-kecil flex min-h-[40px] items-center font-bold text-brand">Complete profile →</Link>
         </div>
-        <p className="t-kecil leading-snug text-neutral-500">Weight, height and age are needed before Panacea can build your energy compass.</p>
+        <p className="t-kecil leading-snug text-neutral-500">
+          Weight, height, age and sex are needed before Panacea can build your energy compass. They are not
+          guessed: a calorie target computed from stand-in figures would belong to somebody else.
+        </p>
       </section>
     )
   }

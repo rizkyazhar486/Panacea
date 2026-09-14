@@ -66,8 +66,28 @@ export const KALOLUMEN = {
  * baik akan mudah terbaca sebagai halaman yang MENJALANKANNYA. Keduanya sangat
  * berbeda, dan yang kedua tidak benar.
  */
+// KALIMAT PERTAMA DI BAWAH PERNAH SALAH, dan salahnya ke arah yang jarang
+// diperiksa orang: ia MENGECILKAN apa yang ada.
+//
+// Ia berbunyi "Panacea does not read DICOM files" -- ditulis ketika memang
+// begitu keadaannya. Sesudah jembatan ke /radiology dipasang, halaman yang
+// sama memuat dua kalimat yang saling membantah: satu blok mengatakan
+// "Panacea can also read an actual DICOM study" dan menautkan pembacanya ke
+// sana, sebuah blok merah beberapa baris di bawahnya mengatakan Panacea
+// tidak bisa. src/lib/dicom.ts memang memuat pengurai sungguhan, dan
+// Radiology.tsx memanggil bacaDicom() atas berkas yang dipilih pemakai.
+//
+// Pernyataan batas yang terlalu berhati-hati tetap pernyataan yang keliru,
+// dan yang ini sekaligus menyembunyikan fitur yang benar-benar ada.
+//
+// SEKARANG IA SALAH UNTUK KEDUA KALINYA, dan dengan cara yang sama: kalimat
+// penggantinya berbunyi "This panel loads no study", benar ketika ditulis dan
+// menjadi keliru pada hari panel ini benar-benar membaca berkas. Gerbang yang
+// menjaganya pun lolos, karena ia memeriksa ADA-TIDAKNYA KALIMAT, bukan
+// benar-tidaknya. Itu persis jenis cacat yang dicari gerbang-gerbang lain di
+// repositori ini, dan ia ada di dalam gerbang itu sendiri.
 export const YANG_BELUM_DIMILIKI_PANACEA: readonly string[] = [
-  'Panacea does not read DICOM files. No CT or MRI study is loaded, decoded or reconstructed anywhere on this page.',
+  'What this panel renders is the contents of the files you pick and nothing else: no anatomical model is loaded, no organ is recognised, and no missing slice is interpolated over. A hole in the image is a hole in the data or in your threshold, not a finding.',
   'Panacea does not bundle, call, embed or license KaloLumen, and none of its images or models are reproduced here.',
   'The Hounsfield window below is Panacea computing the published physics itself, on a reference scale — not a scan, and not anyone’s body.',
   'No number here was measured from a patient, and nothing here is a diagnosis or a clinical finding.',

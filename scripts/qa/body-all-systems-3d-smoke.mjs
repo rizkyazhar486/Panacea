@@ -1,5 +1,6 @@
 import { mkdir, writeFile } from 'node:fs/promises'
 import { chromium } from '@playwright/test'
+import { eyeScreenshotOptions } from './eye-screenshot-options.mjs'
 
 const url = process.env.BODY_ALL_SYSTEMS_QA_URL || 'http://127.0.0.1:4173/#/body-explorer'
 const screenshotPath = process.env.BODY_ALL_SYSTEMS_QA_SCREENSHOT || 'artifacts/body3d-mobile-all-systems.png'
@@ -166,19 +167,16 @@ try {
 
   const explorerBox = await explorer.boundingBox()
   if (!explorerBox) throw new Error('All-system explorer has no measurable bounding box for visual evidence')
-  const documentSize = await page.evaluate(() => ({
-    width: document.documentElement.scrollWidth,
-    height: document.documentElement.scrollHeight,
-  }))
-  const clipX = Math.max(0, explorerBox.x)
-  const clipY = Math.max(0, explorerBox.y)
-  const screenshotClip = {
-    x: clipX,
-    y: clipY,
-    width: Math.max(1, Math.min(explorerBox.width, documentSize.width - clipX)),
-    height: Math.max(1, Math.min(explorerBox.height, documentSize.height - clipY)),
-  }
-  await page.screenshot({ path: screenshotPath, clip: screenshotClip })
+  const scroll = await page.evaluate(() => ({ x: window.scrollX, y: window.scrollY }))
+  // Reuse the tested document-coordinate capture helper; retain the live page.
+  // CSS pixels avoid encoding nine times as many pixels at deviceScaleFactor 3.
+  await page.screenshot({
+    path: screenshotPath,
+    ...eyeScreenshotOptions(explorerBox, scroll),
+    scale: 'css',
+    animations: 'disabled',
+    timeout: 45_000,
+  })
 
   const metrics = {
     ok: true,
