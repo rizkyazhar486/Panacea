@@ -1,8 +1,9 @@
 import { lazy, Suspense, type ComponentType } from 'react'
 import { useSearchParams } from 'react-router-dom'
+import { PanaceaZoneNav } from '../components/PanaceaZoneNav'
 
 const Settings = lazy(() => import('./Settings').then((m) => ({ default: m.Settings })))
-const Tutorial = lazy(() => import('./Tutorial').then((m) => ({ default: m.Tutorial })))
+const Tutorial = lazy(() => import('./Tutorial'))
 
 type SettingsView = 'settings' | 'tutorial'
 type View = { key: SettingsView; label: string; component: ComponentType; description: string }
@@ -19,6 +20,7 @@ export function SettingsWorkspace() {
   const Active = active.component
   return (
     <div className="mx-auto w-full max-w-5xl space-y-4 pb-10">
+      <PanaceaZoneNav />
       <section className="rounded-[30px] border border-white/10 bg-black/20 p-4 shadow-2xl backdrop-blur-xl sm:p-5">
         <div className="text-[10px] font-black uppercase tracking-[.22em] text-brand">Settings & Tutorial</div>
         <h1 className="mt-1 text-2xl font-black tracking-tight text-ink dark:text-white">One place to configure and learn Panacea</h1>
