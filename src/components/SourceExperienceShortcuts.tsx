@@ -1,0 +1,82 @@
+import { Link } from 'react-router-dom'
+
+type Shortcut = {
+  id: string
+  title: string
+  keywords: string
+  route: string
+  location: string
+  status: string
+  boundary: string
+}
+
+const SHORTCUTS: Shortcut[] = [
+  {
+    id: 'heart-ecg',
+    title: 'Heart anatomy × ECG',
+    keywords: 'heart cardiovascular ecg electrocardiogram rhythm ptb-xl',
+    route: '/body-explorer',
+    location: 'Body Explorer → Mechanisms → Cardiovascular',
+    status: 'Interactive teaching trace available',
+    boundary: 'The displayed trace is synthetic education, not recorded ECG data, a PTB-XL sample, or a rhythm diagnosis.',
+  },
+  {
+    id: 'ct-mr',
+    title: 'CT / MR volumetric teaching',
+    keywords: 'ct mr mri radiology imaging dicom totalsegmentator axial coronal sagittal 3d',
+    route: '/body-explorer',
+    location: 'Body Explorer → Imaging → Volumetric imaging',
+    status: '3D and cross-sectional teaching controls available',
+    boundary: 'Reference, simulated and acquired-image states remain separate; nothing shown should be treated as patient segmentation.',
+  },
+  {
+    id: 'pubmed',
+    title: 'PubMed evidence search',
+    keywords: 'pubmed evidence paper research literature clinical study',
+    route: '/rujukan?t=bukti',
+    location: 'Reference → Evidence',
+    status: 'Live PubMed records available',
+    boundary: 'Search results are literature candidates, not an AI conclusion, diagnosis, or proof that a finding applies to an individual.',
+  },
+  {
+    id: 'money',
+    title: 'Personal Finance',
+    keywords: 'finance money debt cashflow emergency fund risk',
+    route: '/keuangan',
+    location: 'Personal Finance',
+    status: 'Private on-device tools available',
+    boundary: 'Educational planning only. It does not issue lending, trading, buy, or sell decisions.',
+  },
+]
+
+export function SourceExperienceShortcuts({ query }: { query: string }) {
+  const needle = query.trim().toLocaleLowerCase()
+  const visible = needle
+    ? SHORTCUTS.filter((item) => `${item.title} ${item.keywords} ${item.location}`.toLocaleLowerCase().includes(needle))
+    : SHORTCUTS
+
+  if (visible.length === 0) return null
+
+  return (
+    <section className="mb-4" aria-labelledby="source-experiences-heading">
+      <div id="source-experiences-heading" className="mb-1.5 px-1 text-xs font-bold uppercase tracking-wide text-neutral-500">
+        Tools and scientific experiences
+      </div>
+      <div className="grid gap-2 sm:grid-cols-2">
+        {visible.map((item) => (
+          <article key={item.id} className="rounded-2xl border border-neutral-200 bg-white p-3 shadow-sm dark:border-white/10 dark:bg-white/[.04]">
+            <div className="text-sm font-black text-neutral-900 dark:text-white">{item.title}</div>
+            <div className="mt-1 text-[10px] font-bold text-emerald-700 dark:text-emerald-300">{item.status}</div>
+            <div className="mt-1 text-[11px] text-neutral-500">{item.location}</div>
+            <p className="mt-2 text-[10.5px] leading-relaxed text-neutral-600 dark:text-neutral-300">{item.boundary}</p>
+            <Link to={item.route} className="mt-3 inline-flex min-h-11 items-center rounded-xl bg-neutral-950 px-4 text-xs font-black text-white dark:bg-white dark:text-neutral-950">
+              Open
+            </Link>
+          </article>
+        ))}
+      </div>
+    </section>
+  )
+}
+
+export default SourceExperienceShortcuts
