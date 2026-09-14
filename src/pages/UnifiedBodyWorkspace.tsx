@@ -1,5 +1,6 @@
 import { lazy, Suspense, type ComponentType } from 'react'
 import { useSearchParams } from 'react-router-dom'
+import { PanaceaZoneNav } from '../components/PanaceaZoneNav'
 
 const BodyComposition = lazy(() => import('./BodyComposition').then((m) => ({ default: m.BodyComposition })))
 const PusatLatihan = lazy(() => import('./PusatLatihan').then((m) => ({ default: m.PusatLatihan })))
@@ -49,6 +50,7 @@ export function UnifiedBodyWorkspace() {
 
   return (
     <div className="mx-auto w-full max-w-[1450px] space-y-4 pb-10">
+      <PanaceaZoneNav />
       <section className="rounded-[30px] border border-white/10 bg-black/20 p-4 shadow-2xl backdrop-blur-xl sm:p-5">
         <div className="text-[10px] font-black uppercase tracking-[.22em] text-brand">Your Body · one personal health workspace</div>
         <h1 className="mt-1 text-2xl font-black tracking-tight text-ink dark:text-white sm:text-3xl">Train, recover, eat, measure and age in one body context</h1>
