@@ -36,8 +36,9 @@ if (bisaBacaDicom) {
   }
   // Dan panel itu harus MENUNJUK ke tempatnya, bukan diam.
   assert.ok(/to="\/radiology"/.test(panel), 'the panel no longer points at the viewer that does read DICOM')
-  assert.ok(YANG_BELUM_DIMILIKI_PANACEA.some((b) => /viewer linked above/i.test(b)),
-    'the boundary list no longer tells the reader where the real viewer is')
+  assert.ok(YANG_BELUM_DIMILIKI_PANACEA.some((b) => /viewer linked above/i.test(b))
+    || YANG_BELUM_DIMILIKI_PANACEA.some((b) => /contents of the files you pick/i.test(b)),
+    'the boundary list no longer tells the reader what is and is not being shown')
 } else {
   // Kalau penguraianya benar-benar hilang, kalimat lamalah yang benar --
   // dan blok yang menjanjikan pembaca sebuah penampil harus ikut hilang.
@@ -53,9 +54,34 @@ for (const pola of [
   /does not bundle, call, embed or license KaloLumen/i,
   /not a scan, and not anyone/i,
   /nothing here is a diagnosis or a clinical finding/i,
-  /This panel loads no study/i,
 ]) {
   assert.ok(YANG_BELUM_DIMILIKI_PANACEA.some((b) => pola.test(b)), `a still-true boundary matching ${pola} disappeared`)
+}
+
+// ── 3b. Klaim "tidak memuat studi" harus sesuai dengan panelnya ────────────
+//
+// Gerbang ini pernah LOLOS ketika seharusnya gagal. Ia memeriksa bahwa
+// kalimat 'This panel loads no study' ADA, bukan bahwa ia BENAR -- jadi pada
+// hari panel itu mulai membaca berkas sungguhan, kalimatnya menjadi keliru
+// dan gerbangnya tetap hijau. Yang diperiksa sekarang adalah kenyataannya.
+const panelMemuatStudi = /<VolumeDicomBagian\s*\/>/.test(panel)
+const bagian = (() => {
+  try {
+    return readFileSync(new URL('../../src/pages/bodyhub/VolumeDicomBagian.tsx', import.meta.url), 'utf8')
+  } catch {
+    return ''
+  }
+})()
+if (panelMemuatStudi) {
+  assert.ok(/bacaDicom\(/.test(bagian),
+    'the panel mounts a loader section that never calls bacaDicom — it claims to render a study it does not read')
+  for (const b of YANG_BELUM_DIMILIKI_PANACEA) {
+    assert.ok(!/panel loads no study/i.test(b) && !/no CT or MRI file is read/i.test(b),
+      `the panel now reads DICOM files, but a boundary statement still says it does not: "${b}"`)
+  }
+} else {
+  assert.ok(YANG_BELUM_DIMILIKI_PANACEA.some((b) => /loads no study|no CT or MRI file is read/i.test(b)),
+    'the panel loads nothing, yet no boundary statement says so')
 }
 
 // ── 4. Provenans KaloLumen tetap belum terselesaikan ───────────────────────

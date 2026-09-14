@@ -7,6 +7,7 @@ import {
   lebarJendela, levelJendela, kelasDalamJendela, cakupanKelas, keabuan,
 } from '../../lib/pencitraanVolumetrik'
 import { KALOLUMEN, YANG_BELUM_DIMILIKI_PANACEA } from '../../lib/rujukanKaloLumen'
+import { VolumeDicomBagian } from './VolumeDicomBagian'
 
 // Panel teknologi pencitraan volumetrik untuk Body Exposure.
 //
@@ -131,7 +132,9 @@ export function PencitraanVolumetrikPanel() {
       </div>
 
       <div className="rounded-2xl border border-brand/30 bg-brand/[.06] p-3.5">
-        <div className="text-[10px] font-black uppercase tracking-[.14em] text-brand">
+        <VolumeDicomBagian />
+
+      <div className="text-[10px] font-black uppercase tracking-[.14em] text-brand">
           Open your own study
         </div>
         <p className="mt-1 text-[11.5px] leading-relaxed text-neutral-700 dark:text-neutral-200">

@@ -79,8 +79,15 @@ export const KALOLUMEN = {
 //
 // Pernyataan batas yang terlalu berhati-hati tetap pernyataan yang keliru,
 // dan yang ini sekaligus menyembunyikan fitur yang benar-benar ada.
+//
+// SEKARANG IA SALAH UNTUK KEDUA KALINYA, dan dengan cara yang sama: kalimat
+// penggantinya berbunyi "This panel loads no study", benar ketika ditulis dan
+// menjadi keliru pada hari panel ini benar-benar membaca berkas. Gerbang yang
+// menjaganya pun lolos, karena ia memeriksa ADA-TIDAKNYA KALIMAT, bukan
+// benar-tidaknya. Itu persis jenis cacat yang dicari gerbang-gerbang lain di
+// repositori ini, dan ia ada di dalam gerbang itu sendiri.
 export const YANG_BELUM_DIMILIKI_PANACEA: readonly string[] = [
-  'This panel loads no study. The window below is a reference scale computed here — no CT or MRI file is read, decoded or reconstructed on this page. Panacea does read uncompressed DICOM, in the viewer linked above; that is a different screen, and it renders single images and planes, not a reconstructed 3D model.',
+  'What this panel renders is the contents of the files you pick and nothing else: no anatomical model is loaded, no organ is recognised, and no missing slice is interpolated over. A hole in the image is a hole in the data or in your threshold, not a finding.',
   'Panacea does not bundle, call, embed or license KaloLumen, and none of its images or models are reproduced here.',
   'The Hounsfield window below is Panacea computing the published physics itself, on a reference scale — not a scan, and not anyone’s body.',
   'No number here was measured from a patient, and nothing here is a diagnosis or a clinical finding.',
