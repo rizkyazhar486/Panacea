@@ -1,5 +1,6 @@
 import { lazy, Suspense, useMemo, useState } from 'react'
 import { Prosa } from '../../components/Prosa'
+import { EegScalpStudio } from './EegScalpStudio'
 
 // 3D dimuat hanya saat panel ini dibuka; ia membawa three.js dan nervous.glb.
 const LesiNeuro3D = lazy(() => import('./LesiNeuro3D').then((m) => ({ default: m.LesiNeuro3D })))
@@ -146,6 +147,8 @@ export function LokalisasiLesiPanel() {
           sisi={adaTemuan ? terbaik?.sisi ?? null : null}
         />
       </Suspense>
+
+      <EegScalpStudio />
 
       {/* Tutorial: kasus yang benar-benar menjalankan alatnya. */}
       <div className="rounded-2xl border border-brand/25 bg-brand/[0.05] p-3">
