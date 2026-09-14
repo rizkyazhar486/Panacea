@@ -1,6 +1,7 @@
 import { lazy, Suspense, type ComponentType } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { PanaceaZoneNav } from '../components/PanaceaZoneNav'
+import { FeatureBoulevard } from '../components/FeatureBoulevard'
 
 const BodyComposition = lazy(() => import('./BodyComposition').then((m) => ({ default: m.BodyComposition })))
 const PusatLatihan = lazy(() => import('./PusatLatihan').then((m) => ({ default: m.PusatLatihan })))
@@ -68,6 +69,7 @@ export function UnifiedBodyWorkspace() {
         <div className="mt-3 rounded-2xl border border-white/10 bg-white/[.03] px-3 py-2.5 text-[11px] leading-relaxed text-neutral-500 dark:text-neutral-400"><b className="text-ink dark:text-white">{active.label}:</b> {active.description}</div>
       </section>
       <section role="tabpanel" aria-label={active.label} className="min-w-0"><Suspense fallback={<Loader />}><Active /></Suspense></section>
+      <FeatureBoulevard zone="body" title="Your Body feature boulevard" />
     </div>
   )
 }
