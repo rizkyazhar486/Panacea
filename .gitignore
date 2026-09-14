@@ -41,3 +41,21 @@ artifacts/
 # sekali pakai di akar repo; menamainya *.tmp.mjs membuatnya tidak pernah
 # terbawa ke dalam commit kalau seseorang lupa menghapusnya.
 *.tmp.mjs
+
+# Worktree milik agen, bukan isi repositori.
+#
+# Beberapa agen bekerja serentak di repositori ini dan masing-masing membuat
+# git worktree terisolasi di bawah .claude/. Isinya checkout penuh — puluhan
+# megabyte per worktree — dan sepenuhnya merupakan keadaan alat lokal: tidak
+# ada satu pun yang berarti bagi orang lain yang meng-clone repositori ini.
+#
+# Tanpa baris ini, `git status` setiap agen menampilkan .claude/ sebagai
+# untracked, dan cepat atau lambat ada yang menganggapnya pekerjaan yang
+# belum disimpan lalu meng-commit checkout agen lain ke dalam riwayat.
+.claude/
+
+# Skrip uji sekali pakai. Konvensi *.tmp.* dipakai untuk berkas yang sengaja
+# dibuang setelah dipakai; yang tertinggal di akar repositori hampir selalu
+# sisa sesi, bukan sesuatu yang ingin dibagikan.
+*.tmp.mjs
+*.tmp.js
