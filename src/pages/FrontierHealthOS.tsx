@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react'
 import { DiscoveryWorkbench } from '../components/frontier/DiscoveryWorkbench'
+import { RationalDrugDesignWorkbench } from '../components/frontier/RationalDrugDesignWorkbench'
 import { PanaceaFrontierSeven } from '../components/frontier/PanaceaFrontierSeven'
 import { PanaceaHopeStack } from '../components/frontier/PanaceaHopeStack'
 import {
@@ -75,6 +76,7 @@ export function FrontierHealthOS() {
       <PanaceaFrontierSeven />
       <PanaceaHopeStack />
       <DiscoveryWorkbench />
+      <RationalDrugDesignWorkbench />
 
       <section className="space-y-4 rounded-[30px] border border-neutral-200 bg-white/70 p-4 dark:border-white/10 dark:bg-white/[.025] sm:p-5">
         <div>
