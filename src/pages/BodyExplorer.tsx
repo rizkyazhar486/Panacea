@@ -86,11 +86,12 @@ function toSearchTerm(rawName: string): string {
 // dulu tiap deret menulis ulang kelasnya sendiri, dan itu yang membuat
 // halaman terasa ramai: bentuk yang sama tampil sedikit berbeda-beda.
 function Chip({
-  active, onClick, children,
-}: { active: boolean; onClick: () => void; children: React.ReactNode }) {
+  active, onClick, children, ariaLabel,
+}: { active: boolean; onClick: () => void; children: React.ReactNode; ariaLabel?: string }) {
   return (
     <button
       onClick={onClick}
+      aria-label={ariaLabel}
       className={`min-h-[34px] rounded-full border px-3 text-xs font-bold transition ${
         active
           ? 'border-brand bg-brand text-white'
@@ -906,9 +907,17 @@ export function BodyExplorer() {
                 </div>
                 <div className="flex flex-wrap gap-1.5">
                   {ANATOMY_LAYERS.map((l) => (
-                    <Chip key={l.key} active={layers.has(l.key)} onClick={() => toggleLayer(l.key)}>
+                    <Chip
+                      key={l.key}
+                      active={layers.has(l.key)}
+                      onClick={() => toggleLayer(l.key)}
+                      /* Angka di pil adalah data, bukan bagian dari nama tombol.
+                         Tanpa label ini nama aksesibelnya terbaca "Vessels 434",
+                         yang ambigu bagi pembaca layar. */
+                      ariaLabel={`${l.label}, ${(jumlahAtlas.perSistem[l.key] ?? 0).toLocaleString()} structures`}
+                    >
                       {l.label}
-                      <span className={`ml-1.5 tabular-nums ${layers.has(l.key) ? 'text-white/70' : 'text-neutral-400 dark:text-neutral-500'}`}>
+                      <span aria-hidden="true" className={`ml-1.5 tabular-nums ${layers.has(l.key) ? 'text-white/70' : 'text-neutral-400 dark:text-neutral-500'}`}>
                         {jumlahAtlas.perSistem[l.key] ?? 0}
                       </span>
                     </Chip>
