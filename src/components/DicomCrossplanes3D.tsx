@@ -73,6 +73,10 @@ function disposeGroup(group: THREE.Group) {
   }
 }
 
+function mm(value: number) {
+  return Number.isFinite(value) ? `${value.toFixed(value >= 100 ? 0 : 1)} mm` : '—'
+}
+
 export function DicomCrossplanes3D({ volume, cursor, slice, pusat, lebar, terbalik }: Props) {
   const hostRef = useRef<HTMLDivElement>(null)
   const sceneRef = useRef<THREE.Scene | null>(null)
@@ -90,6 +94,15 @@ export function DicomCrossplanes3D({ volume, cursor, slice, pusat, lebar, terbal
   })
 
   const patientDirections = arahBidangDicom(volume.orientasiPasien)
+  const xIndex = Math.max(0, Math.min(volume.kolom - 1, Math.round(cursor.x)))
+  const yIndex = Math.max(0, Math.min(volume.baris - 1, Math.round(cursor.y)))
+  const zIndex = Math.max(0, Math.min(volume.kedalaman - 1, Math.round(slice)))
+  const widthMm = volume.kolom * volume.jarakKolomMm
+  const heightMm = volume.baris * volume.jarakBarisMm
+  const depthMm = volume.kedalaman * volume.jarakIrisMm
+  const localXmm = (xIndex - (volume.kolom - 1) / 2) * volume.jarakKolomMm
+  const localYmm = ((volume.baris - 1) / 2 - yIndex) * volume.jarakBarisMm
+  const localZmm = (zIndex - (volume.kedalaman - 1) / 2) * volume.jarakIrisMm
 
   useEffect(() => {
     const host = hostRef.current
@@ -165,16 +178,13 @@ export function DicomCrossplanes3D({ volume, cursor, slice, pusat, lebar, terbal
     disposeGroup(group)
 
     try {
-      const xIndex = Math.max(0, Math.min(volume.kolom - 1, Math.round(cursor.x)))
-      const yIndex = Math.max(0, Math.min(volume.baris - 1, Math.round(cursor.y)))
-      const zIndex = Math.max(0, Math.min(volume.kedalaman - 1, Math.round(slice)))
       const source = ambilIrisanMpr(volume, 'source', { x: xIndex, y: yIndex, z: zIndex })
       const row = ambilIrisanMpr(volume, 'cross-row', { x: xIndex, y: yIndex, z: zIndex })
       const column = ambilIrisanMpr(volume, 'cross-column', { x: xIndex, y: yIndex, z: zIndex })
 
-      const rawX = Math.max(1e-6, volume.kolom * volume.jarakKolomMm)
-      const rawY = Math.max(1e-6, volume.baris * volume.jarakBarisMm)
-      const rawZ = Math.max(1e-6, volume.kedalaman * volume.jarakIrisMm)
+      const rawX = Math.max(1e-6, widthMm)
+      const rawY = Math.max(1e-6, heightMm)
+      const rawZ = Math.max(1e-6, depthMm)
       const scale = 2.4 / Math.max(rawX, rawY, rawZ)
       const sx = rawX * scale
       const sy = rawY * scale
@@ -186,48 +196,20 @@ export function DicomCrossplanes3D({ volume, cursor, slice, pusat, lebar, terbal
 
       const addPlane = (plane: IrisanMpr, geometry: THREE.BufferGeometry, opacity: number) => {
         const texture = textureFromPlane(plane, pusat, lebar, terbalik)
-        const material = new THREE.MeshBasicMaterial({
-          map: texture,
-          side: THREE.DoubleSide,
-          transparent: true,
-          opacity,
-          depthWrite: false,
-        })
+        const material = new THREE.MeshBasicMaterial({ map: texture, side: THREE.DoubleSide, transparent: true, opacity, depthWrite: false })
         const mesh = new THREE.Mesh(geometry, material)
         mesh.renderOrder = 2
         group.add(mesh)
       }
 
-      if (visiblePlanes.source) {
-        addPlane(
-          source,
-          quad([-sx / 2, -sy / 2, cz], [sx / 2, -sy / 2, cz], [sx / 2, sy / 2, cz], [-sx / 2, sy / 2, cz]),
-          Math.min(1, planeOpacity + 0.12),
-        )
-      }
-      if (visiblePlanes.row) {
-        addPlane(
-          row,
-          quad([-sx / 2, cy, -sz / 2], [sx / 2, cy, -sz / 2], [sx / 2, cy, sz / 2], [-sx / 2, cy, sz / 2]),
-          planeOpacity,
-        )
-      }
-      if (visiblePlanes.column) {
-        addPlane(
-          column,
-          quad([cx, -sy / 2, -sz / 2], [cx, sy / 2, -sz / 2], [cx, sy / 2, sz / 2], [cx, -sy / 2, sz / 2]),
-          planeOpacity,
-        )
-      }
+      if (visiblePlanes.source) addPlane(source, quad([-sx / 2, -sy / 2, cz], [sx / 2, -sy / 2, cz], [sx / 2, sy / 2, cz], [-sx / 2, sy / 2, cz]), Math.min(1, planeOpacity + 0.12))
+      if (visiblePlanes.row) addPlane(row, quad([-sx / 2, cy, -sz / 2], [sx / 2, cy, -sz / 2], [sx / 2, cy, sz / 2], [-sx / 2, cy, sz / 2]), planeOpacity)
+      if (visiblePlanes.column) addPlane(column, quad([cx, -sy / 2, -sz / 2], [cx, sy / 2, -sz / 2], [cx, sy / 2, sz / 2], [cx, -sy / 2, sz / 2]), planeOpacity)
 
       const bounds = new THREE.BoxGeometry(sx, sy, sz)
       const edges = new THREE.EdgesGeometry(bounds)
       bounds.dispose()
-      const outline = new THREE.LineSegments(
-        edges,
-        new THREE.LineBasicMaterial({ color: 0x738195, transparent: true, opacity: 0.45 }),
-      )
-      group.add(outline)
+      group.add(new THREE.LineSegments(edges, new THREE.LineBasicMaterial({ color: 0x738195, transparent: true, opacity: 0.45 })))
 
       const guideGeometry = new THREE.BufferGeometry()
       guideGeometry.setAttribute('position', new THREE.Float32BufferAttribute([
@@ -235,17 +217,11 @@ export function DicomCrossplanes3D({ volume, cursor, slice, pusat, lebar, terbal
         cx, -sy / 2, cz, cx, sy / 2, cz,
         cx, cy, -sz / 2, cx, cy, sz / 2,
       ], 3))
-      const guides = new THREE.LineSegments(
-        guideGeometry,
-        new THREE.LineBasicMaterial({ color: 0x67e8f9, transparent: true, opacity: 0.82, depthTest: false }),
-      )
+      const guides = new THREE.LineSegments(guideGeometry, new THREE.LineBasicMaterial({ color: 0x67e8f9, transparent: true, opacity: 0.82, depthTest: false }))
       guides.renderOrder = 4
       group.add(guides)
 
-      const point = new THREE.Mesh(
-        new THREE.SphereGeometry(Math.max(0.012, Math.min(sx, sy, sz) * 0.018), 16, 12),
-        new THREE.MeshBasicMaterial({ color: 0x67e8f9, depthTest: false }),
-      )
+      const point = new THREE.Mesh(new THREE.SphereGeometry(Math.max(0.012, Math.min(sx, sy, sz) * 0.018), 16, 12), new THREE.MeshBasicMaterial({ color: 0x67e8f9, depthTest: false }))
       point.position.set(cx, cy, cz)
       point.renderOrder = 5
       group.add(point)
@@ -255,23 +231,9 @@ export function DicomCrossplanes3D({ volume, cursor, slice, pusat, lebar, terbal
     } catch (reason) {
       setError(reason instanceof Error ? reason.message : '3D voxel context could not be rendered.')
     }
-  }, [
-    volume,
-    cursor.x,
-    cursor.y,
-    slice,
-    pusat,
-    lebar,
-    terbalik,
-    planeOpacity,
-    visiblePlanes.source,
-    visiblePlanes.row,
-    visiblePlanes.column,
-  ])
+  }, [volume, xIndex, yIndex, zIndex, pusat, lebar, terbalik, planeOpacity, visiblePlanes.source, visiblePlanes.row, visiblePlanes.column, widthMm, heightMm, depthMm])
 
-  const togglePlane = (key: PlaneKey) => {
-    setVisiblePlanes((current) => ({ ...current, [key]: !current[key] }))
-  }
+  const togglePlane = (key: PlaneKey) => setVisiblePlanes((current) => ({ ...current, [key]: !current[key] }))
 
   const resetView = () => {
     const camera = cameraRef.current
@@ -287,53 +249,23 @@ export function DicomCrossplanes3D({ volume, cursor, slice, pusat, lebar, terbal
     <section className="overflow-hidden rounded-2xl border border-white/10 bg-black/70">
       <div className="border-b border-white/10 px-3 py-2.5">
         <div className="flex flex-wrap items-center justify-between gap-3">
-          <div>
-            <div className="text-xs font-black text-white">3D voxel context</div>
-            <div className="text-[10px] text-white/45">Actual loaded pixels · three intersecting planes</div>
-          </div>
+          <div><div className="text-xs font-black text-white">3D voxel context</div><div className="text-[10px] text-white/45">Actual loaded pixels · three intersecting planes · spacing preserved</div></div>
           <span className="rounded-lg border border-cyan-400/20 bg-cyan-400/10 px-2 py-1 text-[9px] font-black text-cyan-200">LOCAL</span>
         </div>
 
+        <div className="mt-2 grid grid-cols-2 gap-1.5 sm:grid-cols-4">
+          <div className="rounded-lg bg-white/5 px-2 py-1.5"><div className="text-[8px] font-black uppercase tracking-wide text-white/35">Volume</div><div className="mt-0.5 text-[9px] font-black text-white/75">{mm(widthMm)} × {mm(heightMm)} × {mm(depthMm)}</div></div>
+          <div className="rounded-lg bg-white/5 px-2 py-1.5"><div className="text-[8px] font-black uppercase tracking-wide text-white/35">Voxel</div><div className="mt-0.5 text-[9px] font-black text-white/75">{xIndex + 1}, {yIndex + 1}, {zIndex + 1}</div></div>
+          <div className="rounded-lg bg-white/5 px-2 py-1.5"><div className="text-[8px] font-black uppercase tracking-wide text-white/35">Local X / Y</div><div className="mt-0.5 text-[9px] font-black text-white/75">{mm(localXmm)} · {mm(localYmm)}</div></div>
+          <div className="rounded-lg bg-white/5 px-2 py-1.5"><div className="text-[8px] font-black uppercase tracking-wide text-white/35">Local Z</div><div className="mt-0.5 text-[9px] font-black text-white/75">{mm(localZmm)}</div></div>
+        </div>
+
         <div className="mt-2.5 flex flex-wrap items-center gap-1.5">
-          {([
-            ['source', 'Source'],
-            ['row', 'Cross A'],
-            ['column', 'Cross B'],
-          ] as const).map(([key, label]) => (
-            <button
-              key={key}
-              type="button"
-              aria-pressed={visiblePlanes[key]}
-              onClick={() => togglePlane(key)}
-              className={`rounded-lg border px-2.5 py-1.5 text-[9px] font-black transition ${
-                visiblePlanes[key]
-                  ? 'border-cyan-300/40 bg-cyan-400/15 text-cyan-100'
-                  : 'border-white/10 bg-white/5 text-white/40'
-              }`}
-            >
-              {label}
-            </button>
+          {([['source', 'Source'], ['row', 'Cross A'], ['column', 'Cross B']] as const).map(([key, label]) => (
+            <button key={key} type="button" aria-pressed={visiblePlanes[key]} onClick={() => togglePlane(key)} className={`rounded-lg border px-2.5 py-1.5 text-[9px] font-black transition ${visiblePlanes[key] ? 'border-cyan-300/40 bg-cyan-400/15 text-cyan-100' : 'border-white/10 bg-white/5 text-white/40'}`}>{label}</button>
           ))}
-          <button
-            type="button"
-            onClick={resetView}
-            className="rounded-lg border border-white/10 bg-white/5 px-2.5 py-1.5 text-[9px] font-black text-white/60 transition hover:bg-white/10"
-          >
-            Reset view
-          </button>
-          <label className="ml-auto flex min-w-[150px] items-center gap-2 text-[9px] font-bold text-white/45">
-            Plane opacity
-            <input
-              type="range"
-              min={0.2}
-              max={1}
-              step={0.05}
-              value={planeOpacity}
-              onChange={(event) => setPlaneOpacity(Number(event.target.value))}
-              className="w-24 accent-cyan-400"
-              aria-label="3D plane opacity"
-            />
-          </label>
+          <button type="button" onClick={resetView} className="rounded-lg border border-white/10 bg-white/5 px-2.5 py-1.5 text-[9px] font-black text-white/60 transition hover:bg-white/10">Reset view</button>
+          <label className="ml-auto flex min-w-[150px] items-center gap-2 text-[9px] font-bold text-white/45">Plane opacity<input type="range" min={0.2} max={1} step={0.05} value={planeOpacity} onChange={(event) => setPlaneOpacity(Number(event.target.value))} className="w-24 accent-cyan-400" aria-label="3D plane opacity" /></label>
         </div>
 
         {patientDirections ? (
@@ -342,18 +274,14 @@ export function DicomCrossplanes3D({ volume, cursor, slice, pusat, lebar, terbal
             <span className="rounded-md bg-white/5 px-2 py-1">Source Y {formatPasanganArah(patientDirections.source.vertical)}</span>
             <span className="rounded-md bg-white/5 px-2 py-1">Stack {formatPasanganArah(patientDirections.crossRow.vertical)}</span>
           </div>
-        ) : (
-          <div className="mt-2 text-[8px] font-bold text-white/30">Patient-direction metadata unavailable or not valid enough to label safely.</div>
-        )}
+        ) : <div className="mt-2 text-[8px] font-bold text-white/30">Patient-direction metadata unavailable or not valid enough to label safely.</div>}
       </div>
 
       <div className="relative h-[340px] min-h-[280px] bg-[#05080c] sm:h-[430px]">
         <div ref={hostRef} className="absolute inset-0" aria-label="Interactive 3D voxel cross-plane context" />
-        {error && (
-          <div className="absolute inset-0 grid place-items-center bg-black/80 p-6 text-center text-xs text-white/60">{error}</div>
-        )}
+        {error && <div className="absolute inset-0 grid place-items-center bg-black/80 p-6 text-center text-xs text-white/60">{error}</div>}
         <div className="pointer-events-none absolute bottom-2 left-2 right-2 rounded-xl border border-white/10 bg-black/60 px-2.5 py-2 text-[9px] leading-relaxed text-white/45 backdrop-blur">
-          This is a spatial view of the loaded voxel planes, not surface segmentation, anatomy labeling, diagnosis, or registration to the textbook atlas. Drag to rotate; wheel/pinch to zoom. {BATAS_ARAH_DICOM}
+          Local millimetre readouts preserve DICOM pixel/slice spacing and are offsets from this loaded volume's centre, not atlas coordinates or patient measurements. This is voxel context, not TotalSegmentator output, surface segmentation, anatomy labeling, diagnosis, or registration to a textbook atlas. Drag to rotate; wheel/pinch to zoom. {BATAS_ARAH_DICOM}
         </div>
       </div>
     </section>
