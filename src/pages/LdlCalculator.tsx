@@ -24,14 +24,23 @@ function ldlBand(v: number): { label: string; tone: 'brand' | 'low' | 'critical'
 }
 
 export function LdlCalculator() {
-  const [totalChol, setTotalChol] = useState(200)
-  const [hdl, setHdl] = useState(50)
-  const [tg, setTg] = useState(150)
+  // Kolesterol total 200, HDL 50 dan trigliserida 150 memberi LDL 120 --
+  // sebuah hasil lipid lengkap dengan pitanya, di layar yang belum menerima
+  // satu pun nilai. Ketiganya hasil laboratorium.
+  const [totalChol, setTotalChol] = useState(0)
+  const [hdl, setHdl] = useState(0)
+  const [tg, setTg] = useState(0)
+
+  const belum: string[] = []
+  if (!(totalChol > 0)) belum.push('total cholesterol')
+  if (!(hdl > 0)) belum.push('HDL')
+  if (!(tg > 0)) belum.push('triglycerides')
+  const lengkap = belum.length === 0
 
   const tgTooHigh = tg >= 400
   const ldl = totalChol - hdl - tg / 5
   const nonHdl = totalChol - hdl
-  const band = ldlBand(ldl)
+  const band = lengkap ? ldlBand(ldl) : null
 
   return (
     <div className="mx-auto max-w-2xl space-y-5 pb-24">
@@ -55,6 +64,14 @@ export function LdlCalculator() {
       </Card>
 
       <Card className="!p-5">
+        {!lengkap ? (
+          <p className="text-[12.5px] leading-relaxed text-neutral-600 dark:text-neutral-300">
+            Nothing calculated yet. Still needed: {belum.join(', ')}.
+            {' '}All three come off a lipid panel. Total cholesterol 200 with HDL 50 and triglycerides 150 gives an
+            LDL of 120 — a complete lipid result, with its band, on a screen that had received no values at all.
+          </p>
+        ) : (
+        <>
         <div className="grid grid-cols-2 gap-4">
           <div>
             <div className="text-[11px] font-bold uppercase tracking-wide text-neutral-500">Calculated LDL</div>
@@ -64,7 +81,7 @@ export function LdlCalculator() {
               <>
                 <div className="mt-1 text-2xl font-black text-brand-dark">{ldl.toFixed(0)}</div>
                 <div className="text-[11px] text-neutral-500">mg/dL</div>
-                <Badge tone={band.tone}>{band.label}</Badge>
+                {band !== null && <Badge tone={band.tone}>{band.label}</Badge>}
               </>
             )}
           </div>
@@ -80,7 +97,9 @@ export function LdlCalculator() {
           e.g. {'<'}70 mg/dL (or lower) is commonly targeted after a cardiovascular event. Discuss
           individual goals with the treating clinician.
         </p>
-        <CopyNote text={tgTooHigh ? `Non-HDL ${nonHdl.toFixed(0)} mg/dL (TC ${totalChol}, HDL ${hdl}; TG ${tg} >=400 so Friedewald LDL not valid — direct LDL advised)` : `LDL ${ldl.toFixed(0)} mg/dL by Friedewald (TC ${totalChol}, HDL ${hdl}, TG ${tg}) — ${band.label}; non-HDL ${nonHdl.toFixed(0)} mg/dL [Friedewald 1972]`} />
+        <CopyNote text={tgTooHigh ? `Non-HDL ${nonHdl.toFixed(0)} mg/dL (TC ${totalChol}, HDL ${hdl}; TG ${tg} >=400 so Friedewald LDL not valid — direct LDL advised)` : `LDL ${ldl.toFixed(0)} mg/dL by Friedewald (TC ${totalChol}, HDL ${hdl}, TG ${tg}) — ${band ? band.label : ''}; non-HDL ${nonHdl.toFixed(0)} mg/dL [Friedewald 1972]`} />
+        </>
+        )}
       </Card>
 
       <div className="rounded-2xl border border-neutral-100 bg-white p-4 text-center text-[11px] leading-relaxed text-neutral-500 dark:border-white/10 dark:bg-white/5">
