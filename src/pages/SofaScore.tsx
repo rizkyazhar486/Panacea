@@ -67,13 +67,30 @@ function mortalityBand(score: number): { label: string; tone: 'brand' | 'low' | 
 }
 
 export function SofaScore() {
-  const [pf, setPf] = useState(350)
+  // Empat nilai lab dan satu skala neurologis dimulai kosong. Dengan nilai
+  // lamanya -- PaO2/FiO2 350, trombosit 180, bilirubin 0,8, GCS 15,
+  // kreatinin 1,0 -- keenam subskor bernilai NOL, jadi halaman ini terbuka
+  // pada SOFA 0 dengan perkiraan mortalitas "<10%", dan menyimpannya sebagai
+  // titik tren.
+  //
+  // Tingkat kardiovaskular 0 ("tanpa hipotensi") dan "tidak disokong
+  // ventilasi" TETAP: keduanya penilaian yang memang dijawab, bukan kolom
+  // yang dibiarkan kosong.
+  const [pf, setPf] = useState(0)
   const [supported, setSupported] = useState(false)
-  const [plt, setPlt] = useState(180)
-  const [bili, setBili] = useState(0.8)
+  const [plt, setPlt] = useState(0)
+  const [bili, setBili] = useState(0)
   const [cv, setCv] = useState<CvLevel>(0)
-  const [gcs, setGcs] = useState(15)
-  const [creat, setCreat] = useState(1.0)
+  const [gcs, setGcs] = useState(0)
+  const [creat, setCreat] = useState(0)
+
+  const belum: string[] = []
+  if (!(pf > 0)) belum.push('PaO₂/FiO₂')
+  if (!(plt > 0)) belum.push('platelets')
+  if (!(bili > 0)) belum.push('bilirubin')
+  if (!(gcs > 0)) belum.push('Glasgow Coma Scale')
+  if (!(creat > 0)) belum.push('creatinine')
+  const lengkap = belum.length === 0
 
   const resp = respPts(pf, supported)
   const coag = coagPts(plt)
@@ -81,7 +98,7 @@ export function SofaScore() {
   const renal = renalPts(creat)
   const cns = cnsPts(gcs)
   const total = resp + coag + liver + renal + cns + cv
-  const band = mortalityBand(total)
+  const band = lengkap ? mortalityBand(total) : null
 
   const rows = [
     { name: 'Respiration (PaO₂/FiO₂)', pts: resp },
@@ -143,14 +160,26 @@ export function SofaScore() {
 
       <Card className="!p-5">
         <div className="text-xs font-black uppercase tracking-wide text-neutral-500">Total SOFA Score</div>
-        <div className="mt-2 flex items-center gap-3">
-          <span className="text-3xl font-black text-brand-dark">{total} / 24</span>
-          <Badge tone={band.tone}>{band.label}</Badge>
-        </div>
-        <p className="mt-2 text-[12px] text-neutral-500">Estimated mortality: {band.mortality} (population-level estimate).</p>
-        <CopyNote text={`SOFA ${total}/24 (resp ${resp}, coag ${coag}, liver ${liver}, CV ${cv}, CNS ${cns}, renal ${renal}) — ${band.label.toLowerCase()}, est. mortality ${band.mortality} [Vincent 1996]`} />
+        {lengkap && band !== null ? (
+          <>
+            <div className="mt-2 flex items-center gap-3">
+              <span className="text-3xl font-black text-brand-dark">{total} / 24</span>
+              <Badge tone={band.tone}>{band.label}</Badge>
+            </div>
+            <p className="mt-2 text-[12px] text-neutral-500">Estimated mortality: {band.mortality} (population-level estimate).</p>
+            <CopyNote text={`SOFA ${total}/24 (resp ${resp}, coag ${coag}, liver ${liver}, CV ${cv}, CNS ${cns}, renal ${renal}) — ${band.label.toLowerCase()}, est. mortality ${band.mortality} [Vincent 1996]`} />
+          </>
+        ) : (
+          <p className="mt-2 text-[12.5px] leading-relaxed text-neutral-600 dark:text-neutral-300">
+            No score yet. Still needed: {belum.join(', ')}.
+            {' '}The cardiovascular level and the ventilation question are already answered. The five measurements are
+            not — and with their old starting values every subscore was zero, so this page opened at SOFA 0 with an
+            estimated mortality under 10% and wrote that to a trend.
+          </p>
+        )}
       </Card>
 
+      {lengkap && (
       <ScoreTrend
         storageKey="pmd_sofa_trend_v1"
         scoreName="SOFA"
@@ -158,6 +187,7 @@ export function SofaScore() {
         maxScore={24}
         detail={`Resp ${resp}, Coag ${coag}, Liver ${liver}, CV ${cv}, CNS ${cns}, Renal ${renal}`}
       />
+      )}
 
       <div className="rounded-2xl border border-neutral-100 bg-white p-4 text-center text-[11px] leading-relaxed text-neutral-500 dark:border-white/10 dark:bg-white/5">
         Vincent, J.L., et al. (1996). The SOFA score. <i>Intensive Care Med</i>, 22(7), 707-710.
