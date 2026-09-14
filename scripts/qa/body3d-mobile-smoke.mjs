@@ -160,6 +160,32 @@ try {
   }
 
   const vessels = page.getByRole('button', { name: 'Vessels', exact: true }).first()
+  await vessels.waitFor({ state: 'visible', timeout: 10_000 })
+  // The viewer was deliberately centered above for unobstructed-canvas checks.
+  // Move to the Layers control the way a mobile user would, then prove the
+  // button is genuinely tappable before clicking it. Do not force-click: a
+  // clipped or covered control must still fail this acceptance gate.
+  await vessels.evaluate((node) => node.scrollIntoView({ block: 'center', inline: 'nearest', behavior: 'auto' }))
+  await page.waitForTimeout(150)
+  const vesselsGeometry = await vessels.evaluate((node) => {
+    const rect = node.getBoundingClientRect()
+    const centerX = rect.left + rect.width / 2
+    const centerY = rect.top + rect.height / 2
+    const hit = document.elementFromPoint(centerX, centerY)
+    return {
+      rect: [rect.left, rect.top, rect.right, rect.bottom],
+      center: [centerX, centerY],
+      inViewport: rect.left >= 0 && rect.top >= 0 && rect.right <= innerWidth && rect.bottom <= innerHeight,
+      centerHitIsControl: Boolean(hit && (hit === node || node.contains(hit))),
+      hitTag: hit?.tagName ?? null,
+      hitText: hit?.textContent?.trim().slice(0, 80) ?? null,
+      scrollY,
+    }
+  })
+  metrics.vesselsControlGeometry = vesselsGeometry
+  if (!vesselsGeometry.inViewport || !vesselsGeometry.centerHitIsControl) {
+    throw new Error(`Vessels layer control is not genuinely tappable on mobile: ${JSON.stringify(vesselsGeometry)}`)
+  }
   await vessels.click()
   await progressiveLoading.waitFor({ state: 'visible', timeout: 5_000 })
   const progressiveClass = await progressiveLoading.evaluate((node) =>

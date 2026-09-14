@@ -19,9 +19,9 @@ concurrency:
 
 jobs:
   # Keep the expensive browser/WebGL acceptance on one runner so the production
-  # build is reused by both Body smoke checks. `npm run build` already executes
-  # repository validators plus `tsc -b`, so a separate frontend `tsc --noEmit`
-  # only repeated the same type gate on every PR.
+  # build is reused by Body, surgery, and Panacea OS smoke checks. `npm run build`
+  # already executes repository validators plus `tsc -b`, so a separate frontend
+  # `tsc --noEmit` would only repeat the same type gate on every PR.
   full-acceptance:
     runs-on: ubuntu-latest
     timeout-minutes: 40
@@ -85,6 +85,13 @@ jobs:
           BODY3D_QA_CANVAS_ARTIFACT: artifacts/body3d-mobile-canvas.png
         run: node scripts/qa/body3d-canvas-artifact.mjs
 
+      - name: Surgical simulator mobile 390x844 smoke
+        env:
+          SURGERY_QA_URL: http://127.0.0.1:4173/#/body-explorer
+          SURGERY_QA_SCREENSHOT: artifacts/surgery-simulator-390x844.png
+          SURGERY_QA_METRICS: artifacts/surgery-simulator-metrics.json
+        run: node scripts/qa/surgery-simulator-mobile-smoke.mjs
+
       - name: Panacea OS Daily mobile 390x844 smoke
         env:
           PANACEA_OS_QA_URL: http://127.0.0.1:4173/#/harian
@@ -92,12 +99,14 @@ jobs:
           PANACEA_OS_QA_METRICS: artifacts/panacea-os-mobile-metrics.json
         run: node scripts/qa/panacea-os-mobile-smoke.mjs
 
-      - name: Upload Body Exposure mobile QA artifact
+      - name: Upload Body Exposure and surgery mobile QA artifacts
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: body3d-mobile-qa
-          path: artifacts/body3d-mobile-*
+          path: |
+            artifacts/body3d-mobile-*
+            artifacts/surgery-simulator-*
           if-no-files-found: warn
           retention-days: 7
 
