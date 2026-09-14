@@ -1,6 +1,7 @@
 import { lazy, Suspense, type ComponentType } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { PanaceaZoneNav } from '../components/PanaceaZoneNav'
+import { FeatureBoulevard } from '../components/FeatureBoulevard'
 
 const BodyExplorer = lazy(() => import('./BodyExplorer').then((m) => ({ default: m.BodyExplorer })))
 const FrontierHealthOS = lazy(() => import('./FrontierHealthOS').then((m) => ({ default: m.FrontierHealthOS })))
@@ -128,6 +129,8 @@ export function UnifiedLearnWorkspace() {
           <ActiveComponent />
         </Suspense>
       </section>
+
+      <FeatureBoulevard zone="learn" title="Learn feature boulevard" />
     </div>
   )
 }
