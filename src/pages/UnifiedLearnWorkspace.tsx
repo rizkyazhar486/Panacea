@@ -1,5 +1,6 @@
 import { lazy, Suspense, type ComponentType } from 'react'
 import { useSearchParams } from 'react-router-dom'
+import { PanaceaZoneNav } from '../components/PanaceaZoneNav'
 
 const BodyExplorer = lazy(() => import('./BodyExplorer').then((m) => ({ default: m.BodyExplorer })))
 const FrontierHealthOS = lazy(() => import('./FrontierHealthOS').then((m) => ({ default: m.FrontierHealthOS })))
@@ -82,6 +83,7 @@ export function UnifiedLearnWorkspace() {
 
   return (
     <div className="mx-auto w-full max-w-[1500px] space-y-4 pb-10">
+      <PanaceaZoneNav />
       <section className="overflow-hidden rounded-[30px] border border-white/10 bg-black/20 p-4 shadow-2xl backdrop-blur-xl sm:p-5">
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div className="max-w-3xl">
