@@ -1,30 +1,21 @@
 import { MultiscaleScaleRail } from './MultiscaleScaleRail'
+import TissueLayerContinuumPanel from './TissueLayerContinuumPanel'
 import {
   PULMONARY_SFTPC_MOLECULAR_VERTICAL,
   PULMONARY_SFTPC_WITHHELD_GAPS,
   validatePulmonarySftpcVertical,
 } from '../../lib/bodyPulmonaryMolecularVertical'
 
-// Perjalanan satu tubuh dari jaringan sampai gen.
-//
-// Inti Body Exposure adalah orang bisa BERJALAN menembus skala: jaringan ->
-// sel -> protein -> lintasan -> gen, tanpa kehilangan konteks tubuhnya. Rel
-// skalanya sudah ada di repositori ini, lengkap, beserta satu vertikal
-// bersumber (surfaktan paru SFTPC) yang membawa bukti dan status telaahnya
-// sendiri -- dan TIDAK ADA satu berkas pun yang mengimpornya. Selesai
-// dibangun, tidak bisa dibuka siapa pun.
-//
-// Yang ditambahkan di sini hanya jalan masuknya, ditambah satu hal yang tidak
-// boleh hilang saat dipasang: skala yang SENGAJA DIKOSONGKAN. Rel itu
-// menampilkan skala tanpa simpul sebagai tombol mati. Tombol mati tanpa
-// keterangan terbaca sebagai "belum dikerjakan", padahal keduanya adalah
-// keputusan yang tercatat alasannya. Alasan itu ditampilkan apa adanya.
-
+// Perjalanan satu tubuh dari gross anatomy sampai gen. TissueLayerContinuumPanel
+// menjelaskan batas representasi di setiap kedalaman jaringan, lalu scale rail
+// meneruskan satu contoh bersumber (pulmonary SFTPC) ke skala sel/protein/pathway/gene.
 export function VertikalMolekulerPanel() {
   const periksa = validatePulmonarySftpcVertical()
 
   return (
     <div className="space-y-4">
+      <TissueLayerContinuumPanel />
+
       <MultiscaleScaleRail bridge={PULMONARY_SFTPC_MOLECULAR_VERTICAL} />
 
       <section
@@ -57,10 +48,9 @@ export function VertikalMolekulerPanel() {
       </section>
 
       <p className="text-[11.5px] leading-relaxed text-neutral-500 dark:text-neutral-400">
-        This vertical is a reference relationship map for pulmonary surfactant protein C, not a
-        localisation of a molecule inside rendered gross anatomy and not a patient-specific finding.
-        Cross-scale links say that the evidence connects two scales; they do not say that a protein
-        occupies a coordinate on the body model. The bridge currently validates as{' '}
+        The tissue continuum and pulmonary vertical are reference relationship maps, not patient findings.
+        Gross 3D, histology, cellular and molecular representations stay separate unless exact source evidence
+        connects them. The pulmonary bridge currently validates as{' '}
         <strong className="text-neutral-700 dark:text-neutral-200">
           {periksa.valid ? 'internally consistent' : 'not yet consistent'}
         </strong>{' '}
@@ -68,8 +58,8 @@ export function VertikalMolekulerPanel() {
         <strong className="text-neutral-700 dark:text-neutral-200">
           {periksa.publicationReady ? 'publication-ready' : 'not publication-ready'}
         </strong>
-        {periksa.publicationReady ? '' : ' — qualified academic review is still outstanding'}. Nothing
-        here is a diagnosis, a treatment, or a claim about any person's lungs.
+        {periksa.publicationReady ? '' : ' — qualified academic review is still outstanding'}. Nothing here is
+        a diagnosis, treatment, injury-risk estimate, or claim about any person's tissue.
       </p>
     </div>
   )
