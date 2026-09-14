@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import * as THREE from 'three'
+import { penjagaMuatan } from '../lib/gltfSesudahLepas'
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'
 import { MeshoptDecoder } from 'three/examples/jsm/libs/meshopt_decoder.module.js'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
@@ -104,6 +105,8 @@ export function CardiacCycle3D({ hr = 72, tinggi = 300 }: Props) {
     const meshes: THREE.Mesh[] = []
     const warna = new Map<THREE.Mesh, THREE.Color>()
     let root: THREE.Group | null = null
+    // Muatan yang tiba sesudah komponen ini dilepas tidak punya pemilik.
+    const penjaga = penjagaMuatan()
 
     const flows = [
       { flow: buatPartikel(scene, kurva(JALUR.rightFill), '#5aa2ff'), mode: 'fill' as const },
@@ -120,6 +123,7 @@ export function CardiacCycle3D({ hr = 72, tinggi = 300 }: Props) {
     loader.load(
       `${import.meta.env.BASE_URL}cardio/cardio.glb`,
       (gltf) => {
+        if (!penjaga.terima(gltf.scene)) return
         root = gltf.scene
         root.traverse((o) => {
           if (!(o as THREE.Mesh).isMesh) return
@@ -252,6 +256,7 @@ export function CardiacCycle3D({ hr = 72, tinggi = 300 }: Props) {
     start()
 
     return () => {
+      penjaga.lepas()
       stop()
       io.disconnect()
       ro.disconnect()
