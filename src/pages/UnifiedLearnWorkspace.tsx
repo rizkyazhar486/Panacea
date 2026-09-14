@@ -12,6 +12,7 @@ const Electrophysiology = lazy(() => import('./Electrophysiology').then((m) => (
 const GenomeLab = lazy(() => import('./GenomeLab').then((m) => ({ default: m.GenomeLab })))
 const KnowledgeBridge = lazy(() => import('./KnowledgeBridge').then((m) => ({ default: m.KnowledgeBridge })))
 const MedStudyHub = lazy(() => import('./MedStudyHub').then((m) => ({ default: m.MedStudyHub })))
+const OsceUkmppd = lazy(() => import('./OsceUkmppd').then((m) => ({ default: m.OsceUkmppd })))
 const ClinicalEvidence = lazy(() => import('./ClinicalEvidence').then((m) => ({ default: m.ClinicalEvidence })))
 const DrugInfo = lazy(() => import('./DrugInfo').then((m) => ({ default: m.DrugInfo })))
 const ClinicalCalculators = lazy(() => import('./ClinicalCalculators').then((m) => ({ default: m.ClinicalCalculators })))
@@ -26,6 +27,7 @@ type LearnTab =
   | 'genome'
   | 'knowledge'
   | 'library'
+  | 'cases'
   | 'curriculum'
   | 'ask'
   | 'drugs'
@@ -49,8 +51,9 @@ const TABS: TabDefinition[] = [
   { key: 'arrhythmia', label: 'Arrhythmia Lab', short: 'ECG', component: Electrophysiology, description: 'Electrical physiology and rhythm learning in the same heart/body context.' },
   { key: 'genome', label: 'Genome Lab', short: 'Genome', component: GenomeLab, description: 'Genes, variants and molecular context interpreted back toward tissues and organs.' },
   { key: 'knowledge', label: 'Knowledge Bridge', short: 'Bridge', component: KnowledgeBridge, description: 'Connect anatomy, disease, evidence and mechanisms inside the same workspace.' },
-  { key: 'library', label: 'Medical Library', short: 'Library', component: MedStudyHub, description: 'Disease notes, cases and skills used beside the visual body instead of replacing it.', bagian: 'library' },
-  { key: 'curriculum', label: 'Study Curriculum', short: 'Study', component: MedStudyHub, description: 'Structured study tracks, OSCE and exam-oriented learning inside the same learning environment.', bagian: 'usmle' },
+  { key: 'library', label: 'Medical Library', short: 'Library', component: MedStudyHub, description: 'Disease notes and skills used beside the visual body instead of replacing it.', bagian: 'library' },
+  { key: 'cases', label: 'Cases & Exam Practice', short: 'Cases', component: OsceUkmppd, description: 'OSCE and case-bank practice remains inside the same visual learning environment so a case can be studied beside anatomy, imaging, disease and drugs.' },
+  { key: 'curriculum', label: 'Study Curriculum', short: 'Study', component: MedStudyHub, description: 'Structured study tracks and exam-oriented learning inside the same learning environment.', bagian: 'usmle' },
   { key: 'ask', label: 'Ask Health Question', short: 'Ask', component: ClinicalEvidence, description: 'Turn a clinical question into transparent evidence lookup without leaving Learn.' },
   { key: 'drugs', label: 'Drugs & Herbal', short: 'Drugs', component: DrugInfo, description: 'Drug and herbal references, safety, interactions and mechanism context beside the body where effects occur.' },
   { key: 'calculators', label: 'Health Calculators', short: 'Calc', component: ClinicalCalculators, description: 'Clinical and health calculations used without breaking the visual learning context.' },
