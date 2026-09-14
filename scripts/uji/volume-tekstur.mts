@@ -145,4 +145,54 @@ for (const m of ["id: 'volume'", "id: 'permukaan'", "id: 'keduanya'"]) {
 assert.ok(/hole here may be a hole in the data or in your threshold/.test(komponen),
   'surface mode no longer warns that a hole in it is ambiguous')
 
+// ── 8. Radiograf tersimulasi: fisikanya dihitung ulang di sini ────────────
+// Beer-Lambert, I = I0 exp(-integral(mu dl)), dengan mu diturunkan dari
+// definisi Hounsfield: mu = mu_air * (1 + HU/1000).
+//
+// Ini ditulis ulang, bukan dicerminkan dari shader-nya, supaya perubahan
+// diam-diam pada konstanta atau pada tanda eksponennya gagal di sini.
+const mu = (hu: number, muAir: number) => Math.max(0, muAir * (1 + hu / 1000))
+const MU_AIR = 0.0193
+
+// Udara pada -1000 HU harus TIDAK menyerap sama sekali. Itu bukan pilihan
+// gaya melainkan konsekuensi definisinya, dan kalau ia menyerap, seluruh
+// gambar berkabut.
+assert.equal(mu(-1000, MU_AIR), 0, 'air at -1000 HU must attenuate nothing')
+// Air pada 0 HU harus tepat mu_air.
+assert.ok(Math.abs(mu(0, MU_AIR) - MU_AIR) < 1e-12, 'water at 0 HU must equal the water coefficient')
+// Tulang padat menyerap jauh lebih kuat.
+assert.ok(mu(1000, MU_AIR) > mu(0, MU_AIR) * 1.9, 'dense bone no longer attenuates far more than water')
+
+// 100 mm air harus meneruskan sekitar 14,5% berkas. Angka yang bisa dicek
+// tangan: exp(-0.0193 x 100) = 0.145.
+const transmisi = Math.exp(-mu(0, MU_AIR) * 100)
+assert.ok(Math.abs(transmisi - 0.1452) < 0.001, '100 mm of water no longer transmits ~14.5% of the beam')
+
+assert.ok(/uMode == 3/.test(komponen), 'the simulated radiograph mode is gone')
+assert.ok(/uMuAir \* \(1\.0 \+ hu \/ 1000\.0\)/.test(komponen),
+  'the attenuation coefficient is no longer derived from the Hounsfield definition')
+assert.ok(/exp\(-integral \* uPajanan\)/.test(komponen), 'Beer-Lambert is no longer applied along the ray')
+// Bukan "uniform-nya ada", melainkan "integralnya MEMAKAINYA". Menghapus
+// pengali panjang lintasan membuat hasilnya tak bersatuan dan berubah
+// diam-diam mengikuti resolusi, sementara uniform-nya tetap terdeklarasi.
+assert.ok(/integral \+= max\(mu, 0\.0\) \* uMmPerLangkah;/.test(komponen),
+  'the ray integral no longer multiplies by the millimetre step, so it has no units')
+assert.ok(/MU_AIR_PER_MM = 0\.0193/.test(komponen), 'the stated water coefficient changed without a note')
+// Batasnya harus tetap dinyatakan: ini bukan foto.
+for (const pola of [/no scatter/i, /beam hardening/i, /simulation, not a photograph/i]) {
+  assert.ok(pola.test(komponen), `the radiograph mode no longer states its limit: ${pola}`)
+}
+assert.ok(/not a dose in milligray/.test(readFileSync(new URL('../../src/pages/bodyhub/VolumeDicomBagian.tsx', import.meta.url), 'utf8')),
+  'the exposure slider no longer says it is not a dose')
+
+// ── 9. Kendali harus hilang ketika tidak berlaku ──────────────────────────
+// "Opacity per step" adalah pengali penyusunan volume. Pada radiograf ia
+// tidak berarti apa-apa, dan penggeser yang tidak berpengaruh mengajari
+// pemakainya bahwa angka di layar tidak selalu berhubungan dengan gambarnya.
+const bagianSrc = readFileSync(new URL('../../src/pages/bodyhub/VolumeDicomBagian.tsx', import.meta.url), 'utf8')
+assert.ok(/\{\(mode === 'volume' \|\| mode === 'keduanya'\) && \(/.test(bagianSrc),
+  'the opacity slider is shown in modes that do not composite a volume')
+assert.ok(/mode === 'radiograf' \?/.test(bagianSrc),
+  'the threshold sliders are still offered in radiograph mode, where they do nothing')
+
 console.log('volume-tekstur: ok')

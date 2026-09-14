@@ -49,6 +49,7 @@ export function VolumeDicomBagian() {
   const [atas, setAtas] = useState(1)
   const [kepekatan, setKepekatan] = useState(0.12)
   const [mode, setMode] = useState<ModeRender>('volume')
+  const [pajanan, setPajanan] = useState(1)
   const masukanRef = useRef<HTMLInputElement | null>(null)
 
   const muat = useCallback(async (berkas: FileList | null) => {
@@ -160,11 +161,31 @@ export function VolumeDicomBagian() {
           <VolumeDicom3D
             tekstur={keadaan.tekstur}
             mode={mode}
+            pajanan={pajanan}
             ambangBawah={bawah}
             ambangAtas={atas}
             kepekatan={kepekatan}
           />
 
+          {mode === 'radiograf' ? (
+            <label className="mt-2 block">
+              <span className="flex items-baseline justify-between text-[11px] font-bold text-ink dark:text-white">
+                <span>Exposure</span>
+                <span className="tabular-nums text-neutral-500">×{pajanan.toFixed(1)}</span>
+              </span>
+              <input
+                type="range" min={0.2} max={4} step={0.1} value={pajanan}
+                onChange={(e) => setPajanan(Number(e.target.value))}
+                aria-label="Exposure"
+                className="mt-1.5 h-11 w-full accent-brand"
+              />
+              <span className="mt-1 block text-[11px] leading-relaxed text-neutral-500">
+                Scales the integrated attenuation. It stands in for tube output and detector gain together, and is
+                not a dose in milligray — no dose is computed anywhere here.
+              </span>
+            </label>
+          ) : (
+          <>
           <GeserHu
             label={`Lower threshold (${keadaan.modalitas === 'CT' ? 'HU' : 'relative value'})`}
             nilai={bawah} min={keadaan.tekstur.jendela.bawah} maks={atas - 1}
@@ -175,7 +196,9 @@ export function VolumeDicomBagian() {
             nilai={atas} min={bawah + 1} maks={keadaan.tekstur.jendela.atas}
             onUbah={(n) => setAtas(Math.max(n, bawah + 1))}
           />
-          {mode !== 'permukaan' && (
+          </>
+          )}
+          {(mode === 'volume' || mode === 'keduanya') && (
           <label className="mt-2 block">
             <span className="flex items-baseline justify-between text-[11px] font-bold text-ink dark:text-white">
               <span>Opacity per step</span>

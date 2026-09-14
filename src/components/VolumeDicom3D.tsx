@@ -49,6 +49,14 @@ uniform float uLangkah;
 // 0 = volume (kumpulkan sepanjang sinar), 1 = permukaan (berhenti di
 // perpotongan pertama), 2 = keduanya ditumpuk.
 uniform int uMode;
+// Simulasi radiograf: jendela dibawa masuk supaya byte tekstur dapat
+// dikembalikan menjadi Hounsfield, dan panjang lintasan dalam MILIMETER
+// supaya integralnya punya satuan.
+uniform float uJendelaBawah;
+uniform float uJendelaRentang;
+uniform float uMmPerLangkah;
+uniform float uMuAir;
+uniform float uPajanan;
 
 vec2 potongKotak(vec3 asal, vec3 arah) {
   const vec3 kotakMin = vec3(-0.5);
@@ -84,6 +92,33 @@ void main() {
 
   vec3 langkahVec = arah * uLangkah;
   vec3 p = vOrigin + arah * t.x;
+
+  // ── Mode 3: radiograf tersimulasi (DRR) ─────────────────────────────
+  // Beer-Lambert: I = I0 * exp(-integral(mu dl)). Koefisien atenuasi linier
+  // diturunkan dari definisi Hounsfield itu sendiri --
+  // HU = 1000 * (mu - mu_air) / (mu_air - mu_air_ref), yang untuk udara
+  // mendekati nol memberi mu = mu_air * (1 + HU/1000).
+  //
+  // INI SIMULASI, BUKAN FOTO. Ia berkas tunggal berenergi satu, tanpa
+  // hamburan, tanpa pengerasan berkas, tanpa respons detektor. Sebuah
+  // radiograf sungguhan berbeda justru pada hal-hal itu.
+  if (uMode == 3) {
+    float integral = 0.0;
+    for (int i = 0; i < 512; i++) {
+      float v = ambil(p);
+      float hu = uJendelaBawah + v * uJendelaRentang;
+      float mu = uMuAir * (1.0 + hu / 1000.0);
+      integral += max(mu, 0.0) * uMmPerLangkah;
+      p += langkahVec;
+      if (p.x < -0.5 || p.x > 0.5 || p.y < -0.5 || p.y > 0.5 || p.z < -0.5 || p.z > 0.5) break;
+    }
+    float transmisi = exp(-integral * uPajanan);
+    // Film: yang banyak menyerap tampak TERANG, seperti radiograf cetak.
+    float film = 1.0 - transmisi;
+    if (film < 0.004) discard;
+    color = vec4(vec3(film), 1.0);
+    return;
+  }
 
   vec4 terkumpul = vec4(0.0);
   bool kenaPermukaan = false;
@@ -142,15 +177,19 @@ void main() {
 }
 `
 
-export type ModeRender = 'volume' | 'permukaan' | 'keduanya'
+export type ModeRender = 'volume' | 'permukaan' | 'keduanya' | 'radiograf'
 
 export const MODE_RENDER: { id: ModeRender; label: string; catatan: string }[] = [
   { id: 'volume', label: 'Volume', catatan: 'Every voxel along the ray contributes, so weaker tissue stays visible as weaker.' },
   { id: 'permukaan', label: 'Surface', catatan: 'Stops at the first voxel inside the threshold. A hole here may be a hole in the data or in your threshold.' },
   { id: 'keduanya', label: 'Both', catatan: 'The same threshold drawn both ways at once, so the two can be compared rather than trusted separately.' },
+  { id: 'radiograf', label: 'X-ray (simulated)', catatan: 'Beer-Lambert attenuation integrated along each ray from the actual Hounsfield values — a single-energy beam with no scatter, no beam hardening and no detector response. It is a simulation, not a photograph, and thresholds do not apply to it.' },
 ]
 
-const NOMOR_MODE: Record<ModeRender, number> = { volume: 0, permukaan: 1, keduanya: 2 }
+/** Koefisien atenuasi linier air, 1/mm, pada energi efektif ~70 keV. */
+export const MU_AIR_PER_MM = 0.0193
+
+const NOMOR_MODE: Record<ModeRender, number> = { volume: 0, permukaan: 1, keduanya: 2, radiograf: 3 }
 
 export interface VolumeDicom3DProps {
   tekstur: VolumeTekstur
@@ -159,11 +198,13 @@ export interface VolumeDicom3DProps {
   ambangBawah: number
   ambangAtas: number
   kepekatan: number
+  /** Pengali pajanan simulasi; 1 berarti tanpa penguatan. */
+  pajanan: number
   /** Dilaporkan ke atas supaya halaman dapat menyatakan kegagalan, bukan diam. */
   onGagal?: (alasan: string) => void
 }
 
-export function VolumeDicom3D({ tekstur, mode, ambangBawah, ambangAtas, kepekatan, onGagal }: VolumeDicom3DProps) {
+export function VolumeDicom3D({ tekstur, mode, ambangBawah, ambangAtas, kepekatan, pajanan, onGagal }: VolumeDicom3DProps) {
   const wadahRef = useRef<HTMLDivElement | null>(null)
   const materialRef = useRef<THREE.ShaderMaterial | null>(null)
   const [gagal, setGagal] = useState<string | null>(null)
@@ -178,7 +219,8 @@ export function VolumeDicom3D({ tekstur, mode, ambangBawah, ambangAtas, kepekata
     m.uniforms.uAmbangAtas.value = ambangKeTekstur(ambangAtas, tekstur.jendela)
     m.uniforms.uKepekatan.value = kepekatan
     m.uniforms.uMode.value = NOMOR_MODE[mode]
-  }, [ambangBawah, ambangAtas, kepekatan, mode, tekstur.jendela])
+    m.uniforms.uPajanan.value = pajanan
+  }, [ambangBawah, ambangAtas, kepekatan, mode, pajanan, tekstur.jendela])
 
   useEffect(() => {
     const wadah = wadahRef.current
@@ -232,6 +274,15 @@ export function VolumeDicom3D({ tekstur, mode, ambangBawah, ambangAtas, kepekata
         // lebih besar melewati lapisan tipis dan membuat tulang berlubang.
         uLangkah: { value: 1 / Math.max(tekstur.lebar, tekstur.tinggi, tekstur.dalam) },
         uMode: { value: NOMOR_MODE[mode] },
+        uJendelaBawah: { value: tekstur.jendela.bawah },
+        uJendelaRentang: { value: tekstur.jendela.atas - tekstur.jendela.bawah },
+        // Panjang satu langkah sinar dalam milimeter: sisi fisik terpanjang
+        // dibagi jumlah langkah sepanjang kotak satuan.
+        uMmPerLangkah: {
+          value: Math.max(...tekstur.fisikMm) / Math.max(tekstur.lebar, tekstur.tinggi, tekstur.dalam),
+        },
+        uMuAir: { value: MU_AIR_PER_MM },
+        uPajanan: { value: pajanan },
       },
       vertexShader: VERTEX,
       fragmentShader: FRAGMENT,
