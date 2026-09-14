@@ -22,15 +22,29 @@ function interpret(fena: number): { label: string; tone: 'brand' | 'low' | 'crit
 }
 
 export function FenaCalculator() {
-  const [urineNa, setUrineNa] = useState(20)
-  const [plasmaCr, setPlasmaCr] = useState(2.0)
-  const [plasmaNa, setPlasmaNa] = useState(140)
-  const [urineCr, setUrineCr] = useState(60)
+  // Nilai lamanya -- UNa 20, PCr 2,0, PNa 140, UCr 60 -- menghasilkan
+  // FeNa 0,48%, di bawah 1, sehingga halaman ini terbuka dengan sebuah
+  // DIAGNOSIS BANDING: "Prerenal azotemia likely". Keempatnya hasil
+  // laboratorium dari dua sampel yang harus diambil bersamaan.
+  //
+  // "Sedang memakai diuretik" tetap terjawab: tidak dicentang berarti tidak,
+  // dan itu jawaban yang mengubah cara pembacaannya, bukan pengukuran.
+  const [urineNa, setUrineNa] = useState(0)
+  const [plasmaCr, setPlasmaCr] = useState(0)
+  const [plasmaNa, setPlasmaNa] = useState(0)
+  const [urineCr, setUrineCr] = useState(0)
   const [onDiuretics, setOnDiuretics] = useState(false)
+
+  const belum: string[] = []
+  if (!(urineNa > 0)) belum.push('urine sodium')
+  if (!(plasmaCr > 0)) belum.push('plasma creatinine')
+  if (!(plasmaNa > 0)) belum.push('plasma sodium')
+  if (!(urineCr > 0)) belum.push('urine creatinine')
+  const lengkap = belum.length === 0
 
   const denom = plasmaNa * urineCr
   const fena = denom > 0 ? (urineNa * plasmaCr) / denom * 100 : 0
-  const result = interpret(fena)
+  const result = lengkap ? interpret(fena) : null
 
   return (
     <div className="mx-auto max-w-2xl space-y-5 pb-24">
@@ -62,12 +76,22 @@ export function FenaCalculator() {
 
       <Card className="!p-5">
         <div className="text-xs font-black uppercase tracking-wide text-neutral-500">FeNa</div>
-        <div className="mt-2 flex items-center gap-3">
-          <span className="text-3xl font-black text-brand-dark">{fena.toFixed(2)}%</span>
-          <Badge tone={result.tone}>{result.label}</Badge>
-        </div>
-        <p className="mt-2 text-[12px] text-neutral-500">Reference: FeNa {'<'}1% prerenal · 1-2% indeterminate · {'>'}2% intrinsic renal.</p>
-        <CopyNote text={`FeNa ${fena.toFixed(2)}% (UNa ${urineNa}, PCr ${plasmaCr}, PNa ${plasmaNa}, UCr ${urineCr}${onDiuretics ? '; on diuretics — interpret cautiously' : ''}) — ${result.label} [Espinel 1976]`} />
+        {lengkap && result !== null ? (
+          <>
+            <div className="mt-2 flex items-center gap-3">
+              <span className="text-3xl font-black text-brand-dark">{fena.toFixed(2)}%</span>
+              <Badge tone={result.tone}>{result.label}</Badge>
+            </div>
+            <p className="mt-2 text-[12px] text-neutral-500">Reference: FeNa {'<'}1% prerenal · 1-2% indeterminate · {'>'}2% intrinsic renal.</p>
+            <CopyNote text={`FeNa ${fena.toFixed(2)}% (UNa ${urineNa}, PCr ${plasmaCr}, PNa ${plasmaNa}, UCr ${urineCr}${onDiuretics ? '; on diuretics — interpret cautiously' : ''}) — ${result.label} [Espinel 1976]`} />
+          </>
+        ) : (
+          <p className="mt-2 text-[12.5px] leading-relaxed text-neutral-600 dark:text-neutral-300">
+            No FeNa yet. Still needed: {belum.join(', ')}.
+            {' '}All four come from a paired urine and plasma sample. The old starting values gave 0.48%, so this page
+            used to open on a differential diagnosis — "prerenal azotemia likely" — for a patient nobody had sampled.
+          </p>
+        )}
       </Card>
 
       <div className="rounded-2xl border border-neutral-100 bg-white p-4 text-center text-[11px] leading-relaxed text-neutral-500 dark:border-white/10 dark:bg-white/5">
