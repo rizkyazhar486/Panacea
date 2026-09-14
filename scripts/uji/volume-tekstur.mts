@@ -123,4 +123,26 @@ assert.ok(/no WebGL2/.test(komponen), 'the missing-WebGL2 case is no longer stat
 assert.ok(/skalaKotak\(tekstur\.fisikMm\)/.test(komponen),
   'the box is no longer scaled by physical size — the render would be geometrically wrong')
 
+// ── 7. Dua mode render, dan ambang yang SAMA untuk keduanya ───────────────
+// Klaim rujukannya berbunyi: volume rendering ditambahkan DI SAMPING surface
+// rendering, berbagi pengaturan ambang, supaya keduanya bisa dibandingkan
+// atau ditumpuk. Kalau tiap mode memakai ambangnya sendiri, yang dibandingkan
+// bukan hal yang sama, dan perbandingannya tidak berarti apa-apa.
+assert.ok(/uniform int uMode/.test(komponen), 'the render mode uniform is gone')
+assert.ok(/vec3 gradien\(vec3 p, float h\)/.test(komponen),
+  'the surface normal is no longer taken from the value gradient')
+assert.ok(/if \(uMode >= 1 && diDalam && !kenaPermukaan\)/.test(komponen),
+  'surface mode no longer stops at the first voxel inside the threshold')
+assert.ok(/if \(uMode != 1 && diDalam\)/.test(komponen), 'volume accumulation no longer runs outside surface mode')
+// Satu pasang ambang, dipakai kedua cabang.
+assert.equal((komponen.match(/uAmbangBawah/g) ?? []).length >= 3, true, 'the shared lower threshold was split per mode')
+assert.ok(!/uAmbangBawahPermukaan|uAmbangVolume/.test(komponen),
+  'the two modes were given separate thresholds; then they are not comparable')
+// Dan ketiga mode harus benar-benar ditawarkan ke pembaca.
+for (const m of ["id: 'volume'", "id: 'permukaan'", "id: 'keduanya'"]) {
+  assert.ok(komponen.includes(m), `a render mode disappeared from the list: ${m}`)
+}
+assert.ok(/hole here may be a hole in the data or in your threshold/.test(komponen),
+  'surface mode no longer warns that a hole in it is ambiguous')
+
 console.log('volume-tekstur: ok')

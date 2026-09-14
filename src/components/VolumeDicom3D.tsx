@@ -46,6 +46,9 @@ uniform float uAmbangBawah;
 uniform float uAmbangAtas;
 uniform float uKepekatan;
 uniform float uLangkah;
+// 0 = volume (kumpulkan sepanjang sinar), 1 = permukaan (berhenti di
+// perpotongan pertama), 2 = keduanya ditumpuk.
+uniform int uMode;
 
 vec2 potongKotak(vec3 asal, vec3 arah) {
   const vec3 kotakMin = vec3(-0.5);
@@ -62,6 +65,17 @@ float ambil(vec3 p) {
   return texture(uData, p + vec3(0.5)).r;
 }
 
+// Normal permukaan dari GRADIEN nilai, bukan dari mesh: tidak ada segitiga
+// yang dibuat, jadi tidak ada bentuk yang dikarang di antara voxel. Arah
+// perubahan nilai di sekitar titik itulah yang menjadi arah permukaannya.
+vec3 gradien(vec3 p, float h) {
+  return normalize(vec3(
+    ambil(p + vec3(h, 0.0, 0.0)) - ambil(p - vec3(h, 0.0, 0.0)),
+    ambil(p + vec3(0.0, h, 0.0)) - ambil(p - vec3(0.0, h, 0.0)),
+    ambil(p + vec3(0.0, 0.0, h)) - ambil(p - vec3(0.0, 0.0, h))
+  ) + vec3(1e-6));
+}
+
 void main() {
   vec3 arah = normalize(vDirection);
   vec2 t = potongKotak(vOrigin, arah);
@@ -72,18 +86,36 @@ void main() {
   vec3 p = vOrigin + arah * t.x;
 
   vec4 terkumpul = vec4(0.0);
+  bool kenaPermukaan = false;
+  vec3 warnaPermukaan = vec3(0.0);
+
   for (int i = 0; i < 512; i++) {
     float v = ambil(p);
+    bool diDalam = v >= uAmbangBawah && v <= uAmbangAtas;
 
-    // Di luar ambang berarti TIDAK DIGAMBAR, bukan digambar transparan:
-    // yang di bawah ambang bawah adalah udara dan yang di atas ambang atas
+    // PERMUKAAN: berhenti pada perpotongan PERTAMA. Inilah yang membuang
+    // volumenya dan menyisakan satu kulit -- dan itu sebabnya mode ini
+    // tidak menggantikan mode volume melainkan mendampinginya: sebuah
+    // lubang pada kulit ini tidak dapat dibedakan antara lubang pada
+    // pasien dan lubang pada ambang yang dipilih.
+    if (uMode >= 1 && diDalam && !kenaPermukaan) {
+      vec3 n = gradien(p, uLangkah);
+      // Pencahayaan dari arah kamera: bentuknya terbaca tanpa lampu yang
+      // ditempatkan sembarangan, yang akan menyembunyikan sisi tertentu.
+      float terang = clamp(abs(dot(n, arah)), 0.12, 1.0);
+      warnaPermukaan = vec3(terang);
+      kenaPermukaan = true;
+      if (uMode == 1) break;
+    }
+
+    // VOLUME: di luar ambang berarti TIDAK DIGAMBAR, bukan digambar
+    // transparan -- di bawah ambang bawah adalah udara, di atas ambang atas
     // adalah logam atau artefak, dan keduanya tidak boleh mewarnai apa pun.
-    if (v >= uAmbangBawah && v <= uAmbangAtas) {
+    if (uMode != 1 && diDalam) {
       float rentang = max(1e-4, uAmbangAtas - uAmbangBawah);
       float n = (v - uAmbangBawah) / rentang;
       float alpha = n * uKepekatan;
-      vec3 warna = vec3(n);
-      terkumpul.rgb += (1.0 - terkumpul.a) * alpha * warna;
+      terkumpul.rgb += (1.0 - terkumpul.a) * alpha * vec3(n);
       terkumpul.a += (1.0 - terkumpul.a) * alpha;
       if (terkumpul.a >= 0.98) break;
     }
@@ -92,13 +124,37 @@ void main() {
     if (p.x < -0.5 || p.x > 0.5 || p.y < -0.5 || p.y > 0.5 || p.z < -0.5 || p.z > 0.5) break;
   }
 
+  if (uMode == 1) {
+    if (!kenaPermukaan) discard;
+    color = vec4(warnaPermukaan, 1.0);
+    return;
+  }
+
+  if (uMode == 2 && kenaPermukaan) {
+    // Kulit di atas volumenya, keduanya dari ambang yang SAMA -- supaya yang
+    // dibandingkan memang hal yang sama, bukan dua pengaturan berbeda.
+    terkumpul.rgb = mix(terkumpul.rgb, warnaPermukaan, 0.55);
+    terkumpul.a = max(terkumpul.a, 0.55);
+  }
+
   if (terkumpul.a < 0.01) discard;
   color = terkumpul;
 }
 `
 
+export type ModeRender = 'volume' | 'permukaan' | 'keduanya'
+
+export const MODE_RENDER: { id: ModeRender; label: string; catatan: string }[] = [
+  { id: 'volume', label: 'Volume', catatan: 'Every voxel along the ray contributes, so weaker tissue stays visible as weaker.' },
+  { id: 'permukaan', label: 'Surface', catatan: 'Stops at the first voxel inside the threshold. A hole here may be a hole in the data or in your threshold.' },
+  { id: 'keduanya', label: 'Both', catatan: 'The same threshold drawn both ways at once, so the two can be compared rather than trusted separately.' },
+]
+
+const NOMOR_MODE: Record<ModeRender, number> = { volume: 0, permukaan: 1, keduanya: 2 }
+
 export interface VolumeDicom3DProps {
   tekstur: VolumeTekstur
+  mode: ModeRender
   /** Ambang dalam satuan asli (HU untuk CT). */
   ambangBawah: number
   ambangAtas: number
@@ -107,7 +163,7 @@ export interface VolumeDicom3DProps {
   onGagal?: (alasan: string) => void
 }
 
-export function VolumeDicom3D({ tekstur, ambangBawah, ambangAtas, kepekatan, onGagal }: VolumeDicom3DProps) {
+export function VolumeDicom3D({ tekstur, mode, ambangBawah, ambangAtas, kepekatan, onGagal }: VolumeDicom3DProps) {
   const wadahRef = useRef<HTMLDivElement | null>(null)
   const materialRef = useRef<THREE.ShaderMaterial | null>(null)
   const [gagal, setGagal] = useState<string | null>(null)
@@ -121,7 +177,8 @@ export function VolumeDicom3D({ tekstur, ambangBawah, ambangAtas, kepekatan, onG
     m.uniforms.uAmbangBawah.value = ambangKeTekstur(ambangBawah, tekstur.jendela)
     m.uniforms.uAmbangAtas.value = ambangKeTekstur(ambangAtas, tekstur.jendela)
     m.uniforms.uKepekatan.value = kepekatan
-  }, [ambangBawah, ambangAtas, kepekatan, tekstur.jendela])
+    m.uniforms.uMode.value = NOMOR_MODE[mode]
+  }, [ambangBawah, ambangAtas, kepekatan, mode, tekstur.jendela])
 
   useEffect(() => {
     const wadah = wadahRef.current
@@ -174,6 +231,7 @@ export function VolumeDicom3D({ tekstur, ambangBawah, ambangAtas, kepekatan, onG
         // Langkah sinar diikat ke ketebalan voxel terkecil: langkah yang
         // lebih besar melewati lapisan tipis dan membuat tulang berlubang.
         uLangkah: { value: 1 / Math.max(tekstur.lebar, tekstur.tinggi, tekstur.dalam) },
+        uMode: { value: NOMOR_MODE[mode] },
       },
       vertexShader: VERTEX,
       fragmentShader: FRAGMENT,

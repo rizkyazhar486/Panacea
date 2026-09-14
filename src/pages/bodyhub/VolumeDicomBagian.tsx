@@ -5,7 +5,7 @@ import {
   susunVolumeTekstur, jendelaAwalVolume, BATAS_VOLUME,
   type VolumeTekstur,
 } from '../../lib/volumeTekstur'
-import { VolumeDicom3D } from '../../components/VolumeDicom3D'
+import { VolumeDicom3D, MODE_RENDER, type ModeRender } from '../../components/VolumeDicom3D'
 
 // Bagian yang BENAR-BENAR MEMBACA berkas dan merendernya dalam tiga dimensi.
 //
@@ -48,6 +48,7 @@ export function VolumeDicomBagian() {
   const [bawah, setBawah] = useState(0)
   const [atas, setAtas] = useState(1)
   const [kepekatan, setKepekatan] = useState(0.12)
+  const [mode, setMode] = useState<ModeRender>('volume')
   const masukanRef = useRef<HTMLInputElement | null>(null)
 
   const muat = useCallback(async (berkas: FileList | null) => {
@@ -138,8 +139,27 @@ export function VolumeDicomBagian() {
 
       {keadaan.tahap === 'siap' && (
         <div className="mt-3">
+          <div className="mb-2.5 flex flex-wrap gap-2">
+            {MODE_RENDER.map((m) => (
+              <button
+                key={m.id}
+                type="button"
+                onClick={() => setMode(m.id)}
+                aria-pressed={mode === m.id}
+                className={`min-h-11 rounded-full border px-4 text-xs font-black ${
+                  mode === m.id ? 'border-brand bg-brand text-white' : 'border-neutral-300/70 text-neutral-600 dark:border-white/15 dark:text-neutral-300'
+                }`}
+              >
+                {m.label}
+              </button>
+            ))}
+          </div>
+          <p className="mb-2.5 text-[11px] leading-relaxed text-neutral-600 dark:text-neutral-300">
+            {MODE_RENDER.find((m) => m.id === mode)?.catatan}
+          </p>
           <VolumeDicom3D
             tekstur={keadaan.tekstur}
+            mode={mode}
             ambangBawah={bawah}
             ambangAtas={atas}
             kepekatan={kepekatan}
@@ -155,6 +175,7 @@ export function VolumeDicomBagian() {
             nilai={atas} min={bawah + 1} maks={keadaan.tekstur.jendela.atas}
             onUbah={(n) => setAtas(Math.max(n, bawah + 1))}
           />
+          {mode !== 'permukaan' && (
           <label className="mt-2 block">
             <span className="flex items-baseline justify-between text-[11px] font-bold text-ink dark:text-white">
               <span>Opacity per step</span>
@@ -167,6 +188,7 @@ export function VolumeDicomBagian() {
               className="mt-1.5 h-11 w-full accent-brand"
             />
           </label>
+          )}
 
           <ul className="mt-2.5 space-y-1 text-[11px] leading-relaxed text-neutral-600 dark:text-neutral-300">
             <li>
