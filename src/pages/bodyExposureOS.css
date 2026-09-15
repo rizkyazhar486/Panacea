@@ -1,14 +1,29 @@
 .body-exposure-os {
+  --be-space-black: #010207;
+  --be-surface-0: rgba(2, 5, 12, 0.98);
+  --be-surface-1: rgba(255, 255, 255, 0.032);
+  --be-surface-2: rgba(255, 255, 255, 0.052);
+  --be-border-soft: rgba(255, 255, 255, 0.07);
+  --be-border-active: rgba(103, 232, 249, 0.24);
+  --be-cyan: 103, 232, 249;
+  --be-violet: 167, 139, 250;
+  --be-magenta: 244, 114, 182;
+  --be-emerald: 110, 231, 183;
+  --be-amber: 253, 230, 138;
+  --be-radius-shell: 34px;
+  --be-radius-panel: 28px;
+  --be-radius-control: 16px;
+  --be-blur: 20px;
   position: relative;
   isolation: isolate;
   overflow: clip;
-  border-radius: 34px;
-  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: var(--be-radius-shell);
+  border: 1px solid var(--be-border-soft);
   background:
-    radial-gradient(circle at 20% -8%, rgba(34, 211, 238, 0.10), transparent 28%),
-    radial-gradient(circle at 82% 4%, rgba(139, 92, 246, 0.10), transparent 24%),
-    radial-gradient(circle at 60% 42%, rgba(236, 72, 153, 0.035), transparent 32%),
-    linear-gradient(180deg, rgba(2, 5, 12, 0.98), rgba(0, 0, 0, 0.99));
+    radial-gradient(circle at 20% -8%, rgba(var(--be-cyan), 0.10), transparent 28%),
+    radial-gradient(circle at 82% 4%, rgba(var(--be-violet), 0.10), transparent 24%),
+    radial-gradient(circle at 60% 42%, rgba(var(--be-magenta), 0.035), transparent 32%),
+    linear-gradient(180deg, var(--be-surface-0), rgba(0, 0, 0, 0.99));
   padding: 10px;
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.045),
@@ -38,7 +53,7 @@
   z-index: 0;
   height: 420px;
   background:
-    conic-gradient(from 225deg at 50% 50%, transparent, rgba(34,211,238,.06), transparent 28%, rgba(139,92,246,.055), transparent 58%, rgba(236,72,153,.035), transparent);
+    conic-gradient(from 225deg at 50% 50%, transparent, rgba(var(--be-cyan),.06), transparent 28%, rgba(var(--be-violet),.055), transparent 58%, rgba(var(--be-magenta),.035), transparent);
   filter: blur(44px);
   opacity: .8;
 }
@@ -46,8 +61,8 @@
 .body-exposure-os__glass {
   background:
     linear-gradient(135deg, rgba(255,255,255,.075), rgba(255,255,255,.024) 48%, rgba(255,255,255,.035));
-  -webkit-backdrop-filter: blur(20px) saturate(165%);
-  backdrop-filter: blur(20px) saturate(165%);
+  -webkit-backdrop-filter: blur(var(--be-blur)) saturate(165%);
+  backdrop-filter: blur(var(--be-blur)) saturate(165%);
   box-shadow:
     inset 0 1px 0 rgba(255,255,255,.11),
     inset 18px 18px 40px rgba(255,255,255,.012),
@@ -63,6 +78,336 @@
 
 .body-exposure-os__dock::-webkit-scrollbar {
   display: none;
+}
+
+/* Intelligence layers share one spatial shell. This is intentionally scoped
+   to Body Exposure so the clinical and consumer surfaces outside this OS keep
+   their own visual grammar. */
+.body-intelligence-workspace {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  border: 1px solid rgba(255,255,255,.08);
+  border-radius: 30px;
+  background:
+    radial-gradient(circle at 12% 0%, rgba(var(--be-cyan), .07), transparent 26%),
+    radial-gradient(circle at 88% 8%, rgba(var(--be-violet), .065), transparent 28%),
+    linear-gradient(145deg, rgba(255,255,255,.055), rgba(255,255,255,.018) 44%, rgba(255,255,255,.028));
+  padding: 12px;
+  -webkit-backdrop-filter: blur(22px) saturate(165%);
+  backdrop-filter: blur(22px) saturate(165%);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.09),
+    0 24px 80px rgba(0,0,0,.26);
+}
+
+.body-intelligence-workspace__spectral {
+  pointer-events: none;
+  position: absolute;
+  inset: -100px -70px auto;
+  height: 250px;
+  background:
+    conic-gradient(from 210deg at 50% 50%, transparent 0 18%, rgba(var(--be-cyan), .11), transparent 33% 49%, rgba(var(--be-violet), .09), transparent 64% 78%, rgba(var(--be-magenta), .055), transparent 92%);
+  filter: blur(46px);
+  opacity: .68;
+}
+
+.body-intelligence-workspace__header {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  gap: 14px;
+  padding: 8px 8px 12px;
+}
+
+.body-intelligence-workspace__eyebrow {
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: .22em;
+  text-transform: uppercase;
+  color: rgba(var(--be-cyan), .82);
+}
+
+.body-intelligence-workspace__badge {
+  display: inline-flex;
+  align-items: center;
+  min-height: 24px;
+  border: 1px solid rgba(255,255,255,.09);
+  border-radius: 999px;
+  background: rgba(255,255,255,.035);
+  padding: 3px 9px;
+  font-size: 8px;
+  font-weight: 900;
+  letter-spacing: .11em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,.43);
+}
+
+.body-intelligence-workspace__badge--live {
+  border-color: rgba(var(--be-cyan), .16);
+  background: rgba(var(--be-cyan), .045);
+  color: rgba(var(--be-cyan), .72);
+}
+
+.body-intelligence-workspace__title {
+  max-width: 860px;
+  margin-top: 9px;
+  font-size: clamp(1.25rem, 2vw, 1.85rem);
+  font-weight: 900;
+  line-height: 1.08;
+  letter-spacing: -.03em;
+  color: rgba(255,255,255,.94);
+}
+
+.body-intelligence-workspace__lede {
+  max-width: 820px;
+  margin-top: 8px;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.65;
+  color: rgba(226,232,240,.48);
+}
+
+.body-intelligence-workspace__summary {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 7px;
+}
+
+.body-intelligence-workspace__summary-card {
+  min-width: 0;
+  border: 1px solid rgba(255,255,255,.065);
+  border-radius: 16px;
+  background: rgba(0,0,0,.24);
+  padding: 9px 8px;
+  text-align: center;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.025);
+}
+
+.body-intelligence-workspace__summary-card strong {
+  display: block;
+  font-size: 15px;
+  font-weight: 900;
+  color: rgba(255,255,255,.82);
+}
+
+.body-intelligence-workspace__summary-card span {
+  display: block;
+  margin-top: 2px;
+  font-size: 7px;
+  font-weight: 900;
+  letter-spacing: .09em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,.28);
+}
+
+.body-intelligence-workspace__tabbar {
+  position: relative;
+  z-index: 2;
+  overflow-x: auto;
+  border: 1px solid rgba(255,255,255,.065);
+  border-radius: 20px;
+  background: rgba(0,0,0,.34);
+  padding: 5px;
+  scrollbar-width: none;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.03);
+}
+
+.body-intelligence-workspace__tabbar::-webkit-scrollbar {
+  display: none;
+}
+
+.body-intelligence-workspace__tabtrack {
+  display: flex;
+  min-width: max-content;
+  gap: 5px;
+}
+
+.body-intelligence-workspace__tab {
+  position: relative;
+  min-width: 112px;
+  min-height: 52px;
+  border: 1px solid transparent;
+  border-radius: var(--be-radius-control);
+  background: transparent;
+  padding: 8px 12px;
+  text-align: left;
+  transition: border-color 180ms ease, background-color 180ms ease, transform 180ms ease, box-shadow 180ms ease;
+}
+
+.body-intelligence-workspace__tab:hover {
+  border-color: rgba(255,255,255,.08);
+  background: rgba(255,255,255,.035);
+}
+
+.body-intelligence-workspace__tab:focus-visible {
+  outline: none;
+  border-color: rgba(var(--be-cyan), .35);
+  box-shadow: 0 0 0 3px rgba(var(--be-cyan), .07);
+}
+
+.body-intelligence-workspace__tab.is-active {
+  border-color: rgba(var(--be-cyan), .22);
+  background:
+    linear-gradient(135deg, rgba(var(--be-cyan), .105), rgba(var(--be-violet), .07) 54%, rgba(var(--be-magenta), .04));
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.09),
+    0 10px 30px rgba(var(--be-cyan), .045);
+}
+
+.body-intelligence-workspace__tab-category {
+  display: block;
+  font-size: 7px;
+  font-weight: 900;
+  letter-spacing: .11em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,.25);
+}
+
+.body-intelligence-workspace__tab-label {
+  display: block;
+  margin-top: 4px;
+  font-size: 11px;
+  font-weight: 900;
+  color: rgba(255,255,255,.52);
+}
+
+.body-intelligence-workspace__tab.is-active .body-intelligence-workspace__tab-category {
+  color: rgba(var(--be-cyan), .58);
+}
+
+.body-intelligence-workspace__tab.is-active .body-intelligence-workspace__tab-label {
+  color: rgba(255,255,255,.9);
+}
+
+.body-intelligence-workspace__context {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 8px;
+  border: 1px solid rgba(255,255,255,.055);
+  border-radius: 18px;
+  background: rgba(255,255,255,.018);
+  padding: 11px 13px;
+}
+
+.body-intelligence-workspace__context-kicker {
+  display: block;
+  margin-bottom: 3px;
+  font-size: 7px;
+  font-weight: 900;
+  letter-spacing: .11em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,.25);
+}
+
+.body-intelligence-workspace__context strong {
+  font-size: 11px;
+  font-weight: 900;
+  color: rgba(255,255,255,.74);
+}
+
+.body-intelligence-workspace__context p {
+  max-width: 920px;
+  margin-top: 3px;
+  font-size: 9px;
+  font-weight: 600;
+  line-height: 1.5;
+  color: rgba(226,232,240,.34);
+}
+
+.body-intelligence-workspace__context-state {
+  display: inline-flex;
+  align-items: center;
+  align-self: flex-start;
+  gap: 7px;
+  border: 1px solid rgba(var(--be-cyan), .09);
+  border-radius: 999px;
+  background: rgba(var(--be-cyan), .025);
+  padding: 5px 9px;
+  font-size: 8px;
+  font-weight: 800;
+  color: rgba(255,255,255,.32);
+}
+
+.body-intelligence-workspace__context-state strong {
+  color: rgba(var(--be-cyan), .64);
+}
+
+.body-intelligence-workspace__panel {
+  position: relative;
+  z-index: 1;
+  margin-top: 8px;
+  overflow: hidden;
+  border-radius: 25px;
+}
+
+.body-intelligence-workspace__panel > section {
+  margin: 0 !important;
+  border-color: rgba(255,255,255,.065) !important;
+  border-radius: 25px !important;
+  background:
+    radial-gradient(circle at 18% 0%, rgba(var(--be-cyan), .035), transparent 28%),
+    linear-gradient(145deg, rgba(255,255,255,.032), rgba(0,0,0,.26)) !important;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.025) !important;
+}
+
+.body-intelligence-workspace__fallback {
+  position: relative;
+  display: grid;
+  min-height: 260px;
+  place-items: center;
+  overflow: hidden;
+  border: 1px solid rgba(255,255,255,.06);
+  border-radius: 25px;
+  background: rgba(0,0,0,.28);
+  font-size: 10px;
+  font-weight: 800;
+  color: rgba(255,255,255,.34);
+}
+
+.body-intelligence-workspace__pulse {
+  position: absolute;
+  width: 130px;
+  height: 130px;
+  border-radius: 999px;
+  background: radial-gradient(circle, rgba(var(--be-cyan), .10), transparent 66%);
+  filter: blur(16px);
+  animation: body-intelligence-pulse 1.9s ease-in-out infinite alternate;
+}
+
+.body-intelligence-workspace__footer {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  gap: 5px;
+  margin-top: 8px;
+  border: 1px solid rgba(var(--be-amber), .08);
+  border-radius: 17px;
+  background: rgba(var(--be-amber), .018);
+  padding: 10px 12px;
+}
+
+.body-intelligence-workspace__footer span {
+  font-size: 8px;
+  font-weight: 900;
+  letter-spacing: .07em;
+  text-transform: uppercase;
+  color: rgba(var(--be-amber), .5);
+}
+
+.body-intelligence-workspace__footer p {
+  font-size: 8px;
+  font-weight: 600;
+  line-height: 1.55;
+  color: rgba(255,255,255,.26);
+}
+
+@keyframes body-intelligence-pulse {
+  from { opacity: .45; transform: scale(.9); }
+  to { opacity: .9; transform: scale(1.1); }
 }
 
 /* BodyExplorer predates the OS shell and still contains several neutral utility
@@ -95,8 +440,8 @@
 .body-exposure-os__core input:focus,
 .body-exposure-os__core select:focus,
 .body-exposure-os__core textarea:focus {
-  border-color: rgba(103, 232, 249, 0.36) !important;
-  box-shadow: 0 0 0 3px rgba(34, 211, 238, 0.07);
+  border-color: rgba(var(--be-cyan), 0.36) !important;
+  box-shadow: 0 0 0 3px rgba(var(--be-cyan), 0.07);
 }
 
 .body-exposure-os:fullscreen {
@@ -106,7 +451,7 @@
   border: 0;
   border-radius: 0;
   padding: max(10px, env(safe-area-inset-top)) max(10px, env(safe-area-inset-right)) max(18px, env(safe-area-inset-bottom)) max(10px, env(safe-area-inset-left));
-  background: #010207;
+  background: var(--be-space-black);
 }
 
 .body-exposure-os:fullscreen .body-exposure-os__dock {
@@ -118,6 +463,27 @@
 @media (min-width: 640px) {
   .body-exposure-os {
     padding: 14px;
+  }
+
+  .body-intelligence-workspace {
+    padding: 16px;
+  }
+
+  .body-intelligence-workspace__context {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .body-intelligence-workspace__context-state {
+    flex-shrink: 0;
+  }
+}
+
+@media (min-width: 1024px) {
+  .body-intelligence-workspace__header {
+    grid-template-columns: minmax(0, 1.45fr) minmax(320px, .55fr);
+    align-items: end;
   }
 }
 
