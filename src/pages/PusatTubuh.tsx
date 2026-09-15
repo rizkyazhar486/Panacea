@@ -15,6 +15,11 @@ import { getVitals } from '../lib/healthVitals'
 //   Tidur    — durasi, tahapan, dan keteraturan jam tidur
 //   Gerak    — asimetri langkah, kualitas jalan, bentuk lari
 //   Klinis   — SpO₂, EKG, jet lag, kehamilan, kursi roda
+//
+// Prinsip baru: halaman ini juga menjadi entry surface untuk kapabilitas tubuh
+// yang definisi fungsinya beririsan. Modul lama TIDAK dihapus; mereka dipasang
+// sebagai capability di dalam workspace bertingkat agar fungsi bertambah tanpa
+// menambah jumlah destinasi yang harus dipahami pengguna.
 // ─────────────────────────────────────────────────────────────────────────────
 
 const BodyBattery = lazy(() => import('./BodyBattery').then((m) => ({ default: m.BodyBattery })))
@@ -22,6 +27,7 @@ const HeartRateLog = lazy(() => import('./HeartRateLog').then((m) => ({ default:
 const SleepPattern = lazy(() => import('./SleepPattern').then((m) => ({ default: m.SleepPattern })))
 const GaitAnalysis = lazy(() => import('./GaitAnalysis').then((m) => ({ default: m.GaitAnalysis })))
 const ClinicalTrackers = lazy(() => import('./ClinicalTrackers').then((m) => ({ default: m.ClinicalTrackers })))
+const BodySystemsLab = lazy(() => import('./BodySystemsLab').then((m) => ({ default: m.BodySystemsLab })))
 // Pemulihan dan tidur yang dulu tersebar sebagai rute sendiri-sendiri. Halaman
 // ini sudah memiliki tab Tidur sejak awal, jadi di sinilah tempatnya — bukan di
 // hub baru. Isinya tidak ditulis ulang; komponennya dipasang apa adanya.
@@ -68,6 +74,8 @@ const TABS: TabDef[] = [
     ringkas: 'Step asymmetry, walking quality, running form, heart-rate recovery' },
   { id: 'klinis', label: 'Clinical', emoji: '🩺', komponen: ClinicalTrackers,
     ringkas: 'SpO₂, ECG recordings, jet lag, pregnancy, wheelchair physiology' },
+  { id: 'sistem', label: 'Body Lab', emoji: '✦', komponen: BodySystemsLab,
+    ringkas: 'Composition, anatomy, organs, imaging, tools and simulation compiled into one workspace' },
 ]
 
 export function PusatTubuh() {
@@ -113,8 +121,8 @@ export function PusatTubuh() {
 
   return (
     <HalamanTab
-      judul="Body Signals"
-      subjudul="Energy, heart, sleep, movement and clinical trackers on one page"
+      judul="Body"
+      subjudul="Signals, recovery, anatomy, imaging and simulation in one compact workspace"
       ikon={<IconActivity />}
       ringkasan={<PanelAngka angka={angka} />}
       tabs={TABS}
