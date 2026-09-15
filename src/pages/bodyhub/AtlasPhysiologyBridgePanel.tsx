@@ -15,9 +15,18 @@ const FIDELITY_LABEL = {
   contextual: 'Contextual link',
 } as const
 
-export default function AtlasPhysiologyBridgePanel() {
-  const [selectedAtlasSystemId, setSelectedAtlasSystemId] = useState<BodySystemId>('cardiovascular')
-  const sourceSystem = BODY_SYSTEM_SOURCE_WAVE.find((system) => system.id === selectedAtlasSystemId) ?? BODY_SYSTEM_SOURCE_WAVE[0]
+interface AtlasPhysiologyBridgePanelProps {
+  selectedAtlasSystemId?: BodySystemId
+  onSystemChange?: (systemId: BodySystemId) => void
+}
+
+export default function AtlasPhysiologyBridgePanel({
+  selectedAtlasSystemId,
+  onSystemChange,
+}: AtlasPhysiologyBridgePanelProps) {
+  const [internalSystemId, setInternalSystemId] = useState<BodySystemId>('cardiovascular')
+  const activeAtlasSystemId = selectedAtlasSystemId ?? internalSystemId
+  const sourceSystem = BODY_SYSTEM_SOURCE_WAVE.find((system) => system.id === activeAtlasSystemId) ?? BODY_SYSTEM_SOURCE_WAVE[0]
   const bridge = getBodySystemPhysiologyBridge(sourceSystem.id)
   const physiologySystems = bridge.physiologySystemIds.map((id) => getWholeBodySystem(id))
   const loops = useMemo(
@@ -25,8 +34,13 @@ export default function AtlasPhysiologyBridgePanel() {
     [bridge],
   )
 
+  function selectSystem(systemId: BodySystemId) {
+    if (selectedAtlasSystemId === undefined) setInternalSystemId(systemId)
+    onSystemChange?.(systemId)
+  }
+
   return (
-    <section data-atlas-physiology-bridge="v1" className="overflow-hidden rounded-[26px] border border-white/[.09] bg-[linear-gradient(135deg,rgba(34,211,238,.045),rgba(255,255,255,.018)_40%,rgba(168,85,247,.05))] p-3 sm:p-4">
+    <section data-atlas-physiology-bridge="v1" data-selected-atlas-system={activeAtlasSystemId} className="overflow-hidden rounded-[26px] border border-white/[.09] bg-[linear-gradient(135deg,rgba(34,211,238,.045),rgba(255,255,255,.018)_40%,rgba(168,85,247,.05))] p-3 sm:p-4">
       <div className="flex flex-col gap-3 lg:flex-row lg:items-end lg:justify-between">
         <div className="max-w-3xl">
           <div className="text-[9px] font-black uppercase tracking-[.2em] text-violet-200/80">Anatomy ↔ physiology bridge</div>
@@ -38,14 +52,14 @@ export default function AtlasPhysiologyBridgePanel() {
 
       <div className="no-scrollbar mt-3 flex gap-1.5 overflow-x-auto pb-1" role="tablist" aria-label="Atlas systems physiology bridge">
         {BODY_SYSTEM_SOURCE_WAVE.map((system) => {
-          const active = system.id === selectedAtlasSystemId
+          const active = system.id === activeAtlasSystemId
           return (
             <button
               key={system.id}
               type="button"
               role="tab"
               aria-selected={active}
-              onClick={() => setSelectedAtlasSystemId(system.id)}
+              onClick={() => selectSystem(system.id)}
               className={`min-h-10 shrink-0 rounded-full border px-3 text-[9px] font-black transition ${active ? 'border-violet-300/30 bg-violet-300/[.11] text-white' : 'border-white/[.07] bg-white/[.025] text-white/45 hover:bg-white/[.05] hover:text-white/75'}`}
             >
               {system.label}
