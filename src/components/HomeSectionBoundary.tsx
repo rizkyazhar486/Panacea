@@ -1,4 +1,5 @@
 import { Component, type ReactNode } from 'react'
+import { HomeLiveWidgetRail } from './HomeLiveWidgetRail'
 import '../styles/home-mobile-stability.css'
 
 type Props = {
@@ -34,7 +35,17 @@ export class HomeSectionBoundary extends Component<Props, State> {
   }
 
   render() {
-    if (!this.state.error) return this.props.children
+    if (!this.state.error) {
+      if (this.props.label === 'Dashboard widgets') {
+        return (
+          <div className="min-w-0">
+            <HomeLiveWidgetRail />
+            {this.props.children}
+          </div>
+        )
+      }
+      return this.props.children
+    }
 
     return (
       <section className="rounded-[24px] border border-amber-200/70 bg-amber-50/80 p-4 dark:border-amber-300/15 dark:bg-amber-300/[.06]">
