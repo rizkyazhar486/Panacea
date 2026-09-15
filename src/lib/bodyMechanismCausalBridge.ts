@@ -126,7 +126,7 @@ export const BODY_MECHANISM_CAUSAL_BRIDGE: readonly BodyMechanismCausalLink[] = 
 ] as const
 
 export const BODY_MECHANISM_CAUSAL_BRIDGE_BOUNDARY =
-  'Educational disease ↔ pharmacology causal bridge only. Links identify literature-consistent mechanistic intersections between an existing pathophysiology node and a class-level pharmacology mechanism; they do not establish indication, contraindication, comparative efficacy, dose, timing, treatment sequence, patient-specific response, or clinical outcome.'
+  'Educational disease ↔ pharmacology causal bridge only. This bridge does not establish indication, contraindication, comparative efficacy, dose, timing, treatment sequence, patient-specific response, or clinical outcome; links only identify literature-consistent mechanistic intersections between an existing pathophysiology node and a class-level pharmacology mechanism.'
 
 export function listCausalLinksForScenario(scenarioId: BodyPathophysiologyScenarioId): readonly BodyMechanismCausalLink[] {
   return BODY_MECHANISM_CAUSAL_BRIDGE.filter((link) => link.scenarioId === scenarioId)
