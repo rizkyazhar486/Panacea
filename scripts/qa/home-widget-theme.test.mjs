@@ -11,6 +11,8 @@ const emergencyGuard = read('public/home-widget-dark-v31.css')
 const comfortGuard = read('src/styles/home-dark-comfort-v34.css')
 const activeGuard = read('src/styles/home-widget-active-v35.css')
 const mobileStability = read('src/styles/home-mobile-stability.css')
+const readabilityGuard = read('public/home-readability-v36.css')
+const higFoundation = read('public/panacea-hig-v41.css')
 const index = read('index.html')
 
 test('Living Instrument mounts the active source widget, not only the filtered index', () => {
@@ -101,4 +103,15 @@ test('Mobile loading cards stay explicit black-green instead of gray placeholder
   assert.match(mobileStability, /\.home-loading-card\s*\{[^}]*background:\s*#000\s*!important/s)
   assert.match(mobileStability, /\.home-loading-card\s*\{[^}]*border-color:\s*rgba\(0,\s*191,\s*99,\s*\.22\)\s*!important/s)
   assert.match(mobileStability, /\.home-loading-card \[aria-hidden="true"\] > div\s*\{[^}]*background:\s*rgba\(0,\s*191,\s*99,\s*\.18\)\s*!important/s)
+})
+
+test('HIG v41 is wired through the final Home cascade and keeps comfort fallbacks', () => {
+  assert.match(readabilityGuard, /@import url\('\/panacea-hig-v41\.css\?v=20260915-2'\);/)
+  assert.match(higFoundation, /--pmd-ease-spring:/)
+  assert.match(higFoundation, /\.pmd-control-material/)
+  assert.match(higFoundation, /prefers-reduced-motion/)
+  assert.match(higFoundation, /html\.pmd-low-memory/)
+  assert.match(readabilityGuard, /--pmd-v36-panel:#050b14/)
+  assert.match(readabilityGuard, /--pmd-v36-card:#08111d/)
+  assert.doesNotMatch(readabilityGuard, /--pmd-v36-panel:#f8fafc/)
 })
