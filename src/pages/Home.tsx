@@ -1,12 +1,14 @@
-import { Navigate } from 'react-router-dom'
+import { Navigate, useLocation } from 'react-router-dom'
 import { useStore } from '../lib/store'
+import Beranda from './Beranda'
 import { HomeSocialWorkspace } from './HomeSocialWorkspace'
 
-// Role-aware landing stays intact for contributor/verifier/admin accounts.
-// Patient, doctor and owner accounts now land in one Home workspace that
-// contains logs/stats, social, clubs, finance, markets, scores and reading.
+// Keep the approved daily Home visual baseline at `/`.
+// The expanded social/life workspace remains available at `/social`, so this
+// restoration changes the default presentation without deleting functionality.
 export function Home() {
   const { account } = useStore()
+  const location = useLocation()
   if (!account) return null
   switch (account.role) {
     case 'kontributor':
@@ -16,6 +18,6 @@ export function Home() {
     case 'admin':
       return <Navigate to="/admin" replace />
     default:
-      return <HomeSocialWorkspace />
+      return location.pathname === '/social' ? <HomeSocialWorkspace /> : <Beranda />
   }
 }
