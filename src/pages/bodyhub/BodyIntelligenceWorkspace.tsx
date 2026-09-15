@@ -7,6 +7,7 @@ import {
   getBodyIntelligenceWorkspaceTab,
   type BodyIntelligenceWorkspaceTabId,
 } from '../../lib/bodyIntelligenceWorkspace'
+import '../bodyExposureConceptSpine.css'
 
 const PathophysiologyNetworkPanel = lazy(() => import('./PathophysiologyNetworkPanel'))
 const PharmacologyMechanismPanel = lazy(() => import('./PharmacologyMechanismPanel'))
