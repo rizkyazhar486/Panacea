@@ -1,0 +1,200 @@
+/* Panacea Home spectral surface protocol.
+   Visual-only refinement: preserve recorded data and interaction logic while removing gray slab dominance. */
+
+:root {
+  --pmd-spectrum-green: #43f59d;
+  --pmd-spectrum-cyan: #67e8f9;
+  --pmd-spectrum-violet: #c4b5fd;
+  --pmd-spectrum-black: #020509;
+}
+
+.pmd-health-instruments {
+  isolation: isolate;
+}
+
+.pmd-instrument-card,
+.pmd-vitals-strip {
+  border-color: rgba(148, 237, 220, .14) !important;
+  background:
+    radial-gradient(120% 90% at 8% 0%, rgba(0, 191, 99, .105), transparent 45%),
+    radial-gradient(95% 80% at 100% 100%, rgba(124, 58, 237, .085), transparent 48%),
+    linear-gradient(150deg, rgba(5, 11, 15, .98) 0%, rgba(2, 5, 9, .985) 52%, rgba(3, 8, 13, .97) 100%) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, .075),
+    0 20px 58px rgba(0, 0, 0, .34),
+    0 0 0 1px rgba(0, 191, 99, .018) !important;
+  -webkit-backdrop-filter: blur(20px) saturate(155%) !important;
+  backdrop-filter: blur(20px) saturate(155%) !important;
+}
+
+.pmd-instrument-card::before,
+.pmd-vitals-strip::before {
+  background:
+    radial-gradient(ellipse at center, rgba(103, 232, 249, .10), rgba(67, 245, 157, .035) 42%, transparent 70%) !important;
+}
+
+.pmd-instrument-card::after,
+.pmd-vitals-strip::after {
+  border-color: rgba(196, 181, 253, .08) !important;
+  box-shadow:
+    0 0 0 12px rgba(103, 232, 249, .012),
+    0 0 42px rgba(124, 58, 237, .055) !important;
+}
+
+.pmd-instruments-head > div > span,
+.pmd-card-label {
+  color: rgba(186, 255, 226, .72) !important;
+}
+
+.pmd-instruments-head > a {
+  border-color: rgba(103, 232, 249, .18) !important;
+  background: rgba(2, 5, 9, .78) !important;
+  color: rgba(236, 254, 255, .92) !important;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .045) !important;
+}
+
+.pmd-instruments-head > a:hover,
+.pmd-instruments-head > a:active {
+  border-color: rgba(103, 232, 249, .45) !important;
+  background: rgba(103, 232, 249, .07) !important;
+  color: #cffafe !important;
+}
+
+.pmd-gauge {
+  background: conic-gradient(
+    var(--pmd-spectrum-green) 0%,
+    var(--pmd-spectrum-cyan) calc(var(--pmd-gauge) * .72),
+    var(--pmd-spectrum-violet) var(--pmd-gauge),
+    rgba(255, 255, 255, .07) 0
+  ) !important;
+  box-shadow:
+    0 0 0 1px rgba(103, 232, 249, .08),
+    0 0 26px rgba(67, 245, 157, .08) !important;
+}
+
+.pmd-gauge-inner {
+  background: radial-gradient(circle at 35% 28%, rgba(103, 232, 249, .06), transparent 38%), #020509 !important;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .045);
+}
+
+.pmd-gauge-inner span,
+.pmd-score-copy > span,
+.pmd-score-footer,
+.pmd-card-topline > div > span:last-child,
+.pmd-mini-bar-day,
+.pmd-trend-caption,
+.pmd-vital-label,
+.pmd-vital-chip small {
+  color: rgba(226, 232, 240, .58) !important;
+}
+
+.pmd-score-rule {
+  background: rgba(103, 232, 249, .065) !important;
+}
+
+.pmd-score-rule span {
+  background: linear-gradient(90deg, var(--pmd-spectrum-green), var(--pmd-spectrum-cyan), var(--pmd-spectrum-violet)) !important;
+  box-shadow: 0 0 18px rgba(103, 232, 249, .22) !important;
+}
+
+.pmd-source-pill {
+  border-color: rgba(103, 232, 249, .13) !important;
+  background: rgba(2, 5, 9, .62) !important;
+  color: rgba(207, 250, 254, .76) !important;
+}
+
+.pmd-mini-bars {
+  border-color: rgba(103, 232, 249, .07) !important;
+}
+
+.pmd-mini-bar {
+  background: linear-gradient(180deg, var(--pmd-spectrum-cyan), var(--pmd-spectrum-green)) !important;
+  box-shadow: 0 0 18px rgba(67, 245, 157, .11) !important;
+}
+
+.pmd-mini-bar-value {
+  color: rgba(236, 254, 255, .92) !important;
+}
+
+.pmd-sparkline line {
+  stroke: rgba(103, 232, 249, .075) !important;
+}
+
+.pmd-sparkline polyline {
+  stroke: var(--pmd-spectrum-cyan) !important;
+  filter: drop-shadow(0 0 4px rgba(103, 232, 249, .28)) !important;
+}
+
+.pmd-vital-chip {
+  border-right-color: rgba(103, 232, 249, .055) !important;
+}
+
+.pmd-vital-icon {
+  color: var(--pmd-spectrum-green) !important;
+  text-shadow: 0 0 18px rgba(67, 245, 157, .14);
+}
+
+.pmd-connect-empty {
+  border-color: rgba(103, 232, 249, .28) !important;
+  background:
+    linear-gradient(135deg, rgba(0, 191, 99, .075), rgba(103, 232, 249, .035) 52%, rgba(124, 58, 237, .055)) !important;
+}
+
+.pmd-connect-empty b {
+  color: #a7f3d0 !important;
+}
+
+.pmd-instrument-empty {
+  border-color: rgba(103, 232, 249, .065) !important;
+  color: rgba(226, 232, 240, .48) !important;
+}
+
+/* Beranda lazy states should look intentional, not like disabled gray cards. */
+.panacea-home .home-loading-card {
+  position: relative;
+  overflow: hidden;
+  border: 1px solid rgba(103, 232, 249, .10) !important;
+  background:
+    radial-gradient(90% 120% at 0% 0%, rgba(0, 191, 99, .08), transparent 48%),
+    linear-gradient(145deg, rgba(4, 10, 13, .98), rgba(2, 5, 9, .98)) !important;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .04), 0 14px 42px rgba(0, 0, 0, .24) !important;
+}
+
+.panacea-home .home-loading-card [aria-hidden='true'] > div:first-child {
+  background: linear-gradient(90deg, rgba(67, 245, 157, .22), rgba(103, 232, 249, .16)) !important;
+}
+
+.panacea-home .home-loading-card [aria-hidden='true'] > div:last-child {
+  background: linear-gradient(90deg, rgba(103, 232, 249, .12), rgba(196, 181, 253, .10)) !important;
+}
+
+.panacea-home .home-signal-card {
+  border-color: rgba(103, 232, 249, .11) !important;
+  background:
+    radial-gradient(120% 120% at 0% 0%, rgba(0, 191, 99, .075), transparent 46%),
+    rgba(2, 5, 9, .86) !important;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .04) !important;
+}
+
+.panacea-home .home-signal-card:hover {
+  border-color: rgba(103, 232, 249, .24) !important;
+  background:
+    radial-gradient(120% 120% at 0% 0%, rgba(0, 191, 99, .11), transparent 48%),
+    rgba(3, 8, 12, .94) !important;
+}
+
+@media (max-width: 430px) {
+  .pmd-instrument-card,
+  .pmd-vitals-strip {
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, .06), 0 14px 34px rgba(0, 0, 0, .28) !important;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pmd-health-instruments *,
+  .panacea-home .home-loading-card,
+  .panacea-home .home-signal-card {
+    transition: none !important;
+    animation: none !important;
+  }
+}
