@@ -1,0 +1,90 @@
+/* Home mobile collision repair.
+   Keep the global Shell as the single primary navigation layer and make Home's
+   secondary room rail sit below it. The widget carousel is intentionally
+   flattened here so legacy light shells cannot reappear around dark cards. */
+
+@media (max-width: 1023px) {
+  nav[aria-label="Home rooms"].home-rooms-mobile-nav {
+    top: calc(var(--tinggi-bilah-atas, 64px) + 8px) !important;
+    z-index: 8 !important;
+    border-color: rgba(71, 235, 172, .18) !important;
+    background:
+      linear-gradient(145deg, rgba(4, 11, 18, .96), rgba(2, 7, 12, .985)) !important;
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, .045),
+      0 12px 30px rgba(0, 0, 0, .42) !important;
+    backdrop-filter: blur(22px) saturate(165%) !important;
+    -webkit-backdrop-filter: blur(22px) saturate(165%) !important;
+  }
+
+  /* The primary Shell must stay visually opaque enough that content never
+     ghosts through it while scrolling. */
+  body:has(.panacea-home) header:has(button[aria-label="Open menu"]) {
+    background:
+      linear-gradient(145deg, rgba(7, 13, 22, .965), rgba(4, 8, 15, .985)) !important;
+    border-bottom: 1px solid rgba(80, 230, 181, .13) !important;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, .34) !important;
+    backdrop-filter: blur(22px) saturate(170%) !important;
+    -webkit-backdrop-filter: blur(22px) saturate(170%) !important;
+  }
+
+  /* Remove the obsolete outer carousel frame. The actual widget card is the
+     visual surface; adding a second shell created the pale 16px ring shown in
+     the mobile regression screenshots. */
+  html body .panacea-home .widget-instrument-shell-v5 {
+    border: 0 !important;
+    border-radius: 0 !important;
+    background: transparent !important;
+    box-shadow: none !important;
+    overflow: visible !important;
+  }
+
+  html body .panacea-home .widget-instrument-shell-v5::before,
+  html body .panacea-home .widget-instrument-shell-v5::after {
+    content: none !important;
+    display: none !important;
+  }
+
+  html body .panacea-home .widget-instrument-slide-v5 {
+    padding: 0 !important;
+    background: transparent !important;
+    scrollbar-width: none;
+  }
+
+  html body .panacea-home .widget-instrument-slide-v5::-webkit-scrollbar {
+    display: none;
+  }
+
+  html body .panacea-home .widget-instrument-slide-v5[data-widget] > section {
+    border-color: transparent !important;
+    background: transparent !important;
+    box-shadow: none !important;
+  }
+
+  html body .panacea-home .widget-instrument-slide-v5[data-widget] section > .kaca {
+    border: 1px solid rgba(44, 221, 147, .20) !important;
+    border-radius: 20px !important;
+    background:
+      radial-gradient(circle at 12% 4%, rgba(0, 191, 99, .07), transparent 31%),
+      linear-gradient(145deg, rgba(10, 17, 25, .98), rgba(5, 12, 17, .99)) !important;
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, .035),
+      0 12px 28px rgba(0, 0, 0, .22) !important;
+  }
+
+  html body .panacea-home .widget-instrument-v5 {
+    gap: 8px !important;
+  }
+
+  html body .panacea-home .widget-instrument-foot-v5 {
+    padding: 4px 0 0 !important;
+  }
+
+  /* Home already exposes the Shell hamburger. Hide the duplicate draggable FAB
+     on this route so it cannot cover More/reference-range controls. */
+  body:has(.panacea-home) button[aria-label="Buka menu navigasi"],
+  body:has(.panacea-home) button[aria-label="Tutup menu"],
+  body:has(.panacea-home) [role="menu"][aria-label="Menu navigasi"] {
+    display: none !important;
+  }
+}
