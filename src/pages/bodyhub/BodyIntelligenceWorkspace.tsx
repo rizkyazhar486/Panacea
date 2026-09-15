@@ -1,6 +1,7 @@
 import { lazy, Suspense, useMemo, useState } from 'react'
 import type { BodySystemId } from '../../lib/bodySystemSourceWave'
 import {
+  BODY_EXPOSURE_CONCEPT_SPINE,
   BODY_INTELLIGENCE_WORKSPACE_BOUNDARY,
   BODY_INTELLIGENCE_WORKSPACE_TABS,
   getBodyIntelligenceWorkspaceTab,
@@ -93,6 +94,30 @@ export function BodyIntelligenceWorkspace({ selectedAtlasSystemId }: BodyIntelli
         </div>
       </header>
 
+      <div className="body-intelligence-workspace__spine" aria-label="Body Exposure concept spine">
+        <div className="body-intelligence-workspace__spine-track">
+          {BODY_EXPOSURE_CONCEPT_SPINE.map((stage, index) => {
+            const active = stage.id === activeTab.conceptStageId
+            const foundational = index <= 2
+            return (
+              <div
+                key={stage.id}
+                className={`body-intelligence-workspace__spine-stage ${active ? 'is-active' : ''} ${foundational ? 'is-foundational' : ''}`}
+                aria-current={active ? 'step' : undefined}
+                title={stage.description}
+              >
+                <span className="body-intelligence-workspace__spine-index">{index + 1}</span>
+                <span className="body-intelligence-workspace__spine-copy">
+                  <strong>{stage.shortLabel}</strong>
+                  <small>{stage.label}</small>
+                </span>
+                {index < BODY_EXPOSURE_CONCEPT_SPINE.length - 1 && <span className="body-intelligence-workspace__spine-connector" aria-hidden>→</span>}
+              </div>
+            )
+          })}
+        </div>
+      </div>
+
       <nav className="body-intelligence-workspace__tabbar" aria-label="Body intelligence layers">
         <div className="body-intelligence-workspace__tabtrack" role="tablist">
           {BODY_INTELLIGENCE_WORKSPACE_TABS.map((tab) => {
@@ -117,7 +142,7 @@ export function BodyIntelligenceWorkspace({ selectedAtlasSystemId }: BodyIntelli
 
       <div className="body-intelligence-workspace__context" aria-live="polite">
         <div>
-          <span className="body-intelligence-workspace__context-kicker">Active layer</span>
+          <span className="body-intelligence-workspace__context-kicker">Active layer · {activeTab.conceptStageId}</span>
           <strong>{activeTab.label}</strong>
           <p>{activeTab.description}</p>
         </div>
@@ -134,7 +159,7 @@ export function BodyIntelligenceWorkspace({ selectedAtlasSystemId }: BodyIntelli
       </div>
 
       <footer className="body-intelligence-workspace__footer">
-        <span>Concept alignment: whole-body first → progressive depth → inspectable mechanism → traceable evidence.</span>
+        <span>Concept spine: Whole body → System → Function → Failure → Mechanism → Evidence → Learning.</span>
         <p>{BODY_INTELLIGENCE_WORKSPACE_BOUNDARY}</p>
       </footer>
     </section>
