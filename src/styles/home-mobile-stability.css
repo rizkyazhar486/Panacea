@@ -43,3 +43,10 @@
     animation: none !important;
   }
 }
+
+/* Emergency Home hotfix: remove the legacy live-widget carousel from Home.
+   Its underlying feature routes/components remain intact; only the gray widget
+   block shown in the current iOS screenshots is removed from the landing page. */
+.panacea-home section[aria-labelledby='my-dashboard-title'] {
+  display: none !important;
+}
