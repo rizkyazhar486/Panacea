@@ -11,6 +11,7 @@ const PharmacologyMechanismPanel = lazy(() => import('./bodyhub/PharmacologyMech
 const MechanismCausalBridgePanel = lazy(() => import('./bodyhub/MechanismCausalBridgePanel'))
 const UnifiedMechanismGraphPanel = lazy(() => import('./bodyhub/UnifiedMechanismGraphPanel'))
 const EvidenceProvenanceObservatory = lazy(() => import('./bodyhub/EvidenceProvenanceObservatory'))
+const LearningRouteComposerPanel = lazy(() => import('./bodyhub/LearningRouteComposerPanel'))
 
 type ExposureMode = 'atlas' | 'physiology' | 'imaging' | 'surgery' | 'molecular' | 'clinical'
 
@@ -113,12 +114,13 @@ export function BodyExposureOS() {
               <span className="rounded-full border border-fuchsia-300/10 bg-fuchsia-300/[.04] px-2.5 py-1 text-[9px] font-black uppercase tracking-[.14em] text-fuchsia-100/65">causal bridge</span>
               <span className="rounded-full border border-emerald-300/10 bg-emerald-300/[.04] px-2.5 py-1 text-[9px] font-black uppercase tracking-[.14em] text-emerald-100/65">unified graph</span>
               <span className="rounded-full border border-amber-200/10 bg-amber-200/[.04] px-2.5 py-1 text-[9px] font-black uppercase tracking-[.14em] text-amber-50/65">evidence provenance</span>
+              <span className="rounded-full border border-teal-300/10 bg-teal-300/[.04] px-2.5 py-1 text-[9px] font-black uppercase tracking-[.14em] text-teal-100/65">learning routes</span>
             </div>
             <h2 id="body-exposure-os-title" className="mt-2 max-w-3xl text-2xl font-black tracking-[-.035em] text-white sm:text-3xl lg:text-4xl">
               One body. Every scale. One continuous learning space.
             </h2>
             <p className="mt-2 max-w-3xl text-sm font-medium leading-relaxed text-white/60 sm:text-[15px]">
-              Start from the complete human body, switch across major systems, isolate a structure, then move through physiology, pathophysiology, pharmacology, evidence, imaging, surgery, disease, cells and molecular detail without leaving the same workspace.
+              Start from the complete human body, switch across major systems, isolate a structure, then move through physiology, pathophysiology, pharmacology, evidence, guided learning, imaging, surgery, disease, cells and molecular detail without leaving the same workspace.
             </p>
           </div>
 
@@ -230,6 +232,12 @@ export function BodyExposureOS() {
       <div className="relative z-[2] mt-3">
         <Suspense fallback={<div className="grid min-h-52 place-items-center rounded-[30px] border border-white/[.08] bg-black/35 text-xs font-bold text-white/35">Auditing evidence provenance…</div>}>
           <EvidenceProvenanceObservatory />
+        </Suspense>
+      </div>
+
+      <div className="relative z-[2] mt-3">
+        <Suspense fallback={<div className="grid min-h-52 place-items-center rounded-[30px] border border-white/[.08] bg-black/35 text-xs font-bold text-white/35">Composing graph-backed learning route…</div>}>
+          <LearningRouteComposerPanel selectedAtlasSystemId={selectedBodySystemId} />
         </Suspense>
       </div>
 
