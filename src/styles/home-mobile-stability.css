@@ -217,3 +217,39 @@
     padding: 14px !important;
   }
 }
+
+/*
+ * HARD NO-GRAY GUARD — emergency mobile polish.
+ * Any residual Tailwind neutral/gray/slate/zinc/stone surface inside Home is
+ * remapped to the Panacea white/ink system. This deliberately targets surfaces,
+ * not text, so legibility and semantic emphasis remain intact.
+ */
+.panacea-home :where(section, article, div, nav, aside, header, footer, a, button)[class*='bg-neutral-'],
+.panacea-home :where(section, article, div, nav, aside, header, footer, a, button)[class*='bg-gray-'],
+.panacea-home :where(section, article, div, nav, aside, header, footer, a, button)[class*='bg-slate-'],
+.panacea-home :where(section, article, div, nav, aside, header, footer, a, button)[class*='bg-zinc-'],
+.panacea-home :where(section, article, div, nav, aside, header, footer, a, button)[class*='bg-stone-'],
+.panacea-home :where(section, article, div, nav, aside, header, footer, a, button)[class*='bg-black/'] {
+  background-color: rgba(255, 255, 255, 0.985) !important;
+  border-color: rgba(0, 191, 99, 0.13) !important;
+}
+
+.dark .panacea-home :where(section, article, div, nav, aside, header, footer, a, button)[class*='bg-neutral-'],
+.dark .panacea-home :where(section, article, div, nav, aside, header, footer, a, button)[class*='bg-gray-'],
+.dark .panacea-home :where(section, article, div, nav, aside, header, footer, a, button)[class*='bg-slate-'],
+.dark .panacea-home :where(section, article, div, nav, aside, header, footer, a, button)[class*='bg-zinc-'],
+.dark .panacea-home :where(section, article, div, nav, aside, header, footer, a, button)[class*='bg-stone-'],
+.dark .panacea-home :where(section, article, div, nav, aside, header, footer, a, button)[class*='bg-white/'],
+.dark .panacea-home :where(section, article, div, nav, aside, header, footer, a, button)[class*='bg-black/'] {
+  background-color: rgba(4, 9, 8, 0.985) !important;
+  border-color: rgba(0, 191, 99, 0.15) !important;
+}
+
+/* Neutral skeletons/placeholders become emerald-tinted instead of gray blocks. */
+.panacea-home :where([class*='animate-pulse'], [data-skeleton], [aria-busy='true']) :where(div, span)[class*='bg-'] {
+  background-color: rgba(0, 191, 99, 0.10) !important;
+}
+
+.dark .panacea-home :where([class*='animate-pulse'], [data-skeleton], [aria-busy='true']) :where(div, span)[class*='bg-'] {
+  background-color: rgba(0, 191, 99, 0.13) !important;
+}
