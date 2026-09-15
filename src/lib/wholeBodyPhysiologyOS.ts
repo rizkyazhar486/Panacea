@@ -147,7 +147,7 @@ export const WHOLE_BODY_PHYSIOLOGY_SYSTEMS: readonly WholeBodySystemModel[] = [
     physiologyAnchors: ['motor units', 'force-length relation', 'ATP turnover', 'mechanical work'],
     couplingTargets: ['nervous', 'cardiovascular', 'respiratory', 'hepatic-metabolic'],
     equation: 'mechanical power = force × velocity',
-    equationNote: 'Fundamental mechanics relationship; the workbench does not estimate personal performance.',
+    equationNote: 'Fundamental mechanics teaching relationship; the workbench does not estimate patient-specific or personal performance.',
   },
   {
     id: 'integumentary',
