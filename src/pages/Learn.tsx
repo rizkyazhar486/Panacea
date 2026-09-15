@@ -5,14 +5,16 @@ const LifeLibraryWorkbench = lazy(() => import('../components/LifeLibraryWorkben
 const HealthGapNavigator = lazy(() => import('../components/HealthGapNavigator').then((m) => ({ default: m.HealthGapNavigator })))
 const Medical3DFrontierLab = lazy(() => import('../components/Medical3DFrontierLab').then((m) => ({ default: m.Medical3DFrontierLab })))
 const LearnBase = lazy(() => import('./LearnBase').then((m) => ({ default: m.Learn })))
+const SettingsWorkspace = lazy(() => import('./SettingsWorkspace').then((m) => ({ default: m.SettingsWorkspace })))
 
-type LearnExtension = 'none' | 'library' | 'life' | 'gap' | 'frontier3d'
+type LearnExtension = 'none' | 'library' | 'life' | 'gap' | 'frontier3d' | 'tutorial'
 
 const EXTENSIONS: ReadonlyArray<{ id: Exclude<LearnExtension, 'none'>; label: string; detail: string }> = [
   { id: 'library', label: 'Life Library', detail: 'Read, save, reflect and turn learning into action.' },
   { id: 'life', label: 'Life Learning', detail: 'Explore broader wealth, stories and practical life lessons.' },
   { id: 'gap', label: 'Gap Navigator', detail: 'Find unanswered care-plan questions before an appointment.' },
   { id: 'frontier3d', label: '3D Frontier', detail: 'Open advanced interactive biomedical teaching models on demand.' },
+  { id: 'tutorial', label: 'Settings & Tutorial', detail: 'Configure Panacea or open the guided product tutorial.' },
 ]
 
 function ExtensionLoading() {
@@ -74,6 +76,7 @@ export function Learn() {
             {extension === 'life' && <LearnBase />}
             {extension === 'gap' && <HealthGapNavigator />}
             {extension === 'frontier3d' && <Medical3DFrontierLab />}
+            {extension === 'tutorial' && <SettingsWorkspace />}
           </Suspense>
         </div>
       )}
