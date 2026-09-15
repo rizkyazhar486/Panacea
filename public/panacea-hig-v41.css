@@ -1,0 +1,348 @@
+/* Panaceamed HIG foundation v41
+   System-wide interaction grammar + Home material hierarchy.
+   Principle: complexity belongs to the system; simplicity belongs to the user.
+   This layer is presentation-only and intentionally leaves clinical/data semantics untouched. */
+
+:root {
+  color-scheme: light dark;
+
+  /* Core spectrum */
+  --pmd-black: #020409;
+  --pmd-space: #030711;
+  --pmd-space-2: #06101c;
+  --pmd-surface: rgba(6, 13, 24, .92);
+  --pmd-surface-raised: rgba(9, 19, 33, .94);
+  --pmd-material: rgba(8, 18, 31, .72);
+  --pmd-material-strong: rgba(5, 12, 22, .88);
+  --pmd-line: rgba(255, 255, 255, .11);
+  --pmd-line-strong: rgba(255, 255, 255, .19);
+  --pmd-specular: rgba(255, 255, 255, .24);
+  --pmd-text: #f8fbff;
+  --pmd-text-2: rgba(238, 247, 255, .78);
+  --pmd-text-3: rgba(224, 238, 249, .58);
+  --pmd-green: #00d879;
+  --pmd-cyan: #4de7ff;
+  --pmd-blue: #4f8cff;
+  --pmd-violet: #9c7cff;
+  --pmd-magenta: #ff63d8;
+  --pmd-amber: #ffd278;
+  --pmd-danger: #ff5f72;
+
+  /* Deterministic spacing/radius grammar */
+  --pmd-space-1: 4px;
+  --pmd-space-2x: 8px;
+  --pmd-space-3: 12px;
+  --pmd-space-4: 16px;
+  --pmd-space-6: 24px;
+  --pmd-space-8: 32px;
+  --pmd-space-12: 48px;
+  --pmd-space-16: 64px;
+  --pmd-radius-s: 10px;
+  --pmd-radius-m: 14px;
+  --pmd-radius-l: 20px;
+  --pmd-radius-xl: 26px;
+  --pmd-radius-2xl: 32px;
+  --pmd-radius-pill: 999px;
+
+  /* Motion: short response, slower spatial transition. */
+  --pmd-ease: cubic-bezier(.22, .8, .2, 1);
+  --pmd-ease-spring: cubic-bezier(.16, 1, .3, 1);
+  --pmd-fast: 140ms;
+  --pmd-normal: 220ms;
+  --pmd-spatial: 420ms;
+
+  /* Depth is restrained: controls float, content stays legible. */
+  --pmd-shadow-1: 0 8px 24px rgba(0, 0, 0, .22);
+  --pmd-shadow-2: 0 18px 54px rgba(0, 0, 0, .32);
+  --pmd-shadow-3: 0 30px 90px rgba(0, 0, 0, .42);
+  --pmd-focus: 0 0 0 3px rgba(77, 231, 255, .28), 0 0 0 1px rgba(77, 231, 255, .92);
+}
+
+html {
+  background: var(--pmd-black);
+  -webkit-text-size-adjust: 100%;
+  text-rendering: optimizeLegibility;
+  font-synthesis: none;
+  scroll-padding-top: 72px;
+}
+
+body {
+  min-height: 100vh;
+  background:
+    radial-gradient(70rem 44rem at 8% -12%, rgba(79, 140, 255, .10), transparent 62%),
+    radial-gradient(54rem 42rem at 98% 4%, rgba(156, 124, 255, .08), transparent 64%),
+    linear-gradient(180deg, var(--pmd-space) 0%, var(--pmd-black) 100%);
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", Inter, "Segoe UI", sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+::selection {
+  color: #fff;
+  background: rgba(79, 140, 255, .58);
+}
+
+/* One focus language everywhere. Do not infer keyboard focus from colour alone. */
+:where(a, button, input, select, textarea, summary, [role="button"], [tabindex]):focus-visible {
+  outline: none;
+  box-shadow: var(--pmd-focus);
+}
+
+/* Direct manipulation: immediate response without exaggerated motion. */
+:where(button, a, summary, [role="button"]) {
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+
+:where(button, a, summary, [role="button"]):active {
+  transition-duration: 70ms !important;
+}
+
+/* Reusable system materials. Content surfaces are intentionally more opaque
+   than navigation/control materials to preserve hierarchy. */
+.pmd-content-surface {
+  border: 1px solid var(--pmd-line);
+  border-radius: var(--pmd-radius-xl);
+  background: var(--pmd-surface);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .045), var(--pmd-shadow-1);
+}
+
+.pmd-control-material {
+  border: 1px solid var(--pmd-line-strong);
+  border-radius: var(--pmd-radius-l);
+  background:
+    linear-gradient(135deg, rgba(255, 255, 255, .075), rgba(255, 255, 255, .025)),
+    var(--pmd-material);
+  box-shadow: inset 0 1px 0 var(--pmd-specular), var(--pmd-shadow-1);
+  -webkit-backdrop-filter: blur(18px) saturate(150%);
+  backdrop-filter: blur(18px) saturate(150%);
+}
+
+.pmd-interactive {
+  transition:
+    transform var(--pmd-fast) var(--pmd-ease-spring),
+    border-color var(--pmd-normal) var(--pmd-ease),
+    background-color var(--pmd-normal) var(--pmd-ease),
+    box-shadow var(--pmd-normal) var(--pmd-ease),
+    opacity var(--pmd-normal) var(--pmd-ease);
+}
+.pmd-interactive:hover { transform: translateY(-1px); }
+.pmd-interactive:active { transform: scale(.985); }
+
+/* Existing glass primitives now follow one material grammar rather than each
+   feature inventing its own blur/border/shadow combination. */
+:where(.liquid-panel, .learning-depth, .panacea-landing-nav) {
+  border-color: var(--pmd-line) !important;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .08), var(--pmd-shadow-1) !important;
+}
+
+/* --------------------------------------------------------------------------
+   HOME — whole-system-first hierarchy
+   -------------------------------------------------------------------------- */
+.panacea-home {
+  --pmd-home-page: #02050a;
+  --pmd-home-panel: #050b14;
+  --pmd-home-card: #08111d;
+  --pmd-home-card-hover: #0a1726;
+  --pmd-home-line: rgba(135, 204, 255, .13);
+  --pmd-home-line-active: rgba(77, 231, 255, .32);
+  position: relative;
+  isolation: isolate;
+  color: var(--pmd-text);
+}
+
+.panacea-home-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: -2;
+  pointer-events: none;
+  background:
+    radial-gradient(48rem 34rem at 7% 0%, rgba(79, 140, 255, .13), transparent 62%),
+    radial-gradient(42rem 32rem at 95% 14%, rgba(156, 124, 255, .105), transparent 62%),
+    radial-gradient(36rem 30rem at 78% 82%, rgba(77, 231, 255, .07), transparent 66%),
+    linear-gradient(180deg, #02060d 0%, #020409 58%, #010307 100%);
+}
+
+/* Hero carries atmosphere; ordinary content panels stay calm. */
+.panacea-home .home-odyssey-hero {
+  border: 1px solid rgba(142, 211, 255, .15) !important;
+  border-radius: var(--pmd-radius-2xl) !important;
+  background:
+    radial-gradient(42rem 26rem at -8% -22%, rgba(79, 140, 255, .30), transparent 58%),
+    radial-gradient(34rem 28rem at 106% -8%, rgba(156, 124, 255, .25), transparent 61%),
+    radial-gradient(28rem 24rem at 70% 108%, rgba(255, 99, 216, .09), transparent 64%),
+    radial-gradient(22rem 20rem at 18% 95%, rgba(77, 231, 255, .10), transparent 66%),
+    linear-gradient(145deg, #071321 0%, #06101c 48%, #050a13 100%) !important;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .10), var(--pmd-shadow-3) !important;
+}
+
+.panacea-home .home-odyssey-kicker,
+.panacea-home .energy-word,
+.panacea-home .home-text-link {
+  color: var(--pmd-cyan) !important;
+}
+
+.panacea-home .home-command-panel,
+.panacea-home .home-loading-card {
+  border: 1px solid var(--pmd-home-line) !important;
+  border-radius: var(--pmd-radius-xl) !important;
+  background:
+    linear-gradient(155deg, rgba(79, 140, 255, .035), transparent 38%),
+    var(--pmd-home-panel) !important;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .045), var(--pmd-shadow-1) !important;
+}
+
+.panacea-home :where(.home-action-card, .home-signal-card) {
+  border: 1px solid var(--pmd-home-line) !important;
+  background:
+    radial-gradient(circle at 90% 0%, rgba(79, 140, 255, .07), transparent 38%),
+    var(--pmd-home-card) !important;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .045), 0 8px 22px rgba(0, 0, 0, .18) !important;
+  transition:
+    transform var(--pmd-fast) var(--pmd-ease-spring),
+    border-color var(--pmd-normal) var(--pmd-ease),
+    background var(--pmd-normal) var(--pmd-ease),
+    box-shadow var(--pmd-normal) var(--pmd-ease) !important;
+}
+
+.panacea-home :where(.home-action-card, .home-signal-card):hover {
+  transform: translateY(-2px);
+  border-color: var(--pmd-home-line-active) !important;
+  background:
+    radial-gradient(circle at 88% 4%, rgba(77, 231, 255, .095), transparent 40%),
+    var(--pmd-home-card-hover) !important;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .07), 0 14px 32px rgba(0, 0, 0, .25) !important;
+}
+
+.panacea-home :where(.home-action-card, .home-signal-card):active {
+  transform: scale(.985);
+}
+
+/* Give adjacent health objects distinct identity without converting content
+   into a wall of neon. Only a restrained spectral edge changes. */
+.panacea-home .home-action-card:nth-child(4n + 1) { border-top-color: rgba(77, 231, 255, .28) !important; }
+.panacea-home .home-action-card:nth-child(4n + 2) { border-top-color: rgba(156, 124, 255, .28) !important; }
+.panacea-home .home-action-card:nth-child(4n + 3) { border-top-color: rgba(255, 99, 216, .22) !important; }
+.panacea-home .home-action-card:nth-child(4n) { border-top-color: rgba(255, 210, 120, .24) !important; }
+
+.panacea-home :where(.home-primary-action, .home-secondary-action, .home-pill-button, .home-icon-button) {
+  min-height: 44px;
+  border-radius: var(--pmd-radius-m) !important;
+  transition:
+    transform var(--pmd-fast) var(--pmd-ease-spring),
+    border-color var(--pmd-normal) var(--pmd-ease),
+    background var(--pmd-normal) var(--pmd-ease),
+    box-shadow var(--pmd-normal) var(--pmd-ease) !important;
+}
+
+.panacea-home .home-primary-action {
+  border-color: rgba(77, 231, 255, .32) !important;
+  background: linear-gradient(135deg, #1478ff, #7657ff 72%, #a34fff) !important;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .26), 0 10px 26px rgba(63, 94, 255, .24) !important;
+}
+
+.panacea-home :where(.home-secondary-action, .home-pill-button, .home-icon-button) {
+  border: 1px solid var(--pmd-line-strong) !important;
+  background: linear-gradient(145deg, rgba(255, 255, 255, .075), rgba(255, 255, 255, .025)), var(--pmd-material-strong) !important;
+  -webkit-backdrop-filter: blur(16px) saturate(145%);
+  backdrop-filter: blur(16px) saturate(145%);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .10), 0 8px 22px rgba(0, 0, 0, .20) !important;
+}
+
+.panacea-home :where(.home-primary-action, .home-secondary-action, .home-pill-button, .home-icon-button):hover {
+  transform: translateY(-1px);
+  border-color: rgba(77, 231, 255, .34) !important;
+}
+
+.panacea-home :where(.home-primary-action, .home-secondary-action, .home-pill-button, .home-icon-button):active {
+  transform: scale(.975);
+}
+
+.panacea-home .home-details-summary {
+  min-height: 52px;
+  cursor: pointer;
+}
+
+/* Home text hierarchy: luminous white, never flat grey. */
+.panacea-home :where(.text-neutral-950, .text-neutral-900, .text-neutral-800, .text-neutral-700, .text-ink) {
+  color: var(--pmd-text) !important;
+}
+.panacea-home :where(.text-neutral-600, .text-gray-600, .text-slate-600, .text-zinc-600, .text-neutral-500, .text-neutral-400, .text-gray-500, .text-gray-400, .text-slate-500, .text-slate-400) {
+  color: var(--pmd-text-2) !important;
+}
+.panacea-home :where(.text-neutral-300, .text-gray-300, .text-slate-300, .text-zinc-300) {
+  color: var(--pmd-text-3) !important;
+}
+
+.panacea-home :where(input, select, textarea):not([type="range"]):not([type="checkbox"]):not([type="radio"]) {
+  color: var(--pmd-text) !important;
+  border: 1px solid var(--pmd-line-strong) !important;
+  border-radius: var(--pmd-radius-m) !important;
+  background: #06101b !important;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .035) !important;
+}
+.panacea-home :where(input, textarea)::placeholder {
+  color: var(--pmd-text-3) !important;
+  opacity: 1;
+}
+
+/* Progressive disclosure should look spatial, not like a hard page swap. */
+.panacea-home details > :not(summary) {
+  animation: pmd-disclose var(--pmd-normal) var(--pmd-ease-spring) both;
+  transform-origin: top center;
+}
+
+@keyframes pmd-disclose {
+  from { opacity: 0; transform: translateY(-4px) scale(.996); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+/* Mobile: fewer expensive translucent layers, same hierarchy. */
+@media (max-width: 640px) {
+  .panacea-home { gap: var(--pmd-space-4); }
+  .panacea-home .home-odyssey-hero { border-radius: var(--pmd-radius-xl) !important; }
+  .panacea-home .home-command-panel { border-radius: var(--pmd-radius-l) !important; }
+  .panacea-home :where(.home-action-card, .home-signal-card) { border-radius: 18px !important; }
+
+  .pmd-control-material,
+  .panacea-home :where(.home-secondary-action, .home-pill-button, .home-icon-button) {
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+    background: #07111e !important;
+  }
+}
+
+/* Low-memory mode removes decorative GPU work while preserving affordance. */
+html.pmd-low-memory :where(.pmd-control-material, .panacea-home .home-secondary-action, .panacea-home .home-pill-button, .panacea-home .home-icon-button) {
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
+}
+html.pmd-low-memory .panacea-home * {
+  text-shadow: none !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root { --pmd-fast: 1ms; --pmd-normal: 1ms; --pmd-spatial: 1ms; }
+  html { scroll-behavior: auto !important; }
+  .panacea-home details > :not(summary) { animation: none !important; }
+  :where(.pmd-interactive, .panacea-home .home-action-card, .panacea-home .home-signal-card):hover { transform: none !important; }
+}
+
+@media (prefers-contrast: more) {
+  :root {
+    --pmd-line: rgba(255, 255, 255, .28);
+    --pmd-line-strong: rgba(255, 255, 255, .48);
+    --pmd-text-2: rgba(255, 255, 255, .90);
+    --pmd-text-3: rgba(255, 255, 255, .76);
+  }
+}
+
+@media (forced-colors: active) {
+  :where(.pmd-content-surface, .pmd-control-material, .panacea-home .home-command-panel, .panacea-home .home-action-card, .panacea-home .home-signal-card) {
+    forced-color-adjust: auto;
+    color: CanvasText !important;
+    background: Canvas !important;
+    border: 1px solid CanvasText !important;
+    box-shadow: none !important;
+  }
+}
