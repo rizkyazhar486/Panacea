@@ -1,6 +1,4 @@
 import { Component, type ReactNode } from 'react'
-import { HomeHealthInstruments } from './HomeHealthInstruments'
-import { getVitals } from '../lib/healthVitals'
 import '../styles/home-mobile-stability.css'
 
 type Props = {
@@ -36,22 +34,7 @@ export class HomeSectionBoundary extends Component<Props, State> {
   }
 
   render() {
-    if (!this.state.error) {
-      if (this.props.label === 'Dashboard widgets') {
-        return (
-          <div className="space-y-4">
-            <HomeHealthInstruments vitals={getVitals()} />
-            <details className="rounded-[18px] border border-white/10 bg-black/40 p-2">
-              <summary className="cursor-pointer select-none px-2 py-2 text-[11px] font-black uppercase tracking-[.12em] text-neutral-400">
-                More personal widgets
-              </summary>
-              <div className="pt-2">{this.props.children}</div>
-            </details>
-          </div>
-        )
-      }
-      return this.props.children
-    }
+    if (!this.state.error) return this.props.children
 
     return (
       <section className="rounded-[24px] border border-amber-200/70 bg-amber-50/80 p-4 dark:border-amber-300/15 dark:bg-amber-300/[.06]">
