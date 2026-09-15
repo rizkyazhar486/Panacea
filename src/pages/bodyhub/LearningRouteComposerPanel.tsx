@@ -28,7 +28,7 @@ export function LearningRouteComposerPanel({ selectedAtlasSystemId }: LearningRo
   const route = useMemo(() => buildBodyLearningRoute(selectedAtlasSystemId, targetId), [selectedAtlasSystemId, targetId])
 
   const targetStillExists = targets.some((target) => target.id === targetId)
-  const effectiveTargetId = targetStillExists ? targetId : targets[0]?.id
+  const effectiveTargetId = targetStillExists ? targetId : (targets[0]?.id ?? 'pathophysiology:atherosclerosis')
   const effectiveRoute = effectiveTargetId === targetId ? route : buildBodyLearningRoute(selectedAtlasSystemId, effectiveTargetId)
   const stepCount = effectiveRoute?.steps.length ?? 0
   const completedCount = effectiveRoute?.steps.filter((step) => completed.has(step.nodeId)).length ?? 0
