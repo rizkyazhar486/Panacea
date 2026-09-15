@@ -46,6 +46,10 @@ assert.match(osSource, /whole-body first/i)
 assert.match(osSource, /multiscale intelligence/i)
 assert.match(osSource, /evidence traceable/i)
 assert.match(osSource, /bodyExposureDesignAlignment\.css/, 'Body Exposure must load the HIG alignment layer after its local OS styles')
+assert.match(osSource, /key:\s*'intelligence'.*label:\s*'Intelligence'.*destination:\s*'intelligence'/s, 'top navigation must expose Intelligence as a first-class destination')
+assert.match(osSource, /Open intelligence/i, 'hero must expose a direct one-tap path into the intelligence workspace')
+assert.match(osSource, /intelligenceRef\.current\?\.scrollIntoView/, 'Intelligence navigation must directly manipulate the workspace location')
+assert.match(osSource, /onClickCapture=\{\(\) => setActiveMode\('intelligence'\)\}/, 'workspace interaction must keep the top-level active mental model synchronized')
 
 const cssSource = readFileSync(resolve('src/pages/bodyExposureOS.css'), 'utf8')
 for (const token of ['--be-space-black', '--be-cyan', '--be-violet', '--be-magenta', '--be-border-soft', '--be-radius-panel']) {
@@ -69,4 +73,4 @@ assert.match(alignmentSource, /var\(--be-surface-2\).*important/s, 'biomedical c
 assert.match(alignmentSource, /touch-action:\s*manipulation/, 'direct-manipulation touch semantics must remain enabled')
 assert.match(alignmentSource, /prefers-reduced-motion/, 'HIG alignment must retain reduced-motion behavior')
 
-console.log('body intelligence workspace: six progressive-disclosure layers validated with whole-body-first hierarchy, Panacea HIG token alignment, calm-content/translucent-control materials and non-clinical navigation boundaries')
+console.log('body intelligence workspace: six progressive-disclosure layers validated with whole-body-first hierarchy, direct Intelligence navigation, Panacea HIG token alignment, calm-content/translucent-control materials and non-clinical navigation boundaries')
