@@ -115,7 +115,10 @@ const DIKETAHUI: readonly string[] = [
   'components/growth/ClinicalDuel.tsx',
   'components/growth/HumanPassportWidget.tsx',
   'pages/MacroLab.tsx',
-  'pages/bodyhub/AtomicSystemsLab.tsx',
+  // Deliberate duplicate aggregator: /settings and /tutorial are already
+  // independently user-reachable routes, so this wrapper is retained without
+  // inventing a second navigation path just to satisfy the reachability gate.
+  'pages/SettingsWorkspace.tsx',
 ]
 
 // ── 1. Tidak boleh ada permukaan tak terjangkau yang BARU ────────────────
