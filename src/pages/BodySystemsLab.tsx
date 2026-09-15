@@ -1,4 +1,4 @@
-import { lazy, Suspense, useMemo } from 'react'
+import { lazy, Suspense, useMemo, type ComponentType } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { RangkaDaftar } from '../components/Rangka'
 
@@ -14,7 +14,7 @@ type BodyMode = {
   label: string
   emoji: string
   summary: string
-  component: React.ComponentType
+  component: ComponentType
 }
 
 const MODES: BodyMode[] = [
