@@ -5,7 +5,7 @@ import { vitalsAge } from '../lib/healthVitals'
 import { deretMetrik } from '../lib/riwayatVitals'
 import '../styles/home-overview-mosaic-v43.css'
 
-type MetricKey = keyof Vitals
+type MetricKey = Extract<keyof Vitals, string>
 
 type SystemGroup = {
   label: string
@@ -39,7 +39,7 @@ function metric(vitals: Vitals, key: MetricKey, unit: string, digits = 0): strin
 }
 
 function available(vitals: Vitals, keys: MetricKey[]): number {
-  return keys.reduce((total, key) => total + (numeric(vitals, key) != null ? 1 : 0), 0)
+  return keys.reduce<number>((total, key) => total + (numeric(vitals, key) != null ? 1 : 0), 0)
 }
 
 function MiniMetric({ label, children }: { label: string; children: ReactNode }) {
