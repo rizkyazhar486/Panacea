@@ -11,6 +11,7 @@
   const EXCLUDED_ICON_NAMES = /^(close|dismiss|back|menu|more|search|previous|next|tutup|kembali|menu|lainnya|cari|sebelumnya|berikutnya)$/i
   const CONTROL_SELECTOR = 'button, a[href], [role="button"]'
   const FIELD_SELECTOR = 'input, textarea, select'
+  const INVALID_FIELD_SELECTOR = 'input[aria-invalid="true"], textarea[aria-invalid="true"], select[aria-invalid="true"]'
   let uid = 0
   let scheduled = false
 
@@ -161,7 +162,8 @@
     }
 
     const humanLabel = normalizeWhitespace(label || container.dataset.pmdProgressLabel)
-    meta.textContent = humanLabel || `Step ${safeCurrent} of ${safeTotal}`
+    const nextLabel = humanLabel || `Step ${safeCurrent} of ${safeTotal}`
+    if (meta.textContent !== nextLabel) meta.textContent = nextLabel
 
     let track = container.querySelector(':scope > .pmd-progress-track')
     if (!track) {
@@ -195,11 +197,11 @@
     if (!human) return
 
     if (el.matches('input[type="button"], input[type="submit"]')) {
-      el.value = human
+      if (el.value !== human) el.value = human
       return
     }
 
-    if (el.matches(CONTROL_SELECTOR) && !directText(el)) {
+    if (el.matches(CONTROL_SELECTOR) && !directText(el) && el.getAttribute('aria-label') !== human) {
       el.setAttribute('aria-label', human)
     }
   }
@@ -253,9 +255,18 @@
   document.addEventListener('change', clearIfValid, true)
 
   const observer = new MutationObserver((mutations) => {
-    if (mutations.some((mutation) => mutation.type === 'childList' && mutation.addedNodes.length)) {
-      scheduleRefresh()
-    }
+    const hasExternalAddition = mutations.some((mutation) =>
+      mutation.type === 'childList' &&
+      Array.from(mutation.addedNodes).some((node) =>
+        !(node instanceof Element) ||
+        (!node.classList.contains('pmd-control-label') &&
+          !node.classList.contains('pmd-progress-meta') &&
+          !node.classList.contains('pmd-progress-track') &&
+          !node.classList.contains('pmd-progress-value') &&
+          !node.classList.contains('pmd-field-error')),
+      ),
+    )
+    if (hasExternalAddition) scheduleRefresh()
   })
 
   const start = () => {
@@ -272,8 +283,8 @@
     },
     clearErrors(target = document) {
       const fields = []
-      if (target instanceof HTMLElement && target.matches(FIELD_SELECTOR)) fields.push(target)
-      target.querySelectorAll?.(`${FIELD_SELECTOR}[aria-invalid="true"]`).forEach((field) => fields.push(field))
+      if (target instanceof HTMLElement && target.matches(INVALID_FIELD_SELECTOR)) fields.push(target)
+      target.querySelectorAll?.(INVALID_FIELD_SELECTOR).forEach((field) => fields.push(field))
       fields.forEach(clearError)
     },
   })
