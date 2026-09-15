@@ -3,6 +3,7 @@ import { useSearchParams } from 'react-router-dom'
 import { PanaceaZoneNav } from '../components/PanaceaZoneNav'
 import { FeatureBoulevard } from '../components/FeatureBoulevard'
 import { HomeNowWidget } from '../components/HomeNowWidget'
+import { HomeInteractiveRail } from '../components/HomeInteractiveRail'
 
 const Beranda = lazy(() => import('./Beranda'))
 const Feed = lazy(() => import('./Feed'))
@@ -82,14 +83,19 @@ export function HomeSocialWorkspace() {
         ))}
       </nav>
 
-      {activeKey === 'home' && <HomeNowWidget />}
+      {activeKey === 'home' && (
+        <>
+          <HomeNowWidget />
+          <HomeInteractiveRail />
+        </>
+      )}
 
-      <section className="hidden overflow-hidden rounded-[26px] border border-brand/20 bg-white shadow-[0_14px_38px_rgba(0,191,99,.07)] dark:bg-black sm:block">
+      <section className="hidden overflow-hidden rounded-[26px] border border-white/10 bg-black shadow-[0_14px_38px_rgba(0,0,0,.20)] sm:block">
         <div className="h-1 w-full bg-brand" aria-hidden />
         <div className="p-4 sm:p-5">
           <div className="text-[10px] font-black uppercase tracking-[.2em] text-brand">Home · life, people, faith and money</div>
-          <h1 className="mt-1 text-2xl font-black tracking-tight text-black dark:text-white sm:text-3xl">Your daily life in one home</h1>
-          <p className="mt-2 max-w-4xl text-sm font-medium leading-relaxed text-black/70 dark:text-white/75">Logs and stats sit beside social, community, clubs, finance, markets, scores, religion and reading. These are rooms inside one Home, not a maze of separate destinations.</p>
+          <h1 className="mt-1 text-2xl font-black tracking-tight text-white sm:text-3xl">Your daily life in one home</h1>
+          <p className="mt-2 max-w-4xl text-sm font-medium leading-relaxed text-white/70">Logs and stats sit beside social, community, clubs, finance, markets, scores, religion and reading. These are rooms inside one Home, not a maze of separate destinations.</p>
           <div className="no-scrollbar mt-4 flex gap-1.5 overflow-x-auto pb-1" role="tablist" aria-label="Home workspace">
             {VIEWS.map((view) => (
               <button
@@ -101,15 +107,15 @@ export function HomeSocialWorkspace() {
                 className={`min-h-[44px] shrink-0 rounded-[13px] border px-4 text-xs font-black transition ${
                   activeKey === view.key
                     ? 'border-brand bg-brand text-white'
-                    : 'border-brand/10 bg-white text-black hover:border-brand/25 hover:bg-brand/[.06] hover:text-brand dark:bg-black dark:text-white'
+                    : 'border-white/10 bg-[#080d13] text-white hover:border-brand/25 hover:bg-brand/[.08] hover:text-brand'
                 }`}
               >
                 {view.short}
               </button>
             ))}
           </div>
-          <div className="mt-3 rounded-[16px] border border-brand/15 bg-brand/[.045] px-3 py-2.5 text-[12px] font-medium leading-relaxed text-black dark:text-white">
-            <b>{active.label}:</b> {active.description}
+          <div className="mt-3 rounded-[16px] border border-white/10 bg-white/[.035] px-3 py-2.5 text-[12px] font-medium leading-relaxed text-white/75">
+            <b className="text-white">{active.label}:</b> {active.description}
           </div>
         </div>
       </section>
