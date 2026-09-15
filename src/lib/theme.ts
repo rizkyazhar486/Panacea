@@ -1,6 +1,8 @@
 // Appearance preferences — class-based dark mode + text scale + reduced motion.
 // Toggling theme adds/removes `.dark` on <html>; index.css carries a `.dark`
 // override layer that remaps the literal utility colors the pages use.
+import { installSonarAirGestureBootstrap } from './sonarAirGestureBootstrap'
+
 export type Theme = 'light' | 'dark'
 export type ThemePref = Theme | 'system'
 export type TextScale = 'sm' | 'md' | 'lg'
@@ -106,6 +108,7 @@ export function getSimpleMode(): boolean {
   } catch {
     return false
   }
+  return false
 }
 
 export function setSimpleMode(on: boolean) {
@@ -123,4 +126,5 @@ export function applyAppearance() {
   setTextScale(getTextScale())
   setReducedMotion(getReducedMotion())
   setSimpleMode(getSimpleMode())
+  installSonarAirGestureBootstrap()
 }
