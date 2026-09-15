@@ -20,6 +20,57 @@ Before selecting work:
 One active coherent PR is preferable to several overlapping micro-PRs. Close or
 supersede stale duplicates explicitly.
 
+## Product UX constitution — compact super-pages
+
+Panaceamed must expose a very small mental model while preserving a very large
+capability set. This is a permanent product-architecture constraint, not a styling
+preference.
+
+- Prefer **3 primary super-pages**: Home / OS, Clinical, and Explore. A fourth
+  primary page is allowed only when a genuinely distinct mental model cannot be
+  represented cleanly inside those three.
+- New capability does **not** imply a new page. First try to compile it into an
+  existing super-page as a widget, horizontal rail, carousel, compact card,
+  contextual tab, expandable panel, drawer, bottom sheet, overlay, visual state,
+  or command/search action.
+- Preserve existing useful features when consolidating. Merge overlapping
+  features, datasets, APIs and assets into one coherent surface instead of
+  deleting capability or creating parallel/duplicate products.
+- Target **1–2 interactions from a primary super-page to any feature**, including
+  low-frequency features. Rare features may occupy less permanent visual space,
+  but they must not become harder to reach.
+- Use one main vertical scroll. Prefer short, visually calm pages with horizontal
+  rails/carousels and progressive disclosure instead of long menus or nested
+  route trees.
+- Order content by significance: urgent/high-value/high-frequency items first;
+  useful secondary items next; optional/rare items last or on demand.
+- Visible complexity must stay much lower than available capability. A user should
+  understand the app's main structure within roughly **5–9 minutes**.
+- Education may be deep, but the first layer should be visual and concise:
+  diagrams, images, motion, simulation, 3D, video, charts and interaction before
+  long explanatory text. Reveal deeper evidence and detail on demand.
+- Do not expose development state, TODOs, unfinished work, implementation plans,
+  repository names, internal architecture commentary, or “what we are building
+  next” in production-facing UI unless it is intentionally a public roadmap.
+- Navigation is disposable. Remove or collapse nav items when they add clutter,
+  duplicate another path, or reduce aesthetics. Global search / Ask Panacea may
+  serve as the universal shortcut layer.
+- Theme values come from shared design tokens. Components must not invent local
+  colors merely because they look attractive. Visual hierarchy, spacing, radius,
+  typography, glass treatment, motion and color must read as one system.
+
+A useful default rule is:
+
+`visible prominence ∝ value × frequency × urgency × context`
+
+and:
+
+`available capability >> visible complexity`
+
+When two features substantially overlap in user intent, data, actions or context,
+the default is to **merge them into the same super-page** rather than add another
+branch in navigation.
+
 ## Standard agent lane
 
 For each candidate:
