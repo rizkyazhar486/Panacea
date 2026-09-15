@@ -1,4 +1,4 @@
-import type { BodySystemId } from './bodySystemSourceWave'
+import { BODY_SYSTEM_SOURCE_WAVE, type BodySystemId } from './bodySystemSourceWave'
 import type { WholeBodySystemId } from './wholeBodyPhysiologyOS'
 
 export type BodyPhysiologyBridgeFidelity = 'direct' | 'compound' | 'contextual'
@@ -86,4 +86,10 @@ export function getBodySystemPhysiologyBridge(atlasSystemId: BodySystemId): Body
   const bridge = BODY_SYSTEM_PHYSIOLOGY_BRIDGE.find((item) => item.atlasSystemId === atlasSystemId)
   if (!bridge) throw new Error(`Missing atlas-to-physiology bridge for ${atlasSystemId}`)
   return bridge
+}
+
+export function resolveBodySystemIdFromAtlasLabel(label: string | null | undefined): BodySystemId | null {
+  const normalized = label?.trim()
+  if (!normalized) return null
+  return BODY_SYSTEM_SOURCE_WAVE.find((system) => system.label === normalized)?.id ?? null
 }
