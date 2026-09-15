@@ -1,5 +1,7 @@
 import { Link } from 'react-router-dom'
 import { getVitals } from '../lib/healthVitals'
+import { FITUR_DARI_HUB } from '../lib/katalogFitur'
+import { productSpaceForRoute, routePathOnly } from '../lib/productSpaces'
 
 type Feature = {
   label: string
@@ -14,7 +16,9 @@ type Tone = {
   strong: string
 }
 
-const TONES: Record<'body' | 'clinical' | 'you', Tone> = {
+type SuperPageId = 'body' | 'clinical' | 'you'
+
+const TONES: Record<SuperPageId, Tone> = {
   body: {
     edge: 'rgba(45, 212, 191, .34)',
     glow: 'rgba(34, 211, 238, .18)',
@@ -128,6 +132,57 @@ const FOR_YOU: Feature[] = [
   { label: 'All Features', to: '/semua-fitur', glyph: '⋯' },
 ]
 
+const FORCE_YOU = new Set([
+  '/chatbot', '/emr', '/care-episode', '/profile', '/settings', '/atur-fitur',
+  '/messages', '/feed', '/community', '/social', '/scripture', '/hadith',
+  '/prayer-times', '/keuangan', '/tutorial', '/notifikasi', '/notifications',
+  '/marketplace', '/my-materials', '/planning', '/consult', '/hospitals',
+  '/pharmacy', '/orders', '/clubs', '/family-health',
+])
+
+const FORCE_CLINICAL = new Set([
+  '/clinical', '/clinical-hub', '/body-explorer', '/frontier-health', '/genome-lab',
+  '/drug-info', '/rujukan', '/calculator-hub', '/clinical-calculators', '/clinical-scores',
+  '/lab-decoder', '/learn', '/med-study', '/osce-ukmppd', '/radiology',
+  '/electrophysiology', '/knowledge-bridge', '/bio-simulators', '/data-lab',
+  '/data-lab-advanced', '/predictive-models-toolkit', '/second-opinion',
+  '/psychiatric-status-exam', '/emergency',
+])
+
+function superPageFor(to: string, group = ''): SuperPageId {
+  const path = routePathOnly(to)
+  if (FORCE_YOU.has(path)) return 'you'
+  if (FORCE_CLINICAL.has(path)) return 'clinical'
+
+  const space = productSpaceForRoute(to, group)
+  if (space === 'today' || space === 'body' || space === 'move') return 'body'
+  if (space === 'learn' || space === 'discover') return 'clinical'
+  return 'you'
+}
+
+function glyphFor(to: string, group = '') {
+  const page = superPageFor(to, group)
+  if (page === 'body') return '◎'
+  if (page === 'clinical') return '✚'
+  return '✦'
+}
+
+function compileFeatures(seed: Feature[], page: SuperPageId): Feature[] {
+  const map = new Map<string, Feature>()
+  for (const item of seed) map.set(item.to, item)
+  for (const item of FITUR_DARI_HUB) {
+    if (superPageFor(item.to, item.grup) !== page) continue
+    if (!map.has(item.to)) {
+      map.set(item.to, { label: item.nama, to: item.to, glyph: glyphFor(item.to, item.grup) })
+    }
+  }
+  return [...map.values()]
+}
+
+const BODY_FEATURES = compileFeatures(YOUR_BODY, 'body')
+const CLINICAL_FEATURES = compileFeatures(CLINICAL, 'clinical')
+const YOU_FEATURES = compileFeatures(FOR_YOU, 'you')
+
 function reading(value: number | undefined, suffix = '') {
   return typeof value === 'number' && Number.isFinite(value) ? `${value}${suffix}` : '—'
 }
@@ -163,7 +218,7 @@ function CapabilityRail({ items, tone }: { items: Feature[]; tone: Tone }) {
   )
 }
 
-function SectionTitle({ label, to, tone }: { label: string; to: string; tone: Tone }) {
+function SectionTitle({ label, to, tone, count }: { label: string; to: string; tone: Tone; count: number }) {
   return (
     <div className="mb-3 flex items-center justify-between gap-3">
       <Link to={to} className="truncate text-[18px] font-black tracking-[-.035em] text-white sm:text-xl">
@@ -174,7 +229,7 @@ function SectionTitle({ label, to, tone }: { label: string; to: string; tone: To
         className="shrink-0 rounded-full border px-3 py-1.5 text-[9px] font-black uppercase tracking-[.14em] text-white/70 transition hover:text-white"
         style={{ borderColor: tone.edge, background: tone.fill }}
       >
-        Open →
+        {count} widgets →
       </Link>
     </div>
   )
@@ -237,7 +292,7 @@ export function HomeUnified() {
         </nav>
 
         <section className="mb-9" aria-label="Your Body super page widgets">
-          <SectionTitle label="Your Body" to="/tubuh" tone={bodyTone} />
+          <SectionTitle label="Your Body" to="/tubuh" tone={bodyTone} count={BODY_FEATURES.length} />
           <div
             className="mb-4 overflow-hidden rounded-[28px] border p-4 sm:p-5"
             style={{
@@ -263,11 +318,11 @@ export function HomeUnified() {
               ))}
             </div>
           </div>
-          <CapabilityRail items={YOUR_BODY} tone={bodyTone} />
+          <CapabilityRail items={BODY_FEATURES} tone={bodyTone} />
         </section>
 
         <section className="mb-9" aria-label="Clinical super page widgets">
-          <SectionTitle label="Clinical" to="/clinical" tone={clinicalTone} />
+          <SectionTitle label="Clinical" to="/clinical" tone={clinicalTone} count={CLINICAL_FEATURES.length} />
           <div className="mb-4 grid gap-3 sm:grid-cols-3">
             {[
               ['Ask Health', '/chatbot', 'Ask a clinical question', '✺'],
@@ -293,11 +348,11 @@ export function HomeUnified() {
               </Link>
             ))}
           </div>
-          <CapabilityRail items={CLINICAL} tone={clinicalTone} />
+          <CapabilityRail items={CLINICAL_FEATURES} tone={clinicalTone} />
         </section>
 
         <section aria-label="For You super page widgets">
-          <SectionTitle label="For You" to="/" tone={youTone} />
+          <SectionTitle label="For You" to="/" tone={youTone} count={YOU_FEATURES.length} />
           <div className="mb-4 grid grid-cols-2 gap-3 sm:grid-cols-4">
             {[
               ['Prayer', '/prayer-times', '☾'],
@@ -323,7 +378,7 @@ export function HomeUnified() {
               </Link>
             ))}
           </div>
-          <CapabilityRail items={FOR_YOU} tone={youTone} />
+          <CapabilityRail items={YOU_FEATURES} tone={youTone} />
         </section>
       </div>
     </main>
