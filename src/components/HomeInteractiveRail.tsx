@@ -29,7 +29,7 @@ const ITEMS: RailItem[] = [
   { group: 'Clinical', to: '/second-opinion', eyebrow: 'Review', title: 'Second Opinion', note: 'Organize another perspective around available clinical information.', glyph: '⇄' },
   { group: 'Learn', to: '/learn?t=body', eyebrow: 'See', title: 'Visual Medicine', note: 'Study anatomy, physiology and disease through the body.', glyph: '◫' },
   { group: 'Learn', to: '/learn?t=cases', eyebrow: 'Practice', title: 'Cases & OSCE', note: 'Jump into case-based and exam-oriented practice.', glyph: '✓' },
-  { group: 'Learn', to: '/learn?t=imaging', eyebrow: 'Image', title: 'Radiology', note: 'Connect medical imaging with anatomy and clinical context.', glyph: '⌗' },
+  { group: 'Learn', to: '/learn?t=radiology', eyebrow: 'Image', title: 'Radiology', note: 'Connect medical imaging with anatomy and clinical context.', glyph: '⌗' },
   { group: 'Learn', to: '/learn?t=drugs', eyebrow: 'Mechanism', title: 'Drugs & Herbal', note: 'Open drug, interaction and mechanism references.', glyph: '✚' },
 ]
 
