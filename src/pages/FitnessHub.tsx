@@ -7,6 +7,8 @@ export const GROUPS = [
     name: 'Your Body',
     tools: [
       { to: '/fitness-hub?view=body', name: 'Your Body', kw: 'body composition measurements' },
+      { to: '/fitness-hub?view=body-exposure', name: 'Body Exposure', kw: '3d anatomy organ physiology radiology dissection biomechanics molecular atlas body explorer' },
+      { to: '/fitness-hub?view=body-tools', name: 'Body & Skin Tools', kw: 'body region symptom map skincare neat tracker' },
       { to: '/fitness-hub?view=character', name: '3D Character & Body Shaper', kw: '3d avatar posture body shaper' },
       { to: '/fitness-hub?view=training', name: 'Training', kw: 'training plan sport science progression' },
       { to: '/fitness-hub?view=workout', name: 'Workout', kw: 'workout strength movement session' },
