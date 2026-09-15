@@ -2,11 +2,14 @@ import test from 'node:test'
 import assert from 'node:assert/strict'
 import { readFile } from 'node:fs/promises'
 
-const [taxonomy, hiddenFeatures, allFeatures, entryPoints] = await Promise.all([
+const [taxonomy, hiddenFeatures, allFeatures, entryPoints, services, carePlanning, careAccess] = await Promise.all([
   readFile(new URL('../../src/lib/productSpaces.ts', import.meta.url), 'utf8'),
   readFile(new URL('../../src/lib/fiturTersembunyi.ts', import.meta.url), 'utf8'),
   readFile(new URL('../../src/pages/SemuaFitur.tsx', import.meta.url), 'utf8'),
   readFile(new URL('../../src/lib/featureEntryPoints.ts', import.meta.url), 'utf8'),
+  readFile(new URL('../../src/pages/HelpServicesWorkspace.tsx', import.meta.url), 'utf8'),
+  readFile(new URL('../../src/pages/CarePlanningWorkspace.tsx', import.meta.url), 'utf8'),
+  readFile(new URL('../../src/pages/CareAccessWorkspace.tsx', import.meta.url), 'utf8'),
 ])
 
 test('product surface exposes one stable compact OS taxonomy', () => {
@@ -44,6 +47,22 @@ test('shell representatives are rewritten to hubs instead of spawning sibling pa
   assert.match(taxonomy, /'\/clinical-hub': \{ to: '\/clinical-hub', label: 'Services' \}/)
   assert.match(taxonomy, /next\.group = 'Home'/)
   assert.match(taxonomy, /seen\.has\(next\.to\)/)
+})
+
+test('services use intent-level grouping with nested planning and access workspaces', () => {
+  for (const key of ['assistant', 'records', 'planning', 'access', 'emergency']) {
+    assert.ok(services.includes(`key: '${key}'`), `missing services mode: ${key}`)
+  }
+  assert.match(services, /CarePlanningWorkspace/)
+  assert.match(services, /CareAccessWorkspace/)
+  assert.match(services, /feature count can grow inside these modes/i)
+
+  for (const label of ['Care Plan', 'Care Episode']) {
+    assert.ok(carePlanning.includes(label), `care planning surface missing: ${label}`)
+  }
+  for (const label of ['Consult', 'Facilities', 'Pharmacy', 'Second Opinion', 'Medication Reminders']) {
+    assert.ok(careAccess.includes(label), `care access surface missing: ${label}`)
+  }
 })
 
 test('all-features page starts with spaces and keeps full directory progressive', () => {
