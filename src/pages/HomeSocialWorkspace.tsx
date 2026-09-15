@@ -6,6 +6,7 @@ import { IconDashboard, IconHeart, IconSparkle, IconStethoscope } from '../compo
 import '../styles/home-health-spectrum.css'
 import '../styles/home-mobile-shell-repair-v45.css'
 import '../styles/home-liquid-reference.css'
+import '../styles/home-green-material-v48.css'
 
 const Feed = lazy(() => import('./Feed'))
 const Community = lazy(() => import('./Community').then((m) => ({ default: m.Community })))
