@@ -1,4 +1,4 @@
-import { lazy, Suspense } from 'react'
+import { lazy, Suspense, type ComponentType, type LazyExoticComponent } from 'react'
 import { Link, useSearchParams } from 'react-router-dom'
 import { CanonicalBodyExposure } from '../components/CanonicalBodyExposure'
 
@@ -36,7 +36,9 @@ type PanelKey =
   | 'postur'
   | 'puasa'
 
-const PANELS: Record<PanelKey, { label: string; component: React.LazyExoticComponent<React.ComponentType> }> = {
+type LazyPanel = LazyExoticComponent<ComponentType<Record<string, never>>>
+
+const PANELS: Record<PanelKey, { label: string; component: LazyPanel }> = {
   energi: { label: 'Energy', component: BodyBattery },
   jantung: { label: 'Heart rate', component: HeartRateLog },
   tidur: { label: 'Sleep', component: SleepPattern },
