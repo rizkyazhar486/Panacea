@@ -3,7 +3,6 @@ import { useSearchParams } from 'react-router-dom'
 import { PanaceaZoneNav } from '../components/PanaceaZoneNav'
 import { FeatureBoulevard } from '../components/FeatureBoulevard'
 import { HomeNowWidget } from '../components/HomeNowWidget'
-import { HomeInteractiveRail } from '../components/HomeInteractiveRail'
 
 const Beranda = lazy(() => import('./Beranda'))
 const Feed = lazy(() => import('./Feed'))
@@ -83,12 +82,7 @@ export function HomeSocialWorkspace() {
         ))}
       </nav>
 
-      {activeKey === 'home' && (
-        <>
-          <HomeNowWidget />
-          <HomeInteractiveRail />
-        </>
-      )}
+      {activeKey === 'home' && <HomeNowWidget />}
 
       <section className="hidden overflow-hidden rounded-[26px] border border-white/10 bg-black shadow-[0_14px_38px_rgba(0,0,0,.20)] sm:block">
         <div className="h-1 w-full bg-brand" aria-hidden />
