@@ -2,7 +2,7 @@ import { lazy, Suspense, type ComponentType } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { PanaceaZoneNav } from '../components/PanaceaZoneNav'
 import { FeatureBoulevard } from '../components/FeatureBoulevard'
-import { HomeNowWidget } from '../components/HomeNowWidget'
+import { PanaceaPulseWidget } from '../components/PanaceaPulseWidget'
 
 const Beranda = lazy(() => import('./Beranda'))
 const Feed = lazy(() => import('./Feed'))
@@ -31,11 +31,7 @@ const VALID = new Set(VIEWS.map((view) => view.key))
 
 function Loader() {
   return (
-    <div
-      className="grid min-h-[26vh] place-items-center rounded-[22px] border border-brand/20 bg-white text-sm font-black text-brand dark:bg-black"
-      role="status"
-      aria-live="polite"
-    >
+    <div className="grid min-h-[26vh] place-items-center rounded-[22px] border border-brand/15 bg-brand/[.025] text-sm font-bold text-brand/75 dark:bg-brand/[.045]" role="status" aria-live="polite">
       Loading Home…
     </div>
   )
@@ -57,67 +53,33 @@ export function HomeSocialWorkspace() {
 
   return (
     <div className="mx-auto w-full max-w-[1450px] space-y-3 pb-10 sm:space-y-4">
-      <div className="hidden sm:block">
-        <PanaceaZoneNav />
-      </div>
+      <div className="hidden sm:block"><PanaceaZoneNav /></div>
 
-      <nav
-        className="no-scrollbar sticky top-2 z-30 -mx-1 flex gap-1 overflow-x-auto rounded-[16px] border border-brand/20 bg-white px-1.5 py-1.5 shadow-[0_10px_30px_rgba(0,191,99,.10)] dark:bg-black sm:hidden"
-        aria-label="Home rooms"
-      >
+      <nav className="no-scrollbar -mx-1 flex gap-1 overflow-x-auto rounded-[16px] border border-brand/10 bg-white/[.9] px-1.5 py-1.5 shadow-[0_8px_24px_rgba(15,23,42,.04)] dark:bg-black/[.68] sm:hidden" aria-label="Home rooms">
         {VIEWS.map((view) => (
-          <button
-            key={view.key}
-            type="button"
-            aria-current={activeKey === view.key ? 'page' : undefined}
-            onClick={() => select(view)}
-            className={`min-h-[38px] shrink-0 rounded-[12px] border px-3.5 text-[11px] font-black transition active:scale-[.98] ${
-              activeKey === view.key
-                ? 'border-brand bg-brand text-white shadow-[0_6px_18px_rgba(0,191,99,.2)]'
-                : 'border-transparent bg-white text-black hover:border-brand/20 hover:bg-brand/[.06] hover:text-brand dark:bg-black dark:text-white dark:hover:bg-brand/[.10]'
-            }`}
-          >
+          <button key={view.key} type="button" aria-current={activeKey === view.key ? 'page' : undefined} onClick={() => select(view)} className={`min-h-[38px] shrink-0 rounded-[12px] border px-3.5 text-[11px] font-black transition active:scale-[.98] ${activeKey === view.key ? 'border-brand bg-brand text-white shadow-[0_6px_18px_rgba(0,191,99,.2)]' : 'border-transparent bg-transparent text-neutral-700 hover:border-brand/15 hover:bg-brand/[.055] hover:text-brand dark:text-neutral-200 dark:hover:bg-brand/[.08]'}`}>
             {view.short}
           </button>
         ))}
       </nav>
 
-      <HomeNowWidget />
+      {activeKey === 'home' && <PanaceaPulseWidget />}
 
-      <section className="hidden overflow-hidden rounded-[26px] border border-brand/20 bg-white shadow-[0_14px_38px_rgba(0,191,99,.07)] dark:bg-black sm:block">
-        <div className="h-1 w-full bg-brand" aria-hidden />
-        <div className="p-4 sm:p-5">
-          <div className="text-[10px] font-black uppercase tracking-[.2em] text-brand">Home · life, people, faith and money</div>
-          <h1 className="mt-1 text-2xl font-black tracking-tight text-black dark:text-white sm:text-3xl">Your daily life in one home</h1>
-          <p className="mt-2 max-w-4xl text-sm font-medium leading-relaxed text-black/70 dark:text-white/75">Logs and stats sit beside social, community, clubs, finance, markets, scores, religion and reading. These are rooms inside one Home, not a maze of separate destinations.</p>
-          <div className="no-scrollbar mt-4 flex gap-1.5 overflow-x-auto pb-1" role="tablist" aria-label="Home workspace">
-            {VIEWS.map((view) => (
-              <button
-                key={view.key}
-                type="button"
-                role="tab"
-                aria-selected={activeKey === view.key}
-                onClick={() => select(view)}
-                className={`min-h-[42px] shrink-0 rounded-[13px] border px-4 text-xs font-black transition ${
-                  activeKey === view.key
-                    ? 'border-brand bg-brand text-white'
-                    : 'border-brand/10 bg-white text-black hover:border-brand/25 hover:bg-brand/[.06] hover:text-brand dark:bg-black dark:text-white'
-                }`}
-              >
-                {view.short}
-              </button>
-            ))}
-          </div>
-          <div className="mt-3 rounded-[16px] border border-brand/15 bg-brand/[.045] px-3 py-2.5 text-[11px] font-medium leading-relaxed text-black dark:text-white">
-            <b>{active.label}:</b> {active.description}
-          </div>
+      <section className="hidden rounded-[26px] border border-brand/12 bg-white/[.94] p-4 shadow-[0_14px_38px_rgba(15,23,42,.055)] backdrop-blur-xl dark:bg-black/[.74] dark:shadow-[0_16px_40px_rgba(0,0,0,.22)] sm:block sm:p-5">
+        <div className="text-[10px] font-black uppercase tracking-[.2em] text-brand">Home · life, people, faith and money</div>
+        <h1 className="mt-1 text-2xl font-black tracking-tight text-ink dark:text-white sm:text-3xl">Your daily life in one home</h1>
+        <p className="mt-2 max-w-4xl text-sm leading-relaxed text-neutral-600 dark:text-neutral-300">Logs and stats sit beside social, community, clubs, finance, markets, scores, religion and reading. These are rooms inside one Home, not a maze of separate destinations.</p>
+        <div className="no-scrollbar mt-4 flex gap-1.5 overflow-x-auto pb-1" role="tablist" aria-label="Home workspace">
+          {VIEWS.map((view) => (
+            <button key={view.key} type="button" role="tab" aria-selected={activeKey === view.key} onClick={() => select(view)} className={`min-h-[42px] shrink-0 rounded-[13px] border px-4 text-xs font-black transition ${activeKey === view.key ? 'border-brand bg-brand text-white' : 'border-transparent bg-brand/[.035] text-neutral-700 hover:border-brand/15 hover:bg-brand/[.07] hover:text-brand dark:text-neutral-200'}`}>
+              {view.short}
+            </button>
+          ))}
         </div>
+        <div className="mt-3 rounded-[16px] border border-brand/10 bg-brand/[.025] px-3 py-2.5 text-[11px] leading-relaxed text-neutral-600 dark:bg-brand/[.04] dark:text-neutral-300"><b className="text-ink dark:text-white">{active.label}:</b> {active.description}</div>
       </section>
 
-      <section role="tabpanel" aria-label={active.label} className="min-w-0">
-        <Suspense fallback={<Loader />}><Active /></Suspense>
-      </section>
-
+      <section role="tabpanel" aria-label={active.label} className="min-w-0"><Suspense fallback={<Loader />}><Active /></Suspense></section>
       <FeatureBoulevard zone="home" title="Home feature boulevard" />
     </div>
   )
