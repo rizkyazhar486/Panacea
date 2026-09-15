@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom'
 import { HomeHealthInstruments } from './HomeHealthInstruments'
+import { HomeOverviewMosaic } from './HomeOverviewMosaic'
 import { getVitals } from '../lib/healthVitals'
 
 const ACTIONS = [
@@ -12,7 +13,8 @@ const ACTIONS = [
 export function HomeNowWidget() {
   const vitals = getVitals()
   return (
-    <section data-ui="wearable-dashboard-v42" aria-label="Panacea live health workspace" className="space-y-3">
+    <section data-ui="wearable-dashboard-v43" aria-label="Panacea live health workspace" className="space-y-3">
+      <HomeOverviewMosaic vitals={vitals} />
       <HomeHealthInstruments vitals={vitals} />
 
       <div className="grid grid-cols-4 gap-2" aria-label="Quick actions">
