@@ -3,6 +3,7 @@ import { BodyExplorer } from './BodyExplorer'
 import './bodyExposureOS.css'
 
 const BodyAllSystems3D = lazy(() => import('../components/BodyAllSystems3D'))
+const AtlasPhysiologyBridgePanel = lazy(() => import('./bodyhub/AtlasPhysiologyBridgePanel'))
 
 type ExposureMode = 'atlas' | 'physiology' | 'imaging' | 'surgery' | 'molecular' | 'clinical'
 
@@ -173,6 +174,12 @@ export function BodyExposureOS() {
       <div ref={systemsRef} className="relative z-[2] mt-3 scroll-mt-4">
         <Suspense fallback={<div className="grid min-h-44 place-items-center rounded-[26px] border border-white/[.08] bg-black/35 text-xs font-bold text-white/35">Loading system atlas…</div>}>
           <BodyAllSystems3D />
+        </Suspense>
+      </div>
+
+      <div className="relative z-[2] mt-3">
+        <Suspense fallback={<div className="grid min-h-32 place-items-center rounded-[26px] border border-white/[.08] bg-black/35 text-xs font-bold text-white/35">Loading anatomy-physiology bridge…</div>}>
+          <AtlasPhysiologyBridgePanel />
         </Suspense>
       </div>
 
