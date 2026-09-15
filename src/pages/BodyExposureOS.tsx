@@ -6,6 +6,7 @@ import './bodyExposureOS.css'
 
 const BodyAllSystems3D = lazy(() => import('../components/BodyAllSystems3D'))
 const AtlasPhysiologyBridgePanel = lazy(() => import('./bodyhub/AtlasPhysiologyBridgePanel'))
+const CardiacHemodynamicsWorkbench = lazy(() => import('./bodyhub/CardiacHemodynamicsWorkbench'))
 const PathophysiologyNetworkPanel = lazy(() => import('./bodyhub/PathophysiologyNetworkPanel'))
 const LesionLocalizationPanel = lazy(() => import('./bodyhub/LesionLocalizationPanel'))
 const DrugMechanismNetworkPanel = lazy(() => import('./bodyhub/DrugMechanismNetworkPanel'))
@@ -106,7 +107,8 @@ export function BodyExposureOS() {
               <span className="text-[10px] font-black uppercase tracking-[.24em] text-cyan-200">Body Exposure · Human Body OS</span>
               <span className="rounded-full border border-white/10 bg-white/[.045] px-2.5 py-1 text-[9px] font-black uppercase tracking-[.14em] text-white/60">whole-body first</span>
               <span className="rounded-full border border-violet-300/10 bg-violet-300/[.045] px-2.5 py-1 text-[9px] font-black uppercase tracking-[.14em] text-violet-100/65">11-system source atlas</span>
-              <span className="rounded-full border border-rose-300/10 bg-rose-300/[.045] px-2.5 py-1 text-[9px] font-black uppercase tracking-[.14em] text-rose-100/65">pathophysiology</span>
+              <span className="rounded-full border border-rose-300/10 bg-rose-300/[.045] px-2.5 py-1 text-[9px] font-black uppercase tracking-[.14em] text-rose-100/65">heart PV lab</span>
+              <span className="rounded-full border border-fuchsia-300/10 bg-fuchsia-300/[.045] px-2.5 py-1 text-[9px] font-black uppercase tracking-[.14em] text-fuchsia-100/65">pathophysiology</span>
               <span className="rounded-full border border-sky-300/10 bg-sky-300/[.045] px-2.5 py-1 text-[9px] font-black uppercase tracking-[.14em] text-sky-100/65">lesion localization</span>
               <span className="rounded-full border border-emerald-300/10 bg-emerald-300/[.045] px-2.5 py-1 text-[9px] font-black uppercase tracking-[.14em] text-emerald-100/65">drug mechanisms</span>
             </div>
@@ -114,7 +116,7 @@ export function BodyExposureOS() {
               One body. Every scale. One continuous learning space.
             </h2>
             <p className="mt-2 max-w-3xl text-sm font-medium leading-relaxed text-white/60 sm:text-[15px]">
-              Start from the complete human body, switch across major systems, isolate a structure, then move through physiology, pathophysiology, lesion localization, pharmacology, imaging, surgery, cells and molecular detail without leaving the same workspace.
+              Start from the complete human body, switch across major systems, then move into organ-level physiology, pathophysiology, lesion localization, pharmacology, imaging, surgery, cells and molecular detail without leaving the same workspace.
             </p>
           </div>
 
@@ -196,6 +198,12 @@ export function BodyExposureOS() {
       <div className="relative z-[2] mt-3">
         <Suspense fallback={<div className="grid min-h-32 place-items-center rounded-[26px] border border-white/[.08] bg-black/35 text-xs font-bold text-white/35">Loading anatomy-physiology bridge…</div>}>
           <AtlasPhysiologyBridgePanel selectedAtlasSystemId={selectedBodySystemId} onSystemChange={setSelectedBodySystemId} />
+        </Suspense>
+      </div>
+
+      <div className="relative z-[2] mt-3">
+        <Suspense fallback={<div className="grid min-h-40 place-items-center rounded-[28px] border border-white/[.08] bg-black/35 text-xs font-bold text-white/35">Loading cardiac hemodynamics lab…</div>}>
+          <CardiacHemodynamicsWorkbench selectedAtlasSystemId={selectedBodySystemId} />
         </Suspense>
       </div>
 
