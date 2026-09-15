@@ -33,7 +33,7 @@ const QUICK_KEYS = new Set<HomeView>(['home', 'learn', 'community', 'finance'])
 function Loader() {
   return (
     <div
-      className="grid min-h-[26vh] place-items-center rounded-[22px] border border-brand/20 bg-white text-sm font-black text-brand dark:bg-black"
+      className="grid min-h-[26vh] place-items-center rounded-[22px] border border-white/10 bg-black text-sm font-black text-brand shadow-none"
       role="status"
       aria-live="polite"
     >
