@@ -7,6 +7,7 @@ import './bodyExposureDesignAlignment.css'
 
 const BodyAllSystems3D = lazy(() => import('../components/BodyAllSystems3D'))
 const AtlasPhysiologyBridgePanel = lazy(() => import('./bodyhub/AtlasPhysiologyBridgePanel'))
+const BodySystemDeepDiveWorkspace = lazy(() => import('./bodyhub/BodySystemDeepDiveWorkspace'))
 const BodyIntelligenceWorkspace = lazy(() => import('./bodyhub/BodyIntelligenceWorkspace'))
 
 type ExposureMode = 'atlas' | 'physiology' | 'intelligence' | 'imaging' | 'surgery' | 'molecular' | 'clinical'
@@ -122,7 +123,7 @@ export function BodyExposureOS() {
               One body. Every scale. One continuous learning space.
             </h2>
             <p className="mt-2 max-w-3xl text-sm font-medium leading-relaxed text-white/60 sm:text-[15px]">
-              Begin with the complete human body as the spatial anchor, then move progressively into systems, physiology, mechanism, disease, pharmacology, evidence, imaging, surgery, cells and molecular detail without fragmenting the experience into unrelated pages.
+              Begin with the complete human body as the spatial anchor, then move progressively into systems, physiology, organ-specific function, mechanism, disease, pharmacology, evidence, imaging, surgery, cells and molecular detail without fragmenting the experience into unrelated pages.
             </p>
           </div>
 
@@ -204,6 +205,12 @@ export function BodyExposureOS() {
       <div className="relative z-[2] mt-3">
         <Suspense fallback={<div className="grid min-h-32 place-items-center rounded-[26px] border border-white/[.08] bg-black/35 text-xs font-bold text-white/35">Loading anatomy-physiology bridge…</div>}>
           <AtlasPhysiologyBridgePanel selectedAtlasSystemId={selectedBodySystemId} onSystemChange={setSelectedBodySystemId} />
+        </Suspense>
+      </div>
+
+      <div className="relative z-[2] mt-3">
+        <Suspense fallback={<div className="grid min-h-40 place-items-center rounded-[28px] border border-white/[.08] bg-black/35 text-xs font-bold text-white/35">Loading selected-system function deep dive…</div>}>
+          <BodySystemDeepDiveWorkspace selectedAtlasSystemId={selectedBodySystemId} />
         </Suspense>
       </div>
 
