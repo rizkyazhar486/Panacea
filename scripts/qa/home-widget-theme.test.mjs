@@ -11,6 +11,8 @@ const emergencyGuard = read('public/home-widget-dark-v31.css')
 const comfortGuard = read('src/styles/home-dark-comfort-v34.css')
 const activeGuard = read('src/styles/home-widget-active-v35.css')
 const mobileStability = read('src/styles/home-mobile-stability.css')
+const readabilityGuard = read('public/home-readability-v36.css')
+const higFoundation = read('public/panacea-hig-v41.css')
 const index = read('index.html')
 
 test('Living Instrument mounts the active source widget, not only the filtered index', () => {
@@ -45,7 +47,7 @@ test('Final-authority Dark Home guard loads after the general Home contrast laye
   const darkGuard = index.indexOf('/home-widget-dark-v31.css?v=20260909-1')
   assert.ok(contrast >= 0, 'Home contrast layer must remain registered')
   assert.ok(darkGuard > contrast, 'Dark widget guard must load after the general contrast layer')
-  assert.match(index, /MAINTENANCE_VERSION = '20260909-v33'/)
+  assert.match(index, /MAINTENANCE_VERSION = '20260915-v42'/)
 })
 
 test('Home v34 removes decorative outline leakage without recoloring semantic data', () => {
@@ -101,4 +103,19 @@ test('Mobile loading cards stay explicit black-green instead of gray placeholder
   assert.match(mobileStability, /\.home-loading-card\s*\{[^}]*background:\s*#000\s*!important/s)
   assert.match(mobileStability, /\.home-loading-card\s*\{[^}]*border-color:\s*rgba\(0,\s*191,\s*99,\s*\.22\)\s*!important/s)
   assert.match(mobileStability, /\.home-loading-card \[aria-hidden="true"\] > div\s*\{[^}]*background:\s*rgba\(0,\s*191,\s*99,\s*\.18\)\s*!important/s)
+})
+
+test('HIG v41 is loaded once as the final Home cascade and keeps comfort fallbacks', () => {
+  const readability = index.indexOf('/home-readability-v36.css?v=20260915-2')
+  const hig = index.indexOf('/panacea-hig-v41.css?v=20260915-1')
+  assert.ok(readability >= 0, 'Home readability guard must remain registered')
+  assert.ok(hig > readability, 'HIG foundation must load after the final Home legacy guard')
+  assert.doesNotMatch(readabilityGuard, /@import\s+url\([^)]*panacea-hig-v41/, 'HIG foundation must not be loaded twice')
+  assert.match(higFoundation, /--pmd-ease-spring:/)
+  assert.match(higFoundation, /\.pmd-control-material/)
+  assert.match(higFoundation, /prefers-reduced-motion/)
+  assert.match(higFoundation, /html\.pmd-low-memory/)
+  assert.match(readabilityGuard, /--pmd-v36-panel:#050b14/)
+  assert.match(readabilityGuard, /--pmd-v36-card:#08111d/)
+  assert.doesNotMatch(readabilityGuard, /--pmd-v36-panel:#f8fafc/)
 })
