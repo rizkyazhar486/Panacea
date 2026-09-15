@@ -47,7 +47,7 @@ test('Final-authority Dark Home guard loads after the general Home contrast laye
   const darkGuard = index.indexOf('/home-widget-dark-v31.css?v=20260909-1')
   assert.ok(contrast >= 0, 'Home contrast layer must remain registered')
   assert.ok(darkGuard > contrast, 'Dark widget guard must load after the general contrast layer')
-  assert.match(index, /MAINTENANCE_VERSION = '20260915-v41'/)
+  assert.match(index, /MAINTENANCE_VERSION = '20260915-v42'/)
 })
 
 test('Home v34 removes decorative outline leakage without recoloring semantic data', () => {
@@ -105,8 +105,12 @@ test('Mobile loading cards stay explicit black-green instead of gray placeholder
   assert.match(mobileStability, /\.home-loading-card \[aria-hidden="true"\] > div\s*\{[^}]*background:\s*rgba\(0,\s*191,\s*99,\s*\.18\)\s*!important/s)
 })
 
-test('HIG v41 is wired through the final Home cascade and keeps comfort fallbacks', () => {
-  assert.match(readabilityGuard, /@import url\('\/panacea-hig-v41\.css\?v=20260915-2'\);/)
+test('HIG v41 is loaded once as the final Home cascade and keeps comfort fallbacks', () => {
+  const readability = index.indexOf('/home-readability-v36.css?v=20260915-2')
+  const hig = index.indexOf('/panacea-hig-v41.css?v=20260915-1')
+  assert.ok(readability >= 0, 'Home readability guard must remain registered')
+  assert.ok(hig > readability, 'HIG foundation must load after the final Home legacy guard')
+  assert.doesNotMatch(readabilityGuard, /@import\s+url\([^)]*panacea-hig-v41/, 'HIG foundation must not be loaded twice')
   assert.match(higFoundation, /--pmd-ease-spring:/)
   assert.match(higFoundation, /\.pmd-control-material/)
   assert.match(higFoundation, /prefers-reduced-motion/)
