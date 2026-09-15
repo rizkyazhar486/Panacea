@@ -209,3 +209,245 @@ html.pmd-low-memory #pmd-liquid-press-layer {
     transform: none !important;
   }
 }
+
+/* ──────────────────────────────────────────────────────────────────────────
+   Professional Dark Mode pass — 2026-09-16
+
+   Rules distilled from the supplied dark-mode guide:
+   1) never use pure black as the working canvas;
+   2) blend restrained light into the canvas rather than painting neon blocks;
+   3) mute chroma so data, anatomy and controls remain the focal points;
+   4) derive text hierarchy from white + opacity instead of unrelated greys;
+   5) make hover / focus / active / selected states unmistakable.
+
+   This is deliberately an override layer. It does not alter application logic,
+   routes, data, medical semantics, or feature ownership.
+   ────────────────────────────────────────────────────────────────────────── */
+
+html.dark {
+  --pmd-dark-canvas: #111019;
+  --pmd-dark-canvas-tint: #12131d;
+  --pmd-dark-surface: #171821;
+  --pmd-dark-surface-raised: #1d1e29;
+  --pmd-dark-surface-strong: #232430;
+  --pmd-dark-edge: rgba(255,255,255,.10);
+  --pmd-dark-edge-strong: rgba(255,255,255,.18);
+  --pmd-dark-text-100: rgba(255,255,255,.96);
+  --pmd-dark-text-88: rgba(255,255,255,.88);
+  --pmd-dark-text-76: rgba(255,255,255,.76);
+  --pmd-dark-text-64: rgba(255,255,255,.64);
+  --pmd-dark-text-52: rgba(255,255,255,.52);
+  --pmd-dark-text-46: rgba(255,255,255,.46);
+  --pmd-dark-cyan: #7ecad2;
+  --pmd-dark-blue: #849fd4;
+  --pmd-dark-violet: #aa91d0;
+  --pmd-dark-magenta: #c58eae;
+  --pmd-dark-green: #77bfa3;
+  --pmd-dark-amber: #c8aa72;
+  --pmd-focus-ring: rgba(155, 205, 220, .78);
+  --pmd-action-cyan: rgba(126, 202, 210, .72);
+  --pmd-action-violet: rgba(170, 145, 208, .46);
+  --pmd-action-edge: rgba(255,255,255,.18);
+  color-scheme: dark;
+}
+
+/* Advice 1 + 2: gray-ish / subtly tinted black with restrained blended light. */
+html.dark body {
+  background-color: var(--pmd-dark-canvas) !important;
+  background-image:
+    radial-gradient(60% 42% at 88% -4%, rgba(108, 123, 196, .12) 0%, rgba(108, 123, 196, .04) 42%, transparent 72%),
+    radial-gradient(52% 44% at 8% 108%, rgba(83, 161, 157, .08) 0%, transparent 68%),
+    linear-gradient(180deg, #13121c 0%, var(--pmd-dark-canvas) 52%, #12121a 100%) !important;
+  background-blend-mode: screen, screen, normal;
+  color: var(--pmd-dark-text-88) !important;
+}
+
+/* Inline splash previously used an almost-pure black. Keep it premium but not #000. */
+html.dark #pmd-splash {
+  background:
+    radial-gradient(34rem 26rem at 50% 36%, rgba(111, 145, 195, .13), transparent 66%),
+    radial-gradient(28rem 22rem at 70% 62%, rgba(155, 127, 189, .08), transparent 68%),
+    var(--pmd-dark-canvas) !important;
+}
+
+/* Re-map literal black utilities to the same dark tonal family. */
+html.dark .bg-black,
+html.dark .bg-black\/95,
+html.dark .bg-black\/90,
+html.dark .bg-black\/80,
+html.dark .bg-ink {
+  background-color: var(--pmd-dark-canvas) !important;
+}
+
+html.dark .bg-neutral-950,
+html.dark .bg-neutral-900,
+html.dark .bg-slate-950,
+html.dark .bg-slate-900 {
+  background-color: var(--pmd-dark-surface) !important;
+}
+
+html.dark .bg-neutral-800,
+html.dark .bg-slate-800,
+html.dark .bg-white {
+  background-color: var(--pmd-dark-surface-raised) !important;
+}
+
+html.dark .bg-neutral-700,
+html.dark .bg-slate-700 {
+  background-color: var(--pmd-dark-surface-strong) !important;
+}
+
+/* Advice 4: white + opacity creates a coherent hierarchy on every tinted dark surface. */
+html.dark .text-white,
+html.dark .text-ink,
+html.dark .text-neutral-50,
+html.dark .text-slate-50 {
+  color: var(--pmd-dark-text-100) !important;
+}
+
+html.dark .text-neutral-100,
+html.dark .text-neutral-200,
+html.dark .text-slate-100,
+html.dark .text-slate-200,
+html.dark .text-neutral-900,
+html.dark .text-slate-900 {
+  color: var(--pmd-dark-text-88) !important;
+}
+
+html.dark .text-neutral-300,
+html.dark .text-slate-300,
+html.dark .text-neutral-800,
+html.dark .text-slate-800 {
+  color: var(--pmd-dark-text-76) !important;
+}
+
+html.dark .text-neutral-400,
+html.dark .text-slate-400,
+html.dark .text-neutral-700,
+html.dark .text-slate-700 {
+  color: var(--pmd-dark-text-64) !important;
+}
+
+html.dark .text-neutral-500,
+html.dark .text-slate-500,
+html.dark .text-neutral-600,
+html.dark .text-slate-600 {
+  color: var(--pmd-dark-text-52) !important;
+}
+
+/* Advice 3: desaturated semantic accents — still identifiable, less dirty on dark. */
+html.dark .text-cyan-300,
+html.dark .text-cyan-400,
+html.dark .text-sky-300,
+html.dark .text-sky-400 { color: var(--pmd-dark-cyan) !important; }
+html.dark .text-blue-300,
+html.dark .text-blue-400 { color: var(--pmd-dark-blue) !important; }
+html.dark .text-violet-300,
+html.dark .text-violet-400,
+html.dark .text-purple-300,
+html.dark .text-purple-400 { color: var(--pmd-dark-violet) !important; }
+html.dark .text-fuchsia-300,
+html.dark .text-fuchsia-400,
+html.dark .text-pink-300,
+html.dark .text-pink-400 { color: var(--pmd-dark-magenta) !important; }
+html.dark .text-emerald-300,
+html.dark .text-emerald-400,
+html.dark .text-green-300,
+html.dark .text-green-400,
+html.dark .text-teal-300,
+html.dark .text-teal-400 { color: var(--pmd-dark-green) !important; }
+html.dark .text-amber-300,
+html.dark .text-amber-400,
+html.dark .text-orange-300,
+html.dark .text-orange-400 { color: var(--pmd-dark-amber) !important; }
+
+/* Dark surfaces should read as layers, not separate grey rectangles. */
+html.dark .kaca,
+html.dark [data-pmd-glass],
+html.dark .pmd-glass,
+html.dark .pmd-liquid-card {
+  background:
+    linear-gradient(180deg, rgba(255,255,255,.035), transparent 44%),
+    color-mix(in srgb, var(--pmd-dark-surface) 88%, transparent) !important;
+  border-color: var(--pmd-dark-edge) !important;
+  box-shadow:
+    0 18px 54px rgba(3, 4, 10, .22),
+    inset 0 1px 0 rgba(255,255,255,.055) !important;
+}
+
+/* Forms: quiet by default, obvious while being used. */
+html.dark :where(input, textarea, select) {
+  background-color: rgba(255,255,255,.035) !important;
+  color: var(--pmd-dark-text-88) !important;
+  border-color: var(--pmd-dark-edge) !important;
+  caret-color: var(--pmd-dark-text-100);
+}
+
+html.dark :where(input, textarea)::placeholder {
+  color: var(--pmd-dark-text-46) !important;
+}
+
+/* Advice 5: universal state language. Do not rely on subtle color-only changes. */
+html.dark :where(button, a[href], [role='button'], [role='tab'], [data-pmd-liquid-action]) {
+  outline-color: transparent;
+  -webkit-tap-highlight-color: transparent;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  html.dark :where(button, a[href], [role='button'], [role='tab'], [data-pmd-liquid-action]):not(:disabled):not([aria-disabled='true']):hover {
+    filter: brightness(1.075) saturate(.94) !important;
+    box-shadow:
+      0 0 0 1px rgba(255,255,255,.10),
+      0 12px 34px rgba(26, 33, 58, .18) !important;
+  }
+}
+
+html.dark :where(button, a[href], [role='button'], [role='tab'], input, textarea, select, [data-pmd-liquid-action]):focus-visible {
+  outline: 2px solid var(--pmd-focus-ring) !important;
+  outline-offset: 3px !important;
+  box-shadow:
+    0 0 0 4px rgba(126, 202, 210, .10),
+    0 10px 28px rgba(23, 27, 46, .18) !important;
+}
+
+html.dark :where(button, a[href], [role='button'], [role='tab'], [data-pmd-liquid-action]):active,
+html.dark [data-pmd-liquid-action].pmd-liquid-pressed {
+  filter: brightness(1.11) saturate(.90) !important;
+  box-shadow:
+    0 0 0 1px rgba(255,255,255,.15),
+    inset 0 1px 0 rgba(255,255,255,.08) !important;
+}
+
+html.dark :where([aria-current='page'], [aria-selected='true'], [aria-pressed='true'], [data-state='active']) {
+  border-color: rgba(164, 190, 218, .30) !important;
+  box-shadow:
+    0 0 0 1px rgba(164, 190, 218, .15),
+    0 12px 34px rgba(86, 104, 154, .12) !important;
+}
+
+/* Keep fluorescent light as a highlight, never the dominant fill. */
+html.dark .shadow-cyan-500\/20,
+html.dark .shadow-violet-500\/20,
+html.dark .shadow-purple-500\/20,
+html.dark .shadow-fuchsia-500\/20 {
+  --tw-shadow-color: rgba(126, 202, 210, .12) !important;
+}
+
+/* Accessibility: users asking for more contrast get clearer boundaries without
+   reverting to hard pure-black / pure-grey blocks. */
+@media (prefers-contrast: more) {
+  html.dark {
+    --pmd-dark-edge: rgba(255,255,255,.18);
+    --pmd-dark-edge-strong: rgba(255,255,255,.26);
+    --pmd-dark-text-52: rgba(255,255,255,.64);
+  }
+  html.dark :where(button, a[href], [role='button'], [role='tab'], input, textarea, select) {
+    border-color: var(--pmd-dark-edge-strong) !important;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html.dark :where(button, a[href], [role='button'], [role='tab'], input, textarea, select, [data-pmd-liquid-action]) {
+    transition: none !important;
+  }
+}
