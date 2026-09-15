@@ -1,33 +1,36 @@
 /* Panacea Home readability guard v36
    Final-authority Home-only accessibility layer.
    Presentation only: no health calculations, routes, storage, chart semantics,
-   clinical meaning, loading behavior, or animation logic is changed. */
+   clinical meaning, loading behavior, or animation logic is changed.
+
+   v41 alignment: this layer consumes the HIG semantic palette. The HIG
+   foundation itself is loaded once, explicitly after all Home legacy layers in
+   index.html, so browser parsing and cascade order stay deterministic. */
 
 .panacea-home{
-  --pmd-v36-text:#111827;
-  --pmd-v36-secondary:#374151;
-  --pmd-v36-muted:#4b5563;
-  --pmd-v36-subtle:#64748b;
-  --pmd-v36-panel:#f8fafc;
-  --pmd-v36-card:#ffffff;
-  --pmd-v36-border:rgba(15,23,42,.15);
-  --pmd-v36-border-strong:rgba(15,23,42,.22);
+  --pmd-v36-text:var(--pmd-text,#f8fbff);
+  --pmd-v36-secondary:var(--pmd-text-2,rgba(238,247,255,.78));
+  --pmd-v36-muted:rgba(224,238,249,.68);
+  --pmd-v36-subtle:rgba(224,238,249,.56);
+  --pmd-v36-panel:#050b14;
+  --pmd-v36-card:#08111d;
+  --pmd-v36-border:rgba(135,204,255,.13);
+  --pmd-v36-border-strong:rgba(77,231,255,.28);
 }
 
 .dark .panacea-home{
-  --pmd-v36-text:#f8fafc;
-  --pmd-v36-secondary:#e2e8f0;
-  --pmd-v36-muted:#cbd5e1;
-  --pmd-v36-subtle:#b6c2d0;
-  --pmd-v36-panel:#08101a;
-  --pmd-v36-card:#111925;
-  --pmd-v36-border:rgba(255,255,255,.14);
-  --pmd-v36-border-strong:rgba(255,255,255,.22);
+  --pmd-v36-text:var(--pmd-text,#f8fbff);
+  --pmd-v36-secondary:var(--pmd-text-2,rgba(238,247,255,.78));
+  --pmd-v36-muted:rgba(224,238,249,.68);
+  --pmd-v36-subtle:rgba(224,238,249,.56);
+  --pmd-v36-panel:#050b14;
+  --pmd-v36-card:#08111d;
+  --pmd-v36-border:rgba(135,204,255,.13);
+  --pmd-v36-border-strong:rgba(77,231,255,.28);
 }
 
 /* Neutral utility text is descriptive UI copy, not a semantic health colour.
-   These overrides intentionally leave emerald/rose/amber/blue/etc. data tones
-   untouched. */
+   Semantic emerald/rose/amber/blue/etc. data tones remain untouched. */
 .panacea-home :is(.text-neutral-950,.text-neutral-900,.text-neutral-800,.text-neutral-700,.text-ink){
   color:var(--pmd-v36-text)!important;
 }
@@ -41,44 +44,46 @@
   color:var(--pmd-v36-subtle)!important;
 }
 
-/* Restore visible depth between page -> panel -> widget. Previous translucent
-   dark surfaces could be only a few luminance points apart. */
+/* Page -> panel -> widget depth. No grey card fallback. */
 .panacea-home .home-command-panel,
 .panacea-home .home-loading-card{
-  background:var(--pmd-v36-panel)!important;
+  background:
+    linear-gradient(155deg,rgba(79,140,255,.035),transparent 38%),
+    var(--pmd-v36-panel)!important;
   border:1px solid var(--pmd-v36-border)!important;
 }
 
 .panacea-home :is(.home-action-card,.home-signal-card){
-  background:var(--pmd-v36-card)!important;
+  background:
+    radial-gradient(circle at 90% 0%,rgba(79,140,255,.07),transparent 38%),
+    var(--pmd-v36-card)!important;
   border:1px solid var(--pmd-v36-border)!important;
 }
 
 .dark .panacea-home .home-action-card,
 .dark .panacea-home .home-signal-card{
   background:
-    radial-gradient(circle at 84% 16%,rgba(49,130,255,.10),transparent 38%),
+    radial-gradient(circle at 90% 0%,rgba(77,231,255,.075),transparent 38%),
     var(--pmd-v36-card)!important;
   border-color:var(--pmd-v36-border)!important;
 }
 
 .panacea-home .home-command-panel .kaca,
 .panacea-home .widget-instrument-slide-v5 .kaca{
-  background:var(--pmd-v36-card)!important;
+  background:#07101c!important;
   border:1px solid var(--pmd-v36-border)!important;
 }
 
 .dark .panacea-home .widget-instrument-shell-v5{
-  background:#070b11!important;
+  background:#030812!important;
   border-color:var(--pmd-v36-border)!important;
 }
 .dark .panacea-home .widget-instrument-slide-v5 .kaca{
-  background:var(--pmd-v36-card)!important;
+  background:#07101c!important;
   border-color:var(--pmd-v36-border)!important;
 }
 
-/* Small Home labels were technically present but visually fragile on phones.
-   Increase only reading-critical labels; layout dimensions remain unchanged. */
+/* Small Home labels remain readable on phones. */
 .panacea-home .home-action-card>span:nth-child(2)>span:first-child{
   color:var(--pmd-v36-text)!important;
   font-size:12px!important;
@@ -98,10 +103,10 @@
   color:var(--pmd-v36-muted);
 }
 
-/* Inputs and placeholders remain explicit against either Home theme. */
+/* Inputs and placeholders remain explicit against the dark Home material. */
 .panacea-home :is(input,select,textarea):not([type='range']):not([type='checkbox']):not([type='radio']){
   color:var(--pmd-v36-text)!important;
-  background:var(--pmd-v36-card)!important;
+  background:#06101b!important;
   border-color:var(--pmd-v36-border-strong)!important;
 }
 .panacea-home :is(input,textarea)::placeholder{
@@ -109,23 +114,19 @@
   opacity:1!important;
 }
 
-/* Keyboard and switch-control users should never have to infer focus from a
-   tiny colour change. */
+/* Keyboard and switch-control users get one luminous focus language. */
 .panacea-home :is(a,button,input,select,textarea,summary):focus-visible{
-  outline:3px solid #00bf63!important;
+  outline:3px solid var(--pmd-cyan,#4de7ff)!important;
   outline-offset:2px!important;
 }
 
 @media (prefers-contrast:more){
-  .panacea-home{
-    --pmd-v36-muted:#334155;
-    --pmd-v36-subtle:#475569;
-    --pmd-v36-border:rgba(15,23,42,.28);
-  }
+  .panacea-home,
   .dark .panacea-home{
-    --pmd-v36-muted:#e2e8f0;
-    --pmd-v36-subtle:#cbd5e1;
+    --pmd-v36-muted:rgba(255,255,255,.90);
+    --pmd-v36-subtle:rgba(255,255,255,.78);
     --pmd-v36-border:rgba(255,255,255,.30);
+    --pmd-v36-border-strong:rgba(77,231,255,.62);
   }
 }
 
