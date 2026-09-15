@@ -4,6 +4,7 @@ import {
   BODY_SYSTEM_PHYSIOLOGY_BRIDGE,
   BODY_SYSTEM_PHYSIOLOGY_BRIDGE_BOUNDARY,
   getBodySystemPhysiologyBridge,
+  resolveBodySystemIdFromAtlasLabel,
 } from '../../src/lib/bodySystemPhysiologyBridge.ts'
 import { getWholeBodySystem } from '../../src/lib/wholeBodyPhysiologyOS.ts'
 
@@ -14,6 +15,7 @@ for (const atlasSystem of BODY_SYSTEM_SOURCE_WAVE) {
   const bridge = getBodySystemPhysiologyBridge(atlasSystem.id)
   assert.ok(bridge.physiologySystemIds.length >= 1, `${atlasSystem.id} needs at least one physiology destination`)
   assert.ok(bridge.rationale.length >= 40, `${atlasSystem.id} bridge needs an explicit rationale`)
+  assert.equal(resolveBodySystemIdFromAtlasLabel(atlasSystem.label), atlasSystem.id, `${atlasSystem.label} must resolve back to its stable source id`)
   for (const physiologyId of bridge.physiologySystemIds) getWholeBodySystem(physiologyId)
 }
 
@@ -23,9 +25,12 @@ assert.deepEqual(getBodySystemPhysiologyBridge('integumentary-surface').physiolo
 assert.equal(getBodySystemPhysiologyBridge('sensory-ent').fidelity, 'contextual', 'sensory/ENT must not be misrepresented as a direct one-to-one physiology domain')
 assert.ok(getBodySystemPhysiologyBridge('digestive').physiologySystemIds.includes('hepatic-metabolic'), 'digestive bridge must preserve hepatometabolic coupling')
 assert.ok(getBodySystemPhysiologyBridge('reproductive').physiologySystemIds.includes('endocrine'), 'reproductive bridge must preserve endocrine coupling')
+assert.equal(resolveBodySystemIdFromAtlasLabel('  Cardiovascular  '), 'cardiovascular')
+assert.equal(resolveBodySystemIdFromAtlasLabel('not-a-system'), null)
+assert.equal(resolveBodySystemIdFromAtlasLabel(null), null)
 
 assert.match(BODY_SYSTEM_PHYSIOLOGY_BRIDGE_BOUNDARY, /educational navigation relationships/i)
 assert.match(BODY_SYSTEM_PHYSIOLOGY_BRIDGE_BOUNDARY, /not claims/i)
 assert.match(BODY_SYSTEM_PHYSIOLOGY_BRIDGE_BOUNDARY, /clinical function/i)
 
-console.log('body system physiology bridge: 11/11 source-atlas systems mapped with explicit fidelity and educational boundary')
+console.log('body system physiology bridge: 11/11 source-atlas systems mapped with explicit fidelity, tested label resolver, and educational boundary')
