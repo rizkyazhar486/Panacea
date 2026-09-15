@@ -5,6 +5,7 @@ import {
   evidenceReadiness,
   type DiscoveryMode,
 } from '../../lib/discoveryWorkbench'
+import { FutureSignalsRadar } from './FutureSignalsRadar'
 
 const SynapseMicro3DLab = lazy(() => import('../../pages/discovery/SynapseMicro3DLab'))
 
@@ -142,8 +143,11 @@ export function DiscoveryWorkbench() {
       )}
 
       {mode === 'innovation' && (
-        <div className="grid gap-3 md:grid-cols-2">
-          {challenge.innovationCandidates.map((item) => <article key={item} className="rounded-2xl border border-neutral-200 p-4 dark:border-white/10"><div className="text-sm font-black text-ink dark:text-white">{item}</div><p className="mt-2 text-xs leading-relaxed text-neutral-500">Candidate concept only. Promotion requires evidence, assumptions, failure modes, safety analysis and a prospective validation plan.</p></article>)}
+        <div className="space-y-4">
+          <div className="grid gap-3 md:grid-cols-2">
+            {challenge.innovationCandidates.map((item) => <article key={item} className="rounded-2xl border border-neutral-200 p-4 dark:border-white/10"><div className="text-sm font-black text-ink dark:text-white">{item}</div><p className="mt-2 text-xs leading-relaxed text-neutral-500">Candidate concept only. Promotion requires evidence, assumptions, failure modes, safety analysis and a prospective validation plan.</p></article>)}
+          </div>
+          <FutureSignalsRadar />
         </div>
       )}
 
