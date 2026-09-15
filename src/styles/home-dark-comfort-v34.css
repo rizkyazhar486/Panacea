@@ -131,3 +131,42 @@ html.pmd-low-memory .panacea-home :is(.widget-instrument-edit-v5,.widget-instrum
   .panacea-home{--pmd-calm-border:rgba(255,255,255,.22)}
   html.dark .panacea-home,.dark .panacea-home{--pmd-calm-border:rgba(255,255,255,.22)}
 }
+
+/* 2026-09-15 v36 authority: the user-facing Home must read as black, not gray.
+   Keep the legacy variables above for QA compatibility; these final values win
+   in the cascade and deliberately avoid translucent gray stacking on iOS. */
+.panacea-home,
+html.dark .panacea-home,
+.dark .panacea-home{
+  --pmd-calm-surface:#05080d;
+  --pmd-calm-border:rgba(255,255,255,.10);
+}
+.panacea-home .kaca,
+.panacea-home .widget-instrument-shell-v5,
+.panacea-home .widget-instrument-scroll-v5{
+  background-color:#05080d!important;
+  background-image:none!important;
+}
+.panacea-home .widget-instrument-count-v5,
+.panacea-home .widget-instrument-nav-v5{
+  background:#080d13!important;
+}
+
+@media(max-width:430px){
+  .panacea-home{
+    overflow-x:hidden!important;
+  }
+  .panacea-home .widget-instrument-v5,
+  .panacea-home .widget-instrument-shell-v5,
+  .panacea-home .widget-instrument-scroll-v5,
+  .panacea-home .widget-instrument-slide-v5{
+    min-width:0!important;
+    max-width:100%!important;
+  }
+  .panacea-home .widget-instrument-head-v5{
+    padding-inline:2px!important;
+  }
+  .panacea-home .widget-instrument-tools-v5{
+    justify-content:space-between!important;
+  }
+}
