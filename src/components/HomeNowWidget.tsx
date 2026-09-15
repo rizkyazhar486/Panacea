@@ -20,9 +20,9 @@ export function HomeNowWidget() {
           <Link
             key={action.to}
             to={action.to}
-            className="flex min-h-[58px] flex-col items-center justify-center gap-1 rounded-[16px] border border-brand bg-black px-2 text-center text-white transition hover:bg-brand hover:text-black active:scale-[.97] active:bg-brand active:text-black focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand"
+            className="group flex min-h-[58px] flex-col items-center justify-center gap-1 rounded-[16px] border border-brand bg-black px-2 text-center text-white transition hover:bg-brand hover:text-black active:scale-[.97] active:bg-brand active:text-black focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand"
           >
-            <span className="text-[17px] font-black leading-none text-brand group-hover:text-black" aria-hidden>{action.glyph}</span>
+            <span className="text-[17px] font-black leading-none text-brand group-hover:text-black group-active:text-black" aria-hidden>{action.glyph}</span>
             <span className="text-[10px] font-black leading-none">{action.title}</span>
           </Link>
         ))}
