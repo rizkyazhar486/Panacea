@@ -1,8 +1,8 @@
-/* Panacea Home widget dark-surface guard v37
+/* Panacea Home widget dark-surface guard v38
    Scoped companion to the public final-authority guard. Keeps Living Instrument
    loading and card surfaces readable without changing widget data or logic.
-   v37 additionally guards Safari/PWA theme-restoration and empty-active-slide
-   races so Dark Mode can never expose a blank light-gray canvas. */
+   v38 hard-locks the active Home widget preview to a dark, fully opaque surface
+   so app-theme restoration can never expose the pale-gray slab seen on iOS. */
 
 .widget-instrument-loading-v29{
   min-height:132px;
@@ -233,4 +233,71 @@ html.pmd-low-memory.dark .panacea-home :is(.widget-instrument-shell-v5,.widget-i
   filter:none!important;
   -webkit-backdrop-filter:none!important;
   backdrop-filter:none!important;
+}
+
+/* ──────────────────────────────────────────────────────────────────────────
+   v38 FINAL AUTHORITY — remove the pale-gray active widget surface everywhere.
+   This deliberately does not depend on `.dark`, `color-scheme`, or OS theme.
+   The Home living-instrument preview is a dark product surface in every theme.
+   Only the preview chrome/surface is touched; widget data and behavior are not.
+   ────────────────────────────────────────────────────────────────────────── */
+.panacea-home .widget-instrument-shell-v5{
+  background:#070b11!important;
+  background-image:linear-gradient(155deg,#0d121a 0%,#070b11 100%)!important;
+  background-color:#070b11!important;
+  border-color:rgba(255,255,255,.10)!important;
+  color:#f8fafc!important;
+  color-scheme:dark!important;
+  opacity:1!important;
+  filter:none!important;
+  mix-blend-mode:normal!important;
+  -webkit-backdrop-filter:none!important;
+  backdrop-filter:none!important;
+}
+.panacea-home .widget-instrument-shell-v5::before,
+.panacea-home .widget-instrument-shell-v5::after{
+  content:none!important;
+  display:none!important;
+}
+.panacea-home .widget-instrument-scroll-v5,
+.panacea-home .widget-instrument-slide-v5,
+.panacea-home .widget-instrument-slide-v5[aria-hidden='false'] > *{
+  background:transparent!important;
+  background-image:none!important;
+  opacity:1!important;
+  filter:none!important;
+  mix-blend-mode:normal!important;
+  -webkit-backdrop-filter:none!important;
+  backdrop-filter:none!important;
+}
+.panacea-home .widget-instrument-slide-v5[aria-hidden='false'] > .widget-instrument-loading-v29,
+.panacea-home .widget-instrument-slide-v5[aria-hidden='false'] section > .kaca,
+.panacea-home .widget-instrument-slide-v5[aria-hidden='false'] > .kaca{
+  background:#0b1119!important;
+  background-image:none!important;
+  background-color:#0b1119!important;
+  border-color:rgba(255,255,255,.08)!important;
+  color:#f8fafc!important;
+  box-shadow:none!important;
+  opacity:1!important;
+  filter:none!important;
+  mix-blend-mode:normal!important;
+  -webkit-backdrop-filter:none!important;
+  backdrop-filter:none!important;
+  color-scheme:dark!important;
+}
+.panacea-home .widget-instrument-slide-v5[aria-hidden='false'] .kaca::before,
+.panacea-home .widget-instrument-slide-v5[aria-hidden='false'] .kaca::after{
+  display:none!important;
+}
+.panacea-home .widget-instrument-slide-v5[aria-hidden='false'] :is(.text-neutral-950,.text-neutral-900,.text-neutral-800,.text-neutral-700,.text-ink){
+  color:#f8fafc!important;
+}
+.panacea-home .widget-instrument-slide-v5[aria-hidden='false'] .text-neutral-600{color:#dde6ef!important}
+.panacea-home .widget-instrument-slide-v5[aria-hidden='false'] :is(.text-neutral-500,.text-neutral-400){color:#b8c3cf!important}
+.panacea-home .widget-instrument-slide-v5[aria-hidden='false']:empty{
+  background:#0a0f16!important;
+  background-image:none!important;
+  border-color:rgba(255,255,255,.07)!important;
+  color:#dbe7ef!important;
 }
