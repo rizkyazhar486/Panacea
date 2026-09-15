@@ -104,9 +104,92 @@
   transition: opacity var(--be-normal) var(--be-ease), transform var(--be-spatial) var(--be-ease-spring);
 }
 
+/* Legacy BodyExplorer control rails now inherit the same control-material
+   grammar. This deliberately does not rewrite BodyExplorer logic or hide tabs;
+   it only removes the remaining grey/light visual island under the new OS. */
+.body-exposure-os__core [role="group"][aria-label="Panel groups"] {
+  scrollbar-width: none;
+}
+
+.body-exposure-os__core [role="group"][aria-label="Panel groups"]::-webkit-scrollbar {
+  display: none;
+}
+
+.body-exposure-os__core [role="group"][aria-label="Panel groups"] > button {
+  border: 1px solid transparent;
+  background: rgba(255,255,255,.025) !important;
+  color: rgba(224,238,249,.48) !important;
+  transition:
+    transform var(--be-fast) var(--be-ease-spring),
+    border-color var(--be-normal) var(--be-ease),
+    background var(--be-normal) var(--be-ease),
+    color var(--be-normal) var(--be-ease);
+}
+
+.body-exposure-os__core [role="group"][aria-label="Panel groups"] > button[aria-pressed="true"] {
+  border-color: rgba(var(--be-cyan), .22);
+  background:
+    linear-gradient(135deg, rgba(var(--be-cyan), .13), rgba(var(--be-violet), .085)) !important;
+  color: rgba(248,251,255,.92) !important;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.08), 0 8px 24px rgba(0,0,0,.16);
+}
+
+.body-exposure-os__core [role="group"][aria-label="Panel groups"] > button:active {
+  transform: scale(.985);
+}
+
+/* The panel-tab rail is the immediate sibling of the group-jump rail in
+   BodyExplorer. It remains horizontally scrollable and all panels remain
+   rendered/reachable; only its material and active state are normalized. */
+.body-exposure-os__core [role="group"][aria-label="Panel groups"] + div {
+  border: 1px solid var(--be-border-soft);
+  background:
+    linear-gradient(135deg, rgba(255,255,255,.05), rgba(255,255,255,.018)),
+    var(--pmd-material, rgba(8,18,31,.72)) !important;
+  -webkit-backdrop-filter: blur(16px) saturate(145%);
+  backdrop-filter: blur(16px) saturate(145%);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.08), var(--be-shadow-1);
+  scrollbar-width: none;
+}
+
+.body-exposure-os__core [role="group"][aria-label="Panel groups"] + div::-webkit-scrollbar {
+  display: none;
+}
+
+.body-exposure-os__core [role="group"][aria-label="Panel groups"] + div > button {
+  border: 1px solid transparent;
+  background: transparent !important;
+  color: rgba(224,238,249,.48) !important;
+  box-shadow: none !important;
+  transition:
+    transform var(--be-fast) var(--be-ease-spring),
+    border-color var(--be-normal) var(--be-ease),
+    background var(--be-normal) var(--be-ease),
+    color var(--be-normal) var(--be-ease);
+}
+
+.body-exposure-os__core [role="group"][aria-label="Panel groups"] + div > button[aria-pressed="true"] {
+  border-color: rgba(var(--be-cyan), .18);
+  background:
+    linear-gradient(135deg, rgba(var(--be-cyan), .10), rgba(var(--be-violet), .065)) !important;
+  color: rgba(248,251,255,.9) !important;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.075), 0 8px 20px rgba(0,0,0,.14) !important;
+}
+
+.body-exposure-os__core [role="group"][aria-label="Panel groups"] + div > button:hover {
+  border-color: rgba(255,255,255,.08);
+  color: rgba(248,251,255,.76) !important;
+}
+
+.body-exposure-os__core [role="group"][aria-label="Panel groups"] + div > button:active {
+  transform: scale(.985);
+}
+
 @media (prefers-reduced-motion: reduce) {
   .body-intelligence-workspace__tab:hover,
-  .body-intelligence-workspace__tab:active {
+  .body-intelligence-workspace__tab:active,
+  .body-exposure-os__core [role="group"][aria-label="Panel groups"] > button,
+  .body-exposure-os__core [role="group"][aria-label="Panel groups"] + div > button {
     transform: none !important;
   }
 }
