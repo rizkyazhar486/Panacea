@@ -10,6 +10,7 @@ const scopedGuard = read('src/styles/widget-dark-surface-v29.css')
 const emergencyGuard = read('public/home-widget-dark-v31.css')
 const comfortGuard = read('src/styles/home-dark-comfort-v34.css')
 const activeGuard = read('src/styles/home-widget-active-v35.css')
+const mobileStability = read('src/styles/home-mobile-stability.css')
 const index = read('index.html')
 
 test('Living Instrument mounts the active source widget, not only the filtered index', () => {
@@ -84,4 +85,20 @@ test('Home v35 separates mobile widget identity from global controls', () => {
   assert.match(activeGuard, /max-width:min\(68vw,240px\)!important/)
   assert.match(activeGuard, /widget-instrument-label-v5/)
   assert.match(activeGuard, /font-size:11px!important/)
+})
+
+test('Mobile dashboard restoration never blanket-recolors widget descendants', () => {
+  assert.match(mobileStability, /section\[aria-labelledby="my-dashboard-title"\] > div:first-child h2/)
+  assert.match(mobileStability, /section\[aria-labelledby="my-dashboard-title"\] > div:first-child p/)
+  assert.doesNotMatch(
+    mobileStability,
+    /section\[aria-labelledby="my-dashboard-title"\]\s+div\s*\{[^}]*color:\s*#fff/s,
+    'Dashboard mobile guard must not force every nested widget div to white',
+  )
+})
+
+test('Mobile loading cards stay explicit black-green instead of gray placeholders', () => {
+  assert.match(mobileStability, /\.home-loading-card\s*\{[^}]*background:\s*#000\s*!important/s)
+  assert.match(mobileStability, /\.home-loading-card\s*\{[^}]*border-color:\s*rgba\(0,\s*191,\s*99,\s*\.22\)\s*!important/s)
+  assert.match(mobileStability, /\.home-loading-card \[aria-hidden="true"\] > div\s*\{[^}]*background:\s*rgba\(0,\s*191,\s*99,\s*\.18\)\s*!important/s)
 })
