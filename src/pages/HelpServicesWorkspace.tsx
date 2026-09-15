@@ -6,12 +6,16 @@ import { FeatureBoulevard } from '../components/FeatureBoulevard'
 const EMR = lazy(() => import('./EMR').then((m) => ({ default: m.EMR })))
 const Chatbot = lazy(() => import('./Chatbot').then((m) => ({ default: m.Chatbot })))
 const EmergencyCard = lazy(() => import('./EmergencyCard').then((m) => ({ default: m.EmergencyCard })))
+const CarePlanningWorkspace = lazy(() => import('./CarePlanningWorkspace').then((m) => ({ default: m.CarePlanningWorkspace })))
+const CareAccessWorkspace = lazy(() => import('./CareAccessWorkspace').then((m) => ({ default: m.CareAccessWorkspace })))
 
-type HelpView = 'records' | 'assistant' | 'emergency'
+type HelpView = 'assistant' | 'records' | 'planning' | 'access' | 'emergency'
 type View = { key: HelpView; label: string; short: string; component: ComponentType; description: string }
 const VIEWS: View[] = [
-  { key: 'assistant', label: 'AI Health Assistant', short: 'AI Assistant', component: Chatbot, description: 'Ask, organize symptoms and prepare the next step without replacing professional assessment.' },
+  { key: 'assistant', label: 'AI Health Assistant', short: 'Assistant', component: Chatbot, description: 'Ask, organize symptoms and prepare the next step without replacing professional assessment.' },
   { key: 'records', label: 'AI-EMR', short: 'Records', component: EMR, description: 'Clinical records and structured care documentation for authorized clinical use.' },
+  { key: 'planning', label: 'Care Planning', short: 'Plan', component: CarePlanningWorkspace, description: 'Care plan and care-episode timeline grouped as one longitudinal planning surface.' },
+  { key: 'access', label: 'Care Access', short: 'Access', component: CareAccessWorkspace, description: 'Consultation, facilities, pharmacy, second opinion and medication follow-through grouped in one access workspace.' },
   { key: 'emergency', label: 'Emergency Card', short: 'Emergency', component: EmergencyCard, description: 'Critical identity and health information intended to be quickly reachable when needed.' },
 ]
 const VALID = new Set(VIEWS.map((view) => view.key))
@@ -31,8 +35,8 @@ export function HelpServicesWorkspace() {
       <PanaceaZoneNav />
       <section className="rounded-[30px] border border-white/10 bg-black/20 p-4 shadow-2xl backdrop-blur-xl sm:p-5">
         <div className="text-[10px] font-black uppercase tracking-[.22em] text-brand">Help & Services</div>
-        <h1 className="mt-1 text-2xl font-black tracking-tight text-ink dark:text-white sm:text-3xl">Ask, document and reach emergency information in one place</h1>
-        <p className="mt-2 max-w-3xl text-sm leading-relaxed text-neutral-500 dark:text-neutral-300">The assistant, medical record workspace and emergency card share one service destination instead of competing as separate pages.</p>
+        <h1 className="mt-1 text-2xl font-black tracking-tight text-ink dark:text-white sm:text-3xl">Ask, document, plan and access care without opening a maze of pages</h1>
+        <p className="mt-2 max-w-3xl text-sm leading-relaxed text-neutral-500 dark:text-neutral-300">Similar service functions are grouped by intent. The feature count can grow inside these modes without turning every capability into another top-level destination.</p>
         <div className="mt-4 flex flex-wrap gap-2" role="tablist" aria-label="Help and services">
           {VIEWS.map((view) => (
             <button key={view.key} type="button" role="tab" aria-selected={activeKey === view.key} onClick={() => {
