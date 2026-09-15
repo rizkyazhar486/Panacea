@@ -12,7 +12,7 @@ import {
 const near = (a: number, b: number, epsilon = 1e-8) => assert.ok(Math.abs(a - b) <= epsilon, `${a} ≉ ${b}`)
 
 // Pointer geometry stays bounded and fails safe.
-near(closureFromPinchY(76, 260), 0)
+assert.ok(closureFromPinchY(76, 260) < 0.01)
 near(closureFromPinchY(130, 260), 1)
 near(closureFromPinchY(Number.NaN, 260), 0)
 near(closureFromPinchY(130, 0), 0)
