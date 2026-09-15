@@ -2,6 +2,7 @@ import { Component, type ReactNode } from 'react'
 import { HomeLiveWidgetRail } from './HomeLiveWidgetRail'
 import { HomeWidgetUniverse } from './HomeWidgetUniverse'
 import '../styles/home-mobile-stability.css'
+import '../styles/home-no-gray.css'
 
 type Props = {
   children: ReactNode
