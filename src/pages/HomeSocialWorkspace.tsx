@@ -3,6 +3,7 @@ import { useSearchParams } from 'react-router-dom'
 import { PanaceaZoneNav } from '../components/PanaceaZoneNav'
 import { FeatureBoulevard } from '../components/FeatureBoulevard'
 import { HomeNowWidget } from '../components/HomeNowWidget'
+import '../styles/home-mobile-shell-repair-v45.css'
 
 const Beranda = lazy(() => import('./Beranda'))
 const Feed = lazy(() => import('./Feed'))
@@ -62,7 +63,7 @@ export function HomeSocialWorkspace() {
       </div>
 
       <nav
-        className="no-scrollbar sticky top-2 z-30 -mx-1 flex gap-1 overflow-x-auto rounded-[16px] border border-white/10 bg-black px-1.5 py-1.5 shadow-none sm:hidden"
+        className="home-rooms-mobile-nav no-scrollbar sticky z-30 -mx-1 flex gap-1 overflow-x-auto rounded-[16px] border border-white/10 bg-black px-1.5 py-1.5 shadow-none sm:hidden"
         aria-label="Home rooms"
       >
         {VIEWS.map((view) => (
