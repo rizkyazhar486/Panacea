@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import { useStore } from '../lib/store'
 import { DeferredBodyExposureWidget, DeferredHomeFeatureUniverse, DeferredPanaceaLearningRail } from '../components/dashboard/DeferredHomeSections'
 import { HomeSectionBoundary } from '../components/HomeSectionBoundary'
+import { HomeInteractiveRail } from '../components/HomeInteractiveRail'
 import { pratinjauBeranda } from '../lib/pratinjauBeranda'
 import { getVitals, vitalsAge } from '../lib/healthVitals'
 import { getWorkouts } from '../lib/workoutStore'
@@ -277,6 +278,8 @@ export default function Beranda() {
           )}
         </div>
       </section>
+
+      <HomeInteractiveRail />
 
       <section className="home-command-panel" aria-labelledby="daily-tools-title">
         <div className="mb-3 flex items-end justify-between gap-3">
