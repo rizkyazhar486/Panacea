@@ -63,9 +63,8 @@
 .pmd-gauge {
   background: conic-gradient(
     var(--pmd-spectrum-green) 0%,
-    var(--pmd-spectrum-cyan) calc(var(--pmd-gauge) * .72),
-    var(--pmd-spectrum-violet) var(--pmd-gauge),
-    rgba(255, 255, 255, .07) 0
+    var(--pmd-spectrum-cyan) var(--pmd-gauge),
+    rgba(255, 255, 255, .07) var(--pmd-gauge) 100%
   ) !important;
   box-shadow:
     0 0 0 1px rgba(103, 232, 249, .08),
