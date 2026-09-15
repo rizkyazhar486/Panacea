@@ -30,9 +30,13 @@
     <!-- v44 is the final presentation layer: floating Liquid Glass controls,
          wide spatial rhythm, continuous canvas, and compact widget rails. -->
     <link rel="stylesheet" href="/panacea-liquid-infinite-v44.css?v=20260916-1" />
+    <!-- v45 makes every functional action behave like one liquid control:
+         compress on touch, morph/expand, preserve the original feature logic. -->
+    <link rel="stylesheet" href="/panacea-liquid-actions-v45.css?v=20260916-1" />
     <script defer src="/welcome-runtime-v28.js?v=20260908-1"></script>
     <script defer src="/panacea-visual-first-v43.js?v=20260916-1"></script>
     <script defer src="/panacea-liquid-infinite-v44.js?v=20260916-1"></script>
+    <script defer src="/panacea-liquid-actions-v45.js?v=20260916-1"></script>
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     <meta name="apple-mobile-web-app-title" content="Panaceamed" />
@@ -122,7 +126,7 @@
     <script>
       (() => {
         const CACHE_PREFIX = 'panaceamed-'
-        const MAINTENANCE_VERSION = '20260916-v44'
+        const MAINTENANCE_VERSION = '20260916-v45'
         const MAINTENANCE_KEY = 'pmd-cache-maintenance-version'
         const rootReady = () => {
           const root = document.getElementById('root')
