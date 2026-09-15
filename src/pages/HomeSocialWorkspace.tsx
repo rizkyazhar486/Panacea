@@ -28,6 +28,7 @@ const VIEWS: View[] = [
   { key: 'learn', label: 'Read & Learn', short: 'Learn', component: MedStudyHub, description: 'Reading, cases and study material available without leaving the Home experience.' },
 ]
 const VALID = new Set(VIEWS.map((view) => view.key))
+const QUICK_KEYS = new Set<HomeView>(['home', 'learn', 'community', 'finance'])
 
 function Loader() {
   return (
@@ -71,10 +72,10 @@ export function HomeSocialWorkspace() {
             type="button"
             aria-current={activeKey === view.key ? 'page' : undefined}
             onClick={() => select(view)}
-            className={`min-h-[38px] shrink-0 rounded-[12px] border px-3.5 text-[11px] font-black transition active:scale-[.98] ${
+            className={`min-h-[44px] shrink-0 rounded-[12px] border px-3.5 text-[12px] font-black transition active:scale-[.98] ${
               activeKey === view.key
                 ? 'border-brand bg-brand text-white shadow-[0_6px_18px_rgba(0,191,99,.2)]'
-                : 'border-transparent bg-white text-black hover:border-brand/20 hover:bg-brand/[.06] hover:text-brand dark:bg-black dark:text-white dark:hover:bg-brand/[.10]'
+                : 'border-transparent bg-black text-white hover:border-brand/20 hover:bg-brand/[.08] hover:text-brand'
             }`}
           >
             {view.short}
@@ -83,6 +84,34 @@ export function HomeSocialWorkspace() {
       </nav>
 
       <HomeNowWidget />
+
+      <section className="overflow-hidden rounded-[20px] border border-white/10 bg-black p-3 text-white shadow-none sm:p-4" aria-label="Quick launch">
+        <div className="flex items-center justify-between gap-3">
+          <div className="min-w-0">
+            <div className="text-[10px] font-black uppercase tracking-[.18em] text-brand">Quick launch</div>
+            <p className="mt-0.5 truncate text-[12px] font-semibold text-white/70">Four useful rooms, one tap away.</p>
+          </div>
+          <span className="h-2 w-2 shrink-0 rounded-full bg-brand shadow-[0_0_16px_rgba(0,191,99,.65)]" aria-hidden />
+        </div>
+        <div className="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-4">
+          {VIEWS.filter((view) => QUICK_KEYS.has(view.key)).map((view) => (
+            <button
+              key={view.key}
+              type="button"
+              onClick={() => select(view)}
+              aria-pressed={activeKey === view.key}
+              className={`min-h-[48px] rounded-[14px] border px-3 text-left text-[12px] font-black transition active:scale-[.98] ${
+                activeKey === view.key
+                  ? 'border-brand bg-brand text-white'
+                  : 'border-white/10 bg-[#080d13] text-white hover:border-brand/35 hover:text-brand'
+              }`}
+            >
+              <span className="block">{view.short}</span>
+              <span className={`mt-0.5 block text-[10px] font-semibold ${activeKey === view.key ? 'text-white/80' : 'text-white/45'}`}>{view.label}</span>
+            </button>
+          ))}
+        </div>
+      </section>
 
       <section className="hidden overflow-hidden rounded-[26px] border border-brand/20 bg-white shadow-[0_14px_38px_rgba(0,191,99,.07)] dark:bg-black sm:block">
         <div className="h-1 w-full bg-brand" aria-hidden />
@@ -98,7 +127,7 @@ export function HomeSocialWorkspace() {
                 role="tab"
                 aria-selected={activeKey === view.key}
                 onClick={() => select(view)}
-                className={`min-h-[42px] shrink-0 rounded-[13px] border px-4 text-xs font-black transition ${
+                className={`min-h-[44px] shrink-0 rounded-[13px] border px-4 text-xs font-black transition ${
                   activeKey === view.key
                     ? 'border-brand bg-brand text-white'
                     : 'border-brand/10 bg-white text-black hover:border-brand/25 hover:bg-brand/[.06] hover:text-brand dark:bg-black dark:text-white'
@@ -108,7 +137,7 @@ export function HomeSocialWorkspace() {
               </button>
             ))}
           </div>
-          <div className="mt-3 rounded-[16px] border border-brand/15 bg-brand/[.045] px-3 py-2.5 text-[11px] font-medium leading-relaxed text-black dark:text-white">
+          <div className="mt-3 rounded-[16px] border border-brand/15 bg-brand/[.045] px-3 py-2.5 text-[12px] font-medium leading-relaxed text-black dark:text-white">
             <b>{active.label}:</b> {active.description}
           </div>
         </div>
