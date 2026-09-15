@@ -13,6 +13,7 @@ type SignalDef = {
 
 const SIGNALS: SignalDef[] = [
   { key: 'steps', field: 'steps', label: 'Steps', unit: 'steps', to: '/tubuh?t=gerak' },
+  { key: 'heartRate', field: 'heartRate', label: 'Heart Rate', unit: 'bpm', to: '/tubuh?t=jantung' },
   { key: 'restingHr', field: 'restingHr', label: 'Resting HR', unit: 'bpm', to: '/tubuh?t=jantung' },
   { key: 'hrvMs', field: 'hrvMs', label: 'HRV', unit: 'ms', to: '/tubuh?t=jantung' },
   { key: 'sleepH', field: 'sleepH', label: 'Sleep', unit: 'h', to: '/pola-tidur', digits: 1 },
@@ -24,6 +25,26 @@ const SIGNALS: SignalDef[] = [
   { key: 'strain', field: 'strain', label: 'Strain', unit: 'load', to: '/readiness', digits: 1 },
   { key: 'bodyScore', field: 'bodyScore', label: 'Body Score', unit: '/100', to: '/tubuh' },
   { key: 'activeKcal', field: 'activeKcal', label: 'Active Energy', unit: 'kcal', to: '/latihan' },
+  { key: 'weightKg', field: 'weightKg', label: 'Weight', unit: 'kg', to: '/tubuh', digits: 1 },
+  { key: 'bodyFatPct', field: 'bodyFatPct', label: 'Body Fat', unit: '%', to: '/tubuh', digits: 1 },
+  { key: 'leanMassKg', field: 'leanMassKg', label: 'Lean Mass', unit: 'kg', to: '/tubuh', digits: 1 },
+  { key: 'bmi', field: 'bmi', label: 'BMI', unit: 'kg/m²', to: '/tubuh', digits: 1 },
+  { key: 'skeletalMuscleKg', field: 'skeletalMuscleKg', label: 'Skeletal Muscle', unit: 'kg', to: '/tubuh', digits: 1 },
+  { key: 'bodyWaterPct', field: 'bodyWaterPct', label: 'Body Water', unit: '%', to: '/tubuh', digits: 1 },
+  { key: 'bodyAge', field: 'bodyAge', label: 'Body Age', unit: 'yr', to: '/tubuh' },
+  { key: 'exerciseMin', field: 'exerciseMin', label: 'Exercise', unit: 'min', to: '/latihan' },
+  { key: 'distanceKm', field: 'distanceKm', label: 'Distance', unit: 'km', to: '/latihan', digits: 1 },
+  { key: 'flightsClimbed', field: 'flightsClimbed', label: 'Flights', unit: 'floors', to: '/tubuh?t=gerak' },
+  { key: 'standHours', field: 'standHours', label: 'Stand', unit: 'h', to: '/tubuh?t=gerak', digits: 1 },
+  { key: 'daylightMin', field: 'daylightMin', label: 'Daylight', unit: 'min', to: '/harian' },
+  { key: 'cardioRecoveryBpm', field: 'cardioRecoveryBpm', label: 'Cardio Recovery', unit: 'bpm', to: '/latihan?t=analisis' },
+  { key: 'walkingSpeedKmh', field: 'walkingSpeedKmh', label: 'Walking Speed', unit: 'km/h', to: '/tubuh?t=gerak', digits: 1 },
+  { key: 'sixMinWalkM', field: 'sixMinWalkM', label: '6-Min Walk', unit: 'm', to: '/tubuh?t=gerak' },
+  { key: 'runningPowerW', field: 'runningPowerW', label: 'Running Power', unit: 'W', to: '/latihan?t=analisis' },
+  { key: 'runningSpeedKmh', field: 'runningSpeedKmh', label: 'Running Speed', unit: 'km/h', to: '/latihan?t=analisis', digits: 1 },
+  { key: 'runningStrideLengthM', field: 'runningStrideLengthM', label: 'Stride Length', unit: 'm', to: '/latihan?t=analisis', digits: 2 },
+  { key: 'runningGroundContactMs', field: 'runningGroundContactMs', label: 'Ground Contact', unit: 'ms', to: '/latihan?t=analisis' },
+  { key: 'runningVerticalOscCm', field: 'runningVerticalOscCm', label: 'Vertical Osc.', unit: 'cm', to: '/latihan?t=analisis', digits: 1 },
 ]
 
 function number(value: unknown): number | undefined {
@@ -64,7 +85,7 @@ export function HomeLiveWidgetRail() {
     <section aria-labelledby="home-live-widget-rail-title" className="mb-4">
       <div className="mb-2 flex items-center justify-between gap-3 px-0.5">
         <div>
-          <div className="text-[9px] font-black uppercase tracking-[.18em] text-[#00BF63]">Live instruments</div>
+          <div className="text-[9px] font-black uppercase tracking-[.18em] text-[#00BF63]">33 live instruments</div>
           <h3 id="home-live-widget-rail-title" className="mt-0.5 text-[15px] font-black tracking-[-.02em] text-white">
             Swipe your health signals
           </h3>
