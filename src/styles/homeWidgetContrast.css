@@ -1,0 +1,134 @@
+/* Home widget contrast hardening.
+ * Applied to the existing Tumpukan/PapanWidget DOM so every active preview is
+ * readable without changing widget data, ordering, or interaction logic.
+ */
+:root {
+  --home-widget-surface: #0b111a;
+  --home-widget-surface-raised: #101923;
+  --home-widget-border: rgba(255, 255, 255, 0.12);
+  --home-widget-text: #f8fafc;
+  --home-widget-text-secondary: #d7e0ea;
+  --home-widget-text-muted: #9baabd;
+  --home-widget-brand: #25e58d;
+}
+
+/* Dark theme: make the preview shell deterministic instead of depending on
+ * nested translucent cards or the mount timing of individual widgets. */
+.dark .panacea-home .widget-instrument-shell-v5,
+.dark .panacea-home .widget-instrument-scroll-v5,
+.dark .panacea-home .widget-instrument-slide-v5[aria-hidden='false'] {
+  background: var(--home-widget-surface) !important;
+  color: var(--home-widget-text) !important;
+  opacity: 1 !important;
+  filter: none !important;
+  mix-blend-mode: normal !important;
+}
+
+.dark .panacea-home .widget-instrument-shell-v5 {
+  overflow: hidden;
+  border: 1px solid var(--home-widget-border) !important;
+  border-radius: 16px !important;
+  background:
+    radial-gradient(110% 120% at 8% 0%, rgba(37, 229, 141, 0.045), transparent 44%),
+    linear-gradient(180deg, var(--home-widget-surface-raised), var(--home-widget-surface)) !important;
+}
+
+.dark .panacea-home .widget-instrument-scroll-v5 {
+  isolation: isolate;
+}
+
+.dark .panacea-home .widget-instrument-slide-v5[aria-hidden='false'],
+.dark .panacea-home .widget-instrument-slide-v5[aria-hidden='false'] > * {
+  opacity: 1 !important;
+  filter: none !important;
+  mix-blend-mode: normal !important;
+}
+
+/* Common utility colours used by older widgets are remapped only inside the
+ * active dark preview; this prevents grey-on-grey while leaving light mode and
+ * non-Home pages untouched. */
+.dark .panacea-home .widget-instrument-slide-v5[aria-hidden='false'] .text-ink,
+.dark .panacea-home .widget-instrument-slide-v5[aria-hidden='false'] .text-neutral-950,
+.dark .panacea-home .widget-instrument-slide-v5[aria-hidden='false'] .text-neutral-900,
+.dark .panacea-home .widget-instrument-slide-v5[aria-hidden='false'] .text-neutral-800,
+.dark .panacea-home .widget-instrument-slide-v5[aria-hidden='false'] .text-neutral-700 {
+  color: var(--home-widget-text) !important;
+}
+
+.dark .panacea-home .widget-instrument-slide-v5[aria-hidden='false'] .text-neutral-600,
+.dark .panacea-home .widget-instrument-slide-v5[aria-hidden='false'] .text-neutral-500,
+.dark .panacea-home .widget-instrument-slide-v5[aria-hidden='false'] .text-neutral-400 {
+  color: var(--home-widget-text-secondary) !important;
+}
+
+.dark .panacea-home .widget-instrument-slide-v5[aria-hidden='false'] .bg-white,
+.dark .panacea-home .widget-instrument-slide-v5[aria-hidden='false'] [class*='bg-white/'] {
+  background-color: rgba(4, 10, 18, 0.76) !important;
+}
+
+.dark .panacea-home .widget-instrument-slide-v5[aria-hidden='false'] [class*='border-neutral-'],
+.dark .panacea-home .widget-instrument-slide-v5[aria-hidden='false'] [class*='border-white/'] {
+  border-color: var(--home-widget-border) !important;
+}
+
+.dark .panacea-home .widget-instrument-loading-v29 {
+  min-height: 184px;
+  background: linear-gradient(110deg, #0b111a 20%, #121d28 42%, #0b111a 64%) !important;
+  background-size: 220% 100% !important;
+  opacity: 1 !important;
+}
+
+.dark .panacea-home .widget-instrument-head-v5,
+.dark .panacea-home .widget-instrument-foot-v5 {
+  color: var(--home-widget-text-secondary);
+}
+
+.dark .panacea-home .widget-instrument-title-v5 { color: var(--home-widget-text) !important; }
+.dark .panacea-home .widget-instrument-kicker-v5,
+.dark .panacea-home .widget-instrument-state-v5,
+.dark .panacea-home .widget-instrument-count-v5,
+.dark .panacea-home .widget-instrument-label-v5 { color: var(--home-widget-text-muted) !important; }
+
+.dark .panacea-home .widget-instrument-nav-v5 {
+  min-width: 44px;
+  min-height: 44px;
+}
+
+.dark .panacea-home .widget-instrument-nav-v5:focus-visible {
+  outline: 2px solid var(--home-widget-brand);
+  outline-offset: 2px;
+}
+
+/* Safari/PWA can paint before the persisted .dark class is restored. When the
+ * OS itself requests dark mode, provide the same safe first-paint shell unless
+ * the app has explicitly selected light mode. */
+@media (prefers-color-scheme: dark) {
+  html:not(.light) .panacea-home .widget-instrument-shell-v5,
+  html:not(.light) .panacea-home .widget-instrument-scroll-v5,
+  html:not(.light) .panacea-home .widget-instrument-slide-v5[aria-hidden='false'] {
+    background-color: var(--home-widget-surface) !important;
+    color: var(--home-widget-text) !important;
+    opacity: 1 !important;
+    filter: none !important;
+  }
+}
+
+@media (max-width: 640px) {
+  .dark .panacea-home .widget-instrument-shell-v5 {
+    border-radius: 12px !important;
+  }
+
+  .dark .panacea-home .widget-instrument-slide-v5[aria-hidden='false'] {
+    color: var(--home-widget-text) !important;
+  }
+}
+
+@media (prefers-reduced-transparency: reduce) {
+  .dark .panacea-home .widget-instrument-shell-v5,
+  .dark .panacea-home .widget-instrument-scroll-v5,
+  .dark .panacea-home .widget-instrument-slide-v5[aria-hidden='false'] {
+    background: #0b111a !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+  }
+}
