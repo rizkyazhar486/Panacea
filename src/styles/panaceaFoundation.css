@@ -1,0 +1,301 @@
+/* Panacea UI foundation — compact, information-first, mobile-safe.
+ * This layer intentionally preserves the existing light/dark theme switch.
+ * It defines shared geometry/type/spacing and only styles opted-in Panacea UI.
+ */
+:root {
+  --pan-brand: #00bf63;
+  --pan-brand-strong: #00a957;
+  --pan-brand-soft: rgba(0, 191, 99, 0.10);
+  --pan-brand-border: rgba(0, 191, 99, 0.28);
+
+  --pan-canvas: #f7f9f8;
+  --pan-surface-1: rgba(255, 255, 255, 0.92);
+  --pan-surface-2: #ffffff;
+  --pan-surface-3: #f1f5f3;
+  --pan-border: rgba(12, 20, 16, 0.10);
+  --pan-border-strong: rgba(12, 20, 16, 0.17);
+  --pan-text: #0c1410;
+  --pan-text-2: #415149;
+  --pan-text-3: #6d7c74;
+
+  --pan-fs-xs: 0.75rem;
+  --pan-fs-sm: 0.875rem;
+  --pan-fs-md: 1rem;
+  --pan-fs-lg: 1.25rem;
+  --pan-fs-xl: 1.75rem;
+
+  --pan-s1: 0.25rem;
+  --pan-s2: 0.5rem;
+  --pan-s3: 0.75rem;
+  --pan-s4: 1rem;
+  --pan-s5: 1.25rem;
+  --pan-s6: 1.5rem;
+  --pan-s8: 2rem;
+  --pan-s10: 2.5rem;
+
+  --pan-r-sm: 8px;
+  --pan-r-md: 12px;
+  --pan-r-lg: 16px;
+  --pan-r-xl: 20px;
+  --pan-control: 44px;
+  --pan-content: 1240px;
+}
+
+.dark {
+  --pan-canvas: #070b11;
+  --pan-surface-1: rgba(11, 17, 24, 0.94);
+  --pan-surface-2: #0f1720;
+  --pan-surface-3: #131d27;
+  --pan-border: rgba(255, 255, 255, 0.09);
+  --pan-border-strong: rgba(255, 255, 255, 0.15);
+  --pan-text: #f5f7fa;
+  --pan-text-2: #c8d0da;
+  --pan-text-3: #8895a5;
+}
+
+[data-pan-surface],
+[data-pan-card],
+[data-home-widget-surface] {
+  opacity: 1 !important;
+  filter: none !important;
+  mix-blend-mode: normal !important;
+}
+
+/* Home is a workspace, not another nested dashboard card. */
+.home-social-workspace {
+  width: min(100%, var(--pan-content));
+  margin-inline: auto;
+  display: grid;
+  gap: var(--pan-s3);
+  padding-bottom: max(var(--pan-s8), env(safe-area-inset-bottom));
+}
+
+.home-workspace-intro {
+  border: 1px solid var(--pan-border);
+  border-radius: var(--pan-r-lg);
+  background: var(--pan-surface-1);
+  padding: var(--pan-s4);
+  color: var(--pan-text);
+  box-shadow: none;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+.pan-home-eyebrow {
+  margin: 0;
+  color: var(--pan-brand-strong);
+  font-size: var(--pan-fs-xs);
+  font-weight: 750;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.dark .pan-home-eyebrow { color: #25e58d; }
+
+.pan-home-title {
+  margin: var(--pan-s1) 0 0;
+  max-width: 760px;
+  color: var(--pan-text);
+  font-size: clamp(1.55rem, 5vw, 2.15rem);
+  font-weight: 720;
+  line-height: 1.08;
+  letter-spacing: -0.035em;
+}
+
+.pan-home-copy {
+  max-width: 72ch;
+  margin: var(--pan-s2) 0 0;
+  color: var(--pan-text-2);
+  font-size: var(--pan-fs-sm);
+  font-weight: 520;
+  line-height: 1.55;
+}
+
+.pan-home-tabs {
+  display: flex;
+  gap: var(--pan-s2);
+  margin-top: var(--pan-s4);
+  overflow-x: auto;
+  overscroll-behavior-inline: contain;
+  scrollbar-width: none;
+  scroll-snap-type: x proximity;
+  padding-bottom: 2px;
+}
+
+.pan-home-tabs::-webkit-scrollbar { display: none; }
+
+.pan-home-tab {
+  min-height: var(--pan-control);
+  flex: 0 0 auto;
+  scroll-snap-align: start;
+  border: 1px solid var(--pan-border);
+  border-radius: var(--pan-r-md);
+  padding: 0 var(--pan-s4);
+  background: transparent;
+  color: var(--pan-text-2);
+  font: inherit;
+  font-size: var(--pan-fs-xs);
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.pan-home-tab:hover { background: var(--pan-surface-3); color: var(--pan-text); }
+.pan-home-tab[data-active='true'] {
+  border-color: var(--pan-brand-border);
+  background: var(--pan-brand-soft);
+  color: var(--pan-brand-strong);
+}
+.dark .pan-home-tab[data-active='true'] { color: #25e58d; }
+.pan-home-tab:focus-visible { outline: 2px solid var(--pan-brand); outline-offset: 2px; }
+
+.pan-home-room-description {
+  margin-top: var(--pan-s3);
+  border-top: 1px solid var(--pan-border);
+  padding-top: var(--pan-s3);
+  color: var(--pan-text-3);
+  font-size: var(--pan-fs-xs);
+  line-height: 1.5;
+}
+.pan-home-room-description strong { color: var(--pan-text); font-weight: 680; }
+
+.pan-home-panel { min-width: 0; }
+
+.pan-home-loader {
+  min-height: 34vh;
+  display: grid;
+  place-items: center;
+  border: 1px solid var(--pan-border);
+  border-radius: var(--pan-r-lg);
+  background: var(--pan-surface-1);
+  color: var(--pan-text-3);
+  font-size: var(--pan-fs-sm);
+  font-weight: 650;
+}
+
+/* Main-zone navigation: one restrained rail, no glow-heavy chrome. */
+.pan-zone-nav {
+  position: sticky;
+  top: max(0px, env(safe-area-inset-top));
+  z-index: 35;
+  display: flex;
+  align-items: center;
+  gap: var(--pan-s2);
+  min-height: 60px;
+  border: 1px solid var(--pan-border);
+  border-radius: var(--pan-r-lg);
+  padding: var(--pan-s2);
+  background: var(--pan-surface-1);
+  color: var(--pan-text);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+  backdrop-filter: blur(16px) saturate(115%);
+  -webkit-backdrop-filter: blur(16px) saturate(115%);
+}
+
+.dark .pan-zone-nav { box-shadow: 0 10px 30px rgba(0, 0, 0, 0.24); }
+
+.pan-zone-nav__scroll {
+  min-width: 0;
+  flex: 1;
+  display: flex;
+  gap: var(--pan-s1);
+  overflow-x: auto;
+  scrollbar-width: none;
+  overscroll-behavior-inline: contain;
+}
+.pan-zone-nav__scroll::-webkit-scrollbar { display: none; }
+
+.pan-zone-nav__link {
+  min-height: var(--pan-control);
+  display: inline-flex;
+  align-items: center;
+  flex: 0 0 auto;
+  border-radius: var(--pan-r-md);
+  padding: 0 var(--pan-s3);
+  color: var(--pan-text-2);
+  font-size: var(--pan-fs-xs);
+  font-weight: 680;
+  text-decoration: none;
+}
+.pan-zone-nav__link:hover { background: var(--pan-surface-3); color: var(--pan-text); }
+.pan-zone-nav__link.is-active {
+  background: var(--pan-brand-soft);
+  color: var(--pan-brand-strong);
+}
+.dark .pan-zone-nav__link.is-active { color: #25e58d; }
+.pan-zone-nav__link:focus-visible,
+.pan-zone-nav__profile:focus-visible { outline: 2px solid var(--pan-brand); outline-offset: 2px; }
+
+.pan-zone-nav__profile {
+  inline-size: var(--pan-control);
+  block-size: var(--pan-control);
+  flex: 0 0 var(--pan-control);
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  border: 1px solid var(--pan-brand-border);
+  border-radius: 50%;
+  background: var(--pan-brand-soft);
+  color: var(--pan-brand-strong);
+  font-size: var(--pan-fs-xs);
+  font-weight: 750;
+  text-decoration: none;
+}
+.pan-zone-nav__profile img { width: 100%; height: 100%; object-fit: cover; }
+
+/* Compact existing Beranda without deleting its content or behavior. */
+.panacea-home {
+  --home-compact-gap: 16px;
+  gap: var(--home-compact-gap) !important;
+}
+
+.panacea-home .home-command-panel {
+  border-radius: var(--pan-r-lg) !important;
+  box-shadow: none !important;
+}
+
+.panacea-home .home-signal-card,
+.panacea-home .home-action-card {
+  border-radius: var(--pan-r-md) !important;
+}
+
+.panacea-home [class*="text-[10px]"],
+.panacea-home [class*="text-[10.5px]"],
+.panacea-home [class*="text-[11px]"] {
+  font-size: 12px !important;
+  line-height: 1.4 !important;
+}
+
+.panacea-home button,
+.panacea-home .home-icon-button,
+.panacea-home .home-primary-action,
+.panacea-home .home-secondary-action,
+.panacea-home .home-pill-button {
+  min-height: var(--pan-control);
+}
+
+@media (max-width: 767px) {
+  .home-social-workspace { gap: var(--pan-s2); padding-inline: 0; }
+  .home-workspace-intro { border-radius: var(--pan-r-md); padding: var(--pan-s3); }
+  .pan-zone-nav { border-radius: var(--pan-r-md); padding: 6px; }
+  .pan-zone-nav__link { padding-inline: 10px; }
+  .pan-home-title { font-size: 1.55rem; }
+  .panacea-home { --home-compact-gap: 12px; padding-bottom: 72px !important; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .home-social-workspace *,
+  .pan-zone-nav * {
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+  }
+}
+
+@media (prefers-reduced-transparency: reduce) {
+  .home-workspace-intro,
+  .pan-zone-nav {
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    background: var(--pan-surface-2);
+  }
+}
