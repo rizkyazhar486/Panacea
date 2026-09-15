@@ -10,6 +10,7 @@ const CardiacHemodynamicsWorkbench = lazy(() => import('./bodyhub/CardiacHemodyn
 const NeurovascularPerfusionWorkbench = lazy(() => import('./bodyhub/NeurovascularPerfusionWorkbench'))
 const RespiratoryGasExchangeWorkbench = lazy(() => import('./bodyhub/RespiratoryGasExchangeWorkbench'))
 const RenalHomeostasisWorkbench = lazy(() => import('./bodyhub/RenalHomeostasisWorkbench'))
+const EndocrineFeedbackWorkbench = lazy(() => import('./bodyhub/EndocrineFeedbackWorkbench'))
 const PathophysiologyNetworkPanel = lazy(() => import('./bodyhub/PathophysiologyNetworkPanel'))
 const LesionLocalizationPanel = lazy(() => import('./bodyhub/LesionLocalizationPanel'))
 const DrugMechanismNetworkPanel = lazy(() => import('./bodyhub/DrugMechanismNetworkPanel'))
@@ -114,6 +115,7 @@ export function BodyExposureOS() {
               <span className="rounded-full border border-indigo-300/10 bg-indigo-300/[.045] px-2.5 py-1 text-[9px] font-black uppercase tracking-[.14em] text-indigo-100/65">brain perfusion lab</span>
               <span className="rounded-full border border-cyan-300/10 bg-cyan-300/[.045] px-2.5 py-1 text-[9px] font-black uppercase tracking-[.14em] text-cyan-100/65">respiratory gas exchange</span>
               <span className="rounded-full border border-sky-300/10 bg-sky-300/[.045] px-2.5 py-1 text-[9px] font-black uppercase tracking-[.14em] text-sky-100/65">renal homeostasis</span>
+              <span className="rounded-full border border-violet-300/10 bg-violet-300/[.045] px-2.5 py-1 text-[9px] font-black uppercase tracking-[.14em] text-violet-100/65">endocrine feedback</span>
               <span className="rounded-full border border-fuchsia-300/10 bg-fuchsia-300/[.045] px-2.5 py-1 text-[9px] font-black uppercase tracking-[.14em] text-fuchsia-100/65">pathophysiology</span>
               <span className="rounded-full border border-sky-300/10 bg-sky-300/[.045] px-2.5 py-1 text-[9px] font-black uppercase tracking-[.14em] text-sky-100/65">lesion localization</span>
               <span className="rounded-full border border-emerald-300/10 bg-emerald-300/[.045] px-2.5 py-1 text-[9px] font-black uppercase tracking-[.14em] text-emerald-100/65">drug mechanisms</span>
@@ -127,136 +129,37 @@ export function BodyExposureOS() {
           </div>
 
           <div className="flex shrink-0 flex-wrap gap-2">
-            <button
-              type="button"
-              onClick={openSystemAtlas}
-              className="min-h-[44px] rounded-full border border-cyan-300/25 bg-cyan-300/10 px-4 text-xs font-black text-cyan-100 transition hover:bg-cyan-300/15 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-300/60"
-            >
-              Explore 11 systems
-            </button>
-            <button
-              type="button"
-              onClick={() => openPanel(MODES[0])}
-              className="min-h-[44px] rounded-full border border-white/12 bg-white/[.055] px-4 text-xs font-black text-white/70 transition hover:bg-white/[.09] hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/40"
-            >
-              Layers & structures
-            </button>
-            <button
-              type="button"
-              onClick={toggleImmersive}
-              className="min-h-[44px] rounded-full border border-white/12 bg-white/[.055] px-4 text-xs font-black text-white/80 transition hover:bg-white/[.09] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/40"
-            >
-              {immersive ? 'Exit immersive' : 'Immersive view'}
-            </button>
+            <button type="button" onClick={openSystemAtlas} className="min-h-[44px] rounded-full border border-cyan-300/25 bg-cyan-300/10 px-4 text-xs font-black text-cyan-100 transition hover:bg-cyan-300/15 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-300/60">Explore 11 systems</button>
+            <button type="button" onClick={() => openPanel(MODES[0])} className="min-h-[44px] rounded-full border border-white/12 bg-white/[.055] px-4 text-xs font-black text-white/70 transition hover:bg-white/[.09] hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/40">Layers & structures</button>
+            <button type="button" onClick={toggleImmersive} className="min-h-[44px] rounded-full border border-white/12 bg-white/[.055] px-4 text-xs font-black text-white/80 transition hover:bg-white/[.09] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/40">{immersive ? 'Exit immersive' : 'Immersive view'}</button>
           </div>
         </div>
 
         <div className="relative mt-5 grid grid-cols-3 gap-2 sm:max-w-2xl">
-          <div className="rounded-2xl border border-white/[.08] bg-black/25 px-3 py-2.5">
-            <div className="text-[9px] font-black uppercase tracking-[.16em] text-white/35">Orientation</div>
-            <div className="mt-1 text-xs font-black text-white/85">Whole body → system</div>
-          </div>
-          <div className="rounded-2xl border border-white/[.08] bg-black/25 px-3 py-2.5">
-            <div className="text-[9px] font-black uppercase tracking-[.16em] text-white/35">Depth</div>
-            <div className="mt-1 text-xs font-black text-white/85">Organ → tissue → gene</div>
-          </div>
-          <div className="rounded-2xl border border-white/[.08] bg-black/25 px-3 py-2.5">
-            <div className="text-[9px] font-black uppercase tracking-[.16em] text-white/35">Context</div>
-            <div className="mt-1 text-xs font-black text-white/85">Structure → function → failure → localization</div>
-          </div>
+          <div className="rounded-2xl border border-white/[.08] bg-black/25 px-3 py-2.5"><div className="text-[9px] font-black uppercase tracking-[.16em] text-white/35">Orientation</div><div className="mt-1 text-xs font-black text-white/85">Whole body → system</div></div>
+          <div className="rounded-2xl border border-white/[.08] bg-black/25 px-3 py-2.5"><div className="text-[9px] font-black uppercase tracking-[.16em] text-white/35">Depth</div><div className="mt-1 text-xs font-black text-white/85">Organ → tissue → gene</div></div>
+          <div className="rounded-2xl border border-white/[.08] bg-black/25 px-3 py-2.5"><div className="text-[9px] font-black uppercase tracking-[.16em] text-white/35">Context</div><div className="mt-1 text-xs font-black text-white/85">Structure → function → failure → localization</div></div>
         </div>
       </header>
 
       <nav className="body-exposure-os__dock relative z-[3] mt-3 overflow-x-auto rounded-[22px] border border-white/[.08] bg-black/55 p-1.5 backdrop-blur-2xl" aria-label="Body Exposure modes">
-        <div className="flex min-w-max gap-1.5">
-          {MODES.map((mode) => {
-            const active = mode.key === activeMode
-            return (
-              <button
-                key={mode.key}
-                type="button"
-                aria-pressed={active}
-                onClick={() => openPanel(mode)}
-                className={`min-h-[42px] rounded-[16px] border px-4 text-xs font-black transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-300/60 ${
-                  active
-                    ? 'border-cyan-300/25 bg-[linear-gradient(135deg,rgba(34,211,238,.16),rgba(139,92,246,.11),rgba(236,72,153,.08))] text-white shadow-[inset_0_1px_0_rgba(255,255,255,.12),0_10px_30px_rgba(34,211,238,.06)]'
-                    : 'border-transparent bg-transparent text-white/45 hover:border-white/[.08] hover:bg-white/[.04] hover:text-white/80'
-                }`}
-              >
-                {mode.label}
-              </button>
-            )
-          })}
-        </div>
+        <div className="flex min-w-max gap-1.5">{MODES.map((mode) => { const active = mode.key === activeMode; return <button key={mode.key} type="button" aria-pressed={active} onClick={() => openPanel(mode)} className={`min-h-[42px] rounded-[16px] border px-4 text-xs font-black transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-300/60 ${active ? 'border-cyan-300/25 bg-[linear-gradient(135deg,rgba(34,211,238,.16),rgba(139,92,246,.11),rgba(236,72,153,.08))] text-white shadow-[inset_0_1px_0_rgba(255,255,255,.12),0_10px_30px_rgba(34,211,238,.06)]' : 'border-transparent bg-transparent text-white/45 hover:border-white/[.08] hover:bg-white/[.04] hover:text-white/80'}`}>{mode.label}</button> })}</div>
       </nav>
 
-      <div className="relative z-[2] mt-2 flex items-center justify-between gap-3 px-1 text-[10px] font-bold text-white/40" aria-live="polite">
-        <span><span className="text-cyan-200/80">{current.label}</span> · {current.description}</span>
-        <span className="hidden shrink-0 sm:inline">Educational atlas · not a patient-specific diagnosis</span>
-      </div>
+      <div className="relative z-[2] mt-2 flex items-center justify-between gap-3 px-1 text-[10px] font-bold text-white/40" aria-live="polite"><span><span className="text-cyan-200/80">{current.label}</span> · {current.description}</span><span className="hidden shrink-0 sm:inline">Educational atlas · not a patient-specific diagnosis</span></div>
 
-      <div ref={systemsRef} onClickCapture={captureSystemAtlasSelection} className="relative z-[2] mt-3 scroll-mt-4">
-        <Suspense fallback={<div className="grid min-h-44 place-items-center rounded-[26px] border border-white/[.08] bg-black/35 text-xs font-bold text-white/35">Loading system atlas…</div>}>
-          <BodyAllSystems3D />
-        </Suspense>
-      </div>
+      <div ref={systemsRef} onClickCapture={captureSystemAtlasSelection} className="relative z-[2] mt-3 scroll-mt-4"><Suspense fallback={<div className="grid min-h-44 place-items-center rounded-[26px] border border-white/[.08] bg-black/35 text-xs font-bold text-white/35">Loading system atlas…</div>}><BodyAllSystems3D /></Suspense></div>
+      <div className="relative z-[2] mt-3"><Suspense fallback={<div className="grid min-h-32 place-items-center rounded-[26px] border border-white/[.08] bg-black/35 text-xs font-bold text-white/35">Loading anatomy-physiology bridge…</div>}><AtlasPhysiologyBridgePanel selectedAtlasSystemId={selectedBodySystemId} onSystemChange={setSelectedBodySystemId} /></Suspense></div>
+      <div className="relative z-[2] mt-3"><Suspense fallback={<div className="grid min-h-40 place-items-center rounded-[28px] border border-white/[.08] bg-black/35 text-xs font-bold text-white/35">Loading cardiac hemodynamics lab…</div>}><CardiacHemodynamicsWorkbench selectedAtlasSystemId={selectedBodySystemId} /></Suspense></div>
+      <div className="relative z-[2] mt-3"><Suspense fallback={<div className="grid min-h-40 place-items-center rounded-[28px] border border-white/[.08] bg-black/35 text-xs font-bold text-white/35">Loading neurovascular perfusion lab…</div>}><NeurovascularPerfusionWorkbench selectedAtlasSystemId={selectedBodySystemId} /></Suspense></div>
+      <div className="relative z-[2] mt-3"><Suspense fallback={<div className="grid min-h-40 place-items-center rounded-[28px] border border-white/[.08] bg-black/35 text-xs font-bold text-white/35">Loading respiratory gas-exchange lab…</div>}><RespiratoryGasExchangeWorkbench selectedAtlasSystemId={selectedBodySystemId} /></Suspense></div>
+      <div className="relative z-[2] mt-3"><Suspense fallback={<div className="grid min-h-40 place-items-center rounded-[28px] border border-white/[.08] bg-black/35 text-xs font-bold text-white/35">Loading renal homeostasis lab…</div>}><RenalHomeostasisWorkbench selectedAtlasSystemId={selectedBodySystemId} /></Suspense></div>
+      <div className="relative z-[2] mt-3"><Suspense fallback={<div className="grid min-h-40 place-items-center rounded-[28px] border border-white/[.08] bg-black/35 text-xs font-bold text-white/35">Loading endocrine feedback lab…</div>}><EndocrineFeedbackWorkbench selectedAtlasSystemId={selectedBodySystemId} /></Suspense></div>
+      <div className="relative z-[2] mt-3"><Suspense fallback={<div className="grid min-h-40 place-items-center rounded-[28px] border border-white/[.08] bg-black/35 text-xs font-bold text-white/35">Loading pathophysiology network…</div>}><PathophysiologyNetworkPanel selectedAtlasSystemId={selectedBodySystemId} /></Suspense></div>
+      <div className="relative z-[2] mt-3"><Suspense fallback={<div className="grid min-h-40 place-items-center rounded-[28px] border border-white/[.08] bg-black/35 text-xs font-bold text-white/35">Loading lesion localization lab…</div>}><LesionLocalizationPanel selectedAtlasSystemId={selectedBodySystemId} /></Suspense></div>
+      <div className="relative z-[2] mt-3"><Suspense fallback={<div className="grid min-h-40 place-items-center rounded-[28px] border border-white/[.08] bg-black/35 text-xs font-bold text-white/35">Loading drug mechanism network…</div>}><DrugMechanismNetworkPanel selectedAtlasSystemId={selectedBodySystemId} /></Suspense></div>
 
-      <div className="relative z-[2] mt-3">
-        <Suspense fallback={<div className="grid min-h-32 place-items-center rounded-[26px] border border-white/[.08] bg-black/35 text-xs font-bold text-white/35">Loading anatomy-physiology bridge…</div>}>
-          <AtlasPhysiologyBridgePanel selectedAtlasSystemId={selectedBodySystemId} onSystemChange={setSelectedBodySystemId} />
-        </Suspense>
-      </div>
-
-      <div className="relative z-[2] mt-3">
-        <Suspense fallback={<div className="grid min-h-40 place-items-center rounded-[28px] border border-white/[.08] bg-black/35 text-xs font-bold text-white/35">Loading cardiac hemodynamics lab…</div>}>
-          <CardiacHemodynamicsWorkbench selectedAtlasSystemId={selectedBodySystemId} />
-        </Suspense>
-      </div>
-
-      <div className="relative z-[2] mt-3">
-        <Suspense fallback={<div className="grid min-h-40 place-items-center rounded-[28px] border border-white/[.08] bg-black/35 text-xs font-bold text-white/35">Loading neurovascular perfusion lab…</div>}>
-          <NeurovascularPerfusionWorkbench selectedAtlasSystemId={selectedBodySystemId} />
-        </Suspense>
-      </div>
-
-      <div className="relative z-[2] mt-3">
-        <Suspense fallback={<div className="grid min-h-40 place-items-center rounded-[28px] border border-white/[.08] bg-black/35 text-xs font-bold text-white/35">Loading respiratory gas-exchange lab…</div>}>
-          <RespiratoryGasExchangeWorkbench selectedAtlasSystemId={selectedBodySystemId} />
-        </Suspense>
-      </div>
-
-      <div className="relative z-[2] mt-3">
-        <Suspense fallback={<div className="grid min-h-40 place-items-center rounded-[28px] border border-white/[.08] bg-black/35 text-xs font-bold text-white/35">Loading renal homeostasis lab…</div>}>
-          <RenalHomeostasisWorkbench selectedAtlasSystemId={selectedBodySystemId} />
-        </Suspense>
-      </div>
-
-      <div className="relative z-[2] mt-3">
-        <Suspense fallback={<div className="grid min-h-40 place-items-center rounded-[28px] border border-white/[.08] bg-black/35 text-xs font-bold text-white/35">Loading pathophysiology network…</div>}>
-          <PathophysiologyNetworkPanel selectedAtlasSystemId={selectedBodySystemId} />
-        </Suspense>
-      </div>
-
-      <div className="relative z-[2] mt-3">
-        <Suspense fallback={<div className="grid min-h-40 place-items-center rounded-[28px] border border-white/[.08] bg-black/35 text-xs font-bold text-white/35">Loading lesion localization lab…</div>}>
-          <LesionLocalizationPanel selectedAtlasSystemId={selectedBodySystemId} />
-        </Suspense>
-      </div>
-
-      <div className="relative z-[2] mt-3">
-        <Suspense fallback={<div className="grid min-h-40 place-items-center rounded-[28px] border border-white/[.08] bg-black/35 text-xs font-bold text-white/35">Loading drug mechanism network…</div>}>
-          <DrugMechanismNetworkPanel selectedAtlasSystemId={selectedBodySystemId} />
-        </Suspense>
-      </div>
-
-      <div
-        id="body-exposure-core"
-        ref={explorerRef}
-        onClickCapture={captureExplorerSelection}
-        className="body-exposure-os__core relative z-[1] mt-3 rounded-[30px] border border-white/[.08] bg-black/45 p-2 shadow-[0_24px_80px_rgba(0,0,0,.34)] backdrop-blur-xl sm:p-3"
-      >
-        <BodyExplorer />
-      </div>
+      <div id="body-exposure-core" ref={explorerRef} onClickCapture={captureExplorerSelection} className="body-exposure-os__core relative z-[1] mt-3 rounded-[30px] border border-white/[.08] bg-black/45 p-2 shadow-[0_24px_80px_rgba(0,0,0,.34)] backdrop-blur-xl sm:p-3"><BodyExplorer /></div>
     </section>
   )
 }
