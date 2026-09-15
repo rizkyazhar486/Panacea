@@ -218,6 +218,118 @@ merged and its relevant acceptance evidence is green.
   non-overlapping unfinished item, implement it, validate it, merge safely, then
   continue.
 
+## Continuous product director — publish first, mature continuously
+
+The default objective is **maximum validated user-visible output per unit of time**,
+not maximum page count, raw LOC or novelty. Every agent run should choose the next
+non-overlapping task with the highest release value.
+
+Use this transparent priority score with each component normalized to 0–5:
+
+`ShipPriority = 0.30B + 0.25R + 0.20X + 0.15S + 0.10E`
+
+where `B` = release-blocker reduction, `R` = user reach, `X` = reuse across target
+audiences, `S` = safety/trust improvement, and `E` = effort efficiency. Hard
+security/clinical-safety blockers override the numerical score.
+
+### Release sequence
+
+1. **Showcase candidate first.** The app should be safe to show publicly and to
+   clinicians: exactly three obvious super-pages, no broken primary flows, no dev
+   copy/TODOs, coherent theme, responsive phone/desktop behavior, demo-safe data,
+   and every visible control either functional or intentionally disabled with a
+   user-facing reason.
+2. **Patient + athlete pilot next.** Mature Home / OS for connected signals,
+   provenance, trends, sleep/recovery, activity/training, nutrition, prevention,
+   reminders, emergency actions, consent and export/delete controls. Athlete mode
+   is role-adaptive Home / OS, not a fourth page.
+3. **Puskesmas assisted pilot next.** Mature Clinical for patient queue/context,
+   intake, vitals, red flags/triage support, problem/allergy/medication review,
+   calculators, labs, medicines, referral, notes, print/export, audit and
+   low-bandwidth resilience. Clinician sign-off remains mandatory for clinical
+   actions.
+4. **Hospital integration pilot after that.** Add/finish RBAC, holistic EMR,
+   longitudinal records, audit trail, interoperability/FHIR mapping where
+   appropriate, deployment observability, backups/recovery, privacy/governance,
+   incident/downtime behavior and institution-specific integration tests. Do not
+   market “hospital ready” merely because the UI looks finished.
+5. **Explore / Body Exposure matures in parallel** as Panaceamed's differentiation
+   layer, but novelty must not block release-critical Home / Clinical work.
+
+### Same three pages, role-adaptive composition
+
+- **Home / OS:** primary for patient, athlete and general user; clinicians may also
+  see their own/personal summary. Change widgets/priority by role, not route trees.
+- **Clinical:** primary for doctor/Puskesmas/hospital workflow. Patients may receive
+  a limited patient-facing view, but clinician-only actions stay role-gated.
+- **Explore:** universal visual learning/research/body workspace; role changes depth
+  and available controls, not the top-level page count.
+- Admin/settings/enterprise controls belong in profile, command/search, drawers or
+  contextual management surfaces, not as another primary super-page.
+
+### Feature admission rule
+
+Every new capability must declare:
+1. parent super-page (`Home`, `Clinical`, or `Explore`);
+2. surface form (`primary widget`, `rail/carousel item`, `contextual mode/drawer`,
+   or `search/command-only`);
+3. expected access depth (normally 1–2 interactions);
+4. data/evidence/provenance status;
+5. whether it is release-critical, differentiating, or optional.
+
+A feature without this mapping is parked instead of creating a new top-level route.
+
+### Current PR harvest order (2026-09-15)
+
+- **0 — #1734 first:** land the 3-super-page foundation after fresh exact-head
+  Validate + full Stabilization Acceptance and final latest-main overlap check.
+- **1 — Clinical core:** replay/adapt useful work from #1708 into Clinical. Reuse
+  the intent-level Care grouping from closed #1733 where useful, but do not restore
+  its competing IA.
+- **2 — Body mechanism evidence chain:** #1711 → #1712 → #1713, replayed one layer
+  at a time onto latest main and integrated under Explore / Body Exposure. Closed
+  #1705 is superseded by #1711.
+- **3 — High-value Body depth:** selectively integrate #1681 lesion localization,
+  #1646 EEG/brain work and useful convergence ideas from #1701 without creating
+  parallel Body products.
+- **4 — Discovery differentiation:** integrate safe, evidence-bounded pieces of
+  #1645, #1709, #1726 and #1715 under Explore / Discovery rather than separate
+  public products.
+- **5 — Legacy Home/UI PRs:** treat #1664, #1665 and #1666 as design/test sources to
+  harvest selectively after #1734; do not wholesale merge stale UI that reopens old
+  Home architecture.
+- **6 — Enterprise/product architecture:** #1683 and #1714 are lower priority than
+  working Clinical/EMR/pilot flows; integrate only when their governance/economics
+  concepts support the real three-page product.
+- **7 — Optional novelty:** #1672 and #1706 remain parked until showcase and pilot
+  gates are green. Novel input/cinematic features must not delay publishability.
+- **Conditional — #1658:** only replay if its reachability fix still corresponds to
+  a current failing gate after Learn content has been absorbed into Explore.
+
+### Continuous lane allocation
+
+- **Lane A — Release/CI (Claude Code):** exact-head failures, build/type/test,
+  routing, accessibility blockers, performance, responsive defects, hardening.
+- **Lane B — Product integration (routine/medium coding):** 3-page consolidation,
+  role-adaptive widgets, Clinical/EMR/data wiring, route adapters, search/command.
+- **Lane C — Visual/3D (Astra/heavy):** Body Exposure, WebGL/Three.js, spatial
+  interaction, anatomy/physiology motion and difficult visual foundations.
+- **Lane D — Evidence/content/data (fast/medium):** source/provenance mapping,
+  concise educational layers, safe demo fixtures, labels, token/a11y sweeps and
+  deterministic tests.
+
+Do not let two lanes edit the same high-conflict files simultaneously. Prefer one
+coherent PR per lane. When a PR merges, immediately select the next highest
+`ShipPriority` non-overlapping task instead of waiting for another “continue”.
+
+### Definition of publishable vs clinically deployable
+
+A visually polished showcase can ship before institutional deployment. Puskesmas
+or hospital use requires the relevant security, privacy, audit, human-review,
+evidence, reliability and governance gates to be actually satisfied. Software CI
+is not clinical validation. Keep those stages explicit so speed never becomes an
+unsupported clinical-readiness claim.
+
 ## Standard agent lane
 
 For each candidate:
