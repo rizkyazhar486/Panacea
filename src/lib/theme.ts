@@ -108,7 +108,6 @@ export function getSimpleMode(): boolean {
   } catch {
     return false
   }
-  return false
 }
 
 export function setSimpleMode(on: boolean) {
