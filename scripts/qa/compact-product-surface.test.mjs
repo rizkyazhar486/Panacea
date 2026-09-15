@@ -13,16 +13,37 @@ test('product surface exposes one stable compact OS taxonomy', () => {
   for (const id of ['today', 'body', 'move', 'learn', 'care', 'discover', 'community', 'system']) {
     assert.match(taxonomy, new RegExp(`id: '${id}'`), `missing product space: ${id}`)
   }
-  assert.match(taxonomy, /One system|stable mental model|small OS/)
+  assert.match(taxonomy, /small OS|conceptual\s+neighborhoods|canonical workspace/s)
+})
+
+test('similar product spaces converge into shared canonical workspaces', () => {
+  assert.match(taxonomy, /id: 'body'[\s\S]*to: '\/fitness-hub\?view=body-exposure'/)
+  assert.match(taxonomy, /id: 'move'[\s\S]*to: '\/fitness-hub\?view=training'/)
+  assert.match(taxonomy, /id: 'learn'[\s\S]*to: '\/learn'/)
+  assert.match(taxonomy, /id: 'discover'[\s\S]*to: '\/learn\?t=discovery'/)
+  assert.match(taxonomy, /id: 'care'[\s\S]*to: '\/clinical-hub'/)
 })
 
 test('daily navigation hides secondary doors without deleting routes', () => {
   assert.match(taxonomy, /SECONDARY_DAILY_DESTINATIONS/)
-  assert.match(taxonomy, /'\/workout'/)
-  assert.match(taxonomy, /'\/radiology'/)
-  assert.match(taxonomy, /'\/frontier-health'/)
+  for (const route of [
+    '/latihan', '/workout', '/recovery', '/tubuh', '/nutrition', '/radiology',
+    '/electrophysiology', '/genome-lab', '/frontier-health', '/health-data',
+    '/evidence', '/osce-ukmppd', '/clinical-calculators', '/drug-info', '/emr',
+  ]) {
+    assert.ok(taxonomy.includes(`'${route}'`), `secondary daily destination missing: ${route}`)
+  }
   assert.match(hiddenFeatures, /compactPrimaryNavigation\(items\)/)
   assert.match(hiddenFeatures, /fitur tersedia.*navigasi utama/s)
+})
+
+test('shell representatives are rewritten to hubs instead of spawning sibling pages', () => {
+  assert.match(taxonomy, /CANONICAL_PRIMARY_WORKSPACES/)
+  assert.match(taxonomy, /'\/body-explorer': \{ to: '\/fitness-hub', label: 'Your Body' \}/)
+  assert.match(taxonomy, /'\/med-study': \{ to: '\/learn', label: 'Learn' \}/)
+  assert.match(taxonomy, /'\/clinical-hub': \{ to: '\/clinical-hub', label: 'Services' \}/)
+  assert.match(taxonomy, /next\.group = 'Home'/)
+  assert.match(taxonomy, /seen\.has\(next\.to\)/)
 })
 
 test('all-features page starts with spaces and keeps full directory progressive', () => {
