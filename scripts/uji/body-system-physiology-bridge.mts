@@ -1,0 +1,31 @@
+import assert from 'node:assert/strict'
+import { BODY_SYSTEM_SOURCE_WAVE } from '../../src/lib/bodySystemSourceWave.ts'
+import {
+  BODY_SYSTEM_PHYSIOLOGY_BRIDGE,
+  BODY_SYSTEM_PHYSIOLOGY_BRIDGE_BOUNDARY,
+  getBodySystemPhysiologyBridge,
+} from '../../src/lib/bodySystemPhysiologyBridge.ts'
+import { getWholeBodySystem } from '../../src/lib/wholeBodyPhysiologyOS.ts'
+
+assert.equal(BODY_SYSTEM_PHYSIOLOGY_BRIDGE.length, BODY_SYSTEM_SOURCE_WAVE.length, 'every source-atlas system needs a physiology bridge')
+assert.equal(new Set(BODY_SYSTEM_PHYSIOLOGY_BRIDGE.map((item) => item.atlasSystemId)).size, BODY_SYSTEM_SOURCE_WAVE.length, 'bridge atlas ids must be unique')
+
+for (const atlasSystem of BODY_SYSTEM_SOURCE_WAVE) {
+  const bridge = getBodySystemPhysiologyBridge(atlasSystem.id)
+  assert.ok(bridge.physiologySystemIds.length >= 1, `${atlasSystem.id} needs at least one physiology destination`)
+  assert.ok(bridge.rationale.length >= 40, `${atlasSystem.id} bridge needs an explicit rationale`)
+  for (const physiologyId of bridge.physiologySystemIds) getWholeBodySystem(physiologyId)
+}
+
+assert.deepEqual(getBodySystemPhysiologyBridge('urinary').physiologySystemIds, ['renal'])
+assert.deepEqual(getBodySystemPhysiologyBridge('lymphatic-immune').physiologySystemIds, ['immune-lymphatic'])
+assert.deepEqual(getBodySystemPhysiologyBridge('integumentary-surface').physiologySystemIds, ['integumentary'])
+assert.equal(getBodySystemPhysiologyBridge('sensory-ent').fidelity, 'contextual', 'sensory/ENT must not be misrepresented as a direct one-to-one physiology domain')
+assert.ok(getBodySystemPhysiologyBridge('digestive').physiologySystemIds.includes('hepatic-metabolic'), 'digestive bridge must preserve hepatometabolic coupling')
+assert.ok(getBodySystemPhysiologyBridge('reproductive').physiologySystemIds.includes('endocrine'), 'reproductive bridge must preserve endocrine coupling')
+
+assert.match(BODY_SYSTEM_PHYSIOLOGY_BRIDGE_BOUNDARY, /educational navigation relationships/i)
+assert.match(BODY_SYSTEM_PHYSIOLOGY_BRIDGE_BOUNDARY, /not claims/i)
+assert.match(BODY_SYSTEM_PHYSIOLOGY_BRIDGE_BOUNDARY, /clinical function/i)
+
+console.log('body system physiology bridge: 11/11 source-atlas systems mapped with explicit fidelity and educational boundary')
