@@ -3,6 +3,7 @@ import { BodyExplorer } from './BodyExplorer'
 import './bodyExposureOS.css'
 
 const BodyAllSystems3D = lazy(() => import('../components/BodyAllSystems3D'))
+const BodyInfinityLab = lazy(() => import('../components/BodyInfinityLab'))
 
 type ExposureMode = 'atlas' | 'physiology' | 'imaging' | 'surgery' | 'molecular' | 'clinical'
 
@@ -26,6 +27,7 @@ export function BodyExposureOS() {
   const rootRef = useRef<HTMLElement | null>(null)
   const explorerRef = useRef<HTMLDivElement | null>(null)
   const systemsRef = useRef<HTMLDivElement | null>(null)
+  const infinityRef = useRef<HTMLDivElement | null>(null)
   const [activeMode, setActiveMode] = useState<ExposureMode>('atlas')
   const [immersive, setImmersive] = useState(false)
 
@@ -57,6 +59,10 @@ export function BodyExposureOS() {
   function openSystemAtlas() {
     setActiveMode('atlas')
     systemsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+  }
+
+  function openInfinityLab() {
+    infinityRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
   }
 
   async function toggleImmersive() {
@@ -92,6 +98,7 @@ export function BodyExposureOS() {
               <span className="text-[10px] font-black uppercase tracking-[.24em] text-cyan-200">Body Exposure · Human Body OS</span>
               <span className="rounded-full border border-white/10 bg-white/[.045] px-2.5 py-1 text-[9px] font-black uppercase tracking-[.14em] text-white/60">whole-body first</span>
               <span className="rounded-full border border-violet-300/10 bg-violet-300/[.045] px-2.5 py-1 text-[9px] font-black uppercase tracking-[.14em] text-violet-100/65">11-system source atlas</span>
+              <span className="rounded-full border border-fuchsia-300/10 bg-fuchsia-300/[.045] px-2.5 py-1 text-[9px] font-black uppercase tracking-[.14em] text-fuchsia-100/65">Infinity Lab</span>
             </div>
             <h2 id="body-exposure-os-title" className="mt-2 max-w-3xl text-2xl font-black tracking-[-.035em] text-white sm:text-3xl lg:text-4xl">
               One body. Every scale. One continuous learning space.
@@ -108,6 +115,13 @@ export function BodyExposureOS() {
               className="min-h-[44px] rounded-full border border-cyan-300/25 bg-cyan-300/10 px-4 text-xs font-black text-cyan-100 transition hover:bg-cyan-300/15 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-300/60"
             >
               Explore 11 systems
+            </button>
+            <button
+              type="button"
+              onClick={openInfinityLab}
+              className="min-h-[44px] rounded-full border border-fuchsia-300/20 bg-[linear-gradient(135deg,rgba(34,211,238,.08),rgba(139,92,246,.11),rgba(236,72,153,.09))] px-4 text-xs font-black text-white/85 transition hover:border-fuchsia-300/30 hover:bg-white/[.08] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-fuchsia-300/45"
+            >
+              Open Infinity Lab
             </button>
             <button
               type="button"
@@ -162,6 +176,13 @@ export function BodyExposureOS() {
               </button>
             )
           })}
+          <button
+            type="button"
+            onClick={openInfinityLab}
+            className="min-h-[42px] rounded-[16px] border border-fuchsia-300/10 bg-fuchsia-300/[.035] px-4 text-xs font-black text-fuchsia-100/60 transition hover:border-fuchsia-300/20 hover:bg-fuchsia-300/[.065] hover:text-fuchsia-100"
+          >
+            Infinity Lab
+          </button>
         </div>
       </nav>
 
@@ -173,6 +194,12 @@ export function BodyExposureOS() {
       <div ref={systemsRef} className="relative z-[2] mt-3 scroll-mt-4">
         <Suspense fallback={<div className="grid min-h-44 place-items-center rounded-[26px] border border-white/[.08] bg-black/35 text-xs font-bold text-white/35">Loading system atlas…</div>}>
           <BodyAllSystems3D />
+        </Suspense>
+      </div>
+
+      <div ref={infinityRef} className="relative z-[2] mt-3 scroll-mt-4">
+        <Suspense fallback={<div className="grid min-h-64 place-items-center rounded-[30px] border border-white/[.08] bg-black/50 text-xs font-bold text-white/35">Building experimental spatial lab…</div>}>
+          <BodyInfinityLab />
         </Suspense>
       </div>
 
