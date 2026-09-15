@@ -81,10 +81,11 @@
   }
 
   /* Home already exposes the Shell hamburger. Hide the duplicate draggable FAB
-     on this route so it cannot cover More/reference-range controls. */
+     and its radial menu on this route so neither can cover More/reference-range
+     controls. */
   body:has(.panacea-home) button[aria-label="Buka menu navigasi"],
   body:has(.panacea-home) button[aria-label="Tutup menu"],
-  body:has(.panacea-home) [role="menu"][aria-label="Menu navigasi"] {
+  body:has(.panacea-home) [role="menu"][aria-label="Tindakan cepat"] {
     display: none !important;
   }
 }
