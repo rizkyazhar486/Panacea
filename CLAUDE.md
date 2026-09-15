@@ -93,8 +93,8 @@ unfinished before touching it; do not re-plan settled product decisions.
 - Finish exact-head Validate + full Stabilization Acceptance + relevant security /
   Body/WebGL gates for active production PRs, re-check latest `main`, ancestry and
   file overlap, then merge only through the PR. Never trust stale green CI.
-- If Deep Human Lab blocker/PR `#1711` still exists, capture the present failure,
-  make the smallest evidence-based fix and rerun fresh CI.
+- If PR `#1711` is still open, treat it as the current causal-bridge replay rather
+  than reviving older #1705. Fix only concrete failures and rerun fresh CI.
 - Own final debugging, hardening, performance cleanup, build/type/test fixes,
   responsive behavior and visual finishing. Target remains Friday **18 Sep 2026**,
   but no deadline allows bypassing gates or weakening validation.
@@ -203,6 +203,63 @@ unfinished before touching it; do not re-plan settled product decisions.
   deterministic cleanup and simple tests.
 - Do not re-plan decisions already settled in this file. Take the highest-value
   non-overlapping unfinished item, implement, validate, merge safely, then continue.
+
+## Claude Code publish-first director
+
+Claude Code should behave as the **finisher/integrator**, not as a second product
+planner. `AGENTS.md` contains the global priority model and PR harvest order; use it
+as the source of truth for what comes next.
+
+### Immediate order
+
+1. **Finish #1734 first.** Do not start a competing IA branch. If CI fails, diagnose
+   the exact current head, patch the concrete defect, rerun exact-head gates, and
+   merge only after latest-main overlap/ancestry is clean.
+2. **Make the 3-page shell real, not cosmetic.** Ensure Home / OS, Clinical and
+   Explore are the only primary mental-model destinations. Existing routes may
+   remain for compatibility, but common actions must resolve into those pages in
+   1–2 interactions.
+3. **Clinical before enterprise polish.** Replay/adapt #1708 into Clinical after the
+   foundation lands. Reuse useful Care grouping from closed #1733 without restoring
+   its separate workspace IA. Make Puskesmas workflow credible before prioritizing
+   internal architecture/economics pages.
+4. **Body evidence chain next.** Replay #1711 → #1712 → #1713 one layer at a time on
+   fresh main; then selectively integrate #1681, #1646 and useful #1701 ideas into
+   Explore / Body Exposure.
+5. **Discovery after core stability.** Safely absorb #1645, #1709, #1726 and #1715
+   into Explore / Discovery. Keep research/synthetic boundaries explicit.
+6. **Harvest stale UI PRs; do not wholesale merge them.** #1664/#1665/#1666 are
+   design/test sources after #1734, not authority for the old Home architecture.
+7. **Park optional novelty** (#1672, #1706) until showcase and pilot gates are green.
+   Do not spend scarce stabilization time on features that do not improve
+   publishability, reach, safety or differentiation of the three super-pages.
+
+### Release ladder Claude should optimize for
+
+- **Showcase:** beautiful, coherent, no broken visible controls, no dev/TODO copy,
+  responsive phone/desktop, demo-safe and understandable within minutes.
+- **Patient/Athlete pilot:** Home / OS connected signals, trends, recovery/training,
+  prevention, consent and data controls.
+- **Puskesmas pilot:** Clinical patient context, intake/vitals, triage support,
+  problem/allergy/medication review, calculators, labs, referral, notes, audit,
+  low-bandwidth resilience and clinician sign-off.
+- **Hospital pilot:** role/RBAC, longitudinal EMR, audit, interoperability, privacy,
+  observability, backup/recovery, downtime behavior and institutional integration.
+
+Do not claim a later rung based only on UI completeness. A polished demo is not a
+clinical deployment.
+
+### Claude's task-selection formula
+
+When several non-overlapping candidates are available, rank them using the shared
+0–5 inputs from `AGENTS.md`:
+
+`ShipPriority = 0.30B + 0.25R + 0.20X + 0.15S + 0.10E`
+
+Prefer the higher score, except hard security/clinical-safety blockers always win.
+After each safe merge, immediately select the next highest-value non-overlapping
+candidate; do not wait for another owner message when operating in an authorized
+continuous run.
 
 ## Multi-agent coordination — mandatory
 
