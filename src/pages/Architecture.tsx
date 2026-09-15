@@ -1,6 +1,7 @@
 import { Card, SectionTitle, Badge } from '../components/ui'
 import { Prosa } from '../components/Prosa'
 import { IconShield, IconSparkle, IconEMR, IconBook, IconCheck } from '../components/icons'
+import { PanaceaOperatingModelBoard } from '../components/PanaceaOperatingModelBoard'
 import { WEIGHTS, S_THRESHOLD } from '../lib/cdss'
 
 const MODULES = [
@@ -66,6 +67,8 @@ export function Architecture() {
           <Badge tone="high">AI = decision support, not autonomous prescribing</Badge>
         </div>
       </Card>
+
+      <PanaceaOperatingModelBoard />
 
       {/* Ensemble formula */}
       <Card className="border-2 border-brand/20">
