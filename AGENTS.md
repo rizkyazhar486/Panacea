@@ -71,6 +71,153 @@ When two features substantially overlap in user intent, data, actions or context
 the default is to **merge them into the same super-page** rather than add another
 branch in navigation.
 
+## Durable unfinished-work queue — no separate handoff
+
+This section is the in-repository continuation ledger for Claude Code, Codex and
+other implementation agents. **Do not create a separate handoff document unless
+an owner explicitly asks for one.** Read this queue together with current `main`,
+open PRs/issues and CI evidence. Before starting an item, verify that it is still
+unfinished. Do not delete or mark an item complete until the implementation is
+merged and its relevant acceptance evidence is green.
+
+### P0 — stabilization, hardening and visual debt
+
+- Finish exact-head CI for active production PRs: Validate, complete Stabilization
+  Acceptance, security gates, Body/WebGL acceptance where relevant, then re-check
+  latest `main`, ancestry and overlap before merge. Never rely on stale green CI.
+- Diagnose concrete build/test/typecheck/browser failures before changing code.
+  If Deep Human Lab blocker/PR `#1711` is still open, capture the current failure,
+  make the smallest justified patch, and rerun fresh CI rather than re-planning.
+- Complete the UI/UX debt pass without deleting capability: Home contrast and
+  information simplification, typography hierarchy, 4/8 spacing consistency,
+  navigation de-duplication/mobile flow, Today/widgets/reference ranges, Body
+  Exposure/Learn/Discovery visual cleanup, forms/tables/modals/alerts/empty/error
+  states, responsive behavior, accessibility and visual-regression review.
+- Final stabilization/debugging/hardening/optimization is a Claude Code + Astra
+  responsibility. The target remains Friday **18 Sep 2026**, but never bypass a
+  gate, weaken a validator or claim readiness without evidence.
+
+### P1 — finish consolidation into three super-pages
+
+- Continue reducing public route complexity toward **Home / OS, Clinical, Explore**.
+  Existing specialized routes may remain as compatibility/deep-link adapters, but
+  they must not present themselves as competing top-level products.
+- Compile duplicate or overlapping pages into one stateful workspace using widgets,
+  rails/carousels, contextual tabs, drawers, overlays and progressive disclosure.
+- Preserve useful functions, datasets, APIs and assets while removing duplicate UI
+  and duplicate mental models. Consolidation means **merge capability, not delete
+  capability**.
+- Keep any feature reachable in roughly 1–2 interactions from a primary super-page.
+  Rare tools should be smaller/secondary, not deeply buried.
+- Make global search / Ask Panacea the universal shortcut layer so a user can reach
+  uncommon functionality without understanding the old route tree.
+- Remove production-facing TODOs, dev-status copy, “coming next”, implementation
+  commentary and internal repo/workflow language from all public surfaces.
+
+### P2 — unify the visual system instead of page-local styling
+
+- Replace arbitrary component-local colors with semantic/shared tokens. Do not add
+  new page-local palettes.
+- Current owner direction: near-black/space-black biomedical-cosmic foundation;
+  spectral/refraction accents in cyan/electric blue/violet/magenta; restrained
+  warm-white/gold halo; Panacea green `#00BF63` remains a brand/semantic accent,
+  not a large decorative fill.
+- Keep surfaces quiet, translucent/glass only where it improves hierarchy, with
+  narrow consistent borders and continuous framing. Avoid washed-out dark panels,
+  parent `opacity`/`filter`/`grayscale`, decorative green slabs and unreadable muted
+  mobile text.
+- Use predictable spacing and typography. Prefer the 4/8 spacing rhythm and the
+  existing size ladder `12, 14, 16, 20, 24, 32`; body copy must not fall below
+  12 px and primary touch targets should be at least 44 px.
+- Motion/3D/visual effects may be ambitious, but they must clarify state, anatomy,
+  causality or navigation rather than become empty spectacle. Experimental/synthetic
+  visualizations must be labeled as such and never presented as clinical fact.
+
+### P3 — Body Exposure: whole-body first, then depth
+
+- Keep **whole body first**. Mature breadth across the body and organ systems before
+  spending disproportionate effort on one isolated organ or microscopic layer.
+- Canonical anatomical depth is:
+  `whole body → organ/system → tissue → histology → cell/organelle → molecule → genome/DNA`.
+  The physical layer sequence should remain anatomically meaningful: skin →
+  subcutaneous tissue → fascia → muscle → tendon/ligament → neurovascular
+  structures → organ/capsule → histology → cell → molecule → gene.
+- Biomechanics should follow bone → cartilage → capsule → ligament → tendon →
+  muscle → fascia → force/load/movement, with source-backed geometry and no
+  fabricated precision.
+- Integrate anatomy, physiology, pathophysiology, pharmacology, imaging, lesion
+  localization, biomechanics and surgical education as modes/layers of the same
+  Body Exposure workspace, not separate competing products.
+- Mandatory references/targets remain: `thebuggeddev/anatomy`, the Breath Atlas,
+  `aycibatuhan/nervous-system-atlas`, the dental-atlas reference and the
+  anatomy-unfolded reference. Use them for capability/interaction targets; copy
+  code/assets only when licensing/permission is verified. Preserve provenance.
+- Issue `#626` remains a mandatory Body Exposure HD Anatomy + Breath Atlas target:
+  progressive loading, LOD, high-DPI fidelity, stable WebGL, respiratory mechanics,
+  airway hierarchy and mobile 390x844 evidence.
+- Organ/system maturation sequence includes the Eye Gold Standard, Heart &
+  Cardiovascular, Brain & Neurovascular/Nervous System, Respiratory, Renal,
+  Endocrine, and whole-body Musculoskeletal/Biomechanics. Do not declare an organ
+  presentation-ready merely because a shell exists.
+- Eye Gold Standard scope includes orbit/globe, corneal layers, retinal layers,
+  extraocular muscles, neural pathway, blood supply, lacrimal system, aqueous flow,
+  accommodation, pupillary reflex, pathology, pharmacology, imaging, interaction,
+  performance and validation. Owner quality goals `Q ≥ 0.88` and anatomical
+  accuracy `≥ 0.92` are aspirational gates unless an explicit reproducible rubric
+  exists; never fabricate a passing score.
+- Continue mechanism integration: pathophysiology → pharmacology/DailyMed → causal
+  bridge → unified mechanism graph → provenance; complete/replay lesion workflows,
+  heart pressure-volume, brain neurovascular, respiratory V/Q + gas exchange,
+  renal and endocrine simulations with explicit evidence/simulation boundaries.
+
+### P4 — Home / OS, Clinical and Explore capability compilation
+
+- **Home / OS:** compile personal health overview, wearables/device integrations,
+  activity, sleep/recovery, nutrition, longevity, prevention, alerts, goals,
+  emergency actions and quick actions into a short vertically scrollable surface.
+  WHOOP, Garmin, Oura and Apple Health integrations belong here contextually rather
+  than as separate top-level products.
+- **Clinical:** unify patient context, intake/triage, differential diagnosis, CDSS,
+  labs, imaging, clinical scores/calculators, medicines/interactions, guidelines,
+  monitoring and documentation into one clinical flow. Do not expose AI output as
+  verified diagnosis/treatment without the required evidence/review boundary.
+- **Explore:** unify Body Exposure, medical education, evidence/reference, research,
+  datasets and biomedical discovery in one visual-first workspace. Deep content is
+  allowed, but first-layer text should stay brief and visual/interactive.
+- Discovery/research simulation may support computational molecule/drug/vaccine
+  concepts, literature/evidence links and safe synthetic modeling. Do **not** add
+  operational pathogen engineering, actionable wet-lab viral design or unsupported
+  claims of real-time clinical applicability.
+
+### P5 — final polish and acceptance
+
+- After feature consolidation, run a full responsive pass for phone/tablet/desktop,
+  especially 390x844; verify no floating controls, nav, drawers or carousels cover
+  important content.
+- Preserve progressive asset loading, bounded render scale/devicePixelRatio, WebGL
+  context stability, graceful degradation and performance budgets for 3D pages.
+- Audit keyboard/focus semantics, reduced motion, color contrast, readable muted
+  text, empty/error/loading states and visual regression.
+- Remove genuinely dead duplicate routes/components only after compatibility/deep
+  links and usage are accounted for. Never delete a feature merely because its old
+  page is no longer visible.
+
+### Model/work allocation
+
+- **Claude Code:** stabilization, debugging, hardening, integration, route/UI
+  de-fragmentation, refactoring, responsive behavior, performance cleanup, build/
+  type/test failures, and finishing already-settled product decisions.
+- **Astra / heavy visual mode:** difficult Three.js/WebGL, advanced anatomy or
+  physiology rendering, sophisticated 3D/motion/spatial interaction and visual
+  problems that ordinary coding modes cannot solve reliably.
+- **Routine/medium:** most React/TypeScript integration, component consolidation,
+  data wiring and predictable UI work.
+- **Light/repetitive:** token replacement, spacing/typography/accessibility sweeps,
+  labels, deterministic cleanup and simple tests.
+- **Do not re-plan settled decisions.** Inspect current state, take the highest-value
+  non-overlapping unfinished item, implement it, validate it, merge safely, then
+  continue.
+
 ## Standard agent lane
 
 For each candidate:
