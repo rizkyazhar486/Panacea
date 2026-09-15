@@ -27,7 +27,7 @@ type Runtime = {
   outputGain: GainNode
   stream: MediaStream
   frame: number
-  spectrum: Float32Array
+  spectrum: Float32Array<ArrayBuffer>
 }
 
 const SPEED_OF_SOUND_MPS = 343
@@ -221,7 +221,7 @@ class SonarAirGestureService {
         outputGain,
         stream,
         frame: 0,
-        spectrum: new Float32Array(analyser.frequencyBinCount),
+        spectrum: new Float32Array(new ArrayBuffer(analyser.frequencyBinCount * Float32Array.BYTES_PER_ELEMENT)),
       }
       this.patch({ phase: 'calibrating', carrierHz, error: null })
       this.mountDock()
