@@ -5,6 +5,25 @@
 // navigasi dekoratif. Pengguna dapat memilih kombinasi yang sesuai dengan
 // hidupnya: belajar, latihan, uang, cerita hidup, tubuh, ibadah, atau klinis.
 
+/**
+ * ONE MOBILE NAVIGATION LAYER.
+ *
+ * Shell masih memiliki strip pintasan historis (`data-pintasan`) sementara
+ * FabNavigasi sudah menjadi command dock global. Menampilkan keduanya sekaligus
+ * membuat dua lapisan navigasi berebut ruang 390px yang sama dan memberi dua
+ * jalan visual menuju tujuan serupa. Untuk stabilisasi cepat, sumber tindakan
+ * FAB menjadi pemilik kebijakan ini dan menonaktifkan strip lama pada viewport
+ * mobile. Rute, drawer, search, dan isi strip tidak dihapus; hanya presentasi
+ * redundannya yang dihentikan. Claude/Astra dapat memindahkan aturan ini ke
+ * stylesheet global saat finishing tanpa mengubah perilaku produk.
+ */
+if (typeof document !== 'undefined' && !document.getElementById('panacea-single-mobile-nav')) {
+  const style = document.createElement('style')
+  style.id = 'panacea-single-mobile-nav'
+  style.textContent = '@media (max-width: 1023px){[data-pintasan]{display:none!important}}'
+  document.head.appendChild(style)
+}
+
 export type JenisAksi = 'rute' | 'kembali' | 'atas' | 'tema' | 'cari'
 
 export interface AksiFab {
