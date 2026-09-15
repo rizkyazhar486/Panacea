@@ -253,3 +253,53 @@
 .dark .panacea-home :where([class*='animate-pulse'], [data-skeleton], [aria-busy='true']) :where(div, span)[class*='bg-'] {
   background-color: rgba(0, 191, 99, 0.13) !important;
 }
+
+/*
+ * GLOBAL NO-GRAY SURFACE OVERRIDE — 2026-09-15 UI sprint.
+ * The current theme still maps several Tailwind surfaces to graphite. These
+ * overrides keep semantic text neutrals but make visual containers either pure
+ * white / white-green in light mode or near-black / black-green in dark mode.
+ */
+:where(section, article, nav, aside, header, footer, main, div, a, button)[class*='bg-neutral-'],
+:where(section, article, nav, aside, header, footer, main, div, a, button)[class*='bg-gray-'],
+:where(section, article, nav, aside, header, footer, main, div, a, button)[class*='bg-slate-'],
+:where(section, article, nav, aside, header, footer, main, div, a, button)[class*='bg-zinc-'],
+:where(section, article, nav, aside, header, footer, main, div, a, button)[class*='bg-stone-'] {
+  background-color: rgba(255, 255, 255, 0.985) !important;
+}
+
+.dark :where(section, article, nav, aside, header, footer, main, div, a, button)[class*='bg-neutral-'],
+.dark :where(section, article, nav, aside, header, footer, main, div, a, button)[class*='bg-gray-'],
+.dark :where(section, article, nav, aside, header, footer, main, div, a, button)[class*='bg-slate-'],
+.dark :where(section, article, nav, aside, header, footer, main, div, a, button)[class*='bg-zinc-'],
+.dark :where(section, article, nav, aside, header, footer, main, div, a, button)[class*='bg-stone-'],
+.dark .bg-white,
+.dark .bg-white\/95,
+.dark .bg-white\/90,
+.dark .bg-white\/85,
+.dark .bg-white\/80,
+.dark .bg-white\/70,
+.dark .bg-white\/60,
+.dark .bg-white\/50,
+.dark .bg-white\/40 {
+  background-color: rgba(4, 9, 8, 0.985) !important;
+}
+
+.dark input,
+.dark textarea,
+.dark select,
+.dark option {
+  background-color: #050b08 !important;
+  border-color: rgba(0, 191, 99, 0.18) !important;
+}
+
+.dark .liquid-glass,
+.dark .kaca {
+  background: linear-gradient(145deg, rgba(5, 12, 9, 0.98), rgba(2, 7, 5, 0.985)) !important;
+  border-color: rgba(0, 191, 99, 0.14) !important;
+}
+
+/* Keep inactive navigation/controls legible without gray-pill chrome. */
+.dark :where(nav, [role='tablist']) button:not([aria-selected='true']):not([aria-current='page']) {
+  background-color: transparent !important;
+}
