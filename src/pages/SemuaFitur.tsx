@@ -4,6 +4,7 @@ import { useStore } from '../lib/store'
 import { NAV_UNTUK_PENGATURAN } from '../components/Shell'
 import { FITUR_DARI_HUB } from '../lib/katalogFitur'
 import { penjelasan } from '../lib/penjelasanFitur'
+import { compactBrowseResults } from '../lib/featureEntryPoints'
 import {
   PANACEA_SPACES,
   getProductSpace,
@@ -69,9 +70,19 @@ export default function SemuaFitur() {
     })
   }, [q, kategori, tersedia])
 
+  // Browsing should show workspaces and substantial capabilities, not every
+  // historic deep-link as a sibling app. Search intentionally bypasses this
+  // compaction so a precise query such as "Wells", "caffeine" or "sleep apnea"
+  // can still land directly on the focused tool.
+  const visibleHasil = useMemo(
+    () => compactBrowseResults(hasil, q.trim().length > 0),
+    [hasil, q],
+  )
+  const deepToolsHidden = hasil.length - visibleHasil.length
+
   const grup = useMemo(() => {
-    const map = new Map<ProductSpaceId, typeof hasil>()
-    for (const n of hasil) {
+    const map = new Map<ProductSpaceId, typeof visibleHasil>()
+    for (const n of visibleHasil) {
       const id = productSpaceForRoute(n.to, n.group)
       if (!map.has(id)) map.set(id, [])
       map.get(id)!.push(n)
@@ -79,7 +90,7 @@ export default function SemuaFitur() {
     return PANACEA_SPACES
       .map((space) => [space.id, map.get(space.id) ?? []] as const)
       .filter(([, items]) => items.length > 0)
-  }, [hasil])
+  }, [visibleHasil])
 
   const primarySpaces = useMemo(() => PANACEA_SPACES.filter((space) => PRIMARY_SPACE_IDS.includes(space.id)), [])
   const directoryOpen = showDirectory || !!q || !!kategori
@@ -149,14 +160,14 @@ export default function SemuaFitur() {
             <div className="text-[10px] font-black uppercase tracking-[.16em] text-neutral-500 dark:text-neutral-400">Advanced directory</div>
             <h2 className="mt-1 text-lg font-black tracking-[-.02em] text-neutral-950 dark:text-white">Need a specific tool?</h2>
             <p className="mt-1 max-w-2xl text-xs font-medium leading-relaxed text-neutral-600 dark:text-neutral-300">
-              Browse every capability only when you need precision. Routes remain available; this directory no longer dominates the product.
+              Browse the main destinations, or search to reach focused calculators and legacy deep links directly. Nothing is deleted.
             </p>
           </div>
           <button
             onClick={() => setShowDirectory((v) => !v)}
             className="min-h-[42px] rounded-full border border-neutral-200 bg-white px-4 text-[11px] font-black text-neutral-800 shadow-sm transition hover:-translate-y-0.5 dark:border-white/10 dark:bg-white/[.06] dark:text-white"
           >
-            {directoryOpen && !q && !kategori ? 'Hide directory' : 'Browse all tools'}
+            {directoryOpen && !q && !kategori ? 'Hide directory' : 'Browse main tools'}
           </button>
         </div>
       </section>
@@ -191,7 +202,12 @@ export default function SemuaFitur() {
           <div className="flex items-end justify-between gap-3 px-1">
             <div>
               <div className="text-[10px] font-black uppercase tracking-[.16em] text-neutral-500 dark:text-neutral-400">Directory</div>
-              <h2 className="mt-1 text-xl font-black tracking-[-.025em] text-ink dark:text-white">{hasil.length} matching capabilities</h2>
+              <h2 className="mt-1 text-xl font-black tracking-[-.025em] text-ink dark:text-white">{visibleHasil.length} matching destinations</h2>
+              {deepToolsHidden > 0 && !q && (
+                <p className="mt-1 max-w-xl text-[10px] font-semibold leading-relaxed text-neutral-500 dark:text-neutral-400">
+                  {deepToolsHidden} focused tools are intentionally search-first. Type their name above to open them directly.
+                </p>
+              )}
             </div>
             {(q || kategori) && <div className="text-right text-[10px] font-semibold text-neutral-600 dark:text-neutral-300">Filtered from {tersedia.length}</div>}
           </div>
@@ -239,7 +255,7 @@ export default function SemuaFitur() {
             )
           })}
 
-          {hasil.length === 0 && (
+          {visibleHasil.length === 0 && (
             <section className="panacea-readable-card rounded-[26px] border border-dashed p-8 text-center">
               <div className="text-3xl" aria-hidden>⌕</div>
               <div className="mt-3 text-base font-black text-neutral-950 dark:text-white">Nothing matches yet</div>
