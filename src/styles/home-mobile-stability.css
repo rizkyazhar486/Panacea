@@ -43,3 +43,56 @@
     animation: none !important;
   }
 }
+
+/*
+ * Mobile priority restoration.
+ * The legacy PapanWidget never disappeared from the codebase; it had drifted
+ * below the 12-card utility launcher and was also deferred. On a phone this
+ * made the user's actual widgets look deleted. Keep every section, but restore
+ * the personal widget board directly after the hero so its IntersectionObserver
+ * mounts immediately when Home opens.
+ */
+@media (max-width: 767px) {
+  .panacea-home {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 1rem !important;
+  }
+
+  .panacea-home > * {
+    order: 30;
+  }
+
+  .panacea-home > .panacea-home-backdrop {
+    order: -10;
+  }
+
+  .panacea-home > .home-odyssey-hero {
+    order: 0;
+  }
+
+  .panacea-home > section[aria-labelledby="my-dashboard-title"] {
+    order: 1;
+    margin-top: 0 !important;
+  }
+
+  .panacea-home > section[aria-labelledby="daily-tools-title"] {
+    order: 2;
+  }
+
+  .panacea-home > section[aria-labelledby="my-dashboard-title"] .home-command-panel,
+  .panacea-home > section[aria-labelledby="my-dashboard-title"] {
+    background: #000 !important;
+    border-color: rgba(0, 191, 99, .28) !important;
+  }
+
+  .panacea-home > section[aria-labelledby="my-dashboard-title"] h2,
+  .panacea-home > section[aria-labelledby="my-dashboard-title"] p,
+  .panacea-home > section[aria-labelledby="my-dashboard-title"] div {
+    color: #fff;
+  }
+
+  .panacea-home > section[aria-labelledby="my-dashboard-title"] > div:first-child > div:first-child > div:first-child {
+    color: #00BF63 !important;
+  }
+}
