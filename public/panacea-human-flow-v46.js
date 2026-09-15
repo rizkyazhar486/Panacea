@@ -35,7 +35,13 @@
     if (!(el instanceof Element)) return ''
     return normalizeWhitespace(
       Array.from(el.childNodes)
-        .filter((node) => node.nodeType === Node.TEXT_NODE)
+        .filter((node) => {
+          if (node.nodeType === Node.TEXT_NODE) return true
+          if (!(node instanceof HTMLElement)) return false
+          if (node.getAttribute('aria-hidden') === 'true') return false
+          if (node.matches('svg, img, i, [data-icon], [class*="icon"]')) return false
+          return true
+        })
         .map((node) => node.textContent)
         .join(' '),
     )
@@ -106,7 +112,7 @@
     const explicit = normalizeWhitespace(field.dataset.pmdErrorMessage)
     if (explicit) return explicit
     if ('validationMessage' in field && field.validationMessage) return normalizeWhitespace(field.validationMessage)
-    return 'Please check this field and try again.'
+    return 'Periksa kolom ini lalu coba lagi.'
   }
 
   const showError = (field) => {
@@ -129,7 +135,8 @@
     field.setAttribute('aria-describedby', described.join(' '))
 
     const wrapper = field.closest('[data-pmd-field], .field, .form-field, .input-group')
-    ;(wrapper || field.parentElement || field).appendChild(error)
+    const host = wrapper && wrapper !== field ? wrapper : field.parentElement
+    if (host) host.appendChild(error)
   }
 
   const enhanceForm = (form) => {
@@ -162,7 +169,7 @@
     }
 
     const humanLabel = normalizeWhitespace(label || container.dataset.pmdProgressLabel)
-    const nextLabel = humanLabel || `Step ${safeCurrent} of ${safeTotal}`
+    const nextLabel = humanLabel || `Langkah ${safeCurrent} dari ${safeTotal}`
     if (meta.textContent !== nextLabel) meta.textContent = nextLabel
 
     let track = container.querySelector(':scope > .pmd-progress-track')
