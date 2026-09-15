@@ -1,12 +1,11 @@
-@import url('/panacea-hig-v41.css?v=20260915-2');
-
 /* Panacea Home readability guard v36
    Final-authority Home-only accessibility layer.
    Presentation only: no health calculations, routes, storage, chart semantics,
    clinical meaning, loading behavior, or animation logic is changed.
 
-   v41 alignment: this final cascade layer now consumes the HIG semantic palette
-   instead of restoring the old grey/light surfaces. */
+   v41 alignment: this layer consumes the HIG semantic palette. The HIG
+   foundation itself is loaded once, explicitly after all Home legacy layers in
+   index.html, so browser parsing and cascade order stay deterministic. */
 
 .panacea-home{
   --pmd-v36-text:var(--pmd-text,#f8fbff);
