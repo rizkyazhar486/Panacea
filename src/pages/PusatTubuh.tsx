@@ -1,30 +1,15 @@
-import { lazy, useMemo } from 'react'
-import { HalamanTab, type TabDef } from '../components/HalamanTab'
-import { PanelAngka, NADA, type Angka } from '../components/PanelAngka'
-import { KartuAngkaKlinis } from '../components/AngkaKlinis'
-import { auditTubuh } from '../lib/rujukanTubuh'
-import { IconActivity } from '../components/icons'
-import { getVitals } from '../lib/healthVitals'
+import { lazy, Suspense } from 'react'
+import { Link, useSearchParams } from 'react-router-dom'
+import { CanonicalBodyExposure } from '../components/CanonicalBodyExposure'
 
-// ─────────────────────────────────────────────────────────────────────────────
-// Sinyal Tubuh — lima halaman yang semuanya membaca deret dari jam tangan,
-// disatukan karena orang membacanya berurutan, bukan satu per satu.
-//
-//   Energi   — Body Battery dan stres sepanjang hari
-//   Jantung  — setiap sampel denyut yang dikirim jam tangan
-//   Tidur    — durasi, tahapan, dan keteraturan jam tidur
-//   Gerak    — asimetri langkah, kualitas jalan, bentuk lari
-//   Klinis   — SpO₂, EKG, jet lag, kehamilan, kursi roda
-// ─────────────────────────────────────────────────────────────────────────────
-
+// Existing health/recovery tools remain available, but they no longer compete
+// with the anatomical atlas as separate top-level body experiences. A legacy
+// deep link opens its tool below the SAME canonical body workspace.
 const BodyBattery = lazy(() => import('./BodyBattery').then((m) => ({ default: m.BodyBattery })))
 const HeartRateLog = lazy(() => import('./HeartRateLog').then((m) => ({ default: m.HeartRateLog })))
 const SleepPattern = lazy(() => import('./SleepPattern').then((m) => ({ default: m.SleepPattern })))
 const GaitAnalysis = lazy(() => import('./GaitAnalysis').then((m) => ({ default: m.GaitAnalysis })))
 const ClinicalTrackers = lazy(() => import('./ClinicalTrackers').then((m) => ({ default: m.ClinicalTrackers })))
-// Pemulihan dan tidur yang dulu tersebar sebagai rute sendiri-sendiri. Halaman
-// ini sudah memiliki tab Tidur sejak awal, jadi di sinilah tempatnya — bukan di
-// hub baru. Isinya tidak ditulis ulang; komponennya dipasang apa adanya.
 const SleepDebt = lazy(() => import('./SleepDebt').then((m) => ({ default: m.SleepDebt })))
 const SleepApneaScreen = lazy(() => import('./SleepApneaScreen').then((m) => ({ default: m.SleepApneaScreen })))
 const SleepToolkit = lazy(() => import('./SleepToolkit').then((m) => ({ default: m.SleepToolkit })))
@@ -35,104 +20,95 @@ const ThermalTherapy = lazy(() => import('./ThermalTherapy').then((m) => ({ defa
 const PostureBreaks = lazy(() => import('./PostureBreaks').then((m) => ({ default: m.PostureBreaks })))
 const FastingTimer = lazy(() => import('./FastingTimer').then((m) => ({ default: m.FastingTimer })))
 
-const TABS: TabDef[] = [
-  { id: 'energi', label: 'Energy', emoji: '🔋', komponen: BodyBattery,
-    ringkas: 'Energy reserve 0–100 and stress level through the day' },
-  { id: 'jantung', label: 'Heart', emoji: '❤️', komponen: HeartRateLog,
-    ringkas: 'Every heart-rate sample the watch sends, and how dense it is' },
-  { id: 'tidur', label: 'Sleep', emoji: '😴', komponen: SleepPattern,
-    ringkas: 'Duration, stages, and how consistent your bedtime is' },
-  // ── Tidur, diperinci ──────────────────────────────────────────────────────
-  { id: 'utang-tidur', label: 'Sleep debt', emoji: '📉', komponen: SleepDebt,
-    ringkas: 'Accumulated shortfall against your own need, and what repays it' },
-  { id: 'apnea', label: 'Apnoea screen', emoji: '🫁', komponen: SleepApneaScreen,
-    ringkas: 'STOP-BANG style screening for obstructive sleep apnoea' },
-  { id: 'kronotipe', label: 'Chronotype', emoji: '🌗', komponen: Chronotype,
-    ringkas: 'Your body clock, and why forcing it costs more than it saves' },
-  { id: 'alat-tidur', label: 'Sleep toolkit', emoji: '🛏️', komponen: SleepToolkit,
-    ringkas: 'Sleep hygiene, light, temperature and timing — what changes it' },
+type PanelKey =
+  | 'energi'
+  | 'jantung'
+  | 'tidur'
+  | 'gerak'
+  | 'klinis'
+  | 'utang-tidur'
+  | 'apnea'
+  | 'alat-tidur'
+  | 'kronotipe'
+  | 'pulih'
+  | 'napas'
+  | 'termal'
+  | 'postur'
+  | 'puasa'
 
-  // ── Pemulihan ─────────────────────────────────────────────────────────────
-  { id: 'pulih', label: 'Recovery', emoji: '🌱', komponen: Recovery,
-    ringkas: 'Recovering from surgery, injury, illness or overtraining' },
-  { id: 'napas', label: 'Breathwork', emoji: '💨', komponen: Breathwork,
-    ringkas: 'Breathing patterns that shift autonomic balance, and their limits' },
-  { id: 'termal', label: 'Heat & cold', emoji: '🔥', komponen: ThermalTherapy,
-    ringkas: 'Sauna and cold exposure — what the evidence supports' },
-  { id: 'postur', label: 'Posture breaks', emoji: '🪑', komponen: PostureBreaks,
-    ringkas: 'Breaking up sitting — the intervention with the best evidence' },
-  { id: 'puasa', label: 'Fasting', emoji: '⏳', komponen: FastingTimer,
-    ringkas: 'Fasting windows and what actually happens in each' },
+const PANELS: Record<PanelKey, { label: string; component: React.LazyExoticComponent<React.ComponentType> }> = {
+  energi: { label: 'Energy', component: BodyBattery },
+  jantung: { label: 'Heart rate', component: HeartRateLog },
+  tidur: { label: 'Sleep', component: SleepPattern },
+  gerak: { label: 'Movement', component: GaitAnalysis },
+  klinis: { label: 'Clinical trackers', component: ClinicalTrackers },
+  'utang-tidur': { label: 'Sleep debt', component: SleepDebt },
+  apnea: { label: 'Sleep apnoea', component: SleepApneaScreen },
+  'alat-tidur': { label: 'Sleep toolkit', component: SleepToolkit },
+  kronotipe: { label: 'Chronotype', component: Chronotype },
+  pulih: { label: 'Recovery', component: Recovery },
+  napas: { label: 'Breathwork', component: Breathwork },
+  termal: { label: 'Heat & cold', component: ThermalTherapy },
+  postur: { label: 'Posture breaks', component: PostureBreaks },
+  puasa: { label: 'Fasting', component: FastingTimer },
+}
 
-  { id: 'gerak', label: 'Movement', emoji: '🦶', komponen: GaitAnalysis,
-    ringkas: 'Step asymmetry, walking quality, running form, heart-rate recovery' },
-  { id: 'klinis', label: 'Clinical', emoji: '🩺', komponen: ClinicalTrackers,
-    ringkas: 'SpO₂, ECG recordings, jet lag, pregnancy, wheelchair physiology' },
-]
+const PRIMARY_PANEL_KEYS: PanelKey[] = ['energi', 'jantung', 'tidur', 'gerak', 'klinis', 'pulih']
 
 export function PusatTubuh() {
-  /**
-   * Angka tubuh terkini, ditampilkan di atas seluruh tab.
-   *
-   * Diukur di peramban sebelum ini ada: halaman /tubuh hanya 42 kata dan
-   * nyaris kosong, karena tab pertamanya kebetulan yang paling jarang berisi
-   * data — padahal berat, nadi, dan tensi pemakainya tersimpan dan bisa
-   * langsung dibaca. Halaman yang terbuka kosong mengajarkan orang bahwa
-   * halaman itu memang kosong, dan ia tidak akan kembali.
-   */
-  const angka = useMemo<Angka[]>(() => {
-    const v = getVitals()
-    const out: Angka[] = []
-    if (v.weightKg) out.push({ label: 'Weight', nilai: String(v.weightKg), satuan: 'kg', nada: NADA.netral })
-    if (v.restingHr) out.push({ label: 'Pulse', nilai: String(v.restingHr), satuan: 'bpm', nada: NADA.jantung })
-    if (v.systolic && v.diastolic) out.push({ label: 'BP', nilai: `${v.systolic}/${v.diastolic}`, nada: NADA.netral })
-    if (v.spo2Pct) out.push({ label: 'SpO₂', nilai: String(v.spo2Pct), satuan: '%', nada: NADA.biru })
-    if (v.hrvMs) out.push({ label: 'HRV', nilai: String(v.hrvMs), satuan: 'ms', nada: NADA.biru })
-    return out
-  }, [])
-
-  /**
-   * Penjabaran tiap angka tubuh: rentang rujukan BESERTA POPULASINYA, ragam
-   * harian dalam diri sendiri, dan batasan alatnya.
-   *
-   * Label "baik / cukup / kurang" sengaja tidak dipakai. Label semacam itu
-   * menyembunyikan terhadap siapa angkanya dibandingkan, seberapa tidak pasti
-   * alatnya, dan seberapa besar ayunan hariannya — dan ketiganya menentukan
-   * apakah angka itu berarti sama sekali.
-   */
-  const klinis = useMemo(() => {
-    const v = getVitals()
-    return auditTubuh({
-      restingHr: typeof v.restingHr === 'number' ? v.restingHr : undefined,
-      hrvMs: typeof v.hrvMs === 'number' ? v.hrvMs : undefined,
-      spo2Pct: typeof v.spo2Pct === 'number' ? v.spo2Pct : undefined,
-      systolic: typeof v.systolic === 'number' ? v.systolic : undefined,
-      diastolic: typeof v.diastolic === 'number' ? v.diastolic : undefined,
-    })
-  }, [])
+  const [params] = useSearchParams()
+  const requested = params.get('t') as PanelKey | null
+  const active = requested && requested in PANELS ? PANELS[requested] : null
+  const ActivePanel = active?.component
 
   return (
-    <HalamanTab
-      judul="Body Signals"
-      subjudul="Energy, heart, sleep, movement and clinical trackers on one page"
-      ikon={<IconActivity />}
-      ringkasan={<PanelAngka angka={angka} />}
-      tabs={TABS}
-      kaki={
-        klinis.length > 0 ? (
-          <section className="space-y-3">
-            <h2 className="text-[13px] font-black text-ink dark:text-white">Where these numbers come from</h2>
-            <p className="text-[12px] leading-relaxed text-neutral-500">
-              Each number below carries its reference range and the population it came from, how much it swings
-              day to day, and when it should not be trusted.
-            </p>
-            {klinis.map((a) => (
-              <KartuAngkaKlinis key={a.label} a={a} />
+    <div className="min-h-screen bg-[#030408] text-white">
+      <CanonicalBodyExposure />
+
+      <section className="mx-auto w-full max-w-[1500px] px-3 pb-10 sm:px-5 lg:px-7">
+        <div className="border-t border-white/10 pt-4">
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <div>
+              <div className="text-[10px] font-black uppercase tracking-[.18em] text-neutral-500">Physiology & personal signals</div>
+              <h2 className="mt-1 text-base font-black text-white">Same body, measured over time</h2>
+            </div>
+            {active && (
+              <Link
+                to="/tubuh"
+                className="rounded-full border border-white/10 bg-white/[.04] px-3 py-1.5 text-[10px] font-black text-neutral-300 hover:text-white"
+              >
+                Close panel
+              </Link>
+            )}
+          </div>
+
+          <nav className="mt-3 flex gap-1.5 overflow-x-auto pb-1" aria-label="Body signal tools">
+            {PRIMARY_PANEL_KEYS.map((key) => (
+              <Link
+                key={key}
+                to={`/tubuh?t=${key}`}
+                className={`shrink-0 rounded-full border px-3 py-2 text-[10px] font-bold transition ${
+                  requested === key
+                    ? 'border-violet-300/50 bg-violet-300/10 text-white'
+                    : 'border-white/10 bg-white/[.025] text-neutral-400 hover:text-white'
+                }`}
+              >
+                {PANELS[key].label}
+              </Link>
             ))}
-          </section>
-        ) : undefined
-      }
-    />
+          </nav>
+
+          {ActivePanel && (
+            <div className="mt-4 overflow-hidden rounded-[22px] border border-white/10 bg-black/20 p-3 sm:p-4">
+              <div className="mb-3 text-[10px] font-black uppercase tracking-[.16em] text-violet-300/80">{active.label}</div>
+              <Suspense fallback={<div className="min-h-48 animate-pulse rounded-2xl bg-white/[.03]" />}>
+                <ActivePanel />
+              </Suspense>
+            </div>
+          )}
+        </div>
+      </section>
+    </div>
   )
 }
 
