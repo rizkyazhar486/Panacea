@@ -234,3 +234,45 @@ html.pmd-low-memory.dark .panacea-home :is(.widget-instrument-shell-v5,.widget-i
   -webkit-backdrop-filter:none!important;
   backdrop-filter:none!important;
 }
+
+/* Active-widget contrast boundary v38.
+   Some legacy widgets still carry full-card opacity/filter/blend utilities on
+   their outer wrapper. A dark child cannot recover contrast once an ancestor is
+   dimmed, so normalize only the visible slide and its immediate rendered root.
+   Descendant bars, charts, progress fills and semantic opacity remain untouched. */
+.panacea-home .widget-instrument-slide-v5[aria-hidden='false'],
+.panacea-home .widget-instrument-slide-v5[aria-hidden='false'] > *{
+  opacity:1!important;
+  filter:none!important;
+  -webkit-filter:none!important;
+  mix-blend-mode:normal!important;
+}
+
+html.dark .panacea-home .widget-instrument-slide-v5[aria-hidden='false'],
+.dark .panacea-home .widget-instrument-slide-v5[aria-hidden='false'],
+html[style*='color-scheme: dark'] .panacea-home .widget-instrument-slide-v5[aria-hidden='false']{
+  color:#f8fafc!important;
+  background:transparent!important;
+  background-image:none!important;
+}
+
+html.dark .panacea-home .widget-instrument-slide-v5[aria-hidden='false'] > :is(section,article,div,a),
+.dark .panacea-home .widget-instrument-slide-v5[aria-hidden='false'] > :is(section,article,div,a),
+html[style*='color-scheme: dark'] .panacea-home .widget-instrument-slide-v5[aria-hidden='false'] > :is(section,article,div,a){
+  opacity:1!important;
+  filter:none!important;
+  -webkit-filter:none!important;
+  mix-blend-mode:normal!important;
+  color-scheme:dark;
+}
+
+/* Never let a legacy pale full-card utility become the active widget surface.
+   This selector is intentionally limited to the active slide's immediate root. */
+html.dark .panacea-home .widget-instrument-slide-v5[aria-hidden='false'] > :is(.bg-white,.bg-neutral-50,.bg-neutral-100,.bg-neutral-200,.bg-gray-50,.bg-gray-100,.bg-gray-200,.bg-slate-50,.bg-slate-100,.bg-slate-200),
+.dark .panacea-home .widget-instrument-slide-v5[aria-hidden='false'] > :is(.bg-white,.bg-neutral-50,.bg-neutral-100,.bg-neutral-200,.bg-gray-50,.bg-gray-100,.bg-gray-200,.bg-slate-50,.bg-slate-100,.bg-slate-200),
+html[style*='color-scheme: dark'] .panacea-home .widget-instrument-slide-v5[aria-hidden='false'] > :is(.bg-white,.bg-neutral-50,.bg-neutral-100,.bg-neutral-200,.bg-gray-50,.bg-gray-100,.bg-gray-200,.bg-slate-50,.bg-slate-100,.bg-slate-200){
+  background:#0b1119!important;
+  background-image:none!important;
+  color:#f8fafc!important;
+  border-color:rgba(255,255,255,.08)!important;
+}
