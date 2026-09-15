@@ -1,0 +1,247 @@
+/* Body Exposure ↔ Panacea HIG alignment layer.
+   This file intentionally loads after bodyExposureOS.css. Body keeps its
+   biomedical-cosmic atmosphere, but the underlying material, spacing, colour,
+   motion and focus grammar follows the same system-wide Panacea design tokens.
+   Every var() has a fallback so this branch remains visually coherent before
+   the global HIG foundation PR lands. */
+
+.body-exposure-os {
+  --be-space-black: var(--pmd-black, #020409);
+  --be-surface-0: var(--pmd-space, #030711);
+  --be-surface-1: var(--pmd-surface, rgba(6, 13, 24, .92));
+  --be-surface-2: var(--pmd-surface-raised, rgba(9, 19, 33, .94));
+  --be-border-soft: var(--pmd-line, rgba(255, 255, 255, .11));
+  --be-border-active: rgba(77, 231, 255, .32);
+
+  /* Exact spectral family used by the global HIG foundation. */
+  --be-cyan: 77, 231, 255;
+  --be-violet: 156, 124, 255;
+  --be-magenta: 255, 99, 216;
+  --be-emerald: 0, 216, 121;
+  --be-amber: 255, 210, 120;
+
+  /* Semantic colour roles. These describe interface meaning, not clinical state. */
+  --be-role-spatial: rgb(var(--be-cyan));
+  --be-role-intelligence: rgb(var(--be-violet));
+  --be-role-causal: rgb(var(--be-magenta));
+  --be-role-biologic-focus: rgb(var(--be-emerald));
+  --be-role-evidence: rgb(var(--be-amber));
+
+  --be-radius-shell: var(--pmd-radius-2xl, 32px);
+  --be-radius-panel: var(--pmd-radius-xl, 26px);
+  --be-radius-control: var(--pmd-radius-m, 14px);
+  --be-radius-pill: var(--pmd-radius-pill, 999px);
+
+  --be-fast: var(--pmd-fast, 140ms);
+  --be-normal: var(--pmd-normal, 220ms);
+  --be-spatial: var(--pmd-spatial, 420ms);
+  --be-ease: var(--pmd-ease, cubic-bezier(.22, .8, .2, 1));
+  --be-ease-spring: var(--pmd-ease-spring, cubic-bezier(.16, 1, .3, 1));
+  --be-shadow-1: var(--pmd-shadow-1, 0 8px 24px rgba(0, 0, 0, .22));
+  --be-shadow-2: var(--pmd-shadow-2, 0 18px 54px rgba(0, 0, 0, .32));
+  --be-shadow-3: var(--pmd-shadow-3, 0 30px 90px rgba(0, 0, 0, .42));
+  --be-focus: var(--pmd-focus, 0 0 0 3px rgba(77, 231, 255, .28), 0 0 0 1px rgba(77, 231, 255, .92));
+}
+
+/* HIG material hierarchy: atmospheric shell, calm content, translucent controls. */
+.body-intelligence-workspace {
+  background:
+    radial-gradient(circle at 12% 0%, rgba(var(--be-cyan), .055), transparent 28%),
+    radial-gradient(circle at 90% 4%, rgba(var(--be-violet), .05), transparent 30%),
+    var(--be-surface-1);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.05), var(--be-shadow-2);
+}
+
+.body-intelligence-workspace__tabbar {
+  border-color: var(--be-border-soft);
+  background:
+    linear-gradient(135deg, rgba(255,255,255,.06), rgba(255,255,255,.02)),
+    var(--pmd-material, rgba(8, 18, 31, .72));
+  -webkit-backdrop-filter: blur(18px) saturate(150%);
+  backdrop-filter: blur(18px) saturate(150%);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.12), var(--be-shadow-1);
+}
+
+.body-intelligence-workspace__context,
+.body-intelligence-workspace__summary-card,
+.body-intelligence-workspace__footer {
+  background-color: var(--pmd-material-strong, rgba(5, 12, 22, .88));
+}
+
+.body-intelligence-workspace__panel > section {
+  background:
+    radial-gradient(circle at 14% 0%, rgba(var(--be-cyan), .025), transparent 26%),
+    var(--be-surface-2) !important;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.04), var(--be-shadow-1) !important;
+}
+
+.body-intelligence-workspace__tab,
+.body-exposure-os__dock button,
+.body-exposure-os button {
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+
+.body-intelligence-workspace__tab {
+  transition:
+    transform var(--be-fast) var(--be-ease-spring),
+    border-color var(--be-normal) var(--be-ease),
+    background-color var(--be-normal) var(--be-ease),
+    box-shadow var(--be-normal) var(--be-ease),
+    opacity var(--be-normal) var(--be-ease);
+}
+
+.body-intelligence-workspace__tab:hover { transform: translateY(-1px); }
+.body-intelligence-workspace__tab:active { transform: scale(.985); transition-duration: 70ms; }
+
+.body-intelligence-workspace__tab:focus-visible,
+.body-exposure-os :where(button, a, summary, input, select, textarea):focus-visible {
+  outline: none;
+  box-shadow: var(--be-focus);
+}
+
+/* Spatial transitions stay restrained; no continuous ornamental motion. */
+.body-intelligence-workspace__panel {
+  transition: opacity var(--be-normal) var(--be-ease), transform var(--be-spatial) var(--be-ease-spring);
+}
+
+/* Whole-body atlas inherits the same calm-content/spectral-control hierarchy. */
+.body-exposure-os [aria-label="Eleven body systems source-backed 3D atlas"] {
+  border-color: var(--be-border-soft) !important;
+  background:
+    radial-gradient(circle at 8% 0%, rgba(var(--be-cyan), .05), transparent 30%),
+    radial-gradient(circle at 94% 14%, rgba(var(--be-violet), .04), transparent 34%),
+    var(--be-surface-1) !important;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.05), var(--be-shadow-2) !important;
+}
+
+.body-exposure-os [aria-label="Body systems"] > button {
+  border-color: rgba(255,255,255,.07) !important;
+  background: rgba(255,255,255,.022) !important;
+  color: rgba(224,238,249,.48) !important;
+  transition:
+    transform var(--be-fast) var(--be-ease-spring),
+    border-color var(--be-normal) var(--be-ease),
+    background var(--be-normal) var(--be-ease),
+    color var(--be-normal) var(--be-ease);
+}
+
+.body-exposure-os [aria-label="Body systems"] > button[aria-selected="true"] {
+  border-color: rgba(var(--be-cyan), .24) !important;
+  background: linear-gradient(135deg, rgba(var(--be-cyan), .13), rgba(var(--be-violet), .085)) !important;
+  color: rgba(248,251,255,.94) !important;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.08), 0 8px 24px rgba(0,0,0,.15);
+}
+
+.body-exposure-os [aria-label="Body systems"] > button:active { transform: scale(.985); }
+
+/* Anatomy ↔ physiology is a bridge surface: cyan keeps source/spatial context,
+   violet indicates systems interpretation, magenta is reserved for coupling,
+   amber remains the provenance/boundary language. */
+.body-exposure-os [data-atlas-physiology-bridge="v1"] {
+  border-color: var(--be-border-soft) !important;
+  background:
+    radial-gradient(circle at 8% 0%, rgba(var(--be-cyan), .035), transparent 28%),
+    radial-gradient(circle at 92% 0%, rgba(var(--be-violet), .045), transparent 30%),
+    var(--be-surface-1) !important;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.04), var(--be-shadow-1);
+}
+
+.body-exposure-os [aria-label="Atlas systems physiology bridge"] > button {
+  border-color: rgba(255,255,255,.07) !important;
+  background: rgba(255,255,255,.02) !important;
+  color: rgba(224,238,249,.46) !important;
+  transition:
+    transform var(--be-fast) var(--be-ease-spring),
+    border-color var(--be-normal) var(--be-ease),
+    background var(--be-normal) var(--be-ease),
+    color var(--be-normal) var(--be-ease);
+}
+
+.body-exposure-os [aria-label="Atlas systems physiology bridge"] > button[aria-selected="true"] {
+  border-color: rgba(var(--be-violet), .24) !important;
+  background: linear-gradient(135deg, rgba(var(--be-cyan), .065), rgba(var(--be-violet), .13)) !important;
+  color: rgba(248,251,255,.92) !important;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.07), 0 8px 20px rgba(0,0,0,.13);
+}
+
+.body-exposure-os [aria-label="Atlas systems physiology bridge"] > button:active { transform: scale(.985); }
+
+/* Legacy BodyExplorer control rails now inherit the same control-material
+   grammar. This deliberately does not rewrite BodyExplorer logic or hide tabs;
+   it only removes the remaining grey/light visual island under the new OS. */
+.body-exposure-os__core [role="group"][aria-label="Panel groups"] { scrollbar-width: none; }
+.body-exposure-os__core [role="group"][aria-label="Panel groups"]::-webkit-scrollbar { display: none; }
+
+.body-exposure-os__core [role="group"][aria-label="Panel groups"] > button {
+  border: 1px solid transparent;
+  background: rgba(255,255,255,.025) !important;
+  color: rgba(224,238,249,.48) !important;
+  transition:
+    transform var(--be-fast) var(--be-ease-spring),
+    border-color var(--be-normal) var(--be-ease),
+    background var(--be-normal) var(--be-ease),
+    color var(--be-normal) var(--be-ease);
+}
+
+.body-exposure-os__core [role="group"][aria-label="Panel groups"] > button[aria-pressed="true"] {
+  border-color: rgba(var(--be-cyan), .22);
+  background: linear-gradient(135deg, rgba(var(--be-cyan), .13), rgba(var(--be-violet), .085)) !important;
+  color: rgba(248,251,255,.92) !important;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.08), 0 8px 24px rgba(0,0,0,.16);
+}
+
+.body-exposure-os__core [role="group"][aria-label="Panel groups"] > button:active { transform: scale(.985); }
+
+/* The panel-tab rail is the immediate sibling of the group-jump rail in
+   BodyExplorer. It remains horizontally scrollable and all panels remain
+   rendered/reachable; only its material and active state are normalized. */
+.body-exposure-os__core [role="group"][aria-label="Panel groups"] + div {
+  border: 1px solid var(--be-border-soft);
+  background:
+    linear-gradient(135deg, rgba(255,255,255,.05), rgba(255,255,255,.018)),
+    var(--pmd-material, rgba(8,18,31,.72)) !important;
+  -webkit-backdrop-filter: blur(16px) saturate(145%);
+  backdrop-filter: blur(16px) saturate(145%);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.08), var(--be-shadow-1);
+  scrollbar-width: none;
+}
+
+.body-exposure-os__core [role="group"][aria-label="Panel groups"] + div::-webkit-scrollbar { display: none; }
+
+.body-exposure-os__core [role="group"][aria-label="Panel groups"] + div > button {
+  border: 1px solid transparent;
+  background: transparent !important;
+  color: rgba(224,238,249,.48) !important;
+  box-shadow: none !important;
+  transition:
+    transform var(--be-fast) var(--be-ease-spring),
+    border-color var(--be-normal) var(--be-ease),
+    background var(--be-normal) var(--be-ease),
+    color var(--be-normal) var(--be-ease);
+}
+
+.body-exposure-os__core [role="group"][aria-label="Panel groups"] + div > button[aria-pressed="true"] {
+  border-color: rgba(var(--be-cyan), .18);
+  background: linear-gradient(135deg, rgba(var(--be-cyan), .10), rgba(var(--be-violet), .065)) !important;
+  color: rgba(248,251,255,.9) !important;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.075), 0 8px 20px rgba(0,0,0,.14) !important;
+}
+
+.body-exposure-os__core [role="group"][aria-label="Panel groups"] + div > button:hover {
+  border-color: rgba(255,255,255,.08);
+  color: rgba(248,251,255,.76) !important;
+}
+
+.body-exposure-os__core [role="group"][aria-label="Panel groups"] + div > button:active { transform: scale(.985); }
+
+@media (prefers-reduced-motion: reduce) {
+  .body-intelligence-workspace__tab:hover,
+  .body-intelligence-workspace__tab:active,
+  .body-exposure-os [aria-label="Body systems"] > button,
+  .body-exposure-os [aria-label="Atlas systems physiology bridge"] > button,
+  .body-exposure-os__core [role="group"][aria-label="Panel groups"] > button,
+  .body-exposure-os__core [role="group"][aria-label="Panel groups"] + div > button {
+    transform: none !important;
+  }
+}

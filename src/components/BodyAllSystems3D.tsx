@@ -10,6 +10,13 @@ import {
 import { body3dPixelRatio } from '../lib/body3dQuality'
 import { muatAtlas, namaAtlas } from '../lib/anatomy/pemuatAtlas'
 
+const BODY_ATLAS_LIGHT = {
+  key: 0xe8fbff,
+  cyan: 0x4de7ff,
+  violet: 0x9c7cff,
+  emissive: 0x06313d,
+} as const
+
 function materialFor(source: THREE.Material) {
   const cloned = source.clone()
   if ((cloned as THREE.MeshStandardMaterial).isMeshStandardMaterial) {
@@ -17,7 +24,7 @@ function materialFor(source: THREE.Material) {
     standard.transparent = true
     standard.opacity = 0.88
     standard.depthWrite = false
-    standard.emissive.set(0x062f3b)
+    standard.emissive.set(BODY_ATLAS_LIGHT.emissive)
     standard.emissiveIntensity = 0.32
   }
   return cloned
@@ -136,13 +143,13 @@ export default function BodyAllSystems3D() {
     container.appendChild(renderer.domElement)
 
     scene.add(new THREE.AmbientLight(0xffffff, 0.74))
-    const key = new THREE.DirectionalLight(0xdffaff, 1.18)
+    const key = new THREE.DirectionalLight(BODY_ATLAS_LIGHT.key, 1.18)
     key.position.set(2.5, 3.5, 4.5)
     scene.add(key)
-    const cyanRim = new THREE.DirectionalLight(0x67e8f9, 0.42)
+    const cyanRim = new THREE.DirectionalLight(BODY_ATLAS_LIGHT.cyan, 0.42)
     cyanRim.position.set(-4, 1.5, -3)
     scene.add(cyanRim)
-    const violetRim = new THREE.DirectionalLight(0xa78bfa, 0.25)
+    const violetRim = new THREE.DirectionalLight(BODY_ATLAS_LIGHT.violet, 0.25)
     violetRim.position.set(3, -1, -2)
     scene.add(violetRim)
 

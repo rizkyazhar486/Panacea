@@ -3,38 +3,38 @@ import type { BodySystemId } from '../lib/bodySystemSourceWave'
 import { resolveBodySystemIdFromAtlasLabel } from '../lib/bodySystemPhysiologyBridge'
 import { BodyExplorer } from './BodyExplorer'
 import './bodyExposureOS.css'
+import './bodyExposureDesignAlignment.css'
 
 const BodyAllSystems3D = lazy(() => import('../components/BodyAllSystems3D'))
 const AtlasPhysiologyBridgePanel = lazy(() => import('./bodyhub/AtlasPhysiologyBridgePanel'))
-const PathophysiologyNetworkPanel = lazy(() => import('./bodyhub/PathophysiologyNetworkPanel'))
-const PharmacologyMechanismPanel = lazy(() => import('./bodyhub/PharmacologyMechanismPanel'))
-const MechanismCausalBridgePanel = lazy(() => import('./bodyhub/MechanismCausalBridgePanel'))
-const UnifiedMechanismGraphPanel = lazy(() => import('./bodyhub/UnifiedMechanismGraphPanel'))
-const EvidenceProvenanceObservatory = lazy(() => import('./bodyhub/EvidenceProvenanceObservatory'))
-const LearningRouteComposerPanel = lazy(() => import('./bodyhub/LearningRouteComposerPanel'))
+const BodyIntelligenceWorkspace = lazy(() => import('./bodyhub/BodyIntelligenceWorkspace'))
 
-type ExposureMode = 'atlas' | 'physiology' | 'imaging' | 'surgery' | 'molecular' | 'clinical'
+type ExposureMode = 'atlas' | 'physiology' | 'intelligence' | 'imaging' | 'surgery' | 'molecular' | 'clinical'
+type ModeDestination = 'explorer' | 'intelligence'
 
 type Mode = {
   key: ExposureMode
   label: string
-  panel: string
   description: string
+  destination: ModeDestination
+  panel?: string
 }
 
 const MODES: Mode[] = [
-  { key: 'atlas', label: 'Atlas', panel: 'Layers', description: 'Whole-body layers, structures, organs and surface-to-depth exploration.' },
-  { key: 'physiology', label: 'Physiology', panel: 'Physiology', description: 'Connect anatomy to organ function, motion and reference physiology.' },
-  { key: 'imaging', label: 'Imaging', panel: 'DICOM → 3D', description: 'Move between anatomy, radiology views and volumetric imaging tools.' },
-  { key: 'surgery', label: 'Surgery', panel: 'Surgical layers', description: 'Explore operative approaches as ordered tissue and anatomical layers.' },
-  { key: 'molecular', label: 'Micro → Gene', panel: 'Tissue → gene', description: 'Descend from organs into tissue, cells, molecular pathways and genes.' },
-  { key: 'clinical', label: 'Clinical', panel: 'Diseases', description: 'Relate structures to disease, drugs and clinically oriented learning.' },
+  { key: 'atlas', label: 'Atlas', panel: 'Layers', destination: 'explorer', description: 'Whole-body layers, structures, organs and surface-to-depth exploration.' },
+  { key: 'physiology', label: 'Physiology', panel: 'Physiology', destination: 'explorer', description: 'Connect anatomy to organ function, motion and reference physiology.' },
+  { key: 'intelligence', label: 'Intelligence', destination: 'intelligence', description: 'Traverse disease mechanisms, pharmacology, causal graphs, evidence provenance and guided learning.' },
+  { key: 'imaging', label: 'Imaging', panel: 'DICOM → 3D', destination: 'explorer', description: 'Move between anatomy, radiology views and volumetric imaging tools.' },
+  { key: 'surgery', label: 'Surgery', panel: 'Surgical layers', destination: 'explorer', description: 'Explore operative approaches as ordered tissue and anatomical layers.' },
+  { key: 'molecular', label: 'Micro → Gene', panel: 'Tissue → gene', destination: 'explorer', description: 'Descend from organs into tissue, cells, molecular pathways and genes.' },
+  { key: 'clinical', label: 'Clinical', panel: 'Diseases', destination: 'explorer', description: 'Relate structures to disease and clinically oriented learning tools.' },
 ]
 
 export function BodyExposureOS() {
   const rootRef = useRef<HTMLElement | null>(null)
   const explorerRef = useRef<HTMLDivElement | null>(null)
   const systemsRef = useRef<HTMLDivElement | null>(null)
+  const intelligenceRef = useRef<HTMLDivElement | null>(null)
   const [activeMode, setActiveMode] = useState<ExposureMode>('atlas')
   const [immersive, setImmersive] = useState(false)
   const [selectedBodySystemId, setSelectedBodySystemId] = useState<BodySystemId>('cardiovascular')
@@ -45,8 +45,15 @@ export function BodyExposureOS() {
     return () => document.removeEventListener('fullscreenchange', syncFullscreen)
   }, [])
 
-  function openPanel(mode: Mode) {
+  function openMode(mode: Mode) {
     setActiveMode(mode.key)
+    const reduceMotion = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches
+
+    if (mode.destination === 'intelligence') {
+      intelligenceRef.current?.scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth', block: 'start' })
+      return
+    }
+
     const buttons = Array.from(explorerRef.current?.querySelectorAll<HTMLButtonElement>('button') ?? [])
     const target = buttons.find((button) => {
       const label = button.textContent?.trim()
@@ -56,17 +63,17 @@ export function BodyExposureOS() {
 
     if (target) {
       target.click()
-      const reduceMotion = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches
       requestAnimationFrame(() => target.scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth', block: 'center', inline: 'center' }))
       return
     }
 
-    explorerRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    explorerRef.current?.scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth', block: 'start' })
   }
 
   function openSystemAtlas() {
     setActiveMode('atlas')
-    systemsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    const reduceMotion = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches
+    systemsRef.current?.scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth', block: 'start' })
   }
 
   async function toggleImmersive() {
@@ -89,7 +96,7 @@ export function BodyExposureOS() {
     const button = (event.target as HTMLElement).closest('button')
     if (!button) return
     const label = button.textContent?.trim()
-    const matched = MODES.find((mode) => mode.panel === label)
+    const matched = MODES.find((mode) => mode.destination === 'explorer' && mode.panel === label)
     if (matched) setActiveMode(matched.key)
   }
 
@@ -108,19 +115,14 @@ export function BodyExposureOS() {
             <div className="flex flex-wrap items-center gap-2">
               <span className="text-[10px] font-black uppercase tracking-[.24em] text-cyan-200">Body Exposure · Human Body OS</span>
               <span className="rounded-full border border-white/10 bg-white/[.045] px-2.5 py-1 text-[9px] font-black uppercase tracking-[.14em] text-white/60">whole-body first</span>
-              <span className="rounded-full border border-violet-300/10 bg-violet-300/[.045] px-2.5 py-1 text-[9px] font-black uppercase tracking-[.14em] text-violet-100/65">11-system source atlas</span>
-              <span className="rounded-full border border-rose-300/10 bg-rose-300/[.045] px-2.5 py-1 text-[9px] font-black uppercase tracking-[.14em] text-rose-100/65">pathophysiology network</span>
-              <span className="rounded-full border border-cyan-300/10 bg-cyan-300/[.045] px-2.5 py-1 text-[9px] font-black uppercase tracking-[.14em] text-cyan-100/65">pharmacology mechanisms</span>
-              <span className="rounded-full border border-fuchsia-300/10 bg-fuchsia-300/[.04] px-2.5 py-1 text-[9px] font-black uppercase tracking-[.14em] text-fuchsia-100/65">causal bridge</span>
-              <span className="rounded-full border border-emerald-300/10 bg-emerald-300/[.04] px-2.5 py-1 text-[9px] font-black uppercase tracking-[.14em] text-emerald-100/65">unified graph</span>
-              <span className="rounded-full border border-amber-200/10 bg-amber-200/[.04] px-2.5 py-1 text-[9px] font-black uppercase tracking-[.14em] text-amber-50/65">evidence provenance</span>
-              <span className="rounded-full border border-teal-300/10 bg-teal-300/[.04] px-2.5 py-1 text-[9px] font-black uppercase tracking-[.14em] text-teal-100/65">learning routes</span>
+              <span className="rounded-full border border-violet-300/10 bg-violet-300/[.045] px-2.5 py-1 text-[9px] font-black uppercase tracking-[.14em] text-violet-100/65">multiscale intelligence</span>
+              <span className="rounded-full border border-amber-200/10 bg-amber-200/[.04] px-2.5 py-1 text-[9px] font-black uppercase tracking-[.14em] text-amber-50/65">evidence traceable</span>
             </div>
             <h2 id="body-exposure-os-title" className="mt-2 max-w-3xl text-2xl font-black tracking-[-.035em] text-white sm:text-3xl lg:text-4xl">
               One body. Every scale. One continuous learning space.
             </h2>
             <p className="mt-2 max-w-3xl text-sm font-medium leading-relaxed text-white/60 sm:text-[15px]">
-              Start from the complete human body, switch across major systems, isolate a structure, then move through physiology, pathophysiology, pharmacology, evidence, guided learning, imaging, surgery, disease, cells and molecular detail without leaving the same workspace.
+              Begin with the complete human body as the spatial anchor, then move progressively into systems, physiology, mechanism, disease, pharmacology, evidence, imaging, surgery, cells and molecular detail without fragmenting the experience into unrelated pages.
             </p>
           </div>
 
@@ -134,10 +136,10 @@ export function BodyExposureOS() {
             </button>
             <button
               type="button"
-              onClick={() => openPanel(MODES[0])}
-              className="min-h-[44px] rounded-full border border-white/12 bg-white/[.055] px-4 text-xs font-black text-white/70 transition hover:bg-white/[.09] hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/40"
+              onClick={() => openMode(MODES[2])}
+              className="min-h-[44px] rounded-full border border-violet-300/18 bg-violet-300/[.07] px-4 text-xs font-black text-violet-100/80 transition hover:bg-violet-300/[.11] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-300/50"
             >
-              Layers & structures
+              Open intelligence
             </button>
             <button
               type="button"
@@ -159,8 +161,8 @@ export function BodyExposureOS() {
             <div className="mt-1 text-xs font-black text-white/85">Organ → tissue → gene</div>
           </div>
           <div className="rounded-2xl border border-white/[.08] bg-black/25 px-3 py-2.5">
-            <div className="text-[9px] font-black uppercase tracking-[.16em] text-white/35">Context</div>
-            <div className="mt-1 text-xs font-black text-white/85">Anatomy + function + failure</div>
+            <div className="text-[9px] font-black uppercase tracking-[.16em] text-white/35">Reasoning</div>
+            <div className="mt-1 text-xs font-black text-white/85">Function → failure → mechanism</div>
           </div>
         </div>
       </header>
@@ -174,7 +176,7 @@ export function BodyExposureOS() {
                 key={mode.key}
                 type="button"
                 aria-pressed={active}
-                onClick={() => openPanel(mode)}
+                onClick={() => openMode(mode)}
                 className={`min-h-[42px] rounded-[16px] border px-4 text-xs font-black transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-300/60 ${
                   active
                     ? 'border-cyan-300/25 bg-[linear-gradient(135deg,rgba(34,211,238,.16),rgba(139,92,246,.11),rgba(236,72,153,.08))] text-white shadow-[inset_0_1px_0_rgba(255,255,255,.12),0_10px_30px_rgba(34,211,238,.06)]'
@@ -205,39 +207,9 @@ export function BodyExposureOS() {
         </Suspense>
       </div>
 
-      <div className="relative z-[2] mt-3">
-        <Suspense fallback={<div className="grid min-h-40 place-items-center rounded-[28px] border border-white/[.08] bg-black/35 text-xs font-bold text-white/35">Loading pathophysiology network…</div>}>
-          <PathophysiologyNetworkPanel selectedAtlasSystemId={selectedBodySystemId} />
-        </Suspense>
-      </div>
-
-      <div className="relative z-[2] mt-3">
-        <Suspense fallback={<div className="grid min-h-44 place-items-center rounded-[28px] border border-white/[.08] bg-black/35 text-xs font-bold text-white/35">Loading pharmacology mechanism network…</div>}>
-          <PharmacologyMechanismPanel selectedAtlasSystemId={selectedBodySystemId} />
-        </Suspense>
-      </div>
-
-      <div className="relative z-[2] mt-3">
-        <Suspense fallback={<div className="grid min-h-44 place-items-center rounded-[28px] border border-white/[.08] bg-black/35 text-xs font-bold text-white/35">Loading disease-mechanism causal bridge…</div>}>
-          <MechanismCausalBridgePanel />
-        </Suspense>
-      </div>
-
-      <div className="relative z-[2] mt-3">
-        <Suspense fallback={<div className="grid min-h-52 place-items-center rounded-[30px] border border-white/[.08] bg-black/35 text-xs font-bold text-white/35">Compiling unified mechanism graph…</div>}>
-          <UnifiedMechanismGraphPanel selectedAtlasSystemId={selectedBodySystemId} />
-        </Suspense>
-      </div>
-
-      <div className="relative z-[2] mt-3">
-        <Suspense fallback={<div className="grid min-h-52 place-items-center rounded-[30px] border border-white/[.08] bg-black/35 text-xs font-bold text-white/35">Auditing evidence provenance…</div>}>
-          <EvidenceProvenanceObservatory />
-        </Suspense>
-      </div>
-
-      <div className="relative z-[2] mt-3">
-        <Suspense fallback={<div className="grid min-h-52 place-items-center rounded-[30px] border border-white/[.08] bg-black/35 text-xs font-bold text-white/35">Composing graph-backed learning route…</div>}>
-          <LearningRouteComposerPanel selectedAtlasSystemId={selectedBodySystemId} />
+      <div ref={intelligenceRef} onClickCapture={() => setActiveMode('intelligence')} className="relative z-[2] mt-3 scroll-mt-4">
+        <Suspense fallback={<div className="grid min-h-72 place-items-center rounded-[30px] border border-white/[.08] bg-black/35 text-xs font-bold text-white/35">Loading unified Body Intelligence workspace…</div>}>
+          <BodyIntelligenceWorkspace selectedAtlasSystemId={selectedBodySystemId} />
         </Suspense>
       </div>
 
