@@ -74,25 +74,30 @@
   .panacea-home > section[aria-labelledby="my-dashboard-title"] {
     order: 1;
     margin-top: 0 !important;
+    background: #000 !important;
+    border-color: rgba(0, 191, 99, .28) !important;
   }
 
   .panacea-home > section[aria-labelledby="daily-tools-title"] {
     order: 2;
   }
 
-  .panacea-home > section[aria-labelledby="my-dashboard-title"] .home-command-panel,
-  .panacea-home > section[aria-labelledby="my-dashboard-title"] {
-    background: #000 !important;
-    border-color: rgba(0, 191, 99, .28) !important;
-  }
-
-  .panacea-home > section[aria-labelledby="my-dashboard-title"] h2,
-  .panacea-home > section[aria-labelledby="my-dashboard-title"] p,
-  .panacea-home > section[aria-labelledby="my-dashboard-title"] div {
-    color: #fff;
+  .panacea-home > section[aria-labelledby="my-dashboard-title"] > div:first-child h2,
+  .panacea-home > section[aria-labelledby="my-dashboard-title"] > div:first-child p {
+    color: #fff !important;
   }
 
   .panacea-home > section[aria-labelledby="my-dashboard-title"] > div:first-child > div:first-child > div:first-child {
     color: #00BF63 !important;
+  }
+
+  /* Loading placeholders must never masquerade as missing gray widgets. */
+  .home-loading-card {
+    background: #000 !important;
+    border-color: rgba(0, 191, 99, .22) !important;
+  }
+
+  .home-loading-card [aria-hidden="true"] > div {
+    background: rgba(0, 191, 99, .18) !important;
   }
 }
