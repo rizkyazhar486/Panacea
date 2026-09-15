@@ -1,5 +1,6 @@
 import { lazy, Suspense, useEffect, useRef, useState } from 'react'
-import { BODY_SYSTEM_SOURCE_WAVE, type BodySystemId } from '../lib/bodySystemSourceWave'
+import type { BodySystemId } from '../lib/bodySystemSourceWave'
+import { resolveBodySystemIdFromAtlasLabel } from '../lib/bodySystemPhysiologyBridge'
 import { BodyExplorer } from './BodyExplorer'
 import './bodyExposureOS.css'
 
@@ -74,9 +75,8 @@ export function BodyExposureOS() {
   function captureSystemAtlasSelection(event: React.MouseEvent<HTMLDivElement>) {
     const button = (event.target as HTMLElement).closest<HTMLButtonElement>('button[role="tab"]')
     if (!button) return
-    const label = button.textContent?.trim()
-    const matched = BODY_SYSTEM_SOURCE_WAVE.find((system) => system.label === label)
-    if (matched) setSelectedBodySystemId(matched.id)
+    const systemId = resolveBodySystemIdFromAtlasLabel(button.textContent)
+    if (systemId) setSelectedBodySystemId(systemId)
   }
 
   function captureExplorerSelection(event: React.MouseEvent<HTMLDivElement>) {
