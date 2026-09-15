@@ -2,6 +2,7 @@ import { Card, SectionTitle, Badge } from '../components/ui'
 import { Prosa } from '../components/Prosa'
 import { IconShield, IconSparkle, IconEMR, IconBook, IconCheck } from '../components/icons'
 import { PanaceaOperatingModelBoard } from '../components/PanaceaOperatingModelBoard'
+import { PrecisionCareOrchestrationBoard } from '../components/PrecisionCareOrchestrationBoard'
 import { WEIGHTS, S_THRESHOLD } from '../lib/cdss'
 
 const MODULES = [
@@ -69,6 +70,7 @@ export function Architecture() {
       </Card>
 
       <PanaceaOperatingModelBoard />
+      <PrecisionCareOrchestrationBoard />
 
       {/* Ensemble formula */}
       <Card className="border-2 border-brand/20">
