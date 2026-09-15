@@ -3,6 +3,7 @@ import type { BodySystemId } from '../lib/bodySystemSourceWave'
 import { resolveBodySystemIdFromAtlasLabel } from '../lib/bodySystemPhysiologyBridge'
 import { BodyExplorer } from './BodyExplorer'
 import './bodyExposureOS.css'
+import './bodyExposureDesignAlignment.css'
 
 const BodyAllSystems3D = lazy(() => import('../components/BodyAllSystems3D'))
 const AtlasPhysiologyBridgePanel = lazy(() => import('./bodyhub/AtlasPhysiologyBridgePanel'))
