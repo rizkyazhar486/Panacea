@@ -3,13 +3,15 @@ import { lazy, Suspense, useState } from 'react'
 const BodyInfinityLab = lazy(() => import('./BodyInfinityLab'))
 const BodySimulationDeck = lazy(() => import('./BodySimulationDeck'))
 const BodyTrillionLab = lazy(() => import('./BodyTrillionLab'))
+const BodyOpenWorldLab = lazy(() => import('./BodyOpenWorldLab'))
 
-type UniversePanel = 'spatial' | 'simulation' | 'trillion'
+type UniversePanel = 'spatial' | 'simulation' | 'trillion' | 'world'
 
 const PANELS: readonly { id: UniversePanel; label: string; description: string }[] = [
   { id: 'spatial', label: 'Spatial Lab', description: 'Motion, cinematic, spatial and game prototypes.' },
   { id: 'simulation', label: 'Simulation Factory', description: 'Synthetic physiology, imaging, surgery and biomechanics controls.' },
   { id: 'trillion', label: 'Trillion Space', description: '1.73T deterministic experience coordinates without trillion-object allocation.' },
+  { id: 'world', label: 'Open World', description: 'Procedural anatomical districts, missions, encounters and progression.' },
 ]
 
 function LoadingPanel({ label }: { label: string }) {
@@ -55,6 +57,11 @@ export default function BodyInfinityUniverse() {
       {panel === 'trillion' && (
         <Suspense fallback={<LoadingPanel label="Trillion Space" />}>
           <BodyTrillionLab />
+        </Suspense>
+      )}
+      {panel === 'world' && (
+        <Suspense fallback={<LoadingPanel label="Open World" />}>
+          <BodyOpenWorldLab />
         </Suspense>
       )}
     </section>
