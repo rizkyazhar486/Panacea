@@ -97,3 +97,18 @@ html.pmd-low-memory .panacea-home :is(.widget-instrument-loading-v29,.widget-ins
 @media(prefers-reduced-motion:reduce) {
   .panacea-home .widget-instrument-scroll-v5 { scroll-behavior:auto!important; }
 }
+
+/* v36 visual authority: no gray placeholder/loading panels. The earlier token
+   remains above for the compatibility test; this final selector wins. */
+.panacea-home .widget-instrument-loading-v29,
+html.dark .panacea-home .widget-instrument-loading-v29,
+.dark .panacea-home .widget-instrument-loading-v29{
+  background:#05080d!important;
+  background-image:none!important;
+  border:1px solid rgba(255,255,255,.09)!important;
+  color:#f8fafc!important;
+}
+html.dark .panacea-home .widget-instrument-shell-v5,
+.dark .panacea-home .widget-instrument-shell-v5{
+  background-color:#05080d!important;
+}
