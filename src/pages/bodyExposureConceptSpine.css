@@ -1,0 +1,142 @@
+/* Canonical concept spine for Body Exposure.
+   It is intentionally non-interactive: the spine explains the mental model,
+   while workspace tabs remain the controls. */
+
+.body-intelligence-workspace__spine {
+  position: relative;
+  z-index: 1;
+  overflow-x: auto;
+  margin: 0 0 8px;
+  border: 1px solid var(--be-border-soft);
+  border-radius: var(--be-radius-control);
+  background:
+    linear-gradient(135deg, rgba(255,255,255,.035), rgba(255,255,255,.012)),
+    var(--pmd-material-strong, rgba(5,12,22,.88));
+  padding: 6px;
+  scrollbar-width: none;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.045);
+}
+
+.body-intelligence-workspace__spine::-webkit-scrollbar {
+  display: none;
+}
+
+.body-intelligence-workspace__spine-track {
+  display: flex;
+  min-width: max-content;
+  align-items: stretch;
+  gap: 4px;
+}
+
+.body-intelligence-workspace__spine-stage {
+  position: relative;
+  display: grid;
+  grid-template-columns: 24px minmax(82px, 1fr) 14px;
+  min-width: 126px;
+  align-items: center;
+  gap: 6px;
+  border: 1px solid transparent;
+  border-radius: 12px;
+  padding: 7px 7px 7px 8px;
+  color: rgba(224,238,249,.38);
+  scroll-snap-align: start;
+  transition:
+    border-color var(--be-normal) var(--be-ease),
+    background var(--be-normal) var(--be-ease),
+    color var(--be-normal) var(--be-ease),
+    opacity var(--be-normal) var(--be-ease);
+}
+
+.body-intelligence-workspace__spine-stage.is-foundational {
+  color: rgba(var(--be-cyan), .48);
+}
+
+.body-intelligence-workspace__spine-stage.is-active {
+  border-color: rgba(var(--be-cyan), .19);
+  background:
+    linear-gradient(135deg, rgba(var(--be-cyan), .085), rgba(var(--be-violet), .055) 62%, rgba(var(--be-magenta), .025));
+  color: rgba(248,251,255,.88);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.07), 0 8px 24px rgba(0,0,0,.13);
+}
+
+.body-intelligence-workspace__spine-index {
+  display: grid;
+  width: 22px;
+  height: 22px;
+  place-items: center;
+  border: 1px solid rgba(255,255,255,.075);
+  border-radius: 999px;
+  background: rgba(0,0,0,.22);
+  font-size: 8px;
+  font-weight: 900;
+  color: currentColor;
+}
+
+.body-intelligence-workspace__spine-stage.is-active .body-intelligence-workspace__spine-index {
+  border-color: rgba(var(--be-cyan), .22);
+  background: rgba(var(--be-cyan), .075);
+  color: rgba(var(--be-cyan), .92);
+}
+
+.body-intelligence-workspace__spine-copy {
+  display: block;
+  min-width: 0;
+}
+
+.body-intelligence-workspace__spine-copy strong,
+.body-intelligence-workspace__spine-copy small {
+  display: block;
+}
+
+.body-intelligence-workspace__spine-copy strong {
+  font-size: 9px;
+  font-weight: 900;
+  line-height: 1.15;
+  letter-spacing: .035em;
+  text-transform: uppercase;
+  color: currentColor;
+}
+
+.body-intelligence-workspace__spine-copy small {
+  overflow: hidden;
+  margin-top: 2px;
+  max-width: 100px;
+  font-size: 7px;
+  font-weight: 700;
+  line-height: 1.25;
+  color: rgba(224,238,249,.24);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.body-intelligence-workspace__spine-stage.is-active .body-intelligence-workspace__spine-copy small {
+  color: rgba(224,238,249,.43);
+}
+
+.body-intelligence-workspace__spine-connector {
+  align-self: center;
+  font-size: 11px;
+  font-weight: 900;
+  color: rgba(224,238,249,.16);
+}
+
+.body-intelligence-workspace__spine-stage.is-active .body-intelligence-workspace__spine-connector {
+  color: rgba(var(--be-cyan), .38);
+}
+
+@media (min-width: 1024px) {
+  .body-intelligence-workspace__spine-track {
+    min-width: 100%;
+  }
+
+  .body-intelligence-workspace__spine-stage {
+    min-width: 0;
+    flex: 1 1 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .body-intelligence-workspace__spine-stage {
+    transition-duration: 0.01ms !important;
+  }
+}
