@@ -33,20 +33,19 @@ type Runtime = {
 const SPEED_OF_SOUND_MPS = 343
 const MIN_SAFE_CARRIER_HZ = 18_000
 const PREFERRED_CARRIER_HZ = 20_000
-const SIDE_BAND_INNER_HZ = 16
-const SIDE_BAND_OUTER_HZ = 140
+const INNER_HZ = 16
+const OUTER_HZ = 140
 const CALIBRATION_MS = 1_400
 const SAMPLE_INTERVAL_MS = 45
 const STORAGE_KEY = 'panacea.sonar-air-gestures.v1'
 const DOCK_ID = 'panacea-sonar-air-gesture-dock'
 
-export function dopplerShiftHz(velocityMps: number, carrierHz = PREFERRED_CARRIER_HZ): number {
+export function dopplerShiftHz(velocityMps: number, carrierHz = PREFERRED_CARRIER_HZ) {
   return (2 * velocityMps * carrierHz) / SPEED_OF_SOUND_MPS
 }
 
 export function chooseSonarCarrierHz(sampleRate: number): number | null {
-  const nyquist = sampleRate / 2
-  const carrier = Math.min(PREFERRED_CARRIER_HZ, nyquist - 700)
+  const carrier = Math.min(PREFERRED_CARRIER_HZ, sampleRate / 2 - 700)
   return carrier >= MIN_SAFE_CARRIER_HZ ? carrier : null
 }
 
@@ -55,23 +54,24 @@ function clamp(value: number, min: number, max: number) {
 }
 
 function dbToPower(db: number) {
-  if (!Number.isFinite(db) || db <= -150) return 0
-  return 10 ** (db / 10)
+  return !Number.isFinite(db) || db <= -150 ? 0 : 10 ** (db / 10)
 }
 
 function median(values: number[]) {
-  if (values.length === 0) return 0
+  if (!values.length) return 0
   const sorted = [...values].sort((a, b) => a - b)
   const middle = Math.floor(sorted.length / 2)
   return sorted.length % 2 ? sorted[middle] : (sorted[middle - 1] + sorted[middle]) / 2
 }
 
-function getAudioContextCtor(): typeof AudioContext | null {
+function audioContextCtor(): typeof AudioContext | null {
   if (typeof window === 'undefined') return null
   return window.AudioContext ?? (window as WindowWithWebkitAudio).webkitAudioContext ?? null
 }
 
-function isEditableTarget(target: Element | null) {
+function editingText() {
+  if (typeof document === 'undefined') return false
+  const target = document.activeElement
   if (!target) return false
   if (target instanceof HTMLInputElement || target instanceof HTMLTextAreaElement || target instanceof HTMLSelectElement) return true
   return target instanceof HTMLElement && target.isContentEditable
@@ -80,11 +80,11 @@ function isEditableTarget(target: Element | null) {
 class SonarAirGestureService {
   private listeners = new Set<Listener>()
   private runtime: Runtime | null = null
-  private calibrationEnergy: number[] = []
-  private calibrationAsymmetry: number[] = []
-  private calibrationStartedAt = 0
+  private baselineSamples: number[] = []
+  private asymmetrySamples: number[] = []
   private baselineEnergy = 0
   private baselineAsymmetry = 0
+  private calibrationStartedAt = 0
   private smoothedScore = 0
   private lastSampleAt = 0
   private previousMotion: SonarMotion = 'idle'
@@ -114,15 +114,15 @@ class SonarAirGestureService {
   subscribe(listener: Listener) {
     this.listeners.add(listener)
     listener(this.snapshot)
-    return () => this.listeners.delete(listener)
+    return () => { this.listeners.delete(listener) }
   }
 
   isSupported() {
     return Boolean(
       typeof window !== 'undefined' &&
-      getAudioContextCtor() &&
-      navigator.mediaDevices?.getUserMedia &&
-      window.isSecureContext,
+      window.isSecureContext &&
+      audioContextCtor() &&
+      navigator.mediaDevices?.getUserMedia,
     )
   }
 
@@ -146,33 +146,30 @@ class SonarAirGestureService {
     if (!this.isSupported()) {
       this.patch({
         phase: 'unsupported',
-        error: window.isSecureContext
-          ? 'This browser does not expose the required microphone/Web Audio APIs.'
-          : 'Touchless audio control requires HTTPS or localhost.',
+        error: typeof window !== 'undefined' && !window.isSecureContext
+          ? 'Touchless audio control requires HTTPS or localhost.'
+          : 'This browser does not expose the required microphone/Web Audio APIs.',
       })
       return
     }
 
-    const AudioContextCtor = getAudioContextCtor()
-    if (!AudioContextCtor) {
-      this.patch({ phase: 'unsupported', error: 'Web Audio is unavailable in this browser.' })
-      return
-    }
-
+    const Ctor = audioContextCtor()
+    if (!Ctor) return
     this.patch({ phase: 'requesting', motion: 'idle', error: null, confidence: 0, signalRatio: 0, shiftHz: 0 })
 
     let context: AudioContext | null = null
     let stream: MediaStream | null = null
     try {
-      context = new AudioContextCtor({ latencyHint: 'interactive' })
+      context = new Ctor({ latencyHint: 'interactive' })
       await context.resume()
       const carrierHz = chooseSonarCarrierHz(context.sampleRate)
       if (!carrierHz) {
+        const sampleRate = context.sampleRate
         await context.close()
         this.patch({
           phase: 'unsupported',
           carrierHz: null,
-          error: `Audio sample rate ${context.sampleRate} Hz cannot keep the carrier above ${MIN_SAFE_CARRIER_HZ} Hz.`,
+          error: `Audio sample rate ${sampleRate} Hz cannot keep the carrier above ${MIN_SAFE_CARRIER_HZ} Hz.`,
         })
         return
       }
@@ -197,10 +194,7 @@ class SonarAirGestureService {
       highPass.type = 'highpass'
       highPass.frequency.value = Math.max(14_000, carrierHz - 3_000)
       highPass.Q.value = 0.45
-
-      const microphone = context.createMediaStreamSource(stream)
-      microphone.connect(highPass)
-      highPass.connect(analyser)
+      context.createMediaStreamSource(stream).connect(highPass).connect(analyser)
 
       const oscillator = context.createOscillator()
       oscillator.type = 'sine'
@@ -208,20 +202,18 @@ class SonarAirGestureService {
       const outputGain = context.createGain()
       outputGain.gain.setValueAtTime(0, context.currentTime)
       outputGain.gain.linearRampToValueAtTime(0.016, context.currentTime + 0.08)
-      oscillator.connect(outputGain)
-      outputGain.connect(context.destination)
+      oscillator.connect(outputGain).connect(context.destination)
       oscillator.start()
 
-      this.calibrationEnergy = []
-      this.calibrationAsymmetry = []
-      this.calibrationStartedAt = performance.now()
+      this.baselineSamples = []
+      this.asymmetrySamples = []
       this.baselineEnergy = 0
       this.baselineAsymmetry = 0
+      this.calibrationStartedAt = performance.now()
       this.smoothedScore = 0
       this.lastSampleAt = 0
       this.previousMotion = 'idle'
       this.lastApproachPulseAt = 0
-
       this.runtime = {
         context,
         analyser,
@@ -257,7 +249,7 @@ class SonarAirGestureService {
         runtime.outputGain.gain.setTargetAtTime(0, now, 0.01)
         runtime.oscillator.stop(now + 0.05)
       } catch {
-        // Audio graph may already be closing.
+        // The graph may already be closing.
       }
       runtime.stream.getTracks().forEach((track) => track.stop())
       if (runtime.context.state !== 'closed') await runtime.context.close().catch(() => undefined)
@@ -273,77 +265,71 @@ class SonarAirGestureService {
     runtime.frame = requestAnimationFrame(this.loop)
     if (timestamp - this.lastSampleAt < SAMPLE_INTERVAL_MS) return
     this.lastSampleAt = timestamp
-
     const carrierHz = this.snapshot.carrierHz
     if (!carrierHz) return
-    runtime.analyser.getFloatFrequencyData(runtime.spectrum as Float32Array<ArrayBuffer>)
+
+    runtime.analyser.getFloatFrequencyData(runtime.spectrum)
     const spectral = this.measureSpectrum(runtime, carrierHz)
 
     if (this.snapshot.phase === 'calibrating') {
-      this.calibrationEnergy.push(spectral.totalPower)
-      this.calibrationAsymmetry.push(spectral.asymmetry)
-      if (timestamp - this.calibrationStartedAt >= CALIBRATION_MS && this.calibrationEnergy.length >= 12) {
-        this.baselineEnergy = Math.max(median(this.calibrationEnergy), 1e-15)
-        this.baselineAsymmetry = median(this.calibrationAsymmetry)
+      this.baselineSamples.push(spectral.totalPower)
+      this.asymmetrySamples.push(spectral.asymmetry)
+      if (timestamp - this.calibrationStartedAt >= CALIBRATION_MS && this.baselineSamples.length >= 12) {
+        this.baselineEnergy = Math.max(median(this.baselineSamples), 1e-15)
+        this.baselineAsymmetry = median(this.asymmetrySamples)
         this.patch({ phase: 'active', signalRatio: 1, confidence: 0, motion: 'idle' })
       }
       return
     }
-
     if (this.snapshot.phase !== 'active') return
+
     const corrected = spectral.asymmetry - this.baselineAsymmetry
     this.smoothedScore = this.smoothedScore * 0.76 + corrected * 0.24
     const threshold = 0.145 - this.snapshot.sensitivity * 0.105
     const absoluteScore = Math.abs(this.smoothedScore)
     const signalRatio = clamp(spectral.totalPower / Math.max(this.baselineEnergy, 1e-15), 0, 8)
-    const hasSignal = spectral.totalPower >= this.baselineEnergy * 0.58
-    const activeMotion = hasSignal && absoluteScore >= threshold
+    const activeMotion = spectral.totalPower >= this.baselineEnergy * 0.58 && absoluteScore >= threshold
     const motion: SonarMotion = !activeMotion
       ? 'idle'
       : this.smoothedScore > 0 ? 'approaching' : 'receding'
     const confidence = activeMotion
       ? clamp((absoluteScore - threshold) / Math.max(0.035, 0.24 - threshold), 0, 1)
       : 0
-    const shiftHz = activeMotion ? spectral.dominantShiftHz * (motion === 'approaching' ? 1 : -1) : 0
+    const shiftHz = activeMotion
+      ? spectral.dominantShiftHz * (motion === 'approaching' ? 1 : -1)
+      : 0
 
     if (motion !== this.previousMotion) this.onMotionTransition(motion, timestamp)
     this.previousMotion = motion
     this.patch({ motion, confidence, signalRatio, shiftHz })
-
     if (activeMotion) this.applyDefaultScroll(motion, confidence)
   }
 
   private measureSpectrum(runtime: Runtime, carrierHz: number) {
-    const { analyser, context, spectrum } = runtime
-    const hzPerBin = context.sampleRate / analyser.fftSize
-    const powerBetween = (fromHz: number, toHz: number) => {
+    const hzPerBin = runtime.context.sampleRate / runtime.analyser.fftSize
+    const { spectrum } = runtime
+    const windowPower = (fromHz: number, toHz: number) => {
       const from = clamp(Math.floor(fromHz / hzPerBin), 0, spectrum.length - 1)
       const to = clamp(Math.ceil(toHz / hzPerBin), from, spectrum.length - 1)
       let total = 0
-      for (let index = from; index <= to; index += 1) total += dbToPower(spectrum[index])
+      for (let i = from; i <= to; i += 1) total += dbToPower(spectrum[i])
       return total / Math.max(1, to - from + 1)
     }
     const peakOffset = (fromHz: number, toHz: number) => {
       const from = clamp(Math.floor(fromHz / hzPerBin), 0, spectrum.length - 1)
       const to = clamp(Math.ceil(toHz / hzPerBin), from, spectrum.length - 1)
       let bestIndex = from
-      let bestDb = Number.NEGATIVE_INFINITY
-      for (let index = from; index <= to; index += 1) {
-        if (spectrum[index] > bestDb) {
-          bestDb = spectrum[index]
-          bestIndex = index
-        }
-      }
+      for (let i = from + 1; i <= to; i += 1) if (spectrum[i] > spectrum[bestIndex]) bestIndex = i
       return Math.abs(bestIndex * hzPerBin - carrierHz)
     }
 
-    const lower = powerBetween(carrierHz - SIDE_BAND_OUTER_HZ, carrierHz - SIDE_BAND_INNER_HZ)
-    const upper = powerBetween(carrierHz + SIDE_BAND_INNER_HZ, carrierHz + SIDE_BAND_OUTER_HZ)
+    const lower = windowPower(carrierHz - OUTER_HZ, carrierHz - INNER_HZ)
+    const upper = windowPower(carrierHz + INNER_HZ, carrierHz + OUTER_HZ)
     const totalPower = lower + upper
     const asymmetry = (upper - lower) / Math.max(totalPower, 1e-18)
     const dominantShiftHz = upper >= lower
-      ? peakOffset(carrierHz + SIDE_BAND_INNER_HZ, carrierHz + SIDE_BAND_OUTER_HZ)
-      : peakOffset(carrierHz - SIDE_BAND_OUTER_HZ, carrierHz - SIDE_BAND_INNER_HZ)
+      ? peakOffset(carrierHz + INNER_HZ, carrierHz + OUTER_HZ)
+      : peakOffset(carrierHz - OUTER_HZ, carrierHz - INNER_HZ)
     return { totalPower, asymmetry, dominantShiftHz }
   }
 
@@ -354,17 +340,16 @@ class SonarAirGestureService {
       this.lastApproachPulseAt = 0
       this.setInverted(!this.snapshot.inverted)
       this.flashDock(`Direction ${this.snapshot.inverted ? 'reversed' : 'normal'}`)
-      return
+    } else {
+      this.lastApproachPulseAt = timestamp
     }
-    this.lastApproachPulseAt = timestamp
   }
 
   private applyDefaultScroll(motion: SonarMotion, confidence: number) {
-    if (typeof document === 'undefined' || isEditableTarget(document.activeElement)) return
-    const direction = motion === 'approaching' ? -1 : 1
-    const signedDirection = this.snapshot.inverted ? -direction : direction
-    const pixels = signedDirection * (10 + confidence * 58)
-    window.scrollBy({ top: pixels, left: 0, behavior: 'auto' })
+    if (editingText()) return
+    const baseDirection = motion === 'approaching' ? -1 : 1
+    const direction = this.snapshot.inverted ? -baseDirection : baseDirection
+    window.scrollBy({ top: direction * (10 + confidence * 58), left: 0, behavior: 'auto' })
   }
 
   private patch(next: Partial<SonarSnapshot>) {
@@ -376,15 +361,12 @@ class SonarAirGestureService {
   private restorePreferences() {
     if (typeof localStorage === 'undefined') return
     try {
-      const value = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}') as Partial<SonarSnapshot>
-      this.snapshot = {
-        ...this.snapshot,
-        sensitivity: typeof value.sensitivity === 'number' ? clamp(value.sensitivity, 0, 1) : this.snapshot.sensitivity,
-        inverted: typeof value.inverted === 'boolean' ? value.inverted : this.snapshot.inverted,
-        doubleTapInvert: typeof value.doubleTapInvert === 'boolean' ? value.doubleTapInvert : this.snapshot.doubleTapInvert,
-      }
+      const saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}') as Partial<SonarSnapshot>
+      if (typeof saved.sensitivity === 'number') this.snapshot.sensitivity = clamp(saved.sensitivity, 0, 1)
+      if (typeof saved.inverted === 'boolean') this.snapshot.inverted = saved.inverted
+      if (typeof saved.doubleTapInvert === 'boolean') this.snapshot.doubleTapInvert = saved.doubleTapInvert
     } catch {
-      // Corrupt preferences are ignored; no health or account data is stored here.
+      // Preference corruption should never block the app.
     }
   }
 
@@ -397,7 +379,7 @@ class SonarAirGestureService {
         doubleTapInvert: this.snapshot.doubleTapInvert,
       }))
     } catch {
-      // Preference persistence is optional.
+      // Persistence is optional.
     }
   }
 
@@ -408,38 +390,21 @@ class SonarAirGestureService {
     dock.setAttribute('role', 'status')
     dock.setAttribute('aria-live', 'polite')
     Object.assign(dock.style, {
-      position: 'fixed',
-      right: '12px',
-      bottom: 'calc(82px + env(safe-area-inset-bottom, 0px))',
-      zIndex: '2147483000',
-      display: 'flex',
-      alignItems: 'center',
-      gap: '9px',
-      padding: '8px 9px 8px 12px',
-      border: '1px solid rgba(123, 238, 255, .28)',
-      borderRadius: '999px',
-      background: 'rgba(4, 9, 18, .84)',
-      color: '#f7fbff',
-      boxShadow: '0 12px 34px rgba(0,0,0,.34), inset 0 1px rgba(255,255,255,.08)',
-      backdropFilter: 'blur(18px) saturate(150%)',
-      font: '600 11px/1.2 Montserrat, ui-sans-serif, system-ui, sans-serif',
-      maxWidth: 'min(86vw, 320px)',
+      position: 'fixed', right: '12px', bottom: 'calc(82px + env(safe-area-inset-bottom, 0px))', zIndex: '2147483000',
+      display: 'flex', alignItems: 'center', gap: '9px', padding: '8px 9px 8px 12px',
+      border: '1px solid rgba(123,238,255,.28)', borderRadius: '999px', background: 'rgba(4,9,18,.84)',
+      color: '#f7fbff', boxShadow: '0 12px 34px rgba(0,0,0,.34), inset 0 1px rgba(255,255,255,.08)',
+      backdropFilter: 'blur(18px) saturate(150%)', font: '600 11px/1.2 Montserrat,ui-sans-serif,system-ui,sans-serif',
+      maxWidth: 'min(86vw,320px)',
     })
     const dot = document.createElement('span')
-    Object.assign(dot.style, {
-      width: '8px', height: '8px', borderRadius: '50%', flex: '0 0 auto',
-      background: '#4de7ff', boxShadow: '0 0 14px rgba(77,231,255,.9)',
-    })
+    Object.assign(dot.style, { width: '8px', height: '8px', borderRadius: '50%', background: '#4de7ff', boxShadow: '0 0 14px rgba(77,231,255,.9)' })
     const status = document.createElement('span')
-    status.textContent = 'Air gesture calibrating…'
     const stop = document.createElement('button')
     stop.type = 'button'
     stop.textContent = 'Stop'
     stop.setAttribute('aria-label', 'Stop touchless air gestures')
-    Object.assign(stop.style, {
-      border: '0', borderRadius: '999px', padding: '6px 9px', cursor: 'pointer',
-      background: 'rgba(255,255,255,.10)', color: 'inherit', font: 'inherit',
-    })
+    Object.assign(stop.style, { border: '0', borderRadius: '999px', padding: '6px 9px', cursor: 'pointer', background: 'rgba(255,255,255,.10)', color: 'inherit', font: 'inherit' })
     stop.addEventListener('click', () => { void this.stop() })
     dock.append(dot, status, stop)
     document.body.appendChild(dock)
@@ -449,14 +414,13 @@ class SonarAirGestureService {
 
   private updateDock() {
     if (!this.dockStatus) return
-    const phaseLabel = this.snapshot.phase === 'calibrating'
+    this.dockStatus.textContent = this.snapshot.phase === 'calibrating'
       ? 'Air gesture calibrating…'
       : this.snapshot.phase === 'active'
         ? this.snapshot.motion === 'idle'
           ? 'Air gesture ready'
           : `${this.snapshot.motion === 'approaching' ? 'Hand approaching' : 'Hand receding'} · ${Math.round(this.snapshot.confidence * 100)}%`
         : 'Air gesture active'
-    this.dockStatus.textContent = phaseLabel
   }
 
   private flashDock(message: string) {
