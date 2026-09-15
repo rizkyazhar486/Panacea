@@ -5,6 +5,8 @@ import { FeatureBoulevard } from '../components/FeatureBoulevard'
 import { PersonalBodyAvatar3D } from '../components/PersonalBodyAvatar3D'
 
 const BodyComposition = lazy(() => import('./BodyComposition').then((m) => ({ default: m.BodyComposition })))
+const BodyExplorer = lazy(() => import('./BodyExplorer').then((m) => ({ default: m.BodyExplorer })))
+const BodyToolkit = lazy(() => import('./BodyToolkit').then((m) => ({ default: m.BodyToolkit })))
 const ShapeForming = lazy(() => import('./ShapeForming').then((m) => ({ default: m.ShapeForming })))
 const PusatLatihan = lazy(() => import('./PusatLatihan').then((m) => ({ default: m.PusatLatihan })))
 const PusatTubuh = lazy(() => import('./PusatTubuh').then((m) => ({ default: m.PusatTubuh })))
@@ -14,11 +16,13 @@ const VitaPulse = lazy(() => import('./VitaPulse').then((m) => ({ default: m.Vit
 const Longevity = lazy(() => import('./Longevity').then((m) => ({ default: m.Longevity })))
 const DataLab = lazy(() => import('./DataLab').then((m) => ({ default: m.DataLab })))
 
-type BodyView = 'body' | 'character' | 'training' | 'workout' | 'recovery' | 'numbers' | 'nutrition' | 'health-data' | 'labs' | 'longevity' | 'vitapulse'
+type BodyView = 'body' | 'body-exposure' | 'body-tools' | 'character' | 'training' | 'workout' | 'recovery' | 'numbers' | 'nutrition' | 'health-data' | 'labs' | 'longevity' | 'vitapulse'
 type View = { key: BodyView; label: string; short: string; component: ComponentType; childTab?: string; description: string }
 
 const VIEWS: View[] = [
   { key: 'body', label: 'Your Body', short: 'Body', component: BodyComposition, description: 'Body composition and the measurements that define your personal body context.' },
+  { key: 'body-exposure', label: 'Body Exposure', short: 'Body Exposure', component: BodyExplorer, description: 'Interactive whole-body anatomy, organ systems, physiology, radiology modes, dissection, biomechanics, molecular and clinical exploration in one living body atlas.' },
+  { key: 'body-tools', label: 'Body & Skin Tools', short: 'Body Tools', component: BodyToolkit, description: 'Body-region symptom logging, skin routine tools and daily non-exercise activity tracking connected to the body workspace.' },
   { key: 'character', label: '3D Character & Body Shaper', short: '3D Character', component: ShapeForming, description: 'Use your measurements and body/posture photo analysis to refine the same personal 3D character shown above.' },
   { key: 'training', label: 'Training', short: 'Training', component: PusatLatihan, childTab: 'rencana', description: 'Plans, sport science and training progression in the same personal workspace.' },
   { key: 'workout', label: 'Workout', short: 'Workout', component: PusatLatihan, childTab: 'sesi', description: 'Daily sessions, strength and movement work.' },
