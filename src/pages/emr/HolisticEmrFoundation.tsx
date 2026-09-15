@@ -6,6 +6,7 @@ import {
   appendAudit,
   buildHolisticChartFromLegacy,
   calculateHolisticCompleteness,
+  createEmptyHolisticChart,
   newClinicalId,
   type ClinicalProvenance,
   type HolisticAllergy,
@@ -43,8 +44,8 @@ export function HolisticEmrFoundation() {
   const [medicationFrequency, setMedicationFrequency] = useState('')
   const actor = state.settings.doctorName || state.account?.name || 'Clinician'
 
-  const chart = useMemo(() => {
-    if (!record) return null
+  const chart = useMemo<HolisticChart>(() => {
+    if (!record) return createEmptyHolisticChart(activePatient.id)
     return buildHolisticChartFromLegacy({
       patient: activePatient,
       record,
@@ -54,13 +55,14 @@ export function HolisticEmrFoundation() {
     })
   }, [record, activePatient, state.vitals, state.supportive, actor])
 
-  const completeness = useMemo(() => chart ? calculateHolisticCompleteness(chart) : null, [chart])
-  if (!record || !chart || !completeness) return null
+  const completeness = useMemo(() => calculateHolisticCompleteness(chart), [chart])
+  if (!record) return null
 
   function commit(nextChart: HolisticChart, action: string, target?: string, detail?: string) {
     const now = new Date().toISOString()
     const audited = appendAudit({ ...nextChart, updatedAt: now }, actor, action, target, detail, now)
-    saveRecord({ ...record, holistic: audited, updatedAt: now })
+    const nextRecord: HolisticEMRRecord = { ...record, holistic: audited, updatedAt: now }
+    saveRecord(nextRecord)
   }
 
   function reviewProblems() {
