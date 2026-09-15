@@ -5,11 +5,19 @@
    Presentation only: no health values, thresholds, chart/status colors,
    widget logic, routing, persistence or loading behavior are changed. */
 
+/*
+   Dark is the resilient Home fallback.
+   The production Home shell is dark even when a host/theme class is delayed or
+   absent (for example during mobile hydration). Keeping a light base here made
+   every shared .kaca surface flash or remain washed-out gray while descendant
+   typography still used dark-theme colors. Explicit dark hooks remain below,
+   but they are no longer required for readable widgets.
+*/
 .panacea-home{
-  --pmd-calm-surface:rgba(255,255,255,.78);
-  --pmd-calm-border:rgba(15,23,42,.075);
-  --pmd-calm-fg:#111827;
-  --pmd-calm-muted:#52606d;
+  --pmd-calm-surface:rgba(9,14,22,.82);
+  --pmd-calm-border:rgba(255,255,255,.085);
+  --pmd-calm-fg:#f8fafc;
+  --pmd-calm-muted:#b8c4cf;
 }
 html.dark .panacea-home,
 .dark .panacea-home{
@@ -73,7 +81,7 @@ html.dark .panacea-home .widget-instrument-nav-v5,
 /* Reference/body sections should read as measurement panels, not framed
    posters. Their internal separators and reference markers remain untouched. */
 .panacea-home .kaca > :is(div,a)+:is(div,a){
-  border-color:rgba(148,163,184,.12);
+  border-color:rgba(255,255,255,.075);
 }
 html.dark .panacea-home .kaca > :is(div,a)+:is(div,a),
 .dark .panacea-home .kaca > :is(div,a)+:is(div,a){
@@ -119,6 +127,6 @@ html.pmd-low-memory .panacea-home :is(.widget-instrument-edit-v5,.widget-instrum
 }
 
 @media(prefers-contrast:more){
-  .panacea-home{--pmd-calm-border:rgba(15,23,42,.22)}
+  .panacea-home{--pmd-calm-border:rgba(255,255,255,.22)}
   html.dark .panacea-home,.dark .panacea-home{--pmd-calm-border:rgba(255,255,255,.22)}
 }
