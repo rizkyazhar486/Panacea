@@ -1,327 +1,212 @@
-# Panaceamed.id — working rules
+# Panaceamed.id — Claude Code working rules
 
-## Language: English is the base. This is permanent.
+## Language: English is the base
 
-The **fundamental language of this application is English**, everywhere, from now
-on and for good. English is not a preference to be revisited each session — it is
-what makes the product professional and usable outside one person's own screen.
+The application language is English by default. New user-facing strings are written
+in English first, then translated to Arabic, Mandarin, Indonesian, French, Japanese
+and Dutch where the multilingual layer supports them.
 
-The app is **multilingual on top of that base**: English (source) plus
-**Arabic, Mandarin, Indonesian, French, Japanese, Dutch**. Every new string is
-written in English first and then translated outward; never the reverse.
+Two content exceptions remain:
+1. SKDI / OSCE / UKMPPD medical corpus may remain Indonesian because it mirrors the
+   Indonesian competency source material.
+2. Scripture/religious content keeps source language plus the existing rendering.
 
-### What this means in practice
+The UI around those exceptions remains English. Repository code comments remain in
+Indonesian by established convention. Identifiers, route paths, option values,
+filter keys and comparison keys are data, not translatable interface text.
 
-- **Write every new user-facing string in English.** Buttons, labels, empty
-  states, error messages, notification titles and bodies, onboarding copy.
-- **Never translate the interface into Indonesian.** If a screen is still in
-  Indonesian, it is unfinished work — convert it to English, do not "keep it
-  consistent" with its neighbours by adding more Indonesian.
-- **Two exceptions, and only these two:**
-  1. The **SKDI / OSCE / UKMPPD medical corpus** (disease notes, station notes,
-     exam banks, therapy references) stays in Indonesian — it mirrors Indonesian
-     national competency material and its wording is the point.
-  2. **Scripture and religious content** (Qur'an, hadith, other traditions) keeps
-     its source language plus the existing Indonesian rendering.
-  The interface *around* both of those is still English.
-- **Code comments in this repository are written in Indonesian** by long-standing
-  convention, and that stays. Comments are not interface.
+## Read `AGENTS.md` first
 
-### Why this was written down
+`AGENTS.md` is the global operating policy and priority source of truth. This file
+specializes that policy for Claude Code. If there is any coordination conflict,
+follow the safer rule:
 
-An earlier session read a note that said "~1,100 remaining English strings" as a
-list of strings to translate *into* Indonesian, and pushed ten commits in the
-wrong direction before it was caught. The instruction had always been the
-opposite. The cost of re-deriving this from context is a day of work thrown away,
-so it lives here instead.
+`short-lived branch → PR → exact-head gates → latest-main audit → merge`
 
-## Identifiers are not text
+Never push production work directly to `main`.
 
-`id`, route paths, `value=` on options, filter keys, and anything compared with
-`===` are **data**, not interface. Translating them empties saved layouts and
-silently kills filters with no visible error. Translate the label; leave the key.
+## Claude Code role — finisher, integrator and reliability owner
 
-## Product architecture: simplicity is permanent
+Claude Code is the primary implementation finisher for settled product direction.
+Do not behave as a second independent product planner when the repository policy has
+already decided the architecture.
 
-Panaceamed must feel small even when its capability set is very large. Treat this
-as a permanent architecture rule for every UI change.
+Primary responsibilities:
+- stabilize exact-head build/type/test/browser/deployment failures;
+- integrate settled Home / OS, Clinical and Explore architecture;
+- remove route/UI duplication without deleting useful capability;
+- harden responsive behavior, accessibility, performance and error states;
+- integrate role/privacy/audit/data boundaries;
+- finish shared-contract refactors only when necessary and well-scoped;
+- coordinate final QA and safe merge sequencing.
 
-- The default information architecture is **3 primary super-pages: Home / OS,
-  Clinical, Explore**. Add a fourth only if a truly different mental model cannot
-  be represented cleanly inside those three.
-- Do not create a new page merely because a new feature exists. Merge overlapping
-  functionality, data, APIs and assets into an existing super-page first.
-- Compile features into compact widgets, horizontal rails, carousels, visual
-  states, contextual tabs, expandable panels, drawers, bottom sheets, overlays,
-  motion/3D views, and global search / Ask Panacea.
-- Keep one main vertical scroll and use progressive disclosure. The initial screen
-  should be short, calm and readable; deeper capability appears when requested.
-- Any feature should normally be reachable in **1–2 interactions** from a primary
-  super-page. Rare features may be visually smaller, but not buried deeper.
-- Order the screen by value and urgency: most significant first, less useful or
-  low-frequency capability later or on demand.
-- A new user should understand the application's primary structure in roughly
-  **5–9 minutes**.
-- Educational content can be scientifically deep, but its first layer should use
-  visuals first and minimal text: images, diagrams, charts, animation, video, 3D,
-  simulation and interaction. Reveal detailed explanation/evidence on demand.
-- Never expose internal TODOs, unfinished work, development plans, repository
-  structure, implementation commentary or “what comes next” in public UI unless
-  it is intentionally a public roadmap.
-- Navigation is not sacred. Remove, collapse or replace nav that adds clutter or
-  duplicate paths. Search / command access may be the universal shortcut.
-- Theme/color values come from shared design tokens. Do not invent page-local
-  palettes or arbitrary colors inside components.
+## Product architecture — keep the product small
 
-The governing equation is simple:
+The default public mental model is exactly three primary super-pages:
+**Home / OS, Clinical, Explore**.
+
+Do not create another primary page because a feature exists. First compile the
+capability into its parent super-page using widgets, rails/carousels, contextual
+modes, drawers, bottom sheets, overlays, search/command and progressive disclosure.
+Keep normal access depth at roughly 1–2 interactions. Preserve capability while
+removing duplicate UI and duplicate mental models.
+
+Rules:
+- one main vertical scroll per super-page;
+- compact first layer, deeper detail on demand;
+- no internal TODO/dev/repository commentary in production UI;
+- shared design tokens own visual semantics;
+- Global Search / Ask Panacea is the universal shortcut for uncommon tools.
 
 `available capability >> visible complexity`
 
-and prominence should broadly follow:
+## Priority order
 
-`value × frequency × urgency × context`
+Hard clinical-safety, security, privacy, data-integrity and production blockers win
+before feature work.
 
-## Claude Code continuation queue — use this instead of a separate handoff
+1. **P0 integrity/stabilization** — failing exact-head CI, broken primary flows,
+   stale ancestry, merge conflicts, deployment blockers and regressions.
+2. **P1 canonical shell + release-critical workflows** — three super-pages, Home /
+   OS, Clinical, roles, consent, audit, export/delete, resilience and clinician
+   sign-off boundaries.
+3. **P2 Explore / Body Exposure** — canonical whole-body workspace, source-backed
+   anatomy, physiology/pathophysiology/pharmacology/imaging/localization/biomechanics
+   integration, then organ depth.
+4. **P3 evidence/governance** — provenance, evaluation contracts, metrics, release
+   cards, uncertainty and human review.
+5. **P4 polish/optimization** — responsive, accessibility, visual regression,
+   WebGL stability and performance.
 
-This is the durable continuation queue. The owner does **not** want a separate
-handoff document for routine continuation. Read this section and `AGENTS.md`, then
-inspect current `main`, open PRs/issues and exact-head CI. Verify an item is still
-unfinished before touching it; do not re-plan settled product decisions.
+Park novelty that does not materially improve publishability, reach, safety,
+trustworthiness or differentiation of the canonical three-page product.
 
-### First responsibility: stabilization and finishing
+## Pinned workspace allocation
 
-- Finish exact-head Validate + full Stabilization Acceptance + relevant security /
-  Body/WebGL gates for active production PRs, re-check latest `main`, ancestry and
-  file overlap, then merge only through the PR. Never trust stale green CI.
-- If PR `#1711` is still open, treat it as the current causal-bridge replay rather
-  than reviving older #1705. Fix only concrete failures and rerun fresh CI.
-- Own final debugging, hardening, performance cleanup, build/type/test fixes,
-  responsive behavior and visual finishing. Target remains Friday **18 Sep 2026**,
-  but no deadline allows bypassing gates or weakening validation.
-- Complete visual debt: Home contrast/information simplification, global typography
-  hierarchy, 4/8 spacing, nav de-duplication/mobile flow, Today/widgets/reference
-  ranges, Body Exposure/Learn/Discovery cleanup, forms/tables/modals/alerts/empty /
-  error states, accessibility and visual-regression checks.
+Use the role split in `AGENTS.md` consistently:
 
-### Continue product consolidation, not page growth
+- **Work 5.6 Sol:** control plane/integrator; shared architecture, queue, PR
+  rationalization, Home/Clinical integration and final QA coordination.
+- **Work Astra Max:** heavy specialist for hard Three.js/WebGL, complex anatomy /
+  physiology rendering, spatial interaction and difficult visual/performance work.
+- **Body Light — Terra:** low-risk source/provenance inventory, metadata,
+  deterministic tests, accessibility, labels and repetitive Body cleanup.
+- **Panacea Organ Build:** moderate organ/system builder using canonical Body
+  contracts, one isolated organ/system scope at a time.
 
-- Reduce the public mental model toward **Home / OS, Clinical, Explore**. Existing
-  specialist routes may survive only as compatibility/deep-link adapters or
-  contextual states; do not let them remain parallel top-level products.
-- Merge overlapping functions, APIs, datasets and assets into the same super-page.
-  Preserve capability; remove duplication, not functionality.
-- Keep every feature roughly 1–2 interactions from a primary super-page. Rare
-  tools should be compact but discoverable via rails, drawers, contextual modes,
-  global search / Ask Panacea.
-- Remove public-facing TODO/dev status/“coming next”/internal repository or workflow
-  commentary from the shipped UI.
+Claude Code must not duplicate a scope currently owned by another lane. It should
+integrate or finish only after checking latest main, active PRs and changed-file
+ownership.
 
-### Visual system that must be unified
+## Parallelism
 
-- Replace arbitrary component-local colors with shared semantic tokens.
-- Owner direction: near-black/space-black biomedical-cosmic canvas; spectral
-  cyan/electric blue/violet/magenta refraction; restrained warm-white/gold halo;
-  Panacea green `#00BF63` is brand/semantic accent rather than a large fill.
-- Keep quiet surfaces, narrow consistent borders and controlled glass/translucency.
-  Avoid washed-out dark panels, parent opacity/filter/grayscale, decorative green
-  backgrounds and unreadable muted text.
-- Prefer 4/8 spacing rhythm, typography ladder `12, 14, 16, 20, 24, 32`, body text
-  at least 12 px, and 44 px minimum primary touch targets.
-- Motion/3D can be ambitious but must communicate state/anatomy/causality. Mark
-  experimental or synthetic content explicitly; never present spectacle as fact.
+Parallel work is allowed only when it is truly independent:
 
-### Body Exposure remains the highest-value product depth work
+`ParallelSafe = (changed_paths_A ∩ changed_paths_B = ∅) ∧ stable_shared_contracts ∧ no_unresolved_dependency`
 
-- Keep whole-body-first ordering. Mature breadth across organ systems before
-  over-investing in one organ or microscopic view.
-- Canonical depth: `whole body → organ/system → tissue → histology → cell/organelle
-  → molecule → genome/DNA`.
-- Physical layers: skin → subcutaneous tissue → fascia → muscle → tendon/ligament →
-  neurovascular structures → organ/capsule → histology → cell → molecule → gene.
-- Biomechanics: bone → cartilage → capsule → ligament → tendon → muscle → fascia →
-  force/load/movement.
-- Keep anatomy, physiology, pathophysiology, pharmacology, imaging, lesion
-  localization, biomechanics and surgical education inside the same Body Exposure
-  state model rather than spawning separate products.
-- Mandatory capability references remain `thebuggeddev/anatomy`, Breath Atlas,
-  `aycibatuhan/nervous-system-atlas`, dental-atlas and anatomy-unfolded references.
-  Verify licensing before copying code/assets; preserve source/version/license /
-  transformation/evidence/provenance.
-- Issue `#626` is mandatory: HD anatomy + Breath Atlas fidelity, respiratory
-  mechanics, airway hierarchy, LOD/progressive loading, stable WebGL, 390x844 and
-  high-DPI visual evidence.
-- Continue organ/system maturation: Eye Gold Standard, Heart & Cardiovascular,
-  Brain & Neurovascular/Nervous System, Respiratory, Renal, Endocrine, and whole-
-  body Musculoskeletal/Biomechanics.
-- Eye scope: orbit/globe, corneal layers, retinal layers, EOM, neural pathway,
-  blood supply, lacrimal system, aqueous flow, accommodation, pupillary reflex,
-  pathology, pharmacology, imaging, interaction, performance and validation. Treat
-  owner goals `Q ≥ 0.88` and anatomical accuracy `≥ 0.92` as real gates only when
-  a reproducible rubric exists; never invent a passing score.
-- Continue mechanism chain work: pathophysiology → pharmacology/DailyMed → causal
-  bridge → unified mechanism graph → provenance; finish/replay lesion, heart PV,
-  brain neurovascular, respiratory V/Q + gas exchange, renal and endocrine flows.
+Serialize work that touches any of these shared zones unless ownership is explicitly
+coordinated:
+- `AGENTS.md`, `CLAUDE.md`;
+- routing/app shell and the three super-page roots;
+- `.github/workflows`, package/build scripts;
+- shared theme/design tokens;
+- auth, EMR/clinical shared data contracts;
+- canonical Body root state, renderer/loader and anatomy schema.
 
-### Compile the three super-pages deeply
+Do not force-push shared branches or overwrite another agent's work.
 
-- **Home / OS:** health overview, longitudinal signals, wearables/device data,
-  activity, sleep/recovery, nutrition, longevity/prevention, alerts, goals,
-  emergency actions and quick actions. WHOOP, Garmin, Oura and Apple Health are
-  contextual integrations, not standalone top-level products.
-- **Clinical:** patient context, intake/triage, differential diagnosis, CDSS, labs,
-  imaging, scores/calculators, medicines/interactions, guidelines, monitoring and
-  documentation in one flow, with human-review/evidence boundaries preserved.
-- **Explore:** Body Exposure, education, evidence/reference, research, datasets and
-  biomedical discovery in one visual-first workspace with brief surface text and
-  deeper evidence on demand.
-- Discovery may include computational molecule/drug/vaccine concepts and safe
-  synthetic simulation tied to literature/provenance. Do not implement operational
-  pathogen engineering, actionable wet-lab viral design or unsupported claims of
-  immediate patient applicability.
+## Task selection and pruning
 
-### Final acceptance before calling work finished
+Use the shared score from `AGENTS.md`:
 
-- Phone/tablet/desktop pass, especially 390x844; no floating control, nav, drawer
-  or carousel may cover clinically/educationally important content.
-- Preserve progressive asset loading, bounded render scale/devicePixelRatio,
-  graceful degradation and stable WebGL under toggles/orbit/zoom/animation.
-- Audit keyboard/focus semantics, reduced motion, contrast, readable muted text,
-  loading/empty/error states and visual regression.
-- Delete genuinely dead duplicate routes/components only after deep-link /
-  compatibility and usage concerns are resolved; do not delete capability merely
-  because its old page is hidden.
+`Priority = 0.28B + 0.20R + 0.18S + 0.14A + 0.10U + 0.10E - 0.18O - 0.10D`
 
-### Work allocation
+Hard safety/security/privacy blockers override the score.
 
-- **Claude Code:** stabilization, debugging, hardening, integration, de-fragmenting
-  routes/UI, refactors, responsive behavior, performance cleanup and finishing.
-- **Astra/heavy:** difficult Three.js/WebGL, advanced 3D anatomy/physiology,
-  sophisticated spatial/motion work and hard visual foundations.
-- **Routine/medium:** most React/TypeScript integration, consolidation and data
-  wiring.
-- **Light/repetitive:** token/spacing/typography/accessibility sweeps, labels,
-  deterministic cleanup and simple tests.
-- Do not re-plan decisions already settled in this file. Take the highest-value
-  non-overlapping unfinished item, implement, validate, merge safely, then continue.
+Close/park a task when it is superseded, duplicate, restores superseded IA, is safer
+to replay than merge, lacks provenance/licensing, or has much lower release value
+than current P0–P2 work. Preserve useful unique ideas by referencing the successor
+or harvest destination when practical.
 
-## Claude Code publish-first director
+Do not keep stale PRs open merely because they contain code. Closed branches remain
+history and can be harvested later.
 
-Claude Code should behave as the **finisher/integrator**, not as a second product
-planner. `AGENTS.md` contains the global priority model and PR harvest order; use it
-as the source of truth for what comes next.
+## Execution loop
 
-### Immediate order
+For every task:
+1. resolve latest `main`, recent commits, relevant open PRs and exact CI state;
+2. confirm no overlapping owner and define a small measurable acceptance criterion;
+3. make the smallest coherent reversible change;
+4. run targeted type/build/tests/browser/render checks while iterating;
+5. keep one coherent PR instead of repeated micro-PR churn;
+6. require exact-head **Validate pull requests** + complete **Stabilization
+   Acceptance** + relevant specialized gates;
+7. immediately before merge, re-check latest `main`, mergeability, changed-file
+   overlap, ancestry and unchanged tested head;
+8. merge through the PR only, never force;
+9. verify the merge on `main` plus available deployment/smoke evidence;
+10. continue with the next highest-priority safe task.
 
-1. **Finish #1734 first.** Do not start a competing IA branch. If CI fails, diagnose
-   the exact current head, patch the concrete defect, rerun exact-head gates, and
-   merge only after latest-main overlap/ancestry is clean.
-2. **Make the 3-page shell real, not cosmetic.** Ensure Home / OS, Clinical and
-   Explore are the only primary mental-model destinations. Existing routes may
-   remain for compatibility, but common actions must resolve into those pages in
-   1–2 interactions.
-3. **Clinical before enterprise polish.** Replay/adapt #1708 into Clinical after the
-   foundation lands. Reuse useful Care grouping from closed #1733 without restoring
-   its separate workspace IA. Make Puskesmas workflow credible before prioritizing
-   internal architecture/economics pages.
-4. **Body evidence chain next.** Replay #1711 → #1712 → #1713 one layer at a time on
-   fresh main; then selectively integrate #1681, #1646 and useful #1701 ideas into
-   Explore / Body Exposure.
-5. **Discovery after core stability.** Safely absorb #1645, #1709, #1726 and #1715
-   into Explore / Discovery. Keep research/synthetic boundaries explicit.
-6. **Harvest stale UI PRs; do not wholesale merge them.** #1664/#1665/#1666 are
-   design/test sources after #1734, not authority for the old Home architecture.
-7. **Park optional novelty** (#1672, #1706) until showcase and pilot gates are green.
-   Do not spend scarce stabilization time on features that do not improve
-   publishability, reach, safety or differentiation of the three super-pages.
+A task is finished by evidence and acceptance, not by time. **There is no default
+deadline or task time limit.**
 
-### Release ladder Claude should optimize for
+## Body Exposure rules
 
-- **Showcase:** beautiful, coherent, no broken visible controls, no dev/TODO copy,
-  responsive phone/desktop, demo-safe and understandable within minutes.
-- **Patient/Athlete pilot:** Home / OS connected signals, trends, recovery/training,
-  prevention, consent and data controls.
-- **Puskesmas pilot:** Clinical patient context, intake/vitals, triage support,
-  problem/allergy/medication review, calculators, labs, referral, notes, audit,
-  low-bandwidth resilience and clinician sign-off.
-- **Hospital pilot:** role/RBAC, longitudinal EMR, audit, interoperability, privacy,
-  observability, backup/recovery, downtime behavior and institutional integration.
+Body Exposure is one canonical workspace. Keep whole-body first, then depth:
 
-Do not claim a later rung based only on UI completeness. A polished demo is not a
-clinical deployment.
+`whole body → organ/system → tissue → histology → cell/organelle → molecule → genome/DNA`
 
-### Claude's task-selection formula
+Do not create standalone organ products. Organ modules must plug into the shared Body
+state model. Preserve source/version/license/transformation/provenance. Never invent
+anatomy, patient-specific precision, clinical interpretation or validation.
 
-When several non-overlapping candidates are available, rank them using the shared
-0–5 inputs from `AGENTS.md`:
+For Body/3D work, preserve the specialized WebGL/render acceptance and mobile
+390x844 evidence. Difficult rendering foundations may be handed to Astra, but routine
+integration, responsive cleanup and tests should return to normal implementation.
 
-`ShipPriority = 0.30B + 0.25R + 0.20X + 0.15S + 0.10E`
+## Clinical / biomedical truth boundary
 
-Prefer the higher score, except hard security/clinical-safety blockers always win.
-After each safe merge, immediately select the next highest-value non-overlapping
-candidate; do not wait for another owner message when operating in an authorized
-continuous run.
+Software CI is not academic, clinical or regulatory validation. For anatomy,
+physiology, pathology, pharmacology, genomics, surgery, diagnosis/treatment or other
+medical content:
+- distinguish measured, reference, simulated, derived and unsupported states;
+- preserve source identity, version, evidence/provenance and uncertainty;
+- run the Academic Accuracy Gate where material biomedical content changes;
+- never claim human review without an actual qualified reviewer record;
+- never infer patient-specific anatomy, lesion location, procedure target,
+  diagnosis, treatment or dose from generic atlas/simulation data.
 
-## Multi-agent coordination — mandatory
+## Quality and optimization
 
-This repository is edited concurrently by ChatGPT/Codex, Claude Code, Replit and
-other automation. **GitHub `main` is the source of truth, but agents must not push
-directly to `main`.** Direct writes make other PRs stale, cancel useful CI, and
-create hard-to-audit races.
+Optimize only after correctness is demonstrated. Prefer measured fixes over broad
+refactors. Preserve the intent of validators and deterministic tests. Diagnose a
+failing gate before pushing another speculative commit. Never claim DONE, green,
+merged, deployed or validated without direct evidence.
 
-Before editing:
-1. Resolve the latest `main` SHA.
-2. Inspect recent commits and open PRs touching the intended files/area.
-3. If another active PR owns overlapping paths, do not duplicate it. Pick another
-   safe task or coordinate explicitly.
-4. Create a short-lived branch from the latest safe `main`.
+For user-visible work, verify phone/tablet/desktop behavior where tooling supports
+it, especially 390x844. Check keyboard/focus semantics, reduced motion, contrast,
+readable muted text, empty/error/loading states and visual regression.
 
-During implementation:
-- Keep one coherent, reversible batch per PR.
-- Do not create `TEMP`, placeholder, dummy, or knowingly broken commits on `main`.
-- Prefer targeted tests while iterating; diagnose failures before pushing another
-  commit so CI is not repeatedly cancelled and restarted.
-- Do not weaken validators, biomedical gates, browser smoke, security checks, or
-  tests merely to obtain green CI.
-- Do not force-push shared branches or overwrite another agent's work.
+## `lanjut` keyword protocol
+
+When the owner sends **`lanjut`**, continue immediately from the current repository
+state on the highest-priority safe unfinished task. Do not ask for confirmation and
+do not restate the plan. First resolve latest main, active PRs, overlap and current
+QA evidence, then resume execution.
+
+If the message includes `lanjut` plus a qualifier, use the qualifier as scope while
+preserving the same integrity and QA rules.
+
+The response to `lanjut` must be **one concise paragraph only**, containing:
+- what has already been completed/verified in that run; and
+- what is currently being worked on.
+
+Do not add headings, lists, ETA, deadlines, future promises or long explanation.
+Mention a blocker only when it concretely prevents continued execution.
 
 ## Shipping — PR only
 
-**Never push directly to `main`, and never "push to both main and a Claude branch".**
-The previous dual-push rule is retired because it caused moving-main races.
-
-For every production change:
-1. Push the short-lived branch and open/update exactly one PR.
-2. Run targeted checks first as useful.
-3. Require **Validate pull requests** and the complete **Stabilization Acceptance**
-   workflow to pass for the exact current PR head. Full acceptance remains the
-   authority for frontend build/tests, Body/WebGL smoke, and server gates.
-4. Immediately before merge, resolve latest `main`, confirm mergeability, inspect
-   changed-file overlap, and confirm the tested head has not changed.
-5. If `main` moved into overlapping files, CI/workflow files, or creates uncertain
-   ancestry, refresh/rebuild from latest `main` and rerun gates. Never force merge.
-6. Merge through the PR only after the exact-head gates are green and the final
-   race check is clean. Automatic merge is acceptable under those conditions.
-7. After merge, verify the merge is present on `main` and inspect available
-   deployment/smoke evidence.
-8. Close stale or superseded duplicate PRs so agents do not keep working the same
-   candidate twice.
-
-For user-visible changes, verify the affected surface in a real browser at
-**390x844** when the repository's browser tooling supports it. For Body/3D work,
-preserve the existing WebGL smoke and rendered-artifact checks.
-
-## Biomedical / clinical publication boundary
-
-Software CI is not academic or clinical validation. For anatomy, physiology,
-pathology, pharmacology, genomics, surgery, diagnosis/treatment, or other medical
-content, preserve provenance, evidence/version boundaries, uncertainty, AI
-assistance disclosure, and the repository Academic Accuracy Gate. Never claim
-human review unless a real qualified reviewer, credentials, date and scope are
-recorded. Never infer patient-specific anatomy, lesion location, procedure target,
-force/device setting, diagnosis or treatment from generic atlas/simulation data.
-
-## Shared policy
-
-Read and follow `AGENTS.md` as the cross-agent operating policy. If this file and
-`AGENTS.md` conflict on Git/CI coordination, follow the safer rule: short-lived
-branch → PR → exact-head gates → final latest-main audit → merge.
+Never push directly to `main`. Never dual-push the same change to `main` and another
+shared branch. Exact-head green evidence becomes stale when the tested head changes.
+If `main` moves materially into overlapping/shared files, refresh/replay and rerun
+required gates. Merge only through the PR with a final latest-main integrity audit.
