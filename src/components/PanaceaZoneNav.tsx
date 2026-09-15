@@ -1,11 +1,12 @@
 import { NavLink } from 'react-router-dom'
 import { useStore } from '../lib/store'
+import { LogoMark } from './Logo'
 
 const ZONES = [
   { to: '/', label: 'Home', end: true },
   { to: '/learn', label: 'Learn' },
-  { to: '/fitness-hub', label: 'Your Body' },
-  { to: '/clinical-hub', label: 'Services' },
+  { to: '/fitness-hub', label: 'Body' },
+  { to: '/clinical-hub', label: 'Care' },
   { to: '/settings', label: 'Settings' },
 ]
 
@@ -16,29 +17,43 @@ export function PanaceaZoneNav() {
 
   return (
     <nav
-      className="flex items-center gap-1.5 rounded-[18px] border border-brand/15 bg-white/[.92] p-1.5 shadow-[0_10px_30px_rgba(15,23,42,.05)] backdrop-blur-xl dark:bg-black/[.72] dark:shadow-[0_12px_34px_rgba(0,0,0,.22)] sm:gap-2 sm:rounded-[22px] sm:p-2"
+      className="relative flex min-h-[58px] items-center gap-2 rounded-[20px] border border-white/[.085] bg-[#01040a]/88 px-2 py-1.5 shadow-[0_16px_46px_rgba(0,0,0,.25)] backdrop-blur-2xl sm:min-h-[64px] sm:gap-3 sm:rounded-[22px] sm:px-3"
       aria-label="Panacea main zones"
     >
-      <div className="no-scrollbar flex min-w-0 flex-1 gap-1 overflow-x-auto sm:gap-1.5">
+      <NavLink
+        to="/"
+        className="flex h-11 shrink-0 items-center gap-2 rounded-[15px] px-1.5 text-white transition hover:bg-white/[.04] sm:px-2"
+        aria-label="Panacea Home"
+      >
+        <LogoMark size={30} />
+        <span className="hidden text-sm font-black tracking-[-.02em] sm:block" style={{ fontFamily: 'var(--font-wordmark)' }}>
+          Panacea<span className="text-emerald-300">med</span><span className="text-cyan-300">.id</span>
+        </span>
+      </NavLink>
+
+      <div className="h-7 w-px shrink-0 bg-white/[.08]" aria-hidden />
+
+      <div className="no-scrollbar flex min-w-0 flex-1 items-center gap-1.5 overflow-x-auto sm:justify-center sm:gap-2">
         {ZONES.map((zone) => (
           <NavLink
             key={zone.to}
             to={zone.to}
             end={zone.end}
-            className={({ isActive }) => `grid min-h-[40px] shrink-0 place-items-center rounded-[13px] border px-3 text-[11px] font-black transition active:scale-[.98] sm:min-h-[44px] sm:rounded-[15px] sm:px-4 sm:text-xs ${
+            className={({ isActive }) => `grid h-11 min-w-[62px] shrink-0 place-items-center rounded-[14px] border px-3 text-[11px] font-black transition duration-200 active:scale-[.98] sm:min-w-[74px] sm:px-4 sm:text-xs ${
               isActive
-                ? 'border-brand bg-brand text-white shadow-[0_7px_20px_rgba(0,191,99,.22)]'
-                : 'border-transparent bg-transparent text-neutral-700 hover:border-brand/15 hover:bg-brand/[.055] hover:text-brand dark:text-neutral-200 dark:hover:bg-brand/[.08]'
+                ? 'border-cyan-100/45 bg-gradient-to-r from-cyan-200 via-emerald-200 to-violet-200 text-[#01040a] shadow-[0_8px_26px_rgba(34,211,238,.12)]'
+                : 'border-transparent bg-transparent text-white/60 hover:border-white/[.09] hover:bg-white/[.045] hover:text-white'
             }`}
           >
             {zone.label}
           </NavLink>
         ))}
       </div>
+
       {account && (
         <NavLink
           to="/profile"
-          className="grid h-[40px] w-[40px] shrink-0 place-items-center overflow-hidden rounded-full border border-brand/20 bg-brand/[.08] text-[10px] font-black text-brand shadow-sm transition hover:bg-brand/[.14] sm:h-11 sm:w-11 sm:text-xs"
+          className="grid h-11 w-11 shrink-0 place-items-center overflow-hidden rounded-[14px] border border-white/10 bg-gradient-to-br from-cyan-300/[.12] to-violet-400/[.12] text-[10px] font-black text-cyan-100 shadow-[inset_0_1px_0_rgba(255,255,255,.08)] transition hover:border-cyan-200/30 sm:text-xs"
           aria-label="Open profile"
           title={account.name}
         >
