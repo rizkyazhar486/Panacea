@@ -16,7 +16,7 @@ export function PanaceaZoneNav() {
 
   return (
     <nav
-      className="sticky top-2 z-40 flex min-w-0 items-center gap-2 rounded-[22px] border border-white/10 bg-neutral-950/80 p-1.5 shadow-[0_16px_60px_rgba(0,0,0,.28)] backdrop-blur-2xl supports-[backdrop-filter]:bg-neutral-950/65 sm:p-2"
+      className="sticky top-2 z-40 flex min-w-0 items-center gap-1.5 rounded-[22px] border border-white/10 bg-neutral-950/80 p-1.5 shadow-[0_16px_60px_rgba(0,0,0,.28)] backdrop-blur-2xl supports-[backdrop-filter]:bg-neutral-950/65 sm:gap-2 sm:p-2"
       aria-label="Panacea main zones"
     >
       <div className="no-scrollbar flex min-w-0 flex-1 snap-x snap-mandatory gap-1.5 overflow-x-auto overscroll-x-contain sm:gap-2">
@@ -32,6 +32,15 @@ export function PanaceaZoneNav() {
           </NavLink>
         ))}
       </div>
+
+      <NavLink
+        to="/clinical-hub?t=emergency"
+        className="grid h-11 min-w-11 shrink-0 place-items-center rounded-[16px] border border-rose-400/20 bg-rose-500/[.08] px-2 text-[9px] font-black uppercase tracking-[.08em] text-rose-200 transition hover:border-rose-400/40 hover:bg-rose-500/[.14] hover:text-white sm:px-3 sm:text-[10px]"
+        aria-label="Open emergency information"
+        title="Emergency"
+      >
+        SOS
+      </NavLink>
 
       {account && (
         <NavLink
