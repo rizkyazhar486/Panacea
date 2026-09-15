@@ -1,0 +1,211 @@
+/* Panaceamed Liquid Action Engine v45
+   Universal button/action behavior: every functional control feels like one
+   continuous droplet that compresses, expands and merges back into the canvas.
+   This layer is intentionally presentation-only and preserves feature logic.
+*/
+
+:root {
+  --pmd-action-ease: cubic-bezier(.16, 1, .3, 1);
+  --pmd-action-fast: 150ms;
+  --pmd-action-morph: 420ms;
+  --pmd-action-cyan: rgba(94, 231, 255, .78);
+  --pmd-action-violet: rgba(160, 118, 255, .46);
+  --pmd-action-edge: rgba(255, 255, 255, .22);
+}
+
+html.pmd-liquid-actions-v45 [data-pmd-liquid-action] {
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+  transform-origin: center;
+  transition:
+    transform var(--pmd-action-fast) var(--pmd-action-ease),
+    filter var(--pmd-action-fast) ease,
+    outline-color var(--pmd-action-fast) ease,
+    outline-offset var(--pmd-action-fast) var(--pmd-action-ease) !important;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  html.pmd-liquid-actions-v45 [data-pmd-liquid-action]:not(:disabled):not([aria-disabled='true']):hover {
+    transform: translateY(-1px) scale(1.008);
+    filter: saturate(1.07) brightness(1.035);
+  }
+}
+
+html.pmd-liquid-actions-v45 [data-pmd-liquid-action].pmd-liquid-pressed {
+  transform: translateY(1px) scale(.965) !important;
+  filter: saturate(1.16) brightness(1.08) !important;
+  outline: 1px solid color-mix(in srgb, var(--pmd-action-cyan) 72%, transparent);
+  outline-offset: 2px;
+}
+
+html.pmd-liquid-actions-v45 [data-pmd-liquid-action].pmd-liquid-focus:focus-visible {
+  outline: 2px solid rgba(111, 229, 255, .82) !important;
+  outline-offset: 3px !important;
+}
+
+html.pmd-liquid-actions-v45 [data-pmd-liquid-action].pmd-liquid-expanded,
+html.pmd-liquid-actions-v45 [data-pmd-liquid-action][aria-expanded='true'] {
+  transform: scale(1.018);
+  filter: saturate(1.1) brightness(1.04);
+  outline: 1px solid rgba(109, 226, 255, .42);
+  outline-offset: 3px;
+}
+
+html.pmd-liquid-actions-v45 [data-pmd-liquid-action].pmd-liquid-selected,
+html.pmd-liquid-actions-v45 [data-pmd-liquid-action][aria-pressed='true'] {
+  outline: 1px solid rgba(180, 143, 255, .40);
+  outline-offset: 2px;
+}
+
+#pmd-liquid-press-layer {
+  position: fixed;
+  z-index: 2147483000;
+  left: var(--pmd-press-left, 50vw);
+  top: var(--pmd-press-top, 50vh);
+  width: var(--pmd-press-size, 72px);
+  height: var(--pmd-press-size, 72px);
+  margin-left: calc(var(--pmd-press-size, 72px) / -2);
+  margin-top: calc(var(--pmd-press-size, 72px) / -2);
+  border-radius: 999px;
+  pointer-events: none;
+  opacity: 0;
+  transform: scale(.18);
+  background:
+    radial-gradient(circle at 34% 26%, rgba(255,255,255,.78) 0 7%, rgba(255,255,255,.24) 15%, transparent 31%),
+    radial-gradient(circle at 58% 58%, rgba(82,230,255,.22), rgba(119,94,255,.12) 47%, transparent 72%);
+  border: 1px solid rgba(255,255,255,.22);
+  box-shadow:
+    0 0 0 1px rgba(107,225,255,.07),
+    0 12px 42px rgba(50, 174, 255, .18),
+    inset 0 1px 0 rgba(255,255,255,.44);
+  -webkit-backdrop-filter: blur(5px) saturate(170%);
+  backdrop-filter: blur(5px) saturate(170%);
+  will-change: transform, opacity;
+}
+
+#pmd-liquid-press-layer.is-active {
+  animation: pmd-liquid-ripple-v45 520ms var(--pmd-action-ease) both;
+}
+
+@keyframes pmd-liquid-ripple-v45 {
+  0% { opacity: 0; transform: scale(.18); }
+  18% { opacity: .86; }
+  100% { opacity: 0; transform: scale(1.12); }
+}
+
+#pmd-liquid-morph-layer {
+  position: fixed;
+  z-index: 2147482990;
+  left: var(--pmd-morph-start-left, 50vw);
+  top: var(--pmd-morph-start-top, 50vh);
+  width: var(--pmd-morph-start-width, 44px);
+  height: var(--pmd-morph-start-height, 44px);
+  border-radius: var(--pmd-morph-radius-start, 22px);
+  pointer-events: none;
+  opacity: 0;
+  overflow: hidden;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: center;
+  gap: 10px;
+  padding: 0 16px;
+  color: rgba(245, 252, 255, .96);
+  background:
+    radial-gradient(18rem 8rem at 18% 0%, rgba(255,255,255,.18), transparent 62%),
+    radial-gradient(15rem 9rem at 100% 100%, rgba(145,102,255,.15), transparent 70%),
+    linear-gradient(135deg, rgba(10,20,33,.78), rgba(5,10,19,.68) 52%, rgba(11,17,28,.76));
+  border: 1px solid rgba(255,255,255,.14);
+  box-shadow:
+    0 26px 80px rgba(0,0,0,.42),
+    0 0 42px rgba(64,203,255,.11),
+    inset 0 1px 0 rgba(255,255,255,.18);
+  -webkit-backdrop-filter: blur(24px) saturate(175%);
+  backdrop-filter: blur(24px) saturate(175%);
+  transform: translateZ(0) scale(.985);
+  transition:
+    left var(--pmd-action-morph) var(--pmd-action-ease),
+    top var(--pmd-action-morph) var(--pmd-action-ease),
+    width var(--pmd-action-morph) var(--pmd-action-ease),
+    height var(--pmd-action-morph) var(--pmd-action-ease),
+    border-radius var(--pmd-action-morph) var(--pmd-action-ease),
+    opacity 150ms ease,
+    transform var(--pmd-action-morph) var(--pmd-action-ease);
+}
+
+#pmd-liquid-morph-layer.is-active {
+  left: var(--pmd-morph-left);
+  top: var(--pmd-morph-top);
+  width: var(--pmd-morph-width);
+  height: var(--pmd-morph-height);
+  border-radius: min(28px, calc(var(--pmd-morph-height) / 2));
+  opacity: 1;
+  transform: translateZ(0) scale(1);
+}
+
+#pmd-liquid-morph-layer.is-leaving {
+  opacity: 0;
+  transform: translateZ(0) scale(.985);
+}
+
+.pmd-liquid-morph-orb {
+  width: 32px;
+  height: 32px;
+  flex: 0 0 32px;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at 32% 24%, #fff 0 8%, rgba(255,255,255,.26) 13%, transparent 31%),
+    conic-gradient(from 210deg, rgba(72,231,255,.9), rgba(98,128,255,.78), rgba(174,95,255,.76), rgba(72,231,255,.9));
+  box-shadow: 0 0 26px rgba(79,216,255,.24), inset 0 1px 1px rgba(255,255,255,.6);
+}
+
+.pmd-liquid-morph-label {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font: 800 clamp(11px, 1vw, 13px)/1.1 Inter, system-ui, -apple-system, sans-serif;
+  letter-spacing: -.01em;
+  text-shadow: 0 1px 12px rgba(0,0,0,.3);
+}
+
+.pmd-liquid-morph-trace {
+  position: absolute;
+  left: 16px;
+  right: 16px;
+  bottom: 10px;
+  height: 2px;
+  border-radius: 999px;
+  overflow: hidden;
+  background: rgba(255,255,255,.08);
+}
+
+.pmd-liquid-morph-trace::after {
+  content: '';
+  display: block;
+  width: 44%;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, transparent, rgba(80,230,255,.92), rgba(188,128,255,.86), transparent);
+  transform: translateX(-120%);
+  animation: pmd-liquid-trace-v45 680ms var(--pmd-action-ease) both;
+}
+
+@keyframes pmd-liquid-trace-v45 {
+  to { transform: translateX(310%); }
+}
+
+html.pmd-low-memory #pmd-liquid-morph-layer,
+html.pmd-low-memory #pmd-liquid-press-layer {
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
+  box-shadow: 0 14px 38px rgba(0,0,0,.28), inset 0 1px 0 rgba(255,255,255,.13);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #pmd-liquid-press-layer,
+  #pmd-liquid-morph-layer { display: none !important; }
+  html.pmd-liquid-actions-v45 [data-pmd-liquid-action] {
+    transition: none !important;
+    transform: none !important;
+  }
+}
