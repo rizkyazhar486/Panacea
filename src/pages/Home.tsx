@@ -1,13 +1,14 @@
 import { Navigate } from 'react-router-dom'
 import { useStore } from '../lib/store'
-import { HomeSocialWorkspace } from './HomeSocialWorkspace'
+import { HomeUnified } from './HomeUnified'
 
-// Role-aware landing stays intact for contributor/verifier/admin accounts.
-// Patient, doctor and owner accounts now land in one Home workspace that
-// contains logs/stats, social, clubs, finance, markets, scores and reading.
+// Role-aware operational destinations remain explicit. Patient, doctor and
+// owner roles share one compact home so navigation does not fork into multiple
+// competing dashboards.
 export function Home() {
   const { account } = useStore()
   if (!account) return null
+
   switch (account.role) {
     case 'kontributor':
       return <Navigate to="/editor" replace />
@@ -16,6 +17,6 @@ export function Home() {
     case 'admin':
       return <Navigate to="/admin" replace />
     default:
-      return <HomeSocialWorkspace />
+      return <HomeUnified />
   }
 }
