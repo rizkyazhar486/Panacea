@@ -8,6 +8,7 @@ const BodyAllSystems3D = lazy(() => import('../components/BodyAllSystems3D'))
 const AtlasPhysiologyBridgePanel = lazy(() => import('./bodyhub/AtlasPhysiologyBridgePanel'))
 const CardiacHemodynamicsWorkbench = lazy(() => import('./bodyhub/CardiacHemodynamicsWorkbench'))
 const NeurovascularPerfusionWorkbench = lazy(() => import('./bodyhub/NeurovascularPerfusionWorkbench'))
+const RespiratoryGasExchangeWorkbench = lazy(() => import('./bodyhub/RespiratoryGasExchangeWorkbench'))
 const PathophysiologyNetworkPanel = lazy(() => import('./bodyhub/PathophysiologyNetworkPanel'))
 const LesionLocalizationPanel = lazy(() => import('./bodyhub/LesionLocalizationPanel'))
 const DrugMechanismNetworkPanel = lazy(() => import('./bodyhub/DrugMechanismNetworkPanel'))
@@ -110,6 +111,7 @@ export function BodyExposureOS() {
               <span className="rounded-full border border-violet-300/10 bg-violet-300/[.045] px-2.5 py-1 text-[9px] font-black uppercase tracking-[.14em] text-violet-100/65">11-system source atlas</span>
               <span className="rounded-full border border-rose-300/10 bg-rose-300/[.045] px-2.5 py-1 text-[9px] font-black uppercase tracking-[.14em] text-rose-100/65">heart PV lab</span>
               <span className="rounded-full border border-indigo-300/10 bg-indigo-300/[.045] px-2.5 py-1 text-[9px] font-black uppercase tracking-[.14em] text-indigo-100/65">brain perfusion lab</span>
+              <span className="rounded-full border border-cyan-300/10 bg-cyan-300/[.045] px-2.5 py-1 text-[9px] font-black uppercase tracking-[.14em] text-cyan-100/65">respiratory gas exchange</span>
               <span className="rounded-full border border-fuchsia-300/10 bg-fuchsia-300/[.045] px-2.5 py-1 text-[9px] font-black uppercase tracking-[.14em] text-fuchsia-100/65">pathophysiology</span>
               <span className="rounded-full border border-sky-300/10 bg-sky-300/[.045] px-2.5 py-1 text-[9px] font-black uppercase tracking-[.14em] text-sky-100/65">lesion localization</span>
               <span className="rounded-full border border-emerald-300/10 bg-emerald-300/[.045] px-2.5 py-1 text-[9px] font-black uppercase tracking-[.14em] text-emerald-100/65">drug mechanisms</span>
@@ -212,6 +214,12 @@ export function BodyExposureOS() {
       <div className="relative z-[2] mt-3">
         <Suspense fallback={<div className="grid min-h-40 place-items-center rounded-[28px] border border-white/[.08] bg-black/35 text-xs font-bold text-white/35">Loading neurovascular perfusion lab…</div>}>
           <NeurovascularPerfusionWorkbench selectedAtlasSystemId={selectedBodySystemId} />
+        </Suspense>
+      </div>
+
+      <div className="relative z-[2] mt-3">
+        <Suspense fallback={<div className="grid min-h-40 place-items-center rounded-[28px] border border-white/[.08] bg-black/35 text-xs font-bold text-white/35">Loading respiratory gas-exchange lab…</div>}>
+          <RespiratoryGasExchangeWorkbench selectedAtlasSystemId={selectedBodySystemId} />
         </Suspense>
       </div>
 
