@@ -1,0 +1,112 @@
+/* Body Exposure ↔ Panacea HIG alignment layer.
+   This file intentionally loads after bodyExposureOS.css. Body keeps its
+   biomedical-cosmic atmosphere, but the underlying material, spacing, colour,
+   motion and focus grammar follows the same system-wide Panacea design tokens.
+   Every var() has a fallback so this branch remains visually coherent before
+   the global HIG foundation PR lands. */
+
+.body-exposure-os {
+  --be-space-black: var(--pmd-black, #020409);
+  --be-surface-0: var(--pmd-space, #030711);
+  --be-surface-1: var(--pmd-surface, rgba(6, 13, 24, .92));
+  --be-surface-2: var(--pmd-surface-raised, rgba(9, 19, 33, .94));
+  --be-border-soft: var(--pmd-line, rgba(255, 255, 255, .11));
+  --be-border-active: rgba(77, 231, 255, .32);
+
+  /* Exact spectral family used by the global HIG foundation. */
+  --be-cyan: 77, 231, 255;
+  --be-violet: 156, 124, 255;
+  --be-magenta: 255, 99, 216;
+  --be-emerald: 0, 216, 121;
+  --be-amber: 255, 210, 120;
+
+  --be-radius-shell: var(--pmd-radius-2xl, 32px);
+  --be-radius-panel: var(--pmd-radius-xl, 26px);
+  --be-radius-control: var(--pmd-radius-m, 14px);
+  --be-radius-pill: var(--pmd-radius-pill, 999px);
+
+  --be-fast: var(--pmd-fast, 140ms);
+  --be-normal: var(--pmd-normal, 220ms);
+  --be-spatial: var(--pmd-spatial, 420ms);
+  --be-ease: var(--pmd-ease, cubic-bezier(.22, .8, .2, 1));
+  --be-ease-spring: var(--pmd-ease-spring, cubic-bezier(.16, 1, .3, 1));
+  --be-shadow-1: var(--pmd-shadow-1, 0 8px 24px rgba(0, 0, 0, .22));
+  --be-shadow-2: var(--pmd-shadow-2, 0 18px 54px rgba(0, 0, 0, .32));
+  --be-shadow-3: var(--pmd-shadow-3, 0 30px 90px rgba(0, 0, 0, .42));
+  --be-focus: var(--pmd-focus, 0 0 0 3px rgba(77, 231, 255, .28), 0 0 0 1px rgba(77, 231, 255, .92));
+}
+
+/* HIG material hierarchy: atmospheric shell, calm content, translucent controls. */
+.body-intelligence-workspace {
+  background:
+    radial-gradient(circle at 12% 0%, rgba(var(--be-cyan), .055), transparent 28%),
+    radial-gradient(circle at 90% 4%, rgba(var(--be-violet), .05), transparent 30%),
+    var(--be-surface-1);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.05), var(--be-shadow-2);
+}
+
+.body-intelligence-workspace__tabbar {
+  border-color: var(--be-border-soft);
+  background:
+    linear-gradient(135deg, rgba(255,255,255,.06), rgba(255,255,255,.02)),
+    var(--pmd-material, rgba(8, 18, 31, .72));
+  -webkit-backdrop-filter: blur(18px) saturate(150%);
+  backdrop-filter: blur(18px) saturate(150%);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.12), var(--be-shadow-1);
+}
+
+.body-intelligence-workspace__context,
+.body-intelligence-workspace__summary-card,
+.body-intelligence-workspace__footer {
+  background-color: var(--pmd-material-strong, rgba(5, 12, 22, .88));
+}
+
+.body-intelligence-workspace__panel > section {
+  background:
+    radial-gradient(circle at 14% 0%, rgba(var(--be-cyan), .025), transparent 26%),
+    var(--be-surface-2) !important;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.04), var(--be-shadow-1) !important;
+}
+
+.body-intelligence-workspace__tab,
+.body-exposure-os__dock button,
+.body-exposure-os button {
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+
+.body-intelligence-workspace__tab {
+  transition:
+    transform var(--be-fast) var(--be-ease-spring),
+    border-color var(--be-normal) var(--be-ease),
+    background-color var(--be-normal) var(--be-ease),
+    box-shadow var(--be-normal) var(--be-ease),
+    opacity var(--be-normal) var(--be-ease);
+}
+
+.body-intelligence-workspace__tab:hover {
+  transform: translateY(-1px);
+}
+
+.body-intelligence-workspace__tab:active {
+  transform: scale(.985);
+  transition-duration: 70ms;
+}
+
+.body-intelligence-workspace__tab:focus-visible,
+.body-exposure-os :where(button, a, summary, input, select, textarea):focus-visible {
+  outline: none;
+  box-shadow: var(--be-focus);
+}
+
+/* Spatial transitions stay restrained; no continuous ornamental motion. */
+.body-intelligence-workspace__panel {
+  transition: opacity var(--be-normal) var(--be-ease), transform var(--be-spatial) var(--be-ease-spring);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .body-intelligence-workspace__tab:hover,
+  .body-intelligence-workspace__tab:active {
+    transform: none !important;
+  }
+}
