@@ -3,6 +3,7 @@ import { useSearchParams } from 'react-router-dom'
 import { PanaceaZoneNav } from '../components/PanaceaZoneNav'
 import { FeatureBoulevard } from '../components/FeatureBoulevard'
 import { PanaceaQuickActions } from '../components/PanaceaQuickActions'
+import { TodayCommandCenter } from '../components/TodayCommandCenter'
 
 const Beranda = lazy(() => import('./Beranda'))
 const Feed = lazy(() => import('./Feed'))
@@ -113,6 +114,8 @@ export function HomeSocialWorkspace() {
           <span><b className="text-neutral-100">{active.label}.</b> {active.description}</span>
         </div>
       </section>
+
+      {activeKey === 'home' && <TodayCommandCenter />}
 
       <PanaceaQuickActions />
 
