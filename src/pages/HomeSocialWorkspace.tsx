@@ -14,22 +14,39 @@ const ReligionWorkspace = lazy(() => import('./ReligionWorkspace').then((m) => (
 const MedStudyHub = lazy(() => import('./MedStudyHub').then((m) => ({ default: m.MedStudyHub })))
 
 type HomeView = 'home' | 'social' | 'community' | 'clubs' | 'finance' | 'markets' | 'scores' | 'religion' | 'learn'
-type View = { key: HomeView; label: string; short: string; component: ComponentType; description: string }
+type View = {
+  key: HomeView
+  label: string
+  short: string
+  eyebrow: string
+  component: ComponentType
+  description: string
+}
+
 const VIEWS: View[] = [
-  { key: 'home', label: 'Logs & Stats', short: 'Home', component: Beranda, description: 'Your daily logs, snapshots and useful actions.' },
-  { key: 'social', label: 'Social', short: 'Social', component: Feed, description: 'Healthy-living posts, activity, learning and sharing.' },
-  { key: 'community', label: 'Community', short: 'Community', component: Community, description: 'People, support, accountability and health-oriented social spaces.' },
-  { key: 'clubs', label: 'Club Hub', short: 'Clubs', component: ClubHub, description: 'Groups, communities and shared activity.' },
-  { key: 'finance', label: 'Finance & Emergency Fund', short: 'Finance', component: MoneyHub, description: 'Personal finance, planning and emergency-fund context.' },
-  { key: 'markets', label: 'Stocks & Markets', short: 'Markets', component: Markets, description: 'Delayed market data for monitoring and learning, not trading instructions.' },
-  { key: 'scores', label: 'Scores', short: 'Scores', component: SportsScores, description: 'Live and recorded sports-score context.' },
-  { key: 'religion', label: 'Religion & Reflection', short: 'Religion', component: ReligionWorkspace, description: 'Scripture, hadith, prayer-time tools and reflective learning in one room.' },
-  { key: 'learn', label: 'Read & Learn', short: 'Read & Learn', component: MedStudyHub, description: 'Reading, cases and study material available without leaving the Home experience.' },
+  { key: 'home', label: 'Today', short: 'Today', eyebrow: 'Your day', component: Beranda, description: 'Daily health signals, logs, progress and useful actions in one compact view.' },
+  { key: 'social', label: 'Social', short: 'Social', eyebrow: 'Share', component: Feed, description: 'Healthy-living posts, activity, learning and sharing without leaving Home.' },
+  { key: 'community', label: 'Community', short: 'People', eyebrow: 'Connect', component: Community, description: 'Support, accountability and health-oriented spaces with people you care about.' },
+  { key: 'clubs', label: 'Club Hub', short: 'Clubs', eyebrow: 'Groups', component: ClubHub, description: 'Communities and shared activity collected into a single room.' },
+  { key: 'finance', label: 'Finance & Emergency Fund', short: 'Finance', eyebrow: 'Plan', component: MoneyHub, description: 'Personal finance, planning and emergency-fund context alongside daily life.' },
+  { key: 'markets', label: 'Stocks & Markets', short: 'Markets', eyebrow: 'Observe', component: Markets, description: 'Delayed market data for monitoring and learning, not trading instructions.' },
+  { key: 'scores', label: 'Sports Scores', short: 'Scores', eyebrow: 'Follow', component: SportsScores, description: 'Live and recorded sports-score context in the same Home workspace.' },
+  { key: 'religion', label: 'Religion & Reflection', short: 'Reflect', eyebrow: 'Faith', component: ReligionWorkspace, description: 'Scripture, hadith, prayer-time tools and reflective learning in one room.' },
+  { key: 'learn', label: 'Read & Learn', short: 'Learn', eyebrow: 'Grow', component: MedStudyHub, description: 'Reading, cases and study material available without turning Home into a maze.' },
 ]
+
 const VALID = new Set(VIEWS.map((view) => view.key))
 
-function Loader() {
-  return <div className="grid min-h-[34vh] place-items-center rounded-[28px] border border-white/10 bg-black/10 text-sm font-bold text-neutral-500" role="status">Loading Home…</div>
+function Loader({ label }: { label: string }) {
+  return (
+    <div className="relative grid min-h-[38vh] place-items-center overflow-hidden rounded-[24px] border border-white/10 bg-neutral-950/60 text-sm font-bold text-neutral-400" role="status" aria-live="polite">
+      <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-brand/45 to-transparent" />
+      <div className="flex items-center gap-3">
+        <span className="h-2.5 w-2.5 animate-pulse rounded-full bg-brand shadow-[0_0_18px_rgba(0,191,99,.7)]" />
+        Loading {label}…
+      </div>
+    </div>
+  )
 }
 
 export function HomeSocialWorkspace() {
@@ -38,21 +55,75 @@ export function HomeSocialWorkspace() {
   const activeKey: HomeView = requested && VALID.has(requested) ? requested : 'home'
   const active = VIEWS.find((view) => view.key === activeKey) ?? VIEWS[0]
   const Active = active.component
+
+  function select(view: View) {
+    const next = new URLSearchParams(params)
+    next.set('t', view.key)
+    setParams(next, { replace: true })
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+  }
+
   return (
-    <div className="mx-auto w-full max-w-[1450px] space-y-4 pb-10">
+    <div className="mx-auto w-full max-w-[1480px] space-y-3 pb-8 sm:space-y-4 sm:pb-10">
       <PanaceaZoneNav />
-      <section className="rounded-[30px] border border-white/10 bg-black/20 p-4 shadow-2xl backdrop-blur-xl sm:p-5">
-        <div className="text-[10px] font-black uppercase tracking-[.22em] text-brand">Home · life, people, faith and money</div>
-        <h1 className="mt-1 text-2xl font-black tracking-tight text-ink dark:text-white sm:text-3xl">Your daily life in one home</h1>
-        <p className="mt-2 max-w-4xl text-sm leading-relaxed text-neutral-500 dark:text-neutral-300">Logs and stats sit beside social, community, clubs, finance, markets, scores, religion and reading. These are rooms inside one Home, not a maze of separate destinations.</p>
-        <div className="no-scrollbar mt-4 flex gap-2 overflow-x-auto pb-1" role="tablist" aria-label="Home workspace">
+
+      <section className="relative overflow-hidden rounded-[26px] border border-white/10 bg-neutral-950/70 p-3 shadow-[0_20px_70px_rgba(0,0,0,.24)] backdrop-blur-2xl sm:rounded-[30px] sm:p-5">
+        <div className="pointer-events-none absolute -right-20 -top-28 h-64 w-64 rounded-full bg-brand/10 blur-3xl" />
+        <div className="relative flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+          <div className="max-w-3xl">
+            <div className="text-[9px] font-black uppercase tracking-[.24em] text-brand sm:text-[10px]">Panacea Home · one continuous daily workspace</div>
+            <h1 className="mt-1 text-[1.65rem] font-black leading-tight tracking-[-.035em] text-white sm:text-3xl">Everything important today, without the clutter.</h1>
+            <p className="mt-2 max-w-3xl text-xs leading-relaxed text-neutral-400 sm:text-sm">
+              Health, people, finance, reflection and learning stay connected as rooms inside one Home. Switch context without losing the page or fighting navigation.
+            </p>
+          </div>
+
+          <div className="flex items-center gap-2 self-start rounded-[16px] border border-brand/20 bg-brand/[.08] px-3 py-2 lg:self-auto">
+            <span className="h-2 w-2 rounded-full bg-brand shadow-[0_0_14px_rgba(0,191,99,.75)]" />
+            <div>
+              <div className="text-[8px] font-black uppercase tracking-[.18em] text-brand">{active.eyebrow}</div>
+              <div className="text-xs font-black text-white">{active.label}</div>
+            </div>
+          </div>
+        </div>
+
+        <div className="no-scrollbar relative mt-4 flex snap-x snap-mandatory gap-1.5 overflow-x-auto overscroll-x-contain pb-1 sm:gap-2" role="tablist" aria-label="Home workspace">
           {VIEWS.map((view) => (
-            <button key={view.key} type="button" role="tab" aria-selected={activeKey === view.key} onClick={() => { const next = new URLSearchParams(params); next.set('t', view.key); setParams(next, { replace: true }); window.scrollTo({ top: 0, behavior: 'smooth' }) }} className={`min-h-[44px] shrink-0 rounded-full border px-4 text-xs font-black transition ${activeKey === view.key ? 'border-brand bg-brand text-white' : 'border-white/10 bg-white/5 text-neutral-600 dark:text-neutral-300'}`}>{view.short}</button>
+            <button
+              key={view.key}
+              type="button"
+              role="tab"
+              aria-selected={activeKey === view.key}
+              aria-controls={`home-panel-${view.key}`}
+              onClick={() => select(view)}
+              className={`min-h-[42px] shrink-0 snap-start rounded-[15px] border px-3.5 text-[11px] font-black transition duration-200 sm:min-h-[44px] sm:rounded-[16px] sm:px-4 sm:text-xs ${
+                activeKey === view.key
+                  ? 'border-brand/70 bg-brand text-white shadow-[0_8px_26px_rgba(0,191,99,.22)]'
+                  : 'border-white/[.08] bg-white/[.035] text-neutral-400 hover:border-white/15 hover:bg-white/[.07] hover:text-white'
+              }`}
+            >
+              {view.short}
+            </button>
           ))}
         </div>
-        <div className="mt-3 rounded-2xl border border-white/10 bg-white/[.03] px-3 py-2.5 text-[11px] leading-relaxed text-neutral-500 dark:text-neutral-400"><b className="text-ink dark:text-white">{active.label}:</b> {active.description}</div>
+
+        <div className="relative mt-2.5 flex items-start gap-2 rounded-[16px] border border-white/[.07] bg-white/[.025] px-3 py-2.5 text-[11px] leading-relaxed text-neutral-400 sm:mt-3">
+          <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-brand/80" />
+          <span><b className="text-neutral-100">{active.label}.</b> {active.description}</span>
+        </div>
       </section>
-      <section role="tabpanel" aria-label={active.label}><Suspense fallback={<Loader />}><Active /></Suspense></section>
+
+      <section
+        id={`home-panel-${active.key}`}
+        role="tabpanel"
+        aria-label={active.label}
+        className="min-w-0 overflow-hidden rounded-[24px] border border-white/[.08] bg-black/[.16] p-1 sm:rounded-[28px] sm:p-2"
+      >
+        <Suspense fallback={<Loader label={active.label} />}>
+          <Active />
+        </Suspense>
+      </section>
+
       <FeatureBoulevard zone="home" title="Home feature boulevard" />
     </div>
   )
