@@ -99,25 +99,34 @@ export default function SemuaFitur() {
         <div className="pointer-events-none absolute left-1/3 top-1/2 h-52 w-52 -translate-y-1/2 rounded-full bg-violet-500/15 blur-3xl" />
         <div className="relative grid gap-4 md:grid-cols-[1fr_auto] md:items-center">
           <div>
-            <div className="text-[10px] font-black uppercase tracking-[.18em] text-cyan-300">New research surface</div>
-            <h2 className="mt-1 text-2xl font-black tracking-[-.03em] sm:text-3xl">Deep Human Lab</h2>
+            <div className="text-[10px] font-black uppercase tracking-[.18em] text-cyan-300">Research surfaces</div>
+            <h2 className="mt-1 text-2xl font-black tracking-[-.03em] sm:text-3xl">Deep Human Lab + Discovery Lab</h2>
             <p className="mt-2 max-w-3xl text-[12px] leading-relaxed text-white/70">
-              Explore the human system from atomic interactions → molecules → genome → organelles → cells → tissues → organs → neural networks → cognition and consciousness research. Includes a safe genome-consequence sandbox, voluntary focus-state model, competing consciousness theories, and an invention/hypothesis forge.
+              Explore the human system from atomic interactions → molecules → genome → cells → organs → neural networks → cognition and consciousness, then move into an interactive discovery workspace for neuropsychiatric state simulation, molecular and vaccine concepts, patient translation, evidence provenance and trial readiness.
             </p>
             <div className="mt-3 flex flex-wrap gap-1.5 text-[9px] font-black uppercase tracking-[.11em] text-white/70">
               <span className="rounded-full border border-white/10 bg-white/[.05] px-2.5 py-1">Atomic</span>
               <span className="rounded-full border border-white/10 bg-white/[.05] px-2.5 py-1">Microscopic</span>
               <span className="rounded-full border border-white/10 bg-white/[.05] px-2.5 py-1">Genomics</span>
               <span className="rounded-full border border-white/10 bg-white/[.05] px-2.5 py-1">Cognition</span>
-              <span className="rounded-full border border-white/10 bg-white/[.05] px-2.5 py-1">Research</span>
+              <span className="rounded-full border border-white/10 bg-white/[.05] px-2.5 py-1">Discovery</span>
+              <span className="rounded-full border border-white/10 bg-white/[.05] px-2.5 py-1">Evidence</span>
             </div>
           </div>
-          <a
-            href="/deep-human-lab.html"
-            className="inline-flex min-h-[48px] items-center justify-center rounded-full border border-cyan-200/25 bg-gradient-to-r from-cyan-300/20 via-violet-400/20 to-fuchsia-400/20 px-5 text-xs font-black text-white shadow-[0_12px_32px_rgba(79,190,255,.12)] transition hover:-translate-y-0.5"
-          >
-            Open Deep Human Lab →
-          </a>
+          <div className="grid gap-2 sm:grid-cols-2 md:grid-cols-1">
+            <a
+              href="/deep-human-lab.html"
+              className="inline-flex min-h-[48px] items-center justify-center rounded-full border border-cyan-200/25 bg-white/[.04] px-5 text-xs font-black text-white transition hover:-translate-y-0.5"
+            >
+              Open Deep Human Lab →
+            </a>
+            <a
+              href="/discovery-lab.html"
+              className="inline-flex min-h-[48px] items-center justify-center rounded-full border border-cyan-200/25 bg-gradient-to-r from-cyan-300/20 via-violet-400/20 to-fuchsia-400/20 px-5 text-xs font-black text-white shadow-[0_12px_32px_rgba(79,190,255,.12)] transition hover:-translate-y-0.5"
+            >
+              Open Discovery Lab →
+            </a>
+          </div>
         </div>
       </section>
 
