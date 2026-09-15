@@ -3,6 +3,7 @@ import type { BodySystemId } from '../../lib/bodySystemSourceWave'
 
 const CardiacHemodynamicsWorkbench = lazy(() => import('./CardiacHemodynamicsWorkbench'))
 const NeurovascularPerfusionWorkbench = lazy(() => import('./NeurovascularPerfusionWorkbench'))
+const RespiratoryGasExchangeWorkbench = lazy(() => import('./RespiratoryGasExchangeWorkbench'))
 
 interface BodySystemDeepDiveWorkspaceProps {
   selectedAtlasSystemId: BodySystemId
@@ -18,6 +19,11 @@ const DEEP_DIVE_META: Partial<Record<BodySystemId, { label: string; scale: strin
     label: 'Brain & Neurovascular',
     scale: 'Function deep dive',
     description: 'Move from nervous-system orientation into cerebral perfusion, autoregulation, intracranial compliance and oxygen-delivery relationships without converting synthetic signals into patient measurements.',
+  },
+  respiratory: {
+    label: 'Respiratory Mechanics & Gas Exchange',
+    scale: 'Function deep dive',
+    description: 'Move from respiratory-system orientation into airway mechanics, compliance, ventilation, V/Q matching, diffusion and gas-exchange reserve while keeping every signal normalized and educational.',
   },
 }
 
@@ -51,6 +57,12 @@ export function BodySystemDeepDiveWorkspace({ selectedAtlasSystemId }: BodySyste
       {selectedAtlasSystemId === 'nervous' && (
         <Suspense fallback={<div className="grid min-h-52 place-items-center rounded-[24px] border border-white/[.07] bg-black/35 text-xs font-bold text-white/35">Loading neurovascular function deep dive…</div>}>
           <NeurovascularPerfusionWorkbench selectedAtlasSystemId={selectedAtlasSystemId} />
+        </Suspense>
+      )}
+
+      {selectedAtlasSystemId === 'respiratory' && (
+        <Suspense fallback={<div className="grid min-h-52 place-items-center rounded-[24px] border border-white/[.07] bg-black/35 text-xs font-bold text-white/35">Loading respiratory mechanics and gas-exchange deep dive…</div>}>
+          <RespiratoryGasExchangeWorkbench selectedAtlasSystemId={selectedAtlasSystemId} />
         </Suspense>
       )}
     </section>
