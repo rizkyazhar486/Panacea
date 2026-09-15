@@ -1,6 +1,8 @@
-import { useEffect, useRef, useState } from 'react'
+import { lazy, Suspense, useEffect, useRef, useState } from 'react'
 import { BodyExplorer } from './BodyExplorer'
 import './bodyExposureOS.css'
+
+const BodyAllSystems3D = lazy(() => import('../components/BodyAllSystems3D'))
 
 type ExposureMode = 'atlas' | 'physiology' | 'imaging' | 'surgery' | 'molecular' | 'clinical'
 
@@ -23,6 +25,7 @@ const MODES: Mode[] = [
 export function BodyExposureOS() {
   const rootRef = useRef<HTMLElement | null>(null)
   const explorerRef = useRef<HTMLDivElement | null>(null)
+  const systemsRef = useRef<HTMLDivElement | null>(null)
   const [activeMode, setActiveMode] = useState<ExposureMode>('atlas')
   const [immersive, setImmersive] = useState(false)
 
@@ -49,6 +52,11 @@ export function BodyExposureOS() {
     }
 
     explorerRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+  }
+
+  function openSystemAtlas() {
+    setActiveMode('atlas')
+    systemsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
   }
 
   async function toggleImmersive() {
@@ -83,22 +91,30 @@ export function BodyExposureOS() {
             <div className="flex flex-wrap items-center gap-2">
               <span className="text-[10px] font-black uppercase tracking-[.24em] text-cyan-200">Body Exposure · Human Body OS</span>
               <span className="rounded-full border border-white/10 bg-white/[.045] px-2.5 py-1 text-[9px] font-black uppercase tracking-[.14em] text-white/60">whole-body first</span>
+              <span className="rounded-full border border-violet-300/10 bg-violet-300/[.045] px-2.5 py-1 text-[9px] font-black uppercase tracking-[.14em] text-violet-100/65">11-system source atlas</span>
             </div>
             <h2 id="body-exposure-os-title" className="mt-2 max-w-3xl text-2xl font-black tracking-[-.035em] text-white sm:text-3xl lg:text-4xl">
               One body. Every scale. One continuous learning space.
             </h2>
             <p className="mt-2 max-w-3xl text-sm font-medium leading-relaxed text-white/60 sm:text-[15px]">
-              Start from the whole human body, isolate a structure, then move through physiology, imaging, surgery, disease, cells and molecular detail without leaving the same workspace.
+              Start from the complete human body, switch across major systems, isolate a structure, then move through physiology, imaging, surgery, disease, cells and molecular detail without leaving the same workspace.
             </p>
           </div>
 
           <div className="flex shrink-0 flex-wrap gap-2">
             <button
               type="button"
-              onClick={() => openPanel(MODES[0])}
+              onClick={openSystemAtlas}
               className="min-h-[44px] rounded-full border border-cyan-300/25 bg-cyan-300/10 px-4 text-xs font-black text-cyan-100 transition hover:bg-cyan-300/15 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-300/60"
             >
-              Reset to whole body
+              Explore 11 systems
+            </button>
+            <button
+              type="button"
+              onClick={() => openPanel(MODES[0])}
+              className="min-h-[44px] rounded-full border border-white/12 bg-white/[.055] px-4 text-xs font-black text-white/70 transition hover:bg-white/[.09] hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/40"
+            >
+              Layers & structures
             </button>
             <button
               type="button"
@@ -113,7 +129,7 @@ export function BodyExposureOS() {
         <div className="relative mt-5 grid grid-cols-3 gap-2 sm:max-w-2xl">
           <div className="rounded-2xl border border-white/[.08] bg-black/25 px-3 py-2.5">
             <div className="text-[9px] font-black uppercase tracking-[.16em] text-white/35">Orientation</div>
-            <div className="mt-1 text-xs font-black text-white/85">Whole body → structure</div>
+            <div className="mt-1 text-xs font-black text-white/85">Whole body → system</div>
           </div>
           <div className="rounded-2xl border border-white/[.08] bg-black/25 px-3 py-2.5">
             <div className="text-[9px] font-black uppercase tracking-[.16em] text-white/35">Depth</div>
@@ -152,6 +168,12 @@ export function BodyExposureOS() {
       <div className="relative z-[2] mt-2 flex items-center justify-between gap-3 px-1 text-[10px] font-bold text-white/40" aria-live="polite">
         <span><span className="text-cyan-200/80">{current.label}</span> · {current.description}</span>
         <span className="hidden shrink-0 sm:inline">Educational atlas · not a patient-specific diagnosis</span>
+      </div>
+
+      <div ref={systemsRef} className="relative z-[2] mt-3 scroll-mt-4">
+        <Suspense fallback={<div className="grid min-h-44 place-items-center rounded-[26px] border border-white/[.08] bg-black/35 text-xs font-bold text-white/35">Loading system atlas…</div>}>
+          <BodyAllSystems3D />
+        </Suspense>
       </div>
 
       <div
