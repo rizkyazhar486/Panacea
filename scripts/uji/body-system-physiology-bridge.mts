@@ -9,11 +9,17 @@ import { getWholeBodySystem } from '../../src/lib/wholeBodyPhysiologyOS.ts'
 
 assert.equal(BODY_SYSTEM_PHYSIOLOGY_BRIDGE.length, BODY_SYSTEM_SOURCE_WAVE.length, 'every source-atlas system needs a physiology bridge')
 assert.equal(new Set(BODY_SYSTEM_PHYSIOLOGY_BRIDGE.map((item) => item.atlasSystemId)).size, BODY_SYSTEM_SOURCE_WAVE.length, 'bridge atlas ids must be unique')
+assert.deepEqual(
+  [...new Set(BODY_SYSTEM_PHYSIOLOGY_BRIDGE.map((item) => item.fidelity))].sort(),
+  ['compound', 'contextual', 'direct'],
+  'bridge fidelity vocabulary must remain explicit and bounded',
+)
 
 for (const atlasSystem of BODY_SYSTEM_SOURCE_WAVE) {
   const bridge = getBodySystemPhysiologyBridge(atlasSystem.id)
   assert.ok(bridge.physiologySystemIds.length >= 1, `${atlasSystem.id} needs at least one physiology destination`)
   assert.ok(bridge.rationale.length >= 40, `${atlasSystem.id} bridge needs an explicit rationale`)
+  assert.ok(['direct', 'compound', 'contextual'].includes(bridge.fidelity), `${atlasSystem.id} uses an unsupported fidelity label`)
   for (const physiologyId of bridge.physiologySystemIds) getWholeBodySystem(physiologyId)
 }
 
