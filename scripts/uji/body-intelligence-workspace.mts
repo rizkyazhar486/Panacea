@@ -2,10 +2,26 @@ import assert from 'node:assert/strict'
 import { readFileSync } from 'node:fs'
 import { resolve } from 'node:path'
 import {
+  BODY_EXPOSURE_CONCEPT_SPINE,
   BODY_INTELLIGENCE_WORKSPACE_BOUNDARY,
   BODY_INTELLIGENCE_WORKSPACE_TABS,
+  getBodyExposureConceptStage,
   getBodyIntelligenceWorkspaceTab,
 } from '../../src/lib/bodyIntelligenceWorkspace.ts'
+
+assert.equal(BODY_EXPOSURE_CONCEPT_SPINE.length, 7, 'Body Exposure concept spine must retain seven canonical stages')
+assert.deepEqual(
+  BODY_EXPOSURE_CONCEPT_SPINE.map((stage) => stage.id),
+  ['whole-body', 'system', 'function', 'failure', 'mechanism', 'evidence', 'learning'],
+  'concept spine must preserve whole body → system → function → failure → mechanism → evidence → learning',
+)
+assert.equal(new Set(BODY_EXPOSURE_CONCEPT_SPINE.map((stage) => stage.id)).size, 7, 'concept-stage ids must be unique')
+for (const stage of BODY_EXPOSURE_CONCEPT_SPINE) {
+  assert.ok(stage.label.length >= 10, `${stage.id} needs a clear full label`)
+  assert.ok(stage.shortLabel.length >= 5 && stage.shortLabel.length <= 16, `${stage.id} needs a compact orientation label`)
+  assert.ok(stage.description.length >= 90, `${stage.id} needs a substantive mental-model description`)
+  assert.equal(getBodyExposureConceptStage(stage.id).id, stage.id)
+}
 
 assert.equal(BODY_INTELLIGENCE_WORKSPACE_TABS.length, 6, 'workspace must expose exactly six intelligence layers in this wave')
 assert.equal(new Set(BODY_INTELLIGENCE_WORKSPACE_TABS.map((tab) => tab.id)).size, 6, 'workspace tab ids must be unique')
@@ -20,8 +36,16 @@ for (const tab of BODY_INTELLIGENCE_WORKSPACE_TABS) {
   assert.ok(tab.shortLabel.length >= 3 && tab.shortLabel.length <= 20, `${tab.id} needs a compact control label`)
   assert.ok(tab.description.length >= 90, `${tab.id} needs a substantive progressive-disclosure description`)
   assert.ok(['mechanism', 'navigation', 'audit', 'learning'].includes(tab.category), `${tab.id} uses unsupported workspace category`)
+  assert.ok(BODY_EXPOSURE_CONCEPT_SPINE.some((stage) => stage.id === tab.conceptStageId), `${tab.id} must map to a canonical concept stage`)
   assert.equal(getBodyIntelligenceWorkspaceTab(tab.id).id, tab.id)
 }
+
+assert.equal(getBodyIntelligenceWorkspaceTab('pathophysiology').conceptStageId, 'failure')
+assert.equal(getBodyIntelligenceWorkspaceTab('pharmacology').conceptStageId, 'mechanism')
+assert.equal(getBodyIntelligenceWorkspaceTab('causal-bridge').conceptStageId, 'mechanism')
+assert.equal(getBodyIntelligenceWorkspaceTab('unified-graph').conceptStageId, 'mechanism')
+assert.equal(getBodyIntelligenceWorkspaceTab('evidence').conceptStageId, 'evidence')
+assert.equal(getBodyIntelligenceWorkspaceTab('learning-route').conceptStageId, 'learning')
 
 assert.equal(BODY_INTELLIGENCE_WORKSPACE_TABS.filter((tab) => tab.category === 'mechanism').length, 3, 'mechanism family should remain the largest first-order intelligence group')
 assert.equal(BODY_INTELLIGENCE_WORKSPACE_TABS.filter((tab) => tab.category === 'navigation').length, 1)
@@ -51,6 +75,14 @@ assert.match(osSource, /Open intelligence/i, 'hero must expose a direct one-tap 
 assert.match(osSource, /intelligenceRef\.current\?\.scrollIntoView/, 'Intelligence navigation must directly manipulate the workspace location')
 assert.match(osSource, /onClickCapture=\{\(\) => setActiveMode\('intelligence'\)\}/, 'workspace interaction must keep the top-level active mental model synchronized')
 
+const workspaceSource = readFileSync(resolve('src/pages/bodyhub/BodyIntelligenceWorkspace.tsx'), 'utf8')
+assert.match(workspaceSource, /BODY_EXPOSURE_CONCEPT_SPINE/, 'workspace must render the canonical concept spine')
+assert.match(workspaceSource, /aria-label="Body Exposure concept spine"/, 'concept spine must have an accessible landmark label')
+assert.match(workspaceSource, /aria-current=\{active \? 'step' : undefined\}/, 'active concept stage must be exposed semantically')
+assert.match(workspaceSource, /is-foundational/, 'whole-body/system/function foundation stages must remain visually distinguishable')
+assert.match(workspaceSource, /Whole body → System → Function → Failure → Mechanism → Evidence → Learning/, 'workspace footer must state the canonical mental model')
+assert.match(workspaceSource, /bodyExposureConceptSpine\.css/, 'workspace must load the dedicated concept-spine visual layer')
+
 const cssSource = readFileSync(resolve('src/pages/bodyExposureOS.css'), 'utf8')
 for (const token of ['--be-space-black', '--be-cyan', '--be-violet', '--be-magenta', '--be-border-soft', '--be-radius-panel']) {
   assert.ok(cssSource.includes(token), `Body Exposure visual token ${token} must remain defined`)
@@ -71,6 +103,15 @@ assert.match(alignmentSource, /HIG material hierarchy/i, 'alignment layer must p
 assert.match(alignmentSource, /var\(--pmd-material/, 'translucent workspace controls must inherit the global HIG control material')
 assert.match(alignmentSource, /var\(--be-surface-2\).*important/s, 'biomedical content panel must use the calmer raised content surface')
 assert.match(alignmentSource, /touch-action:\s*manipulation/, 'direct-manipulation touch semantics must remain enabled')
+assert.match(alignmentSource, /Panel groups/, 'legacy BodyExplorer rails must remain included in the same HIG alignment layer')
 assert.match(alignmentSource, /prefers-reduced-motion/, 'HIG alignment must retain reduced-motion behavior')
 
-console.log('body intelligence workspace: six progressive-disclosure layers validated with whole-body-first hierarchy, direct Intelligence navigation, Panacea HIG token alignment, calm-content/translucent-control materials and non-clinical navigation boundaries')
+const spineCssSource = readFileSync(resolve('src/pages/bodyExposureConceptSpine.css'), 'utf8')
+assert.match(spineCssSource, /\.body-intelligence-workspace__spine\s*\{/, 'concept spine must retain a dedicated orientation surface')
+assert.match(spineCssSource, /\.body-intelligence-workspace__spine-stage\.is-active/, 'concept spine must expose a coherent active-stage state')
+assert.match(spineCssSource, /\.body-intelligence-workspace__spine-stage\.is-foundational/, 'concept spine must distinguish whole-body/system/function foundation stages')
+assert.match(spineCssSource, /overflow-x:\s*auto/, 'concept spine must remain usable on narrow screens')
+assert.match(spineCssSource, /@media \(min-width:\s*1024px\)/, 'concept spine must expand coherently on desktop')
+assert.match(spineCssSource, /prefers-reduced-motion/, 'concept spine must preserve reduced-motion accessibility')
+
+console.log('body intelligence workspace: seven-stage concept spine + six progressive-disclosure layers validated with direct Intelligence navigation, Panacea HIG token alignment, aligned legacy controls and non-clinical navigation boundaries')
