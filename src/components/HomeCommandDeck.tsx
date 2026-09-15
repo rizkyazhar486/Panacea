@@ -1,13 +1,15 @@
-import { useMemo, useState } from 'react'
+import { useMemo, useState, type ComponentType } from 'react'
 import { Link } from 'react-router-dom'
 import { FITUR_DARI_HUB } from '../lib/katalogFitur'
+import { IconBook, IconGauge, IconMoon, IconRun, IconSparkle, IconUsers } from './icons'
 
 type HubFeature = (typeof FITUR_DARI_HUB)[number]
+type ActionIcon = ComponentType<{ size?: number; className?: string }>
 type Anchor = {
   label: string
   hint: string
   to: string
-  glyph: string
+  icon: ActionIcon
   surface: string
   glow: string
 }
@@ -15,12 +17,12 @@ type Anchor = {
 const FEATURE_LIMIT = 96
 
 const FALLBACK_ANCHORS: Anchor[] = [
-  { label: 'Score', hint: 'Clinical & health scores', to: '/clinical-scores', glyph: '◎', surface: 'from-sky-400/24 via-cyan-300/10 to-blue-500/20', glow: 'shadow-[0_14px_42px_rgba(56,189,248,.16)]' },
-  { label: 'Adzan', hint: 'Prayer time', to: '/prayer-times', glyph: '◒', surface: 'from-emerald-300/24 via-teal-300/10 to-cyan-500/16', glow: 'shadow-[0_14px_42px_rgba(52,211,153,.14)]' },
-  { label: 'Stories', hint: 'Stories & reflection', to: '/prophet-stories', glyph: '◇', surface: 'from-violet-400/24 via-fuchsia-300/10 to-indigo-500/18', glow: 'shadow-[0_14px_42px_rgba(167,139,250,.15)]' },
-  { label: 'Motivation', hint: 'Reset your direction', to: '/resilience-stories', glyph: '✦', surface: 'from-amber-300/25 via-orange-300/10 to-rose-500/16', glow: 'shadow-[0_14px_42px_rgba(251,191,36,.13)]' },
-  { label: 'Social', hint: 'People & activity', to: '/?t=social', glyph: '◉', surface: 'from-rose-400/24 via-pink-300/10 to-violet-500/18', glow: 'shadow-[0_14px_42px_rgba(244,114,182,.14)]' },
-  { label: 'Zone 2', hint: 'Aerobic base', to: '/latihan?t=endurance', glyph: '⌁', surface: 'from-cyan-300/25 via-sky-300/10 to-emerald-400/16', glow: 'shadow-[0_14px_42px_rgba(34,211,238,.14)]' },
+  { label: 'Score', hint: 'Clinical & health scores', to: '/clinical-scores', icon: IconGauge, surface: 'from-sky-400/24 via-cyan-300/10 to-blue-500/20', glow: 'shadow-[0_14px_42px_rgba(56,189,248,.16)]' },
+  { label: 'Adzan', hint: 'Prayer time', to: '/prayer-times', icon: IconMoon, surface: 'from-emerald-300/24 via-teal-300/10 to-cyan-500/16', glow: 'shadow-[0_14px_42px_rgba(52,211,153,.14)]' },
+  { label: 'Stories', hint: 'Stories & reflection', to: '/prophet-stories', icon: IconBook, surface: 'from-violet-400/24 via-fuchsia-300/10 to-indigo-500/18', glow: 'shadow-[0_14px_42px_rgba(167,139,250,.15)]' },
+  { label: 'Motivation', hint: 'Reset your direction', to: '/resilience-stories', icon: IconSparkle, surface: 'from-amber-300/25 via-orange-300/10 to-rose-500/16', glow: 'shadow-[0_14px_42px_rgba(251,191,36,.13)]' },
+  { label: 'Social', hint: 'People & activity', to: '/?t=social', icon: IconUsers, surface: 'from-rose-400/24 via-pink-300/10 to-violet-500/18', glow: 'shadow-[0_14px_42px_rgba(244,114,182,.14)]' },
+  { label: 'Zone 2', hint: 'Aerobic base', to: '/latihan?t=endurance', icon: IconRun, surface: 'from-cyan-300/25 via-sky-300/10 to-emerald-400/16', glow: 'shadow-[0_14px_42px_rgba(34,211,238,.14)]' },
 ]
 
 const MATCHERS: Array<{ index: number; rx: RegExp }> = [
@@ -144,20 +146,26 @@ export function HomeCommandDeck() {
       </div>
 
       <div className="relative grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-6">
-        {anchors.map((anchor) => (
-          <Link
-            key={anchor.label}
-            to={anchor.to}
-            className={`group min-h-[104px] overflow-hidden rounded-[20px] border border-white/10 bg-gradient-to-br ${anchor.surface} p-3 ${anchor.glow} transition duration-200 hover:-translate-y-0.5 hover:border-white/25 active:scale-[.985]`}
-          >
-            <div className="flex items-start justify-between gap-2">
-              <span className="grid h-9 w-9 place-items-center rounded-[13px] border border-white/12 bg-black/22 text-lg text-white shadow-[inset_0_1px_0_rgba(255,255,255,.12)]">{anchor.glyph}</span>
-              <span className="text-white/42 transition group-hover:translate-x-0.5 group-hover:text-white/75">↗</span>
-            </div>
-            <div className="mt-3 text-sm font-black tracking-tight">{anchor.label}</div>
-            <div className="mt-0.5 truncate text-[10px] font-semibold text-white/52">{anchor.hint}</div>
-          </Link>
-        ))}
+        {anchors.map((anchor) => {
+          const AnchorIcon = anchor.icon
+          return (
+            <Link
+              key={anchor.label}
+              to={anchor.to}
+              aria-label={`${anchor.label}: ${anchor.hint}`}
+              className={`group min-h-[104px] overflow-hidden rounded-[20px] border border-white/10 bg-gradient-to-br ${anchor.surface} p-3 ${anchor.glow} transition duration-200 hover:-translate-y-0.5 hover:border-white/25 active:scale-[.985]`}
+            >
+              <div className="flex items-start justify-between gap-2">
+                <span className="grid h-9 w-9 place-items-center rounded-[13px] border border-white/12 bg-black/22 text-white shadow-[inset_0_1px_0_rgba(255,255,255,.12)]" aria-hidden>
+                  <AnchorIcon size={19} />
+                </span>
+                <span className="text-white/42 transition group-hover:translate-x-0.5 group-hover:text-white/75" aria-hidden>↗</span>
+              </div>
+              <div className="mt-3 text-sm font-black tracking-tight">{anchor.label}</div>
+              <div className="mt-0.5 truncate text-[10px] font-semibold text-white/52">{anchor.hint}</div>
+            </Link>
+          )
+        })}
       </div>
 
       <div className="relative mt-3 rounded-[22px] border border-white/[.08] bg-white/[.025] p-2.5 shadow-[inset_0_1px_0_rgba(255,255,255,.04)] backdrop-blur-xl sm:p-3">
