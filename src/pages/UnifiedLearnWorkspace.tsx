@@ -16,6 +16,10 @@ const OsceUkmppd = lazy(() => import('./OsceUkmppd').then((m) => ({ default: m.O
 const ClinicalEvidence = lazy(() => import('./ClinicalEvidence').then((m) => ({ default: m.ClinicalEvidence })))
 const DrugInfo = lazy(() => import('./DrugInfo').then((m) => ({ default: m.DrugInfo })))
 const ClinicalCalculators = lazy(() => import('./ClinicalCalculators').then((m) => ({ default: m.ClinicalCalculators })))
+const LifeLibraryWorkbench = lazy(() => import('../components/LifeLibraryWorkbench').then((m) => ({ default: m.LifeLibraryWorkbench })))
+const LearnFoundation = lazy(() => import('./LearnBase').then((m) => ({ default: m.Learn })))
+const Medical3DFrontierLab = lazy(() => import('../components/Medical3DFrontierLab').then((m) => ({ default: m.Medical3DFrontierLab })))
+const HealthGapNavigator = lazy(() => import('../components/HealthGapNavigator').then((m) => ({ default: m.HealthGapNavigator })))
 
 type LearnTab =
   | 'body'
@@ -26,6 +30,10 @@ type LearnTab =
   | 'arrhythmia'
   | 'genome'
   | 'knowledge'
+  | 'life'
+  | 'foundation'
+  | 'frontier3d'
+  | 'gaps'
   | 'library'
   | 'cases'
   | 'curriculum'
@@ -51,6 +59,10 @@ const TABS: TabDefinition[] = [
   { key: 'arrhythmia', label: 'Arrhythmia Lab', short: 'ECG', component: Electrophysiology, description: 'Electrical physiology and rhythm learning in the same heart/body context.' },
   { key: 'genome', label: 'Genome Lab', short: 'Genome', component: GenomeLab, description: 'Genes, variants and molecular context interpreted back toward tissues and organs.' },
   { key: 'knowledge', label: 'Knowledge Bridge', short: 'Bridge', component: KnowledgeBridge, description: 'Connect anatomy, disease, evidence and mechanisms inside the same workspace.' },
+  { key: 'life', label: 'Life Library', short: 'Life', component: LifeLibraryWorkbench, description: 'Seven-pillar life learning with readable briefs, reflection and action restored inside the unified Learn workspace.' },
+  { key: 'foundation', label: 'Learning Foundation', short: 'Core', component: LearnFoundation, description: 'Preserves the original clinical learning foundation and its established study pathways inside the unified workspace.' },
+  { key: 'frontier3d', label: '3D Frontier Medical Lab', short: '3D Lab', component: Medical3DFrontierLab, description: 'Interactive hemodynamics, neural tract, embryology and tumor-microenvironment teaching scenes.' },
+  { key: 'gaps', label: 'Health Gap Navigator', short: 'Gaps', component: HealthGapNavigator, description: 'Identify unknown, blocked and high-friction care-plan gaps without presenting them as disease severity.' },
   { key: 'library', label: 'Medical Library', short: 'Library', component: MedStudyHub, description: 'Disease notes and skills used beside the visual body instead of replacing it.', bagian: 'library' },
   { key: 'cases', label: 'Cases & Exam Practice', short: 'Cases', component: OsceUkmppd, description: 'OSCE and case-bank practice remains inside the same visual learning environment so a case can be studied beside anatomy, imaging, disease and drugs.' },
   { key: 'curriculum', label: 'Study Curriculum', short: 'Study', component: MedStudyHub, description: 'Structured study tracks and exam-oriented learning inside the same learning environment.', bagian: 'usmle' },

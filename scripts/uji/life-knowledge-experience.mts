@@ -41,7 +41,8 @@ assert.equal(reviewIntervalFor(2), 7)
 assert.equal(reviewIntervalFor(50), 14)
 
 const wrappers = [
-  ['src/pages/Learn.tsx', /LifeLibraryWorkbench/],
+  ['src/pages/Learn.tsx', /UnifiedLearnWorkspace/],
+  ['src/pages/UnifiedLearnWorkspace.tsx', /LifeLibraryWorkbench/],
   ['src/pages/KnowledgeBridge.tsx', /KnowledgeBridgeWorkbench/],
   ['src/pages/MedStudyHub.tsx', /StudyCommandCenter/],
   ['src/pages/MedStudyHub.tsx', /MedicalLibraryWorkbench/],
