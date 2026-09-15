@@ -6,12 +6,7 @@ import './bodyExposureOS.css'
 
 const BodyAllSystems3D = lazy(() => import('../components/BodyAllSystems3D'))
 const AtlasPhysiologyBridgePanel = lazy(() => import('./bodyhub/AtlasPhysiologyBridgePanel'))
-const PathophysiologyNetworkPanel = lazy(() => import('./bodyhub/PathophysiologyNetworkPanel'))
-const PharmacologyMechanismPanel = lazy(() => import('./bodyhub/PharmacologyMechanismPanel'))
-const MechanismCausalBridgePanel = lazy(() => import('./bodyhub/MechanismCausalBridgePanel'))
-const UnifiedMechanismGraphPanel = lazy(() => import('./bodyhub/UnifiedMechanismGraphPanel'))
-const EvidenceProvenanceObservatory = lazy(() => import('./bodyhub/EvidenceProvenanceObservatory'))
-const LearningRouteComposerPanel = lazy(() => import('./bodyhub/LearningRouteComposerPanel'))
+const BodyIntelligenceWorkspace = lazy(() => import('./bodyhub/BodyIntelligenceWorkspace'))
 
 type ExposureMode = 'atlas' | 'physiology' | 'imaging' | 'surgery' | 'molecular' | 'clinical'
 
@@ -108,19 +103,14 @@ export function BodyExposureOS() {
             <div className="flex flex-wrap items-center gap-2">
               <span className="text-[10px] font-black uppercase tracking-[.24em] text-cyan-200">Body Exposure · Human Body OS</span>
               <span className="rounded-full border border-white/10 bg-white/[.045] px-2.5 py-1 text-[9px] font-black uppercase tracking-[.14em] text-white/60">whole-body first</span>
-              <span className="rounded-full border border-violet-300/10 bg-violet-300/[.045] px-2.5 py-1 text-[9px] font-black uppercase tracking-[.14em] text-violet-100/65">11-system source atlas</span>
-              <span className="rounded-full border border-rose-300/10 bg-rose-300/[.045] px-2.5 py-1 text-[9px] font-black uppercase tracking-[.14em] text-rose-100/65">pathophysiology network</span>
-              <span className="rounded-full border border-cyan-300/10 bg-cyan-300/[.045] px-2.5 py-1 text-[9px] font-black uppercase tracking-[.14em] text-cyan-100/65">pharmacology mechanisms</span>
-              <span className="rounded-full border border-fuchsia-300/10 bg-fuchsia-300/[.04] px-2.5 py-1 text-[9px] font-black uppercase tracking-[.14em] text-fuchsia-100/65">causal bridge</span>
-              <span className="rounded-full border border-emerald-300/10 bg-emerald-300/[.04] px-2.5 py-1 text-[9px] font-black uppercase tracking-[.14em] text-emerald-100/65">unified graph</span>
-              <span className="rounded-full border border-amber-200/10 bg-amber-200/[.04] px-2.5 py-1 text-[9px] font-black uppercase tracking-[.14em] text-amber-50/65">evidence provenance</span>
-              <span className="rounded-full border border-teal-300/10 bg-teal-300/[.04] px-2.5 py-1 text-[9px] font-black uppercase tracking-[.14em] text-teal-100/65">learning routes</span>
+              <span className="rounded-full border border-violet-300/10 bg-violet-300/[.045] px-2.5 py-1 text-[9px] font-black uppercase tracking-[.14em] text-violet-100/65">multiscale intelligence</span>
+              <span className="rounded-full border border-amber-200/10 bg-amber-200/[.04] px-2.5 py-1 text-[9px] font-black uppercase tracking-[.14em] text-amber-50/65">evidence traceable</span>
             </div>
             <h2 id="body-exposure-os-title" className="mt-2 max-w-3xl text-2xl font-black tracking-[-.035em] text-white sm:text-3xl lg:text-4xl">
               One body. Every scale. One continuous learning space.
             </h2>
             <p className="mt-2 max-w-3xl text-sm font-medium leading-relaxed text-white/60 sm:text-[15px]">
-              Start from the complete human body, switch across major systems, isolate a structure, then move through physiology, pathophysiology, pharmacology, evidence, guided learning, imaging, surgery, disease, cells and molecular detail without leaving the same workspace.
+              Begin with the complete human body as the spatial anchor, then move progressively into systems, physiology, mechanism, disease, pharmacology, evidence, imaging, surgery, cells and molecular detail without fragmenting the experience into unrelated pages.
             </p>
           </div>
 
@@ -159,8 +149,8 @@ export function BodyExposureOS() {
             <div className="mt-1 text-xs font-black text-white/85">Organ → tissue → gene</div>
           </div>
           <div className="rounded-2xl border border-white/[.08] bg-black/25 px-3 py-2.5">
-            <div className="text-[9px] font-black uppercase tracking-[.16em] text-white/35">Context</div>
-            <div className="mt-1 text-xs font-black text-white/85">Anatomy + function + failure</div>
+            <div className="text-[9px] font-black uppercase tracking-[.16em] text-white/35">Reasoning</div>
+            <div className="mt-1 text-xs font-black text-white/85">Function → failure → mechanism</div>
           </div>
         </div>
       </header>
@@ -206,38 +196,8 @@ export function BodyExposureOS() {
       </div>
 
       <div className="relative z-[2] mt-3">
-        <Suspense fallback={<div className="grid min-h-40 place-items-center rounded-[28px] border border-white/[.08] bg-black/35 text-xs font-bold text-white/35">Loading pathophysiology network…</div>}>
-          <PathophysiologyNetworkPanel selectedAtlasSystemId={selectedBodySystemId} />
-        </Suspense>
-      </div>
-
-      <div className="relative z-[2] mt-3">
-        <Suspense fallback={<div className="grid min-h-44 place-items-center rounded-[28px] border border-white/[.08] bg-black/35 text-xs font-bold text-white/35">Loading pharmacology mechanism network…</div>}>
-          <PharmacologyMechanismPanel selectedAtlasSystemId={selectedBodySystemId} />
-        </Suspense>
-      </div>
-
-      <div className="relative z-[2] mt-3">
-        <Suspense fallback={<div className="grid min-h-44 place-items-center rounded-[28px] border border-white/[.08] bg-black/35 text-xs font-bold text-white/35">Loading disease-mechanism causal bridge…</div>}>
-          <MechanismCausalBridgePanel />
-        </Suspense>
-      </div>
-
-      <div className="relative z-[2] mt-3">
-        <Suspense fallback={<div className="grid min-h-52 place-items-center rounded-[30px] border border-white/[.08] bg-black/35 text-xs font-bold text-white/35">Compiling unified mechanism graph…</div>}>
-          <UnifiedMechanismGraphPanel selectedAtlasSystemId={selectedBodySystemId} />
-        </Suspense>
-      </div>
-
-      <div className="relative z-[2] mt-3">
-        <Suspense fallback={<div className="grid min-h-52 place-items-center rounded-[30px] border border-white/[.08] bg-black/35 text-xs font-bold text-white/35">Auditing evidence provenance…</div>}>
-          <EvidenceProvenanceObservatory />
-        </Suspense>
-      </div>
-
-      <div className="relative z-[2] mt-3">
-        <Suspense fallback={<div className="grid min-h-52 place-items-center rounded-[30px] border border-white/[.08] bg-black/35 text-xs font-bold text-white/35">Composing graph-backed learning route…</div>}>
-          <LearningRouteComposerPanel selectedAtlasSystemId={selectedBodySystemId} />
+        <Suspense fallback={<div className="grid min-h-72 place-items-center rounded-[30px] border border-white/[.08] bg-black/35 text-xs font-bold text-white/35">Loading unified Body Intelligence workspace…</div>}>
+          <BodyIntelligenceWorkspace selectedAtlasSystemId={selectedBodySystemId} />
         </Suspense>
       </div>
 
