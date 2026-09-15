@@ -12,7 +12,7 @@ const ACTIONS = [
 export function HomeNowWidget() {
   const vitals = getVitals()
   return (
-    <section aria-label="Panacea live health workspace" className="space-y-3">
+    <section data-ui="wearable-dashboard-v42" aria-label="Panacea live health workspace" className="space-y-3">
       <HomeHealthInstruments vitals={vitals} />
 
       <div className="grid grid-cols-4 gap-2" aria-label="Quick actions">
