@@ -1,4 +1,5 @@
 import { lazy, Suspense, useEffect, useRef, useState } from 'react'
+import { BODY_SYSTEM_SOURCE_WAVE, type BodySystemId } from '../lib/bodySystemSourceWave'
 import { BodyExplorer } from './BodyExplorer'
 import './bodyExposureOS.css'
 
@@ -29,6 +30,7 @@ export function BodyExposureOS() {
   const systemsRef = useRef<HTMLDivElement | null>(null)
   const [activeMode, setActiveMode] = useState<ExposureMode>('atlas')
   const [immersive, setImmersive] = useState(false)
+  const [selectedBodySystemId, setSelectedBodySystemId] = useState<BodySystemId>('cardiovascular')
 
   useEffect(() => {
     const syncFullscreen = () => setImmersive(document.fullscreenElement === rootRef.current)
@@ -67,6 +69,14 @@ export function BodyExposureOS() {
     } catch {
       // Fullscreen is progressive enhancement. Body Exposure remains fully usable when a browser blocks it.
     }
+  }
+
+  function captureSystemAtlasSelection(event: React.MouseEvent<HTMLDivElement>) {
+    const button = (event.target as HTMLElement).closest<HTMLButtonElement>('button[role="tab"]')
+    if (!button) return
+    const label = button.textContent?.trim()
+    const matched = BODY_SYSTEM_SOURCE_WAVE.find((system) => system.label === label)
+    if (matched) setSelectedBodySystemId(matched.id)
   }
 
   function captureExplorerSelection(event: React.MouseEvent<HTMLDivElement>) {
@@ -171,7 +181,7 @@ export function BodyExposureOS() {
         <span className="hidden shrink-0 sm:inline">Educational atlas · not a patient-specific diagnosis</span>
       </div>
 
-      <div ref={systemsRef} className="relative z-[2] mt-3 scroll-mt-4">
+      <div ref={systemsRef} onClickCapture={captureSystemAtlasSelection} className="relative z-[2] mt-3 scroll-mt-4">
         <Suspense fallback={<div className="grid min-h-44 place-items-center rounded-[26px] border border-white/[.08] bg-black/35 text-xs font-bold text-white/35">Loading system atlas…</div>}>
           <BodyAllSystems3D />
         </Suspense>
@@ -179,7 +189,7 @@ export function BodyExposureOS() {
 
       <div className="relative z-[2] mt-3">
         <Suspense fallback={<div className="grid min-h-32 place-items-center rounded-[26px] border border-white/[.08] bg-black/35 text-xs font-bold text-white/35">Loading anatomy-physiology bridge…</div>}>
-          <AtlasPhysiologyBridgePanel />
+          <AtlasPhysiologyBridgePanel selectedAtlasSystemId={selectedBodySystemId} onSystemChange={setSelectedBodySystemId} />
         </Suspense>
       </div>
 
