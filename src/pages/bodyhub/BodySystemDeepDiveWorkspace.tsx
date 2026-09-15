@@ -2,11 +2,16 @@ import { lazy, Suspense } from 'react'
 import type { BodySystemId } from '../../lib/bodySystemSourceWave'
 
 const CardiacHemodynamicsWorkbench = lazy(() => import('./CardiacHemodynamicsWorkbench'))
+const NeurovascularPerfusionWorkbench = lazy(() => import('./NeurovascularPerfusionWorkbench'))
 
 const META: Partial<Record<BodySystemId, { label: string; description: string }>> = {
   cardiovascular: {
     label: 'Heart & Cardiovascular',
     description: 'Selected-system function deep dive: valve phases, loading conditions and normalized pressure–volume mechanics.',
+  },
+  nervous: {
+    label: 'Brain & Neurovascular',
+    description: 'Selected-system function deep dive: cerebral perfusion, autoregulation, intracranial compliance and oxygen-delivery coupling.',
   },
 }
 
@@ -31,6 +36,11 @@ export function BodySystemDeepDiveWorkspace({ selectedAtlasSystemId }: { selecte
       {selectedAtlasSystemId === 'cardiovascular' && (
         <Suspense fallback={<div className="grid min-h-52 place-items-center rounded-[24px] border border-white/[.07] bg-black/35 text-xs text-white/35">Loading cardiovascular function…</div>}>
           <CardiacHemodynamicsWorkbench selectedAtlasSystemId={selectedAtlasSystemId} />
+        </Suspense>
+      )}
+      {selectedAtlasSystemId === 'nervous' && (
+        <Suspense fallback={<div className="grid min-h-52 place-items-center rounded-[24px] border border-white/[.07] bg-black/35 text-xs text-white/35">Loading neurovascular function…</div>}>
+          <NeurovascularPerfusionWorkbench />
         </Suspense>
       )}
     </section>
