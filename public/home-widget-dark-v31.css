@@ -111,6 +111,46 @@ html.dark .panacea-home :is(.widget-instrument-count-v5,.widget-instrument-nav-v
   color:#d7e0e8!important;
 }
 
+/* Active-widget contrast boundary.
+   Legacy widgets can carry opacity/filter/blend utilities on the full widget
+   wrapper. Because a dimmed ancestor cannot be repaired by a dark child, the
+   final-authority guard normalizes only the visible slide and its immediate
+   rendered root. Nested charts, progress fills and semantic opacity remain. */
+.panacea-home .widget-instrument-slide-v5[aria-hidden='false'],
+.panacea-home .widget-instrument-slide-v5[aria-hidden='false'] > *{
+  opacity:1!important;
+  filter:none!important;
+  -webkit-filter:none!important;
+  mix-blend-mode:normal!important;
+}
+
+html.dark .panacea-home .widget-instrument-slide-v5[aria-hidden='false'],
+.dark .panacea-home .widget-instrument-slide-v5[aria-hidden='false'],
+html[style*='color-scheme: dark'] .panacea-home .widget-instrument-slide-v5[aria-hidden='false']{
+  color:#f8fafc!important;
+  background:transparent!important;
+  background-image:none!important;
+}
+
+html.dark .panacea-home .widget-instrument-slide-v5[aria-hidden='false'] > :is(section,article,div,a),
+.dark .panacea-home .widget-instrument-slide-v5[aria-hidden='false'] > :is(section,article,div,a),
+html[style*='color-scheme: dark'] .panacea-home .widget-instrument-slide-v5[aria-hidden='false'] > :is(section,article,div,a){
+  opacity:1!important;
+  filter:none!important;
+  -webkit-filter:none!important;
+  mix-blend-mode:normal!important;
+  color-scheme:dark;
+}
+
+html.dark .panacea-home .widget-instrument-slide-v5[aria-hidden='false'] > :is(.bg-white,.bg-neutral-50,.bg-neutral-100,.bg-neutral-200,.bg-gray-50,.bg-gray-100,.bg-gray-200,.bg-slate-50,.bg-slate-100,.bg-slate-200),
+.dark .panacea-home .widget-instrument-slide-v5[aria-hidden='false'] > :is(.bg-white,.bg-neutral-50,.bg-neutral-100,.bg-neutral-200,.bg-gray-50,.bg-gray-100,.bg-gray-200,.bg-slate-50,.bg-slate-100,.bg-slate-200),
+html[style*='color-scheme: dark'] .panacea-home .widget-instrument-slide-v5[aria-hidden='false'] > :is(.bg-white,.bg-neutral-50,.bg-neutral-100,.bg-neutral-200,.bg-gray-50,.bg-gray-100,.bg-gray-200,.bg-slate-50,.bg-slate-100,.bg-slate-200){
+  background:#0b1119!important;
+  background-image:none!important;
+  color:#f8fafc!important;
+  border-color:rgba(255,255,255,.08)!important;
+}
+
 /* When the ACTIVE slide is the Suspense fallback, collapse the retained stage
    height to the compact baseline rather than showing the previous widget's tall
    empty canvas. Modern Safari/iOS supports :has(); older browsers simply keep
