@@ -1,6 +1,8 @@
 import { Suspense, lazy, useState } from 'react'
 import { UnifiedLearnWorkspace } from './UnifiedLearnWorkspace'
 
+// Immediate-release marker: keep the completed workspaces reachable while the
+// mobile UI hotfix is released without waiting for the normal Vercel batch.
 const LifeLibraryWorkbench = lazy(() => import('../components/LifeLibraryWorkbench').then((m) => ({ default: m.LifeLibraryWorkbench })))
 const HealthGapNavigator = lazy(() => import('../components/HealthGapNavigator').then((m) => ({ default: m.HealthGapNavigator })))
 const Medical3DFrontierLab = lazy(() => import('../components/Medical3DFrontierLab').then((m) => ({ default: m.Medical3DFrontierLab })))
