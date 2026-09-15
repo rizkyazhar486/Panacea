@@ -22,10 +22,9 @@ export type ProductSpace = {
  * Product-level information architecture.
  *
  * Panacea has many capabilities, but the product should feel like a small OS,
- * not a folder containing hundreds of mini-apps. These spaces are the stable
- * mental model shown to users. Individual feature routes remain alive and
- * searchable; they simply live inside one of these spaces instead of competing
- * for first-class navigation.
+ * not a folder containing hundreds of mini-apps. These spaces are conceptual
+ * neighborhoods, not separate-page mandates. Similar capabilities deliberately
+ * converge into the same canonical workspace and open as subviews there.
  */
 export const PANACEA_SPACES: readonly ProductSpace[] = [
   {
@@ -42,7 +41,7 @@ export const PANACEA_SPACES: readonly ProductSpace[] = [
     label: 'Body',
     shortLabel: 'Body',
     description: 'Whole-body anatomy, physiology, imaging and personal body data.',
-    to: '/body-explorer',
+    to: '/fitness-hub?view=body-exposure',
     eyebrow: 'See the human system',
     accent: 'emerald',
   },
@@ -51,7 +50,7 @@ export const PANACEA_SPACES: readonly ProductSpace[] = [
     label: 'Move & Recover',
     shortLabel: 'Move',
     description: 'Training, sleep, recovery, readiness and performance tools.',
-    to: '/latihan',
+    to: '/fitness-hub?view=training',
     eyebrow: 'Act on your body',
     accent: 'blue',
   },
@@ -60,7 +59,7 @@ export const PANACEA_SPACES: readonly ProductSpace[] = [
     label: 'Learn',
     shortLabel: 'Learn',
     description: 'Medical knowledge, evidence, calculators and structured study.',
-    to: '/med-study',
+    to: '/learn',
     eyebrow: 'Understand',
     accent: 'violet',
   },
@@ -78,7 +77,7 @@ export const PANACEA_SPACES: readonly ProductSpace[] = [
     label: 'Discovery',
     shortLabel: 'Discover',
     description: 'Advanced simulation, research, frontier models and data labs.',
-    to: '/frontier-health',
+    to: '/learn?t=discovery',
     eyebrow: 'Explore the frontier',
     accent: 'amber',
   },
@@ -174,24 +173,61 @@ export function getProductSpace(id: ProductSpaceId): ProductSpace {
  * Destinations kept searchable but intentionally removed from the everyday
  * menu. They are sub-tools, alternate views, or duplicated doors into a wider
  * workspace. No route is deleted by this list.
+ *
+ * Rule: capability count may grow; first-class destinations should not grow at
+ * the same rate. A new tool joins an existing workspace unless its user goal,
+ * data model and interaction model are genuinely different.
  */
 export const SECONDARY_DAILY_DESTINATIONS: ReadonlySet<string> = new Set([
   '/tutorial',
+  '/latihan',
   '/workout',
+  '/recovery',
+  '/tubuh',
+  '/nutrition',
   '/radiology',
   '/electrophysiology',
   '/genome-lab',
   '/knowledge-bridge',
   '/frontier-health',
+  '/health-data',
   '/med-study?bagian=usmle',
+  '/evidence',
   '/osce-ukmppd',
+  '/clinical-calculators',
   '/drug-info',
-  '/clinical-hub',
+  '/emr',
   '/feed',
   '/messages',
   '/scripture',
   '/owner-analytics',
 ])
+
+/**
+ * Shell representatives are rewritten to the canonical workspace URL. This is
+ * the important distinction between hiding and merging: the menu does not just
+ * become shorter; several formerly separate doors now enter the same workspace
+ * and reveal their capability as a subview.
+ */
+const CANONICAL_PRIMARY_WORKSPACES: Readonly<Record<string, { to: string; label: string }>> = {
+  '/': { to: '/', label: 'Home' },
+  '/semua-fitur': { to: '/semua-fitur', label: 'All Features' },
+  '/body-explorer': { to: '/fitness-hub', label: 'Your Body' },
+  '/med-study': { to: '/learn', label: 'Learn' },
+  '/clinical-hub': { to: '/clinical-hub', label: 'Services' },
+  '/community': { to: '/community', label: 'Community' },
+  '/emergency': { to: '/emergency', label: 'Emergency' },
+  '/profile': { to: '/profile', label: 'Profile' },
+}
+
+function rewritePrimaryItem<T extends { to: string }>(item: T, target: { to: string; label: string }): T {
+  const next: Record<string, unknown> = { ...item, to: target.to }
+  if ('label' in item) next.label = target.label
+  // Put the small set of everyday destinations in one flat section. Role-
+  // specific management and account controls keep their original groups.
+  if ('group' in item) next.group = 'Home'
+  return next as T
+}
 
 /** Shell's daily nav has these sentinels; feature directories do not. */
 export function looksLikePrimaryShellNavigation<T extends { to: string }>(items: readonly T[]): boolean {
@@ -201,5 +237,19 @@ export function looksLikePrimaryShellNavigation<T extends { to: string }>(items:
 
 export function compactPrimaryNavigation<T extends { to: string }>(items: readonly T[]): T[] {
   if (!looksLikePrimaryShellNavigation(items)) return [...items]
-  return items.filter((item) => !SECONDARY_DAILY_DESTINATIONS.has(item.to))
+
+  const compact: T[] = []
+  const seen = new Set<string>()
+
+  for (const item of items) {
+    if (SECONDARY_DAILY_DESTINATIONS.has(item.to)) continue
+
+    const target = CANONICAL_PRIMARY_WORKSPACES[item.to]
+    const next = target ? rewritePrimaryItem(item, target) : item
+    if (seen.has(next.to)) continue
+    seen.add(next.to)
+    compact.push(next)
+  }
+
+  return compact
 }
