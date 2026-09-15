@@ -4,14 +4,16 @@ const BodyInfinityLab = lazy(() => import('./BodyInfinityLab'))
 const BodySimulationDeck = lazy(() => import('./BodySimulationDeck'))
 const BodyTrillionLab = lazy(() => import('./BodyTrillionLab'))
 const BodyOpenWorldLab = lazy(() => import('./BodyOpenWorldLab'))
+const BodyUniverseCatalog = lazy(() => import('./BodyUniverseCatalog'))
 
-type UniversePanel = 'spatial' | 'simulation' | 'trillion' | 'world'
+type UniversePanel = 'spatial' | 'simulation' | 'trillion' | 'world' | 'catalog'
 
 const PANELS: readonly { id: UniversePanel; label: string; description: string }[] = [
   { id: 'spatial', label: 'Spatial Lab', description: 'Motion, cinematic, spatial and game prototypes.' },
   { id: 'simulation', label: 'Simulation Factory', description: 'Synthetic physiology, imaging, surgery and biomechanics controls.' },
   { id: 'trillion', label: 'Trillion Space', description: '1.73T deterministic experience coordinates without trillion-object allocation.' },
   { id: 'world', label: 'Open World', description: 'Procedural anatomical districts, missions, encounters and progression.' },
+  { id: 'catalog', label: 'Universe Catalog', description: 'Surgery, micro worlds, imaging, visual FX and motion primitives.' },
 ]
 
 function LoadingPanel({ label }: { label: string }) {
@@ -62,6 +64,11 @@ export default function BodyInfinityUniverse() {
       {panel === 'world' && (
         <Suspense fallback={<LoadingPanel label="Open World" />}>
           <BodyOpenWorldLab />
+        </Suspense>
+      )}
+      {panel === 'catalog' && (
+        <Suspense fallback={<LoadingPanel label="Universe Catalog" />}>
+          <BodyUniverseCatalog />
         </Suspense>
       )}
     </section>
