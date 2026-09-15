@@ -26,8 +26,11 @@
          rules consistently win over legacy page-specific CSS. -->
     <link rel="stylesheet" href="/panacea-hig-v41.css?v=20260915-1" />
     <link rel="stylesheet" href="/panacea-visual-first-v43.css?v=20260916-1" />
+    <link rel="stylesheet" href="/panacea-command-ui-v44.css?v=20260916-1" />
     <script defer src="/welcome-runtime-v28.js?v=20260908-1"></script>
     <script defer src="/panacea-visual-first-v43.js?v=20260916-1"></script>
+    <script defer src="/panacea-command-ui-v44.js?v=20260916-1"></script>
+    <script defer src="/panacea-command-route-alias-v44.js?v=20260916-1"></script>
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="default" />
     <meta name="apple-mobile-web-app-title" content="Panaceamed" />
@@ -117,7 +120,7 @@
     <script>
       (() => {
         const CACHE_PREFIX = 'panaceamed-'
-        const MAINTENANCE_VERSION = '20260916-v43'
+        const MAINTENANCE_VERSION = '20260916-v44'
         const MAINTENANCE_KEY = 'pmd-cache-maintenance-version'
         const rootReady = () => {
           const root = document.getElementById('root')

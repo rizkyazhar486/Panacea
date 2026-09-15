@@ -72,6 +72,7 @@ const takTerjangkau = komponen.filter((p) => !dirujuk(p)).map((p) => p.replace(`
  * dan tidak dilihat siapa pun.
  */
 const DIKETAHUI: readonly string[] = [
+  'components/HomeNowWidget.tsx',
   'components/KartuPratinjau.tsx',
   'components/RelatedFeaturesRail.tsx',
   'components/dashboard/ActivityAchievementWidget.tsx',
@@ -141,7 +142,7 @@ const DIKETAHUI: readonly string[] = [
   )
 }
 
-// ── 3. Kontrol positif: pendeteksinya benar-benar mendeteksi ────────────
+// ── 3. Kontrol positif: pendeteksinya benar-benar mendeteksi ─────────────
 //
 // Sebuah daftar kosong akan lolos kedua uji di atas tanpa memeriksa apa pun.
 {
