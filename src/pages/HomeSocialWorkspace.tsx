@@ -24,7 +24,7 @@ const VIEWS: View[] = [
   { key: 'markets', label: 'Stocks & Markets', short: 'Markets', component: Markets, description: 'Delayed market data for monitoring and learning, not trading instructions.' },
   { key: 'scores', label: 'Scores', short: 'Scores', component: SportsScores, description: 'Live and recorded sports-score context.' },
   { key: 'religion', label: 'Religion & Reflection', short: 'Religion', component: ReligionWorkspace, description: 'Scripture, hadith, prayer-time tools and reflective learning in one room.' },
-  { key: 'learn', label: 'Read & Learn', short: 'Read & Learn', component: MedStudyHub, description: 'Reading, cases and study material available without leaving the Home experience.' },
+  { key: 'learn', label: 'Read & Learn', short: 'Learn', component: MedStudyHub, description: 'Reading, cases and study material available without leaving the Home experience.' },
 ]
 const VALID = new Set(VIEWS.map((view) => view.key))
 
@@ -38,21 +38,58 @@ export function HomeSocialWorkspace() {
   const activeKey: HomeView = requested && VALID.has(requested) ? requested : 'home'
   const active = VIEWS.find((view) => view.key === activeKey) ?? VIEWS[0]
   const Active = active.component
+
+  const select = (view: View) => {
+    const next = new URLSearchParams(params)
+    next.set('t', view.key)
+    setParams(next, { replace: true })
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+  }
+
   return (
-    <div className="mx-auto w-full max-w-[1450px] space-y-4 pb-10">
-      <PanaceaZoneNav />
-      <section className="rounded-[30px] border border-white/10 bg-black/20 p-4 shadow-2xl backdrop-blur-xl sm:p-5">
+    <div className="mx-auto w-full max-w-[1450px] space-y-3 pb-10 sm:space-y-4">
+      {/* Desktop keeps the full zone navigation and workspace introduction.
+          On phones the global Shell already provides navigation; repeating a
+          second large navigation block consumed the first screen before any
+          useful health content appeared. Nothing is removed: every Home room
+          remains available in the compact horizontal rail below. */}
+      <div className="hidden sm:block">
+        <PanaceaZoneNav />
+      </div>
+
+      <nav className="no-scrollbar -mx-1 flex gap-1.5 overflow-x-auto px-1 pb-0.5 sm:hidden" aria-label="Home rooms">
+        {VIEWS.map((view) => (
+          <button
+            key={view.key}
+            type="button"
+            aria-current={activeKey === view.key ? 'page' : undefined}
+            onClick={() => select(view)}
+            className={`min-h-[38px] shrink-0 rounded-full border px-3.5 text-[11px] font-black transition active:scale-[.98] ${
+              activeKey === view.key
+                ? 'border-brand bg-brand text-white shadow-[0_6px_18px_rgba(0,191,99,.22)]'
+                : 'border-white/10 bg-black/10 text-neutral-600 dark:bg-white/[.045] dark:text-neutral-300'
+            }`}
+          >
+            {view.short}
+          </button>
+        ))}
+      </nav>
+
+      <section className="hidden rounded-[30px] border border-white/10 bg-black/20 p-4 shadow-2xl backdrop-blur-xl sm:block sm:p-5">
         <div className="text-[10px] font-black uppercase tracking-[.22em] text-brand">Home · life, people, faith and money</div>
         <h1 className="mt-1 text-2xl font-black tracking-tight text-ink dark:text-white sm:text-3xl">Your daily life in one home</h1>
         <p className="mt-2 max-w-4xl text-sm leading-relaxed text-neutral-500 dark:text-neutral-300">Logs and stats sit beside social, community, clubs, finance, markets, scores, religion and reading. These are rooms inside one Home, not a maze of separate destinations.</p>
         <div className="no-scrollbar mt-4 flex gap-2 overflow-x-auto pb-1" role="tablist" aria-label="Home workspace">
           {VIEWS.map((view) => (
-            <button key={view.key} type="button" role="tab" aria-selected={activeKey === view.key} onClick={() => { const next = new URLSearchParams(params); next.set('t', view.key); setParams(next, { replace: true }); window.scrollTo({ top: 0, behavior: 'smooth' }) }} className={`min-h-[44px] shrink-0 rounded-full border px-4 text-xs font-black transition ${activeKey === view.key ? 'border-brand bg-brand text-white' : 'border-white/10 bg-white/5 text-neutral-600 dark:text-neutral-300'}`}>{view.short}</button>
+            <button key={view.key} type="button" role="tab" aria-selected={activeKey === view.key} onClick={() => select(view)} className={`min-h-[44px] shrink-0 rounded-full border px-4 text-xs font-black transition ${activeKey === view.key ? 'border-brand bg-brand text-white' : 'border-white/10 bg-white/5 text-neutral-600 dark:text-neutral-300'}`}>{view.short}</button>
           ))}
         </div>
         <div className="mt-3 rounded-2xl border border-white/10 bg-white/[.03] px-3 py-2.5 text-[11px] leading-relaxed text-neutral-500 dark:text-neutral-400"><b className="text-ink dark:text-white">{active.label}:</b> {active.description}</div>
       </section>
-      <section role="tabpanel" aria-label={active.label}><Suspense fallback={<Loader />}><Active /></Suspense></section>
+
+      <section role="tabpanel" aria-label={active.label} className="min-w-0">
+        <Suspense fallback={<Loader />}><Active /></Suspense>
+      </section>
       <FeatureBoulevard zone="home" title="Home feature boulevard" />
     </div>
   )
