@@ -1,4 +1,4 @@
-import { useMemo } from 'react'
+import { useMemo, type CSSProperties } from 'react'
 import { Link } from 'react-router-dom'
 import type { Vitals } from '../lib/healthVitals'
 import { deretMetrik } from '../lib/riwayatVitals'
@@ -64,7 +64,7 @@ function Gauge({ value, max = 100, label }: { value?: number; max?: number; labe
   const bounded = value == null ? 0 : Math.max(0, Math.min(max, value))
   const pct = (bounded / max) * 100
   return (
-    <div className="pmd-gauge" style={{ '--pmd-gauge': `${pct}%` } as React.CSSProperties}>
+    <div className="pmd-gauge" style={{ '--pmd-gauge': `${pct}%` } as CSSProperties}>
       <div className="pmd-gauge-inner">
         <strong>{value == null ? '—' : fmt(value, value < 10 ? 1 : 0)}</strong>
         <span>{label}</span>
