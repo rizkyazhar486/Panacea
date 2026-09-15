@@ -20,6 +20,13 @@
   --be-emerald: 0, 216, 121;
   --be-amber: 255, 210, 120;
 
+  /* Semantic colour roles. These describe interface meaning, not clinical state. */
+  --be-role-spatial: rgb(var(--be-cyan));
+  --be-role-intelligence: rgb(var(--be-violet));
+  --be-role-causal: rgb(var(--be-magenta));
+  --be-role-biologic-focus: rgb(var(--be-emerald));
+  --be-role-evidence: rgb(var(--be-amber));
+
   --be-radius-shell: var(--pmd-radius-2xl, 32px);
   --be-radius-panel: var(--pmd-radius-xl, 26px);
   --be-radius-control: var(--pmd-radius-m, 14px);
@@ -102,6 +109,39 @@
 /* Spatial transitions stay restrained; no continuous ornamental motion. */
 .body-intelligence-workspace__panel {
   transition: opacity var(--be-normal) var(--be-ease), transform var(--be-spatial) var(--be-ease-spring);
+}
+
+/* Whole-body atlas inherits the same calm-content/spectral-control hierarchy. */
+.body-exposure-os [aria-label="Eleven body systems source-backed 3D atlas"] {
+  border-color: var(--be-border-soft) !important;
+  background:
+    radial-gradient(circle at 8% 0%, rgba(var(--be-cyan), .05), transparent 30%),
+    radial-gradient(circle at 94% 14%, rgba(var(--be-violet), .04), transparent 34%),
+    var(--be-surface-1) !important;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.05), var(--be-shadow-2) !important;
+}
+
+.body-exposure-os [aria-label="Body systems"] > button {
+  border-color: rgba(255,255,255,.07) !important;
+  background: rgba(255,255,255,.022) !important;
+  color: rgba(224,238,249,.48) !important;
+  transition:
+    transform var(--be-fast) var(--be-ease-spring),
+    border-color var(--be-normal) var(--be-ease),
+    background var(--be-normal) var(--be-ease),
+    color var(--be-normal) var(--be-ease);
+}
+
+.body-exposure-os [aria-label="Body systems"] > button[aria-selected="true"] {
+  border-color: rgba(var(--be-cyan), .24) !important;
+  background:
+    linear-gradient(135deg, rgba(var(--be-cyan), .13), rgba(var(--be-violet), .085)) !important;
+  color: rgba(248,251,255,.94) !important;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.08), 0 8px 24px rgba(0,0,0,.15);
+}
+
+.body-exposure-os [aria-label="Body systems"] > button:active {
+  transform: scale(.985);
 }
 
 /* Legacy BodyExplorer control rails now inherit the same control-material
@@ -188,6 +228,7 @@
 @media (prefers-reduced-motion: reduce) {
   .body-intelligence-workspace__tab:hover,
   .body-intelligence-workspace__tab:active,
+  .body-exposure-os [aria-label="Body systems"] > button,
   .body-exposure-os__core [role="group"][aria-label="Panel groups"] > button,
   .body-exposure-os__core [role="group"][aria-label="Panel groups"] + div > button {
     transform: none !important;
