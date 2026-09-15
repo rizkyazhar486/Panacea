@@ -115,7 +115,6 @@ const DIKETAHUI: readonly string[] = [
   'components/growth/ClinicalDuel.tsx',
   'components/growth/HumanPassportWidget.tsx',
   'pages/MacroLab.tsx',
-  'pages/bodyhub/AtomicSystemsLab.tsx',
 ]
 
 // ── 1. Tidak boleh ada permukaan tak terjangkau yang BARU ────────────────
