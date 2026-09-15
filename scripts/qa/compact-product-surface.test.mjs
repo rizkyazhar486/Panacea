@@ -2,10 +2,11 @@ import test from 'node:test'
 import assert from 'node:assert/strict'
 import { readFile } from 'node:fs/promises'
 
-const [taxonomy, hiddenFeatures, allFeatures] = await Promise.all([
+const [taxonomy, hiddenFeatures, allFeatures, entryPoints] = await Promise.all([
   readFile(new URL('../../src/lib/productSpaces.ts', import.meta.url), 'utf8'),
   readFile(new URL('../../src/lib/fiturTersembunyi.ts', import.meta.url), 'utf8'),
   readFile(new URL('../../src/pages/SemuaFitur.tsx', import.meta.url), 'utf8'),
+  readFile(new URL('../../src/lib/featureEntryPoints.ts', import.meta.url), 'utf8'),
 ])
 
 test('product surface exposes one stable compact OS taxonomy', () => {
@@ -21,7 +22,7 @@ test('daily navigation hides secondary doors without deleting routes', () => {
   assert.match(taxonomy, /'\/radiology'/)
   assert.match(taxonomy, /'\/frontier-health'/)
   assert.match(hiddenFeatures, /compactPrimaryNavigation\(items\)/)
-  assert.match(hiddenFeatures, /fitur tersedia.*fitur yang pantas tampil di\s*\/\/ navigasi utama|fitur tersedia.*navigasi utama/s)
+  assert.match(hiddenFeatures, /fitur tersedia.*navigasi utama/s)
 })
 
 test('all-features page starts with spaces and keeps full directory progressive', () => {
@@ -29,7 +30,18 @@ test('all-features page starts with spaces and keeps full directory progressive'
   assert.match(allFeatures, /Advanced directory/)
   assert.match(allFeatures, /showDirectory/)
   assert.match(allFeatures, /productSpaceForRoute/)
-  assert.match(allFeatures, /Browse all tools/)
+  assert.match(allFeatures, /Browse main tools/)
+})
+
+test('browse stays compact while exact search keeps deep tools reachable', () => {
+  assert.match(entryPoints, /BrowseSurface = AvailableCapabilities − SecondaryDoors/)
+  assert.match(entryPoints, /SearchSurface = AvailableCapabilities/)
+  assert.match(entryPoints, /compactBrowseResults/)
+  for (const route of ['/wells-score', '/sleep-apnea-screen', '/caffeine', '/drug-info', '/training-plan']) {
+    assert.ok(entryPoints.includes(`'${route}'`), `secondary browse door missing: ${route}`)
+  }
+  assert.match(allFeatures, /compactBrowseResults\(hasil, q\.trim\(\)\.length > 0\)/)
+  assert.match(allFeatures, /focused tools are intentionally search-first/)
 })
 
 test('emergency and core account exits remain protected', () => {
