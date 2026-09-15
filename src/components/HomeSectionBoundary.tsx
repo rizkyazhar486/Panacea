@@ -1,5 +1,6 @@
 import { Component, type ReactNode } from 'react'
 import { HomeLiveWidgetRail } from './HomeLiveWidgetRail'
+import { HomeWidgetUniverse } from './HomeWidgetUniverse'
 import '../styles/home-mobile-stability.css'
 
 type Props = {
@@ -39,6 +40,7 @@ export class HomeSectionBoundary extends Component<Props, State> {
       if (this.props.label === 'Dashboard widgets') {
         return (
           <div className="min-w-0">
+            <HomeWidgetUniverse />
             <HomeLiveWidgetRail />
             {this.props.children}
           </div>
