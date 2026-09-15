@@ -3,7 +3,7 @@ import { BodyExplorer } from './BodyExplorer'
 import './bodyExposureOS.css'
 
 const BodyAllSystems3D = lazy(() => import('../components/BodyAllSystems3D'))
-const BodyInfinityLab = lazy(() => import('../components/BodyInfinityLab'))
+const BodyInfinityLab = lazy(() => import('../components/BodyInfinityUniverse'))
 
 type ExposureMode = 'atlas' | 'physiology' | 'imaging' | 'surgery' | 'molecular' | 'clinical'
 
