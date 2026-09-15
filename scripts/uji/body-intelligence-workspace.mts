@@ -45,6 +45,7 @@ assert.doesNotMatch(osSource, /const LearningRouteComposerPanel = lazy/, 'OS she
 assert.match(osSource, /whole-body first/i)
 assert.match(osSource, /multiscale intelligence/i)
 assert.match(osSource, /evidence traceable/i)
+assert.match(osSource, /bodyExposureDesignAlignment\.css/, 'Body Exposure must load the HIG alignment layer after its local OS styles')
 
 const cssSource = readFileSync(resolve('src/pages/bodyExposureOS.css'), 'utf8')
 for (const token of ['--be-space-black', '--be-cyan', '--be-violet', '--be-magenta', '--be-border-soft', '--be-radius-panel']) {
@@ -55,4 +56,17 @@ assert.match(cssSource, /\.body-intelligence-workspace__tab\.is-active/, 'worksp
 assert.match(cssSource, /\.body-intelligence-workspace__panel > section/, 'child intelligence panels must remain normalized by the workspace shell')
 assert.match(cssSource, /prefers-reduced-motion/, 'workspace visual system must preserve reduced-motion accessibility')
 
-console.log('body intelligence workspace: six progressive-disclosure layers validated with whole-body-first hierarchy, shared visual tokens and non-clinical navigation boundaries')
+const alignmentSource = readFileSync(resolve('src/pages/bodyExposureDesignAlignment.css'), 'utf8')
+for (const globalToken of ['--pmd-black', '--pmd-space', '--pmd-surface', '--pmd-surface-raised', '--pmd-line', '--pmd-radius-2xl', '--pmd-fast', '--pmd-focus']) {
+  assert.ok(alignmentSource.includes(globalToken), `Body Exposure must bridge to global HIG token ${globalToken}`)
+}
+assert.match(alignmentSource, /--be-cyan:\s*77,\s*231,\s*255/, 'Body cyan must match the global Panacea HIG cyan family')
+assert.match(alignmentSource, /--be-violet:\s*156,\s*124,\s*255/, 'Body violet must match the global Panacea HIG violet family')
+assert.match(alignmentSource, /--be-magenta:\s*255,\s*99,\s*216/, 'Body magenta must match the global Panacea HIG magenta family')
+assert.match(alignmentSource, /HIG material hierarchy/i, 'alignment layer must preserve content-vs-control material semantics')
+assert.match(alignmentSource, /var\(--pmd-material/, 'translucent workspace controls must inherit the global HIG control material')
+assert.match(alignmentSource, /var\(--be-surface-2\).*important/s, 'biomedical content panel must use the calmer raised content surface')
+assert.match(alignmentSource, /touch-action:\s*manipulation/, 'direct-manipulation touch semantics must remain enabled')
+assert.match(alignmentSource, /prefers-reduced-motion/, 'HIG alignment must retain reduced-motion behavior')
+
+console.log('body intelligence workspace: six progressive-disclosure layers validated with whole-body-first hierarchy, Panacea HIG token alignment, calm-content/translucent-control materials and non-clinical navigation boundaries')
