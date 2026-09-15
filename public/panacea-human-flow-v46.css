@@ -16,6 +16,10 @@
   --pmd-v46-focus: rgba(111, 190, 255, 0.86);
   --pmd-v46-track: rgba(255, 255, 255, 0.10);
   --pmd-v46-progress: rgba(124, 206, 255, 0.96);
+  --pmd-v46-dashboard-gap: clamp(14px, 2vw, 24px);
+  --pmd-v46-section-gap: clamp(28px, 5vw, 56px);
+  --pmd-v46-card-shadow: 0 16px 46px rgba(0, 0, 0, 0.22), inset 0 1px 0 rgba(255, 255, 255, 0.045);
+  --pmd-v46-card-shadow-hover: 0 22px 62px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(155, 224, 255, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.07);
 }
 
 /* 1. Clean alignment — consistent form rhythm without forcing a redesign. */
@@ -171,6 +175,211 @@
   opacity: 0.78;
 }
 
+/* --------------------------------------------------------------------------
+   Dashboard scan architecture — applies the eight dashboard principles from
+   the supplied reference to the current Home without replacing its visual
+   language or clinical behavior.
+
+   Formula:
+   grid -> hierarchy -> one concept/card -> subtle depth -> full hit area ->
+   view navigation -> strong labels -> progressive detail.
+   -------------------------------------------------------------------------- */
+
+/* 01 · Grid: preserve the responsive columns chosen by React/Tailwind, while
+   enforcing one shared spatial rhythm so dense functionality stays calm. */
+:where(.panacea-liquid-home, [data-pmd-dashboard-scan='true']) :where(.grid, [data-pmd-grid='true']):not(.panacea-liquid-dock) {
+  gap: var(--pmd-v46-dashboard-gap);
+  align-items: stretch;
+}
+
+:where(.panacea-liquid-home, [data-pmd-dashboard-scan='true']) > :where(section, [data-pmd-section]) + :where(section, [data-pmd-section]) {
+  margin-block-start: var(--pmd-v46-section-gap);
+}
+
+/* 02 · Content hierarchy: first-screen health state stays visually dominant;
+   secondary capability groups become quieter rather than competing with it. */
+.panacea-liquid-home > :first-child {
+  position: relative;
+  z-index: 1;
+}
+
+.panacea-liquid-home :where([aria-label='Today health brief']) {
+  box-shadow: 0 26px 84px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(126, 222, 255, 0.045), inset 0 1px 0 rgba(255, 255, 255, 0.055);
+}
+
+.panacea-liquid-home :where([aria-label='Panacea command deck']) {
+  box-shadow: 0 18px 62px rgba(0, 0, 0, 0.24), inset 0 1px 0 rgba(255, 255, 255, 0.04);
+}
+
+/* 03 · Consistency: interactive cards share depth, focus and motion without
+   repainting their existing biomedical-cosmic gradients. */
+:where(.panacea-liquid-home, [data-pmd-dashboard-scan='true']) :where(
+  [data-pmd-card],
+  [data-pmd-concept-card],
+  .pmd-dashboard-card,
+  .grid > a[href][class*='rounded'],
+  .grid > button[class*='rounded']
+) {
+  position: relative;
+  isolation: isolate;
+  box-shadow: var(--pmd-v46-card-shadow);
+  transition: transform 180ms ease, border-color 180ms ease, box-shadow 180ms ease, background-color 180ms ease;
+}
+
+:where(.panacea-liquid-home, [data-pmd-dashboard-scan='true']) :where(
+  [data-pmd-card],
+  [data-pmd-concept-card],
+  .pmd-dashboard-card,
+  .grid > a[href][class*='rounded'],
+  .grid > button[class*='rounded']
+):is(:hover, :focus-visible) {
+  box-shadow: var(--pmd-v46-card-shadow-hover);
+}
+
+/* 04 · Shadows: slight elevation communicates container boundaries. The rule
+   is intentionally restrained; it never adds opaque grey card fills. */
+:where(.panacea-liquid-home, [data-pmd-dashboard-scan='true']) :where(
+  [data-pmd-card],
+  [data-pmd-concept-card],
+  .pmd-dashboard-card
+) {
+  border-color: color-mix(in srgb, currentColor 9%, transparent);
+}
+
+/* 05 · Divide content: one concept per card and one-line scan labels. Detail
+   belongs in the destination, drawer, tooltip or interpretation action. */
+:where(.panacea-liquid-home, [data-pmd-dashboard-scan='true']) :where(
+  [data-pmd-concept-card],
+  .pmd-dashboard-card
+) {
+  min-width: 0;
+  overflow: hidden;
+}
+
+:where(.panacea-liquid-home, [data-pmd-dashboard-scan='true']) :where(
+  [data-pmd-concept-card],
+  .pmd-dashboard-card
+) :where([data-pmd-card-label], .pmd-card-label) {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* 06 · Click area: cards that are themselves links/buttons already expose the
+   full surface as the hit target. Legacy cards can opt in without JS by adding
+   data-pmd-single-action and keeping one link as the only action. */
+:where(.panacea-liquid-home, [data-pmd-dashboard-scan='true']) :where(
+  a[href][data-pmd-card],
+  button[data-pmd-card],
+  .grid > a[href][class*='rounded'],
+  .grid > button[class*='rounded']
+) {
+  min-height: 48px;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+
+[data-pmd-single-action='true'] {
+  position: relative;
+}
+
+[data-pmd-single-action='true'] > a[href]::after,
+[data-pmd-single-action='true'] > button::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  border-radius: inherit;
+}
+
+/* 07 · Navigation: chart/date/view controls stay horizontally reachable on a
+   phone instead of wrapping into a tall control wall. */
+:where([data-pmd-view-nav='true'], [role='tablist'].pmd-dashboard-nav) {
+  display: flex;
+  align-items: center;
+  gap: var(--pmd-v46-gap-2);
+  max-width: 100%;
+  overflow-x: auto;
+  overscroll-behavior-inline: contain;
+  scroll-snap-type: x proximity;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+}
+
+:where([data-pmd-view-nav='true'], [role='tablist'].pmd-dashboard-nav)::-webkit-scrollbar {
+  display: none;
+}
+
+:where([data-pmd-view-nav='true'], [role='tablist'].pmd-dashboard-nav) > * {
+  flex: 0 0 auto;
+  scroll-snap-align: start;
+}
+
+/* Current Home category rail is already functional navigation. Give it the
+   same compact scan behavior without changing its state or routing. */
+.panacea-liquid-home [aria-label='Feature categories'] {
+  scroll-snap-type: x proximity;
+  overscroll-behavior-inline: contain;
+}
+
+.panacea-liquid-home [aria-label='Feature categories'] > button {
+  scroll-snap-align: start;
+}
+
+/* 08 · Labels: section anchors are short, high-contrast and stable. Existing
+   visible labels remain source-of-truth; these rules do not invent medicine. */
+:where(.pmd-dashboard-label, [data-pmd-dashboard-label]) {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  max-width: 100%;
+  margin: 0 0 12px;
+  color: rgba(232, 248, 255, 0.68);
+  font-size: 0.68rem;
+  font-weight: 850;
+  letter-spacing: 0.14em;
+  line-height: 1;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+:where(.pmd-dashboard-label, [data-pmd-dashboard-label])::before {
+  content: '';
+  width: 18px;
+  height: 1px;
+  flex: 0 0 18px;
+  background: linear-gradient(90deg, rgba(95, 219, 255, 0.92), rgba(170, 114, 255, 0.38));
+}
+
+/* The Super Pages rail has an accessible label but no permanent visual title.
+   Render that existing name as a visual anchor and span the whole grid. */
+.panacea-liquid-home [aria-label='Super pages']::before {
+  content: 'Super pages';
+  grid-column: 1 / -1;
+  display: block;
+  margin: 2px 2px -2px;
+  color: rgba(232, 248, 255, 0.52);
+  font-size: 0.64rem;
+  font-weight: 850;
+  letter-spacing: 0.15em;
+  line-height: 1;
+  text-transform: uppercase;
+}
+
+/* Scan performance: strong hierarchy without reducing the generous whitespace
+   requested for Panacea. */
+@media (min-width: 1024px) {
+  .panacea-liquid-home {
+    container-type: inline-size;
+  }
+
+  .panacea-liquid-home [aria-label='Super pages'] > :first-of-type {
+    transform-origin: left center;
+  }
+}
+
 @media (max-width: 768px) {
   :where(form[data-pmd-human-flow='true']) .pmd-primary-cta,
   [data-pmd-primary-action='true'] {
@@ -185,10 +394,47 @@
   [data-pmd-sticky-cta='true'] {
     margin-inline: max(0px, env(safe-area-inset-left)) max(0px, env(safe-area-inset-right));
   }
+
+  :where(.panacea-liquid-home, [data-pmd-dashboard-scan='true']) {
+    --pmd-v46-dashboard-gap: 14px;
+    --pmd-v46-section-gap: 34px;
+  }
+
+  :where(.panacea-liquid-home, [data-pmd-dashboard-scan='true']) :where(
+    [data-pmd-card],
+    [data-pmd-concept-card],
+    .pmd-dashboard-card,
+    .grid > a[href][class*='rounded'],
+    .grid > button[class*='rounded']
+  ):active {
+    transform: scale(0.985);
+  }
+}
+
+@media (hover: hover) and (pointer: fine) {
+  :where(.panacea-liquid-home, [data-pmd-dashboard-scan='true']) :where(
+    [data-pmd-card],
+    [data-pmd-concept-card],
+    .pmd-dashboard-card,
+    .grid > a[href][class*='rounded'],
+    .grid > button[class*='rounded']
+  ):hover {
+    transform: translateY(-2px);
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
   .pmd-progress-value {
+    transition: none !important;
+  }
+
+  :where(.panacea-liquid-home, [data-pmd-dashboard-scan='true']) :where(
+    [data-pmd-card],
+    [data-pmd-concept-card],
+    .pmd-dashboard-card,
+    .grid > a[href][class*='rounded'],
+    .grid > button[class*='rounded']
+  ) {
     transition: none !important;
   }
 }
