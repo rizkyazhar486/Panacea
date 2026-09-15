@@ -3,6 +3,7 @@ import { useSearchParams } from 'react-router-dom'
 import { PanaceaZoneNav } from '../components/PanaceaZoneNav'
 import { FeatureBoulevard } from '../components/FeatureBoulevard'
 import { HomeNowWidget } from '../components/HomeNowWidget'
+import '../styles/home-health-spectrum.css'
 
 const Beranda = lazy(() => import('./Beranda'))
 const Feed = lazy(() => import('./Feed'))
