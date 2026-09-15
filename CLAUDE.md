@@ -41,6 +41,46 @@ so it lives here instead.
 `===` are **data**, not interface. Translating them empties saved layouts and
 silently kills filters with no visible error. Translate the label; leave the key.
 
+## Product architecture: simplicity is permanent
+
+Panaceamed must feel small even when its capability set is very large. Treat this
+as a permanent architecture rule for every UI change.
+
+- The default information architecture is **3 primary super-pages: Home / OS,
+  Clinical, Explore**. Add a fourth only if a truly different mental model cannot
+  be represented cleanly inside those three.
+- Do not create a new page merely because a new feature exists. Merge overlapping
+  functionality, data, APIs and assets into an existing super-page first.
+- Compile features into compact widgets, horizontal rails, carousels, visual
+  states, contextual tabs, expandable panels, drawers, bottom sheets, overlays,
+  motion/3D views, and global search / Ask Panacea.
+- Keep one main vertical scroll and use progressive disclosure. The initial screen
+  should be short, calm and readable; deeper capability appears when requested.
+- Any feature should normally be reachable in **1–2 interactions** from a primary
+  super-page. Rare features may be visually smaller, but not buried deeper.
+- Order the screen by value and urgency: most significant first, less useful or
+  low-frequency capability later or on demand.
+- A new user should understand the application's primary structure in roughly
+  **5–9 minutes**.
+- Educational content can be scientifically deep, but its first layer should use
+  visuals first and minimal text: images, diagrams, charts, animation, video, 3D,
+  simulation and interaction. Reveal detailed explanation/evidence on demand.
+- Never expose internal TODOs, unfinished work, development plans, repository
+  structure, implementation commentary or “what comes next” in public UI unless
+  it is intentionally a public roadmap.
+- Navigation is not sacred. Remove, collapse or replace nav that adds clutter or
+  duplicate paths. Search / command access may be the universal shortcut.
+- Theme/color values come from shared design tokens. Do not invent page-local
+  palettes or arbitrary colors inside components.
+
+The governing equation is simple:
+
+`available capability >> visible complexity`
+
+and prominence should broadly follow:
+
+`value × frequency × urgency × context`
+
 ## Multi-agent coordination — mandatory
 
 This repository is edited concurrently by ChatGPT/Codex, Claude Code, Replit and
