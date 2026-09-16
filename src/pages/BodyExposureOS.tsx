@@ -9,6 +9,7 @@ const AtlasPhysiologyBridgePanel = lazy(() => import('./bodyhub/AtlasPhysiologyB
 const BodySystemDeepDiveWorkspace = lazy(() => import('./bodyhub/BodySystemDeepDiveWorkspace'))
 const PathophysiologyNetworkPanel = lazy(() => import('./bodyhub/PathophysiologyNetworkPanel'))
 const PharmacologyMechanismPanel = lazy(() => import('./bodyhub/PharmacologyMechanismPanel'))
+const MechanismCausalBridgePanel = lazy(() => import('./bodyhub/MechanismCausalBridgePanel'))
 
 type ExposureMode = 'atlas' | 'physiology' | 'imaging' | 'surgery' | 'molecular' | 'clinical'
 
@@ -108,6 +109,7 @@ export function BodyExposureOS() {
               <span className="rounded-full border border-violet-300/10 bg-violet-300/[.045] px-2.5 py-1 text-[9px] font-black uppercase tracking-[.14em] text-violet-100/65">11-system source atlas</span>
               <span className="rounded-full border border-rose-300/10 bg-rose-300/[.045] px-2.5 py-1 text-[9px] font-black uppercase tracking-[.14em] text-rose-100/65">pathophysiology network</span>
               <span className="rounded-full border border-cyan-300/10 bg-cyan-300/[.045] px-2.5 py-1 text-[9px] font-black uppercase tracking-[.14em] text-cyan-100/65">pharmacology mechanisms</span>
+              <span className="rounded-full border border-fuchsia-300/10 bg-fuchsia-300/[.04] px-2.5 py-1 text-[9px] font-black uppercase tracking-[.14em] text-fuchsia-100/65">causal bridge</span>
             </div>
             <h2 id="body-exposure-os-title" className="mt-2 max-w-3xl text-2xl font-black tracking-[-.035em] text-white sm:text-3xl lg:text-4xl">
               One body. Every scale. One continuous learning space.
@@ -213,6 +215,12 @@ export function BodyExposureOS() {
       <div className="relative z-[2] mt-3">
         <Suspense fallback={<div className="grid min-h-44 place-items-center rounded-[28px] border border-white/[.08] bg-black/35 text-xs font-bold text-white/35">Loading pharmacology mechanism network…</div>}>
           <PharmacologyMechanismPanel selectedAtlasSystemId={selectedBodySystemId} />
+        </Suspense>
+      </div>
+
+      <div className="relative z-[2] mt-3">
+        <Suspense fallback={<div className="grid min-h-44 place-items-center rounded-[28px] border border-white/[.08] bg-black/35 text-xs font-bold text-white/35">Loading disease-mechanism causal bridge…</div>}>
+          <MechanismCausalBridgePanel />
         </Suspense>
       </div>
 
