@@ -1,6 +1,8 @@
 import { motion } from 'framer-motion'
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useState, type ReactNode } from 'react'
 import { Link } from 'react-router-dom'
+import { useStore } from '../lib/store'
+import { useLongitudinalClinicalBridge } from '../lib/useLongitudinalClinicalBridge'
 import {
   persistLongitudinalHandoff,
   readLongitudinalSignals,
@@ -39,11 +41,11 @@ function timeLabel(value: string | null) {
   return `${Math.round(hours / 24)}d`
 }
 
-function Handoff({ to, target, children }: { to: string; target: 'chatbot' | 'emr' | 'care'; children: React.ReactNode }) {
+function Handoff({ to, target, subjectId, children }: { to: string; target: 'chatbot' | 'emr' | 'care'; subjectId: string; children: ReactNode }) {
   return (
     <Link
       to={to}
-      onClick={() => persistLongitudinalHandoff(target)}
+      onClick={() => persistLongitudinalHandoff(target, subjectId)}
       className="grid min-h-[40px] place-items-center rounded-[13px] border border-white/[.08] bg-white/[.025] px-3 text-[9px] font-black text-white/58 transition hover:border-cyan-200/25 hover:bg-cyan-200/[.06] hover:text-white"
     >
       {children}
@@ -52,9 +54,15 @@ function Handoff({ to, target, children }: { to: string; target: 'chatbot' | 'em
 }
 
 export function LongitudinalStateRibbon({ className = '', title = 'Longitudinal state', showHandoffs = true }: LongitudinalStateRibbonProps) {
-  const [signals, setSignals] = useState<LongitudinalSignal[]>(() => readLongitudinalSignals())
+  const { activePatient } = useStore()
+  useLongitudinalClinicalBridge()
+  const [signals, setSignals] = useState<LongitudinalSignal[]>(() => readLongitudinalSignals(activePatient.id))
 
-  useEffect(() => subscribeLongitudinalState(() => setSignals(readLongitudinalSignals())), [])
+  useEffect(() => {
+    const refresh = () => setSignals(readLongitudinalSignals(activePatient.id))
+    refresh()
+    return subscribeLongitudinalState(refresh)
+  }, [activePatient.id])
 
   const summary = useMemo(() => summarizeLongitudinalState(signals), [signals])
   const maxCount = Math.max(1, ...summary.domains.map((domain) => domain.count))
@@ -67,7 +75,7 @@ export function LongitudinalStateRibbon({ className = '', title = 'Longitudinal 
 
       <div className="relative flex items-center justify-between gap-3">
         <div className="min-w-0">
-          <div className="truncate text-[9px] font-black uppercase tracking-[.16em] text-cyan-100/42">Patient state · live contract</div>
+          <div className="truncate text-[9px] font-black uppercase tracking-[.16em] text-cyan-100/42">Patient state · {activePatient.name}</div>
           <strong className="mt-1 block truncate text-sm">{title}</strong>
         </div>
         <div className="shrink-0 text-right">
@@ -79,7 +87,7 @@ export function LongitudinalStateRibbon({ className = '', title = 'Longitudinal 
       <div className="relative mt-4 grid grid-cols-4 gap-2">
         <div className="rounded-[14px] border border-white/[.06] bg-black/20 px-2.5 py-2.5"><div className="truncate text-[8px] font-black uppercase tracking-[.12em] text-white/30">Domains</div><strong className="mt-1 block text-lg tabular-nums">{summary.domainCount}/8</strong></div>
         <div className="rounded-[14px] border border-white/[.06] bg-black/20 px-2.5 py-2.5"><div className="truncate text-[8px] font-black uppercase tracking-[.12em] text-white/30">Sources</div><strong className="mt-1 block text-lg tabular-nums">{summary.sourceCount}</strong></div>
-        <div className="rounded-[14px] border border-white/[.06] bg-black/20 px-2.5 py-2.5"><div className="truncate text-[8px] font-black uppercase tracking-[.12em] text-white/30">Confidence</div><strong className="mt-1 block text-lg tabular-nums">{confidence}%</strong></div>
+        <div className="rounded-[14px] border border-white/[.06] bg-black/20 px-2.5 py-2.5"><div className="truncate text-[8px] font-black uppercase tracking-[.12em] text-white/30">Fidelity</div><strong className="mt-1 block text-lg tabular-nums">{confidence}%</strong></div>
         <div className="rounded-[14px] border border-white/[.06] bg-black/20 px-2.5 py-2.5"><div className="truncate text-[8px] font-black uppercase tracking-[.12em] text-white/30">Updated</div><strong className="mt-1 block text-lg tabular-nums">{timeLabel(summary.lastMeasuredAt)}</strong></div>
       </div>
 
@@ -100,14 +108,14 @@ export function LongitudinalStateRibbon({ className = '', title = 'Longitudinal 
 
       <div className="relative mt-4 flex items-center justify-between gap-3 text-[8px] font-black uppercase tracking-[.1em] text-white/28">
         <span className="truncate">24h {summary.recentCount} · consent {consentCoverage}%</span>
-        <span className="shrink-0">provenance + time + uncertainty</span>
+        <span className="shrink-0">patient-scoped · provenance · time</span>
       </div>
 
       {showHandoffs ? (
         <div className="relative mt-3 grid grid-cols-3 gap-2">
-          <Handoff to="/chatbot" target="chatbot">Ask with context</Handoff>
-          <Handoff to="/emr" target="emr">Open AI-EMR</Handoff>
-          <Handoff to="/care-episode" target="care">Open Care</Handoff>
+          <Handoff to="/chatbot" target="chatbot" subjectId={activePatient.id}>Ask with context</Handoff>
+          <Handoff to="/emr" target="emr" subjectId={activePatient.id}>Open AI-EMR</Handoff>
+          <Handoff to="/care-episode" target="care" subjectId={activePatient.id}>Open Care</Handoff>
         </div>
       ) : null}
     </section>
