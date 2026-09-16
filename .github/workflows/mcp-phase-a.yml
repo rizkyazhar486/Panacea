@@ -1,0 +1,34 @@
+name: MCP Phase A
+
+on:
+  pull_request:
+    paths:
+      - 'server/src/mcp/**'
+      - 'server/uji/mcp*.uji.ts'
+      - 'server/package.json'
+      - 'server/package-lock.json'
+      - '.github/workflows/mcp-phase-a.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  targeted:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    defaults:
+      run:
+        working-directory: server
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: npm
+          cache-dependency-path: server/package-lock.json
+      - name: Install server dependencies
+        run: npm ci
+      - name: MCP kernel contract
+        run: npx tsx uji/mcpCore.uji.ts
