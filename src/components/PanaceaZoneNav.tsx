@@ -5,7 +5,7 @@ import { LogoMark } from './Logo'
 const ZONES = [
   { to: '/fitness-hub', label: 'Your Body' },
   { to: '/clinical-hub', label: 'Clinical' },
-  { to: '/for-you', label: 'For You' },
+  { to: '/?t=for-you', label: 'For You' },
 ]
 
 export function PanaceaZoneNav() {
