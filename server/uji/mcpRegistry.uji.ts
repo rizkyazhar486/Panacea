@@ -2,6 +2,7 @@
 // Registry adalah satu-satunya pintu dispatch: policy, batas payload, dan transport
 // harus diperiksa sebelum handler apa pun dijalankan.
 
+import { readFileSync } from 'node:fs'
 import { createPanaceaToolRegistry } from '../src/mcp/registry.js'
 import { executePanaceaTool } from '../src/mcp/tools.js'
 
@@ -76,6 +77,12 @@ const qaPlanNoRoot = await executePanaceaTool(
   { transport: 'stdio', requestId: 'plan-no-root' },
 )
 ok('QA plan tanpa host repoRoot ditolak', !qaPlanNoRoot.ok && qaPlanNoRoot.error.code === 'invalid_input')
+
+const readme = readFileSync(new URL('../src/mcp/README.md', import.meta.url), 'utf8')
+ok('README menyatakan remote MCP default off', readme.includes('Remote MCP is disabled by default'))
+ok('README menyatakan tidak ada patient-record retrieval', readme.includes('No patient-record retrieval'))
+ok('README menyatakan tidak ada arbitrary shell', readme.includes('No arbitrary shell'))
+ok('README menyatakan tidak ada direct push main', readme.includes('No direct push to main'))
 
 console.log(`\n${lulus} lulus, ${gagal} gagal`)
 if (gagal) process.exit(1)
