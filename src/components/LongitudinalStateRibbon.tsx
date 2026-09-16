@@ -3,6 +3,7 @@ import { useEffect, useMemo, useState, type ReactNode } from 'react'
 import { Link } from 'react-router-dom'
 import { useStore } from '../lib/store'
 import { useLongitudinalClinicalBridge } from '../lib/useLongitudinalClinicalBridge'
+import { deriveLongitudinalActions } from '../lib/longitudinalActionEngine'
 import { LongitudinalTrendRail } from './LongitudinalTrendRail'
 import {
   persistLongitudinalHandoff,
@@ -66,6 +67,7 @@ export function LongitudinalStateRibbon({ className = '', title = 'Longitudinal 
   }, [activePatient.id])
 
   const summary = useMemo(() => summarizeLongitudinalState(signals), [signals])
+  const actions = useMemo(() => deriveLongitudinalActions(signals), [signals])
   const maxCount = Math.max(1, ...summary.domains.map((domain) => domain.count))
   const fidelity = Math.round(summary.meanConfidence * 100)
   const consentCoverage = summary.signalCount ? Math.round((summary.consentedCount / summary.signalCount) * 100) : 0
@@ -108,6 +110,14 @@ export function LongitudinalStateRibbon({ className = '', title = 'Longitudinal 
       </div>
 
       <LongitudinalTrendRail signals={signals} />
+
+      {actions.length ? (
+        <div className="no-scrollbar relative mt-3 flex gap-2 overflow-x-auto pb-1" aria-label="Contextual data actions">
+          {actions.map((action) => (
+            <Link key={action.id} to={action.route} className="shrink-0 rounded-full border border-white/[.07] bg-white/[.025] px-3 py-2 text-[8px] font-black uppercase tracking-[.08em] text-white/46 transition hover:border-cyan-200/20 hover:bg-cyan-200/[.05] hover:text-white/80">{action.label}</Link>
+          ))}
+        </div>
+      ) : null}
 
       <div className="relative mt-4 flex items-center justify-between gap-3 text-[8px] font-black uppercase tracking-[.1em] text-white/28">
         <span className="truncate">24h {summary.recentCount} · consent {consentCoverage}%</span>
