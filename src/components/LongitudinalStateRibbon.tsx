@@ -3,6 +3,7 @@ import { useEffect, useMemo, useState, type ReactNode } from 'react'
 import { Link } from 'react-router-dom'
 import { useStore } from '../lib/store'
 import { useLongitudinalClinicalBridge } from '../lib/useLongitudinalClinicalBridge'
+import { LongitudinalTrendRail } from './LongitudinalTrendRail'
 import {
   persistLongitudinalHandoff,
   readLongitudinalSignals,
@@ -66,7 +67,7 @@ export function LongitudinalStateRibbon({ className = '', title = 'Longitudinal 
 
   const summary = useMemo(() => summarizeLongitudinalState(signals), [signals])
   const maxCount = Math.max(1, ...summary.domains.map((domain) => domain.count))
-  const confidence = Math.round(summary.meanConfidence * 100)
+  const fidelity = Math.round(summary.meanConfidence * 100)
   const consentCoverage = summary.signalCount ? Math.round((summary.consentedCount / summary.signalCount) * 100) : 0
 
   return (
@@ -87,7 +88,7 @@ export function LongitudinalStateRibbon({ className = '', title = 'Longitudinal 
       <div className="relative mt-4 grid grid-cols-4 gap-2">
         <div className="rounded-[14px] border border-white/[.06] bg-black/20 px-2.5 py-2.5"><div className="truncate text-[8px] font-black uppercase tracking-[.12em] text-white/30">Domains</div><strong className="mt-1 block text-lg tabular-nums">{summary.domainCount}/8</strong></div>
         <div className="rounded-[14px] border border-white/[.06] bg-black/20 px-2.5 py-2.5"><div className="truncate text-[8px] font-black uppercase tracking-[.12em] text-white/30">Sources</div><strong className="mt-1 block text-lg tabular-nums">{summary.sourceCount}</strong></div>
-        <div className="rounded-[14px] border border-white/[.06] bg-black/20 px-2.5 py-2.5"><div className="truncate text-[8px] font-black uppercase tracking-[.12em] text-white/30">Fidelity</div><strong className="mt-1 block text-lg tabular-nums">{confidence}%</strong></div>
+        <div className="rounded-[14px] border border-white/[.06] bg-black/20 px-2.5 py-2.5"><div className="truncate text-[8px] font-black uppercase tracking-[.12em] text-white/30">Fidelity</div><strong className="mt-1 block text-lg tabular-nums">{fidelity}%</strong></div>
         <div className="rounded-[14px] border border-white/[.06] bg-black/20 px-2.5 py-2.5"><div className="truncate text-[8px] font-black uppercase tracking-[.12em] text-white/30">Updated</div><strong className="mt-1 block text-lg tabular-nums">{timeLabel(summary.lastMeasuredAt)}</strong></div>
       </div>
 
@@ -105,6 +106,8 @@ export function LongitudinalStateRibbon({ className = '', title = 'Longitudinal 
           )
         })}
       </div>
+
+      <LongitudinalTrendRail signals={signals} />
 
       <div className="relative mt-4 flex items-center justify-between gap-3 text-[8px] font-black uppercase tracking-[.1em] text-white/28">
         <span className="truncate">24h {summary.recentCount} · consent {consentCoverage}%</span>
