@@ -1,6 +1,7 @@
 import { AnimatePresence, motion } from 'framer-motion'
 import { useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
+import { LongitudinalStateRibbon } from '../components/LongitudinalStateRibbon'
 import { PanaceaZoneNav } from '../components/PanaceaZoneNav'
 import { SuperPageCapabilityRail } from '../components/SuperPageCapabilityRail'
 
@@ -83,6 +84,8 @@ export function ClinicalHub() {
           </div>
           <span className="shrink-0 rounded-full border border-emerald-300/15 bg-emerald-300/[.06] px-3 py-1.5 text-[9px] font-black text-emerald-200/80">clinician-in-loop</span>
         </header>
+
+        <LongitudinalStateRibbon className="relative mb-4" title="Clinical context stream" />
 
         <div className="relative grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
           <Card className="xl:col-span-2">
