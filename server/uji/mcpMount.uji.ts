@@ -1,8 +1,9 @@
 // Uji mount MCP ke backend Express tanpa menjalankan seluruh server produksi.
-// Kontrak: /api/mcp tetap default-off, config remote fail-closed, dan bearer
-// auth tetap menjadi boundary sebelum request mencapai transport MCP.
+// Kontrak: /api/mcp tetap default-off, config remote fail-closed, bearer auth
+// menjadi boundary, dan wiring produksi tetap berada di belakang global limiter.
 
 import { once } from 'node:events'
+import { readFileSync } from 'node:fs'
 import { createServer } from 'node:http'
 import type { AddressInfo } from 'node:net'
 import express from 'express'
@@ -83,6 +84,19 @@ const initialized = await requestMounted(
 )
 ok('backend mount bearer benar mencapai initialize', initialized.status === 200, initialized.body)
 ok('backend mount initialize menyebut Panaceamed MCP', initialized.body.includes('panaceamed-mcp'), initialized.body)
+
+const backendSource = readFileSync(new URL('../src/index.ts', import.meta.url), 'utf8')
+const limiterPosition = backendSource.indexOf("app.use('/api', globalLimiter)")
+const mountPosition = backendSource.indexOf('mountHttpMcp(app)')
+ok(
+  'backend produksi mengimpor mount MCP',
+  backendSource.includes("import { mountHttpMcp } from './mcp/mount.js'"),
+)
+ok(
+  'backend produksi memasang MCP setelah global limiter',
+  limiterPosition >= 0 && mountPosition > limiterPosition,
+  `limiter=${limiterPosition}, mount=${mountPosition}`,
+)
 
 console.log(`\n${lulus} lulus, ${gagal} gagal`)
 if (gagal) process.exit(1)
