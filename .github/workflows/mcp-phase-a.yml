@@ -36,3 +36,5 @@ jobs:
         run: npx tsx uji/mcpOrchestration.uji.ts
       - name: MCP repository QA contract
         run: npx tsx uji/mcpRepoQa.uji.ts
+      - name: MCP tool registry contract
+        run: npx tsx uji/mcpRegistry.uji.ts
