@@ -1,3 +1,4 @@
+import { LongitudinalStateRibbon } from '../components/LongitudinalStateRibbon'
 import { UnifiedBodyWorkspace } from './UnifiedBodyWorkspace'
 
 // Search-catalog compatibility for PencarianGlobal. FitnessHub is now a unified
@@ -22,7 +23,12 @@ export const GROUPS = [
 ]
 
 export function FitnessHub() {
-  return <UnifiedBodyWorkspace />
+  return (
+    <div className="space-y-5">
+      <LongitudinalStateRibbon title="Your Body state stream" />
+      <UnifiedBodyWorkspace />
+    </div>
+  )
 }
 
 export default FitnessHub
