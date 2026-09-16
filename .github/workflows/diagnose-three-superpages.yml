@@ -18,49 +18,24 @@ jobs:
           node-version: 24
           cache: npm
       - run: npm ci
-      - name: Capture production build output
-        shell: bash
-        run: |
-          set +e
-          npm run build > /tmp/panacea-build.log 2>&1
-          echo "$?" > /tmp/panacea-build-exit
-          exit 0
-      - name: Marker · note index drift
+      - name: Stage · note index
         continue-on-error: true
-        run: "! grep -q 'skdiDiseaseNoteIndex.ts is stale' /tmp/panacea-build.log"
-      - name: Marker · source registry
+        run: node scripts/gen-note-index.mjs --check
+      - name: Stage · source registry
         continue-on-error: true
-        run: "! grep -q 'Source registry validation failed' /tmp/panacea-build.log"
-      - name: Marker · feature factory
+        run: node scripts/validate-source-registry.mjs
+      - name: Stage · feature factory
         continue-on-error: true
-        run: "! grep -q 'Feature Factory validation failed' /tmp/panacea-build.log"
-      - name: Marker · academic accuracy
+        run: node scripts/validate-feature-factory.mjs
+      - name: Stage · academic review
         continue-on-error: true
-        run: "! grep -q 'Academic Accuracy Gate failed' /tmp/panacea-build.log"
-      - name: Marker · node QA test
+        run: node scripts/validate-academic-review.mjs
+      - name: Stage · embedded build QA
         continue-on-error: true
-        run: "! grep -Eq '(^|[[:space:]])not ok([[:space:]]|$)' /tmp/panacea-build.log"
-      - name: Marker · TypeScript
+        run: node --test scripts/qa/source-registry-validator.test.mjs scripts/qa/feature-factory.test.mjs scripts/qa/academic-review-gate.test.mjs scripts/qa/home-widget-theme.test.mjs scripts/qa/compact-product-surface.test.mjs
+      - name: Stage · TypeScript
         continue-on-error: true
-        run: "! grep -q 'error TS' /tmp/panacea-build.log"
-      - name: TS file · FeatureBoulevard
+        run: npx tsc -b
+      - name: Stage · Vite
         continue-on-error: true
-        run: "! grep -q 'src/components/FeatureBoulevard.tsx' /tmp/panacea-build.log"
-      - name: TS file · PanaceaZoneNav
-        continue-on-error: true
-        run: "! grep -q 'src/components/PanaceaZoneNav.tsx' /tmp/panacea-build.log"
-      - name: TS file · ClinicalHub
-        continue-on-error: true
-        run: "! grep -q 'src/pages/ClinicalHub.tsx' /tmp/panacea-build.log"
-      - name: TS file · ForYouWorkspace
-        continue-on-error: true
-        run: "! grep -q 'src/pages/ForYouWorkspace.tsx' /tmp/panacea-build.log"
-      - name: TS file · HomeSocialWorkspace
-        continue-on-error: true
-        run: "! grep -q 'src/pages/HomeSocialWorkspace.tsx' /tmp/panacea-build.log"
-      - name: Marker · Vite
-        continue-on-error: true
-        run: "! grep -Eq 'vite.*(error|failed)|Build failed|RollupError' /tmp/panacea-build.log"
-      - name: Build command success
-        continue-on-error: true
-        run: test "$(cat /tmp/panacea-build-exit)" -eq 0
+        run: npx vite build
