@@ -48,16 +48,27 @@ export function BodyExposureOS() {
   useLayoutEffect(() => {
     // Body Exposure owns a dense anatomy/physiology interaction model. The later
     // global liquid-action material pass overrides those controls through an
-    // html-level selector. Suspend it before first paint so the validated Body
-    // material never flashes through the generic control skin during navigation.
+    // html-level selector. Suspend it before first paint and keep it suspended
+    // while mounted, even if a global runtime tries to re-assert the class.
     const html = document.documentElement
-    const hadLiquidActions = html.classList.contains(LIQUID_ACTIONS_ROOT_CLASS)
+    let restoreLiquidActions = html.classList.contains(LIQUID_ACTIONS_ROOT_CLASS)
+
+    const suppressGlobalControlSkin = () => {
+      if (!html.classList.contains(LIQUID_ACTIONS_ROOT_CLASS)) return
+      restoreLiquidActions = true
+      html.classList.remove(LIQUID_ACTIONS_ROOT_CLASS)
+    }
+
     html.classList.add(BODY_EXPOSURE_ROOT_CLASS)
-    html.classList.remove(LIQUID_ACTIONS_ROOT_CLASS)
+    suppressGlobalControlSkin()
+
+    const classObserver = new MutationObserver(suppressGlobalControlSkin)
+    classObserver.observe(html, { attributes: true, attributeFilter: ['class'] })
 
     return () => {
+      classObserver.disconnect()
       html.classList.remove(BODY_EXPOSURE_ROOT_CLASS)
-      if (hadLiquidActions) html.classList.add(LIQUID_ACTIONS_ROOT_CLASS)
+      if (restoreLiquidActions) html.classList.add(LIQUID_ACTIONS_ROOT_CLASS)
     }
   }, [])
 
