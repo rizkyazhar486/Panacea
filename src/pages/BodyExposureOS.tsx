@@ -1,6 +1,5 @@
 import { lazy, Suspense, useEffect, useLayoutEffect, useRef, useState } from 'react'
 import type { BodySystemId } from '../lib/bodySystemSourceWave'
-import { resolveBodySystemIdFromAtlasLabel } from '../lib/bodySystemPhysiologyBridge'
 import { BodyExplorer } from './BodyExplorer'
 import './bodyExposureOS.css'
 
@@ -103,13 +102,6 @@ export function BodyExposureOS() {
     } catch {
       // Fullscreen is progressive enhancement. Body Exposure remains fully usable when a browser blocks it.
     }
-  }
-
-  function captureSystemAtlasSelection(event: React.MouseEvent<HTMLDivElement>) {
-    const button = (event.target as HTMLElement).closest<HTMLButtonElement>('button[role="tab"]')
-    if (!button) return
-    const systemId = resolveBodySystemIdFromAtlasLabel(button.textContent)
-    if (systemId) setSelectedBodySystemId(systemId)
   }
 
   function captureExplorerSelection(event: React.MouseEvent<HTMLDivElement>) {
@@ -223,9 +215,9 @@ export function BodyExposureOS() {
         <span className="hidden shrink-0 sm:inline">Educational atlas · not a patient-specific diagnosis</span>
       </div>
 
-      <div ref={systemsRef} onClickCapture={captureSystemAtlasSelection} className="relative z-[2] mt-3 scroll-mt-4">
+      <div ref={systemsRef} className="relative z-[2] mt-3 scroll-mt-4">
         <Suspense fallback={<div className="grid min-h-44 place-items-center rounded-[26px] border border-white/[.08] bg-black/35 text-xs font-bold text-white/35">Loading system atlas…</div>}>
-          <BodyAllSystems3D />
+          <BodyAllSystems3D selectedSystemId={selectedBodySystemId} onSystemChange={setSelectedBodySystemId} />
         </Suspense>
       </div>
 
