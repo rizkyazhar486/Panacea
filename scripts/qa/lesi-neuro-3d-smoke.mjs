@@ -30,6 +30,19 @@ page.setDefaultTimeout(60_000)
 const pageErrors = []
 page.on('pageerror', (e) => pageErrors.push(e.message))
 
+async function tutupInterpretasiJikaTerbuka() {
+  const dialog = page.locator('#pmd-context-dialog[open]')
+  if (await dialog.count() === 0) return
+
+  const tutup = dialog.getByRole('button', { name: 'Close interpretation' })
+  if (await tutup.count() === 0) {
+    throw new Error('Interpretation terbuka tetapi tombol tutup aksesibel tidak ditemukan')
+  }
+
+  await tutup.click()
+  await page.waitForFunction(() => !document.querySelector('#pmd-context-dialog')?.hasAttribute('open'))
+}
+
 let gagal = null
 try {
   await page.goto(url, { waitUntil: 'networkidle' })
@@ -62,12 +75,16 @@ try {
   if (awal !== '0') throw new Error(`Tanpa temuan harus nol sorotan, dapat ${awal}`)
 
   // Kasus terpandu menjalankan model penalarannya sampai ke sebuah tempat.
+  // Visual-first dapat membuka modal Interpretation dari teks konteks klinis.
+  // Tutup modal tersebut melalui kontrol aksesibelnya sebelum berpindah kasus,
+  // sebagaimana alur pengguna sebenarnya; jangan memaksa klik menembus modal.
   const kasus = page.getByRole('button', { name: /^Case \d/ })
   const jumlahKasus = await kasus.count()
   if (jumlahKasus === 0) throw new Error('Tidak ada kasus terpandu untuk dijalankan')
 
   let pernahMenyala = false
   for (let i = 0; i < jumlahKasus; i += 1) {
+    await tutupInterpretasiJikaTerbuka()
     await kasus.nth(i).click()
     await page.waitForTimeout(1200)
     const sorot = Number(await canvas.evaluate((n) => n.dataset.mesSorot ?? '-1'))
@@ -80,6 +97,7 @@ try {
         throw new Error('Tidak ada yang disorot dan tidak ada penjelasan yang ditampilkan')
       }
     }
+    await tutupInterpretasiJikaTerbuka()
   }
   if (!pernahMenyala) throw new Error('Tidak ada satu pun kasus yang menyalakan struktur')
 

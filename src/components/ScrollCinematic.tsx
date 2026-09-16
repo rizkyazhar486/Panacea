@@ -1,334 +1,288 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState, type PointerEvent, type RefObject } from 'react'
 
-// Scroll-driven cinematic sequence for the landing page hero region — the
-// live implementation of the Remotion concept video (sunrise → vitality →
-// science → longevity). A tall (400vh) track holds a `sticky` viewport;
-// scrolling through the track advances a 0..1 progress value that drives
-// each act's opacity/parallax via direct style writes (no re-render per
-// scroll frame, so it stays smooth on mobile).
+/**
+ * Exploded-human cinematic for the public landing page.
+ * A single persistent figure changes state while the viewport is pinned:
+ * whole body → exploded anatomy → connected systems → unified health state.
+ * SVG/CSS keeps the first load light and preserves a reduced-motion fallback.
+ */
 const ACTS = [
-  { key: 'hero', label: 'Start' },
-  { key: 'vitality', label: 'Vitality' },
-  { key: 'science', label: 'Science' },
-  { key: 'longevity', label: 'Longevity' },
+  { key: 'whole', label: 'Whole Body', eyebrow: 'YOUR BODY', title: 'One body. Every layer.' },
+  { key: 'exploded', label: 'Exploded Anatomy', eyebrow: 'EXPLORE', title: 'See what lives beneath.' },
+  { key: 'systems', label: 'Connected Systems', eyebrow: 'UNDERSTAND', title: 'Systems move together.' },
+  { key: 'unified', label: 'Longitudinal State', eyebrow: 'PANACEAMED', title: 'One continuous health state.' },
 ] as const
+
+type Stage = (typeof ACTS)[number]['key']
 
 function clamp01(n: number) {
   return Math.min(1, Math.max(0, n))
 }
 
 export function ScrollCinematic() {
-  const trackRef = useRef<HTMLDivElement | null>(null)
+  const trackRef = useRef<HTMLDivElement>(null)
+  const sceneRef = useRef<HTMLDivElement>(null)
   const actRefs = useRef<(HTMLDivElement | null)[]>([])
   const dotRefs = useRef<(HTMLSpanElement | null)[]>([])
   const [reduced, setReduced] = useState(false)
 
   useEffect(() => {
-    setReduced(document.documentElement.classList.contains('reduce-motion'))
+    const media = window.matchMedia('(prefers-reduced-motion: reduce)')
+    const sync = () => setReduced(document.documentElement.classList.contains('reduce-motion') || media.matches)
+    sync()
+    media.addEventListener?.('change', sync)
+    return () => media.removeEventListener?.('change', sync)
   }, [])
 
   useEffect(() => {
     if (reduced) return
     let raf = 0
-    const onScroll = () => {
+    const update = () => {
       if (raf) return
       raf = requestAnimationFrame(() => {
         raf = 0
         const track = trackRef.current
-        if (!track) return
+        const scene = sceneRef.current
+        if (!track || !scene) return
+
         const rect = track.getBoundingClientRect()
         const total = rect.height - window.innerHeight
         const progress = total > 0 ? clamp01(-rect.top / total) : 0
+        const stageIndex = Math.min(ACTS.length - 1, Math.floor(progress * ACTS.length))
+        scene.dataset.stage = ACTS[stageIndex].key
+        scene.style.setProperty('--cinematic-progress', String(progress))
 
         ACTS.forEach((_, i) => {
-          const el = actRefs.current[i]
+          const copy = actRefs.current[i]
           const dot = dotRefs.current[i]
-          if (!el) return
-          const start = i / ACTS.length
-          const end = (i + 1) / ACTS.length
-          const local = clamp01((progress - start) / (end - start))
-          const isFirst = i === 0
-          const isLast = i === ACTS.length - 1
-          let opacity: number
-          if (!isFirst && local < 0.18) opacity = local / 0.18
-          else if (!isLast && local > 0.82) opacity = (1 - local) / 0.18
-          else opacity = 1
-          const translateY = (1 - opacity) * 36
-          el.style.opacity = String(opacity)
-          el.style.transform = `translateY(${translateY}px)`
-          el.style.pointerEvents = opacity > 0.5 ? 'auto' : 'none'
+          if (!copy) return
+          const center = (i + 0.5) / ACTS.length
+          const distance = Math.abs(progress - center)
+          const opacity = clamp01(1 - distance / 0.16)
+          copy.style.opacity = String(opacity)
+          copy.style.transform = `translate3d(0, ${(center - progress) * 105}px, 0)`
           if (dot) {
-            dot.style.opacity = opacity > 0.3 ? '1' : '0.35'
-            dot.style.transform = opacity > 0.3 ? 'scale(1.35)' : 'scale(1)'
+            dot.style.opacity = i === stageIndex ? '1' : '0.28'
+            dot.style.transform = i === stageIndex ? 'scale(1.5)' : 'scale(1)'
           }
         })
       })
     }
-    onScroll()
-    window.addEventListener('scroll', onScroll, { passive: true })
-    window.addEventListener('resize', onScroll)
+
+    update()
+    window.addEventListener('scroll', update, { passive: true })
+    window.addEventListener('resize', update)
     return () => {
-      window.removeEventListener('scroll', onScroll)
-      window.removeEventListener('resize', onScroll)
+      window.removeEventListener('scroll', update)
+      window.removeEventListener('resize', update)
       if (raf) cancelAnimationFrame(raf)
     }
   }, [reduced])
 
-  // Reduced-motion / no-JS-scroll fallback: just stack the acts normally,
-  // no pinning, no opacity tricks — everyone still sees all 4 beats.
   if (reduced) {
     return (
-      <div className="space-y-4 px-6 py-16 sm:px-10">
-        <ActHero />
-        <ActVitality />
-        <ActScience />
-        <ActLongevity />
-      </div>
+      <section className="anatomy-cinematic relative h-[760px] overflow-hidden bg-[#02050a] text-white" aria-label="Human body overview">
+        <AnatomyScene stage="exploded" reduced />
+        <div className="pointer-events-none absolute inset-x-5 top-12 z-20 text-center">
+          <p className="text-[9px] font-bold uppercase tracking-[0.32em] text-cyan-100/70">PANACEAMED · YOUR BODY</p>
+          <h2 className="mt-2 text-3xl font-black tracking-[-0.05em] sm:text-5xl">One body. Every layer.</h2>
+        </div>
+      </section>
     )
   }
 
   return (
-    <div ref={trackRef} className="relative" style={{ height: '400vh' }}>
-      <div className="sticky top-0 h-screen overflow-hidden">
-        {ACTS.map((a, i) => (
-          <div
-            key={a.key}
-            ref={(el) => { actRefs.current[i] = el }}
-            className="absolute inset-0"
-            style={{ opacity: i === 0 ? 1 : 0, willChange: 'opacity, transform' }}
-          >
-            {a.key === 'hero' && <ActHero />}
-            {a.key === 'vitality' && <ActVitality />}
-            {a.key === 'science' && <ActScience />}
-            {a.key === 'longevity' && <ActLongevity />}
-          </div>
-        ))}
+    <section ref={trackRef} className="anatomy-cinematic relative" style={{ height: '360vh' }} aria-label="Interactive human anatomy cinematic">
+      <div className="sticky top-0 h-[100svh] overflow-hidden bg-[#02050a] text-white">
+        <AnatomyScene stage="whole" sceneRef={sceneRef} />
 
-        {/* Progress rail — mirrors the 4-act structure so scroll depth is legible */}
-        <div className="pointer-events-none absolute right-4 top-1/2 z-20 flex -translate-y-1/2 flex-col items-center gap-3 sm:right-8">
-          {ACTS.map((a, i) => (
+        <div className="pointer-events-none absolute inset-0 z-20">
+          {ACTS.map((act, i) => (
+            <div
+              key={act.key}
+              ref={(el) => { actRefs.current[i] = el }}
+              className="absolute inset-x-5 top-[9svh] text-center sm:inset-x-10 sm:top-[10svh]"
+              style={{ opacity: i === 0 ? 1 : 0, willChange: 'opacity, transform' }}
+            >
+              <p className="text-[9px] font-bold uppercase tracking-[0.32em] text-cyan-100/70 sm:text-[10px]">{act.eyebrow}</p>
+              <h2 className="mt-2 text-[clamp(1.7rem,5vw,4.3rem)] font-black leading-none tracking-[-0.055em] text-white">{act.title}</h2>
+            </div>
+          ))}
+        </div>
+
+        <div className="pointer-events-none absolute right-4 top-1/2 z-30 flex -translate-y-1/2 flex-col items-center gap-3 sm:right-8">
+          {ACTS.map((act, i) => (
             <span
-              key={a.key}
+              key={act.key}
               ref={(el) => { dotRefs.current[i] = el }}
-              className="h-2 w-2 rounded-full bg-white transition-transform"
-              style={{ opacity: 0.35 }}
-              title={a.label}
+              className="h-1.5 w-1.5 rounded-full bg-white transition-[opacity,transform] duration-300"
+              style={{ opacity: i === 0 ? 1 : 0.28 }}
+              title={act.label}
             />
           ))}
         </div>
 
-        {/* Scroll hint */}
-        <div className="pointer-events-none absolute bottom-6 left-1/2 z-20 flex -translate-x-1/2 flex-col items-center gap-1 text-white/70">
-          <span className="text-[10px] font-semibold uppercase tracking-[0.25em]">Scroll</span>
-          <span className="scroll-chevron text-lg">↓</span>
+        <div className="pointer-events-none absolute bottom-5 left-1/2 z-30 flex -translate-x-1/2 items-center gap-2 text-white/45">
+          <span className="text-[9px] font-bold uppercase tracking-[0.28em]">Scroll to dissect</span>
+          <span className="anatomy-scroll-arrow text-sm">↓</span>
         </div>
       </div>
-    </div>
+    </section>
   )
 }
 
-// ── Shared visual bits (pure CSS/SVG loops — no per-scroll JS needed) ──────
+function AnatomyScene({ stage, reduced = false, sceneRef }: { stage: Stage; reduced?: boolean; sceneRef?: RefObject<HTMLDivElement> }) {
+  const localRef = useRef<HTMLDivElement>(null)
+  const targetRef = sceneRef ?? localRef
 
-function Particles({ seed = 1, color = '#7CF5B8' }: { seed?: number; color?: string }) {
-  const items = Array.from({ length: 26 }).map((_, i) => {
-    const r = ((Math.sin(i * 999 + seed) + 1) / 2)
-    const r2 = ((Math.sin(i * 1777 + seed) + 1) / 2)
-    const r3 = ((Math.sin(i * 41 + seed) + 1) / 2)
-    return {
-      left: `${r * 100}%`,
-      size: 2 + r2 * 4,
-      duration: 6 + r3 * 10,
-      delay: -(r * 12),
-    }
-  })
-  return (
-    <div className="pointer-events-none absolute inset-0 overflow-hidden">
-      {items.map((p, i) => (
-        <span
-          key={i}
-          className="cinematic-particle absolute rounded-full"
-          style={{
-            left: p.left,
-            width: p.size,
-            height: p.size,
-            background: color,
-            animationDuration: `${p.duration}s`,
-            animationDelay: `${p.delay}s`,
-          }}
-        />
-      ))}
-    </div>
-  )
-}
+  const move = (event: PointerEvent<HTMLDivElement>) => {
+    if (reduced || event.pointerType === 'touch') return
+    const el = targetRef.current
+    if (!el) return
+    const rect = el.getBoundingClientRect()
+    const x = ((event.clientX - rect.left) / rect.width - 0.5) * 2
+    const y = ((event.clientY - rect.top) / rect.height - 0.5) * 2
+    el.style.setProperty('--tilt-x', `${x * 4.5}deg`)
+    el.style.setProperty('--tilt-y', `${y * -3.5}deg`)
+  }
 
-function SunriseGlow({ opacity = 1 }: { opacity?: number }) {
+  const reset = () => {
+    targetRef.current?.style.setProperty('--tilt-x', '0deg')
+    targetRef.current?.style.setProperty('--tilt-y', '0deg')
+  }
+
   return (
     <div
-      className="cinematic-breathe pointer-events-none absolute left-1/2 top-[38%] -translate-x-1/2 -translate-y-1/2 rounded-full"
-      style={{
-        width: 640,
-        height: 640,
-        maxWidth: '90vw',
-        opacity,
-        background: 'radial-gradient(circle, rgba(124,245,184,0.55) 0%, rgba(0,191,99,0.28) 35%, rgba(5,46,28,0) 70%)',
-        filter: 'blur(6px)',
-      }}
-    />
-  )
-}
+      ref={targetRef}
+      data-stage={stage}
+      onPointerMove={move}
+      onPointerLeave={reset}
+      className="anatomy-scene absolute inset-0 overflow-hidden"
+    >
+      <div className="anatomy-aurora absolute inset-0" />
+      <div className="anatomy-grid absolute inset-0" />
+      <Particles />
+      <OrbitRings />
 
-function DnaHelix() {
-  const rungs = Array.from({ length: 12 })
-  return (
-    <div className="cinematic-spin pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2" style={{ perspective: 600 }}>
-      <svg width="180" height="340" viewBox="0 0 180 340">
-        {rungs.map((_, i) => {
-          const t = i / (rungs.length - 1)
-          const y = t * 320 + 10
-          return (
-            <g key={i} className="cinematic-helix-rung" style={{ animationDelay: `${-t * 3}s` }}>
-              <line x1="20" y1={y} x2="160" y2={y} stroke="rgba(255,255,255,0.2)" strokeWidth={2} />
-              <circle cx="20" cy={y} r={5} fill="#7CF5B8" />
-              <circle cx="160" cy={y} r={5} fill="#00BF63" />
-            </g>
-          )
-        })}
-      </svg>
+      <div className="anatomy-stage absolute left-1/2 top-[54%] h-[min(70svh,720px)] w-[min(92vw,760px)] -translate-x-1/2 -translate-y-1/2 [perspective:1200px]">
+        <div className="anatomy-tilt h-full w-full"><HumanAnatomy /></div>
+      </div>
+
+      <div className="anatomy-label anatomy-label-brain">BRAIN</div>
+      <div className="anatomy-label anatomy-label-lungs">LUNGS</div>
+      <div className="anatomy-label anatomy-label-heart">HEART</div>
+      <div className="anatomy-label anatomy-label-liver">LIVER</div>
+      <div className="anatomy-label anatomy-label-kidneys">KIDNEYS</div>
+      <div className="anatomy-label anatomy-label-skeleton">SKELETON</div>
+      <div className="anatomy-label anatomy-label-neuro">NEURO</div>
+      <div className="anatomy-label anatomy-label-vascular">VASCULAR</div>
     </div>
   )
 }
 
-function Heartbeat() {
+function Particles() {
+  const dots = Array.from({ length: 32 }, (_, i) => {
+    const a = (Math.sin(i * 31.7) + 1) / 2
+    const b = (Math.sin(i * 73.1 + 3) + 1) / 2
+    const c = (Math.sin(i * 19.3 + 8) + 1) / 2
+    return { left: `${a * 100}%`, top: `${b * 100}%`, size: 1 + c * 2.4, delay: `${-a * 8}s` }
+  })
+  return <div className="pointer-events-none absolute inset-0">{dots.map((dot, i) => <span key={i} className="anatomy-particle absolute rounded-full bg-white" style={{ left: dot.left, top: dot.top, width: dot.size, height: dot.size, animationDelay: dot.delay }} />)}</div>
+}
+
+function OrbitRings() {
   return (
-    <svg width="100%" height="80" viewBox="0 0 700 100" preserveAspectRatio="none" className="mx-auto max-w-md">
-      <polyline
-        className="cinematic-heartbeat"
-        points="0,50 260,50 285,50 300,10 315,90 330,50 345,50 700,50"
-        fill="none"
-        stroke="#7CF5B8"
-        strokeWidth={4}
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
+    <div className="pointer-events-none absolute left-1/2 top-[54%] h-[58vmin] w-[58vmin] max-h-[620px] max-w-[620px] -translate-x-1/2 -translate-y-1/2">
+      <span className="anatomy-ring absolute inset-0 rounded-full border border-cyan-100/10" />
+      <span className="anatomy-ring anatomy-ring-2 absolute inset-[13%] rounded-full border border-violet-200/10" />
+      <span className="anatomy-ring anatomy-ring-3 absolute inset-[27%] rounded-full border border-white/10" />
+    </div>
+  )
+}
+
+function HumanAnatomy() {
+  const ribs = [0, 1, 2, 3, 4, 5]
+  return (
+    <svg className="h-full w-full overflow-visible" viewBox="0 0 520 760" role="img" aria-label="Human anatomy layers separating into organs and systems">
+      <defs>
+        <radialGradient id="skinGlow" cx="50%" cy="35%" r="65%"><stop offset="0%" stopColor="#e8fbff" stopOpacity=".24" /><stop offset="65%" stopColor="#7dd3fc" stopOpacity=".08" /><stop offset="100%" stopColor="#0ea5e9" stopOpacity="0" /></radialGradient>
+        <linearGradient id="bone" x1="0" x2="1" y1="0" y2="1"><stop offset="0%" stopColor="#fff" /><stop offset="100%" stopColor="#bdefff" /></linearGradient>
+        <linearGradient id="vessel" x1="0" x2="0" y1="0" y2="1"><stop offset="0%" stopColor="#6ee7f9" /><stop offset="48%" stopColor="#a78bfa" /><stop offset="100%" stopColor="#fb7185" /></linearGradient>
+        <filter id="softGlow" x="-80%" y="-80%" width="260%" height="260%"><feGaussianBlur stdDeviation="7" result="blur" /><feMerge><feMergeNode in="blur" /><feMergeNode in="SourceGraphic" /></feMerge></filter>
+        <filter id="organGlow" x="-90%" y="-90%" width="280%" height="280%"><feGaussianBlur stdDeviation="3" result="blur" /><feMerge><feMergeNode in="blur" /><feMergeNode in="SourceGraphic" /></feMerge></filter>
+      </defs>
+
+      <ellipse className="anatomy-floor" cx="260" cy="714" rx="112" ry="18" fill="rgba(64,220,255,.13)" />
+
+      <g className="anatomy-envelope">
+        <circle cx="260" cy="92" r="48" fill="url(#skinGlow)" stroke="rgba(202,244,255,.28)" strokeWidth="1.5" />
+        <path d="M210 151C191 173 184 219 190 279l17 135-31 214c-4 31 15 53 32 30l44-214h16l44 214c17 23 36 1 32-30l-31-214 17-135c6-60-1-106-20-128-20-12-80-12-100 0Z" fill="url(#skinGlow)" stroke="rgba(202,244,255,.26)" strokeWidth="1.5" />
+        <path d="M203 171 117 357c-7 21 10 32 23 14l79-141M317 171l86 186c7 21-10 32-23 14l-79-141" fill="none" stroke="rgba(202,244,255,.22)" strokeWidth="27" strokeLinecap="round" />
+      </g>
+
+      <g className="anatomy-part anatomy-skeleton" filter="url(#softGlow)">
+        <circle cx="260" cy="92" r="34" fill="none" stroke="url(#bone)" strokeWidth="5" opacity=".8" />
+        <path d="M244 106q16 12 32 0M260 126v294" fill="none" stroke="url(#bone)" strokeWidth="6" strokeLinecap="round" opacity=".78" />
+        {ribs.map((i) => { const y = 177 + i * 28; const w = 58 - i * 4; return <path key={i} d={`M260 ${y}C${260-w} ${y-15} ${260-w} ${y+24} 260 ${y+24}C${260+w} ${y+24} ${260+w} ${y-15} 260 ${y}`} fill="none" stroke="url(#bone)" strokeWidth="3.8" opacity=".66" /> })}
+        <path d="m223 158-59 106-38 100m171-206 59 106 38 100M224 408q36 24 72 0m-64 14-30 193m86-193 30 193m-115 0-9 65m123-65 9 65" fill="none" stroke="url(#bone)" strokeWidth="8" strokeLinecap="round" opacity=".73" />
+      </g>
+
+      <g className="anatomy-part anatomy-neuro" fill="none" stroke="#c4b5fd" strokeLinecap="round" filter="url(#organGlow)">
+        <path d="M260 128v303" strokeWidth="3.2" /><path d="M260 202c-36 30-65 67-96 127m96-127c36 30 65 67 96 127M260 330c-24 69-42 163-55 285m55-285c24 69 42 163 55 285" strokeWidth="1.7" opacity=".82" />
+      </g>
+
+      <g className="anatomy-part anatomy-brain" filter="url(#organGlow)">
+        <path d="M226 86c-2-26 17-43 34-36 17-10 38 8 34 29 12 20-4 43-26 39-19 12-47-7-42-32Z" fill="rgba(196,181,253,.84)" stroke="#ede9fe" strokeWidth="2" />
+        <path d="M240 61c10 10 6 24-4 31m28-39c-9 13 0 26 10 32m11-19c-11 10-9 29 3 36m-39-2c11-11 24-4 30 11" fill="none" stroke="rgba(255,255,255,.55)" strokeWidth="2" />
+      </g>
+
+      <g className="anatomy-part anatomy-lungs" filter="url(#organGlow)">
+        <path d="M248 176c-29-5-43 27-41 71 2 39 22 58 43 37V181Z" fill="rgba(103,232,249,.7)" stroke="#cffafe" strokeWidth="2" /><path d="M272 176c29-5 43 27 41 71-2 39-22 58-43 37V181Z" fill="rgba(103,232,249,.7)" stroke="#cffafe" strokeWidth="2" /><path d="M260 147v44m0-7-25 25m25-25 25 25" fill="none" stroke="#e6fdff" strokeWidth="4" strokeLinecap="round" />
+      </g>
+
+      <g className="anatomy-part anatomy-heart" filter="url(#organGlow)">
+        <path d="M260 251c-15-22-40-12-39 10 1 24 39 50 39 50s38-26 39-50c1-22-24-32-39-10Z" fill="#fb7185" stroke="#fecdd3" strokeWidth="2.4" /><path d="M256 244c-4-14-2-25 4-35m8 37c10-15 15-25 15-38" fill="none" stroke="#fda4af" strokeWidth="5" strokeLinecap="round" />
+      </g>
+
+      <g className="anatomy-part anatomy-liver" filter="url(#organGlow)"><path d="M246 326c-39-11-47 16-36 45 19 14 56 7 77-13 13-13-1-32-41-32Z" fill="rgba(251,146,60,.82)" stroke="#fed7aa" strokeWidth="2" /></g>
+
+      <g className="anatomy-part anatomy-kidneys" filter="url(#organGlow)">
+        <path d="M222 372c-17-7-26 12-19 35 7 19 27 14 29-8 2-16-1-23-10-27Z" fill="rgba(244,114,182,.76)" stroke="#fbcfe8" strokeWidth="2" /><path d="M298 372c17-7 26 12 19 35-7 19-27 14-29-8-2-16 1-23 10-27Z" fill="rgba(244,114,182,.76)" stroke="#fbcfe8" strokeWidth="2" />
+      </g>
+
+      <g className="anatomy-part anatomy-digestive" filter="url(#organGlow)">
+        <path d="M274 338c29 1 26 41 4 44-18 2-21-17-13-30" fill="rgba(253,186,116,.7)" stroke="#ffedd5" strokeWidth="2" /><path d="M234 410c-17 12-17 59 4 73 24 16 61 4 64-26 4-31-17-49-38-41-20 7-21 33-5 40 20 9 30-15 19-25" fill="none" stroke="#fdba74" strokeWidth="9" strokeLinecap="round" strokeLinejoin="round" />
+      </g>
+
+      <g className="anatomy-part anatomy-vascular" fill="none" stroke="url(#vessel)" strokeLinecap="round" filter="url(#organGlow)">
+        <path d="M265 209c5 50 3 115-2 223l24 182" strokeWidth="5" /><path d="m263 320-45 87m45-87 39 87m-36-142-48-59m48 59 41-60" strokeWidth="2.6" opacity=".8" />
+      </g>
     </svg>
   )
 }
 
-function StretchSilhouette() {
-  return (
-    <div className="cinematic-bob pointer-events-none absolute bottom-24 left-1/2 -translate-x-1/2">
-      <svg width="140" height="230" viewBox="0 0 220 360">
-        <ellipse cx="110" cy="330" rx="46" ry="10" fill="rgba(0,0,0,0.2)" />
-        <circle cx="110" cy="46" r="26" fill="rgba(255,255,255,0.92)" />
-        <rect x="92" y="70" width="36" height="120" rx="18" fill="rgba(255,255,255,0.92)" />
-        <g className="cinematic-arm-left"><rect x="60" y="80" width="42" height="16" rx="8" fill="rgba(255,255,255,0.85)" /></g>
-        <g className="cinematic-arm-right"><rect x="118" y="80" width="42" height="16" rx="8" fill="rgba(255,255,255,0.85)" /></g>
-        <rect x="95" y="185" width="14" height="110" rx="7" fill="rgba(255,255,255,0.9)" transform="rotate(-6 102 240)" />
-        <rect x="111" y="185" width="14" height="110" rx="7" fill="rgba(255,255,255,0.9)" transform="rotate(6 118 240)" />
-      </svg>
-    </div>
-  )
-}
-
-function Rays() {
-  return (
-    <div
-      className="cinematic-rotate pointer-events-none absolute left-1/2 top-[46%] -translate-x-1/2 -translate-y-1/2 rounded-full"
-      style={{
-        width: 900,
-        height: 900,
-        maxWidth: '140vw',
-        background: 'repeating-conic-gradient(rgba(124,245,184,0.16) 0deg 6deg, transparent 6deg 18deg)',
-        maskImage: 'radial-gradient(circle, black 0%, transparent 62%)',
-        WebkitMaskImage: 'radial-gradient(circle, black 0%, transparent 62%)',
-      }}
-    />
-  )
-}
-
-// ── The 4 acts ──────────────────────────────────────────────────────────
-
-function ActHero() {
-  return (
-    <div className="flex h-full w-full flex-col items-center justify-center gap-4 text-center" style={{ background: 'linear-gradient(180deg, #052E1C 0%, #0B4A2E 60%, #0B7A4B 100%)' }}>
-      <SunriseGlow />
-      <Particles seed={3} />
-      <h2 className="relative text-3xl font-black tracking-tight text-white sm:text-5xl">PANACEAMED.ID</h2>
-      <p className="relative max-w-md px-6 text-sm font-semibold text-white/75 sm:text-base">Toward a Longer, Healthier Life</p>
-    </div>
-  )
-}
-
-function ActVitality() {
-  return (
-    <div className="relative flex h-full w-full flex-col items-center justify-start gap-6 pt-20 text-center" style={{ background: 'linear-gradient(180deg, #0B4A2E 0%, #0B7A4B 55%, #00BF63 100%)' }}>
-      <Particles seed={11} color="#EFFFF6" />
-      <h2 className="relative text-2xl font-black tracking-tight text-white sm:text-4xl">VITALITY</h2>
-      <p className="relative max-w-md px-6 text-sm font-semibold text-white/80">Move every day, live longer</p>
-      <StretchSilhouette />
-      <div className="absolute bottom-10 left-0 right-0 px-6"><Heartbeat /></div>
-    </div>
-  )
-}
-
-function ActScience() {
-  const chips = ['VO₂max', 'Biomarker Endpoints', 'AI Clinical Insight']
-  return (
-    <div className="relative flex h-full w-full flex-col items-center justify-start gap-4 pt-20 text-center" style={{ background: 'linear-gradient(180deg, #00BF63 0%, #0B7A4B 55%, #0B4A2E 100%)' }}>
-      <Particles seed={19} color="#DFFFF0" />
-      <DnaHelix />
-      <h2 className="relative text-2xl font-black tracking-tight text-white sm:text-4xl">LONGEVITY SCIENCE</h2>
-      <div className="absolute bottom-16 left-0 right-0 flex flex-col items-center gap-3 px-6">
-        {chips.map((c) => (
-          <span key={c} className="rounded-full border border-white/35 bg-white/15 px-6 py-2 text-sm font-bold text-white backdrop-blur">
-            {c}
-          </span>
-        ))}
-      </div>
-    </div>
-  )
-}
-
-function ActLongevity() {
-  return (
-    <div className="relative flex h-full w-full flex-col items-center justify-center gap-4 text-center" style={{ background: 'linear-gradient(180deg, #0B4A2E 0%, #0B7A4B 45%, #052E1C 100%)' }}>
-      <Rays />
-      <SunriseGlow opacity={0.7} />
-      <Particles seed={29} />
-      <h2 className="relative max-w-lg px-6 text-2xl font-black tracking-tight text-white sm:text-4xl">LONGEVITY STARTS TODAY</h2>
-      <p className="relative text-base font-bold" style={{ color: '#7CF5B8' }}>Start Your Longevity Journey →</p>
-    </div>
-  )
-}
-
-// ── Keyframes (scoped, injected once) ──────────────────────────────────
 export function ScrollCinematicStyles() {
   return (
     <style>{`
-      .cinematic-particle { animation-name: cinematicFloat; animation-timing-function: linear; animation-iteration-count: infinite; opacity: 0.6; bottom: -10px; }
-      @keyframes cinematicFloat { from { transform: translateY(0); opacity: 0; } 10% { opacity: 0.7; } 90% { opacity: 0.7; } to { transform: translateY(-110vh); opacity: 0; } }
-      .cinematic-breathe { animation: cinematicBreathe 6s ease-in-out infinite; }
-      @keyframes cinematicBreathe { 0%,100% { transform: translate(-50%,-50%) scale(0.94); } 50% { transform: translate(-50%,-50%) scale(1.04); } }
-      .cinematic-spin { animation: cinematicSpin 14s linear infinite; }
-      @keyframes cinematicSpin { from { transform: translate(-50%,-50%) rotateY(0deg); } to { transform: translate(-50%,-50%) rotateY(360deg); } }
-      .cinematic-helix-rung { animation: cinematicRungFade 3s ease-in-out infinite; transform-origin: center; }
-      @keyframes cinematicRungFade { 0%,100% { opacity: 0.55; } 50% { opacity: 1; } }
-      .cinematic-heartbeat { stroke-dasharray: 1400; animation: cinematicDash 2.4s linear infinite; }
-      @keyframes cinematicDash { from { stroke-dashoffset: 1400; } to { stroke-dashoffset: 0; } }
-      .cinematic-bob { animation: cinematicBob 3.2s ease-in-out infinite; }
-      @keyframes cinematicBob { 0%,100% { transform: translate(-50%,0); } 50% { transform: translate(-50%,-12px); } }
-      .cinematic-arm-left { animation: cinematicArmL 3.2s ease-in-out infinite; transform-origin: 100px 90px; }
-      .cinematic-arm-right { animation: cinematicArmR 3.2s ease-in-out infinite; transform-origin: 120px 90px; }
-      @keyframes cinematicArmL { 0%,100% { transform: rotate(-18deg); } 50% { transform: rotate(-30deg); } }
-      @keyframes cinematicArmR { 0%,100% { transform: rotate(18deg); } 50% { transform: rotate(30deg); } }
-      .cinematic-rotate { animation: cinematicRotate 30s linear infinite; }
-      @keyframes cinematicRotate { from { transform: translate(-50%,-50%) rotate(0deg); } to { transform: translate(-50%,-50%) rotate(360deg); } }
-      .scroll-chevron { animation: cinematicChevron 1.6s ease-in-out infinite; }
-      @keyframes cinematicChevron { 0%,100% { transform: translateY(0); opacity: 0.7; } 50% { transform: translateY(6px); opacity: 1; } }
-      .reduce-motion .cinematic-particle, .reduce-motion .cinematic-breathe, .reduce-motion .cinematic-spin,
-      .reduce-motion .cinematic-helix-rung, .reduce-motion .cinematic-heartbeat, .reduce-motion .cinematic-bob,
-      .reduce-motion .cinematic-arm-left, .reduce-motion .cinematic-arm-right, .reduce-motion .cinematic-rotate,
-      .reduce-motion .scroll-chevron { animation: none !important; }
+      .anatomy-cinematic{--cyan:#67e8f9;--violet:#a78bfa;--rose:#fb7185}
+      .anatomy-scene{--tilt-x:0deg;--tilt-y:0deg;background:radial-gradient(circle at 50% 47%,#0d2231 0%,#050a12 36%,#02050a 72%)}
+      .anatomy-aurora{background:radial-gradient(circle at 48% 43%,rgba(34,211,238,.13),transparent 28%),radial-gradient(circle at 62% 55%,rgba(139,92,246,.1),transparent 32%),radial-gradient(circle at 38% 58%,rgba(236,72,153,.07),transparent 28%);filter:blur(22px)}
+      .anatomy-grid{opacity:.18;background-image:linear-gradient(rgba(125,211,252,.06) 1px,transparent 1px),linear-gradient(90deg,rgba(125,211,252,.06) 1px,transparent 1px);background-size:42px 42px;mask-image:radial-gradient(circle at center,#000 0%,transparent 67%);-webkit-mask-image:radial-gradient(circle at center,#000 0%,transparent 67%)}
+      .anatomy-tilt{transform:rotateX(var(--tilt-y)) rotateY(var(--tilt-x));transform-style:preserve-3d;transition:transform 280ms cubic-bezier(.2,.8,.2,1)}
+      .anatomy-part{transform-box:fill-box;transform-origin:center;transition:transform 1050ms cubic-bezier(.16,1,.3,1),opacity 700ms ease,filter 700ms ease}
+      .anatomy-envelope{transition:opacity 800ms ease,transform 1100ms cubic-bezier(.16,1,.3,1);transform-origin:center}.anatomy-floor{transition:opacity 800ms ease,transform 900ms ease;transform-origin:center;filter:blur(7px)}
+      .anatomy-scene[data-stage='whole'] .anatomy-part{transform:translate(0,0) scale(1)}.anatomy-scene[data-stage='whole'] .anatomy-envelope{opacity:.95}.anatomy-scene[data-stage='whole'] .anatomy-label{opacity:0}
+      .anatomy-scene[data-stage='exploded'] .anatomy-envelope{opacity:.18;transform:scale(1.035)}
+      .anatomy-scene[data-stage='exploded'] .anatomy-brain{transform:translate(-92px,-42px) rotate(-7deg) scale(1.08)}.anatomy-scene[data-stage='exploded'] .anatomy-lungs{transform:translate(102px,-10px) rotate(5deg) scale(1.04)}.anatomy-scene[data-stage='exploded'] .anatomy-heart{transform:translate(-116px,18px) rotate(-9deg) scale(1.12)}.anatomy-scene[data-stage='exploded'] .anatomy-liver{transform:translate(108px,29px) rotate(8deg) scale(1.08)}.anatomy-scene[data-stage='exploded'] .anatomy-kidneys{transform:translate(-84px,51px) rotate(-4deg) scale(1.08)}.anatomy-scene[data-stage='exploded'] .anatomy-digestive{transform:translate(101px,72px) rotate(7deg) scale(1.07)}.anatomy-scene[data-stage='exploded'] .anatomy-neuro{transform:translate(-34px,0)}.anatomy-scene[data-stage='exploded'] .anatomy-vascular{transform:translate(40px,0)}.anatomy-scene[data-stage='exploded'] .anatomy-skeleton{transform:scale(.98);opacity:.68}
+      .anatomy-scene[data-stage='systems'] .anatomy-envelope{opacity:.08;transform:scale(1.07)}
+      .anatomy-scene[data-stage='systems'] .anatomy-brain{transform:translate(-142px,-56px) rotate(-11deg) scale(1.14)}.anatomy-scene[data-stage='systems'] .anatomy-lungs{transform:translate(152px,-30px) rotate(8deg) scale(1.1)}.anatomy-scene[data-stage='systems'] .anatomy-heart{transform:translate(-164px,34px) rotate(-13deg) scale(1.18)}.anatomy-scene[data-stage='systems'] .anatomy-liver{transform:translate(155px,41px) rotate(11deg) scale(1.14)}.anatomy-scene[data-stage='systems'] .anatomy-kidneys{transform:translate(-139px,87px) rotate(-8deg) scale(1.13)}.anatomy-scene[data-stage='systems'] .anatomy-digestive{transform:translate(150px,104px) rotate(9deg) scale(1.12)}.anatomy-scene[data-stage='systems'] .anatomy-neuro{transform:translate(-69px,3px) scale(1.025);filter:drop-shadow(0 0 10px rgba(196,181,253,.6))}.anatomy-scene[data-stage='systems'] .anatomy-vascular{transform:translate(71px,-1px) scale(1.025);filter:drop-shadow(0 0 10px rgba(103,232,249,.58))}.anatomy-scene[data-stage='systems'] .anatomy-skeleton{transform:scale(.96);opacity:.5}
+      .anatomy-scene[data-stage='unified'] .anatomy-part{transform:translate(0,0) scale(1)}.anatomy-scene[data-stage='unified'] .anatomy-envelope{opacity:.44;transform:scale(1)}.anatomy-scene[data-stage='unified'] .anatomy-skeleton{opacity:.56}.anatomy-scene[data-stage='unified'] .anatomy-neuro,.anatomy-scene[data-stage='unified'] .anatomy-vascular{filter:drop-shadow(0 0 11px rgba(103,232,249,.56))}.anatomy-scene[data-stage='unified'] .anatomy-floor{transform:scaleX(1.18);opacity:.95}
+      .anatomy-label{position:absolute;z-index:12;padding:.35rem .55rem;border:1px solid rgba(255,255,255,.13);border-radius:999px;background:rgba(4,10,18,.48);backdrop-filter:blur(14px);color:rgba(236,254,255,.78);font-size:8px;font-weight:800;letter-spacing:.18em;opacity:0;transform:translateY(8px);transition:opacity 500ms ease 380ms,transform 500ms cubic-bezier(.16,1,.3,1) 380ms}.anatomy-scene[data-stage='exploded'] .anatomy-label,.anatomy-scene[data-stage='systems'] .anatomy-label{opacity:1;transform:translateY(0)}
+      .anatomy-label-brain{left:calc(50% - 180px);top:25%}.anatomy-label-lungs{left:calc(50% + 105px);top:34%}.anatomy-label-heart{left:calc(50% - 196px);top:44%}.anatomy-label-liver{left:calc(50% + 115px);top:50%}.anatomy-label-kidneys{left:calc(50% - 185px);top:57%}.anatomy-label-skeleton{left:calc(50% - 34px);top:75%}.anatomy-label-neuro{left:calc(50% - 126px);top:69%}.anatomy-label-vascular{left:calc(50% + 75px);top:68%}
+      .anatomy-ring{animation:anatomyOrbit 22s linear infinite;box-shadow:0 0 40px rgba(34,211,238,.03) inset}.anatomy-ring-2{animation-direction:reverse;animation-duration:17s}.anatomy-ring-3{animation-duration:12s}.anatomy-particle{opacity:.26;box-shadow:0 0 8px rgba(103,232,249,.65);animation:anatomyParticle 5s ease-in-out infinite alternate}.anatomy-scroll-arrow{animation:anatomyChevron 1.6s ease-in-out infinite}
+      @keyframes anatomyOrbit{from{transform:rotate(0deg) scaleX(1)}50%{transform:rotate(180deg) scaleX(.78)}to{transform:rotate(360deg) scaleX(1)}}@keyframes anatomyParticle{from{transform:translate3d(0,0,0);opacity:.12}to{transform:translate3d(0,-16px,0);opacity:.52}}@keyframes anatomyChevron{0%,100%{transform:translateY(0);opacity:.45}50%{transform:translateY(5px);opacity:1}}
+      @media(max-width:640px){.anatomy-stage{width:min(124vw,690px)!important;top:55%!important}.anatomy-label{font-size:7px;padding:.28rem .42rem}.anatomy-label-brain{left:9%;top:29%}.anatomy-label-lungs{left:auto;right:8%;top:36%}.anatomy-label-heart{left:7%;top:46%}.anatomy-label-liver{left:auto;right:7%;top:51%}.anatomy-label-kidneys{left:8%;top:59%}.anatomy-label-skeleton{left:44%;top:76%}.anatomy-label-neuro{left:15%;top:69%}.anatomy-label-vascular{left:auto;right:12%;top:68%}.anatomy-scene[data-stage='systems'] .anatomy-brain{transform:translate(-108px,-46px) rotate(-10deg) scale(1.12)}.anatomy-scene[data-stage='systems'] .anatomy-lungs{transform:translate(112px,-24px) rotate(7deg) scale(1.08)}.anatomy-scene[data-stage='systems'] .anatomy-heart{transform:translate(-118px,28px) rotate(-11deg) scale(1.15)}.anatomy-scene[data-stage='systems'] .anatomy-liver{transform:translate(116px,37px) rotate(9deg) scale(1.12)}.anatomy-scene[data-stage='systems'] .anatomy-kidneys{transform:translate(-103px,70px) rotate(-7deg) scale(1.1)}.anatomy-scene[data-stage='systems'] .anatomy-digestive{transform:translate(110px,84px) rotate(8deg) scale(1.1)}}
+      .reduce-motion .anatomy-part,.reduce-motion .anatomy-envelope,.reduce-motion .anatomy-tilt,.reduce-motion .anatomy-label{transition:none!important}.reduce-motion .anatomy-ring,.reduce-motion .anatomy-particle,.reduce-motion .anatomy-scroll-arrow{animation:none!important}
     `}</style>
   )
 }
