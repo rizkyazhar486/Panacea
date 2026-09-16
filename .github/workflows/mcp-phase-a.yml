@@ -32,3 +32,5 @@ jobs:
         run: npm ci
       - name: MCP kernel contract
         run: npx tsx uji/mcpCore.uji.ts
+      - name: MCP orchestration contract
+        run: npx tsx uji/mcpOrchestration.uji.ts
