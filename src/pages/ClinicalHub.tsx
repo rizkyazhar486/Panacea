@@ -2,6 +2,7 @@ import { useMemo, useState, type ReactNode } from 'react'
 import { Link } from 'react-router-dom'
 import { FeatureBoulevard } from '../components/FeatureBoulevard'
 import { PanaceaZoneNav } from '../components/PanaceaZoneNav'
+import { HelpServicesWorkspace } from './HelpServicesWorkspace'
 
 export const GROUPS = [
   {
@@ -47,6 +48,7 @@ export function ClinicalHub() {
   const [lab, setLab] = useState('')
   const [low, setLow] = useState('')
   const [high, setHigh] = useState('')
+  const [showServices, setShowServices] = useState(false)
 
   const bmi = useMemo(() => height > 0 ? weight / ((height / 100) ** 2) : 0, [height, weight])
   const map = useMemo(() => (sbp + 2 * dbp) / 3, [sbp, dbp])
@@ -73,7 +75,10 @@ export function ClinicalHub() {
             <div className="text-[10px] font-black uppercase tracking-[.2em] text-cyan-200/75">Super page 02</div>
             <h1 className="mt-1 truncate text-2xl font-black tracking-[-.035em] sm:text-3xl">Clinical</h1>
           </div>
-          <div className="rounded-full border border-emerald-300/15 bg-emerald-300/[.07] px-3 py-1.5 text-[10px] font-black text-emerald-200">clinician-in-loop</div>
+          <div className="flex items-center gap-2">
+            <button type="button" onClick={() => setShowServices((value) => !value)} aria-expanded={showServices} className={`shrink-0 rounded-full border px-3 py-1.5 text-[10px] font-black transition ${showServices ? 'border-cyan-200/50 bg-cyan-200 text-black' : 'border-white/10 bg-white/[.04] text-white/70'}`}>Help + Services</button>
+            <div className="rounded-full border border-emerald-300/15 bg-emerald-300/[.07] px-3 py-1.5 text-[10px] font-black text-emerald-200">clinician-in-loop</div>
+          </div>
         </header>
 
         <div className="relative grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
@@ -134,6 +139,16 @@ export function ClinicalHub() {
 
         <div className="relative mt-5 truncate px-1 text-[9px] font-semibold text-white/35">BMI = kg ÷ m² · MAP ≈ (SBP + 2×DBP) ÷ 3 · decision support, not autonomous diagnosis</div>
       </main>
+
+      {showServices && (
+        <section className="rounded-[30px] border border-cyan-200/15 bg-[#01040a]/95 p-3 text-white shadow-[0_24px_72px_rgba(0,0,0,.4)] sm:p-5" aria-label="Clinical help and services">
+          <div className="mb-4 flex items-center justify-between gap-3">
+            <div className="min-w-0"><div className="text-[9px] font-black uppercase tracking-[.18em] text-cyan-200/60">Progressive disclosure</div><h2 className="truncate text-lg font-black">Help + services console</h2></div>
+            <button type="button" onClick={() => setShowServices(false)} className="grid h-9 w-9 shrink-0 place-items-center rounded-full border border-white/10 bg-white/[.04] text-sm font-black" aria-label="Close help and services">×</button>
+          </div>
+          <HelpServicesWorkspace />
+        </section>
+      )}
 
       <FeatureBoulevard zone="clinical" title="Clinical feature boulevard" />
     </div>
