@@ -16,6 +16,7 @@ assert.match(visualFirstRuntime, /\[data-pmd-unclamped="true"\]/, 'visual-first 
 assert.match(visualFirstStyles, /\[data-pmd-unclamped='true'\]/, 'visual-first styles must honor the unclamped boundary')
 assert.match(liquidRuntime, /\[data-pmd-liquid="off"\]/, 'liquid runtime must honor the local opt-out boundary')
 
+assert.match(os, /useLayoutEffect\(\(\) =>/, 'Body Exposure presentation isolation must be applied before first paint')
 assert.match(os, /LIQUID_ACTIONS_ROOT_CLASS = 'pmd-liquid-actions-v45'/)
 assert.match(os, /html\.classList\.remove\(LIQUID_ACTIONS_ROOT_CLASS\)/, 'Body Exposure must suspend the later global control-material selector while mounted')
 assert.match(os, /if \(hadLiquidActions\) html\.classList\.add\(LIQUID_ACTIONS_ROOT_CLASS\)/, 'Body Exposure must restore the global control layer when the workspace unmounts')
