@@ -53,6 +53,8 @@ export interface PanaceaToolContext {
   transport: McpTransportKind
   requestId: string
   signal?: AbortSignal
+  /** Ditetapkan host lokal, tidak pernah diambil dari payload tool MCP. */
+  repoRoot?: string
 }
 
 export type PanaceaToolResult<T = unknown> =
