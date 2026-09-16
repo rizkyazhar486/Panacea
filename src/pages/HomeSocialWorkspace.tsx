@@ -17,7 +17,7 @@ const Markets = lazy(() => import('./Markets').then((m) => ({ default: m.Markets
 const SportsScores = lazy(() => import('./SportsScores').then((m) => ({ default: m.SportsScores })))
 const ReligionWorkspace = lazy(() => import('./ReligionWorkspace').then((m) => ({ default: m.ReligionWorkspace })))
 const MedStudyHub = lazy(() => import('./MedStudyHub').then((m) => ({ default: m.MedStudyHub })))
-const ForYouHub = lazy(() => import('./ForYouHub').then((m) => ({ default: m.ForYouHub })))
+const ForYouWorkspace = lazy(() => import('./ForYouWorkspace').then((m) => ({ default: m.ForYouWorkspace })))
 
 type LegacyViewKey = 'social' | 'community' | 'clubs' | 'finance' | 'markets' | 'scores' | 'religion' | 'learn'
 type HomeView = 'home' | 'for-you' | LegacyViewKey
@@ -74,7 +74,7 @@ export function HomeSocialWorkspace() {
           <HomeCommandDeck />
         </div>
       ) : activeKey === 'for-you' ? (
-        <Suspense fallback={<Loader />}><ForYouHub /></Suspense>
+        <Suspense fallback={<Loader />}><ForYouWorkspace /></Suspense>
       ) : LegacyActive ? (
         <section aria-label={legacy?.label ?? 'Home space'} className="min-w-0">
           <Suspense fallback={<Loader />}><LegacyActive /></Suspense>
@@ -93,7 +93,7 @@ export function HomeSocialWorkspace() {
           <span>Home</span>
         </button>
         <Link
-          to="/tubuh"
+          to="/fitness-hub"
           className="liquid-dock-item flex min-h-[50px] flex-col items-center justify-center gap-1 rounded-[18px] px-2 text-[9px] font-black text-white/55"
           aria-label="Your Body super page"
         >
