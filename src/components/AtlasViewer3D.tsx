@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import * as THREE from 'three'
+import { penjagaMuatan } from '../lib/gltfSesudahLepas'
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'
 import { MeshoptDecoder } from 'three/examples/jsm/libs/meshopt_decoder.module.js'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
@@ -118,6 +119,8 @@ export function AtlasViewer3D({
     const wilayahMesh = new Map<THREE.Mesh, string>()
     const jenisMesh = new Map<THREE.Mesh, string>()
     let grup: THREE.Group | null = null
+    // Muatan yang tiba sesudah komponen ini dilepas tidak punya pemilik.
+    const penjaga = penjagaMuatan()
 
     const geoPartikel = new THREE.SphereGeometry(1, 8, 6)
     const matPartikel = new THREE.MeshBasicMaterial({
@@ -147,6 +150,7 @@ export function AtlasViewer3D({
     loader.load(
       `${import.meta.env.BASE_URL}${berkas}`,
       (gltf) => {
+        if (!penjaga.terima(gltf.scene)) return
         grup = gltf.scene
 
         // Satu nama sanitized hanya boleh menunjuk ke satu metadata atlas.
@@ -401,6 +405,7 @@ export function AtlasViewer3D({
     startRendering()
 
     return () => {
+      penjaga.lepas()
       stopRendering()
       io.disconnect()
       ro.disconnect()

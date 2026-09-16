@@ -20,6 +20,7 @@ import { hrMaxFromAge } from '../lib/workoutImport'
 // explains it, 4) what exercise / plan should I choose.
 const WorkoutHistory = lazy(() => import('./WorkoutHistory').then((m) => ({ default: m.WorkoutHistory })))
 const OrganizerLatihan = lazy(() => import('./OrganizerLatihan').then((m) => ({ default: m.OrganizerLatihan })))
+const PelatihProgres = lazy(() => import('./PelatihProgres').then((m) => ({ default: m.PelatihProgres })))
 const PelatihAsupan = lazy(() => import('./PelatihAsupan').then((m) => ({ default: m.PelatihAsupan })))
 const GpsTracker = lazy(() => import('../components/GpsTracker').then((m) => ({ default: m.GpsTracker })))
 const AthleteScience = lazy(() => import('./AthleteScience').then((m) => ({ default: m.AthleteScience })))
@@ -51,6 +52,8 @@ const TABS: TabDef[] = [
     ringkas: 'Weekly calendar for push, pull, legs and abs, scheduled around the runs already recorded' },
   { id: 'asupan-pelatih', label: 'Coach intake', emoji: '📝', komponen: PelatihAsupan,
     ringkas: 'Collects age, height, weight, goal, equipment, injuries and restrictions first, and refuses to print a plan until they are answered' },
+  { id: 'progres', label: 'Progress', emoji: '📈', komponen: PelatihProgres,
+    ringkas: 'Week against week on weight, waist, strength, energy, sleep, sessions and protein — charted, with changes too small to call named as such' },
   { id: 'gps', label: 'GPS', emoji: '📍', komponen: GpsTracker,
     ringkas: 'Live device GPS with fix quality control, auto-pause, moving pace, kilometre splits and privacy-first sharing' },
   { id: 'athlete-science', label: 'Athlete Science', emoji: '🧬', komponen: AthleteScience,

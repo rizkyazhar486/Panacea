@@ -3,6 +3,7 @@ import { Card, SectionTitle, Button, Badge } from '../components/ui'
 import { IconSparkle, IconUpload, IconActivity, IconLeaf, IconHeart } from '../components/icons'
 import { compressImage, readAsDataUrl } from '../lib/upload'
 import { api } from '../lib/api'
+import { saveBodyCharacter } from '../lib/bodyCharacter'
 
 // Level-based workout plans (Beginner → Pro) for shaping the body.
 type Level = 'beginner' | 'intermediate' | 'advanced' | 'pro'
@@ -112,7 +113,15 @@ export function ShapeForming() {
       const prompt = `Analyze this body/posture photo for SHAPE FORMING & LONGEVITY purposes (not a formal medical diagnosis, lifestyle education only). Assess body proportions, posture, and visible skin quality (texture, signs of aging, hydration). Provide a weekly (7-day) workout program and nutrition recommendations suited to shape forming & long-term health, plus skin quality education & care advice.\n\nOutput ONLY minified JSON with the structure:\n{"bodyAssessment":string,"bodyType":string,"workoutFocus":string[4],"weeklyPlan":[{"day":string,"focus":string}×7],"nutritionSummary":string,"foodsRecommended":string[],"foodsAvoid":string[],"skinAssessment":string,"skinAdvice":string[]}`
       const r = await api.aiVision(dataUrl, prompt)
       const parsed = extractJson(r.text)
-      setResult(parsed ?? demoAnalysis())
+      if (parsed) {
+        setResult(parsed)
+        // Reuse the user's real input instead of asking for the same body-shape
+        // information again elsewhere. Only compact derived traits are saved;
+        // the uploaded body photo itself is not persisted here.
+        saveBodyCharacter({ bodyType: parsed.bodyType, bodyAssessment: parsed.bodyAssessment })
+      } else {
+        setResult(demoAnalysis())
+      }
     } catch {
       setError('Failed to analyze photo. Showing sample recommendations.')
       setResult(demoAnalysis())
@@ -131,7 +140,7 @@ export function ShapeForming() {
           ) : (
             <span className="grid h-16 w-16 place-items-center rounded-full bg-white text-2xl shadow-sm"><IconUpload size={24} /></span>
           )}
-          <p className="text-xs text-neutral-500">Body photo (front/side, good lighting) — processed once for analysis, not stored permanently on our servers.</p>
+          <p className="text-xs text-neutral-500">Body photo (front/side, good lighting) — processed once for analysis, not stored permanently on our servers. Derived body-shape traits can update your local 3D character.</p>
           <Button onClick={() => fileRef.current?.click()} disabled={busy}>
             <IconUpload size={14} /> {busy ? 'Analyzing…' : preview ? 'Change Photo' : 'Upload Photo'}
           </Button>
@@ -140,7 +149,6 @@ export function ShapeForming() {
         </div>
       </Card>
 
-      {/* Program latihan berdasarkan level */}
       <Card className="!p-5">
         <SectionTitle icon={<IconActivity size={18} />} title="Workout Program by Level" subtitle="Choose your level — beginner to professional athlete" />
         <div className="mt-3 grid grid-cols-4 gap-2">

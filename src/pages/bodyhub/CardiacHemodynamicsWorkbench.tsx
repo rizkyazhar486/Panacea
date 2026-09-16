@@ -1,0 +1,96 @@
+import { useMemo, useState } from 'react'
+import type { BodySystemId } from '../../lib/bodySystemSourceWave'
+import {
+  CARDIAC_HEMODYNAMICS_BOUNDARY,
+  CARDIAC_HEMODYNAMICS_EVIDENCE,
+  CARDIAC_PHASES,
+  CARDIAC_TEACHING_RELATIONSHIPS,
+  buildSyntheticPvLoop,
+  simulateSyntheticCardiacHemodynamics,
+  type SyntheticCardiacInput,
+} from '../../lib/cardiacHemodynamicsLab'
+
+const INPUT_META: Readonly<Record<keyof SyntheticCardiacInput, { label: string; hint: string }>> = {
+  preload: { label: 'Preload', hint: 'Synthetic ventricular filling / end-diastolic loading signal' },
+  afterload: { label: 'Afterload', hint: 'Synthetic resistance / pressure load against ejection' },
+  contractility: { label: 'Contractility', hint: 'Synthetic intrinsic inotropic state' },
+  heartRate: { label: 'Heart-rate drive', hint: 'Normalized rate drive; not beats per minute' },
+  lusitropy: { label: 'Lusitropy', hint: 'Synthetic ventricular relaxation quality' },
+}
+
+const OUTPUT_META = {
+  strokeVolumeSignal: 'Stroke-volume signal',
+  fillingPressureSignal: 'Filling-pressure signal',
+  ejectionPressureSignal: 'Ejection-pressure signal',
+  cardiacOutputSignal: 'Cardiac-output signal',
+  myocardialWorkSignal: 'Myocardial-work signal',
+  diastolicPerfusionOpportunity: 'Diastolic-perfusion opportunity',
+} as const
+
+const pct = (value: number) => `${Math.round(value * 100)}%`
+
+export default function CardiacHemodynamicsWorkbench({ selectedAtlasSystemId }: { selectedAtlasSystemId?: BodySystemId }) {
+  const baseline: SyntheticCardiacInput = { preload: 0.52, afterload: 0.48, contractility: 0.54, heartRate: 0.42, lusitropy: 0.55 }
+  const [input, setInput] = useState<SyntheticCardiacInput>(baseline)
+  const state = useMemo(() => simulateSyntheticCardiacHemodynamics(input), [input])
+  const pv = useMemo(() => buildSyntheticPvLoop(input), [input])
+
+  if (selectedAtlasSystemId && selectedAtlasSystemId !== 'cardiovascular') return null
+
+  const toX = (volume: number) => 18 + volume * 220
+  const toY = (pressure: number) => 218 - pressure * 180
+  const path = `${pv.map((point, index) => `${index ? 'L' : 'M'} ${toX(point.volume)} ${toY(point.pressure)}`).join(' ')} Z`
+
+  return (
+    <section data-cardiac-hemodynamics-workbench="v2" className="overflow-hidden rounded-[28px] border border-cyan-300/10 bg-[linear-gradient(145deg,rgba(16,185,129,.055),rgba(2,6,12,.97)_42%,rgba(77,231,255,.035)_72%,rgba(156,124,255,.03))] text-white">
+      <header className="border-b border-white/[.08] p-4 sm:p-5">
+        <div className="text-[9px] font-black uppercase tracking-[.22em] text-cyan-100/70">Body Exposure · heart / cardiovascular</div>
+        <h3 className="mt-1.5 text-lg font-black">Cardiac Hemodynamics & Pressure–Volume Lab</h3>
+        <p className="mt-1.5 max-w-3xl text-[11px] leading-relaxed text-white/45">Transform the selected cardiovascular system into valve phases and normalized pressure–volume mechanics. This is an educational synthetic model, not a patient calculator.</p>
+      </header>
+
+      <div className="grid gap-3 p-3 sm:p-4 2xl:grid-cols-[340px_minmax(0,1fr)]">
+        <article className="rounded-[22px] border border-white/[.08] bg-black/20 p-3.5">
+          <div className="flex items-center justify-between">
+            <h4 className="text-sm font-black">Load, pump & relaxation</h4>
+            <button type="button" onClick={() => setInput(baseline)} className="min-h-9 rounded-xl border border-white/[.09] px-3 text-[8px] font-black text-white/55 transition hover:bg-white/[.04] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-300/55">Reset</button>
+          </div>
+          <div className="mt-3 space-y-2">
+            {(Object.keys(INPUT_META) as (keyof SyntheticCardiacInput)[]).map((key) => (
+              <label key={key} className="block rounded-2xl border border-white/[.07] bg-white/[.022] p-3">
+                <div className="flex justify-between gap-3">
+                  <div><div className="text-[9px] font-black text-white/75">{INPUT_META[key].label}</div><div className="text-[8px] text-white/30">{INPUT_META[key].hint}</div></div>
+                  <output className="text-[8px] font-black text-emerald-100/70">{pct(input[key])}</output>
+                </div>
+                <input aria-label={INPUT_META[key].label} type="range" min="0" max="1" step="0.01" value={input[key]} onChange={(event) => setInput((current) => ({ ...current, [key]: Number(event.target.value) }))} className="mt-3 w-full accent-emerald-300" />
+              </label>
+            ))}
+          </div>
+        </article>
+
+        <div className="space-y-3">
+          <article className="rounded-[22px] border border-white/[.08] bg-[#02060b] p-3.5">
+            <div className="flex justify-between gap-2"><h4 className="text-sm font-black">Directional pressure–volume loop</h4><span className="text-[8px] text-white/30">normalized axes · no mmHg · no mL</span></div>
+            <div className="mt-3 grid gap-3 lg:grid-cols-[minmax(0,1fr)_210px]">
+              <svg viewBox="0 0 270 240" role="img" aria-label="Normalized synthetic ventricular pressure volume loop" className="min-h-[260px] w-full rounded-[18px] border border-white/[.07] bg-black/40">
+                <line x1="18" y1="218" x2="252" y2="218" stroke="rgba(255,255,255,.15)" />
+                <line x1="18" y1="218" x2="18" y2="22" stroke="rgba(255,255,255,.15)" />
+                <path d={path} fill="rgba(16,185,129,.06)" stroke="rgba(77,231,255,.92)" strokeWidth="3" />
+                {pv.map((point, index) => <g key={point.id}><circle cx={toX(point.volume)} cy={toY(point.pressure)} r="5" fill="white" /><text x={toX(point.volume) + 7} y={toY(point.pressure) - 7} fill="rgba(255,255,255,.6)" fontSize="8">{index + 1}</text></g>)}
+              </svg>
+              <div className="space-y-2">{pv.map((point, index) => <div key={point.id} className="rounded-2xl border border-white/[.07] p-2.5 text-[8px]"><b>{index + 1}. {point.label}</b><div className="mt-1 font-mono text-white/30">V {pct(point.volume)} · P {pct(point.pressure)}</div></div>)}</div>
+            </div>
+          </article>
+          <article className="grid gap-2 sm:grid-cols-2 xl:grid-cols-3">{(Object.entries(OUTPUT_META) as [keyof typeof OUTPUT_META, string][]).map(([key, label]) => <div key={key} className="rounded-2xl border border-white/[.07] bg-black/20 p-3"><div className="flex justify-between gap-2 text-[8px]"><span className="text-white/50">{label}</span><b>{pct(state[key])}</b></div><div className="mt-2 h-1.5 overflow-hidden rounded-full bg-white/[.06]"><div className="h-full rounded-full bg-[linear-gradient(90deg,rgba(52,211,153,.9),rgba(77,231,255,.9),rgba(156,124,255,.8))] transition-[width]" style={{ width: pct(state[key]) }} /></div></div>)}</article>
+        </div>
+      </div>
+
+      <div className="grid gap-3 px-3 pb-3 sm:px-4 sm:pb-4 lg:grid-cols-2">
+        <article className="rounded-[22px] border border-white/[.08] bg-black/20 p-3.5"><h4 className="text-sm font-black">Valve-state cycle</h4><div className="mt-3 grid gap-2 sm:grid-cols-2">{CARDIAC_PHASES.map((phase) => <div key={phase.id} className="rounded-2xl border border-white/[.07] p-3"><div className="text-[9px] font-black">{phase.label}</div><div className="mt-1 text-[8px] text-white/40">Mitral {phase.mitralState} · Aortic {phase.aorticState} · Volume {phase.volumeDirection}</div><p className="mt-2 text-[8px] leading-relaxed text-white/35">{phase.teachingPoint}</p></div>)}</div></article>
+        <article className="rounded-[22px] border border-white/[.08] bg-black/20 p-3.5"><h4 className="text-sm font-black">Formula & provenance ledger</h4><div className="mt-3 space-y-2">{CARDIAC_TEACHING_RELATIONSHIPS.map((relationship) => <div key={relationship.id} className="rounded-xl border border-white/[.06] p-2.5"><code className="text-[9px] text-emerald-100/75">{relationship.expression}</code><p className="mt-1 text-[8px] text-white/40">{relationship.meaning}</p><p className="mt-1 text-[7px] text-amber-100/45">{relationship.boundary}</p></div>)}</div><div className="mt-3 flex flex-wrap gap-2">{CARDIAC_HEMODYNAMICS_EVIDENCE.map((source) => <a key={source.pmid} href={source.url} target="_blank" rel="noreferrer" className="rounded-full border border-cyan-300/12 px-2.5 py-1 text-[8px] text-cyan-100/65">PMID {source.pmid}</a>)}</div></article>
+      </div>
+
+      <footer className="border-t border-amber-300/10 bg-amber-300/[.025] px-4 py-3 text-[8px] leading-relaxed text-amber-50/50">{CARDIAC_HEMODYNAMICS_BOUNDARY}</footer>
+    </section>
+  )
+}

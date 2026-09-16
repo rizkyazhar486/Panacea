@@ -8,6 +8,7 @@ import '../styles/widget-concepts-v6.css'
 import '../styles/widget-archetypes-v6.css'
 import '../styles/widget-concepts-v7.css'
 import '../styles/widget-concepts-v9.css'
+import '../styles/prayer-widget-dark-hotfix.css'
 
 export function UbinSalat() {
   const setelan = useMemo(() => muatSetelan(), [])

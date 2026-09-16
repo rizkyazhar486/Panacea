@@ -1,7 +1,9 @@
 import { useMemo, useState } from 'react'
 import { DiscoveryWorkbench } from '../components/frontier/DiscoveryWorkbench'
+import { PanaceaCausalTimeMachine } from '../components/frontier/PanaceaCausalTimeMachine'
 import { PanaceaFrontierSeven } from '../components/frontier/PanaceaFrontierSeven'
 import { PanaceaHopeStack } from '../components/frontier/PanaceaHopeStack'
+import { PanaceaRealityEngine } from '../components/frontier/PanaceaRealityEngine'
 import {
   FRONTIER_CATEGORIES,
   FRONTIER_FEATURES,
@@ -75,6 +77,8 @@ export function FrontierHealthOS() {
       <PanaceaFrontierSeven />
       <PanaceaHopeStack />
       <DiscoveryWorkbench />
+      <PanaceaRealityEngine />
+      <PanaceaCausalTimeMachine />
 
       <section className="space-y-4 rounded-[30px] border border-neutral-200 bg-white/70 p-4 dark:border-white/10 dark:bg-white/[.025] sm:p-5">
         <div>

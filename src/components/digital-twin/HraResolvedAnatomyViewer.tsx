@@ -13,12 +13,25 @@ type Props = {
   maxResults?: number
 }
 
+type ClipAxis = 'x' | 'y' | 'z' | null
+
 type ViewApi = {
   camera: THREE.PerspectiveCamera
   controls: OrbitControls
   root: THREE.Object3D
   render: () => void
   focus: (term: string) => boolean
+  setOpacity: (value: number) => void
+  setExplode: (value: number) => void
+  setClip: (axis: ClipAxis) => void
+  setIsolated: (value: boolean) => boolean
+  resetVisuals: () => void
+}
+
+type MeshState = {
+  mesh: THREE.Mesh
+  position: THREE.Vector3
+  direction: THREE.Vector3
 }
 
 function unique(values: string[]) {
@@ -93,6 +106,10 @@ function bestMeshForTerm(root: THREE.Object3D, term: string) {
   return candidates[0]?.mesh ?? null
 }
 
+function materialsOf(mesh: THREE.Mesh) {
+  return Array.isArray(mesh.material) ? mesh.material : [mesh.material]
+}
+
 export function HraResolvedAnatomyViewer({ terms, title, description, maxResults = 12 }: Props) {
   const mountRef = useRef<HTMLDivElement>(null)
   const viewApiRef = useRef<ViewApi | null>(null)
@@ -103,6 +120,10 @@ export function HraResolvedAnatomyViewer({ terms, title, description, maxResults
   const [state, setState] = useState<'loading' | 'ready' | 'empty' | 'error'>('loading')
   const [picked, setPicked] = useState('')
   const [viewerError, setViewerError] = useState('')
+  const [opacity, setOpacity] = useState(1)
+  const [explode, setExplode] = useState(0)
+  const [clipAxis, setClipAxis] = useState<ClipAxis>(null)
+  const [isolated, setIsolated] = useState(false)
 
   useEffect(() => {
     let cancelled = false
@@ -150,8 +171,17 @@ export function HraResolvedAnatomyViewer({ terms, title, description, maxResults
     let observer: ResizeObserver | null = null
     let loadedRoot: THREE.Object3D | null = null
     let pickedHelper: THREE.BoxHelper | null = null
+    let inspectedMesh: THREE.Mesh | null = null
+    let modelCenter = new THREE.Vector3()
+    let modelRadius = 1
+    const meshStates: MeshState[] = []
+
     setPicked('')
     setViewerError('')
+    setOpacity(1)
+    setExplode(0)
+    setClipAxis(null)
+    setIsolated(false)
     mount.innerHTML = ''
     viewApiRef.current = null
 
@@ -172,6 +202,7 @@ export function HraResolvedAnatomyViewer({ terms, title, description, maxResults
     renderer.outputColorSpace = THREE.SRGBColorSpace
     renderer.toneMapping = THREE.ACESFilmicToneMapping
     renderer.toneMappingExposure = 1.02
+    renderer.localClippingEnabled = true
     renderer.domElement.style.touchAction = 'none'
     mount.appendChild(renderer.domElement)
 
@@ -231,10 +262,13 @@ export function HraResolvedAnatomyViewer({ terms, title, description, maxResults
 
     const inspectMesh = (mesh: THREE.Object3D, refocus: boolean) => {
       clearHelper()
+      inspectedMesh = mesh instanceof THREE.Mesh ? mesh : null
       pickedHelper = new THREE.BoxHelper(mesh, 0x62ddff)
       pickedHelper.renderOrder = 50
       scene.add(pickedHelper)
       setPicked(meshLabel(mesh))
+      setIsolated(false)
+      for (const entry of meshStates) entry.mesh.visible = true
       if (refocus) fitCamera(camera, controls, mesh, 1.8)
       render()
     }
@@ -247,18 +281,85 @@ export function HraResolvedAnatomyViewer({ terms, title, description, maxResults
       return true
     }
 
+    const applyOpacity = (value: number) => {
+      const safe = THREE.MathUtils.clamp(value, 0.12, 1)
+      for (const { mesh } of meshStates) {
+        for (const material of materialsOf(mesh)) {
+          material.transparent = safe < 0.995
+          material.opacity = safe
+          material.depthWrite = safe >= 0.5
+          material.needsUpdate = true
+        }
+      }
+      render()
+    }
+
+    const applyExplode = (value: number) => {
+      const safe = THREE.MathUtils.clamp(value, 0, 1)
+      for (const entry of meshStates) {
+        entry.mesh.position.copy(entry.position).addScaledVector(entry.direction, modelRadius * 0.32 * safe)
+      }
+      if (pickedHelper && inspectedMesh) pickedHelper.setFromObject(inspectedMesh)
+      render()
+    }
+
+    const applyClip = (axis: ClipAxis) => {
+      if (!axis) {
+        renderer.clippingPlanes = []
+      } else {
+        const normal = axis === 'x' ? new THREE.Vector3(1, 0, 0) : axis === 'y' ? new THREE.Vector3(0, 1, 0) : new THREE.Vector3(0, 0, 1)
+        renderer.clippingPlanes = [new THREE.Plane(normal, -normal.dot(modelCenter))]
+      }
+      render()
+    }
+
+    const applyIsolated = (value: boolean) => {
+      if (value && !inspectedMesh) return false
+      for (const entry of meshStates) entry.mesh.visible = !value || entry.mesh === inspectedMesh
+      if (!value && pickedHelper && inspectedMesh) pickedHelper.setFromObject(inspectedMesh)
+      render()
+      return true
+    }
+
+    const resetVisuals = () => {
+      for (const entry of meshStates) {
+        entry.mesh.position.copy(entry.position)
+        entry.mesh.visible = true
+      }
+      renderer.clippingPlanes = []
+      applyOpacity(1)
+      if (pickedHelper && inspectedMesh) pickedHelper.setFromObject(inspectedMesh)
+      render()
+    }
+
     const loader = new GLTFLoader()
-  loader.setMeshoptDecoder(MeshoptDecoder)
+    loader.setMeshoptDecoder(MeshoptDecoder)
     loader.load(
       selectedModelUrl,
       (gltf) => {
         if (disposed) return
         loadedRoot = gltf.scene
+        world.add(gltf.scene)
+        gltf.scene.updateMatrixWorld(true)
+        const sphere = boundingSphere(gltf.scene)
+        if (sphere) {
+          modelCenter = sphere.center.clone()
+          modelRadius = Math.max(sphere.radius, 0.001)
+        }
+
         gltf.scene.traverse((object) => {
           if (!(object instanceof THREE.Mesh) || !object.material) return
           object.frustumCulled = true
-          const materials = Array.isArray(object.material) ? object.material : [object.material]
-          for (const material of materials) {
+          const center = new THREE.Box3().setFromObject(object).getCenter(new THREE.Vector3())
+          const direction = center.sub(modelCenter)
+          if (direction.lengthSq() > 1e-12) direction.normalize()
+          if (object.parent) {
+            const parentRotation = new THREE.Quaternion()
+            object.parent.getWorldQuaternion(parentRotation)
+            direction.applyQuaternion(parentRotation.invert())
+          }
+          meshStates.push({ mesh: object, position: object.position.clone(), direction })
+          for (const material of materialsOf(object)) {
             if (material instanceof THREE.MeshStandardMaterial || material instanceof THREE.MeshPhysicalMaterial) {
               material.envMapIntensity = 0.85
               material.metalness = Math.min(material.metalness ?? 0, 0.035)
@@ -266,9 +367,20 @@ export function HraResolvedAnatomyViewer({ terms, title, description, maxResults
             }
           }
         })
-        world.add(gltf.scene)
+
         fitCamera(camera, controls, gltf.scene)
-        viewApiRef.current = { camera, controls, root: gltf.scene, render, focus }
+        viewApiRef.current = {
+          camera,
+          controls,
+          root: gltf.scene,
+          render,
+          focus,
+          setOpacity: applyOpacity,
+          setExplode: applyExplode,
+          setClip: applyClip,
+          setIsolated: applyIsolated,
+          resetVisuals,
+        }
         if (focusTerm) focus(focusTerm)
         render()
       },
@@ -315,8 +427,7 @@ export function HraResolvedAnatomyViewer({ terms, title, description, maxResults
       world.traverse((object) => {
         if (!(object instanceof THREE.Mesh)) return
         object.geometry?.dispose()
-        const materials = Array.isArray(object.material) ? object.material : [object.material]
-        materials.forEach((material) => material.dispose())
+        materialsOf(object).forEach((material) => material.dispose())
       })
       environment.dispose()
       pmrem.dispose()
@@ -325,8 +436,8 @@ export function HraResolvedAnatomyViewer({ terms, title, description, maxResults
       renderer.forceContextLoss()
       mount.innerHTML = ''
     }
-  // Rebuild WebGL only when the actual GLB changes. A cornea→iris→lens selection
-  // within the same eye source focuses a mesh instead of reparsing the whole organ.
+  // Rebuild WebGL only when the actual GLB changes. Structure focus and visual
+  // inspection controls mutate the loaded source scene without reparsing it.
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedModelUrl])
 
@@ -335,6 +446,11 @@ export function HraResolvedAnatomyViewer({ terms, title, description, maxResults
     if (!api) return
     if (view === 'reset') {
       setPicked('')
+      setOpacity(1)
+      setExplode(0)
+      setClipAxis(null)
+      setIsolated(false)
+      api.resetVisuals()
       fitCamera(api.camera, api.controls, api.root)
       api.render()
       return
@@ -356,6 +472,28 @@ export function HraResolvedAnatomyViewer({ terms, title, description, maxResults
     api.render()
   }
 
+  function changeOpacity(value: number) {
+    setOpacity(value)
+    viewApiRef.current?.setOpacity(value)
+  }
+
+  function changeExplode(value: number) {
+    setExplode(value)
+    viewApiRef.current?.setExplode(value)
+  }
+
+  function changeClip(axis: ClipAxis) {
+    setClipAxis(axis)
+    viewApiRef.current?.setClip(axis)
+  }
+
+  function toggleIsolation() {
+    const next = !isolated
+    const applied = viewApiRef.current?.setIsolated(next) ?? false
+    if (next && !applied) return
+    setIsolated(next)
+  }
+
   return (
     <section className="overflow-hidden rounded-[28px] border border-neutral-200 bg-white shadow-sm dark:border-white/10 dark:bg-[#090d11]">
       <div className="border-b border-neutral-200 p-4 dark:border-white/10 sm:p-5">
@@ -365,7 +503,7 @@ export function HraResolvedAnatomyViewer({ terms, title, description, maxResults
             <h3 className="mt-1 text-lg font-black text-neutral-950 dark:text-white">{title}</h3>
             {description && <p className="mt-1 max-w-3xl text-[10px] leading-relaxed text-neutral-500 dark:text-neutral-400">{description}</p>}
           </div>
-          <div className="rounded-full border border-neutral-200 bg-neutral-50 px-3 py-1.5 text-[9px] font-black text-neutral-500 dark:border-white/10 dark:bg-white/[.04] dark:text-neutral-300">One GLB · submesh focus · redraw on interaction</div>
+          <div className="rounded-full border border-neutral-200 bg-neutral-50 px-3 py-1.5 text-[9px] font-black text-neutral-500 dark:border-white/10 dark:bg-white/[.04] dark:text-neutral-300">Source GLB · inspect · isolate · explode · clip</div>
         </div>
 
         {renderable.length > 1 && (
@@ -383,13 +521,13 @@ export function HraResolvedAnatomyViewer({ terms, title, description, maxResults
       </div>
 
       {selected?.model ? (
-        <div className="grid lg:grid-cols-[minmax(0,1fr)_300px]">
+        <div className="grid lg:grid-cols-[minmax(0,1fr)_320px]">
           <div className="relative min-h-[440px] bg-[#070a0d]">
             <div ref={mountRef} className="absolute inset-0" aria-label={`HRA 3D model of ${selected.label}`} />
             <div className="pointer-events-none absolute left-3 top-3 rounded-xl bg-black/45 px-2.5 py-2 text-[9px] font-semibold text-white/80 backdrop-blur">Drag rotate · pinch/scroll zoom · tap structure inspect</div>
             <div className="absolute bottom-3 left-3 right-3 flex flex-wrap gap-1.5 sm:right-auto">
               {(['front', 'side', 'back', 'reset'] as const).map((view) => (
-                <button key={view} type="button" onClick={() => orient(view)} className="rounded-full border border-white/15 bg-black/55 px-3 py-2 text-[9px] font-bold capitalize text-white backdrop-blur hover:bg-black/70">{view}</button>
+                <button key={view} type="button" onClick={() => orient(view)} className="min-h-10 rounded-full border border-white/15 bg-black/55 px-3 py-2 text-[9px] font-bold capitalize text-white backdrop-blur hover:bg-black/70">{view}</button>
               ))}
             </div>
             {viewerError && (
@@ -401,6 +539,7 @@ export function HraResolvedAnatomyViewer({ terms, title, description, maxResults
               </div>
             )}
           </div>
+
           <aside className="border-t border-neutral-200 p-4 dark:border-white/10 lg:border-l lg:border-t-0 sm:p-5">
             <div className="text-[8px] font-black uppercase tracking-[.16em] text-neutral-400">Source structure</div>
             <div className="mt-1 text-base font-black text-neutral-950 dark:text-white">{selected.label}</div>
@@ -412,6 +551,25 @@ export function HraResolvedAnatomyViewer({ terms, title, description, maxResults
               <div><dt className="font-black uppercase tracking-wide text-neutral-400">GitHub SHA</dt><dd className="mt-1 break-all font-mono text-[9px] text-neutral-500">{selected.model.sha || '—'}</dd></div>
               {picked && <div className="rounded-xl border border-cyan-200 bg-cyan-50 p-2.5 dark:border-cyan-300/20 dark:bg-cyan-300/10"><dt className="font-black uppercase tracking-wide text-cyan-700 dark:text-cyan-300">Inspected mesh</dt><dd className="mt-1 break-all font-semibold text-neutral-800 dark:text-neutral-100">{picked}</dd></div>}
             </dl>
+
+            <section aria-label="3D anatomy inspection controls" className="mt-4 rounded-2xl border border-neutral-200 bg-neutral-50 p-3 dark:border-white/10 dark:bg-white/[.025]">
+              <div className="text-[8px] font-black uppercase tracking-[.16em] text-neutral-400">Visual inspection</div>
+              <label className="mt-3 flex items-center justify-between text-[9px] font-black text-neutral-600 dark:text-neutral-300"><span>Opacity</span><span>{Math.round(opacity * 100)}%</span></label>
+              <input aria-label="Anatomy opacity" type="range" min="0.12" max="1" step="0.04" value={opacity} onChange={(event) => changeOpacity(Number(event.target.value))} className="mt-1 w-full" />
+              <label className="mt-3 flex items-center justify-between text-[9px] font-black text-neutral-600 dark:text-neutral-300"><span>Exploded separation</span><span>{Math.round(explode * 100)}%</span></label>
+              <input aria-label="Exploded anatomy separation" type="range" min="0" max="1" step="0.05" value={explode} onChange={(event) => changeExplode(Number(event.target.value))} className="mt-1 w-full" />
+
+              <div className="mt-3 text-[8px] font-black uppercase tracking-wide text-neutral-400">Cross-section plane</div>
+              <div className="mt-1.5 grid grid-cols-4 gap-1.5">
+                {([null, 'x', 'y', 'z'] as const).map((axis) => (
+                  <button key={axis ?? 'off'} type="button" aria-pressed={clipAxis === axis} onClick={() => changeClip(axis)} className={`min-h-10 rounded-xl border px-2 text-[9px] font-black ${clipAxis === axis ? 'border-cyan-500 bg-cyan-50 text-cyan-900 dark:bg-cyan-300/10 dark:text-cyan-100' : 'border-neutral-200 bg-white text-neutral-500 dark:border-white/10 dark:bg-black/20 dark:text-neutral-300'}`}>{axis ? axis.toUpperCase() : 'Off'}</button>
+                ))}
+              </div>
+
+              <button type="button" disabled={!picked} aria-pressed={isolated} onClick={toggleIsolation} className="mt-2 min-h-11 w-full rounded-xl border border-neutral-300 bg-white px-3 text-[9px] font-black text-neutral-700 disabled:cursor-not-allowed disabled:opacity-40 dark:border-white/15 dark:bg-black/20 dark:text-white">{isolated ? 'Show all source meshes' : 'Isolate inspected mesh'}</button>
+              <p className="mt-2 text-[8px] leading-relaxed text-neutral-400">Opacity, separation and clipping are reversible viewer transforms of the upstream GLB. They do not create or validate new anatomy.</p>
+            </section>
+
             <a href={selected.sourceUrl} target="_blank" rel="noreferrer" className="mt-4 inline-flex rounded-full bg-neutral-950 px-3 py-2 text-[9px] font-black text-white dark:bg-white dark:text-neutral-950">Open HRA source ↗</a>
             <p className="mt-4 text-[9px] leading-relaxed text-neutral-400">This viewer preserves upstream HRA geometry. Structure changes within the same organ focus matching source meshes without reloading the whole GLB. Panacea does not invent patient-specific anatomy.</p>
           </aside>

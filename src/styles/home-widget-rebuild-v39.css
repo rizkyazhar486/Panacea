@@ -1,0 +1,98 @@
+/* Panacea Home widget surface rebuild v39 — 2026-09-15
+   Final active-widget boundary. Presentation-only: never changes widget data,
+   chart/reference SVG semantics, routing, persistence, or medical logic. */
+
+/* The active preview is its own opaque dark surface. Do not depend on host
+   theme restoration, backdrop compositing, or a widget's legacy light root. */
+.panacea-home .widget-instrument-slide-v5[aria-hidden='false']{
+  isolation:isolate!important;
+  opacity:1!important;
+  filter:none!important;
+  mix-blend-mode:normal!important;
+  background:#0b1119!important;
+  background-image:none!important;
+  color:#f8fafc!important;
+  color-scheme:dark!important;
+  border-radius:20px!important;
+  overflow:hidden!important;
+}
+
+/* Rebuild only the OUTER widget card. Legacy white/neutral surfaces, opacity,
+   grayscale, brightness, blend and backdrop filters cannot wash out the card.
+   Inner charts, bars, ranges and SVGs are deliberately not selected. */
+.panacea-home .widget-instrument-slide-v5[aria-hidden='false'] > :first-child{
+  position:relative!important;
+  opacity:1!important;
+  filter:none!important;
+  mix-blend-mode:normal!important;
+  -webkit-backdrop-filter:none!important;
+  backdrop-filter:none!important;
+  background-color:#0b1119!important;
+  background-image:none!important;
+  color:#f8fafc!important;
+  border-color:rgba(255,255,255,.085)!important;
+  box-shadow:none!important;
+  color-scheme:dark!important;
+}
+
+.panacea-home .widget-instrument-slide-v5[aria-hidden='false'] > :first-child::before,
+.panacea-home .widget-instrument-slide-v5[aria-hidden='false'] > :first-child::after{
+  opacity:0!important;
+  filter:none!important;
+  mix-blend-mode:normal!important;
+  background:transparent!important;
+  box-shadow:none!important;
+  pointer-events:none!important;
+}
+
+/* Known shared card shell: dark and readable without touching semantic data. */
+.panacea-home .widget-instrument-slide-v5[aria-hidden='false'] > :first-child:is(.kaca,.bg-white,.bg-neutral-50,.bg-neutral-100,.bg-neutral-200,.bg-gray-50,.bg-gray-100,.bg-gray-200,.bg-slate-50,.bg-slate-100,.bg-slate-200),
+.panacea-home .widget-instrument-slide-v5[aria-hidden='false'] > :first-child > .kaca{
+  background:#0b1119!important;
+  background-image:none!important;
+  color:#f8fafc!important;
+  border:1px solid rgba(255,255,255,.085)!important;
+}
+
+/* Typography repair is restricted to legacy neutral text classes. Explicit
+   semantic status colors (green/red/amber/blue etc.) remain untouched. */
+.panacea-home .widget-instrument-slide-v5[aria-hidden='false'] :is(.text-neutral-950,.text-neutral-900,.text-neutral-800,.text-neutral-700,.text-gray-950,.text-gray-900,.text-gray-800,.text-gray-700,.text-slate-950,.text-slate-900,.text-slate-800,.text-slate-700,.text-ink){
+  color:#f8fafc!important;
+}
+.panacea-home .widget-instrument-slide-v5[aria-hidden='false'] :is(.text-neutral-600,.text-gray-600,.text-slate-600){color:#dbe5ee!important}
+.panacea-home .widget-instrument-slide-v5[aria-hidden='false'] :is(.text-neutral-500,.text-neutral-400,.text-gray-500,.text-gray-400,.text-slate-500,.text-slate-400){color:#b8c4cf!important}
+
+/* A lazy/empty state is intentionally compact instead of becoming a giant
+   pale slab while the next widget mounts. */
+.panacea-home .widget-instrument-slide-v5[aria-hidden='false']:empty,
+.panacea-home .widget-instrument-slide-v5[aria-hidden='false'] > .widget-instrument-loading-v29{
+  min-height:132px!important;
+  max-height:184px!important;
+  background:#090f17!important;
+  background-image:none!important;
+  border:1px solid rgba(255,255,255,.075)!important;
+  color:#dbe7ef!important;
+  opacity:1!important;
+  filter:none!important;
+  -webkit-backdrop-filter:none!important;
+  backdrop-filter:none!important;
+}
+
+/* Mobile protocol: 12px minimum supporting copy and 44px touch targets. */
+@media(max-width:430px){
+  .panacea-home .widget-instrument-slide-v5[aria-hidden='false']{border-radius:16px!important}
+  .panacea-home .widget-instrument-slide-v5[aria-hidden='false'] :is(p,.t-kecil,.t-mikro){font-size:max(12px,1em)}
+  .panacea-home :is(.widget-instrument-nav-v5,.widget-instrument-edit-v5){min-height:44px!important}
+}
+
+html.pmd-low-memory .panacea-home .widget-instrument-slide-v5[aria-hidden='false'],
+html.pmd-low-memory .panacea-home .widget-instrument-slide-v5[aria-hidden='false'] > :first-child{
+  box-shadow:none!important;
+  filter:none!important;
+  -webkit-backdrop-filter:none!important;
+  backdrop-filter:none!important;
+}
+
+@media(prefers-reduced-motion:reduce){
+  .panacea-home .widget-instrument-slide-v5[aria-hidden='false'] *{scroll-behavior:auto!important}
+}

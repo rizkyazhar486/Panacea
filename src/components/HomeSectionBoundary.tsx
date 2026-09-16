@@ -1,5 +1,8 @@
 import { Component, type ReactNode } from 'react'
+import { HomeLiveWidgetRail } from './HomeLiveWidgetRail'
+import { HomeWidgetUniverse } from './HomeWidgetUniverse'
 import '../styles/home-mobile-stability.css'
+import '../styles/home-no-gray.css'
 
 type Props = {
   children: ReactNode
@@ -14,8 +17,8 @@ type State = {
  * A Home section must never be able to take the entire daily dashboard down.
  *
  * The app-wide ErrorBoundary is still the final safety net, but Home contains
- * many independent visualisations and optional widgets. If one of those has a
- * bad local value, a stale chunk, or a browser-specific rendering problem we
+ * many independent visualisations and optional widgets. If one of those has
+ * a bad local value, a stale chunk, or a browser-specific rendering problem we
  * keep Training, Recovery and the user's core metrics usable.
  */
 export class HomeSectionBoundary extends Component<Props, State> {
@@ -34,7 +37,18 @@ export class HomeSectionBoundary extends Component<Props, State> {
   }
 
   render() {
-    if (!this.state.error) return this.props.children
+    if (!this.state.error) {
+      if (this.props.label === 'Dashboard widgets') {
+        return (
+          <div className="min-w-0">
+            <HomeWidgetUniverse />
+            <HomeLiveWidgetRail />
+            {this.props.children}
+          </div>
+        )
+      }
+      return this.props.children
+    }
 
     return (
       <section className="rounded-[24px] border border-amber-200/70 bg-amber-50/80 p-4 dark:border-amber-300/15 dark:bg-amber-300/[.06]">
