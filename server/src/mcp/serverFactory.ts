@@ -99,7 +99,7 @@ export function createPanaceaMcpServer(
         description: definition.description,
         inputSchema,
       },
-      async (input) => {
+      async (input: unknown) => {
         const result = await executePanaceaTool(definition.name, input, {
           transport,
           requestId: randomUUID(),
