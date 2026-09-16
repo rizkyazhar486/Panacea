@@ -28,6 +28,9 @@ const MODES: Mode[] = [
   { key: 'clinical', label: 'Clinical', panel: 'Diseases', description: 'Relate structures to disease, drugs and clinically oriented learning.' },
 ]
 
+const LIQUID_ACTIONS_ROOT_CLASS = 'pmd-liquid-actions-v45'
+const BODY_EXPOSURE_ROOT_CLASS = 'pmd-body-exposure-active'
+
 export function BodyExposureOS() {
   const rootRef = useRef<HTMLElement | null>(null)
   const explorerRef = useRef<HTMLDivElement | null>(null)
@@ -40,6 +43,22 @@ export function BodyExposureOS() {
     const syncFullscreen = () => setImmersive(document.fullscreenElement === rootRef.current)
     document.addEventListener('fullscreenchange', syncFullscreen)
     return () => document.removeEventListener('fullscreenchange', syncFullscreen)
+  }, [])
+
+  useEffect(() => {
+    // Body Exposure owns a dense anatomy/physiology interaction model. The later
+    // global liquid-action material pass overrides those controls through an
+    // html-level selector, so suspend that global presentation class only while
+    // this workspace is mounted. The original class is restored on navigation.
+    const html = document.documentElement
+    const hadLiquidActions = html.classList.contains(LIQUID_ACTIONS_ROOT_CLASS)
+    html.classList.add(BODY_EXPOSURE_ROOT_CLASS)
+    html.classList.remove(LIQUID_ACTIONS_ROOT_CLASS)
+
+    return () => {
+      html.classList.remove(BODY_EXPOSURE_ROOT_CLASS)
+      if (hadLiquidActions) html.classList.add(LIQUID_ACTIONS_ROOT_CLASS)
+    }
   }, [])
 
   function openPanel(mode: Mode) {
@@ -93,7 +112,14 @@ export function BodyExposureOS() {
   const current = MODES.find((mode) => mode.key === activeMode) ?? MODES[0]
 
   return (
-    <section ref={rootRef} className="body-exposure-os" aria-labelledby="body-exposure-os-title">
+    <section
+      ref={rootRef}
+      className="body-exposure-os"
+      aria-labelledby="body-exposure-os-title"
+      data-pmd-body-exposure="true"
+      data-pmd-unclamped="true"
+      data-pmd-liquid="off"
+    >
       <div className="body-exposure-os__ambient" aria-hidden />
 
       <header className="body-exposure-os__glass relative z-[2] overflow-hidden rounded-[28px] border border-white/10 p-4 sm:p-5 lg:p-6">
