@@ -1,6 +1,6 @@
 import { resolve } from 'node:path'
 import { fileURLToPath, pathToFileURL } from 'node:url'
-import { StdioServerTransport } from '@modelcontextprotocol/server'
+import { StdioServerTransport } from '@modelcontextprotocol/server/stdio'
 import { createPanaceaMcpServer } from './serverFactory.js'
 
 export function defaultMcpRepoRoot(): string {
