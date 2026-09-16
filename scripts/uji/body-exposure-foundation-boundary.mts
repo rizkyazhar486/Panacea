@@ -12,9 +12,9 @@ assert.match(os, /data-pmd-body-exposure="true"/, 'Body Exposure must declare an
 assert.match(os, /data-pmd-unclamped="true"/, 'Body Exposure must opt out of generic copy mutation/clamping')
 assert.match(os, /data-pmd-liquid="off"/, 'Body Exposure must opt out of generic liquid-action runtime binding')
 
-assert.match(visualFirstRuntime, /\[data-pmd-unclamped=\\"true\\"\]/, 'visual-first runtime must honor the unclamped boundary')
+assert.match(visualFirstRuntime, /\[data-pmd-unclamped="true"\]/, 'visual-first runtime must honor the unclamped boundary')
 assert.match(visualFirstStyles, /\[data-pmd-unclamped='true'\]/, 'visual-first styles must honor the unclamped boundary')
-assert.match(liquidRuntime, /\[data-pmd-liquid=\\"off\\"\]/, 'liquid runtime must honor the local opt-out boundary')
+assert.match(liquidRuntime, /\[data-pmd-liquid="off"\]/, 'liquid runtime must honor the local opt-out boundary')
 
 assert.match(os, /LIQUID_ACTIONS_ROOT_CLASS = 'pmd-liquid-actions-v45'/)
 assert.match(os, /html\.classList\.remove\(LIQUID_ACTIONS_ROOT_CLASS\)/, 'Body Exposure must suspend the later global control-material selector while mounted')
