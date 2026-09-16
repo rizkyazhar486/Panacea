@@ -1,0 +1,68 @@
+name: Diagnose first offline failure
+
+on:
+  pull_request:
+    branches:
+      - main
+
+permissions:
+  contents: read
+  issues: write
+  pull-requests: write
+
+jobs:
+  diagnose-first-offline-failure:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - name: Find first failing offline test
+        id: diagnose
+        shell: bash
+        run: |
+          set +e
+          resolver="file://$PWD/scripts/uji/typescript-resolver.mjs"
+          : > /tmp/panacea-first-failure.txt
+          failed=""
+          for f in $(find scripts/uji -maxdepth 1 -type f -name '*.mts' | sort); do
+            node --experimental-transform-types --import="$resolver" "$f" > /tmp/panacea-single-test.log 2>&1
+            code=$?
+            if [ "$code" -ne 0 ]; then
+              failed="$f"
+              {
+                echo "FIRST_FAIL=$f"
+                echo "EXIT_CODE=$code"
+                echo
+                cat /tmp/panacea-single-test.log
+              } > /tmp/panacea-first-failure.txt
+              break
+            fi
+          done
+          if [ -z "$failed" ]; then
+            echo "ALL_OFFLINE_TESTS_PASS" > /tmp/panacea-first-failure.txt
+            echo "failed=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "failed=true" >> "$GITHUB_OUTPUT"
+          fi
+          exit 0
+      - name: Publish first failure
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+        shell: bash
+        run: |
+          {
+            echo '<!-- panacea-offline-first-failure -->'
+            echo 'First deterministic offline failure:'
+            echo '```text'
+            cat /tmp/panacea-first-failure.txt
+            echo '```'
+          } > /tmp/panacea-first-failure-comment.md
+          gh pr comment "$PR_NUMBER" --body-file /tmp/panacea-first-failure-comment.md
+      - name: Fail when regression remains
+        if: steps.diagnose.outputs.failed == 'true'
+        run: exit 1
