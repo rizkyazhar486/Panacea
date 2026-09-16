@@ -12,6 +12,7 @@ export type ProvenanceKind = 'device' | 'user' | 'clinical' | 'derived' | 'simul
 
 export type LongitudinalSignal = {
   id: string
+  subjectId: string
   domain: LongitudinalDomain
   metric: string
   value: number | string
@@ -48,9 +49,9 @@ export type LongitudinalStateSummary = {
   }>
 }
 
-const STORAGE_KEY = 'panacea.longitudinal.patient-state.v1'
+const STORAGE_KEY = 'panacea.longitudinal.patient-state.v2'
 export const LONGITUDINAL_EVENT = 'panacea:longitudinal-state'
-const MAX_SIGNALS = 600
+const MAX_SIGNALS = 1200
 const RECENT_WINDOW_MS = 24 * 60 * 60 * 1000
 
 const ALL_DOMAINS: LongitudinalDomain[] = [
@@ -83,6 +84,8 @@ function isSignal(value: unknown): value is LongitudinalSignal {
   const signal = value as Partial<LongitudinalSignal>
   return Boolean(
     typeof signal.id === 'string' &&
+    typeof signal.subjectId === 'string' &&
+    signal.subjectId.length > 0 &&
     isLongitudinalDomain(signal.domain) &&
     typeof signal.metric === 'string' &&
     (typeof signal.value === 'number' || typeof signal.value === 'string') &&
@@ -97,26 +100,26 @@ function isSignal(value: unknown): value is LongitudinalSignal {
   )
 }
 
-export function readLongitudinalSignals(): LongitudinalSignal[] {
+export function readLongitudinalSignals(subjectId?: string): LongitudinalSignal[] {
   if (typeof window === 'undefined') return []
   try {
     const raw = window.localStorage.getItem(STORAGE_KEY)
     if (!raw) return []
     const parsed = JSON.parse(raw)
     if (!Array.isArray(parsed)) return []
-    return parsed
+    const valid = parsed
       .filter(isSignal)
       .map((signal) => ({ ...signal, confidence: clamp01(signal.confidence) }))
       .sort((a, b) => safeDate(b.measuredAt) - safeDate(a.measuredAt))
-      .slice(0, MAX_SIGNALS)
+    return (subjectId ? valid.filter((signal) => signal.subjectId === subjectId) : valid).slice(0, MAX_SIGNALS)
   } catch {
     return []
   }
 }
 
-function emitLongitudinalState() {
+function emitLongitudinalState(subjectId?: string) {
   if (typeof window === 'undefined') return
-  window.dispatchEvent(new CustomEvent(LONGITUDINAL_EVENT))
+  window.dispatchEvent(new CustomEvent(LONGITUDINAL_EVENT, { detail: { subjectId } }))
 }
 
 export function writeLongitudinalSignals(signals: LongitudinalSignal[]) {
@@ -130,17 +133,24 @@ export function writeLongitudinalSignals(signals: LongitudinalSignal[]) {
   emitLongitudinalState()
 }
 
+export function replaceSubjectSignals(subjectId: string, nextSubjectSignals: LongitudinalSignal[]) {
+  const others = readLongitudinalSignals().filter((signal) => signal.subjectId !== subjectId)
+  writeLongitudinalSignals([...nextSubjectSignals.filter((signal) => signal.subjectId === subjectId), ...others])
+  emitLongitudinalState(subjectId)
+}
+
 export function appendLongitudinalSignal(signal: LongitudinalSignal) {
   const next = [
     { ...signal, confidence: clamp01(signal.confidence) },
     ...readLongitudinalSignals().filter((item) => item.id !== signal.id),
   ]
   writeLongitudinalSignals(next)
+  emitLongitudinalState(signal.subjectId)
 }
 
 export function createLongitudinalSignal(input: Omit<LongitudinalSignal, 'id' | 'receivedAt'> & { id?: string; receivedAt?: string }): LongitudinalSignal {
   const receivedAt = input.receivedAt || new Date().toISOString()
-  const id = input.id || `${input.domain}:${input.metric}:${input.source}:${input.measuredAt}`
+  const id = input.id || `${input.subjectId}:${input.domain}:${input.metric}:${input.source}:${input.measuredAt}`
   return {
     ...input,
     id,
@@ -191,9 +201,10 @@ export function summarizeLongitudinalState(signals: LongitudinalSignal[]): Longi
   }
 }
 
-export function createLongitudinalHandoff(signals = readLongitudinalSignals()) {
+export function createLongitudinalHandoff(signals: LongitudinalSignal[]) {
   const summary = summarizeLongitudinalState(signals)
   const consentedSignals = signals.filter((signal) => signal.consent.granted)
+  const subjectId = signals[0]?.subjectId || null
   const recent = consentedSignals.slice(0, 24).map((signal) => ({
     domain: signal.domain,
     metric: signal.metric,
@@ -207,18 +218,19 @@ export function createLongitudinalHandoff(signals = readLongitudinalSignals()) {
   }))
 
   return {
-    schema: 'panacea.longitudinal-handoff.v1',
+    schema: 'panacea.longitudinal-handoff.v2',
+    subjectId,
     generatedAt: new Date().toISOString(),
     summary,
     eligibleSignalCount: consentedSignals.length,
     recent,
-    boundary: 'Context only. Only consent-granted signals are attached. Preserve provenance, uncertainty, temporal context and clinician oversight.',
+    boundary: 'Context only. Patient-scoped and consent-gated. Preserve provenance, uncertainty, temporal context and clinician oversight.',
   }
 }
 
-export function persistLongitudinalHandoff(target: 'chatbot' | 'emr' | 'care') {
+export function persistLongitudinalHandoff(target: 'chatbot' | 'emr' | 'care', subjectId: string) {
   if (typeof window === 'undefined') return
-  const handoff = createLongitudinalHandoff()
+  const handoff = createLongitudinalHandoff(readLongitudinalSignals(subjectId))
   window.sessionStorage.setItem('pm_longitudinal_context', JSON.stringify({ ...handoff, target }))
 }
 
@@ -241,4 +253,5 @@ export const longitudinalPatientStateContract = {
   domains: ALL_DOMAINS,
   maxSignals: MAX_SIGNALS,
   recentWindowMs: RECENT_WINDOW_MS,
+  schema: 'panacea.longitudinal-handoff.v2',
 } as const
