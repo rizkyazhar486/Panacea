@@ -32,5 +32,7 @@ jobs:
         run: npm ci
       - name: MCP targeted tests
         run: npm run uji:mcp
+      - name: MCP backend mount contract
+        run: npx tsx uji/mcpMount.uji.ts
       - name: Server typecheck
         run: npm run typecheck
