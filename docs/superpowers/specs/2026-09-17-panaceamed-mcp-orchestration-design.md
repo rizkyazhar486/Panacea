@@ -8,7 +8,7 @@ Base: `main@2aa72e35592d9616f8d84997c064c571b1bd1304`
 
 Build one project-owned Model Context Protocol (MCP) layer that lets ChatGPT and Claude Code use Panaceamed capabilities through stable, typed, auditable tools without creating a second clinical source of truth.
 
-The MCP layer must cover five domains:
+The MCP layer covers five domains:
 
 1. FHIR R4 / HL7 v2 interoperability previews;
 2. medical terminology resolution;
@@ -16,11 +16,11 @@ The MCP layer must cover five domains:
 4. autonomous repository QA under a strict command allowlist;
 5. structured ChatGPT <-> Claude Code orchestration and handoff.
 
-The system is an orchestration and adaptation layer. Existing Panaceamed modules remain authoritative for the clinical and repository behavior they already implement.
+The MCP is an orchestration and adaptation layer. Existing Panaceamed modules remain authoritative for the clinical and repository behavior they already implement.
 
 ## 2. Existing capabilities to reuse
 
-The repository already contains important foundations that must be wrapped rather than reimplemented:
+The repository already contains foundations that must be wrapped rather than reimplemented:
 
 - `src/lib/fhir.ts`: FHIR R4 export with verified LOINC/UCUM mappings and explicit local coding for derived values;
 - `server/src/satusehat.ts`: conservative SATUSEHAT FHIR R4 preview/submission boundary;
@@ -39,9 +39,9 @@ Use a shared MCP domain registry under `server/src/mcp/` with two transports ove
 - **stdio** for local Claude Code and other local MCP hosts;
 - **Streamable HTTP** for explicitly configured remote clients such as ChatGPT/custom connectors.
 
-The implementation will target the current stable MCP TypeScript SDK line and protocol revision after dependency verification at implementation time. As of the design review, MCP TypeScript SDK v2 implements the 2026-07-28 specification, with stdio for local process-spawned integration and Streamable HTTP as the recommended remote transport.
+Implementation uses the current stable MCP TypeScript SDK v2 package split (`@modelcontextprotocol/server` plus the Node transport package) and the 2026-07-28 protocol line. Before dependency installation, Context7 and the official SDK documentation are rechecked for the current package/API names so code follows the installed SDK rather than model memory.
 
-Transport code must not contain clinical mapping logic. Tool handlers call domain services, and domain services call existing Panaceamed modules.
+Transport code contains no clinical mapping logic. Tool handlers call domain services, and domain services call existing Panaceamed modules.
 
 ```text
 ChatGPT / remote MCP host ---- Streamable HTTP ----\
@@ -53,9 +53,20 @@ Claude Code / local host -------- stdio ----------/
 
 ### 4.1 Remote MCP
 
-Remote MCP is disabled by default. Enabling it requires explicit environment configuration and authentication middleware.
+Remote MCP is disabled by default.
 
-Initial remote tool exposure is limited to low-side-effect operations: capability discovery, terminology lookup, PubMed metadata search, evidence metadata normalization, FHIR/HL7 caller-supplied preview, and orchestration packet generation.
+Phase A private/single-user HTTP configuration is explicit:
+
+- `PANACEA_MCP_HTTP_ENABLED=false` by default;
+- when enabled, `PANACEA_MCP_HTTP_TOKEN` is mandatory and must contain at least 32 characters;
+- requests without `Authorization: Bearer <token>` are rejected before tool dispatch;
+- `PANACEA_MCP_HTTP_HOST` defaults to `127.0.0.1`; a non-loopback bind must be explicitly configured and placed behind TLS/reverse-proxy protection;
+- the MCP route receives its own request-size bound and rate limit;
+- the token is read only from the server environment and is never returned by any tool or audit event.
+
+This private bearer gate is not claimed to implement the full MCP OAuth authorization profile. Public or multi-user Internet exposure is prohibited until a separate standards-conformant OAuth/authorization design is implemented and reviewed.
+
+Initial HTTP tool exposure is limited to low-side-effect operations: capability discovery, terminology lookup, PubMed metadata search, evidence metadata normalization, caller-supplied FHIR/HL7 preview, and orchestration packet generation.
 
 Remote MCP must not expose:
 
@@ -66,26 +77,26 @@ Remote MCP must not expose:
 - autonomous EMR signing, medication commit, order commit, diagnosis, or treatment;
 - unrestricted retrieval of patient records from the Panaceamed datastore.
 
-Patient-specific MCP access requires a later dedicated authorization/consent design and is out of scope for this implementation.
+Patient-specific datastore access through MCP requires a later dedicated authorization/consent design and is out of scope.
 
 ### 4.2 Local stdio MCP
 
-Local stdio may expose repository QA tools because it runs on a user-controlled development machine. It still must use an explicit allowlist and must never accept arbitrary command strings.
+Local stdio may expose repository QA tools because it runs on a user-controlled development machine. It still uses an explicit allowlist and never accepts arbitrary command strings.
 
 ### 4.3 Audit
 
-Every MCP tool has metadata:
+Every MCP tool declares:
 
 - tool name and version;
 - domain;
 - transport eligibility;
 - side-effect class (`none`, `local-read`, `local-test`);
 - clinical-risk class;
-- input-size limits;
+- input-size limit;
 - timeout;
 - provenance requirements.
 
-Audit logs must exclude secrets and raw patient payloads. For caller-supplied clinical payloads, audit only safe metadata such as resource/message type, size, outcome, and stable request identifier.
+Audit logs exclude secrets and raw patient payloads. For caller-supplied clinical payloads, audit only safe metadata such as resource/message type, byte size, outcome, and stable request identifier.
 
 ## 5. MCP kernel
 
@@ -108,24 +119,26 @@ No MCP tool may have an undocumented side effect.
 
 ### 6.1 FHIR principles
 
-The MCP layer reuses existing verified Panaceamed mappings. It does not invent new LOINC, UCUM, ICD, SNOMED CT, or SATUSEHAT identifiers.
+The MCP reuses existing verified Panaceamed mappings. It does not invent new LOINC, UCUM, ICD, SNOMED CT, or SATUSEHAT identifiers.
 
 Derived Panaceamed scores remain locally coded unless a mapping is explicitly verified and added through the existing evidence/review process.
 
-Initial FHIR tools operate on caller-supplied data or Panaceamed-safe preview builders. They do not fetch arbitrary patient records.
+Initial FHIR tools operate on caller-supplied data or safe preview builders. They do not fetch arbitrary patient records.
 
-Proposed tools:
+Required tools:
 
 - `panacea_fhir_capabilities`;
 - `panacea_fhir_build_observation_bundle_preview`;
 - `panacea_fhir_inspect_resource`;
-- `panacea_fhir_satusehat_preview` when the existing preview builder can be invoked without submission.
+- `panacea_fhir_satusehat_preview`.
 
-`inspect` is deliberately not called a full standards validator unless Panaceamed later integrates an official/full FHIR validation engine.
+`panacea_fhir_satusehat_preview` calls the existing `buildEmrBundle` preview builder only. It must never call `postResource`, `submitEmr`, or any network submission path.
+
+`inspect` is deliberately not called a full standards validator. A future official/full FHIR validator integration requires a separate implementation decision.
 
 ### 6.2 HL7 v2 principles
 
-Add a bounded structural parser for common inbound message segments. First implementation supports structural parsing of `MSH`, `PID`, `PV1`, `OBR`, and `OBX`, with conversion focused on demographics and observation previews.
+Add a bounded structural parser for common inbound message segments. The first implementation supports `MSH`, `PID`, `PV1`, `OBR`, and `OBX`, with conversion focused on demographics and observation previews.
 
 The parser must:
 
@@ -137,18 +150,18 @@ The parser must:
 - preserve source message metadata and warnings;
 - perform no clinical action.
 
-Proposed tools:
+Required tools:
 
 - `panacea_hl7v2_parse_preview`;
 - `panacea_hl7v2_to_fhir_preview`.
 
-Conversion output includes the FHIR preview plus an `unmapped` collection so information loss is visible.
+Conversion output contains the FHIR preview plus an `unmapped` collection so information loss is visible.
 
 ## 7. Medical terminology domain
 
 Expose one normalized contract while keeping provider identity visible.
 
-Proposed tools:
+Required tools:
 
 - `panacea_terminology_search`;
 - `panacea_terminology_resolve`;
@@ -177,16 +190,16 @@ The evidence domain has two roles:
 1. directly reuse Panaceamed server retrieval where already implemented, beginning with PubMed;
 2. accept normalized metadata from specialist ChatGPT plugins/connectors without coupling the MCP server to the ChatGPT plugin runtime.
 
-This separation is important: Consensus, Elicit, Scite, Sider Scholar, PubMed connectors, and other ChatGPT tools are invoked by ChatGPT outside the Panaceamed server. Their results can be converted to a common evidence envelope and passed into MCP ingestion/normalization tools.
+Consensus, Elicit, Scite, Sider Scholar, PubMed connectors, Scholar Gateway, and other ChatGPT tools are invoked by ChatGPT outside the Panaceamed server. Their results can be converted to a common evidence envelope and passed into MCP normalization/review tools.
 
-Proposed tools:
+Required tools:
 
 - `panacea_evidence_search_pubmed`;
 - `panacea_evidence_normalize`;
 - `panacea_evidence_dedupe`;
 - `panacea_evidence_build_review_packet`.
 
-Evidence record fields include source provider, PMID/DOI when available, title, authors, journal/source, publication year/date, URL, retrieval time, evidence role, and provenance. Metadata must not fabricate missing identifiers.
+Evidence records contain source provider, PMID/DOI when available, title, authors, journal/source, publication year/date, URL, retrieval time, evidence role, and provenance. Missing identifiers are never fabricated.
 
 Deduplication priority:
 
@@ -196,40 +209,40 @@ Deduplication priority:
 
 Conflicting records are preserved and reported, not silently merged.
 
-Full-text copyrighted papers are not copied into the repository by this layer. The MCP evidence path stores/returns metadata, short user-supplied notes, and source links/identifiers needed for the existing Academic Accuracy Gate.
+Full-text copyrighted papers are not copied into the repository by this layer. The evidence path stores/returns metadata, short user-supplied notes, and source links/identifiers needed for the existing Academic Accuracy Gate.
 
 ## 9. Repository QA domain
 
 Repository QA is local-stdio-only in the initial implementation.
 
-Proposed tools:
+Required tools:
 
 - `panacea_repo_snapshot`;
 - `panacea_repo_qa_plan`;
 - `panacea_repo_qa_run`;
 - `panacea_repo_handoff_summary`.
 
-`panacea_repo_qa_run` accepts a named profile, not a shell command. Initial profiles may include:
+`panacea_repo_qa_run` accepts one of these exact named profiles and never accepts a shell command:
 
-- `server_typecheck` -> the existing server typecheck script;
-- `server_tests_targeted` -> explicitly enumerated MCP-related tests;
-- `root_validators` -> existing source/feature/academic validators;
-- `root_build` -> existing root build;
-- `server_full_tests` only when requested and appropriate.
+- `server_typecheck` -> `npm --prefix server run typecheck`;
+- `mcp_targeted` -> `npm --prefix server run uji:mcp`;
+- `root_validators` -> sequentially run `npm run validate:source-registry`, `npm run validate:feature-factory`, and `npm run validate:academic-review`;
+- `root_build` -> `npm run build`;
+- `server_full_tests` -> `npm --prefix server run uji`.
 
-Implementation resolves the repository root once, runs without a shell where practical, applies timeouts, caps output, and rejects unknown profiles. No user-provided command interpolation.
+Implementation resolves the repository root once, spawns executables without `shell: true`, uses fixed argument arrays, applies per-profile timeouts, caps captured output, and rejects unknown profiles. No user-provided command or argument interpolation is permitted.
 
-The MCP layer must not expose `push_main`, `force_push`, direct merge, validator bypass, or test-disabling operations.
+The MCP must not expose `push_main`, `force_push`, direct merge, validator bypass, or test-disabling operations.
 
-GitHub remains the source of truth for branch/PR/CI state. ChatGPT should continue using the GitHub connector for authoritative remote repo actions and CI evidence rather than embedding GitHub credentials in this MCP server.
+GitHub remains the source of truth for branch/PR/CI state. ChatGPT continues using the GitHub connector for authoritative remote repo actions and CI evidence rather than embedding GitHub credentials in this MCP server.
 
 ## 10. ChatGPT <-> Claude Code orchestration
 
 The orchestration layer produces deterministic coordination packets. It does not claim agents are communicating unless a packet is actually persisted/transferred by an available connector or local bridge.
 
-Core structures:
-
 ### Task packet
+
+Required fields:
 
 - `taskId`;
 - objective;
@@ -245,6 +258,8 @@ Core structures:
 
 ### Handoff packet
 
+Required fields:
+
 - task packet reference;
 - work completed;
 - changed paths;
@@ -256,25 +271,27 @@ Core structures:
 
 ### Completion packet
 
+Required fields:
+
 - tested head SHA when applicable;
 - exact checks observed;
-- merge/deployment evidence if available;
-- explicit distinction among `implemented`, `tested`, `PR-open`, `merged`, and `deployed`.
+- merge/deployment evidence when supplied;
+- explicit state flags for `implemented`, `tested`, `prOpen`, `merged`, and `deployed`.
 
-Proposed tools:
+Required tools:
 
 - `panacea_orchestration_create_task`;
 - `panacea_orchestration_create_handoff`;
 - `panacea_orchestration_check_claim`;
 - `panacea_orchestration_verify_completion_evidence`.
 
-Persistence remains outside the pure packet builder in phase one. ChatGPT may persist coordination through GitHub issues/PR comments using the GitHub connector. Claude Code may consume the packet through its MCP connection, local file handoff, or GitHub context. This avoids adding another database solely for agent state.
+Persistence remains outside the pure packet builder in phase one. ChatGPT may persist coordination through GitHub issues/PR comments using the GitHub connector. Claude Code may consume the packet through its MCP connection, a local file handoff, or GitHub context. No new orchestration database is introduced.
 
 ## 11. Optimal plugin/connector usage
 
 The MCP is one member of the toolchain, not a replacement for specialist connectors.
 
-Recommended responsibility split:
+Responsibility split:
 
 - **GitHub**: authoritative branches, PRs, changed-file overlap, CI, merge evidence;
 - **Remote Desktop Commander**: explicitly authorized local filesystem/terminal operations when its device is online;
@@ -291,7 +308,7 @@ ChatGPT is the cross-tool orchestrator. Claude Code is the repository implementa
 
 ## 12. Error model
 
-Domain errors use stable codes such as:
+Domain errors use stable codes:
 
 - `invalid_input`;
 - `payload_too_large`;
@@ -315,14 +332,16 @@ Required deterministic coverage:
 ### MCP kernel
 
 - every registered tool declares risk/transport metadata;
-- remote policy rejects local-only tools;
+- HTTP policy rejects local-only tools;
+- HTTP startup refuses to enable without a valid private token;
 - unknown tools/profiles fail closed;
-- audit redaction does not retain raw clinical payloads/secrets.
+- audit redaction does not retain raw clinical payloads or secrets.
 
 ### FHIR/HL7
 
 - existing FHIR derived-value/local-code invariants remain intact;
 - empty/NaN values never become clinical zeros;
+- SATUSEHAT MCP preview cannot reach a network submission function;
 - HL7 separators are parsed from MSH;
 - unknown coding systems remain explicit/unmapped;
 - oversized/malformed messages are rejected deterministically;
@@ -344,28 +363,29 @@ Required deterministic coverage:
 
 ### Repo QA
 
-- arbitrary commands are impossible through the public API;
-- only named profiles execute;
+- arbitrary commands are impossible through the tool schema;
+- only exact named profiles execute;
+- fixed executable/argument arrays are used;
 - timeout/output limits work;
-- remote transport cannot invoke QA execution.
+- HTTP transport cannot invoke QA execution.
 
 ### Orchestration
 
 - packets require base SHA, scope, acceptance criteria, and evidence state;
 - completion verification rejects claims not supported by supplied evidence;
-- `implemented`, `tested`, `PR-open`, `merged`, and `deployed` cannot collapse into one boolean.
+- `implemented`, `tested`, `prOpen`, `merged`, and `deployed` cannot collapse into one boolean.
 
 Full repository gates remain required at PR merge boundaries according to `CLAUDE.md` and `AGENTS.md`.
 
 ## 14. Delivery decomposition
 
-This system is intentionally delivered as multiple coherent PRs to reduce blast radius and overlap with concurrent work.
+The system is delivered as multiple coherent PRs to reduce blast radius and overlap with concurrent work.
 
 ### Phase A — MCP foundation + orchestration + repo QA
 
-Deliver shared registry/policy/audit, stdio transport, disabled-by-default Streamable HTTP transport, orchestration packet builders, local QA allowlist, tests, package scripts, and operator documentation.
+Deliver shared registry/policy/audit, stdio transport, private disabled-by-default Streamable HTTP transport, orchestration packet builders, local QA allowlist, tests, package scripts, and operator documentation.
 
-This is the first implementation plan after this spec is approved.
+This is the first implementation plan after this written spec is approved.
 
 ### Phase B — FHIR/HL7 + terminology adapters
 
@@ -382,7 +402,7 @@ Each phase starts from a fresh/latest safe `main` or an explicitly reviewed depe
 The overall MCP initiative is complete only when:
 
 - Claude Code can connect through stdio to the shared Panaceamed tool registry;
-- an authenticated, explicitly enabled remote Streamable HTTP transport exposes only remote-safe tools;
+- the private authenticated Streamable HTTP transport exposes only HTTP-safe tools when explicitly enabled;
 - FHIR/HL7 previews never fabricate clinical coding;
 - terminology results preserve provider/version/provenance and fail closed on unverified crosswalks;
 - evidence packets preserve identifiers and source provenance without invented citations;
@@ -390,7 +410,7 @@ The overall MCP initiative is complete only when:
 - ChatGPT/Claude handoffs distinguish planning, implementation, testing, PR, merge, and deployment evidence;
 - new MCP tests pass;
 - existing repository validators and required exact-head merge gates remain intact;
-- documentation states the patient-data and clinical-action boundaries explicitly.
+- documentation states patient-data, public-exposure, and clinical-action boundaries explicitly.
 
 ## 16. Explicit non-goals
 
@@ -403,5 +423,6 @@ This design does not authorize:
 - claiming a lightweight resource inspector is an official FHIR validator;
 - storing patient records in a new MCP database;
 - arbitrary remote shell/filesystem access;
+- public/multi-user MCP exposure under the private bearer-token phase;
 - direct writes or force pushes to `main`;
 - weakening CI, academic review, security, or biomedical gates.
