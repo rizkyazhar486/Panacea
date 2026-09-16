@@ -1,6 +1,7 @@
 import { AnimatePresence, motion } from 'framer-motion'
 import { useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
+import { ClinicalCopilotSurface } from '../components/ClinicalCopilotSurface'
 import { LongitudinalStateRibbon } from '../components/LongitudinalStateRibbon'
 import { PanaceaZoneNav } from '../components/PanaceaZoneNav'
 import { SuperPageCapabilityRail } from '../components/SuperPageCapabilityRail'
@@ -42,7 +43,6 @@ function Open({ to }: { to: string }) {
 export function ClinicalHub() {
   const [layer, setLayer] = useState<BodyLayer>('Anatomy')
   const [calculator, setCalculator] = useState<Calculator>('bmi')
-  const [question, setQuestion] = useState('')
   const [lookup, setLookup] = useState('')
   const [weight, setWeight] = useState(70)
   const [height, setHeight] = useState(170)
@@ -63,11 +63,6 @@ export function ClinicalHub() {
     if (value > max) return 'HIGH'
     return 'IN RANGE'
   }, [high, lab, low])
-
-  const handoffQuestion = () => {
-    const draft = question.trim()
-    if (draft) window.sessionStorage.setItem('pm_chat_draft', draft)
-  }
 
   return (
     <div className="mx-auto w-full max-w-[1500px] space-y-5 pb-20">
@@ -102,21 +97,9 @@ export function ClinicalHub() {
             </motion.div>
           </Card>
 
-          <Card className="xl:col-span-2">
-            <div className="flex items-center justify-between"><strong className="truncate text-sm">Ask + Record</strong><Open to="/chatbot" /></div>
-            <label className="mt-4 flex min-h-[48px] items-center gap-2 rounded-[16px] border border-white/[.08] bg-black/25 px-3 focus-within:border-cyan-200/30">
-              <span className="text-cyan-100/45" aria-hidden>✦</span>
-              <input value={question} onChange={(event) => setQuestion(event.target.value)} placeholder="Ask Panacea…" className="min-w-0 flex-1 bg-transparent text-xs font-semibold outline-none placeholder:text-white/25" />
-            </label>
-            <div className="mt-3 grid grid-cols-3 gap-2">
-              <Link to="/chatbot" onClick={handoffQuestion} className="grid min-h-[42px] place-items-center rounded-[14px] bg-gradient-to-r from-cyan-200 to-violet-200 px-2 text-[9px] font-black text-black">Ask</Link>
-              <Link to="/emr" className="grid min-h-[42px] place-items-center rounded-[14px] border border-white/[.08] px-2 text-[9px] font-black text-white/65">AI-EMR</Link>
-              <Link to="/care-episode" className="grid min-h-[42px] place-items-center rounded-[14px] border border-white/[.08] px-2 text-[9px] font-black text-white/65">Care</Link>
-            </div>
-            <div className="mt-4 flex gap-2 overflow-x-auto no-scrollbar">
-              {['Evidence', 'Guideline', 'Drug', 'Imaging'].map((item) => <span key={item} className="shrink-0 rounded-full border border-white/[.07] bg-white/[.025] px-3 py-1.5 text-[9px] font-black text-white/38">{item}</span>)}
-            </div>
-          </Card>
+          <div className="xl:col-span-2">
+            <ClinicalCopilotSurface />
+          </div>
 
           <Card>
             <div className="flex items-center justify-between"><strong className="truncate text-sm">Calculator</strong><Open to="/clinical-calculators" /></div>
