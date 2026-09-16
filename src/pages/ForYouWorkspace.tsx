@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import { FeatureBoulevard } from '../components/FeatureBoulevard'
 import { PanaceaZoneNav } from '../components/PanaceaZoneNav'
 import { useStore } from '../lib/store'
+import { ForYouHub } from './ForYouHub'
 
 function readNumber(key: string, fallback: number) {
   if (typeof window === 'undefined') return fallback
@@ -29,6 +30,7 @@ export function ForYouWorkspace() {
   const [emrDraft, setEmrDraft] = useState(() => readText('pm_foryou_emr_draft'))
   const [focus, setFocus] = useState(() => typeof window !== 'undefined' && window.localStorage.getItem('pm_foryou_focus') === '1')
   const [prompt, setPrompt] = useState('')
+  const [showSpaces, setShowSpaces] = useState(false)
 
   const budgetPct = useMemo(() => budget > 0 ? Math.min(100, Math.max(0, (spent / budget) * 100)) : 0, [budget, spent])
   const save = (key: string, value: string | number | boolean) => {
@@ -49,7 +51,10 @@ export function ForYouWorkspace() {
             <div className="text-[10px] font-black uppercase tracking-[.2em] text-violet-200/75">Super page 03</div>
             <h1 className="mt-1 truncate text-2xl font-black tracking-[-.035em] sm:text-3xl">For You</h1>
           </div>
-          <div className="max-w-[45%] truncate rounded-full border border-white/10 bg-white/[.04] px-3 py-1.5 text-[10px] font-black text-white/65">{account?.name ?? 'Personal OS'}</div>
+          <div className="flex min-w-0 items-center gap-2">
+            <button type="button" onClick={() => setShowSpaces((value) => !value)} aria-expanded={showSpaces} className={`shrink-0 rounded-full border px-3 py-1.5 text-[10px] font-black transition ${showSpaces ? 'border-violet-200/50 bg-violet-200 text-black' : 'border-white/10 bg-white/[.04] text-white/70'}`}>All spaces</button>
+            <div className="max-w-[28vw] truncate rounded-full border border-white/10 bg-white/[.04] px-3 py-1.5 text-[10px] font-black text-white/65">{account?.name ?? 'Personal OS'}</div>
+          </div>
         </header>
 
         <div className="relative grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
@@ -96,6 +101,16 @@ export function ForYouWorkspace() {
           </Glass>
         </div>
       </main>
+
+      {showSpaces && (
+        <section className="rounded-[30px] border border-violet-200/15 bg-[#01040a]/95 p-3 text-white shadow-[0_24px_72px_rgba(0,0,0,.4)] sm:p-5" aria-label="All For You spaces">
+          <div className="mb-4 flex items-center justify-between gap-3">
+            <div className="min-w-0"><div className="text-[9px] font-black uppercase tracking-[.18em] text-violet-200/60">Progressive disclosure</div><h2 className="truncate text-lg font-black">All life + intelligence spaces</h2></div>
+            <button type="button" onClick={() => setShowSpaces(false)} className="grid h-9 w-9 shrink-0 place-items-center rounded-full border border-white/10 bg-white/[.04] text-sm font-black" aria-label="Close all spaces">×</button>
+          </div>
+          <ForYouHub />
+        </section>
+      )}
 
       <FeatureBoulevard zone="for-you" title="For You feature boulevard" />
     </div>
