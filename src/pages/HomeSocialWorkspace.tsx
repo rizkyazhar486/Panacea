@@ -2,6 +2,7 @@ import { lazy, Suspense, type ComponentType } from 'react'
 import { Link, useSearchParams } from 'react-router-dom'
 import { HomeCommandDeck } from '../components/HomeCommandDeck'
 import { HomeHealthBrief } from '../components/HomeHealthBrief'
+import { HomeVisualLanding } from '../components/HomeVisualLanding'
 import { IconDashboard, IconHeart, IconSparkle, IconStethoscope } from '../components/icons'
 import '../styles/home-health-spectrum.css'
 import '../styles/home-mobile-shell-repair-v45.css'
@@ -68,6 +69,7 @@ export function HomeSocialWorkspace() {
     <div className="panacea-liquid-home mx-auto w-full max-w-[1320px] pb-32">
       {activeKey === 'home' ? (
         <div className="space-y-5">
+          <HomeVisualLanding />
           <HomeHealthBrief />
           <HomeCommandDeck />
         </div>
