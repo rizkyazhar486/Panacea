@@ -1,4 +1,4 @@
-import { lazy, Suspense, useEffect, useRef, useState } from 'react'
+import { lazy, Suspense, useEffect, useLayoutEffect, useRef, useState } from 'react'
 import type { BodySystemId } from '../lib/bodySystemSourceWave'
 import { resolveBodySystemIdFromAtlasLabel } from '../lib/bodySystemPhysiologyBridge'
 import { BodyExplorer } from './BodyExplorer'
@@ -45,11 +45,11 @@ export function BodyExposureOS() {
     return () => document.removeEventListener('fullscreenchange', syncFullscreen)
   }, [])
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     // Body Exposure owns a dense anatomy/physiology interaction model. The later
     // global liquid-action material pass overrides those controls through an
-    // html-level selector, so suspend that global presentation class only while
-    // this workspace is mounted. The original class is restored on navigation.
+    // html-level selector. Suspend it before first paint so the validated Body
+    // material never flashes through the generic control skin during navigation.
     const html = document.documentElement
     const hadLiquidActions = html.classList.contains(LIQUID_ACTIONS_ROOT_CLASS)
     html.classList.add(BODY_EXPOSURE_ROOT_CLASS)
