@@ -34,3 +34,34 @@ jobs:
         run: npm run uji:mcp
       - name: Server typecheck
         run: npm run typecheck
+
+  sdk-lock-bootstrap:
+    if: github.head_ref == 'feat/panacea-mcp-core-20260917'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    defaults:
+      run:
+        working-directory: server
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Generate official MCP SDK package files
+        run: >-
+          npm install --package-lock-only --ignore-scripts
+          @modelcontextprotocol/server@2.0.0-alpha.2
+          @modelcontextprotocol/node@2.0.0-alpha.2
+          @modelcontextprotocol/express@2.0.0-alpha.2
+          zod
+      - name: Upload generated package files
+        uses: actions/upload-artifact@v4
+        with:
+          name: mcp-sdk-package-files
+          path: |
+            server/package.json
+            server/package-lock.json
+          if-no-files-found: error
+          retention-days: 1
