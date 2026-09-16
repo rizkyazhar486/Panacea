@@ -1,6 +1,7 @@
 import { motion } from 'framer-motion'
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
+import { LongitudinalStateRibbon } from '../components/LongitudinalStateRibbon'
 import { SuperPageCapabilityRail } from '../components/SuperPageCapabilityRail'
 import { useStore } from '../lib/store'
 import {
@@ -114,6 +115,8 @@ export function ForYouHub() {
           <Link to="/settings" className="liquid-action flex items-center justify-center gap-1.5 rounded-[18px] border border-white/[.08] bg-white/[.035] px-3 py-3 text-[11px] font-black text-white/75"><IconSettings size={14} />Settings</Link>
         </div>
       </section>
+
+      <LongitudinalStateRibbon title="Your connected health context" />
 
       <section className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4" aria-label="For You live widgets">
         <motion.div layout className="rounded-[24px] border border-white/[.08] bg-white/[.03] p-4 backdrop-blur-xl">
