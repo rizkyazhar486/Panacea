@@ -66,6 +66,7 @@ try {
   const jumlahKasus = await kasus.count()
   if (jumlahKasus === 0) throw new Error('Tidak ada kasus terpandu untuk dijalankan')
 
+  const contextDialog = page.locator('dialog#pmd-context-dialog')
   let pernahMenyala = false
   for (let i = 0; i < jumlahKasus; i += 1) {
     await kasus.nth(i).click()
@@ -79,6 +80,14 @@ try {
       if (!teks.includes('is not highlighted')) {
         throw new Error('Tidak ada yang disorot dan tidak ada penjelasan yang ditampilkan')
       }
+    }
+
+    // Setiap guided case dapat membuka modal konteks. Tutup secara natural
+    // sebelum memilih kasus berikutnya agar smoke-test mengikuti interaksi user
+    // dan tidak mengklik menembus dialog modal.
+    if (i < jumlahKasus - 1 && await contextDialog.isVisible()) {
+      await page.keyboard.press('Escape')
+      await contextDialog.waitFor({ state: 'hidden' })
     }
   }
   if (!pernahMenyala) throw new Error('Tidak ada satu pun kasus yang menyalakan struktur')
