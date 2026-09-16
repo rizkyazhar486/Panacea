@@ -20,8 +20,8 @@ function clamp01(n: number) {
 }
 
 export function ScrollCinematic() {
-  const trackRef = useRef<HTMLDivElement | null>(null)
-  const sceneRef = useRef<HTMLDivElement | null>(null)
+  const trackRef = useRef<HTMLDivElement>(null)
+  const sceneRef = useRef<HTMLDivElement>(null)
   const actRefs = useRef<(HTMLDivElement | null)[]>([])
   const dotRefs = useRef<(HTMLSpanElement | null)[]>([])
   const [reduced, setReduced] = useState(false)
@@ -131,8 +131,8 @@ export function ScrollCinematic() {
   )
 }
 
-function AnatomyScene({ stage, reduced = false, sceneRef }: { stage: Stage; reduced?: boolean; sceneRef?: RefObject<HTMLDivElement | null> }) {
-  const localRef = useRef<HTMLDivElement | null>(null)
+function AnatomyScene({ stage, reduced = false, sceneRef }: { stage: Stage; reduced?: boolean; sceneRef?: RefObject<HTMLDivElement> }) {
+  const localRef = useRef<HTMLDivElement>(null)
   const targetRef = sceneRef ?? localRef
 
   const move = (event: PointerEvent<HTMLDivElement>) => {
