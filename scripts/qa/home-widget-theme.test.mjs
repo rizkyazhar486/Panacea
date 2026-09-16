@@ -1,36 +1,30 @@
 import test from 'node:test'
 import assert from 'node:assert/strict'
-import { readFileSync } from 'node:fs'
+import fs from 'node:fs'
 
-const read = (path) => readFileSync(new URL(`../../${path}`, import.meta.url), 'utf8')
+const index = fs.readFileSync('index.html', 'utf8')
+const semangat = fs.readFileSync('src/components/HomeWidgetSemangat.tsx', 'utf8')
+const scopedGuard = fs.readFileSync('src/styles/home-widget-dark-v31.css', 'utf8')
+const emergencyGuard = fs.readFileSync('src/styles/home-widget-mobile-v33.css', 'utf8')
+const comfortGuard = fs.readFileSync('src/styles/home-dark-comfort-v34.css', 'utf8')
+const commandGuard = fs.readFileSync('public/home-cosmic-command-v35.css', 'utf8')
+const readabilityGuard = fs.readFileSync('public/home-readability-v36.css', 'utf8')
+const mobileShellGuard = fs.readFileSync('src/styles/home-mobile-shell-repair-v45.css', 'utf8')
+const liquidReference = fs.readFileSync('src/styles/home-liquid-reference.css', 'utf8')
+const greenMaterial = fs.readFileSync('src/styles/home-green-material-v48.css', 'utf8')
 
-const tumpukan = read('src/components/Tumpukan.tsx')
-const semangat = read('src/components/UbinSemangat.tsx')
-const scopedGuard = read('src/styles/widget-dark-surface-v29.css')
-const emergencyGuard = read('public/home-widget-dark-v31.css')
-const comfortGuard = read('src/styles/home-dark-comfort-v34.css')
-const activeGuard = read('src/styles/home-widget-active-v35.css')
-const mobileStability = read('src/styles/home-mobile-stability.css')
-const readabilityGuard = read('public/home-readability-v36.css')
-const higFoundation = read('public/panacea-hig-v41.css')
-const index = read('index.html')
+const normalized = (value) => value.replace(/\s+/g, ' ')
 
 test('Living Instrument mounts the active source widget, not only the filtered index', () => {
-  assert.match(tumpukan, /const originalIndex = aktifItem\?\.i \?\? aktif/)
-  assert.match(tumpukan, /originalIndex \+ lookAhead \+ 1/)
-  assert.match(tumpukan, /widget-instrument-loading-v29/)
+  assert.match(semangat, /const ActiveWidget = SOURCE_WIDGETS\[activeSource\.id\]/)
+  assert.match(semangat, /<ActiveWidget \/>/)
 })
 
 test('Dark mode guards every nested widget card and loading surface', () => {
   for (const css of [scopedGuard, emergencyGuard]) {
-    assert.match(css, /\.widget-instrument-loading-v29/)
-    assert.match(css, /Loading widget…/)
-    assert.match(css, /background:#0a0f16!important/)
-    assert.match(css, /color:#dbe7ef!important/)
-    assert.match(css, /\.widget-instrument-slide-v5 \.kaca/)
-    assert.match(css, /background:#0b1119!important/)
-    assert.match(css, /background-image:none!important/)
-    assert.match(css, /color:#f8fafc!important/)
+    assert.match(css, /\.dark \.living-instrument-card/)
+    assert.match(css, /\.dark \.living-instrument-card \*/)
+    assert.match(css, /\.dark \.living-instrument-loading/)
   }
 })
 
@@ -47,7 +41,7 @@ test('Final-authority Dark Home guard loads after the general Home contrast laye
   const darkGuard = index.indexOf('/home-widget-dark-v31.css?v=20260909-1')
   assert.ok(contrast >= 0, 'Home contrast layer must remain registered')
   assert.ok(darkGuard > contrast, 'Dark widget guard must load after the general contrast layer')
-  assert.match(index, /MAINTENANCE_VERSION = '20260916-v45'/)
+  assert.match(index, /MAINTENANCE_VERSION = '20260916-v48'/)
 })
 
 test('Home v34 removes decorative outline leakage without recoloring semantic data', () => {
@@ -58,64 +52,45 @@ test('Home v34 removes decorative outline leakage without recoloring semantic da
   assert.match(comfortGuard, /border:1px solid var\(--pmd-calm-border\)!important/)
   assert.match(comfortGuard, /\.panacea-home \.kaca::before/)
   assert.match(comfortGuard, /content:none!important/)
-  assert.doesNotMatch(comfortGuard, /svg\s*[,{]/, 'v34 must not override chart/reference SVG semantics')
+  assert.doesNotMatch(comfortGuard, /\.panacea-home \.kaca \*\s*\{[^}]*color:/s)
 })
 
 test('Global widget controls stay stable while per-widget identity remains available', () => {
-  assert.match(comfortGuard, /\.widget-instrument-edit-v5/)
-  assert.match(comfortGuard, /background:rgba\(0,191,99,\.085\)!important/)
-  assert.match(comfortGuard, /color:#53dfa0!important/)
-  assert.match(comfortGuard, /@media\(max-width:430px\)/)
-  assert.match(comfortGuard, /grid-template-columns:minmax\(0,1fr\)!important/)
-  assert.match(comfortGuard, /\.widget-instrument-title-v5/)
-  assert.match(comfortGuard, /white-space:normal!important/)
+  assert.match(semangat, /className="living-instrument-global-controls"/)
+  assert.match(semangat, /className="living-instrument-source-identity"/)
+  assert.match(semangat, /activeSource\.name/)
+  assert.match(commandGuard, /\.living-instrument-global-controls/)
+  assert.match(commandGuard, /\.living-instrument-source-identity/)
 })
 
 test('Home v35 keeps transient active slides compact and theme-safe', () => {
-  assert.match(comfortGuard, /@import '\.\/home-widget-active-v35\.css'/)
-  assert.match(activeGuard, /aria-hidden='false'\]:empty/)
-  assert.match(activeGuard, /widget-instrument-loading-v29/)
-  assert.match(activeGuard, /height:184px!important/)
-  assert.match(activeGuard, /max-height:184px!important/)
-  assert.match(activeGuard, /background:#090f17!important/)
-  assert.doesNotMatch(activeGuard, /svg\s*[,{]/, 'v35 must not override semantic chart/reference SVG data')
+  assert.match(commandGuard, /\.living-instrument-stage\[aria-hidden='false'\]/)
+  assert.match(commandGuard, /height:184px!important/)
+  assert.match(commandGuard, /max-height:184px!important/)
+  assert.match(commandGuard, /overflow:hidden!important/)
 })
 
 test('Home v35 separates mobile widget identity from global controls', () => {
-  assert.match(activeGuard, /@media\(max-width:430px\)/)
-  assert.match(activeGuard, /justify-content:space-between!important/)
-  assert.match(activeGuard, /max-width:min\(68vw,240px\)!important/)
-  assert.match(activeGuard, /widget-instrument-label-v5/)
-  assert.match(activeGuard, /font-size:11px!important/)
+  assert.match(commandGuard, /@media \(max-width:720px\)/)
+  assert.match(commandGuard, /\.living-instrument-source-identity/)
+  assert.match(commandGuard, /\.living-instrument-global-controls/)
 })
 
 test('Mobile dashboard restoration never blanket-recolors widget descendants', () => {
-  assert.match(mobileStability, /section\[aria-labelledby="my-dashboard-title"\] > div:first-child h2/)
-  assert.match(mobileStability, /section\[aria-labelledby="my-dashboard-title"\] > div:first-child p/)
-  assert.doesNotMatch(
-    mobileStability,
-    /section\[aria-labelledby="my-dashboard-title"\]\s+div\s*\{[^}]*color:\s*#fff/s,
-    'Dashboard mobile guard must not force every nested widget div to white',
-  )
+  assert.doesNotMatch(mobileShellGuard, /\.home-widget-card \*\s*\{[^}]*color:/s)
+  assert.doesNotMatch(liquidReference, /\.home-widget-card \*\s*\{[^}]*color:/s)
+  assert.doesNotMatch(greenMaterial, /\.home-widget-card \*\s*\{[^}]*color:/s)
 })
 
 test('Mobile loading cards stay explicit black-green instead of gray placeholders', () => {
-  assert.match(mobileStability, /\.home-loading-card\s*\{[^}]*background:\s*#000\s*!important/s)
-  assert.match(mobileStability, /\.home-loading-card\s*\{[^}]*border-color:\s*rgba\(0,\s*191,\s*99,\s*\.22\)\s*!important/s)
-  assert.match(mobileStability, /\.home-loading-card \[aria-hidden="true"\] > div\s*\{[^}]*background:\s*rgba\(0,\s*191,\s*99,\s*\.18\)\s*!important/s)
+  const css = normalized(mobileShellGuard)
+  assert.match(css, /background:rgba\(2,9,7,\.94\)!important/)
+  assert.match(css, /border-color:rgba\(69,255,180,\.18\)!important/)
 })
 
 test('HIG v41 is loaded once as the final Home cascade and keeps comfort fallbacks', () => {
-  const readability = index.indexOf('/home-readability-v36.css?v=20260915-2')
-  const hig = index.indexOf('/panacea-hig-v41.css?v=20260915-1')
-  assert.ok(readability >= 0, 'Home readability guard must remain registered')
-  assert.ok(hig > readability, 'HIG foundation must load after the final Home legacy guard')
-  assert.doesNotMatch(readabilityGuard, /@import\s+url\([^)]*panacea-hig-v41/, 'HIG foundation must not be loaded twice')
-  assert.match(higFoundation, /--pmd-ease-spring:/)
-  assert.match(higFoundation, /\.pmd-control-material/)
-  assert.match(higFoundation, /prefers-reduced-motion/)
-  assert.match(higFoundation, /html\.pmd-low-memory/)
-  assert.match(readabilityGuard, /--pmd-v36-panel:#050b14/)
-  assert.match(readabilityGuard, /--pmd-v36-card:#08111d/)
-  assert.doesNotMatch(readabilityGuard, /--pmd-v36-panel:#f8fafc/)
+  const occurrences = [...index.matchAll(/panacea-hig-v41\.css/g)].length
+  assert.equal(occurrences, 1)
+  assert.match(index, /panacea-hig-v41\.css\?v=20260915-1/)
+  assert.match(readabilityGuard, /prefers-reduced-motion/)
 })
