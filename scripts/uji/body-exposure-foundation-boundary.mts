@@ -18,8 +18,10 @@ assert.match(liquidRuntime, /\[data-pmd-liquid="off"\]/, 'liquid runtime must ho
 
 assert.match(os, /useLayoutEffect\(\(\) =>/, 'Body Exposure presentation isolation must be applied before first paint')
 assert.match(os, /LIQUID_ACTIONS_ROOT_CLASS = 'pmd-liquid-actions-v45'/)
+assert.match(os, /new MutationObserver\(suppressGlobalControlSkin\)/, 'Body Exposure must keep the global control skin suppressed for the full mount lifecycle')
+assert.match(os, /classObserver\.disconnect\(\)/, 'Body Exposure must clean up the class observer on navigation')
 assert.match(os, /html\.classList\.remove\(LIQUID_ACTIONS_ROOT_CLASS\)/, 'Body Exposure must suspend the later global control-material selector while mounted')
-assert.match(os, /if \(hadLiquidActions\) html\.classList\.add\(LIQUID_ACTIONS_ROOT_CLASS\)/, 'Body Exposure must restore the global control layer when the workspace unmounts')
+assert.match(os, /if \(restoreLiquidActions\) html\.classList\.add\(LIQUID_ACTIONS_ROOT_CLASS\)/, 'Body Exposure must restore the global control layer when the workspace unmounts')
 assert.match(grading, /html\.pmd-liquid-actions-v45/, 'guard assumption changed: review the Body Exposure isolation boundary before removing it')
 
 const bridge = os.indexOf('<AtlasPhysiologyBridgePanel')
