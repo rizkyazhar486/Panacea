@@ -47,7 +47,7 @@ test('Final-authority Dark Home guard loads after the general Home contrast laye
   const darkGuard = index.indexOf('/home-widget-dark-v31.css?v=20260909-1')
   assert.ok(contrast >= 0, 'Home contrast layer must remain registered')
   assert.ok(darkGuard > contrast, 'Dark widget guard must load after the general contrast layer')
-  assert.match(index, /MAINTENANCE_VERSION = '20260916-v47'/)
+  assert.match(index, /MAINTENANCE_VERSION = '20260916-v48'/)
 })
 
 test('Home v34 removes decorative outline leakage without recoloring semantic data', () => {
