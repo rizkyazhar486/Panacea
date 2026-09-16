@@ -151,6 +151,72 @@ export function resolveBridgeTopic(query: string): BridgeTopic | null {
   }) ?? null
 }
 
+export type BridgeSearchMatch = 'title' | 'alias' | 'body'
+
+export type BridgeSearchHit = {
+  topic: BridgeTopic
+  score: number
+  matchedOn: BridgeSearchMatch
+}
+
+function tokenizeBridgeQuery(value: string): string[] {
+  return normalizeBridgeSearchText(value)
+    .split(' ')
+    .filter((token) => token.length >= 3)
+}
+
+function wordSet(value: string): Set<string> {
+  return new Set(normalizeBridgeSearchText(value).split(' ').filter(Boolean))
+}
+
+function bridgeSearchFields(topic: BridgeTopic) {
+  return {
+    titleWords: wordSet(topic.title),
+    aliasWordSets: topic.aliases.map(wordSet),
+    bodyWords: wordSet(
+      [topic.oneLiner, ...topic.stages.map((item) => `${item.question} ${item.explanation}`)].join(' '),
+    ),
+  }
+}
+
+/**
+ * Lightweight local index over the curated bridge corpus: whole-word token
+ * scoring across title, aliases and stage text. No network call — same
+ * static BRIDGE_TOPICS data resolveBridgeTopic already uses, so this adds
+ * no new medical claim, only a better recall path when the query does not
+ * exactly match a title or alias. Matching is whole-word only (a `Set`
+ * membership check, not `includes`) so a fragment like "art" cannot match
+ * inside an unrelated word like "heart" — the same fail-closed guarantee
+ * resolveBridgeTopic already enforces via containsWholePhrase.
+ */
+export function searchBridgeTopics(query: string, limit = 3): BridgeSearchHit[] {
+  const tokens = tokenizeBridgeQuery(query)
+  if (tokens.length === 0) return []
+
+  const hits: BridgeSearchHit[] = []
+  for (const topic of BRIDGE_TOPICS) {
+    const fields = bridgeSearchFields(topic)
+    let score = 0
+    let matchedOn: BridgeSearchMatch = 'body'
+    for (const token of tokens) {
+      if (fields.titleWords.has(token)) {
+        score += 5
+        matchedOn = 'title'
+      }
+      if (fields.aliasWordSets.some((words) => words.has(token))) {
+        score += 3
+        if (matchedOn === 'body') matchedOn = 'alias'
+      }
+      if (fields.bodyWords.has(token)) score += 1
+    }
+    if (score > 0) hits.push({ topic, score, matchedOn })
+  }
+
+  return hits
+    .sort((a, b) => b.score - a.score || a.topic.title.localeCompare(b.topic.title))
+    .slice(0, limit)
+}
+
 function canonicalStageLabel(label: string) {
   return label.split(' · ', 1)[0]
 }
