@@ -193,7 +193,8 @@ export function summarizeLongitudinalState(signals: LongitudinalSignal[]): Longi
 
 export function createLongitudinalHandoff(signals = readLongitudinalSignals()) {
   const summary = summarizeLongitudinalState(signals)
-  const recent = signals.slice(0, 24).map((signal) => ({
+  const consentedSignals = signals.filter((signal) => signal.consent.granted)
+  const recent = consentedSignals.slice(0, 24).map((signal) => ({
     domain: signal.domain,
     metric: signal.metric,
     value: signal.value,
@@ -209,8 +210,9 @@ export function createLongitudinalHandoff(signals = readLongitudinalSignals()) {
     schema: 'panacea.longitudinal-handoff.v1',
     generatedAt: new Date().toISOString(),
     summary,
+    eligibleSignalCount: consentedSignals.length,
     recent,
-    boundary: 'Context only. Preserve provenance, uncertainty, temporal context, consent and clinician oversight.',
+    boundary: 'Context only. Only consent-granted signals are attached. Preserve provenance, uncertainty, temporal context and clinician oversight.',
   }
 }
 
