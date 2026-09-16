@@ -1,0 +1,66 @@
+name: Diagnose three superpages
+
+on:
+  pull_request:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+jobs:
+  diagnose:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - name: Capture production build output
+        shell: bash
+        run: |
+          set +e
+          npm run build > /tmp/panacea-build.log 2>&1
+          echo "$?" > /tmp/panacea-build-exit
+          exit 0
+      - name: Marker · note index drift
+        continue-on-error: true
+        run: "! grep -q 'skdiDiseaseNoteIndex.ts is stale' /tmp/panacea-build.log"
+      - name: Marker · source registry
+        continue-on-error: true
+        run: "! grep -q 'Source registry validation failed' /tmp/panacea-build.log"
+      - name: Marker · feature factory
+        continue-on-error: true
+        run: "! grep -q 'Feature Factory validation failed' /tmp/panacea-build.log"
+      - name: Marker · academic accuracy
+        continue-on-error: true
+        run: "! grep -q 'Academic Accuracy Gate failed' /tmp/panacea-build.log"
+      - name: Marker · node QA test
+        continue-on-error: true
+        run: "! grep -Eq '(^|[[:space:]])not ok([[:space:]]|$)' /tmp/panacea-build.log"
+      - name: Marker · TypeScript
+        continue-on-error: true
+        run: "! grep -q 'error TS' /tmp/panacea-build.log"
+      - name: TS file · FeatureBoulevard
+        continue-on-error: true
+        run: "! grep -q 'src/components/FeatureBoulevard.tsx' /tmp/panacea-build.log"
+      - name: TS file · PanaceaZoneNav
+        continue-on-error: true
+        run: "! grep -q 'src/components/PanaceaZoneNav.tsx' /tmp/panacea-build.log"
+      - name: TS file · ClinicalHub
+        continue-on-error: true
+        run: "! grep -q 'src/pages/ClinicalHub.tsx' /tmp/panacea-build.log"
+      - name: TS file · ForYouWorkspace
+        continue-on-error: true
+        run: "! grep -q 'src/pages/ForYouWorkspace.tsx' /tmp/panacea-build.log"
+      - name: TS file · HomeSocialWorkspace
+        continue-on-error: true
+        run: "! grep -q 'src/pages/HomeSocialWorkspace.tsx' /tmp/panacea-build.log"
+      - name: Marker · Vite
+        continue-on-error: true
+        run: "! grep -Eq 'vite.*(error|failed)|Build failed|RollupError' /tmp/panacea-build.log"
+      - name: Build command success
+        continue-on-error: true
+        run: test "$(cat /tmp/panacea-build-exit)" -eq 0
