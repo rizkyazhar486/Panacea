@@ -68,7 +68,10 @@ function hasGoldInTopK(record: DiagnosisEvaluationCase, k: number): boolean {
 }
 
 function diagnosisMetric(cases: DiagnosisEvaluationCase[], k: number): ProportionMetric {
-  const evaluable = cases.filter((record) => record.goldDiagnosisIds.length > 0 && record.predictedDiagnosisIds.length > 0)
+  // A labelled case remains evaluable even when the model abstains or returns no
+  // diagnosis. Empty prediction lists therefore count as misses instead of
+  // silently shrinking the denominator and inflating reported performance.
+  const evaluable = cases.filter((record) => record.goldDiagnosisIds.length > 0)
   const hits = evaluable.filter((record) => hasGoldInTopK(record, k)).length
   return proportionMetric(hits, evaluable.length)
 }
@@ -96,7 +99,8 @@ export function summarizeClinicalEvaluation(input: {
 }
 
 export const CLINICAL_EVALUATION_FORMULAS = {
-  topKRecall: 'TopKRecall = cases with ≥1 gold diagnosis in first K predictions / evaluable diagnosis cases',
+  topKRecall:
+    'TopKRecall = labelled cases with ≥1 gold diagnosis in first K predictions / labelled diagnosis cases; empty prediction lists count as misses',
   unsafeRecommendationRate: 'UnsafeRecommendationRate = unsafe labelled recommendations / reviewed recommendations',
   citationSupportPrecision: 'CitationSupportPrecision = citations judged to support their linked claim / reviewed citations',
   clinicianAcceptanceRate: 'ClinicianAcceptanceRate = accepted reviewed items / clinician-reviewed items',
