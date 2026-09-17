@@ -297,31 +297,34 @@ try {
   }
   await assertNoFatal('Orbit interaction triggered a Body3D fatal state')
 
-  // Body Explorer intentionally uses a two-step mobile navigation contract:
-  // first jump to a semantic group, then activate the target panel. The group
-  // rail itself is horizontally scrollable on a 390px viewport, so the smoke
-  // first performs the same reveal gesture a user would make before tapping.
+  // Body Explorer intentionally uses a semantic group jump plus a horizontal
+  // target rail. Prove the group jump lands at the start of the requested
+  // group, then reveal the deeper target inside that same group before tapping.
+  // This mirrors the real mobile contract without assuming every member of a
+  // long group can fit inside a 390px viewport at the same time.
   const referenceGroup = page.getByRole('button', { name: 'Jump to Reference', exact: true })
   await revealInViewport(referenceGroup, 'Reference group control')
   await referenceGroup.click()
-  const precisionTab = page.getByRole('button', { name: 'Whole-body precision', exact: true })
   await page.waitForFunction(() => {
-    const target = Array.from(document.querySelectorAll('button')).find((node) => node.textContent?.trim() === 'Whole-body precision')
+    const target = Array.from(document.querySelectorAll('button')).find((node) => node.textContent?.trim() === 'Dioptres & decibels')
     if (!target) return false
     const rect = target.getBoundingClientRect()
     return rect.left >= 0 && rect.right <= window.innerWidth
   }, undefined, { timeout: 20_000 })
+  const precisionTab = page.getByRole('button', { name: 'Whole-body precision', exact: true })
+  await revealInViewport(precisionTab, 'Whole-body precision control')
   await precisionTab.click()
   await page.getByText('Panacea · Whole-body precision atlas', { exact: true }).waitFor({ state: 'visible', timeout: 20_000 })
 
-  // Move through the same semantic-group contract instead of clicking a tab
-  // that is now intentionally outside the rail after opening Reference.
+  // Move through the same semantic-group contract. Motion biomechanics is the
+  // first Systems tab in the live grouped order, so the group jump itself must
+  // bring that exact control into the mobile viewport before activation.
   const systemsGroup = page.getByRole('button', { name: 'Jump to Systems', exact: true })
   await revealInViewport(systemsGroup, 'Systems group control')
   await systemsGroup.click()
-  const movementTab = page.getByRole('button', { name: 'Movement biomechanics', exact: true })
+  const movementTab = page.getByRole('button', { name: 'Motion biomechanics', exact: true })
   await page.waitForFunction(() => {
-    const target = Array.from(document.querySelectorAll('button')).find((node) => node.textContent?.trim() === 'Movement biomechanics')
+    const target = Array.from(document.querySelectorAll('button')).find((node) => node.textContent?.trim() === 'Motion biomechanics')
     if (!target) return false
     const rect = target.getBoundingClientRect()
     return rect.left >= 0 && rect.right <= window.innerWidth
