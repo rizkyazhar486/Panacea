@@ -97,6 +97,13 @@ async function assertNoFatal(label) {
 
 async function revealInViewport(locator, label) {
   const geometry = await locator.evaluate(async (node) => {
+    // First reveal the control on the document's vertical axis. A horizontally
+    // scrollable parent may still sit far below the viewport, so centering that
+    // parent alone is not enough for a real mobile tap target.
+    node.scrollIntoView({ block: 'center', inline: 'nearest', behavior: 'auto' })
+    await new Promise((resolve) => requestAnimationFrame(resolve))
+    await new Promise((resolve) => requestAnimationFrame(resolve))
+
     const rail = node.parentElement
     if (rail && rail.scrollWidth > rail.clientWidth) {
       const before = node.getBoundingClientRect()
@@ -110,9 +117,6 @@ async function revealInViewport(locator, label) {
         behavior: 'auto',
       })
       await new Promise((resolve) => requestAnimationFrame(resolve))
-      await new Promise((resolve) => requestAnimationFrame(resolve))
-    } else {
-      node.scrollIntoView({ block: 'nearest', inline: 'nearest', behavior: 'auto' })
       await new Promise((resolve) => requestAnimationFrame(resolve))
     }
     const rect = node.getBoundingClientRect()
