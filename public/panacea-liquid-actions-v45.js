@@ -18,7 +18,13 @@
 
   const isElement = (value) => value instanceof Element
 
+  const isBodyExplorerRoute = () => {
+    const route = window.location.hash.replace(/^#/, '').split('?')[0]
+    return route === '/body-explorer'
+  }
+
   const isEligible = (element) => {
+    if (isBodyExplorerRoute()) return false
     if (!(element instanceof HTMLElement)) return false
     if (!element.matches(ACTION_SELECTOR)) return false
     if (element.closest('[data-pmd-liquid="off"]')) return false
