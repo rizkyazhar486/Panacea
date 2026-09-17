@@ -47,7 +47,21 @@ test('Final-authority Dark Home guard loads after the general Home contrast laye
   const darkGuard = index.indexOf('/home-widget-dark-v31.css?v=20260909-1')
   assert.ok(contrast >= 0, 'Home contrast layer must remain registered')
   assert.ok(darkGuard > contrast, 'Dark widget guard must load after the general contrast layer')
-  assert.match(index, /MAINTENANCE_VERSION = '20260916-v45'/)
+})
+
+test('Cache maintenance version tracks the newest Panacea presentation layer', () => {
+  const maintenance = index.match(/MAINTENANCE_VERSION = '\d{8}-v(\d+)'/)
+  const presentationVersions = [...index.matchAll(/\/panacea-[^"'?]*-v(\d+)\.(?:css|js)(?:\?[^"']*)?/g)]
+    .map((match) => Number(match[1]))
+    .filter(Number.isFinite)
+
+  assert.ok(maintenance, 'Home cache maintenance version must remain declared')
+  assert.ok(presentationVersions.length > 0, 'At least one Panacea presentation layer must remain registered')
+  assert.equal(
+    Number(maintenance[1]),
+    Math.max(...presentationVersions),
+    'Cache maintenance version must advance with the newest Panacea presentation layer',
+  )
 })
 
 test('Home v34 removes decorative outline leakage without recoloring semantic data', () => {
