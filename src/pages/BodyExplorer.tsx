@@ -580,7 +580,7 @@ export function BodyExplorer() {
   }
 
   return (
-    <div className="space-y-4">
+    <div data-pmd-body-exposure="true" data-pmd-unclamped="true" data-pmd-liquid="off" className="space-y-4">
       <SectionTitle
         icon={<IconActivity />}
         title="Body Explorer"

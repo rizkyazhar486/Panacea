@@ -95,6 +95,48 @@ async function assertNoFatal(label) {
   }
 }
 
+async function revealInViewport(locator, label) {
+  const geometry = await locator.evaluate(async (node) => {
+    const rail = node.parentElement
+    if (rail && rail.scrollWidth > rail.clientWidth) {
+      const before = node.getBoundingClientRect()
+      const railRect = rail.getBoundingClientRect()
+      const centeredLeft = rail.scrollLeft
+        + (before.left - railRect.left)
+        - (rail.clientWidth - before.width) / 2
+      const maxScrollLeft = Math.max(0, rail.scrollWidth - rail.clientWidth)
+      const targetScrollLeft = Math.max(0, Math.min(maxScrollLeft, centeredLeft))
+      rail.scrollTo({ left: targetScrollLeft, behavior: 'auto' })
+      await new Promise((resolve) => requestAnimationFrame(resolve))
+      await new Promise((resolve) => requestAnimationFrame(resolve))
+    } else {
+      node.scrollIntoView({ block: 'nearest', inline: 'nearest', behavior: 'auto' })
+      await new Promise((resolve) => requestAnimationFrame(resolve))
+    }
+    const rect = node.getBoundingClientRect()
+    const railRect = rail?.getBoundingClientRect() ?? null
+    return {
+      left: rect.left,
+      right: rect.right,
+      top: rect.top,
+      bottom: rect.bottom,
+      viewportWidth: window.innerWidth,
+      viewportHeight: window.innerHeight,
+      railLeft: railRect?.left ?? null,
+      railRight: railRect?.right ?? null,
+      railScrollLeft: rail?.scrollLeft ?? null,
+      railClientWidth: rail?.clientWidth ?? null,
+      railScrollWidth: rail?.scrollWidth ?? null,
+    }
+  })
+  if (
+    geometry.left < 0 || geometry.right > geometry.viewportWidth
+    || geometry.top < 0 || geometry.bottom > geometry.viewportHeight
+  ) {
+    throw new Error(`${label} could not be brought into the mobile viewport: ${JSON.stringify(geometry)}`)
+  }
+}
+
 try {
   const response = await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 45_000 })
   if (response && !response.ok()) throw new Error(`Body Explorer returned HTTP ${response.status()}`)
@@ -129,21 +171,43 @@ try {
     devicePixelRatio: window.devicePixelRatio,
     documentScrollWidth: document.documentElement.scrollWidth,
   }))
-  const centerUnobstructed = await canvas.evaluate((node) => {
+  const centerHit = await canvas.evaluate((node) => {
     const rect = node.getBoundingClientRect()
-    const hit = document.elementFromPoint(rect.left + rect.width / 2, rect.top + rect.height / 2)
-    return hit === node
+    const x = rect.left + rect.width / 2
+    const y = rect.top + rect.height / 2
+    const hit = document.elementFromPoint(x, y)
+    if (!hit) return { unobstructed: false, x, y, hit: null }
+    const hitRect = hit.getBoundingClientRect()
+    const style = getComputedStyle(hit)
+    return {
+      unobstructed: hit === node,
+      x,
+      y,
+      hit: {
+        tag: hit.tagName,
+        id: hit.id || null,
+        className: typeof hit.className === 'string' ? hit.className : null,
+        role: hit.getAttribute('role'),
+        ariaLabel: hit.getAttribute('aria-label'),
+        text: hit.textContent?.trim().slice(0, 160) || null,
+        pointerEvents: style.pointerEvents,
+        position: style.position,
+        zIndex: style.zIndex,
+        rect: [hitRect.left, hitRect.top, hitRect.right, hitRect.bottom],
+      },
+    }
   })
 
   metrics = {
     viewport,
     canvas: health,
-    canvasCenterUnobstructed: centerUnobstructed,
+    canvasCenterUnobstructed: centerHit.unobstructed,
+    canvasCenterHit: centerHit,
     route: await page.evaluate(() => window.location.hash),
   }
 
   if (!health.webgl || health.contextLost) throw new Error('Body3D WebGL context is unavailable or lost')
-  if (!centerUnobstructed) throw new Error('Body3D canvas center is obstructed by another UI layer')
+  if (!centerHit.unobstructed) throw new Error(`Body3D canvas center is obstructed by another UI layer: ${JSON.stringify(centerHit.hit)}`)
   if (viewport.width !== 390 || viewport.height !== 844) {
     throw new Error(`Unexpected viewport ${viewport.width}x${viewport.height}`)
   }
@@ -233,11 +297,38 @@ try {
   }
   await assertNoFatal('Orbit interaction triggered a Body3D fatal state')
 
+  // Body Explorer intentionally uses a semantic group jump plus a horizontal
+  // target rail. Prove the group jump lands at the start of the requested
+  // group, then reveal the deeper target inside that same group before tapping.
+  // This mirrors the real mobile contract without assuming every member of a
+  // long group can fit inside a 390px viewport at the same time.
+  const referenceGroup = page.getByRole('button', { name: 'Jump to Reference', exact: true })
+  await revealInViewport(referenceGroup, 'Reference group control')
+  await referenceGroup.click()
+  await page.waitForFunction(() => {
+    const target = Array.from(document.querySelectorAll('button')).find((node) => node.textContent?.trim() === 'Dioptres & decibels')
+    if (!target) return false
+    const rect = target.getBoundingClientRect()
+    return rect.left >= 0 && rect.right <= window.innerWidth
+  }, undefined, { timeout: 20_000 })
   const precisionTab = page.getByRole('button', { name: 'Whole-body precision', exact: true })
+  await revealInViewport(precisionTab, 'Whole-body precision control')
   await precisionTab.click()
   await page.getByText('Panacea · Whole-body precision atlas', { exact: true }).waitFor({ state: 'visible', timeout: 20_000 })
 
-  const movementTab = page.getByRole('button', { name: 'Movement biomechanics', exact: true })
+  // Move through the same semantic-group contract. Motion biomechanics is the
+  // first Systems tab in the live grouped order, so the group jump itself must
+  // bring that exact control into the mobile viewport before activation.
+  const systemsGroup = page.getByRole('button', { name: 'Jump to Systems', exact: true })
+  await revealInViewport(systemsGroup, 'Systems group control')
+  await systemsGroup.click()
+  const movementTab = page.getByRole('button', { name: 'Motion biomechanics', exact: true })
+  await page.waitForFunction(() => {
+    const target = Array.from(document.querySelectorAll('button')).find((node) => node.textContent?.trim() === 'Motion biomechanics')
+    if (!target) return false
+    const rect = target.getBoundingClientRect()
+    return rect.left >= 0 && rect.right <= window.innerWidth
+  }, undefined, { timeout: 20_000 })
   await movementTab.click()
   const inspectorTitle = page.getByText('Whole-body motion inspector', { exact: true })
   await inspectorTitle.waitFor({ state: 'visible', timeout: 20_000 })
