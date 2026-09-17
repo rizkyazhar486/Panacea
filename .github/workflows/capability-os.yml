@@ -25,4 +25,5 @@ jobs:
           node-version: 24
           cache: npm
       - run: npm ci
-      - run: node --test scripts/qa/capability-os-validator.test.mjs scripts/qa/capability-os-routing.test.mjs scripts/qa/capability-os-skill-contract.test.mjs
+      - run: npm run validate:capability-os
+      - run: npm run test:capability-os
