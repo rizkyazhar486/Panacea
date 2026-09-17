@@ -52,6 +52,16 @@ const falseExternalClaim: EvaluationDatasetManifest = {
 assert.equal(datasetEvaluationReady(falseExternalClaim), false)
 assert.ok(validateEvaluationDatasetManifest(falseExternalClaim).some((check) => check.key === 'external-claim' && !check.pass))
 
+const invalidRuntimeManifest = {
+  ...validManifest,
+  origin: 'social-post',
+  split: 'holdout',
+} as unknown as EvaluationDatasetManifest
+const invalidManifestChecks = validateEvaluationDatasetManifest(invalidRuntimeManifest)
+assert.equal(datasetEvaluationReady(invalidRuntimeManifest), false)
+assert.ok(invalidManifestChecks.some((check) => check.key === 'origin' && !check.pass))
+assert.ok(invalidManifestChecks.some((check) => check.key === 'split' && !check.pass))
+
 const validCase: EvaluationCaseContract = {
   caseId: 'case-0001',
   datasetId: validManifest.datasetId,
@@ -71,6 +81,15 @@ const unsafeCase = {
   patientIdentifier: 'forbidden' as never,
 }
 assert.ok(validateEvaluationCaseContract(unsafeCase).some((check) => check.key === 'no-patient-identifier' && !check.pass))
+
+const invalidRuntimeCase = {
+  ...validCase,
+  split: 'shadow',
+  reviewDisposition: 'approved-by-model',
+} as unknown as EvaluationCaseContract
+const invalidCaseChecks = validateEvaluationCaseContract(invalidRuntimeCase)
+assert.ok(invalidCaseChecks.some((check) => check.key === 'split' && !check.pass))
+assert.ok(invalidCaseChecks.some((check) => check.key === 'review-disposition' && !check.pass))
 
 assert.ok(EVALUATION_DATASET_FORMULAS.metadataCompleteness.includes('passed dataset-contract checks'))
 assert.ok(EVALUATION_DATASET_BOUNDARY.includes('not clinical accuracy'))
