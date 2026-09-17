@@ -180,7 +180,6 @@ app.use('/api/health-webhook/:token', webhookLimiter, (req, res, next) => {
 // sesi itu hilang tanpa jejak di mana pun.
 app.use('/api/health-webhook', express.json({ limit: '12mb' }))
 
-app.use(express.json({ limit: '12mb' })) // allow base64 images for AI vision
 app.use(cookieParser())
 app.use(
   cors({
@@ -207,6 +206,7 @@ const authLimiter = rateLimit({
 })
 app.use('/api', globalLimiter)
 mountHttpMcp(app)
+app.use(express.json({ limit: '12mb' })) // allow base64 images for AI vision
 app.use(['/api/auth', '/api/login', '/api/dev-login'], authLimiter)
 
 // --- health / capability discovery ---
@@ -530,7 +530,15 @@ app.post('/api/applications', requireAuth, async (req, res) => {
     tahunLulus: b.tahunLulus, spesialis: b.spesialis, subspesialis: b.subspesialis, pdfName: b.pdfName,
   })
   addAudit(u, 'application.submit', `${u.role} · ${u.email}`)
-  const summary = `Pendaftar: ${u.name} (${u.email})\nPeran: ${u.role}\nSTR: ${b.str || '-'}\nGelar: ${b.gelar || '-'}\nKeahlian: ${b.keahlian || '-'}\nUniversitas: ${b.universitas || '-'} (lulus ${b.tahunLulus || '-'})\nSpesialis: ${b.spesialis || '-'}\nSubspesialis: ${b.subspesialis || '-'}\nDokumen: ${b.pdfName || 'tidak ada'}`
+  const summary = `Pendaftar: ${u.name} (${u.email})\
+Peran: ${u.role}\
+STR: ${b.str || '-'}\
+Gelar: ${b.gelar || '-'}\
+Keahlian: ${b.keahlian || '-'}\
+Universitas: ${b.universitas || '-'} (lulus ${b.tahunLulus || '-'})\
+Spesialis: ${b.spesialis || '-'}\
+Subspesialis: ${b.subspesialis || '-'}\
+Dokumen: ${b.pdfName || 'tidak ada'}`
   // AI-Agent review (async) then store the verdict.
   reviewApplicationText(summary).then((verdict) => setApplicationVerdict(app_.id, verdict)).catch(() => {})
   // Email the owner so applications never get missed.
@@ -741,7 +749,10 @@ app.post('/api/second-opinion', requireAuth, async (req, res) => {
   const currentTreatment = String(b.currentTreatment || '').slice(0, 1000)
   const symptoms = String(b.symptoms || '').slice(0, 1000)
   const history = String(b.history || '').slice(0, 1000)
-  const caseInfo = `Diagnosis/pengobatan saat ini: ${currentDiagnosis || '(tidak diisi)'}\nPengobatan saat ini: ${currentTreatment || '(tidak diisi)'}\nGejala: ${symptoms || '(tidak diisi)'}\nRiwayat relevan: ${history || '(tidak diisi)'}`
+  const caseInfo = `Diagnosis/pengobatan saat ini: ${currentDiagnosis || '(tidak diisi)'}\
+Pengobatan saat ini: ${currentTreatment || '(tidak diisi)'}\
+Gejala: ${symptoms || '(tidak diisi)'}\
+Riwayat relevan: ${history || '(tidak diisi)'}`
   const aiDraft = await draftSecondOpinion(caseInfo)
   const s: SecondOpinion = {
     id: uid(),
@@ -1786,7 +1797,8 @@ app.use((err: unknown, req: express.Request, res: express.Response, _next: expre
     if (!res.headersSent) res.status(400).json({ error: 'bad_request' })
     return
   }
-  const msg = err instanceof Error ? `${err.message}\n${err.stack ?? ''}` : String(err)
+  const msg = err instanceof Error ? `${err.message}\
+${err.stack ?? ''}` : String(err)
   alertOwner(`Route error @ ${req.method} ${req.path}`, msg)
   if (!res.headersSent) res.status(500).json({ error: 'internal_error' })
 })
