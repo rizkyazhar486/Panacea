@@ -4,6 +4,7 @@ import type { BodySystemId } from '../../lib/bodySystemSourceWave'
 const CardiacHemodynamicsWorkbench = lazy(() => import('./CardiacHemodynamicsWorkbench'))
 const NeurovascularPerfusionWorkbench = lazy(() => import('./NeurovascularPerfusionWorkbench'))
 const RespiratoryGasExchangeWorkbench = lazy(() => import('./RespiratoryGasExchangeWorkbench'))
+const RenalFiltrationWorkbench = lazy(() => import('./RenalFiltrationWorkbench'))
 
 const META: Partial<Record<BodySystemId, { label: string; description: string }>> = {
   cardiovascular: {
@@ -17,6 +18,10 @@ const META: Partial<Record<BodySystemId, { label: string; description: string }>
   respiratory: {
     label: 'Respiratory Mechanics & Gas Exchange',
     description: 'Selected-system educational deep dive: airway mechanics, ventilation, V/Q matching and diffusion.',
+  },
+  urinary: {
+    label: 'Kidney Filtration & Tubular Delivery',
+    description: 'Selected-system educational deep dive: renal plasma-flow, filtration and water-conservation relationships.',
   },
 }
 
@@ -51,6 +56,11 @@ export function BodySystemDeepDiveWorkspace({ selectedAtlasSystemId }: { selecte
       {selectedAtlasSystemId === 'respiratory' && (
         <Suspense fallback={<div className="grid min-h-52 place-items-center rounded-[24px] border border-white/[.07] bg-black/35 text-xs text-white/35">Loading respiratory function…</div>}>
           <RespiratoryGasExchangeWorkbench />
+        </Suspense>
+      )}
+      {selectedAtlasSystemId === 'urinary' && (
+        <Suspense fallback={<div className="grid min-h-52 place-items-center rounded-[24px] border border-white/[.07] bg-black/35 text-xs text-white/35">Loading urinary function…</div>}>
+          <RenalFiltrationWorkbench />
         </Suspense>
       )}
     </section>
