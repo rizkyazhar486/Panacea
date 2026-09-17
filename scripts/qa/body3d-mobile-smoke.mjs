@@ -96,8 +96,15 @@ async function assertNoFatal(label) {
 }
 
 async function revealInViewport(locator, label) {
-  await locator.evaluate((node) => node.scrollIntoView({ block: 'nearest', inline: 'center', behavior: 'auto' }))
   const geometry = await locator.evaluate((node) => {
+    node.scrollIntoView({ block: 'nearest', inline: 'nearest', behavior: 'auto' })
+    const rail = node.parentElement
+    if (rail) {
+      const before = node.getBoundingClientRect()
+      const railRect = rail.getBoundingClientRect()
+      const delta = (before.left + before.width / 2) - (railRect.left + railRect.width / 2)
+      rail.scrollLeft += delta
+    }
     const rect = node.getBoundingClientRect()
     return {
       left: rect.left,
@@ -106,6 +113,9 @@ async function revealInViewport(locator, label) {
       bottom: rect.bottom,
       viewportWidth: window.innerWidth,
       viewportHeight: window.innerHeight,
+      railScrollLeft: rail?.scrollLeft ?? null,
+      railClientWidth: rail?.clientWidth ?? null,
+      railScrollWidth: rail?.scrollWidth ?? null,
     }
   })
   if (
