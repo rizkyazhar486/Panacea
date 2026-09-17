@@ -137,6 +137,7 @@ import { lookupDrug } from './openfda.js'
 import { lookupGene } from './mygene.js'
 import { findRelatedDrugs } from './rxnorm.js'
 import { attachRealtime } from './realtime.js'
+import { mountHttpMcp } from './mcp/mount.js'
 
 const app = express()
 // Security headers (CSP disabled here — the SPA is served from GitHub Pages,
@@ -179,7 +180,6 @@ app.use('/api/health-webhook/:token', webhookLimiter, (req, res, next) => {
 // sesi itu hilang tanpa jejak di mana pun.
 app.use('/api/health-webhook', express.json({ limit: '12mb' }))
 
-app.use(express.json({ limit: '12mb' })) // allow base64 images for AI vision
 app.use(cookieParser())
 app.use(
   cors({
@@ -205,6 +205,8 @@ const authLimiter = rateLimit({
   message: { error: 'rate_limited' },
 })
 app.use('/api', globalLimiter)
+mountHttpMcp(app)
+app.use(express.json({ limit: '12mb' })) // allow base64 images for AI vision
 app.use(['/api/auth', '/api/login', '/api/dev-login'], authLimiter)
 
 // --- health / capability discovery ---
