@@ -3,6 +3,11 @@ import type { BodySystemId } from '../../lib/bodySystemSourceWave'
 
 const CardiacHemodynamicsWorkbench = lazy(() => import('./CardiacHemodynamicsWorkbench'))
 const NeurovascularPerfusionWorkbench = lazy(() => import('./NeurovascularPerfusionWorkbench'))
+const RespiratoryGasExchangeWorkbench = lazy(() => import('./RespiratoryGasExchangeWorkbench'))
+const RenalFiltrationWorkbench = lazy(() => import('./RenalFiltrationWorkbench'))
+const EndocrineHptAxisWorkbench = lazy(() => import('./EndocrineHptAxisWorkbench'))
+const DigestiveBileCycleWorkbench = lazy(() => import('./DigestiveBileCycleWorkbench'))
+const MusculoskeletalBoneRemodelingWorkbench = lazy(() => import('./MusculoskeletalBoneRemodelingWorkbench'))
 
 const META: Partial<Record<BodySystemId, { label: string; description: string }>> = {
   cardiovascular: {
@@ -12,6 +17,26 @@ const META: Partial<Record<BodySystemId, { label: string; description: string }>
   nervous: {
     label: 'Brain & Neurovascular',
     description: 'Selected-system function deep dive: cerebral perfusion, autoregulation, intracranial compliance and oxygen-delivery coupling.',
+  },
+  respiratory: {
+    label: 'Respiratory Mechanics & Gas Exchange',
+    description: 'Selected-system educational deep dive: airway mechanics, ventilation, V/Q matching and diffusion.',
+  },
+  digestive: {
+    label: 'Digestive & Hepatobiliary',
+    description: 'Selected-system educational deep dive: schematic bile production, delivery, intestinal reabsorption and enterohepatic return.',
+  },
+  urinary: {
+    label: 'Kidney Filtration & Tubular Delivery',
+    description: 'Selected-system educational deep dive: renal plasma-flow, filtration and water-conservation relationships.',
+  },
+  endocrine: {
+    label: 'Endocrine Feedback',
+    description: 'Selected-system educational deep dive: schematic hypothalamic–pituitary–thyroid signaling and negative feedback.',
+  },
+  musculoskeletal: {
+    label: 'Musculoskeletal Remodeling',
+    description: 'Selected-system educational deep dive: schematic RANKL/OPG regulation, osteoclast resorption and coupled osteoblast formation.',
   },
 }
 
@@ -41,6 +66,31 @@ export function BodySystemDeepDiveWorkspace({ selectedAtlasSystemId }: { selecte
       {selectedAtlasSystemId === 'nervous' && (
         <Suspense fallback={<div className="grid min-h-52 place-items-center rounded-[24px] border border-white/[.07] bg-black/35 text-xs text-white/35">Loading neurovascular function…</div>}>
           <NeurovascularPerfusionWorkbench />
+        </Suspense>
+      )}
+      {selectedAtlasSystemId === 'respiratory' && (
+        <Suspense fallback={<div className="grid min-h-52 place-items-center rounded-[24px] border border-white/[.07] bg-black/35 text-xs text-white/35">Loading respiratory function…</div>}>
+          <RespiratoryGasExchangeWorkbench />
+        </Suspense>
+      )}
+      {selectedAtlasSystemId === 'digestive' && (
+        <Suspense fallback={<div className="grid min-h-52 place-items-center rounded-[24px] border border-white/[.07] bg-black/35 text-xs text-white/35">Loading digestive function…</div>}>
+          <DigestiveBileCycleWorkbench />
+        </Suspense>
+      )}
+      {selectedAtlasSystemId === 'urinary' && (
+        <Suspense fallback={<div className="grid min-h-52 place-items-center rounded-[24px] border border-white/[.07] bg-black/35 text-xs text-white/35">Loading urinary function…</div>}>
+          <RenalFiltrationWorkbench />
+        </Suspense>
+      )}
+      {selectedAtlasSystemId === 'endocrine' && (
+        <Suspense fallback={<div className="grid min-h-52 place-items-center rounded-[24px] border border-white/[.07] bg-black/35 text-xs text-white/35">Loading endocrine function…</div>}>
+          <EndocrineHptAxisWorkbench />
+        </Suspense>
+      )}
+      {selectedAtlasSystemId === 'musculoskeletal' && (
+        <Suspense fallback={<div className="grid min-h-52 place-items-center rounded-[24px] border border-white/[.07] bg-black/35 text-xs text-white/35">Loading musculoskeletal function…</div>}>
+          <MusculoskeletalBoneRemodelingWorkbench />
         </Suspense>
       )}
     </section>

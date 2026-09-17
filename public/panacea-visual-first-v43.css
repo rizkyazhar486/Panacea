@@ -52,12 +52,20 @@ main .pmd-vf-copy[data-pmd-has-context='true']:is(:hover,:focus-visible) {
   text-underline-offset: 3px;
 }
 
-/* Explicit opt-out for true detail surfaces, editors and dialogs. */
+/* Explicit opt-out for true detail surfaces, editors and dialogs.
+   Keep the typography unclamped, but do not globally force structural div/span
+   descendants to overflow:visible. Those nodes can be real scroll containers
+   (for example Body Explorer's horizontal mobile rails). Only prose/context
+   nodes have their visual-first overflow clamp released. */
 main :where(dialog,[role='dialog'],[data-pmd-unclamped='true'],details[open],pre,code,textarea,[contenteditable='true']) :where(h1,h2,h3,h4,h5,h6,p,li,dd,figcaption,span,div),
 #pmd-context-dialog :where(h1,h2,h3,h4,h5,h6,p,span,div,button) {
   white-space: normal !important;
-  overflow: visible !important;
   text-overflow: clip !important;
+}
+
+main :where(dialog,[role='dialog'],[data-pmd-unclamped='true'],details[open],pre,code,textarea,[contenteditable='true']) :where(h1,h2,h3,h4,h5,h6,p,li,dd,figcaption,.pmd-vf-copy),
+#pmd-context-dialog :where(h1,h2,h3,h4,h5,h6,p,.pmd-vf-copy,button) {
+  overflow: visible !important;
 }
 
 #pmd-context-dialog {

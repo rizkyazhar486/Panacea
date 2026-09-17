@@ -71,24 +71,35 @@ function disposeProjectedMaterials(group: THREE.Group) {
   })
 }
 
-export default function BodyAllSystems3D() {
+interface BodyAllSystems3DProps {
+  selectedSystemId?: BodySystemId
+  onSystemChange?: (systemId: BodySystemId) => void
+}
+
+export default function BodyAllSystems3D({ selectedSystemId, onSystemChange }: BodyAllSystems3DProps) {
   const containerRef = useRef<HTMLDivElement>(null)
   const openTimerRef = useRef<number | null>(null)
   const [open, setOpen] = useState(false)
   const [rendererArmed, setRendererArmed] = useState(false)
-  const [systemId, setSystemId] = useState<BodySystemId>('cardiovascular')
+  const [internalSystemId, setInternalSystemId] = useState<BodySystemId>('cardiovascular')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const [loadedFiles, setLoadedFiles] = useState(0)
   const [loadedSourceFiles, setLoadedSourceFiles] = useState<string[]>([])
   const [failedFiles, setFailedFiles] = useState<string[]>([])
 
+  const systemId = selectedSystemId ?? internalSystemId
   const systems = useMemo(() => resolveBodySystemSourceWave(), [])
   const selected = systems.find((system) => system.id === systemId) ?? systems[0]
 
   useEffect(() => () => {
     if (openTimerRef.current !== null) window.clearTimeout(openTimerRef.current)
   }, [])
+
+  function selectSystem(nextSystemId: BodySystemId) {
+    if (selectedSystemId === undefined) setInternalSystemId(nextSystemId)
+    onSystemChange?.(nextSystemId)
+  }
 
   function toggleOpen() {
     if (openTimerRef.current !== null) {
@@ -330,7 +341,7 @@ export default function BodyAllSystems3D() {
               type="button"
               role="tab"
               aria-selected={active}
-              onClick={() => setSystemId(system.id)}
+              onClick={() => selectSystem(system.id)}
               className={`min-h-10 shrink-0 rounded-full border px-3 text-[9px] font-black transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-300/50 ${active ? 'border-cyan-300/30 bg-[linear-gradient(135deg,rgba(34,211,238,.18),rgba(139,92,246,.12))] text-white' : 'border-white/[.07] bg-white/[.025] text-white/45 hover:bg-white/[.055] hover:text-white/75'}`}
             >
               {system.label}
