@@ -4,6 +4,13 @@ import process from 'node:process'
 
 const isPlainObject = (value) => value !== null && typeof value === 'object' && !Array.isArray(value)
 
+const ALLOWED_DUPLICATE_REASONS = new Set([
+  'conflict',
+  'high-risk-corroboration',
+  'distinct-evidence-class',
+  'explicit-comparison',
+])
+
 const matchesType = (value, type) => {
   switch (type) {
     case 'null':
@@ -131,6 +138,42 @@ function semanticErrors(manifest) {
 
 export function validateCapabilityOs(manifest, schema) {
   return [...validateAgainstSchema(manifest, schema), ...semanticErrors(manifest)]
+}
+
+export function selectCapability(manifest, request) {
+  if (!Array.isArray(manifest?.capabilities)) throw new Error('invalid capability manifest')
+
+  const capability = manifest.capabilities.find((entry) => entry.id === request?.capabilityId)
+  if (!capability) throw new Error(`unknown capability: ${request?.capabilityId ?? '<missing>'}`)
+
+  if (request.policyAllowed !== true) {
+    throw new Error('policy denied: fallback is forbidden')
+  }
+  if (request.authorizationAvailable !== true) {
+    throw new Error('authorization required')
+  }
+  if (!capability.executors.supported.includes(request.executor)) {
+    throw new Error(`executor ${request.executor} is not supported by ${capability.id}`)
+  }
+
+  const duplicateProviderAllowed = request.additionalProviderRequested === true
+  if (duplicateProviderAllowed && !ALLOWED_DUPLICATE_REASONS.has(request.duplicateReason)) {
+    throw new Error('duplicate provider request requires an allowed duplicate reason')
+  }
+
+  const availableProviders = Array.isArray(request.availableProviders) ? request.availableProviders : []
+  const orderedProviders = [capability.primary, ...capability.fallbacks]
+  const provider = orderedProviders.find((candidate) => availableProviders.includes(candidate))
+  if (!provider) throw new Error(`no available provider for ${capability.id}`)
+
+  return {
+    capabilityId: capability.id,
+    provider,
+    executor: request.executor,
+    fallbackUsed: provider !== capability.primary,
+    duplicateProviderAllowed,
+    reason: provider === capability.primary ? 'primary-authoritative-provider' : 'ordered-fallback',
+  }
 }
 
 export async function loadCapabilityOs({ manifestPath, schemaPath } = {}) {
