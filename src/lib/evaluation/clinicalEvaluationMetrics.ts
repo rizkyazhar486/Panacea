@@ -41,7 +41,7 @@ function clamp01(value: number): number {
 }
 
 export function wilsonInterval(successes: number, total: number, z = 1.96): { low: number; high: number } | null {
-  if (!Number.isFinite(successes) || !Number.isFinite(total) || total <= 0 || successes < 0 || successes > total) return null
+  if (!Number.isInteger(successes) || !Number.isInteger(total) || !Number.isFinite(z) || z <= 0 || total <= 0 || successes < 0 || successes > total) return null
   const p = successes / total
   const z2 = z * z
   const denominator = 1 + z2 / total
