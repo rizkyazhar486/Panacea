@@ -26,7 +26,13 @@
 
   const textOf = (el) => (el.textContent || '').replace(/\s+/g, ' ').trim()
 
+  function isBodyExplorerRoute() {
+    const route = window.location.hash.replace(/^#/, '').split('?')[0]
+    return route === '/body-explorer'
+  }
+
   function isEligible(el) {
+    if (isBodyExplorerRoute()) return false
     if (!(el instanceof HTMLElement)) return false
     if (!el.closest('main')) return false
     if (el.closest(EXCLUDE_SELECTOR)) return false
@@ -94,6 +100,7 @@
   }
 
   function openContext(el) {
+    if (isBodyExplorerRoute()) return
     const text = originals.get(el) || textOf(el)
     if (!text) return
     const modal = ensureDialog()
@@ -127,9 +134,16 @@
     }
   })
 
+  function closeContextForBodyExplorer() {
+    if (!isBodyExplorerRoute() || !dialog?.open) return
+    dialog.close()
+  }
+
   function boot() {
     const root = document.getElementById('root') || document.body
     observer.observe(root, { childList: true, subtree: true })
+    window.addEventListener('hashchange', closeContextForBodyExplorer)
+    closeContextForBodyExplorer()
     scheduleScan()
   }
 
