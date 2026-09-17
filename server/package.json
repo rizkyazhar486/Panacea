@@ -13,7 +13,7 @@
     "build": "tsc -p tsconfig.json",
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "mcp:stdio": "tsx src/mcp/stdio.ts",
-    "uji:mcp": "tsx uji/mcpCore.uji.ts && tsx uji/mcpOrchestration.uji.ts && tsx uji/mcpRepoQa.uji.ts && tsx uji/mcpRegistry.uji.ts && tsx uji/mcpTransport.uji.ts && tsx uji/mcpMount.uji.ts",
+    "uji:mcp": "tsx uji/mcpCore.uji.ts && tsx uji/mcpOrchestration.uji.ts && tsx uji/mcpRepoQa.uji.ts && tsx uji/mcpRegistry.uji.ts && tsx uji/mcpTransport.uji.ts && tsx uji/mcpMount.uji.ts && tsx uji/mcpInteroperability.uji.ts && tsx uji/mcpTerminology.uji.ts",
     "uji:trials": "tsx uji/trials.uji.ts",
     "uji:pubmed": "tsx uji/pubmed.uji.ts",
     "uji:openfda": "tsx uji/openfda.uji.ts",
