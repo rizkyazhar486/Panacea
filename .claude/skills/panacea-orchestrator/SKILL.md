@@ -8,6 +8,9 @@ description: Use when a Panaceamed task spans multiple domains, agents, reposito
 ## Core rule
 Coordinate work; do not replace `CLAUDE.md` or `AGENTS.md`. Those files remain authoritative for repository policy, Git/CI coordination, language, and clinical publication boundaries.
 
+## Capability selection boundary
+When a task has multiple possible tools, providers, plugins, or executors, use `panacea-capability-router` first. The capability router selects the logical capability, provider, executor, required evidence, and stop condition; this orchestrator owns scheduling, dependency ordering, repository-path ownership, sequencing, parallelism, and integration boundaries.
+
 ## Workflow
 1. Read `CLAUDE.md` and `AGENTS.md` before planning.
 2. Resolve the latest `main` SHA and inspect open PRs touching intended paths.
