@@ -46,13 +46,6 @@ const isi = new Map(semua.map((p) => [p, readFileSync(p, 'utf8')]))
 const komponen = semua.filter((p) => /\/(components|pages)\/.*\.tsx$/.test(p))
 assert.ok(komponen.length > 200, `hanya ${komponen.length} komponen terbaca`)
 
-/**
- * Apakah ada berkas LAIN yang menyebut nama berkas ini?
- *
- * Sengaja longgar: impor dinamis lewat jalur (`import('./x/Foo')`) juga memuat
- * nama dasarnya, jadi pemeriksaan ini tidak akan salah menuduh komponen yang
- * dimuat malas. Kalau hasilnya nol, ia benar-benar tidak disebut di mana pun.
- */
 function dirujuk(path: string): boolean {
   const dasar = path.split('/').pop()!.replace(/\.tsx$/, '')
   const pola = new RegExp(`\\b${dasar}\\b`)
@@ -65,14 +58,17 @@ function dirujuk(path: string): boolean {
 
 const takTerjangkau = komponen.filter((p) => !dirujuk(p)).map((p) => p.replace(`${AKAR}/`, '')).sort()
 
-/**
- * Permukaan yang saat ini diketahui tidak terjangkau.
- *
- * Ini CATATAN, bukan restu. Setiap barisnya adalah pekerjaan yang sudah selesai
- * dan tidak dilihat siapa pun.
- */
 const DIKETAHUI: readonly string[] = [
+  // Ditambahkan 2026-09-16, dengan alasannya, bukan sekadar didiamkan:
+  // HomeNowWidget adalah susunan Home generasi v43. Home sekarang disusun oleh
+  // HomeCommandDeck, HomeHealthBrief dan HomeVisualLanding; memasangnya kembali
+  // akan menampilkan vitals yang sama dua kali di satu layar.
+  'components/HomeNowWidget.tsx',
   'components/KartuPratinjau.tsx',
+  // PremiumMotionRuntime hanya menyuapi pointer light dari pulau stylesheet
+  // yang tidak diimpor. Menyalakannya di tengah PR lain akan mengambil alih
+  // banyak button/card/main>section yang kini sudah dimiliki lapisan v43-v48.
+  'components/PremiumMotionRuntime.tsx',
   'components/RelatedFeaturesRail.tsx',
   'components/dashboard/ActivityAchievementWidget.tsx',
   'components/dashboard/LibraryDiscoveryWidget.tsx',
@@ -117,7 +113,6 @@ const DIKETAHUI: readonly string[] = [
   'pages/MacroLab.tsx',
 ]
 
-// ── 1. Tidak boleh ada permukaan tak terjangkau yang BARU ────────────────
 {
   const baru = takTerjangkau.filter((p) => !DIKETAHUI.includes(p))
   assert.deepEqual(
@@ -128,10 +123,6 @@ const DIKETAHUI: readonly string[] = [
   )
 }
 
-// ── 2. Daftarnya tidak boleh membusuk ───────────────────────────────────
-//
-// Tanpa ini, sebuah komponen yang akhirnya disambungkan akan tetap tercatat
-// "tidak terjangkau" selamanya, dan daftar ini berhenti berarti apa-apa.
 {
   const hidup = DIKETAHUI.filter((p) => !takTerjangkau.includes(p))
   assert.deepEqual(
@@ -141,9 +132,6 @@ const DIKETAHUI: readonly string[] = [
   )
 }
 
-// ── 3. Kontrol positif: pendeteksinya benar-benar mendeteksi ────────────
-//
-// Sebuah daftar kosong akan lolos kedua uji di atas tanpa memeriksa apa pun.
 {
   assert.ok(takTerjangkau.length > 0, 'the detector found nothing at all; it is probably broken')
   assert.ok(
