@@ -233,7 +233,19 @@ try {
   }
   await assertNoFatal('Orbit interaction triggered a Body3D fatal state')
 
+  // Body Explorer intentionally uses a two-step mobile navigation contract:
+  // first jump to a semantic group, then activate the target panel. Clicking a
+  // far-off tab directly bypasses the product interaction and can leave that
+  // button outside the 390px rail viewport even though the UI is working.
+  const referenceGroup = page.getByRole('button', { name: 'Jump to Reference', exact: true })
+  await referenceGroup.click()
   const precisionTab = page.getByRole('button', { name: 'Whole-body precision', exact: true })
+  await page.waitForFunction(() => {
+    const target = Array.from(document.querySelectorAll('button')).find((node) => node.textContent?.trim() === 'Whole-body precision')
+    if (!target) return false
+    const rect = target.getBoundingClientRect()
+    return rect.left >= 0 && rect.right <= window.innerWidth
+  }, undefined, { timeout: 20_000 })
   await precisionTab.click()
   await page.getByText('Panacea · Whole-body precision atlas', { exact: true }).waitFor({ state: 'visible', timeout: 20_000 })
 
