@@ -26,6 +26,7 @@
     "qa:bergerak": "node scripts/qa/panel-bergerak-smoke.mjs",
     "qa:kendali": "node scripts/qa/panel-kendali-smoke.mjs",
     "qa:bilah-atas": "node scripts/qa/bilah-atas-tak-tertimpa.mjs",
+    "qa:kendali-tak-terbajak": "node scripts/qa/kendali-tak-terbajak-smoke.mjs",
     "qa:organ-3d": "node scripts/qa/organ-model-3d-smoke.mjs",
     "qa:wilayah-3d": "node scripts/qa/wilayah-abdomen-3d-smoke.mjs",
     "qa:ventilasi-3d": "node scripts/qa/ventilasi-bronkus-3d-smoke.mjs",

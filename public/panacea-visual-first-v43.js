@@ -17,16 +17,35 @@
     '[contenteditable="true"]',
     '.sr-only',
     '#pmd-context-dialog',
-    // Any descendant of a real control. Without this, a wrapping <button> or
-    // <a> whose child copy is long enough gets wrapped in its own
-    // role="button"/tabindex target: the click opens the interpretation
-    // dialog on top of the control instead of (or as well as) activating it,
-    // and the dialog then blocks every click underneath until closed.
+    // Any descendant of a real control, not just the control itself.
+    //
+    // `isEligible` below already rejects an element that IS a button/a/
+    // label/summary/[role=button]/[role=tab] -- but it never rejected an
+    // element that lives INSIDE one. <button><div>Title</div>
+    // <div>{long sub-line}</div></button> is a very common pattern here,
+    // and the sub-line is often >=48 characters. Without this, that div
+    // gets decorated into a SECOND click target stacked on the button: one
+    // tap fires the button's own onClick AND opens the "Interpretation"
+    // dialog, and because the dialog is modal every tap after it --
+    // including the very next button on the page -- is silently swallowed
+    // until someone closes a dialog they never asked to open.
+    //
+    // Reproduced via qa:lesi-3d: tapping "Case 1" in the lesion localiser
+    // (whose sub-line is its own 82-character case description) opened the
+    // interpretation dialog with that same sentence, then blocked "Case 2"
+    // for the rest of a 60s timeout.
     'button',
     'a',
+    'label',
+    'summary',
     '[role="button"]',
     '[role="tab"]',
-    'summary',
+    '[role="link"]',
+    '[role="menuitem"]',
+    '[role="option"]',
+    '[role="switch"]',
+    '[role="checkbox"]',
+    '[role="radio"]',
   ].join(',')
 
   const originals = new WeakMap()

@@ -100,12 +100,14 @@ jobs:
           KENDALI_QA_URL: http://127.0.0.1:4173/#/body-explorer
           BILAH_QA_URL: http://127.0.0.1:4173/#/latihan?t=pelatih
           SHARE_QA_URL: http://127.0.0.1:4173/#/latihan?t=pelatih
+          KENDALI_TB_QA_URL: http://127.0.0.1:4173/#/
         run: |
           set -e
           gagal=""
           for gerbang in qa:organ-3d qa:wilayah-3d qa:ventilasi-3d qa:arteri-3d \
                          qa:limfe-3d qa:kerangka-3d qa:lesi-3d qa:kelenjar-3d \
-                         qa:bergerak qa:kendali qa:bilah-atas qa:share-card; do
+                         qa:bergerak qa:kendali qa:bilah-atas qa:kendali-tak-terbajak \
+                         qa:share-card; do
             echo "::group::$gerbang"
             if npm run "$gerbang"; then
               echo "::endgroup::"
