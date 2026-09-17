@@ -33,11 +33,18 @@ export function categoryForCapability(feature: Fitur): CapabilityCategory {
   if (/finance|money|market|wallet|asset|invest|budget|expense|income|crypto|stock/.test(text)) return 'Finance'
   if (/account|profile|setting|billing|subscription|notification|manage feature|theme/.test(text)) return 'Account'
   if (/social|community|feed|club|message|story/.test(text)) return 'Social'
-  if (/clinical|score|risk|emergency|drug|hospital|diagnos|medical|emr/.test(text)) return 'Clinical'
+
+  // A generic word such as "risk" is not strong enough to pull a capability
+  // out of its longitudinal-health context. Require an explicit clinical
+  // anchor first, then let mind/fitness/body semantics win before the generic
+  // risk fallback. This keeps preventive/longevity risk surfaces in Your Body
+  // while true clinical scores and decision tools remain Clinical.
+  if (/clinical|score|emergency|drug|hospital|diagnos|medical|emr/.test(text)) return 'Clinical'
   if (/learn|study|education|library|evidence|exam|osce|research/.test(text)) return 'Learn'
   if (/mind|mental|mood|gratitude|resilience|stress|breath/.test(text)) return 'Mind'
   if (/run|training|workout|fitness|sport|endurance|zone|strength|movement/.test(text)) return 'Fitness'
   if (/body|sleep|recovery|nutrition|heart|health|longevity|vital|lab|wearable/.test(text)) return 'Body'
+  if (/\brisk\b/.test(text)) return 'Clinical'
   if (/calculator|tool|simulat|tracker|data|search/.test(text)) return 'Tools'
   return 'Daily'
 }
