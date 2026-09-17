@@ -70,9 +70,18 @@ const takTerjangkau = komponen.filter((p) => !dirujuk(p)).map((p) => p.replace(`
  *
  * Ini CATATAN, bukan restu. Setiap barisnya adalah pekerjaan yang sudah selesai
  * dan tidak dilihat siapa pun.
+ *
+ * HomeNowWidget adalah wearable dashboard v43 yang dipertahankan sebagai
+ * bahan migrasi setelah Home authoritative bergerak ke presentation v48.
+ * PremiumMotionRuntime juga dipertahankan tetapi belum dipasang global sampai
+ * pointer-light runtime melewati keputusan integrasi/reduced-motion. Keduanya
+ * tidak boleh dihidupkan ulang diam-diam atau dihapus hanya untuk membuat gate
+ * hijau; keputusan migrasinya harus eksplisit.
  */
 const DIKETAHUI: readonly string[] = [
+  'components/HomeNowWidget.tsx',
   'components/KartuPratinjau.tsx',
+  'components/PremiumMotionRuntime.tsx',
   'components/RelatedFeaturesRail.tsx',
   'components/dashboard/ActivityAchievementWidget.tsx',
   'components/dashboard/LibraryDiscoveryWidget.tsx',
