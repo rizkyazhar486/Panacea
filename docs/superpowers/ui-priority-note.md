@@ -1,1 +1,0 @@
-Temporary coordination note: UI/UX priority lane replays functional scrollable widgets and Assistive Touch v2 on exact latest main. Tests land before production code; this note will be removed before merge if no longer needed.
