@@ -1,11 +1,11 @@
-import { lazy, Suspense, useEffect, useRef, useState } from 'react'
+import { lazy, Suspense, useEffect, useLayoutEffect, useRef, useState } from 'react'
 import type { BodySystemId } from '../lib/bodySystemSourceWave'
-import { resolveBodySystemIdFromAtlasLabel } from '../lib/bodySystemPhysiologyBridge'
 import { BodyExplorer } from './BodyExplorer'
 import './bodyExposureOS.css'
 
 const BodyAllSystems3D = lazy(() => import('../components/BodyAllSystems3D'))
 const AtlasPhysiologyBridgePanel = lazy(() => import('./bodyhub/AtlasPhysiologyBridgePanel'))
+const BodySystemDeepDiveWorkspace = lazy(() => import('./bodyhub/BodySystemDeepDiveWorkspace'))
 const PathophysiologyNetworkPanel = lazy(() => import('./bodyhub/PathophysiologyNetworkPanel'))
 const PharmacologyMechanismPanel = lazy(() => import('./bodyhub/PharmacologyMechanismPanel'))
 
@@ -27,6 +27,9 @@ const MODES: Mode[] = [
   { key: 'clinical', label: 'Clinical', panel: 'Diseases', description: 'Relate structures to disease, drugs and clinically oriented learning.' },
 ]
 
+const LIQUID_ACTIONS_ROOT_CLASS = 'pmd-liquid-actions-v45'
+const BODY_EXPOSURE_ROOT_CLASS = 'pmd-body-exposure-active'
+
 export function BodyExposureOS() {
   const rootRef = useRef<HTMLElement | null>(null)
   const explorerRef = useRef<HTMLDivElement | null>(null)
@@ -39,6 +42,33 @@ export function BodyExposureOS() {
     const syncFullscreen = () => setImmersive(document.fullscreenElement === rootRef.current)
     document.addEventListener('fullscreenchange', syncFullscreen)
     return () => document.removeEventListener('fullscreenchange', syncFullscreen)
+  }, [])
+
+  useLayoutEffect(() => {
+    // Body Exposure owns a dense anatomy/physiology interaction model. The later
+    // global liquid-action material pass overrides those controls through an
+    // html-level selector. Suspend it before first paint and keep it suspended
+    // while mounted, even if a global runtime tries to re-assert the class.
+    const html = document.documentElement
+    let restoreLiquidActions = html.classList.contains(LIQUID_ACTIONS_ROOT_CLASS)
+
+    const suppressGlobalControlSkin = () => {
+      if (!html.classList.contains(LIQUID_ACTIONS_ROOT_CLASS)) return
+      restoreLiquidActions = true
+      html.classList.remove(LIQUID_ACTIONS_ROOT_CLASS)
+    }
+
+    html.classList.add(BODY_EXPOSURE_ROOT_CLASS)
+    suppressGlobalControlSkin()
+
+    const classObserver = new MutationObserver(suppressGlobalControlSkin)
+    classObserver.observe(html, { attributes: true, attributeFilter: ['class'] })
+
+    return () => {
+      classObserver.disconnect()
+      html.classList.remove(BODY_EXPOSURE_ROOT_CLASS)
+      if (restoreLiquidActions) html.classList.add(LIQUID_ACTIONS_ROOT_CLASS)
+    }
   }, [])
 
   function openPanel(mode: Mode) {
@@ -74,13 +104,6 @@ export function BodyExposureOS() {
     }
   }
 
-  function captureSystemAtlasSelection(event: React.MouseEvent<HTMLDivElement>) {
-    const button = (event.target as HTMLElement).closest<HTMLButtonElement>('button[role="tab"]')
-    if (!button) return
-    const systemId = resolveBodySystemIdFromAtlasLabel(button.textContent)
-    if (systemId) setSelectedBodySystemId(systemId)
-  }
-
   function captureExplorerSelection(event: React.MouseEvent<HTMLDivElement>) {
     const button = (event.target as HTMLElement).closest('button')
     if (!button) return
@@ -92,7 +115,14 @@ export function BodyExposureOS() {
   const current = MODES.find((mode) => mode.key === activeMode) ?? MODES[0]
 
   return (
-    <section ref={rootRef} className="body-exposure-os" aria-labelledby="body-exposure-os-title">
+    <section
+      ref={rootRef}
+      className="body-exposure-os"
+      aria-labelledby="body-exposure-os-title"
+      data-pmd-body-exposure="true"
+      data-pmd-unclamped="true"
+      data-pmd-liquid="off"
+    >
       <div className="body-exposure-os__ambient" aria-hidden />
 
       <header className="body-exposure-os__glass relative z-[2] overflow-hidden rounded-[28px] border border-white/10 p-4 sm:p-5 lg:p-6">
@@ -185,15 +215,21 @@ export function BodyExposureOS() {
         <span className="hidden shrink-0 sm:inline">Educational atlas · not a patient-specific diagnosis</span>
       </div>
 
-      <div ref={systemsRef} onClickCapture={captureSystemAtlasSelection} className="relative z-[2] mt-3 scroll-mt-4">
+      <div ref={systemsRef} className="relative z-[2] mt-3 scroll-mt-4">
         <Suspense fallback={<div className="grid min-h-44 place-items-center rounded-[26px] border border-white/[.08] bg-black/35 text-xs font-bold text-white/35">Loading system atlas…</div>}>
-          <BodyAllSystems3D />
+          <BodyAllSystems3D selectedSystemId={selectedBodySystemId} onSystemChange={setSelectedBodySystemId} />
         </Suspense>
       </div>
 
       <div className="relative z-[2] mt-3">
         <Suspense fallback={<div className="grid min-h-32 place-items-center rounded-[26px] border border-white/[.08] bg-black/35 text-xs font-bold text-white/35">Loading anatomy-physiology bridge…</div>}>
           <AtlasPhysiologyBridgePanel selectedAtlasSystemId={selectedBodySystemId} onSystemChange={setSelectedBodySystemId} />
+        </Suspense>
+      </div>
+
+      <div className="relative z-[2] mt-3">
+        <Suspense fallback={<div className="grid min-h-40 place-items-center rounded-[28px] border border-white/[.08] bg-black/35 text-xs font-bold text-white/35">Loading organ-specific function…</div>}>
+          <BodySystemDeepDiveWorkspace selectedAtlasSystemId={selectedBodySystemId} />
         </Suspense>
       </div>
 

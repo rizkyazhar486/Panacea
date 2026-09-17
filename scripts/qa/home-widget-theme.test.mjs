@@ -47,7 +47,29 @@ test('Final-authority Dark Home guard loads after the general Home contrast laye
   const darkGuard = index.indexOf('/home-widget-dark-v31.css?v=20260909-1')
   assert.ok(contrast >= 0, 'Home contrast layer must remain registered')
   assert.ok(darkGuard > contrast, 'Dark widget guard must load after the general contrast layer')
-  assert.match(index, /MAINTENANCE_VERSION = '20260915-v42'/)
+  // Kunci perawatan cache harus ikut naik setiap kali lapisan presentasi naik;
+  // kalau tidak, pengguna lama tetap memakai stylesheet lama dari cache.
+  //
+  // Versinya TIDAK lagi ditulis sebagai teks tetap di sini. Versi tetap membuat
+  // gerbang ini gagal pada setiap kenaikan yang sah — dan gerbang yang gagal
+  // karena hal yang sah akan ditulis ulang, bukan dibaca. Angkanya dibaca dari
+  // index.html sendiri, sehingga yang diperiksa adalah hubungannya: kunci
+  // perawatan tidak boleh tertinggal dari lapisan presentasi tertinggi.
+  const lapisan = [...index.matchAll(/\/panacea-[a-z0-9-]+-v(\d+)\.css/g)].map((m) => Number(m[1]))
+  assert.ok(lapisan.length > 0, 'index.html no longer links any versioned panacea-* presentation layer')
+  const tertinggi = Math.max(...lapisan)
+  const kunci = index.match(/MAINTENANCE_VERSION = '(\d{8})-v(\d+)'/)
+  assert.ok(kunci, "MAINTENANCE_VERSION is missing or no longer shaped 'YYYYMMDD-vN'")
+  const versiKunci = Number(kunci?.[2])
+  assert.equal(
+    versiKunci,
+    tertinggi,
+    versiKunci < tertinggi
+      ? `the cache maintenance key is still v${versiKunci} while index.html already loads v${tertinggi}; ` +
+        'returning users would keep serving the older stylesheet from cache'
+      : `the cache maintenance key claims v${versiKunci} but the newest presentation layer linked from ` +
+        `index.html is v${tertinggi}; the key names a release that is not shipped`,
+  )
 })
 
 test('Home v34 removes decorative outline leakage without recoloring semantic data', () => {

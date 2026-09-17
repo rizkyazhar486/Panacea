@@ -1,0 +1,314 @@
+/* Panaceamed Reference UI v47
+   Structural translation of the supplied UI/UX recordings — not a literal copy.
+
+   Extracted principles:
+   1) Dashboard scan: one dominant metric/visual, compact secondary metrics, sparse labels.
+   2) Premium mobile: content behaves like an immersive poster; controls float above it.
+   3) Spatial web: the product sits on an ambient stage instead of inside stacked grey panels.
+   4) Progressive detail: glance first, action second, explanation only on demand.
+
+   Layout formulas:
+   stage gap = clamp(20px, 2.6vw, 48px)
+   stage radius = clamp(26px, 2vw, 38px)
+   poster width (mobile) = min(78vw, 320px)
+   perspective tilt <= 2.6deg; disabled for reduced motion/coarse pointers.
+*/
+
+:root {
+  --pmd-v47-gap: clamp(1.25rem, 2.6vw, 3rem);
+  --pmd-v47-radius: clamp(1.625rem, 2vw, 2.375rem);
+  --pmd-v47-line: rgba(255,255,255,.10);
+  --pmd-v47-line-hot: rgba(255,255,255,.20);
+  --pmd-v47-surface: rgba(13,18,16,.58);
+  --pmd-v47-surface-strong: rgba(12,16,14,.76);
+  --pmd-v47-specular: rgba(255,255,255,.18);
+  --pmd-v47-shadow: 0 28px 90px rgba(0,0,0,.28);
+  --pmd-v47-ambient-rgb: 37 209 98;
+  --pmd-v47-ambient-2-rgb: 94 214 255;
+}
+
+html:not(.dark) {
+  --pmd-v47-line: rgba(13,39,26,.09);
+  --pmd-v47-line-hot: rgba(13,39,26,.16);
+  --pmd-v47-surface: rgba(255,255,255,.66);
+  --pmd-v47-surface-strong: rgba(255,255,255,.84);
+  --pmd-v47-specular: rgba(255,255,255,.92);
+  --pmd-v47-shadow: 0 26px 78px rgba(36,58,46,.10);
+}
+
+/* Ambient stage: content changes the light subtly, never the semantic data palette. */
+html.pmd-reference-ui-v47 body {
+  background:
+    radial-gradient(58rem 38rem at 88% -8%, rgb(var(--pmd-v47-ambient-rgb) / .105), transparent 67%),
+    radial-gradient(46rem 34rem at -8% 24%, rgb(var(--pmd-v47-ambient-2-rgb) / .075), transparent 70%),
+    linear-gradient(180deg, var(--pmd-canvas-1), var(--pmd-canvas-0) 56%, var(--pmd-canvas-2)) !important;
+  transition: background 520ms var(--pmd-liquid-ease);
+}
+
+html.pmd-reference-ui-v47 #root::before {
+  background:
+    radial-gradient(34rem 28rem at var(--pmd-v47-pointer-x, 50%) var(--pmd-v47-pointer-y, 18%), rgb(var(--pmd-v47-ambient-rgb) / .085), transparent 72%),
+    radial-gradient(30rem 24rem at 82% 82%, rgb(var(--pmd-v47-ambient-2-rgb) / .045), transparent 76%) !important;
+  transition: background 420ms var(--pmd-liquid-ease);
+}
+
+/* --------------------------------------------------------------------------
+   HOME AS ONE SPATIAL STAGE
+   -------------------------------------------------------------------------- */
+html.pmd-reference-ui-v47 .panacea-liquid-home {
+  width: min(100%, 92rem);
+  display: grid;
+  gap: var(--pmd-v47-gap);
+}
+
+html.pmd-reference-ui-v47 .panacea-liquid-home > .space-y-5 {
+  display: grid;
+  gap: var(--pmd-v47-gap);
+}
+html.pmd-reference-ui-v47 .panacea-liquid-home > .space-y-5 > * + * { margin-top: 0 !important; }
+
+html.pmd-reference-ui-v47 section[aria-label='Today health brief'],
+html.pmd-reference-ui-v47 section[aria-label='Panacea command deck'] {
+  border-radius: var(--pmd-v47-radius) !important;
+  border: 1px solid var(--pmd-v47-line) !important;
+  background:
+    radial-gradient(46rem 28rem at var(--pmd-v47-glow-x, 72%) var(--pmd-v47-glow-y, 4%), rgb(var(--pmd-v47-ambient-rgb) / .08), transparent 66%),
+    linear-gradient(145deg, rgba(255,255,255,.035), transparent 38%),
+    var(--pmd-v47-surface) !important;
+  box-shadow: var(--pmd-v47-shadow), inset 0 1px 0 var(--pmd-v47-specular) !important;
+  -webkit-backdrop-filter: blur(24px) saturate(150%) !important;
+  backdrop-filter: blur(24px) saturate(150%) !important;
+}
+
+/* Dashboard reference: one number/visual clearly outranks everything else. */
+html.pmd-reference-ui-v47 section[aria-label='Today health brief'] {
+  padding: clamp(1rem, 2.2vw, 2rem) !important;
+}
+
+html.pmd-reference-ui-v47 section[aria-label='Today health brief'] > div:nth-of-type(4) {
+  gap: clamp(.8rem, 1.4vw, 1.35rem) !important;
+  margin-top: clamp(1.25rem, 2.2vw, 2rem) !important;
+}
+
+html.pmd-reference-ui-v47 section[aria-label='Today health brief'] a[aria-label^='Steps '] {
+  position: relative;
+  min-height: clamp(15rem, 29vw, 22rem);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  border-color: rgba(255,255,255,.11) !important;
+  background:
+    radial-gradient(22rem 18rem at 86% 18%, rgb(var(--pmd-v47-ambient-rgb) / .16), transparent 70%),
+    linear-gradient(145deg, rgba(255,255,255,.055), rgba(255,255,255,.018)) !important;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.13), 0 20px 56px rgba(0,0,0,.16) !important;
+}
+
+html.pmd-reference-ui-v47 section[aria-label='Today health brief'] a[aria-label^='Steps '] div[class*='text-[48px]'] {
+  font-size: clamp(3.4rem, 8vw, 6.75rem) !important;
+  line-height: .88 !important;
+  letter-spacing: -.075em !important;
+}
+
+/* Secondary health metrics: quieter, cleaner, equal visual rhythm. */
+html.pmd-reference-ui-v47 section[aria-label='Today health brief'] > div:nth-of-type(4) > div:last-child {
+  gap: clamp(.7rem, 1.1vw, 1rem) !important;
+}
+
+html.pmd-reference-ui-v47 section[aria-label='Today health brief'] > div:nth-of-type(4) > div:last-child > a {
+  min-height: 7.75rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  border-color: rgba(255,255,255,.085) !important;
+  background: rgba(255,255,255,.025) !important;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.07) !important;
+}
+
+/* Context actions become a compact tool rail rather than another card wall. */
+html.pmd-reference-ui-v47 section[aria-label='Today health brief'] > div:last-child {
+  gap: .65rem !important;
+}
+html.pmd-reference-ui-v47 section[aria-label='Today health brief'] > div:last-child > a {
+  min-height: 2.85rem;
+  border-radius: 999px !important;
+  background: rgba(255,255,255,.022) !important;
+  box-shadow: none !important;
+}
+
+/* --------------------------------------------------------------------------
+   COMMAND DECK: FRAMED OBJECTS, NOT NESTED PANELS
+   -------------------------------------------------------------------------- */
+html.pmd-reference-ui-v47 section[aria-label='Panacea command deck'] {
+  padding: clamp(1rem, 2.25vw, 2rem) !important;
+}
+
+html.pmd-reference-ui-v47 section[aria-label='Panacea command deck'] > header {
+  gap: clamp(1.2rem, 2vw, 2rem) !important;
+  padding-bottom: clamp(1.8rem, 3vw, 3rem) !important;
+}
+
+html.pmd-reference-ui-v47 [aria-label='Capability coverage'] {
+  min-height: 9.5rem;
+  border-radius: 1.5rem !important;
+  border-color: rgba(255,255,255,.085) !important;
+  background: rgba(255,255,255,.022) !important;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.07) !important;
+}
+
+html.pmd-reference-ui-v47 [aria-label='Capability coverage'] button {
+  background: transparent !important;
+  border-color: transparent !important;
+  box-shadow: none !important;
+}
+
+html.pmd-reference-ui-v47 [aria-label='Capability coverage'] button > span:first-child {
+  border-radius: 999px !important;
+  background: linear-gradient(180deg, rgb(var(--pmd-v47-ambient-2-rgb) / .82), rgb(var(--pmd-v47-ambient-rgb) / .48)) !important;
+}
+
+/* Super-pages become three premium poster objects. */
+html.pmd-reference-ui-v47 [aria-label='Super pages'] {
+  gap: clamp(.9rem, 1.65vw, 1.4rem) !important;
+}
+
+html.pmd-reference-ui-v47 [aria-label='Super pages'] > button {
+  --pmd-v47-tilt-x: 0deg;
+  --pmd-v47-tilt-y: 0deg;
+  --pmd-v47-card-x: 50%;
+  --pmd-v47-card-y: 24%;
+  min-height: clamp(13.5rem, 24vw, 18rem) !important;
+  border-radius: clamp(1.45rem, 1.8vw, 2rem) !important;
+  border-color: rgba(255,255,255,.11) !important;
+  background:
+    radial-gradient(18rem 14rem at var(--pmd-v47-card-x) var(--pmd-v47-card-y), rgba(255,255,255,.15), transparent 64%),
+    linear-gradient(155deg, rgba(255,255,255,.075), rgba(255,255,255,.018) 52%, rgba(0,0,0,.10)) !important;
+  box-shadow: 0 20px 58px rgba(0,0,0,.20), inset 0 1px 0 rgba(255,255,255,.13) !important;
+  transform: perspective(900px) rotateX(var(--pmd-v47-tilt-x)) rotateY(var(--pmd-v47-tilt-y)) translateZ(0);
+  transform-style: preserve-3d;
+  will-change: transform;
+}
+
+@media (hover:hover) and (pointer:fine) {
+  html.pmd-reference-ui-v47 [aria-label='Super pages'] > button:hover {
+    border-color: rgba(255,255,255,.23) !important;
+    box-shadow: 0 28px 76px rgba(0,0,0,.28), inset 0 1px 0 rgba(255,255,255,.18) !important;
+  }
+}
+
+html.pmd-reference-ui-v47 [aria-label='Super pages'] > button[aria-pressed='true'] {
+  border-color: rgba(37,209,98,.42) !important;
+  box-shadow: 0 24px 70px rgba(37,209,98,.10), inset 0 1px 0 rgba(255,255,255,.16) !important;
+}
+
+/* Quick actions borrow the premium-app poster rhythm: strong surface, tiny copy. */
+html.pmd-reference-ui-v47 section[aria-label='Panacea command deck'] .grid.grid-cols-2.gap-3.sm\:grid-cols-3.lg\:grid-cols-6 > a {
+  min-height: 8.2rem !important;
+  border-radius: 1.55rem !important;
+  border-color: rgba(255,255,255,.10) !important;
+  background-blend-mode: screen, normal;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.12), 0 16px 42px rgba(0,0,0,.14) !important;
+}
+
+/* Catalogue is intentionally quieter than the three super-page objects. */
+html.pmd-reference-ui-v47 section[aria-label='Panacea command deck'] > div:last-child {
+  margin-top: clamp(2rem, 3.4vw, 3.5rem) !important;
+  border-radius: 1.65rem !important;
+  background: rgba(255,255,255,.018) !important;
+  border-color: rgba(255,255,255,.065) !important;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.045) !important;
+}
+
+html.pmd-reference-ui-v47 section[aria-label='Panacea command deck'] > div:last-child input {
+  font-size: .875rem;
+}
+
+html.pmd-reference-ui-v47 [aria-label='Feature categories'] {
+  scroll-snap-type: x proximity;
+}
+html.pmd-reference-ui-v47 [aria-label='Feature categories'] > button {
+  scroll-snap-align: start;
+}
+
+/* Keep the global dock visually subordinate, like the mobile reference. */
+html.pmd-reference-ui-v47 .panacea-liquid-dock {
+  width: min(calc(100vw - 1.25rem), 31rem) !important;
+  bottom: max(.55rem, env(safe-area-inset-bottom)) !important;
+  padding: .34rem !important;
+  border-radius: 1.55rem !important;
+  background: rgba(18,22,20,.64) !important;
+  border: 1px solid rgba(255,255,255,.10) !important;
+  box-shadow: 0 18px 52px rgba(0,0,0,.28), inset 0 1px 0 rgba(255,255,255,.12) !important;
+  -webkit-backdrop-filter: blur(24px) saturate(160%) !important;
+  backdrop-filter: blur(24px) saturate(160%) !important;
+}
+
+html.pmd-reference-ui-v47 .liquid-dock-item {
+  min-height: 3rem !important;
+  border-radius: 1.12rem !important;
+  background: transparent !important;
+  border-color: transparent !important;
+  box-shadow: none !important;
+}
+html.pmd-reference-ui-v47 .liquid-dock-item[data-active='true'],
+html.pmd-reference-ui-v47 .liquid-dock-item[aria-current='page'] {
+  background: rgba(255,255,255,.09) !important;
+  border-color: rgba(255,255,255,.09) !important;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.13) !important;
+}
+
+/* --------------------------------------------------------------------------
+   MOBILE: horizontal poster rails preserve high function without long pages.
+   -------------------------------------------------------------------------- */
+@media (max-width: 767px) {
+  html.pmd-reference-ui-v47 main.mx-auto {
+    padding-inline: clamp(.85rem, 4vw, 1.1rem) !important;
+    padding-top: 1.15rem !important;
+  }
+
+  html.pmd-reference-ui-v47 .panacea-liquid-home,
+  html.pmd-reference-ui-v47 .panacea-liquid-home > .space-y-5 {
+    gap: 1.3rem;
+  }
+
+  html.pmd-reference-ui-v47 section[aria-label='Today health brief'],
+  html.pmd-reference-ui-v47 section[aria-label='Panacea command deck'] {
+    border-radius: 1.7rem !important;
+  }
+
+  html.pmd-reference-ui-v47 [aria-label='Super pages'] {
+    display: flex !important;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    gap: .85rem !important;
+    margin-inline: -.15rem;
+    padding: .15rem .15rem .55rem;
+    scrollbar-width: none;
+  }
+  html.pmd-reference-ui-v47 [aria-label='Super pages']::-webkit-scrollbar { display:none; }
+  html.pmd-reference-ui-v47 [aria-label='Super pages'] > button {
+    flex: 0 0 min(78vw, 20rem);
+    min-height: 15rem !important;
+    scroll-snap-align: center;
+  }
+
+  html.pmd-reference-ui-v47 section[aria-label='Today health brief'] > div:last-child {
+    display: flex !important;
+    overflow-x: auto;
+    scroll-snap-type: x proximity;
+    scrollbar-width: none;
+  }
+  html.pmd-reference-ui-v47 section[aria-label='Today health brief'] > div:last-child::-webkit-scrollbar { display:none; }
+  html.pmd-reference-ui-v47 section[aria-label='Today health brief'] > div:last-child > a {
+    flex: 0 0 auto;
+    min-width: 6.2rem;
+    scroll-snap-align: start;
+  }
+}
+
+/* No motion tricks when the OS/user asks for less motion. */
+@media (prefers-reduced-motion: reduce), (hover:none), (pointer:coarse) {
+  html.pmd-reference-ui-v47 [aria-label='Super pages'] > button {
+    transform: none !important;
+    will-change: auto;
+  }
+}
