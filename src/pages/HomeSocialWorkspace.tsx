@@ -9,6 +9,7 @@ import '../styles/home-health-spectrum.css'
 import '../styles/home-mobile-shell-repair-v45.css'
 import '../styles/home-liquid-reference.css'
 import '../styles/home-green-material-v48.css'
+import '../styles/home-human-interface.css'
 
 const Feed = lazy(() => import('./Feed'))
 const Community = lazy(() => import('./Community').then((m) => ({ default: m.Community })))
@@ -39,7 +40,7 @@ const LEGACY_VALID = new Set(LEGACY_VIEWS.map((view) => view.key))
 
 function Loader() {
   return (
-    <div className="liquid-glass grid min-h-[24vh] place-items-center rounded-[26px] text-xs font-black text-cyan-100/70" role="status" aria-live="polite">
+    <div className="grid min-h-[24vh] place-items-center border-y border-white/10 text-xs font-black text-white/50" role="status" aria-live="polite">
       Loading…
     </div>
   )
@@ -69,11 +70,9 @@ export function HomeSocialWorkspace() {
   return (
     <div className="panacea-liquid-home mx-auto w-full max-w-[1320px] pb-32">
       {activeKey === 'home' ? (
-        <div className="space-y-5">
+        <div className="panacea-human-home">
           <HomeVisualLanding />
           <HomeHealthBrief />
-          {/* Papan widget yang bisa digeser: satu widget per layar, digeser
-              dengan jempol, dan isinya dipilih penggunanya sendiri. */}
           <RelWidgetRumah />
           <HomeCommandDeck />
         </div>
