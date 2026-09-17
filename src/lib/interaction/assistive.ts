@@ -32,6 +32,10 @@ export interface AssistiveViewport {
   leftInset?: number
 }
 
+export const ASSISTIVE_PREFS_KEY = 'pmd-assistive-v2'
+export const ASSISTIVE_POSITION_KEY = 'pmd_fab_posisi_v1'
+export const ASSISTIVE_PREFS_EVENT = 'panacea:assistive-preferences'
+
 const SPECIAL = new Set<AssistiveSpecialAction>(['menu', 'customize'])
 const actionIds = () => new Set(KATALOG_AKSI.map((action) => action.id))
 
@@ -93,6 +97,38 @@ export function normalizeAssistivePreferences(value: unknown): AssistivePreferen
     snap: typeof source.snap === 'boolean' ? source.snap : DEFAULT_ASSISTIVE_PREFERENCES.snap,
     haptics: typeof source.haptics === 'boolean' ? source.haptics : DEFAULT_ASSISTIVE_PREFERENCES.haptics,
   }
+}
+
+export function loadAssistivePreferences(): AssistivePreferences {
+  if (typeof localStorage === 'undefined') return normalizeAssistivePreferences(null)
+  try {
+    return normalizeAssistivePreferences(JSON.parse(localStorage.getItem(ASSISTIVE_PREFS_KEY) || 'null'))
+  } catch {
+    return normalizeAssistivePreferences(null)
+  }
+}
+
+export function saveAssistivePreferences(value: unknown): AssistivePreferences {
+  const normalized = normalizeAssistivePreferences(value)
+  try { localStorage.setItem(ASSISTIVE_PREFS_KEY, JSON.stringify(normalized)) } catch { /* presentation preference only */ }
+  try { window.dispatchEvent(new Event(ASSISTIVE_PREFS_EVENT)) } catch { /* non-browser test environment */ }
+  return normalized
+}
+
+export function loadAssistivePosition(): AssistivePosition | null {
+  if (typeof localStorage === 'undefined') return null
+  try {
+    const value = JSON.parse(localStorage.getItem(ASSISTIVE_POSITION_KEY) || 'null')
+    if (!value || typeof value !== 'object') return null
+    const x = (value as { x?: unknown }).x
+    const y = (value as { y?: unknown }).y
+    return typeof x === 'number' && Number.isFinite(x) && typeof y === 'number' && Number.isFinite(y) ? { x, y } : null
+  } catch { return null }
+}
+
+export function saveAssistivePosition(position: AssistivePosition): AssistivePosition {
+  try { localStorage.setItem(ASSISTIVE_POSITION_KEY, JSON.stringify(position)) } catch { /* presentation preference only */ }
+  return position
 }
 
 export function contextActionIds(route: string): string[] {
