@@ -1,0 +1,68 @@
+name: Longitudinal Foundation
+
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'src/lib/panaceaLongitudinalState.ts'
+      - 'src/lib/healthStoreLongitudinalBridge.ts'
+      - 'src/lib/productionHealthLongitudinalSync.ts'
+      - 'src/lib/productionHealthStoreSelector.ts'
+      - 'src/lib/productionAppStateLongitudinalSync.ts'
+      - 'src/lib/productionContinuousCarePipeline.ts'
+      - 'src/lib/continuousCarePipeline.ts'
+      - 'src/lib/governedContextOrchestrator.ts'
+      - 'src/lib/habitualCareEngine.ts'
+      - 'src/lib/superPageInsightProjection.ts'
+      - 'src/lib/wearableSignalAdapters.ts'
+      - 'scripts/uji/health-store-longitudinal-bridge.mts'
+      - 'scripts/uji/health-store-manual-provenance.mts'
+      - 'scripts/uji/production-health-longitudinal-sync.mts'
+      - 'scripts/uji/production-health-store-scope.mts'
+      - 'scripts/uji/production-appstate-longitudinal-sync.mts'
+      - 'scripts/uji/production-continuous-care-pipeline.mts'
+      - '.github/workflows/longitudinal-foundation.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: longitudinal-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  production-store-contracts:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout exact head
+        uses: actions/checkout@v4
+
+      - name: Setup Node 24
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Install locked dependencies
+        run: npm ci
+
+      - name: Production health-store bridge
+        run: node --experimental-transform-types --import=./scripts/uji/typescript-resolver.mjs scripts/uji/health-store-longitudinal-bridge.mts
+
+      - name: Manual provenance boundary
+        run: node --experimental-transform-types --import=./scripts/uji/typescript-resolver.mjs scripts/uji/health-store-manual-provenance.mts
+
+      - name: Production store idempotent sync
+        run: node --experimental-transform-types --import=./scripts/uji/typescript-resolver.mjs scripts/uji/production-health-longitudinal-sync.mts
+
+      - name: Subject-scope isolation
+        run: node --experimental-transform-types --import=./scripts/uji/typescript-resolver.mjs scripts/uji/production-health-store-scope.mts
+
+      - name: Scoped AppState orchestration
+        run: node --experimental-transform-types --import=./scripts/uji/typescript-resolver.mjs scripts/uji/production-appstate-longitudinal-sync.mts
+
+      - name: Production continuous-care pipeline
+        run: node --experimental-transform-types --import=./scripts/uji/typescript-resolver.mjs scripts/uji/production-continuous-care-pipeline.mts
