@@ -129,21 +129,65 @@ try {
     devicePixelRatio: window.devicePixelRatio,
     documentScrollWidth: document.documentElement.scrollWidth,
   }))
-  const centerUnobstructed = await canvas.evaluate((node) => {
+  // Apa yang MENUTUPI, bukan sekadar "tertutup".
+  //
+  // Pemeriksaan lama hanya menanyakan `hit === node`. Ketika titik tengah
+  // kanvas berada di LUAR viewport, elementFromPoint mengembalikan null, dan
+  // kegagalannya dilaporkan sebagai "tertutup lapisan UI lain" — padahal tidak
+  // ada yang menutupi apa pun. Dua keadaan itu sekarang dipisahkan, dan yang
+  // benar-benar menutupi disebutkan namanya supaya log CI bisa dibaca.
+  const gulirKeTengah = async () => {
+    await canvas.evaluate((node) => node.scrollIntoView({ block: 'center', inline: 'nearest', behavior: 'auto' }))
+    await page.waitForTimeout(150)
+  }
+  const periksaTengah = () => canvas.evaluate((node) => {
     const rect = node.getBoundingClientRect()
-    const hit = document.elementFromPoint(rect.left + rect.width / 2, rect.top + rect.height / 2)
-    return hit === node
+    const x = rect.left + rect.width / 2
+    const y = rect.top + rect.height / 2
+    const diLayar = x >= 0 && y >= 0 && x <= window.innerWidth && y <= window.innerHeight
+    const hit = diLayar ? document.elementFromPoint(x, y) : null
+    const sebut = (el) => {
+      if (!el) return null
+      const cs = getComputedStyle(el)
+      const r = el.getBoundingClientRect()
+      return `${el.tagName.toLowerCase()}${el.id ? `#${el.id}` : ''}${el.className && typeof el.className === 'string' ? `.${el.className.trim().split(/\s+/).slice(0, 3).join('.')}` : ''}` +
+        ` [z=${cs.zIndex} pos=${cs.position} pointer-events=${cs.pointerEvents} rect=${Math.round(r.left)},${Math.round(r.top)} ${Math.round(r.width)}x${Math.round(r.height)}]`
+    }
+    return {
+      diLayar,
+      titik: [Math.round(x), Math.round(y)],
+      viewport: [window.innerWidth, window.innerHeight],
+      bebas: diLayar && hit === node,
+      penutup: hit === node ? null : sebut(hit),
+    }
   })
+
+  let tengah = await periksaTengah()
+  if (!tengah.diLayar) {
+    // Tata letak bisa bergeser setelah anatomi selesai dimuat; gulir sekali lagi
+    // sebelum menyimpulkan apa pun.
+    await gulirKeTengah()
+    tengah = await periksaTengah()
+  }
+  const centerUnobstructed = tengah.bebas
 
   metrics = {
     viewport,
     canvas: health,
     canvasCenterUnobstructed: centerUnobstructed,
+    canvasCenterProbe: tengah,
     route: await page.evaluate(() => window.location.hash),
   }
 
   if (!health.webgl || health.contextLost) throw new Error('Body3D WebGL context is unavailable or lost')
-  if (!centerUnobstructed) throw new Error('Body3D canvas center is obstructed by another UI layer')
+  if (!centerUnobstructed) {
+    throw new Error(
+      tengah.diLayar
+        ? `Body3D canvas center is obstructed by another UI layer: ${tengah.penutup}`
+        : `Body3D canvas center sits outside the ${tengah.viewport[0]}x${tengah.viewport[1]} viewport ` +
+          `at ${tengah.titik[0]},${tengah.titik[1]} even after scrolling it into view — nothing is covering it`,
+    )
+  }
   if (viewport.width !== 390 || viewport.height !== 844) {
     throw new Error(`Unexpected viewport ${viewport.width}x${viewport.height}`)
   }
