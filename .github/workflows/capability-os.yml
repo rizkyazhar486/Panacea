@@ -1,0 +1,29 @@
+name: Capability OS
+
+on:
+  pull_request:
+    paths:
+      - 'config/capability-os*.json'
+      - 'scripts/lib/capability-os.mjs'
+      - 'scripts/validate-capability-os.mjs'
+      - 'scripts/qa/capability-os-*.test.mjs'
+      - '.claude/skills/panacea-capability-router/**'
+      - '.claude/skills/panacea-orchestrator/**'
+      - 'package.json'
+      - '.github/workflows/capability-os.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - run: npm run validate:capability-os
+      - run: npm run test:capability-os

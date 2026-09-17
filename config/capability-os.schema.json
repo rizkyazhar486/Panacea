@@ -1,0 +1,140 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Panaceamed Capability OS",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["version", "capabilities"],
+  "properties": {
+    "version": {
+      "type": "integer",
+      "enum": [1]
+    },
+    "capabilities": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "lane",
+          "domains",
+          "executors",
+          "primary",
+          "fallbacks",
+          "skill",
+          "risk",
+          "sideEffects",
+          "parallelizable",
+          "writeAuthority",
+          "requiredEvidence",
+          "stopCondition"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 3,
+            "pattern": "^[a-z0-9]+(?:[.-][a-z0-9]+)*$"
+          },
+          "lane": {
+            "type": "string",
+            "enum": [
+              "engineering",
+              "biomedical-evidence",
+              "ux-visual",
+              "browser-qa",
+              "release-infrastructure",
+              "growth-operations"
+            ]
+          },
+          "domains": {
+            "type": "array",
+            "minItems": 1,
+            "uniqueItems": true,
+            "items": {
+              "type": "string",
+              "minLength": 1,
+              "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+            }
+          },
+          "executors": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["preferred", "supported"],
+            "properties": {
+              "preferred": {
+                "type": "string",
+                "enum": ["chatgpt", "claude-code"]
+              },
+              "supported": {
+                "type": "array",
+                "minItems": 1,
+                "uniqueItems": true,
+                "items": {
+                  "type": "string",
+                  "enum": ["chatgpt", "claude-code"]
+                }
+              }
+            }
+          },
+          "primary": {
+            "type": "string",
+            "minLength": 1,
+            "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+          },
+          "fallbacks": {
+            "type": "array",
+            "uniqueItems": true,
+            "items": {
+              "type": "string",
+              "minLength": 1,
+              "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+            }
+          },
+          "skill": {
+            "type": ["string", "null"],
+            "minLength": 1
+          },
+          "risk": {
+            "type": "string",
+            "enum": [
+              "routine",
+              "security",
+              "privacy",
+              "clinical-reference",
+              "clinical-high-risk",
+              "deployment",
+              "financial"
+            ]
+          },
+          "sideEffects": {
+            "type": "string",
+            "enum": ["read-only", "local-change", "remote-change", "production-change"]
+          },
+          "parallelizable": {
+            "type": "boolean"
+          },
+          "writeAuthority": {
+            "type": "string",
+            "enum": ["none", "branch-only", "external-draft", "approved-production"]
+          },
+          "requiredEvidence": {
+            "type": "array",
+            "minItems": 1,
+            "uniqueItems": true,
+            "items": {
+              "type": "string",
+              "minLength": 1,
+              "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+            }
+          },
+          "stopCondition": {
+            "type": "string",
+            "minLength": 1,
+            "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+          }
+        }
+      }
+    }
+  }
+}
