@@ -9,12 +9,14 @@ on:
       - 'src/lib/healthStoreLongitudinalBridge.ts'
       - 'src/lib/productionHealthLongitudinalSync.ts'
       - 'src/lib/productionHealthStoreSelector.ts'
+      - 'src/lib/productionAppStateLongitudinalSync.ts'
       - 'src/lib/continuousCarePipeline.ts'
       - 'src/lib/wearableSignalAdapters.ts'
       - 'scripts/uji/health-store-longitudinal-bridge.mts'
       - 'scripts/uji/health-store-manual-provenance.mts'
       - 'scripts/uji/production-health-longitudinal-sync.mts'
       - 'scripts/uji/production-health-store-scope.mts'
+      - 'scripts/uji/production-appstate-longitudinal-sync.mts'
       - '.github/workflows/longitudinal-foundation.yml'
   workflow_dispatch:
 
@@ -53,3 +55,6 @@ jobs:
 
       - name: Subject-scope isolation
         run: node --experimental-transform-types --import=./scripts/uji/typescript-resolver.mjs scripts/uji/production-health-store-scope.mts
+
+      - name: Scoped AppState orchestration
+        run: node --experimental-transform-types --import=./scripts/uji/typescript-resolver.mjs scripts/uji/production-appstate-longitudinal-sync.mts
