@@ -30,12 +30,12 @@ export type BlockedAgentAction =
   | 'deescalate_without_human_confirmation'
 
 /**
- * Explicit safety signals only.
+ * Hanya menerima sinyal keselamatan yang eksplisit.
  *
- * These fields are intended to represent direct user report or clinician-entered
- * information. Model-, wearable-, or behavior-inferred signals must not be mapped
- * into these fields without an explicit confirmation step. This module is an
- * orchestration guardrail, not a validated suicide-risk prediction instrument.
+ * Field ini dimaksudkan untuk laporan langsung pengguna atau data yang dimasukkan
+ * klinisi. Sinyal hasil inferensi model, wearable, atau perilaku tidak boleh
+ * dipetakan ke field ini tanpa langkah konfirmasi eksplisit. Modul ini adalah
+ * guardrail orkestrasi, bukan instrumen prediksi risiko bunuh diri yang tervalidasi.
  */
 export interface ExplicitMentalHealthSafetySignals {
   suicidalThoughts?: boolean
@@ -92,17 +92,21 @@ const hasSelfHarmSignal = (signals: ExplicitMentalHealthSafetySignals): boolean 
   signals.unableToStaySafe === true
 
 /**
- * Derive the minimum safe orchestration disposition from explicit signals.
+ * Menentukan disposisi orkestrasi minimum yang aman dari sinyal eksplisit.
  *
- * Safety invariants:
- * - Hard escalation signals always win. There is intentionally no model override.
- * - Emergency dispositions cannot resolve to self-help-only behavior.
- * - Explicit self-harm signals require a human handoff path and follow-up.
- * - Severe distress alone prompts assessment/human review without fabricating an
- *   emergency classification.
+ * Invarian keselamatan:
+ * - Sinyal hard-escalation selalu menang; model tidak memiliki jalur override.
+ * - Disposisi emergensi tidak boleh berakhir sebagai self-help saja.
+ * - Sinyal self-harm eksplisit wajib memiliki jalur handoff manusia dan follow-up.
+ * - Distress berat saja memicu asesmen/review manusia tanpa mengarang klasifikasi
+ *   emergensi.
  *
- * This function does not diagnose, predict, or score suicide risk. Clinical
- * assessment and disposition remain human responsibilities.
+ * Daftar `actions` adalah rencana orkestrasi murni dan tidak melakukan side effect.
+ * Kontak eksternal tetap membutuhkan alur otorisasi/consent dan kebijakan emergensi
+ * yang berlaku pada lapisan eksekusi.
+ *
+ * Fungsi ini tidak mendiagnosis, memprediksi, atau memberi skor risiko bunuh diri.
+ * Asesmen klinis dan keputusan disposisi tetap menjadi tanggung jawab manusia.
  */
 export function deriveMentalHealthSafetyDisposition(
   signals: ExplicitMentalHealthSafetySignals,
