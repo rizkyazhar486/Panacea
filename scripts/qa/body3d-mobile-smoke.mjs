@@ -96,16 +96,25 @@ async function assertNoFatal(label) {
 }
 
 async function revealInViewport(locator, label) {
-  const geometry = await locator.evaluate((node) => {
-    node.scrollIntoView({ block: 'nearest', inline: 'nearest', behavior: 'auto' })
+  const geometry = await locator.evaluate(async (node) => {
     const rail = node.parentElement
-    if (rail) {
+    if (rail && rail.scrollWidth > rail.clientWidth) {
       const before = node.getBoundingClientRect()
       const railRect = rail.getBoundingClientRect()
-      const delta = (before.left + before.width / 2) - (railRect.left + railRect.width / 2)
-      rail.scrollLeft += delta
+      const centeredLeft = rail.scrollLeft
+        + (before.left - railRect.left)
+        - (rail.clientWidth - before.width) / 2
+      const maxScrollLeft = Math.max(0, rail.scrollWidth - rail.clientWidth)
+      const targetScrollLeft = Math.max(0, Math.min(maxScrollLeft, centeredLeft))
+      rail.scrollTo({ left: targetScrollLeft, behavior: 'auto' })
+      await new Promise((resolve) => requestAnimationFrame(resolve))
+      await new Promise((resolve) => requestAnimationFrame(resolve))
+    } else {
+      node.scrollIntoView({ block: 'nearest', inline: 'nearest', behavior: 'auto' })
+      await new Promise((resolve) => requestAnimationFrame(resolve))
     }
     const rect = node.getBoundingClientRect()
+    const railRect = rail?.getBoundingClientRect() ?? null
     return {
       left: rect.left,
       right: rect.right,
@@ -113,6 +122,8 @@ async function revealInViewport(locator, label) {
       bottom: rect.bottom,
       viewportWidth: window.innerWidth,
       viewportHeight: window.innerHeight,
+      railLeft: railRect?.left ?? null,
+      railRight: railRect?.right ?? null,
       railScrollLeft: rail?.scrollLeft ?? null,
       railClientWidth: rail?.clientWidth ?? null,
       railScrollWidth: rail?.scrollWidth ?? null,
