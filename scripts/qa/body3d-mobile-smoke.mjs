@@ -95,6 +95,27 @@ async function assertNoFatal(label) {
   }
 }
 
+async function revealInViewport(locator, label) {
+  await locator.evaluate((node) => node.scrollIntoView({ block: 'nearest', inline: 'center', behavior: 'auto' }))
+  const geometry = await locator.evaluate((node) => {
+    const rect = node.getBoundingClientRect()
+    return {
+      left: rect.left,
+      right: rect.right,
+      top: rect.top,
+      bottom: rect.bottom,
+      viewportWidth: window.innerWidth,
+      viewportHeight: window.innerHeight,
+    }
+  })
+  if (
+    geometry.left < 0 || geometry.right > geometry.viewportWidth
+    || geometry.top < 0 || geometry.bottom > geometry.viewportHeight
+  ) {
+    throw new Error(`${label} could not be brought into the mobile viewport: ${JSON.stringify(geometry)}`)
+  }
+}
+
 try {
   const response = await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 45_000 })
   if (response && !response.ok()) throw new Error(`Body Explorer returned HTTP ${response.status()}`)
@@ -234,10 +255,11 @@ try {
   await assertNoFatal('Orbit interaction triggered a Body3D fatal state')
 
   // Body Explorer intentionally uses a two-step mobile navigation contract:
-  // first jump to a semantic group, then activate the target panel. Clicking a
-  // far-off tab directly bypasses the product interaction and can leave that
-  // button outside the 390px rail viewport even though the UI is working.
+  // first jump to a semantic group, then activate the target panel. The group
+  // rail itself is horizontally scrollable on a 390px viewport, so the smoke
+  // first performs the same reveal gesture a user would make before tapping.
   const referenceGroup = page.getByRole('button', { name: 'Jump to Reference', exact: true })
+  await revealInViewport(referenceGroup, 'Reference group control')
   await referenceGroup.click()
   const precisionTab = page.getByRole('button', { name: 'Whole-body precision', exact: true })
   await page.waitForFunction(() => {
@@ -249,7 +271,18 @@ try {
   await precisionTab.click()
   await page.getByText('Panacea · Whole-body precision atlas', { exact: true }).waitFor({ state: 'visible', timeout: 20_000 })
 
+  // Move through the same semantic-group contract instead of clicking a tab
+  // that is now intentionally outside the rail after opening Reference.
+  const systemsGroup = page.getByRole('button', { name: 'Jump to Systems', exact: true })
+  await revealInViewport(systemsGroup, 'Systems group control')
+  await systemsGroup.click()
   const movementTab = page.getByRole('button', { name: 'Movement biomechanics', exact: true })
+  await page.waitForFunction(() => {
+    const target = Array.from(document.querySelectorAll('button')).find((node) => node.textContent?.trim() === 'Movement biomechanics')
+    if (!target) return false
+    const rect = target.getBoundingClientRect()
+    return rect.left >= 0 && rect.right <= window.innerWidth
+  }, undefined, { timeout: 20_000 })
   await movementTab.click()
   const inspectorTitle = page.getByText('Whole-body motion inspector', { exact: true })
   await inspectorTitle.waitFor({ state: 'visible', timeout: 20_000 })
