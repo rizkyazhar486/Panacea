@@ -33,6 +33,7 @@ const context = await browser.newContext({
   deviceScaleFactor: 3,
   isMobile: true,
   hasTouch: true,
+  reducedMotion: 'reduce',
 })
 
 await context.addInitScript(() => {
@@ -248,9 +249,26 @@ try {
   const motionTab = page.getByRole('button', { name: 'Motion biomechanics', exact: true })
   await revealInViewport(motionTab, 'Motion biomechanics control')
   await motionTab.click()
+  await page.waitForFunction(() => {
+    const target = Array.from(document.querySelectorAll('button'))
+      .find((node) => node.textContent?.trim() === 'Motion biomechanics')
+    return target?.getAttribute('aria-pressed') === 'true'
+  }, undefined, { timeout: 10_000 })
 
-  const lab = page.getByRole('region', { name: 'Biomechanics motion lab', exact: true })
-  await lab.waitFor({ state: 'visible', timeout: 20_000 })
+  const lab = page.locator('[data-biomechanics-motion-lab="v1"]').first()
+  const recovery = page.getByRole('alert').filter({ hasText: 'Feature recovery' }).first()
+  const panelOutcome = await Promise.race([
+    lab.waitFor({ state: 'visible', timeout: 20_000 }).then(() => 'lab'),
+    recovery.waitFor({ state: 'visible', timeout: 20_000 }).then(() => 'recovery'),
+  ])
+  if (panelOutcome === 'recovery') {
+    const detail = await recovery.locator('details p').textContent().catch(() => null)
+    throw new Error(`Biomechanics motion panel hit FeatureErrorBoundary: ${detail || await recovery.innerText()}`)
+  }
+  const labAriaLabel = await lab.getAttribute('aria-label')
+  if (labAriaLabel !== 'Biomechanics motion lab') {
+    throw new Error(`Biomechanics motion lab lost its accessible label: ${labAriaLabel ?? 'missing'}`)
+  }
   await lab.getByText('Original motion ↔ source-backed anatomical atlas', { exact: true }).waitFor({ state: 'visible', timeout: 10_000 })
 
   const atlasCanvas = lab.locator('canvas').first()
