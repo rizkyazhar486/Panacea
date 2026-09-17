@@ -1,0 +1,54 @@
+/* Papan widget saat dipasang di Home v48.
+ *
+ * Dua hal diperbaiki DI SINI, bukan di berkas global, supaya tidak ada
+ * permukaan lain yang ikut berubah:
+ *
+ * 1. Lapisan kendali global memberi setiap <button> bayangan putih
+ *    (rgba(255,255,255,.72) -8px -8px 24px). Pada titik posisi seukuran 6px,
+ *    bayangan itu tampak sebagai kotak putih yang jauh lebih besar daripada
+ *    titiknya sendiri.
+ * 2. Warna teks kepala papan ini ditulis untuk latar terang
+ *    (rgb(17,24,39)), sementara Home v48 berlatar gelap — judulnya nyaris
+ *    tidak terbaca. Mewarisi warna dari permukaan induk membuatnya benar pada
+ *    tema terang MAUPUN gelap tanpa menebak salah satunya.
+ */
+
+.rel-widget-rumah .widget-instrument-dot-v5,
+.rel-widget-rumah .widget-instrument-nav-v5 {
+  box-shadow: none !important;
+  background-image: none !important;
+}
+
+.rel-widget-rumah .widget-instrument-dot-v5 {
+  background: none !important;
+  border: 0 !important;
+  border-radius: 999px;
+}
+
+.rel-widget-rumah .widget-instrument-head-v5 {
+  /* Home v48 mengecat latarnya gelap sekalipun aplikasi sedang bertema terang,
+     sedangkan warna teks kepala papan ini ditulis untuk latar terang (#111827).
+     Alih-alih menebak tema, kepala papan diberi alasnya sendiri sehingga teks
+     gelap itu memang berdiri di atas permukaan terang. */
+  border-radius: 20px;
+  padding: 10px 12px;
+  background: color-mix(in srgb, Canvas 86%, transparent);
+  -webkit-backdrop-filter: blur(14px) saturate(140%);
+  backdrop-filter: blur(14px) saturate(140%);
+}
+
+.rel-widget-rumah .widget-instrument-kicker-v5,
+.rel-widget-rumah .widget-instrument-label-v5,
+.rel-widget-rumah .widget-instrument-state-v5 {
+  color: color-mix(in srgb, currentColor 62%, transparent);
+}
+
+.rel-widget-rumah .widget-instrument-count-v5 {
+  color: color-mix(in srgb, currentColor 78%, transparent);
+}
+
+/* Ruang napas: doktrin memakai jarak lebar antar bagian, dan papan ini berdiri
+   di antara dua bagian Home yang lain. */
+.rel-widget-rumah {
+  padding-block: 4px;
+}

@@ -3,6 +3,7 @@ import { Link, useSearchParams } from 'react-router-dom'
 import { HomeCommandDeck } from '../components/HomeCommandDeck'
 import { HomeHealthBrief } from '../components/HomeHealthBrief'
 import { HomeVisualLanding } from '../components/HomeVisualLanding'
+import { RelWidgetRumah } from '../components/RelWidgetRumah'
 import { IconDashboard, IconHeart, IconSparkle, IconStethoscope } from '../components/icons'
 import '../styles/home-health-spectrum.css'
 import '../styles/home-mobile-shell-repair-v45.css'
@@ -71,6 +72,9 @@ export function HomeSocialWorkspace() {
         <div className="space-y-5">
           <HomeVisualLanding />
           <HomeHealthBrief />
+          {/* Papan widget yang bisa digeser: satu widget per layar, digeser
+              dengan jempol, dan isinya dipilih penggunanya sendiri. */}
+          <RelWidgetRumah />
           <HomeCommandDeck />
         </div>
       ) : activeKey === 'for-you' ? (
