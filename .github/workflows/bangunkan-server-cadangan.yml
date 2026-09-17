@@ -1,0 +1,72 @@
+# ─────────────────────────────────────────────────────────────────────────────
+# Cadangan untuk "Bangunkan server" — jadwal GitHub Actions sendiri BISA berhenti
+# berbunyi tanpa satu pun kegagalan yang tercatat.
+#
+# KEJADIAN NYATA yang membuat berkas ini ditulis: pada 2026-09-17, jadwal
+# "Bangunkan server" (setiap 10 menit, 04.00-23.00 WIB) berhenti terpicu sejak
+# pukul 01:40 UTC. Bukan gagal — TIDAK SATU PUN kejadian terjadwal tercatat
+# sampai dipicu manual pukul 05:53 UTC, jeda 4 jam 13 menit tanpa satu kali pun
+# berbunyi, padahal repositori ini sangat aktif (puluhan alur kerja lain
+# berjalan normal di jam yang sama). GitHub sendiri mendokumentasikan bahwa
+# jadwal `cron` bersifat "sebisanya" dan dapat tertunda pada beban tinggi,
+# tetapi jeda empat jam jauh melampaui "tertunda". Selama jeda itu, instans
+# Render gratis tertidur dan TIDAK ADA notifikasi sama sekali yang terkirim —
+# skor langsung, pengingat obat, waktu salat, semuanya diam bersama peladen
+# yang tertidur, karena penjadwalnya hidup DI DALAM proses peladen itu sendiri.
+#
+# Berkas ini bukan pengganti bangunkan-server.yml, melainkan JALUR KEDUA yang
+# independen: cron sendiri, digeser lima menit dari yang pertama, dan grup
+# konkurensi sendiri. Kalau jadwal GitHub berhenti berbunyi untuk SATU alur
+# kerja pada satu saat, kecil kemungkinan ia berhenti berbunyi untuk KEDUANYA
+# pada saat yang sama dengan cara yang sama persis — dan begitu salah satu
+# berbunyi, peladen bangun untuk semuanya, bukan hanya untuk alur kerja yang
+# membangunkannya.
+#
+# Variabel yang dibaca SAMA PERSIS dengan bangunkan-server.yml — SERVER_URL lalu
+# VITE_API_URL, sebagai variabel repositori atau secret. Tidak ada yang perlu
+# diisi ulang.
+# ─────────────────────────────────────────────────────────────────────────────
+
+name: Bangunkan server (cadangan)
+
+on:
+  schedule:
+    # Sama seperti bangunkan-server.yml tetapi digeser 5 menit, supaya jadwal
+    # yang benar-benar berhenti berbunyi pada satu alur kerja tetap punya jalur
+    # kedua yang independen setiap ~5 menit rata-rata.
+    - cron: '5-55/10 21-23,0-16 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: bangunkan-server-cadangan
+  cancel-in-progress: false
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Sentuh /api/health
+        env:
+          SERVER_URL: ${{ vars.SERVER_URL }}
+          SERVER_URL_SECRET: ${{ secrets.SERVER_URL }}
+          VITE_API_URL: ${{ vars.VITE_API_URL }}
+          VITE_API_URL_SECRET: ${{ secrets.VITE_API_URL }}
+        run: |
+          alamat="${SERVER_URL:-${SERVER_URL_SECRET:-${VITE_API_URL:-$VITE_API_URL_SECRET}}}"
+          if [ -z "$alamat" ]; then
+            echo "Tidak ada VITE_API_URL maupun SERVER_URL di repositori ini — lihat keterangan di kepala berkas. Berhenti tanpa menjadi gagal."
+            exit 0
+          fi
+          echo "Menyentuh: ${alamat%/}/api/health"
+          SERVER_URL="$alamat"
+          kode=$(curl -s -o /tmp/jawab.json -w '%{http_code}' --max-time 90 "${SERVER_URL%/}/api/health" || echo 000)
+          echo "HTTP $kode"
+          head -c 400 /tmp/jawab.json || true
+          echo
+          if [ "$kode" != "200" ]; then
+            echo "::warning::Server belum menjawab 200 (kode $kode). Percobaan berikutnya sekitar lima menit lagi (jalur utama atau jalur cadangan, mana yang lebih dulu berbunyi)."
+          fi
