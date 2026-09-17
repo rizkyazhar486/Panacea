@@ -1,5 +1,10 @@
-import { Children, useCallback, useEffect, useRef, useState, type CSSProperties, type KeyboardEvent, type PointerEvent, type ReactNode } from 'react'
+import { Children, forwardRef, useCallback, useEffect, useImperativeHandle, useRef, useState, type CSSProperties, type KeyboardEvent, type PointerEvent, type ReactNode } from 'react'
 import { clampScrollTarget, edgeState, nextIndex, scrollBehavior } from '../lib/interaction/slidable'
+
+export interface SlidableRailHandle {
+  scrollToIndex: (index: number) => void
+  element: () => HTMLDivElement | null
+}
 
 export interface SlidableRailProps {
   ariaLabel: string
@@ -7,6 +12,7 @@ export interface SlidableRailProps {
   mandatorySnap?: boolean
   className?: string
   itemClassName?: string
+  onActiveIndexChange?: (index: number) => void
 }
 
 type DragState = {
@@ -28,7 +34,7 @@ function motionReduced(): boolean {
   return window.matchMedia?.('(prefers-reduced-motion: reduce)').matches ?? false
 }
 
-export function SlidableRail({ ariaLabel, children, mandatorySnap = false, className = '', itemClassName = '' }: SlidableRailProps) {
+export const SlidableRail = forwardRef<SlidableRailHandle, SlidableRailProps>(function SlidableRail({ ariaLabel, children, mandatorySnap = false, className = '', itemClassName = '', onActiveIndexChange }, forwardedRef) {
   const railRef = useRef<HTMLDivElement>(null)
   const drag = useRef<DragState | null>(null)
   const [canLeft, setCanLeft] = useState(false)
@@ -36,13 +42,50 @@ export function SlidableRail({ ariaLabel, children, mandatorySnap = false, class
   const [dragging, setDragging] = useState(false)
   const [reducedMotion, setReducedMotion] = useState(motionReduced)
 
+  const items = useCallback(() => {
+    const rail = railRef.current
+    if (!rail) return [] as HTMLElement[]
+    return Array.from(rail.children).filter((node): node is HTMLElement => node instanceof HTMLElement && node.hasAttribute('data-slidable-item'))
+  }, [])
+
+  const activeIndex = useCallback(() => {
+    const rail = railRef.current
+    const all = items()
+    if (!rail || !all.length) return 0
+    const center = rail.scrollLeft + rail.clientWidth / 2
+    let winner = 0
+    let distance = Number.POSITIVE_INFINITY
+    all.forEach((item, index) => {
+      const itemCenter = item.offsetLeft + item.offsetWidth / 2
+      const next = Math.abs(itemCenter - center)
+      if (next < distance) { distance = next; winner = index }
+    })
+    return winner
+  }, [items])
+
   const refreshEdges = useCallback(() => {
     const rail = railRef.current
     if (!rail) return
     const next = edgeState(rail.scrollLeft, rail.clientWidth, rail.scrollWidth)
     setCanLeft(next.canLeft)
     setCanRight(next.canRight)
-  }, [])
+    onActiveIndexChange?.(activeIndex())
+  }, [activeIndex, onActiveIndexChange])
+
+  const revealItem = useCallback((item: HTMLElement) => {
+    item.scrollIntoView({ behavior: scrollBehavior(reducedMotion), block: 'nearest', inline: 'nearest' })
+  }, [reducedMotion])
+
+  const scrollToIndex = useCallback((index: number) => {
+    const all = items()
+    if (!all.length) return
+    revealItem(all[Math.min(Math.max(index, 0), all.length - 1)])
+  }, [items, revealItem])
+
+  useImperativeHandle(forwardedRef, () => ({
+    scrollToIndex,
+    element: () => railRef.current,
+  }), [scrollToIndex])
 
   useEffect(() => {
     refreshEdges()
@@ -61,16 +104,6 @@ export function SlidableRail({ ariaLabel, children, mandatorySnap = false, class
     }
   }, [refreshEdges])
 
-  const items = useCallback(() => {
-    const rail = railRef.current
-    if (!rail) return [] as HTMLElement[]
-    return Array.from(rail.children).filter((node): node is HTMLElement => node instanceof HTMLElement && node.hasAttribute('data-slidable-item'))
-  }, [])
-
-  const revealItem = useCallback((item: HTMLElement) => {
-    item.scrollIntoView({ behavior: scrollBehavior(reducedMotion), block: 'nearest', inline: 'nearest' })
-  }, [reducedMotion])
-
   const onKeyDown = useCallback((event: KeyboardEvent<HTMLDivElement>) => {
     if (!['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(event.key)) return
     const target = event.target as HTMLElement
@@ -78,7 +111,7 @@ export function SlidableRail({ ariaLabel, children, mandatorySnap = false, class
     const all = items()
     if (!all.length) return
     const currentItem = target.closest('[data-slidable-item]') as HTMLElement | null
-    const current = Math.max(0, currentItem ? all.indexOf(currentItem) : 0)
+    const current = Math.max(0, currentItem ? all.indexOf(currentItem) : activeIndex())
     let index = current
     if (event.key === 'Home') index = 0
     else if (event.key === 'End') index = all.length - 1
@@ -89,7 +122,7 @@ export function SlidableRail({ ariaLabel, children, mandatorySnap = false, class
     event.preventDefault()
     focusTarget.focus({ preventScroll: true })
     revealItem(next)
-  }, [items, revealItem])
+  }, [activeIndex, items, revealItem])
 
   const resetDrag = useCallback((event?: PointerEvent<HTMLDivElement>) => {
     const rail = railRef.current
@@ -131,7 +164,7 @@ export function SlidableRail({ ariaLabel, children, mandatorySnap = false, class
       }
       current.active = true
       setDragging(true)
-      try { rail.setPointerCapture(event.pointerId) } catch { /* capture is a progressive enhancement */ }
+      try { rail.setPointerCapture(event.pointerId) } catch { /* capture is progressive enhancement */ }
     }
     event.preventDefault()
     rail.scrollLeft = clampScrollTarget(current.startScrollLeft - dx, rail.clientWidth, rail.scrollWidth)
@@ -168,6 +201,6 @@ export function SlidableRail({ ariaLabel, children, mandatorySnap = false, class
       <span aria-hidden className={`pointer-events-none absolute inset-y-0 right-0 w-6 bg-gradient-to-l from-black/20 to-transparent transition-opacity ${canRight ? 'opacity-100' : 'opacity-0'}`} />
     </div>
   )
-}
+})
 
 export default SlidableRail
