@@ -12,6 +12,27 @@ assert.equal(canonicalCapabilityRoute('/body-explorer'), '/learn?t=body')
 assert.equal(canonicalCapabilityRoute('/feed'), '/?t=social')
 assert.equal(domainForCategory(categoryForCapability(FITUR_DARI_HUB[0])), 'Your Body')
 
+// Generic "risk" language must not override a stronger longitudinal-health
+// context, while an explicitly clinical score must stay in Clinical.
+const preventiveRisk = {
+  to: '/what-if-health',
+  nama: 'What-If Health Simulator',
+  apa: 'See how today’s choices reshape your 10-year risk',
+  kw: 'health longevity simulator risk prevention',
+  grup: 'Longevity',
+}
+const clinicalRiskScore = {
+  to: '/clinical-risk-score',
+  nama: 'Clinical Risk Score',
+  apa: 'Clinician-facing decision support score',
+  kw: 'clinical risk score medical decision',
+  grup: 'Clinical',
+}
+assert.equal(categoryForCapability(preventiveRisk), 'Body')
+assert.equal(domainForCategory(categoryForCapability(preventiveRisk)), 'Your Body')
+assert.equal(categoryForCapability(clinicalRiskScore), 'Clinical')
+assert.equal(domainForCategory(categoryForCapability(clinicalRiskScore)), 'Clinical')
+
 const audit = auditSuperPageCapabilityConvergence()
 assert.equal(audit.boundary.deleteLegacyRoutesAuthorized, false)
 assert.equal(audit.boundary.featureDeletionAuthorized, false)
