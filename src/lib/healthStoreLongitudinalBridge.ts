@@ -305,12 +305,13 @@ export function vo2MaxToLongitudinalEvent(
 }
 
 /**
- * Current device-derived health snapshot → longitudinal events.
+ * Current shared health snapshot → longitudinal events.
  *
  * `measuredAt` is mandatory. The bridge intentionally refuses to replace a
- * missing measurement time with Date.now(): doing so would turn an old device
- * value into a fabricated current observation. `syncedAt`, when valid, is the
- * receipt time; otherwise the caller's actual bridge receipt time is used.
+ * missing measurement time with Date.now(): doing so would turn an old value
+ * into a fabricated current observation. The shared store also accepts manual
+ * corrections (`source: "Manual"`), so sourceKind is preserved rather than
+ * blindly labelling every record as device-derived.
  */
 export function currentDeviceVitalsToLongitudinalEvents(
   subjectId: string,
@@ -336,6 +337,8 @@ export function currentDeviceVitalsToLongitudinalEvents(
     if (syncedAt >= Date.parse(vitals.measuredAt)) receivedAt = vitals.syncedAt
   }
 
+  const sourceKind: LongitudinalProvenance['sourceKind'] = source.toLowerCase() === 'manual' ? 'manual' : 'device'
+  const provenanceMethod = sourceKind === 'manual' ? 'shared-vitals-manual-entry' : 'health-vitals-snapshot'
   const events: LongitudinalEvent<number>[] = []
   const skipped: BridgeSkippedRecord[] = []
   const sourceToken = idToken(source)
@@ -358,11 +361,11 @@ export function currentDeviceVitalsToLongitudinalEvents(
       recordedAt: vitals.measuredAt,
       confidence: context.confidence.deviceSnapshot,
       provenance: {
-        sourceKind: 'device',
+        sourceKind,
         sourceId: `health-vitals:${source}`,
         capturedAt: vitals.measuredAt,
         receivedAt,
-        method: 'health-vitals-snapshot',
+        method: provenanceMethod,
       },
       consent: context.consent,
       tags: ['store:health-vitals', `source:${source}`],
