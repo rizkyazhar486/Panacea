@@ -38,3 +38,13 @@
 @media(max-width:350px){.widget-instrument-kicker-v5{display:none}.widget-instrument-title-v5{margin-top:0}.widget-instrument-count-v5{display:none}.widget-instrument-label-v5{display:none}.widget-instrument-edit-v5{padding:0 7px}}
 @media(prefers-reduced-motion:reduce){.widget-instrument-line-fill-v5{transition:none}}
 html.pmd-low-memory .widget-instrument-shell-v5{box-shadow:none}html.pmd-low-memory .widget-instrument-shell-v5::after{display:none}
+
+/* Titik posisi yang bisa ditekan. Menggantikan garis kemajuan yang hanya bisa
+   dibaca: penunjuk posisi sekaligus kendali, dengan sasaran sentuh 28px. */
+.widget-instrument-dots-v5{display:flex;flex:1;align-items:center;justify-content:center;gap:2px;min-width:0}
+.widget-instrument-dot-v5{display:grid;place-items:center;width:28px;height:28px;padding:0;border:0;background:none;cursor:pointer}
+.widget-instrument-dot-v5::before{content:"";width:6px;height:6px;border-radius:999px;background:rgba(148,163,184,.45);transition:width .22s cubic-bezier(.22,1,.36,1),background-color .22s ease}
+.dark .widget-instrument-dot-v5::before{background:rgba(255,255,255,.28)}
+.widget-instrument-dot-v5.is-active::before{width:20px;background:var(--wa)}
+@media(prefers-reduced-motion:reduce){.widget-instrument-dot-v5::before{transition:none}}
+@media(max-width:420px){.widget-instrument-dots-v5{gap:0}.widget-instrument-dot-v5{width:26px;height:26px}}
