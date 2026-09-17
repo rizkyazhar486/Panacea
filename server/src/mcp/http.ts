@@ -56,7 +56,10 @@ export function createHttpMcpRouter(config: HttpMcpConfig): Router {
   validateRouterConfig(config)
   const router = express.Router()
 
-  router.all('/', async (req, res) => {
+  // Auth/default-off gate MUST run before any MCP body parser. This keeps
+  // unauthenticated callers from spending CPU/memory on JSON bodies they are
+  // not authorized to submit in the first place.
+  router.all('/', (req, res, next) => {
     if (!config.enabled) {
       res.status(404).json({ error: 'mcp_disabled' })
       return
@@ -68,6 +71,15 @@ export function createHttpMcpRouter(config: HttpMcpConfig): Router {
       return
     }
 
+    next()
+  })
+
+  // Remote MCP payloads are deliberately much smaller than the application's
+  // global 12 MB vision/body limit. Parser errors propagate to the app's normal
+  // Express error boundary (or Express' default 4xx handler in isolated tests).
+  router.use(express.json({ limit: '256kb' }))
+
+  router.all('/', async (req, res) => {
     try {
       const server = createPanaceaMcpServer('http')
       const transport = new NodeStreamableHTTPServerTransport({
