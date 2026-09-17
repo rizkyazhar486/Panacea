@@ -4,6 +4,7 @@ import { resolve } from 'node:path'
 
 const os = readFileSync(resolve('src/pages/BodyExposureOS.tsx'), 'utf8')
 const body3d = readFileSync(resolve('src/components/BodyAllSystems3D.tsx'), 'utf8')
+const main = readFileSync(resolve('src/main.tsx'), 'utf8')
 const visualFirstRuntime = readFileSync(resolve('public/panacea-visual-first-v43.js'), 'utf8')
 const visualFirstStyles = readFileSync(resolve('public/panacea-visual-first-v43.css'), 'utf8')
 const liquidRuntime = readFileSync(resolve('public/panacea-liquid-actions-v45.js'), 'utf8')
@@ -12,6 +13,17 @@ const grading = readFileSync(resolve('public/panacea-control-grading-v46.css'), 
 assert.match(os, /data-pmd-body-exposure="true"/, 'Body Exposure must declare an explicit product boundary')
 assert.match(os, /data-pmd-unclamped="true"/, 'Body Exposure must opt out of generic copy mutation/clamping')
 assert.match(os, /data-pmd-liquid="off"/, 'Body Exposure must opt out of generic liquid-action runtime binding')
+
+assert.match(main, /path="\/body-explorer"\s+element=\{<BodyExplorer\s*\/>\}/,
+  'guard assumption changed: /body-explorer is a direct BodyExplorer route and needs runtime-level isolation')
+assert.match(visualFirstRuntime, /isBodyExplorerRoute/,
+  'visual-first runtime must recognize the direct Body Explorer route')
+assert.match(visualFirstRuntime, /if \(isBodyExplorerRoute\(\)\) return false/,
+  'visual-first runtime must not mutate Body Explorer copy into context-dialog buttons')
+assert.match(liquidRuntime, /isBodyExplorerRoute/,
+  'liquid-action runtime must recognize the direct Body Explorer route')
+assert.match(liquidRuntime, /if \(isBodyExplorerRoute\(\)\) return false/,
+  'liquid-action runtime must not take ownership of Body Explorer controls')
 
 assert.match(visualFirstRuntime, /\[data-pmd-unclamped="true"\]/, 'visual-first runtime must honor the unclamped boundary')
 assert.match(visualFirstStyles, /\[data-pmd-unclamped='true'\]/, 'visual-first styles must honor the unclamped boundary')
@@ -45,4 +57,4 @@ assert.doesNotMatch(os, /resolveBodySystemIdFromAtlasLabel|captureSystemAtlasSel
 assert.match(os, /selectedAtlasSystemId=\{selectedBodySystemId\}/, 'selected system must keep driving downstream Body workbenches')
 assert.match(os, /onSystemChange=\{setSelectedBodySystemId\}/, 'atlas/physiology bridge must remain synchronized with the shared system state')
 
-console.log('body exposure foundation boundary: global UI mutation is isolated and the end-to-end body-system state stays synchronized')
+console.log('body exposure foundation boundary: active route resists global UI mutation and the end-to-end body-system state stays synchronized')
