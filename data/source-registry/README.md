@@ -75,6 +75,22 @@ Do not collapse these dimensions into a single clinical confidence score unless 
 - Wearables: preserve provider/device origin and distinguish measured observations from provider-derived scores.
 - Drug data: keep medication identity, official label provenance and chemical structure sources separate.
 
+## PRIME Wisdom extension
+
+PRIME Wisdom reuses the same provenance and rights model instead of creating a parallel trust system:
+
+`Wisdom source -> rights/provenance gate -> adapter or governed reference -> PrimeWisdomUnit -> policy/retrieval engine -> contextual lens UI`
+
+Additional rules for Wisdom sources:
+
+- a catalog identity is only a coverage target; it does not grant permission to scrape, retain, or redistribute books, podcast transcripts, interviews, religious translations, or premium material;
+- unresolved rights fail closed for long-form verbatim retention;
+- podcasts, books, founder/athlete anecdotes, philosophy, and worldview sources keep their source class and cannot be promoted into clinical evidence by popularity or creator credentials;
+- peer-reviewed scientific work, expert education, public commentary, personal routine, and opinion from the same creator remain separate source units;
+- political/geopolitical claims remain attributed claims and require independent verification before factual use;
+- seed content under `data/prime-wisdom/` is intentionally limited to short original paraphrases with explicit locators and transformation metadata;
+- health guidance must resolve to the appropriate scientific/clinical evidence path; the Wisdom catalog is not itself a medical recommendation engine.
+
 ## Validation
 
 Run:
