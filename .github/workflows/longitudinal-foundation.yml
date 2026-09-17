@@ -10,13 +10,18 @@ on:
       - 'src/lib/productionHealthLongitudinalSync.ts'
       - 'src/lib/productionHealthStoreSelector.ts'
       - 'src/lib/productionAppStateLongitudinalSync.ts'
+      - 'src/lib/productionContinuousCarePipeline.ts'
       - 'src/lib/continuousCarePipeline.ts'
+      - 'src/lib/governedContextOrchestrator.ts'
+      - 'src/lib/habitualCareEngine.ts'
+      - 'src/lib/superPageInsightProjection.ts'
       - 'src/lib/wearableSignalAdapters.ts'
       - 'scripts/uji/health-store-longitudinal-bridge.mts'
       - 'scripts/uji/health-store-manual-provenance.mts'
       - 'scripts/uji/production-health-longitudinal-sync.mts'
       - 'scripts/uji/production-health-store-scope.mts'
       - 'scripts/uji/production-appstate-longitudinal-sync.mts'
+      - 'scripts/uji/production-continuous-care-pipeline.mts'
       - '.github/workflows/longitudinal-foundation.yml'
   workflow_dispatch:
 
@@ -58,3 +63,6 @@ jobs:
 
       - name: Scoped AppState orchestration
         run: node --experimental-transform-types --import=./scripts/uji/typescript-resolver.mjs scripts/uji/production-appstate-longitudinal-sync.mts
+
+      - name: Production continuous-care pipeline
+        run: node --experimental-transform-types --import=./scripts/uji/typescript-resolver.mjs scripts/uji/production-continuous-care-pipeline.mts
