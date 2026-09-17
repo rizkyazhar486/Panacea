@@ -56,7 +56,9 @@ export function createHttpMcpRouter(config: HttpMcpConfig): Router {
   validateRouterConfig(config)
   const router = express.Router()
 
-  router.all('/', async (req, res) => {
+  // Auth/default-off adalah boundary sebelum pembacaan body. Ini mencegah
+  // caller tanpa token memaksa server mem-parsing JSON besar atau malformed.
+  router.use((req, res, next) => {
     if (!config.enabled) {
       res.status(404).json({ error: 'mcp_disabled' })
       return
@@ -68,6 +70,14 @@ export function createHttpMcpRouter(config: HttpMcpConfig): Router {
       return
     }
 
+    next()
+  })
+
+  // MCP remote tidak membutuhkan batas JSON global 12 MB yang dipakai AI
+  // vision. Parser khusus ini hanya berjalan setelah bearer tervalidasi.
+  router.use(express.json({ limit: '256kb' }))
+
+  router.all('/', async (req, res) => {
     try {
       const server = createPanaceaMcpServer('http')
       const transport = new NodeStreamableHTTPServerTransport({
