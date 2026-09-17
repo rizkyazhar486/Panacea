@@ -10,7 +10,7 @@ Panaceamed is developed by a solo founder using multiple AI agents, project skil
 
 The Capability OS is a project-scoped orchestration layer that converts a task into a deterministic execution route:
 
-`task → domain → risk → lane → primary skill → primary capability → fallback → verification → handoff`
+`task → domain → risk → lane → executor → primary skill → primary capability → fallback → verification → handoff`
 
 It does not replace ChatGPT, Claude Code, MCP, GitHub, or plugins. It defines how they cooperate.
 
@@ -23,6 +23,7 @@ The Capability OS does not:
 - create a second source of truth for repository state;
 - store plugin OAuth tokens or secrets in the repository;
 - claim a plugin is connected merely because it exists in the manifest;
+- assume ChatGPT and Claude Code have identical tools or plugin runtimes;
 - make autonomous clinical decisions, sign EMRs, submit orders, prescribe treatment, or submit SATUSEHAT records;
 - duplicate provider-specific APIs already implemented by Panaceamed;
 - run every available tool for every task;
@@ -34,7 +35,7 @@ The Capability OS does not:
 
 The repository contains a machine-readable capability manifest plus project skills that interpret it. ChatGPT and Claude Code read the same routing contract. MCP Phase B may expose the same manifest later, but MCP is a consumer of the Capability OS rather than its owner.
 
-This keeps policy reviewable in Git while allowing plugin connectivity and runtime availability to remain dynamic.
+This keeps policy reviewable in Git while allowing plugin connectivity, permissions, and runtime availability to remain dynamic.
 
 ### Rejected: instructions only
 
@@ -59,19 +60,22 @@ A lower layer cannot override a higher layer.
 
 ## 5. Capability manifest
 
-Canonical file:
+Canonical files:
 
-`config/capability-os.json`
+- `config/capability-os.json`
+- `config/capability-os.schema.json`
 
-The manifest contains logical capabilities, not account-specific connection state.
+The manifest contains logical capabilities, not account-specific connection state. It begins with `schemaVersion: 1` and a `capabilities` array.
 
-Each entry has this shape:
+Each capability entry has this shape:
 
 ```json
 {
   "id": "research.biomedical.pubmed",
   "lane": "biomedical-evidence",
   "domains": ["medicine", "evidence"],
+  "preferredExecutor": "chatgpt",
+  "supportedExecutors": ["chatgpt"],
   "primary": "pubmed",
   "fallbacks": ["consensus", "elicit", "scite", "sider-scholar"],
   "skill": "panacea-medical-evidence-validator",
@@ -89,6 +93,8 @@ Required fields:
 - `id`: stable logical identifier.
 - `lane`: exactly one execution lane.
 - `domains`: one or more routing domains.
+- `preferredExecutor`: `chatgpt`, `claude-code`, or `either`.
+- `supportedExecutors`: non-empty subset of `chatgpt`, `claude-code`.
 - `primary`: preferred provider/tool class.
 - `fallbacks`: ordered provider/tool classes.
 - `skill`: project skill that supplies judgment rules; `null` only for purely mechanical capabilities.
@@ -99,7 +105,9 @@ Required fields:
 - `requiredEvidence`: explicit proof required before completion claims.
 - `stopCondition`: deterministic condition that prevents unnecessary additional tool calls.
 
-The manifest must not include credentials, tokens, private health data, private financial data, or plugin connection state.
+`preferredExecutor` must be compatible with `supportedExecutors`; `either` requires both executors to be supported.
+
+The manifest must not include credentials, tokens, private health data, private financial data, plugin permission state, or plugin connection state.
 
 ## 6. Six execution lanes
 
@@ -109,7 +117,7 @@ Purpose: implementation, debugging, code review, repository operations, dependen
 
 Primary components:
 
-- Claude Code — implementation worker.
+- Claude Code — implementation worker when local/project tooling is available.
 - ChatGPT + Superpowers — planning, TDD, debugging, verification, review orchestration.
 - GitHub — repository state, PR, CI, branch and evidence authority.
 - Context7 — current library/API documentation.
@@ -137,6 +145,7 @@ Rules:
 - An LLM is never the evidence source.
 - High-risk clinical content cannot be promoted to qualified-human-reviewed state by this lane.
 - Multiple scholar tools are not called by default; corroboration is triggered by ambiguity, conflict, novelty, or high clinical risk.
+- If an evidence connector exists only in ChatGPT, ChatGPT retrieves and packages evidence; Claude Code consumes the evidence handoff rather than pretending the connector exists locally.
 
 ### 6.3 UX / Visual
 
@@ -220,14 +229,17 @@ The router evaluates candidates in this order:
 
 1. **Policy eligibility** — reject any candidate conflicting with `CLAUDE.md`, `AGENTS.md`, privacy, clinical, or security boundaries.
 2. **Domain fit** — prefer the narrowest capability that directly owns the task.
-3. **Authority** — authoritative provider beats general-purpose search or synthesis where applicable.
-4. **Availability** — runtime must verify the plugin/tool is currently available and connected before execution.
-5. **Side-effect fit** — prefer read-only over write tools unless a write is required.
-6. **Cost/context fit** — use the smallest sufficient set of tools.
-7. **Evidence fit** — candidate must be capable of producing the required completion evidence.
-8. **Fallback** — use the next manifest fallback only if the primary is unavailable, fails, or is insufficient by the stop condition.
+3. **Executor fit** — choose a supported executor; prefer `preferredExecutor` when available.
+4. **Authority** — authoritative provider beats general-purpose search or synthesis where applicable.
+5. **Availability** — executor runtime must verify the plugin/tool is currently available and connected before execution.
+6. **Side-effect fit** — prefer read-only over write tools unless a write is required.
+7. **Cost/context fit** — use the smallest sufficient set of tools.
+8. **Evidence fit** — candidate must be capable of producing the required completion evidence.
+9. **Fallback** — use the next manifest fallback only if the primary is unavailable, fails, or is insufficient by the stop condition.
 
-The router never interprets `primary` as permission to bypass runtime authorization or connection requirements.
+If the current executor is unsupported but another executor is supported, the router creates a typed handoff instead of simulating unavailable capability access.
+
+The router never interprets `primary` or `writeAuthority` as permission to bypass runtime authorization, plugin permission settings, user confirmation requirements, or repository policy.
 
 ## 8. Tool budget and anti-duplication policy
 
@@ -249,7 +261,16 @@ Examples:
 - Do not deploy the same change through Vercel + Render + AppDeploy unless each has a distinct predeclared responsibility.
 - Do not query every scholarly synthesis tool when PubMed or an official connector already answers the question.
 
-## 9. Parallelism rules
+## 9. Permission posture
+
+The Capability OS optimizes autonomy without granting blanket authority.
+
+- Read-only discovery/analysis should be preferred and may run without repeated confirmation when the connected runtime permits it.
+- Persistent external writes, production mutations, payments, secrets changes, clinical publication actions, and destructive operations retain the confirmation/permission rules of their provider and ChatGPT runtime.
+- The Capability OS must never recommend global `full_access` merely for convenience.
+- A provider permission denial is an authorization failure, not a reason to route around the permission with another write-capable provider.
+
+## 10. Parallelism rules
 
 Parallel execution is allowed only when all are true:
 
@@ -264,7 +285,7 @@ Biomedical corroboration may run in parallel because providers are read-only, bu
 
 Repository writes, migrations, shared configuration, release changes and clinical publication gates are sequential unless a specific isolation boundary proves otherwise.
 
-## 10. Handoff contract
+## 11. Handoff contract
 
 Every cross-agent handoff must include:
 
@@ -274,7 +295,7 @@ Every cross-agent handoff must include:
 - base `main` SHA;
 - branch / PR when applicable;
 - owned paths or external resource scope;
-- capability IDs used;
+- capability IDs and actual providers used;
 - completed checks;
 - unresolved blockers;
 - required next checks;
@@ -283,7 +304,7 @@ Every cross-agent handoff must include:
 
 A later agent must not infer a stronger state from weaker evidence.
 
-## 11. Project skills
+## 12. Project skills
 
 The existing 12 Panaceamed project skills remain valid. The Capability OS adds one new routing skill:
 
@@ -293,24 +314,26 @@ Trigger: tasks where selecting among multiple tools, plugins, agents, evidence p
 
 It reads the manifest, applies selection and fallback rules, and delegates judgment to existing specialist skills rather than duplicating their instructions.
 
-Existing `panacea-orchestrator` remains responsible for dependency graphs, ownership, parallelization and integration boundaries. The router selects capabilities; the orchestrator schedules work.
+Existing `panacea-orchestrator` remains responsible for dependency graphs, ownership, parallelization and integration boundaries. The router selects capabilities and executor; the orchestrator schedules work.
 
-## 12. Runtime plugin discovery
+## 13. Runtime plugin discovery
 
 Plugin availability is dynamic and must never be committed as truth.
 
 At runtime:
 
 1. identify logical capability from the manifest;
-2. discover/check the preferred provider;
-3. use it when connected and authorized;
-4. otherwise walk ordered fallbacks;
-5. stop when the manifest stop condition is satisfied;
-6. record which logical capability/provider produced evidence in the handoff packet.
+2. confirm the current executor is supported;
+3. discover/check the preferred provider in that executor runtime;
+4. use it when connected and authorized;
+5. otherwise walk ordered fallbacks available to that executor;
+6. if no provider is available but another executor is supported, issue a handoff;
+7. stop when the manifest stop condition is satisfied;
+8. record the capability/provider/evidence in the handoff packet.
 
 The router does not automatically install plugins. Installation always requires user action.
 
-## 13. Prompt optimization
+## 14. Prompt optimization
 
 Prompt Perfect is treated as a prompt-development utility, not a production authority.
 
@@ -323,11 +346,12 @@ Use it for reusable complex prompts when prompt quality materially affects auton
 
 Do not route trivial questions or mechanical commands through prompt optimization.
 
-## 14. Failure handling
+## 15. Failure handling
 
 Failures are classified before fallback:
 
 - `unavailable`: provider/tool not connected or runtime inaccessible;
+- `unsupported-executor`: current agent runtime does not expose the capability; hand off if another executor is supported;
 - `authorization`: missing permission; stop if user approval is required;
 - `provider-error`: retry only according to provider-safe behavior, otherwise fallback;
 - `insufficient-evidence`: invoke an evidence-distinct fallback;
@@ -337,7 +361,7 @@ Failures are classified before fallback:
 
 Failures must not silently downgrade clinical evidence quality or repository safety.
 
-## 15. Verification model
+## 16. Verification model
 
 Completion evidence is capability-specific.
 
@@ -351,7 +375,7 @@ Release requires provider deployment state plus post-deploy evidence; a merge al
 
 Growth/operations writes require confirmation from the target system when a persistent change was requested.
 
-## 16. MCP integration boundary
+## 17. MCP integration boundary
 
 MCP Phase A remains independent and should not be enlarged by this design.
 
@@ -365,33 +389,37 @@ After the Capability OS is merged and stable, MCP Phase B may expose read-orient
 
 MCP tools consume the same manifest. They must preserve Phase A transport policy, audit redaction, local-only repo QA, and no arbitrary shell.
 
-## 17. Implementation boundary
+## 18. First implementation slice
 
-The first implementation slice is deliberately small:
+The first implementation slice is deliberately non-runtime and reversible:
 
 1. add `config/capability-os.json`;
-2. add deterministic schema/semantic validation;
-3. add `.claude/skills/panacea-capability-router/SKILL.md`;
-4. minimally cross-reference the router from `panacea-orchestrator` without duplicating policy;
-5. add pressure-test scenarios for capability selection and anti-duplication behavior;
-6. update PR #1753 documentation and verification.
+2. add `config/capability-os.schema.json`;
+3. add `scripts/qa/capability-os.test.mjs` for schema and semantic validation;
+4. add `.claude/skills/panacea-capability-router/SKILL.md`;
+5. minimally cross-reference the router from `.claude/skills/panacea-orchestrator/SKILL.md` without duplicating policy;
+6. add pressure-test fixtures under `.claude/skills/panacea-capability-router/pressure-scenarios.md` covering selection and anti-duplication behavior;
+7. update PR #1753 documentation and verification.
 
 No production application runtime behavior changes in this slice.
 
-MCP integration, plugin-specific automation and production orchestration are later slices after this contract is verified.
+MCP integration, plugin-specific automation, permission changes, and production orchestration are later slices after this contract is verified.
 
-## 18. Acceptance criteria
+## 19. Acceptance criteria
 
 The Capability OS design is implemented correctly when:
 
-- every manifest entry passes schema and semantic validation;
-- no manifest entry contains secrets or account connection state;
-- every capability has one lane, one primary, ordered fallbacks, risk, side-effect class, evidence requirement and stop condition;
+- the manifest and schema use `schemaVersion: 1`;
+- every manifest entry passes JSON schema and semantic validation;
+- no manifest entry contains secrets, account permission state, or account connection state;
+- every capability has one lane, executor contract, one primary, ordered fallbacks, risk, side-effect class, evidence requirement and stop condition;
+- preferred/supported executor combinations are internally valid;
 - project skills reference canonical repository policy instead of copying it;
-- the router chooses the narrowest authoritative available provider;
+- the router chooses the narrowest authoritative available provider for a supported executor;
+- unsupported executors produce a handoff rather than simulated access;
 - fallback never bypasses policy or authorization;
 - duplicate provider calls require a documented reason;
 - parallelization obeys ownership/isolation rules;
-- pressure tests demonstrate correct routing under unavailable-provider, clinical-risk, deployment, overlap and ordinary-task scenarios;
-- the branch remains a docs/skills/config-only change with no production runtime behavior change;
+- pressure scenarios cover unavailable-provider, unsupported-executor, clinical-risk, deployment, repository-overlap and ordinary-task routing;
+- the implementation slice changes only configuration, QA/process tests, skills and documentation, not production application runtime behavior;
 - merge still requires exact-head repository gates and latest-main overlap audit.
