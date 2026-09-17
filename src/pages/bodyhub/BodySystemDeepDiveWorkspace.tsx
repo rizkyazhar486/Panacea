@@ -3,6 +3,7 @@ import type { BodySystemId } from '../../lib/bodySystemSourceWave'
 
 const CardiacHemodynamicsWorkbench = lazy(() => import('./CardiacHemodynamicsWorkbench'))
 const NeurovascularPerfusionWorkbench = lazy(() => import('./NeurovascularPerfusionWorkbench'))
+const RespiratoryGasExchangeWorkbench = lazy(() => import('./RespiratoryGasExchangeWorkbench'))
 
 const META: Partial<Record<BodySystemId, { label: string; description: string }>> = {
   cardiovascular: {
@@ -12,6 +13,10 @@ const META: Partial<Record<BodySystemId, { label: string; description: string }>
   nervous: {
     label: 'Brain & Neurovascular',
     description: 'Selected-system function deep dive: cerebral perfusion, autoregulation, intracranial compliance and oxygen-delivery coupling.',
+  },
+  respiratory: {
+    label: 'Respiratory Mechanics & Gas Exchange',
+    description: 'Selected-system educational deep dive: airway mechanics, ventilation, V/Q matching and diffusion.',
   },
 }
 
@@ -41,6 +46,11 @@ export function BodySystemDeepDiveWorkspace({ selectedAtlasSystemId }: { selecte
       {selectedAtlasSystemId === 'nervous' && (
         <Suspense fallback={<div className="grid min-h-52 place-items-center rounded-[24px] border border-white/[.07] bg-black/35 text-xs text-white/35">Loading neurovascular function…</div>}>
           <NeurovascularPerfusionWorkbench />
+        </Suspense>
+      )}
+      {selectedAtlasSystemId === 'respiratory' && (
+        <Suspense fallback={<div className="grid min-h-52 place-items-center rounded-[24px] border border-white/[.07] bg-black/35 text-xs text-white/35">Loading respiratory function…</div>}>
+          <RespiratoryGasExchangeWorkbench />
         </Suspense>
       )}
     </section>
