@@ -13,6 +13,8 @@ const summary = summarizeClinicalEvaluation({
     { caseId: 'case-002', goldDiagnosisIds: ['dx-d'], predictedDiagnosisIds: ['dx-x', 'dx-y', 'dx-d'] },
     { caseId: 'case-003', goldDiagnosisIds: ['dx-e'], predictedDiagnosisIds: ['dx-x', 'dx-y', 'dx-z', 'dx-q', 'dx-e'] },
     { caseId: 'case-004', goldDiagnosisIds: ['dx-f'], predictedDiagnosisIds: ['dx-x'] },
+    { caseId: 'case-005', goldDiagnosisIds: ['dx-g'], predictedDiagnosisIds: [] },
+    { caseId: 'case-006', goldDiagnosisIds: [], predictedDiagnosisIds: ['dx-z'] },
   ],
   recommendations: [
     { recommendationId: 'rec-1', unsafe: false },
@@ -33,10 +35,13 @@ const summary = summarizeClinicalEvaluation({
   ],
 })
 
-assert.equal(summary.caseCount, 4)
-assert.equal(summary.top1Accuracy.value, 0.25)
-assert.equal(summary.top3Recall.value, 0.5)
-assert.equal(summary.top5Recall.value, 0.75)
+assert.equal(summary.caseCount, 6)
+assert.equal(summary.top1Accuracy.denominator, 5)
+assert.equal(summary.top3Recall.denominator, 5)
+assert.equal(summary.top5Recall.denominator, 5)
+assert.equal(summary.top1Accuracy.value, 1 / 5)
+assert.equal(summary.top3Recall.value, 2 / 5)
+assert.equal(summary.top5Recall.value, 3 / 5)
 assert.equal(summary.unsafeRecommendationRate.value, 0.25)
 assert.equal(summary.citationSupportPrecision.value, 2 / 3)
 assert.equal(summary.clinicianAcceptanceRate.value, 0.75)
@@ -63,6 +68,13 @@ assert.equal(empty.unsafeRecommendationRate.value, null)
 assert.equal(empty.citationSupportPrecision.value, null)
 assert.equal(empty.clinicianAcceptanceRate.value, null)
 
+const abstentionOnly = summarizeClinicalEvaluation({
+  diagnoses: [{ caseId: 'abstain-001', goldDiagnosisIds: ['dx-a'], predictedDiagnosisIds: [] }],
+})
+assert.equal(abstentionOnly.top1Accuracy.denominator, 1)
+assert.equal(abstentionOnly.top1Accuracy.value, 0)
+assert.equal(abstentionOnly.top5Recall.value, 0)
+
 assert.deepEqual(proportionMetric(0, 0), {
   numerator: 0,
   denominator: 0,
@@ -78,7 +90,7 @@ assert.ok(interval)
 assert.ok(interval!.low < 0.5)
 assert.ok(interval!.high > 0.5)
 
-assert.ok(CLINICAL_EVALUATION_FORMULAS.topKRecall.includes('gold diagnosis'))
+assert.ok(CLINICAL_EVALUATION_FORMULAS.topKRecall.includes('empty prediction lists count as misses'))
 assert.ok(CLINICAL_EVALUATION_BOUNDARY.includes('do not by themselves establish clinical validity'))
 assert.ok(CLINICAL_EVALUATION_BOUNDARY.includes('de-identified'))
 
