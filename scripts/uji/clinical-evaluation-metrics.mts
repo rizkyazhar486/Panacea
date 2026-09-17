@@ -84,6 +84,9 @@ assert.deepEqual(proportionMetric(0, 0), {
 assert.throws(() => proportionMetric(2, 1), /invalid proportion counts/)
 assert.equal(wilsonInterval(1, 0), null)
 assert.equal(wilsonInterval(3, 2), null)
+assert.equal(wilsonInterval(0.5, 1), null)
+assert.equal(wilsonInterval(1, 2, 0), null)
+assert.equal(wilsonInterval(1, 2, Number.NaN), null)
 
 const interval = wilsonInterval(50, 100)
 assert.ok(interval)
