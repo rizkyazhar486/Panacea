@@ -160,21 +160,43 @@ try {
     devicePixelRatio: window.devicePixelRatio,
     documentScrollWidth: document.documentElement.scrollWidth,
   }))
-  const centerUnobstructed = await canvas.evaluate((node) => {
+  const centerHit = await canvas.evaluate((node) => {
     const rect = node.getBoundingClientRect()
-    const hit = document.elementFromPoint(rect.left + rect.width / 2, rect.top + rect.height / 2)
-    return hit === node
+    const x = rect.left + rect.width / 2
+    const y = rect.top + rect.height / 2
+    const hit = document.elementFromPoint(x, y)
+    if (!hit) return { unobstructed: false, x, y, hit: null }
+    const hitRect = hit.getBoundingClientRect()
+    const style = getComputedStyle(hit)
+    return {
+      unobstructed: hit === node,
+      x,
+      y,
+      hit: {
+        tag: hit.tagName,
+        id: hit.id || null,
+        className: typeof hit.className === 'string' ? hit.className : null,
+        role: hit.getAttribute('role'),
+        ariaLabel: hit.getAttribute('aria-label'),
+        text: hit.textContent?.trim().slice(0, 160) || null,
+        pointerEvents: style.pointerEvents,
+        position: style.position,
+        zIndex: style.zIndex,
+        rect: [hitRect.left, hitRect.top, hitRect.right, hitRect.bottom],
+      },
+    }
   })
 
   metrics = {
     viewport,
     canvas: health,
-    canvasCenterUnobstructed: centerUnobstructed,
+    canvasCenterUnobstructed: centerHit.unobstructed,
+    canvasCenterHit: centerHit,
     route: await page.evaluate(() => window.location.hash),
   }
 
   if (!health.webgl || health.contextLost) throw new Error('Body3D WebGL context is unavailable or lost')
-  if (!centerUnobstructed) throw new Error('Body3D canvas center is obstructed by another UI layer')
+  if (!centerHit.unobstructed) throw new Error(`Body3D canvas center is obstructed by another UI layer: ${JSON.stringify(centerHit.hit)}`)
   if (viewport.width !== 390 || viewport.height !== 844) {
     throw new Error(`Unexpected viewport ${viewport.width}x${viewport.height}`)
   }
