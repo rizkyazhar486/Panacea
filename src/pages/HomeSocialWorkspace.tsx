@@ -48,7 +48,7 @@ function Loader() {
 }
 
 export function HomeSocialWorkspace() {
-  const [params, setParams] = useSearchParams()
+  const [params] = useSearchParams()
   const requested = params.get('t') as HomeView | null
   const activeKey: HomeView = requested === 'for-you' || (requested && LEGACY_VALID.has(requested as LegacyViewKey)) ? requested : 'home'
   const legacy = LEGACY_VIEWS.find((view) => view.key === activeKey)
