@@ -1,6 +1,7 @@
 import { lazy, Suspense, useEffect, useLayoutEffect, useRef, useState } from 'react'
 import type { BodySystemId } from '../lib/bodySystemSourceWave'
 import type { SimulationDomain } from './bodyhub/UnifiedHumanSimulationProjector'
+import { BodyExposurePatientOverlay } from '../components/BodyExposurePatientOverlay'
 import { BodyExplorer } from './BodyExplorer'
 import './bodyExposureOS.css'
 
@@ -202,6 +203,7 @@ export function BodyExposureOS() {
       </div>
 
       <div ref={systemsRef} className="relative z-[2] mt-3 scroll-mt-4">
+        <BodyExposurePatientOverlay onClinicalView={() => setActiveMode('clinical')} />
         <Suspense fallback={<div className="grid min-h-56 place-items-center rounded-[28px] border border-white/[.08] bg-black/35 text-xs font-bold text-white/35">Loading unified human simulation projector…</div>}>
           <UnifiedHumanSimulationProjector
             selectedSystemId={selectedBodySystemId}
