@@ -25,49 +25,27 @@ function BodyExplorerStartHere() {
   return (
     <details
       data-testid="body-explorer-start-here"
-      className="mt-3 overflow-hidden rounded-2xl border border-brand/20 bg-brand/[.045] shadow-[0_8px_28px_rgba(15,100,70,.06)] dark:border-brand/25 dark:bg-brand/[.08]"
+      className="mt-2 overflow-hidden rounded-[16px] border border-brand/18 bg-brand/[.035] dark:border-brand/20 dark:bg-brand/[.055]"
     >
-      <summary className="flex min-h-[44px] cursor-pointer list-none items-center justify-between gap-3 px-4 py-2.5 text-ink marker:hidden dark:text-white">
+      <summary className="flex min-h-[44px] cursor-pointer list-none items-center justify-between gap-3 px-3.5 py-2 text-ink marker:hidden dark:text-white">
         <span className="min-w-0">
-          <span className="block text-sm font-black">Start here · 60-second guide</span>
-          <span className="block truncate text-[10.5px] font-semibold text-neutral-500 dark:text-neutral-400">
-            Tap structure · drag to rotate · pinch/scroll to zoom
-          </span>
+          <span className="block text-xs font-black">How to use</span>
+          <span className="block truncate text-[10px] font-semibold text-neutral-500 dark:text-neutral-400">Tap · rotate · zoom · inspect</span>
         </span>
-        <span aria-hidden className="shrink-0 rounded-full border border-brand/25 px-2 py-0.5 text-[10px] font-black uppercase tracking-wide text-brand">
-          Help
-        </span>
+        <span aria-hidden className="shrink-0 text-[10px] font-black text-brand">＋</span>
       </summary>
-      <div className="border-t border-brand/15 px-4 py-3">
-        <ol className="grid gap-2 sm:grid-cols-3">
-          <li className="rounded-xl bg-white/75 p-3 dark:bg-white/[.055]">
-            <div className="text-[10px] font-black uppercase tracking-[.14em] text-brand">1 · Explore</div>
-            <p className="mt-1 text-xs leading-relaxed text-neutral-700 dark:text-neutral-200">
-              Tap a structure on the 3D body, or start with <strong>Organs</strong>, <strong>Muscles</strong>, or <strong>Find structure</strong>.
-            </p>
+      <ol className="grid border-t border-brand/12 sm:grid-cols-3">
+        {[
+          ['1', 'Select', 'Tap a body structure or use Find.'],
+          ['2', 'Inspect', 'Rotate and zoom while keeping Anatomy as the anchor.'],
+          ['3', 'Deepen', 'Open physiology, imaging, disease or molecular detail only when needed.'],
+        ].map(([step, title, copy]) => (
+          <li key={step} className="min-w-0 border-b border-brand/10 px-3.5 py-3 last:border-b-0 sm:border-b-0 sm:border-r sm:last:border-r-0">
+            <div className="text-[9px] font-black uppercase tracking-[.12em] text-brand">{step} · {title}</div>
+            <p className="mt-1 text-[10px] leading-relaxed text-neutral-600 dark:text-neutral-300">{copy}</p>
           </li>
-          <li className="rounded-xl bg-white/75 p-3 dark:bg-white/[.055]">
-            <div className="text-[10px] font-black uppercase tracking-[.14em] text-brand">2 · Inspect</div>
-            <p className="mt-1 text-xs leading-relaxed text-neutral-700 dark:text-neutral-200">
-              Keep <strong>Anatomy</strong> as the default view. Switch to CT, MRI, or another view only when you need that perspective.
-            </p>
-          </li>
-          <li className="rounded-xl bg-white/75 p-3 dark:bg-white/[.055]">
-            <div className="text-[10px] font-black uppercase tracking-[.14em] text-brand">3 · Go deeper</div>
-            <p className="mt-1 text-xs leading-relaxed text-neutral-700 dark:text-neutral-200">
-              Open <strong>Physiology</strong>, <strong>Drugs</strong>, <strong>Diseases</strong>, or advanced labs after you have selected what you want to study.
-            </p>
-          </li>
-        </ol>
-        <div className="mt-2 flex flex-wrap gap-1.5 text-[10.5px] font-bold text-neutral-500 dark:text-neutral-300">
-          <span className="rounded-full bg-white/80 px-2.5 py-1 dark:bg-white/[.06]">Explore: Layers · Muscles · Organs · Find</span>
-          <span className="rounded-full bg-white/80 px-2.5 py-1 dark:bg-white/[.06]">Learn: Physiology · Drugs · Diseases · Study</span>
-          <span className="rounded-full bg-white/80 px-2.5 py-1 dark:bg-white/[.06]">Advanced: Cardio · Specialty · Molecular · Genomics · Cell · Surgical</span>
-        </div>
-        <p className="mt-2 text-[10.5px] leading-relaxed text-neutral-500 dark:text-neutral-400">
-          You do not need to use every tab. The same 3D body stays your anchor while the tools around it change.
-        </p>
-      </div>
+        ))}
+      </ol>
     </details>
   )
 }

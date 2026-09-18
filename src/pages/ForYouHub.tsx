@@ -8,15 +8,10 @@ import {
   IconBook,
   IconChat,
   IconEMR,
-  IconHeart,
-  IconMoon,
   IconPlan,
   IconSettings,
-  IconSparkle,
-  IconStore,
   IconUser,
   IconUsers,
-  IconWallet,
 } from '../components/icons'
 
 type Destination = {
@@ -24,15 +19,6 @@ type Destination = {
   to: string
   icon: typeof IconUsers
 }
-
-const LIFE: Destination[] = [
-  { label: 'Social', to: '/?t=social', icon: IconUsers },
-  { label: 'Community', to: '/?t=community', icon: IconHeart },
-  { label: 'Clubs', to: '/?t=clubs', icon: IconSparkle },
-  { label: 'Faith', to: '/?t=religion', icon: IconMoon },
-  { label: 'Finance', to: '/?t=finance', icon: IconWallet },
-  { label: 'Markets', to: '/?t=markets', icon: IconStore },
-]
 
 const INTELLIGENCE: Destination[] = [
   { label: 'Ask Panacea', to: '/chatbot', icon: IconChat },
@@ -147,7 +133,6 @@ export function ForYouHub() {
       <ForYouSocialPulse />
       <ForYouDailyStack />
 
-      <DestinationRail label="Life" items={LIFE} />
       <DestinationRail label="Intelligence" items={INTELLIGENCE} />
 
       <section aria-label="Personal tools" className="border-t border-white/10">
