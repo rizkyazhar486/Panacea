@@ -7,6 +7,8 @@ const hero = readFileSync('src/components/HomeVisualLanding.tsx', 'utf8')
 const heroCss = readFileSync('src/styles/home-intent-motion.css', 'utf8')
 const health = readFileSync('src/components/HomeHealthBrief.tsx', 'utf8')
 const healthCss = readFileSync('src/styles/home-human-interface.css', 'utf8')
+const bentoBoard = readFileSync('src/components/HomeBentoWidgetBoard.tsx', 'utf8')
+const widgetRegistry = readFileSync('src/lib/homeWidgets.ts', 'utf8')
 const glass = readFileSync('src/styles/home-liquid-control-layer.css', 'utf8')
 const shell = readFileSync('src/components/Shell.tsx', 'utf8')
 
@@ -18,6 +20,12 @@ const heroIndex = workspace.indexOf('<HomeVisualLanding />')
 assert.ok(healthIndex >= 0 && heroIndex >= 0 && healthIndex < heroIndex,
   'Home puts the promotional hero before the user\'s health state; useful content must win the first viewport')
 assert.match(workspace, /data-panacea-primary-nav/, 'Home lost its single persistent primary navigation layer')
+assert.match(workspace, /<HomeBentoWidgetBoard \/>/, 'Home lost the primary customizable bento widget board')
+assert.match(workspace, /panacea-legacy-widget-disclosure/, 'legacy dashboard must stay demoted behind progressive disclosure')
+const canonicalWidgetCount = [...widgetRegistry.matchAll(/\\{\\s*id:\\s*'[^']+'/g)].length
+assert.ok(canonicalWidgetCount >= 200, `customizable widget universe fell below 200: ${canonicalWidgetCount}`)
+assert.match(bentoBoard, /Customize · \{WIDGETS\.length\}/, 'bento board no longer exposes the full customization universe')
+assert.match(bentoBoard, /data-size=\{data\.size\}/, 'custom bento tiles lost mixed semantic sizes')
 assert.match(health, /className="panacea-health-bento"/, 'Home health state regressed from bento to a flat dashboard strip')
 for (const key of ['primary', 'sleep', 'heart', 'vo2', 'hrv', 'nutrition', 'training']) {
   assert.match(health, new RegExp(`key: '${key}'`), `health bento lost ${key}`)
