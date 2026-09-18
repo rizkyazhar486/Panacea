@@ -419,7 +419,6 @@ export function Shell({ children }: { children: ReactNode }) {
   }, [])
 
   useEffect(() => pasangKilau(), [])
-  const [sidebarOpen, setSidebarOpen] = useState(true)
   const [closedGroups, setClosedGroups] = useState<Record<string, boolean>>({})
   const [navHidden, setNavHidden] = useState(false)
   const account = state.account
@@ -559,84 +558,6 @@ export function Shell({ children }: { children: ReactNode }) {
         <div className="orb absolute right-1/3 top-0 h-64 w-64 rounded-full bg-blue-700/16 blur-3xl dark:bg-sky-500/9" style={{ animationDelay: '-11s' }} />
         <div className="orb absolute left-1/3 bottom-1/4 h-60 w-60 rounded-full bg-sky-600/18 blur-3xl dark:bg-sky-400/9" style={{ animationDelay: '-21s' }} />
       </div>
-      <aside className={`sticky top-0 z-10 hidden h-screen shrink-0 flex-col border-r border-black/5 bg-white/80 py-6 backdrop-blur-xl transition-all duration-300 lg:flex ${sidebarOpen ? 'w-64 px-4' : 'w-0 overflow-hidden border-r-0 px-0 opacity-0'}`}>
-        <div className="mb-6 flex items-center justify-between gap-2 px-2">
-          <div className="flex items-center gap-2.5">
-            <LogoMark size={36} />
-            <div className="leading-tight">
-              <div className="text-base font-extrabold tracking-tight" style={{ fontFamily: 'var(--font-wordmark)' }}>
-                Panacea<span className="text-brand">med</span>
-                <span className="text-accent">.id</span>
-              </div>
-              <div className="text-[10px] font-semibold uppercase tracking-wider text-neutral-500">
-                Longevity Medical-AI
-              </div>
-            </div>
-          </div>
-          <button onClick={() => setSidebarOpen(false)} className="grid h-10 w-10 shrink-0 place-items-center rounded-lg text-neutral-500 transition-colors hover:bg-neutral-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/30" title="Hide menu" aria-label="Hide menu">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6" /></svg>
-          </button>
-        </div>
-
-        <div className="mb-4 rounded-xl bg-brand-50 px-3 py-2">
-          <div className="text-[10px] font-semibold uppercase tracking-wide text-brand-dark">Logged in as</div>
-          <div className="truncate text-sm font-bold">{account.name}</div>
-          <div className="text-[11px] text-neutral-500">{roleLabel[account.role]}</div>
-        </div>
-
-        <nav className="flex flex-1 flex-col gap-1 overflow-y-auto">
-          {groups.map((g) => {
-            const open = !closedGroups[g.name]
-            // A single-item "Home" group renders as a plain link (no accordion).
-            if (g.name === 'Home') {
-              return g.items.map((n) => (
-                <NavLink key={n.to} to={n.to} end={n.end} className={({ isActive }) => `flex items-center gap-3 rounded-full px-4 py-2.5 text-sm font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/30 ${isActive ? 'bg-brand-50 text-brand-dark font-bold' : 'text-neutral-500 hover:bg-neutral-50 hover:text-neutral-800'}`}>
-                  <n.icon size={20} /> {n.label}
-                </NavLink>
-              ))
-            }
-            return (
-              <div key={g.name} className="mt-1">
-                <button
-                  onClick={() => setClosedGroups((s) => ({ ...s, [g.name]: !s[g.name] }))}
-                  className="flex min-h-[40px] w-full items-center justify-between rounded-lg px-3 text-[11px] font-bold uppercase tracking-wide text-neutral-500 hover:text-neutral-600"
-                >
-                  {g.name}
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" className={`transition-transform ${open ? '' : '-rotate-90'}`}><polyline points="6 9 12 15 18 9" /></svg>
-                </button>
-                {open && (
-                  <div className="mt-0.5 space-y-0.5">
-                    {g.items.map((n) => (
-                      <NavLink key={n.to} to={n.to} end={n.end} className={({ isActive }) => `flex min-h-[40px] items-center gap-3 rounded-full px-4 text-sm font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/30 ${isActive ? 'bg-brand-50 text-brand-dark font-bold' : 'text-neutral-500 hover:bg-neutral-50 hover:text-neutral-800'}`}>
-                        <n.icon size={18} /> {n.label}
-                      </NavLink>
-                    ))}
-                  </div>
-                )}
-              </div>
-            )
-          })}
-        </nav>
-
-        {(account.role === 'pasien' || account.role === 'dokter') && (
-          <NavLink
-            to="/hospitals"
-            className="mt-3 flex items-center justify-center gap-2 rounded-full bg-accent/10 px-3 py-2.5 text-sm font-bold text-accent transition hover:bg-accent/20"
-          >
-            <IconHospital size={18} /> Emergency (SOS)
-          </NavLink>
-        )}
-        <button
-          onClick={() => {
-            if (backendEnabled) api.logout().catch(() => {})
-            logout()
-          }}
-          className="mt-2 flex min-h-[40px] items-center gap-2 rounded-full px-4 text-sm font-semibold text-neutral-500 hover:bg-neutral-50"
-        >
-          <IconLogout size={18} /> Log Out
-        </button>
-      </aside>
-
       <div className="relative z-10 flex min-w-0 flex-1 flex-col">
         {/* Pita tangkap: selalu ada di tepi atas, tidak pernah ikut menyingkir.
             Inilah yang memanggil bilah kembali — mengandalkan hover pada
@@ -660,18 +581,6 @@ export function Shell({ children }: { children: ReactNode }) {
                 <line x1="4" y1="7" x2="20" y2="7" /><line x1="4" y1="12" x2="20" y2="12" /><line x1="4" y1="17" x2="20" y2="17" />
               </svg>
             </button>
-            {/* Desktop: buka kembali sidebar saat diciutkan (di dalam header → tidak menimpa judul) */}
-            {!sidebarOpen && (
-              <button
-                onClick={() => setSidebarOpen(true)}
-                className="header-icon-btn hidden h-10 w-10 shrink-0 place-items-center rounded-full text-ink lg:grid"
-                aria-label="Open sidebar menu"
-              >
-                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round">
-                  <line x1="4" y1="7" x2="20" y2="7" /><line x1="4" y1="12" x2="20" y2="12" /><line x1="4" y1="17" x2="20" y2="17" />
-                </svg>
-              </button>
-            )}
             {/* Tombol kembali: gestur geser saja tidak cukup — ia tidak ada di
                 desktop, tidak terlihat, dan tidak bisa dijangkau papan ketik. */}
             {bisaKembali && (
