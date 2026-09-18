@@ -2,22 +2,33 @@ import { useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useStore } from '../lib/store'
 import { getVitals } from '../lib/healthVitals'
+import { getWorkouts } from '../lib/workoutStore'
 import { IconHeart, IconMoon, IconPlus, IconRun, IconUpload } from './icons'
 import '../styles/home-human-interface.css'
 
-function num(value: number | undefined, digits = 0) {
+const DAY = 86_400_000
+
+function num(value: number | undefined | null, digits = 0) {
   if (typeof value !== 'number' || !Number.isFinite(value)) return '—'
   return digits ? value.toFixed(digits) : Math.round(value).toLocaleString()
 }
 
-type Instrument = {
+function todayKey() {
+  const d = new Date()
+  const p = (n: number) => String(n).padStart(2, '0')
+  return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}`
+}
+
+type BentoMetric = {
   key: string
   label: string
   value: string
   unit?: string
+  meta?: string
   to: string
+  size: 'hero' | 'wide' | 'unit'
   icon: typeof IconRun
-  primary?: boolean
+  accent?: 'green' | 'violet' | 'orange' | 'cyan' | 'rose'
 }
 
 export function HomeHealthBrief() {
@@ -35,6 +46,7 @@ export function HomeHealthBrief() {
   }, [])
 
   const vitals = useMemo(() => getVitals(), [refresh])
+  const workouts = useMemo(() => getWorkouts(), [refresh])
   const latestSleep = useMemo(() => [...(state.sleepLogs ?? [])]
     .filter((item) => typeof item?.hours === 'number' && item.hours > 0)
     .sort((a, b) => (a.date < b.date ? 1 : -1))[0], [state.sleepLogs])
@@ -44,27 +56,128 @@ export function HomeHealthBrief() {
     : (typeof vitals.sleepH === 'number' ? vitals.sleepH : undefined)
   const steps = typeof vitals.steps === 'number' && vitals.steps >= 0 ? vitals.steps : undefined
   const restingHr = typeof vitals.restingHr === 'number' && vitals.restingHr > 0 ? vitals.restingHr : undefined
+  const hrv = typeof vitals.hrvMs === 'number' && vitals.hrvMs > 0 ? vitals.hrvMs : undefined
   const vo2max = typeof vitals.vo2max === 'number' && vitals.vo2max > 0 ? vitals.vo2max : undefined
+  const recovery = typeof vitals.recoveryPct === 'number' && vitals.recoveryPct > 0 ? vitals.recoveryPct : undefined
+  const bodyScore = typeof vitals.bodyScore === 'number' && vitals.bodyScore > 0 ? vitals.bodyScore : undefined
   const source = typeof vitals.source === 'string' && vitals.source.trim() ? vitals.source.trim() : 'Health data'
   const date = useMemo(
     () => new Intl.DateTimeFormat(undefined, { weekday: 'short', month: 'short', day: 'numeric' }).format(new Date()),
     [],
   )
 
-  const instruments: Instrument[] = [
-    { key: 'steps', label: 'Steps', value: num(steps), to: '/tubuh?t=gerak', icon: IconRun, primary: true },
-    { key: 'sleep', label: 'Sleep', value: num(sleep, 1), unit: 'h', to: '/tubuh?t=tidur', icon: IconMoon },
-    { key: 'heart', label: 'Rest HR', value: num(restingHr), unit: 'bpm', to: '/tubuh?t=jantung', icon: IconHeart },
-    { key: 'vo2', label: 'VO₂max', value: num(vo2max, 1), to: '/latihan?t=lab', icon: IconRun },
+  const nutrition = useMemo(() => {
+    const today = todayKey()
+    return (state.foods ?? [])
+      .filter((food) => food?.date === today)
+      .reduce((sum, food) => ({
+        kcal: sum.kcal + (food.kcal || 0),
+        protein: sum.protein + (food.protein || 0),
+      }), { kcal: 0, protein: 0 })
+  }, [state.foods])
+
+  const training = useMemo(() => {
+    const now = Date.now()
+    const recent = workouts.filter((workout) => {
+      const at = Date.parse(workout.mulai)
+      return Number.isFinite(at) && now - at <= 7 * DAY
+    })
+    return {
+      sessions: recent.length,
+      minutes: Math.round(recent.reduce((sum, workout) => sum + Math.max(0, workout.durasi || 0), 0) / 60),
+    }
+  }, [workouts])
+
+  const primary = recovery ?? bodyScore ?? steps
+  const primaryLabel = recovery != null
+    ? 'Recovery'
+    : bodyScore != null
+      ? 'Body score'
+      : 'Steps'
+  const primaryUnit = recovery != null ? '%' : undefined
+
+  const metrics: BentoMetric[] = [
+    {
+      key: 'primary',
+      label: primaryLabel,
+      value: num(primary),
+      unit: primaryUnit,
+      meta: recovery != null || bodyScore != null ? 'Today' : undefined,
+      to: recovery != null || bodyScore != null ? '/readiness' : '/tubuh?t=gerak',
+      size: 'hero',
+      icon: IconRun,
+      accent: 'green',
+    },
+    {
+      key: 'sleep',
+      label: 'Sleep',
+      value: num(sleep, 1),
+      unit: 'h',
+      to: '/tubuh?t=tidur',
+      size: 'unit',
+      icon: IconMoon,
+      accent: 'violet',
+    },
+    {
+      key: 'heart',
+      label: 'Rest HR',
+      value: num(restingHr),
+      unit: 'bpm',
+      to: '/tubuh?t=jantung',
+      size: 'unit',
+      icon: IconHeart,
+      accent: 'rose',
+    },
+    {
+      key: 'vo2',
+      label: 'VO₂max',
+      value: num(vo2max, 1),
+      to: '/latihan?t=lab',
+      size: 'unit',
+      icon: IconRun,
+      accent: 'cyan',
+    },
+    {
+      key: 'hrv',
+      label: 'HRV',
+      value: num(hrv),
+      unit: 'ms',
+      to: '/readiness',
+      size: 'unit',
+      icon: IconHeart,
+      accent: 'cyan',
+    },
+    {
+      key: 'nutrition',
+      label: 'Nutrition',
+      value: num(nutrition.kcal),
+      unit: 'kcal',
+      meta: nutrition.protein > 0 ? `${Math.round(nutrition.protein)}g protein` : 'Today',
+      to: '/nutrition',
+      size: 'wide',
+      icon: IconPlus,
+      accent: 'orange',
+    },
+    {
+      key: 'training',
+      label: 'Training',
+      value: num(training.sessions),
+      unit: 'sessions',
+      meta: training.minutes > 0 ? `${training.minutes} min · 7d` : 'Last 7 days',
+      to: '/latihan',
+      size: 'wide',
+      icon: IconRun,
+      accent: 'green',
+    },
   ]
 
   return (
     <section
       data-panacea-instrument-strip
-      className="panacea-instrument-strip"
+      className="panacea-health-bento-section"
       aria-label="Today health instruments"
     >
-      <div className="panacea-instrument-head">
+      <div className="panacea-health-bento-head">
         <span className="panacea-instrument-date">{date}</span>
         <Link
           to="/health-data"
@@ -76,24 +189,35 @@ export function HomeHealthBrief() {
         </Link>
       </div>
 
-      <div className="panacea-instrument-rail">
-        {instruments.map(({ key, label, value, unit, to, icon: Icon, primary }) => (
+      <div className="panacea-health-bento">
+        {metrics.map(({ key, label, value, unit, meta, to, size, icon: Icon, accent }) => (
           <Link
             key={key}
             to={to}
-            className={`panacea-instrument-cell${primary ? ' panacea-instrument-primary' : ''}`}
+            className="panacea-health-bento-tile"
+            data-size={size}
+            data-accent={accent}
             aria-label={`${label} ${value}${unit ? ` ${unit}` : ''}`}
           >
-            <span className="panacea-instrument-kicker"><Icon size={15} />{label}</span>
-            <span className="panacea-instrument-value">
+            <span className="panacea-health-bento-kicker"><Icon size={14} />{label}</span>
+            <span className="panacea-health-bento-value">
               {value}
-              {unit ? <span className="panacea-instrument-unit">{unit}</span> : null}
+              {unit ? <small>{unit}</small> : null}
             </span>
+            {meta ? <span className="panacea-health-bento-meta">{meta}</span> : null}
+            {size === 'hero' ? (
+              <span className="panacea-health-bento-matrix" aria-hidden>
+                {Array.from({ length: 36 }).map((_, index) => (
+                  <i key={index} data-on={primary != null && index < Math.max(3, Math.min(36, Math.round((Number(primary) / 100) * 36)))} />
+                ))}
+              </span>
+            ) : null}
           </Link>
         ))}
 
-        <Link to="/harian" className="panacea-instrument-checkin" aria-label="Log today">
-          <IconPlus size={20} />
+        <Link to="/harian" className="panacea-health-bento-action" aria-label="Log today">
+          <IconPlus size={18} />
+          <span>Log</span>
         </Link>
       </div>
     </section>
