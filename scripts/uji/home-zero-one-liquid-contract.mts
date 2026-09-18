@@ -25,11 +25,8 @@ assert.doesNotMatch(workspace, /data-panacea-primary-nav|panacea-liquid-dock/,
   'Home reintroduced a persistent local navigation bar')
 assert.match(shell, /data-panacea-command-bar=\{keadaanBilah\}/,
   'global top command bar is missing from Shell')
-assert.match(shell, /panacea-command-primary-links/,
-  'primary navigation is not inside the auto-hiding top command bar')
-for (const label of ['Home', 'Your Body', 'Clinical', 'For You']) {
-  assert.match(shell, new RegExp(`${label}\\s*<\\/NavLink>`), `top reveal navigation lost ${label}`)
-}
+assert.doesNotMatch(shell, /panacea-command-primary-links|aria-label="Primary"/,
+  'a destination navigation bar returned inside the reveal header')
 assert.match(commandBarCss, /data-panacea-command-bar='hidden'[\s\S]*translateY\(-100%\)/,
   'top command bar no longer hides out of the reading surface')
 assert.match(commandBarLogic, /return delta > 0 \? 'hidden' : 'shown'/,
@@ -54,8 +51,8 @@ assert.doesNotMatch(hero, /pointermove|pointerleave|panacea-intent-hero__media|p
 assert.doesNotMatch(heroCss, /@keyframes|animation:/,
   'Home action panel reintroduced decorative ambient animation')
 
-// Liquid material stays contextual; Home itself no longer owns a persistent
-// navigation bar. The global top command bar owns reveal-on-scroll navigation.
+// Liquid material stays contextual. The top surface is utility chrome only:
+ // page context + universal actions, with no destination navigation bar.
 assert.doesNotMatch(glass, /\.panacea-liquid-dock/,
   'removed bottom navigation dock styles came back')
 assert.match(glass, /\.panacea-intent-action[\s\S]*backdrop-filter: blur\(16px\)/,
@@ -73,8 +70,8 @@ assert.doesNotMatch(shell, /DrawerNav|setMenuOpen|menuOpen|FabNavigasi/,
   'old drawer or floating navigation returned')
 assert.doesNotMatch(shell, /aria-label="Open menu"/,
   'hamburger navigation returned instead of the reveal-on-scroll top bar')
-assert.match(shell, /panacea-command-primary-links no-scrollbar flex/,
-  'mobile primary destinations are no longer inside the top command bar')
+assert.doesNotMatch(shell, /panacea-command-primary-links|aria-label="Primary"/,
+  'mobile navigation tabs returned inside the utility header')
 assert.match(shell, /aria-label="Emergency"/,
   'removing the drawer must not bury emergency access')
 assert.match(shell, /aria-label="Profile"/,
@@ -83,4 +80,4 @@ assert.match(shell, /aria-label="Profile"/,
 assert.doesNotMatch(shell, /className="orb absolute/,
   'global Shell reintroduced decorative gradient orbs that carry no state or information')
 
-console.log('home-zero-one-liquid-contract: zero-step health context, top-only reveal navigation, no drawer/FAB/bottom dock, contextual Liquid Glass, and direct emergency/profile access.')
+console.log('home-zero-one-liquid-contract: zero-step health context, no navigation bar/drawer/FAB/dock, clean reveal-on-scroll utility header, and direct emergency/profile access.')
