@@ -235,3 +235,25 @@ Tomorrow/next Body 3D lane priority:
 5. acquire/audit the pinned HRA female united v1.5 reference with `scripts/bangun/acquire-hra-female-v1_5.mjs`; keep fascia, skin depth and external female genital surface claims blocked until exact source geometry/nodes are verified.
 
 Astra/Blender owns asset assembly/packaging work; Claude Code owns Three.js/runtime integration; ChatGPT Work owns provenance/source-gap/acceptance/reconciliation. This is lane responsibility, not permanent file ownership: re-read latest main and active overlap before every shared-file edit.
+
+
+## Body Exposure one-projector continuation — 2026-09-18
+
+The owner explicitly wants Body Exposure to reach the capability class of a detailed interactive anatomy atlas: exact structure selection, lesion-localization teaching, education, simulation, imaging, surgical layers and biological scale transitions must stay inside one unified human simulation projector rather than fragmenting into unrelated pages.
+
+Already landed on main:
+- exact rendered source-mesh picking in `BodyAllSystems3D` using raycasting; selected source anatomy is visually isolated without mutating canonical GLTF geometry;
+- persistent selected-structure context in `UnifiedHumanSimulationProjector`;
+- first-class projector domains for Localization and Imaging, reusing the existing tract-based `LokalisasiLesiPanel` and source-grounded volumetric/DICOM teaching panel;
+- continuous representation ladder: whole body → system → organ → tissue → cell → organelle → molecule → genome;
+- structure teaching explanation inside the same projector;
+- Body Exposure top-level modes now drive the projector directly; the historical Body Explorer remains preserved as an on-demand deep-reference lab;
+- regression contract: `scripts/uji/body-exposure-one-projector.mts`.
+
+Next deep work should extend rather than replace this contract:
+1. propagate exact selected source node into physiology, pathophysiology, pharmacology, imaging and surgery adapters so those projections are structure-specific, not only system-specific;
+2. extend educational lesion localization beyond the current tract/cranial-nerve engine with source-backed peripheral nerve, root/dermatome/myotome, spinal cord, brain vascular territory and musculoskeletal lesion maps; never claim patient-specific localization from generic atlas data;
+3. register verified tissue/histology/cellular assets per organ so semantic scale transitions replace representation at real source-resolution boundaries rather than enlarging gross meshes;
+4. integrate patient-specific imaging only from actual uploaded/authorized DICOM with explicit registration/provenance and a clear distinction between atlas reference and patient data;
+5. AR/WebXR may be added as a spatial educational view of the same selected source structure, never as operative navigation or patient-specific anatomy without validated registration and review;
+6. preserve mobile 390×844, WebGL fallback, source provenance, fail-closed missing anatomy and Academic Accuracy Gate behavior.
