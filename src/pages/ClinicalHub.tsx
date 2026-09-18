@@ -58,16 +58,24 @@ const REFERENCE_LINKS = [
 export function ClinicalHub() {
   const [calculator, setCalculator] = useState<Calculator>('bmi')
   const [question, setQuestion] = useState('')
-  const [weight, setWeight] = useState(70)
-  const [height, setHeight] = useState(170)
-  const [sbp, setSbp] = useState(120)
-  const [dbp, setDbp] = useState(80)
+  const [weight, setWeight] = useState('')
+  const [height, setHeight] = useState('')
+  const [sbp, setSbp] = useState('')
+  const [dbp, setDbp] = useState('')
   const [lab, setLab] = useState('')
   const [low, setLow] = useState('')
   const [high, setHigh] = useState('')
 
-  const bmi = useMemo(() => height > 0 ? weight / ((height / 100) ** 2) : 0, [height, weight])
-  const map = useMemo(() => (sbp + 2 * dbp) / 3, [sbp, dbp])
+  const bmi = useMemo(() => {
+    const kg = Number(weight)
+    const cm = Number(height)
+    return kg > 0 && cm > 0 ? kg / ((cm / 100) ** 2) : null
+  }, [height, weight])
+  const map = useMemo(() => {
+    const systolic = Number(sbp)
+    const diastolic = Number(dbp)
+    return systolic > 0 && diastolic > 0 ? (systolic + 2 * diastolic) / 3 : null
+  }, [sbp, dbp])
   const labState = useMemo(() => {
     const value = Number(lab)
     const min = Number(low)
@@ -157,29 +165,34 @@ export function ClinicalHub() {
               <div className="mt-4 grid grid-cols-2 gap-3">
                 <label className="border-b border-white/10 pb-2">
                   <span className="block text-[9px] font-black uppercase tracking-[.12em] text-white/35">Weight · kg</span>
-                  <input type="number" value={weight} onChange={(event) => setWeight(Number(event.target.value))} className="mt-2 w-full bg-transparent text-lg font-black outline-none" />
+                  <input inputMode="decimal" type="number" value={weight} onChange={(event) => setWeight(event.target.value)} placeholder="—" className="mt-2 w-full bg-transparent text-lg font-black outline-none placeholder:text-white/20" />
                 </label>
                 <label className="border-b border-white/10 pb-2">
                   <span className="block text-[9px] font-black uppercase tracking-[.12em] text-white/35">Height · cm</span>
-                  <input type="number" value={height} onChange={(event) => setHeight(Number(event.target.value))} className="mt-2 w-full bg-transparent text-lg font-black outline-none" />
+                  <input inputMode="decimal" type="number" value={height} onChange={(event) => setHeight(event.target.value)} placeholder="—" className="mt-2 w-full bg-transparent text-lg font-black outline-none placeholder:text-white/20" />
                 </label>
               </div>
             ) : (
               <div className="mt-4 grid grid-cols-2 gap-3">
                 <label className="border-b border-white/10 pb-2">
                   <span className="block text-[9px] font-black uppercase tracking-[.12em] text-white/35">SBP</span>
-                  <input type="number" value={sbp} onChange={(event) => setSbp(Number(event.target.value))} className="mt-2 w-full bg-transparent text-lg font-black outline-none" />
+                  <input inputMode="numeric" type="number" value={sbp} onChange={(event) => setSbp(event.target.value)} placeholder="—" className="mt-2 w-full bg-transparent text-lg font-black outline-none placeholder:text-white/20" />
                 </label>
                 <label className="border-b border-white/10 pb-2">
                   <span className="block text-[9px] font-black uppercase tracking-[.12em] text-white/35">DBP</span>
-                  <input type="number" value={dbp} onChange={(event) => setDbp(Number(event.target.value))} className="mt-2 w-full bg-transparent text-lg font-black outline-none" />
+                  <input inputMode="numeric" type="number" value={dbp} onChange={(event) => setDbp(event.target.value)} placeholder="—" className="mt-2 w-full bg-transparent text-lg font-black outline-none placeholder:text-white/20" />
                 </label>
               </div>
             )}
 
             <output className="mt-5 block text-4xl font-black tracking-[-.05em] tabular-nums">
-              {calculator === 'bmi' ? bmi.toFixed(1) : `${Math.round(map)} mmHg`}
+              {calculator === 'bmi'
+                ? bmi == null ? '—' : bmi.toFixed(1)
+                : map == null ? '—' : `${Math.round(map)} mmHg`}
             </output>
+            <div className="mt-1 truncate text-[9px] font-bold text-white/30">
+              {calculator === 'bmi' ? 'BMI = kg ÷ m²' : 'MAP = (SBP + 2×DBP) ÷ 3'}
+            </div>
           </div>
 
           <div className="border-t border-white/10 pt-4">
