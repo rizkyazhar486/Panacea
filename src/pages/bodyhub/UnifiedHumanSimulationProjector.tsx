@@ -17,9 +17,11 @@ const SemanticMicroscopeStage = lazy(() => import('./SemanticMicroscopeStage'))
 const LokalisasiLesiPanel = lazy(() => import('./LokalisasiLesiPanel').then((module) => ({ default: module.LokalisasiLesiPanel })))
 const PencitraanVolumetrikPanel = lazy(() => import('./PencitraanVolumetrikPanel').then((module) => ({ default: module.PencitraanVolumetrikPanel })))
 const VirtualEndoscopyWorkbench = lazy(() => import('./VirtualEndoscopyWorkbench'))
+const PersonalAvatarCameraCapture = lazy(() => import('./PersonalAvatarCameraCapture'))
 
 export type SimulationDomain =
   | 'anatomy'
+  | 'personal-avatar'
   | 'localization'
   | 'physiology'
   | 'pathophysiology'
@@ -46,6 +48,12 @@ type DomainDefinition = {
 }
 
 const DOMAINS: DomainDefinition[] = [
+  {
+    id: 'personal-avatar',
+    label: 'My Body',
+    scale: 'camera → personal surface',
+    description: 'Import the patient-facing external body identity from one RGB camera while keeping internal anatomy provenance separate.',
+  },
   {
     id: 'anatomy',
     label: '3D Anatomy',
@@ -157,6 +165,8 @@ export default function UnifiedHumanSimulationProjector({
   const semanticStop = getBodySemanticZoomStop(semanticZoom.scale)
   const microscopic = isMicroscopicBodyScale(semanticZoom.scale)
   const isEndoscopy = domain === 'endoscopy'
+  const isStandaloneBodyIdentity = domain === 'personal-avatar'
+  const hideReferenceAtlasCanvas = isEndoscopy || isStandaloneBodyIdentity
   const selectedStructureEducation = useMemo(() => {
     if (!selectedStructureName) return ''
     return penjelasanTertulis(selectedStructureName, selectedStructureName).replace(/\*\*/g, '')
@@ -183,6 +193,8 @@ export default function UnifiedHumanSimulationProjector({
 
   function renderDomain() {
     switch (domain) {
+      case 'personal-avatar':
+        return <PersonalAvatarCameraCapture />
       case 'localization':
         return <LokalisasiLesiPanel />
       case 'physiology':
@@ -293,7 +305,7 @@ export default function UnifiedHumanSimulationProjector({
         </div>
       </header>
 
-      {!isEndoscopy && (
+      {!hideReferenceAtlasCanvas && (
         <UniversalAtlasDepthRail
           semanticScale={semanticZoom.scale}
           selectedSystemId={selectedSystemId}
@@ -301,7 +313,7 @@ export default function UnifiedHumanSimulationProjector({
         />
       )}
 
-      {!isEndoscopy && (
+      {!hideReferenceAtlasCanvas && (
       <div className="grid gap-0 xl:grid-cols-[minmax(0,1fr)_250px]">
         <div className="min-w-0 border-b border-white/[.08] p-2 sm:p-3 xl:border-b-0 xl:border-r">
           <Suspense fallback={<ProjectorLoader label="3D anatomy" />}>
@@ -348,7 +360,7 @@ export default function UnifiedHumanSimulationProjector({
       </div>
       )}
 
-      {!isEndoscopy && microscopic && (
+      {!hideReferenceAtlasCanvas && microscopic && (
         <div className="border-t border-white/[.08] p-2 sm:p-3" data-semantic-microscope-active={semanticZoom.scale}>
           <Suspense fallback={<ProjectorLoader label={semanticStop.label + ' detail'} />}>
             <SemanticMicroscopeStage scale={semanticZoom.scale} selectedSystemId={selectedSystemId} />
