@@ -1,11 +1,10 @@
 import { lazy, Suspense, type ComponentType } from 'react'
-import { Link, useSearchParams } from 'react-router-dom'
+import { useSearchParams } from 'react-router-dom'
 import { HomeCommandDeck } from '../components/HomeCommandDeck'
 import { HomeBentoWidgetBoard } from '../components/HomeBentoWidgetBoard'
 import { HomeHealthBrief } from '../components/HomeHealthBrief'
 import { HomeVisualLanding } from '../components/HomeVisualLanding'
 import { RelWidgetRumah } from '../components/RelWidgetRumah'
-import { IconDashboard, IconHeart, IconSparkle, IconStethoscope } from '../components/icons'
 import '../styles/home-liquid-reference.css'
 import '../styles/home-green-material-v48.css'
 import '../styles/home-human-interface.css'
@@ -47,28 +46,15 @@ function Loader() {
 }
 
 export function HomeSocialWorkspace() {
-  const [params, setParams] = useSearchParams()
+  const [params] = useSearchParams()
   const requested = params.get('t') as HomeView | null
   const activeKey: HomeView = requested === 'for-you' || (requested && LEGACY_VALID.has(requested as LegacyViewKey)) ? requested : 'home'
   const legacy = LEGACY_VIEWS.find((view) => view.key === activeKey)
   const LegacyActive = legacy?.component
 
-  const selectHome = () => {
-    const next = new URLSearchParams(params)
-    next.delete('t')
-    setParams(next, { replace: true })
-    window.scrollTo({ top: 0, behavior: 'smooth' })
-  }
-
-  const selectForYou = () => {
-    const next = new URLSearchParams(params)
-    next.set('t', 'for-you')
-    setParams(next, { replace: true })
-    window.scrollTo({ top: 0, behavior: 'smooth' })
-  }
 
   return (
-    <div className="panacea-liquid-home mx-auto w-full max-w-[1320px] pb-32">
+    <div className="panacea-liquid-home mx-auto w-full max-w-[1320px] pb-16">
       {activeKey === 'home' ? (
         <div className="panacea-human-home">
           <HomeHealthBrief />
@@ -87,45 +73,6 @@ export function HomeSocialWorkspace() {
           <Suspense fallback={<Loader />}><LegacyActive /></Suspense>
         </section>
       ) : null}
-
-      <nav data-panacea-primary-nav data-control-layer="liquid" className="panacea-liquid-dock grid grid-cols-4 gap-1 rounded-[24px] p-1.5" aria-label="Panacea primary navigation">
-        <button
-          type="button"
-          onClick={selectHome}
-          data-active={activeKey === 'home'}
-          aria-current={activeKey === 'home' ? 'page' : undefined}
-          className="liquid-dock-item flex min-h-[50px] flex-col items-center justify-center gap-1 rounded-[18px] px-2 text-[9px] font-black text-white/55"
-        >
-          <IconDashboard size={17} />
-          <span>Home</span>
-        </button>
-        <Link
-          to="/fitness-hub"
-          className="liquid-dock-item flex min-h-[50px] flex-col items-center justify-center gap-1 rounded-[18px] px-2 text-[9px] font-black text-white/55"
-          aria-label="Your Body super page"
-        >
-          <IconHeart size={17} />
-          <span>Your Body</span>
-        </Link>
-        <Link
-          to="/clinical-hub"
-          className="liquid-dock-item flex min-h-[50px] flex-col items-center justify-center gap-1 rounded-[18px] px-2 text-[9px] font-black text-white/55"
-          aria-label="Clinical super page"
-        >
-          <IconStethoscope size={17} />
-          <span>Clinical</span>
-        </Link>
-        <button
-          type="button"
-          onClick={selectForYou}
-          data-active={activeKey === 'for-you' || !!legacy}
-          aria-current={activeKey === 'for-you' || !!legacy ? 'page' : undefined}
-          className="liquid-dock-item flex min-h-[50px] flex-col items-center justify-center gap-1 rounded-[18px] px-2 text-[9px] font-black text-white/55"
-        >
-          <IconSparkle size={17} />
-          <span>For You</span>
-        </button>
-      </nav>
     </div>
   )
 }
