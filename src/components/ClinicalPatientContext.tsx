@@ -1,12 +1,15 @@
+import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useStore } from '../lib/store'
 import { buildBodyClinicalFindings } from '../lib/bodyClinicalFindings'
 import { projectEmrToBodyClinicalBridge } from '../lib/bodyClinicalBridge'
 import { ClinicalBodyTwin } from './ClinicalBodyTwin'
+import type { BodySystemId } from '../lib/bodySystemSourceWave'
 
 export function ClinicalPatientContext() {
   const { state, activePatient } = useStore()
   const record = state.records[activePatient.id]
+  const [focusSystemId, setFocusSystemId] = useState<BodySystemId | null>(null)
 
   if (!record) {
     return (
@@ -27,7 +30,14 @@ export function ClinicalPatientContext() {
     record.updatedAt,
   )
 
-  return <ClinicalBodyTwin projection={projection} patientLabel={activePatient.name} />
+  return (
+    <ClinicalBodyTwin
+      projection={projection}
+      patientLabel={activePatient.name}
+      focusSystemId={focusSystemId}
+      onFocusSystemChange={setFocusSystemId}
+    />
+  )
 }
 
 export default ClinicalPatientContext

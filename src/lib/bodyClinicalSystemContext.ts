@@ -4,6 +4,7 @@ import type {
   BodyClinicalMarkerStatus,
 } from './bodyClinicalBridge'
 import type { BodySystemId } from './bodySystemSourceWave'
+import { BODY_SYSTEM_SOURCE_WAVE } from './bodySystemSourceWave'
 
 type BodyClinicalSystemFocusDefinition = {
   label: string
@@ -64,6 +65,12 @@ const BODY_CLINICAL_SYSTEM_FOCUS: Record<BodySystemId, BodyClinicalSystemFocusDe
     markerKeys: ['kulit', 'ekstremitas'],
   },
 }
+
+export const BODY_CLINICAL_SYSTEM_FOCUS_LIST: readonly { id: BodySystemId; label: string }[] =
+  BODY_SYSTEM_SOURCE_WAVE.map((system) => ({
+    id: system.id,
+    label: BODY_CLINICAL_SYSTEM_FOCUS[system.id].label,
+  }))
 
 function countFocusedMarkers(markers: readonly BodyClinicalMarker[]) {
   return markers.reduce<Record<BodyClinicalMarkerStatus, number>>(

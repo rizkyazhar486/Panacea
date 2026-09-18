@@ -1,6 +1,8 @@
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import { motion, useReducedMotion } from 'framer-motion'
 import type { BodyClinicalBridgeProjection, BodyClinicalMarkerStatus } from '../lib/bodyClinicalBridge'
+import { BODY_CLINICAL_SYSTEM_FOCUS_LIST, focusBodyClinicalProjection } from '../lib/bodyClinicalSystemContext'
+import type { BodySystemId } from '../lib/bodySystemSourceWave'
 
 const STATUS: Record<BodyClinicalMarkerStatus, { dot: string; ring: string; label: string }> = {
   normal: { dot: '#00BF63', ring: 'rgba(0,191,99,.28)', label: 'Recorded normal' },
@@ -17,13 +19,22 @@ function reviewLabel(state: BodyClinicalBridgeProjection['reviewState']) {
 export function ClinicalBodyTwin({
   projection,
   patientLabel,
+  focusSystemId = null,
+  onFocusSystemChange,
 }: {
   projection: BodyClinicalBridgeProjection
   patientLabel?: string
+  focusSystemId?: BodySystemId | null
+  onFocusSystemChange?: (systemId: BodySystemId | null) => void
 }) {
   const reduceMotion = useReducedMotion()
   const [activeKey, setActiveKey] = useState<string | null>(null)
-  const active = projection.markers.find((marker) => marker.key === activeKey) ?? null
+  const focus = useMemo(
+    () => (focusSystemId ? focusBodyClinicalProjection(projection, focusSystemId) : null),
+    [projection, focusSystemId],
+  )
+  const markers = focus ? focus.markers : projection.markers
+  const active = markers.find((marker) => marker.key === activeKey) ?? null
 
   return (
     <section
@@ -33,7 +44,9 @@ export function ClinicalBodyTwin({
     >
       <header className="flex flex-wrap items-center justify-between gap-3 border-b border-white/10 px-4 py-3 sm:px-5">
         <div className="min-w-0">
-          <div className="truncate text-[10px] font-black uppercase tracking-[.18em] text-emerald-300/80">AI-EMR · Clinical body context</div>
+          <div className="truncate text-[10px] font-black uppercase tracking-[.18em] text-emerald-300/80">
+            AI-EMR · Clinical body context{focus ? ` · ${focus.label}` : ''}
+          </div>
           <div className="truncate text-sm font-black tracking-[-.02em] text-white/90">{patientLabel || projection.patientId}</div>
         </div>
         <div className="flex shrink-0 items-center gap-2 text-[9px] font-black uppercase tracking-[.12em] text-white/45">
@@ -41,6 +54,39 @@ export function ClinicalBodyTwin({
           <span className="rounded-full border border-emerald-300/20 px-2 py-1 text-emerald-200/75">Body Exposure bridge</span>
         </div>
       </header>
+
+      {onFocusSystemChange ? (
+        <div
+          className="flex items-center gap-1.5 overflow-x-auto border-b border-white/[.06] px-4 py-2 no-scrollbar sm:px-5"
+          aria-label="Focus by body system"
+        >
+          <button
+            type="button"
+            onClick={() => onFocusSystemChange(null)}
+            className={`shrink-0 rounded-full border px-2.5 py-1 text-[9px] font-black uppercase tracking-[.1em] transition ${
+              focusSystemId === null
+                ? 'border-emerald-300/40 bg-emerald-300/10 text-emerald-100'
+                : 'border-white/10 text-white/40 hover:text-white/65'
+            }`}
+          >
+            All systems
+          </button>
+          {BODY_CLINICAL_SYSTEM_FOCUS_LIST.map((system) => (
+            <button
+              key={system.id}
+              type="button"
+              onClick={() => onFocusSystemChange(system.id)}
+              className={`shrink-0 rounded-full border px-2.5 py-1 text-[9px] font-black uppercase tracking-[.1em] transition ${
+                focusSystemId === system.id
+                  ? 'border-emerald-300/40 bg-emerald-300/10 text-emerald-100'
+                  : 'border-white/10 text-white/40 hover:text-white/65'
+              }`}
+            >
+              {system.label}
+            </button>
+          ))}
+        </div>
+      ) : null}
 
       <div className="grid gap-4 p-4 sm:p-5 lg:grid-cols-[220px_minmax(0,1fr)_220px] lg:items-stretch">
         <aside className="order-2 grid grid-cols-2 gap-2 sm:grid-cols-3 lg:order-1 lg:grid-cols-1 lg:content-start" aria-label="Latest clinical vitals">
@@ -68,7 +114,7 @@ export function ClinicalBodyTwin({
               <path d="M138 86 L160 180 Q162 196 152 198 Q142 198 140 184 L130 120" />
             </g>
 
-            {projection.markers.map((marker) => {
+            {markers.map((marker) => {
               const style = STATUS[marker.status]
               const x = (marker.x / 100) * 200
               const y = (marker.y / 100) * 440
@@ -119,22 +165,22 @@ export function ClinicalBodyTwin({
           <div className="grid grid-cols-3 gap-2 lg:grid-cols-1">
             <div className="border-b border-white/10 pb-2">
               <div className="text-[9px] font-black uppercase tracking-[.12em] text-white/35">Findings</div>
-              <div className="mt-1 text-lg font-black">{projection.findingCounts.abnormal}</div>
+              <div className="mt-1 text-lg font-black">{(focus ?? projection).findingCounts.abnormal}</div>
             </div>
             <div className="border-b border-white/10 pb-2">
               <div className="text-[9px] font-black uppercase tracking-[.12em] text-white/35">Recorded normal</div>
-              <div className="mt-1 text-lg font-black">{projection.findingCounts.normal}</div>
+              <div className="mt-1 text-lg font-black">{(focus ?? projection).findingCounts.normal}</div>
             </div>
             <div className="border-b border-white/10 pb-2">
               <div className="text-[9px] font-black uppercase tracking-[.12em] text-white/35">Not examined</div>
-              <div className="mt-1 text-lg font-black">{projection.findingCounts.unchecked}</div>
+              <div className="mt-1 text-lg font-black">{(focus ?? projection).findingCounts.unchecked}</div>
             </div>
           </div>
 
           <details className="border-t border-white/10 pt-3 text-[11px] text-white/55">
             <summary className="cursor-pointer font-black text-white/70">Context boundary</summary>
             <p className="mt-2 leading-relaxed">
-              Patient findings and vitals come from this AI-EMR context. The body silhouette is reference-only and is not patient-specific geometry. This bridge does not generate diagnosis, prognosis, treatment, lesion location or autonomous clinical action.
+              Patient findings and vitals come from this AI-EMR context. Vitals remain patient-wide and are not re-labeled as organ-specific measurements. The body silhouette is reference-only and is not patient-specific geometry. This bridge does not generate diagnosis, prognosis, treatment, lesion location or autonomous clinical action.
             </p>
           </details>
 

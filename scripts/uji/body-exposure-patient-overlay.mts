@@ -20,7 +20,7 @@ assert.match(overlay, /focusBodyClinicalProjection/, 'overlay must focus recorde
 assert.match(overlay, /Vitals remain patient-wide/, 'system focus must not relabel generic vitals as organ-specific measurements')
 assert.match(overlay, /state\.records\[activePatient\.id\]/, 'overlay must read the selected patient from the existing app store')
 assert.match(overlay, /geometry remains reference-only/, 'reference anatomy boundary must remain visible')
-assert.match(overlay, /do not morph atlas geometry into patient-specific anatomy/, 'patient-specific geometry claim must stay blocked')
+assert.match(overlay, /does not morph atlas geometry into patient-specific anatomy/, 'patient-specific geometry claim must stay blocked')
 assert.doesNotMatch(overlay, /localStorage|sessionStorage/, 'overlay must not create a second persisted patient-state authority')
 
 
