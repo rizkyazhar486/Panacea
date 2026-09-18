@@ -27,9 +27,10 @@ const LAYER_ACCENT: Record<PharmacologyMechanismLayer, string> = {
 
 interface PharmacologyMechanismPanelProps {
   selectedAtlasSystemId: BodySystemId
+  selectedSourceStructureName?: string | null
 }
 
-export function PharmacologyMechanismPanel({ selectedAtlasSystemId }: PharmacologyMechanismPanelProps) {
+export function PharmacologyMechanismPanel({ selectedAtlasSystemId, selectedSourceStructureName }: PharmacologyMechanismPanelProps) {
   const visibleMechanisms = useMemo(
     () => listBodyPharmacologyForAtlasSystem(selectedAtlasSystemId),
     [selectedAtlasSystemId],
@@ -45,6 +46,8 @@ export function PharmacologyMechanismPanel({ selectedAtlasSystemId }: Pharmacolo
 
   return (
     <section
+      data-selected-source-structure={selectedSourceStructureName ?? undefined}
+      data-structure-specific-mechanism="not-inferred"
       className="relative overflow-hidden rounded-[28px] border border-white/[.08] bg-black/55 p-3 shadow-[0_24px_90px_rgba(0,0,0,.26)] backdrop-blur-2xl sm:p-4 lg:p-5"
       aria-labelledby="body-pharmacology-title"
     >

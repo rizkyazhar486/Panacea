@@ -17,14 +17,19 @@ const FIDELITY_LABEL = {
 
 interface AtlasPhysiologyBridgePanelProps {
   selectedAtlasSystemId?: BodySystemId
+  selectedSourceStructureName?: string | null
   onSystemChange?: (systemId: BodySystemId) => void
 }
 
-export default function AtlasPhysiologyBridgePanel({ selectedAtlasSystemId, onSystemChange }: AtlasPhysiologyBridgePanelProps) {
+export default function AtlasPhysiologyBridgePanel({ selectedAtlasSystemId, selectedSourceStructureName, onSystemChange }: AtlasPhysiologyBridgePanelProps) {
   const [internalSystemId, setInternalSystemId] = useState<BodySystemId>('cardiovascular')
   const activeAtlasSystemId = selectedAtlasSystemId ?? internalSystemId
   const sourceSystem = BODY_SYSTEM_SOURCE_WAVE.find((system) => system.id === activeAtlasSystemId) ?? BODY_SYSTEM_SOURCE_WAVE[0]
   const bridge = getBodySystemPhysiologyBridge(sourceSystem.id)
+  const selectedSourceTarget = selectedSourceStructureName
+    ? sourceSystem.targets.find((target) => target.names.includes(selectedSourceStructureName))
+    : undefined
+  const visibleSourceTargets = selectedSourceTarget ? [selectedSourceTarget] : sourceSystem.targets
   const physiologySystems = bridge.physiologySystemIds.map((id) => getWholeBodySystem(id))
   const loops = useMemo(
     () => WHOLE_BODY_COUPLING_LOOPS.filter((loop) => loop.path.some((id) => bridge.physiologySystemIds.includes(id))),
@@ -37,7 +42,7 @@ export default function AtlasPhysiologyBridgePanel({ selectedAtlasSystemId, onSy
   }
 
   return (
-    <section data-atlas-physiology-bridge="v1" data-selected-atlas-system={activeAtlasSystemId} className="overflow-hidden rounded-[26px] border border-white/[.09] bg-[linear-gradient(135deg,rgba(34,211,238,.045),rgba(255,255,255,.018)_40%,rgba(168,85,247,.05))] p-3 sm:p-4">
+    <section data-atlas-physiology-bridge="v1" data-selected-atlas-system={activeAtlasSystemId} data-selected-source-structure={selectedSourceStructureName ?? undefined} data-source-structure-match={selectedSourceStructureName ? (selectedSourceTarget ? 'exact' : 'unresolved') : 'none'} className="overflow-hidden rounded-[26px] border border-white/[.09] bg-[linear-gradient(135deg,rgba(34,211,238,.045),rgba(255,255,255,.018)_40%,rgba(168,85,247,.05))] p-3 sm:p-4">
       <div className="flex flex-col gap-3 lg:flex-row lg:items-end lg:justify-between">
         <div className="max-w-3xl">
           <div className="text-[9px] font-black uppercase tracking-[.2em] text-violet-200/80">Anatomy ↔ physiology bridge</div>
@@ -76,7 +81,7 @@ export default function AtlasPhysiologyBridgePanel({ selectedAtlasSystemId, onSy
           </div>
 
           <div className="mt-3 flex flex-wrap gap-1.5">
-            {sourceSystem.targets.map((target) => (
+            {visibleSourceTargets.map((target) => (
               <span key={target.id} className="rounded-full border border-white/[.07] bg-white/[.025] px-2 py-1 text-[8px] font-bold text-white/55">{target.label}</span>
             ))}
           </div>

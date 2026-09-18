@@ -190,13 +190,14 @@ export default function UnifiedHumanSimulationProjector({
           <div className="space-y-3">
             <AtlasPhysiologyBridgePanel
               selectedAtlasSystemId={selectedSystemId}
+              selectedSourceStructureName={selectedStructureName}
               onSystemChange={(systemId) => onSystemChange(systemId)}
             />
             <BodySystemDeepDiveWorkspace selectedAtlasSystemId={selectedSystemId} />
           </div>
         )
       case 'pathophysiology':
-        return <PathophysiologyNetworkPanel selectedAtlasSystemId={selectedSystemId} />
+        return <PathophysiologyNetworkPanel selectedAtlasSystemId={selectedSystemId} selectedSourceStructureName={selectedStructureName} />
       case 'imaging':
         return <PencitraanVolumetrikPanel />
       case 'endoscopy':
@@ -210,7 +211,7 @@ export default function UnifiedHumanSimulationProjector({
       case 'surgery':
         return <SurgicalLab />
       case 'pharmacology':
-        return <PharmacologyMechanismPanel selectedAtlasSystemId={selectedSystemId} />
+        return <PharmacologyMechanismPanel selectedAtlasSystemId={selectedSystemId} selectedSourceStructureName={selectedStructureName} />
       case 'anatomy':
       default:
         return (

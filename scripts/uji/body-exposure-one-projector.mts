@@ -4,6 +4,9 @@ import { readFileSync } from 'node:fs'
 const os = readFileSync('src/pages/BodyExposureOS.tsx', 'utf8')
 const projector = readFileSync('src/pages/bodyhub/UnifiedHumanSimulationProjector.tsx', 'utf8')
 const atlas = readFileSync('src/components/BodyAllSystems3D.tsx', 'utf8')
+const physiology = readFileSync('src/pages/bodyhub/AtlasPhysiologyBridgePanel.tsx', 'utf8')
+const pathophysiology = readFileSync('src/pages/bodyhub/PathophysiologyNetworkPanel.tsx', 'utf8')
+const pharmacology = readFileSync('src/pages/bodyhub/PharmacologyMechanismPanel.tsx', 'utf8')
 
 assert.match(os, /projectorDomain: 'localization'/, 'Body Exposure top-level navigation must expose lesion localization in the same projector')
 assert.match(os, /projectorDomain: 'imaging'/, 'Body Exposure top-level navigation must expose imaging in the same projector')
@@ -19,6 +22,11 @@ assert.match(projector, /selectedStructureName/, 'exact rendered structure conte
 assert.match(projector, /penjelasanTertulis/, 'selected source anatomy must expose an in-projector teaching explanation')
 assert.match(projector, /Explain structure/, 'teaching context must remain progressively disclosed inside the same projector')
 assert.match(projector, /onStructureSelect=\{setSelectedStructureName\}/, '3D structure selection must feed projector state')
+assert.match(projector, /selectedSourceStructureName=\{selectedStructureName\}/, 'selected source structure must propagate into downstream projection adapters')
+assert.match(physiology, /selectedSourceStructureName\?: string \| null/, 'physiology adapter must accept exact selected source structure context')
+assert.match(physiology, /visibleSourceTargets/, 'physiology must narrow its source-atlas context to the exact containing target when available')
+assert.match(pathophysiology, /data-structure-specific-mechanism="not-inferred"/, 'pathophysiology must preserve structure context without inventing a structure-to-disease mapping')
+assert.match(pharmacology, /data-structure-specific-mechanism="not-inferred"/, 'pharmacology must preserve structure context without inventing a structure-to-drug mapping')
 
 assert.match(atlas, /THREE\.Raycaster/, 'whole-body atlas must support direct mesh picking')
 assert.match(atlas, /onStructureSelect\?: \(sourceName: string\) => void/, 'mesh selection must be exposed to the parent projector')
