@@ -9,6 +9,8 @@ const funWidgetsCss = readFileSync('src/styles/home-fun-widgets.css', 'utf8')
 const heroCss = readFileSync('src/styles/home-intent-motion.css', 'utf8')
 const glass = readFileSync('src/styles/home-liquid-control-layer.css', 'utf8')
 const shell = readFileSync('src/components/Shell.tsx', 'utf8')
+const widgetRegistry = readFileSync('src/lib/homeWidgets.ts', 'utf8')
+const canonicalWidgetCount = [...widgetRegistry.matchAll(/\\{\\s*id:\\s*'[^']+'/g)].length
 
 // Zero-step: Home itself shows health context. One-step: primary destinations
 // and universal actions are directly exposed without an intermediate menu.
