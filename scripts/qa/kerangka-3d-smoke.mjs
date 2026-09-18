@@ -8,6 +8,7 @@
 // satu kelompok menyalakan kelompok ITU — bukan tetangganya.
 import { readFileSync } from 'node:fs'
 import { chromium } from '@playwright/test'
+import { pilihAktivitasBodyExposure } from './body-exposure-activity-helper.mjs'
 
 const url = process.env.KERANGKA3D_QA_URL || 'http://127.0.0.1:4173/#/body-explorer'
 // Kosong berarti "biar Playwright yang memilih". Jalur tetap ke sebuah versi
@@ -62,7 +63,7 @@ let gagal = null
 let ringkas = ''
 try {
   await page.goto(url, { waitUntil: 'networkidle' })
-  await page.getByRole('button', { name: /^Skeleton\b/ }).first().click()
+  await pilihAktivitasBodyExposure(page, "Skeleton")
 
   const canvas = page.locator('canvas[data-kerangka3d="true"]')
   await canvas.waitFor({ state: 'attached' })

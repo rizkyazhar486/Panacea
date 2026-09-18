@@ -11,6 +11,7 @@
 // Karena itu yang diperiksa bukan "kanvas ada", melainkan: delapan belas
 // segmen terikat ke mesh, dan pengisian rata-ratanya NAIK dari waktu ke waktu.
 import { chromium } from '@playwright/test'
+import { pilihAktivitasBodyExposure } from './body-exposure-activity-helper.mjs'
 
 const url = process.env.VENT3D_QA_URL || 'http://127.0.0.1:4173/#/body-explorer'
 
@@ -42,7 +43,7 @@ page.on('pageerror', (e) => pageErrors.push(e.message))
 let gagal = null
 try {
   await page.goto(url, { waitUntil: 'networkidle' })
-  await page.getByRole('button', { name: 'Segmental ventilation' }).first().click()
+  await pilihAktivitasBodyExposure(page, "Segmental ventilation")
 
   const canvas = page.locator('canvas[data-ventilasi3d="true"]')
   await canvas.waitFor({ state: 'attached' })

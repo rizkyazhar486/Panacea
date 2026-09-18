@@ -56,6 +56,9 @@ function canonical(feature: Fitur, domain: Domain) {
     }
     return body[feature.to] ?? feature.to
   }
+  if (domain === 'clinical' && feature.to === '/body-explorer') {
+    return '/fitness-hub?view=body-exposure'
+  }
   return feature.to
 }
 
@@ -78,7 +81,11 @@ export function SuperPageCapabilityRail({ domain, initialLimit = 24 }: { domain:
     })
   }, [bucket, domain, query])
 
-  const visible = expanded ? items : items.slice(0, initialLimit)
+  // The full catalogue stays available, but a super-page should not read like
+  // a directory by default. Keep the first viewport intentionally small and
+  // reveal search/filter controls only when the user asks for more.
+  const previewLimit = Math.min(initialLimit, 6)
+  const visible = expanded ? items : items.slice(0, previewLimit)
 
   return (
     <section className="relative isolate overflow-hidden rounded-[30px] border border-white/[.08] bg-[#01040a]/92 p-4 text-white shadow-[0_24px_72px_rgba(0,0,0,.35)] backdrop-blur-2xl sm:p-5" aria-label={`${config.label} capabilities`}>
@@ -91,25 +98,37 @@ export function SuperPageCapabilityRail({ domain, initialLimit = 24 }: { domain:
           <h2 className="truncate text-lg font-black tracking-[-.025em]">{config.label}</h2>
         </div>
         <button type="button" onClick={() => setExpanded((value) => !value)} className="rounded-full border border-white/10 bg-white/[.04] px-3 py-1.5 text-[10px] font-black text-white/70 transition hover:border-cyan-200/30 hover:text-white" aria-expanded={expanded}>
-          {expanded ? 'Compact' : `${Math.min(initialLimit, items.length)} / ${items.length}`}
+          {expanded ? 'Compact' : `${Math.min(previewLimit, items.length)} / ${items.length} · All`}
         </button>
       </div>
 
-      <div className="relative mt-4 flex gap-2 overflow-x-auto pb-1 no-scrollbar" aria-label="Capability filters">
-        {(['all', 'core', 'data', 'action'] as const).map((item) => (
-          <button key={item} type="button" onClick={() => setBucket(item)} aria-pressed={bucket === item} className={`min-h-[38px] shrink-0 rounded-full border px-3 text-[9px] font-black uppercase tracking-[.12em] transition ${bucket === item ? 'border-cyan-200/45 bg-cyan-200 text-black' : 'border-white/[.08] bg-white/[.025] text-white/50 hover:text-white'}`}>
-            {item}
-          </button>
-        ))}
-      </div>
+      <AnimatePresence initial={false}>
+        {expanded && (
+          <motion.div
+            initial={{ opacity: 0, height: 0, y: -6 }}
+            animate={{ opacity: 1, height: 'auto', y: 0 }}
+            exit={{ opacity: 0, height: 0, y: -6 }}
+            transition={{ duration: .2, ease: [0.22, 1, 0.36, 1] }}
+            className="overflow-hidden"
+          >
+            <div className="relative mt-4 flex gap-2 overflow-x-auto pb-1 no-scrollbar" aria-label="Capability filters">
+              {(['all', 'core', 'data', 'action'] as const).map((item) => (
+                <button key={item} type="button" onClick={() => setBucket(item)} aria-pressed={bucket === item} className={`min-h-[38px] shrink-0 rounded-full border px-3 text-[9px] font-black uppercase tracking-[.12em] transition ${bucket === item ? 'border-cyan-200/45 bg-cyan-200 text-black' : 'border-white/[.08] bg-white/[.025] text-white/50 hover:text-white'}`}>
+                  {item}
+                </button>
+              ))}
+            </div>
 
-      <label className="relative mt-3 flex min-h-[44px] items-center gap-2 rounded-[16px] border border-white/[.08] bg-black/30 px-3 focus-within:border-cyan-200/30">
-        <span className="text-cyan-100/50" aria-hidden>⌕</span>
-        <input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search capability…" className="min-w-0 flex-1 bg-transparent text-xs font-semibold text-white outline-none placeholder:text-white/28" />
-        {query && <button type="button" onClick={() => setQuery('')} className="grid h-7 w-7 place-items-center rounded-full text-white/45 hover:bg-white/[.06] hover:text-white" aria-label="Clear search">×</button>}
-      </label>
+            <label className="relative mt-3 flex min-h-[44px] items-center gap-2 rounded-[16px] border border-white/[.08] bg-black/30 px-3 focus-within:border-cyan-200/30">
+              <span className="text-cyan-100/50" aria-hidden>⌕</span>
+              <input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search capability…" className="min-w-0 flex-1 bg-transparent text-xs font-semibold text-white outline-none placeholder:text-white/28" />
+              {query && <button type="button" onClick={() => setQuery('')} className="grid h-7 w-7 place-items-center rounded-full text-white/45 hover:bg-white/[.06] hover:text-white" aria-label="Clear search">×</button>}
+            </label>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
-      <motion.div layout className={`relative mt-4 grid gap-2.5 ${expanded ? 'grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5' : 'grid-flow-col auto-cols-[168px] overflow-x-auto pb-1 no-scrollbar sm:auto-cols-[184px]'}`}>
+      <motion.div layout className={`relative mt-3 grid gap-2.5 ${expanded ? 'max-h-[46vh] grid-cols-2 overflow-y-auto pr-0.5 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5' : 'grid-flow-col auto-cols-[168px] overflow-x-auto pb-1 no-scrollbar sm:auto-cols-[184px]'}`}>
         <AnimatePresence initial={false} mode="popLayout">
           {visible.map((feature, index) => (
             <motion.div key={`${feature.to}|${feature.nama}`} layout initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, scale: .97 }} transition={{ duration: .18, delay: Math.min(index, 8) * .015 }}>

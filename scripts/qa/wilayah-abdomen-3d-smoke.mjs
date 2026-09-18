@@ -5,6 +5,7 @@
 // melainkan bahwa id yang disorot SAMA dengan id yang dipilih, dan bahwa
 // menunjuk model benar-benar memilih sesuatu.
 import { chromium } from '@playwright/test'
+import { pilihAktivitasBodyExposure } from './body-exposure-activity-helper.mjs'
 
 const url = process.env.WILAYAH3D_QA_URL || 'http://127.0.0.1:4173/#/body-explorer'
 
@@ -33,7 +34,7 @@ page.on('pageerror', (e) => pageErrors.push(e.message))
 let gagal = null
 try {
   await page.goto(url, { waitUntil: 'networkidle' })
-  await page.getByRole('button', { name: 'Abdominal regions' }).first().click()
+  await pilihAktivitasBodyExposure(page, "Abdominal regions")
 
   const canvas = page.locator('canvas[data-wilayah3d="true"]')
   await canvas.waitFor({ state: 'attached' })

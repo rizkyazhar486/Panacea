@@ -7,6 +7,7 @@
 // sebelum dipilih, dan memilih sebuah struktur menyorot ID STRUKTUR ITU --
 // termasuk satu struktur dari MASING-MASING berkas sumber.
 import { chromium } from '@playwright/test'
+import { pilihAktivitasBodyExposure } from './body-exposure-activity-helper.mjs'
 
 const url = process.env.KELENJAR3D_QA_URL || 'http://127.0.0.1:4173/#/body-explorer'
 const DIHARAPKAN = 13
@@ -40,7 +41,7 @@ page.on('pageerror', (e) => pageErrors.push(e.message))
 let gagal = null
 try {
   await page.goto(url, { waitUntil: 'networkidle' })
-  await page.getByRole('button', { name: 'Glands & urinary tract' }).first().click()
+  await pilihAktivitasBodyExposure(page, "Glands & urinary tract")
 
   const canvas = page.locator('canvas[data-kelenjar3d="true"]')
   await canvas.waitFor({ state: 'attached' })

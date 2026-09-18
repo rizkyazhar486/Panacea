@@ -6,6 +6,7 @@
 // berapa stasiun benar-benar terikat ke geometri, bahwa tidak ada yang menyala
 // sebelum dipilih, dan bahwa id yang disorot SAMA dengan id yang dipilih.
 import { chromium } from '@playwright/test'
+import { pilihAktivitasBodyExposure } from './body-exposure-activity-helper.mjs'
 
 const url = process.env.LIMFE3D_QA_URL || 'http://127.0.0.1:4173/#/body-explorer'
 const CHROME = process.env.LIMFE3D_QA_CHROME || undefined
@@ -45,7 +46,7 @@ let gagal = null
 let catatan = ''
 try {
   await page.goto(url, { waitUntil: 'networkidle' })
-  await page.getByRole('button', { name: 'Lymphoid system', exact: true }).first().click()
+  await pilihAktivitasBodyExposure(page, "Lymphoid system")
 
   const canvas = page.locator('canvas[data-limfe3d="true"]')
   await canvas.waitFor({ state: 'attached' })

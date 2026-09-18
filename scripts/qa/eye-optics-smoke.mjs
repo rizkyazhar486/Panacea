@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict'
 import { expect } from '@playwright/test'
 import { eyeScreenshotOptions } from './eye-screenshot-options.mjs'
+import { pilihAktivitasBodyExposure } from './body-exposure-activity-helper.mjs'
 
 // Reuse the authenticated mobile Body smoke browser and production build.
 // This exercises the shipped UI, not a stand-alone component fixture.
@@ -52,8 +53,7 @@ async function runEyeOptics(page) {
     await expect(dismissReminder).toHaveCount(0)
   }
 
-  const specialty = page.getByRole('button', { name: 'Specialty labs', exact: true })
-  await step('open-specialty', () => specialty.click())
+  await step('open-specialty', () => pilihAktivitasBodyExposure(page, 'Specialty labs'))
 
   const neuro = page.getByRole('button', { name: 'Neuro & senses', exact: true })
   await step('wait-neuro', () => neuro.waitFor({ state: 'visible', timeout: 20_000 }))

@@ -7,6 +7,7 @@
 // memilih satu arteri menyalakan arteri ITU, dan bahwa jumlah pembuluh hilir
 // yang ikut menyala cocok dengan pohon di dalam berkasnya.
 import { chromium } from '@playwright/test'
+import { pilihAktivitasBodyExposure } from './body-exposure-activity-helper.mjs'
 
 const url = process.env.ARTERI3D_QA_URL || 'http://127.0.0.1:4173/#/body-explorer'
 const jalurPeramban = process.env.ARTERI3D_QA_CHROME || undefined
@@ -45,7 +46,7 @@ const pilih = async (id) => {
 let gagal = null
 try {
   await page.goto(url, { waitUntil: 'networkidle' })
-  await page.getByRole('button', { name: 'Arterial territories', exact: true }).first().click()
+  await pilihAktivitasBodyExposure(page, "Arterial territories")
 
   const kanvas = page.locator('canvas[data-arteri3d="true"]')
   await kanvas.waitFor({ state: 'attached' })
