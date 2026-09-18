@@ -1,9 +1,7 @@
 import { lazy, useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { HalamanTab, type TabDef } from '../components/HalamanTab'
-import { NADA, type Angka } from '../components/PanelAngka'
-import { MetalStatPanel } from '../components/MetalStatPanel'
-import { FightHero } from '../components/FightHero'
+import { TrainingLabBento } from '../components/TrainingLabBento'
 import { KartuAngkaKlinis } from '../components/AngkaKlinis'
 import { RaporRamalanKesegaran } from '../components/RaporRamalan'
 import { auditKebugaran, auditKelelahan, auditKesegaran, bacaanJujur, type BahanAudit } from '../lib/auditKebugaran'
@@ -47,57 +45,57 @@ const Rekomposisi = lazy(() => import('./Rekomposisi').then((m) => ({ default: m
 
 const TABS: TabDef[] = [
   { id: 'pelatih', label: 'Today', emoji: '🎯', komponen: WorkoutHistory,
-    ringkas: 'Decision first: next session, recovery context, recent history and targets' },
+    ringkas: 'Next session · recovery · targets' },
   { id: 'organizer', label: 'Organizer', emoji: '🗂️', komponen: OrganizerLatihan,
-    ringkas: 'Weekly calendar for push, pull, legs and abs, scheduled around the runs already recorded' },
+    ringkas: 'Weekly training calendar' },
   { id: 'asupan-pelatih', label: 'Coach intake', emoji: '📝', komponen: PelatihAsupan,
-    ringkas: 'Collects age, height, weight, goal, equipment, injuries and restrictions first, and refuses to print a plan until they are answered' },
+    ringkas: 'Profile · goals · limits' },
   { id: 'progres', label: 'Progress', emoji: '📈', komponen: PelatihProgres,
-    ringkas: 'Week against week on weight, waist, strength, energy, sleep, sessions and protein — charted, with changes too small to call named as such' },
+    ringkas: 'Week-to-week change' },
   { id: 'gps', label: 'GPS', emoji: '📍', komponen: GpsTracker,
-    ringkas: 'Live device GPS with fix quality control, auto-pause, moving pace, kilometre splits and privacy-first sharing' },
+    ringkas: 'Live pace · splits · route' },
   { id: 'athlete-science', label: 'Athlete Science', emoji: '🧬', komponen: AthleteScience,
-    ringkas: 'VO₂, HRV, load and recovery with assumptions, confidence and physiological context' },
+    ringkas: 'VO₂ · HRV · load' },
   { id: 'analisis', label: 'Analysis', emoji: '📈', komponen: AnalisisPro,
-    ringkas: 'Fitness/fatigue trends, relative effort, training log and pace analysis' },
+    ringkas: 'Fitness · effort · pace' },
   { id: 'fisiologi', label: 'Physiology', emoji: '🫀', komponen: TrainingPhysiology,
-    ringkas: 'Training load, recovery, thresholds, readiness and the physiology behind them' },
+    ringkas: 'Load · threshold · readiness' },
   { id: 'endurance', label: 'Endurance', emoji: '⛽', komponen: EnduranceTools,
-    ringkas: 'Fuelling, sweat rate, FTP, power guidance and acclimatisation' },
+    ringkas: 'Fuel · sweat · power' },
   { id: 'sesi', label: 'Exercises', emoji: '🏋️', komponen: Workout,
-    ringkas: 'Exercise library by muscle group, with technique and clinical context' },
+    ringkas: 'Movement library · technique' },
   { id: 'beban', label: 'Weights', emoji: '🔩', komponen: LatihanBeban,
-    ringkas: 'Barbell and dumbbell work — loading, progression and technique' },
+    ringkas: 'Load · progression · form' },
   { id: 'kalistenik', label: 'Calisthenics', emoji: '🤸', komponen: Kalistenik,
-    ringkas: 'Bodyweight progressions from fundamentals upward' },
+    ringkas: 'Bodyweight progressions' },
   { id: 'crossfit', label: 'CrossFit', emoji: '⏱️', komponen: CrossFit,
-    ringkas: 'Benchmark workouts, scaling and metabolic demand' },
+    ringkas: 'Benchmarks · scaling' },
   { id: 'peregangan', label: 'Mobility', emoji: '🧘', komponen: Peregangan,
-    ringkas: 'Mobility and stretching — what changes performance and what does not' },
+    ringkas: 'Mobility · flexibility' },
   { id: 'lari', label: 'Running', emoji: '👟', komponen: TeknikLari,
-    ringkas: 'Technique, cadence, pacing and common movement errors' },
+    ringkas: 'Technique · cadence · pace' },
   { id: 'multisport', label: 'Multi-sport', emoji: '🚴', komponen: MultiSport,
-    ringkas: 'Running, cycling and swimming together' },
+    ringkas: 'Run · ride · swim' },
   { id: 'dasar', label: 'Base', emoji: '🧱', komponen: BaseTraining,
-    ringkas: 'Aerobic-base development without presenting one intensity distribution as universal' },
+    ringkas: 'Aerobic base' },
   { id: 'rencana', label: 'Plan', emoji: '🗓️', komponen: TrainingPlan,
-    ringkas: 'Periodised plans, load progression and block structure' },
+    ringkas: 'Periodization · progression' },
   { id: 'tes', label: 'Testing', emoji: '📋', komponen: FitnessTest,
-    ringkas: 'Field tests with measurement limits and useful norms' },
+    ringkas: 'Field tests · norms' },
   { id: 'lab', label: 'Performance', emoji: '🔬', komponen: PerformanceLab,
-    ringkas: 'VO₂, thresholds, power, pace and performance trends' },
+    ringkas: 'VO₂ · power · thresholds' },
   { id: 'sains', label: 'Evidence', emoji: '📚', komponen: SportsScience,
-    ringkas: 'Evidence quality, training methods and uncertainty' },
+    ringkas: 'Methods · evidence · uncertainty' },
   { id: 'sportlab', label: 'Sports lab', emoji: '🧪', komponen: SportsLab,
-    ringkas: 'Sport-specific analysis and benchmarks' },
+    ringkas: 'Sport benchmarks' },
   { id: 'alat', label: 'Equipment', emoji: '🏟️', komponen: GymEquipment,
-    ringkas: 'Gym equipment — load, setup and movement mechanics' },
+    ringkas: 'Setup · load · mechanics' },
   { id: 'gerak', label: 'Movement', emoji: '🦵', komponen: MovementToolkit,
-    ringkas: 'Movement quality, asymmetry and corrective work' },
+    ringkas: 'Gait · asymmetry · control' },
   { id: 'bentuk', label: 'Shaping', emoji: '📐', komponen: ShapeForming,
-    ringkas: 'Body-composition goals and realistic training effects' },
+    ringkas: 'Body composition' },
   { id: 'rekomposisi', label: 'Recomp', emoji: '⚖️', komponen: Rekomposisi,
-    ringkas: 'Fat loss and muscle gain with explicit assumptions' },
+    ringkas: 'Fat loss · muscle gain' },
 ]
 
 type Sex = 'M' | 'F'
@@ -165,20 +163,22 @@ export function PusatLatihan() {
     return { workouts, k, status, missing, hrMaxSource }
   }, [dataRevision])
 
-  const angka = useMemo<Angka[]>(() => {
+  const bento = useMemo(() => {
     const { workouts, k, status } = snapshot
-    if (!workouts.length || !k || !status) return []
-    const deret = Array.from({ length: 14 }, (_, i) => {
-      const x = statusSingkat(workouts, k, Date.now() - (13 - i) * 86400_000)
-      return x ? x.kesegaran : 0
-    })
-    return [
-      { label: 'Freshness', nilai: String(Math.round(status.kesegaran)),
-        nada: status.kesegaran >= -10 ? NADA.baik : NADA.perhatian, deret },
-      { label: 'Fitness trend', nilai: String(Math.round(status.kebugaran)), nada: NADA.biru },
-      { label: 'Fatigue load', nilai: String(Math.round(status.kelelahan)), nada: NADA.jantung },
-      { label: 'Sessions', nilai: String(workouts.length), satuan: 'recorded', nada: NADA.netral },
-    ]
+    const freshnessSeries = status && k
+      ? Array.from({ length: 14 }, (_, i) => {
+          const point = statusSingkat(workouts, k, Date.now() - (13 - i) * 86400_000)
+          return point ? point.kesegaran : 0
+        })
+      : []
+
+    return {
+      freshness: status ? status.kesegaran : null,
+      fitness: status ? status.kebugaran : null,
+      fatigue: status ? status.kelelahan : null,
+      sessions: workouts.length,
+      freshnessSeries,
+    }
   }, [snapshot])
 
   const audit = useMemo(() => {
@@ -213,53 +213,49 @@ export function PusatLatihan() {
   return (
     <HalamanTab
       judul="Training Lab"
-      subjudul="Decision → evidence → physiology → workout"
+      subjudul="Train · measure · adapt"
       ikon={<IconRun />}
       theme="metal"
       ringkasan={
         <div className="space-y-3">
-          <FightHero tag="Human Performance" title="Training Lab" motto="Measure. Interpret. Adapt." />
-          <MetalStatPanel angka={angka} />
+          <TrainingLabBento snapshot={bento} />
           {snapshot.workouts.length > 0 && !snapshot.k && snapshot.missing.length > 0 && (
-            <p className="rounded-2xl border border-amber-400/25 bg-amber-500/10 p-3 text-[12px] leading-relaxed text-amber-800 dark:text-amber-200">
-              Training-load model paused rather than inventing profile values. Add {snapshot.missing.join(', ')}; your recorded sessions remain available below.
-            </p>
+            <details className="training-model-disclosure">
+              <summary>
+                <span>Model paused · {snapshot.missing.length} inputs missing</span>
+                <span aria-hidden>+</span>
+              </summary>
+              <div className="training-model-detail text-[11px] leading-relaxed text-neutral-500">
+                Add {snapshot.missing.join(', ')}. Recorded sessions stay available.
+              </div>
+            </details>
           )}
-          <div className="grid gap-2 sm:grid-cols-3">
-            <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-3">
-              <div className="text-[10px] font-black uppercase tracking-[0.16em] text-neutral-500">1 · Decision</div>
-              <p className="mt-1 text-xs leading-relaxed text-neutral-500">What session makes sense today?</p>
-            </div>
-            <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-3">
-              <div className="text-[10px] font-black uppercase tracking-[0.16em] text-neutral-500">2 · Evidence</div>
-              <p className="mt-1 text-xs leading-relaxed text-neutral-500">What was measured, estimated, or inferred?</p>
-            </div>
-            <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-3">
-              <div className="text-[10px] font-black uppercase tracking-[0.16em] text-neutral-500">3 · Mechanism</div>
-              <p className="mt-1 text-xs leading-relaxed text-neutral-500">Which physiological system explains the result?</p>
-            </div>
-          </div>
         </div>
       }
       tabs={TABS}
       kaki={
         <div className="space-y-3">
           {audit && (
-            <section className="space-y-3">
-              <h2 className="text-[13px] font-black text-ink dark:text-white">Model audit & uncertainty</h2>
-              <p className="rounded-2xl border border-white/10 bg-white/[0.03] p-3 text-[12px] leading-relaxed text-neutral-500">
-                Fitness, fatigue and freshness are model outputs, not direct biological measurements. HRmax input: {audit.k.hrMax} bpm ({snapshot.hrMaxSource}); resting HR: {audit.k.hrRest} bpm. Interpret trends within the same athlete and verify them against symptoms, sleep, session RPE and actual performance.
-              </p>
-              {bacaanJujur(audit.bahan) && (
-                <p className="rounded-2xl border-l-4 border-amber-400 bg-amber-50/70 p-3 text-[12px] leading-relaxed text-amber-900 dark:bg-amber-500/10 dark:text-amber-200">
-                  {bacaanJujur(audit.bahan)}
+            <details className="training-audit-disclosure">
+              <summary>
+                <span>Model audit · uncertainty</span>
+                <span aria-hidden>+</span>
+              </summary>
+              <div className="training-audit-detail space-y-3">
+                <p className="text-[11px] leading-relaxed text-neutral-500">
+                  Fitness, fatigue and freshness are model outputs, not direct biological measurements. HRmax input: {audit.k.hrMax} bpm ({snapshot.hrMaxSource}); resting HR: {audit.k.hrRest} bpm. Interpret trends within the same athlete and verify them against symptoms, sleep, session RPE and actual performance.
                 </p>
-              )}
-              <KartuAngkaKlinis a={auditKesegaran(audit.bahan)} />
-              <KartuAngkaKlinis a={auditKebugaran(audit.bahan)} />
-              <KartuAngkaKlinis a={auditKelelahan(audit.bahan)} />
-              <RaporRamalanKesegaran riwayat={audit.riwayat} k={audit.k} />
-            </section>
+                {bacaanJujur(audit.bahan) && (
+                  <p className="rounded-2xl border-l-4 border-amber-400 bg-amber-50/70 p-3 text-[11px] leading-relaxed text-amber-900 dark:bg-amber-500/10 dark:text-amber-200">
+                    {bacaanJujur(audit.bahan)}
+                  </p>
+                )}
+                <KartuAngkaKlinis a={auditKesegaran(audit.bahan)} />
+                <KartuAngkaKlinis a={auditKebugaran(audit.bahan)} />
+                <KartuAngkaKlinis a={auditKelelahan(audit.bahan)} />
+                <RaporRamalanKesegaran riwayat={audit.riwayat} k={audit.k} />
+              </div>
+            </details>
           )}
           <Link to="/fitness-hub"
             className="flex h-11 items-center justify-center rounded-2xl border border-dashed border-white/15 text-[12px] font-bold text-neutral-500 transition hover:border-white/30 hover:text-ink">
