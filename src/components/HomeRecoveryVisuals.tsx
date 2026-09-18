@@ -56,7 +56,7 @@ export function HomeRecoveryVisuals() {
       </div>
 
       <div className="pmd-recovery-grid">
-        {MODES.map((mode, index) => (
+        {MODES.map((mode) => (
           <Link
             key={mode.id}
             to={`/tubuh?t=termal&mode=${mode.id}`}
@@ -64,11 +64,6 @@ export function HomeRecoveryVisuals() {
             data-mode={mode.id}
             aria-label={`Open ${mode.label} recovery`}
           >
-            <span className="pmd-recovery-meter" aria-hidden>
-              {Array.from({ length: 7 }).map((_, i) => (
-                <i key={i} style={{ height: `${24 + ((i + index) % 5) * 11}%` }} />
-              ))}
-            </span>
             <span className="pmd-recovery-glyph"><RecoveryGlyph mode={mode.id} /></span>
             <span className="pmd-recovery-label">{mode.label}</span>
             <span className="pmd-recovery-cue">{mode.cue}</span>
