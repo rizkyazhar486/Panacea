@@ -68,12 +68,12 @@
 .pmd-recovery-tile {
   position: relative;
   min-width: 0;
-  min-height: 92px;
+  min-height: 78px;
   overflow: hidden;
   display: grid;
-  grid-template-rows: 1fr auto auto;
+  grid-template-rows: auto auto auto;
   align-items: end;
-  padding: 9px 9px 8px;
+  padding: 9px;
   border: 1px solid rgba(255,255,255,.07);
   border-radius: 17px;
   background:
@@ -98,20 +98,6 @@
   border-color: color-mix(in srgb, var(--mode-color) 44%, rgba(255,255,255,.08));
 }
 
-.pmd-recovery-meter {
-  position: absolute;
-  inset: auto 8px 8px auto;
-  height: 26px;
-  display: flex;
-  align-items: flex-end;
-  gap: 2px;
-  opacity: .35;
-}
-.pmd-recovery-meter i {
-  width: 2px;
-  border-radius: 999px;
-  background: var(--mode-color);
-}
 
 .pmd-recovery-glyph {
   width: 31px;
@@ -162,7 +148,7 @@
   .pmd-recovery-grid::-webkit-scrollbar { display: none; }
   .pmd-recovery-tile {
     flex: 0 0 96px;
-    min-height: 88px;
+    min-height: 76px;
     scroll-snap-align: start;
   }
 }
