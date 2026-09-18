@@ -54,6 +54,9 @@ assert.match(glass, /@supports not \(\(-webkit-backdrop-filter:/,
 assert.match(glass, /body:has\(\.panacea-liquid-home\) button\[aria-label="Buka menu navigasi"\]/,
   'duplicate global navigation is visible on Home again')
 
+assert.doesNotMatch(shell, /className="orb absolute/,
+  'global Shell reintroduced decorative gradient orbs that carry no state or information')
+
 assert.doesNotMatch(shell, /aria-label="Log Out"/,
   'global header duplicates logout even though the mobile drawer already owns that secondary action')
 assert.match(shell, /onClick=\{doLogout\}[\s\S]{0,240}?Log Out/,
