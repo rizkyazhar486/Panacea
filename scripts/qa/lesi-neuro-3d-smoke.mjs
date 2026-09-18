@@ -5,6 +5,7 @@
 // tidak dikirim akan terlihat persis seperti berhasil, dan akan menunjukkan
 // tempat lesi yang keliru pada model anatomi.
 import { chromium } from '@playwright/test'
+import { pilihAktivitasBodyExposure } from './body-exposure-activity-helper.mjs'
 
 const url = process.env.LESI3D_QA_URL || 'http://127.0.0.1:4173/#/body-explorer'
 
@@ -33,7 +34,7 @@ page.on('pageerror', (e) => pageErrors.push(e.message))
 let gagal = null
 try {
   await page.goto(url, { waitUntil: 'networkidle' })
-  await page.getByRole('button', { name: 'Localise a lesion' }).first().click()
+  await pilihAktivitasBodyExposure(page, "Localise a lesion")
 
   const canvas = page.locator('canvas[data-lesi3d="true"]')
   await canvas.waitFor({ state: 'attached' })
