@@ -3,12 +3,13 @@ import { useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { PanaceaZoneNav } from '../components/PanaceaZoneNav'
 import { SuperPageCapabilityRail } from '../components/SuperPageCapabilityRail'
+import { BodyExposurePortal } from '../components/BodyExposurePortal'
 
 export const GROUPS = [
   {
     name: 'Clinical',
     tools: [
-      { to: '/body-explorer', name: 'Body Explorer', kw: 'anatomy physiology imaging atlas' },
+      { to: '/fitness-hub?view=body-exposure', name: 'Body Explorer', kw: 'anatomy physiology imaging atlas body exposure' },
       { to: '/frontier-health', name: 'Discovery & Innovation', kw: 'research discovery invention simulation' },
       { to: '/genome-lab', name: 'Genome Databank', kw: 'gene genome dna variant genetics' },
       { to: '/rujukan?t=obat', name: 'Drugs', kw: 'drug medication pharmacology mechanism safety' },
@@ -21,10 +22,7 @@ export const GROUPS = [
   },
 ]
 
-type BodyLayer = 'Anatomy' | 'Physiology' | 'Imaging'
 type Calculator = 'bmi' | 'map'
-
-const layerGlyph: Record<BodyLayer, string> = { Anatomy: '◉', Physiology: '⌁', Imaging: '⌗' }
 
 function Card({ children, className = '' }: { children: React.ReactNode; className?: string }) {
   return (
@@ -39,7 +37,6 @@ function Open({ to }: { to: string }) {
 }
 
 export function ClinicalHub() {
-  const [layer, setLayer] = useState<BodyLayer>('Anatomy')
   const [calculator, setCalculator] = useState<Calculator>('bmi')
   const [question, setQuestion] = useState('')
   const [lookup, setLookup] = useState('')
@@ -76,7 +73,7 @@ export function ClinicalHub() {
         <div className="pointer-events-none absolute -left-24 -top-24 h-80 w-80 rounded-full bg-cyan-400/[.08] blur-3xl" aria-hidden />
         <div className="pointer-events-none absolute -right-24 top-20 h-80 w-80 rounded-full bg-violet-500/[.09] blur-3xl" aria-hidden />
 
-        <header className="relative mb-6 flex items-end justify-between gap-4">
+        <header className="relative mb-4 flex items-end justify-between gap-4">
           <div className="min-w-0">
             <div className="truncate text-[9px] font-black uppercase tracking-[.2em] text-cyan-100/45">Super page 02</div>
             <h1 className="truncate text-2xl font-black tracking-[-.04em] sm:text-3xl">Clinical</h1>
@@ -85,19 +82,9 @@ export function ClinicalHub() {
         </header>
 
         <div className="relative grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-          <Card className="xl:col-span-2">
-            <div className="flex items-center justify-between"><strong className="truncate text-sm">Body Explorer</strong><Open to="/body-explorer" /></div>
-            <div className="mt-4 grid grid-cols-3 gap-2">
-              {(['Anatomy', 'Physiology', 'Imaging'] as const).map((item) => (
-                <button key={item} type="button" onClick={() => setLayer(item)} className={`min-h-[40px] truncate rounded-[13px] border px-2 text-[9px] font-black transition ${layer === item ? 'border-cyan-200/40 bg-cyan-200 text-black' : 'border-white/[.07] bg-black/20 text-white/48 hover:text-white'}`}>
-                  {item}
-                </button>
-              ))}
-            </div>
-            <motion.div key={layer} initial={{ opacity: 0, scale: .96 }} animate={{ opacity: 1, scale: 1 }} className="mt-4 grid h-32 place-items-center rounded-[20px] border border-white/[.06] bg-[radial-gradient(circle_at_center,rgba(34,211,238,.15),transparent_62%)] text-5xl text-cyan-100/80" aria-label={layer}>
-              {layerGlyph[layer]}
-            </motion.div>
-          </Card>
+          <div className="min-w-0 sm:col-span-2 xl:col-span-2">
+            <BodyExposurePortal context="clinical" />
+          </div>
 
           <Card className="xl:col-span-2">
             <div className="flex items-center justify-between"><strong className="truncate text-sm">Ask + Record</strong><Open to="/chatbot" /></div>
