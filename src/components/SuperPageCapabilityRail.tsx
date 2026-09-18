@@ -92,7 +92,7 @@ export function SuperPageCapabilityRail({ domain, initialLimit = 24 }: { domain:
   const visible = expanded ? items : items.slice(0, previewLimit)
 
   return (
-    <section className="relative isolate overflow-hidden rounded-[30px] border border-white/[.08] bg-[#01040a]/92 p-4 text-white shadow-[0_24px_72px_rgba(0,0,0,.35)] backdrop-blur-2xl sm:p-5" aria-label={`${config.label} capabilities`}>
+    <section className="relative isolate overflow-hidden rounded-[22px] border border-white/[.075] bg-[#01040a]/92 p-3 text-white shadow-[0_16px_48px_rgba(0,0,0,.28)] backdrop-blur-xl sm:p-4" aria-label={`${config.label} capabilities`}>
       <div className={`pointer-events-none absolute inset-x-10 top-0 h-px bg-gradient-to-r ${config.accent} opacity-70`} aria-hidden />
       <div className="pointer-events-none absolute -right-24 -top-24 h-56 w-56 rounded-full bg-cyan-400/[.07] blur-3xl" aria-hidden />
 
