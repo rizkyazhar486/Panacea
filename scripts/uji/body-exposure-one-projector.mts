@@ -16,6 +16,8 @@ assert.match(projector, /LokalisasiLesiPanel/, 'localization reasoning must rend
 assert.match(projector, /PencitraanVolumetrikPanel/, 'volumetric imaging must render inside the unified projector')
 assert.match(projector, /Body → system → organ → tissue → cell → organelle → molecule → genome/, 'one projector must expose the full biological scale ladder')
 assert.match(projector, /selectedStructureName/, 'exact rendered structure context must persist across projections')
+assert.match(projector, /penjelasanTertulis/, 'selected source anatomy must expose an in-projector teaching explanation')
+assert.match(projector, /Explain structure/, 'teaching context must remain progressively disclosed inside the same projector')
 assert.match(projector, /onStructureSelect=\{setSelectedStructureName\}/, '3D structure selection must feed projector state')
 
 assert.match(atlas, /THREE\.Raycaster/, 'whole-body atlas must support direct mesh picking')
