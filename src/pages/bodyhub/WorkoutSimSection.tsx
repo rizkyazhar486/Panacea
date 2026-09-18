@@ -198,7 +198,7 @@ function FotoLatihan({ nama }: { nama: string }) {
   return (
     <div className="grid grid-cols-2 gap-2">
       {img.slice(0, 4).map((item) => (
-        <figure key={item.url} className="overflow-hidden rounded-xl bg-neutral-50 dark:bg-white/5">
+        <figure key={item.url} className="overflow-hidden border-t border-neutral-200 pt-2 dark:border-white/10">
           <img src={item.url} alt={item.title} loading="lazy" className="h-28 w-full bg-white object-contain" />
           <figcaption className="p-1.5">
             <a href={item.sourcePage} target="_blank" rel="noreferrer" className="block truncate text-[9.5px] text-neutral-400 underline">{item.artist} · {item.license}</a>
@@ -235,7 +235,7 @@ function KineticChainDiagram({ chain }: { chain: KineticChain }) {
   const spacing = chain.segments.length > 1 ? (right - left) / (chain.segments.length - 1) : 0
 
   return (
-    <div className="overflow-hidden rounded-2xl border border-neutral-200 bg-neutral-950 p-3 dark:border-white/10">
+    <div className="overflow-hidden border-y border-neutral-200 bg-neutral-950 py-3 dark:border-white/10">
       <svg viewBox="0 0 640 170" role="img" aria-label={`${chain.name} kinetic-chain diagram`} className="h-auto w-full">
         <defs><marker id="chain-arrow" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 Z" fill="#00BF63" /></marker></defs>
         <text x="24" y="24" fill="#00BF63" fontSize="12" fontWeight="800">{chain.name.toUpperCase()}</text>
@@ -431,7 +431,7 @@ export function WorkoutSimSection({ onHighlight, onTempo }: Props) {
               <p className="mt-2 leading-relaxed"><span className="font-black text-ink dark:text-white">Mechanics: </span>{chain.cue}</p>
               <p className="mt-2 leading-relaxed"><span className="font-black text-ink dark:text-white">Observe: </span>{chain.watch}</p>
             </details>
-            {chain.exerciseId && <button type="button" onClick={() => openChainExercise(chain.exerciseId!)} className="mt-2 rounded-full bg-brand px-4 py-2 text-xs font-bold text-white">Open {chain.name} in Movement Lab →</button>}
+            {chain.exerciseId && <button type="button" onClick={() => openChainExercise(chain.exerciseId!)} className="mt-2 min-h-10 border-b border-brand px-1 text-xs font-bold text-brand">Open {chain.name} in Movement Lab →</button>}
           </div>
         </div>
       )}
@@ -439,9 +439,9 @@ export function WorkoutSimSection({ onHighlight, onTempo }: Props) {
       {mode === 'exercise' && (
         <div className="space-y-3">
           <p className="truncate text-[10px] font-bold text-neutral-400">Movement selection · shared 3D highlight · synchronized contraction phase</p>
-          <div className="flex gap-1.5 overflow-x-auto pb-1 no-scrollbar">
+          <div className="flex gap-5 overflow-x-auto border-b border-neutral-200 pb-0 no-scrollbar dark:border-white/10">
             {LATIHAN.map((exercise) => (
-              <button key={exercise.id} type="button" aria-pressed={aktif?.id === exercise.id} onClick={() => { setAktif(aktif?.id === exercise.id ? null : exercise); setFase('konsentrik'); setJalan(false) }} className={`min-h-[40px] shrink-0 rounded-full border px-3 text-xs font-bold transition ${aktif?.id === exercise.id ? 'border-brand bg-brand text-white' : 'border-neutral-200 text-neutral-600 hover:border-brand/40 hover:text-brand dark:border-white/10 dark:text-neutral-300'}`}>{exercise.nama}</button>
+              <button key={exercise.id} type="button" aria-pressed={aktif?.id === exercise.id} onClick={() => { setAktif(aktif?.id === exercise.id ? null : exercise); setFase('konsentrik'); setJalan(false) }} className={`min-h-[42px] shrink-0 border-0 border-b-2 bg-transparent px-0 text-xs font-bold transition ${aktif?.id === exercise.id ? 'border-brand text-ink dark:text-white' : 'border-transparent text-neutral-500 dark:text-neutral-400'}`}>{exercise.nama}</button>
             ))}
           </div>
 
