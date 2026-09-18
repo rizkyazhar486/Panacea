@@ -87,13 +87,32 @@ main :where([class*='grid'], [class*='flex']) > * {
    descendants to overflow:visible. Those nodes can be real scroll containers
    (for example Body Explorer's horizontal mobile rails). Only prose/context
    nodes have their visual-first overflow clamp released. */
+/* Membungkus teks kembali boleh berlaku luas: `white-space` dan `text-overflow`
+   tidak mengubah CARA sebuah kotak menata anaknya, jadi span dan div aman. */
 main :where(dialog,[role='dialog'],[data-pmd-unclamped='true'],details[open],pre,code,textarea,[contenteditable='true']) :where(h1,h2,h3,h4,h5,h6,p,li,dd,figcaption,span,div),
 #pmd-context-dialog :where(h1,h2,h3,h4,h5,h6,p,span,div,button) {
   white-space: normal !important;
   text-overflow: clip !important;
-  /* Pemotongan baris juga harus dilepas di sini; kalau tidak, permukaan detail
-     dan dialog tetap terpotong pada tiga baris meskipun sudah ikut daftar
-     pengecualian. */
+}
+
+/* `display` TIDAK boleh, dan daftarnya berhenti pada prosa.
+   Versi pertama aturan ini menyertakan `span,div` bersama prosa, dan itu
+   menghancurkan setiap tata letak di dalam permukaan yang memilih keluar:
+   `display: revert` mengembalikan sebuah div ke `block` bawaan peramban,
+   sehingga `display:flex` dan `display:grid` milik kelas Tailwind hilang.
+   Terukur di 390x844 pada /body-explorer: baris 40 tab yang seharusnya satu
+   jalur bergulir mendatar (`flex`, `nowrap`, `overflow-x:auto`) menjadi
+   `display:block` dengan anak `inline-block`, membungkus menjadi 18 baris
+   setinggi 800 piksel — hampir seluruh layar 844 piksel habis oleh deretan
+   tab saja.
+   Yang perlu dilepas hanyalah pemotongan baris, dan pemotongan itu hanya
+   pernah dipasang pada p/li/dd/figcaption/.pmd-vf-copy. Tidak ada span atau
+   div yang pernah menerimanya, jadi me-revert display mereka tidak pernah
+   memperbaiki apa pun — ia hanya merusak.
+   Komentar tepat di atas sudah memperingatkan bentuk kesalahan yang sama untuk
+   `overflow`, dan menyebut rel mendatar Body Explorer sebagai contohnya. */
+main :where(dialog,[role='dialog'],[data-pmd-unclamped='true'],details[open],pre,code,textarea,[contenteditable='true']) :where(p,li,dd,figcaption,.pmd-vf-copy),
+#pmd-context-dialog :where(p,.pmd-vf-copy) {
   display: revert !important;
   -webkit-line-clamp: none !important;
   line-clamp: none !important;
