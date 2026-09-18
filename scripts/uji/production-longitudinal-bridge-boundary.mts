@@ -2,11 +2,11 @@ import assert from 'node:assert/strict'
 import { readFileSync } from 'node:fs'
 
 const files = [
-  '../src/lib/healthStoreLongitudinalBridge.ts',
-  '../src/lib/productionHealthStoreSelector.ts',
-  '../src/lib/productionHealthLongitudinalSync.ts',
-  '../src/lib/productionAppStateLongitudinalSync.ts',
-  '../src/lib/productionPersonalLongitudinalSync.ts',
+  '../../src/lib/healthStoreLongitudinalBridge.ts',
+  '../../src/lib/productionHealthStoreSelector.ts',
+  '../../src/lib/productionHealthLongitudinalSync.ts',
+  '../../src/lib/productionAppStateLongitudinalSync.ts',
+  '../../src/lib/productionPersonalLongitudinalSync.ts',
 ]
 
 const source = files.map((relative) =>
