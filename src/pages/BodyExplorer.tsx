@@ -1,4 +1,4 @@
-import { useMemo, useRef, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { Card, SectionTitle } from '../components/ui'
 import { IconActivity, IconSearch, IconStethoscope } from '../components/icons'
 import { api, type OntologyTerm, type DrugLabelInfo, type AnatomyImage, type ImageKind } from '../lib/api'
@@ -14,7 +14,8 @@ import { ORGAN_FOCUS } from '../lib/organFocus'
 import { penjelasanTertulis } from '../lib/explainFallback'
 import { IconChevronRight } from '../components/icons'
 import { lazy, Suspense } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useSearchParams } from 'react-router-dom'
+import { BodyExposureActivityNavigator } from '../components/BodyExposureActivityNavigator'
 
 // Bagian berat dimuat saat dibuka saja — pengguna yang cuma memutar model 3D
 // tidak perlu ikut mengunduh tabel fisiologi dan pencarian obat.
@@ -114,7 +115,6 @@ function Chip({
 // melainkan satu tubuh yang ditanyai dari enam sudut.
 type PanelTab = 'hemodinamik' | 'nefron' | 'asam-basa' | 'farmakodinamik' | 'dialisis' | 'gas-alveolar' | 'indera' | 'termoregulasi' | 'difusi' | 'wilayah-abdomen' | 'kerangka' | 'arteri' | 'limfe' | 'kelenjar-saluran' | 'ventilasi' | 'ventilasi-membran' | 'lokalisasi' | 'tuas-sendi' | 'layers' | 'muscles' | 'workout-sim' | 'biomekanika' | 'organs' | 'physiology' | 'simulator' | 'cardio' | 'spesialisasi' | 'molekul' | 'genomik' | 'genom-alfa' | 'vertikal-molekuler' | 'pencitraan-volumetrik' | 'sel' | 'bedah' | 'cari' | 'presisi' | 'mesin' | 'drugs' | 'diseases' | 'reference'
 
-import { kelompokUntuk, kelompokTerpakai, urutkanMenurutKelompok } from '../lib/bodyExplorerTabGroups'
 
 const PANEL_TABS: Array<{ key: PanelTab; label: string }> = [
   { key: 'layers', label: 'Layers' },
@@ -158,6 +158,10 @@ const PANEL_TABS: Array<{ key: PanelTab; label: string }> = [
   { key: 'diseases', label: 'Diseases' },
   { key: 'reference', label: 'Study' },
 ]
+
+function isPanelTab(value: string | null): value is PanelTab {
+  return Boolean(value && PANEL_TABS.some((tab) => tab.key === value))
+}
 
 const IMAGE_KINDS: Array<{ key: ImageKind; label: string }> = [
   { key: 'anatomy', label: 'Anatomy' },
@@ -301,35 +305,16 @@ export function BodyExplorer() {
   // NYATA yang ditampilkan di bawah kalau ada struktur yang sedang dipilih —
   // memilih "CT" lalu masih melihat foto anatomi berwarna akan membingungkan.
   const [renderMode, setRenderMode] = useState<RenderMode>('anatomy')
-  const [panelTab, setPanelTab] = useState<PanelTab>('layers')
-  // Baris tab digulirkan, bukan disaring. Rujukan ini dipakai untuk melompat
-  // ke kelompok; lihat komentar di bawah untuk alasannya.
-  const barisTab = useRef<HTMLDivElement | null>(null)
-  const kelompokAktif = kelompokUntuk(panelTab)
-  // Urutan tab mengikuti urutan kelompok supaya tiap kelompok menjadi satu
-  // ketetanggaan yang bersambung -- melompat ke sana harus mendaratkan
-  // seluruh kelompoknya, bukan satu tab yang tetangganya acak.
-  const tabTerurut = useMemo(() => urutkanMenurutKelompok(PANEL_TABS, (t: { key: PanelTab }) => t.key), [])
-  const lompatKeKelompok = (k: string) => {
-    const pertama = tabTerurut.findIndex((t) => kelompokUntuk(t.key) === k)
-    const baris = barisTab.current
-    if (pertama < 0 || !baris) return
-    const anak = baris.children[pertama] as HTMLElement | undefined
-    if (!anak) return
-    // getBoundingClientRect, bukan offsetLeft. offsetLeft diukur terhadap
-    // offsetParent -- yang belum tentu wadah gulir ini -- sehingga selisihnya
-    // benar hanya kalau kebetulan keduanya sama. Diukur begitu, tiga dari lima
-    // lompatan tidak bergerak sama sekali. Bentuk di bawah ini tidak bergantung
-    // pada posisi ancestor mana pun.
-    const geser = anak.getBoundingClientRect().left - baris.getBoundingClientRect().left
-    // Hormati prefers-reduced-motion. Guliran mendatar yang panjang adalah
-    // persis gerakan yang dimatikan orang karena membuat pusing -- dan sebagai
-    // akibat yang menyenangkan, perilakunya menjadi bisa diperiksa dengan
-    // pasti, bukan diperlombakan dengan animasi.
-    const pelan = typeof window !== 'undefined'
-      && window.matchMedia?.('(prefers-reduced-motion: reduce)').matches
-    baris.scrollTo({ left: baris.scrollLeft + geser, behavior: pelan ? 'auto' : 'smooth' })
-  }
+  const [searchParams] = useSearchParams()
+  const requestedPanel = searchParams.get('panel')
+  const [panelTab, setPanelTab] = useState<PanelTab>(() => isPanelTab(requestedPanel) ? requestedPanel : 'layers')
+
+  // Activity links from Your Body and Clinical deep-link into the same Body
+  // Exposure workspace. No duplicate/dummy viewer is created: only the active
+  // tool changes while the canonical anatomical body remains the anchor.
+  useEffect(() => {
+    if (isPanelTab(requestedPanel)) setPanelTab(requestedPanel)
+  }, [requestedPanel])
   // Hasil pencarian atlas bisa menunjuk ke ruang lain. Kedua nilai ini membawa
   // pilihannya menyeberang tab, supaya menekan hasil pencarian benar-benar
   // membuka apa yang ditunjuk dan bukan sekadar berpindah tab kosong.
@@ -840,47 +825,11 @@ export function BodyExplorer() {
               tetap terjangkau; kelompok hanya menggulirkan barisnya ke
               ketetanggaan yang dicari, yang memang masalah manusianya --
               menggulir buta melewati dua puluh nama yang tidak dicari. */}
-          <div role="group" aria-label="Panel groups"
-            className="-mx-1 mb-1 flex gap-1 overflow-x-auto">
-            {kelompokTerpakai(PANEL_TABS.map((t) => t.key)).map((k) => (
-              <button
-                key={k}
-                type="button"
-                onClick={() => lompatKeKelompok(k)}
-                // Nama aksesibel yang BERBEDA dari label tab. Keping "Physiology"
-                // dan tab "Physiology" sebelumnya bertabrakan, sehingga pencarian
-                // tombol menurut nama menjadi mendua -- persis cara sebuah gerbang
-                // QA patah tanpa ada yang rusak. Namanya juga lebih jujur: keping
-                // ini melompat, bukan memilih.
-                aria-label={`Jump to ${k}`}
-                aria-pressed={kelompokAktif === k}
-                className={`min-h-[30px] shrink-0 rounded-full px-3 text-[11px] font-black uppercase tracking-[0.08em] transition ${
-                  kelompokAktif === k
-                    ? 'bg-[#00BF63] text-white'
-                    : 'bg-neutral-100 text-neutral-500 dark:bg-white/5'
-                }`}
-              >
-                {k}
-              </button>
-            ))}
-          </div>
-
-          <div ref={barisTab} className="-mx-1 flex gap-1 overflow-x-auto rounded-xl bg-neutral-100 p-1 dark:bg-white/5">
-            {tabTerurut.map((t) => (
-              <button
-                key={t.key}
-                onClick={() => setPanelTab(t.key)}
-                aria-pressed={panelTab === t.key}
-                className={`min-h-[34px] shrink-0 rounded-lg px-3 text-xs font-bold transition ${
-                  panelTab === t.key
-                    ? 'bg-white text-ink shadow-sm dark:bg-white/15 dark:text-white'
-                    : 'text-neutral-500'
-                }`}
-              >
-                {t.label}
-              </button>
-            ))}
-          </div>
+          <BodyExposureActivityNavigator
+            context="explore"
+            activePanel={panelTab}
+            onSelectPanel={(key) => setPanelTab(key as PanelTab)}
+          />
 
           <FeatureErrorBoundary
             key={panelTab}
