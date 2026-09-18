@@ -345,7 +345,8 @@ export function FabNavigasi({ onCari }: { tujuan: TujuanFab[]; onTambah?: () => 
           <div
             role="menu"
             aria-label="Panacea Assistive Touch commands"
-            className="kaca absolute rounded-[28px] bg-white/66 p-2 shadow-xl backdrop-blur-2xl backdrop-saturate-150 dark:bg-neutral-900/62"
+            data-panacea-assistive-orbit="true"
+            className="absolute rounded-[28px] border border-white/10 bg-neutral-950/78 p-2 shadow-xl backdrop-blur-2xl backdrop-saturate-150"
             style={{ width: 224, [keAtas ? 'bottom' : 'top']: prefs.size + 8, [keKiri ? 'right' : 'left']: 0 } as React.CSSProperties}
           >
             <div className="mb-1 flex items-center justify-between gap-2 px-2 py-1">
@@ -368,6 +369,7 @@ export function FabNavigasi({ onCari }: { tujuan: TujuanFab[]; onTambah?: () => 
                       key={`${pageIndex}-${action.id}`}
                       type="button"
                       role="menuitem"
+                      data-panacea-assistive-action={action.id}
                       onClick={() => action.id === 'customize' ? (setBuka(false), setAturBuka(true)) : jalankan(action.id)}
                       className={`flex h-[58px] w-[58px] flex-col items-center justify-center gap-1 rounded-2xl px-1 transition active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/40 ${TATA[index]} ${action.primary ? 'bg-brand text-white' : 'text-ink hover:bg-black/5 dark:text-white dark:hover:bg-white/10'}`}
                     >
