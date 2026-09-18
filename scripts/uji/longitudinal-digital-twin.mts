@@ -1,3 +1,4 @@
+// Stacked validation: this fixture intentionally exercises the adapter against the replay layer before production retargeting.
 import assert from 'node:assert/strict'
 import { buildLongitudinalTwinSnapshot, twinSignalByMetric } from '../../src/lib/longitudinalDigitalTwin.ts'
 import {
