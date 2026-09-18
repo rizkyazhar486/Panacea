@@ -1,26 +1,28 @@
 import { lazy, Suspense, useEffect, useLayoutEffect, useRef, useState } from 'react'
 import type { BodySystemId } from '../lib/bodySystemSourceWave'
+import type { SimulationDomain } from './bodyhub/UnifiedHumanSimulationProjector'
 import { BodyExplorer } from './BodyExplorer'
 import './bodyExposureOS.css'
 
 const UnifiedHumanSimulationProjector = lazy(() => import('./bodyhub/UnifiedHumanSimulationProjector'))
 
-type ExposureMode = 'atlas' | 'physiology' | 'imaging' | 'surgery' | 'molecular' | 'clinical'
+type ExposureMode = 'atlas' | 'localization' | 'physiology' | 'imaging' | 'surgery' | 'molecular' | 'clinical'
 
 type Mode = {
   key: ExposureMode
   label: string
-  panel: string
+  projectorDomain: SimulationDomain
   description: string
 }
 
 const MODES: Mode[] = [
-  { key: 'atlas', label: 'Atlas', panel: 'Layers', description: 'Whole-body layers, structures, organs and surface-to-depth exploration.' },
-  { key: 'physiology', label: 'Physiology', panel: 'Physiology', description: 'Connect anatomy to organ function, motion and reference physiology.' },
-  { key: 'imaging', label: 'Imaging', panel: 'DICOM → 3D', description: 'Move between anatomy, radiology views and volumetric imaging tools.' },
-  { key: 'surgery', label: 'Surgery', panel: 'Surgical layers', description: 'Explore operative approaches as ordered tissue and anatomical layers.' },
-  { key: 'molecular', label: 'Micro → Gene', panel: 'Tissue → gene', description: 'Descend from organs into tissue, cells, molecular pathways and genes.' },
-  { key: 'clinical', label: 'Clinical', panel: 'Diseases', description: 'Relate structures to disease, drugs and clinically oriented learning.' },
+  { key: 'atlas', label: 'Atlas', projectorDomain: 'anatomy', description: 'Whole-body layers, exact source structures and surface-to-depth exploration.' },
+  { key: 'localization', label: 'Localize', projectorDomain: 'localization', description: 'Relate neurological findings to tract crossings, cranial nerve level and lesion side.' },
+  { key: 'physiology', label: 'Physiology', projectorDomain: 'physiology', description: 'Connect anatomy to organ function, motion and reference physiology.' },
+  { key: 'imaging', label: 'Imaging', projectorDomain: 'imaging', description: 'Move between anatomy, CT windows, DICOM context and volumetric reconstruction.' },
+  { key: 'surgery', label: 'Surgery', projectorDomain: 'surgery', description: 'Explore operative approaches as ordered tissue and anatomical layers.' },
+  { key: 'molecular', label: 'Micro → Gene', projectorDomain: 'cell', description: 'Descend from organs into tissue, cells, organelles, molecular pathways and genome.' },
+  { key: 'clinical', label: 'Clinical', projectorDomain: 'pathophysiology', description: 'Relate the selected body context to disease mechanisms and clinically oriented learning.' },
 ]
 
 const LIQUID_ACTIONS_ROOT_CLASS = 'pmd-liquid-actions-v45'
@@ -28,7 +30,6 @@ const BODY_EXPOSURE_ROOT_CLASS = 'pmd-body-exposure-active'
 
 export function BodyExposureOS() {
   const rootRef = useRef<HTMLElement | null>(null)
-  const explorerRef = useRef<HTMLDivElement | null>(null)
   const systemsRef = useRef<HTMLDivElement | null>(null)
   const [activeMode, setActiveMode] = useState<ExposureMode>('atlas')
   const [immersive, setImmersive] = useState(false)
@@ -69,21 +70,19 @@ export function BodyExposureOS() {
 
   function openPanel(mode: Mode) {
     setActiveMode(mode.key)
-    const buttons = Array.from(explorerRef.current?.querySelectorAll<HTMLButtonElement>('button') ?? [])
-    const target = buttons.find((button) => {
-      const label = button.textContent?.trim()
-      const aria = button.getAttribute('aria-label') ?? ''
-      return label === mode.panel && !aria.startsWith('Jump to ')
-    })
+    systemsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+  }
 
-    if (target) {
-      target.click()
-      const reduceMotion = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches
-      requestAnimationFrame(() => target.scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth', block: 'center', inline: 'center' }))
-      return
-    }
-
-    explorerRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+  function syncModeFromProjector(domain: SimulationDomain) {
+    const next: ExposureMode =
+      domain === 'localization' ? 'localization'
+      : domain === 'physiology' || domain === 'biomechanics' ? 'physiology'
+      : domain === 'imaging' ? 'imaging'
+      : domain === 'surgery' ? 'surgery'
+      : domain === 'cell' || domain === 'genome' ? 'molecular'
+      : domain === 'pathophysiology' || domain === 'pharmacology' ? 'clinical'
+      : 'atlas'
+    setActiveMode(next)
   }
 
   function openSystemAtlas() {
@@ -98,14 +97,6 @@ export function BodyExposureOS() {
     } catch {
       // Fullscreen is progressive enhancement. Body Exposure remains fully usable when a browser blocks it.
     }
-  }
-
-  function captureExplorerSelection(event: React.MouseEvent<HTMLDivElement>) {
-    const button = (event.target as HTMLElement).closest('button')
-    if (!button) return
-    const label = button.textContent?.trim()
-    const matched = MODES.find((mode) => mode.panel === label)
-    if (matched) setActiveMode(matched.key)
   }
 
   const current = MODES.find((mode) => mode.key === activeMode) ?? MODES[0]
@@ -215,18 +206,24 @@ export function BodyExposureOS() {
           <UnifiedHumanSimulationProjector
             selectedSystemId={selectedBodySystemId}
             onSystemChange={setSelectedBodySystemId}
+            requestedDomain={current.projectorDomain}
+            onDomainChange={syncModeFromProjector}
           />
         </Suspense>
       </div>
 
-      <div
-        id="body-exposure-core"
-        ref={explorerRef}
-        onClickCapture={captureExplorerSelection}
-        className="body-exposure-os__core relative z-[1] mt-3 rounded-[30px] border border-white/[.08] bg-black/45 p-2 shadow-[0_24px_80px_rgba(0,0,0,.34)] backdrop-blur-xl sm:p-3"
-      >
-        <BodyExplorer />
-      </div>
+      <details className="body-exposure-os__labs relative z-[1] mt-3 overflow-hidden rounded-[28px] border border-white/[.08] bg-black/35">
+        <summary className="flex min-h-[54px] cursor-pointer list-none items-center justify-between gap-3 px-4 text-xs font-black text-white/65 transition hover:text-white">
+          <span>Deep reference labs</span>
+          <span className="text-[9px] font-bold uppercase tracking-[.14em] text-white/30">all existing tools preserved · open on demand</span>
+        </summary>
+        <div
+          id="body-exposure-core"
+          className="body-exposure-os__core border-t border-white/[.08] p-2 sm:p-3"
+        >
+          <BodyExplorer />
+        </div>
+      </details>
     </section>
   )
 }
