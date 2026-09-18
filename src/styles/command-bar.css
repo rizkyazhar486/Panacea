@@ -57,8 +57,17 @@
    occupying a permanent bottom dock. It disappears with the header on downward
    scroll and returns with the same header on upward scroll. */
 .panacea-command-primary-links {
-  flex: 1 1 auto;
-  justify-content: center;
+  order: 3;
+  flex: 0 0 100%;
+  justify-content: flex-start;
+  overflow-x: auto;
+  padding-top: 4px;
+  scrollbar-width: none;
+  overscroll-behavior-inline: contain;
+}
+
+.panacea-command-primary-links::-webkit-scrollbar {
+  display: none;
 }
 
 .panacea-command-primary-link {
@@ -94,5 +103,25 @@
 @media (prefers-reduced-motion: reduce) {
   .panacea-command-primary-link {
     transition: none;
+  }
+}
+
+
+.panacea-command-emergency {
+  color: rgb(248 113 113);
+}
+
+.panacea-command-emergency:hover,
+.panacea-command-emergency:focus-visible {
+  background: rgba(248,113,113,.08);
+}
+
+@media (min-width: 1024px) {
+  .panacea-command-primary-links {
+    order: 0;
+    flex: 1 1 auto;
+    justify-content: center;
+    overflow: visible;
+    padding-top: 0;
   }
 }
