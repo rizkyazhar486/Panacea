@@ -1,6 +1,7 @@
 import { lazy, Suspense, useEffect, useMemo, useState } from 'react'
 import { resolveBodySystemSourceWave, type BodySystemId } from '../../lib/bodySystemSourceWave'
 import { BODY_SEMANTIC_ZOOM_STOPS, getBodySemanticZoomStop, isMicroscopicBodyScale, type BodySemanticScale } from '../../lib/bodySemanticZoom'
+import { penjelasanTertulis } from '../../lib/explainFallback'
 
 const BodyAllSystems3D = lazy(() => import('../../components/BodyAllSystems3D'))
 const AtlasPhysiologyBridgePanel = lazy(() => import('./AtlasPhysiologyBridgePanel'))
@@ -146,6 +147,10 @@ export default function UnifiedHumanSimulationProjector({
   const systemLabel = readableSystem(selectedSystemId)
   const semanticStop = getBodySemanticZoomStop(semanticZoom.scale)
   const microscopic = isMicroscopicBodyScale(semanticZoom.scale)
+  const selectedStructureEducation = useMemo(() => {
+    if (!selectedStructureName) return ''
+    return penjelasanTertulis(selectedStructureName, selectedStructureName).replace(/\*\*/g, '')
+  }, [selectedStructureName])
 
   useEffect(() => {
     setSelectedStructureName(null)
@@ -322,6 +327,12 @@ export default function UnifiedHumanSimulationProjector({
             <div className="text-[8px] font-black uppercase tracking-[.16em] text-white/30">Structure context</div>
             <div className="mt-1 truncate text-[10px] font-black text-cyan-100/80">{selectedStructureName ?? 'No exact mesh selected'}</div>
             <div className="mt-1 text-[8px] leading-relaxed text-white/30">Tap the 3D atlas or choose a source node in Anatomy. Context persists across projections.</div>
+            {selectedStructureEducation && (
+              <details className="mt-2 border-t border-white/[.07] pt-2">
+                <summary className="cursor-pointer text-[8px] font-black uppercase tracking-[.12em] text-cyan-100/55">Explain structure</summary>
+                <p className="mt-1 line-clamp-6 whitespace-pre-line text-[9px] leading-relaxed text-white/42">{selectedStructureEducation}</p>
+              </details>
+            )}
           </div>
 
           <div className="mt-3 rounded-2xl border border-amber-300/12 bg-amber-300/[.045] p-2.5 text-[9px] leading-relaxed text-amber-100/65">
