@@ -38,6 +38,7 @@ interface UnifiedHumanSimulationProjectorProps {
   onSystemChange: (systemId: BodySystemId) => void
   requestedDomain?: SimulationDomain
   onDomainChange?: (domain: SimulationDomain) => void
+  compact?: boolean
 }
 
 type DomainDefinition = {
@@ -150,6 +151,7 @@ export default function UnifiedHumanSimulationProjector({
   onSystemChange,
   requestedDomain,
   onDomainChange,
+  compact = false,
 }: UnifiedHumanSimulationProjectorProps) {
   const [internalDomain, setInternalDomain] = useState<SimulationDomain>('anatomy')
   const [selectedStructureName, setSelectedStructureName] = useState<string | null>(null)
@@ -165,8 +167,7 @@ export default function UnifiedHumanSimulationProjector({
   const semanticStop = getBodySemanticZoomStop(semanticZoom.scale)
   const microscopic = isMicroscopicBodyScale(semanticZoom.scale)
   const isEndoscopy = domain === 'endoscopy'
-  const isStandaloneBodyIdentity = domain === 'personal-avatar'
-  const hideReferenceAtlasCanvas = isEndoscopy || isStandaloneBodyIdentity
+  const hideReferenceAtlasCanvas = isEndoscopy
   const selectedStructureEducation = useMemo(() => {
     if (!selectedStructureName) return ''
     return penjelasanTertulis(selectedStructureName, selectedStructureName).replace(/\*\*/g, '')
@@ -289,20 +290,22 @@ export default function UnifiedHumanSimulationProjector({
           </div>
         </div>
 
-        <div className="no-scrollbar mt-3 flex gap-1.5 overflow-x-auto pb-1" role="tablist" aria-label="Unified simulation domains">
-          {DOMAINS.map((item) => (
-            <button
-              key={item.id}
-              type="button"
-              role="tab"
-              aria-selected={domain === item.id}
-              onClick={() => selectDomain(item.id)}
-              className={tabClass(domain === item.id)}
-            >
-              {item.label}
-            </button>
-          ))}
-        </div>
+        {!compact && (
+          <div className="no-scrollbar mt-3 flex gap-1.5 overflow-x-auto pb-1" role="tablist" aria-label="Unified simulation domains">
+            {DOMAINS.map((item) => (
+              <button
+                key={item.id}
+                type="button"
+                role="tab"
+                aria-selected={domain === item.id}
+                onClick={() => selectDomain(item.id)}
+                className={tabClass(domain === item.id)}
+              >
+                {item.label}
+              </button>
+            ))}
+          </div>
+        )}
       </header>
 
       {!hideReferenceAtlasCanvas && (

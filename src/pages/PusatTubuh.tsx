@@ -5,6 +5,7 @@ import { KartuAngkaKlinis } from '../components/AngkaKlinis'
 import { auditTubuh } from '../lib/rujukanTubuh'
 import { IconActivity } from '../components/icons'
 import { getVitals } from '../lib/healthVitals'
+import { PersonalBodyUnifiedSurface } from '../components/PersonalBodyUnifiedSurface'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Sinyal Tubuh — lima halaman yang semuanya membaca deret dari jam tangan,
@@ -112,7 +113,9 @@ export function PusatTubuh() {
   }, [])
 
   return (
-    <HalamanTab
+    <div className="space-y-4">
+      <PersonalBodyUnifiedSurface compact defaultFocus="identity" shareable cameraCapture />
+      <HalamanTab
       judul="Body Signals"
       subjudul="Energy, heart, sleep, movement and clinical trackers on one page"
       ikon={<IconActivity />}
@@ -132,7 +135,8 @@ export function PusatTubuh() {
           </section>
         ) : undefined
       }
-    />
+      />
+    </div>
   )
 }
 
