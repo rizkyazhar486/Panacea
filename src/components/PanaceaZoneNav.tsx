@@ -1,6 +1,7 @@
 import { NavLink, useLocation } from 'react-router-dom'
 import { useStore } from '../lib/store'
 import { LogoMark } from './Logo'
+import '../styles/superpage-cohesion-v1.css'
 
 const ZONES = [
   { to: '/fitness-hub', label: 'Your Body', queryAware: false },
