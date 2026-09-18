@@ -11,6 +11,8 @@ const bentoBoard = readFileSync('src/components/HomeBentoWidgetBoard.tsx', 'utf8
 const widgetRegistry = readFileSync('src/lib/homeWidgets.ts', 'utf8')
 const glass = readFileSync('src/styles/home-liquid-control-layer.css', 'utf8')
 const shell = readFileSync('src/components/Shell.tsx', 'utf8')
+const commandBarCss = readFileSync('src/styles/command-bar.css', 'utf8')
+const commandBarLogic = readFileSync('src/lib/interaction/commandBar.ts', 'utf8')
 
 // Zero-step: Home itself shows health context. One-step: primary destinations
 // and universal actions are directly exposed without an intermediate menu.
@@ -19,24 +21,14 @@ const healthIndex = workspace.indexOf('<HomeHealthBrief />')
 const heroIndex = workspace.indexOf('<HomeVisualLanding />')
 assert.ok(healthIndex >= 0 && heroIndex >= 0 && healthIndex < heroIndex,
   'Home puts the promotional hero before the user\'s health state; useful content must win the first viewport')
-assert.match(workspace, /data-panacea-primary-nav/, 'Home lost its single persistent primary navigation layer')
-assert.match(workspace, /<HomeBentoWidgetBoard \/>/, 'Home lost the primary customizable bento widget board')
-assert.match(workspace, /panacea-legacy-widget-disclosure/, 'legacy dashboard must stay demoted behind progressive disclosure')
-const canonicalWidgetCount = [...widgetRegistry.matchAll(/\\{\\s*id:\\s*'[^']+'/g)].length
-assert.ok(canonicalWidgetCount >= 200, `customizable widget universe fell below 200: ${canonicalWidgetCount}`)
-assert.match(bentoBoard, /Customize · \{WIDGETS\.length\}/, 'bento board no longer exposes the full customization universe')
-assert.match(bentoBoard, /data-size=\{data\.size\}/, 'custom bento tiles lost mixed semantic sizes')
-assert.match(health, /className="panacea-health-bento"/, 'Home health state regressed from bento to a flat dashboard strip')
-for (const key of ['primary', 'sleep', 'heart', 'vo2', 'hrv', 'nutrition', 'training']) {
-  assert.match(health, new RegExp(`key: '${key}'`), `health bento lost ${key}`)
-}
-assert.match(healthCss, /grid-template-columns:\s*repeat\(12,\s*minmax\(0,\s*1fr\)\)/,
-  'desktop health bento lost its dense 12-column composition')
-assert.match(healthCss, /panacea-bento-tile\[data-span='wide'\]/,
-  'capability browser lost semantic wide bento tiles')
-for (const label of ['Home', 'Your Body', 'Clinical', 'For You']) {
-  assert.match(workspace, new RegExp(`<span>${label}<\\/span>`), `primary navigation lost ${label}`)
-}
+assert.doesNotMatch(workspace, /data-panacea-primary-nav|panacea-liquid-dock/,
+  'Home reintroduced a persistent local navigation bar')
+assert.match(shell, /data-panacea-command-bar=\{keadaanBilah\}/,
+  'global top command bar is missing from Shell')
+assert.match(commandBarCss, /data-panacea-command-bar='hidden'[\s\S]*translateY\(-100%\)/,
+  'top command bar no longer hides out of the reading surface')
+assert.match(commandBarLogic, /return delta > 0 \? 'hidden' : 'shown'/,
+  'top command bar no longer hides on scroll down and returns on scroll up')
 
 const heroActions = [...hero.matchAll(/\{ to: '([^']+)', label: '([^']+)'/g)]
 assert.deepEqual(heroActions.map((m) => m[1]), ['/chatbot', '/harian'],
@@ -57,9 +49,10 @@ assert.doesNotMatch(hero, /pointermove|pointerleave|panacea-intent-hero__media|p
 assert.doesNotMatch(heroCss, /@keyframes|animation:/,
   'Home action panel reintroduced decorative ambient animation')
 
-// Liquid Glass is a CONTROL layer, not a card skin.
-assert.match(glass, /\.panacea-liquid-dock[\s\S]*backdrop-filter: blur\(20px\)/,
-  'primary navigation no longer has the intended liquid control material')
+// Liquid material stays contextual; Home itself no longer owns a persistent
+// navigation bar. The global top command bar owns reveal-on-scroll navigation.
+assert.doesNotMatch(glass, /\.panacea-liquid-dock/,
+  'removed bottom navigation dock styles came back')
 assert.match(glass, /\.panacea-intent-action[\s\S]*backdrop-filter: blur\(16px\)/,
   'contextual hero controls lost their glass treatment')
 assert.doesNotMatch(glass, /panacea-instrument-(cell|rail)|panacea-bento-tile/,
