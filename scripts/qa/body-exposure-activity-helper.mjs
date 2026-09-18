@@ -2,21 +2,24 @@
 // dengan pengguna. Gerbang render 3D tidak boleh bergantung pada semua tombol
 // selalu terlihat sekaligus, tetapi tetap membuktikan aktivitas itu terjangkau.
 export async function pilihAktivitasBodyExposure(page, label) {
-  const langsung = page.getByRole('button', { name: label, exact: true }).first()
+  const navigator = page.locator('section[aria-label="Body Exposure activities"]')
+  await navigator.waitFor({ state: 'visible' })
+
+  const langsung = navigator.getByRole('button', { name: label, exact: true }).first()
   if (await langsung.isVisible().catch(() => false)) {
     await langsung.click()
     return
   }
 
-  const semua = page.getByRole('button', { name: 'All activities', exact: true })
+  const semua = navigator.getByRole('button', { name: 'All activities', exact: true })
   if (!(await semua.isVisible().catch(() => false))) {
     throw new Error(`Body Exposure: pintu "All activities" tidak terlihat saat mencari "${label}"`)
   }
   await semua.click()
 
-  const pencarian = page.getByPlaceholder('Find anatomy, physiology, disease, surgery…')
+  const pencarian = navigator.getByPlaceholder('Find anatomy, physiology, disease, surgery…')
   await pencarian.fill(label)
-  const target = page.getByRole('button', { name: label, exact: true }).first()
+  const target = navigator.getByRole('button', { name: label, exact: true }).first()
   await target.waitFor({ state: 'visible' })
   await target.click()
 }
