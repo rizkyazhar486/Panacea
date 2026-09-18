@@ -2,6 +2,8 @@ import { motion } from 'framer-motion'
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { SuperPageCapabilityRail } from '../components/SuperPageCapabilityRail'
+import { PanaceaMusicPlayer } from '../components/PanaceaMusicPlayer'
+import { SuperPageActivityFeed } from '../components/SuperPageActivityFeed'
 import { useStore } from '../lib/store'
 import {
   IconBook,
@@ -53,7 +55,7 @@ function TileCard({ tile }: { tile: Tile }) {
   const Icon = tile.icon
   return (
     <motion.div whileHover={{ y: -2 }} transition={{ duration: .18 }}>
-      <Link to={tile.to} className={`liquid-action liquid-glass liquid-spectral-edge group relative block min-h-[116px] overflow-hidden rounded-[24px] bg-gradient-to-br ${tile.tone} p-4`} aria-label={`${tile.label} — ${tile.meta}`}>
+      <Link to={tile.to} className={`liquid-action liquid-glass liquid-spectral-edge pmd-liquid-metal group relative block min-h-[116px] overflow-hidden rounded-[24px] bg-gradient-to-br ${tile.tone} p-4`} aria-label={`${tile.label} — ${tile.meta}`}>
         <div className="flex items-start justify-between gap-3">
           <span className="liquid-lens grid h-11 w-11 place-items-center rounded-[16px] text-white" aria-hidden><Icon size={20} /></span>
           <span className="text-sm text-white/32 transition group-hover:translate-x-0.5 group-hover:text-white/70" aria-hidden>↗</span>
@@ -140,6 +142,8 @@ export function ForYouHub() {
         </div>
       </section>
 
+      <PanaceaMusicPlayer />
+
       <section className="rounded-[26px] border border-white/[.08] bg-white/[.03] p-4 backdrop-blur-xl" aria-label="AI quick handoff">
         <div className="flex items-center justify-between gap-3"><strong className="truncate text-sm">Ask Panacea</strong><span className="shrink-0 text-[9px] font-black uppercase tracking-[.14em] text-cyan-100/38">context handoff</span></div>
         <label className="mt-4 flex min-h-[48px] items-center gap-2 rounded-[16px] border border-white/[.07] bg-black/20 px-3 focus-within:border-cyan-200/30"><IconChat size={16} /><input value={prompt} onChange={(event) => setPrompt(event.target.value)} placeholder="Ask anything…" className="min-w-0 flex-1 bg-transparent text-xs font-semibold outline-none placeholder:text-white/24" /></label>
@@ -155,6 +159,8 @@ export function ForYouHub() {
         <div className="mb-2 flex items-center justify-between px-1"><h2 className="truncate text-xs font-black uppercase tracking-[.15em] text-white/50">Intelligence</h2><span className="text-[10px] font-black text-violet-100/45">4 tools</span></div>
         <div className="grid grid-cols-2 gap-2.5 sm:grid-cols-4">{INTELLIGENCE_TILES.map((tile) => <TileCard key={tile.label} tile={tile} />)}</div>
       </section>
+
+      <SuperPageActivityFeed domain="for-you" initialLimit={18} />
 
       <SuperPageCapabilityRail domain="for-you" initialLimit={24} />
     </main>
