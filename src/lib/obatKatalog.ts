@@ -893,6 +893,45 @@ export const EJAAN_ID: Record<string, string[]> = {
   'Cyanocobalamin (B12)': ['Mekobalamin'],
   'Zinc sulfate': ['Zinc'],
   'Zinc sulfate (supplement)': ['Zinc'],
+  // Ditambahkan setelah diperiksa satu per satu terhadap `contoh` di
+  // golonganObat.ts: dosis untuk 33 zat ini SUDAH ada di sana, tertulis
+  // berdampingan dengan zat lain dalam golongan yang sama, tetapi tidak
+  // pernah tersambung ke sini karena ejaan Indonesianya belum didaftar.
+  // Hasilnya, DrugInfo menampilkan "No dose is given here on purpose" untuk
+  // zat yang dosisnya sebenarnya sudah tertulis di berkas ini sendiri.
+  'Esomeprazole': ['Esomeprazol'],
+  'Lansoprazole': ['Lansoprazol'],
+  'Pantoprazole': ['Pantoprazol'],
+  'Rabeprazole': ['Rabeprazol'],
+  'Ranitidine': ['Ranitidin'],
+  'Famotidine': ['Famotidin'],
+  'Mebeverine': ['Mebeverin'],
+  'Drotaverine': ['Drotaverin'],
+  'Domperidone': ['Domperidon'],
+  'Glimepiride': ['Glimepirid'],
+  'Semaglutide': ['Semaglutid'],
+  'Dulaglutide': ['Dulaglutid'],
+  'Magnesium sulfate': ['Magnesium sulfat'],
+  'Clopidogrel': ['Klopidogrel'],
+  'Ticagrelor': ['Tikagrelor'],
+  'Milrinone': ['Milrinon'],
+  'Indapamide': ['Indapamid'],
+  'Eplerenone': ['Eplerenon'],
+  'Carvedilol': ['Karvedilol'],
+  'Nifedipine': ['Nifedipin'],
+  'Candesartan': ['Kandesartan'],
+  'Terbinafine': ['Terbinafin'],
+  'Diclofenac': ['Diklofenak'],
+  'Ketorolac': ['Ketorolak'],
+  'Baclofen': ['Baklofen'],
+  'Tizanidine': ['Tizanidin'],
+  'Phenobarbital': ['Fenobarbital'],
+  'Topiramate': ['Topiramat'],
+  'Clonazepam': ['Klonazepam'],
+  'Mebendazole': ['Mebendazol'],
+  'Terbutaline': ['Terbutalin'],
+  'Mometasone': ['Mometason'],
+  'Loratadine': ['Loratadin'],
 }
 
 /**
