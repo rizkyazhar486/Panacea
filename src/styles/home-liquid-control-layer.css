@@ -1,68 +1,14 @@
 /* Home control layer.
-   Liquid Glass belongs on navigation and contextual controls floating over
-   content. Health data, widgets, and capability content remain flat so the
-   material communicates hierarchy instead of becoming decoration. */
+   Home has no persistent local navigation dock. Navigation belongs to the
+   global top command bar in Shell, which hides while scrolling down and
+   returns when the user scrolls up, reaches the top, focuses it, or moves a
+   fine pointer into the top reveal zone.
 
-.panacea-liquid-home .panacea-liquid-dock {
-  overflow: hidden;
-  border: 1px solid rgba(255,255,255,.14) !important;
-  border-radius: 999px !important;
-  background: rgba(17,21,19,.62) !important;
-  box-shadow:
-    inset 0 1px 0 rgba(255,255,255,.18),
-    inset 0 -1px 0 rgba(0,0,0,.18),
-    0 12px 34px rgba(0,0,0,.30) !important;
-  -webkit-backdrop-filter: blur(20px) saturate(135%) !important;
-  backdrop-filter: blur(20px) saturate(135%) !important;
-  isolation: isolate;
-  contain: paint;
-}
+   Liquid treatment remains limited to contextual controls. Health data,
+   widgets, and capability content stay flat and readable. */
 
-.panacea-liquid-home .panacea-liquid-dock::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  z-index: -1;
-  pointer-events: none;
-  border-radius: inherit;
-  background:
-    linear-gradient(180deg, rgba(255,255,255,.07), transparent 42%),
-    radial-gradient(80% 120% at 50% 130%, rgba(37,209,98,.055), transparent 70%);
-}
-
-.panacea-liquid-home .panacea-liquid-dock .liquid-dock-item {
-  border: 1px solid transparent !important;
-  background: transparent !important;
-  box-shadow: none !important;
-  color: rgba(255,255,255,.58) !important;
-  transition:
-    color 170ms ease,
-    background-color 170ms ease,
-    transform 150ms cubic-bezier(.2,.8,.2,1) !important;
-}
-
-.panacea-liquid-home .panacea-liquid-dock .liquid-dock-item svg {
-  transition: color 170ms ease, transform 170ms cubic-bezier(.2,.8,.2,1);
-}
-
-.panacea-liquid-home .panacea-liquid-dock .liquid-dock-item[data-active='true'],
-.panacea-liquid-home .panacea-liquid-dock .liquid-dock-item[aria-current='page'] {
-  color: rgba(255,255,255,.98) !important;
-  border-color: rgba(255,255,255,.08) !important;
-  background: rgba(255,255,255,.085) !important;
-  box-shadow:
-    inset 0 1px 0 rgba(255,255,255,.13),
-    inset 0 -1px 0 rgba(0,0,0,.10) !important;
-}
-
-.panacea-liquid-home .panacea-liquid-dock .liquid-dock-item[data-active='true'] svg,
-.panacea-liquid-home .panacea-liquid-dock .liquid-dock-item[aria-current='page'] svg {
-  color: #49df7f;
-  transform: translateY(-1px);
-}
-
-/* Contextual controls can use glass because real hero content moves beneath
-   them. This is deliberately not applied to metric cards or catalogue tiles. */
+/* Contextual actions may use translucent material because they are controls,
+   not data containers. */
 .panacea-liquid-home .panacea-intent-action {
   border-color: rgba(255,255,255,.14) !important;
   background: rgba(13,18,16,.50) !important;
@@ -77,8 +23,8 @@
   background: rgba(255,255,255,.10) !important;
 }
 
-/* Personalized repetition gets a direct one-tap path without adding another
-   dashboard card. When the full index opens this rail disappears. */
+/* Personalized repetition gets a direct one-tap path without becoming another
+   permanent navigation bar. The complete catalogue remains search-first. */
 .panacea-command-recents {
   display: flex;
   gap: 4px;
@@ -118,9 +64,9 @@
   transform: scale(.97);
 }
 
-/* Home owns one primary navigation surface. The global draggable navigation
-   remains available everywhere else, but showing both here would force the
-   user to choose between two systems for the same job. */
+/* Home deliberately has no floating navigation control. The global top command
+   bar already provides menu + search and is direction-aware. Keeping the FAB
+   here would create a second navigation system after removing the bottom dock. */
 body:has(.panacea-liquid-home) button[aria-label="Buka menu navigasi"],
 body:has(.panacea-liquid-home) button[aria-label="Tutup menu"],
 body:has(.panacea-liquid-home) [role="menu"][aria-label="Tindakan cepat"] {
@@ -128,14 +74,12 @@ body:has(.panacea-liquid-home) [role="menu"][aria-label="Tindakan cepat"] {
 }
 
 @supports not ((-webkit-backdrop-filter: blur(1px)) or (backdrop-filter: blur(1px))) {
-  .panacea-liquid-home .panacea-liquid-dock,
   .panacea-liquid-home .panacea-intent-action {
     background: rgba(20,24,22,.96) !important;
   }
 }
 
 @media (prefers-reduced-transparency: reduce) {
-  .panacea-liquid-home .panacea-liquid-dock,
   .panacea-liquid-home .panacea-intent-action {
     -webkit-backdrop-filter: none !important;
     backdrop-filter: none !important;
@@ -144,7 +88,6 @@ body:has(.panacea-liquid-home) [role="menu"][aria-label="Tindakan cepat"] {
 }
 
 @media (hover: none) and (pointer: coarse) {
-  .panacea-liquid-home .panacea-liquid-dock .liquid-dock-item:hover,
   .panacea-liquid-home .panacea-intent-action:hover,
   .panacea-command-recent:hover {
     transform: none;
@@ -152,8 +95,6 @@ body:has(.panacea-liquid-home) [role="menu"][aria-label="Tindakan cepat"] {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .panacea-liquid-home .panacea-liquid-dock .liquid-dock-item,
-  .panacea-liquid-home .panacea-liquid-dock .liquid-dock-item svg,
   .panacea-liquid-home .panacea-intent-action,
   .panacea-command-recent {
     transition: none !important;
