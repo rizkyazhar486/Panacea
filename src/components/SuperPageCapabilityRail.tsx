@@ -18,13 +18,22 @@ const CLINICAL_PATHS = new Set([
   '/chatbot', '/emr', '/emergency', '/second-opinion', '/consult', '/hospitals', '/pharmacy', '/orders', '/data-lab',
 ])
 
+const FOR_YOU_PATHS = new Set([
+  '/feed', '/community', '/clubs', '/keuangan', '/markets', '/sports-scores', '/messages', '/profile',
+  '/scripture', '/hadith', '/prayer-times', '/prophet-stories', '/education', '/life-compass', '/ikigai',
+  '/harada', '/gratitude', '/resilience-stories', '/connect', '/my-story', '/planning', '/my-materials',
+])
+
 function textOf(feature: Fitur) {
   return `${feature.grup} ${feature.nama} ${feature.apa} ${feature.kw}`.toLowerCase()
 }
 
 function matchesDomain(feature: Fitur, domain: Domain) {
   const text = textOf(feature)
-  if (domain === 'for-you') return true
+  if (domain === 'for-you') {
+    return FOR_YOU_PATHS.has(feature.to)
+      || /social|community|friend|partner|relationship|family|story|journal|gratitude|resilience|purpose|ikigai|goal|planning|career|finance|money|budget|wallet|market|invest|club|message|profile|account|faith|religion|prayer|hadith|scripture|prophet|mental|habit|attention|motivation/.test(text)
+  }
   if (domain === 'clinical') {
     return CLINICAL_PATHS.has(feature.to) || /clinical|medical|disease|drug|pharma|anatom|physiol|radiolog|imaging|genom|gene|dna|evidence|research|trial|diagnos|score|calculator|lab|emr|care|hospital|consult|emergency/.test(text)
   }
