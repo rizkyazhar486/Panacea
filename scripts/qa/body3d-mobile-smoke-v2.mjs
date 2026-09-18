@@ -280,7 +280,7 @@ try {
   if (labAriaLabel !== 'Biomechanics motion lab') {
     throw new Error(`Biomechanics motion lab lost its accessible label: ${labAriaLabel ?? 'missing'}`)
   }
-  await lab.getByText('Original motion ↔ source-backed anatomical atlas', { exact: true }).waitFor({ state: 'visible', timeout: 10_000 })
+  await lab.getByText('Motion ↔ source-backed atlas', { exact: true }).waitFor({ state: 'visible', timeout: 10_000 })
 
   const atlasCanvas = lab.locator('canvas').first()
   await atlasCanvas.waitFor({ state: 'visible', timeout: 45_000 })
@@ -297,8 +297,16 @@ try {
 
   const timeline = lab.getByRole('slider', { name: 'Motion timeline', exact: true })
   if (!(await timeline.isDisabled())) throw new Error('Motion timeline should remain disabled until a real local video is loaded')
+
+  // Validation boundaries now live behind a one-tap <details> disclosure
+  // instead of always-on cards, so they must be expanded before the labels
+  // are visible, and each label is a lead-in span ("Pose · ...") rather than
+  // a standalone exact string.
+  const boundaryDisclosure = lab.getByText('Validation boundaries & atlas provenance', { exact: true })
+  await revealInViewport(boundaryDisclosure, 'Validation boundaries disclosure')
+  await boundaryDisclosure.click()
   for (const boundary of ['Pose', 'Force vectors', 'Atlas provenance']) {
-    if (!(await lab.getByText(boundary, { exact: true }).isVisible().catch(() => false))) {
+    if (!(await lab.getByText(boundary).first().isVisible().catch(() => false))) {
       throw new Error(`Biomechanics scientific boundary is missing: ${boundary}`)
     }
   }
