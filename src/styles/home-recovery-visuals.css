@@ -1,0 +1,181 @@
+.pmd-recovery-strip {
+  min-width: 0;
+  overflow: hidden;
+  padding: clamp(10px, 1.8vw, 14px);
+  border: 1px solid rgba(255,255,255,.09);
+  border-radius: clamp(22px, 3vw, 28px);
+  background: rgba(8,12,10,.48);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.08);
+  -webkit-backdrop-filter: blur(16px) saturate(120%);
+  backdrop-filter: blur(16px) saturate(120%);
+}
+
+.pmd-recovery-head {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 9px;
+}
+
+.pmd-recovery-head > strong {
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,.72);
+}
+
+.pmd-recovery-head details { position: relative; }
+.pmd-recovery-head summary {
+  width: 28px;
+  height: 28px;
+  display: grid;
+  place-items: center;
+  list-style: none;
+  cursor: pointer;
+  border: 1px solid rgba(255,255,255,.1);
+  border-radius: 999px;
+  color: rgba(255,255,255,.55);
+  font: 800 11px/1 var(--font-sans);
+}
+.pmd-recovery-head summary::-webkit-details-marker { display: none; }
+.pmd-recovery-head details p {
+  position: absolute;
+  z-index: 30;
+  right: 0;
+  top: 34px;
+  width: min(290px, 78vw);
+  margin: 0;
+  padding: 10px 12px;
+  border: 1px solid rgba(255,255,255,.12);
+  border-radius: 14px;
+  background: rgba(8,12,10,.96);
+  box-shadow: 0 18px 44px rgba(0,0,0,.34);
+  color: rgba(255,255,255,.72);
+  font-size: 10px;
+  line-height: 1.45;
+}
+
+.pmd-recovery-grid {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(86px, 1fr));
+  gap: 7px;
+  min-width: 0;
+}
+
+.pmd-recovery-tile {
+  position: relative;
+  min-width: 0;
+  min-height: 92px;
+  overflow: hidden;
+  display: grid;
+  grid-template-rows: 1fr auto auto;
+  align-items: end;
+  padding: 9px 9px 8px;
+  border: 1px solid rgba(255,255,255,.07);
+  border-radius: 17px;
+  background:
+    radial-gradient(circle at 50% 8%, color-mix(in srgb, var(--mode-color) 18%, transparent), transparent 52%),
+    rgba(255,255,255,.015);
+  color: white;
+  text-decoration: none;
+  transition: transform 160ms ease, border-color 160ms ease, background-color 160ms ease;
+  --mode-color: #64e6a6;
+}
+
+.pmd-recovery-tile[data-mode='sauna'],
+.pmd-recovery-tile[data-mode='hot'] { --mode-color: #ff8a4a; }
+.pmd-recovery-tile[data-mode='steam'] { --mode-color: #b69cff; }
+.pmd-recovery-tile[data-mode='jacuzzi'] { --mode-color: #52d8ff; }
+.pmd-recovery-tile[data-mode='cold'] { --mode-color: #5cbcff; }
+.pmd-recovery-tile[data-mode='onsen'] { --mode-color: #8be0d0; }
+
+.pmd-recovery-tile:hover,
+.pmd-recovery-tile:focus-visible {
+  transform: translateY(-2px);
+  border-color: color-mix(in srgb, var(--mode-color) 44%, rgba(255,255,255,.08));
+}
+
+.pmd-recovery-meter {
+  position: absolute;
+  inset: auto 8px 8px auto;
+  height: 26px;
+  display: flex;
+  align-items: flex-end;
+  gap: 2px;
+  opacity: .35;
+}
+.pmd-recovery-meter i {
+  width: 2px;
+  border-radius: 999px;
+  background: var(--mode-color);
+}
+
+.pmd-recovery-glyph {
+  width: 31px;
+  height: 31px;
+  display: grid;
+  place-items: center;
+  border-radius: 11px;
+  background: color-mix(in srgb, var(--mode-color) 12%, transparent);
+  color: var(--mode-color);
+}
+.pmd-recovery-glyph svg {
+  width: 23px;
+  height: 23px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2.3;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.pmd-recovery-label {
+  margin-top: 6px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: rgba(255,255,255,.92);
+  font-size: 10px;
+  font-weight: 900;
+  white-space: nowrap;
+}
+.pmd-recovery-cue {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: rgba(255,255,255,.32);
+  font-size: 8px;
+  font-weight: 800;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+@media (max-width: 760px) {
+  .pmd-recovery-grid {
+    display: flex;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: none;
+    overscroll-behavior-x: contain;
+  }
+  .pmd-recovery-grid::-webkit-scrollbar { display: none; }
+  .pmd-recovery-tile {
+    flex: 0 0 96px;
+    min-height: 88px;
+    scroll-snap-align: start;
+  }
+}
+
+@media (hover: none) and (pointer: coarse) {
+  .pmd-recovery-tile:hover { transform: none; }
+}
+
+@media (prefers-reduced-transparency: reduce) {
+  .pmd-recovery-strip,
+  .pmd-recovery-head details p { background: #111512; -webkit-backdrop-filter: none; backdrop-filter: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pmd-recovery-tile { transition: none; }
+}
