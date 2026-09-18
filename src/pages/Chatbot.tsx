@@ -6,6 +6,7 @@ import { useStore, uid } from '../lib/store'
 import { Card, Button, Badge } from '../components/ui'
 import { IconSend, IconSparkle, IconChat } from '../components/icons'
 import { LogoMark } from '../components/Logo'
+import { ThinkingOrb } from '../components/ThinkingOrb'
 import { sendChat, draftEMR, aiAvailable, type PatientContext } from '../lib/ai'
 import { api, backendEnabled } from '../lib/api'
 import { compressImage, readAsDataUrl } from '../lib/upload'
@@ -393,7 +394,10 @@ export function Chatbot() {
             {busy && (
               <div className="flex items-center gap-2.5 text-sm text-neutral-500">
                 <LogoMark size={22} />
-                <span className="animate-pulse">AI is analyzing…</span>
+                {/* Yang ditunggu di sini adalah jawaban yang panjang dan
+                    bentuknya belum diketahui, jadi rangka tidak bisa menirunya;
+                    inilah tempat orb, bukan pengganti rangka di tempat lain. */}
+                <ThinkingOrb label="Reading your question" size={18} />
               </div>
             )}
           </div>
