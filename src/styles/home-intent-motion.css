@@ -1,47 +1,47 @@
-/* Quiet secondary action panel.
-   Home's first viewport belongs to the user's health state, not decorative
-   motion. Liquid treatment is applied to the controls by the control layer. */
+/* Compact action surface: one line of intent + two real actions. */
 .panacea-intent-hero {
   position: relative;
-  min-height: 190px;
+  min-height: 116px;
   display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(280px, 420px);
-  align-items: end;
-  gap: clamp(24px, 5vw, 72px);
-  padding: clamp(24px, 4vw, 48px);
+  grid-template-columns: minmax(0, 1fr) minmax(250px, 360px);
+  align-items: center;
+  gap: clamp(16px, 3vw, 32px);
+  padding: clamp(14px, 2.4vw, 22px) clamp(2px, 1vw, 10px);
   overflow: hidden;
-  border-block: 1px solid rgba(255,255,255,.10);
+  border-block: 1px solid rgba(255,255,255,.08);
   background: transparent;
   color: #fff;
 }
 
 .panacea-intent-hero__copy h1 {
   margin: 0;
-  max-width: 720px;
-  font-size: clamp(34px, 5.2vw, 64px);
-  line-height: .94;
-  letter-spacing: -.058em;
-  font-weight: 620;
-  text-wrap: balance;
+  max-width: 620px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: clamp(22px, 3.2vw, 34px);
+  line-height: 1;
+  letter-spacing: -.045em;
+  font-weight: 720;
 }
 
 .panacea-intent-hero__actions {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 8px;
+  gap: 7px;
 }
 
 .panacea-intent-action {
-  min-height: 58px;
+  min-height: 50px;
   display: flex;
   align-items: center;
-  gap: 10px;
-  padding: 9px 12px;
-  border: 1px solid rgba(255,255,255,.11);
-  border-radius: 16px;
+  gap: 9px;
+  padding: 7px 10px;
+  border: 1px solid rgba(255,255,255,.10);
+  border-radius: 15px;
   color: #fff;
   text-decoration: none;
-  background: rgba(13,18,16,.50);
+  background: rgba(13,18,16,.46);
   transition:
     border-color 180ms ease,
     background-color 180ms ease,
@@ -49,13 +49,13 @@
 }
 
 .panacea-intent-action__icon {
-  width: 36px;
-  height: 36px;
+  width: 34px;
+  height: 34px;
   display: grid;
   place-items: center;
   flex: 0 0 auto;
-  border-radius: 11px;
-  background: rgba(255,255,255,.06);
+  border-radius: 10px;
+  background: rgba(255,255,255,.055);
 }
 
 .panacea-intent-action__label {
@@ -63,9 +63,15 @@
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  font-size: 12px;
-  font-weight: 680;
+  font-size: 11px;
+  font-weight: 760;
   letter-spacing: -.01em;
+}
+
+.panacea-intent-action:hover,
+.panacea-intent-action:focus-visible {
+  border-color: rgba(84,223,130,.22);
+  background: rgba(255,255,255,.055);
 }
 
 .panacea-intent-action:active {
@@ -77,21 +83,17 @@
     min-height: 0;
     grid-template-columns: 1fr;
     align-items: start;
-    gap: 20px;
-    padding: 28px 0 0;
+    gap: 12px;
+    padding: 12px 0 0;
     border-bottom: 0;
   }
 
   .panacea-intent-hero__copy h1 {
-    font-size: clamp(34px, 11vw, 48px);
-  }
-
-  .panacea-intent-hero__actions {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    font-size: clamp(24px, 7.2vw, 31px);
   }
 
   .panacea-intent-action {
-    min-height: 56px;
+    min-height: 48px;
   }
 }
 
