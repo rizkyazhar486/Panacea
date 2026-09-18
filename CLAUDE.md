@@ -146,3 +146,16 @@ Scientific/detail target by exemplar:
 The semantic-zoom trigger may use relative camera distance, for example M_semantic = D_fit / D_camera, strictly as an interaction/LOD signal. It must never be displayed as literal optical magnification or implied physical continuity across incompatible biological scales.
 
 Claude Code may replace the initial implementation with a stronger renderer, asset pipeline, spatial index, streaming LOD, GPU instancing, WebGPU, volume rendering, histology tiles, point-cloud/meshlet strategy or other architecture if it advances this target without weakening provenance, safety, mobile usability or the fail-closed rule.
+
+
+## Clinical ↔ Body Exposure command-space target — 2026-09-18
+
+The owner supplied a concrete visual direction for Clinical and Body Exposure: a dark, immersive medical command space with the anatomical/body canvas as the focal point and compact vitals, trends, imaging/finding context and actions arranged around it. Avoid returning to a card-wall dashboard.
+
+Phase 1 is the AI-EMR integration seam:
+- `src/lib/bodyClinicalBridge.ts` projects existing AI-EMR examination markers and latest recorded clinical vitals into one shared visual-overlay contract.
+- `src/components/ClinicalBodyTwin.tsx` renders that contract inside AI-EMR as a body-centered command surface while keeping long explanation behind disclosure.
+- Reference silhouette/atlas geometry remains explicitly non-patient-specific. Patient signals, reviewed findings, reference anatomy, simulation and AI-derived/draft content must remain distinguishable.
+- The bridge generates no diagnosis, severity, prognosis, treatment, lesion location, procedure target or autonomous clinical action.
+
+Next integration steps must reconcile rather than overwrite active overlap in #1827 (ClinicalHub/UnifiedBodyWorkspace) and #1848 (Body Exposure styling/simulators). When those lanes settle, mount the same patient overlay contract into Clinical and Body Exposure so the selected patient context can follow the user without creating a second patient-state authority. Preserve the canonical longitudinal governance and clinician-review boundaries already on main.

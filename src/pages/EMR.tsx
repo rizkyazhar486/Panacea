@@ -10,12 +10,14 @@ import { lazy, Suspense } from 'react'
 const AutonomousFlow = lazy(() => import('./emr/AutonomousFlow'))
 import { IconEMR, IconCheck, IconSparkle, IconShield, IconBook } from '../components/icons'
 import { BodyDiagram, type SystemFinding } from '../components/BodyDiagram'
+import { ClinicalBodyTwin } from '../components/ClinicalBodyTwin'
 import { GrowthChart } from '../components/GrowthChart'
 import { ageFromDob } from '../lib/anthro'
 import { generateEducation } from '../lib/ai'
 import { api, backendEnabled } from '../lib/api'
 import { searchICD, matchICD, icd11, type ICDCode } from '../lib/icd'
 import { evaluateVitals, overallStatus, STATUS_COLOR, STATUS_LABEL } from '../lib/chronic'
+import { projectEmrToBodyClinicalBridge } from '../lib/bodyClinicalBridge'
 import type { Anamnesis, EMRRecord, PhysicalExam, VitalSign } from '../lib/types'
 
 // Send the current EMR to SATUSEHAT as a FHIR R4 Bundle (dokter/owner only).
@@ -170,6 +172,14 @@ export function EMR() {
 
   if (!draft) return <EmptyEMR />
 
+  const systemFindings = buildFindings(draft.physicalExam.perSystem)
+  const bodyClinicalProjection = projectEmrToBodyClinicalBridge(
+    draft,
+    state.vitals[activePatient.id] ?? [],
+    systemFindings,
+    draft.updatedAt,
+  )
+
   function patch(fn: (r: EMRRecord) => EMRRecord) {
     setDraft((d) => (d ? fn(d) : d))
     setDirty(true)
@@ -300,12 +310,16 @@ export function EMR() {
           </div>
         )}
 
-        <div className="mb-4 rounded-2xl border border-neutral-100 bg-white p-4">
-          <div className="mb-2 text-xs font-semibold uppercase tracking-wide text-neutral-500">
-            System Map — visual summary of findings
+        <ClinicalBodyTwin projection={bodyClinicalProjection} patientLabel={activePatient.name} />
+
+        <details className="mb-4 rounded-2xl border border-neutral-100 bg-white p-4">
+          <summary className="cursor-pointer text-xs font-semibold uppercase tracking-wide text-neutral-500">
+            Detailed system map
+          </summary>
+          <div className="mt-3">
+            <BodyDiagram findings={systemFindings} />
           </div>
-          <BodyDiagram findings={buildFindings(draft.physicalExam.perSystem)} />
-        </div>
+        </details>
 
         <div className="grid gap-4">
           <ExamField
