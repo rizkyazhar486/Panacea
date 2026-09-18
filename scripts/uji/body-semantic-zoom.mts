@@ -43,6 +43,23 @@ assert.match(microscope, /must not manufacture a microscopic layer by enlarging 
 assert.match(microscope, /CellLab/)
 assert.match(microscope, /AlphaGenomeAtlas/)
 assert.match(microscope, /VertikalMolekulerPanel/)
-assert.match(microscope, /No validated organ → tissue → cell → protein\/pathway vertical/)
+// 7023e43 "feat(body): expose chemistry depth across all body systems"
+// (part of the universal gold-standard directive) replaced the blanket
+// "No validated organ → tissue → cell → protein/pathway vertical" fail-closed
+// message at the molecule scale with a real MolecularChemistryStage that
+// renders verified, PubChem-linked metabolites (glucose/NAD+/NADH/ATP) for
+// every system, and keeps VertikalMolekulerPanel layered on top for the
+// respiratory system specifically. The vertical is no longer universally
+// unregistered, so the contract now checks that the new stage is wired in
+// and that it still fails closed on precision it cannot back (no invented
+// 3D chemical structure without a verified identifier).
+assert.match(microscope, /MolecularChemistryStage/)
+const chemistryStage = readFileSync(new URL('../../src/pages/bodyhub/MolecularChemistryStage.tsx', import.meta.url), 'utf8')
+assert.match(chemistryStage, /pubchemCid/,
+  'molecular chemistry stage lost its verified PubChem provenance')
+assert.match(chemistryStage, /not a measured patient flux/,
+  'molecular chemistry stage lost its reference-vs-measured disclaimer')
+assert.match(chemistryStage, /must bind to verified chemical\/protein identifiers before they are rendered as source-backed 3D/,
+  'molecular chemistry stage lost its fail-closed boundary for unverified 3D structures')
 
 console.log('body semantic zoom: camera-relative LOD switches macro anatomy toward source-aware microscopic representations without fake optical magnification')
