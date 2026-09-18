@@ -19,6 +19,7 @@
 // juga begitu. Keduanya benar. Yang TIDAK pernah benar adalah kendali yang
 // tidak mengubah apa pun sama sekali.
 import { chromium } from '@playwright/test'
+import { pilihAktivitasBodyExposure } from './body-exposure-activity-helper.mjs'
 import { readFileSync, existsSync } from 'node:fs'
 
 const url = process.env.KENDALI_QA_URL || 'http://127.0.0.1:4173/#/body-explorer'
@@ -106,7 +107,7 @@ await page.goto(url, { waitUntil: 'networkidle' })
 
 const ringkas = []
 for (const p of PANEL) {
-  await page.getByRole('button', { name: p.label, exact: true }).first().click()
+  await pilihAktivitasBodyExposure(page, p.label)
   await page.waitForSelector('svg[role="img"]', { timeout: 45_000 })
 
   const sliders = await page.$$('input[type=range]')
