@@ -36,7 +36,15 @@ assert.match(deck, /pintasan\.map\(/, 'the one-tap rail does not use the existin
 
 // The logged-in product should reach useful data quickly instead of spending
 // most of the first viewport on a marketing hero.
-assert.match(heroCss, /min-height:\s*190px/,
+// 4df16e0 "style(home): compact primary action surface" tuned this panel
+// down further (190px -> 116px min-height, 64px -> 34px h1) in the same
+// compacting direction this contract exists to protect, so the ceiling is
+// checked numerically rather than pinned to one exact historical value that
+// legitimate further compaction would keep breaking.
+const heroMinHeightMatch = heroCss.match(/\.panacea-intent-hero\s*\{[\s\S]*?min-height:\s*(\d+)px/)
+assert.ok(heroMinHeightMatch, 'secondary action panel lost its min-height rule')
+const heroMinHeightPx = Number(heroMinHeightMatch?.[1])
+assert.ok(heroMinHeightPx > 0 && heroMinHeightPx <= 190,
   'secondary action panel grew back into a majority-viewport marketing surface')
 assert.doesNotMatch(hero, /pointermove|pointerleave|panacea-intent-hero__media|panacea-intent-hero__scan|panacea-intent-hero__halo/,
   'Home action panel reintroduced decorative pointer/parallax media')
