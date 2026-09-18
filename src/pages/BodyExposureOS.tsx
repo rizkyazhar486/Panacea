@@ -8,6 +8,7 @@ const AtlasPhysiologyBridgePanel = lazy(() => import('./bodyhub/AtlasPhysiologyB
 const BodySystemDeepDiveWorkspace = lazy(() => import('./bodyhub/BodySystemDeepDiveWorkspace'))
 const PathophysiologyNetworkPanel = lazy(() => import('./bodyhub/PathophysiologyNetworkPanel'))
 const PharmacologyMechanismPanel = lazy(() => import('./bodyhub/PharmacologyMechanismPanel'))
+const MechanismCausalBridgePanel = lazy(() => import('./bodyhub/MechanismCausalBridgePanel'))
 
 type ExposureMode = 'atlas' | 'physiology' | 'imaging' | 'surgery' | 'molecular' | 'clinical'
 
@@ -242,6 +243,12 @@ export function BodyExposureOS() {
       <div className="relative z-[2] mt-3">
         <Suspense fallback={<div className="grid min-h-44 place-items-center rounded-[28px] border border-white/[.08] bg-black/35 text-xs font-bold text-white/35">Loading pharmacology mechanism network…</div>}>
           <PharmacologyMechanismPanel selectedAtlasSystemId={selectedBodySystemId} />
+        </Suspense>
+      </div>
+
+      <div className="relative z-[2] mt-3">
+        <Suspense fallback={<div className="grid min-h-44 place-items-center rounded-[28px] border border-white/[.08] bg-black/35 text-xs font-bold text-white/35">Loading disease-mechanism causal bridge…</div>}>
+          <MechanismCausalBridgePanel />
         </Suspense>
       </div>
 
