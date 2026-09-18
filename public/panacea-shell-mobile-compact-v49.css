@@ -1,0 +1,110 @@
+/* Panacea mobile shell compactness v49
+   Screenshot-driven repair: the command bar must remain a toolbar, never a
+   viewport-sized card. Notification badges must be fully visible outside the
+   circular control. */
+
+@media (max-width: 1023px) {
+  header.kaca.panacea-command-bar {
+    box-sizing: border-box !important;
+    width: auto !important;
+    height: auto !important;
+    min-height: 56px !important;
+    max-height: 68px !important;
+    aspect-ratio: auto !important;
+    flex: 0 0 auto !important;
+    align-self: auto !important;
+    margin: .45rem .55rem .2rem !important;
+    padding: .4rem .5rem !important;
+    gap: .35rem !important;
+    border-radius: 1.45rem !important;
+    overflow: visible !important;
+    align-items: center !important;
+  }
+
+  header.kaca.panacea-command-bar > div {
+    min-width: 0 !important;
+    min-height: 0 !important;
+    height: auto !important;
+    align-items: center !important;
+  }
+
+  header.kaca.panacea-command-bar h1 {
+    min-width: 0 !important;
+    max-width: clamp(4.25rem, 24vw, 7.75rem) !important;
+    margin: 0 !important;
+    font-size: .9rem !important;
+    line-height: 1.05 !important;
+  }
+
+  header.kaca.panacea-command-bar :where(
+    .header-icon-btn,
+    button[aria-label^='Search'],
+    button[aria-label^='Notifications']
+  ) {
+    min-width: 40px !important;
+    width: 40px !important;
+    min-height: 40px !important;
+    height: 40px !important;
+    flex: 0 0 40px !important;
+  }
+
+  header.kaca.panacea-command-bar .pmd-notification-button {
+    overflow: visible !important;
+    isolation: isolate;
+  }
+
+  header.kaca.panacea-command-bar .pmd-notification-badge {
+    top: -5px;
+    right: -5px;
+    height: 19px;
+    min-width: 19px;
+    max-width: 32px;
+    padding-inline: 4px;
+    border: 2px solid #080b0d;
+    font-size: 9px;
+    font-weight: 900;
+    line-height: 1;
+    font-variant-numeric: tabular-nums;
+    box-shadow: 0 3px 10px rgba(0,0,0,.34);
+    overflow: visible;
+  }
+
+  /* A tall descendant must never enlarge the toolbar. Menus/dialogs are
+     positioned independently and therefore do not need to contribute height. */
+  header.kaca.panacea-command-bar .pmd-command-spaces {
+    max-height: min(70dvh, 34rem);
+    overflow-y: auto;
+  }
+}
+
+@media (max-width: 430px) {
+  header.kaca.panacea-command-bar {
+    min-height: 54px !important;
+    max-height: 62px !important;
+    margin-inline: .45rem !important;
+    padding-inline: .42rem !important;
+  }
+
+  header.kaca.panacea-command-bar h1 {
+    max-width: clamp(3.8rem, 20vw, 6rem) !important;
+    font-size: .84rem !important;
+  }
+
+  header.kaca.panacea-command-bar :where(
+    .header-icon-btn,
+    button[aria-label^='Search'],
+    button[aria-label^='Notifications']
+  ) {
+    min-width: 38px !important;
+    width: 38px !important;
+    min-height: 38px !important;
+    height: 38px !important;
+    flex-basis: 38px !important;
+  }
+}
+
+@media (prefers-reduced-transparency: reduce) {
+  header.kaca.panacea-command-bar .pmd-notification-badge {
+    border-color: #0b0d0e;
+  }
+}
