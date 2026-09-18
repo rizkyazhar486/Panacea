@@ -932,6 +932,39 @@ export const EJAAN_ID: Record<string, string[]> = {
   'Terbutaline': ['Terbutalin'],
   'Mometasone': ['Mometason'],
   'Loratadine': ['Loratadin'],
+  // Second pass, found with a wider (still hand-verified, never auto-applied)
+  // set of spelling-shift patterns. Each was checked against golonganObat.ts
+  // for both a real drug-specific number AND a matching route/indication —
+  // two of the raw hits from this pass were rejected for exactly that second
+  // reason and are recorded below the table, not added here.
+  'Sucralfate': ['Sukralfat'],
+  'Promethazine': ['Prometazin'],
+  'Docusate': ['Dokusat'],
+  'Gliclazide': ['Gliklazid'],
+  'Thiamine (B1)': ['Tiamin'],
+  'Clotrimazole (topical)': ['Klotrimazol'],
+  'Miconazole (topical)': ['Mikonazol'],
+  'Itraconazole': ['Itrakonazol'],
+  'Naproxen': ['Naproksen'],
+  'Codeine': ['Kodein'],
+  'Carbamazepine': ['Karbamazepin'],
+  'Duloxetine': ['Duloksetin'],
+  'Amitriptyline': ['Amitriptilin'],
+  'Ambroxol': ['Ambroksol'],
+  'Fexofenadine': ['Feksofenadin'],
+  // NOT added, on purpose:
+  //   'Clotrimazole (vaginal)' — the only golongan mentioning "klotrimazol"
+  //     covers topical/oral skin dosing only; nothing here addresses the
+  //     vaginal route, so showing it would misrepresent a real regimen.
+  //   'Betamethasone (antenatal)' — "betametason" only appears in the
+  //     TOPICAL corticosteroid golongan (cream/ointment for skin). Antenatal
+  //     betamethasone is an IM injection for fetal lung maturation — an
+  //     entirely different route, dose and purpose. Matching by molecule
+  //     name alone here would attach a skin-cream regimen to an obstetric
+  //     injection.
+  //   'Beclometasone' — catalogued as an asthma-maintenance INHALER; the
+  //     only golongan mentioning it is nasal-spray dosing for rhinitis.
+  //     Same molecule, different device, different numbers.
 }
 
 /**

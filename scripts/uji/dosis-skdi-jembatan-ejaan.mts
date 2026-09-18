@@ -25,7 +25,25 @@ const SEHARUSNYA_PUNYA_DOSIS = [
   'Candesartan', 'Terbinafine (topical)', 'Terbinafine (oral)', 'Diclofenac',
   'Ketorolac', 'Baclofen', 'Tizanidine', 'Phenobarbital', 'Topiramate',
   'Clonazepam', 'Mebendazole', 'Terbutaline', 'Mometasone (nasal)', 'Loratadine',
+  // Second pass — wider spelling-shift search, still hand-verified one by one.
+  'Sucralfate', 'Promethazine', 'Docusate', 'Gliclazide', 'Thiamine (B1)',
+  'Clotrimazole (topical)', 'Miconazole (topical)', 'Itraconazole', 'Naproxen',
+  'Codeine', 'Carbamazepine', 'Duloxetine', 'Amitriptyline', 'Ambroxol', 'Fexofenadine',
 ]
+
+// ── 1b. These must STAY unmatched — matching by molecule name alone would be
+// wrong, not merely incomplete. Guards against a future pass "completing"
+// EJAAN_ID by transliteration rule instead of checking route/indication.
+const HARUS_TETAP_KOSONG: [string, string][] = [
+  ['Clotrimazole (vaginal)', 'the only golongan mentioning klotrimazol covers topical/oral skin dosing, not the vaginal route'],
+  ['Betamethasone (antenatal)', 'the only golongan mentioning betametason is a topical skin cream, not the antenatal IM injection'],
+  ['Beclometasone', 'the only golongan mentioning it is a nasal spray for rhinitis; this substance is catalogued as an asthma inhaler'],
+]
+for (const [nama, alasan] of HARUS_TETAP_KOSONG) {
+  assert.equal(dosisSkdi(nama).length, 0,
+    `${nama} now resolves to a dose, but it should not: ${alasan}. If a real matching golongan was added for this ` +
+    'exact route/indication, update this test — otherwise this is a route/indication mismatch, not a fix.')
+}
 
 // ── 1. Tiap zat di daftar ini harus benar-benar cocok dengan dosis dari SKDI ─
 for (const nama of SEHARUSNYA_PUNYA_DOSIS) {
@@ -52,8 +70,8 @@ for (const [a, b] of [
 // Bukan angka tetap: siapa pun boleh menambah cakupan lebih jauh. Yang tidak
 // boleh adalah MUNDUR dari sini tanpa ketahuan.
 const totalPunyaDosis = semuaObat().filter((o) => dosisSkdi(o.nama).length > 0).length
-assert.ok(totalPunyaDosis >= 127,
+assert.ok(totalPunyaDosis >= 142,
   `only ${totalPunyaDosis} of ${semuaObat().length} catalogue substances resolve to an SKDI dose (expected at ` +
-  'least 127). Coverage regressed — some EJAAN_ID entry was likely removed or renamed.')
+  'least 142). Coverage regressed — some EJAAN_ID entry was likely removed or renamed.')
 
 console.log(`dosis-skdi-jembatan-ejaan: ok (${totalPunyaDosis}/${semuaObat().length} substansi tersambung ke dosis SKDI)`)
