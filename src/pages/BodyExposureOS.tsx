@@ -177,7 +177,7 @@ export function BodyExposureOS() {
       </div>
 
       <div ref={systemsRef} className="relative z-[2] mt-3 scroll-mt-4">
-        <BodyExposurePatientOverlay onClinicalView={() => setActiveMode('clinical')} />
+        <BodyExposurePatientOverlay selectedSystemId={selectedBodySystemId} onClinicalView={() => setActiveMode('clinical')} />
         <Suspense fallback={<div className="grid min-h-56 place-items-center rounded-[28px] border border-white/[.08] bg-black/35 text-xs font-bold text-white/35">Loading unified human simulation projector…</div>}>
           <UnifiedHumanSimulationProjector
             selectedSystemId={selectedBodySystemId}
