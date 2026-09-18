@@ -420,6 +420,7 @@ export function Shell({ children }: { children: ReactNode }) {
 
   useEffect(() => pasangKilau(), [])
   const [closedGroups, setClosedGroups] = useState<Record<string, boolean>>({})
+  const [navHidden, setNavHidden] = useState(false)
   const account = state.account
 
   // Bilah atas menyingkir saat membaca ke bawah dan kembali saat dicari.
@@ -429,16 +430,20 @@ export function Shell({ children }: { children: ReactNode }) {
   // pada bilahnya sendiri: bilah yang sudah menyingkir tidak berada di bawah
   // kursor, jadi hover padanya tidak akan pernah menyala.
   //
-  // Assistive Touch sengaja TIDAK mengikuti status bilah ini. Ia adalah
-  // kontrol akses persisten: menyembunyikannya saat scroll membuat aksi global
-  // menghilang justru ketika pengguna sedang membaca jauh di dalam halaman.
+  // `navHidden` sudah berdiri di sini beserta komentar yang menjanjikan dock
+  // bawah ikut menyingkir, tetapi `setNavHidden` tidak pernah dipanggil dari
+  // mana pun — janjinya belum pernah hidup. Sekarang keduanya dijalankan oleh
+  // keputusan yang sama, jadi bilah atas dan dock bawah menyingkir dan kembali
+  // bersama alih-alih saling bertentangan.
   const keadaanBilah = useCommandBar(bilahAtas)
+  useEffect(() => { setNavHidden(keadaanBilah === 'hidden') }, [keadaanBilah])
 
   // Close the mobile drawer & record the visit (for "most-used services").
   useEffect(() => { setMenuOpen(false); trackVisit(loc.pathname) }, [loc.pathname])
 
-  // Assistive Touch tetap tersedia selama membaca/scroll; hanya chrome atas
-  // yang boleh menyingkir. Input lokal orb tidak memasang listener pointer global.
+  // Auto-hide the floating bottom nav while scrolling down through a feed
+  // (it otherwise sits on top of post action buttons); bring it back on any
+  // upward scroll or once near the top, so it's never more than a flick away.
   // Harus di atas `if (!account)`: hook tidak boleh berada setelah return
   // bersyarat, karena jumlah hook akan berbeda antara render sebelum dan
   // sesudah login — React menolaknya dan seluruh halaman gagal dirender.
@@ -467,6 +472,26 @@ export function Shell({ children }: { children: ReactNode }) {
 
   const [tersembunyi, setTersembunyi] = useState<string[]>(ambilTersembunyi)
   useEffect(() => langgananFitur(setTersembunyi), [])
+
+  useEffect(() => {
+    let lastY = window.scrollY
+    let ticking = false
+    function onScroll() {
+      if (ticking) return
+      ticking = true
+      requestAnimationFrame(() => {
+        const y = window.scrollY
+        const delta = y - lastY
+        if (y < 80) setNavHidden(false)
+        else if (delta > 8) setNavHidden(true)
+        else if (delta < -8) setNavHidden(false)
+        lastY = y
+        ticking = false
+      })
+    }
+    window.addEventListener('scroll', onScroll, { passive: true })
+    return () => window.removeEventListener('scroll', onScroll)
+  }, [])
 
   // Halaman demo mandiri: butuh kanvas penuh sendiri (video layar penuh,
   // tanpa header/nav aplikasi), dan harus dapat diakses lewat URL langsung
@@ -781,7 +806,7 @@ export function Shell({ children }: { children: ReactNode }) {
 
           Tujuh tujuan yang sama tetap ada, kini di dalam menu yang muncul saat
           tombolnya diketuk; tidak ada satu pun yang dihapus. */}
-      {['pasien', 'dokter', 'owner'].includes(account.role) && (
+      {['pasien', 'dokter', 'owner'].includes(account.role) && !navHidden && (
         <FabNavigasi
           tujuan={[
             { to: '/', label: 'Home', ikon: <IconHome size={19} />, end: true },

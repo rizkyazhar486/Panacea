@@ -4,48 +4,20 @@ import { readFileSync } from 'node:fs'
 const workspace = readFileSync('src/pages/HomeSocialWorkspace.tsx', 'utf8')
 const deck = readFileSync('src/components/HomeCommandDeck.tsx', 'utf8')
 const hero = readFileSync('src/components/HomeVisualLanding.tsx', 'utf8')
-const funWidgets = readFileSync('src/components/HomeFunWidgetRail.tsx', 'utf8')
-const funWidgetsCss = readFileSync('src/styles/home-fun-widgets.css', 'utf8')
 const heroCss = readFileSync('src/styles/home-intent-motion.css', 'utf8')
 const glass = readFileSync('src/styles/home-liquid-control-layer.css', 'utf8')
 const shell = readFileSync('src/components/Shell.tsx', 'utf8')
-const widgetRegistry = readFileSync('src/lib/homeWidgets.ts', 'utf8')
-const canonicalWidgetCount = [...widgetRegistry.matchAll(/\\{\\s*id:\\s*'[^']+'/g)].length
 
 // Zero-step: Home itself shows health context. One-step: primary destinations
 // and universal actions are directly exposed without an intermediate menu.
 assert.match(workspace, /<HomeHealthBrief \/>/, 'Home stopped exposing health context at zero steps')
-assert.match(workspace, /import \{ HomeFunWidgetRail \}/, 'Home stopped importing the live fun-widget rail')
-assert.match(workspace, /<HomeFunWidgetRail \/>/, 'Home lost the live fun-widget rail from the rendered Home surface')
-
-// Fun widgets must be real mini-apps backed by the existing feature universe and
-// real local health state, not a decorative three-card mockup.
-assert.match(funWidgets, /import \{ WIDGETS, type WidgetDef \} from '\.\.\/lib\/homeWidgets'/,
-  'fun widgets stopped deriving from the canonical feature registry')
-assert.match(funWidgets, /DEFAULT_WIDGETS = \[/, 'Home fun widgets lost their explicit starter set')
-assert.match(funWidgets, /getVitals\(\)/, 'live widgets stopped reading the shared vitals source')
-assert.match(funWidgets, /getWorkouts\(\)/, 'live widgets stopped reading the shared workout source')
-assert.match(funWidgets, /state\.foods/, 'live widgets stopped reading nutrition state')
-assert.match(funWidgets, /state\.sleepLogs/, 'live widgets stopped reading sleep state')
-assert.match(funWidgets, /panacea:health-updated/, 'live widgets no longer refresh from the shared health event stream')
-assert.match(funWidgets, /function FocusWidget\(\)[\s\S]*setRunning[\s\S]*window\.setInterval/,
-  'focus widget regressed into decoration instead of a working timer')
-assert.match(funWidgets, /Customize · \{WIDGETS\.length\}/, 'Home lost direct customization across the full widget universe')
-assert.match(funWidgets, /Widget universe/, 'customizable widget picker is missing')
-assert.match(funWidgets, /panacea-fun-picker-grid/, 'feature picker lost its scalable grid surface')
-assert.match(funWidgets, /localStorage\.setItem\(STORAGE_KEY/, 'widget customization no longer persists')
-assert.match(funWidgetsCss, /scroll-snap-type:\s*x mandatory/, 'fun widget rail lost mobile swipe snapping')
-assert.match(funWidgetsCss, /prefers-reduced-motion: reduce/, 'fun widget motion has no reduced-motion escape')
-
 const healthIndex = workspace.indexOf('<HomeHealthBrief />')
-const funIndex = workspace.indexOf('<HomeFunWidgetRail />')
-const legacyWidgetIndex = workspace.indexOf('<RelWidgetRumah />')
 const heroIndex = workspace.indexOf('<HomeVisualLanding />')
-assert.ok(healthIndex >= 0 && funIndex > healthIndex && legacyWidgetIndex > funIndex && heroIndex > legacyWidgetIndex,
-  'Home must show health context, live mini-app widgets, preserved legacy widgets, then the secondary action hero')
+assert.ok(healthIndex >= 0 && heroIndex >= 0 && healthIndex < heroIndex,
+  'Home puts the promotional hero before the user\'s health state; useful content must win the first viewport')
 assert.match(workspace, /data-panacea-primary-nav/, 'Home lost its single persistent primary navigation layer')
 for (const label of ['Home', 'Your Body', 'Clinical', 'For You']) {
-  assert.match(workspace, new RegExp(\`<span>\${label}<\\/span>\`), \`primary navigation lost \${label}\`)
+  assert.match(workspace, new RegExp(`<span>${label}<\\/span>`), `primary navigation lost ${label}`)
 }
 
 const heroActions = [...hero.matchAll(/\{ to: '([^']+)', label: '([^']+)'/g)]
@@ -92,4 +64,4 @@ assert.doesNotMatch(shell, /aria-label="Log Out"/,
 assert.match(shell, /onClick=\{doLogout\}[\s\S]{0,240}?Log Out/,
   'removing duplicate header logout must not remove logout from the drawer')
 
-console.log('home-zero-one-liquid-contract: zero-step health context, live customizable mini-app widgets, one-tap primary/actions/recents, one navigation system, Liquid Glass confined to controls, and no duplicate header logout.')
+console.log('home-zero-one-liquid-contract: zero-step health context, one-tap primary/actions/recents, one navigation system, Liquid Glass confined to controls, and no duplicate header logout.')
