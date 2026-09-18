@@ -12,7 +12,7 @@ assert.doesNotMatch(clinical, /backdrop-blur|bg-gradient|blur-3xl|shadow-\[/,
 
 // High-frequency tasks are one direct interaction from Clinical.
 for (const path of ['/chatbot', '/emr', '/emergency', '/care-episode', '/body-explorer']) {
-  assert.match(clinical, new RegExp(`to="${path.replace(/[?]/g, '\\?')}"`),
+  assert.ok(clinical.includes(`to: '${path}'`) || clinical.includes(`to="${path}"`),
     `Clinical lost one-tap access to ${path}`)
 }
 
