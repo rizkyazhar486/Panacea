@@ -7,6 +7,7 @@ import { BodyExposurePortal } from '../components/BodyExposurePortal'
 
 const BodyComposition = lazy(() => import('./BodyComposition').then((m) => ({ default: m.BodyComposition })))
 const BodyExposureOS = lazy(() => import('./BodyExposureOS').then((m) => ({ default: m.BodyExposureOS })))
+const PersonalBodyAvatar3D = lazy(() => import('../components/PersonalBodyAvatar3D').then((m) => ({ default: m.PersonalBodyAvatar3D })))
 const BodyToolkit = lazy(() => import('./BodyToolkit').then((m) => ({ default: m.BodyToolkit })))
 const ShapeForming = lazy(() => import('./ShapeForming').then((m) => ({ default: m.ShapeForming })))
 const PusatLatihan = lazy(() => import('./PusatLatihan').then((m) => ({ default: m.PusatLatihan })))
@@ -164,6 +165,16 @@ export function UnifiedBodyWorkspace() {
       </section>
 
       <section role="tabpanel" aria-label={active.label} className="min-w-0">
+        {/* Karakter parametrik tetap tersedia sebagai alat ukur/postur sekunder.
+            Ia sengaja hanya muncul di view character agar tidak menggantikan
+            Body Exposure sebagai jangkar anatomi source-backed. */}
+        {activeKey === 'character' && (
+          <div className="mb-4">
+            <Suspense fallback={<Loader />}>
+              <PersonalBodyAvatar3D />
+            </Suspense>
+          </div>
+        )}
         <Suspense fallback={<Loader exposure={isExposure} />}><Active /></Suspense>
       </section>
 
