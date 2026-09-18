@@ -4,6 +4,8 @@ import { PanaceaZoneNav } from '../components/PanaceaZoneNav'
 import { SuperPageCapabilityRail } from '../components/SuperPageCapabilityRail'
 import { SurfaceDepthNavigator } from '../components/SurfaceDepthNavigator'
 import { ClinicalPatientContext } from '../components/ClinicalPatientContext'
+import { PersonalBodyUnifiedSurface } from '../components/PersonalBodyUnifiedSurface'
+import { SurfaceGuide } from '../components/SurfaceGuide'
 
 export const GROUPS = [
   {
@@ -102,6 +104,15 @@ export function ClinicalHub() {
 
         <SurfaceDepthNavigator surface="clinical" routes={CLINICAL_DEPTH_ROUTES} />
         <ClinicalPatientContext />
+        <SurfaceGuide
+          summary="see the body → ask one question → record only reviewed facts"
+          steps={[
+            'Use the body surface to orient the region and system.',
+            'Ask Panacea for sourced context, not an autonomous diagnosis.',
+            'Promote findings into AI-EMR only after clinician review.',
+          ]}
+        />
+        <PersonalBodyUnifiedSurface compact defaultFocus="clinical" shareable={false} cameraCapture={false} />
 
         <section aria-label="Ask and record" className="border-b border-white/10 pb-8">
           <div className="grid gap-3 sm:grid-cols-[minmax(0,1fr)_96px]">
