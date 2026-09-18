@@ -71,8 +71,8 @@ export function HomeSocialWorkspace() {
       {activeKey === 'home' ? (
         <div className="panacea-human-home">
           <HomeHealthBrief />
-          <RelWidgetRumah />
           <HomeVisualLanding />
+          <RelWidgetRumah />
           <HomeCommandDeck />
         </div>
       ) : activeKey === 'for-you' ? (
