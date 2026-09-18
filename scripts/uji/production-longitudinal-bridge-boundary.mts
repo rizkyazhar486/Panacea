@@ -13,16 +13,20 @@ const source = files.map((relative) =>
   readFileSync(new URL(relative, import.meta.url), 'utf8'),
 ).join('\n')
 
+const executableSource = source
+  .replace(/\/\*[\s\S]*?\*\//g, '')
+  .replace(/^\s*\/\/.*$/gm, '')
+
 assert.match(
-  source,
+  executableSource,
   /panaceaLongitudinalState/,
   'production bridge no longer targets the canonical longitudinal kernel',
 )
-assert.doesNotMatch(source, /localStorage/, 'production bridge must not create browser persistence side effects')
-assert.doesNotMatch(source, /\bfetch\s*\(/, 'production bridge must not perform network retrieval')
-assert.doesNotMatch(source, /\bwindow\b/, 'production bridge must remain runtime-agnostic and pure')
+assert.doesNotMatch(executableSource, /localStorage/, 'production bridge must not create browser persistence side effects')
+assert.doesNotMatch(executableSource, /\bfetch\s*\(/, 'production bridge must not perform network retrieval')
+assert.doesNotMatch(executableSource, /\bwindow\b/, 'production bridge must remain runtime-agnostic and pure')
 assert.doesNotMatch(
-  source,
+  executableSource,
   /longitudinalPatientState/,
   'production bridge must not revive the duplicate longitudinalPatientState store',
 )
