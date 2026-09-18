@@ -32,10 +32,12 @@ assert.match(deck, /pintasan\.map\(/, 'the one-tap rail does not use the existin
 
 // The logged-in product should reach useful data quickly instead of spending
 // most of the first viewport on a marketing hero.
-assert.match(heroCss, /min-height:clamp\(310px,38svh,410px\)/,
-  'desktop Home hero grew back into a majority-viewport marketing surface')
-assert.match(heroCss, /min-height:330px/,
-  'mobile Home hero grew back and pushes health context below the first viewport')
+assert.match(heroCss, /min-height:\s*190px/,
+  'secondary action panel grew back into a majority-viewport marketing surface')
+assert.doesNotMatch(hero, /pointermove|pointerleave|panacea-intent-hero__media|panacea-intent-hero__scan|panacea-intent-hero__halo/,
+  'Home action panel reintroduced decorative pointer/parallax media')
+assert.doesNotMatch(heroCss, /@keyframes|animation:/,
+  'Home action panel reintroduced decorative ambient animation')
 
 // Liquid Glass is a CONTROL layer, not a card skin.
 assert.match(glass, /\.panacea-liquid-dock[\s\S]*backdrop-filter: blur\(20px\)/,
