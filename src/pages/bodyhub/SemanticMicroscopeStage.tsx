@@ -5,6 +5,7 @@ import type { BodySemanticScale } from '../../lib/bodySemanticZoom'
 const CellLab = lazy(() => import('./CellLab').then((module) => ({ default: module.CellLab })))
 const AlphaGenomeAtlas = lazy(() => import('./AlphaGenomeAtlas'))
 const VertikalMolekulerPanel = lazy(() => import('./VertikalMolekulerPanel'))
+const MolecularChemistryStage = lazy(() => import('./MolecularChemistryStage'))
 
 interface SemanticMicroscopeStageProps {
   scale: BodySemanticScale
@@ -62,13 +63,17 @@ export default function SemanticMicroscopeStage({ scale, selectedSystemId }: Sem
   }
 
   if (scale === 'molecule') {
-    if (selectedSystemId === 'respiratory') {
-      return <Suspense fallback={<Loader label="respiratory molecular vertical" />}><VertikalMolekulerPanel /></Suspense>
-    }
     return (
-      <SourceGap title={systemLabel + ' molecular vertical'}>
-        No validated organ → tissue → cell → protein/pathway vertical is registered for this system yet. Keep this state blocked until the molecular identity, cross-scale relationship and provenance are source-backed.
-      </SourceGap>
+      <section className="space-y-3">
+        <Suspense fallback={<Loader label="molecular chemistry reference" />}>
+          <MolecularChemistryStage selectedSystemId={selectedSystemId} />
+        </Suspense>
+        {selectedSystemId === 'respiratory' ? (
+          <Suspense fallback={<Loader label="respiratory molecular vertical" />}>
+            <VertikalMolekulerPanel />
+          </Suspense>
+        ) : null}
+      </section>
     )
   }
 
