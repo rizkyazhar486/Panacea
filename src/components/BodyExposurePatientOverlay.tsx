@@ -92,7 +92,7 @@ export function BodyExposurePatientOverlay({
           {focus.label} exam focus · patient-wide vitals · geometry remains reference-only
         </summary>
         <p className="mt-2 max-w-4xl pb-2 leading-relaxed text-white/45">
-          Recorded examination markers are filtered to the selected Body Exposure system for navigation only. Vitals remain patient-wide and are not re-labeled as organ-specific measurements. The overlay does not morph atlas geometry into patient-specific anatomy and does not generate diagnosis, severity, prognosis, treatment, lesion location or procedure targets.
+          Recorded examination markers are filtered to the selected Body Exposure system for navigation only. Vitals remain patient-wide and are not re-labeled as organ-specific measurements. They do not morph atlas geometry into patient-specific anatomy and do not generate diagnosis, severity, prognosis, treatment, lesion location or procedure targets.
         </p>
       </details>
     </section>
