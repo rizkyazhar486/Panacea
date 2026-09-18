@@ -5,6 +5,8 @@ import { PostCard } from './Feed'
 import { compressImage, readAsDataUrl } from '../lib/upload'
 import { IconX } from '../components/icons'
 import { Portal } from '../components/Portal'
+import { PersonalBodyUnifiedSurface } from '../components/PersonalBodyUnifiedSurface'
+import { SurfaceGuide } from '../components/SurfaceGuide'
 import type { ProfileEdit } from '../lib/types'
 
 type Tab = 'posts' | 'locked' | 'reposts' | 'saved' | 'liked' | 'archive'
@@ -63,7 +65,7 @@ export function Profile() {
   const list = collections[tab]
 
   return (
-    <div className="mx-auto w-full max-w-xl">
+    <div className="mx-auto w-full max-w-5xl space-y-4">
       {/* Header */}
       <div className="flex items-center gap-4">
         <button onClick={openEdit} className="relative h-20 w-20 shrink-0" aria-label="Change profile photo">
@@ -97,6 +99,16 @@ export function Profile() {
           <a href={normalizeUrl(profile.link)} target="_blank" rel="noopener noreferrer" className="inline-block text-xs font-semibold text-brand-dark">🔗 {profile.link}</a>
         )}
       </div>
+
+      <SurfaceGuide
+        summary="build your body once → keep it synced → share only when you choose"
+        steps={[
+          'Use My Body to orient your personal visual identity.',
+          'Open anatomy only when you want internal reference context.',
+          'Share exports are user-triggered and never automatic.',
+        ]}
+      />
+      <PersonalBodyUnifiedSurface compact defaultFocus="identity" shareable cameraCapture />
 
       <HealthSnapshot className="mt-3" />
 
