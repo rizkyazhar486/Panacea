@@ -257,3 +257,26 @@ Next deep work should extend rather than replace this contract:
 4. integrate patient-specific imaging only from actual uploaded/authorized DICOM with explicit registration/provenance and a clear distinction between atlas reference and patient data;
 5. AR/WebXR may be added as a spatial educational view of the same selected source structure, never as operative navigation or patient-specific anatomy without validated registration and review;
 6. preserve mobile 390×844, WebGL fallback, source provenance, fail-closed missing anatomy and Academic Accuracy Gate behavior.
+
+
+## Body Exposure universal gold-standard directive — 2026-09-18
+
+There is no privileged “Eye Gold Standard.” The quality target is universal across the whole body and every biological scale.
+
+The canonical registry is now:
+- `src/lib/anatomy/universalAtlasStandard.ts`
+- `src/pages/bodyhub/UniversalAtlasDepthRail.tsx`
+- `src/pages/bodyhub/MolecularChemistryStage.tsx`
+- `scripts/uji/universal-atlas-standard.mts`
+
+Required product behavior:
+- every body system must ultimately satisfy the same ladder: gross anatomy → histology/microanatomy → cell → organelle → chemistry → genome;
+- examples such as nails, sebaceous glands, areola, nephron, kidney microstructure, lens, auricle, cornea, eyelid, tunica intima/media/adventitia, genital/reproductive anatomy, ATP, NAD+/NADH, glucose, proteins, peptides and compounds are part of the universal target, not special-case side modules;
+- gross geometry, histology, cells and molecular structures must each come from the appropriate source class; never enlarge a gross mesh and call it microscopic anatomy;
+- missing microanatomy remains an explicit source gap until licensed/verified assets exist;
+- molecular/compound nodes must bind to verified identifiers/provenance before 3D chemical structures are called source-backed;
+- keep the UI compact and visual-first: one depth rail, progressive disclosure, no duplicate scale navigation walls.
+
+The first runtime implementation is already visible in Unified Human Simulation Projector: a universal depth rail replaces the duplicate scale rail, and the molecular stage now exposes ATP/NAD+/NADH/glucose chemistry context across all systems with PubChem references for the verified core compounds.
+
+Continue by adding real source adapters and assets, not more placeholder prose.
