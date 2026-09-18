@@ -68,7 +68,7 @@ Do not add those generated binaries to main until:
 - a browser artifact proves surface + eye + internal systems remain aligned;
 - attribution/share-alike requirements are preserved.
 
-Then research/prepare the female reference lane using HRA. Do not fit `obgin.glb` into the male reference body.
+Then acquire/audit the pinned HRA Visible Human Female united v1.5 source with `scripts/bangun/acquire-hra-female-v1_5.mjs`. Treat it as a separate female whole-body reference mode. Do not fit `obgin.glb` or the HRA united source into the male reference body.
 
 Astra may use Blender Python and headless Blender. Geometry should be edited only when the edit is source-derived and traceable. Cosmetic material work is allowed; anatomical sculpting from imagination is not.
 
@@ -92,7 +92,7 @@ Immediate runtime requirements:
 1. whole-body surface is actually reachable;
 2. ocular source structures remain connected to the whole body;
 3. male reproductive structures remain connected to the whole body;
-4. female regional reference remains explicitly separate until compatible;
+4. female HRA united whole-body source remains a separate pipeline-ready reference until acquired, audited, Blender-packaged and browser/mobile accepted;
 5. no second competing renderer if the canonical loader/runtime can be extended.
 
 Prefer extending:
@@ -119,7 +119,7 @@ Current immediate fixes landed:
 - integument target can select the complete `surface.glb` source catalogue;
 - whole-body eye lookup uses actual ocular source bundles instead of the wrong visceral lookup;
 - male reproductive whole-body targets include penile/erectile, testicular, epididymal, deferent-duct, seminal-vesicle and prostate structures;
-- female whole-body absence remains explicit rather than fabricated.
+- HRA Visible Human Female united v1.5 is registered as a real whole-body source candidate rather than treating female whole-body anatomy as nonexistent; runtime admission remains blocked until acquisition/node/performance audit passes.
 
 ## Work locking
 
@@ -161,7 +161,7 @@ Blender scripts, asset manifests and new source-audit files are preferred for pa
 
 ### Wave 3 — sex-specific reference anatomy
 - keep male and female references explicit;
-- ingest compatible female reference assets;
+- acquire/audit/package HRA Visible Human Female united v1.5 as its own whole-body reference;
 - vagina/uterus/ovary/tube/pelvic floor and external-genital surface only from source-backed female geometry;
 - never superimpose sex-specific anatomy without an explicit educational comparison mode.
 
