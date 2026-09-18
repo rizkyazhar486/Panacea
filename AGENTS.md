@@ -1,157 +1,98 @@
 # Panacea Multi-Agent Operating Policy
 
 ## Objective
-Work efficiently on Panacea while minimizing duplicated work, CI churn, stale PRs,
-and unnecessary model/credit usage. Correctness, clinical safety, maintainability,
-security and production stability remain more important than speed.
 
-## Source of truth and traffic rules
+Develop Panacea quickly without destroying existing work. Correctness, clinical safety, maintainability, security, provenance and production stability remain hard constraints.
 
-GitHub `main` is the source of truth. **Agents must not push directly to `main`.**
-Every production change uses a short-lived branch and PR.
+## Owner directive: main-first continuous development
 
-Before selecting work:
-1. Resolve latest `main` and recent commits.
-2. Inspect open PRs/branches and current CI/deployment state.
-3. Check changed-file overlap for the intended area.
-4. If another agent already owns overlapping paths, do not duplicate the work.
-5. Select a safe non-overlapping unfinished candidate. There is **no global
-   product-wide priority order** unless a later explicit instruction introduces one.
+GitHub main is the source of truth. As of 2026-09-18, authorized agents may and should commit coherent production changes directly to main. This supersedes the repository's older PR-only traffic rule.
 
-One active coherent PR per owned change is preferable to several overlapping
-micro-PRs. Close or supersede stale duplicates explicitly.
+Traffic rules:
+1. Resolve the current main head immediately before writing.
+2. Preserve already-landed work and inspect likely overlap when practical.
+3. Commit coherent, buildable batches directly to main; do not create a PR merely because an older instruction required one.
+4. Never force-push, rewrite shared history, or overwrite a newer main.
+5. If main advances during preparation, replay/rebuild on the newer head.
+6. Validate before committing when practical and inspect CI after committing.
+7. A broken main is repaired forward immediately; do not bypass or weaken tests, security checks or biomedical gates to make status green.
 
-## Simultaneous all-lane execution
+## Agent autonomy and collaboration
 
-Panacea currently operates in **simultaneous multi-lane mode**. ChatGPT/Codex,
-Claude Code and other authorized agents should keep independent lanes moving in
-parallel rather than waiting for one lane to finish before another begins.
+The latest explicit owner/user instruction outranks agent-authored process or architecture recommendations.
 
-Active lanes include, concurrently:
-- UI/UX, interaction, motion, responsive behavior, accessibility and design system;
-- frontend product behavior and feature integration;
-- backend, APIs, database/Supabase, data architecture and integrations;
+Claude Code, ChatGPT/Codex and other authorized builders may improve, refactor or replace one another's implementation when it produces a stronger integrated result. No file or subsystem is permanently reserved for one agent.
+
+Agents may deviate from older agent recommendations, including sequencing and architecture, when current evidence supports a better approach. Material changes should preserve the owner's intent, useful capabilities, data compatibility where required, and clinical/safety boundaries.
+
+Default behavior is preserve → understand → integrate → improve. Do not sabotage another agent, delete working capability for stylistic preference, or add bureaucracy that exists only to protect an agent's past choices.
+
+## Simultaneous product lanes
+
+Independent lanes may continue concurrently:
+- UI/UX, motion, responsive behavior, accessibility and design system;
+- frontend behavior and feature convergence;
+- backend, APIs, database/Supabase and integrations;
 - AI orchestration, evaluation, clinical reasoning infrastructure and safety;
-- Body Exposure, anatomy, physiology, pathology, pharmacology and simulation;
-- tests, CI, stabilization, observability, security and repository hygiene;
-- analytics, localization, documentation and developer tooling.
+- Body Exposure and biomedical simulation;
+- tests, CI, observability, security and repository hygiene;
+- analytics, localization, documentation and tooling.
 
-**UI/UX is active implementation scope**, not a deferred handoff. Visual work may
-proceed at the same time as backend, AI, biomedical and stabilization work.
+A real shared dependency should block only the work that depends on it.
 
-"No global priority" does not remove technical dependencies:
-- each lane may order its own prerequisites locally;
-- a blocker should stop only work that actually depends on it;
-- unrelated healthy lanes should continue;
-- an overlapping file or tightly coupled state is single-writer until the owning
-  PR lands or relinquishes it;
-- never create artificial concurrency by force-pushing, bypassing CI, deleting
-  another agent's work, or weakening validation.
+## Body Exposure operating model
 
-For long-running or blocked work, leave durable continuation/handoff context in
-the repository's canonical task ledger or `CLAUDE.md`.
+Body Exposure is a single Unified Human Simulation Projector, not a collection of unrelated visual demos.
 
-## Standard agent lane
+All body simulation work should converge on one persistent context:
+- body system / organ / structure selection;
+- source-backed 3D spatial reference;
+- whole-body-to-genome scale;
+- physiology/pathophysiology scenario;
+- movement/biomechanics state;
+- cellular/metabolic/genomic state;
+- surgical/imaging/pharmacology projection;
+- evidence provenance and boundary.
 
-For each candidate:
-1. Define a small acceptance criterion.
-2. Create a branch from latest safe `main`.
-3. Make the smallest coherent reversible change.
-4. Run targeted tests/typechecks locally or through available tooling first.
-5. Push a consolidated branch update; avoid repeated tiny pushes that continually
-   cancel and restart CI.
-6. Open/update one PR.
-7. Require exact-head **Validate pull requests** plus complete **Stabilization
-   Acceptance** before merge.
-8. Immediately before merge, re-resolve latest `main`, mergeability and changed-file
-   overlap. If overlap or workflow ancestry is uncertain, refresh from latest main
-   and rerun gates; never force merge.
-9. Merge through the PR only. Verify `main` and available deployment/smoke evidence.
-10. Continue to the next non-overlapping candidate without waiting for a manual
-    “lanjut” instruction when operating under an authorized automation.
+Canonical scale:
+body → system → organ → tissue → cell → organelle → molecule/pathway → genome.
 
-## CI throughput policy
+Canonical projection domains:
+3D anatomy → physiology → pathophysiology → biomechanics → cell/metabolism → genome → surgery → pharmacology/imaging.
 
-Stabilization coverage must not be weakened merely to make CI faster. Throughput
-improvements should remove redundant work, expose failures earlier, improve cache
-use, or safely parallelize independent gates.
+Reuse existing engines as plugins in the shared projector and progressively couple their state. Prefer one strong spatial/simulation engine over more standalone pages.
 
-- `npm run build` already includes repository validators and TypeScript project
-  build; avoid duplicating an equivalent typecheck in the same workflow unless it
-  catches a distinct class of failure.
-- Preserve deterministic frontend tests, Body 390x844 browser smoke, rendered
-  WebGL evidence, server typecheck/build/tests, and specialized gates where relevant.
-- Diagnose a failed run before pushing another commit. A speculative push wastes
-  runner time and cancels useful evidence.
-- Do not create placeholder/TEMP commits on `main` to trigger or test CI.
-- Do not bypass or edit tests solely to make a failing candidate green.
-- CI green on an old head is stale evidence if the PR head changes. If `main`
-  changes materially or overlaps the PR, revalidate against current main.
+## Validation
 
-## Failure protocol
+Build and test expectations remain meaningful even though PR gating is retired.
 
-When a gate fails:
-- identify whether the failure is caused by the candidate, current `main`, runner
-  infrastructure, or a hidden dependency between jobs;
-- fix only the concrete defect when possible;
-- preserve the original test intent;
-- if a refactor/optimization exposes a hidden dependency, encode that dependency
-  explicitly rather than restoring accidental ordering;
-- never claim DONE, green, merged, deployed or verified without direct evidence.
+- Preserve deterministic frontend tests and validators.
+- Preserve Body/WebGL and mobile smoke coverage.
+- Preserve server build/typecheck/tests.
+- Preserve security baselines and Academic Accuracy Gate.
+- Diagnose concrete failures rather than editing tests to hide them.
+- Never claim a check ran when it did not.
 
-## Default coding behavior
-
-- Use normal/default Codex and medium reasoning for routine coding.
-- Keep repository context narrow; inspect only relevant files unless broader
-  context is necessary.
-- Prefer targeted edits over repo-wide refactors.
-- Prefer targeted tests first; full gates remain required at merge boundaries.
-- Avoid repeatedly re-reading unchanged files.
-- Do not use expensive/highest-capability modes for routine Git, docs, renaming,
-  formatting, simple styling, CRUD, small refactors, or straightforward bug fixes.
-
-## Escalation policy
-
-1. **Routine / Medium reasoning**
-   - Small bug fixes, CRUD/API wiring, TypeScript fixes, simple React components,
-     CSS/layout, tests, documentation and Git operations.
-2. **High reasoning**
-   - Multi-file dependency issues, difficult debugging, architecture, complex
-     state/data flow, security-sensitive or clinically important implementation.
-3. **Extra-high reasoning**
-   - Only when High is insufficient or correctness risk is substantial.
-4. **Astra**
-   - Reserve for complex interactive medical visualization, Three.js/WebGL,
-     advanced 3D/animated anatomy or physiology, sophisticated SVG/canvas, and
-     difficult end-to-end visual work ordinary modes cannot solve reliably.
-
-After a difficult visual foundation works, return to normal/default mode for
-integration, cleanup, responsive behavior, tests and maintenance.
+For an authorized direct-main commit, a post-commit CI failure is a forward-fix priority, not a reason to fabricate success.
 
 ## Biomedical and scientific boundary
 
-For anatomy, physiology, pathology, pharmacology, surgery, genomics, longevity or
-other medical behavior:
-- preserve authoritative source identity, version/provenance and uncertainty;
-- distinguish measured, reference, simulated, derived and unsupported states;
-- run the repository Academic Accuracy Gate for material biomedical content;
-- never fabricate citations, anatomy, geometry, reviewer identity or validation;
-- never promote generic atlas geometry to patient-specific anatomy or procedure
-  targeting;
-- high-risk clinical/procedure content stays blocked from clinical publication
-  until the required qualified human review is actually recorded.
+For anatomy, physiology, pathology, pharmacology, surgery, genomics, longevity and related medical behavior:
+- retain authoritative source identity, provenance and uncertainty;
+- keep measured, reference, simulated, derived and unsupported states distinct;
+- never fabricate citations, geometry, reviewer identity or validation;
+- never convert generic atlas geometry into patient-specific anatomy or operative targeting;
+- never present a synthetic teaching model as a measured patient state;
+- high-risk clinical publication remains blocked until actual qualified human review is recorded.
+
+## Engineering behavior
+
+Prefer the smallest coherent change that advances the shared architecture, but Claude Code may perform larger refactors when fragmentation itself is the problem.
+
+Use normal reasoning for routine work, higher reasoning for architecture/debugging/clinical-risk work, and the strongest visual/3D tooling for difficult Three.js/WebGL or advanced simulation tasks. Once a difficult foundation works, return to cheaper routine modes for cleanup, integration and maintenance.
+
+Keep implementation simple, observable and resumable. Leave durable handoff context for long-running work.
 
 ## Progress reporting
 
-Report simultaneous work by lane using verifiable repository state. Do not invent
-precision. When a canonical weighted backlog exists, aggregate progress may use:
-
-`Overall progress = 100 × (verified completed weighted work / canonical weighted backlog)`
-
-If the denominator is not trustworthy, report concrete deltas, active PRs, CI
-state and blockers instead of a fabricated percentage.
-
-## Cost-awareness rule
-Before escalating model/reasoning or broadening context, ask internally whether a
-smaller targeted change/test can solve the task reliably. Save compute where safe,
-but never trade away correctness, clinical safety, security or evidence quality.
+Report verifiable deltas: current main SHA, concrete capability, tests/CI, deployment evidence and blockers. Do not invent precision or completion percentages.

@@ -1,157 +1,103 @@
-# Panaceamed.id — working rules
+# Panaceamed.id — Claude Code working contract
 
-## Language: English is the base. This is permanent.
+## Authority order
 
-The **fundamental language of this application is English**, everywhere, from now
-on and for good. English is not a preference to be revisited each session — it is
-what makes the product professional and usable outside one person's own screen.
+The latest explicit instruction from the repository owner/user is the highest product-development authority. After that, prefer the current working repository state, then this file and AGENTS.md, then older agent-authored plans or recommendations.
 
-The app is **multilingual on top of that base**: English (source) plus
-**Arabic, Mandarin, Indonesian, French, Japanese, Dutch**. Every new string is
-written in English first and then translated outward; never the reverse.
+Claude Code may supersede older ChatGPT/Codex/Claude implementation recommendations, sequencing, architecture preferences, file-ownership assumptions, or handoff conventions when a better engineering path is available. Explain material deviations in the commit message or durable repository notes when useful. No agent-authored recommendation is permanent merely because it was written first.
 
-### What this means in practice
+Safety, security, data integrity, licensing, biomedical provenance, and the clinical-publication boundary are not optional implementation preferences and must not be weakened as a shortcut.
 
-- **Write every new user-facing string in English.** Buttons, labels, empty
-  states, error messages, notification titles and bodies, onboarding copy.
-- **Never translate the interface into Indonesian.** If a screen is still in
-  Indonesian, it is unfinished work — convert it to English, do not "keep it
-  consistent" with its neighbours by adding more Indonesian.
-- **Two exceptions, and only these two:**
-  1. The **SKDI / OSCE / UKMPPD medical corpus** (disease notes, station notes,
-     exam banks, therapy references) stays in Indonesian — it mirrors Indonesian
-     national competency material and its wording is the point.
-  2. **Scripture and religious content** (Qur'an, hadith, other traditions) keeps
-     its source language plus the existing Indonesian rendering.
-  The interface *around* both of those is still English.
-- **Code comments in this repository are written in Indonesian** by long-standing
-  convention, and that stays. Comments are not interface.
+## Language
 
-### Why this was written down
+English is the product source language. New user-facing interface strings are written in English first and translated outward. Supported translation work may include Arabic, Mandarin, Indonesian, French, Japanese and Dutch.
 
-An earlier session read a note that said "~1,100 remaining English strings" as a
-list of strings to translate *into* Indonesian, and pushed ten commits in the
-wrong direction before it was caught. The instruction had always been the
-opposite. The cost of re-deriving this from context is a day of work thrown away,
-so it lives here instead.
+Exceptions:
+1. SKDI / OSCE / UKMPPD medical corpus content may remain Indonesian because it mirrors Indonesian competency material.
+2. Scripture/religious source content may retain its source language and the established Indonesian rendering.
 
-## Identifiers are not text
+Code comments may remain Indonesian by repository convention. Identifiers, route keys, option values, storage keys and other programmatic identifiers are data, not translatable interface copy.
 
-`id`, route paths, `value=` on options, filter keys, and anything compared with
-`===` are **data**, not interface. Translating them empties saved layouts and
-silently kills filters with no visible error. Translate the label; leave the key.
+## Shipping — direct main is the active owner directive
 
-## Multi-agent coordination — mandatory
+As of 2026-09-18, authorized Panacea development is direct-to-main by default. This supersedes the older PR-only rule in this repository.
 
-This repository is edited concurrently by ChatGPT/Codex, Claude Code, Replit and
-other automation. **GitHub `main` is the source of truth, but agents must not push
-directly to `main`.** Direct writes make other PRs stale, cancel useful CI, and
-create hard-to-audit races.
+For authorized implementation:
+1. Read the current main head immediately before changing files.
+2. Build on the newest main and preserve already-landed work.
+3. Commit coherent, buildable batches directly to main. A pull request is not required.
+4. Never force-push or rewrite shared history.
+5. If main moves while a change is being prepared, replay the change on the newest main rather than overwriting the newer work.
+6. Run targeted validation before the commit when practical and inspect CI/deployment evidence after the commit. A failing gate becomes the next concrete repair task; it does not restore the retired PR-only policy.
+7. Never weaken tests, academic gates, biomedical checks or security controls merely to obtain green status.
 
-Before editing:
-1. Resolve the latest `main` SHA.
-2. Inspect recent commits and open PRs touching the intended files/area.
-3. If another active PR owns overlapping paths, do not duplicate it. Pick another
-   safe task or coordinate explicitly.
-4. Create a short-lived branch from the latest safe `main`.
+Direct-to-main does not mean destructive editing. Preserve user-visible capability and other agents' useful work unless replacement is necessary to implement a better equivalent or explicitly requested redesign.
 
-During implementation:
-- Keep one coherent, reversible batch per PR.
-- Do not create `TEMP`, placeholder, dummy, or knowingly broken commits on `main`.
-- Prefer targeted tests while iterating; diagnose failures before pushing another
-  commit so CI is not repeatedly cancelled and restarted.
-- Do not weaken validators, biomedical gates, browser smoke, security checks, or
-  tests merely to obtain green CI.
-- Do not force-push shared branches or overwrite another agent's work.
+## Claude Code development autonomy
 
-## Execution mode — all lanes simultaneous, no global priority
+Claude Code is authorized to improve Panacea beyond literal older implementation prescriptions when doing so advances the owner's product intent.
 
-The current product directive is **broad concurrent execution across all product
-lanes**. ChatGPT/Codex and Claude Code should work at the same time on independent
-work rather than serializing the roadmap behind one global priority queue.
+Claude Code may:
+- refactor, consolidate, split or replace existing implementations;
+- change architecture, state flow, component boundaries, data contracts and developer workflow;
+- add or replace dependencies when the trade-off is justified;
+- add tests, validators, tooling, documentation, schemas and reusable infrastructure;
+- repair or improve work originally written by ChatGPT/Codex, Claude Code, Replit or another agent;
+- simplify or remove obsolete duplication when the capability is preserved or replaced by a demonstrably better integrated implementation;
+- choose a different technical route from an older agent recommendation when current repository evidence supports it.
 
-All of the following are active scope at the same time:
-- UI/UX, interaction, responsive behavior, motion, accessibility and design-system
-  implementation;
-- backend, APIs, data architecture, Supabase/database work and integrations;
-- AI orchestration, clinical reasoning infrastructure, evaluation and safety;
-- Body Exposure, anatomy, physiology, pathology, pharmacology and simulation;
-- tests, CI, stabilization, observability, security and repository hygiene;
-- product analytics, documentation, localization and developer tooling.
+Default collaboration behavior remains: understand first, preserve intent, integrate rather than sabotage, and avoid deleting useful capability merely to make the code look cleaner.
 
-**UI/UX is explicitly back in scope.** Do not treat visual/interface work as a
-separate deferred phase. It may proceed concurrently with backend, AI, biomedical,
-testing and infrastructure work, subject to the same PR and verification rules.
+## Body Exposure — one unified human simulation project
 
-"No global priority" means:
-- do not stop healthy independent lanes merely because another lane has an older,
-  larger or more prestigious task;
-- do not impose a single product-wide ordering such as stabilization → Body →
-  backend → UI;
-- each lane may still sequence its own prerequisites locally when technically
-  necessary;
-- a true shared blocker may gate only the work that depends on it, not unrelated
-  lanes.
+Body Exposure is one project: the Unified Human Simulation Projector. Do not grow anatomy, physiology, pathophysiology, biomechanics, cellular biology, genomics, pharmacology, imaging and surgical simulation as unrelated demo pages.
 
-Parallelism must remain race-safe:
-1. Prefer separate branches/PRs with disjoint file ownership.
-2. Treat an overlapping file or tightly coupled state as single-writer until the
-   owning PR lands or releases it.
-3. Rebase/replay from current `main` when ancestry or overlap becomes uncertain.
-4. Never solve concurrency by force-pushing, bypassing CI, deleting another
-   agent's work, or weakening safety checks.
-5. Preserve features unless removal is explicitly required and justified.
+The canonical model is one persistent body context with shared:
+- selected body system / organ / structure;
+- spatial 3D reference;
+- scale and depth;
+- simulation/scenario state;
+- timeline or motion state when relevant;
+- provenance, confidence and educational/clinical boundary.
 
-For long-running or blocked work, leave durable continuation context in this file
-or the repository's canonical handoff/task ledger so Claude Code and ChatGPT can
-resume without re-deriving intent from chat history.
+The scale ladder is:
+whole body → system → organ → tissue → cell → organelle → molecule/pathway → genome/DNA.
 
-For progress reporting, report each active lane independently from verifiable repo
-state. Do not fabricate precision. A useful aggregate is:
+The main simulation domains are:
+3D anatomy, physiology, pathophysiology, biomechanics, cells/metabolism, genome, surgery, pharmacology and imaging.
 
-`Overall progress = 100 × (verified completed weighted work / canonical weighted backlog)`
+Existing engines are reusable simulation plugins inside the same project. Prefer coupling them through shared state and source-backed spatial context instead of adding another standalone page. A user should be able to select an organ/system once and then change the projection from anatomy to function, failure, motion, micro/cellular/genomic scale or surgical layers without losing orientation.
 
-If a trustworthy denominator is unavailable, report the lane status and delta
-without inventing a percentage.
+Whole-body coverage comes first, then important organs, then tissues and smaller scales. Deep organ work should improve the shared engine rather than create isolated toy anatomy.
 
-## Shipping — PR only
+## Body Exposure scientific rules
 
-**Never push directly to `main`, and never "push to both main and a Claude branch".**
-The previous dual-push rule is retired because it caused moving-main races.
+Reference atlas geometry must never be represented as patient-specific anatomy. Synthetic physiology/pathophysiology/biomechanics simulations must be labeled as simulated. Genomic and cellular content must retain source provenance and fail closed when evidence is missing.
 
-For every production change:
-1. Push the short-lived branch and open/update exactly one PR.
-2. Run targeted checks first as useful.
-3. Require **Validate pull requests** and the complete **Stabilization Acceptance**
-   workflow to pass for the exact current PR head. Full acceptance remains the
-   authority for frontend build/tests, Body/WebGL smoke, and server gates.
-4. Immediately before merge, resolve latest `main`, confirm mergeability, inspect
-   changed-file overlap, and confirm the tested head has not changed.
-5. If `main` moved into overlapping files, CI/workflow files, or creates uncertain
-   ancestry, refresh/rebuild from latest `main` and rerun gates. Never force merge.
-6. Merge through the PR only after the exact-head gates are green and the final
-   race check is clean. Automatic merge is acceptable under those conditions.
-7. After merge, verify the merge is present on `main` and inspect available
-   deployment/smoke evidence.
-8. Close stale or superseded duplicate PRs so agents do not keep working the same
-   candidate twice.
+For anatomy, physiology, pathology, pharmacology, genomics, surgery, diagnosis/treatment or other biomedical content:
+- preserve source identity, version, provenance and uncertainty;
+- distinguish measured, reference, simulated, derived and unsupported states;
+- preserve the repository Academic Accuracy Gate;
+- never invent human review, reviewer credentials, anatomy, geometry or citations;
+- never infer patient-specific lesion location, procedure target, device setting, diagnosis or treatment from generic atlas/simulation data;
+- high-risk clinical publication remains blocked until the required qualified human review is genuinely recorded.
 
-For user-visible changes, verify the affected surface in a real browser at
-**390x844** when the repository's browser tooling supports it. For Body/3D work,
-preserve the existing WebGL smoke and rendered-artifact checks.
+## Product architecture and simplicity
 
-## Biomedical / clinical publication boundary
+Panacea should remain simple inside and outside. Consolidate overlapping capabilities into compact super-pages and shared engines rather than multiplying routes. Keep data flow, naming, API contracts, state ownership and developer workflow legible.
 
-Software CI is not academic or clinical validation. For anatomy, physiology,
-pathology, pharmacology, genomics, surgery, diagnosis/treatment, or other medical
-content, preserve provenance, evidence/version boundaries, uncertainty, AI
-assistance disclosure, and the repository Academic Accuracy Gate. Never claim
-human review unless a real qualified reviewer, credentials, date and scope are
-recorded. Never infer patient-specific anatomy, lesion location, procedure target,
-force/device setting, diagnosis or treatment from generic atlas/simulation data.
+For Body Exposure specifically, prefer a shared scene/state graph and progressive disclosure. Heavy 3D engines should lazy-load. Maintain mobile usability and WebGL degradation behavior.
 
-## Shared policy
+## Multi-agent collaboration
 
-Read and follow `AGENTS.md` as the cross-agent operating policy. If this file and
-`AGENTS.md` conflict on Git/CI coordination, follow the safer rule: short-lived
-branch → PR → exact-head gates → final latest-main audit → merge.
+GitHub main is the source of truth. Multiple agents may work concurrently. No agent has permanent ownership over a file or subsystem.
+
+Before a material edit, inspect current main and recent overlapping work when available. When another agent's landed change is useful, build on it. If two approaches conflict, reconcile intent and keep the stronger integrated result rather than deleting one side reflexively.
+
+Long-running, blocked or high-context tasks should leave durable continuation notes here or in the repository's canonical task ledger so the next agent can continue without reconstructing the entire history.
+
+## Validation and reporting
+
+Do not claim build, test, CI, deployment, browser or biomedical validation without evidence. For user-visible Body/3D work, preserve the existing 390x844 browser/WebGL smoke expectations when available.
+
+Useful progress is concrete: commit SHA, changed capability, test result, CI state and remaining blocker. Do not invent completion percentages without a trustworthy denominator.
