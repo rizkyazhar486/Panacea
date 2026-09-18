@@ -30,6 +30,7 @@ function event(input: {
   sourceKind: LongitudinalProvenance['sourceKind']
   review?: LongitudinalEvent['review']
   confidence?: number
+  consent?: LongitudinalEvent['consent']
 }): LongitudinalEvent {
   const receivedAt = input.receivedAt ?? input.recordedAt
   return {
@@ -49,7 +50,7 @@ function event(input: {
       method: 'fixture',
       version: '1',
     },
-    consent: consentAll,
+    consent: input.consent ?? consentAll,
     review: input.review ?? { state: 'not-required' },
   }
 }
@@ -112,6 +113,20 @@ state = ingestLongitudinalBatch(state, [
     sourceKind: 'import',
   }),
   event({
+    id: 'body-fat-clinical-only',
+    metric: 'body-fat',
+    domain: 'longevity',
+    value: 20,
+    unit: '%',
+    recordedAt: '2026-09-03T09:30:00.000Z',
+    sourceKind: 'device',
+    consent: {
+      granted: true,
+      purposes: ['clinical-support'],
+      grantedAt: '2026-09-01T00:00:00.000Z',
+    },
+  }),
+  event({
     id: 'lab-ldl',
     metric: 'ldl-c',
     domain: 'lab',
@@ -144,7 +159,8 @@ assert.equal(body.boundary.diagnosticInferenceGenerated, false)
 assert.equal(body.boundary.autonomousClinicalActionAllowed, false)
 assert.equal(body.boundary.simulatedState, false)
 assert.equal(body.boundary.purposeConsentLedgerApplied, true)
-assert.equal(body.governance.purposeConsentFilteredEvents, 0)
+assert.equal(body.governance.blockedByConsent, 1, 'capture-time envelope block must remain visible')
+assert.equal(body.governance.purposeConsentFilteredEvents, 0, 'envelope blocks must not be mislabeled as ledger revocations')
 
 const rhr = twinSignalByMetric(body, 'resting-heart-rate')
 assert.ok(rhr)
