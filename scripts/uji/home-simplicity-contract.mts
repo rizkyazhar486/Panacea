@@ -4,6 +4,8 @@ import { readFileSync } from 'node:fs'
 const landing = readFileSync('src/components/HomeVisualLanding.tsx', 'utf8')
 const deck = readFileSync('src/components/HomeCommandDeck.tsx', 'utf8')
 const workspace = readFileSync('src/pages/HomeSocialWorkspace.tsx', 'utf8')
+const shell = readFileSync('src/components/Shell.tsx', 'utf8')
+const commandBarLogic = readFileSync('src/lib/interaction/commandBar.ts', 'utf8')
 
 // Simplicity is not feature deletion. The persistent dock owns top-level
 // navigation; the hero is allowed only contextual actions, so the same four
@@ -26,10 +28,13 @@ assert.match(deck, /group\.items\.map\(/, 'The full capability index must remain
 assert.match(deck, /gabungKatalog\(FITUR_DARI_HUB, NAV_UNTUK_PENGATURAN\)/,
   'Simplifying the surface must not drop menu-only destinations')
 
-// One persistent four-item dock keeps the primary information architecture
-// obvious and stable.
-for (const label of ['Home', 'Your Body', 'Clinical', 'For You']) {
-  assert.match(workspace, new RegExp(`<span>${label}<\\/span>`), `primary dock lost ${label}`)
-}
+// Home no longer owns a persistent navigation dock. The global top command
+// bar stays out of the way while reading and returns on upward scroll.
+assert.doesNotMatch(workspace, /panacea-liquid-dock|data-panacea-primary-nav/,
+  'Home brought back a permanent bottom navigation dock')
+assert.match(shell, /data-panacea-command-bar=\{keadaanBilah\}/,
+  'Shell lost the top command bar')
+assert.match(commandBarLogic, /return delta > 0 \? 'hidden' : 'shown'/,
+  'top command bar is no longer direction-aware')
 
-console.log('home-simplicity-contract: one focal hero, two contextual actions, search-led Explore, complete capability reachability, and one persistent four-destination dock.')
+console.log('home-simplicity-contract: one focal hero, two contextual actions, search-led Explore, complete capability reachability, and a reveal-on-scroll top command bar with no persistent Home dock.')
