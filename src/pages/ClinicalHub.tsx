@@ -105,10 +105,11 @@ export function ClinicalHub() {
               <span className="text-cyan-100/45" aria-hidden>✦</span>
               <input value={question} onChange={(event) => setQuestion(event.target.value)} placeholder="Ask Panacea…" className="min-w-0 flex-1 bg-transparent text-xs font-semibold outline-none placeholder:text-white/25" />
             </label>
-            <div className="mt-3 grid grid-cols-3 gap-2">
+            <div className="mt-3 grid grid-cols-4 gap-2">
               <Link to="/chatbot" onClick={handoffQuestion} className="grid min-h-[42px] place-items-center rounded-[14px] bg-gradient-to-r from-cyan-200 to-violet-200 px-2 text-[9px] font-black text-black">Ask</Link>
               <Link to="/emr" className="grid min-h-[42px] place-items-center rounded-[14px] border border-white/[.08] px-2 text-[9px] font-black text-white/65">AI-EMR</Link>
               <Link to="/care-episode" className="grid min-h-[42px] place-items-center rounded-[14px] border border-white/[.08] px-2 text-[9px] font-black text-white/65">Care</Link>
+              <Link to="/emergency" className="grid min-h-[42px] place-items-center rounded-[14px] border border-white/[.08] px-2 text-[9px] font-black text-white/65">Emergency</Link>
             </div>
             <div className="mt-4 flex gap-2 overflow-x-auto no-scrollbar">
               {['Evidence', 'Guideline', 'Drug', 'Imaging'].map((item) => <span key={item} className="shrink-0 rounded-full border border-white/[.07] bg-white/[.025] px-3 py-1.5 text-[9px] font-black text-white/38">{item}</span>)}
