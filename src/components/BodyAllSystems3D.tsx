@@ -20,8 +20,37 @@ function materialFor(source: THREE.Material) {
     standard.depthWrite = false
     standard.emissive.set(0x062f3b)
     standard.emissiveIntensity = 0.32
+    standard.userData.panaceaBaseEmissiveIntensity = standard.emissiveIntensity
   }
+  cloned.userData.panaceaBaseOpacity = cloned.opacity
   return cloned
+}
+
+function applyProjectedSelection(groups: readonly THREE.Group[], selectedName?: string | null) {
+  const selected = selectedName ? normalizeAnatomySourceName(selectedName) : ''
+  for (const group of groups) {
+    group.traverse((object) => {
+      const mesh = object as THREE.Mesh
+      if (!mesh.isMesh) return
+      const hit = selected !== '' && normalizeAnatomySourceName(mesh.name) === selected
+      const materials = Array.isArray(mesh.material) ? mesh.material : [mesh.material]
+      for (const material of materials) {
+        const baseOpacity = typeof material.userData.panaceaBaseOpacity === 'number'
+          ? material.userData.panaceaBaseOpacity
+          : material.opacity
+        material.transparent = true
+        material.opacity = selected ? (hit ? Math.max(baseOpacity, 0.98) : Math.min(baseOpacity, 0.22)) : baseOpacity
+        if ((material as THREE.MeshStandardMaterial).isMeshStandardMaterial) {
+          const standard = material as THREE.MeshStandardMaterial
+          const baseEmissive = typeof standard.userData.panaceaBaseEmissiveIntensity === 'number'
+            ? standard.userData.panaceaBaseEmissiveIntensity
+            : standard.emissiveIntensity
+          standard.emissiveIntensity = selected ? (hit ? Math.max(baseEmissive, 1.05) : Math.min(baseEmissive, 0.12)) : baseEmissive
+        }
+        material.needsUpdate = true
+      }
+    })
+  }
 }
 
 /**
@@ -81,9 +110,17 @@ interface BodyAllSystems3DProps {
   selectedSystemId?: BodySystemId
   onSystemChange?: (systemId: BodySystemId) => void
   onSemanticZoomChange?: (state: BodySemanticZoomState) => void
+  selectedStructureName?: string | null
+  onStructureSelect?: (sourceName: string) => void
 }
 
-export default function BodyAllSystems3D({ selectedSystemId, onSystemChange, onSemanticZoomChange }: BodyAllSystems3DProps) {
+export default function BodyAllSystems3D({
+  selectedSystemId,
+  onSystemChange,
+  onSemanticZoomChange,
+  selectedStructureName,
+  onStructureSelect,
+}: BodyAllSystems3DProps) {
   const containerRef = useRef<HTMLDivElement>(null)
   const openTimerRef = useRef<number | null>(null)
   const [open, setOpen] = useState(false)
@@ -95,10 +132,20 @@ export default function BodyAllSystems3D({ selectedSystemId, onSystemChange, onS
   const [loadedSourceFiles, setLoadedSourceFiles] = useState<string[]>([])
   const [failedFiles, setFailedFiles] = useState<string[]>([])
   const semanticZoomCallbackRef = useRef(onSemanticZoomChange)
+  const structureSelectCallbackRef = useRef(onStructureSelect)
+  const selectionApplierRef = useRef<((name?: string | null) => void) | null>(null)
 
   useEffect(() => {
     semanticZoomCallbackRef.current = onSemanticZoomChange
   }, [onSemanticZoomChange])
+
+  useEffect(() => {
+    structureSelectCallbackRef.current = onStructureSelect
+  }, [onStructureSelect])
+
+  useEffect(() => {
+    selectionApplierRef.current?.(selectedStructureName)
+  }, [selectedStructureName])
 
   const systemId = selectedSystemId ?? internalSystemId
   const systems = useMemo(() => resolveBodySystemSourceWave(), [])
@@ -178,6 +225,10 @@ export default function BodyAllSystems3D({ selectedSystemId, onSystemChange, onS
 
     const sourceBounds = new THREE.Box3()
     const projectedGroups: THREE.Group[] = []
+    selectionApplierRef.current = (name) => {
+      applyProjectedSelection(projectedGroups, name)
+      requestRender()
+    }
     let fittedCameraDistance = 0
     let lastSemanticScale: BodySemanticScale = 'whole-body'
     let lastRelativeZoom = 1
@@ -277,6 +328,7 @@ export default function BodyAllSystems3D({ selectedSystemId, onSystemChange, onS
           projectedGroups.push(projection.group)
           scene.add(projection.group)
           sourceBounds.union(projection.bounds)
+          applyProjectedSelection(projectedGroups, selectedStructureName)
           setLoadedSourceFiles((current) => current.includes(file) ? current : [...current, file])
           requestRender()
         } else {
@@ -312,6 +364,31 @@ export default function BodyAllSystems3D({ selectedSystemId, onSystemChange, onS
     }
     controls.addEventListener('change', onControlChange)
 
+    const raycaster = new THREE.Raycaster()
+    const pointer = new THREE.Vector2()
+    let pointerStartX = 0
+    let pointerStartY = 0
+    const onPointerDown = (event: PointerEvent) => {
+      pointerStartX = event.clientX
+      pointerStartY = event.clientY
+    }
+    const onPointerUp = (event: PointerEvent) => {
+      if (Math.hypot(event.clientX - pointerStartX, event.clientY - pointerStartY) > 7) return
+      const rect = renderer.domElement.getBoundingClientRect()
+      if (rect.width <= 0 || rect.height <= 0) return
+      pointer.x = ((event.clientX - rect.left) / rect.width) * 2 - 1
+      pointer.y = -((event.clientY - rect.top) / rect.height) * 2 + 1
+      raycaster.setFromCamera(pointer, camera)
+      const hit = raycaster.intersectObjects(projectedGroups, true).find((entry) => (entry.object as THREE.Mesh).isMesh)
+      const mesh = hit?.object as THREE.Mesh | undefined
+      if (!mesh?.name) return
+      structureSelectCallbackRef.current?.(mesh.name)
+      applyProjectedSelection(projectedGroups, mesh.name)
+      requestRender()
+    }
+    renderer.domElement.addEventListener('pointerdown', onPointerDown)
+    renderer.domElement.addEventListener('pointerup', onPointerUp)
+
     const io = new IntersectionObserver(([entry]) => {
       inViewport = Boolean(entry?.isIntersecting)
       if (inViewport) requestRender()
@@ -334,6 +411,9 @@ export default function BodyAllSystems3D({ selectedSystemId, onSystemChange, onS
       ro.disconnect()
       document.removeEventListener('visibilitychange', onVisibility)
       controls.removeEventListener('change', onControlChange)
+      renderer.domElement.removeEventListener('pointerdown', onPointerDown)
+      renderer.domElement.removeEventListener('pointerup', onPointerUp)
+      selectionApplierRef.current = null
       controls.dispose()
       projectedGroups.forEach(disposeProjectedMaterials)
       renderer.dispose()
@@ -402,8 +482,13 @@ export default function BodyAllSystems3D({ selectedSystemId, onSystemChange, onS
           )}
           <div className="pointer-events-none absolute inset-x-3 top-3 flex items-center justify-between gap-2">
             <span className="rounded-full border border-white/[.08] bg-black/60 px-2.5 py-1 text-[8px] font-black uppercase tracking-[.14em] text-white/55 backdrop-blur-xl">{selected.label}</span>
-            <span className="rounded-full border border-white/[.08] bg-black/60 px-2.5 py-1 text-[8px] font-bold text-white/35 backdrop-blur-xl">orbit · zoom</span>
+            <span className="rounded-full border border-white/[.08] bg-black/60 px-2.5 py-1 text-[8px] font-bold text-white/35 backdrop-blur-xl">tap structure · orbit · zoom</span>
           </div>
+          {selectedStructureName && (
+            <div className="pointer-events-none absolute left-3 top-12 max-w-[72%] truncate rounded-full border border-cyan-300/20 bg-cyan-950/80 px-2.5 py-1 text-[8px] font-black text-cyan-100 backdrop-blur-xl">
+              Selected · {selectedStructureName}
+            </div>
+          )}
           {loading && <div role="status" className="absolute inset-x-3 bottom-3 rounded-xl border border-cyan-300/10 bg-black/75 px-3 py-2 text-[10px] font-bold text-cyan-100 backdrop-blur-xl">Loading canonical source bundles… {loadedFiles}</div>}
           {error && <div role="alert" className="absolute inset-x-3 bottom-3 rounded-xl border border-red-300/15 bg-red-950/85 px-3 py-2 text-[10px] font-bold text-red-100 backdrop-blur-xl">{error}</div>}
         </div>
