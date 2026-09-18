@@ -14,7 +14,7 @@ export function Card({
 }) {
   return (
     <div
-      className={`kaca relative overflow-hidden rounded-[28px] border border-white/75 bg-white/90 shadow-[0_18px_55px_rgba(15,35,45,.075)] ring-1 ring-black/[.035] backdrop-blur-2xl dark:border-white/12 dark:bg-[#111315]/95 dark:shadow-[0_22px_70px_rgba(0,0,0,.26)] dark:ring-white/[.035] ${pad ? 'p-5 sm:p-6' : ''} ${className}`}
+      className={`kaca relative overflow-hidden rounded-[22px] border border-white/70 bg-white/92 shadow-[0_10px_30px_rgba(15,35,45,.06)] ring-1 ring-black/[.025] backdrop-blur-xl dark:border-white/10 dark:bg-[#0d1012]/96 dark:shadow-[0_14px_40px_rgba(0,0,0,.22)] dark:ring-white/[.025] ${pad ? 'p-4 sm:p-5' : ''} ${className}`}
     >
       {children}
     </div>
@@ -86,21 +86,21 @@ export function SectionTitle({
   const w = rupaRute()
   const showBodyExplorerGuide = title === 'Body Explorer'
   return (
-    <div className="mb-5">
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
-        <div className="flex min-w-0 items-start gap-3.5">
+    <div className="mb-4">
+      <div className="flex flex-col gap-2.5 sm:flex-row sm:items-start sm:justify-between">
+        <div className="flex min-w-0 items-start gap-3">
           {icon && (
-            <span className={`grid h-11 w-11 shrink-0 place-items-center rounded-2xl shadow-[inset_0_1px_rgba(255,255,255,.7),0_8px_24px_rgba(20,40,50,.08)] ${w.bg} ${w.teks}`}>
+            <span className={`grid h-10 w-10 shrink-0 place-items-center rounded-[14px] shadow-[inset_0_1px_rgba(255,255,255,.55),0_6px_18px_rgba(20,40,50,.06)] ${w.bg} ${w.teks}`}>
               {icon}
             </span>
           )}
           <div className="min-w-0 pt-0.5">
-            <h2 className="flex items-start gap-2.5 text-[clamp(1.2rem,2.3vw,1.65rem)] font-black leading-[1.08] tracking-[-.025em] text-ink dark:text-white">
-              <span aria-hidden className={`mt-1 h-5 w-1.5 shrink-0 rounded-full ${w.garis}`} />
+            <h2 className="flex items-start gap-2 text-[clamp(1.08rem,2.1vw,1.48rem)] font-black leading-[1.1] tracking-[-.022em] text-ink dark:text-white">
+              <span aria-hidden className={`mt-1 h-4 w-1 shrink-0 rounded-full ${w.garis}`} />
               <span>{title}</span>
             </h2>
             {subtitle && (
-              <Prosa kelas="mt-1.5 max-w-3xl text-[13px] leading-relaxed text-neutral-600 dark:text-neutral-300">
+              <Prosa kelas="mt-1 max-w-3xl text-[12px] leading-relaxed text-neutral-600 dark:text-neutral-300">
                 {subtitle}
               </Prosa>
             )}
@@ -162,7 +162,7 @@ export function Button({
       type={type}
       onClick={onClick}
       disabled={disabled}
-      className={`liquid-glass-btn liquid-glass-btn--${variant} inline-flex min-h-[44px] items-center justify-center gap-2 rounded-full px-5 py-2.5 text-sm font-black tracking-[-.01em] shadow-sm transition duration-200 hover:-translate-y-0.5 active:scale-[.98] active:translate-y-0 disabled:hover:translate-y-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/40 focus-visible:ring-offset-2 ${textColor[variant]} ${className}`}
+      className={`liquid-glass-btn liquid-glass-btn--${variant} inline-flex min-h-[44px] items-center justify-center gap-2 rounded-full px-4 py-2 text-[13px] font-black tracking-[-.01em] shadow-sm transition duration-200 hover:-translate-y-0.5 active:scale-[.98] active:translate-y-0 disabled:hover:translate-y-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/40 focus-visible:ring-offset-2 ${textColor[variant]} ${className}`}
     >
       {children}
     </button>
@@ -208,4 +208,4 @@ export function SkeletonRows({ rows = 3 }: { rows?: number }) {
 }
 
 export const inputClass =
-  'w-full min-h-[46px] rounded-2xl border border-black/[.10] bg-white/95 px-3.5 py-2.5 text-sm text-ink shadow-[inset_0_1px_rgba(255,255,255,.8),0_6px_20px_rgba(20,40,50,.035)] outline-none backdrop-blur-xl transition duration-200 placeholder:text-neutral-500 hover:border-black/[.16] focus:border-brand/55 focus:ring-4 focus:ring-brand/10 dark:border-white/12 dark:bg-[#111315]/95 dark:text-white dark:placeholder:text-neutral-500'
+  'w-full min-h-[44px] rounded-[14px] border border-black/[.10] bg-white/95 px-3.5 py-2 text-sm text-ink shadow-[inset_0_1px_rgba(255,255,255,.7),0_4px_14px_rgba(20,40,50,.03)] outline-none backdrop-blur-lg transition duration-200 placeholder:text-neutral-500 hover:border-black/[.16] focus:border-brand/55 focus:ring-4 focus:ring-brand/10 dark:border-white/12 dark:bg-[#101214]/96 dark:text-white dark:placeholder:text-neutral-500'
