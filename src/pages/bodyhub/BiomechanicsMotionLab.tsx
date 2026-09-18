@@ -61,16 +61,15 @@ export default function BiomechanicsMotionLab() {
     <section
       data-biomechanics-motion-lab="v1"
       aria-label="Biomechanics motion lab"
-      className="overflow-hidden rounded-2xl border border-emerald-900/30 bg-[#07110f] text-white shadow-sm"
+      className="overflow-hidden border-y border-emerald-900/30 bg-transparent text-white"
     >
-      <div className="flex flex-wrap items-start justify-between gap-3 border-b border-white/10 px-3 py-3 sm:px-4">
-        <div>
+      <div className="flex items-center justify-between gap-3 border-b border-white/10 px-1 py-3">
+        <div className="min-w-0">
           <div className="text-[9px] font-black uppercase tracking-[0.18em] text-emerald-300">Biomechanics motion lab</div>
-          <h3 className="mt-1 text-sm font-black">Original motion ↔ source-backed anatomical atlas</h3>
-          <p className="mt-1 max-w-3xl text-[10px] leading-relaxed text-white/55">A side-by-side workspace inspired by the supplied reference: scrub a real exercise video while inspecting the corresponding source-backed muscle atlas. The atlas remains rotatable and the same timeline stays visible on mobile.</p>
+          <h3 className="truncate text-sm font-black">Motion ↔ source-backed atlas</h3>
         </div>
-        <label className="min-h-11 cursor-pointer rounded-xl border border-emerald-300/30 bg-emerald-300/10 px-3 py-2 text-[10px] font-black text-emerald-200">
-          Load motion video
+        <label className="grid min-h-11 shrink-0 cursor-pointer place-items-center rounded-full border border-emerald-300/30 px-4 text-[10px] font-black text-emerald-200">
+          Load video
           <input className="sr-only" type="file" accept="video/*" onChange={(event) => loadVideo(event.target.files?.[0])} />
         </label>
       </div>
@@ -78,8 +77,8 @@ export default function BiomechanicsMotionLab() {
       <p className="sr-only" role="status" aria-live="polite">{videoStatus}</p>
 
       <div className="grid min-h-0 grid-cols-1 md:min-h-[430px] md:grid-cols-2">
-        <div className="relative min-h-[300px] border-b border-white/10 bg-black sm:min-h-[340px] md:min-h-[430px] md:border-b-0 md:border-r">
-          <div className="absolute left-3 top-3 z-10 rounded-full bg-black/65 px-2 py-1 text-[10px] font-bold backdrop-blur">Original · {time.toFixed(2)}s</div>
+        <div className="relative order-2 min-h-[300px] border-b border-white/10 bg-black sm:min-h-[340px] md:order-1 md:min-h-[430px] md:border-b-0 md:border-r">
+          <div className="absolute left-3 top-3 z-10 border-b border-white/20 bg-black/70 px-2 py-1 text-[10px] font-bold">Original · {time.toFixed(2)}s</div>
           {videoUrl ? (
             <video
               ref={videoRef}
@@ -115,12 +114,12 @@ export default function BiomechanicsMotionLab() {
         </div>
 
         <div
-          className="relative min-h-[390px] bg-[#091613] sm:min-h-[430px]"
+          className="relative order-1 min-h-[390px] bg-[#091613] sm:min-h-[430px] md:order-2"
           role="region"
           aria-label={`Source-backed rotatable muscle atlas. Current target: ${group.label}.`}
           aria-describedby="biomechanics-atlas-help biomechanics-atlas-state"
         >
-          <div className="pointer-events-none absolute left-3 top-3 z-10 rounded-full bg-black/55 px-2 py-1 text-[10px] font-bold backdrop-blur">Source atlas · drag or touch to rotate</div>
+          <div className="pointer-events-none absolute left-3 top-3 z-10 border-b border-white/20 bg-black/70 px-2 py-1 text-[10px] font-bold">Source atlas · drag or touch to rotate</div>
           <p id="biomechanics-atlas-help" className="sr-only">Interactive 3D anatomy remains the primary visualization. Drag with a pointer or use touch gestures supported by the atlas viewer to inspect the model.</p>
           <p id="biomechanics-atlas-state" className="sr-only" role="status" aria-live="polite">{group.label} selected. {group.nodeNames.length} source atlas nodes are requested for highlighting.</p>
           <AtlasViewer3D
@@ -129,9 +128,8 @@ export default function BiomechanicsMotionLab() {
             lesi={group.nodeNames}
             tinggi={430}
           />
-          <div className="pointer-events-none absolute bottom-3 left-3 right-3 z-10 rounded-xl border border-white/10 bg-black/65 p-2 backdrop-blur">
-            <div className="flex items-center justify-between gap-2"><span className="text-[10px] font-black text-emerald-200">{group.label}</span><span className="text-[9px] text-white/45">{group.nodeNames.length} source nodes</span></div>
-            <p className="mt-1 line-clamp-2 text-[9px] leading-relaxed text-white/55">{group.penjelasan.aksi}</p>
+          <div className="pointer-events-none absolute bottom-0 left-0 right-0 z-10 border-t border-white/10 bg-black/76 px-3 py-2">
+            <div className="flex items-center justify-between gap-2"><span className="truncate text-[10px] font-black text-emerald-200">{group.label}</span><span className="shrink-0 text-[9px] text-white/45">{group.nodeNames.length} nodes</span></div>
           </div>
         </div>
       </div>
@@ -153,11 +151,14 @@ export default function BiomechanicsMotionLab() {
           </div>
         </div>
 
-        <div className="grid gap-2 sm:grid-cols-3">
-          <div className="rounded-xl border border-white/10 bg-white/[.035] p-3"><div className="text-[9px] font-black uppercase tracking-wide text-emerald-300">Pose</div><p className="mt-1 text-[10px] leading-relaxed text-white/55">BLOCKED until validated per-frame landmark inference is connected. No synthetic skeleton is drawn over the user video.</p></div>
-          <div className="rounded-xl border border-white/10 bg-white/[.035] p-3"><div className="text-[9px] font-black uppercase tracking-wide text-emerald-300">Force vectors</div><p className="mt-1 text-[10px] leading-relaxed text-white/55">BLOCKED until subject scale, external load, segment kinematics and a validated inverse-dynamics model are available. Muscle highlighting is not a force estimate.</p></div>
-          <div className="rounded-xl border border-white/10 bg-white/[.035] p-3"><div className="text-[9px] font-black uppercase tracking-wide text-emerald-300">Atlas provenance</div><p className="mt-1 text-[10px] leading-relaxed text-white/55">Only named nodes already bound to the shipped muscular atlas are highlighted. Missing tendons or structures are never substituted with neighbouring geometry.</p></div>
-        </div>
+        <details className="border-t border-white/10 pt-2">
+          <summary className="cursor-pointer text-[10px] font-black text-white/55">Validation boundaries & atlas provenance</summary>
+          <div className="mt-2 grid gap-3 text-[10px] leading-relaxed text-white/55 sm:grid-cols-3">
+            <p><span className="font-black text-emerald-300">Pose · </span>BLOCKED until validated per-frame landmark inference is connected. No synthetic skeleton is drawn over the user video.</p>
+            <p><span className="font-black text-emerald-300">Force vectors · </span>BLOCKED until subject scale, external load, segment kinematics and a validated inverse-dynamics model are available. Muscle highlighting is not a force estimate.</p>
+            <p><span className="font-black text-emerald-300">Atlas provenance · </span>Only named nodes already bound to the shipped muscular atlas are highlighted. Missing tendons or structures are never substituted with neighbouring geometry.</p>
+          </div>
+        </details>
       </div>
     </section>
   )
