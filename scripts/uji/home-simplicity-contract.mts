@@ -38,5 +38,9 @@ assert.match(shell, /panacea-command-primary-links/,
   'primary links are not housed in the auto-hiding top command bar')
 assert.match(commandBarLogic, /return delta > 0 \? 'hidden' : 'shown'/,
   'top command bar is no longer direction-aware')
+assert.doesNotMatch(shell, /DrawerNav|setMenuOpen|menuOpen|FabNavigasi/,
+  'secondary drawer/FAB navigation returned')
+assert.match(shell, /panacea-command-primary-links no-scrollbar flex/,
+  'primary navigation is no longer available in the top bar on mobile')
 
-console.log('home-simplicity-contract: one focal hero, two contextual actions, search-led Explore, complete capability reachability, and a reveal-on-scroll top command bar with no persistent Home dock.')
+console.log('home-simplicity-contract: search-led capability access, no drawer/FAB/bottom dock, and one reveal-on-scroll top command bar across mobile and desktop.')
