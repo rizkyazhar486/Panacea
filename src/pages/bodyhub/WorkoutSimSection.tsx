@@ -211,19 +211,19 @@ function FotoLatihan({ nama }: { nama: string }) {
 
 function Metric({ label, value, unit, hint }: { label: string; value: string; unit: string; hint?: string }) {
   return (
-    <div className="rounded-xl border border-neutral-200 bg-white/60 p-3 dark:border-white/10 dark:bg-white/[0.03]">
-      <div className="text-[10px] font-bold uppercase tracking-wide text-neutral-400">{label}</div>
-      <div className="mt-1 text-xl font-black tabular-nums text-ink dark:text-white">{value} <span className="text-xs font-semibold text-neutral-400">{unit}</span></div>
-      {hint && <div className="mt-1 text-[9.5px] leading-snug text-neutral-400">{hint}</div>}
+    <div className="min-w-0 border-t border-neutral-200 pt-2 dark:border-white/10">
+      <div className="truncate text-[9px] font-bold uppercase tracking-wide text-neutral-400">{label}</div>
+      <div className="mt-1 truncate text-xl font-black tabular-nums text-ink dark:text-white">{value} <span className="text-xs font-semibold text-neutral-400">{unit}</span></div>
+      {hint && <div className="mt-1 truncate text-[9.5px] text-neutral-400">{hint}</div>}
     </div>
   )
 }
 
 function RangeControl(props: { label: string; value: number; unit: string; min: number; max: number; step: number; onChange: (value: number) => void; display?: string }) {
   return (
-    <label className="rounded-xl border border-neutral-200 p-3 text-xs font-bold text-ink dark:border-white/10 dark:text-white">
-      <span className="flex items-center justify-between gap-3"><span>{props.label}</span><span className="tabular-nums text-brand">{props.display ?? props.value} {props.unit}</span></span>
-      <input className="mt-3 w-full accent-[var(--brand)]" type="range" min={props.min} max={props.max} step={props.step} value={props.value} onChange={(event) => props.onChange(Number(event.target.value))} />
+    <label className="border-t border-neutral-200 pt-2 text-xs font-bold text-ink dark:border-white/10 dark:text-white">
+      <span className="flex items-center justify-between gap-3"><span className="truncate">{props.label}</span><span className="shrink-0 tabular-nums text-brand">{props.display ?? props.value} {props.unit}</span></span>
+      <input className="mt-2 min-h-11 w-full accent-[var(--brand)]" type="range" min={props.min} max={props.max} step={props.step} value={props.value} onChange={(event) => props.onChange(Number(event.target.value))} />
     </label>
   )
 }
@@ -376,23 +376,22 @@ export function WorkoutSimSection({ onHighlight, onTempo }: Props) {
 
   return (
     <div className="space-y-4">
-      <div className="rounded-2xl border border-neutral-200 bg-gradient-to-br from-white to-brand/[0.04] p-4 dark:border-white/10 dark:from-white/[0.04] dark:to-brand/[0.04]">
-        <div className="text-[10px] font-bold uppercase tracking-[0.18em] text-brand">Panacea Whole-Body Movement Atlas</div>
-        <h3 className="mt-1 text-lg font-black text-ink dark:text-white">Functional anatomy → kinetic chain → mechanics</h3>
-        <p className="mt-1 max-w-3xl text-[11px] leading-relaxed text-neutral-500">The shared 3D body is linked to the biomechanics panel: choosing a region highlights its real muscle meshes, movement phases drive the contraction pulse, and the mechanics lab exposes every assumption used in the calculation.</p>
+      <div className="border-b border-neutral-200 pb-3 dark:border-white/10">
+        <div className="text-[10px] font-bold uppercase tracking-[0.18em] text-brand">Whole-body movement atlas</div>
+        <h3 className="truncate text-lg font-black text-ink dark:text-white">Anatomy → kinetic chain → mechanics</h3>
       </div>
 
-      <div className="grid grid-cols-3 gap-1 rounded-xl bg-neutral-100 p-1 dark:bg-white/5">
+      <div className="grid grid-cols-3 border-y border-neutral-200 dark:border-white/10">
         {([['atlas', 'Joint atlas'], ['exercise', 'Movement lab'], ['mechanics', 'Force lab']] as const).map(([key, label]) => (
-          <button key={key} type="button" aria-pressed={mode === key} onClick={() => setMode(key)} className={`rounded-lg px-2 py-2 text-[11px] font-bold transition ${mode === key ? 'bg-white text-ink shadow-sm dark:bg-white/10 dark:text-white' : 'text-neutral-500 hover:text-ink dark:hover:text-white'}`}>{label}</button>
+          <button key={key} type="button" aria-pressed={mode === key} onClick={() => setMode(key)} className={`min-h-11 border-b-2 px-2 text-[11px] font-bold transition ${mode === key ? 'border-brand text-ink dark:text-white' : 'border-transparent text-neutral-500 hover:text-ink dark:hover:text-white'}`}>{label}</button>
         ))}
       </div>
 
       {mode === 'atlas' && (
         <div className="space-y-4">
-          <div className="flex flex-wrap gap-1.5">
+          <div className="flex gap-1.5 overflow-x-auto pb-1 no-scrollbar">
             {JOINT_ATLAS.map((item) => (
-              <button key={item.region} type="button" aria-pressed={region === item.region} onClick={() => setRegion(item.region)} className={`min-h-[34px] rounded-full border px-3 text-xs font-bold transition ${region === item.region ? 'border-brand bg-brand text-white shadow-sm shadow-brand/20' : 'border-neutral-200 text-neutral-600 hover:border-brand/40 hover:text-brand dark:border-white/10 dark:text-neutral-300'}`}>{item.region}</button>
+              <button key={item.region} type="button" aria-pressed={region === item.region} onClick={() => setRegion(item.region)} className={`min-h-[40px] shrink-0 rounded-full border px-3 text-xs font-bold transition ${region === item.region ? 'border-brand bg-brand text-white' : 'border-neutral-200 text-neutral-600 hover:border-brand/40 hover:text-brand dark:border-white/10 dark:text-neutral-300'}`}>{item.region}</button>
             ))}
           </div>
 
@@ -435,10 +434,10 @@ export function WorkoutSimSection({ onHighlight, onTempo }: Props) {
 
       {mode === 'exercise' && (
         <div className="space-y-3">
-          <p className="text-[11px] leading-relaxed text-neutral-400">Pick a movement. Exact muscle nodes illuminate on the shared 3D body by role while the contraction pulse follows the programmed concentric/eccentric timing.</p>
-          <div className="flex flex-wrap gap-1.5">
+          <p className="truncate text-[10px] font-bold text-neutral-400">Movement selection · shared 3D highlight · synchronized contraction phase</p>
+          <div className="flex gap-1.5 overflow-x-auto pb-1 no-scrollbar">
             {LATIHAN.map((exercise) => (
-              <button key={exercise.id} type="button" aria-pressed={aktif?.id === exercise.id} onClick={() => { setAktif(aktif?.id === exercise.id ? null : exercise); setFase('konsentrik'); setJalan(false) }} className={`min-h-[34px] rounded-full border px-3 text-xs font-bold transition ${aktif?.id === exercise.id ? 'border-brand bg-brand text-white' : 'border-neutral-200 text-neutral-600 hover:border-brand/40 hover:text-brand dark:border-white/10 dark:text-neutral-300'}`}>{exercise.nama}</button>
+              <button key={exercise.id} type="button" aria-pressed={aktif?.id === exercise.id} onClick={() => { setAktif(aktif?.id === exercise.id ? null : exercise); setFase('konsentrik'); setJalan(false) }} className={`min-h-[40px] shrink-0 rounded-full border px-3 text-xs font-bold transition ${aktif?.id === exercise.id ? 'border-brand bg-brand text-white' : 'border-neutral-200 text-neutral-600 hover:border-brand/40 hover:text-brand dark:border-white/10 dark:text-neutral-300'}`}>{exercise.nama}</button>
             ))}
           </div>
 
@@ -465,7 +464,7 @@ export function WorkoutSimSection({ onHighlight, onTempo }: Props) {
 
       {mode === 'mechanics' && (
         <div className="space-y-4">
-          <p className="text-[11px] leading-relaxed text-neutral-500">This lab models one external vertical resultant and its moment about a joint. It deliberately separates body mass, supported body-mass fraction, external load, acceleration, lever arm and angular motion so the assumptions are visible.</p>
+          <p className="truncate text-[10px] font-bold text-neutral-500">External resultant · moment arm · torque · work · power · impulse</p>
           <div className="grid gap-2 md:grid-cols-2 xl:grid-cols-4">
             <RangeControl label="Body mass" value={bodyMassKg} unit="kg" min={30} max={180} step={1} onChange={setBodyMassKg} />
             <RangeControl label="Supported body mass" value={supportedMassPct} unit="%" min={0} max={100} step={5} onChange={setSupportedMassPct} />
@@ -489,9 +488,9 @@ export function WorkoutSimSection({ onHighlight, onTempo }: Props) {
             </div>
           </div>
 
-          <div className="rounded-2xl bg-neutral-950 p-4 text-neutral-100">
-            <div className="text-[10px] font-bold uppercase tracking-[0.16em] text-brand">Transparent equations</div>
-            <div className="mt-3 grid gap-2 font-mono text-[11px] leading-relaxed md:grid-cols-2">
+          <details className="border-y border-neutral-200 py-2 dark:border-white/10">
+            <summary className="cursor-pointer text-[10px] font-bold uppercase tracking-[0.12em] text-brand">Transparent equations</summary>
+            <div className="mt-3 grid gap-2 font-mono text-[11px] leading-relaxed text-neutral-600 dark:text-neutral-300 md:grid-cols-2">
               <div>m_eff = m_body·f_support + m_load = {bodyMassKg}·{(supportedMassPct / 100).toFixed(2)} + {externalLoadKg} = {mechanics.effectiveMass.toFixed(1)} kg</div>
               <div>F = m_eff·(g + a) = {mechanics.effectiveMass.toFixed(1)}·(9.80665 + {verticalAcceleration.toFixed(1)}) = {mechanics.verticalForce.toFixed(1)} N</div>
               <div>τ = F·r = {mechanics.verticalForce.toFixed(1)}·{mechanics.radius.toFixed(2)} = {mechanics.torque.toFixed(1)} N·m</div>
@@ -499,7 +498,7 @@ export function WorkoutSimSection({ onHighlight, onTempo }: Props) {
               <div>P = τ·ω = {mechanics.torque.toFixed(1)}·{angularVelocity.toFixed(1)} = {mechanics.power.toFixed(1)} W</div>
               <div>J = F·Δt = {mechanics.verticalForce.toFixed(1)}·{(contactTimeMs / 1000).toFixed(2)} = {mechanics.impulse.toFixed(1)} N·s</div>
             </div>
-          </div>
+          </details>
 
           <div className="grid gap-2 md:grid-cols-2">
             <div className="rounded-xl border border-neutral-200 p-3 text-[11px] leading-relaxed text-neutral-600 dark:border-white/10 dark:text-neutral-300">Static component: <span className="font-bold text-ink dark:text-white">{mechanics.staticWeight.toFixed(0)} N</span>. Inertial component from the chosen acceleration: <span className="font-bold text-ink dark:text-white">{mechanics.inertialForce.toFixed(0)} N</span>.</div>
@@ -508,7 +507,10 @@ export function WorkoutSimSection({ onHighlight, onTempo }: Props) {
         </div>
       )}
 
-      <div className="border-t border-neutral-100 pt-3 text-[10px] leading-relaxed text-neutral-400 dark:border-white/5">Reference framework: rigid-body mechanics (F = m·a; τ = r×F; W = ∫τdθ; P = τ·ω; J = ∫Fdt), Winter DA, <i>Biomechanics and Motor Control of Human Movement</i>, and Neumann DA, <i>Kinesiology of the Musculoskeletal System</i>. Joint ROM values are teaching ranges, not diagnostic thresholds; ROM varies with method, age, sex, position and anatomy.</div>
+      <details className="border-t border-neutral-100 pt-3 text-[10px] text-neutral-400 dark:border-white/5">
+        <summary className="cursor-pointer font-bold">References & teaching limits</summary>
+        <p className="mt-2 leading-relaxed">Reference framework: rigid-body mechanics (F = m·a; τ = r×F; W = ∫τdθ; P = τ·ω; J = ∫Fdt), Winter DA, <i>Biomechanics and Motor Control of Human Movement</i>, and Neumann DA, <i>Kinesiology of the Musculoskeletal System</i>. Joint ROM values are teaching ranges, not diagnostic thresholds; ROM varies with method, age, sex, position and anatomy.</p>
+      </details>
     </div>
   )
 }
