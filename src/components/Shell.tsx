@@ -531,33 +531,6 @@ export function Shell({ children }: { children: ReactNode }) {
           <div className="text-[10px] font-semibold uppercase tracking-wider text-neutral-500">Longevity Medical-AI · Official Document</div>
         </div>
       </div>
-      {/* Ambient animated backdrop — sits behind every page */}
-      {/* "Outer space" — nebula multi-warna, bukan pelangi pastel lembut.
-          Menambah sian elektrik dan merah-kobalt (lihat referensi: sosok
-          berapi biru-merah) di samping hijau/emas/magenta/ungu yang sudah
-          ada, supaya kesannya benar-benar ruang angkasa berwarna, bukan
-          taman musim semi. */}
-      {/* Dark mode: delapan orb warna-warni yang tumpang tindih dulu adalah
-          sumber utama tampilan "muram/kotor" yang dikeluhkan — begitu
-          backdrop-blur kartu menyerapnya sekaligus, hasilnya coklat-kehijauan,
-          bukan hitam pekat. `dark:bg-*` di sini MENGGANTI warnanya (bukan
-          hanya opacity) jadi hanya dua logam: emas dan cyan/violet — selaras
-          dengan identitas "Neoclassical Cyber-Organic Glass". Mode terang
-          tidak disentuh, warnanya tetap seperti semula. */}
-      <div className="pointer-events-none fixed inset-0 z-0 overflow-hidden">
-        <div className="orb absolute -left-32 top-10 h-80 w-80 rounded-full bg-brand/20 blur-3xl dark:bg-amber-400/12" />
-        <div className="orb absolute right-0 top-1/3 h-96 w-96 rounded-full bg-cyan-400/22 blur-3xl dark:bg-sky-400/13" style={{ animationDelay: '-8s' }} />
-        <div className="orb absolute bottom-0 left-1/2 h-72 w-72 rounded-full bg-red-500/16 blur-3xl dark:bg-violet-500/10" style={{ animationDelay: '-14s' }} />
-        <div className="orb absolute right-10 bottom-10 h-72 w-72 rounded-full bg-amber-300/18 blur-3xl dark:bg-amber-400/16" style={{ animationDelay: '-4s' }} />
-        <div className="orb absolute left-1/4 top-0 h-72 w-72 rounded-full bg-orange-500/16 blur-3xl dark:bg-amber-500/10" style={{ animationDelay: '-6s' }} />
-        {/* Fuchsia/indigo pastel di sini dulu adalah sumber "terasa feminin" yang
-            dikeluhkan — bukan warnanya yang salah, tapi pilihan nada pastel-
-            lembutnya. Diganti violet gelap dan biru-baja yang lebih tegas,
-            sejalan dengan urutan api-dulu yang sudah dipakai di .kaca. */}
-        <div className="orb absolute left-10 top-1/2 h-80 w-80 rounded-full bg-violet-700/18 blur-3xl dark:bg-violet-500/9" style={{ animationDelay: '-18s' }} />
-        <div className="orb absolute right-1/3 top-0 h-64 w-64 rounded-full bg-blue-700/16 blur-3xl dark:bg-sky-500/9" style={{ animationDelay: '-11s' }} />
-        <div className="orb absolute left-1/3 bottom-1/4 h-60 w-60 rounded-full bg-sky-600/18 blur-3xl dark:bg-sky-400/9" style={{ animationDelay: '-21s' }} />
-      </div>
       <div className="relative z-10 flex min-w-0 flex-1 flex-col">
         {/* Pita tangkap: selalu ada di tepi atas, tidak pernah ikut menyingkir.
             Inilah yang memanggil bilah kembali — mengandalkan hover pada
@@ -630,18 +603,6 @@ export function Shell({ children }: { children: ReactNode }) {
             {account.isOwner && (
               <MenuPeran peran={account.role} daftar={ALL} label={roleLabel} ganti={setMode} />
             )}
-            {/* Mobile-only exit/logout — the sidebar Log Out is hidden on phones */}
-            <button
-              onClick={() => {
-                if (backendEnabled) api.logout().catch(() => {})
-                logout()
-              }}
-              className="grid h-10 w-10 shrink-0 place-items-center rounded-full border border-accent/20 bg-accent/10 text-accent transition hover:bg-accent/20 lg:hidden"
-              title="Log Out"
-              aria-label="Log Out"
-            >
-              <IconLogout size={18} />
-            </button>
             {showPatient && (
               <div
                 className="flex items-center gap-2 rounded-xl border border-neutral-200 bg-white px-2 py-1"
