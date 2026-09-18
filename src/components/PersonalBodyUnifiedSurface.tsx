@@ -122,6 +122,7 @@ export function PersonalBodyUnifiedSurface({
               selectedSystemId={systemId}
               onSystemChange={setSystemId}
               requestedDomain={domain}
+              compact={compact}
             />
           </Suspense>
         </div>
