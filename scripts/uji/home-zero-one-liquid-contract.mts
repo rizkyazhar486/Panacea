@@ -4,6 +4,8 @@ import { readFileSync } from 'node:fs'
 const workspace = readFileSync('src/pages/HomeSocialWorkspace.tsx', 'utf8')
 const deck = readFileSync('src/components/HomeCommandDeck.tsx', 'utf8')
 const hero = readFileSync('src/components/HomeVisualLanding.tsx', 'utf8')
+const funWidgets = readFileSync('src/components/HomeFunWidgetRail.tsx', 'utf8')
+const funWidgetsCss = readFileSync('src/styles/home-fun-widgets.css', 'utf8')
 const heroCss = readFileSync('src/styles/home-intent-motion.css', 'utf8')
 const glass = readFileSync('src/styles/home-liquid-control-layer.css', 'utf8')
 const shell = readFileSync('src/components/Shell.tsx', 'utf8')
@@ -11,13 +13,27 @@ const shell = readFileSync('src/components/Shell.tsx', 'utf8')
 // Zero-step: Home itself shows health context. One-step: primary destinations
 // and universal actions are directly exposed without an intermediate menu.
 assert.match(workspace, /<HomeHealthBrief \/>/, 'Home stopped exposing health context at zero steps')
+assert.match(workspace, /<HomeFunWidgetRail \/>/, 'Home lost the live fun-widget rail')
+assert.match(funWidgets, /Performance[\s\S]*Fuel · today[\s\S]*Focus[\s\S]*Reset · 60s/,
+  'fun widget rail lost performance, nutrition, focus, or guided reset mini-apps')
+assert.match(funWidgets, /panacea:health-updated/, 'live widgets no longer refresh from the shared health event stream')
+assert.match(funWidgets, /setFocusRunning/, 'focus widget regressed into a decorative card instead of a working timer')
+assert.match(funWidgets, /BREATH_PHASES[\s\S]*setBreathRunning[\s\S]*Guided breathing controls/,
+  'guided breath widget regressed into decoration instead of a working stateful mini-app')
+assert.match(funWidgetsCss, /panacea-breath-orbit[\s\S]*transition: transform 4s/,
+  'guided breath lost phase-driven functional motion')
+assert.match(funWidgetsCss, /prefers-reduced-motion: reduce[\s\S]*panacea-breath-orbit/,
+  'guided breath has no reduced-motion escape')
+
 const healthIndex = workspace.indexOf('<HomeHealthBrief />')
+const funIndex = workspace.indexOf('<HomeFunWidgetRail />')
+const legacyWidgetIndex = workspace.indexOf('<RelWidgetRumah />')
 const heroIndex = workspace.indexOf('<HomeVisualLanding />')
-assert.ok(healthIndex >= 0 && heroIndex >= 0 && healthIndex < heroIndex,
-  'Home puts the promotional hero before the user\'s health state; useful content must win the first viewport')
+assert.ok(healthIndex >= 0 && funIndex > healthIndex && legacyWidgetIndex > funIndex && heroIndex > legacyWidgetIndex,
+  'Home must show health context, live mini-app widgets, preserved legacy widgets, then the secondary action hero')
 assert.match(workspace, /data-panacea-primary-nav/, 'Home lost its single persistent primary navigation layer')
 for (const label of ['Home', 'Your Body', 'Clinical', 'For You']) {
-  assert.match(workspace, new RegExp(`<span>${label}<\\/span>`), `primary navigation lost ${label}`)
+  assert.match(workspace, new RegExp(\`<span>\${label}<\\/span>\`), \`primary navigation lost \${label}\`)
 }
 
 const heroActions = [...hero.matchAll(/\{ to: '([^']+)', label: '([^']+)'/g)]
@@ -64,4 +80,4 @@ assert.doesNotMatch(shell, /aria-label="Log Out"/,
 assert.match(shell, /onClick=\{doLogout\}[\s\S]{0,240}?Log Out/,
   'removing duplicate header logout must not remove logout from the drawer')
 
-console.log('home-zero-one-liquid-contract: zero-step health context, one-tap primary/actions/recents, one navigation system, Liquid Glass confined to controls, and no duplicate header logout.')
+console.log('home-zero-one-liquid-contract: zero-step health context, live mini-app widgets, one-tap primary/actions/recents, one navigation system, Liquid Glass confined to controls, and no duplicate header logout.')
