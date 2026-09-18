@@ -25,6 +25,11 @@ assert.doesNotMatch(workspace, /data-panacea-primary-nav|panacea-liquid-dock/,
   'Home reintroduced a persistent local navigation bar')
 assert.match(shell, /data-panacea-command-bar=\{keadaanBilah\}/,
   'global top command bar is missing from Shell')
+assert.match(shell, /panacea-command-primary-links/,
+  'primary navigation is not inside the auto-hiding top command bar')
+for (const label of ['Home', 'Your Body', 'Clinical', 'For You']) {
+  assert.match(shell, new RegExp(`>${label}<\\/NavLink>`), `top reveal navigation lost ${label}`)
+}
 assert.match(commandBarCss, /data-panacea-command-bar='hidden'[\s\S]*translateY\(-100%\)/,
   'top command bar no longer hides out of the reading surface')
 assert.match(commandBarLogic, /return delta > 0 \? 'hidden' : 'shown'/,
