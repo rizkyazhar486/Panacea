@@ -9,6 +9,7 @@
 // Karena itu yang diperiksa bukan "berkasnya sampai", melainkan berapa mesh
 // yang benar-benar masuk ke adegan.
 import { chromium } from '@playwright/test'
+import { pilihAktivitasBodyExposure } from './body-exposure-activity-helper.mjs'
 
 const url = process.env.ORGAN3D_QA_URL || 'http://127.0.0.1:4173/#/body-explorer'
 // Satu organ per berkas sumber yang berbeda; semuanya terkompresi meshopt.
@@ -44,7 +45,7 @@ page.on('response', (r) => { if (/\/organs\/.*\.glb/.test(r.url())) unduhan.push
 let gagal = null
 try {
   await page.goto(url, { waitUntil: 'networkidle' })
-  await page.getByRole('button', { name: /^Organs\b/ }).first().click()
+  await pilihAktivitasBodyExposure(page, "Organs")
   await page.waitForTimeout(1500)
 
   for (const organ of ORGAN) {
