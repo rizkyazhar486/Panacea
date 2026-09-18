@@ -4,34 +4,15 @@ import { SectionTitle } from './ui'
 import { RangkaDaftar } from './Rangka'
 import '../styles/metal.css'
 
-// ─────────────────────────────────────────────────────────────────────────────
-// Rangka halaman bertab.
-//
-// Fitur sudah terlalu banyak, dan sebagian besar sebenarnya satu topik yang
-// terpecah menjadi banyak halaman. Menggabungkannya dengan tab menghilangkan
-// perpindahan halaman tanpa membuang satu pun isinya.
-//
-// Dua keputusan yang membuat penggabungan ini tidak merusak apa pun:
-//
-//   * Tab memuat KOMPONEN HALAMAN YANG SUDAH ADA apa adanya. Tidak ada isi
-//     yang ditulis ulang, jadi tidak ada yang bisa hilang atau menyimpang dari
-//     versi aslinya.
-//   * Tab aktif tersimpan di query string (?t=). Menyegarkan halaman, membuka
-//     tautan yang dibagikan, dan tombol "kembali" semuanya tetap mendarat di
-//     tab yang benar — sesuatu yang hilang bila tab hanya disimpan di state.
-//
-// Halaman lama tetap hidup dan mengalihkan ke sini, sehingga penanda halaman
-// dan tautan lama tidak ada yang putus.
-// ─────────────────────────────────────────────────────────────────────────────
-
 export interface TabDef {
   id: string
   label: string
   emoji: string
   komponen: ComponentType
-  /** Ditampilkan di bawah judul saat tab ini aktif. */
   ringkas?: string
 }
+
+const PRIMARY_TAB_LIMIT = 7
 
 export function HalamanTab({
   judul, subjudul, ikon, tabs, ringkasan, kaki, theme,
@@ -40,35 +21,13 @@ export function HalamanTab({
   subjudul: string
   ikon: React.ReactNode
   tabs: TabDef[]
-  /**
-   * 'metal' mewarnai keping tab aktif dengan gaya Fitness/Training (lihat
-   * styles/metal.css) — opt-in per halaman, jadi Body Hub yang juga memakai
-   * komponen ini tidak ikut berubah kecuali dimintai.
-   */
   theme?: 'metal'
-  /**
-   * Panel angka yang berlaku untuk SELURUH tab, ditampilkan di atasnya.
-   *
-   * Tanpa ini halaman bertab bergantung sepenuhnya pada tab pertama. Diukur di
-   * peramban: /tubuh hanya 42 kata dan nyaris kosong, karena tab pertamanya
-   * kebetulan yang paling jarang berisi data — padahal berat, nadi, dan tensi
-   * pemakainya tersimpan dan bisa langsung ditampilkan. Halaman yang terbuka
-   * kosong mengajarkan orang bahwa halaman itu memang kosong.
-   */
   ringkasan?: React.ReactNode
-  /**
-   * Ditempel di bawah isi tab, di dalam alur yang sama.
-   *
-   * Ada supaya halaman pemanggil tidak perlu menempelkan blok sendiri di luar
-   * rangka ini. Diukur di peramban: /latihan menempelkan tautannya sebagai
-   * saudara sekandung lalu menariknya naik dengan `-mt-20` untuk memakan
-   * `pb-24` di sini — hasilnya blok 358×80 px yang menindih isi tab. Slot ini
-   * menghapus sebab masalahnya, bukan menambal jaraknya.
-   */
   kaki?: React.ReactNode
 }) {
   const lokasi = useLocation()
   const navigate = useNavigate()
+  const [allOpen, setAllOpen] = useState(false)
 
   const dariUrl = useMemo(() => {
     const q = new URLSearchParams(lokasi.search).get('t')
@@ -80,44 +39,88 @@ export function HalamanTab({
 
   const pilih = (id: string) => {
     setAktif(id)
-    // `replace` supaya berpindah antar tab tidak menumpuk riwayat browser:
-    // menekan "kembali" seharusnya keluar dari halaman, bukan menelusuri
-    // setiap tab yang pernah disentuh.
+    setAllOpen(false)
     navigate(`${lokasi.pathname}?t=${id}`, { replace: true })
   }
 
   const tab = tabs.find((x) => x.id === aktif) ?? tabs[0]
   const Isi = tab.komponen
 
+  const primaryTabs = useMemo(() => {
+    if (tabs.length <= PRIMARY_TAB_LIMIT + 1) return tabs
+    const first = tabs.slice(0, PRIMARY_TAB_LIMIT)
+    if (first.some((item) => item.id === aktif)) return first
+    const current = tabs.find((item) => item.id === aktif)
+    return current ? [...first.slice(0, PRIMARY_TAB_LIMIT - 1), current] : first
+  }, [aktif, tabs])
+
+  const primaryIds = useMemo(() => new Set(primaryTabs.map((item) => item.id)), [primaryTabs])
+  const moreTabs = useMemo(() => tabs.filter((item) => !primaryIds.has(item.id)), [primaryIds, tabs])
+
+  const tabButton = (t: TabDef, compact = false) => {
+    const selected = t.id === aktif
+    return (
+      <button
+        key={t.id}
+        type="button"
+        role="tab"
+        aria-selected={selected}
+        aria-current={selected ? 'page' : undefined}
+        onClick={() => pilih(t.id)}
+        className={`flex min-h-[42px] min-w-0 items-center gap-1.5 rounded-full border px-3 text-[11px] font-black transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/40 ${
+          compact ? 'justify-start' : 'shrink-0'
+        } ${
+          selected
+            ? theme === 'metal'
+              ? 'metal-tag metal-gold border-transparent !text-[11px] normal-case tracking-normal'
+              : 'border-brand/30 bg-brand text-[#03150c] shadow-[0_6px_18px_rgba(0,191,99,.12)]'
+            : 'border-black/[.07] bg-neutral-100 text-neutral-600 hover:border-black/[.12] hover:bg-neutral-200 dark:border-white/[.07] dark:bg-white/[.055] dark:text-neutral-300 dark:hover:bg-white/[.09] dark:hover:text-white'
+        }`}
+      >
+        <span className="shrink-0 text-[12px]" aria-hidden>{t.emoji}</span>
+        <span className="truncate">{t.label}</span>
+      </button>
+    )
+  }
+
   return (
-    <div className="space-y-6 pb-24">
+    <div className="space-y-5 pb-20">
       <SectionTitle icon={ikon} title={judul} subtitle={tab.ringkas ?? subjudul} />
 
       {ringkasan}
 
-      <div className="no-scrollbar -mx-1 flex gap-1.5 overflow-x-auto px-1 pb-1">
-        {tabs.map((t) => (
-          <button key={t.id} onClick={() => pilih(t.id)}
-            aria-current={t.id === aktif ? 'page' : undefined}
-            className={`flex h-10 shrink-0 items-center gap-1.5 rounded-full px-3.5 text-[12px] font-bold transition ${
-              /* Keping tab ini ditulis untuk latar gelap: bg-white/5 dan
-                 text-slate-400 hampir tidak terlihat di atas kanvas terang —
-                 terukur 2,45:1. Dibuat memakai pasangan yang bekerja di kedua
-                 tema, seperti keping tab di halaman lain. */
-              t.id === aktif
-                ? theme === 'metal' ? 'metal-tag metal-gold !text-[12px] normal-case tracking-normal' : 'bg-brand text-ink'
-                : 'bg-neutral-100 text-neutral-600 hover:bg-neutral-200 dark:bg-white/10 dark:text-neutral-300'
-            }`}>
-            <span className="text-[13px]">{t.emoji}</span>{t.label}
-          </button>
-        ))}
-      </div>
+      <section aria-label={`${judul} tools`} className="min-w-0">
+        <div className="flex items-center gap-2">
+          <div className="no-scrollbar flex min-w-0 flex-1 gap-1.5 overflow-x-auto pb-1" role="tablist" aria-label={`${judul} primary tools`}>
+            {primaryTabs.map((t) => tabButton(t))}
+          </div>
 
-      {/* key memaksa pemasangan ulang saat tab berganti, sehingga setiap halaman
-          menjalankan efek pemuatan datanya sendiri seperti saat dibuka langsung. */}
-      {/* Rangka, bukan tulisan satu baris: tab yang dimuat malas menggantikan
-          satu baris dengan isi setinggi ribuan piksel, dan lompatannya membuat
-          keping tab di atasnya bergeser tepat saat jari menuju ke sana. */}
+          {moreTabs.length > 0 && (
+            <button
+              type="button"
+              onClick={() => setAllOpen((value) => !value)}
+              aria-expanded={allOpen}
+              aria-controls={`more-tabs-${judul.replace(/\s+/g, '-').toLowerCase()}`}
+              className="flex min-h-[42px] shrink-0 items-center gap-1 rounded-full border border-black/[.08] bg-white/80 px-3 text-[10px] font-black text-neutral-600 shadow-sm transition hover:border-brand/25 hover:text-ink dark:border-white/[.08] dark:bg-white/[.045] dark:text-neutral-300 dark:hover:text-white"
+            >
+              {allOpen ? 'Less' : `More ${moreTabs.length}`}
+              <span aria-hidden>{allOpen ? '↑' : '↓'}</span>
+            </button>
+          )}
+        </div>
+
+        {allOpen && moreTabs.length > 0 && (
+          <div
+            id={`more-tabs-${judul.replace(/\s+/g, '-').toLowerCase()}`}
+            className="mt-2 grid grid-cols-2 gap-1.5 rounded-[18px] border border-black/[.07] bg-black/[.025] p-2 dark:border-white/[.07] dark:bg-white/[.025] sm:grid-cols-3 lg:grid-cols-4"
+            role="tablist"
+            aria-label={`${judul} additional tools`}
+          >
+            {moreTabs.map((t) => tabButton(t, true))}
+          </div>
+        )}
+      </section>
+
       <Suspense fallback={<RangkaDaftar jumlah={3} />}>
         <div key={tab.id}><Isi /></div>
       </Suspense>
