@@ -166,15 +166,14 @@ overlap, ancestry, and whether a newer PR has superseded it.
   a model, or a prior conversation. Before representing it as clinically reviewed,
   record the real reviewer's name/credentials, review date, review scope, and
   explicit disposition. Then refresh against latest main and rerun required gates.
-- **Longitudinal governance core — PR #1805, head
-  `62ad45667179eaa7b8dd3276153799f53d310b64`.** Fresh extraction of the
-  self-contained governance kernel from stale #1744: patient-scoped idempotent
-  event state, provenance/confidence/timestamps, purpose consent ledger, clinician
-  review ledger, minimum-necessary AI context, governed Chatbot/AI-EMR bundle and
-  audit manifest. Do not merge stale #1744 wholesale and do not create a second
-  patient-state store from #1745.
-- **MCP Phase B interoperability/terminology — PR #1807, head
-  `95307ea118258f227c901f1df675b6b1d6efce54`.** Bounded FHIR R4 inspection,
+- **Longitudinal governance core — merged through #1805 at
+  `ce9527950eb60bec3209f0dfa003aa6e447dda72`.** This is now the canonical
+  patient-scoped longitudinal source of truth: idempotent events, provenance,
+  confidence/timestamps, purpose consent, clinician review, governed AI context
+  and audit manifest. Do not merge stale #1744 wholesale and do not create a
+  second patient-state store from #1745.
+- **MCP Phase B interoperability/terminology — PR #1807, current synced head
+  `c222ad1988e1a473e8b55d0838c45407b670df27`.** Bounded FHIR R4 inspection,
   SATUSEHAT preview-only Bundle building, bounded HL7 v2 preview conversion,
   truthful ICD fallback identity, RxNorm RxCUI resolution, explicit-only ATC,
   verified local LOINC registry and fail-closed crosswalks. Preserve zero
@@ -193,6 +192,16 @@ overlap, ancestry, and whether a newer PR has superseded it.
   of #1799 after a tree-level audit proved all 25 current-main paths were still
   identical to the old base. Require fresh exact-head gates and final latest-main
   overlap audit; #1799 is superseded and closed.
+- **Production longitudinal health bridges — draft PR #1813, head
+  `f521da9064cd2d611f7e5e4f5d1581c108b288cb`.** Canonical pure adapters for
+  clinical/self/device/VO2 plus patient-scoped sleep/GPS/training/nutrition/
+  wellness. Date-only source records retain day precision; no fabricated clock
+  time, localStorage, network, or duplicate patient-state store.
+- **Neural Intent longitudinal Phase B — draft PR #1814, head
+  `e9968495eecfa59cb77d1cda7eb268cd6546a36d`.** Adds canonical `intent`
+  domain + `rehab-tracking` consent and a governed IntentEvent bridge. Simulated
+  intent is excluded from clinical/AI context; non-simulated intent is review
+  gated; no new route/store/hardware access.
 - **Coordination queue itself — PR #1811.** Keep this section current when active
   PR numbers or blockers move; documentation must not become an authority for
   stale CI or stale branch state.
@@ -220,8 +229,8 @@ overlap, ancestry, and whether a newer PR has superseded it.
 
 ### Duplicate/stale-lane hygiene
 
-Fresh replacements currently supersede and close #1797, #1798, #1799, #1800,
-#1801 and #1803. Before reviving any earlier validation-only or duplicate branch,
+Fresh replacements currently supersede and close #1764, #1797, #1798, #1799,
+#1800, #1801 and #1803. Before reviving any earlier validation-only or duplicate branch,
 compare changed paths and ancestry against #1805/#1807/#1808/#1809/#1810/#1812
 and current main. Also re-check #1762, #1763 and #1759 against the active UI lane.
 
