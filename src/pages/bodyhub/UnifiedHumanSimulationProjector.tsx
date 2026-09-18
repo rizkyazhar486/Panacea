@@ -329,6 +329,32 @@ export default function UnifiedHumanSimulationProjector({
         </aside>
       </div>
 
+      <div className="border-t border-white/[.08] p-2 sm:p-3" aria-label="Explore across biological scales">
+        <div className="mb-2 flex items-center justify-between gap-3">
+          <div>
+            <div className="text-[8px] font-black uppercase tracking-[.16em] text-white/30">Explore across scales</div>
+            <div className="text-[10px] font-bold text-white/48">Body → system → organ → tissue → cell → organelle → molecule → genome</div>
+          </div>
+          <div className="hidden text-[8px] text-white/25 sm:block">Representation changes at source-resolution boundaries</div>
+        </div>
+        <div className="no-scrollbar flex gap-1.5 overflow-x-auto pb-1">
+          {BODY_SEMANTIC_ZOOM_STOPS.map((stop, index) => (
+            <button
+              key={stop.id}
+              type="button"
+              onClick={() => openScale(stop.id)}
+              title={stop.note}
+              className={semanticZoom.scale === stop.id
+                ? 'min-h-[48px] min-w-[104px] shrink-0 rounded-[15px] border border-cyan-300/35 bg-cyan-300/[.10] px-2.5 text-left text-cyan-50 transition'
+                : 'min-h-[48px] min-w-[104px] shrink-0 rounded-[15px] border border-white/[.07] bg-white/[.02] px-2.5 text-left text-white/45 transition hover:bg-white/[.045] hover:text-white/75'}
+            >
+              <span className="block text-[8px] font-black uppercase tracking-[.12em] opacity-55">{index + 1}</span>
+              <span className="block text-[10px] font-black">{stop.label}</span>
+            </button>
+          ))}
+        </div>
+        <p className="mt-1.5 text-[8px] leading-relaxed text-white/25">Changing scale changes representation; gross atlas geometry is never falsely enlarged into microscopic anatomy.</p>
+      </div>
       {microscopic && (
         <div className="border-t border-white/[.08] p-2 sm:p-3" data-semantic-microscope-active={semanticZoom.scale}>
           <Suspense fallback={<ProjectorLoader label={semanticStop.label + ' detail'} />}>
