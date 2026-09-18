@@ -11,15 +11,15 @@ import { body3dPixelRatio } from '../lib/body3dQuality'
 import { bodySemanticScaleFromRelativeZoom, type BodySemanticScale } from '../lib/bodySemanticZoom'
 import { muatAtlas, namaAtlas } from '../lib/anatomy/pemuatAtlas'
 
-function materialFor(source: THREE.Material) {
+function materialFor(source: THREE.Material, role: 'selected' | 'context' = 'selected') {
   const cloned = source.clone()
+  cloned.transparent = true
+  cloned.opacity = role === 'context' ? 0.13 : 0.9
+  cloned.depthWrite = false
   if ((cloned as THREE.MeshStandardMaterial).isMeshStandardMaterial) {
     const standard = cloned as THREE.MeshStandardMaterial
-    standard.transparent = true
-    standard.opacity = 0.88
-    standard.depthWrite = false
-    standard.emissive.set(0x062f3b)
-    standard.emissiveIntensity = 0.32
+    standard.emissive.set(role === 'context' ? 0x031219 : 0x062f3b)
+    standard.emissiveIntensity = role === 'context' ? 0.08 : 0.32
     standard.userData.panaceaBaseEmissiveIntensity = standard.emissiveIntensity
   }
   cloned.userData.panaceaBaseOpacity = cloned.opacity
@@ -35,6 +35,21 @@ function applyProjectedSelection(groups: readonly THREE.Group[], selectedName?: 
       const hit = selected !== '' && normalizeAnatomySourceName(mesh.name) === selected
       const materials = Array.isArray(mesh.material) ? mesh.material : [mesh.material]
       for (const material of materials) {
+        if (mesh.userData.panaceaContext === true) {
+          const contextOpacity = typeof material.userData.panaceaBaseOpacity === 'number'
+            ? material.userData.panaceaBaseOpacity
+            : 0.13
+          material.transparent = true
+          material.opacity = contextOpacity
+          if ((material as THREE.MeshStandardMaterial).isMeshStandardMaterial) {
+            const standard = material as THREE.MeshStandardMaterial
+            standard.emissiveIntensity = typeof standard.userData.panaceaBaseEmissiveIntensity === 'number'
+              ? standard.userData.panaceaBaseEmissiveIntensity
+              : 0.08
+          }
+          material.needsUpdate = true
+          continue
+        }
         const baseOpacity = typeof material.userData.panaceaBaseOpacity === 'number'
           ? material.userData.panaceaBaseOpacity
           : material.opacity
@@ -61,6 +76,7 @@ function projectMatchedSourceMeshes(
   atlasScene: THREE.Group,
   namaAsli: Map<THREE.Object3D, string>,
   names: ReadonlySet<string>,
+  contextNames: ReadonlySet<string> = new Set<string>(),
 ) {
   const group = new THREE.Group()
   const bounds = new THREE.Box3()
@@ -74,12 +90,15 @@ function projectMatchedSourceMeshes(
     if (!names.has(normalizeAnatomySourceName(sourceName))) return
 
     const sourceMaterials = Array.isArray(source.material) ? source.material : [source.material]
-    const clonedMaterials = sourceMaterials.map(materialFor)
+    const normalizedSourceName = normalizeAnatomySourceName(sourceName)
+    const role = contextNames.has(normalizedSourceName) ? 'context' : 'selected'
+    const clonedMaterials = sourceMaterials.map((material) => materialFor(material, role))
     const projected = new THREE.Mesh(
       source.geometry,
       Array.isArray(source.material) ? clonedMaterials : clonedMaterials[0],
     )
     projected.name = sourceName
+    projected.userData.panaceaContext = role === 'context'
     projected.matrix.copy(source.matrixWorld)
     projected.matrixAutoUpdate = false
     projected.frustumCulled = source.frustumCulled
@@ -266,10 +285,32 @@ export default function BodyAllSystems3D({
     }
 
     const resolvedByFile = new Map<string, Set<string>>()
+    const contextNamesByFile = new Map<string, Set<string>>()
     for (const target of selected.targets) {
       const fileNames = resolvedByFile.get(target.file) ?? new Set<string>()
       for (const name of target.names) fileNames.add(normalizeAnatomySourceName(name))
       resolvedByFile.set(target.file, fileNames)
+    }
+
+    // Whole-body-first spatial context. The compatible Z-Anatomy surface
+    // bundle stays faintly visible around internal systems so the user starts
+    // from a complete human envelope instead of a floating organ. The surface
+    // is source-backed, shares the same reference space, and is never used as
+    // a substitute for deeper skin histology.
+    if (selected.id !== 'integumentary-surface') {
+      const surfaceSystem = systems.find((system) => system.id === 'integumentary-surface')
+      const surfaceTarget = surfaceSystem?.targets.find((target) => target.file === 'surface.glb')
+      if (surfaceTarget?.available) {
+        const fileNames = resolvedByFile.get(surfaceTarget.file) ?? new Set<string>()
+        const contextNames = contextNamesByFile.get(surfaceTarget.file) ?? new Set<string>()
+        for (const name of surfaceTarget.names) {
+          const normalized = normalizeAnatomySourceName(name)
+          fileNames.add(normalized)
+          contextNames.add(normalized)
+        }
+        resolvedByFile.set(surfaceTarget.file, fileNames)
+        contextNamesByFile.set(surfaceTarget.file, contextNames)
+      }
     }
 
     const filesNeeded = [...resolvedByFile.keys()]
@@ -323,7 +364,12 @@ export default function BodyAllSystems3D({
       muatAtlas(file).then(({ scene: atlasScene, namaAsli }) => {
         if (disposed) return
         const names = resolvedByFile.get(file) ?? new Set<string>()
-        const projection = projectMatchedSourceMeshes(atlasScene, namaAsli, names)
+        const projection = projectMatchedSourceMeshes(
+          atlasScene,
+          namaAsli,
+          names,
+          contextNamesByFile.get(file) ?? new Set<string>(),
+        )
         if (projection.matched > 0) {
           projectedGroups.push(projection.group)
           scene.add(projection.group)
@@ -379,7 +425,10 @@ export default function BodyAllSystems3D({
       pointer.x = ((event.clientX - rect.left) / rect.width) * 2 - 1
       pointer.y = -((event.clientY - rect.top) / rect.height) * 2 + 1
       raycaster.setFromCamera(pointer, camera)
-      const hit = raycaster.intersectObjects(projectedGroups, true).find((entry) => (entry.object as THREE.Mesh).isMesh)
+      const hit = raycaster.intersectObjects(projectedGroups, true).find((entry) => {
+        const candidate = entry.object as THREE.Mesh
+        return candidate.isMesh && candidate.userData.panaceaContext !== true
+      })
       const mesh = hit?.object as THREE.Mesh | undefined
       if (!mesh?.name) return
       structureSelectCallbackRef.current?.(mesh.name)
@@ -436,7 +485,7 @@ export default function BodyAllSystems3D({
           </div>
           <h3 className="mt-1.5 text-base font-black tracking-[-.02em] text-white sm:text-lg">See the body by system without inventing missing anatomy</h3>
           <p className="mt-1 max-w-3xl text-[10px] font-medium leading-relaxed text-white/48 sm:text-[11px]">
-            Select a system first. The renderer resolves named structures against Panacea's shipped anatomy source index, loads only the required canonical bundles, and keeps unresolved or failed structures blocked instead of drawing substitutes.
+            Start from a source-backed whole-body surface, then inspect the selected system inside it; unresolved or failed structures remain blocked instead of being replaced with invented anatomy.
           </p>
         </div>
         <button
@@ -482,7 +531,7 @@ export default function BodyAllSystems3D({
           )}
           <div className="pointer-events-none absolute inset-x-3 top-3 flex items-center justify-between gap-2">
             <span className="rounded-full border border-white/[.08] bg-black/60 px-2.5 py-1 text-[8px] font-black uppercase tracking-[.14em] text-white/55 backdrop-blur-xl">{selected.label}</span>
-            <span className="rounded-full border border-white/[.08] bg-black/60 px-2.5 py-1 text-[8px] font-bold text-white/35 backdrop-blur-xl">tap structure · orbit · zoom</span>
+            <span className="rounded-full border border-white/[.08] bg-black/60 px-2.5 py-1 text-[8px] font-bold text-white/35 backdrop-blur-xl">surface context · tap · zoom</span>
           </div>
           {selectedStructureName && (
             <div className="pointer-events-none absolute left-3 top-12 max-w-[72%] truncate rounded-full border border-cyan-300/20 bg-cyan-950/80 px-2.5 py-1 text-[8px] font-black text-cyan-100 backdrop-blur-xl">
