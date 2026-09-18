@@ -44,7 +44,7 @@ page.on('response', (r) => { if (/\/organs\/.*\.glb/.test(r.url())) unduhan.push
 let gagal = null
 try {
   await page.goto(url, { waitUntil: 'networkidle' })
-  await page.getByRole('button', { name: 'Organs', exact: true }).first().click()
+  await page.getByRole('button', { name: /^Organs\b/ }).first().click()
   await page.waitForTimeout(1500)
 
   for (const organ of ORGAN) {
