@@ -2,6 +2,10 @@
 import assert from 'node:assert/strict'
 import { buildLongitudinalTwinSnapshot, twinSignalByMetric } from '../../src/lib/longitudinalDigitalTwin.ts'
 import {
+  appendPurposeConsentDecision,
+  createPurposeConsentLedger,
+} from '../../src/lib/purposeConsentLedger.ts'
+import {
   createLongitudinalPatientState,
   ingestLongitudinalBatch,
   type LongitudinalEvent,
@@ -49,6 +53,24 @@ function event(input: {
     review: input.review ?? { state: 'not-required' },
   }
 }
+
+let consentLedger = createPurposeConsentLedger()
+consentLedger = appendPurposeConsentDecision(consentLedger, {
+  id: 'grant-personal',
+  subjectId,
+  purpose: 'personal-visualization',
+  action: 'grant',
+  decidedAt: '2026-09-01T00:00:00.000Z',
+  source: 'user',
+})
+consentLedger = appendPurposeConsentDecision(consentLedger, {
+  id: 'grant-clinical',
+  subjectId,
+  purpose: 'clinical-support',
+  action: 'grant',
+  decidedAt: '2026-09-01T00:00:00.000Z',
+  source: 'user',
+})
 
 let state = createLongitudinalPatientState(subjectId, '2026-09-01T00:00:00.000Z')
 state = ingestLongitudinalBatch(state, [
@@ -108,6 +130,7 @@ state = ingestLongitudinalBatch(state, [
 
 const body = buildLongitudinalTwinSnapshot({
   state,
+  consentLedger,
   at: '2026-09-04T12:00:00.000Z',
   surface: 'your-body',
 })
@@ -120,6 +143,8 @@ assert.equal(body.boundary.referenceAtlasGeometryMayBeUsedForOrientationOnly, tr
 assert.equal(body.boundary.diagnosticInferenceGenerated, false)
 assert.equal(body.boundary.autonomousClinicalActionAllowed, false)
 assert.equal(body.boundary.simulatedState, false)
+assert.equal(body.boundary.purposeConsentLedgerApplied, true)
+assert.equal(body.governance.purposeConsentFilteredEvents, 0)
 
 const rhr = twinSignalByMetric(body, 'resting-heart-rate')
 assert.ok(rhr)
@@ -135,6 +160,7 @@ assert.equal(twinSignalByMetric(body, 'ldl-c'), undefined, 'Your Body projection
 
 const earlyClinical = buildLongitudinalTwinSnapshot({
   state,
+  consentLedger,
   at: '2026-09-04T12:00:00.000Z',
   surface: 'clinical',
   clock: 'effective',
@@ -144,6 +170,7 @@ assert.equal(earlyClinical.governance.pendingClinicalReview, 1, 'later clinician
 
 const reviewedClinical = buildLongitudinalTwinSnapshot({
   state,
+  consentLedger,
   at: '2026-09-06T12:00:00.000Z',
   surface: 'clinical',
 })
@@ -154,7 +181,32 @@ assert.equal(ldl.displayState, 'reviewed')
 assert.equal(ldl.reviewState, 'accepted')
 assert.equal(ldl.provenance.sourceId, 'clinical-system:lab-ldl')
 
+const revokedPersonalLedger = appendPurposeConsentDecision(consentLedger, {
+  id: 'revoke-personal',
+  subjectId,
+  purpose: 'personal-visualization',
+  action: 'revoke',
+  decidedAt: '2026-09-05T18:00:00.000Z',
+  source: 'user',
+})
+const revokedBody = buildLongitudinalTwinSnapshot({
+  state,
+  consentLedger: revokedPersonalLedger,
+  at: '2026-09-06T12:00:00.000Z',
+  surface: 'your-body',
+})
+assert.equal(revokedBody.signals.length, 0, 'purpose revoke must remove formerly consented personal signals')
+assert.ok(revokedBody.governance.purposeConsentFilteredEvents > 0)
+
+const clinicalAfterPersonalRevoke = buildLongitudinalTwinSnapshot({
+  state,
+  consentLedger: revokedPersonalLedger,
+  at: '2026-09-06T12:00:00.000Z',
+  surface: 'clinical',
+})
+assert.ok(twinSignalByMetric(clinicalAfterPersonalRevoke, 'ldl-c'), 'personal-visualization revoke must not revoke clinical-support purpose')
+
 assert.equal(Object.prototype.hasOwnProperty.call(reviewedClinical, 'anatomy'), false)
 assert.equal(Object.prototype.hasOwnProperty.call(ldl, 'bodyRegion'), false)
 
-console.log('Longitudinal Digital Twin adapter verified: governed replay input, evidence-class separation, temporal clinician-review integrity, provenance preservation, surface scoping, and no fabricated patient-specific internal anatomy.')
+console.log('Longitudinal Digital Twin adapter verified: governed replay input, purpose-ledger grant/revoke enforcement, evidence-class separation, temporal clinician-review integrity, provenance preservation, surface scoping, and no fabricated patient-specific internal anatomy.')
