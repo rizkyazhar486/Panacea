@@ -45,7 +45,6 @@ const CLINICAL_DEPTH_ROUTES = {
 
 const REFERENCE_LINKS = [
   { to: '/learn', label: 'Diseases' },
-  { to: '/learn', label: 'Look & Learn' },
   { to: '/clinical-calculators', label: 'Calculators' },
   { to: '/radiology', label: 'Imaging' },
   { to: '/rujukan?t=obat', label: 'Doses & Drugs' },
