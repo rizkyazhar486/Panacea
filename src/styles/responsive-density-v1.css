@@ -1,0 +1,92 @@
+/* Panacea responsive density v1
+   Global comfort pass for regular pages. It reduces "zoomed" UI density on
+   phones/tablets without shrinking touch targets or touching spatial/3D canvases. */
+
+.pmd-page-stage {
+  container-type: inline-size;
+  min-width: 0;
+  overflow-x: clip;
+}
+
+.pmd-page-stage > .page-enter,
+.pmd-page-stage > .page-enter > * {
+  min-width: 0;
+}
+
+.pmd-page-stage img,
+.pmd-page-stage video,
+.pmd-page-stage svg {
+  max-width: 100%;
+}
+
+@media (max-width: 760px) {
+  .pmd-page-stage[data-spatial='false'] {
+    padding-inline: clamp(9px, 2.7vw, 14px) !important;
+    padding-top: 14px !important;
+    padding-bottom: calc(72px + env(safe-area-inset-bottom)) !important;
+  }
+
+  .pmd-page-stage[data-spatial='false'] :where([class~='p-6'], [class~='!p-6']) {
+    padding: 14px !important;
+  }
+  .pmd-page-stage[data-spatial='false'] :where([class~='p-5'], [class~='!p-5']) {
+    padding: 12px !important;
+  }
+  .pmd-page-stage[data-spatial='false'] :where([class~='p-4'], [class~='!p-4']) {
+    padding: 11px !important;
+  }
+
+  .pmd-page-stage[data-spatial='false'] :where([class~='gap-6'], [class~='gap-5']) {
+    gap: 12px !important;
+  }
+  .pmd-page-stage[data-spatial='false'] :where([class~='gap-4']) {
+    gap: 10px !important;
+  }
+  .pmd-page-stage[data-spatial='false'] :where([class~='space-y-6'], [class~='space-y-5']) > * + * {
+    margin-top: 12px !important;
+  }
+
+  .pmd-page-stage[data-spatial='false'] :where([class~='text-5xl'], [class~='text-4xl'], [class~='text-3xl']) {
+    font-size: clamp(1.45rem, 6vw, 1.9rem) !important;
+    line-height: 1.08 !important;
+  }
+  .pmd-page-stage[data-spatial='false'] :where([class~='text-2xl']) {
+    font-size: clamp(1.18rem, 5vw, 1.45rem) !important;
+  }
+
+  .pmd-page-stage[data-spatial='false'] :where(input, select, textarea, button, a[role='button']) {
+    max-width: 100%;
+  }
+
+  .pmd-page-stage[data-spatial='false'] :where(button, a[href], input, select) {
+    min-height: 42px;
+  }
+
+  .pmd-page-stage[data-spatial='false'] :where(.grid) {
+    min-width: 0;
+  }
+
+  .pmd-page-stage[data-spatial='false'] :where([class*='min-w-[']) {
+    max-width: 100%;
+  }
+}
+
+@media (min-width: 761px) and (max-width: 1180px) {
+  .pmd-page-stage[data-spatial='false'] {
+    padding-inline: clamp(16px, 2.4vw, 24px) !important;
+  }
+
+  .pmd-page-stage[data-spatial='false'] :where([class~='space-y-6'], [class~='space-y-5']) > * + * {
+    margin-top: clamp(14px, 2vw, 20px) !important;
+  }
+}
+
+@media (min-width: 1181px) {
+  .pmd-page-stage[data-spatial='false'] {
+    max-width: 1180px !important;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pmd-page-stage * { scroll-behavior: auto !important; }
+}
