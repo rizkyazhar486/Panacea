@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { Card, SectionTitle } from '../components/ui'
 import { IconChartUp } from '../components/icons'
 import { GrafikProgres, GLIF, panahDelta } from '../components/GrafikProgres'
+import { Accordion } from '../components/Accordion'
 import { getWorkouts } from '../lib/workoutStore'
 import {
   UKURAN, bandingkan, ringkas, kunciPekan, BATAS_PROGRES,
@@ -180,12 +181,11 @@ export function PelatihProgres() {
         )}
       </Card>
 
-      <Card>
-        <h3 className="text-sm font-black text-ink dark:text-white">Limits</h3>
-        <ul className="mt-2 space-y-1.5 text-[11.5px] leading-relaxed text-neutral-600 dark:text-neutral-300">
+      <Accordion title="Limits" className="mt-1">
+        <ul className="space-y-1.5">
           {BATAS_PROGRES.map((b) => <li key={b}>· {b}</li>)}
         </ul>
-      </Card>
+      </Accordion>
     </div>
   )
 }
