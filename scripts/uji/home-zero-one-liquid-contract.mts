@@ -6,6 +6,7 @@ const deck = readFileSync('src/components/HomeCommandDeck.tsx', 'utf8')
 const hero = readFileSync('src/components/HomeVisualLanding.tsx', 'utf8')
 const heroCss = readFileSync('src/styles/home-intent-motion.css', 'utf8')
 const glass = readFileSync('src/styles/home-liquid-control-layer.css', 'utf8')
+const shell = readFileSync('src/components/Shell.tsx', 'utf8')
 
 // Zero-step: Home itself shows health context. One-step: primary destinations
 // and universal actions are directly exposed without an intermediate menu.
@@ -53,4 +54,9 @@ assert.match(glass, /@supports not \(\(-webkit-backdrop-filter:/,
 assert.match(glass, /body:has\(\.panacea-liquid-home\) button\[aria-label="Buka menu navigasi"\]/,
   'duplicate global navigation is visible on Home again')
 
-console.log('home-zero-one-liquid-contract: zero-step health context, one-tap primary/actions/recents, one navigation system, and Liquid Glass confined to controls.')
+assert.doesNotMatch(shell, /aria-label="Log Out"/,
+  'global header duplicates logout even though the mobile drawer already owns that secondary action')
+assert.match(shell, /onClick=\{doLogout\}[\s\S]{0,240}?Log Out/,
+  'removing duplicate header logout must not remove logout from the drawer')
+
+console.log('home-zero-one-liquid-contract: zero-step health context, one-tap primary/actions/recents, one navigation system, Liquid Glass confined to controls, and no duplicate header logout.')
