@@ -59,6 +59,8 @@ import { trackVisit, rankByUsage } from '../lib/usage'
 import type { Role } from '../lib/types'
 import { ambilTersembunyi, saring, langgananFitur } from '../lib/fiturTersembunyi'
 import { autoIsiDariPerangkat } from '../lib/autoIsi'
+import { useCommandBar } from './useCommandBar'
+import '../styles/command-bar.css'
 
 // Public entry: marketing landing first, then the login screen on demand.
 function PublicEntry() {
@@ -422,6 +424,21 @@ export function Shell({ children }: { children: ReactNode }) {
   const [navHidden, setNavHidden] = useState(false)
   const account = state.account
 
+  // Bilah atas menyingkir saat membaca ke bawah dan kembali saat dicari.
+  // Isinya tidak berubah sedikit pun: menu, kembali, judul, pencarian,
+  // notifikasi dan profil tetap di sana — yang berubah hanya kapan ia menempati
+  // layar. Pemanggilnya adalah pita tangkap di tepi atas viewport, bukan hover
+  // pada bilahnya sendiri: bilah yang sudah menyingkir tidak berada di bawah
+  // kursor, jadi hover padanya tidak akan pernah menyala.
+  //
+  // `navHidden` sudah berdiri di sini beserta komentar yang menjanjikan dock
+  // bawah ikut menyingkir, tetapi `setNavHidden` tidak pernah dipanggil dari
+  // mana pun — janjinya belum pernah hidup. Sekarang keduanya dijalankan oleh
+  // keputusan yang sama, jadi bilah atas dan dock bawah menyingkir dan kembali
+  // bersama alih-alih saling bertentangan.
+  const keadaanBilah = useCommandBar(bilahAtas)
+  useEffect(() => { setNavHidden(keadaanBilah === 'hidden') }, [keadaanBilah])
+
   // Close the mobile drawer & record the visit (for "most-used services").
   useEffect(() => { setMenuOpen(false); trackVisit(loc.pathname) }, [loc.pathname])
 
@@ -621,7 +638,17 @@ export function Shell({ children }: { children: ReactNode }) {
       </aside>
 
       <div className="relative z-10 flex min-w-0 flex-1 flex-col">
-        <header ref={bilahAtas} className="kaca sticky top-0 z-10 flex items-center justify-between gap-2 rounded-none border-x-0 border-t-0 px-4 py-3 sm:px-5">
+        {/* Pita tangkap: selalu ada di tepi atas, tidak pernah ikut menyingkir.
+            Inilah yang memanggil bilah kembali — mengandalkan hover pada
+            bilahnya sendiri mustahil, karena bilah yang tersembunyi sudah tidak
+            berada di bawah kursor. Tidak menerima penunjuk supaya tidak pernah
+            menelan klik milik isi halaman di bawahnya. */}
+        <div className="panacea-command-bar-reveal-zone" aria-hidden />
+        <header
+          ref={bilahAtas}
+          data-panacea-command-bar={keadaanBilah}
+          className="kaca panacea-command-bar sticky top-0 z-10 flex items-center justify-between gap-2 rounded-none border-x-0 border-t-0 px-4 py-3 sm:px-5"
+        >
           <div className="flex min-w-0 items-center gap-2">
             {/* Mobile: buka drawer */}
             <button

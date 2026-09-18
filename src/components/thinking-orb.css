@@ -1,0 +1,70 @@
+/* Orb penunggu penalaran.
+   Seluruh geraknya CSS: tidak ada requestAnimationFrame, tidak ada kanvas, dan
+   tidak ada timer JavaScript yang tetap berdetak setelah jawabannya datang.
+   Penanda tunggu yang sendirinya membebani CPU memperlambat hal yang sedang
+   ditunggu. */
+
+.pmd-thinking {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  color: inherit;
+}
+
+.pmd-thinking-orb {
+  position: relative;
+  flex: 0 0 auto;
+  display: inline-grid;
+  place-items: center;
+}
+
+/* Inti bernapas: skala dan cahayanya bergerak bersama, jadi ia terbaca sebagai
+   satu benda hidup alih-alih titik yang berkedip. */
+.pmd-thinking-core {
+  position: absolute;
+  inset: 22%;
+  border-radius: 50%;
+  background: currentColor;
+  opacity: .82;
+  animation: pmd-thinking-breathe 1900ms cubic-bezier(.45,0,.55,1) infinite;
+}
+
+/* Cincin menyapu satu arah dengan celah, sehingga arah putarnya terbaca.
+   Cincin penuh yang berputar tidak terlihat berputar sama sekali. */
+.pmd-thinking-ring {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  border: 1.5px solid currentColor;
+  border-right-color: transparent;
+  border-bottom-color: transparent;
+  opacity: .42;
+  animation: pmd-thinking-sweep 1400ms linear infinite;
+}
+
+.pmd-thinking-label {
+  min-width: 0;
+  font-size: inherit;
+  font-weight: inherit;
+}
+
+@keyframes pmd-thinking-breathe {
+  0%, 100% { transform: scale(.72); opacity: .55; }
+  50%      { transform: scale(1);   opacity: .95; }
+}
+
+@keyframes pmd-thinking-sweep {
+  to { transform: rotate(360deg); }
+}
+
+/* Gerak berulang tanpa akhir adalah persis jenis animasi yang memicu pusing
+   dan mual pada sebagian orang. Dimatikan sepenuhnya di sini — orbnya tetap
+   terlihat, dan kalimatnya tetap diucapkan pembaca layar, jadi tidak ada
+   informasi yang hilang bersama geraknya. */
+@media (prefers-reduced-motion: reduce) {
+  .pmd-thinking-core,
+  .pmd-thinking-ring {
+    animation: none;
+  }
+  .pmd-thinking-core { opacity: .85; transform: scale(.86); }
+}
