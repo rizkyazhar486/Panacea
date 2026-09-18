@@ -16,6 +16,7 @@ const SurgicalLab = lazy(() => import('./SurgicalLab').then((module) => ({ defau
 const SemanticMicroscopeStage = lazy(() => import('./SemanticMicroscopeStage'))
 const LokalisasiLesiPanel = lazy(() => import('./LokalisasiLesiPanel').then((module) => ({ default: module.LokalisasiLesiPanel })))
 const PencitraanVolumetrikPanel = lazy(() => import('./PencitraanVolumetrikPanel').then((module) => ({ default: module.PencitraanVolumetrikPanel })))
+const VirtualEndoscopyWorkbench = lazy(() => import('./VirtualEndoscopyWorkbench'))
 
 export type SimulationDomain =
   | 'anatomy'
@@ -23,6 +24,7 @@ export type SimulationDomain =
   | 'physiology'
   | 'pathophysiology'
   | 'imaging'
+  | 'endoscopy'
   | 'biomechanics'
   | 'cell'
   | 'genome'
@@ -73,6 +75,12 @@ const DOMAINS: DomainDefinition[] = [
     label: 'Imaging',
     scale: 'voxel → anatomy',
     description: 'Connect CT windowing, volumetric reconstruction and DICOM context back to the same anatomy instead of a separate radiology island.',
+  },
+  {
+    id: 'endoscopy',
+    label: 'Scope',
+    scale: 'lumen → landmark',
+    description: 'Move through a simulated endoluminal teaching view while a schematic anatomy route stays visible.',
   },
   {
     id: 'biomechanics',
@@ -148,6 +156,7 @@ export default function UnifiedHumanSimulationProjector({
   const systemLabel = readableSystem(selectedSystemId)
   const semanticStop = getBodySemanticZoomStop(semanticZoom.scale)
   const microscopic = isMicroscopicBodyScale(semanticZoom.scale)
+  const isEndoscopy = domain === 'endoscopy'
   const selectedStructureEducation = useMemo(() => {
     if (!selectedStructureName) return ''
     return penjelasanTertulis(selectedStructureName, selectedStructureName).replace(/\*\*/g, '')
@@ -190,6 +199,8 @@ export default function UnifiedHumanSimulationProjector({
         return <PathophysiologyNetworkPanel selectedAtlasSystemId={selectedSystemId} />
       case 'imaging':
         return <PencitraanVolumetrikPanel />
+      case 'endoscopy':
+        return <VirtualEndoscopyWorkbench selectedSystemId={selectedSystemId} onSystemChange={onSystemChange} />
       case 'biomechanics':
         return <BiomechanicsMotionLab />
       case 'cell':
@@ -252,10 +263,10 @@ export default function UnifiedHumanSimulationProjector({
           <div className="min-w-0">
             <div className="text-[9px] font-black uppercase tracking-[.22em] text-cyan-200/70">Body Exposure · unified human simulation projector</div>
             <h3 id="unified-human-simulation-title" className="mt-1 text-lg font-black tracking-[-.025em] sm:text-xl">
-              One 3D body, one selected system, every biological scale
+              One body. Switch the projection.
             </h3>
             <p className="mt-1 max-w-4xl text-[10px] leading-relaxed text-white/45 sm:text-[11px]">
-              Switch the simulation layer without abandoning the spatial context. Anatomy is the anchor; physiology, disease, movement, cells, genome, surgery and pharmacology are projections over the same body model.
+              Anatomy · function · imaging · scope · surgery · micro — one persistent body context.
             </p>
           </div>
           <div className="shrink-0 rounded-2xl border border-cyan-300/15 bg-cyan-300/[.055] px-3 py-2">
@@ -280,12 +291,15 @@ export default function UnifiedHumanSimulationProjector({
         </div>
       </header>
 
-      <UniversalAtlasDepthRail
-        semanticScale={semanticZoom.scale}
-        selectedSystemId={selectedSystemId}
-        onOpenScale={openScale}
-      />
+      {!isEndoscopy && (
+        <UniversalAtlasDepthRail
+          semanticScale={semanticZoom.scale}
+          selectedSystemId={selectedSystemId}
+          onOpenScale={openScale}
+        />
+      )}
 
+      {!isEndoscopy && (
       <div className="grid gap-0 xl:grid-cols-[minmax(0,1fr)_250px]">
         <div className="min-w-0 border-b border-white/[.08] p-2 sm:p-3 xl:border-b-0 xl:border-r">
           <Suspense fallback={<ProjectorLoader label="3D anatomy" />}>
@@ -330,8 +344,9 @@ export default function UnifiedHumanSimulationProjector({
           </div>
         </aside>
       </div>
+      )}
 
-      {microscopic && (
+      {!isEndoscopy && microscopic && (
         <div className="border-t border-white/[.08] p-2 sm:p-3" data-semantic-microscope-active={semanticZoom.scale}>
           <Suspense fallback={<ProjectorLoader label={semanticStop.label + ' detail'} />}>
             <SemanticMicroscopeStage scale={semanticZoom.scale} selectedSystemId={selectedSystemId} />
