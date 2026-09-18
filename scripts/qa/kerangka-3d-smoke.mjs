@@ -62,7 +62,7 @@ let gagal = null
 let ringkas = ''
 try {
   await page.goto(url, { waitUntil: 'networkidle' })
-  await page.getByRole('button', { name: 'Skeleton', exact: true }).first().click()
+  await page.getByRole('button', { name: /^Skeleton\b/ }).first().click()
 
   const canvas = page.locator('canvas[data-kerangka3d="true"]')
   await canvas.waitFor({ state: 'attached' })

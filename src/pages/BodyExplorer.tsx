@@ -4,6 +4,8 @@ import { IconActivity, IconSearch, IconStethoscope } from '../components/icons'
 import { api, type OntologyTerm, type DrugLabelInfo, type AnatomyImage, type ImageKind } from '../lib/api'
 import { explainBodyRegion, explainDrug } from '../lib/ai'
 import { useStore } from '../lib/store'
+import jumlahAtlas from '../data/jumlahAtlas.json'
+import { CariStrukturCepat } from '../components/CariStrukturCepat'
 import { Body3D, ANATOMY_LAYERS, RENDER_MODES, CT_WINDOWS, MOTION_OFF, MOTION_REST, MOTION_EXERCISE, type AnatomyLayer, type RenderMode, type SlicePlane, type MotionState } from '../components/Body3D'
 import { FeatureErrorBoundary } from '../components/FeatureErrorBoundary'
 import { WORKOUT_MUSCLE_GROUPS } from '../lib/workoutMuscles'
@@ -84,11 +86,12 @@ function toSearchTerm(rawName: string): string {
 // dulu tiap deret menulis ulang kelasnya sendiri, dan itu yang membuat
 // halaman terasa ramai: bentuk yang sama tampil sedikit berbeda-beda.
 function Chip({
-  active, onClick, children,
-}: { active: boolean; onClick: () => void; children: React.ReactNode }) {
+  active, onClick, children, ariaLabel,
+}: { active: boolean; onClick: () => void; children: React.ReactNode; ariaLabel?: string }) {
   return (
     <button
       onClick={onClick}
+      aria-label={ariaLabel}
       className={`min-h-[34px] rounded-full border px-3 text-xs font-bold transition ${
         active
           ? 'border-brand bg-brand text-white'
@@ -587,6 +590,24 @@ export function BodyExplorer() {
         subtitle="A real 3D anatomy model — tap any bone, muscle, vessel, nerve, or organ"
       />
       <Card>
+        {/* Kotak cari di ATAS modelnya. Struktur yang dicari orang hampir
+            selalu berada di sistem yang sedang dimatikan -- itu sebabnya ia
+            dicari dan bukan diketuk -- jadi memilih hasil ikut menyalakan
+            sistemnya, kalau tidak layarnya tidak berubah dan strukturnya
+            terbaca sebagai tidak ada. */}
+        <div className="mb-2">
+          <CariStrukturCepat
+            lapisanAktif={layers}
+            onNyalakanLapisan={(kunci) => setLayers((prev) => new Set(prev).add(kunci))}
+            onSorot={(nama, label) => {
+              setActiveWorkout(null)
+              setActiveOrgan(null)
+              setFocusKeywords(null)
+              setHighlighted(nama)
+              lookup(label, [toSearchTerm(nama[0])], undefined, nama[0])
+            }}
+          />
+        </div>
         <Body3D
           layers={layers}
           highlighted={highlighted}
@@ -870,13 +891,35 @@ export function BodyExplorer() {
             <div className="mt-3">
               {panelTab === 'layers' && (
               <>
-                <p className="mb-1.5 text-[11px] text-neutral-400">
-                  Turn body systems on or off. Only what you can see can be tapped.
-                </p>
+                <div className="mb-1.5 flex flex-wrap items-baseline justify-between gap-x-2 gap-y-0.5">
+                  <p className="text-[11px] text-neutral-400">
+                    Turn body systems on or off. Only what you can see can be tapped.
+                  </p>
+                  {/* Jumlah struktur yang SEDANG terlihat, dihitung dari berkas
+                      geometrinya sendiri lewat src/data/jumlahAtlas.json. */}
+                  <p className="text-[11px] font-bold tabular-nums text-neutral-500 dark:text-neutral-400">
+                    {ANATOMY_LAYERS.filter((l) => layers.has(l.key))
+                      .reduce((n, l) => n + (jumlahAtlas.perSistem[l.key] ?? 0), 0)
+                      .toLocaleString()}
+                    {' of '}
+                    {jumlahAtlas.total.toLocaleString()} structures visible
+                  </p>
+                </div>
                 <div className="flex flex-wrap gap-1.5">
                   {ANATOMY_LAYERS.map((l) => (
-                    <Chip key={l.key} active={layers.has(l.key)} onClick={() => toggleLayer(l.key)}>
+                    <Chip
+                      key={l.key}
+                      active={layers.has(l.key)}
+                      onClick={() => toggleLayer(l.key)}
+                      /* Angka di pil adalah data, bukan bagian dari nama tombol.
+                         Tanpa label ini nama aksesibelnya terbaca "Vessels 434",
+                         yang ambigu bagi pembaca layar. */
+                      ariaLabel={`${l.label}, ${(jumlahAtlas.perSistem[l.key] ?? 0).toLocaleString()} structures`}
+                    >
                       {l.label}
+                      <span aria-hidden="true" className={`ml-1.5 tabular-nums ${layers.has(l.key) ? 'text-white/70' : 'text-neutral-400 dark:text-neutral-500'}`}>
+                        {jumlahAtlas.perSistem[l.key] ?? 0}
+                      </span>
                     </Chip>
                   ))}
                 </div>

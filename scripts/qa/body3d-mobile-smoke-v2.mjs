@@ -198,7 +198,7 @@ try {
   if (renderDpr < 1 || renderDpr > 1.51) throw new Error(`Mobile Body3D backing-store ratio ${renderDpr.toFixed(3)} is outside the safe 1.0–1.5 range`)
   if (viewport.documentScrollWidth > viewport.width + 2) throw new Error(`Page overflows horizontally: ${viewport.documentScrollWidth}px > ${viewport.width}px`)
 
-  const vessels = page.getByRole('button', { name: 'Vessels', exact: true }).first()
+  const vessels = page.getByRole('button', { name: /^Vessels\b/ }).first()
   await vessels.click()
   await progressiveLoading.waitFor({ state: 'visible', timeout: 5_000 })
   const progressiveState = await progressiveLoading.evaluate((node) => {

@@ -223,7 +223,7 @@ try {
     throw new Error(`Page overflows horizontally: ${viewport.documentScrollWidth}px > ${viewport.width}px`)
   }
 
-  const vessels = page.getByRole('button', { name: 'Vessels', exact: true }).first()
+  const vessels = page.getByRole('button', { name: /^Vessels\b/ }).first()
   await vessels.click()
   await progressiveLoading.waitFor({ state: 'visible', timeout: 5_000 })
   const progressiveClass = await progressiveLoading.evaluate((node) =>
