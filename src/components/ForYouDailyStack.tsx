@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { FOR_YOU_WIDGET_CATALOG, type ForYouWidgetDefinition } from '../lib/forYouWidgetCatalog'
 
@@ -22,46 +22,58 @@ function widgetMetric(widget: ForYouWidgetDefinition) {
 
 export function ForYouDailyStack() {
   const [infoId, setInfoId] = useState<string | null>(null)
+  const [expanded, setExpanded] = useState(false)
+  const visibleWidgets = useMemo(
+    () => expanded ? FOR_YOU_WIDGET_CATALOG : FOR_YOU_WIDGET_CATALOG.slice(0, 4),
+    [expanded],
+  )
 
   return (
     <section aria-label="For You daily stack" className="border-t border-white/10 pt-4">
       <div className="mb-3 flex items-center justify-between gap-3">
         <div className="text-[9px] font-black uppercase tracking-[.14em] text-white/34">Daily stack</div>
-        <span className="text-[9px] font-black uppercase tracking-[.12em] text-white/22">visual first</span>
+        <button
+          type="button"
+          onClick={() => setExpanded((value) => !value)}
+          aria-expanded={expanded}
+          className="min-h-[36px] rounded-full border border-white/[.08] px-3 text-[9px] font-black text-white/40 transition hover:border-white/15 hover:text-white/72"
+        >
+          {expanded ? 'Compact' : `All ${FOR_YOU_WIDGET_CATALOG.length}`}
+        </button>
       </div>
 
-      <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
-        {FOR_YOU_WIDGET_CATALOG.map((widget) => {
+      <div className="grid gap-2 sm:grid-cols-2 xl:grid-cols-4">
+        {visibleWidgets.map((widget) => {
           const body = (
-            <div className="flex h-full min-h-[148px] flex-col justify-between rounded-[24px] border border-white/[.08] bg-white/[.025] p-4 transition hover:border-white/15 hover:bg-white/[.04]">
+            <div className="flex h-full min-h-[112px] flex-col justify-between rounded-[18px] border border-white/[.07] bg-white/[.022] p-3 transition hover:border-white/14 hover:bg-white/[.035]">
               <div className="flex items-center justify-between gap-3">
-                <span className="text-[9px] font-black uppercase tracking-[.13em] text-white/30">{widget.primaryVisual}</span>
-                <span className="text-[8px] font-black uppercase tracking-[.12em] text-white/20">{sourceLabel(widget)}</span>
+                <span className="text-[8px] font-black uppercase tracking-[.12em] text-white/28">{widget.primaryVisual}</span>
+                <span className="truncate text-[8px] font-black uppercase tracking-[.1em] text-white/18">{sourceLabel(widget)}</span>
               </div>
 
-              <div>
-                <div className="text-[10px] font-black uppercase tracking-[.13em] text-white/38">{widget.title}</div>
-                <div className="mt-1 truncate text-2xl font-black tracking-[-.045em] text-white">{widgetMetric(widget)}</div>
+              <div className="min-w-0">
+                <div className="truncate text-[9px] font-black uppercase tracking-[.12em] text-white/36">{widget.title}</div>
+                <div className="mt-1 truncate text-xl font-black tracking-[-.04em] text-white">{widgetMetric(widget)}</div>
               </div>
-
-              <p className="line-clamp-2 text-[11px] font-semibold leading-relaxed text-white/48">{widget.oneSentence}</p>
             </div>
           )
 
           return (
-            <article key={widget.id} className="min-w-0">
+            <article key={widget.id} className="relative min-w-0">
               {widget.route ? <Link to={widget.route} aria-label={`Open ${widget.title}`}>{body}</Link> : body}
               <button
                 type="button"
-                className="mt-1 min-h-[38px] text-[9px] font-black uppercase tracking-[.12em] text-white/30 hover:text-white/62"
+                className="absolute bottom-2.5 right-2.5 z-10 grid h-7 w-7 place-items-center rounded-full border border-white/[.08] bg-black/25 text-[9px] font-black text-white/35 hover:text-white/70"
                 onClick={() => setInfoId((current) => current === widget.id ? null : widget.id)}
+                aria-expanded={infoId === widget.id}
+                aria-label={`About ${widget.title}`}
               >
-                {infoId === widget.id ? 'Hide info' : 'Info'}
+                i
               </button>
               {infoId === widget.id && (
-                <p className="pb-2 text-[10px] leading-relaxed text-white/40">
+                <p className="mt-1 rounded-[14px] border border-white/[.06] bg-white/[.02] px-3 py-2 text-[10px] leading-relaxed text-white/42">
                   {widget.kind === 'music'
-                    ? 'Spotify and Apple Music remain explicitly unconnected until a real provider authorization flow and credentials are configured; Panacea does not simulate playback or account state.'
+                    ? 'Spotify and Apple Music stay unconnected until a real provider authorization flow is configured; Panacea does not simulate playback or account state.'
                     : widget.oneSentence}
                 </p>
               )}
