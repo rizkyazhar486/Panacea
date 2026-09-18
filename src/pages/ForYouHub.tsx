@@ -75,7 +75,7 @@ function DestinationRail({ label, items }: { label: string; items: Destination[]
 export function ForYouHub() {
   const { account } = useStore()
   const name = account?.name?.trim().split(/\s+/)[0] || 'You'
-  const [score, setScore] = useState(72)
+  const [score, setScore] = useState<number | null>(null)
   const [budget, setBudget] = useState('')
   const [motivation, setMotivation] = useState(0)
   const [prompt, setPrompt] = useState('')
@@ -83,13 +83,14 @@ export function ForYouHub() {
 
   useEffect(() => {
     if (typeof window === 'undefined') return
-    const stored = Number(window.localStorage.getItem('pm_for_you_score'))
+    const rawScore = window.localStorage.getItem('pm_for_you_score')
+    const stored = rawScore == null ? Number.NaN : Number(rawScore)
     if (Number.isFinite(stored) && stored >= 0 && stored <= 100) setScore(stored)
     setBudget(window.localStorage.getItem('pm_for_you_budget_note') ?? '')
   }, [])
 
   useEffect(() => {
-    if (typeof window === 'undefined') return
+    if (typeof window === 'undefined' || score == null) return
     window.localStorage.setItem('pm_for_you_score', String(score))
   }, [score])
 
@@ -152,11 +153,12 @@ export function ForYouHub() {
       <section aria-label="Personal tools" className="border-t border-white/10">
         <details className="group border-b border-white/10">
           <summary className="flex min-h-[56px] cursor-pointer list-none items-center justify-between gap-4 text-xs font-black">
-            <span>Daily score</span>
-            <span className="text-2xl tabular-nums">{score}</span>
+            <span>Daily check-in</span>
+            <span className="text-2xl tabular-nums">{score == null ? '—' : score}</span>
           </summary>
           <div className="pb-5">
-            <input type="range" min="0" max="100" value={score} onChange={(event) => setScore(Number(event.target.value))} className="w-full accent-emerald-300" aria-label="Daily score" />
+            <div className="mb-2 text-[9px] font-bold uppercase tracking-[.12em] text-white/32">Self-rated · 0–100</div>
+            <input type="range" min="0" max="100" value={score ?? 50} onChange={(event) => setScore(Number(event.target.value))} className="w-full accent-emerald-300" aria-label="Self-rated daily check-in" />
           </div>
         </details>
 
