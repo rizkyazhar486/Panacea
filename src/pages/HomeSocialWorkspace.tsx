@@ -63,10 +63,10 @@ export function HomeSocialWorkspace() {
       {activeKey === 'home' ? (
         <div className="panacea-human-home">
           <HomeHealthBrief />
-          <HomeRecoveryVisuals />
-          <SuperPageLauncher />
-          <RelWidgetRumah />
           <HomeVisualLanding />
+          <SuperPageLauncher />
+          <HomeRecoveryVisuals />
+          <RelWidgetRumah />
           <PanaceaImageSlider />
           <HomeCommandDeck />
         </div>
