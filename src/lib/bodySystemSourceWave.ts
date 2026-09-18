@@ -21,6 +21,14 @@ export interface BodySystemSourceTarget {
   label: string
   file: string
   hints: readonly string[]
+  /**
+   * Some source bundles are themselves one reviewed anatomical layer. For
+   * example surface.glb contains the complete shipped superficial/surface
+   * catalogue and does not expose a single mesh literally named "skin".
+   * Selecting the whole source bundle is therefore safer than pretending one
+   * fuzzy name represents the integument.
+   */
+  allSourceNodes?: boolean
 }
 
 export interface BodySystemSourceDefinition {
@@ -69,11 +77,21 @@ export const BODY_SYSTEM_SOURCE_WAVE: readonly BodySystemSourceDefinition[] = [
     { id: 'pancreas', label: 'Pancreas', file: 'visceral.glb', hints: ['pancreas'] },
   ] },
   { id: 'reproductive', label: 'Reproductive', targets: [
+    // Female structures intentionally remain listed even when the current
+    // full-body male reference cannot resolve them. Their unavailable state is
+    // a visible source gap, not permission to substitute urinary anatomy.
     { id: 'uterus', label: 'Uterus', file: 'visceral.glb', hints: ['uterus'] },
     { id: 'ovary', label: 'Ovaries', file: 'visceral.glb', hints: ['ovary'] },
     { id: 'vagina', label: 'Vagina', file: 'visceral.glb', hints: ['vagina'] },
+
+    // Male reference structures that are actually present in the shipped
+    // BodyParts3D/Z-Anatomy lineage and should be selectable in whole-body 3D.
+    { id: 'penis', label: 'Penis', file: 'visceral.glb', hints: ['penis', 'glans penis'] },
+    { id: 'erectile-tissue', label: 'Erectile tissue', file: 'visceral.glb', hints: ['corpus cavernosum', 'corpus spongiosum'] },
     { id: 'testis', label: 'Testes', file: 'visceral.glb', hints: ['testis', 'testicle'] },
     { id: 'epididymis', label: 'Epididymis', file: 'visceral.glb', hints: ['epididymis'] },
+    { id: 'deferent-duct', label: 'Deferent ducts', file: 'visceral.glb', hints: ['ductus deferens', 'deferent duct'] },
+    { id: 'seminal-vesicle', label: 'Seminal vesicles', file: 'visceral.glb', hints: ['seminal vesicle'] },
     { id: 'prostate', label: 'Prostate', file: 'visceral.glb', hints: ['prostate'] },
   ] },
   { id: 'lymphatic-immune', label: 'Lymphatic / Immune', targets: [
@@ -90,13 +108,23 @@ export const BODY_SYSTEM_SOURCE_WAVE: readonly BodySystemSourceDefinition[] = [
     { id: 'knee', label: 'Knee complex', file: 'skeletal.glb', hints: ['femur', 'tibia', 'patella'] },
   ] },
   { id: 'sensory-ent', label: 'Sensory / ENT', targets: [
-    { id: 'eye-context', label: 'Eye context', file: 'visceral.glb', hints: ['eye', 'eyeball'] },
+    // The shipped full-body index classifies ocular compartments with the
+    // nervous bundle. The previous visceral lookup left the eye disconnected
+    // even though source-backed cornea/iris/lens/retina/globe structures exist.
+    { id: 'eye-globe', label: 'Eye / globe', file: 'nervous.glb', hints: ['eyeball', 'cornea', 'sclera', 'iris', 'lens', 'retina', 'vitreous body', 'anterior chamber of eyeball'] },
     { id: 'optic-nerve', label: 'Optic nerve', file: 'nervous.glb', hints: ['optic nerve'] },
-    { id: 'ear', label: 'Ear', file: 'visceral.glb', hints: ['ear', 'cochlea'] },
+    { id: 'ocular-motor', label: 'Extraocular motor context', file: 'muscular.glb', hints: ['superior rectus', 'inferior rectus', 'medial rectus', 'lateral rectus', 'superior oblique', 'inferior oblique'] },
+    { id: 'ear', label: 'Ear / vestibular context', file: 'nervous.glb', hints: ['cochlea', 'vestibule', 'vestibular nerve'] },
     { id: 'tongue', label: 'Tongue', file: 'visceral.glb', hints: ['tongue'] },
   ] },
   { id: 'integumentary-surface', label: 'Integumentary / Surface', targets: [
-    { id: 'surface', label: 'Whole-body surface', file: 'surface.glb', hints: ['body', 'skin', 'surface'] },
+    {
+      id: 'surface',
+      label: 'Whole-body surface / face / superficial regions',
+      file: 'surface.glb',
+      hints: ['surface'],
+      allSourceNodes: true,
+    },
   ] },
 ] as const
 
@@ -106,7 +134,9 @@ export function resolveBodySystemSourceWave() {
     ...system,
     targets: system.targets.map((target) => {
       const bundles = snapshot.filter((bundle) => bundle.file === target.file)
-      const names = [...new Set(resolveAllAnatomySourceNodes(target.hints, bundles, 24).flatMap((match) => match.names))]
+      const names = target.allSourceNodes
+        ? [...new Set(bundles.flatMap((bundle) => bundle.names))]
+        : [...new Set(resolveAllAnatomySourceNodes(target.hints, bundles, 24).flatMap((match) => match.names))]
       return { ...target, names, available: names.length > 0 }
     }),
   }))
