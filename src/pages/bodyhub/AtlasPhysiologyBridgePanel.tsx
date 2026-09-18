@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react'
-import { BODY_SYSTEM_SOURCE_WAVE, type BodySystemId } from '../../lib/bodySystemSourceWave'
+import { resolveBodySystemSourceWave, type BodySystemId } from '../../lib/bodySystemSourceWave'
 import {
   BODY_SYSTEM_PHYSIOLOGY_BRIDGE_BOUNDARY,
   getBodySystemPhysiologyBridge,
@@ -24,7 +24,8 @@ interface AtlasPhysiologyBridgePanelProps {
 export default function AtlasPhysiologyBridgePanel({ selectedAtlasSystemId, selectedSourceStructureName, onSystemChange }: AtlasPhysiologyBridgePanelProps) {
   const [internalSystemId, setInternalSystemId] = useState<BodySystemId>('cardiovascular')
   const activeAtlasSystemId = selectedAtlasSystemId ?? internalSystemId
-  const sourceSystem = BODY_SYSTEM_SOURCE_WAVE.find((system) => system.id === activeAtlasSystemId) ?? BODY_SYSTEM_SOURCE_WAVE[0]
+  const sourceSystems = useMemo(() => resolveBodySystemSourceWave(), [])
+  const sourceSystem = sourceSystems.find((system) => system.id === activeAtlasSystemId) ?? sourceSystems[0]
   const bridge = getBodySystemPhysiologyBridge(sourceSystem.id)
   const selectedSourceTarget = selectedSourceStructureName
     ? sourceSystem.targets.find((target) => target.names.includes(selectedSourceStructureName))
@@ -53,7 +54,7 @@ export default function AtlasPhysiologyBridgePanel({ selectedAtlasSystemId, sele
       </div>
 
       <div className="no-scrollbar mt-3 flex gap-1.5 overflow-x-auto pb-1" role="tablist" aria-label="Atlas systems physiology bridge">
-        {BODY_SYSTEM_SOURCE_WAVE.map((system) => {
+        {sourceSystems.map((system) => {
           const active = system.id === activeAtlasSystemId
           return (
             <button
