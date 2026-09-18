@@ -2,7 +2,8 @@ import { lazy, Suspense, type ComponentType } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { PanaceaZoneNav } from '../components/PanaceaZoneNav'
 import { SuperPageCapabilityRail } from '../components/SuperPageCapabilityRail'
-import { PersonalBodyAvatar3D } from '../components/PersonalBodyAvatar3D'
+import { PersonalBodyUnifiedSurface } from '../components/PersonalBodyUnifiedSurface'
+import { SurfaceGuide } from '../components/SurfaceGuide'
 import { SurfaceDepthNavigator } from '../components/SurfaceDepthNavigator'
 
 const BodyComposition = lazy(() => import('./BodyComposition').then((m) => ({ default: m.BodyComposition })))
@@ -36,6 +37,7 @@ const VIEWS: View[] = [
   { key: 'vitapulse', label: 'VitaPulse', short: 'VitaPulse', component: VitaPulse, description: 'A compact vitality view tied to the rest of Your Body.' },
 ]
 const VALID = new Set(VIEWS.map((view) => view.key))
+const PRIMARY_VIEW_KEYS = new Set<BodyView>(['body', 'body-exposure', 'training', 'recovery', 'nutrition', 'health-data'])
 
 const BODY_DEPTH_BY_VIEW: Record<BodyView, string> = {
   body: 'today',
@@ -77,6 +79,9 @@ export function UnifiedBodyWorkspace() {
   const active = VIEWS.find((view) => view.key === activeKey) ?? VIEWS[0]
   const Active = active.component
   const isExposure = activeKey === 'body-exposure'
+  const primaryViews = VIEWS.filter((view) => PRIMARY_VIEW_KEYS.has(view.key))
+  const secondaryViews = VIEWS.filter((view) => !PRIMARY_VIEW_KEYS.has(view.key))
+  const secondaryValue = secondaryViews.some((view) => view.key === activeKey) ? activeKey : ''
 
   function select(view: View) {
     const next = new URLSearchParams(params)
@@ -118,7 +123,7 @@ export function UnifiedBodyWorkspace() {
           </p>
 
           <div className="no-scrollbar mt-3 flex snap-x gap-1.5 overflow-x-auto pb-1" role="tablist" aria-label="Your Body workspace">
-            {VIEWS.map((view) => {
+            {primaryViews.map((view) => {
               const selected = activeKey === view.key
               const exposureTab = view.key === 'body-exposure'
               return (
@@ -130,10 +135,10 @@ export function UnifiedBodyWorkspace() {
                   onClick={() => select(view)}
                   className={`min-h-[42px] shrink-0 snap-start rounded-full border px-3.5 text-[11px] font-black transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-300/50 ${
                     selected
-                      ? 'border-cyan-300/25 bg-[linear-gradient(135deg,rgba(34,211,238,.18),rgba(139,92,246,.13),rgba(236,72,153,.08))] text-white shadow-[inset_0_1px_0_rgba(255,255,255,.12),0_10px_28px_rgba(34,211,238,.05)]'
+                      ? 'border-white bg-white text-black shadow-sm'
                       : exposureTab
-                        ? 'border-cyan-300/15 bg-cyan-300/[.055] text-cyan-100/80 hover:bg-cyan-300/[.09]'
-                        : 'border-white/[.08] bg-white/[.035] text-white/55 hover:border-white/15 hover:bg-white/[.055] hover:text-white/80'
+                        ? 'border-white/15 bg-white/[.055] text-white/85 hover:bg-white/[.09]'
+                        : 'border-white/[.08] bg-white/[.035] text-white/75 hover:border-white/15 hover:bg-white/[.055] hover:text-white'
                   }`}
                 >
                   {view.short}
@@ -141,7 +146,31 @@ export function UnifiedBodyWorkspace() {
                 </button>
               )
             })}
+            <label className="shrink-0">
+              <span className="sr-only">More features</span>
+              <select
+                aria-label="More features"
+                value={secondaryValue}
+                onChange={(event) => {
+                  const target = VIEWS.find((view) => view.key === event.target.value)
+                  if (target) select(target)
+                }}
+                className="min-h-[42px] rounded-full border border-white/10 bg-white/[.04] px-3 text-[11px] font-black text-white outline-none"
+              >
+                <option value="">More features</option>
+                {secondaryViews.map((view) => <option key={view.key} value={view.key}>{view.short}</option>)}
+              </select>
+            </label>
           </div>
+
+          <SurfaceGuide
+            summary="pick one goal → stay on one body → open details only when needed"
+            steps={[
+              'Start with My Body or Body Exposure.',
+              'Use the six primary destinations for daily work.',
+              'Everything else stays preserved under More features.',
+            ]}
+          />
 
           <SurfaceDepthNavigator
             surface="your-body"
@@ -157,7 +186,7 @@ export function UnifiedBodyWorkspace() {
 
         {!isExposure && (
           <div className="relative lg:sticky lg:top-24 lg:self-start">
-            <PersonalBodyAvatar3D />
+            <PersonalBodyUnifiedSurface compact defaultFocus="identity" shareable cameraCapture />
           </div>
         )}
       </section>
