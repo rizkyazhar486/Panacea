@@ -488,3 +488,329 @@
     transition: none;
   }
 }
+
+
+/* ── Home Bento v2 ──────────────────────────────────────────────────────────
+   The Home surface is an instrument wall, not a dashboard of equal cards.
+   Size reflects information density: one anchor, compact single-metric tiles,
+   and wide multi-signal tiles. Content stays flat; only controls use glass. */
+.panacea-human-home {
+  gap: clamp(28px, 4vw, 52px);
+}
+
+.panacea-health-bento-section {
+  min-width: 0;
+  color: rgba(255,255,255,.96);
+}
+
+.panacea-health-bento-head {
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  margin-bottom: 8px;
+}
+
+.panacea-health-bento {
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  grid-auto-flow: dense;
+  grid-auto-rows: minmax(126px, auto);
+  gap: 10px;
+}
+
+.panacea-health-bento-tile,
+.panacea-health-bento-action {
+  position: relative;
+  min-width: 0;
+  overflow: hidden;
+  border: 1px solid rgba(255,255,255,.10);
+  border-radius: 24px;
+  background: rgba(255,255,255,.018);
+  color: inherit;
+  text-decoration: none;
+  transition:
+    border-color 160ms ease,
+    background-color 160ms ease,
+    transform 140ms cubic-bezier(.2,.8,.2,1);
+}
+
+.panacea-health-bento-tile:hover,
+.panacea-health-bento-tile:focus-visible,
+.panacea-health-bento-action:hover,
+.panacea-health-bento-action:focus-visible {
+  border-color: rgba(255,255,255,.26);
+  background: rgba(255,255,255,.045);
+}
+
+.panacea-health-bento-tile:active,
+.panacea-health-bento-action:active {
+  transform: scale(.988);
+}
+
+.panacea-health-bento-tile {
+  grid-column: span 3;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 17px;
+}
+
+.panacea-health-bento-tile[data-size='hero'] {
+  grid-column: span 6;
+  grid-row: span 2;
+  min-height: 262px;
+  padding: 22px;
+}
+
+.panacea-health-bento-tile[data-size='wide'] {
+  grid-column: span 6;
+}
+
+.panacea-health-bento-kicker {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: rgba(255,255,255,.46);
+  font-size: 9px;
+  font-weight: 820;
+  letter-spacing: .10em;
+  text-transform: uppercase;
+}
+
+.panacea-health-bento-value {
+  display: flex;
+  align-items: baseline;
+  gap: 5px;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: clamp(30px, 4.8vw, 55px);
+  font-weight: 780;
+  line-height: .92;
+  letter-spacing: -.06em;
+  font-variant-numeric: tabular-nums;
+}
+
+.panacea-health-bento-tile[data-size='hero'] .panacea-health-bento-value {
+  font-size: clamp(68px, 9vw, 112px);
+}
+
+.panacea-health-bento-value small {
+  color: rgba(255,255,255,.38);
+  font-size: 10px;
+  font-weight: 780;
+  letter-spacing: .01em;
+}
+
+.panacea-health-bento-meta {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: rgba(255,255,255,.36);
+  font-size: 9px;
+  font-weight: 720;
+}
+
+.panacea-health-bento-matrix {
+  position: absolute;
+  right: 22px;
+  bottom: 22px;
+  width: 82px;
+  display: grid;
+  grid-template-columns: repeat(6, 7px);
+  gap: 6px;
+}
+
+.panacea-health-bento-matrix i {
+  width: 7px;
+  height: 7px;
+  border-radius: 999px;
+  background: rgba(255,255,255,.10);
+}
+
+.panacea-health-bento-tile[data-accent='green'] { --panacea-bento-accent: #00bf63; }
+.panacea-health-bento-tile[data-accent='violet'] { --panacea-bento-accent: #a78bfa; }
+.panacea-health-bento-tile[data-accent='orange'] { --panacea-bento-accent: #fb923c; }
+.panacea-health-bento-tile[data-accent='cyan'] { --panacea-bento-accent: #67e8f9; }
+.panacea-health-bento-tile[data-accent='rose'] { --panacea-bento-accent: #fb7185; }
+
+.panacea-health-bento-matrix i[data-on='true'] {
+  background: var(--panacea-bento-accent, #00bf63);
+}
+
+.panacea-health-bento-action {
+  grid-column: span 3;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 10px;
+  min-height: 126px;
+  padding: 17px;
+}
+
+.panacea-health-bento-action span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 15px;
+  font-weight: 760;
+  letter-spacing: -.025em;
+}
+
+/* Most-used capabilities are also bento: repeated behavior earns visible
+   space, but the complete catalogue remains behind the search-first surface. */
+.panacea-command-recents {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  grid-auto-flow: dense;
+  gap: 8px;
+  margin: 14px 0 4px;
+}
+
+.panacea-command-recent {
+  grid-column: span 2;
+  min-height: 76px;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 13px;
+  border: 1px solid rgba(255,255,255,.09);
+  border-radius: 18px;
+  background: rgba(255,255,255,.016);
+  color: rgba(255,255,255,.88);
+  text-decoration: none;
+}
+
+.panacea-command-recent:nth-child(1),
+.panacea-command-recent:nth-child(2) {
+  grid-column: span 3;
+  min-height: 92px;
+}
+
+.panacea-command-recent span:first-child {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 11px;
+  font-weight: 780;
+}
+
+.panacea-command-recent span:last-child {
+  color: rgba(255,255,255,.34);
+}
+
+.panacea-command-recent:hover,
+.panacea-command-recent:focus-visible {
+  border-color: rgba(255,255,255,.24);
+  background: rgba(255,255,255,.04);
+}
+
+/* Capability browser: six-column dense bento instead of rows of same-size
+   dashboard cards. Group share still decides its span via bentoSpan(). */
+.panacea-bento {
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  grid-auto-flow: dense;
+  gap: 9px;
+}
+
+.panacea-bento-tile {
+  grid-column: span 2;
+  border-radius: 20px;
+}
+
+.panacea-bento-tile[data-span='wide'] {
+  grid-column: span 3;
+}
+
+.panacea-bento-tile[data-span='lead'],
+.panacea-bento-tile[data-open='true'] {
+  grid-column: 1 / -1;
+}
+
+.panacea-bento-head {
+  min-height: 86px;
+  padding: 16px;
+}
+
+@media (max-width: 760px) {
+  .panacea-human-home {
+    gap: 34px;
+  }
+
+  .panacea-health-bento {
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+    grid-auto-rows: minmax(112px, auto);
+    gap: 8px;
+  }
+
+  .panacea-health-bento-tile {
+    grid-column: span 3;
+    padding: 14px;
+    border-radius: 20px;
+  }
+
+  .panacea-health-bento-tile[data-size='hero'] {
+    grid-column: 1 / -1;
+    grid-row: span 2;
+    min-height: 226px;
+    padding: 18px;
+  }
+
+  .panacea-health-bento-tile[data-size='wide'] {
+    grid-column: 1 / -1;
+  }
+
+  .panacea-health-bento-action {
+    grid-column: span 3;
+    min-height: 112px;
+    padding: 14px;
+    border-radius: 20px;
+  }
+
+  .panacea-health-bento-matrix {
+    right: 18px;
+    bottom: 18px;
+  }
+
+  .panacea-command-recents {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+
+  .panacea-command-recent,
+  .panacea-command-recent:nth-child(1),
+  .panacea-command-recent:nth-child(2) {
+    grid-column: span 2;
+  }
+
+  .panacea-bento {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 8px;
+  }
+
+  .panacea-bento-tile {
+    grid-column: span 2;
+  }
+
+  .panacea-bento-tile[data-span='wide'],
+  .panacea-bento-tile[data-span='lead'],
+  .panacea-bento-tile[data-open='true'] {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .panacea-health-bento-tile,
+  .panacea-health-bento-action {
+    transition: none !important;
+  }
+}
