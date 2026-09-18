@@ -1,273 +1,336 @@
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState, type PointerEvent as ReactPointerEvent, type ReactNode } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { LogoMark } from './Logo'
-import { KATALOG_AKSI, ambilAksi, SLOT_PER_HALAMAN } from '../lib/aksiFab'
+import { KATALOG_AKSI, SLOT_PER_HALAMAN } from '../lib/aksiFab'
 import { PemilihAksiFab } from './PemilihAksiFab'
+import { SlidableRail, type SlidableRailHandle } from './SlidableRail'
 import { toggleTheme } from '../lib/theme'
-
-// ─────────────────────────────────────────────────────────────────────────────
-// Navigasi berbentuk satu tombol melayang yang dapat dipindah.
-//
-// Menggantikan bilah bawah selebar layar. Bilah itu memakan 68 px tinggi layar
-// SETIAP SAAT, di aplikasi yang halaman-halamannya sudah setinggi enam layar;
-// satu tombol berdiameter 56 px mengembalikan ruang itu ke isi, dan itulah yang
-// membuat halaman terasa lebih lapang.
-//
-// TIGA MASALAH YANG HARUS DISELESAIKAN BERSAMAAN, dan urutannya penting:
-//
-//   1. GESER vs KETUK. Tombol yang dapat dipindah selalu berisiko kehilangan
-//      fungsi ketuknya. Diselesaikan dengan AMBANG 8 px: gerakan di bawah itu
-//      tetap dihitung sebagai ketukan. Tanpa ambang, jari yang bergeser satu
-//      piksel saat menekan akan membuat menu tidak pernah terbuka.
-//
-//   2. GESER vs SAPU-KEMBALI DARI TEPI. Ponsel memakai sapuan dari tepi layar
-//      untuk kembali ke halaman sebelumnya. Diselesaikan dengan MENJAGA JARAK
-//      12 px dari tepi: sapuan sistem berawal pada beberapa piksel pertama, dan
-//      pada jarak itu jari yang memulai dari tepi tidak pernah mendarat di atas
-//      tombol. Menempelkan tombol rata tepi akan mematikan gerakan kembali —
-//      cacat yang tidak akan pernah dilaporkan orang, mereka hanya berhenti
-//      memakai gerakan itu.
-//
-//   3. GESER vs GULIR HALAMAN. Diselesaikan dengan setPointerCapture dan
-//      touch-action: none PADA TOMBOLNYA SAJA. Memasangnya pada pembungkus
-//      yang lebih besar akan mematikan guliran di daerah yang tampak kosong.
-//
-// Letaknya disimpan supaya tidak kembali ke sudut asal setiap kali halaman
-// dibuka — tombol yang melompat kembali ke tempat semula membuat orang berhenti
-// memindahkannya sama sekali.
-// ─────────────────────────────────────────────────────────────────────────────
-
-const KUNCI = 'pmd_fab_posisi_v1'
-const UKURAN = 56
-/** Jarak minimum dari tepi layar. Lihat alasan nomor 2 di atas. */
-const TEPI = 12
-/** Gerakan di bawah ini masih dihitung ketukan, bukan geseran. */
-const AMBANG = 8
-
-type Posisi = { x: number; y: number }
-
-function bacaPosisi(): Posisi | null {
-  try {
-    const j = localStorage.getItem(KUNCI)
-    if (!j) return null
-    const p = JSON.parse(j)
-    // Bentuknya diperiksa, bukan dipercaya. Data tersimpan bisa berasal dari
-    // versi lama maupun rusak, dan posisi NaN membuat tombolnya hilang dari
-    // layar tanpa cara mengembalikannya.
-    return typeof p?.x === 'number' && typeof p?.y === 'number' && Number.isFinite(p.x) && Number.isFinite(p.y)
-      ? p : null
-  } catch { return null }
-}
-
-function jepit(p: Posisi): Posisi {
-  const lw = window.innerWidth, lt = window.innerHeight
-  return {
-    x: Math.min(Math.max(p.x, TEPI), Math.max(TEPI, lw - UKURAN - TEPI)),
-    y: Math.min(Math.max(p.y, TEPI + 56), Math.max(TEPI, lt - UKURAN - TEPI - 8)),
-  }
-}
+import { classifyReleasedGesture, DEFAULT_GESTURE_THRESHOLDS } from '../lib/interaction/gesture'
+import {
+  ASSISTIVE_PREFS_EVENT,
+  clampAssistivePosition,
+  loadAssistivePosition,
+  loadAssistivePreferences,
+  registeredContextActionIds,
+  saveAssistivePosition,
+  snapAssistivePosition,
+  type AssistivePosition,
+  type AssistivePreferences,
+} from '../lib/interaction/assistive'
 
 export interface TujuanFab {
   to: string
   label: string
-  ikon: React.ReactNode
+  ikon: ReactNode
   end?: boolean
 }
 
-/*
- * `tujuan` dan `onTambah` TIDAK LAGI DIPAKAI oleh menu ini, dan itu disengaja.
+type PointerState = {
+  id: number
+  startX: number
+  startY: number
+  orbX: number
+  orbY: number
+  started: number
+  dragging: boolean
+}
+
+const TATA = [
+  'col-start-2 row-start-1',
+  'col-start-1 row-start-2',
+  'col-start-3 row-start-2',
+  'col-start-2 row-start-3',
+  'col-start-1 row-start-3',
+  'col-start-3 row-start-3',
+  'col-start-1 row-start-1',
+  'col-start-3 row-start-1',
+]
+
+function viewport() {
+  return {
+    width: window.innerWidth,
+    height: window.innerHeight,
+    topInset: 56,
+    bottomInset: 8,
+  }
+}
+
+function reducedMotion() {
+  try {
+    if (localStorage.getItem('pmd-reduced-motion') === 'true') return true
+  } catch { /* preferensi tampilan */ }
+  return window.matchMedia?.('(prefers-reduced-motion: reduce)').matches ?? false
+}
+
+/**
+ * Tombol bantu global Panacea.
  *
- * Menu lingkar berisi TINDAKAN, bukan daftar halaman: menaruh enam pintu di
- * sini akan mengulang kisi fitur dan pencarian yang sudah ada, dan tepat itulah
- * yang membuat menu lama terasa seperti menu belaka. Kedua prop dibiarkan ada
- * supaya pemanggilnya tidak perlu diubah sekaligus, dan supaya menu daftar
- * dapat dihidupkan kembali bila ternyata dibutuhkan.
+ * Satu rangkaian pointer hanya boleh menghasilkan satu makna: pindah tombol,
+ * long-press, swipe, double tap, atau single tap. Ambang gesture berasal dari
+ * kernel murni di `lib/interaction/gesture`, bukan angka lokal yang berbeda.
  */
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-export function FabNavigasi({ tujuan, onTambah, onCari }: { tujuan: TujuanFab[]; onTambah?: () => void; onCari?: () => void }) {
+export function FabNavigasi({ onCari }: { tujuan: TujuanFab[]; onTambah?: () => void; onCari?: () => void }) {
   const lokasi = useLocation()
   const navigasi = useNavigate()
-  // Body Explorer sudah memiliki hamburger, tombol kembali, pencarian dan
-  // quick-navigation sendiri. Pada layar ponsel, FAB global menutupi sudut
-  // kanan-bawah kanvas WebGL dan mengganggu inspeksi anatomi. Karena FAB ini
-  // sendiri memang `lg:hidden`, menonaktifkannya pada route ini hanya mengubah
-  // pengalaman mobile dan tidak mengurangi navigasi desktop/sidebar.
   const sembunyikanDiBodyExplorer = lokasi.pathname.startsWith('/body-explorer')
-  // Letak bawaan: sudut kanan bawah, bukan melayang 96 px di atasnya.
-  //
-  // Tombol yang beristirahat di tengah tinggi layar menutupi isi yang sedang
-  // dibaca — terlihat pada tangkapan layar 390x844: ia duduk tepat di atas
-  // salah satu ubin lambang, sehingga satu pintu fitur harus digeser dahulu
-  // sebelum dapat disentuh. Di sudut, yang tertutupi hanyalah ujung halaman,
-  // dan ujung halaman sudah diberi bantalan tersendiri di bawah.
-  const [pos, setPos] = useState<Posisi>(() =>
-    jepit(bacaPosisi() ?? { x: window.innerWidth - UKURAN - TEPI, y: window.innerHeight - UKURAN - TEPI - 8 }))
+
+  const [prefs, setPrefs] = useState<AssistivePreferences>(loadAssistivePreferences)
+  const [pos, setPos] = useState<AssistivePosition>(() => {
+    const saved = loadAssistivePosition()
+    const defaultPos = { x: window.innerWidth - 72, y: window.innerHeight - 88 }
+    return clampAssistivePosition(saved ?? defaultPos, viewport(), loadAssistivePreferences().size)
+  })
   const [buka, setBuka] = useState(false)
   const [menggeser, setMenggeser] = useState(false)
   const [aturBuka, setAturBuka] = useState(false)
-  const [pilihan, setPilihan] = useState<string[]>(ambilAksi)
-  /* SAMAR SAAT DIAM, JELAS SAAT DISENTUH — persis seperti tombol bantu ponsel.
-     Tombol yang selalu pekat menutupi isi bacaan di sudut layar sepanjang
-     waktu. Ia tidak pernah dibuat HILANG: tombol yang benar-benar tidak
-     terlihat adalah tombol yang tidak dapat ditemukan lagi oleh orang yang
-     baru memasangnya. Yang dipilih adalah samar — cukup untuk tidak
-     mengganggu, cukup untuk masih terlihat. */
   const [redup, setRedup] = useState(false)
+  const [halaman, setHalaman] = useState(0)
+
+  const orbRef = useRef<HTMLButtonElement>(null)
+  const railRef = useRef<SlidableRailHandle>(null)
+  const pointer = useRef<PointerState | null>(null)
   const jamRedup = useRef<number | null>(null)
+  const longTimer = useRef<number | null>(null)
+  const tapTimer = useRef<number | null>(null)
+  const lastTapAt = useRef(0)
+  const longFired = useRef(false)
+
   const bangunkan = useCallback(() => {
     setRedup(false)
     if (jamRedup.current) window.clearTimeout(jamRedup.current)
     jamRedup.current = window.setTimeout(() => setRedup(true), 2600)
   }, [])
-  useEffect(() => {
-    bangunkan()
-    return () => { if (jamRedup.current) window.clearTimeout(jamRedup.current) }
-  }, [bangunkan])
-  /* Halaman ke berapa dari menu yang sedang tampak. */
-  const [halaman, setHalaman] = useState(0)
-  const geser = useRef<HTMLDivElement>(null)
-  useEffect(() => {
-    const on = () => setPilihan(ambilAksi())
-    window.addEventListener('panacea:aksi-fab', on)
-    return () => window.removeEventListener('panacea:aksi-fab', on)
-  }, [])
 
-  const ref = useRef<HTMLButtonElement>(null)
-  const awal = useRef<{ px: number; py: number; x: number; y: number; geser: boolean } | null>(null)
+  const vibrate = useCallback(() => {
+    if (!prefs.haptics || !navigator.vibrate) return
+    try { navigator.vibrate(9) } catch { /* dukungan perangkat bersifat opsional */ }
+  }, [prefs.haptics])
 
-  // Menu ditutup setiap kali berpindah halaman. Tanpa ini menu tetap terbuka
-  // menutupi halaman baru, dan orang mengira halamannya yang tidak berganti.
-  useEffect(() => { setBuka(false) }, [lokasi.pathname])
-
-  // Menu yang terbuka tidak boleh meredup, dan menu yang ditutup memulai
-  // hitungan meredup dari awal.
-  useEffect(() => { if (buka) { setRedup(false); setHalaman(0) } else bangunkan() }, [buka, bangunkan])
-
-  // Layar bisa berputar maupun berubah ukuran; posisi yang tersimpan untuk
-  // layar tegak akan berada di luar layar saat mendatar.
-  useEffect(() => {
-    const ubah = () => setPos((p) => jepit(p))
-    window.addEventListener('resize', ubah)
-    window.addEventListener('orientationchange', ubah)
-    return () => {
-      window.removeEventListener('resize', ubah)
-      window.removeEventListener('orientationchange', ubah)
+  const jalankan = useCallback((id: string) => {
+    const action = KATALOG_AKSI.find((item) => item.id === id)
+    if (!action) return
+    setBuka(false)
+    vibrate()
+    if (action.jenis === 'rute' && action.ke) navigasi(action.ke)
+    else if (action.jenis === 'kembali') navigasi(-1)
+    else if (action.jenis === 'atas') window.scrollTo({ top: 0, behavior: reducedMotion() ? 'auto' : 'smooth' })
+    else if (action.jenis === 'tema') toggleTheme()
+    else if (action.jenis === 'cari') {
+      if (onCari) onCari()
+      else window.dispatchEvent(new Event('panacea:cari'))
     }
-  }, [])
+  }, [navigasi, onCari, vibrate])
 
-  // Tombol Escape menutup menu — jalan keluar yang selalu tersedia bagi
-  // pemakai papan tik.
-  useEffect(() => {
-    if (!buka) return
-    const tekan = (e: KeyboardEvent) => { if (e.key === 'Escape') setBuka(false) }
-    window.addEventListener('keydown', tekan)
-    return () => window.removeEventListener('keydown', tekan)
-  }, [buka])
-
-  const turun = useCallback((e: React.PointerEvent) => {
-    bangunkan()
-    awal.current = { px: e.clientX, py: e.clientY, x: pos.x, y: pos.y, geser: false }
-    ref.current?.setPointerCapture(e.pointerId)
-  }, [pos, bangunkan])
-
-  const gerak = useCallback((e: React.PointerEvent) => {
-    const a = awal.current
-    if (!a) return
-    const dx = e.clientX - a.px, dy = e.clientY - a.py
-    if (!a.geser && Math.hypot(dx, dy) < AMBANG) return
-    if (!a.geser) { a.geser = true; setMenggeser(true); setBuka(false) }
-    setPos(jepit({ x: a.x + dx, y: a.y + dy }))
-  }, [])
-
-  const naik = useCallback((e: React.PointerEvent) => {
-    const a = awal.current
-    awal.current = null
-    ref.current?.releasePointerCapture?.(e.pointerId)
-    if (!a) return
-    if (a.geser) {
-      setMenggeser(false)
-      setPos((p) => {
-        // MENEMPEL KE TEPI TERDEKAT, seperti tombol bantu pada ponsel.
-        //
-        // Tombol yang berhenti di tengah layar menutupi isi bacaan dan tidak
-        // pernah berada di tempat yang sama dua kali, sehingga tangan tidak
-        // pernah hafal letaknya. Menempel ke tepi membuat letaknya hanya empat
-        // kemungkinan, dan tangan menghafalnya dalam beberapa kali pakai.
-        const l = jepit(p)
-        const kanan = window.innerWidth - UKURAN - TEPI
-        const x = l.x + UKURAN / 2 < window.innerWidth / 2 ? TEPI : kanan
-        const akhir = jepit({ x, y: l.y })
-        try { localStorage.setItem(KUNCI, JSON.stringify(akhir)) } catch {}
-        return akhir
-      })
+  const jalankanPemetaan = useCallback((id: string) => {
+    if (id === 'menu') {
+      vibrate()
+      setBuka((value) => !value)
       return
     }
-    // Gerakan tidak melewati ambang: ini ketukan.
-    setBuka((x) => !x)
+    if (id === 'customize') {
+      vibrate()
+      setBuka(false)
+      setAturBuka(true)
+      return
+    }
+    jalankan(id)
+  }, [jalankan, vibrate])
+
+  useEffect(() => {
+    bangunkan()
+    const onPrefs = () => setPrefs(loadAssistivePreferences())
+    window.addEventListener(ASSISTIVE_PREFS_EVENT, onPrefs)
+    return () => {
+      if (jamRedup.current) window.clearTimeout(jamRedup.current)
+      if (longTimer.current) window.clearTimeout(longTimer.current)
+      if (tapTimer.current) window.clearTimeout(tapTimer.current)
+      window.removeEventListener(ASSISTIVE_PREFS_EVENT, onPrefs)
+    }
+  }, [bangunkan])
+
+  useEffect(() => {
+    setPos((current) => clampAssistivePosition(current, viewport(), prefs.size))
+  }, [prefs.size])
+
+  useEffect(() => {
+    setBuka(false)
+    setHalaman(0)
+  }, [lokasi.pathname, lokasi.search])
+
+  useEffect(() => {
+    if (buka) {
+      setRedup(false)
+      setHalaman(0)
+      railRef.current?.scrollToIndex(0)
+    } else bangunkan()
+  }, [buka, bangunkan])
+
+  useEffect(() => {
+    const resize = () => setPos((current) => clampAssistivePosition(current, viewport(), prefs.size))
+    window.addEventListener('resize', resize)
+    window.addEventListener('orientationchange', resize)
+    return () => {
+      window.removeEventListener('resize', resize)
+      window.removeEventListener('orientationchange', resize)
+    }
+  }, [prefs.size])
+
+  useEffect(() => {
+    if (!buka) return
+    const key = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        setBuka(false)
+        requestAnimationFrame(() => orbRef.current?.focus())
+      }
+    }
+    window.addEventListener('keydown', key)
+    return () => window.removeEventListener('keydown', key)
+  }, [buka])
+
+  const routeId = `${lokasi.pathname}${lokasi.search}`
+  const suggestionIds = useMemo(() => registeredContextActionIds(routeId), [routeId])
+  const commandIds = useMemo(() => {
+    const merged = [...suggestionIds, ...prefs.menuActionIds]
+    return merged.filter((id, index) => merged.indexOf(id) === index).slice(0, 12)
+  }, [prefs.menuActionIds, suggestionIds])
+
+  const actions = useMemo(() => [
+    ...commandIds
+      .map((id) => KATALOG_AKSI.find((action) => action.id === id))
+      .filter((action): action is (typeof KATALOG_AKSI)[number] => Boolean(action))
+      .map((action, index) => ({
+        id: action.id,
+        label: action.label,
+        icon: action.ikon,
+        primary: index === 0,
+      })),
+    { id: 'customize', label: 'Customize', icon: '⚙', primary: false },
+  ], [commandIds])
+
+  const pages = useMemo(() => {
+    const result: typeof actions[] = []
+    for (let index = 0; index < actions.length; index += SLOT_PER_HALAMAN) result.push(actions.slice(index, index + SLOT_PER_HALAMAN))
+    return result
+  }, [actions])
+
+  const onPointerDown = useCallback((event: ReactPointerEvent<HTMLButtonElement>) => {
+    event.preventDefault()
+    bangunkan()
+    longFired.current = false
+    pointer.current = {
+      id: event.pointerId,
+      startX: event.clientX,
+      startY: event.clientY,
+      orbX: pos.x,
+      orbY: pos.y,
+      started: performance.now(),
+      dragging: false,
+    }
+    try { orbRef.current?.setPointerCapture(event.pointerId) } catch { /* progresif */ }
+    if (longTimer.current) window.clearTimeout(longTimer.current)
+    longTimer.current = window.setTimeout(() => {
+      const current = pointer.current
+      if (!current || current.dragging) return
+      longFired.current = true
+      jalankanPemetaan(prefs.gestures.longPress)
+    }, DEFAULT_GESTURE_THRESHOLDS.longPressMs)
+  }, [bangunkan, jalankanPemetaan, pos.x, pos.y, prefs.gestures.longPress])
+
+  const onPointerMove = useCallback((event: ReactPointerEvent<HTMLButtonElement>) => {
+    const current = pointer.current
+    if (!current || current.id !== event.pointerId) return
+    const dx = event.clientX - current.startX
+    const dy = event.clientY - current.startY
+    const distance = Math.hypot(dx, dy)
+    const elapsed = performance.now() - current.started
+    if (distance > DEFAULT_GESTURE_THRESHOLDS.tapTolerancePx && longTimer.current) {
+      window.clearTimeout(longTimer.current)
+      longTimer.current = null
+    }
+    // Swipe cepat tetap menjadi aksi. Drag baru diambil setelah gerakan cukup
+    // lama sehingga pengguna jelas sedang memindahkan orb, bukan menyapunya.
+    if (!current.dragging && elapsed > 220 && distance > DEFAULT_GESTURE_THRESHOLDS.tapTolerancePx) {
+      current.dragging = true
+      setMenggeser(true)
+      setBuka(false)
+    }
+    if (!current.dragging) return
+    setPos(clampAssistivePosition({ x: current.orbX + dx, y: current.orbY + dy }, viewport(), prefs.size))
+  }, [prefs.size])
+
+  const finishDrag = useCallback(() => {
+    setMenggeser(false)
+    setPos((current) => {
+      const next = prefs.snap ? snapAssistivePosition(current, viewport(), prefs.size) : clampAssistivePosition(current, viewport(), prefs.size)
+      saveAssistivePosition(next)
+      return next
+    })
+    bangunkan()
+  }, [bangunkan, prefs.size, prefs.snap])
+
+  const onPointerUp = useCallback((event: ReactPointerEvent<HTMLButtonElement>) => {
+    if (longTimer.current) {
+      window.clearTimeout(longTimer.current)
+      longTimer.current = null
+    }
+    const current = pointer.current
+    pointer.current = null
+    try { orbRef.current?.releasePointerCapture(event.pointerId) } catch { /* sudah lepas */ }
+    if (!current) return
+    if (current.dragging) {
+      finishDrag()
+      return
+    }
+
+    const dx = event.clientX - current.startX
+    const dy = event.clientY - current.startY
+    const decision = classifyReleasedGesture({
+      dx,
+      dy,
+      elapsedMs: performance.now() - current.started,
+      dragged: false,
+      longPressed: longFired.current,
+      cancelled: false,
+    })
+    if (decision === 'none') return
+    if (decision.startsWith('swipe-')) {
+      const map = {
+        'swipe-up': prefs.gestures.swipeUp,
+        'swipe-down': prefs.gestures.swipeDown,
+        'swipe-left': prefs.gestures.swipeLeft,
+        'swipe-right': prefs.gestures.swipeRight,
+      } as const
+      jalankanPemetaan(map[decision as keyof typeof map])
+      return
+    }
+
+    const now = Date.now()
+    if (now - lastTapAt.current <= DEFAULT_GESTURE_THRESHOLDS.doubleTapMs) {
+      if (tapTimer.current) window.clearTimeout(tapTimer.current)
+      tapTimer.current = null
+      lastTapAt.current = 0
+      jalankanPemetaan(prefs.gestures.doubleTap)
+      return
+    }
+    lastTapAt.current = now
+    if (tapTimer.current) window.clearTimeout(tapTimer.current)
+    tapTimer.current = window.setTimeout(() => {
+      lastTapAt.current = 0
+      jalankanPemetaan(prefs.gestures.singleTap)
+    }, DEFAULT_GESTURE_THRESHOLDS.doubleTapMs)
+  }, [finishDrag, jalankanPemetaan, prefs.gestures])
+
+  const onPointerCancel = useCallback((event: ReactPointerEvent<HTMLButtonElement>) => {
+    if (longTimer.current) window.clearTimeout(longTimer.current)
+    longTimer.current = null
+    pointer.current = null
+    longFired.current = false
+    setMenggeser(false)
+    try { orbRef.current?.releasePointerCapture(event.pointerId) } catch { /* sudah lepas */ }
   }, [])
 
-  // Menu dibuka ke ATAS bila tombol berada di paruh bawah layar, dan ke BAWAH
-  // bila di paruh atas — supaya daftarnya tidak pernah keluar layar.
   const keAtas = pos.y > window.innerHeight / 2
-  // Rata kanan bila tombol di paruh kanan, supaya daftar tidak melewati tepi.
   const keKiri = pos.x > window.innerWidth / 2
-
-  /* Letak tiap tindakan di dalam kisi 3x3: atas, kiri, kanan, bawah, lalu
-     keempat sudut. Tengahnya sengaja DIBIARKAN KOSONG — di situlah ibu jari
-     mendarat sesudah mengetuk tombolnya, dan menaruh tindakan di sana membuat
-     orang menekan sesuatu yang tidak dimaksudnya.
-
-     Delapan tempat per halaman, bukan enam: dua tempat yang dahulu dikosongkan
-     tidak menghemat apa pun — kisinya toh sudah selebar itu — sementara dua
-     tindakan lagi harus dibuang karenanya. */
-  const TATA = [
-    'col-start-2 row-start-1',
-    'col-start-1 row-start-2',
-    'col-start-3 row-start-2',
-    'col-start-2 row-start-3',
-    'col-start-1 row-start-3',
-    'col-start-3 row-start-3',
-    'col-start-1 row-start-1',
-    'col-start-3 row-start-1',
-  ]
-
-  const jalankan = (id: string) => {
-    const a = KATALOG_AKSI.find((x) => x.id === id)
-    if (!a) return
-    if (a.jenis === 'rute' && a.ke) navigasi(a.ke)
-    else if (a.jenis === 'kembali') navigasi(-1)
-    else if (a.jenis === 'atas') window.scrollTo({ top: 0, behavior: 'smooth' })
-    else if (a.jenis === 'tema') toggleTheme()
-    // Kotak pencarian menumpang di atas halaman yang sedang terbuka.
-    else if (a.jenis === 'cari') window.dispatchEvent(new Event('panacea:cari'))
-  }
-
-  const terpilih = pilihan
-    .map((id) => KATALOG_AKSI.find((a) => a.id === id))
-    .filter((a): a is (typeof KATALOG_AKSI)[number] => !!a)
-
-  const aksi: { label: string; ikon: React.ReactNode; jalan: () => void; utama?: boolean }[] = [
-    ...terpilih.map((a, i) => ({
-      label: a.label,
-      ikon: <span className="text-[16px] leading-none">{a.ikon}</span>,
-      jalan: () => jalankan(a.id),
-      utama: i === 0,
-    })),
-    {
-      label: 'Ubah',
-      ikon: <span className="text-[15px] leading-none">⚙</span>,
-      jalan: () => setAturBuka(true),
-    },
-  ]
-
-  /* DIPOTONG MENJADI HALAMAN, BUKAN DIPADATKAN.
-     Enam belas tindakan pada satu kisi menuntut ikon sebesar 34 px, dan sasaran
-     sentuh sekecil itu meleset di tangan yang sedang berjalan. Halaman kedua
-     digeser mendatar seperti layar utama ponsel: ukuran tiap tombol tetap. */
-  const halamanAksi: typeof aksi[] = []
-  for (let i = 0; i < aksi.length; i += SLOT_PER_HALAMAN) {
-    halamanAksi.push(aksi.slice(i, i + SLOT_PER_HALAMAN))
-  }
 
   if (sembunyikanDiBodyExplorer) return null
 
@@ -275,94 +338,59 @@ export function FabNavigasi({ tujuan, onTambah, onCari }: { tujuan: TujuanFab[];
     <>
       {aturBuka && <PemilihAksiFab tutup={() => setAturBuka(false)} />}
 
-      {/* Tirai: menutup menu bila disentuh di luar. Diberi warna sangat samar
-          alih-alih sepenuhnya bening supaya jelas bahwa layar sedang "terkunci"
-          oleh menu. */}
-      {buka && (
-        <div
-          className="fixed inset-0 z-40 bg-black/20 lg:hidden"
-          onPointerDown={() => setBuka(false)}
-          aria-hidden="true"
-        />
-      )}
+      {buka && <div className="fixed inset-0 z-40 bg-black/20 lg:hidden" onPointerDown={() => setBuka(false)} aria-hidden="true" />}
 
-      <div
-        className="fixed z-50 lg:hidden"
-        style={{ left: pos.x, top: pos.y }}
-        // Tanpa transisi saat sedang digeser: transisi membuat tombol
-        // tertinggal di belakang jari, dan tertinggalnya terbaca sebagai
-        // aplikasi yang lambat, bukan sebagai gerak yang halus.
-      >
+      <div className="fixed z-50 lg:hidden" style={{ left: pos.x, top: pos.y }}>
         {buka && (
-          /* MENU LINGKAR, BUKAN DAFTAR TEGAK.
-             Daftar tegak sepanjang enam butir menutupi separuh layar dan
-             menuntut mata membaca dari atas ke bawah untuk menemukan satu
-             tindakan. Susunan melingkar meletakkan tiap tindakan pada ARAH
-             yang tetap — atas, kanan, bawah, kiri — sehingga sesudah beberapa
-             kali pakai tangan bergerak tanpa membaca. Itulah alasan tombol
-             bantu di ponsel memakai bentuk ini.
-
-             Ukuran 208 px dipilih supaya seluruh menu tetap muat pada layar
-             320 px sekalipun tombolnya berada rapat di tepi. */
           <div
             role="menu"
-            aria-label="Tindakan cepat"
-            /* TEMBUS PANDANG DENGAN BURAM TEBAL, bukan panel pekat.
-               Panel pekat memotong halaman menjadi dua benda yang tidak
-               berhubungan. Keterbacaannya dijaga oleh buram dan penjenuhan
-               warna — cara yang sama dipakai tombol bantu ponsel — bukan
-               dengan menutup halaman di belakangnya. */
-            className="kaca absolute rounded-[28px] bg-white/62 p-2 shadow-xl backdrop-blur-2xl backdrop-saturate-150 dark:bg-neutral-900/58"
-            style={{
-              width: 208,
-              [keAtas ? 'bottom' : 'top']: 64,
-              [keKiri ? 'right' : 'left']: 0,
-            } as React.CSSProperties}
+            aria-label="Panacea Assistive Touch commands"
+            data-panacea-assistive-orbit="true"
+            className="absolute rounded-[28px] border border-white/10 bg-neutral-950/78 p-2 shadow-xl backdrop-blur-2xl backdrop-saturate-150"
+            style={{ width: 224, [keAtas ? 'bottom' : 'top']: prefs.size + 8, [keKiri ? 'right' : 'left']: 0 } as React.CSSProperties}
           >
-            <div
-              ref={geser}
-              className="geser-aman flex snap-x snap-mandatory overflow-x-auto"
-              style={{ scrollbarWidth: 'none' }}
-              onScroll={(e) => {
-                const el = e.currentTarget
-                setHalaman(Math.round(el.scrollLeft / Math.max(1, el.clientWidth)))
-              }}
+            <div className="mb-1 flex items-center justify-between gap-2 px-2 py-1">
+              <span className="truncate text-[9px] font-black uppercase tracking-[.14em] text-neutral-400">Actions</span>
+              <button type="button" onClick={() => { setBuka(false); setAturBuka(true) }} className="grid h-9 w-9 place-items-center rounded-full text-[14px] text-neutral-500 hover:bg-black/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/40 dark:hover:bg-white/10" aria-label="Customize Assistive Touch">Edit</button>
+            </div>
+
+            <SlidableRail
+              ref={railRef}
+              ariaLabel="Assistive Touch command pages"
+              mandatorySnap
+              className="w-full"
+              itemClassName="w-[208px]"
+              onActiveIndexChange={setHalaman}
             >
-              {halamanAksi.map((hal, h) => (
-                <div
-                  key={h}
-                  className="grid w-full shrink-0 snap-center grid-cols-3 grid-rows-3 place-items-center"
-                  style={{ height: 192 }}
-                >
-                  {hal.map((t, i) => (
+              {pages.map((page, pageIndex) => (
+                <div key={pageIndex} className="grid h-[192px] w-[208px] grid-cols-3 grid-rows-3 place-items-center">
+                  {page.map((action, index) => (
                     <button
-                      key={t.label}
+                      key={`${pageIndex}-${action.id}`}
+                      type="button"
                       role="menuitem"
-                      onClick={() => { setBuka(false); t.jalan() }}
-                      className={`flex h-[58px] w-[58px] flex-col items-center justify-center gap-1 rounded-2xl px-1 transition active:scale-95 ${TATA[i]} ${
-                        t.utama ? 'bg-brand text-white' : 'text-ink hover:bg-black/5 dark:text-white dark:hover:bg-white/10'
-                      }`}
+                      data-panacea-assistive-action={action.id}
+                      onClick={() => action.id === 'customize' ? (setBuka(false), setAturBuka(true)) : jalankan(action.id)}
+                      className={`flex h-[58px] w-[58px] flex-col items-center justify-center gap-1 rounded-2xl px-1 transition active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/40 ${TATA[index]} ${action.primary ? 'bg-brand text-white' : 'text-ink hover:bg-black/5 dark:text-white dark:hover:bg-white/10'}`}
                     >
-                      <span className="shrink-0">{t.ikon}</span>
-                      <span className="w-full truncate text-center text-[9.5px] font-bold leading-none">{t.label}</span>
+                      <span aria-hidden className="text-[16px] leading-none">{action.icon}</span>
+                      <span className="w-full truncate text-center text-[9.5px] font-bold leading-none">{action.label}</span>
                     </button>
                   ))}
                 </div>
               ))}
-            </div>
+            </SlidableRail>
 
-            {/* Titik halaman hanya ditarik bila memang ada halaman kedua.
-                Satu titik tunggal tidak memberi tahu apa pun dan hanya
-                menyisakan garis di bawah menu. */}
-            {halamanAksi.length > 1 && (
+            {pages.length > 1 && (
               <div className="mt-1 flex items-center justify-center gap-1.5">
-                {halamanAksi.map((_, h) => (
+                {pages.map((_, index) => (
                   <button
-                    key={h}
-                    aria-label={`Halaman ${h + 1} dari ${halamanAksi.length}`}
-                    aria-current={h === halaman}
-                    onClick={() => geser.current?.scrollTo({ left: h * (geser.current?.clientWidth ?? 0), behavior: 'smooth' })}
-                    className={`h-1.5 rounded-full transition-all ${h === halaman ? 'w-4 bg-brand' : 'w-1.5 bg-neutral-400/60'}`}
+                    key={index}
+                    type="button"
+                    aria-label={`Command page ${index + 1} of ${pages.length}`}
+                    aria-current={index === halaman ? 'page' : undefined}
+                    onClick={() => railRef.current?.scrollToIndex(index)}
+                    className={`h-1.5 rounded-full transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/40 ${index === halaman ? 'w-4 bg-brand' : 'w-1.5 bg-neutral-400/60'}`}
                   />
                 ))}
               </div>
@@ -371,33 +399,30 @@ export function FabNavigasi({ tujuan, onTambah, onCari }: { tujuan: TujuanFab[];
         )}
 
         <button
-          ref={ref}
-          onPointerDown={turun}
-          onPointerMove={gerak}
-          onPointerUp={naik}
-          onPointerCancel={naik}
-          aria-label={buka ? 'Tutup menu' : 'Buka menu navigasi'}
+          ref={orbRef}
+          type="button"
+          data-pmd-assistive="true"
+          onPointerDown={onPointerDown}
+          onPointerMove={onPointerMove}
+          onPointerUp={onPointerUp}
+          onPointerCancel={onPointerCancel}
+          onContextMenu={(event) => event.preventDefault()}
+          onFocus={bangunkan}
+          aria-label="Panacea Assistive Touch"
+          aria-haspopup="menu"
           aria-expanded={buka}
-          // touch-action pada TOMBOLNYA SAJA. Dipasang pada pembungkus yang
-          // lebih besar, guliran halaman akan mati di daerah yang tampak kosong.
-          className="kaca kaca-tekan grid place-items-center rounded-full"
+          className="kaca kaca-tekan grid place-items-center rounded-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-300/70 focus-visible:ring-offset-2"
           style={{
-            width: UKURAN,
-            height: UKURAN,
+            width: prefs.size,
+            height: prefs.size,
             touchAction: 'none',
             cursor: menggeser ? 'grabbing' : 'grab',
-            transition: menggeser ? 'none' : 'transform 0.2s cubic-bezier(0.32,0.72,0,1), opacity 0.45s ease',
-            transform: buka ? 'rotate(45deg)' : 'none',
-            // Samar hanya saat benar-benar diam. Nilainya tidak diturunkan di
-            // bawah 0,4: di bawah itu tombolnya tidak lagi lolos ambang beda
-            // terang WCAG terhadap latar terang, dan orang yang penglihatannya
-            // kurang kehilangan satu-satunya alat navigasi di halaman ini.
-            opacity: redup && !buka && !menggeser ? 0.42 : 1,
+            transition: menggeser || reducedMotion() ? 'none' : 'transform 0.2s cubic-bezier(0.32,0.72,0,1), opacity 0.35s ease',
+            transform: buka ? 'scale(1.06)' : 'none',
+            opacity: redup && !buka && !menggeser ? prefs.idleOpacity : 1,
           }}
         >
-          <span style={{ transform: buka ? 'rotate(-45deg)' : 'none' }}>
-            <LogoMark size={30} />
-          </span>
+          <LogoMark size={Math.max(28, Math.round(prefs.size * 0.52))} />
         </button>
       </div>
     </>

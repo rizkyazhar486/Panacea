@@ -99,3 +99,39 @@ The MCP test suite covers policy/audit redaction, orchestration evidence state, 
 ## Specialist connector boundary
 
 The MCP kernel complements specialist connectors rather than replacing them. GitHub remains authoritative for remote repository state and CI evidence; Context7 supplies current SDK documentation; literature connectors remain evidence-retrieval specialists; deployment/analytics/email/growth connectors retain their own operational responsibilities. ChatGPT can orchestrate those tools and normalize their outputs into later Panaceamed MCP phases without presenting the LLM itself as a clinical or academic source.
+
+
+## Phase B: FHIR / HL7 / terminology preview
+
+Phase B adds a **read/transform/reference-only** interoperability surface. All tools below are side-effect free and may operate only on caller-supplied payloads or bounded terminology-provider lookups.
+
+| Tool | Purpose | Clinical boundary |
+| --- | --- | --- |
+| `panacea_fhir_capabilities` | Describe supported preview semantics | reference only |
+| `panacea_fhir_build_observation_bundle_preview` | Build an R4 collection from verified Panaceamed metric codes | preview only |
+| `panacea_fhir_inspect_resource` | Structural resource/Bundle inspection | **not** full FHIR validation |
+| `panacea_fhir_satusehat_preview` | Build a SATUSEHAT-shaped transaction Bundle | no OAuth, no submission |
+| `panacea_hl7v2_parse_preview` | Parse bounded MSH/PID/PV1/OBR/OBX | partial parser |
+| `panacea_hl7v2_to_fhir_preview` | Convert supported PID/OBX fields | partial conversion; unknown coding stays unmapped |
+| `panacea_terminology_search` | ICD/RxNorm/explicit-ATC/verified-LOINC reference lookup | no diagnosis/treatment inference |
+| `panacea_terminology_resolve` | Resolve supported identifiers | no guessed terminology |
+| `panacea_terminology_crosswalk_preview` | Return explicitly verified relationships only | unknown relationships remain `unmapped` |
+
+### Interoperability limits
+
+- FHIR inspection checks bounded structure and `resourceType` syntax. It is **not** a complete FHIR validator and does not claim conformance to a national implementation guide.
+- SATUSEHAT MCP support calls only the pure Bundle builder. It does not call OAuth, `postResource`, or `submitEmr`.
+- HL7 v2 parsing is bounded to 128 KiB, 256 segments, 256 fields per segment, and 4096 characters per field. Supported preview segments are MSH, PID, PV1, OBR, and OBX.
+- HL7→FHIR maps a code to LOINC only when the source explicitly declares `LN` or `LOINC`; any other coding system is preserved in an `unmapped` record rather than guessed.
+- Non-finite numeric values are never silently converted to zero.
+
+### Terminology limits
+
+- ICD search preserves whether the result came from WHO ICD-11 MMS or the NLM ICD-10-CM fallback. The fallback is never relabeled as ICD-11.
+- RxNorm returns canonical RxCUI + RxNorm name only. It does not establish drug interaction safety, indication, dose, or therapeutic equivalence.
+- ATC accepts only explicit structurally plausible ATC codes. No drug name is heuristically converted into an ATC code, and DDD is never presented as an individual prescription dose.
+- LOINC lookup is limited to the small Panaceamed registry already verified for FHIR export. Locally derived metrics such as PhenoAge remain in the Panaceamed derived CodeSystem rather than masquerading as LOINC.
+- SNOMED CT remains unsupported until an authorized/licensed terminology service is configured.
+- Crosswalk preview is fail-closed: if Panaceamed has no explicit verified relationship, the result is `unmapped`.
+
+The Phase B surface still exposes **zero** patient-datastore retrieval tools and **zero** remote clinical-write tools.
