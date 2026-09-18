@@ -2,6 +2,7 @@ import { lazy, Suspense, useEffect, useMemo, useState } from 'react'
 import { resolveBodySystemSourceWave, type BodySystemId } from '../../lib/bodySystemSourceWave'
 import { BODY_SEMANTIC_ZOOM_STOPS, getBodySemanticZoomStop, isMicroscopicBodyScale, type BodySemanticScale } from '../../lib/bodySemanticZoom'
 import { penjelasanTertulis } from '../../lib/explainFallback'
+import UniversalAtlasDepthRail from './UniversalAtlasDepthRail'
 
 const BodyAllSystems3D = lazy(() => import('../../components/BodyAllSystems3D'))
 const AtlasPhysiologyBridgePanel = lazy(() => import('./AtlasPhysiologyBridgePanel'))
@@ -279,6 +280,12 @@ export default function UnifiedHumanSimulationProjector({
         </div>
       </header>
 
+      <UniversalAtlasDepthRail
+        semanticScale={semanticZoom.scale}
+        selectedSystemId={selectedSystemId}
+        onOpenScale={openScale}
+      />
+
       <div className="grid gap-0 xl:grid-cols-[minmax(0,1fr)_250px]">
         <div className="min-w-0 border-b border-white/[.08] p-2 sm:p-3 xl:border-b-0 xl:border-r">
           <Suspense fallback={<ProjectorLoader label="3D anatomy" />}>
@@ -305,23 +312,6 @@ export default function UnifiedHumanSimulationProjector({
             </div>
             <div className="text-right text-[8px] font-bold text-cyan-200/55">{semanticZoom.relativeZoom.toFixed(1)}× from fitted view</div>
           </div>
-          <div className="mt-2 flex flex-wrap gap-1.5">
-            {BODY_SEMANTIC_ZOOM_STOPS.map((stop, index) => {
-              const active = stop.id === semanticZoom.scale
-              return (
-                <span
-                  key={stop.id}
-                  title={stop.note}
-                  className={active
-                    ? 'rounded-full border border-cyan-300/35 bg-cyan-300/[.12] px-2 py-1 text-[8px] font-bold text-cyan-100'
-                    : 'rounded-full border border-white/[.08] bg-white/[.025] px-2 py-1 text-[8px] font-bold text-white/35'}
-                >
-                  {index + 1}. {stop.label}
-                </span>
-              )
-            })}
-          </div>
-          <p className="mt-2 text-[8px] leading-relaxed text-white/30">Relative zoom controls representation/LOD; it is not optical magnification.</p>
 
           <div className="mt-4 rounded-2xl border border-white/[.08] bg-white/[.025] p-2.5">
             <div className="text-[8px] font-black uppercase tracking-[.16em] text-white/30">Structure context</div>
@@ -341,32 +331,6 @@ export default function UnifiedHumanSimulationProjector({
         </aside>
       </div>
 
-      <div className="border-t border-white/[.08] p-2 sm:p-3" aria-label="Explore across biological scales">
-        <div className="mb-2 flex items-center justify-between gap-3">
-          <div>
-            <div className="text-[8px] font-black uppercase tracking-[.16em] text-white/30">Explore across scales</div>
-            <div className="text-[10px] font-bold text-white/48">Body → system → organ → tissue → cell → organelle → molecule → genome</div>
-          </div>
-          <div className="hidden text-[8px] text-white/25 sm:block">Representation changes at source-resolution boundaries</div>
-        </div>
-        <div className="no-scrollbar flex gap-1.5 overflow-x-auto pb-1">
-          {BODY_SEMANTIC_ZOOM_STOPS.map((stop, index) => (
-            <button
-              key={stop.id}
-              type="button"
-              onClick={() => openScale(stop.id)}
-              title={stop.note}
-              className={semanticZoom.scale === stop.id
-                ? 'min-h-[48px] min-w-[104px] shrink-0 rounded-[15px] border border-cyan-300/35 bg-cyan-300/[.10] px-2.5 text-left text-cyan-50 transition'
-                : 'min-h-[48px] min-w-[104px] shrink-0 rounded-[15px] border border-white/[.07] bg-white/[.02] px-2.5 text-left text-white/45 transition hover:bg-white/[.045] hover:text-white/75'}
-            >
-              <span className="block text-[8px] font-black uppercase tracking-[.12em] opacity-55">{index + 1}</span>
-              <span className="block text-[10px] font-black">{stop.label}</span>
-            </button>
-          ))}
-        </div>
-        <p className="mt-1.5 text-[8px] leading-relaxed text-white/25">Changing scale changes representation; gross atlas geometry is never falsely enlarged into microscopic anatomy.</p>
-      </div>
       {microscopic && (
         <div className="border-t border-white/[.08] p-2 sm:p-3" data-semantic-microscope-active={semanticZoom.scale}>
           <Suspense fallback={<ProjectorLoader label={semanticStop.label + ' detail'} />}>
