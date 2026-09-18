@@ -113,8 +113,8 @@ export function UnifiedBodyWorkspace() {
           </h1>
           <p className="mt-2 max-w-5xl text-sm leading-relaxed text-white/55">
             {isExposure
-              ? 'Body Exposure is the spatial core of Panacea: orient on the complete body first, isolate anatomy only when needed, then connect the same structure to function, imaging, pathology, pharmacology, surgery and deeper biological scale.'
-              : 'The 3D character is the visual anchor. Measurements entered in your profile shape its proportions; a saved Body Shaper photo analysis refines the body-type model; your profile photo can appear as its face texture. Training, workouts, sleep, recovery, nutrition, health data, labs, longevity and VitaPulse stay around the same person.'}
+              ? 'Body Exposure keeps whole-body orientation while one selected structure drills into function, imaging, pathology, pharmacology, surgery and validated deeper biological scales.'
+              : 'Your Body keeps training, recovery, nutrition, measurements, health data and longevity around one personal 3D context.'}
           </p>
 
           <div className="no-scrollbar mt-4 flex gap-2 overflow-x-auto pb-1" role="tablist" aria-label="Your Body workspace">
