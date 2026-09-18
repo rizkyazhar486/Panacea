@@ -74,13 +74,21 @@ function disposeProjectedMaterials(group: THREE.Group) {
 interface BodyAllSystems3DProps {
   selectedSystemId?: BodySystemId
   onSystemChange?: (systemId: BodySystemId) => void
+  presentation?: 'full' | 'compact'
+  startOpen?: boolean
 }
 
-export default function BodyAllSystems3D({ selectedSystemId, onSystemChange }: BodyAllSystems3DProps) {
+export default function BodyAllSystems3D({
+  selectedSystemId,
+  onSystemChange,
+  presentation = 'full',
+  startOpen = false,
+}: BodyAllSystems3DProps) {
   const containerRef = useRef<HTMLDivElement>(null)
   const openTimerRef = useRef<number | null>(null)
-  const [open, setOpen] = useState(false)
-  const [rendererArmed, setRendererArmed] = useState(false)
+  const compact = presentation === 'compact'
+  const [open, setOpen] = useState(() => startOpen || compact)
+  const [rendererArmed, setRendererArmed] = useState(() => startOpen || compact)
   const [internalSystemId, setInternalSystemId] = useState<BodySystemId>('cardiovascular')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
@@ -308,6 +316,79 @@ export default function BodyAllSystems3D({ selectedSystemId, onSystemChange }: B
   const represented = selected.targets.filter((target) => target.available && loadedSourceFiles.includes(target.file) && !failedFiles.includes(target.file))
   const unavailable = selected.targets.filter((target) => !target.available || failedFiles.includes(target.file))
   const sourceResolved = selected.targets.filter((target) => target.available).length
+
+  if (compact) {
+    return (
+      <section
+        className="overflow-hidden rounded-[22px] border border-white/[.08] bg-[#010207]"
+        aria-label="Canonical Body Exposure anatomy surface"
+        data-body-exposure-compact="true"
+      >
+        <div className="flex items-center justify-between gap-2 border-b border-white/[.06] px-3 py-2.5">
+          <div className="min-w-0">
+            <div className="truncate text-[9px] font-black uppercase tracking-[.16em] text-cyan-200/70">Body Exposure · canonical anatomy</div>
+            <div className="truncate text-[11px] font-black text-white/75">{selected.label}</div>
+          </div>
+          <span className="shrink-0 rounded-full border border-white/[.07] bg-white/[.03] px-2 py-1 text-[8px] font-black uppercase tracking-[.1em] text-white/35">
+            source-backed
+          </span>
+        </div>
+
+        <div className="no-scrollbar flex gap-1 overflow-x-auto border-b border-white/[.06] p-1.5" role="tablist" aria-label="Body systems">
+          {BODY_SYSTEM_SOURCE_WAVE.map((system) => {
+            const active = system.id === systemId
+            return (
+              <button
+                key={system.id}
+                type="button"
+                role="tab"
+                aria-selected={active}
+                onClick={() => selectSystem(system.id)}
+                className={`min-h-[34px] shrink-0 rounded-full border px-2.5 text-[8px] font-black transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-300/50 ${
+                  active
+                    ? 'border-cyan-300/25 bg-cyan-300/[.12] text-white'
+                    : 'border-transparent text-white/35 hover:border-white/[.07] hover:bg-white/[.035] hover:text-white/65'
+                }`}
+              >
+                {system.label}
+              </button>
+            )
+          })}
+        </div>
+
+        <div className="relative h-[330px] bg-[radial-gradient(circle_at_50%_40%,rgba(34,211,238,.07),transparent_34%),radial-gradient(circle_at_58%_62%,rgba(139,92,246,.055),transparent_30%),#010207] sm:h-[380px]">
+          {open ? (
+            <div ref={containerRef} className="h-full w-full" aria-hidden="true" />
+          ) : (
+            <button type="button" onClick={toggleOpen} className="grid h-full w-full place-items-center text-xs font-black text-cyan-100/70">
+              Open verified anatomy
+            </button>
+          )}
+
+          <div className="pointer-events-none absolute inset-x-3 top-3 flex items-center justify-between gap-2">
+            <span className="rounded-full border border-white/[.08] bg-black/65 px-2.5 py-1 text-[8px] font-black text-white/55 backdrop-blur-xl">{selected.label}</span>
+            <span className="rounded-full border border-white/[.08] bg-black/65 px-2.5 py-1 text-[8px] font-bold text-white/35 backdrop-blur-xl">orbit · pinch · zoom</span>
+          </div>
+
+          {loading && (
+            <div role="status" className="absolute inset-x-3 bottom-3 rounded-xl border border-cyan-300/10 bg-black/75 px-3 py-2 text-[9px] font-bold text-cyan-100 backdrop-blur-xl">
+              Loading verified anatomy… {loadedFiles}
+            </div>
+          )}
+          {!loading && !error && open && (
+            <div className="pointer-events-none absolute bottom-3 left-3 rounded-full border border-white/[.07] bg-black/65 px-2.5 py-1 text-[8px] font-bold text-white/35 backdrop-blur-xl">
+              {represented.length || sourceResolved}/{selected.targets.length} source targets
+            </div>
+          )}
+          {error && (
+            <div role="alert" className="absolute inset-x-3 bottom-3 rounded-xl border border-red-300/15 bg-red-950/85 px-3 py-2 text-[9px] font-bold text-red-100 backdrop-blur-xl">
+              {error}
+            </div>
+          )}
+        </div>
+      </section>
+    )
+  }
 
   return (
     <section className="overflow-hidden rounded-[26px] border border-white/[.09] bg-[linear-gradient(135deg,rgba(34,211,238,.055),rgba(255,255,255,.025)_42%,rgba(139,92,246,.045))] p-3 shadow-[inset_0_1px_0_rgba(255,255,255,.06),0_18px_70px_rgba(0,0,0,.2)] sm:p-4" aria-label="Eleven body systems source-backed 3D atlas">
