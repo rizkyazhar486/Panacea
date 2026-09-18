@@ -98,7 +98,7 @@ export function UnifiedBodyWorkspace() {
     <div className="mx-auto w-full max-w-[1580px] space-y-4 pb-10">
       <PanaceaZoneNav />
 
-      <section className={`relative overflow-hidden grid gap-4 rounded-[30px] border border-white/[.08] bg-[#020306] p-4 shadow-[0_24px_80px_rgba(0,0,0,.28)] sm:p-5 ${isExposure ? 'lg:grid-cols-1' : 'lg:grid-cols-[minmax(0,1fr)_360px]'}`}>
+      <section className={`relative overflow-hidden grid gap-4 rounded-[24px] border border-white/[.075] bg-[#020306] p-3.5 shadow-[0_18px_60px_rgba(0,0,0,.24)] sm:p-4 ${isExposure ? 'lg:grid-cols-1' : 'lg:grid-cols-[minmax(0,1fr)_340px]'}`}>
         <div className="pointer-events-none absolute inset-x-0 top-0 h-40 bg-[radial-gradient(circle_at_18%_0%,rgba(34,211,238,.11),transparent_28%),radial-gradient(circle_at_76%_0%,rgba(139,92,246,.09),transparent_24%)]" aria-hidden />
         <div className="relative min-w-0">
           <div className="flex flex-wrap items-center gap-2">
@@ -108,16 +108,16 @@ export function UnifiedBodyWorkspace() {
             {isExposure && <span className="rounded-full border border-violet-300/15 bg-violet-300/[.07] px-2 py-0.5 text-[9px] font-black uppercase tracking-[.15em] text-violet-200/80">flagship atlas</span>}
           </div>
 
-          <h1 className="mt-1 max-w-5xl text-2xl font-black tracking-[-.035em] text-white sm:text-3xl">
-            {isExposure ? 'Explore the human body from whole-body anatomy to molecular scale' : 'Train, recover, eat, measure and age in one body context'}
+          <h1 className="mt-1 max-w-5xl text-[clamp(1.35rem,4vw,2rem)] font-black leading-[1.04] tracking-[-.035em] text-white">
+            {isExposure ? 'Your body, from whole person to molecule' : 'One body context'}
           </h1>
-          <p className="mt-2 max-w-5xl text-sm leading-relaxed text-white/55">
+          <p className="mt-1.5 truncate text-[11px] font-bold text-white/48 sm:text-xs">
             {isExposure
-              ? 'Body Exposure keeps whole-body orientation while one selected structure drills into function, imaging, pathology, pharmacology, surgery and validated deeper biological scales.'
-              : 'Your Body keeps training, recovery, nutrition, measurements, health data and longevity around one personal 3D context.'}
+              ? 'Whole body → organ → tissue → cell → molecule'
+              : 'Train · recover · eat · measure · age'}
           </p>
 
-          <div className="no-scrollbar mt-4 flex gap-2 overflow-x-auto pb-1" role="tablist" aria-label="Your Body workspace">
+          <div className="no-scrollbar mt-3 flex snap-x gap-1.5 overflow-x-auto pb-1" role="tablist" aria-label="Your Body workspace">
             {VIEWS.map((view) => {
               const selected = activeKey === view.key
               const exposureTab = view.key === 'body-exposure'
@@ -128,7 +128,7 @@ export function UnifiedBodyWorkspace() {
                   role="tab"
                   aria-selected={selected}
                   onClick={() => select(view)}
-                  className={`min-h-[44px] shrink-0 rounded-full border px-4 text-xs font-black transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-300/50 ${
+                  className={`min-h-[42px] shrink-0 snap-start rounded-full border px-3.5 text-[11px] font-black transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-300/50 ${
                     selected
                       ? 'border-cyan-300/25 bg-[linear-gradient(135deg,rgba(34,211,238,.18),rgba(139,92,246,.13),rgba(236,72,153,.08))] text-white shadow-[inset_0_1px_0_rgba(255,255,255,.12),0_10px_28px_rgba(34,211,238,.05)]'
                       : exposureTab
@@ -149,7 +149,7 @@ export function UnifiedBodyWorkspace() {
             onSelect={selectDepth}
           />
 
-          <details className="mt-3 rounded-2xl border border-white/[.07] bg-white/[.025] px-3 py-2.5 text-[11px] text-white/45">
+          <details className="mt-2.5 rounded-[14px] border border-white/[.065] bg-white/[.02] px-3 py-2 text-[10px] text-white/45">
             <summary className="cursor-pointer font-black text-white/72">About {active.label}</summary>
             <p className="mt-2 leading-relaxed">{active.description}</p>
           </details>
