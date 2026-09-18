@@ -2,7 +2,6 @@ import { lazy, Suspense, type ComponentType } from 'react'
 import { Link, useSearchParams } from 'react-router-dom'
 import { HomeCommandDeck } from '../components/HomeCommandDeck'
 import { HomeHealthBrief } from '../components/HomeHealthBrief'
-import { HomeFunWidgetRail } from '../components/HomeFunWidgetRail'
 import { HomeVisualLanding } from '../components/HomeVisualLanding'
 import { RelWidgetRumah } from '../components/RelWidgetRumah'
 import { IconDashboard, IconHeart, IconSparkle, IconStethoscope } from '../components/icons'
@@ -72,7 +71,6 @@ export function HomeSocialWorkspace() {
       {activeKey === 'home' ? (
         <div className="panacea-human-home">
           <HomeHealthBrief />
-          <HomeFunWidgetRail />
           <RelWidgetRumah />
           <HomeVisualLanding />
           <HomeCommandDeck />
