@@ -2,7 +2,12 @@ import {
   buildLongitudinalReplayFrame,
   type LongitudinalReplayClock,
 } from './longitudinalReplay'
+import {
+  filterStateByPurposeConsent,
+  type PurposeConsentLedger,
+} from './purposeConsentLedger'
 import type {
+  ConsentPurpose,
   LongitudinalEvent,
   LongitudinalPatientState,
   PanaceaSurface,
@@ -47,6 +52,7 @@ export interface LongitudinalTwinSnapshot {
   governance: {
     pendingClinicalReview: number
     blockedByConsent: number
+    purposeConsentFilteredEvents: number
   }
   boundary: {
     patientSpecificSignals: true
@@ -55,6 +61,7 @@ export interface LongitudinalTwinSnapshot {
     diagnosticInferenceGenerated: false
     autonomousClinicalActionAllowed: false
     simulatedState: false
+    purposeConsentLedgerApplied: true
   }
 }
 
@@ -81,6 +88,12 @@ function displayState(review: LongitudinalEvent['review']): TwinDisplayState {
   return 'recorded'
 }
 
+function consentPurposeForSurface(surface: PanaceaSurface): ConsentPurpose {
+  if (surface === 'clinical' || surface === 'ai-emr') return 'clinical-support'
+  if (surface === 'ai-chatbot') return 'ai-context'
+  return 'personal-visualization'
+}
+
 /**
  * Build a governed, patient-specific signal snapshot for a Digital Twin surface.
  *
@@ -88,17 +101,31 @@ function displayState(review: LongitudinalEvent['review']): TwinDisplayState {
  * map generic atlas geometry to patient-specific internal anatomy, infer a
  * diagnosis, create a forecast, or authorize clinical action.
  *
- * Requiring a Panacea surface means the canonical consent/review projection is
- * always applied. Callers cannot accidentally construct an ungoverned patient
- * twin from raw longitudinal events through this function.
+ * Both governance layers are mandatory:
+ * 1) capture-time ConsentEnvelope + clinician review through surface replay;
+ * 2) purpose-specific grant/revoke history through PurposeConsentLedger.
+ *
+ * Callers therefore cannot construct a patient twin from raw longitudinal
+ * events without supplying the canonical purpose-consent ledger.
  */
 export function buildLongitudinalTwinSnapshot(input: {
   state: LongitudinalPatientState
+  consentLedger: PurposeConsentLedger
   at: string
   surface: PanaceaSurface
   clock?: LongitudinalReplayClock
 }): LongitudinalTwinSnapshot {
-  const frame = buildLongitudinalReplayFrame(input.state, input.at, {
+  const purpose = consentPurposeForSurface(input.surface)
+  const governedState = filterStateByPurposeConsent(
+    input.state,
+    input.consentLedger,
+    purpose,
+    input.at,
+  )
+  const sourceEventCount = Object.keys(input.state.eventsById).length
+  const governedEventCount = Object.keys(governedState.eventsById).length
+
+  const frame = buildLongitudinalReplayFrame(governedState, input.at, {
     clock: input.clock ?? 'known',
     surface: input.surface,
   })
@@ -135,6 +162,7 @@ export function buildLongitudinalTwinSnapshot(input: {
     governance: {
       pendingClinicalReview: frame.governance.pendingClinicalReview,
       blockedByConsent: frame.governance.blockedByConsent,
+      purposeConsentFilteredEvents: sourceEventCount - governedEventCount,
     },
     boundary: {
       patientSpecificSignals: true,
@@ -143,6 +171,7 @@ export function buildLongitudinalTwinSnapshot(input: {
       diagnosticInferenceGenerated: false,
       autonomousClinicalActionAllowed: false,
       simulatedState: false,
+      purposeConsentLedgerApplied: true,
     },
   }
 }
