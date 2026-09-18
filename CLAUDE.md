@@ -280,3 +280,21 @@ Required product behavior:
 The first runtime implementation is already visible in Unified Human Simulation Projector: a universal depth rail replaces the duplicate scale rail, and the molecular stage now exposes ATP/NAD+/NADH/glucose chemistry context across all systems with PubChem references for the verified core compounds.
 
 Continue by adding real source adapters and assets, not more placeholder prose.
+
+
+## Camera-only Personal Digital Human handoff — 2026-09-19
+
+The owner explicitly wants a game-quality **“digitally import myself”** experience using an ordinary RGB camera as the baseline input, not a manual cosmetic character creator.
+
+Canonical references:
+- `DOCS/PERSONAL-DIGITAL-HUMAN.md`
+- `DOCS/CLAUDE-CONTINUATION-PERSONAL-DIGITAL-HUMAN.md`
+- `src/lib/personalAvatar.ts`
+- `src/pages/bodyhub/PersonalAvatarCameraCapture.tsx`
+- `scripts/uji/personal-avatar-camera-contract.mts`
+
+First runtime slice: camera-only guided 9-view capture, automatic 3×3 QA preview, ephemeral raw-frame lifecycle, consent/reconstruction contract and a “My Body” projection in the existing Unified Human Simulation Projector.
+
+Critical boundary: **camera-derived PersonalAvatar is patient-specific external appearance only. It is not patient-specific internal anatomy.** Internal patient anatomy requires verified imaging or another validated patient-specific source. Do not use generic atlas organs as if they were reconstructed from the camera.
+
+Continue by implementing a real reconstruction adapter (parametric body/face fit → clothed surface reconstruction → texture/material → rig → LOD) without creating a competing Body renderer. Preserve privacy, provenance, mobile performance and deterministic acceptance. Do not claim game-quality reconstruction is complete until an actual tested reconstruction backend produces a rigged asset.
