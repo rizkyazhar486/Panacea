@@ -366,9 +366,10 @@ export function Shell({ children }: { children: ReactNode }) {
   useEffect(() => pasangKilau(), [])
   const account = state.account
 
-  // Bilah atas menyingkir saat membaca ke bawah dan kembali saat pengguna
-  // menggulir ke atas. Ini menjadi SATU-SATUNYA navigasi persisten aplikasi:
-  // tidak ada bottom dock, FAB navigation, atau drawer penuh.
+  // Header utilitas menyingkir saat membaca ke bawah dan kembali saat pengguna
+  // menggulir ke atas. Ini BUKAN navigation bar: tidak ada daftar destinasi
+  // permanen di sini; hanya konteks halaman, back, search, emergency, profile,
+  // notification, theme, dan kontrol klinis yang benar-benar kontekstual.
   const keadaanBilah = useCommandBar(bilahAtas)
 
   // Record visits for evidence-based shortcuts.
@@ -465,36 +466,6 @@ export function Shell({ children }: { children: ReactNode }) {
             )}
             <h1 className="truncate text-base font-bold sm:text-lg">{title?.label ?? 'Panaceamed.id'}</h1>
           </div>
-
-          {['pasien', 'dokter', 'owner'].includes(account.role) && (
-            <nav className="panacea-command-primary-links no-scrollbar flex min-w-0 items-center gap-1 overflow-x-auto" aria-label="Primary">
-              <NavLink
-                to="/"
-                end
-                className={`panacea-command-primary-link${loc.pathname === '/' && !loc.search.includes('t=for-you') ? ' is-active' : ''}`}
-              >
-                Home
-              </NavLink>
-              <NavLink
-                to="/fitness-hub"
-                className={`panacea-command-primary-link${loc.pathname.startsWith('/fitness-hub') ? ' is-active' : ''}`}
-              >
-                Your Body
-              </NavLink>
-              <NavLink
-                to="/clinical-hub"
-                className={`panacea-command-primary-link${loc.pathname.startsWith('/clinical-hub') ? ' is-active' : ''}`}
-              >
-                Clinical
-              </NavLink>
-              <NavLink
-                to="/?t=for-you"
-                className={`panacea-command-primary-link${loc.pathname === '/' && loc.search.includes('t=for-you') ? ' is-active' : ''}`}
-              >
-                For You
-              </NavLink>
-            </nav>
-          )}
 
           {/* Pencarian: fitur sudah lewat 200, dan menu menuntut menebak grupnya
               dulu. Ditaruh di header supaya tersedia dari halaman mana pun. */}
