@@ -146,6 +146,6 @@ assert.ok(kunciTab.length > 20, `Hanya ${kunciTab.length} tab terbaca; pembacaan
 
 console.log(
   `Kelompok tab Body Exposure: ${kunciTab.length} tab dalam ${kelompokTerpakai(kunciTab).length} kelompok, ` +
-  'semuanya tetap dirender (kelompok menggulirkan, tidak menyaring), pengurutan adalah permutasi ' +
+  'semua panel tetap ada di registry kanonik dan dapat dicari lewat progressive disclosure; pengurutan adalah permutasi ' +
   'yang menjaga tiap kelompok bersambung, dan petanya memakai kunci tab bukan label.',
 )
