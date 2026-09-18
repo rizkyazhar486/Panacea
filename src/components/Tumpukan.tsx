@@ -13,6 +13,20 @@ type InstrumentMeta = {
   soft: string
 }
 
+/**
+ * Tujuh titik yang mengelilingi slide aktif.
+ *
+ * Dengan 23 widget, 23 titik pada layar 390px tinggal 3px sekali — tidak
+ * terbaca dan tidak bisa ditekan. Jendela ini bergerak bersama posisi
+ * sehingga titiknya tetap cukup besar untuk jempol.
+ */
+export function jendelaTitik(aktif: number, jumlah: number, lebar = 7): number[] {
+  if (jumlah <= lebar) return Array.from({ length: jumlah }, (_, i) => i)
+  const separuh = Math.floor(lebar / 2)
+  const mulai = Math.max(0, Math.min(aktif - separuh, jumlah - lebar))
+  return Array.from({ length: lebar }, (_, i) => mulai + i)
+}
+
 const META: Record<string, Partial<InstrumentMeta>> = {
   kebugaran: { name: 'Training today', kicker: 'Performance', icon: '🏃', kind: 'performance' },
   salat: { name: 'Prayer rhythm', kicker: 'Time & ritual', icon: '◌', kind: 'ritual' },
@@ -113,6 +127,33 @@ export function Tumpukan({ judul, anak, aksi }: { judul?: string; anak: WidgetIt
   const wadah = useRef<HTMLDivElement>(null)
   const halaman = useRef<(HTMLDivElement | null)[]>([])
   const digeser = useRef(false)
+  // Indeks yang SEDANG dituju. Penyelarasan ulang di bawah memakai angka ini,
+  // bukan posisi gulir saat itu juga.
+  const dituju = useRef(0)
+  // Daftar slide yang TERLIHAT, dibaca dari dalam efek.
+  //
+  // Slide yang kosong tetap ada di DOM (bersembunyi dengan `hidden`), jadi
+  // indeks ke-n dalam daftar terlihat BUKAN slide ke-n dalam DOM. Menggulir ke
+  // `n * lebar` karena itu mendarat di slide yang salah begitu ada satu widget
+  // yang melaporkan dirinya kosong — dan pada Home yang penuh, sepuluh di
+  // antaranya kosong. Posisinya sekarang dibaca dari elemennya sendiri.
+  const tampilRef = useRef<{ kunci: string; i: number }[]>([])
+  // Widget yang sedang dibuka, disimpan sebagai KUNCI, bukan nomor urut.
+  //
+  // Daftar yang terlihat menyusut sendiri saat widget selesai dimuat dan
+  // melaporkan dirinya kosong — pada Home yang penuh, dari 23 menjadi 13 dalam
+  // waktu kurang dari sedetik. Selama "yang aktif" hanya disimpan sebagai
+  // nomor urut, setiap penyusutan memindahkan pembaca ke widget lain, dan
+  // geseran yang sedang berjalan ditarik kembali ke awal. Kunci tidak berubah
+  // ketika tetangganya menghilang.
+  const kunciAktif = useRef<string | null>(null)
+  // Sampai kapan geseran yang DIMINTA tombol/titik tidak boleh diganggu.
+  //
+  // Selama gulir mulus berjalan, penangan scroll melihat posisi setengah jalan
+  // (169px dari 1427px), menyimpulkan slide terdekat adalah yang pertama, dan
+  // menulis ulang widget aktif ke sana — geserannya batal sendiri sebelum
+  // sampai. Pembacaan itu ditunda sampai geserannya selesai.
+  const gulirTerkunci = useRef(0)
   const hemat = typeof document !== 'undefined' && document.documentElement.classList.contains('pmd-low-memory')
   const preload = 1
   const [aktif, setAktif] = useState(0)
@@ -146,6 +187,7 @@ export function Tumpukan({ judul, anak, aksi }: { judul?: string; anak: WidgetIt
   }, [anak, siap])
 
   const tampil = anak.map((a, i) => ({ ...a, i })).filter((a) => !kosong[a.i])
+  tampilRef.current = tampil.map((t) => ({ kunci: t.kunci, i: t.i }))
   const TINGGI_MIN = 184
   const TINGGI_MAKS = hemat ? 390 : 440
   const aktifItem = tampil[Math.min(aktif, Math.max(0, tampil.length - 1))]
@@ -195,19 +237,39 @@ export function Tumpukan({ judul, anak, aksi }: { judul?: string; anak: WidgetIt
     }
   }, [aktifItem?.i, siap, TINGGI_MAKS])
 
+  /** Posisi kiri slide ke-n dalam daftar yang terlihat. */
+  const kiriSlide = (n: number): number | null => {
+    const asli = tampilRef.current[n]?.i
+    if (asli == null) return null
+    const el = halaman.current[asli]
+    return el ? el.offsetLeft : null
+  }
+
   useEffect(() => {
     const el = wadah.current
     if (!el) return
     let frame = 0
     const gulir = () => {
+      if (Date.now() < gulirTerkunci.current) return
       if (frame) return
       frame = requestAnimationFrame(() => {
-        const i = Math.round(el.scrollLeft / Math.max(1, el.clientWidth))
-        setAktif(Math.max(0, Math.min(i, Math.max(0, tampil.length - 1))))
+        // Slide terdekat menurut posisinya sendiri.
+        let terdekat = 0
+        let jarak = Infinity
+        tampilRef.current.forEach((t, n) => {
+          const kiri = halaman.current[t.i]?.offsetLeft
+          if (kiri == null) return
+          const d = Math.abs(kiri - el.scrollLeft)
+          if (d < jarak) { jarak = d; terdekat = n }
+        })
+        const aman = Math.max(0, Math.min(terdekat, Math.max(0, tampilRef.current.length - 1)))
+        dituju.current = aman
+        kunciAktif.current = tampilRef.current[aman]?.kunci ?? null
+        setAktif(aman)
         frame = 0
       })
     }
-    const tandai = () => { digeser.current = true }
+    const tandai = () => { digeser.current = true; gulirTerkunci.current = 0 }
     el.addEventListener('scroll', gulir, { passive: true })
     el.addEventListener('pointerdown', tandai, { passive: true })
     el.addEventListener('wheel', tandai, { passive: true })
@@ -221,13 +283,32 @@ export function Tumpukan({ judul, anak, aksi }: { judul?: string; anak: WidgetIt
 
   useEffect(() => {
     if (!tampil.length) return
-    setAktif((v) => Math.min(v, tampil.length - 1))
+    // Cari lagi widget yang sama menurut kuncinya; kalau ia memang ikut
+    // menghilang, barulah jatuh ke pembatasan nomor urut.
+    setAktif((v) => {
+      const kunci = kunciAktif.current
+      const n = kunci ? tampil.findIndex((t) => t.kunci === kunci) : -1
+      const hasil = n >= 0 ? n : Math.min(v, tampil.length - 1)
+      dituju.current = hasil
+      return hasil
+    })
     const el = wadah.current
     if (!el) return
     const id = window.setTimeout(() => {
       const w = el.clientWidth
       if (!w) return
-      const target = digeser.current ? Math.round(el.scrollLeft / w) * w : 0
+      // JANGAN membaca posisi gulir di sini.
+      //
+      // Daftar widget bisa menyusut tepat setelah tombol ‹ / › ditekan (sebuah
+      // widget melaporkan dirinya kosong saat mount), dan efek ini ikut jalan.
+      // Versi lama menyelaraskan ke `Math.round(scrollLeft / w) * w` — dibaca
+      // 60 ms setelah gulir mulus dimulai, ketika geserannya baru sampai ~50px
+      // dari 357px. Pembulatannya menghasilkan 0, jadi gulirannya ditarik
+      // kembali ke slide pertama di tengah jalan dan berhenti tersangkut di
+      // antara dua slide: tombolnya tampak mati padahal sudah bekerja.
+      //
+      // Yang benar sudah diketahui: slide yang aktif.
+      const target = digeser.current ? (kiriSlide(dituju.current) ?? dituju.current * w) : 0
       if (Math.abs(el.scrollLeft - target) > 1) el.scrollTo({ left: target })
     }, 60)
     return () => window.clearTimeout(id)
@@ -238,11 +319,14 @@ export function Tumpukan({ judul, anak, aksi }: { judul?: string; anak: WidgetIt
   const ke = (i: number) => {
     const next = Math.max(0, Math.min(i, Math.max(0, tampil.length - 1)))
     digeser.current = true
+    dituju.current = next
+    kunciAktif.current = tampilRef.current[next]?.kunci ?? null
+    gulirTerkunci.current = Date.now() + 700
     setAktif(next)
     const el = wadah.current
     if (el) {
       const reduced = typeof window !== 'undefined' && window.matchMedia?.('(prefers-reduced-motion: reduce)').matches
-      el.scrollTo({ left: next * el.clientWidth, behavior: hemat || reduced ? 'auto' : 'smooth' })
+      el.scrollTo({ left: kiriSlide(next) ?? next * el.clientWidth, behavior: hemat || reduced ? 'auto' : 'smooth' })
     }
   }
 
@@ -307,8 +391,30 @@ export function Tumpukan({ judul, anak, aksi }: { judul?: string; anak: WidgetIt
         <div className="widget-instrument-foot-v5" aria-label="Widget navigation">
           <button type="button" className="widget-instrument-nav-v5" onClick={() => ke(aktif - 1)} disabled={aktif <= 0} aria-label="Previous widget">‹</button>
           <div className="widget-instrument-track-v5">
-            <div className="widget-instrument-line-v5" aria-hidden>
-              <div className="widget-instrument-line-fill-v5" style={{ width: `${progress}%` }} />
+            {/* Titik, bukan garis kemajuan.
+                Garis hanya bisa dibaca; titik bisa ditekan, dan itu mengubah
+                penunjuk posisi menjadi kendali. Dengan 23 widget, menampilkan
+                semuanya akan menjadi deretan titik yang tak terbaca, jadi yang
+                ditampilkan adalah jendela tujuh titik yang bergerak — posisi
+                penuhnya tetap terbaca pada penghitung n/N di kepala. */}
+            {/* Titiknya BUKAN tab.
+                Menandainya role="tab" + aria-selected membuat lapisan kendali
+                global (panacea-control-grading-v46) memperlakukannya sebagai
+                kendali terpilih dan mengecatnya sebagai kapsul putih
+                neumorfik — jauh lebih besar daripada titik 6px di dalamnya.
+                `aria-current` adalah penanda yang tepat untuk "yang sedang
+                dibuka dalam satu deret", dan tidak memicu perlakuan itu. */}
+            <div className="widget-instrument-dots-v5" aria-label="Widget position">
+              {jendelaTitik(aktif, tampil.length).map((i) => (
+                <button
+                  key={tampil[i]?.kunci ?? i}
+                  type="button"
+                  aria-current={i === aktif ? 'true' : undefined}
+                  aria-label={`Show ${metaFor(tampil[i]?.kunci).name}`}
+                  className={`widget-instrument-dot-v5${i === aktif ? ' is-active' : ''}`}
+                  onClick={() => ke(i)}
+                />
+              ))}
             </div>
             <span className="widget-instrument-label-v5">Next · {nextMeta.name}</span>
           </div>

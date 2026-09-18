@@ -1,0 +1,28 @@
+.rel-widget-rumah {
+  padding-block: 0;
+}
+
+.rel-widget-rumah .widget-instrument-head-v5 {
+  border-radius: 0;
+  padding: 0 2px;
+  -webkit-backdrop-filter: none!important;
+  backdrop-filter: none!important;
+}
+
+.rel-widget-rumah .widget-instrument-dot-v5,
+.rel-widget-rumah .widget-instrument-nav-v5 {
+  box-shadow: none!important;
+  background-image: none!important;
+}
+
+.rel-widget-rumah .widget-instrument-dot-v5 {
+  background-color: transparent!important;
+  border: 0!important;
+}
+
+.rel-widget-rumah .widget-instrument-kicker-v5,
+.rel-widget-rumah .widget-instrument-label-v5,
+.rel-widget-rumah .widget-instrument-state-v5,
+.rel-widget-rumah .widget-instrument-count-v5 {
+  color: rgba(255,255,255,.34);
+}
