@@ -12,7 +12,7 @@
   --training-accent: rgba(255, 255, 255, .32);
   position: relative;
   min-width: 0;
-  min-height: 108px;
+  min-height: 104px;
   overflow: hidden;
   display: flex;
   flex-direction: column;
@@ -21,7 +21,9 @@
   padding: 14px;
   border: 1px solid rgba(255, 255, 255, .09);
   border-radius: 22px;
-  background: rgba(255, 255, 255, .035);
+  background:
+    radial-gradient(circle at 100% 0%, color-mix(in srgb, var(--training-accent) 8%, transparent), transparent 48%),
+    linear-gradient(155deg, rgba(17, 21, 28, .96), rgba(7, 10, 15, .985));
   color: rgba(255, 255, 255, .94);
   text-decoration: none;
   transform: translateZ(0);
@@ -30,6 +32,8 @@
     border-color 180ms ease,
     background-color 180ms ease;
   -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .035);
 }
 
 .training-lab-bento-card::before {
@@ -74,7 +78,7 @@
 
 .training-lab-bento-card--lead {
   grid-column: 1 / -1;
-  min-height: 152px;
+  min-height: 146px;
   padding: 16px;
 }
 
@@ -281,19 +285,186 @@
   background: rgba(255, 255, 255, .04);
 }
 
+
+/* Compact secondary navigation: bento owns the main decisions, this dock only
+   exposes a few secondary tools plus one calm "More tools" disclosure. */
+.halaman-tab-root[data-tab-layout='compact'] > div:first-child {
+  margin-bottom: 0;
+}
+
+.halaman-tab-root[data-tab-layout='compact'] > * + * {
+  margin-top: 18px !important;
+}
+
+.halaman-tab-compact {
+  display: grid;
+  gap: 9px;
+}
+
+.halaman-tab-primary {
+  display: flex;
+  min-width: 0;
+  gap: 8px;
+  overflow-x: auto;
+  padding: 1px 1px 3px;
+  scrollbar-width: none;
+  scroll-snap-type: x proximity;
+}
+
+.halaman-tab-primary::-webkit-scrollbar {
+  display: none;
+}
+
+.halaman-tab-root[data-tab-layout='compact'] .halaman-tab-choice {
+  min-width: 0;
+  min-height: 44px;
+  max-width: 10.5rem;
+  scroll-snap-align: start;
+  border: 1px solid rgba(255, 255, 255, .085);
+  background: rgba(255, 255, 255, .035);
+  color: rgba(255, 255, 255, .68);
+  box-shadow: none !important;
+  letter-spacing: 0 !important;
+  text-transform: none !important;
+  white-space: nowrap;
+  touch-action: manipulation;
+}
+
+.halaman-tab-root[data-tab-layout='compact'] .halaman-tab-choice:hover {
+  border-color: rgba(255, 255, 255, .15);
+  background: rgba(255, 255, 255, .055);
+  color: rgba(255, 255, 255, .94);
+}
+
+.halaman-tab-root[data-tab-layout='compact'] .halaman-tab-choice[aria-current='page'] {
+  border-color: rgba(52, 211, 153, .34) !important;
+  background: rgba(16, 185, 129, .11) !important;
+  color: rgba(236, 253, 245, .96) !important;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .045) !important;
+}
+
+.halaman-tab-root[data-tab-layout='compact'] .halaman-tab-emoji {
+  opacity: .76;
+}
+
+.halaman-tab-root[data-tab-layout='compact'] .halaman-tab-label {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.halaman-tab-root[data-tab-layout='compact'] .halaman-tab-choice:focus-visible,
+.training-lab-bento-card:focus-visible,
+.training-model-disclosure > summary:focus-visible,
+.training-depth-disclosure > summary:focus-visible,
+.training-audit-disclosure > summary:focus-visible {
+  outline: 2px solid rgba(52, 211, 153, .78);
+  outline-offset: 2px;
+}
+
+.halaman-tab-more {
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, .075);
+  border-radius: 17px;
+  background: rgba(255, 255, 255, .022);
+}
+
+.halaman-tab-more > summary {
+  min-height: 46px;
+  display: flex;
+  cursor: pointer;
+  list-style: none;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 0 13px;
+  color: rgba(255, 255, 255, .56);
+  font-size: 11px;
+  font-weight: 850;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+
+.halaman-tab-more > summary::-webkit-details-marker {
+  display: none;
+}
+
+.halaman-tab-more > summary > span:last-child {
+  color: rgba(255, 255, 255, .3);
+  font-size: 16px;
+  line-height: 1;
+}
+
+.halaman-tab-more[open] > summary {
+  color: rgba(255, 255, 255, .9);
+}
+
+.halaman-tab-more-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 7px;
+  border-top: 1px solid rgba(255, 255, 255, .065);
+  padding: 9px;
+}
+
+.halaman-tab-more-grid .halaman-tab-choice {
+  width: 100%;
+  max-width: none !important;
+  justify-content: flex-start;
+  border-radius: 14px;
+  padding-inline: 11px;
+}
+
+/* Open panels should feel like part of one continuous instrument rather than
+   a second stack of floating cards. */
+.training-model-disclosure,
+.training-audit-disclosure,
+.training-depth-disclosure,
+.halaman-tab-more {
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .025);
+}
+
+.training-depth-disclosure[open],
+.training-model-disclosure[open],
+.training-audit-disclosure[open],
+.halaman-tab-more[open] {
+  border-color: rgba(255, 255, 255, .115);
+}
+
 @media (max-width: 390px) {
   .training-lab-bento {
     gap: 8px;
   }
 
+
+  .halaman-tab-root[data-tab-layout='compact'] > * + * {
+    margin-top: 15px !important;
+  }
+
+  .halaman-tab-primary {
+    gap: 7px;
+  }
+
+  .halaman-tab-root[data-tab-layout='compact'] .halaman-tab-choice {
+    min-height: 44px;
+    padding-inline: 12px;
+    font-size: 11px !important;
+  }
+
+  .halaman-tab-more-grid {
+    gap: 6px;
+    padding: 8px;
+  }
+
   .training-lab-bento-card {
-    min-height: 102px;
+    min-height: 98px;
     padding: 12px;
     border-radius: 19px;
   }
 
   .training-lab-bento-card--lead {
-    min-height: 144px;
+    min-height: 138px;
     padding: 14px;
   }
 
