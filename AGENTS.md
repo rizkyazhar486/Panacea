@@ -15,10 +15,41 @@ Before selecting work:
 2. Inspect open PRs/branches and current CI/deployment state.
 3. Check changed-file overlap for the intended area.
 4. If another agent already owns overlapping paths, do not duplicate the work.
-5. Prefer the highest-value non-overlapping unfinished candidate.
+5. Select a safe non-overlapping unfinished candidate. There is **no global
+   product-wide priority order** unless a later explicit instruction introduces one.
 
-One active coherent PR is preferable to several overlapping micro-PRs. Close or
-supersede stale duplicates explicitly.
+One active coherent PR per owned change is preferable to several overlapping
+micro-PRs. Close or supersede stale duplicates explicitly.
+
+## Simultaneous all-lane execution
+
+Panacea currently operates in **simultaneous multi-lane mode**. ChatGPT/Codex,
+Claude Code and other authorized agents should keep independent lanes moving in
+parallel rather than waiting for one lane to finish before another begins.
+
+Active lanes include, concurrently:
+- UI/UX, interaction, motion, responsive behavior, accessibility and design system;
+- frontend product behavior and feature integration;
+- backend, APIs, database/Supabase, data architecture and integrations;
+- AI orchestration, evaluation, clinical reasoning infrastructure and safety;
+- Body Exposure, anatomy, physiology, pathology, pharmacology and simulation;
+- tests, CI, stabilization, observability, security and repository hygiene;
+- analytics, localization, documentation and developer tooling.
+
+**UI/UX is active implementation scope**, not a deferred handoff. Visual work may
+proceed at the same time as backend, AI, biomedical and stabilization work.
+
+"No global priority" does not remove technical dependencies:
+- each lane may order its own prerequisites locally;
+- a blocker should stop only work that actually depends on it;
+- unrelated healthy lanes should continue;
+- an overlapping file or tightly coupled state is single-writer until the owning
+  PR lands or relinquishes it;
+- never create artificial concurrency by force-pushing, bypassing CI, deleting
+  another agent's work, or weakening validation.
+
+For long-running or blocked work, leave durable continuation/handoff context in
+the repository's canonical task ledger or `CLAUDE.md`.
 
 ## Standard agent lane
 
@@ -109,6 +140,16 @@ other medical behavior:
   targeting;
 - high-risk clinical/procedure content stays blocked from clinical publication
   until the required qualified human review is actually recorded.
+
+## Progress reporting
+
+Report simultaneous work by lane using verifiable repository state. Do not invent
+precision. When a canonical weighted backlog exists, aggregate progress may use:
+
+`Overall progress = 100 × (verified completed weighted work / canonical weighted backlog)`
+
+If the denominator is not trustworthy, report concrete deltas, active PRs, CI
+state and blockers instead of a fabricated percentage.
 
 ## Cost-awareness rule
 Before escalating model/reasoning or broadening context, ask internally whether a
