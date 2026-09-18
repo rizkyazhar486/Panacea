@@ -1,7 +1,7 @@
 import { lazy, Suspense, type ComponentType } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { PanaceaZoneNav } from '../components/PanaceaZoneNav'
-import { FeatureBoulevard } from '../components/FeatureBoulevard'
+import { SuperPageCapabilityRail } from '../components/SuperPageCapabilityRail'
 import { PersonalBodyAvatar3D } from '../components/PersonalBodyAvatar3D'
 import { SurfaceDepthNavigator } from '../components/SurfaceDepthNavigator'
 
@@ -166,7 +166,7 @@ export function UnifiedBodyWorkspace() {
         <Suspense fallback={<Loader exposure={isExposure} />}><Active /></Suspense>
       </section>
 
-      <FeatureBoulevard zone="body" title="Your Body feature boulevard" />
+      <SuperPageCapabilityRail domain="body" initialLimit={16} />
     </div>
   )
 }
