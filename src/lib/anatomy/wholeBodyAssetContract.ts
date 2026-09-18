@@ -24,6 +24,7 @@ export interface WholeBodyReferenceVariant {
 
 export const Z_ANATOMY_MALE_SPACE = 'z-anatomy-bodyparts3d-male-reference'
 export const HRA_FEMALE_SPACE = 'hubmap-hra-vh-female-reference'
+export const PANACEA_FEMALE_PELVIS_SPACE = 'panacea-normalized-hra-vh-female-pelvis-v1'
 
 /**
  * Current compatible whole-body source set.
@@ -63,22 +64,52 @@ export const FEMALE_PELVIS_REFERENCE: WholeBodyReferenceVariant = {
   label: 'Adult female pelvis reference',
   sex: 'female-reference',
   scope: 'regional',
-  coordinateSpace: HRA_FEMALE_SPACE,
-  boundary: 'Regional Visible Human female reference. Do not merge into the male Z-Anatomy coordinate space without validated registration.',
+  coordinateSpace: PANACEA_FEMALE_PELVIS_SPACE,
+  boundary: 'Regional Visible Human female reference normalized for this standalone module. Do not overlay it on either the male Z-Anatomy body or raw HRA whole-body coordinates without a validated transform.',
   layers: [
     {
       id: 'female-pelvis',
       label: 'Uterus / ovaries / uterine tubes / vagina / ligaments / bladder / pelvis',
       sourcePath: '/atlas/obgin.glb',
-      coordinateSpace: HRA_FEMALE_SPACE,
+      coordinateSpace: PANACEA_FEMALE_PELVIS_SPACE,
       status: 'shipped',
       provenance: 'HuBMAP Human Reference Atlas VH_Female; see public/atlas/CREDITS.txt',
     },
   ],
 }
 
+/**
+ * Source-discovered full female reference candidate.
+ *
+ * HRA v1.5 publishes a Visible Human female "united" GLB with a whole-body
+ * surface and selected organs, including female reproductive anatomy. It is
+ * pipeline-ready, not shipped: runtime admission still requires asset
+ * download verification, manifest inspection, structure-name audit, browser
+ * performance checks and preserved CC BY 4.0 attribution.
+ */
+export const FEMALE_HRA_UNITED_REFERENCE: WholeBodyReferenceVariant = {
+  id: 'female-hra-united-v1.5',
+  label: 'Adult female HRA united reference',
+  sex: 'female-reference',
+  scope: 'whole-body',
+  coordinateSpace: HRA_FEMALE_SPACE,
+  boundary: 'Whole-body female reference candidate with surface and selected organs; skeleton and muscle coverage are partial and it must not be presented as anatomically complete.',
+  layers: [
+    {
+      id: 'female-united',
+      label: 'Female whole-body surface + selected organs',
+      sourcePath: 'https://cdn.humanatlas.io/digital-objects/ref-organ/united-female/v1.5/assets/3d-vh-f-united.glb',
+      coordinateSpace: HRA_FEMALE_SPACE,
+      status: 'pipeline-ready',
+      provenance: 'HuBMAP Human Reference Atlas / Visible Human Female v1.5 · CC BY 4.0',
+      notes: 'External pinned-version source candidate. Do not runtime-load until acquisition manifest, node audit and performance acceptance pass.',
+    },
+  ],
+}
+
 export const WHOLE_BODY_REFERENCE_VARIANTS = [
   MALE_WHOLE_BODY_REFERENCE,
+  FEMALE_HRA_UNITED_REFERENCE,
   FEMALE_PELVIS_REFERENCE,
 ] as const
 
@@ -92,11 +123,11 @@ export interface WholeBodyAssetGap {
 
 export const WHOLE_BODY_ASSET_GAPS: readonly WholeBodyAssetGap[] = [
   {
-    id: 'female-whole-body-compatible',
-    label: 'Female whole-body compatible reference',
+    id: 'female-whole-body-runtime-admission',
+    label: 'Female whole-body runtime admission',
     priority: 'P0',
-    reason: 'The current female source is pelvis-only and uses a different reference coordinate space.',
-    completionRule: 'Ship a source-backed female whole-body surface plus required systems in one documented coordinate frame, or a validated registration with reproducible error measurements.',
+    reason: 'HRA provides a pinned whole-body female united source candidate, but Panacea has not yet acquired, audited, packaged and performance-validated it for the runtime.',
+    completionRule: 'Acquire the v1.5 HRA female united GLB, record checksum/metadata/license, audit exact node coverage including reproductive and surface anatomy, package through Blender, and pass browser/mobile acceptance before marking it shipped.',
   },
   {
     id: 'fascial-layer',
