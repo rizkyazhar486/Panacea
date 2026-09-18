@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom'
 import { HalamanTab, type TabDef } from '../components/HalamanTab'
 import { NADA, type Angka } from '../components/PanelAngka'
 import { MetalStatPanel } from '../components/MetalStatPanel'
-import { FightHero } from '../components/FightHero'
+import { PerformanceVisualizationDeck } from '../components/dashboard/PerformanceVisualizationDeck'
 import { KartuAngkaKlinis } from '../components/AngkaKlinis'
 import { RaporRamalanKesegaran } from '../components/RaporRamalan'
 import { auditKebugaran, auditKelelahan, auditKesegaran, bacaanJujur, type BahanAudit } from '../lib/auditKebugaran'
@@ -51,7 +51,7 @@ const TABS: TabDef[] = [
   { id: 'organizer', label: 'Organizer', emoji: '🗂️', komponen: OrganizerLatihan,
     ringkas: 'Weekly calendar for push, pull, legs and abs, scheduled around the runs already recorded' },
   { id: 'asupan-pelatih', label: 'Coach intake', emoji: '📝', komponen: PelatihAsupan,
-    ringkas: 'Collects age, height, weight, goal, equipment, injuries and restrictions first, and refuses to print a plan until they are answered' },
+    ringkas: 'Profile · goals · equipment · injuries · restrictions before planning.' },
   { id: 'progres', label: 'Progress', emoji: '📈', komponen: PelatihProgres,
     ringkas: 'Week against week on weight, waist, strength, energy, sleep, sessions and protein — charted, with changes too small to call named as such' },
   { id: 'gps', label: 'GPS', emoji: '📍', komponen: GpsTracker,
@@ -218,26 +218,41 @@ export function PusatLatihan() {
       theme="metal"
       ringkasan={
         <div className="space-y-3">
-          <FightHero tag="Human Performance" title="Training Lab" motto="Measure. Interpret. Adapt." />
+          <PerformanceVisualizationDeck mode="home" />
           <MetalStatPanel angka={angka} />
           {snapshot.workouts.length > 0 && !snapshot.k && snapshot.missing.length > 0 && (
             <p className="rounded-2xl border border-amber-400/25 bg-amber-500/10 p-3 text-[12px] leading-relaxed text-amber-800 dark:text-amber-200">
               Training-load model paused rather than inventing profile values. Add {snapshot.missing.join(', ')}; your recorded sessions remain available below.
             </p>
           )}
-          <div className="grid gap-2 sm:grid-cols-3">
-            <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-3">
-              <div className="text-[10px] font-black uppercase tracking-[0.16em] text-neutral-500">1 · Decision</div>
-              <p className="mt-1 text-xs leading-relaxed text-neutral-500">What session makes sense today?</p>
+          <div className="relative overflow-hidden rounded-[20px] border border-white/[.08] bg-black/[.18] p-2.5" aria-label="Training reasoning flow">
+            <div className="grid grid-cols-3 gap-1.5">
+              {[
+                ['01', 'Decision'],
+                ['02', 'Evidence'],
+                ['03', 'Mechanism'],
+              ].map(([step, label], index) => (
+                <div key={label} className="relative min-w-0 overflow-hidden rounded-[15px] border border-white/[.07] bg-white/[.025] px-2.5 py-2">
+                  <div className="text-[8px] font-black tabular-nums text-orange-300/60">{step}</div>
+                  <div className="mt-0.5 truncate text-[10px] font-black text-white/80">{label}</div>
+                  <div className="mt-2 flex h-3 items-end gap-[2px]" aria-hidden="true">
+                    {Array.from({ length: 7 }).map((_, bar) => (
+                      <i
+                        key={bar}
+                        className="w-[2px] rounded-full bg-orange-300/55"
+                        style={{ height: `${4 + ((bar + index) % 5) * 2}px` }}
+                      />
+                    ))}
+                  </div>
+                </div>
+              ))}
             </div>
-            <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-3">
-              <div className="text-[10px] font-black uppercase tracking-[0.16em] text-neutral-500">2 · Evidence</div>
-              <p className="mt-1 text-xs leading-relaxed text-neutral-500">What was measured, estimated, or inferred?</p>
-            </div>
-            <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-3">
-              <div className="text-[10px] font-black uppercase tracking-[0.16em] text-neutral-500">3 · Mechanism</div>
-              <p className="mt-1 text-xs leading-relaxed text-neutral-500">Which physiological system explains the result?</p>
-            </div>
+            <details className="absolute right-2.5 top-2.5">
+              <summary className="grid h-7 w-7 cursor-pointer list-none place-items-center rounded-full border border-white/10 bg-black/45 text-[9px] font-black text-white/50" aria-label="Explain training reasoning flow">i</summary>
+              <div className="absolute right-0 top-9 z-20 w-[min(300px,78vw)] rounded-2xl border border-white/10 bg-[#080a0d] p-3 text-[10px] leading-relaxed text-white/60 shadow-2xl">
+                Decide what to do, show what data supports it, then expose the physiology behind the recommendation.
+              </div>
+            </details>
           </div>
         </div>
       }
