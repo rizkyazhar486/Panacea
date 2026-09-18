@@ -20,7 +20,9 @@ test('Home capability surface is search-first and not a gradient card mosaic', a
   assert.doesNotMatch(deck, /featureSurface\(|bg-gradient-to-/)
   assert.doesNotMatch(deck, /shadow-\[0_14px_42px/)
   assert.match(deck, /data-panacea-command-surface/)
-  assert.match(deck, /data-panacea-direct-launch/)
+  assert.match(deck, /Search Panacea capabilities/)
+  assert.match(deck, /All \$\{uniqueFeatures\.length\} capabilities/)
+  assert.doesNotMatch(deck, /data-panacea-direct-launch|panacea-command-domains/)
 })
 
 test('Assistive Touch opens as an orb-anchored spatial control rather than a generic panel', async () => {
