@@ -1,4 +1,4 @@
-import { useMemo, useState, type ComponentType } from 'react'
+import { useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { FITUR_DARI_HUB } from '../lib/katalogFitur'
 import { bentoSpan } from '../lib/interaction/bento'
@@ -7,28 +7,9 @@ import { NAV_UNTUK_PENGATURAN } from './Shell'
 import { useStore } from '../lib/store'
 import { getUsageCounts } from '../lib/usage'
 import { pintasanTerpakai } from '../lib/pintasanTerpakai'
-import { IconBook, IconChat, IconHeart, IconRun, IconStethoscope, IconUsers } from './icons'
 import '../styles/home-human-interface.css'
 
-type ActionIcon = ComponentType<{ size?: number; className?: string }>
 type Domain = 'Your Body' | 'Clinical' | 'For You'
-
-type Launch = {
-  label: string
-  to: string
-  icon: ActionIcon
-}
-
-const DIRECT_LAUNCHES: Launch[] = [
-  { label: 'Your Body', to: '/tubuh', icon: IconHeart },
-  { label: 'Clinical', to: '/clinical-hub', icon: IconStethoscope },
-  { label: 'Training', to: '/fitness-hub?view=training', icon: IconRun },
-  { label: 'Learn', to: '/learn', icon: IconBook },
-  { label: 'People', to: '/?t=social', icon: IconUsers },
-  { label: 'Ask Panacea', to: '/chatbot', icon: IconChat },
-]
-
-const DOMAINS: Array<'All' | Domain> = ['All', 'Your Body', 'Clinical', 'For You']
 
 function textOf(feature: EntriKatalog) {
   return `${feature.label} ${feature.apa} ${feature.kw} ${feature.group}`
@@ -45,22 +26,15 @@ export function HomeCommandDeck() {
   const { account } = useStore()
   const peran = account?.role ?? 'pasien'
   const [query, setQuery] = useState('')
-  const [domain, setDomain] = useState<'All' | Domain>('All')
   const [expanded, setExpanded] = useState(false)
   const [openGroup, setOpenGroup] = useState<string | null>(null)
 
-  // Indeks Beranda menarik dari KEDUA daftar, sama seperti halaman All
-  // Features. Sebelumnya ia hanya membaca FITUR_DARI_HUB, sehingga 56 tujuan
-  // yang hanya terdaftar di menu samping — Kartu Darurat, Pengaturan, Apotek,
-  // Pengingat Obat, Rumah Sakit, dan seterusnya — tidak pernah muncul di
-  // Beranda sama sekali. Selama itu terjadi, menghapus menu samping berarti
-  // membuang satu-satunya jalan menuju mereka.
+  // Home still owns one complete, role-aware capability index. Simplifying the
+  // visible surface must never make a destination unreachable.
   const uniqueFeatures = useMemo(() => {
     const gabungan = saringPeran(gabungKatalog(FITUR_DARI_HUB, NAV_UNTUK_PENGATURAN), peran)
     const seen = new Set<string>()
     return gabungan.filter((feature) => {
-      // Beranda sendiri dan halaman daftar-fitur tidak dimasukkan ke dalam
-      // daftar fitur: keduanya adalah tempat daftar ini berada.
       if (feature.to === '/' || feature.to === '/semua-fitur') return false
       const key = canonical(feature.to)
       if (seen.has(key)) return false
@@ -69,28 +43,21 @@ export function HomeCommandDeck() {
     })
   }, [peran])
 
+  // Search is the primary retrieval path once the catalogue is larger than a
+  // person can scan. Browsing stays available on demand, but it no longer
+  // competes with a second set of top-level navigation controls.
   const filtered = useMemo(() => {
     const needle = query.trim().toLowerCase()
-    return uniqueFeatures.filter((feature) => {
-      if (domain !== 'All' && domainOf(feature) !== domain) return false
-      return !needle || textOf(feature).toLowerCase().includes(needle)
-    })
-  }, [domain, query, uniqueFeatures])
+    return uniqueFeatures.filter((feature) => !needle || textOf(feature).toLowerCase().includes(needle))
+  }, [query, uniqueFeatures])
 
   const searching = query.trim().length > 0
 
-  // Pintasan menuju yang benar-benar sering dibuka orang ini. Dibaca sekali
-  // saat dipasang: hitungannya berubah ketika ia BERPINDAH halaman, dan
-  // membacanya ulang setiap render hanya menambah kerja tanpa menambah
-  // kebenaran. Kosong pada pemakaian pertama, dan memang harus begitu.
   const pintasan = useMemo(
     () => pintasanTerpakai(uniqueFeatures, getUsageCounts(), canonical),
     [uniqueFeatures],
   )
 
-  // Bento dikelompokkan menurut `grup` yang sudah dibawa katalognya sendiri.
-  // Kelompok dipakai apa adanya — menerjemahkan atau menyusun ulang namanya di
-  // sini akan memisahkannya dari katalog dan membuat hitungannya berbohong.
   const groups = useMemo(() => {
     const bucket = new Map<string, EntriKatalog[]>()
     for (const feature of filtered) {
@@ -103,17 +70,13 @@ export function HomeCommandDeck() {
       .map(([name, items]) => ({ name, items }))
       .sort((a, b) => b.items.length - a.items.length)
 
-    // Pintasan berdiri di depan, dan hanya ketika ada isinya. Ia TIDAK
-    // menggantikan kelompok mana pun: setiap kapabilitas tetap ada di
-    // kelompok aslinya di bawah, jadi memindahkan pintasan tidak pernah
-    // membuat sesuatu menghilang dari indeks.
     if (!searching && pintasan.length > 0) {
       return [{ name: 'Most used', items: pintasan }, ...menurutUkuran]
     }
     return menurutUkuran
   }, [filtered, pintasan, searching])
 
-  const showIndex = expanded || searching || domain !== 'All'
+  const showIndex = expanded || searching
 
   return (
     <section data-panacea-command-surface className="panacea-command-surface" aria-label="Panacea capabilities">
@@ -129,39 +92,8 @@ export function HomeCommandDeck() {
             placeholder="Search Panacea"
             autoComplete="off"
           />
-          <span className="panacea-command-search-icon" aria-hidden><IconChat size={17} /></span>
         </label>
       </div>
-
-      <div className="panacea-command-domains" aria-label="Capability domains">
-        {DOMAINS.map((item) => (
-          <button
-            key={item}
-            type="button"
-            className="panacea-command-domain"
-            data-active={domain === item}
-            aria-pressed={domain === item}
-            onClick={() => {
-              setDomain(item)
-              if (item !== 'All') setExpanded(true)
-            }}
-          >
-            {item}
-          </button>
-        ))}
-      </div>
-
-      <nav data-panacea-direct-launch className="panacea-direct-launch" aria-label="Direct launch">
-        {DIRECT_LAUNCHES.map(({ label, to, icon: Icon }) => (
-          <Link key={label} to={to} className="panacea-direct-launch-item">
-            <span className="panacea-direct-launch-icon" aria-hidden><Icon size={20} /></span>
-            <span className="panacea-direct-launch-label">
-              <span>{label}</span>
-              <span aria-hidden>↗</span>
-            </span>
-          </Link>
-        ))}
-      </nav>
 
       <button
         type="button"
@@ -173,7 +105,7 @@ export function HomeCommandDeck() {
       </button>
 
       {showIndex ? (
-        <div className="panacea-bento" aria-label="Capability index">
+        <div className="panacea-bento" aria-label="Capability index" aria-live={searching ? 'polite' : 'off'}>
           {groups.map((group) => {
             const open = openGroup === group.name || searching
             const span = bentoSpan(group.items.length, filtered.length)
@@ -195,11 +127,6 @@ export function HomeCommandDeck() {
                   <span className="panacea-bento-count" aria-hidden>{group.items.length}</span>
                 </button>
 
-                {/* Seluruh isi kelompok dirender saat dibuka — tidak ada
-                    pemotongan diam-diam. Daftar sebelumnya berhenti di 40 dari
-                    135 kapabilitas tanpa memberi tahu siapa pun bahwa 95
-                    sisanya ada, jadi menjelajah tidak akan pernah menemukannya
-                    dan hanya pencarian yang bisa. */}
                 {open ? (
                   <ul className="panacea-bento-items" role="list">
                     {group.items.map((feature) => (
