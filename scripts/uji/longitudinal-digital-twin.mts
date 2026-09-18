@@ -127,6 +127,15 @@ state = ingestLongitudinalBatch(state, [
     },
   }),
   event({
+    id: 'future-rhr',
+    metric: 'resting-heart-rate',
+    domain: 'vital',
+    value: 56,
+    unit: 'bpm',
+    recordedAt: '2026-09-10T06:00:00.000Z',
+    sourceKind: 'wearable',
+  }),
+  event({
     id: 'lab-ldl',
     metric: 'ldl-c',
     domain: 'lab',
@@ -212,7 +221,7 @@ const revokedBody = buildLongitudinalTwinSnapshot({
   surface: 'your-body',
 })
 assert.equal(revokedBody.signals.length, 0, 'purpose revoke must remove formerly consented personal signals')
-assert.ok(revokedBody.governance.purposeConsentFilteredEvents > 0)
+assert.equal(revokedBody.governance.purposeConsentFilteredEvents, 5, 'future events beyond the replay cutoff must not inflate ledger-filter accounting')
 
 const clinicalAfterPersonalRevoke = buildLongitudinalTwinSnapshot({
   state,
