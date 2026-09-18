@@ -67,17 +67,20 @@ assert.match(glass, /prefers-reduced-transparency: reduce/,
 assert.match(glass, /@supports not \(\(-webkit-backdrop-filter:/,
   'glass layer has no solid fallback for unsupported browsers')
 
-// Exactly one navigation system on Home: hide the global draggable menu there,
-// but nowhere else.
-assert.match(glass, /body:has\(\.panacea-liquid-home\) button\[aria-label="Buka menu navigasi"\]/,
-  'duplicate global navigation is visible on Home again')
+// Exactly one navigation system: the old mobile accordion drawer and floating
+// navigation must not return. Long-tail discovery belongs to global search.
+assert.doesNotMatch(shell, /DrawerNav|setMenuOpen|menuOpen|FabNavigasi/,
+  'old drawer or floating navigation returned')
+assert.doesNotMatch(shell, /aria-label="Open menu"/,
+  'hamburger navigation returned instead of the reveal-on-scroll top bar')
+assert.match(shell, /panacea-command-primary-links no-scrollbar flex/,
+  'mobile primary destinations are no longer inside the top command bar')
+assert.match(shell, /aria-label="Emergency"/,
+  'removing the drawer must not bury emergency access')
+assert.match(shell, /aria-label="Profile"/,
+  'removing the drawer must not bury profile access')
 
 assert.doesNotMatch(shell, /className="orb absolute/,
   'global Shell reintroduced decorative gradient orbs that carry no state or information')
 
-assert.doesNotMatch(shell, /aria-label="Log Out"/,
-  'global header duplicates logout even though the mobile drawer already owns that secondary action')
-assert.match(shell, /onClick=\{doLogout\}[\s\S]{0,240}?Log Out/,
-  'removing duplicate header logout must not remove logout from the drawer')
-
-console.log('home-zero-one-liquid-contract: zero-step health context, one-tap primary/actions/recents, one navigation system, Liquid Glass confined to controls, and no duplicate header logout.')
+console.log('home-zero-one-liquid-contract: zero-step health context, top-only reveal navigation, no drawer/FAB/bottom dock, contextual Liquid Glass, and direct emergency/profile access.')
