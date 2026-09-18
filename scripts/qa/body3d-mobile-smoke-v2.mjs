@@ -142,6 +142,14 @@ try {
   const response = await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 45_000 })
   if (response && !response.ok()) throw new Error(`Body Explorer returned HTTP ${response.status()}`)
 
+  // index.html paints a full-screen #pmd-splash (position:fixed, inset:0,
+  // z-index:9999) before React mounts. main.tsx removes it on its own timer —
+  // a 500ms floor plus a 350ms fade — independently of how fast Body3D itself
+  // loads. On a fast run the canvas can finish loading before that timer
+  // fires, so the obstruction check below would catch the splash mid-fade
+  // instead of a real regression. Wait for it to leave the DOM first.
+  await page.waitForSelector('#pmd-splash', { state: 'detached', timeout: 10_000 }).catch(() => {})
+
   const reminderText = page.getByText(/TODAY.?S REMINDER/i).first()
   if (await reminderText.isVisible().catch(() => false)) {
     const reminder = reminderText.locator('xpath=ancestor::*[.//button][1]')
