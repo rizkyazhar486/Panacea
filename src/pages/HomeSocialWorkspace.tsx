@@ -1,6 +1,7 @@
 import { lazy, Suspense, type ComponentType } from 'react'
 import { Link, useSearchParams } from 'react-router-dom'
 import { HomeCommandDeck } from '../components/HomeCommandDeck'
+import { HomeBentoWidgetBoard } from '../components/HomeBentoWidgetBoard'
 import { HomeHealthBrief } from '../components/HomeHealthBrief'
 import { HomeVisualLanding } from '../components/HomeVisualLanding'
 import { RelWidgetRumah } from '../components/RelWidgetRumah'
@@ -72,8 +73,12 @@ export function HomeSocialWorkspace() {
         <div className="panacea-human-home">
           <HomeHealthBrief />
           <HomeVisualLanding />
-          <RelWidgetRumah />
+          <HomeBentoWidgetBoard />
           <HomeCommandDeck />
+          <details className="panacea-legacy-widget-disclosure">
+            <summary>More widgets</summary>
+            <RelWidgetRumah />
+          </details>
         </div>
       ) : activeKey === 'for-you' ? (
         <Suspense fallback={<Loader />}><ForYouHub /></Suspense>
