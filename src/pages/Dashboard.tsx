@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { Link } from 'react-router-dom'
 import { useStore, uid } from '../lib/store'
 import { Card, SectionTitle, Badge, Button, Field, inputClass } from '../components/ui'
 import { IconHeart, IconShield, IconPlus, IconSparkle } from '../components/icons'
@@ -502,6 +503,13 @@ export function Dashboard() {
         <button onClick={() => setShowAdd((s) => !s)} className="flex shrink-0 items-center gap-1.5 rounded-full px-4 py-2 text-[11px] font-bold text-ink transition-all duration-200 hover:shadow-lg active:scale-[0.97]" style={{ background: 'linear-gradient(135deg, #00BF63, #00A857)', boxShadow: '0 4px 16px rgba(0,191,99,0.3)' }}>
           <IconHeart size={13} /> Record Vitals
         </button>
+        <Link
+          to="/clinical-hub"
+          title="Open visual clinical workspace"
+          className="flex shrink-0 items-center gap-1.5 rounded-full border border-neutral-200 px-4 py-2 text-[11px] font-bold text-neutral-700 transition active:scale-[0.97] dark:border-white/15 dark:text-white/85"
+        >
+          Visual Clinical →
+        </Link>
         {vitals.length > 0 && <span className="shrink-0 px-2 text-[10px] font-bold uppercase tracking-[0.2em] text-neutral-300">{vitals.length} entries</span>}
       </div>
 
