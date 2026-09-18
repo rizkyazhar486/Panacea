@@ -12,6 +12,7 @@ const systems = read('src/components/BodyAllSystems3D.tsx')
 const portal = read('src/components/BodyExposurePortal.tsx')
 const navigator = read('src/components/BodyExposureActivityNavigator.tsx')
 const activities = read('src/lib/bodyExposureActivities.ts')
+const capabilityRail = read('src/components/SuperPageCapabilityRail.tsx')
 
 assert.ok(
   !unifiedBody.includes('PersonalBodyAvatar3D'),
@@ -64,6 +65,16 @@ assert.match(
   navigator,
   /max-h-64/,
   'Expanded activities must stay bounded so the page remains compact',
+)
+assert.match(
+  capabilityRail,
+  /const previewLimit = Math\.min\(initialLimit, 6\)/,
+  'Super-page capability catalogues must keep the default viewport compact',
+)
+assert.match(
+  capabilityRail,
+  /\{expanded && \(/,
+  'Search and filter chrome must use progressive disclosure instead of occupying every default page view',
 )
 
 const activityCount = (activities.match(/\{ key: '/g) || []).length
