@@ -10,6 +10,10 @@ const glass = readFileSync('src/styles/home-liquid-control-layer.css', 'utf8')
 // Zero-step: Home itself shows health context. One-step: primary destinations
 // and universal actions are directly exposed without an intermediate menu.
 assert.match(workspace, /<HomeHealthBrief \/>/, 'Home stopped exposing health context at zero steps')
+const healthIndex = workspace.indexOf('<HomeHealthBrief />')
+const heroIndex = workspace.indexOf('<HomeVisualLanding />')
+assert.ok(healthIndex >= 0 && heroIndex >= 0 && healthIndex < heroIndex,
+  'Home puts the promotional hero before the user\'s health state; useful content must win the first viewport')
 assert.match(workspace, /data-panacea-primary-nav/, 'Home lost its single persistent primary navigation layer')
 for (const label of ['Home', 'Your Body', 'Clinical', 'For You']) {
   assert.match(workspace, new RegExp(`<span>${label}<\\/span>`), `primary navigation lost ${label}`)
