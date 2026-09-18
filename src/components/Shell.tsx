@@ -570,6 +570,37 @@ export function Shell({ children }: { children: ReactNode }) {
             )}
             <h1 className="truncate text-base font-bold sm:text-lg">{title?.label ?? 'Panaceamed.id'}</h1>
           </div>
+
+          {['pasien', 'dokter', 'owner'].includes(account.role) && (
+            <nav className="panacea-command-primary-links hidden min-w-0 items-center gap-1 lg:flex" aria-label="Primary">
+              <NavLink
+                to="/"
+                end
+                className={`panacea-command-primary-link${loc.pathname === '/' && !loc.search.includes('t=for-you') ? ' is-active' : ''}`}
+              >
+                Home
+              </NavLink>
+              <NavLink
+                to="/fitness-hub"
+                className={`panacea-command-primary-link${loc.pathname.startsWith('/fitness-hub') ? ' is-active' : ''}`}
+              >
+                Your Body
+              </NavLink>
+              <NavLink
+                to="/clinical-hub"
+                className={`panacea-command-primary-link${loc.pathname.startsWith('/clinical-hub') ? ' is-active' : ''}`}
+              >
+                Clinical
+              </NavLink>
+              <NavLink
+                to="/?t=for-you"
+                className={`panacea-command-primary-link${loc.pathname === '/' && loc.search.includes('t=for-you') ? ' is-active' : ''}`}
+              >
+                For You
+              </NavLink>
+            </nav>
+          )}
+
           {/* Pencarian: fitur sudah lewat 200, dan menu menuntut menebak grupnya
               dulu. Ditaruh di header supaya tersedia dari halaman mana pun. */}
           <button
