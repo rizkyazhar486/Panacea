@@ -7,7 +7,7 @@ import './bodyExposureOS.css'
 
 const UnifiedHumanSimulationProjector = lazy(() => import('./bodyhub/UnifiedHumanSimulationProjector'))
 
-type ExposureMode = 'atlas' | 'localization' | 'physiology' | 'imaging' | 'endoscopy' | 'surgery' | 'molecular' | 'clinical'
+type ExposureMode = 'identity' | 'atlas' | 'localization' | 'physiology' | 'imaging' | 'endoscopy' | 'surgery' | 'molecular' | 'clinical'
 
 type Mode = {
   key: ExposureMode
@@ -17,6 +17,7 @@ type Mode = {
 }
 
 const MODES: Mode[] = [
+  { key: 'identity', label: 'My Body', projectorDomain: 'personal-avatar', description: 'Scan or review your personal outer-body identity while the source-backed anatomy remains visible in the same projector.' },
   { key: 'atlas', label: 'Atlas', projectorDomain: 'anatomy', description: 'Whole-body layers, exact source structures and surface-to-depth exploration.' },
   { key: 'localization', label: 'Localize', projectorDomain: 'localization', description: 'Relate neurological findings to tract crossings, cranial nerve level and lesion side.' },
   { key: 'physiology', label: 'Physiology', projectorDomain: 'physiology', description: 'Connect anatomy to organ function, motion and reference physiology.' },
@@ -33,7 +34,7 @@ const BODY_EXPOSURE_ROOT_CLASS = 'pmd-body-exposure-active'
 export function BodyExposureOS() {
   const rootRef = useRef<HTMLElement | null>(null)
   const systemsRef = useRef<HTMLDivElement | null>(null)
-  const [activeMode, setActiveMode] = useState<ExposureMode>('atlas')
+  const [activeMode, setActiveMode] = useState<ExposureMode>('identity')
   const [immersive, setImmersive] = useState(false)
   const [selectedBodySystemId, setSelectedBodySystemId] = useState<BodySystemId>('cardiovascular')
 
@@ -77,7 +78,8 @@ export function BodyExposureOS() {
 
   function syncModeFromProjector(domain: SimulationDomain) {
     const next: ExposureMode =
-      domain === 'localization' ? 'localization'
+      domain === 'personal-avatar' ? 'identity'
+      : domain === 'localization' ? 'localization'
       : domain === 'physiology' || domain === 'biomechanics' ? 'physiology'
       : domain === 'imaging' ? 'imaging'
       : domain === 'endoscopy' ? 'endoscopy'
@@ -121,10 +123,10 @@ export function BodyExposureOS() {
           <div className="min-w-0">
             <div className="text-[9px] font-black uppercase tracking-[.22em] text-cyan-200/75">Body Exposure</div>
             <h2 id="body-exposure-os-title" className="mt-1 text-xl font-black tracking-[-.035em] text-white sm:text-2xl">
-              One body. Every scale.
+              Your body. Every scale.
             </h2>
             <p className="mt-1 truncate text-[10px] font-bold text-white/42 sm:text-[11px]">
-              Atlas → function → imaging → scope → surgery → micro
+              You → anatomy → function → imaging → micro
             </p>
           </div>
 
@@ -160,7 +162,7 @@ export function BodyExposureOS() {
                 onClick={() => openPanel(mode)}
                 className={`min-h-[42px] rounded-[16px] border px-4 text-xs font-black transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-300/60 ${
                   active
-                    ? 'border-cyan-300/25 bg-[linear-gradient(135deg,rgba(34,211,238,.16),rgba(139,92,246,.11),rgba(236,72,153,.08))] text-white shadow-[inset_0_1px_0_rgba(255,255,255,.12),0_10px_30px_rgba(34,211,238,.06)]'
+                    ? 'border-white bg-white text-black shadow-sm'
                     : 'border-transparent bg-transparent text-white/45 hover:border-white/[.08] hover:bg-white/[.04] hover:text-white/80'
                 }`}
               >
