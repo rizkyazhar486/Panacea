@@ -2,7 +2,7 @@ import { useMemo, useState } from 'react'
 import { Card, SectionTitle, inputClass, Button, Badge } from '../components/ui'
 import { IconPill, IconShield } from '../components/icons'
 import { api, backendEnabled } from '../lib/api'
-import { ATC, cariObat, jumlahObat, jumlahEml, dosisSkdi, type Obat } from '../lib/obatKatalog'
+import { ATC, cariObat, jumlahObat, jumlahEml, jumlahDenganDosisSkdi, dosisSkdi, type Obat } from '../lib/obatKatalog'
 import { HERBAL, cariHerbal, jumlahHerbal, BUKTI_LABEL, BPOM_LABEL, type Herbal } from '../lib/herbal'
 import { semuaButir, periksa, dariNama, type Butir } from '../lib/interaksi'
 
@@ -54,10 +54,12 @@ export function DrugInfo() {
 
   const total = useMemo(() => jumlahObat(), [])
   const eml = useMemo(() => jumlahEml(), [])
+  const doseCoverage = useMemo(() => jumlahDenganDosisSkdi(), [])
   const hasil = useMemo(() => cariObat(q), [q])
   const hasilHerbal = useMemo(() => cariHerbal(q), [q])
   const totalHerbal = useMemo(() => jumlahHerbal(), [])
   const dosis = useMemo(() => (pilih ? dosisSkdi(pilih.nama) : []), [pilih])
+  const officialDose = useMemo(() => (pilih && drug?.dosage ? drug.dosage.trim() : ''), [drug, pilih])
   const butir = useMemo(() => semuaButir(), [])
   const saran = useMemo(() => {
     const t = cariButir.toLowerCase().trim()
@@ -166,6 +168,7 @@ export function DrugInfo() {
             <>
               <Badge tone="brand">{total} substances</Badge>
               <Badge tone="low">{eml} on the WHO essential list</Badge>
+              <Badge tone="neutral">{doseCoverage}/{total} offline dose bridges · official labels fill online gaps</Badge>
             </>
           ) : (
             <Badge tone="brand">{totalHerbal} preparations</Badge>
@@ -239,11 +242,12 @@ export function DrugInfo() {
               <p className="mt-0.5 text-[12px] leading-relaxed text-ink dark:text-neutral-200">{pilih.catatan}</p>
             </div>
           )}
-          {/* Ketiadaan dosis DINYATAKAN, bukan dibiarkan tampak seperti kelalaian. */}
-          {dosis.length > 0 ? (
+          {/* Doses are shown only when a named source exists. Offline SKDI and
+              online official-label text stay visually distinct instead of being merged. */}
+          {dosis.length > 0 && (
             <div className="mt-2 rounded-xl bg-brand/10 p-2.5">
               <div className="text-[10px] font-black uppercase tracking-wide text-brand-dark">
-                Dose · from this app's SKDI therapy reference
+                Dose · curated SKDI therapy reference
               </div>
               {dosis.map((d, i) => (
                 <div key={i} className="mt-1.5">
@@ -253,18 +257,24 @@ export function DrugInfo() {
                   <p className="mt-0.5 text-[12px] leading-relaxed text-ink dark:text-neutral-200">{d.dosis}</p>
                 </div>
               ))}
-              {/* Dosis ini milik GOLONGANNYA, dan sering menyebut lebih dari
-                  satu zat di dalamnya. Menyebutnya "dosis obat ini" akan
-                  keliru pada golongan yang anggotanya beberapa. */}
               <p className="mt-1.5 text-[10px] leading-snug text-neutral-500">
-                These are the doses recorded for the drug group, which may name more than one substance. Written for
-                Indonesian practice; check against the label for the product in your hand.
+                These are doses recorded for the named drug group and may mention more than one substance. Check the
+                exact product label before prescribing or administering.
               </p>
             </div>
-          ) : (
+          )}
+          {officialDose && (
+            <div className="mt-2 rounded-xl border border-sky-500/15 bg-sky-500/[.07] p-2.5">
+              <div className="text-[10px] font-black uppercase tracking-wide text-sky-700 dark:text-sky-200">
+                Official label dose · openFDA
+              </div>
+              <p className="mt-1 whitespace-pre-line text-[12px] leading-relaxed text-ink dark:text-neutral-200">{officialDose}</p>
+            </div>
+          )}
+          {dosis.length === 0 && !officialDose && (
             <p className="mt-2 text-[10.5px] leading-relaxed text-neutral-500">
-              No dose is given here on purpose. Doses in this app come from a source that can be named — the official
-              label below, or the curated SKDI therapy reference — never from memory.
+              No verified dose is available yet in the offline SKDI bridge or the current official-label response.
+              Panacea leaves this blank rather than inventing a regimen.
             </p>
           )}
           <button onClick={() => { setPilih(null) }} className="mt-2 min-h-[36px] text-[11px] font-bold text-brand">
