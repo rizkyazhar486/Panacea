@@ -447,7 +447,7 @@ export function Shell({ children }: { children: ReactNode }) {
         <header
           ref={bilahAtas}
           data-panacea-command-bar={keadaanBilah}
-          className="kaca panacea-command-bar sticky top-0 z-10 flex flex-wrap items-center justify-between gap-2 rounded-none border-x-0 border-t-0 px-4 py-3 sm:px-5"
+          className="panacea-command-bar sticky top-0 z-10 flex items-center justify-between gap-2 px-3 py-2 sm:px-5"
         >
           <div className="flex min-w-0 items-center gap-2">
             {/* Tombol kembali: gestur geser saja tidak cukup — ia tidak ada di
@@ -455,7 +455,7 @@ export function Shell({ children }: { children: ReactNode }) {
             {bisaKembali && (
               <button
                 onClick={kembali}
-                className="header-icon-btn grid h-10 w-10 shrink-0 place-items-center rounded-full text-ink"
+                className="header-icon-btn grid h-9 w-9 shrink-0 place-items-center rounded-full text-ink"
                 aria-label="Go back"
                 title="Back"
               >
@@ -464,25 +464,23 @@ export function Shell({ children }: { children: ReactNode }) {
                 </svg>
               </button>
             )}
-            <h1 className="truncate text-base font-bold sm:text-lg">{title?.label ?? 'Panaceamed.id'}</h1>
+            <h1 className="panacea-command-title truncate">{title?.label ?? 'Panaceamed.id'}</h1>
           </div>
 
-          {/* Pencarian: fitur sudah lewat 200, dan menu menuntut menebak grupnya
-              dulu. Ditaruh di header supaya tersedia dari halaman mana pun. */}
-          <button
-            onClick={() => setCariBuka(true)}
-            className="header-icon-btn grid h-10 w-10 shrink-0 place-items-center rounded-full text-ink"
-            aria-label="Search features, people, or hashtags"
-          >
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round">
-              <circle cx="11" cy="11" r="7" /><line x1="16.5" y1="16.5" x2="21" y2="21" />
-            </svg>
-          </button>
-
-          <div className="no-scrollbar flex min-w-0 shrink items-center gap-1 overflow-x-auto sm:gap-2">
+          <div className="panacea-command-utilities flex min-w-0 shrink items-center gap-1">
+            <button
+              onClick={() => setCariBuka(true)}
+              className="header-icon-btn grid h-9 w-9 shrink-0 place-items-center rounded-full text-ink"
+              aria-label="Search features, people, or hashtags"
+              title="Search"
+            >
+              <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.1" strokeLinecap="round">
+                <circle cx="11" cy="11" r="7" /><line x1="16.5" y1="16.5" x2="21" y2="21" />
+              </svg>
+            </button>
             <NavLink
               to="/emergency"
-              className="header-icon-btn panacea-command-emergency grid h-10 w-10 shrink-0 place-items-center rounded-full"
+              className="header-icon-btn panacea-command-emergency grid h-9 w-9 shrink-0 place-items-center rounded-full"
               aria-label="Emergency"
               title="Emergency"
             >
@@ -490,7 +488,7 @@ export function Shell({ children }: { children: ReactNode }) {
             </NavLink>
             <NavLink
               to="/profile"
-              className="header-icon-btn grid h-10 w-10 shrink-0 place-items-center rounded-full text-ink"
+              className="header-icon-btn grid h-9 w-9 shrink-0 place-items-center rounded-full text-ink"
               aria-label="Profile"
               title="Profile"
             >
@@ -499,16 +497,16 @@ export function Shell({ children }: { children: ReactNode }) {
             <button
               type="button"
               onClick={() => setBantuanBuka(true)}
-              className="header-icon-btn hidden h-10 w-10 shrink-0 place-items-center rounded-full text-ink sm:grid"
+              className="header-icon-btn hidden h-9 w-9 shrink-0 place-items-center rounded-full text-ink md:grid"
               aria-label="Support"
               title="Support"
             >
               <IconPhone size={18} />
             </button>
-            <NotificationBell />
+            <div className="hidden sm:block"><NotificationBell /></div>
             <button
               onClick={() => setTheme(toggleTheme())}
-              className="hidden h-10 w-10 place-items-center rounded-full border border-black/5 bg-white text-neutral-500 transition-colors hover:bg-neutral-50 hover:text-brand-dark focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/30 sm:grid"
+              className="panacea-command-theme hidden h-9 w-9 place-items-center rounded-full text-neutral-500 md:grid"
               title={theme === 'dark' ? 'Light mode' : 'Dark mode'}
               aria-label="Toggle theme"
             >
