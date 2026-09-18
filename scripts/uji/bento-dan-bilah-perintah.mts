@@ -55,7 +55,11 @@ for (const f of FITUR_DARI_HUB) {
 const jumlahTerkelompok = [...perGrup.values()].reduce((a, b) => a + b, 0)
 assert.equal(jumlahTerkelompok, FITUR_DARI_HUB.length,
   `grouping lost capabilities: ${jumlahTerkelompok} grouped vs ${FITUR_DARI_HUB.length} in the catalogue`)
-assert.ok(/feature\.grup \?\? 'Other'/.test(deck),
+// Fallback kelompok kini tinggal di penggabung katalog, bukan di komponen —
+// satu tempat untuk kedua pemakainya. Yang dijaga tetap sama: entri tanpa
+// kelompok harus jatuh ke ember yang TERLIHAT, bukan menghilang.
+const gabung = readFileSync(new URL('../../src/lib/katalogLengkap.ts', import.meta.url), 'utf8')
+assert.ok(/f\.grup \?\? 'Other'/.test(gabung),
   'features without a group are dropped instead of collected into a visible bucket')
 
 // ── 3. Ukuran ubin dibaca dari isi, bukan dari selera ────────────────────

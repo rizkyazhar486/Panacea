@@ -2,10 +2,12 @@ import { useMemo, useState, type ComponentType } from 'react'
 import { Link } from 'react-router-dom'
 import { FITUR_DARI_HUB } from '../lib/katalogFitur'
 import { bentoSpan } from '../lib/interaction/bento'
+import { gabungKatalog, saringPeran, rutaKanonik as canonical, type EntriKatalog } from '../lib/katalogLengkap'
+import { NAV_UNTUK_PENGATURAN } from './Shell'
+import { useStore } from '../lib/store'
 import { IconBook, IconChat, IconHeart, IconRun, IconStethoscope, IconUsers } from './icons'
 import '../styles/home-human-interface.css'
 
-type HubFeature = (typeof FITUR_DARI_HUB)[number]
 type ActionIcon = ComponentType<{ size?: number; className?: string }>
 type Domain = 'Your Body' | 'Clinical' | 'For You'
 
@@ -26,55 +28,44 @@ const DIRECT_LAUNCHES: Launch[] = [
 
 const DOMAINS: Array<'All' | Domain> = ['All', 'Your Body', 'Clinical', 'For You']
 
-function textOf(feature: HubFeature) {
-  return `${feature.nama} ${feature.apa ?? ''} ${feature.kw ?? ''} ${feature.grup ?? ''}`
+function textOf(feature: EntriKatalog) {
+  return `${feature.label} ${feature.apa} ${feature.kw} ${feature.group}`
 }
 
-function domainOf(feature: HubFeature): Domain {
+function domainOf(feature: EntriKatalog): Domain {
   const text = textOf(feature).toLowerCase()
   if (/clinical|score|risk|emergency|drug|hospital|diagnos|medical|emr|osce|radiology|calculator|evidence/.test(text)) return 'Clinical'
   if (/social|community|feed|club|message|story|faith|prayer|adzan|quran|relig|finance|money|market|wallet|account|profile/.test(text)) return 'For You'
   return 'Your Body'
 }
 
-function canonical(to: string) {
-  const redirects: Record<string, string> = {
-    '/feed': '/?t=social',
-    '/community': '/?t=community',
-    '/clubs': '/?t=clubs',
-    '/sports-scores': '/?t=scores',
-    '/scripture': '/?t=religion&faith=scripture',
-    '/hadith': '/?t=religion&faith=hadith',
-    '/prayer-times': '/?t=religion&faith=prayer',
-    '/prophet-stories': '/?t=religion&faith=stories',
-    '/body-explorer': '/learn?t=body',
-    '/radiology': '/learn?t=radiology',
-    '/med-study': '/learn?t=library',
-    '/clinical-calculators': '/learn?t=calculators',
-    '/latihan': '/fitness-hub?view=training',
-    '/workout': '/fitness-hub?view=workout&t=sesi',
-    '/recovery': '/fitness-hub?view=recovery',
-    '/nutrition': '/fitness-hub?view=nutrition',
-    '/health-data': '/fitness-hub?view=health-data',
-  }
-  return redirects[to] ?? to
-}
-
 export function HomeCommandDeck() {
+  const { account } = useStore()
+  const peran = account?.role ?? 'pasien'
   const [query, setQuery] = useState('')
   const [domain, setDomain] = useState<'All' | Domain>('All')
   const [expanded, setExpanded] = useState(false)
   const [openGroup, setOpenGroup] = useState<string | null>(null)
 
+  // Indeks Beranda menarik dari KEDUA daftar, sama seperti halaman All
+  // Features. Sebelumnya ia hanya membaca FITUR_DARI_HUB, sehingga 56 tujuan
+  // yang hanya terdaftar di menu samping — Kartu Darurat, Pengaturan, Apotek,
+  // Pengingat Obat, Rumah Sakit, dan seterusnya — tidak pernah muncul di
+  // Beranda sama sekali. Selama itu terjadi, menghapus menu samping berarti
+  // membuang satu-satunya jalan menuju mereka.
   const uniqueFeatures = useMemo(() => {
+    const gabungan = saringPeran(gabungKatalog(FITUR_DARI_HUB, NAV_UNTUK_PENGATURAN), peran)
     const seen = new Set<string>()
-    return FITUR_DARI_HUB.filter((feature) => {
+    return gabungan.filter((feature) => {
+      // Beranda sendiri dan halaman daftar-fitur tidak dimasukkan ke dalam
+      // daftar fitur: keduanya adalah tempat daftar ini berada.
+      if (feature.to === '/' || feature.to === '/semua-fitur') return false
       const key = canonical(feature.to)
       if (seen.has(key)) return false
       seen.add(key)
       return true
     })
-  }, [])
+  }, [peran])
 
   const filtered = useMemo(() => {
     const needle = query.trim().toLowerCase()
@@ -88,9 +79,9 @@ export function HomeCommandDeck() {
   // Kelompok dipakai apa adanya — menerjemahkan atau menyusun ulang namanya di
   // sini akan memisahkannya dari katalog dan membuat hitungannya berbohong.
   const groups = useMemo(() => {
-    const bucket = new Map<string, HubFeature[]>()
+    const bucket = new Map<string, EntriKatalog[]>()
     for (const feature of filtered) {
-      const key = feature.grup ?? 'Other'
+      const key = feature.group
       const list = bucket.get(key)
       if (list) list.push(feature)
       else bucket.set(key, [feature])
@@ -191,10 +182,10 @@ export function HomeCommandDeck() {
                 {open ? (
                   <ul className="panacea-bento-items" role="list">
                     {group.items.map((feature) => (
-                      <li key={`${feature.nama}-${canonical(feature.to)}`}>
+                      <li key={`${feature.label}-${canonical(feature.to)}`}>
                         <Link to={canonical(feature.to)} className="panacea-command-result">
                           <span className="panacea-command-result-main">
-                            <span className="panacea-command-result-title">{feature.nama}</span>
+                            <span className="panacea-command-result-title">{feature.label}</span>
                             <span className="panacea-command-result-meta">{domainOf(feature)}</span>
                           </span>
                           <span className="panacea-command-result-arrow" aria-hidden>→</span>
