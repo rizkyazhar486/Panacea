@@ -29,6 +29,7 @@ const PRIMARY_ACTIONS = [
   { to: '/visit-os', label: 'Visit OS' },
   { to: '/emr', label: 'AI-EMR' },
   { to: '/emergency', label: 'Emergency' },
+  { to: '/care-episode', label: 'Care' },
   { to: '/body-explorer', label: 'Body Explorer' },
 ] as const
 
@@ -116,7 +117,7 @@ export function ClinicalHub() {
             </Link>
           </div>
 
-          <nav className="mt-4 grid grid-cols-2 gap-x-5 sm:grid-cols-4" aria-label="Primary clinical actions">
+          <nav className="mt-4 grid grid-cols-2 gap-x-5 sm:grid-cols-5" aria-label="Primary clinical actions">
             {PRIMARY_ACTIONS.map((item) => (
               <Link
                 key={item.to}
