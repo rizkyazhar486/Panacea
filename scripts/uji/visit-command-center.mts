@@ -17,6 +17,7 @@ for (const token of [
   'useVitals',
   'buildAiEmrVisitContext',
   'ingestVisitDeviceObservation',
+  'promoteObservationToClinicalRecord',
   'updateVisitMedia',
   'Confirm consent',
   'Clinical commitment still occurs through the existing reviewed AI-EMR workflow.',
@@ -31,13 +32,22 @@ assert.ok(command.includes('onMediaStateChange={onMediaStateChange}'))
 assert.ok(command.includes('Realtime backend unavailable'))
 assert.ok(!/signalQuality:\s*0\.[0-9]+/.test(command), 'UI must not fabricate a device signal-quality score')
 
+// The promote action only surfaces observations the kernel itself accepted as
+// quality-known (visitContext.observations already filters null out via the
+// existing signalQuality contract) — the UI must not re-derive its own score,
+// and it must say plainly when nothing is eligible rather than hide the gap.
+assert.ok(command.includes('onPromoteObservation?.(event)'))
+assert.ok(command.includes('observation.signalQuality != null'))
+assert.ok(command.includes('No connected device is currently reporting an adapter-verified signal-quality score'))
+
 assert.ok(chat.includes('ConsultChatMediaState'))
 assert.ok(chat.includes('onMediaStateChange?.({'))
 assert.ok(chat.includes('compact = false'))
 assert.ok(liveHr.includes('lastSampleAt'))
 assert.ok(liveHr.includes('sampleSequence'))
-assert.ok(emr.includes('<VisitCommandCenter recordId={draft.id} embedded />'))
+assert.ok(emr.includes('<VisitCommandCenter recordId={draft.id} embedded onPromoteObservation={promoteVisitObservation} />'))
+assert.ok(emr.includes('promotedObservations: [...(current.promotedObservations ?? []), event]'))
 assert.ok(clinical.includes('/visit-os'))
 assert.ok(main.includes('path="/visit-os"'))
 
-console.log('Visit command center verified: camera state, continuous BLE/synced observations, AI-EMR embedding, route reachability, consent gate, and no fabricated signal-quality score.')
+console.log('Visit command center verified: camera state, continuous BLE/synced observations, AI-EMR embedding, clinician-gated observation promotion, route reachability, consent gate, and no fabricated signal-quality score.')

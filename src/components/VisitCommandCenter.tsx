@@ -13,6 +13,7 @@ import {
   endVisit,
   ingestVisitDeviceObservation,
   pauseVisit,
+  promoteObservationToClinicalRecord,
   registerMedicalDevice,
   resumeVisit,
   setMedicalDeviceConnection,
@@ -21,10 +22,13 @@ import {
   type VisitDeviceMetric,
   type VisitOperatingState,
 } from '../lib/visitOperatingSystem'
+import type { LongitudinalEvent } from '../lib/panaceaLongitudinalState'
 
 interface VisitCommandCenterProps {
   recordId?: string
   embedded?: boolean
+  /** Present only when mounted inside a patient's AI-EMR record. */
+  onPromoteObservation?: (event: LongitudinalEvent<number>) => void
 }
 
 function finite(value: unknown): value is number {
@@ -80,7 +84,7 @@ function tracePath(values: readonly number[]) {
   }).join(' ')
 }
 
-export function VisitCommandCenter({ recordId, embedded = false }: VisitCommandCenterProps) {
+export function VisitCommandCenter({ recordId, embedded = false, onPromoteObservation }: VisitCommandCenterProps) {
   const { state, activePatient, account } = useStore()
   const reduceMotion = useReducedMotion()
   const synced = useVitals()
@@ -357,6 +361,20 @@ export function VisitCommandCenter({ recordId, embedded = false }: VisitCommandC
     setVisit((current) => endVisit(current, new Date().toISOString()))
   }
 
+  const [lastPromoted, setLastPromoted] = useState<{ metric: VisitDeviceMetric; at: string } | null>(null)
+  const promotable = visitContext.observations.filter((observation) => observation.signalQuality != null)
+
+  const promote = useCallback((metric: VisitDeviceMetric) => {
+    try {
+      const event = promoteObservationToClinicalRecord(visit, metric, clinicianId, new Date().toISOString())
+      onPromoteObservation?.(event)
+      setLastPromoted({ metric, at: event.recordedAt })
+    } catch {
+      // No live, adapter-quality-rated reading for this metric right now —
+      // nothing eligible to promote, so the record stays untouched.
+    }
+  }, [clinicianId, onPromoteObservation, visit])
+
   const onMediaStateChange = useCallback((media: ConsultChatMediaState) => {
     setVisit((current) => {
       if (current.phase !== 'live' && current.phase !== 'paused') return current
@@ -434,6 +452,35 @@ export function VisitCommandCenter({ recordId, embedded = false }: VisitCommandC
             <summary className="cursor-pointer font-black text-white/60">Interpret context</summary>
             <p className="mt-2 leading-relaxed">Live and synced device values stay visibly source-bound. The heart render is reference physiology, not patient-specific anatomy. Clinical commitment still occurs through the existing reviewed AI-EMR workflow.</p>
           </details>
+
+          {onPromoteObservation ? (
+            <div className="col-span-full border-t border-white/10 pt-3">
+              <div className="text-[8px] font-black uppercase tracking-[.13em] text-white/30">Promote to AI-EMR</div>
+              {promotable.length ? (
+                <div className="mt-2 flex flex-wrap gap-1.5">
+                  {promotable.map((observation) => (
+                    <button
+                      key={observation.metric}
+                      type="button"
+                      onClick={() => promote(observation.metric)}
+                      className="min-h-8 rounded-full border border-emerald-300/25 px-2.5 text-[9px] font-black text-emerald-100/80 transition active:scale-[.97]"
+                    >
+                      Promote {observation.metric}
+                    </button>
+                  ))}
+                </div>
+              ) : (
+                <p className="mt-1 text-[10px] leading-relaxed text-white/34">
+                  No connected device is currently reporting an adapter-verified signal-quality score, so nothing is eligible for clinician promotion yet.
+                </p>
+              )}
+              {lastPromoted ? (
+                <p className="mt-2 text-[9px] font-bold text-emerald-200/70">
+                  Promoted {lastPromoted.metric} into this record; continuous device streams themselves remain outside the signed record.
+                </p>
+              ) : null}
+            </div>
+          ) : null}
         </aside>
 
         <div className="order-1 relative min-h-[430px] overflow-hidden rounded-[28px] border border-white/[.07] bg-black/35 xl:order-2">

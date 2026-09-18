@@ -36,22 +36,43 @@ export function EmrTimelineLens({
   const [depth, setDepth] = useState<EmrDepth>('timeline')
   const latestVital = useMemo(() => latestByTime(vitals), [vitals])
   const latestSupportive = useMemo(() => latestByTime(supportive), [supportive])
+  const promoted = record.promotedObservations ?? []
 
   const events = useMemo(() => {
     const items = [
       { id: 'created', at: record.createdAt, label: 'Encounter opened', detail: record.anamnesis.keluhanUtama || 'Clinical record created' },
       latestVital ? { id: 'vital', at: latestVital.takenAt, label: 'Vitals recorded', detail: `${latestVital.systolic}/${latestVital.diastolic} mmHg · HR ${latestVital.heartRate} bpm · SpO₂ ${latestVital.spo2}%` } : null,
       latestSupportive ? { id: 'supportive', at: latestSupportive.takenAt, label: latestSupportive.category, detail: `${latestSupportive.name}: ${latestSupportive.value}${latestSupportive.unit ? ` ${latestSupportive.unit}` : ''}` } : null,
+      ...promoted.map((event) => ({
+        id: `promoted-${event.id}`,
+        at: event.recordedAt,
+        label: `Device reading promoted · ${event.metric}`,
+        detail: `${event.value}${event.unit ? ` ${event.unit}` : ''} · reviewed by ${event.review.reviewerId || 'clinician'}`,
+      })),
       record.primaryDiagnosis ? { id: 'diagnosis', at: record.updatedAt, label: 'Diagnosis context', detail: `${record.primaryDiagnosis.code} · ${record.primaryDiagnosis.title}` } : null,
       record.signedAt ? { id: 'signed', at: record.signedAt, label: 'Record signed', detail: record.signedBy || 'Clinician verified' } : null,
     ].filter(Boolean) as { id: string; at: string; label: string; detail: string }[]
 
     return items.sort((a, b) => Date.parse(a.at) - Date.parse(b.at))
-  }, [latestSupportive, latestVital, record])
+  }, [latestSupportive, latestVital, promoted, record])
 
   const observationText = latestVital
     ? `BP ${latestVital.systolic}/${latestVital.diastolic} · HR ${latestVital.heartRate} · RR ${latestVital.respRate} · SpO₂ ${latestVital.spo2}% · ${latestVital.tempC.toFixed(1)} °C`
     : 'No recorded vital series for this encounter.'
+
+  const latestPromoted = promoted[promoted.length - 1]
+  const provenanceValue = latestPromoted
+    ? `${promoted.length} device reading${promoted.length === 1 ? '' : 's'} promoted`
+    : record.signedBy
+      ? 'Clinician signed'
+      : record.physicalExam.doctorVerified
+        ? 'Exam verified'
+        : 'Draft'
+  const provenanceDetail = latestPromoted
+    ? `Last: ${latestPromoted.metric} = ${latestPromoted.value}${latestPromoted.unit ? ` ${latestPromoted.unit}` : ''} · source ${latestPromoted.provenance.sourceId} (${latestPromoted.provenance.method || 'unspecified transport'}) · reviewed by ${latestPromoted.review.reviewerId || 'clinician'} at ${shortDate(latestPromoted.review.reviewedAt)}. Clinician-reviewed device reading, distinct from unreviewed AI-drafted content.`
+    : record.signedBy
+      ? `Signed by ${record.signedBy} at ${shortDate(record.signedAt)}; later edits require explicit re-signing.`
+      : 'AI-assisted content remains draft context until the clinician explicitly verifies and signs it.'
 
   const depthContent: Record<EmrDepth, { label: string; value: string; detail: string }> = {
     timeline: {
@@ -72,7 +93,7 @@ export function EmrTimelineLens({
     observation: {
       label: 'Observation',
       value: latestVital ? shortDate(latestVital.takenAt) : 'No vitals',
-      detail: observationText,
+      detail: promoted.length ? `${observationText} · plus ${promoted.length} clinician-promoted device reading${promoted.length === 1 ? '' : 's'} from live visits.` : observationText,
     },
     resource: {
       label: 'Structured record',
@@ -81,10 +102,8 @@ export function EmrTimelineLens({
     },
     provenance: {
       label: 'Provenance',
-      value: record.signedBy ? 'Clinician signed' : record.physicalExam.doctorVerified ? 'Exam verified' : 'Draft',
-      detail: record.signedBy
-        ? `Signed by ${record.signedBy} at ${shortDate(record.signedAt)}; later edits require explicit re-signing.`
-        : 'AI-assisted content remains draft context until the clinician explicitly verifies and signs it.',
+      value: provenanceValue,
+      detail: provenanceDetail,
     },
   }
 

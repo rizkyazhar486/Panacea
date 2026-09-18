@@ -21,6 +21,7 @@ import { searchICD, matchICD, icd11, type ICDCode } from '../lib/icd'
 import { evaluateVitals, overallStatus, STATUS_COLOR, STATUS_LABEL } from '../lib/chronic'
 import { projectEmrToBodyClinicalBridge } from '../lib/bodyClinicalBridge'
 import type { Anamnesis, EMRRecord, PhysicalExam, VitalSign } from '../lib/types'
+import type { LongitudinalEvent } from '../lib/panaceaLongitudinalState'
 
 // Send the current EMR to SATUSEHAT as a FHIR R4 Bundle (dokter/owner only).
 function SatusehatButton({ patient, record, vitals }: { patient: unknown; record: EMRRecord; vitals: unknown[] }) {
@@ -201,6 +202,19 @@ export function EMR() {
     }
   }
 
+  function promoteVisitObservation(event: LongitudinalEvent<number>) {
+    setDraft((current) => {
+      if (!current) return current
+      const promoted = {
+        ...current,
+        promotedObservations: [...(current.promotedObservations ?? []), event],
+        updatedAt: new Date().toISOString(),
+      }
+      saveRecord(promoted)
+      return promoted
+    })
+  }
+
   function sign() {
     if (!draft) return
     const signed = {
@@ -249,7 +263,7 @@ export function EMR() {
         </div>
       </Card>
 
-      <VisitCommandCenter recordId={draft.id} embedded />
+      <VisitCommandCenter recordId={draft.id} embedded onPromoteObservation={promoteVisitObservation} />
 
       <EmrTimelineLens
         patientLabel={activePatient.name}

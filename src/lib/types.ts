@@ -1,5 +1,7 @@
 // Shared domain types for the Panaceamed.id Longevity Medical-AI platform.
 
+import type { LongitudinalEvent } from './panaceaLongitudinalState.ts'
+
 export type Sex = 'L' | 'P'
 
 export type RiskFlag = 'chronic' | 'elderly' | 'immunocompromised'
@@ -115,6 +117,11 @@ export interface EMRRecord {
   // whether it's actually happening). Optional: only present once a plan
   // item is actually being carried out.
   careEpisodes?: CareEpisode[]
+  // Live Visit OS device observations a clinician has explicitly promoted
+  // into this record via promoteObservationToClinicalRecord(). Continuous
+  // device streams themselves never appear here — only the reviewed,
+  // provenance-carrying event for the one reading a clinician selected.
+  promotedObservations?: LongitudinalEvent<number>[]
 }
 
 // One stage in a patient's path from problem to prevention. Stage order is
