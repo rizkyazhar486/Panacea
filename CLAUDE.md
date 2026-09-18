@@ -154,8 +154,8 @@ force/device setting, diagnosis or treatment from generic atlas/simulation data.
 ## Active durable continuation queue — 2026-09-18
 
 This is a **snapshot**, not a substitute for resolving live GitHub state. Before
-acting on any item below, re-check `main`, the PR head, CI, overlap, and whether a
-newer PR has superseded it.
+acting on any item below, re-check `main`, the PR head, exact-head CI, changed-path
+overlap, ancestry, and whether a newer PR has superseded it.
 
 ### Current blockers / exact-head candidates
 
@@ -165,39 +165,66 @@ newer PR has superseded it.
   of the trigger/action policy. Do **not** infer review from CI, the product owner,
   a model, or a prior conversation. Before representing it as clinically reviewed,
   record the real reviewer's name/credentials, review date, review scope, and
-  explicit disposition. After that, if the head is unchanged, run the normal
-  latest-main race/overlap audit before merge.
-- **Home widgets + Assistive Touch replay — PR #1799, head
-  `09e7f2cec247e05df5069a863bf746dc73a8762f`.** This is the current replay
-  of the previously validated #1776 work on latest main. It preserves the current
-  `/fitness-hub` route and manually reconciles the one overlapping Home file.
-  Wait for all exact-head gates, then race-audit and merge only if clean. #1776 is
-  superseded and closed.
+  explicit disposition. Then refresh against latest main and rerun required gates.
+- **Longitudinal governance core — PR #1805, head
+  `62ad45667179eaa7b8dd3276153799f53d310b64`.** Fresh extraction of the
+  self-contained governance kernel from stale #1744: patient-scoped idempotent
+  event state, provenance/confidence/timestamps, purpose consent ledger, clinician
+  review ledger, minimum-necessary AI context, governed Chatbot/AI-EMR bundle and
+  audit manifest. Do not merge stale #1744 wholesale and do not create a second
+  patient-state store from #1745.
+- **MCP Phase B interoperability/terminology — PR #1807, head
+  `95307ea118258f227c901f1df675b6b1d6efce54`.** Bounded FHIR R4 inspection,
+  SATUSEHAT preview-only Bundle building, bounded HL7 v2 preview conversion,
+  truthful ICD fallback identity, RxNorm RxCUI resolution, explicit-only ATC,
+  verified local LOINC registry and fail-closed crosswalks. Preserve zero
+  patient-store reads, zero SATUSEHAT submission and zero remote clinical writes.
+- **Body Exposure evidence increments — PR #1808 head
+  `e2c6d13ca96f5a4937e3b3dd58e9fe12544fda13` (skeletal-muscle EC coupling)
+  and PR #1809 head `21ba7000a62d58da95a28e3caa204226c61fc545`
+  (integumentary barrier/aging).** Generic education only; preserve PubMed
+  provenance, semantic-anchor boundaries and no patient-specific inference.
+- **Coach energy/training visualization — PR #1810, head
+  `44e3b3c73832b5cb23653ba1fd2c7bc2cd8fc0f3`.** Atwater 4/4/9 energy
+  accounting and weekly training visualization replay. Keep training duration as
+  estimate, not patient-specific exercise prescription.
+- **Functional widgets + Assistive Touch — PR #1812, head
+  `e4f340adab28e053bd93a94f8d6127036e261dbf`.** Fresh byte-for-byte replay
+  of #1799 after a tree-level audit proved all 25 current-main paths were still
+  identical to the old base. Require fresh exact-head gates and final latest-main
+  overlap audit; #1799 is superseded and closed.
+- **Coordination queue itself — PR #1811.** Keep this section current when active
+  PR numbers or blockers move; documentation must not become an authority for
+  stale CI or stale branch state.
 
 ### Long-running lanes that must not be lost
 
 - **Neural Intent follow-on:** Phase A landed through #1795. Phase B must bridge
-  IntentEvent into the canonical longitudinal state only after the authoritative
-  longitudinal foundation is settled on `main`, reusing its provenance, consent,
-  clinician-review and AI-context policies. Phase C must mount the Intent workspace
-  inside existing **Your Body**, not create another top-level route, and must retain
-  explicit/observed/decoded/simulated labels plus 390x844 and Body/WebGL acceptance.
-- **Longitudinal foundation:** re-resolve #1744 and #1745 before implementation;
-  do not create a second patient-state store or duplicate provenance/governance.
-- **FHIR / terminology:** re-resolve #1764 and its parent/base lane before further
-  Phase B implementation. Do not transplant stale commits blindly onto main.
+  IntentEvent into the canonical longitudinal kernel from #1805 (or its eventual
+  merged successor), reusing provenance, consent, clinician-review and AI-context
+  policies. Phase C must mount the Intent workspace inside existing **Your Body**,
+  not create another top-level route, and must retain explicit/observed/decoded/
+  simulated labels plus 390x844 and Body/WebGL acceptance.
+- **Longitudinal product bridge:** after #1805 settles, rework #1745 as adapters and
+  UI/runtime bridges into the canonical kernel; do **not** transplant its separate
+  `longitudinalPatientState.ts` as another source of truth.
 - **PANACEA PRIME / EDGE:** re-resolve #1768, #1770 and #1767. Preserve user-owned
   goals, recovery/safety precedence, evidence hierarchy, and non-persuasive
   treatment of political/worldview material.
 - **Plugin control plane:** re-resolve #1758 before adding another connector
   abstraction so plugin permissions, consent and tool routing stay centralized.
+- **Body whole-body maturation:** continue whole-body → system → organ → tissue →
+  cell → organelle → molecular pathway → protein → RNA → DNA/epigenome. Anatomy
+  representation coverage is not proof of anatomical accuracy; qualified human
+  review and provenance remain separate gates.
 
 ### Duplicate/stale-lane hygiene
 
-When a fresh replay supersedes an older implementation PR, close the older PR with
-a pointer to the active candidate. Do not leave old validation-only or duplicate
-interaction branches looking like production candidates. In particular, re-check
-#1762, #1763 and #1759 against #1799 before doing any more work in those lanes.
+Fresh replacements currently supersede and close #1797, #1798, #1799, #1800,
+#1801 and #1803. Before reviving any earlier validation-only or duplicate branch,
+compare changed paths and ancestry against #1805/#1807/#1808/#1809/#1810/#1812
+and current main. Also re-check #1762, #1763 and #1759 against the active UI lane.
+
 
 ## Shared policy
 
