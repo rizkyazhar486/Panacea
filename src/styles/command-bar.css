@@ -46,6 +46,35 @@
   z-index: 0;
 }
 
+
+/* Mobile repair: the command bar is chrome, not a hero card. iOS can otherwise
+   preserve an oversized flex block during a route/layout transition, leaving a
+   screen-high empty panel with the four controls floating in its middle.
+   Pinning only the mobile command bar to its intended control height also keeps
+   the notification glyph fully inside the visible chrome. */
+@media (max-width: 760px) {
+  .panacea-command-bar {
+    height: 64px !important;
+    min-height: 64px !important;
+    max-height: 64px !important;
+    padding-block: 10px !important;
+    border-radius: 0 !important;
+    overflow: visible !important;
+    align-items: center !important;
+  }
+
+  .panacea-command-bar > div:first-child > h1 {
+    display: none;
+  }
+
+  .panacea-command-bar .header-icon-btn {
+    width: 40px;
+    height: 40px;
+    min-height: 40px;
+    flex: 0 0 40px;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .panacea-command-bar {
     transition: none;
