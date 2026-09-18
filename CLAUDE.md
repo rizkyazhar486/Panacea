@@ -159,3 +159,29 @@ Phase 1 is the AI-EMR integration seam:
 - The bridge generates no diagnosis, severity, prognosis, treatment, lesion location, procedure target or autonomous clinical action.
 
 Next integration steps must reconcile rather than overwrite active overlap in #1827 (ClinicalHub/UnifiedBodyWorkspace) and #1848 (Body Exposure styling/simulators). When those lanes settle, mount the same patient overlay contract into Clinical and Body Exposure so the selected patient context can follow the user without creating a second patient-state authority. Preserve the canonical longitudinal governance and clinician-review boundaries already on main.
+
+
+## Cross-surface semantic depth + For You stack — 2026-09-18
+
+Owner direction: progressive detail must become a shared Panacea interaction language, while each surface keeps its own medical/product role. The durable implementation brief is `DOCS/SUPERPAGE-SEMANTIC-DEPTH.md`. Use `src/lib/surfaceSemanticDepth.ts` as the product-level depth contract and `src/lib/forYouWidgetCatalog.ts` as the initial source-aware For You registry.
+
+Required surface behavior:
+- **Your Body** is the everyday physiology/fitness OS: recovery, sleep, running, workouts, push-ups/sit-ups/calisthenics, load, pace, distance, zones, body composition, nutrition and longitudinal signals. Depth is **Today → domain → metric → session → sample/event → source/provenance**. Charts/numbers/body visualization first; interpretation behind Info/Interpret.
+- **Body Exposure** keeps true semantic representation zoom **whole body → system → organ → tissue → cell → organelle → molecule/pathway → genome/DNA**. Continue using `bodySemanticZoom.ts` for actual zoom/LOD thresholds. Never fake microscopic precision by enlarging gross meshes.
+- **Clinical** is the clinical learning/action layer: disease education, Look & Learn, exam/diagnostic reasoning, calculators/scores, labs/imaging, treatment pathways, drug dosing references, ICD-11 and evidence. Depth is **overview → condition → mechanism → assessment → management → coding → evidence**.
+- **AI-EMR** is the longitudinal clinical source of truth. Depth is **timeline → encounter → problem → observation → structured resource → provenance/audit**. AI-derived/draft content must remain visually and semantically distinct from clinician-authored/verified facts.
+- **For You** is a fun daily stack, not another medical dashboard: music adapters (Spotify/Apple Music), sports scores, faith/adzan/scripture, mental wellbeing, motivation, library/books/materials, stories, social/community and activity highlights. Activity/sport on the main scroll is graphics/numbers first.
+
+Global copy rule for these super-pages: persistent scrolling UI gets **one concise sentence per widget/item**; the sentence may wrap responsively, but it remains one sentence. Longer interpretation belongs behind contextual disclosure and should default to one short paragraph. Safety-critical warnings are exempt when brevity would hide risk.
+
+External integrations must be real or explicitly unavailable. Never fabricate Spotify/Apple Music connection state, wearable measurements, live sports data, biomedical evidence, reviewer identity or patient-specific anatomy.
+
+Implementation order for Claude Code:
+1. wire Your Body modules into the shared depth/provenance contract without deleting existing functionality;
+2. converge Clinical modules around the clinical depth ladder and existing routes;
+3. add AI-EMR timeline/provenance drill-down over current record state/`emrPipeline`;
+4. render For You from a registry and add explicit music-adapter auth/error states;
+5. bind all surfaces to the canonical longitudinal patient/event state;
+6. expand deeper anatomical/molecular assets only after provenance and performance gates remain trustworthy.
+
+Treat this as a continuation target, not permission to duplicate super-pages or bypass active overlap. Re-read latest main before touching ClinicalHub, UnifiedBodyWorkspace, Body Exposure, EMR or ForYouHub and reconcile any concurrently landed work.
