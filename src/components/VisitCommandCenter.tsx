@@ -14,6 +14,7 @@ import {
   resumeVisit,
   setMedicalDeviceConnection,
   startVisit,
+  type VisitDeviceMetric,
   type VisitOperatingState,
 } from '../lib/visitOperatingSystem'
 
@@ -151,15 +152,14 @@ export function VisitCommandCenter({ recordId, embedded = false }: VisitCommandC
     setVisit((current) => {
       if (current.phase === 'ended') return current
       try {
-        const supports = [
-          finite(synced.heartRate) ? 'heart-rate' : null,
-          finite(synced.spo2Pct) ? 'spo2' : null,
-          finite(synced.respRate) ? 'respiratory-rate' : null,
-          finite(synced.systolic) ? 'blood-pressure-systolic' : null,
-          finite(synced.diastolic) ? 'blood-pressure-diastolic' : null,
-          finite(synced.bodyTempC) ? 'temperature' : null,
-          finite(synced.weightKg) ? 'weight' : null,
-        ].filter((item): item is NonNullable<typeof item> => Boolean(item))
+        const supports: VisitDeviceMetric[] = []
+        if (finite(synced.heartRate)) supports.push('heart-rate')
+        if (finite(synced.spo2Pct)) supports.push('spo2')
+        if (finite(synced.respRate)) supports.push('respiratory-rate')
+        if (finite(synced.systolic)) supports.push('blood-pressure-systolic')
+        if (finite(synced.diastolic)) supports.push('blood-pressure-diastolic')
+        if (finite(synced.bodyTempC)) supports.push('temperature')
+        if (finite(synced.weightKg)) supports.push('weight')
         if (!supports.length) return current
         let next = registerMedicalDevice(current, {
           id: 'health-sync',
