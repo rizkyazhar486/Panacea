@@ -1,5 +1,5 @@
-import { lazy, Suspense, useMemo, useState } from 'react'
-import type { BodySystemId } from '../../lib/bodySystemSourceWave'
+import { lazy, Suspense, useEffect, useMemo, useState } from 'react'
+import { resolveBodySystemSourceWave, type BodySystemId } from '../../lib/bodySystemSourceWave'
 import { BODY_SEMANTIC_ZOOM_STOPS, getBodySemanticZoomStop, isMicroscopicBodyScale, type BodySemanticScale } from '../../lib/bodySemanticZoom'
 
 const BodyAllSystems3D = lazy(() => import('../../components/BodyAllSystems3D'))
@@ -12,11 +12,15 @@ const CellLab = lazy(() => import('./CellLab').then((module) => ({ default: modu
 const AlphaGenomeAtlas = lazy(() => import('./AlphaGenomeAtlas'))
 const SurgicalLab = lazy(() => import('./SurgicalLab').then((module) => ({ default: module.SurgicalLab })))
 const SemanticMicroscopeStage = lazy(() => import('./SemanticMicroscopeStage'))
+const LokalisasiLesiPanel = lazy(() => import('./LokalisasiLesiPanel').then((module) => ({ default: module.LokalisasiLesiPanel })))
+const PencitraanVolumetrikPanel = lazy(() => import('./PencitraanVolumetrikPanel').then((module) => ({ default: module.PencitraanVolumetrikPanel })))
 
-type SimulationDomain =
+export type SimulationDomain =
   | 'anatomy'
+  | 'localization'
   | 'physiology'
   | 'pathophysiology'
+  | 'imaging'
   | 'biomechanics'
   | 'cell'
   | 'genome'
@@ -26,6 +30,8 @@ type SimulationDomain =
 interface UnifiedHumanSimulationProjectorProps {
   selectedSystemId: BodySystemId
   onSystemChange: (systemId: BodySystemId) => void
+  requestedDomain?: SimulationDomain
+  onDomainChange?: (domain: SimulationDomain) => void
 }
 
 type DomainDefinition = {
@@ -43,6 +49,12 @@ const DOMAINS: DomainDefinition[] = [
     description: 'Keep the source-backed whole-body atlas as the spatial anchor for every other simulation.',
   },
   {
+    id: 'localization',
+    label: 'Localization',
+    scale: 'finding → tract → level',
+    description: 'Localize educational lesion patterns against tract crossings, cranial nerve levels and the same nervous-system anatomy context.',
+  },
+  {
     id: 'physiology',
     label: 'Physiology',
     scale: 'organ → system',
@@ -53,6 +65,12 @@ const DOMAINS: DomainDefinition[] = [
     label: 'Pathophysiology',
     scale: 'failure cascade',
     description: 'Trace disease mechanisms from trigger and injury through compensation, propagation and consequence.',
+  },
+  {
+    id: 'imaging',
+    label: 'Imaging',
+    scale: 'voxel → anatomy',
+    description: 'Connect CT windowing, volumetric reconstruction and DICOM context back to the same anatomy instead of a separate radiology island.',
   },
   {
     id: 'biomechanics',
@@ -112,9 +130,15 @@ function ProjectorLoader({ label }: { label: string }) {
 export default function UnifiedHumanSimulationProjector({
   selectedSystemId,
   onSystemChange,
+  requestedDomain,
+  onDomainChange,
 }: UnifiedHumanSimulationProjectorProps) {
-  const [domain, setDomain] = useState<SimulationDomain>('anatomy')
+  const [internalDomain, setInternalDomain] = useState<SimulationDomain>('anatomy')
+  const [selectedStructureName, setSelectedStructureName] = useState<string | null>(null)
   const [semanticZoom, setSemanticZoom] = useState<{ scale: BodySemanticScale; relativeZoom: number }>({ scale: 'whole-body', relativeZoom: 1 })
+  const domain = requestedDomain ?? internalDomain
+  const systems = useMemo(() => resolveBodySystemSourceWave(), [])
+  const currentSystem = systems.find((system) => system.id === selectedSystemId) ?? systems[0]
   const current = useMemo(
     () => DOMAINS.find((item) => item.id === domain) ?? DOMAINS[0],
     [domain],
@@ -123,8 +147,29 @@ export default function UnifiedHumanSimulationProjector({
   const semanticStop = getBodySemanticZoomStop(semanticZoom.scale)
   const microscopic = isMicroscopicBodyScale(semanticZoom.scale)
 
+  useEffect(() => {
+    setSelectedStructureName(null)
+  }, [selectedSystemId])
+
+  useEffect(() => {
+    if (domain === 'localization' && selectedSystemId !== 'nervous') onSystemChange('nervous')
+  }, [domain, onSystemChange, selectedSystemId])
+
+  function selectDomain(next: SimulationDomain) {
+    if (requestedDomain === undefined) setInternalDomain(next)
+    onDomainChange?.(next)
+  }
+
+  function openScale(scale: BodySemanticScale) {
+    if (scale === 'tissue' || scale === 'cell' || scale === 'organelle') selectDomain('cell')
+    else if (scale === 'molecule' || scale === 'genome') selectDomain('genome')
+    else selectDomain('anatomy')
+  }
+
   function renderDomain() {
     switch (domain) {
+      case 'localization':
+        return <LokalisasiLesiPanel />
       case 'physiology':
         return (
           <div className="space-y-3">
@@ -137,6 +182,8 @@ export default function UnifiedHumanSimulationProjector({
         )
       case 'pathophysiology':
         return <PathophysiologyNetworkPanel selectedAtlasSystemId={selectedSystemId} />
+      case 'imaging':
+        return <PencitraanVolumetrikPanel />
       case 'biomechanics':
         return <BiomechanicsMotionLab />
       case 'cell':
@@ -150,18 +197,35 @@ export default function UnifiedHumanSimulationProjector({
       case 'anatomy':
       default:
         return (
-          <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
-            {[
-              ['Spatial anchor', 'The 3D source atlas remains the canonical visual coordinate system.'],
-              ['Persistent context', systemLabel + ' stays selected while you change simulation domain.'],
-              ['Scale continuity', 'Body → organ → tissue → cell → genome is treated as one navigable hierarchy.'],
-              ['Evidence boundary', 'Reference and simulated states stay visibly separate from patient-specific data.'],
-            ].map(([title, copy]) => (
-              <div key={title} className="rounded-2xl border border-white/[.08] bg-white/[.025] p-3">
-                <div className="text-[9px] font-black uppercase tracking-[.14em] text-cyan-200/70">{title}</div>
-                <p className="mt-1 text-[10px] leading-relaxed text-white/45">{copy}</p>
+          <div className="grid gap-3 lg:grid-cols-[minmax(0,1fr)_minmax(280px,.72fr)]">
+            <div className="rounded-2xl border border-white/[.08] bg-white/[.025] p-3">
+              <div className="text-[9px] font-black uppercase tracking-[.14em] text-cyan-200/70">Selected structure</div>
+              <div className="mt-1 text-base font-black text-white/90">{selectedStructureName ?? 'Tap a rendered structure'}</div>
+              <p className="mt-1 text-[10px] leading-relaxed text-white/45">
+                Selection comes from the rendered source mesh, not inferred screen position. The exact structure can stay in context while the projection changes.
+              </p>
+              {selectedStructureName && (
+                <button type="button" onClick={() => setSelectedStructureName(null)} className="mt-3 min-h-9 rounded-full border border-white/10 px-3 text-[9px] font-black text-white/55 hover:text-white">
+                  Clear structure
+                </button>
+              )}
+            </div>
+            <div className="rounded-2xl border border-white/[.08] bg-white/[.025] p-3">
+              <div className="text-[9px] font-black uppercase tracking-[.14em] text-white/35">Source-backed structure shortcuts</div>
+              <div className="mt-2 flex max-h-36 flex-wrap gap-1.5 overflow-y-auto pr-1">
+                {currentSystem.targets.flatMap((target) => target.names.slice(0, 4)).slice(0, 18).map((name) => (
+                  <button
+                    key={name}
+                    type="button"
+                    aria-pressed={selectedStructureName === name}
+                    onClick={() => setSelectedStructureName(name)}
+                    className="min-h-8 max-w-full truncate rounded-full border border-white/[.08] bg-black/20 px-2.5 text-[8px] font-bold text-white/45 aria-pressed:border-cyan-300/35 aria-pressed:bg-cyan-300/[.10] aria-pressed:text-cyan-100"
+                  >
+                    {name}
+                  </button>
+                ))}
               </div>
-            ))}
+            </div>
           </div>
         )
     }
@@ -200,7 +264,7 @@ export default function UnifiedHumanSimulationProjector({
               type="button"
               role="tab"
               aria-selected={domain === item.id}
-              onClick={() => setDomain(item.id)}
+              onClick={() => selectDomain(item.id)}
               className={tabClass(domain === item.id)}
             >
               {item.label}
@@ -216,6 +280,8 @@ export default function UnifiedHumanSimulationProjector({
               selectedSystemId={selectedSystemId}
               onSystemChange={onSystemChange}
               onSemanticZoomChange={setSemanticZoom}
+              selectedStructureName={selectedStructureName}
+              onStructureSelect={setSelectedStructureName}
             />
           </Suspense>
         </div>
@@ -251,7 +317,13 @@ export default function UnifiedHumanSimulationProjector({
           </div>
           <p className="mt-2 text-[8px] leading-relaxed text-white/30">Relative zoom controls representation/LOD; it is not optical magnification.</p>
 
-          <div className="mt-4 rounded-2xl border border-amber-300/12 bg-amber-300/[.045] p-2.5 text-[9px] leading-relaxed text-amber-100/65">
+          <div className="mt-4 rounded-2xl border border-white/[.08] bg-white/[.025] p-2.5">
+            <div className="text-[8px] font-black uppercase tracking-[.16em] text-white/30">Structure context</div>
+            <div className="mt-1 truncate text-[10px] font-black text-cyan-100/80">{selectedStructureName ?? 'No exact mesh selected'}</div>
+            <div className="mt-1 text-[8px] leading-relaxed text-white/30">Tap the 3D atlas or choose a source node in Anatomy. Context persists across projections.</div>
+          </div>
+
+          <div className="mt-3 rounded-2xl border border-amber-300/12 bg-amber-300/[.045] p-2.5 text-[9px] leading-relaxed text-amber-100/65">
             Educational/reference simulation. Generic atlas geometry and synthetic models are not patient-specific anatomy, diagnosis, operative navigation or treatment advice.
           </div>
         </aside>
