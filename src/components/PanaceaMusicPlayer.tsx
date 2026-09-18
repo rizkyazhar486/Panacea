@@ -1,4 +1,4 @@
-import { FormEvent, useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState, type FormEvent } from 'react'
 import { ThinkingOrb } from './ThinkingOrb'
 
 type PreviewTrack = {
