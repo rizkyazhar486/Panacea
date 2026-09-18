@@ -57,6 +57,7 @@ export function HomeFunWidgetRail() {
   const [refresh, setRefresh] = useState(0)
   const [expanded, setExpanded] = useState<Expanded>(null)
   const [focusSeconds, setFocusSeconds] = useState(25 * 60)
+  const [focusTotal, setFocusTotal] = useState(25 * 60)
   const [focusRunning, setFocusRunning] = useState(false)
 
   useEffect(() => {
@@ -102,9 +103,15 @@ export function HomeFunWidgetRail() {
     const bodyScore = positive(vitals.bodyScore)
     const primary = recovery ?? bodyScore ?? sessions7d
     const primaryLabel = recovery != null ? 'recovery' : bodyScore != null ? 'body score' : 'sessions · 7d'
+    const primaryUnit = recovery != null ? '%' : ''
+    const dotCount = recovery != null || bodyScore != null
+      ? Math.round((Math.min(100, primary) / 100) * 24)
+      : Math.min(24, sessions7d)
     return {
       primary,
       primaryLabel,
+      primaryUnit,
+      dotCount,
       sleep: positive(latestSleep?.hours) ?? positive(vitals.sleepH),
       steps: positive(vitals.steps),
       vo2: positive(vitals.vo2max),
@@ -163,13 +170,13 @@ export function HomeFunWidgetRail() {
           >
             <span className="panacea-fun-card-kicker">Performance</span>
             <span className="panacea-fun-card-primary">
-              {compact(performance.primary, performance.primaryLabel === 'sessions · 7d' ? 0 : 0)}
-              {performance.primaryLabel !== 'sessions · 7d' ? <small>%</small> : null}
+              {compact(performance.primary)}
+              {performance.primaryUnit ? <small>{performance.primaryUnit}</small> : null}
             </span>
             <span className="panacea-fun-card-caption">{performance.primaryLabel}</span>
             <span className="panacea-fun-dotfield" aria-hidden>
               {Array.from({ length: 24 }).map((_, index) => (
-                <i key={index} data-on={performance.primary != null && index < Math.round(Math.min(24, Number(performance.primary) / 4))} />
+                <i key={index} data-on={index < performance.dotCount} />
               ))}
             </span>
           </button>
@@ -254,7 +261,7 @@ export function HomeFunWidgetRail() {
                   cy="21"
                   r="16"
                   pathLength="100"
-                  strokeDasharray={`${Math.max(0, Math.min(100, 100 - (focusSeconds / (25 * 60)) * 100))} 100`}
+                  strokeDasharray={`${Math.max(0, Math.min(100, 100 - (focusSeconds / Math.max(1, focusTotal)) * 100))} 100`}
                 />
               </svg>
             </span>
@@ -264,7 +271,7 @@ export function HomeFunWidgetRail() {
             <button type="button" onClick={() => setFocusRunning((value) => !value)}>
               {focusRunning ? 'Pause' : 'Start'}
             </button>
-            <button type="button" onClick={() => { setFocusRunning(false); setFocusSeconds(25 * 60) }}>Reset</button>
+            <button type="button" onClick={() => { setFocusRunning(false); setFocusTotal(25 * 60); setFocusSeconds(25 * 60) }}>Reset</button>
           </div>
 
           {expanded === 'focus' ? (
@@ -275,6 +282,7 @@ export function HomeFunWidgetRail() {
                   type="button"
                   onClick={() => {
                     setFocusRunning(false)
+                    setFocusTotal(minutes * 60)
                     setFocusSeconds(minutes * 60)
                   }}
                 >
