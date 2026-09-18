@@ -6,6 +6,7 @@ const files = [
   '../src/lib/productionHealthStoreSelector.ts',
   '../src/lib/productionHealthLongitudinalSync.ts',
   '../src/lib/productionAppStateLongitudinalSync.ts',
+  '../src/lib/productionPersonalLongitudinalSync.ts',
 ]
 
 const source = files.map((relative) =>
