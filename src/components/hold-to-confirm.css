@@ -1,0 +1,109 @@
+/* HoldToConfirm — ring mengisi selama ditahan, membatalkan dengan mulus bila
+   dilepas lebih awal. Dibangun dengan currentColor/color-mix supaya mengikuti
+   warna teks di sekelilingnya tanpa aturan gelap/terang terpisah. */
+
+.htc {
+  --htc-progres: 0;
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: .5rem;
+  min-width: 0;
+  flex: 1 1 auto;
+  min-height: 44px;
+  padding: .55rem 1rem .55rem .6rem;
+  border: 1px solid color-mix(in srgb, currentColor 18%, transparent);
+  border-radius: 999px;
+  background: color-mix(in srgb, currentColor 6%, transparent);
+  color: inherit;
+  font: inherit;
+  font-weight: 800;
+  font-size: .8rem;
+  cursor: pointer;
+  touch-action: none;
+  -webkit-user-select: none;
+  user-select: none;
+  overflow: hidden;
+  isolation: isolate;
+}
+
+.htc__ring {
+  --htc-ukuran: 22px;
+  position: relative;
+  flex: 0 0 var(--htc-ukuran);
+  width: var(--htc-ukuran);
+  height: var(--htc-ukuran);
+  border-radius: 50%;
+  background: conic-gradient(
+    var(--color-brand, #00bf63) calc(var(--htc-progres) * 360deg),
+    color-mix(in srgb, currentColor 16%, transparent) 0
+  );
+  transition: background .05s linear;
+}
+
+.htc__ring::after {
+  content: '';
+  position: absolute;
+  inset: 3px;
+  border-radius: 50%;
+  background: Canvas;
+  opacity: .92;
+}
+
+.htc__text {
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.htc:active {
+  background: color-mix(in srgb, currentColor 10%, transparent);
+}
+
+/* Selesai ditahan penuh: pantulan singkat menandai "tercatat", lalu diam.
+   Bukan hiasan berulang — hanya sekali, tepat saat aksinya benar-benar
+   terjadi, supaya gerakannya berarti sesuatu alih-alih dekorasi kosong. */
+.htc--pop {
+  animation: htc-pop 420ms cubic-bezier(.34, 1.56, .64, 1);
+}
+
+@keyframes htc-pop {
+  0% { transform: scale(1); }
+  35% { transform: scale(1.06); }
+  60% { transform: scale(.97); }
+  100% { transform: scale(1); }
+}
+
+.htc--done {
+  border-color: color-mix(in srgb, var(--color-brand, #00bf63) 45%, transparent);
+  background: color-mix(in srgb, var(--color-brand, #00bf63) 14%, transparent);
+  color: color-mix(in srgb, var(--color-brand, #00bf63) 88%, currentColor);
+}
+
+.htc__check {
+  display: grid;
+  place-items: center;
+  flex: 0 0 22px;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: var(--color-brand, #00bf63);
+  color: white;
+  font-size: 13px;
+  font-weight: 900;
+  line-height: 1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .htc__ring { transition: none; }
+  .htc--pop { animation: none; }
+}
+
+.pw-prayer-confirm {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: .6rem;
+  min-width: 0;
+}
