@@ -24,7 +24,6 @@ const SportsScores = lazy(() => import('./SportsScores').then((m) => ({ default:
 const ReligionWorkspace = lazy(() => import('./ReligionWorkspace').then((m) => ({ default: m.ReligionWorkspace })))
 const MedStudyHub = lazy(() => import('./MedStudyHub').then((m) => ({ default: m.MedStudyHub })))
 const ForYouHub = lazy(() => import('./ForYouHub').then((m) => ({ default: m.ForYouHub })))
-const ForYouSocialPulse = lazy(() => import('../components/ForYouSocialPulse').then((m) => ({ default: m.ForYouSocialPulse })))
 
 type LegacyViewKey = 'social' | 'community' | 'clubs' | 'finance' | 'markets' | 'scores' | 'religion' | 'learn'
 type HomeView = 'home' | 'for-you' | LegacyViewKey
@@ -72,10 +71,7 @@ export function HomeSocialWorkspace() {
           <HomeCommandDeck />
         </div>
       ) : activeKey === 'for-you' ? (
-        <div className="grid gap-5">
-          <Suspense fallback={<Loader />}><ForYouSocialPulse /></Suspense>
-          <Suspense fallback={<Loader />}><ForYouHub /></Suspense>
-        </div>
+        <Suspense fallback={<Loader />}><ForYouHub /></Suspense>
       ) : LegacyActive ? (
         <section aria-label={legacy?.label ?? 'Home space'} className="min-w-0">
           <Suspense fallback={<Loader />}><LegacyActive /></Suspense>
