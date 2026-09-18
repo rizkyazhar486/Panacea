@@ -1,0 +1,57 @@
+{
+  "version": 1,
+  "updatedAt": "2026-09-18",
+  "system": "renal-urinary",
+  "scope": "Educational organ/system knowledge boundary for Body Exposure. This dataset is not patient-specific anatomy, diagnosis, treatment advice, prescribing guidance, clinical validation, or evidence of human review.",
+  "reviewStatus": "requires-clinical-content-review-before-clinical-use",
+  "claims": [
+    {
+      "id": "renal-anatomy-overview",
+      "domain": "anatomy",
+      "status": "educational-curation-pending-source-verification",
+      "content": "Kidneys connect to the urinary bladder through the ureters; urine exits the bladder through the urethra.",
+      "patientSpecificInference": false
+    },
+    {
+      "id": "renal-physiology-overview",
+      "domain": "physiology",
+      "status": "educational-curation-pending-source-verification",
+      "content": "Renal function includes filtration followed by tubular handling of water and solutes, supporting fluid, electrolyte and acid-base homeostasis.",
+      "patientSpecificInference": false
+    },
+    {
+      "id": "renal-pathophysiology-boundary",
+      "domain": "pathophysiology",
+      "status": "relationship-framework-only",
+      "content": "Disease-state overlays may connect altered filtration, tubular handling, urinary flow or tissue injury to educational explanations only after the specific relationship is source-verified.",
+      "patientSpecificInference": false
+    },
+    {
+      "id": "renal-pharmacology-boundary",
+      "domain": "pharmacology",
+      "status": "relationship-framework-only",
+      "content": "Drug overlays must identify the relevant renal or urinary target/mechanism and must not imply an individualized indication, dose, efficacy or safety conclusion.",
+      "patientSpecificInference": false
+    },
+    {
+      "id": "renal-imaging-boundary",
+      "domain": "imaging",
+      "status": "relationship-framework-only",
+      "content": "Imaging overlays must distinguish educational modality/anatomy relationships from interpretation of a patient's study and must not infer pathology from atlas geometry.",
+      "patientSpecificInference": false
+    }
+  ],
+  "provenancePolicy": {
+    "sourceRequiredForPromotion": true,
+    "allowedPromotionTarget": "source-verified-educational",
+    "humanReviewRequiredForClinicalUse": true,
+    "forbiddenPromotions": [
+      "atlas-geometry-to-patient-specific-anatomy",
+      "educational-relationship-to-diagnosis",
+      "mechanism-overlay-to-prescribing-guidance",
+      "imaging-overlay-to-patient-image-interpretation",
+      "pending-source-verification-to-source-verified"
+    ]
+  },
+  "sources": []
+}
