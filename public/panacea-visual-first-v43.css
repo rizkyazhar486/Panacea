@@ -6,21 +6,42 @@
   --pmd-vf-context-z: 2147483000;
 }
 
+/* Judul dan kendali tetap satu baris — itu memang bentuknya. Yang ditambahkan
+   di sini hanya `min-width: 0`: tanpa itu, satu tombol atau judul panjang
+   menaikkan lebar min-content seluruh induknya, dan sebuah kolom grid/flex
+   melar melewati layar meskipun teksnya sendiri sudah terpotong rapi. */
 main :where(h1,h2,h3,h4,h5,h6),
 main :where(button,a,[role='button'],[role='tab']) {
+  min-width: 0;
   max-width: 100%;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
+/* Prosa dipendekkan, TIDAK dijadikan satu baris.
+   `white-space: nowrap` pada setiap p/li di dalam main melakukan dua hal
+   sekaligus, dan yang kedua tidak disengaja:
+     1. kalimatnya terpotong setelah beberapa kata — itu memang niat v43;
+     2. lebar min-content paragraf menjadi selebar SELURUH kalimat, dan karena
+        anak grid/flex bawaannya `min-width: auto`, kolomnya ikut melar.
+   Terukur di 390x844 pada /med-study: tiap kartu panduan menjadi 486px di
+   dalam kolom 325px, jadi kartunya tampak kosong dan isinya terdorong ke luar
+   layar. Memakai pemotongan BARIS memberi hasil pendek yang sama tanpa
+   menaikkan lebar min-content: yang menentukan tinggal kata terpanjang. */
 main :where(p,li,dd,figcaption),
 main .pmd-vf-copy {
   min-width: 0;
   max-width: 100%;
-  white-space: nowrap !important;
+  /* Wajib ditulis ulang: aturan di atas memasang nowrap pada judul/kendali,
+     dan white-space itu MENURUN ke prosa di dalamnya. Tanpa baris ini,
+     paragraf di dalam sebuah kartu yang berupa tombol tetap satu baris. */
+  white-space: normal;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+  line-clamp: 3;
   overflow: hidden !important;
-  text-overflow: ellipsis !important;
 }
 
 main .pmd-vf-copy[data-pmd-has-context='true'] {
@@ -52,6 +73,15 @@ main .pmd-vf-copy[data-pmd-has-context='true']:is(:hover,:focus-visible) {
   text-underline-offset: 3px;
 }
 
+/* Anak grid dan flex bawaannya `min-width: auto`, yang berarti "sepanjang
+   isinya". Begitu teks di dalamnya dipaksa satu baris oleh aturan di atas,
+   lebar minimum itu menjadi selebar seluruh kalimat dan kolomnya melar
+   melewati layar — kartunya tampak kosong, isinya terdorong ke luar.
+   Ini pembetulan bakunya, dibatasi pada main. */
+main :where([class*='grid'], [class*='flex']) > * {
+  min-width: 0;
+}
+
 /* Explicit opt-out for true detail surfaces, editors and dialogs.
    Keep the typography unclamped, but do not globally force structural div/span
    descendants to overflow:visible. Those nodes can be real scroll containers
@@ -61,6 +91,12 @@ main :where(dialog,[role='dialog'],[data-pmd-unclamped='true'],details[open],pre
 #pmd-context-dialog :where(h1,h2,h3,h4,h5,h6,p,span,div,button) {
   white-space: normal !important;
   text-overflow: clip !important;
+  /* Pemotongan baris juga harus dilepas di sini; kalau tidak, permukaan detail
+     dan dialog tetap terpotong pada tiga baris meskipun sudah ikut daftar
+     pengecualian. */
+  display: revert !important;
+  -webkit-line-clamp: none !important;
+  line-clamp: none !important;
 }
 
 main :where(dialog,[role='dialog'],[data-pmd-unclamped='true'],details[open],pre,code,textarea,[contenteditable='true']) :where(h1,h2,h3,h4,h5,h6,p,li,dd,figcaption,.pmd-vf-copy),
