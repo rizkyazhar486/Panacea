@@ -150,6 +150,55 @@ human review unless a real qualified reviewer, credentials, date and scope are
 recorded. Never infer patient-specific anatomy, lesion location, procedure target,
 force/device setting, diagnosis or treatment from generic atlas/simulation data.
 
+
+## Active durable continuation queue — 2026-09-18
+
+This is a **snapshot**, not a substitute for resolving live GitHub state. Before
+acting on any item below, re-check `main`, the PR head, CI, overlap, and whether a
+newer PR has superseded it.
+
+### Current blockers / exact-head candidates
+
+- **Mental-health safety — PR #1794, head
+  `46adc4bfadbd6d322fa8088bdef25cf8b5002075`.** Repository CI is green on
+  this head, but merge remains blocked on a real qualified clinical human review
+  of the trigger/action policy. Do **not** infer review from CI, the product owner,
+  a model, or a prior conversation. Before representing it as clinically reviewed,
+  record the real reviewer's name/credentials, review date, review scope, and
+  explicit disposition. After that, if the head is unchanged, run the normal
+  latest-main race/overlap audit before merge.
+- **Home widgets + Assistive Touch replay — PR #1799, head
+  `09e7f2cec247e05df5069a863bf746dc73a8762f`.** This is the current replay
+  of the previously validated #1776 work on latest main. It preserves the current
+  `/fitness-hub` route and manually reconciles the one overlapping Home file.
+  Wait for all exact-head gates, then race-audit and merge only if clean. #1776 is
+  superseded and closed.
+
+### Long-running lanes that must not be lost
+
+- **Neural Intent follow-on:** Phase A landed through #1795. Phase B must bridge
+  IntentEvent into the canonical longitudinal state only after the authoritative
+  longitudinal foundation is settled on `main`, reusing its provenance, consent,
+  clinician-review and AI-context policies. Phase C must mount the Intent workspace
+  inside existing **Your Body**, not create another top-level route, and must retain
+  explicit/observed/decoded/simulated labels plus 390x844 and Body/WebGL acceptance.
+- **Longitudinal foundation:** re-resolve #1744 and #1745 before implementation;
+  do not create a second patient-state store or duplicate provenance/governance.
+- **FHIR / terminology:** re-resolve #1764 and its parent/base lane before further
+  Phase B implementation. Do not transplant stale commits blindly onto main.
+- **PANACEA PRIME / EDGE:** re-resolve #1768, #1770 and #1767. Preserve user-owned
+  goals, recovery/safety precedence, evidence hierarchy, and non-persuasive
+  treatment of political/worldview material.
+- **Plugin control plane:** re-resolve #1758 before adding another connector
+  abstraction so plugin permissions, consent and tool routing stay centralized.
+
+### Duplicate/stale-lane hygiene
+
+When a fresh replay supersedes an older implementation PR, close the older PR with
+a pointer to the active candidate. Do not leave old validation-only or duplicate
+interaction branches looking like production candidates. In particular, re-check
+#1762, #1763 and #1759 against #1799 before doing any more work in those lanes.
+
 ## Shared policy
 
 Read and follow `AGENTS.md` as the cross-agent operating policy. If this file and
