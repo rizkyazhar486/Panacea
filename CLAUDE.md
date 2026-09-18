@@ -101,3 +101,15 @@ Long-running, blocked or high-context tasks should leave durable continuation no
 Do not claim build, test, CI, deployment, browser or biomedical validation without evidence. For user-visible Body/3D work, preserve the existing 390x844 browser/WebGL smoke expectations when available.
 
 Useful progress is concrete: commit SHA, changed capability, test result, CI state and remaining blocker. Do not invent completion percentages without a trustworthy denominator.
+
+
+## UI convergence handoff — 2026-09-18
+
+The current UI convergence work is additive and already landed on main:
+- `src/components/ForYouSocialPulse.tsx` makes For You social-first with recent people/posts, real stored GPS activity summaries, and the existing live football data source; it links into the canonical Feed, GPS tracker, Sports Scores, Community, Clubs, Markets, Finance and Faith capabilities instead of duplicating them.
+- `src/styles/superpage-cohesion-v1.css` is the shared visual-rhythm compatibility layer for Home, Clinical and Body Exposure.
+- `HomeSocialWorkspace` now uses the same `PanaceaZoneNav` as Your Body and Clinical. Preserve that common shell.
+
+Active overlap to reconcile rather than overwrite: PR #1745 touches ClinicalHub/FitnessHub/ForYouHub; #1827 touches ClinicalHub/UnifiedBodyWorkspace/SuperPageCapabilityRail; #1845 touches the Home widget board; #1848 touches Body Exposure styling/simulators. When those streams land or are superseded, fold their stronger implementation into the shared visual language rather than recreating a second shell.
+
+For You direction: keep the social feed as the primary scrolling experience; keep GPS device-derived (weekly distance = sum of stored accepted activity distances inside the 7-day window) and sports scores source-backed/fail-explicitly when unavailable. Use progressive disclosure for secondary personal tools so the main feed remains visual, compact and social.
