@@ -1,6 +1,6 @@
 import { lazy, Suspense, useEffect, useMemo, useState } from 'react'
 import { resolveBodySystemSourceWave, type BodySystemId } from '../../lib/bodySystemSourceWave'
-import { BODY_SEMANTIC_ZOOM_STOPS, getBodySemanticZoomStop, isMicroscopicBodyScale, type BodySemanticScale } from '../../lib/bodySemanticZoom'
+import { getBodySemanticZoomStop, isMicroscopicBodyScale, type BodySemanticScale } from '../../lib/bodySemanticZoom'
 import { penjelasanTertulis } from '../../lib/explainFallback'
 import UniversalAtlasDepthRail from './UniversalAtlasDepthRail'
 
