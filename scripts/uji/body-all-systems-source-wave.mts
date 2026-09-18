@@ -50,6 +50,23 @@ for (const coverage of bodySystemSourceCoverage()) {
   assert.ok(coverage.total > 0)
 }
 
+// The full-body source contract must keep the superficial envelope, the eye,
+// and male reproductive anatomy connected to the same compatible source body.
+// Missing female whole-body anatomy remains an explicit source gap rather than
+// being spatially guessed from the separate HRA female pelvis module.
+const integument = BODY_SYSTEM_SOURCE_WAVE.find((system) => system.id === 'integumentary-surface')!
+assert.equal(integument.targets[0]?.file, 'surface.glb')
+assert.equal(integument.targets[0]?.allSourceNodes, true)
+
+const sensory = BODY_SYSTEM_SOURCE_WAVE.find((system) => system.id === 'sensory-ent')!
+assert.ok(sensory.targets.some((target) => target.id === 'eye-globe' && target.file === 'nervous.glb'))
+assert.ok(sensory.targets.some((target) => target.id === 'ocular-motor' && target.file === 'muscular.glb'))
+
+const reproductive = BODY_SYSTEM_SOURCE_WAVE.find((system) => system.id === 'reproductive')!
+for (const id of ['penis', 'erectile-tissue', 'testis', 'epididymis', 'deferent-duct', 'seminal-vesicle', 'prostate']) {
+  assert.ok(reproductive.targets.some((target) => target.id === id), `missing male reproductive source target: ${id}`)
+}
+
 const component = readFileSync(new URL('../../src/components/BodyAllSystems3D.tsx', import.meta.url), 'utf8')
 assert.match(component, /muatAtlas/)
 assert.match(component, /namaAtlas/)
