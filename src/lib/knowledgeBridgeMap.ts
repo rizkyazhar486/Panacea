@@ -158,3 +158,41 @@ function canonicalStageLabel(label: string) {
 export function bridgeSummary(topic: BridgeTopic) {
   return [topic.title, topic.oneLiner, ...topic.stages.map((item) => `${canonicalStageLabel(item.label)}: ${item.explanation}`)].join('\n\n')
 }
+
+export type BridgeSnapshot = {
+  topicId: string
+  title: string
+  oneLiner: string
+  stageCount: number
+  actionableStageCount: number
+  hasPersonalNote: boolean
+  linkedEvidenceCount: number
+}
+
+/**
+ * Snapshot dashboard: a deterministic, at-a-glance rollup of a topic's own
+ * static stage data plus the study state the workbench already tracks
+ * (personal note, evidence shelf). It introduces no new medical fact,
+ * threshold or claim — only counts of fields the curated topic and the
+ * user's own local study state already contain.
+ */
+export function buildBridgeSnapshot(topic: BridgeTopic, note: string, evidence: { query?: string }[]): BridgeSnapshot {
+  const normalizedTitle = normalizeBridgeSearchText(topic.title)
+  const normalizedAliases = topic.aliases.map((alias) => normalizeBridgeSearchText(alias))
+  const linkedEvidenceCount = evidence.filter((item) => {
+    const q = item.query ? normalizeBridgeSearchText(item.query) : ''
+    if (!q) return false
+    if (q === normalizedTitle || containsWholePhrase(q, normalizedTitle) || containsWholePhrase(normalizedTitle, q)) return true
+    return normalizedAliases.some((alias) => q === alias || containsWholePhrase(q, alias) || containsWholePhrase(alias, q))
+  }).length
+
+  return {
+    topicId: topic.id,
+    title: topic.title,
+    oneLiner: topic.oneLiner,
+    stageCount: topic.stages.length,
+    actionableStageCount: topic.stages.filter((item) => !!item.route).length,
+    hasPersonalNote: note.trim().length > 0,
+    linkedEvidenceCount,
+  }
+}

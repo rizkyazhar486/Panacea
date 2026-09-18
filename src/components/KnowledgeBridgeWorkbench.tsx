@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react'
 import { Link, useSearchParams } from 'react-router-dom'
-import { BRIDGE_TOPICS, bridgeSummary, resolveBridgeTopic } from '../lib/knowledgeBridgeMap'
+import { BRIDGE_TOPICS, bridgeSummary, buildBridgeSnapshot, resolveBridgeTopic } from '../lib/knowledgeBridgeMap'
 import {
   clearBridgeEvidence,
   loadBridgeEvidence,
@@ -36,6 +36,7 @@ export function KnowledgeBridgeWorkbench() {
 
   const topic = useMemo(() => BRIDGE_TOPICS.find((item) => item.id === selectedId) ?? resolveBridgeTopic(query) ?? BRIDGE_TOPICS[0], [selectedId, query])
   const note = notes[topic.id] ?? ''
+  const snapshot = useMemo(() => buildBridgeSnapshot(topic, note, evidence), [topic, note, evidence])
 
   function search() {
     const clean = query.trim()
@@ -85,6 +86,13 @@ export function KnowledgeBridgeWorkbench() {
         <GuideCard label="Function" text="Build a causal map that shows how a topic moves from normal biology to clinical findings and evidence." />
         <GuideCard label="How to use" text="Choose or search a curated topic → follow the stages → verify uncertain claims in Medical Library." />
         <GuideCard label="Benefit" text="Makes the reasoning path visible, so facts are easier to study, challenge and connect to their sources." />
+      </div>
+
+      <div aria-label="Topic snapshot" className="mt-4 grid grid-cols-2 gap-2 sm:grid-cols-4">
+        <SnapshotTile label="Stages mapped" value={`${snapshot.stageCount}/7`} />
+        <SnapshotTile label="Linked Panacea tools" value={String(snapshot.actionableStageCount)} />
+        <SnapshotTile label="Personal note" value={snapshot.hasPersonalNote ? 'Saved' : 'Not started'} />
+        <SnapshotTile label="Evidence linked" value={String(snapshot.linkedEvidenceCount)} />
       </div>
 
       {evidence.length > 0 && (
@@ -183,6 +191,10 @@ export function KnowledgeBridgeWorkbench() {
 
 function GuideCard({ label, text }: { label: string; text: string }) {
   return <div className="rounded-[18px] border border-neutral-200 bg-neutral-50 p-3 dark:border-white/10 dark:bg-white/[.035]"><div className="text-[8px] font-black uppercase tracking-[.12em] text-cyan-700 dark:text-cyan-300">{label}</div><p className="mt-1 text-[9.5px] leading-relaxed text-neutral-600 dark:text-neutral-300">{text}</p></div>
+}
+
+function SnapshotTile({ label, value }: { label: string; value: string }) {
+  return <div className="rounded-[16px] border border-neutral-200 bg-neutral-50 p-2.5 text-center dark:border-white/10 dark:bg-white/[.035]"><div className="text-[13px] font-black tracking-[-.02em] text-neutral-950 dark:text-white">{value}</div><div className="mt-0.5 text-[8px] font-black uppercase tracking-[.1em] text-neutral-400">{label}</div></div>
 }
 
 export default KnowledgeBridgeWorkbench
