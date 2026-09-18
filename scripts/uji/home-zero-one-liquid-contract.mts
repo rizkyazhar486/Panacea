@@ -13,22 +13,27 @@ const shell = readFileSync('src/components/Shell.tsx', 'utf8')
 // Zero-step: Home itself shows health context. One-step: primary destinations
 // and universal actions are directly exposed without an intermediate menu.
 assert.match(workspace, /<HomeHealthBrief \/>/, 'Home stopped exposing health context at zero steps')
-assert.match(workspace, /<HomeFunWidgetRail \/>/, 'Home lost the live fun-widget rail')
-assert.match(funWidgets, /Performance[\s\S]*Fuel · today[\s\S]*Focus[\s\S]*Reset · 60s/,
-  'fun widget rail lost performance, nutrition, focus, or guided reset mini-apps')
+assert.match(workspace, /import \{ HomeFunWidgetRail \}/, 'Home stopped importing the live fun-widget rail')
+assert.match(workspace, /<HomeFunWidgetRail \/>/, 'Home lost the live fun-widget rail from the rendered Home surface')
+
+// Fun widgets must be real mini-apps backed by the existing feature universe and
+// real local health state, not a decorative three-card mockup.
+assert.match(funWidgets, /import \{ WIDGETS, type WidgetDef \} from '\.\.\/lib\/homeWidgets'/,
+  'fun widgets stopped deriving from the canonical feature registry')
+assert.match(funWidgets, /DEFAULT_WIDGETS = \[/, 'Home fun widgets lost their explicit starter set')
+assert.match(funWidgets, /getVitals\(\)/, 'live widgets stopped reading the shared vitals source')
+assert.match(funWidgets, /getWorkouts\(\)/, 'live widgets stopped reading the shared workout source')
+assert.match(funWidgets, /state\.foods/, 'live widgets stopped reading nutrition state')
+assert.match(funWidgets, /state\.sleepLogs/, 'live widgets stopped reading sleep state')
 assert.match(funWidgets, /panacea:health-updated/, 'live widgets no longer refresh from the shared health event stream')
-assert.match(funWidgets, /setFocusRunning/, 'focus widget regressed into a decorative card instead of a working timer')
-assert.match(funWidgets, /import \{ WIDGETS, type WidgetDef \} from '\.\.\/lib\/homeWidgets'/, 'fun widgets stopped deriving from the canonical feature registry')
+assert.match(funWidgets, /function FocusWidget\(\)[\s\S]*setRunning[\s\S]*window\.setInterval/,
+  'focus widget regressed into decoration instead of a working timer')
 assert.match(funWidgets, /Customize · \{WIDGETS\.length\}/, 'Home lost direct customization across the full widget universe')
 assert.match(funWidgets, /Widget universe/, 'customizable widget picker is missing')
-assert.match(funWidgets, /DEFAULT_WIDGETS = \[/, 'Home fun widgets lost their explicit starter set')
-assert.match(funWidgets, /panacea-fun-picker-grid/, '200+ feature picker lost its scalable grid surface')
-assert.match(funWidgets, /BREATH_PHASES[\s\S]*setBreathRunning[\s\S]*Guided breathing controls/,
-  'guided breath widget regressed into decoration instead of a working stateful mini-app')
-assert.match(funWidgetsCss, /panacea-breath-orbit[\s\S]*transition: transform 4s/,
-  'guided breath lost phase-driven functional motion')
-assert.match(funWidgetsCss, /prefers-reduced-motion: reduce[\s\S]*panacea-breath-orbit/,
-  'guided breath has no reduced-motion escape')
+assert.match(funWidgets, /panacea-fun-picker-grid/, 'feature picker lost its scalable grid surface')
+assert.match(funWidgets, /localStorage\.setItem\(STORAGE_KEY/, 'widget customization no longer persists')
+assert.match(funWidgetsCss, /scroll-snap-type:\s*x mandatory/, 'fun widget rail lost mobile swipe snapping')
+assert.match(funWidgetsCss, /prefers-reduced-motion: reduce/, 'fun widget motion has no reduced-motion escape')
 
 const healthIndex = workspace.indexOf('<HomeHealthBrief />')
 const funIndex = workspace.indexOf('<HomeFunWidgetRail />')
@@ -85,4 +90,4 @@ assert.doesNotMatch(shell, /aria-label="Log Out"/,
 assert.match(shell, /onClick=\{doLogout\}[\s\S]{0,240}?Log Out/,
   'removing duplicate header logout must not remove logout from the drawer')
 
-console.log('home-zero-one-liquid-contract: zero-step health context, live mini-app widgets, one-tap primary/actions/recents, one navigation system, Liquid Glass confined to controls, and no duplicate header logout.')
+console.log('home-zero-one-liquid-contract: zero-step health context, live customizable mini-app widgets, one-tap primary/actions/recents, one navigation system, Liquid Glass confined to controls, and no duplicate header logout.')
