@@ -493,3 +493,106 @@
     transition: none !important;
   }
 }
+
+/* ── Bento indeks kapabilitas ──────────────────────────────────────────────
+   Ubin dikelompokkan menurut `grup` milik katalog, dan LEBARNYA dibaca dari
+   jumlah isinya (lihat bentoSpan): kelompok dengan lima puluh kapabilitas
+   memang mengambil ruang lebih besar daripada yang bersembilan. Ukuran yang
+   dipilih menurut selera tidak memberi tahu apa pun; ukuran yang dihitung
+   memberi tahu di mana isi produk sebenarnya berada.
+
+   Tidak ada gradien dan tidak ada bayangan melayang di sini: bahasa rupa
+   permukaan ini sudah ditetapkan datar dan bergaris rambut, dan gerbang
+   home-anti-slop menjaganya tetap begitu. */
+.panacea-bento {
+  margin-top: 18px;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.panacea-bento-tile {
+  min-width: 0;
+  border: 1px solid rgba(255,255,255,.10);
+  border-radius: 18px;
+  background: rgba(255,255,255,.018);
+  transition: border-color 160ms ease, background-color 160ms ease;
+}
+
+.panacea-bento-tile[data-span='lead'],
+.panacea-bento-tile[data-open='true'] {
+  grid-column: 1 / -1;
+}
+
+.panacea-bento-tile:hover,
+.panacea-bento-tile:focus-within {
+  border-color: rgba(255,255,255,.22);
+  background: rgba(255,255,255,.04);
+}
+
+.panacea-bento-head {
+  width: 100%;
+  min-height: 72px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  padding: 16px 16px;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+  text-align: start;
+}
+
+.panacea-bento-name {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 14px;
+  font-weight: 800;
+  letter-spacing: -.02em;
+}
+
+/* Hitungan ditulis dengan angka tabular supaya deretan ubin tidak bergoyang
+   saat pencarian mengubah jumlahnya dari 9 menjadi 41. */
+.panacea-bento-count {
+  flex: 0 0 auto;
+  color: rgba(255,255,255,.40);
+  font-size: 12px;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+}
+
+.panacea-bento-tile[data-open='true'] .panacea-bento-count {
+  color: rgba(255,255,255,.88);
+}
+
+.panacea-bento-items {
+  margin: 0;
+  padding: 0 16px 6px;
+  list-style: none;
+  border-top: 1px solid rgba(255,255,255,.08);
+}
+
+/* Isi kelompok yang panjang digulir di dalam ubinnya sendiri, bukan
+   memanjangkan halaman: 57 baris sekaligus mendorong segalanya keluar layar
+   dan membuat kelompok berikutnya mustahil dijangkau tanpa menggulir jauh. */
+.panacea-bento-items {
+  max-height: min(52vh, 420px);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+@media (max-width: 520px) {
+  .panacea-bento {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .panacea-bento-tile {
+    transition: none;
+  }
+}

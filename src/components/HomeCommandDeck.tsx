@@ -1,6 +1,7 @@
 import { useMemo, useState, type ComponentType } from 'react'
 import { Link } from 'react-router-dom'
 import { FITUR_DARI_HUB } from '../lib/katalogFitur'
+import { bentoSpan } from '../lib/interaction/bento'
 import { IconBook, IconChat, IconHeart, IconRun, IconStethoscope, IconUsers } from './icons'
 import '../styles/home-human-interface.css'
 
@@ -63,6 +64,7 @@ export function HomeCommandDeck() {
   const [query, setQuery] = useState('')
   const [domain, setDomain] = useState<'All' | Domain>('All')
   const [expanded, setExpanded] = useState(false)
+  const [openGroup, setOpenGroup] = useState<string | null>(null)
 
   const uniqueFeatures = useMemo(() => {
     const seen = new Set<string>()
@@ -82,8 +84,24 @@ export function HomeCommandDeck() {
     })
   }, [domain, query, uniqueFeatures])
 
-  const showIndex = expanded || query.trim().length > 0 || domain !== 'All'
-  const visible = showIndex ? filtered.slice(0, 40) : []
+  // Bento dikelompokkan menurut `grup` yang sudah dibawa katalognya sendiri.
+  // Kelompok dipakai apa adanya — menerjemahkan atau menyusun ulang namanya di
+  // sini akan memisahkannya dari katalog dan membuat hitungannya berbohong.
+  const groups = useMemo(() => {
+    const bucket = new Map<string, HubFeature[]>()
+    for (const feature of filtered) {
+      const key = feature.grup ?? 'Other'
+      const list = bucket.get(key)
+      if (list) list.push(feature)
+      else bucket.set(key, [feature])
+    }
+    return [...bucket.entries()]
+      .map(([name, items]) => ({ name, items }))
+      .sort((a, b) => b.items.length - a.items.length)
+  }, [filtered])
+
+  const searching = query.trim().length > 0
+  const showIndex = expanded || searching || domain !== 'All'
 
   return (
     <section data-panacea-command-surface className="panacea-command-surface" aria-label="Panacea capabilities">
@@ -139,26 +157,56 @@ export function HomeCommandDeck() {
         aria-expanded={showIndex}
         onClick={() => setExpanded((value) => !value)}
       >
-        {showIndex ? 'Hide capabilities' : 'All capabilities'}
+        {showIndex ? 'Hide capabilities' : `All ${uniqueFeatures.length} capabilities`}
       </button>
 
       {showIndex ? (
-        <div className="panacea-command-results" role="list" aria-label="Capability index">
-          {visible.map((feature) => (
-            <Link
-              key={`${feature.nama}-${canonical(feature.to)}`}
-              to={canonical(feature.to)}
-              className="panacea-command-result"
-              role="listitem"
-            >
-              <span className="panacea-command-result-main">
-                <span className="panacea-command-result-title">{feature.nama}</span>
-                <span className="panacea-command-result-meta">{domainOf(feature)}</span>
-              </span>
-              <span className="panacea-command-result-arrow" aria-hidden>→</span>
-            </Link>
-          ))}
-          {visible.length === 0 ? (
+        <div className="panacea-bento" aria-label="Capability index">
+          {groups.map((group) => {
+            const open = openGroup === group.name || searching
+            const span = bentoSpan(group.items.length, filtered.length)
+            return (
+              <section
+                key={group.name}
+                className="panacea-bento-tile"
+                data-span={span}
+                data-open={open}
+                aria-label={`${group.name}, ${group.items.length} capabilities`}
+              >
+                <button
+                  type="button"
+                  className="panacea-bento-head"
+                  aria-expanded={open}
+                  onClick={() => setOpenGroup((value) => (value === group.name ? null : group.name))}
+                >
+                  <span className="panacea-bento-name">{group.name}</span>
+                  <span className="panacea-bento-count" aria-hidden>{group.items.length}</span>
+                </button>
+
+                {/* Seluruh isi kelompok dirender saat dibuka — tidak ada
+                    pemotongan diam-diam. Daftar sebelumnya berhenti di 40 dari
+                    135 kapabilitas tanpa memberi tahu siapa pun bahwa 95
+                    sisanya ada, jadi menjelajah tidak akan pernah menemukannya
+                    dan hanya pencarian yang bisa. */}
+                {open ? (
+                  <ul className="panacea-bento-items" role="list">
+                    {group.items.map((feature) => (
+                      <li key={`${feature.nama}-${canonical(feature.to)}`}>
+                        <Link to={canonical(feature.to)} className="panacea-command-result">
+                          <span className="panacea-command-result-main">
+                            <span className="panacea-command-result-title">{feature.nama}</span>
+                            <span className="panacea-command-result-meta">{domainOf(feature)}</span>
+                          </span>
+                          <span className="panacea-command-result-arrow" aria-hidden>→</span>
+                        </Link>
+                      </li>
+                    ))}
+                  </ul>
+                ) : null}
+              </section>
+            )
+          })}
+          {groups.length === 0 ? (
             <div className="py-5 text-sm font-bold text-white/40">No match</div>
           ) : null}
         </div>

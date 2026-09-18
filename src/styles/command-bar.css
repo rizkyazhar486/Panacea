@@ -1,0 +1,53 @@
+/* Bilah perintah yang menyingkir — dan pita yang memanggilnya kembali.
+   Keputusan kapan menyingkir ada di lib/interaction/commandBar.ts; berkas ini
+   hanya menggambarkannya. */
+
+.panacea-command-bar {
+  transition: transform 260ms cubic-bezier(.22,.61,.36,1), opacity 200ms ease;
+  will-change: transform;
+}
+
+.panacea-command-bar[data-panacea-command-bar='hidden'] {
+  transform: translateY(-100%);
+  opacity: 0;
+}
+
+/* Bilah yang sedang menyingkir tidak boleh menahan fokus papan ketik: Tab akan
+   berpindah ke kendali yang tidak terlihat, dan pengguna kehilangan jejaknya.
+   Dipakai `visibility` lewat transisi supaya kendalinya baru benar-benar hilang
+   setelah animasinya selesai, bukan berkedip putus di tengah jalan. */
+.panacea-command-bar[data-panacea-command-bar='hidden'] {
+  visibility: hidden;
+  transition:
+    transform 260ms cubic-bezier(.22,.61,.36,1),
+    opacity 200ms ease,
+    visibility 0s linear 260ms;
+}
+
+.panacea-command-bar[data-panacea-command-bar='shown'] {
+  visibility: visible;
+  transition:
+    transform 260ms cubic-bezier(.22,.61,.36,1),
+    opacity 200ms ease,
+    visibility 0s linear 0s;
+}
+
+/* Pita tangkap di tepi atas viewport.
+   `pointer-events: none` disengaja: yang dibutuhkan hanya POSISI penunjuk, dan
+   itu dibaca dari window oleh useCommandBar. Membuatnya menerima penunjuk akan
+   menelan klik milik isi halaman di bawahnya pada 64px teratas — persis jenis
+   lapisan tak terlihat yang pernah membuat bilah atas tidak bisa ditekan. */
+.panacea-command-bar-reveal-zone {
+  position: fixed;
+  inset-inline: 0;
+  top: 0;
+  height: 64px;
+  pointer-events: none;
+  z-index: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .panacea-command-bar {
+    transition: none;
+  }
+}
