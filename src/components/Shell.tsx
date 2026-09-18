@@ -630,18 +630,6 @@ export function Shell({ children }: { children: ReactNode }) {
             {account.isOwner && (
               <MenuPeran peran={account.role} daftar={ALL} label={roleLabel} ganti={setMode} />
             )}
-            {/* Mobile-only exit/logout — the sidebar Log Out is hidden on phones */}
-            <button
-              onClick={() => {
-                if (backendEnabled) api.logout().catch(() => {})
-                logout()
-              }}
-              className="grid h-10 w-10 shrink-0 place-items-center rounded-full border border-accent/20 bg-accent/10 text-accent transition hover:bg-accent/20 lg:hidden"
-              title="Log Out"
-              aria-label="Log Out"
-            >
-              <IconLogout size={18} />
-            </button>
             {showPatient && (
               <div
                 className="flex items-center gap-2 rounded-xl border border-neutral-200 bg-white px-2 py-1"
