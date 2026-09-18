@@ -5,8 +5,6 @@ import { HomeHealthBrief } from '../components/HomeHealthBrief'
 import { HomeVisualLanding } from '../components/HomeVisualLanding'
 import { RelWidgetRumah } from '../components/RelWidgetRumah'
 import { IconDashboard, IconHeart, IconSparkle, IconStethoscope } from '../components/icons'
-import '../styles/home-health-spectrum.css'
-import '../styles/home-mobile-shell-repair-v45.css'
 import '../styles/home-liquid-reference.css'
 import '../styles/home-green-material-v48.css'
 import '../styles/home-human-interface.css'
@@ -72,9 +70,9 @@ export function HomeSocialWorkspace() {
     <div className="panacea-liquid-home mx-auto w-full max-w-[1320px] pb-32">
       {activeKey === 'home' ? (
         <div className="panacea-human-home">
-          <HomeVisualLanding />
           <HomeHealthBrief />
           <RelWidgetRumah />
+          <HomeVisualLanding />
           <HomeCommandDeck />
         </div>
       ) : activeKey === 'for-you' ? (
