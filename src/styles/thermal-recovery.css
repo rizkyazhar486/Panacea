@@ -1,0 +1,321 @@
+.thermal-recovery {
+  --tr-accent: #5ee6a8;
+  width: min(100%, 860px);
+  margin-inline: auto;
+  padding-bottom: 5rem;
+  color: var(--color-ink, #f8fafc);
+}
+
+.thermal-mode-rail {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(72px, 1fr));
+  gap: 7px;
+  overflow: hidden;
+  padding: 8px;
+  border: 1px solid rgba(255,255,255,.08);
+  border-radius: 22px;
+  background: rgba(255,255,255,.018);
+}
+
+.thermal-mode-button {
+  min-width: 0;
+  min-height: 72px;
+  display: grid;
+  place-items: center;
+  align-content: center;
+  gap: 5px;
+  padding: 7px;
+  border: 1px solid transparent;
+  border-radius: 16px;
+  background: transparent;
+  color: rgba(255,255,255,.46);
+  transition: border-color 160ms ease, background 160ms ease, color 160ms ease, transform 140ms ease;
+}
+
+.thermal-mode-button[aria-pressed='true'] {
+  border-color: color-mix(in srgb, var(--tr-accent) 38%, transparent);
+  background: color-mix(in srgb, var(--tr-accent) 10%, transparent);
+  color: rgba(255,255,255,.96);
+}
+
+.thermal-mode-button:active { transform: scale(.97); }
+.thermal-mode-button svg {
+  width: 24px;
+  height: 24px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2.15;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.thermal-mode-button span {
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-size: 9px;
+  font-weight: 900;
+  white-space: nowrap;
+}
+
+.thermal-hero {
+  position: relative;
+  min-height: 260px;
+  overflow: hidden;
+  display: grid;
+  grid-template-columns: minmax(0, 1.15fr) minmax(180px, .85fr);
+  gap: 12px;
+  margin-top: 12px;
+  padding: clamp(14px, 2.3vw, 22px);
+  border: 1px solid rgba(255,255,255,.09);
+  border-radius: 26px;
+  background:
+    radial-gradient(circle at 18% 0%, color-mix(in srgb, var(--tr-accent) 15%, transparent), transparent 38%),
+    linear-gradient(180deg, rgba(255,255,255,.025), rgba(255,255,255,.008));
+}
+
+.thermal-visual {
+  position: relative;
+  min-height: 212px;
+  display: grid;
+  place-items: center;
+  border-radius: 22px;
+  background: rgba(255,255,255,.018);
+  overflow: hidden;
+}
+.thermal-visual svg {
+  width: min(250px, 85%);
+  aspect-ratio: 1.55;
+  overflow: visible;
+}
+.thermal-visual .track {
+  fill: none;
+  stroke: rgba(255,255,255,.065);
+  stroke-width: 9;
+}
+.thermal-visual .active {
+  fill: none;
+  stroke: var(--tr-accent);
+  stroke-width: 9;
+  stroke-linecap: round;
+  filter: drop-shadow(0 0 8px color-mix(in srgb, var(--tr-accent) 50%, transparent));
+}
+.thermal-wave {
+  fill: none;
+  stroke: var(--tr-accent);
+  stroke-width: 3.5;
+  stroke-linecap: round;
+  opacity: .82;
+}
+.thermal-pulse-dot { fill: var(--tr-accent); }
+
+.thermal-hero-copy {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 4px;
+}
+.thermal-kicker {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: rgba(255,255,255,.38);
+  font-size: 9px;
+  font-weight: 900;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+.thermal-title {
+  margin: 4px 0 0;
+  color: rgba(255,255,255,.96);
+  font-size: clamp(28px, 5vw, 48px);
+  font-weight: 900;
+  letter-spacing: -.055em;
+  line-height: .95;
+}
+.thermal-count {
+  margin-top: 10px;
+  color: var(--tr-accent);
+  font-size: clamp(28px, 4vw, 40px);
+  font-weight: 900;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+.thermal-count small {
+  margin-left: 5px;
+  color: rgba(255,255,255,.38);
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+}
+.thermal-one-line {
+  margin-top: 9px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: rgba(255,255,255,.52);
+  font-size: 10px;
+  font-weight: 750;
+  white-space: nowrap;
+}
+
+.thermal-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 13px;
+}
+.thermal-log {
+  min-height: 42px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  padding: 0 14px;
+  border: 1px solid color-mix(in srgb, var(--tr-accent) 38%, transparent);
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--tr-accent) 14%, transparent);
+  color: rgba(255,255,255,.95);
+  font-size: 10px;
+  font-weight: 900;
+}
+.thermal-info {
+  position: relative;
+}
+.thermal-info summary {
+  width: 42px;
+  height: 42px;
+  display: grid;
+  place-items: center;
+  list-style: none;
+  cursor: pointer;
+  border: 1px solid rgba(255,255,255,.10);
+  border-radius: 999px;
+  background: rgba(255,255,255,.025);
+  color: rgba(255,255,255,.62);
+  font-size: 11px;
+  font-weight: 900;
+}
+.thermal-info summary::-webkit-details-marker { display: none; }
+.thermal-info-panel {
+  position: absolute;
+  z-index: 40;
+  right: 0;
+  bottom: 50px;
+  width: min(360px, 82vw);
+  padding: 12px;
+  border: 1px solid rgba(255,255,255,.12);
+  border-radius: 16px;
+  background: rgba(9,12,10,.98);
+  box-shadow: 0 20px 58px rgba(0,0,0,.38);
+}
+.thermal-info-panel strong {
+  display: block;
+  color: rgba(255,255,255,.88);
+  font-size: 10px;
+  font-weight: 900;
+}
+.thermal-info-panel p {
+  margin: 3px 0 9px;
+  color: rgba(255,255,255,.58);
+  font-size: 10px;
+  line-height: 1.45;
+}
+
+.thermal-week {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 6px;
+  margin-top: 12px;
+}
+.thermal-day {
+  min-width: 0;
+  min-height: 62px;
+  display: grid;
+  align-content: end;
+  gap: 5px;
+  padding: 8px;
+  border: 1px solid rgba(255,255,255,.065);
+  border-radius: 14px;
+  background: rgba(255,255,255,.012);
+}
+.thermal-day-bars {
+  height: 28px;
+  display: flex;
+  align-items: flex-end;
+  gap: 2px;
+}
+.thermal-day-bars i {
+  width: 3px;
+  border-radius: 999px;
+  background: var(--tr-accent);
+  opacity: .22;
+}
+.thermal-day[data-count='1'] i,
+.thermal-day[data-count='2'] i,
+.thermal-day[data-count='3'] i { opacity: .88; }
+.thermal-day label {
+  color: rgba(255,255,255,.30);
+  font-size: 8px;
+  font-weight: 850;
+  text-transform: uppercase;
+}
+
+.thermal-recent {
+  margin-top: 12px;
+  overflow-x: auto;
+  display: flex;
+  gap: 6px;
+  padding-bottom: 2px;
+  scrollbar-width: none;
+}
+.thermal-recent::-webkit-scrollbar { display: none; }
+.thermal-chip {
+  flex: 0 0 auto;
+  min-height: 34px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0 10px;
+  border: 1px solid rgba(255,255,255,.07);
+  border-radius: 999px;
+  color: rgba(255,255,255,.55);
+  font-size: 9px;
+  font-weight: 850;
+}
+
+@media (max-width: 760px) {
+  .thermal-mode-rail {
+    display: flex;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: none;
+  }
+  .thermal-mode-rail::-webkit-scrollbar { display: none; }
+  .thermal-mode-button {
+    flex: 0 0 76px;
+    scroll-snap-align: start;
+  }
+  .thermal-hero {
+    min-height: 0;
+    grid-template-columns: minmax(0, 1fr);
+    padding: 11px;
+    border-radius: 22px;
+  }
+  .thermal-visual { min-height: 168px; }
+  .thermal-hero-copy { padding: 2px 4px 5px; }
+  .thermal-title { font-size: clamp(27px, 9vw, 38px); }
+  .thermal-week { gap: 4px; }
+  .thermal-day { min-height: 55px; padding: 6px 5px; }
+  .thermal-info-panel { left: auto; right: 0; }
+}
+
+@media (max-width: 420px) {
+  .thermal-week { grid-template-columns: repeat(7, minmax(34px, 1fr)); }
+  .thermal-day { border-radius: 11px; }
+  .thermal-day-bars i:nth-child(n+5) { display: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .thermal-mode-button { transition: none; }
+}
