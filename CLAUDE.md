@@ -64,6 +64,56 @@ During implementation:
   tests merely to obtain green CI.
 - Do not force-push shared branches or overwrite another agent's work.
 
+## Execution mode — all lanes simultaneous, no global priority
+
+The current product directive is **broad concurrent execution across all product
+lanes**. ChatGPT/Codex and Claude Code should work at the same time on independent
+work rather than serializing the roadmap behind one global priority queue.
+
+All of the following are active scope at the same time:
+- UI/UX, interaction, responsive behavior, motion, accessibility and design-system
+  implementation;
+- backend, APIs, data architecture, Supabase/database work and integrations;
+- AI orchestration, clinical reasoning infrastructure, evaluation and safety;
+- Body Exposure, anatomy, physiology, pathology, pharmacology and simulation;
+- tests, CI, stabilization, observability, security and repository hygiene;
+- product analytics, documentation, localization and developer tooling.
+
+**UI/UX is explicitly back in scope.** Do not treat visual/interface work as a
+separate deferred phase. It may proceed concurrently with backend, AI, biomedical,
+testing and infrastructure work, subject to the same PR and verification rules.
+
+"No global priority" means:
+- do not stop healthy independent lanes merely because another lane has an older,
+  larger or more prestigious task;
+- do not impose a single product-wide ordering such as stabilization → Body →
+  backend → UI;
+- each lane may still sequence its own prerequisites locally when technically
+  necessary;
+- a true shared blocker may gate only the work that depends on it, not unrelated
+  lanes.
+
+Parallelism must remain race-safe:
+1. Prefer separate branches/PRs with disjoint file ownership.
+2. Treat an overlapping file or tightly coupled state as single-writer until the
+   owning PR lands or releases it.
+3. Rebase/replay from current `main` when ancestry or overlap becomes uncertain.
+4. Never solve concurrency by force-pushing, bypassing CI, deleting another
+   agent's work, or weakening safety checks.
+5. Preserve features unless removal is explicitly required and justified.
+
+For long-running or blocked work, leave durable continuation context in this file
+or the repository's canonical handoff/task ledger so Claude Code and ChatGPT can
+resume without re-deriving intent from chat history.
+
+For progress reporting, report each active lane independently from verifiable repo
+state. Do not fabricate precision. A useful aggregate is:
+
+`Overall progress = 100 × (verified completed weighted work / canonical weighted backlog)`
+
+If a trustworthy denominator is unavailable, report the lane status and delta
+without inventing a percentage.
+
 ## Shipping — PR only
 
 **Never push directly to `main`, and never "push to both main and a Claude branch".**
