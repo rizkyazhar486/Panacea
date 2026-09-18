@@ -18,6 +18,11 @@ assert.match(funWidgets, /Performance[\s\S]*Fuel · today[\s\S]*Focus[\s\S]*Rese
   'fun widget rail lost performance, nutrition, focus, or guided reset mini-apps')
 assert.match(funWidgets, /panacea:health-updated/, 'live widgets no longer refresh from the shared health event stream')
 assert.match(funWidgets, /setFocusRunning/, 'focus widget regressed into a decorative card instead of a working timer')
+assert.match(funWidgets, /import \{ WIDGETS, type WidgetDef \} from '\.\.\/lib\/homeWidgets'/, 'fun widgets stopped deriving from the canonical feature registry')
+assert.match(funWidgets, /Customize · \{WIDGETS\.length\}/, 'Home lost direct customization across the full widget universe')
+assert.match(funWidgets, /Widget universe/, 'customizable widget picker is missing')
+assert.match(funWidgets, /DEFAULT_WIDGETS = \[/, 'Home fun widgets lost their explicit starter set')
+assert.match(funWidgets, /panacea-fun-picker-grid/, '200+ feature picker lost its scalable grid surface')
 assert.match(funWidgets, /BREATH_PHASES[\s\S]*setBreathRunning[\s\S]*Guided breathing controls/,
   'guided breath widget regressed into decoration instead of a working stateful mini-app')
 assert.match(funWidgetsCss, /panacea-breath-orbit[\s\S]*transition: transform 4s/,
