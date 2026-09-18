@@ -5,15 +5,15 @@ interface MolecularChemistryStageProps {
 }
 
 const METABOLITES = [
-  { id: 'glucose', label: 'Glucose', formula: 'C₆H₁₂O₆', lane: 'carbon' },
+  { id: 'glucose', label: 'Glucose', formula: 'C₆H₁₂O₆', lane: 'carbon', pubchemCid: 5793 },
   { id: 'pyruvate', label: 'Pyruvate', formula: 'C₃H₃O₃⁻', lane: 'carbon' },
   { id: 'acetyl-coa', label: 'Acetyl-CoA', formula: '2-C acetyl carrier', lane: 'carbon' },
-  { id: 'nad-plus', label: 'NAD⁺', formula: 'oxidized carrier', lane: 'redox' },
-  { id: 'nadh', label: 'NADH', formula: 'reduced carrier', lane: 'redox' },
+  { id: 'nad-plus', label: 'NAD⁺', formula: 'C₂₁H₂₈N₇O₁₄P₂⁺', lane: 'redox', pubchemCid: 5893 },
+  { id: 'nadh', label: 'NADH', formula: 'C₂₁H₂₉N₇O₁₄P₂', lane: 'redox', pubchemCid: 439153 },
   { id: 'fad', label: 'FAD', formula: 'oxidized carrier', lane: 'redox' },
   { id: 'fadh2', label: 'FADH₂', formula: 'reduced carrier', lane: 'redox' },
   { id: 'adp', label: 'ADP', formula: 'phosphate acceptor', lane: 'energy' },
-  { id: 'atp', label: 'ATP', formula: 'energy-transfer nucleotide', lane: 'energy' },
+  { id: 'atp', label: 'ATP', formula: 'C₁₀H₁₆N₅O₁₃P₃', lane: 'energy', pubchemCid: 5957 },
   { id: 'oxygen', label: 'O₂', formula: 'terminal electron acceptor', lane: 'gas' },
   { id: 'co2', label: 'CO₂', formula: 'carbon product', lane: 'gas' },
 ] as const
@@ -94,6 +94,16 @@ export default function MolecularChemistryStage({ selectedSystemId }: MolecularC
             </span>
             <div className="pr-7 text-[13px] font-black tracking-[-.02em] text-white/92">{item.label}</div>
             <div className="mt-1 max-w-[96px] text-[8px] font-bold leading-tight text-white/38">{item.formula}</div>
+            {'pubchemCid' in item ? (
+              <a
+                href={`https://pubchem.ncbi.nlm.nih.gov/compound/${item.pubchemCid}`}
+                target="_blank"
+                rel="noreferrer"
+                className="mt-2 inline-flex min-h-7 items-center rounded-full border border-white/[.08] px-2 text-[7px] font-black text-white/34 hover:text-white/70"
+              >
+                CID {item.pubchemCid}
+              </a>
+            ) : null}
             <div className="absolute bottom-2.5 left-3 h-1.5 w-1.5 rounded-full bg-current opacity-45" aria-hidden />
           </article>
         ))}
