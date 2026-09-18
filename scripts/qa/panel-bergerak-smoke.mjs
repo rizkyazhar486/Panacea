@@ -10,6 +10,7 @@
 // panel pada keadaan diamnya adalah cara paling mudah membuktikan tidak ada
 // apa-apa.
 import { chromium } from '@playwright/test'
+import { pilihAktivitasBodyExposure } from './body-exposure-activity-helper.mjs'
 
 const url = process.env.BERGERAK_QA_URL || 'http://127.0.0.1:4173/#/body-explorer'
 
@@ -143,7 +144,7 @@ try {
   await page.goto(url, { waitUntil: 'networkidle' })
 
   for (const p of PANEL) {
-    await page.getByRole('button', { name: p.tab, exact: true }).first().click()
+    await pilihAktivitasBodyExposure(page, p.tab)
     await page.waitForTimeout(1200)
     await p.ganggu()
     await page.waitForTimeout(400)
