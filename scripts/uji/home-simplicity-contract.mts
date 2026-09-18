@@ -7,9 +7,9 @@ const workspace = readFileSync('src/pages/HomeSocialWorkspace.tsx', 'utf8')
 const shell = readFileSync('src/components/Shell.tsx', 'utf8')
 const commandBarLogic = readFileSync('src/lib/interaction/commandBar.ts', 'utf8')
 
-// Simplicity is not feature deletion. The persistent dock owns top-level
-// navigation; the hero is allowed only contextual actions, so the same four
-// super-pages do not compete in two or three places above the fold.
+// Simplicity is not feature deletion. Top-level navigation lives in the
+// direction-aware top command bar; the hero keeps only contextual actions, so
+// the same destinations do not compete in multiple permanent surfaces.
 const heroActions = [...landing.matchAll(/\{ to: '([^']+)', label: '([^']+)'/g)]
 assert.equal(heroActions.length, 2, `Home hero exposes ${heroActions.length} actions; keep one focal message and at most two contextual actions`)
 assert.deepEqual(heroActions.map((m) => m[1]), ['/chatbot', '/harian'],
@@ -34,6 +34,8 @@ assert.doesNotMatch(workspace, /panacea-liquid-dock|data-panacea-primary-nav/,
   'Home brought back a permanent bottom navigation dock')
 assert.match(shell, /data-panacea-command-bar=\{keadaanBilah\}/,
   'Shell lost the top command bar')
+assert.match(shell, /panacea-command-primary-links/,
+  'primary links are not housed in the auto-hiding top command bar')
 assert.match(commandBarLogic, /return delta > 0 \? 'hidden' : 'shown'/,
   'top command bar is no longer direction-aware')
 
