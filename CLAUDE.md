@@ -298,3 +298,62 @@ First runtime slice: camera-only guided 9-view capture, automatic 3×3 QA previe
 Critical boundary: **camera-derived PersonalAvatar is patient-specific external appearance only. It is not patient-specific internal anatomy.** Internal patient anatomy requires verified imaging or another validated patient-specific source. Do not use generic atlas organs as if they were reconstructed from the camera.
 
 Continue by implementing a real reconstruction adapter (parametric body/face fit → clothed surface reconstruction → texture/material → rig → LOD) without creating a competing Body renderer. Preserve privacy, provenance, mobile performance and deterministic acceptance. Do not claim game-quality reconstruction is complete until an actual tested reconstruction backend produces a rigged asset.
+
+
+## Production UX + unified personal body directive — 2026-09-19
+
+The owner explicitly considers the current product **not production-ready yet**. Treat this as an R&D / product-hardening objective, not as a request to keep adding disconnected features.
+
+### One personal body everywhere
+
+Profile, Clinical and Your Body must converge on the same canonical personal-body experience:
+- personal outer-body avatar;
+- source-backed 3D anatomy context;
+- longitudinal patient state;
+- Clinical / AI-EMR context;
+- explicit provenance boundaries.
+
+Use `src/components/PersonalBodyUnifiedSurface.tsx` rather than inventing another body renderer.
+
+The current surface composes the existing personal avatar renderer and canonical anatomy projector in one product surface. The long-term target is to admit the camera-reconstructed rigged PersonalAvatar into the same canonical Three.js scene once a real reconstruction backend exists and is validated. Do not fake that milestone.
+
+### Share
+
+Personal body sharing must always be user-triggered. The current export shares the personal avatar render through the Web Share API when supported and downloads a PNG otherwise. Never auto-share or publish clinical overlays, private records or raw camera frames.
+
+### Product simplicity
+
+R&D must optimize for:
+- fewer visible choices;
+- six-or-fewer primary destinations per surface when practical;
+- progressive disclosure for secondary features;
+- one focal action / visual per viewport;
+- readable contrast;
+- minimal text on the primary scroll;
+- clear one-line guidance with detail behind disclosure;
+- no gradient/card mosaic merely to make a page look busy;
+- preserve features rather than deleting them: move secondary tools under More / disclosure.
+
+Use successful consumer apps as interaction-quality benchmarks, not as copyrighted asset sources.
+
+### Drug-dose completeness
+
+Dose coverage is incomplete and must continue improving, but **never by guessing**. Three acceptable sources are:
+1. exact curated SKDI therapy corpus mappings;
+2. verified official product-label dosage text through the existing label integration;
+3. another authoritative dose source only after provenance and indication/route matching are explicit.
+
+Route/indication mismatches are worse than blanks. Keep rejected mappings rejected until a genuinely matching source exists. Track coverage numerically and continue safe mapping passes.
+
+### Self-development loop
+
+Do not wait for the owner to invent every feature. For each major surface:
+1. observe concrete friction from code, QA, screenshots and real interaction;
+2. identify the smallest high-impact usability/clinical gap;
+3. design a non-destructive fix;
+4. implement with deterministic acceptance;
+5. measure readability, reachability, latency and mobile behavior;
+6. ship only when exact-head gates are green;
+7. continue to the next independent bottleneck.
+
+The target is not feature count. The target is a coherent, enjoyable, obvious-to-use, medically trustworthy product.
