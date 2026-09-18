@@ -225,13 +225,13 @@ Immediate source-continuity fixes already landed on main:
 - `integumentary-surface` resolves the complete compatible `surface.glb` catalogue instead of depending on a nonexistent generic “skin” source node;
 - whole-body ocular lookup now uses the actual `nervous.glb` ocular compartments plus `muscular.glb` extraocular context;
 - the compatible male whole-body reproductive set now explicitly includes penis/glans, erectile tissue, testes, epididymides, deferent ducts, seminal vesicles and prostate where source names resolve;
-- female vagina/uterus/ovary anatomy remains available in the separate HRA female pelvis module, but must not be visually fitted into the male Z-Anatomy reference body.
+- female vagina/uterus/ovary anatomy remains available in the separate HRA female pelvis module; additionally, the HRA Visible Human Female united v1.5 whole-body source is now pinned as a pipeline-ready candidate, but neither may be visually fitted into the male Z-Anatomy reference body.
 
 Tomorrow/next Body 3D lane priority:
 1. run the Blender assembly pipeline against the seven compatible `public/anatomy/*.glb` source layers;
 2. inspect the exported manifest, exact source-name retention, whole-body alignment, file size and visual artifact before committing generated binary output;
 3. wire the accepted asset through the canonical Three.js runtime rather than adding a second renderer;
 4. implement atlas-grade select/search/focus/hide/fade/isolate/show-others/layer controls around one continuous body canvas;
-5. keep female whole-body completion, fascia, skin depth and external female genital surface anatomy blocked until licensed compatible source geometry exists.
+5. acquire/audit the pinned HRA female united v1.5 reference with `scripts/bangun/acquire-hra-female-v1_5.mjs`; keep fascia, skin depth and external female genital surface claims blocked until exact source geometry/nodes are verified.
 
 Astra/Blender owns asset assembly/packaging work; Claude Code owns Three.js/runtime integration; ChatGPT Work owns provenance/source-gap/acceptance/reconciliation. This is lane responsibility, not permanent file ownership: re-read latest main and active overlap before every shared-file edit.
