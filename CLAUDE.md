@@ -210,3 +210,28 @@ Continue in this order, reconciling active UI work instead of overwriting it:
 Freshness in the Visit OS is transport freshness, not clinical severity: `ageMs = max(0, now - receivedAt)`; ≤30 s fresh, 30–120 s delayed, >120 s stale. Clinical alert thresholds must remain separate evidence-backed logic.
 
 The durable boundary is: **live encounter context ≠ signed clinical record**. Device streams and AI drafts may inform the clinician; clinical commitment remains provenance-preserving, consent-aware and human-reviewed.
+
+
+## Body Exposure Blender-first asset handoff — 2026-09-18
+
+The owner explicitly wants Body Exposure to stop treating Three.js code as a substitute for anatomical assets. The durable pipeline and multi-agent work contract are now:
+
+- `DOCS/BODY-3D-ASSET-PIPELINE.md`
+- `DOCS/BODY-3D-MULTIAGENT-CONTRACT.md`
+- `scripts/blender/build_panacea_whole_body.py`
+- `src/lib/anatomy/wholeBodyAssetContract.ts`
+
+Immediate source-continuity fixes already landed on main:
+- `integumentary-surface` resolves the complete compatible `surface.glb` catalogue instead of depending on a nonexistent generic “skin” source node;
+- whole-body ocular lookup now uses the actual `nervous.glb` ocular compartments plus `muscular.glb` extraocular context;
+- the compatible male whole-body reproductive set now explicitly includes penis/glans, erectile tissue, testes, epididymides, deferent ducts, seminal vesicles and prostate where source names resolve;
+- female vagina/uterus/ovary anatomy remains available in the separate HRA female pelvis module, but must not be visually fitted into the male Z-Anatomy reference body.
+
+Tomorrow/next Body 3D lane priority:
+1. run the Blender assembly pipeline against the seven compatible `public/anatomy/*.glb` source layers;
+2. inspect the exported manifest, exact source-name retention, whole-body alignment, file size and visual artifact before committing generated binary output;
+3. wire the accepted asset through the canonical Three.js runtime rather than adding a second renderer;
+4. implement atlas-grade select/search/focus/hide/fade/isolate/show-others/layer controls around one continuous body canvas;
+5. keep female whole-body completion, fascia, skin depth and external female genital surface anatomy blocked until licensed compatible source geometry exists.
+
+Astra/Blender owns asset assembly/packaging work; Claude Code owns Three.js/runtime integration; ChatGPT Work owns provenance/source-gap/acceptance/reconciliation. This is lane responsibility, not permanent file ownership: re-read latest main and active overlap before every shared-file edit.
