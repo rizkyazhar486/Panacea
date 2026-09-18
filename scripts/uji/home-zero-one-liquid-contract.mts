@@ -5,6 +5,8 @@ const workspace = readFileSync('src/pages/HomeSocialWorkspace.tsx', 'utf8')
 const deck = readFileSync('src/components/HomeCommandDeck.tsx', 'utf8')
 const hero = readFileSync('src/components/HomeVisualLanding.tsx', 'utf8')
 const heroCss = readFileSync('src/styles/home-intent-motion.css', 'utf8')
+const health = readFileSync('src/components/HomeHealthBrief.tsx', 'utf8')
+const healthCss = readFileSync('src/styles/home-human-interface.css', 'utf8')
 const glass = readFileSync('src/styles/home-liquid-control-layer.css', 'utf8')
 const shell = readFileSync('src/components/Shell.tsx', 'utf8')
 
@@ -16,6 +18,14 @@ const heroIndex = workspace.indexOf('<HomeVisualLanding />')
 assert.ok(healthIndex >= 0 && heroIndex >= 0 && healthIndex < heroIndex,
   'Home puts the promotional hero before the user\'s health state; useful content must win the first viewport')
 assert.match(workspace, /data-panacea-primary-nav/, 'Home lost its single persistent primary navigation layer')
+assert.match(health, /className="panacea-health-bento"/, 'Home health state regressed from bento to a flat dashboard strip')
+for (const key of ['primary', 'sleep', 'heart', 'vo2', 'hrv', 'nutrition', 'training']) {
+  assert.match(health, new RegExp(`key: '${key}'`), `health bento lost ${key}`)
+}
+assert.match(healthCss, /grid-template-columns:\s*repeat\(12,\s*minmax\(0,\s*1fr\)\)/,
+  'desktop health bento lost its dense 12-column composition')
+assert.match(healthCss, /panacea-bento-tile\[data-span='wide'\]/,
+  'capability browser lost semantic wide bento tiles')
 for (const label of ['Home', 'Your Body', 'Clinical', 'For You']) {
   assert.match(workspace, new RegExp(`<span>${label}<\\/span>`), `primary navigation lost ${label}`)
 }
