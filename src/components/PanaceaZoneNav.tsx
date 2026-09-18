@@ -20,22 +20,22 @@ export function PanaceaZoneNav() {
   const forYouActive = location.pathname === '/' && new URLSearchParams(location.search).get('t') === 'for-you'
 
   return (
-    <nav className="relative flex min-h-[58px] items-center gap-2 rounded-[20px] border border-white/[.085] bg-[#01040a]/88 px-2 py-1.5 shadow-[0_16px_46px_rgba(0,0,0,.25)] backdrop-blur-2xl sm:min-h-[64px] sm:gap-3 sm:rounded-[22px] sm:px-3" aria-label="Panacea super pages">
-      <NavLink to="/" end className="flex h-11 shrink-0 items-center gap-2 rounded-[15px] px-1.5 text-white transition hover:bg-white/[.04] active:scale-[.98] sm:px-2" aria-label="Panacea Home">
-        <LogoMark size={30} />
-        <span className="hidden text-sm font-black tracking-[-.02em] sm:block" style={{ fontFamily: 'var(--font-wordmark)' }}>Panacea<span className="text-emerald-300">med</span><span className="text-cyan-300">.id</span></span>
+    <nav className="relative flex min-h-[52px] items-center gap-1.5 rounded-[18px] border border-white/[.08] bg-[#01040a]/90 px-1.5 py-1 shadow-[0_12px_36px_rgba(0,0,0,.22)] backdrop-blur-xl sm:min-h-[56px] sm:gap-2 sm:px-2" aria-label="Panacea super pages">
+      <NavLink to="/" end className="flex h-11 shrink-0 items-center gap-1.5 rounded-[14px] px-1 text-white transition hover:bg-white/[.04] active:scale-[.98] sm:px-1.5" aria-label="Panacea Home">
+        <LogoMark size={27} />
+        <span className="hidden text-[13px] font-black tracking-[-.02em] md:block" style={{ fontFamily: 'var(--font-wordmark)' }}>Panacea<span className="text-emerald-300">med</span><span className="text-cyan-300">.id</span></span>
       </NavLink>
 
-      <div className="h-7 w-px shrink-0 bg-white/[.08]" aria-hidden />
+      <div className="h-6 w-px shrink-0 bg-white/[.07]" aria-hidden />
 
-      <div className="no-scrollbar flex min-w-0 flex-1 items-center gap-1.5 overflow-x-auto sm:justify-center sm:gap-2">
+      <div className="no-scrollbar flex min-w-0 flex-1 items-center gap-1 overflow-x-auto sm:justify-center sm:gap-1.5">
         {ZONES.map((zone) => (
           <NavLink
             key={zone.to}
             to={zone.to}
             className={({ isActive }) => {
               const selected = zone.queryAware ? forYouActive : isActive
-              return `grid h-11 min-w-[82px] shrink-0 place-items-center rounded-[14px] border px-3 text-[10px] font-black transition duration-200 active:scale-[.98] sm:min-w-[104px] sm:px-4 sm:text-xs ${selected ? activeClass : idleClass}`
+              return `grid h-11 min-w-[74px] shrink-0 place-items-center rounded-[13px] border px-2.5 text-[10px] font-black transition duration-200 active:scale-[.98] sm:min-w-[92px] sm:px-3 sm:text-[11px] ${selected ? activeClass : idleClass}`
             }}
           >
             {zone.label}
@@ -44,7 +44,7 @@ export function PanaceaZoneNav() {
       </div>
 
       {account && (
-        <NavLink to="/profile" className="grid h-11 w-11 shrink-0 place-items-center overflow-hidden rounded-[14px] border border-white/10 bg-gradient-to-br from-cyan-300/[.12] to-violet-400/[.12] text-[10px] font-black text-cyan-100 shadow-[inset_0_1px_0_rgba(255,255,255,.08)] transition hover:border-cyan-200/30 active:scale-[.98] sm:text-xs" aria-label="Open profile" title={account.name}>
+        <NavLink to="/profile" className="grid h-11 w-11 shrink-0 place-items-center overflow-hidden rounded-[13px] border border-white/[.08] bg-white/[.035] text-[10px] font-black text-cyan-100 shadow-[inset_0_1px_0_rgba(255,255,255,.06)] transition hover:border-cyan-200/25 active:scale-[.98] sm:text-[11px]" aria-label="Open profile" title={account.name}>
           {avatar ? <img src={avatar} alt="" className="h-full w-full object-cover" /> : initials}
         </NavLink>
       )}
