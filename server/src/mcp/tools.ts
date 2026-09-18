@@ -18,6 +18,24 @@ import {
   RepoQaError,
   type QaProfileName,
 } from './repoQa.js'
+import {
+  buildObservationBundlePreview,
+  buildSatusehatPreview,
+  fhirMcpCapabilities,
+  hl7v2ToFhirPreview,
+  inspectFhirResource,
+  parseHl7v2Preview,
+  type ObservationBundlePreviewInput,
+  type SatusehatPreviewInput,
+} from './interoperability.js'
+import {
+  crosswalkTerminologyPreview,
+  resolveTerminology,
+  searchTerminology,
+  type TerminologyCrosswalkInput,
+  type TerminologyResolveInput,
+  type TerminologySearchInput,
+} from './terminology.js'
 import type {
   PanaceaMcpError,
   PanaceaToolContext,
@@ -187,6 +205,36 @@ async function executeHandler(
       return createHandoffPacket(handoffInput(input))
     case 'panacea_orchestration_verify_completion':
       return verifyCompletionEvidence(completionInput(input))
+    case 'panacea_fhir_capabilities':
+      return fhirMcpCapabilities()
+    case 'panacea_fhir_build_observation_bundle_preview':
+      return buildObservationBundlePreview(
+        objectInput(input) as unknown as ObservationBundlePreviewInput,
+      )
+    case 'panacea_fhir_inspect_resource': {
+      const value = objectInput(input)
+      return inspectFhirResource('resource' in value ? value.resource : value)
+    }
+    case 'panacea_fhir_satusehat_preview':
+      return buildSatusehatPreview(
+        objectInput(input) as unknown as SatusehatPreviewInput,
+      )
+    case 'panacea_hl7v2_parse_preview':
+      return parseHl7v2Preview(requiredString(objectInput(input).message, 'message'))
+    case 'panacea_hl7v2_to_fhir_preview':
+      return hl7v2ToFhirPreview(requiredString(objectInput(input).message, 'message'))
+    case 'panacea_terminology_search':
+      return searchTerminology(
+        objectInput(input) as unknown as TerminologySearchInput,
+      )
+    case 'panacea_terminology_resolve':
+      return resolveTerminology(
+        objectInput(input) as unknown as TerminologyResolveInput,
+      )
+    case 'panacea_terminology_crosswalk_preview':
+      return crosswalkTerminologyPreview(
+        objectInput(input) as unknown as TerminologyCrosswalkInput,
+      )
     case 'panacea_repo_qa_plan':
       return buildQaInvocation(qaProfile(input), requireRepoRoot(context))
     case 'panacea_repo_qa_run':
