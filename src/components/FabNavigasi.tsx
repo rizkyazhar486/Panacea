@@ -338,9 +338,9 @@ export function FabNavigasi({ onCari }: { tujuan: TujuanFab[]; onTambah?: () => 
     <>
       {aturBuka && <PemilihAksiFab tutup={() => setAturBuka(false)} />}
 
-      {buka && <div className="fixed inset-0 z-40 bg-black/20 lg:hidden" onPointerDown={() => setBuka(false)} aria-hidden="true" />}
+      {buka && <div className="fixed inset-0 z-40 bg-black/20" onPointerDown={() => setBuka(false)} aria-hidden="true" />}
 
-      <div className="fixed z-50 lg:hidden" style={{ left: pos.x, top: pos.y }}>
+      <div className="fixed z-50" style={{ left: pos.x, top: pos.y }}>
         {buka && (
           <div
             role="menu"
