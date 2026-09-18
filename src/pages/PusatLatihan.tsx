@@ -233,6 +233,8 @@ export function PusatLatihan() {
       subjudul="Train · measure · adapt"
       ikon={<IconRun />}
       theme="metal"
+      tabLayout="compact"
+      featuredTabIds={['pelatih', 'progres', 'fisiologi', 'rencana', 'lab']}
       ringkasan={
         <div className="space-y-3">
           <TrainingLabBento snapshot={bento} />
