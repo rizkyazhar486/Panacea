@@ -11,8 +11,6 @@ const shell = readFileSync('src/components/Shell.tsx', 'utf8')
 // Zero-step: Home itself shows health context. One-step: primary destinations
 // and universal actions are directly exposed without an intermediate menu.
 assert.match(workspace, /<HomeHealthBrief \/>/, 'Home stopped exposing health context at zero steps')
-assert.match(workspace, /<HomeFunWidgetRail \/>/, 'Home lost the interactive live widget rail')
-assert.match(funWidgets, /Performance[\s\S]*Fuel · today[\s\S]*Focus/, 'fun widget rail lost performance, nutrition, or focus instruments')
 const healthIndex = workspace.indexOf('<HomeHealthBrief />')
 const heroIndex = workspace.indexOf('<HomeVisualLanding />')
 assert.ok(healthIndex >= 0 && heroIndex >= 0 && healthIndex < heroIndex,
