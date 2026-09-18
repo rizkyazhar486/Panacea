@@ -57,7 +57,7 @@ export const GROUPS: { title: string; emoji: string; feats: Feat[] }[] = [
     emoji: '⚡',
     feats: [
       { to: '/fasting', name: 'Metabolic Fasting', what: 'Time-restricted eating window & metabolic phases', kw: 'fasting intermittent eating window metabolic autophagy', tag: 'Metabolic' },
-      { to: '/thermal-therapy', name: 'Thermal Therapy', what: 'Sauna & cold-exposure protocols with the evidence', kw: 'sauna cold plunge heat ice thermal recovery', tag: 'New' },
+      { to: '/thermal-therapy', name: 'Thermal Recovery', what: 'Spa · sauna · steam · jacuzzi · hot · cold · onsen', kw: 'spa sauna steam jacuzzi hot cold plunge heat ice onsen thermal recovery', tag: 'New' },
       { to: '/macro-lab', name: 'Macro Lab', what: 'Macronutrient targets and meal composition', kw: 'macro protein karbohidrat lemak gizi makro kalori', tag: 'Wellness' },
       { to: '/sehat-sibuk', name: 'Healthy But Busy', what: 'Health habits that fit a packed schedule', kw: 'sibuk busy habit kebiasaan praktis waktu terbatas', tag: 'Wellness' },
       { to: '/carbon-diet', name: 'Carbon-Footprint Diet', what: 'Dietary choices weighed by carbon footprint', kw: 'carbon jejak karbon diet lingkungan iklim makanan', tag: 'Wellness' },
