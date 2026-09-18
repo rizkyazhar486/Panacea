@@ -1,5 +1,6 @@
 import assert from 'node:assert/strict'
 import { readFileSync } from 'node:fs'
+import { SUPER_PAGES } from '../../src/lib/superPages.ts'
 
 const landing = readFileSync('src/components/HomeVisualLanding.tsx', 'utf8')
 const deck = readFileSync('src/components/HomeCommandDeck.tsx', 'utf8')
@@ -26,10 +27,13 @@ assert.match(deck, /group\.items\.map\(/, 'The full capability index must remain
 assert.match(deck, /gabungKatalog\(FITUR_DARI_HUB, NAV_UNTUK_PENGATURAN\)/,
   'Simplifying the surface must not drop menu-only destinations')
 
-// One persistent four-item dock keeps the primary information architecture
-// obvious and stable.
-for (const label of ['Home', 'Your Body', 'Clinical', 'For You']) {
-  assert.match(workspace, new RegExp(`<span>${label}<\\/span>`), `primary dock lost ${label}`)
-}
+// Home itself is the zero-step surface; three one-tap super-page launchers
+// replace the persistent dock without creating another navigation bar.
+assert.deepEqual(SUPER_PAGES.map((space) => space.label), ['Your Body', 'Clinical', 'For You'],
+  'the primary product model drifted away from exactly three super pages')
+assert.match(workspace, /<SuperPageLauncher \/>/,
+  'Home lost the one-tap three-super-page launcher')
+assert.doesNotMatch(workspace, /data-panacea-primary-nav/,
+  'a persistent bottom navigation dock returned and competes with the command bar')
 
-console.log('home-simplicity-contract: one focal hero, two contextual actions, search-led Explore, complete capability reachability, and one persistent four-destination dock.')
+console.log('home-simplicity-contract: one focal hero, two contextual actions, search-led Explore, complete capability reachability, and exactly three one-tap super pages.')
