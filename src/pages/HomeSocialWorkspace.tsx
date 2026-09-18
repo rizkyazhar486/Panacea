@@ -93,7 +93,7 @@ export function HomeSocialWorkspace() {
           <span>Home</span>
         </button>
         <Link
-          to="/tubuh"
+          to="/fitness-hub"
           className="liquid-dock-item flex min-h-[50px] flex-col items-center justify-center gap-1 rounded-[18px] px-2 text-[9px] font-black text-white/55"
           aria-label="Your Body super page"
         >
