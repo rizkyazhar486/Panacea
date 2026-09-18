@@ -113,3 +113,36 @@ The current UI convergence work is additive and already landed on main:
 Active overlap to reconcile rather than overwrite: PR #1745 touches ClinicalHub/FitnessHub/ForYouHub; #1827 touches ClinicalHub/UnifiedBodyWorkspace/SuperPageCapabilityRail; #1845 touches the Home widget board; #1848 touches Body Exposure styling/simulators. When those streams land or are superseded, fold their stronger implementation into the shared visual language rather than recreating a second shell.
 
 For You direction: keep the social feed as the primary scrolling experience; keep GPS device-derived (weekly distance = sum of stored accepted activity distances inside the 7-day window) and sports scores source-backed/fail-explicitly when unavailable. Use progressive disclosure for secondary personal tools so the main feed remains visual, compact and social.
+
+
+## Body Exposure microscopic semantic zoom target — 2026-09-18
+
+Body Exposure must target inspectability at least comparable to mature commercial 3D anatomy atlases while going deeper across biological scale. Zoom is not allowed to mean “make the same low-resolution gross mesh larger.”
+
+The required interaction model is **semantic zoom / representation LOD**:
+- whole body → system → organ use source-backed gross 3D geometry;
+- tissue/microstructure switches to source-backed histology or microanatomy representation;
+- cell → organelle switches to cell-type-appropriate 3D/subcellular representation;
+- molecule/protein/pathway uses verified molecular or evidence-network representation;
+- genome/DNA/chromatin uses sequence/chromatin/genomic reference representation.
+- Preserve the selected system/organ/structure context across scale transitions whenever a validated cross-scale evidence edge exists.
+- If that edge or source asset does not exist, fail closed and show the missing-resolution boundary. Never synthesize microscopic precision by enlarging gross anatomy or inventing vessels, nerves, fascia, cells, proteins or DNA coordinates.
+
+Interaction quality target:
+- selectable structures with isolate/fade/hide/show-others behavior;
+- fine arterial/venous/nerve branching where the source truly contains it;
+- layer peeling, clipping/cross-section, exploded anatomy, focus and search;
+- continuous pinch/wheel/orbit behavior on mobile and desktop;
+- scale-aware labels and units;
+- explicit geometry/source/version/review metadata;
+- progressive loading and LOD so high detail does not destroy mobile performance.
+
+Scientific/detail target by exemplar:
+- nervous system: network → neuron → dendritic tree → synapse → axon/axon hillock → myelin → cytoskeleton/microtubules → mitochondria → molecular layer → DNA;
+- nucleus: nuclear pore complex → outer/inner membrane → perinuclear space → lamina → nucleoplasm/nucleolus → chromatin → histones/nucleosomes → DNA;
+- DNA packaging: double helix → nucleosome → higher-order chromatin/looped domains → chromatid → chromosome, using current evidence rather than legacy textbook simplifications when the literature is contested;
+- vascular anatomy: progressively finer branches only when source resolution/provenance supports them.
+
+The semantic-zoom trigger may use relative camera distance, for example M_semantic = D_fit / D_camera, strictly as an interaction/LOD signal. It must never be displayed as literal optical magnification or implied physical continuity across incompatible biological scales.
+
+Claude Code may replace the initial implementation with a stronger renderer, asset pipeline, spatial index, streaming LOD, GPU instancing, WebGPU, volume rendering, histology tiles, point-cloud/meshlet strategy or other architecture if it advances this target without weakening provenance, safety, mobile usability or the fail-closed rule.

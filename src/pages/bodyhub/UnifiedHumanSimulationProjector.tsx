@@ -1,5 +1,6 @@
 import { lazy, Suspense, useMemo, useState } from 'react'
 import type { BodySystemId } from '../../lib/bodySystemSourceWave'
+import { BODY_SEMANTIC_ZOOM_STOPS, getBodySemanticZoomStop, isMicroscopicBodyScale, type BodySemanticScale } from '../../lib/bodySemanticZoom'
 
 const BodyAllSystems3D = lazy(() => import('../../components/BodyAllSystems3D'))
 const AtlasPhysiologyBridgePanel = lazy(() => import('./AtlasPhysiologyBridgePanel'))
@@ -10,6 +11,7 @@ const BiomechanicsMotionLab = lazy(() => import('./BiomechanicsMotionLab'))
 const CellLab = lazy(() => import('./CellLab').then((module) => ({ default: module.CellLab })))
 const AlphaGenomeAtlas = lazy(() => import('./AlphaGenomeAtlas'))
 const SurgicalLab = lazy(() => import('./SurgicalLab').then((module) => ({ default: module.SurgicalLab })))
+const SemanticMicroscopeStage = lazy(() => import('./SemanticMicroscopeStage'))
 
 type SimulationDomain =
   | 'anatomy'
@@ -84,7 +86,6 @@ const DOMAINS: DomainDefinition[] = [
   },
 ]
 
-const SCALE_LADDER = ['Body', 'System', 'Organ', 'Tissue', 'Cell', 'Organelle', 'Molecule', 'Genome']
 
 function readableSystem(id: BodySystemId) {
   return id
@@ -113,11 +114,14 @@ export default function UnifiedHumanSimulationProjector({
   onSystemChange,
 }: UnifiedHumanSimulationProjectorProps) {
   const [domain, setDomain] = useState<SimulationDomain>('anatomy')
+  const [semanticZoom, setSemanticZoom] = useState<{ scale: BodySemanticScale; relativeZoom: number }>({ scale: 'whole-body', relativeZoom: 1 })
   const current = useMemo(
     () => DOMAINS.find((item) => item.id === domain) ?? DOMAINS[0],
     [domain],
   )
   const systemLabel = readableSystem(selectedSystemId)
+  const semanticStop = getBodySemanticZoomStop(semanticZoom.scale)
+  const microscopic = isMicroscopicBodyScale(semanticZoom.scale)
 
   function renderDomain() {
     switch (domain) {
@@ -168,6 +172,7 @@ export default function UnifiedHumanSimulationProjector({
       data-unified-human-simulation-projector="v1"
       data-selected-body-system={selectedSystemId}
       data-simulation-domain={domain}
+      data-semantic-scale={semanticZoom.scale}
       className="overflow-hidden rounded-[30px] border border-white/[.09] bg-[#020508] text-white shadow-[0_28px_90px_rgba(0,0,0,.36)]"
       aria-labelledby="unified-human-simulation-title"
     >
@@ -210,6 +215,7 @@ export default function UnifiedHumanSimulationProjector({
             <BodyAllSystems3D
               selectedSystemId={selectedSystemId}
               onSystemChange={onSystemChange}
+              onSemanticZoomChange={setSemanticZoom}
             />
           </Suspense>
         </div>
@@ -220,20 +226,44 @@ export default function UnifiedHumanSimulationProjector({
           <div className="mt-0.5 text-[9px] font-bold text-cyan-200/55">{current.scale}</div>
           <p className="mt-2 text-[10px] leading-relaxed text-white/45">{current.description}</p>
 
-          <div className="mt-4 text-[8px] font-black uppercase tracking-[.16em] text-white/30">Scale ladder</div>
-          <div className="mt-2 flex flex-wrap gap-1.5">
-            {SCALE_LADDER.map((scale, index) => (
-              <span key={scale} className="rounded-full border border-white/[.08] bg-white/[.025] px-2 py-1 text-[8px] font-bold text-white/45">
-                {index + 1}. {scale}
-              </span>
-            ))}
+          <div className="mt-4 flex items-end justify-between gap-2">
+            <div>
+              <div className="text-[8px] font-black uppercase tracking-[.16em] text-white/30">Semantic zoom</div>
+              <div className="mt-1 text-xs font-black text-white/85">{semanticStop.label}</div>
+            </div>
+            <div className="text-right text-[8px] font-bold text-cyan-200/55">{semanticZoom.relativeZoom.toFixed(1)}× from fitted view</div>
           </div>
+          <div className="mt-2 flex flex-wrap gap-1.5">
+            {BODY_SEMANTIC_ZOOM_STOPS.map((stop, index) => {
+              const active = stop.id === semanticZoom.scale
+              return (
+                <span
+                  key={stop.id}
+                  title={stop.note}
+                  className={active
+                    ? 'rounded-full border border-cyan-300/35 bg-cyan-300/[.12] px-2 py-1 text-[8px] font-bold text-cyan-100'
+                    : 'rounded-full border border-white/[.08] bg-white/[.025] px-2 py-1 text-[8px] font-bold text-white/35'}
+                >
+                  {index + 1}. {stop.label}
+                </span>
+              )
+            })}
+          </div>
+          <p className="mt-2 text-[8px] leading-relaxed text-white/30">Relative zoom controls representation/LOD; it is not optical magnification.</p>
 
           <div className="mt-4 rounded-2xl border border-amber-300/12 bg-amber-300/[.045] p-2.5 text-[9px] leading-relaxed text-amber-100/65">
             Educational/reference simulation. Generic atlas geometry and synthetic models are not patient-specific anatomy, diagnosis, operative navigation or treatment advice.
           </div>
         </aside>
       </div>
+
+      {microscopic && (
+        <div className="border-t border-white/[.08] p-2 sm:p-3" data-semantic-microscope-active={semanticZoom.scale}>
+          <Suspense fallback={<ProjectorLoader label={semanticStop.label + ' detail'} />}>
+            <SemanticMicroscopeStage scale={semanticZoom.scale} selectedSystemId={selectedSystemId} />
+          </Suspense>
+        </div>
+      )}
 
       <div className="border-t border-white/[.08] p-2 sm:p-3">
         <Suspense fallback={<ProjectorLoader label={current.label} />}>

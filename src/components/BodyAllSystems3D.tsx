@@ -8,6 +8,7 @@ import {
   type BodySystemId,
 } from '../lib/bodySystemSourceWave'
 import { body3dPixelRatio } from '../lib/body3dQuality'
+import { bodySemanticScaleFromRelativeZoom, type BodySemanticScale } from '../lib/bodySemanticZoom'
 import { muatAtlas, namaAtlas } from '../lib/anatomy/pemuatAtlas'
 
 function materialFor(source: THREE.Material) {
@@ -71,12 +72,18 @@ function disposeProjectedMaterials(group: THREE.Group) {
   })
 }
 
+export interface BodySemanticZoomState {
+  scale: BodySemanticScale
+  relativeZoom: number
+}
+
 interface BodyAllSystems3DProps {
   selectedSystemId?: BodySystemId
   onSystemChange?: (systemId: BodySystemId) => void
+  onSemanticZoomChange?: (state: BodySemanticZoomState) => void
 }
 
-export default function BodyAllSystems3D({ selectedSystemId, onSystemChange }: BodyAllSystems3DProps) {
+export default function BodyAllSystems3D({ selectedSystemId, onSystemChange, onSemanticZoomChange }: BodyAllSystems3DProps) {
   const containerRef = useRef<HTMLDivElement>(null)
   const openTimerRef = useRef<number | null>(null)
   const [open, setOpen] = useState(false)
@@ -87,6 +94,11 @@ export default function BodyAllSystems3D({ selectedSystemId, onSystemChange }: B
   const [loadedFiles, setLoadedFiles] = useState(0)
   const [loadedSourceFiles, setLoadedSourceFiles] = useState<string[]>([])
   const [failedFiles, setFailedFiles] = useState<string[]>([])
+  const semanticZoomCallbackRef = useRef(onSemanticZoomChange)
+
+  useEffect(() => {
+    semanticZoomCallbackRef.current = onSemanticZoomChange
+  }, [onSemanticZoomChange])
 
   const systemId = selectedSystemId ?? internalSystemId
   const systems = useMemo(() => resolveBodySystemSourceWave(), [])
@@ -166,6 +178,9 @@ export default function BodyAllSystems3D({ selectedSystemId, onSystemChange }: B
 
     const sourceBounds = new THREE.Box3()
     const projectedGroups: THREE.Group[] = []
+    let fittedCameraDistance = 0
+    let lastSemanticScale: BodySemanticScale = 'whole-body'
+    let lastRelativeZoom = 1
     let disposed = false
     let raf = 0
     let inViewport = true
@@ -212,6 +227,17 @@ export default function BodyAllSystems3D({ selectedSystemId, onSystemChange }: B
       setLoading(false)
     }
 
+    const emitSemanticZoom = () => {
+      if (!fittedCameraDistance) return
+      const cameraDistance = Math.max(camera.position.distanceTo(controls.target), 0.000001)
+      const relativeZoom = Math.max(0.1, Math.min(256, fittedCameraDistance / cameraDistance))
+      const scale = bodySemanticScaleFromRelativeZoom(relativeZoom)
+      if (scale === lastSemanticScale && Math.abs(relativeZoom - lastRelativeZoom) < 0.2) return
+      lastSemanticScale = scale
+      lastRelativeZoom = relativeZoom
+      semanticZoomCallbackRef.current?.({ scale, relativeZoom })
+    }
+
     const fitCamera = () => {
       if (sourceBounds.isEmpty()) return
       const center = sourceBounds.getCenter(new THREE.Vector3())
@@ -219,7 +245,15 @@ export default function BodyAllSystems3D({ selectedSystemId, onSystemChange }: B
       const span = Math.max(size.x, size.y, size.z, 0.05)
       controls.target.copy(center)
       camera.position.set(center.x + span * 0.25, center.y + span * 0.08, center.z + span * 2.25)
+      camera.near = Math.max(span * 0.0005, 0.0001)
+      camera.far = Math.max(span * 200, 1000)
+      camera.updateProjectionMatrix()
+      controls.minDistance = Math.max(span * 0.008, camera.near * 4)
+      fittedCameraDistance = camera.position.distanceTo(center)
       camera.lookAt(center)
+      semanticZoomCallbackRef.current?.({ scale: 'whole-body', relativeZoom: 1 })
+      lastSemanticScale = 'whole-body'
+      lastRelativeZoom = 1
       requestRender()
     }
 
@@ -272,8 +306,11 @@ export default function BodyAllSystems3D({ selectedSystemId, onSystemChange }: B
     const ro = new ResizeObserver(resize)
     ro.observe(container)
 
-    const onControlChange = () => requestRender()
-    if (mobile) controls.addEventListener('change', onControlChange)
+    const onControlChange = () => {
+      emitSemanticZoom()
+      requestRender()
+    }
+    controls.addEventListener('change', onControlChange)
 
     const io = new IntersectionObserver(([entry]) => {
       inViewport = Boolean(entry?.isIntersecting)
@@ -296,7 +333,7 @@ export default function BodyAllSystems3D({ selectedSystemId, onSystemChange }: B
       io.disconnect()
       ro.disconnect()
       document.removeEventListener('visibilitychange', onVisibility)
-      if (mobile) controls.removeEventListener('change', onControlChange)
+      controls.removeEventListener('change', onControlChange)
       controls.dispose()
       projectedGroups.forEach(disposeProjectedMaterials)
       renderer.dispose()
