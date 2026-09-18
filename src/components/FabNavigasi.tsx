@@ -349,8 +349,8 @@ export function FabNavigasi({ onCari }: { tujuan: TujuanFab[]; onTambah?: () => 
             style={{ width: 224, [keAtas ? 'bottom' : 'top']: prefs.size + 8, [keKiri ? 'right' : 'left']: 0 } as React.CSSProperties}
           >
             <div className="mb-1 flex items-center justify-between gap-2 px-2 py-1">
-              <span className="truncate text-[9px] font-black uppercase tracking-[.14em] text-neutral-500">Context commands</span>
-              <button type="button" onClick={() => { setBuka(false); setAturBuka(true) }} className="grid h-9 w-9 place-items-center rounded-full text-[14px] text-neutral-500 hover:bg-black/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/40 dark:hover:bg-white/10" aria-label="Customize Assistive Touch">⚙</button>
+              <span className="truncate text-[9px] font-black uppercase tracking-[.14em] text-neutral-400">Actions</span>
+              <button type="button" onClick={() => { setBuka(false); setAturBuka(true) }} className="grid h-9 w-9 place-items-center rounded-full text-[14px] text-neutral-500 hover:bg-black/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/40 dark:hover:bg-white/10" aria-label="Customize Assistive Touch">Edit</button>
             </div>
 
             <SlidableRail
