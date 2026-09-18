@@ -8,6 +8,7 @@ import { getDemo, getDemoTersimpan } from '../lib/profile'
 import { getVitals } from '../lib/healthVitals'
 import { deretMetrik, ambilRiwayat } from '../lib/riwayatVitals'
 import { useStore } from '../lib/store'
+import { cakupanDenyutPekan, kalimatCakupan } from '../lib/cakupanDenyut'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Widget lanjutan — yang bisa dihitung JUJUR dari data yang sudah masuk.
@@ -65,6 +66,7 @@ function konteksLatihan() {
 // adalah menitnya sendiri beserta garis anjuran itu, bukan nilai lulus/gagal.
 export function UbinZona2() {
   const { sesi, k } = useMemo(konteksLatihan, [])
+  const cakupan = useMemo(() => cakupanDenyutPekan(sesi), [sesi])
   const menit = useMemo(() => {
     const pekan = sesi.filter((w) => Date.now() - Date.parse(w.mulai) < 7 * HARI && w.hr.length >= 2)
     if (!pekan.length) return null
@@ -72,8 +74,26 @@ export function UbinZona2() {
     return terhitung.reduce((a, s) => a + (s.zona.find((z) => z.z === 2)?.menit ?? 0), 0)
   }, [sesi, k])
 
-  if (menit == null) return null
+  // Sebelumnya ubin ini menghilang sama sekali ketika tidak ada satu pun sesi
+  // ber-HR. Menghilang tanpa keterangan membuat pemakainya menyimpulkan
+  // fiturnya rusak atau pekannya kosong; yang benar adalah alatnya tidak
+  // merekam. Sesi yang ADA tetapi tanpa HR karena itu disebut dengan angka.
+  if (menit == null) {
+    if (cakupan.tanpaHr === 0) return null
+    return (
+      <section>
+        <Kepala judul="Zone 2 · 7 days" ke="/latihan?t=analisis" />
+        <div className="kaca rounded-3xl p-3">
+          <p className="t-kecil leading-snug text-neutral-500">
+            {cakupan.tanpaHr === 1 ? 'One session' : `${cakupan.tanpaHr} sessions`} this week, none with heart-rate
+            data — zone minutes cannot be derived without it.
+          </p>
+        </div>
+      </section>
+    )
+  }
   const sasaran = 150
+  const cakupanTeks = kalimatCakupan(cakupan)
 
   return (
     <section>
@@ -93,6 +113,11 @@ export function UbinZona2() {
         <p className="t-mikro mt-1.5 leading-snug text-neutral-400">
           The line marks 150 min/week, the WHO moderate-activity recommendation. Calculated from each session's heart-rate series, not from the sport you picked.
         </p>
+        {cakupanTeks ? (
+          <p className="t-mikro mt-1.5 border-t border-neutral-100 pt-1.5 leading-snug text-neutral-500 dark:border-white/10 dark:text-neutral-400">
+            {cakupanTeks}
+          </p>
+        ) : null}
       </div>
     </section>
   )
