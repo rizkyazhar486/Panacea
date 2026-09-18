@@ -21,6 +21,7 @@ import {
 import type { AtlasLayerKey, AtlasRegionKey } from '../../lib/wholeBodyAtlasBlueprint'
 
 export interface SurgicalLabProps {
+  selectedSourceStructureName?: string | null
   onKedalaman?: (kedalaman: number) => void
   onSorot?: (nama: string[]) => void
 }
@@ -48,7 +49,7 @@ export function kedalamanUntukLangkah(langkah: number, total: number): number {
   return Math.round(bagian * KEDALAMAN.visceral)
 }
 
-export function SurgicalLab({ onKedalaman, onSorot }: SurgicalLabProps) {
+export function SurgicalLab({ selectedSourceStructureName, onKedalaman, onSorot }: SurgicalLabProps) {
   const [incomingHandoff] = useState(() => consumeAnatomyContextHandoff('surgery'))
   const initialSpatial = SURGICAL_SPATIAL_SCENARIOS.find((item) => item.id === incomingHandoff?.surgicalScenarioId) ?? SURGICAL_SPATIAL_SCENARIOS[0]
   const [kunci, setKunci] = useState<string | null>(null)
@@ -113,7 +114,12 @@ export function SurgicalLab({ onKedalaman, onSorot }: SurgicalLabProps) {
   }
 
   return (
-    <div className="space-y-4">
+    <div
+      className="space-y-4"
+      data-selected-source-structure={selectedSourceStructureName ?? undefined}
+      data-structure-procedure-inference="not-inferred"
+      data-patient-specific-surgical-target="not-generated"
+    >
       <div className="overflow-hidden rounded-2xl border border-neutral-200 bg-neutral-950 text-white dark:border-white/10">
         <div className="border-b border-white/10 bg-gradient-to-br from-brand/15 via-transparent to-blue-500/10 p-4">
           <div className="text-[10px] font-black uppercase tracking-[0.18em] text-brand">Spatial surgical anatomy</div>

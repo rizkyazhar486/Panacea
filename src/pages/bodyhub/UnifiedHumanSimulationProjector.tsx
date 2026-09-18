@@ -199,7 +199,7 @@ export default function UnifiedHumanSimulationProjector({
       case 'pathophysiology':
         return <PathophysiologyNetworkPanel selectedAtlasSystemId={selectedSystemId} selectedSourceStructureName={selectedStructureName} />
       case 'imaging':
-        return <PencitraanVolumetrikPanel />
+        return <PencitraanVolumetrikPanel selectedSourceStructureName={selectedStructureName} />
       case 'endoscopy':
         return <VirtualEndoscopyWorkbench selectedSystemId={selectedSystemId} onSystemChange={onSystemChange} />
       case 'biomechanics':
@@ -209,7 +209,7 @@ export default function UnifiedHumanSimulationProjector({
       case 'genome':
         return <AlphaGenomeAtlas />
       case 'surgery':
-        return <SurgicalLab />
+        return <SurgicalLab selectedSourceStructureName={selectedStructureName} />
       case 'pharmacology':
         return <PharmacologyMechanismPanel selectedAtlasSystemId={selectedSystemId} selectedSourceStructureName={selectedStructureName} />
       case 'anatomy':
