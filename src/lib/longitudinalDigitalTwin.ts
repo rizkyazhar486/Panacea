@@ -1,5 +1,6 @@
 import {
   buildLongitudinalReplayFrame,
+  materializeLongitudinalStateAt,
   type LongitudinalReplayClock,
 } from './longitudinalReplay'
 import {
@@ -117,27 +118,32 @@ export function buildLongitudinalTwinSnapshot(input: {
   clock?: LongitudinalReplayClock
 }): LongitudinalTwinSnapshot {
   const purpose = consentPurposeForSurface(input.surface)
+  const clock = input.clock ?? 'known'
+  const atMs = Date.parse(input.at)
+  if (!Number.isFinite(atMs)) throw new Error('twin snapshot time must be a valid timestamp')
+
+  // Apply temporal replay first so governance counters never include events that
+  // did not yet exist for the requested known/effective-time frame.
+  const temporalState = materializeLongitudinalStateAt(input.state, input.at, clock)
   const governedState = filterStateByPurposeConsent(
-    input.state,
+    temporalState,
     input.consentLedger,
     purpose,
     input.at,
   )
-  const atMs = Date.parse(input.at)
-  if (!Number.isFinite(atMs)) throw new Error('twin snapshot time must be a valid timestamp')
 
-  const envelopeAuthorizedEventCount = Object.values(input.state.eventsById)
+  const envelopeAuthorizedEventCount = Object.values(temporalState.eventsById)
     .filter((event) => isConsentActive(event.consent, purpose, atMs)).length
   const governedEventCount = Object.keys(governedState.eventsById).length
 
   // Preserve the canonical surface projection's own envelope-consent counters.
   // The governed frame below adds the purpose-ledger restriction on top.
-  const surfaceFrame = buildLongitudinalReplayFrame(input.state, input.at, {
-    clock: input.clock ?? 'known',
+  const surfaceFrame = buildLongitudinalReplayFrame(temporalState, input.at, {
+    clock,
     surface: input.surface,
   })
   const frame = buildLongitudinalReplayFrame(governedState, input.at, {
-    clock: input.clock ?? 'known',
+    clock,
     surface: input.surface,
   })
 
@@ -167,7 +173,7 @@ export function buildLongitudinalTwinSnapshot(input: {
     at: frame.at,
     clock: frame.clock,
     surface: input.surface,
-    sourceRevision: frame.sourceRevision,
+    sourceRevision: input.state.revision,
     eventCount: frame.eventCount,
     signals,
     governance: {
