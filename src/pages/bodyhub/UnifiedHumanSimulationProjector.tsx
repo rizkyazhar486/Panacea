@@ -38,6 +38,7 @@ interface UnifiedHumanSimulationProjectorProps {
   onSystemChange: (systemId: BodySystemId) => void
   requestedDomain?: SimulationDomain
   onDomainChange?: (domain: SimulationDomain) => void
+  compact?: boolean
 }
 
 type DomainDefinition = {
@@ -150,6 +151,7 @@ export default function UnifiedHumanSimulationProjector({
   onSystemChange,
   requestedDomain,
   onDomainChange,
+  compact = false,
 }: UnifiedHumanSimulationProjectorProps) {
   const [internalDomain, setInternalDomain] = useState<SimulationDomain>('anatomy')
   const [selectedStructureName, setSelectedStructureName] = useState<string | null>(null)
@@ -288,20 +290,22 @@ export default function UnifiedHumanSimulationProjector({
           </div>
         </div>
 
-        <div className="no-scrollbar mt-3 flex gap-1.5 overflow-x-auto pb-1" role="tablist" aria-label="Unified simulation domains">
-          {DOMAINS.map((item) => (
-            <button
-              key={item.id}
-              type="button"
-              role="tab"
-              aria-selected={domain === item.id}
-              onClick={() => selectDomain(item.id)}
-              className={tabClass(domain === item.id)}
-            >
-              {item.label}
-            </button>
-          ))}
-        </div>
+        {!compact && (
+          <div className="no-scrollbar mt-3 flex gap-1.5 overflow-x-auto pb-1" role="tablist" aria-label="Unified simulation domains">
+            {DOMAINS.map((item) => (
+              <button
+                key={item.id}
+                type="button"
+                role="tab"
+                aria-selected={domain === item.id}
+                onClick={() => selectDomain(item.id)}
+                className={tabClass(domain === item.id)}
+              >
+                {item.label}
+              </button>
+            ))}
+          </div>
+        )}
       </header>
 
       {!hideReferenceAtlasCanvas && (
