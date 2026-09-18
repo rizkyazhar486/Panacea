@@ -74,6 +74,7 @@ const PROCEDURES: readonly ScopeProcedure[] = [
 
 interface VirtualEndoscopyWorkbenchProps {
   selectedSystemId: BodySystemId
+  selectedSourceStructureName?: string | null
   onSystemChange: (systemId: BodySystemId) => void
 }
 
@@ -81,6 +82,7 @@ const clamp01 = (value: number) => Math.max(0, Math.min(1, value))
 
 export default function VirtualEndoscopyWorkbench({
   selectedSystemId,
+  selectedSourceStructureName,
   onSystemChange,
 }: VirtualEndoscopyWorkbenchProps) {
   const reducedMotion = useReducedMotion()
@@ -127,6 +129,9 @@ export default function VirtualEndoscopyWorkbench({
   return (
     <section
       data-virtual-endoscopy="v1"
+      data-selected-source-structure={selectedSourceStructureName ?? undefined}
+      data-structure-route-inference="not-inferred"
+      data-patient-specific-scope-navigation="not-generated"
       className="overflow-hidden rounded-[24px] border border-white/[.08] bg-[#030405] text-white"
       aria-labelledby="virtual-endoscopy-title"
     >

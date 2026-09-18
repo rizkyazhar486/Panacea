@@ -9,6 +9,7 @@ const pathophysiology = readFileSync('src/pages/bodyhub/PathophysiologyNetworkPa
 const pharmacology = readFileSync('src/pages/bodyhub/PharmacologyMechanismPanel.tsx', 'utf8')
 const imaging = readFileSync('src/pages/bodyhub/PencitraanVolumetrikPanel.tsx', 'utf8')
 const surgery = readFileSync('src/pages/bodyhub/SurgicalLab.tsx', 'utf8')
+const endoscopy = readFileSync('src/pages/bodyhub/VirtualEndoscopyWorkbench.tsx', 'utf8')
 
 assert.match(os, /projectorDomain: 'localization'/, 'Body Exposure top-level navigation must expose lesion localization in the same projector')
 assert.match(os, /projectorDomain: 'imaging'/, 'Body Exposure top-level navigation must expose imaging in the same projector')
@@ -35,6 +36,9 @@ assert.match(imaging, /data-atlas-dicom-registration="not-performed"/, 'atlas st
 assert.match(imaging, /data-patient-specific-localization="not-inferred"/, 'imaging must not infer patient localization from reference atlas selection')
 assert.match(surgery, /data-structure-procedure-inference="not-inferred"/, 'surgery must not infer an operative route from a selected atlas mesh')
 assert.match(surgery, /data-patient-specific-surgical-target="not-generated"/, 'surgery must not generate a patient-specific operative target from generic atlas context')
+assert.match(projector, /VirtualEndoscopyWorkbench selectedSystemId=\{selectedSystemId\} selectedSourceStructureName=\{selectedStructureName\}/, 'endoscopy must receive the persistent exact atlas structure context')
+assert.match(endoscopy, /data-structure-route-inference="not-inferred"/, 'endoscopy must not infer a scope route from a selected atlas mesh')
+assert.match(endoscopy, /data-patient-specific-scope-navigation="not-generated"/, 'endoscopy must not turn a reference atlas structure into patient-specific scope navigation')
 
 assert.match(atlas, /THREE\.Raycaster/, 'whole-body atlas must support direct mesh picking')
 assert.match(atlas, /onStructureSelect\?: \(sourceName: string\) => void/, 'mesh selection must be exposed to the parent projector')

@@ -201,7 +201,7 @@ export default function UnifiedHumanSimulationProjector({
       case 'imaging':
         return <PencitraanVolumetrikPanel selectedSourceStructureName={selectedStructureName} />
       case 'endoscopy':
-        return <VirtualEndoscopyWorkbench selectedSystemId={selectedSystemId} onSystemChange={onSystemChange} />
+        return <VirtualEndoscopyWorkbench selectedSystemId={selectedSystemId} selectedSourceStructureName={selectedStructureName} onSystemChange={onSystemChange} />
       case 'biomechanics':
         return <BiomechanicsMotionLab />
       case 'cell':
