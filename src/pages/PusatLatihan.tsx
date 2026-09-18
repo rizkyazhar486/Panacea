@@ -234,7 +234,7 @@ export function PusatLatihan() {
       ikon={<IconRun />}
       theme="metal"
       tabLayout="compact"
-      featuredTabIds={['pelatih', 'progres', 'fisiologi', 'rencana', 'lab']}
+      featuredTabIds={['organizer', 'gps', 'sesi']}
       ringkasan={
         <div className="space-y-3">
           <TrainingLabBento snapshot={bento} />
