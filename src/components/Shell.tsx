@@ -597,7 +597,7 @@ export function Shell({ children }: { children: ReactNode }) {
              sudut kanan bawah, dan di sana ia menempati 12-68 px dari dasar
              layar. Dengan 64 px, empat piksel terakhir isi halaman berada
              tepat di bawahnya. */
-          className={`mx-auto w-full max-w-6xl flex-1 px-4 py-6 pb-20 sm:px-6 lg:pb-6 ${
+          className={`mx-auto w-full max-w-6xl flex-1 px-4 py-5 pb-8 sm:px-6 lg:pb-6 ${
             menggeser ? 'geser-ikut' : 'geser-pulih'}`}
           style={geser ? { transform: `translate3d(${geser}px,0,0)` } : undefined}
         >
