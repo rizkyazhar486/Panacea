@@ -5,6 +5,9 @@ import { HomeBentoWidgetBoard } from '../components/HomeBentoWidgetBoard'
 import { HomeHealthBrief } from '../components/HomeHealthBrief'
 import { HomeVisualLanding } from '../components/HomeVisualLanding'
 import { RelWidgetRumah } from '../components/RelWidgetRumah'
+import { SuperPageLauncher } from '../components/SuperPageLauncher'
+import { PanaceaImageSlider } from '../components/PanaceaImageSlider'
+import { ThinkingOrb } from '../components/ThinkingOrb'
 import '../styles/home-liquid-reference.css'
 import '../styles/home-green-material-v48.css'
 import '../styles/home-human-interface.css'
@@ -39,8 +42,8 @@ const LEGACY_VALID = new Set(LEGACY_VIEWS.map((view) => view.key))
 
 function Loader() {
   return (
-    <div className="grid min-h-[24vh] place-items-center border-y border-white/10 text-xs font-black text-white/50" role="status" aria-live="polite">
-      Loading…
+    <div className="grid min-h-[24vh] place-items-center border-y border-white/10 text-xs font-black text-white/50">
+      <ThinkingOrb label="Loading space" size={20} />
     </div>
   )
 }
@@ -58,8 +61,10 @@ export function HomeSocialWorkspace() {
       {activeKey === 'home' ? (
         <div className="panacea-human-home">
           <HomeHealthBrief />
+          <SuperPageLauncher />
           <HomeVisualLanding />
           <HomeBentoWidgetBoard />
+          <PanaceaImageSlider />
           <HomeCommandDeck />
           <details className="panacea-legacy-widget-disclosure">
             <summary>More widgets</summary>
