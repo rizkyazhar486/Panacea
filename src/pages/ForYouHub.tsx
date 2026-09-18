@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { SuperPageCapabilityRail } from '../components/SuperPageCapabilityRail'
+import { ForYouSocialPulse } from '../components/ForYouSocialPulse'
+import { ForYouDailyStack } from '../components/ForYouDailyStack'
 import { useStore } from '../lib/store'
 import {
   IconBook,
@@ -140,6 +142,9 @@ export function ForYouHub() {
           </Link>
         </div>
       </section>
+
+      <ForYouSocialPulse />
+      <ForYouDailyStack />
 
       <DestinationRail label="Life" items={LIFE} />
       <DestinationRail label="Intelligence" items={INTELLIGENCE} />

@@ -2,6 +2,8 @@ import { useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { PanaceaZoneNav } from '../components/PanaceaZoneNav'
 import { SuperPageCapabilityRail } from '../components/SuperPageCapabilityRail'
+import { SurfaceDepthNavigator } from '../components/SurfaceDepthNavigator'
+import { ClinicalPatientContext } from '../components/ClinicalPatientContext'
 
 export const GROUPS = [
   {
@@ -30,14 +32,26 @@ const PRIMARY_ACTIONS = [
   { to: '/body-explorer', label: 'Body Explorer' },
 ] as const
 
+const CLINICAL_DEPTH_ROUTES = {
+  overview: '/clinical-hub',
+  condition: '/learn',
+  mechanism: '/body-explorer',
+  assessment: '/clinical-calculators',
+  management: '/rujukan?t=empiris',
+  coding: '/emr',
+  evidence: '/evidence',
+} as const
+
 const REFERENCE_LINKS = [
-  { to: '/body-explorer', label: 'Anatomy' },
+  { to: '/learn', label: 'Diseases' },
+  { to: '/learn', label: 'Look & Learn' },
+  { to: '/clinical-calculators', label: 'Calculators' },
   { to: '/radiology', label: 'Imaging' },
-  { to: '/rujukan?t=obat', label: 'Drugs' },
-  { to: '/genome-lab', label: 'Genome' },
+  { to: '/rujukan?t=obat', label: 'Doses & Drugs' },
+  { to: '/rujukan?t=empiris', label: 'Management' },
+  { to: '/emr', label: 'ICD-10 ↔ 11' },
   { to: '/evidence', label: 'Evidence' },
   { to: '/med-study', label: 'Library' },
-  { to: '/frontier-health', label: 'Discovery' },
 ] as const
 
 export function ClinicalHub() {
@@ -77,6 +91,9 @@ export function ClinicalHub() {
           <h1 className="truncate text-2xl font-black tracking-[-.04em] sm:text-3xl">Clinical</h1>
           <span className="shrink-0 text-[9px] font-black uppercase tracking-[.14em] text-emerald-200/70">clinician-in-loop</span>
         </header>
+
+        <SurfaceDepthNavigator surface="clinical" routes={CLINICAL_DEPTH_ROUTES} />
+        <ClinicalPatientContext />
 
         <section aria-label="Ask and record" className="border-b border-white/10 pb-8">
           <div className="grid gap-3 sm:grid-cols-[minmax(0,1fr)_96px]">

@@ -3,6 +3,7 @@ import { useSearchParams } from 'react-router-dom'
 import { PanaceaZoneNav } from '../components/PanaceaZoneNav'
 import { FeatureBoulevard } from '../components/FeatureBoulevard'
 import { PersonalBodyAvatar3D } from '../components/PersonalBodyAvatar3D'
+import { SurfaceDepthNavigator } from '../components/SurfaceDepthNavigator'
 
 const BodyComposition = lazy(() => import('./BodyComposition').then((m) => ({ default: m.BodyComposition })))
 const BodyExposureOS = lazy(() => import('./BodyExposureOS').then((m) => ({ default: m.BodyExposureOS })))
@@ -36,6 +37,31 @@ const VIEWS: View[] = [
 ]
 const VALID = new Set(VIEWS.map((view) => view.key))
 
+const BODY_DEPTH_BY_VIEW: Record<BodyView, string> = {
+  body: 'today',
+  'body-exposure': 'domain',
+  'body-tools': 'domain',
+  character: 'domain',
+  training: 'domain',
+  workout: 'session',
+  recovery: 'domain',
+  numbers: 'metric',
+  nutrition: 'domain',
+  'health-data': 'source',
+  labs: 'sample',
+  longevity: 'today',
+  vitapulse: 'today',
+}
+
+const BODY_VIEW_BY_DEPTH: Record<string, BodyView> = {
+  today: 'body',
+  domain: 'training',
+  metric: 'numbers',
+  session: 'workout',
+  sample: 'labs',
+  source: 'health-data',
+}
+
 function Loader({ exposure = false }: { exposure?: boolean }) {
   return (
     <div className={`grid min-h-[34vh] place-items-center rounded-[28px] border text-sm font-bold ${exposure ? 'border-cyan-300/10 bg-black text-white/45' : 'border-white/10 bg-black/10 text-neutral-500'}`} role="status">
@@ -59,6 +85,13 @@ export function UnifiedBodyWorkspace() {
     else next.delete('t')
     setParams(next, { replace: true })
     window.scrollTo({ top: 0, behavior: 'smooth' })
+  }
+
+  function selectDepth(stopId: string) {
+    const targetKey = BODY_VIEW_BY_DEPTH[stopId]
+    if (!targetKey) return
+    const target = VIEWS.find((view) => view.key === targetKey)
+    if (target) select(target)
   }
 
   return (
@@ -110,9 +143,16 @@ export function UnifiedBodyWorkspace() {
             })}
           </div>
 
-          <div className="mt-3 rounded-2xl border border-white/[.07] bg-white/[.025] px-3 py-2.5 text-[11px] leading-relaxed text-white/45">
-            <b className="text-white/80">{active.label}:</b> {active.description}
-          </div>
+          <SurfaceDepthNavigator
+            surface="your-body"
+            activeStopId={BODY_DEPTH_BY_VIEW[activeKey]}
+            onSelect={selectDepth}
+          />
+
+          <details className="mt-3 rounded-2xl border border-white/[.07] bg-white/[.025] px-3 py-2.5 text-[11px] text-white/45">
+            <summary className="cursor-pointer font-black text-white/72">About {active.label}</summary>
+            <p className="mt-2 leading-relaxed">{active.description}</p>
+          </details>
         </div>
 
         {!isExposure && (
