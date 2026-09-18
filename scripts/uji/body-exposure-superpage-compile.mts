@@ -14,9 +14,10 @@ const navigator = read('src/components/BodyExposureActivityNavigator.tsx')
 const activities = read('src/lib/bodyExposureActivities.ts')
 const capabilityRail = read('src/components/SuperPageCapabilityRail.tsx')
 
-assert.ok(
-  !unifiedBody.includes('PersonalBodyAvatar3D'),
-  'Your Body must not use the standalone mannequin/avatar as its primary body surface',
+assert.match(
+  unifiedBody,
+  /activeKey === 'character'[\s\S]{0,500}<PersonalBodyAvatar3D \/>/,
+  'Personal avatar must remain reachable only as a secondary character/posture tool',
 )
 assert.match(
   unifiedBody,
