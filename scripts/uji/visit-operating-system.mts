@@ -79,6 +79,21 @@ assert.equal(state.latestByMetric['heart-rate']?.value, 76)
 assert.equal(state.sampleCountByMetric['heart-rate'], 1)
 assert.equal(state.quarantinedSampleCount, 0)
 
+const unknownQuality = ingestVisitDeviceObservation(state, {
+  ...sample,
+  id: 'sample-spo2-unknown-quality',
+  metric: 'spo2',
+  value: 98,
+  unit: '%',
+  capturedAt: '2026-09-18T10:05:12.000Z',
+  receivedAt: '2026-09-18T10:05:13.000Z',
+  signalQuality: null,
+  standardCode: undefined,
+})
+assert.equal(unknownQuality.accepted, true)
+state = unknownQuality.state
+assert.equal(state.latestByMetric.spo2?.value, 98)
+
 const duplicate = ingestVisitDeviceObservation(state, sample)
 assert.equal(duplicate.accepted, false)
 assert.equal(duplicate.reason, 'duplicate')
@@ -118,9 +133,13 @@ assert.equal(wrongPatient.accepted, false)
 assert.equal(wrongPatient.reason, 'subject-mismatch')
 
 const context = buildAiEmrVisitContext(state, '2026-09-18T10:05:20.000Z')
-assert.equal(context.observations.length, 1)
-assert.equal(context.observations[0].metric, 'heart-rate')
-assert.equal(context.observations[0].freshness, 'fresh')
+assert.equal(context.observations.length, 2)
+const heartRateContext = context.observations.find((observation) => observation.metric === 'heart-rate')
+assert.ok(heartRateContext)
+assert.equal(heartRateContext.freshness, 'fresh')
+const spo2Context = context.observations.find((observation) => observation.metric === 'spo2')
+assert.ok(spo2Context)
+assert.equal(spo2Context.signalQuality, null)
 assert.equal(context.media.camera, 'live')
 assert.equal(context.media.peerCount, 2)
 assert.equal(context.governance.liveDeviceDataIsPermanentRecord, false)
@@ -154,6 +173,10 @@ assert.equal(reviewed.provenance.sourceKind, 'device')
 assert.match(reviewed.provenance.method ?? '', /bluetooth-le/)
 assert.match(reviewed.provenance.method ?? '', /loinc:8867-4/)
 assert.equal(canEnterClinicalRecord(reviewed, Date.parse('2026-09-18T10:06:01.000Z')), true)
+assert.throws(
+  () => promoteObservationToClinicalRecord(state, 'spo2', 'doctor-001', '2026-09-18T10:06:02.000Z'),
+  /signal quality is unknown/,
+)
 
 state = endVisit(state, '2026-09-18T10:10:00.000Z')
 assert.equal(state.phase, 'ended')
@@ -189,4 +212,4 @@ assert.throws(
   /active clinical \+ media consent is required/,
 )
 
-console.log('Visit OS verified: WebRTC metadata boundary, continuous device ingest, consent/identity/unit/quality gates, freshness formula, uncommitted AI-EMR context, and clinician-reviewed promotion.')
+console.log('Visit OS verified: WebRTC metadata boundary, continuous device ingest, consent/identity/unit/quality gates, unknown-quality live context, freshness formula, uncommitted AI-EMR context, and clinician-reviewed promotion.')

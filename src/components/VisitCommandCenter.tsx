@@ -1,19 +1,23 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { motion, useReducedMotion } from 'framer-motion'
 import { CardiacCycle3D } from './CardiacCycle3D'
-import { ConsultChat } from './ConsultChat'
+import { ConsultChat, type ConsultChatMediaState } from './ConsultChat'
 import { useStore } from '../lib/store'
+import { backendEnabled } from '../lib/api'
 import { useLiveHeartRate } from '../lib/useLiveHeartRate'
 import { useVitals } from '../lib/useVitals'
 import {
+  buildAiEmrVisitContext,
   createVisitOperatingSession,
   endVisit,
+  ingestVisitDeviceObservation,
   pauseVisit,
   registerMedicalDevice,
   resumeVisit,
   setMedicalDeviceConnection,
   startVisit,
+  updateVisitMedia,
   type VisitDeviceMetric,
   type VisitOperatingState,
 } from '../lib/visitOperatingSystem'
@@ -89,6 +93,12 @@ export function VisitCommandCenter({ recordId, embedded = false }: VisitCommandC
     createSession(visitId, activePatient.id, clinicianId, false, new Date().toISOString()),
   )
   const [liveTrace, setLiveTrace] = useState<number[]>([])
+  const [clock, setClock] = useState(() => new Date().toISOString())
+
+  useEffect(() => {
+    const timer = window.setInterval(() => setClock(new Date().toISOString()), 15_000)
+    return () => window.clearInterval(timer)
+  }, [])
 
   useEffect(() => {
     setVisit(createSession(visitId, activePatient.id, clinicianId, false, new Date().toISOString()))
@@ -112,9 +122,9 @@ export function VisitCommandCenter({ recordId, embedded = false }: VisitCommandC
   )
 
   useEffect(() => {
-    if (!liveHeart.isLive || !finite(liveHeart.bpm) || liveHeart.bpm <= 0) return
+    if (!liveHeart.isLive || !liveHeart.lastSampleAt || !finite(liveHeart.bpm) || liveHeart.bpm <= 0) return
     setLiveTrace((current) => [...current, liveHeart.bpm].slice(-32))
-  }, [liveHeart.bpm, liveHeart.isLive])
+  }, [liveHeart.bpm, liveHeart.isLive, liveHeart.lastSampleAt, liveHeart.sampleSequence])
 
   useEffect(() => {
     if (visit.phase === 'ended') return
@@ -146,6 +156,42 @@ export function VisitCommandCenter({ recordId, embedded = false }: VisitCommandC
   }, [liveHeart.bleStatus, visit.phase])
 
   useEffect(() => {
+    if (!liveHeart.isLive || !liveHeart.lastSampleAt || liveHeart.bpm <= 0) return
+    setVisit((current) => {
+      if (current.phase !== 'live' && current.phase !== 'paused') return current
+      try {
+        let next = current
+        if (!next.devices['ble-heart-rate']) {
+          next = registerMedicalDevice(next, {
+            id: 'ble-heart-rate',
+            label: 'BLE Heart Rate Service',
+            deviceClass: 'vital-signs-monitor',
+            evidenceClass: 'consumer',
+            transport: 'bluetooth-le',
+            supports: ['heart-rate'],
+          }, liveHeart.lastSampleAt!)
+        }
+        next = setMedicalDeviceConnection(next, 'ble-heart-rate', 'live', liveHeart.lastSampleAt!)
+        return ingestVisitDeviceObservation(next, {
+          id: 'ble-heart-rate-' + liveHeart.sampleSequence + '-' + Date.parse(liveHeart.lastSampleAt!),
+          visitId: next.visitId,
+          subjectId: next.subjectId,
+          deviceId: 'ble-heart-rate',
+          metric: 'heart-rate',
+          value: liveHeart.bpm,
+          unit: 'bpm',
+          capturedAt: liveHeart.lastSampleAt!,
+          receivedAt: new Date().toISOString(),
+          signalQuality: null,
+          standardCode: { system: 'loinc', code: '8867-4' },
+        }).state
+      } catch {
+        return current
+      }
+    })
+  }, [liveHeart.bpm, liveHeart.isLive, liveHeart.lastSampleAt, liveHeart.sampleSequence])
+
+  useEffect(() => {
     const source = synced.source?.trim()
     const measuredAt = synced.measuredAt || synced.syncedAt
     if (!source || source === 'Manual' || !measuredAt || !Number.isFinite(Date.parse(measuredAt))) return
@@ -161,6 +207,7 @@ export function VisitCommandCenter({ recordId, embedded = false }: VisitCommandC
         if (finite(synced.bodyTempC)) supports.push('temperature')
         if (finite(synced.weightKg)) supports.push('weight')
         if (!supports.length) return current
+        const now = new Date().toISOString()
         let next = registerMedicalDevice(current, {
           id: 'health-sync',
           label: source,
@@ -168,9 +215,40 @@ export function VisitCommandCenter({ recordId, embedded = false }: VisitCommandC
           evidenceClass: 'unknown',
           transport: 'manual-bridge',
           supports,
-        }, new Date().toISOString())
-        const age = Date.now() - Date.parse(measuredAt)
-        next = setMedicalDeviceConnection(next, 'health-sync', age <= 120000 ? 'live' : 'degraded', new Date().toISOString())
+        }, now)
+        const capturedMs = Date.parse(measuredAt)
+        const age = Math.max(0, Date.parse(now) - capturedMs)
+        next = setMedicalDeviceConnection(next, 'health-sync', age <= 120000 ? 'live' : 'degraded', now)
+        if ((next.phase !== 'live' && next.phase !== 'paused') || age > 5 * 60_000) return next
+
+        const receivedAt = synced.syncedAt && Number.isFinite(Date.parse(synced.syncedAt)) && Date.parse(synced.syncedAt) >= capturedMs
+          ? synced.syncedAt
+          : now
+        const readings: Array<[VisitDeviceMetric, number | undefined, string, string | undefined]> = [
+          ['heart-rate', finite(synced.heartRate) ? synced.heartRate : undefined, 'bpm', '8867-4'],
+          ['spo2', finite(synced.spo2Pct) ? synced.spo2Pct : undefined, '%', undefined],
+          ['respiratory-rate', finite(synced.respRate) ? synced.respRate : undefined, '/min', undefined],
+          ['blood-pressure-systolic', finite(synced.systolic) ? synced.systolic : undefined, 'mmHg', '8480-6'],
+          ['blood-pressure-diastolic', finite(synced.diastolic) ? synced.diastolic : undefined, 'mmHg', '8462-4'],
+          ['temperature', finite(synced.bodyTempC) ? synced.bodyTempC : undefined, '°C', undefined],
+          ['weight', finite(synced.weightKg) ? synced.weightKg : undefined, 'kg', '29463-7'],
+        ]
+        for (const [metric, value, unit, loinc] of readings) {
+          if (!finite(value)) continue
+          next = ingestVisitDeviceObservation(next, {
+            id: 'health-sync-' + metric + '-' + capturedMs,
+            visitId: next.visitId,
+            subjectId: next.subjectId,
+            deviceId: 'health-sync',
+            metric,
+            value,
+            unit,
+            capturedAt: measuredAt,
+            receivedAt,
+            signalQuality: null,
+            standardCode: loinc ? { system: 'loinc', code: loinc } : undefined,
+          }).state
+        }
         return next
       } catch {
         return current
@@ -190,34 +268,52 @@ export function VisitCommandCenter({ recordId, embedded = false }: VisitCommandC
     visit.phase,
   ])
 
-  const heartRate = liveHeart.isLive && liveHeart.bpm > 0
+  const visitContext = useMemo(() => buildAiEmrVisitContext(visit, clock), [clock, visit])
+  const liveByMetric = useMemo(
+    () => new Map(visitContext.observations.map((observation) => [observation.metric, observation])),
+    [visitContext.observations],
+  )
+
+  const heartRate = finite(liveByMetric.get('heart-rate')?.value)
+    ? liveByMetric.get('heart-rate')!.value
+    : liveHeart.isLive && liveHeart.bpm > 0
     ? liveHeart.bpm
     : finite(latestClinical?.heartRate)
       ? latestClinical.heartRate
       : finite(synced.heartRate)
         ? synced.heartRate
         : undefined
-  const spo2 = finite(latestClinical?.spo2)
+  const spo2 = finite(liveByMetric.get('spo2')?.value)
+    ? liveByMetric.get('spo2')!.value
+    : finite(latestClinical?.spo2)
     ? latestClinical.spo2
     : finite(synced.spo2Pct)
       ? synced.spo2Pct
       : undefined
-  const respiratoryRate = finite(latestClinical?.respRate)
+  const respiratoryRate = finite(liveByMetric.get('respiratory-rate')?.value)
+    ? liveByMetric.get('respiratory-rate')!.value
+    : finite(latestClinical?.respRate)
     ? latestClinical.respRate
     : finite(synced.respRate)
       ? synced.respRate
       : undefined
-  const temperature = finite(latestClinical?.tempC)
+  const temperature = finite(liveByMetric.get('temperature')?.value)
+    ? liveByMetric.get('temperature')!.value
+    : finite(latestClinical?.tempC)
     ? latestClinical.tempC
     : finite(synced.bodyTempC)
       ? synced.bodyTempC
       : undefined
-  const systolic = finite(latestClinical?.systolic)
+  const systolic = finite(liveByMetric.get('blood-pressure-systolic')?.value)
+    ? liveByMetric.get('blood-pressure-systolic')!.value
+    : finite(latestClinical?.systolic)
     ? latestClinical.systolic
     : finite(synced.systolic)
       ? synced.systolic
       : undefined
-  const diastolic = finite(latestClinical?.diastolic)
+  const diastolic = finite(liveByMetric.get('blood-pressure-diastolic')?.value)
+    ? liveByMetric.get('blood-pressure-diastolic')!.value
+    : finite(latestClinical?.diastolic)
     ? latestClinical.diastolic
     : finite(synced.diastolic)
       ? synced.diastolic
@@ -225,7 +321,7 @@ export function VisitCommandCenter({ recordId, embedded = false }: VisitCommandC
 
   const trace = [...clinicalTrace, ...liveTrace].slice(-32)
   const path = tracePath(trace)
-  const deviceCount = Object.values(visit.devices).filter((device) => device.status === 'live' || device.status === 'degraded').length
+  const deviceCount = visitContext.connectedDevices.filter((device) => device.status === 'live' || device.status === 'degraded').length
   const running = visit.phase === 'live' || visit.phase === 'paused'
   const cameraOpen = visit.phase === 'live'
   const confirmed = visit.consent.clinicalData.granted
@@ -247,7 +343,10 @@ export function VisitCommandCenter({ recordId, embedded = false }: VisitCommandC
     setVisit((current) => {
       const at = new Date().toISOString()
       if (current.phase === 'ready') return startVisit(current, at)
-      if (current.phase === 'live') return pauseVisit(current)
+      if (current.phase === 'live') {
+        const mediaOff = updateVisitMedia(current, { camera: 'off', microphone: 'off', peerCount: 0 })
+        return pauseVisit(mediaOff)
+      }
       if (current.phase === 'paused') return resumeVisit(current, at)
       if (current.phase === 'ended') return createSession(visitId, activePatient.id, clinicianId, false, at)
       return current
@@ -257,6 +356,21 @@ export function VisitCommandCenter({ recordId, embedded = false }: VisitCommandC
   function stopVisit() {
     setVisit((current) => endVisit(current, new Date().toISOString()))
   }
+
+  const onMediaStateChange = useCallback((media: ConsultChatMediaState) => {
+    setVisit((current) => {
+      if (current.phase !== 'live' && current.phase !== 'paused') return current
+      try {
+        return updateVisitMedia(current, {
+          camera: media.camera,
+          microphone: media.microphone,
+          peerCount: media.peerCount,
+        })
+      } catch {
+        return current
+      }
+    })
+  }, [])
 
   if (activePatient.id === 'none') {
     return (
@@ -363,13 +477,18 @@ export function VisitCommandCenter({ recordId, embedded = false }: VisitCommandC
             </div>
           </div>
 
-          {cameraOpen ? (
-            <ConsultChat room={cameraRoom} name={account?.name || state.settings.doctorName || 'Clinician'} title="Doctor camera" compact />
+          {cameraOpen && backendEnabled ? (
+            <ConsultChat
+              room={cameraRoom}
+              name={account?.name || state.settings.doctorName || 'Clinician'}
+              title="Doctor camera"
+              compact
+              onMediaStateChange={onMediaStateChange}
+            />
           ) : (
             <div className="grid min-h-[280px] place-items-center rounded-[22px] border border-white/10 bg-black/35 p-5 text-center">
-              <div>
-                <div className="text-sm font-black">{visit.phase === 'paused' ? 'Visit paused' : 'Camera ready after visit starts'}</div>
-                <div className="mt-1 text-[10px] text-white/35">Camera and microphone are requested only inside an active visit.</div>
+              <div className="truncate text-sm font-black text-white/65">
+                {!backendEnabled ? 'Realtime backend unavailable' : visit.phase === 'paused' ? 'Visit paused' : 'Camera ready after visit starts'}
               </div>
             </div>
           )}
@@ -390,7 +509,7 @@ export function VisitCommandCenter({ recordId, embedded = false }: VisitCommandC
           <Link to="/emr" className="grid min-h-10 shrink-0 place-items-center rounded-full border border-white/10 px-3 text-[9px] font-black text-white/60">AI-EMR</Link>
           <Link to="/body-explorer" className="grid min-h-10 shrink-0 place-items-center rounded-full border border-white/10 px-3 text-[9px] font-black text-white/60">Body Exposure</Link>
           <span className="grid min-h-10 shrink-0 place-items-center rounded-full border border-white/10 px-3 text-[9px] font-black text-white/35">
-            {synced.source ? 'Sync · ' + synced.source : 'No synced device source'}
+            {visitContext.observations.length + ' live observations · ' + (synced.source ? synced.source : 'no sync source')}
           </span>
         </div>
       </footer>

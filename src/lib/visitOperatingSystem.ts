@@ -99,7 +99,7 @@ export interface VisitDeviceObservation {
   unit: string
   capturedAt: string
   receivedAt: string
-  signalQuality: number
+  signalQuality: number | null
   standardCode?: {
     system: 'loinc' | 'ieee-11073' | 'vendor'
     code: string
@@ -172,7 +172,7 @@ export interface VisitObservationContext {
   capturedAt: string
   receivedAt: string
   deviceId: string
-  signalQuality: number
+  signalQuality: number | null
   freshness: VisitFreshness
   ageMs: number
 }
@@ -447,7 +447,7 @@ export function ingestVisitDeviceObservation(
   try {
     capturedMs = parseIso(sample.capturedAt, 'sample.capturedAt')
     receivedMs = parseIso(sample.receivedAt, 'sample.receivedAt')
-    assertQuality(sample.signalQuality)
+    if (sample.signalQuality != null) assertQuality(sample.signalQuality)
   } catch {
     return quarantine(state, 'invalid-time')
   }
@@ -456,7 +456,7 @@ export function ingestVisitDeviceObservation(
   if (!isConsentActive(state.consent.clinicalData, 'clinical-support', receivedMs)) {
     return quarantine(state, 'clinical-consent-inactive')
   }
-  if (sample.signalQuality < 0.5) return quarantine(state, 'low-signal-quality')
+  if (sample.signalQuality != null && sample.signalQuality < 0.5) return quarantine(state, 'low-signal-quality')
 
   const next = cloneState(state)
   next.latestByMetric = {
@@ -473,7 +473,7 @@ export function ingestVisitDeviceObservation(
     [sample.deviceId]: {
       ...device,
       lastSeenAt: sample.receivedAt,
-      status: sample.signalQuality < 0.75 ? 'degraded' : 'live',
+      status: sample.signalQuality != null && sample.signalQuality < 0.75 ? 'degraded' : 'live',
     },
   }
 
@@ -576,6 +576,9 @@ export function promoteObservationToClinicalRecord(
   if (!device) throw new Error('observation device is no longer registered')
 
   const definition = canonicalMetric(metric)
+  if (sample.signalQuality == null) {
+    throw new Error('observation signal quality is unknown; promotion requires adapter-provided quality')
+  }
   return {
     id: `visit:${state.visitId}:${sample.id}`,
     subjectId: state.subjectId,

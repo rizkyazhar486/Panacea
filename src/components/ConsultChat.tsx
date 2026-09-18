@@ -5,6 +5,14 @@ import { IconStethoscope } from './icons'
 
 interface Line { from?: string; text?: string; type: string; at?: string }
 
+export interface ConsultChatMediaState {
+  connected: boolean
+  inCall: boolean
+  camera: 'off' | 'live' | 'degraded'
+  microphone: 'off' | 'live' | 'degraded'
+  peerCount: number
+}
+
 // Public STUN server for NAT traversal. For users behind symmetric NAT a TURN
 // server is also required — supply it via VITE_TURN_URL / VITE_TURN_USER /
 // VITE_TURN_CRED (see DOCS/REALTIME-SETUP.md).
@@ -27,7 +35,19 @@ function iceServers(): RTCIceServer[] {
 // Real-time consultation room over WebSocket (doctor ↔ patient join the same room).
 // Text chat + optional WebRTC audio/video call. The WebSocket relays both chat
 // messages and WebRTC signaling (offer/answer/ICE) to the other peer in the room.
-export function ConsultChat({ room, name, title, compact = false }: { room: string; name: string; title?: string; compact?: boolean }) {
+export function ConsultChat({
+  room,
+  name,
+  title,
+  compact = false,
+  onMediaStateChange,
+}: {
+  room: string
+  name: string
+  title?: string
+  compact?: boolean
+  onMediaStateChange?: (state: ConsultChatMediaState) => void
+}) {
   const [lines, setLines] = useState<Line[]>([])
   const [input, setInput] = useState('')
   const [connected, setConnected] = useState(false)
@@ -57,7 +77,11 @@ export function ConsultChat({ room, name, title, compact = false }: { room: stri
     pc.onicecandidate = (e) => { if (e.candidate) wsSend({ type: 'rtc-ice', candidate: e.candidate }) }
     pc.ontrack = (e) => { if (remoteVideoRef.current) remoteVideoRef.current.srcObject = e.streams[0] }
     pc.onconnectionstatechange = () => {
-      if (pc.connectionState === 'failed' || pc.connectionState === 'disconnected') setCallError('The call connection was lost.')
+      if (pc.connectionState === 'failed' || pc.connectionState === 'disconnected') {
+        setCallError('The call connection was lost.')
+      } else if (pc.connectionState === 'connected') {
+        setCallError('')
+      }
     }
     const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true })
     localStreamRef.current = stream
@@ -158,6 +182,16 @@ export function ConsultChat({ room, name, title, compact = false }: { room: stri
       localVideoRef.current.srcObject = localStreamRef.current
     }
   }, [inCall])
+
+  useEffect(() => {
+    onMediaStateChange?.({
+      connected,
+      inCall,
+      camera: inCall && camOn ? (callError ? 'degraded' : 'live') : 'off',
+      microphone: inCall && micOn ? (callError ? 'degraded' : 'live') : 'off',
+      peerCount: count,
+    })
+  }, [callError, camOn, connected, count, inCall, micOn, onMediaStateChange])
 
   useEffect(() => {
     scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight })
