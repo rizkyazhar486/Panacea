@@ -50,6 +50,8 @@ for (const required of [
 const projector = readFileSync(new URL('../../src/pages/bodyhub/UnifiedHumanSimulationProjector.tsx', import.meta.url), 'utf8')
 const rail = readFileSync(new URL('../../src/pages/bodyhub/UniversalAtlasDepthRail.tsx', import.meta.url), 'utf8')
 const multisystem = readFileSync(new URL('../../src/pages/bodyhub/MultisystemScaleNavigator.tsx', import.meta.url), 'utf8')
+const microscope = readFileSync(new URL('../../src/pages/bodyhub/SemanticMicroscopeStage.tsx', import.meta.url), 'utf8')
+const chemistry = readFileSync(new URL('../../src/pages/bodyhub/MolecularChemistryStage.tsx', import.meta.url), 'utf8')
 
 assert.match(projector, /UniversalAtlasDepthRail/)
 assert.match(projector, /semanticScale=\{semanticZoom\.scale\}/)
@@ -57,5 +59,9 @@ assert.match(rail, /Universal standard · every structure/)
 assert.match(rail, /Body → histology → cell → organelle → chemistry → genome/)
 assert.doesNotMatch(multisystem, /Eye 4D Gold Standard/)
 assert.doesNotMatch(multisystem, /Current organ benchmark/)
+assert.match(microscope, /MolecularChemistryStage/)
+for (const token of ['Glucose', 'ATP', 'NAD⁺', 'NADH', '5793', '5957', '5893', '439153']) {
+  assert.ok(chemistry.includes(token), `chemistry stage missing verified core reference: ${token}`)
+}
 
 console.log('universal-atlas-standard: every body system is held to one gross→histology→cell→organelle→chemistry→genome target')
