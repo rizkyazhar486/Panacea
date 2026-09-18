@@ -6,7 +6,6 @@ import { pasangKilau } from '../lib/kilau'
 import { indukRute } from '../lib/alurHalaman'
 import { useState, useEffect, useCallback, useRef, type ReactNode } from 'react'
 import { LogoMark } from './Logo'
-import { FabNavigasi } from './FabNavigasi'
 import { kirimRingkasan } from '../lib/ringkasan'
 import {
   IconDashboard,
@@ -23,7 +22,6 @@ import {
   IconFood,
   IconStethoscope,
   IconChartUp,
-  IconLogout,
   IconHeart,
   IconTimer,
   IconPill,
@@ -40,7 +38,6 @@ import {
   IconLeaf,
   IconSearch,
   IconBell,
-  IconPhone,
 } from './icons'
 import { useStore } from '../lib/store'
 import { getTheme, toggleTheme, type Theme } from '../lib/theme'
@@ -269,61 +266,11 @@ const riskLabel: Record<string, string> = {
   immunocompromised: 'Immunocompromised',
 }
 
-// Mobile drawer navigation with accordion groups — the flat list grew too long
-// to scroll. 'Home' items stay as always-visible plain links; every other
-// group collapses, with the group containing the current route open by default.
-function DrawerNav({ items }: { items: Nav[] }) {
-  const loc = useLocation()
-  const groups = GROUP_ORDER
-    .map((g) => ({ name: g, items: items.filter((n) => n.group === g) }))
-    .filter((g) => g.items.length > 0)
-  const activeGroup = groups.find((g) => g.items.some((n) => navMatches(n, loc.pathname)))?.name
-  const [open, setOpen] = useState<Record<string, boolean>>(() => (activeGroup ? { [activeGroup]: true } : {}))
-
-  const link = (n: Nav, indent = false) => (
-    <NavLink key={n.to} to={n.to} end={n.end}
-      className={({ isActive }) =>
-        `flex items-center gap-3 rounded-xl px-4 py-3 text-[15px] font-semibold transition ${indent ? 'ml-2' : ''} ${
-          isActive ? 'bg-brand-50 text-brand-dark font-bold' : 'text-neutral-600 hover:bg-neutral-50'
-        }`
-      }>
-      <n.icon size={20} />
-      {n.label}
-    </NavLink>
-  )
-
-  return (
-    <nav className="flex flex-1 flex-col gap-1 overflow-y-auto px-3 py-3">
-      {groups.map((g) =>
-        g.name === 'Home' ? (
-          g.items.map((n) => link(n))
-        ) : (
-          <div key={g.name}>
-            <button
-              onClick={() => setOpen((o) => ({ ...o, [g.name]: !o[g.name] }))}
-              aria-expanded={!!open[g.name]}
-              className="flex w-full items-center justify-between rounded-xl px-4 py-3 text-[13px] font-bold uppercase tracking-wide text-neutral-500 hover:bg-neutral-50"
-            >
-              {g.name}
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round"
-                className={`transition-transform ${open[g.name] ? 'rotate-180' : ''}`}>
-                <polyline points="6 9 12 15 18 9" />
-              </svg>
-            </button>
-            {open[g.name] && <div className="flex flex-col gap-1">{g.items.map((n) => link(n, true))}</div>}
-          </div>
-        ),
-      )}
-    </nav>
-  )
-}
-
 export function Shell({ children }: { children: ReactNode }) {
   const { state, activePatient, setActivePatient, logout, setMode } = useStore()
   const loc = useLocation()
   const navigate = useNavigate()
   const [theme, setTheme] = useState<Theme>(getTheme)
-  const [menuOpen, setMenuOpen] = useState(false)
   const [cariBuka, setCariBuka] = useState(false)
   /* SATU KOTAK, DIPANGGIL DARI MANA SAJA.
      Kotak pencarian ini menumpang di atas halaman yang sedang dibuka, jadi
@@ -381,7 +328,7 @@ export function Shell({ children }: { children: ReactNode }) {
 
   const { tarikan, geser, menggeser } = useGestur({
     onKembali: kembali, onLanjut: lanjut, onSegarkan: segarkan,
-    mati: cariBuka || menuOpen,
+    mati: cariBuka,
   })
 
   // Ctrl/Cmd+K membuka pencarian — kebiasaan yang sudah dikenal luas, dan satu-
@@ -419,27 +366,15 @@ export function Shell({ children }: { children: ReactNode }) {
   }, [])
 
   useEffect(() => pasangKilau(), [])
-  const [closedGroups, setClosedGroups] = useState<Record<string, boolean>>({})
-  const [navHidden, setNavHidden] = useState(false)
   const account = state.account
 
-  // Bilah atas menyingkir saat membaca ke bawah dan kembali saat dicari.
-  // Isinya tidak berubah sedikit pun: menu, kembali, judul, pencarian,
-  // notifikasi dan profil tetap di sana — yang berubah hanya kapan ia menempati
-  // layar. Pemanggilnya adalah pita tangkap di tepi atas viewport, bukan hover
-  // pada bilahnya sendiri: bilah yang sudah menyingkir tidak berada di bawah
-  // kursor, jadi hover padanya tidak akan pernah menyala.
-  //
-  // `navHidden` sudah berdiri di sini beserta komentar yang menjanjikan dock
-  // bawah ikut menyingkir, tetapi `setNavHidden` tidak pernah dipanggil dari
-  // mana pun — janjinya belum pernah hidup. Sekarang keduanya dijalankan oleh
-  // keputusan yang sama, jadi bilah atas dan dock bawah menyingkir dan kembali
-  // bersama alih-alih saling bertentangan.
+  // Bilah atas menyingkir saat membaca ke bawah dan kembali saat pengguna
+  // menggulir ke atas. Ini menjadi SATU-SATUNYA navigasi persisten aplikasi:
+  // tidak ada bottom dock, FAB navigation, atau drawer penuh.
   const keadaanBilah = useCommandBar(bilahAtas)
-  useEffect(() => { setNavHidden(keadaanBilah === 'hidden') }, [keadaanBilah])
 
-  // Close the mobile drawer & record the visit (for "most-used services").
-  useEffect(() => { setMenuOpen(false); trackVisit(loc.pathname) }, [loc.pathname])
+  // Record visits for evidence-based shortcuts.
+  useEffect(() => { trackVisit(loc.pathname) }, [loc.pathname])
 
   // Auto-hide the floating bottom nav while scrolling down through a feed
   // (it otherwise sits on top of post action buttons); bring it back on any
@@ -473,26 +408,6 @@ export function Shell({ children }: { children: ReactNode }) {
   const [tersembunyi, setTersembunyi] = useState<string[]>(ambilTersembunyi)
   useEffect(() => langgananFitur(setTersembunyi), [])
 
-  useEffect(() => {
-    let lastY = window.scrollY
-    let ticking = false
-    function onScroll() {
-      if (ticking) return
-      ticking = true
-      requestAnimationFrame(() => {
-        const y = window.scrollY
-        const delta = y - lastY
-        if (y < 80) setNavHidden(false)
-        else if (delta > 8) setNavHidden(true)
-        else if (delta < -8) setNavHidden(false)
-        lastY = y
-        ticking = false
-      })
-    }
-    window.addEventListener('scroll', onScroll, { passive: true })
-    return () => window.removeEventListener('scroll', onScroll)
-  }, [])
-
   // Halaman demo mandiri: butuh kanvas penuh sendiri (video layar penuh,
   // tanpa header/nav aplikasi), dan harus dapat diakses lewat URL langsung
   // tanpa login. `fixed inset-0` di dalamnya tidak akan menutupi header/nav
@@ -505,20 +420,12 @@ export function Shell({ children }: { children: ReactNode }) {
   const title = items.find((n) => navMatches(n, loc.pathname))
   // Only doctors switch between patients; patients see their own data only.
   const showPatient = PATIENT_PAGES.includes(loc.pathname) && account.role === 'dokter'
-  // Quick actions (mobile): the role's most useful destinations, minus the
-  // utility pages — one-tap shortcuts beside the hamburger menu.
-  const quick = items.filter((n) => !['/settings', '/legal', '/billing', '/architecture'].includes(n.to)).slice(0, 6)
-  const doLogout = () => { if (backendEnabled) api.logout().catch(() => {}); logout() }
   // Beranda ringkas — the user's most-used services (ranked by visit history),
   // shown on the home route only.
   const homeServices = rankByUsage(
     items.filter((n) => !['/', '/settings', '/legal', '/architecture'].includes(n.to)),
   ).slice(0, 8)
   const onHome = loc.pathname === '/'
-  // Sidebar accordion groups (only groups with visible items for this role).
-  const groups = GROUP_ORDER
-    .map((name) => ({ name, items: items.filter((n) => (n.group ?? 'Account') === name) }))
-    .filter((g) => g.items.length > 0)
 
   return (
     <div className="relative flex min-h-screen">
@@ -541,19 +448,9 @@ export function Shell({ children }: { children: ReactNode }) {
         <header
           ref={bilahAtas}
           data-panacea-command-bar={keadaanBilah}
-          className="kaca panacea-command-bar sticky top-0 z-10 flex items-center justify-between gap-2 rounded-none border-x-0 border-t-0 px-4 py-3 sm:px-5"
+          className="kaca panacea-command-bar sticky top-0 z-10 flex flex-wrap items-center justify-between gap-2 rounded-none border-x-0 border-t-0 px-4 py-3 sm:px-5"
         >
           <div className="flex min-w-0 items-center gap-2">
-            {/* Mobile: buka drawer */}
-            <button
-              onClick={() => setMenuOpen(true)}
-              className="header-icon-btn grid h-10 w-10 shrink-0 place-items-center rounded-full text-ink lg:hidden"
-              aria-label="Open menu"
-            >
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round">
-                <line x1="4" y1="7" x2="20" y2="7" /><line x1="4" y1="12" x2="20" y2="12" /><line x1="4" y1="17" x2="20" y2="17" />
-              </svg>
-            </button>
             {/* Tombol kembali: gestur geser saja tidak cukup — ia tidak ada di
                 desktop, tidak terlihat, dan tidak bisa dijangkau papan ketik. */}
             {bisaKembali && (
@@ -572,7 +469,7 @@ export function Shell({ children }: { children: ReactNode }) {
           </div>
 
           {['pasien', 'dokter', 'owner'].includes(account.role) && (
-            <nav className="panacea-command-primary-links hidden min-w-0 items-center gap-1 lg:flex" aria-label="Primary">
+            <nav className="panacea-command-primary-links no-scrollbar flex min-w-0 items-center gap-1 overflow-x-auto" aria-label="Primary">
               <NavLink
                 to="/"
                 end
@@ -613,10 +510,23 @@ export function Shell({ children }: { children: ReactNode }) {
             </svg>
           </button>
 
-          <div className="no-scrollbar flex min-w-0 shrink items-center gap-2 overflow-x-auto sm:gap-3">
-            {/* Pesan, dukungan, dan tema pindah ke laci menu -- lihat catatan
-                di atas soal delapan sasaran ketuk dalam satu bilah. Yang
-                tersisa di sini hanya yang benar-benar dipakai setiap hari. */}
+          <div className="no-scrollbar flex min-w-0 shrink items-center gap-1 overflow-x-auto sm:gap-2">
+            <NavLink
+              to="/emergency"
+              className="header-icon-btn panacea-command-emergency grid h-10 w-10 shrink-0 place-items-center rounded-full"
+              aria-label="Emergency"
+              title="Emergency"
+            >
+              <IconShield size={18} />
+            </NavLink>
+            <NavLink
+              to="/profile"
+              className="header-icon-btn grid h-10 w-10 shrink-0 place-items-center rounded-full text-ink"
+              aria-label="Profile"
+              title="Profile"
+            >
+              <IconUser size={18} />
+            </NavLink>
             <NotificationBell />
             <button
               onClick={() => setTheme(toggleTheme())}
@@ -669,39 +579,6 @@ export function Shell({ children }: { children: ReactNode }) {
         </header>
         <PencarianGlobal buka={cariBuka} tutup={() => setCariBuka(false)} />
 
-        {/* Pintasan cepat, hanya di layar sempit -- DAN tidak di dasbor.
-            Di dasbor deretan ini mengulang persis kisi lambang yang ada tepat
-            di bawahnya, jadi ia hanya mendorong isi yang sesungguhnya turun
-            satu baris dan memberi dua jalan ke tujuan yang sama. Di halaman
-            lain ia tetap berguna, karena di sana kisinya tidak ada. */}
-        {!onHome && (
-        <div data-pintasan className="kaca relative rounded-none border-x-0 border-t-0 lg:hidden">
-          <div className="flex gap-2 overflow-x-auto px-3 py-2.5">
-            {quick.map((n) => (
-              <NavLink
-                key={n.to}
-                to={n.to}
-                end={n.end}
-                className={({ isActive }) =>
-                  `flex min-h-[40px] shrink-0 items-center gap-1.5 rounded-full px-3 text-xs font-bold ${
-                    isActive ? 'bg-brand text-white' : 'bg-neutral-100 text-neutral-600'
-                  }`
-                }
-              >
-                <n.icon size={15} />
-                {n.label}
-              </NavLink>
-            ))}
-            {(account.role === 'pasien' || account.role === 'dokter') && (
-              <NavLink to="/hospitals" className="flex min-h-[40px] shrink-0 items-center gap-1.5 rounded-full bg-accent/10 px-3 text-xs font-bold text-accent">
-                <IconHospital size={15} /> SOS
-              </NavLink>
-            )}
-          </div>
-          {/* Fade hint that the strip scrolls further right */}
-          <div className="fade-edge-surface pointer-events-none absolute inset-y-0 right-0 w-8" />
-        </div>
-        )}
         {/* Umpan balik tarikan: tanpa ini gestur terasa seperti tidak terjadi
             apa-apa sampai tiba-tiba halaman berkedip. */}
         {(tarikan > 0 || sedangSegar) && (
@@ -777,84 +654,6 @@ export function Shell({ children }: { children: ReactNode }) {
         </main>
       </div>
 
-      {/* Mobile drawer — full menu (different & friendlier than the desktop sidebar) */}
-      {menuOpen && (
-        <div className="fixed inset-0 z-40 lg:hidden">
-          <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={() => setMenuOpen(false)} />
-          <aside className="kaca absolute left-0 top-0 flex h-full w-[82%] max-w-xs flex-col rounded-none shadow-2xl drawer-in">
-            <div className="flex items-center justify-between border-b border-black/5 px-4 py-4">
-              <div className="flex items-center gap-2.5">
-                <LogoMark size={34} />
-                <div className="leading-tight">
-                  <div className="text-base font-extrabold tracking-tight" style={{ fontFamily: 'var(--font-wordmark)' }}>Panacea<span className="text-brand">med</span><span className="text-accent">.id</span></div>
-                  <div className="text-[10px] font-semibold uppercase tracking-wider text-neutral-500">{roleLabel[account.role]}</div>
-                </div>
-              </div>
-              <button onClick={() => setMenuOpen(false)} className="grid h-10 w-10 place-items-center rounded-full text-2xl leading-none text-neutral-500 hover:bg-neutral-100" aria-label="Close menu">×</button>
-            </div>
-            <DrawerNav items={items} />
-            <div className="border-t border-black/5 p-3">
-              {(account.role === 'pasien' || account.role === 'dokter') && (
-                <NavLink to="/hospitals" className="mb-2 flex items-center justify-center gap-2 rounded-xl bg-accent/10 px-3 py-3 text-sm font-bold text-accent">
-                  <IconHospital size={18} /> Emergency (SOS)
-                </NavLink>
-              )}
-              <NavLink
-                to="/messages"
-                onClick={() => setMenuOpen(false)}
-                className="flex items-center gap-3 rounded-xl px-4 py-2.5 text-sm font-semibold text-neutral-600 hover:bg-neutral-50"
-              >
-                <IconChat size={18} /> Pesan
-              </NavLink>
-              <button
-                onClick={() => { setMenuOpen(false); setBantuanBuka(true) }}
-                className="flex w-full items-center gap-3 rounded-xl px-4 py-2.5 text-left text-sm font-semibold text-neutral-600 hover:bg-neutral-50"
-              >
-                <IconPhone size={18} /> Bantuan / Dukungan
-              </button>
-              <button
-                onClick={() => setTheme(toggleTheme())}
-                className="flex w-full items-center gap-3 rounded-xl px-4 py-2.5 text-left text-sm font-semibold text-neutral-600 hover:bg-neutral-50"
-              >
-                {theme === 'dark' ? <IconSun size={18} /> : <IconMoon size={18} />}
-                {theme === 'dark' ? 'Light mode' : 'Dark mode'}
-              </button>
-              <button onClick={doLogout} className="flex w-full items-center justify-center gap-2 rounded-xl bg-neutral-100 px-3 py-3 text-sm font-bold text-neutral-600">
-                <IconLogout size={18} /> Log Out
-              </button>
-            </div>
-          </aside>
-        </div>
-      )}
-
-      {/* Navigasi: satu tombol melayang yang dapat dipindah, menggantikan bilah
-          selebar layar.
-
-          Bilah lama memakan 68 px tinggi layar SETIAP SAAT pada aplikasi yang
-          halaman-halamannya sudah setinggi enam layar. Satu tombol 56 px
-          mengembalikan ruang itu kepada isi — dan karena dapat dipindah, ia
-          tidak pernah menutupi bagian yang sedang dibaca.
-
-          Tujuh tujuan yang sama tetap ada, kini di dalam menu yang muncul saat
-          tombolnya diketuk; tidak ada satu pun yang dihapus. */}
-      {['pasien', 'dokter', 'owner'].includes(account.role) && !navHidden && (
-        <FabNavigasi
-          tujuan={[
-            { to: '/', label: 'Home', ikon: <IconHome size={19} />, end: true },
-            { to: '/community', label: 'Community', ikon: <IconUsers size={19} /> },
-            { to: '/vitapulse', label: 'VitaPulse', ikon: <IconActivity size={19} /> },
-            { to: '/health-data', label: 'Device', ikon: <IconHeart size={19} /> },
-            { to: '/latihan', label: 'Training', ikon: <IconRun size={19} /> },
-            { to: '/sports-scores', label: 'Skor Langsung', ikon: <IconFlame size={19} /> },
-            { to: '/profile', label: 'Profile', ikon: <IconUser size={19} /> },
-          ]}
-          onCari={() => setCariBuka(true)}
-          onTambah={() => {
-            navigate('/feed')
-            setTimeout(() => window.dispatchEvent(new Event('panacea:compose')), 60)
-          }}
-        />
-      )}
 
       {['pasien', 'dokter', 'owner'].includes(account.role) && <><OnboardingTour /><AssessmentPrompt /></>}
 
