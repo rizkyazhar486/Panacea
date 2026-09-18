@@ -138,7 +138,7 @@ export default function UnifiedHumanSimulationProjector({
   const [semanticZoom, setSemanticZoom] = useState<{ scale: BodySemanticScale; relativeZoom: number }>({ scale: 'whole-body', relativeZoom: 1 })
   const domain = requestedDomain ?? internalDomain
   const systems = useMemo(() => resolveBodySystemSourceWave(), [])
-  const currentSystem = systems.find((system) => system.id === selectedSystemId) ?? systems[0]
+  const currentSystem = systems.find((system) => system.id === selectedSystemId) ?? systems[0]!
   const current = useMemo(
     () => DOMAINS.find((item) => item.id === domain) ?? DOMAINS[0],
     [domain],
@@ -237,6 +237,7 @@ export default function UnifiedHumanSimulationProjector({
       data-selected-body-system={selectedSystemId}
       data-simulation-domain={domain}
       data-semantic-scale={semanticZoom.scale}
+      data-selected-source-structure={selectedStructureName ?? undefined}
       className="overflow-hidden rounded-[30px] border border-white/[.09] bg-[#020508] text-white shadow-[0_28px_90px_rgba(0,0,0,.36)]"
       aria-labelledby="unified-human-simulation-title"
     >
