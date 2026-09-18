@@ -27,10 +27,22 @@ assert.doesNotMatch(
   'Shell must not render a persistent desktop sidebar',
 )
 
+assert.doesNotMatch(
+  shell,
+  /DrawerNav|menuOpen|setMenuOpen|Mobile drawer/,
+  'sidebar/drawer navigation must not reappear on mobile after convergence',
+)
+
 assert.match(
   shell,
-  /Mobile drawer[\s\S]{0,500}lg:hidden/,
-  'mobile contextual drawer must remain available after desktop sidebar removal',
+  /aria-label="Open Panacea spaces"/,
+  'the top command bar lost the compact mobile-accessible super-page trigger',
+)
+
+assert.match(
+  shell,
+  /SUPER_PAGES\.map\([\s\S]{0,600}?pmd-command-space-link/,
+  'the command dropdown must expose the three super pages after drawer removal',
 )
 
 assert.match(
@@ -51,4 +63,4 @@ assert.match(
   'Home must continue merging menu destinations into its complete capability index',
 )
 
-console.log('desktop-sidebar-removal: ok')
+console.log('sidebar-removal: desktop and mobile drawers stay removed while command-bar super-page access remains reachable')

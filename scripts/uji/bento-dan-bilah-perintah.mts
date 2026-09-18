@@ -120,8 +120,10 @@ assert.ok(/data-panacea-command-bar='hidden'\][\s\S]{0,220}?visibility:\s*hidden
 // ── 10. Shell benar-benar memasangnya ────────────────────────────────────
 assert.ok(/data-panacea-command-bar=\{keadaanBilah\}/.test(shell), 'the top bar no longer reports its state')
 assert.ok(/panacea-command-bar-reveal-zone/.test(shell), 'the reveal zone is not mounted in the Shell')
-assert.ok(/setNavHidden\(keadaanBilah === 'hidden'\)/.test(shell),
-  'the bottom dock no longer follows the same decision; navHidden goes back to being set by nothing at all')
+assert.doesNotMatch(shell, /navHidden|setNavHidden/,
+  'global Assistive Touch must not disappear when the command bar hides during reading')
+assert.match(shell, /SUPER_PAGES\.map\(/,
+  'removing the old dock must still leave the three super-page command dropdown reachable from the command bar')
 
 console.log(
   `bento-dan-bilah-perintah: ok (${FITUR_DARI_HUB.length} kapabilitas dalam ${perGrup.size} kelompok, tidak ada yang dipotong diam-diam)`,
