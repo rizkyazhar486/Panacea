@@ -2,74 +2,143 @@
   position: relative;
   isolation: isolate;
   overflow: clip;
-  border-radius: 34px;
+  border-radius: 28px;
   border: 1px solid rgba(255, 255, 255, 0.07);
-  background:
-    radial-gradient(circle at 20% -8%, rgba(34, 211, 238, 0.10), transparent 28%),
-    radial-gradient(circle at 82% 4%, rgba(139, 92, 246, 0.10), transparent 24%),
-    radial-gradient(circle at 60% 42%, rgba(236, 72, 153, 0.035), transparent 32%),
-    linear-gradient(180deg, rgba(2, 5, 12, 0.98), rgba(0, 0, 0, 0.99));
+  background: #030507;
   padding: 10px;
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.045),
-    0 28px 90px rgba(0, 0, 0, 0.34);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
 }
 
 .body-exposure-os::before {
-  content: '';
-  pointer-events: none;
-  position: absolute;
-  inset: 0;
-  z-index: 0;
-  border-radius: inherit;
-  background:
-    linear-gradient(120deg, rgba(255,255,255,.025), transparent 18%, transparent 72%, rgba(91,33,182,.035)),
-    radial-gradient(circle at 14% 14%, rgba(255,255,255,.12) 0 1px, transparent 1.5px),
-    radial-gradient(circle at 72% 26%, rgba(125,211,252,.14) 0 1px, transparent 1.5px),
-    radial-gradient(circle at 42% 54%, rgba(196,181,253,.10) 0 1px, transparent 1.5px);
-  background-size: auto, 87px 87px, 123px 123px, 147px 147px;
-  opacity: .55;
+  display: none;
 }
 
 .body-exposure-os__ambient {
-  pointer-events: none;
-  position: absolute;
-  inset: -18% -10% auto;
-  z-index: 0;
-  height: 420px;
-  background:
-    conic-gradient(from 225deg at 50% 50%, transparent, rgba(34,211,238,.06), transparent 28%, rgba(139,92,246,.055), transparent 58%, rgba(236,72,153,.035), transparent);
-  filter: blur(44px);
-  opacity: .8;
+  display: none;
 }
 
+/* The OS chrome should recede behind anatomy and simulation. Keep the header as
+   orientation, not a promotional card. */
 .body-exposure-os__glass {
-  background:
-    linear-gradient(135deg, rgba(255,255,255,.075), rgba(255,255,255,.024) 48%, rgba(255,255,255,.035));
-  -webkit-backdrop-filter: blur(20px) saturate(165%);
-  backdrop-filter: blur(20px) saturate(165%);
-  box-shadow:
-    inset 0 1px 0 rgba(255,255,255,.11),
-    inset 18px 18px 40px rgba(255,255,255,.012),
-    0 18px 70px rgba(0,0,0,.26);
+  background: transparent;
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+  box-shadow: none;
+  border-color: transparent !important;
+  border-bottom-color: rgba(255, 255, 255, 0.09) !important;
+  border-radius: 0 !important;
+  padding-inline: 4px !important;
+  padding-top: 8px !important;
+  padding-bottom: 14px !important;
 }
 
+.body-exposure-os__glass h2 {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.body-exposure-os__glass p {
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 1;
+}
+
+.body-exposure-os__glass [class~="grid-cols-3"] > div {
+  min-width: 0;
+  border: 0 !important;
+  border-top: 1px solid rgba(255, 255, 255, 0.08) !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  padding-inline: 0 !important;
+  padding-bottom: 0 !important;
+}
+
+.body-exposure-os__glass button {
+  box-shadow: none !important;
+}
+
+/* Modes behave as one compact instrument ribbon. It remains reachable while
+   users move from the whole-body overview into deeper simulations. */
 .body-exposure-os__dock {
+  position: sticky;
+  top: 8px;
+  z-index: 24 !important;
   scrollbar-width: none;
-  box-shadow:
-    inset 0 1px 0 rgba(255,255,255,.05),
-    0 12px 40px rgba(0,0,0,.18);
+  border-radius: 16px !important;
+  background: rgba(3, 6, 9, 0.94) !important;
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
+  box-shadow: none;
 }
 
 .body-exposure-os__dock::-webkit-scrollbar {
   display: none;
 }
 
+.body-exposure-os__dock button {
+  min-height: 44px;
+  border-radius: 12px !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  white-space: nowrap;
+}
+
+.body-exposure-os__dock button[aria-pressed="true"] {
+  border-color: rgba(255, 255, 255, 0.16) !important;
+  background: rgba(255, 255, 255, 0.08) !important;
+  color: rgb(255, 255, 255) !important;
+}
+
+/* The line below the mode ribbon is status, not prose. */
+.body-exposure-os__dock + div {
+  min-height: 28px;
+  overflow: hidden;
+  padding-inline: 4px !important;
+  white-space: nowrap;
+}
+
+.body-exposure-os__dock + div > span:first-child {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Give the major visualization/simulation blocks breathing room without
+   turning them into isolated dashboard cards. */
+.body-exposure-os > div.relative {
+  margin-top: 26px !important;
+}
+
+.body-exposure-os > .body-exposure-os__dock + div {
+  margin-top: 6px !important;
+}
+
+.body-exposure-os > .body-exposure-os__dock + div + div {
+  margin-top: 14px !important;
+}
+
+/* BodyExplorer is already feature-rich. The outer shell should not add another
+   floating card around it. */
+.body-exposure-os__core {
+  border-width: 0 !important;
+  border-top-width: 1px !important;
+  border-top-color: rgba(255, 255, 255, 0.09) !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  padding-inline: 0 !important;
+  padding-top: 24px !important;
+  box-shadow: none !important;
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
+}
+
 /* BodyExplorer predates the OS shell and still contains several neutral utility
-   surfaces. Scope the visual normalization here so no other Panacea page is
-   affected and no feature logic needs to be duplicated or removed. */
+   surfaces. Normalize only inside Body Exposure so the rest of Panacea stays
+   untouched. */
 .body-exposure-os__core [class~="bg-neutral-100"] {
-  background-color: rgba(255, 255, 255, 0.038) !important;
+  background-color: rgba(255, 255, 255, 0.045) !important;
 }
 
 .body-exposure-os__core [class~="border-neutral-200"],
@@ -86,17 +155,113 @@
   color: rgba(203, 213, 225, 0.52) !important;
 }
 
+/* Group jumpers and simulation tabs read as controls, not cards. */
+.body-exposure-os__core [aria-label="Panel groups"] {
+  gap: 8px !important;
+  margin-bottom: 8px !important;
+  padding-block: 2px;
+  scrollbar-width: none;
+}
+
+.body-exposure-os__core [aria-label="Panel groups"]::-webkit-scrollbar {
+  display: none;
+}
+
+.body-exposure-os__core [aria-label="Panel groups"] button {
+  min-height: 40px !important;
+  border: 0 !important;
+  border-bottom: 1px solid transparent !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  padding-inline: 8px !important;
+  color: rgba(226, 232, 240, 0.48) !important;
+  letter-spacing: 0.07em !important;
+}
+
+.body-exposure-os__core [aria-label="Panel groups"] button[aria-pressed="true"] {
+  border-bottom-color: rgba(255, 255, 255, 0.78) !important;
+  color: rgba(255, 255, 255, 0.94) !important;
+}
+
+/* Simulation choices should give immediate state feedback but avoid glow. */
+.body-exposure-os__core button[aria-pressed="true"],
+.body-exposure-os__core button[aria-selected="true"] {
+  box-shadow: none !important;
+}
+
 .body-exposure-os__core input,
 .body-exposure-os__core select,
 .body-exposure-os__core textarea {
-  transition: border-color 160ms ease, background-color 160ms ease, box-shadow 160ms ease;
+  transition: border-color 160ms ease, background-color 160ms ease;
 }
 
 .body-exposure-os__core input:focus,
 .body-exposure-os__core select:focus,
 .body-exposure-os__core textarea:focus {
-  border-color: rgba(103, 232, 249, 0.36) !important;
-  box-shadow: 0 0 0 3px rgba(34, 211, 238, 0.07);
+  border-color: rgba(255, 255, 255, 0.38) !important;
+  box-shadow: none;
+}
+
+.body-exposure-os__core input[type="range"] {
+  min-height: 44px;
+}
+
+/* Long helper copy is secondary during exploration. Keep the scrolling layer
+   visual-first while preserving the full text in the DOM for accessibility. */
+.body-exposure-os__core p.text-neutral-400,
+.body-exposure-os__core p.text-neutral-500 {
+  max-width: 100%;
+}
+
+@media (max-width: 639px) {
+  .body-exposure-os {
+    border-radius: 22px;
+    padding: 8px;
+  }
+
+  .body-exposure-os__glass {
+    padding-top: 4px !important;
+    padding-bottom: 10px !important;
+  }
+
+  .body-exposure-os__glass h2 {
+    font-size: 1.35rem !important;
+    line-height: 1.25 !important;
+  }
+
+  .body-exposure-os__glass p {
+    display: none;
+  }
+
+  .body-exposure-os__glass [class~="grid-cols-3"] {
+    gap: 8px !important;
+    margin-top: 12px !important;
+  }
+
+  .body-exposure-os__glass [class~="grid-cols-3"] > div {
+    padding-top: 8px !important;
+  }
+
+  .body-exposure-os__dock {
+    top: 6px;
+    margin-top: 8px !important;
+  }
+
+  .body-exposure-os__dock + div > span:last-child {
+    display: none !important;
+  }
+
+  .body-exposure-os > div.relative {
+    margin-top: 22px !important;
+  }
+
+  .body-exposure-os > .body-exposure-os__dock + div + div {
+    margin-top: 12px !important;
+  }
+
+  .body-exposure-os__core {
+    padding-top: 18px !important;
+  }
 }
 
 .body-exposure-os:fullscreen {
@@ -105,19 +270,27 @@
   overflow-y: auto;
   border: 0;
   border-radius: 0;
-  padding: max(10px, env(safe-area-inset-top)) max(10px, env(safe-area-inset-right)) max(18px, env(safe-area-inset-bottom)) max(10px, env(safe-area-inset-left));
+  padding:
+    max(10px, env(safe-area-inset-top))
+    max(10px, env(safe-area-inset-right))
+    max(18px, env(safe-area-inset-bottom))
+    max(10px, env(safe-area-inset-left));
   background: #010207;
 }
 
 .body-exposure-os:fullscreen .body-exposure-os__dock {
-  position: sticky;
   top: max(6px, env(safe-area-inset-top));
-  z-index: 30;
 }
 
 @media (min-width: 640px) {
   .body-exposure-os {
     padding: 14px;
+  }
+}
+
+@media (prefers-reduced-transparency: reduce) {
+  .body-exposure-os__dock {
+    background: #05080b !important;
   }
 }
 
