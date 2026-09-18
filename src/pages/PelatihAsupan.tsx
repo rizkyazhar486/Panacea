@@ -4,6 +4,8 @@ import { IconActivity } from '../components/icons'
 import { getDemoTersimpan } from '../lib/profile'
 import { hitungTdee, TUJUAN_GIZI, AKTIVITAS_GIZI, type TujuanGizi, type TingkatAktivitas } from '../lib/tdee'
 import { susunPekan, type HariRencana } from '../lib/organizerLatihan'
+import { BatangEnergi, BatangMenitPekan } from '../components/GrafikEnergiPekan'
+import type { BebanHari } from '../lib/energiMakro'
 import {
   MASUKAN, PERAN, BATAS_PELATIH, periksaKesiapan, sulihanTerpakai,
   type Masukan, type PeranPelatih, type Terisi,
@@ -145,6 +147,14 @@ function Rencana({ peran, f }: { peran: PeranPelatih; f: NilaiForm }) {
     return susunPekan({ hariLatihan: hari, fokus: 'seimbang', sesiLari: 0 }, null)
   }, [peran, f.jadwal])
 
+  // susunPekan sudah mengembalikan tujuh hari penuh; hari pemulihan datang
+  // dengan menit 0 karena tidak ada gerakan di dalamnya. Yang dipakai grafik
+  // sebagai "hari latihan" adalah menitnya sendiri, bukan keberadaan harinya.
+  const beban: BebanHari[] = useMemo(
+    () => (pekan ?? []).map((h) => ({ indeks: h.indeks, hari: h.hari, menit: h.menit, judul: h.judul, latihan: h.menit > 0 })),
+    [pekan],
+  )
+
   const perluGizi = peran !== 'pelatih'
 
   return (
@@ -165,6 +175,10 @@ function Rencana({ peran, f }: { peran: PeranPelatih; f: NilaiForm }) {
               </div>
             ))}
           </div>
+          {/* Satu anggaran energi, bukan empat angka yang berdiri sendiri. */}
+          <div className="mt-4">
+            <BatangEnergi gizi={gizi} />
+          </div>
           <p className="mt-3 text-[11.5px] leading-relaxed text-neutral-600 dark:text-neutral-300">
             Carbohydrate {gizi.karboG} g · fat {gizi.lemakG} g · fibre {gizi.seratG} g · water about {gizi.airL} L.
             {Number(f.kebiasaanMakan) > 0
@@ -181,6 +195,12 @@ function Rencana({ peran, f }: { peran: PeranPelatih; f: NilaiForm }) {
       {pekan && (
         <Card>
           <h3 className="text-sm font-black text-ink dark:text-white">The training week</h3>
+          {/* Tujuh hari sekaligus: berapa lama tiap sesi, dan di mana
+              istirahatnya jatuh. Daftar kartu di bawah tidak memperlihatkan
+              bentuk pekannya. */}
+          <div className="mt-3">
+            <BatangMenitPekan hari={beban} />
+          </div>
           <div className="mt-3 grid gap-2 sm:grid-cols-2">
             {pekan.map((h) => (
               <div key={h.indeks} className="rounded-2xl border border-neutral-200/70 bg-neutral-50/70 p-3 dark:border-white/10 dark:bg-white/[.03]">
