@@ -5,7 +5,6 @@
 .rel-widget-rumah .widget-instrument-head-v5 {
   border-radius: 0;
   padding: 0 2px;
-  background: transparent!important;
   -webkit-backdrop-filter: none!important;
   backdrop-filter: none!important;
 }
@@ -17,7 +16,7 @@
 }
 
 .rel-widget-rumah .widget-instrument-dot-v5 {
-  background: none!important;
+  background-color: transparent!important;
   border: 0!important;
 }
 
