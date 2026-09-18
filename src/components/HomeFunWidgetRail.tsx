@@ -3,22 +3,41 @@ import { Link } from 'react-router-dom'
 import { useStore } from '../lib/store'
 import { getVitals } from '../lib/healthVitals'
 import { getWorkouts } from '../lib/workoutStore'
+import { WIDGETS, type WidgetDef } from '../lib/homeWidgets'
 import '../styles/home-fun-widgets.css'
 
-type Expanded = 'performance' | 'fuel' | 'focus' | 'breath' | null
-
-const DAY = 86_400_000
-const BREATH_TOTAL = 60
-const BREATH_PHASE_SECONDS = 4
-const BREATH_PHASES = ['Inhale', 'Hold', 'Exhale', 'Hold'] as const
-
-function todayKey() {
-  const d = new Date()
-  const p = (n: number) => String(n).padStart(2, '0')
-  return \`\${d.getFullYear()}-\${p(d.getMonth() + 1)}-\${p(d.getDate())}\`
+type Snapshot = {
+  steps: number | null
+  sleep: number | null
+  restingHr: number | null
+  hrv: number | null
+  vo2: number | null
+  weight: number | null
+  recovery: number | null
+  bodyScore: number | null
+  kcal: number
+  protein: number
+  carbs: number
+  fat: number
+  foodEntries: number
+  workouts7d: number
+  trainingMinutes7d: number
+  wallet: number
 }
 
-function positive(value: unknown): number | null {
+type MetricPresentation = {
+  value: string
+  unit?: string
+  label: string
+  secondary: Array<{ label: string; value: string; unit?: string }>
+  mode: 'matrix' | 'ring' | 'bars' | 'stack' | 'dial' | 'launcher'
+}
+
+const STORAGE_KEY = 'pmd-home-fun-widgets-v1'
+const DEFAULT_WIDGETS = ['ringHarian', 'giziLebar', 'pewaktu', 'langkahRingkas', 'tidurRingkas', 'vo2tren', 'denyutRingkas', 'kebugaran']
+const DAY = 86_400_000
+
+function finitePositive(value: unknown): number | null {
   return typeof value === 'number' && Number.isFinite(value) && value > 0 ? value : null
 }
 
@@ -27,43 +46,294 @@ function compact(value: number | null, digits = 0) {
   return value.toLocaleString('en-US', { maximumFractionDigits: digits })
 }
 
-function clock(totalSeconds: number) {
-  const seconds = Math.max(0, Math.floor(totalSeconds))
-  const minutes = Math.floor(seconds / 60)
-  return \`\${minutes}:\${String(seconds % 60).padStart(2, '0')}\`
+function todayKey() {
+  const d = new Date()
+  const p = (n: number) => String(n).padStart(2, '0')
+  return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}`
 }
 
-function Metric({
-  label,
-  value,
-  unit,
-  accent,
-}: {
-  label: string
-  value: string
-  unit?: string
-  accent: string
-}) {
-  return (
-    <div className="panacea-fun-metric">
-      <span className="panacea-fun-metric-dot" style={{ backgroundColor: accent }} aria-hidden />
-      <span className="panacea-fun-metric-label">{label}</span>
-      <span className="panacea-fun-metric-value">
-        {value}{unit ? <small>{unit}</small> : null}
+function loadSelection(): string[] {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY)
+    if (!raw) return DEFAULT_WIDGETS
+    const parsed = JSON.parse(raw)
+    if (!Array.isArray(parsed)) return DEFAULT_WIDGETS
+    const valid = parsed.filter((id): id is string => typeof id === 'string' && WIDGETS.some((w) => w.id === id))
+    return valid.length ? valid : DEFAULT_WIDGETS
+  } catch {
+    return DEFAULT_WIDGETS
+  }
+}
+
+function saveSelection(ids: string[]) {
+  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(ids)) } catch { /* storage unavailable */ }
+}
+
+function idHas(widget: WidgetDef, pattern: RegExp) {
+  return pattern.test(`${widget.id} ${widget.label} ${widget.kategori}`.toLowerCase())
+}
+
+function modeFor(widget: WidgetDef): MetricPresentation['mode'] {
+  const hash = [...widget.id].reduce((sum, ch) => sum + ch.charCodeAt(0), 0)
+  return (['matrix', 'ring', 'bars', 'stack', 'dial'] as const)[hash % 5]
+}
+
+function presentation(widget: WidgetDef, s: Snapshot): MetricPresentation {
+  const secondaryBody = [
+    { label: 'Steps', value: compact(s.steps) },
+    { label: 'RHR', value: compact(s.restingHr), unit: 'bpm' },
+    { label: 'VO₂', value: compact(s.vo2, 1) },
+  ]
+
+  if (widget.id === 'ringHarian' || idHas(widget, /recovery|readiness|body battery|body score|ringharian/)) {
+    const primary = s.recovery ?? s.bodyScore
+    return {
+      value: compact(primary),
+      unit: primary != null ? '%' : undefined,
+      label: s.recovery != null ? 'recovery' : s.bodyScore != null ? 'body score' : 'no score yet',
+      secondary: secondaryBody,
+      mode: 'matrix',
+    }
+  }
+
+  if (idHas(widget, /gizi|nutrition|kalori|calorie|protein|tdee|macro|pangan|food/)) {
+    return {
+      value: compact(s.kcal),
+      unit: 'kcal',
+      label: 'logged today',
+      secondary: [
+        { label: 'Protein', value: compact(s.protein), unit: 'g' },
+        { label: 'Carbs', value: compact(s.carbs), unit: 'g' },
+        { label: 'Fat', value: compact(s.fat), unit: 'g' },
+      ],
+      mode: 'ring',
+    }
+  }
+
+  if (idHas(widget, /sleep|tidur|hrv|recovery|utang tidur|nap/)) {
+    const value = idHas(widget, /hrv/) ? s.hrv : s.sleep
+    return {
+      value: compact(value, 1),
+      unit: idHas(widget, /hrv/) ? 'ms' : 'h',
+      label: idHas(widget, /hrv/) ? 'latest HRV' : 'latest sleep',
+      secondary: [
+        { label: 'HRV', value: compact(s.hrv), unit: 'ms' },
+        { label: 'RHR', value: compact(s.restingHr), unit: 'bpm' },
+        { label: 'Recovery', value: compact(s.recovery), unit: s.recovery != null ? '%' : undefined },
+      ],
+      mode: 'bars',
+    }
+  }
+
+  if (idHas(widget, /vo2|aerobic|cardiorespiratory/)) {
+    return {
+      value: compact(s.vo2, 1),
+      label: 'VO₂ max',
+      secondary: [
+        { label: 'Steps', value: compact(s.steps) },
+        { label: 'Sessions', value: compact(s.workouts7d) },
+        { label: 'Sleep', value: compact(s.sleep, 1), unit: 'h' },
+      ],
+      mode: 'dial',
+    }
+  }
+
+  if (idHas(widget, /heart|hr|denyut|nadi|cardio/)) {
+    return {
+      value: compact(s.restingHr),
+      unit: 'bpm',
+      label: 'resting HR',
+      secondary: [
+        { label: 'HRV', value: compact(s.hrv), unit: 'ms' },
+        { label: 'VO₂', value: compact(s.vo2, 1) },
+        { label: 'Sleep', value: compact(s.sleep, 1), unit: 'h' },
+      ],
+      mode: 'dial',
+    }
+  }
+
+  if (idHas(widget, /steps|langkah|tangga|movement|gerak/)) {
+    return {
+      value: compact(s.steps),
+      label: 'steps today',
+      secondary: [
+        { label: 'Sessions', value: compact(s.workouts7d) },
+        { label: 'Minutes', value: compact(s.trainingMinutes7d) },
+        { label: 'VO₂', value: compact(s.vo2, 1) },
+      ],
+      mode: 'matrix',
+    }
+  }
+
+  if (idHas(widget, /training|latihan|workout|athlete|sport|fitness|zona2|zone 2|muatan/)) {
+    return {
+      value: compact(s.workouts7d),
+      label: 'sessions · 7d',
+      secondary: [
+        { label: 'Minutes', value: compact(s.trainingMinutes7d) },
+        { label: 'Steps', value: compact(s.steps) },
+        { label: 'VO₂', value: compact(s.vo2, 1) },
+      ],
+      mode: 'stack',
+    }
+  }
+
+  if (idHas(widget, /weight|berat|body|komposisi|composition|bmi/)) {
+    return {
+      value: compact(s.weight, 1),
+      unit: 'kg',
+      label: 'latest weight',
+      secondary: secondaryBody,
+      mode: 'ring',
+    }
+  }
+
+  if (idHas(widget, /wallet|money|keuangan|finance/)) {
+    return {
+      value: compact(s.wallet),
+      label: 'wallet',
+      secondary: [],
+      mode: 'stack',
+    }
+  }
+
+  return {
+    value: 'Open',
+    label: widget.kategori,
+    secondary: [],
+    mode: modeFor(widget),
+  }
+}
+
+function WidgetVisual({ p }: { p: MetricPresentation }) {
+  if (p.mode === 'launcher') return null
+
+  if (p.mode === 'matrix') {
+    return (
+      <span className="panacea-fun-visual panacea-fun-matrix" aria-hidden>
+        {Array.from({ length: 24 }).map((_, index) => <i key={index} data-on={index < 7} />)}
       </span>
-    </div>
+    )
+  }
+
+  if (p.mode === 'bars') {
+    return (
+      <span className="panacea-fun-visual panacea-fun-bars" aria-hidden>
+        {[32, 46, 54, 42, 70, 58, 82].map((height, index) => <i key={index} style={{ height: `${height}%` }} />)}
+      </span>
+    )
+  }
+
+  if (p.mode === 'stack') {
+    return (
+      <span className="panacea-fun-visual panacea-fun-stack" aria-hidden>
+        <i /><i /><i />
+      </span>
+    )
+  }
+
+  return (
+    <span className="panacea-fun-visual panacea-fun-ring" aria-hidden>
+      <svg viewBox="0 0 42 42">
+        <circle cx="21" cy="21" r="16" pathLength="100" />
+        <circle className="is-progress" cx="21" cy="21" r="16" pathLength="100" strokeDasharray="68 100" />
+      </svg>
+    </span>
+  )
+}
+
+function FeatureWidget({ widget, snapshot }: { widget: WidgetDef; snapshot: Snapshot }) {
+  const p = presentation(widget, snapshot)
+  return (
+    <Link
+      to={widget.ke}
+      className="panacea-fun-card"
+      data-mode={p.mode}
+      style={{ '--fw-accent': '#00bf63' } as CSSProperties}
+      aria-label={`${widget.label}: ${p.value} ${p.unit ?? ''}`}
+    >
+      <span className="panacea-fun-card-kicker">{widget.label}</span>
+      <span className="panacea-fun-card-primary">
+        {p.value}{p.unit ? <small>{p.unit}</small> : null}
+      </span>
+      <span className="panacea-fun-card-caption">{p.label}</span>
+      <WidgetVisual p={p} />
+      {p.secondary.length ? (
+        <span className="panacea-fun-metrics" aria-hidden>
+          {p.secondary.slice(0, 3).map((metric) => (
+            <span key={metric.label} className="panacea-fun-metric">
+              <span>{metric.label}</span>
+              <b>{metric.value}{metric.unit ? <small>{metric.unit}</small> : null}</b>
+            </span>
+          ))}
+        </span>
+      ) : (
+        <span className="panacea-fun-launch-note">{widget.ringkas}</span>
+      )}
+    </Link>
+  )
+}
+
+function FocusWidget() {
+  const [seconds, setSeconds] = useState(25 * 60)
+  const [total, setTotal] = useState(25 * 60)
+  const [running, setRunning] = useState(false)
+
+  useEffect(() => {
+    if (!running) return
+    const id = window.setInterval(() => {
+      setSeconds((value) => {
+        if (value <= 1) {
+          setRunning(false)
+          return 0
+        }
+        return value - 1
+      })
+    }, 1000)
+    return () => window.clearInterval(id)
+  }, [running])
+
+  const mins = Math.floor(seconds / 60)
+  const secs = String(seconds % 60).padStart(2, '0')
+  const progress = Math.max(0, Math.min(100, 100 - (seconds / Math.max(1, total)) * 100))
+
+  return (
+    <article className="panacea-fun-card panacea-fun-focus" style={{ '--fw-accent': '#7dd3fc' } as CSSProperties}>
+      <span className="panacea-fun-card-kicker">Focus timer</span>
+      <span className="panacea-fun-card-primary panacea-fun-clock">{mins}:{secs}</span>
+      <span className="panacea-fun-card-caption">{running ? 'in progress' : 'ready'}</span>
+      <span className="panacea-fun-visual panacea-fun-ring" aria-hidden>
+        <svg viewBox="0 0 42 42">
+          <circle cx="21" cy="21" r="16" pathLength="100" />
+          <circle className="is-progress" cx="21" cy="21" r="16" pathLength="100" strokeDasharray={`${progress} 100`} />
+        </svg>
+      </span>
+      <div className="panacea-fun-focus-controls">
+        <button type="button" onClick={() => setRunning((value) => !value)}>{running ? 'Pause' : 'Start'}</button>
+        {[15, 25, 50].map((minutes) => (
+          <button
+            key={minutes}
+            type="button"
+            onClick={() => {
+              setRunning(false)
+              setTotal(minutes * 60)
+              setSeconds(minutes * 60)
+            }}
+          >
+            {minutes}m
+          </button>
+        ))}
+      </div>
+    </article>
   )
 }
 
 export function HomeFunWidgetRail() {
   const { state } = useStore()
   const [refresh, setRefresh] = useState(0)
-  const [expanded, setExpanded] = useState<Expanded>(null)
-  const [focusSeconds, setFocusSeconds] = useState(25 * 60)
-  const [focusTotal, setFocusTotal] = useState(25 * 60)
-  const [focusRunning, setFocusRunning] = useState(false)
-  const [breathSeconds, setBreathSeconds] = useState(BREATH_TOTAL)
-  const [breathRunning, setBreathRunning] = useState(false)
+  const [selected, setSelected] = useState<string[]>(loadSelection)
+  const [customizing, setCustomizing] = useState(false)
+  const [query, setQuery] = useState('')
 
   useEffect(() => {
     const update = () => setRefresh((value) => value + 1)
@@ -75,73 +345,13 @@ export function HomeFunWidgetRail() {
     }
   }, [])
 
-  useEffect(() => {
-    if (!focusRunning) return
-    const id = window.setInterval(() => {
-      setFocusSeconds((value) => {
-        if (value <= 1) {
-          setFocusRunning(false)
-          return 0
-        }
-        return value - 1
-      })
-    }, 1000)
-    return () => window.clearInterval(id)
-  }, [focusRunning])
-
-  useEffect(() => {
-    if (!breathRunning) return
-    const id = window.setInterval(() => {
-      setBreathSeconds((value) => {
-        if (value <= 1) {
-          setBreathRunning(false)
-          return 0
-        }
-        return value - 1
-      })
-    }, 1000)
-    return () => window.clearInterval(id)
-  }, [breathRunning])
-
   const vitals = useMemo(() => getVitals(), [refresh])
   const workouts = useMemo(() => getWorkouts(), [refresh])
-  const latestSleep = useMemo(
-    () => [...(state.sleepLogs ?? [])]
-      .filter((entry) => positive(entry?.hours) != null)
-      .sort((a, b) => (a.date < b.date ? 1 : -1))[0],
-    [state.sleepLogs],
-  )
 
-  const performance = useMemo(() => {
-    const now = Date.now()
-    const sessions7d = workouts.filter((workout) => {
-      const at = Date.parse(workout.mulai)
-      return Number.isFinite(at) && now - at <= 7 * DAY
-    }).length
-    const recovery = positive(vitals.recoveryPct)
-    const bodyScore = positive(vitals.bodyScore)
-    const primary = recovery ?? bodyScore ?? sessions7d
-    const primaryLabel = recovery != null ? 'recovery' : bodyScore != null ? 'body score' : 'sessions · 7d'
-    const primaryUnit = recovery != null ? '%' : ''
-    const dotCount = recovery != null || bodyScore != null
-      ? Math.round((Math.min(100, primary) / 100) * 24)
-      : Math.min(24, sessions7d)
-    return {
-      primary,
-      primaryLabel,
-      primaryUnit,
-      dotCount,
-      sleep: positive(latestSleep?.hours) ?? positive(vitals.sleepH),
-      steps: positive(vitals.steps),
-      vo2: positive(vitals.vo2max),
-      sessions7d,
-    }
-  }, [latestSleep?.hours, vitals, workouts])
-
-  const fuel = useMemo(() => {
-    const key = todayKey()
-    const today = (state.foods ?? []).filter((food) => food?.date === key)
-    const totals = today.reduce(
+  const snapshot = useMemo<Snapshot>(() => {
+    const today = todayKey()
+    const foods = (state.foods ?? []).filter((food) => food?.date === today)
+    const nutrition = foods.reduce(
       (sum, food) => ({
         kcal: sum.kcal + (food.kcal || 0),
         protein: sum.protein + (food.protein || 0),
@@ -150,223 +360,109 @@ export function HomeFunWidgetRail() {
       }),
       { kcal: 0, protein: 0, carbs: 0, fat: 0 },
     )
-    const target = positive(vitals.amrKcal)
+    const latestSleep = [...(state.sleepLogs ?? [])]
+      .filter((entry) => finitePositive(entry?.hours) != null)
+      .sort((a, b) => (a.date < b.date ? 1 : -1))[0]
+    const now = Date.now()
+    const recentWorkouts = workouts.filter((workout) => {
+      const at = Date.parse(workout.mulai)
+      return Number.isFinite(at) && now - at <= 7 * DAY
+    })
     return {
-      ...totals,
-      target,
-      primary: target != null ? Math.max(0, target - totals.kcal) : totals.kcal,
-      primaryLabel: target != null ? 'kcal left' : 'kcal logged',
-      entries: today.length,
+      steps: finitePositive(vitals.steps),
+      sleep: finitePositive(latestSleep?.hours) ?? finitePositive(vitals.sleepH),
+      restingHr: finitePositive(vitals.restingHr),
+      hrv: finitePositive(vitals.hrvMs),
+      vo2: finitePositive(vitals.vo2max),
+      weight: finitePositive(vitals.weightKg),
+      recovery: finitePositive(vitals.recoveryPct),
+      bodyScore: finitePositive(vitals.bodyScore),
+      kcal: nutrition.kcal,
+      protein: nutrition.protein,
+      carbs: nutrition.carbs,
+      fat: nutrition.fat,
+      foodEntries: foods.length,
+      workouts7d: recentWorkouts.length,
+      trainingMinutes7d: Math.round(recentWorkouts.reduce((sum, workout) => sum + Math.max(0, workout.durasi || 0), 0) / 60),
+      wallet: Math.max(0, state.wallet?.balance ?? 0),
     }
-  }, [state.foods, vitals.amrKcal])
+  }, [state.foods, state.sleepLogs, state.wallet?.balance, vitals, workouts])
 
-  const breathElapsed = BREATH_TOTAL - breathSeconds
-  const breathPhaseIndex = Math.floor((breathElapsed % (BREATH_PHASE_SECONDS * BREATH_PHASES.length)) / BREATH_PHASE_SECONDS)
-  const breathPhase = breathSeconds === 0 ? 'Done' : BREATH_PHASES[breathPhaseIndex]
-  const breathPhaseRemaining = breathSeconds === 0
-    ? 0
-    : BREATH_PHASE_SECONDS - (breathElapsed % BREATH_PHASE_SECONDS)
+  const byId = useMemo(() => new Map(WIDGETS.map((widget) => [widget.id, widget])), [])
+  const selectedWidgets = selected.map((id) => byId.get(id)).filter((widget): widget is WidgetDef => !!widget)
 
-  const toggle = (key: Exclude<Expanded, null>) => {
-    setExpanded((value) => (value === key ? null : key))
+  const matches = useMemo(() => {
+    const needle = query.trim().toLowerCase()
+    if (!needle) return WIDGETS
+    return WIDGETS.filter((widget) => `${widget.label} ${widget.ringkas} ${widget.kategori}`.toLowerCase().includes(needle))
+  }, [query])
+
+  const toggle = (id: string) => {
+    setSelected((current) => {
+      const next = current.includes(id) ? current.filter((item) => item !== id) : [...current, id]
+      saveSelection(next.length ? next : DEFAULT_WIDGETS)
+      return next.length ? next : DEFAULT_WIDGETS
+    })
   }
 
-  const performanceAccent = '#b4f000'
-  const fuelAccent = '#ff7849'
-  const focusAccent = '#7dd3fc'
-  const breathAccent = '#5eead4'
-
   return (
-    <section className="panacea-fun-widgets" aria-label="Live fun widgets">
+    <section className="panacea-fun-widgets" aria-label="Custom live widgets">
       <div className="panacea-fun-widgets-head">
-        <span>Live widgets</span>
-        <Link to="/atur-fitur">Customize</Link>
+        <span>{selected.length} live widgets</span>
+        <button type="button" onClick={() => setCustomizing(true)}>Customize · {WIDGETS.length}</button>
       </div>
 
       <div className="panacea-fun-widgets-rail">
-        <article
-          className="panacea-fun-card"
-          data-expanded={expanded === 'performance'}
-          style={{ '--fw-accent': performanceAccent } as CSSProperties}
-        >
-          <button
-            type="button"
-            className="panacea-fun-card-main"
-            aria-expanded={expanded === 'performance'}
-            onClick={() => toggle('performance')}
-          >
-            <span className="panacea-fun-card-kicker">Performance</span>
-            <span className="panacea-fun-card-primary">
-              {compact(performance.primary)}
-              {performance.primaryUnit ? <small>{performance.primaryUnit}</small> : null}
-            </span>
-            <span className="panacea-fun-card-caption">{performance.primaryLabel}</span>
-            <span className="panacea-fun-dotfield" aria-hidden>
-              {Array.from({ length: 24 }).map((_, index) => (
-                <i key={index} data-on={index < performance.dotCount} />
-              ))}
-            </span>
-          </button>
-
-          <div className="panacea-fun-metrics">
-            <Metric label="Sleep" value={compact(performance.sleep, 1)} unit="h" accent="#f97316" />
-            <Metric label="Steps" value={compact(performance.steps)} accent="#8b5cf6" />
-            <Metric label="VO₂ max" value={compact(performance.vo2, 1)} accent="#67e8f9" />
-          </div>
-
-          {expanded === 'performance' ? (
-            <div className="panacea-fun-card-expand">
-              <span>{performance.sessions7d} sessions · 7d</span>
-              <Link to="/fitness-hub">Open Your Body →</Link>
-            </div>
-          ) : null}
-        </article>
-
-        <article
-          className="panacea-fun-card"
-          data-expanded={expanded === 'fuel'}
-          style={{ '--fw-accent': fuelAccent } as CSSProperties}
-        >
-          <button
-            type="button"
-            className="panacea-fun-card-main"
-            aria-expanded={expanded === 'fuel'}
-            onClick={() => toggle('fuel')}
-          >
-            <span className="panacea-fun-card-kicker">Fuel · today</span>
-            <span className="panacea-fun-card-primary">{compact(fuel.primary)}</span>
-            <span className="panacea-fun-card-caption">{fuel.primaryLabel}</span>
-            <span className="panacea-fun-ring" aria-hidden>
-              <svg viewBox="0 0 42 42">
-                <circle cx="21" cy="21" r="16" pathLength="100" />
-                <circle
-                  className="is-progress"
-                  cx="21"
-                  cy="21"
-                  r="16"
-                  pathLength="100"
-                  strokeDasharray={\`\${fuel.target ? Math.min(100, (fuel.kcal / fuel.target) * 100) : Math.min(100, fuel.entries * 18)} 100\`}
-                />
-              </svg>
-            </span>
-          </button>
-
-          <div className="panacea-fun-metrics">
-            <Metric label="Protein" value={compact(fuel.protein)} unit="g" accent="#ef4444" />
-            <Metric label="Carbs" value={compact(fuel.carbs)} unit="g" accent="#f59e0b" />
-            <Metric label="Fat" value={compact(fuel.fat)} unit="g" accent="#60a5fa" />
-          </div>
-
-          {expanded === 'fuel' ? (
-            <div className="panacea-fun-card-expand">
-              <span>{fuel.entries} entries today</span>
-              <Link to="/nutrition">Open Nutrition →</Link>
-            </div>
-          ) : null}
-        </article>
-
-        <article
-          className="panacea-fun-card panacea-fun-focus"
-          data-expanded={expanded === 'focus'}
-          style={{ '--fw-accent': focusAccent } as CSSProperties}
-        >
-          <button
-            type="button"
-            className="panacea-fun-card-main"
-            aria-expanded={expanded === 'focus'}
-            onClick={() => toggle('focus')}
-          >
-            <span className="panacea-fun-card-kicker">Focus</span>
-            <span className="panacea-fun-card-primary panacea-fun-clock">{clock(focusSeconds)}</span>
-            <span className="panacea-fun-card-caption">{focusRunning ? 'in progress' : focusSeconds === 0 ? 'complete' : 'ready'}</span>
-            <span className="panacea-fun-ring" aria-hidden>
-              <svg viewBox="0 0 42 42">
-                <circle cx="21" cy="21" r="16" pathLength="100" />
-                <circle
-                  className="is-progress"
-                  cx="21"
-                  cy="21"
-                  r="16"
-                  pathLength="100"
-                  strokeDasharray={\`\${Math.max(0, Math.min(100, 100 - (focusSeconds / Math.max(1, focusTotal)) * 100))} 100\`}
-                />
-              </svg>
-            </span>
-          </button>
-
-          <div className="panacea-fun-focus-controls" aria-label="Focus timer controls">
-            <button
-              type="button"
-              disabled={focusSeconds === 0}
-              onClick={() => setFocusRunning((value) => !value)}
-            >
-              {focusRunning ? 'Pause' : 'Start'}
-            </button>
-            <button type="button" onClick={() => { setFocusRunning(false); setFocusTotal(25 * 60); setFocusSeconds(25 * 60) }}>Reset</button>
-          </div>
-
-          {expanded === 'focus' ? (
-            <div className="panacea-fun-card-expand panacea-fun-presets">
-              {[15, 25, 50].map((minutes) => (
-                <button
-                  key={minutes}
-                  type="button"
-                  onClick={() => {
-                    setFocusRunning(false)
-                    setFocusTotal(minutes * 60)
-                    setFocusSeconds(minutes * 60)
-                  }}
-                >
-                  {minutes}m
-                </button>
-              ))}
-            </div>
-          ) : null}
-        </article>
-
-        <article
-          className="panacea-fun-card panacea-fun-breath"
-          data-expanded={expanded === 'breath'}
-          data-phase={breathPhase.toLowerCase()}
-          style={{ '--fw-accent': breathAccent } as CSSProperties}
-        >
-          <button
-            type="button"
-            className="panacea-fun-card-main panacea-fun-breath-main"
-            aria-expanded={expanded === 'breath'}
-            onClick={() => toggle('breath')}
-          >
-            <span className="panacea-fun-card-kicker">Reset · 60s</span>
-            <span className="panacea-fun-card-primary panacea-fun-clock">{clock(breathSeconds)}</span>
-            <span className="panacea-fun-card-caption" aria-live="polite">
-              {breathRunning ? \`\${breathPhase} · \${breathPhaseRemaining}s\` : breathSeconds === 0 ? 'complete' : 'guided breath'}
-            </span>
-            <span className="panacea-breath-orbit" aria-hidden>
-              <i />
-              <b />
-            </span>
-          </button>
-
-          <div className="panacea-fun-focus-controls" aria-label="Guided breathing controls">
-            <button
-              type="button"
-              disabled={breathSeconds === 0}
-              onClick={() => setBreathRunning((value) => !value)}
-            >
-              {breathRunning ? 'Pause' : 'Start'}
-            </button>
-            <button type="button" onClick={() => { setBreathRunning(false); setBreathSeconds(BREATH_TOTAL) }}>Reset</button>
-          </div>
-
-          {expanded === 'breath' ? (
-            <div className="panacea-fun-card-expand panacea-breath-sequence" aria-label="Breathing sequence">
-              {BREATH_PHASES.map((phase, index) => (
-                <span key={\`\${phase}-\${index}\`} data-active={breathRunning && index === breathPhaseIndex}>{phase}</span>
-              ))}
-            </div>
-          ) : null}
-        </article>
+        {selectedWidgets.map((widget) => (
+          widget.id === 'pewaktu'
+            ? <FocusWidget key={widget.id} />
+            : <FeatureWidget key={widget.id} widget={widget} snapshot={snapshot} />
+        ))}
       </div>
+
+      {customizing ? (
+        <div className="panacea-fun-picker-backdrop" role="presentation" onMouseDown={(event) => {
+          if (event.currentTarget === event.target) setCustomizing(false)
+        }}>
+          <section className="panacea-fun-picker" role="dialog" aria-modal="true" aria-label="Customize Home widgets">
+            <div className="panacea-fun-picker-head">
+              <div>
+                <strong>Widget universe</strong>
+                <span>{WIDGETS.length} existing Panacea features · choose any</span>
+              </div>
+              <button type="button" onClick={() => setCustomizing(false)} aria-label="Close widget picker">×</button>
+            </div>
+
+            <input
+              className="panacea-fun-picker-search"
+              type="search"
+              value={query}
+              onChange={(event) => setQuery(event.target.value)}
+              placeholder="Search widgets"
+              autoFocus
+            />
+
+            <div className="panacea-fun-picker-grid">
+              {matches.map((widget) => {
+                const active = selected.includes(widget.id)
+                return (
+                  <button
+                    key={widget.id}
+                    type="button"
+                    className="panacea-fun-picker-item"
+                    data-active={active}
+                    onClick={() => toggle(widget.id)}
+                  >
+                    <span>{widget.label}</span>
+                    <small>{widget.kategori}</small>
+                    <b aria-hidden>{active ? '✓' : '+'}</b>
+                  </button>
+                )
+              })}
+            </div>
+          </section>
+        </div>
+      ) : null}
     </section>
   )
 }
