@@ -88,7 +88,8 @@ export function HomeHealthBrief() {
     }
   }, [workouts])
 
-  const primary = recovery ?? bodyScore ?? steps
+  const scorePrimary = recovery ?? bodyScore
+  const primary = scorePrimary ?? steps
   const primaryLabel = recovery != null
     ? 'Recovery'
     : bodyScore != null
@@ -205,10 +206,10 @@ export function HomeHealthBrief() {
               {unit ? <small>{unit}</small> : null}
             </span>
             {meta ? <span className="panacea-health-bento-meta">{meta}</span> : null}
-            {size === 'hero' ? (
+            {size === 'hero' && scorePrimary != null ? (
               <span className="panacea-health-bento-matrix" aria-hidden>
                 {Array.from({ length: 36 }).map((_, index) => (
-                  <i key={index} data-on={primary != null && index < Math.max(3, Math.min(36, Math.round((Number(primary) / 100) * 36)))} />
+                  <i key={index} data-on={index < Math.round((Math.min(100, scorePrimary) / 100) * 36)} />
                 ))}
               </span>
             ) : null}
