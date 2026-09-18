@@ -4,6 +4,7 @@ import {
   KELOMPOK_TAB, URUTAN_KELOMPOK, KELOMPOK_LAIN, kelompokUntuk, kelompokTerpakai,
   urutkanMenurutKelompok,
 } from '../../src/lib/bodyExplorerTabGroups.ts'
+import { BODY_EXPOSURE_ACTIVITIES } from '../../src/lib/bodyExposureActivities.ts'
 
 // Tidak ada tab yang boleh lenyap.
 //
@@ -19,6 +20,7 @@ import {
 // tidak boleh menambah, menghilangkan, atau menggandakan satu tab pun.
 
 const sumber = await readFile(new URL('../../src/pages/BodyExplorer.tsx', import.meta.url), 'utf8')
+const navigator = await readFile(new URL('../../src/components/BodyExposureActivityNavigator.tsx', import.meta.url), 'utf8')
 
 /** Kunci tab dibaca dari PANEL_TABS, bukan didaftar ulang di sini. */
 const blok = sumber.slice(sumber.indexOf('const PANEL_TABS'), sumber.indexOf('\n]', sumber.indexOf('const PANEL_TABS')))
@@ -87,36 +89,39 @@ assert.ok(kunciTab.length > 20, `Hanya ${kunciTab.length} tab terbaca; pembacaan
   }
 }
 
-// ── 3c. Baris tab benar-benar merender SEMUA tab ──────────────────────────
+// ── 3c. Registry aktivitas harus sama persis dengan panel yang nyata ─────────
 //
-// Dibaca dari sumbernya: sebuah `.filter(` pada baris tab adalah persis cacat
-// yang membuat gerbang QA gagal, dan ia tidak akan terlihat dari uji unit mana
-// pun di atas.
+// Arsitektur baru memakai progressive disclosure: semua tombol tidak lagi
+// dirender sekaligus. Invariant yang penting bukan "semua terlihat bersamaan",
+// melainkan tidak ada panel yang hilang dari registry pencarian/navigasi.
 {
-  const awal = sumber.indexOf('ref={barisTab}')
-  assert.ok(awal > 0, 'Baris tab harus memakai rujukan barisTab supaya bisa digulirkan')
-  const potongan = sumber.slice(awal, awal + 400)
-  assert.ok(
-    !/PANEL_TABS\s*\.filter/.test(potongan) && !/tabTerurut\s*\.filter/.test(potongan),
-    'Baris tab tidak boleh menyaring: setiap tab harus tetap dirender dan terjangkau',
+  const kunciAktivitas = BODY_EXPOSURE_ACTIVITIES.map((activity) => activity.key)
+  assert.deepEqual(
+    [...kunciAktivitas].sort(),
+    [...kunciTab].sort(),
+    'Registry aktivitas harus memuat tepat panel yang benar-benar ada, tanpa hilang atau yatim',
   )
-  assert.ok(/tabTerurut\.map/.test(potongan), 'Baris tab harus merender seluruh tab yang sudah terurut')
+  assert.match(
+    sumber,
+    /<BodyExposureActivityNavigator[\s\S]{0,240}activePanel=\{panelTab\}[\s\S]{0,240}onSelectPanel=/,
+    'BodyExplorer harus memasang navigator aktivitas ke state panel yang sama',
+  )
+  assert.match(navigator, /All activities/, 'Semua aktivitas harus punya pintu progressive-disclosure yang jelas')
+  assert.match(navigator, /value=\{query\}/, 'Drawer aktivitas harus menyediakan pencarian')
+  assert.match(
+    navigator,
+    /BODY_EXPOSURE_ACTIVITIES\.filter/,
+    'Pencarian/kelompok harus bekerja langsung dari registry kanonik, bukan daftar bayangan',
+  )
+  assert.match(navigator, /visible\.map/, 'Hasil registry yang terlihat harus benar-benar dirender sebagai kontrol')
 }
 
-// ── 3d. Nama keping kelompok tidak boleh menabrak nama tab ───────────────
-//
-// Keping "Physiology" dan tab "Physiology" sempat memakai nama aksesibel yang
-// sama persis, sehingga mencari tombol menurut namanya menjadi mendua. Tidak
-// ada yang rusak dan tidak ada galat -- hanya setiap pemanggil menurut nama,
-// termasuk pembaca layar dan gerbang QA, yang kehilangan kepastian.
+// ── 3d. Nama aktivitas harus unik untuk pembaca layar dan browser QA ────────
 {
-  const label = [...blok.matchAll(/label: '([^']+)'/g)].map((m) => m[1])
-  const bentrok = URUTAN_KELOMPOK.filter((g) => label.includes(g))
-  assert.ok(bentrok.length > 0, 'Uji ini mengandaikan ada nama yang bertabrakan; kalau tidak, ia tidak menguji apa pun')
-  assert.ok(
-    /aria-label=\{`Jump to \$\{k\}`\}/.test(sumber),
-    `Keping kelompok harus memakai nama aksesibel tersendiri; ${bentrok.join(', ')} menabrak label tab`,
-  )
+  const label = BODY_EXPOSURE_ACTIVITIES.map((activity) => activity.label)
+  assert.equal(new Set(label).size, label.length, 'Label aktivitas harus unik agar pemilihan menurut nama tidak ambigu')
+  assert.match(navigator, /role="tablist"/, 'Kelompok aktivitas harus tetap punya semantik tablist')
+  assert.match(navigator, /aria-selected=\{group === item\}/, 'Kelompok aktif harus diumumkan ke pembaca layar')
 }
 
 // ── 4. Peta memakai KUNCI, bukan label ─────────────────────────────────────
