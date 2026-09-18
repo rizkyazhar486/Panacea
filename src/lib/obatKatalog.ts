@@ -998,4 +998,9 @@ export function dosisSkdi(nama: string): { keluhan: string; golongan: string; do
   return keluar
 }
 
+/** Number of offline catalogue substances with at least one named SKDI dose bridge. */
+export function jumlahDenganDosisSkdi(): number {
+  return semuaObat().filter((obat) => dosisSkdi(obat.nama).length > 0).length
+}
+
 export default ATC
