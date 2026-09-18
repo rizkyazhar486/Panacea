@@ -24,6 +24,7 @@ const snapshot: LongitudinalTwinSnapshot = {
   governance: {
     pendingClinicalReview: 0,
     blockedByConsent: 0,
+    purposeConsentFilteredEvents: 0,
   },
   boundary: {
     patientSpecificSignals: true,
@@ -32,6 +33,7 @@ const snapshot: LongitudinalTwinSnapshot = {
     diagnosticInferenceGenerated: false,
     autonomousClinicalActionAllowed: false,
     simulatedState: false,
+    purposeConsentLedgerApplied: true,
   },
   signals: [
     {
