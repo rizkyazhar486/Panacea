@@ -261,14 +261,14 @@ export function NotificationBell() {
         onClick={toggle}
         aria-expanded={open}
         aria-haspopup="dialog"
-        className="relative grid h-9 w-9 shrink-0 place-items-center rounded-full border border-black/10 bg-white text-neutral-700 shadow-sm transition hover:text-brand-dark dark:border-white/12 dark:bg-[#17191c] dark:text-neutral-200 dark:hover:text-emerald-300"
+        className="pmd-notification-button relative grid h-9 w-9 shrink-0 place-items-center overflow-visible rounded-full border border-black/10 bg-white text-neutral-700 shadow-sm transition hover:text-brand-dark dark:border-white/12 dark:bg-[#17191c] dark:text-neutral-200 dark:hover:text-emerald-300"
         title="Notifications"
         aria-label={unread > 0 ? `Notifications, ${unread} unread` : 'Notifications'}
       >
         <IconBell size={18} />
         {unread > 0 && (
-          <span className="absolute -right-0.5 -top-0.5 grid h-4 min-w-4 place-items-center rounded-full bg-accent px-1 text-[10px] font-black text-white">
-            {unread > 9 ? '9+' : unread}
+          <span className="pmd-notification-badge absolute z-10 grid place-items-center rounded-full bg-accent text-white" aria-hidden="true">
+            {unread > 99 ? '99+' : unread}
           </span>
         )}
       </button>
