@@ -1,6 +1,14 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { FOR_YOU_WIDGET_CATALOG, type ForYouWidgetDefinition } from '../lib/forYouWidgetCatalog'
+import { FOR_YOU_ADAPTER_META, FOR_YOU_WIDGET_CATALOG, type ForYouWidgetDefinition } from '../lib/forYouWidgetCatalog'
+import {
+  beginSpotifyAuthorization,
+  completePendingSpotifyAuthorization,
+  disconnectMusicAdapter,
+  isMusicAdapterConfigured,
+  readMusicAdapterStatus,
+  type MusicAdapterStatus,
+} from '../lib/musicAdapterAuth'
 
 function sourceLabel(widget: ForYouWidgetDefinition) {
   if (widget.sourcePolicy === 'adapter-required') return 'connection required'
@@ -9,8 +17,16 @@ function sourceLabel(widget: ForYouWidgetDefinition) {
   return 'Panacea'
 }
 
-function widgetMetric(widget: ForYouWidgetDefinition) {
-  if (widget.kind === 'music') return 'Spotify · Apple Music'
+function musicMetric(statuses: Record<string, MusicAdapterStatus>) {
+  const connected = Object.values(statuses).filter((status) => status.state === 'connected').length
+  if (connected > 0) return `${connected} connected`
+  if (Object.values(statuses).some((status) => status.state === 'error')) return 'Auth error'
+  if (Object.values(statuses).some((status) => status.state === 'disconnected')) return 'Not connected'
+  return 'Setup needed'
+}
+
+function widgetMetric(widget: ForYouWidgetDefinition, musicStatuses: Record<string, MusicAdapterStatus>) {
+  if (widget.kind === 'music') return musicMetric(musicStatuses)
   if (widget.kind === 'sports') return 'Live'
   if (widget.kind === 'faith') return 'Today'
   if (widget.kind === 'mental-wellbeing') return 'Private'
@@ -20,13 +36,55 @@ function widgetMetric(widget: ForYouWidgetDefinition) {
   return 'Activity'
 }
 
+const MUSIC_ADAPTERS = FOR_YOU_WIDGET_CATALOG.find((widget) => widget.kind === 'music')?.adapters ?? []
+
+function refreshMusicStatuses(): Record<string, MusicAdapterStatus> {
+  return Object.fromEntries(MUSIC_ADAPTERS.map((adapter) => [adapter, readMusicAdapterStatus(adapter)]))
+}
+
 export function ForYouDailyStack() {
   const [infoId, setInfoId] = useState<string | null>(null)
   const [expanded, setExpanded] = useState(false)
+  const [musicStatuses, setMusicStatuses] = useState<Record<string, MusicAdapterStatus>>(() => refreshMusicStatuses())
+  const [connectingAdapter, setConnectingAdapter] = useState<string | null>(null)
   const visibleWidgets = useMemo(
     () => expanded ? FOR_YOU_WIDGET_CATALOG : FOR_YOU_WIDGET_CATALOG.slice(0, 4),
     [expanded],
   )
+
+  useEffect(() => {
+    let cancelled = false
+    completePendingSpotifyAuthorization(window.location.search).then((outcome) => {
+      if (outcome === 'handled' && !cancelled) {
+        const url = new URL(window.location.href)
+        url.searchParams.delete('code')
+        url.searchParams.delete('state')
+        url.searchParams.delete('error')
+        window.history.replaceState(null, '', `${url.pathname}${url.search}${url.hash}`)
+      }
+      if (!cancelled) setMusicStatuses(refreshMusicStatuses())
+    })
+    return () => {
+      cancelled = true
+    }
+  }, [])
+
+  const handleAdapterAction = async (adapter: string) => {
+    const status = musicStatuses[adapter]
+    if (status?.state === 'connected' || status?.state === 'error') {
+      disconnectMusicAdapter(adapter as (typeof MUSIC_ADAPTERS)[number])
+      setMusicStatuses(refreshMusicStatuses())
+      return
+    }
+    if (adapter === 'spotify' && isMusicAdapterConfigured('spotify')) {
+      setConnectingAdapter(adapter)
+      try {
+        await beginSpotifyAuthorization()
+      } finally {
+        setConnectingAdapter(null)
+      }
+    }
+  }
 
   return (
     <section aria-label="For You daily stack" className="border-t border-white/10 pt-4">
@@ -53,7 +111,7 @@ export function ForYouDailyStack() {
 
               <div className="min-w-0">
                 <div className="truncate text-[9px] font-black uppercase tracking-[.12em] text-white/36">{widget.title}</div>
-                <div className="mt-1 truncate text-xl font-black tracking-[-.04em] text-white">{widgetMetric(widget)}</div>
+                <div className="mt-1 truncate text-xl font-black tracking-[-.04em] text-white">{widgetMetric(widget, musicStatuses)}</div>
               </div>
             </div>
           )
@@ -70,11 +128,53 @@ export function ForYouDailyStack() {
               >
                 i
               </button>
-              {infoId === widget.id && (
+              {infoId === widget.id && widget.kind === 'music' && (
+                <div className="mt-1 space-y-1.5 rounded-[14px] border border-white/[.06] bg-white/[.02] px-3 py-2">
+                  <p className="text-[10px] leading-relaxed text-white/42">
+                    Panacea never simulates playback or account state — each provider below shows its real
+                    authorization status.
+                  </p>
+                  {MUSIC_ADAPTERS.map((adapter) => {
+                    const status = musicStatuses[adapter] ?? { state: 'not-configured' as const }
+                    const label = FOR_YOU_ADAPTER_META[adapter].label
+                    const isConnecting = connectingAdapter === adapter
+                    const actionLabel =
+                      status.state === 'connected' ? 'Disconnect'
+                      : status.state === 'error' ? 'Clear error'
+                      : status.state === 'not-configured' ? 'Not configured'
+                      : isConnecting ? 'Connecting…'
+                      : 'Connect'
+                    return (
+                      <div key={adapter} className="flex items-center justify-between gap-2 text-[10px]">
+                        <span className="text-white/60">{label}</span>
+                        <span
+                          className={
+                            status.state === 'connected' ? 'text-emerald-300/80'
+                            : status.state === 'error' ? 'text-rose-300/80'
+                            : 'text-white/32'
+                          }
+                        >
+                          {status.state === 'error' && status.errorMessage ? status.errorMessage : status.state.replace('-', ' ')}
+                        </span>
+                        <button
+                          type="button"
+                          disabled={status.state === 'not-configured' || isConnecting}
+                          onClick={(event) => {
+                            event.preventDefault()
+                            void handleAdapterAction(adapter)
+                          }}
+                          className="rounded-full border border-white/[.1] px-2 py-1 font-black uppercase tracking-[.08em] text-white/50 transition hover:text-white/80 disabled:cursor-not-allowed disabled:opacity-40"
+                        >
+                          {actionLabel}
+                        </button>
+                      </div>
+                    )
+                  })}
+                </div>
+              )}
+              {infoId === widget.id && widget.kind !== 'music' && (
                 <p className="mt-1 rounded-[14px] border border-white/[.06] bg-white/[.02] px-3 py-2 text-[10px] leading-relaxed text-white/42">
-                  {widget.kind === 'music'
-                    ? 'Spotify and Apple Music stay unconnected until a real provider authorization flow is configured; Panacea does not simulate playback or account state.'
-                    : widget.oneSentence}
+                  {widget.oneSentence}
                 </p>
               )}
             </article>

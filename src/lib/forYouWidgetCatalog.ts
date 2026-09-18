@@ -19,6 +19,24 @@ export type ForYouPrimaryVisual =
 
 export type ForYouAdapter = 'spotify' | 'apple-music'
 
+export interface ForYouAdapterMeta {
+  id: ForYouAdapter
+  label: string
+  /** Vite env var whose presence marks this adapter as configured for this deployment. */
+  configEnvVar: string
+}
+
+export const FOR_YOU_ADAPTER_META: Readonly<Record<ForYouAdapter, ForYouAdapterMeta>> = {
+  spotify: { id: 'spotify', label: 'Spotify', configEnvVar: 'VITE_SPOTIFY_CLIENT_ID' },
+  'apple-music': {
+    id: 'apple-music',
+    label: 'Apple Music',
+    // MusicKit JS requires a server-signed developer token; no issuance endpoint exists yet,
+    // so this adapter has no client-side config var and stays "not configured" until one does.
+    configEnvVar: '',
+  },
+}
+
 export interface ForYouWidgetDefinition {
   id: string
   title: string
