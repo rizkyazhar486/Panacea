@@ -7,7 +7,7 @@ import { getDemoTersimpan } from '../lib/profile'
 
 function clamp(n: number, min: number, max: number) { return Math.max(min, Math.min(max, n)) }
 
-export function PersonalBodyAvatar3D() {
+export function PersonalBodyAvatar3D({ compact = false }: { compact?: boolean } = {}) {
   const mountRef = useRef<HTMLDivElement>(null)
   const { account, state } = useStore()
   const [revision, setRevision] = useState(0)
@@ -51,7 +51,8 @@ export function PersonalBodyAvatar3D() {
     const camera = new THREE.PerspectiveCamera(34, 1, 0.1, 100)
     camera.position.set(0, 1.25, 5.2)
 
-    const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false })
+    const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false, preserveDrawingBuffer: true })
+    renderer.domElement.dataset.personalAvatarCanvas = 'true'
     renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2))
     renderer.outputColorSpace = THREE.SRGBColorSpace
     renderer.shadowMap.enabled = true
@@ -186,7 +187,7 @@ export function PersonalBodyAvatar3D() {
 
   return (
     <section className="overflow-hidden rounded-[26px] border border-white/10 bg-[#071018] text-white shadow-2xl">
-      <div ref={mountRef} className="h-[360px] w-full sm:h-[430px]" aria-label="Personalized 3D body character" />
+      <div ref={mountRef} className={compact ? "h-[300px] w-full sm:h-[340px]" : "h-[360px] w-full sm:h-[430px]"} aria-label="Personalized 3D body character" />
       <div className="border-t border-white/10 p-3">
         <div className="flex flex-wrap gap-2 text-[10px] font-bold text-white/75">
           <span className="rounded-full bg-white/10 px-2 py-1">{Math.round(input.heightCm)} cm</span>
@@ -194,9 +195,11 @@ export function PersonalBodyAvatar3D() {
           <span className="rounded-full bg-white/10 px-2 py-1">BMI {input.bmi.toFixed(1)}</span>
           {input.bodyType && <span className="rounded-full bg-brand/20 px-2 py-1 text-emerald-200">{input.bodyType}</span>}
         </div>
-        <p className="mt-2 text-[10px] leading-relaxed text-white/55">
-          Personal character: body proportions are estimated from the measurements you entered and saved body-shape analysis. Your profile photo can be used as a face texture. This is a stylized parametric character, not a medical body scan or photogrammetric reconstruction.
-        </p>
+        {!compact && (
+          <p className="mt-2 text-[10px] leading-relaxed text-white/70">
+            Personal character: body proportions are estimated from saved measurements and body-shape analysis. This is a visual identity shell, not a medical body scan.
+          </p>
+        )}
       </div>
     </section>
   )
