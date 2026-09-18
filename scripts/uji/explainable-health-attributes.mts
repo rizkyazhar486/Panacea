@@ -137,12 +137,18 @@ assert.equal(mobility.coverage.available, 0)
 assert.equal(mobility.coverage.ratio, 0)
 
 const endurance = buildExplainableHealthAttribute(snapshot, 'endurance')
-assert.equal(endurance.evidence.find((item) => item.metric === 'activity-distance')?.available, true)
-assert.equal(endurance.evidence.find((item) => item.metric === 'activity-distance')?.signal?.evidenceClass, 'derived')
+const enduranceDistance = endurance.evidence.find((item) => item.metric === 'distance')
+assert.equal(enduranceDistance?.available, true)
+assert.equal(enduranceDistance?.matchedMetric, 'activity-distance')
+assert.equal(enduranceDistance?.signal?.evidenceClass, 'derived')
+assert.deepEqual(enduranceDistance?.aliases, ['activity-distance'])
 
 const sleep = buildExplainableHealthAttribute(snapshot, 'sleep')
 assert.equal(sleep.evidenceState, 'primary-observed')
-assert.equal(sleep.evidence.find((item) => item.metric === 'sleep-duration')?.signal?.evidenceClass, 'self-reported')
+const sleepDuration = sleep.evidence.find((item) => item.metric === 'sleep-duration')
+assert.equal(sleepDuration?.signal?.evidenceClass, 'self-reported')
+assert.equal(sleepDuration?.available, true)
+assert.deepEqual(sleepDuration?.aliases, ['wellness-sleep-duration'])
 
 for (const attribute of buildExplainableHealthAttributes(snapshot)) {
   assert.equal(attribute.boundary.descriptiveOnly, true)
