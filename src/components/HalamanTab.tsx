@@ -34,7 +34,7 @@ export interface TabDef {
 }
 
 export function HalamanTab({
-  judul, subjudul, ikon, tabs, ringkasan, kaki, theme,
+  judul, subjudul, ikon, tabs, ringkasan, kaki, theme, tabLayout = 'scroll', featuredTabIds = [],
 }: {
   judul: string
   subjudul: string
@@ -46,6 +46,11 @@ export function HalamanTab({
    * komponen ini tidak ikut berubah kecuali dimintai.
    */
   theme?: 'metal'
+  /** Compact mode keeps the daily destinations visible and moves the long tail
+   * behind one progressive-disclosure control. Default remains the historical
+   * horizontal rail so existing pages do not change. */
+  tabLayout?: 'scroll' | 'compact'
+  featuredTabIds?: string[]
   /**
    * Panel angka yang berlaku untuk SELURUH tab, ditampilkan di atasnya.
    *
@@ -76,6 +81,7 @@ export function HalamanTab({
   }, [lokasi.search, tabs])
 
   const [aktif, setAktif] = useState(dariUrl)
+  const [moreOpen, setMoreOpen] = useState(false)
   useEffect(() => { setAktif(dariUrl) }, [dariUrl])
 
   const pilih = (id: string) => {
@@ -84,34 +90,80 @@ export function HalamanTab({
     // menekan "kembali" seharusnya keluar dari halaman, bukan menelusuri
     // setiap tab yang pernah disentuh.
     navigate(`${lokasi.pathname}?t=${id}`, { replace: true })
+    setMoreOpen(false)
   }
 
   const tab = tabs.find((x) => x.id === aktif) ?? tabs[0]
   const Isi = tab.komponen
 
+  const compactPrimary = useMemo(() => {
+    if (tabLayout !== 'compact') return tabs
+    const wanted = featuredTabIds.length
+      ? featuredTabIds.map((id) => tabs.find((candidate) => candidate.id === id)).filter((candidate): candidate is TabDef => Boolean(candidate))
+      : tabs.slice(0, 5)
+    if (!wanted.some((candidate) => candidate.id === aktif)) {
+      const current = tabs.find((candidate) => candidate.id === aktif)
+      if (current) return [...wanted, current].slice(0, 6)
+    }
+    return wanted.slice(0, 6)
+  }, [aktif, featuredTabIds, tabLayout, tabs])
+
+  const compactSecondary = useMemo(
+    () => tabLayout === 'compact'
+      ? tabs.filter((candidate) => !compactPrimary.some((primary) => primary.id === candidate.id))
+      : [],
+    [compactPrimary, tabLayout, tabs],
+  )
+
+  const renderTab = (t: TabDef, compact = false) => (
+    <button
+      key={t.id}
+      type="button"
+      onClick={() => pilih(t.id)}
+      aria-current={t.id === aktif ? 'page' : undefined}
+      className={`${compact ? 'halaman-tab-choice halaman-tab-choice--compact' : 'halaman-tab-choice'} flex h-10 shrink-0 items-center gap-1.5 rounded-full px-3.5 text-[12px] font-bold transition ${
+        t.id === aktif
+          ? theme === 'metal' ? 'metal-tag metal-gold !text-[12px] normal-case tracking-normal' : 'bg-brand text-ink'
+          : 'bg-neutral-100 text-neutral-600 hover:bg-neutral-200 dark:bg-white/10 dark:text-neutral-300'
+      }`}
+    >
+      <span className="halaman-tab-emoji text-[13px]" aria-hidden>{t.emoji}</span>
+      <span className="halaman-tab-label">{t.label}</span>
+    </button>
+  )
+
   return (
-    <div className="space-y-6 pb-24">
+    <div className="halaman-tab-root space-y-6 pb-24" data-tab-layout={tabLayout}>
       <SectionTitle icon={ikon} title={judul} subtitle={tab.ringkas ?? subjudul} />
 
       {ringkasan}
 
-      <div className="no-scrollbar -mx-1 flex gap-1.5 overflow-x-auto px-1 pb-1">
-        {tabs.map((t) => (
-          <button key={t.id} onClick={() => pilih(t.id)}
-            aria-current={t.id === aktif ? 'page' : undefined}
-            className={`flex h-10 shrink-0 items-center gap-1.5 rounded-full px-3.5 text-[12px] font-bold transition ${
-              /* Keping tab ini ditulis untuk latar gelap: bg-white/5 dan
-                 text-slate-400 hampir tidak terlihat di atas kanvas terang —
-                 terukur 2,45:1. Dibuat memakai pasangan yang bekerja di kedua
-                 tema, seperti keping tab di halaman lain. */
-              t.id === aktif
-                ? theme === 'metal' ? 'metal-tag metal-gold !text-[12px] normal-case tracking-normal' : 'bg-brand text-ink'
-                : 'bg-neutral-100 text-neutral-600 hover:bg-neutral-200 dark:bg-white/10 dark:text-neutral-300'
-            }`}>
-            <span className="text-[13px]">{t.emoji}</span>{t.label}
-          </button>
-        ))}
-      </div>
+      {tabLayout === 'compact' ? (
+        <div className="halaman-tab-compact">
+          <div className="halaman-tab-primary" aria-label="Primary tools">
+            {compactPrimary.map((t) => renderTab(t, true))}
+          </div>
+          {compactSecondary.length > 0 && (
+            <details
+              className="halaman-tab-more"
+              open={moreOpen}
+              onToggle={(event) => setMoreOpen((event.currentTarget as HTMLDetailsElement).open)}
+            >
+              <summary>
+                <span>More tools</span>
+                <span aria-hidden>{moreOpen ? '−' : '+'}</span>
+              </summary>
+              <div className="halaman-tab-more-grid">
+                {compactSecondary.map((t) => renderTab(t, true))}
+              </div>
+            </details>
+          )}
+        </div>
+      ) : (
+        <div className="halaman-tab-rail no-scrollbar -mx-1 flex gap-1.5 overflow-x-auto px-1 pb-1">
+          {tabs.map((t) => renderTab(t))}
+        </div>
+      )}
 
       {/* key memaksa pemasangan ulang saat tab berganti, sehingga setiap halaman
           menjalankan efek pemuatan datanya sendiri seperti saat dibuka langsung. */}
