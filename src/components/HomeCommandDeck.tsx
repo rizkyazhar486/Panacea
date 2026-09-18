@@ -5,6 +5,8 @@ import { bentoSpan } from '../lib/interaction/bento'
 import { gabungKatalog, saringPeran, rutaKanonik as canonical, type EntriKatalog } from '../lib/katalogLengkap'
 import { NAV_UNTUK_PENGATURAN } from './Shell'
 import { useStore } from '../lib/store'
+import { getUsageCounts } from '../lib/usage'
+import { pintasanTerpakai } from '../lib/pintasanTerpakai'
 import { IconBook, IconChat, IconHeart, IconRun, IconStethoscope, IconUsers } from './icons'
 import '../styles/home-human-interface.css'
 
@@ -75,6 +77,17 @@ export function HomeCommandDeck() {
     })
   }, [domain, query, uniqueFeatures])
 
+  const searching = query.trim().length > 0
+
+  // Pintasan menuju yang benar-benar sering dibuka orang ini. Dibaca sekali
+  // saat dipasang: hitungannya berubah ketika ia BERPINDAH halaman, dan
+  // membacanya ulang setiap render hanya menambah kerja tanpa menambah
+  // kebenaran. Kosong pada pemakaian pertama, dan memang harus begitu.
+  const pintasan = useMemo(
+    () => pintasanTerpakai(uniqueFeatures, getUsageCounts(), canonical),
+    [uniqueFeatures],
+  )
+
   // Bento dikelompokkan menurut `grup` yang sudah dibawa katalognya sendiri.
   // Kelompok dipakai apa adanya — menerjemahkan atau menyusun ulang namanya di
   // sini akan memisahkannya dari katalog dan membuat hitungannya berbohong.
@@ -86,12 +99,20 @@ export function HomeCommandDeck() {
       if (list) list.push(feature)
       else bucket.set(key, [feature])
     }
-    return [...bucket.entries()]
+    const menurutUkuran = [...bucket.entries()]
       .map(([name, items]) => ({ name, items }))
       .sort((a, b) => b.items.length - a.items.length)
-  }, [filtered])
 
-  const searching = query.trim().length > 0
+    // Pintasan berdiri di depan, dan hanya ketika ada isinya. Ia TIDAK
+    // menggantikan kelompok mana pun: setiap kapabilitas tetap ada di
+    // kelompok aslinya di bawah, jadi memindahkan pintasan tidak pernah
+    // membuat sesuatu menghilang dari indeks.
+    if (!searching && pintasan.length > 0) {
+      return [{ name: 'Most used', items: pintasan }, ...menurutUkuran]
+    }
+    return menurutUkuran
+  }, [filtered, pintasan, searching])
+
   const showIndex = expanded || searching || domain !== 'All'
 
   return (

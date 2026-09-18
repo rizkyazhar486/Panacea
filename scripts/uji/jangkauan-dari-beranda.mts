@@ -149,4 +149,46 @@ const terbuka = saringPeran([{ to: '/x', label: 'x', group: 'g', kw: '', apa: ''
 assert.equal(terbuka.length, 1,
   'an entry with no role restriction is being treated as forbidden to everyone; that empties the whole index')
 
+
+// ── Pintasan "paling sering dipakai" tidak boleh mengarang ───────────────
+//
+// Bagian yang mengaku personal tetapi diisi tebakan pada pemakaian pertama
+// merusak lebih dari dirinya sendiri: begitu satu bagian layar ketahuan
+// mengarang, angka lain di layar yang sama ikut kehilangan kepercayaan.
+const { pintasanTerpakai, MINIMAL_KUNJUNGAN, BATAS_PINTASAN } =
+  await import('../../src/lib/pintasanTerpakai.ts')
+
+const contoh = [
+  { to: '/a', label: 'A', group: 'g', kw: '', apa: '', roles: [] },
+  { to: '/b', label: 'B', group: 'g', kw: '', apa: '', roles: [] },
+  { to: '/body-explorer', label: 'Body', group: 'g', kw: '', apa: '', roles: [] },
+]
+const apaAdanya = (t: string) => t
+
+assert.deepEqual(pintasanTerpakai(contoh, {}, apaAdanya), [],
+  'with no usage recorded the shortcut list invents entries and calls them "most used"')
+assert.deepEqual(pintasanTerpakai(contoh, { '/a': MINIMAL_KUNJUNGAN - 1 }, apaAdanya), [],
+  'a single stray visit is presented as a habit; it may simply have been a mis-tap')
+
+const berurut = pintasanTerpakai(contoh, { '/a': 3, '/b': 9 }, apaAdanya)
+assert.deepEqual(berurut.map((e) => e.to), ['/b', '/a'], 'the shortcuts are no longer ranked by actual use')
+
+// Hitungan dicatat pada rute KANONIK. Kalau pencariannya memakai rute mentah,
+// setiap tujuan yang dialihkan akan selamanya terbaca nol kali dibuka.
+const lewatKanonik = pintasanTerpakai(contoh, { '/learn?t=body': 5 }, rutaKanonik)
+assert.deepEqual(lewatKanonik.map((e) => e.to), ['/body-explorer'],
+  'visits recorded against the canonical route no longer count, so every redirected destination reads as never used')
+
+assert.ok(pintasanTerpakai(
+  Array.from({ length: 40 }, (_, i) => ({ to: `/r${i}`, label: `R${i}`, group: 'g', kw: '', apa: '', roles: [] })),
+  Object.fromEntries(Array.from({ length: 40 }, (_, i) => [`/r${i}`, i + MINIMAL_KUNJUNGAN])),
+  apaAdanya,
+).length === BATAS_PINTASAN, 'the shortcut list grew past its cap and stopped being a shortcut')
+
+// Pintasan menambah jalan, tidak pernah mengambilnya: kapabilitas yang muncul
+// sebagai pintasan harus TETAP ada di kelompok aslinya di bawah.
+assert.ok(/\{ name: 'Most used', items: pintasan \}, \.\.\.menurutUkuran/.test(deck),
+  'the shortcut group replaces the grouped index instead of standing in front of it, so anything promoted to a ' +
+  'shortcut disappears from the group it belongs to')
+
 console.log(`jangkauan-dari-beranda: ok (${nav.length} tujuan menu, semuanya terjangkau dari Beranda — ${laporan.join(', ')})`)
