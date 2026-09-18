@@ -87,6 +87,19 @@ const snapshot: LongitudinalTwinSnapshot = {
       provenance,
     },
     {
+      eventId: 'gps-distance',
+      metric: 'activity-distance',
+      domain: 'activity',
+      value: 8.2,
+      unit: 'km',
+      recordedAt: '2026-09-18T07:00:00.000Z',
+      confidence: 0.9,
+      evidenceClass: 'derived',
+      displayState: 'recorded',
+      reviewState: 'not-required',
+      provenance: { ...provenance, sourceKind: 'derived', sourceId: 'gps-activity' },
+    },
+    {
       eventId: 'weight',
       metric: 'weight',
       domain: 'longevity',
@@ -122,6 +135,10 @@ const mobility = buildExplainableHealthAttribute(snapshot, 'mobility')
 assert.equal(mobility.evidenceState, 'insufficient-evidence')
 assert.equal(mobility.coverage.available, 0)
 assert.equal(mobility.coverage.ratio, 0)
+
+const endurance = buildExplainableHealthAttribute(snapshot, 'endurance')
+assert.equal(endurance.evidence.find((item) => item.metric === 'activity-distance')?.available, true)
+assert.equal(endurance.evidence.find((item) => item.metric === 'activity-distance')?.signal?.evidenceClass, 'derived')
 
 const sleep = buildExplainableHealthAttribute(snapshot, 'sleep')
 assert.equal(sleep.evidenceState, 'primary-observed')
