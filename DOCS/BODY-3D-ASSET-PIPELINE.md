@@ -43,9 +43,19 @@ Z-Anatomy license reference:
 - https://github.com/Z-Anatomy/Models-of-human-anatomy
 - CC BY-SA 4.0; derivatives must retain attribution/share-alike obligations.
 
-### Female regional reference — HuBMAP Human Reference Atlas
+### Female references — HuBMAP Human Reference Atlas
 
-Already shipped in `public/atlas/obgin.glb`:
+A full female source candidate is now pinned for acquisition:
+
+- HRA Visible Human Female united set v1.5
+- GLB: `https://cdn.humanatlas.io/digital-objects/ref-organ/united-female/v1.5/assets/3d-vh-f-united.glb`
+- metadata: `https://cdn.humanatlas.io/digital-objects/ref-organ/united-female/v1.5/metadata.json`
+- license: CC BY 4.0
+- acquisition/audit tool: `scripts/bangun/acquire-hra-female-v1_5.mjs`
+
+This source provides a whole-body female surface plus selected organs, including female reproductive anatomy. It is **pipeline-ready, not shipped**: skeleton/muscle coverage is partial and exact external-genital surface names still require source-node verification before Panacea may claim that coverage.
+
+A separate adapted regional female module is already shipped in `public/atlas/obgin.glb`:
 - uterus
 - ovaries
 - uterine tubes
@@ -54,7 +64,7 @@ Already shipped in `public/atlas/obgin.glb`:
 - urinary bladder
 - female bony pelvis
 
-This is a Visible Human female / HRA reference and is **not in the same coordinate space** as the current male whole-body Z-Anatomy reference. Do not visually "fit" it inside the male body.
+The shipped `obgin.glb` is a normalized standalone adaptation and must not be assumed to retain the raw HRA united-set coordinates. Neither female source may be visually "fit" into the male Z-Anatomy body; sex/reference bodies remain explicit modes.
 
 Useful HRA interfaces:
 - HRA Portal / 3D reference library: https://humanatlas.io/
@@ -180,9 +190,7 @@ Current compatible whole-body male reference should expose source-backed:
 - urethral context.
 
 ### Female reproductive anatomy
-The regional HRA female reference already provides internal pelvic structures including vagina, uterus, ovaries and uterine tubes. It must remain a sex-specific/reference-specific mode until a compatible whole-body female source or validated registration is available.
-
-Do not combine male and female reproductive anatomy in one body as though both are simultaneously normal structures of the same reference subject.
+The regional HRA module already provides internal pelvic structures including vagina, uterus, ovaries and uterine tubes. HRA also publishes the pinned v1.5 female united whole-body source candidate, which must be acquired and audited before runtime admission. Female anatomy remains a sex-specific/reference-specific mode; do not combine male and female reproductive anatomy in one body as though both are simultaneously normal structures of the same reference subject.
 
 ## 6. Missing-source rules
 
@@ -193,7 +201,7 @@ src/lib/anatomy/wholeBodyAssetContract.ts
 ```
 
 Key gaps:
-- female whole-body compatible reference;
+- female whole-body **runtime admission/completeness** (the HRA united source exists but is not yet audited/packaged/shipped);
 - source-backed fascia;
 - skin microanatomy below gross surface;
 - female external genital surface geometry;
