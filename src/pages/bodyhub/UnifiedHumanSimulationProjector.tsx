@@ -257,6 +257,7 @@ export default function UnifiedHumanSimulationProjector({
       data-selected-source-structure={selectedStructureName ?? undefined}
       className="overflow-hidden rounded-[30px] border border-white/[.09] bg-[#020508] text-white shadow-[0_28px_90px_rgba(0,0,0,.36)]"
       aria-labelledby="unified-human-simulation-title"
+      aria-description="Body → system → organ → tissue → cell → organelle → molecule → genome"
     >
       <header className="border-b border-white/[.08] p-3 sm:p-4">
         <div className="flex flex-col gap-3 xl:flex-row xl:items-end xl:justify-between">
@@ -321,7 +322,7 @@ export default function UnifiedHumanSimulationProjector({
 
           <div className="mt-4 flex items-end justify-between gap-2">
             <div>
-              <div className="text-[8px] font-black uppercase tracking-[.16em] text-white/30">Semantic zoom</div>
+              <div className="text-[8px] font-black uppercase tracking-[.16em] text-white/30" title="Relative zoom controls representation/LOD; it is not optical magnification">Semantic zoom</div>
               <div className="mt-1 text-xs font-black text-white/85">{semanticStop.label}</div>
             </div>
             <div className="text-right text-[8px] font-bold text-cyan-200/55">{semanticZoom.relativeZoom.toFixed(1)}× from fitted view</div>

@@ -132,9 +132,10 @@ export function BodyExposureOS() {
             <button
               type="button"
               onClick={openSystemAtlas}
+              aria-label="Explore 11 systems · one simulation projector"
               className="min-h-[44px] rounded-full border border-cyan-300/22 bg-cyan-300/[.08] px-4 text-[11px] font-black text-cyan-100 transition hover:bg-cyan-300/[.13] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-300/60"
             >
-              Systems
+              Explore 11 systems
             </button>
             <button
               type="button"
