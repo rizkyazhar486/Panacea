@@ -6,10 +6,10 @@ import {
   filterStateByPurposeConsent,
   type PurposeConsentLedger,
 } from './purposeConsentLedger'
+import { isConsentActive } from './panaceaLongitudinalState'
 import type {
   ConsentPurpose,
   LongitudinalEvent,
-  isConsentActive,
   LongitudinalPatientState,
   PanaceaSurface,
   ReviewState,
