@@ -185,3 +185,28 @@ Implementation order for Claude Code:
 6. expand deeper anatomical/molecular assets only after provenance and performance gates remain trustworthy.
 
 Treat this as a continuation target, not permission to duplicate super-pages or bypass active overlap. Re-read latest main before touching ClinicalHub, UnifiedBodyWorkspace, Body Exposure, EMR or ForYouHub and reconcile any concurrently landed work.
+
+## Panacea Visit Operating System handoff — 2026-09-18
+
+The owner wants doctor visits to operate as one AI-EMR-connected clinical OS: camera/microphone encounter plus continuous medical-device context, with the visual direction of a body/organ-centered medical command space rather than a card wall.
+
+Phase 1 is landed on main:
+- `src/lib/visitOperatingSystem.ts` is the canonical visit-session kernel.
+- `scripts/uji/visit-operating-system.mts` covers consent, identity, device/unit/signal-quality checks, freshness, idempotency, lifecycle, AI-EMR live context and clinician-reviewed promotion.
+- Existing `server/src/realtime.ts` + `src/components/ConsultChat.tsx` already provide WebRTC camera/microphone signaling and peer media. Reuse them; do not create a competing video stack.
+- Continuous device samples are live/ephemeral visit context by default. They do not silently become the signed AI-EMR. A selected sample crosses into the longitudinal clinical record only through `promoteObservationToClinicalRecord()` with an identified clinician review.
+- Raw camera/audio is not persisted by the Visit OS kernel and recording remains disabled by default.
+
+Continue in this order, reconciling active UI work instead of overwriting it:
+1. **Runtime integration:** couple WebRTC call state to `VisitOperatingState.media`; selected patient and clinician identities must come from authenticated application state, never room-name inference.
+2. **Device adapter boundary:** normalize supported BLE/USB/local-network/vendor-cloud/FHIR feeds into `VisitDeviceObservation`. Preserve manufacturer/model/firmware, source timestamp, standard code where known, and signal quality. Do not claim support for a device until its adapter is actually implemented and tested.
+3. **Secure transport:** for remote patient devices, prefer authenticated/authorized transport or an encrypted WebRTC data channel. Do not place patient device data onto the current generic unauthenticated room relay merely because it is convenient.
+4. **AI-EMR visit surface:** project `buildAiEmrVisitContext()` into the existing AI-EMR/Clinical/Body command space. Keep camera, live vitals/trends, device health and review actions compact around the patient/body focal canvas. Respect the one-line primary-UI rule and progressive disclosure.
+5. **Ambient visit intelligence:** only after explicit audio/video AI consent, produce source-linked draft transcript/note candidates. Generated findings remain drafts until clinician review; no autonomous diagnosis, prescription, order, procedure target or emergency disposition.
+6. **Record interoperability:** after clinician acceptance/signing, map eligible measurements to FHIR R4 Observation using verified LOINC/UCUM and the existing SATUSEHAT pathway. Preserve Encounter, subject, effective time, performer/device provenance and review state.
+7. **Reliability:** add reconnect/backpressure handling, device clock-skew detection, stale-stream detection, adapter-level validation, audit events, fail-closed consent revocation, and production observability before calling the stream continuous.
+8. **Validation:** maintain deterministic Visit OS tests plus browser camera/WebRTC smoke, device-adapter fixtures, FHIR/SATUSEHAT conformance checks and mobile behavior. Never weaken clinical/security gates merely to make CI green.
+
+Freshness in the Visit OS is transport freshness, not clinical severity: `ageMs = max(0, now - receivedAt)`; ≤30 s fresh, 30–120 s delayed, >120 s stale. Clinical alert thresholds must remain separate evidence-backed logic.
+
+The durable boundary is: **live encounter context ≠ signed clinical record**. Device streams and AI drafts may inform the clinician; clinical commitment remains provenance-preserving, consent-aware and human-reviewed.
