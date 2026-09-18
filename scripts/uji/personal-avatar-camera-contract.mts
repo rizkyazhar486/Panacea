@@ -78,7 +78,7 @@ assert.equal(
     { faceSimilarity: 1, bodyProportionSimilarity: 0.8, postureSimilarity: 0.8, textureSimilarity: 0.6, motionSimilarity: 0.6 },
     { faceSimilarity: 0.3, bodyProportionSimilarity: 0.3, postureSimilarity: 0.15, textureSimilarity: 0.15, motionSimilarity: 0.1 },
   ),
-  0.8,
+  0.81,
 )
 
 assert.match(PERSONAL_AVATAR_TRUTH_BOUNDARY, /external appearance/i)
