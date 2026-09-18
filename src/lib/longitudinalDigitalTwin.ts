@@ -9,6 +9,7 @@ import {
 import type {
   ConsentPurpose,
   LongitudinalEvent,
+  isConsentActive,
   LongitudinalPatientState,
   PanaceaSurface,
   ReviewState,
@@ -122,15 +123,25 @@ export function buildLongitudinalTwinSnapshot(input: {
     purpose,
     input.at,
   )
-  const sourceEventCount = Object.keys(input.state.eventsById).length
+  const atMs = Date.parse(input.at)
+  if (!Number.isFinite(atMs)) throw new Error('twin snapshot time must be a valid timestamp')
+
+  const envelopeAuthorizedEventCount = Object.values(input.state.eventsById)
+    .filter((event) => isConsentActive(event.consent, purpose, atMs)).length
   const governedEventCount = Object.keys(governedState.eventsById).length
 
+  // Preserve the canonical surface projection's own envelope-consent counters.
+  // The governed frame below adds the purpose-ledger restriction on top.
+  const surfaceFrame = buildLongitudinalReplayFrame(input.state, input.at, {
+    clock: input.clock ?? 'known',
+    surface: input.surface,
+  })
   const frame = buildLongitudinalReplayFrame(governedState, input.at, {
     clock: input.clock ?? 'known',
     surface: input.surface,
   })
 
-  if (!frame.governance) {
+  if (!frame.governance || !surfaceFrame.governance) {
     throw new Error('governed replay frame is required for a patient digital twin snapshot')
   }
 
@@ -161,8 +172,8 @@ export function buildLongitudinalTwinSnapshot(input: {
     signals,
     governance: {
       pendingClinicalReview: frame.governance.pendingClinicalReview,
-      blockedByConsent: frame.governance.blockedByConsent,
-      purposeConsentFilteredEvents: sourceEventCount - governedEventCount,
+      blockedByConsent: surfaceFrame.governance.blockedByConsent,
+      purposeConsentFilteredEvents: Math.max(0, envelopeAuthorizedEventCount - governedEventCount),
     },
     boundary: {
       patientSpecificSignals: true,
