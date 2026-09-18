@@ -142,6 +142,13 @@ try {
   const response = await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 45_000 })
   if (response && !response.ok()) throw new Error(`Body Explorer returned HTTP ${response.status()}`)
 
+
+  // index.html paints a full-screen #pmd-splash before React mounts. The
+  // application removes it on a timer independent of Body3D loading, so a fast
+  // render can otherwise make the obstruction check inspect the transient
+  // startup overlay rather than the product surface.
+  await page.waitForSelector('#pmd-splash', { state: 'detached', timeout: 10_000 }).catch(() => {})
+
   const reminderText = page.getByText(/TODAY.?S REMINDER/i).first()
   if (await reminderText.isVisible().catch(() => false)) {
     const reminder = reminderText.locator('xpath=ancestor::*[.//button][1]')
