@@ -38,6 +38,7 @@ import {
   IconLeaf,
   IconSearch,
   IconBell,
+  IconPhone,
 } from './icons'
 import { useStore } from '../lib/store'
 import { getTheme, toggleTheme, type Theme } from '../lib/theme'
@@ -51,7 +52,6 @@ import { InstallBanner } from './InstallApp'
 import { PeringatanPenyimpanan } from './PeringatanPenyimpanan'
 import { DailyQuoteBanner } from './DailyQuoteBanner'
 import { OnboardingTour, AssessmentPrompt } from './OnboardingTour'
-import { api, backendEnabled } from '../lib/api'
 import { trackVisit, rankByUsage } from '../lib/usage'
 import type { Role } from '../lib/types'
 import { ambilTersembunyi, saring, langgananFitur } from '../lib/fiturTersembunyi'
@@ -85,8 +85,6 @@ const ALL: Role[] = ['pasien', 'dokter', 'kontributor', 'verifikator', 'admin', 
    aplikasi ini sebagai alat klinis kepada orang yang membukanya untuk hidup
    lebih sehat. Sekarang gerak lebih dahulu, dan bagian klinisnya
    diperkenalkan sebagai PENGETAHUAN — isinya sama persis. */
-const GROUP_ORDER = ['Home', 'Move', 'Your Body', 'Longevity', 'Learn & Look Up', 'Calculators & Labs', 'Fitness', 'Services', 'Money', 'Content', 'Manage', 'Account']
-
 /**
  * Dipakai layar "Atur Fitur" agar daftarnya berasal dari sumber yang sama
  * dengan menu. Daftar terpisah yang ditulis ulang pasti akan tertinggal.
@@ -267,7 +265,7 @@ const riskLabel: Record<string, string> = {
 }
 
 export function Shell({ children }: { children: ReactNode }) {
-  const { state, activePatient, setActivePatient, logout, setMode } = useStore()
+  const { state, activePatient, setActivePatient, setMode } = useStore()
   const loc = useLocation()
   const navigate = useNavigate()
   const [theme, setTheme] = useState<Theme>(getTheme)
@@ -527,6 +525,15 @@ export function Shell({ children }: { children: ReactNode }) {
             >
               <IconUser size={18} />
             </NavLink>
+            <button
+              type="button"
+              onClick={() => setBantuanBuka(true)}
+              className="header-icon-btn hidden h-10 w-10 shrink-0 place-items-center rounded-full text-ink sm:grid"
+              aria-label="Support"
+              title="Support"
+            >
+              <IconPhone size={18} />
+            </button>
             <NotificationBell />
             <button
               onClick={() => setTheme(toggleTheme())}
