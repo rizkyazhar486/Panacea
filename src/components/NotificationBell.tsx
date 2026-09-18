@@ -261,13 +261,13 @@ export function NotificationBell() {
         onClick={toggle}
         aria-expanded={open}
         aria-haspopup="dialog"
-        className="relative grid h-9 w-9 shrink-0 place-items-center rounded-full border border-black/10 bg-white text-neutral-700 shadow-sm transition hover:text-brand-dark dark:border-white/12 dark:bg-[#17191c] dark:text-neutral-200 dark:hover:text-emerald-300"
+        className="header-icon-btn relative grid h-10 w-10 shrink-0 place-items-center overflow-visible rounded-full text-ink transition hover:text-brand-dark focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/30 dark:text-neutral-200 dark:hover:text-emerald-300"
         title="Notifications"
         aria-label={unread > 0 ? `Notifications, ${unread} unread` : 'Notifications'}
       >
         <IconBell size={18} />
         {unread > 0 && (
-          <span className="absolute -right-0.5 -top-0.5 grid h-4 min-w-4 place-items-center rounded-full bg-accent px-1 text-[10px] font-black text-white">
+          <span className="pointer-events-none absolute right-0.5 top-0.5 grid h-3.5 min-w-3.5 place-items-center rounded-full bg-accent px-1 text-[9px] font-black leading-none text-white ring-2 ring-white dark:ring-[#111315]">
             {unread > 9 ? '9+' : unread}
           </span>
         )}
