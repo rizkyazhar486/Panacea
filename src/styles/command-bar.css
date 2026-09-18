@@ -1,127 +1,162 @@
-/* Bilah perintah yang menyingkir — dan pita yang memanggilnya kembali.
-   Keputusan kapan menyingkir ada di lib/interaction/commandBar.ts; berkas ini
-   hanya menggambarkannya. */
+/* Reveal-on-scroll utility header.
+   This is deliberately NOT a navigation bar: no destination strip, no tabs,
+   no dock, no drawer. It carries only page context and universal utilities. */
 
 .panacea-command-bar {
-  transition: transform 260ms cubic-bezier(.22,.61,.36,1), opacity 200ms ease;
+  min-height: 52px;
+  padding-top: max(.5rem, env(safe-area-inset-top));
+  border: 0;
+  border-bottom: 1px solid rgba(12,20,16,.055);
+  background: rgba(252,252,253,.82);
+  box-shadow: none;
+  -webkit-backdrop-filter: blur(18px) saturate(118%);
+  backdrop-filter: blur(18px) saturate(118%);
+  transition:
+    transform 240ms cubic-bezier(.22,.61,.36,1),
+    opacity 180ms ease,
+    background-color 180ms ease;
   will-change: transform;
 }
 
-.panacea-command-bar[data-panacea-command-bar='hidden'] {
-  transform: translateY(-100%);
-  opacity: 0;
+.dark .panacea-command-bar {
+  border-bottom-color: rgba(255,255,255,.065);
+  background: rgba(5,5,5,.72);
 }
 
-/* Bilah yang sedang menyingkir tidak boleh menahan fokus papan ketik: Tab akan
-   berpindah ke kendali yang tidak terlihat, dan pengguna kehilangan jejaknya.
-   Dipakai `visibility` lewat transisi supaya kendalinya baru benar-benar hilang
-   setelah animasinya selesai, bukan berkedip putus di tengah jalan. */
 .panacea-command-bar[data-panacea-command-bar='hidden'] {
+  transform: translateY(calc(-100% - env(safe-area-inset-top)));
+  opacity: 0;
   visibility: hidden;
   transition:
-    transform 260ms cubic-bezier(.22,.61,.36,1),
-    opacity 200ms ease,
-    visibility 0s linear 260ms;
+    transform 240ms cubic-bezier(.22,.61,.36,1),
+    opacity 180ms ease,
+    visibility 0s linear 240ms;
 }
 
 .panacea-command-bar[data-panacea-command-bar='shown'] {
+  transform: translateY(0);
+  opacity: 1;
   visibility: visible;
   transition:
-    transform 260ms cubic-bezier(.22,.61,.36,1),
-    opacity 200ms ease,
+    transform 240ms cubic-bezier(.22,.61,.36,1),
+    opacity 180ms ease,
     visibility 0s linear 0s;
 }
 
-/* Pita tangkap di tepi atas viewport.
-   `pointer-events: none` disengaja: yang dibutuhkan hanya POSISI penunjuk, dan
-   itu dibaca dari window oleh useCommandBar. Membuatnya menerima penunjuk akan
-   menelan klik milik isi halaman di bawahnya pada 64px teratas — persis jenis
-   lapisan tak terlihat yang pernah membuat bilah atas tidak bisa ditekan. */
+.panacea-command-title {
+  max-width: min(42vw, 320px);
+  margin: 0;
+  color: rgba(12,20,16,.82);
+  font-family: var(--font-sans);
+  font-size: 14px;
+  font-weight: 720;
+  letter-spacing: -.02em;
+  line-height: 1;
+}
+
+.dark .panacea-command-title {
+  color: rgba(255,255,255,.84);
+}
+
+.panacea-command-utilities {
+  margin-left: auto;
+}
+
+.panacea-command-bar .header-icon-btn,
+.panacea-command-theme {
+  min-width: 40px;
+  min-height: 40px;
+  border: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  color: rgba(12,20,16,.62) !important;
+  transition:
+    color 140ms ease,
+    background-color 140ms ease,
+    transform 120ms cubic-bezier(.2,.8,.2,1);
+}
+
+.dark .panacea-command-bar .header-icon-btn,
+.dark .panacea-command-theme {
+  color: rgba(255,255,255,.64) !important;
+}
+
+.panacea-command-bar .header-icon-btn:hover,
+.panacea-command-bar .header-icon-btn:focus-visible,
+.panacea-command-theme:hover,
+.panacea-command-theme:focus-visible {
+  color: rgba(12,20,16,.94) !important;
+  background: rgba(12,20,16,.045) !important;
+}
+
+.dark .panacea-command-bar .header-icon-btn:hover,
+.dark .panacea-command-bar .header-icon-btn:focus-visible,
+.dark .panacea-command-theme:hover,
+.dark .panacea-command-theme:focus-visible {
+  color: rgba(255,255,255,.94) !important;
+  background: rgba(255,255,255,.055) !important;
+}
+
+.panacea-command-emergency {
+  color: rgb(226 62 62) !important;
+}
+
+.dark .panacea-command-emergency {
+  color: rgb(248 113 113) !important;
+}
+
 .panacea-command-bar-reveal-zone {
   position: fixed;
   inset-inline: 0;
   top: 0;
-  height: 64px;
+  height: 56px;
   pointer-events: none;
   z-index: 0;
 }
 
-@media (prefers-reduced-motion: reduce) {
+@supports not ((-webkit-backdrop-filter: blur(1px)) or (backdrop-filter: blur(1px))) {
   .panacea-command-bar {
-    transition: none;
+    background: rgba(252,252,253,.96);
+  }
+
+  .dark .panacea-command-bar {
+    background: rgba(5,5,5,.96);
   }
 }
 
+@media (max-width: 520px) {
+  .panacea-command-bar {
+    min-height: 50px;
+    gap: 4px;
+    padding-inline: 10px;
+  }
 
-/* Primary navigation lives inside the auto-hiding top command bar instead of
-   occupying a permanent bottom dock. It disappears with the header on downward
-   scroll and returns with the same header on upward scroll. */
-.panacea-command-primary-links {
-  order: 3;
-  flex: 0 0 100%;
-  justify-content: flex-start;
-  overflow-x: auto;
-  padding-top: 4px;
-  scrollbar-width: none;
-  overscroll-behavior-inline: contain;
+  .panacea-command-title {
+    max-width: 34vw;
+    font-size: 13px;
+  }
+
+  .panacea-command-utilities {
+    gap: 0;
+  }
 }
 
-.panacea-command-primary-links::-webkit-scrollbar {
-  display: none;
-}
+@media (prefers-reduced-transparency: reduce) {
+  .panacea-command-bar {
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+    background: #fcfcfd;
+  }
 
-.panacea-command-primary-link {
-  min-height: 38px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0 12px;
-  border-radius: 999px;
-  color: rgba(255,255,255,.52);
-  text-decoration: none;
-  font-size: 11px;
-  font-weight: 760;
-  white-space: nowrap;
-  transition: color 150ms ease, background-color 150ms ease, transform 120ms ease;
-}
-
-.panacea-command-primary-link:hover,
-.panacea-command-primary-link:focus-visible {
-  color: rgba(255,255,255,.94);
-  background: rgba(255,255,255,.055);
-}
-
-.panacea-command-primary-link.is-active {
-  color: rgba(255,255,255,.98);
-  background: rgba(255,255,255,.08);
-}
-
-.panacea-command-primary-link:active {
-  transform: scale(.97);
+  .dark .panacea-command-bar {
+    background: #050505;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .panacea-command-primary-link {
-    transition: none;
-  }
-}
-
-
-.panacea-command-emergency {
-  color: rgb(248 113 113);
-}
-
-.panacea-command-emergency:hover,
-.panacea-command-emergency:focus-visible {
-  background: rgba(248,113,113,.08);
-}
-
-@media (min-width: 1024px) {
-  .panacea-command-primary-links {
-    order: 0;
-    flex: 1 1 auto;
-    justify-content: center;
-    overflow: visible;
-    padding-top: 0;
+  .panacea-command-bar,
+  .panacea-command-bar .header-icon-btn,
+  .panacea-command-theme {
+    transition: none !important;
   }
 }
