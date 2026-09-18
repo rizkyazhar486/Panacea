@@ -15,7 +15,13 @@ export type HealthAttributeId =
 export type AttributeEvidenceRole = 'primary' | 'supporting'
 
 export interface HealthAttributeMetricDefinition {
+  /** Canonical evidence key used by this attribute. */
   metric: string
+  /**
+   * Equivalent source-specific metric names. Aliases satisfy the SAME evidence
+   * requirement and therefore do not inflate or penalize coverage.
+   */
+  aliases?: readonly string[]
   label: string
   role: AttributeEvidenceRole
 }
@@ -27,12 +33,13 @@ export interface HealthAttributeDefinition {
   metrics: readonly HealthAttributeMetricDefinition[]
 }
 
-export interface HealthAttributeEvidence {
-  metric: string
-  label: string
-  role: AttributeEvidenceRole
+export interface HealthAttributeEvidence extends HealthAttributeMetricDefinition {
   available: boolean
+  matchedMetric?: string
+  /** Freshest matching signal for compact consumers. */
   signal?: LongitudinalTwinSignal
+  /** All matching equivalent-source signals remain inspectable. */
+  signals: readonly LongitudinalTwinSignal[]
 }
 
 export type HealthAttributeEvidenceState =
@@ -91,8 +98,12 @@ export const HEALTH_ATTRIBUTE_DEFINITIONS: readonly HealthAttributeDefinition[] 
     label: 'Sleep',
     description: 'Observed sleep duration, timing consistency and stage evidence.',
     metrics: [
-      { metric: 'sleep-duration', label: 'Sleep duration', role: 'primary' },
-      { metric: 'wellness-sleep-duration', label: 'Wellness sleep duration', role: 'primary' },
+      {
+        metric: 'sleep-duration',
+        aliases: ['wellness-sleep-duration'],
+        label: 'Sleep duration',
+        role: 'primary',
+      },
       { metric: 'bedtime-consistency', label: 'Bedtime consistency', role: 'supporting' },
       { metric: 'sleep-deep-duration', label: 'Deep sleep', role: 'supporting' },
       { metric: 'sleep-rem-duration', label: 'REM sleep', role: 'supporting' },
@@ -140,11 +151,18 @@ export const HEALTH_ATTRIBUTE_DEFINITIONS: readonly HealthAttributeDefinition[] 
     metrics: [
       { metric: 'vo2max', label: 'VO₂max', role: 'primary' },
       { metric: 'six-minute-walk-distance', label: '6-minute walk', role: 'primary' },
-      { metric: 'active-minutes', label: 'Active minutes', role: 'supporting' },
-      { metric: 'activity-duration', label: 'Activity duration', role: 'supporting' },
-      { metric: 'exercise-duration', label: 'Exercise duration', role: 'supporting' },
-      { metric: 'distance', label: 'Device distance', role: 'supporting' },
-      { metric: 'activity-distance', label: 'GPS activity distance', role: 'supporting' },
+      {
+        metric: 'active-minutes',
+        aliases: ['activity-duration', 'exercise-duration'],
+        label: 'Active duration',
+        role: 'supporting',
+      },
+      {
+        metric: 'distance',
+        aliases: ['activity-distance'],
+        label: 'Distance',
+        role: 'supporting',
+      },
       { metric: 'running-power', label: 'Running power', role: 'supporting' },
     ],
   },
@@ -175,6 +193,10 @@ function evidenceState(evidence: readonly HealthAttributeEvidence[]): HealthAttr
   return 'insufficient-evidence'
 }
 
+function newestFirst(left: LongitudinalTwinSignal, right: LongitudinalTwinSignal) {
+  return Date.parse(right.recordedAt) - Date.parse(left.recordedAt) || right.eventId.localeCompare(left.eventId)
+}
+
 /**
  * Build one explainable attribute from a governed Digital Twin snapshot.
  *
@@ -189,11 +211,19 @@ export function buildExplainableHealthAttribute(
   const signalsByMetric = new Map(snapshot.signals.map((signal) => [signal.metric, signal]))
 
   const evidence = definition.metrics.map((metric) => {
-    const signal = signalsByMetric.get(metric.metric)
+    const keys = [metric.metric, ...(metric.aliases ?? [])]
+    const signals = keys
+      .map((key) => signalsByMetric.get(key))
+      .filter((signal): signal is LongitudinalTwinSignal => Boolean(signal))
+      .sort(newestFirst)
+    const signal = signals[0]
+
     return {
       ...metric,
-      available: Boolean(signal),
+      available: signals.length > 0,
+      matchedMetric: signal?.metric,
       signal,
+      signals,
     } satisfies HealthAttributeEvidence
   })
 
