@@ -206,7 +206,8 @@
 }
 
 .training-model-disclosure,
-.training-audit-disclosure {
+.training-audit-disclosure,
+.training-depth-disclosure {
   overflow: hidden;
   border: 1px solid rgba(255, 255, 255, .08);
   border-radius: 18px;
@@ -214,7 +215,8 @@
 }
 
 .training-model-disclosure > summary,
-.training-audit-disclosure > summary {
+.training-audit-disclosure > summary,
+.training-depth-disclosure > summary {
   min-height: 44px;
   display: flex;
   cursor: pointer;
@@ -230,12 +232,14 @@
 }
 
 .training-model-disclosure > summary::-webkit-details-marker,
-.training-audit-disclosure > summary::-webkit-details-marker {
+.training-audit-disclosure > summary::-webkit-details-marker,
+.training-depth-disclosure > summary::-webkit-details-marker {
   display: none;
 }
 
 .training-model-disclosure > summary span,
-.training-audit-disclosure > summary span {
+.training-audit-disclosure > summary span,
+.training-depth-disclosure > summary span {
   min-width: 0;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -243,14 +247,38 @@
 }
 
 .training-model-disclosure[open] > summary,
-.training-audit-disclosure[open] > summary {
+.training-audit-disclosure[open] > summary,
+.training-depth-disclosure[open] > summary {
   color: rgba(255, 255, 255, .9);
 }
 
 .training-model-detail,
-.training-audit-detail {
+.training-audit-detail,
+.training-depth-detail {
   border-top: 1px solid rgba(255, 255, 255, .07);
   padding: 12px 13px 14px;
+}
+
+
+.training-depth-disclosure > summary > span:last-child,
+.training-model-disclosure > summary > span:last-child,
+.training-audit-disclosure > summary > span:last-child {
+  flex: 0 0 auto;
+  color: rgba(255, 255, 255, .34);
+  transition: transform 180ms ease, color 180ms ease;
+}
+
+.training-depth-disclosure[open] > summary > span:last-child,
+.training-model-disclosure[open] > summary > span:last-child,
+.training-audit-disclosure[open] > summary > span:last-child {
+  color: rgba(52, 211, 153, .9);
+  transform: rotate(45deg);
+}
+
+.training-depth-disclosure > summary:active,
+.training-model-disclosure > summary:active,
+.training-audit-disclosure > summary:active {
+  background: rgba(255, 255, 255, .04);
 }
 
 @media (max-width: 390px) {
