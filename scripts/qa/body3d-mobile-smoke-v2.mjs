@@ -1,5 +1,6 @@
 import { mkdir, writeFile } from 'node:fs/promises'
 import { chromium } from '@playwright/test'
+import { pilihAktivitasBodyExposure } from './body-exposure-activity-helper.mjs'
 
 const url = process.env.BODY3D_QA_URL || 'http://127.0.0.1:4173/#/body-explorer'
 const metricsPath = process.env.BODY3D_QA_METRICS || 'artifacts/body3d-mobile-metrics.json'
@@ -246,25 +247,13 @@ try {
   if (!metrics.orbitInteraction.contextStable || !metrics.orbitInteraction.canvasVisible) throw new Error('Orbit interaction destabilized the Body3D canvas')
   await assertNoFatal('Orbit interaction triggered a Body3D fatal state')
 
-  const referenceGroup = page.getByRole('button', { name: 'Jump to Reference', exact: true })
-  await revealInViewport(referenceGroup, 'Reference group control')
-  await referenceGroup.click()
-  const precisionTab = page.getByRole('button', { name: 'Whole-body precision', exact: true })
-  await revealInViewport(precisionTab, 'Whole-body precision control')
-  await precisionTab.click()
+  // Navigator baru memakai progressive disclosure. Gerbang tetap membuka
+  // aktivitas lewat jalur pengguna nyata (All activities → search → target),
+  // bukan menghidupkan kembali tab wall lama hanya untuk QA.
+  await pilihAktivitasBodyExposure(page, 'Whole-body precision')
   await page.getByText('Panacea · Whole-body precision atlas', { exact: true }).waitFor({ state: 'visible', timeout: 20_000 })
 
-  const systemsGroup = page.getByRole('button', { name: 'Jump to Systems', exact: true })
-  await revealInViewport(systemsGroup, 'Systems group control')
-  await systemsGroup.click()
-  const motionTab = page.getByRole('button', { name: 'Motion biomechanics', exact: true })
-  await revealInViewport(motionTab, 'Motion biomechanics control')
-  await motionTab.click()
-  await page.waitForFunction(() => {
-    const target = Array.from(document.querySelectorAll('button'))
-      .find((node) => node.textContent?.trim() === 'Motion biomechanics')
-    return target?.getAttribute('aria-pressed') === 'true'
-  }, undefined, { timeout: 10_000 })
+  await pilihAktivitasBodyExposure(page, 'Motion biomechanics')
 
   const lab = page.locator('[data-biomechanics-motion-lab="v1"]').first()
   const recovery = page.getByRole('alert').filter({ hasText: 'Feature recovery' }).first()
