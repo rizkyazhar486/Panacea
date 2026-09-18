@@ -7,6 +7,7 @@ export const GROUPS = [
   {
     name: 'Clinical',
     tools: [
+      { to: '/visit-os', name: 'Visit OS', kw: 'doctor visit camera medical device realtime ai emr' },
       { to: '/body-explorer', name: 'Body Explorer', kw: 'anatomy physiology imaging atlas' },
       { to: '/frontier-health', name: 'Discovery & Innovation', kw: 'research discovery invention simulation' },
       { to: '/genome-lab', name: 'Genome Databank', kw: 'gene genome dna variant genetics' },
@@ -23,9 +24,9 @@ export const GROUPS = [
 type Calculator = 'bmi' | 'map'
 
 const PRIMARY_ACTIONS = [
+  { to: '/visit-os', label: 'Visit OS' },
   { to: '/emr', label: 'AI-EMR' },
   { to: '/emergency', label: 'Emergency' },
-  { to: '/care-episode', label: 'Care' },
   { to: '/body-explorer', label: 'Body Explorer' },
 ] as const
 

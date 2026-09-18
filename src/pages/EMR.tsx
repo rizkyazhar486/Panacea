@@ -11,6 +11,7 @@ const AutonomousFlow = lazy(() => import('./emr/AutonomousFlow'))
 import { IconEMR, IconCheck, IconSparkle, IconShield, IconBook } from '../components/icons'
 import { BodyDiagram, type SystemFinding } from '../components/BodyDiagram'
 import { ClinicalBodyTwin } from '../components/ClinicalBodyTwin'
+import { VisitCommandCenter } from '../components/VisitCommandCenter'
 import { GrowthChart } from '../components/GrowthChart'
 import { ageFromDob } from '../lib/anthro'
 import { generateEducation } from '../lib/ai'
@@ -246,6 +247,8 @@ export function EMR() {
           signing.
         </div>
       </Card>
+
+      <VisitCommandCenter recordId={draft.id} embedded />
 
       {/* Alur otonom: apa yang berjalan sendiri, dan di mana dokter WAJIB
           turun tangan. Diletakkan sebelum bagian S/O/A/P karena ia menjelaskan

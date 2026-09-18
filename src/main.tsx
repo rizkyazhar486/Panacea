@@ -35,6 +35,7 @@ const KnowledgeBridge = lazy(() => import('./pages/KnowledgeBridge').then((m) =>
 const Electrophysiology = lazy(() => import('./pages/Electrophysiology').then((m) => ({ default: m.Electrophysiology })))
 const GenomeLab = lazy(() => import('./pages/GenomeLab').then((m) => ({ default: m.GenomeLab })))
 const Consult = lazy(() => import('./pages/Consult').then((m) => ({ default: m.Consult })))
+const VisitOS = lazy(() => import('./pages/VisitOS').then((m) => ({ default: m.VisitOS })))
 const Hospitals = lazy(() => import('./pages/Hospitals').then((m) => ({ default: m.Hospitals })))
 const Pharmacy = lazy(() => import('./pages/Pharmacy').then((m) => ({ default: m.Pharmacy })))
 const Orders = lazy(() => import('./pages/Orders').then((m) => ({ default: m.Orders })))
@@ -397,6 +398,7 @@ createRoot(document.getElementById('root')!).render(
               <Route path="/sexual-health" element={<SexualHealth />} />
               <Route path="/shape-forming" element={<Navigate to="/latihan?t=bentuk" replace />} />
               <Route path="/consult" element={<Consult />} />
+              <Route path="/visit-os" element={<VisitOS />} />
               <Route path="/hospitals" element={<Hospitals />} />
               <Route path="/pharmacy" element={<Pharmacy />} />
               <Route path="/orders" element={<Orders />} />
