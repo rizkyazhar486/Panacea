@@ -531,20 +531,7 @@ export function Shell({ children }: { children: ReactNode }) {
           <div className="text-[10px] font-semibold uppercase tracking-wider text-neutral-500">Longevity Medical-AI · Official Document</div>
         </div>
       </div>
-      {/* Ambient animated backdrop — sits behind every page */}
-      {/* "Outer space" — nebula multi-warna, bukan pelangi pastel lembut.
-          Menambah sian elektrik dan merah-kobalt (lihat referensi: sosok
-          berapi biru-merah) di samping hijau/emas/magenta/ungu yang sudah
-          ada, supaya kesannya benar-benar ruang angkasa berwarna, bukan
-          taman musim semi. */}
-      {/* Dark mode: delapan orb warna-warni yang tumpang tindih dulu adalah
-          sumber utama tampilan "muram/kotor" yang dikeluhkan — begitu
-          backdrop-blur kartu menyerapnya sekaligus, hasilnya coklat-kehijauan,
-          bukan hitam pekat. `dark:bg-*` di sini MENGGANTI warnanya (bukan
-          hanya opacity) jadi hanya dua logam: emas dan cyan/violet — selaras
-          dengan identitas "Neoclassical Cyber-Organic Glass". Mode terang
-          tidak disentuh, warnanya tetap seperti semula. */}
-            <div className="relative z-10 flex min-w-0 flex-1 flex-col">
+      <div className="relative z-10 flex min-w-0 flex-1 flex-col">
         {/* Pita tangkap: selalu ada di tepi atas, tidak pernah ikut menyingkir.
             Inilah yang memanggil bilah kembali — mengandalkan hover pada
             bilahnya sendiri mustahil, karena bilah yang tersembunyi sudah tidak
