@@ -1,5 +1,7 @@
 import { useMemo, useState } from 'react'
+import { AtlasViewer3D } from '../../components/AtlasViewer3D'
 import { Prosa } from '../../components/Prosa'
+import { partsForModule } from '../../lib/systemAtlas.gen'
 import {
   RENTANG_INDERA, titikDekat, amplitudoLazimUsia, energiFotonEv,
   tingkatTekanan, tekananDariDb, jumlahSumber, deretTitikDekat, deretTekanan,
@@ -118,6 +120,11 @@ export function InderaPanel() {
   const [db, setDb] = useState<number>(70)
   const [sumber, setSumber] = useState<number>(2)
   const [nm, setNm] = useState<number>(550)
+  const [strukturTelinga, setStrukturTelinga] = useState<string | null>(null)
+  const bagianTelinga = useMemo(() => partsForModule('telinga').map((part) => ({
+    name: part.name,
+    kind: part.kind,
+  })), [])
 
   const amp = amplitudoLazimUsia(usia)
   const jarak = titikDekat(amp)
@@ -136,6 +143,30 @@ export function InderaPanel() {
           the numbers.
         </p>
       </Prosa>
+
+      <section aria-labelledby="middle-inner-ear-3d-title" className="rounded-2xl border border-[var(--pelatih-garis,rgba(15,23,42,0.10))] p-3">
+        <div id="middle-inner-ear-3d-title" className="text-[11px] font-black uppercase tracking-[0.14em] text-neutral-500">
+          Source-backed middle & inner ear · interactive 3D
+        </div>
+        <p className="mt-1 text-[11px] leading-relaxed text-neutral-500">
+          This view loads the shipped Z-Anatomy ear module rather than drawing substitute anatomy. Tap a source-named structure to inspect it.
+        </p>
+        <div className="mt-2 overflow-hidden rounded-2xl bg-[var(--pelatih-alas-1,rgba(15,23,42,0.04))]" data-sensory-ent-source-3d="telinga">
+          <AtlasViewer3D
+            berkas="atlas/telinga.glb"
+            bagian={bagianTelinga}
+            tinggi={340}
+            dipilih={strukturTelinga}
+            onPilih={setStrukturTelinga}
+          />
+        </div>
+        <div aria-live="polite" className="mt-2 min-h-11 rounded-xl bg-[var(--pelatih-alas-1,rgba(15,23,42,0.04))] px-3 py-2 text-[12px] leading-relaxed text-neutral-600 dark:text-neutral-300">
+          {strukturTelinga ? <><span className="font-black text-ink dark:text-white">Selected:</span> {strukturTelinga}</> : 'Tap the model to select an exact source-named ear structure.'}
+        </div>
+        <p className="mt-2 text-[10.5px] leading-relaxed text-neutral-500">
+          Provenance boundary: shipped Z-Anatomy geometry, CC BY-SA 4.0; repository credits remain authoritative. Missing anatomy is not synthesized, mirrored or inferred in this view.
+        </p>
+      </section>
 
       <div className="rounded-2xl border border-[var(--pelatih-garis,rgba(15,23,42,0.10))] p-3">
         <div className="text-[11px] font-black uppercase tracking-[0.14em] text-neutral-500">
