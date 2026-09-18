@@ -165,8 +165,7 @@ export default function UnifiedHumanSimulationProjector({
   const semanticStop = getBodySemanticZoomStop(semanticZoom.scale)
   const microscopic = isMicroscopicBodyScale(semanticZoom.scale)
   const isEndoscopy = domain === 'endoscopy'
-  const isStandaloneBodyIdentity = domain === 'personal-avatar'
-  const hideReferenceAtlasCanvas = isEndoscopy || isStandaloneBodyIdentity
+  const hideReferenceAtlasCanvas = isEndoscopy
   const selectedStructureEducation = useMemo(() => {
     if (!selectedStructureName) return ''
     return penjelasanTertulis(selectedStructureName, selectedStructureName).replace(/\*\*/g, '')
