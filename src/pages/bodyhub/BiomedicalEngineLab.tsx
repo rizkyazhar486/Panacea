@@ -19,6 +19,7 @@ import {
   type RenderMode,
   type SlicePlane,
 } from '../../components/Body3D'
+import { RadiologyReconstructionLab } from './RadiologyReconstructionLab'
 
 type View = 'engine' | 'imaging' | 'data' | 'evidence' | 'validation'
 
@@ -184,7 +185,7 @@ export function BiomedicalEngineLab() {
       )}
 
       {view === 'imaging' && (
-        <div className="space-y-3" data-biomedical-imaging-lab="v1">
+        <div className="space-y-3" data-biomedical-imaging-lab="v2">
           <div className="rounded-2xl border border-cyan-400/20 bg-[#071014] p-3 text-white sm:p-4">
             <div className="flex flex-wrap items-start justify-between gap-3">
               <div>
@@ -295,6 +296,8 @@ export function BiomedicalEngineLab() {
               <div className="rounded-xl border border-white/10 bg-black/20 p-3"><div className="text-[9px] font-black text-emerald-300">SAFETY BOUNDARY</div><p className="mt-1 text-[9px] leading-relaxed text-slate-400">This surface is for education/research. It does not diagnose a tear, generate operative navigation, infer pathology or claim that reference anatomy is a patient's anatomy.</p></div>
             </div>
           </div>
+
+          <RadiologyReconstructionLab />
         </div>
       )}
 
