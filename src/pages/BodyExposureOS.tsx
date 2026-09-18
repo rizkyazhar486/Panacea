@@ -6,6 +6,7 @@ import './bodyExposureOS.css'
 const BodyAllSystems3D = lazy(() => import('../components/BodyAllSystems3D'))
 const AtlasPhysiologyBridgePanel = lazy(() => import('./bodyhub/AtlasPhysiologyBridgePanel'))
 const BodySystemDeepDiveWorkspace = lazy(() => import('./bodyhub/BodySystemDeepDiveWorkspace'))
+const EndocrineFeedbackWorkbench = lazy(() => import('./bodyhub/EndocrineFeedbackWorkbench'))
 const PathophysiologyNetworkPanel = lazy(() => import('./bodyhub/PathophysiologyNetworkPanel'))
 const PharmacologyMechanismPanel = lazy(() => import('./bodyhub/PharmacologyMechanismPanel'))
 
@@ -230,6 +231,12 @@ export function BodyExposureOS() {
       <div className="relative z-[2] mt-3">
         <Suspense fallback={<div className="grid min-h-40 place-items-center rounded-[28px] border border-white/[.08] bg-black/35 text-xs font-bold text-white/35">Loading organ-specific function…</div>}>
           <BodySystemDeepDiveWorkspace selectedAtlasSystemId={selectedBodySystemId} />
+        </Suspense>
+      </div>
+
+      <div className="relative z-[2] mt-3">
+        <Suspense fallback={<div className="grid min-h-40 place-items-center rounded-[28px] border border-white/[.08] bg-black/35 text-xs font-bold text-white/35">Loading endocrine feedback lab…</div>}>
+          <EndocrineFeedbackWorkbench selectedAtlasSystemId={selectedBodySystemId} />
         </Suspense>
       </div>
 
