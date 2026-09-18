@@ -95,6 +95,21 @@ export function HomeCommandDeck() {
         </label>
       </div>
 
+      {!showIndex && pintasan.length > 0 ? (
+        <nav className="panacea-command-recents" aria-label="Most used capabilities">
+          {pintasan.map((feature) => (
+            <Link
+              key={`recent-${feature.label}-${canonical(feature.to)}`}
+              to={canonical(feature.to)}
+              className="panacea-command-recent"
+            >
+              <span>{feature.label}</span>
+              <span aria-hidden>→</span>
+            </Link>
+          ))}
+        </nav>
+      ) : null}
+
       <button
         type="button"
         className="panacea-command-index-toggle"

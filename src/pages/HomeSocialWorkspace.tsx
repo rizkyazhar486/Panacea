@@ -10,6 +10,7 @@ import '../styles/home-mobile-shell-repair-v45.css'
 import '../styles/home-liquid-reference.css'
 import '../styles/home-green-material-v48.css'
 import '../styles/home-human-interface.css'
+import '../styles/home-liquid-control-layer.css'
 
 const Feed = lazy(() => import('./Feed'))
 const Community = lazy(() => import('./Community').then((m) => ({ default: m.Community })))
@@ -84,7 +85,7 @@ export function HomeSocialWorkspace() {
         </section>
       ) : null}
 
-      <nav className="panacea-liquid-dock grid grid-cols-4 gap-1 rounded-[24px] p-1.5" aria-label="Panacea primary navigation">
+      <nav data-panacea-primary-nav data-control-layer="liquid" className="panacea-liquid-dock grid grid-cols-4 gap-1 rounded-[24px] p-1.5" aria-label="Panacea primary navigation">
         <button
           type="button"
           onClick={selectHome}
