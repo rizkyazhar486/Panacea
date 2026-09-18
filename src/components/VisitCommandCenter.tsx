@@ -182,7 +182,7 @@ export function VisitCommandCenter({ recordId, embedded = false }: VisitCommandC
           unit: 'bpm',
           capturedAt: liveHeart.lastSampleAt!,
           receivedAt: new Date().toISOString(),
-          signalQuality: null,
+          signalQuality: liveHeart.signalQuality,
           standardCode: { system: 'loinc', code: '8867-4' },
         }).state
       } catch {
@@ -503,7 +503,11 @@ export function VisitCommandCenter({ recordId, embedded = false }: VisitCommandC
             disabled={!liveHeart.bleSupported || liveHeart.bleStatus === 'connecting'}
             className="min-h-10 shrink-0 rounded-full border border-white/10 px-3 text-[9px] font-black text-white/60 disabled:opacity-35"
           >
-            {liveHeart.bleStatus === 'connected' ? 'BLE HR · ' + liveHeart.bpm + ' bpm' : liveHeart.bleStatus === 'connecting' ? 'Connecting BLE…' : liveHeart.bleSupported ? 'Connect BLE HR' : 'BLE unavailable'}
+            {liveHeart.bleStatus === 'connected'
+              ? liveHeart.sensorContact === 'not-detected'
+                ? 'BLE HR · off-body'
+                : 'BLE HR · ' + liveHeart.bpm + ' bpm'
+              : liveHeart.bleStatus === 'connecting' ? 'Connecting BLE…' : liveHeart.bleSupported ? 'Connect BLE HR' : 'BLE unavailable'}
           </button>
           <Link to="/health-data/tutorial" className="grid min-h-10 shrink-0 place-items-center rounded-full border border-white/10 px-3 text-[9px] font-black text-white/60">Health Sync</Link>
           <Link to="/emr" className="grid min-h-10 shrink-0 place-items-center rounded-full border border-white/10 px-3 text-[9px] font-black text-white/60">AI-EMR</Link>
