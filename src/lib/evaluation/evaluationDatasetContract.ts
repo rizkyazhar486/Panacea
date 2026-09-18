@@ -42,6 +42,14 @@ export interface DatasetContractCheck {
 }
 
 const SAFE_ID = /^[a-z0-9][a-z0-9._:-]*$/i
+const EVALUATION_SPLITS = new Set<EvaluationSplit>(['development', 'validation', 'test', 'external'])
+const EVIDENCE_ORIGINS = new Set<EvidenceOrigin>([
+  'synthetic',
+  'retrospective-deidentified',
+  'prospective-deidentified',
+  'public-benchmark',
+])
+const REVIEW_DISPOSITIONS = new Set<ReviewDisposition>(['pending', 'accepted', 'accepted-with-notes', 'rejected'])
 
 export function validateEvaluationDatasetManifest(manifest: EvaluationDatasetManifest): DatasetContractCheck[] {
   return [
@@ -50,6 +58,8 @@ export function validateEvaluationDatasetManifest(manifest: EvaluationDatasetMan
     { key: 'intended-use', pass: manifest.intendedUse.trim().length >= 8, reason: 'intended use must be stated before interpreting performance' },
     { key: 'population-scope', pass: manifest.populationScope.trim().length >= 3, reason: 'population scope must be stated' },
     { key: 'clinical-setting', pass: manifest.clinicalSetting.trim().length >= 3, reason: 'clinical setting must be stated' },
+    { key: 'origin', pass: EVIDENCE_ORIGINS.has(manifest.origin), reason: 'origin must be one of the governed evidence-origin values' },
+    { key: 'split', pass: EVALUATION_SPLITS.has(manifest.split), reason: 'split must be one of the governed evaluation split values' },
     { key: 'case-count', pass: Number.isInteger(manifest.caseCount) && manifest.caseCount > 0, reason: 'caseCount must be a positive integer' },
     { key: 'deidentification', pass: manifest.deidentificationAttested, reason: 'de-identification must be explicitly attested before evaluation use' },
     { key: 'legal-basis', pass: manifest.consentOrLegalBasisRecorded, reason: 'consent or another applicable legal basis must be recorded' },
@@ -65,6 +75,8 @@ export function validateEvaluationCaseContract(record: EvaluationCaseContract): 
   return [
     { key: 'case-id', pass: SAFE_ID.test(record.caseId), reason: 'caseId must be opaque and non-identifying' },
     { key: 'dataset-id', pass: SAFE_ID.test(record.datasetId), reason: 'datasetId must resolve to the immutable dataset manifest' },
+    { key: 'split', pass: EVALUATION_SPLITS.has(record.split), reason: 'case split must be one of the governed evaluation split values' },
+    { key: 'review-disposition', pass: REVIEW_DISPOSITIONS.has(record.reviewDisposition), reason: 'reviewDisposition must be one of the governed review states' },
     { key: 'no-source-record-id', pass: record.sourceRecordId === null, reason: 'raw source record identifiers must not enter the evaluation artifact' },
     { key: 'no-patient-identifier', pass: record.patientIdentifier === null, reason: 'patient identifiers are forbidden in the evaluation artifact' },
     { key: 'no-free-text-identifier', pass: record.freeTextPatientIdentifier === null, reason: 'free-text patient identifiers are forbidden' },
