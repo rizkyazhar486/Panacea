@@ -26,7 +26,13 @@ function materialFor(source: THREE.Material, role: 'selected' | 'context' = 'sel
   return cloned
 }
 
-function applyProjectedSelection(groups: readonly THREE.Group[], selectedName?: string | null) {
+/**
+ * Applies the current selection to projected meshes. `isolate` switches
+ * non-selected, non-context meshes between the default fade (still visible,
+ * dimmed) and a fully hidden atlas-grade isolate view; it never touches the
+ * faint whole-body context surface, which stays as spatial orientation.
+ */
+function applyProjectedSelection(groups: readonly THREE.Group[], selectedName?: string | null, isolate = false) {
   const selected = selectedName ? normalizeAnatomySourceName(selectedName) : ''
   for (const group of groups) {
     group.traverse((object) => {
@@ -34,6 +40,9 @@ function applyProjectedSelection(groups: readonly THREE.Group[], selectedName?: 
       if (!mesh.isMesh) return
       const hit = selected !== '' && normalizeAnatomySourceName(mesh.name) === selected
       const materials = Array.isArray(mesh.material) ? mesh.material : [mesh.material]
+      if (mesh.userData.panaceaContext !== true) {
+        mesh.visible = hit || selected === '' || !isolate
+      }
       for (const material of materials) {
         if (mesh.userData.panaceaContext === true) {
           const contextOpacity = typeof material.userData.panaceaBaseOpacity === 'number'
@@ -150,9 +159,15 @@ export default function BodyAllSystems3D({
   const [loadedFiles, setLoadedFiles] = useState(0)
   const [loadedSourceFiles, setLoadedSourceFiles] = useState<string[]>([])
   const [failedFiles, setFailedFiles] = useState<string[]>([])
+  const [isolate, setIsolate] = useState(false)
   const semanticZoomCallbackRef = useRef(onSemanticZoomChange)
   const structureSelectCallbackRef = useRef(onStructureSelect)
-  const selectionApplierRef = useRef<((name?: string | null) => void) | null>(null)
+  const selectionApplierRef = useRef<((name?: string | null, isolate?: boolean) => void) | null>(null)
+  const isolateRef = useRef(isolate)
+
+  useEffect(() => {
+    isolateRef.current = isolate
+  }, [isolate])
 
   useEffect(() => {
     semanticZoomCallbackRef.current = onSemanticZoomChange
@@ -163,8 +178,12 @@ export default function BodyAllSystems3D({
   }, [onStructureSelect])
 
   useEffect(() => {
-    selectionApplierRef.current?.(selectedStructureName)
-  }, [selectedStructureName])
+    if (!selectedStructureName && isolate) setIsolate(false)
+  }, [selectedStructureName, isolate])
+
+  useEffect(() => {
+    selectionApplierRef.current?.(selectedStructureName, isolate)
+  }, [selectedStructureName, isolate])
 
   const systemId = selectedSystemId ?? internalSystemId
   const systems = useMemo(() => resolveBodySystemSourceWave(), [])
@@ -244,8 +263,8 @@ export default function BodyAllSystems3D({
 
     const sourceBounds = new THREE.Box3()
     const projectedGroups: THREE.Group[] = []
-    selectionApplierRef.current = (name) => {
-      applyProjectedSelection(projectedGroups, name)
+    selectionApplierRef.current = (name, isolateOthers) => {
+      applyProjectedSelection(projectedGroups, name, isolateOthers)
       requestRender()
     }
     let fittedCameraDistance = 0
@@ -374,7 +393,7 @@ export default function BodyAllSystems3D({
           projectedGroups.push(projection.group)
           scene.add(projection.group)
           sourceBounds.union(projection.bounds)
-          applyProjectedSelection(projectedGroups, selectedStructureName)
+          applyProjectedSelection(projectedGroups, selectedStructureName, isolateRef.current)
           setLoadedSourceFiles((current) => current.includes(file) ? current : [...current, file])
           requestRender()
         } else {
@@ -432,7 +451,7 @@ export default function BodyAllSystems3D({
       const mesh = hit?.object as THREE.Mesh | undefined
       if (!mesh?.name) return
       structureSelectCallbackRef.current?.(mesh.name)
-      applyProjectedSelection(projectedGroups, mesh.name)
+      applyProjectedSelection(projectedGroups, mesh.name, isolateRef.current)
       requestRender()
     }
     renderer.domElement.addEventListener('pointerdown', onPointerDown)
@@ -534,8 +553,29 @@ export default function BodyAllSystems3D({
             <span className="rounded-full border border-white/[.08] bg-black/60 px-2.5 py-1 text-[8px] font-bold text-white/35 backdrop-blur-xl">surface context · tap · zoom</span>
           </div>
           {selectedStructureName && (
-            <div className="pointer-events-none absolute left-3 top-12 max-w-[72%] truncate rounded-full border border-cyan-300/20 bg-cyan-950/80 px-2.5 py-1 text-[8px] font-black text-cyan-100 backdrop-blur-xl">
-              Selected · {selectedStructureName}
+            <div className="absolute left-3 top-12 flex max-w-[85%] flex-wrap items-center gap-1.5">
+              <span className="truncate rounded-full border border-cyan-300/20 bg-cyan-950/80 px-2.5 py-1 text-[8px] font-black text-cyan-100 backdrop-blur-xl">
+                Selected · {selectedStructureName}
+              </span>
+              <button
+                type="button"
+                aria-pressed={isolate}
+                onClick={() => setIsolate((current) => !current)}
+                className={`min-h-6 shrink-0 rounded-full border px-2 py-1 text-[8px] font-black backdrop-blur-xl transition ${isolate ? 'border-cyan-300/40 bg-cyan-300/20 text-cyan-50' : 'border-white/[.12] bg-black/60 text-white/55 hover:text-white/80'}`}
+              >
+                {isolate ? 'Show others' : 'Isolate'}
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setIsolate(false)
+                  structureSelectCallbackRef.current?.('')
+                  selectionApplierRef.current?.(null, false)
+                }}
+                className="min-h-6 shrink-0 rounded-full border border-white/[.12] bg-black/60 px-2 py-1 text-[8px] font-black text-white/55 backdrop-blur-xl transition hover:text-white/80"
+              >
+                Clear
+              </button>
             </div>
           )}
           {loading && <div role="status" className="absolute inset-x-3 bottom-3 rounded-xl border border-cyan-300/10 bg-black/75 px-3 py-2 text-[10px] font-bold text-cyan-100 backdrop-blur-xl">Loading canonical source bundles… {loadedFiles}</div>}
