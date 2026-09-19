@@ -58,9 +58,23 @@ export function ForYouDailyStack() {
             </div>
           )
 
+          const needsAdapter = widget.sourcePolicy === 'adapter-required'
+
           return (
             <article key={widget.id} className="relative min-w-0">
-              {widget.route ? <Link to={widget.route} aria-label={`Open ${widget.title}`}>{body}</Link> : body}
+              {widget.route ? (
+                <Link to={widget.route} aria-label={`Open ${widget.title}`}>{body}</Link>
+              ) : needsAdapter ? (
+                <button
+                  type="button"
+                  className="block w-full text-left"
+                  aria-label={`${widget.title} adapter status`}
+                  aria-expanded={infoId === widget.id}
+                  onClick={() => setInfoId((current) => current === widget.id ? null : widget.id)}
+                >
+                  {body}
+                </button>
+              ) : body}
               <button
                 type="button"
                 className="absolute bottom-2.5 right-2.5 z-10 grid h-7 w-7 place-items-center rounded-full border border-white/[.08] bg-black/25 text-[9px] font-black text-white/35 hover:text-white/70"
@@ -71,11 +85,20 @@ export function ForYouDailyStack() {
                 i
               </button>
               {infoId === widget.id && (
-                <p className="mt-1 rounded-[14px] border border-white/[.06] bg-white/[.02] px-3 py-2 text-[10px] leading-relaxed text-white/42">
-                  {widget.kind === 'music'
-                    ? 'Spotify and Apple Music stay unconnected until a real provider authorization flow is configured; Panacea does not simulate playback or account state.'
-                    : widget.oneSentence}
-                </p>
+                <div className="mt-1 rounded-[14px] border border-white/[.06] bg-white/[.02] px-3 py-2 text-[10px] leading-relaxed text-white/42">
+                  {widget.kind === 'music' && widget.adapters ? (
+                    <ul className="space-y-1">
+                      {widget.adapters.map((adapter) => (
+                        <li key={adapter} className="flex items-center justify-between gap-2">
+                          <span>{adapter === 'spotify' ? 'Spotify' : 'Apple Music'}</span>
+                          <span className="font-black uppercase tracking-[.08em] text-white/30">Not connected — sign-in not configured</span>
+                        </li>
+                      ))}
+                    </ul>
+                  ) : (
+                    <p>{widget.oneSentence}</p>
+                  )}
+                </div>
               )}
             </article>
           )
