@@ -157,12 +157,28 @@ export async function aiVision(req: Request, res: Response) {
   const { image, prompt } = req.body as { image?: string; prompt?: string }
   const m = typeof image === 'string' && image.match(/^data:(image\/(?:png|jpe?g|webp|gif));base64,(.+)$/)
   if (!m) return res.status(400).json({ error: 'bad_image' })
-  const content = [
-    { type: 'text', text: prompt?.trim() || 'Analisis citra pemeriksaan penunjang ini untuk rekam medis.' },
-    { type: 'image', source: { type: 'base64', media_type: m[1], data: m[2] } },
-  ]
+  const mediaType = m[1] === 'image/jpg' ? 'image/jpeg' : m[1]
+  const checked = validateAiProxyRequest({
+    system: VISION_SYSTEM,
+    messages: [{
+      role: 'user',
+      content: [
+        { type: 'text', text: prompt?.trim() || 'Analisis citra pemeriksaan penunjang ini untuk rekam medis.' },
+        { type: 'image', source: { type: 'base64', media_type: mediaType, data: m[2] } },
+      ],
+    }],
+    max_tokens: 1500,
+  })
+  if (!checked.ok) {
+    return res.status(checked.status).json({ error: checked.error, reason: checked.reason })
+  }
   try {
-    const text = await callAnthropic('claude-opus-4-8', VISION_SYSTEM, [{ role: 'user', content }], 1500)
+    const text = await callAnthropic(
+      'claude-opus-4-8',
+      checked.value.system,
+      checked.value.messages as Msg[],
+      checked.value.maxTokens,
+    )
     res.json({ text })
   } catch (e) {
     respondWithSafeAiFailure(res, e)
@@ -205,12 +221,21 @@ export async function aiConsult(req: Request, res: Response) {
   if (balance(user.id) < price) {
     return res.status(402).json({ error: 'insufficient_balance', price, balance: balance(user.id) })
   }
-  const body = req.body as { messages?: Msg[] }
-  if (!Array.isArray(body.messages) || body.messages.length === 0) {
-    return res.status(400).json({ error: 'bad_messages' })
+  const checked = validateAiProxyRequest({
+    system: CONSULT_SYSTEM,
+    messages: (req.body as { messages?: unknown }).messages,
+    max_tokens: 3000,
+  })
+  if (!checked.ok) {
+    return res.status(checked.status).json({ error: checked.error, reason: checked.reason })
   }
   try {
-    const text = await callAnthropic('claude-opus-4-8', CONSULT_SYSTEM, body.messages, 3000)
+    const text = await callAnthropic(
+      'claude-opus-4-8',
+      checked.value.system,
+      checked.value.messages as Msg[],
+      checked.value.maxTokens,
+    )
     // Charge only after a successful generation.
     credit(user.id, -price, 'purchase', 'Konsultasi AI Mendalam')
     res.json({ text, charged: price, balance: balance(user.id) })
