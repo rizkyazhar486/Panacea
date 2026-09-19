@@ -1,0 +1,86 @@
+{
+  "version": 1,
+  "updatedAt": "2026-09-19",
+  "system": "cardiovascular",
+  "organ": "heart",
+  "scope": "Educational organ-specific Body Exposure knowledge seed. This record supports general anatomy, physiology and physiology-context relationships only; it does not establish patient-specific anatomy, diagnosis, prognosis, treatment, dose, procedural targeting, clinical efficacy, academic validation, asset licensing, or human review.",
+  "relationships": [
+    {
+      "id": "av-node-conduction-delay-and-filtering",
+      "domain": "anatomy-physiology",
+      "from": "atrioventricular-node",
+      "to": "ventricular-conduction-timing",
+      "relationship": "delays-and-filters-atrial-impulses",
+      "claim": "The atrioventricular node produces the slow-conduction, long-refractory-period delay between atrial and ventricular activation that coordinates sequential chamber contraction, and it filters rapid atrial impulses that could otherwise conduct to the ventricles.",
+      "evidence": ["pmid:31144331"],
+      "status": "source-checked"
+    },
+    {
+      "id": "coronary-flow-serves-myocardial-oxygen-demand",
+      "domain": "anatomy-physiology",
+      "from": "coronary-circulation",
+      "to": "myocardium",
+      "relationship": "supplies-oxygen-and-substrate",
+      "claim": "Coronary blood flow supplies the working myocardium with oxygen and metabolic substrate, and because resting oxygen extraction is already high, increased myocardial oxygen demand is met mainly by increasing coronary flow rather than by extracting further oxygen.",
+      "evidence": ["pmid:20521136"],
+      "status": "source-checked"
+    },
+    {
+      "id": "frank-starling-preload-contraction-relationship",
+      "domain": "physiology",
+      "from": "ventricular-preload",
+      "to": "stroke-volume",
+      "relationship": "increases-contraction-force-with-fiber-stretch",
+      "claim": "Within a physiologic range, greater ventricular end-diastolic stretch of myocardial fibers increases the force of the subsequent contraction, so stroke volume rises as preload rises, up to the point where further stretch no longer increases contractile force.",
+      "evidence": ["pmid:29262149"],
+      "status": "source-checked"
+    }
+  ],
+  "sources": [
+    {
+      "id": "pmid:31144331",
+      "pmid": "31144331",
+      "title": "An integrated overview of AV node physiology.",
+      "year": 2019,
+      "url": "https://pubmed.ncbi.nlm.nih.gov/31144331/",
+      "evidenceRole": "Review describing AV-node slow conduction, refractoriness, cellular automaticity and its integrated role in atrioventricular delay and impulse filtering.",
+      "sourceType": "review"
+    },
+    {
+      "id": "pmid:20521136",
+      "pmid": "20521136",
+      "title": "Anatomy and physiology of coronary blood flow.",
+      "year": 2010,
+      "url": "https://pubmed.ncbi.nlm.nih.gov/20521136/",
+      "evidenceRole": "Review describing coronary circulation anatomy, resting myocardial oxygen extraction, and flow-mediated matching of coronary supply to myocardial oxygen demand.",
+      "sourceType": "review"
+    },
+    {
+      "id": "pmid:29262149",
+      "pmid": "29262149",
+      "title": "Physiology, Frank Starling Law.",
+      "year": 2023,
+      "url": "https://pubmed.ncbi.nlm.nih.gov/29262149/",
+      "evidenceRole": "StatPearls review describing sarcomere length-tension relationships underlying the Frank-Starling preload-stroke volume relationship.",
+      "sourceType": "review"
+    }
+  ],
+  "provenanceBoundary": {
+    "sourceCheckedMeans": "The cited PubMed record was retrieved and its metadata/abstract or indexed terms were checked for the scoped educational relationship.",
+    "sourceCheckedDoesNotMean": [
+      "guideline-recommended",
+      "clinically-validated-feature",
+      "human-reviewed-in-panacea",
+      "patient-specific",
+      "asset-license-cleared",
+      "diagnostic-or-treatment-advice"
+    ],
+    "forbiddenInferences": [
+      "generic-atlas-to-patient-specific-anatomy",
+      "educational-relationship-to-diagnosis",
+      "review-citation-to-treatment-or-dose-recommendation",
+      "source-checked-to-human-reviewed",
+      "generic-conduction-timing-to-patient-specific-arrhythmia-diagnosis"
+    ]
+  }
+}
