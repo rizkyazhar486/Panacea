@@ -9,6 +9,7 @@ import {
   reconcileVisitDeviceLiveness,
   revokeVisitClinicalConsent,
   registerMedicalDevice,
+  resumeVisit,
   setMedicalDeviceConnection,
   startVisit,
   updateVisitMedia,
