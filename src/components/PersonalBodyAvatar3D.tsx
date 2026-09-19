@@ -1,6 +1,9 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import * as THREE from 'three'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
+import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'
+import { MeshoptDecoder } from 'three/examples/jsm/libs/meshopt_decoder.module.js'
+import { penjagaMuatan, buangSubtree } from '../lib/gltfSesudahLepas'
 import { useStore } from '../lib/store'
 import { getBodyCharacter, characterShape } from '../lib/bodyCharacter'
 import { getDemoTersimpan } from '../lib/profile'
@@ -9,6 +12,8 @@ import {
   selesaikanBentukTubuh,
   bangunMeshTubuh,
   lingkarPenampangCm,
+  volumeAcuanPerawakanM3,
+  skalaLingkarUntukVolume,
   type BentukTubuh,
 } from '../lib/anatomy/antropometriTubuh'
 
@@ -289,11 +294,19 @@ export function PersonalBodyAvatar3D({ compact = false }: { compact?: boolean } 
     // dua pertiga bingkai kosong. Sasaran dan jarak sekarang dihitung dari
     // kotak batas sosok yang benar-benar dirender, sehingga tubuh setinggi apa
     // pun terbingkai penuh dan menjadi satu-satunya titik fokus.
-    const bataske = new THREE.Box3().setFromObject(person)
-    const pusat = bataske.getCenter(new THREE.Vector3())
-    const rentang = bataske.getSize(new THREE.Vector3())
-    const tinggiSosok = Math.max(0.2, rentang.y)
-    controls.target.copy(pusat)
+    let pusat = new THREE.Vector3()
+    let rentang = new THREE.Vector3(1, 1, 1)
+    let tinggiSosok = 1
+    // Diukur ulang setiap kali isi sosok berubah — termasuk setelah geometri
+    // manusia sungguhan menggantikan sosok prosedural.
+    const ukurSosok = () => {
+      const kotak = new THREE.Box3().setFromObject(person)
+      pusat = kotak.getCenter(new THREE.Vector3())
+      rentang = kotak.getSize(new THREE.Vector3())
+      tinggiSosok = Math.max(0.2, rentang.y)
+      controls.target.copy(pusat)
+    }
+    ukurSosok()
 
     const resize = () => {
       const width = Math.max(1, mount.clientWidth)
@@ -320,6 +333,92 @@ export function PersonalBodyAvatar3D({ compact = false }: { compact?: boolean } 
     const ro = new ResizeObserver(resize)
     ro.observe(mount)
 
+    // ── GEOMETRI MANUSIA SUNGGUHAN ──────────────────────────────────────────
+    //
+    // Sosok prosedural di atas benar proporsinya tetapi tetap terbaca sebagai
+    // maneken. Repositori ini sudah memuat permukaan tubuh manusia terbitan
+    // (lapisan Z-Anatomy `surface.glb`, 290 simpul), dan itulah yang dipakai
+    // di sini — bukan bentuk yang dibuat sendiri.
+    //
+    // Penskalaannya: tinggi disamakan PERSIS, lalu lingkarnya diskalakan
+    // sebesar simpangan perawakan pengguna terhadap Pria Dewasa Acuan ICRP 89
+    // pada tinggi yang sama. Jadi geometrinya terbitan, ukurannya miliknya.
+    //
+    // Lingkar TIDAK diukur dari mesh. Lapisan permukaan ini adalah tambalan
+    // topografis terbuka, bukan cangkang kedap, sehingga volume tetrahedron di
+    // atasnya tidak berarti — terukur 0,238 m3 untuk sosok 1,79 m yang
+    // sebenarnya sekitar 0,07 m3. Perawakannya diperkirakan, dan dinyatakan
+    // sebagai perkiraan.
+    //
+    // BATAS KEBENARAN: ini geometri manusia ACUAN yang diproporsikan ke ukuran
+    // Anda. Ia bukan pemindaian tubuh Anda, dan tidak boleh disajikan sebagai
+    // anatomi internal khusus-pasien.
+    //
+    // Gagal-tertutup di dua tempat: aset gagal dimuat, atau skalanya jatuh di
+    // luar pita manusia yang wajar. Pada keduanya sosok prosedural dibiarkan
+    // apa adanya alih-alih menampilkan tubuh yang salah.
+    const penjaga = penjagaMuatan()
+    if (bentuk) {
+      const pemuat = new GLTFLoader()
+      pemuat.setMeshoptDecoder(MeshoptDecoder)
+      pemuat.load(
+        `${import.meta.env.BASE_URL}anatomy/surface.glb`,
+        (gltf) => {
+          const nyata = gltf.scene
+          if (!penjaga.terima(nyata)) return
+
+          // Berkas sumbernya membawa dua simpul petunjuk pemakaian atlas
+          // ("HOW TO ...", "Take a picture") yang melayang di dekat kaki. Itu
+          // bukan anatomi; ia dibuang sebelum apa pun diukur atau dibingkai.
+          for (const o of [...nyata.children, ...nyata.children.flatMap((c) => [...c.children])]) {
+            const n = (o.name || '').trim().toLowerCase()
+            if (n.startsWith('how to') || n === 'take a picture') o.removeFromParent()
+          }
+
+          nyata.updateMatrixWorld(true)
+          const kotakAsli = new THREE.Box3().setFromObject(nyata)
+          const tinggiAcuan = kotakAsli.max.y - kotakAsli.min.y
+          // Gagal-tertutup juga harus membuang: muatan yang ditolak tidak
+          // pernah terpasang, jadi tidak ada lagi yang akan membebaskannya.
+          if (!(tinggiAcuan > 0)) { buangSubtree(nyata); return }
+
+          // Tinggi disamakan PERSIS. Lingkarnya diskalakan sebesar simpangan
+          // perawakan pengguna terhadap perawakan acuan pada tinggi yang sama.
+          const sTinggi = input.heightCm / 100 / tinggiAcuan
+          const k = skalaLingkarUntukVolume(
+            volumeAcuanPerawakanM3(input.heightCm / 100),
+            bentuk.volumeSasaranM3,
+          )
+          if (k === null) { buangSubtree(nyata); return }
+
+          nyata.scale.set(sTinggi * k, sTinggi, sTinggi * k)
+          nyata.updateMatrixWorld(true)
+          const kotak = new THREE.Box3().setFromObject(nyata)
+          nyata.position.set(
+            -(kotak.max.x + kotak.min.x) / 2,
+            LANTAI - kotak.min.y,
+            -(kotak.max.z + kotak.min.z) / 2,
+          )
+          nyata.traverse((o) => {
+            const m = o as THREE.Mesh
+            if (!m.isMesh) return
+            m.castShadow = true
+            m.receiveShadow = true
+            m.material = skin
+          })
+
+          // Sosok prosedural hanya dilepas SETELAH penggantinya siap, supaya
+          // tidak pernah ada bingkai tanpa tubuh sama sekali.
+          for (const anak of [...person.children]) person.remove(anak)
+          person.add(nyata)
+          ukurSosok()
+          resize()
+        },
+        undefined,
+        () => { /* aset tidak dapat dimuat: sosok prosedural tetap dipakai */ },
+      )
+    }
+
     let raf = 0
     const tick = () => {
       controls.update()
@@ -329,6 +428,7 @@ export function PersonalBodyAvatar3D({ compact = false }: { compact?: boolean } 
     tick()
 
     return () => {
+      penjaga.lepas()
       cancelAnimationFrame(raf)
       ro.disconnect()
       controls.dispose()

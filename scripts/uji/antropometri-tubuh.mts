@@ -14,6 +14,9 @@ import {
   LEMAK_TUBUH_MAKS_PCT,
   DENSITAS_TUBUH_MIN,
   DENSITAS_TUBUH_MAKS,
+  volumeAcuanPerawakanM3,
+  IMT_ACUAN_ICRP89,
+  skalaLingkarUntukVolume,
 } from '../../src/lib/anatomy/antropometriTubuh.ts'
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -441,6 +444,94 @@ for (const kasus of KASUS) {
     mahkota.a / terlebar > 0.40,
     `mahkota hanya ${((mahkota.a / terlebar) * 100).toFixed(0)}% dari lebar kepala terbesar — tengkorak menyusut seperti kerucut dan ubun-ubun akan tampak lancip`,
   )
+}
+
+// ── PERAWAKAN ACUAN: penyebut saat menskalakan geometri manusia terbitan.
+//
+// Angkanya harus tetap berupa nilai ICRP 89 yang diterbitkan, bukan konstanta
+// yang nyaman. Ditulis ulang di sini dengan tangan supaya menggeser konstanta
+// di modulnya tidak ikut menggeser ujinya.
+{
+  assert.ok(
+    Math.abs(IMT_ACUAN_ICRP89 - 73 / 1.76 ** 2) < 1e-12,
+    `IMT acuan ${IMT_ACUAN_ICRP89} bukan 73 kg / (1,76 m)^2 — perawakan acuan menyimpang dari ICRP 89`,
+  )
+  assert.ok(
+    IMT_ACUAN_ICRP89 > 22 && IMT_ACUAN_ICRP89 < 25,
+    `IMT acuan ${IMT_ACUAN_ICRP89} di luar perawakan dewasa lazim`,
+  )
+
+  // Volume tumbuh dengan kuadrat tinggi pada IMT tetap, dan harus mendarat di
+  // kisaran manusia: sekitar 0,07 m3 untuk orang 1,76 m.
+  const v176 = volumeAcuanPerawakanM3(1.76)
+  assert.ok(
+    Math.abs(v176 - 73 / (DENSITAS_TUBUH_LAZIM * 1000)) < 1e-12,
+    `volume acuan pada 1,76 m adalah ${v176} m3, bukan 73 kg dibagi densitas lazim`,
+  )
+  assert.ok(v176 > 0.06 && v176 < 0.08, `volume acuan ${v176} m3 bukan ukuran tubuh manusia`)
+
+  const v352 = volumeAcuanPerawakanM3(3.52)
+  assert.ok(
+    Math.abs(v352 / v176 - 4) < 1e-9,
+    'volume acuan tidak tumbuh dengan kuadrat tinggi pada IMT tetap',
+  )
+
+  for (const buruk of [0, -1.7, NaN, Infinity]) {
+    assert.throws(
+      () => volumeAcuanPerawakanM3(buruk),
+      /tidak dapat dipakai/,
+      `tinggi acuan ${buruk} tidak ditolak`,
+    )
+  }
+
+  // Orang berperawakan acuan harus menghasilkan skala lingkar sekitar 1:
+  // geometri terbitan tidak boleh dikembang-kempiskan tanpa alasan.
+  const acuan = selesaikanBentukTubuh({ tinggiCm: 176, massaKg: 73 })
+  const kAcuan = skalaLingkarUntukVolume(volumeAcuanPerawakanM3(1.76), acuan.volumeSasaranM3)
+  assert.ok(
+    kAcuan !== null && Math.abs(kAcuan - 1) < 1e-6,
+    `orang berperawakan acuan justru diskalakan ${kAcuan}, bukan 1`,
+  )
+
+  // Dan arah simpangannya harus benar: lebih berat -> lebih besar lingkarnya.
+  const kRingan = skalaLingkarUntukVolume(
+    volumeAcuanPerawakanM3(1.76),
+    selesaikanBentukTubuh({ tinggiCm: 176, massaKg: 60 }).volumeSasaranM3,
+  )
+  const kBerat = skalaLingkarUntukVolume(
+    volumeAcuanPerawakanM3(1.76),
+    selesaikanBentukTubuh({ tinggiCm: 176, massaKg: 88 }).volumeSasaranM3,
+  )
+  assert.ok(kRingan !== null && kRingan < 1, `orang 60 kg pada 176 cm diskalakan ${kRingan}, tidak mengecil`)
+  assert.ok(kBerat !== null && kBerat > 1, `orang 88 kg pada 176 cm diskalakan ${kBerat}, tidak membesar`)
+}
+
+// ── Skala lingkar untuk geometri terbitan, dan GAGAL-TERTUTUPnya.
+{
+  // Volume tumbuh dengan kuadrat skala lingkar: sasaran 4x acuan -> k = 2.
+  // Tetapi 2 berada di luar pita manusia yang wajar, jadi harus ditolak.
+  assert.equal(skalaLingkarUntukVolume(1, 4), null, 'skala 2.0 yang mustahil tidak ditolak')
+
+  const k = skalaLingkarUntukVolume(0.070, 0.070 * 1.21) // k = 1.1
+  assert.ok(k !== null && Math.abs(k - 1.1) < 1e-9, `skala lingkar ${k} bukan 1.1`)
+
+  // Volume acuan rusak atau kosong tidak boleh menghasilkan angka apa pun.
+  for (const buruk of [0, -1, NaN, Infinity]) {
+    assert.equal(skalaLingkarUntukVolume(buruk, 0.07), null, `volume acuan ${buruk} tidak ditolak`)
+    assert.equal(skalaLingkarUntukVolume(0.07, buruk), null, `volume sasaran ${buruk} tidak ditolak`)
+  }
+
+  // Rentang manusia nyata harus DITERIMA seluruhnya: dari orang sangat kurus
+  // sampai sangat berat, pada tinggi ekstrem sekalipun, geometri terbitan tetap
+  // harus dapat diproporsikan alih-alih jatuh ke sosok parametrik.
+  for (const [tinggiCm, massaKg] of [[145, 38], [163, 57], [176, 73], [180, 110], [196, 120]] as const) {
+    const orang = selesaikanBentukTubuh({ tinggiCm, massaKg })
+    const kOrang = skalaLingkarUntukVolume(volumeAcuanPerawakanM3(tinggiCm / 100), orang.volumeSasaranM3)
+    assert.ok(
+      kOrang !== null,
+      `${tinggiCm} cm / ${massaKg} kg ditolak — orang nyata tidak mendapat geometri manusia terbitan`,
+    )
+  }
 }
 
 // ── Monotonisitas: pada tinggi tetap, orang yang lebih berat harus lebih besar.

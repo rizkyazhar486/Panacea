@@ -580,5 +580,62 @@ export function bangunMeshTubuh(
   return { posisi, indeks, jumlahCincin: cincin.length, titikPerCincin: segmen }
 }
 
+/**
+ * Perawakan acuan untuk geometri manusia terbitan.
+ *
+ * Lapisan permukaan Z-Anatomy adalah kumpulan tambalan topografis (regio
+ * epigastrika, trigonum karotikum, dan seterusnya) — permukaan TERBUKA, bukan
+ * cangkang kedap. Karena itu volumenya tidak dapat diukur dari mesh: mencoba
+ * menjumlahkan volume tetrahedron di atasnya menghasilkan angka yang tidak
+ * berarti. Berkas sumbernya juga tidak menyatakan massa orang yang dipindai.
+ *
+ * Jadi perawakannya DIPERKIRAKAN, bukan diukur, memakai Pria Dewasa Acuan
+ * ICRP Publication 89: tinggi 1,76 m, massa 73 kg. Itu satu-satunya klaim yang
+ * dapat dipertanggungjawabkan di sini, dan ia sengaja dinyatakan terbuka
+ * sebagai perkiraan.
+ */
+export const TINGGI_ACUAN_ICRP89_M = 1.76
+export const MASSA_ACUAN_ICRP89_KG = 73
+export const IMT_ACUAN_ICRP89 = MASSA_ACUAN_ICRP89_KG / TINGGI_ACUAN_ICRP89_M ** 2
+export const SUMBER_PERAWAKAN_ACUAN =
+  'ICRP Publication 89 (2002), Reference Adult Male: tinggi 1,76 m, massa 73 kg.'
+
+/**
+ * Volume tubuh perawakan acuan pada tinggi tertentu, dengan densitas lazim.
+ *
+ * Dipakai sebagai penyebut saat menskalakan lingkar geometri terbitan: tinggi
+ * disamakan persis, lalu lingkarnya diskalakan sebesar simpangan perawakan
+ * pengguna terhadap acuan ini.
+ */
+export function volumeAcuanPerawakanM3(tinggiM: number): number {
+  if (!Number.isFinite(tinggiM) || tinggiM <= 0) {
+    throw new Error(`tinggi acuan ${tinggiM} m tidak dapat dipakai`)
+  }
+  return (IMT_ACUAN_ICRP89 * tinggiM ** 2) / (DENSITAS_TUBUH_LAZIM * 1000)
+}
+
+/**
+ * Faktor skala lingkar agar geometri manusia terbitan, setelah tingginya
+ * disamakan, punya volume sama dengan massa/densitas orangnya.
+ *
+ * Volume tumbuh dengan kuadrat skala lingkar, jadi bentuknya tertutup.
+ * Mengembalikan null bila salah satu volumenya tidak masuk akal, atau bila
+ * hasilnya jatuh di luar pita perawakan manusia: lebih baik memakai sosok
+ * parametrik yang benar daripada menarik paksa geometri terbitan ke bentuk
+ * yang tidak pernah ada.
+ */
+export function skalaLingkarUntukVolume(
+  volumeAcuanM3: number,
+  volumeSasaranM3: number,
+): number | null {
+  if (!Number.isFinite(volumeAcuanM3) || volumeAcuanM3 <= 0) return null
+  if (!Number.isFinite(volumeSasaranM3) || volumeSasaranM3 <= 0) return null
+  const k = Math.sqrt(volumeSasaranM3 / volumeAcuanM3)
+  // Di luar pita ini, geometrinya bukan tubuh manusia berskala wajar dan
+  // menariknya paksa akan menghasilkan sosok yang tidak benar.
+  if (!Number.isFinite(k) || k < 0.55 || k > 1.85) return null
+  return k
+}
+
 export const BATAS_KEBENARAN_BENTUK =
   'Bentuk ini diturunkan dari tinggi, massa dan jenis kelamin yang diberikan pengguna melalui proporsi segmen terbitan dan kekekalan massa. Ia bukan pemindaian, bukan rekonstruksi fotogrametrik, dan bukan ukuran klinis.'
