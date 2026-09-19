@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react'
 import { MedicalEvidenceExplorer } from '../components/MedicalEvidenceExplorer'
+import { MedicalEducationBridgeSearch } from '../components/MedicalEducationBridgeSearch'
 import {
   DEFAULT_TEACH_BACK,
   KNOWLEDGE_BRIDGE_MODULES,
@@ -54,6 +55,8 @@ export function KnowledgeBridge() {
         title="Search the medical evidence layer"
         subtitle="One query fans out to Europe PMC, EMBL-EBI Ontology Lookup Service, ClinicalTrials.gov and openFDA. Results keep their source identity and external link."
       />
+
+      <MedicalEducationBridgeSearch />
 
       <section className="rounded-[28px] border border-neutral-200 bg-white p-4 shadow-sm dark:border-white/10 dark:bg-white/[.035] sm:p-5">
         <div className="flex flex-wrap items-start justify-between gap-3">
