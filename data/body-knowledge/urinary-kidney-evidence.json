@@ -1,66 +1,23 @@
 {
   "version": 1,
-  "updatedAt": "2026-09-18",
+  "updatedAt": "2026-09-19",
   "system": "urinary",
   "organ": "kidney",
-  "scope": "Educational organ-specific Body Exposure knowledge seed. This record supports anatomy/physiology/pathophysiology relationships only at the general educational level; it does not establish patient-specific anatomy, diagnosis, prognosis, treatment, dose, procedural targeting, clinical efficacy, academic validation, or human review.",
+  "scope": "Educational organ-specific Body Exposure knowledge seed. This record supports general renal anatomy/physiology and mechanism relationships only; it does not establish patient-specific anatomy, kidney function, diagnosis, prognosis, treatment, dose, procedural targeting, clinical efficacy, academic validation, or human review.",
   "relationships": [
-    {
-      "id": "glomerular-filtration-barrier",
-      "domain": "anatomy-physiology",
-      "from": "glomerular-filtration-barrier",
-      "to": "glomerular-filtration",
-      "relationship": "supports-selective-filtration",
-      "claim": "The glomerular filtration barrier includes specialized podocyte foot processes and slit diaphragms; disruption of this barrier can impair filtration-barrier function and contribute to proteinuria.",
-      "evidence": ["pmid:23176147"],
-      "status": "source-checked"
-    },
-    {
-      "id": "tubular-function-renal-testing",
-      "domain": "physiology",
-      "from": "kidney-tubules",
-      "to": "renal-function-assessment",
-      "relationship": "physiology-relevant-to-assessment",
-      "claim": "Kidney function assessment extends beyond glomerular filtration and includes tubular physiology, renal circulation, urinalysis, acid-base handling, and proteinuria assessment.",
-      "evidence": ["pmid:16377400"],
-      "status": "source-checked"
-    }
+    {"id":"glomerular-filtration-tubular-handling","domain":"anatomy-physiology","from":"glomerulus","to":"renal-tubule","relationship":"couples-filtration-to-selective-tubular-handling","claim":"Renal homeostasis couples glomerular filtration with tubular reabsorption and secretion; urinary excretion is adjusted through these linked nephron processes.","evidence":["pmid:25287933","pmid:19864948"],"status":"source-checked"},
+    {"id":"macula-densa-tubuloglomerular-feedback","domain":"physiology","from":"macula-densa","to":"glomerular-hemodynamics","relationship":"participates-in-tubuloglomerular-feedback","claim":"Macula densa sensing of tubular sodium-chloride delivery participates in tubuloglomerular feedback that helps regulate glomerular filtration and renal autoregulation.","evidence":["pmid:12524458","pmid:19864948"],"status":"source-checked"},
+    {"id":"proximal-transport-feedback-coupling","domain":"physiology-pathophysiology","from":"proximal-tubular-reabsorption","to":"tubuloglomerular-feedback","relationship":"modulates-distal-salt-delivery-and-filtration-feedback","claim":"Changes in proximal tubular sodium and glucose reabsorption can alter downstream salt delivery and thereby modify tubuloglomerular feedback and glomerular filtration dynamics.","evidence":["pmid:32152499"],"status":"source-checked"}
   ],
   "sources": [
-    {
-      "id": "pmid:23176147",
-      "pmid": "23176147",
-      "title": "Podocyte mitosis - a catastrophe.",
-      "year": 2013,
-      "url": "https://pubmed.ncbi.nlm.nih.gov/23176147/",
-      "evidenceRole": "Podocyte structure, slit diaphragm, filtration-barrier dysfunction and proteinuria relationship.",
-      "sourceType": "review"
-    },
-    {
-      "id": "pmid:16377400",
-      "pmid": "16377400",
-      "title": "Renal function testing.",
-      "year": 2006,
-      "url": "https://pubmed.ncbi.nlm.nih.gov/16377400/",
-      "evidenceRole": "Educational overview of glomerular filtration, tubular physiology, renal circulation and renal function testing.",
-      "sourceType": "review"
-    }
+    {"id":"pmid:25287933","pmid":"25287933","title":"Renal control of calcium, phosphate, and magnesium homeostasis.","year":2015,"url":"https://pubmed.ncbi.nlm.nih.gov/25287933/","evidenceRole":"Review describing renal regulation through glomerular filtration and tubular reabsorption/secretion in whole-body mineral homeostasis.","sourceType":"review"},
+    {"id":"pmid:19864948","pmid":"19864948","title":"Renal homeostasis and tubuloglomerular feedback.","year":2010,"url":"https://pubmed.ncbi.nlm.nih.gov/19864948/","evidenceRole":"Review of renal salt homeostasis, glomerulotubular balance, tubuloglomerular feedback and its contribution to stabilization of filtration.","sourceType":"review"},
+    {"id":"pmid:12524458","pmid":"12524458","title":"Macula densa cell signaling.","year":2003,"url":"https://pubmed.ncbi.nlm.nih.gov/12524458/","evidenceRole":"Review of macula densa sensing and signaling to glomerular vascular elements in tubuloglomerular feedback.","sourceType":"review"},
+    {"id":"pmid:32152499","pmid":"32152499","title":"The tubular hypothesis of nephron filtration and diabetic kidney disease.","year":2020,"url":"https://pubmed.ncbi.nlm.nih.gov/32152499/","evidenceRole":"Review connecting proximal sodium-glucose reabsorption, distal salt delivery, tubuloglomerular feedback and hyperfiltration mechanisms.","sourceType":"review"}
   ],
   "provenanceBoundary": {
-    "sourceCheckedMeans": "The cited PubMed record was retrieved and its metadata/abstract or indexed terms were checked for the scoped educational relationship.",
-    "sourceCheckedDoesNotMean": [
-      "guideline-recommended",
-      "clinically-validated-feature",
-      "human-reviewed-in-panacea",
-      "patient-specific",
-      "asset-license-cleared",
-      "diagnostic-or-treatment-advice"
-    ],
-    "forbiddenInferences": [
-      "generic-atlas-to-patient-specific-anatomy",
-      "educational-relationship-to-diagnosis",
-      "review-citation-to-treatment-recommendation",
-      "source-checked-to-human-reviewed"
-    ]
+    "sourceCheckedMeans":"The cited PubMed record was retrieved and its metadata/abstract or indexed terms were checked for the scoped educational relationship.",
+    "sourceCheckedDoesNotMean":["guideline-recommended","clinically-validated-feature","human-reviewed-in-panacea","patient-specific","asset-license-cleared","diagnostic-or-treatment-advice"],
+    "forbiddenInferences":["generic-nephron-model-to-patient-specific-kidney-function","educational-feedback-mechanism-to-diagnosis","review-citation-to-treatment-recommendation","source-checked-to-human-reviewed"]
   }
 }
