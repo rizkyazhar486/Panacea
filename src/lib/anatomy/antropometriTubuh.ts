@@ -19,9 +19,9 @@
 //    vertikal). Ia tidak memberi KETEBALAN.
 //
 // 2. KETEBALAN — tidak ditebak, melainkan diikat oleh kekekalan massa.
-//    Volume tubuh = massa / densitas. Densitas tubuh manusia utuh berada di
-//    kisaran sempit ~1.01-1.06 g/cm3 (dasar yang sama dipakai persamaan
-//    Siri dan Brozek untuk komposisi tubuh). Jadi seluruh lingkar diskalakan
+//    Volume tubuh = massa / densitas, dan densitasnya sendiri diturunkan dari
+//    persen lemak tubuh terukur lewat pembalikan persamaan Siri (1961) bila
+//    tersedia. Jadi seluruh lingkar diskalakan
 //    oleh satu faktor k sampai JUMLAH VOLUME SEGMEN — batang tubuh, dua
 //    tungkai, dua lengan — sama dengan massa/densitas. Karena volume tumbuh
 //    dengan kuadrat ukuran linear, k punya bentuk tertutup: k = sqrt(Vsasaran /
@@ -40,6 +40,11 @@
 // 3. PEMBAGIAN ANTAR SEGMEN — fraksi massa Winter/Dempster. Kekekalan massa
 //    saja masih membolehkan tungkai gemuk di atas batang tubuh kurus; patokan
 //    ini yang menahannya, dan uji memeriksa selisihnya dalam satuan poin.
+//
+// 4. DISTRIBUSI LEMAK — pola android/gynoid. Tanpa ini, tinggi dan berat yang
+//    sama selalu menghasilkan sosok yang sama persis, padahal komposisinya bisa
+//    jauh berbeda. Distribusi hanya MEMINDAHKAN volume antar bagian; totalnya
+//    tetap ditentukan kekekalan massa.
 //
 // YANG TIDAK DIKLAIM BERKAS INI.
 // Ini BUKAN pemindaian, bukan rekonstruksi fotogrametrik, dan bukan ukuran
@@ -102,16 +107,86 @@ export const SUMBER_MASSA =
 export const SUMBER_PROPORSI =
   'Drillis & Contini (1966), proporsi segmen terhadap tinggi badan, sebagaimana direproduksi di Winter, Biomechanics and Motor Control of Human Movement.'
 
-/** Kisaran densitas tubuh utuh (g/cm3) yang dipakai literatur komposisi tubuh. */
-export const DENSITAS_TUBUH_MIN = 1.01
-export const DENSITAS_TUBUH_MAKS = 1.06
+/**
+ * Kisaran densitas tubuh utuh (g/cm3).
+ *
+ * KOREKSI TERHADAP VERSI SEBELUMNYA. Batasnya dulu ditulis 1.01-1.06 sebagai
+ * "kisaran sempit", dan itu terlalu sempit sampai menolak tubuh nyata yang sah:
+ * persamaan Siri memberi D = 1.088 pada 5% lemak tubuh dan D = 1.000 pada 45%.
+ * Keduanya manusia yang benar-benar ada. Batas sekarang diturunkan dari Siri
+ * pada rentang lemak tubuh yang memang dapat diukur (2-70%), bukan dari kesan.
+ */
+export const DENSITAS_TUBUH_MIN = 0.95
+export const DENSITAS_TUBUH_MAKS = 1.10
 export const DENSITAS_TUBUH_LAZIM = 1.035
+
+/** Rentang lemak tubuh yang diterima, sama dengan validasi impor kesehatan. */
+export const LEMAK_TUBUH_MIN_PCT = 2
+export const LEMAK_TUBUH_MAKS_PCT = 70
+
+/**
+ * Densitas tubuh dari persen lemak tubuh — pembalikan persamaan Siri.
+ *
+ * Siri (1961), model dua kompartemen:  %BF = (4.95 / D - 4.50) * 100
+ * dibalik menjadi:                     D   = 4.95 / (%BF/100 + 4.50)
+ *
+ * Ini yang membuat volume benar-benar personal. Dua orang dengan tinggi dan
+ * berat sama tetapi komposisi berbeda BUKAN tubuh dengan volume sama: lemak
+ * (~0.9 g/cm3) jauh lebih ringan per satuan volume daripada massa bebas lemak
+ * (~1.1 g/cm3), jadi yang lemaknya lebih tinggi menempati ruang lebih besar
+ * pada massa yang sama. Memakai satu densitas tetap menghapus perbedaan itu.
+ */
+export function densitasDariLemakTubuh(persenLemak: number): number {
+  if (!Number.isFinite(persenLemak) || persenLemak < LEMAK_TUBUH_MIN_PCT || persenLemak > LEMAK_TUBUH_MAKS_PCT) {
+    throw new Error(`lemak tubuh ${persenLemak}% di luar rentang yang dapat diukur (${LEMAK_TUBUH_MIN_PCT}-${LEMAK_TUBUH_MAKS_PCT})`)
+  }
+  return 4.95 / (persenLemak / 100 + 4.50)
+}
+
+export const SUMBER_DENSITAS =
+  'Siri (1961), model dua kompartemen komposisi tubuh: %BF = (4.95/D - 4.50) x 100.'
 
 export interface UkuranTubuh {
   tinggiCm: number
   massaKg: number
   /** 'L' | 'P'; memengaruhi rasio bahu-panggul, bukan tinggi segmen. */
   jenisKelamin?: 'L' | 'P'
+  /**
+   * Persen lemak tubuh terukur, bila ada. Menentukan densitas lewat Siri DAN
+   * ke mana tambahan volume itu pergi. Tanpa ini model memakai densitas lazim
+   * dan distribusi netral — tetap benar totalnya, hanya tidak personal.
+   */
+  lemakTubuhPct?: number
+}
+
+/**
+ * Lemak tubuh acuan tempat distribusi dianggap netral. Di atas nilai ini
+ * volume tambahan condong ke perut/panggul; di bawahnya, pinggang menyempit
+ * relatif terhadap dada. Dipisah per jenis kelamin karena rentang sehatnya
+ * memang berbeda, bukan sebagai penilaian.
+ */
+const LEMAK_ACUAN = { L: 18, P: 26 } as const
+
+/**
+ * Bobot penampang terhadap simpangan lemak tubuh dari acuan.
+ *
+ * Penambahan lemak TIDAK merata, dan polanya berbeda per jenis kelamin: pola
+ * android (lebih lazim pada laki-laki) menumpuk di perut/pinggang, pola gynoid
+ * (lebih lazim pada perempuan) di panggul dan paha. Tanpa ini, menaikkan lemak
+ * tubuh hanya menggemukkan seluruh tubuh secara seragam — yang tidak pernah
+ * terjadi pada tubuh sungguhan.
+ *
+ * Angka di bawah adalah bobot RELATIF, bukan ukuran: semuanya dinormalkan
+ * kembali agar volume total tetap ditentukan kekekalan massa. Jadi distribusi
+ * memindahkan volume antar bagian, tidak pernah menambah atau menguranginya.
+ */
+const BOBOT_LEMAK: Record<'L' | 'P', Record<string, number>> = {
+  L: { pinggang: 1.00, panggul: 0.55, selangkangan: 0.45, dada: 0.35, bahu: 0.15, leher: 0.15 },
+  P: { pinggang: 0.55, panggul: 1.00, selangkangan: 0.85, dada: 0.45, bahu: 0.12, leher: 0.12 },
+}
+const BOBOT_LEMAK_TUNGKAI: Record<'L' | 'P', Record<string, number>> = {
+  L: { 'pangkal-paha': 0.40, 'paha-atas': 0.35, 'paha-bawah': 0.25, lutut: 0.10, betis: 0.18 },
+  P: { 'pangkal-paha': 0.85, 'paha-atas': 0.75, 'paha-bawah': 0.45, lutut: 0.12, betis: 0.25 },
 }
 
 /**
@@ -278,9 +353,16 @@ function kerangkaLengan(tinggiM: number, kal: number): Penampang[] {
  */
 export function selesaikanBentukTubuh(
   ukuran: UkuranTubuh,
-  densitas: number = DENSITAS_TUBUH_LAZIM,
+  densitasPaksa?: number,
 ): BentukTubuh {
   const { tinggiCm, massaKg } = ukuran
+  // Densitas berasal dari lemak tubuh terukur bila ada (Siri); nilai paksa
+  // hanya dipakai kalau pemanggil memang menyebutkannya.
+  const densitas =
+    densitasPaksa ??
+    (ukuran.lemakTubuhPct !== undefined
+      ? densitasDariLemakTubuh(ukuran.lemakTubuhPct)
+      : DENSITAS_TUBUH_LAZIM)
   if (!Number.isFinite(tinggiCm) || tinggiCm < 50 || tinggiCm > 260) {
     throw new Error(`tinggi ${tinggiCm} cm di luar kisaran manusia yang dapat dimodelkan (50-260)`)
   }
@@ -293,7 +375,31 @@ export function selesaikanBentukTubuh(
 
   const tinggiM = tinggiCm / 100
   const jenisKelamin = ukuran.jenisKelamin === 'P' ? 'P' : 'L'
-  const dasar = kerangka(tinggiM, jenisKelamin)
+  const dasarAwal = kerangka(tinggiM, jenisKelamin)
+
+  // DISTRIBUSI LEMAK — memindahkan volume antar bagian, tidak menambahnya.
+  // Tiap penampang digeser menurut bobotnya, lalu seluruh bentuk diskalakan
+  // ulang oleh kekekalan massa di bawah. Jadi berapa pun distribusinya, volume
+  // akhir tetap ditentukan massa/densitas; yang berubah hanya SILUETNYA.
+  const dasar = (() => {
+    const bf = ukuran.lemakTubuhPct
+    if (bf === undefined) return dasarAwal
+    const simpangan = (bf - LEMAK_ACUAN[jenisKelamin]) / 100
+    if (Math.abs(simpangan) < 1e-9) return dasarAwal
+    const geser = (ps: Penampang[], bobot: Record<string, number>) =>
+      ps.map((p) => {
+        const w = bobot[p.nama] ?? 0
+        // Faktor dibatasi supaya simpangan ekstrem tidak menghasilkan bentuk
+        // yang mustahil; uji kewajaran lingkar menjaga sisanya.
+        const f = Math.max(0.82, Math.min(1.70, 1 + w * simpangan * 1.8))
+        return { ...p, a: p.a * f, b: p.b * f }
+      })
+    return {
+      torso: geser(dasarAwal.torso, BOBOT_LEMAK[jenisKelamin]),
+      tungkai: geser(dasarAwal.tungkai, BOBOT_LEMAK_TUNGKAI[jenisKelamin]),
+      lengan: dasarAwal.lengan,
+    }
+  })()
 
   // densitas g/cm3 -> kg/m3 dikali 1000. volume m3 = massa / (densitas*1000).
   const volumeSasaranM3 = massaKg / (densitas * 1000)

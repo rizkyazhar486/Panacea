@@ -9,6 +9,11 @@ import {
   DENSITAS_TUBUH_LAZIM,
   bangunMeshTubuh,
   BAGIAN_MASSA,
+  densitasDariLemakTubuh,
+  LEMAK_TUBUH_MIN_PCT,
+  LEMAK_TUBUH_MAKS_PCT,
+  DENSITAS_TUBUH_MIN,
+  DENSITAS_TUBUH_MAKS,
 } from '../../src/lib/anatomy/antropometriTubuh.ts'
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -188,6 +193,140 @@ for (const kasus of KASUS) {
     sumberPerender,
     /bentuk\.penampang\.find[\s\S]{0,200}bentuk\.tungkai\.find[\s\S]{0,200}bentuk\.lengan\.find/,
     'pencarian penampang di PersonalBodyAvatar3D tidak menelusuri KETIGA daftar (batang tubuh, tungkai, lengan), sehingga nama yang pindah antar daftar akan kembali menjadi undefined',
+  )
+}
+
+// ── KOMPOSISI TUBUH: densitas dari Siri, dan ke mana volumenya pergi.
+//
+// Sebelum ini avatar hanya memakai tinggi dan berat, jadi dua orang dengan
+// tinggi/berat sama menghasilkan sosok yang identik — padahal komposisinya bisa
+// sangat berbeda. Lemak (~0.9 g/cm3) lebih ringan per satuan volume daripada
+// massa bebas lemak (~1.1), sehingga pada massa yang sama tubuh dengan lemak
+// lebih tinggi benar-benar menempati ruang lebih besar.
+{
+  // Persamaan Siri diperiksa pada titik yang dapat dihitung tangan:
+  // D = 4.95 / (BF/100 + 4.50)
+  for (const [bf, harap] of [[5, 4.95 / 4.55], [15, 4.95 / 4.65], [30, 4.95 / 4.80], [45, 4.95 / 4.95]] as const) {
+    assert.ok(
+      Math.abs(densitasDariLemakTubuh(bf) - harap) < 1e-12,
+      `densitas pada lemak ${bf}% menyimpang dari pembalikan persamaan Siri`,
+    )
+  }
+  // Lebih banyak lemak berarti tubuh kurang padat. Arah ini tidak boleh terbalik.
+  assert.ok(densitasDariLemakTubuh(10) > densitasDariLemakTubuh(35), 'densitas tidak menurun saat lemak tubuh naik')
+
+  // Batas densitas HARUS memuat seluruh rentang lemak yang dapat diukur.
+  // Versi sebelumnya memakai 1.01-1.06 dan akan menolak tubuh nyata: Siri
+  // memberi 1.088 pada 5% dan 1.000 pada 45%.
+  for (const bf of [LEMAK_TUBUH_MIN_PCT, 5, 25, 45, LEMAK_TUBUH_MAKS_PCT]) {
+    const d = densitasDariLemakTubuh(bf)
+    assert.ok(
+      d >= DENSITAS_TUBUH_MIN && d <= DENSITAS_TUBUH_MAKS,
+      `densitas ${d.toFixed(4)} pada lemak ${bf}% berada di luar batas yang diterima model, sehingga tubuh yang sah akan ditolak`,
+    )
+  }
+  assert.throws(() => densitasDariLemakTubuh(1), /di luar rentang/)
+  assert.throws(() => densitasDariLemakTubuh(80), /di luar rentang/)
+  assert.throws(() => densitasDariLemakTubuh(NaN), /di luar rentang/)
+
+  // Pada MASSA SAMA, lemak lebih tinggi harus memberi volume lebih besar.
+  const kurus = selesaikanBentukTubuh({ tinggiCm: 175, massaKg: 78, jenisKelamin: 'L', lemakTubuhPct: 8 })
+  const gemuk = selesaikanBentukTubuh({ tinggiCm: 175, massaKg: 78, jenisKelamin: 'L', lemakTubuhPct: 32 })
+  assert.ok(
+    gemuk.volumeM3 > kurus.volumeM3,
+    'pada massa sama, lemak tubuh lebih tinggi tidak menghasilkan volume lebih besar — densitas dari komposisi tidak benar-benar dipakai',
+  )
+
+  // Kekekalan massa TETAP berlaku setelah distribusi. Distribusi hanya
+  // memindahkan volume antar bagian; ia tidak boleh menambah atau menguranginya.
+  for (const b of [kurus, gemuk]) {
+    assert.ok(
+      b.residuRelatif < 1e-9,
+      `distribusi lemak merusak kekekalan massa (residu ${b.residuRelatif})`,
+    )
+  }
+
+  // POLA ANDROID pada laki-laki: pinggang tumbuh lebih cepat daripada dada.
+  const rasioKurus = lingkarPenampangCm(kurus, 'pinggang') / lingkarPenampangCm(kurus, 'dada')
+  const rasioGemuk = lingkarPenampangCm(gemuk, 'pinggang') / lingkarPenampangCm(gemuk, 'dada')
+  assert.ok(
+    rasioGemuk > rasioKurus + 0.1,
+    `rasio pinggang/dada nyaris tidak berubah (${rasioKurus.toFixed(3)} -> ${rasioGemuk.toFixed(3)}); lemak ditambahkan merata, yang tidak terjadi pada tubuh sungguhan`,
+  )
+
+  // POLA GYNOID pada perempuan: panggul tumbuh lebih cepat daripada pinggang.
+  const pKurus = selesaikanBentukTubuh({ tinggiCm: 165, massaKg: 62, jenisKelamin: 'P', lemakTubuhPct: 18 })
+  const pGemuk = selesaikanBentukTubuh({ tinggiCm: 165, massaKg: 62, jenisKelamin: 'P', lemakTubuhPct: 40 })
+  const wKurus = lingkarPenampangCm(pKurus, 'pinggang') / lingkarPenampangCm(pKurus, 'panggul')
+  const wGemuk = lingkarPenampangCm(pGemuk, 'pinggang') / lingkarPenampangCm(pGemuk, 'panggul')
+  assert.ok(
+    wGemuk < wKurus - 0.1,
+    `rasio pinggang/panggul perempuan tidak turun (${wKurus.toFixed(3)} -> ${wGemuk.toFixed(3)}); pola gynoid tidak terbentuk`,
+  )
+
+  // Dan polanya memang BERBEDA antar jenis kelamin pada masukan yang sama.
+  const lSama = selesaikanBentukTubuh({ tinggiCm: 170, massaKg: 70, jenisKelamin: 'L', lemakTubuhPct: 35 })
+  const pSama = selesaikanBentukTubuh({ tinggiCm: 170, massaKg: 70, jenisKelamin: 'P', lemakTubuhPct: 35 })
+  assert.ok(
+    lingkarPenampangCm(lSama, 'pinggang') / lingkarPenampangCm(lSama, 'panggul') >
+      lingkarPenampangCm(pSama, 'pinggang') / lingkarPenampangCm(pSama, 'panggul') + 0.05,
+    'distribusi lemak tidak dibedakan antar jenis kelamin pada masukan yang sama',
+  )
+
+  // KEWAJARAN DI SELURUH RENTANG KOMPOSISI, bukan hanya pada kasus bawaan.
+  // Uji lama hanya memeriksa tubuh tanpa lemak terukur, sehingga pengali
+  // distribusi yang terlalu kuat lolos: pada 8% lemak ia menghasilkan pinggang
+  // 59 cm untuk laki-laki 175 cm — angka yang tidak ada pada manusia dewasa.
+  for (const bf of [5, 10, 18, 25, 35, 45]) {
+    for (const jk of ['L', 'P'] as const) {
+      const b = selesaikanBentukTubuh({ tinggiCm: 172, massaKg: 72, jenisKelamin: jk, lemakTubuhPct: bf })
+      const pinggang = lingkarPenampangCm(b, 'pinggang')
+      const dada = lingkarPenampangCm(b, 'dada')
+      const panggul = lingkarPenampangCm(b, 'panggul')
+      assert.ok(pinggang > 60 && pinggang < 135, `lemak ${bf}% ${jk}: pinggang ${pinggang.toFixed(1)} cm di luar kisaran manusia dewasa`)
+      assert.ok(dada > 75 && dada < 140, `lemak ${bf}% ${jk}: dada ${dada.toFixed(1)} cm di luar kisaran manusia dewasa`)
+      assert.ok(panggul > 75 && panggul < 140, `lemak ${bf}% ${jk}: panggul ${panggul.toFixed(1)} cm di luar kisaran manusia dewasa`)
+    }
+  }
+
+  // RASIO PINGGANG-TINGGI sebagai pagar bebas-skala.
+  //
+  // Pita lingkar mutlak ternyata terlalu longgar: pengali distribusi yang jauh
+  // terlalu kuat tetap lolos karena lingkarnya masih di atas ambang tetap.
+  // Rasio pinggang/tinggi menangkapnya, dan ia memang ukuran yang dipakai
+  // literatur WHtR. Yang dijamin di sini: sekalipun MASUKANNYA mustahil
+  // (misalnya 195 cm / 70 kg dengan lemak 5%, yang tidak konsisten secara
+  // fisiologis), model tetap tidak boleh menggambar siluet non-manusia.
+  {
+    let terkecil = Infinity
+    let terbesar = 0
+    let kasusKecil = ''
+    for (const bf of [5, 10, 18, 25, 35, 45, 55]) {
+      for (const [h, w] of [[150, 45], [160, 50], [165, 62], [172, 72], [175, 78], [180, 85], [185, 110], [195, 70]] as const) {
+        for (const jk of ['L', 'P'] as const) {
+          const b = selesaikanBentukTubuh({ tinggiCm: h, massaKg: w, jenisKelamin: jk, lemakTubuhPct: bf })
+          const r = lingkarPenampangCm(b, 'pinggang') / h
+          if (r < terkecil) { terkecil = r; kasusKecil = `${h}cm/${w}kg ${jk} lemak ${bf}%` }
+          if (r > terbesar) terbesar = r
+        }
+      }
+    }
+    assert.ok(
+      terkecil > 0.30,
+      `rasio pinggang/tinggi turun sampai ${terkecil.toFixed(3)} pada ${kasusKecil} — di bawah apa pun yang ada pada manusia; distribusi lemak terlalu kuat`,
+    )
+    assert.ok(
+      terbesar < 0.80,
+      `rasio pinggang/tinggi naik sampai ${terbesar.toFixed(3)} — di atas apa pun yang ada pada manusia`,
+    )
+  }
+
+  // Tanpa lemak terukur, model tetap bekerja dengan densitas lazim.
+  const tanpa = selesaikanBentukTubuh({ tinggiCm: 172, massaKg: 72 })
+  assert.equal(tanpa.densitasDipakai, DENSITAS_TUBUH_LAZIM)
+  assert.throws(
+    () => selesaikanBentukTubuh({ tinggiCm: 172, massaKg: 72, lemakTubuhPct: 90 }),
+    /di luar rentang/,
   )
 }
 

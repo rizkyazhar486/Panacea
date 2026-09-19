@@ -4,6 +4,7 @@ import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
 import { useStore } from '../lib/store'
 import { getBodyCharacter, characterShape } from '../lib/bodyCharacter'
 import { getDemoTersimpan } from '../lib/profile'
+import { getVitals } from '../lib/healthVitals'
 import {
   selesaikanBentukTubuh,
   bangunMeshTubuh,
@@ -37,11 +38,18 @@ export function PersonalBodyAvatar3D({ compact = false }: { compact?: boolean } 
     const heightCm = typeof demo.heightCm === 'number' && demo.heightCm > 0 ? demo.heightCm : 170
     const weightKg = typeof demo.weightKg === 'number' && demo.weightKg > 0 ? demo.weightKg : 70
     const bmi = weightKg / Math.pow(heightCm / 100, 2)
+    // Lemak tubuh terukur (impor Apple Health / BIA) bila ada. Tanpa ini model
+    // memakai densitas lazim: tetap benar totalnya, hanya tidak personal.
+    const v = getVitals() as Record<string, unknown>
+    const bf = typeof v.bodyFatPct === 'number' && v.bodyFatPct >= 2 && v.bodyFatPct <= 70
+      ? v.bodyFatPct
+      : undefined
     return {
       heightCm,
       weightKg,
       bmi,
       sex: demo.sex,
+      bodyFatPct: bf,
       shape: characterShape(body.bodyType),
       bodyType: body.bodyType,
       face: profile.avatar,
@@ -57,11 +65,12 @@ export function PersonalBodyAvatar3D({ compact = false }: { compact?: boolean } 
         tinggiCm: input.heightCm,
         massaKg: input.weightKg,
         jenisKelamin: input.sex === 'F' ? 'P' : 'L',
+        lemakTubuhPct: input.bodyFatPct,
       })
     } catch {
       return null
     }
-  }, [input.heightCm, input.weightKg, input.sex])
+  }, [input.heightCm, input.weightKg, input.sex, input.bodyFatPct])
 
   useEffect(() => {
     const mount = mountRef.current
@@ -352,11 +361,19 @@ export function PersonalBodyAvatar3D({ compact = false }: { compact?: boolean } 
               </span>
             </>
           )}
+          {/* Hanya muncul bila lemak tubuh BENAR-BENAR terukur. Tanpa nilai
+              nyata, chip ini tidak ditampilkan sama sekali — bukan diisi
+              perkiraan yang tampak seperti pengukuran. */}
+          {input.bodyFatPct !== undefined && (
+            <span className="rounded-full bg-white/10 px-2 py-1">
+              Body fat {input.bodyFatPct.toFixed(1)}%
+            </span>
+          )}
           {input.bodyType && <span className="rounded-full bg-brand/20 px-2 py-1 text-emerald-200">{input.bodyType}</span>}
         </div>
         {!compact && (
           <p className="mt-2 text-[10px] leading-relaxed text-white/70">
-            Shaped from your height and weight using published segment proportions (Drillis &amp; Contini) and mass conservation, so its volume matches your body mass. Derived from measurements — not a scan, and not a clinical measurement.
+            Shaped from your measurements: published segment proportions (Drillis &amp; Contini), mass conservation, and — when your body fat is measured — density from the Siri equation plus its android/gynoid distribution. Derived from measurements, not a scan and not a clinical measurement.
           </p>
         )}
       </div>
