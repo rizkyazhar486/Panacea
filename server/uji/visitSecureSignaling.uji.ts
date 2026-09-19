@@ -1,6 +1,8 @@
 import assert from 'node:assert/strict'
 import {
   authorizeVisitRealtimeJoin,
+  createVisitRealtimeReplayGuard,
+  isReservedVisitRealtimeRoom,
   validateVisitRealtimeSignalEnvelope,
 } from '../src/visitRealtimePolicy.js'
 
@@ -64,4 +66,35 @@ assert.throws(
   /future/,
 )
 
-console.log('Visit secure signaling policy: authenticated identity, freshness, sender binding and payload bounds ok')
+const replayGuard = createVisitRealtimeReplayGuard()
+assert.equal(replayGuard.accept(base), true, 'first sequence in a visit session is accepted')
+assert.equal(replayGuard.accept(base), false, 'duplicate sequence is rejected')
+assert.equal(replayGuard.accept({ ...base, sequence: 0 }), false, 'older sequence is rejected')
+assert.equal(replayGuard.accept({ ...base, sequence: 2 }), true, 'newer sequence is accepted')
+
+// Re-authorizing/re-joining the same visit must not clear replay state.
+const rejoined = authorizeVisitRealtimeJoin(
+  { userId: 'patient-secure', role: 'pasien' },
+  'visit-secure',
+  membership,
+  '2026-09-19T08:31:00Z',
+)
+assert.equal(rejoined.allowed, true)
+assert.equal(
+  replayGuard.accept({ ...base, sequence: 1 }),
+  false,
+  're-join must not make an already-consumed sequence valid again',
+)
+
+// A genuinely new signaling session gets its own sequence stream.
+assert.equal(
+  replayGuard.accept({ ...base, sessionId: 'session-new', sequence: 0 }),
+  true,
+  'new session id starts an independent sequence stream',
+)
+
+assert.equal(isReservedVisitRealtimeRoom('visit:visit-secure'), true)
+assert.equal(isReservedVisitRealtimeRoom(' visit:visit-secure '), true)
+assert.equal(isReservedVisitRealtimeRoom('consult:visit-secure'), false)
+
+console.log('Visit secure signaling policy: identity, freshness, replay resistance and reserved room namespace ok')
