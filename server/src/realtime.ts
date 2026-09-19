@@ -2,7 +2,7 @@ import { WebSocketServer, WebSocket } from 'ws'
 import type { Server } from 'node:http'
 import { attachGenomicsComputeRoutes } from './genomicsCompute.js'
 import { currentUserFromWebSocketRequest } from './auth.js'
-import { addAudit, getVisitMembership, type User } from './store.js'
+import { addAudit, getVisitMembership } from './store.js'
 import {
   authorizeVisitRealtimeJoin,
   validateVisitRealtimeSignalEnvelope,
@@ -106,7 +106,14 @@ export function attachRealtime(server: Server) {
         const authorization = authorizeVisitRealtimeJoin(
           { userId: authenticatedUser.id, role: authenticatedUser.role },
           m.visitId,
-          membership,
+          {
+            visitId: membership.id,
+            patientUserId: membership.patientUserId,
+            clinicianUserId: membership.clinicianUserId,
+            status: membership.status,
+            startsAt: membership.startsAt,
+            endsAt: membership.endsAt,
+          },
         )
         if (!authorization.allowed) {
           visitError(authorization.code)
