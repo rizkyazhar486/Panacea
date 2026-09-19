@@ -66,4 +66,23 @@ assert.doesNotMatch(
   'AI provider response bodies may contain echoed prompts and must not enter public error paths',
 )
 
+function routeSection(source: string, start: string, end: string): string {
+  const from = source.indexOf(start)
+  const to = source.indexOf(end, from + start.length)
+  assert.notEqual(from, -1, `missing route section: ${start}`)
+  assert.notEqual(to, -1, `missing route boundary: ${end}`)
+  return source.slice(from, to)
+}
+
+assert.match(
+  routeSection(aiSource, 'export async function aiVision', 'export async function aiMessages'),
+  /validateAiProxyRequest/,
+  'Vision requests must pass through the shared bounded-content policy',
+)
+assert.match(
+  routeSection(aiSource, 'export async function aiConsult', 'export async function reviewApplicationText'),
+  /validateAiProxyRequest/,
+  'Paid consultation messages must pass through the shared bounded-content policy before generation or charging',
+)
+
 console.log('AI proxy validates bounded content and never exposes provider payloads.')
