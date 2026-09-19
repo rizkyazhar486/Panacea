@@ -8,6 +8,7 @@ import { useVitals } from '../lib/useVitals'
 import { mergeVitals } from '../lib/healthVitals'
 import { mergeHealthCache } from '../lib/profile'
 import { buildRecoveryRecordedChecklist } from '../lib/recoveryRecordedChecklist'
+import { buildRecoveryRecordedSnapshot } from '../lib/recoveryRecordedSnapshot'
 
 interface Workout { rpe: number; min: number }
 interface DayLog {
@@ -139,6 +140,10 @@ export function Readiness() {
       syncedAt: typeof vitals.syncedAt === 'string' ? vitals.syncedAt : undefined,
     },
   ), [today.hrv, today.rhr, today.sleepH, vitals])
+  const snapshot = useMemo(() => buildRecoveryRecordedSnapshot(
+    { hrv: today.hrv, rhr: today.rhr, sleepH: today.sleepH, loadRpeMin: recordedLoad(today.workouts) },
+    { hrv: hrvBaseline, rhr: rhrBaseline, sleepH: sleepBaseline },
+  ), [today.hrv, today.rhr, today.sleepH, today.workouts, hrvBaseline, rhrBaseline, sleepBaseline])
   const week = useMemo(() => Array.from({ length: 7 }, (_, i) => {
     const date = dayKey(6 - i)
     const day = store[date]
@@ -198,6 +203,32 @@ export function Readiness() {
         <div className="mt-3 rounded-2xl border border-amber-300/60 bg-amber-50 p-3 text-xs leading-relaxed text-amber-950 dark:border-amber-700/60 dark:bg-amber-950/30 dark:text-amber-100">
           Panacea does not convert HRV, resting heart rate, sleep, behaviors, or workout entries into a home-made recovery score or training prescription. Provider-derived scores must remain attributed to their provider and are not available here unless a reviewed adapter supplies them with provenance.
         </div>
+      </Card>
+
+      <Card className="!p-5" aria-label="Today at a glance">
+        <SectionTitle icon={<IconChartUp size={20} />} title="Today at a Glance" subtitle={snapshot.headline} />
+        <div className="mt-3 grid grid-cols-3 gap-2">
+          {snapshot.vitals.map((vital) => (
+            <div key={vital.id} className="rounded-xl border border-neutral-200 bg-neutral-50 p-3 text-center dark:border-neutral-700 dark:bg-neutral-900">
+              <div className="text-[10px] font-semibold uppercase tracking-wide text-neutral-500">{vital.label}</div>
+              <div className="mt-1 text-lg font-black">
+                {vital.recorded !== null ? `${vital.recorded}${vital.unit}` : <span className="text-sm font-bold text-neutral-400">—</span>}
+              </div>
+              <div className="mt-0.5 text-[10px] text-neutral-500">
+                {vital.deltaFromBaseline !== null
+                  ? `${vital.deltaFromBaseline > 0 ? '+' : ''}${vital.deltaFromBaseline}${vital.unit} vs 14d mean`
+                  : vital.recorded !== null ? '14d mean unavailable' : 'not recorded'}
+              </div>
+            </div>
+          ))}
+        </div>
+        <div className="mt-3 flex items-center justify-between rounded-xl bg-brand-50 px-3 py-2 text-xs text-brand-dark">
+          <span>Recorded training load today</span>
+          <span className="font-bold">{snapshot.hasWorkoutToday ? `${snapshot.todayLoad} RPE·min` : 'none logged'}</span>
+        </div>
+        <p className="mt-2 text-[10px] leading-relaxed text-neutral-500">
+          This glance view only restates values already recorded below and their arithmetic delta against your own 14-day mean. It is not a readiness, recovery or stress score.
+        </p>
       </Card>
 
       <Card className="!p-5">
