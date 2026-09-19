@@ -42,6 +42,16 @@ export interface CommandBarInput {
   pointerY: number | null
   /** Benar bila fokus papan ketik sedang berada di dalam bilah. */
   focusWithin: boolean
+  /**
+   * Benar bila pengguna baru saja MENGETUK pita tangkap di tepi atas.
+   *
+   * Sentuhan tidak punya hover: `pointerY` selalu null untuk jari, jadi pada
+   * ponsel satu-satunya cara memanggil bilah kembali adalah menggulir ke atas.
+   * Padahal ketukan di tepi atas adalah isyarat yang paling langsung dan yang
+   * memang diminta. Ini jalurnya — sekali ketuk menampilkan, dan gulir ke
+   * bawah berikutnya menyembunyikannya lagi seperti biasa.
+   */
+  tapAtTop?: boolean
 }
 
 /**
@@ -56,6 +66,7 @@ export function nextCommandBarState(
   thresholds: CommandBarThresholds = DEFAULT_COMMAND_BAR_THRESHOLDS,
 ): CommandBarState {
   if (input.focusWithin) return 'shown'
+  if (input.tapAtTop) return 'shown'
   if (input.scrollY <= thresholds.alwaysVisibleBelowPx) return 'shown'
   if (input.pointerY !== null && input.pointerY <= thresholds.revealZonePx) return 'shown'
 

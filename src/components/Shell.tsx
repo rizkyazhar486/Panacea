@@ -645,6 +645,7 @@ export function Shell({ children }: { children: ReactNode }) {
           tombolnya diketuk; tidak ada satu pun yang dihapus. */}
       {['pasien', 'dokter', 'owner'].includes(account.role) && (
         <FabNavigasi
+          tersembunyi={keadaanBilah === 'hidden'}
           tujuan={[
             { to: '/', label: 'Home', ikon: <IconHome size={19} />, end: true },
             { to: '/community', label: 'Community', ikon: <IconUsers size={19} /> },
