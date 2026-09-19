@@ -25,7 +25,7 @@ assert.doesNotMatch(training, /<FightHero/)
 assert.doesNotMatch(training, /Collects age, height, weight, goal, equipment, injuries and restrictions first/)
 
 assert.match(index, /shell-mobile-compact-v49\.css\?v=20260918-1/)
-assert.match(index, /panacea-ruthless-simple-v50\.css\?v=20260919-1/)
+assert.match(index, /panacea-ruthless-simple-v50\.css\?v=20260919-2/)
 assert.ok(index.indexOf('panacea-ruthless-simple-v50.css') > index.indexOf('panacea-shell-mobile-compact-v49.css'))
 assert.match(index, /MAINTENANCE_VERSION = '20260919-v50'/)
 

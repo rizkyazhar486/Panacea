@@ -228,6 +228,36 @@ const KATALOG: Nav[] = [
   { to: '/atur-fitur', label: 'Manage Features', icon: IconSettings, roles: ['pasien', 'dokter', 'owner'], group: 'Account' },
   { to: '/settings', label: 'Settings', icon: IconSettings, roles: ALL, group: 'Account' },
   { to: '/legal', label: 'Legal', icon: IconShield, roles: ALL, group: 'Account' },
+
+  // Ke-21 tujuan berikut sudah terpasang sebagai rute dan berfungsi, tetapi
+  // tidak pernah masuk katalog mana pun — sehingga satu-satunya cara membukanya
+  // adalah mengetik URL-nya sendiri. Di antaranya ada empat pusat penuh (Gizi,
+  // Jiwa, Catatan, Rujukan) dan layar Overview yang merangkum seluruh angka
+  // tubuh. Labelnya diambil apa adanya dari judul tiap halaman dan dari
+  // katalogFitur, bukan ditulis ulang, agar tidak ada nama yang berubah makna.
+  // Penjaganya: scripts/uji/jangkauan-dua-ketukan.mts.
+  { to: '/ikhtisar', label: 'Overview', icon: IconChartUp, roles: ['pasien', 'dokter', 'owner'], group: 'Your Body' },
+  { to: '/harian', label: 'Daily', icon: IconChartUp, roles: ['pasien', 'dokter', 'owner'], group: 'Your Body' },
+  { to: '/body', label: 'Body Composition', icon: IconActivity, roles: ['pasien', 'dokter', 'owner'], group: 'Your Body' },
+  { to: '/how-numbers-work', label: 'How your numbers work', icon: IconBook, roles: ['pasien', 'dokter', 'owner'], group: 'Your Body' },
+  { to: '/gizi', label: 'Nutrition Centre', icon: IconFood, roles: ['pasien', 'dokter', 'owner'], group: 'Health' },
+  { to: '/jiwa', label: 'Mind Centre', icon: IconHeart, roles: ['pasien', 'dokter', 'owner'], group: 'Health' },
+  { to: '/catatan', label: 'Records Centre', icon: IconEMR, roles: ['pasien', 'dokter', 'owner'], group: 'Health' },
+  { to: '/rujukan', label: 'Reference Centre', icon: IconBook, roles: ['pasien', 'dokter', 'owner'], group: 'Learn & Look Up' },
+  { to: '/assessment', label: 'Initial Assessment', icon: IconActivity, roles: ['pasien', 'dokter'], group: 'Fitness' },
+  { to: '/athlete-board', label: 'Athlete board', icon: IconRun, roles: ['pasien', 'dokter'], group: 'Fitness' },
+  { to: '/dive-log', label: 'Dive log', icon: IconActivity, roles: ['pasien', 'dokter'], group: 'Fitness' },
+  { to: '/translator', label: 'Medical Translator', icon: IconBook, roles: ALL, group: 'Learn & Look Up' },
+  { to: '/clinical-scores', label: 'Clinical Scores', icon: IconStethoscope, roles: ['pasien', 'dokter', 'owner'], group: 'Calculators & Labs' },
+  { to: '/news2-score', label: 'NEWS2', icon: IconStethoscope, roles: ['dokter', 'owner'], group: 'Calculators & Labs' },
+  { to: '/aa-gradient', label: 'A-a Gradient', icon: IconStethoscope, roles: ['dokter', 'owner'], group: 'Calculators & Labs' },
+  { to: '/ottawa-ankle', label: 'Ottawa Ankle Rules', icon: IconStethoscope, roles: ['dokter', 'owner'], group: 'Calculators & Labs' },
+  { to: '/psychiatric-status-exam', label: 'Psychiatric Status Exam', icon: IconStethoscope, roles: ['dokter', 'owner'], group: 'Calculators & Labs' },
+  { to: '/sexual-health', label: 'Sexual Health & OB-GYN', icon: IconHeart, roles: ['pasien', 'dokter', 'owner'], group: 'Health' },
+  { to: '/longevity-curriculum', label: 'Longevity Curriculum', icon: IconBook, roles: ['pasien', 'dokter', 'owner'], group: 'Longevity' },
+  { to: '/ringkasan-karya', label: 'Reading Summary', icon: IconBook, roles: ALL, group: 'Content' },
+  { to: '/prophet-stories', label: 'Stories of the prophets', icon: IconBook, roles: ALL, group: 'Account' },
+  { to: '/notifikasi', label: 'Notification Centre', icon: IconBell, roles: ALL, group: 'Account' },
 ]
 
 // Diisi dari KATALOG, bukan dari `nav`: menu hanya memuat tujuan harian,

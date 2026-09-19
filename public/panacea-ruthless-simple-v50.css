@@ -205,8 +205,23 @@ main :where(p, li, dd, figcaption):not(
   color: var(--pmd-simple-muted);
 }
 
-/* One clean dialog layer: no nested glass. */
-:where(dialog, [role='dialog']) {
+/* One clean dialog layer: no nested glass.
+
+   PENTING — kecualikan tirai layar-penuh. Di aplikasi ini `role="dialog"`
+   dipasang pada elemen TIRAI (`fixed inset-0 bg-black/60`), bukan pada panel
+   di dalamnya; keenam dialog yang ada semuanya berpola begitu. Tanpa
+   pengecualian ini aturan di bawah mengecat seluruh viewport dengan warna
+   permukaan terang dan `!important`, sehingga: latar gelap transparannya
+   hilang dan berganti putih pekat, halaman di belakangnya tidak lagi teredup,
+   dan muncul bingkai serta bayangan mengelilingi layar. Hasilnya modal tampak
+   terpotong separuh dengan bidang putih kosong besar di bawahnya — persis
+   yang terlihat pada pencarian global di 390x844.
+
+   Dicocokkan lewat `inset-0` karena itulah penanda tirai yang benar-benar
+   dipakai keenam komponen, jadi tirai baru pun ikut aman tanpa perlu menandai
+   apa pun. Panel di dalam tirai sudah membawa latarnya sendiri.
+   Penjaganya: scripts/uji/tirai-dialog-tidak-dicat.mts. */
+:where(dialog, [role='dialog']):not([class*='inset-0']) {
   background: var(--pmd-simple-surface) !important;
   background-image: none !important;
   border: 1px solid var(--pmd-simple-line-strong) !important;

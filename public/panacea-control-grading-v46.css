@@ -111,7 +111,14 @@ html.pmd-liquid-actions-v45 :where(
   isolation: isolate;
   overflow: hidden;
   border-color: rgba(255,255,255,.10) !important;
-  color: var(--pmd-ref-white);
+  /* Kebalikan persis dari kasus mode terang di bawah, dan sama merusaknya:
+     latar grafit gelap dipaksa dengan `!important`, jadi tombol ini SELALU
+     gelap. Tanpa `!important` pada tintanya, utility teks gelap dari komponen
+     (`text-ink`, `text-neutral-900`, dan sejenisnya) tetap menang, dan hasilnya
+     tulisan gelap di atas kartu gelap. Satu aturan untuk kedua arah: yang
+     memaksa latar harus ikut memaksa tintanya.
+     Penjaganya: scripts/uji/kontras-kendali-terang.mts. */
+  color: var(--pmd-ref-white) !important;
   background:
     radial-gradient(130% 120% at 18% -22%, rgba(255,255,255,.10), transparent 48%),
     linear-gradient(180deg, var(--pmd-ref-graphite), var(--pmd-ref-deep)) !important;
@@ -133,7 +140,16 @@ html:not(.dark).pmd-liquid-actions-v45 :where(
   input[type='reset']
 ) {
   border-color: rgba(13,39,26,.07) !important;
-  color: #18221d;
+  /* `!important` di sini WAJIB, dan bukan sekadar kerapian: latar di bawah
+     dipaksa dengan `!important`, sehingga tombol ini SELALU tergambar terang.
+     Ketika warna teksnya tidak ikut dipaksa, ia kalah dari utility seperti
+     `text-white` yang dipakai komponen berpermukaan gelap — dan pasangan
+     latar/teks terbelah: latar terang, teks putih, tulisannya hilang.
+     Itu benar-benar terjadi pada hasil pencarian global di mode terang, yang
+     panelnya `bg-slate-900` sehingga isinya memang memakai `text-white`.
+     Aturannya sederhana: yang memaksa latar harus ikut memaksa tintanya.
+     Penjaganya: scripts/uji/kontras-kendali-terang.mts. */
+  color: #18221d !important;
   background:
     radial-gradient(120% 120% at 18% -18%, rgba(255,255,255,.96), transparent 55%),
     linear-gradient(145deg, #f8f9f8, #e8eae9) !important;
@@ -142,6 +158,28 @@ html:not(.dark).pmd-liquid-actions-v45 :where(
     9px 10px 24px rgba(13,39,26,.08),
     inset -12px -12px 34px rgba(255,255,255,.30),
     inset 10px 10px 30px rgba(13,39,26,.045) !important;
+}
+
+/* Memaksa `color` pada TOMBOLNYA saja ternyata belum cukup, dan alasannya
+   mudah terlewat: warna teks itu diwariskan, dan pewarisan kalah oleh nilai
+   eksplisit di anak — berapa pun `!important`-nya. Label hasil pencarian
+   ditulis `<span class="text-white">` di dalam tombol, jadi ia tetap putih di
+   atas kartu terang meski tombolnya sudah bertinta gelap.
+
+   Karena lapisan ini mengambil alih material tombol, ia harus mengambil alih
+   tintanya sampai ke elemen teks di dalamnya. Dibatasi ke elemen pembawa teks
+   (bukan `*`) supaya lencana, titik status dan ikon berwarna di dalam tombol
+   tidak ikut diratakan. */
+html.pmd-liquid-actions-v45 :where(
+  button[class*='rounded'],
+  button[class*='kaca'],
+  button[class*='bg-'],
+  button[class*='border'],
+  input[type='button'],
+  input[type='submit'],
+  input[type='reset']
+) :where(span, small, strong, b, em, i, label, p) {
+  color: inherit !important;
 }
 
 /* Primary/brand buttons become the clean green focal action from the reference.
