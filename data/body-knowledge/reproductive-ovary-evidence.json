@@ -1,0 +1,87 @@
+{
+  "version": 1,
+  "updatedAt": "2026-09-19",
+  "system": "reproductive",
+  "organ": "ovary",
+  "scope": "Educational organ-specific Body Exposure knowledge seed. This record supports general ovarian anatomy/physiology relationships only; it does not establish patient-specific anatomy, fertility status, ovarian reserve, diagnosis, prognosis, treatment, dose, procedural targeting, clinical efficacy, academic validation, or human review.",
+  "relationships": [
+    {
+      "id": "ovarian-follicle-development",
+      "domain": "anatomy-physiology",
+      "from": "primordial-follicle",
+      "to": "antral-and-preovulatory-follicle",
+      "relationship": "develops-through-folliculogenesis",
+      "claim": "Ovarian follicles progress through regulated developmental stages involving communication between the oocyte and surrounding somatic cells; antral follicle development becomes dependent on pituitary gonadotropins.",
+      "evidence": ["pmid:27300179", "pmid:25202833"],
+      "status": "source-checked"
+    },
+    {
+      "id": "gonadotropin-follicle-regulation",
+      "domain": "physiology",
+      "from": "pituitary-gonadotropins",
+      "to": "antral-follicles",
+      "relationship": "supports-follicular-development",
+      "claim": "FSH and LH participate in regulation of antral follicle development, while local intraovarian signaling also contributes to follicular growth and maturation.",
+      "evidence": ["pmid:27300179", "pmid:25202833"],
+      "status": "source-checked"
+    },
+    {
+      "id": "dominant-follicle-ovulation",
+      "domain": "physiology",
+      "from": "dominant-follicle",
+      "to": "ovulation-and-corpus-luteum",
+      "relationship": "can-progress-to-ovulation-and-luteinization",
+      "claim": "During a typical ovulatory cycle, a dominant follicle may reach the preovulatory stage and ovulate; remaining follicular somatic cells then differentiate to form the corpus luteum.",
+      "evidence": ["pmid:22068695", "pmid:27300179"],
+      "status": "source-checked"
+    }
+  ],
+  "sources": [
+    {
+      "id": "pmid:22068695",
+      "pmid": "22068695",
+      "title": "Ovarian antral folliculogenesis during the human menstrual cycle: a review.",
+      "year": 2012,
+      "url": "https://pubmed.ncbi.nlm.nih.gov/22068695/",
+      "evidenceRole": "Review of human antral follicle recruitment, dominant follicle selection and ovulatory-cycle follicular dynamics.",
+      "sourceType": "review"
+    },
+    {
+      "id": "pmid:27300179",
+      "pmid": "27300179",
+      "title": "Ovarian Folliculogenesis.",
+      "year": 2016,
+      "url": "https://pubmed.ncbi.nlm.nih.gov/27300179/",
+      "evidenceRole": "Review of follicle development, oocyte-somatic communication, gonadotropin dependence, ovulation and corpus-luteum formation.",
+      "sourceType": "review"
+    },
+    {
+      "id": "pmid:25202833",
+      "pmid": "25202833",
+      "title": "Intraovarian control of early folliculogenesis.",
+      "year": 2015,
+      "url": "https://pubmed.ncbi.nlm.nih.gov/25202833/",
+      "evidenceRole": "Review of FSH and local intraovarian signaling in preantral and antral follicular growth.",
+      "sourceType": "review"
+    }
+  ],
+  "provenanceBoundary": {
+    "sourceCheckedMeans": "The cited PubMed record was retrieved and its metadata and abstract were checked for the scoped educational relationship.",
+    "sourceCheckedDoesNotMean": [
+      "guideline-recommended",
+      "clinically-validated-feature",
+      "human-reviewed-in-panacea",
+      "patient-specific",
+      "asset-license-cleared",
+      "diagnostic-or-treatment-advice",
+      "fertility-or-ovarian-reserve-assessment"
+    ],
+    "forbiddenInferences": [
+      "generic-atlas-to-patient-specific-anatomy",
+      "educational-relationship-to-diagnosis",
+      "review-citation-to-treatment-recommendation",
+      "source-checked-to-human-reviewed",
+      "generic-folliculogenesis-to-individual-fertility"
+    ]
+  }
+}
