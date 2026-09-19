@@ -6,6 +6,8 @@ import {
   endVisit,
   ingestVisitDeviceObservation,
   promoteObservationToClinicalRecord,
+  reconcileVisitDeviceLiveness,
+  revokeVisitClinicalConsent,
   registerMedicalDevice,
   setMedicalDeviceConnection,
   startVisit,
@@ -213,3 +215,44 @@ assert.throws(
 )
 
 console.log('Visit OS verified: WebRTC metadata boundary, continuous device ingest, consent/identity/unit/quality gates, unknown-quality live context, freshness formula, uncommitted AI-EMR context, and clinician-reviewed promotion.')
+
+
+const reliabilityBase = createVisitOperatingSession({
+  visitId: 'visit-reliability',
+  subjectId: 'patient-reliability',
+  clinicianId: 'doctor-001',
+  createdAt: '2026-09-18T11:00:00.000Z',
+  consent,
+})
+let reliabilityState = registerMedicalDevice(reliabilityBase, {
+  id: 'monitor-1',
+  label: 'Bedside monitor',
+  deviceClass: 'vital-signs-monitor',
+  evidenceClass: 'clinical',
+  transport: 'local-network',
+  supports: ['heart-rate'],
+}, '2026-09-18T11:00:05.000Z')
+reliabilityState = startVisit(reliabilityState, '2026-09-18T11:00:10.000Z')
+reliabilityState = setMedicalDeviceConnection(reliabilityState, 'monitor-1', 'live', '2026-09-18T11:00:20.000Z')
+
+const degraded = reconcileVisitDeviceLiveness(reliabilityState, '2026-09-18T11:02:21.000Z')
+assert.equal(degraded.devices['monitor-1'].status, 'degraded', 'device should degrade after >120 s without transport activity')
+
+const offline = reconcileVisitDeviceLiveness(reliabilityState, '2026-09-18T11:05:21.000Z')
+assert.equal(offline.devices['monitor-1'].status, 'offline', 'device should become offline after >5 min without transport activity')
+
+const revoked = revokeVisitClinicalConsent(reliabilityState, '2026-09-18T11:01:00.000Z')
+assert.equal(revoked.phase, 'consent-required')
+assert.equal(revoked.consent.clinicalData.revokedAt, '2026-09-18T11:01:00.000Z')
+assert.equal(revoked.media.camera, 'off')
+assert.equal(revoked.media.microphone, 'off')
+assert.equal(revoked.media.ambientAi, 'disabled')
+assert.equal(revoked.devices['monitor-1'].status, 'offline')
+assert.throws(
+  () => resumeVisit({ ...revoked, phase: 'paused' }, '2026-09-18T11:01:05.000Z'),
+  /active clinical \+ media consent is required/,
+)
+assert.throws(
+  () => revokeVisitClinicalConsent(reliabilityState, '2026-09-18T09:59:00.000Z'),
+  /must not be earlier than consent grant/,
+)
