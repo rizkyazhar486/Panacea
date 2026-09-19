@@ -9,6 +9,7 @@ import {
 } from '../lib/bodySystemSourceWave'
 import { body3dPixelRatio } from '../lib/body3dQuality'
 import { createBodyRenderScheduler } from '../lib/bodyRenderScheduler'
+import { createBodyWebglContextLifecycle } from '../lib/bodyWebglContextLifecycle'
 import { bodySemanticScaleFromRelativeZoom, type BodySemanticScale } from '../lib/bodySemanticZoom'
 import { muatAtlas, namaAtlas } from '../lib/anatomy/pemuatAtlas'
 
@@ -255,9 +256,10 @@ export default function BodyAllSystems3D({
     let disposed = false
     let inViewport = true
     let documentVisible = !document.hidden
+    let contextAvailable = true
 
     const renderScheduler = createBodyRenderScheduler({
-      canRender: () => !disposed && inViewport && documentVisible,
+      canRender: () => !disposed && inViewport && documentVisible && contextAvailable,
       requestFrame: (callback) => requestAnimationFrame(callback),
       cancelFrame: (frameId) => cancelAnimationFrame(frameId),
       renderFrame: () => {
@@ -269,6 +271,23 @@ export default function BodyAllSystems3D({
     })
     const requestRender = () => renderScheduler.request()
     const stop = () => renderScheduler.stop()
+    const contextLifecycle = createBodyWebglContextLifecycle({
+      onLost: () => {
+        contextAvailable = false
+        stop()
+        setLoading(false)
+        setError('Graphics context was lost. The 3D atlas is paused until this device restores it.')
+      },
+      onRestored: () => {
+        contextAvailable = true
+        setError('')
+        requestRender()
+      },
+    })
+    const onContextLost = (event: Event) => contextLifecycle.handleLost(event)
+    const onContextRestored = () => contextLifecycle.handleRestored()
+    renderer.domElement.addEventListener('webglcontextlost', onContextLost)
+    renderer.domElement.addEventListener('webglcontextrestored', onContextRestored)
 
     const resolvedByFile = new Map<string, Set<string>>()
     const contextNamesByFile = new Map<string, Set<string>>()
@@ -448,6 +467,9 @@ export default function BodyAllSystems3D({
       controls.removeEventListener('change', onControlChange)
       renderer.domElement.removeEventListener('pointerdown', onPointerDown)
       renderer.domElement.removeEventListener('pointerup', onPointerUp)
+      renderer.domElement.removeEventListener('webglcontextlost', onContextLost)
+      renderer.domElement.removeEventListener('webglcontextrestored', onContextRestored)
+      contextLifecycle.dispose()
       selectionApplierRef.current = null
       controls.dispose()
       projectedGroups.forEach(disposeProjectedMaterials)
