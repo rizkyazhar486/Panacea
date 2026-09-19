@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-09-19T06:44:01.561Z",
+  "updatedAt": "2026-09-19T06:44:43.881Z",
   "items": {
     "ff-health-profile-export": {
       "status": "done",
@@ -302,7 +302,7 @@
     },
     "ff-medical-education-search": {
       "status": "done",
-      "commit": null,
+      "commit": "030508640d891557154bd4e6dbdc555d276e4c53",
       "paths": [
         "src/lib/knowledgeBridgeMap.ts",
         "src/components/KnowledgeBridgeWorkbench.tsx",
@@ -314,9 +314,14 @@
         "sourceBasis": [],
         "aiUse": "ai-assisted",
         "note": "This candidate adds a deterministic local ranking/indexing layer over the already-curated topic registry; it introduces no new biomedical factual, quantitative, causal, diagnostic or treatment claim, and does not change which curated stage text is shown for any topic.",
-        "humanReview": { "status": "not-recorded", "reviewer": null, "credentials": null, "reviewedAt": null }
+        "humanReview": {
+          "status": "not-recorded",
+          "reviewer": null,
+          "credentials": null,
+          "reviewedAt": null
+        }
       },
-      "updatedAt": "2026-09-19T06:44:01.561Z"
+      "updatedAt": "2026-09-19T06:44:43.881Z"
     },
     "ff-recovery-stress-checklist": {
       "status": "done",
