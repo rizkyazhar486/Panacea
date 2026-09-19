@@ -90,21 +90,33 @@ const signal = validateVisitRealtimeSignalEnvelope({
   sequence: 0,
   sentAt: '2026-09-19T08:30:00Z',
   payload: { sdp: 'fixture' },
-}, patient)
+}, patient, 64 * 1024, '2026-09-19T08:30:30Z')
 assert.equal(signal.visitId, 'visit-1')
 
 assert.throws(
-  () => validateVisitRealtimeSignalEnvelope({ ...signal, visitId: 'visit-2' }, patient),
+  () => validateVisitRealtimeSignalEnvelope(
+    { ...signal, visitId: 'visit-2' },
+    patient,
+    64 * 1024,
+    '2026-09-19T08:30:30Z',
+  ),
   /authorized visit/,
 )
 assert.throws(
-  () => validateVisitRealtimeSignalEnvelope({ ...signal, sequence: -1 }, patient),
+  () => validateVisitRealtimeSignalEnvelope(
+    { ...signal, sequence: -1 },
+    patient,
+    64 * 1024,
+    '2026-09-19T08:30:30Z',
+  ),
   /non-negative safe integer/,
 )
 assert.throws(
   () => validateVisitRealtimeSignalEnvelope(
     { ...signal, payload: { huge: 'x'.repeat(70 * 1024) } },
     patient,
+    64 * 1024,
+    '2026-09-19T08:30:30Z',
   ),
   /maximum payload size/,
 )
