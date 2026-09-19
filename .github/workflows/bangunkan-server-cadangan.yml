@@ -1,0 +1,52 @@
+# Redundant wake path for the free notification server.
+#
+# GitHub scheduled workflows are best-effort and can occasionally skip or delay
+# a run without producing a job failure. The primary wake workflow runs every
+# ten minutes during the app's active WIB window; this second workflow is
+# staggered by five minutes and has its own concurrency group.
+#
+# It reads the exact same repository variables/secrets as bangunkan-server.yml:
+# SERVER_URL first, then VITE_API_URL. No second endpoint configuration is
+# required. A missing endpoint exits successfully rather than creating noisy
+# failures every few minutes.
+
+name: Bangunkan server (cadangan)
+
+on:
+  schedule:
+    # 04.05-22.55 WIB, staggered five minutes from the primary schedule.
+    - cron: '5-55/10 21-23,0-16 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: bangunkan-server-cadangan
+  cancel-in-progress: false
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Sentuh /api/health
+        env:
+          SERVER_URL: ${{ vars.SERVER_URL }}
+          SERVER_URL_SECRET: ${{ secrets.SERVER_URL }}
+          VITE_API_URL: ${{ vars.VITE_API_URL }}
+          VITE_API_URL_SECRET: ${{ secrets.VITE_API_URL }}
+        run: |
+          alamat="${SERVER_URL:-${SERVER_URL_SECRET:-${VITE_API_URL:-$VITE_API_URL_SECRET}}}"
+          if [ -z "$alamat" ]; then
+            echo "Tidak ada VITE_API_URL maupun SERVER_URL di repositori ini; berhenti tanpa menjadi gagal."
+            exit 0
+          fi
+          echo "Menyentuh: ${alamat%/}/api/health"
+          kode=$(curl -s -o /tmp/jawab.json -w '%{http_code}' --max-time 90 "${alamat%/}/api/health" || echo 000)
+          echo "HTTP $kode"
+          head -c 400 /tmp/jawab.json || true
+          echo
+          if [ "$kode" != "200" ]; then
+            echo "::warning::Server belum menjawab 200 (kode $kode). Jalur utama/cadangan akan mencoba lagi."
+          fi
