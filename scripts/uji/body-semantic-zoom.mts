@@ -5,6 +5,7 @@ import {
   bodySemanticScaleFromRelativeZoom,
   getBodySemanticZoomStop,
   isMicroscopicBodyScale,
+  resolveBodySemanticRepresentation,
 } from '../../src/lib/bodySemanticZoom.ts'
 
 assert.deepEqual(BODY_SEMANTIC_ZOOM_STOPS.map((stop) => stop.id), [
@@ -24,6 +25,45 @@ assert.equal(bodySemanticScaleFromRelativeZoom(140), 'genome')
 assert.equal(getBodySemanticZoomStop('tissue').literalGrossSpatialContinuity, false)
 assert.equal(isMicroscopicBodyScale('organ'), false)
 assert.equal(isMicroscopicBodyScale('cell'), true)
+
+const grossOnly = {
+  'whole-body': { state: 'available', sourceId: 'atlas:whole', version: '2026-09' },
+  system: { state: 'available', sourceId: 'atlas:system', version: '2026-09' },
+  organ: { state: 'available', sourceId: 'atlas:organ', version: '2026-09' },
+} as const
+assert.deepEqual(resolveBodySemanticRepresentation('genome', grossOnly), {
+  requestedScale: 'genome',
+  resolvedScale: 'organ',
+  blocked: true,
+  reason: 'missing-source-asset',
+})
+assert.deepEqual(resolveBodySemanticRepresentation('tissue', {
+  ...grossOnly,
+  tissue: { state: 'available' },
+}), {
+  requestedScale: 'tissue',
+  resolvedScale: 'organ',
+  blocked: true,
+  reason: 'missing-provenance',
+})
+assert.deepEqual(resolveBodySemanticRepresentation('cell', {
+  ...grossOnly,
+  tissue: { state: 'available', sourceId: 'histology:tissue', version: 'v1' },
+  cell: { state: 'available', sourceId: 'cell-atlas:cell', version: 'v2' },
+}), {
+  requestedScale: 'cell',
+  resolvedScale: 'cell',
+  blocked: false,
+})
+assert.deepEqual(resolveBodySemanticRepresentation('tissue', {
+  ...grossOnly,
+  tissue: { state: 'failed', sourceId: 'histology:tissue', version: 'v1' },
+}), {
+  requestedScale: 'tissue',
+  resolvedScale: 'organ',
+  blocked: true,
+  reason: 'source-load-failed',
+})
 
 const atlas = readFileSync(new URL('../../src/components/BodyAllSystems3D.tsx', import.meta.url), 'utf8')
 assert.match(atlas, /fittedCameraDistance \/ cameraDistance/)
