@@ -8,6 +8,7 @@ import {
   type BodySystemId,
 } from '../lib/bodySystemSourceWave'
 import { body3dPixelRatio } from '../lib/body3dQuality'
+import { createBodyRenderScheduler } from '../lib/bodyRenderScheduler'
 import { bodySemanticScaleFromRelativeZoom, type BodySemanticScale } from '../lib/bodySemanticZoom'
 import { muatAtlas, namaAtlas } from '../lib/anatomy/pemuatAtlas'
 
@@ -252,37 +253,22 @@ export default function BodyAllSystems3D({
     let lastSemanticScale: BodySemanticScale = 'whole-body'
     let lastRelativeZoom = 1
     let disposed = false
-    let raf = 0
     let inViewport = true
     let documentVisible = !document.hidden
 
-    const renderFrame = () => {
-      if (disposed || !inViewport || !documentVisible) return
-      controls.update()
-      renderer.render(scene, camera)
-    }
-    const renderLoop = () => {
-      raf = 0
-      if (disposed || !inViewport || !documentVisible) return
-      renderFrame()
-      raf = requestAnimationFrame(renderLoop)
-    }
-    const requestRender = () => {
-      if (disposed || !inViewport || !documentVisible) return
-      if (mobile) {
-        if (raf) return
-        raf = requestAnimationFrame(() => {
-          raf = 0
-          renderFrame()
-        })
-      } else if (!raf) {
-        raf = requestAnimationFrame(renderLoop)
-      }
-    }
-    const stop = () => {
-      if (raf) cancelAnimationFrame(raf)
-      raf = 0
-    }
+    const renderScheduler = createBodyRenderScheduler({
+      canRender: () => !disposed && inViewport && documentVisible,
+      requestFrame: (callback) => requestAnimationFrame(callback),
+      cancelFrame: (frameId) => cancelAnimationFrame(frameId),
+      renderFrame: () => {
+        // OrbitControls emits another change while damping is still settling,
+        // which requests only the next necessary frame.
+        controls.update()
+        renderer.render(scene, camera)
+      },
+    })
+    const requestRender = () => renderScheduler.request()
+    const stop = () => renderScheduler.stop()
 
     const resolvedByFile = new Map<string, Set<string>>()
     const contextNamesByFile = new Map<string, Set<string>>()
@@ -455,7 +441,7 @@ export default function BodyAllSystems3D({
 
     return () => {
       disposed = true
-      stop()
+      renderScheduler.dispose()
       io.disconnect()
       ro.disconnect()
       document.removeEventListener('visibilitychange', onVisibility)
