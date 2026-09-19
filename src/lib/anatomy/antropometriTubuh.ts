@@ -298,8 +298,16 @@ function kerangka(tinggiM: number, jenisKelamin: 'L' | 'P'): { torso: Penampang[
     { nama: 'dada', y: P.tinggiDada * H, a: 0.100 * H * KAL_TORSO * bahu, b: 0.075 * H * KAL_TORSO },
     { nama: 'bahu', y: P.tinggiBahu * H, a: (P.lebarBahu / 2) * H * KAL_TORSO * bahu, b: 0.068 * H * KAL_TORSO },
     { nama: 'leher', y: 0.850 * H, a: 0.035 * H * KAL_TORSO, b: 0.035 * H * KAL_TORSO },
-    { nama: 'kepala-tengah', y: 0.935 * H, a: 0.048 * H * KAL_TORSO, b: 0.052 * H * KAL_TORSO },
-    { nama: 'puncak-kepala', y: 1.0 * H, a: 0.012 * H * KAL_TORSO, b: 0.013 * H * KAL_TORSO },
+    // TENGKORAK MEMBULAT, bukan kerucut. Versi pertama melompat dari 0.048H di
+    // tengah kepala langsung ke 0.012H di puncak, yang menghasilkan ubun-ubun
+    // lancip — dan menutup ujungnya tidak menolong, karena kubah di atas
+    // kerucut tetap terbaca sebagai kerucut. Lebar kepala memuncak di sekitar
+    // 0.93H lalu menyusut perlahan; tinggi kepala 0.130H pada tabel Drillis &
+    // Contini konsisten dengan kepala yang bermula di sekitar 0.87H.
+    { nama: 'rahang', y: 0.880 * H, a: 0.044 * H * KAL_TORSO, b: 0.048 * H * KAL_TORSO },
+    { nama: 'kepala-tengah', y: 0.930 * H, a: 0.050 * H * KAL_TORSO, b: 0.054 * H * KAL_TORSO },
+    { nama: 'kepala-atas', y: 0.972 * H, a: 0.044 * H * KAL_TORSO, b: 0.047 * H * KAL_TORSO },
+    { nama: 'puncak-kepala', y: 1.0 * H, a: 0.026 * H * KAL_TORSO, b: 0.028 * H * KAL_TORSO },
   ]
 
   // SATU tungkai. Lebarnya kira-kira separuh lebar tubuh bawah, karena ada dua.
@@ -483,10 +491,16 @@ export interface MeshTubuh {
  */
 export function bangunMeshTubuh(
   sumber: BentukTubuh | Penampang[],
-  opsi: { segmen?: number; sisipan?: number } = {},
+  opsi: { segmen?: number; sisipan?: number; tutupUjung?: boolean; tutupAtas?: boolean; tutupBawah?: boolean } = {},
 ): MeshTubuh {
   const segmen = Math.max(8, Math.floor(opsi.segmen ?? 48))
   const sisipan = Math.max(0, Math.floor(opsi.sisipan ?? 5))
+  // Kendali per-ujung. Batang tubuh perlu ATAS tertutup supaya ubun-ubun
+  // membulat alih-alih meruncing seperti kerucut, tetapi BAWAH harus tetap
+  // terbuka karena di situlah tungkai menyambung. `tutupUjung` menutup
+  // keduanya dan tetap ada untuk anggota badan.
+  const tutupBawah = opsi.tutupBawah ?? opsi.tutupUjung ?? false
+  const tutupAtas = opsi.tutupAtas ?? opsi.tutupUjung ?? false
 
   // Menerima bentuk utuh (batang tubuh) atau daftar penampang apa adanya,
   // supaya tungkai dapat di-loft dengan kode yang sama persis dan tidak ada
@@ -511,6 +525,32 @@ export function bangunMeshTubuh(
     }
   }
   cincin.push({ ...dasar[dasar.length - 1] })
+
+  // TUTUP UJUNG. Tabung ter-loft ujungnya terbuka, jadi anggota badan berakhir
+  // sebagai tepi datar yang terlihat seperti potongan. Ditutup dengan beberapa
+  // cincin yang mengecil mengikuti seperempat elips, sehingga ujungnya
+  // membulat alih-alih rata — dan normalnya tetap mulus karena cincinnya
+  // dibangun oleh jalur yang sama, bukan oleh geometri kedua.
+  if (tutupBawah || tutupAtas) {
+    const LANGKAH_TUTUP = 4
+    const kubah = (acuan: { y: number; a: number; b: number }, arah: -1 | 1) => {
+      const out: { y: number; a: number; b: number }[] = []
+      const tinggiKubah = Math.min(acuan.a, acuan.b) * 0.9
+      for (let i = 1; i <= LANGKAH_TUTUP; i++) {
+        const t = i / LANGKAH_TUTUP
+        // Seperempat elips: jari-jari menyusut sebagai cos, tinggi sebagai sin.
+        const sk = Math.cos((t * Math.PI) / 2)
+        out.push({
+          y: acuan.y + arah * tinggiKubah * Math.sin((t * Math.PI) / 2),
+          a: Math.max(1e-4, acuan.a * sk),
+          b: Math.max(1e-4, acuan.b * sk),
+        })
+      }
+      return out
+    }
+    if (tutupAtas) cincin.push(...kubah(cincin[cincin.length - 1], 1))
+    if (tutupBawah) cincin.unshift(...kubah(cincin[0], -1).reverse())
+  }
 
   const posisi = new Float32Array(cincin.length * segmen * 3)
   let k = 0

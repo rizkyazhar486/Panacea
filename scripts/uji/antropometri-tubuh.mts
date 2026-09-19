@@ -330,6 +330,119 @@ for (const kasus of KASUS) {
   )
 }
 
+// ── TUTUP UJUNG: anggota badan tidak boleh berakhir sebagai tepi datar.
+//
+// Tabung ter-loft ujungnya terbuka. Pada lengan itu terlihat langsung sebagai
+// potongan rata di puncak, dan pada tungkai sebagai kaki tanpa ujung. Uji ini
+// memeriksa ujungnya benar-benar MENGECIL ke satu titik, bukan sekadar
+// bertambah cincin.
+{
+  const bentuk = selesaikanBentukTubuh({ tinggiCm: 174, massaKg: 74 })
+  const terbuka = bangunMeshTubuh(bentuk.lengan, { segmen: 24, sisipan: 3 })
+  const tertutup = bangunMeshTubuh(bentuk.lengan, { segmen: 24, sisipan: 3, tutupUjung: true })
+
+  assert.ok(
+    tertutup.jumlahCincin > terbuka.jumlahCincin,
+    'tutupUjung tidak menambah cincin apa pun, jadi ujungnya tetap terbuka',
+  )
+
+  // Jari-jari cincin paling ujung harus jauh lebih kecil daripada cincin
+  // tubuh terdekatnya. Kalau tidak, "tutup" hanya memperpanjang tabung.
+  const jariCincin = (m: typeof tertutup, r: number) => {
+    let maks = 0
+    for (let s = 0; s < m.titikPerCincin; s++) {
+      const i = (r * m.titikPerCincin + s) * 3
+      maks = Math.max(maks, Math.hypot(m.posisi[i], m.posisi[i + 2]))
+    }
+    return maks
+  }
+  const ujungBawah = jariCincin(tertutup, 0)
+  const ujungAtas = jariCincin(tertutup, tertutup.jumlahCincin - 1)
+  const tengah = jariCincin(tertutup, Math.floor(tertutup.jumlahCincin / 2))
+  assert.ok(
+    ujungBawah < tengah * 0.25,
+    `cincin ujung bawah masih berjari-jari ${ujungBawah.toFixed(4)} m terhadap ${tengah.toFixed(4)} m di tengah — ujungnya belum menutup`,
+  )
+  assert.ok(
+    ujungAtas < tengah * 0.25,
+    `cincin ujung atas masih berjari-jari ${ujungAtas.toFixed(4)} m terhadap ${tengah.toFixed(4)} m di tengah — ujungnya belum menutup`,
+  )
+
+  // Tutup memanjangkan bentuk ke luar, bukan memakan ke dalam: rentang
+  // vertikalnya harus MELEBIHI versi terbuka di kedua arah.
+  const rentang = (m: typeof tertutup) => {
+    let lo = Infinity, hi = -Infinity
+    for (let i = 1; i < m.posisi.length; i += 3) { lo = Math.min(lo, m.posisi[i]); hi = Math.max(hi, m.posisi[i]) }
+    return { lo, hi }
+  }
+  const rt = rentang(tertutup), rb = rentang(terbuka)
+  assert.ok(rt.lo < rb.lo && rt.hi > rb.hi, 'tutup ujung tidak memanjang ke luar bentuk aslinya')
+
+  // Tetap geometri yang sah.
+  const titik = tertutup.posisi.length / 3
+  for (const idx of tertutup.indeks) assert.ok(idx < titik, 'indeks mesh bertutup di luar batas')
+  for (const v of tertutup.posisi) assert.ok(Number.isFinite(v), 'mesh bertutup memuat nilai bukan bilangan')
+
+  // Bawaan tetap TERBUKA.
+  assert.equal(
+    bangunMeshTubuh(bentuk.lengan, { segmen: 24, sisipan: 3 }).jumlahCincin,
+    terbuka.jumlahCincin,
+    'tutup ujung menyala tanpa diminta',
+  )
+
+  // KENDALI PER-UJUNG. Batang tubuh butuh ubun-ubun membulat tetapi
+  // selangkangannya HARUS tetap terbuka: di situlah tungkai menyambung, dan
+  // menutupnya akan menyisipkan kubah di dalam panggul.
+  const hanyaAtas = bangunMeshTubuh(bentuk.penampang, { segmen: 24, sisipan: 3, tutupAtas: true })
+  const polos = bangunMeshTubuh(bentuk.penampang, { segmen: 24, sisipan: 3 })
+  const bawahnya = (m: typeof polos) => {
+    let lo = Infinity
+    for (let i = 1; i < m.posisi.length; i += 3) lo = Math.min(lo, m.posisi[i])
+    return lo
+  }
+  const atasnya = (m: typeof polos) => {
+    let hi = -Infinity
+    for (let i = 1; i < m.posisi.length; i += 3) hi = Math.max(hi, m.posisi[i])
+    return hi
+  }
+  assert.ok(
+    Math.abs(bawahnya(hanyaAtas) - bawahnya(polos)) < 1e-9,
+    'tutupAtas ikut mengubah ujung bawah — selangkangan tidak lagi terbuka untuk tungkai',
+  )
+  assert.ok(
+    atasnya(hanyaAtas) > atasnya(polos),
+    'tutupAtas tidak membulatkan ubun-ubun',
+  )
+  // Dan ubun-ubunnya benar-benar mengecil, bukan sekadar lebih tinggi.
+  const jariPuncak = (() => {
+    let maks = 0
+    const r = hanyaAtas.jumlahCincin - 1
+    for (let s = 0; s < hanyaAtas.titikPerCincin; s++) {
+      const i = (r * hanyaAtas.titikPerCincin + s) * 3
+      maks = Math.max(maks, Math.hypot(hanyaAtas.posisi[i], hanyaAtas.posisi[i + 2]))
+    }
+    return maks
+  })()
+  assert.ok(jariPuncak < 0.01, `cincin ubun-ubun masih berjari-jari ${jariPuncak.toFixed(4)} m — kepala tetap terpotong rata`)
+
+  // BENTUK TENGKORAK, bukan hanya tutupnya.
+  //
+  // Asersi di atas memeriksa cincin SETELAH ditutup, dan cincin itu selalu
+  // kecil berapa pun bentuk kepalanya — jadi ia tidak dapat menangkap
+  // tengkorak berbentuk kerucut. Yang menentukan adalah seberapa curam kepala
+  // menyusut SEBELUM ditutup: kubah di atas kerucut tetap terbaca sebagai
+  // kerucut. Tengkorak membulat menyisakan mahkota yang masih lebar; versi
+  // pertama menyusut dari 0.050H ke 0.012H (24%) dan tampak lancip.
+  const kepala = bentuk.penampang.filter((p) => p.nama.startsWith('kepala') || p.nama === 'puncak-kepala')
+  assert.ok(kepala.length >= 3, 'kepala hanya punya sedikit penampang, bentuknya tidak dapat diperiksa')
+  const terlebar = Math.max(...kepala.map((p) => p.a))
+  const mahkota = bentuk.penampang.find((p) => p.nama === 'puncak-kepala')!
+  assert.ok(
+    mahkota.a / terlebar > 0.40,
+    `mahkota hanya ${((mahkota.a / terlebar) * 100).toFixed(0)}% dari lebar kepala terbesar — tengkorak menyusut seperti kerucut dan ubun-ubun akan tampak lancip`,
+  )
+}
+
 // ── Monotonisitas: pada tinggi tetap, orang yang lebih berat harus lebih besar.
 // Kalau ini gagal, bentuknya tidak benar-benar mengikuti masukan.
 {

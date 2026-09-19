@@ -162,7 +162,7 @@ export function PersonalBodyAvatar3D({ compact = false }: { compact?: boolean } 
     let wajahZ = 0.235
 
     if (bentuk) {
-      const m = bangunMeshTubuh(bentuk, { segmen: 56, sisipan: 6 })
+      const m = bangunMeshTubuh(bentuk, { segmen: 56, sisipan: 6, tutupAtas: true })
       const geo = new THREE.BufferGeometry()
       geo.setAttribute('position', new THREE.BufferAttribute(m.posisi, 3))
       geo.setIndex(new THREE.BufferAttribute(m.indeks, 1))
@@ -200,7 +200,7 @@ export function PersonalBodyAvatar3D({ compact = false }: { compact?: boolean } 
       // terlihat; tumpang tindih kecil itu urusan tampilan, sedangkan volume
       // tetap dihitung sebagai jumlah volume segmen seperti lazimnya
       // antropometri.
-      const mLengan = bangunMeshTubuh(bentuk.lengan, { segmen: 28, sisipan: 5 })
+      const mLengan = bangunMeshTubuh(bentuk.lengan, { segmen: 28, sisipan: 5, tutupUjung: true })
       const deltoid = cari('deltoid')
       for (const sisi of [-1, 1]) {
         const g = new THREE.BufferGeometry()
@@ -220,7 +220,7 @@ export function PersonalBodyAvatar3D({ compact = false }: { compact?: boolean } 
       // DUA TUNGKAI, di-loft dengan pembangun permukaan yang sama persis.
       // Keduanya juga dihitung dua kali dalam volume, sehingga sosok di layar
       // dan klaim kekekalan massa merujuk pada tubuh yang sama.
-      const mKaki = bangunMeshTubuh(bentuk.tungkai, { segmen: 32, sisipan: 5 })
+      const mKaki = bangunMeshTubuh(bentuk.tungkai, { segmen: 32, sisipan: 5, tutupUjung: true })
       const kakiX = panggulP.a * 0.46
       for (const sisi of [-1, 1]) {
         const g = new THREE.BufferGeometry()
@@ -236,8 +236,15 @@ export function PersonalBodyAvatar3D({ compact = false }: { compact?: boolean } 
         kaki.receiveShadow = true
         person.add(kaki)
 
-        const telapak = new THREE.Mesh(new THREE.BoxGeometry(0.10, 0.055, 0.24), shorts)
-        telapak.position.set(sisi * kakiX, LANTAI + pergelanganKaki.y * 0.45, 0.05)
+        // Telapak kaki berukuran dari proporsi terbitan (panjang telapak
+        // 0.152H), bukan kotak berukuran tetap yang salah pada tubuh pendek
+        // maupun tinggi.
+        const panjangTelapak = 0.152 * (input.heightCm / 100)
+        const telapak = new THREE.Mesh(
+          new THREE.BoxGeometry(pergelanganKaki.a * 2.1, pergelanganKaki.b * 0.9, panjangTelapak),
+          skin,
+        )
+        telapak.position.set(sisi * kakiX, LANTAI + pergelanganKaki.b * 0.45, panjangTelapak * 0.22)
         telapak.castShadow = true
         person.add(telapak)
       }
