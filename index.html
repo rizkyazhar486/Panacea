@@ -167,18 +167,46 @@
                 await registration.update().catch(() => undefined)
               }
             }
-            try { localStorage.setItem(MAINTENANCE_KEY, MAINTENANCE_VERSION) } catch {}
+            try { localStorage.setItem(MAINTENANCE_KEY, maintenanceStamp()) } catch {}
           } catch {}
         }
 
-        let alreadyMaintained = false
-        try { alreadyMaintained = localStorage.getItem(MAINTENANCE_KEY) === MAINTENANCE_VERSION } catch {}
-        if (!alreadyMaintained) {
-          if ('requestIdleCallback' in window) {
-            window.requestIdleCallback(() => { void maintain() }, { timeout: 15000 })
-          } else {
-            window.setTimeout(() => { void maintain() }, 12000)
-          }
+        // Penanda pemeliharaan diikat ke BUILD yang sedang dimuat, bukan hanya
+        // ke konstanta di atas.
+        //
+        // Sebelumnya gerbangnya hanya membandingkan MAINTENANCE_VERSION, dan
+        // konstanta itu berubah hanya kalau ada yang menyuntingnya. Akibatnya
+        // pembersihan cache berjalan SEKALI SEUMUR KONSTANTA: begitu sebuah
+        // peramban menjalankannya, rilis berikutnya tidak pernah memicunya
+        // lagi sampai seseorang ingat menaikkan angkanya dengan tangan. Cara
+        // yang bergantung pada ingatan manusia akan gagal, dan gagalnya diam:
+        // build baru terkirim, deploy hijau, pengguna tetap melihat yang lama.
+        //
+        // Nama berkas bundel modul memuat hash isi, sehingga berubah dengan
+        // sendirinya setiap kali kode aplikasi berubah. Menjadikannya bagian
+        // penanda membuat pemeliharaan berjalan sekali per BUILD, tanpa perlu
+        // diingat siapa pun.
+        const maintenanceStamp = () => {
+          let bundel = ''
+          try {
+            const modul = document.querySelector('script[type="module"][src]')
+            bundel = (modul && modul.getAttribute('src')) || ''
+          } catch {}
+          return MAINTENANCE_VERSION + '|' + bundel
+        }
+
+        // Pembacaan penandanya ditunda sampai DOM terurai, karena tag skrip
+        // modul belum tentu ada saat skrip sebaris ini dijalankan.
+        const periksaPemeliharaan = () => {
+          let sudah = false
+          try { sudah = localStorage.getItem(MAINTENANCE_KEY) === maintenanceStamp() } catch {}
+          if (!sudah) void maintain()
+        }
+
+        if ('requestIdleCallback' in window) {
+          window.requestIdleCallback(() => { periksaPemeliharaan() }, { timeout: 15000 })
+        } else {
+          window.setTimeout(() => { periksaPemeliharaan() }, 12000)
         }
 
         window.setTimeout(() => {
