@@ -135,20 +135,64 @@ function containsWholePhrase(value: string, phrase: string) {
   return ` ${value} `.includes(` ${phrase} `)
 }
 
-export function resolveBridgeTopic(query: string): BridgeTopic | null {
-  const q = normalizeBridgeSearchText(query)
-  if (!q) return null
+export type BridgeSearchMatchKind = 'title' | 'id' | 'alias-exact' | 'alias-phrase'
 
-  return BRIDGE_TOPICS.find((topic) => {
+export type BridgeSearchResult = {
+  id: string
+  title: string
+  oneLiner: string
+  matchedOn: BridgeSearchMatchKind
+  score: number
+}
+
+const BRIDGE_SEARCH_MATCH_SCORE: Record<BridgeSearchMatchKind, number> = {
+  title: 100,
+  id: 100,
+  'alias-exact': 90,
+  'alias-phrase': 60,
+}
+
+/**
+ * Lightweight local index over the curated topic set. Deterministic,
+ * offline, phrase-bounded (never a raw substring match) and bounded by
+ * `limit`, so an ambiguous query surfaces every genuinely matching
+ * curated topic instead of the array-order default `Array.find` would give.
+ */
+export function searchBridgeTopics(query: string, limit = 5): BridgeSearchResult[] {
+  const q = normalizeBridgeSearchText(query)
+  if (!q) return []
+
+  const results: BridgeSearchResult[] = []
+  for (const topic of BRIDGE_TOPICS) {
     const title = normalizeBridgeSearchText(topic.title)
     const id = normalizeBridgeSearchText(topic.id)
-    if (q === title || q === id) return true
+    let best: BridgeSearchMatchKind | null = null
 
-    return topic.aliases.some((rawAlias) => {
+    if (q === title) best = 'title'
+    else if (q === id) best = 'id'
+    else if (containsWholePhrase(title, q)) best = 'title'
+
+    for (const rawAlias of topic.aliases) {
       const alias = normalizeBridgeSearchText(rawAlias)
-      return alias === q || containsWholePhrase(alias, q) || containsWholePhrase(q, alias)
-    })
-  }) ?? null
+      const kind: BridgeSearchMatchKind | null = alias === q
+        ? 'alias-exact'
+        : containsWholePhrase(alias, q) || containsWholePhrase(q, alias)
+          ? 'alias-phrase'
+          : null
+      if (kind && (!best || BRIDGE_SEARCH_MATCH_SCORE[kind] > BRIDGE_SEARCH_MATCH_SCORE[best])) best = kind
+    }
+
+    if (best) results.push({ id: topic.id, title: topic.title, oneLiner: topic.oneLiner, matchedOn: best, score: BRIDGE_SEARCH_MATCH_SCORE[best] })
+  }
+
+  results.sort((a, b) => b.score - a.score || a.title.localeCompare(b.title))
+  return results.slice(0, Math.max(0, limit))
+}
+
+export function resolveBridgeTopic(query: string): BridgeTopic | null {
+  const [top] = searchBridgeTopics(query, 1)
+  if (!top) return null
+  return BRIDGE_TOPICS.find((topic) => topic.id === top.id) ?? null
 }
 
 function canonicalStageLabel(label: string) {

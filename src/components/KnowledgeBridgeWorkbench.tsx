@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react'
 import { Link, useSearchParams } from 'react-router-dom'
-import { BRIDGE_TOPICS, bridgeSummary, resolveBridgeTopic } from '../lib/knowledgeBridgeMap'
+import { BRIDGE_TOPICS, bridgeSummary, resolveBridgeTopic, searchBridgeTopics } from '../lib/knowledgeBridgeMap'
 import {
   clearBridgeEvidence,
   loadBridgeEvidence,
@@ -36,6 +36,8 @@ export function KnowledgeBridgeWorkbench() {
 
   const topic = useMemo(() => BRIDGE_TOPICS.find((item) => item.id === selectedId) ?? resolveBridgeTopic(query) ?? BRIDGE_TOPICS[0], [selectedId, query])
   const note = notes[topic.id] ?? ''
+  const suggestions = useMemo(() => searchBridgeTopics(query, 5), [query])
+  const showSuggestions = query.trim().length > 0 && suggestions.length > 1
 
   function search() {
     const clean = query.trim()
@@ -50,6 +52,13 @@ export function KnowledgeBridgeWorkbench() {
       return
     }
     setStatus(`No curated causal map matches “${clean}” yet. Use Medical Library for the live evidence search instead.`)
+  }
+  function pickSuggestion(id: string) {
+    const found = BRIDGE_TOPICS.find((item) => item.id === id)
+    if (!found) return
+    setSelectedId(found.id)
+    setQuery(found.title)
+    setStatus('')
   }
   function saveNote(value: string) {
     const next = { ...notes, [topic.id]: value }
@@ -117,8 +126,20 @@ export function KnowledgeBridgeWorkbench() {
       <div className="mt-4 grid gap-2 sm:grid-cols-[1fr_auto]">
         <div className="relative">
           <label htmlFor="knowledge-bridge-search" className="sr-only">Search a disease, mechanism, or clinical topic</label>
-          <input id="knowledge-bridge-search" value={query} onChange={(event) => { setQuery(event.target.value); if (status) setStatus('') }} onKeyDown={(event) => { if (event.key === 'Enter') search() }} placeholder="Try hypertension, asthma, anemia, sepsis…" className={`min-h-12 w-full rounded-2xl border border-neutral-200 bg-neutral-50 px-4 pr-24 text-[12px] font-semibold text-neutral-900 outline-none focus:border-cyan-400 dark:border-white/10 dark:bg-white/[.04] dark:text-white ${FOCUS_RING}`} />
+          <input id="knowledge-bridge-search" role="combobox" aria-expanded={showSuggestions} aria-controls="knowledge-bridge-search-results" aria-autocomplete="list" value={query} onChange={(event) => { setQuery(event.target.value); if (status) setStatus('') }} onKeyDown={(event) => { if (event.key === 'Enter') search() }} placeholder="Try hypertension, asthma, anemia, sepsis…" className={`min-h-12 w-full rounded-2xl border border-neutral-200 bg-neutral-50 px-4 pr-24 text-[12px] font-semibold text-neutral-900 outline-none focus:border-cyan-400 dark:border-white/10 dark:bg-white/[.04] dark:text-white ${FOCUS_RING}`} />
           <button type="button" onClick={search} className={`absolute right-1.5 top-1.5 min-h-9 rounded-xl bg-neutral-950 px-4 text-[10px] font-black text-white dark:bg-white dark:text-neutral-950 ${FOCUS_RING}`}>Build map</button>
+          {showSuggestions && (
+            <ul id="knowledge-bridge-search-results" role="listbox" aria-label="Matching curated topics" className="absolute left-0 right-0 top-full z-10 mt-1.5 overflow-hidden rounded-2xl border border-neutral-200 bg-white shadow-[0_18px_40px_rgba(15,23,42,.12)] dark:border-white/10 dark:bg-[#0d1117]">
+              {suggestions.map((item) => (
+                <li key={item.id} role="option" aria-selected={topic.id === item.id}>
+                  <button type="button" onClick={() => pickSuggestion(item.id)} className={`flex w-full flex-col items-start gap-0.5 px-4 py-2.5 text-left hover:bg-neutral-50 dark:hover:bg-white/[.04] ${FOCUS_RING}`}>
+                    <span className="text-[11px] font-black text-neutral-900 dark:text-white">{item.title}</span>
+                    <span className="line-clamp-1 text-[9.5px] leading-relaxed text-neutral-500 dark:text-neutral-400">{item.oneLiner}</span>
+                  </button>
+                </li>
+              ))}
+            </ul>
+          )}
         </div>
         <div className="flex rounded-2xl bg-neutral-100 p-1 dark:bg-white/[.06]" role="radiogroup" aria-label="Explanation depth">
           {(['plain', 'student', 'clinical'] as Depth[]).map((item) => <button key={item} type="button" role="radio" aria-checked={depth === item} onClick={() => setDepth(item)} className={`rounded-xl px-3 py-2 text-[9px] font-black capitalize ${FOCUS_RING} ${depth === item ? 'bg-white text-neutral-950 shadow-sm dark:bg-neutral-800 dark:text-white' : 'text-neutral-500'}`}>{item}</button>)}
