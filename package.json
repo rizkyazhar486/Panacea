@@ -6,7 +6,7 @@
   "description": "Panaceamed.id — Longevity Medical-AI Co-Physician platform (AI Chatbot + AI-EMR)",
   "scripts": {
     "dev": "vite",
-    "build": "node scripts/gen-note-index.mjs --check && node scripts/validate-source-registry.mjs && node scripts/validate-feature-factory.mjs && node scripts/validate-academic-review.mjs && node --test scripts/qa/source-registry-validator.test.mjs scripts/qa/feature-factory.test.mjs scripts/qa/academic-review-gate.test.mjs scripts/qa/home-widget-theme.test.mjs scripts/qa/compact-product-surface.test.mjs scripts/qa/prime-wisdom-schema.test.mjs scripts/qa/prime-wisdom-provenance.test.mjs scripts/qa/home-anti-slop.test.mjs scripts/qa/ruthless-simplicity.test.mjs scripts/qa/body-virtual-endoscopy.test.mjs scripts/qa/mental-health-safety-orchestrator.test.mjs scripts/qa/mental-health-screen-safety.test.mjs scripts/qa/visit-device-adapters.test.mjs scripts/qa/visit-fhir-observation.test.mjs && tsc -b && vite build",
+    "build": "node scripts/gen-note-index.mjs --check && node scripts/validate-source-registry.mjs && node scripts/validate-feature-factory.mjs && node scripts/validate-academic-review.mjs && node --test scripts/qa/source-registry-validator.test.mjs scripts/qa/feature-factory.test.mjs scripts/qa/academic-review-gate.test.mjs scripts/qa/home-widget-theme.test.mjs scripts/qa/compact-product-surface.test.mjs scripts/qa/prime-wisdom-schema.test.mjs scripts/qa/prime-wisdom-provenance.test.mjs scripts/qa/home-anti-slop.test.mjs scripts/qa/ruthless-simplicity.test.mjs scripts/qa/body-virtual-endoscopy.test.mjs scripts/qa/mental-health-safety-orchestrator.test.mjs scripts/qa/mental-health-screen-safety.test.mjs scripts/qa/visit-device-adapters.test.mjs scripts/qa/visit-fhir-observation.test.mjs scripts/qa/longitudinal-digital-twin.test.mjs && tsc -b && vite build",
     "preview": "vite preview",
     "gen:note-index": "node scripts/gen-note-index.mjs",
     "validate:source-registry": "node scripts/validate-source-registry.mjs",
@@ -41,7 +41,8 @@
     "test:mental-health-safety": "node --test scripts/qa/mental-health-safety-orchestrator.test.mjs",
     "test:visit-device-adapters": "node --test scripts/qa/visit-device-adapters.test.mjs",
     "test:visit-fhir": "node --test scripts/qa/visit-fhir-observation.test.mjs",
-    "test:mental-health-screen-safety": "node --test scripts/qa/mental-health-screen-safety.test.mjs"
+    "test:mental-health-screen-safety": "node --test scripts/qa/mental-health-screen-safety.test.mjs",
+    "test:longitudinal-digital-twin": "node --test scripts/qa/longitudinal-digital-twin.test.mjs"
   },
   "dependencies": {
     "framer-motion": "^13.2.0",
