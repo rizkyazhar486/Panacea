@@ -135,3 +135,54 @@ export function validateVisitRealtimeSignalEnvelope(
 
 export const VISIT_REALTIME_SECURITY_BOUNDARY =
   'Do not wire a production Visit WebSocket endpoint until a canonical server-side visit membership registry can resolve visitId to the exact patient and clinician. Generic room names, client-asserted roles, owner/admin status, or authentication alone are not authorization.'
+
+
+export interface VisitRealtimeReplayGuard {
+  accept(signal: Pick<VisitRealtimeSignalEnvelope, 'visitId' | 'senderUserId' | 'sessionId' | 'sequence'>): boolean
+}
+
+/**
+ * Tracks the highest accepted sequence for each authenticated Visit signaling
+ * stream. Keep one guard for the lifetime of a WebSocket connection so a
+ * visit-join retry cannot reset replay state. A new sessionId intentionally
+ * starts a new sequence stream.
+ */
+export function createVisitRealtimeReplayGuard(maxStreams = 32): VisitRealtimeReplayGuard {
+  if (!Number.isSafeInteger(maxStreams) || maxStreams < 1) {
+    throw new Error('maxStreams must be a positive safe integer')
+  }
+
+  const highestByStream = new Map<string, number>()
+
+  return {
+    accept(signal) {
+      if (!Number.isSafeInteger(signal.sequence) || signal.sequence < 0) return false
+
+      const visitId = requiredText(signal.visitId, 'signal.visitId')
+      const senderUserId = requiredText(signal.senderUserId, 'signal.senderUserId')
+      const sessionId = requiredText(signal.sessionId, 'signal.sessionId')
+      const streamKey = JSON.stringify([visitId, senderUserId, sessionId])
+      const previous = highestByStream.get(streamKey)
+
+      if (previous !== undefined) {
+        if (signal.sequence <= previous) return false
+        highestByStream.set(streamKey, signal.sequence)
+        return true
+      }
+
+      // Fail closed rather than evicting an old stream: eviction would make an
+      // earlier sequence replayable again. Reconnect to establish fresh state.
+      if (highestByStream.size >= maxStreams) return false
+      highestByStream.set(streamKey, signal.sequence)
+      return true
+    },
+  }
+}
+
+/**
+ * The secure Visit transport and legacy Consult relay share one WebSocket
+ * server, so their room namespaces must never overlap.
+ */
+export function isReservedVisitRealtimeRoom(room: string): boolean {
+  return room.trim().startsWith('visit:')
+}

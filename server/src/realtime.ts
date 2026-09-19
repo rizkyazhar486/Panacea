@@ -2,9 +2,11 @@ import { WebSocketServer, WebSocket } from 'ws'
 import type { Server } from 'node:http'
 import { attachGenomicsComputeRoutes } from './genomicsCompute.js'
 import { currentUserFromWebSocketRequest } from './auth.js'
-import { addAudit, getVisitMembership, type User } from './store.js'
+import { addAudit, getVisitMembership } from './store.js'
 import {
   authorizeVisitRealtimeJoin,
+  createVisitRealtimeReplayGuard,
+  isReservedVisitRealtimeRoom,
   validateVisitRealtimeSignalEnvelope,
   type VisitRealtimeAuthorization,
   type VisitRealtimeSignalType,
@@ -67,7 +69,7 @@ export function attachRealtime(server: Server) {
     let name = 'Anonim'
     const authenticatedUser = currentUserFromWebSocketRequest(request)
     let visitAuthorization: Extract<VisitRealtimeAuthorization, { allowed: true }> | null = null
-    let lastVisitSequence = -1
+    const replayGuard = createVisitRealtimeReplayGuard()
 
     const visitError = (code: string) => {
       if (ws.readyState === WebSocket.OPEN) {
@@ -88,7 +90,15 @@ export function attachRealtime(server: Server) {
         return
       }
       if (m.type === 'join' && m.room) {
-        room = m.room
+        const requestedRoom = m.room.trim()
+        if (isReservedVisitRealtimeRoom(requestedRoom)) {
+          if (authenticatedUser) {
+            addAudit(authenticatedUser, 'visit_realtime_reserved_room_rejected', requestedRoom.slice(0, 160))
+          }
+          visitError('reserved_visit_room')
+          return
+        }
+        room = requestedRoom
         name = m.from || name
         enterRoom(room)
         broadcast(room, { type: 'system', text: `${name} bergabung`, room })
@@ -106,7 +116,14 @@ export function attachRealtime(server: Server) {
         const authorization = authorizeVisitRealtimeJoin(
           { userId: authenticatedUser.id, role: authenticatedUser.role },
           m.visitId,
-          membership,
+          {
+            visitId: membership.id,
+            patientUserId: membership.patientUserId,
+            clinicianUserId: membership.clinicianUserId,
+            status: membership.status,
+            startsAt: membership.startsAt,
+            endsAt: membership.endsAt,
+          },
         )
         if (!authorization.allowed) {
           visitError(authorization.code)
@@ -114,7 +131,6 @@ export function attachRealtime(server: Server) {
         }
 
         visitAuthorization = authorization
-        lastVisitSequence = -1
         name = authenticatedUser.name
         const secureRoom = `visit:${authorization.visitId}`
         enterRoom(secureRoom)
@@ -138,28 +154,28 @@ export function attachRealtime(server: Server) {
           visitError('visit_join_required')
           return
         }
-        const sequence = m.sequence
-        if (!Number.isSafeInteger(sequence) || (sequence as number) <= lastVisitSequence) {
-          visitError('replayed_or_invalid_sequence')
-          return
-        }
         try {
           const envelope = validateVisitRealtimeSignalEnvelope({
             type: m.type as VisitRealtimeSignalType,
             visitId: m.visitId ?? '',
             senderUserId: authenticatedUser.id,
             sessionId: m.sessionId ?? '',
-            sequence: sequence as number,
+            sequence: m.sequence as number,
             sentAt: m.sentAt ?? '',
             payload: m.payload,
           }, visitAuthorization)
-          lastVisitSequence = envelope.sequence
+          if (!replayGuard.accept(envelope)) {
+            addAudit(authenticatedUser, 'visit_realtime_replay_rejected', visitAuthorization.visitId)
+            visitError('replayed_or_invalid_sequence')
+            return
+          }
           relayToOthers(room, ws, JSON.stringify({
             ...envelope,
             from: authenticatedUser.name,
             participant: visitAuthorization.participant,
           }))
         } catch {
+          addAudit(authenticatedUser, 'visit_realtime_signal_rejected', visitAuthorization.visitId)
           visitError('invalid_visit_signal')
         }
       }
