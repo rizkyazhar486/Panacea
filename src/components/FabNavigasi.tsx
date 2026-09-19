@@ -69,7 +69,21 @@ function reducedMotion() {
  * long-press, swipe, double tap, atau single tap. Ambang gesture berasal dari
  * kernel murni di `lib/interaction/gesture`, bukan angka lokal yang berbeda.
  */
-export function FabNavigasi({ onCari }: { tujuan: TujuanFab[]; onTambah?: () => void; onCari?: () => void }) {
+export function FabNavigasi({ onCari, tersembunyi = false }: {
+  tujuan: TujuanFab[]
+  onTambah?: () => void
+  onCari?: () => void
+  /**
+   * Ikut menyingkir bersama bilah perintah.
+   *
+   * Yang diminta adalah layar yang benar-benar bersih saat sedang dibaca:
+   * bilah atas DAN tombol melayang sama-sama pergi, lalu keduanya kembali
+   * bersama saat digulir ke atas atau tepi atas diketuk. Menyembunyikan
+   * bilahnya saja menyisakan satu benda mengambang di atas isi halaman, dan
+   * itu justru yang paling menarik perhatian.
+   */
+  tersembunyi?: boolean
+}) {
   const lokasi = useLocation()
   const navigasi = useNavigate()
   const sembunyikanDiBodyExplorer = lokasi.pathname.startsWith('/body-explorer')
@@ -85,6 +99,7 @@ export function FabNavigasi({ onCari }: { tujuan: TujuanFab[]; onTambah?: () => 
   const [aturBuka, setAturBuka] = useState(false)
   const [redup, setRedup] = useState(false)
   const [halaman, setHalaman] = useState(0)
+  const menyingkir = tersembunyi && !buka && !menggeser
 
   const orbRef = useRef<HTMLButtonElement>(null)
   const railRef = useRef<SlidableRailHandle>(null)
@@ -418,8 +433,12 @@ export function FabNavigasi({ onCari }: { tujuan: TujuanFab[]; onTambah?: () => 
             touchAction: 'none',
             cursor: menggeser ? 'grabbing' : 'grab',
             transition: menggeser || reducedMotion() ? 'none' : 'transform 0.2s cubic-bezier(0.32,0.72,0,1), opacity 0.35s ease',
-            transform: buka ? 'scale(1.06)' : 'none',
-            opacity: redup && !buka && !menggeser ? prefs.idleOpacity : 1,
+            // Menyingkir hanya saat memang sedang tidak dipakai: menu yang
+            // terbuka dan orb yang sedang digeser TIDAK boleh hilang di tengah
+            // gerakan jari — itu membatalkan aksi yang sedang berlangsung.
+            transform: buka ? 'scale(1.06)' : menyingkir ? 'scale(0.82)' : 'none',
+            opacity: menyingkir ? 0 : redup && !buka && !menggeser ? prefs.idleOpacity : 1,
+            pointerEvents: menyingkir ? 'none' : undefined,
           }}
         >
           <LogoMark size={Math.max(28, Math.round(prefs.size * 0.52))} />
