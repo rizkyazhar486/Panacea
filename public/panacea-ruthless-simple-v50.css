@@ -1,0 +1,249 @@
+/* Panaceamed Ruthless Simplicity v50
+   Final presentation override: complexity may exist in the system, never in the user's face.
+   Preserve capabilities; remove decorative noise, duplicate visual hierarchy and gratuitous material effects.
+
+   Interaction law:
+   1 focal object/action per viewport.
+   <= 6 primary choices per surface when practical.
+   Secondary tools live behind Search / More / contextual disclosure.
+   Major destinations stay reachable within <= 2 interactions.
+*/
+
+:root {
+  --pmd-simple-canvas: #f7f8f8;
+  --pmd-simple-surface: #ffffff;
+  --pmd-simple-surface-2: #f0f2f1;
+  --pmd-simple-ink: #101412;
+  --pmd-simple-muted: #66706b;
+  --pmd-simple-line: rgba(16, 20, 18, .10);
+  --pmd-simple-line-strong: rgba(16, 20, 18, .18);
+  --pmd-simple-accent: #00bf63;
+  --pmd-simple-radius: 14px;
+  --pmd-simple-gap: clamp(1.1rem, 1.5vw + .7rem, 2.25rem);
+  --pmd-simple-fast: 120ms;
+}
+
+html.dark,
+.dark {
+  --pmd-simple-canvas: #050706;
+  --pmd-simple-surface: #0c0f0d;
+  --pmd-simple-surface-2: #131714;
+  --pmd-simple-ink: #f3f6f4;
+  --pmd-simple-muted: #98a39d;
+  --pmd-simple-line: rgba(255, 255, 255, .10);
+  --pmd-simple-line-strong: rgba(255, 255, 255, .18);
+}
+
+html,
+body,
+#root {
+  min-height: 100%;
+  background: var(--pmd-simple-canvas) !important;
+}
+
+body {
+  color: var(--pmd-simple-ink);
+  background-image: none !important;
+}
+
+#root::before,
+#root::after,
+header.kaca::before,
+header.kaca::after,
+aside.sticky[class*='h-screen']::after,
+.drawer-in::after,
+button[data-pmd-assistive='true']::before {
+  display: none !important;
+  content: none !important;
+}
+
+/* One typography system. Decorative faces must never compete with content. */
+body,
+button,
+input,
+textarea,
+select,
+.font-serif-display,
+[class*='font-hero'],
+[class*='font-wordmark'] {
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif !important;
+}
+
+main.mx-auto {
+  padding-top: clamp(1rem, 2vw, 2rem) !important;
+  padding-inline: clamp(.9rem, 2.8vw, 2.5rem) !important;
+}
+
+.page-enter > :where(section, article, header, footer) + :where(section, article, header, footer) {
+  margin-top: var(--pmd-simple-gap) !important;
+}
+
+/* Functional surfaces only. No glow, no decorative blur, no stacked glass. */
+:where(
+  header.kaca,
+  aside.sticky[class*='h-screen'],
+  .drawer-in,
+  [data-pintasan].kaca,
+  nav[aria-label='Home spaces'],
+  .liquid-glass,
+  [role='menu'].kaca
+) {
+  background: var(--pmd-simple-surface) !important;
+  background-image: none !important;
+  border: 1px solid var(--pmd-simple-line) !important;
+  box-shadow: none !important;
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
+}
+
+:where(.kaca, .liquid-glass) {
+  box-shadow: none !important;
+}
+
+header.kaca.panacea-command-bar {
+  border-radius: var(--pmd-simple-radius) !important;
+}
+
+/* Buttons: obvious, quiet, predictable. Semantic status colours remain untouched. */
+:where(
+  .liquid-glass-btn,
+  .header-icon-btn,
+  button[data-pmd-assistive='true'],
+  [data-pintasan] button,
+  [role='menu'][aria-label='Tindakan cepat'] button
+) {
+  background-image: none !important;
+  box-shadow: none !important;
+  filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
+  transition:
+    transform var(--pmd-simple-fast) ease,
+    background-color var(--pmd-simple-fast) ease,
+    border-color var(--pmd-simple-fast) ease,
+    color var(--pmd-simple-fast) ease !important;
+}
+
+:where(.liquid-glass-btn--outline, .liquid-glass-btn--ghost) {
+  background: transparent !important;
+  border-color: var(--pmd-simple-line-strong) !important;
+}
+
+.liquid-glass-btn--primary {
+  background: var(--pmd-simple-accent) !important;
+  border-color: transparent !important;
+  color: #06170e !important;
+}
+
+:where(
+  aside.sticky[class*='h-screen'] nav a[data-pmd-feature-link='true'],
+  .drawer-in nav a[data-pmd-feature-link='true'],
+  [data-pintasan] a[data-pmd-feature-link='true'],
+  main a[data-pmd-feature-link='true']
+) {
+  filter: none !important;
+  box-shadow: none !important;
+  text-shadow: none !important;
+}
+
+:where(
+  aside.sticky[class*='h-screen'] nav a[data-pmd-feature-link='true'],
+  .drawer-in nav a[data-pmd-feature-link='true'],
+  [data-pintasan] a[data-pmd-feature-link='true']
+):hover {
+  background: var(--pmd-simple-surface-2) !important;
+  background-image: none !important;
+  box-shadow: none !important;
+}
+
+:where(
+  aside.sticky[class*='h-screen'] nav a[data-pmd-feature-link='true'],
+  .drawer-in nav a[data-pmd-feature-link='true'],
+  [data-pintasan] a[data-pmd-feature-link='true']
+)[aria-current='page'] {
+  background: var(--pmd-simple-surface-2) !important;
+  background-image: none !important;
+  border-color: var(--pmd-simple-line-strong) !important;
+  box-shadow: inset 3px 0 0 var(--pmd-simple-accent) !important;
+}
+
+:where(
+  aside.sticky[class*='h-screen'] nav a[data-pmd-feature-link='true'],
+  .drawer-in nav a[data-pmd-feature-link='true'],
+  [data-pintasan] a[data-pmd-feature-link='true']
+) svg {
+  filter: none !important;
+}
+
+/* Home is a launcher, not a wall. Keep one dominant lane and quiet secondary rails. */
+section[aria-label='Panacea command deck'] :where(a, button) {
+  box-shadow: none !important;
+}
+
+section[aria-label='Panacea command deck'] :where([class*='bg-gradient'], [style*='gradient']) {
+  background-image: none !important;
+}
+
+/* Dense medical canvases stay immersive, but controls around them must stay quiet. */
+:where(
+  [data-panacea-body-workspace],
+  [data-panacea-clinical-body],
+  [data-panacea-unified-body],
+  [data-panacea-projector]
+) :where(button, [role='button'], [role='tab']) {
+  box-shadow: none !important;
+  filter: none !important;
+}
+
+/* Keep explanations behind disclosure. Persistent scroll should remain visual/data-first. */
+main :where(p, li, dd, figcaption):not(
+  [role='dialog'] *,
+  dialog *,
+  details[open] *,
+  [data-pmd-unclamped='true'] *
+) {
+  color: var(--pmd-simple-muted);
+}
+
+/* One clean dialog layer: no nested glass. */
+:where(dialog, [role='dialog']) {
+  background: var(--pmd-simple-surface) !important;
+  background-image: none !important;
+  border: 1px solid var(--pmd-simple-line-strong) !important;
+  box-shadow: 0 18px 60px rgba(0,0,0,.24) !important;
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
+}
+
+@media (max-width: 720px) {
+  :root { --pmd-simple-gap: 1.25rem; }
+
+  header.kaca.panacea-command-bar {
+    margin: .4rem .45rem .15rem !important;
+    min-height: 52px !important;
+    max-height: 60px !important;
+    padding: .35rem .42rem !important;
+    border-radius: 12px !important;
+  }
+
+  main.mx-auto {
+    padding-top: .95rem !important;
+    padding-inline: .9rem !important;
+  }
+
+  /* Mobile choices should scroll horizontally rather than stack into a control wall. */
+  nav[aria-label='Home spaces'] > div,
+  section[aria-label='Panacea command deck'] > div.relative.grid,
+  section[aria-label='Panacea command deck'] > div.relative.mt-3 .mt-2.grid {
+    gap: .65rem !important;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: .001ms !important;
+    transition-duration: .001ms !important;
+  }
+}
