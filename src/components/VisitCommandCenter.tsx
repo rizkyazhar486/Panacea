@@ -7,6 +7,7 @@ import { useStore } from '../lib/store'
 import { backendEnabled } from '../lib/api'
 import { useLiveHeartRate } from '../lib/useLiveHeartRate'
 import { useVitals } from '../lib/useVitals'
+import { resolveVisitRuntimeIdentity } from '../lib/visitRuntimeIdentity'
 import {
   buildAiEmrVisitContext,
   createVisitOperatingSession,
@@ -80,17 +81,21 @@ function tracePath(values: readonly number[]) {
   }).join(' ')
 }
 
-export function VisitCommandCenter({ recordId, embedded = false }: VisitCommandCenterProps) {
+function AuthenticatedVisitCommandCenter({
+  recordId,
+  embedded = false,
+  clinicianId,
+  subjectId,
+}: VisitCommandCenterProps & { clinicianId: string; subjectId: string }) {
   const { state, activePatient, account } = useStore()
   const reduceMotion = useReducedMotion()
   const synced = useVitals()
   const liveHeart = useLiveHeartRate()
-  const clinicianId = account?.email?.trim() || state.settings.doctorName.trim() || 'local-clinician'
   const visitId = 'visit-' + safeToken((recordId || activePatient.id) + '-' + new Date().toISOString().slice(0, 10))
   const cameraRoom = 'visit-' + safeToken(recordId || activePatient.id)
 
   const [visit, setVisit] = useState<VisitOperatingState>(() =>
-    createSession(visitId, activePatient.id, clinicianId, false, new Date().toISOString()),
+    createSession(visitId, subjectId, clinicianId, false, new Date().toISOString()),
   )
   const [liveTrace, setLiveTrace] = useState<number[]>([])
   const [clock, setClock] = useState(() => new Date().toISOString())
@@ -101,9 +106,9 @@ export function VisitCommandCenter({ recordId, embedded = false }: VisitCommandC
   }, [])
 
   useEffect(() => {
-    setVisit(createSession(visitId, activePatient.id, clinicianId, false, new Date().toISOString()))
+    setVisit(createSession(visitId, subjectId, clinicianId, false, new Date().toISOString()))
     setLiveTrace([])
-  }, [activePatient.id, clinicianId, visitId])
+  }, [clinicianId, subjectId, visitId])
 
   const latestClinical = useMemo(() => {
     const rows = (state.vitals[activePatient.id] ?? [])
@@ -336,7 +341,7 @@ export function VisitCommandCenter({ recordId, embedded = false }: VisitCommandC
   }, [account?.email, state.consults])
 
   function confirmConsent() {
-    setVisit(createSession(visitId, activePatient.id, clinicianId, true, new Date().toISOString()))
+    setVisit(createSession(visitId, subjectId, clinicianId, true, new Date().toISOString()))
   }
 
   function toggleVisit() {
@@ -348,7 +353,7 @@ export function VisitCommandCenter({ recordId, embedded = false }: VisitCommandC
         return pauseVisit(mediaOff)
       }
       if (current.phase === 'paused') return resumeVisit(current, at)
-      if (current.phase === 'ended') return createSession(visitId, activePatient.id, clinicianId, false, at)
+      if (current.phase === 'ended') return createSession(visitId, subjectId, clinicianId, false, at)
       return current
     })
   }
@@ -514,6 +519,38 @@ export function VisitCommandCenter({ recordId, embedded = false }: VisitCommandC
         </div>
       </footer>
     </section>
+  )
+}
+
+export function VisitCommandCenter(props: VisitCommandCenterProps) {
+  const { account, activePatient } = useStore()
+  const identity = resolveVisitRuntimeIdentity(account, activePatient.id)
+
+  if (!identity.ok) {
+    const message = identity.reason === 'patient-required'
+      ? 'Select or add a patient first'
+      : identity.reason === 'clinician-role-required'
+        ? 'Switch to doctor mode to start a clinical visit'
+        : 'Sign in as a doctor to start a clinical visit'
+
+    return (
+      <section
+        data-visit-identity-blocked={identity.reason}
+        aria-label="Panacea doctor visit operating system"
+        className="rounded-[30px] border border-white/10 bg-[#05070a] p-6 text-white"
+      >
+        <div className="text-[9px] font-black uppercase tracking-[.18em] text-white/35">Visit OS</div>
+        <div className="mt-2 text-lg font-black">{message}</div>
+      </section>
+    )
+  }
+
+  return (
+    <AuthenticatedVisitCommandCenter
+      {...props}
+      clinicianId={identity.clinicianId}
+      subjectId={identity.subjectId}
+    />
   )
 }
 
