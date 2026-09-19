@@ -357,3 +357,26 @@ Do not wait for the owner to invent every feature. For each major surface:
 7. continue to the next independent bottleneck.
 
 The target is not feature count. The target is a coherent, enjoyable, obvious-to-use, medically trustworthy product.
+
+
+## Ruthless simplicity is the default product law — 2026-09-19
+
+The owner explicitly wants Panacea to feel radically simple and obvious even when the underlying system is technically deep. The canonical contract is `DOCS/RUTHLESS-SIMPLICITY.md`; the active global presentation layer is `public/panacea-ruthless-simple-v50.css`.
+
+Apply this to **workflow, architecture, frontend, backend, data flow, navigation and UI/UX**, not only cosmetics:
+- one focal purpose and one primary action per viewport;
+- six-or-fewer primary choices per surface when practical;
+- major features reachable in at most two intentional interactions from Home;
+- visual/data-first primary scroll; interpretation behind one-tap disclosure;
+- decoration must communicate meaning or be removed;
+- one canonical source/state/renderer per concern before adding another abstraction;
+- reduce duplicate workflows, duplicate pages and duplicate controls;
+- preserve useful capability by grouping or hiding secondary tools rather than deleting it;
+- keep safety-critical information, provenance, consent and clinician-review state visible when required.
+
+Use the formulas from the contract when simplifying competing designs:
+`Perceived Complexity = Visible Choices × Hierarchy Levels × Simultaneous Contexts`
+and
+`Task Cost = User Interactions + Context Switches + Required Decisions + Waiting`.
+
+Do not reintroduce gradient/card-wall/glow-heavy presentation as a default aesthetic. Clinical/Body canvases may remain immersive when functionally justified, but controls around them must stay quiet and obvious.
