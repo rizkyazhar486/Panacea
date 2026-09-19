@@ -6,7 +6,7 @@
   "description": "Panaceamed.id — Longevity Medical-AI Co-Physician platform (AI Chatbot + AI-EMR)",
   "scripts": {
     "dev": "vite",
-    "build": "node scripts/gen-note-index.mjs --check && node scripts/validate-source-registry.mjs && node scripts/validate-feature-factory.mjs && node scripts/validate-academic-review.mjs && node --test scripts/qa/source-registry-validator.test.mjs scripts/qa/feature-factory.test.mjs scripts/qa/academic-review-gate.test.mjs scripts/qa/home-widget-theme.test.mjs scripts/qa/compact-product-surface.test.mjs scripts/qa/prime-wisdom-schema.test.mjs scripts/qa/prime-wisdom-provenance.test.mjs scripts/qa/home-anti-slop.test.mjs scripts/qa/ruthless-simplicity.test.mjs scripts/qa/body-virtual-endoscopy.test.mjs && tsc -b && vite build",
+    "build": "node scripts/gen-note-index.mjs --check && node scripts/validate-source-registry.mjs && node scripts/validate-feature-factory.mjs && node scripts/validate-academic-review.mjs && node --test scripts/qa/source-registry-validator.test.mjs scripts/qa/feature-factory.test.mjs scripts/qa/academic-review-gate.test.mjs scripts/qa/home-widget-theme.test.mjs scripts/qa/compact-product-surface.test.mjs scripts/qa/prime-wisdom-schema.test.mjs scripts/qa/prime-wisdom-provenance.test.mjs scripts/qa/home-anti-slop.test.mjs scripts/qa/ruthless-simplicity.test.mjs scripts/qa/body-virtual-endoscopy.test.mjs scripts/qa/mental-health-safety-orchestrator.test.mjs && tsc -b && vite build",
     "preview": "vite preview",
     "gen:note-index": "node scripts/gen-note-index.mjs",
     "validate:source-registry": "node scripts/validate-source-registry.mjs",
@@ -37,7 +37,8 @@
     "qa:lesi-3d": "node scripts/qa/lesi-neuro-3d-smoke.mjs",
     "qa:kelenjar-3d": "node scripts/qa/kelenjar-3d-smoke.mjs",
     "cakupan": "node scripts/cakupanSkdi.mjs",
-    "test:ruthless-simplicity": "node --test scripts/qa/ruthless-simplicity.test.mjs"
+    "test:ruthless-simplicity": "node --test scripts/qa/ruthless-simplicity.test.mjs",
+    "test:mental-health-safety": "node --test scripts/qa/mental-health-safety-orchestrator.test.mjs"
   },
   "dependencies": {
     "framer-motion": "^13.2.0",
