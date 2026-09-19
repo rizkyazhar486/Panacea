@@ -8,6 +8,7 @@ import type { AnatomyLayer } from '../../components/Body3D'
 import OrganClinicalPanel from './OrganClinicalPanel'
 import { modelForFocus, modelIlustrasi, ILUSTRASI } from '../../lib/organModels'
 import OrganModel3D from '../../components/OrganModel3D'
+import OrganEvidenceProvenance from './OrganEvidenceProvenance'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // BERKAS LENGKAP SATU STRUKTUR — seluruh lapis pengetahuan dalam SATU aliran.
@@ -275,6 +276,7 @@ export function OrganDossier({ organKey, organLabel, onLocate }: Props) {
         ) : (
           <p className="text-xs text-neutral-500">No physiology written for this structure yet.</p>
         )}
+        <OrganEvidenceProvenance organKey={organKey} />
       </Bagian>
 
       <Bagian judul="4 · Radiology" sub="How it appears on X-ray, CT and MRI">

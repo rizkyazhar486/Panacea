@@ -63,6 +63,13 @@ export interface BodyKnowledgeOrganEvidenceSeed {
   readonly provenanceBoundary: BodyKnowledgeEvidenceProvenanceBoundary
 }
 
+export interface BodyKnowledgeEvidenceRelationshipSummary {
+  readonly id: string
+  readonly domain: string
+  readonly claim: string
+  readonly evidencePmids: readonly string[]
+}
+
 export interface BodyKnowledgeOrganEvidenceSummary {
   readonly system: string
   readonly organ: string
@@ -71,6 +78,11 @@ export interface BodyKnowledgeOrganEvidenceSummary {
   readonly sourceCount: number
   readonly sourcePmids: readonly string[]
   readonly domains: readonly string[]
+  /** One-sentence statement of what "source-checked" actually verifies, for
+   *  display directly next to the claims — never omitted, so the boundary
+   *  is never separated from the evidence it bounds. */
+  readonly sourceCheckedMeans: string
+  readonly relationships: readonly BodyKnowledgeEvidenceRelationshipSummary[]
 }
 
 /**
@@ -155,6 +167,10 @@ export function summarizeBodyKnowledgeOrganEvidence(
     }
   }
 
+  const pmidBySourceId = new Map<string, string>(
+    seed.sources.map((source): [string, string] => [source.id, source.pmid]),
+  )
+
   return {
     system: seed.system,
     organ: seed.organ,
@@ -163,6 +179,13 @@ export function summarizeBodyKnowledgeOrganEvidence(
     sourceCount: seed.sources.length,
     sourcePmids: seed.sources.map((source) => source.pmid),
     domains: [...new Set(seed.relationships.map((relationship) => relationship.domain))],
+    sourceCheckedMeans: boundary.sourceCheckedMeans,
+    relationships: seed.relationships.map((relationship) => ({
+      id: relationship.id,
+      domain: relationship.domain,
+      claim: relationship.claim,
+      evidencePmids: relationship.evidence.map((evidenceId: string) => pmidBySourceId.get(evidenceId)!),
+    })),
   }
 }
 

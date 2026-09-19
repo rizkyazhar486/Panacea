@@ -41,4 +41,32 @@ export function getBodyKnowledgeEvidenceForOrgan(
   return BODY_KNOWLEDGE_ORGAN_EVIDENCE.find((entry) => entry.system === system && entry.organ === organ)
 }
 
+// The UI's organ identifiers (OrganDossier.tsx's `organKey`, e.g. from
+// organFocus.ts) predate this registry and do not always match the seed's
+// own `system`/`organ` strings 1:1 (plural UI keys like "lungs"/"kidneys"
+// vs. the seed's singular "lung"/"kidney"). This map is the single place
+// that reconciles the two vocabularies, so a UI surface can look evidence
+// up by the identifier it already has instead of every caller re-deriving
+// its own guess at the mapping.
+const ORGAN_KEY_TO_EVIDENCE_LOOKUP: Readonly<Record<string, { system: string; organ: string }>> = {
+  liver: { system: 'digestive', organ: 'liver' },
+  pituitary: { system: 'endocrine', organ: 'pituitary' },
+  lungs: { system: 'respiratory', organ: 'lung' },
+  kidneys: { system: 'urinary', organ: 'kidney' },
+}
+
+/**
+ * Looks evidence up by the UI's organKey (as used in OrganDossier.tsx and
+ * organFocus.ts), not the seed's own system/organ strings. Returns
+ * undefined — never a guess — when no seed exists for that organ yet, so a
+ * caller can fail closed rather than render evidence for the wrong organ.
+ */
+export function getBodyKnowledgeEvidenceForOrganKey(
+  organKey: string,
+): BodyKnowledgeOrganEvidenceSummary | undefined {
+  const target = ORGAN_KEY_TO_EVIDENCE_LOOKUP[organKey]
+  if (!target) return undefined
+  return getBodyKnowledgeEvidenceForOrgan(target.system, target.organ)
+}
+
 export { type BodyKnowledgeOrganEvidenceSummary } from './bodyKnowledgeEvidenceContract'
