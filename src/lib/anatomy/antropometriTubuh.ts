@@ -22,12 +22,24 @@
 //    Volume tubuh = massa / densitas. Densitas tubuh manusia utuh berada di
 //    kisaran sempit ~1.01-1.06 g/cm3 (dasar yang sama dipakai persamaan
 //    Siri dan Brozek untuk komposisi tubuh). Jadi seluruh lingkar diskalakan
-//    oleh satu faktor k yang diselesaikan secara numerik sampai VOLUME MESH
-//    YANG BENAR-BENAR DIHASILKAN sama dengan massa/densitas.
+//    oleh satu faktor k sampai JUMLAH VOLUME SEGMEN — batang tubuh, dua
+//    tungkai, dua lengan — sama dengan massa/densitas. Karena volume tumbuh
+//    dengan kuadrat ukuran linear, k punya bentuk tertutup: k = sqrt(Vsasaran /
+//    Vsatuan), tanpa iterasi.
 //
-//    Inilah bedanya dengan angka ajaib: hasilnya dapat difalsifikasi. Hitung
-//    volume mesh keluaran, bandingkan dengan massa/densitas; kalau meleset,
+//    Yang dijumlahkan adalah volume SEGMEN, sebagaimana lazimnya antropometri,
+//    bukan volume gabungan permukaan yang dirender. Anggota badan sengaja
+//    dipasang sedikit masuk ke dalam batang tubuh supaya tidak ada sambungan
+//    yang terlihat; tumpang tindih di sendi itu urusan tampilan dan tidak
+//    mengubah pembukuan volumenya.
+//
+//    Inilah bedanya dengan angka ajaib: hasilnya dapat difalsifikasi. Jumlahkan
+//    volume segmen keluaran, bandingkan dengan massa/densitas; kalau meleset,
 //    berkas ini salah. Penjaganya: scripts/uji/antropometri-tubuh.mts.
+//
+// 3. PEMBAGIAN ANTAR SEGMEN — fraksi massa Winter/Dempster. Kekekalan massa
+//    saja masih membolehkan tungkai gemuk di atas batang tubuh kurus; patokan
+//    ini yang menahannya, dan uji memeriksa selisihnya dalam satuan poin.
 //
 // YANG TIDAK DIKLAIM BERKAS INI.
 // Ini BUKAN pemindaian, bukan rekonstruksi fotogrametrik, dan bukan ukuran
@@ -127,6 +139,11 @@ export interface BentukTubuh {
    * volumenya konsisten secara aritmetika tetapi sosoknya berkaki satu.
    */
   tungkai: Penampang[]
+  /**
+   * Penampang SATU lengan, dari pergelangan tangan ke bahu. Sama seperti
+   * tungkai: dihitung dua kali dan dirender dua kali.
+   */
+  lengan: Penampang[]
   /** Faktor skala lingkar hasil penyelesaian kekekalan massa. */
   skalaLingkar: number
   /** Volume mesh hasil, m3. */
@@ -181,7 +198,7 @@ export function volumeTangkaPenampang(penampang: Penampang[]): number {
  * sampai volumenya benar. Nilai rasio itu sengaja konservatif dan hanya
  * menentukan proporsi relatif, bukan ukuran mutlak.
  */
-function kerangka(tinggiM: number, jenisKelamin: 'L' | 'P'): { torso: Penampang[]; tungkai: Penampang[] } {
+function kerangka(tinggiM: number, jenisKelamin: 'L' | 'P'): { torso: Penampang[]; tungkai: Penampang[]; lengan: Penampang[] } {
   const P = PROPORSI_DRILLIS_CONTINI
   const H = tinggiM
   // Perempuan: panggul relatif lebih lebar terhadap bahu. Satu-satunya tempat
@@ -196,6 +213,7 @@ function kerangka(tinggiM: number, jenisKelamin: 'L' | 'P'): { torso: Penampang[
   // Bukan angka selera: uji memeriksa pembagian hasilnya terhadap tabel Winter.
   const KAL_TORSO = 1.057
   const KAL_TUNGKAI = 0.934
+  const KAL_LENGAN = 0.807
 
   // a = setengah lebar, b = setengah tebal, keduanya sebagai pecahan tinggi.
   const torso: Penampang[] = [
@@ -223,19 +241,33 @@ function kerangka(tinggiM: number, jenisKelamin: 'L' | 'P'): { torso: Penampang[
     { nama: 'pangkal-paha', y: 0.500 * H, a: 0.062 * H * KAL_TUNGKAI, b: 0.064 * H * KAL_TUNGKAI },
   ]
 
-  return { torso, tungkai }
+  return { torso, tungkai, lengan: kerangkaLengan(H, KAL_LENGAN) }
 }
 
 /** Anggota badan diperlakukan terpisah: volumenya ikut dihitung, bukan diabaikan. */
-function volumeAnggotaBadan(tinggiM: number, skala: number): number {
+/**
+ * Penampang SATU lengan, dari pergelangan tangan ke bahu.
+ *
+ * Sebelumnya lengan hanya dihitung sebagai silinder elips seragam, dan
+ * dirender sebagai silinder yang mengambang lepas dari bahu. Dua akibatnya
+ * nyata: volumenya melebihi lengan sungguhan (lengan meruncing kuat dari
+ * deltoid ke pergelangan, tidak seragam), dan sosoknya tidak terbaca sebagai
+ * satu tubuh. Sekarang lengan memakai tangkai penampang yang sama seperti
+ * tungkai, sehingga angka dan gambar berasal dari bentuk yang sama.
+ *
+ * Ketinggiannya memakai proporsi terbitan: bahu 0.818H, siku 0.630H,
+ * pergelangan tangan 0.485H.
+ */
+function kerangkaLengan(tinggiM: number, kal: number): Penampang[] {
   const P = PROPORSI_DRILLIS_CONTINI
   const H = tinggiM
-  // Empat silinder elips: 2 lengan (atas+bawah digabung) dan 2 tungkai sudah
-  // termasuk di tangkai penampang, jadi di sini HANYA lengan yang dihitung.
-  const panjangLengan = (P.panjangLenganAtas + P.panjangLenganBawah) * H
-  const a = 0.028 * 0.937 * H * skala
-  const b = 0.030 * 0.937 * H * skala
-  return 2 * Math.PI * a * b * panjangLengan
+  return [
+    { nama: 'pergelangan-tangan', y: P.tinggiPergelanganTangan * H, a: 0.020 * H * kal, b: 0.024 * H * kal },
+    { nama: 'lengan-bawah', y: 0.560 * H, a: 0.028 * H * kal, b: 0.030 * H * kal },
+    { nama: 'siku', y: P.tinggiSiku * H, a: 0.030 * H * kal, b: 0.032 * H * kal },
+    { nama: 'lengan-atas', y: 0.720 * H, a: 0.036 * H * kal, b: 0.038 * H * kal },
+    { nama: 'deltoid', y: P.tinggiBahu * H, a: 0.046 * H * kal, b: 0.048 * H * kal },
+  ]
 }
 
 /**
@@ -275,21 +307,23 @@ export function selesaikanBentukTubuh(
   const volumeSatuan =
     volumeTangkaPenampang(dasar.torso) +
     2 * volumeTangkaPenampang(dasar.tungkai) +
-    volumeAnggotaBadan(tinggiM, 1)
+    2 * volumeTangkaPenampang(dasar.lengan)
   if (volumeSatuan <= 0) throw new Error('volume kerangka dasar bukan bilangan positif')
   const skalaLingkar = Math.sqrt(volumeSasaranM3 / volumeSatuan)
 
   const skalakan = (ps: Penampang[]) => ps.map((p) => ({ ...p, a: p.a * skalaLingkar, b: p.b * skalaLingkar }))
   const penampang = skalakan(dasar.torso)
   const tungkai = skalakan(dasar.tungkai)
+  const lengan = skalakan(dasar.lengan)
   const volumeM3 =
     volumeTangkaPenampang(penampang) +
     2 * volumeTangkaPenampang(tungkai) +
-    volumeAnggotaBadan(tinggiM, skalaLingkar)
+    2 * volumeTangkaPenampang(lengan)
 
   return {
     penampang,
     tungkai,
+    lengan,
     skalaLingkar,
     volumeM3,
     volumeSasaranM3,

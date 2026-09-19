@@ -175,7 +175,8 @@ export function PersonalBodyAvatar3D({ compact = false }: { compact?: boolean } 
       const cari = (nama: string) => {
         const p =
           bentuk.penampang.find((x) => x.nama === nama) ??
-          bentuk.tungkai.find((x) => x.nama === nama)
+          bentuk.tungkai.find((x) => x.nama === nama) ??
+          bentuk.lengan.find((x) => x.nama === nama)
         if (!p) throw new Error(`penampang '${nama}' tidak ada pada bentuk tubuh`)
         return p
       }
@@ -183,15 +184,27 @@ export function PersonalBodyAvatar3D({ compact = false }: { compact?: boolean } 
       const panggulP = cari('panggul')
       const pergelanganKaki = cari('pergelangan-kaki')
       const kepala = cari('kepala-tengah')
+      const selangkanganP = cari('selangkangan')
 
-      const panjangLengan = (0.186 + 0.146) * (input.heightCm / 100)
-      const jariLengan = Math.max(0.028, bahuP.a * 0.20)
-      const armGeoA = new THREE.CylinderGeometry(jariLengan, jariLengan * 0.82, panjangLengan, 20)
+      // LENGAN — di-loft dari penampangnya sendiri, bukan silinder seragam.
+      // Ditempatkan sedikit MASUK ke dalam bahu supaya tidak ada sambungan yang
+      // terlihat; tumpang tindih kecil itu urusan tampilan, sedangkan volume
+      // tetap dihitung sebagai jumlah volume segmen seperti lazimnya
+      // antropometri.
+      const mLengan = bangunMeshTubuh(bentuk.lengan, { segmen: 28, sisipan: 5 })
+      const deltoid = cari('deltoid')
       for (const sisi of [-1, 1]) {
-        const lengan = new THREE.Mesh(armGeoA.clone(), skin)
-        lengan.position.set(sisi * (bahuP.a + jariLengan * 1.1), LANTAI + bahuP.y - panjangLengan / 2, 0)
-        lengan.rotation.z = sisi * 0.08
+        const g = new THREE.BufferGeometry()
+        g.setAttribute('position', new THREE.BufferAttribute(mLengan.posisi.slice(), 3))
+        g.setIndex(new THREE.BufferAttribute(mLengan.indeks.slice(), 1))
+        g.computeVertexNormals()
+        const lengan = new THREE.Mesh(g, skin)
+        // Diturunkan sedikit: kalau ring teratas lengan berhenti tepat di
+        // garis bahu, ujung terbukanya menonjol sebagai tepi datar karena
+        // batang tubuh sudah menyempit ke arah leher di atas titik itu.
+        lengan.position.set(sisi * (bahuP.a - deltoid.a * 0.35), LANTAI - deltoid.a * 0.55, 0)
         lengan.castShadow = true
+        lengan.receiveShadow = true
         person.add(lengan)
       }
 
@@ -206,7 +219,10 @@ export function PersonalBodyAvatar3D({ compact = false }: { compact?: boolean } 
         g.setIndex(new THREE.BufferAttribute(mKaki.indeks.slice(), 1))
         g.computeVertexNormals()
         const kaki = new THREE.Mesh(g, skin)
-        kaki.position.set(sisi * kakiX, LANTAI, 0)
+        // Dinaikkan sedikit ke dalam panggul: kalau puncak tungkai berhenti
+        // tepat di selangkangan, yang terlihat adalah tepi bertingkat karena
+        // tungkai lebih sempit daripada dasar batang tubuh.
+        kaki.position.set(sisi * kakiX, LANTAI + selangkanganP.y * 0.055, 0)
         kaki.castShadow = true
         kaki.receiveShadow = true
         person.add(kaki)

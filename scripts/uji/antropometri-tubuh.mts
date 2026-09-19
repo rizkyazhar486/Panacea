@@ -124,7 +124,15 @@ for (const kasus of KASUS) {
   const bentuk = selesaikanBentukTubuh({ tinggiCm: 170, massaKg: 68, jenisKelamin: 'L' })
   const vTorso = volumeTangkaPenampang(bentuk.penampang)
   const vTungkai = 2 * volumeTangkaPenampang(bentuk.tungkai)
-  const vLengan = bentuk.volumeM3 - vTorso - vTungkai
+  const vLengan = 2 * volumeTangkaPenampang(bentuk.lengan)
+  // Ketiganya harus MENJUMLAH ke volume yang dilaporkan. Dulu volume lengan
+  // dihitung sebagai sisa (total - torso - tungkai), yang membuat uji ini tidak
+  // pernah bisa menangkap kesalahan pada lengan: berapa pun nilainya, sisanya
+  // selalu pas. Sekarang lengan dihitung sendiri dan totalnya diperiksa.
+  assert.ok(
+    Math.abs(vTorso + vTungkai + vLengan - bentuk.volumeM3) / bentuk.volumeM3 < 1e-9,
+    'jumlah volume batang tubuh + dua tungkai + dua lengan tidak sama dengan volume yang dilaporkan',
+  )
 
   const bagian = {
     torso: vTorso / bentuk.volumeM3,
@@ -138,8 +146,8 @@ for (const kasus of KASUS) {
     const sasaran = BAGIAN_MASSA[kunci] / totalWinter
     const nyata = bagian[kunci]
     assert.ok(
-      Math.abs(nyata - sasaran) < 0.035,
-      `pembagian volume '${kunci}' ${(nyata * 100).toFixed(1)}% menyimpang lebih dari 3.5 poin dari fraksi massa Winter ${(sasaran * 100).toFixed(1)}% — proporsi antar segmen tidak lagi mengikuti tabel terbitan`,
+      Math.abs(nyata - sasaran) < 0.015,
+      `pembagian volume '${kunci}' ${(nyata * 100).toFixed(1)}% menyimpang lebih dari 1.5 poin dari fraksi massa Winter ${(sasaran * 100).toFixed(1)}% — proporsi antar segmen tidak lagi mengikuti tabel terbitan`,
     )
   }
 }
@@ -154,8 +162,8 @@ for (const kasus of KASUS) {
 // Karena itu di sini yang diperiksa adalah kontrak antara lib dan perendernya.
 {
   const bentuk = selesaikanBentukTubuh({ tinggiCm: 172, massaKg: 70 })
-  const tersedia = new Set([...bentuk.penampang, ...bentuk.tungkai].map((p) => p.nama))
-  const DIPAKAI_PERENDER = ['bahu', 'panggul', 'pergelangan-kaki', 'kepala-tengah', 'selangkangan']
+  const tersedia = new Set([...bentuk.penampang, ...bentuk.tungkai, ...bentuk.lengan].map((p) => p.nama))
+  const DIPAKAI_PERENDER = ['bahu', 'panggul', 'pergelangan-kaki', 'kepala-tengah', 'selangkangan', 'deltoid']
   for (const nama of DIPAKAI_PERENDER) {
     assert.ok(
       tersedia.has(nama),
@@ -178,8 +186,8 @@ for (const kasus of KASUS) {
   // persis bentuk kegagalan yang pernah terjadi.
   assert.match(
     sumberPerender,
-    /bentuk\.penampang\.find[\s\S]{0,120}bentuk\.tungkai\.find/,
-    'pencarian penampang di PersonalBodyAvatar3D tidak menelusuri tungkai, sehingga nama yang pindah ke sana akan kembali menjadi undefined',
+    /bentuk\.penampang\.find[\s\S]{0,200}bentuk\.tungkai\.find[\s\S]{0,200}bentuk\.lengan\.find/,
+    'pencarian penampang di PersonalBodyAvatar3D tidak menelusuri KETIGA daftar (batang tubuh, tungkai, lengan), sehingga nama yang pindah antar daftar akan kembali menjadi undefined',
   )
 }
 
