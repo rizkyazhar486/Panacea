@@ -85,6 +85,17 @@ export interface Clinical {
   education: Record<string, any>
 }
 
+export interface VisitMembership {
+  id: string
+  patientUserId: string
+  clinicianUserId: string
+  status: 'scheduled' | 'active' | 'ended'
+  startsAt?: string
+  endsAt?: string
+  createdAt: string
+  updatedAt: string
+}
+
 // No dummy/demo content — a clean clinical store.
 function seedPatients(): any[] {
   return []
@@ -119,6 +130,7 @@ interface DB {
   hrNotifications?: Record<string, Record<string, any>[]> // email -> raw high/low/irregular HR notifications
   webhookDeliveries?: Record<string, WebhookDelivery[]> // email -> what recent syncs actually contained
   facilityPrices?: FacilityPriceSubmission[] // crowd-sourced provider price board — real submissions, no fabricated numbers
+  visitMemberships?: Record<string, VisitMembership> // canonical Visit OS patient/clinician authorization registry
 }
 
 // A real patient/doctor-submitted price for a facility, optionally scoped to
@@ -449,6 +461,92 @@ export function findUserBySelfPatientId(patientId: string): User | undefined {
   if (!patientId?.startsWith('self-')) return undefined
   const suffix = patientId.slice(5).toLowerCase()
   return db.users.find((u) => u.email.toLowerCase().replace(/[^a-z0-9]/g, '').slice(0, 16) === suffix)
+}
+
+const VISIT_STATUS_RANK: Record<VisitMembership['status'], number> = {
+  scheduled: 0,
+  active: 1,
+  ended: 2,
+}
+
+function visitIso(value: string | undefined, field: string): string | undefined {
+  if (value === undefined) return undefined
+  const parsed = Date.parse(value)
+  if (!Number.isFinite(parsed)) throw new Error(`${field} must be a valid timestamp`)
+  return new Date(parsed).toISOString()
+}
+
+function visitText(value: string, field: string): string {
+  const normalized = value.trim()
+  if (!normalized) throw new Error(`${field} must not be blank`)
+  if (normalized.length > 160) throw new Error(`${field} is too long`)
+  return normalized
+}
+
+export function saveVisitMembership(input: Omit<VisitMembership, 'createdAt' | 'updatedAt'> & {
+  createdAt?: string
+  updatedAt?: string
+}): VisitMembership {
+  if (!db.visitMemberships) db.visitMemberships = {}
+
+  const id = visitText(input.id, 'visit.id')
+  const patientUserId = visitText(input.patientUserId, 'visit.patientUserId')
+  const clinicianUserId = visitText(input.clinicianUserId, 'visit.clinicianUserId')
+  if (patientUserId === clinicianUserId) throw new Error('visit patient and clinician must be different users')
+
+  const patient = getUser(patientUserId)
+  const clinician = getUser(clinicianUserId)
+  if (!patient || patient.role !== 'pasien') throw new Error('visit patient must be a registered patient user')
+  if (!clinician || clinician.role !== 'dokter') throw new Error('visit clinician must be a registered doctor user')
+
+  const startsAt = visitIso(input.startsAt, 'visit.startsAt')
+  const endsAt = visitIso(input.endsAt, 'visit.endsAt')
+  if (startsAt && endsAt && Date.parse(endsAt) < Date.parse(startsAt)) {
+    throw new Error('visit.endsAt must not precede visit.startsAt')
+  }
+
+  const existing = db.visitMemberships[id]
+  if (existing) {
+    if (existing.patientUserId !== patientUserId || existing.clinicianUserId !== clinicianUserId) {
+      throw new Error('visit participants are immutable after creation')
+    }
+    if (VISIT_STATUS_RANK[input.status] < VISIT_STATUS_RANK[existing.status]) {
+      throw new Error('visit lifecycle cannot move backward')
+    }
+  }
+
+  const createdAt = existing?.createdAt ?? visitIso(input.createdAt, 'visit.createdAt') ?? new Date().toISOString()
+  const updatedAt = visitIso(input.updatedAt, 'visit.updatedAt') ?? new Date().toISOString()
+  if (Date.parse(updatedAt) < Date.parse(createdAt)) throw new Error('visit.updatedAt must not precede visit.createdAt')
+
+  const record: VisitMembership = {
+    id,
+    patientUserId,
+    clinicianUserId,
+    status: input.status,
+    startsAt,
+    endsAt,
+    createdAt,
+    updatedAt,
+  }
+  db.visitMemberships[id] = record
+  save()
+  return { ...record }
+}
+
+export function getVisitMembership(visitId: string): VisitMembership | undefined {
+  const id = visitId.trim()
+  const record = db.visitMemberships?.[id]
+  return record ? { ...record } : undefined
+}
+
+export function listVisitMembershipsForUser(userId: string): VisitMembership[] {
+  const id = userId.trim()
+  if (!id) return []
+  return Object.values(db.visitMemberships ?? {})
+    .filter((visit) => visit.patientUserId === id || visit.clinicianUserId === id)
+    .sort((a, b) => Date.parse(b.updatedAt) - Date.parse(a.updatedAt))
+    .map((visit) => ({ ...visit }))
 }
 
 export function balance(userId: string): number {

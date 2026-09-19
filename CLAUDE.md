@@ -380,3 +380,9 @@ and
 `Task Cost = User Interactions + Context Switches + Required Decisions + Waiting`.
 
 Do not reintroduce gradient/card-wall/glow-heavy presentation as a default aesthetic. Clinical/Body canvases may remain immersive when functionally justified, but controls around them must stay quiet and obvious.
+
+## Visit OS secure realtime handoff — 2026-09-19
+
+The generic `server/src/realtime.ts` room relay remains preserved for existing Consult/WebRTC behavior and must not be represented as the secure Visit OS transport. `server/src/visitRealtimePolicy.ts` now defines the fail-closed authorization boundary: authentication alone is insufficient; the exact patient/clinician membership, visit id, role, visit window, and bounded signaling envelope must all agree.
+
+Current blocker before wiring a production `/visit-ws` path: the backend has no canonical server-side visit/encounter membership registry that can resolve `visitId -> exact patientUserId + clinicianUserId + lifecycle/window`. Do not authorize from a client-supplied room name, client role, owner/admin privilege, generic chat membership, or atlas/AI state. Next independent implementation should first add/reuse an authoritative visit membership source, then bind authenticated session identity to this policy, add replay/sequence protection and audit events, and only then migrate Visit OS signaling away from the generic relay. Preserve existing Consult compatibility during migration.

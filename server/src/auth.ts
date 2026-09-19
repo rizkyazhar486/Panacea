@@ -1,4 +1,5 @@
 import type { Request, Response, NextFunction } from 'express'
+import type { IncomingMessage } from 'node:http'
 import jwt from 'jsonwebtoken'
 import { OAuth2Client } from 'google-auth-library'
 import { config, features } from './config.js'
@@ -32,10 +33,7 @@ export function clearSession(res: Response) {
   res.clearCookie(COOKIE, SESSION_COOKIE_ATTRIBUTES)
 }
 
-export function currentUser(req: Request): User | undefined {
-  const auth = req.headers.authorization
-  const bearer = auth?.startsWith('Bearer ') ? auth.slice(7) : undefined
-  const token = bearer || req.cookies?.[COOKIE]
+function userFromToken(token: string | undefined): User | undefined {
   if (!token) return undefined
   try {
     const { uid } = jwt.verify(token, config.jwtSecret) as { uid: string }
@@ -43,6 +41,32 @@ export function currentUser(req: Request): User | undefined {
   } catch {
     return undefined
   }
+}
+
+export function currentUser(req: Request): User | undefined {
+  const auth = req.headers.authorization
+  const bearer = auth?.startsWith('Bearer ') ? auth.slice(7) : undefined
+  return userFromToken(bearer || req.cookies?.[COOKIE])
+}
+
+export function currentUserFromWebSocketRequest(req: IncomingMessage): User | undefined {
+  const auth = req.headers.authorization
+  const bearer = auth?.startsWith('Bearer ') ? auth.slice(7) : undefined
+  const cookieToken = req.headers.cookie
+    ?.split(';')
+    .map((part) => part.trim())
+    .find((part) => part.startsWith(`${COOKIE}=`))
+    ?.slice(COOKIE.length + 1)
+
+  const user = userFromToken(bearer || cookieToken)
+  if (!user) return undefined
+  const effectiveRole = effectiveRoleForRequest(
+    user,
+    getSettings(user.id),
+    config.ownerEmail,
+    false,
+  )
+  return effectiveRole === user.role ? user : { ...user, role: effectiveRole }
 }
 
 export function requireAuth(req: Request, res: Response, next: NextFunction) {
