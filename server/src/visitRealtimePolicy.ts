@@ -21,6 +21,7 @@ export type VisitRealtimeAuthorization =
       allowed: true
       participant: 'patient' | 'clinician'
       visitId: string
+      userId: string
     }
   | {
       allowed: false
@@ -76,11 +77,11 @@ export function authorizeVisitRealtimeJoin(
 
   if (userId === membership.patientUserId.trim()) {
     if (principal.role !== 'pasien') return { allowed: false, code: 'role_mismatch' }
-    return { allowed: true, participant: 'patient', visitId }
+    return { allowed: true, participant: 'patient', visitId, userId }
   }
   if (userId === membership.clinicianUserId.trim()) {
     if (principal.role !== 'dokter') return { allowed: false, code: 'role_mismatch' }
-    return { allowed: true, participant: 'clinician', visitId }
+    return { allowed: true, participant: 'clinician', visitId, userId }
   }
 
   return { allowed: false, code: 'not_a_participant' }
@@ -106,6 +107,7 @@ export function validateVisitRealtimeSignalEnvelope(
   envelope: VisitRealtimeSignalEnvelope,
   authorization: Extract<VisitRealtimeAuthorization, { allowed: true }>,
   maxBytes = 64 * 1024,
+  now = new Date().toISOString(),
 ): VisitRealtimeSignalEnvelope {
   const visitId = requiredText(envelope.visitId, 'envelope.visitId')
   const senderUserId = requiredText(envelope.senderUserId, 'envelope.senderUserId')
@@ -114,7 +116,11 @@ export function validateVisitRealtimeSignalEnvelope(
   if (!Number.isSafeInteger(envelope.sequence) || envelope.sequence < 0) {
     throw new Error('signal sequence must be a non-negative safe integer')
   }
-  optionalTime(envelope.sentAt, 'envelope.sentAt')
+  const sentAtMs = optionalTime(envelope.sentAt, 'envelope.sentAt')!
+  const nowMs = optionalTime(now, 'now')!
+  if (nowMs - sentAtMs > 2 * 60_000) throw new Error('signal timestamp is stale')
+  if (sentAtMs - nowMs > 30_000) throw new Error('signal timestamp is too far in the future')
+  if (senderUserId !== authorization.userId) throw new Error('signal sender does not match authenticated participant')
 
   const encoded = Buffer.byteLength(JSON.stringify(envelope), 'utf8')
   if (encoded > maxBytes) throw new Error('signal exceeds maximum payload size')

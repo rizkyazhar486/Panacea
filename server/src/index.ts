@@ -138,6 +138,7 @@ import { lookupGene } from './mygene.js'
 import { findRelatedDrugs } from './rxnorm.js'
 import { attachRealtime } from './realtime.js'
 import { mountHttpMcp } from './mcp/mount.js'
+import { mountVisitRoutes } from './visits.js'
 
 const app = express()
 // Security headers (CSP disabled here — the SPA is served from GitHub Pages,
@@ -207,6 +208,7 @@ const authLimiter = rateLimit({
 app.use('/api', globalLimiter)
 mountHttpMcp(app)
 app.use(express.json({ limit: '12mb' })) // allow base64 images for AI vision
+mountVisitRoutes(app)
 app.use(['/api/auth', '/api/login', '/api/dev-login'], authLimiter)
 
 // --- health / capability discovery ---
