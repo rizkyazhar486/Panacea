@@ -43,12 +43,12 @@ assert.equal(validateAiProxyRequest({
   messages: [{ role: 'user', content: [{ type: 'image', source: { type: 'base64', media_type: 'image/svg+xml', data: image } }] }],
 }).ok, false)
 
-assert.deepEqual(toPublicAiFailure(new Error('openrouter_429:provider payload with user data')), {
+assert.deepEqual(toPublicAiFailure(new Error('openrouter_429')), {
   status: 503,
   error: 'ai_upstream_rate_limited',
   retryable: true,
 })
-assert.deepEqual(toPublicAiFailure(new Error('upstream_401:secret provider detail')), {
+assert.deepEqual(toPublicAiFailure(new Error('upstream_401')), {
   status: 503,
   error: 'ai_provider_misconfigured',
   retryable: false,
