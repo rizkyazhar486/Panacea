@@ -12,12 +12,13 @@ import { join } from 'node:path'
 // kontrol itu — ia memotong ke satu baris dan memasang tombol "i".
 //
 // Aturannya ada; yang tidak ada adalah penegaknya. Saat berkas ini ditulis,
-// 447 paragraf prosa mentah berisi lebih dari satu kalimat masih tampil
-// langsung di layar, tersebar di 248 berkas. Itulah bentuk terukur dari
+// 329 penjelasan panjang (>=20 kata, >1 kalimat) masih tampil mentah
+// langsung di layar. Ambang 20 kata dipakai supaya pesan keadaan-kosong yang
+// benar tidak ikut terhitung dan angkanya tetap menunjuk hal yang nyata. Itulah bentuk terukur dari
 // keluhan "masih banyak tulisan".
 //
 // MENGAPA INI RATCHET, BUKAN AMBANG NOL.
-// Memperbaiki 447 sekaligus berarti menyentuh 248 berkas dalam satu perubahan
+// Memperbaiki semuanya sekaligus berarti menyentuh ratusan berkas dalam satu perubahan
 // besar yang mustahil ditinjau dan pasti bertabrakan dengan agen lain. Jadi
 // berkas ini mengunci angkanya sebagai BATAS ATAS: jumlahnya boleh turun, dan
 // setiap penurunan menurunkan batasnya. Menambah prosa baru menggagalkan uji.
@@ -33,7 +34,7 @@ import { join } from 'node:path'
  * TURUNKAN angka ini setiap kali prosa dipindahkan ke balik disclosure.
  * JANGAN PERNAH menaikkannya untuk membuat uji hijau.
  */
-const BATAS = 447
+const BATAS = 329
 
 const src = fileURLToPath(new URL('../../src/', import.meta.url))
 
@@ -63,10 +64,16 @@ for (const f of berkasTsx(src)) {
     if (PENANDA_KESELAMATAN.test(bersih)) continue
     const kalimat = bersih.split(/(?<=[.!?])\s+(?=[A-Z])/).filter((s) => s.length > 12)
     if (kalimat.length < 2) continue
+    // Panjang minimum, bukan sekadar dua titik. Tanpa ini, pesan keadaan-kosong
+    // yang benar seperti "No goals yet. Set one to start tracking progress."
+    // (9 kata) ikut terhitung, dan angkanya berhenti menunjuk hal yang memang
+    // perlu disembunyikan. Yang disasar aturan ini adalah PENJELASAN panjang.
+    const jumlahKata = bersih.split(/\s+/).length
+    if (jumlahKata < 20) continue
     temuan.push({
       berkas: f.replace(src, ''),
       kalimat: kalimat.length,
-      kata: bersih.split(/\s+/).length,
+      kata: jumlahKata,
       cuplik: bersih.slice(0, 70),
     })
   }
