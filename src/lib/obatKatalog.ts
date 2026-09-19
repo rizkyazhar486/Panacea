@@ -980,6 +980,8 @@ export const EJAAN_ID: Record<string, string[]> = {
   'Ampicillin': ['Ampisilin'],
   'Chlortalidone': ['Klortalidon'],
   'Calcium gluconate': ['Kalsium glukonas'],
+  // Fourth pass — exact systemic corticosteroid name/route match.
+  'Methylprednisolone': ['Metilprednisolon'],
   // NOT added, on purpose:
   //   'Clotrimazole (vaginal)' — the only golongan mentioning "klotrimazol"
   //     covers topical/oral skin dosing only; nothing here addresses the
