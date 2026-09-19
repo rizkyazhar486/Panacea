@@ -147,7 +147,7 @@ export type PublicAiFailure = {
 
 export function toPublicAiFailure(error: unknown): PublicAiFailure {
   const message = error instanceof Error ? error.message : ''
-  const match = message.match(/^(?:openrouter|upstream)_(\d{3}):/)
+  const match = message.match(/^(?:openrouter|upstream)_(\d{3})(?::|$)/)
   const status = match ? Number(match[1]) : 0
   if (status === 429) return { status: 503, error: 'ai_upstream_rate_limited', retryable: true }
   if (status === 401 || status === 403) return { status: 503, error: 'ai_provider_misconfigured', retryable: false }
