@@ -5,7 +5,7 @@ import {
   type LongitudinalMetricSnapshot,
   type LongitudinalPatientState,
   type PanaceaSurface,
-} from './panaceaLongitudinalState'
+} from './panaceaLongitudinalState.ts'
 
 export type LongitudinalReplayClock = 'known' | 'effective'
 
