@@ -50,3 +50,78 @@ export function getBodySemanticZoomStop(scale: BodySemanticScale): BodySemanticZ
 export function isMicroscopicBodyScale(scale: BodySemanticScale) {
   return ['tissue', 'cell', 'organelle', 'molecule', 'genome'].includes(scale)
 }
+
+
+export type BodySemanticAssetState = 'available' | 'missing' | 'failed'
+
+export interface BodySemanticRepresentationCapability {
+  state: BodySemanticAssetState
+  sourceId?: string
+  version?: string
+}
+
+export type BodySemanticRepresentationRegistry = Partial<
+  Record<BodySemanticScale, BodySemanticRepresentationCapability>
+>
+
+export type BodySemanticBlockReason =
+  | 'missing-source-asset'
+  | 'missing-provenance'
+  | 'source-load-failed'
+
+export interface BodySemanticRepresentationResolution {
+  requestedScale: BodySemanticScale
+  resolvedScale: BodySemanticScale | null
+  blocked: boolean
+  reason?: BodySemanticBlockReason
+}
+
+function hasVerifiedRepresentation(capability: BodySemanticRepresentationCapability | undefined) {
+  return capability?.state === 'available'
+    && Boolean(capability.sourceId?.trim())
+    && Boolean(capability.version?.trim())
+}
+
+function blockedReason(capability: BodySemanticRepresentationCapability | undefined): BodySemanticBlockReason {
+  if (capability?.state === 'failed') return 'source-load-failed'
+  if (capability?.state === 'available') return 'missing-provenance'
+  return 'missing-source-asset'
+}
+
+/**
+ * Resolves a requested biological scale without manufacturing detail.
+ *
+ * A representation is eligible only when an available asset declares both its
+ * source identifier and source version. If the requested representation is not
+ * eligible, the renderer stays on the nearest coarser verified representation.
+ * Returning null means no source-backed representation is safe to display.
+ */
+export function resolveBodySemanticRepresentation(
+  requestedScale: BodySemanticScale,
+  registry: BodySemanticRepresentationRegistry,
+): BodySemanticRepresentationResolution {
+  const requestedIndex = BODY_SEMANTIC_ZOOM_STOPS.findIndex((stop) => stop.id === requestedScale)
+  const requested = registry[requestedScale]
+  if (hasVerifiedRepresentation(requested)) {
+    return { requestedScale, resolvedScale: requestedScale, blocked: false }
+  }
+
+  for (let index = requestedIndex - 1; index >= 0; index -= 1) {
+    const candidate = BODY_SEMANTIC_ZOOM_STOPS[index].id
+    if (hasVerifiedRepresentation(registry[candidate])) {
+      return {
+        requestedScale,
+        resolvedScale: candidate,
+        blocked: true,
+        reason: blockedReason(requested),
+      }
+    }
+  }
+
+  return {
+    requestedScale,
+    resolvedScale: null,
+    blocked: true,
+    reason: blockedReason(requested),
+  }
+}
