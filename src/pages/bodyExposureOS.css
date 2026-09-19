@@ -2,101 +2,345 @@
   position: relative;
   isolation: isolate;
   overflow: clip;
-  border-radius: 34px;
-  border: 1px solid rgba(255, 255, 255, 0.07);
-  background:
-    radial-gradient(circle at 20% -8%, rgba(34, 211, 238, 0.10), transparent 28%),
-    radial-gradient(circle at 82% 4%, rgba(139, 92, 246, 0.10), transparent 24%),
-    radial-gradient(circle at 60% 42%, rgba(236, 72, 153, 0.035), transparent 32%),
-    linear-gradient(180deg, rgba(2, 5, 12, 0.98), rgba(0, 0, 0, 0.99));
-  padding: 10px;
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.045),
-    0 28px 90px rgba(0, 0, 0, 0.34);
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  padding: 0;
+  box-shadow: none;
 }
 
-.body-exposure-os::before {
-  content: '';
-  pointer-events: none;
-  position: absolute;
-  inset: 0;
-  z-index: 0;
-  border-radius: inherit;
-  background:
-    linear-gradient(120deg, rgba(255,255,255,.025), transparent 18%, transparent 72%, rgba(91,33,182,.035)),
-    radial-gradient(circle at 14% 14%, rgba(255,255,255,.12) 0 1px, transparent 1.5px),
-    radial-gradient(circle at 72% 26%, rgba(125,211,252,.14) 0 1px, transparent 1.5px),
-    radial-gradient(circle at 42% 54%, rgba(196,181,253,.10) 0 1px, transparent 1.5px);
-  background-size: auto, 87px 87px, 123px 123px, 147px 147px;
-  opacity: .55;
-}
-
+.body-exposure-os::before,
 .body-exposure-os__ambient {
-  pointer-events: none;
-  position: absolute;
-  inset: -18% -10% auto;
-  z-index: 0;
-  height: 420px;
-  background:
-    conic-gradient(from 225deg at 50% 50%, transparent, rgba(34,211,238,.06), transparent 28%, rgba(139,92,246,.055), transparent 58%, rgba(236,72,153,.035), transparent);
-  filter: blur(44px);
-  opacity: .8;
+  display: none;
 }
 
+/* One quiet orientation row. Body content, not chrome, owns the viewport. */
 .body-exposure-os__glass {
-  background:
-    linear-gradient(135deg, rgba(255,255,255,.075), rgba(255,255,255,.024) 48%, rgba(255,255,255,.035));
-  -webkit-backdrop-filter: blur(20px) saturate(165%);
-  backdrop-filter: blur(20px) saturate(165%);
-  box-shadow:
-    inset 0 1px 0 rgba(255,255,255,.11),
-    inset 18px 18px 40px rgba(255,255,255,.012),
-    0 18px 70px rgba(0,0,0,.26);
+  border: 0 !important;
+  border-bottom: 1px solid rgba(255,255,255,.08) !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  padding: 4px 0 12px !important;
+  box-shadow: none !important;
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
 }
 
+.body-exposure-os__glass > .pointer-events-none {
+  display: none !important;
+}
+
+.body-exposure-os__glass .max-w-4xl > .flex:first-child > span:not(:first-child) {
+  display: none !important;
+}
+
+.body-exposure-os__glass h2 {
+  margin-top: 4px !important;
+  overflow: hidden;
+  color: rgba(255,255,255,.94);
+  font-size: clamp(1.25rem, 2.6vw, 1.8rem) !important;
+  line-height: 1.12 !important;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.body-exposure-os__glass p,
+.body-exposure-os__glass [class~="grid-cols-3"] {
+  display: none !important;
+}
+
+.body-exposure-os__glass button {
+  min-height: 44px !important;
+  border: 0 !important;
+  border-bottom: 1px solid transparent !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  padding-inline: 8px !important;
+  color: rgba(255,255,255,.58) !important;
+  box-shadow: none !important;
+}
+
+.body-exposure-os__glass button:hover,
+.body-exposure-os__glass button:focus-visible {
+  border-bottom-color: rgba(255,255,255,.42) !important;
+  color: rgba(255,255,255,.92) !important;
+}
+
+/* Six modes = one instrument strip. No container card, no pills. */
 .body-exposure-os__dock {
+  position: sticky;
+  top: 0;
+  z-index: 30 !important;
+  margin-top: 4px !important;
+  overflow-x: auto;
+  border: 0 !important;
+  border-bottom: 1px solid rgba(255,255,255,.08) !important;
+  border-radius: 0 !important;
+  background: rgba(3,5,7,.96) !important;
+  padding: 0 !important;
+  box-shadow: none !important;
   scrollbar-width: none;
-  box-shadow:
-    inset 0 1px 0 rgba(255,255,255,.05),
-    0 12px 40px rgba(0,0,0,.18);
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
 }
 
 .body-exposure-os__dock::-webkit-scrollbar {
   display: none;
 }
 
-/* BodyExplorer predates the OS shell and still contains several neutral utility
-   surfaces. Scope the visual normalization here so no other Panacea page is
-   affected and no feature logic needs to be duplicated or removed. */
-.body-exposure-os__core [class~="bg-neutral-100"] {
-  background-color: rgba(255, 255, 255, 0.038) !important;
+.body-exposure-os__dock > div {
+  gap: 18px !important;
+}
+
+.body-exposure-os__dock button {
+  min-height: 46px !important;
+  border: 0 !important;
+  border-bottom: 2px solid transparent !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  padding: 0 1px !important;
+  color: rgba(255,255,255,.42) !important;
+  box-shadow: none !important;
+  white-space: nowrap;
+}
+
+.body-exposure-os__dock button[aria-pressed="true"] {
+  border-bottom-color: #00bf63 !important;
+  color: rgba(255,255,255,.96) !important;
+}
+
+.body-exposure-os__dock + div {
+  min-height: 24px;
+  margin-top: 6px !important;
+  overflow: hidden;
+  padding: 0 !important;
+  color: rgba(255,255,255,.34) !important;
+  white-space: nowrap;
+}
+
+.body-exposure-os__dock + div > span:first-child {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Major body blocks are separated by space, not nested cards. */
+.body-exposure-os > div.relative {
+  margin-top: 36px !important;
+}
+
+.body-exposure-os > .body-exposure-os__dock + div,
+.body-exposure-os > .body-exposure-os__dock + div + div {
+  margin-top: 8px !important;
+}
+
+.body-exposure-os__core {
+  border: 0 !important;
+  border-top: 1px solid rgba(255,255,255,.08) !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  padding: 30px 0 0 !important;
+  box-shadow: none !important;
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
+}
+
+.body-exposure-os__core *,
+.body-exposure-os__core *::before,
+.body-exposure-os__core *::after {
+  box-shadow: none !important;
+}
+
+/* Top-level BodyExplorer cards become sections on one continuous canvas. */
+.body-exposure-os__core > div > .kaca {
+  overflow: visible !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  padding: 0 !important;
+  box-shadow: none !important;
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
+}
+
+.body-exposure-os__core > div > .kaca + .kaca {
+  margin-top: 40px !important;
+  border-top: 1px solid rgba(255,255,255,.08) !important;
+  padding-top: 32px !important;
+}
+
+/* Body Explorer heading: no icon tile, no decorative stripe. */
+.body-exposure-os__core > div > .mb-5 .grid.h-11.w-11,
+.body-exposure-os__core > div > .mb-5 h2 > span[aria-hidden="true"] {
+  display: none !important;
+}
+
+.body-exposure-os__core > div > .mb-5 {
+  margin-bottom: 18px !important;
+}
+
+.body-exposure-os__core > div > .mb-5 h2 {
+  font-size: 1.05rem !important;
+  letter-spacing: -.01em !important;
+}
+
+.body-exposure-os__core > div > .mb-5 p {
+  overflow: hidden;
+  max-width: 100% !important;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* The 60-second guide stays available but reads like a disclosure, not a card. */
+.body-exposure-os__core details[data-testid="body-explorer-start-here"] {
+  margin-top: 8px !important;
+  border: 0 !important;
+  border-top: 1px solid rgba(255,255,255,.08) !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+}
+
+.body-exposure-os__core details[data-testid="body-explorer-start-here"] > summary {
+  padding-inline: 0 !important;
+}
+
+.body-exposure-os__core details[data-testid="body-explorer-start-here"] > summary > span:last-child {
+  border: 0 !important;
+  background: transparent !important;
+  padding-inline: 0 !important;
+}
+
+/* Neutral surfaces should recede; state colors remain for warnings/clinical meaning. */
+.body-exposure-os__core [class~="bg-neutral-100"],
+.body-exposure-os__core [class~="bg-neutral-50"],
+.body-exposure-os__core [class~="bg-white/60"] {
+  background-color: transparent !important;
 }
 
 .body-exposure-os__core [class~="border-neutral-200"],
 .body-exposure-os__core [class~="border-neutral-100"] {
-  border-color: rgba(255, 255, 255, 0.09) !important;
+  border-color: rgba(255,255,255,.09) !important;
 }
 
 .body-exposure-os__core [class~="text-neutral-600"],
 .body-exposure-os__core [class~="text-neutral-500"] {
-  color: rgba(226, 232, 240, 0.68) !important;
+  color: rgba(226,232,240,.62) !important;
 }
 
 .body-exposure-os__core [class~="text-neutral-400"] {
-  color: rgba(203, 213, 225, 0.52) !important;
+  color: rgba(203,213,225,.46) !important;
 }
 
+/* Group jumpers + actual panel tabs share one visual language: text + underline. */
+.body-exposure-os__core [aria-label="Panel groups"],
+.body-exposure-os__core [aria-label="Panel groups"] + div {
+  gap: 18px !important;
+  margin-inline: 0 !important;
+  overflow-x: auto;
+  border: 0 !important;
+  border-bottom: 1px solid rgba(255,255,255,.08) !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  padding: 0 !important;
+  scrollbar-width: none;
+}
+
+.body-exposure-os__core [aria-label="Panel groups"]::-webkit-scrollbar,
+.body-exposure-os__core [aria-label="Panel groups"] + div::-webkit-scrollbar {
+  display: none;
+}
+
+.body-exposure-os__core [aria-label="Panel groups"] button,
+.body-exposure-os__core [aria-label="Panel groups"] + div > button {
+  min-height: 42px !important;
+  flex: 0 0 auto !important;
+  border: 0 !important;
+  border-bottom: 2px solid transparent !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  padding: 0 !important;
+  color: rgba(226,232,240,.42) !important;
+}
+
+.body-exposure-os__core [aria-label="Panel groups"] button {
+  font-size: 9px !important;
+  letter-spacing: .08em !important;
+}
+
+.body-exposure-os__core [aria-label="Panel groups"] button[aria-pressed="true"],
+.body-exposure-os__core [aria-label="Panel groups"] + div > button[aria-pressed="true"] {
+  border-bottom-color: #00bf63 !important;
+  color: rgba(255,255,255,.94) !important;
+}
+
+/* Inputs are instruments: no glow, no floating control cards. */
 .body-exposure-os__core input,
 .body-exposure-os__core select,
 .body-exposure-os__core textarea {
-  transition: border-color 160ms ease, background-color 160ms ease, box-shadow 160ms ease;
+  box-shadow: none !important;
+  transition: border-color 160ms ease, background-color 160ms ease;
 }
 
 .body-exposure-os__core input:focus,
 .body-exposure-os__core select:focus,
 .body-exposure-os__core textarea:focus {
-  border-color: rgba(103, 232, 249, 0.36) !important;
-  box-shadow: 0 0 0 3px rgba(34, 211, 238, 0.07);
+  border-color: rgba(255,255,255,.42) !important;
+  box-shadow: none !important;
+}
+
+.body-exposure-os__core input[type="range"] {
+  min-height: 44px;
+}
+
+@media (max-width: 639px) {
+  .body-exposure-os__glass {
+    padding-bottom: 8px !important;
+  }
+
+  .body-exposure-os__glass h2 {
+    font-size: 1.15rem !important;
+  }
+
+  .body-exposure-os__glass > .relative {
+    gap: 6px !important;
+  }
+
+  .body-exposure-os__glass .max-w-4xl > .flex:first-child {
+    display: none !important;
+  }
+
+  .body-exposure-os__glass .flex.shrink-0.flex-wrap {
+    gap: 12px !important;
+  }
+
+  .body-exposure-os__glass button {
+    min-height: 42px !important;
+    font-size: 10px !important;
+  }
+
+  .body-exposure-os__dock {
+    top: 0;
+  }
+
+  .body-exposure-os__dock + div {
+    display: none !important;
+  }
+
+  .body-exposure-os > div.relative {
+    margin-top: 30px !important;
+  }
+
+  .body-exposure-os > .body-exposure-os__dock + div + div {
+    margin-top: 10px !important;
+  }
+
+  .body-exposure-os__core {
+    padding-top: 24px !important;
+  }
+
+  .body-exposure-os__core > div > .mb-5 p {
+    display: none !important;
+  }
 }
 
 .body-exposure-os:fullscreen {
@@ -105,19 +349,21 @@
   overflow-y: auto;
   border: 0;
   border-radius: 0;
-  padding: max(10px, env(safe-area-inset-top)) max(10px, env(safe-area-inset-right)) max(18px, env(safe-area-inset-bottom)) max(10px, env(safe-area-inset-left));
+  padding:
+    max(10px, env(safe-area-inset-top))
+    max(10px, env(safe-area-inset-right))
+    max(18px, env(safe-area-inset-bottom))
+    max(10px, env(safe-area-inset-left));
   background: #010207;
 }
 
 .body-exposure-os:fullscreen .body-exposure-os__dock {
-  position: sticky;
-  top: max(6px, env(safe-area-inset-top));
-  z-index: 30;
+  top: max(0px, env(safe-area-inset-top));
 }
 
-@media (min-width: 640px) {
-  .body-exposure-os {
-    padding: 14px;
+@media (prefers-reduced-transparency: reduce) {
+  .body-exposure-os__dock {
+    background: #030507 !important;
   }
 }
 
@@ -126,8 +372,8 @@
   .body-exposure-os *::before,
   .body-exposure-os *::after {
     scroll-behavior: auto !important;
-    transition-duration: 0.01ms !important;
-    animation-duration: 0.01ms !important;
+    transition-duration: .01ms !important;
+    animation-duration: .01ms !important;
     animation-iteration-count: 1 !important;
   }
 }
