@@ -1,4 +1,5 @@
 import assert from 'node:assert/strict'
+import { readFileSync } from 'node:fs'
 import { toPublicAiFailure, validateAiProxyRequest } from '../src/aiRequestPolicy.js'
 
 const valid = validateAiProxyRequest({
@@ -57,5 +58,12 @@ assert.deepEqual(toPublicAiFailure(new Error('network failed with prompt content
   error: 'ai_upstream_unavailable',
   retryable: true,
 })
+
+const aiSource = readFileSync(new URL('../src/ai.ts', import.meta.url), 'utf8')
+assert.doesNotMatch(
+  aiSource,
+  /await r\.text\(\)/,
+  'AI provider response bodies may contain echoed prompts and must not enter public error paths',
+)
 
 console.log('AI proxy validates bounded content and never exposes provider payloads.')
