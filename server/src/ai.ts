@@ -2,6 +2,7 @@ import type { Request, Response } from 'express'
 import type { User } from './store.js'
 import { balance, credit, getStats, listManualTopups, listDoctors, getAudit } from './store.js'
 import { config } from './config.js'
+import { toPublicAiFailure, validateAiProxyRequest } from './aiRequestPolicy.js'
 
 // Server-side Claude proxy — keeps the Anthropic key on the server so AI works
 // for every signed-in user without anyone pasting a key in the browser.
@@ -26,6 +27,11 @@ function rateLimited(userId: string): boolean {
   }
   cur.n += 1
   return cur.n > MAX_PER_WINDOW
+}
+
+function respondWithSafeAiFailure(res: Response, error: unknown) {
+  const failure = toPublicAiFailure(error)
+  return res.status(failure.status).json({ error: failure.error, retryable: failure.retryable })
 }
 
 type Msg = { role: 'user' | 'assistant'; content: string | any[] }
@@ -161,7 +167,7 @@ export async function aiVision(req: Request, res: Response) {
     const text = await callAnthropic('claude-opus-4-8', VISION_SYSTEM, [{ role: 'user', content }], 1500)
     res.json({ text })
   } catch (e) {
-    res.status(502).json({ error: 'ai_failed', detail: (e as Error).message })
+    respondWithSafeAiFailure(res, e)
   }
 }
 
@@ -170,15 +176,22 @@ export async function aiMessages(req: Request, res: Response) {
   const user = (req as Request & { user: User }).user
   if (rateLimited(user.id)) return res.status(429).json({ error: 'rate_limited' })
 
-  const body = req.body as { model?: string; system?: string; messages?: Msg[]; max_tokens?: number; json?: boolean }
-  if (!Array.isArray(body.messages) || body.messages.length === 0) {
-    return res.status(400).json({ error: 'bad_messages' })
+  const checked = validateAiProxyRequest(req.body)
+  if (!checked.ok) {
+    return res.status(checked.status).json({ error: checked.error, reason: checked.reason })
   }
+  const body = checked.value
   try {
-    const text = await callAnthropic(body.model || 'claude-sonnet-4-6', body.system || '', body.messages, Number(body.max_tokens) || 2048, body.json === true)
+    const text = await callAnthropic(
+      body.model || 'claude-sonnet-4-6',
+      body.system,
+      body.messages as Msg[],
+      body.maxTokens,
+      body.json,
+    )
     res.json({ text })
   } catch (e) {
-    res.status(502).json({ error: 'ai_failed', detail: (e as Error).message })
+    respondWithSafeAiFailure(res, e)
   }
 }
 
@@ -204,7 +217,7 @@ export async function aiConsult(req: Request, res: Response) {
     credit(user.id, -price, 'purchase', 'Konsultasi AI Mendalam')
     res.json({ text, charged: price, balance: balance(user.id) })
   } catch (e) {
-    res.status(502).json({ error: 'ai_failed', detail: (e as Error).message })
+    respondWithSafeAiFailure(res, e)
   }
 }
 
@@ -313,7 +326,7 @@ export async function aiOperator(req: Request, res: Response) {
       const text = await callAnthropic('claude-sonnet-4-6', CONTENT_SYSTEM, [{ role: 'user', content: 'Buat satu artikel hidup sehat untuk feed hari ini.' }], 800)
       return res.json({ text, mode })
     } catch (e) {
-      return res.status(502).json({ error: 'ai_failed', detail: (e as Error).message })
+      return respondWithSafeAiFailure(res, e)
     }
   }
   if (mode in DEPARTMENT_SYSTEM) {
@@ -322,13 +335,13 @@ export async function aiOperator(req: Request, res: Response) {
       const text = await callAnthropic('claude-sonnet-4-6', DEPARTMENT_SYSTEM[mode], [{ role: 'user', content: context }], 1600)
       return res.json({ text, mode })
     } catch (e) {
-      return res.status(502).json({ error: 'ai_failed', detail: (e as Error).message })
+      return respondWithSafeAiFailure(res, e)
     }
   }
   try {
     const r = await generateOperatorBriefing()
     res.json({ text: r.text, mode: 'briefing', pending: r.pending })
   } catch (e) {
-    res.status(502).json({ error: 'ai_failed', detail: (e as Error).message })
+    respondWithSafeAiFailure(res, e)
   }
 }
