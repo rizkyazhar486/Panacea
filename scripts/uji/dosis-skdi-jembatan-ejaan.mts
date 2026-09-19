@@ -29,6 +29,13 @@ const SEHARUSNYA_PUNYA_DOSIS = [
   'Sucralfate', 'Promethazine', 'Docusate', 'Gliclazide', 'Thiamine (B1)',
   'Clotrimazole (topical)', 'Miconazole (topical)', 'Itraconazole', 'Naproxen',
   'Codeine', 'Carbamazepine', 'Duloxetine', 'Amitriptyline', 'Ambroxol', 'Fexofenadine',
+  // Third pass — exact drug-specific corpus hits, route/indication checked.
+  'Pyridoxine (B6)', 'Sacubitril/valsartan', 'Clarithromycin', 'Erythromycin',
+  'Levofloxacin', 'Moxifloxacin', 'Amikacin', 'Streptomycin', 'Clindamycin',
+  'Fosfomycin', 'Meloxicam', 'Levetiracetam', 'Oxymetazoline',
+  'Amoxicillin/clavulanate', 'Polyethylene glycol', 'Dexamethasone',
+  'Cloxacillin', 'Vasopressin', 'Cefotaxime', 'Ceftazidime', 'Ampicillin',
+  'Chlortalidone', 'Calcium gluconate',
 ]
 
 // ── 1b. These must STAY unmatched — matching by molecule name alone would be
@@ -70,8 +77,8 @@ for (const [a, b] of [
 // Bukan angka tetap: siapa pun boleh menambah cakupan lebih jauh. Yang tidak
 // boleh adalah MUNDUR dari sini tanpa ketahuan.
 const totalPunyaDosis = semuaObat().filter((o) => dosisSkdi(o.nama).length > 0).length
-assert.ok(totalPunyaDosis >= 142,
+assert.ok(totalPunyaDosis >= 165,
   `only ${totalPunyaDosis} of ${semuaObat().length} catalogue substances resolve to an SKDI dose (expected at ` +
-  'least 142). Coverage regressed — some EJAAN_ID entry was likely removed or renamed.')
+  'least 165). Coverage regressed — some EJAAN_ID entry was likely removed or renamed.')
 
 console.log(`dosis-skdi-jembatan-ejaan: ok (${totalPunyaDosis}/${semuaObat().length} substansi tersambung ke dosis SKDI)`)

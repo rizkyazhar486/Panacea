@@ -952,6 +952,34 @@ export const EJAAN_ID: Record<string, string[]> = {
   'Amitriptyline': ['Amitriptilin'],
   'Ambroxol': ['Ambroksol'],
   'Fexofenadine': ['Feksofenadin'],
+  // Third pass — exact corpus hits with explicit drug-specific dosing and
+  // matching route/indication. These were discovered mechanically only as
+  // candidates, then checked one-by-one against golonganObat.ts before being
+  // admitted. Ambiguous same-molecule/different-route candidates remain
+  // fail-closed below.
+  'Pyridoxine (B6)': ['Piridoksin'],
+  'Sacubitril/valsartan': ['Sakubitril-valsartan'],
+  'Clarithromycin': ['Klaritromisin'],
+  'Erythromycin': ['Eritromisin'],
+  'Levofloxacin': ['Levofloksasin'],
+  'Moxifloxacin': ['Moksifloksasin'],
+  'Amikacin': ['Amikasin'],
+  'Streptomycin': ['Streptomisin'],
+  'Clindamycin': ['Klindamisin'],
+  'Fosfomycin': ['Fosfomisin'],
+  'Meloxicam': ['Meloksikam'],
+  'Levetiracetam': ['Levetirasetam'],
+  'Oxymetazoline': ['Oksimetazolin'],
+  'Amoxicillin/clavulanate': ['Amoksisilin-klavulanat'],
+  'Polyethylene glycol': ['Polietilen glikol'],
+  'Dexamethasone': ['Deksametason'],
+  'Cloxacillin': ['Kloksasilin'],
+  'Vasopressin': ['Vasopresin'],
+  'Cefotaxime': ['Sefotaksim'],
+  'Ceftazidime': ['Seftazidim'],
+  'Ampicillin': ['Ampisilin'],
+  'Chlortalidone': ['Klortalidon'],
+  'Calcium gluconate': ['Kalsium glukonas'],
   // NOT added, on purpose:
   //   'Clotrimazole (vaginal)' — the only golongan mentioning "klotrimazol"
   //     covers topical/oral skin dosing only; nothing here addresses the
