@@ -95,8 +95,7 @@ async function callOpenRouter(model: string, system: string, messages: Msg[], ma
     }),
   })
   if (!r.ok) {
-    const txt = await r.text()
-    throw new Error(`openrouter_${r.status}:${txt.slice(0, 200)}`)
+    throw new Error(`openrouter_${r.status}`)
   }
   const data = (await r.json()) as { choices?: { message?: { content?: string } }[] }
   return data.choices?.[0]?.message?.content ?? ''
@@ -130,8 +129,7 @@ async function callAnthropic(model: string, system: string, messages: Msg[], max
     }),
   })
   if (!r.ok) {
-    const txt = await r.text()
-    throw new Error(`upstream_${r.status}:${txt.slice(0, 200)}`)
+    throw new Error(`upstream_${r.status}`)
   }
   const data = (await r.json()) as { content?: { type: string; text?: string }[] }
   return (data.content || []).find((b) => b.type === 'text')?.text ?? ''
