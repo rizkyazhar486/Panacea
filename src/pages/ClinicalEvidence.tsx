@@ -11,6 +11,7 @@ import {
   fetchRelatedArticles, type PubmedArticle,
   AUDIENS, type Audiens,
 } from '../lib/evidence'
+import { PubMedSearchWorkbench } from '../components/PubMedSearchWorkbench'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Clinical Evidence — ask a clinical question, get a structured, graded,
@@ -240,6 +241,8 @@ export function ClinicalEvidence() {
           </details>
         )}
       </Card>
+
+      <PubMedSearchWorkbench seedQuestion={q} />
 
       {/* Example questions */}
       {!answer && !loading && (
