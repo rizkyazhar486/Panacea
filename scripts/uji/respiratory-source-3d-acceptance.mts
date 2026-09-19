@@ -18,7 +18,7 @@ assert.ok(parts.length >= 30, 'respiratory module must preserve broad source-bac
 assert.ok(parts.every((part) => Number.isFinite(part.triangles) && part.triangles > 0), 'every respiratory structure must have positive indexed source geometry')
 assert.ok(triangles > 0, 'respiratory module must expose positive indexed geometry')
 assert.deepEqual(sources, ['bodyparts3d'], 'respiratory geometry must retain BodyParts3D provenance')
-for (const structure of ['trachea','diaphragm','epiglottis','left main bronchus','right main bronchus']) assert.ok(names.includes(structure), `respiratory atlas must expose ${structure}`)
+for (const structure of ['trachea','diaphragm','epiglottis','left main bronchus','right main bronchus proper']) assert.ok(names.includes(structure), `respiratory atlas must expose ${structure}`)
 assert.ok(names.some((name) => name.includes('bronchial tree')), 'respiratory atlas must preserve segmental/lobar bronchial tree geometry')
 assert.ok(names.some((name) => name.includes('intercostal muscle')), 'respiratory atlas must preserve chest-wall muscle context')
 assert.ok(names.some((name) => name.includes('rib')), 'respiratory atlas must preserve rib/chest-wall context')
