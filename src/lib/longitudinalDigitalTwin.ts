@@ -2,12 +2,12 @@ import {
   buildLongitudinalReplayFrame,
   materializeLongitudinalStateAt,
   type LongitudinalReplayClock,
-} from './longitudinalReplay'
+} from './longitudinalReplay.ts'
 import {
   filterStateByPurposeConsent,
   type PurposeConsentLedger,
-} from './purposeConsentLedger'
-import { isConsentActive } from './panaceaLongitudinalState'
+} from './purposeConsentLedger.ts'
+import { isConsentActive } from './panaceaLongitudinalState.ts'
 import type {
   ConsentPurpose,
   LongitudinalEvent,
