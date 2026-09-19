@@ -580,8 +580,10 @@ export function buildAiEmrVisitContext(
   state: VisitOperatingState,
   generatedAt: string,
 ): AiEmrVisitContext {
-  parseIso(generatedAt, 'generatedAt')
-  const observations = Object.values(state.latestByMetric)
+  const generatedMs = parseIso(generatedAt, 'generatedAt')
+  // Recheck at read time: retained samples must not outlive their consent.
+  const clinicalConsentActive = isConsentActive(state.consent.clinicalData, 'clinical-support', generatedMs)
+  const observations = (clinicalConsentActive ? Object.values(state.latestByMetric) : [])
     .filter((observation): observation is VisitDeviceObservation => Boolean(observation))
     .map((observation) => {
       const freshness = visitObservationFreshness(observation.receivedAt, generatedAt)
@@ -602,10 +604,16 @@ export function buildAiEmrVisitContext(
     visitId: state.visitId,
     subjectId: state.subjectId,
     clinicianId: state.clinicianId,
-    phase: state.phase,
+    phase: clinicalConsentActive || state.phase === 'ended' ? state.phase : 'consent-required',
     generatedAt,
-    media: { ...state.media },
-    connectedDevices: Object.values(state.devices)
+    media: clinicalConsentActive ? { ...state.media } : {
+      ...state.media,
+      camera: 'off',
+      microphone: 'off',
+      peerCount: 0,
+      ambientAi: 'disabled',
+    },
+    connectedDevices: (clinicalConsentActive ? Object.values(state.devices) : [])
       .map((device) => ({
         id: device.id,
         label: device.label,
@@ -645,9 +653,15 @@ export function promoteObservationToClinicalRecord(
   reviewedAt: string,
 ): LongitudinalEvent<number> {
   assertNonBlank(reviewerId, 'reviewerId')
-  parseIso(reviewedAt, 'reviewedAt')
+  const reviewedMs = parseIso(reviewedAt, 'reviewedAt')
+  if (!isConsentActive(state.consent.clinicalData, 'clinical-support', reviewedMs)) {
+    throw new Error('active clinical consent is required for observation promotion')
+  }
   const sample = state.latestByMetric[metric]
   if (!sample) throw new Error(`no live observation is available for ${metric}`)
+  if (reviewedMs < parseIso(sample.receivedAt, 'sample.receivedAt')) {
+    throw new Error('reviewedAt must not be earlier than observation receipt')
+  }
   const device = state.devices[sample.deviceId]
   if (!device) throw new Error('observation device is no longer registered')
 

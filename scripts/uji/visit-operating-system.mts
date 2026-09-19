@@ -257,3 +257,85 @@ assert.throws(
   () => revokeVisitClinicalConsent(reliabilityState, '2026-09-18T09:59:00.000Z'),
   /must not be earlier than consent grant/,
 )
+
+const consentBoundaryState = ingestVisitDeviceObservation(reliabilityState, {
+  ...sample,
+  id: 'consent-boundary-sample',
+  visitId: reliabilityState.visitId,
+  subjectId: reliabilityState.subjectId,
+  deviceId: 'monitor-1',
+  capturedAt: '2026-09-18T11:00:25.000Z',
+  receivedAt: '2026-09-18T11:00:26.000Z',
+}).state
+const activeContext = buildAiEmrVisitContext(consentBoundaryState, '2026-09-18T11:00:30.000Z')
+assert.equal(activeContext.observations.length, 1)
+
+const consentCutoff = '2026-09-18T11:01:00.000Z'
+const blockedStates = [
+  revokeVisitClinicalConsent(consentBoundaryState, consentCutoff),
+  {
+    ...consentBoundaryState,
+    consent: {
+      ...consentBoundaryState.consent,
+      clinicalData: { ...consentBoundaryState.consent.clinicalData, expiresAt: consentCutoff },
+    },
+  },
+  {
+    ...consentBoundaryState,
+    consent: {
+      ...consentBoundaryState.consent,
+      clinicalData: { ...consentBoundaryState.consent.clinicalData, granted: false },
+    },
+  },
+  {
+    ...consentBoundaryState,
+    consent: {
+      ...consentBoundaryState.consent,
+      clinicalData: { ...consentBoundaryState.consent.clinicalData, purposes: ['ai-context'] as const },
+    },
+  },
+]
+for (const blocked of blockedStates) {
+  const before = JSON.stringify(blocked)
+  const blockedContext = buildAiEmrVisitContext(blocked, consentCutoff)
+  assert.deepEqual(blockedContext.observations, [], 'inactive clinical consent must suppress retained observations')
+  assert.deepEqual(blockedContext.connectedDevices, [], 'inactive clinical consent must suppress device metadata')
+  assert.equal(blockedContext.phase, 'consent-required')
+  assert.equal(blockedContext.media.camera, 'off')
+  assert.equal(blockedContext.media.microphone, 'off')
+  assert.equal(blockedContext.media.peerCount, 0)
+  assert.equal(blockedContext.media.ambientAi, 'disabled')
+  assert.throws(
+    () => promoteObservationToClinicalRecord(blocked, 'heart-rate', 'doctor-001', consentCutoff),
+    /active clinical consent is required/,
+    'inactive consent must not produce a clinician-accepted event',
+  )
+  assert.equal(JSON.stringify(blocked), before, 'projection and rejected promotion must not mutate visit state')
+}
+assert.equal(
+  buildAiEmrVisitContext(blockedStates[1], '2026-09-18T11:00:59.999Z').observations.length,
+  1,
+  'consent remains active immediately before expiry',
+)
+assert.equal(
+  buildAiEmrVisitContext(endVisit(blockedStates[0], consentCutoff), consentCutoff).phase,
+  'ended',
+  'consent suppression must preserve the terminal visit lifecycle',
+)
+assert.equal(
+  promoteObservationToClinicalRecord(
+    endVisit(consentBoundaryState, consentCutoff),
+    'heart-rate',
+    'doctor-001',
+    '2026-09-18T11:02:00.000Z',
+  ).review.state,
+  'accepted',
+  'valid post-visit clinician review remains supported while consent is active',
+)
+assert.throws(
+  () => promoteObservationToClinicalRecord(
+    consentBoundaryState, 'heart-rate', 'doctor-001', '2026-09-18T11:00:25.000Z',
+  ),
+  /reviewedAt must not be earlier than observation receipt/,
+)
+console.log('Visit OS consent output boundary verified: revoked/expired/denied/wrong-purpose context and promotion fail closed.')
