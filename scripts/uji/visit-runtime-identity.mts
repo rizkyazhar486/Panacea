@@ -61,6 +61,16 @@ assert.match(
   /resolveVisitRuntimeIdentity/,
   'VisitCommandCenter must consume the authenticated identity resolver',
 )
+assert.match(
+  commandCenter,
+  /clinicianId=\{identity\.clinicianId\}/,
+  'VisitCommandCenter must forward the resolved clinician identity',
+)
+assert.match(
+  commandCenter,
+  /subjectId=\{identity\.subjectId\}/,
+  'VisitCommandCenter must forward the resolved subject identity',
+)
 assert.doesNotMatch(
   commandCenter,
   /local-clinician/,
