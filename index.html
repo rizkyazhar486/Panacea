@@ -45,6 +45,10 @@
     <!-- v49 is the final mobile shell repair: toolbar-height cap, compact
          icon geometry, and unclipped notification counts. -->
     <link rel="stylesheet" href="/panacea-shell-mobile-compact-v49.css?v=20260918-1" />
+    <!-- v50 is the governing visual layer: ruthless simplicity. It preserves
+         capability while removing decorative gradients/glow/blur and reducing
+         simultaneous visual hierarchy across the shared shell. -->
+    <link rel="stylesheet" href="/panacea-ruthless-simple-v50.css?v=20260919-1" />
     <script defer src="/welcome-runtime-v28.js?v=20260908-1"></script>
     <script defer src="/panacea-visual-first-v43.js?v=20260917-1"></script>
     <script defer src="/panacea-liquid-infinite-v44.js?v=20260916-1"></script>
@@ -140,7 +144,7 @@
     <script>
       (() => {
         const CACHE_PREFIX = 'panaceamed-'
-        const MAINTENANCE_VERSION = '20260918-v49'
+        const MAINTENANCE_VERSION = '20260919-v50'
         const MAINTENANCE_KEY = 'pmd-cache-maintenance-version'
         const rootReady = () => {
           const root = document.getElementById('root')
