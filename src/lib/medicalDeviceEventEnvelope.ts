@@ -190,10 +190,11 @@ export function validateMedicalDeviceEvent(value: unknown): MedicalDeviceEventVa
   }
 
   const provenance = record(event.provenance)
-  if (!validIso(provenance?.capturedAt)) errors.push('provenance.capturedAt must be a valid ISO timestamp')
-  if (!validIso(provenance?.receivedAt)) errors.push('provenance.receivedAt must be a valid ISO timestamp')
-  if (validIso(provenance?.capturedAt) && validIso(provenance?.receivedAt)
-    && Date.parse(provenance.capturedAt as string) > Date.parse(provenance.receivedAt as string)) {
+  const capturedAt = provenance?.capturedAt
+  const receivedAt = provenance?.receivedAt
+  if (!validIso(capturedAt)) errors.push('provenance.capturedAt must be a valid ISO timestamp')
+  if (!validIso(receivedAt)) errors.push('provenance.receivedAt must be a valid ISO timestamp')
+  if (validIso(capturedAt) && validIso(receivedAt) && Date.parse(capturedAt) > Date.parse(receivedAt)) {
     errors.push('provenance.capturedAt must not be after provenance.receivedAt')
   }
   if (!Number.isSafeInteger(provenance?.sequence) || Number(provenance?.sequence) < 0) {
