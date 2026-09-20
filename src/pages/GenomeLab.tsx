@@ -213,11 +213,11 @@ function PhageResearchSandbox() {
         <p className="text-[11px] font-black uppercase tracking-[0.14em] text-emerald-800 dark:text-emerald-300">
           Research-safe boundary
         </p>
-        <p className="mt-1 text-[12px] leading-relaxed text-neutral-600 dark:text-neutral-400">
+        <Prosa kelas="mt-1 text-[12px] leading-relaxed text-neutral-600 dark:text-neutral-400">
           Campaign math, uncertainty and abstract scenario sensitivity are available. Viral DNA generation,
           synthesis export, wet-lab construction steps, host-range expansion, pathogenicity optimization
           and clinically important resistance-trait engineering are intentionally unavailable.
-        </p>
+        </Prosa>
       </div>
 
       <p className="mt-4 text-[11px] font-bold uppercase tracking-[0.14em] text-neutral-500">A · Campaign analyzer</p>
