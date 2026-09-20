@@ -662,3 +662,46 @@ Next implementation priorities:
 5. wire environment/rescue safety signals into Population Safety before performance recommendations;
 6. maintain privacy/minimum-group controls for team/population analytics;
 7. keep full deterministic QA in the build gate and never weaken safety/scientific tests to get green.
+
+
+## Dive Expedition Field Science continuation — 2026-09-20
+
+The owner's latest diving direction is now an additive extension of the existing Universal Sport / Adventure / Environment / Network stack rather than a new page or duplicate communications architecture.
+
+Canonical foundation landed on main:
+- `src/lib/diveExpeditionFieldScienceOS.ts`
+- `scripts/qa/dive-expedition-field-science-os.test.mjs`
+- `DOCS/DIVE-EXPEDITION-FIELD-SCIENCE-OS.md`
+- the QA test is included in the normal frontend build gate.
+
+Current capabilities:
+- source/provenance-aware reef/coral field observations with depth, method, optional imagery/taxon/position context, bleaching/live-tissue fractions and observer confidence;
+- confidence-weighted observational reef-condition summary;
+- marine specimen record + chain-of-custody contract;
+- invasive sampling fails closed without explicit `permitRef` and `authorityRef`;
+- exact surface-interval bookkeeping from timestamps only;
+- composition of the existing underwater relay plan with the defensive network failover kernel;
+- online / degraded / offline-store-and-forward expedition connectivity states;
+- direct satellite/GNSS underwater remains explicitly false.
+
+Scientific/safety formulas:
+- `SurfaceIntervalMinutes = (nextSubmergedAt - previousSurfacedAt) / 60,000`;
+- `WeightedBleaching = sum(confidence_i * bleachingFraction_i) / sum(confidence_i)`.
+
+Hard boundaries:
+- no coral-harvest/tissue-collection procedure generation;
+- no protected-species or permit-scope inference;
+- no decompression recommendation from surface interval;
+- no claim that biodiversity occurrence data guarantees current presence;
+- no direct underwater satellite/GNSS claim;
+- preserve chain-of-custody, source identity and uncertainty.
+
+Next long-running work:
+1. connect actual authorized dive-computer adapters through `performanceTelemetryEnvelope.ts` instead of page-local ingestion;
+2. add reef imagery annotation adapters that preserve model/source confidence and never silently convert AI classification into verified taxonomy;
+3. integrate OBIS occurrence context and NOAA/other authoritative reef/environment sources through the Environment OS source-adapter/conformance layer, including license/version/data-age semantics;
+4. add offline expedition sync queues and geospatial cache/data-age contracts for no-service dives;
+5. add specimen workflow persistence/audit storage without adding collection instructions or inferring legal authority;
+6. wire surface interval, reef observations, environment and connectivity into the existing Diving/Adventure UI through progressive disclosure, not a new mega-page;
+7. extend field science beyond coral through the same observation/specimen contracts where scientifically appropriate;
+8. maintain deterministic tests for permit fail-closed behavior, source provenance, direct-underwater-satellite prohibition, offline store-and-forward, and no-decompression-authority substitution.
