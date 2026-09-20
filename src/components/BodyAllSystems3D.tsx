@@ -9,6 +9,7 @@ import {
 } from '../lib/bodySystemSourceWave'
 import { body3dPixelRatio } from '../lib/body3dQuality'
 import { createBodyRenderScheduler } from '../lib/bodyRenderScheduler'
+import { bodyStructureCameraFocus } from '../lib/bodyStructureCameraFocus'
 import { createBodyWebglContextLifecycle } from '../lib/bodyWebglContextLifecycle'
 import { bodySemanticScaleFromRelativeZoom, type BodySemanticScale } from '../lib/bodySemanticZoom'
 import { muatAtlas, namaAtlas } from '../lib/anatomy/pemuatAtlas'
@@ -423,25 +424,47 @@ export default function BodyAllSystems3D({
       pointerStartX = event.clientX
       pointerStartY = event.clientY
     }
-    const onPointerUp = (event: PointerEvent) => {
-      if (Math.hypot(event.clientX - pointerStartX, event.clientY - pointerStartY) > 7) return
+    const pickStructure = (event: PointerEvent | MouseEvent) => {
       const rect = renderer.domElement.getBoundingClientRect()
-      if (rect.width <= 0 || rect.height <= 0) return
+      if (rect.width <= 0 || rect.height <= 0) return undefined
       pointer.x = ((event.clientX - rect.left) / rect.width) * 2 - 1
       pointer.y = -((event.clientY - rect.top) / rect.height) * 2 + 1
       raycaster.setFromCamera(pointer, camera)
-      const hit = raycaster.intersectObjects(projectedGroups, true).find((entry) => {
+      return raycaster.intersectObjects(projectedGroups, true).find((entry) => {
         const candidate = entry.object as THREE.Mesh
         return candidate.isMesh && candidate.userData.panaceaContext !== true
-      })
-      const mesh = hit?.object as THREE.Mesh | undefined
+      })?.object as THREE.Mesh | undefined
+    }
+    const onPointerUp = (event: PointerEvent) => {
+      if (Math.hypot(event.clientX - pointerStartX, event.clientY - pointerStartY) > 7) return
+      const mesh = pickStructure(event)
       if (!mesh?.name) return
       structureSelectCallbackRef.current?.(mesh.name)
       applyProjectedSelection(projectedGroups, mesh.name)
       requestRender()
     }
+    const onDoubleClick = (event: MouseEvent) => {
+      const mesh = pickStructure(event)
+      if (!mesh) return
+      const bounds = new THREE.Box3().setFromObject(mesh)
+      if (bounds.isEmpty()) return
+      const pose = bodyStructureCameraFocus(
+        {
+          min: { x: bounds.min.x, y: bounds.min.y, z: bounds.min.z },
+          max: { x: bounds.max.x, y: bounds.max.y, z: bounds.max.z },
+        },
+        { x: camera.position.x, y: camera.position.y, z: camera.position.z },
+      )
+      controls.target.set(pose.target.x, pose.target.y, pose.target.z)
+      camera.position.set(pose.position.x, pose.position.y, pose.position.z)
+      camera.lookAt(controls.target)
+      controls.update()
+      emitSemanticZoom()
+      requestRender()
+    }
     renderer.domElement.addEventListener('pointerdown', onPointerDown)
     renderer.domElement.addEventListener('pointerup', onPointerUp)
+    renderer.domElement.addEventListener('dblclick', onDoubleClick)
 
     const io = new IntersectionObserver(([entry]) => {
       inViewport = Boolean(entry?.isIntersecting)
@@ -467,6 +490,7 @@ export default function BodyAllSystems3D({
       controls.removeEventListener('change', onControlChange)
       renderer.domElement.removeEventListener('pointerdown', onPointerDown)
       renderer.domElement.removeEventListener('pointerup', onPointerUp)
+      renderer.domElement.removeEventListener('dblclick', onDoubleClick)
       renderer.domElement.removeEventListener('webglcontextlost', onContextLost)
       renderer.domElement.removeEventListener('webglcontextrestored', onContextRestored)
       contextLifecycle.dispose()
