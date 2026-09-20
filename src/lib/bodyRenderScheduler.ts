@@ -20,19 +20,19 @@ export interface BodyRenderScheduler {
  * state actually changes. This keeps an idle atlas at zero scheduled frames.
  */
 export function createBodyRenderScheduler(options: BodyRenderSchedulerOptions): BodyRenderScheduler {
-  let pendingFrame = 0
+  let pendingFrame: number | null = null
   let disposed = false
 
   const stop = () => {
-    if (!pendingFrame) return
+    if (pendingFrame === null) return
     options.cancelFrame(pendingFrame)
-    pendingFrame = 0
+    pendingFrame = null
   }
 
   const request = () => {
-    if (disposed || pendingFrame || !options.canRender()) return
+    if (disposed || pendingFrame !== null || !options.canRender()) return
     pendingFrame = options.requestFrame(() => {
-      pendingFrame = 0
+      pendingFrame = null
       if (disposed || !options.canRender()) return
       options.renderFrame()
     })
@@ -48,6 +48,6 @@ export function createBodyRenderScheduler(options: BodyRenderSchedulerOptions): 
     request,
     stop,
     dispose,
-    hasPendingFrame: () => pendingFrame !== 0,
+    hasPendingFrame: () => pendingFrame !== null,
   }
 }
