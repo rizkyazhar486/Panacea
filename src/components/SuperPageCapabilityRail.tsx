@@ -6,10 +6,10 @@ import { FITUR_DARI_HUB, type Fitur } from '../lib/katalogFitur'
 type Domain = 'body' | 'clinical' | 'for-you'
 type Bucket = 'all' | 'core' | 'data' | 'action'
 
-const DOMAIN_COPY: Record<Domain, { label: string; accent: string }> = {
-  body: { label: 'Your Body', accent: 'from-emerald-300 via-cyan-300 to-blue-400' },
-  clinical: { label: 'Clinical', accent: 'from-cyan-300 via-blue-400 to-violet-400' },
-  'for-you': { label: 'For You', accent: 'from-violet-300 via-fuchsia-400 to-rose-300' },
+const DOMAIN_COPY: Record<Domain, { label: string }> = {
+  body: { label: 'Your Body' },
+  clinical: { label: 'Clinical' },
+  'for-you': { label: 'For You' },
 }
 
 const CLINICAL_PATHS = new Set([
@@ -92,20 +92,20 @@ export function SuperPageCapabilityRail({ domain, initialLimit = 24 }: { domain:
   const visible = expanded ? items : items.slice(0, previewLimit)
 
   return (
-    <section className="relative isolate overflow-hidden rounded-[22px] border border-white/[.075] bg-[#01040a]/92 p-3 text-white shadow-[0_16px_48px_rgba(0,0,0,.28)] backdrop-blur-xl sm:p-4" aria-label={`${config.label} capabilities`}>
-      <div className={`pointer-events-none absolute inset-x-10 top-0 h-px bg-gradient-to-r ${config.accent} opacity-70`} aria-hidden />
-      <div className="pointer-events-none absolute -right-24 -top-24 h-56 w-56 rounded-full bg-cyan-400/[.07] blur-3xl" aria-hidden />
-
-      <div className="relative flex items-center justify-between gap-3">
+    <section
+      className="overflow-hidden rounded-[16px] border border-white/[.08] bg-[#05070a] p-3 text-white sm:p-4"
+      aria-label={`${config.label} capabilities`}
+    >
+      <div className="flex items-center justify-between gap-3">
         <div className="min-w-0">
-          <div className="truncate text-[9px] font-black uppercase tracking-[.2em] text-white/38">Tools</div>
+          <div className="truncate text-[10px] font-bold uppercase tracking-[.12em] text-white/38">Tools</div>
           <h2 className="truncate text-base font-black tracking-[-.02em] sm:text-lg">{config.label}</h2>
         </div>
-        <div className="flex shrink-0 items-center gap-1.5">
+        <div className="flex shrink-0 items-center gap-2">
           <button
             type="button"
             onClick={() => setFindOpen((value) => !value)}
-            className="min-h-[38px] rounded-full border border-white/10 bg-white/[.035] px-3 text-[10px] font-black text-white/62 transition hover:border-cyan-200/25 hover:text-white"
+            className="min-h-11 rounded-[10px] border border-white/10 px-3 text-[11px] font-bold text-white/64 transition-colors hover:border-white/20 hover:text-white"
             aria-expanded={findOpen}
           >
             {findOpen ? 'Close find' : 'Find'}
@@ -113,7 +113,7 @@ export function SuperPageCapabilityRail({ domain, initialLimit = 24 }: { domain:
           <button
             type="button"
             onClick={() => setExpanded((value) => !value)}
-            className="min-h-[38px] rounded-full border border-white/10 bg-white/[.04] px-3 text-[10px] font-black text-white/72 transition hover:border-cyan-200/30 hover:text-white"
+            className="min-h-11 rounded-[10px] border border-white/10 px-3 text-[11px] font-bold text-white/72 transition-colors hover:border-white/20 hover:text-white"
             aria-expanded={expanded}
           >
             {expanded ? 'Compact' : `All ${items.length}`}
@@ -121,41 +121,94 @@ export function SuperPageCapabilityRail({ domain, initialLimit = 24 }: { domain:
         </div>
       </div>
 
-      {findOpen && (
-        <div className="relative mt-3 rounded-[18px] border border-white/[.07] bg-black/20 p-2.5">
-          <div className="flex gap-1.5 overflow-x-auto pb-1 no-scrollbar" aria-label="Capability filters">
-            {(['all', 'core', 'data', 'action'] as const).map((item) => (
-              <button key={item} type="button" onClick={() => setBucket(item)} aria-pressed={bucket === item} className={`min-h-[36px] shrink-0 rounded-full border px-3 text-[9px] font-black uppercase tracking-[.1em] transition ${bucket === item ? 'border-cyan-200/45 bg-cyan-200 text-black' : 'border-white/[.08] bg-white/[.025] text-white/50 hover:text-white'}`}>
-                {item}
-              </button>
-            ))}
-          </div>
+      <AnimatePresence initial={false}>
+        {findOpen && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: .14 }}
+            className="mt-3 border-t border-white/[.08] pt-3"
+          >
+            <div className="flex gap-2 overflow-x-auto pb-2 no-scrollbar" aria-label="Capability filters">
+              {(['all', 'core', 'data', 'action'] as const).map((item) => (
+                <button
+                  key={item}
+                  type="button"
+                  onClick={() => setBucket(item)}
+                  aria-pressed={bucket === item}
+                  className={`min-h-11 shrink-0 rounded-[9px] border px-3 text-[10px] font-bold uppercase tracking-[.08em] transition-colors ${
+                    bucket === item
+                      ? 'border-brand/55 bg-brand/12 text-brand'
+                      : 'border-white/[.08] text-white/48 hover:border-white/18 hover:text-white'
+                  }`}
+                >
+                  {item}
+                </button>
+              ))}
+            </div>
 
-          <label className="mt-2 flex min-h-[42px] items-center gap-2 rounded-[14px] border border-white/[.08] bg-black/28 px-3 focus-within:border-cyan-200/30">
-            <span className="text-cyan-100/50" aria-hidden>⌕</span>
-            <input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search tools…" className="min-w-0 flex-1 bg-transparent text-xs font-semibold text-white outline-none placeholder:text-white/28" />
-            {query && <button type="button" onClick={() => setQuery('')} className="grid h-7 w-7 place-items-center rounded-full text-white/45 hover:bg-white/[.06] hover:text-white" aria-label="Clear search">×</button>}
-          </label>
-        </div>
-      )}
+            <label className="flex min-h-11 items-center gap-2 border-b border-white/[.12] px-0.5 focus-within:border-brand/55">
+              <span className="text-white/36" aria-hidden>⌕</span>
+              <input
+                value={query}
+                onChange={(event) => setQuery(event.target.value)}
+                placeholder="Search tools"
+                className="min-w-0 flex-1 bg-transparent text-xs font-semibold text-white outline-none placeholder:text-white/28"
+              />
+              {query && (
+                <button
+                  type="button"
+                  onClick={() => setQuery('')}
+                  className="grid min-h-11 min-w-11 place-items-center text-white/45 transition-colors hover:text-white"
+                  aria-label="Clear search"
+                >
+                  ×
+                </button>
+              )}
+            </label>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
-      <motion.div layout className={`relative mt-3 grid gap-2 ${expanded ? 'grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5' : 'grid-flow-col auto-cols-[156px] overflow-x-auto pb-1 no-scrollbar sm:auto-cols-[174px]'}`}>
+      <motion.div
+        layout
+        transition={{ duration: .18 }}
+        className={`mt-3 grid gap-x-4 gap-y-0 ${
+          expanded
+            ? 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3'
+            : 'grid-flow-col auto-cols-[168px] overflow-x-auto pb-1 no-scrollbar sm:auto-cols-[188px]'
+        }`}
+      >
         <AnimatePresence initial={false} mode="popLayout">
-          {visible.map((feature, index) => (
-            <motion.div key={`${feature.to}|${feature.nama}`} layout initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, scale: .97 }} transition={{ duration: .18, delay: Math.min(index, 8) * .015 }}>
-              <Link to={canonical(feature, domain)} className="group relative flex min-h-[80px] flex-col justify-between overflow-hidden rounded-[16px] border border-white/[.07] bg-white/[.022] p-2.5 transition hover:-translate-y-0.5 hover:border-cyan-200/25 hover:bg-cyan-200/[.045] active:scale-[.985]">
-                <div className="flex items-start justify-between gap-2">
-                  <span className="truncate text-[9px] font-black uppercase tracking-[.12em] text-white/34">{feature.grup}</span>
-                  <span className="text-[10px] text-cyan-100/35 transition group-hover:text-cyan-100/80" aria-hidden>↗</span>
-                </div>
-                <strong className="line-clamp-1 text-[12px] font-black leading-tight text-white/88">{feature.nama}</strong>
+          {visible.map((feature) => (
+            <motion.div
+              key={`${feature.to}|${feature.nama}`}
+              layout
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: .12 }}
+            >
+              <Link
+                to={canonical(feature, domain)}
+                className="group flex min-h-[68px] flex-col justify-center border-t border-white/[.08] py-3 transition-colors hover:border-white/20"
+              >
+                <span className="truncate text-[9px] font-bold uppercase tracking-[.1em] text-white/32">{feature.grup}</span>
+                <strong className="mt-1 line-clamp-1 text-[12px] font-black leading-tight text-white/84 transition-colors group-hover:text-brand">
+                  {feature.nama}
+                </strong>
               </Link>
             </motion.div>
           ))}
         </AnimatePresence>
       </motion.div>
 
-      {items.length === 0 && <div className="mt-4 rounded-[18px] border border-white/[.07] bg-white/[.025] p-4 text-center text-[10px] font-black text-white/35">No match</div>}
+      {items.length === 0 && (
+        <div className="mt-3 border-t border-white/[.08] py-4 text-[11px] font-semibold text-white/42">
+          No tools match this filter; clear search or choose All.
+        </div>
+      )}
     </section>
   )
 }
