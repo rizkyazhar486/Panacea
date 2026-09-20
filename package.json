@@ -6,7 +6,7 @@
   "description": "Panaceamed.id — Longevity Medical-AI Co-Physician platform (AI Chatbot + AI-EMR)",
   "scripts": {
     "dev": "vite",
-    "build": "node scripts/gen-note-index.mjs --check && node scripts/validate-source-registry.mjs && node scripts/validate-feature-factory.mjs && node scripts/validate-academic-review.mjs && node --test scripts/qa/source-registry-validator.test.mjs scripts/qa/feature-factory.test.mjs scripts/qa/academic-review-gate.test.mjs scripts/qa/home-widget-theme.test.mjs scripts/qa/compact-product-surface.test.mjs scripts/qa/prime-wisdom-schema.test.mjs scripts/qa/prime-wisdom-provenance.test.mjs scripts/qa/home-anti-slop.test.mjs scripts/qa/ruthless-simplicity.test.mjs scripts/qa/body-virtual-endoscopy.test.mjs scripts/qa/mental-health-safety-orchestrator.test.mjs scripts/qa/mental-health-screen-safety.test.mjs scripts/qa/visit-device-adapters.test.mjs scripts/qa/medical-device-integration-catalog.test.mjs scripts/qa/visit-fhir-observation.test.mjs scripts/qa/longitudinal-digital-twin.test.mjs scripts/qa/future-resilience-os.test.mjs scripts/qa/satellite-mesh-network-resilience.test.mjs && tsc -b && vite build",
+    "build": "node scripts/gen-note-index.mjs --check && node scripts/validate-source-registry.mjs && node scripts/validate-feature-factory.mjs && node scripts/validate-academic-review.mjs && node --test scripts/qa/source-registry-validator.test.mjs scripts/qa/feature-factory.test.mjs scripts/qa/academic-review-gate.test.mjs scripts/qa/home-widget-theme.test.mjs scripts/qa/compact-product-surface.test.mjs scripts/qa/prime-wisdom-schema.test.mjs scripts/qa/prime-wisdom-provenance.test.mjs scripts/qa/home-anti-slop.test.mjs scripts/qa/ruthless-simplicity.test.mjs scripts/qa/body-virtual-endoscopy.test.mjs scripts/qa/mental-health-safety-orchestrator.test.mjs scripts/qa/mental-health-screen-safety.test.mjs scripts/qa/visit-device-adapters.test.mjs scripts/qa/medical-device-integration-catalog.test.mjs scripts/qa/visit-fhir-observation.test.mjs scripts/qa/longitudinal-digital-twin.test.mjs scripts/qa/future-resilience-os.test.mjs scripts/qa/satellite-mesh-network-resilience.test.mjs scripts/qa/sport-adventure-rescue-os.test.mjs && tsc -b && vite build",
     "preview": "vite preview",
     "gen:note-index": "node scripts/gen-note-index.mjs",
     "validate:source-registry": "node scripts/validate-source-registry.mjs",
@@ -45,7 +45,8 @@
     "test:longitudinal-digital-twin": "node --test scripts/qa/longitudinal-digital-twin.test.mjs",
     "test:medical-device-catalog": "node --test scripts/qa/medical-device-integration-catalog.test.mjs",
     "test:future-resilience": "node --test scripts/qa/future-resilience-os.test.mjs",
-    "test:network-resilience": "node --test scripts/qa/satellite-mesh-network-resilience.test.mjs"
+    "test:network-resilience": "node --test scripts/qa/satellite-mesh-network-resilience.test.mjs",
+    "test:sport-adventure-rescue": "node --test scripts/qa/sport-adventure-rescue-os.test.mjs"
   },
   "dependencies": {
     "framer-motion": "^13.2.0",
