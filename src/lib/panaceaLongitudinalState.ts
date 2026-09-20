@@ -296,6 +296,8 @@ export function numericMetricTrend(
   }) as LongitudinalEvent<number>[]
 
   if (events.length < 2) return null
+  // Unit conversion belongs upstream; incomparable values cannot form a trend.
+  if (events.some((event) => event.unit !== events[0].unit)) return null
 
   const firstTime = Date.parse(events[0].recordedAt)
   const points = events.map((event) => ({
