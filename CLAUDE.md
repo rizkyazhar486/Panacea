@@ -567,3 +567,57 @@ Next long-running implementation order:
 9. keep global primary UI simple: users choose sport/session first, then the scientific graph deck progressively discloses physiology, technique/tactics and environment rather than showing dozens of charts simultaneously.
 
 Do not create a fake universal athlete score or mental-toughness score. Cross-sport comparison should preserve sport-specific units, source quality and uncertainty.
+
+
+## Tactical Athlete OS continuation — 2026-09-20
+
+The owner wants Panacea's sport analyzer to reach elite military/law-enforcement human-performance rigor. Interpret this as **public-source tactical-athlete science and evidence fusion**, not operational combat/intelligence capability.
+
+Canonical foundation now landed:
+- `src/lib/tacticalAthleteOS.ts`
+- `DOCS/TACTICAL-ATHLETE-OS.md`
+- `scripts/qa/tactical-athlete-os.test.mjs`
+- shared upstream layers remain `universalSportOS.ts`, `wearableEnvironmentOS.ts`, `sportAdventureRescueOS.ts` and `satelliteMeshNetworkResilience.ts`.
+
+Public framework anchors captured:
+- U.S. Army H2F for integrated physical, cognitive/mental, nutrition and sleep readiness with multidisciplinary performance teams;
+- U.S. Marine Corps Force Fitness for holistic/progressive functional exercise science and physical readiness;
+- FBI public PFT for continuous pull-ups/chin-ups, 300 m sprint, continuous push-ups and 1.5 mile run;
+- load-carriage, gait, power/agility, foot-march cognition and military heat-illness research.
+
+Allowed analyzer domains: aerobic/anaerobic capacity, strength, power, muscular endurance, loaded mobility, agility, movement quality, cognitive performance, sleep, nutrition, heat/environment, recovery, team training readiness and **benign** precision-under-fatigue tasks.
+
+Hard boundaries are non-negotiable:
+- no operational mission planning;
+- no weapons optimization or weapon-use coaching;
+- no targeting/surveillance graph;
+- no pursuit/evasion instruction;
+- no covert tracking;
+- no military/police/intelligence fitness-for-duty certification;
+- no medical diagnosis from performance telemetry;
+- no fake mental-toughness score.
+
+The current transparent training-readiness proxy is:
+`TARI = 0.30*physical + 0.20*loadedMobility + 0.20*recoverySleep + 0.15*cognitiveRetention + 0.10*environmentTolerance + 0.05*dataConfidence`.
+Each component must already be normalized 0–1 from documented measurements/baselines. TARI is not an occupational certification.
+
+Matched-task retention helpers are encoded:
+- higher-is-better: `retention = loadedOrFatigued / freshBaseline`;
+- lower-is-better time: `retention = freshBaseline / loadedOrFatigued`;
+- relative load: `externalLoadKg / bodyMassKg`;
+- fatigue delta reports worsening relative to the same baseline task.
+
+“Palantir-level” is only a benign data-engineering analogy here: same-metric/same-unit multi-source evidence fusion weighted by confidence with source IDs and timestamps preserved. Never extend this into person-targeting, social surveillance or covert location graphs.
+
+Canonical graph families now include loaded vs unloaded locomotion, agility retention under load, power retention after prolonged load carriage, cognition after fatigue, benign precision-task retention, sleep vs next-day performance and heat+load+HR+pace+RPE overlays.
+
+Next long-running implementation order:
+1. connect Tactical Athlete OS to the Universal Sport scientific graph renderer once that exists; do not create another chart schema;
+2. add a synchronized tactical-session envelope for wearable, timing-gate, environment and test events with timestamp quality and device provenance;
+3. add test protocols for loaded locomotion, agility, sprint/endurance, strength/endurance, reaction/attention and benign precision tasks, with versioned course/test definitions;
+4. add baseline-vs-loaded and baseline-vs-fatigued longitudinal comparisons rather than unsupported universal pass/fail thresholds;
+5. integrate H2F-style sleep/recovery/nutrition/cognitive context into training planning without diagnosing or certifying duty fitness;
+6. add team-level aggregate training dashboards only from consented participant data, with minimum group-size/privacy controls and no individual surveillance targeting;
+7. add heat/WBGT/terrain/load overlays from the Environment OS, preserving data age/source and never diagnosing heat stroke from wearable signals;
+8. expand public-source tactical-athlete evidence from military, fire, law-enforcement and SAR exercise-science literature while excluding operational tactics, weapon procedures and restricted/nonpublic doctrine;
+9. maintain deterministic QA for every boundary above.
