@@ -11,7 +11,7 @@
 import {
   chooseFailoverPath,
   type NetworkLinkTelemetry,
-} from './satelliteMeshNetworkResilience'
+} from './satelliteMeshNetworkResilience.ts'
 
 export type KnownSport =
   | 'running'
