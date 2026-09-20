@@ -19,7 +19,7 @@ assert.match(ui, /text-\[12px\]/)
 
 assert.match(rail, /previewLimit = Math\.min\(initialLimit, 10\)/)
 assert.match(rail, /Close find/)
-assert.match(rail, /Search tools…/)
+assert.match(rail, /placeholder="Search tools"/)
 assert.match(rail, /All \$\{items\.length\}/)
 
 assert.match(body, /Your body, from whole person to molecule/)
