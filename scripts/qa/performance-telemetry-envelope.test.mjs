@@ -48,3 +48,9 @@ test('dedupe uses stream sequence and keeps newest received copy', () => {
   assert.equal(out.length, 1)
   assert.equal(out[0].value, 151)
 })
+
+test('scientific overlay rejects receipt before capture', () => {
+  const invalid = make({ capturedAt: '2026-09-20T00:00:00.500Z' })
+  assert.ok(validatePerformanceTelemetry(invalid).errors.includes('clock-order'))
+  assert.equal(canSynchronizeTelemetry([make(), invalid], 1000).reason, 'invalid-telemetry')
+})

@@ -17,11 +17,11 @@
 import {
   buildUnderwaterCommunicationPlan,
   type UnderwaterCommunicationPlan,
-} from './sportAdventureRescueOS'
+} from './sportAdventureRescueOS.ts'
 import {
   chooseFailoverPath,
   type NetworkLinkTelemetry,
-} from './satelliteMeshNetworkResilience'
+} from './satelliteMeshNetworkResilience.ts'
 
 export type ReefObservationMethod =
   | 'photo-quadrat'

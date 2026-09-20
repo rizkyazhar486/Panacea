@@ -204,6 +204,7 @@ export interface EnvironmentSourceFreshness {
 /**
  * ageMs = max(0, now - observedAt)
  * stale when staleAfterMs is defined and ageMs > staleAfterMs.
+ * Future observation/cycle timestamps are invalid; forecast valid time is separate.
  */
 export function assessEnvironmentSourceFreshness(
   adapter: EnvironmentSourceAdapter,
@@ -212,7 +213,7 @@ export function assessEnvironmentSourceFreshness(
 ): EnvironmentSourceFreshness {
   const observedMs = Date.parse(observedAt)
   const nowMs = Date.parse(now)
-  if (!Number.isFinite(observedMs) || !Number.isFinite(nowMs)) {
+  if (!Number.isFinite(observedMs) || !Number.isFinite(nowMs) || observedMs > nowMs) {
     return { state: 'invalid-time', ageMs: null, staleAfterMs: adapter.staleAfterMs }
   }
 
@@ -252,8 +253,13 @@ export function validateNumericObservationAgainstSource(
     errors.push('confidence')
   }
 
-  const allowedUnits = adapter.canonicalNumericUnits?.[observation.metric]
-  if (allowedUnits && !allowedUnits.includes(observation.unit)) errors.push('unit')
+  const unitMap = adapter.canonicalNumericUnits
+  const allowedUnits = unitMap && Object.prototype.hasOwnProperty.call(unitMap, observation.metric)
+    ? unitMap[observation.metric]
+    : undefined
+  // Source-specific adapters must declare metric/unit mappings before numeric admission.
+  if (!allowedUnits) errors.push('metric')
+  else if (!allowedUnits.includes(observation.unit)) errors.push('unit')
 
   return Object.freeze({
     valid: errors.length === 0,

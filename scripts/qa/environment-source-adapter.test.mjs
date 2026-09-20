@@ -115,3 +115,28 @@ test('GEBCO numeric observations require canonical meter units and matching doma
   assert.equal(badUnit.valid, false)
   assert.ok(badUnit.errors.includes('unit'))
 })
+
+test('future observation times cannot masquerade as fresh observations', () => {
+  for (const source of ENVIRONMENT_SOURCE_ADAPTERS) {
+    const result = assessEnvironmentSourceFreshness(source, '2026-09-21T09:00:00Z', '2026-09-20T09:00:00Z')
+    assert.equal(result.state, 'invalid-time')
+    assert.equal(result.ageMs, null)
+  }
+})
+
+test('numeric admission rejects unknown metrics and missing unit mappings', () => {
+  const gebco = ENVIRONMENT_SOURCE_ADAPTERS.find((entry) => entry.sourceId === 'gebco-2026')
+  for (const metric of ['temperature', 'toString', '__proto__']) {
+    const result = validateNumericObservationAgainstSource(gebco, {
+      domain: 'bathymetry', metric, unit: 'm', observedAt: '2026-09-20T09:00:00Z', sourceRef: 'tile-1', confidence: 0.9,
+    })
+    assert.equal(result.valid, false)
+    assert.ok(result.errors.includes('metric'))
+  }
+  const noaa = ENVIRONMENT_SOURCE_ADAPTERS.find((entry) => entry.sourceId === 'noaa-ofs')
+  const result = validateNumericObservationAgainstSource(noaa, {
+    domain: 'ocean', metric: 'current', unit: 'unknown', observedAt: '2026-09-20T09:00:00Z', sourceRef: 'cycle-1', confidence: 0.9,
+  })
+  assert.equal(result.valid, false)
+  assert.ok(result.errors.includes('metric'))
+})

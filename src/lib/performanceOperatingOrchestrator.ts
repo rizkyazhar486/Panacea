@@ -9,25 +9,25 @@ import {
   evaluatePopulationSafety,
   type PopulationSafetyDecision,
   type PopulationSafetySignal,
-} from './populationSafetyOS'
+} from './populationSafetyOS.ts'
 import {
   buildCoachingPlan,
   type CoachingPlan,
   type CoachingSignal,
-} from './tacticalPerformanceCoach'
+} from './tacticalPerformanceCoach.ts'
 import {
   buildObservedPerformanceResilienceProfile,
   type ObservedPerformanceResilienceProfile,
   type PressureTrialObservation,
-} from './performanceResilienceProfile'
+} from './performanceResilienceProfile.ts'
 import {
   listScientificGraphs,
   type ScientificGraphDefinition,
-} from './universalSportOS'
+} from './universalSportOS.ts'
 import {
   getSportCoachingPlaybook,
   type SportCoachingPlaybook,
-} from './sportSpecificCoaching'
+} from './sportSpecificCoaching.ts'
 
 export type PerformanceOperatingMode = 'safety-blocked' | 'safety-modified' | 'performance-enabled'
 
