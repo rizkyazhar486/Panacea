@@ -24,6 +24,10 @@ import {
   listScientificGraphs,
   type ScientificGraphDefinition,
 } from './universalSportOS'
+import {
+  getSportCoachingPlaybook,
+  type SportCoachingPlaybook,
+} from './sportSpecificCoaching'
 
 export type PerformanceOperatingMode = 'safety-blocked' | 'safety-modified' | 'performance-enabled'
 
@@ -41,6 +45,7 @@ export interface PerformanceOperatingDecision {
   resilience: ObservedPerformanceResilienceProfile
   coaching: CoachingPlan
   scientificGraphs: readonly ScientificGraphDefinition[]
+  sportPlaybook: SportCoachingPlaybook | null
   nextActions: readonly string[]
   populationSafetyOverride: true
 }
@@ -65,6 +70,9 @@ export function buildPerformanceOperatingDecision(
   const scientificGraphs = input.sportId
     ? Object.freeze(listScientificGraphs(input.sportId))
     : Object.freeze([])
+  const sportPlaybook = input.sportId
+    ? getSportCoachingPlaybook(input.sportId)
+    : null
 
   let mode: PerformanceOperatingMode
   let coaching: CoachingPlan
@@ -101,6 +109,7 @@ export function buildPerformanceOperatingDecision(
     resilience,
     coaching,
     scientificGraphs,
+    sportPlaybook,
     nextActions,
     populationSafetyOverride: true,
   })
