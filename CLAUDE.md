@@ -759,8 +759,8 @@ Scientific/source boundaries:
 
 Next Environment OS work should build on this contract:
 1. implement read-only source-specific fetch/parse adapters only where API terms/access permit;
-2. emit compatible time-series values into `performanceTelemetryEnvelope.ts` rather than page-local state;
-3. add offline geospatial cache/data-age contracts for remote travel/diving/rescue;
+2. build source-specific metric/unit mappings on top of `environmentTelemetryBridge.ts`; the canonical provenance-safe projection into `performanceTelemetryEnvelope.ts` is landed and must not be duplicated;
+3. build persistent geospatial tile/blob storage, eviction and sync queues on top of `environmentOfflineCache.ts`; digest/source-version/license/data-age/forecast-target metadata gating is landed and must not be duplicated;
 4. connect environment snapshots to Diving/Adventure/Training and Population Safety without creating duplicate state;
 5. preserve privacy/authorization rules for any position/finding source.
 
