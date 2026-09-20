@@ -3,6 +3,7 @@ import type { Server } from 'node:http'
 import { attachGenomicsComputeRoutes } from './genomicsCompute.js'
 import { currentUserFromWebSocketRequest } from './auth.js'
 import { addAudit, getVisitMembership } from './store.js'
+import { moveRealtimeRoomMember, removeRealtimeRoomMember } from './realtimeRoomRegistry.js'
 import {
   authorizeVisitRealtimeJoin,
   createVisitRealtimeReplayGuard,
@@ -78,10 +79,70 @@ export function attachRealtime(server: Server) {
       }
     }
 
+    const leaveCurrentRoom = (reason: 'switch' | 'close') => {
+      const previousRoom = room
+      const previousAuthorization = visitAuthorization
+      const result = removeRealtimeRoomMember(rooms, ws, previousRoom)
+      if (!previousRoom || !result) {
+        room = null
+        visitAuthorization = null
+        return
+      }
+
+      room = null
+      visitAuthorization = null
+
+      if (previousRoom.startsWith('visit:')) {
+        if (authenticatedUser && previousAuthorization) {
+          addAudit(
+            authenticatedUser,
+            reason === 'close' ? 'visit_realtime_leave' : 'visit_realtime_room_switch',
+            previousAuthorization.visitId,
+          )
+        }
+        broadcast(previousRoom, { type: 'presence', room: previousRoom, count: result.count })
+      } else {
+        broadcast(previousRoom, { type: 'system', text: `${name} keluar`, room: previousRoom })
+        broadcast(previousRoom, { type: 'presence', room: previousRoom, count: result.count })
+      }
+    }
+
     const enterRoom = (nextRoom: string) => {
-      room = nextRoom
-      if (!rooms.has(nextRoom)) rooms.set(nextRoom, new Set())
-      rooms.get(nextRoom)!.add(ws)
+      const previousRoom = room
+      const previousAuthorization = visitAuthorization
+      const transition = moveRealtimeRoomMember(rooms, ws, room, nextRoom)
+
+      if (transition.previousRoom) {
+        if (transition.previousRoom.startsWith('visit:')) {
+          if (authenticatedUser && previousAuthorization) {
+            addAudit(
+              authenticatedUser,
+              'visit_realtime_room_switch',
+              previousAuthorization.visitId,
+            )
+          }
+          broadcast(transition.previousRoom, {
+            type: 'presence',
+            room: transition.previousRoom,
+            count: transition.previousCount,
+          })
+          visitAuthorization = null
+        } else {
+          broadcast(transition.previousRoom, {
+            type: 'system',
+            text: `${name} keluar`,
+            room: transition.previousRoom,
+          })
+          broadcast(transition.previousRoom, {
+            type: 'presence',
+            room: transition.previousRoom,
+            count: transition.previousCount,
+          })
+        }
+      }
+
+      room = transition.room
+      return transition
     }
     ws.on('message', (raw) => {
       let m: ChatMsg
@@ -99,11 +160,10 @@ export function attachRealtime(server: Server) {
           visitError('reserved_visit_room')
           return
         }
-        room = requestedRoom
+        enterRoom(requestedRoom)
         name = m.from || name
-        enterRoom(room)
-        broadcast(room, { type: 'system', text: `${name} bergabung`, room })
-        broadcast(room, { type: 'presence', room, count: rooms.get(room)!.size })
+        broadcast(requestedRoom, { type: 'system', text: `${name} bergabung`, room: requestedRoom })
+        broadcast(requestedRoom, { type: 'presence', room: requestedRoom, count: rooms.get(requestedRoom)!.size })
       } else if (m.type === 'visit-join' && m.visitId) {
         if (!authenticatedUser) {
           visitError('unauthenticated')
@@ -131,10 +191,10 @@ export function attachRealtime(server: Server) {
           return
         }
 
-        visitAuthorization = authorization
-        name = authenticatedUser.name
         const secureRoom = `visit:${authorization.visitId}`
         enterRoom(secureRoom)
+        visitAuthorization = authorization
+        name = authenticatedUser.name
         addAudit(authenticatedUser, 'visit_realtime_join', authorization.visitId)
         if (ws.readyState === WebSocket.OPEN) {
           ws.send(JSON.stringify({
@@ -207,18 +267,7 @@ export function attachRealtime(server: Server) {
       }
     })
     ws.on('close', () => {
-      if (room && rooms.has(room)) {
-        rooms.get(room)!.delete(ws)
-        if (room.startsWith('visit:')) {
-          if (authenticatedUser && visitAuthorization) {
-            addAudit(authenticatedUser, 'visit_realtime_leave', visitAuthorization.visitId)
-          }
-          broadcast(room, { type: 'presence', room, count: rooms.get(room)!.size })
-        } else {
-          broadcast(room, { type: 'system', text: `${name} keluar`, room })
-          broadcast(room, { type: 'presence', room, count: rooms.get(room)!.size })
-        }
-      }
+      leaveCurrentRoom('close')
     })
   })
   console.log('  Realtime:     WebSocket /ws ready')
