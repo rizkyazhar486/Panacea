@@ -32,6 +32,7 @@ export type VisitRealtimeAuthorization =
         | 'not_a_participant'
         | 'role_mismatch'
         | 'outside_visit_window'
+        | 'visit_not_found'
     }
 
 function requiredText(value: string, field: string): string {
@@ -133,8 +134,24 @@ export function validateVisitRealtimeSignalEnvelope(
   }
 }
 
+/**
+ * Refresh an already-joined Visit authorization from the canonical membership
+ * source before accepting another secure signal. Join authorization is only a
+ * snapshot: visit lifecycle/window changes must take effect without requiring
+ * the WebSocket to reconnect.
+ */
+export function refreshVisitRealtimeAuthorization(
+  principal: VisitRealtimePrincipal | null | undefined,
+  current: Extract<VisitRealtimeAuthorization, { allowed: true }>,
+  membership: VisitRealtimeMembership | null | undefined,
+  now = new Date().toISOString(),
+): VisitRealtimeAuthorization {
+  if (!membership) return { allowed: false, code: 'visit_not_found' }
+  return authorizeVisitRealtimeJoin(principal, current.visitId, membership, now)
+}
+
 export const VISIT_REALTIME_SECURITY_BOUNDARY =
-  'Do not wire a production Visit WebSocket endpoint until a canonical server-side visit membership registry can resolve visitId to the exact patient and clinician. Generic room names, client-asserted roles, owner/admin status, or authentication alone are not authorization.'
+  'Secure Visit signaling must resolve canonical server-side membership at join and re-authorize it before every signal. Cached join state, generic room names, client-asserted roles, owner/admin status, or authentication alone are never sufficient authorization.'
 
 
 export interface VisitRealtimeReplayGuard {
