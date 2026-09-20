@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState, type ChangeEvent } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { Prosa } from '../components/Prosa'
 import { getVitals, vitalsAge, type Vitals } from '../lib/healthVitals'
 import { getPhoneHealthScanSnapshot, phoneReadingAge, type PhoneHealthScanSnapshot } from '../lib/phoneHealthScan'
 
@@ -239,9 +240,9 @@ export function PhoneHealthScan() {
             <span className="text-[9px] font-bold text-white/30">{syncedAge ? `health data · ${syncedAge}` : 'local-first'}</span>
           </summary>
           <div className="space-y-2 border-t border-white/[.06] px-4 py-3 text-[11px] leading-relaxed text-white/45">
-            <p>Photos stay in this browser session and are used here only for framing, brightness and contrast checks. This surface does not infer attractiveness, masculinity, diagnosis or disease from a face.</p>
-            <p>The camera-pulse tool uses experimental remote photoplethysmography. Sleep, HRV, recovery and fitness remain separate evidence and are shown only when you enter or sync them; Panacea does not fabricate WHOOP-like metrics from a phone camera.</p>
-            <p>Evidence coverage means data availability only. It is not a health-quality score and it does not replace a clinician or a medical device.</p>
+            <Prosa kelas="text-[11px] leading-relaxed text-white/45">Photos stay in this browser session and are used here only for framing, brightness and contrast checks. This surface does not infer attractiveness, masculinity, diagnosis or disease from a face.</Prosa>
+            <Prosa kelas="text-[11px] leading-relaxed text-white/45">The camera-pulse tool uses experimental remote photoplethysmography. Sleep, HRV, recovery and fitness remain separate evidence and are shown only when you enter or sync them; Panacea does not fabricate WHOOP-like metrics from a phone camera.</Prosa>
+            <Prosa kelas="text-[11px] leading-relaxed text-white/45">Evidence coverage means data availability only. It is not a health-quality score and it does not replace a clinician or a medical device.</Prosa>
           </div>
         </details>
       </div>
