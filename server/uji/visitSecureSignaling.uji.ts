@@ -1,5 +1,9 @@
 import assert from 'node:assert/strict'
 import {
+  moveRealtimeRoomMember,
+  removeRealtimeRoomMember,
+} from '../src/realtimeRoomRegistry.js'
+import {
   authorizeVisitRealtimeJoin,
   createVisitRealtimeReplayGuard,
   isReservedVisitRealtimeRoom,
@@ -142,4 +146,40 @@ assert.equal(isReservedVisitRealtimeRoom('visit:visit-secure'), true)
 assert.equal(isReservedVisitRealtimeRoom(' visit:visit-secure '), true)
 assert.equal(isReservedVisitRealtimeRoom('consult:visit-secure'), false)
 
-console.log('Visit secure signaling policy: identity, freshness, replay resistance, live reauthorization and reserved room namespace ok')
+// A socket may belong to only one registry room. Moving it must remove stale
+// membership from the previous room, otherwise it can continue receiving
+// signaling from a visit it already left.
+const socketA = { id: 'socket-a' }
+const socketB = { id: 'socket-b' }
+const roomRegistry = new Map<string, Set<typeof socketA>>([
+  ['visit:first', new Set([socketA, socketB])],
+])
+
+const firstMove = moveRealtimeRoomMember(roomRegistry, socketA, 'visit:first', 'visit:second')
+assert.equal(firstMove.previousRoom, 'visit:first')
+assert.equal(firstMove.previousCount, 1)
+assert.equal(firstMove.count, 1)
+assert.equal(roomRegistry.get('visit:first')?.has(socketA), false)
+assert.equal(roomRegistry.get('visit:first')?.has(socketB), true)
+assert.equal(roomRegistry.get('visit:second')?.has(socketA), true)
+
+const secondMove = moveRealtimeRoomMember(roomRegistry, socketA, 'visit:second', 'visit:third')
+assert.equal(secondMove.previousCount, 0)
+assert.equal(roomRegistry.has('visit:second'), false, 'empty old rooms must be deleted')
+assert.equal(roomRegistry.get('visit:third')?.has(socketA), true)
+
+const sameRoom = moveRealtimeRoomMember(roomRegistry, socketA, 'visit:third', 'visit:third')
+assert.equal(sameRoom.previousRoom, null)
+assert.equal(sameRoom.count, 1, 'same-room rejoin must remain idempotent')
+
+assert.deepEqual(
+  removeRealtimeRoomMember(roomRegistry, socketA, 'visit:third'),
+  { room: 'visit:third', count: 0 },
+)
+assert.equal(roomRegistry.has('visit:third'), false, 'socket close must not leave an empty room behind')
+assert.throws(
+  () => moveRealtimeRoomMember(roomRegistry, socketA, null, '   '),
+  /room must not be blank/,
+)
+
+console.log('Visit secure signaling policy: identity, freshness, replay resistance, live reauthorization, single-room isolation and reserved namespace ok')
