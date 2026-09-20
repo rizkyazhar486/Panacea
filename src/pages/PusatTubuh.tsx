@@ -35,8 +35,11 @@ const Breathwork = lazy(() => import('./Breathwork').then((m) => ({ default: m.B
 const ThermalTherapy = lazy(() => import('./ThermalTherapy').then((m) => ({ default: m.ThermalTherapy })))
 const PostureBreaks = lazy(() => import('./PostureBreaks').then((m) => ({ default: m.PostureBreaks })))
 const FastingTimer = lazy(() => import('./FastingTimer').then((m) => ({ default: m.FastingTimer })))
+const PhoneHealthScan = lazy(() => import('./PhoneHealthScan').then((m) => ({ default: m.PhoneHealthScan })))
 
 const TABS: TabDef[] = [
+  { id: 'phone', label: 'Phone scan', emoji: '📱', komponen: PhoneHealthScan,
+    ringkas: 'Camera pulse + local visual intake; useful without a wearable' },
   { id: 'energi', label: 'Energy', emoji: '🔋', komponen: BodyBattery,
     ringkas: 'Energy reserve 0–100 and stress level through the day' },
   { id: 'jantung', label: 'Heart', emoji: '❤️', komponen: HeartRateLog,
@@ -117,7 +120,7 @@ export function PusatTubuh() {
       <PersonalBodyUnifiedSurface compact defaultFocus="identity" shareable cameraCapture />
       <HalamanTab
       judul="Body Signals"
-      subjudul="Energy, heart, sleep, movement and clinical trackers on one page"
+      subjudul="Phone-first checks, energy, heart, sleep, movement and clinical trackers"
       ikon={<IconActivity />}
       ringkasan={<PanelAngka angka={angka} />}
       tabs={TABS}
