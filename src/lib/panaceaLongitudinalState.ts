@@ -386,6 +386,23 @@ export function buildContextPacket(
   at = new Date().toISOString(),
 ) {
   const projection = projectStateToSurface(state, surface, at)
+  const atMs = parseIso(at, 'at')
+  const purpose = consentPurposeForSurface(surface)
+  // Derived trends must obey the same consent/review boundary as displayed values.
+  const trendState: LongitudinalPatientState = {
+    ...state,
+    metricEventIds: Object.fromEntries(Object.entries(state.metricEventIds).map(([metric, ids]) => [
+      metric,
+      ids.filter((id) => {
+        const event = state.eventsById[id]
+        if (!event || !isConsentActive(event.consent, purpose, atMs)) return false
+        if ((surface === 'clinical' || surface === 'ai-emr') && requiresClinicianReview(event)) {
+          return event.review.state === 'accepted'
+        }
+        return surface !== 'ai-chatbot' || event.review.state !== 'rejected'
+      }),
+    ])),
+  }
   return {
     subjectId: projection.subjectId,
     surface,
@@ -400,7 +417,7 @@ export function buildContextPacket(
       confidence: snapshot.latest.confidence,
       provenance: snapshot.latest.provenance,
       reviewState: snapshot.latest.review.state,
-      trend: typeof snapshot.latest.value === 'number' ? numericMetricTrend(state, snapshot.metric) : null,
+      trend: typeof snapshot.latest.value === 'number' ? numericMetricTrend(trendState, snapshot.metric) : null,
     })),
     governance: {
       pendingClinicalReview: projection.pendingClinicalReview,
