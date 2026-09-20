@@ -731,3 +731,35 @@ Standing product principles that apply across historical and new work:
 - Body Exposure remains one whole-body-first semantic-zoom projector from body -> system -> organ -> tissue -> cell -> organelle -> molecule/pathway -> genome;
 - preserve and build on useful work from Claude Code, ChatGPT/Codex and prior agents; understand -> integrate -> improve;
 - use plugins/connectors when they materially improve correctness or execution, but avoid creating duplicate external systems when the repository already has a canonical source of truth.
+
+
+## Environment source adapter continuation — 2026-09-20
+
+The first long-running Environment OS priority is now landed on main as an additive canonical contract:
+- `src/lib/environmentSourceAdapter.ts`
+- `scripts/qa/environment-source-adapter.test.mjs`
+- `DOCS/ENVIRONMENT-SOURCE-ADAPTER.md`
+- the test is included in the normal frontend build gate.
+
+This supersedes the earlier unfinished instruction to create a canonical environment-source adapter/conformance matrix. Do not create a second source registry.
+
+Current source contracts cover GEBCO 2026, NOAA Operational Forecast Systems, OBIS and Aviation Weather Center. Every source declares version/snapshot semantics, supported domains, truth class, payload kinds, spatial/temporal resolution, units, uncertainty, licensing/authority references, stale behavior and explicit failure semantics.
+
+Freshness formula:
+`ageMs = max(0, nowMs - observedAtMs)`
+A source is stale only when its adapter defines `staleAfterMs` and `ageMs > staleAfterMs`; otherwise freshness remains `age-unknown` until a product-specific adapter provides authoritative valid-time logic.
+
+Scientific/source boundaries:
+- GEBCO grid resolution is not measurement uncertainty; preserve TID/source-data class where available.
+- NOAA OFS values remain modeled/forecast context and do not silently become measured observations.
+- OBIS occurrence records do not imply present-time species presence and are not converted into a fake numeric presence score.
+- Aviation Weather Center products remain observation/forecast context and do not replace certified flight planning, ATC or operational aviation authority.
+- unit conversion must be explicit at the adapter boundary; incompatible units fail closed.
+- missing provenance, stale cycle, out-of-domain data or unsupported payload type must remain visible failure states.
+
+Next Environment OS work should build on this contract:
+1. implement read-only source-specific fetch/parse adapters only where API terms/access permit;
+2. emit compatible time-series values into `performanceTelemetryEnvelope.ts` rather than page-local state;
+3. add offline geospatial cache/data-age contracts for remote travel/diving/rescue;
+4. connect environment snapshots to Diving/Adventure/Training and Population Safety without creating duplicate state;
+5. preserve privacy/authorization rules for any position/finding source.
