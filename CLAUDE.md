@@ -386,3 +386,46 @@ Do not reintroduce gradient/card-wall/glow-heavy presentation as a default aesth
 The generic `server/src/realtime.ts` room relay remains preserved for existing Consult/WebRTC behavior and must not be represented as the secure Visit OS transport. `server/src/visitRealtimePolicy.ts` now defines the fail-closed authorization boundary: authentication alone is insufficient; the exact patient/clinician membership, visit id, role, visit window, and bounded signaling envelope must all agree.
 
 Current blocker before wiring a production `/visit-ws` path: the backend has no canonical server-side visit/encounter membership registry that can resolve `visitId -> exact patientUserId + clinicianUserId + lifecycle/window`. Do not authorize from a client-supplied room name, client role, owner/admin privilege, generic chat membership, or atlas/AI state. Next independent implementation should first add/reuse an authoritative visit membership source, then bind authenticated session identity to this policy, add replay/sequence protection and audit events, and only then migrate Visit OS signaling away from the generic relay. Preserve existing Consult compatibility during migration.
+## Medical Device Fabric continuation — 2026-09-20
+
+The owner wants Panacea to study and connect the medical-device industry broadly, including AVVIGO+-class cath-lab systems, and provide a detailed analyzer layer without creating a vendor-by-vendor architectural mess.
+
+Canonical foundation now landed:
+- `DOCS/MEDICAL-DEVICE-FABRIC.md`
+- `src/lib/medicalDeviceIntegrationCatalog.ts`
+- `scripts/qa/medical-device-integration-catalog.test.mjs`
+
+The catalog covers major device families across bedside monitoring, ECG/telemetry, cath-lab coronary physiology, IVUS/OCT, angiography/fluoroscopy, CT/MRI/X-ray, ultrasound, ventilation/anesthesia, infusion, dialysis/CRRT, ECMO, central lab/POC, spirometry, EEG/EMG, endoscopy, surgical navigation/robotics, ophthalmology, implantable cardiac devices, fetal/neonatal monitoring, digital pathology, rehabilitation, home devices and wearables.
+
+Architecture rule: this is one shared Medical Device Fabric underneath Visit OS, Clinical, AI-EMR, Your Body and Body Exposure. Do not create another patient state, visit kernel, imaging stack or EMR. Reuse:
+- `visitOperatingSystem.ts` for live visit/session state;
+- `visitDeviceAdapters.ts` for scalar Visit OS adapter normalization;
+- `visitFhirObservation.ts` for clinician-accepted FHIR publication;
+- the existing DICOM modules for imaging;
+- `panaceaLongitudinalState.ts` as the longitudinal source of truth.
+
+Interoperability preference order: DICOM/DICOMweb; IHE Devices profiles (DEC/ACM/IDCO/IPEC/PIV); IEEE 11073 where applicable; HL7 v2 for existing enterprise feeds; FHIR R4 for normalized publication; then documented BLE/USB/serial/TCP or authorized vendor SDK/cloud adapters. Never claim vendor/model support from catalog presence alone.
+
+Safety boundary is inbound/read-only by default. Do not add therapy actuation for pumps, ventilators, dialysis/ECMO, implant programming, navigation/robotics or other high-risk devices unless a separately regulated and validated bidirectional pathway exists. Device data may inform clinicians and AI context; it does not autonomously diagnose, prescribe or change treatment.
+
+Next long-running implementation order:
+1. add a canonical non-scalar device event envelope for waveforms, alarms, settings, therapy-delivery events and image/report references;
+2. add deterministic technical-QC analyzers for identity, timestamps, clock skew, replay, units, signal quality, sample completeness and liveness;
+3. build real vendor/model adapters only from documented/authorized interfaces, beginning with bedside monitors and ventilators, then infusion pumps, cath-lab IVUS/physiology, lab/POC and implant interrogation;
+4. keep high-frequency waveforms in bounded time-series/waveform storage and imaging in DICOM/DICOMweb; do not flatten them into ordinary FHIR scalar rows;
+5. maintain a conformance matrix per vendor/model/firmware/interface with tested fields, fixture, limitations and last validation date;
+6. project only normalized provenance-preserving results into Clinical/AI-EMR/Body surfaces, and publish clinically committed data only through the existing review/FHIR boundary.
+
+For AVVIGO+-class systems, model intravascular imaging and coronary physiology as coordinated streams. Public product literature is enough to design the data contract, not enough to claim an AVVIGO+ connector. A real Boston Scientific integration requires an authorized interface/export path plus fixtures and validation.
+
+Use exact formulas only when prerequisites are met and version them with provenance. Examples already captured in the fabric spec include:
+`age_ms = max(0, now - receivedAt)`,
+`Δt = receivedAt - capturedAt`,
+`PP = SBP - DBP`,
+`MAP ≈ DBP + (SBP - DBP)/3`,
+`SI = HR/SBP`,
+`FFR = Pd/Pa` under valid hyperemic/calibrated conditions,
+`P/F = PaO2/FiO2`,
+`Cstat = VT/(Pplat - PEEP)`, and
+`ΔP = Pplat - PEEP`.
+Vendor-specific indexes must come from validated vendor/clinical definitions rather than guessed formulas.
