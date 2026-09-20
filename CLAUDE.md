@@ -381,8 +381,19 @@ and
 
 Do not reintroduce gradient/card-wall/glow-heavy presentation as a default aesthetic. Clinical/Body canvases may remain immersive when functionally justified, but controls around them must stay quiet and obvious.
 
-## Visit OS secure realtime handoff — 2026-09-19
+## Visit OS secure realtime handoff — updated 2026-09-20
 
-The generic `server/src/realtime.ts` room relay remains preserved for existing Consult/WebRTC behavior and must not be represented as the secure Visit OS transport. `server/src/visitRealtimePolicy.ts` now defines the fail-closed authorization boundary: authentication alone is insufficient; the exact patient/clinician membership, visit id, role, visit window, and bounded signaling envelope must all agree.
+The legacy Consult/WebRTC behavior in `server/src/realtime.ts` remains preserved, but secure Visit signaling now coexists on the same `/ws` server behind the reserved `visit:` namespace and explicit `visit-join` / `visit-rtc-*` protocol. Do not collapse secure Visit authorization back into generic room membership.
 
-Current blocker before wiring a production `/visit-ws` path: the backend has no canonical server-side visit/encounter membership registry that can resolve `visitId -> exact patientUserId + clinicianUserId + lifecycle/window`. Do not authorize from a client-supplied room name, client role, owner/admin privilege, generic chat membership, or atlas/AI state. Next independent implementation should first add/reuse an authoritative visit membership source, then bind authenticated session identity to this policy, add replay/sequence protection and audit events, and only then migrate Visit OS signaling away from the generic relay. Preserve existing Consult compatibility during migration.
+Landed security/runtime boundaries:
+- the canonical server-side visit membership registry resolves the exact patient, clinician, lifecycle, and visit window;
+- `server/src/visitRealtimePolicy.ts` fails closed unless authenticated identity, exact membership, visit id, role, time window, sender identity, bounded payload, freshness, session id, and sequence all agree;
+- replay/sequence protection persists across re-join attempts within a signaling session;
+- canonical membership is re-read before every secure Visit signal, so ended visits, expired windows, or missing memberships revoke stale joined authorization;
+- one WebSocket may belong to only one realtime room at a time; room switches remove stale membership before entering the next room and empty room sets are cleaned up on switch/close;
+- secure Visit join/leave, room-switch, replay rejection, authorization expiry, and rejected signals are audited;
+- owner/admin privilege, client-supplied roles, generic room names, atlas state, and AI state never grant Visit access.
+
+These boundaries landed through #1919 and #1921. Preserve them and the existing Consult compatibility. Do not recreate the already-resolved membership/replay/room-isolation work from this older handoff.
+
+Remaining Visit work should extend from the current implementation rather than replace it: add production-grade end-to-end browser/WebRTC coverage and any dedicated transport-path separation only when it provides a concrete security or operability benefit; continue device/FHIR/AI-EMR integration through the existing Visit OS governance; and keep recording, ambient transcript/note generation, clinical promotion, diagnosis, prescribing, orders, procedures, and emergency actions behind their existing consent/review/safety boundaries.
