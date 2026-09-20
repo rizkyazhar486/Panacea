@@ -473,3 +473,50 @@ Useful formulas already encoded:
 `searchRadius = sqrt(accuracy^2 + (t*sigma_current)^2 + (t*sigma_subject)^2)`
 
 Do not hide uncertainty for a cleaner UI. Rescue usefulness depends on truth about what is known, what was relayed and what is only estimated.
+
+
+## Future Wearable Environment OS continuation — 2026-09-20
+
+The owner wants Panacea to evolve into a universal wearable **body + environment + position + vehicle + rescue OS** for future devices, not a set of isolated watch integrations.
+
+Canonical foundation now landed:
+- `src/lib/wearableEnvironmentOS.ts`
+- `DOCS/FUTURE-WEARABLE-ENVIRONMENT-OS.md`
+- `scripts/qa/wearable-environment-os.test.mjs`
+- existing `sportAdventureRescueOS.ts` and `satelliteMeshNetworkResilience.ts` remain upstream/shared layers.
+
+Environment domains include terrain/topography, geology, atmosphere/weather, ocean/current/waves, bathymetry, marine biodiversity, indoor positioning, aviation, maritime and motorsport. Every source-backed observation must preserve source identity, timestamp, confidence/uncertainty, location context and units.
+
+Reference-source direction:
+- GEBCO for global terrain/bathymetry context, preserving grid/source-resolution limits;
+- NOAA operational marine/weather model families where coverage applies for currents, wind, waves, water level, temperature and salinity;
+- OBIS for marine-biodiversity occurrence/reference context, never as guaranteed species presence;
+- Aviation Weather Center / FAA sources for aviation weather context, while approved aviation planning/ATC systems remain authoritative.
+
+Diving motion analysis now has a source-aware hover/trim proxy and Archimedes physics helper. Preserve the boundary: no guessed BCD volume, no automatic ballast prescription, no decompression/ascent authority. Hover score is for longitudinal technique analysis only.
+
+The finding network must be authorization-first and fail closed. Supported conceptual sources include GNSS, UWB, BLE, Wi-Fi RTT, venue gateways, crowd/mesh relays, acoustic underwater relays, vehicle relays and satellite backhaul. Child/dependent tracking requires guardian authorization; consenting adults/team members require explicit consent or scoped event/rescue authorization; covert tracking is prohibited. Build rotating/short-lived identifiers, bounded retention, purpose limitation and auditability before any production crowd-relay design.
+
+Routing is advisory only. Panacea may rank precomputed candidate routes using time + weather + terrain/airspace + communications + uncertainty, but must not become a certified flight planner, marine passage planner, parachute authority or vehicle control system. Fastest is never allowed to silently override safer/higher-authority constraints.
+
+Extreme-event coverage currently includes Ironman, Tour de France-style stages, HYROX, ultramarathon, ultra-trail, open-water swimming, adventure racing, skydiving, F1, Daytona/endurance motorsport, rally and rowing. Expand through the same registry rather than creating unrelated pages. Do not create a fake universal “mental toughness” score from wearable telemetry; use explicit self-report/validated cognitive tasks and preserve uncertainty.
+
+Next long-running implementation order:
+1. add a canonical environment-source adapter interface and conformance matrix (source, version, spatial/temporal resolution, units, uncertainty, licensing, stale/failure semantics);
+2. implement source adapters behind that interface for terrain/bathymetry, marine currents/weather, biodiversity and aviation weather where terms/API access permit;
+3. connect the environment snapshot into Training/Sport Science, Dive Log/Adventure Rescue and authorized navigation/rescue context without creating duplicate state;
+4. add offline geospatial tile/cache contracts for remote travel, diving and emergency use, with explicit data-age indicators;
+5. add indoor authorized-finding fusion for UWB/BLE/Wi-Fi/venue/crowd relays and outdoor handoff to GNSS/cellular/satellite, preserving privacy and authorization at every hop;
+6. extend dive hover analysis from depth/IMU samples to connected dive-computer/pressure/current context when real adapters exist; keep decompression separate;
+7. add event-specific analysis adapters for Ironman/Tour/HYROX/ultra/open-water/F1/Daytona/rally/skydiving while preserving event-specific units and source truth;
+8. add route/environment uncertainty visualizations that separate measured, forecast, modeled, relayed and derived values;
+9. maintain deterministic tests for privacy, no-covert-tracking, no-certified-navigation replacement, no-direct-underwater-satellite claims, derived-vs-measured location, and advisory-only routing.
+
+Useful formulas already encoded:
+- terrain slope: `atan(deltaElevation / horizontalDistance)`;
+- vector components: `north = speed*cos(theta)`, `east = speed*sin(theta)` using an explicit direction-toward convention;
+- dive hover: `1 / (1 + depthSD/0.30 + verticalSpeedRMS/0.10 + trimRMS/20)` as an educational motion proxy;
+- Archimedes: `F_b = rho*g*V`, `F_net = F_b - m*g`;
+- route advisory cost: `0.30*time + 0.30*weather + 0.20*terrain/airspace + 0.10*comms + 0.10*uncertainty`.
+
+Do not hide model/source uncertainty to make the interface feel more confident.
