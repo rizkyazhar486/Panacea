@@ -139,8 +139,8 @@ export function SuperPageCapabilityRail({ domain, initialLimit = 24 }: { domain:
                   aria-pressed={bucket === item}
                   className={`min-h-11 shrink-0 rounded-[9px] border px-3 text-[10px] font-bold uppercase tracking-[.08em] transition-colors ${
                     bucket === item
-                      ? 'border-brand/55 bg-brand/12 text-brand'
-                      : 'border-white/[.08] text-white/48 hover:border-white/18 hover:text-white'
+                      ? 'border-brand/50 bg-brand/10 text-brand'
+                      : 'border-white/[.08] text-white/48 hover:border-white/20 hover:text-white'
                   }`}
                 >
                   {item}
@@ -148,7 +148,7 @@ export function SuperPageCapabilityRail({ domain, initialLimit = 24 }: { domain:
               ))}
             </div>
 
-            <label className="flex min-h-11 items-center gap-2 border-b border-white/[.12] px-0.5 focus-within:border-brand/55">
+            <label className="flex min-h-11 items-center gap-2 border-b border-white/[.12] px-0.5 focus-within:border-brand/50">
               <span className="text-white/36" aria-hidden>⌕</span>
               <input
                 value={query}
