@@ -520,3 +520,50 @@ Useful formulas already encoded:
 - route advisory cost: `0.30*time + 0.30*weather + 0.20*terrain/airspace + 0.10*comms + 0.10*uncertainty`.
 
 Do not hide model/source uncertainty to make the interface feel more confident.
+
+
+## Universal Sport OS continuation — 2026-09-20
+
+The owner wants Panacea to become a universal scientific operating system for essentially every sport, with deep physiology, biomechanics, technique, tactics, environment, equipment, positioning, communications and safety rather than shallow sport labels.
+
+Canonical foundation now landed:
+- `src/lib/universalSportOS.ts`
+- `DOCS/UNIVERSAL-SPORT-OS.md`
+- `scripts/qa/universal-sport-os.test.mjs`
+- existing `sportAdventureRescueOS.ts`, `wearableEnvironmentOS.ts` and `satelliteMeshNetworkResilience.ts` remain shared upstream layers.
+
+The universal registry currently covers 50+ contexts spanning endurance, racquet, bat-and-ball, team field/court, combat, strength, precision, water, mountain/winter, aerial, motorsport, equestrian, gymnastics and tactical domains. Key explicitly requested profiles include tennis, baseball, F1, Daytona/endurance racing, MotoGP, scuba, freediving, triathlon/Ironman, cycling, HYROX, tactical fitness and skydiving.
+
+Scientific graph definitions are first-class contracts. Core graph families include HR response, internal load, pace/power vs HR, tennis work:rest, baseball Statcast-style velocity/spin and exit-velocity/launch-angle, motorsport driver physiology + g-load, vehicle brake/throttle/speed, MotoGP lean angle, diving depth/absolute pressure, hovering/vertical control, freediving depth/HR/SpO2, and environmental wind/current overlays. Rendering should use these contracts rather than inventing separate data schemas per page.
+
+Source discipline is mandatory:
+- all metrics require a real source;
+- measured and estimated values remain distinct;
+- wearable VO2 estimate != measured VO2;
+- blood lactate requires a measured source, never an HR-only guess;
+- vehicle telemetry requires explicit authorized access;
+- MLB Statcast-like definitions may be used as metric semantics, but Panacea must not imply access to proprietary MLB data feeds;
+- MotoGP/F1 telemetry semantics may guide contracts, but no team/series private data should be claimed without authorization;
+- dive/freedive physiology graphs never become decompression or blackout predictors.
+
+Reference foundations captured in the docs/code registry include PubMed endurance physiology, ITF tennis conditioning, MLB Statcast, FIA medical/safety material, MotoGP official telemetry descriptions, Divers Alert Network buoyancy/pressure physiology, and modern freediving physiology reviews.
+
+Useful formulas already encoded:
+- `sRPE = durationMinutes * RPE`;
+- `P_abs = P_surface + rho*g*h`;
+- Boyle approximation `V2 = V1*P1/P2`;
+- resultant g `sqrt(ax^2+ay^2+az^2)/g0`;
+- two-trial critical speed `(D2-D1)/(T2-T1)`.
+
+Next long-running implementation order:
+1. add a canonical time-series/event envelope shared by sport metrics, environment, vehicle and wearable streams with monotonic sequence, timestamp quality, units, source, confidence, device identity and synchronization quality;
+2. build adapter/conformance interfaces for HR/HRV sensors, running pods, cycling power meters, swimming/dive computers, tennis/baseball radar/camera systems, authorized motorsport telemetry and event timing feeds;
+3. implement a scientific graph renderer that consumes `SCIENTIFIC_SPORT_GRAPHS` and refuses incompatible units or unsynchronized overlays;
+4. deepen tennis into serve/shot/rally/court-position + physiology/tactical graphs while preserving source confidence;
+5. deepen baseball into pitch, bat, batted-ball, baserunning and player-position analysis using Statcast-like public definitions without claiming MLB feed access;
+6. deepen motorsport into human + vehicle + track/weather synchronized analysis for F1, endurance/Daytona, MotoGP, rally and karting; no vehicle control, no medical fitness determination;
+7. deepen scuba/freediving into pressure/depth/current/temperature/communications + physiology with true dive-computer source data, preserving the existing no-decompression-planner and no-blackout-prediction rules;
+8. expand the registry with additional sports by composing existing metric packs before inventing new schemas;
+9. keep global primary UI simple: users choose sport/session first, then the scientific graph deck progressively discloses physiology, technique/tactics and environment rather than showing dozens of charts simultaneously.
+
+Do not create a fake universal athlete score or mental-toughness score. Cross-sport comparison should preserve sport-specific units, source quality and uncertainty.
