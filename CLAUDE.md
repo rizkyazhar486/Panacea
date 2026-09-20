@@ -621,3 +621,44 @@ Next long-running implementation order:
 7. add heat/WBGT/terrain/load overlays from the Environment OS, preserving data age/source and never diagnosing heat stroke from wearable signals;
 8. expand public-source tactical-athlete evidence from military, fire, law-enforcement and SAR exercise-science literature while excluding operational tactics, weapon procedures and restricted/nonpublic doctrine;
 9. maintain deterministic QA for every boundary above.
+
+
+## Unified Sport / Performance / Population Safety continuation — 2026-09-20
+
+The owner's preceding sport/wearable/tactical/rescue prompts are now one canonical system rather than separate feature requests.
+
+Core modules landed on main:
+- `src/lib/universalSportOS.ts`
+- `src/lib/wearableEnvironmentOS.ts`
+- `src/lib/sportAdventureRescueOS.ts`
+- `src/lib/satelliteMeshNetworkResilience.ts`
+- `src/lib/tacticalAthleteOS.ts`
+- `src/lib/performanceTelemetryEnvelope.ts`
+- `src/lib/performanceResilienceProfile.ts`
+- `src/lib/tacticalPerformanceCoach.ts`
+- `src/lib/sportSpecificCoaching.ts`
+- `src/lib/populationSafetyOS.ts`
+- `src/lib/performanceOperatingOrchestrator.ts`
+- `DOCS/UNIFIED-SPORT-PERFORMANCE-SAFETY-OS.md`
+
+Canonical runtime decision order is:
+`Population Safety -> synchronized/source-valid telemetry -> scientific analysis -> objective performance resilience -> actionable coaching -> sport-specific playbook -> reassessment`.
+
+Population safety is the prime directive. Performance optimization is rank 6 after immediate life safety, participant/buddy/team/bystander protection, venue/route/environment hazard control, communications/location/data integrity, and privacy/consent. Missing or unknown high-consequence safety context fails closed. No score, graph, resilience profile or coaching plan may override the safety gate.
+
+All sport outputs should move beyond scores. When enough valid data exists, give a concise actionable coaching result with: limitation, rationale, procedure, progression, stop/modify criteria, reassessment interval and evidence/source confidence. Current sport-specific playbooks cover tennis, baseball, Formula racing, MotoGP, road running, cycling, swimming, triathlon/Ironman, HYROX, scuba, freediving and tactical fitness. Expand through the same playbook contract.
+
+Mental toughness/resilience must remain evidence-honest. Keep validated psychometric/self-report instruments separate from objective task-performance retention under fatigue/pressure. The latter may produce an observed retention profile only when enough distinct task classes are present; it is not personality, diagnosis, employability or duty-fitness certification.
+
+“Tactical” remains elite human-performance science, not operational harm. Do not implement weapon-use optimization, human targeting, covert surveillance, pursuit/evasion operations or operational mission planning. Safe analogues are sport precision/visual search, authorized situational awareness, obstacle/agility route choice, search-and-rescue planning and objective resilience testing.
+
+All new real-time sources must flow through `performanceTelemetryEnvelope.ts`: metric/unit, source/device, measured/estimated/derived/relayed truth class, captured/received time, timestamp quality, confidence/uncertainty, sequence and optional position. Scientific overlays must pass synchronization/clock-skew gates before combining human, vehicle, environment, GPS, camera/radar or dive streams.
+
+Next implementation priorities:
+1. build real authorized adapters into the canonical telemetry envelope rather than adding per-page custom ingestion;
+2. implement a reusable scientific graph renderer over existing graph contracts with unit/time/source validation;
+3. wire the Performance Operating Orchestrator into existing Training/Sport Science/Adventure surfaces without creating duplicate patient or athlete state;
+4. expand sport-specific coaching playbooks and test protocols using authoritative/public evidence;
+5. wire environment/rescue safety signals into Population Safety before performance recommendations;
+6. maintain privacy/minimum-group controls for team/population analytics;
+7. keep full deterministic QA in the build gate and never weaken safety/scientific tests to get green.
