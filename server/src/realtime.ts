@@ -156,10 +156,18 @@ export function attachRealtime(server: Server) {
           return
         }
 
+        const currentMembership = getVisitMembership(visitAuthorization.visitId)
         const refreshedAuthorization = refreshVisitRealtimeAuthorization(
           { userId: authenticatedUser.id, role: authenticatedUser.role },
           visitAuthorization,
-          getVisitMembership(visitAuthorization.visitId),
+          currentMembership ? {
+            visitId: currentMembership.id,
+            patientUserId: currentMembership.patientUserId,
+            clinicianUserId: currentMembership.clinicianUserId,
+            status: currentMembership.status,
+            startsAt: currentMembership.startsAt,
+            endsAt: currentMembership.endsAt,
+          } : undefined,
         )
         if (!refreshedAuthorization.allowed) {
           addAudit(
