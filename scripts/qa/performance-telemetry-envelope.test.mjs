@@ -33,7 +33,7 @@ test('telemetry contract requires provenance and valid timing', () => {
 
 test('scientific overlay rejects excessive timestamp skew', () => {
   const a = make()
-  const b = make({ id: 'b', streamId: 'vehicle', metricId: 'g-load', unit: 'g', capturedAt: '2026-09-20T00:00:00.500Z' })
+  const b = make({ id: 'b', streamId: 'vehicle', metricId: 'g-load', unit: 'g', capturedAt: '2026-09-20T00:00:00.500Z', receivedAt: '2026-09-20T00:00:00.600Z' })
   assert.equal(canSynchronizeTelemetry([a, b], 1000).aligned, true)
 
   const late = make({ id: 'late', capturedAt: '2026-09-20T00:00:03.000Z', receivedAt: '2026-09-20T00:00:03.100Z' })
