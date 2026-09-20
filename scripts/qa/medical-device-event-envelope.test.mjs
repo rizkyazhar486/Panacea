@@ -80,7 +80,7 @@ test('therapy-delivery events are observations only and can never request actuat
     ...base,
     id: 'evt-therapy-1',
     kind: 'therapy-delivery',
-    source: { ...base.source, profileId: 'infusion-pump' },
+    source: { ...base.source, profileId: 'infusion-pump', interface: 'ihe-dev-ipec' },
     payload: {
       shape: 'therapy-delivery',
       therapyCode: 'local-device-code',
