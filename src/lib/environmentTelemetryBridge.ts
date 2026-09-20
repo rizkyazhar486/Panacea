@@ -14,13 +14,13 @@ import {
   type EnvironmentSourceFreshness,
   type EnvironmentSourceTruthClass,
   type NumericEnvironmentObservationCandidate,
-} from './environmentSourceAdapter'
+} from './environmentSourceAdapter.ts'
 import {
   validatePerformanceTelemetry,
   type PerformanceTelemetryEnvelope,
   type TelemetryTruthClass,
   type TimestampQuality,
-} from './performanceTelemetryEnvelope'
+} from './performanceTelemetryEnvelope.ts'
 
 export interface EnvironmentTelemetryCandidate extends NumericEnvironmentObservationCandidate {
   id: string
