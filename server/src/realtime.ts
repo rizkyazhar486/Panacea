@@ -7,6 +7,7 @@ import {
   authorizeVisitRealtimeJoin,
   createVisitRealtimeReplayGuard,
   isReservedVisitRealtimeRoom,
+  refreshVisitRealtimeAuthorization,
   validateVisitRealtimeSignalEnvelope,
   type VisitRealtimeAuthorization,
   type VisitRealtimeSignalType,
@@ -154,6 +155,23 @@ export function attachRealtime(server: Server) {
           visitError('visit_join_required')
           return
         }
+
+        const refreshedAuthorization = refreshVisitRealtimeAuthorization(
+          { userId: authenticatedUser.id, role: authenticatedUser.role },
+          visitAuthorization,
+          getVisitMembership(visitAuthorization.visitId),
+        )
+        if (!refreshedAuthorization.allowed) {
+          addAudit(
+            authenticatedUser,
+            'visit_realtime_authorization_expired',
+            `${visitAuthorization.visitId}:${refreshedAuthorization.code}`,
+          )
+          visitError(refreshedAuthorization.code)
+          return
+        }
+        visitAuthorization = refreshedAuthorization
+
         try {
           const envelope = validateVisitRealtimeSignalEnvelope({
             type: m.type as VisitRealtimeSignalType,
