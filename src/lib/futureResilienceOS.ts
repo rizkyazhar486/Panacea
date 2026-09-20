@@ -246,11 +246,27 @@ export function assessTechnology(candidate: TechnologyCandidate): TechnologyAsse
   const researchUrgency = calculateResearchUrgency(candidate)
   const blockers: string[] = []
 
+  // TypeScript types do not validate persisted JSON or adapter input at runtime.
+  // Clamping keeps display scores bounded; it must never authorize a cutover.
+  const normalizedEvidenceFields = [
+    'expectedUpside', 'maturity', 'compatibility', 'portability', 'reversibility',
+    'security', 'clinicalSafety', 'migrationCost', 'vendorLockIn',
+  ] as const
+  for (const field of normalizedEvidenceFields) {
+    const value = candidate[field]
+    if (!Number.isFinite(value) || value < 0 || value > 1) {
+      blockers.push(`invalid-evidence:${field}`)
+    }
+  }
+  if (!Number.isFinite(candidate.evidenceAgeDays) || candidate.evidenceAgeDays < 0) {
+    blockers.push('invalid-evidence:evidenceAgeDays')
+  }
+
   if (candidate.security < 0.7) blockers.push('security-below-cutover-threshold')
   if (candidate.clinicalSafety < 0.7) blockers.push('clinical-safety-below-cutover-threshold')
-  if (!candidate.benchmarkValidated) blockers.push('benchmark-not-validated')
-  if (!candidate.shadowValidated) blockers.push('shadow-mode-not-validated')
-  if (!candidate.rollbackValidated) blockers.push('rollback-not-validated')
+  if (candidate.benchmarkValidated !== true) blockers.push('benchmark-not-validated')
+  if (candidate.shadowValidated !== true) blockers.push('shadow-mode-not-validated')
+  if (candidate.rollbackValidated !== true) blockers.push('rollback-not-validated')
   if (candidate.compatibility < 0.6) blockers.push('canonical-contract-compatibility-too-low')
   if (candidate.portability < 0.5) blockers.push('portability-too-low')
 

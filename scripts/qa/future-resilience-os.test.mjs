@@ -45,6 +45,45 @@ const candidate = {
   rollbackValidated: true,
 }
 
+test('malformed numeric evidence never authorizes technology replacement', () => {
+  const fields = [
+    'expectedUpside', 'maturity', 'compatibility', 'portability', 'reversibility',
+    'security', 'clinicalSafety', 'migrationCost', 'vendorLockIn',
+  ]
+  // Perfect remaining dimensions ensure averaging cannot hide an invalid field.
+  const ready = Object.fromEntries(fields.map((field) => [field, 1]))
+  ready.migrationCost = 0
+  ready.vendorLockIn = 0
+  for (const field of fields) {
+    for (const value of [NaN, Infinity, -Infinity, undefined, null, '1', -0.01, 1.01]) {
+      const assessment = assessTechnology({ ...candidate, ...ready, [field]: value })
+      assert.equal(assessment.replacementAllowed, false, `${field}=${String(value)}`)
+      assert.ok(assessment.blockers.includes(`invalid-evidence:${field}`))
+      assert.ok(Number.isFinite(assessment.adoptionReadiness))
+      assert.ok(Number.isFinite(assessment.researchUrgency))
+    }
+  }
+})
+
+test('evidence age must be a finite nonnegative number', () => {
+  for (const evidenceAgeDays of [NaN, Infinity, -Infinity, undefined, null, '7', -1]) {
+    const assessment = assessTechnology({ ...candidate, evidenceAgeDays })
+    assert.equal(assessment.replacementAllowed, false)
+    assert.ok(assessment.blockers.includes('invalid-evidence:evidenceAgeDays'))
+  }
+  assert.equal(assessTechnology({ ...candidate, evidenceAgeDays: 0 }).replacementAllowed, true)
+})
+
+test('cutover validation requires explicit boolean true rather than truthy input', () => {
+  for (const field of ['benchmarkValidated', 'shadowValidated', 'rollbackValidated']) {
+    for (const value of ['false', 'true', 1, {}, [], null, undefined, false]) {
+      const assessment = assessTechnology({ ...candidate, [field]: value })
+      assert.equal(assessment.replacementAllowed, false, `${field}=${String(value)}`)
+      assert.ok(assessment.blockers.length > 0)
+    }
+  }
+})
+
 test('future resilience policy keeps canonical product behavior replaceable at the edge', () => {
   assert.equal(listResiliencePolicyViolations().length, 0)
   assert.equal(PANACEA_FUTURE_RESILIENCE_POLICY.singleVendorMayNotOwnPatientTruth, true)
