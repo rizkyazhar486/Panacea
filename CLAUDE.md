@@ -705,3 +705,29 @@ Next long-running work:
 6. wire surface interval, reef observations, environment and connectivity into the existing Diving/Adventure UI through progressive disclosure, not a new mega-page;
 7. extend field science beyond coral through the same observation/specimen contracts where scientifically appropriate;
 8. maintain deterministic tests for permit fail-closed behavior, source provenance, direct-underwater-satellite prohibition, offline store-and-forward, and no-decompression-authority substitution.
+
+
+## Historical prompt continuity contract — 2026-09-20
+
+The owner's Panacea requirements are cumulative across conversations, model changes and subscription periods. A requirement is not expired merely because it was requested before a model/subscription change or because a newer implementation lane exists.
+
+Interpretation rules:
+1. newest explicit owner instruction wins when two requirements truly conflict;
+2. otherwise preserve older unfinished intent and integrate it into the current shared architecture;
+3. do not resurrect already-superseded implementation details when the capability is already delivered more strongly;
+4. do not duplicate a capability that already exists—extend or compose the canonical engine;
+5. do not delete working capability merely to simplify code/UI; simplify access, presentation and architecture while preserving useful function;
+6. long-running/unresolved requirements stay in this ledger or the canonical task system until shipped, superseded or explicitly dropped;
+7. safety, security, privacy, licensing, scientific provenance and clinical human-review boundaries remain hard constraints over all historical prompts.
+
+Standing product principles that apply across historical and new work:
+- ruthless simplicity inside and outside: simple data flow, backend/API/state ownership, navigation and UI;
+- maximum ~2 interactions from Home to important capabilities where practical;
+- visual/data-first surfaces with interpretation behind progressive disclosure;
+- wide whitespace and one clear focal purpose per viewport despite high functional density;
+- functional Motion UI, not decorative animation;
+- three-system convergence rather than page proliferation: Home/OS, Clinical, and the shared Human/Body exploration space, with existing canonical routes preserved as needed;
+- AI-EMR, longitudinal patient state, chatbot/orchestration, Body Exposure, wearables/devices, evidence and safety should share contracts rather than copy state;
+- Body Exposure remains one whole-body-first semantic-zoom projector from body -> system -> organ -> tissue -> cell -> organelle -> molecule/pathway -> genome;
+- preserve and build on useful work from Claude Code, ChatGPT/Codex and prior agents; understand -> integrate -> improve;
+- use plugins/connectors when they materially improve correctness or execution, but avoid creating duplicate external systems when the repository already has a canonical source of truth.
