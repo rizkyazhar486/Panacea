@@ -2,7 +2,7 @@ import {
   getMedicalDeviceIntegrationProfile,
   type MedicalDeviceDataShape,
   type MedicalDeviceInteropStandard,
-} from './medicalDeviceIntegrationCatalog'
+} from './medicalDeviceIntegrationCatalog.ts'
 
 export type MedicalDeviceEventKind =
   | 'waveform'
