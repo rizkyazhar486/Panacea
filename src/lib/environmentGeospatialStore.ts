@@ -432,8 +432,9 @@ export function createIndexedDbEnvironmentGeospatialPersistence(
     async getEntry(cacheId) {
       const database = await db()
       const tx = database.transaction(ENTRY_STORE, 'readonly')
+      const done = transactionPromise(tx)
       const stored = await requestPromise<any>(tx.objectStore(ENTRY_STORE).get(cacheId))
-      await transactionPromise(tx)
+      await done
       if (!stored) return null
       return {
         record: stored.record as EnvironmentGeospatialCacheRecord,
@@ -444,60 +445,67 @@ export function createIndexedDbEnvironmentGeospatialPersistence(
     async putEntry(entry) {
       const database = await db()
       const tx = database.transaction(ENTRY_STORE, 'readwrite')
+      const done = transactionPromise(tx)
       tx.objectStore(ENTRY_STORE).put({
         cacheId: entry.record.metadata.cacheId,
         record: entry.record,
         payload: new Uint8Array(entry.payload),
       })
-      await transactionPromise(tx)
+      await done
     },
 
     async deleteEntry(cacheId) {
       const database = await db()
       const tx = database.transaction(ENTRY_STORE, 'readwrite')
+      const done = transactionPromise(tx)
       tx.objectStore(ENTRY_STORE).delete(cacheId)
-      await transactionPromise(tx)
+      await done
     },
 
     async listRecords() {
       const database = await db()
       const tx = database.transaction(ENTRY_STORE, 'readonly')
+      const done = transactionPromise(tx)
       const rows = await requestPromise<any[]>(tx.objectStore(ENTRY_STORE).getAll())
-      await transactionPromise(tx)
+      await done
       return rows.map((row) => row.record as EnvironmentGeospatialCacheRecord)
     },
 
     async getSyncTask(taskId) {
       const database = await db()
       const tx = database.transaction(SYNC_STORE, 'readonly')
+      const done = transactionPromise(tx)
       const task = await requestPromise<EnvironmentGeospatialSyncTask | undefined>(
         tx.objectStore(SYNC_STORE).get(taskId),
       )
-      await transactionPromise(tx)
+      await done
       return task ?? null
     },
 
     async putSyncTask(task) {
       const database = await db()
       const tx = database.transaction(SYNC_STORE, 'readwrite')
+      const done = transactionPromise(tx)
       tx.objectStore(SYNC_STORE).put(task)
-      await transactionPromise(tx)
+      await done
     },
 
     async deleteSyncTask(taskId) {
       const database = await db()
       const tx = database.transaction(SYNC_STORE, 'readwrite')
+      const done = transactionPromise(tx)
       tx.objectStore(SYNC_STORE).delete(taskId)
-      await transactionPromise(tx)
+      await done
     },
 
     async listSyncTasks() {
       const database = await db()
       const tx = database.transaction(SYNC_STORE, 'readonly')
+      const done = transactionPromise(tx)
       const tasks = await requestPromise<EnvironmentGeospatialSyncTask[]>(
         tx.objectStore(SYNC_STORE).getAll(),
       )
-      await transactionPromise(tx)
+      await done
       return tasks
     },
   }
