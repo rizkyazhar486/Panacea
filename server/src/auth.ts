@@ -96,7 +96,7 @@ export async function googleLogin(req: Request, res: Response) {
   try {
     const ticket = await googleClient.verifyIdToken({ idToken: credential, audience: config.googleClientId })
     const payload = ticket.getPayload()
-    if (!payload?.email) return res.status(401).json({ error: 'invalid_token' })
+    if (!payload?.email || payload.email_verified !== true) return res.status(401).json({ error: 'invalid_token' })
 
     const email = payload.email.trim().toLowerCase()
     const existing = getUserByEmail(email)
