@@ -6,7 +6,7 @@
   "description": "Panaceamed.id — Longevity Medical-AI Co-Physician platform (AI Chatbot + AI-EMR)",
   "scripts": {
     "dev": "vite",
-    "build": "node scripts/gen-note-index.mjs --check && node scripts/validate-source-registry.mjs && node scripts/validate-feature-factory.mjs && node scripts/validate-academic-review.mjs && node --test scripts/qa/source-registry-validator.test.mjs scripts/qa/feature-factory.test.mjs scripts/qa/academic-review-gate.test.mjs scripts/qa/home-widget-theme.test.mjs scripts/qa/compact-product-surface.test.mjs scripts/qa/prime-wisdom-schema.test.mjs scripts/qa/prime-wisdom-provenance.test.mjs scripts/qa/home-anti-slop.test.mjs scripts/qa/ruthless-simplicity.test.mjs scripts/qa/body-virtual-endoscopy.test.mjs scripts/qa/mental-health-safety-orchestrator.test.mjs scripts/qa/mental-health-screen-safety.test.mjs scripts/qa/visit-device-adapters.test.mjs scripts/qa/medical-device-integration-catalog.test.mjs scripts/qa/visit-fhir-observation.test.mjs scripts/qa/longitudinal-digital-twin.test.mjs scripts/qa/future-resilience-os.test.mjs scripts/qa/satellite-mesh-network-resilience.test.mjs scripts/qa/sport-adventure-rescue-os.test.mjs scripts/qa/wearable-environment-os.test.mjs scripts/qa/universal-sport-os.test.mjs scripts/qa/tactical-athlete-os.test.mjs scripts/qa/tactical-performance-coach.test.mjs scripts/qa/population-safety-os.test.mjs && tsc -b && vite build",
+    "build": "node scripts/gen-note-index.mjs --check && node scripts/validate-source-registry.mjs && node scripts/validate-feature-factory.mjs && node scripts/validate-academic-review.mjs && node --test scripts/qa/source-registry-validator.test.mjs scripts/qa/feature-factory.test.mjs scripts/qa/academic-review-gate.test.mjs scripts/qa/home-widget-theme.test.mjs scripts/qa/compact-product-surface.test.mjs scripts/qa/prime-wisdom-schema.test.mjs scripts/qa/prime-wisdom-provenance.test.mjs scripts/qa/home-anti-slop.test.mjs scripts/qa/ruthless-simplicity.test.mjs scripts/qa/body-virtual-endoscopy.test.mjs scripts/qa/mental-health-safety-orchestrator.test.mjs scripts/qa/mental-health-screen-safety.test.mjs scripts/qa/visit-device-adapters.test.mjs scripts/qa/medical-device-integration-catalog.test.mjs scripts/qa/visit-fhir-observation.test.mjs scripts/qa/longitudinal-digital-twin.test.mjs scripts/qa/future-resilience-os.test.mjs scripts/qa/satellite-mesh-network-resilience.test.mjs scripts/qa/sport-adventure-rescue-os.test.mjs scripts/qa/wearable-environment-os.test.mjs scripts/qa/universal-sport-os.test.mjs scripts/qa/tactical-athlete-os.test.mjs scripts/qa/tactical-performance-coach.test.mjs scripts/qa/population-safety-os.test.mjs scripts/qa/sport-specific-coaching.test.mjs scripts/qa/performance-operating-orchestrator.test.mjs scripts/qa/performance-telemetry-envelope.test.mjs scripts/qa/performance-resilience-profile.test.mjs && tsc -b && vite build",
     "preview": "vite preview",
     "gen:note-index": "node scripts/gen-note-index.mjs",
     "validate:source-registry": "node scripts/validate-source-registry.mjs",
@@ -51,7 +51,11 @@
     "test:universal-sport-os": "node --test scripts/qa/universal-sport-os.test.mjs",
     "test:tactical-athlete-os": "node --test scripts/qa/tactical-athlete-os.test.mjs",
     "test:tactical-performance-coach": "node --test scripts/qa/tactical-performance-coach.test.mjs",
-    "test:population-safety-os": "node --test scripts/qa/population-safety-os.test.mjs"
+    "test:population-safety-os": "node --test scripts/qa/population-safety-os.test.mjs",
+    "test:performance-resilience": "node --test scripts/qa/performance-resilience-profile.test.mjs",
+    "test:performance-telemetry": "node --test scripts/qa/performance-telemetry-envelope.test.mjs",
+    "test:performance-orchestrator": "node --test scripts/qa/performance-operating-orchestrator.test.mjs",
+    "test:sport-specific-coaching": "node --test scripts/qa/sport-specific-coaching.test.mjs"
   },
   "dependencies": {
     "framer-motion": "^13.2.0",
