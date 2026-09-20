@@ -108,7 +108,6 @@ export function attachRealtime(server: Server) {
     }
 
     const enterRoom = (nextRoom: string) => {
-      const previousRoom = room
       const previousAuthorization = visitAuthorization
       const transition = moveRealtimeRoomMember(rooms, ws, room, nextRoom)
 
