@@ -8,6 +8,10 @@ import {
   type PharmacologyMechanismId,
   type PharmacologyMechanismLayer,
 } from '../../lib/bodyPharmacologyMechanismNetwork'
+import {
+  BODY_MECHANISM_CAUSAL_BRIDGE_BOUNDARY,
+  listCausalLinksForPharmacology,
+} from '../../lib/bodyMechanismCausalBridge'
 
 const LAYER_LABELS: Record<PharmacologyMechanismLayer, string> = {
   target: 'Target',
@@ -43,6 +47,10 @@ export function PharmacologyMechanismPanel({ selectedAtlasSystemId, selectedSour
     BODY_PHARMACOLOGY_MECHANISM_NETWORK[0]
 
   const atlasHasDirectMechanism = visibleMechanisms.length > 0
+  const causalLinks = useMemo(
+    () => listCausalLinksForPharmacology(selected.id),
+    [selected.id],
+  )
 
   return (
     <section
@@ -113,7 +121,30 @@ export function PharmacologyMechanismPanel({ selectedAtlasSystemId, selectedSour
           </article>
 
           <aside className="grid content-start gap-3">
-            <div className="rounded-[22px] border border-violet-300/10 bg-violet-300/[.035] p-3.5"><div className="text-[9px] font-black uppercase tracking-[.16em] text-violet-100/65">Pathophysiology links</div><div className="mt-2 flex flex-wrap gap-1.5">{selected.linkedScenarioIds.map((scenarioId) => <span key={scenarioId} className="rounded-full border border-violet-200/10 bg-black/25 px-2.5 py-1 text-[10px] font-bold text-violet-50/70">{scenarioId}</span>)}</div><p className="mt-2.5 text-[10px] font-medium leading-relaxed text-white/38">A link means the mechanism intersects that disease network. It does not mean the class is automatically indicated for every presentation of that disease.</p></div>
+            <div className="rounded-[22px] border border-violet-300/10 bg-violet-300/[.035] p-3.5">
+              <div className="text-[9px] font-black uppercase tracking-[.16em] text-violet-100/65">Pathophysiology links</div>
+              <div className="mt-2 flex flex-wrap gap-1.5">
+                {selected.linkedScenarioIds.map((scenarioId) => <span key={scenarioId} className="rounded-full border border-violet-200/10 bg-black/25 px-2.5 py-1 text-[10px] font-bold text-violet-50/70">{scenarioId}</span>)}
+              </div>
+              <p className="mt-2.5 text-[10px] font-medium leading-relaxed text-white/38">A link means the mechanism intersects that disease network. It does not mean the class is automatically indicated for every presentation of that disease.</p>
+              {causalLinks.length > 0 && (
+                <details className="mt-3 border-t border-violet-200/10 pt-2" data-pharmacology-causal-bridge={selected.id}>
+                  <summary className="cursor-pointer text-[9px] font-black uppercase tracking-[.12em] text-violet-100/65">
+                    Mechanistic intersections · {causalLinks.length}
+                  </summary>
+                  <div className="mt-2 grid gap-2">
+                    {causalLinks.map((link) => (
+                      <article key={link.id} className="rounded-2xl border border-white/[.06] bg-black/25 p-2.5">
+                        <div className="text-[9px] font-black text-white/72">{link.title}</div>
+                        <p className="mt-1 text-[9px] leading-relaxed text-white/38">{link.explanation}</p>
+                        <p className="mt-1 text-[8px] leading-relaxed text-amber-100/45">{link.doesNotImply}</p>
+                      </article>
+                    ))}
+                  </div>
+                  <p className="mt-2 text-[8px] leading-relaxed text-white/28">{BODY_MECHANISM_CAUSAL_BRIDGE_BOUNDARY}</p>
+                </details>
+              )}
+            </div>
             <div className="rounded-[22px] border border-cyan-300/10 bg-cyan-300/[.025] p-3.5"><div className="text-[9px] font-black uppercase tracking-[.16em] text-cyan-100/65">Teaching relationship</div>{selected.equations.map((equation) => <div key={equation.expression} className="mt-2 rounded-2xl border border-white/[.06] bg-black/25 p-3"><div className="font-mono text-[11px] font-black text-cyan-100/80">{equation.expression}</div><div className="mt-1 text-[10px] font-black text-white/65">{equation.label}</div><p className="mt-1 text-[9px] font-medium leading-relaxed text-white/35">{equation.note}</p></div>)}</div>
             <div className="rounded-[22px] border border-white/[.07] bg-white/[.022] p-3.5"><div className="text-[9px] font-black uppercase tracking-[.16em] text-white/40">Evidence anchors</div><div className="mt-2 grid gap-2">{selected.evidence.map((source) => <a key={source.pmid} href={source.url} target="_blank" rel="noreferrer" className="rounded-2xl border border-white/[.06] bg-black/25 p-2.5 transition hover:border-cyan-300/15 hover:bg-white/[.035] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-300/50"><div className="text-[9px] font-black uppercase tracking-[.12em] text-cyan-100/60">PMID {source.pmid} · {source.year}</div><div className="mt-1 text-[10px] font-bold leading-snug text-white/62">{source.title}</div><div className="mt-1 text-[9px] font-medium leading-relaxed text-white/34">{source.role}</div></a>)}</div></div>
           </aside>
