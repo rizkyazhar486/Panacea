@@ -13,7 +13,7 @@ import {
   type EnvironmentSourceAdapter,
   type EnvironmentSourceFreshness,
   type EnvironmentSourceTruthClass,
-} from './environmentSourceAdapter'
+} from './environmentSourceAdapter.ts'
 
 export interface EnvironmentOfflineCacheEntry {
   cacheId: string
