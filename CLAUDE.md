@@ -771,3 +771,29 @@ The owner explicitly wants future predictions and favorable/adverse scenarios pr
 `assessEnvironmentForecast()` in `src/lib/environmentSourceAdapter.ts` now admits source-backed forecast metadata with separate `issuedAt` and `validAt`, model version, source reference and explicit uncertainty. `horizonMs = validAt - issuedAt`; freshness uses `now - issuedAt`, never the future target time. Metadata admission does not establish predictive skill, calibrated probability or suitability for clinical/safety decisions. Unknown probabilities remain unknown.
 
 Continuation: connect this contract to authorized forecast adapters and existing graph surfaces; preserve favorable/adverse scenarios with model assumptions and source-stated intervals, without inventing probabilities or presenting scenarios as measurements. The current change is a metadata contract, not a live forecasting model or UI integration.
+
+
+## Environment geospatial persistence continuation — 2026-09-21
+
+The persistent geospatial cache/sync layer is implemented on the current continuation branch as an additive layer on top of the canonical Environment OS contracts:
+- `src/lib/environmentGeospatialStore.ts`
+- `scripts/qa/environment-geospatial-store.test.mjs`
+- `DOCS/ENVIRONMENT-GEOSPATIAL-PERSISTENCE.md`
+- the deterministic QA is included in the normal frontend build gate.
+
+Do not create a second offline-cache metadata model. `EnvironmentOfflineCacheEntry` remains the source of truth for source/version/license/digest/data-age/forecast-target metadata.
+
+Geospatial payload admission is fail-closed:
+`persist = validCanonicalOfflineMetadata AND byteLengthMatch AND SHA256(payload)=declaredDigest`.
+
+Eviction preserves current context over invalid/historical-only records, then uses least-recently-used order; protected pinned records are not silently deleted. Location-derived cache records require an explicit consent scope reference and the canonical record stores no patient identity by default.
+
+Persistent sync retry uses:
+`delayMs = min(maxDelayMs, baseDelayMs * 2^(attemptsAfterFailure - 1))`.
+
+Remaining Environment OS continuation after this lands:
+1. authorized read-only source-specific fetch/parse adapters where terms/access permit;
+2. source-specific metric/unit mappings on top of `environmentTelemetryBridge.ts`;
+3. connect admitted snapshots to Diving/Adventure/Training and Population Safety through shared state;
+4. browser quota-pressure, IndexedDB migration/recovery and offline/online transition smoke tests;
+5. preserve source licensing, forecast issue/target separation, provenance, consent and location privacy.
