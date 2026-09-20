@@ -429,3 +429,47 @@ Use exact formulas only when prerequisites are met and version them with provena
 `Cstat = VT/(Pplat - PEEP)`, and
 `ΔP = Pplat - PEEP`.
 Vendor-specific indexes must come from validated vendor/clinical definitions rather than guessed formulas.
+
+
+## Sport Science + Adventure / Rescue OS continuation — 2026-09-20
+
+The owner wants Panacea to unify deep sport-science analysis with expedition, diving, travel, tactical and rescue operation modes, including difficult terrain, caves, offshore environments and aviation connectivity context.
+
+Canonical foundation now landed:
+- `src/lib/sportAdventureRescueOS.ts`
+- `DOCS/SPORT-ADVENTURE-RESCUE-OS.md`
+- `scripts/qa/sport-adventure-rescue-os.test.mjs`
+- `src/lib/satelliteMeshNetworkResilience.ts`
+
+Sport-science coverage currently includes running, cycling, swimming, triathlon/Ironman, tennis, padel, HYROX, strength/gym, tactical fitness and diving. Keep analysis multidimensional: physiology, biomechanics, technique, tactics, internal/external load, recovery, environment, equipment and safety. Never fabricate a metric that the connected device/source does not actually provide.
+
+Underwater communication rule is non-negotiable: do not represent GNSS or ordinary satellite RF as a direct underwater link. The canonical path is underwater acoustic/optical/tether communication -> local repeaters when needed -> entrance/surface gateway -> cellular/LEO satellite or another authorized surface backhaul. Cave/overhead environments should support breadcrumb/repeater nodes plus offline store-and-forward. WHOI-style buoy/node/vehicle acoustic relays are a useful reference architecture, but no vendor/model connector may be claimed until a real authorized adapter and fixtures exist.
+
+Rescue positioning must preserve three distinct truth states:
+- measured;
+- relay-derived;
+- drift-estimated.
+
+The drift estimate is a search aid only. The current deterministic projection uses current/subject vectors and expands uncertainty with time; never display it as a real GNSS/acoustic fix. Preserve last trusted fix, timestamp, source, accuracy, confidence, route history and search-radius uncertainty.
+
+Certified emergency systems remain independent and primary. Panacea may complement but must not replace 406 MHz EPIRB/PLB/AIS-SART maritime distress systems or 406 MHz ELT aviation distress locating. Panacea does not control aircraft or vessels and does not become a decompression computer.
+
+Next long-running implementation order:
+1. define a separate expedition/rescue device-adapter catalog for sports wearables, dive computers, acoustic modems, cave repeaters, surface buoys/boat gateways, PLB/EPIRB/AIS-SART/ELT metadata feeds and authorized aircraft/vessel telemetry without mixing them into patient truth;
+2. add concrete adapter interfaces with identity, timestamp, location accuracy, confidence, battery, link quality, firmware/model and provenance; start with read-only fixtures, not vendor claims;
+3. extend diving from manual log to optional imported depth-profile/current/position/communications context while preserving the existing rule that Panacea is not the decompression authority;
+4. add offline-first mission/event storage and delayed synchronization so cave/remote segments can safely reconnect without replay/duplication;
+5. add rescue track fusion with last-known-position timeline, current/wind/environment sources, uncertainty growth, breadcrumb history and responder export; preserve measured vs estimated styling and semantics;
+6. connect Sport Science/Training to the shared sport profile registry rather than creating new isolated sport pages; allow discipline-specific deeper analyzers for running, cycling, swimming, triathlon/Ironman, tennis, padel, HYROX, strength and tactical work;
+7. for aviation, restrict Panacea to authorized communication/health/location context, crew/passenger wearable integration and rescue-support telemetry. Never add flight-control actuation or claim replacement of ATC/ELT-certified systems;
+8. maintain deterministic QA for no-direct-underwater-satellite claims, certified-system non-replacement, confidence decay, stale-fix behavior, failover and offline/store-forward semantics.
+
+Useful formulas already encoded:
+`distance = speed * elapsedSeconds`
+`north = distance * cos(bearing)`
+`east = distance * sin(bearing)`
+`dLat = north / EarthRadius`
+`dLon = east / (EarthRadius * cos(latitude))`
+`searchRadius = sqrt(accuracy^2 + (t*sigma_current)^2 + (t*sigma_subject)^2)`
+
+Do not hide uncertainty for a cleaner UI. Rescue usefulness depends on truth about what is known, what was relayed and what is only estimated.
