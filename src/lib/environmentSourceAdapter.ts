@@ -266,3 +266,44 @@ export function validateNumericObservationAgainstSource(
     errors: Object.freeze([...new Set(errors)]),
   })
 }
+
+/** A prediction's target time is distinct from its publication/cycle time. */
+export interface EnvironmentForecastCandidate {
+  issuedAt: string
+  validAt: string
+  sourceRef: string
+  modelVersion: string
+  /** Source-stated uncertainty or explicit lack of calibrated probabilities. */
+  uncertainty: string
+}
+
+/**
+ * Forecast horizon = validAt - issuedAt; source age = now - issuedAt.
+ * Admission validates metadata, not predictive skill or safety for action.
+ * A stale forecast remains a forecast and must not be treated as current guidance.
+ */
+export function assessEnvironmentForecast(
+  adapter: EnvironmentSourceAdapter,
+  forecast: EnvironmentForecastCandidate,
+  now: string,
+) {
+  const errors: string[] = validateEnvironmentSourceAdapter(adapter)
+  const freshness = assessEnvironmentSourceFreshness(adapter, forecast.issuedAt, now)
+  const issuedMs = Date.parse(forecast.issuedAt)
+  const validMs = Date.parse(forecast.validAt)
+  if (!adapter.payloadKinds.includes('forecast-report')) errors.push('payload-kind')
+  if (freshness.state === 'invalid-time') errors.push('issuedAt-or-now')
+  if (!Number.isFinite(validMs) || !Number.isFinite(issuedMs) || validMs < issuedMs) errors.push('validAt')
+  if (!forecast.sourceRef?.trim()) errors.push('sourceRef')
+  if (!forecast.modelVersion?.trim()) errors.push('modelVersion')
+  if (!forecast.uncertainty?.trim()) errors.push('uncertainty')
+  return Object.freeze({
+    valid: errors.length === 0,
+    errors: Object.freeze([...new Set(errors)]),
+    truthClass: 'forecast' as const,
+    horizonMs: Number.isFinite(validMs) && Number.isFinite(issuedMs) && validMs >= issuedMs
+      ? validMs - issuedMs : null,
+    freshness,
+    forecast,
+  })
+}

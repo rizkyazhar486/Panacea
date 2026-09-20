@@ -763,3 +763,11 @@ Next Environment OS work should build on this contract:
 3. add offline geospatial cache/data-age contracts for remote travel/diving/rescue;
 4. connect environment snapshots to Diving/Adventure/Training and Population Safety without creating duplicate state;
 5. preserve privacy/authorization rules for any position/finding source.
+
+## Forecast semantics clarification — 2026-09-20
+
+The owner explicitly wants future predictions and favorable/adverse scenarios preserved. Future target times are valid for forecasts; they must not be mislabeled as measured observations.
+
+`assessEnvironmentForecast()` in `src/lib/environmentSourceAdapter.ts` now admits source-backed forecast metadata with separate `issuedAt` and `validAt`, model version, source reference and explicit uncertainty. `horizonMs = validAt - issuedAt`; freshness uses `now - issuedAt`, never the future target time. Metadata admission does not establish predictive skill, calibrated probability or suitability for clinical/safety decisions. Unknown probabilities remain unknown.
+
+Continuation: connect this contract to authorized forecast adapters and existing graph surfaces; preserve favorable/adverse scenarios with model assumptions and source-stated intervals, without inventing probabilities or presenting scenarios as measurements. The current change is a metadata contract, not a live forecasting model or UI integration.

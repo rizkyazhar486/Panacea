@@ -140,3 +140,21 @@ test('numeric admission rejects unknown metrics and missing unit mappings', () =
   assert.equal(result.valid, false)
   assert.ok(result.errors.includes('metric'))
 })
+
+test('forecast accepts future target time while retaining issue age and uncertainty', async () => {
+  const { assessEnvironmentForecast } = await import('../../src/lib/environmentSourceAdapter.ts')
+  const source = ENVIRONMENT_SOURCE_ADAPTERS.find((entry) => entry.sourceId === 'noaa-ofs')
+  const forecast = { issuedAt: '2026-09-20T08:00:00Z', validAt: '2026-09-21T08:00:00Z', sourceRef: 'ofs:cycle-1', modelVersion: 'test-model-v1', uncertainty: 'Scenario range; probability not calibrated' }
+  const result = assessEnvironmentForecast(source, forecast, '2026-09-20T09:00:00Z')
+  assert.equal(result.valid, true)
+  assert.equal(result.truthClass, 'forecast')
+  assert.equal(result.horizonMs, 86400000)
+  assert.equal(result.freshness.ageMs, 3600000)
+  assert.equal(result.freshness.state, 'fresh')
+  assert.equal(result.forecast, forecast)
+  assert.equal(assessEnvironmentForecast(source, forecast, '2026-09-20T15:00:00Z').freshness.state, 'stale')
+  for (const patch of [{ issuedAt: '2026-09-22T08:00:00Z' }, { validAt: 'bad' }, { validAt: '2026-09-19T08:00:00Z' }, { sourceRef: '' }, { modelVersion: '' }, { uncertainty: '' }]) {
+    assert.equal(assessEnvironmentForecast(source, { ...forecast, ...patch }, '2026-09-20T09:00:00Z').valid, false)
+  }
+  assert.equal(assessEnvironmentForecast(ENVIRONMENT_SOURCE_ADAPTERS[0], forecast, '2026-09-20T09:00:00Z').valid, false)
+})
