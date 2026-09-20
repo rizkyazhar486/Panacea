@@ -153,6 +153,7 @@ export function attachRealtime(server: Server) {
       }
       if (m.type === 'join' && m.room) {
         const requestedRoom = m.room.trim()
+        if (!requestedRoom) return
         if (isReservedVisitRealtimeRoom(requestedRoom)) {
           if (authenticatedUser) {
             addAudit(authenticatedUser, 'visit_realtime_reserved_room_rejected', requestedRoom.slice(0, 160))
