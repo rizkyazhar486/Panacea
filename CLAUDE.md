@@ -1,5 +1,12 @@
 # Panaceamed.id — Claude Code working contract
 
+
+## Panacea Constitution — parent scientific authority
+
+All Claude Code work must comply with [PANACEA_CONSTITUTION.md](PANACEA_CONSTITUTION.md). It is the model-agnostic parent charter for scientific discovery, R&D, invention, clinical translation, drug discovery, trials, surveillance, publication integrity, continuous model/technology evolution, privacy, safety and validation. The latest explicit owner instruction remains highest product authority, but no model-specific instruction may silently weaken the Constitution's evidence, reproducibility, safety, governance, external-validation, publication-integrity or human-oversight requirements.
+
+A current-version “100%” acceptance state is a transition trigger, not an endpoint: after defined acceptance gates are satisfied, continue in Continuous Evolution Mode by monitoring new evidence/technology, benchmarking, validating, integrating and re-validating the next baseline. Model roles are capability-driven and may change as future models outperform current ones.
+
 ## Authority order
 
 The latest explicit instruction from the repository owner/user is the highest product-development authority. After that, prefer the current working repository state, then this file and AGENTS.md, then older agent-authored plans or recommendations.
@@ -797,3 +804,49 @@ Remaining Environment OS continuation after this lands:
 3. connect admitted snapshots to Diving/Adventure/Training and Population Safety through shared state;
 4. browser quota-pressure, IndexedDB migration/recovery and offline/online transition smoke tests;
 5. preserve source licensing, forecast issue/target separation, provenance, consent and location privacy.
+
+
+## Pioneer publication & discovery session
+
+For dedicated frontier research-idea work, use [docs/PIONEER_PUBLICATION_DISCOVERY_SESSION.md](docs/PIONEER_PUBLICATION_DISCOVERY_SESSION.md) as the canonical session protocol.
+
+This mode is for publication ideas, scientific-gap discovery, new datasets, methods, biomarkers, mechanisms, interventions, and translational hypotheses. It must remain subordinate to the Panacea Constitution and Academic Accuracy Gate.
+
+Key rules:
+- Never certify novelty from model memory alone.
+- Treat "unsolved", "no dataset exists", "first", and "discovery" as evidence-dependent claims.
+- Record reproducible literature/trial/patent/dataset searches and nearest prior art.
+- Require falsifiability, provenance, reproducibility, ethics/safety, and applicability before promotion.
+- Preserve rejected hypotheses and negative searches when useful.
+- Use independent adversarial review rather than allowing one model to invent and self-certify novelty.
+- Because the repository is public, do not commit confidential/patent-sensitive enabling detail, protected patient information, NDA material, or trade secrets without authorization.
+
+
+## Interactive surgical simulation directive — 2026-09-21
+
+The owner explicitly requires Body Exposure to progress beyond static surgical-layer teaching into an interactive 3D-capable surgical simulation system. Preserve the existing source-grounded SurgicalLab, but treat it as the anatomical-reference layer underneath a reusable simulation runtime rather than the final product.
+
+Initial required procedure catalogue:
+- CABG;
+- Cimino AV fistula;
+- exploratory laparotomy;
+- cesarean section;
+- mastectomy;
+- lesion/soft-tissue excision;
+- laparoscopic surgery;
+- VP shunt;
+- craniectomy;
+- appendectomy;
+- then expand across the major surgical specialties without creating isolated toy pages.
+
+The runtime must converge on one shared architecture:
+1. procedure/scenario state machine with explicit phases and restart/replay;
+2. shared Body Exposure anatomy context and exact-source structure highlighting where geometry exists;
+3. operating-room / procedure scene state, instrument state, anatomy target state, hazard state and telemetry;
+4. interaction validation, safety/accuracy/efficiency metrics and error feedback;
+5. procedure-specific 3D assets, camera/port/trajectory context, instrument collision and later deformable-tissue / fluid / bleeding physics only when validated;
+6. complications and branching scenarios as explicit simulation states, not fabricated patient-specific predictions;
+7. mobile/desktop interaction with progressive loading and graceful WebGL degradation;
+8. source provenance, evidence boundary, academic review and clear educational-vs-clinical labeling.
+
+Do not call a generic animation, static layer list or scripted slideshow a surgical simulator. A mature module should allow the learner to act on a stateful environment and receive objective state/telemetry feedback. At the same time, do not invent operative geometry or claim physical realism before validation. The current lightweight runtime is a scaffold; the continuation target is high-fidelity validated simulation built on the same contracts.
