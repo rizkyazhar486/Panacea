@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom'
 import { useStore, uid } from '../lib/store'
 import { Card, SectionTitle, Badge, Button, Field, inputClass } from '../components/ui'
 import { IconPlan, IconCheck, IconPlus, IconSparkle, IconShield } from '../components/icons'
-import { scorePlanItem, WEIGHTS, S_THRESHOLD } from '../lib/cdss'
+import { evaluatePlanSafety, scorePlanItem, WEIGHTS } from '../lib/cdss'
 import { checkInteractions } from '../lib/ddi'
 import { ensureEpisodeFromVerifiedPlan } from '../lib/careEpisode'
 import type { PlanItem, Patient } from '../lib/types'
@@ -49,6 +49,21 @@ export function Planning() {
     )
   }
 
+  const clinicianIdentity = (state.account?.name ?? state.settings.doctorName).trim()
+
+  function medicationContextFor(planItemId: string): string[] {
+    return [
+      record!.anamnesis.riwayatPengobatan,
+      ...record!.plan
+        .filter((p) => p.id !== planItemId && p.status !== 'ditolak')
+        .map((p) => p.text),
+    ].filter((text) => text.trim().length > 0)
+  }
+
+  function planSafety(item: PlanItem) {
+    return evaluatePlanSafety(item, activePatient, medicationContextFor(item.id))
+  }
+
   function update(plan: PlanItem[]) {
     let next = { ...record!, plan, updatedAt: new Date().toISOString() }
     // The first plan item verified for a diagnosis is the moment the care
@@ -58,13 +73,19 @@ export function Planning() {
     saveRecord(next)
   }
   function setStatus(id: string, status: PlanItem['status']) {
+    if (status === 'diverifikasi') {
+      const item = record!.plan.find((p) => p.id === id)
+      if (!item) return
+      const safety = evaluatePlanSafety(item, activePatient, medicationContextFor(id))
+      if (!safety.canVerify) return
+    }
     update(record!.plan.map((p) => (p.id === id ? { ...p, status } : p)))
   }
   function add() {
     if (!newText.trim()) return
     update([
       ...record!.plan,
-      { id: uid(), category: newCat, text: newText.trim(), source: 'Dokter', status: 'diverifikasi' },
+      { id: uid(), category: newCat, text: newText.trim(), source: 'Dokter', status: 'usulan' },
     ])
     setNewText('')
   }
@@ -77,8 +98,35 @@ export function Planning() {
 
   return (
     <div className="space-y-6">
-      <CdssPanel plan={record.plan} patient={activePatient} />
-      <DDICheck texts={[...record.plan.map((p) => p.text), record.anamnesis.riwayatPengobatan, ...activePatient.allergies]} />
+      <CdssPanel
+        plan={record.plan}
+        patient={activePatient}
+        medicationHistory={record.anamnesis.riwayatPengobatan}
+        clinicianIdentity={clinicianIdentity}
+        onOverride={(id, findingIds, reason, by) =>
+          update(
+            record.plan.map((p) =>
+              p.id === id
+                ? {
+                    ...p,
+                    safetyOverride: {
+                      reason: reason,
+                      by: by,
+                      at: new Date().toISOString(),
+                      findingIds: findingIds,
+                    },
+                  }
+                : p,
+            ),
+          )
+        }
+      />
+      <DDICheck
+        texts={[
+          ...record.plan.filter((p) => p.status !== 'ditolak').map((p) => p.text),
+          record.anamnesis.riwayatPengobatan,
+        ]}
+      />
       <SurgeryCard />
 
       <Card>
@@ -125,7 +173,11 @@ export function Planning() {
               </div>
               <div className="flex shrink-0 gap-1.5">
                 {pi.status !== 'diverifikasi' && (
-                  <Button variant="outline" onClick={() => setStatus(pi.id, 'diverifikasi')}>
+                  <Button
+                    variant="outline"
+                    onClick={() => setStatus(pi.id, 'diverifikasi')}
+                    disabled={!planSafety(pi).canVerify}
+                  >
                     <IconCheck size={14} /> Verify
                   </Button>
                 )}
@@ -197,11 +249,13 @@ function DDICheck({ texts }: { texts: string[] }) {
       <SectionTitle
         icon={<IconShield size={18} />}
         title="Drug–Drug Interaction (DDI) Checker"
-        subtitle="Automatic screening of the plan against medication history & allergies"
-        right={hits.length === 0 ? <Badge tone="brand">No interactions</Badge> : <Badge tone="critical">{hits.length} interactions</Badge>}
+        subtitle="Automatic local-rule screening of the plan against medication history"
+        right={hits.length === 0 ? <Badge tone="brand">No local-rule hits</Badge> : <Badge tone="critical">{hits.length} interactions</Badge>}
       />
       {hits.length === 0 ? (
-        <p className="text-sm text-neutral-500">No significant interactions detected in the current list.</p>
+        <p className="text-sm text-neutral-500">
+          No interactions found in the current local rule set — this is not a comprehensive interaction database.
+        </p>
       ) : (
         <div className="space-y-2">
           {hits.map((h, i) => (
@@ -304,27 +358,51 @@ function ScoreBar({ label, value, color }: { label: string; value: number; color
   )
 }
 
-function CdssPanel({ plan, patient }: { plan: PlanItem[]; patient: Patient }) {
+function CdssPanel({
+  plan,
+  patient,
+  medicationHistory,
+  clinicianIdentity,
+  onOverride,
+}: {
+  plan: PlanItem[]
+  patient: Patient
+  medicationHistory: string
+  clinicianIdentity: string
+  onOverride: (id: string, findingIds: string[], reason: string, by: string) => void
+}) {
   const [open, setOpen] = useState(true)
-  const [overrides, setOverrides] = useState<Record<string, string>>({})
   const [drafting, setDrafting] = useState<string>('')
   const [note, setNote] = useState('')
 
-  const scored = plan.map((p) => ({ item: p, s: scorePlanItem(p, patient) }))
-  const blocked = scored.filter((x) => x.s.blocked && !overrides[x.item.id])
+  const scored = plan.map((item) => {
+    const medicationContext = [
+      medicationHistory,
+      ...plan
+        .filter((other) => other.id !== item.id && other.status !== 'ditolak')
+        .map((other) => other.text),
+    ].filter((text) => text.trim().length > 0)
+
+    return {
+      item,
+      s: scorePlanItem(item, patient, medicationContext),
+      safety: evaluatePlanSafety(item, patient, medicationContext),
+    }
+  })
+  const blocked = scored.filter((entry) => entry.safety.blocked)
 
   return (
     <Card className="border-2 border-brand/20">
       <SectionTitle
         icon={<IconShield size={20} />}
-        title="CDSS Safety Engine — Hybrid Lateral + Vertical"
-        subtitle={`Ensemble  α·V + β·L + γ·S  (α=${WEIGHTS.alpha}, β=${WEIGHTS.beta}, γ=${WEIGHTS.gamma}) · safety gate S ≥ ${S_THRESHOLD}`}
+        title="CDSS Safety Engine — Verification Gate"
+        subtitle={`Heuristic display: α·V + β·L + γ·S (α=${WEIGHTS.alpha}, β=${WEIGHTS.beta}, γ=${WEIGHTS.gamma}); verification is governed by explicit blocker rules.`}
         right={
           <div className="flex items-center gap-2">
             {blocked.length > 0 ? (
               <Badge tone="critical">{blocked.length} blocked</Badge>
             ) : (
-              <Badge tone="brand">Safe</Badge>
+              <Badge tone="brand">No local blockers</Badge>
             )}
             <Button variant="ghost" onClick={() => setOpen((o) => !o)}>
               {open ? 'Hide' : 'Show'}
@@ -335,8 +413,9 @@ function CdssPanel({ plan, patient }: { plan: PlanItem[]; patient: Patient }) {
       {open && (
         <div className="space-y-2.5">
           {scored.length === 0 && <p className="text-sm text-neutral-500">No items to score yet.</p>}
-          {scored.map(({ item, s }) => {
-            const isBlocked = s.blocked && !overrides[item.id]
+          {scored.map(({ item, s, safety }) => {
+            const isBlocked = safety.blocked
+            const findings = [...safety.blockers, ...safety.warnings]
             return (
               <div
                 key={item.id}
@@ -349,14 +428,14 @@ function CdssPanel({ plan, patient }: { plan: PlanItem[]; patient: Patient }) {
                     <div className="mb-1 flex items-center gap-2">
                       <Badge tone="neutral">{CAT_LABEL[item.category] ?? item.category}</Badge>
                       {s.highAlert && <Badge tone="critical">High-alert</Badge>}
-                      {overrides[item.id] && <Badge tone="high">Clinician override</Badge>}
+                      {safety.overrideApplied && <Badge tone="high">Clinician override</Badge>}
                     </div>
                     <p className="text-sm">{item.text}</p>
                   </div>
                   <div className="w-44 shrink-0 space-y-1">
                     <ScoreBar label="V" value={s.V} color="#0b7a4b" />
                     <ScoreBar label="L" value={s.L} color="#3b82f6" />
-                    <ScoreBar label="S" value={s.S} color={s.blocked ? '#FF3131' : '#00BF63'} />
+                    <ScoreBar label="S" value={s.S} color={safety.blockers.length > 0 ? '#FF3131' : '#00BF63'} />
                     <div className="flex justify-between border-t border-neutral-100 pt-1 text-[11px] font-bold">
                       <span className="text-neutral-500">Final</span>
                       <span className={isBlocked ? 'text-accent' : 'text-brand-dark'}>
@@ -366,10 +445,13 @@ function CdssPanel({ plan, patient }: { plan: PlanItem[]; patient: Patient }) {
                   </div>
                 </div>
 
-                {s.reasons.length > 0 && (
-                  <ul className="mt-2 space-y-0.5 text-xs text-accent">
-                    {s.reasons.map((r, i) => (
-                      <li key={i}>⚠ {r}</li>
+                {findings.length > 0 && (
+                  <ul className="mt-2 space-y-0.5 text-xs">
+                    {safety.blockers.map((finding) => (
+                      <li key={finding.id} className="text-accent">🚫 {finding.message}</li>
+                    ))}
+                    {safety.warnings.map((finding) => (
+                      <li key={finding.id} className="text-amber-700">⚠ {finding.message}</li>
                     ))}
                   </ul>
                 )}
@@ -385,12 +467,22 @@ function CdssPanel({ plan, patient }: { plan: PlanItem[]; patient: Patient }) {
                             onChange={(e) => setNote(e.target.value)}
                             placeholder="Clinical justification required to override…"
                           />
+                          {!clinicianIdentity && (
+                            <p className="mt-1 text-[11px] text-accent">
+                              An identified clinician is required before an override can be recorded.
+                            </p>
+                          )}
                         </div>
                         <Button
                           variant="danger"
-                          disabled={!note.trim()}
+                          disabled={note.trim().length < 12 || !clinicianIdentity}
                           onClick={() => {
-                            setOverrides((o) => ({ ...o, [item.id]: note.trim() }))
+                            onOverride(
+                              item.id,
+                              safety.blockers.map((finding) => finding.id),
+                              note.trim(),
+                              clinicianIdentity,
+                            )
                             setDrafting('')
                             setNote('')
                           }}
@@ -404,7 +496,7 @@ function CdssPanel({ plan, patient }: { plan: PlanItem[]; patient: Patient }) {
                     ) : (
                       <div className="flex items-center justify-between gap-2">
                         <span className="text-xs font-semibold text-accent">
-                          🚫 Blocked by safety gate — clinician override with justification required.
+                          🚫 Verification blocked — resolve the finding or record an identified clinician override.
                         </span>
                         <Button variant="outline" onClick={() => setDrafting(item.id)}>
                           Override (justification)
@@ -413,21 +505,27 @@ function CdssPanel({ plan, patient }: { plan: PlanItem[]; patient: Patient }) {
                     )}
                   </div>
                 )}
-                {overrides[item.id] && (
+
+                {item.safetyOverride && safety.overrideApplied && (
                   <p className="mt-2 rounded-lg bg-amber-50 px-2 py-1 text-[11px] text-amber-700">
-                    📝 Audit: clinician override — "{overrides[item.id]}"
+                    📝 Audit: {item.safetyOverride.by} overrode {item.safetyOverride.findingIds.length} blocker(s) at{' '}
+                    {new Date(item.safetyOverride.at).toLocaleString()} — “{item.safetyOverride.reason}”
+                  </p>
+                )}
+                {item.safetyOverride && !safety.overrideApplied && safety.blockers.length > 0 && (
+                  <p className="mt-2 rounded-lg bg-red-50 px-2 py-1 text-[11px] text-accent">
+                    Prior override no longer covers the current blocker set; re-review is required.
                   </p>
                 )}
               </div>
             )
           })}
           <p className="text-[11px] leading-relaxed text-neutral-500">
-            V = vertical (guideline/dosing concordance) · L = lateral (LLM suggestion/patient fit) · S =
-            safety (DDI/allergy/contraindication). Items with S &lt; {S_THRESHOLD} are blocked and require
-            a recorded clinician justification (doctor-in-the-loop).
+            V/L/S are explanatory heuristics; verification uses bounded local blocker rules, and no local hit is not comprehensive medication clearance.
           </p>
         </div>
       )}
     </Card>
   )
 }
+
