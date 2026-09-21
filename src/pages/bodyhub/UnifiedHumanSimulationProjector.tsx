@@ -6,6 +6,8 @@ import UniversalAtlasDepthRail from './UniversalAtlasDepthRail'
 
 const BodyAllSystems3D = lazy(() => import('../../components/BodyAllSystems3D'))
 const AtlasPhysiologyBridgePanel = lazy(() => import('./AtlasPhysiologyBridgePanel'))
+const WholeBodyPhysiologyWorkbench = lazy(() => import('./WholeBodyPhysiologyWorkbench'))
+const PhysiologyDeepDivePanel = lazy(() => import('./PhysiologyDeepDivePanel').then((module) => ({ default: module.PhysiologyDeepDivePanel })))
 const BodySystemDeepDiveWorkspace = lazy(() => import('./BodySystemDeepDiveWorkspace'))
 const PathophysiologyNetworkPanel = lazy(() => import('./PathophysiologyNetworkPanel'))
 const PharmacologyMechanismPanel = lazy(() => import('./PharmacologyMechanismPanel'))
@@ -201,12 +203,14 @@ export default function UnifiedHumanSimulationProjector({
       case 'physiology':
         return (
           <div className="space-y-3">
+            <WholeBodyPhysiologyWorkbench />
             <AtlasPhysiologyBridgePanel
               selectedAtlasSystemId={selectedSystemId}
               selectedSourceStructureName={selectedStructureName}
               onSystemChange={(systemId) => onSystemChange(systemId)}
             />
             <BodySystemDeepDiveWorkspace selectedAtlasSystemId={selectedSystemId} />
+            <PhysiologyDeepDivePanel />
           </div>
         )
       case 'pathophysiology':
