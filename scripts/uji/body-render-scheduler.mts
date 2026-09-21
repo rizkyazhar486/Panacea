@@ -61,4 +61,24 @@ assert.equal(pending.size, 0)
 scheduler.request()
 assert.equal(pending.size, 0, 'disposed renderers must ignore later invalidations')
 
+let zeroIdScheduleCount = 0
+const zeroIdCancelled: number[] = []
+const zeroIdScheduler = createBodyRenderScheduler({
+  canRender: () => true,
+  renderFrame: () => {},
+  requestFrame: () => {
+    zeroIdScheduleCount += 1
+    return 0
+  },
+  cancelFrame: (id) => { zeroIdCancelled.push(id) },
+})
+
+zeroIdScheduler.request()
+zeroIdScheduler.request()
+assert.equal(zeroIdScheduleCount, 1, 'frame id zero must still coalesce duplicate invalidations')
+assert.equal(zeroIdScheduler.hasPendingFrame(), true, 'frame id zero must be tracked as pending')
+zeroIdScheduler.stop()
+assert.deepEqual(zeroIdCancelled, [0], 'frame id zero must remain cancellable')
+assert.equal(zeroIdScheduler.hasPendingFrame(), false)
+
 console.log('body render scheduler: coalesces invalidations and stays idle while hidden, offscreen, or disposed')
