@@ -79,7 +79,7 @@ export function SurgicalSimulatorPanel({ onSorot, onKedalaman }: SurgicalSimulat
           </button>
         </div>
         <p className="mt-1.5 max-w-4xl text-[10px] leading-relaxed text-white/55">
-          The current Body Exposure 3D model is the anatomy canvas. Simulation phases drive anatomy focus, shared highlighting, dissection depth, tool/action validation, and live telemetry. Deformable tissue, instrument collision, fluid/bleeding physics, and validated procedure-specific assets remain explicit fidelity gates.
+          Body Exposure 3D is the anatomy canvas; simulator phases drive shared focus, dissection depth, action validation and telemetry while advanced physics and procedure-specific assets remain gated until validated.
         </p>
       </div>
 
