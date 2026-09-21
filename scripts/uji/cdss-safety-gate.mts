@@ -62,6 +62,18 @@ const majorDdi = evaluatePlanSafety(
 assert.equal(majorDdi.blocked, true, 'a known major DDI involving the proposed item must hard-block verification')
 assert.ok(majorDdi.blockers.some((finding) => finding.code === 'major-ddi'))
 
+const majorDdiScore = cdss.scorePlanItem(
+  proposed('Warfarin 5 mg PO daily'),
+  patient,
+  ['Aspirin 81 mg daily'],
+)
+assert.equal(
+  majorDdiScore.blocked,
+  true,
+  'the explanatory score must use the same medication context as the verification gate',
+)
+assert.equal(majorDdiScore.final, 0, 'a blocked contextual DDI must not retain a nonzero final score')
+
 const highAlertMissingDose = evaluatePlanSafety(proposed('Start insulin glargine'), patient)
 assert.equal(highAlertMissingDose.blocked, true, 'a high-alert medication without an explicit dose must fail closed')
 assert.ok(highAlertMissingDose.blockers.some((finding) => finding.code === 'high-alert-dose-unverified'))
