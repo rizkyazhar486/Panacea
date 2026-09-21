@@ -9,6 +9,7 @@ import {
   type WholeBodySystemId,
 } from '../../lib/wholeBodyPhysiologyOS'
 import { PHYSIOLOGY_DEEP_DIVES } from '../../lib/physiologyDeepDives'
+import { humanPhysiologyCoverageSnapshot } from '../../lib/humanPhysiologyCoverage'
 
 const SIGNAL_LABELS = {
   oxygenDemand: 'O₂ demand',
@@ -41,6 +42,7 @@ export default function WholeBodyPhysiologyWorkbench() {
   })
 
   const selectedSystem = getWholeBodySystem(selectedSystemId)
+  const coreCoverage = useMemo(() => humanPhysiologyCoverageSnapshot(), [])
   const state = useMemo(() => simulateSyntheticHomeostasis(perturbation), [perturbation])
   const connectedSystems = useMemo(
     () => selectedSystem.couplingTargets.map((id) => getWholeBodySystem(id)),
@@ -72,6 +74,7 @@ export default function WholeBodyPhysiologyWorkbench() {
             <span className="rounded-full border border-cyan-300/20 bg-cyan-300/10 px-2.5 py-1 text-cyan-200">{WHOLE_BODY_PHYSIOLOGY_SYSTEMS.length} system networks</span>
             <span className="rounded-full border border-violet-300/20 bg-violet-300/10 px-2.5 py-1 text-violet-200">{PHYSIOLOGY_DEEP_DIVES.length} mechanism deep dives</span>
             <span className="rounded-full border border-fuchsia-300/20 bg-fuchsia-300/10 px-2.5 py-1 text-fuchsia-200">{WHOLE_BODY_COUPLING_LOOPS.length} coupling loops</span>
+            <span className="rounded-full border border-emerald-300/20 bg-emerald-300/10 px-2.5 py-1 text-emerald-200">{coreCoverage.represented}/{coreCoverage.total} core coverage</span>
           </div>
         </div>
       </div>
