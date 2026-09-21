@@ -52,4 +52,13 @@ assert.ok(
   'DDI no-hit state must state the coverage limitation explicitly',
 )
 
+assert.ok(
+  /scorePlanItem\(item,\s*patient,\s*medicationContext\)/.test(planning),
+  'the displayed safety score must receive the same medication context as the verification gate',
+)
+assert.ok(
+  !planning.includes('medication history & allergies'),
+  'DDI checker copy must not claim allergy screening after allergies were removed from its medication input',
+)
+
 console.log('planning-safety-gate: ok')
