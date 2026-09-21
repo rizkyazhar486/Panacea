@@ -8,6 +8,7 @@ import {
   type SyntheticPerturbationInput,
   type WholeBodySystemId,
 } from '../../lib/wholeBodyPhysiologyOS'
+import { PHYSIOLOGY_DEEP_DIVES } from '../../lib/physiologyDeepDives'
 
 const SIGNAL_LABELS = {
   oxygenDemand: 'O₂ demand',
@@ -62,15 +63,15 @@ export default function WholeBodyPhysiologyWorkbench() {
         <div className="relative flex flex-col gap-3 lg:flex-row lg:items-end lg:justify-between">
           <div>
             <div className="text-[9px] font-black uppercase tracking-[0.22em] text-cyan-300">Body Exposure · whole-body physiology OS</div>
-            <h3 className="mt-1 text-xl font-black tracking-tight text-white sm:text-2xl">Eleven systems, one homeostatic network</h3>
+            <h3 className="mt-1 text-xl font-black tracking-tight text-white sm:text-2xl">Whole-human physiology, one connected network</h3>
             <p className="mt-2 max-w-3xl text-[11px] leading-relaxed text-white/60 sm:text-xs">
-              Explore how circulation, ventilation, renal conservation, endocrine control, metabolism, movement, immunity and heat exchange interact across the whole body before drilling down to a single organ.
+              Explore organ systems and integrative physiology together: circulation, ventilation, renal conservation, endocrine control, metabolism, movement, immunity, allergy, thermoregulation, sensory processing, balance, proprioception, pain and autonomic control.
             </p>
           </div>
           <div className="flex flex-wrap gap-2 text-[9px] font-black uppercase tracking-wide">
-            <span className="rounded-full border border-cyan-300/20 bg-cyan-300/10 px-2.5 py-1 text-cyan-200">11 systems</span>
-            <span className="rounded-full border border-violet-300/20 bg-violet-300/10 px-2.5 py-1 text-violet-200">8 coupling loops</span>
-            <span className="rounded-full border border-emerald-300/20 bg-emerald-300/10 px-2.5 py-1 text-emerald-200">Synthetic teaching model</span>
+            <span className="rounded-full border border-cyan-300/20 bg-cyan-300/10 px-2.5 py-1 text-cyan-200">{WHOLE_BODY_PHYSIOLOGY_SYSTEMS.length} system networks</span>
+            <span className="rounded-full border border-violet-300/20 bg-violet-300/10 px-2.5 py-1 text-violet-200">{PHYSIOLOGY_DEEP_DIVES.length} mechanism deep dives</span>
+            <span className="rounded-full border border-fuchsia-300/20 bg-fuchsia-300/10 px-2.5 py-1 text-fuchsia-200">{WHOLE_BODY_COUPLING_LOOPS.length} coupling loops</span>
           </div>
         </div>
       </div>
