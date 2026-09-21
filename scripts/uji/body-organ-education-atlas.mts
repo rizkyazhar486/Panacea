@@ -26,6 +26,8 @@ for (const relationship of ORGAN_EDUCATION_RELATIONSHIPS) {
 assert.equal(getOrganEducationRelationships('kidney').length, 1)
 assert.equal(getOrganEducationRelationships('lung').length, 1)
 assert.equal(getOrganEducationRelationships('liver').length, 1)
+assert.equal(getOrganEducationRelationships('pancreas').length, 1)
+assert.equal(hasSourceBackedOrganRelationship('pancreas-acinar-duct-exocrine-flow'), true)
 assert.equal(getOrganEducationRelationships('unsupported-organ').length, 0)
 assert.equal(hasSourceBackedOrganRelationship('missing-relationship'), false)
 console.log(`body-organ-education-atlas: ${ORGAN_EDUCATION_RELATIONSHIPS.length} source-bounded relationships verified`)
