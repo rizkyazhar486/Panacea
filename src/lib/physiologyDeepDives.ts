@@ -45,6 +45,11 @@ const NCBI = {
   spirometry: 'https://www.ncbi.nlm.nih.gov/books/NBK560526/',
   hemostasis: 'https://www.ncbi.nlm.nih.gov/books/NBK507795/',
   fever: 'https://www.ncbi.nlm.nih.gov/books/NBK562334/',
+  vestibular: 'https://www.ncbi.nlm.nih.gov/books/NBK545297/',
+  proprioception: 'https://www.ncbi.nlm.nih.gov/books/NBK10812/',
+  autonomic: 'https://www.ncbi.nlm.nih.gov/books/NBK539845/',
+  pain: 'https://www.ncbi.nlm.nih.gov/books/NBK11093/',
+  taste: 'https://www.ncbi.nlm.nih.gov/books/NBK557768/',
 }
 
 export const PHYSIOLOGY_DEEP_DIVES: PhysiologyDeepDive[] = [
