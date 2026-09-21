@@ -177,7 +177,6 @@ export function Planning() {
                     variant="outline"
                     onClick={() => setStatus(pi.id, 'diverifikasi')}
                     disabled={!planSafety(pi).canVerify}
-                    title={!planSafety(pi).canVerify ? 'Resolve or explicitly override current safety blockers first.' : undefined}
                   >
                     <IconCheck size={14} /> Verify
                   </Button>
