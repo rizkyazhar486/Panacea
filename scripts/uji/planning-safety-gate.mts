@@ -61,4 +61,13 @@ assert.ok(
   'DDI checker copy must not claim allergy screening after allergies were removed from its medication input',
 )
 
+assert.ok(
+  !/right=\{hits\.length === 0 \? <Badge tone="brand">No interactions<\/Badge>/.test(planning),
+  'bounded local DDI rules must not show an absolute No interactions badge',
+)
+assert.ok(
+  /<Badge tone="brand">No local-rule hits<\/Badge>/.test(planning),
+  'DDI no-hit badge must remain explicitly scoped to the local rule set',
+)
+
 console.log('planning-safety-gate: ok')
