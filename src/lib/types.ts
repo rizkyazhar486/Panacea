@@ -74,12 +74,28 @@ export interface PhysicalExam {
   verifiedBy?: string
 }
 
+export interface PlanSafetyOverride {
+  /** Human-readable rationale recorded by the clinician at the moment of override. */
+  reason: string
+  /** Identified clinician/account responsible for the override. */
+  by: string
+  /** ISO timestamp for the audit trail. */
+  at: string
+  /**
+   * Exact safety-finding identities acknowledged by this override.
+   * If the blocker set changes, the override no longer applies and the gate
+   * fails closed until the new findings are reviewed.
+   */
+  findingIds: string[]
+}
+
 export interface PlanItem {
   id: string
   category: 'Suportif' | 'Definitif' | 'Edukasi' | 'Follow-up' | 'Monitoring'
   text: string
   source: 'AI' | 'Dokter'
   status: 'usulan' | 'diverifikasi' | 'ditolak'
+  safetyOverride?: PlanSafetyOverride
 }
 
 export interface ProblemEntry {
