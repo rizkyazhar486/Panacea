@@ -55,11 +55,11 @@ export interface HumanPhysiologyCoverageSnapshot {
 }
 
 export function humanPhysiologyCoverageSnapshot(): HumanPhysiologyCoverageSnapshot {
-  const systems = new Set(WHOLE_BODY_PHYSIOLOGY_SYSTEMS.map((item) => item.id))
-  const deepDives = new Set(PHYSIOLOGY_DEEP_DIVES.map((item) => item.id))
+  const systems = new Set<string>(WHOLE_BODY_PHYSIOLOGY_SYSTEMS.map((item) => item.id))
+  const deepDives = new Set<string>(PHYSIOLOGY_DEEP_DIVES.map((item) => item.id))
   const missing = HUMAN_PHYSIOLOGY_CORE_REQUIREMENTS.filter((item) =>
     item.kind === 'system-network'
-      ? !systems.has(item.implementationId as never)
+      ? !systems.has(item.implementationId)
       : !deepDives.has(item.implementationId),
   )
   return {
