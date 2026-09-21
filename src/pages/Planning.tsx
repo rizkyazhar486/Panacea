@@ -250,7 +250,7 @@ function DDICheck({ texts }: { texts: string[] }) {
         icon={<IconShield size={18} />}
         title="Drug–Drug Interaction (DDI) Checker"
         subtitle="Automatic local-rule screening of the plan against medication history"
-        right={hits.length === 0 ? <Badge tone="brand">No interactions</Badge> : <Badge tone="critical">{hits.length} interactions</Badge>}
+        right={hits.length === 0 ? <Badge tone="brand">No local-rule hits</Badge> : <Badge tone="critical">{hits.length} interactions</Badge>}
       />
       {hits.length === 0 ? (
         <p className="text-sm text-neutral-500">
