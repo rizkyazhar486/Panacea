@@ -233,9 +233,13 @@ export function evaluatePlanSafety(
   }
 }
 
-export function scorePlanItem(item: PlanItem, patient: Patient): CdssScore {
+export function scorePlanItem(
+  item: PlanItem,
+  patient: Patient,
+  medicationContext: string[] = [],
+): CdssScore {
   const text = item.text.toLowerCase()
-  const safety = evaluatePlanSafety(item, patient)
+  const safety = evaluatePlanSafety(item, patient, medicationContext)
 
   // V/L/S remain a bounded explanatory heuristic only. In particular, being
   // clinician-authored does not imply guideline concordance.
