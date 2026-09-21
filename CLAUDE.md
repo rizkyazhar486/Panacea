@@ -804,3 +804,19 @@ Remaining Environment OS continuation after this lands:
 3. connect admitted snapshots to Diving/Adventure/Training and Population Safety through shared state;
 4. browser quota-pressure, IndexedDB migration/recovery and offline/online transition smoke tests;
 5. preserve source licensing, forecast issue/target separation, provenance, consent and location privacy.
+
+
+## Pioneer publication & discovery session
+
+For dedicated frontier research-idea work, use [docs/PIONEER_PUBLICATION_DISCOVERY_SESSION.md](docs/PIONEER_PUBLICATION_DISCOVERY_SESSION.md) as the canonical session protocol.
+
+This mode is for publication ideas, scientific-gap discovery, new datasets, methods, biomarkers, mechanisms, interventions, and translational hypotheses. It must remain subordinate to the Panacea Constitution and Academic Accuracy Gate.
+
+Key rules:
+- Never certify novelty from model memory alone.
+- Treat "unsolved", "no dataset exists", "first", and "discovery" as evidence-dependent claims.
+- Record reproducible literature/trial/patent/dataset searches and nearest prior art.
+- Require falsifiability, provenance, reproducibility, ethics/safety, and applicability before promotion.
+- Preserve rejected hypotheses and negative searches when useful.
+- Use independent adversarial review rather than allowing one model to invent and self-certify novelty.
+- Because the repository is public, do not commit confidential/patent-sensitive enabling detail, protected patient information, NDA material, or trade secrets without authorization.
