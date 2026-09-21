@@ -820,3 +820,33 @@ Key rules:
 - Preserve rejected hypotheses and negative searches when useful.
 - Use independent adversarial review rather than allowing one model to invent and self-certify novelty.
 - Because the repository is public, do not commit confidential/patent-sensitive enabling detail, protected patient information, NDA material, or trade secrets without authorization.
+
+
+## Interactive surgical simulation directive — 2026-09-21
+
+The owner explicitly requires Body Exposure to progress beyond static surgical-layer teaching into an interactive 3D-capable surgical simulation system. Preserve the existing source-grounded SurgicalLab, but treat it as the anatomical-reference layer underneath a reusable simulation runtime rather than the final product.
+
+Initial required procedure catalogue:
+- CABG;
+- Cimino AV fistula;
+- exploratory laparotomy;
+- cesarean section;
+- mastectomy;
+- lesion/soft-tissue excision;
+- laparoscopic surgery;
+- VP shunt;
+- craniectomy;
+- appendectomy;
+- then expand across the major surgical specialties without creating isolated toy pages.
+
+The runtime must converge on one shared architecture:
+1. procedure/scenario state machine with explicit phases and restart/replay;
+2. shared Body Exposure anatomy context and exact-source structure highlighting where geometry exists;
+3. operating-room / procedure scene state, instrument state, anatomy target state, hazard state and telemetry;
+4. interaction validation, safety/accuracy/efficiency metrics and error feedback;
+5. procedure-specific 3D assets, camera/port/trajectory context, instrument collision and later deformable-tissue / fluid / bleeding physics only when validated;
+6. complications and branching scenarios as explicit simulation states, not fabricated patient-specific predictions;
+7. mobile/desktop interaction with progressive loading and graceful WebGL degradation;
+8. source provenance, evidence boundary, academic review and clear educational-vs-clinical labeling.
+
+Do not call a generic animation, static layer list or scripted slideshow a surgical simulator. A mature module should allow the learner to act on a stateful environment and receive objective state/telemetry feedback. At the same time, do not invent operative geometry or claim physical realism before validation. The current lightweight runtime is a scaffold; the continuation target is high-fidelity validated simulation built on the same contracts.

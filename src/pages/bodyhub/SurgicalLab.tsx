@@ -19,6 +19,7 @@ import {
   type SurgicalSpatialRegion,
 } from '../../lib/surgicalSpatialTeaching'
 import type { AtlasLayerKey, AtlasRegionKey } from '../../lib/wholeBodyAtlasBlueprint'
+import { SurgicalSimulatorPanel } from './SurgicalSimulatorPanel'
 
 export interface SurgicalLabProps {
   selectedSourceStructureName?: string | null
@@ -120,6 +121,8 @@ export function SurgicalLab({ selectedSourceStructureName, onKedalaman, onSorot 
       data-structure-procedure-inference="not-inferred"
       data-patient-specific-surgical-target="not-generated"
     >
+      <SurgicalSimulatorPanel onSorot={onSorot} onKedalaman={onKedalaman} />
+
       <div className="overflow-hidden rounded-2xl border border-neutral-200 bg-neutral-950 text-white dark:border-white/10">
         <div className="border-b border-white/10 bg-gradient-to-br from-brand/15 via-transparent to-blue-500/10 p-4">
           <div className="text-[10px] font-black uppercase tracking-[0.18em] text-brand">Spatial surgical anatomy</div>
