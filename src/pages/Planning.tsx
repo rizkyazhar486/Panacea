@@ -110,10 +110,10 @@ export function Planning() {
                 ? {
                     ...p,
                     safetyOverride: {
-                      reason,
-                      by,
+                      reason: reason,
+                      by: by,
                       at: new Date().toISOString(),
-                      findingIds,
+                      findingIds: findingIds,
                     },
                   }
                 : p,
