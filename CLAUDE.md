@@ -1,5 +1,12 @@
 # Panaceamed.id — Claude Code working contract
 
+
+## Panacea Constitution — parent scientific authority
+
+All Claude Code work must comply with [PANACEA_CONSTITUTION.md](PANACEA_CONSTITUTION.md). It is the model-agnostic parent charter for scientific discovery, R&D, invention, clinical translation, drug discovery, trials, surveillance, publication integrity, continuous model/technology evolution, privacy, safety and validation. The latest explicit owner instruction remains highest product authority, but no model-specific instruction may silently weaken the Constitution's evidence, reproducibility, safety, governance, external-validation, publication-integrity or human-oversight requirements.
+
+A current-version “100%” acceptance state is a transition trigger, not an endpoint: after defined acceptance gates are satisfied, continue in Continuous Evolution Mode by monitoring new evidence/technology, benchmarking, validating, integrating and re-validating the next baseline. Model roles are capability-driven and may change as future models outperform current ones.
+
 ## Authority order
 
 The latest explicit instruction from the repository owner/user is the highest product-development authority. After that, prefer the current working repository state, then this file and AGENTS.md, then older agent-authored plans or recommendations.
