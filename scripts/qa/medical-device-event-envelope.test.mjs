@@ -130,6 +130,18 @@ test('alarms, settings and image/report references require bounded kind-specific
   assert.ok(imageWithoutReference.errors.some((error) => error.includes('reference uri')))
 })
 
+test('rejects parseable non-ISO timestamps so provenance is runtime-stable', () => {
+  const result = validateMedicalDeviceEvent({
+    ...base,
+    provenance: {
+      ...base.provenance,
+      capturedAt: 'September 20, 2026 06:00:00 UTC',
+    },
+  })
+  assert.equal(result.accepted, false)
+  assert.ok(result.errors.some((error) => error.includes('capturedAt')))
+})
+
 test('invalid identity, timestamps and sequence values fail closed', () => {
   const result = validateMedicalDeviceEvent({
     ...base,
