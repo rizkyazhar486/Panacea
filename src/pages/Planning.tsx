@@ -249,7 +249,7 @@ function DDICheck({ texts }: { texts: string[] }) {
       <SectionTitle
         icon={<IconShield size={18} />}
         title="Drug–Drug Interaction (DDI) Checker"
-        subtitle="Automatic screening of the plan against medication history & allergies"
+        subtitle="Automatic local-rule screening of the plan against medication history"
         right={hits.length === 0 ? <Badge tone="brand">No interactions</Badge> : <Badge tone="critical">{hits.length} interactions</Badge>}
       />
       {hits.length === 0 ? (
@@ -385,7 +385,7 @@ function CdssPanel({
 
     return {
       item,
-      s: scorePlanItem(item, patient),
+      s: scorePlanItem(item, patient, medicationContext),
       safety: evaluatePlanSafety(item, patient, medicationContext),
     }
   })
