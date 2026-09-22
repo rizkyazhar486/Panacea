@@ -132,8 +132,12 @@ function nonBlank(value: unknown): value is string {
   return typeof value === 'string' && value.trim().length > 0
 }
 
+const ISO_8601_TIMESTAMP = /^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(?:\\.\\d{1,9})?(?:Z|[+-]\\d{2}:\\d{2})$/
+
 function validIso(value: unknown): value is string {
-  return typeof value === 'string' && Number.isFinite(Date.parse(value))
+  return typeof value === 'string'
+    && ISO_8601_TIMESTAMP.test(value)
+    && Number.isFinite(Date.parse(value))
 }
 
 function declaredShapeForKind(kind: string): readonly MedicalDeviceDataShape[] {
