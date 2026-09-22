@@ -17,7 +17,7 @@ export interface SpleenEducationEdge {
   note: string
 }
 
-export const SPLEEN_SYSTEM_ID: BodySystemId = 'lymphatic'
+export const SPLEEN_SYSTEM_ID: BodySystemId = 'lymphatic-immune'
 
 /** Spleen-specific educational relationships. No atlas or biomedical claim is promoted as source-backed here. */
 export const SPLEEN_EDUCATION_NODES: readonly SpleenEducationNode[] = [
