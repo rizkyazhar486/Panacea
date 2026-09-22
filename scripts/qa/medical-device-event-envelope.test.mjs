@@ -160,6 +160,7 @@ test('rejects out-of-range ISO clock components instead of rolling into the next
     provenance: {
       ...base.provenance,
       capturedAt: '2026-09-20T24:00:00.000Z',
+      receivedAt: '2026-09-21T01:00:00.000Z',
     },
   })
   assert.equal(result.accepted, false)
