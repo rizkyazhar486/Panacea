@@ -6,7 +6,7 @@ import {
   validateSpleenEducationGraph,
 } from '../../src/lib/bodySpleenEducation.ts'
 
-assert.equal(SPLEEN_SYSTEM_ID, 'lymphatic')
+assert.equal(SPLEEN_SYSTEM_ID, 'lymphatic-immune')
 for (const kind of ['anatomy', 'physiology', 'pathophysiology', 'pharmacology', 'imaging'] as const) {
   assert.ok(SPLEEN_EDUCATION_NODES.some((node) => node.kind === kind))
 }
