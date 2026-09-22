@@ -29,12 +29,14 @@ The workflow is successful when all of the following are true:
 1. Independent feature lanes can be developed concurrently without touching the same active files.
 2. Shared-core areas remain serialized to avoid conflicts and accidental overwrites.
 3. CI selects relevant gates from the changed paths and risk class rather than automatically running every expensive suite on every PR.
-4. Comprehensive regression coverage still runs at integration points and on `main`.
+4. Comprehensive regression coverage still runs at integration checkpoints and on `main`.
 5. A moving `main` does not automatically force replay of a non-overlapping PR.
 6. Merge remains expected-head / non-force and does not trust stale green checks.
 7. Claude Code and other active builders retain ownership of their current scopes; Merge Factory never uses throughput as justification to overwrite active work.
 8. Clinical, security, provenance, and patient-safety boundaries remain stricter than ordinary product-code boundaries.
 9. Throughput and cycle time become measurable from repository data.
+
+A **meaningful merge** is one independently reviewable capability, bug fix, safety improvement, evidence-boundary improvement, test/infrastructure improvement, or documentation contract that could reasonably be reverted on its own. Mechanical fragmentation performed only to inflate merge count does not count.
 
 ## 3. Non-Goals
 
@@ -111,7 +113,7 @@ This list must be explicit and versioned rather than inferred informally.
 
 ## 5. Risk Classes
 
-Each PR receives a deterministic risk class based on changed paths and declared intent.
+Each PR receives a deterministic risk class based on changed paths and declared intent. If classification is uncertain, choose the higher risk class.
 
 ### R0 — Documentation / metadata only
 
@@ -164,6 +166,8 @@ Required pre-merge gates:
 - specialized safety acceptance;
 - no path-based optimization may skip a directly relevant safety test.
 
+R4 changes are never grouped into a low-risk merge cohort without an immediate comprehensive checkpoint after merge.
+
 ## 6. CI Routing Design
 
 The current repository repeats broad validation in multiple workflows. Merge Factory introduces a change classifier and routes only required pre-merge jobs.
@@ -199,18 +203,19 @@ Body 3D browser/WebGL acceptance runs pre-merge only when the PR changes Body ru
 
 Server acceptance runs pre-merge when server paths or shared contracts imported by server tests change.
 
-Security enforcement runs when security-sensitive or executable paths change, with a small always-on baseline allowed when cheap.
+The existing lightweight security baseline remains always-on for executable-code PRs. Additional security suites are selected when trust-boundary paths change.
 
 Clinical safety gates run whenever clinical decision/safety paths change.
 
 ### 6.4 Comprehensive Integration Gates
 
-Full regression remains mandatory at integration points:
+Full regression remains mandatory at integration checkpoints:
 
-- every push to `main`;
-- scheduled full-regression runs;
+- latest `main` after each merge cohort;
+- immediately after every R4 clinical/security-critical merge;
 - shared-core / dependency / CI changes;
-- explicit stabilization runs before releases or major integration milestones.
+- explicit stabilization runs before releases or major integration milestones;
+- scheduled full-regression runs as an additional safety net.
 
 Therefore path-aware PR optimization does not eliminate comprehensive testing; it moves broad duplicate work from every isolated PR to the places where it provides the highest marginal safety value.
 
@@ -244,7 +249,7 @@ Replay or sync is required when:
 
 Replay should preserve commits where possible; destructive recreation is the last resort.
 
-## 8. Integration Queue
+## 8. Integration Queue and Merge Cohorts
 
 Mature PRs enter a single integration queue.
 
@@ -256,23 +261,49 @@ Queue entry requires:
 - overlap audit complete;
 - head SHA recorded.
 
-Merge procedure:
+Merge procedure for each PR:
 
 1. Read latest `main` SHA.
 2. Recheck overlap against changes since PR base.
 3. Recheck required statuses for the exact PR head SHA.
 4. Merge using expected-head SHA; never force merge.
 5. Verify resulting commit is present on `main`.
-6. Trigger post-merge comprehensive regression as configured.
-7. Move immediately to the next independent mature PR.
+6. Move immediately to the next independent mature PR if the cohort remains open.
 
-Only the merge operation is serialized. Development and most validation remain parallel.
+### 8.1 Low-Risk Merge Cohort
+
+R0/R1 independent PRs may be merged in a bounded cohort before waiting for one comprehensive `main` regression run. This prevents every rapid `main` push from canceling an expensive previous `main` workflow while still ensuring the latest `main` is comprehensively tested.
+
+Initial conservative cohort boundary:
+
+- maximum 5 R0/R1 merges, or
+- maximum 30 minutes from the first merge in the cohort,
+
+whichever occurs first.
+
+At the boundary, the queue pauses new cohort merges until the comprehensive regression on the latest `main` SHA is green.
+
+The cohort size is a tunable operational parameter, not a permanent product invariant. It may increase only after measured evidence shows stable post-merge regression performance.
+
+### 8.2 Immediate Checkpoint Cases
+
+Do not wait for a cohort boundary after:
+
+- any R4 merge;
+- shared-core runtime change;
+- root dependency/lockfile change;
+- CI classifier/workflow change;
+- any merge whose overlap audit had elevated uncertainty.
+
+These require a comprehensive latest-`main` checkpoint before continuing the queue.
+
+Only merge execution and checkpoint barriers are serialized. Development and most validation remain parallel.
 
 ## 9. Superpowers Integration
 
 Superpowers is the default process framework.
 
-Use `dispatching-parallel-agents` whenever two or more tasks are truly independent.
+Use `dispatching-parallel-agents` whenever two or more tasks are truly independent and the execution environment exposes parallel-agent capability. When it does not, preserve the same lane isolation and branch structure so multiple available builders/tools can still work independently.
 
 Each parallel task receives:
 
@@ -334,7 +365,9 @@ Quality counter-metric:
 
 `escaped_regression_rate = regressions_discovered_after_merge / merged_prs`
 
-Optimization is accepted only if throughput improves without an unacceptable increase in escaped regressions or safety failures.
+Baseline and post-change throughput must be computed over comparable repository-activity windows, not from an assumption that ChatGPT executed continuously throughout a wall-clock period.
+
+For the first 20 meaningful merges after Merge Factory activation, any regression attributable to a skipped required gate is a stop condition: fail closed to the broader previous gate for that risk class and investigate before further optimization.
 
 ## 13. Initial Implementation Scope
 
@@ -350,14 +383,15 @@ Phase 2 — Remove duplicated PR work
 - refactor `validate-pr.yml` to use path/risk outputs;
 - avoid rerunning identical server suites in multiple workflows for isolated frontend/content PRs;
 - avoid Body 3D browser acceptance for changes that provably cannot affect Body rendering;
-- keep full acceptance on `main` and shared-core changes.
+- keep full acceptance at checkpoints and on shared-core changes.
 
 Phase 3 — Integration queue discipline
 
 - add overlap/ancestry audit tooling;
 - standardize expected-head merge checks;
 - standardize stale-main decision rules;
-- close only truly superseded PRs.
+- close only truly superseded PRs;
+- add cohort/checkpoint policy.
 
 Phase 4 — Parallel execution policy
 
@@ -385,9 +419,11 @@ Merge Factory v1 is complete when:
 2. Isolated Body organ/content PRs no longer pay unrelated server + browser/WebGL cost unless shared contracts require it.
 3. Server-only PRs do not pay unrelated Body 3D browser cost.
 4. Shared-core/clinical/security changes still receive all relevant specialized gates.
-5. `main` still receives comprehensive regression validation.
+5. Latest `main` receives comprehensive regression validation at bounded checkpoints.
 6. Stale-main overlap audit distinguishes safe non-overlap from true replay-required cases.
 7. Merge uses expected-head SHA and never force merge.
 8. Parallel task ownership prevents overlapping edits.
 9. Metrics show cycle time and throughput before/after the change.
 10. Any uncertain classification fails closed to broader validation.
+11. Low-risk merge cohorts are bounded and cannot starve comprehensive `main` regression indefinitely.
+12. Any skipped-required-gate regression during the first 20 post-activation merges automatically rolls that risk class back to broader CI.
