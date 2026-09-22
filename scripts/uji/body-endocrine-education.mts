@@ -23,6 +23,13 @@ assert.ok(anatomy.evidence.some((item) => item.kind === 'atlas-source' && item.i
 assert.match(anatomy.boundary, /not patient-specific anatomy/i)
 assert.match(anatomy.boundary, /not microscopic gland architecture/i)
 
+const hpt = ENDOCRINE_EDUCATION_NODES.find((node) => node.id === 'endocrine-hpt-axis')
+assert.ok(hpt)
+assert.equal(hpt.kind, 'physiology')
+assert.ok(hpt.evidence.some((item) => item.kind === 'pubmed' && item.id === '27347897'))
+assert.match(hpt.boundary, /no person-level hormone/i)
+assert.ok(ENDOCRINE_EDUCATION_EDGES.some((edge) => edge.from === 'endocrine-hpt-axis' && edge.to === 'thyroid-hormone-replacement-context'))
+
 const imaging = ENDOCRINE_EDUCATION_NODES.find((node) => node.kind === 'imaging')
 assert.ok(imaging)
 assert.equal(imaging.evidenceState, 'educational-only')

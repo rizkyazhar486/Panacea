@@ -56,6 +56,17 @@ export const ENDOCRINE_EDUCATION_NODES: readonly EndocrineEducationNode[] = [
     boundary: 'Educational physiology only; no person-level hormone concentration, axis gain, receptor sensitivity, circadian phase, stimulation-test result, or endocrine reserve is inferred.',
   },
   {
+    id: 'endocrine-hpt-axis',
+    label: 'Hypothalamic-pituitary-thyroid axis',
+    kind: 'physiology',
+    evidenceState: 'literature-backed',
+    evidence: [
+      { kind: 'pubmed', id: '27347897', url: 'https://pubmed.ncbi.nlm.nih.gov/27347897/', note: 'Comprehensive physiology review describes TRH-to-TSH-to-thyroid-hormone signaling, negative feedback, peripheral conversion, and thyroid-hormone actions.' },
+      { kind: 'pubmed', id: '33549603', url: 'https://pubmed.ncbi.nlm.nih.gov/33549603/', note: 'Review describes the HPT axis and its interactions with other hypothalamic-pituitary endocrine axes.' },
+    ],
+    boundary: 'Educational axis relationship only; no person-level hormone concentration, thyroid set point, deiodinase activity, thyroid function, laboratory interpretation, or diagnosis is inferred.',
+  },
+  {
     id: 'endocrine-feedback-disruption',
     label: 'Feedback disruption context',
     kind: 'pathophysiology',
@@ -94,16 +105,28 @@ export const ENDOCRINE_EDUCATION_EDGES: readonly EndocrineEducationEdge[] = [
     note: 'Gross gland orientation leads into feedback physiology without implying source-backed hypothalamic, pituitary, receptor, or microscopic spatial correspondence.',
   },
   {
+    from: 'endocrine-gross-reference',
+    to: 'endocrine-hpt-axis',
+    relationship: 'educational-context',
+    note: 'Gross thyroid orientation links to the literature-backed HPT-axis concept without claiming atlas geometry for hypothalamic, pituitary, cellular, or molecular components.',
+  },
+  {
+    from: 'endocrine-hpt-axis',
+    to: 'endocrine-negative-feedback',
+    relationship: 'supports',
+    note: 'The HPT axis is an explicit endocrine feedback example, while the broader feedback node remains a multi-axis educational abstraction rather than a patient model.',
+  },
+  {
     from: 'endocrine-negative-feedback',
     to: 'endocrine-feedback-disruption',
     relationship: 'disruption-associated-with',
     note: 'Feedback disruption is presented as a bounded mechanism relationship rather than a diagnosis, laboratory interpretation, or severity inference.',
   },
   {
-    from: 'endocrine-gross-reference',
+    from: 'endocrine-hpt-axis',
     to: 'thyroid-hormone-replacement-context',
     relationship: 'educational-context',
-    note: 'Thyroid orientation links to replacement-therapy context without implying an indication, prescription, dose, biochemical target, or individual response.',
+    note: 'Physiology links to replacement-therapy context for mechanism education only, without inferring hypothyroidism, treatment eligibility, dose, biochemical target, or response.',
   },
   {
     from: 'endocrine-gross-reference',
