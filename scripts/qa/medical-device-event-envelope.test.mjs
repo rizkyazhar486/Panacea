@@ -142,6 +142,30 @@ test('rejects parseable non-ISO timestamps so provenance is runtime-stable', () 
   assert.ok(result.errors.some((error) => error.includes('capturedAt')))
 })
 
+test('rejects impossible ISO calendar dates instead of Date.parse normalization', () => {
+  const result = validateMedicalDeviceEvent({
+    ...base,
+    provenance: {
+      ...base.provenance,
+      capturedAt: '2026-02-30T06:00:00.000Z',
+    },
+  })
+  assert.equal(result.accepted, false)
+  assert.ok(result.errors.some((error) => error.includes('capturedAt')))
+})
+
+test('rejects out-of-range ISO clock components instead of rolling into the next day', () => {
+  const result = validateMedicalDeviceEvent({
+    ...base,
+    provenance: {
+      ...base.provenance,
+      capturedAt: '2026-09-20T24:00:00.000Z',
+    },
+  })
+  assert.equal(result.accepted, false)
+  assert.ok(result.errors.some((error) => error.includes('capturedAt')))
+})
+
 test('invalid identity, timestamps and sequence values fail closed', () => {
   const result = validateMedicalDeviceEvent({
     ...base,
