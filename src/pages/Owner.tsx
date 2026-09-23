@@ -226,6 +226,49 @@ function RealtimeStats() {
             <MiniChart title="Sign-ups (7 days)" data={s.signups7d.map((d) => d.count)} labels={s.signups7d.map((d) => d.day.slice(5))} color="#00BF63" />
             <MiniChart title="Revenue (7 days)" data={s.revenue7d.map((d) => d.idr)} labels={s.revenue7d.map((d) => d.day.slice(5))} color="#3b82f6" money />
           </div>
+          <div className="mt-4 rounded-2xl border border-neutral-100 bg-neutral-50/70 p-4">
+            <div className="flex flex-wrap items-start justify-between gap-2">
+              <div>
+                <div className="text-[10px] font-black uppercase tracking-[0.14em] text-brand-dark">Product learning · PMF</div>
+                <div className="mt-0.5 text-[11px] text-neutral-500">First-party behavior only — no health values or free-text analytics.</div>
+              </div>
+              <Badge tone="neutral">{s.productLearning.eventCount} events</Badge>
+            </div>
+            <div className="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-4">
+              {[
+                { label: 'Activated', value: s.productLearning.activationRatePct === null ? '—' : `${s.productLearning.activationRatePct}%` },
+                { label: '7d active', value: s.productLearning.activeUsers7d },
+                { label: '7d repeat', value: s.productLearning.repeatUsers7d },
+                { label: 'Users observed', value: s.productLearning.usersObserved },
+              ].map((item) => (
+                <div key={item.label} className="rounded-xl bg-white p-3">
+                  <div className="text-lg font-extrabold leading-tight text-ink">{item.value}</div>
+                  <div className="mt-1 text-[9px] font-semibold uppercase tracking-wide text-neutral-500">{item.label}</div>
+                </div>
+              ))}
+            </div>
+            <div className="mt-2 grid grid-cols-3 gap-2">
+              {s.productLearning.retention.map((point) => (
+                <div key={point.day} className="rounded-xl bg-white p-3">
+                  <div className="text-[10px] font-black uppercase tracking-wide text-neutral-500">D{point.day} retention</div>
+                  <div className="mt-1 text-lg font-extrabold text-ink">{point.ratePct === null ? '—' : `${point.ratePct}%`}</div>
+                  <div className="text-[9px] text-neutral-500">{point.retained}/{point.eligible} eligible users</div>
+                </div>
+              ))}
+            </div>
+            {s.productLearning.topTargets.length > 0 && (
+              <div className="mt-3 border-t border-neutral-200 pt-3">
+                <div className="text-[9px] font-black uppercase tracking-wide text-neutral-500">Most-used learning targets</div>
+                <div className="mt-2 flex flex-wrap gap-1.5">
+                  {s.productLearning.topTargets.slice(0, 6).map((target) => (
+                    <span key={target.key} className="rounded-full bg-white px-2.5 py-1 text-[10px] font-semibold text-neutral-600">
+                      {target.key} · {target.users} users
+                    </span>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
         </>
       )}
     </Card>
