@@ -51,6 +51,7 @@ function monitorFor(
 ): SyntheticMonitorState {
   if (bleeding === 'critical') return { heartRate: 112, spo2: 94, map: 58, severity: 'urgent' }
   if (bleeding === 'significant') return { heartRate: 96, spo2: 97, map: 68, severity: 'watch' }
+  if (bleeding === 'limited' || scenario === 'bleeding') return { heartRate: 84, spo2: 98, map: 78, severity: 'watch' }
   if (scenario === 'visibility-loss' || clarity < 40) return { heartRate: 88, spo2: 98, map: 76, severity: 'watch' }
   return { heartRate: 72, spo2: 99, map: 84, severity: 'stable' }
 }
