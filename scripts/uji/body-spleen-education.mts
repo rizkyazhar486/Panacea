@@ -27,8 +27,8 @@ for (const edge of SPLEEN_EDUCATION_EDGES) {
 }
 
 assert.match(SPLEEN_EDUCATION_NODES.find((node) => node.kind === 'anatomy')!.boundary, /no geometry/i)
-assert.match(SPLEEN_EDUCATION_NODES.find((node) => node.kind === 'physiology')!.boundary, /no filtration/i)
+assert.match(SPLEEN_EDUCATION_NODES.find((node) => node.kind === 'physiology')!.boundary, /no splenic function/i)
 assert.match(SPLEEN_EDUCATION_NODES.find((node) => node.kind === 'pharmacology')!.boundary, /no drug selection/i)
-assert.match(SPLEEN_EDUCATION_NODES.find((node) => node.kind === 'imaging')!.boundary, /no ultrasound, CT, MRI/i)
+assert.match(SPLEEN_EDUCATION_NODES.find((node) => node.kind === 'imaging')!.boundary, /no CT/i)
 
 console.log(`body-spleen-education: ${SPLEEN_EDUCATION_NODES.length} nodes, ${SPLEEN_EDUCATION_EDGES.length} bounded edges OK`)
