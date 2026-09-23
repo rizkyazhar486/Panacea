@@ -41,6 +41,8 @@ Panacea generalizes that interaction pattern across specialties while preserving
 
 Representative families are a coverage scaffold, not a claim that every named procedure already has detailed simulation.
 
+Every representative family is instantiated as a **generic reference simulation** so it can enter the shared state machine immediately. Generic mode is intentionally anatomy-agnostic. It becomes a detailed simulation only after procedure-specific anatomy, risk structures, evidence and review are available.
+
 ## Detailed simulation kernel
 
 Every detailed `SurgicalProcedure` can run through the same state machine:
