@@ -65,8 +65,8 @@ const neutral = simulateEvolution({
   generations: 30,
   selectionCoefficient: 0,
   dominance: 0.5,
-  mutationAtoA: 0,
-  mutationAtoBigA: 0,
+  mutationBigAToLittleA: 0,
+  mutationLittleAToBigA: 0,
   drift: false,
   seed: 7,
 })
@@ -81,8 +81,8 @@ const directional = simulateEvolution({
   generations: 40,
   selectionCoefficient: 0.12,
   dominance: 0.5,
-  mutationAtoA: 0,
-  mutationAtoBigA: 0,
+  mutationBigAToLittleA: 0,
+  mutationLittleAToBigA: 0,
   drift: false,
   seed: 7,
 })
@@ -95,8 +95,8 @@ const driftParams = {
   generations: 25,
   selectionCoefficient: 0,
   dominance: 0.5,
-  mutationAtoA: 0,
-  mutationAtoBigA: 0,
+  mutationBigAToLittleA: 0,
+  mutationLittleAToBigA: 0,
   drift: true,
   seed: 12345,
 }
