@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react'
 import { Card, SectionTitle } from '../components/ui'
 import { Prosa } from '../components/Prosa'
 import { IconActivity } from '../components/icons'
+import { CentralDogmaEvolutionSimulator } from '../components/CentralDogmaEvolutionSimulator'
 import {
   TETAPAN, TELOMERASE, GARPU_PER_ORIGIN,
   mulaiReplikasi, langkahReplikasi, lamaFaseSDetik, anggaranGalat,
@@ -290,6 +291,7 @@ export function GenomeLab() {
       <Card>
         <SectionTitle icon={<IconActivity />} title="4 · DNA → RNA → protein, and where an edit would land"
           subtitle="Transcription, translation, and Cas9 guide placement on the same sequence" />
+        <CentralDogmaEvolutionSimulator codingDna={bersih} />
         <label className="block text-[11px] font-bold uppercase tracking-[0.14em] text-neutral-500" htmlFor="urutan">
           Sequence (A, C, G, T)
         </label>
