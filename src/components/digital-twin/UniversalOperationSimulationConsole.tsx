@@ -1,10 +1,10 @@
 import { useEffect, useMemo, useState } from 'react'
-import type { SurgicalProcedure } from '../../lib/surgicalAtlas'
 import {
   applyUniversalOperationAction,
   createUniversalOperationSimulation,
   operationSimulationCompletion,
   type OperationSimulationAction,
+  type OperationSimulationProcedure,
 } from '../../lib/universalOperationSimulator'
 
 const ACTIONS: Array<{ action: OperationSimulationAction; label: string; note: string }> = [
@@ -20,7 +20,7 @@ function meter(value: number) {
   return Math.max(0, Math.min(100, value)) + '%'
 }
 
-export function UniversalOperationSimulationConsole({ procedure }: { procedure: SurgicalProcedure }) {
+export function UniversalOperationSimulationConsole({ procedure }: { procedure: OperationSimulationProcedure }) {
   const [state, setState] = useState(() => createUniversalOperationSimulation(procedure))
 
   useEffect(() => {
