@@ -6,6 +6,7 @@ import { fileURLToPath } from 'node:url'
 import { dirname, join } from 'node:path'
 import { randomBytes } from 'node:crypto'
 import { KATALOG } from './healthMetrics.js'
+import { normalizeProductEventInput, summarizeProductEvents, type ProductEvent } from './productLearning.js'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
 const DB_PATH = join(__dirname, '..', 'data.json')
@@ -121,6 +122,7 @@ interface DB {
   sleepSeries?: Record<string, Record<string, any>[]> // email -> one entry per night, with stages
   sportsFavorites?: Record<string, string[]> // userId -> followed team keys, e.g. "epl:Arsenal"
   feedback?: Feedback[] // in-app "Pesan & Saran" — delivered to the owner only
+  productEvents?: ProductEvent[] // privacy-bounded first-party product-learning events
   reminders?: Record<string, MedReminder[]> // userId -> medication reminders
   ringkasan?: Record<string, Record<string, any>> // userId -> ringkasan harian dari perangkat pemakainya
   meets?: Meet[] // Club Hub meets — real, user-created, server-persisted
@@ -1192,6 +1194,29 @@ export function markFeedbackRead(id: string) {
   if (f) { f.read = true; save() }
 }
 
+export function recordProductEvents(userId: string, inputs: unknown[]): number {
+  if (!Array.isArray(inputs) || !userId) return 0
+  if (!db.productEvents) db.productEvents = []
+
+  const accepted: ProductEvent[] = []
+  for (const raw of inputs.slice(0, 50)) {
+    const normalized = normalizeProductEventInput(raw)
+    if (!normalized) continue
+    accepted.push({ id: uid(), userId, ...normalized })
+  }
+  if (!accepted.length) return 0
+
+  db.productEvents.push(...accepted)
+  // Bound storage while preserving a long enough window for D30 cohort analysis.
+  if (db.productEvents.length > 50_000) db.productEvents = db.productEvents.slice(-50_000)
+  save()
+  return accepted.length
+}
+
+export function getProductLearningSummary() {
+  return summarizeProductEvents(db.productEvents ?? [])
+}
+
 export function getStats() {
   const users = db.users
   const orders = db.orders ?? []
@@ -1223,6 +1248,7 @@ export function getStats() {
     paidOrders: paid.length,
     revenueIdr,
     pushSubscribers: Object.keys(db.pushSubs ?? {}).length,
+    productLearning: getProductLearningSummary(),
     signups7d,
     revenue7d,
   }
