@@ -1,9 +1,15 @@
-import { useMemo } from 'react'
+import { useMemo, useState } from 'react'
 import { ALL_SURGICAL_PROCEDURES } from '../../lib/surgicalAtlasCatalog'
-import { getGlobalOperationUniverseStats } from '../../lib/globalOperationUniverse'
+import {
+  GLOBAL_GENERIC_OPERATION_PROCEDURES,
+  getGlobalOperationUniverseStats,
+} from '../../lib/globalOperationUniverse'
+import { UniversalOperationSimulationConsole } from './UniversalOperationSimulationConsole'
 
 export function GlobalOperationUniverseCoverage() {
   const stats = useMemo(() => getGlobalOperationUniverseStats(ALL_SURGICAL_PROCEDURES), [])
+  const [genericId, setGenericId] = useState(GLOBAL_GENERIC_OPERATION_PROCEDURES[0]?.id ?? '')
+  const genericProcedure = GLOBAL_GENERIC_OPERATION_PROCEDURES.find((item) => item.id === genericId) ?? GLOBAL_GENERIC_OPERATION_PROCEDURES[0]
 
   return (
     <section className="border-t border-white/8 bg-[#040a12] p-5 sm:p-6" aria-label="Global operation universe coverage">
@@ -42,6 +48,28 @@ export function GlobalOperationUniverseCoverage() {
             </div>
           </details>
         ))}
+      </div>
+
+      <div className="mt-5 rounded-[26px] border border-white/8 bg-black/20 p-4">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+          <div>
+            <div className="text-[9px] font-black uppercase tracking-[.15em] text-emerald-300">Generic reference simulation</div>
+            <div className="mt-1 text-[10px] text-white/38">Every representative procedure family can enter the shared simulator immediately. Generic mode stays anatomy-agnostic until validated detailed data are added.</div>
+          </div>
+          <label className="min-w-0 sm:w-[360px]">
+            <span className="sr-only">Choose generic operation</span>
+            <select value={genericId} onChange={(event) => setGenericId(event.target.value)} className="h-11 w-full rounded-2xl border border-white/10 bg-[#07111a] px-3 text-xs font-bold text-white outline-none">
+              {GLOBAL_GENERIC_OPERATION_PROCEDURES.map((item) => (
+                <option key={item.id} value={item.id}>{item.name} · {item.domain}</option>
+              ))}
+            </select>
+          </label>
+        </div>
+        {genericProcedure && (
+          <div className="-mx-4 -mb-4 mt-4">
+            <UniversalOperationSimulationConsole procedure={genericProcedure} />
+          </div>
+        )}
       </div>
 
       <div className="mt-4 text-[9px] leading-relaxed text-white/28">
