@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
+import { Prosa } from './Prosa'
 import {
   CENTRAL_DOGMA_REFERENCES,
   codingDnaToMrna,
@@ -119,10 +120,10 @@ export function CentralDogmaEvolutionSimulator({ codingDna }: { codingDna: strin
       <div className="flex flex-wrap items-start justify-between gap-2">
         <div>
           <div className="text-[10px] font-black uppercase tracking-[0.14em] text-brand">Interactive mechanism simulator</div>
-          <p className="mt-1 max-w-2xl text-[11px] leading-relaxed text-neutral-600 dark:text-neutral-300">
+          <Prosa kelas="mt-1 max-w-2xl text-[11px] leading-relaxed text-neutral-600 dark:text-neutral-300">
             Scrub or play each mechanism. The sequence panels compute from the DNA above; the evolution panel is a separate
             two-allele population model so molecular change is not confused with population evolution.
-          </p>
+          </Prosa>
         </div>
       </div>
 
@@ -168,12 +169,12 @@ export function CentralDogmaEvolutionSimulator({ codingDna }: { codingDna: strin
         <summary className="cursor-pointer text-[10px] font-black uppercase tracking-[0.14em] text-neutral-500">
           Model boundaries & references
         </summary>
-        <p className="mt-2 text-[10.5px] leading-relaxed text-neutral-500">
+        <Prosa kelas="mt-2 text-[10.5px] leading-relaxed text-neutral-500">
           Sequence animation is schematic: it shows information flow and base/codon bookkeeping, not molecular dynamics,
           chromatin geometry, transcription-factor kinetics, RNA processing, ribosome conformational states, or a laboratory
           protocol. The evolution model assumes one diploid locus with random mating before selection; migration, linkage,
           epistasis, spatial structure and overlapping generations are omitted.
-        </p>
+        </Prosa>
         <div className="mt-2 space-y-1">
           {CENTRAL_DOGMA_REFERENCES.map((ref) => (
             <a
@@ -207,10 +208,10 @@ function ReplicationPanel({ dna, progress }: { dna: string; progress: number }) 
       <div className="h-2 overflow-hidden rounded-full bg-neutral-200 dark:bg-white/10">
         <div className="h-full rounded-full bg-brand transition-[width]" style={{ width: `${fraction * 100}%` }} />
       </div>
-      <p className="text-[11px] leading-relaxed text-neutral-600 dark:text-neutral-300">
+      <Prosa kelas="text-[11px] leading-relaxed text-neutral-600 dark:text-neutral-300">
         <b>Rule:</b> A↔T and C↔G. Semiconservative replication means each daughter duplex keeps one parental strand and gains
         one newly synthesized complementary strand. Both daughter strands are synthesized 5′→3′; one is displayed 3′→5′ only to keep antiparallel base pairing aligned on screen. This base-by-base view complements the fork/Okazaki model already above.
-      </p>
+      </Prosa>
     </div>
   )
 }
@@ -224,11 +225,11 @@ function TranscriptionPanel({ dna, progress }: { dna: string; progress: number }
         <Strand label="Template DNA read by RNA polymerase · 3′→5′" sequence={frame.templateDna3to5} />
         <Strand label="Growing RNA · 5′→3′" sequence={frame.visibleMrna5to3} tone="orange" />
       </div>
-      <p className="text-[11px] leading-relaxed text-neutral-600 dark:text-neutral-300">
+      <Prosa kelas="text-[11px] leading-relaxed text-neutral-600 dark:text-neutral-300">
         RNA polymerase reads the DNA template 3′→5′ while RNA grows 5′→3′. At this simplified coding-sequence level,
         the RNA sequence matches the coding strand except <b>U replaces T</b>. Eukaryotic capping, splicing and polyadenylation
         are deliberately outside this animation.
-      </p>
+      </Prosa>
     </div>
   )
 }
@@ -289,10 +290,10 @@ function TranslationPanel({ mrna, progress }: { mrna: string; progress: number }
           </>
         )}
       </div>
-      <p className="text-[11px] leading-relaxed text-neutral-600 dark:text-neutral-300">
+      <Prosa kelas="text-[11px] leading-relaxed text-neutral-600 dark:text-neutral-300">
         <b>Formula-like bookkeeping:</b> 3 RNA nucleotides = 1 codon; each codon maps through the standard genetic code to
         one amino acid or a stop signal. The simulator begins at the first AUG and stops at the first in-frame stop codon.
-      </p>
+      </Prosa>
     </div>
   )
 }
@@ -390,11 +391,11 @@ function EvolutionPanel() {
         <div><b>Drift:</b> when enabled, the next generation samples 2N allele copies from p″; smaller N therefore fluctuates more.</div>
       </div>
 
-      <p className="text-[11px] leading-relaxed text-neutral-600 dark:text-neutral-300">
+      <Prosa kelas="text-[11px] leading-relaxed text-neutral-600 dark:text-neutral-300">
         In population genetics, <b>evolution means a change in allele frequency across generations</b>. Selection is only one
         cause; mutation and random genetic drift can also move the line. Turn selection to 0 and drift off to see the
         Hardy–Weinberg baseline remain stable.
-      </p>
+      </Prosa>
     </div>
   )
 }
