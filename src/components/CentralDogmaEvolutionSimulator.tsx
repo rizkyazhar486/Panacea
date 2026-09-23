@@ -201,15 +201,15 @@ function ReplicationPanel({ dna, progress }: { dna: string; progress: number }) 
         <Strand label="Parental coding · 5′→3′" sequence={frame.coding5to3} />
         <Strand label="Parental template · 3′→5′" sequence={frame.template3to5} />
         <div className="h-px bg-neutral-200 dark:bg-white/10" />
-        <Strand label="New strand against coding · 3′→5′" sequence={frame.daughterAgainstCoding3to5} tone="green" />
-        <Strand label="New strand against template · 5′→3′" sequence={frame.daughterAgainstTemplate5to3} tone="green" />
+        <Strand label="New complement · displayed 3′→5′" sequence={frame.daughterAgainstCoding3to5} tone="green" />
+        <Strand label="New complement · displayed 5′→3′" sequence={frame.daughterAgainstTemplate5to3} tone="green" />
       </div>
       <div className="h-2 overflow-hidden rounded-full bg-neutral-200 dark:bg-white/10">
         <div className="h-full rounded-full bg-brand transition-[width]" style={{ width: `${fraction * 100}%` }} />
       </div>
       <p className="text-[11px] leading-relaxed text-neutral-600 dark:text-neutral-300">
         <b>Rule:</b> A↔T and C↔G. Semiconservative replication means each daughter duplex keeps one parental strand and gains
-        one newly synthesized complementary strand. This base-by-base view complements the fork/Okazaki model already above.
+        one newly synthesized complementary strand. Both daughter strands are synthesized 5′→3′; one is displayed 3′→5′ only to keep antiparallel base pairing aligned on screen. This base-by-base view complements the fork/Okazaki model already above.
       </p>
     </div>
   )
@@ -313,8 +313,8 @@ function EvolutionPanel() {
     generations,
     selectionCoefficient: selection,
     dominance,
-    mutationAtoA: mutationPermille / 1000,
-    mutationAtoBigA: 0,
+    mutationBigAToLittleA: mutationPermille / 1000,
+    mutationLittleAToBigA: 0,
     drift,
     seed,
   }), [initialP, populationSize, generations, selection, dominance, mutationPermille, drift, seed])
