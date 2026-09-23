@@ -1,8 +1,16 @@
-import type { SurgicalProcedure } from './surgicalAtlas'
-
 export type OperationSimulationSeverity = 'stable' | 'watch' | 'urgent'
 export type OperationBleedingState = 'none' | 'limited' | 'significant' | 'critical'
 export type OperationScenarioKind = 'baseline' | 'bleeding' | 'anatomy-risk' | 'visibility-loss'
+
+export interface OperationSimulationProcedure {
+  id: string
+  complications: string[]
+  phases: Array<{
+    title: string
+    objective: string
+    structuresAtRisk: string[]
+  }>
+}
 
 export type OperationSimulationAction =
   | 'orient-field'
@@ -62,7 +70,7 @@ function previousBleeding(value: OperationBleedingState): OperationBleedingState
 }
 
 export function createUniversalOperationSimulation(
-  procedure: SurgicalProcedure,
+  procedure: OperationSimulationProcedure,
 ): UniversalOperationSimulationState {
   return {
     procedureId: procedure.id,
@@ -78,7 +86,7 @@ export function createUniversalOperationSimulation(
   }
 }
 
-function deterministicComplication(procedure: SurgicalProcedure, phaseIndex: number): string {
+function deterministicComplication(procedure: OperationSimulationProcedure, phaseIndex: number): string {
   const list = procedure.complications.length ? procedure.complications : ['Unspecified procedural complication']
   const seed = [...procedure.id].reduce((sum, ch) => sum + ch.charCodeAt(0), 0) + phaseIndex
   return list[seed % list.length]
@@ -87,7 +95,7 @@ function deterministicComplication(procedure: SurgicalProcedure, phaseIndex: num
 export function applyUniversalOperationAction(
   state: UniversalOperationSimulationState,
   action: OperationSimulationAction,
-  procedure: SurgicalProcedure,
+  procedure: OperationSimulationProcedure,
 ): UniversalOperationSimulationState {
   if (action === 'reset') return createUniversalOperationSimulation(procedure)
 
@@ -154,7 +162,7 @@ export function applyUniversalOperationAction(
 
 export function operationSimulationCompletion(
   state: UniversalOperationSimulationState,
-  procedure: SurgicalProcedure,
+  procedure: OperationSimulationProcedure,
 ) {
   const phaseBase = procedure.phases.length
     ? ((state.phaseIndex + 1) / procedure.phases.length) * 70
