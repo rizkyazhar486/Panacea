@@ -3,6 +3,12 @@
  * The desktop visual language stays intact, but touch devices avoid stacking
  * several full-screen backdrop filters/composited layers during long scrolls.
  */
+.home-primary-action:focus-visible,
+.home-secondary-action:focus-visible {
+  outline: 3px solid rgba(59, 130, 246, 0.42);
+  outline-offset: 2px;
+}
+
 @media (hover: none) and (pointer: coarse) {
   .panacea-home-backdrop {
     position: absolute !important;
@@ -28,6 +34,7 @@
   .home-primary-action,
   .home-secondary-action,
   .home-pill-button,
+  .home-text-link,
   .home-details-summary {
     min-height: 44px !important;
   }
