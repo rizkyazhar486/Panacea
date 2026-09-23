@@ -40,6 +40,16 @@ For authorized implementation:
 
 Direct-to-main does not mean destructive editing. Preserve user-visible capability and other agents' useful work unless replacement is necessary to implement a better equivalent or explicitly requested redesign.
 
+## Field R&D continuation contract
+
+Claude Code must follow the model-agnostic [Field Use-Case R&D Autopilot](DOCS/FIELD-USECASE-RD-AUTOPILOT.md).
+
+When the owner says **"lanjut"** or equivalent without a narrower target, continue the highest-value safe independent evidence-to-product cycle rather than asking which routine task to do next or simply adding another feature. The canonical framing is **WHO -> PROBLEM -> PROMISE -> PROOF** backed by real field evidence, explicit telemetry/validation and a keep/iterate/kill decision.
+
+This includes learning from care-delivery friction, health education, outpatient workflows, access, support feedback, safety incidents, near misses, malpractice/ethics reports, public-health evidence and product behavior, with provenance/privacy/jurisdiction boundaries preserved. Unverified allegations remain allegations.
+
+Retention should come from real repeated value. Do not optimize Panacea for compulsive use, manipulative dark patterns or maximum screen time.
+
 ## Claude Code development autonomy
 
 Claude Code is authorized to improve Panacea beyond literal older implementation prescriptions when doing so advances the owner's product intent.
