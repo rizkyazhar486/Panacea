@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom'
 import { HomeHealthInstruments } from './HomeHealthInstruments'
 import { HomeOverviewMosaic } from './HomeOverviewMosaic'
 import { getVitals } from '../lib/healthVitals'
+import { trackProductEvent } from '../lib/productLearning'
 
 const ACTIONS = [
   { to: '/chatbot', title: 'Ask', glyph: '✦' },
@@ -23,6 +24,7 @@ export function HomeNowWidget() {
             key={action.to}
             to={action.to}
             className="group flex min-h-[58px] flex-col items-center justify-center gap-1 rounded-[16px] border border-brand bg-black px-2 text-center text-white transition hover:bg-brand hover:text-black active:scale-[.97] active:bg-brand active:text-black focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand"
+            onClick={() => trackProductEvent({ name: 'quick_action_open', surface: 'home_now', target: action.title.toLowerCase().replace(/\s+/g, '-') })}
           >
             <span className="text-[17px] font-black leading-none text-brand group-hover:text-black group-active:text-black" aria-hidden>{action.glyph}</span>
             <span className="text-[10px] font-black leading-none">{action.title}</span>
