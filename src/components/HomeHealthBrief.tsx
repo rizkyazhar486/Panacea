@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useStore } from '../lib/store'
 import { getVitals } from '../lib/healthVitals'
+import { trackProductEvent } from '../lib/productLearning'
 import { IconHeart, IconMoon, IconPlus, IconRun } from './icons'
 import '../styles/home-human-interface.css'
 
@@ -53,6 +54,10 @@ export function HomeHealthBrief() {
     }
   }, [])
 
+  useEffect(() => {
+    trackProductEvent({ name: 'health_brief_view', surface: 'home_health_brief' })
+  }, [])
+
   const vitals = useMemo(() => getVitals(), [refresh])
   const latestSleep = useMemo(() => [...(state.sleepLogs ?? [])]
     .filter((item) => typeof item?.hours === 'number' && item.hours > 0)
@@ -94,6 +99,7 @@ export function HomeHealthBrief() {
           data-online={online ? 'true' : 'false'}
           aria-label={`${online ? 'Online' : 'Offline'}. Open connected health data. Current source: ${source}`}
           title={`${online ? 'Online' : 'Offline'} · ${source}`}
+          onClick={() => trackProductEvent({ name: 'feature_open', surface: 'home_health_brief', target: 'connected-health-data' })}
         >
           <ConnectionStatusGlyph online={online} />
         </Link>
@@ -104,6 +110,7 @@ export function HomeHealthBrief() {
           to={primary.to}
           className="panacea-signal-ring"
           aria-label={`${primary.label} ${primary.value}. ${availableCount} of ${instruments.length} health signals currently available.`}
+          onClick={() => trackProductEvent({ name: 'health_brief_signal_open', surface: 'home_health_brief', target: primary.key })}
         >
           <svg viewBox="0 0 120 120" aria-hidden="true">
             <circle className="panacea-signal-ring-track" cx="60" cy="60" r="48" />
@@ -136,6 +143,7 @@ export function HomeHealthBrief() {
               to={to}
               className="panacea-instrument-mini"
               aria-label={`${label} ${value}${unit ? ` ${unit}` : ''}`}
+              onClick={() => trackProductEvent({ name: 'health_brief_signal_open', surface: 'home_health_brief', target: key })}
             >
               <span className="panacea-instrument-mini-main">
                 <span className="panacea-instrument-mini-label"><Icon size={13} />{label}</span>
@@ -147,7 +155,12 @@ export function HomeHealthBrief() {
             </Link>
           ))}
 
-          <Link to="/harian" className="panacea-instrument-checkin" aria-label="Log today">
+          <Link
+            to="/harian"
+            className="panacea-instrument-checkin"
+            aria-label="Log today"
+            onClick={() => trackProductEvent({ name: 'daily_log_open', surface: 'home_health_brief', target: 'log-today' })}
+          >
             <IconPlus size={17} />
             <span>Log</span>
           </Link>
