@@ -1,4 +1,5 @@
 import type { SurgicalProcedure, SurgicalSpecialty } from './surgicalAtlas'
+import type { OperationSimulationProcedure } from './universalOperationSimulator'
 
 export type GlobalOperationDomain =
   | 'general'
@@ -114,3 +115,51 @@ export function attachIchiIdentity(
 ): IchiOperationIdentity {
   return { ...identity, source: 'WHO-ICHI' }
 }
+
+
+export interface GlobalGenericOperationProcedure extends OperationSimulationProcedure {
+  name: string
+  domain: GlobalOperationDomain
+  evidenceLevel: 'generic-reference-simulation'
+}
+
+function slug(value: string) {
+  return value.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '')
+}
+
+export const GLOBAL_GENERIC_OPERATION_PROCEDURES: GlobalGenericOperationProcedure[] =
+  GLOBAL_OPERATION_FAMILIES.flatMap((family) =>
+    family.representativeProcedures.map((name) => ({
+      id: 'global-' + family.id + '-' + slug(name),
+      name,
+      domain: family.id,
+      evidenceLevel: 'generic-reference-simulation' as const,
+      complications: [
+        'Procedure-specific complication scenario',
+        'Bleeding or tissue-injury scenario',
+        'Post-procedure safety issue',
+      ],
+      phases: [
+        {
+          title: 'Orientation',
+          objective: 'Orient the target system and confirm the educational scope before the procedure concept begins.',
+          structuresAtRisk: family.targetSystems,
+        },
+        {
+          title: 'Target & risk map',
+          objective: 'Review target anatomy and explicitly mark where detailed source anatomy is still required.',
+          structuresAtRisk: [...family.targetSystems, 'adjacent anatomy requiring verification'],
+        },
+        {
+          title: 'Treatment concept',
+          objective: 'Visualize the intended anatomical change without generating an executable operative technique.',
+          structuresAtRisk: family.targetSystems,
+        },
+        {
+          title: 'Final safety review',
+          objective: 'Review preserved anatomy, complication awareness and unresolved evidence gaps.',
+          structuresAtRisk: family.targetSystems,
+        },
+      ],
+    })),
+  )
