@@ -248,10 +248,10 @@ export function selectionStep(pInput: number, sInput: number, hInput: number): S
  * Reversible mutation after selection:
  * p_mut = p_sel (1 - mu_A→a) + (1 - p_sel) nu_a→A
  */
-export function mutationStep(pInput: number, mutationAtoA: number, mutationAtoBigA: number): number {
+export function mutationStep(pInput: number, mutationBigAToLittleA: number, mutationLittleAToBigA: number): number {
   const p = clamp01(pInput)
-  const mu = Math.max(0, Math.min(1, mutationAtoA))
-  const nu = Math.max(0, Math.min(1, mutationAtoBigA))
+  const mu = Math.max(0, Math.min(1, mutationBigAToLittleA))
+  const nu = Math.max(0, Math.min(1, mutationLittleAToBigA))
   return clamp01(p * (1 - mu) + (1 - p) * nu)
 }
 
@@ -282,8 +282,8 @@ export interface EvolutionParams {
   generations: number
   selectionCoefficient: number
   dominance: number
-  mutationAtoA: number
-  mutationAtoBigA: number
+  mutationBigAToLittleA: number
+  mutationLittleAToBigA: number
   drift: boolean
   seed?: number
 }
@@ -330,7 +330,7 @@ export function simulateEvolution(params: EvolutionParams): EvolutionResult {
     }
 
     const selected = selectionStep(p, params.selectionCoefficient, params.dominance)
-    const mutated = mutationStep(selected.pAfter, params.mutationAtoA, params.mutationAtoBigA)
+    const mutated = mutationStep(selected.pAfter, params.mutationBigAToLittleA, params.mutationLittleAToBigA)
     if (params.drift) {
       const sampled = sampleAlleles(populationSize * 2, mutated, seed)
       p = sampled.p
