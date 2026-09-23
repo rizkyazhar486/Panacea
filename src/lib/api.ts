@@ -249,6 +249,12 @@ export const api = {
   // compliance — audit log (owner-only) & SATUSEHAT integration status
   audit: () => req<{ entries: AuditEntry[] }>('/api/audit').then((r) => r.entries),
   stats: () => req<Stats>('/api/stats'),
+  trackProductEvents: (events: ProductEventInput[]) =>
+    req<{ ok: boolean; accepted: number }>('/api/product-events', {
+      method: 'POST',
+      body: JSON.stringify({ events: events.slice(0, 50) }),
+    }),
+  productLearning: () => req<ProductLearningSummary>('/api/product-learning'),
   ownerUsers: () => req<{ users: UserDirectoryRow[] }>('/api/owner/users').then((r) => r.users),
   submitFeedback: (kind: FeedbackKind, text: string) =>
     req<{ ok: boolean; entry: FeedbackEntry }>('/api/feedback', { method: 'POST', body: JSON.stringify({ kind, text }) }),
@@ -569,6 +575,38 @@ export interface Notif {
   read: boolean
 }
 
+export type ProductEventName =
+  | 'health_brief_view'
+  | 'health_brief_signal_open'
+  | 'quick_action_open'
+  | 'daily_log_open'
+  | 'feedback_submit'
+  | 'share'
+  | 'feature_open'
+  | 'experiment_exposure'
+
+export interface ProductEventInput {
+  name: ProductEventName
+  surface: string
+  target?: string
+  sessionId?: string
+}
+
+export interface ProductLearningSummary {
+  eventCount: number
+  usersObserved: number
+  activeUsers1d: number
+  activeUsers7d: number
+  activeUsers30d: number
+  activatedUsers: number
+  activationRatePct: number | null
+  repeatUsers7d: number
+  retention: { day: 1 | 7 | 30; eligible: number; retained: number; ratePct: number | null }[]
+  topTargets: { key: string; users: number; events: number }[]
+  dailyActive7d: { day: string; users: number; events: number }[]
+  definition: { activation: string; retention: string; privacy: string }
+}
+
 export interface Stats {
   totalUsers: number
   doctors: number
@@ -578,6 +616,7 @@ export interface Stats {
   paidOrders: number
   revenueIdr: number
   pushSubscribers: number
+  productLearning: ProductLearningSummary
   signups7d: { day: string; count: number }[]
   revenue7d: { day: string; idr: number }[]
 }
