@@ -1,140 +1,35 @@
 import type { BodySystemId } from './bodySystemSourceWave'
 
 export type AdrenalNodeKind = 'anatomy' | 'physiology' | 'pathophysiology' | 'pharmacology' | 'imaging'
-export type AdrenalEvidenceState = 'source-backed' | 'literature-backed' | 'educational-only'
 
-export interface AdrenalEvidence {
-  kind: 'atlas-source' | 'pubmed'
-  id: string
-  url?: string
-  note: string
-}
-
-export interface AdrenalEducationNode {
-  id: string
-  label: string
-  kind: AdrenalNodeKind
-  evidenceState: AdrenalEvidenceState
-  evidence: readonly AdrenalEvidence[]
-  boundary: string
-}
-
-export interface AdrenalEducationEdge {
-  from: string
-  to: string
-  relationship: 'supports' | 'disruption-associated-with' | 'educational-context'
-  note: string
-}
+export interface AdrenalEducationNode { id: string; label: string; kind: AdrenalNodeKind; evidenceState: 'educational-only'; boundary: string }
+export interface AdrenalEducationEdge { from: string; to: string; relationship: 'supports' | 'educational-context'; note: string }
 
 export const ADRENAL_SYSTEM_ID: BodySystemId = 'endocrine'
 
-/**
- * Organ-specific adrenal education for Body Exposure.
- * This module deliberately separates atlas-backed gross orientation from literature-backed
- * physiology and from unavailable imaging/treatment detail. It is educational only and
- * must never be interpreted as patient anatomy, diagnosis, laboratory interpretation,
- * treatment selection, or proof that a source asset contains microscopic structures.
- */
+/** Adrenal-specific educational relationships. No atlas or biomedical claim is promoted as source-backed here. */
 export const ADRENAL_EDUCATION_NODES: readonly AdrenalEducationNode[] = [
-  {
-    id: 'adrenal-gross-reference',
-    label: 'Adrenal gross reference',
-    kind: 'anatomy',
-    evidenceState: 'source-backed',
-    evidence: [
-      {
-        kind: 'atlas-source',
-        id: 'visceral.glb',
-        note: 'Repository source bundle used only for gross adrenal orientation.',
-      },
-    ],
-    boundary: 'Reference atlas geometry only; not patient-specific anatomy and not evidence for cortical zonation, medullary microarchitecture, vascular detail, receptor distribution, or measured gland volume.',
-  },
-  {
-    id: 'adrenal-hpa-feedback',
-    label: 'Hypothalamic-pituitary-adrenal feedback context',
-    kind: 'physiology',
-    evidenceState: 'literature-backed',
-    evidence: [
-      {
-        kind: 'pubmed',
-        id: '29764284',
-        url: 'https://pubmed.ncbi.nlm.nih.gov/29764284/',
-        note: 'Review describes glucocorticoid negative feedback and rhythmic regulation of the hypothalamic-pituitary-adrenal axis.',
-      },
-    ],
-    boundary: 'Educational physiology only; no person-level cortisol concentration, ACTH concentration, circadian phase, stress response, feedback gain, stimulation-test result, or adrenal reserve is inferred.',
-  },
-  {
-    id: 'adrenal-feedback-disruption',
-    label: 'Adrenal feedback disruption context',
-    kind: 'pathophysiology',
-    evidenceState: 'literature-backed',
-    evidence: [
-      {
-        kind: 'pubmed',
-        id: '29764284',
-        url: 'https://pubmed.ncbi.nlm.nih.gov/29764284/',
-        note: 'Review discusses altered glucocorticoid rhythmicity and feedback mechanisms in HPA-axis biology.',
-      },
-    ],
-    boundary: 'Mechanism education only; does not diagnose adrenal insufficiency, hypercortisolism, pituitary disease, stress-related disease, or any other endocrine disorder.',
-  },
-  {
-    id: 'adrenal-pharmacology-context',
-    label: 'Adrenal pharmacology context',
-    kind: 'pharmacology',
-    evidenceState: 'educational-only',
-    evidence: [],
-    boundary: 'Placeholder only: no drug class, indication, dose, route, contraindication, interaction, taper, biochemical target, monitoring plan, or patient-specific treatment is represented until claim-specific evidence and review are added.',
-  },
-  {
-    id: 'adrenal-imaging-context',
-    label: 'Adrenal imaging context',
-    kind: 'imaging',
-    evidenceState: 'educational-only',
-    evidence: [],
-    boundary: 'Placeholder only: no CT, MRI, PET, scintigraphy, lesion characterization, attenuation, washout, signal behavior, size threshold, or malignancy inference is represented until modality-specific evidence and reviewed assets are added.',
-  },
+  { id: 'adrenal-anatomy-context', label: 'Adrenal anatomy context', kind: 'anatomy', evidenceState: 'educational-only', boundary: 'Educational anatomy placeholder only; no geometry, gland dimensions, cortical zonation, medullary architecture, vascular branching, lesion location, variant, or patient-specific anatomy is asserted.' },
+  { id: 'adrenal-function-context', label: 'Adrenal physiology context', kind: 'physiology', evidenceState: 'educational-only', boundary: 'Educational physiology placeholder only; no hormone concentration, secretion rate, feedback-loop magnitude, stress response, reserve, circadian profile, or person-level adrenal function is inferred.' },
+  { id: 'adrenal-disorder-context', label: 'Adrenal pathophysiology context', kind: 'pathophysiology', evidenceState: 'educational-only', boundary: 'Mechanism placeholder only; does not diagnose adrenal insufficiency, cortisol excess, aldosterone disorders, catecholamine-secreting disease, malignancy, crisis, or any other adrenal disorder.' },
+  { id: 'adrenal-drug-context', label: 'Adrenal pharmacology context', kind: 'pharmacology', evidenceState: 'educational-only', boundary: 'Pharmacology placeholder only; no drug selection, hormone replacement, synthesis inhibition, receptor blockade, dose, contraindication, interaction, monitoring plan, or treatment recommendation is provided.' },
+  { id: 'adrenal-imaging-context', label: 'Adrenal imaging context', kind: 'imaging', evidenceState: 'educational-only', boundary: 'Imaging placeholder only; no CT, MRI, nuclear imaging, segmentation, attenuation value, washout calculation, organ size, lesion characterization, procedure target, or patient-specific interpretation is represented.' },
 ] as const
 
 export const ADRENAL_EDUCATION_EDGES: readonly AdrenalEducationEdge[] = [
-  {
-    from: 'adrenal-gross-reference',
-    to: 'adrenal-hpa-feedback',
-    relationship: 'educational-context',
-    note: 'Gross adrenal orientation links to HPA-axis physiology without implying atlas geometry for hypothalamic, pituitary, cellular, or molecular components.',
-  },
-  {
-    from: 'adrenal-hpa-feedback',
-    to: 'adrenal-feedback-disruption',
-    relationship: 'disruption-associated-with',
-    note: 'Feedback disruption is presented as a bounded mechanism relationship rather than a diagnosis, laboratory interpretation, or severity inference.',
-  },
-  {
-    from: 'adrenal-hpa-feedback',
-    to: 'adrenal-pharmacology-context',
-    relationship: 'educational-context',
-    note: 'Pharmacology remains unavailable until claim-specific evidence and review are present; this edge does not imply a treatment recommendation.',
-  },
-  {
-    from: 'adrenal-gross-reference',
-    to: 'adrenal-imaging-context',
-    relationship: 'educational-context',
-    note: 'Imaging remains unavailable until modality-specific provenance, evidence, and reviewed assets are present.',
-  },
+  { from: 'adrenal-anatomy-context', to: 'adrenal-function-context', relationship: 'educational-context', note: 'General adrenal orientation may anchor physiology education without implying source-backed microanatomy, steroidogenesis, catecholamine synthesis, feedback magnitude, or measured endocrine function.' },
+  { from: 'adrenal-function-context', to: 'adrenal-disorder-context', relationship: 'supports', note: 'General physiology concepts can contextualize mechanism education, but this relationship carries no diagnosis, laboratory interpretation, disease probability, severity, or patient-state inference.' },
+  { from: 'adrenal-disorder-context', to: 'adrenal-imaging-context', relationship: 'educational-context', note: 'Pathophysiology and imaging may be studied together only as bounded education; no lesion classification, attenuation measurement, washout value, procedure target, or imaging finding is generated.' },
+  { from: 'adrenal-disorder-context', to: 'adrenal-drug-context', relationship: 'educational-context', note: 'Disease-mechanism education may link to pharmacology education without selecting medication, hormone replacement, dose, indication, contraindication, monitoring, or patient-specific action.' },
 ] as const
 
 export function validateAdrenalEducationGraph() {
-  const ids = new Set(ADRENAL_EDUCATION_NODES.map((node) => node.id))
-  const duplicateIds = ids.size !== ADRENAL_EDUCATION_NODES.length
-  const danglingEdges = ADRENAL_EDUCATION_EDGES.filter((edge) => !ids.has(edge.from) || !ids.has(edge.to))
-  const unsupportedLiteratureNodes = ADRENAL_EDUCATION_NODES.filter(
-    (node) => node.evidenceState === 'literature-backed' && !node.evidence.some((item) => item.kind === 'pubmed'),
-  )
-  const unsupportedSourceNodes = ADRENAL_EDUCATION_NODES.filter(
-    (node) => node.evidenceState === 'source-backed' && !node.evidence.some((item) => item.kind === 'atlas-source'),
-  )
-  const boundaryMissing = ADRENAL_EDUCATION_NODES.filter((node) => !node.boundary.trim())
-  return { duplicateIds, danglingEdges, unsupportedLiteratureNodes, unsupportedSourceNodes, boundaryMissing }
+  const ids = ADRENAL_EDUCATION_NODES.map((node) => node.id)
+  const idSet = new Set(ids)
+  return {
+    duplicateIds: idSet.size !== ids.length,
+    danglingEdges: ADRENAL_EDUCATION_EDGES.filter((edge) => !idSet.has(edge.from) || !idSet.has(edge.to)),
+    nonEducationalNodes: ADRENAL_EDUCATION_NODES.filter((node) => node.evidenceState !== 'educational-only'),
+    boundaryMissing: ADRENAL_EDUCATION_NODES.filter((node) => node.boundary.trim().length < 40),
+  }
 }
