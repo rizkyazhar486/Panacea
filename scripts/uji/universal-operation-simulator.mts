@@ -7,6 +7,7 @@ import {
   UNIVERSAL_OPERATION_SIMULATION_BOUNDARY,
 } from '../../src/lib/universalOperationSimulator.ts'
 import {
+  GLOBAL_GENERIC_OPERATION_PROCEDURES,
   GLOBAL_OPERATION_FAMILIES,
   getGlobalOperationUniverseStats,
 } from '../../src/lib/globalOperationUniverse.ts'
@@ -52,3 +53,12 @@ assert.ok(stats.unresolvedDomains.includes('ophthalmology'))
 assert.ok(stats.unresolvedDomains.includes('transplant'))
 
 console.log('universal operation simulator: OK')
+
+
+assert.equal(GLOBAL_GENERIC_OPERATION_PROCEDURES.length, stats.representativeProcedures)
+const genericProcedure = GLOBAL_GENERIC_OPERATION_PROCEDURES.find((item) => item.domain === 'ophthalmology')
+assert.ok(genericProcedure)
+const genericState = createUniversalOperationSimulation(genericProcedure)
+const genericEvent = applyUniversalOperationAction(genericState, 'inject-complication', genericProcedure)
+assert.ok(genericEvent.complication)
+assert.equal(genericProcedure.evidenceLevel, 'generic-reference-simulation')
