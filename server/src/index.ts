@@ -89,6 +89,8 @@ import {
   listNotifications,
   markNotificationsRead,
   getStats,
+  recordProductEvents,
+  getProductLearningSummary,
   addAudit,
   getAudit,
   initStore,
@@ -1606,6 +1608,22 @@ app.get('/api/audit', requireAuth, (req, res) => {
   res.json({ entries: getAudit(300) })
 })
 
+// --- product learning: first-party categorical behavior only ---
+// The server attaches user identity and server time. The payload intentionally
+// rejects arbitrary metadata so health values/free text cannot leak into analytics.
+app.post('/api/product-events', requireAuth, (req, res) => {
+  const u = (req as express.Request & { user: User }).user
+  const events = Array.isArray(req.body?.events) ? req.body.events : []
+  const accepted = recordProductEvents(u.id, events)
+  res.json({ ok: true, accepted })
+})
+
+app.get('/api/product-learning', requireAuth, (req, res) => {
+  const u = (req as express.Request & { user: User }).user
+  if (!isOwner(u)) return res.status(403).json({ error: 'forbidden' })
+  res.json(getProductLearningSummary())
+})
+
 // --- owner stats dashboard ---
 app.get('/api/stats', requireAuth, (req, res) => {
   const u = (req as express.Request & { user: User }).user
@@ -1630,6 +1648,7 @@ app.post('/api/feedback', requireAuth, (req, res) => {
   const safeKind = validKinds.includes(kind as Feedback['kind']) ? (kind as Feedback['kind']) : 'Suggestion'
   const entry: Feedback = { id: uid(), userId: u.id, userEmail: u.email, userName: u.name, kind: safeKind, text: trimmed, at: new Date().toISOString(), read: false }
   addFeedback(entry)
+  recordProductEvents(u.id, [{ name: 'feedback_submit', surface: 'feedback' }])
   const owner = getUserByEmail(config.ownerEmail)
   if (owner) {
     notify(owner.id, { title: `💬 ${safeKind} baru dari ${u.name}`, body: trimmed.slice(0, 120), url: './#/owner' }, 'notifTransactions').catch(() => {})

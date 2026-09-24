@@ -24,6 +24,18 @@ Traffic rules:
 6. Validate before committing when practical and inspect CI after committing.
 7. A broken main is repaired forward immediately; do not bypass or weaken tests, security checks or biomedical gates to make status green.
 
+## Field Use-Case R&D Autopilot
+
+[DOCS/FIELD-USECASE-RD-AUTOPILOT.md](DOCS/FIELD-USECASE-RD-AUTOPILOT.md) is the mandatory model-agnostic operating loop for finding and validating Panacea use cases from real-world evidence.
+
+When the owner says **"lanjut"**, **"continue"** or an equivalent continuation command without narrower scope, do not default to inventing another feature. Inspect current main and the unresolved field/use-case gap state, then automatically run the next highest-value safe independent **field signal -> WHO -> PROBLEM -> PROMISE -> PROOF -> experiment -> measurement -> keep/iterate/kill -> platform capability** cycle.
+
+The field-learning scope includes consumer health, health education, outpatient/clinical workflows, access, follow-up, administrative burden, safety/near-miss learning, malpractice/ethics complaints and verified professional-conduct findings, public-health evidence, support feedback, product telemetry, and jurisdiction-specific regulatory/workflow gaps. Preserve provenance, de-identify by default, and never turn an unverified malpractice or ethics allegation into a factual accusation.
+
+Optimize for **meaningful voluntary return and durable health value**, not compulsive engagement or maximum screen time. Strong consumer-product engagement is encouraged through relevance, progress, continuity, useful novelty, low friction and user control. Dark patterns, notification spam, fear/shame, health-anxiety amplification, exploitative intermittent rewards and endless-scroll mechanics whose primary purpose is compulsive use are not acceptable success criteria.
+
+"No gap" means maintain an explicit, continuously reduced gap ledger; it never means fabricating evidence or declaring unknowns solved. Continuous work operates within actual authorized execution windows; no agent may claim background work when no runtime/automation is executing.
+
 ## Agent autonomy and collaboration
 
 The latest explicit owner/user instruction outranks agent-authored process or architecture recommendations.
