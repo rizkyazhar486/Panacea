@@ -224,10 +224,101 @@ export const FEATURE_READINESS: readonly FeatureReadiness[] = [
     lastValidated: LAST_VALIDATED,
     notes: 'Existing planning surface; orchestration work must reuse it instead of creating another independent task/calendar state.',
   },
+  {
+    id: 'health-profile',
+    label: 'Health Profile',
+    status: 'FUNCTIONAL-BUT-INCOMPLETE',
+    route: '/health-data',
+    requiresExternalAdapter: true,
+    requiresPatientData: true,
+    requiresWebGL: false,
+    productionReady: false,
+    lastValidated: '2026-09-24',
+    notes: 'Functional personal-health profile with server-first loading, local fallback, validated imports, shared-vitals publication, dated history, trends, and explicit export. External device/provider normalization and broader production interoperability remain incomplete.',
+  },
+  {
+    id: 'readiness',
+    label: 'Readiness & Recovery',
+    status: 'FUNCTIONAL-BUT-INCOMPLETE',
+    route: '/readiness',
+    requiresExternalAdapter: false,
+    requiresPatientData: true,
+    requiresWebGL: false,
+    productionReady: false,
+    lastValidated: '2026-09-24',
+    notes: 'Functional recorded-data readiness journal with HRV/resting-heart-rate/sleep baselines, behavior logging, workout-load capture, local persistence, and a bounded recovery checklist. It intentionally avoids a synthetic proprietary readiness score.',
+  },
+  {
+    id: 'clinical-calculators',
+    label: 'Clinical Calculators',
+    status: 'FUNCTIONAL-BUT-INCOMPLETE',
+    route: '/clinical-calculators',
+    requiresExternalAdapter: false,
+    requiresPatientData: false,
+    requiresWebGL: false,
+    productionReady: false,
+    lastValidated: '2026-09-24',
+    notes: 'Functional interactive calculator surface with explicit inputs and computed outputs across multiple validated scoring/formula tools. Formula-by-formula clinical review and broader regression coverage remain ongoing.',
+  },
+  {
+    id: 'calculator-hub',
+    label: 'Calculator Hub',
+    status: 'FUNCTIONAL-BUT-INCOMPLETE',
+    route: '/calculator-hub',
+    requiresExternalAdapter: false,
+    requiresPatientData: false,
+    requiresWebGL: false,
+    productionReady: false,
+    lastValidated: '2026-09-24',
+    notes: 'Functional searchable calculator discovery surface backed by the canonical calculator catalog and deep links into individual tools. Catalog drift remains guarded but not yet declared production-complete.',
+  },
+  {
+    id: 'self-assessment-toolkit',
+    label: 'Self-Assessment Toolkit',
+    status: 'FUNCTIONAL-BUT-INCOMPLETE',
+    route: '/self-assessment-toolkit',
+    requiresExternalAdapter: false,
+    requiresPatientData: false,
+    requiresWebGL: false,
+    productionReady: false,
+    lastValidated: '2026-09-24',
+    notes: 'Functional client-side educational self-assessment surface with explicit user interaction and bounded outputs. Educational heuristics remain clearly separated from diagnostic or treatment claims.',
+  },
+  {
+    id: 'sports-scores',
+    label: 'Sports Scores',
+    status: 'FUNCTIONAL-BUT-INCOMPLETE',
+    route: '/sports-scores',
+    requiresExternalAdapter: true,
+    requiresPatientData: false,
+    requiresWebGL: false,
+    productionReady: false,
+    lastValidated: '2026-09-24',
+    notes: 'Functional live-score client with league selection, normalized events, favorites, explicit unavailable/error states, and server-side provider adapters. Availability still depends on upstream sports sources and backend configuration.',
+  },
+  {
+    id: 'osce-ukmppd',
+    label: 'OSCE UKMPPD',
+    status: 'FUNCTIONAL-BUT-INCOMPLETE',
+    route: '/osce-ukmppd',
+    requiresExternalAdapter: false,
+    requiresPatientData: false,
+    requiresWebGL: false,
+    productionReady: false,
+    lastValidated: '2026-09-24',
+    notes: 'Functional OSCE history explorer with system filtering, synonym-aware search, frequency summaries, period coverage, and station-note linking over the curated UKMPPD history dataset. Dataset completeness and ongoing curation remain explicit limitations.',
+  },
+
 ] as const
 
 export function getFeatureReadiness(id: string): FeatureReadiness | undefined {
   return FEATURE_READINESS.find((feature) => feature.id === id)
+}
+
+export function functionalFeatures(): readonly FeatureReadiness[] {
+  return FEATURE_READINESS.filter(
+    (feature) => feature.status === 'PRODUCTION' || feature.status === 'FUNCTIONAL-BUT-INCOMPLETE',
+  )
 }
 
 export function productionFeatures(): readonly FeatureReadiness[] {
