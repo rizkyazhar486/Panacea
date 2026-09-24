@@ -15,13 +15,17 @@ function Angka({ label, nilai, satuan, normal, buruk }: {
   label: string; nilai: number; satuan: string; normal: string; buruk?: boolean
 }) {
   return (
-    <div className={`rounded-lg p-2 ${buruk ? 'bg-red-50 dark:bg-red-500/10' : 'bg-neutral-50 dark:bg-white/5'}`}>
-      <div className="t-mikro font-bold uppercase tracking-wide text-neutral-500">{label}</div>
-      <div className={`text-base font-black ${buruk ? 'text-red-600 dark:text-red-400' : 'text-ink dark:text-white'}`}>
-        {nilai.toFixed(nilai < 10 ? 1 : 0)}
-        <span className="ml-0.5 text-[10px] font-bold text-neutral-400">{satuan}</span>
+    <div className="min-w-0 border-t border-neutral-200 pt-2 dark:border-white/10">
+      <div className="flex items-center justify-between gap-2">
+        <div className="truncate text-[9px] font-black uppercase tracking-[0.1em] text-neutral-500">{label}</div>
+        {buruk && <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-red-500" aria-hidden="true" />}
       </div>
-      <div className="text-[10px] text-neutral-400">{normal}</div>
+      <div className={`truncate text-lg font-black tabular-nums ${buruk ? 'text-red-600 dark:text-red-400' : 'text-ink dark:text-white'}`}>
+        {nilai.toFixed(nilai < 10 ? 1 : 0)}
+        <span className="ml-1 text-[10px] font-bold text-neutral-400">{satuan}</span>
+      </div>
+      <div className="truncate text-[9px] text-neutral-400">{normal}</div>
+      <span className="sr-only">{buruk ? 'Outside teaching reference' : 'Within teaching reference'}</span>
     </div>
   )
 }
@@ -54,23 +58,20 @@ function SystemCouplingDiagram({ out, heartRate, motion, onToggleMotion }: {
   const beatDuration = Math.max(0.32, 60 / Math.max(heartRate, 1)).toFixed(2)
 
   return (
-    <figure className="rounded-2xl border border-neutral-200 bg-neutral-50/70 p-3 dark:border-white/10 dark:bg-white/[0.035]">
+    <figure className="border-y border-neutral-200 py-3 dark:border-white/10">
       <div className="mb-1 flex items-center justify-between gap-2">
         <div>
           <div className="text-[10px] font-black uppercase tracking-[0.14em] text-neutral-500">Live system coupling</div>
           <div className="mt-0.5 text-[11px] font-bold text-ink dark:text-white">Heart ↔ lungs · heart ↔ kidneys</div>
         </div>
-        <div className="flex shrink-0 items-center gap-1.5">
-          <span className="rounded-full border border-neutral-200 px-2 py-1 text-[8px] font-black uppercase tracking-wide text-neutral-500 dark:border-white/10">schematic</span>
-          <button
-            type="button"
-            aria-pressed={motion}
-            onClick={onToggleMotion}
-            className="min-h-[30px] rounded-full border border-neutral-200 px-2.5 text-[9px] font-black text-ink dark:border-white/10 dark:text-white"
-          >
-            {motion ? 'Pause flow' : 'Run flow'}
-          </button>
-        </div>
+        <button
+          type="button"
+          aria-pressed={motion}
+          onClick={onToggleMotion}
+          className="min-h-10 shrink-0 border-b border-transparent px-1 text-[10px] font-black text-neutral-500 transition hover:text-ink aria-pressed:border-brand aria-pressed:text-brand dark:hover:text-white"
+        >
+          {motion ? 'Pause' : 'Animate'}
+        </button>
       </div>
 
       <svg
@@ -214,8 +215,13 @@ function SystemCouplingDiagram({ out, heartRate, motion, onToggleMotion }: {
         <text x="180" y="222" textAnchor="middle" className="fill-current text-[8px] font-bold" opacity="0.54">O₂ delivery {out.do2.toFixed(0)} mL/min · lactate {out.lactate.toFixed(1)} mmol/L</text>
       </svg>
 
-      <figcaption className="mt-1 text-[10px] leading-relaxed text-neutral-500">
-        Educational coupling map, not anatomical scale. Organ shapes are schematic; line thickness and particle speed are normalized teaching cues, not vessel calibre or blood transit time. The halo cadence follows the selected simulator heart rate and is not a measured heartbeat. Motion is suppressed when reduced-motion is requested.
+      <figcaption className="mt-2 border-t border-neutral-200 pt-2 dark:border-white/10">
+        <details>
+          <summary className="cursor-pointer text-[10px] font-bold text-neutral-500">Simulation assumptions</summary>
+          <p className="mt-2 text-[10px] leading-relaxed text-neutral-500">
+            Educational coupling map, not anatomical scale. Organ shapes are schematic; line thickness and particle speed are normalized teaching cues, not vessel calibre or blood transit time. The halo cadence follows the selected simulator heart rate and is not a measured heartbeat. Motion is suppressed when reduced-motion is requested.
+          </p>
+        </details>
       </figcaption>
     </figure>
   )
@@ -249,25 +255,23 @@ export function SimulatorSection({ onVitals }: Props) {
 
   return (
     <div className="space-y-3">
-      <p className="text-[11px] leading-relaxed text-neutral-400">
-        The three systems are solved together, so a change in one moves the others. Every number below is computed
-        from standard physiological equations — Frank–Starling, the alveolar gas and shunt equations, the
-        haemoglobin dissociation curve, and renal autoregulation.
-      </p>
+      <div className="truncate text-[10px] font-bold text-neutral-400">
+        Circulation ↔ gas exchange ↔ kidney · steady-state educational model
+      </div>
 
       <div>
         <div className="t-mikro font-bold uppercase tracking-wide text-neutral-500">Scenario</div>
-        <div className="mt-1 flex flex-wrap gap-1.5">
+        <div className="mt-1 flex gap-5 overflow-x-auto border-b border-neutral-200 pb-0 no-scrollbar dark:border-white/10">
           {SKENARIO.map((s) => (
             <button
               key={s.key}
               type="button"
               aria-pressed={skenarioAktif === s.key}
               onClick={() => pakaiSkenario(s.key)}
-              className={`min-h-[32px] rounded-full border px-2.5 text-[11px] font-bold transition ${
+              className={`min-h-[42px] shrink-0 border-0 border-b-2 bg-transparent px-0 text-[11px] font-bold transition ${
                 skenarioAktif === s.key
-                  ? 'border-brand bg-brand text-white'
-                  : 'border-neutral-200 text-neutral-600 dark:border-white/10 dark:text-neutral-300'
+                  ? 'border-brand text-ink dark:text-white'
+                  : 'border-transparent text-neutral-500 dark:text-neutral-400'
               }`}
             >
               {s.label}
@@ -277,12 +281,17 @@ export function SimulatorSection({ onVitals }: Props) {
       </div>
 
       {skenario && (
-        <div className="rounded-xl bg-brand/5 p-2.5 dark:bg-brand/10">
-          <p className="text-xs leading-relaxed text-ink dark:text-white">{skenario.cerita}</p>
-          <p className="mt-1 text-[11px] leading-relaxed text-neutral-600 dark:text-neutral-300">
-            <span className="font-bold">Watch for: </span>{skenario.perhatikan}
-          </p>
-        </div>
+        <details className="border-t border-neutral-200 py-2 dark:border-white/10">
+          <summary className="cursor-pointer truncate text-[11px] font-black text-ink dark:text-white">
+            Scenario context · {skenario.label}
+          </summary>
+          <div className="pt-2">
+            <p className="text-xs leading-relaxed text-ink dark:text-white">{skenario.cerita}</p>
+            <p className="mt-1 text-[11px] leading-relaxed text-neutral-600 dark:text-neutral-300">
+              <span className="font-bold">Watch for: </span>{skenario.perhatikan}
+            </p>
+          </div>
+        </details>
       )}
 
       <SystemCouplingDiagram
@@ -292,9 +301,9 @@ export function SimulatorSection({ onVitals }: Props) {
         onToggleMotion={() => setGerakVisual((x) => !x)}
       />
 
-      <div>
+      <section aria-label="Circulation outputs">
         <div className="t-mikro font-bold uppercase tracking-wide text-neutral-500">Circulation</div>
-        <div className="mt-1 grid grid-cols-3 gap-1.5">
+        <div className="mt-2 grid grid-cols-3 gap-3">
           <Angka label="Cardiac output" nilai={out.cardiacOutput} satuan="L/min" normal="4–8" buruk={out.cardiacOutput < 3.5} />
           <Angka label="MAP" nilai={out.map} satuan="mmHg" normal="70–100" buruk={out.map < 65} />
           <Angka label="Stroke volume" nilai={out.strokeVolume} satuan="mL" normal="60–100" buruk={out.strokeVolume < 40} />
@@ -302,11 +311,11 @@ export function SimulatorSection({ onVitals }: Props) {
         <p className="mt-1 text-center text-[11px] font-bold text-neutral-500">
           {out.systolic.toFixed(0)}/{out.diastolic.toFixed(0)} mmHg
         </p>
-      </div>
+      </section>
 
-      <div>
+      <section aria-label="Gas exchange outputs">
         <div className="t-mikro font-bold uppercase tracking-wide text-neutral-500">Gas exchange</div>
-        <div className="mt-1 grid grid-cols-3 gap-1.5">
+        <div className="mt-2 grid grid-cols-3 gap-3">
           <Angka label="SaO₂" nilai={out.sao2} satuan="%" normal="95–100" buruk={out.sao2 < 90} />
           <Angka label="PaO₂" nilai={out.pao2} satuan="mmHg" normal="80–100" buruk={out.pao2 < 60} />
           <Angka label="PaCO₂" nilai={out.paco2} satuan="mmHg" normal="35–45" buruk={out.paco2 > 50 || out.paco2 < 30} />
@@ -314,27 +323,29 @@ export function SimulatorSection({ onVitals }: Props) {
           <Angka label="O₂ delivery" nilai={out.do2} satuan="mL/min" normal="~1000" buruk={out.do2 < 600} />
           <Angka label="Lactate" nilai={out.lactate} satuan="mmol/L" normal="<2" buruk={out.lactate > 2} />
         </div>
-      </div>
+      </section>
 
-      <div>
+      <section aria-label="Kidney outputs">
         <div className="t-mikro font-bold uppercase tracking-wide text-neutral-500">Kidney</div>
-        <div className="mt-1 grid grid-cols-3 gap-1.5">
+        <div className="mt-2 grid grid-cols-3 gap-3">
           <Angka label="Renal flow" nilai={out.renalPerfusion} satuan="mL/min" normal="~1100" buruk={out.renalPerfusion < 600} />
           <Angka label="GFR" nilai={out.gfr} satuan="mL/min" normal="90–120" buruk={out.gfr < 60} />
           <Angka label="Urine" nilai={out.urineOutput} satuan="mL/h" normal="≥30" buruk={out.urineOutput < 30} />
         </div>
-      </div>
+      </section>
 
-      <div className="rounded-xl border border-neutral-200 p-2.5 dark:border-white/10">
-        <div className="t-mikro font-bold uppercase tracking-wide text-neutral-500">What is limiting the system</div>
-        <ul className="mt-1 space-y-1">
+      <details className="border-t border-neutral-200 py-2 dark:border-white/10">
+        <summary className="cursor-pointer truncate text-[11px] font-black text-neutral-600 dark:text-neutral-300">
+          What is limiting the system · {out.catatan.length} signal{out.catatan.length === 1 ? '' : 's'}
+        </summary>
+        <ul className="mt-2 space-y-1">
           {out.catatan.map((c, i) => (
             <li key={i} className="flex gap-1.5 text-xs leading-relaxed text-neutral-600 dark:text-neutral-300">
               <span className="shrink-0 text-neutral-400">·</span><span>{c}</span>
             </li>
           ))}
         </ul>
-      </div>
+      </details>
 
       <div>
         <button
@@ -342,7 +353,7 @@ export function SimulatorSection({ onVitals }: Props) {
           aria-expanded={bukaKendali}
           aria-controls="body-simulator-controls"
           onClick={() => setBukaKendali(!bukaKendali)}
-          className="w-full rounded-xl border border-neutral-200 px-3 py-2 text-left text-xs font-bold text-ink dark:border-white/10 dark:text-white"
+          className="flex min-h-[44px] w-full items-center justify-between border-y border-neutral-200 px-1 text-left text-xs font-bold text-ink dark:border-white/10 dark:text-white"
         >
           {bukaKendali ? 'Hide controls' : 'Change any variable yourself'} ›
         </button>
@@ -384,12 +395,12 @@ export function SimulatorSection({ onVitals }: Props) {
         )}
       </div>
 
-      <p className="text-[10.5px] leading-relaxed text-neutral-400">
-        This is a simplified STEADY-STATE model built to teach the direction and size of the couplings between
-        systems. It is not a patient model: it has no time course, so slower responses such as the metabolic
-        compensation of an acid–base disturbance are not represented, and it must never be used to estimate a real
-        person’s state.
-      </p>
+      <details className="border-t border-neutral-200 pt-2 dark:border-white/10">
+        <summary className="cursor-pointer text-[10px] font-bold text-neutral-400">Model limits & equations</summary>
+        <p className="mt-2 text-[10.5px] leading-relaxed text-neutral-400">
+          This is a simplified STEADY-STATE model built to teach the direction and size of the couplings between systems. It is not a patient model: it has no time course, so slower responses such as the metabolic compensation of an acid–base disturbance are not represented, and it must never be used to estimate a real person’s state. Equations include Frank–Starling coupling, alveolar gas and shunt relationships, haemoglobin dissociation, and renal autoregulation.
+        </p>
+      </details>
     </div>
   )
 }
