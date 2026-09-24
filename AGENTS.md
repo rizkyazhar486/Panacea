@@ -7,6 +7,8 @@
 
 For healthcare impact, every agent must also follow [`PANACEA_HUMANITY_10_CHARTER.md`](PANACEA_HUMANITY_10_CHARTER.md). It defines the standing outcome function, hard clinical gates, evidence tiers, human-AI rule, interoperability/access requirements, learning loop, and anti-feature-count law. A future stronger model should deepen validated benefit rather than merely increase code or feature volume.
 
+For product prioritization, every agent must also follow [`docs/LONGEVITY_FIRST_MASTER_DIRECTIVE.md`](docs/LONGEVITY_FIRST_MASTER_DIRECTIVE.md). Panaceamed's primary product center is personalized longitudinal longevity, wellness and healthy aging: one canonical health state combining blood/laboratory trends, personal baselines, biological-age trajectory, validated personalized medicine/genomics, mental wellness, sleep/recovery, fitness/body composition, environment and real-world wellness exposures such as sauna/bath-house check-ins. Stabilization, security, privacy and clinical-safety blockers still outrank feature expansion.
+
 Do not grant a model authority because of branding, generation number or AGI claims. Route work by validated capability and re-benchmark when stronger technology appears. Reaching 100% of a version's defined acceptance criteria transitions the project into Continuous Evolution Mode; it does not terminate R&D.
 
 ## Objective

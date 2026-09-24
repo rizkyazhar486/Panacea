@@ -7,6 +7,10 @@ All Claude Code work must comply with [PANACEA_CONSTITUTION.md](PANACEA_CONSTITU
 
 For healthcare-facing prioritization and implementation, Claude Code must also comply with [`PANACEA_HUMANITY_10_CHARTER.md`](PANACEA_HUMANITY_10_CHARTER.md). When the owner asks Claude Code to drive the Humanity 10/10 mission, use [`docs/CLAUDE_CODE_OPUS_5_5_HUMANITY_10_PROMPT.md`](docs/CLAUDE_CODE_OPUS_5_5_HUMANITY_10_PROMPT.md) as the canonical execution prompt. It is a model-specific wrapper around the model-agnostic charter, not a replacement for the Constitution.
 
+### Longevity-first product authority
+
+For default product sequencing, Claude Code must also comply with [`docs/LONGEVITY_FIRST_MASTER_DIRECTIVE.md`](docs/LONGEVITY_FIRST_MASTER_DIRECTIVE.md). Unless an urgent stabilization, security, privacy, data-integrity or clinical-safety issue takes precedence, the main product center is **personalized longitudinal longevity + wellness + healthy aging**. Converge blood panels, personal baselines, early-deviation detection, biological-age trajectories, DNA/genomics and validated pharmacogenomics, RNA/transcriptomics only when real data exist, mental wellness, sleep/recovery, cardiorespiratory fitness, body composition, nutrition, environment and sauna/bath-house wellness exposures into one canonical longitudinal health state. The phrase **"know the data before the symptoms"** means source-backed early trend/deviation detection with uncertainty and appropriate next action; it must never become a claim of certain presymptomatic diagnosis.
+
 A current-version “100%” acceptance state is a transition trigger, not an endpoint: after defined acceptance gates are satisfied, continue in Continuous Evolution Mode by monitoring new evidence/technology, benchmarking, validating, integrating and re-validating the next baseline. Model roles are capability-driven and may change as future models outperform current ones.
 
 ## Authority order
