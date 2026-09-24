@@ -1,7 +1,7 @@
 # Dual-Lane Continuous Integration Conveyor — Design Specification
 
 **Date:** 2026-09-24  
-**Status:** Approved design, pending implementation-plan review  
+**Status:** Chat design approved; written specification pending owner review  
 **Owner objective:** Increase Panacea integration throughput toward **2 validated merges/integrations per hour** without weakening correctness, clinical safety, security, provenance, or non-destructive collaboration rules.
 
 ## 1. Problem statement
@@ -315,7 +315,7 @@ The implementation is accepted when all of the following are demonstrated:
 7. Existing required CI gates remain present and green.
 8. The coordinator records timing metrics sufficient to calculate lead time, green-to-merge time, waste rate, and integration throughput.
 9. No force-push or history rewrite path exists.
-10. A controlled sustained run demonstrates a path toward median <=30-minute validated integration intervals when a ready queue of independent tasks exists.
+10. In a controlled sustained run with at least four independent ready tasks, the median validated integration interval is <=30 minutes, median green-to-integration time is <=5 minutes when no blocker exists, and no required validation gate is bypassed.
 
 ## 12. Non-goals
 
