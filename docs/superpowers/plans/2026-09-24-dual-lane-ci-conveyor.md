@@ -875,7 +875,7 @@ git commit -m "docs(ci): adopt dual-lane conveyor contract"
 No spec requirement is intentionally omitted.
 
 ### Placeholder scan
-No TBD/TODO/“implement later” placeholders are permitted in this plan.
+No unresolved placeholder markers or deferred implementation language are permitted in this plan.
 
 ### Type/interface consistency
 - `formatMetadata()/parseMetadata()` own the single PR metadata contract.
