@@ -5,6 +5,8 @@
 
 [PANACEA_CONSTITUTION.md](PANACEA_CONSTITUTION.md) is the model-agnostic parent scientific and governance charter. Every current or future agent, model, workflow and specialist tool must conform to it. This includes research/discovery, invention, biomedical/drug work, clinical trials, surveillance, scientific publication, education, hospital deployment, human-performance domains, privacy/security and continuous technology refresh.
 
+For healthcare impact, every agent must also follow [`PANACEA_HUMANITY_10_CHARTER.md`](PANACEA_HUMANITY_10_CHARTER.md). It defines the standing outcome function, hard clinical gates, evidence tiers, human-AI rule, interoperability/access requirements, learning loop, and anti-feature-count law. A future stronger model should deepen validated benefit rather than merely increase code or feature volume.
+
 Do not grant a model authority because of branding, generation number or AGI claims. Route work by validated capability and re-benchmark when stronger technology appears. Reaching 100% of a version's defined acceptance criteria transitions the project into Continuous Evolution Mode; it does not terminate R&D.
 
 ## Objective
