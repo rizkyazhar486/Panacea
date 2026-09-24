@@ -7,6 +7,8 @@ This document is intentionally model-agnostic. It applies to Claude Code, ChatGP
 
 The repository owner's latest explicit instruction remains the highest product-development authority. Within that intent, this Constitution is the standing scientific/safety/governance baseline. Model-specific files such as `CLAUDE.md`, `AGENTS.md`, future `GPT.md`, `ASTRA.md`, workflow prompts, and agent handoffs must conform to it rather than silently weakening it.
 
+**Healthcare humanity-impact annex:** [`PANACEA_HUMANITY_10_CHARTER.md`](PANACEA_HUMANITY_10_CHARTER.md) is a normative annex for all healthcare-facing work. Every current or future model must use it to prioritize measurable outcomes, safety/evidence, access/equity, efficiency, interoperability, human agency, and controlled learning over raw feature count or code volume.
+
 ---
 
 ## 1. Mission
