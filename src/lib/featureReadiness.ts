@@ -57,6 +57,18 @@ export const FEATURE_READINESS: readonly FeatureReadiness[] = [
     notes: 'Flagship workflow. Working: guarded entry (reason on reject, no future dates, unit-mismatch confirm), correction/delete, personal baseline + trend (median ± 2 MAD, two-point confirmation), PhenoAge trajectory with named missing markers, server sync (last-write-wins, retry), FHIR R4 Observations (LOINC only from the verified registry; hs-CRP and 8 analytes uncoded), patient consent to one verified clinician with revoke + audit, clinician trend view, clinician review with note and recheck date shown to the patient ("Recheck due" when reached), in-app + push notification on share and on review (no PHI in the notification text). Per-report reference ranges (optional, validated, used by the trend flag and FHIR referenceRange; generic ranges only as fallback). Missing: photo/PDF import, prospective clinician validation (none yet; engineering correctness only).',
   },
   {
+    id: 'daily-checkin',
+    label: 'Daily check-in (clinician-authored daily anamnesis)',
+    status: 'FUNCTIONAL-BUT-INCOMPLETE',
+    route: '/tubuh',
+    requiresExternalAdapter: false,
+    requiresPatientData: true,
+    requiresWebGL: false,
+    productionReady: false,
+    lastValidated: '2026-09-25',
+    notes: 'The continuous-care kernel (#2006) is now reachable: a verified clinician with the patient\'s active grant writes the plan (diagnosis, questions, optional "flag yes for review today" rules); the patient answers once a day on /tubuh; raw answers are stored server-side and the clinician view recomputes priority with the kernel. Revoking the grant stops the check-in. Missing: measurement review rules (need evidence ref + verifier workflow), longitudinal-state projection and QuestionnaireResponse export, offline queue in the UI, reminders at the scheduled time, clinical validation.',
+  },
+  {
     id: 'body-explorer',
     label: 'Body Explorer',
     status: 'FUNCTIONAL-BUT-INCOMPLETE',

@@ -463,6 +463,12 @@ export const api = {
   clinicianLabFhir: (id: string) => req<{ pasien: string; berakhir: string; reviews: TinjauanLabKlien[]; bundle: FhirBundelLab }>(`/api/clinician/lab-shares/${encodeURIComponent(id)}/fhir`),
   reviewLab: (izinId: string, tes: string, catatan: string, cekUlangSebelum: string) =>
     req<TinjauanLabKlien>(`/api/clinician/lab-shares/${encodeURIComponent(izinId)}/review`, { method: 'POST', body: JSON.stringify({ tes, catatan, cekUlangSebelum }) }),
+  carePlans: () => req<{ plans: { plan: import('./continuousCareOperatingSystem').ContinuousCarePlan; dokterEmail: string; reports: import('./continuousCareOperatingSystem').DailyAnamnesisSubmissionInput[] }[] }>('/api/care/plans'),
+  submitCareReport: (planId: string, scheduledFor: string, answers: { questionId: string; value: boolean | number | string }[]) =>
+    req<import('./continuousCareOperatingSystem').DailyAnamnesisSubmissionInput>('/api/care/reports', { method: 'POST', body: JSON.stringify({ planId, scheduledFor, answers }) }),
+  clinicianCare: (izinId: string) => req<{ plan: import('./continuousCareOperatingSystem').ContinuousCarePlan | null; reports: import('./continuousCareOperatingSystem').DailyAnamnesisSubmissionInput[] }>(`/api/clinician/lab-shares/${encodeURIComponent(izinId)}/care`),
+  createCarePlan: (izinId: string, body: unknown) =>
+    req<import('./continuousCareOperatingSystem').ContinuousCarePlan>(`/api/clinician/lab-shares/${encodeURIComponent(izinId)}/care-plan`, { method: 'POST', body: JSON.stringify(body) }),
   getHealthProfile: () => req<{ profile: Record<string, unknown> }>('/api/health-profile').then((r) => r.profile),
   saveHealthProfile: (profile: Record<string, unknown>) =>
     req<{ ok: boolean; profile: Record<string, unknown> }>('/api/health-profile', { method: 'PUT', body: JSON.stringify({ profile }) }).then((r) => r.profile),

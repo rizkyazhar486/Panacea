@@ -121,7 +121,7 @@ export function logKeBundelFhir(log: LogLab, pasienRef: string, dibuat: string) 
 
 // ── Izin & audit ─────────────────────────────────────────────────────────
 export interface IzinLab { id: string; pasienEmail: string; dokterEmail: string; dibuat: string; berakhir: string; dicabut?: string }
-export interface AuditLab { waktu: string; pasienEmail: string; aktor: string; aksi: 'izin-dibuat' | 'izin-dicabut' | 'dibaca-dokter' | 'ditinjau-dokter'; izinId: string }
+export interface AuditLab { waktu: string; pasienEmail: string; aktor: string; aksi: 'izin-dibuat' | 'izin-dicabut' | 'dibaca-dokter' | 'ditinjau-dokter' | 'rencana-harian'; izinId: string }
 
 const EMAIL = /^[^\s@]{1,64}@[^\s@]{1,190}\.[^\s@]{2,}$/
 export const HARI_MAKS = 90

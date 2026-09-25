@@ -54,6 +54,10 @@ import {
   listLabAudit,
   addLabReview,
   listLabReviews,
+  listCarePlans,
+  addCarePlan,
+  addCareReport,
+  listCareReports,
   saveRingkasan,
   saveHealthProfile,
   recordDeviceHealthSync,
@@ -135,6 +139,7 @@ import { disburse, irisLive } from './iris.js'
 import { KATALOG, KATEGORI } from './healthMetrics.js'
 import { validasiLogLab, validasiCapWaktu, terimaTulisan } from './labLog.js'
 import { logKeBundelFhir, buatIzin, izinBerlaku, buatTinjauan } from './labFhir.js'
+import { susunRencana, susunLaporan } from './carePlan.js'
 import { parseHealthWebhookPayload, extractHeartRateSeries, extractSleepSessions, newestSampleDate } from './healthWebhook.js'
 import { checkHrZoneAlert, checkBedtimeReminder, checkWorkoutReminder, suggestedBedtime, ZONES } from './healthAlerts.js'
 import { fetchLeagueScoreboard, fetchF1Info, fetchMotoGpInfo, LEAGUES, UNAVAILABLE } from './sports.js'
@@ -978,6 +983,59 @@ app.post('/api/clinician/lab-shares/:id/review', requireAuth, (req, res) => {
     const pasien = getUserByEmail(izin.pasienEmail)
     if (pasien) void notify(pasien.id, { title: 'Your doctor reviewed a lab result', body: 'Open your lab results to see the review.', url: '/tubuh' }).catch((e) => console.warn('[lab-review] notify failed', (e as Error).message))
     res.json(t)
+  } catch (e) {
+    res.status(400).json({ error: (e as Error).message })
+  }
+})
+
+// Anamnesis harian (Continuous Care). Relasi perawatan = izin pasien yang sama
+// dengan berbagi lab: dokter terverifikasi + izin berlaku. Laporan disimpan
+// sebagai jawaban MENTAH; prioritas dihitung ulang oleh kernel di sisi dokter.
+app.post('/api/clinician/lab-shares/:id/care-plan', requireAuth, (req, res) => {
+  const u = (req as express.Request & { user: User }).user
+  if (u.role !== 'dokter') { res.status(403).json({ error: 'verified clinician role required' }); return }
+  const kini = new Date()
+  const izin = listLabShares().find((i) => i.id === String(req.params.id))
+  if (!izinBerlaku(izin, u.email, kini)) { res.status(404).json({ error: 'no active access' }); return }
+  const pasien = getUserByEmail(izin.pasienEmail)
+  if (!pasien) { res.status(404).json({ error: 'patient not found' }); return }
+  try {
+    const rencana = susunRencana(req.body, pasien.id, u.id, kini)
+    addCarePlan({ izinId: izin.id, pasienEmail: izin.pasienEmail, dokterEmail: u.email, dibuat: kini.toISOString(), rencana })
+    addLabAudit({ waktu: kini.toISOString(), pasienEmail: izin.pasienEmail, aktor: u.email, aksi: 'rencana-harian', izinId: izin.id })
+    void notify(pasien.id, { title: 'Your doctor set up a daily check-in', body: 'Open Your Body to answer today\'s questions.', url: '/tubuh' }).catch((e) => console.warn('[care-plan] notify failed', (e as Error).message))
+    res.json(rencana)
+  } catch (e) {
+    res.status(400).json({ error: (e as Error).message })
+  }
+})
+app.get('/api/clinician/lab-shares/:id/care', requireAuth, (req, res) => {
+  const u = (req as express.Request & { user: User }).user
+  if (u.role !== 'dokter') { res.status(403).json({ error: 'verified clinician role required' }); return }
+  const kini = new Date()
+  const izin = listLabShares().find((i) => i.id === String(req.params.id))
+  if (!izinBerlaku(izin, u.email, kini)) { res.status(404).json({ error: 'no active access' }); return }
+  const p = listCarePlans().find((x) => x.pasienEmail === izin.pasienEmail && x.dokterEmail === u.email && !x.dicabut)
+  if (p) addLabAudit({ waktu: kini.toISOString(), pasienEmail: izin.pasienEmail, aktor: u.email, aksi: 'dibaca-dokter', izinId: izin.id })
+  res.json({ plan: p?.rencana ?? null, reports: p ? listCareReports(izin.pasienEmail, p.rencana.id) : [] })
+})
+// Pasien: rencana aktif dari dokter yang IZINNYA MASIH BERLAKU; dicabut = berhenti.
+app.get('/api/care/plans', requireAuth, (req, res) => {
+  const u = (req as express.Request & { user: User }).user
+  const kini = new Date()
+  const aktif = listCarePlans().filter((p) => p.pasienEmail === u.email && !p.dicabut && izinBerlaku(listLabShares().find((i) => i.id === p.izinId), p.dokterEmail, kini))
+  res.json({ plans: aktif.map((p) => ({ plan: p.rencana, dokterEmail: p.dokterEmail, reports: listCareReports(u.email, p.rencana.id).slice(-7) })) })
+})
+app.post('/api/care/reports', requireAuth, (req, res) => {
+  const u = (req as express.Request & { user: User }).user
+  const kini = new Date()
+  const b = req.body as { planId?: unknown }
+  const p = listCarePlans().find((x) => x.rencana.id === String(b?.planId ?? '') && x.pasienEmail === u.email && !x.dicabut)
+  if (!p || !izinBerlaku(listLabShares().find((i) => i.id === p.izinId), p.dokterEmail, kini)) { res.status(404).json({ error: 'no active daily check-in' }); return }
+  try {
+    const laporan = susunLaporan(p.rencana, req.body, kini)
+    addCareReport(u.email, laporan)
+    res.json(laporan)
   } catch (e) {
     res.status(400).json({ error: (e as Error).message })
   }

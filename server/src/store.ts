@@ -117,8 +117,10 @@ interface DB {
   applications?: Application[] // professional onboarding applications (doctor/writer/verifier)
   healthProfiles?: Record<string, Record<string, any>> // email -> health data blob (manual/wearable)
   labShares?: { id: string; pasienEmail: string; dokterEmail: string; dibuat: string; berakhir: string; dicabut?: string }[]
+  carePlans?: { izinId: string; pasienEmail: string; dokterEmail: string; dibuat: string; dicabut?: string; rencana: any }[]
+  careReports?: { pasienEmail: string; laporan: any }[]
   labReviews?: { id: string; izinId: string; pasienEmail: string; dokterEmail: string; tes: string; ditinjau: string; catatan?: string; cekUlangSebelum?: string }[]
-  labAudit?: { waktu: string; pasienEmail: string; aktor: string; aksi: 'izin-dibuat' | 'izin-dicabut' | 'dibaca-dokter' | 'ditinjau-dokter'; izinId: string }[]
+  labAudit?: { waktu: string; pasienEmail: string; aktor: string; aksi: 'izin-dibuat' | 'izin-dicabut' | 'dibaca-dokter' | 'ditinjau-dokter' | 'rencana-harian'; izinId: string }[]
   labLogs?: Record<string, { log: Record<string, { id: string; tanggal: string; nilai: number }[]>; diperbaruiPada: string }> // email -> riwayat lab pribadi
   healthWebhookTokens?: Record<string, string> // opaque token -> email, for Apple Health auto-export (Health Auto Export app)
   hrSeries?: Record<string, { t: number; bpm: number; lo?: number; hi?: number; kind: string }[]> // email -> heart-rate log
@@ -854,6 +856,14 @@ export function addLabAudit(a: AuditLabDb) { const l = (db.labAudit ??= []); l.p
 type TinjauanLabDb = NonNullable<typeof db.labReviews>[number]
 export function addLabReview(t: TinjauanLabDb) { const l = (db.labReviews ??= []); l.push(t); if (l.length > 20000) l.splice(0, l.length - 20000); save() }
 export function listLabReviews(pasienEmail: string): TinjauanLabDb[] { return (db.labReviews ?? []).filter((t) => t.pasienEmail === pasienEmail).slice(-200).reverse() }
+export function listCarePlans() { return db.carePlans ?? [] }
+export function addCarePlan(p: NonNullable<typeof db.carePlans>[number]) {
+  // Satu rencana aktif per pasien–dokter: rencana baru menggantikan yang lama.
+  for (const lama of db.carePlans ?? []) if (lama.pasienEmail === p.pasienEmail && lama.dokterEmail === p.dokterEmail && !lama.dicabut) lama.dicabut = p.dibuat
+  ;(db.carePlans ??= []).push(p); save()
+}
+export function addCareReport(pasienEmail: string, laporan: any) { const l = (db.careReports ??= []); l.push({ pasienEmail, laporan }); if (l.length > 50000) l.splice(0, l.length - 50000); save() }
+export function listCareReports(pasienEmail: string, planId: string) { return (db.careReports ?? []).filter((r) => r.pasienEmail === pasienEmail && r.laporan.planId === planId).map((r) => r.laporan).slice(-60) }
 export function listLabAudit(pasienEmail: string): AuditLabDb[] { return (db.labAudit ?? []).filter((a) => a.pasienEmail === pasienEmail).slice(-100).reverse() }
 
 export function getHealthProfile(email: string): Record<string, any> {

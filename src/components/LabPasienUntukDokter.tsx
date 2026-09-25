@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { api, backendEnabled, type FhirBundelLab, type FhirObservasiLab, type TinjauanLabKlien } from '../lib/api'
+import { RencanaHarianDokter } from './RencanaHarianDokter'
 import { analisisTrenSeri, MIN_RIWAYAT_GARIS_DASAR, type StatusTren } from '../lib/labTrend'
 
 // Bahasa klinisi untuk mesin tren yang sama dengan sisi pasien (labTrend.ts):
@@ -123,6 +124,7 @@ export function LabPasienUntukDokter() {
           </ul>
           <p className="mt-1 text-[10px] leading-snug text-white/40">Compared with this patient's own earlier results (median ± 2 MAD) — a monitoring signal, not an interpretation.</p>
           {kelompok.size === 0 && <p className="mt-1 text-[11px] text-white/55">This patient has no lab results yet.</p>}
+          <RencanaHarianDokter izinId={buka.izinId} />
         </div>
       )}
     </section>
