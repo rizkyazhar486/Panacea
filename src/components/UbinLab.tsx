@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
-import { JENIS_LAB, ambilLab, tambahLab, umurHari, periksaMasukanLab, type ButirLab, type JenisLab } from '../lib/lab'
+import { JENIS_LAB, ambilLab, tambahLab, hapusLab, umurHari, periksaMasukanLab, type ButirLab, type JenisLab } from '../lib/lab'
 import { analisisTrenLab, type StatusTren } from '../lib/labTrend'
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -218,6 +218,31 @@ export function UbinLab() {
 
                   <Garis butir={butir} jenis={j} />
                   <BarisTren butir={butir} jenis={j} />
+
+                  {/* Riwayat yang bisa dikoreksi: satu hasil salah ketik tanpa
+                      jalan menghapusnya merusak garis dasar dan PhenoAge selamanya. */}
+                  <details className="mt-2" data-lab-history>
+                    <summary className="t-mikro cursor-pointer font-bold text-neutral-500">All {butir.length} results · edit</summary>
+                    <ul className="mt-1 divide-y divide-neutral-100 dark:divide-white/10">
+                      {[...butir].reverse().map((b) => (
+                        <li key={b.id} className="t-kecil flex min-h-[40px] items-center justify-between gap-2">
+                          <span className="tabular-nums text-ink dark:text-white">{b.tanggal} · <b>{b.nilai}</b> {j.satuan}</span>
+                          <button
+                            type="button"
+                            aria-label={`Delete ${j.nama} ${b.nilai} ${j.satuan} from ${b.tanggal}`}
+                            onClick={() => {
+                              if (!window.confirm(`Delete ${j.nama} ${b.nilai} ${j.satuan} (${b.tanggal})?`)) return
+                              hapusLab(j.id, b.id)
+                              setTersimpan(`Deleted ${j.nama} ${b.nilai} ${j.satuan} · ${b.tanggal}`)
+                            }}
+                            className="t-mikro min-h-[36px] px-2 font-bold text-red-500"
+                          >
+                            Delete
+                          </button>
+                        </li>
+                      ))}
+                    </ul>
+                  </details>
 
                   <p className="t-mikro mt-1 leading-snug text-neutral-500 dark:text-neutral-400">
                     Reference: {j.sumber}

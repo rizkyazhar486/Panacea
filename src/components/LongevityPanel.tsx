@@ -7,8 +7,8 @@ import {
   sindromMetabolikIdf, type Hasil, type HasilAngka,
 } from '../lib/longevity'
 import { bangunBundel, ringkasBundel, keJson } from '../lib/fhir'
-import { ambilTrajektori, hitungTrajektori, simpanTitik, titikDariHasil, titikDariRiwayatLab, gabungSumber, type TitikUsiaBiologis } from '../lib/bioAgeTrajectory'
-import { ambilLab } from '../lib/lab'
+import { ambilTrajektori, hitungTrajektori, simpanTitik, titikDariHasil, titikDariRiwayatLab, gabungSumber, penandaKurangTerbaru, type TitikUsiaBiologis } from '../lib/bioAgeTrajectory'
+import { JENIS_LAB, ambilLab } from '../lib/lab'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Panel ini berdiri terpisah dari model poin di halaman yang sama, dan
@@ -278,6 +278,16 @@ export function LongevityPanel({ age, sex, restingHr, waistCm, systolic }: Longe
             {/* Titik dari log lab (sembilan penanda pada tanggal ambil darah yang
                 sama) digabung dengan titik yang disimpan manual. */}
             <TrajektoriUsia titik={gabungSumber(trajektori, titikDariRiwayatLab(ambilLab(), age, hariIni()))} />
+            {(() => {
+              const k = penandaKurangTerbaru(ambilLab())
+              if (!k || !k.kurang.length) return null
+              const nama = k.kurang.map((id) => JENIS_LAB.find((j) => j.id === id)?.nama ?? id).join(', ')
+              return (
+                <p className="mt-1 text-[11px] leading-snug text-neutral-500" data-phenoage-missing>
+                  Your latest blood draw ({k.tanggal}) is missing {nama}; PhenoAge from your lab log needs all nine from the same draw.
+                </p>
+              )
+            })()}
           </div>
         )}
 

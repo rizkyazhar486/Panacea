@@ -138,3 +138,16 @@ export function gabungSumber(manual: readonly TitikUsiaBiologis[], dariLab: read
   for (const t of dariLab) semua = gabungTitik(semua, t)
   return semua
 }
+
+/**
+ * Penanda PhenoAge yang BELUM ada pada tanggal pengambilan darah terbaru yang
+ * memuat setidaknya satu penanda. Tanpa ini pengguna yang mengisi delapan dari
+ * sembilan penanda hanya melihat trajektori kosong tanpa tahu sebabnya.
+ */
+export function penandaKurangTerbaru(lab: Record<string, readonly ButirLab[]>): { tanggal: string; kurang: string[] } | null {
+  let tanggal = ''
+  for (const id of PENANDA_PHENOAGE) for (const b of lab[id] ?? []) if (TANGGAL.test(b.tanggal) && b.tanggal > tanggal) tanggal = b.tanggal
+  if (!tanggal) return null
+  const kurang = PENANDA_PHENOAGE.filter((id) => !(lab[id] ?? []).some((b) => b.tanggal === tanggal && b.nilai > 0))
+  return { tanggal, kurang }
+}

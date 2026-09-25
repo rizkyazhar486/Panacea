@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict'
 import { readFileSync } from 'node:fs'
 import { JENIS_LAB, periksaMasukanLab, FAKTOR_CURIGA_SATUAN } from '../../src/lib/lab.ts'
+import { penandaKurangTerbaru, PENANDA_PHENOAGE } from '../../src/lib/bioAgeTrajectory.ts'
 
 // Satu angka salah di riwayat lab merusak garis dasar, tren dan PhenoAge sekaligus,
 // dan hasilnya tetap tampak meyakinkan. Sebelumnya: nilai tak valid diabaikan
@@ -32,4 +33,19 @@ for (const [teks, tgl] of [['', hari], ['abc', hari], ['5 mg/dL', hari], ['0', h
   assert.match(ui, /konfirmasi !== kunci/, 'nilai bersatuan mencurigakan disimpan tanpa konfirmasi')
   assert.doesNotMatch(ui, /if \(!Number\.isFinite\(n\) \|\| n <= 0\) return/, 'penolakan diam-diam kembali')
 }
-console.log('masukan-lab-terjaga: nilai tak sah ditolak dengan alasan, tanggal masa depan ditolak, salah satuan butuh konfirmasi')
+// Hasil salah harus bisa dihapus dari UI (hapusLab dulu tidak dipakai di mana pun).
+{
+  const ui = readFileSync('src/components/UbinLab.tsx', 'utf8')
+  assert.match(ui, /hapusLab\(j\.id, b\.id\)/, 'riwayat lab tidak bisa dikoreksi dari UI')
+  assert.match(ui, /window\.confirm\(/, 'penghapusan tanpa konfirmasi')
+}
+// Penanda PhenoAge yang kurang pada pengambilan terbaru disebutkan, bukan disembunyikan.
+{
+  const lab: Record<string, { id: string; tanggal: string; nilai: number }[]> = {}
+  for (const id of PENANDA_PHENOAGE) lab[id] = [{ id, tanggal: '2026-01-01', nilai: 1 }]
+  for (const id of PENANDA_PHENOAGE.filter((x) => x !== 'crp' && x !== 'rdw')) lab[id].push({ id: id + '2', tanggal: '2026-06-01', nilai: 1 })
+  assert.deepEqual(penandaKurangTerbaru(lab), { tanggal: '2026-06-01', kurang: ['crp', 'rdw'] })
+  assert.equal(penandaKurangTerbaru({}), null)
+  assert.match(readFileSync('src/components/LongevityPanel.tsx', 'utf8'), /data-phenoage-missing/, 'panel longevity tidak lagi menyebut penanda yang kurang')
+}
+console.log('masukan-lab-terjaga: nilai tak sah ditolak dengan alasan, tanggal masa depan ditolak, salah satuan butuh konfirmasi, hasil dapat dihapus, penanda PhenoAge yang kurang disebutkan')
