@@ -35,6 +35,24 @@ assert.equal(ubahFisik.physicalExam.verifiedById, undefined, 'id verifikator lam
 // Pasien menyimpan ulang rekam bertanda tangan untuk consent pasien saja → tanda tangan klinis tetap.
 const setuju = terapkanSimpanRekam(tt, { ...tt, surgery: { consent: { given: true } } }, pasien, kini)
 assert.equal(setuju.rekam.signedBy, 'Dr. Asli'); assert.ok(setuju.arsip, 'perubahan pada rekam bertanda tangan tidak diarsipkan')
+// Dokter juga tidak boleh mengubah isi lalu menyimpan dengan cap lama. Harus re-sign.
+const editDokterTanpaResign = terapkanSimpanRekam(tt, { ...tt, anamnesis: { keluhan: 'diubah dokter tanpa re-sign' } }, dokter, kini)
+assert.equal(editDokterTanpaResign.rekam.signedBy, undefined, 'edit dokter tanpa re-sign masih membawa cap lama')
+assert.equal(editDokterTanpaResign.rekam.signedById, undefined)
+assert.equal(editDokterTanpaResign.rekam.signedAt, undefined)
+assert.ok(editDokterTanpaResign.arsip?.signedBy === 'Dr. Asli')
+
+// Re-sign eksplisit (signedAt klien berubah) mencap ulang server dan memverifikasi ulang fisik.
+const kiniResign = new Date('2026-09-26T11:00:00Z')
+const resign = terapkanSimpanRekam(tt, {
+  ...tt,
+  anamnesis: { keluhan: 'diubah dokter dan di-sign ulang' },
+  physicalExam: { ...tt.physicalExam, general: 'temuan baru', doctorVerified: true },
+  signedAt: '2099-01-01T00:00:00Z',
+}, dokter, kiniResign).rekam
+assert.deepEqual([resign.signedBy, resign.signedById, resign.signedAt], ['Dr. Asli', 'd1', kiniResign.toISOString()])
+assert.deepEqual([resign.physicalExam.verifiedBy, resign.physicalExam.verifiedById], ['Dr. Asli', 'd1'])
+
 // Simpan identik tidak mengarsipkan.
 assert.equal(terapkanSimpanRekam(tt, tt, dokter, kini).arsip, undefined)
 console.log('rekamKlinis: tanda tangan tidak dapat dipalsukan, dicap server, versi bertanda tangan diarsipkan')
