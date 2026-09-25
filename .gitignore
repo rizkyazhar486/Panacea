@@ -12,6 +12,8 @@ yarn-error.log*
 
 # backend
 server/data.json
+server/arsip/
+server/data.json.corrupt-*
 
 # Locally-added agent skills (tooling, not app code)
 .agents/
