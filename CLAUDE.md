@@ -856,3 +856,14 @@ The runtime must converge on one shared architecture:
 8. source provenance, evidence boundary, academic review and clear educational-vs-clinical labeling.
 
 Do not call a generic animation, static layer list or scripted slideshow a surgical simulator. A mature module should allow the learner to act on a stateful environment and receive objective state/telemetry feedback. At the same time, do not invent operative geometry or claim physical realism before validation. The current lightweight runtime is a scaffold; the continuation target is high-fidelity validated simulation built on the same contracts.
+
+## Scientific graph renderer continuation — 2026-09-25
+
+The scientific graph renderer named as a "next" item in the Universal Sport OS, Unified Sport/Performance/Safety and Tactical Athlete OS continuation sections above is now landed as an additive module:
+- `src/lib/scientificGraphRenderer.ts`
+- `scripts/qa/scientific-graph-renderer.test.mjs` (in the normal frontend build gate and as `npm run test:scientific-graph-renderer`)
+- `DOCS/SCIENTIFIC-GRAPH-RENDERER.md`
+
+Do not create a second graph-resolution contract. This module consumes `SCIENTIFIC_SPORT_GRAPHS` and `PerformanceTelemetryEnvelope` streams and fails closed on an unknown metric, a unit mismatch, missing required data, invalid telemetry, or an unsynchronized multi-stream overlay; it never interpolates across metrics or converts units. Resolving the module's `unknown-metric` path surfaced a real pre-existing gap — `vertical-speed` (used by `dive-motion-control`) had no registry entry — which is now defined in `UNIVERSAL_SPORT_METRICS` and added to the `diving-core` metric pack.
+
+Next continuation step: wire a chart component to `resolveScientificGraph()` for the Universal Sport OS / Tactical Athlete OS / Performance Orchestrator surfaces, following the repository's `dataviz` design guidance, before any UI claims to render these graphs from real telemetry.
