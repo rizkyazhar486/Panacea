@@ -37,6 +37,7 @@ const B: Kotak = { x: 220, y: 0, w: 96, h: 42, r: 21 }
   assert.match(c, /prefers-reduced-motion/, 'gerak berkurang tidak dihormati')
   assert.match(readFileSync('src/styles/one-shape.css', 'utf8'), /pointer-events: none/, 'bentuk menangkap klik')
   assert.match(readFileSync('src/components/PanaceaZoneNav.tsx', 'utf8'), /data-one-shape="explicit"[\s\S]*<OneShape \/>/)
+  assert.match(readFileSync('src/components/HalamanTab.tsx', 'utf8'), /data-one-shape=\{theme === 'metal' \? undefined : 'aria'\}[\s\S]*<OneShape tone="green" \/>/, 'tab bersama (6 halaman Pusat*) kehilangan One Shape')
   assert.match(readFileSync('src/pages/UnifiedBodyWorkspace.tsx', 'utf8'), /data-one-shape="aria"[\s\S]*<OneShape \/>/)
 }
-console.log('one-shape: pegas konvergen <0,8 s, lewatan ≤2%, kontinu saat ganti target, terpasang di navigasi zona + tab Your Body')
+console.log('one-shape: pegas konvergen <0,8 s, lewatan ≤2%, kontinu saat ganti target, terpasang di navigasi zona, tab Your Body dan tab bersama Pusat*')
