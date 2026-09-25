@@ -35,9 +35,15 @@ page.on('pageerror', (e) => galat.push(e.message))
 
 let gagal = null
 try {
-  await page.goto(url, { waitUntil: 'networkidle' })
-  await page.waitForSelector('header.kaca')
-  await page.waitForTimeout(1500)
+  // Jangan menunggu networkidle di sini. DailyQuoteBanner memang sengaja
+  // auto-hide setelah waktu baca (minimum 9 detik), sementara halaman ini
+  // memuat modul lazy/3D yang dapat membuat networkidle datang setelah banner
+  // sudah menghilang. Itu membuat gerbang gagal bukan karena overlap, tetapi
+  // karena observasinya dimulai terlalu terlambat. Tangkap kedua elemen segera
+  // setelah DOM siap, lalu uji stacking saat banner benar-benar masih tampil.
+  await page.goto(url, { waitUntil: 'domcontentloaded' })
+  await page.waitForSelector('header.kaca', { state: 'visible' })
+  await page.waitForSelector('[data-daily-reminder]', { state: 'visible', timeout: 8_000 })
 
   // 1. Spanduk harian harus benar-benar TAMPIL -- kalau tidak, pemeriksaan ini
   //    lulus tanpa menguji apa pun, persis cara gerbang kehilangan artinya.
