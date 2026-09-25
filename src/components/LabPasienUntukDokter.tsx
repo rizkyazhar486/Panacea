@@ -65,7 +65,8 @@ export function LabPasienUntukDokter() {
   if (!backendEnabled) return null
 
   const kelompok = new Map<string, FhirBundelLab['entry'][number]['resource'][]>()
-  for (const e of buka?.bundle.entry ?? []) {
+  // Bundel juga memuat Provenance; hanya Observation yang punya kode/nilai.
+  for (const e of (buka?.bundle.entry ?? []).filter((x) => (x.resource as { resourceType?: string }).resourceType === 'Observation')) {
     const k = e.resource.code.text
     kelompok.set(k, [...(kelompok.get(k) ?? []), e.resource].sort((a, b) => a.effectiveDateTime.localeCompare(b.effectiveDateTime)))
   }

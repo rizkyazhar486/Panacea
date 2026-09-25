@@ -8,7 +8,16 @@ const b = logKeBundelFhir({
   wbc: [{ id: 'w1', tanggal: '2026-09-20', nilai: 6.1 }],
   misteri: [{ id: 'm1', tanggal: '2026-09-20', nilai: 1 }],
 }, 'Patient/p-a', kini.toISOString()) as any
-assert.equal(b.resourceType, 'Bundle'); assert.equal(b.total, 3, 'jenis tak dikenal ikut diekspor')
+assert.equal(b.resourceType, 'Bundle')
+const obsSaja = b.entry.filter((e: any) => e.resource.resourceType === 'Observation')
+assert.equal(obsSaja.length, 3, 'jenis tak dikenal ikut diekspor')
+const UUID = /^urn:uuid:[0-9a-f]{8}-[0-9a-f]{4}-5[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/
+for (const e of b.entry) assert.match(e.fullUrl, UUID, `fullUrl bukan UUID RFC 4122: ${e.fullUrl}`)
+assert.equal(new Set(b.entry.map((e: any) => e.fullUrl)).size, b.entry.length, 'fullUrl ganda')
+const again = logKeBundelFhir({ gdp: [{ id: 'g1', tanggal: '2026-09-20', nilai: 92 }] }, 'Patient/p-a', kini.toISOString()) as any
+assert.equal(again.entry[0].fullUrl, obsSaja.find((e: any) => e.resource.id === 'lab-g1').fullUrl, 'identitas Observation tidak stabil antar-ekspor')
+const prov = b.entry.find((e: any) => e.resource.resourceType === 'Provenance').resource
+assert.equal(prov.target.length, 3); assert.deepEqual(prov.agent.map((a: any) => a.type[0].coding[0].code), ['assembler', 'enterer'])
 const obs = (id: string) => b.entry.find((e: any) => e.resource.id === id).resource
 assert.deepEqual(obs('lab-g1').code.coding[0], { system: 'http://loinc.org', code: '1558-6', display: 'Fasting glucose [Mass/volume] in Serum or Plasma' })
 assert.equal(obs('lab-g1').valueQuantity.code, 'mg/dL')
@@ -20,7 +29,7 @@ assert.deepEqual(obs('lab-g1').identifier, [{ system: 'https://panaceamed.id/fhi
 assert.equal(obs('lab-c1').code.coding, undefined, 'hs-CRP diberi kode CRP biasa')
 assert.equal(obs('lab-c1').code.text, 'hs-CRP')
 assert.equal(obs('lab-w1').valueQuantity.code, '10*3/uL')
-for (const e of b.entry) {
+for (const e of obsSaja) {
   assert.equal(e.resource.meta.tag[0].system, SISTEM_ASAL); assert.equal(e.resource.meta.tag[0].code, 'patient-transcribed', 'asal data (disalin pasien) hilang')
   assert.equal(e.resource.subject.reference, 'Patient/p-a')
 }

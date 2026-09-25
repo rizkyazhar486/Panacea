@@ -12,7 +12,7 @@
 // Dokter hanya membaca lewat id izin yang menyebut dirinya, belum kedaluwarsa,
 // belum dicabut, dan perannya dokter terverifikasi. Setiap baca dicatat.
 
-import { randomBytes } from 'node:crypto'
+import { randomBytes, createHash } from 'node:crypto'
 import { VERIFIED_METRIC_TERMS, LOINC_SYSTEM, UCUM_SYSTEM, OBS_CATEGORY_SYSTEM } from './mcp/verifiedTerminologyRegistry.js'
 import type { LogLab } from './labLog.js'
 
@@ -52,6 +52,17 @@ export function kodeUntuk(jenis: string) {
   return t
 }
 
+// fullUrl urn:uuid harus UUID RFC 4122 (#2009). UUID v5-gaya (SHA-1, berbasis
+// nama) dari identitas butir: stabil antar-ekspor, jadi penerima dapat mengenali
+// Observation yang sama tanpa duplikasi.
+export function uuidStabil(nama: string): string {
+  const h = createHash('sha1').update(`panaceamed:lab:${nama}`).digest()
+  h[6] = (h[6] & 0x0f) | 0x50
+  h[8] = (h[8] & 0x3f) | 0x80
+  const x = h.subarray(0, 16).toString('hex')
+  return `${x.slice(0, 8)}-${x.slice(8, 12)}-${x.slice(12, 16)}-${x.slice(16, 20)}-${x.slice(20, 32)}`
+}
+
 export function logKeBundelFhir(log: LogLab, pasienRef: string, dibuat: string) {
   const entry: { fullUrl: string; resource: Record<string, unknown> }[] = []
   for (const [jenis, daftar] of Object.entries(log)) {
@@ -61,7 +72,7 @@ export function logKeBundelFhir(log: LogLab, pasienRef: string, dibuat: string) 
     for (const b of daftar) {
       const id = `lab-${b.id}`
       entry.push({
-        fullUrl: `urn:uuid:${id}`,
+        fullUrl: `urn:uuid:${uuidStabil(`${jenis}/${b.id}`)}`,
         resource: {
           resourceType: 'Observation',
           id,
@@ -84,6 +95,26 @@ export function logKeBundelFhir(log: LogLab, pasienRef: string, dibuat: string) 
         },
       })
     }
+  }
+  // Provenance: Panaceamed merakit; sumbernya lembar hasil lab yang disalin pasien.
+  if (entry.length) {
+    entry.push({
+      fullUrl: `urn:uuid:${uuidStabil(`provenance/${pasienRef}/${dibuat}`)}`,
+      resource: {
+        resourceType: 'Provenance',
+        id: `lab-provenance`,
+        target: entry.map((e) => ({ reference: `Observation/${(e.resource as { id: string }).id}` })),
+        recorded: dibuat,
+        agent: [{
+          type: [{ coding: [{ system: 'http://terminology.hl7.org/CodeSystem/provenance-participant-type', code: 'assembler', display: 'Assembler' }] }],
+          who: { identifier: { system: 'https://panaceamed.id/fhir/identifier/software-agent', value: 'panaceamed' }, display: 'Panaceamed.id' },
+        }, {
+          type: [{ coding: [{ system: 'http://terminology.hl7.org/CodeSystem/provenance-participant-type', code: 'enterer', display: 'Enterer' }] }],
+          who: { reference: pasienRef },
+        }],
+        entity: [{ role: 'source', what: { display: 'Laboratory report transcribed by the patient' } }],
+      },
+    })
   }
   return { resourceType: 'Bundle', type: 'collection', timestamp: dibuat, total: entry.length, entry }
 }

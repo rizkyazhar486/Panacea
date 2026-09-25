@@ -50,6 +50,9 @@ assert.match(ui, /a monitoring signal, not an interpretation/, 'batas "sinyal pe
   }
 }
 
+// Bundel lab juga membawa Provenance; tampilan dokter hanya mengolah Observation.
+assert.match(ui, /resourceType === 'Observation'/, 'tampilan dokter mengolah Provenance sebagai hasil lab')
+
 // Regresi: rekam medis server tanpa pemeriksaan per sistem merobohkan Clinical untuk dokter.
 assert.doesNotThrow(() => buildBodyClinicalFindings(undefined))
 assert.doesNotThrow(() => buildBodyClinicalFindings(null))
