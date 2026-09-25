@@ -1,0 +1,151 @@
+{
+  "schemaVersion": 1,
+  "updatedAt": "2026-09-25",
+  "principle": "No clinical-validation claim without prospective evidence, clinician review, safety outcomes, provenance, and an inspectable analysis artifact.",
+  "workflows": [
+    {
+      "id": "lab-longitudinal-baseline",
+      "title": "Lab → longitudinal baseline → biological-age trajectory",
+      "stage": "instrumented",
+      "clinicalOwner": "preventive-longevity",
+      "primaryMetric": {
+        "name": "complete_baseline_rate",
+        "unit": "proportion",
+        "direction": "increase",
+        "target": 0.7
+      },
+      "safetyMetrics": [
+        {
+          "name": "incorrect_unit_or_value_accepted_rate",
+          "unit": "proportion",
+          "direction": "decrease",
+          "target": 0
+        }
+      ],
+      "requiredEvidence": {
+        "prospective": true,
+        "clinicianReview": true,
+        "minimumCohortN": 30,
+        "minimumClinicianN": 3
+      },
+      "dataContract": {
+        "fhirResources": ["Observation", "DiagnosticReport", "Provenance"],
+        "provenanceRequired": true
+      },
+      "proof": {
+        "cohortN": 0,
+        "clinicianN": 0,
+        "analysisDate": null,
+        "artifact": null
+      }
+    },
+    {
+      "id": "daily-anamnesis-continuous-care",
+      "title": "Daily anamnesis → longitudinal signal → clinician review",
+      "stage": "instrumented",
+      "clinicalOwner": "continuous-care",
+      "primaryMetric": {
+        "name": "clinically_actionable_signal_precision",
+        "unit": "proportion",
+        "direction": "increase",
+        "target": 0.8
+      },
+      "safetyMetrics": [
+        {
+          "name": "unsafe_autonomous_action_rate",
+          "unit": "proportion",
+          "direction": "decrease",
+          "target": 0
+        }
+      ],
+      "requiredEvidence": {
+        "prospective": true,
+        "clinicianReview": true,
+        "minimumCohortN": 50,
+        "minimumClinicianN": 5
+      },
+      "dataContract": {
+        "fhirResources": ["QuestionnaireResponse", "Observation", "ClinicalImpression", "Provenance"],
+        "provenanceRequired": true
+      },
+      "proof": {
+        "cohortN": 0,
+        "clinicianN": 0,
+        "analysisDate": null,
+        "artifact": null
+      }
+    },
+    {
+      "id": "ai-emr-clinician-signoff",
+      "title": "AI draft → clinician edit/sign-off → final EMR",
+      "stage": "planned",
+      "clinicalOwner": "clinical-documentation",
+      "primaryMetric": {
+        "name": "median_documentation_time_saved_minutes",
+        "unit": "minutes",
+        "direction": "increase",
+        "target": 3
+      },
+      "safetyMetrics": [
+        {
+          "name": "major_clinical_error_escape_rate",
+          "unit": "proportion",
+          "direction": "decrease",
+          "target": 0
+        }
+      ],
+      "requiredEvidence": {
+        "prospective": true,
+        "clinicianReview": true,
+        "minimumCohortN": 100,
+        "minimumClinicianN": 5
+      },
+      "dataContract": {
+        "fhirResources": ["Encounter", "Condition", "Observation", "MedicationRequest", "Provenance"],
+        "provenanceRequired": true
+      },
+      "proof": {
+        "cohortN": 0,
+        "clinicianN": 0,
+        "analysisDate": null,
+        "artifact": null
+      }
+    },
+    {
+      "id": "body-exposure-clinical-localization",
+      "title": "Body Exposure → finding localization → clinician comprehension/action",
+      "stage": "planned",
+      "clinicalOwner": "body-exposure",
+      "primaryMetric": {
+        "name": "localization_task_accuracy",
+        "unit": "proportion",
+        "direction": "increase",
+        "target": 0.9
+      },
+      "safetyMetrics": [
+        {
+          "name": "misleading_anatomy_or_overlay_rate",
+          "unit": "proportion",
+          "direction": "decrease",
+          "target": 0
+        }
+      ],
+      "requiredEvidence": {
+        "prospective": true,
+        "clinicianReview": true,
+        "minimumCohortN": 40,
+        "minimumClinicianN": 5
+      },
+      "dataContract": {
+        "fhirResources": ["BodyStructure", "Observation", "ImagingStudy", "Provenance"],
+        "provenanceRequired": true
+      },
+      "proof": {
+        "cohortN": 0,
+        "clinicianN": 0,
+        "analysisDate": null,
+        "artifact": null
+      }
+    }
+  ]
+}
