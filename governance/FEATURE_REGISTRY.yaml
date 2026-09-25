@@ -1,0 +1,176 @@
+schema_version: 1
+status: living_source_of_truth
+authority:
+  parent:
+    - PANACEA_CONSTITUTION.md
+    - PANACEA_HUMANITY_10_CHARTER.md
+  operating_system: PANACEA_PRODUCT_MATURITY_OS.md
+
+rules:
+  - "Do not invent implementation status; audit repository evidence."
+  - "Update entries when dependencies, state ownership, workflow boundaries, or production status materially change."
+  - "Prefer stable feature_id values once created."
+  - "A UI component is not automatically a product feature."
+  - "Clinical claims require provenance appropriate to their risk."
+
+feature_schema:
+  feature_id: string
+  name: string
+  domain: string
+  capability: string
+  workflow: string
+  user_types: []
+  primary_problem: string
+  use_case: string
+  inputs: []
+  outputs: []
+  reads_from: []
+  writes_to: []
+  dependencies: []
+  dependents: []
+  patient_state_fields: []
+  knowledge_graph_entities: []
+  shared_services: []
+  backend_surfaces: []
+  frontend_surfaces: []
+  persistence_surfaces: []
+  external_integrations: []
+  maturity_level: "DISCOVERED|MAPPED|CONNECTED|FUNCTIONAL|VALIDATED|MATURE|PRODUCTION_READY|OPTIMIZED|UNKNOWN"
+  clinical_validation: "not_applicable|not_started|planned|in_progress|reviewed|validated|unknown"
+  technical_risk: "low|medium|high|critical|unknown"
+  clinical_risk: "low|medium|high|critical|unknown"
+  provenance_required: true
+  tests: []
+  observability: []
+  known_gaps: []
+  next_actions: []
+  last_audited_commit: null
+
+features:
+  - feature_id: core.canonical_patient_state
+    name: Canonical longitudinal patient state
+    domain: Core Health Intelligence
+    capability: Longitudinal State
+    workflow: Cross-domain patient context
+    user_types: [clinician, patient, system]
+    primary_problem: Fragmented representations of the same person across modules
+    use_case: Provide one provenance-aware longitudinal state consumed by multiple Panaceamed surfaces
+    inputs: [clinical_records, observations, labs, imaging, medications, devices, contextual_data]
+    outputs: [canonical_patient_context, longitudinal_events]
+    reads_from: []
+    writes_to: [timeline, clinical_intelligence, body_exposure, longitudinal_health]
+    dependencies: [identity, provenance, consent, terminology]
+    dependents: [clinical_intelligence, body_exposure, longevity, prevention, wearables]
+    patient_state_fields: [requires_repository_audit]
+    knowledge_graph_entities: []
+    shared_services: [identity, provenance, consent, audit, terminology]
+    backend_surfaces: [requires_repository_audit]
+    frontend_surfaces: [requires_repository_audit]
+    persistence_surfaces: [requires_repository_audit]
+    external_integrations: [requires_repository_audit]
+    maturity_level: UNKNOWN
+    clinical_validation: unknown
+    technical_risk: high
+    clinical_risk: high
+    provenance_required: true
+    tests: [requires_repository_audit]
+    observability: [requires_repository_audit]
+    known_gaps: [registry_bootstrap_requires_repository_audit]
+    next_actions: [audit_current_state_ownership_and_existing_bridges]
+    last_audited_commit: null
+
+  - feature_id: body.unified_exposure
+    name: Unified Body Exposure
+    domain: Body Exposure
+    capability: Spatial Human Model
+    workflow: Spatial anatomy-to-clinical context
+    user_types: [clinician, learner, patient]
+    primary_problem: Fragmented spatial understanding of human biology and clinical context
+    use_case: Maintain one shared spatial context across scale and projection domains
+    inputs: [reference_anatomy, selected_structure, scenario_state, optional_patient_context]
+    outputs: [spatial_context, educational_projection, contextual_overlay]
+    reads_from: [canonical_patient_state_when_authorized]
+    writes_to: [interaction_state]
+    dependencies: [anatomy_provenance, rendering_runtime, semantic_zoom]
+    dependents: [clinical_education, localization, imaging, simulation]
+    patient_state_fields: [requires_repository_audit]
+    knowledge_graph_entities: [anatomy, physiology, pathology]
+    shared_services: [provenance, terminology]
+    backend_surfaces: [requires_repository_audit]
+    frontend_surfaces: [requires_repository_audit]
+    persistence_surfaces: [requires_repository_audit]
+    external_integrations: [requires_repository_audit]
+    maturity_level: UNKNOWN
+    clinical_validation: not_applicable
+    technical_risk: high
+    clinical_risk: medium
+    provenance_required: true
+    tests: [requires_repository_audit]
+    observability: [requires_repository_audit]
+    known_gaps: [registry_bootstrap_requires_repository_audit]
+    next_actions: [audit_current_unified_projector_and_active_pr_overlap]
+    last_audited_commit: null
+
+  - feature_id: clinical.ai_emr_intelligence
+    name: Clinical Intelligence and AI-EMR
+    domain: Clinical
+    capability: Longitudinal Clinical Intelligence
+    workflow: Patient review to decision support to follow-up
+    user_types: [clinician]
+    primary_problem: Fragmented clinical data and cognitive burden
+    use_case: Provide traceable clinician-supportive longitudinal intelligence
+    inputs: [patient_state, clinical_knowledge, workflow_context]
+    outputs: [structured_context, supported_interpretation, follow_up_context]
+    reads_from: [canonical_patient_state, clinical_knowledge_graph]
+    writes_to: [draft_clinical_outputs, reviewed_clinical_state]
+    dependencies: [provenance, clinician_review, audit, terminology]
+    dependents: [body_exposure, follow_up, care_coordination]
+    patient_state_fields: [requires_repository_audit]
+    knowledge_graph_entities: [requires_repository_audit]
+    shared_services: [reasoning_gateway, provenance, audit, consent]
+    backend_surfaces: [requires_repository_audit]
+    frontend_surfaces: [requires_repository_audit]
+    persistence_surfaces: [requires_repository_audit]
+    external_integrations: [requires_repository_audit]
+    maturity_level: UNKNOWN
+    clinical_validation: unknown
+    technical_risk: high
+    clinical_risk: critical
+    provenance_required: true
+    tests: [requires_repository_audit]
+    observability: [requires_repository_audit]
+    known_gaps: [registry_bootstrap_requires_repository_audit]
+    next_actions: [audit_end_to_end_clinical_state_and_review_boundaries]
+    last_audited_commit: null
+
+  - feature_id: health.longitudinal_longevity
+    name: Longitudinal Health and Longevity
+    domain: Longitudinal Health
+    capability: Prevention and trajectory intelligence
+    workflow: Observe trend to interpret to act to reassess
+    user_types: [patient, clinician]
+    primary_problem: Health data presented as disconnected snapshots
+    use_case: Turn source-backed longitudinal signals into understandable trajectories and appropriate action
+    inputs: [labs, vitals, activity, sleep, wearables, lifestyle, medications, optional_genomics]
+    outputs: [trend_context, baseline_context, prevention_context]
+    reads_from: [canonical_patient_state]
+    writes_to: [timeline, longitudinal_health_state]
+    dependencies: [source_normalization, provenance, uncertainty]
+    dependents: [prevention, coaching, clinical_view]
+    patient_state_fields: [requires_repository_audit]
+    knowledge_graph_entities: [requires_repository_audit]
+    shared_services: [provenance, normalization, terminology]
+    backend_surfaces: [requires_repository_audit]
+    frontend_surfaces: [requires_repository_audit]
+    persistence_surfaces: [requires_repository_audit]
+    external_integrations: [requires_repository_audit]
+    maturity_level: UNKNOWN
+    clinical_validation: unknown
+    technical_risk: high
+    clinical_risk: high
+    provenance_required: true
+    tests: [requires_repository_audit]
+    observability: [requires_repository_audit]
+    known_gaps: [registry_bootstrap_requires_repository_audit]
+    next_actions: [audit_lab_to_baseline_to_trajectory_workflow]
+    last_audited_commit: null
