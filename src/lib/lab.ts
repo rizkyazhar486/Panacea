@@ -82,6 +82,15 @@ export const JENIS_LAB: JenisLab[] = [
   { id: 'hb', nama: 'Hemoglobin', satuan: 'g/dL', bawah: 12, atas: 17, sumber: 'WHO: anaemia below 13 g/dL (men) or 12 g/dL (women)' },
   { id: 'crp', nama: 'hs-CRP', satuan: 'mg/L', atas: 3, sumber: 'AHA/CDC: <1 low risk, 1–3 moderate, >3 high (not during acute infection)' },
   { id: 'asamUrat', nama: 'Uric acid', satuan: 'mg/dL', atas: 7, sumber: 'Usual range; gout can occur at normal levels' },
+  // Enam penanda berikut melengkapi sembilan masukan PhenoAge (Levine 2018)
+  // bersama glukosa puasa, kreatinin dan hs-CRP di atas, sehingga usia
+  // biologis bisa dihitung dari riwayat lab yang sama, per tanggal ambil darah.
+  { id: 'albumin', nama: 'Albumin', satuan: 'g/dL', bawah: 3.5, atas: 5.0, sumber: 'Usual adult range; varies by laboratory' },
+  { id: 'mcv', nama: 'MCV', satuan: 'fL', bawah: 80, atas: 100, sumber: 'Usual adult range; varies by laboratory' },
+  { id: 'rdw', nama: 'RDW', satuan: '%', bawah: 11.5, atas: 14.5, sumber: 'Usual adult range (RDW-CV); varies by analyser' },
+  { id: 'alp', nama: 'Alkaline phosphatase', satuan: 'U/L', bawah: 44, atas: 147, sumber: 'Usual adult range; higher in adolescents and pregnancy' },
+  { id: 'wbc', nama: 'White blood cells', satuan: '10³/µL', bawah: 4.0, atas: 11.0, sumber: 'Usual adult range; varies by laboratory' },
+  { id: 'limfosit', nama: 'Lymphocytes', satuan: '%', bawah: 20, atas: 40, sumber: 'Usual adult differential; varies by laboratory' },
 ]
 
 const KUNCI = 'pmd_lab_v1'

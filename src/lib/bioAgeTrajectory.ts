@@ -21,6 +21,9 @@
 // - Tidak ada rekomendasi pengobatan dari angka ini.
 
 import type { HasilPhenoAge } from './longevity'
+import { phenoAge, konversi } from './longevity'
+import type { ButirLab } from './lab'
+
 
 export interface TitikUsiaBiologis {
   /** yyyy-mm-dd — tanggal pengambilan darah. */
@@ -83,4 +86,55 @@ export function simpanTitik(t: TitikUsiaBiologis): TitikUsiaBiologis[] {
   const baru = gabungTitik(ambilTrajektori(), t).slice(-60)
   try { localStorage.setItem(KUNCI, JSON.stringify(baru)) } catch { /* kuota */ }
   return baru
+}
+
+// ── PhenoAge langsung dari riwayat lab (src/lib/lab.ts). ─────────────────
+// PhenoAge sah hanya bila KESEMBILAN penanda berasal dari pengambilan darah
+// yang SAMA. Mencampur albumin bulan Maret dengan CRP bulan Juni menghasilkan
+// angka yang tampak sungguhan tetapi tidak menggambarkan satu keadaan pun,
+// jadi tanggal yang tidak lengkap dilewati, bukan ditambal.
+
+export const PENANDA_PHENOAGE = ['albumin', 'kreatinin', 'gdp', 'crp', 'limfosit', 'mcv', 'rdw', 'alp', 'wbc'] as const
+
+export function titikDariRiwayatLab(
+  lab: Record<string, readonly ButirLab[]>,
+  usiaSekarang: number,
+  hariIniISO: string,
+): TitikUsiaBiologis[] {
+  if (!(usiaSekarang > 0) || !TANGGAL.test(hariIniISO)) return []
+  const perTanggal = new Map<string, Record<string, number>>()
+  for (const id of PENANDA_PHENOAGE) {
+    for (const b of lab[id] ?? []) {
+      if (!TANGGAL.test(b.tanggal) || !Number.isFinite(b.nilai)) continue
+      const r = perTanggal.get(b.tanggal) ?? {}
+      r[id] = b.nilai
+      perTanggal.set(b.tanggal, r)
+    }
+  }
+  const hasil: TitikUsiaBiologis[] = []
+  const hariIni = Date.parse(`${hariIniISO}T00:00:00Z`)
+  for (const [tanggal, m] of perTanggal) {
+    if (!PENANDA_PHENOAGE.every((k) => m[k] > 0)) continue
+    // Usia saat pengambilan darah: usia sekarang dikurangi selang waktunya.
+    const usia = Number((usiaSekarang - (hariIni - Date.parse(`${tanggal}T00:00:00Z`)) / (365.25 * 864e5)).toFixed(1))
+    const h = phenoAge({
+      usia,
+      albuminGL: konversi.albuminGdLKeGL(m.albumin),
+      kreatininUmolL: konversi.kreatininMgdLKeUmolL(m.kreatinin),
+      glukosaMmolL: konversi.glukosaMgdLKeMmolL(m.gdp),
+      crpMgdL: konversi.crpMgLKeMgdL(m.crp),
+      limfositPersen: m.limfosit, mcvFL: m.mcv, rdwPersen: m.rdw, alpUL: m.alp, wbcRibu: m.wbc,
+    })
+    if (!h.ok) continue
+    const t = titikDariHasil(tanggal, usia, h.data)
+    if (t) hasil.push(t)
+  }
+  return hasil.sort((a, b) => a.tanggal.localeCompare(b.tanggal))
+}
+
+/** Titik dari riwayat lab menang atas titik manual pada tanggal yang sama. */
+export function gabungSumber(manual: readonly TitikUsiaBiologis[], dariLab: readonly TitikUsiaBiologis[]): TitikUsiaBiologis[] {
+  let semua = [...manual]
+  for (const t of dariLab) semua = gabungTitik(semua, t)
+  return semua
 }

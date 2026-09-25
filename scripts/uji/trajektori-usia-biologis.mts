@@ -48,7 +48,31 @@ assert.equal(titikDariHasil('2025-01-01', 0, h50.data), null)
 
 // Terpasang di panel PhenoAge.
 const panel = readFileSync(new URL('../../src/components/LongevityPanel.tsx', import.meta.url), 'utf8')
-assert.match(panel, /<TrajektoriUsia titik=\{trajektori\} \/>/, 'trajektori tidak lagi dirender di panel PhenoAge')
+assert.match(panel, /<TrajektoriUsia titik=\{gabungSumber\(trajektori, titikDariRiwayatLab\(/, 'trajektori (manual + log lab) tidak lagi dirender di panel PhenoAge')
 assert.match(panel, /Save to trajectory/, 'tombol menyimpan titik trajektori hilang')
 
 console.log('trajektori-usia-biologis: AgeGap tak bergerak karena bertambah tua, ΔAgeGap/laju sesuai hitungan tangan, tanggal sama menggantikan')
+
+// ── PhenoAge langsung dari riwayat lab, per tanggal ambil darah. ────────
+import { titikDariRiwayatLab, gabungSumber, PENANDA_PHENOAGE } from '../../src/lib/bioAgeTrajectory.ts'
+import { JENIS_LAB } from '../../src/lib/lab.ts'
+{
+  for (const id of PENANDA_PHENOAGE) assert.ok(JENIS_LAB.some((j) => j.id === id), `penanda PhenoAge "${id}" tidak bisa dimasukkan di kartu Lab`)
+  const nilai: Record<string, number> = { albumin: 4.5, kreatinin: 0.9, gdp: 90, crp: 1, limfosit: 30, mcv: 90, rdw: 13, alp: 70, wbc: 6 }
+  const lab: Record<string, { id: string; tanggal: string; nilai: number }[]> = {}
+  for (const [k, v] of Object.entries(nilai)) lab[k] = [{ id: k + '1', tanggal: '2025-09-25', nilai: v }, { id: k + '2', tanggal: '2026-09-25', nilai: v }]
+  // Tanggal ketiga tidak lengkap (tanpa albumin): harus dilewati, bukan ditambal.
+  for (const [k, v] of Object.entries(nilai)) if (k !== 'albumin') lab[k].push({ id: k + '3', tanggal: '2026-03-01', nilai: v })
+  const titik = titikDariRiwayatLab(lab, 50, '2026-09-25')
+  assert.deepEqual(titik.map((t) => t.tanggal), ['2025-09-25', '2026-09-25'], `tanggal PhenoAge ${titik.map((t) => t.tanggal)} — pengambilan tak lengkap ikut dihitung`)
+  assert.equal(titik[0].usia, 49, `usia saat pengambilan setahun lalu ${titik[0].usia}, bukan 49`)
+  // Nilai hasil sama persis dengan phenoAge() langsung — tidak ada konversi yang tertukar.
+  const langsung = phenoAge({ usia: 50, albuminGL: 45, kreatininUmolL: 0.9 * 88.4, glukosaMmolL: 90 / 18.0182, crpMgdL: 0.1, limfositPersen: 30, mcvFL: 90, rdwPersen: 13, alpUL: 70, wbcRibu: 6 })
+  assert.ok(langsung.ok && Math.abs(titik[1].phenoAge - langsung.data.phenoAge) < 1e-9, `PhenoAge dari log lab ${titik[1].phenoAge} ≠ perhitungan langsung — konversi satuan tertukar`)
+  // Darah sama setahun kemudian: AgeGap tidak bergerak.
+  assert.ok(Math.abs(hitungTrajektori(titik).deltaAgeGap!) < AMBANG_DATAR_TAHUN)
+  // Titik dari log lab menang atas titik manual pada tanggal yang sama.
+  const g = gabungSumber([{ ...titik[1], ageGap: 99 }], titik)
+  assert.equal(g.find((t) => t.tanggal === '2026-09-25')!.ageGap, titik[1].ageGap, 'titik manual menimpa titik yang dihitung dari log lab')
+}
+console.log('trajektori-usia-biologis: PhenoAge dari log lab hanya untuk pengambilan darah lengkap, konversi satuan cocok dengan perhitungan langsung')

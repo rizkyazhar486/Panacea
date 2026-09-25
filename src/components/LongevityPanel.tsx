@@ -7,7 +7,8 @@ import {
   sindromMetabolikIdf, type Hasil, type HasilAngka,
 } from '../lib/longevity'
 import { bangunBundel, ringkasBundel, keJson } from '../lib/fhir'
-import { ambilTrajektori, hitungTrajektori, simpanTitik, titikDariHasil, type TitikUsiaBiologis } from '../lib/bioAgeTrajectory'
+import { ambilTrajektori, hitungTrajektori, simpanTitik, titikDariHasil, titikDariRiwayatLab, gabungSumber, type TitikUsiaBiologis } from '../lib/bioAgeTrajectory'
+import { ambilLab } from '../lib/lab'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Panel ini berdiri terpisah dari model poin di halaman yang sama, dan
@@ -274,7 +275,9 @@ export function LongevityPanel({ age, sex, restingHr, waistCm, systolic }: Longe
             ) : (
               <p className="mt-1 text-[11px] leading-snug text-amber-700 dark:text-amber-300">{pheno.alasan}</p>
             )}
-            <TrajektoriUsia titik={trajektori} />
+            {/* Titik dari log lab (sembilan penanda pada tanggal ambil darah yang
+                sama) digabung dengan titik yang disimpan manual. */}
+            <TrajektoriUsia titik={gabungSumber(trajektori, titikDariRiwayatLab(ambilLab(), age, hariIni()))} />
           </div>
         )}
 
