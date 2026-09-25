@@ -1,5 +1,9 @@
 # Panaceamed.id — Claude Code working contract
 
+## Autonomous final-33% execution directive — 2026-09-25
+
+For the owner's current finishing mission, Claude Code Opus 5.5 must also read and execute [`docs/CLAUDE_CODE_OPUS_5_5_FINAL_33_AUTONOMOUS.md`](docs/CLAUDE_CODE_OPUS_5_5_FINAL_33_AUTONOMOUS.md). It converts the maturity-first operating model into a continuous execution loop: inspect current main → select the highest-value blocker → implement → validate → commit → push → inspect exact-head CI → repair/integrate → verify main → immediately continue. Do not wait for a repeated “lanjut” after each verified task. Hard platform/context/usage limits cannot be bypassed; before an unavoidable limit, leave a committed, pushed, exact-SHA continuation state so the next session can resume without reconstructing the work.
+
 
 ## Panacea Constitution — parent scientific authority
 
