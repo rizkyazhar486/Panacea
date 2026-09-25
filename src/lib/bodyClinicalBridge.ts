@@ -1,7 +1,7 @@
 import type { EMRRecord, VitalSign } from './types.ts'
 
 export type BodyClinicalReviewState = 'draft' | 'exam-verified' | 'record-signed'
-export type BodyClinicalMarkerStatus = 'normal' | 'abnormal' | 'unchecked'
+export type BodyClinicalMarkerStatus = 'normal' | 'abnormal' | 'recorded' | 'unchecked'
 
 export interface BodyClinicalSystemFinding {
   key: string
@@ -52,9 +52,13 @@ export interface BodyClinicalBridgeProjection {
   }
 }
 
+// Hanya cap SERVER yang dihitung (server/src/rekamKlinis.ts): signedById untuk
+// tanda tangan, physicalExam.verifiedById untuk verifikasi fisik. EMR menyetel
+// signedBy/doctorVerified secara optimistis di klien sebelum server menerima;
+// tanda tangan yang masih antre, ditolak, atau dari non-klinisi tetap 'draft'.
 function reviewState(record: EMRRecord): BodyClinicalReviewState {
-  if (record.signedBy && record.signedAt) return 'record-signed'
-  if (record.physicalExam.doctorVerified) return 'exam-verified'
+  if (record.signedById && record.signedAt) return 'record-signed'
+  if (record.physicalExam?.doctorVerified && record.physicalExam.verifiedById) return 'exam-verified'
   return 'draft'
 }
 
@@ -129,7 +133,7 @@ export function projectEmrToBodyClinicalBridge(
       counts[marker.status] += 1
       return counts
     },
-    { normal: 0, abnormal: 0, unchecked: 0 },
+    { normal: 0, abnormal: 0, recorded: 0, unchecked: 0 },
   )
 
   return {

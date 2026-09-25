@@ -9,13 +9,14 @@ export interface SystemFinding {
   label: string
   x: number // % position on the 0..200 / 0..440 viewBox
   y: number
-  status: 'normal' | 'abnormal' | 'unchecked'
+  status: 'normal' | 'abnormal' | 'recorded' | 'unchecked'
   note?: string
 }
 
 const STATUS = {
   normal: { ring: '#00BF63', fill: '#00BF63' },
   abnormal: { ring: '#FF3131', fill: '#FF3131' },
+  recorded: { ring: '#f5b942', fill: '#f5b942' },
   unchecked: { ring: '#cbd5d1', fill: '#ffffff' },
 }
 
@@ -103,7 +104,7 @@ export function BodyDiagram({
                   className="rounded-full px-2 py-0.5 text-[10px] font-bold text-white"
                   style={{ background: STATUS[sel.status].fill }}
                 >
-                  {sel.status === 'normal' ? 'Normal' : sel.status === 'abnormal' ? 'Finding (+)' : 'Not examined'}
+                  {sel.status === 'normal' ? 'Normal' : sel.status === 'abnormal' ? 'Finding (+)' : sel.status === 'recorded' ? 'Recorded · not classified' : 'Not examined'}
                 </span>
               </div>
               <p className="text-neutral-600">{sel.note || 'No notes recorded for this system yet.'}</p>

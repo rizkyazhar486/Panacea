@@ -72,6 +72,8 @@ export interface PhysicalExam {
   perSystem: string
   doctorVerified: boolean
   verifiedBy?: string
+  /** Id verifikator — dicap server (server/src/rekamKlinis.ts). */
+  verifiedById?: string
 }
 
 export interface PlanSafetyOverride {

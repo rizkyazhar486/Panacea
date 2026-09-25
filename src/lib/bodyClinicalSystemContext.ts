@@ -71,7 +71,7 @@ function countFocusedMarkers(markers: readonly BodyClinicalMarker[]) {
       counts[marker.status] += 1
       return counts
     },
-    { normal: 0, abnormal: 0, unchecked: 0 },
+    { normal: 0, abnormal: 0, recorded: 0, unchecked: 0 },
   )
 }
 

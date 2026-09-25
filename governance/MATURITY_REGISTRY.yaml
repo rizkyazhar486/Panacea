@@ -87,17 +87,20 @@ workflows:
   - workflow_id: body.spatial_clinical_context
     name: Patient or educational context to spatial Body Exposure projection
     strategic_priority: core
-    maturity_level: UNKNOWN
+    maturity_level: PARTIAL  # first audit 2026-09-26
     clinical_validation: not_applicable
     dimensions:
-      functional_completeness: unknown
-      integration: unknown
-      reliability: unknown
-      usability: unknown
-      clinical_quality: unknown
-      safety_security: unknown
-      observability_testing: unknown
-    acceptance_evidence: []
-    known_gaps: [requires_current_main_audit]
-    next_action: audit_unified_body_projector_and_clinical_bridge
+      functional_completeness: medium  # AI-EMR overlay (vitals, exam markers per system, review state) and personal longitudinal signals per body system are mounted in Body Exposure; atlas geometry stays reference-only
+      integration: medium  # reads the same store record/vitals as AI-EMR and the canonical longitudinal state; no second patient state
+      reliability: medium  # browser 390x844: overlay renders with WebGL canvas, no page errors, no horizontal overflow
+      usability: unknown  # no user test
+      clinical_quality: low  # free-text exam classification is a keyword heuristic (navigation only); now conservative
+      safety_security: medium  # 2026-09-26 fixes: review state from server stamps only; documented abnormal findings no longer shown as normal
+      observability_testing: medium  # gates body-clinical-bridge, body-exposure-patient-overlay, klasifikasi-temuan-fisik, status-tanda-tangan, sinyal-pribadi-tubuh
+    acceptance_evidence:
+      - "2026-09-26 audit, browser 390x844 (doctor, patient with server-verified exam + vitals): overlay shows vitals, cardiovascular focus, 'Exam verified' (not 'Signed'), 1 canvas, scrollWidth 390, no page errors"
+      - "defect fixed: overlay / EMR 'Certified by' / timeline lens showed 'signed' from client-side optimistic fields; now only server stamps (signedById, physicalExam.verifiedById) count; pending signatures are labelled pending (scripts/uji/status-tanda-tangan.mts, body-clinical-bridge.mts; sabotaged)"
+      - "defect fixed: 'murmur sistolik 2/6' was classified and drawn as green 'Recorded normal' because only '(+)' counted as abnormal; one shared conservative classifier now marks unnegated abnormal terms as findings, requires an explicit normal marker for 'normal', and otherwise shows 'Recorded · not classified' (scripts/uji/klasifikasi-temuan-fisik.mts, 3 sabotages). Browser: Focused findings 0 -> 1"
+    known_gaps: [exam_text_classifier_is_heuristic_not_structured_exam, personal_signals_not_browser_verified_for_linked_patient, overlay_markers_not_bound_to_exact_3d_structures, usability_test]
+    next_action: structured_per_system_exam_fields_instead_of_free_text_heuristic
     last_audited_commit: null

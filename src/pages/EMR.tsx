@@ -22,6 +22,8 @@ import { searchICD, matchICD, icd11, type ICDCode } from '../lib/icd'
 import { evaluateVitals, overallStatus, STATUS_COLOR, STATUS_LABEL } from '../lib/chronic'
 import { projectEmrToBodyClinicalBridge } from '../lib/bodyClinicalBridge'
 import { KunjunganEmr } from '../components/KunjunganEmr'
+import { klasifikasiTemuan } from '../lib/bodyClinicalFindings'
+import { statusTinjauRekam } from '../lib/statusTandaTangan'
 import { TerbitkanKodeTaut } from '../components/TautanRekamPraktik'
 import { labelAsalMasalah, labelAsalRencana } from '../lib/asalButirEmr'
 import type { Anamnesis, EMRRecord, PhysicalExam, VitalSign } from '../lib/types'
@@ -118,9 +120,7 @@ function buildFindings(perSystem: string | undefined): SystemFinding[] {
     const matched = lines.filter((l) => sys.kw.some((k) => l.toLowerCase().includes(k)))
     if (matched.length === 0) return { ...sys, status: 'unchecked' as const }
     const note = matched.join(' ')
-    const low = note.toLowerCase()
-    const abnormal = ABNORMAL_HINTS.some((h) => low.includes(h))
-    return { ...sys, status: abnormal ? ('abnormal' as const) : ('normal' as const), note }
+    return { ...sys, status: klasifikasiTemuan(note), note }
   })
 }
 
@@ -535,11 +535,15 @@ export function EMR() {
             {draft.signedBy ? 'Re-sign' : `Sign as ${acc?.name || state.settings.doctorName}`}
           </Button>
         </div>
-        {draft.signedAt && (
-          <p className="mt-2 text-xs text-brand-dark">
+        {draft.signedAt && (statusTinjauRekam(draft) === 'signed' ? (
+          <p className="mt-2 text-xs text-brand-dark" data-status-tanda-tangan="signed">
             ✓ Certified by {draft.signedBy} on {new Date(draft.signedAt).toLocaleString('en-US')}
           </p>
-        )}
+        ) : (
+          <p className="mt-2 text-xs text-amber-700" data-status-tanda-tangan="pending">
+            Signature pending — not yet confirmed by the server, so it does not count as signed.
+          </p>
+        ))}
         <KunjunganEmr record={draft} dirty={dirty} klinisi={acc?.role === 'dokter' || Boolean(acc?.isOwner)} />
         {(acc?.role === 'dokter' || acc?.isOwner) && <TerbitkanKodeTaut patientId={activePatient.id} />}
       </Card>
