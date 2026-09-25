@@ -407,6 +407,7 @@ Canonical foundation now landed:
 - `DOCS/MEDICAL-DEVICE-FABRIC.md`
 - `src/lib/medicalDeviceIntegrationCatalog.ts`
 - `scripts/qa/medical-device-integration-catalog.test.mjs`
+- `src/lib/medicalDeviceEventEnvelope.ts` — the canonical non-scalar event envelope (waveform/alarm/setting/therapy-delivery/image-reference/report-reference/device-status/event) plus deterministic technical-QC analyzers (identity/catalog-profile resolution, timestamp order, clock skew, replay/reorder via `createMedicalDeviceReplayLedger`, signal quality, waveform sample-completeness, and receivedAt-based liveness using the same fresh/delayed/stale thresholds as Visit OS). QC here is transport/technical only — never a diagnosis, severity score or treatment output. Covered by `scripts/qa/medical-device-event-envelope.test.mjs`, wired into the `build` gate.
 
 The catalog covers major device families across bedside monitoring, ECG/telemetry, cath-lab coronary physiology, IVUS/OCT, angiography/fluoroscopy, CT/MRI/X-ray, ultrasound, ventilation/anesthesia, infusion, dialysis/CRRT, ECMO, central lab/POC, spirometry, EEG/EMG, endoscopy, surgical navigation/robotics, ophthalmology, implantable cardiac devices, fetal/neonatal monitoring, digital pathology, rehabilitation, home devices and wearables.
 
@@ -421,10 +422,10 @@ Interoperability preference order: DICOM/DICOMweb; IHE Devices profiles (DEC/ACM
 
 Safety boundary is inbound/read-only by default. Do not add therapy actuation for pumps, ventilators, dialysis/ECMO, implant programming, navigation/robotics or other high-risk devices unless a separately regulated and validated bidirectional pathway exists. Device data may inform clinicians and AI context; it does not autonomously diagnose, prescribe or change treatment.
 
-Next long-running implementation order:
-1. add a canonical non-scalar device event envelope for waveforms, alarms, settings, therapy-delivery events and image/report references;
-2. add deterministic technical-QC analyzers for identity, timestamps, clock skew, replay, units, signal quality, sample completeness and liveness;
-3. build real vendor/model adapters only from documented/authorized interfaces, beginning with bedside monitors and ventilators, then infusion pumps, cath-lab IVUS/physiology, lab/POC and implant interrogation;
+Next long-running implementation order (items 1-2 landed as `medicalDeviceEventEnvelope.ts`; continue from item 3):
+1. ~~add a canonical non-scalar device event envelope for waveforms, alarms, settings, therapy-delivery events and image/report references~~ — landed;
+2. ~~add deterministic technical-QC analyzers for identity, timestamps, clock skew, replay, units, signal quality, sample completeness and liveness~~ — landed;
+3. build real vendor/model adapters only from documented/authorized interfaces, beginning with bedside monitors and ventilators, then infusion pumps, cath-lab IVUS/physiology, lab/POC and implant interrogation; adapters should decode a real payload and emit `MedicalDeviceEventEnvelope` instances through `runMedicalDeviceEventQc` before anything is projected into Clinical/AI-EMR/Body;
 4. keep high-frequency waveforms in bounded time-series/waveform storage and imaging in DICOM/DICOMweb; do not flatten them into ordinary FHIR scalar rows;
 5. maintain a conformance matrix per vendor/model/firmware/interface with tested fields, fixture, limitations and last validation date;
 6. project only normalized provenance-preserving results into Clinical/AI-EMR/Body surfaces, and publish clinically committed data only through the existing review/FHIR boundary.
