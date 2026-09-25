@@ -15,12 +15,37 @@ export interface Penulis { id: string; nama: string; klinisi: boolean }
 
 const sama = (a: unknown, b: unknown) => JSON.stringify(a) === JSON.stringify(b)
 
+// Persetujuan pasien adalah satu-satunya bagian dari rekam bertanda tangan yang
+// boleh berubah tanpa membatalkan cap klinisi. Ia pasien-authored, bukan isi
+// klinis yang dokter tandatangani. Semua perubahan lain harus membuat record
+// baru kembali unsigned sampai ditinjau dokter lagi.
+function tanpaPersetujuanPasien(value: any) {
+  const copy = structuredClone(value ?? {})
+  if (copy.surgery && typeof copy.surgery === 'object' && !Array.isArray(copy.surgery)) {
+    delete copy.surgery.consent
+    if (Object.keys(copy.surgery).length === 0) delete copy.surgery
+  }
+  return copy
+}
+
+function isiKlinisTetapSama(lama: any, baru: any) {
+  return sama(tanpaPersetujuanPasien(lama), tanpaPersetujuanPasien(baru))
+}
+
 export function terapkanSimpanRekam(lama: any | undefined, baru: any, penulis: Penulis, kini: Date): { rekam: any; arsip?: any } {
   const r = structuredClone(baru ?? {})
   const fisikLama = lama?.physicalExam ?? {}
   if (!penulis.klinisi) {
-    // Tidak dapat menandatangani atau memalsukan konten klinisi.
-    if (!(lama?.signedAt && sama(r.signedAt, lama.signedAt) && sama(r.signedBy, lama.signedBy) && sama(r.signedById, lama.signedById))) {
+    // Cap tanda tangan hanya tetap bila cap itu sendiri identik DAN isi klinis
+    // tidak berubah. Tanpa aturan kedua ini, pasien dapat mengubah anamnesis /
+    // diagnosis / plan sambil membawa signedById lama ke isi baru.
+    const capSama = Boolean(
+      lama?.signedAt &&
+      sama(r.signedAt, lama.signedAt) &&
+      sama(r.signedBy, lama.signedBy) &&
+      sama(r.signedById, lama.signedById)
+    )
+    if (!(capSama && isiKlinisTetapSama(lama, r))) {
       delete r.signedAt; delete r.signedBy; delete r.signedById
     }
     if (r.physicalExam && !(fisikLama.doctorVerified && sama(r.physicalExam.verifiedBy, fisikLama.verifiedBy))) {
