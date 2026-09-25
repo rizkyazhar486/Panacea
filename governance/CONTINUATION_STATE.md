@@ -13,7 +13,7 @@ completed_this_session:
 - evidence-backed clinician lab review rules + kernel age from capturedAt (c1e4018a, browser-verified)
 
 current_blocker:
-- none in code. Owner decisions: always-on backend or reliable external scheduler (risk.free_tier_server_sleep); real DB schema (risk.single_document_store) belongs to the engineering owner.
+- none in code. Owner: free tier only, no medication-reminder focus. Wake workflow now loops (free); verify run durations. Real DB schema (risk.single_document_store) belongs to the engineering owner.
 
 failing_checks:
 - none at 45300546

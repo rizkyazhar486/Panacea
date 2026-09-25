@@ -59,6 +59,8 @@ risks:
       times/day, so per-minute schedulers (reminders, rule engine) run only while someone is using the app.
     mitigation: >-
       Check-in reminder catches up within 6 h of its time (02772b82). Medication reminders intentionally do
-      not catch up (double-dose risk). Durable fix needs an owner decision: paid always-on instance or a
-      reliable external scheduler.
+      not catch up (double-dose risk). Owner decision 2026-09-25: free options only, medication reminders
+      are not a focus. Free fix: each wake-workflow run now loops a health ping every 9 minutes for up to
+      5h50m within 04:00-23:00 WIB (public repo => free Actions minutes), so a few successful cron starts a
+      day keep the server awake through waking hours. Verify with the next days' run durations.
     evidence: [.github/workflows/bangunkan-server.yml run history 2026-09-22..25, server/uji/pengingatCek.uji.ts]
