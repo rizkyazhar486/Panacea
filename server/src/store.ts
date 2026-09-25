@@ -116,6 +116,7 @@ interface DB {
   manualTopups?: ManualTopup[] // bank-transfer top-up requests awaiting owner approval
   applications?: Application[] // professional onboarding applications (doctor/writer/verifier)
   healthProfiles?: Record<string, Record<string, any>> // email -> health data blob (manual/wearable)
+  labLogs?: Record<string, { log: Record<string, { id: string; tanggal: string; nilai: number }[]>; diperbaruiPada: string }> // email -> riwayat lab pribadi
   healthWebhookTokens?: Record<string, string> // opaque token -> email, for Apple Health auto-export (Health Auto Export app)
   hrSeries?: Record<string, { t: number; bpm: number; lo?: number; hi?: number; kind: string }[]> // email -> heart-rate log
   sleepSeries?: Record<string, Record<string, any>[]> // email -> one entry per night, with stages
@@ -827,6 +828,15 @@ export function saveSettings(userId: string, prefs: Record<string, any>) {
 // Per-user health profile — an opaque JSON blob owned by the frontend
 // (demographics + wearable snapshot from manual/WHOOP/Apple Watch/etc.).
 // Keyed by user email so it follows the account across devices.
+export function getLabLog(email: string) {
+  return db.labLogs?.[email]
+}
+export function putLabLog(email: string, isi: { log: Record<string, { id: string; tanggal: string; nilai: number }[]>; diperbaruiPada: string }) {
+  if (!db.labLogs) db.labLogs = {}
+  db.labLogs[email] = isi
+  save()
+}
+
 export function getHealthProfile(email: string): Record<string, any> {
   if (!db.healthProfiles) db.healthProfiles = {}
   return db.healthProfiles[email] ?? {}

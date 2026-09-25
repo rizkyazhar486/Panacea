@@ -439,6 +439,9 @@ export const api = {
     req<{ post: BackendPost }>(`/api/posts/${id}/react`, { method: 'POST', body: JSON.stringify({ emoji }) }).then((r) => r.post),
   deletePost: (id: string) => req<{ ok: boolean }>(`/api/posts/${id}`, { method: 'DELETE' }),
   // Per-user health profile (manual / WHOOP / Apple Watch / other)
+  getLabLog: () => req<{ log: Record<string, { id: string; tanggal: string; nilai: number }[]>; diperbaruiPada: string | null }>('/api/lab-log'),
+  putLabLog: (log: Record<string, { id: string; tanggal: string; nilai: number }[]>, diperbaruiPada: string) =>
+    req<{ log: Record<string, { id: string; tanggal: string; nilai: number }[]>; diperbaruiPada: string }>('/api/lab-log', { method: 'PUT', body: JSON.stringify({ log, diperbaruiPada }) }),
   getHealthProfile: () => req<{ profile: Record<string, unknown> }>('/api/health-profile').then((r) => r.profile),
   saveHealthProfile: (profile: Record<string, unknown>) =>
     req<{ ok: boolean; profile: Record<string, unknown> }>('/api/health-profile', { method: 'PUT', body: JSON.stringify({ profile }) }).then((r) => r.profile),

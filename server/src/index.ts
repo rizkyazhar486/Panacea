@@ -45,6 +45,8 @@ import {
   getSettings,
   saveSettings,
   getHealthProfile,
+  getLabLog,
+  putLabLog,
   saveRingkasan,
   saveHealthProfile,
   recordDeviceHealthSync,
@@ -124,6 +126,7 @@ import { submitEmr } from './satusehat.js'
 import { createPayment, confirmPayment, paymentWebhook, orderStatus } from './payments.js'
 import { disburse, irisLive } from './iris.js'
 import { KATALOG, KATEGORI } from './healthMetrics.js'
+import { validasiLogLab, validasiCapWaktu, terimaTulisan } from './labLog.js'
 import { parseHealthWebhookPayload, extractHeartRateSeries, extractSleepSessions, newestSampleDate } from './healthWebhook.js'
 import { checkHrZoneAlert, checkBedtimeReminder, checkWorkoutReminder, suggestedBedtime, ZONES } from './healthAlerts.js'
 import { fetchLeagueScoreboard, fetchF1Info, fetchMotoGpInfo, LEAGUES, UNAVAILABLE } from './sports.js'
@@ -866,6 +869,27 @@ app.put('/api/health-profile', requireAuth, (req, res) => {
   }
   try {
     res.json({ ok: true, profile: saveHealthProfile(u.email, data as Record<string, unknown>) })
+  } catch (e) {
+    res.status(400).json({ error: (e as Error).message })
+  }
+})
+
+// Riwayat lab pribadi. Kepemilikan dari sesi terautentikasi saja (tanpa id di
+// jalur), validasi di server, dan tulisan lama ditolak (409) agar penghapusan
+// di perangkat lain tidak dihidupkan kembali. Lihat server/src/labLog.ts.
+app.get('/api/lab-log', requireAuth, (req, res) => {
+  const u = (req as express.Request & { user: User }).user
+  res.json(getLabLog(u.email) ?? { log: {}, diperbaruiPada: null })
+})
+app.put('/api/lab-log', requireAuth, (req, res) => {
+  const u = (req as express.Request & { user: User }).user
+  const body = req.body as { log?: unknown; diperbaruiPada?: unknown }
+  try {
+    const kini = new Date()
+    const baru = { log: validasiLogLab(body?.log, kini), diperbaruiPada: validasiCapWaktu(body?.diperbaruiPada, kini) }
+    const { diterima, hasil } = terimaTulisan(getLabLog(u.email), baru)
+    if (diterima) putLabLog(u.email, hasil)
+    res.status(diterima ? 200 : 409).json(hasil)
   } catch (e) {
     res.status(400).json({ error: (e as Error).message })
   }

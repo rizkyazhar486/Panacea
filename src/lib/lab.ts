@@ -112,9 +112,30 @@ export function ambilLab(): Simpanan {
   }
 }
 
+// Cap waktu perubahan lokal terakhir — dasar sinkronisasi "yang terakhir
+// menang" dengan server (lihat labSync.ts dan server/src/labLog.ts).
+export const KUNCI_DIPERBARUI = 'pmd_lab_diperbarui_v1'
+
+export function labDiperbaruiPada(): string | null {
+  try { return localStorage.getItem(KUNCI_DIPERBARUI) } catch { return null }
+}
+
+function tulis(s: Simpanan, cap: string) {
+  try {
+    localStorage.setItem(KUNCI, JSON.stringify(s))
+    localStorage.setItem(KUNCI_DIPERBARUI, cap)
+  } catch { /* kuota */ }
+}
+
 function simpan(s: Simpanan) {
-  try { localStorage.setItem(KUNCI, JSON.stringify(s)) } catch { /* kuota */ }
-  try { window.dispatchEvent(new Event('panacea:lab')) } catch { /* ignore */ }
+  tulis(s, new Date().toISOString())
+  try { window.dispatchEvent(new CustomEvent('panacea:lab', { detail: { asal: 'lokal' } })) } catch { /* ignore */ }
+}
+
+/** Ganti seluruh log dengan salinan server; tidak dianggap perubahan lokal. */
+export function gantiDariServer(s: Simpanan, cap: string): void {
+  tulis(s, cap)
+  try { window.dispatchEvent(new CustomEvent('panacea:lab', { detail: { asal: 'server' } })) } catch { /* ignore */ }
 }
 
 export function tambahLab(jenis: string, tanggal: string, nilai: number): void {

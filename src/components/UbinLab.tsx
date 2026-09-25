@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { JENIS_LAB, ambilLab, tambahLab, hapusLab, umurHari, periksaMasukanLab, type ButirLab, type JenisLab } from '../lib/lab'
+import { pasangSinkronLab, dengarSinkronLab, statusSinkronLab, type StatusSinkronLab } from '../lib/labSync'
 import { analisisTrenLab, type StatusTren } from '../lib/labTrend'
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -95,6 +96,9 @@ export function UbinLab() {
   const [tanggal, setTanggal] = useState(tanggalHariIni)
   const [pilih, setPilih] = useState<string | null>(null)
 
+  const [sinkron, setSinkron] = useState<StatusSinkronLab>(statusSinkronLab)
+  useEffect(() => { pasangSinkronLab(); return dengarSinkronLab(setSinkron) }, [])
+
   useEffect(() => {
     const on = () => setVersi((v) => v + 1)
     window.addEventListener('panacea:lab', on)
@@ -131,7 +135,12 @@ export function UbinLab() {
   return (
     <section>
       <div className="mb-2 flex items-baseline justify-between gap-2">
-        <h2 className="t-kecil font-black uppercase tracking-wide text-neutral-500">Lab results</h2>
+        <h2 className="t-kecil font-black uppercase tracking-wide text-neutral-500">
+          Lab results
+          <span data-lab-sync={sinkron} className="ml-2 font-bold normal-case tracking-normal text-neutral-400">
+            {{ lokal: '· this device only', menyinkron: '· syncing…', tersinkron: '· saved to your account', gagal: '· not synced yet — kept on this device' }[sinkron]}
+          </span>
+        </h2>
         <button onClick={() => setBuka((v) => !v)} className="t-kecil flex min-h-[40px] items-center font-bold text-brand">
           {buka ? 'Close' : '+ Add'}
         </button>
