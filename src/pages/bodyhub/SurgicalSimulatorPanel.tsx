@@ -67,7 +67,7 @@ export function SurgicalSimulatorPanel({ onSorot, onKedalaman }: SurgicalSimulat
   }
 
   return (
-    <section className="overflow-hidden rounded-2xl border border-cyan-300/15 bg-[#02070b] text-white">
+    <section className="dark overflow-hidden rounded-2xl border border-cyan-300/15 bg-[#02070b] text-white">
       <div className="border-b border-white/10 bg-[radial-gradient(circle_at_15%_0%,rgba(34,211,238,.16),transparent_35%),radial-gradient(circle_at_85%_0%,rgba(139,92,246,.12),transparent_30%)] p-4">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div>

@@ -53,7 +53,7 @@ function MicroScene({ node }: { node: ScaleNode }) {
   const molecules = node.scale === 'molecule'
   const cell = node.scale === 'cell' || node.scale === 'organelle'
   return (
-    <div className="relative flex min-h-[520px] items-center justify-center overflow-hidden rounded-2xl bg-[#050b13] p-8 text-white">
+    <div className="dark relative flex min-h-[520px] items-center justify-center overflow-hidden rounded-2xl bg-[#050b13] p-8 text-white">
       <div className="absolute inset-0 opacity-30" style={{ backgroundImage: 'radial-gradient(circle at 1px 1px, rgba(255,255,255,.22) 1px, transparent 0)', backgroundSize: '24px 24px' }} />
       {molecules ? (
         <div className="relative z-10 w-full max-w-xl">
@@ -155,7 +155,7 @@ export function DigitalTwinEngine() {
 
   return (
     <div className="space-y-4 pb-10">
-      <header className="overflow-hidden rounded-3xl border border-emerald-300/20 bg-[#061019] p-5 text-white shadow-xl">
+      <header className="dark overflow-hidden rounded-3xl border border-emerald-300/20 bg-[#061019] p-5 text-white shadow-xl">
         <div className="flex flex-col gap-5 xl:flex-row xl:items-end xl:justify-between">
           <div className="max-w-4xl">
             <div className="text-[11px] font-black uppercase tracking-[0.25em] text-emerald-300">PanaceaMed · Interactive Human Digital Twin</div>

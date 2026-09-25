@@ -101,7 +101,7 @@ export function HomeLiveWidgetRail() {
             <Link
               key={signal.key}
               to={signal.to}
-              className="group relative min-h-[148px] w-[148px] shrink-0 snap-start overflow-hidden rounded-[22px] border border-[#00BF63]/35 bg-black p-3 text-white shadow-[inset_0_1px_0_rgba(255,255,255,.06)] transition active:scale-[.97]"
+              className="dark group relative min-h-[148px] w-[148px] shrink-0 snap-start overflow-hidden rounded-[22px] border border-[#00BF63]/35 bg-black p-3 text-white shadow-[inset_0_1px_0_rgba(255,255,255,.06)] transition active:scale-[.97]"
             >
               <div className="flex items-start justify-between gap-2">
                 <span className="text-[9px] font-black uppercase tracking-[.13em] text-[#00BF63]">{signal.label}</span>

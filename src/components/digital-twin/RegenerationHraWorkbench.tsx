@@ -137,7 +137,7 @@ export function RegenerationHraWorkbench() {
             </div>
           </section>
 
-          <section className="rounded-[26px] border border-neutral-200 bg-[#071019] p-4 text-white sm:p-5 dark:border-white/10">
+          <section className="dark rounded-[26px] border border-neutral-200 bg-[#071019] p-4 text-white sm:p-5 dark:border-white/10">
             <div className="text-[9px] font-black uppercase tracking-[.16em] text-cyan-300">Mechanism chain</div>
             <div className="mt-3 flex flex-wrap items-center gap-2">
               {hypothesis.mechanismSteps.map((item, index) => <div key={item} className="flex items-center gap-2"><span className="rounded-full border border-white/10 bg-white/[.05] px-3 py-2 text-[9px] font-bold text-white/75">{item}</span>{index < hypothesis.mechanismSteps.length - 1 && <span className="text-cyan-300">→</span>}</div>)}

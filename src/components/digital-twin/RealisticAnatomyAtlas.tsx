@@ -562,7 +562,7 @@ export function RealisticAnatomyAtlas() {
 
   return (
     <div className="space-y-4 pb-8">
-      <header className="overflow-hidden rounded-3xl border border-white/10 bg-[#070b10] p-5 text-white shadow-xl">
+      <header className="dark overflow-hidden rounded-3xl border border-white/10 bg-[#070b10] p-5 text-white shadow-xl">
         <div className="flex flex-col gap-4 xl:flex-row xl:items-end xl:justify-between">
           <div className="max-w-4xl">
             <div className="text-[11px] font-black uppercase tracking-[0.24em] text-cyan-300">PanaceaMed · Realistic Anatomy Atlas</div>

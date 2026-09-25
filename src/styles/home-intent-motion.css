@@ -102,3 +102,15 @@
     transition: none !important;
   }
 }
+
+/* Baris alat harian: tiga kolom, jarak yang sama dengan pahlawan. */
+.panacea-essential-tools {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  margin-top: 7px;
+}
+.panacea-essential-tools .panacea-intent-action {
+  flex-direction: column;
+  justify-content: center;
+  gap: 4px;
+  text-align: center;
+}
