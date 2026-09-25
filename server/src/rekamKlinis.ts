@@ -32,6 +32,18 @@ function isiKlinisTetapSama(lama: any, baru: any) {
   return sama(tanpaPersetujuanPasien(lama), tanpaPersetujuanPasien(baru))
 }
 
+function tanpaCapVerifikasiFisik(value: any) {
+  const copy = structuredClone(value ?? {})
+  delete copy.doctorVerified
+  delete copy.verifiedBy
+  delete copy.verifiedById
+  return copy
+}
+
+function isiFisikTetapSama(lama: any, baru: any) {
+  return sama(tanpaCapVerifikasiFisik(lama), tanpaCapVerifikasiFisik(baru))
+}
+
 export function terapkanSimpanRekam(lama: any | undefined, baru: any, penulis: Penulis, kini: Date): { rekam: any; arsip?: any } {
   const r = structuredClone(baru ?? {})
   const fisikLama = lama?.physicalExam ?? {}
@@ -48,8 +60,18 @@ export function terapkanSimpanRekam(lama: any | undefined, baru: any, penulis: P
     if (!(capSama && isiKlinisTetapSama(lama, r))) {
       delete r.signedAt; delete r.signedBy; delete r.signedById
     }
-    if (r.physicalExam && !(fisikLama.doctorVerified && sama(r.physicalExam.verifiedBy, fisikLama.verifiedBy))) {
-      r.physicalExam.doctorVerified = false; delete r.physicalExam.verifiedBy; delete r.physicalExam.verifiedById
+    if (r.physicalExam) {
+      const capFisikSama = Boolean(
+        fisikLama.doctorVerified &&
+        r.physicalExam.doctorVerified &&
+        sama(r.physicalExam.verifiedBy, fisikLama.verifiedBy) &&
+        sama(r.physicalExam.verifiedById, fisikLama.verifiedById)
+      )
+      if (!(capFisikSama && isiFisikTetapSama(fisikLama, r.physicalExam))) {
+        r.physicalExam.doctorVerified = false
+        delete r.physicalExam.verifiedBy
+        delete r.physicalExam.verifiedById
+      }
     }
     if (r.primaryDiagnosis?.source === 'Dokter' && !sama(r.primaryDiagnosis, lama?.primaryDiagnosis)) r.primaryDiagnosis.source = 'AI'
   } else {
