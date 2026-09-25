@@ -1,4 +1,4 @@
-import { productSpaceForRoute, routePathOnly, type ProductSpaceId } from './productSpaces'
+import { getProductSpace, productSpaceForRoute, routePathOnly, type ProductSpaceId } from './productSpaces'
 
 export type SuperPageId = 'body' | 'clinical' | 'for-you'
 
@@ -48,4 +48,32 @@ export function getSuperPage(id: SuperPageId): SuperPageDefinition {
 
 export function superPageEntryForRoute(to: string, group = ''): string {
   return getSuperPage(superPageForRoute(to, group)).to
+}
+
+
+/**
+ * Satu baris lokasi yang memakai taksonomi yang SUDAH ada, bukan membuat
+ * breadcrumb taxonomy baru. Contoh: Your Body › Move › Training.
+ *
+ * Label yang sama dibuang bila route-level title sudah identik dengan
+ * super-page atau product space (mis. /fitness-hub = Your Body › Move),
+ * sehingga bilah ponsel tetap padat.
+ */
+export function navigationHierarchyForRoute(
+  to: string,
+  group = '',
+  pageTitle = '',
+): string[] {
+  const superPage = getSuperPage(superPageForRoute(to, group))
+  const productSpace = getProductSpace(productSpaceForRoute(to, group))
+  const labels = [superPage.label, productSpace.shortLabel, pageTitle.trim()]
+  const seen = new Set<string>()
+
+  return labels.filter((label) => {
+    if (!label) return false
+    const key = label.toLocaleLowerCase()
+    if (seen.has(key)) return false
+    seen.add(key)
+    return true
+  })
 }

@@ -60,7 +60,7 @@ import type { Role } from '../lib/types'
 import { ambilTersembunyi, saring, langgananFitur } from '../lib/fiturTersembunyi'
 import { autoIsiDariPerangkat } from '../lib/autoIsi'
 import { useCommandBar } from './useCommandBar'
-import { SUPER_PAGES } from '../lib/superPages'
+import { SUPER_PAGES, navigationHierarchyForRoute } from '../lib/superPages'
 import { judulRute } from '../lib/judulRute'
 import '../styles/command-bar.css'
 import '../styles/superpage-convergence.css'
@@ -435,6 +435,10 @@ export function Shell({ children }: { children: ReactNode }) {
   if (!account) return <PublicEntry />
   const items = saring(nav.filter((n) => n.roles.includes(account.role)), tersembunyi)
   const judul = judulRute(loc.pathname, items, [...nav, ...KATALOG], navMatches)
+  const ruteAktif = [...nav, ...KATALOG].find((n) => navMatches(n, loc.pathname))
+  const judulBilah = loc.pathname === '/'
+    ? judul
+    : navigationHierarchyForRoute(loc.pathname, ruteAktif?.group ?? '', judul).join(' › ')
   // Only doctors switch between patients; patients see their own data only.
   const showPatient = PATIENT_PAGES.includes(loc.pathname) && account.role === 'dokter'
   const doLogout = () => { if (backendEnabled) api.logout().catch(() => {}); logout() }
@@ -495,7 +499,12 @@ export function Shell({ children }: { children: ReactNode }) {
                 </svg>
               </button>
             )}
-            <h1 className="truncate text-base font-bold sm:text-lg">{judul}</h1>
+            <h1
+              className="min-w-0 truncate text-[13px] font-bold sm:text-base"
+              title={judulBilah}
+            >
+              {judulBilah}
+            </h1>
           </div>
 
           {spacesOpen && (
