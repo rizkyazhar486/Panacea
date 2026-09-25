@@ -37,3 +37,28 @@ risks:
     description: Future models may restart from incomplete context and duplicate or contradict prior architecture.
     mitigation: Root agent contract plus human-readable architecture plus machine-readable registries and autonomous R&D loop.
     evidence: [PANACEA_PRODUCT_MATURITY_OS.md, governance/FEATURE_REGISTRY.yaml]
+
+  - risk_id: risk.single_document_store
+    category: data_integrity
+    severity: high
+    state: mitigated_partially
+    description: All server state is one data.json / one MongoDB document (16 MB BSON limit), rewritten on every save; growth or a failed write can lose data.
+    mitigation: >-
+      2026-09-25: atomic file writes, corrupt file preserved not overwritten, MongoDB save failures and
+      near-limit size surfaced in /api/health (penyimpananSehat), flush on SIGTERM, capped clinical/audit
+      records archived append-only (arsip_<name>) instead of deleted. Remaining: real schema with
+      per-record collections/tables and migrations (engineering owner).
+    evidence: [server/src/simpanAman.ts, server/uji/simpanAman.uji.ts, server/uji/arsipKlinis.uji.ts, production /api/health 2026-09-25 penyimpanan=mongo penyimpananSehat=true]
+
+  - risk_id: risk.free_tier_server_sleep
+    category: reliability
+    severity: medium
+    state: open
+    description: >-
+      Backend runs on Render free tier and sleeps when idle; the 10-minute wake cron actually fires ~3-5
+      times/day, so per-minute schedulers (reminders, rule engine) run only while someone is using the app.
+    mitigation: >-
+      Check-in reminder catches up within 6 h of its time (02772b82). Medication reminders intentionally do
+      not catch up (double-dose risk). Durable fix needs an owner decision: paid always-on instance or a
+      reliable external scheduler.
+    evidence: [.github/workflows/bangunkan-server.yml run history 2026-09-22..25, server/uji/pengingatCek.uji.ts]
