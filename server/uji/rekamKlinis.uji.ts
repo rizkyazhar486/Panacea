@@ -19,7 +19,14 @@ assert.deepEqual([tt.physicalExam.verifiedBy, tt.physicalExam.verifiedById], ['D
 const draf = terapkanSimpanRekam(tt, { ...dasar, anamnesis: { keluhan: 'baru' } }, pasien, kini)
 assert.ok(draf.arsip && draf.arsip.signedBy === 'Dr. Asli', 'versi bertanda tangan hilang saat ditimpa')
 assert.equal(draf.rekam.signedBy, undefined)
-// Pasien menyimpan ulang rekam bertanda tangan tanpa mengubah tanda tangan (mis. persetujuan) → tanda tangan tetap.
+// Pasien TIDAK boleh mengubah isi klinis sambil mempertahankan cap tanda tangan lama.
+const ubahIsi = terapkanSimpanRekam(tt, { ...tt, anamnesis: { keluhan: 'diubah pasien setelah ditandatangani' } }, pasien, kini)
+assert.equal(ubahIsi.rekam.signedBy, undefined, 'isi yang diubah pasien masih terlihat ditandatangani dokter')
+assert.equal(ubahIsi.rekam.signedById, undefined, 'identitas penanda tangan lama melekat pada isi baru')
+assert.equal(ubahIsi.rekam.signedAt, undefined, 'waktu tanda tangan lama melekat pada isi baru')
+assert.ok(ubahIsi.arsip?.signedBy === 'Dr. Asli', 'versi klinis bertanda tangan lama harus tetap diarsipkan')
+
+// Pasien menyimpan ulang rekam bertanda tangan untuk consent pasien saja → tanda tangan klinis tetap.
 const setuju = terapkanSimpanRekam(tt, { ...tt, surgery: { consent: { given: true } } }, pasien, kini)
 assert.equal(setuju.rekam.signedBy, 'Dr. Asli'); assert.ok(setuju.arsip, 'perubahan pada rekam bertanda tangan tidak diarsipkan')
 // Simpan identik tidak mengarsipkan.
