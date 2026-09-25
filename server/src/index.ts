@@ -965,7 +965,7 @@ app.get('/api/clinician/lab-shares/:id/fhir', requireAuth, (req, res) => {
   if (!izinBerlaku(izin, u.email, kini)) { res.status(404).json({ error: 'no active access' }); return }
   const pasien = getUserByEmail(izin.pasienEmail)
   addLabAudit({ waktu: kini.toISOString(), pasienEmail: izin.pasienEmail, aktor: u.email, aksi: 'dibaca-dokter', izinId: izin.id })
-  res.json({ pasien: pasien?.name ?? 'Patient', berakhir: izin.berakhir, reviews: listLabReviews(izin.pasienEmail).filter((t) => t.dokterEmail === u.email), bundle: logKeBundelFhir(getLabLog(izin.pasienEmail)?.log ?? {}, `Patient/${pasien?.id ?? 'unknown'}`, kini.toISOString()) })
+  res.json({ pasien: pasien?.name ?? 'Patient', dibuat: izin.dibuat, berakhir: izin.berakhir, reviews: listLabReviews(izin.pasienEmail).filter((t) => t.dokterEmail === u.email), bundle: logKeBundelFhir(getLabLog(izin.pasienEmail)?.log ?? {}, `Patient/${pasien?.id ?? 'unknown'}`, kini.toISOString()) })
 })
 
 // Tinjauan klinisi atas hasil lab yang dibagikan: dokter terverifikasi, izin

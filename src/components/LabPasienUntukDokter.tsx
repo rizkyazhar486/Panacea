@@ -1,6 +1,9 @@
 import { useEffect, useState } from 'react'
 import { api, backendEnabled, type FhirBundelLab, type FhirObservasiLab, type TinjauanLabKlien } from '../lib/api'
 import { RencanaHarianDokter } from './RencanaHarianDokter'
+import { statusPasienUntukDokter } from '../lib/statusPasienDokter'
+import { timelineHarian, angka } from '../lib/perubahanLongitudinal'
+import type { ContinuousCarePlan, DailyAnamnesisSubmissionInput } from '../lib/continuousCareOperatingSystem'
 import { analisisTrenSeri, MIN_RIWAYAT_GARIS_DASAR, type StatusTren } from '../lib/labTrend'
 
 // Bahasa klinisi untuk mesin tren yang sama dengan sisi pasien (labTrend.ts):
@@ -60,7 +63,9 @@ function Garis({ obs }: { obs: FhirObservasiLab[] }) {
 // Angkanya disalin pasien dari lembar hasil — ditandai jelas, bukan dari lab.
 export function LabPasienUntukDokter() {
   const [daftar, setDaftar] = useState<{ id: string; berakhir: string; pasien: string }[] | null>(null)
-  const [buka, setBuka] = useState<{ izinId: string; pasien: string; reviews: TinjauanLabKlien[]; bundle: FhirBundelLab } | null>(null)
+  const [buka, setBuka] = useState<{ izinId: string; pasien: string; dibuat: string; berakhir: string; reviews: TinjauanLabKlien[]; bundle: FhirBundelLab } | null>(null)
+  const [care, setCare] = useState<{ plan: ContinuousCarePlan | null; reports: DailyAnamnesisSubmissionInput[] }>({ plan: null, reports: [] })
+  useEffect(() => { if (buka) api.clinicianCare(buka.izinId).then(setCare).catch(() => setCare({ plan: null, reports: [] })) }, [buka?.izinId, buka?.reviews.length])
   const [galat, setGalat] = useState<string | null>(null)
   useEffect(() => { if (backendEnabled) api.clinicianLabShares().then((r) => setDaftar(r.shares)).catch((e) => setGalat((e as Error).message)) }, [])
   if (!backendEnabled) return null
@@ -124,6 +129,30 @@ export function LabPasienUntukDokter() {
           </ul>
           <p className="mt-1 text-[10px] leading-snug text-white/40">Compared with this patient's own earlier results (median ± 2 MAD) — a monitoring signal, not an interpretation.</p>
           {kelompok.size === 0 && <p className="mt-1 text-[11px] text-white/55">This patient has no lab results yet.</p>}
+          {(() => {
+            // Status kanonik yang sama dengan sisi pasien, disusun dari sumber server.
+            const { state, labels } = statusPasienUntukDokter(buka.bundle.entry as never, care, buka.reviews, buka, new Date().toISOString())
+            const hari = timelineHarian(state, 30, labels, 'dokter')
+            if (!hari.length) return null
+            return (
+              <details className="mt-3 border-t border-white/10 pt-2" data-clinician-timeline>
+                <summary className="cursor-pointer text-[12px] font-black">Timeline · {hari.length} day{hari.length > 1 ? 's' : ''}</summary>
+                <ol className="mt-1 space-y-1.5">
+                  {hari.map((h) => (
+                    <li key={h.tanggal}>
+                      <p className="text-[10px] font-black uppercase tracking-wide text-white/40">{h.tanggal}</p>
+                      {h.butir.map((b) => (
+                        <p key={b.id} className="flex justify-between gap-3 text-[11px]">
+                          <span className="min-w-0 truncate">{b.label} <span className="text-white/40">· {b.asal}</span></span>
+                          <span className="shrink-0 font-bold tabular-nums">{typeof b.value === 'number' ? angka(b.value) : b.value} <span className="font-normal text-white/40">{b.unit}</span></span>
+                        </p>
+                      ))}
+                    </li>
+                  ))}
+                </ol>
+              </details>
+            )
+          })()}
           <RencanaHarianDokter izinId={buka.izinId} />
         </div>
       )}
