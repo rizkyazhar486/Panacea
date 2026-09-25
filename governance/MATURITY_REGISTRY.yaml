@@ -1,0 +1,61 @@
+schema_version: 1
+status: living_source_of_truth
+model:
+  lifecycle: [DISCOVERED, MAPPED, CONNECTED, FUNCTIONAL, VALIDATED, MATURE, PRODUCTION_READY, OPTIMIZED]
+  formula: "M = 0.20F + 0.15I + 0.15R + 0.15U + 0.15C + 0.10S + 0.10O"
+  warning: "Heuristic only. Unknown dimensions stay unknown. Clinical validation is tracked separately."
+
+workflows:
+  - workflow_id: longitudinal.lab_to_trajectory
+    name: Lab result to personal baseline/trend to longitudinal trajectory
+    strategic_priority: highest_current_lane
+    maturity_level: UNKNOWN
+    clinical_validation: unknown
+    dimensions:
+      functional_completeness: unknown
+      integration: unknown
+      reliability: unknown
+      usability: unknown
+      clinical_quality: unknown
+      safety_security: unknown
+      observability_testing: unknown
+    acceptance_evidence: []
+    known_gaps: [requires_current_main_audit]
+    next_action: audit_end_to_end_current_main
+    last_audited_commit: null
+
+  - workflow_id: clinical.patient_review
+    name: Longitudinal patient review to clinician-supported next action
+    strategic_priority: core
+    maturity_level: UNKNOWN
+    clinical_validation: unknown
+    dimensions:
+      functional_completeness: unknown
+      integration: unknown
+      reliability: unknown
+      usability: unknown
+      clinical_quality: unknown
+      safety_security: unknown
+      observability_testing: unknown
+    acceptance_evidence: []
+    known_gaps: [requires_current_main_audit]
+    next_action: audit_ai_emr_patient_state_reasoning_review_followup
+    last_audited_commit: null
+
+  - workflow_id: body.spatial_clinical_context
+    name: Patient or educational context to spatial Body Exposure projection
+    strategic_priority: core
+    maturity_level: UNKNOWN
+    clinical_validation: not_applicable
+    dimensions:
+      functional_completeness: unknown
+      integration: unknown
+      reliability: unknown
+      usability: unknown
+      clinical_quality: unknown
+      safety_security: unknown
+      observability_testing: unknown
+    acceptance_evidence: []
+    known_gaps: [requires_current_main_audit]
+    next_action: audit_unified_body_projector_and_clinical_bridge
+    last_audited_commit: null
