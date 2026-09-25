@@ -1,5 +1,6 @@
 import { useCallback, useRef, useState } from 'react'
 import { lapisanAwalCt, lapisanAwalRelatif, type LapisanVolume } from '../../lib/lapisanVolume'
+import { buatResep, bacaResep, cocokkanResep, sha256Hex, BATAS_RESEP } from '../../lib/resepRender'
 import { bacaDicom, urutkanSeri, type Citra } from '../../lib/dicom'
 import { buatVolumeMpr } from '../../lib/dicomMpr'
 import {
@@ -14,7 +15,7 @@ type Keadaan =
   | { tahap: 'kosong' }
   | { tahap: 'membaca'; jumlah: number }
   | { tahap: 'gagal'; alasan: string }
-  | { tahap: 'siap'; tekstur: VolumeTekstur; jumlah: number; modalitas: string; ditolak: string[] }
+  | { tahap: 'siap'; tekstur: VolumeTekstur; jumlah: number; modalitas: string; ditolak: string[]; sha256: string[]; seriesUid?: string }
 
 function GeserHu({ label, nilai, min, maks, onUbah }: {
   label: string; nilai: number; min: number; maks: number; onUbah: (n: number) => void
@@ -61,6 +62,8 @@ export function VolumeDicomBagian() {
   const [potong, setPotong] = useState<PotongVolume>([1, 1, 1])
   const [lapisan, setLapisan] = useState<LapisanVolume[]>([])
   const [halus, setHalus] = useState(1.5)
+  const [pesanResep, setPesanResep] = useState<{ nada: 'ok' | 'peringatan'; teks: string } | null>(null)
+  const resepRef = useRef<HTMLInputElement | null>(null)
   const masukanRef = useRef<HTMLInputElement | null>(null)
 
   const ubahPotong = (sumbu: 0 | 1 | 2, nilai: number) => {
@@ -73,10 +76,12 @@ export function VolumeDicomBagian() {
 
     const citra: Citra[] = []
     const ditolak: string[] = []
+    const sidik: string[] = []
     for (const f of Array.from(berkas)) {
       try {
-        const hasil = bacaDicom(await f.arrayBuffer())
-        if (hasil.ok) citra.push(hasil.data)
+        const buf = await f.arrayBuffer()
+        const hasil = bacaDicom(buf)
+        if (hasil.ok) { citra.push(hasil.data); sidik.push(await sha256Hex(buf)) }
         else ditolak.push(`${f.name}: ${hasil.alasan}`)
       } catch {
         ditolak.push(`${f.name}: could not be read`)
@@ -108,8 +113,9 @@ export function VolumeDicomBagian() {
     setLapisan(citra[0].modalitas === 'CT' ? lapisanAwalCt() : lapisanAwalRelatif(jendela))
     setKeadaan({
       tahap: 'siap', tekstur: tekstur.tekstur, jumlah: citra.length,
-      modalitas: citra[0].modalitas, ditolak,
+      modalitas: citra[0].modalitas, ditolak, sha256: sidik, seriesUid: citra[0].seriesInstanceUid,
     })
+    setPesanResep(null)
   }, [])
 
   return (
@@ -143,6 +149,43 @@ export function VolumeDicomBagian() {
           <p className="mb-2.5 text-[11px] leading-relaxed text-neutral-600 dark:text-neutral-300">{MODE_RENDER.find((m) => m.id === mode)?.catatan}</p>
 
           <VolumeDicom3D tekstur={keadaan.tekstur} mode={mode} pajanan={pajanan} ambangBawah={bawah} ambangAtas={atas} kepekatan={kepekatan} potong={potong} lapisan={lapisan} halus={halus} />
+
+          <div className="mt-2 flex flex-wrap items-center gap-2" data-render-recipe>
+            <span className="text-[10px] font-black uppercase tracking-[.12em] text-neutral-500">Reproduce</span>
+            <button type="button" className="min-h-11 rounded-lg border border-neutral-300/70 px-3 text-[11px] font-black dark:border-white/15"
+              onClick={() => {
+                const t = keadaan.tekstur
+                const resep = buatResep(
+                  { jumlahBerkas: keadaan.sha256.length, sha256: keadaan.sha256, modalitas: keadaan.modalitas, voxel: [t.lebar, t.tinggi, t.dalam], fisikMm: t.fisikMm },
+                  { mode, ambangBawah: bawah, ambangAtas: atas, kepekatan, pajanan, potong, halus, lapisan },
+                  new Date(),
+                )
+                const url = URL.createObjectURL(new Blob([JSON.stringify(resep, null, 2)], { type: 'application/json' }))
+                const a = document.createElement('a'); a.href = url; a.download = `panacea-volume-recipe-${resep.dibuat.slice(0, 10)}.json`; a.click()
+                setTimeout(() => URL.revokeObjectURL(url), 1000)
+                setPesanResep({ nada: 'ok', teks: `Recipe saved: ${resep.data.jumlahBerkas} file fingerprints and every render setting. No pixels or patient tags are included.` })
+              }}>Save recipe</button>
+            <button type="button" className="min-h-11 rounded-lg border border-neutral-300/70 px-3 text-[11px] font-black dark:border-white/15" onClick={() => resepRef.current?.click()}>Load recipe</button>
+            <input ref={resepRef} type="file" accept="application/json,.json" className="sr-only" aria-label="Render recipe to load"
+              onChange={async (e) => {
+                const f = e.target.files?.[0]; e.target.value = ''
+                if (!f) return
+                try {
+                  const r = bacaResep(JSON.parse(await f.text()))
+                  const p = r.parameter
+                  setMode(p.mode); setBawah(p.ambangBawah); setAtas(p.ambangAtas); setKepekatan(p.kepekatan)
+                  setPajanan(p.pajanan); setPotong(p.potong); setHalus(p.halus); if (p.lapisan.length) setLapisan(p.lapisan)
+                  const c = cocokkanResep(r, { sha256: keadaan.sha256, seriesUid: keadaan.seriesUid })
+                  setPesanResep(c.status === 'identik'
+                    ? { nada: 'ok', teks: 'Same files, same renderer version: this view reproduces the recipe.' }
+                    : { nada: 'peringatan', teks: `Settings applied, but this is NOT a reproduction — ${c.alasan.join('; ')}.` })
+                } catch (err) {
+                  setPesanResep({ nada: 'peringatan', teks: `Recipe not loaded: ${(err as Error).message}.` })
+                }
+              }} />
+          </div>
+          {pesanResep && <p role="status" data-recipe-status={pesanResep.nada} className={`mt-1 text-[11px] leading-snug ${pesanResep.nada === 'ok' ? 'text-emerald-700 dark:text-emerald-300' : 'font-bold text-amber-700 dark:text-amber-300'}`}>{pesanResep.teks}</p>}
+          <p className="mt-0.5 text-[10px] text-neutral-500">{BATAS_RESEP}</p>
 
           <div className="mt-2.5 rounded-xl border border-neutral-200/70 bg-neutral-50/70 p-2.5 dark:border-white/10 dark:bg-white/[.025]">
             <div className="flex items-center justify-between gap-3">
