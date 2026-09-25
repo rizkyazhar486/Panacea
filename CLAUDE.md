@@ -856,3 +856,22 @@ The runtime must converge on one shared architecture:
 8. source provenance, evidence boundary, academic review and clear educational-vs-clinical labeling.
 
 Do not call a generic animation, static layer list or scripted slideshow a surgical simulator. A mature module should allow the learner to act on a stateful environment and receive objective state/telemetry feedback. At the same time, do not invent operative geometry or claim physical realism before validation. The current lightweight runtime is a scaffold; the continuation target is high-fidelity validated simulation built on the same contracts.
+
+
+## Maturation phase directive — 2026-09-25 (owner)
+
+Panaceamed = **Healthcare Infrastructure + Clinical Intelligence Layer + Human Longitudinal Model + Body Exposure + Human-in-the-loop AI.**
+
+Once the end-to-end operating-system architecture is in place, the default is **depth, not breadth**. Every prompt and work unit should aim at one or more of:
+- maturing, specializing, and raising confidence in existing capabilities;
+- optimizing workflow and use-case fit across all flows;
+- technical maturity, interoperability and infrastructure: a real **server-side healthcare data architecture with a FHIR R4 layer** (verified LOINC/UCUM only, provenance, consent, audit), not browser-only state;
+- clinical validation and safety evidence: **prospective clinician validation** plus software QA. Software gates alone never count as clinical proof;
+- execution feasibility at the current scope (one founder plus AI; weekends for development).
+
+Priorities:
+1. **One extremely strong real-world workflow with measurable benefit.** The current lane is lab result → personal baseline/trend → biological-age trajectory, synced to the account. Carry it to FHIR Observation, clinician view with patient consent and audit, and a measurable outcome definition before widening.
+2. **Body Exposure and longitudinal intelligence must be genuinely useful**, not just impressive visualization. Tie visuals to the person's own data and to a decision they support.
+3. Convert the unusual breadth into clinical proof, interoperability and production-grade depth. Do not add breadth indefinitely: a new surface needs a named user, a problem, and a way to measure benefit.
+
+Existing capability stays; secondary surfaces are grouped or hidden rather than deleted. Report "technically works", "clinically reviewed" and "clinically validated" as separate states, and never claim the latter two without real evidence.
