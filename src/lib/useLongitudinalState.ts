@@ -76,8 +76,12 @@ export function useLongitudinalState(): { state: LongitudinalPatientState | null
     // longitudinal. Draft lokal yang baru menekan tombol Sign tidak punya
     // signedById server, sehingga gagal tertutup sampai sinkron berhasil.
     if (account.role === 'pasien') {
-      const record = (server.records[subjectId] ?? Object.values(server.records).find((item) => item.patientId === subjectId)) as ServerAcceptedEmrRecord | undefined
-      if (record) {
+      // /api/clinical sudah fail-closed ke self-record akun pasien di server
+      // (saringKlinis + bolehAksesPasien). Karena account.patientId lokal lama
+      // belum memakai id self-* server, jangan mencocokkan dua namespace itu
+      // dengan string. Semua record yang lolos endpoint pasien adalah milik
+      // akun ini dan diproyeksikan ke subjectId kanonik lokal yang sama.
+      for (const record of Object.values(server.records) as ServerAcceptedEmrRecord[]) {
         const emr = emrRecordToLongitudinalEvents(record, subjectId, consent, kini)
         skipped += emr.skipped
         for (const ev of emr.events) {
