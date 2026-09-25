@@ -856,3 +856,39 @@ The runtime must converge on one shared architecture:
 8. source provenance, evidence boundary, academic review and clear educational-vs-clinical labeling.
 
 Do not call a generic animation, static layer list or scripted slideshow a surgical simulator. A mature module should allow the learner to act on a stateful environment and receive objective state/telemetry feedback. At the same time, do not invent operative geometry or claim physical realism before validation. The current lightweight runtime is a scaffold; the continuation target is high-fidelity validated simulation built on the same contracts.
+
+
+## Medical Device Fabric non-scalar event envelope — 2026-09-25
+
+Implementation-sequence step 2 from the Medical Device Fabric continuation ledger above is now landed: a canonical non-scalar device-event envelope, additive to the existing scalar path.
+
+Canonical files:
+- `src/lib/medicalDeviceEventEnvelope.ts`
+- `scripts/qa/medical-device-event-envelope.test.mjs` (wired into `npm run build` and into `npm run test:medical-device-event-envelope`)
+- `DOCS/MEDICAL-DEVICE-FABRIC.md` updated to mark step 2 landed and step 3 partially landed.
+
+What it does:
+- defines a discriminated `MedicalDeviceEvent` union for the seven non-scalar shapes the catalog already declares: `waveform`, `alarm`, `setting`, `therapy-delivery`, `image-reference`, `report-reference`, `device-status`;
+- every event carries identity (`eventId`, `visitId`, `subjectId`, `deviceId`, `profileId`), a declared `transport`, `capturedAt`/`receivedAt`, a `sequence` and a `truthClass` (`measured` | `derived` | `relayed`);
+- `validateMedicalDeviceEvent()` fails closed when: the `profileId` does not resolve in `MEDICAL_DEVICE_INTEGRATION_CATALOG`, the profile's declared `dataShapes` do not cover the event's kind, the `transport` is not one of that profile's declared preferred/fallback standards, `receivedAt` precedes `capturedAt`, or any kind-specific field is missing/out of range (e.g. empty waveform sample batch, out-of-range `signalQuality`, negative therapy `amount`, out-of-range `batteryPercent`);
+- `computeWaveformSampleCompleteness()` implements the fabric doc's `completeness = valid_samples / expected_samples × 100%` formula from `windowDurationMs` and `sampleRateHz`, capped at 100;
+- `sortAndDedupeMedicalDeviceEvents()` gives replay protection by keeping one event per `(deviceId, kind, sequence)`, preferring the latest `receivedAt`, and drops events that fail validation rather than admitting them;
+- `assessMedicalDeviceEventLiveness()` reuses the existing Visit OS transport-freshness convention (`ageMs = max(0, now - capturedAt)`; ≤30 s live, ≤120 s delayed, else stale) — this is transport freshness, not clinical severity, matching the boundary already established for Visit OS.
+
+What it does NOT do (hard boundaries, enforced by `MEDICAL_DEVICE_EVENT_ENVELOPE_BOUNDARY` and `MEDICAL_DEVICE_EVENT_ENVELOPE_POLICY`):
+- it does not flatten waveform samples or image/report references into FHIR scalar `Observation` rows — that remains explicitly out of scope; a clinician-reviewed scalar summary derived from these events would still need to cross through the existing `visitFhirObservation.ts` review boundary;
+- it does not implement any vendor/model adapter and makes no device-support claim; `profileId` values used in the module and its tests are drawn from the existing catalog and remain `catalog-only`/read-only;
+- it does not embed pixel data — `image-reference` only carries DICOM identifiers (`studyInstanceUid`/`seriesInstanceUid`/`sopInstanceUid`) and an optional retrieve URL, never image content;
+- it does not perform real cross-vendor unit conversion/normalization — it only requires a non-blank unit string where a unit applies; a canonical unit-mapping table is still open work;
+- it does not publish anything anywhere; it is a pure validation/dedupe/liveness contract with no I/O.
+
+Validation run this session: `node --test scripts/qa/medical-device-event-envelope.test.mjs` (11/11 pass) and the full `npm run build` test line (`node --test scripts/qa/source-registry-validator.test.mjs ... scripts/qa/environment-geospatial-store.test.mjs`, 206/206 pass, including this module's tests). `npx tsc -b` in this sandbox pre-existingly fails with ~56k `JSX.IntrinsicElements`-style errors across nearly every `.tsx` file because `node_modules/@types/react` is absent from this environment (confirmed identical failure count on a clean `git stash` with no changes applied); this is a pre-existing sandbox/environment gap, not something introduced by this change, and `npx tsc --noEmit` produced zero diagnostics for `src/lib/medicalDeviceEventEnvelope.ts` itself. `vite build` was not run for the same reason (it depends on the same incomplete `node_modules`).
+
+Next 3-8 concrete follow-up steps:
+1. add a real unit-normalization/mapping table for the units this envelope's kinds actually carry (waveform channel units, therapy-delivery dose/rate units, setting units) instead of only checking non-blank strings;
+2. add a `groupMedicalDeviceEventsByDevice`/liveness-per-device rollup that composes `assessMedicalDeviceEventLiveness()` over a device's most recent event per kind, for a future device-health analyzer;
+3. wire a first real bedside-monitor or ventilator adapter that emits `MedicalDeviceAlarmEvent`/`MedicalDeviceSettingEvent` through this envelope from documented IEEE 11073 SDC or IHE DEC/ACM payloads, with deterministic fixtures, before claiming any adapter-tested maturity;
+4. connect `image-reference`/`report-reference` events to the existing DICOM/report identifiers used by `src/lib/dicom.ts` and the report path, so a real study/report resolves through this envelope rather than only through ad hoc UIDs in tests;
+5. add a bounded in-memory/store-backed waveform window buffer that consumes `MedicalDeviceWaveformEvent` batches without ever writing raw samples into `visitFhirObservation.ts` or another scalar/FHIR path;
+6. extend `MEDICAL_DEVICE_INTEGRATION_CATALOG` profiles with an explicit conformance-matrix field (vendor, model, firmware, interface, fields verified, fixture, last validation date) once a first real adapter exists, per the fabric doc's acceptance rule;
+7. reconcile this session's environment finding (`node_modules/@types/react` missing) separately — the next agent that needs `tsc -b`/`vite build` to actually pass should first restore/verify a complete `npm install` rather than assuming the current sandbox state is representative of CI.

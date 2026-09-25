@@ -68,6 +68,8 @@ longitudinal patient state
 
 Images/volumes stay in the DICOM imaging path and are referenced from clinical resources rather than flattened into scalar observations. Continuous waveforms should use a time-series/waveform store and bounded windows; do not force high-frequency raw streams into ordinary FHIR Observation rows.
 
+Step 2 of the implementation sequence below (the non-scalar device-event envelope) is now landed as `src/lib/medicalDeviceEventEnvelope.ts`, with a matching `MEDICAL_DEVICE_EVENT_ENVELOPE_BOUNDARY` string that states this rule in code, not only in this document.
+
 ## Analyzer design
 
 Every analyzer declares:
@@ -152,8 +154,8 @@ Do not create a second EMR, second patient state, second DICOM viewer or second 
 ## Implementation sequence
 
 1. Keep the catalog as the capability map and add vendor/model adapters only when a real interface is available.
-2. Add a canonical non-scalar device-event envelope for waveforms, alarms, settings, therapy-delivery events and image references.
-3. Implement technical analyzers first: identity, timestamps, replay, unit normalization, signal quality, sample completeness, device liveness.
+2. **Landed.** Add a canonical non-scalar device-event envelope for waveforms, alarms, settings, therapy-delivery events and image references — `src/lib/medicalDeviceEventEnvelope.ts`.
+3. **Partially landed.** Implement technical analyzers first: identity, timestamps, replay, unit normalization, signal quality, sample completeness, device liveness. The envelope module above already validates identity/profile/transport declaration, capture-vs-receive clock order, replay/dedupe by `(deviceId, kind, sequence)`, waveform signal-quality range, waveform sample completeness, and transport-freshness liveness classification. Still open: real unit-normalization tables (this module only checks non-blank units, it does not convert or reconcile units across vendors) and any analyzer beyond these structural checks.
 4. Add source-specific high-value adapters in this order: bedside monitors → ventilators → infusion pumps → cath-lab IVUS/physiology → laboratory/POC → implant interrogation.
 5. Route imaging through DICOM/DICOMweb and high-frequency streams through bounded waveform/time-series storage.
 6. Project only normalized, provenance-preserving results into Clinical/AI-EMR/Body surfaces.
