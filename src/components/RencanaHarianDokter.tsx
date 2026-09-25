@@ -41,7 +41,18 @@ export function RencanaHarianDokter({ izinId, state }: { izinId: string; state?:
     }),
   }).then(() => { setGalat(null); void muat() }).catch((e) => setGalat((e as Error).message))
 
-  if (!data) return null
+  if (!data) {
+    return (
+      <div className="mt-3 border-t border-white/10 pt-3" data-care-plan>
+        <h3 className="text-[12px] font-black">Daily follow-up</h3>
+        {galat ? (
+          <p role="alert" className="mt-1 text-[11px] font-bold text-amber-300">
+            {galat} <button type="button" className="ml-1 underline" onClick={() => { setGalat(null); void muat() }}>Retry</button>
+          </p>
+        ) : <p className="mt-1 text-[11px] text-white/45">Loading…</p>}
+      </div>
+    )
+  }
   const plan = data.plan
   return (
     <div className="mt-3 border-t border-white/10 pt-3" data-care-plan>
