@@ -68,4 +68,26 @@ console.log('rencana-harian-kontrak: rencana/laporan server diterima kernel, ide
   const muatAwal = dokterUi.slice(dokterUi.indexOf('if (!data)'), dokterUi.indexOf('const plan = data.plan'))
   assert.match(muatAwal, /galat/, 'cabang !data tidak menampilkan galat saat muat() awal gagal')
   assert.match(muatAwal, /Retry|muat\(\)/, 'cabang !data tidak menawarkan jalan retry')
+  // Form aturan lab HARUS divalidasi di peramban sebelum simpan() memanggil
+  // server: tanpa ini setiap kesalahan pengetikan (ambang bukan angka, umur
+  // hasil di luar 1–730 hari, rujukan bukti kosong) hanya diketahui dokter
+  // setelah pulang-pergi ke server, dan hilang tanpa berbekas dari fokus form.
+  const validasiFn = dokterUi.slice(dokterUi.indexOf('const validasi ='), dokterUi.indexOf('const simpan ='))
+  assert.match(validasiFn, /threshold must be a number/, 'validasi tidak menolak ambang aturan lab yang bukan angka')
+  assert.match(validasiFn, /result age must be 1.730 days/, 'validasi tidak menolak umur hasil di luar 1–730 hari')
+  assert.match(validasiFn, /evidence reference is required/, 'validasi tidak menolak rujukan bukti kosong')
+  const simpanFn = dokterUi.slice(dokterUi.indexOf('const simpan ='), dokterUi.indexOf('if (!data) {'))
+  assert.match(simpanFn, /validasi\(\)/, 'simpan() tidak memeriksa validasi() di peramban sebelum memanggil server')
+  // "Start daily check-in" HARUS dikunci selama simpan() berjalan, atau koneksi
+  // lambat/flaky bisa membuat dokter menekannya dua kali dan mengirim dua
+  // rencana (tidak ada idempotency key di jalur ini, tidak seperti laporan harian pasien).
+  assert.match(simpanFn, /if \(mengirim\) return/, 'simpan() tidak menolak pemanggilan ganda selagi masih berjalan')
+  const tombolSimpan = dokterUi.slice(dokterUi.indexOf('Start daily check-in') - 300, dokterUi.indexOf('Start daily check-in'))
+  assert.match(tombolSimpan, /disabled=\{mengirim\}/, 'tombol "Start daily check-in" tidak dikunci selama pengiriman')
+
+  const dafPasienUi = readFileSync('src/components/LabPasienUntukDokter.tsx', 'utf8')
+  // Antara mount dan respons api.clinicianLabShares() pertama, daftar==null;
+  // tanpa indikator ini bagian terlihat kosong dan dokter tidak tahu apakah
+  // sedang memuat atau memang tidak ada pasien yang berbagi.
+  assert.match(dafPasienUi, /daftar === null && !galat && <p[^>]*>Loading/, 'daftar berbagi lab dokter tidak punya indikator memuat sebelum respons pertama')
 }
