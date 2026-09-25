@@ -8,6 +8,7 @@
 // - confidence=1 means "faithfully projected from the signed record", NOT
 //   diagnostic certainty or clinical validation.
 import type { EMRRecord } from './types.ts'
+import { deriveEmrFieldStates } from './emrSemanticState.ts'
 import type { ConsentEnvelope, LongitudinalEvent } from './panaceaLongitudinalState.ts'
 
 export type ServerAcceptedEmrRecord = EMRRecord & {
@@ -30,6 +31,7 @@ export function emrRecordToLongitudinalEvents(
   receivedAt: string,
 ): EmrLongitudinalProjection {
   const events: LongitudinalEvent<string>[] = []
+  const semantic = deriveEmrFieldStates(record)
   const signedAt = text(record?.signedAt)
   const reviewerId = text(record?.signedById)
   const subject = text(subjectId)
@@ -75,7 +77,11 @@ export function emrRecordToLongitudinalEvents(
     id: `emr:${record.id}:signed-note`,
     metric: 'emr.signed-note',
     value: noteParts.join(' · ') || 'Signed clinical record',
-    tags: ['clinician-signed', 'server-accepted', `emr:${record.id}`, 'semantic-state:clinician-signed'],
+    tags: [
+      'clinician-signed', 'server-accepted', `emr:${record.id}`, 'semantic-state:clinician-signed',
+      `field-origin:${semantic['subjective.history']?.origin ?? 'unknown'}`,
+      `field-review:${semantic['subjective.history']?.review ?? 'unreviewed'}`,
+    ],
   })
 
   if (record.primaryDiagnosis && text(record.primaryDiagnosis.code || record.primaryDiagnosis.title)) {
@@ -92,6 +98,8 @@ export function emrRecordToLongitudinalEvents(
         `emr:${record.id}`,
         'semantic-state:clinician-signed',
         `draft-source:${record.primaryDiagnosis.source === 'Dokter' ? 'clinician' : 'ai-or-unspecified'}`,
+        `field-origin:${semantic['assessment.primaryDiagnosis']?.origin ?? 'unknown'}`,
+        `field-review:${semantic['assessment.primaryDiagnosis']?.review ?? 'unreviewed'}`,
       ],
     })
   }
@@ -105,7 +113,15 @@ export function emrRecordToLongitudinalEvents(
       id: `emr:${record.id}:verified-plan`,
       metric: 'emr.verified-plan',
       value: verifiedPlan.join(' · '),
-      tags: ['clinician-signed', 'server-accepted', `emr:${record.id}`, 'semantic-state:clinician-verified-plan'],
+      tags: [
+      'clinician-signed', 'server-accepted', `emr:${record.id}`, 'semantic-state:clinician-verified-plan',
+      ...[...new Set(record.plan
+        .filter((item) => item.status === 'diverifikasi' && text(item.text))
+        .map((item) => `field-origin:${semantic[`plan.${item.id}`]?.origin ?? 'unknown'}`))],
+      ...[...new Set(record.plan
+        .filter((item) => item.status === 'diverifikasi' && text(item.text))
+        .map((item) => `field-review:${semantic[`plan.${item.id}`]?.review ?? 'unreviewed'}`))],
+    ],
     })
   }
 
