@@ -3,6 +3,8 @@
 // summary layer that makes the exam "modern dengan gambar".
 
 import { useState } from 'react'
+import type { AsalTemuan } from '../lib/bodyClinicalBridge'
+import { LABEL_ASAL_TEMUAN } from '../lib/bodyClinicalFindings'
 
 export interface SystemFinding {
   key: string
@@ -11,6 +13,7 @@ export interface SystemFinding {
   y: number
   status: 'normal' | 'abnormal' | 'recorded' | 'unchecked'
   note?: string
+  origin?: AsalTemuan
 }
 
 const STATUS = {
@@ -107,6 +110,7 @@ export function BodyDiagram({
                   {sel.status === 'normal' ? 'Normal' : sel.status === 'abnormal' ? 'Finding (+)' : sel.status === 'recorded' ? 'Recorded · not classified' : 'Not examined'}
                 </span>
               </div>
+              {sel.origin && <p className="mb-1 text-[10px] font-semibold text-neutral-500" data-asal-temuan>{LABEL_ASAL_TEMUAN[sel.origin]}</p>}
               <p className="text-neutral-600">{sel.note || 'No notes recorded for this system yet.'}</p>
             </>
           ) : (

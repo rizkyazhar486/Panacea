@@ -74,7 +74,12 @@ export interface PhysicalExam {
   verifiedBy?: string
   /** Id verifikator — dicap server (server/src/rekamKlinis.ts). */
   verifiedById?: string
+  /** Status per sistem yang ditandai klinisi (kunci sistem: mata, tht, kepala, leher, paru, jantung, abdomen, kulit, ekstremitas).
+   *  Mengalahkan heuristik teks; dihitung "diverifikasi klinisi" hanya bila server mencap verifiedById. */
+  statusSistem?: Record<string, StatusSistemFisik>
 }
+
+export type StatusSistemFisik = 'normal' | 'abnormal' | 'not-examined'
 
 export interface PlanSafetyOverride {
   /** Human-readable rationale recorded by the clinician at the moment of override. */

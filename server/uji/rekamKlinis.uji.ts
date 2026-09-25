@@ -32,6 +32,10 @@ assert.equal(ubahFisik.physicalExam.doctorVerified, false, 'temuan fisik baru ma
 assert.equal(ubahFisik.physicalExam.verifiedBy, undefined, 'nama verifikator lama melekat pada temuan fisik baru')
 assert.equal(ubahFisik.physicalExam.verifiedById, undefined, 'id verifikator lama melekat pada temuan fisik baru')
 
+// Status per sistem terstruktur termasuk isi pemeriksaan: pasien mengubahnya -> verifikasi dokter hilang.
+const ubahStatus = terapkanSimpanRekam(tt, { ...tt, physicalExam: { ...tt.physicalExam, statusSistem: { jantung: 'normal' } } }, pasien, kini).rekam
+assert.equal(ubahStatus.physicalExam.verifiedById, undefined, 'status sistem yang diubah pasien tetap terlihat diverifikasi dokter')
+
 // Pasien menyimpan ulang rekam bertanda tangan untuk consent pasien saja → tanda tangan klinis tetap.
 const setuju = terapkanSimpanRekam(tt, { ...tt, surgery: { consent: { given: true } } }, pasien, kini)
 assert.equal(setuju.rekam.signedBy, 'Dr. Asli'); assert.ok(setuju.arsip, 'perubahan pada rekam bertanda tangan tidak diarsipkan')

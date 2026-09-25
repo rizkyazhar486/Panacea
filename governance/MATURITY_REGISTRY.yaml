@@ -94,13 +94,14 @@ workflows:
       integration: medium  # reads the same store record/vitals as AI-EMR and the canonical longitudinal state; no second patient state
       reliability: medium  # browser 390x844: overlay renders with WebGL canvas, no page errors, no horizontal overflow
       usability: unknown  # no user test
-      clinical_quality: low  # free-text exam classification is a keyword heuristic (navigation only); now conservative
+      clinical_quality: medium  # structured clinician marks per system override the conservative text heuristic; heuristic remains only for unmarked systems
       safety_security: medium  # 2026-09-26 fixes: review state from server stamps only; documented abnormal findings no longer shown as normal
       observability_testing: medium  # gates body-clinical-bridge, body-exposure-patient-overlay, klasifikasi-temuan-fisik, status-tanda-tangan, sinyal-pribadi-tubuh
     acceptance_evidence:
       - "2026-09-26 audit, browser 390x844 (doctor, patient with server-verified exam + vitals): overlay shows vitals, cardiovascular focus, 'Exam verified' (not 'Signed'), 1 canvas, scrollWidth 390, no page errors"
       - "defect fixed: overlay / EMR 'Certified by' / timeline lens showed 'signed' from client-side optimistic fields; now only server stamps (signedById, physicalExam.verifiedById) count; pending signatures are labelled pending (scripts/uji/status-tanda-tangan.mts, body-clinical-bridge.mts; sabotaged)"
       - "defect fixed: 'murmur sistolik 2/6' was classified and drawn as green 'Recorded normal' because only '(+)' counted as abnormal; one shared conservative classifier now marks unnegated abnormal terms as findings, requires an explicit normal marker for 'normal', and otherwise shows 'Recorded · not classified' (scripts/uji/klasifikasi-temuan-fisik.mts, 3 sabotages). Browser: Focused findings 0 -> 1"
-    known_gaps: [exam_text_classifier_is_heuristic_not_structured_exam, personal_signals_not_browser_verified_for_linked_patient, overlay_markers_not_bound_to_exact_3d_structures, usability_test]
-    next_action: structured_per_system_exam_fields_instead_of_free_text_heuristic
+      - "2026-09-26 structured per-system exam (physicalExam.statusSistem): clinician marks Normal/Finding/Not examined per system in EMR; structured marks override the text heuristic in EMR, Clinical and Body Exposure; origin shown ('marked by clinician · verified' only with server verifiedById, else 'marked · not verified' or 'read from free text · heuristic'); patient edits drop verification (server test). Browser 390x844: 9 rows, 42px buttons, marks persist after reload, overlay Focused findings 1, width 390, no errors (scripts/uji/status-sistem-fisik.mts, 2 sabotages)"
+    known_gaps: [free_text_heuristic_remains_fallback_for_unmarked_systems, personal_signals_not_browser_verified_for_linked_patient, overlay_markers_not_bound_to_exact_3d_structures, usability_test]
+    next_action: bind_overlay_markers_to_exact_3d_source_structures
     last_audited_commit: null

@@ -1,4 +1,5 @@
-import type { BodyClinicalSystemFinding } from './bodyClinicalBridge'
+import type { AsalTemuan, BodyClinicalMarkerStatus, BodyClinicalSystemFinding } from './bodyClinicalBridge'
+import type { PhysicalExam, StatusSistemFisik } from './types'
 
 const BODY_SYSTEMS: readonly {
   key: string
@@ -71,10 +72,31 @@ export function klasifikasiTemuan(catatan: string): 'normal' | 'abnormal' | 'rec
   return PENANDA_NORMAL.some((n) => t.includes(n)) ? 'normal' : 'recorded'
 }
 
+const DARI_STRUKTUR: Record<StatusSistemFisik, BodyClinicalMarkerStatus> = { normal: 'normal', abnormal: 'abnormal', 'not-examined': 'unchecked' }
+
+/**
+ * Status satu sistem: tanda terstruktur klinisi MENGALAHKAN heuristik teks.
+ * Asal 'clinician-verified' hanya bila server mencap verifiedById pada pemeriksaan.
+ */
+export function statusSistemFisik(key: string, catatanTeks: string | undefined, exam?: Pick<PhysicalExam, 'statusSistem' | 'doctorVerified' | 'verifiedById'>): { status: BodyClinicalMarkerStatus; origin?: AsalTemuan } {
+  const tanda = exam?.statusSistem?.[key]
+  if (tanda && tanda in DARI_STRUKTUR) {
+    return { status: DARI_STRUKTUR[tanda], origin: exam?.doctorVerified && exam.verifiedById ? 'clinician-verified' : 'marked-unverified' }
+  }
+  if (!catatanTeks) return { status: 'unchecked' }
+  return { status: klasifikasiTemuan(catatanTeks), origin: 'text-heuristic' }
+}
+
+export const LABEL_ASAL_TEMUAN: Record<AsalTemuan, string> = {
+  'clinician-verified': 'marked by clinician · verified',
+  'marked-unverified': 'marked · not verified',
+  'text-heuristic': 'read from free text · heuristic',
+}
+
 // Rekam medis dari server bisa belum memuat pemeriksaan per sistem. Dulu
 // `undefined.split` merobohkan seluruh halaman Clinical untuk setiap dokter pada
 // deployment yang tersambung ke backend; sekarang dianggap "belum ada temuan".
-export function buildBodyClinicalFindings(perSystem: string | null | undefined): BodyClinicalSystemFinding[] {
+export function buildBodyClinicalFindings(perSystem: string | null | undefined, exam?: Pick<PhysicalExam, 'statusSistem' | 'doctorVerified' | 'verifiedById'>): BodyClinicalSystemFinding[] {
   const lines = (typeof perSystem === 'string' ? perSystem : '').split('\n').map((line) => line.trim()).filter(Boolean)
 
   return BODY_SYSTEMS.map((system) => {
@@ -82,22 +104,8 @@ export function buildBodyClinicalFindings(perSystem: string | null | undefined):
       const lower = line.toLowerCase()
       return system.keywords.some((keyword) => lower.includes(keyword))
     })
-
-    if (matched.length === 0) {
-      return { key: system.key, label: system.label, x: system.x, y: system.y, status: 'unchecked' }
-    }
-
-    const note = matched.join(' ')
-    const lower = note.toLowerCase()
-    const abnormal = ABNORMAL_HINTS.some((hint) => lower.includes(hint))
-
-    return {
-      key: system.key,
-      label: system.label,
-      x: system.x,
-      y: system.y,
-      status: klasifikasiTemuan(note),
-      note,
-    }
+    const note = matched.length ? matched.join(' ') : undefined
+    const { status, origin } = statusSistemFisik(system.key, note, exam)
+    return { key: system.key, label: system.label, x: system.x, y: system.y, status, ...(note ? { note } : {}), ...(origin ? { origin } : {}) }
   })
 }

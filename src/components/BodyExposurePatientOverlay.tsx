@@ -25,7 +25,7 @@ export function BodyExposurePatientOverlay({
   const projection = projectEmrToBodyClinicalBridge(
     record,
     state.vitals[activePatient.id] ?? [],
-    buildBodyClinicalFindings(record.physicalExam?.perSystem),
+    buildBodyClinicalFindings(record.physicalExam?.perSystem, record.physicalExam),
     record.updatedAt,
   )
   const focus = focusBodyClinicalProjection(projection, selectedSystemId)

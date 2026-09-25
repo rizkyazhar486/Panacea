@@ -22,11 +22,11 @@ import { searchICD, matchICD, icd11, type ICDCode } from '../lib/icd'
 import { evaluateVitals, overallStatus, STATUS_COLOR, STATUS_LABEL } from '../lib/chronic'
 import { projectEmrToBodyClinicalBridge } from '../lib/bodyClinicalBridge'
 import { KunjunganEmr } from '../components/KunjunganEmr'
-import { klasifikasiTemuan } from '../lib/bodyClinicalFindings'
+import { statusSistemFisik } from '../lib/bodyClinicalFindings'
 import { statusTinjauRekam } from '../lib/statusTandaTangan'
 import { TerbitkanKodeTaut } from '../components/TautanRekamPraktik'
 import { labelAsalMasalah, labelAsalRencana } from '../lib/asalButirEmr'
-import type { Anamnesis, EMRRecord, PhysicalExam, VitalSign } from '../lib/types'
+import type { Anamnesis, EMRRecord, PhysicalExam, StatusSistemFisik, VitalSign } from '../lib/types'
 
 // Send the current EMR to SATUSEHAT as a FHIR R4 Bundle (dokter/owner only).
 function SatusehatButton({ patient, record, vitals }: { patient: unknown; record: EMRRecord; vitals: unknown[] }) {
@@ -71,7 +71,6 @@ const BODY_SYSTEMS: { key: string; label: string; x: number; y: number; kw: stri
   { key: 'ekstremitas', label: 'Extremities', x: 72, y: 82, kw: ['ekstremitas', 'akral', 'crt', 'edema'] },
 ]
 
-const ABNORMAL_HINTS = ['(+)', 'menurun', 'prolaps', 'massa', 'pembesaran', 'deviasi', 'ikterik', 'edema (+)', 'anemis (+)', 'ronki (+', 'wheezing (+', 'murmur (+', 'asites']
 
 function LabPanel({ results }: { results: import('../lib/types').SupportiveResult[] }) {
   const labs = results.filter((r) => r.category === 'Lab')
@@ -114,13 +113,13 @@ function supportiveDefaults(weightKg: number) {
   }
 }
 
-function buildFindings(perSystem: string | undefined): SystemFinding[] {
-  const lines = (perSystem ?? '').split('\n').filter(Boolean)
+function buildFindings(exam: PhysicalExam): SystemFinding[] {
+  const lines = (exam.perSystem ?? '').split('\n').filter(Boolean)
   return BODY_SYSTEMS.map((sys) => {
     const matched = lines.filter((l) => sys.kw.some((k) => l.toLowerCase().includes(k)))
-    if (matched.length === 0) return { ...sys, status: 'unchecked' as const }
-    const note = matched.join(' ')
-    return { ...sys, status: klasifikasiTemuan(note), note }
+    const note = matched.length ? matched.join(' ') : undefined
+    const { status, origin } = statusSistemFisik(sys.key, note, exam)
+    return { ...sys, status, ...(note ? { note } : {}), ...(origin ? { origin } : {}) }
   })
 }
 
@@ -178,7 +177,7 @@ export function EMR() {
 
   if (!draft) return <EmptyEMR />
 
-  const systemFindings = buildFindings(draft.physicalExam.perSystem)
+  const systemFindings = buildFindings(draft.physicalExam)
   const bodyClinicalProjection = projectEmrToBodyClinicalBridge(
     draft,
     state.vitals[activePatient.id] ?? [],
@@ -356,6 +355,11 @@ export function EMR() {
             value={draft.physicalExam.perSystem}
             onChange={(v) => setExam('perSystem', v)}
             rows={6}
+          />
+          <StatusSistemEditor
+            value={draft.physicalExam.statusSistem ?? {}}
+            findings={systemFindings}
+            onChange={(statusSistem) => patch((r) => ({ ...r, physicalExam: { ...r.physicalExam, statusSistem }, updatedAt: new Date().toISOString() }))}
           />
         </div>
       </Card>
@@ -548,6 +552,43 @@ export function EMR() {
         {(acc?.role === 'dokter' || acc?.isOwner) && <TerbitkanKodeTaut patientId={activePatient.id} />}
       </Card>
     </div>
+  )
+}
+
+// Status terstruktur per sistem: klinisi menandai Normal / Finding / Not examined.
+// Tanda ini mengalahkan heuristik teks di EMR, Clinical dan Body Exposure.
+const PILIHAN_STATUS: { v: StatusSistemFisik; label: string; on: string }[] = [
+  { v: 'normal', label: 'Normal', on: 'bg-brand text-white' },
+  { v: 'abnormal', label: 'Finding', on: 'bg-red-600 text-white' },
+  { v: 'not-examined', label: 'Not examined', on: 'bg-neutral-600 text-white' },
+]
+function StatusSistemEditor({ value, findings, onChange }: { value: Record<string, StatusSistemFisik>; findings: SystemFinding[]; onChange: (v: Record<string, StatusSistemFisik>) => void }) {
+  return (
+    <fieldset className="rounded-xl border border-neutral-200 p-3" data-status-sistem-editor>
+      <legend className="px-1 text-xs font-semibold text-neutral-600">Mark each system (overrides reading the free text)</legend>
+      <ul className="divide-y divide-neutral-100">
+        {BODY_SYSTEMS.map((sys) => {
+          const kini = value[sys.key]
+          const heuristik = !kini ? findings.find((f) => f.key === sys.key) : undefined
+          return (
+            <li key={sys.key} className="flex flex-wrap items-center justify-between gap-2 py-1.5" data-sistem={sys.key}>
+              <span className="min-w-[5.5rem] text-sm font-semibold">{sys.label}
+                {heuristik && heuristik.status !== 'unchecked' && <span className="block text-[10px] font-normal text-neutral-500">text suggests: {heuristik.status === 'abnormal' ? 'finding' : heuristik.status}</span>}
+              </span>
+              <span className="flex gap-1" role="group" aria-label={`${sys.label} status`}>
+                {PILIHAN_STATUS.map((o) => (
+                  <button key={o.v} type="button" aria-pressed={kini === o.v}
+                    onClick={() => { const n = { ...value }; if (kini === o.v) delete n[sys.key]; else n[sys.key] = o.v; onChange(n) }}
+                    className={`min-h-9 rounded-lg px-2.5 text-xs font-bold ${kini === o.v ? o.on : 'border border-neutral-200 text-neutral-600'}`}>
+                    {o.label}
+                  </button>
+                ))}
+              </span>
+            </li>
+          )
+        })}
+      </ul>
+    </fieldset>
   )
 }
 

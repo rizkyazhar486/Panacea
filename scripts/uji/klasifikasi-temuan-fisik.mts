@@ -11,6 +11,6 @@ assert.equal(klasifikasiTemuan('Jantung: S1S2 tunggal, murmur (-), gallop (-)'),
 assert.equal(klasifikasiTemuan('Ronki (+) basah halus basal'), 'abnormal')
 const t = buildBodyClinicalFindings('Kardiovaskular: murmur sistolik 2/6 di apeks\nRespirasi: vesikuler, tidak ada ronki')
 assert.deepEqual([t.find((x) => x.key === 'jantung')?.status, t.find((x) => x.key === 'paru')?.status], ['abnormal', 'normal'])
-assert.match(readFileSync('src/pages/EMR.tsx', 'utf8'), /status: klasifikasiTemuan\(note\)/, 'EMR memakai klasifikasi salinan sendiri')
+assert.match(readFileSync('src/pages/EMR.tsx', 'utf8'), /statusSistemFisik\(sys\.key, note, exam\)/, 'EMR memakai klasifikasi salinan sendiri')
 assert.doesNotMatch(readFileSync('src/pages/EMR.tsx', 'utf8'), /abnormal \? \('abnormal' as const\) : \('normal' as const\)/)
 console.log('klasifikasi-temuan-fisik: murmur/edema terdokumentasi = temuan; normal hanya dengan penanda eksplisit; sisanya "recorded"')

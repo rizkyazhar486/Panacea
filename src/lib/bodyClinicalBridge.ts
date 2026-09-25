@@ -10,7 +10,11 @@ export interface BodyClinicalSystemFinding {
   y: number
   status: BodyClinicalMarkerStatus
   note?: string
+  /** Dari mana status berasal: ditandai klinisi & diverifikasi server, ditandai tanpa verifikasi, atau heuristik teks. */
+  origin?: AsalTemuan
 }
+
+export type AsalTemuan = 'clinician-verified' | 'marked-unverified' | 'text-heuristic'
 
 export interface BodyClinicalMarker extends BodyClinicalSystemFinding {
   source: {
