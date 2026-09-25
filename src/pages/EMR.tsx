@@ -21,6 +21,7 @@ import { api, backendEnabled } from '../lib/api'
 import { searchICD, matchICD, icd11, type ICDCode } from '../lib/icd'
 import { evaluateVitals, overallStatus, STATUS_COLOR, STATUS_LABEL } from '../lib/chronic'
 import { projectEmrToBodyClinicalBridge } from '../lib/bodyClinicalBridge'
+import { KunjunganEmr } from '../components/KunjunganEmr'
 import type { Anamnesis, EMRRecord, PhysicalExam, VitalSign } from '../lib/types'
 
 // Send the current EMR to SATUSEHAT as a FHIR R4 Bundle (dokter/owner only).
@@ -535,6 +536,7 @@ export function EMR() {
             ✓ Certified by {draft.signedBy} on {new Date(draft.signedAt).toLocaleString('en-US')}
           </p>
         )}
+        <KunjunganEmr record={draft} dirty={dirty} klinisi={acc?.role === 'dokter' || Boolean(acc?.isOwner)} />
       </Card>
     </div>
   )

@@ -549,6 +549,10 @@ export const api = {
     req<{ request: BackendSecondOpinion }>(`/api/second-opinion/${id}/complete`, { method: 'POST', body: JSON.stringify({ finalOpinion }) }).then((r) => r.request),
   // clinical persistence
   clinical: () => req<ClinicalData>('/api/clinical'),
+  closeEncounter: (patientId: string) =>
+    req<{ ok: boolean; encounter: EMRRecord & { encounterId: string; closedAt: string; closedBy?: string }; record: EMRRecord }>('/api/clinical/encounter/close', { method: 'POST', body: JSON.stringify({ patientId }) }),
+  encounters: (patientId: string) =>
+    req<{ encounters: (EMRRecord & { encounterId: string; closedAt: string; closedBy?: string })[] }>(`/api/clinical/encounters/${encodeURIComponent(patientId)}`),
   saveRecordRemote: (patientId: string, record: EMRRecord) =>
     req<{ ok: boolean; record: EMRRecord }>('/api/clinical/record', { method: 'POST', body: JSON.stringify({ patientId, record }) }),
   saveEducationRemote: (patientId: string, sheet: EducationSheet) =>

@@ -85,6 +85,8 @@ export interface Clinical {
   supportive: Record<string, any[]>
   records: Record<string, any>
   education: Record<string, any>
+  /** Kunjungan tertutup per pasien (append-only). */
+  encounters?: Record<string, any[]>
 }
 
 export interface VisitMembership {
@@ -783,6 +785,16 @@ export function saveRecord(patientId: string, record: any, arsip?: any) {
   c.records[patientId] = record
   save()
 }
+// Kunjungan tertutup: append-only, tidak dipangkas, tidak dapat diubah via API.
+export function closeEncounter(patientId: string, kunjungan: any, rekamBaru: any) {
+  const c = ensureClinical() as any
+  c.encounters ??= {}
+  const daftar = (c.encounters[patientId] ??= [])
+  if (!daftar.some((k: any) => k.encounterId === kunjungan.encounterId)) daftar.push(kunjungan)
+  c.records[patientId] = rekamBaru
+  save()
+}
+export function getEncounters(patientId: string): any[] { return ((ensureClinical() as any).encounters ?? {})[patientId] ?? [] }
 export function getRecordHistory(patientId: string): any[] { return ((ensureClinical() as any).recordHistory ?? {})[patientId] ?? [] }
 export function saveEducation(patientId: string, sheet: any) {
   ensureClinical().education[patientId] = sheet

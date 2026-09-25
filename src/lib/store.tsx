@@ -291,6 +291,8 @@ interface Store {
   addSupportive: (patientId: string, r: SupportiveResult) => void
   setChat: (patientId: string, messages: ChatMessage[]) => void
   saveRecord: (record: EMRRecord) => void
+  /** Terapkan rekam kanonik yang SUDAH disimpan server (tanpa sinkron ulang). */
+  terapkanRekamServer: (record: EMRRecord) => void
   saveEducation: (patientId: string, sheet: EducationSheet) => void
   updateSettings: (partial: Partial<AppState['settings']>) => void
   resetDemo: () => void
@@ -556,6 +558,8 @@ export function StoreProvider({ children }: { children: ReactNode }) {
         sinkronKlinis('record', record.patientId, record, terimaBalasanKlinis)
         setState((st) => ({ ...st, records: { ...st.records, [record.patientId]: record } }))
       },
+      terapkanRekamServer: (record) =>
+        setState((st) => ({ ...st, records: { ...st.records, [record.patientId]: record } })),
       saveEducation: (patientId, sheet) => {
         sinkronKlinis('education', patientId, sheet)
         setState((st) => ({ ...st, education: { ...st.education, [patientId]: sheet } }))

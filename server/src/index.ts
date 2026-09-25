@@ -1,3 +1,4 @@
+import { randomUUID } from 'node:crypto'
 import { existsSync as adaBerkas, readFileSync as bacaBerkas } from 'node:fs'
 import { dirname as folderDari, join as gabungJalur } from 'node:path'
 import { fileURLToPath as keJalurBerkas } from 'node:url'
@@ -42,6 +43,8 @@ import {
   getClinical,
   getRecord,
   getRecordHistory,
+  closeEncounter,
+  getEncounters,
   saveRecord,
   saveEducation,
   addVital,
@@ -151,7 +154,7 @@ import { susunRencana, susunLaporan, laporanKeBundelFhir } from './carePlan.js'
 import { putusanPengingatCek, PESAN_PENGINGAT_CEK } from './pengingatCek.js'
 import { penyimpananSehat, status as statusSimpan } from './simpanAman.js'
 import { bolehAksesPasien, klinisiAtauPemilik, saringKlinis } from './aksesKlinis.js'
-import { terapkanSimpanRekam } from './rekamKlinis.js'
+import { terapkanSimpanRekam, tutupKunjungan } from './rekamKlinis.js'
 import { sambung, protokolKini, susunPenilaian, susunKeselamatan, susunAdjudikasi, susunUsabilitas, type IdentitasPenilai } from './validasiLedger.js'
 import { parseHealthWebhookPayload, extractHeartRateSeries, extractSleepSessions, newestSampleDate } from './healthWebhook.js'
 import { checkHrZoneAlert, checkBedtimeReminder, checkWorkoutReminder, suggestedBedtime, ZONES } from './healthAlerts.js'
@@ -839,6 +842,25 @@ app.post('/api/clinical/record', requireAuth, (req, res) => {
     }, 'notifVitals').catch(() => {})
   }
   res.json({ ok: true, record: hasil.rekam })
+})
+
+// Tutup kunjungan bertanda tangan dan mulai draf baru (klinisi saja).
+app.post('/api/clinical/encounter/close', requireAuth, (req, res) => {
+  const actor = (req as express.Request & { user: User }).user
+  const patientId = String((req.body as { patientId?: unknown })?.patientId ?? '')
+  if (!patientId) return res.status(400).json({ error: 'missing_patientId' })
+  if (!bolehPasien(actor, patientId)) return res.status(403).json({ error: 'no access to this patient record' })
+  const hasil = tutupKunjungan(getRecord(patientId), { id: actor.id, nama: actor.name, klinisi: klinisiAtauPemilik(actor, isOwner(actor)) }, new Date(), `emr-${randomUUID()}`)
+  if (!hasil.ok) return res.status(hasil.alasan === 'not-clinician' ? 403 : 409).json({ error: hasil.alasan })
+  closeEncounter(patientId, hasil.kunjungan, hasil.rekamBaru)
+  addAudit(actor, 'emr.encounter_closed', patientId)
+  res.json({ ok: true, encounter: hasil.kunjungan, record: hasil.rekamBaru })
+})
+app.get('/api/clinical/encounters/:patientId', requireAuth, (req, res) => {
+  const u = (req as express.Request & { user: User }).user
+  if (!bolehPasien(u, String(req.params.patientId))) return res.status(403).json({ error: 'no access to this patient record' })
+  addAudit(u, 'emr.encounters.read', String(req.params.patientId))
+  res.json({ encounters: getEncounters(String(req.params.patientId)) })
 })
 
 // Riwayat versi rekam bertanda tangan (akses sama dengan rekamnya).

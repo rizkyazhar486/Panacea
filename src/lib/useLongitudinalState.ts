@@ -26,12 +26,12 @@ export function useLongitudinalState(): { state: LongitudinalPatientState | null
   const [versiLab, setVersiLab] = useState(0)
   const [versiKlinis, setVersiKlinis] = useState(0)
   // Data server (hanya bila ada backend + sesi): cek harian dan tinjauan dokter.
-  const [server, setServer] = useState<{ plans: { plan: ContinuousCarePlan; reports: DailyAnamnesisSubmissionInput[] }[]; reviews: TinjauanMasuk[]; records: Record<string, EMRRecord>; vitals: Record<string, VitalTercatat[]> }>({ plans: [], reviews: [], records: {}, vitals: {} })
+  const [server, setServer] = useState<{ plans: { plan: ContinuousCarePlan; reports: DailyAnamnesisSubmissionInput[] }[]; reviews: TinjauanMasuk[]; records: Record<string, EMRRecord>; vitals: Record<string, VitalTercatat[]>; encounters: Record<string, EMRRecord[]> }>({ plans: [], reviews: [], records: {}, vitals: {}, encounters: {} })
   useEffect(() => {
     if (!backendEnabled || !account) return
     let aktif = true
-    Promise.all([api.carePlans().catch(() => ({ plans: [] })), api.getLabShares().catch(() => ({ reviews: [] as TinjauanMasuk[] })), account.role === 'pasien' ? api.clinical().catch(() => ({ records: {} as Record<string, EMRRecord>, vitals: {} as Record<string, VitalTercatat[]> })) : Promise.resolve({ records: {} as Record<string, EMRRecord>, vitals: {} as Record<string, VitalTercatat[]> })])
-      .then(([c, l, clinical]) => { if (aktif) setServer({ plans: c.plans, reviews: (l as { reviews?: TinjauanMasuk[] }).reviews ?? [], records: clinical.records ?? {}, vitals: ((clinical as { vitals?: Record<string, VitalTercatat[]> }).vitals) ?? {} }) })
+    Promise.all([api.carePlans().catch(() => ({ plans: [] })), api.getLabShares().catch(() => ({ reviews: [] as TinjauanMasuk[] })), account.role === 'pasien' ? api.clinical().catch(() => ({ records: {} as Record<string, EMRRecord>, vitals: {} as Record<string, VitalTercatat[]>, encounters: {} as Record<string, EMRRecord[]> })) : Promise.resolve({ records: {} as Record<string, EMRRecord>, vitals: {} as Record<string, VitalTercatat[]>, encounters: {} as Record<string, EMRRecord[]> })])
+      .then(([c, l, clinical]) => { if (aktif) setServer({ plans: c.plans, reviews: (l as { reviews?: TinjauanMasuk[] }).reviews ?? [], records: clinical.records ?? {}, vitals: ((clinical as { vitals?: Record<string, VitalTercatat[]> }).vitals) ?? {}, encounters: ((clinical as { encounters?: Record<string, EMRRecord[]> }).encounters) ?? {} }) })
     return () => { aktif = false }
   }, [account, versiLab, versiKlinis])
   useEffect(() => {
@@ -81,7 +81,8 @@ export function useLongitudinalState(): { state: LongitudinalPatientState | null
       // belum memakai id self-* server, jangan mencocokkan dua namespace itu
       // dengan string. Semua record yang lolos endpoint pasien adalah milik
       // akun ini dan diproyeksikan ke subjectId kanonik lokal yang sama.
-      for (const record of Object.values(server.records) as ServerAcceptedEmrRecord[]) {
+      // Kunjungan tertutup adalah rekam bertanda tangan server yang dibekukan; tetap fakta.
+      for (const record of [...Object.values(server.encounters).flat(), ...Object.values(server.records)] as ServerAcceptedEmrRecord[]) {
         const emr = emrRecordToLongitudinalEvents(record, subjectId, consent, kini)
         skipped += emr.skipped
         for (const ev of emr.events) {

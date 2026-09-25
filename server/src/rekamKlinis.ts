@@ -131,3 +131,29 @@ export function terapkanSimpanRekam(lama: any | undefined, baru: any, penulis: P
   const berubah = lama && !sama(lama, r)
   return { rekam: r, ...(lama?.signedAt && berubah ? { arsip: { ...lama, diarsipkanPada: kini.toISOString(), diarsipkanOleh: penulis.id } } : {}) }
 }
+
+// Kunjungan (encounter). Satu pasien memiliki SATU draf aktif dan daftar
+// kunjungan tertutup yang tidak dapat diubah. Menutup kunjungan:
+// - hanya klinisi/pemilik;
+// - hanya rekam yang SUDAH ditandatangani server (signedById + signedAt), sehingga
+//   draf AI atau isi yang belum ditinjau tidak pernah dibekukan sebagai kunjungan;
+// - draf baru hanya membawa DAFTAR MASALAH (ditandai carriedFrom) — bukan diagnosis,
+//   rencana, pemeriksaan fisik atau tanda tangan, karena itu milik kunjungan lama.
+export type HasilTutupKunjungan =
+  | { ok: true; kunjungan: any; rekamBaru: any }
+  | { ok: false; alasan: 'not-clinician' | 'no-record' | 'not-signed' }
+
+export function tutupKunjungan(lama: any | undefined, penulis: Penulis, kini: Date, idBaru: string): HasilTutupKunjungan {
+  if (!penulis.klinisi) return { ok: false, alasan: 'not-clinician' }
+  if (!lama) return { ok: false, alasan: 'no-record' }
+  if (!lama.signedAt || !lama.signedById) return { ok: false, alasan: 'not-signed' }
+  const t = kini.toISOString()
+  const kunjungan = { ...structuredClone(lama), encounterId: lama.id, closedAt: t, closedById: penulis.id, closedBy: penulis.nama }
+  const rekamBaru = {
+    id: idBaru, patientId: lama.patientId, createdAt: t, updatedAt: t,
+    anamnesis: {}, physicalExam: { doctorVerified: false },
+    problems: (lama.problems ?? []).map((p: any) => ({ ...structuredClone(p), carriedFrom: lama.id })),
+    plan: [], references: [], previousEncounterId: lama.id,
+  }
+  return { ok: true, kunjungan, rekamBaru }
+}
