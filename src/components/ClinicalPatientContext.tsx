@@ -19,7 +19,7 @@ export function ClinicalPatientContext() {
     )
   }
 
-  const findings = buildBodyClinicalFindings(record.physicalExam.perSystem)
+  const findings = buildBodyClinicalFindings(record.physicalExam?.perSystem)
   const projection = projectEmrToBodyClinicalBridge(
     record,
     state.vitals[activePatient.id] ?? [],

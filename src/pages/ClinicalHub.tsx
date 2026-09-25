@@ -4,6 +4,8 @@ import { PanaceaZoneNav } from '../components/PanaceaZoneNav'
 import { SuperPageCapabilityRail } from '../components/SuperPageCapabilityRail'
 import { SurfaceDepthNavigator } from '../components/SurfaceDepthNavigator'
 import { ClinicalPatientContext } from '../components/ClinicalPatientContext'
+import { LabPasienUntukDokter } from '../components/LabPasienUntukDokter'
+import { useStore } from '../lib/store'
 import { PersonalBodyUnifiedSurface } from '../components/PersonalBodyUnifiedSurface'
 import { SurfaceGuide } from '../components/SurfaceGuide'
 
@@ -57,6 +59,7 @@ const REFERENCE_LINKS = [
 ] as const
 
 export function ClinicalHub() {
+  const { account } = useStore()
   const [calculator, setCalculator] = useState<Calculator>('bmi')
   const [question, setQuestion] = useState('')
   const [weight, setWeight] = useState('')
@@ -110,6 +113,7 @@ export function ClinicalHub() {
 
         <SurfaceDepthNavigator surface="clinical" routes={CLINICAL_DEPTH_ROUTES} />
         <ClinicalPatientContext />
+        {account?.role === 'dokter' && <LabPasienUntukDokter />}
 
         <section aria-label="Ask and record" className="border-b border-white/10 pb-8">
           <div className="grid gap-3 sm:grid-cols-[minmax(0,1fr)_96px]">

@@ -116,6 +116,8 @@ interface DB {
   manualTopups?: ManualTopup[] // bank-transfer top-up requests awaiting owner approval
   applications?: Application[] // professional onboarding applications (doctor/writer/verifier)
   healthProfiles?: Record<string, Record<string, any>> // email -> health data blob (manual/wearable)
+  labShares?: { id: string; pasienEmail: string; dokterEmail: string; dibuat: string; berakhir: string; dicabut?: string }[]
+  labAudit?: { waktu: string; pasienEmail: string; aktor: string; aksi: 'izin-dibuat' | 'izin-dicabut' | 'dibaca-dokter'; izinId: string }[]
   labLogs?: Record<string, { log: Record<string, { id: string; tanggal: string; nilai: number }[]>; diperbaruiPada: string }> // email -> riwayat lab pribadi
   healthWebhookTokens?: Record<string, string> // opaque token -> email, for Apple Health auto-export (Health Auto Export app)
   hrSeries?: Record<string, { t: number; bpm: number; lo?: number; hi?: number; kind: string }[]> // email -> heart-rate log
@@ -836,6 +838,19 @@ export function putLabLog(email: string, isi: { log: Record<string, { id: string
   db.labLogs[email] = isi
   save()
 }
+
+type IzinLabDb = NonNullable<typeof db.labShares>[number]
+type AuditLabDb = NonNullable<typeof db.labAudit>[number]
+export function listLabShares(): IzinLabDb[] { return db.labShares ?? [] }
+export function addLabShare(i: IzinLabDb) { (db.labShares ??= []).push(i); save() }
+export function revokeLabShare(id: string, pasienEmail: string, waktu: string): IzinLabDb | undefined {
+  const i = db.labShares?.find((x) => x.id === id && x.pasienEmail === pasienEmail && !x.dicabut)
+  if (i) { i.dicabut = waktu; save() }
+  return i
+}
+// Jejak audit hanya bertambah; dibatasi 5.000 butir terbaru agar tidak tumbuh tanpa batas.
+export function addLabAudit(a: AuditLabDb) { const l = (db.labAudit ??= []); l.push(a); if (l.length > 5000) l.splice(0, l.length - 5000); save() }
+export function listLabAudit(pasienEmail: string): AuditLabDb[] { return (db.labAudit ?? []).filter((a) => a.pasienEmail === pasienEmail).slice(-100).reverse() }
 
 export function getHealthProfile(email: string): Record<string, any> {
   if (!db.healthProfiles) db.healthProfiles = {}

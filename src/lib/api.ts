@@ -105,6 +105,16 @@ import type { Role, Account, Patient, VitalSign, SupportiveResult, EMRRecord, Ed
 
 const API = (import.meta.env.VITE_API_URL as string | undefined)?.replace(/\/$/, '') || ''
 export const backendEnabled = Boolean(API)
+
+export interface IzinLabKlien { id: string; dokterEmail: string; dibuat: string; berakhir: string; dicabut?: string }
+export interface FhirObservasiLab {
+  id: string
+  code: { coding?: { system: string; code: string; display: string }[]; text: string }
+  effectiveDateTime: string
+  valueQuantity: { value: number; unit: string; code?: string }
+  meta?: { tag?: { code: string }[] }
+}
+export interface FhirBundelLab { resourceType: 'Bundle'; total: number; entry: { resource: FhirObservasiLab }[] }
 export const apiBaseUrl = API
 
 export interface Health {
@@ -442,6 +452,12 @@ export const api = {
   getLabLog: () => req<{ log: Record<string, { id: string; tanggal: string; nilai: number }[]>; diperbaruiPada: string | null }>('/api/lab-log'),
   putLabLog: (log: Record<string, { id: string; tanggal: string; nilai: number }[]>, diperbaruiPada: string) =>
     req<{ log: Record<string, { id: string; tanggal: string; nilai: number }[]>; diperbaruiPada: string }>('/api/lab-log', { method: 'PUT', body: JSON.stringify({ log, diperbaruiPada }) }),
+  getLabFhir: () => req<FhirBundelLab>('/api/lab-log/fhir'),
+  getLabShares: () => req<{ shares: IzinLabKlien[]; audit: { waktu: string; aktor: string; aksi: string; izinId: string }[] }>('/api/lab-log/shares'),
+  shareLab: (dokterEmail: string, hari: number) => req<IzinLabKlien>('/api/lab-log/shares', { method: 'POST', body: JSON.stringify({ dokterEmail, hari }) }),
+  revokeLabShare: (id: string) => req<IzinLabKlien>(`/api/lab-log/shares/${encodeURIComponent(id)}`, { method: 'DELETE' }),
+  clinicianLabShares: () => req<{ shares: { id: string; berakhir: string; pasien: string }[] }>('/api/clinician/lab-shares'),
+  clinicianLabFhir: (id: string) => req<{ pasien: string; berakhir: string; bundle: FhirBundelLab }>(`/api/clinician/lab-shares/${encodeURIComponent(id)}/fhir`),
   getHealthProfile: () => req<{ profile: Record<string, unknown> }>('/api/health-profile').then((r) => r.profile),
   saveHealthProfile: (profile: Record<string, unknown>) =>
     req<{ ok: boolean; profile: Record<string, unknown> }>('/api/health-profile', { method: 'PUT', body: JSON.stringify({ profile }) }).then((r) => r.profile),

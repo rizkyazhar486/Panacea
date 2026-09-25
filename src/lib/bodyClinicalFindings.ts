@@ -34,8 +34,11 @@ const ABNORMAL_HINTS = [
   'asites',
 ] as const
 
-export function buildBodyClinicalFindings(perSystem: string): BodyClinicalSystemFinding[] {
-  const lines = perSystem.split('\n').map((line) => line.trim()).filter(Boolean)
+// Rekam medis dari server bisa belum memuat pemeriksaan per sistem. Dulu
+// `undefined.split` merobohkan seluruh halaman Clinical untuk setiap dokter pada
+// deployment yang tersambung ke backend; sekarang dianggap "belum ada temuan".
+export function buildBodyClinicalFindings(perSystem: string | null | undefined): BodyClinicalSystemFinding[] {
+  const lines = (typeof perSystem === 'string' ? perSystem : '').split('\n').map((line) => line.trim()).filter(Boolean)
 
   return BODY_SYSTEMS.map((system) => {
     const matched = lines.filter((line) => {

@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { JENIS_LAB, ambilLab, tambahLab, hapusLab, umurHari, periksaMasukanLab, type ButirLab, type JenisLab } from '../lib/lab'
+import { BagikanLabKeDokter } from './BagikanLabKeDokter'
 import { pasangSinkronLab, dengarSinkronLab, statusSinkronLab, type StatusSinkronLab } from '../lib/labSync'
 import { analisisTrenLab, type StatusTren } from '../lib/labTrend'
 
@@ -265,6 +266,7 @@ export function UbinLab() {
             })()}
           </>
         )}
+        <BagikanLabKeDokter />
       </div>
     </section>
   )

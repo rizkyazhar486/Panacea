@@ -47,6 +47,11 @@ import {
   getHealthProfile,
   getLabLog,
   putLabLog,
+  listLabShares,
+  addLabShare,
+  revokeLabShare,
+  addLabAudit,
+  listLabAudit,
   saveRingkasan,
   saveHealthProfile,
   recordDeviceHealthSync,
@@ -127,6 +132,7 @@ import { createPayment, confirmPayment, paymentWebhook, orderStatus } from './pa
 import { disburse, irisLive } from './iris.js'
 import { KATALOG, KATEGORI } from './healthMetrics.js'
 import { validasiLogLab, validasiCapWaktu, terimaTulisan } from './labLog.js'
+import { logKeBundelFhir, buatIzin, izinBerlaku } from './labFhir.js'
 import { parseHealthWebhookPayload, extractHeartRateSeries, extractSleepSessions, newestSampleDate } from './healthWebhook.js'
 import { checkHrZoneAlert, checkBedtimeReminder, checkWorkoutReminder, suggestedBedtime, ZONES } from './healthAlerts.js'
 import { fetchLeagueScoreboard, fetchF1Info, fetchMotoGpInfo, LEAGUES, UNAVAILABLE } from './sports.js'
@@ -893,6 +899,63 @@ app.put('/api/lab-log', requireAuth, (req, res) => {
   } catch (e) {
     res.status(400).json({ error: (e as Error).message })
   }
+})
+
+// Riwayat lab sebagai FHIR R4 + izin pasien untuk dokter (server/src/labFhir.ts).
+app.get('/api/lab-log/fhir', requireAuth, (req, res) => {
+  const u = (req as express.Request & { user: User }).user
+  res.json(logKeBundelFhir(getLabLog(u.email)?.log ?? {}, `Patient/${u.id}`, new Date().toISOString()))
+})
+app.get('/api/lab-log/shares', requireAuth, (req, res) => {
+  const u = (req as express.Request & { user: User }).user
+  res.json({ shares: listLabShares().filter((i) => i.pasienEmail === u.email), audit: listLabAudit(u.email) })
+})
+app.post('/api/lab-log/shares', requireAuth, (req, res) => {
+  const u = (req as express.Request & { user: User }).user
+  try {
+    const b = req.body as { dokterEmail?: unknown; hari?: unknown }
+    const izin = buatIzin(u.email, b?.dokterEmail, b?.hari, new Date())
+    // Satu izin aktif per dokter: berbagi ulang menggantikan yang lama (tercatat).
+    for (const lama of listLabShares().filter((i) => i.pasienEmail === u.email && i.dokterEmail === izin.dokterEmail && !i.dicabut)) {
+      revokeLabShare(lama.id, u.email, izin.dibuat)
+      addLabAudit({ waktu: izin.dibuat, pasienEmail: u.email, aktor: u.email, aksi: 'izin-dicabut', izinId: lama.id })
+    }
+    addLabShare(izin)
+    addLabAudit({ waktu: izin.dibuat, pasienEmail: u.email, aktor: u.email, aksi: 'izin-dibuat', izinId: izin.id })
+    res.json(izin)
+  } catch (e) {
+    res.status(400).json({ error: (e as Error).message })
+  }
+})
+app.delete('/api/lab-log/shares/:id', requireAuth, (req, res) => {
+  const u = (req as express.Request & { user: User }).user
+  const waktu = new Date().toISOString()
+  const i = revokeLabShare(String(req.params.id), u.email, waktu)
+  if (!i) { res.status(404).json({ error: 'not found' }); return }
+  addLabAudit({ waktu, pasienEmail: u.email, aktor: u.email, aksi: 'izin-dicabut', izinId: i.id })
+  res.json(i)
+})
+// Dokter: hanya peran dokter terverifikasi (peran efektif dari requireAuth),
+// hanya izin yang menyebut emailnya, belum kedaluwarsa, belum dicabut.
+app.get('/api/clinician/lab-shares', requireAuth, (req, res) => {
+  const u = (req as express.Request & { user: User }).user
+  if (u.role !== 'dokter') { res.status(403).json({ error: 'verified clinician role required' }); return }
+  const kini = new Date()
+  res.json({
+    shares: listLabShares().filter((i) => izinBerlaku(i, u.email, kini)).map((i) => ({
+      id: i.id, berakhir: i.berakhir, pasien: getUserByEmail(i.pasienEmail)?.name ?? 'Patient',
+    })),
+  })
+})
+app.get('/api/clinician/lab-shares/:id/fhir', requireAuth, (req, res) => {
+  const u = (req as express.Request & { user: User }).user
+  if (u.role !== 'dokter') { res.status(403).json({ error: 'verified clinician role required' }); return }
+  const kini = new Date()
+  const izin = listLabShares().find((i) => i.id === String(req.params.id))
+  if (!izinBerlaku(izin, u.email, kini)) { res.status(404).json({ error: 'no active access' }); return }
+  const pasien = getUserByEmail(izin.pasienEmail)
+  addLabAudit({ waktu: kini.toISOString(), pasienEmail: izin.pasienEmail, aktor: u.email, aksi: 'dibaca-dokter', izinId: izin.id })
+  res.json({ pasien: pasien?.name ?? 'Patient', berakhir: izin.berakhir, bundle: logKeBundelFhir(getLabLog(izin.pasienEmail)?.log ?? {}, `Patient/${pasien?.id ?? 'unknown'}`, kini.toISOString()) })
 })
 
 // Per-user webhook token + endpoint for automatic Apple Health sync via the
