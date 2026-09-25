@@ -1,0 +1,57 @@
+schema_version: 1
+status: living_source_of_truth
+purpose: Evidence-gated research and development queue. Research is not automatically implementation.
+
+promotion_pipeline:
+  - evidence
+  - real_problem
+  - named_user
+  - use_case
+  - system_fit
+  - reuse_check
+  - measurable_value
+  - validation_plan
+  - implementation
+
+priority_formula: "Priority = (Impact * Frequency * IntegrationGain * RiskReduction * StrategicValue) / (Complexity * RegressionRisk)"
+precision_rule: "Use ordinal/qualitative values when trustworthy numeric estimates do not exist."
+
+items:
+  - id: rnd.bootstrap_repository_system_map
+    title: Audit current main into feature/dependency/maturity registries
+    type: architecture_audit
+    status: ready
+    priority: highest
+    reason: Machine-readable governance must reflect actual repository state rather than aspiration.
+    evidence_needed: [current_main, relevant_tests, open_overlap]
+    outputs:
+      - governance/FEATURE_REGISTRY.yaml
+      - governance/MATURITY_REGISTRY.yaml
+      - governance/RISK_REGISTRY.yaml
+      - docs/architecture/INTEGRATION_MAP.md
+
+  - id: rnd.lab_longitudinal_vertical_slice
+    title: Mature lab result to baseline/trend to longitudinal trajectory end-to-end
+    type: product_maturity
+    status: ready_after_audit
+    priority: highest
+    reason: Current owner-defined real-world workflow lane.
+    evidence_needed: [current_implementation, server_persistence, FHIR_boundary, clinician_view, consent_audit, measurable_outcome]
+    outputs: [working_vertical_slice, validation_evidence, maturity_update]
+
+  - id: rnd.feature_island_scan
+    title: Detect orphan, duplicate and mock-only capabilities
+    type: integration
+    status: recurring
+    priority: high
+    reason: Reduce fragmentation without deleting useful capability.
+    evidence_needed: [current_routes, imports, state_ownership, services, persistence]
+    outputs: [integration_candidates, safe_reconciliation_tasks]
+
+  - id: rnd.external_evidence_scan
+    title: Evidence and technology refresh
+    type: research
+    status: recurring
+    priority: evidence_triggered
+    reason: Continuous evolution requires current evidence, standards and validated technology.
+    rule: Findings enter backlog only after evidence/problem/system-fit review.
