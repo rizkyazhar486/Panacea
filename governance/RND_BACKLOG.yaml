@@ -33,11 +33,19 @@ items:
   - id: rnd.lab_longitudinal_vertical_slice
     title: Mature lab result to baseline/trend to longitudinal trajectory end-to-end
     type: product_maturity
-    status: ready_after_audit
+    status: in_progress
     priority: highest
     reason: Current owner-defined real-world workflow lane.
     evidence_needed: [current_implementation, server_persistence, FHIR_boundary, clinician_view, consent_audit, measurable_outcome]
     outputs: [working_vertical_slice, validation_evidence, maturity_update]
+    # 2026-09-25: canonical_longitudinal_state_projection sub-gap closed —
+    # src/lib/labLongitudinalBridge.ts + src/lib/productionLabLongitudinalSync.ts, wired into
+    # src/lib/productionAppStateLongitudinalSync.ts, deterministic gates green (npm run uji
+    # 465/465, tsc -b clean, npm run build passes). Remaining before this item can close:
+    # wire the sync into a real UI/app-state event, timeline_projection, body_exposure_projection,
+    # production_deployment_verification, prospective_clinician_validation. See
+    # governance/MATURITY_REGISTRY.yaml workflow longitudinal.lab_to_trajectory for the audited
+    # dimension scores and full evidence trail.
 
   - id: rnd.feature_island_scan
     title: Detect orphan, duplicate and mock-only capabilities

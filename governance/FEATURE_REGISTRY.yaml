@@ -155,7 +155,7 @@ features:
     outputs: [trend_context, baseline_context, prevention_context]
     reads_from: [canonical_patient_state]
     writes_to: [timeline, longitudinal_health_state]
-    dependencies: [source_normalization, provenance, uncertainty]
+    dependencies: [source_normalization, provenance, uncertainty, canonical_longitudinal_kernel]
     dependents: [prevention, coaching, clinical_view]
     patient_state_fields: [requires_repository_audit]
     knowledge_graph_entities: [requires_repository_audit]
@@ -171,6 +171,16 @@ features:
     provenance_required: true
     tests: [see governance/MATURITY_REGISTRY.yaml longitudinal.lab_to_trajectory]
     observability: [requires_repository_audit]
-    known_gaps: [not_projected_into_canonical_longitudinal_state, wearable_and_non_lab_signals_not_audited]
-    next_actions: [project_lab_observations_into_canonical_longitudinal_state]
-    last_audited_commit: 0cb6906a
+    known_gaps: [not_wired_into_a_real_ui_call_site_for_the_new_longitudinal_sync, wearable_and_non_lab_signals_not_audited]
+    next_actions: [wire_syncProductionAppState_lab_path_into_a_real_app_state_change_handler]
+    last_audited_commit: PENDING_NEXT_COMMIT
+    # 2026-09-25: src/lib/labLongitudinalBridge.ts + src/lib/productionLabLongitudinalSync.ts now
+    # project ButirLab (lab.ts) and the PhenoAge/biological-age trajectory (bioAgeTrajectory.ts)
+    # into panaceaLongitudinalState.ts (domain 'lab' with honest review.state 'pending', domain
+    # 'longevity' derived phenoage/phenoage-age-gap with 'not-required'), composed into
+    # src/lib/productionAppStateLongitudinalSync.ts alongside the existing health-store bridge.
+    # Reachability through projectStateToSurface/buildContextPacket is covered by
+    # scripts/uji/lab-longitudinal-bridge.mts, scripts/uji/production-lab-longitudinal-sync.mts and
+    # the extended scripts/uji/production-appstate-longitudinal-sync.mts. This closes the
+    # `not_projected_into_canonical_longitudinal_state` gap; it does not yet wire the sync into a
+    # real UI event, so `known_gaps`/`next_actions` were updated to name that remaining step.

@@ -13,7 +13,7 @@ workflows:
     clinical_validation: none  # engineering correctness only; no prospective clinician study yet
     dimensions:
       functional_completeness: high  # entry, correction, per-report range, baseline/trend, PhenoAge trajectory, sync, FHIR, share, review, notify
-      integration: medium  # server persistence + FHIR R4 + clinician view + notifications; not yet in canonical longitudinal state/timeline or Body Exposure
+      integration: medium  # now projects into panaceaLongitudinalState (canonical kernel) with honest 'pending' clinician-review status and reachable via projectStateToSurface/buildContextPacket; still not wired into a real UI call site, the Body Exposure timeline, or QuestionnaireResponse/timeline_projection — kept at medium, not raised to high, until wiring + production evidence exist
       reliability: medium  # server validation, last-write-wins with 409, sync retry/backoff; single-node file/Mongo store
       usability: medium  # browser-verified at 390x844; no user testing
       clinical_quality: unknown  # formulas sourced (PhenoAge Levine 2018, MAD baseline); not clinically validated
@@ -25,9 +25,13 @@ workflows:
       - "HTTP: own 200, other patient empty, stale write 409, future date 400; clinician granted 200 / other 404 / unverified 403 / after revoke 404"
       - "browser E2E 390x844: add->warn->save->delete; device A->B sync; share->clinician trend view->review->patient sees review"
       - "commits: 16608b5a 07813792 3fc91bf4 b237c432 88ba36ff 14aa0435 0beadc1c 5516e7d8 7926aee9 96de9684"
-    known_gaps: [photo_pdf_import, canonical_longitudinal_state_projection, timeline_projection, body_exposure_projection, production_deployment_verification, prospective_clinician_validation]
-    next_action: project_lab_observations_into_canonical_longitudinal_state
-    last_audited_commit: 0cb6906a
+      - "canonical longitudinal projection: src/lib/labLongitudinalBridge.ts (ButirLab + TitikUsiaBiologis -> LongitudinalEvent, domain 'lab' review.state genuinely 'pending' not fabricated 'not-required'/'accepted', domain 'longevity' derived phenoage/phenoage-age-gap) + src/lib/productionLabLongitudinalSync.ts (idempotent orchestrator, same shape as productionHealthLongitudinalSync.ts) composed into src/lib/productionAppStateLongitudinalSync.ts (personal-scope gated, same as selfVitals/vo2max)"
+      - "gates: scripts/uji/lab-longitudinal-bridge.mts, scripts/uji/production-lab-longitudinal-sync.mts, scripts/uji/production-appstate-longitudinal-sync.mts (extended) — cover mapping, unit/domain correctness, clinician-review-state honesty, skip-on-invalid-input, idempotent re-ingestion, and direct reachability through projectStateToSurface/buildContextPacket (lab withheld from Clinical while pending, visible in ai-chatbot with true reviewState, derived phenoage visible in Your Body)"
+      - "npm run uji: 465/465; tsc -b: no errors; npm run build: passes"
+      - "commit: (recorded on next audit — see below)"
+    known_gaps: [photo_pdf_import, real_ui_call_site_for_production_sync, timeline_projection, body_exposure_projection, production_deployment_verification, prospective_clinician_validation]
+    next_action: wire_syncProductionAppState_into_a_real_app_state_change_handler_so_lab_and_health_store_projection_actually_fires_on_user_events
+    last_audited_commit: PENDING_NEXT_COMMIT
 
   - workflow_id: care.daily_checkin
     name: Clinician-authored daily check-in to clinician digest

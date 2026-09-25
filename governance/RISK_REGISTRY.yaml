@@ -13,6 +13,17 @@ risks:
     description: Multiple modules may model the same person independently and diverge.
     mitigation: Converge on canonical patient state and explicit write authority.
     evidence: [requires_repository_audit]
+    # 2026-09-25: one concrete instance narrowed, not the whole risk. The lab log
+    # (src/lib/lab.ts) and the PhenoAge/biological-age trajectory
+    # (src/lib/bioAgeTrajectory.ts) previously lived only in their own
+    # localStorage-backed stores, outside panaceaLongitudinalState.ts.
+    # src/lib/labLongitudinalBridge.ts + src/lib/productionLabLongitudinalSync.ts now
+    # give them a real, tested (scripts/uji/lab-longitudinal-bridge.mts,
+    # scripts/uji/production-lab-longitudinal-sync.mts) projection into the canonical
+    # kernel with an honest (not fabricated) clinician-review state. State remains
+    # `open`, not downgraded: this sync is not yet called from a real UI event, and
+    # other non-lab modules that may independently model the same person have not
+    # been re-audited.
 
   - risk_id: risk.feature_sprawl
     category: product_architecture
