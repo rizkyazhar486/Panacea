@@ -20,6 +20,12 @@ assert.match(ui, /not coded/, 'tampilan dokter menyembunyikan bahwa sebagian has
 assert.match(readFileSync('src/pages/ClinicalHub.tsx', 'utf8'), /account\?\.role === 'dokter' && <LabPasienUntukDokter \/>/)
 assert.match(readFileSync('src/components/BagikanLabKeDokter.tsx', 'utf8'), /Revoke/, 'pasien tidak bisa mencabut izin')
 
+// Kecerdasan longitudinal di tampilan dokter: mesin tren yang sama dengan sisi
+// pasien, pergeseran berkelanjutan diurutkan paling atas, bukan tabel angka mati.
+assert.match(ui, /analisisTrenSeri\(/, 'tampilan dokter tidak lagi menghitung tren garis dasar pribadi')
+assert.match(ui, /\.sort\(\(x, y\) => \(x\.tren \? STATUS_KLINISI/, 'pergeseran berkelanjutan tidak lagi diurutkan di atas')
+assert.match(ui, /Monitoring signal, not an interpretation/, 'batas "sinyal pemantauan, bukan interpretasi" hilang')
+
 // Regresi: rekam medis server tanpa pemeriksaan per sistem merobohkan Clinical untuk dokter.
 assert.doesNotThrow(() => buildBodyClinicalFindings(undefined))
 assert.doesNotThrow(() => buildBodyClinicalFindings(null))

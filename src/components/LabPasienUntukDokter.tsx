@@ -1,5 +1,31 @@
 import { useEffect, useState } from 'react'
-import { api, backendEnabled, type FhirBundelLab } from '../lib/api'
+import { api, backendEnabled, type FhirBundelLab, type FhirObservasiLab } from '../lib/api'
+import { analisisTrenSeri, MIN_RIWAYAT_GARIS_DASAR, type StatusTren } from '../lib/labTrend'
+
+// Bahasa klinisi untuk mesin tren yang sama dengan sisi pasien (labTrend.ts):
+// garis dasar pribadi (median ± 2·MAD×1,4826 dari hasil SEBELUMNYA), satu titik
+// menyimpang = "single deviation", dua berurutan searah = "sustained shift".
+// Rentang populasi tidak dipakai di sini: bundel tidak membawanya, dan setiap
+// lab punya rentang sendiri. Ini sinyal pemantauan, bukan interpretasi klinis.
+const STATUS_KLINISI: Record<StatusTren, { teks: string; urut: number; kelas: string }> = {
+  'bicarakan-dengan-dokter': { teks: 'Sustained shift', urut: 0, kelas: 'text-rose-300' },
+  'perubahan-bermakna': { teks: 'Sustained shift', urut: 0, kelas: 'text-rose-300' },
+  pantau: { teks: 'Single deviation', urut: 1, kelas: 'text-amber-300' },
+  stabil: { teks: 'Within personal range', urut: 2, kelas: 'text-emerald-300' },
+  'belum-cukup-data': { teks: `Baseline forming (<${MIN_RIWAYAT_GARIS_DASAR + 1} results)`, urut: 3, kelas: 'text-white/50' },
+}
+
+function Garis({ obs }: { obs: FhirObservasiLab[] }) {
+  if (obs.length < 2) return <span className="text-[10px] text-white/35">1 result</span>
+  const v = obs.map((o) => o.valueQuantity.value)
+  const min = Math.min(...v), maks = Math.max(...v), r = maks - min || 1
+  const titik = v.map((x, i) => `${(i / (v.length - 1)) * 100},${(22 - ((x - min) / r) * 20).toFixed(1)}`).join(' ')
+  return (
+    <svg viewBox="0 0 100 24" preserveAspectRatio="none" className="h-6 w-20" role="img" aria-label={`${v.length} results`}>
+      <polyline points={titik} fill="none" stroke="#00BF63" strokeWidth="1.8" vectorEffect="non-scaling-stroke" strokeLinejoin="round" />
+    </svg>
+  )
+}
 
 // Tampilan dokter: hasil lab yang DIBAGIKAN pasien, dibaca sebagai FHIR
 // Observation. Setiap pembukaan tercatat di jejak audit pasien (server).
@@ -33,23 +59,30 @@ export function LabPasienUntukDokter() {
       {buka && (
         <div className="mt-3">
           <p className="text-[11px] font-bold text-amber-200">{buka.pasien} · patient-transcribed from lab reports — verify against the original before clinical use.</p>
-          <table className="mt-2 w-full text-left text-[12px]">
-            <thead className="text-[10px] uppercase tracking-wide text-white/45"><tr><th className="py-1 pr-2">Test</th><th className="pr-2">Latest</th><th className="pr-2">Prev.</th><th>Date</th></tr></thead>
-            <tbody>
-              {[...kelompok.entries()].map(([nama, obs]) => {
-                const a = obs[obs.length - 1], b = obs[obs.length - 2]
+          <ul className="mt-2 divide-y divide-white/10" aria-label="Results by test">
+            {[...kelompok.entries()]
+              .map(([nama, obs]) => ({ nama, obs, tren: analisisTrenSeri(obs.map((o) => ({ tanggal: o.effectiveDateTime.slice(0, 10), nilai: o.valueQuantity.value }))) }))
+              .sort((x, y) => (x.tren ? STATUS_KLINISI[x.tren.status].urut : 9) - (y.tren ? STATUS_KLINISI[y.tren.status].urut : 9))
+              .map(({ nama, obs, tren }) => {
+                const a = obs[obs.length - 1]
                 const loinc = a.code.coding?.[0]?.code
+                const st = tren ? STATUS_KLINISI[tren.status] : null
                 return (
-                  <tr key={nama} className="border-t border-white/10">
-                    <td className="py-1.5 pr-2">{nama}<span className="block text-[9px] text-white/40">{loinc ? `LOINC ${loinc}` : 'not coded'}</span></td>
-                    <td className="pr-2 tabular-nums font-black">{a.valueQuantity.value} <span className="font-normal text-white/50">{a.valueQuantity.unit}</span></td>
-                    <td className="pr-2 tabular-nums text-white/60">{b ? b.valueQuantity.value : '—'}</td>
-                    <td className="tabular-nums text-white/60">{a.effectiveDateTime}</td>
-                  </tr>
+                  <li key={nama} className="grid grid-cols-[minmax(0,1fr)_auto] gap-x-3 py-2" data-trend-status={tren?.status}>
+                    <div className="min-w-0">
+                      <div className="truncate text-[12px] font-bold">{nama}</div>
+                      <div className="text-[10px] text-white/45">{loinc ? `LOINC ${loinc}` : 'not coded'} · {obs.length} result{obs.length > 1 ? 's' : ''} · last {a.effectiveDateTime.slice(0, 10)}</div>
+                      {st && <div className={`text-[11px] font-bold ${st.kelas}`}>{st.teks}{tren?.garisDasar != null ? ` · baseline ${Number(tren.garisDasar.toFixed(2))}` : ''}{tren?.zPribadi != null && tren.status !== 'belum-cukup-data' ? ` · z ${tren.zPribadi.toFixed(1)}` : ''}</div>}
+                    </div>
+                    <div className="flex flex-col items-end">
+                      <span className="text-[13px] font-black tabular-nums">{a.valueQuantity.value} <span className="text-[10px] font-normal text-white/50">{a.valueQuantity.unit}</span></span>
+                      <Garis obs={obs} />
+                    </div>
+                  </li>
                 )
               })}
-            </tbody>
-          </table>
+          </ul>
+          <p className="mt-1 text-[10px] leading-snug text-white/40">Status compares each result with this patient's own earlier results (median ± 2 MAD); a sustained shift needs two consecutive results moving the same way. Monitoring signal, not an interpretation.</p>
           {kelompok.size === 0 && <p className="mt-1 text-[11px] text-white/55">This patient has no lab results yet.</p>}
         </div>
       )}
