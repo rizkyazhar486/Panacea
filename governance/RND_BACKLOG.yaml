@@ -38,6 +38,15 @@ items:
     reason: Current owner-defined real-world workflow lane.
     evidence_needed: [current_implementation, server_persistence, FHIR_boundary, clinician_view, consent_audit, measurable_outcome]
     outputs: [working_vertical_slice, validation_evidence, maturity_update]
+    notes: >
+      measurable_outcome landed 2026-09-25: process metric lab-outcome-v1
+      (src/lib/hasilTerukurLab.ts, gate scripts/uji/hasil-terukur-lab.mts) plus
+      prospective clinician validation protocol design
+      (DOCS/LAB-LONGITUDINAL-MEASURABLE-OUTCOME.md). All other evidence_needed
+      items were already satisfied per MATURITY_REGISTRY.yaml
+      longitudinal.lab_to_trajectory. Remaining open item is running the
+      protocol itself (investigator + IRB + participants), which is a human/
+      clinical action outside this repository's automation loop.
 
   - id: rnd.feature_island_scan
     title: Detect orphan, duplicate and mock-only capabilities
