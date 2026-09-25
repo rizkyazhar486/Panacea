@@ -14,10 +14,11 @@ export type LongitudinalDomain =
   | 'medication'
   | 'clinical-note'
   | 'device'
+  | 'intent'
   | 'other'
 
 export type ReviewState = 'not-required' | 'pending' | 'accepted' | 'rejected'
-export type ConsentPurpose = 'personal-visualization' | 'clinical-support' | 'ai-context' | 'research-export'
+export type ConsentPurpose = 'personal-visualization' | 'clinical-support' | 'ai-context' | 'research-export' | 'rehab-tracking'
 
 export interface LongitudinalProvenance {
   sourceKind: 'manual' | 'wearable' | 'clinical-system' | 'device' | 'derived' | 'import'
@@ -108,14 +109,14 @@ export interface PublishResult {
 export type LongitudinalSubscriber = (event: LongitudinalEvent) => void
 
 const DOMAIN_BY_SURFACE: Readonly<Record<PanaceaSurface, readonly LongitudinalDomain[]>> = {
-  'your-body': ['vital', 'activity', 'sleep', 'recovery', 'longevity', 'readiness', 'fitness', 'nutrition', 'device'],
-  clinical: ['vital', 'lab', 'symptom', 'medication', 'clinical-note', 'device', 'other'],
+  'your-body': ['vital', 'activity', 'sleep', 'recovery', 'longevity', 'readiness', 'fitness', 'nutrition', 'device', 'intent'],
+  clinical: ['vital', 'lab', 'symptom', 'medication', 'clinical-note', 'device', 'intent', 'other'],
   'for-you': ['activity', 'sleep', 'recovery', 'readiness', 'fitness', 'nutrition', 'other'],
-  'ai-emr': ['vital', 'lab', 'symptom', 'medication', 'clinical-note', 'device', 'other'],
-  'ai-chatbot': ['vital', 'activity', 'sleep', 'recovery', 'longevity', 'readiness', 'fitness', 'nutrition', 'lab', 'symptom', 'medication', 'clinical-note', 'device', 'other'],
+  'ai-emr': ['vital', 'lab', 'symptom', 'medication', 'clinical-note', 'device', 'intent', 'other'],
+  'ai-chatbot': ['vital', 'activity', 'sleep', 'recovery', 'longevity', 'readiness', 'fitness', 'nutrition', 'lab', 'symptom', 'medication', 'clinical-note', 'device', 'intent', 'other'],
 }
 
-const CLINICIAN_REVIEW_DOMAINS = new Set<LongitudinalDomain>(['lab', 'symptom', 'medication', 'clinical-note'])
+const CLINICIAN_REVIEW_DOMAINS = new Set<LongitudinalDomain>(['lab', 'symptom', 'medication', 'clinical-note', 'intent'])
 const DAY_MS = 86_400_000
 const NUMERIC_EPSILON = 1e-9
 
