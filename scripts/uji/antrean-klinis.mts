@@ -37,4 +37,11 @@ for (const f of ['addPatientRemote', 'addVitalRemote', 'addSupportiveRemote', 's
 }
 assert.match(store, /window\.addEventListener\('online', on\)[\s\S]{0,80}kurasSinkronKlinis|kurasSinkronKlinis\(\)\n    const on = \(\) => void kurasSinkronKlinis\(\)/, 'antrean klinis tidak dikuras saat muat/online')
 for (const hal of ['src/pages/EMR.tsx', 'src/pages/Dashboard.tsx']) assert.match(readFileSync(hal, 'utf8'), /<StatusSinkronKlinis \/>/, `${hal} tidak menampilkan status sinkron klinis`)
+const api = readFileSync('src/lib/api.ts', 'utf8')
+const emr = readFileSync('src/pages/EMR.tsx', 'utf8')
+assert.match(api, /saveRecordRemote:[\\s\\S]{0,180}record:\\s*EMRRecord/, 'API belum mengetik balasan record canonical server')
+assert.match(store, /sinkronKlinis\('record',[\\s\\S]{0,180}terimaBalasanKlinis/, 'saveRecord tidak merekonsiliasi balasan canonical server')
+assert.match(store, /record\.patientId !== op\.patientId/, 'balasan canonical server tidak dibatasi ke pasien operasi yang sama')
+assert.match(emr, /Certified by \{draft\.signedBy\}/, 'UI tanda tangan masih menampilkan nama lokal, bukan signer canonical')
+assert.doesNotMatch(emr, /Certified by \{state\.settings\.doctorName\}/, 'UI kembali percaya nama penandatangan dari setting lokal')
 console.log('antrean-klinis: jaringan→antre, penolakan→galat tampil, upsert menggantikan, kuras online, tanpa .catch(() => {}) klinis')
