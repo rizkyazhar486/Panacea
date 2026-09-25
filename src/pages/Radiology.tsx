@@ -1,8 +1,9 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import type { PointerEvent as ReactPointerEvent } from 'react'
 import { Card, SectionTitle } from '../components/ui'
 import { IconSearch, IconActivity } from '../components/icons'
 import { DicomCrossplanes3D } from '../components/DicomCrossplanes3D'
+import { skalaBidang, skalaIrisanTunggal } from '../lib/ukurMpr'
+import { PlaneViewer } from '../components/PlaneViewerMpr'
 import {
   bacaDicom, jendelaAwal, nilaiDi, tafsirHu,
   JENDELA_CT, type Citra,
@@ -23,99 +24,6 @@ import {
 } from '../lib/dicomSeries'
 
 type Irisan = DicomSliceItem
-
-interface PlaneProps {
-  title: string
-  subtitle: string
-  plane: IrisanMpr
-  pusat: number
-  lebar: number
-  terbalik: boolean
-  crossX?: number
-  crossY?: number
-  showCrosshair: boolean
-  primary?: boolean
-  onPick: (x: number, y: number) => void
-}
-
-function PlaneViewer({
-  title, subtitle, plane, pusat, lebar, terbalik,
-  crossX, crossY, showCrosshair, primary, onPick,
-}: PlaneProps) {
-  const canvasRef = useRef<HTMLCanvasElement>(null)
-
-  useEffect(() => {
-    const canvas = canvasRef.current
-    if (!canvas) return
-    canvas.width = plane.kolom
-    canvas.height = plane.baris
-    const context = canvas.getContext('2d')
-    if (!context) return
-
-    const gray = jendelakanMpr(plane.nilai, pusat, lebar, terbalik)
-    const image = context.createImageData(plane.kolom, plane.baris)
-    for (let i = 0; i < gray.length; i++) {
-      const offset = i * 4
-      image.data[offset] = gray[i]
-      image.data[offset + 1] = gray[i]
-      image.data[offset + 2] = gray[i]
-      image.data[offset + 3] = 255
-    }
-    context.putImageData(image, 0, 0)
-  }, [plane, pusat, lebar, terbalik])
-
-  const pick = (event: ReactPointerEvent<HTMLCanvasElement>) => {
-    const canvas = canvasRef.current
-    if (!canvas) return
-    const rect = canvas.getBoundingClientRect()
-    const x = Math.max(0, Math.min(plane.kolom - 1, Math.floor(((event.clientX - rect.left) / rect.width) * plane.kolom)))
-    const y = Math.max(0, Math.min(plane.baris - 1, Math.floor(((event.clientY - rect.top) / rect.height) * plane.baris)))
-    onPick(x, y)
-  }
-
-  const crossLeft = crossX == null || plane.kolom <= 1 ? 50 : (crossX / (plane.kolom - 1)) * 100
-  const crossTop = crossY == null || plane.baris <= 1 ? 50 : (crossY / (plane.baris - 1)) * 100
-  const safeAspect = Math.max(0.35, Math.min(3.2, plane.aspek || 1))
-
-  return (
-    <section className={`overflow-hidden rounded-2xl border border-white/10 bg-black/70 ${primary ? 'lg:row-span-2' : ''}`}>
-      <div className="flex items-center justify-between gap-3 border-b border-white/10 px-3 py-2.5">
-        <div>
-          <div className="text-xs font-black text-white">{title}</div>
-          <div className="text-[10px] text-white/45">{subtitle}</div>
-        </div>
-        <div className="rounded-lg border border-white/10 bg-white/5 px-2 py-1 text-[10px] font-bold text-white/55">
-          {plane.kolom}×{plane.baris}
-        </div>
-      </div>
-      <div className="relative flex min-h-[220px] items-center justify-center overflow-hidden bg-black p-2 sm:min-h-[280px]">
-        <div className="relative w-full max-w-full" style={{ aspectRatio: String(safeAspect) }}>
-          <canvas
-            ref={canvasRef}
-            onPointerDown={(event) => {
-              event.currentTarget.setPointerCapture(event.pointerId)
-              pick(event)
-            }}
-            onPointerMove={(event) => { if (event.buttons === 1) pick(event) }}
-            className="block h-full max-h-[560px] w-full cursor-crosshair select-none object-contain"
-            style={{ imageRendering: 'pixelated', touchAction: 'none', aspectRatio: String(safeAspect) }}
-            aria-label={`${title} DICOM plane`}
-          />
-          {showCrosshair && crossX != null && crossY != null && (
-            <div className="pointer-events-none absolute inset-0" aria-hidden="true">
-              <div className="absolute bottom-0 top-0 w-px bg-cyan-300/70" style={{ left: `${crossLeft}%` }} />
-              <div className="absolute left-0 right-0 h-px bg-amber-300/70" style={{ top: `${crossTop}%` }} />
-              <div
-                className="absolute h-2.5 w-2.5 -translate-x-1/2 -translate-y-1/2 rounded-full border border-white bg-black/70"
-                style={{ left: `${crossLeft}%`, top: `${crossTop}%` }}
-              />
-            </div>
-          )}
-        </div>
-      </div>
-    </section>
-  )
-}
 
 function MiniSlice({ citra, pusat, lebar, aktif, onClick, label }: {
   citra: Citra
@@ -225,6 +133,7 @@ export function Radiology() {
   const [cursor, setCursor] = useState({ x: 0, y: 0 })
   const [memuat, setMemuat] = useState(false)
   const [crosshair, setCrosshair] = useState(true)
+  const [ukur, setUkur] = useState(false)
   const [catatan, setCatatan] = useState('')
 
   const groups = useMemo(() => kelompokkanDicomUntukTampilan(loaded), [loaded])
@@ -401,6 +310,14 @@ export function Radiology() {
               >
                 Point guide {crosshair ? 'on' : 'off'}
               </button>
+              <button
+                type="button"
+                onClick={() => setUkur((value) => !value)}
+                aria-pressed={ukur}
+                className={`rounded-xl border px-3 py-2 text-[10px] font-black ${ukur ? 'border-amber-300/40 bg-amber-400/15 text-amber-100' : 'border-white/10 bg-white/5 text-white/60'}`}
+              >
+                Measure {ukur ? 'on' : 'off'}
+              </button>
               <a
                 href="#/body-explorer"
                 className="rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-[10px] font-black text-white/75 hover:bg-white/10"
@@ -425,6 +342,8 @@ export function Radiology() {
                   crossY={cursor.y}
                   showCrosshair={crosshair}
                   onPick={(x, y) => setCursor({ x, y })}
+                  ukur={ukur}
+                  skala={volume ? skalaBidang(volume, 'source') : skalaIrisanTunggal(kini)}
                 />
 
                 {crossRow && (
@@ -442,6 +361,8 @@ export function Radiology() {
                       setCursor((old) => ({ ...old, x }))
                       setSlice(z)
                     }}
+                    ukur={ukur}
+                    skala={volume ? skalaBidang(volume, 'cross-row') : undefined}
                   />
                 )}
 
@@ -460,6 +381,8 @@ export function Radiology() {
                       setCursor((old) => ({ ...old, y }))
                       setSlice(z)
                     }}
+                    ukur={ukur}
+                    skala={volume ? skalaBidang(volume, 'cross-column') : undefined}
                   />
                 )}
               </div>

@@ -63,4 +63,9 @@ console.log('rencana-harian-kontrak: rencana/laporan server diterima kernel, ide
   const dokterUi = readFileSync('src/components/RencanaHarianDokter.tsx', 'utf8')
   assert.match(dokterUi, /submitDailyAnamnesis\(plan, r\)/, 'prioritas laporan dipercaya dari pasien, bukan dihitung ulang kernel')
   assert.match(readFileSync('src/components/CekHarian.tsx', 'utf8'), /Not an emergency service/, 'cek harian kehilangan batas "bukan layanan darurat"')
+  // Kegagalan muat() awal TIDAK BOLEH `if (!data) return null` menelan pesan
+  // galat: dokter harus melihat error + jalan retry, bukan bagian kosong selamanya.
+  const muatAwal = dokterUi.slice(dokterUi.indexOf('if (!data)'), dokterUi.indexOf('const plan = data.plan'))
+  assert.match(muatAwal, /galat/, 'cabang !data tidak menampilkan galat saat muat() awal gagal')
+  assert.match(muatAwal, /Retry|muat\(\)/, 'cabang !data tidak menawarkan jalan retry')
 }

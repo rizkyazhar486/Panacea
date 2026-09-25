@@ -56,26 +56,27 @@ Do not ask:
 
 The standing owner answer is **yes, continue**, subject to the safety and escalation boundaries in this repository.
 
-## Priority order
+## Priority order — latest owner sequencing override
 
-Unless current repository evidence requires a different dependency order:
+The detailed sequencing contract is [`docs/CLAUDE_CODE_BALANCED_GAP_CLOSURE_DIRECTIVE.md`](CLAUDE_CODE_BALANCED_GAP_CLOSURE_DIRECTIVE.md) and takes precedence over older default product sequencing when they conflict.
 
-1. clinical safety, security, privacy, and data-integrity blockers;
-2. broken `main`, failing CI, build/typecheck/test failures;
-3. broken core end-to-end workflows;
-4. persistence/backend/data reliability;
-5. authorization, consent, provenance, auditability;
-6. interoperability and FHIR correctness;
-7. canonical longitudinal patient-state consistency;
-8. frontend runtime failures and unreachable flows;
-9. mobile/responsive/accessibility failures;
-10. Body Exposure integration, anatomy provenance, scientific accuracy, performance;
-11. observability and deployment reliability;
-12. UX friction and simplification;
-13. visual polish;
-14. net-new breadth only when it clears the repository’s research-to-implementation gate.
+Use this phase order:
 
-Default: **maturity and integration before new breadth**.
+1. **Hard blockers:** clinical safety, security, privacy, data integrity, broken main and critical failing CI.
+2. **Human clinical-validation enablement:** build real protocol/metrics/reviewer/adjudication/provenance/audit/reporting infrastructure. Never fabricate human validation; if genuine human execution is the remaining blocker, record it and continue.
+3. **AI-EMR / longitudinal clinician workflow:** canonical patient state → review → evidence-aware reasoning → clinician verification → action → follow-up.
+4. **Maturity leveling:** repeatedly select the weakest important remaining core lane (continuous care, persistence/backend, interoperability/FHIR, authorization/consent/audit, longevity/personalized medicine, deployment/observability, etc.) until core maturity is reasonably even.
+5. **Body Exposure dominance:** after the maturity-leveling gate is met, make Body Exposure the main implementation lane, whole-body first and then systems → organs → tissues → cells → organelles → molecules/pathways → genome.
+6. **Final UI/UX finishing touch:** cosmetic visual polish is last. Accessibility, broken responsive behavior, unsafe/confusing clinical state, dead controls, loading/error failures and other functional UX defects remain eligible for earlier repair.
+7. **Net-new breadth:** only when it passes the repository research-to-implementation gate and does not steal capacity from a weaker maturity lane.
+
+Default rule:
+
+```
+RAISE THE FLOOR BEFORE RAISING THE CEILING.
+BALANCE CORE MATURITY BEFORE BODY EXPOSURE DOMINANCE.
+FINISH FUNCTION AND EVIDENCE BEFORE COSMETIC POLISH.
+```
 
 ## Exact-head rule
 

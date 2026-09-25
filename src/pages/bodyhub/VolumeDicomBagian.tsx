@@ -1,6 +1,12 @@
-import { useCallback, useRef, useState } from 'react'
-import { bacaDicom, urutkanSeri, type Citra } from '../../lib/dicom'
-import { buatVolumeMpr } from '../../lib/dicomMpr'
+import { useCallback, useMemo, useRef, useState } from 'react'
+import { PlaneViewer } from '../../components/PlaneViewerMpr'
+import { skalaBidang } from '../../lib/ukurMpr'
+import { kursorKeKotak, type KursorVoksel } from '../../lib/sinkronMpr3d'
+import { lapisanAwalCt, lapisanAwalRelatif, type LapisanVolume } from '../../lib/lapisanVolume'
+import { BIDANG_AWAL, type BidangMiring } from '../../lib/bidangPotong'
+import { buatResep, bacaResep, cocokkanResep, sha256Hex, BATAS_RESEP } from '../../lib/resepRender'
+import { bacaDicom, urutkanSeri, JENDELA_CT, type Citra } from '../../lib/dicom'
+import { buatVolumeMpr, ambilIrisanMpr, labelBidangMpr, type VolumeMpr } from '../../lib/dicomMpr'
 import {
   susunVolumeTekstur, jendelaAwalVolume, BATAS_VOLUME,
   type VolumeTekstur,
@@ -13,7 +19,7 @@ type Keadaan =
   | { tahap: 'kosong' }
   | { tahap: 'membaca'; jumlah: number }
   | { tahap: 'gagal'; alasan: string }
-  | { tahap: 'siap'; tekstur: VolumeTekstur; jumlah: number; modalitas: string; ditolak: string[] }
+  | { tahap: 'siap'; tekstur: VolumeTekstur; volume: VolumeMpr; jumlah: number; modalitas: string; ditolak: string[]; sha256: string[]; seriesUid?: string }
 
 function GeserHu({ label, nilai, min, maks, onUbah }: {
   label: string; nilai: number; min: number; maks: number; onUbah: (n: number) => void
@@ -58,6 +64,15 @@ export function VolumeDicomBagian() {
   const [mode, setMode] = useState<ModeRender>('volume')
   const [pajanan, setPajanan] = useState(1)
   const [potong, setPotong] = useState<PotongVolume>([1, 1, 1])
+  const [lapisan, setLapisan] = useState<LapisanVolume[]>([])
+  const [halus, setHalus] = useState(1.5)
+  const [bidang, setBidang] = useState<BidangMiring>(BIDANG_AWAL)
+  // MPR sinkron: satu kursor voksel untuk tiga bidang DAN penanda 3D.
+  const [kursor, setKursor] = useState<KursorVoksel>({ x: 0, y: 0, z: 0 })
+  const [jendela, setJendela] = useState({ pusat: 40, lebar: 400 })
+  const [ukur, setUkur] = useState(false)
+  const [pesanResep, setPesanResep] = useState<{ nada: 'ok' | 'peringatan'; teks: string } | null>(null)
+  const resepRef = useRef<HTMLInputElement | null>(null)
   const masukanRef = useRef<HTMLInputElement | null>(null)
 
   const ubahPotong = (sumbu: 0 | 1 | 2, nilai: number) => {
@@ -70,10 +85,12 @@ export function VolumeDicomBagian() {
 
     const citra: Citra[] = []
     const ditolak: string[] = []
+    const sidik: string[] = []
     for (const f of Array.from(berkas)) {
       try {
-        const hasil = bacaDicom(await f.arrayBuffer())
-        if (hasil.ok) citra.push(hasil.data)
+        const buf = await f.arrayBuffer()
+        const hasil = bacaDicom(buf)
+        if (hasil.ok) { citra.push(hasil.data); sidik.push(await sha256Hex(buf)) }
         else ditolak.push(`${f.name}: ${hasil.alasan}`)
       } catch {
         ditolak.push(`${f.name}: could not be read`)
@@ -101,11 +118,24 @@ export function VolumeDicomBagian() {
     setBawah(jendela.bawah + (jendela.atas - jendela.bawah) * 0.35)
     setAtas(jendela.atas)
     setPotong([1, 1, 1])
+    setKursor({ x: Math.floor(volume.volume.kolom / 2), y: Math.floor(volume.volume.baris / 2), z: Math.floor(volume.volume.kedalaman / 2) })
+    setJendela(citra[0].modalitas === 'CT' ? { pusat: 40, lebar: 400 } : { pusat: (jendela.bawah + jendela.atas) / 2, lebar: Math.max(1, jendela.atas - jendela.bawah) })
+    // Lapisan awal: kelas HU bersumber untuk CT; pecahan jendela tanpa nama jaringan untuk MRI.
+    setLapisan(citra[0].modalitas === 'CT' ? lapisanAwalCt() : lapisanAwalRelatif(jendela))
     setKeadaan({
-      tahap: 'siap', tekstur: tekstur.tekstur, jumlah: citra.length,
-      modalitas: citra[0].modalitas, ditolak,
+      tahap: 'siap', tekstur: tekstur.tekstur, volume: volume.volume, jumlah: citra.length,
+      modalitas: citra[0].modalitas, ditolak, sha256: sidik, seriesUid: citra[0].seriesInstanceUid,
     })
+    setPesanResep(null)
   }, [])
+
+  const siap = keadaan.tahap === 'siap' ? keadaan : null
+  const bidangMpr = useMemo(() => siap ? {
+    aksial: ambilIrisanMpr(siap.volume, 'source', kursor),
+    koronal: ambilIrisanMpr(siap.volume, 'cross-row', kursor),
+    sagital: ambilIrisanMpr(siap.volume, 'cross-column', kursor),
+    label: labelBidangMpr(siap.volume.irisan[0]?.deskripsiSeri, siap.volume.orientasiPasien),
+  } : null, [siap, kursor])
 
   return (
     <div className="rounded-2xl border border-neutral-200/70 bg-white/70 p-3.5 dark:border-white/10 dark:bg-white/[.03]">
@@ -137,7 +167,77 @@ export function VolumeDicomBagian() {
           </div>
           <p className="mb-2.5 text-[11px] leading-relaxed text-neutral-600 dark:text-neutral-300">{MODE_RENDER.find((m) => m.id === mode)?.catatan}</p>
 
-          <VolumeDicom3D tekstur={keadaan.tekstur} mode={mode} pajanan={pajanan} ambangBawah={bawah} ambangAtas={atas} kepekatan={kepekatan} potong={potong} />
+          <VolumeDicom3D tekstur={keadaan.tekstur} mode={mode} pajanan={pajanan} ambangBawah={bawah} ambangAtas={atas} kepekatan={kepekatan} potong={potong} lapisan={lapisan} halus={halus} bidang={bidang} penanda={kursorKeKotak(kursor, keadaan.volume)} />
+
+          {bidangMpr && (
+            <div className="dark mt-2.5 rounded-2xl border border-white/10 bg-[#07090b] p-2 text-white" data-mpr-sync>
+              <div className="mb-2 flex flex-wrap items-center gap-1.5">
+                <span className="text-[10px] font-black uppercase tracking-[.12em] text-white/50">Synchronized planes</span>
+                <button type="button" aria-pressed={ukur} onClick={() => setUkur((v) => !v)}
+                  className={`ml-auto min-h-9 rounded-lg border px-2.5 text-[10px] font-black ${ukur ? 'border-amber-300/40 bg-amber-400/15 text-amber-100' : 'border-white/10 text-white/60'}`}>Measure {ukur ? 'on' : 'off'}</button>
+              </div>
+              {keadaan.modalitas === 'CT' && (
+                <div className="mb-2 flex flex-wrap gap-1">
+                  {JENDELA_CT.slice(0, 6).map((j) => (
+                    <button key={j.nama} type="button" onClick={() => setJendela({ pusat: j.pusat, lebar: j.lebar })}
+                      aria-pressed={jendela.pusat === j.pusat && jendela.lebar === j.lebar}
+                      className={`min-h-9 rounded-full border px-2.5 text-[10px] font-bold ${jendela.pusat === j.pusat && jendela.lebar === j.lebar ? 'border-cyan-300/50 bg-cyan-400/15 text-cyan-100' : 'border-white/10 text-white/60'}`}>{j.nama}</button>
+                  ))}
+                </div>
+              )}
+              <div className="grid gap-2">
+                <PlaneViewer title={bidangMpr.label.source} subtitle={`Slice ${kursor.z + 1}/${keadaan.volume.kedalaman}`} plane={bidangMpr.aksial}
+                  pusat={jendela.pusat} lebar={jendela.lebar} terbalik={keadaan.volume.terbalik} crossX={kursor.x} crossY={kursor.y} showCrosshair
+                  onPick={(x, y) => setKursor((k) => ({ ...k, x, y }))} ukur={ukur} skala={skalaBidang(keadaan.volume, 'source')} />
+                <div className="grid grid-cols-2 gap-2">
+                  <PlaneViewer title={bidangMpr.label['cross-row']} subtitle="Reformatted" plane={bidangMpr.koronal}
+                    pusat={jendela.pusat} lebar={jendela.lebar} terbalik={keadaan.volume.terbalik} crossX={kursor.x} crossY={kursor.z} showCrosshair
+                    onPick={(x, z) => setKursor((k) => ({ ...k, x, z }))} ukur={ukur} skala={skalaBidang(keadaan.volume, 'cross-row')} />
+                  <PlaneViewer title={bidangMpr.label['cross-column']} subtitle="Reformatted" plane={bidangMpr.sagital}
+                    pusat={jendela.pusat} lebar={jendela.lebar} terbalik={keadaan.volume.terbalik} crossX={kursor.y} crossY={kursor.z} showCrosshair
+                    onPick={(y, z) => setKursor((k) => ({ ...k, y, z }))} ukur={ukur} skala={skalaBidang(keadaan.volume, 'cross-column')} />
+                </div>
+              </div>
+              <p className="mt-1.5 text-[10px] text-white/45">Tap any plane to move the shared cursor; the cyan marker in 3D is the same voxel.</p>
+            </div>
+          )}
+
+          <div className="mt-2 flex flex-wrap items-center gap-2" data-render-recipe>
+            <span className="text-[10px] font-black uppercase tracking-[.12em] text-neutral-500">Reproduce</span>
+            <button type="button" className="min-h-11 rounded-lg border border-neutral-300/70 px-3 text-[11px] font-black dark:border-white/15"
+              onClick={() => {
+                const t = keadaan.tekstur
+                const resep = buatResep(
+                  { jumlahBerkas: keadaan.sha256.length, sha256: keadaan.sha256, modalitas: keadaan.modalitas, voxel: [t.lebar, t.tinggi, t.dalam], fisikMm: t.fisikMm },
+                  { mode, ambangBawah: bawah, ambangAtas: atas, kepekatan, pajanan, potong, halus, lapisan, bidang },
+                  new Date(),
+                )
+                const url = URL.createObjectURL(new Blob([JSON.stringify(resep, null, 2)], { type: 'application/json' }))
+                const a = document.createElement('a'); a.href = url; a.download = `panacea-volume-recipe-${resep.dibuat.slice(0, 10)}.json`; a.click()
+                setTimeout(() => URL.revokeObjectURL(url), 1000)
+                setPesanResep({ nada: 'ok', teks: `Recipe saved: ${resep.data.jumlahBerkas} file fingerprints and every render setting. No pixels or patient tags are included.` })
+              }}>Save recipe</button>
+            <button type="button" className="min-h-11 rounded-lg border border-neutral-300/70 px-3 text-[11px] font-black dark:border-white/15" onClick={() => resepRef.current?.click()}>Load recipe</button>
+            <input ref={resepRef} type="file" accept="application/json,.json" className="sr-only" aria-label="Render recipe to load"
+              onChange={async (e) => {
+                const f = e.target.files?.[0]; e.target.value = ''
+                if (!f) return
+                try {
+                  const r = bacaResep(JSON.parse(await f.text()))
+                  const p = r.parameter
+                  setMode(p.mode); setBawah(p.ambangBawah); setAtas(p.ambangAtas); setKepekatan(p.kepekatan)
+                  setPajanan(p.pajanan); setPotong(p.potong); setHalus(p.halus); setBidang(p.bidang ?? BIDANG_AWAL); if (p.lapisan.length) setLapisan(p.lapisan)
+                  const c = cocokkanResep(r, { sha256: keadaan.sha256, seriesUid: keadaan.seriesUid })
+                  setPesanResep(c.status === 'identik'
+                    ? { nada: 'ok', teks: 'Same files, same renderer version: this view reproduces the recipe.' }
+                    : { nada: 'peringatan', teks: `Settings applied, but this is NOT a reproduction — ${c.alasan.join('; ')}.` })
+                } catch (err) {
+                  setPesanResep({ nada: 'peringatan', teks: `Recipe not loaded: ${(err as Error).message}.` })
+                }
+              }} />
+          </div>
+          {pesanResep && <p role="status" data-recipe-status={pesanResep.nada} className={`mt-1 text-[11px] leading-snug ${pesanResep.nada === 'ok' ? 'text-emerald-700 dark:text-emerald-300' : 'font-bold text-amber-700 dark:text-amber-300'}`}>{pesanResep.teks}</p>}
+          <p className="mt-0.5 text-[10px] text-neutral-500">{BATAS_RESEP}</p>
 
           <div className="mt-2.5 rounded-xl border border-neutral-200/70 bg-neutral-50/70 p-2.5 dark:border-white/10 dark:bg-white/[.025]">
             <div className="flex items-center justify-between gap-3">
@@ -147,6 +247,25 @@ export function VolumeDicomBagian() {
               </div>
               <button type="button" onClick={() => setPotong([1, 1, 1])} className="min-h-11 shrink-0 rounded-lg border border-neutral-300/70 px-3 text-[11px] font-black dark:border-white/15">Reset</button>
             </div>
+            <label className="mt-2 flex items-center gap-2 text-[11px] font-bold text-ink dark:text-white" data-oblique-plane>
+              <input type="checkbox" checked={bidang.aktif} onChange={(e) => setBidang({ ...bidang, aktif: e.target.checked })} aria-label="Oblique cut plane" className="h-5 w-5" />
+              Oblique cut plane — tilt, rotate and slide freely
+            </label>
+            {bidang.aktif && (
+              <div className="mt-1 grid gap-1">
+                {([
+                  ['Tilt', 'kemiringanDerajat', 0, 180, 1, '°'],
+                  ['Rotate', 'putaranDerajat', 0, 360, 1, '°'],
+                  ['Slide', 'posisi', -0.87, 0.87, 0.01, ''],
+                ] as const).map(([label, kunci, min, maks, langkah, satuan]) => (
+                  <label key={kunci} className="block">
+                    <span className="flex justify-between text-[11px] font-bold text-ink dark:text-white"><span>{label}</span><span className="tabular-nums text-neutral-500">{kunci === 'posisi' ? bidang.posisi.toFixed(2) : `${bidang[kunci]}${satuan}`}</span></span>
+                    <input type="range" min={min} max={maks} step={langkah} value={bidang[kunci]} aria-label={`Cut plane ${label.toLowerCase()}`}
+                      onChange={(e) => setBidang({ ...bidang, [kunci]: Number(e.target.value) })} className="h-11 w-full accent-brand" />
+                  </label>
+                ))}
+              </div>
+            )}
             <div className="mt-2 grid grid-cols-3 gap-2">
               <GeserPotong label="X" nilai={potong[0]} onUbah={(n) => ubahPotong(0, n)} />
               <GeserPotong label="Y" nilai={potong[1]} onUbah={(n) => ubahPotong(1, n)} />
@@ -160,11 +279,51 @@ export function VolumeDicomBagian() {
               <input type="range" min={0.2} max={4} step={0.1} value={pajanan} onChange={(e) => setPajanan(Number(e.target.value))} aria-label="Exposure" className="mt-1.5 h-11 w-full accent-brand" />
               <span className="mt-1 block text-[11px] leading-relaxed text-neutral-500">Scales the integrated attenuation. It stands in for tube output and detector gain together, and is not a dose in milligray — no dose is computed anywhere here.</span>
             </label>
+          ) : mode === 'lapisan' ? (
+            <div className="mt-2 space-y-2" data-volume-layers>
+              {lapisan.map((l, i) => {
+                const ubah = (p: Partial<LapisanVolume>) => setLapisan((xs) => xs.map((x, k) => (k === i ? { ...x, ...p } : x)))
+                const satuan = keadaan.modalitas === 'CT' ? 'HU' : 'relative'
+                return (
+                  <div key={i} className="rounded-xl border border-neutral-200/70 p-2 dark:border-white/10" data-volume-layer={i}>
+                    <div className="flex items-center gap-2">
+                      <input type="checkbox" checked={l.aktif} onChange={(e) => ubah({ aktif: e.target.checked })} aria-label={`Show ${l.nama}`} className="h-5 w-5" />
+                      <input type="color" value={l.warna} onChange={(e) => ubah({ warna: e.target.value })} aria-label={`${l.nama} colour`} className="h-7 w-9 rounded border-0 bg-transparent p-0" />
+                      <span className="min-w-0 flex-1 truncate text-[11.5px] font-bold text-ink dark:text-white">{l.nama}</span>
+                      <span className="shrink-0 text-[10.5px] tabular-nums text-neutral-500">{Math.round(l.bawah)}–{Math.round(l.atas)} {satuan}</span>
+                    </div>
+                    {l.aktif && (
+                      <>
+                        <GeserHu label={`${l.nama} lower (${satuan})`} nilai={l.bawah} min={keadaan.tekstur.jendela.bawah} maks={l.atas - 1} onUbah={(n) => ubah({ bawah: Math.min(n, l.atas - 1) })} />
+                        <GeserHu label={`${l.nama} upper (${satuan})`} nilai={l.atas} min={l.bawah + 1} maks={keadaan.tekstur.jendela.atas} onUbah={(n) => ubah({ atas: Math.max(n, l.bawah + 1) })} />
+                        <label className="mt-1 block">
+                          <span className="flex items-baseline justify-between text-[11px] font-bold text-ink dark:text-white"><span>Opacity</span><span className="tabular-nums text-neutral-500">{Math.round(l.opasitas * 100)}%</span></span>
+                          <input type="range" min={0.05} max={1} step={0.05} value={l.opasitas} onChange={(e) => ubah({ opasitas: Number(e.target.value) })} aria-label={`${l.nama} opacity`} className="mt-1 h-11 w-full accent-brand" />
+                        </label>
+                      </>
+                    )}
+                  </div>
+                )
+              })}
+              <p className="text-[10.5px] leading-snug text-neutral-500">
+                {keadaan.modalitas === 'CT'
+                  ? 'Starting ranges come from typical CT Hounsfield classes, not from this patient; tune them to the scan. Contrast vessels exist only if contrast was given.'
+                  : 'MR intensity has no absolute scale, so layers start as fractions of this series’ range and carry no tissue names.'}
+              </p>
+            </div>
           ) : (
             <>
               <GeserHu label={`Lower threshold (${keadaan.modalitas === 'CT' ? 'HU' : 'relative value'})`} nilai={bawah} min={keadaan.tekstur.jendela.bawah} maks={atas - 1} onUbah={(n) => setBawah(Math.min(n, atas - 1))} />
               <GeserHu label={`Upper threshold (${keadaan.modalitas === 'CT' ? 'HU' : 'relative value'})`} nilai={atas} min={bawah + 1} maks={keadaan.tekstur.jendela.atas} onUbah={(n) => setAtas(Math.max(n, bawah + 1))} />
             </>
+          )}
+
+          {(mode === 'lapisan' || mode === 'permukaan' || mode === 'keduanya') && (
+            <label className="mt-2 block">
+              <span className="flex items-baseline justify-between text-[11px] font-bold text-ink dark:text-white"><span>Smoothing (surface shading)</span><span className="tabular-nums text-neutral-500">×{halus.toFixed(1)}</span></span>
+              <input type="range" min={1} max={4} step={0.5} value={halus} onChange={(e) => setHalus(Number(e.target.value))} aria-label="Surface smoothing" className="mt-1.5 h-11 w-full accent-brand" />
+              <span className="mt-1 block text-[11px] leading-relaxed text-neutral-500">Widens the gradient used for lighting. It smooths how the surface is shaded; it does not change which voxels are inside a layer.</span>
+            </label>
           )}
 
           {(mode === 'volume' || mode === 'keduanya') && (

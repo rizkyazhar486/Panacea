@@ -85,6 +85,12 @@ export interface Clinical {
   supportive: Record<string, any[]>
   records: Record<string, any>
   education: Record<string, any>
+  /** Kunjungan tertutup per pasien (append-only). */
+  encounters?: Record<string, any[]>
+  /** Tautan pasien praktik -> akun pasien (disetujui pasien lewat kode). */
+  tautan?: Record<string, import('./aksesKlinis.js').TautanPasien>
+  /** Kode tautan (hanya hash). Tidak pernah dikirim ke klien. */
+  kodeTaut?: import('./aksesKlinis.js').KodeTaut[]
 }
 
 export interface VisitMembership {
@@ -119,6 +125,8 @@ interface DB {
   applications?: Application[] // professional onboarding applications (doctor/writer/verifier)
   healthProfiles?: Record<string, Record<string, any>> // email -> health data blob (manual/wearable)
   labShares?: { id: string; pasienEmail: string; dokterEmail: string; dibuat: string; berakhir: string; dicabut?: string }[]
+  /** Buku besar studi validasi klinis — append-only, berantai SHA-256, TIDAK pernah dipangkas. */
+  validasiLedger?: import('./validasiLedger.js').CatatanLedger[]
   carePlans?: { izinId: string; pasienEmail: string; dokterEmail: string; dibuat: string; dicabut?: string; rencana: any }[]
   careReports?: { pasienEmail: string; laporan: any }[]
   labReviews?: { id: string; izinId: string; pasienEmail: string; dokterEmail: string; tes: string; ditinjau: string; catatan?: string; cekUlangSebelum?: string }[]
@@ -773,26 +781,61 @@ function ensureClinical() {
 export function getClinical(): Clinical {
   return ensureClinical()
 }
-export function saveRecord(patientId: string, record: any) {
-  ensureClinical().records[patientId] = record
+export function getRecord(patientId: string) { return ensureClinical().records[patientId] }
+export function saveRecord(patientId: string, record: any, arsip?: any) {
+  const c = ensureClinical()
+  // Riwayat versi bertanda tangan — append-only, tidak dipangkas.
+  if (arsip) { (c as any).recordHistory ??= {}; ((c as any).recordHistory[patientId] ??= []).push(arsip) }
+  c.records[patientId] = record
   save()
 }
+// Kunjungan tertutup: append-only, tidak dipangkas, tidak dapat diubah via API.
+export function closeEncounter(patientId: string, kunjungan: any, rekamBaru: any) {
+  const c = ensureClinical() as any
+  c.encounters ??= {}
+  const daftar = (c.encounters[patientId] ??= [])
+  if (!daftar.some((k: any) => k.encounterId === kunjungan.encounterId)) daftar.push(kunjungan)
+  c.records[patientId] = rekamBaru
+  save()
+}
+export function simpanKodeTaut(k: import('./aksesKlinis.js').KodeTaut) {
+  const c = ensureClinical(); (c.kodeTaut ??= []).push(k); save()
+}
+export function getKodeTaut() { return ensureClinical().kodeTaut ?? [] }
+export function getTautan() { return ensureClinical().tautan ?? {} }
+export function simpanTautan(t: import('./aksesKlinis.js').TautanPasien, kodeHash: string) {
+  const c = ensureClinical()
+  ;(c.tautan ??= {})[t.patientId] = t
+  const k = (c.kodeTaut ?? []).find((x) => x.hash === kodeHash); if (k) { k.dipakaiPada = t.ditautkanPada; k.dipakaiOleh = t.userId }
+  save()
+}
+export function hapusTautan(patientId: string) { const c = ensureClinical(); if (c.tautan) delete c.tautan[patientId]; save() }
+export function getEncounters(patientId: string): any[] { return ((ensureClinical() as any).encounters ?? {})[patientId] ?? [] }
+export function getRecordHistory(patientId: string): any[] { return ((ensureClinical() as any).recordHistory ?? {})[patientId] ?? [] }
 export function saveEducation(patientId: string, sheet: any) {
   ensureClinical().education[patientId] = sheet
   save()
 }
+// Tambah idempoten berdasarkan id butir: kiriman ulang dari antrean sinkron klien
+// (respons pertama hilang di jalan) tidak menggandakan data klinis.
 export function addVital(patientId: string, vital: any) {
   const c = ensureClinical()
-  c.vitals[patientId] = [...(c.vitals[patientId] ?? []), vital]
+  const ada = c.vitals[patientId] ?? []
+  if (vital?.id && ada.some((v) => v?.id === vital.id)) return
+  c.vitals[patientId] = [...ada, vital]
   save()
 }
 export function addSupportive(patientId: string, r: any) {
   const c = ensureClinical()
-  c.supportive[patientId] = [...(c.supportive[patientId] ?? []), r]
+  const ada = c.supportive[patientId] ?? []
+  if (r?.id && ada.some((v) => v?.id === r.id)) return
+  c.supportive[patientId] = [...ada, r]
   save()
 }
 export function addPatient(p: any) {
-  ensureClinical().patients.push(p)
+  const c = ensureClinical()
+  if (p?.id && c.patients.some((x) => x?.id === p.id)) return
+  c.patients.push(p)
   save()
 }
 
@@ -903,6 +946,13 @@ type TinjauanLabDb = NonNullable<typeof db.labReviews>[number]
 export function addLabReview(t: TinjauanLabDb) { const l = (db.labReviews ??= []); l.push(t); if (l.length > 20000) arsipkan('labReviews', l.splice(0, l.length - 20000)); save() }
 export function listLabReviews(pasienEmail: string): TinjauanLabDb[] { return (db.labReviews ?? []).filter((t) => t.pasienEmail === pasienEmail).slice(-200).reverse() }
 export function listCarePlans() { return db.carePlans ?? [] }
+export function bacaLedgerValidasi() { return db.validasiLedger ?? [] }
+/** Hanya menambah; catatan lama tidak pernah diubah atau dihapus. */
+export function tambahLedgerValidasi(c: import('./validasiLedger.js').CatatanLedger) {
+  const l = (db.validasiLedger ??= [])
+  if (c.urutan !== l.length || (l.length && c.sidikSebelum !== l[l.length - 1].sidik)) throw new Error('ledger append out of order')
+  l.push(c); save()
+}
 export function addCarePlan(p: NonNullable<typeof db.carePlans>[number]) {
   // Satu rencana aktif per pasien–dokter: rencana baru menggantikan yang lama.
   for (const lama of db.carePlans ?? []) if (lama.pasienEmail === p.pasienEmail && lama.dokterEmail === p.dokterEmail && !lama.dicabut) lama.dicabut = p.dibuat

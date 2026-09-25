@@ -7,6 +7,7 @@ import { IconActivity } from '../components/icons'
 import { getVitals } from '../lib/healthVitals'
 import { CekHarian } from '../components/CekHarian'
 import { ApaYangBerubah } from '../components/ApaYangBerubah'
+import { TebusKodeTaut } from '../components/TautanRekamPraktik'
 import { UbinLab } from '../components/UbinLab'
 import { PersonalBodyUnifiedSurface } from '../components/PersonalBodyUnifiedSurface'
 
@@ -124,6 +125,7 @@ export function PusatTubuh() {
           §4–5). Sebelumnya ubin lab hanya muncul bila dipilih manual di papan
           widget beranda — tidak aktif secara bawaan. */}
       <ApaYangBerubah />
+      <TebusKodeTaut />
       <CekHarian />
       <UbinLab />
       {/* Tubuh 3D setinggi ~2.300px; di atas, ia mendorong hasil darah ke y~3.080. */}

@@ -72,6 +72,8 @@ export interface PhysicalExam {
   perSystem: string
   doctorVerified: boolean
   verifiedBy?: string
+  /** Id verifikator — dicap server (server/src/rekamKlinis.ts). */
+  verifiedById?: string
 }
 
 export interface PlanSafetyOverride {
@@ -95,12 +97,19 @@ export interface PlanItem {
   text: string
   source: 'AI' | 'Dokter'
   status: 'usulan' | 'diverifikasi' | 'ditolak'
+  /** Dicap server saat butir diverifikasi klinisi (server/src/rekamKlinis.ts). */
+  verifiedById?: string
+  verifiedAt?: string
   safetyOverride?: PlanSafetyOverride
 }
 
 export interface ProblemEntry {
   id: string
   title: string
+  /** Id kunjungan asal bila masalah dibawa dari kunjungan tertutup sebelumnya. */
+  carriedFrom?: string
+  /** Asal dicap server: 'AI' bila ditulis/diubah non-klinisi, 'Dokter' bila oleh klinisi. */
+  source?: 'AI' | 'Dokter'
   basis: string // basis from anamnesis/exam/supporting
   assessment: string // "Dipikirkan ..." comparative reasoning
   probability?: number // 0-100 Bayesian estimate
@@ -125,7 +134,11 @@ export interface EMRRecord {
   surgery?: SurgeryPlan
   references: string[]
   signedBy?: string
+  /** Id pengguna penanda tangan — dicap server (lihat server/src/rekamKlinis.ts). */
+  signedById?: string
   signedAt?: string
+  /** Kunjungan tertutup sebelumnya (dicap server saat kunjungan ditutup). */
+  previousEncounterId?: string
   // The downstream half of the care journey — everything the clinical plan
   // above triggers in the real world (who, where, how much, when, and
   // whether it's actually happening). Optional: only present once a plan

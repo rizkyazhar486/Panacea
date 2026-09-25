@@ -37,3 +37,83 @@ risks:
     description: Future models may restart from incomplete context and duplicate or contradict prior architecture.
     mitigation: Root agent contract plus human-readable architecture plus machine-readable registries and autonomous R&D loop.
     evidence: [PANACEA_PRODUCT_MATURITY_OS.md, governance/FEATURE_REGISTRY.yaml]
+
+  - risk_id: risk.single_document_store
+    category: data_integrity
+    severity: high
+    state: mitigated_partially
+    description: All server state is one data.json / one MongoDB document (16 MB BSON limit), rewritten on every save; growth or a failed write can lose data.
+    mitigation: >-
+      2026-09-25: atomic file writes, corrupt file preserved not overwritten, MongoDB save failures and
+      near-limit size surfaced in /api/health (penyimpananSehat), flush on SIGTERM, capped clinical/audit
+      records archived append-only (arsip_<name>) instead of deleted. Remaining: real schema with
+      per-record collections/tables and migrations (engineering owner).
+    evidence: [server/src/simpanAman.ts, server/uji/simpanAman.uji.ts, server/uji/arsipKlinis.uji.ts, production /api/health 2026-09-25 penyimpanan=mongo penyimpananSehat=true]
+
+  - risk_id: risk.free_tier_server_sleep
+    category: reliability
+    severity: medium
+    state: open
+    description: >-
+      Backend runs on Render free tier and sleeps when idle; the 10-minute wake cron actually fires ~3-5
+      times/day, so per-minute schedulers (reminders, rule engine) run only while someone is using the app.
+    mitigation: >-
+      Check-in reminder catches up within 6 h of its time (02772b82). Medication reminders intentionally do
+      not catch up (double-dose risk). Owner decision 2026-09-25: free options only, medication reminders
+      are not a focus. Free fix: each wake-workflow run now loops a health ping every 9 minutes for up to
+      5h50m within 04:00-23:00 WIB (public repo => free Actions minutes), so a few successful cron starts a
+      day keep the server awake through waking hours. Verify with the next days' run durations.
+    evidence: [.github/workflows/bangunkan-server.yml run history 2026-09-22..25, server/uji/pengingatCek.uji.ts]
+
+  - risk_id: risk.clinical_validation_external_dependency
+    category: clinical_safety
+    severity: high
+    state: externally_blocked
+    description: >-
+      No Panacea workflow is clinically validated. Validation cannot be produced by software; it needs qualified
+      clinicians, a study lead and (where required) ethics review.
+    mitigation: >-
+      2026-09-25: validation infrastructure is software-ready - src/lib/validasiKlinis.ts (predeclared endpoints,
+      frozen protocol hash, frozen cases pinned to system version, reviewer identity/credential/scope/COI,
+      one assessment per reviewer per case, adjudication, safety/near-miss events, SHA-256 audit chain, Wilson CI,
+      Cohen's kappa, report separating engineering acceptance from clinical validation); server ledger + blinded
+      reviewer routes; first study lab-tren-pribadi v1 (30 synthetic cases); reviewer and study-lead UI in Clinical.
+      External steps: (1) study lead confirms or revises the PROPOSED thresholds (a revision = protocol v2 before any
+      assessment); (2) at least two STR-verified clinicians assess all 30 cases; (3) adjudicate disagreements;
+      (4) institution decides whether clinician participation needs ethics review; real patient data would need an
+      approval reference.
+    evidence: [scripts/uji/validasi-klinis.mts, scripts/uji/validasi-ledger-kontrak.mts, scripts/uji/studi-lab-tren-beku.mts, scripts/uji/validasi-ui.mts, server/data-validasi/lab-tren-pribadi-v1.json]
+
+  - risk_id: risk.clinical_store_overexposure
+    category: privacy_security
+    severity: critical
+    state: mitigated
+    description: >-
+      Found 2026-09-25 during the AI-EMR audit: GET /api/clinical returned the entire clinical store (all patients,
+      EMR records, vitals, supportive results, education) to ANY authenticated user, including patients and
+      unverified doctors, and the clinical write routes accepted any patientId. Production (Render, mongo) was
+      exposed for as long as these routes existed; no access log review has been done yet.
+    mitigation: >-
+      server/src/aksesKlinis.ts: verified clinicians / owner keep practice-wide access; everyone else reads and
+      writes only the self-record linked to their own account (id match AND reverse lookup to the same user, so an
+      id-prefix collision fails closed). Enforced on GET /api/clinical and all five clinical write routes.
+      Follow-up for the owner: review the audit log ('clinical.read') for reads by non-clinician accounts to decide
+      whether a data-exposure notification is required.
+    evidence: [server/src/aksesKlinis.ts, server/uji/aksesKlinis.uji.ts, HTTP proof 2026-09-25 (patient sees only own record; patient/unverified doctor 403 on practice patient)]
+
+  - risk_id: risk.stale_emr_signature_reuse
+    category: clinical_safety
+    severity: critical
+    state: mitigated
+    description: >-
+      A patient, or a clinician saving edits without an explicit re-sign, could previously modify clinical content
+      of an already-signed EMR while preserving old signedBy/signedById/signedAt fields, making new content appear
+      to retain an earlier clinician signature.
+    mitigation: >-
+      server/src/rekamKlinis.ts now preserves an existing clinician signature only when the clinical payload is
+      unchanged; patient-authored surgery consent may change without rewriting clinician-authored content.
+      Any patient clinical edit beyond patient-authored consent removes the signature; clinician content edits carrying
+      the old signedAt also become unsigned until an explicit re-sign intent is sent and server-stamped. Changes to
+      physical-exam findings clear doctorVerified/verifiedBy/verifiedById unless re-verified by an authorized clinician.
+      Canonical longitudinal projection additionally requires the server-stamped signedById and ignores unsigned drafts.
+    evidence: [server/src/rekamKlinis.ts, server/uji/rekamKlinis.uji.ts, src/lib/emrLongitudinalBridge.ts, scripts/uji/emr-status-longitudinal.mts]

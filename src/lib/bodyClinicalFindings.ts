@@ -34,6 +34,43 @@ const ABNORMAL_HINTS = [
   'asites',
 ] as const
 
+// Istilah temuan abnormal. Muncul TANPA negasi -> 'abnormal' ("finding recorded").
+const ISTILAH_ABNORMAL = [
+  'murmur', 'gallop', 'ronki', 'rhonki', 'wheezing', 'edema', 'massa', 'nyeri', 'pembesaran', 'hepatomegali',
+  'splenomegali', 'ikterik', 'anemis', 'sianosis', 'pucat', 'eritema', 'asites', 'deviasi', 'menurun', 'prolaps', 'spider nevi',
+] as const
+// Penanda normal eksplisit. Tanpa salah satunya, baris yang tidak abnormal TIDAK
+// dianggap normal — ia 'recorded' (tercatat, tidak diklasifikasi).
+const PENANDA_NORMAL = ['normal', 'dbn', '(-)', '-/-', 'tidak ada', 'tidak ditemukan', 'tanpa', 'reguler', 'vesikuler', 'supel', 'normosefali', 'simetris', 'tunggal', 'sonor', 'jernih', 'baik'] as const
+const NEGASI_SEBELUM = ['tidak ada ', 'tidak ditemukan ', 'tanpa ', 'tidak ', 'no ']
+
+function istilahTerNegasi(teks: string, i: number, istilah: string): boolean {
+  const sebelum = teks.slice(Math.max(0, i - 18), i)
+  const sesudah = teks.slice(i + istilah.length, i + istilah.length + 8)
+  return NEGASI_SEBELUM.some((n) => sebelum.endsWith(n)) || /^\s*(\(-\)|-\/-|negatif)/.test(sesudah)
+}
+
+/**
+ * Klasifikasi konservatif catatan pemeriksaan per sistem (teks bebas).
+ * - 'abnormal': petunjuk (+) eksplisit, atau istilah abnormal tanpa negasi
+ *   (mis. "murmur sistolik 2/6" — dulu keliru dianggap normal);
+ * - 'normal': hanya bila ada penanda normal eksplisit dan tidak ada yang abnormal;
+ * - 'recorded': tercatat tetapi tidak dapat diklasifikasi — tidak diklaim normal.
+ * Heuristik navigasi saja; bukan interpretasi klinis.
+ */
+export function klasifikasiTemuan(catatan: string): 'normal' | 'abnormal' | 'recorded' {
+  const t = catatan.toLowerCase()
+  if (ABNORMAL_HINTS.some((h) => t.includes(h))) return 'abnormal'
+  for (const istilah of ISTILAH_ABNORMAL) {
+    let i = t.indexOf(istilah)
+    while (i >= 0) {
+      if (!istilahTerNegasi(t, i, istilah)) return 'abnormal'
+      i = t.indexOf(istilah, i + istilah.length)
+    }
+  }
+  return PENANDA_NORMAL.some((n) => t.includes(n)) ? 'normal' : 'recorded'
+}
+
 // Rekam medis dari server bisa belum memuat pemeriksaan per sistem. Dulu
 // `undefined.split` merobohkan seluruh halaman Clinical untuk setiap dokter pada
 // deployment yang tersambung ke backend; sekarang dianggap "belum ada temuan".
@@ -59,7 +96,7 @@ export function buildBodyClinicalFindings(perSystem: string | null | undefined):
       label: system.label,
       x: system.x,
       y: system.y,
-      status: abnormal ? 'abnormal' : 'normal',
+      status: klasifikasiTemuan(note),
       note,
     }
   })

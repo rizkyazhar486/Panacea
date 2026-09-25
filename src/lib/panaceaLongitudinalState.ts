@@ -17,6 +17,17 @@ export type LongitudinalDomain =
   | 'other'
 
 export type ReviewState = 'not-required' | 'pending' | 'accepted' | 'rejected'
+
+/**
+ * Keadaan semantik sebuah nilai — WAJIB dibedakan di seluruh Panacea:
+ * diukur, diimpor, dimasukkan klinisi, dilaporkan pasien, turunan deterministik,
+ * keluaran aturan, draf/hipotesis AI, simulasi, rujukan/edukasi, ditinjau klinisi,
+ * tidak tersedia. Opsional supaya peristiwa lama tetap sah; bila ada, divalidasi.
+ */
+export type SemanticState =
+  | 'measured' | 'imported' | 'clinician-entered' | 'patient-reported' | 'derived'
+  | 'rule-output' | 'ai-draft' | 'simulated' | 'reference' | 'clinician-reviewed' | 'unavailable'
+export const SEMANTIC_STATES: readonly SemanticState[] = ['measured', 'imported', 'clinician-entered', 'patient-reported', 'derived', 'rule-output', 'ai-draft', 'simulated', 'reference', 'clinician-reviewed', 'unavailable']
 export type ConsentPurpose = 'personal-visualization' | 'clinical-support' | 'ai-context' | 'research-export'
 
 export interface LongitudinalProvenance {
@@ -56,6 +67,7 @@ export interface LongitudinalEvent<T = unknown> {
   consent: ConsentEnvelope
   review: ClinicianReviewEnvelope
   tags?: readonly string[]
+  semanticState?: SemanticState
 }
 
 export interface LongitudinalMetricSnapshot<T = unknown> {
@@ -155,6 +167,17 @@ function cloneEvent<T>(event: LongitudinalEvent<T>): LongitudinalEvent<T> {
  * measurement is clinically correct, diagnostic, or appropriate for treatment.
  */
 export function validateLongitudinalEvent(event: LongitudinalEvent) {
+  if (event.semanticState !== undefined) {
+    if (!SEMANTIC_STATES.includes(event.semanticState)) throw new Error('event.semanticState is not a known semantic state')
+    // AI tidak pernah diam-diam menjadi kebenaran klinis: 'clinician-reviewed' butuh tinjauan diterima
+    // oleh peninjau yang teridentifikasi; draf AI tidak boleh berstatus diterima.
+    if (event.semanticState === 'clinician-reviewed' && !(event.review.state === 'accepted' && event.review.reviewerId)) {
+      throw new Error('clinician-reviewed events need an accepted review with an identified reviewer')
+    }
+    if (event.semanticState === 'ai-draft' && event.review.state === 'accepted') {
+      throw new Error('an ai-draft event cannot carry an accepted review; promote it to clinician-reviewed')
+    }
+  }
   assertNonBlank(event.id, 'event.id')
   assertNonBlank(event.subjectId, 'event.subjectId')
   assertNonBlank(event.metric, 'event.metric')

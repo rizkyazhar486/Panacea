@@ -5,6 +5,29 @@
 For the owner's current finishing mission, Claude Code Opus 5.5 must also read and execute [`docs/CLAUDE_CODE_OPUS_5_5_FINAL_33_AUTONOMOUS.md`](docs/CLAUDE_CODE_OPUS_5_5_FINAL_33_AUTONOMOUS.md). It converts the maturity-first operating model into a continuous execution loop: inspect current main → select the highest-value blocker → implement → validate → commit → push → inspect exact-head CI → repair/integrate → verify main → immediately continue. Do not wait for a repeated “lanjut” after each verified task. Hard platform/context/usage limits cannot be bypassed; before an unavoidable limit, leave a committed, pushed, exact-SHA continuation state so the next session can resume without reconstructing the work.
 
 
+## Latest sequencing override — balanced gap closure before Body Exposure, visual polish last
+
+For the owner's latest 2026-09-25 sequencing instruction, Claude Code must also read and execute [`docs/CLAUDE_CODE_BALANCED_GAP_CLOSURE_DIRECTIVE.md`](docs/CLAUDE_CODE_BALANCED_GAP_CLOSURE_DIRECTIVE.md).
+
+When sequencing conflicts with older defaults, use this order:
+
+```
+HARD SAFETY / SECURITY / DATA / CI BLOCKERS
+→ HUMAN CLINICAL-VALIDATION ENABLEMENT
+→ AI-EMR + LONGITUDINAL CLINICIAN WORKFLOW
+→ WEAKEST REMAINING CORE MATURITY GAP
+→ REPEAT UNTIL CORE MATURITY IS REASONABLY LEVEL
+→ BODY EXPOSURE AS THE DOMINANT BUILD LANE
+→ UI/UX VISUAL FINISHING TOUCH LAST
+```
+
+Human clinical validation itself must never be fabricated. Claude Code should build the protocol, evaluation metrics, reviewer/adjudication workflow, provenance, audit, versioning and reproducible reporting needed for qualified humans to perform real validation. If the remaining blocker is genuinely external human/ethics/credential execution, record that blocker and continue with the next software-addressable maturity gap.
+
+This sequencing override changes **priority order**, not the long-term product thesis: longevity/personalized prevention remains an important product center, but it must not receive disproportionate expansion while a more important core workflow is materially less mature.
+
+Accessibility failures, broken mobile flows, dead controls, unsafe clinical-state presentation, loading/error gaps and duplicate-submission hazards are functional defects and may be fixed before the final phase. Purely cosmetic restyling, decorative motion and visual polish remain last.
+
+
 ## Panacea Constitution — parent scientific authority
 
 All Claude Code work must comply with [PANACEA_CONSTITUTION.md](PANACEA_CONSTITUTION.md). It is the model-agnostic parent charter for scientific discovery, R&D, invention, clinical translation, drug discovery, trials, surveillance, publication integrity, continuous model/technology evolution, privacy, safety and validation. The latest explicit owner instruction remains highest product authority, but no model-specific instruction may silently weaken the Constitution's evidence, reproducibility, safety, governance, external-validation, publication-integrity or human-oversight requirements.

@@ -35,7 +35,7 @@ export function perubahanTeratas(state: LongitudinalPatientState, kini: Date, ba
 // ── Timeline pribadi: "kapan", dari status kanonik yang sama ────────────────
 export interface HariTimeline {
   tanggal: string
-  butir: { id: string; metric: string; label: string; value: number | string; unit?: string; asal: string }[]
+  butir: { id: string; metric: string; label: string; value: number | string; unit?: string; asal: string; keadaan?: import('./panaceaLongitudinalState').SemanticState }[]
 }
 
 /** Event dikelompokkan per tanggal (UTC, sesuai recordedAt), terbaru di atas. */
@@ -45,7 +45,7 @@ export function timelineHarian(state: LongitudinalPatientState, batasHari = 30, 
     if (typeof e.value !== 'number' && typeof e.value !== 'string' && typeof e.value !== 'boolean') continue
     const t = e.recordedAt.slice(0, 10)
     const d = perHari.get(t) ?? []
-    d.push({ id: e.id, metric: e.metric, label: labelMetrik(e.metric, labels), value: typeof e.value === 'boolean' ? (e.value ? 'Yes' : 'No') : e.value, unit: e.unit, asal: asal(e.provenance.method, e.provenance.sourceKind, sudut) })
+    d.push({ id: e.id, metric: e.metric, label: labelMetrik(e.metric, labels), value: typeof e.value === 'boolean' ? (e.value ? 'Yes' : 'No') : e.value, unit: e.unit, asal: asal(e.provenance.method, e.provenance.sourceKind, sudut), ...(e.semanticState ? { keadaan: e.semanticState } : {}) })
     perHari.set(t, d)
   }
   return [...perHari.entries()]

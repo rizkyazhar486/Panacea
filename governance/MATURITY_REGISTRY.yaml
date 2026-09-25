@@ -10,7 +10,7 @@ workflows:
     name: Lab result to personal baseline/trend to longitudinal trajectory
     strategic_priority: highest_current_lane
     maturity_level: FUNCTIONAL
-    clinical_validation: none  # engineering correctness only; no prospective clinician study yet
+    clinical_validation: none  # no human assessment recorded. Study infrastructure is software-ready (study 'lab-tren-pribadi' v1, 30 frozen synthetic cases, reviewer UI, audit chain, report) and is externally blocked on qualified clinicians executing it
     dimensions:
       functional_completeness: high  # entry, correction, per-report range, baseline/trend, PhenoAge trajectory, sync, FHIR, share, review, notify
       integration: medium  # server persistence + FHIR R4 + clinician view + notifications + canonical longitudinal state (labLongitudinalBridge -> useLongitudinalState -> What changed + Body Exposure 'Your data' per system + personal timeline); state is client-built only
@@ -27,7 +27,7 @@ workflows:
       - "browser E2E 390x844: add->warn->save->delete; device A->B sync; share->clinician trend view->review->patient sees review"
       - "commits: 16608b5a 07813792 3fc91bf4 b237c432 88ba36ff 14aa0435 0beadc1c 5516e7d8 7926aee9 96de9684"
     known_gaps: [photo_ocr_import, direct_lab_system_integration, canonical_state_recomputed_per_view_not_cached, production_deployment_verification, prospective_clinician_validation]
-    next_action: prospective_clinician_protocol_using_lab_outcome_v1  # process measures landed; protocol + clinical outcomes need owner (internship)
+    next_action: external_study_lead_confirms_thresholds_then_two_verified_clinicians_assess_30_cases  # process measures landed; protocol + clinical outcomes need owner (internship)
     last_audited_commit: 0cb6906a
 
   - workflow_id: care.daily_checkin
@@ -39,12 +39,12 @@ workflows:
       functional_completeness: medium  # plan authoring, patient answers, kernel-recomputed priority; no measurement rules, reminders or offline queue in UI
       integration: medium  # shares consent/grant with lab sharing; not yet projected to longitudinal state or QuestionnaireResponse export
       reliability: medium
-      usability: unknown
+      usability: low  # 2026-09-25 code-review pass (not a full clinician/browser usability test) found and fixed one real bug: RencanaHarianDokter's initial-load failure path returned null before ever rendering its own error state, so a failed fetch left the clinician staring at a permanently blank "Daily follow-up" section forever with no error and no retry; fixed with an explicit loading/error+Retry branch. Remaining known friction: no inline validation on the lab-rule authoring form (errors only surface after a server round trip), no loading indicator on LabPasienUntukDokter's clinician-lab-share list, no submitting-state guard against double-submit on "Start daily check-in".
       clinical_quality: unknown  # rules are clinician-authored only; app adds none
       safety_security: medium  # verified clinician + active grant; revoke stops check-in; 'not an emergency service' line
       observability_testing: medium  # rencana-harian-kontrak (server<->kernel contract + endpoint guards, sabotaged), browser E2E
     acceptance_evidence:
-      - "gate: scripts/uji/rencana-harian-kontrak.mts (3 sabotages fail by name)"
+      - "gate: scripts/uji/rencana-harian-kontrak.mts (3 sabotages fail by name, incl. 2026-09-25 !data branch must show galat + retry)"
       - "clinician-authored lab review rules (metric lab.<test>, >=/<=, threshold, max result age, evidence reference REQUIRED; verifiedBy/verifiedAt from server identity) evaluated by the kernel in the clinician browser over the shared canonical state; kernel age now from capturedAt (collection time), not receivedAt; gate aturan-lab-dokter (sabotage: receivedAt age fails); browser E2E 390x844: rule refused without evidence, then HbA1c 9.4 -> Meets your rule"
       - "browser E2E 390x844 (2026-09-25): answer offline -> queued, card says saved-not-sent; reconnect -> sent once, queue empty, no page errors; server holds 1 report with offline authoredAt. HTTP: same clientId x3 -> same report id, 1 stored"
       - "opt-in daily reminder (server/src/pengingatCek.ts): only with an active plan + valid grant and no report for the local date, user local time, once per day (server-owned guard), no PHI in text; server/uji/pengingatCek.uji.ts (sabotage: UTC date fails)"
@@ -52,42 +52,55 @@ workflows:
       - "FHIR R4 export GET /api/clinician/lab-shares/:id/care/fhir (Questionnaire + QuestionnaireResponse + Provenance, raw answers only); server/uji/carePlanFhir.uji.ts (sabotage: priorities leaked fails)"
       - "browser E2E: doctor plan -> patient 'yes' + 148 -> doctor 'Review today'"
       - "commits: dc95129a 0cb6906a"
-    known_gaps: [reminder_live_push_verification, vital_sign_measurement_rules_need_device_or_verified_source, clinical_validation]
-    next_action: clinician_usability_test_of_plan_authoring_and_digest  # longitudinal projection (careLongitudinalBridge) and FHIR QuestionnaireResponse export landed
-    last_audited_commit: 0cb6906a
+    known_gaps: [reminder_live_push_verification, vital_sign_measurement_rules_need_device_or_verified_source, clinical_validation, lab_rule_form_inline_validation, lab_share_list_loading_state, checkin_submit_double_click_guard]
+    next_action: clinician_usability_test_of_plan_authoring_and_digest  # longitudinal projection (careLongitudinalBridge) and FHIR QuestionnaireResponse export landed; 2026-09-25 fixed the blank-panel-on-load-failure bug, three smaller friction items remain (see known_gaps)
+    last_audited_commit: 9a70dfb0
 
   - workflow_id: clinical.patient_review
-    name: Longitudinal patient review to clinician-supported next action
+    name: Longitudinal patient review to clinician-supported next action (AI-EMR)
     strategic_priority: core
-    maturity_level: UNKNOWN
-    clinical_validation: unknown
+    maturity_level: PARTIAL  # audited 2026-09-25 on main 2bf8335
+    clinical_validation: none
     dimensions:
-      functional_completeness: unknown
-      integration: unknown
-      reliability: unknown
-      usability: unknown
-      clinical_quality: unknown
-      safety_security: unknown
-      observability_testing: unknown
-    acceptance_evidence: []
-    known_gaps: [requires_current_main_audit]
-    next_action: audit_ai_emr_patient_state_reasoning_review_followup
-    last_audited_commit: null
+      functional_completeness: medium  # AI-EMR record (anamnesis, exam, problems, dx, plan, signing, care episodes), deterministic order/lab-interpretation rules (emrPipeline.ts); 2026-09-26 encounter model: signed record closes into an immutable encounter, new draft carries only the problem list
+      integration: medium  # server-stamped signed EMR projects into canonical longitudinal state; 2026-09-26 practice patients link to patient accounts by consented one-time code; study linkage still absent
+      reliability: medium  # 2026-09-25: clinical writes queued/retried with visible status (328b12a); appends idempotent by id
+      usability: unknown  # no clinician usability test yet (SUS instrument now exists for studies)
+      clinical_quality: unknown  # rules deterministic and readable; no clinical review recorded
+      safety_security: medium  # /api/clinical access is scoped; signatures are server-stamped; 2026-09-26 stale-signature reuse closed so patient clinical edits invalidate the old clinician cap while patient-authored surgery consent remains separately mutable; no external security review
+      observability_testing: medium  # server uji aksesKlinis/idempotenKlinis/rekamKlinis; root antrean-klinis; HTTP proofs; browser offline sync E2E
+    acceptance_evidence:
+      - "b1402c5 clinical data scoped to clinicians or own self-record (HTTP proof)"
+      - "328b12a clinical writes never silently lost (browser offline->online E2E)"
+      - "2bf8335 server-stamped signatures, signed-version history (HTTP proof)"
+      - "2026-09-26: src/lib/emrLongitudinalBridge.ts + scripts/uji/emr-status-longitudinal.mts project only server-signed EMR semantics (signed note, diagnosis, verified plan) into canonical state; unsigned AI drafts fail closed"
+      - "2026-09-26: server/uji/rekamKlinis.uji.ts proves patient edits cannot retain stale clinician signature/physical-exam verification and clinician edits require explicit re-sign; prior signed version remains archived"
+      - "2026-09-26: successful record writes reconcile the server-returned canonical signer/verification state into the client immediately; EMR UI renders draft.signedBy rather than a local settings name"
+      - "2026-09-26: encounter model (server/src/rekamKlinis.ts tutupKunjungan; server/uji/kunjunganKlinis.uji.ts; scripts/uji/kunjungan-emr.mts); HTTP proof: unsigned close 409, patient close 403, clinician close 200 -> 1 immutable encounter + new draft with no dx/plan/signature and problems carriedFrom; unrelated patient sees 0 encounter lists"
+      - "2026-09-26: per-item provenance server-stamped (server/uji/asalButirKlinis.uji.ts): non-clinician writes cannot create doctor-sourced or verified plan items/problems; verification stamps verifiedById/verifiedAt server-side; declared AI drafts saved from a clinician session stay AI; label-only changes cannot escalate. EMR shows per-item origin (scripts/uji/asal-butir-emr.mts)"
+      - "2026-09-26: browser E2E 390x844 (owner doctor): per-item badges -> sign -> Close encounter enabled -> new draft with problems 'carried from previous visit', 2 closed encounters listed, scrollWidth 390, no page errors. E2E found and fixed two crashes: server patient without riskFlags crashed Shell; closed-encounter draft missing physicalExam.perSystem crashed EMR"
+      - "2026-09-26: practice patient <-> account link (server/src/aksesKlinis.ts terbitkanKodeTaut/tebusKodeTaut; server/uji/tautanPasien.uji.ts; scripts/uji/tautan-rekam-praktik.mts): clinician issues a one-time 7-day code (server stores hash only, never sent to clients), patient redeems from own account, one account per practice patient, audited issue/link/fail/unlink, patient or clinician can unlink. Browser E2E 390x844: wrong code rejected with message; lowercase code links; after reload the patient timeline shows the doctor's signed diagnosis, note and verified plan; no page errors"
+    known_gaps: [self_id_still_email_derived_for_self_records, link_code_ui_for_doctor_not_browser_verified, anamnesis_and_exam_fields_have_no_per_field_origin, clinician_usability_test, clinical_validation]
+    next_action: clinician_usability_test_then_level_next_weakest_core_lane
+    last_audited_commit: 687d77db
 
   - workflow_id: body.spatial_clinical_context
     name: Patient or educational context to spatial Body Exposure projection
     strategic_priority: core
-    maturity_level: UNKNOWN
+    maturity_level: PARTIAL  # first audit 2026-09-26
     clinical_validation: not_applicable
     dimensions:
-      functional_completeness: unknown
-      integration: unknown
-      reliability: unknown
-      usability: unknown
-      clinical_quality: unknown
-      safety_security: unknown
-      observability_testing: unknown
-    acceptance_evidence: []
-    known_gaps: [requires_current_main_audit]
-    next_action: audit_unified_body_projector_and_clinical_bridge
+      functional_completeness: medium  # AI-EMR overlay (vitals, exam markers per system, review state) and personal longitudinal signals per body system are mounted in Body Exposure; atlas geometry stays reference-only
+      integration: medium  # reads the same store record/vitals as AI-EMR and the canonical longitudinal state; no second patient state
+      reliability: medium  # browser 390x844: overlay renders with WebGL canvas, no page errors, no horizontal overflow
+      usability: unknown  # no user test
+      clinical_quality: low  # free-text exam classification is a keyword heuristic (navigation only); now conservative
+      safety_security: medium  # 2026-09-26 fixes: review state from server stamps only; documented abnormal findings no longer shown as normal
+      observability_testing: medium  # gates body-clinical-bridge, body-exposure-patient-overlay, klasifikasi-temuan-fisik, status-tanda-tangan, sinyal-pribadi-tubuh
+    acceptance_evidence:
+      - "2026-09-26 audit, browser 390x844 (doctor, patient with server-verified exam + vitals): overlay shows vitals, cardiovascular focus, 'Exam verified' (not 'Signed'), 1 canvas, scrollWidth 390, no page errors"
+      - "defect fixed: overlay / EMR 'Certified by' / timeline lens showed 'signed' from client-side optimistic fields; now only server stamps (signedById, physicalExam.verifiedById) count; pending signatures are labelled pending (scripts/uji/status-tanda-tangan.mts, body-clinical-bridge.mts; sabotaged)"
+      - "defect fixed: 'murmur sistolik 2/6' was classified and drawn as green 'Recorded normal' because only '(+)' counted as abnormal; one shared conservative classifier now marks unnegated abnormal terms as findings, requires an explicit normal marker for 'normal', and otherwise shows 'Recorded · not classified' (scripts/uji/klasifikasi-temuan-fisik.mts, 3 sabotages). Browser: Focused findings 0 -> 1"
+    known_gaps: [exam_text_classifier_is_heuristic_not_structured_exam, personal_signals_not_browser_verified_for_linked_patient, overlay_markers_not_bound_to_exact_3d_structures, usability_test]
+    next_action: structured_per_system_exam_fields_instead_of_free_text_heuristic
     last_audited_commit: null

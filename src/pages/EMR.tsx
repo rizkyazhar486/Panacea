@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { StatusSinkronKlinis } from '../components/StatusSinkronKlinis'
 import { Prosa } from '../components/Prosa'
 import { Link } from 'react-router-dom'
 import { useStore } from '../lib/store'
@@ -20,6 +21,11 @@ import { api, backendEnabled } from '../lib/api'
 import { searchICD, matchICD, icd11, type ICDCode } from '../lib/icd'
 import { evaluateVitals, overallStatus, STATUS_COLOR, STATUS_LABEL } from '../lib/chronic'
 import { projectEmrToBodyClinicalBridge } from '../lib/bodyClinicalBridge'
+import { KunjunganEmr } from '../components/KunjunganEmr'
+import { klasifikasiTemuan } from '../lib/bodyClinicalFindings'
+import { statusTinjauRekam } from '../lib/statusTandaTangan'
+import { TerbitkanKodeTaut } from '../components/TautanRekamPraktik'
+import { labelAsalMasalah, labelAsalRencana } from '../lib/asalButirEmr'
 import type { Anamnesis, EMRRecord, PhysicalExam, VitalSign } from '../lib/types'
 
 // Send the current EMR to SATUSEHAT as a FHIR R4 Bundle (dokter/owner only).
@@ -108,15 +114,13 @@ function supportiveDefaults(weightKg: number) {
   }
 }
 
-function buildFindings(perSystem: string): SystemFinding[] {
-  const lines = perSystem.split('\n').filter(Boolean)
+function buildFindings(perSystem: string | undefined): SystemFinding[] {
+  const lines = (perSystem ?? '').split('\n').filter(Boolean)
   return BODY_SYSTEMS.map((sys) => {
     const matched = lines.filter((l) => sys.kw.some((k) => l.toLowerCase().includes(k)))
     if (matched.length === 0) return { ...sys, status: 'unchecked' as const }
     const note = matched.join(' ')
-    const low = note.toLowerCase()
-    const abnormal = ABNORMAL_HINTS.some((h) => low.includes(h))
-    return { ...sys, status: abnormal ? ('abnormal' as const) : ('normal' as const), note }
+    return { ...sys, status: klasifikasiTemuan(note), note }
   })
 }
 
@@ -203,10 +207,11 @@ export function EMR() {
 
   function sign() {
     if (!draft) return
+    const signer = acc?.name || state.settings.doctorName
     const signed = {
       ...draft,
-      physicalExam: { ...draft.physicalExam, doctorVerified: true, verifiedBy: state.settings.doctorName },
-      signedBy: state.settings.doctorName,
+      physicalExam: { ...draft.physicalExam, doctorVerified: true, verifiedBy: signer },
+      signedBy: signer,
       signedAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
     }
@@ -217,6 +222,7 @@ export function EMR() {
 
   return (
     <div className="space-y-6">
+      <StatusSinkronKlinis />
       {/* Header */}
       <Card>
         <div className="flex flex-wrap items-center justify-between gap-3">
@@ -426,6 +432,7 @@ export function EMR() {
                   {i + 1}
                 </span>
                 <h4 className="font-bold">{pr.title}</h4>
+                <span className={`text-[10px] font-semibold ${pr.source === 'Dokter' ? 'text-brand-dark' : 'text-amber-700'}`} data-asal-masalah>{labelAsalMasalah(pr)}</span>
                 {typeof pr.probability === 'number' && (
                   <span className="ml-auto flex items-center gap-1.5">
                     <span className="text-[11px] font-semibold text-neutral-500">Probability</span>
@@ -493,6 +500,7 @@ export function EMR() {
                 {pi.category}
               </Badge>
               <span className={pi.status === 'ditolak' ? 'text-neutral-500 line-through' : ''}>{pi.text}</span>
+              <span className="ml-auto shrink-0 text-[10px] font-semibold text-neutral-500" data-asal-rencana>{labelAsalRencana(pi)}</span>
             </li>
           ))}
         </ul>
@@ -524,14 +532,20 @@ export function EMR() {
           </div>
           <Button onClick={sign} disabled={Boolean(draft.signedBy) && !dirty}>
             <IconCheck size={16} />
-            {draft.signedBy ? 'Re-sign' : `Sign as ${state.settings.doctorName}`}
+            {draft.signedBy ? 'Re-sign' : `Sign as ${acc?.name || state.settings.doctorName}`}
           </Button>
         </div>
-        {draft.signedAt && (
-          <p className="mt-2 text-xs text-brand-dark">
-            ✓ Certified by {state.settings.doctorName} on {new Date(draft.signedAt).toLocaleString('en-US')}
+        {draft.signedAt && (statusTinjauRekam(draft) === 'signed' ? (
+          <p className="mt-2 text-xs text-brand-dark" data-status-tanda-tangan="signed">
+            ✓ Certified by {draft.signedBy} on {new Date(draft.signedAt).toLocaleString('en-US')}
           </p>
-        )}
+        ) : (
+          <p className="mt-2 text-xs text-amber-700" data-status-tanda-tangan="pending">
+            Signature pending — not yet confirmed by the server, so it does not count as signed.
+          </p>
+        ))}
+        <KunjunganEmr record={draft} dirty={dirty} klinisi={acc?.role === 'dokter' || Boolean(acc?.isOwner)} />
+        {(acc?.role === 'dokter' || acc?.isOwner) && <TerbitkanKodeTaut patientId={activePatient.id} />}
       </Card>
     </div>
   )

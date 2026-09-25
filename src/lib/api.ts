@@ -456,6 +456,15 @@ export const api = {
   putLabLog: (log: Record<string, { id: string; tanggal: string; nilai: number; rujukanBawah?: number; rujukanAtas?: number }[]>, diperbaruiPada: string) =>
     req<{ log: Record<string, { id: string; tanggal: string; nilai: number; rujukanBawah?: number; rujukanAtas?: number }[]>; diperbaruiPada: string }>('/api/lab-log', { method: 'PUT', body: JSON.stringify({ log, diperbaruiPada }) }),
   getLabFhir: () => req<FhirBundelLab>('/api/lab-log/fhir'),
+  // Studi validasi klinis (lihat src/lib/validasiKlinis.ts). Identitas penilai ditetapkan server.
+  validationStudies: () => req<{ studies: { protokol: import('./validasiKlinis').Protokol; jumlahKasus: number; sudahSaya: number }[] }>('/api/validation/studies'),
+  validationCases: (id: string) => req<{ protokol: import('./validasiKlinis').Protokol; cases: (import('./validasiKlinis').KasusBeku & { sudahSaya: boolean })[] }>(`/api/validation/${encodeURIComponent(id)}/cases`),
+  submitValidationAssessment: (id: string, body: unknown) => req<{ ok: true; urutan: number; sidik: string }>(`/api/validation/${encodeURIComponent(id)}/assessments`, { method: 'POST', body: JSON.stringify(body) }),
+  reportValidationSafetyEvent: (body: unknown) => req<{ ok: true }>('/api/validation/safety-events', { method: 'POST', body: JSON.stringify(body) }),
+  validationDisagreements: (id: string) => req<{ cases: { kasus: import('./validasiKlinis').KasusBeku; penilaian: { benar: boolean; bahaya: string; omisi: string[]; override: { dilakukan: boolean; alasan?: string }; klaimTakDidukung: number }[] }[] }>(`/api/validation/${encodeURIComponent(id)}/disagreements`),
+  submitValidationAdjudication: (body: unknown) => req<{ ok: true }>('/api/validation/adjudications', { method: 'POST', body: JSON.stringify(body) }),
+  submitValidationUsability: (id: string, body: unknown) => req<{ ok: true }>(`/api/validation/${encodeURIComponent(id)}/usability`, { method: 'POST', body: JSON.stringify(body) }),
+  validationLedger: () => req<{ ledger: import('./validasiKlinis').Catatan[] }>('/api/validation/ledger'),
   getLabShares: () => req<{ shares: IzinLabKlien[]; audit: { waktu: string; aktor: string; aksi: string; izinId: string }[]; reviews: TinjauanLabKlien[] }>('/api/lab-log/shares'),
   shareLab: (dokterEmail: string, hari: number) => req<IzinLabKlien>('/api/lab-log/shares', { method: 'POST', body: JSON.stringify({ dokterEmail, hari }) }),
   revokeLabShare: (id: string) => req<IzinLabKlien>(`/api/lab-log/shares/${encodeURIComponent(id)}`, { method: 'DELETE' }),
@@ -540,8 +549,18 @@ export const api = {
     req<{ request: BackendSecondOpinion }>(`/api/second-opinion/${id}/complete`, { method: 'POST', body: JSON.stringify({ finalOpinion }) }).then((r) => r.request),
   // clinical persistence
   clinical: () => req<ClinicalData>('/api/clinical'),
+  issueLinkCode: (patientId: string) =>
+    req<{ code: string; expiresAt: string }>(`/api/clinical/patient/${encodeURIComponent(patientId)}/link-code`, { method: 'POST' }),
+  redeemLinkCode: (code: string) =>
+    req<{ ok: boolean; patientId: string }>('/api/clinical/link', { method: 'POST', body: JSON.stringify({ code }) }),
+  myLinks: () => req<{ links: { patientId: string; linkedAt: string }[] }>('/api/clinical/links'),
+  unlink: (patientId: string) => req<{ ok: boolean }>(`/api/clinical/link/${encodeURIComponent(patientId)}`, { method: 'DELETE' }),
+  closeEncounter: (patientId: string) =>
+    req<{ ok: boolean; encounter: EMRRecord & { encounterId: string; closedAt: string; closedBy?: string }; record: EMRRecord }>('/api/clinical/encounter/close', { method: 'POST', body: JSON.stringify({ patientId }) }),
+  encounters: (patientId: string) =>
+    req<{ encounters: (EMRRecord & { encounterId: string; closedAt: string; closedBy?: string })[] }>(`/api/clinical/encounters/${encodeURIComponent(patientId)}`),
   saveRecordRemote: (patientId: string, record: EMRRecord) =>
-    req<{ ok: boolean }>('/api/clinical/record', { method: 'POST', body: JSON.stringify({ patientId, record }) }),
+    req<{ ok: boolean; record: EMRRecord }>('/api/clinical/record', { method: 'POST', body: JSON.stringify({ patientId, record }) }),
   saveEducationRemote: (patientId: string, sheet: EducationSheet) =>
     req<{ ok: boolean }>('/api/clinical/education', { method: 'POST', body: JSON.stringify({ patientId, sheet }) }),
   addVitalRemote: (patientId: string, vital: VitalSign) =>

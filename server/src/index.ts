@@ -1,3 +1,7 @@
+import { randomUUID } from 'node:crypto'
+import { existsSync as adaBerkas, readFileSync as bacaBerkas } from 'node:fs'
+import { dirname as folderDari, join as gabungJalur } from 'node:path'
+import { fileURLToPath as keJalurBerkas } from 'node:url'
 import { createServer } from 'node:http'
 import {
   ringkasanSaya, ajukanVerifikasi, setelRadius, blokir, bukaBlokir, laporkan,
@@ -37,6 +41,15 @@ import {
   completeSecondOpinion,
   uid,
   getClinical,
+  getRecord,
+  getRecordHistory,
+  closeEncounter,
+  getEncounters,
+  getKodeTaut,
+  getTautan,
+  hapusTautan,
+  simpanKodeTaut,
+  simpanTautan,
   saveRecord,
   saveEducation,
   addVital,
@@ -56,6 +69,8 @@ import {
   listLabReviews,
   listCarePlans,
   addCarePlan,
+  bacaLedgerValidasi,
+  tambahLedgerValidasi,
   addCareReport,
   listCareReports,
   saveRingkasan,
@@ -143,6 +158,9 @@ import { logKeBundelFhir, buatIzin, izinBerlaku, buatTinjauan } from './labFhir.
 import { susunRencana, susunLaporan, laporanKeBundelFhir } from './carePlan.js'
 import { putusanPengingatCek, PESAN_PENGINGAT_CEK } from './pengingatCek.js'
 import { penyimpananSehat, status as statusSimpan } from './simpanAman.js'
+import { bolehAksesPasien, klinisiAtauPemilik, saringKlinis, terbitkanKodeTaut, tebusKodeTaut, tertautKe } from './aksesKlinis.js'
+import { terapkanSimpanRekam, tutupKunjungan } from './rekamKlinis.js'
+import { sambung, protokolKini, susunPenilaian, susunKeselamatan, susunAdjudikasi, susunUsabilitas, type IdentitasPenilai } from './validasiLedger.js'
 import { parseHealthWebhookPayload, extractHeartRateSeries, extractSleepSessions, newestSampleDate } from './healthWebhook.js'
 import { checkHrZoneAlert, checkBedtimeReminder, checkWorkoutReminder, suggestedBedtime, ZONES } from './healthAlerts.js'
 import { fetchLeagueScoreboard, fetchF1Info, fetchMotoGpInfo, LEAGUES, UNAVAILABLE } from './sports.js'
@@ -801,15 +819,25 @@ app.post('/api/second-opinion/:id/complete', requireAuth, (req, res) => {
 })
 
 // --- clinical (patients + EMR + vitals/supportive + education) ---
+// Siapa boleh membaca/menulis rekam klinis pasien tertentu (lihat aksesKlinis.ts).
+const bolehPasien = (u: User, patientId: string) => bolehAksesPasien(u, patientId, isOwner(u), findUserBySelfPatientId, (pid) => tertautKe(u, pid, getTautan()))
 app.get('/api/clinical', requireAuth, (req, res) => {
-  addAudit((req as express.Request & { user: User }).user, 'clinical.read')
-  res.json(getClinical())
+  const u = (req as express.Request & { user: User }).user
+  addAudit(u, 'clinical.read')
+  const c = getClinical()
+  // Hash kode tautan tidak pernah keluar dari server.
+  const { kodeTaut: _k, ...tanpaKode } = c as typeof c & { kodeTaut?: unknown }
+  res.json(klinisiAtauPemilik(u, isOwner(u)) ? tanpaKode : saringKlinis(c, (pid) => bolehPasien(u, pid)))
 })
 app.post('/api/clinical/record', requireAuth, (req, res) => {
+  if (!bolehPasien((req as express.Request & { user: User }).user, String((req.body as { patientId?: unknown })?.patientId ?? ''))) return res.status(403).json({ error: 'no access to this patient record' })
   const { patientId, record } = req.body as { patientId?: string; record?: unknown }
   if (!patientId) return res.status(400).json({ error: 'missing_patientId' })
   const actor = (req as express.Request & { user: User }).user
-  saveRecord(patientId, record)
+  // Tanda tangan dicap server; non-klinisi tidak dapat menandatangani; versi bertanda tangan diarsipkan.
+  const hasil = terapkanSimpanRekam(getRecord(patientId), record, { id: actor.id, nama: actor.name, klinisi: klinisiAtauPemilik(actor, isOwner(actor)) }, new Date())
+  saveRecord(patientId, hasil.rekam, hasil.arsip)
+  if (hasil.arsip) addAudit(actor, 'emr.signed_version_archived', patientId)
   addAudit(actor, 'emr.save', patientId)
   // Notify the patient (if they have a linked account) that their EMR is ready.
   const patientUser = findUserBySelfPatientId(patientId)
@@ -820,29 +848,99 @@ app.post('/api/clinical/record', requireAuth, (req, res) => {
       url: './#/education',
     }, 'notifVitals').catch(() => {})
   }
+  res.json({ ok: true, record: hasil.rekam })
+})
+
+// Tutup kunjungan bertanda tangan dan mulai draf baru (klinisi saja).
+app.post('/api/clinical/encounter/close', requireAuth, (req, res) => {
+  const actor = (req as express.Request & { user: User }).user
+  const patientId = String((req.body as { patientId?: unknown })?.patientId ?? '')
+  if (!patientId) return res.status(400).json({ error: 'missing_patientId' })
+  if (!bolehPasien(actor, patientId)) return res.status(403).json({ error: 'no access to this patient record' })
+  const hasil = tutupKunjungan(getRecord(patientId), { id: actor.id, nama: actor.name, klinisi: klinisiAtauPemilik(actor, isOwner(actor)) }, new Date(), `emr-${randomUUID()}`)
+  if (!hasil.ok) return res.status(hasil.alasan === 'not-clinician' ? 403 : 409).json({ error: hasil.alasan })
+  closeEncounter(patientId, hasil.kunjungan, hasil.rekamBaru)
+  addAudit(actor, 'emr.encounter_closed', patientId)
+  res.json({ ok: true, encounter: hasil.kunjungan, record: hasil.rekamBaru })
+})
+app.get('/api/clinical/encounters/:patientId', requireAuth, (req, res) => {
+  const u = (req as express.Request & { user: User }).user
+  if (!bolehPasien(u, String(req.params.patientId))) return res.status(403).json({ error: 'no access to this patient record' })
+  addAudit(u, 'emr.encounters.read', String(req.params.patientId))
+  res.json({ encounters: getEncounters(String(req.params.patientId)) })
+})
+
+// Tautan pasien praktik -> akun pasien, disetujui pasien lewat kode sekali pakai.
+app.post('/api/clinical/patient/:patientId/link-code', requireAuth, (req, res) => {
+  const actor = (req as express.Request & { user: User }).user
+  const pid = String(req.params.patientId)
+  if (!getClinical().patients.some((p) => p?.id === pid)) return res.status(404).json({ error: 'no-patient' })
+  const h = terbitkanKodeTaut(pid, { id: actor.id, klinisi: klinisiAtauPemilik(actor, isOwner(actor)) }, new Date())
+  if (!h.ok) return res.status(h.alasan === 'not-clinician' ? 403 : 400).json({ error: h.alasan })
+  simpanKodeTaut(h.catatan)
+  addAudit(actor, 'emr.link_code_issued', pid)
+  res.json({ code: h.kode, expiresAt: h.catatan.kedaluwarsa })
+})
+app.post('/api/clinical/link', requireAuth, (req, res) => {
+  const actor = (req as express.Request & { user: User }).user
+  const hasil = tebusKodeTaut(String((req.body as { code?: unknown })?.code ?? ''), actor, getKodeTaut(), getTautan(), new Date())
+  if (!hasil.ok) { addAudit(actor, 'emr.link_failed', hasil.alasan); return res.status(hasil.alasan === 'invalid' ? 404 : 409).json({ error: hasil.alasan }) }
+  simpanTautan(hasil.tautan, hasil.kodeHash)
+  addAudit(actor, 'emr.linked', hasil.tautan.patientId)
+  res.json({ ok: true, patientId: hasil.tautan.patientId })
+})
+app.get('/api/clinical/links', requireAuth, (req, res) => {
+  const u = (req as express.Request & { user: User }).user
+  res.json({ links: Object.values(getTautan()).filter((t) => t.userId === u.id).map((t) => ({ patientId: t.patientId, linkedAt: t.ditautkanPada })) })
+})
+app.delete('/api/clinical/link/:patientId', requireAuth, (req, res) => {
+  const u = (req as express.Request & { user: User }).user
+  const pid = String(req.params.patientId), t = getTautan()[pid]
+  if (!t) return res.status(404).json({ error: 'not-linked' })
+  if (t.userId !== u.id && !klinisiAtauPemilik(u, isOwner(u))) return res.status(403).json({ error: 'forbidden' })
+  hapusTautan(pid)
+  addAudit(u, 'emr.unlinked', pid)
   res.json({ ok: true })
 })
+
+// Riwayat versi rekam bertanda tangan (akses sama dengan rekamnya).
+app.get('/api/clinical/record-history/:patientId', requireAuth, (req, res) => {
+  const u = (req as express.Request & { user: User }).user
+  if (!bolehPasien(u, String(req.params.patientId))) return res.status(403).json({ error: 'no access to this patient record' })
+  addAudit(u, 'emr.history.read', String(req.params.patientId))
+  res.json({ history: getRecordHistory(String(req.params.patientId)) })
+})
 app.post('/api/clinical/education', requireAuth, (req, res) => {
+  if (!bolehPasien((req as express.Request & { user: User }).user, String((req.body as { patientId?: unknown })?.patientId ?? ''))) return res.status(403).json({ error: 'no access to this patient record' })
   const { patientId, sheet } = req.body as { patientId?: string; sheet?: unknown }
   if (!patientId) return res.status(400).json({ error: 'missing_patientId' })
   saveEducation(patientId, sheet)
   res.json({ ok: true })
 })
 app.post('/api/clinical/vital', requireAuth, (req, res) => {
+  if (!bolehPasien((req as express.Request & { user: User }).user, String((req.body as { patientId?: unknown })?.patientId ?? ''))) return res.status(403).json({ error: 'no access to this patient record' })
   const { patientId, vital } = req.body as { patientId?: string; vital?: unknown }
   if (!patientId) return res.status(400).json({ error: 'missing_patientId' })
-  addVital(patientId, vital)
+  // Siapa yang mencatat (dari sesi, bukan payload): klinisi → 'clinician-entered', selain itu 'patient-reported'.
+  const pencatat = (req as express.Request & { user: User }).user
+  const vitalTercap = vital && typeof vital === 'object' ? { ...(vital as object), dicatatOleh: { id: pencatat.id, klinisi: klinisiAtauPemilik(pencatat, isOwner(pencatat)) } } : vital
+  addVital(patientId, vitalTercap)
   res.json({ ok: true })
 })
 app.post('/api/clinical/supportive', requireAuth, (req, res) => {
+  if (!bolehPasien((req as express.Request & { user: User }).user, String((req.body as { patientId?: unknown })?.patientId ?? ''))) return res.status(403).json({ error: 'no access to this patient record' })
   const { patientId, result } = req.body as { patientId?: string; result?: unknown }
   if (!patientId) return res.status(400).json({ error: 'missing_patientId' })
-  addSupportive(patientId, result)
+  // Siapa yang mencatat (dari sesi, bukan payload): klinisi → 'clinician-entered', selain itu 'patient-reported'.
+  const pencatat = (req as express.Request & { user: User }).user
+  const resultTercap = result && typeof result === 'object' ? { ...(result as object), dicatatOleh: { id: pencatat.id, klinisi: klinisiAtauPemilik(pencatat, isOwner(pencatat)) } } : result
+  addSupportive(patientId, resultTercap)
   res.json({ ok: true })
 })
 app.post('/api/clinical/patient', requireAuth, (req, res) => {
   const { patient } = req.body as { patient?: unknown }
   if (!patient) return res.status(400).json({ error: 'missing_patient' })
+  if (!bolehPasien((req as express.Request & { user: User }).user, String((patient as { id?: unknown })?.id ?? ''))) return res.status(403).json({ error: 'patients can only create their own record' })
   addPatient(patient)
   res.json({ ok: true })
 })
@@ -1679,6 +1777,117 @@ app.delete('/api/reminders/:id', requireAuth, (req, res) => {
   res.json({ ok: true })
 })
 
+// ── Studi validasi klinis ───────────────────────────────────────────────────
+// Server menyimpan buku besar append-only dan menegakkan siapa penilai; metrik &
+// laporan dihitung kernel di peramban (src/lib/validasiKlinis.ts), yang juga
+// memverifikasi rantai ini. Tidak ada penilaian yang dibuat oleh perangkat lunak.
+const STUDI_BEKU = ['lab-tren-pribadi-v1.json']
+function semaiStudiValidasi() {
+  for (const berkas of STUDI_BEKU) {
+    const jalur = gabungJalur(folderDari(keJalurBerkas(import.meta.url)), '..', 'data-validasi', berkas)
+    if (!adaBerkas(jalur)) continue
+    const { protokol, kasus } = JSON.parse(bacaBerkas(jalur, 'utf8'))
+    let buku = bacaLedgerValidasi()
+    if (protokolKini(buku, protokol.id)) continue
+    for (const isi of [{ jenis: 'protokol' as const, data: protokol }, ...kasus.map((k: unknown) => ({ jenis: 'kasus' as const, data: k }))]) {
+      const c = sambung(buku, isi); tambahLedgerValidasi(c); buku = bacaLedgerValidasi()
+    }
+    console.log(`[validation] seeded study ${protokol.id} v${protokol.versi} with ${kasus.length} frozen cases`)
+  }
+}
+const penilaiDari = (u: User, coi: unknown): IdentitasPenilai => ({
+  id: u.id, peran: 'physician', kredensialRef: 'panaceamed-str-verification', kredensialTerverifikasi: u.role === 'dokter',
+  cakupan: 'declared by reviewer at assessment time', konflikKepentingan: typeof coi === 'string' && coi.trim() ? coi.trim().slice(0, 300) : 'none declared',
+})
+const bolehMenilai = (u: User) => u.role === 'dokter'
+
+app.get('/api/validation/studies', requireAuth, (req, res) => {
+  const u = (req as express.Request & { user: User }).user
+  if (!bolehMenilai(u) && !isOwner(u)) { res.status(403).json({ error: 'verified clinician role required' }); return }
+  const buku = bacaLedgerValidasi()
+  const ids = [...new Set(buku.filter((c) => c.isi.jenis === 'protokol').map((c) => c.isi.data.id))]
+  res.json({ studies: ids.map((id) => {
+    const kasus = buku.filter((c) => c.isi.jenis === 'kasus' && c.isi.data.protokolId === id)
+    const saya = buku.filter((c) => c.isi.jenis === 'penilaian' && c.isi.data.penilai.id === u.id && kasus.some((k) => k.isi.data.id === c.isi.data.kasusId)).length
+    return { protokol: protokolKini(buku, id), jumlahKasus: kasus.length, sudahSaya: saya }
+  }) })
+})
+
+// Kasus untuk dinilai — BUTA: penilaian penilai lain tidak pernah dikirim.
+app.get('/api/validation/:id/cases', requireAuth, (req, res) => {
+  const u = (req as express.Request & { user: User }).user
+  if (!bolehMenilai(u)) { res.status(403).json({ error: 'verified clinician role required' }); return }
+  const buku = bacaLedgerValidasi(), id = String(req.params.id)
+  if (!protokolKini(buku, id)) { res.status(404).json({ error: 'unknown study' }); return }
+  const sudah = new Set(buku.filter((c) => c.isi.jenis === 'penilaian' && c.isi.data.penilai.id === u.id).map((c) => c.isi.data.kasusId))
+  res.json({ protokol: protokolKini(buku, id), cases: buku.filter((c) => c.isi.jenis === 'kasus' && c.isi.data.protokolId === id).map((c) => ({ ...c.isi.data, sudahSaya: sudah.has(c.isi.data.id) })) })
+})
+
+app.post('/api/validation/:id/assessments', requireAuth, (req, res) => {
+  const u = (req as express.Request & { user: User }).user
+  if (!bolehMenilai(u)) { res.status(403).json({ error: 'verified clinician role required' }); return }
+  try {
+    const buku = bacaLedgerValidasi()
+    const data = susunPenilaian(buku, String(req.params.id), req.body, penilaiDari(u, req.body?.konflikKepentingan), new Date())
+    const c = sambung(buku, { jenis: 'penilaian', data }); tambahLedgerValidasi(c)
+    res.json({ ok: true, urutan: c.urutan, sidik: c.sidik })
+  } catch (e) { res.status(400).json({ error: (e as Error).message }) }
+})
+
+app.post('/api/validation/safety-events', requireAuth, (req, res) => {
+  const u = (req as express.Request & { user: User }).user
+  if (!bolehMenilai(u) && !isOwner(u)) { res.status(403).json({ error: 'verified clinician role required' }); return }
+  try {
+    const buku = bacaLedgerValidasi()
+    const data = susunKeselamatan(req.body, u.id, new Date(), `safety-${buku.length}`)
+    const c = sambung(buku, { jenis: 'keselamatan', data }); tambahLedgerValidasi(c)
+    res.json({ ok: true, urutan: c.urutan })
+  } catch (e) { res.status(400).json({ error: (e as Error).message }) }
+})
+
+// Antrean adjudikasi: kasus dengan ketidaksepakatan yang BUKAN dinilai klinisi ini.
+// Adjudikator memang harus melihat kedua penilaian kasus itu — hanya kasus itu.
+app.get('/api/validation/:id/disagreements', requireAuth, (req, res) => {
+  const u = (req as express.Request & { user: User }).user
+  if (!bolehMenilai(u)) { res.status(403).json({ error: 'verified clinician role required' }); return }
+  const buku = bacaLedgerValidasi(), id = String(req.params.id)
+  const kasus = buku.filter((c) => c.isi.jenis === 'kasus' && c.isi.data.protokolId === id).map((c) => c.isi.data)
+  const sudahAdj = new Set(buku.filter((c) => c.isi.jenis === 'adjudikasi').map((c) => c.isi.data.kasusId))
+  res.json({ cases: kasus.flatMap((k) => {
+    const n = buku.filter((c) => c.isi.jenis === 'penilaian' && c.isi.data.kasusId === k.id).map((c) => c.isi.data)
+    if (sudahAdj.has(k.id) || new Set(n.map((x) => x.benar)).size < 2 || n.some((x) => x.penilai.id === u.id)) return []
+    return [{ kasus: k, penilaian: n.map((x) => ({ benar: x.benar, bahaya: x.bahaya, omisi: x.omisi, override: x.override, klaimTakDidukung: x.klaimTakDidukung })) }]
+  }) })
+})
+
+app.post('/api/validation/adjudications', requireAuth, (req, res) => {
+  const u = (req as express.Request & { user: User }).user
+  if (!bolehMenilai(u)) { res.status(403).json({ error: 'verified clinician role required' }); return }
+  try {
+    const buku = bacaLedgerValidasi()
+    const c = sambung(buku, { jenis: 'adjudikasi', data: susunAdjudikasi(buku, req.body, penilaiDari(u, req.body?.konflikKepentingan), new Date()) })
+    tambahLedgerValidasi(c); res.json({ ok: true, urutan: c.urutan })
+  } catch (e) { res.status(400).json({ error: (e as Error).message }) }
+})
+
+app.post('/api/validation/:id/usability', requireAuth, (req, res) => {
+  const u = (req as express.Request & { user: User }).user
+  if (!bolehMenilai(u)) { res.status(403).json({ error: 'verified clinician role required' }); return }
+  try {
+    const buku = bacaLedgerValidasi()
+    const c = sambung(buku, { jenis: 'usabilitas', data: susunUsabilitas(buku, String(req.params.id), req.body, u.id, new Date()) })
+    tambahLedgerValidasi(c); res.json({ ok: true, urutan: c.urutan })
+  } catch (e) { res.status(400).json({ error: (e as Error).message }) }
+})
+
+// Ekspor buku besar lengkap — hanya pemimpin studi (owner), supaya penilai tetap buta.
+app.get('/api/validation/ledger', requireAuth, (req, res) => {
+  const u = (req as express.Request & { user: User }).user
+  if (!isOwner(u)) { res.status(403).json({ error: 'study lead only' }); return }
+  res.json({ ledger: bacaLedgerValidasi() })
+})
+
+
 // Owner gate — by configured owner email OR an explicit owner role.
 function isOwner(u: User): boolean {
   return u.email.toLowerCase() === config.ownerEmail || u.role === 'owner'
@@ -1991,6 +2200,7 @@ process.on('unhandledRejection', (e) => alertOwner('Unhandled promise rejection'
 const server = createServer(app)
 attachRealtime(server)
 await initStore()
+semaiStudiValidasi()
 // Penghapusan akun Connect yang kreditnya jatuh di bawah ambang. Dijadwalkan
 // tujuh hari, bukan seketika: keputusan yang keliru masih bisa ditarik pemilik
 // lewat pulihkanKredit, dan penghapusan yang tidak bisa dibatalkan bukan hal
