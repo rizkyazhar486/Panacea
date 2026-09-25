@@ -875,3 +875,12 @@ Priorities:
 3. Convert the unusual breadth into clinical proof, interoperability and production-grade depth. Do not add breadth indefinitely: a new surface needs a named user, a problem, and a way to measure benefit.
 
 Existing capability stays; secondary surfaces are grouped or hidden rather than deleted. Report "technically works", "clinically reviewed" and "clinically validated" as separate states, and never claim the latter two without real evidence.
+
+
+## Autonomous maturity source of truth — 2026-09-25
+
+Claude Code must read [PANACEA_PRODUCT_MATURITY_OS.md](PANACEA_PRODUCT_MATURITY_OS.md) and the living sources linked from `AGENTS.md` before starting broad continuation work. This is the canonical operational implementation of the owner's maturity-first direction.
+
+Do not interpret continuous R&D as permission for continuous feature proliferation. Use research to update evidence, gaps and priorities; promote a new feature only when it solves a real named problem, fits the shared architecture, cannot be better handled by an existing capability, and has a validation path.
+
+When the owner says "lanjut" or equivalent, and no narrower task supersedes it, execute `automation/AUTONOMOUS_RND_LOOP.md`. Keep `governance/FEATURE_REGISTRY.yaml`, `governance/MATURITY_REGISTRY.yaml`, `governance/RISK_REGISTRY.yaml` and `governance/RND_BACKLOG.yaml` synchronized with verified repository state.
