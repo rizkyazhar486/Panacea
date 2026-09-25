@@ -45,6 +45,18 @@ export const FEATURE_READINESS: readonly FeatureReadiness[] = [
     notes: 'Established dashboard surface. Freeze against redesign; only objective bug, accessibility, performance, and missing-widget fixes are allowed during stabilization.',
   },
   {
+    id: 'lab-longitudinal',
+    label: 'Lab results → personal baseline → biological age → clinician sharing',
+    status: 'FUNCTIONAL-BUT-INCOMPLETE',
+    route: '/tubuh',
+    requiresExternalAdapter: false,
+    requiresPatientData: true,
+    requiresWebGL: false,
+    productionReady: false,
+    lastValidated: '2026-09-25',
+    notes: 'Flagship workflow. Working: guarded entry (reason on reject, no future dates, unit-mismatch confirm), correction/delete, personal baseline + trend (median ± 2 MAD, two-point confirmation), PhenoAge trajectory with named missing markers, server sync (last-write-wins, retry), FHIR R4 Observations (LOINC only from the verified registry; hs-CRP and 8 analytes uncoded), patient consent to one verified clinician with revoke + audit, clinician trend view, clinician review with note and recheck date shown to the patient ("Recheck due" when reached). Missing: notification on share/review, photo/PDF import, reference ranges per reporting lab, prospective clinician validation (none yet; engineering correctness only).',
+  },
+  {
     id: 'body-explorer',
     label: 'Body Explorer',
     status: 'FUNCTIONAL-BUT-INCOMPLETE',

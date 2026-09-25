@@ -117,7 +117,8 @@ interface DB {
   applications?: Application[] // professional onboarding applications (doctor/writer/verifier)
   healthProfiles?: Record<string, Record<string, any>> // email -> health data blob (manual/wearable)
   labShares?: { id: string; pasienEmail: string; dokterEmail: string; dibuat: string; berakhir: string; dicabut?: string }[]
-  labAudit?: { waktu: string; pasienEmail: string; aktor: string; aksi: 'izin-dibuat' | 'izin-dicabut' | 'dibaca-dokter'; izinId: string }[]
+  labReviews?: { id: string; izinId: string; pasienEmail: string; dokterEmail: string; tes: string; ditinjau: string; catatan?: string; cekUlangSebelum?: string }[]
+  labAudit?: { waktu: string; pasienEmail: string; aktor: string; aksi: 'izin-dibuat' | 'izin-dicabut' | 'dibaca-dokter' | 'ditinjau-dokter'; izinId: string }[]
   labLogs?: Record<string, { log: Record<string, { id: string; tanggal: string; nilai: number }[]>; diperbaruiPada: string }> // email -> riwayat lab pribadi
   healthWebhookTokens?: Record<string, string> // opaque token -> email, for Apple Health auto-export (Health Auto Export app)
   hrSeries?: Record<string, { t: number; bpm: number; lo?: number; hi?: number; kind: string }[]> // email -> heart-rate log
@@ -850,6 +851,9 @@ export function revokeLabShare(id: string, pasienEmail: string, waktu: string): 
 }
 // Jejak audit hanya bertambah; dibatasi 5.000 butir terbaru agar tidak tumbuh tanpa batas.
 export function addLabAudit(a: AuditLabDb) { const l = (db.labAudit ??= []); l.push(a); if (l.length > 5000) l.splice(0, l.length - 5000); save() }
+type TinjauanLabDb = NonNullable<typeof db.labReviews>[number]
+export function addLabReview(t: TinjauanLabDb) { const l = (db.labReviews ??= []); l.push(t); if (l.length > 20000) l.splice(0, l.length - 20000); save() }
+export function listLabReviews(pasienEmail: string): TinjauanLabDb[] { return (db.labReviews ?? []).filter((t) => t.pasienEmail === pasienEmail).slice(-200).reverse() }
 export function listLabAudit(pasienEmail: string): AuditLabDb[] { return (db.labAudit ?? []).filter((a) => a.pasienEmail === pasienEmail).slice(-100).reverse() }
 
 export function getHealthProfile(email: string): Record<string, any> {

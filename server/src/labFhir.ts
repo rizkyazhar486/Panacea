@@ -17,6 +17,8 @@ import { VERIFIED_METRIC_TERMS, LOINC_SYSTEM, UCUM_SYSTEM, OBS_CATEGORY_SYSTEM }
 import type { LogLab } from './labLog.js'
 
 export const SISTEM_ASAL = 'https://panaceamed.id/fhir/CodeSystem/data-origin'
+/** Identitas stabil butir lab: `<jenis>/<id butir>`, dipakai untuk mengaitkan tinjauan klinisi. */
+export const SISTEM_ENTRI = 'https://panaceamed.id/fhir/NamingSystem/lab-entry'
 
 /** jenis lab aplikasi → [kunci registry, satuan aplikasi yang harus sama]. */
 const PETA: Record<string, [string, string]> = {
@@ -63,6 +65,7 @@ export function logKeBundelFhir(log: LogLab, pasienRef: string, dibuat: string) 
         resource: {
           resourceType: 'Observation',
           id,
+          identifier: [{ system: SISTEM_ENTRI, value: `${jenis}/${b.id}` }],
           meta: { tag: [{ system: SISTEM_ASAL, code: 'patient-transcribed', display: 'Transcribed by the patient from a laboratory report' }] },
           status: 'final',
           category: [{ coding: [{ system: OBS_CATEGORY_SYSTEM, code: 'laboratory' }] }],
@@ -80,7 +83,7 @@ export function logKeBundelFhir(log: LogLab, pasienRef: string, dibuat: string) 
 
 // ── Izin & audit ─────────────────────────────────────────────────────────
 export interface IzinLab { id: string; pasienEmail: string; dokterEmail: string; dibuat: string; berakhir: string; dicabut?: string }
-export interface AuditLab { waktu: string; pasienEmail: string; aktor: string; aksi: 'izin-dibuat' | 'izin-dicabut' | 'dibaca-dokter'; izinId: string }
+export interface AuditLab { waktu: string; pasienEmail: string; aktor: string; aksi: 'izin-dibuat' | 'izin-dicabut' | 'dibaca-dokter' | 'ditinjau-dokter'; izinId: string }
 
 const EMAIL = /^[^\s@]{1,64}@[^\s@]{1,190}\.[^\s@]{2,}$/
 export const HARI_MAKS = 90
@@ -96,4 +99,33 @@ export function buatIzin(pasienEmail: string, dokterEmailMentah: unknown, hariMe
 
 export function izinBerlaku(izin: IzinLab | undefined, dokterEmail: string, kini: Date): izin is IzinLab {
   return !!izin && !izin.dicabut && izin.dokterEmail === dokterEmail.toLowerCase() && Date.parse(izin.berakhir) > kini.getTime()
+}
+
+// ── Tinjauan klinisi & tindak lanjut ──────────────────────────────────────
+// Ditulis dokter (clinician-authored), terpisah dari angka yang disalin pasien;
+// tidak pernah mengubah hasil lab. Hanya lewat izin yang berlaku.
+export interface TinjauanLab {
+  id: string; izinId: string; pasienEmail: string; dokterEmail: string
+  tes: string; ditinjau: string; catatan?: string; cekUlangSebelum?: string
+}
+export const MAKS_CATATAN = 500
+
+export function buatTinjauan(izin: IzinLab, masukan: { tes?: unknown; catatan?: unknown; cekUlangSebelum?: unknown }, kini: Date): TinjauanLab {
+  const tes = String(masukan?.tes ?? '').trim()
+  if (!/^[a-z0-9_-]{1,32}$/.test(tes) || tes === '__proto__') throw new Error('choose the test you reviewed')
+  const catatanMentah = masukan?.catatan == null ? '' : String(masukan.catatan).trim()
+  if (catatanMentah.length > MAKS_CATATAN) throw new Error(`note must be ${MAKS_CATATAN} characters or fewer`)
+  let cekUlangSebelum: string | undefined
+  if (masukan?.cekUlangSebelum != null && masukan.cekUlangSebelum !== '') {
+    const t = String(masukan.cekUlangSebelum)
+    const hari = kini.toISOString().slice(0, 10)
+    const maks = new Date(kini.getTime() + 2 * 365 * 864e5).toISOString().slice(0, 10)
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(t) || Number.isNaN(Date.parse(`${t}T00:00:00Z`))) throw new Error('invalid recheck date')
+    if (t < hari || t > maks) throw new Error('recheck date must be between today and two years from now')
+    cekUlangSebelum = t
+  }
+  return {
+    id: randomBytes(12).toString('hex'), izinId: izin.id, pasienEmail: izin.pasienEmail, dokterEmail: izin.dokterEmail,
+    tes, ditinjau: kini.toISOString(), ...(catatanMentah ? { catatan: catatanMentah } : {}), ...(cekUlangSebelum ? { cekUlangSebelum } : {}),
+  }
 }

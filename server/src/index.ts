@@ -52,6 +52,8 @@ import {
   revokeLabShare,
   addLabAudit,
   listLabAudit,
+  addLabReview,
+  listLabReviews,
   saveRingkasan,
   saveHealthProfile,
   recordDeviceHealthSync,
@@ -132,7 +134,7 @@ import { createPayment, confirmPayment, paymentWebhook, orderStatus } from './pa
 import { disburse, irisLive } from './iris.js'
 import { KATALOG, KATEGORI } from './healthMetrics.js'
 import { validasiLogLab, validasiCapWaktu, terimaTulisan } from './labLog.js'
-import { logKeBundelFhir, buatIzin, izinBerlaku } from './labFhir.js'
+import { logKeBundelFhir, buatIzin, izinBerlaku, buatTinjauan } from './labFhir.js'
 import { parseHealthWebhookPayload, extractHeartRateSeries, extractSleepSessions, newestSampleDate } from './healthWebhook.js'
 import { checkHrZoneAlert, checkBedtimeReminder, checkWorkoutReminder, suggestedBedtime, ZONES } from './healthAlerts.js'
 import { fetchLeagueScoreboard, fetchF1Info, fetchMotoGpInfo, LEAGUES, UNAVAILABLE } from './sports.js'
@@ -908,7 +910,7 @@ app.get('/api/lab-log/fhir', requireAuth, (req, res) => {
 })
 app.get('/api/lab-log/shares', requireAuth, (req, res) => {
   const u = (req as express.Request & { user: User }).user
-  res.json({ shares: listLabShares().filter((i) => i.pasienEmail === u.email), audit: listLabAudit(u.email) })
+  res.json({ shares: listLabShares().filter((i) => i.pasienEmail === u.email), audit: listLabAudit(u.email), reviews: listLabReviews(u.email) })
 })
 app.post('/api/lab-log/shares', requireAuth, (req, res) => {
   const u = (req as express.Request & { user: User }).user
@@ -955,7 +957,25 @@ app.get('/api/clinician/lab-shares/:id/fhir', requireAuth, (req, res) => {
   if (!izinBerlaku(izin, u.email, kini)) { res.status(404).json({ error: 'no active access' }); return }
   const pasien = getUserByEmail(izin.pasienEmail)
   addLabAudit({ waktu: kini.toISOString(), pasienEmail: izin.pasienEmail, aktor: u.email, aksi: 'dibaca-dokter', izinId: izin.id })
-  res.json({ pasien: pasien?.name ?? 'Patient', berakhir: izin.berakhir, bundle: logKeBundelFhir(getLabLog(izin.pasienEmail)?.log ?? {}, `Patient/${pasien?.id ?? 'unknown'}`, kini.toISOString()) })
+  res.json({ pasien: pasien?.name ?? 'Patient', berakhir: izin.berakhir, reviews: listLabReviews(izin.pasienEmail).filter((t) => t.dokterEmail === u.email), bundle: logKeBundelFhir(getLabLog(izin.pasienEmail)?.log ?? {}, `Patient/${pasien?.id ?? 'unknown'}`, kini.toISOString()) })
+})
+
+// Tinjauan klinisi atas hasil lab yang dibagikan: dokter terverifikasi, izin
+// berlaku, dicatat di audit pasien. Tidak mengubah angka lab pasien.
+app.post('/api/clinician/lab-shares/:id/review', requireAuth, (req, res) => {
+  const u = (req as express.Request & { user: User }).user
+  if (u.role !== 'dokter') { res.status(403).json({ error: 'verified clinician role required' }); return }
+  const kini = new Date()
+  const izin = listLabShares().find((i) => i.id === String(req.params.id))
+  if (!izinBerlaku(izin, u.email, kini)) { res.status(404).json({ error: 'no active access' }); return }
+  try {
+    const t = buatTinjauan(izin, req.body as Record<string, unknown>, kini)
+    addLabReview(t)
+    addLabAudit({ waktu: t.ditinjau, pasienEmail: izin.pasienEmail, aktor: u.email, aksi: 'ditinjau-dokter', izinId: izin.id })
+    res.json(t)
+  } catch (e) {
+    res.status(400).json({ error: (e as Error).message })
+  }
 })
 
 // Per-user webhook token + endpoint for automatic Apple Health sync via the

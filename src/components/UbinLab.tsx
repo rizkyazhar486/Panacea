@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { JENIS_LAB, ambilLab, tambahLab, hapusLab, umurHari, periksaMasukanLab, type ButirLab, type JenisLab } from '../lib/lab'
 import { BagikanLabKeDokter } from './BagikanLabKeDokter'
+import { api, backendEnabled, type TinjauanLabKlien } from '../lib/api'
 import { pasangSinkronLab, dengarSinkronLab, statusSinkronLab, type StatusSinkronLab } from '../lib/labSync'
 import { analisisTrenLab, type StatusTren } from '../lib/labTrend'
 
@@ -98,6 +99,9 @@ export function UbinLab() {
   const [pilih, setPilih] = useState<string | null>(null)
 
   const [sinkron, setSinkron] = useState<StatusSinkronLab>(statusSinkronLab)
+  // Tinjauan dokter (clinician-authored) — ditampilkan terpisah dari angka lab.
+  const [tinjauan, setTinjauan] = useState<TinjauanLabKlien[]>([])
+  useEffect(() => { if (backendEnabled) api.getLabShares().then((r) => setTinjauan(r.reviews ?? [])).catch(() => {}) }, [])
   useEffect(() => { pasangSinkronLab(); return dengarSinkronLab(setSinkron) }, [])
 
   useEffect(() => {
@@ -228,6 +232,18 @@ export function UbinLab() {
 
                   <Garis butir={butir} jenis={j} />
                   <BarisTren butir={butir} jenis={j} />
+                  {(() => {
+                    const t = tinjauan.find((x) => x.tes === j.id)
+                    if (!t) return null
+                    const jatuhTempo = t.cekUlangSebelum && t.cekUlangSebelum <= tanggalHariIni()
+                    return (
+                      <div className="t-mikro mt-2 rounded-xl border border-emerald-500/25 px-2.5 py-2 leading-snug" data-lab-review>
+                        <p className="font-bold text-emerald-600 dark:text-emerald-300">Reviewed by {t.dokterEmail} · {t.ditinjau.slice(0, 10)}</p>
+                        {t.cekUlangSebelum && <p className={jatuhTempo ? 'font-bold text-amber-600 dark:text-amber-300' : 'text-neutral-500'}>{jatuhTempo ? 'Recheck due' : 'Recheck by'} {t.cekUlangSebelum}</p>}
+                        {t.catatan && <p className="text-neutral-600 dark:text-neutral-300">“{t.catatan}” <span className="text-neutral-400">— clinician note</span></p>}
+                      </div>
+                    )
+                  })()}
 
                   {/* Riwayat yang bisa dikoreksi: satu hasil salah ketik tanpa
                       jalan menghapusnya merusak garis dasar dan PhenoAge selamanya. */}

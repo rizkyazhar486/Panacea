@@ -113,7 +113,9 @@ export interface FhirObservasiLab {
   effectiveDateTime: string
   valueQuantity: { value: number; unit: string; code?: string }
   meta?: { tag?: { code: string }[] }
+  identifier?: { system: string; value: string }[]
 }
+export interface TinjauanLabKlien { id: string; tes: string; dokterEmail: string; ditinjau: string; catatan?: string; cekUlangSebelum?: string }
 export interface FhirBundelLab { resourceType: 'Bundle'; total: number; entry: { resource: FhirObservasiLab }[] }
 export const apiBaseUrl = API
 
@@ -453,11 +455,13 @@ export const api = {
   putLabLog: (log: Record<string, { id: string; tanggal: string; nilai: number }[]>, diperbaruiPada: string) =>
     req<{ log: Record<string, { id: string; tanggal: string; nilai: number }[]>; diperbaruiPada: string }>('/api/lab-log', { method: 'PUT', body: JSON.stringify({ log, diperbaruiPada }) }),
   getLabFhir: () => req<FhirBundelLab>('/api/lab-log/fhir'),
-  getLabShares: () => req<{ shares: IzinLabKlien[]; audit: { waktu: string; aktor: string; aksi: string; izinId: string }[] }>('/api/lab-log/shares'),
+  getLabShares: () => req<{ shares: IzinLabKlien[]; audit: { waktu: string; aktor: string; aksi: string; izinId: string }[]; reviews: TinjauanLabKlien[] }>('/api/lab-log/shares'),
   shareLab: (dokterEmail: string, hari: number) => req<IzinLabKlien>('/api/lab-log/shares', { method: 'POST', body: JSON.stringify({ dokterEmail, hari }) }),
   revokeLabShare: (id: string) => req<IzinLabKlien>(`/api/lab-log/shares/${encodeURIComponent(id)}`, { method: 'DELETE' }),
   clinicianLabShares: () => req<{ shares: { id: string; berakhir: string; pasien: string }[] }>('/api/clinician/lab-shares'),
-  clinicianLabFhir: (id: string) => req<{ pasien: string; berakhir: string; bundle: FhirBundelLab }>(`/api/clinician/lab-shares/${encodeURIComponent(id)}/fhir`),
+  clinicianLabFhir: (id: string) => req<{ pasien: string; berakhir: string; reviews: TinjauanLabKlien[]; bundle: FhirBundelLab }>(`/api/clinician/lab-shares/${encodeURIComponent(id)}/fhir`),
+  reviewLab: (izinId: string, tes: string, catatan: string, cekUlangSebelum: string) =>
+    req<TinjauanLabKlien>(`/api/clinician/lab-shares/${encodeURIComponent(izinId)}/review`, { method: 'POST', body: JSON.stringify({ tes, catatan, cekUlangSebelum }) }),
   getHealthProfile: () => req<{ profile: Record<string, unknown> }>('/api/health-profile').then((r) => r.profile),
   saveHealthProfile: (profile: Record<string, unknown>) =>
     req<{ ok: boolean; profile: Record<string, unknown> }>('/api/health-profile', { method: 'PUT', body: JSON.stringify({ profile }) }).then((r) => r.profile),

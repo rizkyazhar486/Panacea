@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { api, backendEnabled, type FhirBundelLab, type FhirObservasiLab } from '../lib/api'
+import { api, backendEnabled, type FhirBundelLab, type FhirObservasiLab, type TinjauanLabKlien } from '../lib/api'
 import { analisisTrenSeri, MIN_RIWAYAT_GARIS_DASAR, type StatusTren } from '../lib/labTrend'
 
 // Bahasa klinisi untuk mesin tren yang sama dengan sisi pasien (labTrend.ts):
@@ -13,6 +13,33 @@ const STATUS_KLINISI: Record<StatusTren, { teks: string; urut: number; kelas: st
   pantau: { teks: 'Single deviation', urut: 1, kelas: 'text-amber-300' },
   stabil: { teks: 'Within personal range', urut: 2, kelas: 'text-emerald-300' },
   'belum-cukup-data': { teks: `Baseline forming (<${MIN_RIWAYAT_GARIS_DASAR + 1} results)`, urut: 3, kelas: 'text-white/50' },
+}
+
+const jenisDari = (o: FhirObservasiLab) => o.identifier?.find((i) => i.system.endsWith('/lab-entry'))?.value.split('/')[0] ?? ''
+
+// Tinjauan ditulis dokter dan disimpan terpisah; angka lab pasien tidak berubah.
+function FormTinjauan({ izinId, tes, sebelumnya, onSimpan }: { izinId: string; tes: string; sebelumnya?: TinjauanLabKlien; onSimpan: (t: TinjauanLabKlien) => void }) {
+  const [catatan, setCatatan] = useState('')
+  const [cek, setCek] = useState('')
+  const [galat, setGalat] = useState<string | null>(null)
+  return (
+    <details className="mt-1" data-lab-review-form>
+      <summary className="cursor-pointer text-[11px] font-bold text-emerald-300">
+        {sebelumnya ? `Reviewed ${sebelumnya.ditinjau.slice(0, 10)}${sebelumnya.cekUlangSebelum ? ` · recheck by ${sebelumnya.cekUlangSebelum}` : ''}` : 'Mark reviewed'}
+      </summary>
+      <div className="mt-1 grid gap-1.5">
+        <textarea value={catatan} onChange={(e) => setCatatan(e.target.value)} maxLength={500} rows={2} aria-label="Note to patient (optional)" placeholder="Note to patient (optional)"
+          className="rounded-lg border border-white/15 bg-transparent px-2 py-1.5 text-[12px] text-white" />
+        <div className="flex items-center gap-1.5">
+          <label className="text-[10px] text-white/55" htmlFor={`cek-${tes}`}>Recheck by</label>
+          <input id={`cek-${tes}`} type="date" value={cek} onChange={(e) => setCek(e.target.value)} className="rounded-lg border border-white/15 bg-transparent px-2 py-1 text-[12px] text-white" />
+          <button type="button" className="ml-auto min-h-9 rounded-full px-3 text-[11px] font-black"
+            onClick={() => api.reviewLab(izinId, tes, catatan, cek).then((t) => { setGalat(null); setCatatan(''); onSimpan(t) }).catch((e) => setGalat((e as Error).message))}>Save review</button>
+        </div>
+        {galat && <p role="alert" className="text-[11px] font-bold text-amber-300">{galat}</p>}
+      </div>
+    </details>
+  )
 }
 
 function Garis({ obs }: { obs: FhirObservasiLab[] }) {
@@ -32,7 +59,7 @@ function Garis({ obs }: { obs: FhirObservasiLab[] }) {
 // Angkanya disalin pasien dari lembar hasil — ditandai jelas, bukan dari lab.
 export function LabPasienUntukDokter() {
   const [daftar, setDaftar] = useState<{ id: string; berakhir: string; pasien: string }[] | null>(null)
-  const [buka, setBuka] = useState<{ pasien: string; bundle: FhirBundelLab } | null>(null)
+  const [buka, setBuka] = useState<{ izinId: string; pasien: string; reviews: TinjauanLabKlien[]; bundle: FhirBundelLab } | null>(null)
   const [galat, setGalat] = useState<string | null>(null)
   useEffect(() => { if (backendEnabled) api.clinicianLabShares().then((r) => setDaftar(r.shares)).catch((e) => setGalat((e as Error).message)) }, [])
   if (!backendEnabled) return null
@@ -51,7 +78,7 @@ export function LabPasienUntukDokter() {
       <div className="mt-2 flex flex-wrap gap-1.5">
         {daftar?.map((d) => (
           <button key={d.id} type="button" className="min-h-10 rounded-full border border-white/15 px-3 text-[11px] font-black"
-            onClick={() => api.clinicianLabFhir(d.id).then((r) => setBuka(r)).catch((e) => setGalat((e as Error).message))}>
+            onClick={() => api.clinicianLabFhir(d.id).then((r) => setBuka({ ...r, izinId: d.id })).catch((e) => setGalat((e as Error).message))}>
             {d.pasien} · until {d.berakhir.slice(0, 10)}
           </button>
         ))}
@@ -72,6 +99,10 @@ export function LabPasienUntukDokter() {
                     <div className="min-w-0">
                       <div className="truncate text-[12px] font-bold">{nama}</div>
                       <div className="text-[10px] text-white/45">{loinc ? `LOINC ${loinc}` : 'not coded'} · {obs.length} result{obs.length > 1 ? 's' : ''} · last {a.effectiveDateTime.slice(0, 10)}</div>
+                      {jenisDari(a) && (
+                        <FormTinjauan izinId={buka.izinId} tes={jenisDari(a)} sebelumnya={buka.reviews.find((t) => t.tes === jenisDari(a))}
+                          onSimpan={(t) => setBuka((b) => (b ? { ...b, reviews: [t, ...b.reviews] } : b))} />
+                      )}
                       {st && <div className={`text-[11px] font-bold ${st.kelas}`}>{st.teks}{tren?.garisDasar != null ? ` · baseline ${Number(tren.garisDasar.toFixed(2))}` : ''}{tren?.zPribadi != null && tren.status !== 'belum-cukup-data' ? ` · z ${tren.zPribadi.toFixed(1)}` : ''}</div>}
                     </div>
                     <div className="flex flex-col items-end">
