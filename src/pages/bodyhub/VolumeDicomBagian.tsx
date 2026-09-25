@@ -1,9 +1,12 @@
-import { useCallback, useRef, useState } from 'react'
+import { useCallback, useMemo, useRef, useState } from 'react'
+import { PlaneViewer } from '../../components/PlaneViewerMpr'
+import { skalaBidang } from '../../lib/ukurMpr'
+import { kursorKeKotak, type KursorVoksel } from '../../lib/sinkronMpr3d'
 import { lapisanAwalCt, lapisanAwalRelatif, type LapisanVolume } from '../../lib/lapisanVolume'
 import { BIDANG_AWAL, type BidangMiring } from '../../lib/bidangPotong'
 import { buatResep, bacaResep, cocokkanResep, sha256Hex, BATAS_RESEP } from '../../lib/resepRender'
-import { bacaDicom, urutkanSeri, type Citra } from '../../lib/dicom'
-import { buatVolumeMpr } from '../../lib/dicomMpr'
+import { bacaDicom, urutkanSeri, JENDELA_CT, type Citra } from '../../lib/dicom'
+import { buatVolumeMpr, ambilIrisanMpr, labelBidangMpr, type VolumeMpr } from '../../lib/dicomMpr'
 import {
   susunVolumeTekstur, jendelaAwalVolume, BATAS_VOLUME,
   type VolumeTekstur,
@@ -16,7 +19,7 @@ type Keadaan =
   | { tahap: 'kosong' }
   | { tahap: 'membaca'; jumlah: number }
   | { tahap: 'gagal'; alasan: string }
-  | { tahap: 'siap'; tekstur: VolumeTekstur; jumlah: number; modalitas: string; ditolak: string[]; sha256: string[]; seriesUid?: string }
+  | { tahap: 'siap'; tekstur: VolumeTekstur; volume: VolumeMpr; jumlah: number; modalitas: string; ditolak: string[]; sha256: string[]; seriesUid?: string }
 
 function GeserHu({ label, nilai, min, maks, onUbah }: {
   label: string; nilai: number; min: number; maks: number; onUbah: (n: number) => void
@@ -64,6 +67,10 @@ export function VolumeDicomBagian() {
   const [lapisan, setLapisan] = useState<LapisanVolume[]>([])
   const [halus, setHalus] = useState(1.5)
   const [bidang, setBidang] = useState<BidangMiring>(BIDANG_AWAL)
+  // MPR sinkron: satu kursor voksel untuk tiga bidang DAN penanda 3D.
+  const [kursor, setKursor] = useState<KursorVoksel>({ x: 0, y: 0, z: 0 })
+  const [jendela, setJendela] = useState({ pusat: 40, lebar: 400 })
+  const [ukur, setUkur] = useState(false)
   const [pesanResep, setPesanResep] = useState<{ nada: 'ok' | 'peringatan'; teks: string } | null>(null)
   const resepRef = useRef<HTMLInputElement | null>(null)
   const masukanRef = useRef<HTMLInputElement | null>(null)
@@ -111,14 +118,24 @@ export function VolumeDicomBagian() {
     setBawah(jendela.bawah + (jendela.atas - jendela.bawah) * 0.35)
     setAtas(jendela.atas)
     setPotong([1, 1, 1])
+    setKursor({ x: Math.floor(volume.volume.kolom / 2), y: Math.floor(volume.volume.baris / 2), z: Math.floor(volume.volume.kedalaman / 2) })
+    setJendela(citra[0].modalitas === 'CT' ? { pusat: 40, lebar: 400 } : { pusat: (jendela.bawah + jendela.atas) / 2, lebar: Math.max(1, jendela.atas - jendela.bawah) })
     // Lapisan awal: kelas HU bersumber untuk CT; pecahan jendela tanpa nama jaringan untuk MRI.
     setLapisan(citra[0].modalitas === 'CT' ? lapisanAwalCt() : lapisanAwalRelatif(jendela))
     setKeadaan({
-      tahap: 'siap', tekstur: tekstur.tekstur, jumlah: citra.length,
+      tahap: 'siap', tekstur: tekstur.tekstur, volume: volume.volume, jumlah: citra.length,
       modalitas: citra[0].modalitas, ditolak, sha256: sidik, seriesUid: citra[0].seriesInstanceUid,
     })
     setPesanResep(null)
   }, [])
+
+  const siap = keadaan.tahap === 'siap' ? keadaan : null
+  const bidangMpr = useMemo(() => siap ? {
+    aksial: ambilIrisanMpr(siap.volume, 'source', kursor),
+    koronal: ambilIrisanMpr(siap.volume, 'cross-row', kursor),
+    sagital: ambilIrisanMpr(siap.volume, 'cross-column', kursor),
+    label: labelBidangMpr(siap.volume.irisan[0]?.deskripsiSeri, siap.volume.orientasiPasien),
+  } : null, [siap, kursor])
 
   return (
     <div className="rounded-2xl border border-neutral-200/70 bg-white/70 p-3.5 dark:border-white/10 dark:bg-white/[.03]">
@@ -150,7 +167,40 @@ export function VolumeDicomBagian() {
           </div>
           <p className="mb-2.5 text-[11px] leading-relaxed text-neutral-600 dark:text-neutral-300">{MODE_RENDER.find((m) => m.id === mode)?.catatan}</p>
 
-          <VolumeDicom3D tekstur={keadaan.tekstur} mode={mode} pajanan={pajanan} ambangBawah={bawah} ambangAtas={atas} kepekatan={kepekatan} potong={potong} lapisan={lapisan} halus={halus} bidang={bidang} />
+          <VolumeDicom3D tekstur={keadaan.tekstur} mode={mode} pajanan={pajanan} ambangBawah={bawah} ambangAtas={atas} kepekatan={kepekatan} potong={potong} lapisan={lapisan} halus={halus} bidang={bidang} penanda={kursorKeKotak(kursor, keadaan.volume)} />
+
+          {bidangMpr && (
+            <div className="dark mt-2.5 rounded-2xl border border-white/10 bg-[#07090b] p-2 text-white" data-mpr-sync>
+              <div className="mb-2 flex flex-wrap items-center gap-1.5">
+                <span className="text-[10px] font-black uppercase tracking-[.12em] text-white/50">Synchronized planes</span>
+                <button type="button" aria-pressed={ukur} onClick={() => setUkur((v) => !v)}
+                  className={`ml-auto min-h-9 rounded-lg border px-2.5 text-[10px] font-black ${ukur ? 'border-amber-300/40 bg-amber-400/15 text-amber-100' : 'border-white/10 text-white/60'}`}>Measure {ukur ? 'on' : 'off'}</button>
+              </div>
+              {keadaan.modalitas === 'CT' && (
+                <div className="mb-2 flex flex-wrap gap-1">
+                  {JENDELA_CT.slice(0, 6).map((j) => (
+                    <button key={j.nama} type="button" onClick={() => setJendela({ pusat: j.pusat, lebar: j.lebar })}
+                      aria-pressed={jendela.pusat === j.pusat && jendela.lebar === j.lebar}
+                      className={`min-h-9 rounded-full border px-2.5 text-[10px] font-bold ${jendela.pusat === j.pusat && jendela.lebar === j.lebar ? 'border-cyan-300/50 bg-cyan-400/15 text-cyan-100' : 'border-white/10 text-white/60'}`}>{j.nama}</button>
+                  ))}
+                </div>
+              )}
+              <div className="grid gap-2">
+                <PlaneViewer title={bidangMpr.label.source} subtitle={`Slice ${kursor.z + 1}/${keadaan.volume.kedalaman}`} plane={bidangMpr.aksial}
+                  pusat={jendela.pusat} lebar={jendela.lebar} terbalik={keadaan.volume.terbalik} crossX={kursor.x} crossY={kursor.y} showCrosshair
+                  onPick={(x, y) => setKursor((k) => ({ ...k, x, y }))} ukur={ukur} skala={skalaBidang(keadaan.volume, 'source')} />
+                <div className="grid grid-cols-2 gap-2">
+                  <PlaneViewer title={bidangMpr.label['cross-row']} subtitle="Reformatted" plane={bidangMpr.koronal}
+                    pusat={jendela.pusat} lebar={jendela.lebar} terbalik={keadaan.volume.terbalik} crossX={kursor.x} crossY={kursor.z} showCrosshair
+                    onPick={(x, z) => setKursor((k) => ({ ...k, x, z }))} ukur={ukur} skala={skalaBidang(keadaan.volume, 'cross-row')} />
+                  <PlaneViewer title={bidangMpr.label['cross-column']} subtitle="Reformatted" plane={bidangMpr.sagital}
+                    pusat={jendela.pusat} lebar={jendela.lebar} terbalik={keadaan.volume.terbalik} crossX={kursor.y} crossY={kursor.z} showCrosshair
+                    onPick={(y, z) => setKursor((k) => ({ ...k, y, z }))} ukur={ukur} skala={skalaBidang(keadaan.volume, 'cross-column')} />
+                </div>
+              </div>
+              <p className="mt-1.5 text-[10px] text-white/45">Tap any plane to move the shared cursor; the cyan marker in 3D is the same voxel.</p>
+            </div>
+          )}
 
           <div className="mt-2 flex flex-wrap items-center gap-2" data-render-recipe>
             <span className="text-[10px] font-black uppercase tracking-[.12em] text-neutral-500">Reproduce</span>

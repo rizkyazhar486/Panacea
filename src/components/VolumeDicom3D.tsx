@@ -47,6 +47,9 @@ uniform float uHalus;
 uniform int uBidangAktif;
 uniform vec3 uBidangNormal;
 uniform float uBidangJarak;
+uniform int uPenandaAktif;
+uniform vec3 uPenanda;
+uniform float uPenandaR;
 
 vec2 potongKotak(vec3 asal, vec3 arah) {
   vec3 invArah = 1.0 / arah;
@@ -88,6 +91,15 @@ void main() {
 
   vec3 langkahVec = arah * uLangkah;
   vec3 p = vOrigin + arah * t.x;
+
+  // Penanda kursor MPR: bola kecil yang selalu tampak (seperti crosshair), sehingga
+  // titik yang dipilih di bidang aksial/koronal/sagital terlihat di 3D.
+  if (uPenandaAktif == 1) {
+    vec3 oc = vOrigin - uPenanda;
+    float bq = dot(oc, arah);
+    float cq = dot(oc, oc) - uPenandaR * uPenandaR;
+    if (bq * bq - cq >= 0.0 && -bq > 0.0) { color = vec4(0.25, 0.9, 1.0, 1.0); return; }
+  }
 
   if (uMode == 3) {
     float integral = 0.0;
@@ -213,6 +225,8 @@ export interface VolumeDicom3DProps {
   halus?: number
   /** Freely oriented cut plane (tilt/rotate/slide). */
   bidang?: BidangMiring
+  /** MPR cursor in box space [-0.5, 0.5]^3 (see sinkronMpr3d.ts); null hides it. */
+  penanda?: [number, number, number] | null
   onGagal?: (alasan: string) => void
 }
 
@@ -234,7 +248,7 @@ function setelLapisan(m: THREE.ShaderMaterial, lapisan: readonly LapisanVolume[]
 
 export function VolumeDicom3D({
   tekstur, mode, ambangBawah, ambangAtas, kepekatan, pajanan,
-  potong = [1, 1, 1], lapisan = [], halus = 1.5, bidang = BIDANG_AWAL, onGagal,
+  potong = [1, 1, 1], lapisan = [], halus = 1.5, bidang = BIDANG_AWAL, penanda = null, onGagal,
 }: VolumeDicom3DProps) {
   const wadahRef = useRef<HTMLDivElement | null>(null)
   const materialRef = useRef<THREE.ShaderMaterial | null>(null)
@@ -255,7 +269,9 @@ export function VolumeDicom3D({
       Math.max(0.01, Math.min(1, potong[1])) - 0.5,
       Math.max(0.01, Math.min(1, potong[2])) - 0.5,
     )
-  }, [ambangBawah, ambangAtas, kepekatan, mode, pajanan, potong, tekstur, lapisan, halus, bidang])
+    m.uniforms.uPenandaAktif.value = penanda ? 1 : 0
+    if (penanda) (m.uniforms.uPenanda.value as THREE.Vector3).set(penanda[0], penanda[1], penanda[2])
+  }, [ambangBawah, ambangAtas, kepekatan, mode, pajanan, potong, tekstur, lapisan, halus, bidang, penanda?.[0], penanda?.[1], penanda?.[2]])
 
   useEffect(() => {
     const wadah = wadahRef.current
@@ -322,6 +338,9 @@ export function VolumeDicom3D({
         uBidangAktif: { value: 0 },
         uBidangNormal: { value: new THREE.Vector3(0, 0, 1) },
         uBidangJarak: { value: 0 },
+        uPenandaAktif: { value: penanda ? 1 : 0 },
+        uPenanda: { value: new THREE.Vector3(...(penanda ?? [0, 0, 0])) },
+        uPenandaR: { value: 0.018 },
       },
       vertexShader: VERTEX,
       fragmentShader: FRAGMENT,
