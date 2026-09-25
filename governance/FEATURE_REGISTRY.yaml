@@ -125,23 +125,23 @@ features:
     writes_to: [draft_clinical_outputs, reviewed_clinical_state]
     dependencies: [provenance, clinician_review, audit, terminology]
     dependents: [body_exposure, follow_up, care_coordination]
-    patient_state_fields: [requires_repository_audit]
-    knowledge_graph_entities: [requires_repository_audit]
+    patient_state_fields: [emr.signed-note, emr.primary-diagnosis, emr.verified-plan]
+    knowledge_graph_entities: [diagnosis, problem, care_plan]
     shared_services: [reasoning_gateway, provenance, audit, consent]
-    backend_surfaces: [requires_repository_audit]
-    frontend_surfaces: [requires_repository_audit]
-    persistence_surfaces: [requires_repository_audit]
-    external_integrations: [requires_repository_audit]
-    maturity_level: UNKNOWN
-    clinical_validation: unknown
+    backend_surfaces: [server/src/rekamKlinis.ts, 'GET /api/clinical', 'POST /api/clinical/record']
+    frontend_surfaces: [src/pages/EMR.tsx, src/lib/useLongitudinalState.ts]
+    persistence_surfaces: [server_clinical_records, signed_record_history]
+    external_integrations: [SATUSEHAT]
+    maturity_level: CONNECTED
+    clinical_validation: none
     technical_risk: high
     clinical_risk: critical
     provenance_required: true
-    tests: [requires_repository_audit]
-    observability: [requires_repository_audit]
-    known_gaps: [registry_bootstrap_requires_repository_audit]
-    next_actions: [audit_end_to_end_clinical_state_and_review_boundaries]
-    last_audited_commit: null
+    tests: [scripts/uji/emr-status-longitudinal.mts, server/uji/rekamKlinis.uji.ts, server/uji/aksesKlinis.uji.ts]
+    observability: [clinical.read_audit, emr.save_audit, emr.signed_version_archived_audit]
+    known_gaps: [one_record_per_patient_not_per_encounter, practice_patient_vs_account_identity_split, per_field_ai_draft_vs_clinician_state, clinician_usability_test, clinical_validation]
+    next_actions: [encounter_model, per_field_semantic_state, clinician_usability_test]
+    last_audited_commit: 2026-09-26-emr-longitudinal-bridge
 
   - feature_id: health.longitudinal_longevity
     name: Longitudinal Health and Longevity
