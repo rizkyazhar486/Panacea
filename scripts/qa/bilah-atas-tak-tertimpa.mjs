@@ -41,8 +41,10 @@ try {
 
   // 1. Spanduk harian harus benar-benar TAMPIL -- kalau tidak, pemeriksaan ini
   //    lulus tanpa menguji apa pun, persis cara gerbang kehilangan artinya.
-  const adaSpanduk = await page.evaluate(() => [...document.querySelectorAll('div')]
-    .some((d) => /TODAY.S REMINDER/i.test(d.textContent || '') && getComputedStyle(d).position === 'fixed'))
+  //    Dikenali lewat penanda stabil, bukan teks labelnya: label "Today's
+  //    reminder" dihapus demi keringkasan dan gerbang ini ikut buta karenanya.
+  const adaSpanduk = await page.evaluate(() => [...document.querySelectorAll('[data-daily-reminder]')]
+    .some((d) => getComputedStyle(d).position === 'fixed' && (d.textContent || '').trim().length > 0))
   if (!adaSpanduk) throw new Error('spanduk harian tidak tampil, jadi tumpang-tindihnya tidak teruji sama sekali')
 
   // 2. Tidak boleh ada apa pun yang MENUTUPI bilah atas.

@@ -65,6 +65,7 @@ export function DailyQuoteBanner() {
     // keluar tidak terlihat sekaligus tidak bisa ditekan sampai spanduknya
     // ditutup. Tingginya dibaca dari bilah yang sebenarnya, bukan ditebak.
     <div
+      data-daily-reminder="v1"
       className="pointer-events-none fixed inset-x-0 z-[60] flex justify-center px-4"
       style={{ top: 'calc(var(--tinggi-bilah-atas, 0px) + 12px)' }}
     >
