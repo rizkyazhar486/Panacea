@@ -12,6 +12,7 @@ export function CekHarian() {
   const [rencana, setRencana] = useState<{ plan: ContinuousCarePlan; dokterEmail: string; sudah: boolean }[]>([])
   const [jawab, setJawab] = useState<Record<string, boolean | number | string>>({})
   const [pesan, setPesan] = useState<string | null>(null)
+  const [mengirim, setMengirim] = useState(false)
   const muat = () => api.carePlans().then((r) => setRencana(r.plans.map((x) => ({
     plan: x.plan, dokterEmail: x.dokterEmail, sudah: x.reports.some((l) => l.scheduledFor.slice(0, 10) === hariIni()),
   })))).catch(() => {})
@@ -47,14 +48,20 @@ export function CekHarian() {
   try { pertanyaan = buildDailyInterview(plan, new Date(`${hariIni()}T12:00:00Z`).toISOString(), jawaban).questions } catch { /* di luar jendela rencana: tampilkan semua */ }
 
   const kirim = async () => {
+    if (mengirim) return
     const hilang = pertanyaan.filter((q) => q.required && jawab[q.id] === undefined)
     if (hilang.length) { setPesan(`Please answer: ${hilang.map((q) => q.prompt).join(' · ')}`); return }
-    const b: ButirAntrean = { clientId: buatClientId(), planId: plan.id, scheduledFor: hariIni(), authoredAt: new Date().toISOString(),
-      answers: jawaban.filter((a) => pertanyaan.some((q) => q.id === a.questionId)) }
-    const r = await kirimAtauAntre(localStorage, b, kirimSatu)
-    if (r.status === 'terkirim') { setPesan('Sent to your doctor for review.'); setJawab({}); void muat() }
-    else if (r.status === 'diantre') { setPesan('No connection. Saved on this device; it will be sent when you are back online.'); setJawab({}); setAntre(bacaAntrean(localStorage).length) }
-    else setPesan(r.pesan)
+    setMengirim(true)
+    try {
+      const b: ButirAntrean = { clientId: buatClientId(), planId: plan.id, scheduledFor: hariIni(), authoredAt: new Date().toISOString(),
+        answers: jawaban.filter((a) => pertanyaan.some((q) => q.id === a.questionId)) }
+      const r = await kirimAtauAntre(localStorage, b, kirimSatu)
+      if (r.status === 'terkirim') { setPesan('Sent to your doctor for review.'); setJawab({}); void muat() }
+      else if (r.status === 'diantre') { setPesan('No connection. Saved on this device; it will be sent when you are back online.'); setJawab({}); setAntre(bacaAntrean(localStorage).length) }
+      else setPesan(r.pesan)
+    } finally {
+      setMengirim(false)
+    }
   }
 
   return (
@@ -99,7 +106,8 @@ export function CekHarian() {
               )}
             </div>
           ))}
-          <button type="button" onClick={() => void kirim()} className="t-kecil min-h-[44px] w-full rounded-xl bg-brand font-bold text-white">Send to my doctor</button>
+          <button type="button" disabled={mengirim} aria-busy={mengirim} onClick={() => void kirim()}
+            className="t-kecil min-h-[44px] w-full rounded-xl bg-brand font-bold text-white disabled:opacity-60">{mengirim ? 'Sending…' : 'Send to my doctor'}</button>
         </div>
       )}
       <label className="t-mikro mt-2 flex items-center justify-between gap-2 text-neutral-500" data-pengingat-cek>
