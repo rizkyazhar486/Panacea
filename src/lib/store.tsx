@@ -1,7 +1,7 @@
 import { createContext, useContext, useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
 import { hariIni } from './tanggal'
 import { api, backendEnabled, type BackendPost } from './api'
-import { kirimAtauAntre, kurasAntrean, PERISTIWA_SINKRON, type JenisOperasi, type OperasiKlinis } from './antreanKlinis'
+import { kirimAtauAntre, kurasAntrean, PERISTIWA_SINKRON, type JenisOperasi, type OperasiKlinis, type TerimaBalasan } from './antreanKlinis'
 import type {
   AppState,
   Patient,
@@ -72,14 +72,14 @@ const kirimOperasiKlinis = (op: OperasiKlinis): Promise<unknown> => {
   }
 }
 const kabarSinkron = () => { try { window.dispatchEvent(new Event(PERISTIWA_SINKRON)) } catch { /* SSR/uji */ } }
-function sinkronKlinis(jenis: JenisOperasi, patientId: string, payload: unknown) {
+function sinkronKlinis(jenis: JenisOperasi, patientId: string, payload: unknown, terima?: TerimaBalasan) {
   if (!backendEnabled) return
   const op: OperasiKlinis = { opId: `${jenis}-${patientId}-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`, jenis, patientId, payload, dibuat: new Date().toISOString() }
-  void kirimAtauAntre(localStorage, op, kirimOperasiKlinis).then(kabarSinkron)
+  void kirimAtauAntre(localStorage, op, kirimOperasiKlinis, terima).then(kabarSinkron)
 }
-export function kurasSinkronKlinis(): Promise<unknown> {
+export function kurasSinkronKlinis(terima?: TerimaBalasan): Promise<unknown> {
   if (!backendEnabled) return Promise.resolve()
-  return kurasAntrean(localStorage, kirimOperasiKlinis).then(kabarSinkron)
+  return kurasAntrean(localStorage, kirimOperasiKlinis, terima).then(kabarSinkron)
 }
 
 export function uid(): string {
@@ -391,14 +391,25 @@ interface Store {
 const Ctx = createContext<Store | null>(null)
 
 export function StoreProvider({ children }: { children: ReactNode }) {
+  const [state, setState] = useState<AppState>(load)
+
+  // Rekam yang dikembalikan server adalah canonical: identitas penandatangan,
+  // waktu tanda tangan, dan verifikasi fisik dicap server, bukan dipercaya dari klien.
+  const terimaBalasanKlinis: TerimaBalasan = (op, hasil) => {
+    if (op.jenis !== 'record' || !hasil || typeof hasil !== 'object') return
+    const record = (hasil as { record?: EMRRecord }).record
+    if (!record || record.patientId !== op.patientId) return
+    setState((st) => ({ ...st, records: { ...st.records, [op.patientId]: record } }))
+  }
+
   // Kirim ulang tulisan klinis yang tertunda saat aplikasi dimuat dan saat kembali online.
+  // Jika antrean memuat rekam, balasan canonical server langsung mengganti state lokal.
   useEffect(() => {
-    void kurasSinkronKlinis()
-    const on = () => void kurasSinkronKlinis()
+    void kurasSinkronKlinis(terimaBalasanKlinis)
+    const on = () => void kurasSinkronKlinis(terimaBalasanKlinis)
     window.addEventListener('online', on)
     return () => window.removeEventListener('online', on)
   }, [])
-  const [state, setState] = useState<AppState>(load)
 
   // Persist everything EXCEPT the session account, so each visit starts at the
   // public landing and the role can be chosen freely (fixes role being "stuck").
@@ -542,7 +553,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
       setChat: (patientId, messages) =>
         setState((st) => ({ ...st, chats: { ...st.chats, [patientId]: messages } })),
       saveRecord: (record) => {
-        sinkronKlinis('record', record.patientId, record)
+        sinkronKlinis('record', record.patientId, record, terimaBalasanKlinis)
         setState((st) => ({ ...st, records: { ...st.records, [record.patientId]: record } }))
       },
       saveEducation: (patientId, sheet) => {
