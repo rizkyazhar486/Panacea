@@ -10,7 +10,12 @@ assert.equal(putusanPengingatCek(p, t, true, []).alasan, 'send')
 assert.equal(putusanPengingatCek({ ...p, notifCekHarian: undefined }, t, true, []).alasan, 'off', 'bawaan harus mati (opt-in)')
 assert.equal(putusanPengingatCek(p, t, false, []).alasan, 'no-plan', 'tanpa rencana aktif (izin dicabut) tidak boleh mengingatkan')
 assert.equal(putusanPengingatCek(p, t, true, ['2026-09-25']).alasan, 'done-today', 'sudah mengisi hari ini tetap diingatkan')
-assert.equal(putusanPengingatCek(p, t + 10 * 60e3, true, []).alasan, 'not-time')
+assert.equal(putusanPengingatCek(p, t - 10 * 60e3, true, []).alasan, 'not-time', 'dikirim sebelum jamnya')
+// Server tertidur saat 19:00 dan bangun 21:40: masih dikirim (kejar-susul).
+assert.equal(putusanPengingatCek(p, t + 160 * 60e3, true, []).alasan, 'send', 'server yang bangun terlambat tidak pernah mengirim pengingat')
+assert.equal(putusanPengingatCek(p, t + 7 * 3600e3, true, []).alasan, 'not-time', 'lewat jendela susul (6 jam)')
+// Tidak menyeberang ke hari berikutnya: target 22:00, bangun 00:30 esoknya.
+assert.equal(putusanPengingatCek({ ...p, cekHarianHHMM: '22:00' }, Date.parse('2026-09-25T17:30:00Z'), true, []).alasan, 'not-time')
 assert.equal(putusanPengingatCek({ ...p, cekHarianLastFiredOn: '2026-09-25' }, t, true, []).alasan, 'already-today')
 // Tanggal lokal, bukan UTC: 23:59 Jakarta tanggal 25 = 16:59Z; 00:30 Jakarta tanggal 26 = 17:30Z tanggal 25.
 assert.equal(putusanPengingatCek({ ...p, cekHarianHHMM: '00:30' }, Date.parse('2026-09-25T17:30:00Z'), true, ['2026-09-25']).alasan, 'send', 'laporan kemarin dianggap hari ini — tanggal UTC dipakai')

@@ -2,6 +2,8 @@
 // tanpa menunggu jam berjalan. Teks notifikasi tidak memuat PHI: tidak ada
 // nama dokter, diagnosis, maupun isi pertanyaan — layar kunci bisa dilihat orang lain.
 
+export const JENDELA_SUSUL_MENIT = 6 * 60
+
 export type AlasanCek = 'off' | 'no-target' | 'no-plan' | 'done-today' | 'not-time' | 'already-today' | 'send'
 
 export function putusanPengingatCek(prefs: Record<string, unknown>, nowMs: number, punyaRencanaAktif: boolean, tanggalSudahLapor: string[]): { alasan: AlasanCek; tanggalLokal: string } {
@@ -16,8 +18,11 @@ export function putusanPengingatCek(prefs: Record<string, unknown>, nowMs: numbe
   if (tanggalSudahLapor.includes(tanggalLokal)) return hasil('done-today')
   const target = Number(m[1]) * 60 + Number(m[2])
   const kini = lokal.getUTCHours() * 60 + lokal.getUTCMinutes()
-  const selisih = Math.min(Math.abs(kini - target), 1440 - Math.abs(kini - target))
-  if (selisih > 2) return hasil('not-time')
+  // Kejar-susul: server gratis sering tertidur tepat pada jamnya, sehingga jendela
+  // ±2 menit hampir tidak pernah kena. Pengingat "belum cek hari ini" tetap benar
+  // bila terlambat, jadi dikirim sekali kapan pun server bangun SETELAH jamnya,
+  // paling lambat JENDELA_SUSUL_MENIT setelahnya dan tidak melewati hari lokal itu.
+  if (kini < target || kini > Math.min(target + JENDELA_SUSUL_MENIT, 1439)) return hasil('not-time')
   if (prefs.cekHarianLastFiredOn === tanggalLokal) return hasil('already-today')
   return hasil('send')
 }
