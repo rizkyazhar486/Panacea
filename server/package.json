@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "type": "module",
-  "description": "Panaceamed.id backend \u2014 Google OAuth login + Midtrans payments (real, with mock fallback)",
+  "description": "Panaceamed.id backend — Google OAuth login + Midtrans payments (real, with mock fallback)",
   "engines": {
     "node": ">=20"
   },
