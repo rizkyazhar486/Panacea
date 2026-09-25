@@ -5,6 +5,10 @@ import { JENIS_LAB } from '../lib/lab'
 import { evaluasiAturanLab, LABEL_KEADAAN } from '../lib/aturanLabDokter'
 import type { LongitudinalPatientState } from '../lib/panaceaLongitudinalState'
 
+// Must stay equal to server/src/carePlan.ts MAKS_HARI_UMUR_NILAI (server is the
+// enforced limit; this only lets the form catch the same error before a round trip).
+const MAKS_HARI_UMUR_NILAI = 730
+
 // Dokter menyusun cek harian untuk satu pasien (lewat izin yang sama dengan
 // berbagi lab) dan membaca laporan. Prioritas/aturan terpicu DIHITUNG ULANG di
 // sini oleh kernel dari jawaban mentah — bukan dipercaya dari pasien. Aturan
@@ -19,27 +23,58 @@ export function RencanaHarianDokter({ izinId, state }: { izinId: string; state?:
   const [dx, setDx] = useState({ code: '', display: '' })
   const [qs, setQs] = useState<Q[]>([{ id: 'q1', prompt: '', kind: 'boolean', required: true, tandai: false }])
   const [galat, setGalat] = useState<string | null>(null)
+  const [menyimpan, setMenyimpan] = useState(false)
   const [aturanLab, setAturanLab] = useState<AturanLab[]>([])
   const muat = () => api.clinicianCare(izinId).then(setData).catch((e) => setGalat((e as Error).message))
   useEffect(() => { void muat() }, [izinId])
 
-  const simpan = () => api.createCarePlan(izinId, {
-    diagnosisRefs: [{ system: 'local', code: dx.code || dx.display, display: dx.display, verificationStatus: 'provisional' }],
-    questions: qs.map(({ id, prompt, kind, required }) => ({ id, prompt, kind, required })),
-    patientReportedReviewRules: qs.filter((q) => q.kind === 'boolean' && q.tandai).map((q) => ({
-      label: `Patient answered yes: ${q.prompt}`, questionId: q.id, operator: 'equals', value: true, priority: 'review-today',
-      rationale: 'Clinician-authored: flag a "yes" answer for same-day review.',
-    })),
-    measurementReviewRules: aturanLab.map((a) => {
-      const j = JENIS_LAB.find((x) => x.id === a.jenis)!
-      const ambang = Number(a.ambang.replace(',', '.'))
-      return {
-        metric: `lab.${a.jenis}`, operator: a.op, threshold: ambang, unit: j.satuan, maxAgeDays: Number(a.hari),
-        label: `${j.nama} ${a.op === 'gte' ? '≥' : '≤'} ${a.ambang} ${j.satuan}`, priority: 'review-today',
-        rationale: 'Clinician-authored lab review threshold.', evidenceRef: a.bukti.trim(),
-      }
-    }),
-  }).then(() => { setGalat(null); void muat() }).catch((e) => setGalat((e as Error).message))
+  // Validasi di peramban sebelum kirim: mencegah bolak-balik ke server untuk
+  // kesalahan yang sudah terlihat di sini (server tetap sumber kebenaran).
+  const kesalahanForm: string[] = []
+  if (!dx.display.trim()) kesalahanForm.push('Diagnosis being followed is required.')
+  qs.forEach((q, i) => { if (!q.prompt.trim()) kesalahanForm.push(`Question ${i + 1} needs text.`) })
+  const kesalahanLab = new Map<number, string[]>()
+  aturanLab.forEach((a, i) => {
+    const e: string[] = []
+    if (!Number.isFinite(Number(a.ambang.replace(',', '.'))) || a.ambang.trim() === '') e.push('Threshold must be a number.')
+    const hari = Number(a.hari)
+    if (!Number.isInteger(hari) || hari < 1 || hari > MAKS_HARI_UMUR_NILAI) e.push(`Result age must be a whole number of days, 1–${MAKS_HARI_UMUR_NILAI}.`)
+    if (!a.bukti.trim()) e.push('Evidence reference is required.')
+    if (e.length) { kesalahanLab.set(i, e); kesalahanForm.push(`Lab rule ${i + 1}: ${e.join(' ')}`) }
+  })
+  const formValid = kesalahanForm.length === 0
+
+  const [cobaKirim, setCobaKirim] = useState(false)
+  const simpan = async () => {
+    if (menyimpan) return
+    if (!formValid) { setCobaKirim(true); setGalat(kesalahanForm[0]); return }
+    setMenyimpan(true)
+    try {
+      await api.createCarePlan(izinId, {
+        diagnosisRefs: [{ system: 'local', code: dx.code || dx.display, display: dx.display, verificationStatus: 'provisional' }],
+        questions: qs.map(({ id, prompt, kind, required }) => ({ id, prompt, kind, required })),
+        patientReportedReviewRules: qs.filter((q) => q.kind === 'boolean' && q.tandai).map((q) => ({
+          label: `Patient answered yes: ${q.prompt}`, questionId: q.id, operator: 'equals', value: true, priority: 'review-today',
+          rationale: 'Clinician-authored: flag a "yes" answer for same-day review.',
+        })),
+        measurementReviewRules: aturanLab.map((a) => {
+          const j = JENIS_LAB.find((x) => x.id === a.jenis)!
+          const ambang = Number(a.ambang.replace(',', '.'))
+          return {
+            metric: `lab.${a.jenis}`, operator: a.op, threshold: ambang, unit: j.satuan, maxAgeDays: Number(a.hari),
+            label: `${j.nama} ${a.op === 'gte' ? '≥' : '≤'} ${a.ambang} ${j.satuan}`, priority: 'review-today',
+            rationale: 'Clinician-authored lab review threshold.', evidenceRef: a.bukti.trim(),
+          }
+        }),
+      })
+      setGalat(null)
+      void muat()
+    } catch (e) {
+      setGalat((e as Error).message)
+    } finally {
+      setMenyimpan(false)
+    }
+  }
 
   if (!data) {
     return (
@@ -97,6 +132,9 @@ export function RencanaHarianDokter({ izinId, state }: { izinId: string; state?:
                   </div>
                   <input value={a.bukti} onChange={(e) => ubah({ bukti: e.target.value })} placeholder="Evidence reference (guideline, section) — required" aria-label={`Evidence reference ${i + 1}`}
                     className="rounded-md border border-white/15 bg-transparent px-2 py-1 text-white" />
+                  {(cobaKirim || a.ambang.trim() !== '' || a.bukti.trim() !== '') && kesalahanLab.get(i) && (
+                    <p role="alert" className="text-[10px] font-bold text-amber-300">{kesalahanLab.get(i)!.join(' ')}</p>
+                  )}
                 </div>
               )
             })}
@@ -104,7 +142,9 @@ export function RencanaHarianDokter({ izinId, state }: { izinId: string; state?:
           </div>
           <div className="flex gap-1.5">
             {qs.length < 20 && <button type="button" className="min-h-9 rounded-full px-3 text-[11px] font-bold" onClick={() => setQs([...qs, { id: `q${qs.length + 1}`, prompt: '', kind: 'boolean', required: true, tandai: false }])}>+ Question</button>}
-            <button type="button" className="ml-auto min-h-9 rounded-full px-3 text-[11px] font-black" onClick={() => void simpan()}>Start daily check-in</button>
+            <button type="button" disabled={menyimpan} aria-busy={menyimpan} className="ml-auto min-h-9 rounded-full px-3 text-[11px] font-black disabled:opacity-60" onClick={() => void simpan()}>
+              {menyimpan ? 'Starting…' : 'Start daily check-in'}
+            </button>
           </div>
         </div>
       ) : (
