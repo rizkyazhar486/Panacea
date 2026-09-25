@@ -1,4 +1,5 @@
 import { useCallback, useRef, useState } from 'react'
+import { lapisanAwalCt, lapisanAwalRelatif, type LapisanVolume } from '../../lib/lapisanVolume'
 import { bacaDicom, urutkanSeri, type Citra } from '../../lib/dicom'
 import { buatVolumeMpr } from '../../lib/dicomMpr'
 import {
@@ -58,6 +59,8 @@ export function VolumeDicomBagian() {
   const [mode, setMode] = useState<ModeRender>('volume')
   const [pajanan, setPajanan] = useState(1)
   const [potong, setPotong] = useState<PotongVolume>([1, 1, 1])
+  const [lapisan, setLapisan] = useState<LapisanVolume[]>([])
+  const [halus, setHalus] = useState(1.5)
   const masukanRef = useRef<HTMLInputElement | null>(null)
 
   const ubahPotong = (sumbu: 0 | 1 | 2, nilai: number) => {
@@ -101,6 +104,8 @@ export function VolumeDicomBagian() {
     setBawah(jendela.bawah + (jendela.atas - jendela.bawah) * 0.35)
     setAtas(jendela.atas)
     setPotong([1, 1, 1])
+    // Lapisan awal: kelas HU bersumber untuk CT; pecahan jendela tanpa nama jaringan untuk MRI.
+    setLapisan(citra[0].modalitas === 'CT' ? lapisanAwalCt() : lapisanAwalRelatif(jendela))
     setKeadaan({
       tahap: 'siap', tekstur: tekstur.tekstur, jumlah: citra.length,
       modalitas: citra[0].modalitas, ditolak,
@@ -137,7 +142,7 @@ export function VolumeDicomBagian() {
           </div>
           <p className="mb-2.5 text-[11px] leading-relaxed text-neutral-600 dark:text-neutral-300">{MODE_RENDER.find((m) => m.id === mode)?.catatan}</p>
 
-          <VolumeDicom3D tekstur={keadaan.tekstur} mode={mode} pajanan={pajanan} ambangBawah={bawah} ambangAtas={atas} kepekatan={kepekatan} potong={potong} />
+          <VolumeDicom3D tekstur={keadaan.tekstur} mode={mode} pajanan={pajanan} ambangBawah={bawah} ambangAtas={atas} kepekatan={kepekatan} potong={potong} lapisan={lapisan} halus={halus} />
 
           <div className="mt-2.5 rounded-xl border border-neutral-200/70 bg-neutral-50/70 p-2.5 dark:border-white/10 dark:bg-white/[.025]">
             <div className="flex items-center justify-between gap-3">
@@ -160,11 +165,51 @@ export function VolumeDicomBagian() {
               <input type="range" min={0.2} max={4} step={0.1} value={pajanan} onChange={(e) => setPajanan(Number(e.target.value))} aria-label="Exposure" className="mt-1.5 h-11 w-full accent-brand" />
               <span className="mt-1 block text-[11px] leading-relaxed text-neutral-500">Scales the integrated attenuation. It stands in for tube output and detector gain together, and is not a dose in milligray — no dose is computed anywhere here.</span>
             </label>
+          ) : mode === 'lapisan' ? (
+            <div className="mt-2 space-y-2" data-volume-layers>
+              {lapisan.map((l, i) => {
+                const ubah = (p: Partial<LapisanVolume>) => setLapisan((xs) => xs.map((x, k) => (k === i ? { ...x, ...p } : x)))
+                const satuan = keadaan.modalitas === 'CT' ? 'HU' : 'relative'
+                return (
+                  <div key={i} className="rounded-xl border border-neutral-200/70 p-2 dark:border-white/10" data-volume-layer={i}>
+                    <div className="flex items-center gap-2">
+                      <input type="checkbox" checked={l.aktif} onChange={(e) => ubah({ aktif: e.target.checked })} aria-label={`Show ${l.nama}`} className="h-5 w-5" />
+                      <input type="color" value={l.warna} onChange={(e) => ubah({ warna: e.target.value })} aria-label={`${l.nama} colour`} className="h-7 w-9 rounded border-0 bg-transparent p-0" />
+                      <span className="min-w-0 flex-1 truncate text-[11.5px] font-bold text-ink dark:text-white">{l.nama}</span>
+                      <span className="shrink-0 text-[10.5px] tabular-nums text-neutral-500">{Math.round(l.bawah)}–{Math.round(l.atas)} {satuan}</span>
+                    </div>
+                    {l.aktif && (
+                      <>
+                        <GeserHu label={`${l.nama} lower (${satuan})`} nilai={l.bawah} min={keadaan.tekstur.jendela.bawah} maks={l.atas - 1} onUbah={(n) => ubah({ bawah: Math.min(n, l.atas - 1) })} />
+                        <GeserHu label={`${l.nama} upper (${satuan})`} nilai={l.atas} min={l.bawah + 1} maks={keadaan.tekstur.jendela.atas} onUbah={(n) => ubah({ atas: Math.max(n, l.bawah + 1) })} />
+                        <label className="mt-1 block">
+                          <span className="flex items-baseline justify-between text-[11px] font-bold text-ink dark:text-white"><span>Opacity</span><span className="tabular-nums text-neutral-500">{Math.round(l.opasitas * 100)}%</span></span>
+                          <input type="range" min={0.05} max={1} step={0.05} value={l.opasitas} onChange={(e) => ubah({ opasitas: Number(e.target.value) })} aria-label={`${l.nama} opacity`} className="mt-1 h-11 w-full accent-brand" />
+                        </label>
+                      </>
+                    )}
+                  </div>
+                )
+              })}
+              <p className="text-[10.5px] leading-snug text-neutral-500">
+                {keadaan.modalitas === 'CT'
+                  ? 'Starting ranges come from typical CT Hounsfield classes, not from this patient; tune them to the scan. Contrast vessels exist only if contrast was given.'
+                  : 'MR intensity has no absolute scale, so layers start as fractions of this series’ range and carry no tissue names.'}
+              </p>
+            </div>
           ) : (
             <>
               <GeserHu label={`Lower threshold (${keadaan.modalitas === 'CT' ? 'HU' : 'relative value'})`} nilai={bawah} min={keadaan.tekstur.jendela.bawah} maks={atas - 1} onUbah={(n) => setBawah(Math.min(n, atas - 1))} />
               <GeserHu label={`Upper threshold (${keadaan.modalitas === 'CT' ? 'HU' : 'relative value'})`} nilai={atas} min={bawah + 1} maks={keadaan.tekstur.jendela.atas} onUbah={(n) => setAtas(Math.max(n, bawah + 1))} />
             </>
+          )}
+
+          {(mode === 'lapisan' || mode === 'permukaan' || mode === 'keduanya') && (
+            <label className="mt-2 block">
+              <span className="flex items-baseline justify-between text-[11px] font-bold text-ink dark:text-white"><span>Smoothing (surface shading)</span><span className="tabular-nums text-neutral-500">×{halus.toFixed(1)}</span></span>
+              <input type="range" min={1} max={4} step={0.5} value={halus} onChange={(e) => setHalus(Number(e.target.value))} aria-label="Surface smoothing" className="mt-1.5 h-11 w-full accent-brand" />
+              <span className="mt-1 block text-[11px] leading-relaxed text-neutral-500">Widens the gradient used for lighting. It smooths how the surface is shaded; it does not change which voxels are inside a layer.</span>
+            </label>
           )}
 
           {(mode === 'volume' || mode === 'keduanya') && (
