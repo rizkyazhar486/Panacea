@@ -41,6 +41,7 @@ import {
   uid,
   getClinical,
   getRecord,
+  getRecords,
   getRecordHistory,
   saveRecord,
   saveEducation,
@@ -821,11 +822,16 @@ app.get('/api/clinical', requireAuth, (req, res) => {
 })
 app.post('/api/clinical/record', requireAuth, (req, res) => {
   if (!bolehPasien((req as express.Request & { user: User }).user, String((req.body as { patientId?: unknown })?.patientId ?? ''))) return res.status(403).json({ error: 'no access to this patient record' })
-  const { patientId, record } = req.body as { patientId?: string; record?: unknown }
+  const { patientId, record } = req.body as { patientId?: string; record?: any }
   if (!patientId) return res.status(400).json({ error: 'missing_patientId' })
+  if (!record || typeof record !== 'object' || typeof record.id !== 'string' || !record.id.trim()) {
+    return res.status(400).json({ error: 'missing_record_id' })
+  }
+  if (record.patientId !== patientId) return res.status(400).json({ error: 'record_patient_mismatch' })
   const actor = (req as express.Request & { user: User }).user
-  // Tanda tangan dicap server; non-klinisi tidak dapat menandatangani; versi bertanda tangan diarsipkan.
-  const hasil = terapkanSimpanRekam(getRecord(patientId), record, { id: actor.id, nama: actor.name, klinisi: klinisiAtauPemilik(actor, isOwner(actor)) }, new Date())
+  // Tanda tangan dicap server; aturan integritas dibandingkan HANYA dengan encounter
+  // yang sama. Encounter baru tidak boleh mewarisi tanda tangan dari kunjungan lama.
+  const hasil = terapkanSimpanRekam(getRecord(patientId, record.id), record, { id: actor.id, nama: actor.name, klinisi: klinisiAtauPemilik(actor, isOwner(actor)) }, new Date())
   saveRecord(patientId, hasil.rekam, hasil.arsip)
   if (hasil.arsip) addAudit(actor, 'emr.signed_version_archived', patientId)
   addAudit(actor, 'emr.save', patientId)
@@ -841,12 +847,23 @@ app.post('/api/clinical/record', requireAuth, (req, res) => {
   res.json({ ok: true, record: hasil.rekam })
 })
 
-// Riwayat versi rekam bertanda tangan (akses sama dengan rekamnya).
+// Semua encounter pasien (newest first). Akses identik dengan rekam klinis.
+app.get('/api/clinical/records/:patientId', requireAuth, (req, res) => {
+  const u = (req as express.Request & { user: User }).user
+  const patientId = String(req.params.patientId)
+  if (!bolehPasien(u, patientId)) return res.status(403).json({ error: 'no access to this patient record' })
+  addAudit(u, 'emr.encounters.read', patientId)
+  res.json({ records: getRecords(patientId) })
+})
+
+// Riwayat versi bertanda tangan (akses sama dengan rekamnya), opsional per encounter.
 app.get('/api/clinical/record-history/:patientId', requireAuth, (req, res) => {
   const u = (req as express.Request & { user: User }).user
-  if (!bolehPasien(u, String(req.params.patientId))) return res.status(403).json({ error: 'no access to this patient record' })
-  addAudit(u, 'emr.history.read', String(req.params.patientId))
-  res.json({ history: getRecordHistory(String(req.params.patientId)) })
+  const patientId = String(req.params.patientId)
+  if (!bolehPasien(u, patientId)) return res.status(403).json({ error: 'no access to this patient record' })
+  const recordId = typeof req.query.recordId === 'string' ? req.query.recordId : undefined
+  addAudit(u, 'emr.history.read', recordId ? `${patientId}:${recordId}` : patientId)
+  res.json({ history: getRecordHistory(patientId, recordId) })
 })
 app.post('/api/clinical/education', requireAuth, (req, res) => {
   if (!bolehPasien((req as express.Request & { user: User }).user, String((req.body as { patientId?: unknown })?.patientId ?? ''))) return res.status(403).json({ error: 'no access to this patient record' })

@@ -21,6 +21,7 @@ import { api, backendEnabled } from '../lib/api'
 import { searchICD, matchICD, icd11, type ICDCode } from '../lib/icd'
 import { evaluateVitals, overallStatus, STATUS_COLOR, STATUS_LABEL } from '../lib/chronic'
 import { projectEmrToBodyClinicalBridge } from '../lib/bodyClinicalBridge'
+import { deriveEmrFieldStates, type ServerAcceptedEmrForSemantics } from '../lib/emrSemanticState'
 import type { Anamnesis, EMRRecord, PhysicalExam, VitalSign } from '../lib/types'
 
 // Send the current EMR to SATUSEHAT as a FHIR R4 Bundle (dokter/owner only).
@@ -160,19 +161,47 @@ export function EMR() {
   const store = useStore()
   const { state, activePatient, saveRecord } = store
   const acc = state.account
-  // STR gate — AI-EMR is restricted to clinicians with a verified STR/SIP.
-  if (acc?.role === 'dokter' && acc.strStatus !== 'verified' && !acc.isOwner) {
-    return <StrGate str={acc.str} />
-  }
+  const strBlocked = acc?.role === 'dokter' && acc.strStatus !== 'verified' && !acc.isOwner
   const record = state.records[activePatient.id]
   const [draft, setDraft] = useState<EMRRecord | null>(record ?? null)
   const [dirty, setDirty] = useState(false)
+  const [encounters, setEncounters] = useState<EMRRecord[]>(record ? [record] : [])
+  const [encounterLoading, setEncounterLoading] = useState(false)
+  const [encounterError, setEncounterError] = useState('')
 
   useEffect(() => {
     setDraft(state.records[activePatient.id] ?? null)
     setDirty(false)
   }, [activePatient.id, state.records])
 
+  useEffect(() => {
+    let active = true
+    const fallback = record ? [record] : []
+    if (!backendEnabled || strBlocked || activePatient.id === 'none') {
+      setEncounters(fallback)
+      setEncounterLoading(false)
+      setEncounterError('')
+      return () => { active = false }
+    }
+    setEncounterLoading(true)
+    setEncounterError('')
+    void api.recordEncounters(activePatient.id)
+      .then((items) => {
+        if (!active) return
+        setEncounters(items.length ? items : fallback)
+      })
+      .catch((error: unknown) => {
+        if (!active) return
+        setEncounters(fallback)
+        setEncounterError(error instanceof Error ? error.message : 'Could not load encounter history.')
+      })
+      .finally(() => { if (active) setEncounterLoading(false) })
+    return () => { active = false }
+  }, [activePatient.id, record?.id, record?.updatedAt, strBlocked])
+
+  // STR gate — AI-EMR is restricted to clinicians with a verified STR/SIP.
+  // Hooks stay above this return so changing auth state never changes hook order.
+  if (strBlocked) return <StrGate str={acc?.str} />
   if (!draft) return <EmptyEMR />
 
   const systemFindings = buildFindings(draft.physicalExam.perSystem)
@@ -182,6 +211,7 @@ export function EMR() {
     systemFindings,
     draft.updatedAt,
   )
+  const semanticStates = Object.values(deriveEmrFieldStates(draft as ServerAcceptedEmrForSemantics))
 
   function patch(fn: (r: EMRRecord) => EMRRecord) {
     setDraft((d) => (d ? fn(d) : d))
@@ -249,6 +279,69 @@ export function EMR() {
           <IconSparkle size={14} />
           Sections marked <b>AI SUGGESTION</b> must be verified & completed by a doctor before
           signing.
+        </div>
+      </Card>
+
+      <Card>
+        <SectionTitle
+          title="Encounter history"
+          subtitle="Separate visits are preserved by record ID; opening a prior encounter does not merge it into another visit."
+          right={<Badge tone="neutral">{encounters.length} encounter{encounters.length === 1 ? '' : 's'}</Badge>}
+        />
+        {encounterError && (
+          <p className="mb-2 rounded-lg bg-red-50 px-3 py-2 text-xs text-red-700">
+            Encounter history unavailable: {encounterError}
+          </p>
+        )}
+        {encounterLoading ? (
+          <p className="text-sm text-neutral-500">Loading encounter history…</p>
+        ) : (
+          <div className="flex gap-2 overflow-x-auto pb-1">
+            {encounters.map((encounter) => (
+              <button
+                key={encounter.id}
+                type="button"
+                disabled={dirty && encounter.id !== draft.id}
+                onClick={() => { setDraft(encounter); setDirty(false) }}
+                className={`min-w-[190px] rounded-xl border px-3 py-2 text-left text-xs transition ${
+                  encounter.id === draft.id ? 'border-brand bg-brand-50' : 'border-neutral-200 bg-white hover:border-brand/50'
+                } disabled:cursor-not-allowed disabled:opacity-50`}
+                title={dirty && encounter.id !== draft.id ? 'Save or discard current changes before opening another encounter.' : undefined}
+              >
+                <div className="font-semibold text-neutral-900">
+                  {new Date(encounter.createdAt).toLocaleString('en-US')}
+                </div>
+                <div className="mt-1 text-neutral-500">
+                  {encounter.signedBy ? `Signed · ${encounter.signedBy}` : 'Unsigned draft'}
+                </div>
+                <div className="mt-1 font-mono text-[10px] text-neutral-400">{encounter.id}</div>
+              </button>
+            ))}
+          </div>
+        )}
+      </Card>
+
+      <Card>
+        <SectionTitle
+          title="Clinical semantic state"
+          subtitle="Field origin is kept separate from clinician review. Server-stamped identity is required before anything is shown as reviewed."
+          right={<Badge tone={semanticStates.every((item) => item.review === 'unreviewed') ? 'high' : 'brand'}>
+            {semanticStates.filter((item) => item.review !== 'unreviewed').length}/{semanticStates.length} reviewed
+          </Badge>}
+        />
+        <div className="grid gap-2 md:grid-cols-2">
+          {semanticStates.map((item) => (
+            <div key={item.field} className="rounded-xl border border-neutral-100 px-3 py-2">
+              <div className="flex flex-wrap items-center gap-2">
+                <span className="font-mono text-[11px] font-semibold text-neutral-700">{item.field}</span>
+                <Badge tone={item.origin === 'ai-generated' ? 'high' : 'neutral'}>{item.origin}</Badge>
+                <Badge tone={item.review === 'clinician-verified' ? 'brand' : item.review === 'clinician-rejected' ? 'critical' : item.review === 'clinician-reviewed' ? 'brand' : 'high'}>
+                  {item.review}
+                </Badge>
+              </div>
+              <p className="mt-1 text-[11px] leading-relaxed text-neutral-500">{item.reason}</p>
+            </div>
+          ))}
         </div>
       </Card>
 

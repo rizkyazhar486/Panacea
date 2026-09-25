@@ -18,9 +18,14 @@ assert.equal(bolehAksesPasien(pasien, 'p-clinic-001', true, pemilikRekam), true,
 const c = {
   patients: [{ id: diri, name: 'Budi' }, { id: 'p-clinic-001', name: 'Other' }],
   vitals: { [diri]: [{ sbp: 120 }], 'p-clinic-001': [{ sbp: 150 }] },
-  supportive: { 'p-clinic-001': [{}] }, records: { 'p-clinic-001': { dx: 'x' } }, education: {},
+  supportive: { 'p-clinic-001': [{}] }, records: { 'p-clinic-001': { dx: 'x' } },
+  recordEncounters: { [diri]: [{ id: 'enc-self' }], 'p-clinic-001': [{ id: 'enc-private' }] },
+  recordHistory: { [diri]: [{ id: 'enc-self', v: 1 }], 'p-clinic-001': [{ id: 'enc-private', v: 1 }] },
+  education: {},
 }
 const s = saringKlinis(c, (pid) => bolehAksesPasien(pasien, pid, false, pemilikRekam))
 assert.deepEqual(s.patients.map((p) => p.id), [diri])
 assert.deepEqual(Object.keys(s.vitals), [diri]); assert.deepEqual(s.records, {}); assert.deepEqual(s.supportive, {})
+assert.deepEqual(Object.keys(s.recordEncounters ?? {}), [diri], 'encounter pasien lain bocor melalui /api/clinical')
+assert.deepEqual(Object.keys(s.recordHistory ?? {}), [diri], 'riwayat versi pasien lain bocor melalui /api/clinical')
 console.log('aksesKlinis: pasien hanya rekam dirinya, tabrakan id gagal tertutup, klinisi/pemilik data praktik')

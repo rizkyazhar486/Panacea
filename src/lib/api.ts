@@ -551,6 +551,12 @@ export const api = {
   clinical: () => req<ClinicalData>('/api/clinical'),
   saveRecordRemote: (patientId: string, record: EMRRecord) =>
     req<{ ok: boolean; record: EMRRecord }>('/api/clinical/record', { method: 'POST', body: JSON.stringify({ patientId, record }) }),
+  recordEncounters: (patientId: string) =>
+    req<{ records: EMRRecord[] }>(`/api/clinical/records/${encodeURIComponent(patientId)}`).then((r) => r.records),
+  recordHistory: (patientId: string, recordId?: string) =>
+    req<{ history: EMRRecord[] }>(
+      `/api/clinical/record-history/${encodeURIComponent(patientId)}${recordId ? `?recordId=${encodeURIComponent(recordId)}` : ''}`,
+    ).then((r) => r.history),
   saveEducationRemote: (patientId: string, sheet: EducationSheet) =>
     req<{ ok: boolean }>('/api/clinical/education', { method: 'POST', body: JSON.stringify({ patientId, sheet }) }),
   addVitalRemote: (patientId: string, vital: VitalSign) =>
@@ -566,6 +572,8 @@ export interface ClinicalData {
   vitals: Record<string, VitalSign[]>
   supportive: Record<string, SupportiveResult[]>
   records: Record<string, EMRRecord>
+  recordEncounters?: Record<string, EMRRecord[]>
+  recordHistory?: Record<string, EMRRecord[]>
   education: Record<string, EducationSheet>
 }
 
