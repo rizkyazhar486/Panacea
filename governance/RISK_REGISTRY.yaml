@@ -100,3 +100,20 @@ risks:
       Follow-up for the owner: review the audit log ('clinical.read') for reads by non-clinician accounts to decide
       whether a data-exposure notification is required.
     evidence: [server/src/aksesKlinis.ts, server/uji/aksesKlinis.uji.ts, HTTP proof 2026-09-25 (patient sees only own record; patient/unverified doctor 403 on practice patient)]
+
+  - risk_id: risk.stale_emr_signature_reuse
+    category: clinical_safety
+    severity: critical
+    state: mitigated
+    description: >-
+      A patient, or a clinician saving edits without an explicit re-sign, could previously modify clinical content
+      of an already-signed EMR while preserving old signedBy/signedById/signedAt fields, making new content appear
+      to retain an earlier clinician signature.
+    mitigation: >-
+      server/src/rekamKlinis.ts now preserves an existing clinician signature only when the clinical payload is
+      unchanged; patient-authored surgery consent may change without rewriting clinician-authored content.
+      Any patient clinical edit beyond patient-authored consent removes the signature; clinician content edits carrying
+      the old signedAt also become unsigned until an explicit re-sign intent is sent and server-stamped. Changes to
+      physical-exam findings clear doctorVerified/verifiedBy/verifiedById unless re-verified by an authorized clinician.
+      Canonical longitudinal projection additionally requires the server-stamped signedById and ignores unsigned drafts.
+    evidence: [server/src/rekamKlinis.ts, server/uji/rekamKlinis.uji.ts, src/lib/emrLongitudinalBridge.ts, scripts/uji/emr-status-longitudinal.mts]

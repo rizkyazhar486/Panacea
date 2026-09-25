@@ -204,10 +204,11 @@ export function EMR() {
 
   function sign() {
     if (!draft) return
+    const signer = acc?.name || state.settings.doctorName
     const signed = {
       ...draft,
-      physicalExam: { ...draft.physicalExam, doctorVerified: true, verifiedBy: state.settings.doctorName },
-      signedBy: state.settings.doctorName,
+      physicalExam: { ...draft.physicalExam, doctorVerified: true, verifiedBy: signer },
+      signedBy: signer,
       signedAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
     }
@@ -526,12 +527,12 @@ export function EMR() {
           </div>
           <Button onClick={sign} disabled={Boolean(draft.signedBy) && !dirty}>
             <IconCheck size={16} />
-            {draft.signedBy ? 'Re-sign' : `Sign as ${state.settings.doctorName}`}
+            {draft.signedBy ? 'Re-sign' : `Sign as ${acc?.name || state.settings.doctorName}`}
           </Button>
         </div>
         {draft.signedAt && (
           <p className="mt-2 text-xs text-brand-dark">
-            ✓ Certified by {state.settings.doctorName} on {new Date(draft.signedAt).toLocaleString('en-US')}
+            ✓ Certified by {draft.signedBy} on {new Date(draft.signedAt).toLocaleString('en-US')}
           </p>
         )}
       </Card>

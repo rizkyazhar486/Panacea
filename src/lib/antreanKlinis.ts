@@ -11,6 +11,7 @@ export type JenisOperasi = 'patient' | 'vital' | 'supportive' | 'record' | 'educ
 export interface OperasiKlinis { opId: string; jenis: JenisOperasi; patientId: string; payload: unknown; dibuat: string }
 export interface Penyimpan { getItem(k: string): string | null; setItem(k: string, v: string): void }
 export type Kirim = (op: OperasiKlinis) => Promise<unknown>
+export type TerimaBalasan = (op: OperasiKlinis, hasil: unknown) => void
 
 export const KUNCI_ANTREAN_KLINIS = 'pmd_antrean_klinis_v1'
 export const KUNCI_GALAT_KLINIS = 'pmd_galat_klinis_v1'
@@ -36,8 +37,8 @@ export function bacaGalat(s: Penyimpan): { pesan: string; waktu: string } | null
   try { const v = s.getItem(KUNCI_GALAT_KLINIS); return v ? JSON.parse(v) : null } catch { return null }
 }
 
-export async function kirimAtauAntre(s: Penyimpan, op: OperasiKlinis, kirim: Kirim): Promise<'terkirim' | 'diantre' | 'ditolak'> {
-  try { await kirim(op); return 'terkirim' } catch (e) {
+export async function kirimAtauAntre(s: Penyimpan, op: OperasiKlinis, kirim: Kirim, terima?: TerimaBalasan): Promise<'terkirim' | 'diantre' | 'ditolak'> {
+  try { const hasil = await kirim(op); terima?.(op, hasil); return 'terkirim' } catch (e) {
     if (galatJaringan(e)) { antrekan(s, op); return 'diantre' }
     catatGalat(s, `${op.jenis} for ${op.patientId}: ${(e as Error).message}`)
     return 'ditolak'
@@ -45,10 +46,10 @@ export async function kirimAtauAntre(s: Penyimpan, op: OperasiKlinis, kirim: Kir
 }
 
 /** Kirim ulang berurutan; berhenti pada galat jaringan pertama. Penolakan dibuang & dicatat. */
-export async function kurasAntrean(s: Penyimpan, kirim: Kirim): Promise<{ terkirim: number; ditolak: number; sisa: number }> {
+export async function kurasAntrean(s: Penyimpan, kirim: Kirim, terima?: TerimaBalasan): Promise<{ terkirim: number; ditolak: number; sisa: number }> {
   let terkirim = 0, ditolak = 0
   for (const op of bacaAntrean(s)) {
-    try { await kirim(op); terkirim++ } catch (e) {
+    try { const hasil = await kirim(op); terima?.(op, hasil); terkirim++ } catch (e) {
       if (galatJaringan(e)) break
       ditolak++; catatGalat(s, `${op.jenis} for ${op.patientId}: ${(e as Error).message}`)
     }
