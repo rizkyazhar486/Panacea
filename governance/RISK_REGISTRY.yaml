@@ -83,3 +83,20 @@ risks:
       (4) institution decides whether clinician participation needs ethics review; real patient data would need an
       approval reference.
     evidence: [scripts/uji/validasi-klinis.mts, scripts/uji/validasi-ledger-kontrak.mts, scripts/uji/studi-lab-tren-beku.mts, scripts/uji/validasi-ui.mts, server/data-validasi/lab-tren-pribadi-v1.json]
+
+  - risk_id: risk.clinical_store_overexposure
+    category: privacy_security
+    severity: critical
+    state: mitigated
+    description: >-
+      Found 2026-09-25 during the AI-EMR audit: GET /api/clinical returned the entire clinical store (all patients,
+      EMR records, vitals, supportive results, education) to ANY authenticated user, including patients and
+      unverified doctors, and the clinical write routes accepted any patientId. Production (Render, mongo) was
+      exposed for as long as these routes existed; no access log review has been done yet.
+    mitigation: >-
+      server/src/aksesKlinis.ts: verified clinicians / owner keep practice-wide access; everyone else reads and
+      writes only the self-record linked to their own account (id match AND reverse lookup to the same user, so an
+      id-prefix collision fails closed). Enforced on GET /api/clinical and all five clinical write routes.
+      Follow-up for the owner: review the audit log ('clinical.read') for reads by non-clinician accounts to decide
+      whether a data-exposure notification is required.
+    evidence: [server/src/aksesKlinis.ts, server/uji/aksesKlinis.uji.ts, HTTP proof 2026-09-25 (patient sees only own record; patient/unverified doctor 403 on practice patient)]

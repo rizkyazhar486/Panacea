@@ -148,6 +148,7 @@ import { logKeBundelFhir, buatIzin, izinBerlaku, buatTinjauan } from './labFhir.
 import { susunRencana, susunLaporan, laporanKeBundelFhir } from './carePlan.js'
 import { putusanPengingatCek, PESAN_PENGINGAT_CEK } from './pengingatCek.js'
 import { penyimpananSehat, status as statusSimpan } from './simpanAman.js'
+import { bolehAksesPasien, klinisiAtauPemilik, saringKlinis } from './aksesKlinis.js'
 import { sambung, protokolKini, susunPenilaian, susunKeselamatan, susunAdjudikasi, susunUsabilitas, type IdentitasPenilai } from './validasiLedger.js'
 import { parseHealthWebhookPayload, extractHeartRateSeries, extractSleepSessions, newestSampleDate } from './healthWebhook.js'
 import { checkHrZoneAlert, checkBedtimeReminder, checkWorkoutReminder, suggestedBedtime, ZONES } from './healthAlerts.js'
@@ -807,11 +808,16 @@ app.post('/api/second-opinion/:id/complete', requireAuth, (req, res) => {
 })
 
 // --- clinical (patients + EMR + vitals/supportive + education) ---
+// Siapa boleh membaca/menulis rekam klinis pasien tertentu (lihat aksesKlinis.ts).
+const bolehPasien = (u: User, patientId: string) => bolehAksesPasien(u, patientId, isOwner(u), findUserBySelfPatientId)
 app.get('/api/clinical', requireAuth, (req, res) => {
-  addAudit((req as express.Request & { user: User }).user, 'clinical.read')
-  res.json(getClinical())
+  const u = (req as express.Request & { user: User }).user
+  addAudit(u, 'clinical.read')
+  const c = getClinical()
+  res.json(klinisiAtauPemilik(u, isOwner(u)) ? c : saringKlinis(c, (pid) => bolehPasien(u, pid)))
 })
 app.post('/api/clinical/record', requireAuth, (req, res) => {
+  if (!bolehPasien((req as express.Request & { user: User }).user, String((req.body as { patientId?: unknown })?.patientId ?? ''))) return res.status(403).json({ error: 'no access to this patient record' })
   const { patientId, record } = req.body as { patientId?: string; record?: unknown }
   if (!patientId) return res.status(400).json({ error: 'missing_patientId' })
   const actor = (req as express.Request & { user: User }).user
@@ -829,18 +835,21 @@ app.post('/api/clinical/record', requireAuth, (req, res) => {
   res.json({ ok: true })
 })
 app.post('/api/clinical/education', requireAuth, (req, res) => {
+  if (!bolehPasien((req as express.Request & { user: User }).user, String((req.body as { patientId?: unknown })?.patientId ?? ''))) return res.status(403).json({ error: 'no access to this patient record' })
   const { patientId, sheet } = req.body as { patientId?: string; sheet?: unknown }
   if (!patientId) return res.status(400).json({ error: 'missing_patientId' })
   saveEducation(patientId, sheet)
   res.json({ ok: true })
 })
 app.post('/api/clinical/vital', requireAuth, (req, res) => {
+  if (!bolehPasien((req as express.Request & { user: User }).user, String((req.body as { patientId?: unknown })?.patientId ?? ''))) return res.status(403).json({ error: 'no access to this patient record' })
   const { patientId, vital } = req.body as { patientId?: string; vital?: unknown }
   if (!patientId) return res.status(400).json({ error: 'missing_patientId' })
   addVital(patientId, vital)
   res.json({ ok: true })
 })
 app.post('/api/clinical/supportive', requireAuth, (req, res) => {
+  if (!bolehPasien((req as express.Request & { user: User }).user, String((req.body as { patientId?: unknown })?.patientId ?? ''))) return res.status(403).json({ error: 'no access to this patient record' })
   const { patientId, result } = req.body as { patientId?: string; result?: unknown }
   if (!patientId) return res.status(400).json({ error: 'missing_patientId' })
   addSupportive(patientId, result)
@@ -849,6 +858,7 @@ app.post('/api/clinical/supportive', requireAuth, (req, res) => {
 app.post('/api/clinical/patient', requireAuth, (req, res) => {
   const { patient } = req.body as { patient?: unknown }
   if (!patient) return res.status(400).json({ error: 'missing_patient' })
+  if (!bolehPasien((req as express.Request & { user: User }).user, String((patient as { id?: unknown })?.id ?? ''))) return res.status(403).json({ error: 'patients can only create their own record' })
   addPatient(patient)
   res.json({ ok: true })
 })
