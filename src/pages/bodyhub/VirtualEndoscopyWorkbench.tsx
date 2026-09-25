@@ -132,7 +132,7 @@ export default function VirtualEndoscopyWorkbench({
       data-selected-source-structure={selectedSourceStructureName ?? undefined}
       data-structure-route-inference="not-inferred"
       data-patient-specific-scope-navigation="not-generated"
-      className="overflow-hidden rounded-[24px] border border-white/[.08] bg-[#030405] text-white"
+      className="dark overflow-hidden rounded-[24px] border border-white/[.08] bg-[#030405] text-white"
       aria-labelledby="virtual-endoscopy-title"
     >
       <header className="flex flex-col gap-3 border-b border-white/[.07] p-3 sm:p-4 lg:flex-row lg:items-center lg:justify-between">

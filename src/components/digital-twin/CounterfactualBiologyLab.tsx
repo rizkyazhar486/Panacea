@@ -88,7 +88,7 @@ export function CounterfactualBiologyLab() {
 
   return (
     <div className="space-y-4 pb-14">
-      <header className="relative overflow-hidden rounded-[32px] border border-cyan-300/15 bg-[#040910] p-5 text-white shadow-2xl md:p-7">
+      <header className="dark relative overflow-hidden rounded-[32px] border border-cyan-300/15 bg-[#040910] p-5 text-white shadow-2xl md:p-7">
         <div className="pointer-events-none absolute -right-20 -top-24 h-72 w-72 rounded-full bg-cyan-400/10 blur-3xl" />
         <div className="pointer-events-none absolute -bottom-28 left-1/4 h-72 w-72 rounded-full bg-violet-500/10 blur-3xl" />
         <div className="relative grid gap-5 xl:grid-cols-[1fr_360px] xl:items-end">
@@ -186,7 +186,7 @@ export function CounterfactualBiologyLab() {
             />
           </section>
 
-          <section className="overflow-hidden rounded-3xl border border-white/10 bg-[#050a10] p-4 text-white md:p-5">
+          <section className="dark overflow-hidden rounded-3xl border border-white/10 bg-[#050a10] p-4 text-white md:p-5">
             <div className="flex flex-wrap items-center justify-between gap-3">
               <div>
                 <div className="text-[10px] font-black uppercase tracking-[0.2em] text-violet-300">Executable causal graph</div>

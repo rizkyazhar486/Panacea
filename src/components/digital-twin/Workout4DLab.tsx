@@ -19,7 +19,7 @@ export function Workout4DLab() {
 
   if (!workouts.length) {
     return (
-      <section className="rounded-[30px] border border-white/10 bg-[#030914] p-6 text-white">
+      <section className="dark rounded-[30px] border border-white/10 bg-[#030914] p-6 text-white">
         <div className="flex items-center gap-2 text-[10px] font-black uppercase tracking-[.2em] text-emerald-300"><IconActivity size={14} /> Inside My Workout · 4D</div>
         <h2 className="mt-3 text-2xl font-black tracking-[-.04em]">Your first 4D replay starts with a real workout.</h2>
         <p className="mt-2 max-w-2xl text-sm leading-relaxed text-white/48">Connect or import a workout with duration and, ideally, a heart-rate trace. Panacea will keep measured signals separate from model-derived respiration and educational physiology instead of filling the scene with invented biometrics.</p>

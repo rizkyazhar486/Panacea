@@ -172,7 +172,7 @@ export function SurgicalOperationAtlasV2() {
   }
 
   return (
-    <section className="overflow-hidden rounded-[32px] border border-white/10 bg-[#030914] text-white shadow-[0_36px_120px_rgba(0,0,0,.32)]">
+    <section className="dark overflow-hidden rounded-[32px] border border-white/10 bg-[#030914] text-white shadow-[0_36px_120px_rgba(0,0,0,.32)]">
       <header className="border-b border-white/8 p-5 sm:p-6">
         <div className="flex flex-wrap items-start justify-between gap-5">
           <div className="max-w-3xl">

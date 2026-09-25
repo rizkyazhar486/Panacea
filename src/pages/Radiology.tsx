@@ -375,7 +375,7 @@ export function Radiology() {
       <SequenceStrip groups={groups} activeId={activeGroup?.id ?? ''} onSelect={pilihKelompok} />
 
       {kini && sourcePlane && (
-        <section className="overflow-hidden rounded-[28px] border border-slate-700/60 bg-[#081017] text-white shadow-2xl shadow-black/20">
+        <section className="dark overflow-hidden rounded-[28px] border border-slate-700/60 bg-[#081017] text-white shadow-2xl shadow-black/20">
           <header className="flex flex-wrap items-center justify-between gap-3 border-b border-white/10 px-4 py-3 sm:px-5">
             <div className="min-w-0">
               <div className="flex flex-wrap items-center gap-2">

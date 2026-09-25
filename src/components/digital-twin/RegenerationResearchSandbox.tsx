@@ -53,7 +53,7 @@ function Mechanism4D({
   const stress = phase.cellularStress
   const recovery = phase.functionIndex
   return (
-    <div className="overflow-hidden rounded-2xl border border-white/10 bg-[#050b13] p-4 text-white">
+    <div className="dark overflow-hidden rounded-2xl border border-white/10 bg-[#050b13] p-4 text-white">
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
           <div className="text-[10px] font-black uppercase tracking-[0.2em] text-cyan-300">4D cellular / DNA mechanism view</div>
@@ -134,7 +134,7 @@ export function RegenerationResearchSandbox() {
 
   return (
     <div className="space-y-4 pb-12">
-      <header className="overflow-hidden rounded-3xl border border-violet-300/20 bg-[#071019] p-5 text-white shadow-xl">
+      <header className="dark overflow-hidden rounded-3xl border border-violet-300/20 bg-[#071019] p-5 text-white shadow-xl">
         <div className="flex flex-col gap-4 xl:flex-row xl:items-end xl:justify-between">
           <div className="max-w-4xl">
             <div className="text-[11px] font-black uppercase tracking-[0.25em] text-violet-300">PanaceaMed · Regeneration & Aging Research Sandbox</div>

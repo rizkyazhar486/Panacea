@@ -58,7 +58,7 @@ export default function WholeBodyPhysiologyWorkbench() {
   return (
     <section
       data-whole-body-physiology-workbench="v1"
-      className="overflow-hidden rounded-[28px] border border-cyan-300/20 bg-[#03070b] text-white shadow-[0_24px_80px_rgba(0,0,0,.45)]"
+      className="dark overflow-hidden rounded-[28px] border border-cyan-300/20 bg-[#03070b] text-white shadow-[0_24px_80px_rgba(0,0,0,.45)]"
     >
       <div className="relative overflow-hidden border-b border-white/10 px-4 py-4 sm:px-5">
         <div aria-hidden className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_10%_0%,rgba(34,211,238,.18),transparent_34%),radial-gradient(circle_at_88%_12%,rgba(168,85,247,.16),transparent_32%),radial-gradient(circle_at_50%_100%,rgba(236,72,153,.08),transparent_36%)]" />

@@ -103,7 +103,11 @@ export function UnifiedBodyWorkspace() {
     <div className="mx-auto w-full max-w-[1580px] space-y-4 pb-10">
       <PanaceaZoneNav />
 
-      <section className={`relative overflow-hidden grid gap-4 rounded-[24px] border border-white/[.075] bg-[#020306] p-3.5 shadow-[0_18px_60px_rgba(0,0,0,.24)] sm:p-4 ${isExposure ? 'lg:grid-cols-1' : 'lg:grid-cols-[minmax(0,1fr)_340px]'}`}>
+      {/* `dark` menandai bahwa permukaan ini memang gelap apa pun tema
+          aplikasinya. Seluruh gaya `dark:` dan lapisan pemetaan `.dark`
+          bergantung pada kelas itu; tanpa penandanya komponen di dalam sini
+          merender versi terangnya di atas latar hitam. */}
+      <section className={`dark relative overflow-hidden grid gap-4 rounded-[24px] border border-white/[.075] bg-[#020306] p-3.5 shadow-[0_18px_60px_rgba(0,0,0,.24)] sm:p-4 ${isExposure ? 'lg:grid-cols-1' : 'lg:grid-cols-[minmax(0,1fr)_340px]'}`}>
         <div className="pointer-events-none absolute inset-x-0 top-0 h-40 bg-[radial-gradient(circle_at_18%_0%,rgba(34,211,238,.11),transparent_28%),radial-gradient(circle_at_76%_0%,rgba(139,92,246,.09),transparent_24%)]" aria-hidden />
         <div className="relative min-w-0">
           <div className="flex flex-wrap items-center gap-2">

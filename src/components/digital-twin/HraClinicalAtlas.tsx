@@ -390,7 +390,7 @@ export function HraClinicalAtlas() {
   const selectedFile = selected ? catalogByName.get(selected.file) : undefined
 
   return (
-    <section className="overflow-hidden rounded-[30px] border border-neutral-200 bg-[#070a0d] text-white shadow-[0_28px_90px_rgba(0,0,0,.24)] dark:border-white/10">
+    <section className="dark overflow-hidden rounded-[30px] border border-neutral-200 bg-[#070a0d] text-white shadow-[0_28px_90px_rgba(0,0,0,.24)] dark:border-white/10">
       <header className="border-b border-white/10 bg-[#0b0f13] p-4 sm:p-5">
         <div className="flex flex-col gap-4 xl:flex-row xl:items-end xl:justify-between">
           <div className="max-w-4xl">

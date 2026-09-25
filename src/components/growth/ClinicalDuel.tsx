@@ -217,7 +217,7 @@ export function ClinicalDuel() {
   }
 
   return (
-    <section className="overflow-hidden rounded-[28px] border border-emerald-400/15 bg-[#07130f] text-white shadow-[0_24px_80px_rgba(0,0,0,.18)]">
+    <section className="dark overflow-hidden rounded-[28px] border border-emerald-400/15 bg-[#07130f] text-white shadow-[0_24px_80px_rgba(0,0,0,.18)]">
       <div className="relative p-5 sm:p-6">
         <div className="pointer-events-none absolute -right-20 -top-24 h-72 w-72 rounded-full bg-emerald-400/15 blur-3xl" />
         <div className="relative z-10">

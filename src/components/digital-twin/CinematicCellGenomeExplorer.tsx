@@ -597,7 +597,7 @@ export function CinematicCellGenomeExplorer({ initialStage = 'cell', compact = f
   }, [stage, ready])
 
   return (
-    <section className={`overflow-hidden border border-cyan-300/15 bg-[#02060b] text-white shadow-[0_32px_110px_rgba(0,0,0,.38)] ${compact ? 'rounded-2xl' : 'rounded-[32px]'}`}>
+    <section className={`dark overflow-hidden border border-cyan-300/15 bg-[#02060b] text-white shadow-[0_32px_110px_rgba(0,0,0,.38)] ${compact ? 'rounded-2xl' : 'rounded-[32px]'}`}>
       <header className="border-b border-white/8 p-4 sm:p-5">
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div className="max-w-4xl">

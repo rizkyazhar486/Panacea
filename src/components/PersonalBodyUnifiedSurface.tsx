@@ -55,7 +55,7 @@ export function PersonalBodyUnifiedSurface({
   return (
     <section
       data-personal-body-unified-surface="v1"
-      className="pmd-product-surface overflow-hidden rounded-[26px] border border-white/10 bg-[#050708] text-white"
+      className="dark pmd-product-surface overflow-hidden rounded-[26px] border border-white/10 bg-[#050708] text-white"
       aria-label="Unified personal body and anatomy surface"
     >
       <header className="flex flex-wrap items-center gap-2 border-b border-white/10 px-3 py-3 sm:px-4">
