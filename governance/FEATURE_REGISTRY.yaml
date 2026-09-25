@@ -128,20 +128,20 @@ features:
     patient_state_fields: [emr.signed-note, emr.primary-diagnosis, emr.verified-plan]
     knowledge_graph_entities: [diagnosis, problem, care_plan]
     shared_services: [reasoning_gateway, provenance, audit, consent]
-    backend_surfaces: [server/src/rekamKlinis.ts, 'GET /api/clinical', 'POST /api/clinical/record']
-    frontend_surfaces: [src/pages/EMR.tsx, src/lib/useLongitudinalState.ts]
-    persistence_surfaces: [server_clinical_records, signed_record_history]
+    backend_surfaces: [server/src/rekamKlinis.ts, server/src/rekamEncounter.ts, 'GET /api/clinical', 'GET /api/clinical/records/:patientId', 'GET /api/clinical/record-history/:patientId', 'POST /api/clinical/record']
+    frontend_surfaces: [src/pages/EMR.tsx, src/lib/emrSemanticState.ts, src/lib/useLongitudinalState.ts]
+    persistence_surfaces: [server_clinical_records_latest_pointer, server_clinical_record_encounters, signed_record_history]
     external_integrations: [SATUSEHAT]
     maturity_level: CONNECTED
     clinical_validation: none
     technical_risk: high
     clinical_risk: critical
     provenance_required: true
-    tests: [scripts/uji/emr-status-longitudinal.mts, server/uji/rekamKlinis.uji.ts, server/uji/aksesKlinis.uji.ts]
-    observability: [clinical.read_audit, emr.save_audit, emr.signed_version_archived_audit]
-    known_gaps: [one_record_per_patient_not_per_encounter, practice_patient_vs_account_identity_split, per_field_ai_draft_vs_clinician_state, clinician_usability_test, clinical_validation]
-    next_actions: [encounter_model, per_field_semantic_state, clinician_usability_test]
-    last_audited_commit: 2026-09-26-emr-longitudinal-bridge
+    tests: [scripts/uji/emr-status-longitudinal.mts, scripts/uji/emr-encounter-history.mts, scripts/uji/emr-semantic-state.mts, server/uji/rekamKlinis.uji.ts, server/uji/rekamEncounter.uji.ts, server/uji/aksesKlinis.uji.ts]
+    observability: [clinical.read_audit, emr.save_audit, emr.encounters.read_audit, emr.history.read_audit, emr.signed_version_archived_audit]
+    known_gaps: [practice_patient_vs_account_identity_split, explicit_new_encounter_creation_entrypoint_needs_audit, field_origin_metadata_missing_for_history_exam_problem_list, clinician_usability_test, clinical_validation]
+    next_actions: [resolve_patient_identity_split, audit_new_encounter_entrypoint, capture_missing_field_origin_metadata, clinician_usability_test]
+    last_audited_commit: 8a2e3c8b
 
   - feature_id: health.longitudinal_longevity
     name: Longitudinal Health and Longevity
