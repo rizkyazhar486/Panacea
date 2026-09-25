@@ -95,6 +95,9 @@ export interface PlanItem {
   text: string
   source: 'AI' | 'Dokter'
   status: 'usulan' | 'diverifikasi' | 'ditolak'
+  /** Dicap server saat butir diverifikasi klinisi (server/src/rekamKlinis.ts). */
+  verifiedById?: string
+  verifiedAt?: string
   safetyOverride?: PlanSafetyOverride
 }
 
@@ -103,6 +106,8 @@ export interface ProblemEntry {
   title: string
   /** Id kunjungan asal bila masalah dibawa dari kunjungan tertutup sebelumnya. */
   carriedFrom?: string
+  /** Asal dicap server: 'AI' bila ditulis/diubah non-klinisi, 'Dokter' bila oleh klinisi. */
+  source?: 'AI' | 'Dokter'
   basis: string // basis from anamnesis/exam/supporting
   assessment: string // "Dipikirkan ..." comparative reasoning
   probability?: number // 0-100 Bayesian estimate

@@ -77,8 +77,10 @@ workflows:
       - "2026-09-26: server/uji/rekamKlinis.uji.ts proves patient edits cannot retain stale clinician signature/physical-exam verification and clinician edits require explicit re-sign; prior signed version remains archived"
       - "2026-09-26: successful record writes reconcile the server-returned canonical signer/verification state into the client immediately; EMR UI renders draft.signedBy rather than a local settings name"
       - "2026-09-26: encounter model (server/src/rekamKlinis.ts tutupKunjungan; server/uji/kunjunganKlinis.uji.ts; scripts/uji/kunjungan-emr.mts); HTTP proof: unsigned close 409, patient close 403, clinician close 200 -> 1 immutable encounter + new draft with no dx/plan/signature and problems carriedFrom; unrelated patient sees 0 encounter lists"
-    known_gaps: [encounter_ui_not_browser_verified, practice_patient_vs_account_identity_split, ai_draft_vs_clinician_state_not_modelled_per_field, clinician_usability_test, clinical_validation]
-    next_action: make_ai_draft_vs_clinician_state_explicit_per_field_then_split_practice_vs_account_identity
+      - "2026-09-26: per-item provenance server-stamped (server/uji/asalButirKlinis.uji.ts): non-clinician writes cannot create doctor-sourced or verified plan items/problems; verification stamps verifiedById/verifiedAt server-side; declared AI drafts saved from a clinician session stay AI; label-only changes cannot escalate. EMR shows per-item origin (scripts/uji/asal-butir-emr.mts)"
+      - "2026-09-26: browser E2E 390x844 (owner doctor): per-item badges -> sign -> Close encounter enabled -> new draft with problems 'carried from previous visit', 2 closed encounters listed, scrollWidth 390, no page errors. E2E found and fixed two crashes: server patient without riskFlags crashed Shell; closed-encounter draft missing physicalExam.perSystem crashed EMR"
+    known_gaps: [practice_patient_vs_account_identity_split, anamnesis_and_exam_fields_have_no_per_field_origin, clinician_usability_test, clinical_validation]
+    next_action: split_practice_patient_vs_account_identity_then_clinician_usability_test
     last_audited_commit: 687d77db
 
   - workflow_id: body.spatial_clinical_context

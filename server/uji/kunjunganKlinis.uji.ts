@@ -18,6 +18,7 @@ if (h.ok) {
   assert.equal(b.primaryDiagnosis, undefined, 'diagnosis lama terbawa ke draf baru')
   assert.deepEqual(b.plan, [], 'rencana lama terbawa ke draf baru')
   assert.equal(b.physicalExam.doctorVerified, false, 'verifikasi fisik lama terbawa ke draf baru')
+  assert.deepEqual([typeof b.physicalExam.perSystem, typeof b.anamnesis.keluhanUtama], ['string', 'string'], 'draf baru tidak lengkap bentuknya (EMR klien jatuh)')
   assert.deepEqual(b.problems.map((p: any) => [p.title, p.carriedFrom]), [['Hypertension', 'r1']], 'daftar masalah tidak dibawa dengan asalnya')
   // Kunjungan tertutup tidak berbagi objek dengan draf baru.
   b.problems[0].title = 'ubah'; assert.equal(h.kunjungan.problems[0].title, 'Hypertension', 'kunjungan tertutup ikut berubah')

@@ -22,6 +22,7 @@ import { searchICD, matchICD, icd11, type ICDCode } from '../lib/icd'
 import { evaluateVitals, overallStatus, STATUS_COLOR, STATUS_LABEL } from '../lib/chronic'
 import { projectEmrToBodyClinicalBridge } from '../lib/bodyClinicalBridge'
 import { KunjunganEmr } from '../components/KunjunganEmr'
+import { labelAsalMasalah, labelAsalRencana } from '../lib/asalButirEmr'
 import type { Anamnesis, EMRRecord, PhysicalExam, VitalSign } from '../lib/types'
 
 // Send the current EMR to SATUSEHAT as a FHIR R4 Bundle (dokter/owner only).
@@ -110,8 +111,8 @@ function supportiveDefaults(weightKg: number) {
   }
 }
 
-function buildFindings(perSystem: string): SystemFinding[] {
-  const lines = perSystem.split('\n').filter(Boolean)
+function buildFindings(perSystem: string | undefined): SystemFinding[] {
+  const lines = (perSystem ?? '').split('\n').filter(Boolean)
   return BODY_SYSTEMS.map((sys) => {
     const matched = lines.filter((l) => sys.kw.some((k) => l.toLowerCase().includes(k)))
     if (matched.length === 0) return { ...sys, status: 'unchecked' as const }
@@ -430,6 +431,7 @@ export function EMR() {
                   {i + 1}
                 </span>
                 <h4 className="font-bold">{pr.title}</h4>
+                <span className={`text-[10px] font-semibold ${pr.source === 'Dokter' ? 'text-brand-dark' : 'text-amber-700'}`} data-asal-masalah>{labelAsalMasalah(pr)}</span>
                 {typeof pr.probability === 'number' && (
                   <span className="ml-auto flex items-center gap-1.5">
                     <span className="text-[11px] font-semibold text-neutral-500">Probability</span>
@@ -497,6 +499,7 @@ export function EMR() {
                 {pi.category}
               </Badge>
               <span className={pi.status === 'ditolak' ? 'text-neutral-500 line-through' : ''}>{pi.text}</span>
+              <span className="ml-auto shrink-0 text-[10px] font-semibold text-neutral-500" data-asal-rencana>{labelAsalRencana(pi)}</span>
             </li>
           ))}
         </ul>

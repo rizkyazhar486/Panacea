@@ -57,6 +57,41 @@ function isiTertandaTetapSama(lama: any, baru: any) {
   return sama(tanpaCapKlinis(lama), tanpaCapKlinis(baru))
 }
 
+// Asal per butir (masalah & rencana). Butir yang baru atau berubah mengambil asal
+// dari PENULIS yang terautentikasi, bukan dari klien:
+// - non-klinisi: masalah -> source 'AI'; rencana -> source 'AI', status 'usulan',
+//   verifikasi dihapus. Butir identik dengan versi server sebelumnya dibiarkan.
+// - klinisi: klien boleh menurunkan asal ke 'AI' (mis. draf pipeline AI yang
+//   disimpan dari sesi dokter) — itu bukan eskalasi; selain itu 'Dokter'. Rencana
+//   yang (menjadi) 'diverifikasi' dicap verifiedById/verifiedAt oleh server.
+function terapkanAsalPerButir(lama: any | undefined, r: any, penulis: Penulis, kini: Date) {
+  const petaLama = (xs: any) => new Map<string, any>((Array.isArray(xs) ? xs : []).map((x: any) => [String(x?.id), x]))
+  const masalahLama = petaLama(lama?.problems), rencanaLama = petaLama(lama?.plan)
+  if (Array.isArray(r.problems)) r.problems = r.problems.map((m: any) => {
+    const l = masalahLama.get(String(m?.id))
+    if (l && sama(l, m)) return m
+    const tanpaAsal = (x: any) => { const { source: _s, ...isi } = x ?? {}; return isi }
+    // Hanya label asal yang berbeda (isi sama): tidak ada eskalasi ke 'Dokter'.
+    if (l && sama(tanpaAsal(l), tanpaAsal(m))) return { ...m, source: m?.source === 'AI' || l.source !== 'Dokter' ? 'AI' : 'Dokter' }
+    // Klinisi mengubah isi butir yang sudah ada = tulisan dokter; butir BARU boleh dinyatakan 'AI'.
+    return { ...m, source: penulis.klinisi && (l || m?.source !== 'AI') ? 'Dokter' : 'AI' }
+  })
+  if (Array.isArray(r.plan)) r.plan = r.plan.map((b: any) => {
+    const l = rencanaLama.get(String(b?.id))
+    if (l && sama(l, b)) return b
+    const { verifiedById: _a, verifiedAt: _b, ...isi } = b ?? {}
+    if (!penulis.klinisi) return { ...isi, source: 'AI', status: 'usulan' }
+    const teksBerubah = Boolean(l) && !(sama(l.text, b.text) && sama(l.category, b.category))
+    const out: any = { ...isi, source: teksBerubah || isi.source !== 'AI' ? 'Dokter' : 'AI' }
+    if (isi.status === 'diverifikasi') {
+      const tetap = l?.status === 'diverifikasi' && sama(l.text, b.text) && sama(l.category, b.category) && l.verifiedById
+      out.verifiedById = tetap ? l.verifiedById : penulis.id
+      out.verifiedAt = tetap ? l.verifiedAt : kini.toISOString()
+    }
+    return out
+  })
+}
+
 export function terapkanSimpanRekam(lama: any | undefined, baru: any, penulis: Penulis, kini: Date): { rekam: any; arsip?: any } {
   const r = structuredClone(baru ?? {})
   const fisikLama = lama?.physicalExam ?? {}
@@ -128,6 +163,7 @@ export function terapkanSimpanRekam(lama: any | undefined, baru: any, penulis: P
       }
     }
   }
+  terapkanAsalPerButir(lama, r, penulis, kini)
   const berubah = lama && !sama(lama, r)
   return { rekam: r, ...(lama?.signedAt && berubah ? { arsip: { ...lama, diarsipkanPada: kini.toISOString(), diarsipkanOleh: penulis.id } } : {}) }
 }
@@ -151,7 +187,9 @@ export function tutupKunjungan(lama: any | undefined, penulis: Penulis, kini: Da
   const kunjungan = { ...structuredClone(lama), encounterId: lama.id, closedAt: t, closedById: penulis.id, closedBy: penulis.nama }
   const rekamBaru = {
     id: idBaru, patientId: lama.patientId, createdAt: t, updatedAt: t,
-    anamnesis: {}, physicalExam: { doctorVerified: false },
+    // Bentuk lengkap (string kosong) agar klien tidak menerima field undefined.
+    anamnesis: Object.fromEntries(['keluhanUtama', 'rps', 'rpd', 'rpk', 'riwayatKehamilan', 'riwayatPengobatan', 'riwayatAlergi', 'riwayatTumbuhKembang', 'riwayatNutrisi', 'riwayatImunisasi', 'riwayatSosialEkonomi'].map((k) => [k, ''])),
+    physicalExam: { general: '', vitalsNote: '', perSystem: '', doctorVerified: false },
     problems: (lama.problems ?? []).map((p: any) => ({ ...structuredClone(p), carriedFrom: lama.id })),
     plan: [], references: [], previousEncounterId: lama.id,
   }

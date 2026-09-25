@@ -1,4 +1,5 @@
 import { createContext, useContext, useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
+import { normalisasiDaftarPasien } from './normalisasiPasien'
 import { hariIni } from './tanggal'
 import { api, backendEnabled, type BackendPost } from './api'
 import { kirimAtauAntre, kurasAntrean, PERISTIWA_SINKRON, type JenisOperasi, type OperasiKlinis, type TerimaBalasan } from './antreanKlinis'
@@ -450,7 +451,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
       .then((data) =>
         setState((st) => ({
           ...st,
-          patients: data.patients?.length ? data.patients : st.patients,
+          patients: normalisasiDaftarPasien(data.patients).length ? normalisasiDaftarPasien(data.patients) : st.patients,
           vitals: { ...st.vitals, ...(data.vitals ?? {}) },
           supportive: { ...st.supportive, ...(data.supportive ?? {}) },
           records: { ...st.records, ...(data.records ?? {}) },
