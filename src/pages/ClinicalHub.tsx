@@ -5,6 +5,7 @@ import { SuperPageCapabilityRail } from '../components/SuperPageCapabilityRail'
 import { SurfaceDepthNavigator } from '../components/SurfaceDepthNavigator'
 import { ClinicalPatientContext } from '../components/ClinicalPatientContext'
 import { LabPasienUntukDokter } from '../components/LabPasienUntukDokter'
+import { StudiValidasiKlinis } from '../components/StudiValidasiKlinis'
 import { useStore } from '../lib/store'
 import { PersonalBodyUnifiedSurface } from '../components/PersonalBodyUnifiedSurface'
 import { SurfaceGuide } from '../components/SurfaceGuide'
@@ -114,6 +115,7 @@ export function ClinicalHub() {
         <SurfaceDepthNavigator surface="clinical" routes={CLINICAL_DEPTH_ROUTES} />
         <ClinicalPatientContext />
         {account?.role === 'dokter' && <LabPasienUntukDokter />}
+        {(account?.role === 'dokter' || account?.isOwner) && <StudiValidasiKlinis pemimpin={!!account?.isOwner} />}
 
         <section aria-label="Ask and record" className="border-b border-white/10 pb-8">
           <div className="grid gap-3 sm:grid-cols-[minmax(0,1fr)_96px]">

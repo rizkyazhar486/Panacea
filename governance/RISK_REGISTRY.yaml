@@ -64,3 +64,22 @@ risks:
       5h50m within 04:00-23:00 WIB (public repo => free Actions minutes), so a few successful cron starts a
       day keep the server awake through waking hours. Verify with the next days' run durations.
     evidence: [.github/workflows/bangunkan-server.yml run history 2026-09-22..25, server/uji/pengingatCek.uji.ts]
+
+  - risk_id: risk.clinical_validation_external_dependency
+    category: clinical_safety
+    severity: high
+    state: externally_blocked
+    description: >-
+      No Panacea workflow is clinically validated. Validation cannot be produced by software; it needs qualified
+      clinicians, a study lead and (where required) ethics review.
+    mitigation: >-
+      2026-09-25: validation infrastructure is software-ready - src/lib/validasiKlinis.ts (predeclared endpoints,
+      frozen protocol hash, frozen cases pinned to system version, reviewer identity/credential/scope/COI,
+      one assessment per reviewer per case, adjudication, safety/near-miss events, SHA-256 audit chain, Wilson CI,
+      Cohen's kappa, report separating engineering acceptance from clinical validation); server ledger + blinded
+      reviewer routes; first study lab-tren-pribadi v1 (30 synthetic cases); reviewer and study-lead UI in Clinical.
+      External steps: (1) study lead confirms or revises the PROPOSED thresholds (a revision = protocol v2 before any
+      assessment); (2) at least two STR-verified clinicians assess all 30 cases; (3) adjudicate disagreements;
+      (4) institution decides whether clinician participation needs ethics review; real patient data would need an
+      approval reference.
+    evidence: [scripts/uji/validasi-klinis.mts, scripts/uji/validasi-ledger-kontrak.mts, scripts/uji/studi-lab-tren-beku.mts, scripts/uji/validasi-ui.mts, server/data-validasi/lab-tren-pribadi-v1.json]

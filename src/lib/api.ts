@@ -456,6 +456,12 @@ export const api = {
   putLabLog: (log: Record<string, { id: string; tanggal: string; nilai: number; rujukanBawah?: number; rujukanAtas?: number }[]>, diperbaruiPada: string) =>
     req<{ log: Record<string, { id: string; tanggal: string; nilai: number; rujukanBawah?: number; rujukanAtas?: number }[]>; diperbaruiPada: string }>('/api/lab-log', { method: 'PUT', body: JSON.stringify({ log, diperbaruiPada }) }),
   getLabFhir: () => req<FhirBundelLab>('/api/lab-log/fhir'),
+  // Studi validasi klinis (lihat src/lib/validasiKlinis.ts). Identitas penilai ditetapkan server.
+  validationStudies: () => req<{ studies: { protokol: import('./validasiKlinis').Protokol; jumlahKasus: number; sudahSaya: number }[] }>('/api/validation/studies'),
+  validationCases: (id: string) => req<{ protokol: import('./validasiKlinis').Protokol; cases: (import('./validasiKlinis').KasusBeku & { sudahSaya: boolean })[] }>(`/api/validation/${encodeURIComponent(id)}/cases`),
+  submitValidationAssessment: (id: string, body: unknown) => req<{ ok: true; urutan: number; sidik: string }>(`/api/validation/${encodeURIComponent(id)}/assessments`, { method: 'POST', body: JSON.stringify(body) }),
+  reportValidationSafetyEvent: (body: unknown) => req<{ ok: true }>('/api/validation/safety-events', { method: 'POST', body: JSON.stringify(body) }),
+  validationLedger: () => req<{ ledger: import('./validasiKlinis').Catatan[] }>('/api/validation/ledger'),
   getLabShares: () => req<{ shares: IzinLabKlien[]; audit: { waktu: string; aktor: string; aksi: string; izinId: string }[]; reviews: TinjauanLabKlien[] }>('/api/lab-log/shares'),
   shareLab: (dokterEmail: string, hari: number) => req<IzinLabKlien>('/api/lab-log/shares', { method: 'POST', body: JSON.stringify({ dokterEmail, hari }) }),
   revokeLabShare: (id: string) => req<IzinLabKlien>(`/api/lab-log/shares/${encodeURIComponent(id)}`, { method: 'DELETE' }),
