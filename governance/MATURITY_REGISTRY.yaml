@@ -13,7 +13,7 @@ workflows:
     clinical_validation: none  # engineering correctness only; no prospective clinician study yet
     dimensions:
       functional_completeness: high  # entry, correction, per-report range, baseline/trend, PhenoAge trajectory, sync, FHIR, share, review, notify
-      integration: medium  # server persistence + FHIR R4 + clinician view + notifications + canonical longitudinal state (labLongitudinalBridge -> useLongitudinalState -> What changed); not yet timeline or Body Exposure
+      integration: medium  # server persistence + FHIR R4 + clinician view + notifications + canonical longitudinal state (labLongitudinalBridge -> useLongitudinalState -> What changed + Body Exposure 'Your data' per system); not yet timeline
       reliability: medium  # server validation, last-write-wins with 409, sync retry/backoff; single-node file/Mongo store
       usability: medium  # browser-verified at 390x844; no user testing
       clinical_quality: unknown  # formulas sourced (PhenoAge Levine 2018, MAD baseline); not clinically validated
@@ -25,8 +25,8 @@ workflows:
       - "HTTP: own 200, other patient empty, stale write 409, future date 400; clinician granted 200 / other 404 / unverified 403 / after revoke 404"
       - "browser E2E 390x844: add->warn->save->delete; device A->B sync; share->clinician trend view->review->patient sees review"
       - "commits: 16608b5a 07813792 3fc91bf4 b237c432 88ba36ff 14aa0435 0beadc1c 5516e7d8 7926aee9 96de9684"
-    known_gaps: [photo_pdf_import, timeline_projection, body_exposure_projection, production_deployment_verification, prospective_clinician_validation]
-    next_action: project_canonical_state_into_body_exposure_and_timeline
+    known_gaps: [photo_pdf_import, timeline_projection, production_deployment_verification, prospective_clinician_validation]
+    next_action: project_canonical_state_into_timeline
     last_audited_commit: 0cb6906a
 
   - workflow_id: care.daily_checkin
