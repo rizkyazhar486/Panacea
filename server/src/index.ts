@@ -105,6 +105,7 @@ import {
   addAudit,
   getAudit,
   initStore,
+  flushStore,
   type User,
   type Post,
   type Meet,
@@ -141,6 +142,7 @@ import { validasiLogLab, validasiCapWaktu, terimaTulisan } from './labLog.js'
 import { logKeBundelFhir, buatIzin, izinBerlaku, buatTinjauan } from './labFhir.js'
 import { susunRencana, susunLaporan, laporanKeBundelFhir } from './carePlan.js'
 import { putusanPengingatCek, PESAN_PENGINGAT_CEK } from './pengingatCek.js'
+import { penyimpananSehat, status as statusSimpan } from './simpanAman.js'
 import { parseHealthWebhookPayload, extractHeartRateSeries, extractSleepSessions, newestSampleDate } from './healthWebhook.js'
 import { checkHrZoneAlert, checkBedtimeReminder, checkWorkoutReminder, suggestedBedtime, ZONES } from './healthAlerts.js'
 import { fetchLeagueScoreboard, fetchF1Info, fetchMotoGpInfo, LEAGUES, UNAVAILABLE } from './sports.js'
@@ -236,6 +238,9 @@ app.get('/api/health', (_req, res) => {
     // deploy ulang berikutnya — aplikasi mengatakannya, bukan menunggu orang
     // menemukannya sendiri saat gagal masuk.
     penyimpanan: modePenyimpanan(),
+    // Kesehatan simpan: tanpa pesan galat (bisa memuat nama host) di endpoint publik.
+    penyimpananSehat: penyimpananSehat(),
+    simpan: { terakhirBerhasil: statusSimpan.terakhirBerhasil, gagalBeruntun: statusSimpan.gagalBeruntun, mendekatiBatas: statusSimpan.mendekatiBatas },
     features: { google: features.googleLive, payments: features.paymentsLive, ai: features.aiLive, push: features.pushLive, email: features.emailLive, payout: features.payoutLive, otpEmail: emailOtpLive },
     /*
      * KEMAMPUAN SERVER, supaya aplikasi dapat membedakan SERVER YANG BELUM
@@ -2052,6 +2057,11 @@ setInterval(() => {
     } catch { /* satu pengguna gagal tidak menghentikan yang lain */ }
   }
 }, 60_000)
+
+// Deploy ulang mengirim SIGTERM: tulis simpan MongoDB yang masih tertunda dulu.
+for (const sinyal of ['SIGTERM', 'SIGINT'] as const) {
+  process.once(sinyal, () => { void flushStore().finally(() => process.exit(0)) })
+}
 
 server.listen(config.port, () => {
   console.log(`Panaceamed backend on http://localhost:${config.port}`)
