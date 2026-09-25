@@ -107,3 +107,28 @@ Keep implementation simple, observable and resumable. Leave durable handoff cont
 ## Progress reporting
 
 Report verifiable deltas: current main SHA, concrete capability, tests/CI, deployment evidence and blockers. Do not invent precision or completion percentages.
+
+
+## Product Maturity & Integration OS — canonical operating layer
+
+For the current maturity-first phase, every present and future agent must also read and apply [PANACEA_PRODUCT_MATURITY_OS.md](PANACEA_PRODUCT_MATURITY_OS.md). It operationalizes the Constitution/Humanity charter into a dynamic system for specialization, integration, validation and continuous autonomous R&D.
+
+Its canonical supporting sources are:
+- [docs/architecture/PRODUCT_SYSTEM.md](docs/architecture/PRODUCT_SYSTEM.md)
+- [docs/architecture/PATIENT_STATE.md](docs/architecture/PATIENT_STATE.md)
+- [docs/architecture/KNOWLEDGE_GRAPH.md](docs/architecture/KNOWLEDGE_GRAPH.md)
+- [docs/architecture/INTEGRATION_MAP.md](docs/architecture/INTEGRATION_MAP.md)
+- [docs/architecture/MATURITY_MODEL.md](docs/architecture/MATURITY_MODEL.md)
+- [governance/FEATURE_REGISTRY.yaml](governance/FEATURE_REGISTRY.yaml)
+- [governance/MATURITY_REGISTRY.yaml](governance/MATURITY_REGISTRY.yaml)
+- [governance/RISK_REGISTRY.yaml](governance/RISK_REGISTRY.yaml)
+- [governance/RND_BACKLOG.yaml](governance/RND_BACKLOG.yaml)
+- [automation/AUTONOMOUS_RND_LOOP.md](automation/AUTONOMOUS_RND_LOOP.md)
+
+These are living repository state, not aspirational paperwork. A capable agent must update the relevant registry when repository evidence materially changes feature relationships, maturity, risk or R&D priority. Do not invent status merely to make the registry look complete.
+
+When the owner says **"lanjut" / "continue"** without a narrower task and execution access is available, use the autonomous loop:
+
+`SCAN -> MAP -> GAP DETECTION -> PRIORITIZE -> SELECT ONE VERTICAL SLICE -> IMPLEMENT -> INTEGRATE -> VALIDATE -> UPDATE SOURCE OF TRUTH -> COMMIT -> VERIFY -> REASSESS -> REPEAT`.
+
+The current default is **maturity and integration before new breadth**. Research may discover new opportunities continuously, but an idea does not become a feature until it passes evidence, real-problem, named-user, system-fit, reuse and validation gates.
