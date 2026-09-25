@@ -25,3 +25,25 @@ export function perubahanTeratas(state: LongitudinalPatientState, kini: Date, ba
     .slice(0, batas)
 }
 
+
+// ── Timeline pribadi: "kapan", dari status kanonik yang sama ────────────────
+export interface HariTimeline {
+  tanggal: string
+  butir: { id: string; metric: string; label: string; value: number | string; unit?: string; asal: string }[]
+}
+
+/** Event dikelompokkan per tanggal (UTC, sesuai recordedAt), terbaru di atas. */
+export function timelineHarian(state: LongitudinalPatientState, batasHari = 30): HariTimeline[] {
+  const perHari = new Map<string, HariTimeline['butir']>()
+  for (const e of Object.values(state.eventsById)) {
+    if (typeof e.value !== 'number' && typeof e.value !== 'string') continue
+    const t = e.recordedAt.slice(0, 10)
+    const d = perHari.get(t) ?? []
+    d.push({ id: e.id, metric: e.metric, label: labelMetrik(e.metric), value: e.value, unit: e.unit, asal: asal(e.provenance.method, e.provenance.sourceKind) })
+    perHari.set(t, d)
+  }
+  return [...perHari.entries()]
+    .sort((a, b) => b[0].localeCompare(a[0]))
+    .slice(0, batasHari)
+    .map(([tanggal, butir]) => ({ tanggal, butir: butir.sort((a, b) => a.label.localeCompare(b.label)) }))
+}

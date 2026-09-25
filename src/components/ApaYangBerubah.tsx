@@ -1,5 +1,5 @@
 import { useLongitudinalState } from '../lib/useLongitudinalState'
-import { JENDELA_HARI, perubahanTeratas, labelMetrik, asal, angka } from '../lib/perubahanLongitudinal'
+import { JENDELA_HARI, perubahanTeratas, labelMetrik, asal, angka, timelineHarian } from '../lib/perubahanLongitudinal'
 
 // "What changed" — konsumen runtime pertama status longitudinal kanonik.
 // Menaruh lab, vital, dan kebugaran di satu daftar yang sama, diurutkan menurut
@@ -30,6 +30,30 @@ export function ApaYangBerubah() {
           ))}
         </ul>
       )}
+      {(() => {
+        const hari = timelineHarian(state)
+        if (!hari.length) return null
+        return (
+          <details className="mt-2 border-t border-neutral-100 pt-2 dark:border-white/10" data-personal-timeline>
+            <summary className="t-kecil cursor-pointer font-bold text-brand">Timeline · {hari.length} day{hari.length > 1 ? 's' : ''} with records</summary>
+            <ol className="mt-1.5 space-y-2">
+              {hari.map((h) => (
+                <li key={h.tanggal}>
+                  <p className="t-mikro font-black uppercase tracking-wide text-neutral-400">{h.tanggal}</p>
+                  <ul>
+                    {h.butir.map((b) => (
+                      <li key={b.id} className="t-kecil flex justify-between gap-3">
+                        <span className="min-w-0 truncate text-ink dark:text-white">{b.label} <span className="t-mikro text-neutral-400">· {b.asal}</span></span>
+                        <span className="shrink-0 tabular-nums font-bold text-ink dark:text-white">{typeof b.value === 'number' ? angka(b.value) : b.value} <span className="t-mikro font-normal text-neutral-400">{b.unit}</span></span>
+                      </li>
+                    ))}
+                  </ul>
+                </li>
+              ))}
+            </ol>
+          </details>
+        )
+      })()}
     </section>
   )
 }
