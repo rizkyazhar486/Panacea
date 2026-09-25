@@ -4,7 +4,7 @@ import { getVitals } from './healthVitals'
 import { ambilLab } from './lab'
 import { labLogToLongitudinalEvents } from './labLongitudinalBridge'
 import { careToLongitudinalEvents, type TinjauanMasuk } from './careLongitudinalBridge'
-import { emrRecordToLongitudinalEvents, type ServerAcceptedEmrRecord } from './emrLongitudinalBridge'
+import { emrRecordToLongitudinalEvents, emrVitalsToLongitudinalEvents, LABEL_METRIK_VITAL_EMR, type ServerAcceptedEmrRecord, type VitalTercatat } from './emrLongitudinalBridge'
 import { api, backendEnabled } from './api'
 import { PERISTIWA_SINKRON } from './antreanKlinis'
 import type { EMRRecord } from './types'
@@ -26,12 +26,12 @@ export function useLongitudinalState(): { state: LongitudinalPatientState | null
   const [versiLab, setVersiLab] = useState(0)
   const [versiKlinis, setVersiKlinis] = useState(0)
   // Data server (hanya bila ada backend + sesi): cek harian dan tinjauan dokter.
-  const [server, setServer] = useState<{ plans: { plan: ContinuousCarePlan; reports: DailyAnamnesisSubmissionInput[] }[]; reviews: TinjauanMasuk[]; records: Record<string, EMRRecord> }>({ plans: [], reviews: [], records: {} })
+  const [server, setServer] = useState<{ plans: { plan: ContinuousCarePlan; reports: DailyAnamnesisSubmissionInput[] }[]; reviews: TinjauanMasuk[]; records: Record<string, EMRRecord>; vitals: Record<string, VitalTercatat[]> }>({ plans: [], reviews: [], records: {}, vitals: {} })
   useEffect(() => {
     if (!backendEnabled || !account) return
     let aktif = true
-    Promise.all([api.carePlans().catch(() => ({ plans: [] })), api.getLabShares().catch(() => ({ reviews: [] as TinjauanMasuk[] })), account.role === 'pasien' ? api.clinical().catch(() => ({ records: {} as Record<string, EMRRecord> })) : Promise.resolve({ records: {} as Record<string, EMRRecord> })])
-      .then(([c, l, clinical]) => { if (aktif) setServer({ plans: c.plans, reviews: (l as { reviews?: TinjauanMasuk[] }).reviews ?? [], records: clinical.records ?? {} }) })
+    Promise.all([api.carePlans().catch(() => ({ plans: [] })), api.getLabShares().catch(() => ({ reviews: [] as TinjauanMasuk[] })), account.role === 'pasien' ? api.clinical().catch(() => ({ records: {} as Record<string, EMRRecord>, vitals: {} as Record<string, VitalTercatat[]> })) : Promise.resolve({ records: {} as Record<string, EMRRecord>, vitals: {} as Record<string, VitalTercatat[]> })])
+      .then(([c, l, clinical]) => { if (aktif) setServer({ plans: c.plans, reviews: (l as { reviews?: TinjauanMasuk[] }).reviews ?? [], records: clinical.records ?? {}, vitals: ((clinical as { vitals?: Record<string, VitalTercatat[]> }).vitals) ?? {} }) })
     return () => { aktif = false }
   }, [account, versiLab, versiKlinis])
   useEffect(() => {
@@ -88,8 +88,15 @@ export function useLongitudinalState(): { state: LongitudinalPatientState | null
           try { state = ingestLongitudinalEvent(state, ev).state } catch { skipped++ }
         }
       }
+      for (const vitals of Object.values(server.vitals)) {
+        const vit = emrVitalsToLongitudinalEvents(vitals, subjectId, consent, kini)
+        skipped += vit.skipped
+        for (const ev of vit.events) {
+          try { state = ingestLongitudinalEvent(state, ev).state } catch { skipped++ }
+        }
+      }
     }
-    return { state, skipped, labels: { ...care.labels, 'emr.signed-note': 'Signed clinical record', 'emr.primary-diagnosis': 'Primary diagnosis', 'emr.verified-plan': 'Verified care plan' } }
+    return { state, skipped, labels: { ...care.labels, 'emr.signed-note': 'Signed clinical record', 'emr.primary-diagnosis': 'Primary diagnosis', 'emr.verified-plan': 'Verified care plan', ...LABEL_METRIK_VITAL_EMR } }
     // versiLab memicu hitung ulang saat log lab berubah.
   }, [app, account, versiLab, server])
 }

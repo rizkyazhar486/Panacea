@@ -859,14 +859,20 @@ app.post('/api/clinical/vital', requireAuth, (req, res) => {
   if (!bolehPasien((req as express.Request & { user: User }).user, String((req.body as { patientId?: unknown })?.patientId ?? ''))) return res.status(403).json({ error: 'no access to this patient record' })
   const { patientId, vital } = req.body as { patientId?: string; vital?: unknown }
   if (!patientId) return res.status(400).json({ error: 'missing_patientId' })
-  addVital(patientId, vital)
+  // Siapa yang mencatat (dari sesi, bukan payload): klinisi → 'clinician-entered', selain itu 'patient-reported'.
+  const pencatat = (req as express.Request & { user: User }).user
+  const vitalTercap = vital && typeof vital === 'object' ? { ...(vital as object), dicatatOleh: { id: pencatat.id, klinisi: klinisiAtauPemilik(pencatat, isOwner(pencatat)) } } : vital
+  addVital(patientId, vitalTercap)
   res.json({ ok: true })
 })
 app.post('/api/clinical/supportive', requireAuth, (req, res) => {
   if (!bolehPasien((req as express.Request & { user: User }).user, String((req.body as { patientId?: unknown })?.patientId ?? ''))) return res.status(403).json({ error: 'no access to this patient record' })
   const { patientId, result } = req.body as { patientId?: string; result?: unknown }
   if (!patientId) return res.status(400).json({ error: 'missing_patientId' })
-  addSupportive(patientId, result)
+  // Siapa yang mencatat (dari sesi, bukan payload): klinisi → 'clinician-entered', selain itu 'patient-reported'.
+  const pencatat = (req as express.Request & { user: User }).user
+  const resultTercap = result && typeof result === 'object' ? { ...(result as object), dicatatOleh: { id: pencatat.id, klinisi: klinisiAtauPemilik(pencatat, isOwner(pencatat)) } } : result
+  addSupportive(patientId, resultTercap)
   res.json({ ok: true })
 })
 app.post('/api/clinical/patient', requireAuth, (req, res) => {

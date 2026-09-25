@@ -8,7 +8,8 @@
 // - confidence=1 means "faithfully projected from the signed record", NOT
 //   diagnostic certainty or clinical validation.
 import type { EMRRecord } from './types.ts'
-import type { ConsentEnvelope, LongitudinalEvent } from './panaceaLongitudinalState.ts'
+import type { ConsentEnvelope, LongitudinalEvent, SemanticState } from './panaceaLongitudinalState.ts'
+import type { VitalSign } from './types.ts'
 
 export type ServerAcceptedEmrRecord = EMRRecord & {
   signedById?: string
@@ -62,6 +63,7 @@ export function emrRecordToLongitudinalEvents(
       reviewedAt: signedAt,
       note: record.signedBy ? `Signed by ${record.signedBy}` : undefined,
     },
+    semanticState: 'clinician-reviewed' as const,
   }
 
   const problemTitles = record.problems.map((problem) => text(problem.title)).filter(Boolean)
@@ -110,4 +112,44 @@ export function emrRecordToLongitudinalEvents(
   }
 
   return { events, skipped: 0 }
+}
+
+// Vital AI-EMR -> status kanonik. Keadaan semantik diambil dari pencatat yang
+// DICAP SERVER (server/src/index.ts: dicatatOleh), tidak ditebak:
+// klinisi -> 'clinician-entered', pasien -> 'patient-reported', tanpa cap (data
+// lama) -> 'imported'. Vital tidak memerlukan tinjauan untuk masuk, tetapi juga
+// tidak pernah diberi label 'clinician-reviewed'.
+export type VitalTercatat = VitalSign & { dicatatOleh?: { id: string; klinisi: boolean } }
+
+const METRIK_VITAL: readonly [keyof VitalSign, string, string][] = [
+  ['systolic', 'vital.sbp', 'mmHg'], ['diastolic', 'vital.dbp', 'mmHg'], ['heartRate', 'vital.hr', 'bpm'],
+  ['respRate', 'vital.rr', '/min'], ['tempC', 'vital.temp', '°C'], ['spo2', 'vital.spo2', '%'], ['glucose', 'vital.glucose', 'mg/dL'],
+]
+export const LABEL_METRIK_VITAL_EMR: Record<string, string> = {
+  'vital.sbp': 'Systolic BP', 'vital.dbp': 'Diastolic BP', 'vital.hr': 'Heart rate', 'vital.rr': 'Respiratory rate',
+  'vital.temp': 'Temperature', 'vital.spo2': 'SpO₂', 'vital.glucose': 'Glucose',
+}
+
+export function emrVitalsToLongitudinalEvents(
+  vitals: readonly VitalTercatat[], subjectId: string, consent: ConsentEnvelope, receivedAt: string,
+): { events: LongitudinalEvent<number>[]; skipped: number } {
+  const events: LongitudinalEvent<number>[] = []
+  let skipped = 0
+  const batas = Date.parse(receivedAt) + 5 * 60_000
+  for (const v of vitals) {
+    const t = Date.parse(v.takenAt)
+    if (!Number.isFinite(t) || !Number.isFinite(batas) || t > batas) { skipped++; continue }
+    const keadaan: SemanticState = v.dicatatOleh ? (v.dicatatOleh.klinisi ? 'clinician-entered' : 'patient-reported') : 'imported'
+    const iso = new Date(t).toISOString()
+    for (const [kunci, metric, unit] of METRIK_VITAL) {
+      const nilai = v[kunci]
+      if (typeof nilai !== 'number' || !Number.isFinite(nilai) || nilai <= 0) continue
+      events.push({
+        id: `emr-vital:${v.id}:${metric}`, subjectId, domain: 'vital', metric, value: nilai, unit, recordedAt: iso, confidence: 1,
+        provenance: { sourceKind: 'clinical-system', sourceId: 'panaceamed:ai-emr', capturedAt: iso, receivedAt, method: `emr-vital:${keadaan}` },
+        consent, review: { state: 'not-required' }, semanticState: keadaan, tags: ['ai-emr', `semantic-state:${keadaan}`],
+      })
+    }
+  }
+  return { events, skipped }
 }

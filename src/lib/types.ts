@@ -125,6 +125,8 @@ export interface EMRRecord {
   surgery?: SurgeryPlan
   references: string[]
   signedBy?: string
+  /** Id pengguna penanda tangan — dicap server (lihat server/src/rekamKlinis.ts). */
+  signedById?: string
   signedAt?: string
   // The downstream half of the care journey — everything the clinical plan
   // above triggers in the real world (who, where, how much, when, and
