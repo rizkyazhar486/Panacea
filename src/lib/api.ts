@@ -114,6 +114,7 @@ export interface FhirObservasiLab {
   valueQuantity: { value: number; unit: string; code?: string }
   meta?: { tag?: { code: string }[] }
   identifier?: { system: string; value: string }[]
+  referenceRange?: { low?: { value: number }; high?: { value: number }; text?: string }[]
 }
 export interface TinjauanLabKlien { id: string; tes: string; dokterEmail: string; ditinjau: string; catatan?: string; cekUlangSebelum?: string }
 export interface FhirBundelLab { resourceType: 'Bundle'; total: number; entry: { resource: FhirObservasiLab }[] }
@@ -451,9 +452,9 @@ export const api = {
     req<{ post: BackendPost }>(`/api/posts/${id}/react`, { method: 'POST', body: JSON.stringify({ emoji }) }).then((r) => r.post),
   deletePost: (id: string) => req<{ ok: boolean }>(`/api/posts/${id}`, { method: 'DELETE' }),
   // Per-user health profile (manual / WHOOP / Apple Watch / other)
-  getLabLog: () => req<{ log: Record<string, { id: string; tanggal: string; nilai: number }[]>; diperbaruiPada: string | null }>('/api/lab-log'),
-  putLabLog: (log: Record<string, { id: string; tanggal: string; nilai: number }[]>, diperbaruiPada: string) =>
-    req<{ log: Record<string, { id: string; tanggal: string; nilai: number }[]>; diperbaruiPada: string }>('/api/lab-log', { method: 'PUT', body: JSON.stringify({ log, diperbaruiPada }) }),
+  getLabLog: () => req<{ log: Record<string, { id: string; tanggal: string; nilai: number; rujukanBawah?: number; rujukanAtas?: number }[]>; diperbaruiPada: string | null }>('/api/lab-log'),
+  putLabLog: (log: Record<string, { id: string; tanggal: string; nilai: number; rujukanBawah?: number; rujukanAtas?: number }[]>, diperbaruiPada: string) =>
+    req<{ log: Record<string, { id: string; tanggal: string; nilai: number; rujukanBawah?: number; rujukanAtas?: number }[]>; diperbaruiPada: string }>('/api/lab-log', { method: 'PUT', body: JSON.stringify({ log, diperbaruiPada }) }),
   getLabFhir: () => req<FhirBundelLab>('/api/lab-log/fhir'),
   getLabShares: () => req<{ shares: IzinLabKlien[]; audit: { waktu: string; aktor: string; aksi: string; izinId: string }[]; reviews: TinjauanLabKlien[] }>('/api/lab-log/shares'),
   shareLab: (dokterEmail: string, hari: number) => req<IzinLabKlien>('/api/lab-log/shares', { method: 'POST', body: JSON.stringify({ dokterEmail, hari }) }),

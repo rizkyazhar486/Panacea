@@ -73,6 +73,13 @@ export function logKeBundelFhir(log: LogLab, pasienRef: string, dibuat: string) 
           subject: { reference: pasienRef },
           effectiveDateTime: b.tanggal,
           valueQuantity: t ? { value: b.nilai, unit: t.unit, system: UCUM_SYSTEM, code: t.ucum } : { value: b.nilai, unit: teks![1] },
+          ...(b.rujukanBawah != null || b.rujukanAtas != null ? {
+            referenceRange: [{
+              ...(b.rujukanBawah != null ? { low: t ? { value: b.rujukanBawah, unit: t.unit, system: UCUM_SYSTEM, code: t.ucum } : { value: b.rujukanBawah, unit: teks![1] } } : {}),
+              ...(b.rujukanAtas != null ? { high: t ? { value: b.rujukanAtas, unit: t.unit, system: UCUM_SYSTEM, code: t.ucum } : { value: b.rujukanAtas, unit: teks![1] } } : {}),
+              text: 'As printed on the laboratory report (patient-transcribed)',
+            }],
+          } : {}),
           note: [{ text: 'Patient-entered from a lab report; not received from the laboratory. Verify against the original report before clinical use.' }],
         },
       })

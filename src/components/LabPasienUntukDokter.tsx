@@ -98,6 +98,13 @@ export function LabPasienUntukDokter() {
                   <li key={nama} className="grid grid-cols-[minmax(0,1fr)_auto] gap-x-3 py-2" data-trend-status={tren?.status}>
                     <div className="min-w-0">
                       <div className="truncate text-[12px] font-bold">{nama}</div>
+                      {(() => {
+                        const rr = a.referenceRange?.[0]
+                        if (!rr) return null
+                        const v = a.valueQuantity.value
+                        const luar = (rr.low && v < rr.low.value) || (rr.high && v > rr.high.value)
+                        return <div className={`text-[10px] ${luar ? 'font-bold text-amber-300' : 'text-white/45'}`}>{luar ? 'Outside' : 'Within'} the lab's printed range {rr.low?.value ?? '…'}–{rr.high?.value ?? '…'}</div>
+                      })()}
                       <div className="text-[10px] text-white/45">{loinc ? `LOINC ${loinc}` : 'not coded'} · {obs.length} result{obs.length > 1 ? 's' : ''} · last {a.effectiveDateTime.slice(0, 10)}</div>
                       {jenisDari(a) && (
                         <FormTinjauan izinId={buka.izinId} tes={jenisDari(a)} sebelumnya={buka.reviews.find((t) => t.tes === jenisDari(a))}

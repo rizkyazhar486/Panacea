@@ -7,7 +7,7 @@ import { arahSinkron } from './labSyncArah'
 export { arahSinkron }
 
 export type StatusSinkronLab = 'lokal' | 'menyinkron' | 'tersinkron' | 'gagal'
-type Log = Record<string, { id: string; tanggal: string; nilai: number }[]>
+type Log = Record<string, { id: string; tanggal: string; nilai: number; rujukanBawah?: number; rujukanAtas?: number }[]>
 
 let status: StatusSinkronLab = backendEnabled ? 'menyinkron' : 'lokal'
 const pendengar = new Set<(s: StatusSinkronLab) => void>()
@@ -20,7 +20,7 @@ export function logUntukServer(): Log {
   const keluar: Log = {}
   for (const [jenis, daftar] of Object.entries(ambilLab())) {
     const b = daftar.filter((x) => typeof x.id === 'string' && /^[A-Za-z0-9_-]{1,64}$/.test(x.id) && /^\d{4}-\d{2}-\d{2}$/.test(x.tanggal) && x.nilai > 0)
-    if (b.length) keluar[jenis] = b.map(({ id, tanggal, nilai }) => ({ id, tanggal, nilai }))
+    if (b.length) keluar[jenis] = b.map(({ id, tanggal, nilai, rujukanBawah, rujukanAtas }) => ({ id, tanggal, nilai, ...(rujukanBawah != null ? { rujukanBawah } : {}), ...(rujukanAtas != null ? { rujukanAtas } : {}) }))
   }
   return keluar
 }

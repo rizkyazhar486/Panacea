@@ -24,6 +24,10 @@ export interface ButirLab {
   /** yyyy-mm-dd */
   tanggal: string
   nilai: number
+  /** Rentang rujukan yang TERCETAK di lembar hasil lab ini (opsional). Setiap
+   *  lab punya rentangnya sendiri; bila ada, ini yang dipakai, bukan rentang umum. */
+  rujukanBawah?: number
+  rujukanAtas?: number
 }
 
 export interface JenisLab {
@@ -138,10 +142,14 @@ export function gantiDariServer(s: Simpanan, cap: string): void {
   try { window.dispatchEvent(new CustomEvent('panacea:lab', { detail: { asal: 'server' } })) } catch { /* ignore */ }
 }
 
-export function tambahLab(jenis: string, tanggal: string, nilai: number): void {
+export function tambahLab(jenis: string, tanggal: string, nilai: number, rujukan?: { bawah?: number; atas?: number }): void {
   const s = ambilLab()
   const daftar = s[jenis] ?? []
-  daftar.push({ id: `${jenis}-${Date.now()}`, tanggal, nilai })
+  daftar.push({
+    id: `${jenis}-${Date.now()}`, tanggal, nilai,
+    ...(rujukan?.bawah != null ? { rujukanBawah: rujukan.bawah } : {}),
+    ...(rujukan?.atas != null ? { rujukanAtas: rujukan.atas } : {}),
+  })
   daftar.sort((a, b) => a.tanggal.localeCompare(b.tanggal))
   // Seratus butir per jenis sudah lebih dari seumur hidup pemeriksaan tahunan.
   s[jenis] = daftar.slice(-100)
@@ -207,4 +215,20 @@ export function periksaMasukanLab(jenis: JenisLab, teks: string, tanggal: string
     periksaSatuan = `${nilai} ${jenis.satuan} is far above the usual range (${jenis.bawah ?? '…'}–${jenis.atas}). Is your lab sheet in a different unit?`
   }
   return { ok: true, nilai, periksaSatuan }
+}
+
+/** Rentang rujukan lab (opsional) — kosong boleh; bila diisi harus angka > 0 dan bawah < atas. */
+export function periksaRujukanLab(bawahTeks: string, atasTeks: string): { ok: true; bawah?: number; atas?: number } | { ok: false; alasan: string } {
+  const baca = (t: string) => { const b = t.trim().replace(',', '.'); return b === '' ? undefined : /^\d+(\.\d+)?$/.test(b) ? Number(b) : NaN }
+  const bawah = baca(bawahTeks), atas = baca(atasTeks)
+  if (Number.isNaN(bawah) || Number.isNaN(atas)) return { ok: false, alasan: 'Reference range: use plain numbers as printed on your report.' }
+  if ((bawah !== undefined && bawah < 0) || (atas !== undefined && atas <= 0)) return { ok: false, alasan: 'Reference range must be positive.' }
+  if (bawah !== undefined && atas !== undefined && bawah >= atas) return { ok: false, alasan: 'Reference range: the low value must be below the high value.' }
+  return { ok: true, ...(bawah !== undefined ? { bawah } : {}), ...(atas !== undefined ? { atas } : {}) }
+}
+
+/** Rentang yang berlaku untuk satu butir: dari lembar lab bila ada, selain itu rentang umum. */
+export function rentangUntuk(b: ButirLab, j: JenisLab): { bawah?: number; atas?: number; dariLab: boolean } {
+  if (b.rujukanBawah != null || b.rujukanAtas != null) return { bawah: b.rujukanBawah, atas: b.rujukanAtas, dariLab: true }
+  return { bawah: j.bawah, atas: j.atas, dariLab: false }
 }

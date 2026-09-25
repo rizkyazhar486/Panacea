@@ -26,6 +26,7 @@
 // Ini sinyal pemantauan, bukan diagnosis.
 
 import type { ButirLab, JenisLab } from './lab'
+import { rentangUntuk } from './lab'
 
 export const MIN_RIWAYAT_GARIS_DASAR = 3
 export const Z_BERMAKNA = 2
@@ -99,7 +100,9 @@ export function analisisTrenLab(butirMentah: readonly ButirLab[], jenis: JenisLa
 
   const akhir = butir[butir.length - 1]
   const sebelum = butir.length > 1 ? butir[butir.length - 2] : null
-  const luarPop = di_luar(akhir.nilai, jenis)
+  // Rentang dari lembar lab hasil terakhir menang atas rentang umum.
+  const r = rentangUntuk(akhir, jenis)
+  const luarPop = di_luar(akhir.nilai, { ...jenis, bawah: r.bawah, atas: r.atas })
   const riwayat = butir.slice(0, -1).map((b) => b.nilai)
 
   let lajuPerTahun: number | null = null

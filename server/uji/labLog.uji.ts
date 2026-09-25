@@ -29,4 +29,6 @@ const baru = { log: ok, diperbaruiPada: '2026-09-25T05:30:00.000Z' }
 assert.equal(terimaTulisan(baru, lama).diterima, false)
 assert.equal(terimaTulisan(lama, baru).diterima, true)
 assert.equal(terimaTulisan(undefined, lama).diterima, true)
+assert.deepEqual(validasiLogLab({ gdp: [{ id: 'a', tanggal: '2026-09-20', nilai: 92, rujukanBawah: 74, rujukanAtas: 106 }] }, kini).gdp[0], { id: 'a', tanggal: '2026-09-20', nilai: 92, rujukanBawah: 74, rujukanAtas: 106 })
+for (const r of [{ rujukanBawah: 106, rujukanAtas: 74 }, { rujukanAtas: '106' }, { rujukanBawah: -1 }]) assert.throws(() => validasiLogLab({ gdp: [{ id: 'a', tanggal: '2026-09-20', nilai: 92, ...r }] }, kini), 'rentang rujukan buruk diterima')
 console.log('labLog: validasi batas kepercayaan, toleransi zona waktu, dan yang-terakhir-menang lulus')

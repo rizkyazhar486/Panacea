@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
-import { JENIS_LAB, ambilLab, tambahLab, hapusLab, umurHari, periksaMasukanLab, type ButirLab, type JenisLab } from '../lib/lab'
+import { JENIS_LAB, ambilLab, tambahLab, hapusLab, umurHari, periksaMasukanLab, periksaRujukanLab, rentangUntuk, type ButirLab, type JenisLab } from '../lib/lab'
 import { BagikanLabKeDokter } from './BagikanLabKeDokter'
 import { api, backendEnabled, type TinjauanLabKlien } from '../lib/api'
 import { pasangSinkronLab, dengarSinkronLab, statusSinkronLab, type StatusSinkronLab } from '../lib/labSync'
@@ -117,6 +117,8 @@ export function UbinLab() {
 
   const aktif = terisi.find((t) => t.jenis.id === pilih) ?? terisi[0]
 
+  const [rBawah, setRBawah] = useState('')
+  const [rAtas, setRAtas] = useState('')
   const [galat, setGalat] = useState<string | null>(null)
   // Peringatan satuan harus dikonfirmasi dengan menekan Save sekali lagi pada
   // nilai yang sama; mengubah nilai/jenis/tanggal membatalkan konfirmasinya.
@@ -127,9 +129,12 @@ export function UbinLab() {
     const jenis = JENIS_LAB.find((j) => j.id === jenisId) ?? JENIS_LAB[0]
     const h = periksaMasukanLab(jenis, nilai, tanggal, tanggalHariIni())
     if (!h.ok) { setGalat(h.alasan); setKonfirmasi(null); return }
+    const r = periksaRujukanLab(rBawah, rAtas)
+    if (!r.ok) { setGalat(r.alasan); setKonfirmasi(null); return }
     const kunci = `${jenisId}|${tanggal}|${h.nilai}`
     if (h.periksaSatuan && konfirmasi !== kunci) { setGalat(h.periksaSatuan + ' Press Save again to keep it.'); setKonfirmasi(kunci); return }
-    tambahLab(jenisId, tanggal, h.nilai)
+    tambahLab(jenisId, tanggal, h.nilai, { bawah: r.bawah, atas: r.atas })
+    setRBawah(''); setRAtas('')
     setGalat(null); setKonfirmasi(null)
     setTersimpan(`Saved ${jenis.nama} ${h.nilai} ${jenis.satuan} · ${tanggal}`)
     setNilai('')
@@ -182,6 +187,13 @@ export function UbinLab() {
               />
               <button onClick={simpanBaru} className="t-kecil shrink-0 rounded-xl bg-brand px-3 font-bold text-white">Save</button>
             </div>
+            <div className="mt-1.5 flex items-center gap-1.5">
+              <span className="t-mikro shrink-0 text-neutral-500">Range on your report</span>
+              <input inputMode="decimal" value={rBawah} onChange={(e) => { setRBawah(e.target.value); setGalat(null) }} placeholder="low" aria-label="Reference range low (from your report)"
+                className="t-kecil min-w-0 flex-1 rounded-xl border border-neutral-200 bg-transparent px-2 py-1.5 text-ink dark:border-white/12 dark:text-white" />
+              <input inputMode="decimal" value={rAtas} onChange={(e) => { setRAtas(e.target.value); setGalat(null) }} placeholder="high" aria-label="Reference range high (from your report)"
+                className="t-kecil min-w-0 flex-1 rounded-xl border border-neutral-200 bg-transparent px-2 py-1.5 text-ink dark:border-white/12 dark:text-white" />
+            </div>
             {galat && <p role="alert" className="t-kecil mt-1.5 font-bold leading-snug text-amber-500">{galat}</p>}
             <p className="t-mikro mt-1.5 leading-snug text-neutral-400">
               The date blood was TAKEN, not the date the result came out — the gap between them can be days.
@@ -215,9 +227,10 @@ export function UbinLab() {
               const akhir = butir[butir.length - 1]
               const umur = umurHari(butir)
               const j = aktif.jenis
+              const rr = rentangUntuk(akhir, j)
               const diLuar =
-                (typeof j.bawah === 'number' && akhir.nilai < j.bawah) ||
-                (typeof j.atas === 'number' && akhir.nilai > j.atas)
+                (typeof rr.bawah === 'number' && akhir.nilai < rr.bawah) ||
+                (typeof rr.atas === 'number' && akhir.nilai > rr.atas)
               return (
                 <>
                   <div className="flex items-baseline gap-1.5">
@@ -271,7 +284,7 @@ export function UbinLab() {
                   </details>
 
                   <p className="t-mikro mt-1 leading-snug text-neutral-500 dark:text-neutral-400">
-                    Reference: {j.sumber}
+                    {rr.dariLab ? `Your lab's range: ${rr.bawah ?? '…'}–${rr.atas ?? '…'} ${j.satuan} (from your report)` : `Reference: ${j.sumber}`}
                   </p>
                   {j.catatan && <p className="t-mikro mt-0.5 leading-snug text-neutral-400">{j.catatan}</p>}
                   <p className="t-mikro mt-1 leading-snug text-neutral-400">

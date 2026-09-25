@@ -11,7 +11,7 @@
 //   di perangkat lain — lebih buruk daripada kehilangan suntingan serentak.
 // Server tidak menafsirkan angka lab; ia hanya menyimpan apa yang dicatat.
 
-export interface ButirLabServer { id: string; tanggal: string; nilai: number }
+export interface ButirLabServer { id: string; tanggal: string; nilai: number; rujukanBawah?: number; rujukanAtas?: number }
 export type LogLab = Record<string, ButirLabServer[]>
 export interface LogLabTersimpan { log: LogLab; diperbaruiPada: string }
 
@@ -39,7 +39,11 @@ export function validasiLogLab(masukan: unknown, sekarang: Date): LogLab {
       if (typeof x.tanggal !== 'string' || !TANGGAL.test(x.tanggal) || Number.isNaN(Date.parse(`${x.tanggal}T00:00:00Z`))) throw new Error(`invalid date in ${jenis}`)
       if (x.tanggal > batas || x.tanggal < '1900-01-01') throw new Error(`date out of range in ${jenis}`)
       if (typeof x.nilai !== 'number' || !Number.isFinite(x.nilai) || x.nilai <= 0) throw new Error(`invalid value in ${jenis}`)
-      bersih.push({ id: x.id, tanggal: x.tanggal, nilai: x.nilai })
+      // Rentang rujukan dari lembar lab: opsional, angka hingga, bawah < atas.
+      const rb = x.rujukanBawah, ra = x.rujukanAtas
+      for (const v of [rb, ra]) if (v != null && (typeof v !== 'number' || !Number.isFinite(v) || v < 0)) throw new Error(`invalid reference range in ${jenis}`)
+      if (rb != null && ra != null && rb >= ra) throw new Error(`invalid reference range in ${jenis}`)
+      bersih.push({ id: x.id, tanggal: x.tanggal, nilai: x.nilai, ...(rb != null ? { rujukanBawah: rb } : {}), ...(ra != null ? { rujukanAtas: ra } : {}) })
     }
     if (bersih.length) keluar[jenis] = bersih.sort((a, b) => a.tanggal.localeCompare(b.tanggal))
   }
