@@ -44,6 +44,19 @@ function isiFisikTetapSama(lama: any, baru: any) {
   return sama(tanpaCapVerifikasiFisik(lama), tanpaCapVerifikasiFisik(baru))
 }
 
+function tanpaCapKlinis(value: any) {
+  const copy = tanpaPersetujuanPasien(value)
+  delete copy.signedAt
+  delete copy.signedBy
+  delete copy.signedById
+  if (copy.physicalExam) copy.physicalExam = tanpaCapVerifikasiFisik(copy.physicalExam)
+  return copy
+}
+
+function isiTertandaTetapSama(lama: any, baru: any) {
+  return sama(tanpaCapKlinis(lama), tanpaCapKlinis(baru))
+}
+
 export function terapkanSimpanRekam(lama: any | undefined, baru: any, penulis: Penulis, kini: Date): { rekam: any; arsip?: any } {
   const r = structuredClone(baru ?? {})
   const fisikLama = lama?.physicalExam ?? {}
@@ -75,14 +88,44 @@ export function terapkanSimpanRekam(lama: any | undefined, baru: any, penulis: P
     }
     if (r.primaryDiagnosis?.source === 'Dokter' && !sama(r.primaryDiagnosis, lama?.primaryDiagnosis)) r.primaryDiagnosis.source = 'AI'
   } else {
-    // Klinisi: cap identitas & waktu server saat tanda tangan/verifikasi baru.
-    if (r.signedAt && !(lama?.signedAt && sama(r.signedAt, lama.signedAt))) {
-      r.signedBy = penulis.nama; r.signedById = penulis.id; r.signedAt = kini.toISOString()
-    } else if (lama?.signedAt && r.signedAt) {
-      r.signedBy = lama.signedBy; r.signedById = lama.signedById; r.signedAt = lama.signedAt
+    // Klinisi: perubahan signedAt dari klien hanyalah INTENT untuk re-sign;
+    // identitas dan waktu final tetap dicap server. Bila klinisi hanya Save
+    // setelah mengubah isi tetapi membawa signedAt lama, cap lama dibatalkan.
+    const memintaTandaTanganBaru = Boolean(
+      r.signedAt && !(lama?.signedAt && sama(r.signedAt, lama.signedAt))
+    )
+    const membawaTandaTanganLama = Boolean(
+      lama?.signedAt && r.signedAt && sama(r.signedAt, lama.signedAt)
+    )
+    if (memintaTandaTanganBaru) {
+      r.signedBy = penulis.nama
+      r.signedById = penulis.id
+      r.signedAt = kini.toISOString()
+    } else if (membawaTandaTanganLama) {
+      if (isiTertandaTetapSama(lama, r)) {
+        r.signedBy = lama.signedBy
+        r.signedById = lama.signedById
+        r.signedAt = lama.signedAt
+      } else {
+        delete r.signedAt
+        delete r.signedBy
+        delete r.signedById
+      }
     }
-    if (r.physicalExam?.doctorVerified && !(fisikLama.doctorVerified && fisikLama.verifiedById)) {
-      r.physicalExam.verifiedBy = penulis.nama; r.physicalExam.verifiedById = penulis.id
+
+    if (r.physicalExam?.doctorVerified) {
+      const fisikBerubah = !isiFisikTetapSama(fisikLama, r.physicalExam)
+      if (memintaTandaTanganBaru || !fisikLama.doctorVerified) {
+        r.physicalExam.verifiedBy = penulis.nama
+        r.physicalExam.verifiedById = penulis.id
+      } else if (fisikBerubah) {
+        r.physicalExam.doctorVerified = false
+        delete r.physicalExam.verifiedBy
+        delete r.physicalExam.verifiedById
+      } else {
+        r.physicalExam.verifiedBy = fisikLama.verifiedBy
+        r.physicalExam.verifiedById = fisikLama.verifiedById
+      }
     }
   }
   const berubah = lama && !sama(lama, r)
