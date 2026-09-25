@@ -379,7 +379,7 @@ function AuthenticatedVisitCommandCenter({
 
   if (activePatient.id === 'none') {
     return (
-      <section className="rounded-[30px] border border-white/10 bg-[#05070a] p-6 text-white">
+      <section className="dark rounded-[30px] border border-white/10 bg-[#05070a] p-6 text-white">
         <div className="text-[9px] font-black uppercase tracking-[.18em] text-white/35">Visit OS</div>
         <div className="mt-2 text-lg font-black">Select or add a patient first</div>
       </section>
@@ -537,7 +537,7 @@ export function VisitCommandCenter(props: VisitCommandCenterProps) {
       <section
         data-visit-identity-blocked={identity.reason}
         aria-label="Panacea doctor visit operating system"
-        className="rounded-[30px] border border-white/10 bg-[#05070a] p-6 text-white"
+        className="dark rounded-[30px] border border-white/10 bg-[#05070a] p-6 text-white"
       >
         <div className="text-[9px] font-black uppercase tracking-[.18em] text-white/35">Visit OS</div>
         <div className="mt-2 text-lg font-black">{message}</div>

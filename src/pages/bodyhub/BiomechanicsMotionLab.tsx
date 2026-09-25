@@ -61,7 +61,7 @@ export default function BiomechanicsMotionLab() {
     <section
       data-biomechanics-motion-lab="v1"
       aria-label="Biomechanics motion lab"
-      className="overflow-hidden rounded-2xl border border-emerald-900/30 bg-[#07110f] text-white shadow-sm"
+      className="dark overflow-hidden rounded-2xl border border-emerald-900/30 bg-[#07110f] text-white shadow-sm"
     >
       <div className="flex flex-wrap items-start justify-between gap-3 border-b border-white/10 px-3 py-3 sm:px-4">
         <div>

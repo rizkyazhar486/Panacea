@@ -27,7 +27,7 @@ export function ClinicalBodyTwin({
 
   return (
     <section
-      className="mb-4 overflow-hidden rounded-[28px] border border-white/10 bg-[#050708] text-white shadow-[0_28px_90px_rgba(0,0,0,.28)]"
+      className="dark mb-4 overflow-hidden rounded-[28px] border border-white/10 bg-[#050708] text-white shadow-[0_28px_90px_rgba(0,0,0,.28)]"
       aria-label="AI-EMR body context"
       data-pmd-unclamped="true"
     >

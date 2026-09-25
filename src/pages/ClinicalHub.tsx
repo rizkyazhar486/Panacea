@@ -93,7 +93,13 @@ export function ClinicalHub() {
   }
 
   return (
-    <div className="mx-auto w-full max-w-[1380px] space-y-8 pb-20 text-white">
+    // `dark` bukan hiasan di sini. Permukaan ini memang ruang komando gelap
+    // apa pun tema aplikasinya, sementara tema aplikasi bisa saja terang —
+    // dan seluruh gaya `dark:` serta lapisan pemetaan `.dark` di index.css
+    // dipasang pada kelas itu. Tanpa penandanya, setiap komponen di dalam
+    // sini merender versi TERANGnya di atas latar gelap: panduan "How to
+    // use" muncul sebagai lempengan putih menyilaukan pada halaman hitam.
+    <div className="dark mx-auto w-full max-w-[1380px] space-y-8 pb-20 text-white">
       <PanaceaZoneNav />
 
       <main aria-label="Clinical command surface" className="space-y-9">

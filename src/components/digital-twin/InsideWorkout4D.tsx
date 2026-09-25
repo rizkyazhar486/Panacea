@@ -234,7 +234,7 @@ export function InsideWorkout4D({ workouts, hrMax }: Props) {
   }
 
   return (
-    <section className="overflow-hidden rounded-[30px] border border-emerald-300/15 bg-[#030914] text-white shadow-[0_32px_100px_rgba(0,0,0,.28)]">
+    <section className="dark overflow-hidden rounded-[30px] border border-emerald-300/15 bg-[#030914] text-white shadow-[0_32px_100px_rgba(0,0,0,.28)]">
       <div className="border-b border-white/8 p-5 sm:p-6">
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div className="max-w-3xl">

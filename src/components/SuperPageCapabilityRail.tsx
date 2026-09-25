@@ -93,7 +93,7 @@ export function SuperPageCapabilityRail({ domain, initialLimit = 24 }: { domain:
 
   return (
     <section
-      className="overflow-hidden rounded-[16px] border border-white/[.08] bg-[#05070a] p-3 text-white sm:p-4"
+      className="dark overflow-hidden rounded-[16px] border border-white/[.08] bg-[#05070a] p-3 text-white sm:p-4"
       aria-label={`${config.label} capabilities`}
     >
       <div className="flex items-center justify-between gap-3">

@@ -91,7 +91,7 @@ export function EmrTimelineLens({
   const current = depthContent[depth]
 
   return (
-    <section className="overflow-hidden rounded-[28px] border border-white/10 bg-[#050708] text-white" aria-label="AI-EMR longitudinal lens" data-pmd-unclamped="true">
+    <section className="dark overflow-hidden rounded-[28px] border border-white/10 bg-[#050708] text-white" aria-label="AI-EMR longitudinal lens" data-pmd-unclamped="true">
       <header className="flex items-center justify-between gap-4 border-b border-white/10 px-4 py-3 sm:px-5">
         <div className="min-w-0">
           <div className="text-[9px] font-black uppercase tracking-[.16em] text-cyan-200/65">AI-EMR · longitudinal lens</div>

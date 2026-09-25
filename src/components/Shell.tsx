@@ -61,6 +61,7 @@ import { ambilTersembunyi, saring, langgananFitur } from '../lib/fiturTersembuny
 import { autoIsiDariPerangkat } from '../lib/autoIsi'
 import { useCommandBar } from './useCommandBar'
 import { SUPER_PAGES } from '../lib/superPages'
+import { judulRute } from '../lib/judulRute'
 import '../styles/command-bar.css'
 import '../styles/superpage-convergence.css'
 
@@ -433,7 +434,7 @@ export function Shell({ children }: { children: ReactNode }) {
 
   if (!account) return <PublicEntry />
   const items = saring(nav.filter((n) => n.roles.includes(account.role)), tersembunyi)
-  const title = items.find((n) => navMatches(n, loc.pathname))
+  const judul = judulRute(loc.pathname, items, nav, navMatches)
   // Only doctors switch between patients; patients see their own data only.
   const showPatient = PATIENT_PAGES.includes(loc.pathname) && account.role === 'dokter'
   const doLogout = () => { if (backendEnabled) api.logout().catch(() => {}); logout() }
@@ -494,7 +495,7 @@ export function Shell({ children }: { children: ReactNode }) {
                 </svg>
               </button>
             )}
-            <h1 className="truncate text-base font-bold sm:text-lg">{title?.label ?? 'Panaceamed.id'}</h1>
+            <h1 className="truncate text-base font-bold sm:text-lg">{judul}</h1>
           </div>
 
           {spacesOpen && (

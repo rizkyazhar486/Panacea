@@ -185,7 +185,7 @@ export function BiomedicalEngineLab() {
 
       {view === 'imaging' && (
         <div className="space-y-3" data-biomedical-imaging-lab="v1">
-          <div className="rounded-2xl border border-cyan-400/20 bg-[#071014] p-3 text-white sm:p-4">
+          <div className="dark rounded-2xl border border-cyan-400/20 bg-[#071014] p-3 text-white sm:p-4">
             <div className="flex flex-wrap items-start justify-between gap-3">
               <div>
                 <div className="text-[9px] font-black uppercase tracking-[0.18em] text-cyan-300">Imaging reconstruction & exam atlas</div>

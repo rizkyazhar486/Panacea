@@ -273,7 +273,7 @@ export default function UnifiedHumanSimulationProjector({
       data-simulation-domain={domain}
       data-semantic-scale={semanticZoom.scale}
       data-selected-source-structure={selectedStructureName ?? undefined}
-      className="overflow-hidden rounded-[30px] border border-white/[.09] bg-[#020508] text-white shadow-[0_28px_90px_rgba(0,0,0,.36)]"
+      className="dark overflow-hidden rounded-[30px] border border-white/[.09] bg-[#020508] text-white shadow-[0_28px_90px_rgba(0,0,0,.36)]"
       aria-labelledby="unified-human-simulation-title"
       aria-description="Body → system → organ → tissue → cell → organelle → molecule → genome"
     >

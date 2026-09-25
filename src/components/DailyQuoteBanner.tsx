@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { kutipanHariIni } from '../lib/lifeQuotes'
+import { kutipanHariIni, durasiBacaMs } from '../lib/lifeQuotes'
 import { IconX, IconFlame } from './icons'
 
 // "Sesuatu untuk dibawa hari ini" — muncul sekali per hari, hari kalender
@@ -23,6 +23,10 @@ function todayKey(): string {
   return `${d.getFullYear()}-${d.getMonth() + 1}-${d.getDate()}`
 }
 
+function tandaiSudahDilihat() {
+  try { localStorage.setItem(SEEN_KEY, todayKey()) } catch { /* ignore */ }
+}
+
 export function DailyQuoteBanner() {
   const [visible, setVisible] = useState(false)
   const quote = kutipanHariIni()
@@ -36,9 +40,21 @@ export function DailyQuoteBanner() {
     return () => clearTimeout(t)
   }, [])
 
+  // Menyingkir sendiri setelah waktu baca. Tanpa ini spanduknya menutupi
+  // sepertiga layar pertama SETIAP halaman sampai seseorang menekan ×, dan
+  // halaman yang baru dibuka kehilangan judulnya sendiri di balik kutipan.
+  useEffect(() => {
+    if (!visible) return
+    const t = setTimeout(() => {
+      setVisible(false)
+      tandaiSudahDilihat()
+    }, durasiBacaMs(`${quote.quote} ${quote.source}`))
+    return () => clearTimeout(t)
+  }, [visible, quote.quote, quote.source])
+
   function dismiss() {
     setVisible(false)
-    try { localStorage.setItem(SEEN_KEY, todayKey()) } catch { /* ignore */ }
+    tandaiSudahDilihat()
   }
 
   if (!visible) return null
@@ -88,18 +104,25 @@ export function DailyQuoteBanner() {
           <IconX size={13} />
         </button>
 
-        <div className="relative flex gap-3 p-4 pr-10">
+        <div className="relative flex gap-2.5 p-3 pr-9">
           <span
             aria-hidden
-            className="mt-0.5 grid h-9 w-9 shrink-0 place-items-center rounded-full border border-white/15 bg-black/50"
-            style={{ boxShadow: '0 0 16px rgba(255,140,0,0.55)' }}
+            className="mt-0.5 grid h-7 w-7 shrink-0 place-items-center rounded-full border border-white/15 bg-black/50"
+            style={{ boxShadow: '0 0 14px rgba(255,140,0,0.5)' }}
           >
-            <IconFlame size={17} className="text-amber-400" />
+            <IconFlame size={14} className="text-amber-400" />
           </span>
           <div className="min-w-0">
-            <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-white/55">Today’s reminder</p>
-            <p className="mt-1 text-[14px] font-bold leading-snug text-white">“{quote.quote}”</p>
-            <p className="mt-1.5 text-[11px] font-semibold text-white/60">— {quote.source}</p>
+            {/* Baris label dibuang: "Today's reminder" tidak menambah apa pun
+                di atas kutipan yang jelas-jelas sebuah kutipan, dan barisnya
+                ikut mendorong kartunya melewati sepertiga layar. */}
+            <p
+              className="text-[13px] font-bold leading-snug text-white"
+              style={{ display: '-webkit-box', WebkitLineClamp: 3, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}
+            >
+              “{quote.quote}”
+            </p>
+            <p className="mt-1 truncate text-[10px] font-semibold text-white/55">— {quote.source}</p>
           </div>
         </div>
       </div>
