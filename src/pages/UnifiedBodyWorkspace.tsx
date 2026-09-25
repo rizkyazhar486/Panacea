@@ -1,6 +1,7 @@
 import { lazy, Suspense, type ComponentType } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { PanaceaZoneNav } from '../components/PanaceaZoneNav'
+import { OneShape } from '../components/OneShape'
 import { SuperPageCapabilityRail } from '../components/SuperPageCapabilityRail'
 import { PersonalBodyUnifiedSurface, PersonalBodySurfaceShown } from '../components/PersonalBodyUnifiedSurface'
 import { SurfaceDepthNavigator } from '../components/SurfaceDepthNavigator'
@@ -126,7 +127,8 @@ export function UnifiedBodyWorkspace() {
             <h1 className="sr-only">Your Body · {active.label}</h1>
           )}
 
-          <div className={`no-scrollbar flex snap-x gap-1.5 overflow-x-auto pb-1 ${isExposure ? 'mt-3' : ''}`} role="tablist" aria-label="Your Body workspace">
+          <div className={`no-scrollbar flex snap-x gap-1.5 overflow-x-auto pb-1 ${isExposure ? 'mt-3' : ''}`} role="tablist" aria-label="Your Body workspace" data-one-shape="aria">
+            <OneShape />
             {primaryViews.map((view) => {
               const selected = activeKey === view.key
               const exposureTab = view.key === 'body-exposure'
@@ -139,7 +141,7 @@ export function UnifiedBodyWorkspace() {
                   onClick={() => select(view)}
                   className={`min-h-[42px] shrink-0 snap-start rounded-full border px-3.5 text-[11px] font-black transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-300/50 ${
                     selected
-                      ? 'border-white bg-white text-black shadow-sm'
+                      ? 'border-transparent text-black'
                       : exposureTab
                         ? 'border-white/15 bg-white/[.055] text-white/85 hover:bg-white/[.09]'
                         : 'border-white/[.08] bg-white/[.035] text-white/75 hover:border-white/15 hover:bg-white/[.055] hover:text-white'

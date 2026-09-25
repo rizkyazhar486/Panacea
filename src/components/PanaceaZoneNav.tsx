@@ -1,4 +1,5 @@
 import { NavLink, useLocation } from 'react-router-dom'
+import { OneShape } from './OneShape'
 import { useStore } from '../lib/store'
 import { LogoMark } from './Logo'
 import '../styles/superpage-cohesion-v1.css'
@@ -9,7 +10,8 @@ const ZONES = [
   { to: '/?t=for-you', label: 'For You', queryAware: true },
 ] as const
 
-const activeClass = 'border-cyan-100/45 bg-gradient-to-r from-cyan-200 via-emerald-200 to-violet-200 text-[#01040a] shadow-[0_8px_26px_rgba(34,211,238,.12)]'
+// Latar zona aktif adalah satu bentuk bersama (OneShape) yang meluncur antar zona.
+const activeClass = 'border-transparent text-[#01040a]'
 const idleClass = 'border-transparent bg-transparent text-white/58 hover:border-white/[.09] hover:bg-white/[.045] hover:text-white'
 
 export function PanaceaZoneNav() {
@@ -28,11 +30,13 @@ export function PanaceaZoneNav() {
 
       <div className="h-6 w-px shrink-0 bg-white/[.07]" aria-hidden />
 
-      <div className="no-scrollbar flex min-w-0 flex-1 items-center gap-1 overflow-x-auto sm:justify-center sm:gap-1.5">
+      <div data-one-shape="explicit" className="no-scrollbar flex min-w-0 flex-1 items-center gap-1 overflow-x-auto sm:justify-center sm:gap-1.5">
+        <OneShape />
         {ZONES.map((zone) => (
           <NavLink
             key={zone.to}
             to={zone.to}
+            data-one-shape-active={String(zone.queryAware ? forYouActive : location.pathname === zone.to)}
             className={({ isActive }) => {
               const selected = zone.queryAware ? forYouActive : isActive
               return `grid h-11 min-w-[74px] shrink-0 place-items-center rounded-[13px] border px-2.5 text-[10px] font-black transition duration-200 active:scale-[.98] sm:min-w-[92px] sm:px-3 sm:text-[11px] ${selected ? activeClass : idleClass}`
