@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
-import { JENIS_LAB, ambilLab, tambahLab, umurHari, type ButirLab, type JenisLab } from '../lib/lab'
+import { JENIS_LAB, ambilLab, tambahLab, umurHari, periksaMasukanLab, type ButirLab, type JenisLab } from '../lib/lab'
 import { analisisTrenLab, type StatusTren } from '../lib/labTrend'
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -108,10 +108,21 @@ export function UbinLab() {
 
   const aktif = terisi.find((t) => t.jenis.id === pilih) ?? terisi[0]
 
+  const [galat, setGalat] = useState<string | null>(null)
+  // Peringatan satuan harus dikonfirmasi dengan menekan Save sekali lagi pada
+  // nilai yang sama; mengubah nilai/jenis/tanggal membatalkan konfirmasinya.
+  const [konfirmasi, setKonfirmasi] = useState<string | null>(null)
+  const [tersimpan, setTersimpan] = useState<string | null>(null)
+
   const simpanBaru = () => {
-    const n = Number(nilai.replace(',', '.'))
-    if (!Number.isFinite(n) || n <= 0) return
-    tambahLab(jenisId, tanggal, n)
+    const jenis = JENIS_LAB.find((j) => j.id === jenisId) ?? JENIS_LAB[0]
+    const h = periksaMasukanLab(jenis, nilai, tanggal, tanggalHariIni())
+    if (!h.ok) { setGalat(h.alasan); setKonfirmasi(null); return }
+    const kunci = `${jenisId}|${tanggal}|${h.nilai}`
+    if (h.periksaSatuan && konfirmasi !== kunci) { setGalat(h.periksaSatuan + ' Press Save again to keep it.'); setKonfirmasi(kunci); return }
+    tambahLab(jenisId, tanggal, h.nilai)
+    setGalat(null); setKonfirmasi(null)
+    setTersimpan(`Saved ${jenis.nama} ${h.nilai} ${jenis.satuan} · ${tanggal}`)
     setNilai('')
     setPilih(jenisId)
     setBuka(false)
@@ -131,7 +142,7 @@ export function UbinLab() {
           <div className="mb-3 border-b border-neutral-100 pb-3 dark:border-white/10">
             <select
               value={jenisId}
-              onChange={(e) => setJenisId(e.target.value)}
+              onChange={(e) => { setJenisId(e.target.value); setGalat(null); setKonfirmasi(null) }}
               aria-label="Test type"
               className="t-kecil w-full rounded-xl border border-neutral-200 bg-transparent px-2.5 py-2 text-ink dark:border-white/12 dark:text-white"
             >
@@ -143,7 +154,7 @@ export function UbinLab() {
               <input
                 inputMode="decimal"
                 value={nilai}
-                onChange={(e) => setNilai(e.target.value)}
+                onChange={(e) => { setNilai(e.target.value); setGalat(null); setKonfirmasi(null) }}
                 placeholder="Value"
                 aria-label="Result value"
                 className="t-kecil min-w-0 flex-1 rounded-xl border border-neutral-200 bg-transparent px-2.5 py-2 text-ink dark:border-white/12 dark:text-white"
@@ -151,18 +162,20 @@ export function UbinLab() {
               <input
                 type="date"
                 value={tanggal}
-                onChange={(e) => setTanggal(e.target.value)}
+                onChange={(e) => { setTanggal(e.target.value); setGalat(null); setKonfirmasi(null) }}
                 aria-label="Collection date"
                 className="t-kecil min-w-0 flex-1 rounded-xl border border-neutral-200 bg-transparent px-2 py-2 text-ink dark:border-white/12 dark:text-white"
               />
               <button onClick={simpanBaru} className="t-kecil shrink-0 rounded-xl bg-brand px-3 font-bold text-white">Save</button>
             </div>
+            {galat && <p role="alert" className="t-kecil mt-1.5 font-bold leading-snug text-amber-500">{galat}</p>}
             <p className="t-mikro mt-1.5 leading-snug text-neutral-400">
               The date blood was TAKEN, not the date the result came out — the gap between them can be days.
             </p>
           </div>
         )}
 
+        {tersimpan && !buka && <p role="status" className="t-mikro mb-2 font-bold text-brand">{tersimpan}</p>}
         {!aktif ? (
           <p className="t-kecil text-neutral-500">No results yet. Press “+ Add” to enter your first lab result.</p>
         ) : (

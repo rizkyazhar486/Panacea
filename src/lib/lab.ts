@@ -152,3 +152,38 @@ export function umurHari(butir: ButirLab[]): number | null {
   if (Number.isNaN(t)) return null
   return Math.floor((Date.now() - t) / 864e5)
 }
+
+// ── Pemeriksaan masukan sebelum disimpan ──────────────────────────────────
+// Satu angka yang salah masuk ke riwayat merusak tiga hal sekaligus: garis
+// dasar pribadi, tren, dan PhenoAge — dan hasilnya tetap TAMPAK meyakinkan.
+// Kesalahan paling lazim bukan salah ketik digit, melainkan salah SATUAN
+// (glukosa 5,4 mmol/L diketik ke kolom mg/dL). Ambang "periksa satuan" di sini
+// diturunkan dari rentang rujukan yang sudah tercatat di JENIS_LAB (di bawah
+// sepersepuluh batas bawah atau di atas sepuluh kali batas atas); tidak ada
+// angka klinis baru yang ditambahkan. Ini penjaga masukan, bukan penilaian.
+export type HasilPeriksaLab =
+  | { ok: false; alasan: string }
+  | { ok: true; nilai: number; periksaSatuan: string | null }
+
+export const FAKTOR_CURIGA_SATUAN = 10
+
+export function periksaMasukanLab(jenis: JenisLab, teks: string, tanggal: string, hariIniISO: string): HasilPeriksaLab {
+  const bersih = teks.trim().replace(',', '.')
+  if (!bersih) return { ok: false, alasan: 'Enter the result value.' }
+  if (!/^\d+(\.\d+)?$/.test(bersih)) return { ok: false, alasan: 'Use a plain number, e.g. 5.4 — no units or symbols.' }
+  const nilai = Number(bersih)
+  if (!Number.isFinite(nilai) || nilai <= 0) return { ok: false, alasan: 'The value must be greater than zero.' }
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(tanggal) || Number.isNaN(Date.parse(`${tanggal}T00:00:00Z`))) {
+    return { ok: false, alasan: 'Choose the date the blood was taken.' }
+  }
+  if (tanggal > hariIniISO) return { ok: false, alasan: 'The collection date cannot be in the future.' }
+  if (tanggal < '1900-01-01') return { ok: false, alasan: 'Check the collection date.' }
+
+  let periksaSatuan: string | null = null
+  if (typeof jenis.bawah === 'number' && nilai < jenis.bawah / FAKTOR_CURIGA_SATUAN) {
+    periksaSatuan = `${nilai} ${jenis.satuan} is far below the usual range (${jenis.bawah}–${jenis.atas ?? '…'}). Is your lab sheet in a different unit?`
+  } else if (typeof jenis.atas === 'number' && nilai > jenis.atas * FAKTOR_CURIGA_SATUAN) {
+    periksaSatuan = `${nilai} ${jenis.satuan} is far above the usual range (${jenis.bawah ?? '…'}–${jenis.atas}). Is your lab sheet in a different unit?`
+  }
+  return { ok: true, nilai, periksaSatuan }
+}
