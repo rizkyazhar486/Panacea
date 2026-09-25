@@ -27,6 +27,11 @@ const kasus = [
     aktual: navigationHierarchyForRoute('/fitness-hub', 'Fitness', 'Your Body'),
     harapan: ['Your Body', 'Move'],
   },
+  {
+    nama: 'ponsel memakai short label super-page tanpa taxonomy baru',
+    aktual: navigationHierarchyForRoute('/latihan', 'Fitness', 'Training', { compactSuperPage: true }),
+    harapan: ['Body', 'Move', 'Training'],
+  },
 ]
 
 for (const k of kasus) {
