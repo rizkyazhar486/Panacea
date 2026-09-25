@@ -24,7 +24,7 @@ assert.match(readFileSync('src/components/BagikanLabKeDokter.tsx', 'utf8'), /Rev
 // pasien, pergeseran berkelanjutan diurutkan paling atas, bukan tabel angka mati.
 assert.match(ui, /analisisTrenSeri\(/, 'tampilan dokter tidak lagi menghitung tren garis dasar pribadi')
 assert.match(ui, /\.sort\(\(x, y\) => \(x\.tren \? STATUS_KLINISI/, 'pergeseran berkelanjutan tidak lagi diurutkan di atas')
-assert.match(ui, /Monitoring signal, not an interpretation/, 'batas "sinyal pemantauan, bukan interpretasi" hilang')
+assert.match(ui, /a monitoring signal, not an interpretation/, 'batas "sinyal pemantauan, bukan interpretasi" hilang')
 
 // Regresi: rekam medis server tanpa pemeriksaan per sistem merobohkan Clinical untuk dokter.
 assert.doesNotThrow(() => buildBodyClinicalFindings(undefined))

@@ -82,7 +82,7 @@ export function LabPasienUntukDokter() {
                 )
               })}
           </ul>
-          <p className="mt-1 text-[10px] leading-snug text-white/40">Status compares each result with this patient's own earlier results (median ± 2 MAD); a sustained shift needs two consecutive results moving the same way. Monitoring signal, not an interpretation.</p>
+          <p className="mt-1 text-[10px] leading-snug text-white/40">Compared with this patient's own earlier results (median ± 2 MAD) — a monitoring signal, not an interpretation.</p>
           {kelompok.size === 0 && <p className="mt-1 text-[11px] text-white/55">This patient has no lab results yet.</p>}
         </div>
       )}
