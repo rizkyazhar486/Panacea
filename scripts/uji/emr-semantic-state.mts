@@ -1,3 +1,4 @@
+import { readFileSync } from 'node:fs'
 import assert from 'node:assert/strict'
 import { deriveEmrFieldStates } from '../../src/lib/emrSemanticState.ts'
 import type { EMRRecord } from '../../src/lib/types.ts'
@@ -42,4 +43,10 @@ assert.ok(Object.values(unsigned).every((s) => s.review === 'unreviewed'), 'clie
 const rejectedRecord = { ...base, plan: [{ id: 'no', category: 'Follow-up' as const, text: 'No', source: 'AI' as const, status: 'ditolak' as const }] }
 assert.equal(deriveEmrFieldStates(rejectedRecord)['plan.no'].review, 'clinician-rejected')
 
-console.log('emr-semantic-state: origin preserved, review per field, server identity required, rejection explicit')
+const emrUi = readFileSync('src/pages/EMR.tsx', 'utf8')
+assert.match(emrUi, /deriveEmrFieldStates\(draft as ServerAcceptedEmrForSemantics\)/, 'semantic state tidak dipakai oleh AI-EMR')
+assert.match(emrUi, /Clinical semantic state/, 'semantic state tidak terlihat oleh klinisi')
+assert.match(emrUi, /item\.origin/, 'asal field tidak ditampilkan')
+assert.match(emrUi, /item\.review/, 'status review field tidak ditampilkan')
+
+console.log('emr-semantic-state: origin preserved, review per field, server identity required, rejection explicit, visible in AI-EMR')
