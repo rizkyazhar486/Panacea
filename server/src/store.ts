@@ -775,10 +775,15 @@ function ensureClinical() {
 export function getClinical(): Clinical {
   return ensureClinical()
 }
-export function saveRecord(patientId: string, record: any) {
-  ensureClinical().records[patientId] = record
+export function getRecord(patientId: string) { return ensureClinical().records[patientId] }
+export function saveRecord(patientId: string, record: any, arsip?: any) {
+  const c = ensureClinical()
+  // Riwayat versi bertanda tangan — append-only, tidak dipangkas.
+  if (arsip) { (c as any).recordHistory ??= {}; ((c as any).recordHistory[patientId] ??= []).push(arsip) }
+  c.records[patientId] = record
   save()
 }
+export function getRecordHistory(patientId: string): any[] { return ((ensureClinical() as any).recordHistory ?? {})[patientId] ?? [] }
 export function saveEducation(patientId: string, sheet: any) {
   ensureClinical().education[patientId] = sheet
   save()

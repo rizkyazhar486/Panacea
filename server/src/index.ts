@@ -40,6 +40,8 @@ import {
   completeSecondOpinion,
   uid,
   getClinical,
+  getRecord,
+  getRecordHistory,
   saveRecord,
   saveEducation,
   addVital,
@@ -149,6 +151,7 @@ import { susunRencana, susunLaporan, laporanKeBundelFhir } from './carePlan.js'
 import { putusanPengingatCek, PESAN_PENGINGAT_CEK } from './pengingatCek.js'
 import { penyimpananSehat, status as statusSimpan } from './simpanAman.js'
 import { bolehAksesPasien, klinisiAtauPemilik, saringKlinis } from './aksesKlinis.js'
+import { terapkanSimpanRekam } from './rekamKlinis.js'
 import { sambung, protokolKini, susunPenilaian, susunKeselamatan, susunAdjudikasi, susunUsabilitas, type IdentitasPenilai } from './validasiLedger.js'
 import { parseHealthWebhookPayload, extractHeartRateSeries, extractSleepSessions, newestSampleDate } from './healthWebhook.js'
 import { checkHrZoneAlert, checkBedtimeReminder, checkWorkoutReminder, suggestedBedtime, ZONES } from './healthAlerts.js'
@@ -821,7 +824,10 @@ app.post('/api/clinical/record', requireAuth, (req, res) => {
   const { patientId, record } = req.body as { patientId?: string; record?: unknown }
   if (!patientId) return res.status(400).json({ error: 'missing_patientId' })
   const actor = (req as express.Request & { user: User }).user
-  saveRecord(patientId, record)
+  // Tanda tangan dicap server; non-klinisi tidak dapat menandatangani; versi bertanda tangan diarsipkan.
+  const hasil = terapkanSimpanRekam(getRecord(patientId), record, { id: actor.id, nama: actor.name, klinisi: klinisiAtauPemilik(actor, isOwner(actor)) }, new Date())
+  saveRecord(patientId, hasil.rekam, hasil.arsip)
+  if (hasil.arsip) addAudit(actor, 'emr.signed_version_archived', patientId)
   addAudit(actor, 'emr.save', patientId)
   // Notify the patient (if they have a linked account) that their EMR is ready.
   const patientUser = findUserBySelfPatientId(patientId)
@@ -832,7 +838,15 @@ app.post('/api/clinical/record', requireAuth, (req, res) => {
       url: './#/education',
     }, 'notifVitals').catch(() => {})
   }
-  res.json({ ok: true })
+  res.json({ ok: true, record: hasil.rekam })
+})
+
+// Riwayat versi rekam bertanda tangan (akses sama dengan rekamnya).
+app.get('/api/clinical/record-history/:patientId', requireAuth, (req, res) => {
+  const u = (req as express.Request & { user: User }).user
+  if (!bolehPasien(u, String(req.params.patientId))) return res.status(403).json({ error: 'no access to this patient record' })
+  addAudit(u, 'emr.history.read', String(req.params.patientId))
+  res.json({ history: getRecordHistory(String(req.params.patientId)) })
 })
 app.post('/api/clinical/education', requireAuth, (req, res) => {
   if (!bolehPasien((req as express.Request & { user: User }).user, String((req.body as { patientId?: unknown })?.patientId ?? ''))) return res.status(403).json({ error: 'no access to this patient record' })
