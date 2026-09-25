@@ -3,11 +3,20 @@ import type { BodySystemId } from './bodySystemSourceWave'
 export type AdrenalNodeKind = 'anatomy' | 'physiology' | 'pathophysiology' | 'pharmacology' | 'imaging'
 export type AdrenalEvidenceState = 'source-backed' | 'literature-backed' | 'educational-only'
 
+export type AdrenalEvidenceRole = 'anatomy-reference' | 'physiology-reference' | 'mechanism-reference' | 'pharmacology-reference' | 'imaging-reference'
+export type AdrenalReviewState = 'draft' | 'source-checked' | 'human-reviewed'
+
 export interface AdrenalEvidence {
   kind: 'atlas-source' | 'pubmed'
   id: string
   url?: string
   note: string
+  sourceType: 'repository-atlas-source' | 'peer-reviewed-review'
+  sourceLocator: string
+  accessedOrReviewedAt: string
+  claimScope: string
+  evidenceRole: AdrenalEvidenceRole
+  reviewState: AdrenalReviewState
 }
 
 export interface AdrenalEducationNode {
@@ -46,6 +55,12 @@ export const ADRENAL_EDUCATION_NODES: readonly AdrenalEducationNode[] = [
         kind: 'atlas-source',
         id: 'visceral.glb',
         note: 'Repository source bundle used only for gross adrenal orientation.',
+        sourceType: 'repository-atlas-source',
+        sourceLocator: 'visceral.glb',
+        accessedOrReviewedAt: '2026-09-25',
+        claimScope: 'Gross adrenal reference orientation only; this source binding does not establish microscopic zonation or patient anatomy.',
+        evidenceRole: 'anatomy-reference',
+        reviewState: 'draft',
       },
     ],
     boundary: 'Reference atlas geometry only; not patient-specific anatomy and not evidence for cortical zonation, medullary microarchitecture, vascular detail, receptor distribution, or measured gland volume.',
@@ -61,6 +76,12 @@ export const ADRENAL_EDUCATION_NODES: readonly AdrenalEducationNode[] = [
         id: '29764284',
         url: 'https://pubmed.ncbi.nlm.nih.gov/29764284/',
         note: 'Review describes glucocorticoid negative feedback and rhythmic regulation of the hypothalamic-pituitary-adrenal axis.',
+        sourceType: 'peer-reviewed-review',
+        sourceLocator: 'PMID:29764284; DOI:10.1080/10253890.2018.1470238',
+        accessedOrReviewedAt: '2026-09-25',
+        claimScope: 'Supports glucocorticoid negative feedback and circadian/ultradian rhythmic regulation in HPA-axis physiology.',
+        evidenceRole: 'physiology-reference',
+        reviewState: 'source-checked',
       },
     ],
     boundary: 'Educational physiology only; no person-level cortisol concentration, ACTH concentration, circadian phase, stress response, feedback gain, stimulation-test result, or adrenal reserve is inferred.',
@@ -76,6 +97,12 @@ export const ADRENAL_EDUCATION_NODES: readonly AdrenalEducationNode[] = [
         id: '29764284',
         url: 'https://pubmed.ncbi.nlm.nih.gov/29764284/',
         note: 'Review discusses altered glucocorticoid rhythmicity and feedback mechanisms in HPA-axis biology.',
+        sourceType: 'peer-reviewed-review',
+        sourceLocator: 'PMID:29764284; DOI:10.1080/10253890.2018.1470238',
+        accessedOrReviewedAt: '2026-09-25',
+        claimScope: 'Supports a bounded teaching relationship between disrupted glucocorticoid rhythmicity/feedback and disease-associated HPA-axis biology; not diagnosis or causation for a specific disorder.',
+        evidenceRole: 'mechanism-reference',
+        reviewState: 'source-checked',
       },
     ],
     boundary: 'Mechanism education only; does not diagnose adrenal insufficiency, hypercortisolism, pituitary disease, stress-related disease, or any other endocrine disorder.',
@@ -136,5 +163,18 @@ export function validateAdrenalEducationGraph() {
     (node) => node.evidenceState === 'source-backed' && !node.evidence.some((item) => item.kind === 'atlas-source'),
   )
   const boundaryMissing = ADRENAL_EDUCATION_NODES.filter((node) => !node.boundary.trim())
-  return { duplicateIds, danglingEdges, unsupportedLiteratureNodes, unsupportedSourceNodes, boundaryMissing }
+  const incompleteProvenance = ADRENAL_EDUCATION_NODES.flatMap((node) =>
+    node.evidence.filter((item) =>
+      !item.sourceType ||
+      !item.sourceLocator.trim() ||
+      !/^\\d{4}-\\d{2}-\\d{2}$/.test(item.accessedOrReviewedAt) ||
+      !item.claimScope.trim() ||
+      !item.evidenceRole ||
+      !item.reviewState,
+    ).map((item) => ({ nodeId: node.id, evidenceId: item.id })),
+  )
+  const falseHumanReviewClaims = ADRENAL_EDUCATION_NODES.flatMap((node) =>
+    node.evidence.filter((item) => item.reviewState === 'human-reviewed').map((item) => ({ nodeId: node.id, evidenceId: item.id })),
+  )
+  return { duplicateIds, danglingEdges, unsupportedLiteratureNodes, unsupportedSourceNodes, boundaryMissing, incompleteProvenance, falseHumanReviewClaims }
 }
