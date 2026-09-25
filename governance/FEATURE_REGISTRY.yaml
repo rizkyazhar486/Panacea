@@ -171,6 +171,6 @@ features:
     provenance_required: true
     tests: [see governance/MATURITY_REGISTRY.yaml longitudinal.lab_to_trajectory]
     observability: [requires_repository_audit]
-    known_gaps: [not_projected_into_canonical_longitudinal_state, wearable_and_non_lab_signals_not_audited]
-    next_actions: [project_lab_observations_into_canonical_longitudinal_state]
+    known_gaps: [canonical_state_built_client_side_only, wearable_and_non_lab_signals_not_audited]
+    next_actions: [project_canonical_state_into_body_exposure_and_timeline]
     last_audited_commit: 0cb6906a
