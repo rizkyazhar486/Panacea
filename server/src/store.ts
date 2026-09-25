@@ -8,7 +8,8 @@ import { randomBytes } from 'node:crypto'
 import { KATALOG } from './healthMetrics.js'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
-const DB_PATH = join(__dirname, '..', 'data.json')
+// PANACEA_DATA_FILE memisahkan berkas data uji dari data dev lokal (uji tidak boleh menimpa data.json).
+const DB_PATH = process.env.PANACEA_DATA_FILE || join(__dirname, '..', 'data.json')
 
 export type Role = 'pasien' | 'dokter' | 'kontributor' | 'verifikator' | 'admin' | 'owner'
 
