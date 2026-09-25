@@ -26,6 +26,12 @@ assert.equal(ubahIsi.rekam.signedById, undefined, 'identitas penanda tangan lama
 assert.equal(ubahIsi.rekam.signedAt, undefined, 'waktu tanda tangan lama melekat pada isi baru')
 assert.ok(ubahIsi.arsip?.signedBy === 'Dr. Asli', 'versi klinis bertanda tangan lama harus tetap diarsipkan')
 
+// Temuan pemeriksaan fisik yang diubah pasien juga harus kehilangan cap verifikasi dokter.
+const ubahFisik = terapkanSimpanRekam(tt, { ...tt, physicalExam: { ...tt.physicalExam, general: 'diubah pasien' } }, pasien, kini).rekam
+assert.equal(ubahFisik.physicalExam.doctorVerified, false, 'temuan fisik baru masih terlihat diverifikasi dokter')
+assert.equal(ubahFisik.physicalExam.verifiedBy, undefined, 'nama verifikator lama melekat pada temuan fisik baru')
+assert.equal(ubahFisik.physicalExam.verifiedById, undefined, 'id verifikator lama melekat pada temuan fisik baru')
+
 // Pasien menyimpan ulang rekam bertanda tangan untuk consent pasien saja → tanda tangan klinis tetap.
 const setuju = terapkanSimpanRekam(tt, { ...tt, surgery: { consent: { given: true } } }, pasien, kini)
 assert.equal(setuju.rekam.signedBy, 'Dr. Asli'); assert.ok(setuju.arsip, 'perubahan pada rekam bertanda tangan tidak diarsipkan')
