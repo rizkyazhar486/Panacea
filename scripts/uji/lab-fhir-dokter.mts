@@ -37,6 +37,19 @@ assert.match(ui, /a monitoring signal, not an interpretation/, 'batas "sinyal pe
   assert.match(readFileSync('src/components/UbinLab.tsx', 'utf8'), /— clinician note/, 'catatan dokter tidak diberi label penulisnya di sisi pasien')
 }
 
+// Notifikasi: dokter saat dibagikan, pasien saat ditinjau — tanpa nama/nilai
+// di isi (push bisa tampil di layar kunci).
+{
+  const bagi = srv.slice(srv.indexOf("app.post('/api/lab-log/shares'"), srv.indexOf("app.delete('/api/lab-log/shares/:id'"))
+  assert.match(bagi, /notify\(dokter\.id, \{ title: 'Lab results shared with you'/, 'dokter tidak diberi tahu saat pasien berbagi')
+  const tinjau = srv.slice(srv.indexOf("app.post('/api/clinician/lab-shares/:id/review'"), srv.indexOf("app.post('/api/clinician/lab-shares/:id/review'") + 1400)
+  assert.match(tinjau, /notify\(pasien\.id, \{ title: 'Your doctor reviewed a lab result'/, 'pasien tidak diberi tahu saat hasilnya ditinjau')
+  for (const blok of [bagi, tinjau]) {
+    const isi = [...blok.matchAll(/notify\([^)]*\{([^}]*)\}/g)].map((m) => m[1]).join(' ')
+    assert.doesNotMatch(isi, /\$\{|nilai|catatan|pasien\.name|izin\.pasienEmail/, 'isi notifikasi memuat data kesehatan/identitas')
+  }
+}
+
 // Regresi: rekam medis server tanpa pemeriksaan per sistem merobohkan Clinical untuk dokter.
 assert.doesNotThrow(() => buildBodyClinicalFindings(undefined))
 assert.doesNotThrow(() => buildBodyClinicalFindings(null))

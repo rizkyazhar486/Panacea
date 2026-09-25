@@ -924,6 +924,9 @@ app.post('/api/lab-log/shares', requireAuth, (req, res) => {
     }
     addLabShare(izin)
     addLabAudit({ waktu: izin.dibuat, pasienEmail: u.email, aktor: u.email, aksi: 'izin-dibuat', izinId: izin.id })
+    // Tanpa nama/nilai di isi notifikasi: push bisa tampil di layar kunci.
+    const dokter = getUserByEmail(izin.dokterEmail)
+    if (dokter) void notify(dokter.id, { title: 'Lab results shared with you', body: 'A patient gave you read access. Open Clinical to review.', url: '/clinical-hub' }).catch((e) => console.warn('[lab-share] notify failed', (e as Error).message))
     res.json(izin)
   } catch (e) {
     res.status(400).json({ error: (e as Error).message })
@@ -972,6 +975,8 @@ app.post('/api/clinician/lab-shares/:id/review', requireAuth, (req, res) => {
     const t = buatTinjauan(izin, req.body as Record<string, unknown>, kini)
     addLabReview(t)
     addLabAudit({ waktu: t.ditinjau, pasienEmail: izin.pasienEmail, aktor: u.email, aksi: 'ditinjau-dokter', izinId: izin.id })
+    const pasien = getUserByEmail(izin.pasienEmail)
+    if (pasien) void notify(pasien.id, { title: 'Your doctor reviewed a lab result', body: 'Open your lab results to see the review.', url: '/tubuh' }).catch((e) => console.warn('[lab-review] notify failed', (e as Error).message))
     res.json(t)
   } catch (e) {
     res.status(400).json({ error: (e as Error).message })

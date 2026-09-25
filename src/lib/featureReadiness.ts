@@ -54,7 +54,7 @@ export const FEATURE_READINESS: readonly FeatureReadiness[] = [
     requiresWebGL: false,
     productionReady: false,
     lastValidated: '2026-09-25',
-    notes: 'Flagship workflow. Working: guarded entry (reason on reject, no future dates, unit-mismatch confirm), correction/delete, personal baseline + trend (median ± 2 MAD, two-point confirmation), PhenoAge trajectory with named missing markers, server sync (last-write-wins, retry), FHIR R4 Observations (LOINC only from the verified registry; hs-CRP and 8 analytes uncoded), patient consent to one verified clinician with revoke + audit, clinician trend view, clinician review with note and recheck date shown to the patient ("Recheck due" when reached). Missing: notification on share/review, photo/PDF import, reference ranges per reporting lab, prospective clinician validation (none yet; engineering correctness only).',
+    notes: 'Flagship workflow. Working: guarded entry (reason on reject, no future dates, unit-mismatch confirm), correction/delete, personal baseline + trend (median ± 2 MAD, two-point confirmation), PhenoAge trajectory with named missing markers, server sync (last-write-wins, retry), FHIR R4 Observations (LOINC only from the verified registry; hs-CRP and 8 analytes uncoded), patient consent to one verified clinician with revoke + audit, clinician trend view, clinician review with note and recheck date shown to the patient ("Recheck due" when reached), in-app + push notification on share and on review (no PHI in the notification text). Missing: photo/PDF import, reference ranges per reporting lab, prospective clinician validation (none yet; engineering correctness only).',
   },
   {
     id: 'body-explorer',
