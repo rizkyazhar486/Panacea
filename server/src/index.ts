@@ -139,7 +139,7 @@ import { disburse, irisLive } from './iris.js'
 import { KATALOG, KATEGORI } from './healthMetrics.js'
 import { validasiLogLab, validasiCapWaktu, terimaTulisan } from './labLog.js'
 import { logKeBundelFhir, buatIzin, izinBerlaku, buatTinjauan } from './labFhir.js'
-import { susunRencana, susunLaporan } from './carePlan.js'
+import { susunRencana, susunLaporan, laporanKeBundelFhir } from './carePlan.js'
 import { parseHealthWebhookPayload, extractHeartRateSeries, extractSleepSessions, newestSampleDate } from './healthWebhook.js'
 import { checkHrZoneAlert, checkBedtimeReminder, checkWorkoutReminder, suggestedBedtime, ZONES } from './healthAlerts.js'
 import { fetchLeagueScoreboard, fetchF1Info, fetchMotoGpInfo, LEAGUES, UNAVAILABLE } from './sports.js'
@@ -1009,6 +1009,20 @@ app.post('/api/clinician/lab-shares/:id/care-plan', requireAuth, (req, res) => {
     res.status(400).json({ error: (e as Error).message })
   }
 })
+// Ekspor FHIR R4 (Questionnaire + QuestionnaireResponse) — izin berlaku, diaudit.
+app.get('/api/clinician/lab-shares/:id/care/fhir', requireAuth, (req, res) => {
+  const u = (req as express.Request & { user: User }).user
+  if (u.role !== 'dokter') { res.status(403).json({ error: 'verified clinician role required' }); return }
+  const kini = new Date()
+  const izin = listLabShares().find((i) => i.id === String(req.params.id))
+  if (!izinBerlaku(izin, u.email, kini)) { res.status(404).json({ error: 'no active access' }); return }
+  const p = listCarePlans().find((x) => x.pasienEmail === izin.pasienEmail && x.dokterEmail === u.email && !x.dicabut)
+  if (!p) { res.status(404).json({ error: 'no daily plan' }); return }
+  addLabAudit({ waktu: kini.toISOString(), pasienEmail: izin.pasienEmail, aktor: u.email, aksi: 'dibaca-dokter', izinId: izin.id })
+  const pasienRef = `Patient/${getUserByEmail(izin.pasienEmail)?.id ?? 'unknown'}`
+  res.type('application/fhir+json').json(laporanKeBundelFhir(p.rencana, listCareReports(izin.pasienEmail, p.rencana.id), pasienRef, kini.toISOString()))
+})
+
 app.get('/api/clinician/lab-shares/:id/care', requireAuth, (req, res) => {
   const u = (req as express.Request & { user: User }).user
   if (u.role !== 'dokter') { res.status(403).json({ error: 'verified clinician role required' }); return }

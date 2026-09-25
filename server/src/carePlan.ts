@@ -11,6 +11,7 @@
 // Server tidak menambah aturan klinis, ambang, atau red flag apa pun.
 
 import { randomBytes } from 'node:crypto'
+import { uuidStabil } from './labFhir.js'
 
 export type JenisPertanyaan = 'boolean' | 'number' | 'text' | 'choice'
 export interface PertanyaanRencana {
@@ -132,5 +133,58 @@ export function susunLaporan(rencana: RencanaPerawatan, masukan: unknown, kini: 
   return {
     id: `daily-${randomBytes(8).toString('hex')}`, planId: rencana.id, planVersion: rencana.version,
     subjectId: rencana.subjectId, scheduledFor: `${tanggal}T00:00:00.000Z`, authoredAt: kini.toISOString(), answers,
+  }
+}
+
+// ── Ekspor FHIR R4: Questionnaire + QuestionnaireResponse ────────────────
+// Jawaban MENTAH pasien saja (patient-reported). Prioritas/aturan yang
+// terpicu TIDAK diekspor: itu dihitung ulang oleh kernel di peramban dokter,
+// dan menuliskannya di sini akan membuat server tampak menilai secara klinis.
+
+export function laporanKeBundelFhir(rencana: RencanaPerawatan, laporan: LaporanHarian[], pasienRef: string, dibuat: string) {
+  const qUrl = `urn:uuid:${uuidStabil(`Questionnaire/${rencana.id}/${rencana.version}`)}`
+  const canonical = `https://panaceamed.id/fhir/Questionnaire/${rencana.questionnaireId}|${rencana.version}`
+  const tipe = { boolean: 'boolean', number: 'decimal', text: 'string', choice: 'choice' } as const
+  const questionnaire = {
+    resourceType: 'Questionnaire', url: canonical.split('|')[0], version: rencana.version, status: 'active',
+    title: 'Daily check-in', subjectType: ['Patient'], date: dibuat,
+    item: rencana.questions.map((q) => ({
+      linkId: q.id, text: q.prompt, type: tipe[q.kind], required: q.required,
+      ...(q.choices ? { answerOption: q.choices.map((c) => ({ valueString: c })) } : {}),
+    })),
+  }
+  const qrs = laporan.filter((l) => l.planId === rencana.id).map((l) => {
+    const url = `urn:uuid:${uuidStabil(`QuestionnaireResponse/${l.id}`)}`
+    const item = l.answers.map((a) => {
+      const q = rencana.questions.find((x) => x.id === a.questionId)!
+      const answer = typeof a.value === 'boolean' ? { valueBoolean: a.value }
+        : typeof a.value === 'number' ? (q.unit ? { valueQuantity: { value: a.value, unit: q.unit } } : { valueDecimal: a.value })
+        : q.kind === 'choice' ? { valueString: a.value } : { valueString: a.value }
+      return { linkId: q.id, text: q.prompt, answer: [answer] }
+    })
+    return { fullUrl: url, resource: {
+      resourceType: 'QuestionnaireResponse', identifier: { system: 'https://panaceamed.id/fhir/NamingSystem/daily-checkin', value: l.id },
+      questionnaire: canonical, status: 'completed', subject: { reference: pasienRef },
+      authored: l.authoredAt, author: { reference: pasienRef }, source: { reference: pasienRef },
+      extension: [{ url: 'https://panaceamed.id/fhir/StructureDefinition/scheduled-for', valueDate: l.scheduledFor.slice(0, 10) }],
+      item,
+    } }
+  })
+  const provenance = {
+    resourceType: 'Provenance', recorded: dibuat,
+    target: [{ reference: qUrl }, ...qrs.map((x) => ({ reference: x.fullUrl }))],
+    agent: [
+      { type: { text: 'author' }, who: { reference: pasienRef }, onBehalfOf: undefined },
+      { type: { text: 'questionnaire author' }, who: { display: 'Clinician who authored the daily plan' } },
+    ].map((a) => JSON.parse(JSON.stringify(a))),
+    entity: [{ role: 'source', what: { display: 'Patient-reported answers; review priority is not included (recomputed by the clinician client)' } }],
+  }
+  return {
+    resourceType: 'Bundle', type: 'collection', timestamp: dibuat,
+    entry: [
+      { fullUrl: qUrl, resource: questionnaire },
+      ...qrs,
+      { fullUrl: `urn:uuid:${uuidStabil(`Provenance/care/${rencana.id}/${dibuat}`)}`, resource: provenance },
+    ],
   }
 }
