@@ -153,7 +153,7 @@ export function LabPasienUntukDokter() {
               </details>
             )
           })()}
-          <RencanaHarianDokter izinId={buka.izinId} />
+          <RencanaHarianDokter izinId={buka.izinId} state={statusPasienUntukDokter(buka.bundle.entry as never, care, buka.reviews, buka, new Date().toISOString()).state} />
         </div>
       )}
     </section>

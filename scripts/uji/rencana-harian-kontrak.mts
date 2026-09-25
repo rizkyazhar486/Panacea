@@ -19,7 +19,7 @@ const r = susunRencana(masukan, 'pasien-A', 'dokter-D', kini)
 assert.equal(r.subjectId, 'pasien-A', 'subjectId diambil dari payload, bukan dari identitas server')
 assert.equal(r.clinicianId, 'dokter-D', 'clinicianId diambil dari payload, bukan dari identitas server')
 assert.equal(validateContinuousCarePlan(r as never), true)
-assert.deepEqual(r.measurementReviewRules, [], 'aturan ambang pengukuran masuk tanpa jalur bukti/verifikator')
+assert.deepEqual(r.measurementReviewRules, [], 'tanpa aturan lab di payload, rencana tidak boleh mengarang aturan ambang')
 assert.equal(buildDailyInterview(r as never, '2026-09-25T00:00:00.000Z').questions.length, 3)
 
 const lap = susunLaporan(r, { scheduledFor: '2026-09-25', answers: [{ questionId: 'pusing', value: true }, { questionId: 'obat', value: 'Missed a dose' }] }, kini)
