@@ -18,7 +18,7 @@ export function kanonik(v: unknown): string {
 }
 export const sidik = (v: unknown) => createHash('sha256').update(kanonik(v)).digest('hex')
 
-export type JenisCatatan = 'protokol' | 'kasus' | 'penilaian' | 'adjudikasi' | 'keselamatan'
+export type JenisCatatan = 'protokol' | 'kasus' | 'penilaian' | 'adjudikasi' | 'keselamatan' | 'usabilitas'
 export interface CatatanLedger { urutan: number; isi: { jenis: JenisCatatan; data: any }; sidikSebelum: string; sidik: string }
 
 export function sambung(buku: readonly CatatanLedger[], isi: CatatanLedger['isi']): CatatanLedger {
@@ -69,4 +69,30 @@ export function susunKeselamatan(masukan: any, pelapor: string, kini: Date, id: 
   const jenis = m.jenis === 'harm' ? 'harm' : 'near-miss'
   const tingkat = BAHAYA.includes(m.tingkat) ? m.tingkat : 'minor'
   return { id, waktu: kini.toISOString(), jenis, tingkat, ...(m.kasusId ? { kasusId: String(m.kasusId).slice(0, 80) } : {}), deskripsi, pelapor }
+}
+
+/** Adjudikasi: klinisi terverifikasi yang BUKAN penilai kasus itu, hanya bila ada ketidaksepakatan, sekali per kasus. */
+export function susunAdjudikasi(buku: readonly CatatanLedger[], masukan: any, adjudikator: IdentitasPenilai, kini: Date) {
+  const m = masukan ?? {}
+  const kasusId = String(m.kasusId ?? '')
+  if (!buku.some((c) => c.isi.jenis === 'kasus' && c.isi.data.id === kasusId)) throw new Error('unknown case')
+  if (!adjudikator.kredensialTerverifikasi) throw new Error('verified clinician credentials required')
+  const nilai = buku.filter((c) => c.isi.jenis === 'penilaian' && c.isi.data.kasusId === kasusId).map((c) => c.isi.data)
+  if (nilai.some((n) => n.penilai.id === adjudikator.id)) throw new Error('the adjudicator must not be one of the case reviewers')
+  if (new Set(nilai.map((n) => n.benar)).size < 2) throw new Error('there is no disagreement to adjudicate on this case')
+  if (buku.some((c) => c.isi.jenis === 'adjudikasi' && c.isi.data.kasusId === kasusId)) throw new Error('this case is already adjudicated')
+  if (typeof m.keputusanBenar !== 'boolean') throw new Error('state the adjudicated decision')
+  const alasan = teks(m.alasan, 1000)
+  if (!alasan) throw new Error('an adjudication needs a reason')
+  return { kasusId, adjudikator, waktu: kini.toISOString(), keputusanBenar: m.keputusanBenar, alasan }
+}
+
+/** SUS: 10 jawaban 1–5, satu per penilai per studi. */
+export function susunUsabilitas(buku: readonly CatatanLedger[], protokolId: string, masukan: any, penilaiId: string, kini: Date) {
+  if (!protokolKini(buku, protokolId)) throw new Error('unknown study')
+  const j = masukan?.jawaban
+  if (!Array.isArray(j) || j.length !== 10 || j.some((x: unknown) => !Number.isInteger(x) || (x as number) < 1 || (x as number) > 5)) throw new Error('SUS needs 10 answers from 1 to 5')
+  if (buku.some((c) => c.isi.jenis === 'usabilitas' && c.isi.data.protokolId === protokolId && c.isi.data.penilaiId === penilaiId)) throw new Error('one usability response per reviewer per study')
+  const komentar = teks(masukan?.komentar, 1000)
+  return { protokolId, penilaiId, waktu: kini.toISOString(), jawaban: j as number[], ...(komentar ? { komentar } : {}) }
 }

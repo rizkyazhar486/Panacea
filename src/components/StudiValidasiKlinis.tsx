@@ -45,6 +45,7 @@ export function StudiValidasiKlinis({ pemimpin = false }: { pemimpin?: boolean }
           </li>
         ))}
       </ul>
+      {studi && studi.length > 0 && !pemimpin && <AntreanAdjudikasi protokolId={studi[0].protokol.id} />}
       {aktif && <PenilaiKasus studi={aktif} onSelesai={() => { void buka(aktif.protokol.id); api.validationStudies().then((r) => setStudi(r.studies)).catch(() => {}) }} />}
       {laporan && <LaporanStudi laporan={laporan} />}
     </section>
@@ -58,7 +59,12 @@ function PenilaiKasus({ studi, onSelesai }: { studi: { protokol: Protokol; cases
   const [kirim, setKirim] = useState(false)
   const [pesan, setPesan] = useState<string | null>(null)
   useEffect(() => { mulai.current = Date.now(); setF((x) => ({ ...x, benar: null, bahaya: 'none', klaim: '0', omisi: '', override: false, alasan: '', catatan: '' })) }, [kasus?.id])
-  if (!kasus) return <p className="mt-2 text-[12px] font-bold text-emerald-300" data-validation-done>All cases in this study are assessed. Thank you.</p>
+  if (!kasus) return (
+    <div className="mt-2" data-validation-done>
+      <p className="text-[12px] font-bold text-emerald-300">All cases in this study are assessed. Thank you.</p>
+      <FormulirSus protokolId={studi.protokol.id} />
+    </div>
+  )
   const m = kasus.masukan as MasukanSeri, k = kasus.keluaran as KeluaranTren
   const selesai = studi.cases.filter((c) => c.sudahSaya).length
 
@@ -127,6 +133,68 @@ function LaporKeselamatan({ kasusId }: { kasusId: string }) {
   )
 }
 
+// System Usability Scale (Brooke 1996), kata-kata baku domain publik.
+const BUTIR_SUS = [
+  'I think that I would like to use this system frequently.',
+  'I found the system unnecessarily complex.',
+  'I thought the system was easy to use.',
+  'I think that I would need the support of a technical person to be able to use this system.',
+  'I found the various functions in this system were well integrated.',
+  'I thought there was too much inconsistency in this system.',
+  'I would imagine that most people would learn to use this system very quickly.',
+  'I found the system very cumbersome to use.',
+  'I felt very confident using the system.',
+  'I needed to learn a lot of things before I could get going with this system.',
+]
+function FormulirSus({ protokolId }: { protokolId: string }) {
+  const [j, setJ] = useState<(number | null)[]>(Array(10).fill(null)), [pesan, setPesan] = useState<string | null>(null), [selesai, setSelesai] = useState(false)
+  if (selesai) return <p role="status" className="mt-1 text-[11px] text-emerald-300" data-sus-done>Usability response recorded.</p>
+  return (
+    <div className="mt-2 grid gap-1.5 text-[11px]" data-sus-form>
+      <p className="font-black">How was this review workflow? (System Usability Scale, 1 = strongly disagree, 5 = strongly agree)</p>
+      {BUTIR_SUS.map((b, i) => (
+        <div key={i}>
+          <p className="text-white/75">{i + 1}. {b}</p>
+          <div className="mt-0.5 flex gap-1">{[1, 2, 3, 4, 5].map((n) => (
+            <button key={n} type="button" aria-pressed={j[i] === n} aria-label={`Item ${i + 1}: ${n}`} onClick={() => setJ(j.map((x, k) => (k === i ? n : x)))}
+              className={`min-h-9 flex-1 rounded-md border text-[11px] font-black ${j[i] === n ? 'border-cyan-300/60 bg-cyan-400/15' : 'border-white/15'}`}>{n}</button>
+          ))}</div>
+        </div>
+      ))}
+      <button type="button" className="min-h-11 rounded-xl border border-white/15 font-black" onClick={() => {
+        if (j.some((x) => x === null)) { setPesan('Answer all 10 items.'); return }
+        api.submitValidationUsability(protokolId, { jawaban: j }).then(() => setSelesai(true)).catch((e) => setPesan((e as Error).message))
+      }}>Submit usability response</button>
+      {pesan && <p role="alert" className="font-bold text-amber-300">{pesan}</p>}
+    </div>
+  )
+}
+
+function AntreanAdjudikasi({ protokolId }: { protokolId: string }) {
+  const [daftar, setDaftar] = useState<Awaited<ReturnType<typeof api.validationDisagreements>>['cases'] | null>(null)
+  const [alasan, setAlasan] = useState(''), [pesan, setPesan] = useState<string | null>(null)
+  const muat = () => api.validationDisagreements(protokolId).then((r) => setDaftar(r.cases)).catch((e) => setPesan((e as Error).message))
+  if (!daftar) return <button type="button" onClick={() => void muat()} className="mt-2 min-h-10 rounded-full border border-white/15 px-3 text-[11px] font-black">Adjudication queue</button>
+  const d = daftar[0]
+  if (!d) return <p className="mt-2 text-[11px] text-white/55" data-adjudication-empty>No disagreement awaits adjudication by you (cases you reviewed are excluded).</p>
+  const k = d.kasus.keluaran as { status: string; alasan: string } | null
+  return (
+    <div className="mt-3 border-t border-white/10 pt-3 text-[11px]" data-adjudication-case={d.kasus.id}>
+      <p className="text-[10px] font-black uppercase tracking-wide text-white/45">Adjudication · {daftar.length} open · you did not review this case</p>
+      <p className="mt-1 font-bold">{LABEL_STATUS[k?.status ?? ''] ?? k?.status}: <span className="font-normal text-white/70">{k?.alasan}</span></p>
+      <ul className="mt-1 space-y-0.5">{d.penilaian.map((p, i) => <li key={i}>Reviewer {i + 1}: {p.benar ? 'correct' : 'incorrect'} · harm {p.bahaya}{p.override.dilakukan ? ` · override: ${p.override.alasan}` : ''}</li>)}</ul>
+      <input value={alasan} onChange={(e) => setAlasan(e.target.value)} placeholder="Adjudication reason — required" aria-label="Adjudication reason" className="mt-1 w-full rounded-md border border-white/15 bg-transparent px-2 py-1 text-white" />
+      <div className="mt-1 flex gap-1.5">{[true, false].map((v) => (
+        <button key={String(v)} type="button" className="min-h-10 flex-1 rounded-lg border border-white/15 font-black" onClick={() => {
+          if (!alasan.trim()) { setPesan('An adjudication needs a reason.'); return }
+          api.submitValidationAdjudication({ kasusId: d.kasus.id, keputusanBenar: v, alasan }).then(() => { setAlasan(''); setPesan(null); void muat() }).catch((e) => setPesan((e as Error).message))
+        }}>{v ? 'Output is correct' : 'Output is incorrect'}</button>
+      ))}</div>
+      {pesan && <p role="alert" className="mt-1 font-bold text-amber-300">{pesan}</p>}
+    </div>
+  )
+}
+
 const pct = (v: number | null) => (v == null ? '—' : `${(v * 100).toFixed(1)}%`)
 function LaporanStudi({ laporan: r }: { laporan: LaporanValidasi }) {
   const unduh = () => {
@@ -138,7 +206,7 @@ function LaporanStudi({ laporan: r }: { laporan: LaporanValidasi }) {
     <div className="mt-3 border-t border-white/10 pt-3 text-[11px]" data-validation-report={r.status}>
       <p className="font-black">{r.status === 'no-human-data' ? 'No human assessments yet — nothing below is a result.' : r.status === 'in-progress' ? 'In progress — endpoints are not yet evaluable.' : 'All cases assessed by the required reviewers.'}</p>
       <p className={r.rantai.utuh ? 'text-emerald-300' : 'font-bold text-rose-300'}>Audit chain: {r.rantai.utuh ? 'intact' : `BROKEN at record ${r.rantai.pada} (${r.rantai.alasan})`}</p>
-      <p className="text-white/55">{r.metrik.penilaian} assessments · {r.metrik.kasusDinilai} cases · κ {r.metrik.kappa.kappa?.toFixed(2) ?? '—'} (n={r.metrik.kappa.n}) · near-miss {r.metrik.kejadianKeselamatan.nearMiss} · harm {r.metrik.kejadianKeselamatan.harm}</p>
+      <p className="text-white/55">{r.metrik.penilaian} assessments · {r.metrik.kasusDinilai} cases · κ {r.metrik.kappa.kappa?.toFixed(2) ?? '—'} (n={r.metrik.kappa.n}) · near-miss {r.metrik.kejadianKeselamatan.nearMiss} · harm {r.metrik.kejadianKeselamatan.harm} · SUS median {r.metrik.sus.median ?? '—'} (n={r.metrik.sus.n}) · open disagreements {r.metrik.ketidaksepakatanBelumDiadjudikasi.length}</p>
       <ul className="mt-1 space-y-0.5">
         {r.titikAkhir.map((t) => (
           <li key={t.metrik} data-endpoint={t.metrik}>{t.metrik}: {t.metrik === 'time-to-review-ms' ? (t.nilai == null ? '—' : `${Math.round(t.nilai / 1000)} s`) : t.metrik === 'inter-rater-kappa' ? (t.nilai?.toFixed(2) ?? '—') : pct(t.nilai)} · target {t.ambang.arah === 'min' ? '≥' : '≤'} {t.ambang.nilai} · {t.terpenuhi == null ? 'not evaluable' : t.terpenuhi ? 'met' : 'not met'}</li>

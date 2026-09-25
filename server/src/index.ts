@@ -148,7 +148,7 @@ import { logKeBundelFhir, buatIzin, izinBerlaku, buatTinjauan } from './labFhir.
 import { susunRencana, susunLaporan, laporanKeBundelFhir } from './carePlan.js'
 import { putusanPengingatCek, PESAN_PENGINGAT_CEK } from './pengingatCek.js'
 import { penyimpananSehat, status as statusSimpan } from './simpanAman.js'
-import { sambung, protokolKini, susunPenilaian, susunKeselamatan, type IdentitasPenilai } from './validasiLedger.js'
+import { sambung, protokolKini, susunPenilaian, susunKeselamatan, susunAdjudikasi, susunUsabilitas, type IdentitasPenilai } from './validasiLedger.js'
 import { parseHealthWebhookPayload, extractHeartRateSeries, extractSleepSessions, newestSampleDate } from './healthWebhook.js'
 import { checkHrZoneAlert, checkBedtimeReminder, checkWorkoutReminder, suggestedBedtime, ZONES } from './healthAlerts.js'
 import { fetchLeagueScoreboard, fetchF1Info, fetchMotoGpInfo, LEAGUES, UNAVAILABLE } from './sports.js'
@@ -1750,6 +1750,41 @@ app.post('/api/validation/safety-events', requireAuth, (req, res) => {
     const data = susunKeselamatan(req.body, u.id, new Date(), `safety-${buku.length}`)
     const c = sambung(buku, { jenis: 'keselamatan', data }); tambahLedgerValidasi(c)
     res.json({ ok: true, urutan: c.urutan })
+  } catch (e) { res.status(400).json({ error: (e as Error).message }) }
+})
+
+// Antrean adjudikasi: kasus dengan ketidaksepakatan yang BUKAN dinilai klinisi ini.
+// Adjudikator memang harus melihat kedua penilaian kasus itu — hanya kasus itu.
+app.get('/api/validation/:id/disagreements', requireAuth, (req, res) => {
+  const u = (req as express.Request & { user: User }).user
+  if (!bolehMenilai(u)) { res.status(403).json({ error: 'verified clinician role required' }); return }
+  const buku = bacaLedgerValidasi(), id = String(req.params.id)
+  const kasus = buku.filter((c) => c.isi.jenis === 'kasus' && c.isi.data.protokolId === id).map((c) => c.isi.data)
+  const sudahAdj = new Set(buku.filter((c) => c.isi.jenis === 'adjudikasi').map((c) => c.isi.data.kasusId))
+  res.json({ cases: kasus.flatMap((k) => {
+    const n = buku.filter((c) => c.isi.jenis === 'penilaian' && c.isi.data.kasusId === k.id).map((c) => c.isi.data)
+    if (sudahAdj.has(k.id) || new Set(n.map((x) => x.benar)).size < 2 || n.some((x) => x.penilai.id === u.id)) return []
+    return [{ kasus: k, penilaian: n.map((x) => ({ benar: x.benar, bahaya: x.bahaya, omisi: x.omisi, override: x.override, klaimTakDidukung: x.klaimTakDidukung })) }]
+  }) })
+})
+
+app.post('/api/validation/adjudications', requireAuth, (req, res) => {
+  const u = (req as express.Request & { user: User }).user
+  if (!bolehMenilai(u)) { res.status(403).json({ error: 'verified clinician role required' }); return }
+  try {
+    const buku = bacaLedgerValidasi()
+    const c = sambung(buku, { jenis: 'adjudikasi', data: susunAdjudikasi(buku, req.body, penilaiDari(u, req.body?.konflikKepentingan), new Date()) })
+    tambahLedgerValidasi(c); res.json({ ok: true, urutan: c.urutan })
+  } catch (e) { res.status(400).json({ error: (e as Error).message }) }
+})
+
+app.post('/api/validation/:id/usability', requireAuth, (req, res) => {
+  const u = (req as express.Request & { user: User }).user
+  if (!bolehMenilai(u)) { res.status(403).json({ error: 'verified clinician role required' }); return }
+  try {
+    const buku = bacaLedgerValidasi()
+    const c = sambung(buku, { jenis: 'usabilitas', data: susunUsabilitas(buku, String(req.params.id), req.body, u.id, new Date()) })
+    tambahLedgerValidasi(c); res.json({ ok: true, urutan: c.urutan })
   } catch (e) { res.status(400).json({ error: (e as Error).message }) }
 })
 

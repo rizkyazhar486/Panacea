@@ -83,6 +83,15 @@ export interface Penilaian {
 }
 
 export interface Adjudikasi { kasusId: string; adjudikator: Penilai; waktu: string; keputusanBenar: boolean; alasan: string }
+/** System Usability Scale (Brooke 1996): 10 butir, skala 1–5, skor 0–100. */
+export interface Usabilitas { protokolId: string; penilaiId: string; waktu: string; jawaban: number[]; komentar?: string }
+
+export function skorSus(jawaban: readonly number[]): number {
+  if (jawaban.length !== 10 || jawaban.some((j) => !Number.isInteger(j) || j < 1 || j > 5)) throw new Error('SUS needs 10 answers from 1 to 5')
+  // Butir ganjil (1,3,5,7,9 → indeks genap) positif: skor − 1; butir genap negatif: 5 − skor.
+  return jawaban.reduce((t, j, i) => t + (i % 2 === 0 ? j - 1 : 5 - j), 0) * 2.5
+}
+
 export interface KejadianKeselamatan { id: string; waktu: string; jenis: 'near-miss' | 'harm'; tingkat: Bahaya; kasusId?: string; deskripsi: string; pelapor: string }
 
 export type IsiCatatan =
@@ -91,6 +100,7 @@ export type IsiCatatan =
   | { jenis: 'penilaian'; data: Penilaian }
   | { jenis: 'adjudikasi'; data: Adjudikasi }
   | { jenis: 'keselamatan'; data: KejadianKeselamatan }
+  | { jenis: 'usabilitas'; data: Usabilitas }
 
 export interface Catatan { urutan: number; isi: IsiCatatan; sidikSebelum: string; sidik: string }
 
@@ -142,9 +152,20 @@ function validasiIsi(isi: IsiCatatan, sebelumnya: readonly Catatan[]): void {
       }
       return
     }
-    case 'adjudikasi':
+    case 'adjudikasi': {
       if (!kasus(isi.data.kasusId)) throw new Error('adjudication refers to an unknown case')
       if (!isi.data.adjudikator.kredensialTerverifikasi) throw new Error('adjudicator needs verified credentials')
+      const penilaiKasus = sebelumnya.filter((c) => c.isi.jenis === 'penilaian' && c.isi.data.kasusId === isi.data.kasusId).map((c) => (c.isi.data as Penilaian))
+      if (penilaiKasus.some((p) => p.penilai.id === isi.data.adjudikator.id)) throw new Error('the adjudicator must not be one of the case reviewers')
+      if (new Set(penilaiKasus.map((p) => p.benar)).size < 2) throw new Error('there is no disagreement to adjudicate on this case')
+      if (sebelumnya.some((c) => c.isi.jenis === 'adjudikasi' && c.isi.data.kasusId === isi.data.kasusId)) throw new Error('this case is already adjudicated')
+      if (!isi.data.alasan.trim()) throw new Error('an adjudication needs a reason')
+      return
+    }
+    case 'usabilitas':
+      if (!protokol(isi.data.protokolId)) throw new Error('usability response refers to an unknown protocol')
+      skorSus(isi.data.jawaban)
+      if (sebelumnya.some((c) => c.isi.jenis === 'usabilitas' && c.isi.data.protokolId === isi.data.protokolId && c.isi.data.penilaiId === isi.data.penilaiId)) throw new Error('one usability response per reviewer per study')
       return
     case 'keselamatan':
       if (!isi.data.deskripsi.trim()) throw new Error('a safety event needs a description')
@@ -222,6 +243,7 @@ export interface HasilMetrik {
   medianWaktuTinjauMs: number | null
   kejadianKeselamatan: { nearMiss: number; harm: number }
   ketidaksepakatanBelumDiadjudikasi: string[]
+  sus: { n: number; median: number | null; skor: number[] }
 }
 
 export function hitungMetrik(buku: readonly Catatan[], protokolId: string): HasilMetrik {
@@ -250,6 +272,10 @@ export function hitungMetrik(buku: readonly Catatan[], protokolId: string): Hasi
     medianWaktuTinjauMs: median(nilai.map((p) => p.waktuTinjauMs)),
     kejadianKeselamatan: { nearMiss: aman.filter((a) => a.jenis === 'near-miss').length, harm: aman.filter((a) => a.jenis === 'harm').length },
     ketidaksepakatanBelumDiadjudikasi: tidakSepakat.sort(),
+    sus: (() => {
+      const skor = buku.flatMap((c) => (c.isi.jenis === 'usabilitas' && c.isi.data.protokolId === protokolId ? [skorSus(c.isi.data.jawaban)] : [])).sort((a, b) => a - b)
+      return { n: skor.length, median: median(skor), skor }
+    })(),
   }
 }
 
