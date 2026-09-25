@@ -550,7 +550,7 @@ export const api = {
   // clinical persistence
   clinical: () => req<ClinicalData>('/api/clinical'),
   saveRecordRemote: (patientId: string, record: EMRRecord) =>
-    req<{ ok: boolean }>('/api/clinical/record', { method: 'POST', body: JSON.stringify({ patientId, record }) }),
+    req<{ ok: boolean; record: EMRRecord }>('/api/clinical/record', { method: 'POST', body: JSON.stringify({ patientId, record }) }),
   saveEducationRemote: (patientId: string, sheet: EducationSheet) =>
     req<{ ok: boolean }>('/api/clinical/education', { method: 'POST', body: JSON.stringify({ patientId, sheet }) }),
   addVitalRemote: (patientId: string, vital: VitalSign) =>
