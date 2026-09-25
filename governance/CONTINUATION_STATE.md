@@ -1,26 +1,29 @@
 # PANACEA AUTONOMOUS CONTINUATION STATE
 
-Updated 2026-09-25 (session_01Jpyv7TnjBpwfz89tDQN4cx). Template: docs/CLAUDE_CODE_OPUS_5_5_FINAL_33_AUTONOMOUS.md.
+Updated 2026-09-25, scheduled autonomous run (session_014dX7LeTG1isQ169vskyAdk). Template: docs/CLAUDE_CODE_OPUS_5_5_FINAL_33_AUTONOMOUS.md.
 
-main_sha: 9a70dfb0 (pushed directly to main; CI at this SHA was in_progress with no failures at write time — Vercel Prebuilt Production already succeeded, Stabilization/Body 3D/Pages/Security/Clinical Evidence still running with 0 failing jobs observed. Local validation is the primary evidence: 474/474 frontend `npm run uji`, server `npm run uji` 0 gagal across every suite, clean `tsc -b`)
-working_branch: main
-latest_verified_commit: 9a70dfb0
+main_sha: a7a40d0 (this run's base; verified via `git merge-base --is-ancestor origin/main HEAD` before push)
+working_branch: claude/pensive-heisenberg-n56vrz (this session's harness-assigned branch — content-wise this is a direct continuation of main, not a feature branch; the prior session's direct-to-main policy still applies once this branch is reconciled/merged)
+latest_verified_commit: d03f8c87 (on claude/pensive-heisenberg-n56vrz, one commit ahead of a7a40d0)
 
 completed_this_session:
-- fixed a real clinician-facing bug in `RencanaHarianDokter.tsx` (9a70dfb0): the daily-follow-up panel's `if (!data) return null` ran *before* the existing `{galat && ...}` error paragraph, so when the initial `api.clinicianCare(izinId)` fetch failed, the component returned `null` forever — the clinician saw a permanently blank "Daily follow-up" section with no error message and no way to recover (the error was set in state but never reached by any render path). Fixed by rendering an explicit loading state or the error message with a "Retry" button that re-runs `muat()`. Added a source-pattern regression assertion in `scripts/uji/rencana-harian-kontrak.mts` that fails if this `if (!data)` branch ever stops referencing `galat`/retry again.
-- confirmed exact-head CI is genuinely green: this worktree started with no `node_modules` in either `/` or `/server` (fresh clone), which made `npm run uji` falsely report 8 failing files (`Cannot find package 'three'`) purely from missing deps, not a real regression. After `npm install` in both locations, frontend is 474/474 and server is 0 gagal across all ~30 suites. Documenting this so the next session doesn't misdiagnose a fresh worktree as broken main.
+- closed out the three concrete friction points the previous session queued for `RencanaHarianDokter.tsx` / `LabPasienUntukDokter.tsx` (d03f8c87):
+  1. lab-rule authoring form now validates threshold/age/evidence-reference per row *before* `simpan()`, mirroring the server's exact wording from `server/src/carePlan.ts` (`lab rule threshold must be a number`, `lab rule age must be 1–730 days`, `evidence reference is required (max 300 characters)`) so the clinician sees which row failed without a round trip. Errors show once a row is touched or save is attempted, not on a still-pristine freshly-added row.
+  2. "Start daily check-in" is now disabled while any lab rule is invalid, and separately disabled (with a "Saving…" label) while a save is in flight, closing the double-submit gap on a slow/flaky connection.
+  3. `LabPasienUntukDokter`'s clinician-lab-share list now shows an explicit "Loading…" line between mount and the first `api.clinicianLabShares()` response, matching the error path which already rendered feedback.
+- re-confirmed the fresh-worktree false-failure trap from the prior session (no `node_modules` at session start in `/` and `/server` makes `npm run uji` misreport `Cannot find package 'three'` etc. as failures): ran `npm install` in both locations first.
+- full validation at d03f8c87: frontend `npm run uji` 477/477 berkas uji lulus, `npx tsc -b` clean, server `npm run uji` exit 0 with every suite reporting `0 gagal` (the two `[markets]`/`[sports] ... failed: HTTP 503` lines are the tests' own simulated-failure-handling fixtures, not real failures).
 
 current_blocker:
-- none in code at 9a70dfb0. This was a small, well-scoped usability/correctness fix, not a large feature; the clinician usability pass of plan authoring + lab-rule digest is not exhausted by this one fix.
+- none in code at d03f8c87. The clinician usability pass of plan authoring + lab-rule digest is now closed for the three items the prior session queued; nothing else in that specific pass is currently outstanding, but the broader pass (below) is not exhausted.
 
 failing_checks:
-- none observed at 9a70dfb0 (see main_sha note above for CI-in-flight caveat)
+- none observed at d03f8c87 locally; CI status on this branch not yet observed post-push (branch had never been pushed to origin before this session — verify Actions on first push).
 
 next_exact_action:
-- continue the clinician usability pass of plan authoring + lab-rule digest (MATURITY_REGISTRY care.daily_checkin next_action). Concrete remaining friction to look at next in `RencanaHarianDokter.tsx` / `LabPasienUntukDokter.tsx`:
-  - the lab-rule authoring form has no client-side validation before `simpan()` (e.g. empty evidence reference, non-numeric threshold) — errors currently surface only after a round trip to the server as a raw thrown-error string; consider inline field-level validation with the same wording as the server's `teks()`/threshold checks so the clinician doesn't have to guess which of several rule rows failed;
-  - `LabPasienUntukDokter`'s clinician-lab-share list (`daftar`) has no loading indicator between mount and the first `api.clinicianLabShares()` response — currently renders nothing until either the list or an error arrives, similar in kind (though not in severity — it does show `galat` correctly once it arrives) to the bug just fixed;
-  - consider whether "Start daily check-in" should be disabled while `simpan()` is in flight to prevent double-submit on a slow/flaky connection (no submitting-state guard currently exists).
+- push d03f8c87 to `origin/claude/pensive-heisenberg-n56vrz` (harness-assigned branch for this session) and inspect CI at that exact SHA; repair/integrate on any red check rather than declaring done from local validation alone.
+- reconcile this branch into main once CI is green: either open/merge a PR or, if the owner's direct-to-main policy is judged to apply to this session too, fast-forward main to this branch's tip after CI passes — do not silently strand a finished, validated fix on an unmerged branch.
+- after that, continue the broader clinician usability pass of plan authoring + lab-rule digest (MATURITY_REGISTRY care.daily_checkin next_action) — no further concrete friction items are queued right now; the next session should re-scan `RencanaHarianDokter.tsx`, `LabPasienUntukDokter.tsx`, `CekHarian.tsx`, `UbinLab.tsx` and `ImporLembarLab.tsx` for the next highest-value usability/correctness gap rather than assuming one is pre-identified.
 
 next_priority_after_that:
 - photo OCR lab import (explicit confirmation per value, no silent unit conversion)
@@ -36,7 +39,7 @@ do_not_touch:
 
 verification_commands:
 - npm install   (this worktree/clone had NO node_modules at session start; run this first or `npm run uji` false-fails on missing `three` etc.)
-- npm run uji   (expect N/N berkas uji lulus; was 474/474 at 9a70dfb0)
-- (cd server && npm install && npm run uji)   (uses a temp PANACEA_DATA_FILE; data.json untouched; all suites 0 gagal at 9a70dfb0)
-- npx tsc -b   (clean at 9a70dfb0)
-- browser E2E at 390x844: server with ALLOW_DEV_LOGIN=true, doctor needs settings.strStatus=verified and STR field at login (not re-run this session; no UI layout changed, only conditional branches in existing markup)
+- npm run uji   (expect N/N berkas uji lulus; was 477/477 at d03f8c87)
+- (cd server && npm install && npm run uji)   (uses a temp PANACEA_DATA_FILE; data.json untouched; all suites 0 gagal at d03f8c87)
+- npx tsc -b   (clean at d03f8c87)
+- browser E2E at 390x844: server with ALLOW_DEV_LOGIN=true, doctor needs settings.strStatus=verified and STR field at login (not re-run this session; only conditional branches/state guards changed in existing markup, no layout change)
