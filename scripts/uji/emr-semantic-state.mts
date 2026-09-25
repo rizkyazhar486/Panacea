@@ -13,7 +13,7 @@ const base: EMRRecord & { signedById?: string; physicalExam: EMRRecord['physical
   primaryDiagnosis: { code: 'R07.9', title: 'Chest pain', source: 'AI' },
   plan: [
     { id: 'ai-ok', category: 'Follow-up', text: 'ECG', source: 'AI', status: 'diverifikasi' },
-    { id: 'doc', category: 'Follow-up', text: 'Troponin', source: 'Dokter', status: 'diusulkan' },
+    { id: 'doc', category: 'Follow-up', text: 'Troponin', source: 'Dokter', status: 'usulan' },
   ],
   references: [],
   signedBy: 'Dr A',
