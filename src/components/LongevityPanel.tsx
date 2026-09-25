@@ -7,6 +7,7 @@ import {
   sindromMetabolikIdf, type Hasil, type HasilAngka,
 } from '../lib/longevity'
 import { bangunBundel, ringkasBundel, keJson } from '../lib/fhir'
+import { ambilTrajektori, hitungTrajektori, simpanTitik, titikDariHasil, type TitikUsiaBiologis } from '../lib/bioAgeTrajectory'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Panel ini berdiri terpisah dari model poin di halaman yang sama, dan
@@ -66,7 +67,55 @@ function Baris({ nama, hasil }: { nama: string; hasil: Hasil<HasilAngka> | null 
   )
 }
 
+function hariIni(): string {
+  const d = new Date(); const p = (x: number) => String(x).padStart(2, '0')
+  return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}`
+}
+
+const ARAH_TEKS = {
+  membaik: 'Gap narrowing',
+  memburuk: 'Gap widening',
+  datar: 'Steady (<1 y change)',
+  'belum-cukup-data': 'Save a second blood draw to see a trajectory',
+} as const
+
+// Trajektori: AgeGap per tanggal pengambilan darah, dan ΔAgeGap antara dua
+// titik terakhir. Satu baris ringkas; titik-titiknya di balik ℹ️.
+function TrajektoriUsia({ titik }: { titik: TitikUsiaBiologis[] }) {
+  const t = hitungTrajektori(titik)
+  if (!t.titik.length) return null
+  const gaps = t.titik.map((x) => x.ageGap)
+  const min = Math.min(0, ...gaps), maks = Math.max(0, ...gaps), r = maks - min || 1
+  const y = (v: number) => 30 - ((v - min) / r) * 26
+  return (
+    <details className="mt-3 border-t border-neutral-100 pt-3 dark:border-white/10" data-bioage-trajectory={t.arah}>
+      <summary className="flex cursor-pointer list-none items-center gap-2 text-[11px]">
+        <span className="font-black text-ink dark:text-white">{ARAH_TEKS[t.arah]}</span>
+        {t.deltaAgeGap !== null && (
+          <span className="tabular-nums text-neutral-500">ΔAgeGap {t.deltaAgeGap > 0 ? '+' : t.deltaAgeGap < 0 ? '−' : ''}{Math.abs(t.deltaAgeGap)} y</span>
+        )}
+        <span className="ml-auto text-neutral-400" aria-hidden>ℹ️</span>
+      </summary>
+      {t.titik.length > 1 && (
+        <svg viewBox="0 0 100 32" preserveAspectRatio="none" className="mt-2 h-10 w-full" role="img" aria-label={`AgeGap across ${t.titik.length} blood draws`}>
+          <line x1="0" x2="100" y1={y(0)} y2={y(0)} stroke="currentColor" strokeWidth="0.6" strokeDasharray="3 3" className="text-neutral-400" />
+          <polyline fill="none" stroke="currentColor" strokeWidth="1.8" vectorEffect="non-scaling-stroke" className="text-brand"
+            points={gaps.map((g, i) => `${(i / (gaps.length - 1)) * 100},${y(g).toFixed(2)}`).join(' ')} />
+        </svg>
+      )}
+      <ul className="mt-1.5 space-y-0.5 text-[10px] tabular-nums text-neutral-500">
+        {t.titik.map((x) => <li key={x.tanggal}>{x.tanggal} · PhenoAge {x.phenoAge} at age {x.usia} · AgeGap {x.ageGap > 0 ? '+' : ''}{x.ageGap}</li>)}
+      </ul>
+      <p className="mt-1 text-[10px] leading-snug text-neutral-500">
+        AgeGap = PhenoAge − age; ageing alone does not move it. Under 1 year may be lab noise.
+      </p>
+    </details>
+  )
+}
+
 export function LongevityPanel({ age, sex, restingHr, waistCm, systolic }: LongevityPanelProps) {
+  const [trajektori, setTrajektori] = useState<TitikUsiaBiologis[]>(ambilTrajektori)
+  const [tanggalDarah, setTanggalDarah] = useState(hariIni)
   const [lab, setLab] = useState<Lab>(() => {
     try { return { ...KOSONG, ...JSON.parse(localStorage.getItem(KUNCI) || '{}') } } catch { return { ...KOSONG } }
   })
@@ -212,10 +261,20 @@ export function LongevityPanel({ age, sex, restingHr, waistCm, systolic }: Longe
                   ))}
                 </div>
                 <p className="mt-2 text-[10px] text-neutral-500">Top five contributors to the model's linear term — the same PhenoAge can come from very different causes.</p>
+                <div className="mt-3 flex items-center gap-2">
+                  <input type="date" value={tanggalDarah} onChange={(e) => setTanggalDarah(e.target.value)} aria-label="Blood draw date"
+                    className="min-w-0 flex-1 rounded-xl border border-neutral-200 bg-transparent px-2 py-2 text-[11px] dark:border-white/12" />
+                  <button type="button"
+                    onClick={() => { const t = titikDariHasil(tanggalDarah, age, pheno.data); if (t) setTrajektori(simpanTitik(t)) }}
+                    className="shrink-0 rounded-xl bg-brand px-3 py-2 text-[11px] font-black text-white">
+                    Save to trajectory
+                  </button>
+                </div>
               </>
             ) : (
               <p className="mt-1 text-[11px] leading-snug text-amber-700 dark:text-amber-300">{pheno.alasan}</p>
             )}
+            <TrajektoriUsia titik={trajektori} />
           </div>
         )}
 
