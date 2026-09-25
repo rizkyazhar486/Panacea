@@ -87,6 +87,10 @@ export interface Clinical {
   education: Record<string, any>
   /** Kunjungan tertutup per pasien (append-only). */
   encounters?: Record<string, any[]>
+  /** Tautan pasien praktik -> akun pasien (disetujui pasien lewat kode). */
+  tautan?: Record<string, import('./aksesKlinis.js').TautanPasien>
+  /** Kode tautan (hanya hash). Tidak pernah dikirim ke klien. */
+  kodeTaut?: import('./aksesKlinis.js').KodeTaut[]
 }
 
 export interface VisitMembership {
@@ -794,6 +798,18 @@ export function closeEncounter(patientId: string, kunjungan: any, rekamBaru: any
   c.records[patientId] = rekamBaru
   save()
 }
+export function simpanKodeTaut(k: import('./aksesKlinis.js').KodeTaut) {
+  const c = ensureClinical(); (c.kodeTaut ??= []).push(k); save()
+}
+export function getKodeTaut() { return ensureClinical().kodeTaut ?? [] }
+export function getTautan() { return ensureClinical().tautan ?? {} }
+export function simpanTautan(t: import('./aksesKlinis.js').TautanPasien, kodeHash: string) {
+  const c = ensureClinical()
+  ;(c.tautan ??= {})[t.patientId] = t
+  const k = (c.kodeTaut ?? []).find((x) => x.hash === kodeHash); if (k) { k.dipakaiPada = t.ditautkanPada; k.dipakaiOleh = t.userId }
+  save()
+}
+export function hapusTautan(patientId: string) { const c = ensureClinical(); if (c.tautan) delete c.tautan[patientId]; save() }
 export function getEncounters(patientId: string): any[] { return ((ensureClinical() as any).encounters ?? {})[patientId] ?? [] }
 export function getRecordHistory(patientId: string): any[] { return ((ensureClinical() as any).recordHistory ?? {})[patientId] ?? [] }
 export function saveEducation(patientId: string, sheet: any) {

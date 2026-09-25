@@ -45,6 +45,11 @@ import {
   getRecordHistory,
   closeEncounter,
   getEncounters,
+  getKodeTaut,
+  getTautan,
+  hapusTautan,
+  simpanKodeTaut,
+  simpanTautan,
   saveRecord,
   saveEducation,
   addVital,
@@ -153,7 +158,7 @@ import { logKeBundelFhir, buatIzin, izinBerlaku, buatTinjauan } from './labFhir.
 import { susunRencana, susunLaporan, laporanKeBundelFhir } from './carePlan.js'
 import { putusanPengingatCek, PESAN_PENGINGAT_CEK } from './pengingatCek.js'
 import { penyimpananSehat, status as statusSimpan } from './simpanAman.js'
-import { bolehAksesPasien, klinisiAtauPemilik, saringKlinis } from './aksesKlinis.js'
+import { bolehAksesPasien, klinisiAtauPemilik, saringKlinis, terbitkanKodeTaut, tebusKodeTaut, tertautKe } from './aksesKlinis.js'
 import { terapkanSimpanRekam, tutupKunjungan } from './rekamKlinis.js'
 import { sambung, protokolKini, susunPenilaian, susunKeselamatan, susunAdjudikasi, susunUsabilitas, type IdentitasPenilai } from './validasiLedger.js'
 import { parseHealthWebhookPayload, extractHeartRateSeries, extractSleepSessions, newestSampleDate } from './healthWebhook.js'
@@ -815,12 +820,14 @@ app.post('/api/second-opinion/:id/complete', requireAuth, (req, res) => {
 
 // --- clinical (patients + EMR + vitals/supportive + education) ---
 // Siapa boleh membaca/menulis rekam klinis pasien tertentu (lihat aksesKlinis.ts).
-const bolehPasien = (u: User, patientId: string) => bolehAksesPasien(u, patientId, isOwner(u), findUserBySelfPatientId)
+const bolehPasien = (u: User, patientId: string) => bolehAksesPasien(u, patientId, isOwner(u), findUserBySelfPatientId, (pid) => tertautKe(u, pid, getTautan()))
 app.get('/api/clinical', requireAuth, (req, res) => {
   const u = (req as express.Request & { user: User }).user
   addAudit(u, 'clinical.read')
   const c = getClinical()
-  res.json(klinisiAtauPemilik(u, isOwner(u)) ? c : saringKlinis(c, (pid) => bolehPasien(u, pid)))
+  // Hash kode tautan tidak pernah keluar dari server.
+  const { kodeTaut: _k, ...tanpaKode } = c as typeof c & { kodeTaut?: unknown }
+  res.json(klinisiAtauPemilik(u, isOwner(u)) ? tanpaKode : saringKlinis(c, (pid) => bolehPasien(u, pid)))
 })
 app.post('/api/clinical/record', requireAuth, (req, res) => {
   if (!bolehPasien((req as express.Request & { user: User }).user, String((req.body as { patientId?: unknown })?.patientId ?? ''))) return res.status(403).json({ error: 'no access to this patient record' })
@@ -861,6 +868,39 @@ app.get('/api/clinical/encounters/:patientId', requireAuth, (req, res) => {
   if (!bolehPasien(u, String(req.params.patientId))) return res.status(403).json({ error: 'no access to this patient record' })
   addAudit(u, 'emr.encounters.read', String(req.params.patientId))
   res.json({ encounters: getEncounters(String(req.params.patientId)) })
+})
+
+// Tautan pasien praktik -> akun pasien, disetujui pasien lewat kode sekali pakai.
+app.post('/api/clinical/patient/:patientId/link-code', requireAuth, (req, res) => {
+  const actor = (req as express.Request & { user: User }).user
+  const pid = String(req.params.patientId)
+  if (!getClinical().patients.some((p) => p?.id === pid)) return res.status(404).json({ error: 'no-patient' })
+  const h = terbitkanKodeTaut(pid, { id: actor.id, klinisi: klinisiAtauPemilik(actor, isOwner(actor)) }, new Date())
+  if (!h.ok) return res.status(h.alasan === 'not-clinician' ? 403 : 400).json({ error: h.alasan })
+  simpanKodeTaut(h.catatan)
+  addAudit(actor, 'emr.link_code_issued', pid)
+  res.json({ code: h.kode, expiresAt: h.catatan.kedaluwarsa })
+})
+app.post('/api/clinical/link', requireAuth, (req, res) => {
+  const actor = (req as express.Request & { user: User }).user
+  const hasil = tebusKodeTaut(String((req.body as { code?: unknown })?.code ?? ''), actor, getKodeTaut(), getTautan(), new Date())
+  if (!hasil.ok) { addAudit(actor, 'emr.link_failed', hasil.alasan); return res.status(hasil.alasan === 'invalid' ? 404 : 409).json({ error: hasil.alasan }) }
+  simpanTautan(hasil.tautan, hasil.kodeHash)
+  addAudit(actor, 'emr.linked', hasil.tautan.patientId)
+  res.json({ ok: true, patientId: hasil.tautan.patientId })
+})
+app.get('/api/clinical/links', requireAuth, (req, res) => {
+  const u = (req as express.Request & { user: User }).user
+  res.json({ links: Object.values(getTautan()).filter((t) => t.userId === u.id).map((t) => ({ patientId: t.patientId, linkedAt: t.ditautkanPada })) })
+})
+app.delete('/api/clinical/link/:patientId', requireAuth, (req, res) => {
+  const u = (req as express.Request & { user: User }).user
+  const pid = String(req.params.patientId), t = getTautan()[pid]
+  if (!t) return res.status(404).json({ error: 'not-linked' })
+  if (t.userId !== u.id && !klinisiAtauPemilik(u, isOwner(u))) return res.status(403).json({ error: 'forbidden' })
+  hapusTautan(pid)
+  addAudit(u, 'emr.unlinked', pid)
+  res.json({ ok: true })
 })
 
 // Riwayat versi rekam bertanda tangan (akses sama dengan rekamnya).

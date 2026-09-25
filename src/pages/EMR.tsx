@@ -22,6 +22,7 @@ import { searchICD, matchICD, icd11, type ICDCode } from '../lib/icd'
 import { evaluateVitals, overallStatus, STATUS_COLOR, STATUS_LABEL } from '../lib/chronic'
 import { projectEmrToBodyClinicalBridge } from '../lib/bodyClinicalBridge'
 import { KunjunganEmr } from '../components/KunjunganEmr'
+import { TerbitkanKodeTaut } from '../components/TautanRekamPraktik'
 import { labelAsalMasalah, labelAsalRencana } from '../lib/asalButirEmr'
 import type { Anamnesis, EMRRecord, PhysicalExam, VitalSign } from '../lib/types'
 
@@ -540,6 +541,7 @@ export function EMR() {
           </p>
         )}
         <KunjunganEmr record={draft} dirty={dirty} klinisi={acc?.role === 'dokter' || Boolean(acc?.isOwner)} />
+        {(acc?.role === 'dokter' || acc?.isOwner) && <TerbitkanKodeTaut patientId={activePatient.id} />}
       </Card>
     </div>
   )

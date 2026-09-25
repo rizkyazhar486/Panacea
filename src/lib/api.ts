@@ -549,6 +549,12 @@ export const api = {
     req<{ request: BackendSecondOpinion }>(`/api/second-opinion/${id}/complete`, { method: 'POST', body: JSON.stringify({ finalOpinion }) }).then((r) => r.request),
   // clinical persistence
   clinical: () => req<ClinicalData>('/api/clinical'),
+  issueLinkCode: (patientId: string) =>
+    req<{ code: string; expiresAt: string }>(`/api/clinical/patient/${encodeURIComponent(patientId)}/link-code`, { method: 'POST' }),
+  redeemLinkCode: (code: string) =>
+    req<{ ok: boolean; patientId: string }>('/api/clinical/link', { method: 'POST', body: JSON.stringify({ code }) }),
+  myLinks: () => req<{ links: { patientId: string; linkedAt: string }[] }>('/api/clinical/links'),
+  unlink: (patientId: string) => req<{ ok: boolean }>(`/api/clinical/link/${encodeURIComponent(patientId)}`, { method: 'DELETE' }),
   closeEncounter: (patientId: string) =>
     req<{ ok: boolean; encounter: EMRRecord & { encounterId: string; closedAt: string; closedBy?: string }; record: EMRRecord }>('/api/clinical/encounter/close', { method: 'POST', body: JSON.stringify({ patientId }) }),
   encounters: (patientId: string) =>

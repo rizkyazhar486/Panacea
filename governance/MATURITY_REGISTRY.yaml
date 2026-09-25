@@ -63,7 +63,7 @@ workflows:
     clinical_validation: none
     dimensions:
       functional_completeness: medium  # AI-EMR record (anamnesis, exam, problems, dx, plan, signing, care episodes), deterministic order/lab-interpretation rules (emrPipeline.ts); 2026-09-26 encounter model: signed record closes into an immutable encounter, new draft carries only the problem list
-      integration: medium  # server-stamped signed EMR now projects into canonical longitudinal state for patient accounts via emrLongitudinalBridge; practice-vs-account IDs remain separate namespaces and study linkage is still absent
+      integration: medium  # server-stamped signed EMR projects into canonical longitudinal state; 2026-09-26 practice patients link to patient accounts by consented one-time code; study linkage still absent
       reliability: medium  # 2026-09-25: clinical writes queued/retried with visible status (328b12a); appends idempotent by id
       usability: unknown  # no clinician usability test yet (SUS instrument now exists for studies)
       clinical_quality: unknown  # rules deterministic and readable; no clinical review recorded
@@ -79,8 +79,9 @@ workflows:
       - "2026-09-26: encounter model (server/src/rekamKlinis.ts tutupKunjungan; server/uji/kunjunganKlinis.uji.ts; scripts/uji/kunjungan-emr.mts); HTTP proof: unsigned close 409, patient close 403, clinician close 200 -> 1 immutable encounter + new draft with no dx/plan/signature and problems carriedFrom; unrelated patient sees 0 encounter lists"
       - "2026-09-26: per-item provenance server-stamped (server/uji/asalButirKlinis.uji.ts): non-clinician writes cannot create doctor-sourced or verified plan items/problems; verification stamps verifiedById/verifiedAt server-side; declared AI drafts saved from a clinician session stay AI; label-only changes cannot escalate. EMR shows per-item origin (scripts/uji/asal-butir-emr.mts)"
       - "2026-09-26: browser E2E 390x844 (owner doctor): per-item badges -> sign -> Close encounter enabled -> new draft with problems 'carried from previous visit', 2 closed encounters listed, scrollWidth 390, no page errors. E2E found and fixed two crashes: server patient without riskFlags crashed Shell; closed-encounter draft missing physicalExam.perSystem crashed EMR"
-    known_gaps: [practice_patient_vs_account_identity_split, anamnesis_and_exam_fields_have_no_per_field_origin, clinician_usability_test, clinical_validation]
-    next_action: split_practice_patient_vs_account_identity_then_clinician_usability_test
+      - "2026-09-26: practice patient <-> account link (server/src/aksesKlinis.ts terbitkanKodeTaut/tebusKodeTaut; server/uji/tautanPasien.uji.ts; scripts/uji/tautan-rekam-praktik.mts): clinician issues a one-time 7-day code (server stores hash only, never sent to clients), patient redeems from own account, one account per practice patient, audited issue/link/fail/unlink, patient or clinician can unlink. Browser E2E 390x844: wrong code rejected with message; lowercase code links; after reload the patient timeline shows the doctor's signed diagnosis, note and verified plan; no page errors"
+    known_gaps: [self_id_still_email_derived_for_self_records, link_code_ui_for_doctor_not_browser_verified, anamnesis_and_exam_fields_have_no_per_field_origin, clinician_usability_test, clinical_validation]
+    next_action: clinician_usability_test_then_level_next_weakest_core_lane
     last_audited_commit: 687d77db
 
   - workflow_id: body.spatial_clinical_context
