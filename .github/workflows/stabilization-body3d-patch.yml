@@ -30,7 +30,9 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
-          node-version: 20
+          # Frontend tests import TypeScript modules directly; Node 20 rejects
+          # the repository's current test contract before the assertions run.
+          node-version: 24
           cache: npm
 
       - name: Install frontend dependencies
