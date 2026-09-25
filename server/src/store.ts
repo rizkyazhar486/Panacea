@@ -7,6 +7,7 @@ import { dirname, join } from 'node:path'
 import { randomBytes } from 'node:crypto'
 import { KATALOG } from './healthMetrics.js'
 import { tulisAtomik, amankanBerkasRusak, catatBerhasil, catatGagal, BATAS_DOKUMEN_MONGO } from './simpanAman.js'
+import { ambilEncounter, daftarEncounter, daftarRiwayatEncounter, simpanEncounter } from './rekamEncounter.js'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
 // PANACEA_DATA_FILE memisahkan berkas data uji dari data dev lokal (uji tidak boleh menimpa data.json).
@@ -84,6 +85,9 @@ export interface Clinical {
   vitals: Record<string, any[]>
   supportive: Record<string, any[]>
   records: Record<string, any>
+  /** Full encounter history; records[patientId] remains the backward-compatible latest pointer. */
+  recordEncounters?: Record<string, any[]>
+  recordHistory?: Record<string, any[]>
   education: Record<string, any>
 }
 
@@ -775,15 +779,20 @@ function ensureClinical() {
 export function getClinical(): Clinical {
   return ensureClinical()
 }
-export function getRecord(patientId: string) { return ensureClinical().records[patientId] }
+export function getRecord(patientId: string, recordId?: string) {
+  return ambilEncounter(ensureClinical(), patientId, recordId)
+}
+export function getRecords(patientId: string): any[] {
+  return daftarEncounter(ensureClinical(), patientId)
+}
 export function saveRecord(patientId: string, record: any, arsip?: any) {
   const c = ensureClinical()
-  // Riwayat versi bertanda tangan — append-only, tidak dipangkas.
-  if (arsip) { (c as any).recordHistory ??= {}; ((c as any).recordHistory[patientId] ??= []).push(arsip) }
-  c.records[patientId] = record
+  simpanEncounter(c, patientId, record, arsip)
   save()
 }
-export function getRecordHistory(patientId: string): any[] { return ((ensureClinical() as any).recordHistory ?? {})[patientId] ?? [] }
+export function getRecordHistory(patientId: string, recordId?: string): any[] {
+  return daftarRiwayatEncounter(ensureClinical(), patientId, recordId)
+}
 export function saveEducation(patientId: string, sheet: any) {
   ensureClinical().education[patientId] = sheet
   save()
