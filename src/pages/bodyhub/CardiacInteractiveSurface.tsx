@@ -74,7 +74,7 @@ export default function CardiacInteractiveSurface() {
   return (
     <section
       data-cardiac-interactive-surface="v1"
-      className="overflow-hidden rounded-[28px] border border-white/[.09] bg-[#03070b] text-white"
+      className="dark overflow-hidden rounded-[28px] border border-white/[.09] bg-[#03070b] text-white"
       aria-labelledby="cardiac-interactive-title"
     >
       <header className="border-b border-white/[.08] px-3 py-3 sm:px-4">
