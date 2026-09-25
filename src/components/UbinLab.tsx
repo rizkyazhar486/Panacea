@@ -5,6 +5,7 @@ import { ImporLembarLab } from './ImporLembarLab'
 import { api, backendEnabled, type TinjauanLabKlien } from '../lib/api'
 import { pasangSinkronLab, dengarSinkronLab, statusSinkronLab, type StatusSinkronLab } from '../lib/labSync'
 import { analisisTrenLab, type StatusTren } from '../lib/labTrend'
+import { hitungHasilTerukur } from '../lib/hasilTerukurLab'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Widget hasil laboratorium — dimasukkan sendiri, digambar perjalanannya.
@@ -115,6 +116,9 @@ export function UbinLab() {
     const s = ambilLab()
     return JENIS_LAB.filter((j) => (s[j.id] ?? []).length > 0).map((j) => ({ jenis: j, butir: s[j.id] }))
   }, [versi])
+
+  // Ukuran proses (lab-outcome-v1): apakah lingkaran hasil → tinjauan → cek ulang menutup.
+  const lingkaran = useMemo(() => hitungHasilTerukur(ambilLab(), tinjauan, new Date().toISOString().slice(0, 10)), [versi, tinjauan])
 
   const aktif = terisi.find((t) => t.jenis.id === pilih) ?? terisi[0]
 
@@ -295,6 +299,12 @@ export function UbinLab() {
               )
             })()}
           </>
+        )}
+        {(lingkaran.cakupanTinjauan.penyebut > 0 || lingkaran.kepatuhanCekUlang.penyebut > 0) && (
+          <p className="text-xs opacity-80" data-lingkaran-lab>
+            Follow-up loop: {lingkaran.cakupanTinjauan.pembilang} of {lingkaran.cakupanTinjauan.penyebut} out-of-range results reviewed by a doctor within 14 days
+            {lingkaran.kepatuhanCekUlang.penyebut > 0 && <>; {lingkaran.kepatuhanCekUlang.pembilang} of {lingkaran.kepatuhanCekUlang.penyebut} rechecks done by their due date</>}.
+          </p>
         )}
         <ImporLembarLab />
         <BagikanLabKeDokter />
