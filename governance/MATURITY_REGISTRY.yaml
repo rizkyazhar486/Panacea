@@ -78,7 +78,7 @@ workflows:
       - "2026-09-26: successful record writes reconcile the server-returned canonical signer/verification state into the client immediately; EMR UI renders draft.signedBy rather than a local settings name"
     known_gaps: [one_record_per_patient_not_per_encounter, practice_patient_vs_account_identity_split, ai_draft_vs_clinician_state_not_modelled_per_field, clinician_usability_test, clinical_validation]
     next_action: replace_one_record_per_patient_with_encounter_model_then_make_ai_draft_vs_clinician_state_explicit_per_field
-    last_audited_commit: 2bf8335
+    last_audited_commit: eb47c7c3
 
   - workflow_id: body.spatial_clinical_context
     name: Patient or educational context to spatial Body Exposure projection
