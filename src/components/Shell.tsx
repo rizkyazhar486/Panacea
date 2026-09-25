@@ -434,7 +434,7 @@ export function Shell({ children }: { children: ReactNode }) {
 
   if (!account) return <PublicEntry />
   const items = saring(nav.filter((n) => n.roles.includes(account.role)), tersembunyi)
-  const judul = judulRute(loc.pathname, items, nav, navMatches)
+  const judul = judulRute(loc.pathname, items, [...nav, ...KATALOG], navMatches)
   // Only doctors switch between patients; patients see their own data only.
   const showPatient = PATIENT_PAGES.includes(loc.pathname) && account.role === 'dokter'
   const doLogout = () => { if (backendEnabled) api.logout().catch(() => {}); logout() }
