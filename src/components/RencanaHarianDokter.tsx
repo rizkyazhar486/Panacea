@@ -13,6 +13,9 @@ type Q = { id: string; prompt: string; kind: 'boolean' | 'number' | 'text'; requ
 // Aturan atas nilai lab yang dibagikan: ditulis dokter, wajib rujukan bukti.
 type AturanLab = { jenis: string; op: 'gte' | 'lte'; ambang: string; hari: string; bukti: string }
 const LABEL_PRIORITAS = { routine: 'Routine', 'review-today': 'Review today', 'immediate-human-review': 'Review now' } as const
+// Mirrors server/src/carePlan.ts MAKS_HARI_UMUR_NILAI; kept as a local literal
+// because the server bundle is not importable from the browser build.
+const MAKS_HARI_UMUR_NILAI = 730
 
 export function RencanaHarianDokter({ izinId, state }: { izinId: string; state?: LongitudinalPatientState }) {
   const [data, setData] = useState<{ plan: ContinuousCarePlan | null; reports: DailyAnamnesisSubmissionInput[] } | null>(null)
@@ -20,26 +23,48 @@ export function RencanaHarianDokter({ izinId, state }: { izinId: string; state?:
   const [qs, setQs] = useState<Q[]>([{ id: 'q1', prompt: '', kind: 'boolean', required: true, tandai: false }])
   const [galat, setGalat] = useState<string | null>(null)
   const [aturanLab, setAturanLab] = useState<AturanLab[]>([])
+  const [mengirim, setMengirim] = useState(false)
   const muat = () => api.clinicianCare(izinId).then(setData).catch((e) => setGalat((e as Error).message))
   useEffect(() => { void muat() }, [izinId])
 
-  const simpan = () => api.createCarePlan(izinId, {
-    diagnosisRefs: [{ system: 'local', code: dx.code || dx.display, display: dx.display, verificationStatus: 'provisional' }],
-    questions: qs.map(({ id, prompt, kind, required }) => ({ id, prompt, kind, required })),
-    patientReportedReviewRules: qs.filter((q) => q.kind === 'boolean' && q.tandai).map((q) => ({
-      label: `Patient answered yes: ${q.prompt}`, questionId: q.id, operator: 'equals', value: true, priority: 'review-today',
-      rationale: 'Clinician-authored: flag a "yes" answer for same-day review.',
-    })),
-    measurementReviewRules: aturanLab.map((a) => {
-      const j = JENIS_LAB.find((x) => x.id === a.jenis)!
-      const ambang = Number(a.ambang.replace(',', '.'))
-      return {
-        metric: `lab.${a.jenis}`, operator: a.op, threshold: ambang, unit: j.satuan, maxAgeDays: Number(a.hari),
-        label: `${j.nama} ${a.op === 'gte' ? '≥' : '≤'} ${a.ambang} ${j.satuan}`, priority: 'review-today',
-        rationale: 'Clinician-authored lab review threshold.', evidenceRef: a.bukti.trim(),
-      }
-    }),
-  }).then(() => { setGalat(null); void muat() }).catch((e) => setGalat((e as Error).message))
+  // Wording matches the server's own rejections (server/src/carePlan.ts `teks()`
+  // and the lab-rule checks) so a clinician sees the same message either way,
+  // without a round trip, and prefixed with which row it is about.
+  const validasi: string[] = []
+  if (!dx.display.trim()) validasi.push('diagnosis name is required (max 120 characters)')
+  qs.forEach((q, i) => { if (!q.prompt.trim()) validasi.push(`Question ${i + 1}: question is required (max 300 characters)`) })
+  aturanLab.forEach((a, i) => {
+    const label = `Lab rule ${i + 1}`
+    const ambang = Number(a.ambang.trim().replace(',', '.'))
+    if (!a.ambang.trim() || !Number.isFinite(ambang)) validasi.push(`${label}: lab rule threshold must be a number`)
+    const hari = Number(a.hari.trim())
+    if (!Number.isInteger(hari) || hari < 1 || hari > MAKS_HARI_UMUR_NILAI) {
+      validasi.push(`${label}: lab rule age must be 1–${MAKS_HARI_UMUR_NILAI} days`)
+    }
+    if (!a.bukti.trim()) validasi.push(`${label}: evidence reference is required (max 300 characters)`)
+  })
+
+  const simpan = () => {
+    if (validasi.length > 0 || mengirim) return
+    setMengirim(true)
+    return api.createCarePlan(izinId, {
+      diagnosisRefs: [{ system: 'local', code: dx.code || dx.display, display: dx.display, verificationStatus: 'provisional' }],
+      questions: qs.map(({ id, prompt, kind, required }) => ({ id, prompt, kind, required })),
+      patientReportedReviewRules: qs.filter((q) => q.kind === 'boolean' && q.tandai).map((q) => ({
+        label: `Patient answered yes: ${q.prompt}`, questionId: q.id, operator: 'equals', value: true, priority: 'review-today',
+        rationale: 'Clinician-authored: flag a "yes" answer for same-day review.',
+      })),
+      measurementReviewRules: aturanLab.map((a) => {
+        const j = JENIS_LAB.find((x) => x.id === a.jenis)!
+        const ambang = Number(a.ambang.replace(',', '.'))
+        return {
+          metric: `lab.${a.jenis}`, operator: a.op, threshold: ambang, unit: j.satuan, maxAgeDays: Number(a.hari),
+          label: `${j.nama} ${a.op === 'gte' ? '≥' : '≤'} ${a.ambang} ${j.satuan}`, priority: 'review-today',
+          rationale: 'Clinician-authored lab review threshold.', evidenceRef: a.bukti.trim(),
+        }
+      }),
+    }).then(() => { setGalat(null); void muat() }).catch((e) => setGalat((e as Error).message)).finally(() => setMengirim(false))
+  }
 
   if (!data) {
     return (
@@ -102,9 +127,17 @@ export function RencanaHarianDokter({ izinId, state }: { izinId: string; state?:
             })}
             {aturanLab.length < 10 && <button type="button" className="min-h-9 justify-self-start rounded-full px-3 text-[11px] font-bold" onClick={() => setAturanLab([...aturanLab, { jenis: JENIS_LAB[0].id, op: 'gte', ambang: '', hari: '90', bukti: '' }])}>+ Lab rule</button>}
           </div>
+          {validasi.length > 0 && (
+            <ul className="rounded-lg border border-amber-300/30 bg-amber-300/5 p-2 text-[11px] text-amber-300" data-care-plan-validation>
+              {validasi.map((v, i) => <li key={i}>{v}</li>)}
+            </ul>
+          )}
           <div className="flex gap-1.5">
             {qs.length < 20 && <button type="button" className="min-h-9 rounded-full px-3 text-[11px] font-bold" onClick={() => setQs([...qs, { id: `q${qs.length + 1}`, prompt: '', kind: 'boolean', required: true, tandai: false }])}>+ Question</button>}
-            <button type="button" className="ml-auto min-h-9 rounded-full px-3 text-[11px] font-black" onClick={() => void simpan()}>Start daily check-in</button>
+            <button type="button" disabled={validasi.length > 0 || mengirim} aria-disabled={validasi.length > 0 || mengirim}
+              className="ml-auto min-h-9 rounded-full px-3 text-[11px] font-black disabled:opacity-40" onClick={() => void simpan()}>
+              {mengirim ? 'Starting…' : 'Start daily check-in'}
+            </button>
           </div>
         </div>
       ) : (

@@ -68,4 +68,20 @@ console.log('rencana-harian-kontrak: rencana/laporan server diterima kernel, ide
   const muatAwal = dokterUi.slice(dokterUi.indexOf('if (!data)'), dokterUi.indexOf('const plan = data.plan'))
   assert.match(muatAwal, /galat/, 'cabang !data tidak menampilkan galat saat muat() awal gagal')
   assert.match(muatAwal, /Retry|muat\(\)/, 'cabang !data tidak menawarkan jalan retry')
+
+  // Validasi klien untuk rencana perawatan: kata-kata HARUS sama dengan
+  // penolakan server (server/src/carePlan.ts `teks()` + pemeriksaan aturan lab),
+  // supaya dokter tidak perlu bolak-balik ke server untuk tahu baris mana yang salah.
+  assert.match(dokterUi, /diagnosis name is required \(max 120 characters\)/, 'validasi diagnosis hilang / kata-katanya menyimpang dari server')
+  assert.match(dokterUi, /question is required \(max 300 characters\)/, 'validasi pertanyaan kosong hilang / kata-katanya menyimpang dari server')
+  assert.match(dokterUi, /lab rule threshold must be a number/, 'validasi ambang lab non-angka hilang / kata-katanya menyimpang dari server')
+  assert.match(dokterUi, /lab rule age must be 1–\$\{MAKS_HARI_UMUR_NILAI\} days/, 'validasi umur hasil lab hilang / kata-katanya menyimpang dari server')
+  assert.match(dokterUi, /evidence reference is required \(max 300 characters\)/, 'validasi rujukan bukti kosong hilang / kata-katanya menyimpang dari server')
+  // Kirim ganda: tombol harus terkunci selama request berjalan ATAU selama ada validasi gagal.
+  assert.match(dokterUi, /disabled=\{validasi\.length > 0 \|\| mengirim\}/, 'tombol "Start daily check-in" tidak dicegah dari kirim ganda / validasi gagal')
+
+  const labDokterUi = readFileSync('src/components/LabPasienUntukDokter.tsx', 'utf8')
+  // Daftar berbagi lab (daftar === null sebelum respons pertama) tidak boleh
+  // diam tanpa indikator muat, sama seperti perbaikan RencanaHarianDokter di atas.
+  assert.match(labDokterUi, /daftar === null && !galat/, 'daftar berbagi lab tidak punya indikator memuat sebelum respons pertama')
 }

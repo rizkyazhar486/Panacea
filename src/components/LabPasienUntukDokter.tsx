@@ -81,6 +81,7 @@ export function LabPasienUntukDokter() {
     <section className="dark rounded-[20px] border border-white/10 bg-[#050708] p-3 text-white" aria-label="Lab results shared with you" data-clinician-lab>
       <h2 className="text-sm font-black">Lab results shared with you</h2>
       {galat && <p className="mt-1 text-[11px] font-bold text-amber-300">{galat === 'verified clinician role required' ? 'Available after your STR is verified.' : galat}</p>}
+      {daftar === null && !galat && <p className="mt-1 text-[11px] text-white/45">Loading…</p>}
       {daftar && daftar.length === 0 && <p className="mt-1 text-[11px] text-white/55">No patient has shared lab results with you yet.</p>}
       <div className="mt-2 flex flex-wrap gap-1.5">
         {daftar?.map((d) => (
