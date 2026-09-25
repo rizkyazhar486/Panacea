@@ -18,6 +18,18 @@ const tolak = async () => { throw new Error('no access to this patient record') 
   assert.deepEqual(await kurasAntrean(s, putus), { terkirim: 0, ditolak: 0, sisa: 2 })
   assert.deepEqual(await kurasAntrean(s, async (o) => { if (o.patientId === 'p2') throw new Error('refused') }), { terkirim: 1, ditolak: 1, sisa: 0 }) }
 
+// Balasan canonical server harus dapat direkonsiliasi tanpa mengubah semantik transport.
+{ const s = toko(); let canonical = ''; const operasi = op('record', 'p1', 'r1')
+  assert.equal(await kirimAtauAntre(s, operasi, async () => ({ record: { patientId: 'p1', signedBy: 'Server Doctor' } }), (_op, hasil) => {
+    canonical = String((hasil as { record?: { signedBy?: string } }).record?.signedBy ?? '')
+  }), 'terkirim')
+  assert.equal(canonical, 'Server Doctor', 'balasan canonical server tidak diteruskan setelah kirim langsung') }
+{ const s = toko(); antrekan(s, op('record', 'p1', 'r1')); const seen: string[] = []
+  assert.deepEqual(await kurasAntrean(s, async () => ({ record: { patientId: 'p1', signedBy: 'Server Doctor' } }), (_op, hasil) => {
+    seen.push(String((hasil as { record?: { signedBy?: string } }).record?.signedBy ?? ''))
+  }), { terkirim: 1, ditolak: 0, sisa: 0 })
+  assert.deepEqual(seen, ['Server Doctor'], 'balasan canonical server hilang saat antrean offline dikuras') }
+
 // Tidak ada tulisan klinis yang ditelan diam-diam.
 const store = readFileSync('src/lib/store.tsx', 'utf8')
 for (const f of ['addPatientRemote', 'addVitalRemote', 'addSupportiveRemote', 'saveRecordRemote', 'saveEducationRemote']) {
