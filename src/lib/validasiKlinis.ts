@@ -278,7 +278,11 @@ export async function susunLaporan(buku: readonly Catatan[], protokolId: string)
     correctness: m.correctness.nilai, omission: m.omission.nilai, 'unsupported-claim': m.unsupportedClaim.nilai,
     harmful: m.harmful.nilai, override: m.override.nilai, 'inter-rater-kappa': m.kappa.kappa, 'time-to-review-ms': m.medianWaktuTinjauMs,
   })[id]
-  const kasusCukup = m.kasusDinilai > 0 && m.ketidaksepakatanBelumDiadjudikasi.length === 0
+  // Titik akhir baru dapat dievaluasi bila SETIAP kasus beku protokol ini sudah dinilai
+  // oleh jumlah penilai independen yang ditetapkan, dan tidak ada ketidaksepakatan terbuka.
+  const kasusProtokol = buku.flatMap((c) => (c.isi.jenis === 'kasus' && c.isi.data.protokolId === protokolId ? [c.isi.data.id] : []))
+  const penilaiPer = (id: string) => new Set(buku.flatMap((c) => (c.isi.jenis === 'penilaian' && c.isi.data.kasusId === id ? [c.isi.data.penilai.id] : []))).size
+  const kasusCukup = kasusProtokol.length > 0 && kasusProtokol.every((id) => penilaiPer(id) >= protokol.penilaiPerKasus) && m.ketidaksepakatanBelumDiadjudikasi.length === 0
   return {
     kernel: VERSI_KERNEL_VALIDASI,
     protokol,

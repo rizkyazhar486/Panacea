@@ -1,3 +1,6 @@
+import { existsSync as adaBerkas, readFileSync as bacaBerkas } from 'node:fs'
+import { dirname as folderDari, join as gabungJalur } from 'node:path'
+import { fileURLToPath as keJalurBerkas } from 'node:url'
 import { createServer } from 'node:http'
 import {
   ringkasanSaya, ajukanVerifikasi, setelRadius, blokir, bukaBlokir, laporkan,
@@ -56,6 +59,8 @@ import {
   listLabReviews,
   listCarePlans,
   addCarePlan,
+  bacaLedgerValidasi,
+  tambahLedgerValidasi,
   addCareReport,
   listCareReports,
   saveRingkasan,
@@ -143,6 +148,7 @@ import { logKeBundelFhir, buatIzin, izinBerlaku, buatTinjauan } from './labFhir.
 import { susunRencana, susunLaporan, laporanKeBundelFhir } from './carePlan.js'
 import { putusanPengingatCek, PESAN_PENGINGAT_CEK } from './pengingatCek.js'
 import { penyimpananSehat, status as statusSimpan } from './simpanAman.js'
+import { sambung, protokolKini, susunPenilaian, susunKeselamatan, type IdentitasPenilai } from './validasiLedger.js'
 import { parseHealthWebhookPayload, extractHeartRateSeries, extractSleepSessions, newestSampleDate } from './healthWebhook.js'
 import { checkHrZoneAlert, checkBedtimeReminder, checkWorkoutReminder, suggestedBedtime, ZONES } from './healthAlerts.js'
 import { fetchLeagueScoreboard, fetchF1Info, fetchMotoGpInfo, LEAGUES, UNAVAILABLE } from './sports.js'
@@ -1679,6 +1685,82 @@ app.delete('/api/reminders/:id', requireAuth, (req, res) => {
   res.json({ ok: true })
 })
 
+// ── Studi validasi klinis ───────────────────────────────────────────────────
+// Server menyimpan buku besar append-only dan menegakkan siapa penilai; metrik &
+// laporan dihitung kernel di peramban (src/lib/validasiKlinis.ts), yang juga
+// memverifikasi rantai ini. Tidak ada penilaian yang dibuat oleh perangkat lunak.
+const STUDI_BEKU = ['lab-tren-pribadi-v1.json']
+function semaiStudiValidasi() {
+  for (const berkas of STUDI_BEKU) {
+    const jalur = gabungJalur(folderDari(keJalurBerkas(import.meta.url)), '..', 'data-validasi', berkas)
+    if (!adaBerkas(jalur)) continue
+    const { protokol, kasus } = JSON.parse(bacaBerkas(jalur, 'utf8'))
+    let buku = bacaLedgerValidasi()
+    if (protokolKini(buku, protokol.id)) continue
+    for (const isi of [{ jenis: 'protokol' as const, data: protokol }, ...kasus.map((k: unknown) => ({ jenis: 'kasus' as const, data: k }))]) {
+      const c = sambung(buku, isi); tambahLedgerValidasi(c); buku = bacaLedgerValidasi()
+    }
+    console.log(`[validation] seeded study ${protokol.id} v${protokol.versi} with ${kasus.length} frozen cases`)
+  }
+}
+const penilaiDari = (u: User, coi: unknown): IdentitasPenilai => ({
+  id: u.id, peran: 'physician', kredensialRef: 'panaceamed-str-verification', kredensialTerverifikasi: u.role === 'dokter',
+  cakupan: 'declared by reviewer at assessment time', konflikKepentingan: typeof coi === 'string' && coi.trim() ? coi.trim().slice(0, 300) : 'none declared',
+})
+const bolehMenilai = (u: User) => u.role === 'dokter'
+
+app.get('/api/validation/studies', requireAuth, (req, res) => {
+  const u = (req as express.Request & { user: User }).user
+  if (!bolehMenilai(u) && !isOwner(u)) { res.status(403).json({ error: 'verified clinician role required' }); return }
+  const buku = bacaLedgerValidasi()
+  const ids = [...new Set(buku.filter((c) => c.isi.jenis === 'protokol').map((c) => c.isi.data.id))]
+  res.json({ studies: ids.map((id) => {
+    const kasus = buku.filter((c) => c.isi.jenis === 'kasus' && c.isi.data.protokolId === id)
+    const saya = buku.filter((c) => c.isi.jenis === 'penilaian' && c.isi.data.penilai.id === u.id && kasus.some((k) => k.isi.data.id === c.isi.data.kasusId)).length
+    return { protokol: protokolKini(buku, id), jumlahKasus: kasus.length, sudahSaya: saya }
+  }) })
+})
+
+// Kasus untuk dinilai — BUTA: penilaian penilai lain tidak pernah dikirim.
+app.get('/api/validation/:id/cases', requireAuth, (req, res) => {
+  const u = (req as express.Request & { user: User }).user
+  if (!bolehMenilai(u)) { res.status(403).json({ error: 'verified clinician role required' }); return }
+  const buku = bacaLedgerValidasi(), id = String(req.params.id)
+  if (!protokolKini(buku, id)) { res.status(404).json({ error: 'unknown study' }); return }
+  const sudah = new Set(buku.filter((c) => c.isi.jenis === 'penilaian' && c.isi.data.penilai.id === u.id).map((c) => c.isi.data.kasusId))
+  res.json({ protokol: protokolKini(buku, id), cases: buku.filter((c) => c.isi.jenis === 'kasus' && c.isi.data.protokolId === id).map((c) => ({ ...c.isi.data, sudahSaya: sudah.has(c.isi.data.id) })) })
+})
+
+app.post('/api/validation/:id/assessments', requireAuth, (req, res) => {
+  const u = (req as express.Request & { user: User }).user
+  if (!bolehMenilai(u)) { res.status(403).json({ error: 'verified clinician role required' }); return }
+  try {
+    const buku = bacaLedgerValidasi()
+    const data = susunPenilaian(buku, String(req.params.id), req.body, penilaiDari(u, req.body?.konflikKepentingan), new Date())
+    const c = sambung(buku, { jenis: 'penilaian', data }); tambahLedgerValidasi(c)
+    res.json({ ok: true, urutan: c.urutan, sidik: c.sidik })
+  } catch (e) { res.status(400).json({ error: (e as Error).message }) }
+})
+
+app.post('/api/validation/safety-events', requireAuth, (req, res) => {
+  const u = (req as express.Request & { user: User }).user
+  if (!bolehMenilai(u) && !isOwner(u)) { res.status(403).json({ error: 'verified clinician role required' }); return }
+  try {
+    const buku = bacaLedgerValidasi()
+    const data = susunKeselamatan(req.body, u.id, new Date(), `safety-${buku.length}`)
+    const c = sambung(buku, { jenis: 'keselamatan', data }); tambahLedgerValidasi(c)
+    res.json({ ok: true, urutan: c.urutan })
+  } catch (e) { res.status(400).json({ error: (e as Error).message }) }
+})
+
+// Ekspor buku besar lengkap — hanya pemimpin studi (owner), supaya penilai tetap buta.
+app.get('/api/validation/ledger', requireAuth, (req, res) => {
+  const u = (req as express.Request & { user: User }).user
+  if (!isOwner(u)) { res.status(403).json({ error: 'study lead only' }); return }
+  res.json({ ledger: bacaLedgerValidasi() })
+})
+
+
 // Owner gate — by configured owner email OR an explicit owner role.
 function isOwner(u: User): boolean {
   return u.email.toLowerCase() === config.ownerEmail || u.role === 'owner'
@@ -1991,6 +2073,7 @@ process.on('unhandledRejection', (e) => alertOwner('Unhandled promise rejection'
 const server = createServer(app)
 attachRealtime(server)
 await initStore()
+semaiStudiValidasi()
 // Penghapusan akun Connect yang kreditnya jatuh di bawah ambang. Dijadwalkan
 // tujuh hari, bukan seketika: keputusan yang keliru masih bisa ditarik pemilik
 // lewat pulihkanKredit, dan penghapusan yang tidak bisa dibatalkan bukan hal

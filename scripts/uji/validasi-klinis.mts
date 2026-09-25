@@ -37,6 +37,11 @@ await assert.rejects(tambahCatatan(b, { jenis: 'protokol', data: { ...protokol, 
 await assert.rejects(tambahCatatan(b, { jenis: 'protokol', data: { ...protokol, id: 'real', etika: { butuhPersetujuanEtik: true, dataPasienNyata: true, catatan: '' } } }), /approval reference/)
 
 const A = penilai('A'), B = penilai('B')
+// Satu penilaian pada satu dari empat kasus BELUM dapat dievaluasi (butuh 2 penilai × semua kasus).
+{
+  const sebagian = await tambahCatatan(b, { jenis: 'penilaian', data: nilai('c1', A, true) })
+  assert.equal((await susunLaporan(sebagian, protokol.id)).status, 'in-progress', 'studi 1/4 kasus, 1 penilai dinyatakan dapat dievaluasi')
+}
 for (const [k, a, bb] of [['c1', true, true], ['c2', true, false], ['c3', false, false], ['c4', true, true]] as const) {
   b = await tambahCatatan(b, { jenis: 'penilaian', data: nilai(k, A, a, k === 'c3' ? { bahaya: 'moderate', omisi: ['missed recheck'], override: { dilakukan: true, alasan: 'wrong trend' } } : {}) })
   b = await tambahCatatan(b, { jenis: 'penilaian', data: nilai(k, B, bb, { waktuTinjauMs: 120000 }) })

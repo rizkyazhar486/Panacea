@@ -119,6 +119,8 @@ interface DB {
   applications?: Application[] // professional onboarding applications (doctor/writer/verifier)
   healthProfiles?: Record<string, Record<string, any>> // email -> health data blob (manual/wearable)
   labShares?: { id: string; pasienEmail: string; dokterEmail: string; dibuat: string; berakhir: string; dicabut?: string }[]
+  /** Buku besar studi validasi klinis — append-only, berantai SHA-256, TIDAK pernah dipangkas. */
+  validasiLedger?: import('./validasiLedger.js').CatatanLedger[]
   carePlans?: { izinId: string; pasienEmail: string; dokterEmail: string; dibuat: string; dicabut?: string; rencana: any }[]
   careReports?: { pasienEmail: string; laporan: any }[]
   labReviews?: { id: string; izinId: string; pasienEmail: string; dokterEmail: string; tes: string; ditinjau: string; catatan?: string; cekUlangSebelum?: string }[]
@@ -903,6 +905,13 @@ type TinjauanLabDb = NonNullable<typeof db.labReviews>[number]
 export function addLabReview(t: TinjauanLabDb) { const l = (db.labReviews ??= []); l.push(t); if (l.length > 20000) arsipkan('labReviews', l.splice(0, l.length - 20000)); save() }
 export function listLabReviews(pasienEmail: string): TinjauanLabDb[] { return (db.labReviews ?? []).filter((t) => t.pasienEmail === pasienEmail).slice(-200).reverse() }
 export function listCarePlans() { return db.carePlans ?? [] }
+export function bacaLedgerValidasi() { return db.validasiLedger ?? [] }
+/** Hanya menambah; catatan lama tidak pernah diubah atau dihapus. */
+export function tambahLedgerValidasi(c: import('./validasiLedger.js').CatatanLedger) {
+  const l = (db.validasiLedger ??= [])
+  if (c.urutan !== l.length || (l.length && c.sidikSebelum !== l[l.length - 1].sidik)) throw new Error('ledger append out of order')
+  l.push(c); save()
+}
 export function addCarePlan(p: NonNullable<typeof db.carePlans>[number]) {
   // Satu rencana aktif per pasien–dokter: rencana baru menggantikan yang lama.
   for (const lama of db.carePlans ?? []) if (lama.pasienEmail === p.pasienEmail && lama.dokterEmail === p.dokterEmail && !lama.dicabut) lama.dicabut = p.dibuat
