@@ -1,6 +1,7 @@
 import { Suspense, useEffect, useMemo, useState, type ComponentType } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { SectionTitle } from './ui'
+import { OneShape } from './OneShape'
 import { RangkaDaftar } from './Rangka'
 import '../styles/metal.css'
 
@@ -73,7 +74,7 @@ export function HalamanTab({
           selected
             ? theme === 'metal'
               ? 'metal-tag metal-gold border-transparent !text-[11px] normal-case tracking-normal'
-              : 'border-brand/30 bg-brand text-[#03150c] shadow-[0_6px_18px_rgba(0,191,99,.12)]'
+              : 'border-transparent text-[#03150c]' // latarnya satu bentuk hijau bersama (OneShape)
             : 'border-black/[.07] bg-neutral-100 text-neutral-600 hover:border-black/[.12] hover:bg-neutral-200 dark:border-white/[.07] dark:bg-white/[.055] dark:text-neutral-300 dark:hover:bg-white/[.09] dark:hover:text-white'
         }`}
       >
@@ -91,7 +92,8 @@ export function HalamanTab({
 
       <section aria-label={`${judul} tools`} className="min-w-0">
         <div className="flex items-center gap-2">
-          <div className="no-scrollbar flex min-w-0 flex-1 gap-1.5 overflow-x-auto pb-1" role="tablist" aria-label={`${judul} primary tools`}>
+          <div className="no-scrollbar flex min-w-0 flex-1 gap-1.5 overflow-x-auto pb-1" role="tablist" aria-label={`${judul} primary tools`} data-one-shape={theme === 'metal' ? undefined : 'aria'}>
+            {theme !== 'metal' && <OneShape tone="green" />}
             {primaryTabs.map((t) => tabButton(t))}
           </div>
 
