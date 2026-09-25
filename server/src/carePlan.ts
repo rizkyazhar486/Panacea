@@ -31,9 +31,18 @@ export interface RencanaPerawatan {
   schedule: { cadence: 'daily'; graceMinutes: number }
   questions: PertanyaanRencana[]
   patientReportedReviewRules: AturanLaporanPasien[]
-  measurementReviewRules: never[]
+  measurementReviewRules: AturanPengukuran[]
   monitoredMetrics: string[]
 }
+/** Aturan tinjauan atas NILAI LAB yang dibagikan pasien. Ditulis dokter, wajib
+ *  rujukan bukti; verifiedBy/verifiedAt selalu identitas & waktu server. */
+export interface AturanPengukuran {
+  id: string; label: string; metric: string; operator: 'gte' | 'lte'; threshold: number; unit: string
+  maxAgeMinutes: number; priority: 'review-today' | 'immediate-human-review'; rationale: string
+  evidenceRef: string; verifiedBy: string; verifiedAt: string
+}
+export const MAKS_HARI_UMUR_NILAI = 730
+
 export interface LaporanHarian {
   id: string; planId: string; planVersion: string; subjectId: string
   scheduledFor: string; authoredAt: string; answers: { questionId: string; value: boolean | number | string }[]
@@ -100,13 +109,34 @@ export function susunRencana(masukan: unknown, subjectId: string, clinicianId: s
       rationale: teks(x.rationale, 'rule rationale', 300),
     }
   })
+  const ukurMentah = Array.isArray(m.measurementReviewRules) ? m.measurementReviewRules : []
+  if (ukurMentah.length > 10) throw new Error('at most 10 lab review rules')
+  const measurementReviewRules: AturanPengukuran[] = ukurMentah.map((r, i) => {
+    const x = (r ?? {}) as Record<string, unknown>
+    const metric = String(x.metric ?? '')
+    if (!/^lab\.[a-z0-9_-]{1,32}$/.test(metric)) throw new Error('a lab review rule must name a lab test')
+    if (x.operator !== 'gte' && x.operator !== 'lte') throw new Error('lab rule operator must be ≥ or ≤')
+    const threshold = typeof x.threshold === 'number' ? x.threshold : NaN
+    if (!Number.isFinite(threshold)) throw new Error('lab rule threshold must be a number')
+    const hari = typeof x.maxAgeDays === 'number' ? x.maxAgeDays : NaN
+    if (!Number.isInteger(hari) || hari < 1 || hari > MAKS_HARI_UMUR_NILAI) throw new Error(`lab rule age must be 1–${MAKS_HARI_UMUR_NILAI} days`)
+    return {
+      id: `lab-rule-${i + 1}`, label: teks(x.label, 'lab rule label', 120), metric, operator: x.operator, threshold,
+      unit: teks(x.unit, 'lab rule unit', 20), maxAgeMinutes: hari * 1440,
+      priority: x.priority === 'immediate-human-review' ? 'immediate-human-review' : 'review-today',
+      rationale: teks(x.rationale, 'lab rule rationale', 300),
+      // Tanpa rujukan bukti aturan ditolak: ambang klinis tidak boleh tanpa sumber.
+      evidenceRef: teks(x.evidenceRef, 'evidence reference', 300),
+      verifiedBy: clinicianId, verifiedAt: kini.toISOString(),
+    }
+  })
   const hariIni = kini.toISOString()
   return {
     id: `care-${randomBytes(8).toString('hex')}`, version: '1', subjectId, clinicianId,
     questionnaireId: `panaceamed-daily-${clinicianId}`, diagnosisRefs,
     activeFrom: new Date(Date.parse(hariIni.slice(0, 10) + 'T00:00:00Z')).toISOString(),
     schedule: { cadence: 'daily', graceMinutes: 720 },
-    questions, patientReportedReviewRules, measurementReviewRules: [], monitoredMetrics: [],
+    questions, patientReportedReviewRules, measurementReviewRules, monitoredMetrics: [...new Set(measurementReviewRules.map((r) => r.metric))],
   }
 }
 

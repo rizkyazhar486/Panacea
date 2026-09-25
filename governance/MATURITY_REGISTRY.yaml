@@ -45,14 +45,15 @@ workflows:
       observability_testing: medium  # rencana-harian-kontrak (server<->kernel contract + endpoint guards, sabotaged), browser E2E
     acceptance_evidence:
       - "gate: scripts/uji/rencana-harian-kontrak.mts (3 sabotages fail by name)"
+      - "clinician-authored lab review rules (metric lab.<test>, >=/<=, threshold, max result age, evidence reference REQUIRED; verifiedBy/verifiedAt from server identity) evaluated by the kernel in the clinician browser over the shared canonical state; kernel age now from capturedAt (collection time), not receivedAt; gate aturan-lab-dokter (sabotage: receivedAt age fails); browser E2E 390x844: rule refused without evidence, then HbA1c 9.4 -> Meets your rule"
       - "browser E2E 390x844 (2026-09-25): answer offline -> queued, card says saved-not-sent; reconnect -> sent once, queue empty, no page errors; server holds 1 report with offline authoredAt. HTTP: same clientId x3 -> same report id, 1 stored"
       - "opt-in daily reminder (server/src/pengingatCek.ts): only with an active plan + valid grant and no report for the local date, user local time, once per day (server-owned guard), no PHI in text; server/uji/pengingatCek.uji.ts (sabotage: UTC date fails)"
       - "offline queue (src/lib/antreanCekHarian.ts): network failures queued on device and sent on reconnect, server rejections not queued; idempotent POST via clientId; offline authoredAt bounded to 7 days; gates antrean-cek-harian + server carePlanIdem (sabotaged)"
       - "FHIR R4 export GET /api/clinician/lab-shares/:id/care/fhir (Questionnaire + QuestionnaireResponse + Provenance, raw answers only); server/uji/carePlanFhir.uji.ts (sabotage: priorities leaked fails)"
       - "browser E2E: doctor plan -> patient 'yes' + 148 -> doctor 'Review today'"
       - "commits: dc95129a 0cb6906a"
-    known_gaps: [measurement_review_rules_with_evidence_and_verifier, reminder_live_push_verification, clinical_validation]
-    next_action: measurement_review_rules_with_evidence_reference_and_verifier  # longitudinal projection (careLongitudinalBridge) and FHIR QuestionnaireResponse export landed
+    known_gaps: [reminder_live_push_verification, vital_sign_measurement_rules_need_device_or_verified_source, clinical_validation]
+    next_action: clinician_usability_test_of_plan_authoring_and_digest  # longitudinal projection (careLongitudinalBridge) and FHIR QuestionnaireResponse export landed
     last_audited_commit: 0cb6906a
 
   - workflow_id: clinical.patient_review

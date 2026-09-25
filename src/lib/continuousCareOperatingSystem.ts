@@ -483,7 +483,9 @@ function evaluateMeasurementRule(
     return { ruleId: rule.id, label: rule.label, metric: rule.metric, state: 'not-triggered', rationale: rule.rationale }
   }
 
-  const ageMinutes = Math.max(0, Date.parse(now) - Date.parse(snapshot.latest.provenance.receivedAt)) / 60_000
+  // Umur NILAI dihitung dari saat diukur (capturedAt), bukan saat diterima sistem:
+  // hasil lab lama yang baru dibagikan/diimpor bukan data segar.
+  const ageMinutes = Math.max(0, Date.parse(now) - Date.parse(snapshot.latest.provenance.capturedAt)) / 60_000
   if (ageMinutes > rule.maxAgeMinutes) {
     return {
       ruleId: rule.id,
