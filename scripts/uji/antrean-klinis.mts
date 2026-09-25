@@ -35,7 +35,7 @@ const store = readFileSync('src/lib/store.tsx', 'utf8')
 for (const f of ['addPatientRemote', 'addVitalRemote', 'addSupportiveRemote', 'saveRecordRemote', 'saveEducationRemote']) {
   assert.doesNotMatch(store, new RegExp(`api\\.${f}\\([^)]*\\)\\.catch\\(\\(\\) => \\{\\}\\)`), `${f} kembali ditelan diam-diam`)
 }
-assert.match(store, /window\.addEventListener\('online', on\)[\s\S]{0,80}kurasSinkronKlinis|kurasSinkronKlinis\(\)\n    const on = \(\) => void kurasSinkronKlinis\(\)/, 'antrean klinis tidak dikuras saat muat/online')
+assert.match(store, /kurasSinkronKlinis\([^)]*\)\n\s*const on = \(\) => void kurasSinkronKlinis\([^)]*\)[\s\S]{0,120}window\.addEventListener\('online', on\)/, 'antrean klinis tidak dikuras saat muat/online')
 for (const hal of ['src/pages/EMR.tsx', 'src/pages/Dashboard.tsx']) assert.match(readFileSync(hal, 'utf8'), /<StatusSinkronKlinis \/>/, `${hal} tidak menampilkan status sinkron klinis`)
 const api = readFileSync('src/lib/api.ts', 'utf8')
 const emr = readFileSync('src/pages/EMR.tsx', 'utf8')
