@@ -3,6 +3,7 @@ import type { PointerEvent as ReactPointerEvent } from 'react'
 import { Card, SectionTitle } from '../components/ui'
 import { IconSearch, IconActivity } from '../components/icons'
 import { DicomCrossplanes3D } from '../components/DicomCrossplanes3D'
+import { skalaBidang, skalaIrisanTunggal, ukurDenganSkala, type SkalaBidang, type TitikBidang } from '../lib/ukurMpr'
 import {
   bacaDicom, jendelaAwal, nilaiDi, tafsirHu,
   JENDELA_CT, type Citra,
@@ -36,13 +37,19 @@ interface PlaneProps {
   showCrosshair: boolean
   primary?: boolean
   onPick: (x: number, y: number) => void
+  /** Measure mode: two taps set A and B; distance in mm from this plane's own spacing. */
+  ukur?: boolean
+  skala?: SkalaBidang
 }
 
 function PlaneViewer({
   title, subtitle, plane, pusat, lebar, terbalik,
-  crossX, crossY, showCrosshair, primary, onPick,
+  crossX, crossY, showCrosshair, primary, onPick, ukur = false, skala,
 }: PlaneProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null)
+  const [titik, setTitik] = useState<TitikBidang[]>([])
+  useEffect(() => { setTitik([]) }, [ukur, plane.bidang, plane.kolom, plane.baris])
+  const hasilUkur = titik.length === 2 && skala ? ukurDenganSkala(skala, titik[0], titik[1]) : null
 
   useEffect(() => {
     const canvas = canvasRef.current
@@ -70,6 +77,7 @@ function PlaneViewer({
     const rect = canvas.getBoundingClientRect()
     const x = Math.max(0, Math.min(plane.kolom - 1, Math.floor(((event.clientX - rect.left) / rect.width) * plane.kolom)))
     const y = Math.max(0, Math.min(plane.baris - 1, Math.floor(((event.clientY - rect.top) / rect.height) * plane.baris)))
+    if (ukur) { setTitik((t) => (t.length >= 2 ? [{ kolom: x, baris: y }] : [...t, { kolom: x, baris: y }])); return }
     onPick(x, y)
   }
 
@@ -96,11 +104,24 @@ function PlaneViewer({
               event.currentTarget.setPointerCapture(event.pointerId)
               pick(event)
             }}
-            onPointerMove={(event) => { if (event.buttons === 1) pick(event) }}
+            onPointerMove={(event) => { if (event.buttons === 1 && !ukur) pick(event) }}
             className="block h-full max-h-[560px] w-full cursor-crosshair select-none object-contain"
             style={{ imageRendering: 'pixelated', touchAction: 'none', aspectRatio: String(safeAspect) }}
             aria-label={`${title} DICOM plane`}
           />
+          {ukur && titik.length > 0 && (
+            <svg className="pointer-events-none absolute inset-0 h-full w-full" viewBox={`0 0 ${plane.kolom} ${plane.baris}`} preserveAspectRatio="none" aria-hidden="true">
+              {titik.length === 2 && <line x1={titik[0].kolom + 0.5} y1={titik[0].baris + 0.5} x2={titik[1].kolom + 0.5} y2={titik[1].baris + 0.5} stroke="#facc15" strokeWidth={Math.max(plane.kolom, plane.baris) / 220} />}
+              {titik.map((t, i) => <circle key={i} cx={t.kolom + 0.5} cy={t.baris + 0.5} r={Math.max(plane.kolom, plane.baris) / 120} fill="#facc15" />)}
+            </svg>
+          )}
+          {ukur && (
+            <div className="pointer-events-none absolute left-2 top-2 rounded-md bg-black/75 px-2 py-1 text-[11px] font-black tabular-nums text-amber-200" data-mpr-measure={hasilUkur ? (hasilUkur.ok ? 'mm' : 'blocked') : 'pending'}>
+              {!hasilUkur ? (titik.length ? 'Tap point B' : 'Tap point A')
+                : hasilUkur.ok ? `${hasilUkur.mm.toFixed(1)} mm${hasilUkur.perkiraan ? ' (approx.: spacing from slice thickness)' : ''}`
+                : hasilUkur.alasan}
+            </div>
+          )}
           {showCrosshair && crossX != null && crossY != null && (
             <div className="pointer-events-none absolute inset-0" aria-hidden="true">
               <div className="absolute bottom-0 top-0 w-px bg-cyan-300/70" style={{ left: `${crossLeft}%` }} />
@@ -225,6 +246,7 @@ export function Radiology() {
   const [cursor, setCursor] = useState({ x: 0, y: 0 })
   const [memuat, setMemuat] = useState(false)
   const [crosshair, setCrosshair] = useState(true)
+  const [ukur, setUkur] = useState(false)
   const [catatan, setCatatan] = useState('')
 
   const groups = useMemo(() => kelompokkanDicomUntukTampilan(loaded), [loaded])
@@ -401,6 +423,14 @@ export function Radiology() {
               >
                 Point guide {crosshair ? 'on' : 'off'}
               </button>
+              <button
+                type="button"
+                onClick={() => setUkur((value) => !value)}
+                aria-pressed={ukur}
+                className={`rounded-xl border px-3 py-2 text-[10px] font-black ${ukur ? 'border-amber-300/40 bg-amber-400/15 text-amber-100' : 'border-white/10 bg-white/5 text-white/60'}`}
+              >
+                Measure {ukur ? 'on' : 'off'}
+              </button>
               <a
                 href="#/body-explorer"
                 className="rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-[10px] font-black text-white/75 hover:bg-white/10"
@@ -425,6 +455,8 @@ export function Radiology() {
                   crossY={cursor.y}
                   showCrosshair={crosshair}
                   onPick={(x, y) => setCursor({ x, y })}
+                  ukur={ukur}
+                  skala={volume ? skalaBidang(volume, 'source') : skalaIrisanTunggal(kini)}
                 />
 
                 {crossRow && (
@@ -442,6 +474,8 @@ export function Radiology() {
                       setCursor((old) => ({ ...old, x }))
                       setSlice(z)
                     }}
+                    ukur={ukur}
+                    skala={volume ? skalaBidang(volume, 'cross-row') : undefined}
                   />
                 )}
 
@@ -460,6 +494,8 @@ export function Radiology() {
                       setCursor((old) => ({ ...old, y }))
                       setSlice(z)
                     }}
+                    ukur={ukur}
+                    skala={volume ? skalaBidang(volume, 'cross-column') : undefined}
                   />
                 )}
               </div>

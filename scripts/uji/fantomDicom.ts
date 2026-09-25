@@ -21,7 +21,7 @@ const teks = (s: string) => new TextEncoder().encode(s)
 const us = (n: number) => { const b = new Uint8Array(2); new DataView(b.buffer).setUint16(0, n, true); return b }
 const ul = (n: number) => { const b = new Uint8Array(4); new DataView(b.buffer).setUint32(0, n, true); return b }
 
-export interface OpsiFantom { sisi?: number; irisan?: number; jarakPikselMm?: number; tebalMm?: number }
+export interface OpsiFantom { sisi?: number; irisan?: number; jarakPikselMm?: number; tebalMm?: number; tanpaJarakPiksel?: boolean }
 
 /** Satu irisan fantom (indeks z) sebagai ArrayBuffer DICOM. */
 export function irisanFantom(z: number, o: OpsiFantom = {}): ArrayBuffer {
@@ -51,7 +51,7 @@ export function irisanFantom(z: number, o: OpsiFantom = {}): ArrayBuffer {
     unsur(0x0028, 0x0004, 'CS', teks('MONOCHROME2')),
     unsur(0x0028, 0x0010, 'US', us(n)),
     unsur(0x0028, 0x0011, 'US', us(n)),
-    unsur(0x0028, 0x0030, 'DS', teks(`${px}\\${px}`)),
+    ...(o.tanpaJarakPiksel ? [] : [unsur(0x0028, 0x0030, 'DS', teks(`${px}\\${px}`))]),
     unsur(0x0028, 0x0100, 'US', us(16)),
     unsur(0x0028, 0x0101, 'US', us(16)),
     unsur(0x0028, 0x0102, 'US', us(15)),
