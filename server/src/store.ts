@@ -1,6 +1,6 @@
 // Minimal file-backed persistence (no native deps). For production swap for a
 // real database (Postgres/SQLite). Suitable for the demo backend.
-import { readFileSync, existsSync } from 'node:fs'
+import { readFileSync, existsSync, appendFileSync, mkdirSync } from 'node:fs'
 import { isiConnect, muatConnect, pasangPenyimpan } from './connect.js'
 import { fileURLToPath } from 'node:url'
 import { dirname, join } from 'node:path'
@@ -359,6 +359,24 @@ function save() {
   }
 }
 
+// Arsip append-only untuk catatan klinis/audit yang keluar dari dokumen utama
+// karena batas ukuran. Batas itu ada untuk menjaga dokumen < 16 MB, bukan untuk
+// MENGHAPUS data: yang tergeser dipindah ke sini, tidak dibuang.
+let mongoDb: any = null
+const ARSIP_DIR = process.env.PANACEA_ARCHIVE_DIR || join(dirname(DB_PATH), 'arsip')
+export function arsipkan(nama: 'labAudit' | 'labReviews' | 'careReports', catatan: unknown[]): void {
+  if (!catatan.length) return
+  const baris = catatan.map((c) => ({ c, diarsipkan: new Date().toISOString() }))
+  if (mongoDb) {
+    mongoDb.collection(`arsip_${nama}`).insertMany(baris).catch((e: Error) => {
+      catatGagal(e); console.error(`[store] archive ${nama} failed:`, e.message)
+    })
+    return
+  }
+  try { mkdirSync(ARSIP_DIR, { recursive: true }); appendFileSync(join(ARSIP_DIR, `${nama}.jsonl`), baris.map((b) => JSON.stringify(b)).join('\n') + '\n') }
+  catch (e) { catatGagal(e); console.error(`[store] archive ${nama} failed:`, (e as Error).message) }
+}
+
 async function simpanMongo(): Promise<void> {
   const ukuran = Buffer.byteLength(JSON.stringify(db))
   if (ukuran >= BATAS_DOKUMEN_MONGO) {
@@ -401,13 +419,15 @@ export async function initStore() {
     const client = new mongo.MongoClient(uri)
     await client.connect()
     const dbName = process.env.MONGODB_DB || 'panaceamed'
-    mongoCol = client.db(dbName).collection('app')
+    mongoDb = client.db(dbName)
+    mongoCol = mongoDb.collection('app')
     const doc = await mongoCol.findOne({ _id: 'state' })
     if (doc?.data) { db = doc.data as DB; muatConnect(db.connect) }
     else await mongoCol.updateOne({ _id: 'state' }, { $set: { data: db, at: new Date() } }, { upsert: true })
     console.log('[store] MongoDB connected — permanent mode')
   } catch (e) {
     mongoCol = null
+    mongoDb = null
     loadFile()
     console.error('[store] MongoDB failed, using file mode:', (e as Error).message)
   }
@@ -878,9 +898,9 @@ export function revokeLabShare(id: string, pasienEmail: string, waktu: string): 
   return i
 }
 // Jejak audit hanya bertambah; dibatasi 5.000 butir terbaru agar tidak tumbuh tanpa batas.
-export function addLabAudit(a: AuditLabDb) { const l = (db.labAudit ??= []); l.push(a); if (l.length > 5000) l.splice(0, l.length - 5000); save() }
+export function addLabAudit(a: AuditLabDb) { const l = (db.labAudit ??= []); l.push(a); if (l.length > 5000) arsipkan('labAudit', l.splice(0, l.length - 5000)); save() }
 type TinjauanLabDb = NonNullable<typeof db.labReviews>[number]
-export function addLabReview(t: TinjauanLabDb) { const l = (db.labReviews ??= []); l.push(t); if (l.length > 20000) l.splice(0, l.length - 20000); save() }
+export function addLabReview(t: TinjauanLabDb) { const l = (db.labReviews ??= []); l.push(t); if (l.length > 20000) arsipkan('labReviews', l.splice(0, l.length - 20000)); save() }
 export function listLabReviews(pasienEmail: string): TinjauanLabDb[] { return (db.labReviews ?? []).filter((t) => t.pasienEmail === pasienEmail).slice(-200).reverse() }
 export function listCarePlans() { return db.carePlans ?? [] }
 export function addCarePlan(p: NonNullable<typeof db.carePlans>[number]) {
@@ -888,7 +908,7 @@ export function addCarePlan(p: NonNullable<typeof db.carePlans>[number]) {
   for (const lama of db.carePlans ?? []) if (lama.pasienEmail === p.pasienEmail && lama.dokterEmail === p.dokterEmail && !lama.dicabut) lama.dicabut = p.dibuat
   ;(db.carePlans ??= []).push(p); save()
 }
-export function addCareReport(pasienEmail: string, laporan: any) { const l = (db.careReports ??= []); l.push({ pasienEmail, laporan }); if (l.length > 50000) l.splice(0, l.length - 50000); save() }
+export function addCareReport(pasienEmail: string, laporan: any) { const l = (db.careReports ??= []); l.push({ pasienEmail, laporan }); if (l.length > 50000) arsipkan('careReports', l.splice(0, l.length - 50000)); save() }
 export function listCareReports(pasienEmail: string, planId: string) { return (db.careReports ?? []).filter((r) => r.pasienEmail === pasienEmail && r.laporan.planId === planId).map((r) => r.laporan).slice(-60) }
 export function listLabAudit(pasienEmail: string): AuditLabDb[] { return (db.labAudit ?? []).filter((a) => a.pasienEmail === pasienEmail).slice(-100).reverse() }
 
