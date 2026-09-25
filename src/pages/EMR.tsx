@@ -21,6 +21,7 @@ import { api, backendEnabled } from '../lib/api'
 import { searchICD, matchICD, icd11, type ICDCode } from '../lib/icd'
 import { evaluateVitals, overallStatus, STATUS_COLOR, STATUS_LABEL } from '../lib/chronic'
 import { projectEmrToBodyClinicalBridge } from '../lib/bodyClinicalBridge'
+import { deriveEmrFieldStates, type ServerAcceptedEmrForSemantics } from '../lib/emrSemanticState'
 import type { Anamnesis, EMRRecord, PhysicalExam, VitalSign } from '../lib/types'
 
 // Send the current EMR to SATUSEHAT as a FHIR R4 Bundle (dokter/owner only).
@@ -210,6 +211,7 @@ export function EMR() {
     systemFindings,
     draft.updatedAt,
   )
+  const semanticStates = Object.values(deriveEmrFieldStates(draft as ServerAcceptedEmrForSemantics))
 
   function patch(fn: (r: EMRRecord) => EMRRecord) {
     setDraft((d) => (d ? fn(d) : d))
@@ -317,6 +319,30 @@ export function EMR() {
             ))}
           </div>
         )}
+      </Card>
+
+      <Card>
+        <SectionTitle
+          title="Clinical semantic state"
+          subtitle="Field origin is kept separate from clinician review. Server-stamped identity is required before anything is shown as reviewed."
+          right={<Badge tone={semanticStates.every((item) => item.review === 'unreviewed') ? 'high' : 'brand'}>
+            {semanticStates.filter((item) => item.review !== 'unreviewed').length}/{semanticStates.length} reviewed
+          </Badge>}
+        />
+        <div className="grid gap-2 md:grid-cols-2">
+          {semanticStates.map((item) => (
+            <div key={item.field} className="rounded-xl border border-neutral-100 px-3 py-2">
+              <div className="flex flex-wrap items-center gap-2">
+                <span className="font-mono text-[11px] font-semibold text-neutral-700">{item.field}</span>
+                <Badge tone={item.origin === 'ai-generated' ? 'high' : 'neutral'}>{item.origin}</Badge>
+                <Badge tone={item.review === 'clinician-verified' ? 'brand' : item.review === 'clinician-rejected' ? 'critical' : item.review === 'clinician-reviewed' ? 'brand' : 'high'}>
+                  {item.review}
+                </Badge>
+              </div>
+              <p className="mt-1 text-[11px] leading-relaxed text-neutral-500">{item.reason}</p>
+            </div>
+          ))}
+        </div>
       </Card>
 
       <VisitCommandCenter recordId={draft.id} embedded />
