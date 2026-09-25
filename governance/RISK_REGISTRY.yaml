@@ -111,6 +111,7 @@ risks:
     mitigation: >-
       server/src/rekamKlinis.ts now preserves an existing clinician signature only when the clinical payload is
       unchanged; patient-authored surgery consent may change without rewriting clinician-authored content.
-      Any other patient clinical edit removes the signature and keeps the previous signed version in history.
+      Any other patient clinical edit removes the signature and keeps the previous signed version in history; changes
+      to physical-exam findings also clear doctorVerified/verifiedBy/verifiedById unless the findings themselves are unchanged.
       Canonical longitudinal projection additionally requires the server-stamped signedById and ignores unsigned drafts.
     evidence: [server/src/rekamKlinis.ts, server/uji/rekamKlinis.uji.ts, src/lib/emrLongitudinalBridge.ts, scripts/uji/emr-status-longitudinal.mts]
