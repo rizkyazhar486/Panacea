@@ -141,7 +141,7 @@ features:
     observability: [clinical.read_audit, emr.save_audit, emr.signed_version_archived_audit]
     known_gaps: [one_record_per_patient_not_per_encounter, practice_patient_vs_account_identity_split, per_field_ai_draft_vs_clinician_state, clinician_usability_test, clinical_validation]
     next_actions: [encounter_model, per_field_semantic_state, clinician_usability_test]
-    last_audited_commit: 2026-09-26-emr-longitudinal-bridge
+    last_audited_commit: eb47c7c3
 
   - feature_id: health.longitudinal_longevity
     name: Longitudinal Health and Longevity
