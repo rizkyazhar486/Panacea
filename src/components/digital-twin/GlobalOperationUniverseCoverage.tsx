@@ -59,7 +59,7 @@ export function GlobalOperationUniverseCoverage() {
           </div>
           <label className="min-w-0 sm:w-[360px]">
             <span className="sr-only">Choose generic operation</span>
-            <select value={genericId} onChange={(event) => setGenericId(event.target.value)} className="h-11 w-full rounded-2xl border border-white/10 bg-[#07111a] px-3 text-xs font-bold text-white outline-none">
+            <select value={genericId} onChange={(event) => setGenericId(event.target.value)} className="dark h-11 w-full rounded-2xl border border-white/10 bg-[#07111a] px-3 text-xs font-bold text-white outline-none">
               {GLOBAL_GENERIC_OPERATION_PROCEDURES.map((item) => (
                 <option key={item.id} value={item.id}>{item.name} · {item.domain}</option>
               ))}
