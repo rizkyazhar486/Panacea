@@ -6,7 +6,7 @@ import { JENDELA_HARI, perubahanTeratas, labelMetrik, asal, angka, timelineHaria
 // besarnya perubahan relatif dalam 180 hari. Ini deskripsi perubahan, bukan
 // penilaian klinis: tidak ada label normal/abnormal di sini.
 export function ApaYangBerubah() {
-  const { state } = useLongitudinalState()
+  const { state, labels } = useLongitudinalState()
   if (!state) return null
   const daftar = perubahanTeratas(state, new Date())
   return (
@@ -19,7 +19,7 @@ export function ApaYangBerubah() {
           {daftar.map(({ m, t, s }) => (
             <li key={m} className="flex min-h-[44px] items-center justify-between gap-3 py-1.5" data-metric={m}>
               <div className="min-w-0">
-                <p className="t-kecil truncate font-bold text-ink dark:text-white">{labelMetrik(m)}</p>
+                <p className="t-kecil truncate font-bold text-ink dark:text-white">{labelMetrik(m, labels)}</p>
                 <p className="t-mikro text-neutral-500">{t.sampleCount} records since {t.firstRecordedAt.slice(0, 10)} · {asal(s.latest.provenance.method, s.latest.provenance.sourceKind)}</p>
               </div>
               <div className="shrink-0 text-right">
@@ -31,7 +31,7 @@ export function ApaYangBerubah() {
         </ul>
       )}
       {(() => {
-        const hari = timelineHarian(state)
+        const hari = timelineHarian(state, 30, labels)
         if (!hari.length) return null
         return (
           <details className="mt-2 border-t border-neutral-100 pt-2 dark:border-white/10" data-personal-timeline>

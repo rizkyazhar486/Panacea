@@ -3,6 +3,9 @@ import { useStore } from './store'
 import { getVitals } from './healthVitals'
 import { ambilLab } from './lab'
 import { labLogToLongitudinalEvents } from './labLongitudinalBridge'
+import { careToLongitudinalEvents, type TinjauanMasuk } from './careLongitudinalBridge'
+import { api, backendEnabled } from './api'
+import type { ContinuousCarePlan, DailyAnamnesisSubmissionInput } from './continuousCareOperatingSystem'
 import { syncProductionAppState } from './productionAppStateLongitudinalSync'
 import { createLongitudinalPatientState, ingestLongitudinalEvent, type ConsentEnvelope, type LongitudinalPatientState } from './panaceaLongitudinalState'
 
@@ -15,9 +18,18 @@ import { createLongitudinalPatientState, ingestLongitudinalEvent, type ConsentEn
 // Kepercayaan ingest = 1 berarti "diterima sebagaimana dicatat", bukan akurasi alat.
 const KEPERCAYAAN_CATATAN = 1
 
-export function useLongitudinalState(): { state: LongitudinalPatientState | null; skipped: number } {
+export function useLongitudinalState(): { state: LongitudinalPatientState | null; skipped: number; labels: Record<string, string> } {
   const { state: app, account } = useStore()
   const [versiLab, setVersiLab] = useState(0)
+  // Data server (hanya bila ada backend + sesi): cek harian dan tinjauan dokter.
+  const [server, setServer] = useState<{ plans: { plan: ContinuousCarePlan; reports: DailyAnamnesisSubmissionInput[] }[]; reviews: TinjauanMasuk[] }>({ plans: [], reviews: [] })
+  useEffect(() => {
+    if (!backendEnabled || !account) return
+    let aktif = true
+    Promise.all([api.carePlans().catch(() => ({ plans: [] })), api.getLabShares().catch(() => ({ reviews: [] as TinjauanMasuk[] }))])
+      .then(([c, l]) => { if (aktif) setServer({ plans: c.plans, reviews: (l as { reviews?: TinjauanMasuk[] }).reviews ?? [] }) })
+    return () => { aktif = false }
+  }, [account, versiLab])
   useEffect(() => {
     const ubah = () => setVersiLab((v) => v + 1)
     window.addEventListener('panacea:lab', ubah)
@@ -26,7 +38,7 @@ export function useLongitudinalState(): { state: LongitudinalPatientState | null
 
   return useMemo(() => {
     const subjectId = account?.patientId
-    if (!account || !subjectId) return { state: null, skipped: 0 }
+    if (!account || !subjectId) return { state: null, skipped: 0, labels: {} }
     const kini = new Date().toISOString()
     const consent: ConsentEnvelope = { granted: true, purposes: ['personal-visualization'], grantedAt: new Date(0).toISOString() }
     let state = createLongitudinalPatientState(subjectId, kini)
@@ -46,7 +58,12 @@ export function useLongitudinalState(): { state: LongitudinalPatientState | null
     for (const ev of lab.events) {
       try { state = ingestLongitudinalEvent(state, ev).state } catch { skipped++ }
     }
-    return { state, skipped }
+    const care = careToLongitudinalEvents(server.plans, server.reviews, subjectId, consent, kini)
+    skipped += care.skipped
+    for (const ev of care.events) {
+      try { state = ingestLongitudinalEvent(state, ev).state } catch { skipped++ }
+    }
+    return { state, skipped, labels: care.labels }
     // versiLab memicu hitung ulang saat log lab berubah.
-  }, [app, account, versiLab])
+  }, [app, account, versiLab, server])
 }

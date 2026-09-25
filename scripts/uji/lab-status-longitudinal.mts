@@ -42,7 +42,7 @@ assert.equal(top.length, 2)
   assert.equal(tl[0].butir.length, 2)
   assert.ok(tl[0].butir.every((b) => b.asal === 'from your lab report'), 'asal data hilang dari timeline')
   assert.equal(timelineHarian(s, 1).length, 1, 'batas jumlah hari timeline diabaikan')
-  assert.match(readFileSync('src/components/ApaYangBerubah.tsx', 'utf8'), /timelineHarian\(state\)/, 'timeline tidak lagi dibaca dari status kanonik')
+  assert.match(readFileSync('src/components/ApaYangBerubah.tsx', 'utf8'), /timelineHarian\(state, 30, labels\)/, 'timeline tidak lagi dibaca dari status kanonik')
 }
 
 const ui = readFileSync('src/lib/useLongitudinalState.ts', 'utf8')

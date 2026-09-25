@@ -8,12 +8,14 @@ const LABEL: Record<string, string> = {
   weightKg: 'Weight', spo2: 'SpO₂', temperatureC: 'Temperature', respiratoryRate: 'Respiratory rate', vo2max: 'VO₂max',
   glucose: 'Glucose', hrvMs: 'HRV', sleepH: 'Sleep',
 }
-export const labelMetrik = (m: string) => {
+export const labelMetrik = (m: string, labels: Record<string, string> = {}) => {
+  if (labels[m]) return labels[m]
+  if (m.startsWith('review.lab.')) return `Doctor review · ${JENIS_LAB.find((j) => j.id === m.slice(11))?.nama ?? m.slice(11)}`
   if (m.startsWith('lab.')) return JENIS_LAB.find((j) => j.id === m.slice(4))?.nama ?? m.slice(4)
   const kunci = m.split('.').pop() ?? m
   return LABEL[kunci] ?? kunci.replace(/([A-Z])/g, ' $1').replace(/^./, (c) => c.toUpperCase())
 }
-export const asal = (method?: string, kind?: string) => method === 'patient-transcribed-lab-report' ? 'from your lab report' : kind === 'wearable' || kind === 'device' ? 'from a device' : kind === 'clinical-system' ? 'clinical record' : 'self-recorded'
+export const asal = (method?: string, kind?: string) => method === 'clinician-review' ? 'by your doctor' : method?.startsWith('daily-questionnaire:') ? 'daily check-in' : method === 'patient-transcribed-lab-report' ? 'from your lab report' : kind === 'wearable' || kind === 'device' ? 'from a device' : kind === 'clinical-system' ? 'clinical record' : 'self-recorded'
 export const angka = (x: number) => Number(x.toFixed(Math.abs(x) < 10 ? 2 : 1)).toString()
 
 export function perubahanTeratas(state: LongitudinalPatientState, kini: Date, batas = 5) {
@@ -33,13 +35,13 @@ export interface HariTimeline {
 }
 
 /** Event dikelompokkan per tanggal (UTC, sesuai recordedAt), terbaru di atas. */
-export function timelineHarian(state: LongitudinalPatientState, batasHari = 30): HariTimeline[] {
+export function timelineHarian(state: LongitudinalPatientState, batasHari = 30, labels: Record<string, string> = {}): HariTimeline[] {
   const perHari = new Map<string, HariTimeline['butir']>()
   for (const e of Object.values(state.eventsById)) {
-    if (typeof e.value !== 'number' && typeof e.value !== 'string') continue
+    if (typeof e.value !== 'number' && typeof e.value !== 'string' && typeof e.value !== 'boolean') continue
     const t = e.recordedAt.slice(0, 10)
     const d = perHari.get(t) ?? []
-    d.push({ id: e.id, metric: e.metric, label: labelMetrik(e.metric), value: e.value, unit: e.unit, asal: asal(e.provenance.method, e.provenance.sourceKind) })
+    d.push({ id: e.id, metric: e.metric, label: labelMetrik(e.metric, labels), value: typeof e.value === 'boolean' ? (e.value ? 'Yes' : 'No') : e.value, unit: e.unit, asal: asal(e.provenance.method, e.provenance.sourceKind) })
     perHari.set(t, d)
   }
   return [...perHari.entries()]
